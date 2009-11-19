@@ -98,6 +98,8 @@ private:
 			status_t			_RestoreCurrentPlaylist(
 									BMessage* message) const;
 
+			void				_InstallPlaylistMimeType();
+
 private:
 			int32				fPlayerCount;
 			SettingsWindow*		fSettingsWindow;

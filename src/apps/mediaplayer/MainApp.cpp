@@ -28,7 +28,9 @@
 #include <FilePanel.h>
 #include <MediaDefs.h>
 #include <MediaRoster.h>
+#include <MimeType.h>
 #include <Path.h>
+#include <Resources.h>
 #include <Roster.h>
 
 #include <stdio.h>
@@ -36,6 +38,7 @@
 #include <unistd.h>
 
 #include "EventQueue.h"
+#include "Playlist.h"
 #include "Settings.h"
 #include "SettingsWindow.h"
 
@@ -161,6 +164,8 @@ MainApp::ReadyToRun()
 	fSettingsWindow = new SettingsWindow(BRect(150, 150, 450, 520));
 	fSettingsWindow->Hide();
 	fSettingsWindow->Show();
+
+	_InstallPlaylistMimeType();
 }
 
 
@@ -547,6 +552,90 @@ MainApp::_RestoreCurrentPlaylist(BMessage* message) const
 		return B_ERROR;
 
 	return message->Unflatten(&file);
+}
+
+void
+MainApp::_InstallPlaylistMimeType()
+{
+	// install mime type of documents
+	BMimeType mime(kBinaryPlaylistMimeString);
+	status_t ret = mime.InitCheck();
+	if (ret != B_OK) {
+		fprintf(stderr, "Could not init native document mime type (%s): %s.\n",
+			kBinaryPlaylistMimeString, strerror(ret));
+		return;
+	}
+
+	if (mime.IsInstalled() && !(modifiers() & B_SHIFT_KEY)) {
+		// mime is already installed, and the user is not
+		// pressing the shift key to force a re-install
+		return;
+	}
+
+	ret = mime.Install();
+	if (ret != B_OK && ret != B_FILE_EXISTS) {
+		fprintf(stderr, "Could not install native document mime type (%s): %s.\n",
+			kBinaryPlaylistMimeString, strerror(ret));
+		return;
+	}
+	// set preferred app
+	ret = mime.SetPreferredApp(kAppSig);
+	if (ret != B_OK) {
+		fprintf(stderr, "Could not set native document preferred app: %s\n",
+			strerror(ret));
+	}
+
+	// set descriptions
+	ret = mime.SetShortDescription("MediaPlayer Playlist");
+	if (ret != B_OK) {
+		fprintf(stderr, "Could not set short description of mime type: %s\n",
+			strerror(ret));
+	}
+	ret = mime.SetLongDescription("MediaPlayer binary playlist file");
+	if (ret != B_OK) {
+		fprintf(stderr, "Could not set long description of mime type: %s\n",
+			strerror(ret));
+	}
+
+	// set extensions
+	BMessage message('extn');
+	message.AddString("extensions", "playlist");
+	ret = mime.SetFileExtensions(&message);
+	if (ret != B_OK) {
+		fprintf(stderr, "Could not set extensions of mime type: %s\n",
+			strerror(ret));
+	}
+
+	// set sniffer rule
+	char snifferRule[32];
+	uint32 bigEndianMagic = B_HOST_TO_BENDIAN_INT32(kPlaylistMagicBytes);
+	sprintf(snifferRule, "0.9 ('%4s')", (const char*)&bigEndianMagic);
+	ret = mime.SetSnifferRule(snifferRule);
+	if (ret != B_OK) {
+		BString parseError;
+		BMimeType::CheckSnifferRule(snifferRule, &parseError);
+		fprintf(stderr, "Could not set sniffer rule of mime type: %s\n",
+			parseError.String());
+	}
+
+	// set playlist icon
+	BResources* resources = AppResources();
+		// does not need to be freed (belongs to BApplication base)
+	if (resources != NULL) {
+		size_t size;
+		const void* iconData = resources->LoadResource('VICN', "PlaylistIcon",
+			&size);
+		if (iconData != NULL && size > 0) {
+			if (mime.SetIcon(reinterpret_cast<const uint8*>(iconData), size)
+				!= B_OK) {
+				fprintf(stderr, "Could not set vector icon of mime type.\n");
+			}
+		} else {
+			fprintf(stderr, "Could not find icon in app resources "
+				"(data: %p, size: %ld).\n", iconData, size);
+		}
+	} else
+		fprintf(stderr, "Could not find app resources.\n");
 }
 
 

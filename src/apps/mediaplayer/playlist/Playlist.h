@@ -33,6 +33,11 @@ class BString;
 struct entry_ref;
 
 
+extern const uint32 kPlaylistMagicBytes;
+extern const char* kTextPlaylistMimeString;
+extern const char* kBinaryPlaylistMimeString;
+
+
 class Playlist : public BLocker {
 public:
 	class Listener {

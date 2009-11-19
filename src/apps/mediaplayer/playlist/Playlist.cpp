@@ -166,10 +166,9 @@ Playlist::Archive(BMessage* into) const
 }
 
 
-static const uint32 kPlaylistMagicBytes = 'MPPL';
-static const char* kTextPlaylistMimeString = "text/x-playlist";
-static const char* kBinaryPlaylistMimeString
-	= "application/x-vnd.haiku-playlist";
+const uint32 kPlaylistMagicBytes = 'MPPL';
+const char* kTextPlaylistMimeString = "text/x-playlist";
+const char* kBinaryPlaylistMimeString = "application/x-vnd.haiku-playlist";
 
 status_t
 Playlist::Unflatten(BDataIO* stream)
