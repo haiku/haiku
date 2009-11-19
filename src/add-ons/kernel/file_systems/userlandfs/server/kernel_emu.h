@@ -50,6 +50,10 @@ status_t file_cache_write(dev_t mountID, ino_t vnodeID, void *cookie,
 
 status_t do_iterative_fd_io(dev_t volumeID, int fd, int32 requestID,
 	void* cookie, const file_io_vec* vecs, uint32 vecCount);
+status_t read_from_io_request(dev_t volumeID, int32 requestID, void* buffer,
+	size_t size);
+status_t write_to_io_request(dev_t volumeID, int32 requestID, const void* buffer,
+	size_t size);
 status_t notify_io_request(dev_t volumeID, int32 requestID, status_t status);
 
 void kernel_debugger(const char *message);

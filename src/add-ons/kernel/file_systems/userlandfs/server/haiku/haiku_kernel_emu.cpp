@@ -319,10 +319,46 @@ io_request_is_write(const io_request* request)
 }
 
 
+off_t
+io_request_offset(const io_request* request)
+{
+	return ((HaikuKernelIORequest*)request)->offset;
+}
+
+
+off_t
+io_request_length(const io_request* request)
+{
+	return ((HaikuKernelIORequest*)request)->length;
+}
+
+
+status_t
+read_from_io_request(io_request* _request, void* buffer, size_t size)
+{
+	HaikuKernelIORequest* request = (HaikuKernelIORequest*)_request;
+
+	// send the request
+	return UserlandFS::KernelEmu::read_from_io_request(request->volume->GetID(),
+		request->id, buffer, size);
+}
+
+
+status_t
+write_to_io_request(io_request* _request, const void* buffer, size_t size)
+{
+	HaikuKernelIORequest* request = (HaikuKernelIORequest*)_request;
+
+	// send the request
+	return UserlandFS::KernelEmu::write_to_io_request(request->volume->GetID(),
+		request->id, buffer, size);
+}
+
+
 void
 notify_io_request(io_request* _request, status_t status)
 {
-	HaikuKernelIORequest* request = (HaikuKernelIORequest*)request;
+	HaikuKernelIORequest* request = (HaikuKernelIORequest*)_request;
 
 	// send the request
 	UserlandFS::KernelEmu::notify_io_request(request->volume->GetID(),

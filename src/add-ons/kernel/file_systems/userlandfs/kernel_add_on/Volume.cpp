@@ -690,6 +690,32 @@ Volume::WriteFileCache(ino_t vnodeID, void* cookie,
 }
 
 
+status_t
+Volume::ReadFromIORequest(int32 requestID, void* buffer, size_t size)
+{
+	// get the request
+	io_request* request;
+	status_t error = _FindIORequest(requestID, &request);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	return read_from_io_request(request, buffer, size);
+}
+
+
+status_t
+Volume::WriteToIORequest(int32 requestID, const void* buffer, size_t size)
+{
+	// get the request
+	io_request* request;
+	status_t error = _FindIORequest(requestID, &request);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	return write_to_io_request(request, buffer, size);
+}
+
+
 // DoIterativeFDIO
 status_t
 Volume::DoIterativeFDIO(int fd, int32 requestID, void* clientCookie,
@@ -838,6 +864,8 @@ Volume::Unmount()
 			while (info != NULL) {
 				IORequestInfo* nextInfo = info->structLink;
 				delete info;
+				// TODO: We should probably also notify the request, if that
+				// hasn't happened yet.
 				info = nextInfo;
 			}
 			delete fIORequestInfosByStruct;
@@ -1199,6 +1227,7 @@ Volume::DoIO(void* _node, void* cookie, io_request* ioRequest)
 	request->request = requestID;
 	request->offset = ioRequest->Offset();
 	request->length = ioRequest->Length();
+	request->isWrite = ioRequest->IsWrite();
 
 	// send the request
 	KernelRequestHandler handler(this, DO_IO_REPLY);

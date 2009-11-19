@@ -891,6 +891,90 @@ UserlandFS::KernelEmu::do_iterative_fd_io(dev_t volumeID, int fd,
 
 
 status_t
+UserlandFS::KernelEmu::read_from_io_request(dev_t volumeID, int32 requestID,
+	void* buffer, size_t size)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	ReadFromIORequestRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = volumeID;
+	request->request = requestID;
+	request->size = size;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, READ_FROM_IO_REQUEST_REPLY);
+	ReadFromIORequestReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	if (reply->error != B_OK)
+		return reply->error;
+
+	memcpy(buffer, reply->buffer.GetData(), reply->buffer.GetSize());
+
+	// send receipt-ack
+	RequestAllocator receiptAckAllocator(port->GetPort());
+	ReceiptAckReply* receiptAck;
+	if (AllocateRequest(receiptAckAllocator, &receiptAck) == B_OK)
+		port->SendRequest(&receiptAckAllocator);
+
+	return B_OK;
+}
+
+
+status_t
+UserlandFS::KernelEmu::write_to_io_request(dev_t volumeID, int32 requestID,
+	const void* buffer, size_t size)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	WriteToIORequestRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = volumeID;
+	request->request = requestID;
+
+	error = allocator.AllocateData(request->buffer, buffer, size, 1, false);
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, WRITE_TO_IO_REQUEST_REPLY);
+	FileCacheWriteReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	return reply->error;
+}
+
+
+status_t
 UserlandFS::KernelEmu::notify_io_request(dev_t volumeID, int32 requestID,
 	status_t status)
 {

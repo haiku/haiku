@@ -106,6 +106,10 @@ KernelRequestHandler::HandleRequest(Request* request)
 		// I/O
 		case DO_ITERATIVE_FD_IO_REQUEST:
 			return _HandleRequest((DoIterativeFDIORequest*)request);
+		case READ_FROM_IO_REQUEST_REQUEST:
+			return _HandleRequest((ReadFromIORequestRequest*)request);
+		case WRITE_TO_IO_REQUEST_REQUEST:
+			return _HandleRequest((WriteToIORequestRequest*)request);
 		case NOTIFY_IO_REQUEST_REQUEST:
 			return _HandleRequest((NotifyIORequestRequest*)request);
 	}
@@ -737,6 +741,72 @@ KernelRequestHandler::_HandleRequest(DoIterativeFDIORequest* request)
 	// prepare the reply
 	RequestAllocator allocator(fPort->GetPort());
 	DoIterativeFDIOReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+	reply->error = result;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+
+status_t
+KernelRequestHandler::_HandleRequest(ReadFromIORequestRequest* request)
+{
+	// check the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	size_t size = request->size;
+
+	// allocate the reply
+	RequestAllocator allocator(fPort->GetPort());
+	ReadFromIORequestReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	void* buffer;
+	if (result == B_OK) {
+		result = allocator.AllocateAddress(reply->buffer, size, 1, &buffer,
+			true);
+	}
+
+	// execute the request
+	if (result == B_OK)
+		result = volume->ReadFromIORequest(request->request, buffer, size);
+
+	// prepare the reply
+	reply->error = result;
+
+	// send the reply
+	if (reply->error == B_OK && size > 0) {
+		SingleReplyRequestHandler handler(RECEIPT_ACK_REPLY);
+		return fPort->SendRequest(&allocator, &handler);
+	}
+
+	return fPort->SendRequest(&allocator);
+}
+
+
+status_t
+KernelRequestHandler::_HandleRequest(WriteToIORequestRequest* request)
+{
+	// check and execute the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	if (result == B_OK) {
+		result = volume->WriteToIORequest(request->request,
+			request->buffer.GetData(), request->buffer.GetSize());
+	}
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	WriteToIORequestReply* reply;
 	status_t error = AllocateRequest(allocator, &reply);
 	if (error != B_OK)
 		return error;

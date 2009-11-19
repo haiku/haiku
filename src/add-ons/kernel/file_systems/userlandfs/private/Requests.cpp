@@ -313,6 +313,22 @@ FileCacheWriteRequest::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
+// ReadFromIORequestReply
+status_t
+ReadFromIORequestReply::GetAddressInfos(AddressInfo* infos, int32* count)
+{
+	ADD_ADDRESS(buffer);
+	return B_OK;
+}
+
+// WriteToIORequestRequest
+status_t
+WriteToIORequestRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+{
+	ADD_ADDRESS(buffer);
+	return B_OK;
+}
+
 
 // #pragma mark -
 
@@ -720,10 +736,14 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 			return true;
 		// I/O
 		case DO_ITERATIVE_FD_IO_REQUEST:
+		case READ_FROM_IO_REQUEST_REQUEST:
+		case WRITE_TO_IO_REQUEST_REQUEST:
 		case NOTIFY_IO_REQUEST_REQUEST:
 			return false;
 		case DO_ITERATIVE_FD_IO_REPLY:
 		case NOTIFY_IO_REQUEST_REPLY:
+		case READ_FROM_IO_REQUEST_REPLY:
+		case WRITE_TO_IO_REQUEST_REPLY:
 			return true;
 
 		// general reply
@@ -964,9 +984,13 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		// I/O
 		case DO_ITERATIVE_FD_IO_REQUEST:
 		case NOTIFY_IO_REQUEST_REQUEST:
+		case READ_FROM_IO_REQUEST_REQUEST:
+		case WRITE_TO_IO_REQUEST_REQUEST:
 			return true;
 		case DO_ITERATIVE_FD_IO_REPLY:
 		case NOTIFY_IO_REQUEST_REPLY:
+		case READ_FROM_IO_REQUEST_REPLY:
+		case WRITE_TO_IO_REQUEST_REPLY:
 			return false;
 
 		// general reply
