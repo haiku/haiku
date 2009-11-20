@@ -196,10 +196,12 @@ NaturalCompare(const char *s1, const char *s2)
 {
 	struct Chunk {
 		int32	type;
-		char*	ascii;
-			// Type = 0
-		int32	num;
-			// Type = 1
+		union {
+			char*	ascii;
+				// Type = 0
+			int32	num;
+				// Type = 1
+		};
 	};
 
 	Chunk a;
