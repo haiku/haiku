@@ -500,7 +500,7 @@ NodeMonitorService::_SendNotificationMessage(KMessage &message,
 		do {
 			monitor_listener *listener = iterator.Current();
 			if (listener->flags & list->flags)
-				listener->listener->EventOccured(*this, &message);
+				listener->listener->EventOccurred(*this, &message);
 		} while (iterator.Next() != NULL);
 	}
 

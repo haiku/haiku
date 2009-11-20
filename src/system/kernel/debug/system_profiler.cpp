@@ -62,7 +62,7 @@ public:
 									uint64* _droppedEvents);
 
 private:
-    virtual	void				EventOccured(NotificationService& service,
+    virtual	void				EventOccurred(NotificationService& service,
 									const KMessage* event);
 
 	virtual	void				ThreadEnqueuedInRunQueue(struct thread* thread);
@@ -528,7 +528,7 @@ SystemProfiler::NextBuffer(size_t bytesRead, uint64* _droppedEvents)
 
 
 void
-SystemProfiler::EventOccured(NotificationService& service,
+SystemProfiler::EventOccurred(NotificationService& service,
 	const KMessage* event)
 {
 	int32 eventCode;

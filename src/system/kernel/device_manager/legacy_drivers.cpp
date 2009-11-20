@@ -173,7 +173,7 @@ public:
 						DirectoryWatcher();
 	virtual				~DirectoryWatcher();
 
-	virtual void		EventOccured(NotificationService& service,
+	virtual void		EventOccurred(NotificationService& service,
 							const KMessage* event);
 };
 
@@ -182,7 +182,7 @@ public:
 						DriverWatcher();
 	virtual				~DriverWatcher();
 
-	virtual void		EventOccured(NotificationService& service,
+	virtual void		EventOccurred(NotificationService& service,
 							const KMessage* event);
 };
 
@@ -716,7 +716,7 @@ DriverWatcher::~DriverWatcher()
 
 
 void
-DriverWatcher::EventOccured(NotificationService& service,
+DriverWatcher::EventOccurred(NotificationService& service,
 	const KMessage* event)
 {
 	int32 opcode = event->GetInt32("opcode", -1);
@@ -950,7 +950,7 @@ DirectoryWatcher::~DirectoryWatcher()
 
 
 void
-DirectoryWatcher::EventOccured(NotificationService& service,
+DirectoryWatcher::EventOccurred(NotificationService& service,
 	const KMessage* event)
 {
 	int32 opcode = event->GetInt32("opcode", -1);

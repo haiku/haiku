@@ -28,7 +28,7 @@ NotificationListener::~NotificationListener()
 
 
 void
-NotificationListener::EventOccured(NotificationService& service,
+NotificationListener::EventOccurred(NotificationService& service,
 	const KMessage* event)
 {
 }
@@ -106,7 +106,7 @@ UserMessagingListener::~UserMessagingListener()
 
 
 void
-UserMessagingListener::EventOccured(NotificationService& service,
+UserMessagingListener::EventOccurred(NotificationService& service,
 	const KMessage* event)
 {
 	fSender.SendMessage(event, fPort, fToken);
@@ -176,7 +176,7 @@ DefaultNotificationService::Notify(const KMessage& event, uint32 eventMask)
 	DefaultListenerList::Iterator iterator = fListeners.GetIterator();
 	while (default_listener* listener = iterator.Next()) {
 		if ((eventMask & listener->eventMask) != 0)
-			listener->listener->EventOccured(*this, &event);
+			listener->listener->EventOccurred(*this, &event);
 	}
 
 	// notify all listeners that all listeners have been notified
@@ -395,7 +395,7 @@ DefaultUserNotificationService::UpdateUserListener(uint32 eventMask,
 
 
 void
-DefaultUserNotificationService::EventOccured(NotificationService& service,
+DefaultUserNotificationService::EventOccurred(NotificationService& service,
 	const KMessage* event)
 {
 	int32 eventCode = event->GetInt32("event", -1);

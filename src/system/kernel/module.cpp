@@ -212,7 +212,7 @@ public:
 						DirectoryWatcher();
 	virtual				~DirectoryWatcher();
 
-	virtual void		EventOccured(NotificationService& service,
+	virtual void		EventOccurred(NotificationService& service,
 							const KMessage* event);
 };
 
@@ -221,7 +221,7 @@ public:
 						ModuleWatcher();
 	virtual				~ModuleWatcher();
 
-	virtual void		EventOccured(NotificationService& service,
+	virtual void		EventOccurred(NotificationService& service,
 							const KMessage* event);
 };
 
@@ -1204,7 +1204,7 @@ DirectoryWatcher::~DirectoryWatcher()
 
 
 void
-DirectoryWatcher::EventOccured(NotificationService& service,
+DirectoryWatcher::EventOccurred(NotificationService& service,
 	const KMessage* event)
 {
 	int32 opcode = event->GetInt32("opcode", -1);
@@ -1244,7 +1244,7 @@ ModuleWatcher::~ModuleWatcher()
 
 
 void
-ModuleWatcher::EventOccured(NotificationService& service, const KMessage* event)
+ModuleWatcher::EventOccurred(NotificationService& service, const KMessage* event)
 {
 	if (event->GetInt32("opcode", -1) != B_STAT_CHANGED
 		|| (event->GetInt32("fields", 0) & B_STAT_MODIFICATION_TIME) == 0)
@@ -1639,7 +1639,7 @@ ModuleNotificationService::_Notify(int32 opcode, dev_t device, ino_t directory,
 		}
 
 		// notify them!
-		listener->listener->EventOccured(*this, &event);
+		listener->listener->EventOccurred(*this, &event);
 
 		// we might need to watch new files now
 		if (opcode == B_ENTRY_CREATED)

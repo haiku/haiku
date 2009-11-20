@@ -32,7 +32,7 @@ class NotificationListener {
 public:
 	virtual						~NotificationListener();
 
-	virtual void				EventOccured(NotificationService& service,
+	virtual void				EventOccurred(NotificationService& service,
 									const KMessage* event);
 	virtual void				AllListenersNotified(
 									NotificationService& service);
@@ -70,7 +70,7 @@ public:
 									port_id port, int32 token);
 	virtual						~UserMessagingListener();
 
-	virtual void				EventOccured(NotificationService& service,
+	virtual void				EventOccurred(NotificationService& service,
 									const KMessage* event);
 	virtual void				AllListenersNotified(
 									NotificationService& service);
@@ -172,7 +172,7 @@ public:
 									port_id port, uint32 token);
 
 private:
-	virtual void				EventOccured(NotificationService& service,
+	virtual void				EventOccurred(NotificationService& service,
 									const KMessage* event);
 	virtual void				AllListenersNotified(
 									NotificationService& service);

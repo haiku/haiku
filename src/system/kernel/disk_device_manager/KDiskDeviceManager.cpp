@@ -114,7 +114,7 @@ public:
 	{
 	}
 
-	virtual void EventOccured(NotificationService& service,
+	virtual void EventOccurred(NotificationService& service,
 		const KMessage* event)
 	{
 		if (event->GetInt32("opcode", -1) != B_ENTRY_REMOVED)
@@ -136,7 +136,7 @@ public:
 	{
 	}
 
-	virtual void EventOccured(NotificationService& service,
+	virtual void EventOccurred(NotificationService& service,
 		const KMessage* event)
 	{
 		int32 opcode = event->GetInt32("opcode", -1);
