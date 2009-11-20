@@ -8,16 +8,31 @@
 #define APPEARANCE_PREF_VIEW_H
 
 
-#include "PrefView.h"
+#include <Messenger.h>
+#include <String.h>
+#include <View.h>
+
+
+//
+// Appearance Message
+//
+const ulong MSG_HALF_FONT_CHANGED	= 'mchf';
+const ulong MSG_HALF_SIZE_CHANGED	= 'mchs';
+const ulong MSG_FULL_FONT_CHANGED	= 'mcff';
+const ulong MSG_FULL_SIZE_CHANGED	= 'mcfs';
+const ulong MSG_COLOR_FIELD_CHANGED	= 'mccf';
+const ulong MSG_COLOR_CHANGED		= 'mcbc';
+
+
+const ulong MSG_PREF_MODIFIED		= 'mpmo';
+
+
 
 class BColorControl;
 class BMenu;
 class BMenuField;
 
-class TTextControl;
-
-
-class AppearancePrefView : public PrefView {
+class AppearancePrefView : public BView {
 	public:
 		AppearancePrefView(const char *name, const BMessenger &messenger);
 

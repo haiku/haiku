@@ -9,7 +9,6 @@
 #include "AppearPrefView.h"
 #include "PrefHandler.h"
 #include "PrefWindow.h"
-#include "PrefView.h"
 #include "TermConst.h"
 
 #include <Alert.h>
@@ -150,7 +149,6 @@ PrefWindow::_Revert()
 
 		fTerminalMessenger.SendMessage(MSG_HALF_FONT_CHANGED);
 		fTerminalMessenger.SendMessage(MSG_COLOR_CHANGED);
-		fTerminalMessenger.SendMessage(MSG_INPUT_METHOD_CHANGED);
 
 		fDirty = false;
 	}

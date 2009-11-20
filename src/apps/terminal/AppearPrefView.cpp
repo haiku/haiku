@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include <Button.h>
+#include <ColorControl.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <Menu.h>
@@ -29,10 +30,10 @@
 
 AppearancePrefView::AppearancePrefView(const char *name,
 		const BMessenger &messenger)
-	: PrefView(name),
+	: BView(name, B_WILL_DRAW),
 	fTerminalMessenger(messenger)
 {
-  	const char *color_tbl[] = {
+  	const char *kColorTable[] = {
 		PREF_TEXT_FORE_COLOR,
 		PREF_TEXT_BACK_COLOR,
 		PREF_CURSOR_FORE_COLOR,
@@ -72,8 +73,8 @@ AppearancePrefView::AppearancePrefView(const char *name,
 			.Add(fFont = new BMenuField("font", "Font:", fontMenu))
 			.Add(fFontSize = new BMenuField("size", "Size:", sizeMenu))
 			.Add(fColorField = new BMenuField("color", "Color:",
-				MakeMenu(MSG_COLOR_FIELD_CHANGED, color_tbl,
-					color_tbl[0])))
+				MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
+					kColorTable[0])))
 			.Add(fColorControl = new BColorControl(BPoint(10, 10),
 				B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
 		.End();
@@ -183,7 +184,7 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 			break;
 
 		default:
-			PrefView::MessageReceived(msg);
+			BView::MessageReceived(msg);
 			return;
 	}
 

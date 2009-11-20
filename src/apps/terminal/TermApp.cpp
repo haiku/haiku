@@ -40,6 +40,16 @@ const ulong MSG_ACTIVATE_TERM = 'msat';
 const ulong MSG_TERM_WINDOW_INFO = 'mtwi';
 
 
+int
+main()
+{
+	TermApp app;
+	app.Run();
+
+	return 0;
+}
+
+
 TermApp::TermApp()
 	: BApplication(TERM_SIGNATURE),
 	fStartFullscreen(false),
