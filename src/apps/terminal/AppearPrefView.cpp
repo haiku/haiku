@@ -68,13 +68,14 @@ AppearancePrefView::AppearancePrefView(const char *name,
 		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
 	
 	BView *layoutView = BLayoutBuilder::Group<>()
-		.SetInsets(10, 10, 10, 10)
-		.AddGroup(B_VERTICAL)
+		.SetInsets(5, 5, 5, 5)
+		.AddGroup(B_VERTICAL, 5)
 			.Add(fFont = new BMenuField("font", "Font:", fontMenu))
 			.Add(fFontSize = new BMenuField("size", "Size:", sizeMenu))
 			.Add(fColorField = new BMenuField("color", "Color:",
 				MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
 					kColorTable[0])))
+			.Add(BSpaceLayoutItem::CreateGlue())
 			.Add(fColorControl = new BColorControl(BPoint(10, 10),
 				B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
 		.End();

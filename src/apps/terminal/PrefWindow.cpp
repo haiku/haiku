@@ -32,7 +32,7 @@ PrefWindow::PrefWindow(const BMessenger &messenger)
 	fTerminalMessenger(messenger)
 {
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.AddGroup(B_VERTICAL, 1)
+		.AddGroup(B_VERTICAL)
 		.SetInsets(10, 10, 10, 10)
 			.Add(new AppearancePrefView("Appearance", fTerminalMessenger))
 			.AddGroup(B_HORIZONTAL)
@@ -47,8 +47,7 @@ PrefWindow::PrefWindow(const BMessenger &messenger)
 					new BMessage(MSG_SAVE_PRESSED), B_WILL_DRAW))
 			.End()
 		.End();
-		
-	
+			
 	fSaveButton->MakeDefault(true);
 	
 	AddShortcut('Q', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
