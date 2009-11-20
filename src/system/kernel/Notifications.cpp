@@ -10,13 +10,18 @@
 
 #include <Notifications.h>
 
+#include <new>
+
 #include <team.h>
 
 
+#ifdef _KERNEL_MODE
+
 static const char* kEventMaskString = "event mask";
 
-
 NotificationManager NotificationManager::sManager;
+
+#endif
 
 
 // #pragma mark - NotificationListener
@@ -48,6 +53,9 @@ NotificationListener::operator==(const NotificationListener& other) const
 
 
 // #pragma mark - UserMessagingMessageSender
+
+
+#ifdef _KERNEL_MODE
 
 
 UserMessagingMessageSender::UserMessagingMessageSender()
@@ -140,7 +148,7 @@ default_listener::~default_listener()
 }
 
 
-//	#pragma mark - NotificationService
+//	#pragma mark - DefaultNotificationService
 
 
 DefaultNotificationService::DefaultNotificationService(const char* name)
@@ -600,3 +608,5 @@ notifications_init(void)
 	}
 }
 
+
+#endif	// _KERNEL_MODE
