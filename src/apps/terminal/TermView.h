@@ -51,6 +51,8 @@ public:
 			void			SetTermFont(const BFont* font);
 
 			void			GetFontSize(int* width, int* height);
+			int				Rows() const;
+			int				Columns() const;
 			BRect			SetTermSize(int rows, int cols, bool resize);
 
 			void			SetTextColor(rgb_color fore, rgb_color back);

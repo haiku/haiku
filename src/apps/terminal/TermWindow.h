@@ -60,6 +60,7 @@ protected:
 	virtual void	WindowActivated(bool);
 	virtual void	MenusBeginning();
 	virtual	void	Zoom(BPoint leftTop, float width, float height);
+	virtual void	FrameResized(float newWidth, float newHeight);
 
 private:
 	struct Session;

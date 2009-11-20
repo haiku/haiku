@@ -162,9 +162,17 @@ TermWindow::TermWindow(BRect frame, const char* title, Arguments *args)
 
 TermWindow::~TermWindow()
 {
+	// If there's no prefwindow, save the preferences by ourselves.
+	// For example, this saves the columns/rows number.
+	// TODO: Code duplication. Exterminate
 	if (fPrefWindow)
 		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
-
+	else {
+		BPath path;
+		if (PrefHandler::GetDefaultPath(path) == B_OK)
+			PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
+	}
+		
 	if (fFindPanel && fFindPanel->Lock()) {
 		fFindPanel->Quit();
 		fFindPanel = NULL;
@@ -899,6 +907,17 @@ TermWindow::Zoom(BPoint leftTop, float width, float height)
 {
 	_ActiveTermView()->DisableResizeView();
 	BWindow::Zoom(leftTop, width, height);
+}
+
+
+void
+TermWindow::FrameResized(float newWidth, float newHeight)
+{
+	BWindow::FrameResized(newWidth, newHeight);
+	
+	TermView *view = _ActiveTermView();
+	PrefHandler::Default()->setInt32(PREF_COLS, view->Columns());
+	PrefHandler::Default()->setInt32(PREF_ROWS, view->Rows());
 }
 
 

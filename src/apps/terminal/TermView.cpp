@@ -47,7 +47,6 @@
 
 #include "CodeConv.h"
 #include "Globals.h"
-#include "PrefHandler.h"
 #include "Shell.h"
 #include "TermConst.h"
 #include "TerminalCharClassifier.h"
@@ -469,6 +468,20 @@ TermView::GetFontSize(int* _width, int* _height)
 }
 
 
+int
+TermView::Rows() const
+{
+	return fRows;
+}
+
+
+int
+TermView::Columns() const
+{
+	return fColumns;
+}
+
+
 //! Set number of rows and columns in terminal
 BRect
 TermView::SetTermSize(int rows, int columns, bool resize)
@@ -478,9 +491,6 @@ TermView::SetTermSize(int rows, int columns, bool resize)
 		fRows = rows;
 	if (columns > 0)
 		fColumns = columns;
-
-	PrefHandler::Default()->setInt32(PREF_COLS, fColumns);
-	PrefHandler::Default()->setInt32(PREF_ROWS, fRows);
 
 	// To keep things simple, get rid of the selection first.
 	_Deselect();
