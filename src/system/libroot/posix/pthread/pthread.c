@@ -86,6 +86,8 @@ __allocate_pthread(void *data)
 	thread->cleanup_handlers = NULL;
 	thread->flags = 0;
 
+	memset(thread->specific, 0, sizeof(thread->specific));
+
 	return thread;
 }
 
