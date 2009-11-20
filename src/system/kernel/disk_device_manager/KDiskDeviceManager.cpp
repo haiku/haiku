@@ -697,6 +697,7 @@ KDiskDeviceManager::CreateDevice(const char* path, bool* newlyCreated)
 
 		// cleanup on error
 		if (error != B_OK) {
+			deviceLocker.Unlock();
 			delete device;
 			return error;
 		}
@@ -791,6 +792,7 @@ KDiskDeviceManager::CreateFileDevice(const char* filePath, bool* newlyCreated)
 		}
 
 		// cleanup on failure
+		deviceLocker.Unlock();
 		delete device;
 	} else
 		error = B_ERROR;
