@@ -1284,6 +1284,7 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 
 	int32 slot = id % sMaxPorts;
 	status_t status;
+	port_message* message = NULL;
 
 	MutexLocker locker(sPorts[slot].lock);
 
@@ -1326,7 +1327,6 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 	} else
 		sPorts[slot].write_count--;
 
-	port_message* message;
 	status = get_port_message(msgCode, bufferSize, flags, timeout,
 		&message);
 	if (status != B_OK)
