@@ -5,3 +5,8 @@
 "\e[3~": delete-char
 "\eO5D": backward-word
 "\eO5C": forward-word
+
+# UTF-8 support
+set meta-flag on
+set output-meta on
+set convert-meta off
