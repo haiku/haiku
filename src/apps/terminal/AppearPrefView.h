@@ -23,6 +23,9 @@ const ulong MSG_FULL_SIZE_CHANGED	= 'mcfs';
 const ulong MSG_COLOR_FIELD_CHANGED	= 'mccf';
 const ulong MSG_COLOR_CHANGED		= 'mcbc';
 
+const ulong MSG_COLS_CHANGED            = 'mccl';
+const ulong MSG_ROWS_CHANGED            = 'mcrw';
+const ulong MSG_HISTORY_CHANGED         = 'mhst';
 
 const ulong MSG_PREF_MODIFIED		= 'mpmo';
 

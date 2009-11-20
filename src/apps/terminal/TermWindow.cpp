@@ -29,11 +29,11 @@
 #include <String.h>
 
 #include "Arguments.h"
+#include "AppearPrefView.h"
 #include "Coding.h"
 #include "MenuUtil.h"
 #include "FindWindow.h"
 #include "PrefWindow.h"
-#include "PrefView.h"
 #include "PrefHandler.h"
 #include "SmartTabView.h"
 #include "TermConst.h"
