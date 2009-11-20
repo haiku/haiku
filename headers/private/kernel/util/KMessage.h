@@ -29,7 +29,8 @@ public:
 			enum {
 				KMESSAGE_OWNS_BUFFER		= 0x01,
 				KMESSAGE_INIT_FROM_BUFFER	= 0x02,
-				KMESSAGE_READ_ONLY			= 0x04,
+				KMESSAGE_CLONE_BUFFER		= 0x04,
+				KMESSAGE_READ_ONLY			= 0x08,
 
 				KMESSAGE_FLAG_MASK			= 0x07,
 			};
@@ -42,8 +43,10 @@ public:
 			status_t			SetTo(uint32 what, uint32 flags = 0);
 			status_t			SetTo(void* buffer, int32 bufferSize,
 									uint32 what, uint32 flags = 0);
-			status_t			SetTo(const void* buffer,
-									int32 bufferSize = -1);
+			status_t			SetTo(const void* buffer, int32 bufferSize = -1,
+									uint32 flags = 0);
+									// KMESSAGE_INIT_FROM_BUFFER and
+									// KMESSAGE_READ_ONLY are implied
 			void				Unset();
 
 			void				SetWhat(uint32 what);

@@ -177,8 +177,16 @@ KMessage::SetTo(void* buffer, int32 bufferSize, uint32 what, uint32 flags)
 		return B_BAD_VALUE;
 
 	// if read-only, we need to init from the buffer, too
-	if (flags & KMESSAGE_READ_ONLY && !(flags & KMESSAGE_INIT_FROM_BUFFER))
+	if ((flags & KMESSAGE_READ_ONLY) != 0
+		&& (flags & KMESSAGE_INIT_FROM_BUFFER) == 0) {
 		return B_BAD_VALUE;
+	}
+
+	// if not initializing from the given buffer, cloning it doesn't make sense
+	if ((flags & KMESSAGE_INIT_FROM_BUFFER) == 0
+		&& (flags & KMESSAGE_CLONE_BUFFER) != 0) {
+		return B_BAD_VALUE;
+	}
 
 	fBuffer = buffer;
 	fBufferCapacity = bufferSize;
@@ -198,10 +206,10 @@ KMessage::SetTo(void* buffer, int32 bufferSize, uint32 what, uint32 flags)
 
 
 status_t
-KMessage::SetTo(const void* buffer, int32 bufferSize)
+KMessage::SetTo(const void* buffer, int32 bufferSize, uint32 flags)
 {
 	return SetTo(const_cast<void*>(buffer), bufferSize, 0,
-		KMESSAGE_INIT_FROM_BUFFER | KMESSAGE_READ_ONLY);
+		KMESSAGE_INIT_FROM_BUFFER | KMESSAGE_READ_ONLY | flags);
 }
 
 
@@ -805,7 +813,27 @@ KMessage::_AddFieldData(KMessageField* field, const void* data,
 status_t
 KMessage::_InitFromBuffer(bool sizeFromBuffer)
 {
-	if (!fBuffer || _Align(fBuffer) != fBuffer)
+	if (fBuffer == NULL)
+		return B_BAD_DATA;
+
+	// clone the buffer, if requested
+	if ((fFlags & KMESSAGE_CLONE_BUFFER) != 0) {
+		if (sizeFromBuffer) {
+			int32 size = fBufferCapacity;
+			memcpy(&size, &_Header()->size, 4);
+			fBufferCapacity = size;
+		}
+
+		void* buffer = malloc(fBufferCapacity);
+		if (buffer == NULL)
+			return B_NO_MEMORY;
+
+		memcpy(buffer, fBuffer, fBufferCapacity);
+		fBuffer = buffer;
+		fFlags &= ~(uint32)(KMESSAGE_READ_ONLY | KMESSAGE_CLONE_BUFFER);
+	}
+
+	if (_Align(fBuffer) != fBuffer)
 		return B_BAD_DATA;
 	Header* header = _Header();
 
