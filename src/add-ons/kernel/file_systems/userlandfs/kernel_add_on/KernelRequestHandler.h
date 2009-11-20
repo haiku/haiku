@@ -80,6 +80,10 @@ private:
 			status_t			_HandleRequest(
 									WriteToIORequestRequest* request);
 			status_t			_HandleRequest(NotifyIORequestRequest* request);
+			// node monitoring
+			status_t			_HandleRequest(AddNodeListenerRequest* request);
+			status_t			_HandleRequest(
+									RemoveNodeListenerRequest* request);
 
 			status_t			_GetVolume(dev_t id, Volume** volume);
 

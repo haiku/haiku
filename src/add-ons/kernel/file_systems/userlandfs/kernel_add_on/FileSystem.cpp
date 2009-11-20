@@ -3,9 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "Volume.h"
 
 #include <util/AutoLock.h>
+
+#include <fs/node_monitor.h>
+#include <Notifications.h>
 
 #include "AutoLocker.h"
 #include "Compatibility.h"
@@ -20,15 +24,138 @@
 #include "Settings.h"
 #include "SingleReplyRequestHandler.h"
 
+
 // The time after which the notification thread times out at the port and
 // restarts the loop. Of interest only when the FS is deleted. It is the
 // maximal time the destructor has to wait for the thread.
 static const bigtime_t kNotificationRequestTimeout = 50000;	// 50 ms
 
-// SelectSyncMap
+
+// #pragma mark - SelectSyncMap
+
+
 struct FileSystem::SelectSyncMap
 	: public SynchronizedHashMap<HashKey32<selectsync*>, int32*> {
 };
+
+
+// #pragma mark - NodeListenerKey
+
+
+struct FileSystem::NodeListenerKey {
+	NodeListenerKey(void* clientListener, dev_t device, ino_t node)
+		:
+		fClientListener(clientListener),
+		fDevice(device),
+		fNode(node)
+	{
+	}
+
+	void* ClientListener() const
+	{
+		return fClientListener;
+	}
+
+	dev_t Device() const
+	{
+		return fDevice;
+	}
+
+	ino_t Node() const
+	{
+		return fNode;
+	}
+
+	uint32 HashValue() const
+	{
+		return (uint32)(addr_t)fClientListener ^ (uint32)fDevice
+			^ (uint32)fNode ^ (uint32)(fNode >> 32);
+	}
+
+	bool operator==(const NodeListenerKey& other) const
+	{
+		return fClientListener == other.fClientListener
+			&& fDevice == other.fDevice && fNode == other.fNode;
+	}
+
+protected:
+	void*	fClientListener;
+	dev_t	fDevice;
+	ino_t	fNode;
+};
+
+
+// #pragma mark - NodeListenerProxy
+
+
+struct FileSystem::NodeListenerProxy : NodeListenerKey, NotificationListener {
+	NodeListenerProxy(FileSystem* fileSystem, void* clientListener,
+		dev_t device, ino_t node)
+		:
+		NodeListenerKey(clientListener, device, node),
+		fFileSystem(fileSystem)
+	{
+	}
+
+	virtual void EventOccurred(NotificationService& service,
+		const KMessage* event)
+	{
+		fFileSystem->_NodeListenerEventOccurred(this, event);
+	}
+
+	NodeListenerProxy*& HashTableLink()
+	{
+		return fHashTableLink;
+	}
+
+	status_t StartListening(uint32 flags)
+	{
+		return add_node_listener(fDevice, fNode, flags, *this);
+	}
+
+	status_t StopListening()
+	{
+		return remove_node_listener(fDevice, fNode, *this);
+	}
+
+private:
+	FileSystem*			fFileSystem;
+	NodeListenerProxy*	fHashTableLink;
+};
+
+
+// #pragma mark - NodeListenerHashDefinition
+
+
+struct FileSystem::NodeListenerHashDefinition {
+	typedef NodeListenerKey		KeyType;
+	typedef	NodeListenerProxy	ValueType;
+
+	size_t HashKey(const NodeListenerKey& key) const
+	{
+		return key.HashValue();
+	}
+
+	size_t Hash(const NodeListenerProxy* value) const
+	{
+		return value->HashValue();
+	}
+
+	bool Compare(const NodeListenerKey& key,
+		const NodeListenerProxy* value) const
+	{
+		return key == *value;
+	}
+
+	NodeListenerProxy*& GetLink(NodeListenerProxy* value) const
+	{
+		return value->HashTableLink();
+	}
+};
+
+
+// #pragma mark - FileSystem
+
 
 // constructor
 FileSystem::FileSystem()
@@ -47,6 +174,7 @@ FileSystem::FileSystem()
 {
 	mutex_init(&fVolumeLock, "userlandfs volumes");
 	mutex_init(&fVNodeOpsLock, "userlandfs vnode ops");
+	mutex_init(&fNodeListenersLock, "userlandfs node listeners");
 }
 
 // destructor
@@ -61,6 +189,17 @@ FileSystem::~FileSystem()
 	}
 
 	// delete our data structures
+	if (fNodeListeners != NULL) {
+		MutexLocker nodeListenersLocker(fNodeListenersLock);
+		NodeListenerProxy* proxy = fNodeListeners->Clear(true);
+		while (proxy != NULL) {
+			NodeListenerProxy* next = proxy->HashTableLink();
+			proxy->StopListening();
+			delete proxy;
+			proxy = next;
+		}
+	}
+
 	if (fSelectSyncs) {
 		for (SelectSyncMap::Iterator it = fSelectSyncs->GetIterator();
 			 it.HasNext();) {
@@ -69,6 +208,7 @@ FileSystem::~FileSystem()
 		}
 		delete fSelectSyncs;
 	}
+
 	delete fSettings;
 
 	// delete vnode ops vectors -- there shouldn't be any left, though
@@ -82,6 +222,11 @@ FileSystem::~FileSystem()
 	}
 	if (count > 0)
 		WARN(("Deleted %ld vnode ops vectors!\n", count));
+
+
+	mutex_destroy(&fVolumeLock);
+	mutex_destroy(&fVNodeOpsLock);
+	mutex_destroy(&fNodeListenersLock);
 }
 
 // Init
@@ -111,6 +256,11 @@ FileSystem::Init(const char* name, team_id team, Port::Info* infos, int32 count,
 	// create the select sync entry map
 	fSelectSyncs = new(nothrow) SelectSyncMap;
 	if (!fSelectSyncs)
+		return B_NO_MEMORY;
+
+	// create the node listener proxy map
+	fNodeListeners = new(std::nothrow) NodeListenerMap;
+	if (fNodeListeners == NULL || fNodeListeners->Init() != B_OK)
 		return B_NO_MEMORY;
 
 	// create the request ports
@@ -348,6 +498,57 @@ FileSystem::KnowsSelectSyncEntry(selectsync* sync)
 }
 
 
+// AddNodeListener
+status_t
+FileSystem::AddNodeListener(dev_t device, ino_t node, uint32 flags,
+	void* listener)
+{
+	MutexLocker nodeListenersLocker(fNodeListenersLock);
+
+	// lookup the proxy
+	NodeListenerProxy* proxy = fNodeListeners->Lookup(
+		NodeListenerKey(listener, device, node));
+	if (proxy != NULL)
+		return proxy->StartListening(flags);
+
+	// it doesn't exist yet -- create it
+	proxy = new(std::nothrow) NodeListenerProxy(this, listener, device, node);
+	if (proxy == NULL)
+		return B_NO_MEMORY;
+
+	// start listening
+	status_t error = proxy->StartListening(flags);
+	if (error != B_OK) {
+		delete proxy;
+		return error;
+	}
+
+	fNodeListeners->Insert(proxy);
+	return B_OK;
+}
+
+
+// RemoveNodeListener
+status_t
+FileSystem::RemoveNodeListener(dev_t device, ino_t node, void* listener)
+{
+	MutexLocker nodeListenersLocker(fNodeListenersLock);
+
+	// lookup the proxy
+	NodeListenerProxy* proxy = fNodeListeners->Lookup(
+		NodeListenerKey(listener, device, node));
+	if (proxy == NULL)
+		return B_BAD_VALUE;
+
+	status_t error = proxy->StopListening();
+
+	fNodeListeners->Remove(proxy);
+	delete proxy;
+
+	return error;
+}
+
+
 // GetVNodeOps
 VNodeOps*
 FileSystem::GetVNodeOps(const FSVNodeCapabilities& capabilities)
@@ -505,6 +706,42 @@ FileSystem::_InitVNodeOpsVector(fs_vnode_ops* ops,
 	CLEAR_UNSUPPORTED(FS_VNODE_CAPABILITY_GET_SUPER_VNODE, get_super_vnode);
 
 	#undef CLEAR_UNSUPPORTED
+}
+
+
+// _NodeListenerEventOccurred
+void
+FileSystem::_NodeListenerEventOccurred(NodeListenerProxy* proxy,
+	const KMessage* event)
+{
+	// get a free port
+	RequestPort* port = fPortPool.AcquirePort();
+	if (port == NULL)
+		return;
+	PortReleaser _(&fPortPool, port);
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	NodeMonitoringEventRequest* request;
+	status_t error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return;
+
+	error = allocator.AllocateData(request->event, event->Buffer(),
+		event->ContentSize(), 1);
+	if (error != B_OK)
+		return;
+
+	struct thread* thread = thread_get_current_thread();
+	request->team = thread->team->id;
+	request->thread = thread->id;
+	request->user = geteuid();
+	request->group = getegid();
+	request->listener = proxy->ClientListener();
+
+	// send the request
+	KernelRequestHandler handler(this, NODE_MONITORING_EVENT_REPLY);
+	port->SendRequest(&allocator, &handler);
 }
 
 

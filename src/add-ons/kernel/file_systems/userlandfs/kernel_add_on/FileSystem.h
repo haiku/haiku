@@ -5,6 +5,7 @@
 #ifndef USERLAND_FS_FILE_SYSTEM_H
 #define USERLAND_FS_FILE_SYSTEM_H
 
+
 #include <fs_interface.h>
 
 #include <util/OpenHashTable.h>
@@ -21,6 +22,7 @@
 
 
 struct IOCtlInfo;
+class KMessage;
 class Settings;
 class Volume;
 
@@ -93,6 +95,11 @@ public:
 			void				RemoveSelectSyncEntry(selectsync* sync);
 			bool				KnowsSelectSyncEntry(selectsync* sync);
 
+			status_t			AddNodeListener(dev_t device, ino_t node,
+									uint32 flags, void* listener);
+			status_t			RemoveNodeListener(dev_t device, ino_t node,
+									void* listener);
+
 			VNodeOps*			GetVNodeOps(
 									const FSVNodeCapabilities& capabilities);
 			void				PutVNodeOps(VNodeOps* ops);
@@ -100,18 +107,28 @@ public:
 			bool				IsUserlandServerThread() const;
 
 private:
+			friend class KernelDebug;
+			struct SelectSyncMap;
+			struct NodeListenerKey;
+			struct NodeListenerProxy;
+			struct NodeListenerHashDefinition;
+
+			typedef BOpenHashTable<VNodeOpsHashDefinition> VNodeOpsMap;
+			typedef BOpenHashTable<NodeListenerHashDefinition> NodeListenerMap;
+
+
+private:
 			void				_InitVNodeOpsVector(fs_vnode_ops* ops,
 									const FSVNodeCapabilities& capabilities);
+
+			void				_NodeListenerEventOccurred(
+									NodeListenerProxy* proxy,
+									const KMessage* event);
 
 	static	int32				_NotificationThreadEntry(void* data);
 			int32				_NotificationThread();
 
 private:
-			friend class KernelDebug;
-			struct SelectSyncEntry;
-			struct SelectSyncMap;
-			typedef BOpenHashTable<VNodeOpsHashDefinition> VNodeOpsMap;
-
 			Vector<Volume*>		fVolumes;
 			mutex				fVolumeLock;
 			VNodeOpsMap			fVNodeOps;
@@ -123,6 +140,8 @@ private:
 			thread_id			fNotificationThread;
 			RequestPortPool		fPortPool;
 			SelectSyncMap*		fSelectSyncs;
+			mutex				fNodeListenersLock;
+			NodeListenerMap*	fNodeListeners;
 			Settings*			fSettings;
 			team_id				fUserlandServerTeam;
 			bool				fInitialized;

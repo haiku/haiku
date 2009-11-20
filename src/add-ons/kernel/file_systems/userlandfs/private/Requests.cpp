@@ -280,6 +280,14 @@ ReadQueryReply::GetAddressInfos(AddressInfo* infos, int32* count)
 	return B_OK;
 }
 
+// NodeMonitoringEventRequest
+status_t
+NodeMonitoringEventRequest::GetAddressInfos(AddressInfo* infos, int32* count)
+{
+	ADD_ADDRESS(event);
+	return B_OK;
+}
+
 // NotifyListenerRequest
 status_t
 NotifyListenerRequest::GetAddressInfos(AddressInfo* infos, int32* count)
@@ -687,6 +695,11 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case READ_QUERY_REPLY:
 		case REWIND_QUERY_REPLY:
 			return false;
+		// node monitoring
+		case NODE_MONITORING_EVENT_REQUEST:
+			return true;
+		case NODE_MONITORING_EVENT_REPLY:
+			return false;
 
 		// userland -> kernel requests
 		// notifications
@@ -744,6 +757,13 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 		case NOTIFY_IO_REQUEST_REPLY:
 		case READ_FROM_IO_REQUEST_REPLY:
 		case WRITE_TO_IO_REQUEST_REPLY:
+			return true;
+		// node monitoring
+		case ADD_NODE_LISTENER_REQUEST:
+		case REMOVE_NODE_LISTENER_REQUEST:
+			return false;
+		case ADD_NODE_LISTENER_REPLY:
+		case REMOVE_NODE_LISTENER_REPLY:
 			return true;
 
 		// general reply
@@ -934,6 +954,11 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case READ_QUERY_REPLY:
 		case REWIND_QUERY_REPLY:
 			return true;
+		// node monitoring
+		case NODE_MONITORING_EVENT_REQUEST:
+			return false;
+		case NODE_MONITORING_EVENT_REPLY:
+			return true;
 
 		// userland -> kernel requests
 		// notifications
@@ -991,6 +1016,13 @@ UserlandFSUtil::is_userland_request(uint32 type)
 		case NOTIFY_IO_REQUEST_REPLY:
 		case READ_FROM_IO_REQUEST_REPLY:
 		case WRITE_TO_IO_REQUEST_REPLY:
+			return false;
+		// node monitoring
+		case ADD_NODE_LISTENER_REQUEST:
+		case REMOVE_NODE_LISTENER_REQUEST:
+			return true;
+		case ADD_NODE_LISTENER_REPLY:
+		case REMOVE_NODE_LISTENER_REPLY:
 			return false;
 
 		// general reply

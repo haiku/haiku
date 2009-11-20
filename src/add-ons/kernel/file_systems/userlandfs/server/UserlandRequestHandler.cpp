@@ -7,6 +7,10 @@
 
 #include <algorithm>
 
+#include <util/KMessage.h>
+
+#include <Notifications.h>
+
 #include "AutoDeleter.h"
 #include "Compatibility.h"
 #include "Debug.h"
@@ -208,6 +212,10 @@ UserlandRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((ReadQueryRequest*)request);
 		case REWIND_QUERY_REQUEST:
 			return _HandleRequest((RewindQueryRequest*)request);
+
+		// node monitoring
+		case NODE_MONITORING_EVENT_REQUEST:
+			return _HandleRequest((NodeMonitoringEventRequest*)request);
 	}
 PRINT(("UserlandRequestHandler::HandleRequest(): unexpected request: %lu\n",
 request->GetType()));
@@ -2425,6 +2433,33 @@ UserlandRequestHandler::_HandleRequest(RewindQueryRequest* request)
 		RETURN_ERROR(error);
 
 	reply->error = result;
+
+	// send the reply
+	return _SendReply(allocator, false);
+}
+
+
+// #pragma mark - node monitoring
+
+
+// _HandleRequest
+status_t
+UserlandRequestHandler::_HandleRequest(NodeMonitoringEventRequest* request)
+{
+	// check and execute the request
+	KMessage event;
+	event.SetTo(request->event.GetData(), request->event.GetSize());
+	((NotificationListener*)request->listener)->EventOccurred(
+		*(NotificationService*)NULL, &event);
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	NodeMonitoringEventReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	reply->error = B_OK;
 
 	// send the reply
 	return _SendReply(allocator, false);

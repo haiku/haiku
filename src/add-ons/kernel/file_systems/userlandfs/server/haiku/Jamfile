@@ -37,6 +37,7 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	block_cache.cpp
 	file_map.cpp
 	khash.c
+	Notifications.cpp
 	Referenceable.cpp
 
 	# emulation
@@ -54,6 +55,11 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	be	# for BLocker only
 	$(TARGET_LIBSUPC++)
 ;
+
+
+SEARCH on [ FGristFiles
+		Notifications.cpp
+	] = [ FDirName $(HAIKU_TOP) src system kernel ] ;
 
 SEARCH on [ FGristFiles
 		block_cache.cpp

@@ -14,6 +14,8 @@
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 
+#include <fs/node_monitor.h>
+
 #include "Debug.h"
 
 #include "../FileSystem.h"
@@ -363,6 +365,25 @@ notify_io_request(io_request* _request, status_t status)
 	// send the request
 	UserlandFS::KernelEmu::notify_io_request(request->volume->GetID(),
 		request->id, status);
+}
+
+
+// #pragma mark - node monitoring
+
+
+status_t
+add_node_listener(dev_t device, ino_t node, uint32 flags,
+	NotificationListener& listener)
+{
+	return UserlandFS::KernelEmu::add_node_listener(device, node, flags,
+		&listener);
+}
+
+
+status_t
+remove_node_listener(dev_t device, ino_t node, NotificationListener& listener)
+{
+	return UserlandFS::KernelEmu::remove_node_listener(device, node, &listener);
 }
 
 

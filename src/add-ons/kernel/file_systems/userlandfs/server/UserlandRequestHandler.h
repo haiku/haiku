@@ -87,6 +87,8 @@ class CloseQueryRequest;
 class FreeQueryCookieRequest;
 class ReadQueryRequest;
 class RewindQueryRequest;
+// node monitoring
+class NodeMonitoringEventRequest;
 
 class RequestAllocator;
 
@@ -199,6 +201,10 @@ private:
 			status_t			_HandleRequest(FreeQueryCookieRequest* request);
 			status_t			_HandleRequest(ReadQueryRequest* request);
 			status_t			_HandleRequest(RewindQueryRequest* request);
+
+			// node monitoring
+			status_t			_HandleRequest(
+									NodeMonitoringEventRequest* request);
 
 			status_t			_SendReply(RequestAllocator& allocator,
 									bool expectsReceipt);

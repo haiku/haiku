@@ -112,6 +112,11 @@ KernelRequestHandler::HandleRequest(Request* request)
 			return _HandleRequest((WriteToIORequestRequest*)request);
 		case NOTIFY_IO_REQUEST_REQUEST:
 			return _HandleRequest((NotifyIORequestRequest*)request);
+		// node monitoring
+		case ADD_NODE_LISTENER_REQUEST:
+			return _HandleRequest((AddNodeListenerRequest*)request);
+		case REMOVE_NODE_LISTENER_REQUEST:
+			return _HandleRequest((RemoveNodeListenerRequest*)request);
 	}
 PRINT(("KernelRequestHandler::HandleRequest(): unexpected request: %lu\n",
 request->GetType()));
@@ -835,6 +840,48 @@ KernelRequestHandler::_HandleRequest(NotifyIORequestRequest* request)
 	status_t error = AllocateRequest(allocator, &reply);
 	if (error != B_OK)
 		return error;
+	reply->error = result;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+
+status_t
+KernelRequestHandler::_HandleRequest(AddNodeListenerRequest* request)
+{
+	// check and execute the request
+	status_t result = fFileSystem->AddNodeListener(request->device,
+		request->node, request->flags, request->listener);
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	AddNodeListenerReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+
+	reply->error = result;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+
+status_t
+KernelRequestHandler::_HandleRequest(RemoveNodeListenerRequest* request)
+{
+	// check and execute the request
+	status_t result = fFileSystem->RemoveNodeListener(request->device,
+		request->node, request->listener);
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	RemoveNodeListenerReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+
 	reply->error = result;
 
 	// send the reply

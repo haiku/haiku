@@ -188,6 +188,10 @@ enum {
 	REWIND_QUERY_REQUEST,
 	REWIND_QUERY_REPLY,
 
+	// node monitoring
+	NODE_MONITORING_EVENT_REQUEST,
+	NODE_MONITORING_EVENT_REPLY,
+
 	// userland -> kernel requests
 	// notifications
 	NOTIFY_LISTENER_REQUEST,
@@ -240,6 +244,12 @@ enum {
 	WRITE_TO_IO_REQUEST_REPLY,
 	NOTIFY_IO_REQUEST_REQUEST,
 	NOTIFY_IO_REQUEST_REPLY,
+
+	// node monitoring
+	ADD_NODE_LISTENER_REQUEST,
+	ADD_NODE_LISTENER_REPLY,
+	REMOVE_NODE_LISTENER_REQUEST,
+	REMOVE_NODE_LISTENER_REPLY,
 
 	// general reply
 	RECEIPT_ACK_REPLY,
@@ -1506,6 +1516,27 @@ public:
 };
 
 
+// #pragma mark ----- node monitoring -----
+
+
+// NodeMonitoringEventRequest
+class NodeMonitoringEventRequest : public KernelRequest {
+public:
+	NodeMonitoringEventRequest()
+		: KernelRequest(NODE_MONITORING_EVENT_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	void*		listener;
+	Address		event;
+};
+
+// NodeMonitoringEventReply
+class NodeMonitoringEventReply : public ReplyRequest {
+public:
+	NodeMonitoringEventReply() : ReplyRequest(NODE_MONITORING_EVENT_REPLY) {}
+};
+
+
 // #pragma mark -
 // #pragma mark ----- userland requests -----
 
@@ -1893,6 +1924,43 @@ public:
 };
 
 
+// #pragma mark - node monitoring
+
+
+// AddNodeListenerRequest
+class AddNodeListenerRequest : public Request {
+public:
+	AddNodeListenerRequest() : Request(ADD_NODE_LISTENER_REQUEST) {}
+
+	dev_t		device;
+	ino_t		node;
+	uint32		flags;
+	void*		listener;
+};
+
+// AddNodeListenerReply
+class AddNodeListenerReply : public ReplyRequest {
+public:
+	AddNodeListenerReply() : ReplyRequest(ADD_NODE_LISTENER_REPLY) {}
+};
+
+// RemoveNodeListenerRequest
+class RemoveNodeListenerRequest : public Request {
+public:
+	RemoveNodeListenerRequest() : Request(REMOVE_NODE_LISTENER_REQUEST) {}
+
+	dev_t		device;
+	ino_t		node;
+	void*		listener;
+};
+
+// RemoveNodeListenerReply
+class RemoveNodeListenerReply : public ReplyRequest {
+public:
+	RemoveNodeListenerReply() : ReplyRequest(REMOVE_NODE_LISTENER_REPLY) {}
+};
+
+
 //////////////////
 // General Reply
 
@@ -2209,6 +2277,11 @@ do_for_request(Request* request, Task& task)
 			return task((RewindQueryRequest*)request);
 		case REWIND_QUERY_REPLY:
 			return task((RewindQueryReply*)request);
+		// node monitoring
+		case NODE_MONITORING_EVENT_REQUEST:
+			return task((NodeMonitoringEventRequest*)request);
+		case NODE_MONITORING_EVENT_REPLY:
+			return task((NodeMonitoringEventReply*)request);
 
 		// userland -> kernel requests
 		// notifications
@@ -2303,6 +2376,15 @@ do_for_request(Request* request, Task& task)
 			return task((NotifyIORequestRequest*)request);
 		case NOTIFY_IO_REQUEST_REPLY:
 			return task((NotifyIORequestReply*)request);
+		// node monitoring
+		case ADD_NODE_LISTENER_REQUEST:
+			return task((AddNodeListenerRequest*)request);
+		case ADD_NODE_LISTENER_REPLY:
+			return task((AddNodeListenerReply*)request);
+		case REMOVE_NODE_LISTENER_REQUEST:
+			return task((RemoveNodeListenerRequest*)request);
+		case REMOVE_NODE_LISTENER_REPLY:
+			return task((RemoveNodeListenerReply*)request);
 		// general reply
 		case RECEIPT_ACK_REPLY:
 			return task((ReceiptAckReply*)request);
@@ -2482,6 +2564,9 @@ using UserlandFSUtil::ReadQueryRequest;
 using UserlandFSUtil::ReadQueryReply;
 using UserlandFSUtil::RewindQueryRequest;
 using UserlandFSUtil::RewindQueryReply;
+// node monitoring
+using UserlandFSUtil::NodeMonitoringEventRequest;
+using UserlandFSUtil::NodeMonitoringEventReply;
 
 // userland -> kernel requests
 // notifications
@@ -2532,6 +2617,11 @@ using UserlandFSUtil::WriteToIORequestRequest;
 using UserlandFSUtil::WriteToIORequestReply;
 using UserlandFSUtil::NotifyIORequestRequest;
 using UserlandFSUtil::NotifyIORequestReply;
+		// node monitoring
+using UserlandFSUtil::AddNodeListenerRequest;
+using UserlandFSUtil::AddNodeListenerReply;
+using UserlandFSUtil::RemoveNodeListenerRequest;
+using UserlandFSUtil::RemoveNodeListenerReply;
 // general reply
 using UserlandFSUtil::ReceiptAckReply;
 

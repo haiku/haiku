@@ -1009,6 +1009,80 @@ UserlandFS::KernelEmu::notify_io_request(dev_t volumeID, int32 requestID,
 }
 
 
+// #pragma mark - node monitoring
+
+
+status_t
+UserlandFS::KernelEmu::add_node_listener(dev_t device, ino_t node, uint32 flags,
+	void* listener)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	AddNodeListenerRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->device = device;
+	request->node = node;
+	request->flags = flags;
+	request->listener = listener;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, ADD_NODE_LISTENER_REPLY);
+	AddNodeListenerReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	return reply->error;
+}
+
+
+status_t
+UserlandFS::KernelEmu::remove_node_listener(dev_t device, ino_t node,
+	void* listener)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	RemoveNodeListenerRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->device = device;
+	request->node = node;
+	request->listener = listener;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, REMOVE_NODE_LISTENER_REPLY);
+	RemoveNodeListenerReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	return reply->error;
+}
+
+
 // #pragma mark -
 
 

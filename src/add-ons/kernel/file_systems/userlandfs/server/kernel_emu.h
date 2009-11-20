@@ -56,6 +56,10 @@ status_t write_to_io_request(dev_t volumeID, int32 requestID, const void* buffer
 	size_t size);
 status_t notify_io_request(dev_t volumeID, int32 requestID, status_t status);
 
+status_t add_node_listener(dev_t device, ino_t node, uint32 flags,
+	void* listener);
+status_t remove_node_listener(dev_t device, ino_t node, void* listener);
+
 void kernel_debugger(const char *message);
 void vpanic(const char *format, va_list args);
 void panic(const char *format, ...) __attribute__ ((format (__printf__, 1, 2)));
