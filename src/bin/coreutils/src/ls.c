@@ -1520,7 +1520,9 @@ decode_switches (int argc, char **argv)
         {
           format = many_per_line;
           /* See description of qmark_funny_chars, above.  */
+#ifndef __HAIKU__
           qmark_funny_chars = true;
+#endif
         }
       else
         {
