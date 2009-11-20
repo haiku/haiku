@@ -243,7 +243,7 @@ private:
 	static	const uint32		kMessageHeaderMagic;
 };
 
-// KMessageField
+
 class KMessageField {
 public:
 								KMessageField();
@@ -288,48 +288,42 @@ using BPrivate::KMessageField;
 // #pragma mark - inline functions
 
 
-// AddBool
-inline
 status_t
 KMessage::AddBool(const char* name, bool value)
 {
 	return AddData(name, B_BOOL_TYPE, &value, sizeof(bool), true);
 }
 
-// AddInt8
-inline
+
 status_t
 KMessage::AddInt8(const char* name, int8 value)
 {
 	return AddData(name, B_INT8_TYPE, &value, sizeof(int8), true);
 }
 
-// AddInt16
-inline
+
 status_t
 KMessage::AddInt16(const char* name, int16 value)
 {
 	return AddData(name, B_INT16_TYPE, &value, sizeof(int16), true);
 }
 
-// AddInt32
-inline
+
 status_t
 KMessage::AddInt32(const char* name, int32 value)
 {
 	return AddData(name, B_INT32_TYPE, &value, sizeof(int32), true);
 }
 
-// AddInt64
-inline status_t
+
+status_t
 KMessage::AddInt64(const char* name, int64 value)
 {
 	return AddData(name, B_INT64_TYPE, &value, sizeof(int64), true);
 }
 
 
-// AddPointer
-inline status_t
+status_t
 KMessage::AddPointer(const char* name, const void* value)
 {
 	return AddData(name, B_POINTER_TYPE, &value, sizeof(value), true);
@@ -337,7 +331,6 @@ KMessage::AddPointer(const char* name, const void* value)
 
 
 // AddString
-inline
 status_t
 KMessage::AddString(const char* name, const char* value)
 {
@@ -350,9 +343,8 @@ KMessage::AddString(const char* name, const char* value)
 // #pragma mark -
 
 
-// _FindType
 template<typename T>
-inline status_t
+status_t
 KMessage::_FindType(const char* name, type_code type, int32 index,
 	T* value) const
 {
@@ -370,80 +362,70 @@ KMessage::_FindType(const char* name, type_code type, int32 index,
 	return B_OK;
 }
 
-// FindBool
-inline
+
 status_t
 KMessage::FindBool(const char* name, bool* value) const
 {
 	return FindBool(name, 0, value);
 }
 
-// FindBool
-inline
+
 status_t
 KMessage::FindBool(const char* name, int32 index, bool* value) const
 {
 	return _FindType(name, B_BOOL_TYPE, index, value);
 }
 
-// FindInt8
-inline
+
 status_t
 KMessage::FindInt8(const char* name, int8* value) const
 {
 	return FindInt8(name, 0, value);
 }
 
-// FindInt8
-inline
+
 status_t
 KMessage::FindInt8(const char* name, int32 index, int8* value) const
 {
 	return _FindType(name, B_INT8_TYPE, index, value);
 }
 
-// FindInt16
-inline
+
 status_t
 KMessage::FindInt16(const char* name, int16* value) const
 {
 	return FindInt16(name, 0, value);
 }
 
-// FindInt16
-inline
+
 status_t
 KMessage::FindInt16(const char* name, int32 index, int16* value) const
 {
 	return _FindType(name, B_INT16_TYPE, index, value);
 }
 
-// FindInt32
-inline
+
 status_t
 KMessage::FindInt32(const char* name, int32* value) const
 {
 	return FindInt32(name, 0, value);
 }
 
-// FindInt32
-inline
+
 status_t
 KMessage::FindInt32(const char* name, int32 index, int32* value) const
 {
 	return _FindType(name, B_INT32_TYPE, index, value);
 }
 
-// FindInt64
-inline
+
 status_t
 KMessage::FindInt64(const char* name, int64* value) const
 {
 	return FindInt64(name, 0, value);
 }
 
-// FindInt64
-inline
+
 status_t
 KMessage::FindInt64(const char* name, int32 index, int64* value) const
 {
@@ -451,32 +433,27 @@ KMessage::FindInt64(const char* name, int32 index, int64* value) const
 }
 
 
-// FindPointer
-inline status_t
+status_t
 KMessage::FindPointer(const char* name, void** value) const
 {
 	return FindPointer(name, 0, value);
 }
 
 
-// FindPointer
-inline status_t
+status_t
 KMessage::FindPointer(const char* name, int32 index, void** value) const
 {
 	return _FindType(name, B_POINTER_TYPE, index, value);
 }
 
 
-// FindString
-inline
 status_t
 KMessage::FindString(const char* name, const char** value) const
 {
 	return FindString(name, 0, value);
 }
 
-// FindString
-inline
+
 status_t
 KMessage::FindString(const char* name, int32 index, const char** value) const
 {
@@ -485,7 +462,6 @@ KMessage::FindString(const char* name, int32 index, const char** value) const
 }
 
 
-// _GetType
 template<typename T>
 inline T
 KMessage::_GetType(const char* name, type_code type, int32 index,
@@ -498,7 +474,6 @@ KMessage::_GetType(const char* name, type_code type, int32 index,
 }
 
 
-// GetBool
 inline bool
 KMessage::GetBool(const char* name, bool defaultValue) const
 {
@@ -506,87 +481,77 @@ KMessage::GetBool(const char* name, bool defaultValue) const
 }
 
 
-// GetBool
 inline bool
 KMessage::GetBool(const char* name, int32 index, bool defaultValue) const
 {
 	return _GetType(name, B_BOOL_TYPE, index, defaultValue);
 }
 
-// GetInt8
-inline int8
+
+int8
 KMessage::GetInt8(const char* name, int8 defaultValue) const
 {
 	return _GetType(name, B_INT8_TYPE, 0, defaultValue);
 }
 
 
-// GetInt8
-inline int8
+int8
 KMessage::GetInt8(const char* name, int32 index, int8 defaultValue) const
 {
 	return _GetType(name, B_INT8_TYPE, index, defaultValue);
 }
 
 
-// GetInt16
-inline int16
+int16
 KMessage::GetInt16(const char* name, int16 defaultValue) const
 {
 	return _GetType(name, B_INT16_TYPE, 0, defaultValue);
 }
 
 
-// GetInt16
-inline int16
+int16
 KMessage::GetInt16(const char* name, int32 index, int16 defaultValue) const
 {
 	return _GetType(name, B_INT16_TYPE, index, defaultValue);
 }
 
 
-// GetInt32
-inline int32
+int32
 KMessage::GetInt32(const char* name, int32 defaultValue) const
 {
 	return _GetType(name, B_INT32_TYPE, 0, defaultValue);
 }
 
 
-// GetInt32
-inline int32
+int32
 KMessage::GetInt32(const char* name, int32 index, int32 defaultValue) const
 {
 	return _GetType(name, B_INT32_TYPE, index, defaultValue);
 }
 
 
-// GetInt64
-inline int64
+int64
 KMessage::GetInt64(const char* name, int64 defaultValue) const
 {
 	return _GetType(name, B_INT64_TYPE, 0, defaultValue);
 }
 
 
-// GetInt64
-inline int64
+int64
 KMessage::GetInt64(const char* name, int32 index, int64 defaultValue) const
 {
 	return _GetType(name, B_INT64_TYPE, index, defaultValue);
 }
 
 
-// GetPointer
-inline void*
+void*
 KMessage::GetPointer(const char* name, const void* defaultValue) const
 {
 	return const_cast<void*>(_GetType(name, B_POINTER_TYPE, 0, defaultValue));
 }
 
 
-// GetPointer
-inline void*
+void*
 KMessage::GetPointer(const char* name, int32 index,
 	const void* defaultValue) const
 {
@@ -595,8 +560,7 @@ KMessage::GetPointer(const char* name, int32 index,
 }
 
 
-// GetString
-inline const char*
+const char*
 KMessage::GetString(const char* name, int32 index,
 	const char* defaultValue) const
 {
@@ -611,56 +575,49 @@ KMessage::GetString(const char* name, int32 index,
 }
 
 
-// GetString
-inline const char*
+const char*
 KMessage::GetString(const char* name, const char* defaultValue) const
 {
 	return GetString(name, 0, defaultValue);
 }
 
 
-// SetBool
-inline status_t
+status_t
 KMessage::SetBool(const char* name, bool value)
 {
 	return SetData(name, B_BOOL_TYPE, &value, sizeof(bool));
 }
 
 
-// SetInt8
-inline status_t
+status_t
 KMessage::SetInt8(const char* name, int8 value)
 {
 	return SetData(name, B_INT8_TYPE, &value, sizeof(int8));
 }
 
 
-// SetInt16
-inline status_t
+status_t
 KMessage::SetInt16(const char* name, int16 value)
 {
 	return SetData(name, B_INT16_TYPE, &value, sizeof(int16));
 }
 
 
-// SetInt32
-inline status_t
+status_t
 KMessage::SetInt32(const char* name, int32 value)
 {
 	return SetData(name, B_INT32_TYPE, &value, sizeof(int32));
 }
 
 
-// SetInt64
-inline status_t
+status_t
 KMessage::SetInt64(const char* name, int64 value)
 {
 	return SetData(name, B_INT64_TYPE, &value, sizeof(int64));
 }
 
 
-// SetPointer
-inline status_t
+status_t
 KMessage::SetPointer(const char* name, const void* value)
 {
 	return SetData(name, B_POINTER_TYPE, &value, sizeof(value));
