@@ -18,7 +18,6 @@ const ulong MSG_FIND_CLOSED = 'mfcl';
 
 class BTextControl;
 class BRadioButton;
-class BBox;
 class BCheckBox;
 
 class FindWindow : public BWindow {
@@ -34,11 +33,10 @@ class FindWindow : public BWindow {
 		void _SendFindMessage();
 
 	private:
-		BView 			*fFindView;
 		BTextControl 	*fFindLabel;
 		BRadioButton 	*fTextRadio;
 		BRadioButton 	*fSelectionRadio;
-		BBox 			*fSeparator;
+		
 		BCheckBox		*fForwardSearchBox;
 		BCheckBox		*fMatchCaseBox;
 		BCheckBox		*fMatchWordBox;

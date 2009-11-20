@@ -11,6 +11,8 @@
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <RadioButton.h>
 #include <String.h>
 #include <TextControl.h>
@@ -19,95 +21,63 @@
 const uint32 MSG_FIND_HIDE = 'Fhid';
 
 
-FindWindow::FindWindow (BRect frame, BMessenger messenger , BString &str,
+FindWindow::FindWindow(BRect frame, BMessenger messenger , BString &str,
 	bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
 	:
 	BWindow(frame, "Find", B_FLOATING_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE),
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
+		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFindDlgMessenger(messenger)
 {
 	AddShortcut((ulong)'W', (ulong)B_COMMAND_KEY, new BMessage(MSG_FIND_HIDE));
 
-	//Build up view
-	fFindView = new BView(Bounds(), "FindView", B_FOLLOW_ALL, B_WILL_DRAW);
-	fFindView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(fFindView);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	BBox *separator = new BBox("separator");
+	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
-	font_height height;
-	fFindView->GetFontHeight(&height);
-	float lineHeight = height.ascent + height.descent + height.leading;
-
-	//These labels are from the bottom up
-	float buttonsTop = frame.Height() - 19 - lineHeight;
-	float matchWordBottom = buttonsTop - 4;
-	float matchWordTop = matchWordBottom - lineHeight - 8;
-	float matchCaseBottom = matchWordTop - 4;
-	float matchCaseTop = matchCaseBottom - lineHeight - 8;
-	float forwardSearchBottom = matchCaseTop - 4;
-	float forwardSearchTop = forwardSearchBottom - lineHeight - 8;
-
-	//These things are calculated from the top
-	float textRadioTop = 12;
-	float textRadioBottom = textRadioTop + 2 + lineHeight + 2 + 1;
-	float textRadioLeft = 14;
-	float textRadioRight = textRadioLeft + fFindView->StringWidth("Use Text: ") + 30;
-	float selectionRadioTop = textRadioBottom + 4;
-	float selectionRadioBottom = selectionRadioTop + lineHeight + 8;
-
-	//Divider
-	float dividerHeight = (selectionRadioBottom + forwardSearchTop) / 2;
-
-	//Button Coordinates
-	float searchButtonLeft = (frame.Width() - fFindView->StringWidth("Find") - 60) / 2;
-	float searchButtonRight = searchButtonLeft + fFindView->StringWidth("Find") + 60;
-
-	//Build the Views
-	fTextRadio = new BRadioButton(BRect(textRadioLeft, textRadioTop, textRadioRight, textRadioBottom),
-		"fTextRadio", "Use Text: ", NULL);
-	fFindView->AddChild(fTextRadio);
-
-	fFindLabel = new BTextControl(BRect(textRadioRight + 4, textRadioTop, frame.Width() - 14, textRadioBottom),
-		"fFindLabel", "", "", NULL);
+	BView *layoutView = BGroupLayoutBuilder(B_VERTICAL, 10)
+		.SetInsets(5, 5, 5, 5)
+		.Add(fTextRadio = new BRadioButton("fTextRadio", "Use Text: ",
+			NULL))
+		.Add(fFindLabel = new BTextControl("fFindLabel", "", "", NULL))
+		.Add(fSelectionRadio = new BRadioButton("fSelectionRadio",
+			"Use Selection", NULL))
+		.Add(separator)
+		.Add(fForwardSearchBox = new BCheckBox("fForwardSearchBox",
+			"Search Forward", NULL))
+		.Add(fMatchCaseBox = new BCheckBox("fMatchCaseBox",
+			"Match Case", NULL))
+		.Add(fMatchWordBox = new BCheckBox("fMatchWordBox",
+			"Match Word", NULL))
+		.Add(fFindButton = new BButton("fFindButton", "Find",
+			new BMessage(MSG_FIND)))
+		.End();
+	
+	AddChild(layoutView);	
+	
+	layoutView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	
 	fFindLabel->SetDivider(0);
-	fFindView->AddChild(fFindLabel);
+	
 	if (!findSelection)
 		fFindLabel->SetText(str.String());
 	fFindLabel->MakeFocus(true);
-
-	fSelectionRadio = new BRadioButton(BRect(14, selectionRadioTop, frame.Width() - 14, selectionRadioBottom),
-		"fSelectionRadio", "Use Selection", NULL);
-	fFindView->AddChild(fSelectionRadio);
-
+	
 	if (findSelection)
 		fSelectionRadio->SetValue(B_CONTROL_ON);
 	else
 		fTextRadio->SetValue(B_CONTROL_ON);
 
-	fSeparator = new BBox(BRect(6, dividerHeight, frame.Width() - 6, dividerHeight + 1));
-	fFindView->AddChild(fSeparator);
-
-	fForwardSearchBox = new BCheckBox(BRect(14, forwardSearchTop, frame.Width() - 14, forwardSearchBottom),
-		"fForwardSearchBox", "Search Forward", NULL);
-	fFindView->AddChild(fForwardSearchBox);
 	if (forwardSearch)
 		fForwardSearchBox->SetValue(B_CONTROL_ON);
 
-	fMatchCaseBox = new BCheckBox(BRect(14, matchCaseTop, frame.Width() - 14, matchCaseBottom),
-		"fMatchCaseBox", "Match Case", NULL);
-	fFindView->AddChild(fMatchCaseBox);
 	if (matchCase)
 		fMatchCaseBox->SetValue(B_CONTROL_ON);
-
-	fMatchWordBox = new BCheckBox(BRect(14, matchWordTop, frame.Width() - 14, matchWordBottom),
-		"fMatchWordBox", "Match Word", NULL);
-	fFindView->AddChild(fMatchWordBox);
+	
 	if (matchWord)
 		fMatchWordBox->SetValue(B_CONTROL_ON);
 
-	fFindButton = new BButton(BRect(searchButtonLeft, buttonsTop, searchButtonRight, frame.Height() - 14),
-		"fFindButton", "Find", new BMessage(MSG_FIND));
 	fFindButton->MakeDefault(true);
-	fFindView->AddChild(fFindButton);
 
 	Show();
 }
