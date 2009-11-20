@@ -2758,7 +2758,7 @@ name, type, nodeID, offset));
 
 	AutoLocker<Locker> locker(fLock);
 
-	size_t entryLen;
+	size_t entryLen = 0;
 	if (offset != 0) {
 		// does the caller want more entries?
 		if (buffer->entriesRead == buffer->maxEntries)
