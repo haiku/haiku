@@ -1849,6 +1849,8 @@ MainWin::_SetFileAttributes()
 		if (node.InitCheck())
 			return;
 
+		// write duration
+
 		attr_info info;
 		status_t status = node.GetAttrInfo("Audio:Length", &info);
 		if (status != B_OK || info.size == 0) {
@@ -1859,6 +1861,21 @@ MainWin::_SetFileAttributes()
 				duration % 60);
 			node.WriteAttr("Audio:Length", B_STRING_TYPE, 0, text,
 				strlen(text) + 1);
+		}
+
+		// write bitrate
+
+		status = node.GetAttrInfo("Audio:Bitrate", &info);
+		if (status != B_OK || info.size == 0) {
+			media_format format;
+			if (fController->GetEncodedAudioFormat(&format) == B_OK
+				&& format.type == B_MEDIA_ENCODED_AUDIO) {
+				int32 bitrate = (int32)(format.u.encoded_audio.bit_rate / 1000);
+				char text[256];
+				snprintf(text, sizeof(text), "%ld kbit", bitrate);
+				node.WriteAttr("Audio:Bitrate", B_STRING_TYPE, 0, text,
+					strlen(text) + 1);
+			}
 		}
 	}
 }
