@@ -19,8 +19,7 @@ class TTextControl;
 
 class AppearancePrefView : public PrefView {
 	public:
-		AppearancePrefView(BRect frame, const char *name, 
-			BMessenger messenger);
+		AppearancePrefView(const char *name, BMessenger messenger);
 
 		virtual	void	Revert();
 		virtual void	MessageReceived(BMessage *message);

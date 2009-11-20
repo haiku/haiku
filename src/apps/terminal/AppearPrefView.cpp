@@ -12,6 +12,8 @@
 #include <stdlib.h>
 
 #include <Button.h>
+#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -25,9 +27,9 @@
 
 
 
-AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
+AppearancePrefView::AppearancePrefView(const char *name,
 		BMessenger messenger)
-	: PrefView(frame, name),
+	: PrefView(name),
 	fAppearancePrefViewMessenger(messenger)
 {
   	const char *color_tbl[] = {
@@ -58,33 +60,38 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 	float greenDividerSize = StringWidth("Green:") + 8.0;
 	float colorDividerSize = StringWidth("Color:") + 8.0;
 
-	BRect r(5, 5, 261, 25);
-
-	BMenu *menu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	
+	BMenu *fontMenu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
 		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),
 		PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE));
-	fFont = new BMenuField(r, "font", "Font:", menu);
-	fFont->SetDivider(colorDividerSize);
-	fFont->SetAlignment(B_ALIGN_RIGHT);
-	AddChild(fFont);
-
-	r.OffsetBy(r.Width() + 10, 0);
-	menu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
+	
+	BMenu *sizeMenu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
 		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
-	fFontSize = new BMenuField(r, "size", "Size:", menu);
-	fFontSize->SetDivider(greenDividerSize);
+	
+	BView *layoutView = BLayoutBuilder::Group<>()
+		.SetInsets(10, 10, 10, 10)
+		.AddGroup(B_VERTICAL)
+			.Add(fFont = new BMenuField("font", "Font:", fontMenu))
+			.Add(fFontSize = new BMenuField("size", "Size:", sizeMenu))
+			.Add(fColorField = new BMenuField("color", "Color:",
+				MakeMenu(MSG_COLOR_FIELD_CHANGED, color_tbl,
+					color_tbl[0])))
+			.Add(fColorControl = new BColorControl(BPoint(10, 10),
+				B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
+		.End();
+	
+	AddChild(layoutView);
+	
+	//fFont->SetDivider(colorDividerSize);
+	fFont->SetAlignment(B_ALIGN_RIGHT);
+	
+	//fFontSize->SetDivider(greenDividerSize);
 	fFontSize->SetAlignment(B_ALIGN_RIGHT);
-	AddChild(fFontSize);
 
-	r.OffsetBy(-r.Width() - 10,r.Height() + 10);
-	fColorField = new BMenuField(r, "color", "Color:",
-		MakeMenu(MSG_COLOR_FIELD_CHANGED, color_tbl, color_tbl[0]));
-	fColorField->SetDivider(colorDividerSize);
+	//fColorField->SetDivider(colorDividerSize);
 	fColorField->SetAlignment(B_ALIGN_RIGHT);
-	AddChild(fColorField);
 
-	fColorControl = SetupColorControl(BPoint(r.left, r.bottom + 10),
-		B_CELLS_32x8, 8.0, MSG_COLOR_CHANGED);
 	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
 
 	BTextControl* redInput = (BTextControl*)fColorControl->ChildAt(0);
@@ -95,9 +102,9 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 	greenInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	blueInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
-	redInput->SetDivider(greenDividerSize);
+	/*redInput->SetDivider(greenDividerSize);
 	greenInput->SetDivider(greenDividerSize);
-	blueInput->SetDivider(greenDividerSize);
+	blueInput->SetDivider(greenDividerSize);*/
 }
 
 

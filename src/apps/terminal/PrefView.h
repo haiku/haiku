@@ -30,6 +30,7 @@
 
 #ifndef PREFVIEW_H_INCLUDED
 #define PREFVIEW_H_INCLUDED
+
 #include <View.h>
 #include <ColorControl.h>
 #include <String.h>
@@ -79,12 +80,10 @@ const ulong MSG_PREF_MODIFIED		= 'mpmo';
 
 class PrefView : public BView {
 public:
-				PrefView(BRect frame, const char *name);
+				PrefView(const char *name);
   		virtual ~PrefView();
   		virtual bool	CanApply();
   		virtual void	MessageReceived(BMessage *msg);
-
-  		BColorControl* SetupColorControl(BPoint p, color_control_layout layout, float cell_size, ulong msg);
 
 };
 

@@ -40,8 +40,8 @@
 #include <String.h>
 
 
-PrefView::PrefView(BRect frame, const char *name)
-	:BView(frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+PrefView::PrefView(const char *name)
+	:BView(name, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -86,15 +86,3 @@ PrefView::MessageReceived(BMessage* msg)
 			BView::MessageReceived(msg);
 	}
 }
-
-
-BColorControl *
-PrefView::SetupColorControl(BPoint point, color_control_layout layout,
-							float cellSize, ulong message)
-{
-	BColorControl *control = new BColorControl(point, layout, cellSize,
-												"", new BMessage(message));
-	AddChild(control);
-	return control;
-}
-
