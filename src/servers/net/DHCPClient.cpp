@@ -483,8 +483,10 @@ DHCPClient::_Negotiate(dhcp_state state)
 					? broadcast : fServer);
 			}
 
-			if (status < B_OK)
+			if (status != B_OK)
 				break;
+
+			continue;
 		} else if (bytesReceived < B_OK)
 			break;
 
@@ -634,7 +636,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				BPath path;
 				if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK)
 					break;
-				
+
 				path.Append("network/resolv.conf");
 
 				FILE* file = fopen(path.Path(), "w");
