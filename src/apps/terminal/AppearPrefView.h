@@ -19,7 +19,7 @@ class TTextControl;
 
 class AppearancePrefView : public PrefView {
 	public:
-		AppearancePrefView(const char *name, BMessenger messenger);
+		AppearancePrefView(const char *name, const BMessenger &messenger);
 
 		virtual	void	Revert();
 		virtual void	MessageReceived(BMessage *message);
@@ -38,7 +38,7 @@ class AppearancePrefView : public PrefView {
 		BMenuField		*fColorField;
 		BColorControl	*fColorControl;
 
-		BMessenger fAppearancePrefViewMessenger;
+		BMessenger fTerminalMessenger;
 };
 
 #endif	// APPEARANCE_PREF_VIEW_H

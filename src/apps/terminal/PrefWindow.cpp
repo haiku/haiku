@@ -23,19 +23,19 @@
 #include <stdio.h>
 
 
-PrefWindow::PrefWindow(BMessenger messenger)
+PrefWindow::PrefWindow(const BMessenger &messenger)
 	: BWindow(BRect(0, 0, 375, 185), "Terminal Preferences",
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_AUTO_UPDATE_SIZE_LIMITS),
 	fPreviousPref(new PrefHandler(PrefHandler::Default())),
 	fSavePanel(NULL),
 	fDirty(false),
-	fPrefDlgMessenger(messenger)
+	fTerminalMessenger(messenger)
 {
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGroup(B_VERTICAL, 1)
 		.SetInsets(10, 10, 10, 10)
-			.Add(new AppearancePrefView("Appearance", fPrefDlgMessenger))
+			.Add(new AppearancePrefView("Appearance", fTerminalMessenger))
 			.AddGroup(B_HORIZONTAL)
 				.Add(fSaveAsFileButton = new BButton("savebutton",
 					"Save to File" B_UTF8_ELLIPSIS,
@@ -68,7 +68,7 @@ PrefWindow::~PrefWindow()
 void
 PrefWindow::Quit()
 {
-	fPrefDlgMessenger.SendMessage(MSG_PREF_CLOSED);
+	fTerminalMessenger.SendMessage(MSG_PREF_CLOSED);
 	delete fPreviousPref;
 	delete fSavePanel;
 	BWindow::Quit();
@@ -148,9 +148,9 @@ PrefWindow::_Revert()
 	if (fDirty) {
 		PrefHandler::SetDefault(new PrefHandler(fPreviousPref));
 
-		fPrefDlgMessenger.SendMessage(MSG_HALF_FONT_CHANGED);
-		fPrefDlgMessenger.SendMessage(MSG_COLOR_CHANGED);
-		fPrefDlgMessenger.SendMessage(MSG_INPUT_METHOD_CHANGED);
+		fTerminalMessenger.SendMessage(MSG_HALF_FONT_CHANGED);
+		fTerminalMessenger.SendMessage(MSG_COLOR_CHANGED);
+		fTerminalMessenger.SendMessage(MSG_INPUT_METHOD_CHANGED);
 
 		fDirty = false;
 	}

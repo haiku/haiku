@@ -28,9 +28,9 @@
 
 
 AppearancePrefView::AppearancePrefView(const char *name,
-		BMessenger messenger)
+		const BMessenger &messenger)
 	: PrefView(name),
-	fAppearancePrefViewMessenger(messenger)
+	fTerminalMessenger(messenger)
 {
   	const char *color_tbl[] = {
 		PREF_TEXT_FORE_COLOR,
@@ -57,9 +57,6 @@ AppearancePrefView::AppearancePrefView(const char *name,
 		NULL
   	};
 
-	float greenDividerSize = StringWidth("Green:") + 8.0;
-	float colorDividerSize = StringWidth("Color:") + 8.0;
-
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	
 	BMenu *fontMenu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
@@ -83,13 +80,8 @@ AppearancePrefView::AppearancePrefView(const char *name,
 	
 	AddChild(layoutView);
 	
-	//fFont->SetDivider(colorDividerSize);
 	fFont->SetAlignment(B_ALIGN_RIGHT);
-	
-	//fFontSize->SetDivider(greenDividerSize);
 	fFontSize->SetAlignment(B_ALIGN_RIGHT);
-
-	//fColorField->SetDivider(colorDividerSize);
 	fColorField->SetAlignment(B_ALIGN_RIGHT);
 
 	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
@@ -101,10 +93,6 @@ AppearancePrefView::AppearancePrefView(const char *name,
 	redInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	greenInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	blueInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-
-	/*redInput->SetDivider(greenDividerSize);
-	greenInput->SetDivider(greenDividerSize);
-	blueInput->SetDivider(greenDividerSize);*/
 }
 
 
@@ -200,7 +188,7 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 	}
 
 	if (modified) {
-		fAppearancePrefViewMessenger.SendMessage(msg);
+		fTerminalMessenger.SendMessage(msg);
 
 		BMessenger messenger(this);
 		messenger.SendMessage(MSG_PREF_MODIFIED);

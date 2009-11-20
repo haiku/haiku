@@ -31,7 +31,7 @@ class PrefHandler;
 class PrefWindow : public BWindow
 {
 	public:
-		PrefWindow(BMessenger messenger);
+		PrefWindow(const BMessenger &messenger);
 		virtual ~PrefWindow();
 
 		virtual void Quit();
@@ -54,7 +54,7 @@ class PrefWindow : public BWindow
 						*fSaveButton;
 
 		bool			fDirty;
-		BMessenger		fPrefDlgMessenger;
+		BMessenger		fTerminalMessenger;
 };
 
 #endif	// PREFDLG_H_INCLUDED
