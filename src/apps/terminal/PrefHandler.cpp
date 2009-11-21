@@ -8,7 +8,7 @@
  */
 
 
-#include "Coding.h"
+#include "Encoding.h"
 #include "PrefHandler.h"
 #include "TermConst.h"
 

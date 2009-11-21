@@ -30,7 +30,7 @@
 
 #include "Arguments.h"
 #include "AppearPrefView.h"
-#include "Coding.h"
+#include "Encoding.h"
 #include "FindWindow.h"
 #include "PrefWindow.h"
 #include "PrefHandler.h"

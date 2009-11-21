@@ -9,7 +9,7 @@ Application Terminal :
 	Arguments.cpp
 	BasicTerminalBuffer.cpp
 	CodeConv.cpp
-	Coding.cpp
+	Encoding.cpp
 	FindWindow.cpp
 	Globals.cpp
 	HistoryBuffer.cpp

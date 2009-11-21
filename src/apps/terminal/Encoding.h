@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef _CODING__H_
-#define _CODING__H_
+#ifndef _ENCODING__H_
+#define _ENCODING__H_
 
 #include <SupportDefs.h>
 #include <UTF8.h>

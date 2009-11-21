@@ -9,7 +9,8 @@
 
 
 #include <SupportDefs.h>
-#include "Coding.h"
+
+#include "Encoding.h"
 
 class CodeConv {
 	public:
