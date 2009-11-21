@@ -166,11 +166,9 @@ TermWindow::~TermWindow()
 	// TODO: Code duplication. Exterminate
 	if (fPrefWindow)
 		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
-	else {
-		BPath path;
-		if (PrefHandler::GetDefaultPath(path) == B_OK)
-			PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
-	}
+	else 
+		PrefHandler::Default()->SaveDefaultAsText();	
+	
 		
 	if (fFindPanel && fFindPanel->Lock()) {
 		fFindPanel->Quit();
@@ -297,6 +295,8 @@ TermWindow::_SetupMenu()
 	fFilemenu->AddItem(new BMenuItem("About Terminal" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	fFilemenu->AddSeparatorItem();
+	fFilemenu->AddItem(new BMenuItem("Close Active Tab",
+		new BMessage(kCloseView), 'W', B_SHIFT_KEY));
 	fFilemenu->AddItem(new BMenuItem("Quit",
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	fMenubar->AddItem(fFilemenu);
@@ -631,12 +631,15 @@ TermWindow::MessageReceived(BMessage *message)
 		case kCloseView:
 		{
 			TermView* termView;
-			if (message->FindPointer("termView", (void**)&termView) == B_OK) {
-				int32 index = _IndexOfTermView(termView);
-				if (index >= 0) {
-					_RemoveTab(index);
-				}
-			}
+			int32 index = -1;
+			if (message->FindPointer("termView", (void**)&termView) == B_OK)
+				index = _IndexOfTermView(termView);
+			else
+				index = _IndexOfTermView(_ActiveTermView());
+				
+			if (index >= 0)
+				_RemoveTab(index);
+							
 			break;
 		}
 

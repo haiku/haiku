@@ -164,6 +164,15 @@ PrefHandler::Save(const char *path)
 
 
 void
+PrefHandler::SaveDefaultAsText()
+{
+	BPath path;
+	if (GetDefaultPath(path) == B_OK)
+		SaveAsText(path.Path(), PREFFILE_MIMETYPE);
+}
+
+
+void
 PrefHandler::SaveAsText(const char *path, const char *mimetype,
 	const char *signature)
 {

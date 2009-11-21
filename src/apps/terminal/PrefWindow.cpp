@@ -132,11 +132,8 @@ PrefWindow::_Save()
 	delete fPreviousPref;
 	fPreviousPref = new PrefHandler(PrefHandler::Default());
 
-	BPath path;
-	if (PrefHandler::GetDefaultPath(path) == B_OK) {
-		PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
-		fDirty = false;
-	}
+	PrefHandler::Default()->SaveDefaultAsText();
+	fDirty = false;
 }
 
 

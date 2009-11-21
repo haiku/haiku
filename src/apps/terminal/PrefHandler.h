@@ -68,6 +68,7 @@ class PrefHandler {
 		status_t    Open(const char *name);
 		status_t    OpenText(const char *path);
 		status_t    Save(const char *name);
+		void		SaveDefaultAsText();
 		void        SaveAsText(const char *path, const char *minmtype = NULL,
 						const char *signature = NULL);
 
