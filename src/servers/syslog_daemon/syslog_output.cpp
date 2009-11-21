@@ -84,9 +84,9 @@ prepare_output()
 		bool haveSyslog = sLog >= 0;
 
 		// open file
-		sLog = open(syslog.Path(), O_APPEND | O_CREAT | O_WRONLY, 644);
-		if (!haveSyslog && sLog >=0) {
-			// first time open, check file size again 
+		sLog = open(syslog.Path(), O_APPEND | O_CREAT | O_WRONLY, 0644);
+		if (!haveSyslog && sLog >= 0) {
+			// first time open, check file size again
 			prepare_output();
 		}
 	}
@@ -222,7 +222,7 @@ init_syslog_output(SyslogDaemon *daemon)
 
 		unload_driver_settings(handle);
 	}
-	
+
 	daemon->AddHandler(syslog_output);
 }
 
