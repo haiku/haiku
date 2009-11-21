@@ -52,6 +52,7 @@ public:
 	virtual	off_t				FileSize() const = 0;
 
 	virtual	status_t			AddPackageNode(PackageNode* packageNode) = 0;
+	virtual	void				RemovePackageNode(PackageNode* packageNode) = 0;
 
 	virtual	PackageNode*		GetPackageNode() = 0;
 

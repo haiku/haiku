@@ -6,6 +6,8 @@
 
 #include "LeafNode.h"
 
+#include "Utils.h"
+
 
 LeafNode::LeafNode(ino_t id)
 	:
@@ -96,9 +98,48 @@ LeafNode::AddPackageNode(PackageNode* packageNode)
 	if (S_ISDIR(packageNode->Mode()))
 		return B_BAD_VALUE;
 
-	fPackageNodes.Add(dynamic_cast<PackageLeafNode*>(packageNode));
+	PackageLeafNode* packageLeafNode
+		= dynamic_cast<PackageLeafNode*>(packageNode);
+
+	PackageLeafNode* headNode = fPackageNodes.Head();
+	bool isNewest = headNode == NULL
+		|| packageLeafNode->ModifiedTime() > headNode->ModifiedTime();
+
+	if (isNewest) {
+		fPackageNodes.Add(packageLeafNode);
+	} else {
+		// add after the head
+		fPackageNodes.RemoveHead();
+		fPackageNodes.Add(packageLeafNode);
+		fPackageNodes.Add(headNode);
+	}
 
 	return B_OK;
+}
+
+
+void
+LeafNode::RemovePackageNode(PackageNode* packageNode)
+{
+	bool isNewest = packageNode == fPackageNodes.Head();
+	fPackageNodes.Remove(dynamic_cast<PackageLeafNode*>(packageNode));
+
+	// when removing the newest node, we need to find the next node (the list
+	// is not sorted)
+	PackageLeafNode* newestNode = fPackageNodes.Head();
+	if (isNewest && newestNode != NULL) {
+		PackageLeafNodeList::Iterator it = fPackageNodes.GetIterator();
+		it.Next();
+			// skip the first one
+		while (PackageLeafNode* otherNode = it.Next()) {
+			if (otherNode->ModifiedTime() > newestNode->ModifiedTime())
+				newestNode = otherNode;
+		}
+
+		// re-add the newest node to the head
+		fPackageNodes.Remove(newestNode);
+		fPackageNodes.Add(newestNode);
+	}
 }
 
 

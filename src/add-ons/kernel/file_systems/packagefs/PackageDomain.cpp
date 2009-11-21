@@ -11,19 +11,34 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <NodeMonitor.h>
+
+#include <AutoDeleter.h>
+
+#include <fs/node_monitor.h>
+#include <Notifications.h>
+
 #include "DebugSupport.h"
 
 
 PackageDomain::PackageDomain()
 	:
 	fPath(NULL),
-	fDirFD(-1)
+	fDirFD(-1),
+	fListener(NULL)
 {
 }
 
 
 PackageDomain::~PackageDomain()
 {
+	PRINT("PackageDomain::~PackageDomain()\n");
+
+	if (fListener != NULL) {
+		remove_node_listener(fDeviceID, fNodeID, *fListener);
+		delete fListener;
+	}
+
 	Package* package = fPackages.Clear(true);
 	while (package != NULL) {
 		Package* next = package->HashTableNext();
@@ -54,13 +69,28 @@ PackageDomain::Init(const char* path)
 
 
 status_t
-PackageDomain::Prepare()
+PackageDomain::Prepare(NotificationListener* listener)
 {
+	ObjectDeleter<NotificationListener> listenerDeleter(listener);
+
 	fDirFD = open(fPath, O_RDONLY);
 	if (fDirFD < 0) {
 		ERROR("Failed to open package domain \"%s\"\n", strerror(errno));
 		return errno;
 	}
+
+	struct stat st;
+	if (fstat(fDirFD, &st) < 0)
+		RETURN_ERROR(errno);
+
+	fDeviceID = st.st_dev;
+	fNodeID = st.st_ino;
+
+	status_t error = add_node_listener(fDeviceID, fNodeID, B_WATCH_DIRECTORY,
+		*listener);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	fListener = listenerDeleter.Detach();
 
 	return B_OK;
 }
@@ -79,4 +109,11 @@ PackageDomain::RemovePackage(Package* package)
 {
 	fPackages.Remove(package);
 	package->ReleaseReference();
+}
+
+
+Package*
+PackageDomain::FindPackage(const char* name) const
+{
+	return fPackages.Lookup(name);
 }

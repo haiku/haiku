@@ -7,6 +7,7 @@
 #include "Directory.h"
 
 #include "DebugSupport.h"
+#include "Utils.h"
 
 
 Directory::Directory(ino_t id)
@@ -105,9 +106,40 @@ Directory::AddPackageNode(PackageNode* packageNode)
 	PackageDirectory* packageDirectory
 		= dynamic_cast<PackageDirectory*>(packageNode);
 
-	fPackageDirectories.Add(packageDirectory);
+	PackageDirectory* other = fPackageDirectories.Head();
+	bool isNewest = other == NULL
+		|| packageDirectory->ModifiedTime() > other->ModifiedTime();
+
+	if (isNewest)
+		fPackageDirectories.Insert(other, packageDirectory);
+	else
+		fPackageDirectories.Add(packageDirectory);
 
 	return B_OK;
+}
+
+
+void
+Directory::RemovePackageNode(PackageNode* packageNode)
+{
+	bool isNewest = packageNode == fPackageDirectories.Head();
+	fPackageDirectories.Remove(dynamic_cast<PackageDirectory*>(packageNode));
+
+	// when removing the newest node, we need to find the next node (the list
+	// is not sorted)
+	PackageDirectory* newestNode = fPackageDirectories.Head();
+	if (isNewest && newestNode != NULL) {
+		PackageDirectoryList::Iterator it = fPackageDirectories.GetIterator();
+		it.Next();
+			// skip the first one
+		while (PackageDirectory* otherNode = it.Next()) {
+			if (otherNode->ModifiedTime() > newestNode->ModifiedTime())
+				newestNode = otherNode;
+		}
+
+		fPackageDirectories.Remove(newestNode);
+		fPackageDirectories.Insert(fPackageDirectories.Head(), newestNode);
+	}
 }
 
 

@@ -43,6 +43,8 @@ public:
 
 			// VFS wrappers
 			status_t			GetVNode(ino_t nodeID, Node*& _node);
+			status_t			PutVNode(ino_t nodeID);
+			status_t			RemoveVNode(ino_t nodeID);
 			status_t			PublishVNode(Node* node);
 
 			status_t			AddPackageDomain(const char* path);
@@ -50,8 +52,10 @@ public:
 private:
 			struct Job;
 			struct AddPackageDomainJob;
+			struct DomainDirectoryEventJob;
 			struct PackageLoaderErrorOutput;
 			struct PackageLoaderContentHandler;
+			struct DomainDirectoryListener;
 
 			typedef DoublyLinkedList<Job> JobList;
 			typedef DoublyLinkedList<PackageDomain> PackageDomainList;
@@ -65,16 +69,49 @@ private:
 			void				_PushJob(Job* job);
 
 			status_t			_AddInitialPackageDomain(const char* path);
-			status_t			_AddPackageDomain(PackageDomain* domain);
+			status_t			_AddPackageDomain(PackageDomain* domain,
+									bool notify);
 			status_t			_LoadPackage(Package* package);
-			status_t			_AddPackageContent(Package* package);
+
+			status_t			_AddPackageContent(Package* package,
+									bool notify);
+			void				_RemovePackageContent(Package* package,
+									PackageNode* endNode, bool notify);
+
 			status_t			_AddPackageContentRootNode(Package* package,
-									PackageNode* node);
+									PackageNode* node, bool notify);
+			void				_RemovePackageContentRootNode(Package* package,
+									PackageNode* packageNode,
+									PackageNode* endPackageNode, bool notify);
+
 			status_t			_AddPackageNode(Directory* directory,
-									PackageNode* packageNode, Node*& _node);
+									PackageNode* packageNode, bool notify,
+									Node*& _node);
+			void				_RemovePackageNode(Directory* directory,
+									PackageNode* packageNode, Node* node,
+									bool notify);
 
 			status_t			_CreateNode(mode_t mode, Directory* parent,
 									const char* name, Node*& _node);
+									// does *not* return a reference
+			void				_RemoveNode(Node* node);
+
+			void				_DomainListenerEventOccurred(
+									PackageDomain* domain,
+									const KMessage* event);
+			void				_DomainEntryCreated(PackageDomain* domain,
+									dev_t deviceID, ino_t directoryID,
+									ino_t nodeID, const char* name,
+									bool addContent, bool notify);
+			void				_DomainEntryRemoved(PackageDomain* domain,
+									dev_t deviceID, ino_t directoryID,
+									ino_t nodeID, const char* name,
+									bool notify);
+			void				_DomainEntryMoved(PackageDomain* domain,
+									dev_t deviceID, ino_t fromDirectoryID,
+									ino_t toDirectoryID, dev_t nodeDeviceID,
+									ino_t nodeID, const char* fromName,
+									const char* name, bool notify);
 
 private:
 			rw_lock				fLock;

@@ -14,9 +14,14 @@
 
 #include <new>
 
+#include <AppDefs.h>
 #include <KernelExport.h>
+#include <NodeMonitor.h>
 
 #include <AutoDeleter.h>
+
+#include <Notifications.h>
+#include <util/KMessage.h>
 
 #include "ErrorOutput.h"
 #include "FDCloser.h"
@@ -67,20 +72,57 @@ struct Volume::AddPackageDomainJob : Job {
 		Job(volume),
 		fDomain(domain)
 	{
+		fDomain->AcquireReference();
 	}
 
 	virtual ~AddPackageDomainJob()
 	{
+		fDomain->ReleaseReference();
 	}
 
 	virtual void Do()
 	{
-		fVolume->_AddPackageDomain(fDomain);
+		fVolume->_AddPackageDomain(fDomain, true);
 		fDomain = NULL;
 	}
 
 private:
 	PackageDomain*	fDomain;
+};
+
+
+// #pragma mark - DomainDirectoryEventJob
+
+
+struct Volume::DomainDirectoryEventJob : Job {
+	DomainDirectoryEventJob(Volume* volume, PackageDomain* domain)
+		:
+		Job(volume),
+		fDomain(domain),
+		fEvent(NULL)
+	{
+		fDomain->AcquireReference();
+	}
+
+	virtual ~DomainDirectoryEventJob()
+	{
+		fDomain->ReleaseReference();
+	}
+
+	status_t Init(const KMessage* event)
+	{
+		RETURN_ERROR(fEvent.SetTo(event->Buffer(), -1,
+			KMessage::KMESSAGE_CLONE_BUFFER));
+	}
+
+	virtual void Do()
+	{
+		fVolume->_DomainListenerEventOccurred(fDomain, &fEvent);
+	}
+
+private:
+	PackageDomain*	fDomain;
+	KMessage		fEvent;
 };
 
 
@@ -224,6 +266,36 @@ private:
 };
 
 
+// #pragma mark - DomainDirectoryListener
+
+
+struct Volume::DomainDirectoryListener : NotificationListener {
+	DomainDirectoryListener(Volume* volume, PackageDomain* domain)
+		:
+		fVolume(volume),
+		fDomain(domain)
+	{
+	}
+
+	virtual void EventOccurred(NotificationService& service,
+		const KMessage* event)
+	{
+		DomainDirectoryEventJob* job = new(std::nothrow)
+			DomainDirectoryEventJob(fVolume, fDomain);
+		if (job == NULL || job->Init(event)) {
+			delete job;
+			return;
+		}
+
+		fVolume->_PushJob(job);
+	}
+
+private:
+	Volume*			fVolume;
+	PackageDomain*	fDomain;
+};
+
+
 // #pragma mark - Volume
 
 
@@ -246,7 +318,7 @@ Volume::~Volume()
 	_TerminatePackageLoader();
 
 	while (PackageDomain* packageDomain = fPackageDomains.RemoveHead())
-		delete packageDomain;
+		packageDomain->ReleaseReference();
 
 	// remove all nodes from the ID hash table
 	Node* node = fNodes.Clear(true);
@@ -320,6 +392,20 @@ Volume::GetVNode(ino_t nodeID, Node*& _node)
 
 
 status_t
+Volume::PutVNode(ino_t nodeID)
+{
+	return put_vnode(fFSVolume, nodeID);
+}
+
+
+status_t
+Volume::RemoveVNode(ino_t nodeID)
+{
+	return remove_vnode(fFSVolume, nodeID);
+}
+
+
+status_t
 Volume::PublishVNode(Node* node)
 {
 	return publish_vnode(fFSVolume, node->ID(), node, &gPackageFSVnodeOps,
@@ -333,7 +419,7 @@ Volume::AddPackageDomain(const char* path)
 	PackageDomain* packageDomain = new(std::nothrow) PackageDomain;
 	if (packageDomain == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	ObjectDeleter<PackageDomain> packageDomainDeleter(packageDomain);
+	BReference<PackageDomain> packageDomainReference(packageDomain, true);
 
 	status_t error = packageDomain->Init(path);
 	if (error != B_OK)
@@ -342,7 +428,6 @@ Volume::AddPackageDomain(const char* path)
 	Job* job = new(std::nothrow) AddPackageDomainJob(this, packageDomain);
 	if (job == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	packageDomainDeleter.Detach();
 
 	_PushJob(job);
 
@@ -408,6 +493,7 @@ Volume::_PushJob(Job* job)
 {
 	MutexLocker jobQueueLocker(fJobQueueLock);
 	fJobQueue.Add(job);
+	fJobQueueCondition.NotifyOne();
 }
 
 
@@ -417,30 +503,32 @@ Volume::_AddInitialPackageDomain(const char* path)
 	PackageDomain* domain = new(std::nothrow) PackageDomain;
 	if (domain == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	ObjectDeleter<PackageDomain> domainDeleter(domain);
+	BReference<PackageDomain> domainReference(domain, true);
 
 	status_t error = domain->Init(path);
 	if (error != B_OK)
 		return error;
 
-	return _AddPackageDomain(domainDeleter.Detach());
+	return _AddPackageDomain(domain, false);
 }
 
 
 status_t
-Volume::_AddPackageDomain(PackageDomain* domain)
+Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 {
-	ObjectDeleter<PackageDomain> domainDeleter(domain);
+	// create a directory listener
+	DomainDirectoryListener* listener = new(std::nothrow)
+		DomainDirectoryListener(this, domain);
+	if (listener == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
 
 	// prepare the package domain
-	status_t error = domain->Prepare();
+	status_t error = domain->Prepare(listener);
 	if (error != B_OK) {
 		ERROR("Failed to prepare package domain \"%s\": %s\n",
 			domain->Path(), strerror(errno));
 		return errno;
 	}
-
-	// TODO: Start monitoring the directory!
 
 	// iterate through the dir and create packages
 	DIR* dir = opendir(domain->Path());
@@ -456,44 +544,25 @@ Volume::_AddPackageDomain(PackageDomain* domain)
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 
-		// check whether the entry is a file
-		struct stat st;
-		if (fstatat(domain->DirectoryFD(), entry->d_name, &st,
-				AT_SYMLINK_NOFOLLOW) < 0
-			|| !S_ISREG(st.st_mode)) {
-			continue;
-		}
-
-		// create a package
-		Package* package = new(std::nothrow) Package(domain, st.st_dev,
-			st.st_ino);
-		if (package == NULL)
-			RETURN_ERROR(B_NO_MEMORY);
-		BReference<Package> packageReference(package, true);
-
-		status_t error = package->Init(entry->d_name);
-		if (error != B_OK)
-			return error;
-
-		error = _LoadPackage(package);
-		if (error != B_OK)
-			continue;
-
-		domain->AddPackage(package);
+		_DomainEntryCreated(domain, domain->DeviceID(), domain->NodeID(),
+			-1, entry->d_name, false, notify);
+// TODO: -1 node ID?
 	}
 
 	// add the packages to the node tree
 	VolumeWriteLocker volumeLocker(this);
 	for (PackageHashTable::Iterator it = domain->Packages().GetIterator();
 			Package* package = it.Next();) {
-		error = _AddPackageContent(package);
+		error = _AddPackageContent(package, notify);
 		if (error != B_OK) {
 // TODO: Remove the already added packages!
 			return error;
 		}
 	}
 
-	fPackageDomains.Add(domainDeleter.Detach());
+	fPackageDomains.Add(domain);
+	domain->AcquireReference();
+
 	return B_OK;
 }
 
@@ -529,33 +598,64 @@ Volume::_LoadPackage(Package* package)
 
 
 status_t
-Volume::_AddPackageContent(Package* package)
+Volume::_AddPackageContent(Package* package, bool notify)
 {
 	for (PackageNodeList::Iterator it = package->Nodes().GetIterator();
 			PackageNode* node = it.Next();) {
-		status_t error = _AddPackageContentRootNode(package, node);
+		status_t error = _AddPackageContentRootNode(package, node, notify);
 		if (error != B_OK) {
-// TODO: Remove already added nodes!
+			_RemovePackageContent(package, node, notify);
 			return error;
 		}
 	}
-// TODO: Recursively add the nodes!
 
 	return B_OK;
 }
 
 
-status_t
-Volume::_AddPackageContentRootNode(Package* package, PackageNode* packageNode)
+void
+Volume::_RemovePackageContent(Package* package, PackageNode* endNode,
+	bool notify)
 {
+	PackageNode* node = package->Nodes().Head();
+	while (node != NULL) {
+		if (node == endNode)
+			break;
+
+		PackageNode* nextNode = package->Nodes().GetNext(node);
+		_RemovePackageContentRootNode(package, node, NULL, notify);
+		node = nextNode;
+	}
+}
+
+
+/*!	This method recursively iterates through the descendents of the given
+	package root node and adds all package nodes to the node tree in
+	pre-order.
+	Due to limited kernel stack space we avoid deep recursive function calls
+	and rather use the package node stack implied by the tree.
+*/
+status_t
+Volume::_AddPackageContentRootNode(Package* package,
+	PackageNode* rootPackageNode, bool notify)
+{
+	PackageNode* packageNode = rootPackageNode;
 	Directory* directory = fRootDirectory;
 	directory->WriteLock();
 
 	do {
 		Node* node;
-		status_t error = _AddPackageNode(directory, packageNode, node);
+		status_t error = _AddPackageNode(directory, packageNode, notify, node);
 		if (error != B_OK) {
-// TODO: Remove already added nodes!
+			// unlock all directories
+			while (directory != NULL) {
+				directory->WriteUnlock();
+				directory = directory->Parent();
+			}
+
+			// remove the added package nodes
+			_RemovePackageContentRootNode(package, rootPackageNode, packageNode,
+				notify);
 			return error;
 		}
 
@@ -570,11 +670,13 @@ Volume::_AddPackageContentRootNode(Package* package, PackageNode* packageNode)
 			}
 		}
 
-		// continue with the next available (descendent's) sibling
+		// continue with the next available (ancestors's) sibling
 		do {
 			PackageDirectory* packageDirectory = packageNode->Parent();
-			if (PackageNode* sibling
-					= packageDirectory->NextChild(packageNode)) {
+			PackageNode* sibling = packageDirectory != NULL
+				? packageDirectory->NextChild(packageNode) : NULL;
+
+			if (sibling != NULL) {
 				packageNode = sibling;
 				break;
 			}
@@ -591,25 +693,163 @@ Volume::_AddPackageContentRootNode(Package* package, PackageNode* packageNode)
 }
 
 
+/*!	Recursively iterates through the descendents of the given package root node
+	and removes all package nodes from the node tree in post-order, until
+	encountering \a endPackageNode (if non-null).
+	Due to limited kernel stack space we avoid deep recursive function calls
+	and rather use the package node stack implied by the tree.
+*/
+void
+Volume::_RemovePackageContentRootNode(Package* package,
+	PackageNode* rootPackageNode, PackageNode* endPackageNode, bool notify)
+{
+	PackageNode* packageNode = rootPackageNode;
+	Directory* directory = fRootDirectory;
+	directory->WriteLock();
+
+	do {
+		if (packageNode == endPackageNode)
+			break;
+
+		// recursive into directory
+		if (PackageDirectory* packageDirectory
+				= dynamic_cast<PackageDirectory*>(packageNode)) {
+			if (packageDirectory->FirstChild() != NULL) {
+				directory = dynamic_cast<Directory*>(
+					directory->FindChild(packageNode->Name()));
+				packageNode = packageDirectory->FirstChild();
+				directory->WriteLock();
+				continue;
+			}
+		}
+
+		// continue with the next available (ancestors's) sibling
+		do {
+			PackageDirectory* packageDirectory = packageNode->Parent();
+			PackageNode* sibling = packageDirectory != NULL
+				? packageDirectory->NextChild(packageNode) : NULL;
+
+			// we're done with the node -- remove it
+			_RemovePackageNode(directory, packageNode,
+				directory->FindChild(packageNode->Name()), notify);
+
+			if (sibling != NULL) {
+				packageNode = sibling;
+				break;
+			}
+
+			// no more siblings -- go back up the tree
+			packageNode = packageDirectory;
+			directory->WriteUnlock();
+			directory = directory->Parent();
+				// the parent is still locked, so this is safe
+		} while (packageNode != NULL/* && packageNode != rootPackageNode*/);
+	} while (packageNode != NULL/* && packageNode != rootPackageNode*/);
+}
+
+
 status_t
 Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
-	Node*& _node)
+	bool notify, Node*& _node)
 {
+	bool newNode = false;
 	Node* node = directory->FindChild(packageNode->Name());
 	if (node == NULL) {
 		status_t error = _CreateNode(packageNode->Mode(), directory,
 			packageNode->Name(), node);
 		if (error != B_OK)
 			return error;
+		newNode = true;
 	}
+	BReference<Node> nodeReference(node);
 
 	status_t error = node->AddPackageNode(packageNode);
-	if (error != B_OK)
+	if (error != B_OK) {
+		// remove the node, if created before
+		if (newNode)
+			_RemoveNode(node);
 		return error;
-// TODO: Remove the node, if created before!
+	}
+
+	if (notify) {
+		if (newNode) {
+			notify_entry_created(ID(), directory->ID(), node->Name(),
+				node->ID());
+		} else if (packageNode == node->GetPackageNode()) {
+			// The new package node has become the one representing the node.
+			// Send stat changed notification for directories and entry
+			// removed + created notifications for files and symlinks.
+			if (S_ISDIR(packageNode->Mode())) {
+				notify_stat_changed(ID(), node->ID(),
+					B_STAT_MODE | B_STAT_UID | B_STAT_GID | B_STAT_SIZE
+						| B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME
+						| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME);
+				// TODO: Actually the attributes might change, too!
+			} else {
+				notify_entry_removed(ID(), directory->ID(), node->Name(),
+					node->ID());
+				notify_entry_created(ID(), directory->ID(), node->Name(),
+					node->ID());
+			}
+		}
+	}
 
 	_node = node;
 	return B_OK;
+}
+
+
+void
+Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
+	Node* node, bool notify)
+{
+	BReference<Node> nodeReference(node);
+
+	PackageNode* headPackageNode = node->GetPackageNode();
+	node->RemovePackageNode(packageNode);
+
+	// If the node doesn't have any more package nodes attached, remove it
+	// completely.
+	bool nodeRemoved = false;
+	if (node->GetPackageNode() == NULL) {
+		// we get and put the vnode to notify the VFS
+		// TODO: We should probably only do that, if the node is known to the
+		// VFS in the first place.
+		Node* dummyNode;
+		bool gotVNode = GetVNode(node->ID(), dummyNode) == B_OK;
+
+		_RemoveNode(node);
+		nodeRemoved = true;
+
+		if (gotVNode) {
+			RemoveVNode(node->ID());
+			PutVNode(node->ID());
+		}
+	}
+
+	if (!notify)
+		return;
+
+	// send notifications
+	if (nodeRemoved) {
+		notify_entry_removed(ID(), directory->ID(), node->Name(), node->ID());
+	} else if (packageNode == headPackageNode) {
+		// The new package node was the one representing the node.
+		// Send stat changed notification for directories and entry
+		// removed + created notifications for files and symlinks.
+		if (S_ISDIR(packageNode->Mode())) {
+			notify_stat_changed(ID(), node->ID(),
+				B_STAT_MODE | B_STAT_UID | B_STAT_GID | B_STAT_SIZE
+					| B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME
+					| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME);
+			// TODO: Actually the attributes might change, too!
+		} else {
+			notify_entry_removed(ID(), directory->ID(), node->Name(),
+				node->ID());
+			notify_entry_created(ID(), directory->ID(), node->Name(),
+				node->ID());
+		}
+	}
 }
 
 
@@ -641,4 +881,166 @@ Volume::_CreateNode(mode_t mode, Directory* parent, const char* name,
 
 	_node = node;
 	return B_OK;
+}
+
+
+void
+Volume::_RemoveNode(Node* node)
+{
+	// remove from parent
+	Directory* parent = node->Parent();
+	parent->RemoveChild(node);
+
+	// remove from node table
+	fNodes.Remove(node);
+	node->ReleaseReference();
+}
+
+
+void
+Volume::_DomainListenerEventOccurred(PackageDomain* domain,
+	const KMessage* event)
+{
+	int32 opcode;
+	if (event->What() != B_NODE_MONITOR
+		|| event->FindInt32("opcode", &opcode) != B_OK) {
+		return;
+	}
+
+	switch (opcode) {
+		case B_ENTRY_CREATED:
+		{
+			int32 device;
+			int64 directory;
+			int64 node;
+			const char* name;
+			if (event->FindInt32("device", &device) == B_OK
+				&& event->FindInt64("directory", &directory) == B_OK
+				&& event->FindInt64("node", &node) == B_OK
+				&& event->FindString("name", &name) == B_OK) {
+				_DomainEntryCreated(domain, device, directory, node, name,
+					true, true);
+			}
+			break;
+		}
+
+		case B_ENTRY_REMOVED:
+		{
+			int32 device;
+			int64 directory;
+			int64 node;
+			const char* name;
+			if (event->FindInt32("device", &device) == B_OK
+				&& event->FindInt64("directory", &directory) == B_OK
+				&& event->FindInt64("node", &node) == B_OK
+				&& event->FindString("name", &name) == B_OK) {
+				_DomainEntryRemoved(domain, device, directory, node, name,
+					true);
+			}
+			break;
+		}
+
+		case B_ENTRY_MOVED:
+		{
+			int32 device;
+			int64 fromDirectory;
+			int64 toDirectory;
+			int32 nodeDevice;
+			int64 node;
+			const char* fromName;
+			const char* name;
+			if (event->FindInt32("device", &device) == B_OK
+				&& event->FindInt64("from directory", &fromDirectory) == B_OK
+				&& event->FindInt64("to directory", &toDirectory) == B_OK
+				&& event->FindInt32("node device", &nodeDevice) == B_OK
+				&& event->FindInt64("node", &node) == B_OK
+				&& event->FindString("from name", &fromName) == B_OK
+				&& event->FindString("name", &name) == B_OK) {
+				_DomainEntryMoved(domain, device, fromDirectory, toDirectory,
+					nodeDevice, node, fromName, name, true);
+			}
+			break;
+		}
+
+		default:
+			break;
+	}
+}
+
+
+void
+Volume::_DomainEntryCreated(PackageDomain* domain, dev_t deviceID,
+	ino_t directoryID, ino_t nodeID, const char* name, bool addContent,
+	bool notify)
+{
+	// let's see, if things look plausible
+	if (deviceID != domain->DeviceID() || directoryID != domain->NodeID()
+		|| domain->FindPackage(name) != NULL) {
+		return;
+	}
+
+	// check whether the entry is a file
+	struct stat st;
+	if (fstatat(domain->DirectoryFD(), name, &st, AT_SYMLINK_NOFOLLOW) < 0
+		|| !S_ISREG(st.st_mode)) {
+		return;
+	}
+
+	// create a package
+	Package* package = new(std::nothrow) Package(domain, st.st_dev, st.st_ino);
+	if (package == NULL)
+		return;
+	BReference<Package> packageReference(package, true);
+
+	status_t error = package->Init(name);
+	if (error != B_OK)
+		return;
+
+	error = _LoadPackage(package);
+	if (error != B_OK)
+		return;
+
+	VolumeWriteLocker volumeLocker(this);
+	domain->AddPackage(package);
+
+	// add the package to the node tree
+	if (addContent) {
+		error = _AddPackageContent(package, notify);
+		if (error != B_OK) {
+			domain->RemovePackage(package);
+			return;
+		}
+	}
+}
+
+
+void
+Volume::_DomainEntryRemoved(PackageDomain* domain, dev_t deviceID,
+	ino_t directoryID, ino_t nodeID, const char* name, bool notify)
+{
+	// let's see, if things look plausible
+	if (deviceID != domain->DeviceID() || directoryID != domain->NodeID())
+		return;
+
+	Package* package = domain->FindPackage(name);
+	if (package == NULL)
+		return;
+	BReference<Package> packageReference(package);
+
+	// remove the package
+	VolumeWriteLocker volumeLocker(this);
+	_RemovePackageContent(package, NULL, true);
+	domain->RemovePackage(package);
+}
+
+
+void
+Volume::_DomainEntryMoved(PackageDomain* domain, dev_t deviceID,
+	ino_t fromDirectoryID, ino_t toDirectoryID, dev_t nodeDeviceID,
+	ino_t nodeID, const char* fromName, const char* name, bool notify)
+{
+	_DomainEntryRemoved(domain, deviceID, fromDirectoryID, nodeID, fromName,
+		notify);
+	_DomainEntryCreated(domain, deviceID, toDirectoryID, nodeID, name, true,
+		notify);
 }

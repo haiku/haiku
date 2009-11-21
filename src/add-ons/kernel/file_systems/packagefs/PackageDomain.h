@@ -6,24 +6,35 @@
 #define PACKAGE_DOMAIN_H
 
 
+#include <Referenceable.h>
+
 #include <util/DoublyLinkedList.h>
 
 #include "Package.h"
 
 
-class PackageDomain : public DoublyLinkedListLinkImpl<PackageDomain> {
+class NotificationListener;
+
+
+class PackageDomain : public BReferenceable,
+	public DoublyLinkedListLinkImpl<PackageDomain> {
 public:
 								PackageDomain();
 								~PackageDomain();
 
 			const char*			Path() const	{ return fPath; }
 			int					DirectoryFD()	{ return fDirFD; }
+			dev_t				DeviceID()		{ return fDeviceID; }
+			ino_t				NodeID()		{ return fNodeID; }
 
 			status_t			Init(const char* path);
-			status_t			Prepare();
+			status_t			Prepare(NotificationListener* listener);
+									// takes over ownership of the listener
 
 			void				AddPackage(Package* package);
 			void				RemovePackage(Package* package);
+
+			Package*			FindPackage(const char* name) const;
 
 			const PackageHashTable& Packages() const
 									{ return fPackages; }
@@ -31,6 +42,9 @@ public:
 private:
 			char*				fPath;
 			int					fDirFD;
+			dev_t				fDeviceID;
+			ino_t				fNodeID;
+			NotificationListener* fListener;
 			PackageHashTable	fPackages;
 };
 
