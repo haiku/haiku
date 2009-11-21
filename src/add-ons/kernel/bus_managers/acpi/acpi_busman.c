@@ -111,13 +111,6 @@ acpi_std_ops(int32 op,...)
 				return ENOSYS;
 			}
 
-			if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
-				B_NORMAL_PRIORITY) != B_OK) {
-				ERROR("failed to create os execution queue\n");
-				return B_ERROR;
-			}
-
-
 			AcpiGbl_EnableInterpreterSlack = true;
 //			AcpiGbl_CreateOSIMethod = true;
 

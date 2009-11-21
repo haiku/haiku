@@ -143,7 +143,7 @@ ACPI_MODULE_NAME("Haiku ACPI Module")
 #define _COMPONENT ACPI_OS_SERVICES
 
 // verbosity level 0 = off, 1 = normal, 2 = all
-#define DEBUG_OSHAIKU 0 
+#define DEBUG_OSHAIKU 0
 
 #if DEBUG_OSHAIKU <= 0
 // No debugging, do nothing
@@ -253,7 +253,7 @@ AcpiOsGetRootPointer()
  *
  *****************************************************************************/
 ACPI_STATUS
-AcpiOsPredefinedOverride(const ACPI_PREDEFINED_NAMES *initVal, 
+AcpiOsPredefinedOverride(const ACPI_PREDEFINED_NAMES *initVal,
 		ACPI_STRING *newVal)
 {
 	DEBUG_FUNCTION();
@@ -530,14 +530,14 @@ AcpiOsCreateSemaphore(UINT32 maxUnits, UINT32 initialUnits,
 {
 	if (!outHandle)
     	return AE_BAD_PARAMETER;
-	
+
 	*outHandle = create_sem(initialUnits, "acpi_sem");
 	DEBUG_FUNCTION_F("max: %lu; count: %lu; result: %ld",
 		maxUnits, initialUnits, *outHandle);
 
 	if (*outHandle >= B_OK)
 		return AE_OK;
-	
+
 	return *outHandle == B_BAD_VALUE ? AE_BAD_PARAMETER : AE_NO_MEMORY;
 }
 
@@ -556,7 +556,7 @@ AcpiOsCreateSemaphore(UINT32 maxUnits, UINT32 initialUnits,
 ACPI_STATUS
 AcpiOsDeleteSemaphore(ACPI_SEMAPHORE handle)
 {
-	DEBUG_FUNCTION_F("sem: %ld", handle);	
+	DEBUG_FUNCTION_F("sem: %ld", handle);
 	return delete_sem(handle) == B_OK ? AE_OK : AE_BAD_PARAMETER;
 }
 
@@ -599,7 +599,7 @@ AcpiOsWaitSemaphore(ACPI_SEMAPHORE handle, UINT32 units, UINT16 timeout)
 			default:
 				result = AE_BAD_PARAMETER;
 				break;
-		}		
+		}
 	}
 	DEBUG_FUNCTION_VF("sem: %ld; count: %lu; timeout: %u result: %lu",
 		handle, units, timeout, (uint32)result);
@@ -644,7 +644,7 @@ AcpiOsCreateLock(ACPI_SPINLOCK *outHandle)
 	DEBUG_FUNCTION_F("result: %p", *outHandle);
 	if (*outHandle == NULL)
 		return AE_NO_MEMORY;
-	
+
 	**outHandle = B_SPINLOCK_INITIALIZER;
 	return AE_OK;
 }
@@ -665,7 +665,7 @@ AcpiOsAcquireLock(ACPI_SPINLOCK handle)
 	DEBUG_FUNCTION_F("spinlock: %p", handle);
 	cpu = disable_interrupts();
 	acquire_spinlock(handle);
-	return cpu; 
+	return cpu;
 }
 
 
@@ -709,7 +709,7 @@ AcpiOsInstallInterruptHandler(UINT32 interruptNumber,
 
 	DEBUG_FUNCTION_F("vector: %lu; handler: %p context %p returned %d",
 		interruptNumber, serviceRoutine, context, result);
-	
+
 	return result == B_OK ? AE_OK : AE_BAD_PARAMETER;
 #else
 	return AE_BAD_PARAMETER;
@@ -774,6 +774,12 @@ AcpiOsExecute(ACPI_EXECUTE_TYPE type, ACPI_OSD_EXEC_CALLBACK  function,
 			break;
 	}
 */
+	if (!gDPCHandle && gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
+		B_NORMAL_PRIORITY) != B_OK) {
+		DEBUG_FUNCTION_F("failed to create os execution queue\n");
+		return AE_ERROR;
+	}
+
 	if (gDPC->queue_dpc(gDPCHandle, function, context) != B_OK) {
 		DEBUG_FUNCTION_F("Serious failure in AcpiOsExecute! function: %p",
 			function);
@@ -934,7 +940,7 @@ AcpiOsWritePciConfiguration(ACPI_PCI_ID *pciId, UINT32 reg,
 void
 AcpiOsDerivePciId(ACPI_HANDLE rhandle, ACPI_HANDLE chandle, ACPI_PCI_ID **pciId)
 {
-// TODO: Implement this!	
+// TODO: Implement this!
 }
 
 
@@ -1105,7 +1111,7 @@ AcpiOsReadable(void *pointer, ACPI_SIZE length)
 	id = area_for(pointer);
 	if (id == B_ERROR) return false;
 	if (get_area_info(id, &info) != B_OK) return false;
-	return (info.protection & B_READ_AREA) != 0 && 
+	return (info.protection & B_READ_AREA) != 0 &&
 			pointer + length <= info.address + info.ram_size;
 #endif
 }
@@ -1138,7 +1144,7 @@ AcpiOsWritable(void *pointer, ACPI_SIZE length)
 	if (id == B_ERROR) return false;
 	if (get_area_info(id, &info) != B_OK) return false;
 	return (info.protection & B_READ_AREA) != 0 &&
-			(info.protection & B_WRITE_AREA) != 0 && 
+			(info.protection & B_WRITE_AREA) != 0 &&
 			pointer + length <= info.address + info.ram_size;
 #endif
 }
@@ -1232,7 +1238,7 @@ AcpiOsAcquireGlobalLock(uint32 *lock)
 		old = *lock;
 		new = ((old & ~GL_BIT_MASK) | GL_BIT_OWNED) |
 				((old >> 1) & GL_BIT_PENDING);
-		atomic_test_and_set(lock, new, old);		
+		atomic_test_and_set(lock, new, old);
 	} while (*lock == old);
 	return ((new < GL_BIT_MASK) ? GL_ACQUIRED : GL_BUSY);
 }
