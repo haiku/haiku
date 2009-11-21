@@ -587,7 +587,7 @@ FontManager::_AddFont(font_directory& directory, BEntry& entry)
 	if (error != 0)
 		return B_ERROR;
 
-    	FontFamily *family = _FindFamily(face->family_name);
+	FontFamily *family = _FindFamily(face->family_name);
 	if (family != NULL && family->HasStyle(face->style_name)) {
 		// prevent adding the same style twice
 		// (this indicates a problem with the installed fonts maybe?)
@@ -608,7 +608,7 @@ FontManager::_AddFont(font_directory& directory, BEntry& entry)
 	FTRACE(("\tadd style: %s, %s\n", face->family_name, face->style_name));
 
 	// the FontStyle takes over ownership of the FT_Face object
-    	FontStyle *style = new FontStyle(nodeRef, path.Path(), face);
+	FontStyle *style = new FontStyle(nodeRef, path.Path(), face);
 	if (!family->AddStyle(style)) {
 		delete style;
 		delete family;
