@@ -46,7 +46,6 @@
 #include <Window.h>
 
 #include "CodeConv.h"
-#include "Globals.h"
 #include "Shell.h"
 #include "TermConst.h"
 #include "TerminalCharClassifier.h"
@@ -165,7 +164,7 @@ private:
 
 TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize)
 	: BView(frame, "termview", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
+		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
 	fColumns(COLUMNS_DEFAULT),
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
@@ -183,7 +182,7 @@ TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize
 TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 		int32 historySize)
 	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
+		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
 	fColumns(columns),
 	fRows(rows),
 	fEncoding(M_UTF8),
@@ -223,8 +222,8 @@ TermView::TermView(BMessage* archive)
 	fReportButtonMouseEvent(false),
 	fReportAnyMouseEvent(false)
 {
-	// We need this
-	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED);
+	SetFlags(Flags() | B_WILL_DRAW | B_FRAME_EVENTS
+		| B_FULL_UPDATE_ON_RESIZE);
 
 	if (archive->FindInt32("encoding", (int32*)&fEncoding) < B_OK)
 		fEncoding = M_UTF8;
@@ -232,7 +231,7 @@ TermView::TermView(BMessage* archive)
 		fColumns = COLUMNS_DEFAULT;
 	if (archive->FindInt32("rows", (int32*)&fRows) < B_OK)
 		fRows = ROWS_DEFAULT;
-
+	
 	int32 argc = 0;
 	if (archive->HasInt32("argc"))
 		archive->FindInt32("argc", &argc);
@@ -244,7 +243,7 @@ TermView::TermView(BMessage* archive)
 
 	// TODO: Retrieve colors, history size, etc. from archive
 	_InitObject(argc, argv);
-
+	
 	delete[] argv;
 }
 
@@ -296,6 +295,7 @@ TermView::_InitObject(int32 argc, const char** argv)
 	fReportNormalMouseEvent = false;
 	fReportButtonMouseEvent = false;
 	fReportAnyMouseEvent = false;
+	fMouseClipboard = be_clipboard;
 
 	fTextBuffer = new(std::nothrow) TerminalBuffer;
 	if (fTextBuffer == NULL)
@@ -326,8 +326,7 @@ TermView::_InitObject(int32 argc, const char** argv)
 
 	SetTermFont(be_fixed_font);
 	SetTermSize(fRows, fColumns, false);
-	//SetIMAware(false);
-
+	
 	status_t status = fShell->Open(fRows, fColumns,
 		EncodingAsShortString(fEncoding), argc, argv);
 
@@ -365,8 +364,9 @@ TermView::~TermView()
 BArchivable *
 TermView::Instantiate(BMessage* data)
 {
-	if (validate_instantiation(data, "TermView"))
+	if (validate_instantiation(data, "TermView")) {
 		return new (std::nothrow) TermView(data);
+	}
 
 	return NULL;
 }
@@ -578,6 +578,13 @@ TermView::SetEncoding(int encoding)
 
 
 void
+TermView::SetMouseClipboard(BClipboard *clipboard)
+{
+	fMouseClipboard = clipboard;
+}
+	
+	
+void
 TermView::GetTermFont(BFont *font) const
 {
 	if (font != NULL)
@@ -632,9 +639,8 @@ void
 TermView::SetScrollBar(BScrollBar *scrollBar)
 {
 	fScrollBar = scrollBar;
-	if (fScrollBar != NULL) {
+	if (fScrollBar != NULL)
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
-	}
 }
 
 
@@ -976,7 +982,7 @@ void
 TermView::AttachedToWindow()
 {
 	fMouseButtons = 0;
-
+		
 	MakeFocus(true);
 	if (fScrollBar) {
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
@@ -1470,19 +1476,19 @@ TermView::MessageReceived(BMessage *msg)
 			// the contents of the mouse clipboard with the ones from the
 			// system clipboard, in case it contains text data.
 			if (be_clipboard->Lock()) {
-				if (gMouseClipboard->Lock()) {
+				if (fMouseClipboard->Lock()) {
 					BMessage* clipMsgA = be_clipboard->Data();
 					const char* text;
 					ssize_t numBytes;
 					if (clipMsgA->FindData("text/plain", B_MIME_TYPE,
 							(const void**)&text, &numBytes) == B_OK ) {
-						gMouseClipboard->Clear();
-						BMessage* clipMsgB = gMouseClipboard->Data();
+						fMouseClipboard->Clear();
+						BMessage* clipMsgB = fMouseClipboard->Data();
 						clipMsgB->AddData("text/plain", B_MIME_TYPE,
 							text, numBytes);
-						gMouseClipboard->Commit();
+						fMouseClipboard->Commit();
 					}
-					gMouseClipboard->Unlock();
+					fMouseClipboard->Unlock();
 				}
 				be_clipboard->Unlock();
 			}
@@ -2154,7 +2160,7 @@ TermView::MouseDown(BPoint where)
 
 	// paste button
 	if ((buttons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON)) != 0) {
-		Paste(gMouseClipboard);
+		Paste(fMouseClipboard);
 		fLastClickPoint = where;
 		return;
 	}
@@ -2338,7 +2344,7 @@ TermView::MouseUp(BPoint where)
 	} else {
 		if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0
 			&& (fMouseButtons & B_PRIMARY_MOUSE_BUTTON) != 0) {
-			Copy(gMouseClipboard);
+			Copy(fMouseClipboard);
 		}
 
 	}

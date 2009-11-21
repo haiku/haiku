@@ -32,6 +32,7 @@
 #include "AppearPrefView.h"
 #include "Encoding.h"
 #include "FindWindow.h"
+#include "Globals.h"
 #include "PrefWindow.h"
 #include "PrefHandler.h"
 #include "SmartTabView.h"
@@ -800,7 +801,7 @@ TermWindow::_AddTab(Arguments *args)
 			// and update the title using the last executed command ?
 			// Or like Gnome's Terminal and use the current path ?
 		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
-
+		view->SetMouseClipboard(gMouseClipboard);
 		view->SetEncoding(EncodingID(
 			PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
 

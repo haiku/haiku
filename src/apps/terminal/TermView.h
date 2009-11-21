@@ -62,10 +62,11 @@ public:
 			int				Encoding() const;
 			void			SetEncoding(int encoding);
 
-			//void  		SetIMAware(bool);
 			void			SetScrollBar(BScrollBar* scrollBar);
 			BScrollBar*		ScrollBar() const { return fScrollBar; };
 
+			void			SetMouseClipboard(BClipboard *);
+			
 	virtual void			SetTitle(const char* title);
 	virtual void			NotifyQuit(int32 reason);
 
@@ -266,6 +267,7 @@ private:
 			bool			fReportNormalMouseEvent;
 			bool			fReportButtonMouseEvent;
 			bool			fReportAnyMouseEvent;
+			BClipboard*		fMouseClipboard;
 
 			// Input Method parameter.
 			int				fIMViewPtr;

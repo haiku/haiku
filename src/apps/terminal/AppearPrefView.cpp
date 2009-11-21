@@ -167,8 +167,8 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 			break;
 
 		case MSG_COLOR_CHANGED: {
-				rgb_color oldColor = PrefHandler::Default()->getRGB(
-					fColorField->Menu()->FindMarked()->Label());
+			rgb_color oldColor = PrefHandler::Default()->getRGB(
+				fColorField->Menu()->FindMarked()->Label());
 				if (oldColor != fColorControl->ValueAsColor()) {
 					PrefHandler::Default()->setRGB(
 						fColorField->Menu()->FindMarked()->Label(),
