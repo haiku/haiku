@@ -103,6 +103,7 @@ BottomlineWindow::HandleInputMethodEvent(BMessage* event, EventList& newEvents)
 			newEvent->AddInt64("when", system_time());
 			BString bytes(string + offset, nextOffset - offset);
 			newEvent->AddString("bytes", bytes);
+			newEvent->AddInt32("raw_char", 0xa);
 			newEvents.AddItem(newEvent);
 		}
 
