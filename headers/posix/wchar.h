@@ -95,8 +95,8 @@ extern wchar_t	*wcschr(const wchar_t *, wchar_t);
 extern int      wcscmp(const wchar_t *ws1, const wchar_t *ws2);
 extern int      wcscoll(const wchar_t *ws1, const wchar_t *ws2);
 extern wchar_t	*wcscpy(wchar_t *, const wchar_t *);
-extern wchar_t	*wcsdup(const wchar_t *);
 extern size_t	wcscspn(const wchar_t *, const wchar_t *);
+extern wchar_t	*wcsdup(const wchar_t *);
 extern size_t	wcsftime(wchar_t *, size_t, const wchar_t *,
 					const struct tm *);
 extern size_t	wcslen(const wchar_t *);
