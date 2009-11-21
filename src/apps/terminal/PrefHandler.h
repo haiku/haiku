@@ -46,7 +46,7 @@ struct termprefs {
 
 struct pref_defaults {
 	const char *key;
-	char *item;
+	const char *item;
 };
 
 #define PREF_TRUE "true"
