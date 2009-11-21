@@ -13,7 +13,6 @@ Application Terminal :
 	FindWindow.cpp
 	Globals.cpp
 	HistoryBuffer.cpp
-	MenuUtil.cpp
 	PrefHandler.cpp
 	PrefWindow.cpp
 	Shell.cpp

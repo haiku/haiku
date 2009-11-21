@@ -31,7 +31,6 @@
 #include "Arguments.h"
 #include "AppearPrefView.h"
 #include "Coding.h"
-#include "MenuUtil.h"
 #include "FindWindow.h"
 #include "PrefWindow.h"
 #include "PrefHandler.h"
@@ -255,13 +254,30 @@ TermWindow::MenusBeginning()
 }
 
 
+/* static */
+void
+TermWindow::_MakeEncodingMenu(BMenu *eMenu, bool withShortcuts)
+{
+	int encoding;
+	int i = 0;
+	while (get_nth_encoding(i, &encoding) == B_OK) {
+		BMessage *msg = new BMessage(MENU_ENCODING);
+		msg->AddInt32("op", (int32)encoding);
+		if (withShortcuts) {
+			eMenu->AddItem(new BMenuItem(EncodingAsString(encoding),
+				msg, id2shortcut(encoding)));
+		} else 
+			eMenu->AddItem(new BMenuItem(EncodingAsString(encoding),
+				msg));
+
+		i++;
+	}
+}
+
+
 void
 TermWindow::_SetupMenu()
 {
-	PrefHandler menuText;
-
-	LoadLocaleFile(&menuText);
-
 	// Menu bar object.
 	fMenubar = new BMenuBar(Bounds(), "mbar");
 
@@ -315,7 +331,7 @@ TermWindow::_SetupMenu()
 
 	fEncodingmenu = new BMenu("Text Encoding");
 	fEncodingmenu->SetRadioMode(true);
-	MakeEncodingMenu(fEncodingmenu, false);
+	_MakeEncodingMenu(fEncodingmenu, false);
 
 	fSizeMenu = new BMenu("Text Size");
 

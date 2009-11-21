@@ -70,6 +70,7 @@ private:
 	void			_SetTermColors(TermViewContainerView *termView);
 	void			_InitWindow();
 	void			_SetupMenu();
+	static void		_MakeEncodingMenu(BMenu *eMenu, bool withShortcuts);
 	void			_GetPreferredFont(BFont &font);
 	status_t		_DoPageSetup();
 	void			_DoPrint();

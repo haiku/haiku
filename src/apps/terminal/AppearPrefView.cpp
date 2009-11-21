@@ -22,7 +22,6 @@
 #include <TextControl.h>
 #include <View.h>
 
-#include "MenuUtil.h"
 #include "PrefHandler.h"
 #include "TermConst.h"
 
@@ -73,7 +72,7 @@ AppearancePrefView::AppearancePrefView(const char *name,
 			.Add(fFont = new BMenuField("font", "Font:", fontMenu))
 			.Add(fFontSize = new BMenuField("size", "Size:", sizeMenu))
 			.Add(fColorField = new BMenuField("color", "Color:",
-				MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
+				_MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
 					kColorTable[0])))
 			.Add(BSpaceLayoutItem::CreateGlue())
 			.Add(fColorControl = new BColorControl(BPoint(10, 10),
@@ -228,6 +227,7 @@ IsFontUsable(const BFont &font)
 }
 
 
+/* static */
 BMenu *
 AppearancePrefView::_MakeFontMenu(uint32 command,
 	const char *defaultFamily, const char *defaultStyle)
@@ -271,6 +271,7 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 }
 
 
+/* static */
 BMenu *
 AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 {
@@ -304,5 +305,28 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 		}
 	}
 
+	return menu;
+}
+
+
+/* static */
+BPopUpMenu *
+AppearancePrefView::_MakeMenu(uint32 msg, const char **items,
+	const char *defaultItemName)
+{
+	BPopUpMenu *menu = new BPopUpMenu("");
+
+	int32 i = 0;
+	while (*items) {
+		if (!strcmp(*items, ""))
+			menu->AddSeparatorItem();
+		else
+			menu->AddItem(new BMenuItem(*items, new BMessage(msg)));
+		if (!strcmp(*items, defaultItemName))
+			menu->ItemAt(i)->SetMarked(true);
+
+		items++;
+		i++;
+	}
 	return menu;
 }

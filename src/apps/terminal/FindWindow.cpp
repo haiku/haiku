@@ -21,18 +21,19 @@
 const uint32 MSG_FIND_HIDE = 'Fhid';
 
 
-FindWindow::FindWindow(BRect frame, BMessenger messenger , BString &str,
-	bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
+FindWindow::FindWindow(BRect frame, BMessenger messenger, BString &str,
+		bool findSelection, bool matchWord, bool matchCase,
+		bool forwardSearch)
 	:
 	BWindow(frame, "Find", B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
 		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFindDlgMessenger(messenger)
 {
-	AddShortcut((ulong)'W', (ulong)B_COMMAND_KEY, new BMessage(MSG_FIND_HIDE));
-
 	SetLayout(new BGroupLayout(B_VERTICAL));
+	
 	BBox *separator = new BBox("separator");
+	separator->SetExplicitMinSize(BSize(200, B_SIZE_UNSET));
 	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
 	BView *layoutView = BGroupLayoutBuilder(B_VERTICAL, 10)
@@ -79,6 +80,9 @@ FindWindow::FindWindow(BRect frame, BMessenger messenger , BString &str,
 
 	fFindButton->MakeDefault(true);
 
+	AddShortcut((ulong)'W', (ulong)B_COMMAND_KEY,
+		new BMessage(MSG_FIND_HIDE));
+		
 	Show();
 }
 
@@ -131,8 +135,8 @@ FindWindow::_SendFindMessage()
 		message.AddBool("findselection", true);
 
 	//Add the other parameters
-	// TODO: "usetext" is never checked for elsewhere and seems redundant with
-	// "findselection", why is it here?
+	// TODO: "usetext" is never checked for elsewhere and seems
+	// redundant with "findselection", why is it here?
 	message.AddBool("usetext", fTextRadio->Value() == B_CONTROL_ON);
 	message.AddBool("forwardsearch", fForwardSearchBox->Value() == B_CONTROL_ON);
 	message.AddBool("matchcase", fMatchCaseBox->Value() == B_CONTROL_ON);
@@ -140,4 +144,3 @@ FindWindow::_SendFindMessage()
 
 	fFindDlgMessenger.SendMessage(&message);
 }
-
