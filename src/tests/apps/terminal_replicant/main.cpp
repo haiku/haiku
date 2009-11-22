@@ -4,6 +4,7 @@
 #include <Dragger.h>
 #include <Message.h>
 #include <Path.h>
+#include <ScrollView.h>
 #include <Shelf.h>
 #include <Window.h>
 
@@ -62,14 +63,19 @@ Window::AttachTermView()
 	message.AddString("class", "TermView");
 	message.AddString("add_on", TERM_SIGNATURE);
 	message.AddBool("use_rect", true);
-	message.AddRect("_frame", Bounds().InsetByCopy(2, 2));
+	
+	BRect viewFrame = Bounds();
+	viewFrame.right -= 15;
+	message.AddRect("_frame", viewFrame);
 		
 	BView *termView = dynamic_cast<BView *>(instantiate_object(&message));
-	
-	if (termView != NULL) {
-		termView->SetResizingMode(B_FOLLOW_ALL);
-		AddChild(termView);
+	if (termView == NULL)
+		return;
 		
-		termView->ResizeToPreferred();
-	}
+	termView->SetResizingMode(B_FOLLOW_ALL);
+	
+	BScrollView *scrollView = new BScrollView("scrollview", termView,
+		B_FOLLOW_ALL, B_WILL_DRAW, false, true);
+		
+	AddChild(scrollView);
 }
