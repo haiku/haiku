@@ -1,5 +1,6 @@
 /*
  * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009, Philippe St-Pierre, stpere@gmail.com
  * Distributed under the terms of the MIT License.
  */
 
@@ -331,10 +332,10 @@ FindTextView::Paste(BClipboard* clipboard)
 			if (_GetHexFromData(data, dataSize, &hex, &hexSize) < B_OK)
 				return;
 
-			SetText(hex, hexSize);
+			Insert(hex, hexSize);
 			free(hex);
 		} else
-			SetText((char*)data, dataSize);
+			Insert((char*)data, dataSize);
 		return;
 	}
 
