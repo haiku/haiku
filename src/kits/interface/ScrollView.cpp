@@ -681,6 +681,18 @@ BScrollView::_Init(bool horizontal, bool vertical)
 	if (be_control_look != NULL)
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
+	if (horizontal) {
+		fHorizontalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_HSB_",
+			fTarget, 0, 1000, B_HORIZONTAL);
+		AddChild(fHorizontalScrollBar);
+	}
+
+	if (vertical) {
+		fVerticalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_VSB_",
+			fTarget, 0, 1000, B_VERTICAL);
+		AddChild(fVerticalScrollBar);
+	}
+	
 	BRect targetFrame;
 	if (fTarget) {
 		// layout target and add it
@@ -703,18 +715,6 @@ BScrollView::_Init(bool horizontal, bool vertical)
 			targetFrame.bottom--;
 			targetFrame.right--;
 		}
-	}
-
-	if (horizontal) {
-		fHorizontalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_HSB_",
-			fTarget, 0, 1000, B_HORIZONTAL);
-		AddChild(fHorizontalScrollBar);
-	}
-
-	if (vertical) {
-		fVerticalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_VSB_",
-			fTarget, 0, 1000, B_VERTICAL);
-		AddChild(fVerticalScrollBar);
 	}
 
 	_AlignScrollBars(horizontal, vertical, targetFrame);
