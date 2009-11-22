@@ -196,7 +196,6 @@ TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 	fReportAnyMouseEvent(false)
 {
 	_InitObject(argc, argv);
-	//SetTermSize(fRows, fColumns);
 
 	// TODO: Don't show the dragger, since replicant capabilities
 	// don't work very well ATM.
@@ -333,7 +332,6 @@ TermView::_InitObject(int32 argc, const char** argv)
 		return B_NO_MEMORY;
 
 	SetTermFont(be_fixed_font);
-	SetTermSize(fRows, fColumns);
 	
 	status_t status = fShell->Open(fRows, fColumns,
 		EncodingAsShortString(fEncoding), argc, argv);
@@ -545,8 +543,11 @@ TermView::SetTermSize(int rows, int columns)
 void
 TermView::SetTermSize(BRect rect)
 {
-	GetTermSizeFromRect(rect, &fRows, &fColumns);
-	SetTermSize(fRows, fColumns);
+	int rows;
+	int columns;
+	
+	GetTermSizeFromRect(rect, &rows, &columns);
+	SetTermSize(rows, columns);
 }
 
 
