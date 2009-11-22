@@ -29,6 +29,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Beep.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
@@ -101,6 +102,7 @@ private:
 	port_id		fControlPort;
 	thread_id	fControlThread;
 	bool		fStartup;
+	bool		fStartupSound;
 	
 	typedef BApplication inherited;
 };
@@ -108,7 +110,8 @@ private:
 
 MediaAddonServer::MediaAddonServer(const char *sig)
 	: BApplication(sig),
-	fStartup(true)
+	fStartup(true),
+	fStartupSound(true)
 {
 	CALLED();
 	fMediaRoster = BMediaRoster::Roster();
@@ -168,7 +171,14 @@ MediaAddonServer::HandleMessage(int32 code, const void *data, size_t size)
 			_DormantNodeManager->PutAddon(command->addonid);
 			break;
 		}
-
+		
+		case ADDONSERVER_RESCAN_FINISHED_NOTIFY:
+			if (fStartupSound) {
+				system_beep(MEDIA_SOUNDS_STARTUP);
+				fStartupSound = false;
+			}
+			break;
+		
 		default:
 			ERROR("media_addon_server: received unknown message code %#08lx\n",code);
 	}

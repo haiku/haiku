@@ -332,6 +332,9 @@ DefaultManager::RescanThread()
 	} else {
 		ERROR("DefaultManager: Did not try to connect mixer and soundcard\n");
 	}
+	
+	addonserver_rescan_finished_notify_command cmd;
+	SendToAddonServer(ADDONSERVER_RESCAN_FINISHED_NOTIFY, &cmd, sizeof(cmd));
 
 	printf("DefaultManager::RescanThread() leave\n");
 }

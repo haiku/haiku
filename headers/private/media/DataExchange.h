@@ -104,6 +104,7 @@ enum {
 // Raw port based communication
 enum {
 	ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS = 0x50,
+	ADDONSERVER_RESCAN_FINISHED_NOTIFY,
 
 	SERVER_MESSAGE_START = 0x100,
 	SERVER_REGISTER_APP,
@@ -713,6 +714,9 @@ struct server_rescan_defaults_command : command_data {
 
 struct addonserver_rescan_mediaaddon_flavors_command : command_data {
 	media_addon_id			addonid;
+};
+
+struct addonserver_rescan_finished_notify_command : command_data {
 };
 
 struct server_register_mediaaddon_request : request_data {
