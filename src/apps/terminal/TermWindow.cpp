@@ -514,7 +514,7 @@ TermWindow::MessageReceived(BMessage *message)
 			message->FindInt32("columns", &columns);
 			message->FindInt32("rows", &rows);
 
-			_ActiveTermView()->SetTermSize(rows, columns, false);
+			_ActiveTermView()->SetTermSize(rows, columns);
 
 			_ResizeView(_ActiveTermView());
 			break;

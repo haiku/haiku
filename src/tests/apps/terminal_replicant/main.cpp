@@ -60,7 +60,9 @@ Window::AttachTermView()
 	// for Terminal and TermView
 	BMessage message;				
 	message.AddString("class", "TermView");
-	message.AddString("add_on", TERM_SIGNATURE);	
+	message.AddString("add_on", TERM_SIGNATURE);
+	message.AddBool("use_rect", true);
+	message.AddRect("_frame", Bounds().InsetByCopy(2, 2));
 		
 	BView *termView = dynamic_cast<BView *>(instantiate_object(&message));
 	

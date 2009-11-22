@@ -41,6 +41,7 @@
 #include <Region.h>
 #include <Roster.h>
 #include <ScrollBar.h>
+#include <ScrollView.h>
 #include <String.h>
 #include <StringView.h>
 #include <Window.h>
@@ -176,6 +177,7 @@ TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize
 	fReportAnyMouseEvent(false)
 {
 	_InitObject(argc, argv);
+	SetTermSize(frame);
 }
 
 
@@ -194,7 +196,7 @@ TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 	fReportAnyMouseEvent(false)
 {
 	_InitObject(argc, argv);
-	SetTermSize(fRows, fColumns, true);
+	//SetTermSize(fRows, fColumns);
 
 	// TODO: Don't show the dragger, since replicant capabilities
 	// don't work very well ATM.
@@ -225,13 +227,15 @@ TermView::TermView(BMessage* archive)
 	SetFlags(Flags() | B_WILL_DRAW | B_FRAME_EVENTS
 		| B_FULL_UPDATE_ON_RESIZE);
 
+	BRect frame = Bounds();
+	
 	if (archive->FindInt32("encoding", (int32*)&fEncoding) < B_OK)
 		fEncoding = M_UTF8;
 	if (archive->FindInt32("columns", (int32*)&fColumns) < B_OK)
 		fColumns = COLUMNS_DEFAULT;
 	if (archive->FindInt32("rows", (int32*)&fRows) < B_OK)
 		fRows = ROWS_DEFAULT;
-	
+		
 	int32 argc = 0;
 	if (archive->HasInt32("argc"))
 		archive->FindInt32("argc", &argc);
@@ -244,6 +248,10 @@ TermView::TermView(BMessage* archive)
 	// TODO: Retrieve colors, history size, etc. from archive
 	_InitObject(argc, argv);
 	
+	bool useRect = false;
+	if ((archive->FindBool("use_rect", &useRect) == B_OK) && useRect)
+		SetTermSize(frame);
+		
 	delete[] argv;
 }
 
@@ -325,7 +333,7 @@ TermView::_InitObject(int32 argc, const char** argv)
 		return B_NO_MEMORY;
 
 	SetTermFont(be_fixed_font);
-	SetTermSize(fRows, fColumns, false);
+	SetTermSize(fRows, fColumns);
 	
 	status_t status = fShell->Open(fRows, fColumns,
 		EncodingAsShortString(fEncoding), argc, argv);
@@ -365,7 +373,13 @@ BArchivable *
 TermView::Instantiate(BMessage* data)
 {
 	if (validate_instantiation(data, "TermView")) {
-		return new (std::nothrow) TermView(data);
+		TermView *view = new (std::nothrow) TermView(data);
+		/*BScrollView *scrollView = new BScrollView("term_scrollview",
+			view, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, true, true);
+		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
+		scrollView->ResizeTo(200, 200);
+		return scrollView; */
+		return view;
 	}
 
 	return NULL;
@@ -484,7 +498,7 @@ TermView::Columns() const
 
 //! Set number of rows and columns in terminal
 BRect
-TermView::SetTermSize(int rows, int columns, bool resize)
+TermView::SetTermSize(int rows, int columns)
 {
 //debug_printf("TermView::SetTermSize(%d, %d)\n", rows, columns);
 	if (rows > 0)
@@ -514,9 +528,6 @@ TermView::SetTermSize(int rows, int columns, bool resize)
 
 	BRect rect(0, 0, fColumns * fFontWidth, fRows * fFontHeight);
 
-	if (resize)
-		ResizeTo(rect.Width(), rect.Height());
-
 	// synchronize the visible text buffer
 	{
 		BAutolock _(fTextBuffer);
@@ -528,6 +539,28 @@ TermView::SetTermSize(int rows, int columns, bool resize)
 	}
 
 	return rect;
+}
+
+
+void
+TermView::SetTermSize(BRect rect)
+{
+	GetTermSizeFromRect(rect, &fRows, &fColumns);
+	SetTermSize(fRows, fColumns);
+}
+
+
+void
+TermView::GetTermSizeFromRect(const BRect &rect, int *_rows,
+	int *_columns)
+{
+	int columns = (rect.IntegerWidth() + 1) / fFontWidth;
+	int rows = (rect.IntegerHeight() + 1) / fFontHeight;
+	
+	if (_rows)
+		*_rows = rows;
+	if (_columns)
+		*_columns = columns;
 }
 
 
@@ -1383,7 +1416,7 @@ TermView::FrameResized(float width, float height)
 	if (fResizeViewDisableCount > 0)
 		fResizeViewDisableCount--;
 
-	SetTermSize(rows, columns, false);
+	SetTermSize(rows, columns);
 
 	fFrameResized = true;
 }

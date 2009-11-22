@@ -53,7 +53,10 @@ public:
 			void			GetFontSize(int* width, int* height);
 			int				Rows() const;
 			int				Columns() const;
-			BRect			SetTermSize(int rows, int cols, bool resize);
+			BRect			SetTermSize(int rows, int cols);
+			void			SetTermSize(BRect rect);
+			void			GetTermSizeFromRect(const BRect &rect,
+								int *rows, int *columns);
 
 			void			SetTextColor(rgb_color fore, rgb_color back);
 			void			SetSelectColor(rgb_color fore, rgb_color back);
