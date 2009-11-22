@@ -1722,6 +1722,15 @@ TermView::ScrollTo(BPoint where)
 }
 
 
+void
+TermView::TargetedByScrollView(BScrollView *scrollView)
+{
+	BView::TargetedByScrollView(scrollView);
+	
+	SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
+}
+
+
 BHandler*
 TermView::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
 	int32 what, const char* property)

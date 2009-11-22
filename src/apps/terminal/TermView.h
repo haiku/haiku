@@ -23,11 +23,12 @@
 class BClipboard;
 class BMessageRunner;
 class BScrollBar;
+class BScrollView;
 class BString;
 class BStringView;
-class Shell;
 class TermBuffer;
 class ResizeWindow;
+class Shell;
 
 class TermView : public BView {
 public:
@@ -108,6 +109,7 @@ protected:
 	virtual void			MessageReceived(BMessage* message);
 
 	virtual void			ScrollTo(BPoint where);
+	virtual void			TargetedByScrollView(BScrollView *scrollView);
 
 	virtual status_t		GetSupportedSuites(BMessage* msg);
 	virtual BHandler*		ResolveSpecifier(BMessage* msg, int32 index,
