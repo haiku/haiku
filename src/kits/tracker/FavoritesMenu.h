@@ -40,6 +40,8 @@ All rights reserved.
 #include "NavMenu.h"
 #include "ObjectList.h"
 
+class BRefFilter;
+
 namespace BPrivate {
 
 class EntryListBase;
@@ -52,8 +54,10 @@ class FavoritesMenu : public BSlowMenu {
 	public:
 		FavoritesMenu(const char *title, BMessage *openFolderMessage,
 			BMessage *openFileMessage, const BMessenger &,
-			bool isSavePanel);
+			bool isSavePanel, BRefFilter *filter = NULL);
 		virtual ~FavoritesMenu();
+		
+		void SetRefFilter(BRefFilter *filter);
 
 	private:
 		// override the necessary SlowMenu hooks
@@ -61,7 +65,9 @@ class FavoritesMenu : public BSlowMenu {
 		virtual bool AddNextItem();
 		virtual void DoneBuildingItemList();	
 		virtual void ClearMenuBuildingState();
-
+				
+		bool ShouldShowModel(const Model *model);
+		
 		BMessage *fOpenFolderMessage;
 		BMessage *fOpenFileMessage;
 		BMessenger fTarget;
@@ -88,6 +94,7 @@ class FavoritesMenu : public BSlowMenu {
 		int32 fInitialItemCount;
 		std::vector<entry_ref> fUniqueRefCheck;
 		bool fIsSavePanel;
+		BRefFilter *fRefFilter;
 
 		typedef BSlowMenu _inherited;
 };

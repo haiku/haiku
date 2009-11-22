@@ -32,8 +32,13 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include "FavoritesMenu.h"
+
+#include <compat/sys/stat.h>
+
 #include <Application.h>
 #include <FindDirectory.h>
+#include <FilePanel.h>
 #include <Message.h>
 #include <Path.h>
 #include <Query.h>
@@ -43,7 +48,6 @@ All rights reserved.
 #include <algorithm>
 
 #include "EntryIterator.h"
-#include "FavoritesMenu.h"
 #include "IconMenuItem.h"
 #include "NavMenu.h"
 #include "PoseView.h"
@@ -54,14 +58,15 @@ All rights reserved.
 
 FavoritesMenu::FavoritesMenu(const char *title, BMessage *openFolderMessage,
 	BMessage *openFileMessage, const BMessenger &target,
-	bool isSavePanel)
+	bool isSavePanel, BRefFilter *filter)
 	:	BSlowMenu(title),
 		fOpenFolderMessage(openFolderMessage),
 		fOpenFileMessage(openFileMessage),
 		fTarget(target),
 		fContainer(NULL),
 		fInitialItemCount(0),
-		fIsSavePanel(isSavePanel)
+		fIsSavePanel(isSavePanel),
+		fRefFilter(filter)
 {
 }
 
@@ -71,6 +76,13 @@ FavoritesMenu::~FavoritesMenu()
 	delete fOpenFolderMessage;
 	delete fOpenFileMessage;
 	delete fContainer;
+}
+
+
+void
+FavoritesMenu::SetRefFilter(BRefFilter *filter)
+{
+	fRefFilter = filter;
 }
 
 
@@ -143,6 +155,9 @@ FavoritesMenu::AddNextItem()
 			if (model.InitCheck() != B_OK)
 				return true;
 
+			if (!ShouldShowModel(&model))
+				return true;
+
 			BMenuItem *item = BNavMenu::NewModelItem(&model,
 				model.IsDirectory() ? fOpenFolderMessage : fOpenFileMessage,
 				fTarget);
@@ -184,8 +199,12 @@ FavoritesMenu::AddNextItem()
 				entry_ref ref;
 				if (fItems.FindRef("refs", fIndex++, &ref) != B_OK)
 					break;
+
 				Model model(&ref, true);
 				if (model.InitCheck() != B_OK)
+					return true;
+
+				if (!ShouldShowModel(&model))
 					return true;
 
 				BMenuItem *item = BNavMenu::NewModelItem(&model, fOpenFileMessage, fTarget);
@@ -232,6 +251,9 @@ FavoritesMenu::AddNextItem()
 			if (model.InitCheck() != B_OK)
 				return true;
 
+			if (!ShouldShowModel(&model))
+				return true;
+			
 			BMenuItem *item = BNavMenu::NewModelItem(&model, fOpenFolderMessage,
 				fTarget, true);
 			if (item) {
@@ -267,6 +289,23 @@ FavoritesMenu::ClearMenuBuildingState()
 
 	// force the menu to get rebuilt each time
 	fMenuBuilt = false;
+}
+
+
+bool
+FavoritesMenu::ShouldShowModel(const Model *model)
+{
+	if (fIsSavePanel && model->IsFile())
+		return false;
+
+	if (!fRefFilter)
+		return true;
+	
+	struct stat_beos statBeOS;
+	convert_to_stat_beos(model->StatBuf(), &statBeOS);
+
+	return fRefFilter->Filter(model->EntryRef(), model->Node(), &statBeOS,
+		model->MimeType());
 }
 
 

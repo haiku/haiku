@@ -441,6 +441,10 @@ TFilePanel::SetRefFilter(BRefFilter *filter)
 	fPoseView->SetRefFilter(filter);
 	fPoseView->CommitActivePose();
 	fPoseView->Refresh();
+	FavoritesMenu *menu = dynamic_cast<FavoritesMenu *>(
+		fMenuBar->FindItem("Favorites")->Submenu());
+	if (menu)
+		menu->SetRefFilter(filter);
 }
 
 
@@ -595,7 +599,7 @@ TFilePanel::Init(const BMessage *)
 
 	FavoritesMenu *favorites = new FavoritesMenu("Favorites",
 		new BMessage(kSwitchDirectory), new BMessage(B_REFS_RECEIVED),
-		BMessenger(this), IsSavePanel());
+		BMessenger(this), IsSavePanel(), fPoseView->RefFilter());
 	favorites->AddItem(new BMenuItem("Add Current Folder",
 		new BMessage(kAddCurrentDir)));
 	favorites->AddItem(new BMenuItem("Edit Favorites"B_UTF8_ELLIPSIS,
