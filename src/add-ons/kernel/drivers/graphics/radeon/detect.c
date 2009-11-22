@@ -123,6 +123,7 @@
 //#define DEVICE_ID_RADEON_5b50	0x5b50
 #define DEVICE_ID_RADEON_5b60	0x5b60
 #define DEVICE_ID_RADEON_5b62	0x5b62
+#define DEVICE_ID_RADEON_5b63   0x5b63 // new
 #define DEVICE_ID_RADEON_5b64	0x5b64 // new
 #define DEVICE_ID_RADEON_5b65	0x5b65 // new
 #define DEVICE_ID_RADEON_5460	0x5460
@@ -353,6 +354,7 @@ RadeonDevice radeon_device_list[] = {
 	// rv370
 	{ DEVICE_ID_RADEON_5b60	,	rt_rv380,	STD_RADEON,	"Radeon X300 (RV370) 5B60" },
 	{ DEVICE_ID_RADEON_5b62	,	rt_rv380,	STD_RADEON,	"Radeon X600 (RV370) 5B62" },
+        { DEVICE_ID_RADEON_5b63 ,       rt_rv380,       STD_RADEON,     "Radeon X1050 (RV370) 5B63" },
 	{ DEVICE_ID_RADEON_5b64	,	rt_rv380,	STD_RADEON,	"FireGL V3100 (RV370) 5B64" },
 	{ DEVICE_ID_RADEON_5b65	,	rt_rv380,	STD_RADEON,	"FireGL D1100 (RV370) 5B65" },
 	{ DEVICE_ID_RADEON_5460 ,	rt_rv380,	ISMOBILITY,	"Radeon Mobility M300 (M22) 5460" },
