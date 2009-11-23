@@ -56,10 +56,10 @@ using std::map;
 using std::string;
 
 // the maximum length of an attribute listing we support
-static const int kMaxAttributeListingLength = 10240;
+static const size_t kMaxAttributeListingLength = 10240;
 
 // the maximum attribute length we support
-static const int kMaxAttributeLength = 10240 * 4;
+static const size_t kMaxAttributeLength = 10240 * 4;
 
 
 // mangle_attribute_name
