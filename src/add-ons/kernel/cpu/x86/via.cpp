@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc.
+ * Copyright 2005-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,7 +16,6 @@
 static uint32
 via_count_mtrrs(void)
 {
-	cpuid_info cpuInfo;
 	if (!x86_check_feature(IA32_FEATURE_MTRR, FEATURE_COMMON))
 		return 0;
 
@@ -29,6 +28,13 @@ static void
 via_init_mtrrs(void)
 {
 	generic_init_mtrrs(via_count_mtrrs());
+}
+
+
+static void
+via_set_mtrrs(const x86_mtrr_info* infos, uint32 count)
+{
+	generic_set_mtrrs(infos, count, via_count_mtrrs());
 }
 
 
@@ -76,4 +82,5 @@ x86_cpu_module_info gVIAModule = {
 
 	generic_set_mtrr,
 	generic_get_mtrr,
+	via_set_mtrrs
 };

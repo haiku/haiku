@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku, Inc.
+ * Copyright 2005-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,13 @@ amd_init(void)
 }
 
 
+static void
+amd_set_mtrrs(const x86_mtrr_info* infos, uint32 count)
+{
+	generic_set_mtrrs(infos, count, generic_count_mtrrs());
+}
+
+
 static status_t
 amd_stdops(int32 op, ...)
 {
@@ -68,4 +75,5 @@ x86_cpu_module_info gAMDModule = {
 
 	generic_set_mtrr,
 	generic_get_mtrr,
+	amd_set_mtrrs
 };

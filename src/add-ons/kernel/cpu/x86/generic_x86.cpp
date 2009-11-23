@@ -1,9 +1,10 @@
 /*
- * Copyright 2005-2007, Haiku, Inc.
+ * Copyright 2005-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 
 
@@ -15,6 +16,7 @@
 #include <KernelExport.h>
 #include <arch_system_info.h>
 #include <arch/x86/arch_cpu.h>
+#include <smp.h>
 
 
 //#define TRACE_MTRR
@@ -66,52 +68,8 @@ mtrr_type_to_string(uint8 type)
 #endif // TRACE_MTRR
 
 
-uint32
-generic_count_mtrrs(void)
-{
-	if (!x86_check_feature(IA32_FEATURE_MTRR, FEATURE_COMMON) 
-		|| !x86_check_feature(IA32_FEATURE_MSR, FEATURE_COMMON))
-		return 0;
-
-	mtrr_capabilities capabilities(x86_read_msr(IA32_MSR_MTRR_CAPABILITIES));
-	TRACE("CPU has %u variable range MTRRs.\n",
-		(uint8)capabilities.variable_ranges);
-	return capabilities.variable_ranges;
-}
-
-
-void
-generic_init_mtrrs(uint32 count)
-{
-	if (count == 0)
-		return;
-
-	// disable and clear all MTRRs
-	// (we leave the fixed MTRRs as is)
-	// TODO: check if the fixed MTRRs are set on all CPUs identically?
-	TRACE("generic_init_mtrrs(count = %ld)\n", count);
-
-	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE,
-		x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & ~IA32_MTRR_ENABLE);
-
-	for (uint32 i = count; i-- > 0;) {
-		if (x86_read_msr(IA32_MSR_MTRR_PHYSICAL_MASK_0 + i * 2) & IA32_MTRR_VALID_RANGE)
-			x86_write_msr(IA32_MSR_MTRR_PHYSICAL_MASK_0 + i * 2, 0);
-	}
-
-	// but turn on variable MTRR functionality
-
-	// we need to ensure that the default type is uncacheable, otherwise
-	// clearing the mtrrs could result in ranges that aren't supposed to be
-	// cacheable to become cacheable due to the default type
-
-	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE,
-		(x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & ~0xff) | IA32_MTRR_ENABLE);
-}
-
-
-void
-generic_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
+static void
+set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 {
 	uint64 mask = length - 1;
 	mask = ~mask & gPhysicalMask;
@@ -139,8 +97,60 @@ generic_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 		// reset base as well
 		x86_write_msr(IA32_MSR_MTRR_PHYSICAL_BASE_0 + index, 0);
 	}
+}
 
-	TRACE("mtrrs now:\n");
+
+// #pragma mark -
+
+
+uint32
+generic_count_mtrrs(void)
+{
+	if (!x86_check_feature(IA32_FEATURE_MTRR, FEATURE_COMMON)
+		|| !x86_check_feature(IA32_FEATURE_MSR, FEATURE_COMMON))
+		return 0;
+
+	mtrr_capabilities capabilities(x86_read_msr(IA32_MSR_MTRR_CAPABILITIES));
+	TRACE("CPU %ld has %u variable range MTRRs.\n", smp_get_current_cpu(),
+		(uint8)capabilities.variable_ranges);
+	return capabilities.variable_ranges;
+}
+
+
+void
+generic_init_mtrrs(uint32 count)
+{
+	if (count == 0)
+		return;
+
+	// If MTRRs are enabled, we leave everything as is (save for, possibly, the
+	// default, which we set below), so that we can benefit from the BIOS's
+	// setup until we've installed our own. If MTRRs are disabled, we clear
+	// all registers and enable MTRRs.
+	// (we leave the fixed MTRRs as is)
+	// TODO: check if the fixed MTRRs are set on all CPUs identically?
+	TRACE("generic_init_mtrrs(count = %ld)\n", count);
+
+	uint64 defaultType = x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE);
+	if ((defaultType & IA32_MTRR_ENABLE) == 0) {
+		for (uint32 i = 0; i < count; i++)
+			set_mtrr(i, 0, 0, 0);
+	}
+
+	// Turn on variable MTRR functionality.
+	// We need to ensure that the default type is uncacheable, otherwise
+	// clearing the mtrrs could result in ranges that aren't supposed to be
+	// cacheable to become cacheable due to the default type.
+	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE,
+		(defaultType & ~0xff) | IA32_MTRR_ENABLE);
+}
+
+
+void
+generic_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
+{
+	set_mtrr(index, base, length, type);
+	TRACE("[cpu %ld] mtrrs now:\n", smp_get_current_cpu());
 	generic_dump_mtrrs(generic_count_mtrrs());
 }
 
@@ -162,6 +172,34 @@ generic_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
 }
 
 
+void
+generic_set_mtrrs(const x86_mtrr_info* infos, uint32 count, uint32 maxCount)
+{
+	// check count
+	if (maxCount == 0)
+		return;
+
+	if (count > maxCount)
+		count = maxCount;
+
+	// disable MTTRs
+	uint64 defaultType = x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE)
+		& ~IA32_MTRR_ENABLE;
+	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE, defaultType);
+
+	// set the given MTRRs
+	for (uint32 i = 0; i < count; i++)
+		set_mtrr(i, infos[i].base, infos[i].size, infos[i].type);
+
+	// clear the other MTRRs
+	for (uint32 i = count; i < maxCount; i++)
+		set_mtrr(i, 0, 0, 0);
+
+	// re-enable MTTRs
+	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE, defaultType | IA32_MTRR_ENABLE);
+}
+
+
 status_t
 generic_mtrr_compute_physical_mask(void)
 {
@@ -180,8 +218,8 @@ generic_mtrr_compute_physical_mask(void)
 
 	gPhysicalMask = ((1ULL << bits) - 1) & ~(B_PAGE_SIZE - 1);
 
-	TRACE("CPU has %ld physical address bits, physical mask is %016Lx\n",
-		bits, gPhysicalMask);
+	TRACE("CPU %ld has %ld physical address bits, physical mask is %016Lx\n",
+		smp_get_current_cpu(), bits, gPhysicalMask);
 
 	return B_OK;
 }
@@ -194,12 +232,13 @@ generic_dump_mtrrs(uint32 count)
 	if (count == 0)
 		return;
 
+	int cpu = smp_get_current_cpu();
 	uint64 defaultType = x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE);
-	TRACE("MTRRs are %sabled\n",
+	TRACE("[cpu %d] MTRRs are %sabled\n", cpu,
 		(defaultType & IA32_MTRR_ENABLE) != 0 ? "en" : "dis");
-	TRACE("default type is %u %s\n",
+	TRACE("[cpu %d] default type is %u %s\n", cpu,
 		(uint8)defaultType, mtrr_type_to_string(defaultType));
-	TRACE("fixed range MTRRs are %sabled\n",
+	TRACE("[cpu %d] fixed range MTRRs are %sabled\n", cpu,
 		(defaultType & IA32_MTRR_ENABLE_FIXED) != 0 ? "en" : "dis");
 
 	for (uint32 i = 0; i < count; i++) {
@@ -207,10 +246,10 @@ generic_dump_mtrrs(uint32 count)
 		uint64 length;
 		uint8 type;
 		if (generic_get_mtrr(i, &base, &length, &type) == B_OK) {
-			TRACE("%lu: base: 0x%Lx; length: 0x%Lx; type: %u %s\n",
-				i, base, length, type, mtrr_type_to_string(type));
+			TRACE("[cpu %d] %lu: base: 0x%Lx; length: 0x%Lx; type: %u %s\n",
+				cpu, i, base, length, type, mtrr_type_to_string(type));
 		} else
-			TRACE("%lu: empty\n", i);
+			TRACE("[cpu %d] %lu: empty\n", cpu, i);
 	}
 #endif // TRACE_MTRR
 }

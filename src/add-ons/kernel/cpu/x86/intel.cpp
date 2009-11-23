@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc.
+ * Copyright 2005-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -37,6 +37,13 @@ intel_init(void)
 }
 
 
+static void
+intel_set_mtrrs(const x86_mtrr_info* infos, uint32 count)
+{
+	generic_set_mtrrs(infos, count, generic_count_mtrrs());
+}
+
+
 static status_t
 intel_stdops(int32 op, ...)
 {
@@ -63,4 +70,5 @@ x86_cpu_module_info gIntelModule = {
 
 	generic_set_mtrr,
 	generic_get_mtrr,
+	intel_set_mtrrs
 };

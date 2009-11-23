@@ -69,6 +69,11 @@ struct set_mtrr_parameter {
 	uint8	type;
 };
 
+struct set_mtrrs_parameter {
+	const x86_mtrr_info*	infos;
+	uint32					count;
+};
+
 
 extern "C" void reboot(void);
 	// from arch_x86.S
@@ -173,6 +178,25 @@ set_mtrr(void *_parameter, int cpu)
 
 
 static void
+set_mtrrs(void* _parameter, int cpu)
+{
+	set_mtrrs_parameter* parameter = (set_mtrrs_parameter*)_parameter;
+
+	// wait until all CPUs have arrived here
+	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
+
+	disable_caches();
+
+	sCpuModule->set_mtrrs(parameter->infos, parameter->count);
+
+	enable_caches();
+
+	// wait until all CPUs have arrived here
+	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
+}
+
+
+static void
 init_mtrrs(void *_unused, int cpu)
 {
 	// wait until all CPUs have arrived here
@@ -219,6 +243,18 @@ x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
 	// the MTRRs are identical on all CPUs, so it doesn't matter
 	// on which CPU this runs
 	return sCpuModule->get_mtrr(index, _base, _length, _type);
+}
+
+
+void
+x86_set_mtrrs(const x86_mtrr_info* infos, uint32 count)
+{
+	struct set_mtrrs_parameter parameter;
+	parameter.infos = infos;
+	parameter.count = count;
+
+	sCpuRendezvous = sCpuRendezvous2 = 0;
+	call_all_cpus(&set_mtrrs, &parameter);
 }
 
 

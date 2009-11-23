@@ -1,6 +1,7 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, Jérôme Duval.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -44,111 +45,359 @@
 #endif
 
 
-#define kMaxMemoryTypeRegisters 32
+static const uint32 kMaxMemoryTypeRanges	= 32;
+static const uint32 kMaxMemoryTypeRegisters	= 32;
+static const uint64 kMinMemoryTypeRangeSize	= 1 << 12;
+
+
+struct memory_type_range_analysis_info {
+	uint64	size;
+	uint32	rangesNeeded;
+	uint32	subtractiveRangesNeeded;
+	uint64	bestSubtractiveRange;
+};
+
+struct memory_type_range_analysis {
+	uint64							base;
+	uint64							size;
+	uint32							type;
+	uint32							rangesNeeded;
+	uint64							endRange;
+	memory_type_range_analysis_info	left;
+	memory_type_range_analysis_info	right;
+};
+
+struct memory_type_range {
+	uint64						base;
+	uint64						size;
+	uint32						type;
+	area_id						area;
+};
+
 
 void *gDmaAddress;
 
-static uint32 sMemoryTypeBitmap;
-static int32 sMemoryTypeIDs[kMaxMemoryTypeRegisters];
+static memory_type_range sMemoryTypeRanges[kMaxMemoryTypeRanges];
+static uint32 sMemoryTypeRangeCount;
+
+static memory_type_range_analysis sMemoryTypeRangeAnalysis[
+	kMaxMemoryTypeRanges];
+
+static x86_mtrr_info sMemoryTypeRegisters[kMaxMemoryTypeRegisters];
 static uint32 sMemoryTypeRegisterCount;
-static spinlock sMemoryTypeLock;
+static uint32 sMemoryTypeRegistersUsed;
+
+static mutex sMemoryTypeLock = MUTEX_INITIALIZER("memory type ranges");
 
 
-static int32
-allocate_mtrr(void)
+static void
+set_mtrrs()
 {
-	InterruptsSpinLocker _(&sMemoryTypeLock);
+	x86_set_mtrrs(sMemoryTypeRegisters, sMemoryTypeRegistersUsed);
 
-	// find free bit
-
-	for (uint32 index = 0; index < sMemoryTypeRegisterCount; index++) {
-		if (sMemoryTypeBitmap & (1UL << index))
-			continue;
-
-		sMemoryTypeBitmap |= 1UL << index;
-		return index;
+#ifdef TRACE_MTRR_ARCH_VM
+	TRACE_MTRR("set MTRRs to:\n");
+	for (uint32 i = 0; i < sMemoryTypeRegistersUsed; i++) {
+		const x86_mtrr_info& info = sMemoryTypeRegisters[i];
+		TRACE_MTRR("  mtrr: %2lu: base: %#9llx, size: %#9llx, type: %u\n",
+			i, info.base, info.size, info.type);
 	}
-
-	return -1;
+#endif
 }
 
 
 static void
-free_mtrr(int32 index)
+add_used_mtrr(uint64 base, uint64 size, uint32 type)
 {
-	InterruptsSpinLocker _(&sMemoryTypeLock);
+	ASSERT(sMemoryTypeRegistersUsed < sMemoryTypeRegisterCount);
 
-	sMemoryTypeBitmap &= ~(1UL << index);
+	x86_mtrr_info& info = sMemoryTypeRegisters[sMemoryTypeRegistersUsed++];
+	info.base = base;
+	info.size = size;
+	info.type = type;
 }
 
 
-#if 0
-/*!
- 	Checks if the provided range overlaps an existing mtrr range
- 	If it actually extends an existing range, extendedIndex is filled
-*/
-static bool
-is_memory_overlapping(uint64 base, uint64 length, int32 *extendedIndex)
+static void
+analyze_range(memory_type_range_analysis& analysis, uint64 previousEnd,
+	uint64 nextBase)
 {
-	*extendedIndex = -1;
-	for (uint32 index = 0; index < sMemoryTypeRegisterCount; index++) {
-		if (sMemoryTypeBitmap & (1UL << index)) {
-			uint64 b,l;
-			uint8 t;
-			x86_get_mtrr(index, &b, &l, &t);
+	uint64 base = analysis.base;
+	uint64 size = analysis.size;
 
-			// check first for write combining extensions
-			if (base <= b
-				&& (base + length) >= (b + l)
-				&& t == IA32_MTR_WRITE_COMBINING) {
-				*extendedIndex = index;
-				return true;
+	memory_type_range_analysis_info& left = analysis.left;
+	memory_type_range_analysis_info& right = analysis.right;
+
+	uint32 leftSubtractiveRangesNeeded = 2;
+	int32 leftBestSubtractiveRangeDifference = 0;
+	uint32 leftBestSubtractivePositiveRangesNeeded = 0;
+	uint32 leftBestSubtractiveRangesNeeded = 0;
+
+	uint32 rightSubtractiveRangesNeeded = 2;
+	int32 rightBestSubtractiveRangeDifference = 0;
+	uint32 rightBestSubtractivePositiveRangesNeeded = 0;
+	uint32 rightBestSubtractiveRangesNeeded = 0;
+
+	uint64 range = kMinMemoryTypeRangeSize;
+
+	while (size > 0) {
+		if ((base & range) != 0) {
+			left.rangesNeeded++;
+
+			bool replaceBestSubtractive = false;
+			int32 rangeDifference = (int32)left.rangesNeeded
+				- (int32)leftSubtractiveRangesNeeded;
+			if (left.bestSubtractiveRange == 0
+				|| leftBestSubtractiveRangeDifference < rangeDifference) {
+				// check for intersection with previous range
+				replaceBestSubtractive
+					= previousEnd == 0 || base - range >= previousEnd;
 			}
-			if ((base >= b && base < (b + l))
-				|| ((base + length) > b
-					&& (base + length) <= (b + l)))
-				return true;
+
+			if (replaceBestSubtractive) {
+				leftBestSubtractiveRangeDifference = rangeDifference;
+				leftBestSubtractiveRangesNeeded
+					= leftSubtractiveRangesNeeded;
+				left.bestSubtractiveRange = range;
+				leftBestSubtractivePositiveRangesNeeded = 0;
+			} else
+				leftBestSubtractivePositiveRangesNeeded++;
+
+			left.size += range;
+			base += range;
+			size -= range;
+		} else if (left.bestSubtractiveRange > 0)
+			leftSubtractiveRangesNeeded++;
+
+		if ((size & range) != 0) {
+			right.rangesNeeded++;
+
+			bool replaceBestSubtractive = false;
+			int32 rangeDifference = (int32)right.rangesNeeded
+				- (int32)rightSubtractiveRangesNeeded;
+			if (right.bestSubtractiveRange == 0
+				|| rightBestSubtractiveRangeDifference < rangeDifference) {
+				// check for intersection with previous range
+				replaceBestSubtractive
+					= nextBase == 0 || base + size + range <= nextBase;
+			}
+
+			if (replaceBestSubtractive) {
+				rightBestSubtractiveRangeDifference = rangeDifference;
+				rightBestSubtractiveRangesNeeded
+					= rightSubtractiveRangesNeeded;
+				right.bestSubtractiveRange = range;
+				rightBestSubtractivePositiveRangesNeeded = 0;
+			} else
+				rightBestSubtractivePositiveRangesNeeded++;
+
+			right.size += range;
+			size -= range;
+		} else if (right.bestSubtractiveRange > 0)
+			rightSubtractiveRangesNeeded++;
+
+		range <<= 1;
+	}
+
+	analysis.endRange = range;
+
+	// If a subtractive setup doesn't have any advantages, don't use it.
+	// Also compute analysis.rangesNeeded.
+	if (leftBestSubtractiveRangesNeeded
+			+ leftBestSubtractivePositiveRangesNeeded >= left.rangesNeeded) {
+		left.bestSubtractiveRange = 0;
+		left.subtractiveRangesNeeded = 0;
+		analysis.rangesNeeded = left.rangesNeeded;
+	} else {
+		left.subtractiveRangesNeeded = leftBestSubtractiveRangesNeeded
+			+ leftBestSubtractivePositiveRangesNeeded;
+		analysis.rangesNeeded = left.subtractiveRangesNeeded;
+	}
+
+	if (rightBestSubtractiveRangesNeeded
+			+ rightBestSubtractivePositiveRangesNeeded >= right.rangesNeeded) {
+		right.bestSubtractiveRange = 0;
+		right.subtractiveRangesNeeded = 0;
+		analysis.rangesNeeded += right.rangesNeeded;
+	} else {
+		right.subtractiveRangesNeeded = rightBestSubtractiveRangesNeeded
+			+ rightBestSubtractivePositiveRangesNeeded;
+		analysis.rangesNeeded += right.subtractiveRangesNeeded;
+	}
+}
+
+static void
+compute_mtrrs(const memory_type_range_analysis& analysis)
+{
+	const memory_type_range_analysis_info& left = analysis.left;
+	const memory_type_range_analysis_info& right = analysis.right;
+
+	// generate a setup for the left side
+	if (left.rangesNeeded > 0) {
+		uint64 base = analysis.base;
+		uint64 size = left.size;
+		uint64 range = analysis.endRange;
+		uint64 rangeEnd = base + size;
+		bool subtractive = false;
+		while (size > 0) {
+			if (range == left.bestSubtractiveRange) {
+				base = rangeEnd - 2 * range;
+				add_used_mtrr(base, range, analysis.type);
+				subtractive = true;
+				break;
+			}
+
+			if ((size & range) != 0) {
+				rangeEnd -= range;
+				add_used_mtrr(rangeEnd, range, analysis.type);
+				size -= range;
+			}
+
+			range >>= 1;
+		}
+
+		if (subtractive) {
+			uint64 shortestRange = range;
+			while (size > 0) {
+				if ((size & range) != 0) {
+					shortestRange = range;
+					size -= range;
+				} else {
+					add_used_mtrr(base, range, IA32_MTR_UNCACHED);
+					base += range;
+				}
+
+				range >>= 1;
+			}
+
+			add_used_mtrr(base, shortestRange, IA32_MTR_UNCACHED);
 		}
 	}
-	return false;
-}
-#endif	// 0
 
+	// generate a setup for the right side
+	if (right.rangesNeeded > 0) {
+		uint64 base = analysis.base + left.size;
+		uint64 size = right.size;
+		uint64 range = analysis.endRange;
+		bool subtractive = false;
+		while (size > 0) {
+			if (range == right.bestSubtractiveRange) {
+				add_used_mtrr(base, range * 2, analysis.type);
+				subtractive = true;
+				break;
+			}
 
-static uint64
-nearest_power(uint64 value)
-{
-	uint64 power = 1UL << 12;
-		// 12 bits is the smallest supported alignment/length
+			if ((size & range) != 0) {
+				add_used_mtrr(base, range, analysis.type);
+				base += range;
+				size -= range;
+			}
 
-	while (value > power)
-		power <<= 1;
+			range >>= 1;
+		}
 
-	return power;
-}
+		if (subtractive) {
+			uint64 rangeEnd = base + range * 2;
+			uint64 shortestRange = range;
+			while (size > 0) {
+				if ((size & range) != 0) {
+					shortestRange = range;
+					size -= range;
+				} else {
+					rangeEnd -= range;
+					add_used_mtrr(rangeEnd, range, IA32_MTR_UNCACHED);
+				}
 
+				range >>= 1;
+			}
 
-static void
-nearest_powers(uint64 value, uint64 *lower, uint64 *upper)
-{
-	uint64 power = 1UL << 12;
-	*lower = power;
-		// 12 bits is the smallest supported alignment/length
-
-	while (value >= power) {
-		*lower = power;
-		power <<= 1;
+			rangeEnd -= shortestRange;
+			add_used_mtrr(rangeEnd, shortestRange, IA32_MTR_UNCACHED);
+		}
 	}
-
-	*upper = power;
 }
 
 
 static status_t
-set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
+update_mttrs()
 {
-	int32 index = -1;
+	// Transfer the range array to the analysis array, dropping all uncachable
+	// ranges (that's the default anyway) and joining adjacent ranges with the
+	// same type.
+	memory_type_range_analysis* ranges = sMemoryTypeRangeAnalysis;
+	uint32 rangeCount = 0;
+	{
+		uint32 previousRangeType = IA32_MTR_UNCACHED;
+		uint64 previousRangeEnd = 0;
+		for (uint32 i = 0; i < sMemoryTypeRangeCount; i++) {
+			if (sMemoryTypeRanges[i].type != IA32_MTR_UNCACHED) {
+				uint64 rangeEnd = sMemoryTypeRanges[i].base
+					+ sMemoryTypeRanges[i].size;
+				if (previousRangeType == sMemoryTypeRanges[i].type
+					&& previousRangeEnd >= sMemoryTypeRanges[i].base) {
+					// the range overlaps/continues the previous range -- just
+					// enlarge that one
+					if (rangeEnd > previousRangeEnd)
+						previousRangeEnd = rangeEnd;
+					ranges[rangeCount - 1].size  = previousRangeEnd
+						- ranges[rangeCount - 1].base;
+				} else {
+					// add the new range
+					memset(&ranges[rangeCount], 0, sizeof(ranges[rangeCount]));
+					ranges[rangeCount].base = sMemoryTypeRanges[i].base;
+					ranges[rangeCount].size = sMemoryTypeRanges[i].size;
+					ranges[rangeCount].type = sMemoryTypeRanges[i].type;
+					previousRangeEnd = rangeEnd;
+					previousRangeType = sMemoryTypeRanges[i].type;
+					rangeCount++;
+				}
+			}
+		}
+	}
 
+	// analyze the ranges
+	uint32 registersNeeded = 0;
+	uint64 previousEnd = 0;
+	for (uint32 i = 0; i < rangeCount; i++) {
+		memory_type_range_analysis& range = ranges[i];
+		uint64 nextBase = i + 1 < rangeCount ? ranges[i + 1].base : 0;
+		analyze_range(range, previousEnd, nextBase);
+		registersNeeded += range.rangesNeeded;
+		previousEnd = range.base + range.size;
+	}
+
+	// fail when we need more registers than we have
+	if (registersNeeded > sMemoryTypeRegisterCount)
+		return B_BUSY;
+
+	sMemoryTypeRegistersUsed = 0;
+
+	for (uint32 i = 0; i < rangeCount; i++) {
+		memory_type_range_analysis& range = ranges[i];
+		compute_mtrrs(range);
+	}
+
+	set_mtrrs();
+
+	return B_OK;
+}
+
+
+static void
+remove_memory_type_range_locked(uint32 index)
+{
+	sMemoryTypeRangeCount--;
+	if (index < sMemoryTypeRangeCount) {
+		memmove(sMemoryTypeRanges + index, sMemoryTypeRanges + index + 1,
+			(sMemoryTypeRangeCount - index) * sizeof(memory_type_range));
+	}
+}
+
+
+static status_t
+add_memory_type_range(area_id areaID, uint64 base, uint64 size, uint32 type)
+{
+	// translate the type
 	if (type == 0)
 		return B_OK;
 
@@ -172,148 +421,124 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 			return B_BAD_VALUE;
 	}
 
-	if (sMemoryTypeRegisterCount == 0)
-		return B_NOT_SUPPORTED;
+	TRACE_MTRR("add_memory_type_range(%ld, %#llx, %#llx, %lu)\n", areaID, base,
+		size, type);
 
-#if 0
-	// check if it overlaps
-	if (type == IA32_MTR_WRITE_COMBINING
-		&& is_memory_overlapping(base, length, &index)) {
-		if (index < 0) {
-			dprintf("allocate MTRR failed, it overlaps an existing MTRR slot\n");
+	// base and size must at least be aligned to the minimum range size
+	if (((base | size) & (kMinMemoryTypeRangeSize - 1)) != 0) {
+		dprintf("add_memory_type_range(%ld, %#llx, %#llx, %lu): Memory base or "
+			"size not minimally aligned!\n", areaID, base, size, type);
+		return B_BAD_VALUE;
+	}
+
+	MutexLocker locker(sMemoryTypeLock);
+
+	if (sMemoryTypeRangeCount == kMaxMemoryTypeRanges) {
+		dprintf("add_memory_type_range(%ld, %#llx, %#llx, %lu): Out of "
+			"memory ranges!\n", areaID, base, size, type);
+		return B_BUSY;
+	}
+
+	// iterate through the existing ranges and check for clashes
+	bool foundInsertionIndex = false;
+	uint32 index = 0;
+	for (uint32 i = 0; i < sMemoryTypeRangeCount; i++) {
+		const memory_type_range& range = sMemoryTypeRanges[i];
+		if (range.base > base) {
+			if (range.base - base < size && range.type != type) {
+				dprintf("add_memory_type_range(%ld, %#llx, %#llx, %lu): Memory "
+					"range intersects with existing one (%#llx, %#llx, %lu).\n",
+					areaID, base, size, type, range.base, range.size,
+					range.type);
+				return B_BAD_VALUE;
+			}
+
+			// found the insertion index
+			if (!foundInsertionIndex) {
+				index = i;
+				foundInsertionIndex = true;
+			}
+			break;
+		} else if (base - range.base < range.size && range.type != type) {
+			dprintf("add_memory_type_range(%ld, %#llx, %#llx, %lu): Memory "
+				"range intersects with existing one (%#llx, %#llx, %lu).\n",
+				areaID, base, size, type, range.base, range.size, range.type);
 			return B_BAD_VALUE;
 		}
-		// we replace an existing write-combining mtrr with a bigger one at the index position
-	}
-#endif
-
-	// length must be a power of 2; just round it up to the next value
-	length = nearest_power(length);
-
-	if (length + base <= base) {
-		// 4GB overflow
-		return B_BAD_VALUE;
 	}
 
-	// base must be aligned to the length
-	if (base & (length - 1))
-		return B_BAD_VALUE;
+	if (!foundInsertionIndex)
+		index = sMemoryTypeRangeCount;
 
-	if (index < 0)
-		index = allocate_mtrr();
-	if (index < 0)
-		return B_ERROR;
-
-	TRACE_MTRR("allocate MTRR slot %ld, base = %Lx, length = %Lx, type=0x%lx\n",
-		index, base, length, type);
-
-	sMemoryTypeIDs[index] = id;
-	x86_set_mtrr(index, base, length, type);
-
-	return B_OK;
-}
-
-
-#define MTRR_MAX_SOLUTIONS 	5	// usually MTRR count is eight, keep a few for other needs
-#define MTRR_MIN_SIZE 		0x80000	// 512 KB
-static int64 sSolutions[MTRR_MAX_SOLUTIONS];
-static int32 sSolutionCount;
-static int64 sPropositions[MTRR_MAX_SOLUTIONS];
-
-
-/*!	Find the nearest powers of two for a value, save current iteration,
-  	then make recursives calls for the remaining values.
-  	It uses at most MTRR_MAX_SOLUTIONS levels of recursion because
-  	only that count of MTRR registers are available to map the memory.
-*/
-static void
-find_nearest(uint64 value, int iteration)
-{
-	int i;
-	uint64 down, up;
-	TRACE_MTRR("find_nearest %Lx %d\n", value, iteration);
-	if (iteration > (MTRR_MAX_SOLUTIONS - 1) || (iteration + 1) >= sSolutionCount) {
-		if (sSolutionCount > MTRR_MAX_SOLUTIONS) {
-			// no solutions yet, save something
-			for (i=0; i<iteration; i++)
-				sSolutions[i] = sPropositions[i];
-			sSolutionCount = iteration;
-		}
-		return;
+	// make room for the new range
+	if (index < sMemoryTypeRangeCount) {
+		memmove(sMemoryTypeRanges + index + 1, sMemoryTypeRanges + index,
+			(sMemoryTypeRangeCount - index) * sizeof(memory_type_range));
 	}
-	nearest_powers(value, &down, &up);
-	sPropositions[iteration] = down;
-	if (value - down < MTRR_MIN_SIZE) {
-		for (i=0; i<=iteration; i++)
-			sSolutions[i] = sPropositions[i];
-		sSolutionCount = iteration + 1;
-		return;
-	}
-	find_nearest(value - down, iteration + 1);
-	sPropositions[iteration] = -up;
-	if (up - value < MTRR_MIN_SIZE) {
-		for (i=0; i<=iteration; i++)
-			sSolutions[i] = sPropositions[i];
-		sSolutionCount = iteration + 1;
-		return;
-	}
-	find_nearest(up - value, iteration + 1);
-}
+	sMemoryTypeRangeCount++;
 
+	memory_type_range& rangeInfo = sMemoryTypeRanges[index];
+	rangeInfo.base = base;
+	rangeInfo.size = size;
+	rangeInfo.type = type;
+	rangeInfo.area = areaID;
 
-/*!	Set up MTRR to map the memory to write-back using uncached if necessary */
-static void
-set_memory_write_back(int32 id, uint64 base, uint64 length)
-{
-	status_t err;
-	TRACE_MTRR("set_memory_write_back base %Lx length %Lx\n", base, length);
-	sSolutionCount = MTRR_MAX_SOLUTIONS + 1;
-	find_nearest(length, 0);
-
-#ifdef TRACE_MTRR
-	dprintf("solutions: ");
-	for (int i=0; i<sSolutionCount; i++)
-		dprintf("0x%Lx ", sSolutions[i]);
-	dprintf("\n");
-#endif
-
-	for (int run = 0; run < 2; run++) {
-		bool nextDown = false;
-		uint64 newBase = base;
-
-		for (int i = 0; i < sSolutionCount; i++) {
-			if (sSolutions[i] < 0) {
-				if (nextDown)
-					newBase += sSolutions[i];
-
-				if ((run == 0) == nextDown) {
-					err = set_memory_type(id, newBase, -sSolutions[i],
-						nextDown ? B_MTR_UC : B_MTR_WB);
-					if (err != B_OK) {
-						dprintf("set_memory_type returned %s (0x%lx)\n",
-							strerror(err), err);
-					}
-				}
-
-				if (!nextDown)
-					newBase -= sSolutions[i];
-				nextDown = !nextDown;
-			} else {
-				if (nextDown)
-					newBase -= sSolutions[i];
-
-				if ((run == 0) == nextDown) {
-					err = set_memory_type(id, newBase, sSolutions[i],
-						nextDown ? B_MTR_UC : B_MTR_WB);
-					if (err != B_OK) {
-						dprintf("set_memory_type returned %s (0x%lx)\n",
-							strerror(err), err);
-					}
-				}
-
-				if (!nextDown)
-					newBase += sSolutions[i];
+	uint64 range = kMinMemoryTypeRangeSize;
+	status_t error;
+	do {
+		error = update_mttrs();
+		if (error == B_OK) {
+			if (rangeInfo.size != size) {
+				dprintf("add_memory_type_range(%ld, %#llx, %#llx, %lu): "
+					"update_mtrrs() succeeded only with simplified range: "
+					"base: %#llx, size: %#llx\n", areaID, base, size, type,
+					rangeInfo.base, rangeInfo.size);
 			}
+			return B_OK;
+		}
+
+		// update_mttrs() failed -- try to simplify (i.e. shrink) the range
+		while (rangeInfo.size != 0) {
+			if ((rangeInfo.base & range) != 0) {
+				rangeInfo.base += range;
+				rangeInfo.size -= range;
+				// don't shift the range yet -- we might still have an
+				// unaligned size
+				break;
+			}
+			if ((rangeInfo.size & range) != 0) {
+				rangeInfo.size -= range;
+				range <<= 1;
+				break;
+			}
+
+			range <<= 1;
+		}
+	} while (rangeInfo.size > 0);
+
+	dprintf("add_memory_type_range(%ld, %#llx, %#llx, %lu): update_mtrrs() "
+		"failed.\n", areaID, base, size, type);
+	remove_memory_type_range_locked(index);
+	return error;
+}
+
+
+static void
+remove_memory_type_range(area_id areaID)
+{
+	MutexLocker locker(sMemoryTypeLock);
+
+	for (uint32 i = 0; i < sMemoryTypeRangeCount; i++) {
+		if (sMemoryTypeRanges[i].area == areaID) {
+			TRACE_MTRR("remove_memory_type_range(%ld, %#llx, %#llxd)\n",
+				areaID, sMemoryTypeRanges[i].base, sMemoryTypeRanges[i].size);
+			remove_memory_type_range_locked(i);
+			update_mttrs();
+				// TODO: It's actually possible that this call fails, since
+				// compute_mtrrs() joins ranges and removing one might cause a
+				// previously joined big simple range to be split into several
+				// ranges (or just make it more complicated).
+			return;
 		}
 	}
 }
@@ -371,8 +596,6 @@ arch_vm_init_end(kernel_args *args)
 status_t
 arch_vm_init_post_modules(kernel_args *args)
 {
-//	void *cookie;
-
 	// the x86 CPU modules are now accessible
 
 	sMemoryTypeRegisterCount = x86_count_mtrrs();
@@ -383,17 +606,10 @@ arch_vm_init_post_modules(kernel_args *args)
 	if (sMemoryTypeRegisterCount > kMaxMemoryTypeRegisters)
 		sMemoryTypeRegisterCount = kMaxMemoryTypeRegisters;
 
-	// init memory type ID table
-
-	for (uint32 i = 0; i < sMemoryTypeRegisterCount; i++) {
-		sMemoryTypeIDs[i] = -1;
-	}
-
 	// set the physical memory ranges to write-back mode
-
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
-		set_memory_write_back(-1, args->physical_memory_range[i].start,
-			args->physical_memory_range[i].size);
+		add_memory_type_range(-1, args->physical_memory_range[i].start,
+			args->physical_memory_range[i].size, B_MTR_WB);
 	}
 
 	return B_OK;
@@ -433,22 +649,10 @@ arch_vm_supports_protection(uint32 protection)
 void
 arch_vm_unset_memory_type(struct vm_area *area)
 {
-	uint32 index;
-
 	if (area->memory_type == 0)
 		return;
 
-	// find index for area ID
-
-	for (index = 0; index < sMemoryTypeRegisterCount; index++) {
-		if (sMemoryTypeIDs[index] == area->id) {
-			x86_set_mtrr(index, 0, 0, 0);
-
-			sMemoryTypeIDs[index] = -1;
-			free_mtrr(index);
-			break;
-		}
-	}
+	remove_memory_type_range(area->id);
 }
 
 
@@ -457,5 +661,5 @@ arch_vm_set_memory_type(struct vm_area *area, addr_t physicalBase,
 	uint32 type)
 {
 	area->memory_type = type >> MEMORY_TYPE_SHIFT;
-	return set_memory_type(area->id, physicalBase, area->size, type);
+	return add_memory_type_range(area->id, physicalBase, area->size, type);
 }
