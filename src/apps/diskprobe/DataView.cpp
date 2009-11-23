@@ -40,7 +40,7 @@ is_valid_utf8(uint8 *data, size_t size)
 {
 	for (size_t i = 0; i < size; i++) {
 		// accept a terminating null byte
-		if (i == size - 1 && data[0] == '\0')
+		if (i == size - 1 && data[i] == '\0')
 			return true;
 
 		if ((data[i] & 0x80) == 0) {
