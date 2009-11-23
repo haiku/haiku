@@ -45,8 +45,8 @@ is_valid_utf8(uint8 *data, size_t size)
 
 		if ((data[i] & 0x80) == 0) {
 			// a single byte character
-			if (data[i] < ' '
-				&& data[i] != 0x0d && data[i] != 0x09 && data[i] != 0x0a
+			if ((data[i] < ' '
+					&& data[i] != 0x0d && data[i] != 0x09 && data[i] != 0x0a)
 				|| data[i] == 0x7f)
 				return false;
 
