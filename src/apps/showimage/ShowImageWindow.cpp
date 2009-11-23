@@ -631,7 +631,8 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			if (messageProvidesSize) {
 				_UpdateResizerWindow(fWidth, fHeight);
 				if (!fImageView->GetZoomToBounds()
-					&& !fImageView->GetShrinkToBounds())
+					&& !fImageView->GetShrinkToBounds()
+					&& !fFullScreen)
 					WindowRedimension(fImageView->GetBitmap());
 			}
 
