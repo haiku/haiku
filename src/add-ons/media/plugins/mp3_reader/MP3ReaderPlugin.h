@@ -82,9 +82,17 @@ private:
 	
 	int64		XingSeekPoint(float percent);
 
+	int64		VBRIseekPointByTime(float EntryTimeInMilliSeconds);
+	int64		VBRISeekPoint(float percent);
+	
 	bool		ResynchronizeStream(mp3data *data);
 	
 private:
+
+	status_t	CalculatePosition(void* cookie, uint32 flags,
+								int64* frame, bigtime_t* time, off_t *position);
+	bool		isVBR() {return (fXingVbrInfo || fFhgVbrInfo);}
+
 	BPositionIO *	fSeekableSource;
 	int64			fFileSize;
 	

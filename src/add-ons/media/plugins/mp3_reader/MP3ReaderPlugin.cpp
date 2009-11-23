@@ -138,6 +138,18 @@ struct mp3Reader::xing_vbr_info
 
 struct mp3Reader::fhg_vbr_info
 {
+	uint32			SampleRate;
+    char			VbriSignature[4];
+    uint16			VbriVersion;
+    uint16			VbriDelay;		
+    uint16			VbriQuality;	// Actually a float, convert on request
+    uint32			VbriStreamBytes;
+    uint32			VbriStreamFrames;
+    uint16			VbriTableSize;
+    uint16			VbriTableScale;
+    uint16			VbriEntryBytes;
+    uint16			VbriEntryFrames;
+    int				*VbriTable;
 };
 
 
@@ -238,12 +250,27 @@ mp3Reader::AllocateCookie(int32 streamNumber, void **cookie)
 	int frame_size;
 	
 	if (fXingVbrInfo && fXingVbrInfo->frameCount != -1 && fXingVbrInfo->duration != -1) {
-		TRACE("mp3Reader::AllocateCookie: using timing info from VBR header\n");
+		TRACE("mp3Reader::AllocateCookie: using timing info from Xing VBR header\n");
 		bit_rate = (fXingVbrInfo->byteCount * 8 * 1000000) / fXingVbrInfo->duration; // average bit rate
 		frame_size = fXingVbrInfo->byteCount / fXingVbrInfo->encodedFramesCount;	 // average frame size
 		data->duration = fXingVbrInfo->duration;
 		data->frameCount = fXingVbrInfo->frameCount;
 		data->frameRate = fXingVbrInfo->frameRate;
+	} else if (fFhgVbrInfo) {
+		TRACE("mp3Reader::AllocateCookie: using timing info from Fraunhofer VBR header\n");
+		int sampling_rate_index = (header[2] >> 2) & 0x03;
+		uint32 SamplesPerFrame;
+
+		fFhgVbrInfo->SampleRate = frame_rate_table[mpeg_version_index][sampling_rate_index];
+  		(fFhgVbrInfo->SampleRate >= 32000) ? (SamplesPerFrame = 1152) : (SamplesPerFrame = 576);
+  		
+  		data->duration = (int64)(((float)fFhgVbrInfo->VbriStreamFrames * (float)SamplesPerFrame)
+						  / (float)fFhgVbrInfo->SampleRate * 1000000.0f);
+		
+		bit_rate = (fFhgVbrInfo->VbriStreamBytes * 8 * 1000000) / data->duration; // average bit rate
+		frame_size = fFhgVbrInfo->VbriStreamBytes / fFhgVbrInfo->VbriStreamFrames;	 // average frame size
+		data->frameCount = fFhgVbrInfo->VbriStreamFrames * SamplesPerFrame;
+		data->frameRate = fFhgVbrInfo->SampleRate;
 	} else {
 		TRACE("mp3Reader::AllocateCookie: assuming CBR, calculating timing info from file\n");
 		int sampling_rate_index = (header[2] >> 2) & 0x03;
@@ -320,100 +347,65 @@ mp3Reader::Seek(void *cookie,
 				uint32 flags,
 				int64 *frame, bigtime_t *time)
 {
-	// Find a seek position and seek to it
-	if (!fSeekableSource)
-		return B_ERROR;
-
 	mp3data *data = reinterpret_cast<mp3data *>(cookie);
-	int64 pos;
-	
-	// this isn't very accurate
 
-	if (flags & B_MEDIA_SEEK_TO_FRAME) {
-		pos = fXingVbrInfo ? XingSeekPoint(100.0 * *frame / (float)data->frameCount) : -1;
-		if (pos < 0)
-			pos = (*frame * fDataSize) / data->frameCount;
-		TRACE("mp3Reader::Seek to frame %Ld, pos %Ld\n", *frame, pos);
-		*time = (*frame * data->duration) / data->frameCount;
-		TRACE("mp3Reader::Seek newtime %Ld\n", *time);
-	} else if (flags & B_MEDIA_SEEK_TO_TIME) {
-		pos = fXingVbrInfo ? XingSeekPoint(100.0 * *time / (float)data->duration) : -1;
-		if (pos < 0)
-			pos = (*time * fDataSize) / data->duration;
-		TRACE("mp3Reader::Seek to time %Ld, pos %Ld\n", *time, pos);
-		*frame = (*time * data->frameCount) / data->duration;
-		TRACE("mp3Reader::Seek newframe %Ld\n", *frame);
+	status_t result = CalculatePosition(cookie, flags, frame, time, &data->position);
+
+	if (result == B_OK) {
+		data->framePosition = *frame; // this is not exact
+		TRACE("mp3Reader::Seek: synchronized at position %Ld\n", data->position);
 	} else {
-		return B_ERROR;
+		TRACE("mp3Reader::Seek: failed to seek\n");
 	}
 	
-	// We ignore B_MEDIA_SEEK_CLOSEST_FORWARD, B_MEDIA_SEEK_CLOSEST_BACKWARD
-
-	uint8 buffer[16000];
-	if (pos > fDataSize - 16000)
-		pos = fDataSize - 16000;
-	if (pos < 0)
-		pos = 0;
-	int64 size = fDataSize - pos;
-	if (size > 16000)
-		size = 16000;
-	if (size != Source()->ReadAt(fDataStart + pos, buffer, size)) {
-		TRACE("mp3Reader::Seek: unexpected read error\n");
-		return B_ERROR;
-	}
-	int32 end = size - 4;
-	int32 ofs;
-	for (ofs = 0; ofs < end; ofs++) {
-		if (buffer[ofs] != 0xff) // quick check
-			continue;
-		if (IsValidStream(&buffer[ofs], size - ofs))
-			break;
-	}
-	if (ofs == end) {
-		TRACE("mp3Reader::Seek: couldn't synchronize\n");
-		return B_ERROR;
-	}
-	data->position = pos + ofs;
-
-	data->framePosition = *frame; // this is not exact
-
-	TRACE("mp3Reader::Seek: synchronized at position %Ld\n", data->position);
-	return B_OK;
+	return result;
 }
 
 status_t
 mp3Reader::FindKeyFrame(void* cookie, uint32 flags,
 							int64* frame, bigtime_t* time)
 {
-	// Find a seek position without actually seeking
+	off_t pos;
+
+	return CalculatePosition(cookie, flags, frame, time, &pos);
+}
+
+status_t
+mp3Reader::CalculatePosition(void* cookie, uint32 flags,
+							int64* frame, bigtime_t* time, off_t *position) {
+	
+	// Calculate the position within the file for the requested time or frame
 	if (!fSeekableSource)
 		return B_ERROR;
 
 	mp3data *data = reinterpret_cast<mp3data *>(cookie);
+
 	int64 pos;
 	
 	// this isn't very accurate
-
 	if (flags & B_MEDIA_SEEK_TO_FRAME) {
 		pos = fXingVbrInfo ? XingSeekPoint(100.0 * *frame / (float)data->frameCount) : -1;
 		if (pos < 0)
+			pos = fFhgVbrInfo ? VBRISeekPoint(100.0 * *frame / (float)data->frameCount) : -1;
+		if (pos < 0)
 			pos = (*frame * fDataSize) / data->frameCount;
-		TRACE("mp3Reader::FindKeyFrame to frame %Ld, pos %Ld\n", *frame, pos);
+
 		*time = (*frame * data->duration) / data->frameCount;
-		TRACE("mp3Reader::FindKeyFrame newtime %Ld\n", *time);
+		TRACE("mp3Reader::CalculatePosition using frame %Ld gives time %Ld and pos %Ld\n", *frame, *time, pos);
 	} else if (flags & B_MEDIA_SEEK_TO_TIME) {
 		pos = fXingVbrInfo ? XingSeekPoint(100.0 * *time / (float)data->duration) : -1;
 		if (pos < 0)
+			pos = fFhgVbrInfo ? VBRISeekPoint(100.0 * *time / (float)data->duration) : -1;
+		if (pos < 0)
 			pos = (*time * fDataSize) / data->duration;
-		TRACE("mp3Reader::FindKeyFrame to time %Ld, pos %Ld\n", *time, pos);
 		*frame = (*time * data->frameCount) / data->duration;
-		TRACE("mp3Reader::FindKeyFrame newframe %Ld\n", *frame);
+		TRACE("mp3Reader::CalculatePosition using time %Ld gives frame %Ld and pos %Ld\n", *time, *frame, pos);
 	} else {
 		return B_ERROR;
 	}
 	
 	// We ignore B_MEDIA_SEEK_CLOSEST_FORWARD, B_MEDIA_SEEK_CLOSEST_BACKWARD
-
+	// Align position to the sync bytes
 	uint8 buffer[16000];
 	if (pos > fDataSize - 16000)
 		pos = fDataSize - 16000;
@@ -423,7 +415,7 @@ mp3Reader::FindKeyFrame(void* cookie, uint32 flags,
 	if (size > 16000)
 		size = 16000;
 	if (size != Source()->ReadAt(fDataStart + pos, buffer, size)) {
-		TRACE("mp3Reader::FindKeyFrame: unexpected read error\n");
+		TRACE("mp3Reader::CalculatePosition: unexpected read error\n");
 		return B_ERROR;
 	}
 	int32 end = size - 4;
@@ -435,18 +427,23 @@ mp3Reader::FindKeyFrame(void* cookie, uint32 flags,
 			break;
 	}
 	if (ofs == end) {
-		TRACE("mp3Reader::FindKeyFrame: couldn't synchronize\n");
+		printf("mp3Reader::CalculatePosition: couldn't synchronize\n");
 		return B_ERROR;
 	}
 
+	*position = pos + ofs;
+
 	return B_OK;
 }
+
 
 status_t
 mp3Reader::GetNextChunk(void *cookie,
 						const void **chunkBuffer, size_t *chunkSize,
 						media_header *mediaHeader)
 {
+	// TODO This returns a chunk composed of a single frame
+	// Would be better to just return chunks of 16K and let the decoder break up the frames.
 	mp3data *data = reinterpret_cast<mp3data *>(cookie);
 	
 	int64 maxbytes = fDataSize - data->position;
@@ -480,13 +477,13 @@ retry:
 	
 	int size = GetFrameLength(data->chunkBuffer) - 4;
 	if (size <= 0) {
-		TRACE("mp3Reader::GetNextChunk: invalid frame encountered at position %Ld, header %02x %02x %02x %02x \n",
+		printf("mp3Reader::GetNextChunk: invalid frame encountered at position %Ld, header %02x %02x %02x %02x \n",
 			data->position, (uint8)data->chunkBuffer[0], (uint8)data->chunkBuffer[1], (uint8)data->chunkBuffer[2], (uint8)data->chunkBuffer[3]);
 		if (ResynchronizeStream(data)) {
 			TRACE("mp3Reader::GetNextChunk: synchronized again at position %Ld\n", data->position);
 			goto retry;
 		} else {
-			TRACE("mp3Reader::GetNextChunk: synchronization failed\n");
+			printf("mp3Reader::GetNextChunk: synchronization failed\n");
 			return B_ERROR;
 		}
 	}
@@ -608,7 +605,7 @@ mp3Reader::ParseFile()
 			hdr_length = GetFraunhoferVbrLength(&buf[pos]);
 			if (hdr_length > 0) {
 				TRACE("mp3ReaderPlugin::ParseFile found a Fraunhofer VBR header of %d bytes at position %Ld\n", hdr_length, offset + pos);
-				ParseFraunhoferVbrHeader(offset + pos);
+				ParseFraunhoferVbrHeader(offset + pos + 36);
 				goto skip_header;
 			}
 			
@@ -873,6 +870,122 @@ mp3Reader::GetFraunhoferVbrLength(uint8 *header)
 void
 mp3Reader::ParseFraunhoferVbrHeader(int64 pos)
 {
+	uint32 i, entry;
+
+	fFhgVbrInfo = new fhg_vbr_info;
+	
+	Source()->ReadAt(pos, &fFhgVbrInfo->VbriSignature[0], 4);
+	Source()->ReadAt(pos+4, &fFhgVbrInfo->VbriVersion, 2);
+	Source()->ReadAt(pos+6, &fFhgVbrInfo->VbriDelay, 2);
+	Source()->ReadAt(pos+8, &fFhgVbrInfo->VbriQuality, 2);
+	Source()->ReadAt(pos+10, &fFhgVbrInfo->VbriStreamBytes, 4);
+	Source()->ReadAt(pos+14, &fFhgVbrInfo->VbriStreamFrames, 4);
+	Source()->ReadAt(pos+18, &fFhgVbrInfo->VbriTableSize, 2);
+	Source()->ReadAt(pos+20, &fFhgVbrInfo->VbriTableScale, 2);
+	Source()->ReadAt(pos+22, &fFhgVbrInfo->VbriEntryBytes, 2);
+	Source()->ReadAt(pos+24, &fFhgVbrInfo->VbriEntryFrames, 2);
+
+	pos += 26;
+
+	// Double check we are dealing with a VBRI (Fraunhofer) header
+	if (fFhgVbrInfo->VbriSignature[0] == 'V' &&
+		fFhgVbrInfo->VbriSignature[1] == 'B' &&
+		fFhgVbrInfo->VbriSignature[2] == 'R' &&
+		fFhgVbrInfo->VbriSignature[3] == 'I') {
+   
+   		fFhgVbrInfo->VbriVersion = B_BENDIAN_TO_HOST_INT16(fFhgVbrInfo->VbriVersion);
+   		fFhgVbrInfo->VbriDelay = B_BENDIAN_TO_HOST_INT16(fFhgVbrInfo->VbriDelay);
+   		fFhgVbrInfo->VbriQuality = B_BENDIAN_TO_HOST_INT16(fFhgVbrInfo->VbriQuality);
+   		
+   		fFhgVbrInfo->VbriStreamBytes = B_BENDIAN_TO_HOST_INT32(fFhgVbrInfo->VbriStreamBytes);
+   		fFhgVbrInfo->VbriStreamFrames = B_BENDIAN_TO_HOST_INT32(fFhgVbrInfo->VbriStreamFrames);
+   		fFhgVbrInfo->VbriTableSize = B_BENDIAN_TO_HOST_INT16(fFhgVbrInfo->VbriTableSize);
+   		fFhgVbrInfo->VbriTableScale = B_BENDIAN_TO_HOST_INT16(fFhgVbrInfo->VbriTableScale);
+   		fFhgVbrInfo->VbriEntryBytes = B_BENDIAN_TO_HOST_INT16(fFhgVbrInfo->VbriEntryBytes);
+   		fFhgVbrInfo->VbriEntryFrames = B_BENDIAN_TO_HOST_INT16(fFhgVbrInfo->VbriEntryFrames);
+   
+		fFhgVbrInfo->VbriTable = new int[(const int) fFhgVbrInfo->VbriTableSize + 1] ;
+
+		for ( i = 0 ; i <= fFhgVbrInfo->VbriTableSize ; i++) {
+			
+			Source()->ReadAt(pos, &entry, fFhgVbrInfo->VbriEntryBytes);
+			pos += fFhgVbrInfo->VbriEntryBytes;
+			
+			if (fFhgVbrInfo->VbriEntryBytes == 2) {
+				entry = B_BENDIAN_TO_HOST_INT16(entry);
+			} else if (fFhgVbrInfo->VbriEntryBytes == 4) {
+				entry = B_BENDIAN_TO_HOST_INT32(entry);
+			}
+			
+			fFhgVbrInfo->VbriTable[i] = entry * fFhgVbrInfo->VbriTableScale;
+		}
+		
+		TRACE("FraunhoferVbrHeader(Version %d, Delay %d, Quality %f, StreamBytes %ld, StreamFrames %ld, TableSize %d, TableScale %d, EntryBytes %d, EntryFrames %d)\n",
+		fFhgVbrInfo->VbriVersion, fFhgVbrInfo->VbriDelay, (float)fFhgVbrInfo->VbriQuality, fFhgVbrInfo->VbriStreamBytes, fFhgVbrInfo->VbriStreamFrames,
+		fFhgVbrInfo->VbriTableSize,fFhgVbrInfo->VbriTableScale,fFhgVbrInfo->VbriEntryBytes,fFhgVbrInfo->VbriEntryFrames);
+		
+	} else {
+		delete fFhgVbrInfo;
+		fFhgVbrInfo = NULL;
+	}
+}
+
+int64
+mp3Reader::VBRIseekPointByTime(float EntryTimeInMilliSeconds) {
+
+  unsigned int SamplesPerFrame, i = 0, SeekPoint = 0 , fraction = 0;
+
+  float TotalDuration;
+  float DurationPerVbriFrames;
+  float AccumulatedTime = 0.0f;
+ 
+  (fFhgVbrInfo->SampleRate >= 32000) ? (SamplesPerFrame = 1152) : (SamplesPerFrame = 576);
+
+  TotalDuration		= ((float)fFhgVbrInfo->VbriStreamFrames * (float)SamplesPerFrame) 
+						  / (float)fFhgVbrInfo->SampleRate * 1000.0f;
+  DurationPerVbriFrames = (float)TotalDuration / (float)(fFhgVbrInfo->VbriTableSize+1);
+ 
+  if ( EntryTimeInMilliSeconds > TotalDuration ) EntryTimeInMilliSeconds = TotalDuration; 
+ 
+  while ( AccumulatedTime <= EntryTimeInMilliSeconds ) {
+    
+    SeekPoint	    += fFhgVbrInfo->VbriTable[i];
+    AccumulatedTime += DurationPerVbriFrames;
+    i++;
+    
+  }
+  
+  // Searched too far; correct result
+  fraction = ( (int)(((( AccumulatedTime - EntryTimeInMilliSeconds ) / DurationPerVbriFrames ) 
+			 + (1.0f / (2.0f * (float)fFhgVbrInfo->VbriEntryFrames))) * (float)fFhgVbrInfo->VbriEntryFrames));
+
+  
+  SeekPoint -= (int)((float)fFhgVbrInfo->VbriTable[i-1] * (float)(fraction) 
+				 / (float)fFhgVbrInfo->VbriEntryFrames);
+
+  return SeekPoint;
+
+}
+
+int64
+mp3Reader::VBRISeekPoint(float percent)
+{
+	if (!fFhgVbrInfo)
+		return -1;
+
+  int SamplesPerFrame;
+
+  float TotalDuration;
+  
+  if (percent >= 100.0f) percent = 100.0f;
+  if (percent <= 0.0f)   percent = 0.0f;
+
+  (fFhgVbrInfo->SampleRate >= 32000) ? (SamplesPerFrame = 1152) : (SamplesPerFrame = 576);
+
+  TotalDuration = ((float)fFhgVbrInfo->VbriStreamFrames * (float)SamplesPerFrame) 
+				  / (float)fFhgVbrInfo->SampleRate;
+    
+  return VBRIseekPointByTime( (percent/100.0f) * TotalDuration * 1000.0f );
 }
 
 int
