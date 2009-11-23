@@ -128,6 +128,23 @@ enum {
 #endif	// __ACTYPES_H__
 
 
+#ifndef __ACRESTYP_H__
+
+
+typedef struct acpi_prt
+{
+    uint32              length;
+    uint32              pin;
+    int			        address;        /* here for 64-bit alignment */
+    uint32              sourceIndex;
+    char                source[4];		/* pad to 64 bits so sizeof() works in
+    									all cases */
+} acpi_pci_routing_table;
+
+
+#endif // __ACRESTYP_H__
+
+
 typedef uint32 (*acpi_event_handler)(void *Context);
 
 typedef status_t (*acpi_adr_space_handler)(uint32 function,
@@ -218,6 +235,11 @@ struct acpi_module_info {
 					acpi_object_type *returnValue, size_t bufferLength);
 	status_t	(*evaluate_method)(acpi_handle handle, const char *method,
 					acpi_objects *args, acpi_data *returnValue);
+
+	/* Resource info */
+
+	status_t	(*get_irq_routing_table)(acpi_handle busDeviceHandle,
+					acpi_data *retBuffer);
 
 	/* Power state setting */
 
