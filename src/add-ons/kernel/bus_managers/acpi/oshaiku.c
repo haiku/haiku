@@ -774,11 +774,6 @@ AcpiOsExecute(ACPI_EXECUTE_TYPE type, ACPI_OSD_EXEC_CALLBACK  function,
 			break;
 	}
 */
-	if (!gDPCHandle && gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
-		B_NORMAL_PRIORITY) != B_OK) {
-		DEBUG_FUNCTION_F("failed to create os execution queue\n");
-		return AE_ERROR;
-	}
 
 	if (gDPC->queue_dpc(gDPCHandle, function, context) != B_OK) {
 		DEBUG_FUNCTION_F("Serious failure in AcpiOsExecute! function: %p",

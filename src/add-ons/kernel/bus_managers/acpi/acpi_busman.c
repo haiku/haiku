@@ -22,6 +22,7 @@
 
 #include "acpi.h"
 #include "accommon.h"
+#include "acnamesp.h"
 #include "acpi_priv.h"
 
 //#define TRACE_ACPI_BUS
@@ -109,6 +110,12 @@ acpi_std_ops(int32 op,...)
 			if (acpiDisabled) {
 				ERROR("ACPI disabled\n");
 				return ENOSYS;
+			}
+
+			if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
+				B_NORMAL_PRIORITY) != B_OK) {
+				ERROR("failed to create os execution queue\n");
+				return B_ERROR;
 			}
 
 			AcpiGbl_EnableInterpreterSlack = true;
@@ -506,7 +513,8 @@ get_object_typed(const char* path, acpi_object_type** _returnValue,
 status_t
 ns_handle_to_pathname(acpi_handle targetHandle, acpi_data *buffer)
 {
-	status_t status = AcpiNsHandleToPathname(targetHandle, buffer);
+	status_t status = AcpiNsHandleToPathname(targetHandle,
+		(ACPI_BUFFER*)buffer);
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -538,6 +546,19 @@ evaluate_method(acpi_handle handle, const char* method,
 
 	status = AcpiEvaluateObject(handle, (ACPI_STRING)method,
 		(ACPI_OBJECT_LIST*)args, (ACPI_BUFFER*)returnValue);
+	if (status == AE_BUFFER_OVERFLOW)
+		dprintf("evaluate_method: the passed buffer is too small!\n");
+
+	return status == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
+get_irq_routing_table(acpi_handle busDeviceHandle, acpi_data *retBuffer)
+{
+	ACPI_STATUS status;
+
+	status = AcpiGetIrqRoutingTable(busDeviceHandle, (ACPI_BUFFER*)retBuffer);
 	if (status == AE_BUFFER_OVERFLOW)
 		dprintf("evaluate_method: the passed buffer is too small!\n");
 
@@ -651,6 +672,7 @@ struct acpi_module_info gACPIModule = {
 	ns_handle_to_pathname,
 	evaluate_object,
 	evaluate_method,
+	get_irq_routing_table,
 	prepare_sleep_state,
 	enter_sleep_state,
 	reboot

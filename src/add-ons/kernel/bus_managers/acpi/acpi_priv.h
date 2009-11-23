@@ -111,6 +111,12 @@ typedef struct acpi_root_info {
 					acpi_object_type *returnValue, size_t bufferLength);
 	status_t	(*evaluate_method)(acpi_handle handle, const char *method,
 					acpi_objects *args, acpi_data *returnValue);
+
+	/* Resource info */
+
+	status_t	(*get_irq_routing_table)(acpi_handle busDeviceHandle,
+					acpi_data *retBuffer);
+
 } acpi_root_info;
 
 
@@ -170,6 +176,8 @@ status_t evaluate_object(const char* object, acpi_object_type *returnValue,
 status_t evaluate_method(acpi_handle handle, const char *method,
 	acpi_objects *args, acpi_data *returnValue);
 
+status_t get_irq_routing_table(acpi_handle busDeviceHandle,
+	acpi_data *retBuffer);
 __END_DECLS
 
 #endif	/* __ACPI_PRIV_H__ */
