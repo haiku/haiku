@@ -227,7 +227,15 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		enable_interrupts();
 	}
 
+#ifdef TRACE_BOOT
+	// We disable interrupts for this dprintf(), since otherwise dprintf()
+	// would acquires a mutex, which is something we must not do in an idle
+	// thread, or otherwise the scheduler would be seriously unhappy.
+	disable_interrupts();
 	TRACE("main: done... begin idle loop on cpu %d\n", currentCPU);
+	enable_interrupts();
+#endif
+
 	for (;;)
 		arch_cpu_idle();
 
