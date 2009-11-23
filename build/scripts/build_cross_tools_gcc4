@@ -1,16 +1,20 @@
 #!/bin/sh
 #
-# parameters <machine> <haiku sourcedir> <buildtools dir> [ <haiku output dir> ]
+# parameters <machine> <haiku sourcedir> <buildtools dir> <haiku output dir>
 
 # get and check the parameters
-if [ $# -lt 3 ]; then
-	echo Usage: $0 '<machine> <haiku sourcedir> <buildtools dir> [ <haiku output dir> ]' >&2
+if [ $# -lt 4 ]; then
+	echo Usage: $0 '<machine> <haiku sourcedir> <buildtools dir>' \
+		'<haiku output dir>' >&2
 	exit 1
 fi
 
 haikuMachine=$1
 haikuSourceDir=$2
 buildToolsDir=$3
+haikuOutputDir=$4
+shift 4
+additionalMakeArgs=$*
 
 case $(uname) in
 FreeBSD|OpenBSD)
@@ -36,12 +40,6 @@ arm-*)
 	gccConfigureArgs="--disable-multilib"
 	;;
 esac
-
-if [ $# -lt 4 ]; then
-	haikuOutputDir=$haikuSourceDir/generated
-else
-	haikuOutputDir=$4
-fi
 
 if [ ! -d $haikuSourceDir ]; then
 	echo "No such directory: \"$haikuSourceDir\"" >&2
@@ -105,8 +103,8 @@ cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $binutilsSourceDir/configure \
 	--prefix=$installDir --target=$haikuMachine --disable-nls \
 	--disable-shared --disable-werror $binutilsConfigureArgs || exit 1
-$MAKE || exit 1
-$MAKE install || exit 1
+$MAKE $additionalMakeArgs || exit 1
+$MAKE $additionalMakeArgs install || exit 1
 
 export PATH=$PATH:$installDir/bin
 
@@ -140,13 +138,13 @@ CFLAGS="-O2" CXXFLAGS="-O2" $gccSourceDir/configure --prefix=$installDir \
 	$gccConfigureArgs || exit 1
 
 # make gcc
-$MAKE || {
+$MAKE $additionalMakeArgs || {
 	echo "ERROR: Building gcc failed." >&2
 	exit 1
 }
 
 # install gcc
-$MAKE install || {
+$MAKE $additionalMakeArgs install || {
 	echo "ERROR: Installing the cross compiler failed." >&2
 	exit 1
 }

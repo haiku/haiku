@@ -1,21 +1,19 @@
 #!/bin/sh
 
-# parameters <haiku sourcedir> <buildtools dir> [ <haiku output dir> ]
+# parameters <haiku sourcedir> <buildtools dir> <haiku output dir>
 
 # get and check the parameters
-if [ $# -lt 2 ]; then
-	echo Usage: $0 '<haiku sourcedir> <buildtools dir> [ <haiku output dir> ]' >&2
+if [ $# -lt 3 ]; then
+	echo Usage: $0 '<haiku sourcedir> <buildtools dir> <haiku output dir>' >&2
 	exit 1
 fi
 
 haikuSourceDir=$1
 buildToolsDir=$2/legacy
+haikuOutputDir=$3
+shift 3
+additionalMakeArgs=$*
 
-if [ $# -lt 3 ]; then
-	haikuOutputDir=$haikuSourceDir/generated
-else
-	haikuOutputDir=$3
-fi
 
 if [ ! -d $haikuSourceDir ]; then
 	echo "No such directory: \"$haikuSourceDir\"" >&2
@@ -66,8 +64,8 @@ cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
 	--prefix=$installDir --target=i586-pc-haiku --disable-nls \
 	--enable-shared=yes --disable-werror || exit 1
-make || exit 1
-make install || exit 1
+make $additionalMakeArgs || exit 1
+make $additionalMakeArgs install || exit 1
 
 PATH=$PATH:$installDir/bin
 export PATH
@@ -112,13 +110,13 @@ eval "sed $sedExpr Makefile.bak > Makefile" || exit 1
 rm Makefile.bak
 
 # make gcc
-make cross || {
+make $additionalMakeArgs cross || {
 	echo "ERROR: Building gcc failed." >&2
 	exit 1
 }
 
 # install gcc
-make install-gcc-cross || {
+make $additionalMakeArgs install-gcc-cross || {
 	echo "ERROR: Installing the cross compiler failed." >&2
 	exit 1
 }
