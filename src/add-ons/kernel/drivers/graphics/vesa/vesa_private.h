@@ -29,6 +29,11 @@ struct vesa_info {
 	uint32			vbe_dpms_capabilities;
 	uint8			vbe_capabilities;
 	uint8			bits_per_gun;
+
+	addr_t			frame_buffer;
+	addr_t			physical_frame_buffer;
+	size_t			physical_frame_buffer_size;
+	bool			complete_frame_buffer_mapped;
 };
 
 extern status_t vesa_init(vesa_info& info);

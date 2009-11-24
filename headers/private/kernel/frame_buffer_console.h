@@ -17,6 +17,7 @@ struct kernel_args;
 
 struct frame_buffer_boot_info {
 	area_id	area;
+	addr_t	physical_frame_buffer;
 	addr_t	frame_buffer;
 	int32	width;
 	int32	height;

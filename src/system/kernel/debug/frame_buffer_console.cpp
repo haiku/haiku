@@ -413,7 +413,7 @@ frame_buffer_console_init(kernel_args* args)
 	mutex_init(&sConsole.lock, "console_lock");
 
 	void* frameBuffer;
-	sConsole.area = map_physical_memory("vesa_fb",
+	sConsole.area = map_physical_memory("vesa frame buffer",
 		(void*)args->frame_buffer.physical_buffer.start,
 		args->frame_buffer.physical_buffer.size, B_ANY_KERNEL_ADDRESS,
 		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA, &frameBuffer);
@@ -425,6 +425,7 @@ frame_buffer_console_init(kernel_args* args)
 		args->frame_buffer.bytes_per_row);
 
 	sBootInfo.area = sConsole.area;
+	sBootInfo.physical_frame_buffer = args->frame_buffer.physical_buffer.start;
 	sBootInfo.frame_buffer = (addr_t)frameBuffer;
 	sBootInfo.width = args->frame_buffer.width;
 	sBootInfo.height = args->frame_buffer.height;

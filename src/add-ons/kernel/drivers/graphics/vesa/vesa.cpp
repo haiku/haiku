@@ -20,6 +20,40 @@
 #include "vesa_info.h"
 
 
+static status_t
+find_graphics_card(addr_t frameBuffer, addr_t& base, size_t& size)
+{
+	// TODO: when we port this over to the new driver API, this mechanism can be
+	// used to find the right device_node
+	pci_module_info* pci;
+	if (get_module(B_PCI_MODULE_NAME, (module_info**)&pci) != B_OK)
+		return B_ERROR;
+
+	pci_info info;
+	for (int32 index = 0; pci->get_nth_pci_info(index, &info) == B_OK; index++) {
+		if (info.class_base != PCI_display)
+			continue;
+
+		// check PCI BARs
+		for (uint32 i = 0; i < 6; i++) {
+			if (info.u.h0.base_registers[i] <= frameBuffer
+				&& info.u.h0.base_registers[i] + info.u.h0.base_register_sizes[i]
+					> frameBuffer) {
+				// found it!
+				base = info.u.h0.base_registers[i];
+				size = info.u.h0.base_register_sizes[i];
+
+				put_module(B_PCI_MODULE_NAME);
+				return B_OK;
+			}
+		}
+	}
+
+	put_module(B_PCI_MODULE_NAME);
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 static uint32
 get_color_space_for_depth(uint32 depth)
 {
@@ -200,6 +234,61 @@ vbe_set_bits_per_gun(vesa_info& info, uint8 bits)
 }
 
 
+/*!	Remaps the frame buffer if necessary; if we've already mapped the complete
+	frame buffer, there is no need to map it again.
+*/
+static status_t
+remap_frame_buffer(vesa_info& info, addr_t physicalBase,
+	uint32 bytesPerRow, uint32 height, bool initializing)
+{
+	vesa_shared_info& sharedInfo = *info.shared_info;
+	addr_t frameBuffer;
+
+	if (!info.complete_frame_buffer_mapped) {
+		addr_t base = physicalBase;
+		size_t size = bytesPerRow * height;
+		bool remap = !initializing;
+
+		if (info.physical_frame_buffer_size != 0) {
+			// we can map the complete frame buffer
+			base = info.physical_frame_buffer;
+			size = info.physical_frame_buffer_size;
+			remap = true;
+		}
+
+		if (remap) {
+			area_id area = map_physical_memory("vesa frame buffer", (void*)base,
+				size, B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+				(void**)&frameBuffer);
+			if (area < 0)
+				return area;
+
+			delete_area(info.shared_info->frame_buffer_area);
+
+			info.frame_buffer = frameBuffer;
+			sharedInfo.frame_buffer_area = area;
+
+			// Turn on write combining for the area
+			vm_set_area_memory_type(area, base, B_MTR_WC);
+
+			if (info.physical_frame_buffer_size != 0)
+				info.complete_frame_buffer_mapped = true;
+		}
+	} else
+		frameBuffer = info.frame_buffer;
+
+	if (info.complete_frame_buffer_mapped)
+		frameBuffer += physicalBase - info.physical_frame_buffer;
+
+	// Update shared frame buffer information
+	sharedInfo.frame_buffer = (uint8*)frameBuffer;
+	sharedInfo.physical_frame_buffer = (uint8*)physicalBase;
+	sharedInfo.bytes_per_row = bytesPerRow;
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 
 
@@ -212,6 +301,12 @@ vesa_init(vesa_info& info)
 		return B_ERROR;
 
 	info.vbe_capabilities = bufferInfo->vesa_capabilities;
+	info.complete_frame_buffer_mapped = false;
+
+	// Find out which PCI device we belong to, so that we know its frame buffer
+	// size
+	find_graphics_card(bufferInfo->physical_frame_buffer,
+		info.physical_frame_buffer, info.physical_frame_buffer_size);
 
 	size_t modesSize = 0;
 	vesa_mode* modes = (vesa_mode*)get_boot_item(VESA_MODES_BOOT_INFO,
@@ -227,7 +322,7 @@ vesa_init(vesa_info& info)
 	if (info.shared_area < 0)
 		return info.shared_area;
 
-	vesa_shared_info &sharedInfo = *info.shared_info;
+	vesa_shared_info& sharedInfo = *info.shared_info;
 
 	memset(&sharedInfo, 0, sizeof(vesa_shared_info));
 
@@ -239,13 +334,16 @@ vesa_init(vesa_info& info)
 	}
 
 	sharedInfo.frame_buffer_area = bufferInfo->area;
-	sharedInfo.frame_buffer = (uint8*)bufferInfo->frame_buffer;
+
+	remap_frame_buffer(info, bufferInfo->physical_frame_buffer,
+		bufferInfo->bytes_per_row, bufferInfo->height, true);
+		// Does not matter if this fails - the frame buffer was already mapped
+		// before.
 
 	sharedInfo.current_mode.virtual_width = bufferInfo->width;
 	sharedInfo.current_mode.virtual_height = bufferInfo->height;
 	sharedInfo.current_mode.space = get_color_space_for_depth(
 		bufferInfo->depth);
-	sharedInfo.bytes_per_row = bufferInfo->bytes_per_row;
 
 	edid1_info* edidInfo = (edid1_info*)get_boot_item(VESA_EDID_BOOT_INFO,
 		NULL);
@@ -258,10 +356,6 @@ vesa_init(vesa_info& info)
 		sharedInfo.dpms_capabilities);
 	if (bufferInfo->depth <= 8)
 		vbe_set_bits_per_gun(info, 8);
-
-	physical_entry mapping;
-	get_memory_map((void*)sharedInfo.frame_buffer, B_PAGE_SIZE, &mapping, 1);
-	sharedInfo.physical_frame_buffer = (uint8*)mapping.address;
 
 	dprintf(DEVICE_NAME ": vesa_init() completed successfully!\n");
 	return B_OK;
@@ -292,11 +386,8 @@ vesa_set_display_mode(vesa_info& info, uint32 mode)
 		return status;
 	}
 
-	area_id frameBufferArea;
-	frame_buffer_boot_info* bufferInfo;
-	struct vbe_mode_info modeInfo;
-
 	// Get mode information
+	struct vbe_mode_info modeInfo;
 	status = vbe_get_mode_info(vmState, info.modes[mode].mode, &modeInfo);
 	if (status != B_OK) {
 		dprintf(DEVICE_NAME": vesa_set_display_mode(): cannot get mode info\n");
@@ -313,39 +404,17 @@ vesa_set_display_mode(vesa_info& info, uint32 mode)
 	if (info.modes[mode].bits_per_pixel <= 8)
 		vbe_set_bits_per_gun(vmState, info, 8);
 
-	// Map new frame buffer
-	void* frameBuffer;
-	frameBufferArea = map_physical_memory("vesa_fb",
-		(void*)modeInfo.physical_base, modeInfo.bytes_per_row * modeInfo.height,
-		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, &frameBuffer);
-	if (frameBufferArea < B_OK) {
-		status = (status_t)frameBufferArea;
-		goto out;
+	// Map new frame buffer if necessary
+
+	status = remap_frame_buffer(info, modeInfo.physical_base,
+		modeInfo.bytes_per_row, modeInfo.height, false);
+	if (status == B_OK) {
+		// Update shared frame buffer information
+		info.shared_info->current_mode.virtual_width = modeInfo.width;
+		info.shared_info->current_mode.virtual_height = modeInfo.height;
+		info.shared_info->current_mode.space = get_color_space_for_depth(
+			modeInfo.bits_per_pixel);
 	}
-	delete_area(info.shared_info->frame_buffer_area);
-
-	// Turn on write combining for the area
-	vm_set_area_memory_type(frameBufferArea, modeInfo.physical_base, B_MTR_WC);
-
-	// Update shared frame buffer information
-	info.shared_info->frame_buffer_area = frameBufferArea;
-	info.shared_info->frame_buffer = (uint8*)frameBuffer;
-	info.shared_info->physical_frame_buffer = (uint8*)modeInfo.physical_base;
-	info.shared_info->bytes_per_row = modeInfo.bytes_per_row;
-	info.shared_info->current_mode.virtual_width = modeInfo.width;
-	info.shared_info->current_mode.virtual_height = modeInfo.height;
-	info.shared_info->current_mode.space = get_color_space_for_depth(
-		modeInfo.bits_per_pixel);
-
-	// Update boot item as it's used in vesa_init()
-	bufferInfo
-		= (frame_buffer_boot_info*)get_boot_item(FRAME_BUFFER_BOOT_INFO, NULL);
-	bufferInfo->area = frameBufferArea;
-	bufferInfo->frame_buffer = (addr_t)frameBuffer;
-	bufferInfo->width = modeInfo.width;
-	bufferInfo->height = modeInfo.height;
-	bufferInfo->depth = modeInfo.bits_per_pixel;
-	bufferInfo->bytes_per_row = modeInfo.bytes_per_row;
 
 out:
 	vm86_cleanup(&vmState);
