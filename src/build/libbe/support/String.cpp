@@ -1962,7 +1962,7 @@ BString::operator<<(unsigned int i)
 
 
 BString&
-BString::operator<<(uint32 i)
+BString::operator<<(unsigned long i)
 {
 	char num[64];
 	sprintf(num, "%lu", i);
@@ -1972,7 +1972,7 @@ BString::operator<<(uint32 i)
 
 
 BString&
-BString::operator<<(int32 i)
+BString::operator<<(long i)
 {
 	char num[64];
 	sprintf(num, "%ld", i);
@@ -1982,7 +1982,7 @@ BString::operator<<(int32 i)
 
 
 BString&
-BString::operator<<(uint64 i)
+BString::operator<<(unsigned long long i)
 {
 	char num[64];
 	sprintf(num, "%llu", i);
@@ -1992,7 +1992,7 @@ BString::operator<<(uint64 i)
 
 
 BString&
-BString::operator<<(int64 i)
+BString::operator<<(long long i)
 {
 	char num[64];
 	sprintf(num, "%lld", i);

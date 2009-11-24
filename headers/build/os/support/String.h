@@ -39,9 +39,9 @@ public:
 						BString(const char *);
 						BString(const BString &);
 						BString(const char *, int32 maxLength);
-					
+
 						~BString();
-			
+
 /*---- Access --------------------------------------------------------------*/
 	const char 			*String() const;
 						/* returns null-terminated string */
@@ -55,18 +55,18 @@ public:
 	BString 			&operator=(const BString &);
 	BString 			&operator=(const char *);
 	BString 			&operator=(char);
-	
+
 	BString				&SetTo(const char *);
 	BString 			&SetTo(const char *, int32 length);
 
 	BString				&SetTo(const BString &from);
 	BString				&Adopt(BString &from);
 						/* leaves <from> empty, avoiding a copy */
-						
+
 	BString 			&SetTo(const BString &, int32 length);
 	BString 			&Adopt(BString &from, int32 length);
 						/* leaves <from> empty, avoiding a copy */
-		
+
 	BString 			&SetTo(char, int32 count);
 
 /*---- Substring copying ---------------------------------------------------*/
@@ -84,7 +84,7 @@ public:
 	BString 			&operator+=(const BString &);
 	BString 			&operator+=(const char *);
 	BString 			&operator+=(char);
-	
+
 	BString 			&Append(const BString &);
 	BString 			&Append(const char *);
 
@@ -116,7 +116,7 @@ public:
 						/* pass false in <lazy> to ensure freeing up the
 						 * truncated memory
 						 */
-						
+
 	BString 			&Remove(int32 from, int32 length);
 
 	BString 			&RemoveFirst(const BString &);
@@ -126,9 +126,9 @@ public:
 	BString 			&RemoveFirst(const char *);
 	BString 			&RemoveLast(const char *);
 	BString 			&RemoveAll(const char *);
-	
+
 	BString 			&RemoveSet(const char *setOfCharsToRemove);
-	
+
 	BString 			&MoveInto(BString &into, int32 from, int32 length);
 	void				MoveInto(char *into, int32 from, int32 length);
 						/* caller guarantees that <into> is large enough */
@@ -141,14 +141,14 @@ public:
 	bool 				operator>=(const BString &) const;
 	bool 				operator>(const BString &) const;
 	bool 				operator!=(const BString &) const;
-	
+
 	bool 				operator<(const char *) const;
 	bool 				operator<=(const char *) const;
 	bool 				operator==(const char *) const;
 	bool 				operator>=(const char *) const;
 	bool 				operator>(const char *) const;
 	bool 				operator!=(const char *) const;
-	
+
 /*---- strcmp-style compare functions --------------------------------------*/
 	int 				Compare(const BString &) const;
 	int 				Compare(const char *) const;
@@ -158,7 +158,7 @@ public:
 	int 				ICompare(const char *) const;
 	int 				ICompare(const BString &, int32 n) const;
 	int 				ICompare(const char *, int32 n) const;
-	
+
 /*---- Searching -----------------------------------------------------------*/
 	int32 				FindFirst(const BString &) const;
 	int32 				FindFirst(const char *) const;
@@ -215,7 +215,7 @@ public:
 							const char *withThis, int32 fromOffset = 0);
 	BString 			&IReplace(const char *replaceThis, const char *withThis,
 							int32 maxReplaceCount, int32 fromOffset = 0);
-	
+
 	BString				&ReplaceSet(const char *setOfChars, char with);
 	BString				&ReplaceSet(const char *setOfChars, const char *with);
 /*---- Unchecked char access -----------------------------------------------*/
@@ -227,7 +227,7 @@ public:
 
 /*---- Fast low-level manipulation -----------------------------------------*/
 	char 				*LockBuffer(int32 maxLength);
-	
+
 		/* Make room for characters to be added by C-string like manipulation.
 		 * Returns the equivalent of String(), <maxLength> includes space for
 		 * trailing zero while used as C-string, it is illegal to call other
@@ -236,12 +236,12 @@ public:
 		 */
 
 	BString 			&UnlockBuffer(int32 length = -1);
-	
+
 		/* Finish using BString as C-string, adjusting length. If no length
 		 * passed in, strlen of internal data is used to determine it.
 		 * BString is in consistent state after this.
 		 */
-	
+
 /*---- Upercase<->Lowercase ------------------------------------------------*/
 	BString				&ToLower();
 	BString 			&ToUpper();
@@ -252,7 +252,7 @@ public:
 						 */
 
 	BString 			&CapitalizeEachWord();
-						/* Converts first character in each 
+						/* Converts first character in each
 						 * non-alphabethycal-character-separated
 						 * word to upper-case, rest to lower-case
 						 */
@@ -271,10 +271,10 @@ public:
 
 	BString				&CharacterDeescape(const char *original, char escapeChar);
 						/* copy <original> into the string removing the escaping
-						 * characters <escapeChar> 
+						 * characters <escapeChar>
 						 */
 	BString				&CharacterDeescape(char escapeChar);
-						/* remove the escaping characters <escapeChar> from 
+						/* remove the escaping characters <escapeChar> from
 						 * the string
 						 */
 
@@ -285,13 +285,13 @@ public:
 	BString 		&operator<<(char);
 	BString 		&operator<<(int);
 	BString 		&operator<<(unsigned int);
-	BString 		&operator<<(uint32);
-	BString 		&operator<<(int32);
-	BString 		&operator<<(uint64);
-	BString 		&operator<<(int64);
+	BString 		&operator<<(unsigned long);
+	BString 		&operator<<(long);
+	BString 		&operator<<(unsigned long long);
+	BString 		&operator<<(long long);
 	BString 		&operator<<(float);
 		/* float output hardcodes %.2f style formatting */
-	
+
 /*----- Private or reserved ------------------------------------------------*/
 private:
 	void 			_Init(const char *, int32);
@@ -301,7 +301,7 @@ private:
 	char 			*_OpenAtBy(int32, int32);
 	char 			*_ShrinkAtBy(int32, int32);
 	void 			_DoPrepend(const char *, int32);
-	
+
 	int32 			_FindAfter(const char *, int32, int32) const;
 	int32 			_IFindAfter(const char *, int32, int32) const;
 	int32 			_ShortFindAfter(const char *, int32) const;
@@ -323,7 +323,7 @@ private:
 
 	struct PosVect;
 	void 			_ReplaceAtPositions( const PosVect* positions,
-											   int32 searchLen, 
+											   int32 searchLen,
 											   const char* with,
 											   int32 withLen);
 
@@ -351,7 +351,7 @@ int 				ICompare(const BString *, const BString *);
 /*-------------------------------------------------------------------------*/
 /*---- No user serviceable parts after this -------------------------------*/
 
-inline int32 
+inline int32
 BString::Length() const
 {
 	return _privateData ? (*((int32 *)_privateData - 1) & 0x7fffffff) : 0;
@@ -374,13 +374,13 @@ BString::SetTo(const char *str)
 	return operator=(str);
 }
 
-inline char 
+inline char
 BString::operator[](int32 index) const
 {
 	return _privateData[index];
 }
 
-inline char 
+inline char
 BString::ByteAt(int32 index) const
 {
 	if (!_privateData || index < 0 || index > Length())
@@ -408,79 +408,79 @@ BString::Append(const char *str)
 	return operator+=(str);
 }
 
-inline bool 
+inline bool
 BString::operator==(const BString &string) const
 {
 	return strcmp(String(), string.String()) == 0;
 }
 
-inline bool 
+inline bool
 BString::operator<(const BString &string) const
 {
 	return strcmp(String(), string.String()) < 0;
 }
 
-inline bool 
+inline bool
 BString::operator<=(const BString &string) const
 {
 	return strcmp(String(), string.String()) <= 0;
 }
 
-inline bool 
+inline bool
 BString::operator>=(const BString &string) const
 {
 	return strcmp(String(), string.String()) >= 0;
 }
 
-inline bool 
+inline bool
 BString::operator>(const BString &string) const
 {
 	return strcmp(String(), string.String()) > 0;
 }
 
-inline bool 
+inline bool
 BString::operator!=(const BString &string) const
 {
 	return strcmp(String(), string.String()) != 0;
 }
 
-inline bool 
+inline bool
 BString::operator!=(const char *str) const
 {
 	return !operator==(str);
 }
 
-inline bool 
+inline bool
 operator<(const char *str, const BString &string)
 {
 	return string > str;
 }
 
-inline bool 
+inline bool
 operator<=(const char *str, const BString &string)
 {
 	return string >= str;
 }
 
-inline bool 
+inline bool
 operator==(const char *str, const BString &string)
 {
 	return string == str;
 }
 
-inline bool 
+inline bool
 operator>(const char *str, const BString &string)
 {
 	return string < str;
 }
 
-inline bool 
+inline bool
 operator>=(const char *str, const BString &string)
 {
 	return string <= str;
 }
 
-inline bool 
+inline bool
 operator!=(const char *str, const BString &string)
 {
 	return string != str;
