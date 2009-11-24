@@ -48,18 +48,21 @@ local bfsSource =
 	kernel_interface.cpp
 ;
 
+BuildPlatformMergeObject <build>bfs.o : $(bfsSource) ;
+
 BuildPlatformMain <build>bfs_shell
 	:
-	$(bfsSource)
-
-	: <build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
-	  $(HOST_LIBROOT) $(fsShellCommandLibs)
+	:
+	<build>bfs.o
+	<build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_LIBROOT) $(fsShellCommandLibs)
 ;
 
 BuildPlatformMain <build>bfs_fuse
 	:
-	$(bfsSource)
-
-	: <build>fuse_module.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
-	  $(HOST_STATIC_LIBROOT) $(fsShellCommandLibs) fuse
+	:
+	<build>bfs.o
+	<build>fuse_module.a
+	$(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_STATIC_LIBROOT) $(fsShellCommandLibs) fuse
 ;
