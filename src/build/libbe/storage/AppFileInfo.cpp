@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
+//  This software is part of the Haiku distribution and is covered
 //  by the MIT license.
 //---------------------------------------------------------------------
 /*!
@@ -51,7 +51,7 @@ enum {
 };
 
 // R5 also exports these (Tracker is using them):
-// (maybe we better want to drop them silently and declare 
+// (maybe we better want to drop them silently and declare
 // the above in a public Haiku header - and use that one in
 // Tracker when compiled for Haiku)
 extern const uint32 MINI_ICON_TYPE, LARGE_ICON_TYPE;
@@ -675,7 +675,7 @@ BAppFileInfo::GetVersionInfo(version_info *info, version_kind kind) const
 	} else
 		return B_ERROR;
 
-	// return result	
+	// return result
 	return B_OK;
 }
 
@@ -1065,7 +1065,7 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 						size_t &bytesRead, void **allocatedBuffer) const
 {
 	status_t error = B_OK;
-	
+
 	if (allocatedBuffer)
 		buffer = NULL;
 
@@ -1086,7 +1086,7 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 				error = B_NO_MEMORY;
 			bufferSize = info.size;
 		}
-		if (error == B_OK && bufferSize < info.size)
+		if (error == B_OK && (off_t)bufferSize < info.size)
 			error = B_BAD_VALUE;
 
 		// read the data

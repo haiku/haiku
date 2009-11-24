@@ -1223,7 +1223,8 @@ set_bits_worker_gray1(const void *inData, int32 inLength, int32 inBPR,
 							- (inBPR - inRowSkip);
 	const char *outEnd = (const char*)outData + outLength - outBPR;
 	char *outRow = (char*)outData + outOffset - outOffset % outBPR;
-	int32 x = max(0L, width - ((char*)outData + outOffset - outRow) * 8) - 1;
+	int32 x = max((int32)0,
+		width - (int32)((char*)outData + outOffset - outRow) * 8) - 1;
 	while ((const char*)reader.pixels <= inEnd
 		   && (const char*)writer.pixels <= outEnd) {
 		// process one row
@@ -1532,36 +1533,36 @@ BBitmap::BBitmap(BMessage *data)
 {
 	BRect bounds;
 	data->FindRect("_frame", &bounds);
-	
+
 	color_space cspace;
 	data->FindInt32("_cspace", (int32 *)&cspace);
-	
+
 	int32 flags = 0;
 	data->FindInt32("_bmflags", &flags);
-	
+
 	int32 rowbytes = 0;
 	data->FindInt32("_rowbytes", &rowbytes);
 
-flags |= B_BITMAP_NO_SERVER_LINK;	
+flags |= B_BITMAP_NO_SERVER_LINK;
 flags &= ~B_BITMAP_ACCEPTS_VIEWS;
 	InitObject(bounds, cspace, flags, rowbytes, B_MAIN_SCREEN_ID);
-	
+
 	if (data->HasData("_data", B_RAW_TYPE) && InitCheck() == B_OK) {
 			ssize_t size = 0;
 			const void *buffer;
 			if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK)
 				memcpy(fBasePtr, buffer, size);
 	}
-	
+
 	if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
 // 		BArchivable *obj;
 // 		BMessage message;
 // 		int i = 0;
-// 		
+//
 // 		while (data->FindMessage("_view", i++, &message) == B_OK) {
 // 			obj = instantiate_object(&message);
 // 			BView *view = dynamic_cast<BView *>(obj);
-// 			
+//
 // 			if (view)
 // 				AddChild(view);
 // 		}
@@ -1579,7 +1580,7 @@ BBitmap::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BBitmap"))
 		return new BBitmap(data);
-	
+
 	return NULL;
 }
 
@@ -1594,12 +1595,12 @@ status_t
 BBitmap::Archive(BMessage *data, bool deep) const
 {
 	BArchivable::Archive(data, deep);
-	
+
 	data->AddRect("_frame", fBounds);
 	data->AddInt32("_cspace", (int32)fColorSpace);
 	data->AddInt32("_bmflags", fFlags);
 	data->AddInt32("_rowbytes", fBytesPerRow);
-	
+
 	if (deep) {
 		if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
 //			BMessage views;
@@ -1612,10 +1613,10 @@ BBitmap::Archive(BMessage *data, bool deep) const
 		// true and it does save all formats as B_RAW_TYPE and it does save
 		// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
 		// the BeBook)
-			
+
 		data->AddData("_data", B_RAW_TYPE, fBasePtr, fSize);
 	}
-	
+
 	return B_OK;
 }
 
@@ -1796,7 +1797,7 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 	color_space colorSpace)
 {
 	status_t error = (InitCheck() == B_OK ? B_OK : B_NO_INIT);
-	// check params 
+	// check params
 	if (error == B_OK && (data == NULL || offset > fSize || length < 0))
 		error = B_BAD_VALUE;
 	// get BPR
@@ -2080,8 +2081,8 @@ flags &= ~B_BITMAP_ACCEPTS_VIEWS;
 		} else {
 // 			// Ask the server (via our owning application) to create a bitmap.
 // 			BPrivate::AppServerLink link;
-// 	
-// 			// Attach Data: 
+//
+// 			// Attach Data:
 // 			// 1) BRect bounds
 // 			// 2) color_space space
 // 			// 3) int32 bitmap_flags
@@ -2093,20 +2094,20 @@ flags &= ~B_BITMAP_ACCEPTS_VIEWS;
 // 			link.Attach<int32>((int32)flags);
 // 			link.Attach<int32>(bytesPerRow);
 // 			link.Attach<int32>(screenID.id);
-// 			
+//
 // 			// Reply Code: SERVER_TRUE
 // 			// Reply Data:
 // 			//	1) int32 server token
 // 			//	2) area_id id of the area in which the bitmap data resides
 // 			//	3) int32 area pointer offset used to calculate fBasePtr
-// 			
+//
 // 			// alternatively, if something went wrong
 // 			// Reply Code: SERVER_FALSE
 // 			// Reply Data:
 // 			//		None
 // 			int32 code = SERVER_FALSE;
 // 			error = link.FlushWithReply(code);
-// 
+//
 // 			if (error >= B_OK) {
 // 				// *communication* with server successful
 // 				if (code == SERVER_TRUE) {
@@ -2114,21 +2115,21 @@ flags &= ~B_BITMAP_ACCEPTS_VIEWS;
 // 					// Get token
 // 					area_id bmparea;
 // 					int32 areaoffset;
-// 					
+//
 // 					link.Read<int32>(&fServerToken);
 // 					link.Read<area_id>(&bmparea);
 // 					link.Read<int32>(&areaoffset);
-// 					
+//
 // 					// Get the area in which the data resides
 // 					fArea = clone_area("shared bitmap area",
 // 									   (void**)&fBasePtr,
 // 									   B_ANY_ADDRESS,
 // 									   B_READ_AREA | B_WRITE_AREA,
 // 									   bmparea);
-// 					
+//
 // 					// Jump to the location in the area
 // 					fBasePtr = (int8*)fBasePtr + areaoffset;
-// 		
+//
 // 					fSize = size;
 // 					fColorSpace = colorSpace;
 // 					fBounds = bounds;
@@ -2152,7 +2153,7 @@ flags &= ~B_BITMAP_ACCEPTS_VIEWS;
 		fToken = -1;
 		fOrigArea = -1;
 	}
-	
+
 	fInitError = error;
 	// TODO: on success, handle clearing to white if the flags say so. Needs to be
 	// dependent on color space.
@@ -2181,10 +2182,10 @@ BBitmap::CleanUp()
 		} else {
 // 			BPrivate::AppServerLink link;
 // 			// AS_DELETE_BITMAP:
-// 			// Attached Data: 
+// 			// Attached Data:
 // 			//	1) int32 server token
-// 			
-// 			// Reply Code: SERVER_TRUE if successful, 
+//
+// 			// Reply Code: SERVER_TRUE if successful,
 // 			//			   SERVER_FALSE if the buffer was already deleted
 // 			// Reply Data: none
 // //			status_t freestat;

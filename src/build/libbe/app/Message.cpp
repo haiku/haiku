@@ -353,7 +353,7 @@ BMessage::_PrintToStream(const char* indent) const
 	if (isprint(*(char *)&value)) {
 		printf("'%.4s'", (char *)&value);
 	} else
-		printf("0x%lx", what);
+		printf("0x%" B_PRIx32, what);
 	printf(") {\n");
 
 	field_header *field = fFields;
@@ -369,7 +369,7 @@ BMessage::_PrintToStream(const char* indent) const
 				printf("%s        %s = ", indent,
 					(char *)(fData + field->offset));
 			} else {
-				printf("%s        %s[%ld] = ", indent,
+				printf("%s        %s[%" B_PRId32 "] = ", indent,
 					(char *)(fData + field->offset), j);
 			}
 
@@ -426,8 +426,9 @@ BMessage::_PrintToStream(const char* indent) const
 					entry_ref ref;
 					BPrivate::entry_ref_unflatten(&ref, (char *)pointer, size);
 
-					printf("entry_ref(device=%ld, directory=%lld, name=\"%s\", ",
-						(long)ref.device, ref.directory, ref.name);
+					printf("entry_ref(device=%ld, directory=%" B_PRIdINO
+						", name=\"%s\", ", (long)ref.device, ref.directory,
+						ref.name);
 
 					BPath path(&ref);
 					printf("path=\"%s\")\n", path.Path());
@@ -444,7 +445,8 @@ BMessage::_PrintToStream(const char* indent) const
 					const ssize_t size = *(const ssize_t *)pointer;
 					pointer += sizeof(ssize_t);
 					if (message.Unflatten((const char *)pointer) != B_OK) {
-						fprintf(stderr, "couldn't unflatten item %ld\n", i);
+						fprintf(stderr, "couldn't unflatten item %" B_PRId32
+							"\n", i);
 						break;
 					}
 					message._PrintToStream(buffer);

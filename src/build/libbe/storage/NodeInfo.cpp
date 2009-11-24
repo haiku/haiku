@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
+//  This software is part of the Haiku distribution and is covered
 //  by the MIT license.
 //---------------------------------------------------------------------
 /*!
@@ -101,7 +101,7 @@ BNodeInfo::SetTo(BNode *node)
 	- \c B_OK: Everything went fine.
 	- \c B_NO_INIT: The node is not properly initialized.
 */
-status_t 
+status_t
 BNodeInfo::InitCheck() const
 {
 	return fCStatus;
@@ -126,7 +126,7 @@ BNodeInfo::InitCheck() const
 	- \c B_ENTRY_NOT_FOUND: No type is set on the node.
 	- other error codes
 */
-status_t 
+status_t
 BNodeInfo::GetType(char *type) const
 {
 	// check parameter and initialization
@@ -255,7 +255,7 @@ BNodeInfo::GetIcon(BBitmap *icon, icon_size k) const
 		error = fNode->GetAttrInfo(attribute, &attrInfo);
 	if (error == B_OK && attrInfo.type != attrType)
 		error = B_BAD_TYPE;
-	if (error == B_OK && attrInfo.size != attrSize)
+	if (error == B_OK && attrInfo.size != (off_t)attrSize)
 		error = B_BAD_VALUE;	// TODO: B_BAD_DATA?
 	// read the attribute
 	if (error == B_OK) {
@@ -272,7 +272,7 @@ BNodeInfo::GetIcon(BBitmap *icon, icon_size k) const
 									   attrSize);
 			}
 		} else {
-			read = fNode->ReadAttr(attribute, attrType, 0, icon->Bits(), 
+			read = fNode->ReadAttr(attribute, attrType, 0, icon->Bits(),
 								   attrSize);
 		}
 		if (error == B_OK) {
@@ -312,7 +312,7 @@ BNodeInfo::GetIcon(BBitmap *icon, icon_size k) const
 		 and icon size (\a k) do not match.
 	- other error codes
 */
-status_t 
+status_t
 BNodeInfo::SetIcon(const BBitmap *icon, icon_size k)
 {
 	status_t error = B_OK;
@@ -393,7 +393,7 @@ BNodeInfo::SetIcon(const BBitmap *icon, icon_size k)
 	- \c B_BAD_VALUE: \c NULL \a signature or bad app_verb \a verb.
 	- other error codes
 */
-status_t 
+status_t
 BNodeInfo::GetPreferredApp(char *signature, app_verb verb) const
 {
 	// check parameter and initialization
@@ -442,7 +442,7 @@ BNodeInfo::GetPreferredApp(char *signature, app_verb verb) const
 	  \c B_MIME_TYPE_LENGTH or bad app_verb \a verb.
 	- other error codes
 */
-status_t 
+status_t
 BNodeInfo::SetPreferredApp(const char *signature, app_verb verb)
 {
 	// check parameters and initialization
@@ -483,7 +483,7 @@ BNodeInfo::SetPreferredApp(const char *signature, app_verb verb)
 	- \c B_BAD_VALUE: \c NULL \a ref.
 	- other error codes
 */
-status_t 
+status_t
 BNodeInfo::GetAppHint(entry_ref *ref) const
 {
 	// check parameter and initialization
@@ -535,7 +535,7 @@ BNodeInfo::GetAppHint(entry_ref *ref) const
 	- \c B_BAD_VALUE: \c NULL \a ref.
 	- other error codes
 */
-status_t 
+status_t
 BNodeInfo::SetAppHint(const entry_ref *ref)
 {
 	// check parameter and initialization
@@ -593,7 +593,7 @@ BNodeInfo::SetAppHint(const entry_ref *ref)
 		 dimensions (\a icon) and icon size (\a iconSize) do not match.
 	- other error codes
 */
-status_t 
+status_t
 BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size iconSize) const
 {
 	// set some icon size related variables
@@ -717,7 +717,7 @@ error = B_ENTRY_NOT_FOUND;
 		 bitmap dimensions (\a icon) and icon size (\a iconSize) do not match.
 	- other error codes
 */
-status_t 
+status_t
 BNodeInfo::GetTrackerIcon(const entry_ref *ref, BBitmap *icon, icon_size iconSize)
 {
 	// check ref param
@@ -736,17 +736,17 @@ BNodeInfo::GetTrackerIcon(const entry_ref *ref, BBitmap *icon, icon_size iconSiz
 	return error;
 }
 
-void 
+void
 BNodeInfo::_ReservedNodeInfo1()
 {
 }
 
-void 
+void
 BNodeInfo::_ReservedNodeInfo2()
 {
 }
 
-void 
+void
 BNodeInfo::_ReservedNodeInfo3()
 {
 }

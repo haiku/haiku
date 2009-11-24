@@ -53,18 +53,4 @@
 #define __HAIKU_SUBDIR_ARCH_HEADER(subdir, header)	\
 	<subdir/arch/__HAIKU_ARCH/header>
 
-/* BeOS R5 binary compatibility (gcc 2 on x86) */
-#if defined(__HAIKU_ARCH_X86) && __GNUC__ == 2
-#	define __HAIKU_BEOS_COMPATIBLE	1
-#endif
-
-/* BeOS R5 compatible types */
-#ifdef __HAIKU_ARCH_X86
-	/* TODO: This should be "#ifdef __HAIKU_BEOS_COMPATIBLE", but this will
-	   break all gcc 4 C++ optional packages. I.e. switch that at a suitable
-	   time.
-	*/
-#	define __HAIKU_BEOS_COMPATIBLE_TYPES	1
-#endif
-
 #endif	/* _CONFIG_HAIKU_CONFIG_H */

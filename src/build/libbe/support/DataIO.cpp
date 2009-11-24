@@ -105,7 +105,7 @@ BPositionIO::Read(void *buffer, size_t size)
 	ssize_t result = ReadAt(curPos, buffer, size);
 	if (result > 0)
 		Seek(result, SEEK_CUR);
-	
+
 	return result;
 }
 
@@ -118,7 +118,7 @@ BPositionIO::Write(const void *buffer, size_t size)
 	ssize_t result = WriteAt(curPos, buffer, size);
 	if (result > 0)
 		Seek(result, SEEK_CUR);
-	
+
 	return result;
 }
 
@@ -158,7 +158,7 @@ BMemoryIO::BMemoryIO(void *p, size_t len)
 		fLen(len),
 		fPhys(len),
 		fPos(0)
-		
+
 {
 }
 
@@ -185,10 +185,10 @@ BMemoryIO::ReadAt(off_t pos, void *buffer, size_t size)
 {
 	if (buffer == NULL || pos < 0)
 		return B_BAD_VALUE;
-		
+
 	ssize_t sizeRead = 0;
-	if (pos < fLen) {
-		sizeRead = min_c(static_cast<off_t>(size), fLen - pos);
+	if (pos < (off_t)fLen) {
+		sizeRead = min_c((off_t)size, (off_t)fLen - pos);
 		memcpy(buffer, fBuf + pos, sizeRead);
 	}
 	return sizeRead;
@@ -198,22 +198,22 @@ BMemoryIO::ReadAt(off_t pos, void *buffer, size_t size)
 // WriteAt
 ssize_t
 BMemoryIO::WriteAt(off_t pos, const void *buffer, size_t size)
-{	
+{
 	if (fReadOnly)
 		return B_NOT_ALLOWED;
-	
+
 	if (buffer == NULL || pos < 0)
 		return B_BAD_VALUE;
-		
-	ssize_t sizeWritten = 0;	
-	if (pos < fPhys) {
-		sizeWritten = min_c(static_cast<off_t>(size), fPhys - pos);
+
+	ssize_t sizeWritten = 0;
+	if (pos < (off_t)fPhys) {
+		sizeWritten = min_c((off_t)size, (off_t)fPhys - pos);
 		memcpy(fBuf + pos, buffer, sizeWritten);
 	}
-	
-	if (pos + sizeWritten > fLen)
+
+	if (pos + sizeWritten > (off_t)fLen)
 		fLen = pos + sizeWritten;
-						
+
 	return sizeWritten;
 }
 
@@ -228,13 +228,13 @@ BMemoryIO::Seek(off_t position, uint32 seek_mode)
 			break;
 		case SEEK_CUR:
 			fPos += position;
-			break;		
+			break;
 		case SEEK_END:
 			fPos = fLen + position;
 			break;
 		default:
 			break;
-	}	
+	}
 	return fPos;
 }
 
@@ -252,11 +252,11 @@ status_t
 BMemoryIO::SetSize(off_t size)
 {
 	status_t err = B_ERROR;
-	
+
 	if (fReadOnly)
 		return B_NOT_ALLOWED;
-	
-	if (size <= fPhys) {
+
+	if (size <= (off_t)fPhys) {
 		err = B_OK;
 		fLen = size;
 	}
@@ -311,10 +311,10 @@ BMallocIO::ReadAt(off_t pos, void *buffer, size_t size)
 {
 	if (buffer == NULL)
 		return B_BAD_VALUE;
-	
+
 	ssize_t sizeRead = 0;
-	if (pos < fLength) {
-		sizeRead = min_c(static_cast<off_t>(size), fLength - pos);
+	if (pos < (off_t)fLength) {
+		sizeRead = min_c((off_t)size, (off_t)fLength - pos);
 		memcpy(buffer, fData + pos, sizeRead);
 	}
 	return sizeRead;
@@ -327,14 +327,14 @@ BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
 {
 	if (buffer == NULL)
 		return B_BAD_VALUE;
-		
-	size_t newSize = max_c(pos + size, static_cast<off_t>(fLength));
-	
+
+	size_t newSize = max_c(pos + (off_t)size, (off_t)fLength);
+
 	status_t error = B_OK;
-	
+
 	if (newSize > fMallocSize)
 		error = SetSize(newSize);
-			
+
 	if (error == B_OK) {
 		memcpy(fData + pos, buffer, size);
 		if (pos + size > fLength)
@@ -386,22 +386,22 @@ BMallocIO::SetSize(off_t size)
 	} else {
 		// size != 0, see, if necessary to resize
 		size_t newSize = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
-		if (size != fMallocSize) {
+		if (size != (off_t)fMallocSize) {
 			// we need to resize
 			if (char *newData = static_cast<char*>(realloc(fData, newSize))) {
 				// set the new area to 0
 				if (newSize > fMallocSize)
-					memset(newData + fMallocSize, 0, newSize - fMallocSize);				
+					memset(newData + fMallocSize, 0, newSize - fMallocSize);
 				fData = newData;
 				fMallocSize = newSize;
 			} else	// couldn't alloc the memory
 				error = B_NO_MEMORY;
 		}
 	}
-	
+
 	if (error == B_OK)
 		fLength = size;
-	
+
 	return error;
 }
 
