@@ -338,7 +338,7 @@ ServerWindow::_Show()
 	STRACE(("ServerWindow %s: _Show\n", Title()));
 
 	if (fQuitting || fWindow->IsMinimized() || !fWindow->IsHidden()
-		|| fWindow->IsOffscreenWindow())
+		|| fWindow->IsOffscreenWindow() || fWindow->TopView() == NULL)
 		return;
 
 	// TODO: Maybe we need to dispatch a message to the desktop to show/hide us
