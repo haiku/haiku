@@ -35,7 +35,7 @@
 
 // Globals
 port_id gAppServerPort;
-static AppServer *sAppServer;
+static AppServer* sAppServer;
 BTokenSpace gTokenSpace;
 uint32 gAppServerSIMDFlags = 0;
 
@@ -128,6 +128,9 @@ AppServer::AppServer()
 
 	sAppServer = this;
 
+	// Initialize SIMD flags
+	detect_simd();
+
 	gInputManager = new InputManager();
 
 	// Create the font server and scan the proper directories.
@@ -142,9 +145,6 @@ AppServer::AppServer()
 
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	gBitmapManager = new BitmapManager();
-
-	// Initialize SIMD flags
-	detect_simd();
 }
 
 
@@ -239,9 +239,10 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 	switch (code) {
 		case AS_GET_DESKTOP:
 		{
+			Desktop* desktop = NULL;
+
 			port_id replyPort;
-			if (msg.Read<port_id>(&replyPort) < B_OK)
-				break;
+			msg.Read<port_id>(&replyPort);
 
 			int32 userID;
 			msg.Read<int32>(&userID);
@@ -253,16 +254,25 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 				targetScreen = NULL;
 			}
 
-			Desktop* desktop = _FindDesktop(userID, targetScreen);
-			if (desktop == NULL) {
-				// we need to create a new desktop object for this user
-				// TODO: test if the user exists on the system
-				// TODO: maybe have a separate AS_START_DESKTOP_SESSION for
-				// authorizing the user
-				desktop = _CreateDesktop(userID, targetScreen);
+			int32 version;
+			if (msg.Read<int32>(&version) < B_OK
+				|| version != AS_PROTOCOL_VERSION) {
+				syslog(LOG_ERR, "Application for user %ld with port %ld does "
+					"not support the current server protocol.\n", userID,
+					replyPort);
+			} else {
+				desktop = _FindDesktop(userID, targetScreen);
+				if (desktop == NULL) {
+					// we need to create a new desktop object for this user
+					// TODO: test if the user exists on the system
+					// TODO: maybe have a separate AS_START_DESKTOP_SESSION for
+					// authorizing the user
+					desktop = _CreateDesktop(userID, targetScreen);
+				}
 			}
 
 			free(targetScreen);
+
 			BPrivate::LinkSender reply(replyPort);
 			if (desktop != NULL) {
 				reply.StartMessage(B_OK);

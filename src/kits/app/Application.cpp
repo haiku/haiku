@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1273,6 +1273,7 @@ BApplication::_ConnectToServer()
 	fServerLink->Attach<port_id>(clientPort);
 	fServerLink->Attach<int32>(getuid());
 	fServerLink->AttachString(getenv("TARGET_SCREEN"));
+	fServerLink->Attach<int32>(AS_PROTOCOL_VERSION);
 
 	int32 code;
 	if (fServerLink->FlushWithReply(code) != B_OK || code != B_OK) {

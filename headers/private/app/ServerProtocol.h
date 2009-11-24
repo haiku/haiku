@@ -28,6 +28,8 @@
 #	define SERVER_INPUT_PORT "haiku-test:input port"
 #endif
 
+#define AS_PROTOCOL_VERSION	1
+
 #define AS_REQUEST_COLOR_KEY 0x00010000
 	// additional option for AS_VIEW_SET_VIEW_BITMAP
 
