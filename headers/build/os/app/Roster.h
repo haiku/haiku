@@ -22,7 +22,7 @@
 //	File Name:		Roster.h
 //	Author:			Ingo Weinhold (bonefish@users.sf.net)
 //	Description:	BRoster class lets you launch apps and keeps
-//					track of apps that are running. 
+//					track of apps that are running.
 //					Global be_roster represents the default BRoster.
 //					app_info structure provides info for a running app.
 //------------------------------------------------------------------------------
@@ -69,7 +69,10 @@ enum {
 	B_SOME_APP_ACTIVATED	= 'BRAW',
 };
 
+class BFile;
 class BList;
+class BMimeType;
+class BNodeInfo;
 
 // BRoster
 class BRoster {

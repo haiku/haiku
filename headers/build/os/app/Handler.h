@@ -45,6 +45,7 @@
 class BLooper;
 class BMessageFilter;
 class BMessage;
+class BMessenger;
 class BList;
 class _ObserverList;
 

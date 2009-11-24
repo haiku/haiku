@@ -10,6 +10,10 @@
 
 #include <Messenger.h>
 
+
+struct app_info;
+
+
 class BApplication {
 public:
 							BApplication(const char* signature);

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 /*!
@@ -19,17 +19,18 @@
 namespace OpenBeOS {
 #endif
 
+class BFile;
 class BSymLink;
 
 /*!
 	\class BDirectory
 	\brief A directory in the filesystem
-	
+
 	Provides an interface for manipulating directories and their contents.
 
 	\author <a href='mailto:bonefish@users.sf.net'>Ingo Weinhold</a>
 	\author <a href="mailto:tylerdauwalder@users.sf.net">Tyler Dauwalder</a>
-	
+
 	\version 0.0.0
 */
 class BDirectory : public BNode, public BEntryList {
@@ -90,7 +91,7 @@ private:
 	int get_fd() const;
 
 	status_t set_dir_fd(int fd);
-	
+
 private:
 	uint32 _reservedData[7];
 	int fDirFd;

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the OpenBeOS license.
 //
 //  File Name: SymLink.h
@@ -19,14 +19,16 @@
 namespace OpenBeOS {
 #endif
 
+class BPath;
+
 /*!
 	\class BSymLink
 	\brief A symbolic link in the filesystem
-	
+
 	Provides an interface for manipulating symbolic links.
 
 	\author <a href='mailto:bonefish@users.sf.net'>Ingo Weinhold</a>
-	
+
 	\version 0.0.0
 */
 class BSymLink : public BNode {
