@@ -26,9 +26,9 @@
 #define MAX_FAILS_BEFORE_BSOD 0
 
 #ifdef __HAIKU__
-#define FORTUNE_FILE "/etc/fortunes/Fortunes"
+#	define FORTUNE_FILE "/boot/system/data/fortunes/Fortunes"
 #else
-#define FORTUNE_FILE "/etc/fortunes/default"
+#	define FORTUNE_FILE "/etc/fortunes/default"
 #endif
 
 #define KCMD_HELP "A funny KDL hangman game :-)"
@@ -68,7 +68,7 @@ static char hungman_ansi[] = \
 
 #endif
 
-// for gets, 
+// for gets,
 #define BIGBUFFSZ 128
 char bigbuffer[BIGBUFFSZ];
 
@@ -169,7 +169,7 @@ init_words(char *from)
 void
 print_hangman(int fails)
 {
-	PRINTF(HUNGMAN, 
+	PRINTF(HUNGMAN,
 		(fails > 0)?'O':' ',
 		(fails > 2)?'/':' ',
 		(fails > 1)?'|':' ',
@@ -336,7 +336,7 @@ status_t
 init_driver(void)
 {
 	status_t err;
-	
+
 	err = init_words(FORTUNE_FILE);
 	if (err < B_OK) {
 		dprintf("hangman: error reading fortune file: %s\n", strerror(err));
@@ -412,7 +412,7 @@ khangman_write(void *cookie, off_t position, const void *data, size_t *numbytes)
 	bsod_saved_kgets = bsod_kgets;
 	bsod_kgets = bsod_wrapper_gets;
 	kernel_debugger("So much more fun in KDL...");
-	
+
 	return B_OK;
 }
 
@@ -478,7 +478,7 @@ static struct debugger_module_info sModuleInfo = {
 	NULL
 };
 
-module_info *modules[] = { 
+module_info *modules[] = {
 	(module_info *)&sModuleInfo,
 	NULL
 };
