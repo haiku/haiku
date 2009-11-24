@@ -266,6 +266,7 @@ haikuStaticLibSupCxx=
 haikuSharedLibSupCxx=
 haikuCxxHeadersDir=
 hostGCCVersion=`gcc -dumpversion`
+hostGCCMachine=`gcc -dumpmachine`
 bochsDebug=0
 includeGPLAddOns=0
 includePatentedCode=0
@@ -513,6 +514,7 @@ HAIKU_ARFLAGS				?= ${HAIKU_ARFLAGS} ;
 HAIKU_UNARFLAGS				?= ${HAIKU_UNARFLAGS} ;
 
 HOST_GCC_RAW_VERSION		?= ${hostGCCVersion} ;
+HOST_GCC_MACHINE			?= ${hostGCCMachine} ;
 
 EOF
 

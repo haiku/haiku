@@ -478,9 +478,15 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 
 # host platform settings
 
-# enable GCC -m32 option, if requested
+# analyze the host gcc machine spec to find out about 64-bitness
+HOST_PLATFORM_IS_64_BIT = ;
 if $(HAIKU_HOST_USE_32BIT) = 1 {
+	# enable GCC -m32 option
 	HOST_GCC_BASE_FLAGS = -m32 ;
+} else {
+	switch $(HOST_GCC_MACHINE) {
+		case x86_64-*	: HOST_PLATFORM_IS_64_BIT = 1 ;
+	}
 }
 
 
@@ -530,6 +536,7 @@ HOST_CPU	?= $(OSPLAT:L) ;
 
 HOST_ARCH				?= $(HOST_CPU) ;
 HOST_ARCH_MACRO_DEFINE	= ARCH_$(HOST_CPU) ;
+
 
 # directories
 HOST_OBJECT_BASE_DIR = [ FDirName $(HAIKU_OBJECT_DIR) $(HOST_PLATFORM) ] ;
@@ -926,6 +933,10 @@ switch $(HOST_PLATFORM) {
 	case sunos		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_SUNOS ;
 }
 
+# define host platform 64 bit macro
+if $(HOST_PLATFORM_IS_64_BIT) {
+	HOST_DEFINES += HAIKU_HOST_PLATFORM_64_BIT ;
+}
 
 #pragma mark -
 
