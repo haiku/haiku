@@ -61,8 +61,8 @@ struct disk_super_block {
 	int32		fs_byte_order;
 	uint32		block_size;
 	uint32		block_shift;
-	off_t		num_blocks;
-	off_t		used_blocks;
+	int64		num_blocks;
+	int64		used_blocks;
 	int32		inode_size;
 	int32		magic2;
 	int32		blocks_per_ag;
@@ -70,8 +70,8 @@ struct disk_super_block {
 	int32		num_ags;
 	int32		flags;
 	block_run	log_blocks;
-	off_t		log_start;
-	off_t		log_end;
+	int64		log_start;
+	int64		log_end;
 	int32		magic3;
 	inode_addr	root_dir;
 	inode_addr	indices;
@@ -117,12 +117,12 @@ struct disk_super_block {
 
 struct data_stream {
 	block_run	direct[NUM_DIRECT_BLOCKS];
-	off_t		max_direct_range;
+	int64		max_direct_range;
 	block_run	indirect;
-	off_t		max_indirect_range;
+	int64		max_indirect_range;
 	block_run	double_indirect;
-	off_t		max_double_indirect_range;
-	off_t		size;
+	int64		max_double_indirect_range;
+	int64		size;
 
 	off_t MaxDirectRange() const
 		{ return BFS_ENDIAN_TO_HOST_INT64(max_direct_range); }

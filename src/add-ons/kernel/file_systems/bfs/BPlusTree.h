@@ -22,9 +22,9 @@ struct bplustree_header {
 	uint32		node_size;
 	uint32		max_number_of_levels;
 	uint32		data_type;
-	off_t		root_node_pointer;
-	off_t		free_node_pointer;
-	off_t		maximum_size;
+	int64		root_node_pointer;
+	int64		free_node_pointer;
+	int64		maximum_size;
 
 	uint32 Magic() const { return BFS_ENDIAN_TO_HOST_INT32(magic); }
 	uint32 NodeSize() const { return BFS_ENDIAN_TO_HOST_INT32(node_size); }
@@ -60,9 +60,9 @@ struct sorted_array;
 typedef sorted_array duplicate_array;
 
 struct bplustree_node {
-	off_t	left_link;
-	off_t	right_link;
-	off_t	overflow_link;
+	int64	left_link;
+	int64	right_link;
+	int64	overflow_link;
 	uint16	all_key_count;
 	uint16	all_key_length;
 
