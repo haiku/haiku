@@ -13,6 +13,7 @@
  */
 
 
+#include "TerminalBuffer.h"
 #include "TermView.h"
 
 #include <ctype.h>
@@ -372,11 +373,6 @@ TermView::Instantiate(BMessage* data)
 {
 	if (validate_instantiation(data, "TermView")) {
 		TermView *view = new (std::nothrow) TermView(data);
-		/*BScrollView *scrollView = new BScrollView("term_scrollview",
-			view, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, true, true);
-		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
-		scrollView->ResizeTo(200, 200);
-		return scrollView; */
 		return view;
 	}
 

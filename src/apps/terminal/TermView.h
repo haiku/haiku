@@ -16,7 +16,6 @@
 #include <String.h>
 #include <View.h>
 
-#include "TerminalBuffer.h"
 #include "TermPos.h"
 
 
@@ -26,7 +25,9 @@ class BScrollBar;
 class BScrollView;
 class BString;
 class BStringView;
+class BasicTerminalBuffer;
 class TermBuffer;
+class TerminalBuffer;
 class ResizeWindow;
 class Shell;
 
