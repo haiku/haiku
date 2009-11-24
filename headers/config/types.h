@@ -54,7 +54,7 @@ typedef __haiku_std_uint64	__haiku_uint64;
 #	define __HAIKU_SADDR_MAX	(2147483647)
 #	define __HAIKU_ADDR_MAX		(4294967295U)
 #endif
-#define __HAIKU_SADDR_MIN		(-__HAIKU_SADDR_MIN-1)
+#define __HAIKU_SADDR_MIN		(-__HAIKU_SADDR_MAX-1)
 
 
 /* printf()/scanf() format prefixes */
