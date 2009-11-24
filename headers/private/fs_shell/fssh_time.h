@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_TIME_H_
@@ -9,10 +9,10 @@
 #include "fssh_defs.h"
 
 
-typedef long fssh_clock_t;
-typedef long fssh_time_t;
-typedef long fssh_suseconds_t;
-typedef unsigned long fssh_useconds_t;
+typedef int32_t fssh_clock_t;
+typedef int32_t fssh_time_t;
+typedef int32_t fssh_suseconds_t;
+typedef uint32_t fssh_useconds_t;
 
 #define FSSH_CLOCKS_PER_SEC	1000
 #define FSSH_CLK_TCK		FSSH_CLOCKS_PER_SEC
@@ -66,7 +66,7 @@ extern 	char			*fssh_ctime(const fssh_time_t *timer);
 extern char				*fssh_ctime_r(const fssh_time_t *timer, char *buffer);
 extern struct fssh_tm	*fssh_gmtime(const fssh_time_t *timer);
 extern struct fssh_tm	*fssh_gmtime_r(const fssh_time_t *timer,
-								struct fssh_tm *tm); 
+								struct fssh_tm *tm);
 extern struct fssh_tm	*fssh_localtime(const fssh_time_t *timer);
 extern struct fssh_tm	*fssh_localtime_r(const fssh_time_t *timer,
 								struct fssh_tm *tm);

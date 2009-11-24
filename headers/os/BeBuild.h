@@ -6,6 +6,9 @@
 #define _BE_BUILD_H
 
 
+#include <config/HaikuConfig.h>
+
+
 #define B_BEOS_VERSION_4				0x0400
 #define B_BEOS_VERSION_4_5				0x0450
 #define B_BEOS_VERSION_5				0x0500
@@ -38,6 +41,15 @@
 #	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_4
 #else
 #	error Unsupported gcc version!
+#endif
+
+
+#ifdef __HAIKU_ARCH_64_BIT
+#	define B_HAIKU_64_BIT				1
+#endif
+
+#ifdef __HAIKU_BEOS_COMPATIBLE
+#	define B_HAIKU_BEOS_COMPATIBLE		1
 #endif
 
 

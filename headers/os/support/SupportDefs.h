@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
@@ -9,39 +9,32 @@
 #define _SUPPORT_DEFS_H
 
 
-/* this must be located before the include of sys/types.h */
-#if !defined(_SYS_TYPES_H) && !defined(_SYS_TYPES_H_)
-typedef unsigned long			ulong;
-typedef unsigned int			uint;
-typedef unsigned short			ushort;
-#endif
-
 #include <BeBuild.h>
 #include <Errors.h>
 
+#include <inttypes.h>
 #include <sys/types.h>
 
 
-/* Shorthand type formats */
-typedef	signed char				int8;
-typedef unsigned char			uint8;
-typedef volatile signed char   	vint8;
-typedef volatile unsigned char	vuint8;
+/* fixed-size integer types */
+typedef	__haiku_int8			int8;
+typedef __haiku_uint8			uint8;
+typedef	__haiku_int16			int16;
+typedef __haiku_uint16			uint16;
+typedef	__haiku_int32			int32;
+typedef __haiku_uint32			uint32;
+typedef	__haiku_int64			int64;
+typedef __haiku_uint64			uint64;
 
-typedef	short					int16;
-typedef unsigned short			uint16;
-typedef volatile short			vint16;
-typedef volatile unsigned short	vuint16;
-
-typedef	long					int32;
-typedef unsigned long			uint32;
-typedef volatile long			vint32;
-typedef volatile unsigned long	vuint32;
-
-typedef	long long				int64;
-typedef unsigned long long		uint64;
-typedef volatile long long		vint64;
-typedef volatile unsigned long long	vuint64;
+/* shorthand types */
+typedef volatile int8   		vint8;
+typedef volatile uint8			vuint8;
+typedef volatile int16			vint16;
+typedef volatile uint16			vuint16;
+typedef volatile int32			vint32;
+typedef volatile uint32			vuint32;
+typedef volatile int64			vint64;
+typedef volatile uint64			vuint64;
 
 typedef volatile long			vlong;
 typedef volatile int			vint;
@@ -56,12 +49,83 @@ typedef volatile unsigned char	vuchar;
 typedef unsigned char			uchar;
 typedef unsigned short          unichar;
 
-
-/* Descriptive formats */
+/* descriptive types */
 typedef int32					status_t;
 typedef int64					bigtime_t;
 typedef uint32					type_code;
 typedef uint32					perform_code;
+
+
+/* printf()/scanf() format strings for [u]int* types */
+#	define B_PRId8		"d"
+#	define B_PRIi8		"i"
+#	define B_PRId16		"d"
+#	define B_PRIi16		"i"
+#	define B_PRId32		__HAIKU_PRI_PREFIX_32 "d"
+#	define B_PRIi32		__HAIKU_PRI_PREFIX_32 "i"
+#	define B_PRId64		__HAIKU_PRI_PREFIX_64 "d"
+#	define B_PRIi64		__HAIKU_PRI_PREFIX_64 "i"
+#	define B_PRIu8		"u"
+#	define B_PRIo8		"o"
+#	define B_PRIx8		"x"
+#	define B_PRIX8		"X"
+#	define B_PRIu16		"u"
+#	define B_PRIo16		"o"
+#	define B_PRIx16		"x"
+#	define B_PRIX16		"X"
+#	define B_PRIu32		__HAIKU_PRI_PREFIX_32 "u"
+#	define B_PRIo32		__HAIKU_PRI_PREFIX_32 "o"
+#	define B_PRIx32		__HAIKU_PRI_PREFIX_32 "x"
+#	define B_PRIX32		__HAIKU_PRI_PREFIX_32 "X"
+#	define B_PRIu64		__HAIKU_PRI_PREFIX_64 "u"
+#	define B_PRIo64		__HAIKU_PRI_PREFIX_64 "o"
+#	define B_PRIx64		__HAIKU_PRI_PREFIX_64 "x"
+#	define B_PRIX64		__HAIKU_PRI_PREFIX_64 "X"
+
+#	define B_SCNd8 		"hhd"
+#	define B_SCNi8 		"hhi"
+#	define B_SCNd16		"hd"
+#	define B_SCNi16 	"hi"
+#	define B_SCNd32 	__HAIKU_PRI_PREFIX_32 "d"
+#	define B_SCNi32 	__HAIKU_PRI_PREFIX_32 "i"
+#	define B_SCNd64		__HAIKU_PRI_PREFIX_64 "d"
+#	define B_SCNi64 	__HAIKU_PRI_PREFIX_64 "i"
+#	define B_SCNu8 		"hhu"
+#	define B_SCNo8 		"hho"
+#	define B_SCNx8 		"hhx"
+#	define B_SCNu16		"hu"
+#	define B_SCNo16		"ho"
+#	define B_SCNx16		"hx"
+#	define B_SCNu32 	__HAIKU_PRI_PREFIX_32 "u"
+#	define B_SCNo32 	__HAIKU_PRI_PREFIX_32 "o"
+#	define B_SCNx32 	__HAIKU_PRI_PREFIX_32 "x"
+#	define B_SCNu64		__HAIKU_PRI_PREFIX_64 "u"
+#	define B_SCNo64		__HAIKU_PRI_PREFIX_64 "o"
+#	define B_SCNx64		__HAIKU_PRI_PREFIX_64 "x"
+
+/* printf() format strings for some standard types */
+/* size_t */
+#define B_PRIuSIZE		__HAIKU_PRI_PREFIX_ADDR "u"
+#define B_PRIoSIZE		__HAIKU_PRI_PREFIX_ADDR "o"
+#define B_PRIxSIZE		__HAIKU_PRI_PREFIX_ADDR "x"
+#define B_PRIXSIZE		__HAIKU_PRI_PREFIX_ADDR "X"
+/* ssize_t */
+#define B_PRIdSSIZE		__HAIKU_PRI_PREFIX_ADDR "d"
+#define B_PRIiSSIZE		__HAIKU_PRI_PREFIX_ADDR "i"
+/* addr_t */
+#define B_PRIuADDR		__HAIKU_PRI_PREFIX_ADDR "u"
+#define B_PRIoADDR		__HAIKU_PRI_PREFIX_ADDR "o"
+#define B_PRIxADDR		__HAIKU_PRI_PREFIX_ADDR "x"
+#define B_PRIXADDR		__HAIKU_PRI_PREFIX_ADDR "X"
+/* off_t */
+#define B_PRIdOFF		B_PRId64
+#define B_PRIiOFF		B_PRIi64
+/* dev_t */
+#define B_PRIdDEV		B_PRId32
+#define B_PRIiDEV		B_PRIi32
+/* ino_t */
+#define B_PRIdINO		B_PRId64
+#define B_PRIiINO		B_PRIi64
 
 
 /* Empty string ("") */
@@ -78,9 +142,9 @@ extern const char *B_EMPTY_STRING;
 #	ifndef max
 #		define max(a,b) ((a)>(b)?(a):(b))
 #	endif
-#endif 
+#endif
 
-/* min() and max() won't work in C++ */
+/* min() and max() are functions in C++ */
 #define min_c(a,b) ((a)>(b)?(b):(a))
 #define max_c(a,b) ((a)>(b)?(a):(b))
 
@@ -88,7 +152,7 @@ extern const char *B_EMPTY_STRING;
 /* Grandfathering */
 #ifndef __cplusplus
 #	include <stdbool.h>
-#endif 
+#endif
 
 #ifndef NULL
 #	define NULL (0)
@@ -104,14 +168,14 @@ extern int32	atomic_set(vint32 *value, int32 newValue);
 extern int32	atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst);
 extern int32	atomic_add(vint32 *value, int32 addValue);
 extern int32	atomic_and(vint32 *value, int32 andValue);
-extern int32	atomic_or(vint32 *value, int32 orValue);	
+extern int32	atomic_or(vint32 *value, int32 orValue);
 extern int32	atomic_get(vint32 *value);
 
 extern int64	atomic_set64(vint64 *value, int64 newValue);
 extern int64	atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst);
 extern int64	atomic_add64(vint64 *value, int64 addValue);
 extern int64	atomic_and64(vint64 *value, int64 andValue);
-extern int64	atomic_or64(vint64 *value, int64 orValue);	
+extern int64	atomic_or64(vint64 *value, int64 orValue);
 extern int64	atomic_get64(vint64 *value);
 
 /* Other stuff */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2009, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_API_WRAPPER_H
@@ -1502,6 +1502,81 @@
 #define uid_t			fssh_uid_t
 #define gid_t			fssh_gid_t
 #define pid_t			fssh_pid_t
+
+#if !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS)
+
+/* printf()/scanf() format strings for [u]int* types */
+#define B_PRId8			FSSH_B_PRId8
+#define B_PRIi8			FSSH_B_PRIi8
+#define B_PRId16		FSSH_B_PRId16
+#define B_PRIi16		FSSH_B_PRIi16
+#define B_PRId32		FSSH_B_PRId32
+#define B_PRIi32		FSSH_B_PRIi32
+#define B_PRId64		FSSH_B_PRId64
+#define B_PRIi64		FSSH_B_PRIi64
+#define B_PRIu8			FSSH_B_PRIu8
+#define B_PRIo8			FSSH_B_PRIo8
+#define B_PRIx8			FSSH_B_PRIx8
+#define B_PRIX8			FSSH_B_PRIX8
+#define B_PRIu16		FSSH_B_PRIu16
+#define B_PRIo16		FSSH_B_PRIo16
+#define B_PRIx16		FSSH_B_PRIx16
+#define B_PRIX16		FSSH_B_PRIX16
+#define B_PRIu32		FSSH_B_PRIu32
+#define B_PRIo32		FSSH_B_PRIo32
+#define B_PRIx32		FSSH_B_PRIx32
+#define B_PRIX32		FSSH_B_PRIX32
+#define B_PRIu64		FSSH_B_PRIu64
+#define B_PRIo64		FSSH_B_PRIo64
+#define B_PRIx64		FSSH_B_PRIx64
+#define B_PRIX64		FSSH_B_PRIX64
+
+#define B_SCNd8			FSSH_B_SCNd8
+#define B_SCNi8			FSSH_B_SCNi8
+#define B_SCNd16		FSSH_B_SCNd16
+#define B_SCNi16		FSSH_B_SCNi16
+#define B_SCNd32		FSSH_B_SCNd32
+#define B_SCNi32		FSSH_B_SCNi32
+#define B_SCNd64		FSSH_B_SCNd64
+#define B_SCNi64		FSSH_B_SCNi64
+#define B_SCNu8			FSSH_B_SCNu8
+#define B_SCNo8			FSSH_B_SCNo8
+#define B_SCNx8			FSSH_B_SCNx8
+#define B_SCNu16		FSSH_B_SCNu16
+#define B_SCNu16		FSSH_B_SCNu16
+#define B_SCNx16		FSSH_B_SCNx16
+#define B_SCNu32		FSSH_B_SCNu32
+#define B_SCNo32		FSSH_B_SCNo32
+#define B_SCNx32		FSSH_B_SCNx32
+#define B_SCNu64		FSSH_B_SCNu64
+#define B_SCNo64		FSSH_B_SCNo64
+#define B_SCNx64		FSSH_B_SCNx64
+
+/* printf() format strings for some standard types */
+/* size_t */
+#define B_PRIuSIZE		FSSH_B_PRIuSIZE
+#define B_PRIoSIZE		FSSH_B_PRIoSIZE
+#define B_PRIxSIZE		FSSH_B_PRIxSIZE
+#define B_PRIXSIZE		FSSH_B_PRIXSIZE
+/* ssize_t */
+#define B_PRIdSSIZE		FSSH_B_PRIdSSIZE
+#define B_PRIiSSIZE		FSSH_B_PRIiSSIZE
+/* addr_t */
+#define B_PRIuADDR		FSSH_B_PRIuADDR
+#define B_PRIoADDR		FSSH_B_PRIoADDR
+#define B_PRIxADDR		FSSH_B_PRIxADDR
+#define B_PRIXADDR		FSSH_B_PRIXADDR
+/* off_t */
+#define B_PRIdOFF		FSSH_B_PRIdOFF
+#define B_PRIiOFF		FSSH_B_PRIiOFF
+/* dev_t */
+#define B_PRIdDEV		FSSH_B_PRIdDEV
+#define B_PRIiDEV		FSSH_B_PRIiDEV
+/* ino_t */
+#define B_PRIdINO		FSSH_B_PRIdINO
+#define B_PRIiINO		FSSH_B_PRIiINO
+
+#endif	/* !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) */
 
 
 ////////////////////////////////////////////////////////////////////////////////

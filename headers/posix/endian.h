@@ -1,8 +1,12 @@
+/*
+ * Copyright 2003-2008 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _ENDIAN_H_
 #define _ENDIAN_H_
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
+
+
+#include <config/HaikuConfig.h>
 
 
 /* Defines architecture dependent endian constants.
@@ -10,11 +14,11 @@
  * significant byte, "1" the least significant one.
  */
 
-#if defined(__INTEL__) || defined(__ARM__) || defined(__MIPSEL__)
+#if defined(__HAIKU_LITTLE_ENDIAN)
 #	define LITTLE_ENDIAN	1234
 #	define BIG_ENDIAN		0
 #	define BYTE_ORDER		LITTLE_ENDIAN
-#elif defined(__POWERPC__) || defined(__M68K__)
+#elif defined(__HAIKU_BIG_ENDIAN)
 #	define BIG_ENDIAN		4321
 #	define LITTLE_ENDIAN	0
 #	define BYTE_ORDER		BIG_ENDIAN

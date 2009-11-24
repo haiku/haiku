@@ -1,26 +1,17 @@
 /*
- * Copyright 2004-2005, Haiku, Inc.
+ * Copyright 2004-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SETJMP_H_
 #define _SETJMP_H_
 
+
+#include <config/HaikuConfig.h>
+
 #include <signal.h>
 
 /* include architecture specific definitions */
-#ifdef __INTEL__
-	#include <arch/x86/arch_setjmp.h>
-#elif __POWERPC__
-	#include <arch/ppc/arch_setjmp.h>
-#elif __M68K__
-	#include <arch/m68k/arch_setjmp.h>
-#elif __MIPSEL__
-	#include <arch/mipsel/arch_setjmp.h>
-#elif __ARM__
-	#include <arch/arm/arch_setjmp.h>
-#else
-	#error #include <arch/<cpu>/arch_setjmp.h>
-#endif
+#include __HAIKU_ARCH_HEADER(arch_setjmp.h)
 
 typedef struct __jmp_buf_tag {
 	__jmp_buf	regs;		/* saved registers, stack & program pointer */

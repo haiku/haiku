@@ -88,6 +88,7 @@ copy_headers()
 	done
 }
 
+copy_headers $haikuSourceDir/headers/config $tmpIncludeDir/config
 copy_headers $haikuSourceDir/headers/os $tmpIncludeDir/os
 copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 

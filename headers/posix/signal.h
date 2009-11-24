@@ -10,7 +10,7 @@
 
 
 typedef int	sig_atomic_t;
-typedef long sigset_t;
+typedef __haiku_int32 sigset_t;
 
 typedef void (*sighandler_t)(int);
 	/* GNU-like signal handler typedef */
@@ -249,19 +249,7 @@ int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
 typedef struct vregs vregs;
 
 /* include architecture specific definitions */
-#ifdef __INTEL__
-        #include <arch/x86/signal.h>
-#elif __POWERPC__
-        #include <arch/ppc/signal.h>
-#elif __M68K__
-        #include <arch/m68k/signal.h>
-#elif __MIPSEL__
-        #include <arch/mipsel/signal.h>
-#elif __ARM__
-        #include <arch/arm/signal.h>
-#else
-        #error #include <arch/<cpu>/signal.h>
-#endif
+#include __HAIKU_ARCH_HEADER(signal.h)
 
 
 #endif /* _SIGNAL_H_ */

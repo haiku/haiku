@@ -9,10 +9,10 @@
 #include <sys/types.h>
 
 
-typedef long clock_t;
-typedef long time_t;
-typedef long suseconds_t;
-typedef unsigned long useconds_t;
+typedef __haiku_int32 clock_t;
+typedef __haiku_int32 time_t;
+typedef __haiku_int32 suseconds_t;
+typedef __haiku_uint32 useconds_t;
 
 #define CLOCKS_PER_SEC	1000
 #define CLK_TCK			CLOCKS_PER_SEC
@@ -64,7 +64,7 @@ extern char			*asctime_r(const struct tm *timep, char *buffer);
 extern char			*ctime(const time_t *timer);
 extern char			*ctime_r(const time_t *timer, char *buffer);
 extern struct tm	*gmtime(const time_t *timer);
-extern struct tm	*gmtime_r(const time_t *timer, struct tm *tm); 
+extern struct tm	*gmtime_r(const time_t *timer, struct tm *tm);
 extern struct tm	*localtime(const time_t *timer);
 extern struct tm	*localtime_r(const time_t *timer, struct tm *tm);
 extern int			nanosleep(const struct timespec *, struct timespec *);

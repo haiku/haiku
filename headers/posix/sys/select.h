@@ -1,10 +1,12 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_SELECT_H
 #define _SYS_SELECT_H
 
+
+#include <config/types.h>
 
 #include <sys/time.h>
 #include <signal.h>
@@ -22,7 +24,7 @@
 #	define FD_SETSIZE 1024
 #endif
 
-typedef unsigned long fd_mask;
+typedef __haiku_uint32 fd_mask;
 
 #ifndef _howmany
 #	define _howmany(x, y) (((x) + ((y) - 1)) / (y))
@@ -55,7 +57,7 @@ extern "C" {
 
 extern int pselect(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
 			struct fd_set *errorBits, const struct timespec *timeout, const sigset_t *sigMask);
-extern int select(int numBits, struct fd_set *readBits, struct fd_set *writeBits, 
+extern int select(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
 			struct fd_set *errorBits, struct timeval *timeout);
 
 #ifdef __cplusplus

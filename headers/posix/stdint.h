@@ -1,25 +1,26 @@
 /*
- * Copyright 2003-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STDINT_H_
 #define _STDINT_H_
 
 
-/* ToDo: this is a compiler and architecture dependent header */
+#include <config/types.h>
+
 
 /* Exact-width integer types */
-typedef signed char int8_t;
-typedef unsigned char uint8_t;
+typedef __haiku_std_int8	int8_t;
+typedef __haiku_std_uint8	uint8_t;
 
-typedef signed short int16_t;
-typedef unsigned short uint16_t;
+typedef __haiku_std_int16	int16_t;
+typedef __haiku_std_uint16	uint16_t;
 
-typedef signed int int32_t;
-typedef unsigned int uint32_t;
+typedef __haiku_std_int32	int32_t;
+typedef __haiku_std_uint32	uint32_t;
 
-typedef signed long long int64_t;
-typedef unsigned long long uint64_t;
+typedef __haiku_std_int64	int64_t;
+typedef __haiku_std_uint64	uint64_t;
 
 /* Minimum-width integer types */
 typedef int8_t int_least8_t;
@@ -48,12 +49,12 @@ typedef int64_t int_fast64_t;
 typedef uint64_t uint_fast64_t;
 
 /* Integer types capable of holding object pointers */
-typedef int32_t intptr_t;
-typedef uint32_t uintptr_t;
+typedef __haiku_saddr_t intptr_t;
+typedef __haiku_addr_t uintptr_t;
 
 /* Greatest-width integer types */
-typedef signed long long intmax_t;
-typedef unsigned long long uintmax_t;
+typedef int64_t intmax_t;
+typedef uint64_t uintmax_t;
 
 /* Limits of exact-width integer types */
 #define INT8_MIN 	(-128)
@@ -107,9 +108,9 @@ typedef unsigned long long uintmax_t;
 #define UINT_FAST64_MAX	UINT64_MAX
 
 /* Limits of Integer types capable of holding object pointers */
-#define INTPTR_MIN	INT32_MIN
-#define INTPTR_MAX	INT32_MAX
-#define UINTPTR_MAX	UINT32_MAX
+#define INTPTR_MIN	__HAIKU_SADDR_MIN
+#define INTPTR_MAX	__HAIKU_SADDR_MAX
+#define UINTPTR_MAX	__HAIKU_ADDR_MAX
 
 /* Limits of Greatest-width integer types */
 #define INTMAX_MIN	INT64_MIN
@@ -117,13 +118,13 @@ typedef unsigned long long uintmax_t;
 #define UINTMAX_MAX	UINT64_MAX
 
 /* Limits of other integer types */
-#define PTDIFF_MIN INT32_MIN
-#define PTDIFF_MAX INT32_MAX
+#define PTDIFF_MIN __HAIKU_SADDR_MIN
+#define PTDIFF_MAX __HAIKU_SADDR_MAX
 
 #define SIG_ATOMIC_MIN INT32_MIN
 #define SIG_ATOMIC_MAX INT32_MAX
 
-#define SIZE_MAX 	UINT32_MAX
+#define SIZE_MAX 	__HAIKU_ADDR_MAX
 
 #define WINT_MIN 	0
 #define WINT_MAX 	((wint_t)-1)
@@ -154,5 +155,6 @@ typedef uint8_t u_int8_t;
 typedef uint16_t u_int16_t;
 typedef uint32_t u_int32_t;
 typedef uint64_t u_int64_t;
+
 
 #endif	/* _STDINT_H_ */

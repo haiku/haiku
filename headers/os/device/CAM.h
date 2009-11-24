@@ -6,9 +6,9 @@
  * Definitions for the SCSI Common Access Method as implemented in Haiku.
  *
  * See also "Draft Proposed American National Standard, SCSI-2 Common
- * Access Method Transport and SCSI Interface Module", Revision 12, 
+ * Access Method Transport and SCSI Interface Module", Revision 12,
  * ANSI refernce number X3.232-199x.
- * 
+ *
 */
 
 #ifndef _CAM_H
@@ -18,20 +18,21 @@
 
 #include <sys/types.h>
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifndef U32
-typedef unsigned long U32;
+typedef uint32 U32;
 #endif
 
 #ifndef I32
-typedef long I32;
+typedef int32 I32;
 #endif
 
 #ifndef U16
-typedef unsigned short U16;
+typedef uint16 U16;
 #endif
 
 /* Haiku specific additions */
@@ -43,7 +44,7 @@ typedef struct {
 	uchar	path;		/* target SIM ID                              */
 	uchar	target;		/* target device ID                           */
 	uchar	sgcount;	/* # of sg segments (0 if non-sg operation)   */
-	uchar	scsi_op;	/* scsi operation byte                        */	
+	uchar	scsi_op;	/* scsi operation byte                        */
 } cam_iostat;
 
 /* End of Haiku specific additions */
@@ -89,7 +90,7 @@ typedef struct {
 #define HBA_ID		16	/* ASCII string len for HBA ID */
 
 #define BE_SIM_CCB_SIZE		1536	/* we want to allocate 1.5k chunks */
-#define BE_SIM_SCSIIO_SIZE	88		/* sizeof(CAM_CCB_SCSIIO) - SIM_PRIV */  
+#define BE_SIM_SCSIIO_SIZE	88		/* sizeof(CAM_CCB_SCSIIO) - SIM_PRIV */
 #define SIM_PRIV	(BE_SIM_CCB_SIZE - BE_SIM_SCSIIO_SIZE) /* Length of SIM private data area */
 
 /* SIM_PRIV (sim private data area)  Terms and Conditions:
@@ -97,7 +98,7 @@ typedef struct {
  - the size of SIM_PRIV shall be such that sizeof(CCB_SIZE_UNION) = 1.5k
  - all CCB's shall be allocated from locked, contiguous memory
  - CCB's shall be aligned on 512 byte boundaries
- - SIM_PRIV will be >= 1408 bytes 
+ - SIM_PRIV will be >= 1408 bytes
  - this provides 128  8byte sg entries (512mb worth of pages, worstcase fragmentation)
  - and 256 bytes for sense data and 128 bytes for whatever else the SIM needs
 
@@ -116,7 +117,7 @@ typedef struct ccb_header
 	uint16		cam_ccb_len;	/* Length of the entire CCB */
 	uchar		cam_func_code;	/* XPT function code */
 	uchar		cam_status;		/* Returned CAM subsystem status */
-	uchar		cam_hrsvd0;		/* Reserved field, for alignment */ 
+	uchar		cam_hrsvd0;		/* Reserved field, for alignment */
 	uchar		cam_path_id;	/* Path ID for the request */
 	uchar		cam_target_id;	/* Target device ID */
 	uchar		cam_target_lun;	/* Target LUN number */
@@ -174,7 +175,7 @@ typedef struct ccb_scsiio
 	uchar*		cam_pdrv_ptr;		/* Ptr used by the Peripheral driver */
 	CCB_HEADER*	cam_next_ccb;		/* Ptr to the next CCB for action */
 	uchar*		cam_req_map;		/* Ptr for mapping info on the Req. */
-	void		(*cam_cbfcnp)(struct ccb_scsiio*);		
+	void		(*cam_cbfcnp)(struct ccb_scsiio*);
 									/* Callback on completion function */
 	uchar*		cam_data_ptr;		/* Pointer to the data buf/SG list */
 	uint32		cam_dxfer_len;		/* Data xfer length */
@@ -642,7 +643,7 @@ enum {
 typedef struct cam_for_driver_module_info cam_for_driver_module_info;
 
 struct cam_for_driver_module_info {
-	bus_manager_info	minfo;	
+	bus_manager_info	minfo;
 	CCB_HEADER*			(*xpt_ccb_alloc)(void);
 	void				(*xpt_ccb_free)(void* ccb);
 	long				(*xpt_action)(CCB_HEADER* ccbh);
@@ -657,7 +658,7 @@ struct cam_for_driver_module_info {
 typedef struct cam_for_sim_module_info cam_for_sim_module_info;
 
 struct cam_for_sim_module_info {
-	bus_manager_info	minfo;	
+	bus_manager_info	minfo;
 	long				(*xpt_bus_register)(CAM_SIM_ENTRY* sim);
 	long				(*xpt_bus_deregister)(long path);
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TERMIOS_H_
@@ -9,7 +9,7 @@
 #include <sys/types.h>
 
 
-typedef unsigned long tcflag_t;
+typedef __haiku_uint32 tcflag_t;
 typedef unsigned char speed_t;
 typedef unsigned char cc_t;
 
@@ -54,7 +54,7 @@ struct termios {
 #define	IUCLC		0x200		/* map all upper case to lower */
 #define	IXON		0x400		/* enable input SW flow control */
 #define	IXANY		0x800		/* any character will restart input */
-#define	IXOFF		0x1000		/* enable output SW flow control */	
+#define	IXOFF		0x1000		/* enable output SW flow control */
 
 /* c_oflag - output control modes */
 #define	OPOST		0x01		/* enable postprocessing of output */

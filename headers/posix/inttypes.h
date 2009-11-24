@@ -1,6 +1,6 @@
 /*
- * Copyright 2002-2008 Haiku inc. All rights reserved.
- * Distributed under the terms of the MIT License
+ * Copyright 2002-2009 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _INTTYPES_H_
 #define _INTTYPES_H_
@@ -30,24 +30,24 @@ typedef struct {
 #	define PRIiLEAST16		"i"
 #	define PRIiFAST16		"i"
 
-#	define PRId32			"d"
-#	define PRIdLEAST32		"d"
-#	define PRIdFAST32		"d"
-#	define PRIi32			"i"
-#	define PRIiLEAST32		"i"
-#	define PRIiFAST32		"i"
+#	define PRId32			__HAIKU_STD_PRI_PREFIX_32 "d"
+#	define PRIdLEAST32		PRId32
+#	define PRIdFAST32		PRId32
+#	define PRIi32			__HAIKU_STD_PRI_PREFIX_32 "i"
+#	define PRIiLEAST32		PRIi32
+#	define PRIiFAST32		PRIi32
 
-#	define PRId64			"lld"
-#	define PRIdLEAST64		"lld"
-#	define PRIdFAST64		"lld"
-#	define PRIi64			"lli"
-#	define PRIiLEAST64		"lli"
-#	define PRIiFAST64		"lli"
+#	define PRId64			__HAIKU_STD_PRI_PREFIX_64 "d"
+#	define PRIdLEAST64		PRId64
+#	define PRIdFAST64		PRId64
+#	define PRIi64			__HAIKU_STD_PRI_PREFIX_64 "i"
+#	define PRIiLEAST64		PRIi64
+#	define PRIiFAST64		PRIi64
 
-#	define PRIdMAX			"lld"
-#	define PRIdPTR			"d"
-#	define PRIiMAX			"lli"
-#	define PRIiPTR			"i"
+#	define PRIdMAX			PRId64
+#	define PRIdPTR			__HAIKU_PRI_PREFIX_ADDR "d"
+#	define PRIiMAX			PRIi64
+#	define PRIiPTR			__HAIKU_PRI_PREFIX_ADDR "i"
 
 /* fprintf() macros for unsigned integers */
 #	define PRIu8			"u"
@@ -76,40 +76,40 @@ typedef struct {
 #	define PRIXLEAST16		"X"
 #	define PRIXFAST16		"X"
 
-#	define PRIu32			"u"
-#	define PRIuLEAST32		"u"
-#	define PRIuFAST32		"u"
-#	define PRIo32			"o"
-#	define PRIoLEAST32		"o"
-#	define PRIoFAST32		"o"
-#	define PRIx32			"x"
-#	define PRIxLEAST32		"x"
-#	define PRIxFAST32		"x"
-#	define PRIX32			"X"
-#	define PRIXLEAST32		"X"
-#	define PRIXFAST32		"X"
+#	define PRIu32			__HAIKU_STD_PRI_PREFIX_32 "u"
+#	define PRIuLEAST32		PRIu32
+#	define PRIuFAST32		PRIu32
+#	define PRIo32			__HAIKU_STD_PRI_PREFIX_32 "o"
+#	define PRIoLEAST32		PRIo32
+#	define PRIoFAST32		PRIo32
+#	define PRIx32			__HAIKU_STD_PRI_PREFIX_32 "x"
+#	define PRIxLEAST32		PRIx32
+#	define PRIxFAST32		PRIx32
+#	define PRIX32			__HAIKU_STD_PRI_PREFIX_32 "X"
+#	define PRIXLEAST32		PRIX32
+#	define PRIXFAST32		PRIX32
 
-#	define PRIu64			"llu"
-#	define PRIuLEAST64		"llu"
-#	define PRIuFAST64		"llu"
-#	define PRIo64			"llo"
-#	define PRIoLEAST64		"llo"
-#	define PRIoFAST64		"llo"
-#	define PRIx64			"llx"
-#	define PRIxLEAST64		"llx"
-#	define PRIxFAST64		"llx"
-#	define PRIX64			"llX"
-#	define PRIXLEAST64		"llX"
-#	define PRIXFAST64		"llX"
+#	define PRIu64			__HAIKU_STD_PRI_PREFIX_64 "u"
+#	define PRIuLEAST64		PRIu64
+#	define PRIuFAST64		PRIu64
+#	define PRIo64			__HAIKU_STD_PRI_PREFIX_64 "o"
+#	define PRIoLEAST64		PRIo64
+#	define PRIoFAST64		PRIo64
+#	define PRIx64			__HAIKU_STD_PRI_PREFIX_64 "x"
+#	define PRIxLEAST64		PRIx64
+#	define PRIxFAST64		PRIx64
+#	define PRIX64			__HAIKU_STD_PRI_PREFIX_64 "X"
+#	define PRIXLEAST64		PRIX64
+#	define PRIXFAST64		PRIX64
 
-#	define PRIuMAX			"llu"
-#	define PRIuPTR			"u"
-#	define PRIoMAX			"llo"
-#	define PRIoPTR			"o"
-#	define PRIxMAX			"llx"
-#	define PRIxPTR			"x"
-#	define PRIXMAX			"llX"
-#	define PRIXPTR			"X"
+#	define PRIuMAX			PRIu64
+#	define PRIuPTR			__HAIKU_PRI_PREFIX_ADDR "u"
+#	define PRIoMAX			PRIo64
+#	define PRIoPTR			__HAIKU_PRI_PREFIX_ADDR "o"
+#	define PRIxMAX			PRIx64
+#	define PRIxPTR			__HAIKU_PRI_PREFIX_ADDR "x"
+#	define PRIXMAX			PRIX64
+#	define PRIXPTR			__HAIKU_PRI_PREFIX_ADDR "X"
 
 /* fscanf() macros for signed integers */
 #	define SCNd8 			"hhd"
@@ -126,24 +126,24 @@ typedef struct {
 #	define SCNiLEAST16		"hi"
 #	define SCNiFAST16		"i"
 
-#	define SCNd32 			"d"
-#	define SCNdLEAST32		"d"
-#	define SCNdFAST32		"d"
-#	define SCNi32 			"i"
-#	define SCNiLEAST32		"i"
-#	define SCNiFAST32		"i"
+#	define SCNd32 			__HAIKU_STD_PRI_PREFIX_32 "d"
+#	define SCNdLEAST32		SCNd32
+#	define SCNdFAST32		SCNd32
+#	define SCNi32 			__HAIKU_STD_PRI_PREFIX_32 "i"
+#	define SCNiLEAST32		SCNi32
+#	define SCNiFAST32		SCNi32
 
-#	define SCNd64			"lld"
-#	define SCNdLEAST64		"lld"
-#	define SCNdFAST64		"lld"
-#	define SCNi64 			"lli"
-#	define SCNiLEAST64		"lli"
-#	define SCNiFAST64 		"lli"
+#	define SCNd64			__HAIKU_STD_PRI_PREFIX_64 "d"
+#	define SCNdLEAST64		SCNd64
+#	define SCNdFAST64		SCNd64
+#	define SCNi64 			__HAIKU_STD_PRI_PREFIX_64 "i"
+#	define SCNiLEAST64		SCNi64
+#	define SCNiFAST64 		SCNi64
 
-#	define SCNdMAX			"lld"
-#	define SCNdPTR			"d"
-#	define SCNiMAX			"lli"
-#	define SCNiPTR			"i"
+#	define SCNdMAX			SCNd64
+#	define SCNdPTR			__HAIKU_PRI_PREFIX_ADDR "d"
+#	define SCNiMAX			SCNi64
+#	define SCNiPTR			__HAIKU_PRI_PREFIX_ADDR "i"
 
 /* fscanf() macros for unsigned integers */
 #	define SCNu8 			"hhu"
@@ -166,32 +166,32 @@ typedef struct {
 #	define SCNxLEAST16		"hx"
 #	define SCNxFAST16		"x"
 
-#	define SCNu32 			"u"
-#	define SCNuLEAST32		"u"
-#	define SCNuFAST32		"u"
-#	define SCNo32 			"o"
-#	define SCNoLEAST32		"o"
-#	define SCNoFAST32		"o"
-#	define SCNx32 			"x"
-#	define SCNxLEAST32		"x"
-#	define SCNxFAST32		"x"
+#	define SCNu32 			__HAIKU_STD_PRI_PREFIX_32 "u"
+#	define SCNuLEAST32		SCNu32
+#	define SCNuFAST32		SCNu32
+#	define SCNo32 			__HAIKU_STD_PRI_PREFIX_32 "o"
+#	define SCNoLEAST32		SCNo32
+#	define SCNoFAST32		SCNo32
+#	define SCNx32 			__HAIKU_STD_PRI_PREFIX_32 "x"
+#	define SCNxLEAST32		SCNx32
+#	define SCNxFAST32		SCNx32
 
-#	define SCNu64			"llu"
-#	define SCNuLEAST64		"llu"
-#	define SCNuFAST64		"llu"
-#	define SCNo64			"llo"
-#	define SCNoLEAST64		"llo"
-#	define SCNoFAST64		"llo"
-#	define SCNx64			"llx"
-#	define SCNxLEAST64		"llx"
-#	define SCNxFAST64		"llx"
+#	define SCNu64			__HAIKU_STD_PRI_PREFIX_64 "u"
+#	define SCNuLEAST64		SCNu64
+#	define SCNuFAST64		SCNu64
+#	define SCNo64			__HAIKU_STD_PRI_PREFIX_64 "o"
+#	define SCNoLEAST64		SCNo64
+#	define SCNoFAST64		SCNo64
+#	define SCNx64			__HAIKU_STD_PRI_PREFIX_64 "x"
+#	define SCNxLEAST64		SCNx64
+#	define SCNxFAST64		SCNx64
 
-#	define SCNuMAX			"llu"
-#	define SCNuPTR			"u"
-#	define SCNoMAX			"llo"
-#	define SCNoPTR			"o"
-#	define SCNxMAX			"llx"
-#	define SCNxPTR			"x"
+#	define SCNuMAX			SCNu64
+#	define SCNuPTR			__HAIKU_PRI_PREFIX_ADDR "u"
+#	define SCNoMAX			SCNo64
+#	define SCNoPTR			__HAIKU_PRI_PREFIX_ADDR "o"
+#	define SCNxMAX			SCNx64
+#	define SCNxPTR			__HAIKU_PRI_PREFIX_ADDR "x"
 #endif /* !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) */
 
 
@@ -210,5 +210,6 @@ extern uintmax_t	strtoumax(const char *string, char **_end, int base);
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif	/* _INTTYPES_H_ */

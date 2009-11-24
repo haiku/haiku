@@ -1,16 +1,19 @@
 /*
- * Copyright 2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2008-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_MSG_H
 #define _SYS_MSG_H
 
+
+#include <config/types.h>
+
 #include <sys/cdefs.h>
 #include <sys/ipc.h>
 #include <sys/types.h>
 
-typedef unsigned long msgqnum_t;
-typedef unsigned long msglen_t;
+typedef __haiku_uint32 msgqnum_t;
+typedef __haiku_uint32 msglen_t;
 
 /* No error if big message */
 #define MSG_NOERROR		010000

@@ -413,6 +413,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	AddFilesToHaikuImage develop etc : $(makefileEngineFiles) ;
 
 	# headers
+	AddHeaderDirectoryToHaikuImage config ;
 	AddHeaderDirectoryToHaikuImage glibc ;
 	AddHeaderDirectoryToHaikuImage os ;
 	AddHeaderDirectoryToHaikuImage posix ;
@@ -465,15 +466,15 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 		InstallOptionalHaikuImagePackage
 			BeZillaBrowser-2.0.0.22pre-x86-gcc4-2009-09-28
 			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc4-2009-09-28.zip
- 			: 
+ 			:
  		;
  		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
 	} else {
-		InstallOptionalHaikuImagePackage 
+		InstallOptionalHaikuImagePackage
 			BeZillaBrowser-2.0.0.22pre-x86-gcc2-2009-09-27
 			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc2-2009-09-27.zip
- 			: 
+ 			:
  		;
  		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;

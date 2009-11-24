@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_STAT_H_
@@ -24,7 +24,7 @@ struct stat {
 	struct timespec	st_mtim;		/* last modification time */
 	struct timespec	st_ctim;		/* last change time, not creation time */
 	struct timespec	st_crtim;		/* creation time */
-	unsigned int	st_type;		/* attribute/index type */
+	__haiku_uint32	st_type;		/* attribute/index type */
 	blkcnt_t		st_blocks;		/* number of blocks allocated for object */
 };
 

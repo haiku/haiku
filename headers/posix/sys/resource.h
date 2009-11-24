@@ -5,13 +5,16 @@
 #ifndef _SYS_RESOURCE_H
 #define _SYS_RESOURCE_H
 
+
+#include <config/types.h>
+
 #include <sys/cdefs.h>
 #include <sys/time.h>
 
 
 /* getrlimit()/setrlimit() definitions */
 
-typedef unsigned long rlim_t;
+typedef __haiku_addr_t rlim_t;
 
 struct rlimit {
 	rlim_t	rlim_cur;		/* current soft limit */
