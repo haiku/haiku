@@ -53,7 +53,7 @@ device_open(const char* name, uint32 flags, void** _cookie)
 	vesa_info* info = gDeviceInfo[id];
 	*_cookie = info;
 
-	acquire_lock(&gLock);
+	mutex_lock(&gLock);
 
 	status_t status = B_OK;
 
@@ -66,7 +66,7 @@ device_open(const char* name, uint32 flags, void** _cookie)
 			info->id = id;
 	}
 
-	release_lock(&gLock);
+	mutex_unlock(&gLock);
 	return status;
 }
 
@@ -83,14 +83,14 @@ device_free(void* cookie)
 {
 	struct vesa_info* info = (vesa_info*)cookie;
 
-	acquire_lock(&gLock);
+	mutex_lock(&gLock);
 
 	if (info->open_count-- == 1) {
 		// release info structure
 		vesa_uninit(*info);
 	}
 
-	release_lock(&gLock);
+	mutex_unlock(&gLock);
 	return B_OK;
 }
 

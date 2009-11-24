@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,6 +19,7 @@
 #include "driver.h"
 #include "device.h"
 
+
 #define TRACE_DRIVER
 #ifdef TRACE_DRIVER
 #	define TRACE(x) dprintf x
@@ -28,49 +29,24 @@
 
 #define MAX_CARDS 1
 
+
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-char *gDeviceNames[MAX_CARDS + 1];
-vesa_info *gDeviceInfo[MAX_CARDS];
-isa_module_info *gISA;
-lock gLock;
+char* gDeviceNames[MAX_CARDS + 1];
+vesa_info* gDeviceInfo[MAX_CARDS];
+isa_module_info* gISA;
+mutex gLock;
 
 
-extern "C" {
-	status_t init_hardware(void);
-	status_t init_driver(void);
-	void uninit_driver(void);
-	const char **publish_devices(void);
-	device_hooks *find_device(const char *name);
-}
-
-#if 0
-static status_t
-get_next_graphics_card(int32 *_cookie, pci_info &info)
-{
-	int32 index = *_cookie;
-
-	// find devices
-	for (; gPCI->get_nth_pci_info(index, &info) == B_OK; index++) {
-		if (info.class_base == PCI_display) {
-			*_cookie = index + 1;
-			return B_OK;
-		}
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-#endif
-
-const char **
+extern "C" const char**
 publish_devices(void)
 {
 	TRACE((DEVICE_NAME ": publish_devices()\n"));
-	return (const char **)gDeviceNames;
+	return (const char**)gDeviceNames;
 }
 
 
-status_t
+extern "C" status_t
 init_hardware(void)
 {
 	TRACE((DEVICE_NAME ": init_hardware()\n"));
@@ -79,28 +55,33 @@ init_hardware(void)
 }
 
 
-status_t
+extern "C" status_t
 init_driver(void)
 {
 	TRACE((DEVICE_NAME ": init_driver()\n"));
 
-	if ((gDeviceInfo[0] = (vesa_info *)malloc(sizeof(vesa_info))) != NULL)
-		memset(gDeviceInfo[0], 0, sizeof(vesa_info));
-	else
+	gDeviceInfo[0] = (vesa_info*)malloc(sizeof(vesa_info));
+	if (gDeviceInfo[0] == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = get_module(B_ISA_MODULE_NAME, (module_info **)&gISA);
-	if (status < B_OK)
+	memset(gDeviceInfo[0], 0, sizeof(vesa_info));
+
+	status_t status = get_module(B_ISA_MODULE_NAME, (module_info**)&gISA);
+	if (status != B_OK)
 		goto err1;
 
 	gDeviceNames[0] = strdup("graphics/vesa");
+	if (gDeviceNames[0] == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+
 	gDeviceNames[1] = NULL;
 
-	status = init_lock(&gLock, "vesa lock");
-	if (status == B_OK)
-		return B_OK;
+	mutex_init(&gLock, "vesa lock");
+	return B_OK;
 
-	free(gDeviceNames[0]);
+err2:
 	put_module(B_ISA_MODULE_NAME);
 err1:
 	free(gDeviceInfo[0]);
@@ -108,16 +89,16 @@ err1:
 }
 
 
-void
+extern "C" void
 uninit_driver(void)
 {
 	TRACE((DEVICE_NAME ": uninit_driver()\n"));
 
 	put_module(B_ISA_MODULE_NAME);
-	uninit_lock(&gLock);
+	mutex_destroy(&gLock);
 
 	// free device related structures
-	char *name;
+	char* name;
 	for (int32 index = 0; (name = gDeviceNames[index]) != NULL; index++) {
 		free(gDeviceInfo[index]);
 		free(name);
@@ -125,16 +106,17 @@ uninit_driver(void)
 }
 
 
-device_hooks *
-find_device(const char *name)
+extern "C" device_hooks*
+find_device(const char* name)
 {
 	int index;
 
 	TRACE((DEVICE_NAME ": find_device()\n"));
 
-	for (index = 0; gDeviceNames[index] != NULL; index++)
+	for (index = 0; gDeviceNames[index] != NULL; index++) {
 		if (!strcmp(name, gDeviceNames[index]))
 			return &gDeviceHooks;
+	}
 
 	return NULL;
 }
