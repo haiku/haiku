@@ -327,6 +327,7 @@ private:
 			WindowList			fAllWindows;
 			WindowList			fSubsetWindows;
 			WindowList			fFocusList;
+			Window*				fLastWorkspaceFocus[kMaxWorkspaces];
 
 			BObjectList<WorkspacesView> fWorkspacesViews;
 			BLocker				fWorkspacesLock;

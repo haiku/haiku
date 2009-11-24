@@ -339,6 +339,8 @@ Desktop::Desktop(uid_t userID, const char* targetScreen)
 	fFront(NULL),
 	fBack(NULL)
 {
+	memset(fLastWorkspaceFocus, 0, sizeof(fLastWorkspaceFocus));
+
 	char name[B_OS_NAME_LENGTH];
 	Desktop::_GetLooperName(name, sizeof(name));
 
@@ -2656,6 +2658,8 @@ Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
 			// window is on this workspace, is it anymore?
 			if (!workspace_in_workspaces(i, newWorkspaces)) {
 				_Windows(i).RemoveWindow(window);
+				if (fLastWorkspaceFocus[i] == window)
+					fLastWorkspaceFocus[i] = NULL;
 
 				if (i == CurrentWorkspace()) {
 					// remove its appearance from the current workspace
@@ -3120,6 +3124,8 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 		movedWindow->Anchor(index).position = movedWindow->Frame().LeftTop();
 	}
 
+	fLastWorkspaceFocus[previousIndex] = FocusWindow();
+
 	// build region of windows that are no longer visible in the new workspace
 
 	BRegion dirty;
@@ -3248,7 +3254,7 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 	// Set new focus, but keep focus to a floating window if still visible
 	if (!_Windows(index).HasWindow(FocusWindow())
 		|| !FocusWindow()->IsFloating())
-		SetFocusWindow();
+		SetFocusWindow(fLastWorkspaceFocus[index]);
 
 	_WindowChanged(NULL);
 	MarkDirty(dirty);
