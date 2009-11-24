@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences backgrounds ;
 
 UsePrivateHeaders shared ;
 
-Preference Backgrounds : 
+Preference Backgrounds :
 	BackgroundImage.cpp
 	Backgrounds.cpp
 	BackgroundsView.cpp
@@ -18,6 +18,6 @@ DoCatalogs Backgrounds :
 	BackgroundsView.cpp
 	ImageFilePanel.cpp
 	: en.catalog
-	: sv.catkeys
+	: de.catkeys sv.catkeys
 	;
 
