@@ -52,8 +52,8 @@ dump_super_block(const disk_super_block* superBlock)
 		get_tupel(superBlock->fs_byte_order));
 	kprintf("  block_size     = %u\n", (unsigned)superBlock->BlockSize());
 	kprintf("  block_shift    = %u\n", (unsigned)superBlock->BlockShift());
-	kprintf("  num_blocks     = %Lu\n", superBlock->NumBlocks());
-	kprintf("  used_blocks    = %Lu\n", superBlock->UsedBlocks());
+	kprintf("  num_blocks     = %" B_PRIdOFF "\n", superBlock->NumBlocks());
+	kprintf("  used_blocks    = %" B_PRIdOFF "\n", superBlock->UsedBlocks());
 	kprintf("  inode_size     = %u\n", (unsigned)superBlock->InodeSize());
 	kprintf("  magic2         = %#08x (%s) %s\n", (int)superBlock->Magic2(),
 		get_tupel(superBlock->magic2),
@@ -67,8 +67,8 @@ dump_super_block(const disk_super_block* superBlock)
 	kprintf("  flags          = %#08x (%s)\n", (int)superBlock->Flags(),
 		get_tupel(superBlock->Flags()));
 	dump_block_run("  log_blocks     = ", superBlock->log_blocks);
-	kprintf("  log_start      = %Lu\n", superBlock->LogStart());
-	kprintf("  log_end        = %Lu\n", superBlock->LogEnd());
+	kprintf("  log_start      = %" B_PRIdOFF "\n", superBlock->LogStart());
+	kprintf("  log_end        = %" B_PRIdOFF "\n", superBlock->LogEnd());
 	kprintf("  magic3         = %#08x (%s) %s\n", (int)superBlock->Magic3(),
 		get_tupel(superBlock->magic3),
 		(superBlock->magic3 == SUPER_BLOCK_MAGIC3 ? "valid" : "INVALID"));
@@ -87,21 +87,23 @@ dump_data_stream(const data_stream* stream)
 			dump_block_run("", stream->direct[i]);
 		}
 	}
-	kprintf("  max_direct_range          = %Lu\n", stream->MaxDirectRange());
+	kprintf("  max_direct_range          = %" B_PRIdOFF "\n",
+		stream->MaxDirectRange());
 
 	if (!stream->indirect.IsZero())
 		dump_block_run("  indirect                  = ", stream->indirect);
 
-	kprintf("  max_indirect_range        = %Lu\n", stream->MaxIndirectRange());
+	kprintf("  max_indirect_range        = %" B_PRIdOFF "\n",
+		stream->MaxIndirectRange());
 
 	if (!stream->double_indirect.IsZero()) {
 		dump_block_run("  double_indirect           = ",
 			stream->double_indirect);
 	}
 
-	kprintf("  max_double_indirect_range = %Lu\n",
+	kprintf("  max_double_indirect_range = %" B_PRIdOFF "\n",
 		stream->MaxDoubleIndirectRange());
-	kprintf("  size                      = %Lu\n", stream->Size());
+	kprintf("  size                      = %" B_PRIdOFF "\n", stream->Size());
 }
 
 
@@ -117,14 +119,14 @@ dump_inode(const bfs_inode* inode)
 	kprintf("  gid                = %u\n", (unsigned)inode->GroupID());
 	kprintf("  mode               = %08x\n", (int)inode->Mode());
 	kprintf("  flags              = %08x\n", (int)inode->Flags());
-	kprintf("  create_time        = %llx (%ld.%u)\n", inode->CreateTime(),
-		bfs_inode::ToSecs(inode->CreateTime()),
+	kprintf("  create_time        = %" B_PRIx64 " (%ld.%u)\n",
+		inode->CreateTime(), bfs_inode::ToSecs(inode->CreateTime()),
 		(unsigned)bfs_inode::ToUsecs(inode->CreateTime()));
-	kprintf("  last_modified_time = %llx (%ld.%u)\n", inode->LastModifiedTime(),
-		bfs_inode::ToSecs(inode->LastModifiedTime()),
+	kprintf("  last_modified_time = %" B_PRIx64 " (%ld.%u)\n",
+		inode->LastModifiedTime(), bfs_inode::ToSecs(inode->LastModifiedTime()),
 		(unsigned)bfs_inode::ToUsecs(inode->LastModifiedTime()));
-	kprintf("  status_change_time = %llx (%ld.%u)\n", inode->StatusChangeTime(),
-		bfs_inode::ToSecs(inode->StatusChangeTime()),
+	kprintf("  status_change_time = %" B_PRIx64 " (%ld.%u)\n",
+		inode->StatusChangeTime(), bfs_inode::ToSecs(inode->StatusChangeTime()),
 		(unsigned)bfs_inode::ToUsecs(inode->StatusChangeTime()));
 	dump_block_run(	"  parent             = ", inode->parent);
 	dump_block_run(	"  attributes         = ", inode->attributes);
@@ -150,9 +152,9 @@ dump_bplustree_header(const bplustree_header* header)
 	kprintf("  max_number_of_levels = %u\n",
 		(unsigned)header->MaxNumberOfLevels());
 	kprintf("  data_type            = %u\n", (unsigned)header->DataType());
-	kprintf("  root_node_pointer    = %Ld\n", header->RootNode());
-	kprintf("  free_node_pointer    = %Ld\n", header->FreeNode());
-	kprintf("  maximum_size         = %Lu\n", header->MaximumSize());
+	kprintf("  root_node_pointer    = %" B_PRIdOFF "\n", header->RootNode());
+	kprintf("  free_node_pointer    = %" B_PRIdOFF "\n", header->FreeNode());
+	kprintf("  maximum_size         = %" B_PRIdOFF "\n", header->MaximumSize());
 }
 
 
@@ -196,9 +198,9 @@ dump_bplustree_node(const bplustree_node* node, const bplustree_header* header,
 	Volume* volume)
 {
 	kprintf("bplustree_node:\n");
-	kprintf("  left_link      = %Ld\n", node->left_link);
-	kprintf("  right_link     = %Ld\n", node->right_link);
-	kprintf("  overflow_link  = %Ld\n", node->overflow_link);
+	kprintf("  left_link      = %" B_PRId64 "\n", node->left_link);
+	kprintf("  right_link     = %" B_PRId64 "\n", node->right_link);
+	kprintf("  overflow_link  = %" B_PRId64 "\n", node->overflow_link);
 	kprintf("  all_key_count  = %u\n", node->all_key_count);
 	kprintf("  all_key_length = %u\n", node->all_key_length);
 
@@ -240,24 +242,25 @@ dump_bplustree_node(const bplustree_node* node, const bplustree_header* header,
 				kprintf("uint32 = %u (0x%x)", (unsigned)*(uint32 *)&buffer,
 					(unsigned)*(uint32 *)&buffer);
 			} else if (header->data_type == BPLUSTREE_INT64_TYPE) {
-				kprintf("int64 = %Ld (0x%Lx)", *(int64 *)&buffer,
-					*(int64 *)&buffer);
+				kprintf("int64 = %" B_PRId64 " (%#" B_PRIx64 ")",
+					*(int64 *)&buffer, *(int64 *)&buffer);
 			} else
 				kprintf("???");
 
 			off_t offset = *value & 0x3fffffffffffffffLL;
-			kprintf(" (%d bytes) -> %Ld", length, offset);
+			kprintf(" (%d bytes) -> %" B_PRIdOFF, length, offset);
 			if (volume != NULL) {
 				block_run run = volume->ToBlockRun(offset);
 				kprintf(" (%d, %d)", (int)run.allocation_group, run.start);
 			}
 			if (bplustree_node::LinkType(*value)
-					== BPLUSTREE_DUPLICATE_FRAGMENT)
-				kprintf(" (duplicate fragment %Ld)\n", *value & 0x3ff);
-			else if (bplustree_node::LinkType(*value)
-					== BPLUSTREE_DUPLICATE_NODE)
+					== BPLUSTREE_DUPLICATE_FRAGMENT) {
+				kprintf(" (duplicate fragment %" B_PRIdOFF ")\n",
+					*value & 0x3ff);
+			} else if (bplustree_node::LinkType(*value)
+					== BPLUSTREE_DUPLICATE_NODE) {
 				kprintf(" (duplicate node)\n");
-			else
+			} else
 				kprintf("\n");
 		}
 	}

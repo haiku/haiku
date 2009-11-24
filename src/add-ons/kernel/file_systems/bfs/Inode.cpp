@@ -253,7 +253,7 @@ InodeAllocator::Keep(fs_vnode_ops* vnodeOps, uint32 publishFlags)
 
 	status_t status = fInode->WriteBack(*fTransaction);
 	if (status < B_OK) {
-		FATAL(("writing new inode %Ld failed!\n", fInode->ID()));
+		FATAL(("writing new inode %" B_PRIdINO " failed!\n", fInode->ID()));
 		return status;
 	}
 
@@ -412,7 +412,7 @@ Inode::InitCheck(bool checkNode)
 			return B_BUSY;
 
 		if (status != B_OK) {
-			FATAL(("inode at block %Ld corrupt!\n", BlockNumber()));
+			FATAL(("inode at block %" B_PRIdOFF " corrupt!\n", BlockNumber()));
 			RETURN_ERROR(B_BAD_DATA);
 		}
 	}
@@ -424,7 +424,8 @@ Inode::InitCheck(bool checkNode)
 
 		status_t status = fTree->InitCheck();
 		if (status != B_OK) {
-			FATAL(("inode tree at block %Ld corrupt!\n", BlockNumber()));
+			FATAL(("inode tree at block %" B_PRIdOFF " corrupt!\n",
+				BlockNumber()));
 			RETURN_ERROR(B_BAD_DATA);
 		}
 	}
@@ -2781,7 +2782,7 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 		if (get_vnode(volume->FSVolume(), volume->ToVnode(fInode->Attributes()),
 				(void**)&fAttributes) != B_OK) {
 			FATAL(("get_vnode() failed in AttributeIterator::GetNext(ino_t"
-				" = %Ld,name = \"%s\")\n", fInode->ID(), name));
+				" = %" B_PRIdINO ",name = \"%s\")\n", fInode->ID(), name));
 			return B_ENTRY_NOT_FOUND;
 		}
 
@@ -2789,7 +2790,7 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 		if (tree == NULL
 			|| (fIterator = new TreeIterator(tree)) == NULL) {
 			FATAL(("could not get tree in AttributeIterator::GetNext(ino_t"
-				" = %Ld,name = \"%s\")\n", fInode->ID(), name));
+				" = %" B_PRIdINO ",name = \"%s\")\n", fInode->ID(), name));
 			return B_ENTRY_NOT_FOUND;
 		}
 	}

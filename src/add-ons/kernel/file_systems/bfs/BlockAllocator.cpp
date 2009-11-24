@@ -705,8 +705,8 @@ BlockAllocator::_Initialize(BlockAllocator* allocator)
 	if (volume->UsedBlocks() != usedBlocks) {
 		// If the disk in a dirty state at mount time, it's
 		// normal that the values don't match
-		INFORM(("volume reports %Ld used blocks, correct is %Ld\n",
-			volume->UsedBlocks(), usedBlocks));
+		INFORM(("volume reports %" B_PRIdOFF " used blocks, correct is %"
+			B_PRIdOFF "\n", volume->UsedBlocks(), usedBlocks));
 		volume->SuperBlock().used_blocks = HOST_ENDIAN_TO_BFS_INT64(usedBlocks);
 	}
 
@@ -1379,7 +1379,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 			Vnode vnode(fVolume, cookie->current);
 			Inode* inode;
 			if (vnode.Get(&inode) != B_OK) {
-				FATAL(("check: Could not open inode at %Ld\n",
+				FATAL(("check: Could not open inode at %" B_PRIdOFF "\n",
 					fVolume->ToBlock(cookie->current)));
 				continue;
 			}
@@ -1402,8 +1402,8 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 			BPlusTree* tree = inode->Tree();
 			if (tree == NULL) {
-				FATAL(("check: could not open b+tree from inode at %Ld\n",
-					fVolume->ToBlock(cookie->current)));
+				FATAL(("check: could not open b+tree from inode at %" B_PRIdOFF
+					"\n", fVolume->ToBlock(cookie->current)));
 				continue;
 			}
 
@@ -1455,7 +1455,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 			Vnode vnode(fVolume, id);
 			Inode* inode;
 			if (vnode.Get(&inode) != B_OK) {
-				FATAL(("Could not open inode ID %Ld!\n", id));
+				FATAL(("Could not open inode ID %" B_PRIdINO "!\n", id));
 				control->errors |= BFS_COULD_NOT_OPEN;
 
 				if ((control->flags & BFS_REMOVE_INVALID) != 0) {
@@ -1506,9 +1506,10 @@ BlockAllocator::CheckNextNode(check_control* control)
 					&& !inode->IsIndex())
 				|| (is_directory(cookie->parent_mode)
 					&& !inode->IsRegularNode())) {
-				FATAL(("inode at %Ld is of wrong type: %o (parent %o at %Ld)!"
-					"\n", inode->BlockNumber(), inode->Mode(),
-					cookie->parent_mode, cookie->parent->BlockNumber()));
+				FATAL(("inode at %" B_PRIdOFF " is of wrong type: %o (parent "
+					"%o at %" B_PRIdOFF ")!\n", inode->BlockNumber(),
+					inode->Mode(), cookie->parent_mode,
+					cookie->parent->BlockNumber()));
 
 				// if we are allowed to fix errors, we should remove the file
 				if ((control->flags & BFS_REMOVE_WRONG_TYPES) != 0
@@ -1701,14 +1702,14 @@ BlockAllocator::CheckBlockRun(block_run run, const char* type,
 					if (firstSet == -1) {
 						firstSet = firstGroupBlock + offset;
 						control->errors |= BFS_BLOCKS_ALREADY_SET;
-						dprintf("block %lld is already set!!!\n",
+						dprintf("block %" B_PRIdOFF " is already set!!!\n",
 							firstGroupBlock + offset);
 					}
 					control->stats.already_set++;
 				} else {
 					if (firstSet != -1) {
-						FATAL(("%s: block_run(%d, %u, %u): blocks %Ld - %Ld "
-							"are already set!\n", type,
+						FATAL(("%s: block_run(%d, %u, %u): blocks %" B_PRIdOFF
+							" - %" B_PRIdOFF " are already set!\n", type,
 							(int)run.AllocationGroup(), run.Start(),
 							run.Length(), firstSet,
 							firstGroupBlock + offset - 1));
@@ -1729,9 +1730,10 @@ BlockAllocator::CheckBlockRun(block_run run, const char* type,
 					firstGroupBlock + pos + block * bitsPerBlock - 1));
 			}
 			if (firstSet != -1) {
-				FATAL(("%s: block_run(%d, %u, %u): blocks %Ld - %Ld are "
-					"already set!\n", type, (int)run.AllocationGroup(),
-					run.Start(), run.Length(), firstSet,
+				FATAL(("%s: block_run(%d, %u, %u): blocks %" B_PRIdOFF " - %"
+					B_PRIdOFF " are already set!\n", type,
+					(int)run.AllocationGroup(), run.Start(), run.Length(),
+					firstSet,
 					firstGroupBlock + pos + block * bitsPerBlock - 1));
 			}
 		}

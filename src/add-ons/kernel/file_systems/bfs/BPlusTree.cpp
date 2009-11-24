@@ -110,8 +110,9 @@ CachedNode::SetTo(off_t offset, bool check)
 	if (InternalSetTo(NULL, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
 		if (!fTree->fHeader->CheckNode(fNode)) {
-			FATAL(("invalid node [%p] read from offset %Ld (block %Ld), inode "
-				"at %Ld\n", fNode, offset, fBlockNumber, fTree->fStream->ID()));
+			FATAL(("invalid node [%p] read from offset %" B_PRIdOFF " (block %"
+				B_PRIdOFF "), inode at %" B_PRIdINO "\n", fNode, offset,
+				fBlockNumber, fTree->fStream->ID()));
 			return NULL;
 		}
 	}
@@ -140,8 +141,9 @@ CachedNode::SetToWritable(Transaction& transaction, off_t offset, bool check)
 	if (InternalSetTo(&transaction, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
 		if (!fTree->fHeader->CheckNode(fNode)) {
-			FATAL(("invalid node [%p] read from offset %Ld (block %Ld), inode "
-				"at %Ld\n", fNode, offset, fBlockNumber, fTree->fStream->ID()));
+			FATAL(("invalid node [%p] read from offset %" B_PRIdOFF " (block %"
+				B_PRIdOFF "), inode at %" B_PRIdINO "\n", fNode, offset,
+				fBlockNumber, fTree->fStream->ID()));
 			return NULL;
 		}
 	}
@@ -455,8 +457,8 @@ BPlusTree::SetTo(Inode* stream)
 	// is header valid?
 
 	if (fHeader->MaximumSize() != stream->Size()) {
-		dprintf("B+tree header size %Ld doesn't fit file size %Ld!\n",
-			fHeader->MaximumSize(), stream->Size());
+		dprintf("B+tree header size %" B_PRIdOFF " doesn't fit file size %"
+			B_PRIdOFF "!\n", fHeader->MaximumSize(), stream->Size());
 		// we can't change the header since we don't have a transaction
 		//fHeader->maximum_size = HOST_ENDIAN_TO_BFS_INT64(stream->Size());
 	}
@@ -727,7 +729,7 @@ BPlusTree::_SeekDown(Stack<node_and_key>& stack, const uint8* key,
 		nodeAndKey.nodeOffset = nextOffset;
 	}
 
-	FATAL(("BPlusTree::_SeekDown() could not open node %Ld\n",
+	FATAL(("BPlusTree::_SeekDown() could not open node %" B_PRIdOFF "\n",
 		nodeAndKey.nodeOffset));
 	return B_ERROR;
 }
@@ -752,7 +754,8 @@ BPlusTree::_FindFreeDuplicateFragment(Transaction& transaction,
 		const bplustree_node* fragment = cached.SetTo(
 			bplustree_node::FragmentOffset(value), false);
 		if (fragment == NULL) {
-			FATAL(("Could not get duplicate fragment at %Ld\n", value));
+			FATAL(("Could not get duplicate fragment at %" B_PRIdOFF "\n",
+				value));
 			continue;
 		}
 
@@ -804,7 +807,7 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 			if (array->count > NUM_FRAGMENT_VALUES
 				|| array->count < 1) {
 				FATAL(("insertDuplicate: Invalid array[%d] size in fragment "
-					"%Ld == %Ld!\n",
+					"%" B_PRIdOFF " == %" B_PRIdOFF "!\n",
 					(int)bplustree_node::FragmentIndex(oldValue),
 					bplustree_node::FragmentOffset(oldValue), array->count));
 				return B_BAD_DATA;
@@ -878,8 +881,9 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 
 			array = duplicate->DuplicateArray();
 			if (array->count > NUM_DUPLICATE_VALUES || array->count < 0) {
-				FATAL(("removeDuplicate: Invalid array size in duplicate %Ld "
-					"== %Ld!\n", duplicateOffset, array->count));
+				FATAL(("removeDuplicate: Invalid array size in duplicate %"
+					B_PRIdOFF " == %" B_PRIdOFF "!\n", duplicateOffset,
+					array->count));
 				return B_BAD_DATA;
 			}
 		} while (array->count >= NUM_DUPLICATE_VALUES
@@ -1427,14 +1431,15 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 
 		if (array->count > NUM_FRAGMENT_VALUES
 			|| array->count < 1) {
-			FATAL(("removeDuplicate: Invalid array[%d] size in fragment %Ld "
-				"== %Ld!\n", (int)bplustree_node::FragmentIndex(oldValue),
-				duplicateOffset, array->count));
+			FATAL(("removeDuplicate: Invalid array[%d] size in fragment %"
+				B_PRIdOFF " == %" B_PRIdOFF "!\n",
+				(int)bplustree_node::FragmentIndex(oldValue), duplicateOffset,
+				array->count));
 			return B_BAD_DATA;
 		}
 		if (!array->Remove(value)) {
-			FATAL(("Oh no, value %Ld not found in fragments of node %Ld...\n",
-				value, duplicateOffset));
+			FATAL(("Oh no, value %" B_PRIdOFF " not found in fragments of node "
+				"%" B_PRIdOFF "...\n", value, duplicateOffset));
 			return B_ENTRY_NOT_FOUND;
 		}
 
@@ -1464,8 +1469,8 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 	duplicate_array* array = NULL;
 
 	if (duplicate->LeftLink() != BPLUSTREE_NULL) {
-		FATAL(("invalid duplicate node: first left link points to %Ld!\n",
-			duplicate->LeftLink()));
+		FATAL(("invalid duplicate node: first left link points to %" B_PRIdOFF
+			"!\n", duplicate->LeftLink()));
 		return B_BAD_DATA;
 	}
 
@@ -1474,8 +1479,9 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 		array = duplicate->DuplicateArray();
 		if (array->count > NUM_DUPLICATE_VALUES
 			|| array->count < 0) {
-			FATAL(("removeDuplicate: Invalid array size in duplicate %Ld == "
-				"%Ld!\n", duplicateOffset, array->count));
+			FATAL(("removeDuplicate: Invalid array size in duplicate %"
+				B_PRIdOFF " == %" B_PRIdOFF "!\n", duplicateOffset,
+				array->count));
 			return B_BAD_DATA;
 		}
 
@@ -1886,7 +1892,7 @@ BPlusTree::Find(const uint8* key, uint16 keyLength, off_t* _value)
 
 		nodeOffset = nextOffset;
 	}
-	FATAL(("b+tree node at %Ld could not be loaded\n", nodeOffset));
+	FATAL(("b+tree node at %" B_PRIdOFF " could not be loaded\n", nodeOffset));
 	RETURN_ERROR(B_ERROR);
 }
 

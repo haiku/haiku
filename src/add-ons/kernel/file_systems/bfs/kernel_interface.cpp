@@ -175,7 +175,7 @@ bfs_mount(fs_volume* _volume, const char* device, uint32 flags,
 	_volume->ops = &gBFSVolumeOps;
 	*_rootID = volume->ToVnode(volume->Root());
 
-	INFORM(("mounted \"%s\" (root node at %lld, device = %s)\n",
+	INFORM(("mounted \"%s\" (root node at %" B_PRIdINO ", device = %s)\n",
 		volume->Name(), *_rootID, device));
 	return B_OK;
 }
@@ -275,23 +275,23 @@ bfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 	// the hassle and try to load an earlier block from disk
 	if (id < volume->ToBlock(volume->Log()) + volume->Log().Length()
 		|| id > volume->NumBlocks()) {
-		INFORM(("inode at %Ld requested!\n", id));
+		INFORM(("inode at %" B_PRIdINO " requested!\n", id));
 		return B_ERROR;
 	}
 
 	CachedBlock cached(volume, id);
 	bfs_inode* node = (bfs_inode*)cached.Block();
 	if (node == NULL) {
-		FATAL(("could not read inode: %Ld\n", id));
+		FATAL(("could not read inode: %" B_PRIdINO "\n", id));
 		return B_IO_ERROR;
 	}
 
 	status_t status = node->InitCheck(volume);
 	if (status != B_OK) {
 		if ((node->Flags() & INODE_DELETED) != 0) {
-			INFORM(("inode at %Ld is already deleted!\n", id));
+			INFORM(("inode at %" B_PRIdINO " is already deleted!\n", id));
 		} else {
-			FATAL(("inode at %Ld could not be read: %s!\n", id,
+			FATAL(("inode at %" B_PRIdINO " could not be read: %s!\n", id,
 				strerror(status)));
 		}
 		return status;
@@ -1393,8 +1393,9 @@ bfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 		if (needsTrimming) {
 			status = inode->TrimPreallocation(transaction);
 			if (status < B_OK) {
-				FATAL(("Could not trim preallocated blocks: inode %Ld, transaction %d: %s!\n",
-					inode->ID(), (int)transaction.ID(), strerror(status)));
+				FATAL(("Could not trim preallocated blocks: inode %" B_PRIdINO
+					", transaction %d: %s!\n", inode->ID(),
+					(int)transaction.ID(), strerror(status)));
 
 				// we still want this transaction to succeed
 				status = B_OK;
@@ -2244,8 +2245,8 @@ bfs_initialize(int fd, partition_id partitionID, const char* name,
 
 		INFORM(("Disk was initialized successfully.\n"));
 		INFORM(("\tname: \"%s\"\n", super.name));
-		INFORM(("\tnum blocks: %Ld\n", super.NumBlocks()));
-		INFORM(("\tused blocks: %Ld\n", super.UsedBlocks()));
+		INFORM(("\tnum blocks: %" B_PRIdOFF "\n", super.NumBlocks()));
+		INFORM(("\tused blocks: %" B_PRIdOFF "\n", super.UsedBlocks()));
 		INFORM(("\tblock size: %u bytes\n", (unsigned)super.BlockSize()));
 		INFORM(("\tnum allocation groups: %d\n",
 			(int)super.AllocationGroups()));

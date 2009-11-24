@@ -1068,8 +1068,8 @@ Equation::GetNextMatching(Volume* volume, TreeIterator* iterator,
 		Inode* inode;
 		if ((status = vnode.Get(&inode)) != B_OK) {
 			REPORT_ERROR(status);
-			FATAL(("could not get inode %Ld in index \"%s\"!\n", offset,
-				fAttribute));
+			FATAL(("could not get inode %" B_PRIdOFF " in index \"%s\"!\n",
+				offset, fAttribute));
 			// try with next
 			continue;
 		}
@@ -1124,7 +1124,7 @@ Equation::GetNextMatching(Volume* volume, TreeIterator* iterator,
 			dirent->d_pino = volume->ToVnode(inode->Parent());
 
 			if (inode->GetName(dirent->d_name) < B_OK) {
-				FATAL(("inode %Ld in query has no name!\n",
+				FATAL(("inode %" B_PRIdOFF " in query has no name!\n",
 					inode->BlockNumber()));
 			}
 
