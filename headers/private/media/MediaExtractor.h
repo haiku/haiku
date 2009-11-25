@@ -1,78 +1,85 @@
+/*
+ * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
+ * Copyright 2008, Maurice Kalinowski. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _MEDIA_EXTRACTOR_H
 #define _MEDIA_EXTRACTOR_H
 
+
 #include "ReaderPlugin.h"
 #include "DecoderPlugin.h"
+
 
 namespace BPrivate {
 namespace media {
 
 class ChunkCache;
 
-struct stream_info
-{
+struct stream_info {
 	status_t		status;
-	void *			cookie;
+	void*			cookie;
 	bool			hasCookie;
-	const void *	infoBuffer;
+	const void*		infoBuffer;
 	size_t			infoBufferSize;
-	ChunkCache *	chunkCache;
+	ChunkCache*		chunkCache;
 	media_format	encodedFormat;
 };
 
-class MediaExtractor
-{
+class MediaExtractor {
 public:
-					MediaExtractor(BDataIO * source, int32 flags);
-					~MediaExtractor();
+								MediaExtractor(BDataIO* source, int32 flags);
+								~MediaExtractor();
 
-	status_t		InitCheck();
+			status_t			InitCheck();
 
-	void			GetFileFormatInfo(media_file_format *mfi) const;
+			void				GetFileFormatInfo(
+									media_file_format* fileFormat) const;
 
-	int32			StreamCount();
+			int32				StreamCount();
 
-	const char*		Copyright();
+			const char*			Copyright();
 
-	const media_format * EncodedFormat(int32 stream);
-	int64			CountFrames(int32 stream) const;
-	bigtime_t		Duration(int32 stream) const;
+			const media_format*	EncodedFormat(int32 stream);
+			int64				CountFrames(int32 stream) const;
+			bigtime_t			Duration(int32 stream) const;
 
-	status_t		Seek(int32 stream, uint32 seekTo,
-						 int64 *frame, bigtime_t *time);
-	status_t		FindKeyFrame(int32 stream, uint32 seekTo,
-						 int64 *frame, bigtime_t *time) const;
+			status_t			Seek(int32 stream, uint32 seekTo, int64* _frame,
+									bigtime_t* _time);
+			status_t			FindKeyFrame(int32 stream, uint32 seekTo,
+									int64* _frame, bigtime_t* _time) const;
 
-	status_t		GetNextChunk(int32 stream,
-								 const void **chunkBuffer, size_t *chunkSize,
-								 media_header *mediaHeader);
+			status_t			GetNextChunk(int32 stream,
+									const void** _chunkBuffer,
+									size_t* _chunkSize,
+									media_header* mediaHeader);
 
-	status_t		CreateDecoder(int32 stream, Decoder **decoder,
-								  media_codec_info *mci);
-
-private:
-	static int32	extractor_thread(void *arg);
-	void			ExtractorThread();
+			status_t			CreateDecoder(int32 stream, Decoder** _decoder,
+									media_codec_info* codecInfo);
 
 private:
-	status_t		fErr;
+	static	int32				_ExtractorEntry(void* arg);
+			void				_ExtractorThread();
 
-	sem_id			fExtractorWaitSem;
-	thread_id		fExtractorThread;
-	volatile bool	fTerminateExtractor;
+private:
+			status_t			fInitStatus;
 
-	BDataIO			*fSource;
-	Reader			*fReader;
+			sem_id				fExtractorWaitSem;
+			thread_id			fExtractorThread;
+			volatile bool		fTerminateExtractor;
 
-	stream_info *	fStreamInfo;
-	int32			fStreamCount;
+			BDataIO*			fSource;
+			Reader*				fReader;
 
-	media_file_format fMff;
+			stream_info*		fStreamInfo;
+			int32				fStreamCount;
+
+			media_file_format	fFileFormat;
 };
 
-}; // namespace media
-}; // namespace BPrivate
+} // namespace media
+} // namespace BPrivate
 
 using namespace BPrivate::media;
 
-#endif
+#endif	// _MEDIA_EXTRACTOR_H

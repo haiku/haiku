@@ -6,22 +6,48 @@
 
 
 #include "MediaExtractor.h"
-#include "PluginManager.h"
-#include "ChunkCache.h"
-#include "debug.h"
+
+#include <new>
+#include <stdio.h>
+#include <string.h>
 
 #include <Autolock.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <new>
+#include "debug.h"
+#include "ChunkCache.h"
+#include "PluginManager.h"
 
 
 // should be 0, to disable the chunk cache set it to 1
 #define DISABLE_CHUNK_CACHE 0
 
 
-MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
+class MediaExtractorChunkProvider : public ChunkProvider {
+public:
+	MediaExtractorChunkProvider(MediaExtractor* extractor, int32 stream)
+		:
+		fExtractor(extractor),
+		fStream(stream)
+	{
+	}
+
+	virtual status_t GetNextChunk(const void** _chunkBuffer, size_t* _chunkSize,
+		media_header *mediaHeader)
+	{
+		return fExtractor->GetNextChunk(fStream, _chunkBuffer, _chunkSize,
+			mediaHeader);
+	}
+
+private:
+	MediaExtractor*	fExtractor;
+	int32			fStream;
+};
+
+
+// #pragma mark -
+
+
+MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 {
 	CALLED();
 	fSource = source;
@@ -30,8 +56,9 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 	fExtractorWaitSem = -1;
 	fTerminateExtractor = false;
 
-	fErr = _plugin_manager.CreateReader(&fReader, &fStreamCount, &fMff, source);
-	if (fErr) {
+	fInitStatus = _plugin_manager.CreateReader(&fReader, &fStreamCount,
+		&fFileFormat, source);
+	if (fInitStatus != B_OK) {
 		fStreamCount = 0;
 		fReader = NULL;
 		return;
@@ -66,11 +93,13 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 	for (int32 i = 0; i < fStreamCount; i++) {
 		if (fStreamInfo[i].status != B_OK)
 			continue;
+
 		int64 frameCount;
 		bigtime_t duration;
-		if (B_OK != fReader->GetStreamInfo(fStreamInfo[i].cookie, &frameCount,
+		if (fReader->GetStreamInfo(fStreamInfo[i].cookie, &frameCount,
 				&duration, &fStreamInfo[i].encodedFormat,
-				&fStreamInfo[i].infoBuffer, &fStreamInfo[i].infoBufferSize)) {
+				&fStreamInfo[i].infoBuffer, &fStreamInfo[i].infoBufferSize)
+					!= B_OK) {
 			fStreamInfo[i].status = B_ERROR;
 			ERROR("MediaExtractor::MediaExtractor: GetStreamInfo for "
 				"stream %ld failed\n", i);
@@ -80,8 +109,8 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 #if DISABLE_CHUNK_CACHE == 0
 	// start extractor thread
 	fExtractorWaitSem = create_sem(1, "media extractor thread sem");
-	fExtractorThread = spawn_thread(extractor_thread, "media extractor thread",
-		10, this);
+	fExtractorThread = spawn_thread(_ExtractorEntry, "media extractor thread",
+		40, this);
 	resume_thread(fExtractorThread);
 #endif
 }
@@ -117,15 +146,15 @@ status_t
 MediaExtractor::InitCheck()
 {
 	CALLED();
-	return fErr;
+	return fInitStatus;
 }
 
 
 void
-MediaExtractor::GetFileFormatInfo(media_file_format *mfi) const
+MediaExtractor::GetFileFormatInfo(media_file_format* fileFormat) const
 {
 	CALLED();
-	*mfi = fMff;
+	*fileFormat = fFileFormat;
 }
 
 
@@ -144,7 +173,7 @@ MediaExtractor::Copyright()
 }
 
 
-const media_format *
+const media_format*
 MediaExtractor::EncodedFormat(int32 stream)
 {
 	return &fStreamInfo[stream].encodedFormat;
@@ -161,7 +190,7 @@ MediaExtractor::CountFrames(int32 stream) const
 	int64 frameCount;
 	bigtime_t duration;
 	media_format format;
-	const void *infoBuffer;
+	const void* infoBuffer;
 	size_t infoSize;
 
 	fReader->GetStreamInfo(fStreamInfo[stream].cookie, &frameCount, &duration,
@@ -193,8 +222,7 @@ MediaExtractor::Duration(int32 stream) const
 
 
 status_t
-MediaExtractor::Seek(int32 stream, uint32 seekTo,
-					 int64 *frame, bigtime_t *time)
+MediaExtractor::Seek(int32 stream, uint32 seekTo, int64* frame, bigtime_t* time)
 {
 	CALLED();
 	if (fStreamInfo[stream].status != B_OK)
@@ -214,22 +242,21 @@ MediaExtractor::Seek(int32 stream, uint32 seekTo,
 
 
 status_t
-MediaExtractor::FindKeyFrame(int32 stream, uint32 seekTo, int64 *frame,
-	bigtime_t *time) const
+MediaExtractor::FindKeyFrame(int32 stream, uint32 seekTo, int64* _frame,
+	bigtime_t* _time) const
 {
 	CALLED();
 	if (fStreamInfo[stream].status != B_OK)
 		return fStreamInfo[stream].status;
 
 	return fReader->FindKeyFrame(fStreamInfo[stream].cookie,
-		seekTo, frame, time);
+		seekTo, _frame, _time);
 }
 
 
 status_t
-MediaExtractor::GetNextChunk(int32 stream,
-							 const void **chunkBuffer, size_t *chunkSize,
-							 media_header *mediaHeader)
+MediaExtractor::GetNextChunk(int32 stream, const void** _chunkBuffer,
+	size_t* _chunkSize, media_header* mediaHeader)
 {
 	if (fStreamInfo[stream].status != B_OK)
 		return fStreamInfo[stream].status;
@@ -237,68 +264,51 @@ MediaExtractor::GetNextChunk(int32 stream,
 #if DISABLE_CHUNK_CACHE > 0
 	static BLocker locker("media extractor next chunk");
 	BAutolock lock(locker);
-	return fReader->GetNextChunk(fStreamInfo[stream].cookie, chunkBuffer,
-		chunkSize, mediaHeader);
+	return fReader->GetNextChunk(fStreamInfo[stream].cookie, _chunkBuffer,
+		_chunkSize, mediaHeader);
 #endif
 
-	status_t err;
-	err = fStreamInfo[stream].chunkCache->GetNextChunk(chunkBuffer, chunkSize,
-		mediaHeader);
+	status_t status = fStreamInfo[stream].chunkCache->GetNextChunk(_chunkBuffer,
+		_chunkSize, mediaHeader);
 	release_sem(fExtractorWaitSem);
-	return err;
+	return status;
 }
 
 
-class MediaExtractorChunkProvider : public ChunkProvider {
-private:
-	MediaExtractor * fExtractor;
-	int32 fStream;
-public:
-	MediaExtractorChunkProvider(MediaExtractor * extractor, int32 stream)
-	{
-		fExtractor = extractor;
-		fStream = stream;
-	}
-
-	virtual status_t GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
-	                              media_header *mediaHeader)
-	{
-		return fExtractor->GetNextChunk(fStream, chunkBuffer, chunkSize,
-			mediaHeader);
-	}
-};
-
-
 status_t
-MediaExtractor::CreateDecoder(int32 stream, Decoder **out_decoder,
-	media_codec_info *mci)
+MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
+	media_codec_info* codecInfo)
 {
 	CALLED();
-	status_t res;
-	Decoder *decoder;
 
-	res = fStreamInfo[stream].status;
-	if (res != B_OK) {
+	status_t status = fStreamInfo[stream].status;
+	if (status != B_OK) {
 		ERROR("MediaExtractor::CreateDecoder can't create decoder for "
-			"stream %ld\n", stream);
-		return res;
+			"stream %ld: %s\n", stream, strerror(status));
+		return status;
 	}
 
-	// TODO Here we should work out a way so that if there is a setup failure we can try the next decoder
-	res = _plugin_manager.CreateDecoder(&decoder,
+	// TODO: Here we should work out a way so that if there is a setup
+	// failure we can try the next decoder
+	Decoder* decoder;
+	status = _plugin_manager.CreateDecoder(&decoder,
 		fStreamInfo[stream].encodedFormat);
-	if (res != B_OK) {
+	if (status != B_OK) {
+#if DEBUG
 		char formatString[256];
 		string_for_format(fStreamInfo[stream].encodedFormat, formatString,
-			256);
+			sizeof(formatString));
+
 		ERROR("MediaExtractor::CreateDecoder _plugin_manager.CreateDecoder "
-			"failed for stream %ld, format: %s\n", stream, formatString);
-		return res;
+			"failed for stream %ld, format: %s: %s\n", stream, formatString,
+			strerror(status));
+#endif
+		return status;
 	}
 
-	ChunkProvider *chunkProvider
+	ChunkProvider* chunkProvider
 		= new(std::nothrow) MediaExtractorChunkProvider(this, stream);
-	if (!chunkProvider) {
+	if (chunkProvider == NULL) {
 		_plugin_manager.DestroyDecoder(decoder);
 		ERROR("MediaExtractor::CreateDecoder can't create chunk provider "
 			"for stream %ld\n", stream);
@@ -307,64 +317,65 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **out_decoder,
 
 	decoder->SetChunkProvider(chunkProvider);
 
-	res = decoder->Setup(&fStreamInfo[stream].encodedFormat,
+	status = decoder->Setup(&fStreamInfo[stream].encodedFormat,
 		fStreamInfo[stream].infoBuffer, fStreamInfo[stream].infoBufferSize);
-	if (res != B_OK) {
+	if (status != B_OK) {
 		_plugin_manager.DestroyDecoder(decoder);
-		ERROR("MediaExtractor::CreateDecoder Setup failed for stream %ld: "
-			"%ld (%s)\n", stream, res, strerror(res));
-		return res;
+		ERROR("MediaExtractor::CreateDecoder Setup failed for stream %ld: %s\n",
+			stream, strerror(status));
+		return status;
 	}
 
-	res = _plugin_manager.GetDecoderInfo(decoder, mci);
-	if (res != B_OK) {
+	status = _plugin_manager.GetDecoderInfo(decoder, codecInfo);
+	if (status != B_OK) {
 		_plugin_manager.DestroyDecoder(decoder);
 		ERROR("MediaExtractor::CreateDecoder GetCodecInfo failed for stream "
-			"%ld: %ld (%s)\n", stream, res, strerror(res));
-		return res;
+			"%ld: %s\n", stream, strerror(status));
+		return status;
 	}
 
-	*out_decoder = decoder;
+	*_decoder = decoder;
 	return B_OK;
 }
 
 
-int32
-MediaExtractor::extractor_thread(void *arg)
+status_t
+MediaExtractor::_ExtractorEntry(void* extractor)
 {
-	static_cast<MediaExtractor *>(arg)->ExtractorThread();
-	return 0;
+	static_cast<MediaExtractor*>(extractor)->_ExtractorThread();
+	return B_OK;
 }
 
 
 void
-MediaExtractor::ExtractorThread()
+MediaExtractor::_ExtractorThread()
 {
-	for (;;) {
+	while (true) {
 		acquire_sem(fExtractorWaitSem);
 		if (fTerminateExtractor)
 			return;
 
-		bool refill_done;
+		bool refillDone;
 		do {
-			refill_done = false;
+			refillDone = false;
 			for (int32 stream = 0; stream < fStreamCount; stream++) {
 				if (fStreamInfo[stream].status != B_OK)
 					continue;
+
 				if (fStreamInfo[stream].chunkCache->NeedsRefill()) {
 					media_header mediaHeader;
-					const void *chunkBuffer;
+					const void* chunkBuffer;
 					size_t chunkSize;
-					status_t err;
-					err = fReader->GetNextChunk(fStreamInfo[stream].cookie,
-						&chunkBuffer, &chunkSize, &mediaHeader);
+					status_t status = fReader->GetNextChunk(
+						fStreamInfo[stream].cookie, &chunkBuffer, &chunkSize,
+						&mediaHeader);
 					fStreamInfo[stream].chunkCache->PutNextChunk(chunkBuffer,
-						chunkSize, mediaHeader, err);
-					refill_done = true;
+						chunkSize, mediaHeader, status);
+					refillDone = true;
 				}
 			}
 			if (fTerminateExtractor)
 				return;
-		} while (refill_done);
+		} while (refillDone);
 	}
 }
