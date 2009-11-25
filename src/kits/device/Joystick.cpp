@@ -21,6 +21,8 @@
 
 
 #if DEBUG
+static FILE *sLogFile = NULL;
+
 inline void
 LOG(const char *fmt, ...)
 {
@@ -29,12 +31,10 @@ LOG(const char *fmt, ...)
 	va_start(ap, fmt);
 	vsprintf(buf, fmt, ap);
 	va_end(ap);
-	fputs(buf, BJoystick::sLogFile); fflush(BJoystick::sLogFile);
+	fputs(buf, sLogFile); fflush(sLogFile);
 }
 
 #	define LOG_ERR(text...) LOG(text)
-
-static FILE *sLogFile = NULL;
 
 #else
 #	define LOG(text...)
