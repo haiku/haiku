@@ -127,6 +127,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 // #pragma mark - fssh_defs.h
 
+// 32/64 bitness
+#ifdef FSSH_B_HAIKU_64_BIT
+#	define B_HAIKU_64_BIT		FSSH_B_HAIKU_64_BIT
+#endif
+#ifdef FSSH_B_HAIKU_32_BIT
+#	define B_HAIKU_32_BIT		FSSH_B_HAIKU_32_BIT
+#endif
+
 // Limits
 #define B_DEV_NAME_LENGTH	FSSH_B_DEV_NAME_LENGTH
 #define B_FILE_NAME_LENGTH	FSSH_B_FILE_NAME_LENGTH
