@@ -198,7 +198,7 @@ DefaultCatalog::WriteToFile(const char *path)
 		return res;
 
 	BMallocIO mallocIO;
-	mallocIO.SetBlockSize(max(fCatMap.Size()*20, 256L));
+	mallocIO.SetBlockSize(max(fCatMap.Size()*20, 256));
 		// set a largish block-size in order to avoid reallocs
 	res = Flatten(&mallocIO);
 	if (res == B_OK) {
