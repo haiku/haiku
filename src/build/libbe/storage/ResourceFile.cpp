@@ -1,16 +1,14 @@
 /*
- * Copyright 2002-2006, Haiku Inc.
+ * Copyright 2002-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Tyler Dauwalder
- *		Ingo Weinhold, bonefish@users.sf.net
  */
+
 
 /*!
 	\file ResourceFile.cpp
 	ResourceFile implementation.
 */
+
 
 #include <ResourceFile.h>
 
@@ -18,24 +16,30 @@
 #include <new>
 #include <stdio.h>
 
-#include "Elf.h"
-#include "Exception.h"
-#include "Pef.h"
-#include "ResourceItem.h"
-#include "ResourcesContainer.h"
-#include "ResourcesDefs.h"
+#include <AutoDeleter.h>
+
+#include <Elf.h>
+#include <Exception.h>
+#include <Pef.h>
+#include <ResourceItem.h>
+#include <ResourcesContainer.h>
+#include <ResourcesDefs.h>
+//#include <Warnings.h>
 
 
 namespace BPrivate {
 namespace Storage {
 
+
 // ELF defs
-static const uint32	kMaxELFHeaderSize			= sizeof(Elf32_Ehdr) + 32;
+static const uint32	kMaxELFHeaderSize
+	= std::max(sizeof(Elf32_Ehdr), sizeof(Elf64_Ehdr)) + 32;
 static const char	kELFFileMagic[4]			= { 0x7f, 'E', 'L', 'F' };
 
 // sanity bounds
 static const uint32	kMaxResourceCount			= 10000;
 static const uint32	kELFMaxResourceAlignment	= 1024 * 1024 * 10;	// 10 MB
+
 
 // recognized file types (indices into kFileTypeNames)
 enum {
@@ -47,7 +51,8 @@ enum {
 	FILE_TYPE_EMPTY			= 5,
 };
 
-const char *kFileTypeNames[] = {
+
+const char* kFileTypeNames[] = {
 	"unknown",
 	"x86 resource file",
 	"PPC resource file",
@@ -56,19 +61,19 @@ const char *kFileTypeNames[] = {
 	"empty file",
 };
 
+
 // debugging
 //#define DBG(x) x
 #define DBG(x)
 #define OUT	printf
 
 
-// helper functions/classes
+// #pragma mark - helper functions/classes
 
-// read_exactly
-static
-void
-read_exactly(BPositionIO &file, off_t position, void *buffer, size_t size,
-			 const char *errorMessage = NULL)
+
+static void
+read_exactly(BPositionIO& file, off_t position, void* buffer, size_t size,
+	const char* errorMessage = NULL)
 {
 	ssize_t read = file.ReadAt(position, buffer, size);
 	if (read < 0)
@@ -82,11 +87,10 @@ read_exactly(BPositionIO &file, off_t position, void *buffer, size_t size,
 	}
 }
 
-// write_exactly
-static
-void
-write_exactly(BPositionIO &file, off_t position, const void *buffer,
-			  size_t size, const char *errorMessage = NULL)
+
+static void
+write_exactly(BPositionIO& file, off_t position, const void* buffer,
+	size_t size, const char* errorMessage = NULL)
 {
 	ssize_t written = file.WriteAt(position, buffer, size);
 	if (written < 0)
@@ -100,27 +104,25 @@ write_exactly(BPositionIO &file, off_t position, const void *buffer,
 	}
 }
 
-// align_value
+
 template<typename TV, typename TA>
-static inline
-TV
-align_value(const TV &value, const TA &alignment)
+static inline TV
+align_value(const TV& value, const TA& alignment)
 {
 	return ((value + alignment - 1) / alignment) * alignment;
 }
 
-// calculate_checksum
-static
-uint32
-calculate_checksum(const void *data, uint32 size)
+
+static uint32
+calculate_checksum(const void* data, uint32 size)
 {
 	uint32 checkSum = 0;
-	const uint8 *csData = (const uint8*)data;
-	const uint8 *dataEnd = csData + size;
-	const uint8 *current = csData;
+	const uint8* csData = (const uint8*)data;
+	const uint8* dataEnd = csData + size;
+	const uint8* current = csData;
 	for (; current < dataEnd; current += 4) {
 		uint32 word = 0;
-		int32 bytes = min_c(4L, (int32)(dataEnd - current));
+		int32 bytes = std::min((int32)4, (int32)(dataEnd - current));
 		for (int32 i = 0; i < bytes; i++)
 			word = (word << 8) + current[i];
 		checkSum += word;
@@ -128,57 +130,51 @@ calculate_checksum(const void *data, uint32 size)
 	return checkSum;
 }
 
-// skip_bytes
-static inline
-const void*
-skip_bytes(const void *buffer, int32 offset)
+
+static inline const void*
+skip_bytes(const void* buffer, int32 offset)
 {
 	return (const char*)buffer + offset;
 }
 
-// skip_bytes
-static inline
-void*
-skip_bytes(void *buffer, int32 offset)
+
+static inline void*
+skip_bytes(void* buffer, int32 offset)
 {
 	return (char*)buffer + offset;
 }
 
-// fill_pattern
-static
-void
-fill_pattern(uint32 byteOffset, void *_buffer, uint32 count)
+
+static void
+fill_pattern(uint32 byteOffset, void* _buffer, uint32 count)
 {
-	uint32 *buffer = (uint32*)_buffer;
+	uint32* buffer = (uint32*)_buffer;
 	for (uint32 i = 0; i < count; i++)
 		buffer[i] = kUnusedResourceDataPattern[(byteOffset / 4 + i) % 3];
 }
 
-// fill_pattern
-static
-void
-fill_pattern(const void *dataBegin, void *buffer, uint32 count)
+
+static void
+fill_pattern(const void* dataBegin, void* buffer, uint32 count)
 {
 	fill_pattern((char*)buffer - (const char*)dataBegin, buffer, count);
 }
 
-// fill_pattern
-static
-void
-fill_pattern(const void *dataBegin, void *buffer, const void *bufferEnd)
+
+static void
+fill_pattern(const void* dataBegin, void* buffer, const void* bufferEnd)
 {
 	fill_pattern(dataBegin, buffer,
 				 ((const char*)bufferEnd - (char*)buffer) / 4);
 }
 
-// check_pattern
-static
-bool
-check_pattern(uint32 byteOffset, void *_buffer, uint32 count,
-			  bool hostEndianess)
+
+static bool
+check_pattern(uint32 byteOffset, void* _buffer, uint32 count,
+	bool hostEndianess)
 {
 	bool result = true;
-	uint32 *buffer = (uint32*)_buffer;
+	uint32* buffer = (uint32*)_buffer;
 	for (uint32 i = 0; result && i < count; i++) {
 		uint32 value = buffer[i];
 		if (!hostEndianess)
@@ -189,14 +185,17 @@ check_pattern(uint32 byteOffset, void *_buffer, uint32 count,
 	return result;
 }
 
-// MemArea
-struct MemArea {
-	MemArea(const void *data, uint32 size) : data(data), size(size) {}
 
-	inline bool check(const void *_current, uint32 skip = 0) const
+// #pragma mark -
+
+
+struct MemArea {
+	MemArea(const void* data, uint32 size) : data(data), size(size) {}
+
+	inline bool check(const void* _current, uint32 skip = 0) const
 	{
-		const char *start = (const char*)data;
-		const char *current = (const char*)_current;
+		const char* start = (const char*)data;
+		const char* current = (const char*)_current;
 		return (start <= current && start + size >= current + skip);
 	}
 
@@ -204,54 +203,38 @@ struct MemArea {
 	uint32		size;
 };
 
-// AutoDeleter
-template<typename C>
-struct AutoDeleter {
-	AutoDeleter(C *object, bool array = false) : object(object), array(array)
-	{
-	}
 
-	~AutoDeleter()
-	{
-		if (array)
-			delete[] object;
-		else
-			delete object;
-	}
-
-	C*		object;
-	bool	array;
-};
-
-// resource_parse_info
 struct resource_parse_info {
 	off_t				file_size;
 	int32				resource_count;
-	ResourcesContainer	*container;
-	char				*info_table;
+	ResourcesContainer*	container;
+	char*				info_table;
 	uint32				info_table_offset;
 	uint32				info_table_size;
 };
 
 
-// constructor
+// #pragma mark -
+
+
 ResourceFile::ResourceFile()
-			: fFile(),
-			  fFileType(FILE_TYPE_UNKNOWN),
-			  fHostEndianess(true),
-			  fEmptyResources(true)
+	:
+	fFile(),
+	fFileType(FILE_TYPE_UNKNOWN),
+	fHostEndianess(true),
+	fEmptyResources(true)
 {
 }
 
-// destructor
+
 ResourceFile::~ResourceFile()
 {
 	Unset();
 }
 
-// SetTo
+
 status_t
-ResourceFile::SetTo(BFile *file, bool clobber)
+ResourceFile::SetTo(BFile* file, bool clobber)
 {
 	status_t error = (file ? B_OK : B_BAD_VALUE);
 	Unset();
@@ -269,27 +252,26 @@ ResourceFile::SetTo(BFile *file, bool clobber)
 	return error;
 }
 
-// Unset
+
 void
 ResourceFile::Unset()
 {
-	// file
 	fFile.Unset();
 	fFileType = FILE_TYPE_UNKNOWN;
 	fHostEndianess = true;
 	fEmptyResources = true;
 }
 
-// InitCheck
+
 status_t
 ResourceFile::InitCheck() const
 {
 	return fFile.InitCheck();
 }
 
-// InitContainer
+
 status_t
-ResourceFile::InitContainer(ResourcesContainer &container)
+ResourceFile::InitContainer(ResourcesContainer& container)
 {
 	container.MakeEmpty();
 	status_t error = InitCheck();
@@ -321,16 +303,16 @@ ResourceFile::InitContainer(ResourcesContainer &container)
 	return error;
 }
 
-// ReadResource
+
 status_t
-ResourceFile::ReadResource(ResourceItem &resource, bool force)
+ResourceFile::ReadResource(ResourceItem& resource, bool force)
 {
 	status_t error = InitCheck();
 	size_t size = resource.DataSize();
 	if (error == B_OK && (force || !resource.IsLoaded())) {
 		if (error == B_OK)
 			error = resource.SetSize(size);
-		void *data = NULL;
+		void* data = NULL;
 		if (error == B_OK) {
 			data = resource.Data();
 			ssize_t bytesRead = fFile.ReadAt(resource.Offset(), data, size);
@@ -350,14 +332,14 @@ ResourceFile::ReadResource(ResourceItem &resource, bool force)
 	return error;
 }
 
-// ReadResources
+
 status_t
-ResourceFile::ReadResources(ResourcesContainer &container, bool force)
+ResourceFile::ReadResources(ResourcesContainer& container, bool force)
 {
 	status_t error = InitCheck();
 	int32 count = container.CountResources();
 	for (int32 i = 0; error == B_OK && i < count; i++) {
-		if (ResourceItem *resource = container.ResourceAt(i))
+		if (ResourceItem* resource = container.ResourceAt(i))
 			error = ReadResource(*resource, force);
 		else
 			error = B_ERROR;
@@ -365,9 +347,9 @@ ResourceFile::ReadResources(ResourcesContainer &container, bool force)
 	return error;
 }
 
-// WriteResources
+
 status_t
-ResourceFile::WriteResources(ResourcesContainer &container)
+ResourceFile::WriteResources(ResourcesContainer& container)
 {
 	status_t error = InitCheck();
 	if (error == B_OK && !fFile.File()->IsWritable())
@@ -382,9 +364,8 @@ ResourceFile::WriteResources(ResourcesContainer &container)
 }
 
 
-// _InitFile
 void
-ResourceFile::_InitFile(BFile &file, bool clobber)
+ResourceFile::_InitFile(BFile& file, bool clobber)
 {
 	status_t error = B_OK;
 	fFile.Unset();
@@ -414,7 +395,7 @@ ResourceFile::_InitFile(BFile &file, bool clobber)
 	} else if (!memcmp(magic, kPEFFileMagic1, 4)) {
 		PEFContainerHeader pefHeader;
 		read_exactly(file, 0, &pefHeader, kPEFContainerHeaderSize,
-					 "Failed to read PEF container header.");
+			"Failed to read PEF container header.");
 		if (!memcmp(pefHeader.tag2, kPPCResourceFileMagic, 4)) {
 			// PPC resource file
 			fHostEndianess = B_HOST_IS_BENDIAN;
@@ -461,22 +442,29 @@ ResourceFile::_InitFile(BFile &file, bool clobber)
 	}
 }
 
-// _InitELFFile
+
 void
-ResourceFile::_InitELFFile(BFile &file)
+ResourceFile::_InitELFFile(BFile& file)
 {
 	status_t error = B_OK;
+
 	// get the file size
 	off_t fileSize = 0;
 	error = file.GetSize(&fileSize);
 	if (error != B_OK)
 		throw Exception(error, "Failed to get the file size.");
-	// read ELF header
-	Elf32_Ehdr fileHeader;
-	read_exactly(file, 0, &fileHeader, sizeof(Elf32_Ehdr),
-				 "Failed to read ELF header.");
+
+	// read the ELF headers e_ident field
+	unsigned char identification[EI_NIDENT];
+	read_exactly(file, 0, identification, EI_NIDENT,
+		"Failed to read ELF identification.");
+
+	// check version
+	if (identification[EI_VERSION] != EV_CURRENT)
+		throw Exception(B_UNSUPPORTED, "Unsupported ELF version.");
+
 	// check data encoding (endianess)
-	switch (fileHeader.e_ident[EI_DATA]) {
+	switch (identification[EI_DATA]) {
 		case ELFDATA2LSB:
 			fHostEndianess = B_HOST_IS_LENDIAN;
 			break;
@@ -485,125 +473,156 @@ ResourceFile::_InitELFFile(BFile &file)
 			break;
 		default:
 		case ELFDATANONE:
-			throw Exception(B_IO_ERROR, "Unsupported ELF data encoding.");
-			break;
+			throw Exception(B_UNSUPPORTED, "Unsupported ELF data encoding.");
 	}
+
+	// check class (32/64 bit) and call the respective method handling it
+	switch (identification[EI_CLASS]) {
+		case ELFCLASS32:
+			_InitELFXFile<Elf32_Ehdr, Elf32_Phdr, Elf32_Shdr>(file, fileSize);
+			break;
+		case ELFCLASS64:
+			_InitELFXFile<Elf64_Ehdr, Elf64_Phdr, Elf64_Shdr>(file, fileSize);
+			break;
+		default:
+			throw Exception(B_UNSUPPORTED, "Unsupported ELF class.");
+	}
+}
+
+
+template<typename ElfHeader, typename ElfProgramHeader,
+	typename ElfSectionHeader>
+void
+ResourceFile::_InitELFXFile(BFile& file, uint64 fileSize)
+{
+	// read ELF header
+	ElfHeader fileHeader;
+	read_exactly(file, 0, &fileHeader, sizeof(ElfHeader),
+		"Failed to read ELF header.");
+
 	// get the header values
-	uint32 headerSize				= _GetUInt16(fileHeader.e_ehsize);
-	uint32 programHeaderTableOffset	= _GetUInt32(fileHeader.e_phoff);
-	uint32 programHeaderSize		= _GetUInt16(fileHeader.e_phentsize);
-	uint32 programHeaderCount		= _GetUInt16(fileHeader.e_phnum);
-	uint32 sectionHeaderTableOffset	= _GetUInt32(fileHeader.e_shoff);
-	uint32 sectionHeaderSize		= _GetUInt16(fileHeader.e_shentsize);
-	uint32 sectionHeaderCount		= _GetUInt16(fileHeader.e_shnum);
+	uint32 headerSize				= _GetInt(fileHeader.e_ehsize);
+	uint64 programHeaderTableOffset	= _GetInt(fileHeader.e_phoff);
+	uint32 programHeaderSize		= _GetInt(fileHeader.e_phentsize);
+	uint32 programHeaderCount		= _GetInt(fileHeader.e_phnum);
+	uint64 sectionHeaderTableOffset	= _GetInt(fileHeader.e_shoff);
+	uint32 sectionHeaderSize		= _GetInt(fileHeader.e_shentsize);
+	uint32 sectionHeaderCount		= _GetInt(fileHeader.e_shnum);
 	bool hasProgramHeaderTable = (programHeaderTableOffset != 0);
 	bool hasSectionHeaderTable = (sectionHeaderTableOffset != 0);
+
 	// check the sanity of the header values
 	// ELF header size
-	if (headerSize < sizeof(Elf32_Ehdr) || headerSize > kMaxELFHeaderSize) {
+	if (headerSize < sizeof(ElfHeader) || headerSize > kMaxELFHeaderSize) {
 		throw Exception(B_IO_ERROR,
-						"Invalid ELF header: invalid ELF header size: %lu.",
-						headerSize);
+			"Invalid ELF header: invalid ELF header size: %lu.", headerSize);
 	}
-	uint32 resourceOffset = headerSize;
-	uint32 resourceAlignment = 0;
+	uint64 resourceOffset = headerSize;
+	uint64 resourceAlignment = 0;
+
 	// program header table offset and entry count/size
-	uint32 programHeaderTableSize = 0;
+	uint64 programHeaderTableSize = 0;
 	if (hasProgramHeaderTable) {
 		if (programHeaderTableOffset < headerSize
 			|| programHeaderTableOffset > fileSize) {
 			throw Exception(B_IO_ERROR, "Invalid ELF header: invalid program "
-							"header table offset: %lu.",
-							programHeaderTableOffset);
+				"header table offset: %lu.", programHeaderTableOffset);
 		}
-		programHeaderTableSize = programHeaderSize * programHeaderCount;
-		if (programHeaderSize < sizeof(Elf32_Phdr)
+		programHeaderTableSize = (uint64)programHeaderSize * programHeaderCount;
+		if (programHeaderSize < sizeof(ElfProgramHeader)
 			|| programHeaderTableOffset + programHeaderTableSize > fileSize) {
 			throw Exception(B_IO_ERROR, "Invalid ELF header: program header "
-							"table exceeds file: %lu.",
-							programHeaderTableOffset + programHeaderTableSize);
+				"table exceeds file: %lu.",
+				programHeaderTableOffset + programHeaderTableSize);
 		}
-		resourceOffset = max_c(resourceOffset, programHeaderTableOffset
-			+ programHeaderTableSize);
+		resourceOffset = std::max(resourceOffset,
+			programHeaderTableOffset + programHeaderTableSize);
+
 		// iterate through the program headers
-		for (int32 i = 0; i < (int32)programHeaderCount; i++) {
-			uint32 shOffset = programHeaderTableOffset + i * programHeaderSize;
-			Elf32_Phdr programHeader;
-			read_exactly(file, shOffset, &programHeader, sizeof(Elf32_Shdr),
-						 "Failed to read ELF program header.");
+		for (uint32 i = 0; i < programHeaderCount; i++) {
+			uint64 shOffset = programHeaderTableOffset + i * programHeaderSize;
+			ElfProgramHeader programHeader;
+			read_exactly(file, shOffset, &programHeader,
+				sizeof(ElfProgramHeader), "Failed to read ELF program header.");
+
 			// get the header values
-			uint32 type			= _GetUInt32(programHeader.p_type);
-			uint32 offset		= _GetUInt32(programHeader.p_offset);
-			uint32 size			= _GetUInt32(programHeader.p_filesz);
-			uint32 alignment	= _GetUInt32(programHeader.p_align);
+			uint32 type			= _GetInt(programHeader.p_type);
+			uint64 offset		= _GetInt(programHeader.p_offset);
+			uint64 size			= _GetInt(programHeader.p_filesz);
+			uint64 alignment	= _GetInt(programHeader.p_align);
+
 			// check the values
 			// PT_NULL marks the header unused,
 			if (type != PT_NULL) {
 				if (/*offset < headerSize ||*/ offset > fileSize) {
 					throw Exception(B_IO_ERROR, "Invalid ELF program header: "
-									"invalid program offset: %lu.", offset);
+						"invalid program offset: %lu.", offset);
 				}
-				uint32 segmentEnd = offset + size;
+				uint64 segmentEnd = offset + size;
 				if (segmentEnd > fileSize) {
 					throw Exception(B_IO_ERROR, "Invalid ELF section header: "
-									"segment exceeds file: %lu.", segmentEnd);
+						"segment exceeds file: %lu.", segmentEnd);
 				}
-				resourceOffset = max_c(resourceOffset, segmentEnd);
-				resourceAlignment = max_c(resourceAlignment, alignment);
+				resourceOffset = std::max(resourceOffset, segmentEnd);
+				resourceAlignment = std::max(resourceAlignment, alignment);
 			}
 		}
 	}
+
 	// section header table offset and entry count/size
-	uint32 sectionHeaderTableSize = 0;
+	uint64 sectionHeaderTableSize = 0;
 	if (hasSectionHeaderTable) {
 		if (sectionHeaderTableOffset < headerSize
 			|| sectionHeaderTableOffset > fileSize) {
 			throw Exception(B_IO_ERROR, "Invalid ELF header: invalid section "
-							"header table offset: %lu.",
-							sectionHeaderTableOffset);
+				"header table offset: %lu.", sectionHeaderTableOffset);
 		}
-		sectionHeaderTableSize = sectionHeaderSize * sectionHeaderCount;
-		if (sectionHeaderSize < sizeof(Elf32_Shdr)
+		sectionHeaderTableSize = (uint64)sectionHeaderSize * sectionHeaderCount;
+		if (sectionHeaderSize < sizeof(ElfSectionHeader)
 			|| sectionHeaderTableOffset + sectionHeaderTableSize > fileSize) {
 			throw Exception(B_IO_ERROR, "Invalid ELF header: section header "
-							"table exceeds file: %lu.",
-							sectionHeaderTableOffset + sectionHeaderTableSize);
+				"table exceeds file: %lu.",
+				sectionHeaderTableOffset + sectionHeaderTableSize);
 		}
-		resourceOffset = max_c(resourceOffset, sectionHeaderTableOffset
-			+ sectionHeaderTableSize);
+		resourceOffset = std::max(resourceOffset,
+			sectionHeaderTableOffset + sectionHeaderTableSize);
+
 		// iterate through the section headers
-		for (int32 i = 0; i < (int32)sectionHeaderCount; i++) {
+		for (uint32 i = 0; i < sectionHeaderCount; i++) {
 			uint32 shOffset = sectionHeaderTableOffset + i * sectionHeaderSize;
-			Elf32_Shdr sectionHeader;
-			read_exactly(file, shOffset, &sectionHeader, sizeof(Elf32_Shdr),
-						 "Failed to read ELF section header.");
+			ElfSectionHeader sectionHeader;
+			read_exactly(file, shOffset, &sectionHeader,
+				sizeof(ElfSectionHeader), "Failed to read ELF section header.");
+
 			// get the header values
-			uint32 type		= _GetUInt32(sectionHeader.sh_type);
-			uint32 offset	= _GetUInt32(sectionHeader.sh_offset);
-			uint32 size		= _GetUInt32(sectionHeader.sh_size);
+			uint32 type		= _GetInt(sectionHeader.sh_type);
+			uint64 offset	= _GetInt(sectionHeader.sh_offset);
+			uint64 size		= _GetInt(sectionHeader.sh_size);
+
 			// check the values
 			// SHT_NULL marks the header unused,
 			// SHT_NOBITS sections take no space in the file
 			if (type != SHT_NULL && type != SHT_NOBITS) {
 				if (offset < headerSize || offset > fileSize) {
 					throw Exception(B_IO_ERROR, "Invalid ELF section header: "
-									"invalid section offset: %lu.", offset);
+						"invalid section offset: %lu.", offset);
 				}
-				uint32 sectionEnd = offset + size;
+				uint64 sectionEnd = offset + size;
 				if (sectionEnd > fileSize) {
 					throw Exception(B_IO_ERROR, "Invalid ELF section header: "
-									"section exceeds file: %lu.", sectionEnd);
+						"section exceeds file: %lu.", sectionEnd);
 				}
-				resourceOffset = max_c(resourceOffset, sectionEnd);
+				resourceOffset = std::max(resourceOffset, sectionEnd);
 			}
 		}
 	}
+
 	// align the offset
 	if (resourceAlignment < kELFMinResourceAlignment)
 		resourceAlignment = kELFMinResourceAlignment;
 	if (resourceAlignment > kELFMaxResourceAlignment) {
 		throw Exception(B_IO_ERROR, "The ELF object file requires an invalid "
-						"alignment: %lu.", resourceAlignment);
+			"alignment: %lu.", resourceAlignment);
 	}
 	resourceOffset = align_value(resourceOffset, resourceAlignment);
 	if (resourceOffset >= fileSize) {
@@ -611,13 +630,14 @@ ResourceFile::_InitELFFile(BFile &file)
 		fEmptyResources = true;
 	} else
 		fEmptyResources = false;
+
 	// fine, init the offset file
 	fFile.SetTo(&file, resourceOffset);
 }
 
-// _InitPEFFile
+
 void
-ResourceFile::_InitPEFFile(BFile &file, const PEFContainerHeader &pefHeader)
+ResourceFile::_InitPEFFile(BFile& file, const PEFContainerHeader& pefHeader)
 {
 	status_t error = B_OK;
 	// get the file size
@@ -630,7 +650,7 @@ ResourceFile::_InitPEFFile(BFile &file, const PEFContainerHeader &pefHeader)
 		throw Exception(B_IO_ERROR, "PEF file architecture is not PPC.");
 	fHostEndianess = B_HOST_IS_BENDIAN;
 	// get the section count
-	uint16 sectionCount = _GetUInt16(pefHeader.sectionCount);
+	uint16 sectionCount = _GetInt(pefHeader.sectionCount);
 	// iterate through the PEF sections headers
 	uint32 sectionHeaderTableOffset = kPEFContainerHeaderSize;
 	uint32 sectionHeaderTableEnd
@@ -640,21 +660,21 @@ ResourceFile::_InitPEFFile(BFile &file, const PEFContainerHeader &pefHeader)
 		uint32 shOffset = sectionHeaderTableOffset + i * kPEFSectionHeaderSize;
 		PEFSectionHeader sectionHeader;
 		read_exactly(file, shOffset, &sectionHeader, kPEFSectionHeaderSize,
-					 "Failed to read PEF section header.");
+			"Failed to read PEF section header.");
 		// get the header values
-		uint32 offset	= _GetUInt32(sectionHeader.containerOffset);
-		uint32 size		= _GetUInt32(sectionHeader.packedSize);
+		uint32 offset	= _GetInt(sectionHeader.containerOffset);
+		uint32 size		= _GetInt(sectionHeader.packedSize);
 		// check the values
 		if (offset < sectionHeaderTableEnd || offset > fileSize) {
 			throw Exception(B_IO_ERROR, "Invalid PEF section header: invalid "
-							"section offset: %lu.", offset);
+				"section offset: %lu.", offset);
 		}
 		uint32 sectionEnd = offset + size;
 		if (sectionEnd > fileSize) {
 			throw Exception(B_IO_ERROR, "Invalid PEF section header: section "
-							"exceeds file: %lu.", sectionEnd);
+				"exceeds file: %lu.", sectionEnd);
 		}
-		resourceOffset = max_c(resourceOffset, sectionEnd);
+		resourceOffset = std::max(resourceOffset, sectionEnd);
 	}
 	if (resourceOffset >= fileSize) {
 //		throw Exception("The PEF object file does not contain resources.");
@@ -665,21 +685,21 @@ ResourceFile::_InitPEFFile(BFile &file, const PEFContainerHeader &pefHeader)
 	fFile.SetTo(&file, resourceOffset);
 }
 
-// _ReadHeader
+
 void
-ResourceFile::_ReadHeader(resource_parse_info &parseInfo)
+ResourceFile::_ReadHeader(resource_parse_info& parseInfo)
 {
 	// read the header
 	resources_header header;
 	read_exactly(fFile, 0, &header, kResourcesHeaderSize,
-				 "Failed to read the header.");
+		"Failed to read the header.");
 	// check the header
 	// magic
-	uint32 magic = _GetUInt32(header.rh_resources_magic);
+	uint32 magic = _GetInt(header.rh_resources_magic);
 	if (magic == kResourcesHeaderMagic) {
 		// everything is fine
 	} else if (B_SWAP_INT32(magic) == kResourcesHeaderMagic) {
-//		const char *endianessStr[2] = { "little", "big" };
+//		const char* endianessStr[2] = { "little", "big" };
 //		int32 endianess
 //			= (fHostEndianess == ((bool)B_HOST_IS_LENDIAN ? 0 : 1));
 //		Warnings::AddCurrentWarning("Endianess seems to be %s, although %s "
@@ -690,94 +710,94 @@ ResourceFile::_ReadHeader(resource_parse_info &parseInfo)
 	} else
 		throw Exception(B_IO_ERROR, "Invalid resources header magic.");
 	// resource count
-	uint32 resourceCount = _GetUInt32(header.rh_resource_count);
+	uint32 resourceCount = _GetInt(header.rh_resource_count);
 	if (resourceCount > kMaxResourceCount)
 		throw Exception(B_IO_ERROR, "Bad number of resources.");
 	// index section offset
-	uint32 indexSectionOffset = _GetUInt32(header.rh_index_section_offset);
+	uint32 indexSectionOffset = _GetInt(header.rh_index_section_offset);
 	if (indexSectionOffset != kResourceIndexSectionOffset) {
 		throw Exception(B_IO_ERROR, "Unexpected resource index section "
-						"offset. Is: %lu, should be: %lu.", indexSectionOffset,
-						kResourceIndexSectionOffset);
+			"offset. Is: %lu, should be: %lu.", indexSectionOffset,
+			kResourceIndexSectionOffset);
 	}
 	// admin section size
 	uint32 indexSectionSize = kResourceIndexSectionHeaderSize
 							  + kResourceIndexEntrySize * resourceCount;
 	indexSectionSize = align_value(indexSectionSize,
 								   kResourceIndexSectionAlignment);
-	uint32 adminSectionSize = _GetUInt32(header.rh_admin_section_size);
+	uint32 adminSectionSize = _GetInt(header.rh_admin_section_size);
 	if (adminSectionSize != indexSectionOffset + indexSectionSize) {
 		throw Exception(B_IO_ERROR, "Unexpected resource admin section size. "
-						"Is: %lu, should be: %lu.", adminSectionSize,
-						indexSectionOffset + indexSectionSize);
+			"Is: %lu, should be: %lu.", adminSectionSize,
+			indexSectionOffset + indexSectionSize);
 	}
 	// set the resource count
 	parseInfo.resource_count = resourceCount;
 }
 
-// _ReadIndex
+
 void
-ResourceFile::_ReadIndex(resource_parse_info &parseInfo)
+ResourceFile::_ReadIndex(resource_parse_info& parseInfo)
 {
-	int32 &resourceCount = parseInfo.resource_count;
-	off_t &fileSize = parseInfo.file_size;
+	int32& resourceCount = parseInfo.resource_count;
+	off_t& fileSize = parseInfo.file_size;
 	// read the header
 	resource_index_section_header header;
 	read_exactly(fFile, kResourceIndexSectionOffset, &header,
-				 kResourceIndexSectionHeaderSize,
-				 "Failed to read the resource index section header.");
+		kResourceIndexSectionHeaderSize,
+		"Failed to read the resource index section header.");
 	// check the header
 	// index section offset
-	uint32 indexSectionOffset = _GetUInt32(header.rish_index_section_offset);
+	uint32 indexSectionOffset = _GetInt(header.rish_index_section_offset);
 	if (indexSectionOffset != kResourceIndexSectionOffset) {
 		throw Exception(B_IO_ERROR, "Unexpected resource index section "
-						"offset. Is: %lu, should be: %lu.", indexSectionOffset,
-						kResourceIndexSectionOffset);
+			"offset. Is: %lu, should be: %lu.", indexSectionOffset,
+			kResourceIndexSectionOffset);
 	}
 	// index section size
 	uint32 expectedIndexSectionSize = kResourceIndexSectionHeaderSize
 		+ kResourceIndexEntrySize * resourceCount;
 	expectedIndexSectionSize = align_value(expectedIndexSectionSize,
 										   kResourceIndexSectionAlignment);
-	uint32 indexSectionSize = _GetUInt32(header.rish_index_section_size);
+	uint32 indexSectionSize = _GetInt(header.rish_index_section_size);
 	if (indexSectionSize != expectedIndexSectionSize) {
 		throw Exception(B_IO_ERROR, "Unexpected resource index section size. "
-						"Is: %lu, should be: %lu.", indexSectionSize,
-						expectedIndexSectionSize);
+			"Is: %lu, should be: %lu.", indexSectionSize,
+			expectedIndexSectionSize);
 	}
 	// unknown section offset
 	uint32 unknownSectionOffset
-		= _GetUInt32(header.rish_unknown_section_offset);
+		= _GetInt(header.rish_unknown_section_offset);
 	if (unknownSectionOffset != indexSectionOffset + indexSectionSize) {
 		throw Exception(B_IO_ERROR, "Unexpected resource index section size. "
-						"Is: %lu, should be: %lu.", unknownSectionOffset,
-						indexSectionOffset + indexSectionSize);
+			"Is: %lu, should be: %lu.", unknownSectionOffset,
+			indexSectionOffset + indexSectionSize);
 	}
 	// unknown section size
-	uint32 unknownSectionSize = _GetUInt32(header.rish_unknown_section_size);
+	uint32 unknownSectionSize = _GetInt(header.rish_unknown_section_size);
 	if (unknownSectionSize != kUnknownResourceSectionSize) {
 		throw Exception(B_IO_ERROR, "Unexpected resource index section "
-						"offset. Is: %lu, should be: %lu.",
-						unknownSectionOffset, kUnknownResourceSectionSize);
+			"offset. Is: %lu, should be: %lu.",
+			unknownSectionOffset, kUnknownResourceSectionSize);
 	}
 	// info table offset and size
-	uint32 infoTableOffset = _GetUInt32(header.rish_info_table_offset);
-	uint32 infoTableSize = _GetUInt32(header.rish_info_table_size);
+	uint32 infoTableOffset = _GetInt(header.rish_info_table_offset);
+	uint32 infoTableSize = _GetInt(header.rish_info_table_size);
 	if (infoTableOffset + infoTableSize > fileSize)
 		throw Exception(B_IO_ERROR, "Invalid info table location.");
 	parseInfo.info_table_offset = infoTableOffset;
 	parseInfo.info_table_size = infoTableSize;
 	// read the index entries
 	uint32 indexTableOffset = indexSectionOffset
-							  + kResourceIndexSectionHeaderSize;
+		+ kResourceIndexSectionHeaderSize;
 	int32 maxResourceCount = (unknownSectionOffset - indexTableOffset)
-							 / kResourceIndexEntrySize;
+		/ kResourceIndexEntrySize;
 	int32 actualResourceCount = 0;
 	bool tableEndReached = false;
 	for (int32 i = 0; !tableEndReached && i < maxResourceCount; i++) {
 		// read one entry
 		tableEndReached = !_ReadIndexEntry(parseInfo, i, indexTableOffset,
-										   (i >= resourceCount));
+			(i >= resourceCount));
 		if (!tableEndReached)
 			actualResourceCount++;
 	}
@@ -793,22 +813,22 @@ ResourceFile::_ReadIndex(resource_parse_info &parseInfo)
 	}
 }
 
-// _ReadIndexEntry
+
 bool
-ResourceFile::_ReadIndexEntry(resource_parse_info &parseInfo, int32 index,
-							  uint32 tableOffset, bool peekAhead)
+ResourceFile::_ReadIndexEntry(resource_parse_info& parseInfo, int32 index,
+	uint32 tableOffset, bool peekAhead)
 {
-	off_t &fileSize = parseInfo.file_size;
+	off_t& fileSize = parseInfo.file_size;
 	//
 	bool result = true;
 	resource_index_entry entry;
 	// read one entry
 	off_t entryOffset = tableOffset + index * kResourceIndexEntrySize;
 	read_exactly(fFile, entryOffset, &entry, kResourceIndexEntrySize,
-				 "Failed to read a resource index entry.");
+		"Failed to read a resource index entry.");
 	// check, if the end is reached early
 	if (result && check_pattern(entryOffset, &entry,
-								kResourceIndexEntrySize / 4, fHostEndianess)) {
+			kResourceIndexEntrySize / 4, fHostEndianess)) {
 		if (!peekAhead) {
 //			Warnings::AddCurrentWarning("Unexpected end of resource index "
 //										"table at index: %ld (/%ld).",
@@ -816,8 +836,8 @@ ResourceFile::_ReadIndexEntry(resource_parse_info &parseInfo, int32 index,
 		}
 		result = false;
 	}
-	uint32 offset = _GetUInt32(entry.rie_offset);
-	uint32 size = _GetUInt32(entry.rie_size);
+	uint32 offset = _GetInt(entry.rie_offset);
+	uint32 size = _GetInt(entry.rie_size);
 	// check the location
 	if (result && offset + size > fileSize) {
 		if (peekAhead) {
@@ -825,14 +845,14 @@ ResourceFile::_ReadIndexEntry(resource_parse_info &parseInfo, int32 index,
 //										"table.");
 		} else {
 			throw Exception(B_IO_ERROR, "Invalid resource index entry: index: "
-							"%ld, offset: %lu (%lx), size: %lu (%lx).",
-							index + 1, offset, offset, size, size);
+				"%ld, offset: %lu (%lx), size: %lu (%lx).", index + 1, offset,
+				offset, size, size);
 		}
 		result = false;
 	}
 	// add the entry
 	if (result) {
-		ResourceItem *item = new(std::nothrow) ResourceItem;
+		ResourceItem* item = new(std::nothrow) ResourceItem;
 		if (!item)
 			throw Exception(B_NO_MEMORY);
 		item->SetLocation(offset, size);
@@ -844,30 +864,30 @@ ResourceFile::_ReadIndexEntry(resource_parse_info &parseInfo, int32 index,
 	return result;
 }
 
-// _ReadInfoTable
+
 void
-ResourceFile::_ReadInfoTable(resource_parse_info &parseInfo)
+ResourceFile::_ReadInfoTable(resource_parse_info& parseInfo)
 {
-	int32 &resourceCount = parseInfo.resource_count;
+	int32& resourceCount = parseInfo.resource_count;
 	// read the info table
 	// alloc memory for the table
-	char *tableData = new(std::nothrow) char[parseInfo.info_table_size];
+	char* tableData = new(std::nothrow) char[parseInfo.info_table_size];
 	if (!tableData)
 		throw Exception(B_NO_MEMORY);
 	int32 dataSize = parseInfo.info_table_size;
 	parseInfo.info_table = tableData;	// freed by the info owner
 	read_exactly(fFile, parseInfo.info_table_offset, tableData, dataSize,
-				 "Failed to read resource info table.");
+		"Failed to read resource info table.");
 	//
-	bool *readIndices = new(std::nothrow) bool[resourceCount + 1];
+	bool* readIndices = new(std::nothrow) bool[resourceCount + 1];
 		// + 1 => always > 0
 	if (!readIndices)
 		throw Exception(B_NO_MEMORY);
-	AutoDeleter<bool> readIndicesDeleter(readIndices, true);
+	ArrayDeleter<bool> readIndicesDeleter(readIndices);
 	for (int32 i = 0; i < resourceCount; i++)
 		readIndices[i] = false;
 	MemArea area(tableData, dataSize);
-	const void *data = tableData;
+	const void* data = tableData;
 	// check the table end/check sum
 	if (_ReadInfoTableEnd(data, dataSize))
 		dataSize -= kResourceInfoTableEndSize;
@@ -879,24 +899,24 @@ ResourceFile::_ReadInfoTable(resource_parse_info &parseInfo)
 		// read a resource block
 		if (!area.check(data, kMinResourceInfoBlockSize)) {
 			throw Exception(B_IO_ERROR, "Unexpected end of resource info "
-							"table at index %ld.", resourceIndex);
+				"table at index %ld.", resourceIndex);
 		}
-		const resource_info_block *infoBlock
+		const resource_info_block* infoBlock
 			= (const resource_info_block*)data;
-		type_code type = _GetUInt32(infoBlock->rib_type);
+		type_code type = _GetInt(infoBlock->rib_type);
 		// read the infos of this block
-		const resource_info *info = infoBlock->rib_info;
+		const resource_info* info = infoBlock->rib_info;
 		while (info) {
 			data = _ReadResourceInfo(parseInfo, area, info, type, readIndices);
 			// prepare for next iteration, if there is another info
 			if (!area.check(data, kResourceInfoSeparatorSize)) {
 				throw Exception(B_IO_ERROR, "Unexpected end of resource info "
-								"table after index %ld.", resourceIndex);
+					"table after index %ld.", resourceIndex);
 			}
-			const resource_info_separator *separator
+			const resource_info_separator* separator
 				= (const resource_info_separator*)data;
-			if (_GetUInt32(separator->ris_value1) == 0xffffffff
-				&& _GetUInt32(separator->ris_value2) == 0xffffffff) {
+			if (_GetInt(separator->ris_value1) == 0xffffffff
+				&& _GetInt(separator->ris_value2) == 0xffffffff) {
 				// info block ends
 				info = NULL;
 				data = skip_bytes(data, kResourceInfoSeparatorSize);
@@ -912,14 +932,14 @@ ResourceFile::_ReadInfoTable(resource_parse_info &parseInfo)
 	if (resourceIndex == 1) {
 		if (!area.check(data, kResourceInfoSeparatorSize)) {
 			throw Exception(B_IO_ERROR, "Unexpected end of resource info "
-							"table.");
+				"table.");
 		}
-		const resource_info_separator *tableTerminator
+		const resource_info_separator* tableTerminator
 			= (const resource_info_separator*)data;
-		if (_GetUInt32(tableTerminator->ris_value1) != 0xffffffff
-			|| _GetUInt32(tableTerminator->ris_value2) != 0xffffffff) {
+		if (_GetInt(tableTerminator->ris_value1) != 0xffffffff
+			|| _GetInt(tableTerminator->ris_value2) != 0xffffffff) {
 			throw Exception(B_IO_ERROR, "The resource info table ought to be "
-							"empty, but is not properly terminated.");
+				"empty, but is not properly terminated.");
 		}
 		data = skip_bytes(data, kResourceInfoSeparatorSize);
 	}
@@ -927,23 +947,23 @@ ResourceFile::_ReadInfoTable(resource_parse_info &parseInfo)
 	uint32 bytesLeft = (const char*)tableData + dataSize - (const char*)data;
 	if (bytesLeft != 0) {
 		throw Exception(B_IO_ERROR, "Error at the end of the resource info "
-						"table: %lu bytes are remaining.", bytesLeft);
+			"table: %lu bytes are remaining.", bytesLeft);
 	}
 	// check, if all items have been initialized
 	for (int32 i = resourceCount - 1; i >= 0; i--) {
 		if (!readIndices[i]) {
 //			Warnings::AddCurrentWarning("Resource item at index %ld "
 //										"has no info. Item removed.", i + 1);
-			if (ResourceItem *item = parseInfo.container->RemoveResource(i))
+			if (ResourceItem* item = parseInfo.container->RemoveResource(i))
 				delete item;
 			resourceCount--;
 		}
 	}
 }
 
-// _ReadInfoTableEnd
+
 bool
-ResourceFile::_ReadInfoTableEnd(const void *data, int32 dataSize)
+ResourceFile::_ReadInfoTableEnd(const void* data, int32 dataSize)
 {
 	bool hasTableEnd = true;
 	if ((uint32)dataSize < kResourceInfoSeparatorSize)
@@ -951,20 +971,20 @@ ResourceFile::_ReadInfoTableEnd(const void *data, int32 dataSize)
 	if ((uint32)dataSize < kResourceInfoTableEndSize)
 		hasTableEnd = false;
 	if (hasTableEnd) {
-		const resource_info_table_end *tableEnd
+		const resource_info_table_end* tableEnd
 			= (const resource_info_table_end*)
 			  skip_bytes(data, dataSize - kResourceInfoTableEndSize);
-		if (_GetInt32(tableEnd->rite_terminator) != 0)
+		if (_GetInt(tableEnd->rite_terminator) != 0)
 			hasTableEnd = false;
 		if (hasTableEnd) {
 			dataSize -= kResourceInfoTableEndSize;
 			// checksum
 			uint32 checkSum = calculate_checksum(data, dataSize);
-			uint32 fileCheckSum = _GetUInt32(tableEnd->rite_check_sum);
+			uint32 fileCheckSum = _GetInt(tableEnd->rite_check_sum);
 			if (checkSum != fileCheckSum) {
 				throw Exception(B_IO_ERROR, "Invalid resource info table check"
-								" sum: In file: %lx, calculated: %lx.",
-								fileCheckSum, checkSum);
+					" sum: In file: %lx, calculated: %lx.", fileCheckSum,
+					checkSum);
 			}
 		}
 	}
@@ -973,18 +993,17 @@ ResourceFile::_ReadInfoTableEnd(const void *data, int32 dataSize)
 	return hasTableEnd;
 }
 
-// _ReadResourceInfo
+
 const void*
-ResourceFile::_ReadResourceInfo(resource_parse_info &parseInfo, 
-								const MemArea &area, const resource_info *info,
-								type_code type, bool *readIndices)
+ResourceFile::_ReadResourceInfo(resource_parse_info& parseInfo,
+	const MemArea& area, const resource_info* info, type_code type,
+	bool* readIndices)
 {
-	int32 &resourceCount = parseInfo.resource_count;
-	//
-	int32 id = _GetInt32(info->ri_id);
-	int32 index = _GetInt32(info->ri_index);
-	uint16 nameSize = _GetUInt16(info->ri_name_size);
-	const char *name = info->ri_name;
+	int32& resourceCount = parseInfo.resource_count;
+	int32 id = _GetInt(info->ri_id);
+	int32 index = _GetInt(info->ri_index);
+	uint16 nameSize = _GetInt(info->ri_name_size);
+	const char* name = info->ri_name;
 	// check the values
 	bool ignore = false;
 	// index
@@ -996,14 +1015,14 @@ ResourceFile::_ReadResourceInfo(resource_parse_info &parseInfo,
 	if (!ignore) {
 		if (readIndices[index - 1]) {
 			throw Exception(B_IO_ERROR, "Multiple resource infos with the "
-							"same index field: %ld.", index);
+				"same index field: %ld.", index);
 		}
 		readIndices[index - 1] = true;
 	}
 	// name size
 	if (!area.check(name, nameSize)) {
 		throw Exception(B_IO_ERROR, "Invalid name size (%d) for index %ld in "
-						"resource info table.", (int)nameSize, index);
+			"resource info table.", (int)nameSize, index);
 	}
 	// check, if name is null terminated
 	if (name[nameSize - 1] != 0) {
@@ -1014,23 +1033,23 @@ ResourceFile::_ReadResourceInfo(resource_parse_info &parseInfo,
 	// set the values
 	if (!ignore) {
 		BString resourceName(name, nameSize);
-		if (ResourceItem *item = parseInfo.container->ResourceAt(index - 1))
+		if (ResourceItem* item = parseInfo.container->ResourceAt(index - 1))
 			item->SetIdentity(type, id, resourceName.String());
 		else {
 			throw Exception(B_IO_ERROR, "Unexpected error: No resource item "
-							"at index %ld.", index);
+				"at index %ld.", index);
 		}
 	}
 	return skip_bytes(name, nameSize);
 }
 
-// _WriteResources
+
 status_t
-ResourceFile::_WriteResources(ResourcesContainer &container)
+ResourceFile::_WriteResources(ResourcesContainer& container)
 {
 	status_t error = B_OK;
 	int32 resourceCount = container.CountResources();
-	char *buffer = NULL;
+	char* buffer = NULL;
 	try {
 		// calculate sizes and offsets
 		// header
@@ -1041,23 +1060,23 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		uint32 indexSectionSize = kResourceIndexSectionHeaderSize
 			+ resourceCount * kResourceIndexEntrySize;
 		indexSectionSize = align_value(indexSectionSize,
-									   kResourceIndexSectionAlignment);
+			kResourceIndexSectionAlignment);
 		size += indexSectionSize;
-		bufferSize = max_c((uint32)bufferSize, indexSectionSize);
+		bufferSize = std::max((uint32)bufferSize, indexSectionSize);
 		// unknown section
 		uint32 unknownSectionOffset = size;
 		uint32 unknownSectionSize = kUnknownResourceSectionSize;
 		size += unknownSectionSize;
-		bufferSize = max_c((uint32)bufferSize, unknownSectionSize);
+		bufferSize = std::max((uint32)bufferSize, unknownSectionSize);
 		// data
 		uint32 dataOffset = size;
 		uint32 dataSize = 0;
 		for (int32 i = 0; i < resourceCount; i++) {
-			ResourceItem *item = container.ResourceAt(i);
+			ResourceItem* item = container.ResourceAt(i);
 			if (!item->IsLoaded())
 				throw Exception(B_IO_ERROR, "Resource is not loaded.");
 			dataSize += item->DataSize();
-			bufferSize = max_c(bufferSize, item->DataSize());
+			bufferSize = std::max(bufferSize, item->DataSize());
 		}
 		size += dataSize;
 		// info table
@@ -1065,7 +1084,7 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		uint32 infoTableSize = 0;
 		type_code type = 0;
 		for (int32 i = 0; i < resourceCount; i++) {
-			ResourceItem *item = container.ResourceAt(i);
+			ResourceItem* item = container.ResourceAt(i);
 			if (i == 0 || type != item->Type()) {
 				if (i != 0)
 					infoTableSize += kResourceInfoSeparatorSize;
@@ -1074,14 +1093,14 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 			} else
 				infoTableSize += kMinResourceInfoSize;
 
-			const char *name = item->Name();	
+			const char* name = item->Name();
 			if (name && name[0] != '\0')
 				infoTableSize += strlen(name) + 1;
 		}
 		infoTableSize += kResourceInfoSeparatorSize
-						 + kResourceInfoTableEndSize;
+			+ kResourceInfoTableEndSize;
 		size += infoTableSize;
-		bufferSize = max_c((uint32)bufferSize, infoTableSize);
+		bufferSize = std::max((uint32)bufferSize, infoTableSize);
 
 		// write...
 		// set the file size
@@ -1089,9 +1108,9 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		buffer = new(std::nothrow) char[bufferSize];
 		if (!buffer)
 			throw Exception(B_NO_MEMORY);
-		void *data = buffer;
+		void* data = buffer;
 		// header
-		resources_header *resourcesHeader = (resources_header*)data;
+		resources_header* resourcesHeader = (resources_header*)data;
 		resourcesHeader->rh_resources_magic = kResourcesHeaderMagic;
 		resourcesHeader->rh_resource_count = resourceCount;
 		resourcesHeader->rh_index_section_offset = indexSectionOffset;
@@ -1100,11 +1119,11 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		for (int32 i = 0; i < 13; i++)
 			resourcesHeader->rh_pad[i] = 0;
 		write_exactly(fFile, 0, buffer, kResourcesHeaderSize,
-					  "Failed to write resources header.");
+			"Failed to write resources header.");
 		// index section
 		data = buffer;
 		// header
-		resource_index_section_header *indexHeader
+		resource_index_section_header* indexHeader
 			= (resource_index_section_header*)data;
 		indexHeader->rish_index_section_offset = indexSectionOffset;
 		indexHeader->rish_index_section_size = indexSectionSize;
@@ -1113,17 +1132,17 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		indexHeader->rish_info_table_offset = infoTableOffset;
 		indexHeader->rish_info_table_size = infoTableSize;
 		fill_pattern(buffer - indexSectionOffset,
-					 &indexHeader->rish_unused_data1, 1);
+			&indexHeader->rish_unused_data1, 1);
 		fill_pattern(buffer - indexSectionOffset,
-					 indexHeader->rish_unused_data2, 25);
+			indexHeader->rish_unused_data2, 25);
 		fill_pattern(buffer - indexSectionOffset,
-					 &indexHeader->rish_unused_data3, 1);
+			&indexHeader->rish_unused_data3, 1);
 		// index table
 		data = skip_bytes(data, kResourceIndexSectionHeaderSize);
-		resource_index_entry *entry = (resource_index_entry*)data;
+		resource_index_entry* entry = (resource_index_entry*)data;
 		uint32 entryOffset = dataOffset;
 		for (int32 i = 0; i < resourceCount; i++, entry++) {
-			ResourceItem *item = container.ResourceAt(i);
+			ResourceItem* item = container.ResourceAt(i);
 			uint32 entrySize = item->DataSize();
 			entry->rie_offset = entryOffset;
 			entry->rie_size = entrySize;
@@ -1131,19 +1150,19 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 			entryOffset += entrySize;
 		}
 		fill_pattern(buffer - indexSectionOffset, entry,
-					 buffer + indexSectionSize);
+			buffer + indexSectionSize);
 		write_exactly(fFile, indexSectionOffset, buffer, indexSectionSize,
-					  "Failed to write index section.");
+			"Failed to write index section.");
 		// unknown section
 		fill_pattern(unknownSectionOffset, buffer, unknownSectionSize / 4);
 		write_exactly(fFile, unknownSectionOffset, buffer, unknownSectionSize,
-					  "Failed to write unknown section.");
+			"Failed to write unknown section.");
 		// data
 		uint32 itemOffset = dataOffset;
 		for (int32 i = 0; i < resourceCount; i++) {
 			data = buffer;
-			ResourceItem *item = container.ResourceAt(i);
-			const void *itemData = item->Data();
+			ResourceItem* item = container.ResourceAt(i);
+			const void* itemData = item->Data();
 			uint32 itemSize = item->DataSize();
 			if (!itemData && itemSize > 0)
 				throw Exception(error, "Invalid resource item data.");
@@ -1155,7 +1174,7 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 					itemData = data;
 				}
 				write_exactly(fFile, itemOffset, itemData, itemSize,
-							  "Failed to write resource item data.");
+					"Failed to write resource item data.");
 			}
 			item->SetOffset(itemOffset);
 			itemOffset += itemSize;
@@ -1164,18 +1183,18 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		data = buffer;
 		type = 0;
 		for (int32 i = 0; i < resourceCount; i++) {
-			ResourceItem *item = container.ResourceAt(i);
-			resource_info *info = NULL;
+			ResourceItem* item = container.ResourceAt(i);
+			resource_info* info = NULL;
 			if (i == 0 || type != item->Type()) {
 				if (i != 0) {
-					resource_info_separator *separator
+					resource_info_separator* separator
 						= (resource_info_separator*)data;
 					separator->ris_value1 = 0xffffffff;
 					separator->ris_value2 = 0xffffffff;
 					data = skip_bytes(data, kResourceInfoSeparatorSize);
 				}
 				type = item->Type();
-				resource_info_block *infoBlock = (resource_info_block*)data;
+				resource_info_block* infoBlock = (resource_info_block*)data;
 				infoBlock->rib_type = type;
 				info = infoBlock->rib_info;
 			} else
@@ -1186,7 +1205,7 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 			info->ri_name_size = 0;
 			data = info->ri_name;
 
-			const char *name = item->Name();
+			const char* name = item->Name();
 			if (name && name[0] != '\0') {
 				uint32 nameLen = strlen(name);
 				memcpy(info->ri_name, name, nameLen + 1);
@@ -1195,17 +1214,17 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 			}
 		}
 		// separator
-		resource_info_separator *separator = (resource_info_separator*)data;
+		resource_info_separator* separator = (resource_info_separator*)data;
 		separator->ris_value1 = 0xffffffff;
 		separator->ris_value2 = 0xffffffff;
 		// table end
 		data = skip_bytes(data, kResourceInfoSeparatorSize);
-		resource_info_table_end *tableEnd = (resource_info_table_end*)data;
+		resource_info_table_end* tableEnd = (resource_info_table_end*)data;
 		tableEnd->rite_check_sum = calculate_checksum(buffer,
 			infoTableSize - kResourceInfoTableEndSize);
 		tableEnd->rite_terminator = 0;
 		write_exactly(fFile, infoTableOffset, buffer, infoTableSize,
-					  "Failed to write info table.");
+			"Failed to write info table.");
 	} catch (Exception exception) {
 		if (exception.Error() != B_OK)
 			error = exception.Error();
@@ -1216,7 +1235,7 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 	return error;
 }
 
-// _MakeEmptyResourceFile
+
 status_t
 ResourceFile::_MakeEmptyResourceFile()
 {
@@ -1225,13 +1244,13 @@ ResourceFile::_MakeEmptyResourceFile()
 		error = B_NOT_ALLOWED;
 	if (error == B_OK) {
 		try {
-			BFile *file = fFile.File();
+			BFile* file = fFile.File();
 			// make it an x86 resource file
 			error = file->SetSize(4);
 			if (error != B_OK)
 				throw Exception(error, "Failed to set file size.");
 			write_exactly(*file, 0, kX86ResourceFileMagic, 4,
-						  "Failed to write magic number.");
+				"Failed to write magic number.");
 			fHostEndianess = B_HOST_IS_LENDIAN;
 			fFileType = FILE_TYPE_X86_RESOURCE;
 			fFile.SetTo(file, kX86ResourcesOffset);
@@ -1249,7 +1268,3 @@ ResourceFile::_MakeEmptyResourceFile()
 
 };	// namespace Storage
 };	// namespace BPrivate
-
-
-
-
