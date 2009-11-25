@@ -1366,6 +1366,11 @@ ShutdownProcess::_WaitForApp(team_id team, AppInfoList* list, bool systemApps)
 			return false;
 
 		if (event == ABORT_EVENT) {
+			if (eventTeam == -1) {
+				// The user canceled the shutdown process by pressing the
+				// Cancel button.
+				throw_error(B_SHUTDOWN_CANCELLED);
+			}
 			if (systemApps) {
 				// If the app requests aborting the shutdown, we don't need
 				// to wait any longer. It has processed the request and
@@ -1373,10 +1378,11 @@ ShutdownProcess::_WaitForApp(team_id team, AppInfoList* list, bool systemApps)
 				if (eventTeam == team)
 					return false;
 			} else {
+				// The app returned false in QuitRequested().
 				PRINT(("ShutdownProcess::_WaitForApp(): shutdown cancelled "
 					"by team %ld (-1 => user)\n", eventTeam));
 
-				_DisplayAbortingApp(eventTeam);
+				_DisplayAbortingApp(team);
 				throw_error(B_SHUTDOWN_CANCELLED);
 			}
 		}
@@ -1708,6 +1714,8 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList& list, team_id team,
 					PRINT(("ShutdownProcess::_QuitBlockingApp(): shutdown "
 						"cancelled by team %ld (-1 => user)\n", eventTeam));
 
+					if (!debugged)
+						_DisplayAbortingApp(team);
 					throw_error(B_SHUTDOWN_CANCELLED);
 				}
 
