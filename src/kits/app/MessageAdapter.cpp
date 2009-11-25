@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 
+
 namespace BPrivate {
 
 #define R5_MESSAGE_FLAG_VALID			0x01
@@ -40,7 +41,7 @@ enum {
 struct r5_message_header {
 	uint32	magic;
 	uint32	checksum;
-	ssize_t	flattened_size;
+	int32	flattened_size;
 	int32	what;
 	uint8	flags;
 } _PACKED;
@@ -48,7 +49,7 @@ struct r5_message_header {
 
 struct dano_section_header {
 	uint32		code;
-	ssize_t		size;
+	int32		size;
 	uint8		data[0];
 } _PACKED;
 
@@ -68,7 +69,7 @@ typedef struct offset_table_s {
 
 struct dano_single_item {
 	type_code	type;
-	ssize_t		item_size;
+	int32		item_size;
 	uint8		name_length;
 	char		name[0];
 } _PACKED;
@@ -76,7 +77,7 @@ struct dano_single_item {
 
 struct dano_fixed_size_array {
 	type_code	type;
-	ssize_t		size_per_item;
+	int32		size_per_item;
 	uint8		name_length;
 	char		name[0];
 } _PACKED;
