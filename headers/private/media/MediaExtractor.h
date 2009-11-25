@@ -1,6 +1,8 @@
 /*
  * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
  * Copyright 2008, Maurice Kalinowski. All rights reserved.
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ *
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MEDIA_EXTRACTOR_H
@@ -14,7 +16,10 @@
 namespace BPrivate {
 namespace media {
 
+
 class ChunkCache;
+struct chunk_buffer;
+
 
 struct stream_info {
 	status_t		status;
@@ -23,8 +28,10 @@ struct stream_info {
 	const void*		infoBuffer;
 	size_t			infoBufferSize;
 	ChunkCache*		chunkCache;
+	chunk_buffer*	lastChunk;
 	media_format	encodedFormat;
 };
+
 
 class MediaExtractor {
 public:
@@ -58,6 +65,7 @@ public:
 									media_codec_info* codecInfo);
 
 private:
+			void				_RecycleLastChunk(stream_info& info);
 	static	int32				_ExtractorEntry(void* arg);
 			void				_ExtractorThread();
 
@@ -66,7 +74,6 @@ private:
 
 			sem_id				fExtractorWaitSem;
 			thread_id			fExtractorThread;
-			volatile bool		fTerminateExtractor;
 
 			BDataIO*			fSource;
 			Reader*				fReader;

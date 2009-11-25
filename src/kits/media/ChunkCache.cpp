@@ -1,143 +1,144 @@
 /*
- * Copyright 2004, Marcus Overhagen. All rights reserved.
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "ChunkCache.h"
 
-#include <string.h>
+#include <new>
+#include <stdlib.h>
 
-#include <Autolock.h>
-
-#include "debug.h"
+#include <Debug.h>
 
 
-ChunkCache::ChunkCache()
+chunk_buffer::chunk_buffer()
 	:
-	fLocker("media chunk cache locker")
+	buffer(NULL),
+	size(0),
+	capacity(0)
 {
-	// fEmptyChunkCount must be one less than the real chunk count,
-	// because the buffer returned by GetNextChunk must be preserved
-	// until the next call of that function, and must not be overwritten.
+}
 
-	fEmptyChunkCount = CHUNK_COUNT - 1;
-	fReadyChunkCount = 0;
-	fNeedsRefill = 1;
 
-	fGetWaitSem = create_sem(0, "media chunk cache sem");
+chunk_buffer::~chunk_buffer()
+{
+	free(buffer);
+}
 
-	fNextPut = &fChunkInfos[0];
-	fNextGet = &fChunkInfos[0];
 
-	for (int i = 0; i < CHUNK_COUNT; i++) {
-		fChunkInfos[i].next = i == CHUNK_COUNT - 1
-			? &fChunkInfos[0] : &fChunkInfos[i + 1];
-		fChunkInfos[i].buffer = NULL;
-		fChunkInfos[i].sizeUsed = 0;
-		fChunkInfos[i].sizeMax = 0;
-		fChunkInfos[i].status = B_ERROR;
-	}
+// #pragma mark -
+
+
+ChunkCache::ChunkCache(sem_id waitSem, size_t maxBytes)
+	:
+	BLocker("media chunk cache"),
+	fWaitSem(waitSem),
+	fMaxBytes(maxBytes),
+	fBytes(0)
+{
 }
 
 
 ChunkCache::~ChunkCache()
 {
-	delete_sem(fGetWaitSem);
+	while (chunk_buffer* chunk = fChunks.RemoveHead())
+		delete chunk;
 
-	for (int i = 0; i < CHUNK_COUNT; i++) {
-		free(fChunkInfos[i].buffer);
-	}
+	while (chunk_buffer* chunk = fUnusedChunks.RemoveHead())
+		delete chunk;
+
+	while (chunk_buffer* chunk = fInFlightChunks.RemoveHead())
+		delete chunk;
 }
 
 
 void
 ChunkCache::MakeEmpty()
 {
-	BAutolock _(fLocker);
+	ASSERT(IsLocked());
 
-	fEmptyChunkCount = CHUNK_COUNT - 1;
-	fReadyChunkCount = 0;
-	fNextPut = &fChunkInfos[0];
-	fNextGet = &fChunkInfos[0];
-	atomic_or(&fNeedsRefill, 1);
+	fUnusedChunks.MoveFrom(&fChunks);
+	fBytes = 0;
+
+	release_sem(fWaitSem);
 }
 
 
 bool
-ChunkCache::NeedsRefill()
+ChunkCache::SpaceLeft() const
 {
-	return atomic_or(&fNeedsRefill, 0);
+	ASSERT(IsLocked());
+
+	return fBytes < fMaxBytes;
 }
 
 
-status_t
-ChunkCache::GetNextChunk(const void** _chunkBuffer, size_t* _chunkSize,
-	media_header* mediaHeader)
+chunk_buffer*
+ChunkCache::NextChunk()
 {
-	uint8 retryCount = 0;
+	ASSERT(IsLocked());
 
-//	printf("ChunkCache::GetNextChunk: %p fEmptyChunkCount %ld, fReadyChunkCount %ld\n", fNextGet, fEmptyChunkCount, fReadyChunkCount);
-retry:
-	acquire_sem(fGetWaitSem);
-
-	BAutolock locker(fLocker);
-	if (fReadyChunkCount == 0) {
-		locker.Unlock();
-
-		printf("ChunkCache::GetNextChunk: %p retrying\n", fNextGet);
-		// Limit to 5 retries
-		retryCount++;
-		if (retryCount > 4)
-			return B_ERROR;
-
-		goto retry;
+	chunk_buffer* chunk = fChunks.RemoveHead();
+	if (chunk != NULL) {
+		fBytes -= chunk->capacity;
+		fInFlightChunks.Add(chunk);
+		release_sem(fWaitSem);
 	}
 
-	fEmptyChunkCount++;
-	fReadyChunkCount--;
-	atomic_or(&fNeedsRefill, 1);
-
-	locker.Unlock();
-
-	*_chunkBuffer = fNextGet->buffer;
-	*_chunkSize = fNextGet->sizeUsed;
-	*mediaHeader = fNextGet->mediaHeader;
-	status_t status = fNextGet->status;
-	fNextGet = fNextGet->next;
-
-	return status;
+	return chunk;
 }
 
 
+/*!	Moves the specified chunk from the in-flight list to the unused list.
+	This means the chunk data can be overwritten again.
+*/
 void
-ChunkCache::PutNextChunk(const void* chunkBuffer, size_t chunkSize,
-	const media_header& mediaHeader, status_t status)
+ChunkCache::RecycleChunk(chunk_buffer* chunk)
 {
-//	printf("ChunkCache::PutNextChunk: %p fEmptyChunkCount %ld, fReadyChunkCount %ld\n", fNextPut, fEmptyChunkCount, fReadyChunkCount);
+	ASSERT(IsLocked());
 
-	if (status == B_OK) {
-		if (fNextPut->sizeMax < chunkSize) {
-//			printf("ChunkCache::PutNextChunk: %p resizing from %ld to %ld\n", fNextPut, fNextPut->sizeMax, chunkSize);
-			free(fNextPut->buffer);
-			fNextPut->buffer = malloc((chunkSize + 1024) & ~1023);
-			fNextPut->sizeMax = chunkSize;
-		}
-		memcpy(fNextPut->buffer, chunkBuffer, chunkSize);
-		fNextPut->sizeUsed = chunkSize;
+	fInFlightChunks.Remove(chunk);
+	fUnusedChunks.Add(chunk);
+}
+
+
+bool
+ChunkCache::ReadNextChunk(Reader* reader, void* cookie)
+{
+	ASSERT(IsLocked());
+
+	// retrieve chunk buffer
+	chunk_buffer* chunk = fUnusedChunks.RemoveHead();
+	if (chunk == NULL) {
+		// allocate a new one
+		chunk = new(std::nothrow) chunk_buffer;
+		if (chunk == NULL)
+			return false;
+
 	}
 
-	fNextPut->mediaHeader = mediaHeader;
-	fNextPut->status = status;
+	const void* buffer;
+	size_t bufferSize;
+	chunk->status = reader->GetNextChunk(cookie, &buffer, &bufferSize,
+		&chunk->header);
+	if (chunk->status == B_OK) {
+		if (chunk->capacity < bufferSize) {
+			// adapt buffer size
+			free(chunk->buffer);
+			chunk->capacity = (bufferSize + 2047) & ~2047;
+			chunk->buffer = malloc(chunk->capacity);
+			if (chunk->buffer == NULL) {
+				delete chunk;
+				return false;
+			}
+		}
 
-	fNextPut = fNextPut->next;
+		memcpy(chunk->buffer, buffer, bufferSize);
+		chunk->size = bufferSize;
+		fBytes += chunk->capacity;
+	}
 
-	fLocker.Lock();
-	fEmptyChunkCount--;
-	fReadyChunkCount++;
-	if (fEmptyChunkCount == 0)
-		atomic_and(&fNeedsRefill, 0);
-	fLocker.Unlock();
-
-	release_sem(fGetWaitSem);
+	fChunks.Add(chunk);
+	return chunk->status == B_OK;
 }
