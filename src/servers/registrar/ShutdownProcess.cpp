@@ -1373,10 +1373,10 @@ ShutdownProcess::_WaitForApp(team_id team, AppInfoList* list, bool systemApps)
 				if (eventTeam == team)
 					return false;
 			} else {
-				PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled "
+				PRINT(("ShutdownProcess::_WaitForApp(): shutdown cancelled "
 					"by team %ld (-1 => user)\n", eventTeam));
 
-				_DisplayAbortingApp(team);
+				_DisplayAbortingApp(eventTeam);
 				throw_error(B_SHUTDOWN_CANCELLED);
 			}
 		}
