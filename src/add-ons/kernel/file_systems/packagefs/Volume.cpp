@@ -99,7 +99,7 @@ struct Volume::DomainDirectoryEventJob : Job {
 		:
 		Job(volume),
 		fDomain(domain),
-		fEvent(NULL)
+		fEvent()
 	{
 		fDomain->AcquireReference();
 	}

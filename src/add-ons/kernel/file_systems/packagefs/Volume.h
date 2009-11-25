@@ -57,6 +57,10 @@ private:
 			struct PackageLoaderContentHandler;
 			struct DomainDirectoryListener;
 
+			friend struct AddPackageDomainJob;
+			friend struct DomainDirectoryEventJob;
+			friend struct DomainDirectoryListener;
+
 			typedef DoublyLinkedList<Job> JobList;
 			typedef DoublyLinkedList<PackageDomain> PackageDomainList;
 
