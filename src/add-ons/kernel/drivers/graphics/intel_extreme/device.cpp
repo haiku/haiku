@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -116,7 +116,7 @@ device_open(const char *name, uint32 /*flags*/, void **_cookie)
 
 	intel_info *info = gDeviceInfo[id];
 
-	acquire_lock(&gLock);
+	mutex_lock(&gLock);
 
 	if (info->open_count == 0) {
 		// this device has been opened for the first time, so
@@ -132,7 +132,7 @@ device_open(const char *name, uint32 /*flags*/, void **_cookie)
 		}
 	}
 
-	release_lock(&gLock);
+	mutex_unlock(&gLock);
 
 	if (info->init_status == B_OK)
 		*_cookie = info;
@@ -154,7 +154,7 @@ device_free(void *data)
 {
 	struct intel_info *info = (intel_info *)data;
 
-	acquire_lock(&gLock);
+	mutex_lock(&gLock);
 
 	if (info->open_count-- == 1) {
 		// release info structure
@@ -166,7 +166,7 @@ device_free(void *data)
 #endif
 	}
 
-	release_lock(&gLock);
+	mutex_unlock(&gLock);
 
 	return B_OK;
 }
@@ -183,7 +183,7 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 			TRACE((DEVICE_NAME ": accelerant: %s\n", INTEL_ACCELERANT_NAME));
 			return B_OK;
 
-		// needed to share data between kernel and accelerant		
+		// needed to share data between kernel and accelerant
 		case INTEL_GET_PRIVATE_DATA:
 		{
 			intel_get_private_data *data = (intel_get_private_data *)buffer;
@@ -268,7 +268,7 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 static status_t
 device_read(void */*data*/, off_t /*pos*/, void */*buffer*/, size_t *_length)
 {
-	*_length = 0;	
+	*_length = 0;
 	return B_NOT_ALLOWED;
 }
 
@@ -276,7 +276,7 @@ device_read(void */*data*/, off_t /*pos*/, void */*buffer*/, size_t *_length)
 static status_t
 device_write(void */*data*/, off_t /*pos*/, const void */*buffer*/, size_t *_length)
 {
-	*_length = 0;	
+	*_length = 0;
 	return B_NOT_ALLOWED;
 }
 

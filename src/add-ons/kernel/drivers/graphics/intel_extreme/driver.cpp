@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,6 +21,7 @@
 #include <PCI.h>
 #include <SupportDefs.h>
 
+
 #define TRACE_DRIVER
 #ifdef TRACE_DRIVER
 #	define TRACE(x) dprintf x
@@ -30,11 +31,12 @@
 
 #define MAX_CARDS 4
 
+
 // list of supported devices
 const struct supported_device {
 	uint32		device_id;
 	int32		type;
-	const char	*name;
+	const char*	name;
 } kSupportedDevices[] = {
 	{0x3577, INTEL_TYPE_83x, "i830GM"},
 	{0x2562, INTEL_TYPE_83x, "i845G"},
@@ -59,11 +61,11 @@ const struct supported_device {
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-char *gDeviceNames[MAX_CARDS + 1];
-intel_info *gDeviceInfo[MAX_CARDS];
-pci_module_info *gPCI;
-agp_gart_module_info *gGART;
-lock gLock;
+char* gDeviceNames[MAX_CARDS + 1];
+intel_info* gDeviceInfo[MAX_CARDS];
+pci_module_info* gPCI;
+agp_gart_module_info* gGART;
+mutex gLock;
 
 
 static status_t
@@ -129,32 +131,27 @@ init_driver(void)
 {
 	TRACE((DEVICE_NAME ": init_driver()\n"));
 
-	status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCI);
+	status_t status = get_module(B_PCI_MODULE_NAME, (module_info**)&gPCI);
 	if (status != B_OK) {
 		TRACE((DEVICE_NAME ": pci module unavailable\n"));
 		return status;
 	}
 
-	status = get_module(B_AGP_GART_MODULE_NAME, (module_info **)&gGART);
+	status = get_module(B_AGP_GART_MODULE_NAME, (module_info**)&gGART);
 	if (status != B_OK) {
 		TRACE((DEVICE_NAME ": AGP GART module unavailable\n"));
 		put_module(B_PCI_MODULE_NAME);
 		return status;
 	}
 
-	status = init_lock(&gLock, "intel extreme ksync");
-	if (status < B_OK) {
-		put_module(B_AGP_GART_MODULE_NAME);
-		put_module(B_PCI_MODULE_NAME);
-		return status;
-	}
+	mutex_init(&gLock, "intel extreme ksync");
 
 	// find devices
 
 	int32 found = 0;
 
 	for (int32 cookie = 0; found < MAX_CARDS;) {
-		pci_info *info = (pci_info *)malloc(sizeof(pci_info));
+		pci_info* info = (pci_info*)malloc(sizeof(pci_info));
 		if (info == NULL)
 			break;
 
@@ -176,7 +173,7 @@ init_driver(void)
 		if (gDeviceNames[found] == NULL)
 			break;
 
-		gDeviceInfo[found] = (intel_info *)malloc(sizeof(intel_info));
+		gDeviceInfo[found] = (intel_info*)malloc(sizeof(intel_info));
 		if (gDeviceInfo[found] == NULL) {
 			free(gDeviceNames[found]);
 			break;
@@ -201,7 +198,7 @@ init_driver(void)
 	gDeviceNames[found] = NULL;
 
 	if (found == 0) {
-		uninit_lock(&gLock);
+		mutex_destroy(&gLock);
 		put_module(B_AGP_GART_MODULE_NAME);
 		put_module(B_PCI_MODULE_NAME);
 		return ENODEV;
@@ -216,10 +213,10 @@ uninit_driver(void)
 {
 	TRACE((DEVICE_NAME ": uninit_driver()\n"));
 
-	uninit_lock(&gLock);
+	mutex_destroy(&gLock);
 
 	// free device related structures
-	char *name;
+	char* name;
 	for (int32 index = 0; (name = gDeviceNames[index]) != NULL; index++) {
 		free(gDeviceInfo[index]);
 		free(name);
@@ -230,8 +227,8 @@ uninit_driver(void)
 }
 
 
-extern "C" device_hooks *
-find_device(const char *name)
+extern "C" device_hooks*
+find_device(const char* name)
 {
 	int index;
 
@@ -245,17 +242,3 @@ find_device(const char *name)
 	return NULL;
 }
 
-/*
-extern "C" void
-wake_driver(void)
-{
-	// for compatibility with Dano, only
-}
-
-
-extern "C" void
-suspend_driver(void)
-{
-	// for compatibility with Dano, only
-}
-*/
