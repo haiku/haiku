@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src tests kits midi patchbay ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SimpleTest PatchBay
+	: 
+	PatchApp.cpp
+	PatchWin.cpp
+	PatchView.cpp
+	PatchRow.cpp
+	EndpointInfo.cpp
+	MidiEventMeter.cpp
+	TToolTip.cpp
+	: 
+	midi midi2 be $(TARGET_LIBSTDC++)
+;
+
