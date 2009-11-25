@@ -249,15 +249,16 @@ fssh_file_cache_create(fssh_mount_id mountID, fssh_vnode_id vnodeID,
 	// get vnode
 	fssh_status_t error = vfs_lookup_vnode(mountID, vnodeID, &ref->node);
 	if (error != FSSH_B_OK) {
-		fssh_dprintf("file_cache_create(): Failed get vnode %d:%lld: %s\n",
-			mountID, vnodeID, fssh_strerror(error));
+		fssh_dprintf("file_cache_create(): Failed get vnode %d:%" FSSH_B_PRIdINO
+			": %s\n", mountID, vnodeID, fssh_strerror(error));
 		delete ref;
 		return NULL;
 	}
 
 	// create lock
 	char buffer[32];
-	fssh_snprintf(buffer, sizeof(buffer), "file cache %d:%lld", (int)mountID, vnodeID);
+	fssh_snprintf(buffer, sizeof(buffer), "file cache %d:%" FSSH_B_PRIdINO,
+		(int)mountID, vnodeID);
 	fssh_mutex_init(&ref->lock, buffer);
 
 	return ref;

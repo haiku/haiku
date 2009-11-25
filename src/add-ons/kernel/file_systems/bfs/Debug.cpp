@@ -119,13 +119,13 @@ dump_inode(const bfs_inode* inode)
 	kprintf("  gid                = %u\n", (unsigned)inode->GroupID());
 	kprintf("  mode               = %08x\n", (int)inode->Mode());
 	kprintf("  flags              = %08x\n", (int)inode->Flags());
-	kprintf("  create_time        = %" B_PRIx64 " (%ld.%u)\n",
+	kprintf("  create_time        = %" B_PRIx64 " (%" B_PRIdTIME ".%u)\n",
 		inode->CreateTime(), bfs_inode::ToSecs(inode->CreateTime()),
 		(unsigned)bfs_inode::ToUsecs(inode->CreateTime()));
-	kprintf("  last_modified_time = %" B_PRIx64 " (%ld.%u)\n",
+	kprintf("  last_modified_time = %" B_PRIx64 " (%" B_PRIdTIME ".%u)\n",
 		inode->LastModifiedTime(), bfs_inode::ToSecs(inode->LastModifiedTime()),
 		(unsigned)bfs_inode::ToUsecs(inode->LastModifiedTime()));
-	kprintf("  status_change_time = %" B_PRIx64 " (%ld.%u)\n",
+	kprintf("  status_change_time = %" B_PRIx64 " (%" B_PRIdTIME ".%u)\n",
 		inode->StatusChangeTime(), bfs_inode::ToSecs(inode->StatusChangeTime()),
 		(unsigned)bfs_inode::ToUsecs(inode->StatusChangeTime()));
 	dump_block_run(	"  parent             = ", inode->parent);

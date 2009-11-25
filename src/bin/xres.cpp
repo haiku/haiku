@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -364,8 +364,8 @@ struct ListState : State {
 		size_t size;
 		for (int32 i = 0;
 				resources.GetResourceInfo(i, &type, &id, &name, &size); i++) {
-			printf("'%s' %11ld %11lu  %s\n", resource_type(type), id, size,
-				(name && strlen(name) > 0 ? name : "(no name)"));
+			printf("'%s' %11" B_PRId32 " %11lu  %s\n", resource_type(type), id,
+				size, (name && strlen(name) > 0 ? name : "(no name)"));
 		}
 	}
 };
@@ -479,9 +479,9 @@ struct WriteFileState : State {
 		status_t error = fResources->AddResource(id.type, id.id, data, size,
 			name);
 		if (error != B_OK) {
-			fprintf(stderr, "Error: Failed to add resource type '%s', ID %ld "
-				"to output file \"%s\": %s\n", resource_type(id.type), id.id,
-				fOutputFilePath.c_str(), strerror(error));
+			fprintf(stderr, "Error: Failed to add resource type '%s', ID %"
+				B_PRId32 " to output file \"%s\": %s\n", resource_type(id.type),
+				id.id, fOutputFilePath.c_str(), strerror(error));
 			exit(1);
 		}
 	}

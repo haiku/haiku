@@ -318,7 +318,8 @@ FileMap::_Cache(fssh_off_t offset, fssh_off_t size)
 	while (status == FSSH_B_OK && mapEnd < end) {
 		// We don't have the requested extents yet, retrieve them
 		fssh_size_t vecCount = kMaxVecs;
-		status = vfs_get_file_map(Vnode(), mapEnd, ~0UL, vecs, &vecCount);
+		status = vfs_get_file_map(Vnode(), mapEnd, FSSH_SIZE_MAX, vecs,
+			&vecCount);
 		if (status == FSSH_B_OK || status == FSSH_B_BUFFER_OVERFLOW)
 			status = _Add(vecs, vecCount, mapEnd);
 	}
@@ -336,8 +337,8 @@ FileMap::SetMode(uint32_t mode)
 
 	MutexLocker _(fLock);
 
-	if (mode == FSSH_FILE_MAP_CACHE_ALL && fCacheAll
-		|| mode == FSSH_FILE_MAP_CACHE_ON_DEMAND && !fCacheAll)
+	if ((mode == FSSH_FILE_MAP_CACHE_ALL && fCacheAll)
+		|| (mode == FSSH_FILE_MAP_CACHE_ON_DEMAND && !fCacheAll))
 		return FSSH_B_OK;
 
 	if (mode == FSSH_FILE_MAP_CACHE_ALL) {

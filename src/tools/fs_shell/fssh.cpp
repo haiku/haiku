@@ -300,7 +300,7 @@ byte_string(int64_t numBlocks, int64_t blockSize)
 	static char string[64];
 
 	if (blocks < 1024)
-		sprintf(string, "%Ld", numBlocks * blockSize);
+		sprintf(string, "%" FSSH_B_PRId64, numBlocks * blockSize);
 	else {
 		const char* units[] = {"K", "M", "G", NULL};
 		int i = -1;
@@ -406,7 +406,8 @@ list_entry(const char* file, const char* name = NULL)
 		nameSuffix += buffer;
 	}
 
-	printf("%c%s %2d %2d %10lld %d-%02d-%02d %02d:%02d:%02d %s%s\n",
+	printf("%c%s %2d %2d %10" FSSH_B_PRIdOFF
+		" %d-%02d-%02d %02d:%02d:%02d %s%s\n",
 		fileType, permissions.c_str(), (int)st.fssh_st_uid, (int)st.fssh_st_gid,
 		st.fssh_st_size,
 		1900 + time.tm_year, 1 + time.tm_mon, time.tm_mday,
@@ -706,7 +707,7 @@ command_info(int argc, const char* const* argv)
 	if (status != FSSH_B_OK)
 		return status;
 
-	printf("root inode:   %lld\n", info.root);
+	printf("root inode:   %" FSSH_B_PRIdINO "\n", info.root);
 	printf("flags:        ");
 	print_flag(info.flags, FSSH_B_FS_HAS_QUERY, "Q", "-");
 	print_flag(info.flags, FSSH_B_FS_HAS_ATTR, "A", "-");
@@ -716,14 +717,14 @@ command_info(int argc, const char* const* argv)
 	print_flag(info.flags, FSSH_B_FS_IS_REMOVABLE, "R", "-");
 	print_flag(info.flags, FSSH_B_FS_IS_READONLY, "-", "W");
 
-	printf("\nblock size:   %lld\n", info.block_size);
-	printf("I/O size:     %lld\n", info.io_size);
-	printf("total size:   %s (%lld blocks)\n",
+	printf("\nblock size:   %" FSSH_B_PRIdOFF "\n", info.block_size);
+	printf("I/O size:     %" FSSH_B_PRIdOFF "\n", info.io_size);
+	printf("total size:   %s (%" FSSH_B_PRIdOFF " blocks)\n",
 		byte_string(info.total_blocks, info.block_size), info.total_blocks);
-	printf("free size:    %s (%lld blocks)\n",
+	printf("free size:    %s (%" FSSH_B_PRIdOFF " blocks)\n",
 		byte_string(info.free_blocks, info.block_size), info.free_blocks);
-	printf("total nodes:  %lld\n", info.total_nodes);
-	printf("free nodes:   %lld\n", info.free_nodes);
+	printf("total nodes:  %" FSSH_B_PRIdOFF "\n", info.total_nodes);
+	printf("free nodes:   %" FSSH_B_PRIdOFF "\n", info.free_nodes);
 	printf("volume name:  %s\n", info.volume_name);
 	printf("fs name:      %s\n", info.fsh_name);
 
@@ -1089,8 +1090,8 @@ command_query(int argc, const char* const* argv)
 		if (error == FSSH_B_OK) {
 			printf("  %s\n", path);
 		} else {
-			fprintf(stderr, "  failed to resolve entry (%8lld, \"%s\")\n",
-				entry->d_pino, entry->d_name);
+			fprintf(stderr, "  failed to resolve entry (%8" FSSH_B_PRIdINO
+				", \"%s\")\n", entry->d_pino, entry->d_name);
 		}
 	}
 

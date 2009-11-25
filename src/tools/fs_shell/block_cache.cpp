@@ -319,8 +319,8 @@ notify_transaction_listeners(block_cache* cache, cache_transaction* transaction,
 	while (iterator.HasNext()) {
 		cache_listener* listener = iterator.Next();
 
-		bool remove = isClosing && !is_written_event(listener->events)
-			|| isWritten && is_written_event(listener->events);
+		bool remove = (isClosing && !is_written_event(listener->events))
+			|| (isWritten && is_written_event(listener->events));
 		if (remove)
 			iterator.Remove();
 
@@ -536,8 +536,9 @@ block_cache::FreeBlock(cached_block* block)
 	Free(block->current_data);
 
 	if (block->original_data != NULL || block->parent_data != NULL) {
-		fssh_panic("block_cache::FreeBlock(): %Ld, original %p, parent %p\n",
-			block->block_number, block->original_data, block->parent_data);
+		fssh_panic("block_cache::FreeBlock(): %" FSSH_B_PRIdOFF
+			", original %p, parent %p\n", block->block_number,
+			block->original_data, block->parent_data);
 	}
 
 #ifdef DEBUG_CHANGED
@@ -560,7 +561,7 @@ block_cache::NewBlock(fssh_off_t blockNumber)
 
 	// if we hit the limit of blocks to cache¸ try to free one or more
 	if (allocated_block_count >= kMaxBlockCount) {
-		RemoveUnusedBlocks(LONG_MAX,
+		RemoveUnusedBlocks(INT32_MAX,
 			allocated_block_count - kMaxBlockCount + 1);
 	}
 
@@ -685,7 +686,7 @@ put_cached_block(block_cache* cache, cached_block* block)
 	}
 
 	if (cache->allocated_block_count > kMaxBlockCount) {
-		cache->RemoveUnusedBlocks(LONG_MAX,
+		cache->RemoveUnusedBlocks(INT32_MAX,
 			cache->allocated_block_count - kMaxBlockCount);
 	}
 }
@@ -695,8 +696,8 @@ static void
 put_cached_block(block_cache* cache, fssh_off_t blockNumber)
 {
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
-		fssh_panic("put_cached_block: invalid block number %lld (max %lld)",
-			blockNumber, cache->max_blocks - 1);
+		fssh_panic("put_cached_block: invalid block number %" FSSH_B_PRIdOFF
+			" (max %" FSSH_B_PRIdOFF ")", blockNumber, cache->max_blocks - 1);
 	}
 
 	cached_block* block = (cached_block*)hash_lookup(cache->hash, &blockNumber);
@@ -719,8 +720,8 @@ get_cached_block(block_cache* cache, fssh_off_t blockNumber, bool* _allocated,
 	bool readBlock = true)
 {
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
-		fssh_panic("get_cached_block: invalid block number %lld (max %lld)",
-			blockNumber, cache->max_blocks - 1);
+		fssh_panic("get_cached_block: invalid block number %" FSSH_B_PRIdOFF
+			" (max %" FSSH_B_PRIdOFF ")", blockNumber, cache->max_blocks - 1);
 		return NULL;
 	}
 
@@ -744,7 +745,7 @@ get_cached_block(block_cache* cache, fssh_off_t blockNumber, bool* _allocated,
 		if (fssh_read_pos(cache->fd, blockNumber * blockSize, block->current_data,
 				blockSize) < blockSize) {
 			cache->RemoveBlock(block);
-			FATAL(("could not read block %Ld\n", blockNumber));
+			FATAL(("could not read block %" FSSH_B_PRIdOFF "\n", blockNumber));
 			return NULL;
 		}
 	}
@@ -777,8 +778,9 @@ get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber, fssh_off_t
 		blockNumber, transactionID));
 
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
-		fssh_panic("get_writable_cached_block: invalid block number %lld (max %lld)",
-			blockNumber, cache->max_blocks - 1);
+		fssh_panic("get_writable_cached_block: invalid block number %"
+			FSSH_B_PRIdOFF " (max %" FSSH_B_PRIdOFF ")", blockNumber,
+			cache->max_blocks - 1);
 	}
 
 	bool allocated;
@@ -894,8 +896,8 @@ write_cached_block(block_cache* cache, cached_block* block,
 		data, blockSize);
 
 	if (written < blockSize) {
-		FATAL(("could not write back block %Ld (%s)\n", block->block_number,
-			fssh_strerror(fssh_get_errno())));
+		FATAL(("could not write back block %" FSSH_B_PRIdOFF " (%s)\n",
+			block->block_number, fssh_strerror(fssh_get_errno())));
 		return FSSH_B_IO_ERROR;
 	}
 
@@ -1548,8 +1550,8 @@ fssh_block_cache_sync_etc(void* _cache, fssh_off_t blockNumber,
 	// transaction or no transaction only
 
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
-		fssh_panic("block_cache_sync_etc: invalid block number %Ld (max %Ld)",
-			blockNumber, cache->max_blocks - 1);
+		fssh_panic("block_cache_sync_etc: invalid block number %" FSSH_B_PRIdOFF
+			" (max %" FSSH_B_PRIdOFF ")", blockNumber, cache->max_blocks - 1);
 		return FSSH_B_BAD_VALUE;
 	}
 
@@ -1595,8 +1597,8 @@ fssh_block_cache_discard(void* _cache, fssh_off_t blockNumber,
 		} else {
 			if (block->transaction != NULL && block->parent_data != NULL
 				&& block->parent_data != block->current_data) {
-				fssh_panic("Discarded block %Ld has already been changed in "
-					"this transaction!", blockNumber);
+				fssh_panic("Discarded block %" FSSH_B_PRIdOFF " has already "
+					"been changed in this transaction!", blockNumber);
 			}
 
 			// mark it as discarded (in the current transaction only, if any)

@@ -123,6 +123,14 @@ typedef int32_t		fssh_pid_t;
 /* ino_t */
 #define FSSH_B_PRIdINO		FSSH_B_PRId64
 #define FSSH_B_PRIiINO		FSSH_B_PRIi64
+/* time_t */
+#define FSSH_B_PRIdTIME		FSSH_B_PRId32
+#define FSSH_B_PRIiTIME		FSSH_B_PRIi32
+
+
+/* limits */
+#define FSSH_SIZE_MAX		UINT32_MAX
+#define	FSSH_SSIZE_MAX		INT32_MAX
 
 
 #endif	// _FSSH_TYPES_H

@@ -361,13 +361,13 @@ select_fd(int fd, uint8_t event, uint32_t ref, struct select_sync *sync, bool ke
 {
 // 	struct file_descriptor *descriptor;
 // 	fssh_status_t status;
-// 
+//
 // 	TRACE(("select_fd(fd = %d, event = %u, ref = %lu, selectsync = %p)\n", fd, event, ref, sync));
-// 
+//
 // 	descriptor = get_fd(get_current_io_context(kernel), fd);
 // 	if (descriptor == NULL)
 // 		return FSSH_B_FILE_ERROR;
-// 
+//
 // 	if (descriptor->ops->fd_select) {
 // 		status = descriptor->ops->fd_select(descriptor, event, ref, sync);
 // 	} else {
@@ -375,7 +375,7 @@ select_fd(int fd, uint8_t event, uint32_t ref, struct select_sync *sync, bool ke
 // 		// immediately notify the select call
 // 		status = notify_select_event((void *)sync, ref, event);
 // 	}
-// 
+//
 // 	put_fd(descriptor);
 // 	return status;
 
@@ -388,18 +388,18 @@ deselect_fd(int fd, uint8_t event, struct select_sync *sync, bool kernel)
 {
 // 	struct file_descriptor *descriptor;
 // 	fssh_status_t status;
-// 
+//
 // 	TRACE(("deselect_fd(fd = %d, event = %u, selectsync = %p)\n", fd, event, sync));
-// 
+//
 // 	descriptor = get_fd(get_current_io_context(kernel), fd);
 // 	if (descriptor == NULL)
 // 		return FSSH_B_FILE_ERROR;
-// 
+//
 // 	if (descriptor->ops->fd_deselect)
 // 		status = descriptor->ops->fd_deselect(descriptor, event, sync);
 // 	else
 // 		status = FSSH_B_OK;
-// 
+//
 // 	put_fd(descriptor);
 // 	return status;
 
@@ -485,8 +485,8 @@ _kern_read(int fd, fssh_off_t pos, void *buffer, fssh_size_t length)
 	if (descriptor->ops->fd_read) {
 		bytesRead = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
 		if (bytesRead >= FSSH_B_OK) {
-			if (length > SSIZE_MAX)
-				bytesRead = SSIZE_MAX;
+			if (length > FSSH_SSIZE_MAX)
+				bytesRead = FSSH_SSIZE_MAX;
 			else
 				bytesRead = (fssh_ssize_t)length;
 
@@ -528,8 +528,8 @@ _kern_readv(int fd, fssh_off_t pos, const fssh_iovec *vecs, fssh_size_t count)
 				break;
 			}
 
-			if ((uint32_t)bytesRead + length > SSIZE_MAX)
-				bytesRead = SSIZE_MAX;
+			if ((uint32_t)bytesRead + length > FSSH_SSIZE_MAX)
+				bytesRead = FSSH_SSIZE_MAX;
 			else
 				bytesRead += (fssh_ssize_t)length;
 
@@ -564,8 +564,8 @@ _kern_write(int fd, fssh_off_t pos, const void *buffer, fssh_size_t length)
 	if (descriptor->ops->fd_write) {
 		bytesWritten = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
 		if (bytesWritten >= FSSH_B_OK) {
-			if (length > SSIZE_MAX)
-				bytesWritten = SSIZE_MAX;
+			if (length > FSSH_SSIZE_MAX)
+				bytesWritten = FSSH_SSIZE_MAX;
 			else
 				bytesWritten = (fssh_ssize_t)length;
 
@@ -607,8 +607,8 @@ _kern_writev(int fd, fssh_off_t pos, const fssh_iovec *vecs, fssh_size_t count)
 				break;
 			}
 
-			if ((uint32_t)bytesWritten + length > SSIZE_MAX)
-				bytesWritten = SSIZE_MAX;
+			if ((uint32_t)bytesWritten + length > FSSH_SSIZE_MAX)
+				bytesWritten = FSSH_SSIZE_MAX;
 			else
 				bytesWritten += (fssh_ssize_t)length;
 

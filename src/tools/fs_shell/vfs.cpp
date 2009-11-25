@@ -793,7 +793,8 @@ restart:
 		fssh_mutex_unlock(&sVnodeMutex);
 		if (--tries < 0) {
 			// vnode doesn't seem to become unbusy
-			fssh_panic("vnode %d:%lld is not becoming unbusy!\n", (int)mountID, vnodeID);
+			fssh_panic("vnode %d:%" FSSH_B_PRIdINO " is not becoming unbusy!\n",
+				(int)mountID, vnodeID);
 			return FSSH_B_BUSY;
 		}
 		fssh_snooze(10000); // 10 ms
@@ -1080,8 +1081,8 @@ lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 	fssh_mutex_unlock(&sVnodeMutex);
 
 	if (*_vnode == NULL) {
-		fssh_panic("lookup_dir_entry(): could not lookup vnode (mountid 0x%x vnid "
-			"0x%Lx)\n", (int)dir->device, id);
+		fssh_panic("lookup_dir_entry(): could not lookup vnode (mountid %d "
+			"vnid %" FSSH_B_PRIdINO ")\n", (int)dir->device, id);
 		return FSSH_B_ENTRY_NOT_FOUND;
 	}
 
@@ -1906,8 +1907,9 @@ fssh_new_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID,
 
 	struct vnode *vnode = lookup_vnode(volume->id, vnodeID);
 	if (vnode != NULL) {
-		fssh_panic("vnode %d:%Ld already exists (node = %p, vnode->node = %p)!",
-			(int)volume->id, vnodeID, privateNode, vnode->private_node);
+		fssh_panic("vnode %d:%" FSSH_B_PRIdINO " already exists (node = %p, "
+			"vnode->node = %p)!", (int)volume->id, vnodeID, privateNode,
+			vnode->private_node);
 	}
 
 	fssh_status_t status = create_new_vnode(&vnode, volume->id, vnodeID);
@@ -4868,7 +4870,8 @@ fs_sync(fssh_dev_t device)
 			// but this vnode won't go away since we keep a reference to it.
 			previousVnode = vnode;
 		} else {
-			fssh_dprintf("syncing of mount %d stopped due to vnode %lld.\n", (int)mount->id, id);
+			fssh_dprintf("syncing of mount %d stopped due to vnode %"
+				FSSH_B_PRIdINO ".\n", (int)mount->id, id);
 			break;
 		}
 	}

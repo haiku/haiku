@@ -136,6 +136,9 @@ typedef uint32					perform_code;
 /* ino_t */
 #define B_PRIdINO		B_PRId64
 #define B_PRIiINO		B_PRIi64
+/* time_t */
+#define B_PRIdTIME		B_PRId32
+#define B_PRIiTIME		B_PRIi32
 
 
 /* Empty string ("") */

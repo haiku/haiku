@@ -65,18 +65,20 @@ local kernelEmulationSources =
 	vfs.cpp
 ;
 
+BuildPlatformMergeObject <build>fs_shell_kernel.o : $(kernelEmulationSources) ;
+
 BuildPlatformStaticLibrary <build>fuse_module.a :
-	$(kernelEmulationSources)
 	$(externalCommandsSources)
 
 	fuse.cpp
+	: <build>fs_shell_kernel.o
 ;
 
 BuildPlatformStaticLibrary <build>fs_shell.a :
-	$(kernelEmulationSources)
 	$(externalCommandsSources)
 
 	fssh.cpp
+	: <build>fs_shell_kernel.o
 ;
 
 SEARCH on [ FGristFiles rootfs.cpp ]

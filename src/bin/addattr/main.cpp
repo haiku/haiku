@@ -70,7 +70,7 @@ typeForString(const char *string, type_code *_result)
 	// type didn't show up - in this case, we parse the string
 	// as number and use it directly as type code
 
-	if (sscanf(string, "%lu", _result) == 1)
+	if (sscanf(string, "%" B_SCNu32, _result) == 1)
 		return B_OK;
 
 	uchar type[4];
@@ -173,8 +173,8 @@ main(int argc, char *argv[])
 				return 1;
 			}
  			if (size > 4 * 1024 * 1024) {
-				fprintf(stderr, "%s: attribute value is too large: %Ld bytes\n",
-					gProgramName, size);
+				fprintf(stderr, "%s: attribute value is too large: %" B_PRIdOFF
+					" bytes\n", gProgramName, size);
 
 				return 1;
  			}

@@ -222,7 +222,7 @@ copy_attributes(const char *sourcePath, BNode &source, const char *destPath,
 		// created as well
 		do {
 			size_t toRead = kCopyBufferSize;
-			if (toRead > bytesLeft)
+			if ((off_t)toRead > bytesLeft)
 				toRead = bytesLeft;
 
 			// read

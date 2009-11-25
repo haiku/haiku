@@ -237,8 +237,8 @@ dump_partition_map(const PartitionMap& map)
 			continue;
 		}
 
-		fprintf(stderr, "offset: %16lld, size: %16lld, type: %x%s\n",
-			(int64)partition->Offset(), (int64)partition->Size(),
+		fprintf(stderr, "offset: %16" B_PRIdOFF ", size: %16" B_PRIdOFF
+			", type: %x%s\n", partition->Offset(), partition->Size(),
 			partition->Type(), partition->IsExtended() ? " (extended)" : "");
 	}
 }
@@ -658,8 +658,8 @@ main(int argc, const char *const *argv)
 			= B_HOST_TO_LENDIAN_INT32((uint32)(partitionOffset / 512));
 
 		// write the boot code
-		printf("Writing boot code to \"%s\" (partition offset: %lld bytes, "
-			"start offset = %lld) "
+		printf("Writing boot code to \"%s\" (partition offset: %" B_PRId64
+			" bytes, start offset = %" B_PRIdOFF ") "
 			"...\n", fileName, partitionOffset, startOffset);
 
 		write_boot_code_part(fileName, fd, startOffset, bootCodeData, 0,

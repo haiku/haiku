@@ -1503,8 +1503,6 @@
 #define gid_t			fssh_gid_t
 #define pid_t			fssh_pid_t
 
-#if !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS)
-
 /* printf()/scanf() format strings for [u]int* types */
 #define B_PRId8			FSSH_B_PRId8
 #define B_PRIi8			FSSH_B_PRIi8
@@ -1575,8 +1573,9 @@
 /* ino_t */
 #define B_PRIdINO		FSSH_B_PRIdINO
 #define B_PRIiINO		FSSH_B_PRIiINO
-
-#endif	/* !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) */
+/* time_t */
+#define B_PRIdTIME		FSSH_B_PRId32
+#define B_PRIiTIME		FSSH_B_PRIi32
 
 
 ////////////////////////////////////////////////////////////////////////////////
