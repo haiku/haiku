@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src servers midi ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UseLibraryHeaders icon ;
 UsePrivateHeaders midi shared storage ;
 
 Server midi_server :
@@ -12,7 +13,7 @@ Server midi_server :
 	# storage
 	NodeMonitorHandler.cpp
 	
-	: be midi2 libshared.a $(TARGET_LIBSTDC++)
+	: be midi2 libshared.a libicon.a $(TARGET_LIBSTDC++)
 	: midi_server.rdef
 ;
 

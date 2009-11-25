@@ -21,6 +21,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <IconUtils.h>
 #include <Path.h>
 #include <PathMonitor.h>
 #include <Resources.h>
@@ -52,29 +53,37 @@ public:
 
 DeviceWatcher::DeviceWatcher()
 	: BLooper("MIDI devices watcher"),
-	fDeviceEndpointsMap()
+	fDeviceEndpointsMap(), fVectorIconData(NULL), fVectorIconDataSize(0), 
+	fLargeIcon(NULL), fMiniIcon(NULL)
 {
-	// TODO: add support for vector icons
-	
-	fLargeIcon = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
-	fMiniIcon  = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
-
+	// Load midi endpoint vector icon data
 	app_info info;
 	be_app->GetAppInfo(&info);
 	BFile file(&info.ref, B_READ_ONLY);
 
-	BResources res;
-	if (res.SetTo(&file) == B_OK) {
-		size_t size;
-		const void* bits;
-
-		bits = res.LoadResource(B_LARGE_ICON_TYPE, 10, &size);
-		fLargeIcon->SetBits(bits, size, 0, B_CMAP8);
-
-		bits = res.LoadResource(B_MINI_ICON_TYPE, 11, &size);
-		fMiniIcon->SetBits(bits, size, 0, B_CMAP8);
+	BResources resources;
+	if (resources.SetTo(&file) == B_OK) {
+		fVectorIconData = (const uint8*)resources.LoadResource(
+			B_VECTOR_ICON_TYPE,	"endpoint_vector_icon", &fVectorIconDataSize);
 	}
-	
+
+	// Render 32x32 and 16x16 icons for R5 compatibility	
+	if (fVectorIconData != NULL) {
+		fLargeIcon = new(std::nothrow) BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
+		fMiniIcon  = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
+
+		if (BIconUtils::GetVectorIcon(fVectorIconData, fVectorIconDataSize, 
+			fLargeIcon) != B_OK) {
+			delete fLargeIcon;
+			fLargeIcon = NULL;
+		}
+		if (BIconUtils::GetVectorIcon(fVectorIconData, fVectorIconDataSize, 
+			fMiniIcon) != B_OK) {
+			delete fMiniIcon;
+			fMiniIcon = NULL;
+		}
+	}
+
 	Start();
 }
 
@@ -234,8 +243,7 @@ DeviceWatcher::_RemoveDevice(const char* path)
 	if (!deviceEndpoints) {
 		TRACE(("_RemoveDevice(\"%s\") didn't find endpoint in map!!\n", path));
 		return;
-	}
-		
+	}	
 
 	TRACE((" _RemoveDevice(\"%s\") unregistering\n", path));
 	deviceEndpoints->fConsumer->Unregister();
@@ -256,13 +264,20 @@ DeviceWatcher::_SetIcons(BMidiEndpoint* endpoint)
 {
 	BMessage msg;
 
-	// TODO: handle Haiku vector icon type
-
-	msg.AddData("be:large_icon", B_LARGE_ICON_TYPE, fLargeIcon->Bits(), 
-		fLargeIcon->BitsLength());
+	if (fVectorIconData && fVectorIconDataSize > 0) {
+		msg.AddData("haiku:vector_icon", B_VECTOR_ICON_TYPE, fVectorIconData, 
+			fVectorIconDataSize);
+	}
 	
-	msg.AddData("be:mini_icon", B_MINI_ICON_TYPE, fMiniIcon->Bits(), 
-		fMiniIcon->BitsLength());
+	if (fLargeIcon) {
+		msg.AddData("be:large_icon", B_LARGE_ICON_TYPE, fLargeIcon->Bits(), 
+			fLargeIcon->BitsLength());
+	}
+	
+	if (fMiniIcon) {
+		msg.AddData("be:mini_icon", B_MINI_ICON_TYPE, fMiniIcon->Bits(), 
+			fMiniIcon->BitsLength());
+	}
 
 	endpoint->SetProperties(&msg);
 }
