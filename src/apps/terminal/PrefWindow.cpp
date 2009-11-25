@@ -93,6 +93,8 @@ PrefWindow::QuitRequested()
 
 	if (index == 2)
 		_Save();
+	else
+		_Revert();
 
 	return true;
 }
