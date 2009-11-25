@@ -265,7 +265,7 @@ DeviceWatcher::_SetIcons(BMidiEndpoint* endpoint)
 	BMessage msg;
 
 	if (fVectorIconData && fVectorIconDataSize > 0) {
-		msg.AddData("haiku:vector_icon", B_VECTOR_ICON_TYPE, fVectorIconData, 
+		msg.AddData("icon", B_VECTOR_ICON_TYPE, fVectorIconData, 
 			fVectorIconDataSize);
 	}
 	
