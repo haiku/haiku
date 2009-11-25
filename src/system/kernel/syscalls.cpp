@@ -62,6 +62,7 @@ struct generic_syscall {
 	uint32			version;
 	uint32			flags;
 	int32			use_count;
+	bool			valid;
 	generic_syscall	*previous;
 };
 
@@ -140,17 +141,19 @@ _user_generic_syscall(const char* userSubsystem, uint32 function,
 	while (syscall != NULL) {
 		generic_syscall* next;
 
-		syscall->use_count++;
-		locker.Unlock();
+		if (syscall->valid) {
+			syscall->use_count++;
+			locker.Unlock();
 
-		status_t status
-			= syscall->hook(subsystem, function, buffer, bufferSize);
+			status_t status
+				= syscall->hook(subsystem, function, buffer, bufferSize);
 
-		locker.Lock();
-		syscall->use_count--;
+			locker.Lock();
+			syscall->use_count--;
 
-		if (status != B_BAD_HANDLER)
-			return status;
+			if (status != B_BAD_HANDLER)
+				return status;
+		}
 
 		// the syscall may have been removed in the mean time
 		next = find_generic_syscall(subsystem);
@@ -264,6 +267,7 @@ register_generic_syscall(const char* subsystem, syscall_hook hook,
 	syscall->version = version;
 	syscall->flags = flags;
 	syscall->use_count = 0;
+	syscall->valid = true;
 	syscall->previous = previous;
 	list_add_item(&sGenericSyscalls, syscall);
 
@@ -285,6 +289,8 @@ unregister_generic_syscall(const char* subsystem, uint32 version)
 		generic_syscall* syscall = find_generic_syscall(subsystem);
 		if (syscall == NULL)
 			return B_NAME_NOT_FOUND;
+
+		syscall->valid = false;
 
 		if (syscall->use_count != 0) {
 			// TODO: we could use a condition variable here instead
