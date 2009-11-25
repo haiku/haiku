@@ -74,10 +74,10 @@ static int dump_syscall_tracing(int argc, char** argv);
 #endif
 
 
-static generic_syscall *
-find_generic_syscall(const char *subsystem)
+static generic_syscall*
+find_generic_syscall(const char* subsystem)
 {
-	generic_syscall *syscall = NULL;
+	generic_syscall* syscall = NULL;
 
 	ASSERT_LOCKED_MUTEX(&sGenericSyscallLock);
 
@@ -98,8 +98,8 @@ find_generic_syscall(const char *subsystem)
 	All other return codes are depending on the generic syscall implementation.
 */
 static inline status_t
-_user_generic_syscall(const char *userSubsystem, uint32 function,
-	void *buffer, size_t bufferSize)
+_user_generic_syscall(const char* userSubsystem, uint32 function,
+	void* buffer, size_t bufferSize)
 {
 	char subsystem[B_FILE_NAME_LENGTH];
 
@@ -138,7 +138,7 @@ _user_generic_syscall(const char *userSubsystem, uint32 function,
 	}
 
 	while (syscall != NULL) {
-		generic_syscall *next;
+		generic_syscall* next;
 
 		syscall->use_count++;
 		locker.Unlock();
@@ -185,28 +185,28 @@ _user_restore_signal_frame()
 
 
 int32
-syscall_dispatcher(uint32 call_num, void *args, uint64 *call_ret)
+syscall_dispatcher(uint32 callIndex, void* args, uint64* _returnValue)
 {
 	bigtime_t startTime;
 
 //	dprintf("syscall_dispatcher: thread 0x%x call 0x%x, arg0 0x%x, arg1 0x%x arg2 0x%x arg3 0x%x arg4 0x%x\n",
 //		thread_get_current_thread_id(), call_num, arg0, arg1, arg2, arg3, arg4);
 
-	user_debug_pre_syscall(call_num, args);
+	user_debug_pre_syscall(callIndex, args);
 
 	startTime = system_time();
 
-	switch (call_num) {
+	switch (callIndex) {
 		// the cases are auto-generated
 		#include "syscall_dispatcher.h"
 
 		default:
-			*call_ret = (uint64)B_BAD_VALUE;
+			*_returnValue = (uint64)B_BAD_VALUE;
 	}
 
-	user_debug_post_syscall(call_num, args, *call_ret, startTime);
+	user_debug_post_syscall(callIndex, args, *_returnValue, startTime);
 
-//	dprintf("syscall_dispatcher: done with syscall 0x%x\n", call_num);
+//	dprintf("syscall_dispatcher: done with syscall 0x%x\n", callIndex);
 
 	return B_HANDLED_INTERRUPT;
 }
@@ -236,7 +236,7 @@ generic_syscall_init(void)
 
 
 status_t
-register_generic_syscall(const char *subsystem, syscall_hook hook,
+register_generic_syscall(const char* subsystem, syscall_hook hook,
 	uint32 version, uint32 flags)
 {
 	if (hook == NULL)
@@ -275,7 +275,7 @@ register_generic_syscall(const char *subsystem, syscall_hook hook,
 
 
 status_t
-unregister_generic_syscall(const char *subsystem, uint32 version)
+unregister_generic_syscall(const char* subsystem, uint32 version)
 {
 	// TODO: we should only remove the syscall with the matching version
 

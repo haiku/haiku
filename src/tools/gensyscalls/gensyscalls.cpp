@@ -3,9 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 // Don't include arch_gensyscalls.h. It's only needed when creating the
 // syscall vector.
 #define DONT_INCLUDE_ARCH_GENSYSCALLS_H 1
+
+#include "gensyscalls.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -14,7 +17,6 @@
 #include <string.h>
 #include <vector>
 
-#include "gensyscalls.h"
 #include "gensyscalls_common.h"
 
 using std::vector;
@@ -49,47 +51,50 @@ print_usage(bool error)
 }
 
 
-// Type
+// #pragma mark - Type
 
-// constructor
+
 Type::Type(const char* name, int size, int usedSize,
 	const char* alignmentTypeName)
-	: fName(name),
-	  fSize(size),
-	  fUsedSize(usedSize),
-	  fAlignmentType(alignmentTypeName)
+	:
+	fName(name),
+	fSize(size),
+	fUsedSize(usedSize),
+	fAlignmentType(alignmentTypeName)
 {
 }
 
 
-// Parameter
+// #pragma mark - Parameter
 
-// constructor
+
 Parameter::Parameter(const char* typeName, const char* parameterName,
 	int size, int usedSize, int offset, const char* alignmentTypeName)
-	: Type(typeName, size, usedSize, alignmentTypeName),
-	  fParameterName(parameterName),
-	  fOffset(offset)
+	:
+	Type(typeName, size, usedSize, alignmentTypeName),
+	fParameterName(parameterName),
+	fOffset(offset)
 {
 }
 
 
-// Syscall
+// #pragma mark - Syscall
 
-// ParameterVector
+
 struct Syscall::ParameterVector : public vector<Parameter*> {
 };
 
-// constructor
+
 Syscall::Syscall(const char* name, const char* kernelName)
-	: fName(name),
-	  fKernelName(kernelName),
-	  fReturnType(NULL),
-	  fParameters(new ParameterVector)
+	:
+	fName(name),
+	fKernelName(kernelName),
+	fReturnType(NULL),
+	fParameters(new ParameterVector)
 {
 }
 
-// destructor
+
 Syscall::~Syscall()
 {
 	delete fReturnType;
@@ -100,14 +105,14 @@ Syscall::~Syscall()
 	delete fParameters;
 }
 
-// ParameterAt
+
 int
 Syscall::CountParameters() const
 {
 	return fParameters->size();
 }
 
-// ParameterAt
+
 Parameter*
 Syscall::ParameterAt(int index) const
 {
@@ -117,14 +122,14 @@ Syscall::ParameterAt(int index) const
 	return (*fParameters)[index];
 }
 
-// LastParameter
+
 Parameter*
 Syscall::LastParameter() const
 {
 	return ParameterAt(CountParameters() - 1);
 }
 
-// SetReturnType
+
 Type*
 Syscall::SetReturnType(const char* name, int size, int usedSize,
 	const char* alignmentTypeName)
@@ -133,7 +138,7 @@ Syscall::SetReturnType(const char* name, int size, int usedSize,
 	return fReturnType = new Type(name, size, usedSize, alignmentTypeName);
 }
 
-// AddParameter
+
 Parameter*
 Syscall::AddParameter(const char* typeName, const char* parameterName,
 	int size, int usedSize, int offset, const char* alignmentTypeName)
@@ -145,19 +150,21 @@ Syscall::AddParameter(const char* typeName, const char* parameterName,
 }
 
 
-// SyscallVector
+// #pragma mark - SyscallVector
+
 
 struct SyscallVector::_SyscallVector : public vector<Syscall*> {
 };
 
 
-// constructor
+
 SyscallVector::SyscallVector()
-	: fSyscalls(new _SyscallVector)
+	:
+	fSyscalls(new _SyscallVector)
 {
 }
 
-// destructor
+
 SyscallVector::~SyscallVector()
 {
 	int count = CountSyscalls();
@@ -166,21 +173,21 @@ SyscallVector::~SyscallVector()
 	delete fSyscalls;
 }
 
-// Create
+
 SyscallVector*
 SyscallVector::Create()
 {
 	return new SyscallVector;
 }
 
-// CountSyscalls
+
 int
 SyscallVector::CountSyscalls() const
 {
 	return fSyscalls->size();
 }
 
-// SyscallAt
+
 Syscall*
 SyscallVector::SyscallAt(int index) const
 {
@@ -190,7 +197,7 @@ SyscallVector::SyscallAt(int index) const
 	return (*fSyscalls)[index];
 }
 
-// CreateSyscall
+
 Syscall*
 SyscallVector::CreateSyscall(const char* name, const char* kernelName)
 {
@@ -202,18 +209,18 @@ SyscallVector::CreateSyscall(const char* name, const char* kernelName)
 
 // #pragma mark -
 
-// Main
+
 class Main {
 public:
-
-	int Run(int argc, char **argv)
+	int Run(int argc, char** argv)
 	{
 		// parse arguments
-		const char *syscallsFile = NULL;
-		const char *dispatcherFile = NULL;
-		const char *numbersFile = NULL;
-		const char *tableFile = NULL;
-		const char *straceFile = NULL;
+		const char* syscallsFile = NULL;
+		const char* dispatcherFile = NULL;
+		const char* numbersFile = NULL;
+		const char* tableFile = NULL;
+		const char* straceFile = NULL;
+
 		for (int argi = 1; argi < argc; argi++) {
 			string arg(argv[argi]);
 			if (arg == "-h" || arg == "--help") {
@@ -275,7 +282,7 @@ public:
 		return 0;
 	}
 
-	void _WriteSyscallsFile(const char *filename)
+	void _WriteSyscallsFile(const char* filename)
 	{
 		// open the syscalls output file
 		ofstream file(filename, ofstream::out | ofstream::trunc);
@@ -299,7 +306,7 @@ public:
 		}
 	}
 
-	void _WriteDispatcherFile(const char *filename)
+	void _WriteDispatcherFile(const char* filename)
 	{
 		// open the dispatcher output file
 		ofstream file(filename, ofstream::out | ofstream::trunc);
@@ -312,7 +319,7 @@ public:
 			file << "case " << i << ":" << endl;
 			file << "\t";
 			if (string(syscall->ReturnType()->TypeName()) != "void")
-				file << "*call_ret = ";
+				file << "*_returnValue = ";
 			file << syscall->KernelName() << "(";
 			int paramCount = syscall->CountParameters();
 			if (paramCount > 0) {
@@ -344,7 +351,7 @@ public:
 		}
 	}
 
-	void _WriteNumbersFile(const char *filename)
+	void _WriteNumbersFile(const char* filename)
 	{
 		// open the syscall numbers output file
 		ofstream file(filename, ofstream::out | ofstream::trunc);
@@ -352,7 +359,7 @@ public:
 			throw IOException(string("Failed to open `") + filename + "'.");
 
 		// output the defines
-		const char *prefix = "_user_";
+		const char* prefix = "_user_";
 		size_t prefixLen = strlen(prefix);
 		for (int i = 0; i < fSyscallCount; i++) {
 			const Syscall* syscall = fSyscallVector->SyscallAt(i);
@@ -371,7 +378,7 @@ public:
 		}
 	}
 
-	void _WriteTableFile(const char *filename)
+	void _WriteTableFile(const char* filename)
 	{
 		// open the syscall table output file
 		ofstream file(filename, ofstream::out | ofstream::trunc);
@@ -452,7 +459,7 @@ public:
 		file << "#endif	// _ASSEMBLER" << endl;
 	}
 
-	void _WriteSTraceFile(const char *filename)
+	void _WriteSTraceFile(const char* filename)
 	{
 		// open the syscall table output file
 		ofstream file(filename, ofstream::out | ofstream::trunc);
@@ -522,9 +529,9 @@ public:
 		file << "}" << endl;
 	}
 
-	static string _GetPointerType(const char *type)
+	static string _GetPointerType(const char* type)
 	{
-		const char *parenthesis = strchr(type, ')');
+		const char* parenthesis = strchr(type, ')');
 		if (!parenthesis)
 			return string(type) + "*";
 		// function pointer type
@@ -605,9 +612,9 @@ private:
 	int				fSyscallCount;
 };
 
-// main
+
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 	try {
 		return Main().Run(argc, argv);
