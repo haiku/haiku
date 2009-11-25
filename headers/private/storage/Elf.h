@@ -1,14 +1,30 @@
-// Elf.h
-
+/*
+ * Copyright 2002-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _ELF_H
 #define _ELF_H
 
+
+#include <SupportDefs.h>
+
+
 // types
 typedef uint32		Elf32_Addr;
-typedef uint16		Elf32_Half;
 typedef uint32		Elf32_Off;
+typedef uint16		Elf32_Half;
 typedef int32		Elf32_Sword;
 typedef uint32		Elf32_Word;
+typedef uint32		Elf32_Xword;
+typedef int32		Elf32_Sxword;
+
+typedef uint64		Elf64_Addr;
+typedef uint64		Elf64_Off;
+typedef uint16		Elf64_Half;
+typedef int32		Elf64_Sword;
+typedef uint32		Elf64_Word;
+typedef uint64		Elf64_Xword;
+typedef int64		Elf64_Sxword;
 
 // e_ident indices
 #define EI_MAG0		0
@@ -21,23 +37,9 @@ typedef uint32		Elf32_Word;
 #define EI_PAD		7
 #define EI_NIDENT	16
 
-// object file header
-typedef struct {
-	unsigned char	e_ident[EI_NIDENT];
-	Elf32_Half		e_type;
-	Elf32_Half		e_machine;
-	Elf32_Word		e_version;
-	Elf32_Addr		e_entry;
-	Elf32_Off		e_phoff;
-	Elf32_Off		e_shoff;
-	Elf32_Word		e_flags;
-	Elf32_Half		e_ehsize;
-	Elf32_Half		e_phentsize;
-	Elf32_Half		e_phnum;
-	Elf32_Half		e_shentsize;
-	Elf32_Half		e_shnum;
-	Elf32_Half		e_shstrndx;
-} Elf32_Ehdr;
+// e_ident EI_VERSION values
+#define EV_NONE 	0
+#define EV_CURRENT 	1
 
 // e_ident EI_CLASS and EI_DATA values
 #define ELFCLASSNONE	0
@@ -46,18 +48,6 @@ typedef struct {
 #define ELFDATANONE		0
 #define ELFDATA2LSB		1
 #define ELFDATA2MSB		2
-
-// program header
-typedef struct {
-	Elf32_Word	p_type;
-	Elf32_Off	p_offset;
-	Elf32_Addr	p_vaddr;
-	Elf32_Addr	p_paddr;
-	Elf32_Word	p_filesz;
-	Elf32_Word	p_memsz;
-	Elf32_Word	p_flags;
-	Elf32_Word	p_align;
-} Elf32_Phdr;
 
 // p_type
 #define PT_NULL		0
@@ -69,20 +59,6 @@ typedef struct {
 #define PT_PHDIR	6
 #define PT_LOPROC	0x70000000
 #define PT_HIPROC	0x7fffffff
-
-// section header
-typedef struct {
-	Elf32_Word	sh_name;
-	Elf32_Word	sh_type;
-	Elf32_Word	sh_flags;
-	Elf32_Addr	sh_addr;
-	Elf32_Off	sh_offset;
-	Elf32_Word	sh_size;
-	Elf32_Word	sh_link;
-	Elf32_Word	sh_info;
-	Elf32_Word	sh_addralign;
-	Elf32_Word	sh_entsize;
-} Elf32_Shdr;
 
 // sh_type values
 #define SHT_NULL		0
@@ -102,6 +78,17 @@ typedef struct {
 #define SHT_LOUSER		0x80000000
 #define SHT_HIUSER		0xffffffff
 
+// 32 bit definitions
+#undef _ELFX_BITS
+#define _ELFX_BITS	32
+#include <ElfX.h>
+
+// 64 bit definitions
+#undef _ELFX_BITS
+#define _ELFX_BITS	64
+#include <ElfX.h>
+
+#undef _ELFX_BITS
+
+
 #endif	// _ELF_H
-
-

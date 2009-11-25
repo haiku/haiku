@@ -72,7 +72,13 @@ public:
 
 private:
 			void				_InitFile(BFile& file, bool clobber);
+
 			void				_InitELFFile(BFile& file);
+
+			template<typename ElfHeader, typename ElfProgramHeader,
+				typename ElfSectionHeader>
+			void				_InitELFXFile(BFile& file, uint64 fileSize);
+
 			void				_InitPEFFile(BFile& file,
 									const PEFContainerHeader& pefHeader);
 			void				_ReadHeader(resource_parse_info& parseInfo);
@@ -92,10 +98,12 @@ private:
 			status_t			_WriteResources(ResourcesContainer& container);
 			status_t			_MakeEmptyResourceFile();
 
-	inline	int16				_GetInt16(int16 value);
-	inline	uint16				_GetUInt16(uint16 value);
-	inline	int32				_GetInt32(int32 value);
-	inline	uint32				_GetUInt32(uint32 value);
+	inline	int16				_GetInt(int16 value) const;
+	inline	uint16				_GetInt(uint16 value) const;
+	inline	int32				_GetInt(int32 value) const;
+	inline	uint32				_GetInt(uint32 value) const;
+	inline	int64				_GetInt(int64 value) const;
+	inline	uint64				_GetInt(uint64 value) const;
 
 private:
 			OffsetFile			fFile;
@@ -106,30 +114,44 @@ private:
 
 
 inline int16
-ResourceFile::_GetInt16(int16 value)
+ResourceFile::_GetInt(int16 value) const
 {
-	return fHostEndianess ? value : B_SWAP_INT16(value);
+	return fHostEndianess ? value : (int16)B_SWAP_INT16((uint16)value);
 }
 
 
 inline uint16
-ResourceFile::_GetUInt16(uint16 value)
+ResourceFile::_GetInt(uint16 value) const
 {
 	return fHostEndianess ? value : B_SWAP_INT16(value);
 }
 
 
 inline int32
-ResourceFile::_GetInt32(int32 value)
+ResourceFile::_GetInt(int32 value) const
+{
+	return fHostEndianess ? value : (int32)B_SWAP_INT32((uint32)value);
+}
+
+
+inline uint32
+ResourceFile::_GetInt(uint32 value) const
 {
 	return fHostEndianess ? value : B_SWAP_INT32(value);
 }
 
 
-inline uint32
-ResourceFile::_GetUInt32(uint32 value)
+inline int64
+ResourceFile::_GetInt(int64 value) const
 {
-	return fHostEndianess ? value : B_SWAP_INT32(value);
+	return fHostEndianess ? value : (int64)B_SWAP_INT64((uint64)value);
+}
+
+
+inline uint64
+ResourceFile::_GetInt(uint64 value) const
+{
+	return fHostEndianess ? value : B_SWAP_INT64(value);
 }
 
 
