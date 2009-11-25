@@ -87,6 +87,8 @@ SubDirHdrs [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 
 # build gensyscalls
 
+ObjectDefines $(syscallInfos) : HAIKU_BUILD_COMPATIBILITY_H ;
+	# Prevent the inclusion of HaikuBuildCompatibility.h. TODO: Very hacky!
 BuildPlatformMain gensyscalls : gensyscalls.cpp $(syscallInfos) ;
 LinkAgainst gensyscalls : $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
