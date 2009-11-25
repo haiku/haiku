@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
@@ -114,8 +114,7 @@ swap_data(type_code type, void *_data, size_t length, swap_action action)
 				messengerPrivate.SetTo(
 					__swap_int32(messengerPrivate.Team()),
 					__swap_int32(messengerPrivate.Port()),
-					__swap_int32(messengerPrivate.Token()),
-					messengerPrivate.IsPreferredTarget());
+					__swap_int32(messengerPrivate.Token()));
 				messenger++;
 			}
 			break;

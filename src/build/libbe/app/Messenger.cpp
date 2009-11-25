@@ -1,46 +1,41 @@
 /*
- * Copyright 2001-2008, Haiku Inc. All rights reserved.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold, bonefish@users.sf.net
+ *		Ingo Weinhold (bonefish@users.sf.net)
  */
 
-/*!
-	\class BMessenger
-	Delivers messages to local or remote targets.
-*/
 
+#include <AppMisc.h>
+#include <MessageUtils.h>
+#include "TokenSpace.h"
+
+#include <Application.h>
+#include <Handler.h>
+#include <Looper.h>
+#include <LooperList.h>
+#include <Message.h>
+#include <MessagePrivate.h>
 #include <Messenger.h>
+#include <OS.h>
+#include <Roster.h>
+#include <TokenSpace.h>
 
 #include <new>
 #include <stdio.h>
 #include <string.h>
 
-#include <Application.h>
-#include <Handler.h>
-#include <Looper.h>
-#include <Message.h>
-#include <OS.h>
-#include <Roster.h>
 
-#include <AppMisc.h>
-#include <LooperList.h>
-#include <MessageUtils.h>
-#include <MessengerPrivate.h>
-#include <ObjectLocker.h>
-#include <TokenSpace.h>
-
+// debugging
+//#define DBG(x) x
 #define DBG(x)
 #define OUT	printf
 
-using BPrivate::gDefaultTokens;
-using BPrivate::gLooperList;
-using BPrivate::BLooperList;
-using BPrivate::BObjectLocker;
 
-
-//	#pragma mark -
+enum {
+	NOT_IMPLEMENTED	= B_ERROR,
+};
 
 
 /*!	\brief Creates an unitialized BMessenger.
@@ -49,8 +44,7 @@ BMessenger::BMessenger()
 	:
 	fPort(-1),
 	fHandlerToken(B_NULL_TOKEN),
-	fTeam(-1),
-	fPreferredTarget(false)
+	fTeam(-1)
 {
 }
 
@@ -60,12 +54,11 @@ BMessenger::BMessenger()
 
 	\param from The messenger to be copied.
 */
-BMessenger::BMessenger(const BMessenger &from)
+BMessenger::BMessenger(const BMessenger& from)
 	:
 	fPort(from.fPort),
 	fHandlerToken(from.fHandlerToken),
-	fTeam(from.fTeam),
-	fPreferredTarget(from.fPreferredTarget)
+	fTeam(from.fTeam)
 {
 }
 
@@ -75,6 +68,9 @@ BMessenger::BMessenger(const BMessenger &from)
 BMessenger::~BMessenger()
 {
 }
+
+
+//	#pragma mark - Operators and misc
 
 
 /*!	\brief Makes this BMessenger a copy of the supplied one.
@@ -89,7 +85,6 @@ BMessenger::operator=(const BMessenger &from)
 		fPort = from.fPort;
 		fHandlerToken = from.fHandlerToken;
 		fTeam = from.fTeam;
-		fPreferredTarget = from.fPreferredTarget;
 	}
 	return *this;
 }
@@ -107,8 +102,7 @@ BMessenger::operator==(const BMessenger &other) const
 {
 	// Note: The fTeam fields are not compared.
 	return fPort == other.fPort
-		&& fHandlerToken == other.fHandlerToken
-		&& fPreferredTarget == other.fPreferredTarget;
+		&& fHandlerToken == other.fHandlerToken;
 }
 
 
@@ -123,7 +117,6 @@ bool
 BMessenger::IsValid() const
 {
 	return fPort >= 0;
-		// for the build version, we don't actually check the port
 }
 
 
@@ -138,23 +131,23 @@ BMessenger::Team() const
 }
 
 
+//	#pragma mark - Private or reserved
+
+
 /*!	\brief Sets the messenger's team, target looper port and handler token.
 
-	If \a preferred is \c true, \a token is ignored.
+	To target the preferred handler, use B_PREFERRED_TOKEN as token.
 
 	\param team The target's team.
 	\param port The target looper port.
 	\param token The target handler token.
-	\param preferred \c true to rather use the looper's preferred handler
-		   instead of the one specified by \a token.
 */
 void
-BMessenger::SetTo(team_id team, port_id port, int32 token, bool preferred)
+BMessenger::_SetTo(team_id team, port_id port, int32 token)
 {
 	fTeam = team;
 	fPort = port;
-	fHandlerToken = preferred ? B_PREFERRED_TOKEN : token;
-	fPreferredTarget = preferred;
+	fHandlerToken = token;
 }
 
 
@@ -179,12 +172,12 @@ operator<(const BMessenger &_a, const BMessenger &_b)
 	// 2. fHandlerToken
 	// 3. fPreferredTarget
 	// fTeam is insignificant
-	return a.Port() < b.Port()
-		|| (a.Port() == b.Port()
-			&& (a.Token() < b.Token()
-				|| (a.Token() == b.Token()
-					&& !a.IsPreferredTarget()
-					&& b.IsPreferredTarget())));
+	return (a.Port() < b.Port()
+			|| (a.Port() == b.Port()
+				&& (a.Token() < b.Token()
+					|| (a.Token() == b.Token()
+						&& !a.IsPreferredTarget()
+						&& b.IsPreferredTarget()))));
 }
 
 
@@ -200,3 +193,4 @@ operator!=(const BMessenger &a, const BMessenger &b)
 {
 	return !(a == b);
 }
+

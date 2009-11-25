@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -106,9 +106,13 @@ class BMessage {
 		status_t		AddString(const char *name, const char *aString);
 		status_t		AddString(const char *name, const BString &aString);
 		status_t		AddInt8(const char *name, int8 value);
+		status_t		AddUInt8(const char *name, uint8 value);
 		status_t		AddInt16(const char *name, int16 value);
+		status_t		AddUInt16(const char *name, uint16 value);
 		status_t		AddInt32(const char *name, int32 value);
+		status_t		AddUInt32(const char *name, uint32 value);
 		status_t		AddInt64(const char *name, int64 value);
+		status_t		AddUInt64(const char *name, uint64 value);
 		status_t		AddBool(const char *name, bool aBoolean);
 		status_t		AddFloat(const char *name, float aFloat);
 		status_t		AddDouble(const char *name, double aDouble);
@@ -138,12 +142,20 @@ class BMessage {
 		status_t		FindString(const char *name, int32 index, BString *string) const;
 		status_t		FindInt8(const char *name, int8 *value) const;
 		status_t		FindInt8(const char *name, int32 index, int8 *value) const;
+		status_t		FindUInt8(const char *name, uint8 *value) const;
+		status_t		FindUInt8(const char *name, int32 index, uint8 *value) const;
 		status_t		FindInt16(const char *name, int16 *value) const;
 		status_t		FindInt16(const char *name, int32 index, int16 *value) const;
+		status_t		FindUInt16(const char *name, uint16 *value) const;
+		status_t		FindUInt16(const char *name, int32 index, uint16 *value) const;
 		status_t		FindInt32(const char *name, int32 *value) const;
 		status_t		FindInt32(const char *name, int32 index, int32 *value) const;
+		status_t		FindUInt32(const char *name, uint32 *value) const;
+		status_t		FindUInt32(const char *name, int32 index, uint32 *value) const;
 		status_t		FindInt64(const char *name, int64 *value) const;
 		status_t		FindInt64(const char *name, int32 index, int64 *value) const;
+		status_t		FindUInt64(const char *name, uint64 *value) const;
+		status_t		FindUInt64(const char *name, int32 index, uint64 *value) const;
 		status_t		FindBool(const char *name, bool *value) const;
 		status_t		FindBool(const char *name, int32 index, bool *value) const;
 		status_t		FindFloat(const char *name, float *value) const;
@@ -176,12 +188,20 @@ class BMessage {
 		status_t		ReplaceString(const char *name, int32 index, const BString &aString);
 		status_t		ReplaceInt8(const char *name, int8 value);
 		status_t		ReplaceInt8(const char *name, int32 index, int8 value);
+		status_t		ReplaceUInt8(const char *name, uint8 value);
+		status_t		ReplaceUInt8(const char *name, int32 index, uint8 value);
 		status_t		ReplaceInt16(const char *name, int16 value);
 		status_t		ReplaceInt16(const char *name, int32 index, int16 value);
+		status_t		ReplaceUInt16(const char *name, uint16 value);
+		status_t		ReplaceUInt16(const char *name, int32 index, uint16 value);
 		status_t		ReplaceInt32(const char *name, int32 value);
 		status_t		ReplaceInt32(const char *name, int32 index, int32 value);
+		status_t		ReplaceUInt32(const char *name, uint32 value);
+		status_t		ReplaceUInt32(const char *name, int32 index, uint32 value);
 		status_t		ReplaceInt64(const char *name, int64 value);
 		status_t		ReplaceInt64(const char *name, int32 index, int64 value);
+		status_t		ReplaceUInt64(const char *name, uint64 value);
+		status_t		ReplaceUInt64(const char *name, int32 index, uint64 value);
 		status_t		ReplaceBool(const char *name, bool aBoolean);
 		status_t		ReplaceBool(const char *name, int32 index, bool aBoolean);
 		status_t		ReplaceFloat(const char *name, float aFloat);
@@ -203,6 +223,10 @@ class BMessage {
 		status_t		ReplaceData(const char *name, type_code type, int32 index,
 							const void *data, ssize_t numBytes);
 
+		// Comparing data - Haiku experimental API
+		bool			HasSameData(const BMessage &other,
+							bool ignoreFieldOrder = true, bool deep = false) const;
+
 		void			*operator new(size_t size);
 		void			*operator new(size_t, void *pointer);
 		void			operator delete(void *pointer, size_t size);
@@ -212,9 +236,13 @@ class BMessage {
 		bool			HasPoint(const char *, int32 n = 0) const;
 		bool			HasString(const char *, int32 n = 0) const;
 		bool			HasInt8(const char *, int32 n = 0) const;
+		bool			HasUInt8(const char *, int32 n = 0) const;
 		bool			HasInt16(const char *, int32 n = 0) const;
+		bool			HasUInt16(const char *, int32 n = 0) const;
 		bool			HasInt32(const char *, int32 n = 0) const;
+		bool			HasUInt32(const char *, int32 n = 0) const;
 		bool			HasInt64(const char *, int32 n = 0) const;
+		bool			HasUInt64(const char *, int32 n = 0) const;
 		bool			HasBool(const char *, int32 n = 0) const;
 		bool			HasFloat(const char *, int32 n = 0) const;
 		bool			HasDouble(const char *, int32 n = 0) const;
@@ -244,11 +272,13 @@ class BMessage {
 		friend class Private;
 		friend class BMessageQueue;
 
-		status_t		_InitCommon();
+		status_t		_InitCommon(bool initHeader);
 		status_t		_InitHeader();
 		status_t		_Clear();
 
-		status_t		_ResizeData(int32 offset, int32 change);
+		status_t		_ValidateMessage();
+
+		status_t		_ResizeData(uint32 offset, int32 change);
 
 		uint32			_HashName(const char* name) const;
 		status_t		_FindField(const char* name, type_code type,
@@ -257,26 +287,29 @@ class BMessage {
 							bool isFixedSize, field_header** _result);
 		status_t		_RemoveField(field_header* field);
 
-		ssize_t			_NativeFlattenedSize() const;
-		status_t		_NativeFlatten(char *buffer, ssize_t size) const;
-		status_t		_NativeFlatten(BDataIO *stream, ssize_t *size = NULL) const;
 		void			_PrintToStream(const char* indent) const;
 
 	private:
 		message_header*	fHeader;
 		field_header*	fFields;
 		uint8*			fData;
-		area_id			fClonedArea;
+
+		uint32			fFieldsAvailable;
+		size_t			fDataAvailable;
 
 		mutable	BMessage* fOriginal;
 
 		BMessage*		fQueueLink;
 			// fQueueLink is used by BMessageQueue to build a linked list
 
+		uint32			fReserved[9];
+
 						// deprecated
 						BMessage(BMessage *message);
 
-		static void		_StaticCacheCleanup();
+		virtual	void	_ReservedMessage1();
+		virtual	void	_ReservedMessage2();
+		virtual	void	_ReservedMessage3();
 
 		static BBlockCache* sMsgCache;
 };

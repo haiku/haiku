@@ -6,11 +6,11 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Lotz <mmlr@mlotz.ch>
  */
-#include <stdlib.h>
-
 #include <MessageAdapter.h>
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
+
+#include <stdlib.h>
 
 
 namespace BPrivate {
@@ -41,7 +41,7 @@ enum {
 struct r5_message_header {
 	uint32	magic;
 	uint32	checksum;
-	ssize_t	flattened_size;
+	int32	flattened_size;
 	int32	what;
 	uint8	flags;
 } _PACKED;
@@ -49,7 +49,7 @@ struct r5_message_header {
 
 struct dano_section_header {
 	uint32		code;
-	ssize_t		size;
+	int32		size;
 	uint8		data[0];
 } _PACKED;
 
@@ -69,7 +69,7 @@ typedef struct offset_table_s {
 
 struct dano_single_item {
 	type_code	type;
-	ssize_t		item_size;
+	int32		item_size;
 	uint8		name_length;
 	char		name[0];
 } _PACKED;
@@ -77,7 +77,7 @@ struct dano_single_item {
 
 struct dano_fixed_size_array {
 	type_code	type;
-	ssize_t		size_per_item;
+	int32		size_per_item;
 	uint8		name_length;
 	char		name[0];
 } _PACKED;
@@ -250,7 +250,7 @@ MessageAdapter::_R5FlattenedSize(const BMessage *from)
 
 	uint8 *data = messagePrivate.GetMessageData();
 	BMessage::field_header *field = messagePrivate.GetMessageFields();
-	for (int32 i = 0; i < header->field_count; i++, field++) {
+	for (uint32 i = 0; i < header->field_count; i++, field++) {
 		// flags and type
 		flattenedSize += 1 + sizeof(type_code);
 
@@ -277,7 +277,7 @@ MessageAdapter::_R5FlattenedSize(const BMessage *from)
 		else {
 			uint8 *source = data + field->offset + field->name_length;
 
-			for (int32 i = 0; i < field->count; i++) {
+			for (uint32 i = 0; i < field->count; i++) {
 				ssize_t itemSize = *(ssize_t *)source + sizeof(ssize_t);
 				flattenedSize += pad_to_8(itemSize);
 				source += itemSize;
@@ -344,11 +344,11 @@ MessageAdapter::_FlattenR5Message(uint32 format, const BMessage *from,
 	r5header->flags = flags;
 
 	// store the header size - used for the checksum later
-	ssize_t headerSize = (addr_t)pointer - (addr_t)buffer;
+	ssize_t headerSize = (uint32)pointer - (uint32)buffer;
 
 	// collect and add the data
 	BMessage::field_header *field = messagePrivate.GetMessageFields();
-	for (int32 i = 0; i < header->field_count; i++, field++) {
+	for (uint32 i = 0; i < header->field_count; i++, field++) {
 		flags = R5_FIELD_FLAG_VALID;
 
 		if (field->count == 1)
@@ -400,10 +400,12 @@ MessageAdapter::_FlattenR5Message(uint32 format, const BMessage *from,
 			pointer += field->data_size;
 		} else {
 			uint8 *previous = pointer;
-			for (int32 i = 0; i < field->count; i++) {
+			for (uint32 i = 0; i < field->count; i++) {
 				ssize_t itemSize = *(ssize_t *)source + sizeof(ssize_t);
 				memcpy(pointer, source, itemSize);
-				pointer += pad_to_8(itemSize);
+				ssize_t paddedSize = pad_to_8(itemSize);
+				memset(pointer + itemSize, 0, paddedSize - itemSize);
+				pointer += paddedSize;
 				source += itemSize;
 			}
 
@@ -420,7 +422,7 @@ MessageAdapter::_FlattenR5Message(uint32 format, const BMessage *from,
 	pointer++;
 
 	// calculate the flattened size from the pointers
-	r5header->flattened_size = (addr_t)pointer - (addr_t)buffer;
+	r5header->flattened_size = (uint32)pointer - (uint32)buffer;
 	r5header->checksum = CalculateChecksum((uint8 *)(buffer + 8),
 		headerSize - 8);
 
@@ -451,13 +453,13 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 
 	header->what = into->what = r5header.what;
 	if (r5header.flags & R5_MESSAGE_FLAG_INCLUDE_TARGET)
-		reader(header->target);
+		reader(&header->target, sizeof(header->target));
 
 	if (r5header.flags & R5_MESSAGE_FLAG_INCLUDE_REPLY) {
 		// reply info
-		reader(header->reply_port);
-		reader(header->reply_target);
-		reader(header->reply_team);
+		reader(&header->reply_port, sizeof(header->reply_port));
+		reader(&header->reply_target, sizeof(header->reply_target));
+		reader(&header->reply_team, sizeof(header->reply_team));
 
 		// big flags
 		uint8 bigFlag;
@@ -530,24 +532,12 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 		if (fixedSize)
 			itemSize = dataSize / itemCount;
 
-		if (fixedSize) {
+		if (format == MESSAGE_FORMAT_R5) {
 			for (int32 i = 0; i < itemCount; i++) {
-				// ToDo: what if we are swapped? need B_INT32_TYPEs and the
-				// like be swapped here?
-				result = into->AddData(nameBuffer, type, pointer, itemSize,
-					fixedSize, itemCount);
-
-				if (result < B_OK) {
-					free(buffer);
-					return result;
+				if (!fixedSize) {
+					itemSize = *(ssize_t *)pointer;
+					pointer += sizeof(ssize_t);
 				}
-
-				pointer += itemSize;
-			}
-		} else if (format == MESSAGE_FORMAT_R5_SWAPPED) {
-			for (int32 i = 0; i < itemCount; i++) {
-				itemSize = __swap_int32(*(ssize_t *)pointer);
-				pointer += sizeof(ssize_t);
 
 				result = into->AddData(nameBuffer, type, pointer, itemSize,
 					fixedSize, itemCount);
@@ -557,13 +547,19 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 					return result;
 				}
 
-				pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
+				if (fixedSize)
+					pointer += itemSize;
+				else
+					pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
 			}
 		} else {
 			for (int32 i = 0; i < itemCount; i++) {
-				itemSize = *(ssize_t *)pointer;
-				pointer += sizeof(ssize_t);
+				if (!fixedSize) {
+					itemSize = __swap_int32(*(ssize_t *)pointer);
+					pointer += sizeof(ssize_t);
+				}
 
+				swap_data(type, pointer, itemSize, B_SWAP_ALWAYS);
 				result = into->AddData(nameBuffer, type, pointer, itemSize,
 					fixedSize, itemCount);
 
@@ -572,7 +568,10 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 					return result;
 				}
 
-				pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
+				if (fixedSize)
+					pointer += itemSize;
+				else
+					pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
 			}
 		}
 
@@ -618,14 +617,17 @@ MessageAdapter::_UnflattenDanoMessage(uint32 format, BMessage *into,
 
 		ssize_t fieldSize = sectionHeader.size - sizeof(dano_section_header);
 		uint8 *fieldBuffer = NULL;
-		if (fieldSize > 0) {
+		if (fieldSize <= 0) {
 			// there may be no data. we shouldn't fail because of that
-			fieldBuffer = (uint8 *)malloc(fieldSize);
-			if (fieldBuffer == NULL)
-				throw (status_t)B_NO_MEMORY;
-
-			reader(fieldBuffer, fieldSize);
+			offset += sectionHeader.size;
+			continue;
 		}
+
+		fieldBuffer = (uint8 *)malloc(fieldSize);
+		if (fieldBuffer == NULL)
+			throw (status_t)B_NO_MEMORY;
+
+		reader(fieldBuffer, fieldSize);
 
 		switch (sectionHeader.code) {
 			case SECTION_OFFSET_TABLE:
