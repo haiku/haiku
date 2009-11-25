@@ -80,7 +80,7 @@ entry_ref_unflatten(entry_ref *ref, const char *buffer, size_t size)
 	memcpy((void *)&ref->directory, (const void *)buffer, sizeof(ref->directory));
 	buffer += sizeof(ref->directory);
 
-	if (ref->device != -1 && size > sizeof(ref->device)
+	if (ref->device != ~(dev_t)0 && size > sizeof(ref->device)
 			+ sizeof(ref->directory)) {
 		ref->set_name(buffer);
 		if (ref->name == NULL) {

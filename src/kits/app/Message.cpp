@@ -552,7 +552,7 @@ BMessage::_PrintToStream(const char* indent) const
 	if (isprint(*(char *)&value))
 		printf("'%.4s'", (char *)&value);
 	else
-		printf("0x%lx", what);
+		printf("0x%" B_PRIx32, what);
 	printf(") {\n");
 
 	if (fHeader == NULL || fFields == NULL || fData == NULL)
@@ -571,7 +571,7 @@ BMessage::_PrintToStream(const char* indent) const
 				printf("%s        %s = ", indent,
 					(char *)(fData + field->offset));
 			} else {
-				printf("%s        %s[%ld] = ", indent,
+				printf("%s        %s[%" B_PRIu32 "] = ", indent,
 					(char *)(fData + field->offset), j);
 			}
 
@@ -589,7 +589,7 @@ BMessage::_PrintToStream(const char* indent) const
 					size = *(uint32 *)pointer;
 					pointer += sizeof(uint32);
 					printf("string(\"%s\", %ld bytes)\n", (char *)pointer,
-						size);
+						(long)size);
 					break;
 				}
 
@@ -646,8 +646,9 @@ BMessage::_PrintToStream(const char* indent) const
 					entry_ref ref;
 					BPrivate::entry_ref_unflatten(&ref, (char *)pointer, size);
 
-					printf("entry_ref(device=%ld, directory=%lld, "
-						"name=\"%s\", ", ref.device, ref.directory, ref.name);
+					printf("entry_ref(device=%d, directory=%" B_PRIdINO
+						", name=\"%s\", ", (int)ref.device, ref.directory,
+						ref.name);
 
 					BPath path(&ref);
 					printf("path=\"%s\")\n", path.Path());
@@ -676,7 +677,7 @@ BMessage::_PrintToStream(const char* indent) const
 				default:
 				{
 					printf("(type = '%.4s')(size = %ld)\n", (char *)&value,
-						size);
+						(long)size);
 					break;
 				}
 			}
