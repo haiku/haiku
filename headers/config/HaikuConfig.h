@@ -59,7 +59,8 @@
 #endif
 
 /* BeOS R5 compatible types */
-#ifdef __HAIKU_ARCH_X86
+#ifndef __HAIKU_ARCH_64_BIT
+/*#ifdef __HAIKU_ARCH_X86*/
 	/* TODO: This should be "#ifdef __HAIKU_BEOS_COMPATIBLE", but this will
 	   break all gcc 4 C++ optional packages. I.e. switch that at a suitable
 	   time.
