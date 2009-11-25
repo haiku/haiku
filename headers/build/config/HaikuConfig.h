@@ -27,7 +27,7 @@
 #	define __HAIKU_ARCH_PPC			1
 #	define __HAIKU_BIG_ENDIAN		1
 #elif __M68K__
-#	define __HAIKU_ARCH	m68k		1
+#	define __HAIKU_ARCH				m68k
 #	define __HAIKU_ARCH_M68K		1
 #	define __HAIKU_BIG_ENDIAN		1
 #elif __MIPSEL__
