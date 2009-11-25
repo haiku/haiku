@@ -180,10 +180,17 @@ public:
 								{ ASSERT_WRITE_LOCKED_RW_LOCK(&fLock); }
 #endif
 
+#ifdef B_HAIKU_64_BIT
+			Link*			GetDoublyLinkedListLink()
+								{ return &fListLink; }
+			const Link*		GetDoublyLinkedListLink() const
+								{ return &fListLink; }
+#else
 			Link*			GetDoublyLinkedListLink()
 								{ return (Link*)&fNode.pad[0]; }
 			const Link*		GetDoublyLinkedListLink() const
 								{ return (Link*)&fNode.pad[0]; }
+#endif
 
 private:
 							Inode(const Inode& other);
@@ -240,6 +247,10 @@ private:
 			off_t			fOldLastModified;
 				// we need those values to ensure we will remove
 				// the correct keys from the indices
+
+#ifdef B_HAIKU_64_BIT
+			Link			fListLink;
+#endif
 
 			mutable recursive_lock fSmallDataLock;
 			SinglyLinkedList<AttributeIterator> fIterators;

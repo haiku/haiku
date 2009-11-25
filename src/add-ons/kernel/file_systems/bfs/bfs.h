@@ -202,7 +202,8 @@ struct bfs_inode {
 	};
 	bigtime_t	status_change_time;
 	int32		pad[2];
-		// we use this member as a doubly linked list link
+		// on 32 bit architectures we use this member as a doubly linked list
+		// link
 
 	small_data	small_data_start[0];
 
