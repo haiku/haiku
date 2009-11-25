@@ -94,10 +94,10 @@ void
 FPS::drawCounter(GLfloat frameRate)
 {
 	GLfloat pos = 0;
-	int ifps = (int)(frameRate * 10 + 0.5);
+	int ifps = (int)frameRate;
 
 	int count = 0;
-	int number = 10;
+	int number = 1;
 	while (ifps > number) {
 		number *= 10;
 		count++;
@@ -112,15 +112,7 @@ FPS::drawCounter(GLfloat frameRate)
 		number /= 10;
 	}
 
-	pos -= 0.5;
-	glBegin(GL_POINTS);
-	glVertex2f(pos, -0.5);
-	glEnd();
 	pos += 0.5;
-
-	drawChar(pos, 0, (ifps / number) % 10);
-	pos += 1.5;
-
 	drawChar(pos, 0, 10);
 	pos += 1;
 	drawChar(pos, 0, 11);
