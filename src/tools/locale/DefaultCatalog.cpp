@@ -31,21 +31,16 @@
 
 
 using std::auto_ptr;
-using std::min;
-using std::max;
-using std::pair;
 
 
-/*
- *	This file implements the default catalog-type for the opentracker locale
- *	kit. Alternatively, this could be used as a full add-on, but currently this
- *  is provided as part of liblocale.so.
- */
+/*!	This file implements the default catalog-type for the opentracker locale
+	kit. Alternatively, this could be used as a full add-on, but currently this
+	is provided as part of liblocale.so.
+*/
 
 
-/*
- * several attributes/resource-IDs used within the Locale Kit:
- */
+// several attributes/resource-IDs used within the Locale Kit:
+
 const char *kCatLangAttr = "BEOS:LOCALE_LANGUAGE";
 	// name of catalog language, lives in every catalog file
 const char *kCatSigAttr = "BEOS:LOCALE_SIGNATURE";
@@ -60,12 +55,11 @@ static int16 kCatArchiveVersion = 1;
 	// version of the catalog archive structure, bump this if you change it!
 
 
-/*
- * constructs a DefaultCatalog with given signature and language and reads
- * the catalog from disk.
- * InitCheck() will be B_OK if catalog could be loaded successfully, it will
- * give an appropriate error-code otherwise.
- */
+/*!	Constructs a DefaultCatalog with given signature and language and reads
+	the catalog from disk.
+	InitCheck() will be B_OK if catalog could be loaded successfully, it will
+	give an appropriate error-code otherwise.
+*/
 DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 	uint32 fingerprint)
 	:
@@ -78,12 +72,11 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 }
 
 
-/*
- * constructs a DefaultCatalog and reads it from the resources of the
- * given entry-ref (which usually is an app- or add-on-file).
- * InitCheck() will be B_OK if catalog could be loaded successfully, it will
- * give an appropriate error-code otherwise.
- */
+/*!	Constructs a DefaultCatalog and reads it from the resources of the
+	given entry-ref (which usually is an app- or add-on-file).
+	InitCheck() will be B_OK if catalog could be loaded successfully, it will
+	give an appropriate error-code otherwise.
+*/
 DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	:
 	BHashMapCatalog("", "", 0)
@@ -95,11 +88,10 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 }
 
 
-/*
- * constructs an empty DefaultCatalog with given sig and language.
- * This is used for editing/testing purposes.
- * InitCheck() will always be B_OK.
- */
+/*!	Constructs an empty DefaultCatalog with given sig and language.
+	This is used for editing/testing purposes.
+	InitCheck() will always be B_OK.
+*/
 DefaultCatalog::DefaultCatalog(const char *path, const char *signature,
 	const char *language)
 	:
@@ -168,10 +160,9 @@ DefaultCatalog::ReadFromFile(const char *path)
 }
 
 
-/*
- * this method is not currently being used, but it may be useful in the
- * future...
- */
+/*!	This method is not currently being used, but it may be useful in the
+	future...
+*/
 status_t
 DefaultCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
 {
@@ -192,34 +183,35 @@ DefaultCatalog::WriteToFile(const char *path)
 	BFile catalogFile;
 	if (path)
 		fPath = path;
-	status_t res = catalogFile.SetTo(fPath.String(),
+	status_t status = catalogFile.SetTo(fPath.String(),
 		B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	if (res != B_OK)
-		return res;
+	if (status != B_OK)
+		return status;
 
 	BMallocIO mallocIO;
-	mallocIO.SetBlockSize(max(fCatMap.Size()*20, 256));
+	mallocIO.SetBlockSize(max_c(fCatMap.Size() * 20, 256));
 		// set a largish block-size in order to avoid reallocs
-	res = Flatten(&mallocIO);
-	if (res == B_OK) {
-		ssize_t wsz;
-		wsz = catalogFile.Write(mallocIO.Buffer(), mallocIO.BufferLength());
-		if (wsz != (ssize_t)mallocIO.BufferLength())
-			return B_FILE_ERROR;
+	status = Flatten(&mallocIO);
+	if (status != B_OK)
+		return status;
 
-		// set mimetype-, language- and signature-attributes:
-		UpdateAttributes(catalogFile);
-	}
-	if (res == B_OK)
-		UpdateAttributes(catalogFile);
-	return res;
+	ssize_t bytesWritten
+		= catalogFile.Write(mallocIO.Buffer(), mallocIO.BufferLength());
+	if (bytesWritten < 0)
+		return bytesWritten;
+	if (bytesWritten != (ssize_t)mallocIO.BufferLength())
+		return B_IO_ERROR;
+
+	// set mimetype-, language- and signature-attributes:
+	UpdateAttributes(catalogFile);
+
+	return B_OK;
 }
 
 
-/*
- * this method is not currently being used, but it may be useful in the
- * future...
- */
+/*!	This method is not currently being used, but it may be useful in the
+	future...
+*/
 status_t
 DefaultCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
 {
@@ -234,10 +226,9 @@ DefaultCatalog::WriteToResource(entry_ref *appOrAddOnRef)
 }
 
 
-/*
- * writes mimetype, language-name and signature of catalog into the
- * catalog-file.
- */
+/*!	Writes mimetype, language-name and signature of catalog into the
+	catalog-file.
+*/
 void
 DefaultCatalog::UpdateAttributes(BFile& catalogFile)
 {
