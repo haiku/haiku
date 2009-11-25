@@ -4653,7 +4653,7 @@ vfs_exec_io_context(io_context* context)
 	of the parent io_control if it is given.
 */
 io_context*
-vfs_new_io_context(io_context* parentContext)
+vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 {
 	size_t tableSize;
 	struct io_context* context;
@@ -4710,12 +4710,16 @@ vfs_new_io_context(io_context* parentContext)
 			struct file_descriptor* descriptor = parentContext->fds[i];
 
 			if (descriptor != NULL) {
+				bool closeOnExec = fd_close_on_exec(parentContext, i);
+				if (closeOnExec && purgeCloseOnExec)
+					continue;
+
 				context->fds[i] = descriptor;
 				context->num_used_fds++;
 				atomic_add(&descriptor->ref_count, 1);
 				atomic_add(&descriptor->open_count, 1);
 
-				if (fd_close_on_exec(parentContext, i))
+				if (closeOnExec)
 					fd_set_close_on_exec(context, i, true);
 			}
 		}

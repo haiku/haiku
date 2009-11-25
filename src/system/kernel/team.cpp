@@ -1203,7 +1203,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		// args are owned by the team_arg structure now
 
 	// create a new io_context for this team
-	team->io_context = vfs_new_io_context(parentIOContext);
+	team->io_context = vfs_new_io_context(parentIOContext, true);
 	if (!team->io_context) {
 		status = B_NO_MEMORY;
 		goto err2;
@@ -1536,7 +1536,7 @@ fork_team(void)
 	}
 
 	// create a new io_context for this team
-	team->io_context = vfs_new_io_context(parentTeam->io_context);
+	team->io_context = vfs_new_io_context(parentTeam->io_context, false);
 	if (!team->io_context) {
 		status = B_NO_MEMORY;
 		goto err2;
@@ -2064,7 +2064,7 @@ team_init(kernel_args *args)
 
 	insert_team_into_group(group, sKernelTeam);
 
-	sKernelTeam->io_context = vfs_new_io_context(NULL);
+	sKernelTeam->io_context = vfs_new_io_context(NULL, false);
 	if (sKernelTeam->io_context == NULL)
 		panic("could not create io_context for kernel team!\n");
 
