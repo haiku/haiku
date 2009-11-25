@@ -109,7 +109,7 @@ call_handlers(uint32 lowResources)
 		// swap with handler
 		sLowResourceHandlers.Swap(&marker, handler);
 		marker.priority = handler->priority;
-	
+
 		int32 resources = handler->resources & lowResources;
 		if (resources != 0) {
 			recursive_lock_unlock(&sLowResourceLock);
@@ -201,7 +201,7 @@ low_resource_manager(void *)
 			continue;
 
 		call_handlers(sLowResources);
-		
+
 		if (state == B_LOW_RESOURCE_WARNING)
 			timeout = kWarnResourceInterval;
 		else
@@ -213,9 +213,34 @@ low_resource_manager(void *)
 }
 
 
+static const char*
+state_to_string(uint32 state)
+{
+	switch (state) {
+		case B_LOW_RESOURCE_CRITICAL:
+			return "critical";
+		case B_LOW_RESOURCE_WARNING:
+			return "warning";
+		case B_LOW_RESOURCE_NOTE:
+			return "note";
+
+		default:
+			return "normal";
+	}
+}
+
+
 static int
 dump_handlers(int argc, char **argv)
 {
+	kprintf("current state: %c%c%c\n",
+		(sLowResources & B_KERNEL_RESOURCE_PAGES) != 0 ? 'p' : '-',
+		(sLowResources & B_KERNEL_RESOURCE_MEMORY) != 0 ? 'm' : '-',
+		(sLowResources & B_KERNEL_RESOURCE_SEMAPHORES) != 0 ? 's' : '-');
+	kprintf("  pages:  %s\n", state_to_string(sLowPagesState));
+	kprintf("  memory: %s\n", state_to_string(sLowMemoryState));
+	kprintf("  sems:   %s\n\n", state_to_string(sLowSemaphoresState));
+
 	HandlerList::Iterator iterator = sLowResourceHandlers.GetIterator();
 	kprintf("function    data         resources  prio  function-name\n");
 
