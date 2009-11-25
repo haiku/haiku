@@ -107,11 +107,13 @@ public:
 			bool				IsUserlandServerThread() const;
 
 private:
-			friend class KernelDebug;
 			struct SelectSyncMap;
 			struct NodeListenerKey;
 			struct NodeListenerProxy;
 			struct NodeListenerHashDefinition;
+
+			friend class KernelDebug;
+			friend struct NodeListenerProxy;
 
 			typedef BOpenHashTable<VNodeOpsHashDefinition> VNodeOpsMap;
 			typedef BOpenHashTable<NodeListenerHashDefinition> NodeListenerMap;
