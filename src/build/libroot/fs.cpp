@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <BeOSBuildCompatibility.h>
 
 #include "fs_impl.h"
@@ -515,7 +516,7 @@ open_file(const char *path, int openMode, int perms)
 	}
 
 	Descriptor *descriptor;
-	if (exists && S_ISLNK(st.st_mode) && (openMode & O_NOTRAVERSE)) {
+	if (exists && S_ISLNK(st.st_mode) && (openMode & O_NOTRAVERSE) != 0) {
 		// a symlink not to be followed: create a special descriptor
 		// normalize path first
 		string normalizedPath;
@@ -524,7 +525,6 @@ open_file(const char *path, int openMode, int perms)
 			return error;
 		
 		descriptor = new SymlinkDescriptor(normalizedPath.c_str());
-	
 	} else {
 		// open the file
 		openMode &= ~O_NOTRAVERSE;
