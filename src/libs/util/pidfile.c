@@ -112,9 +112,7 @@ pidfile_open(const char *path, mode_t mode, pid_t *pidptr)
 	 * PID file will be truncated again in pidfile_write(), so
 	 * pidfile_write() can be called multiple times.
 	 */
-	fd = open(pfh->pf_path,
-	    O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK, mode);
-
+	fd = open(pfh->pf_path, O_WRONLY | O_CREAT | O_NONBLOCK, mode);
 	if (fd >= 0) {
 		struct flock lock;
 		lock.l_type = F_WRLCK;
@@ -122,7 +120,7 @@ pidfile_open(const char *path, mode_t mode, pid_t *pidptr)
 		lock.l_start = 0;
 		lock.l_len = 0;
 
-		if (fcntl(F_SETLK, &lock) == -1) {
+		if (fcntl(fd, F_SETLK, &lock) == -1) {
 			close(fd);
 			fd = -1;
 		}
@@ -138,6 +136,8 @@ pidfile_open(const char *path, mode_t mode, pid_t *pidptr)
 		return (NULL);
 	}
 	
+	ftruncate(fd, 0);
+
 	/*
 	 * Remember file information, so in pidfile_write() we are sure we write
 	 * to the proper descriptor.
