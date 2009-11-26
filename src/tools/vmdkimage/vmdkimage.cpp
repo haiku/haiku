@@ -71,13 +71,13 @@ dump_image_info(const char *filename)
 	printf("  version:             %d\n", (int)header.version);
 	printf("  flags:               %d\n", (int)header.flags);
 	printf("  capacity:            %d\n", (int)header.capacity);
-	printf("  grainSize:           %lld\n", header.grainSize);
-	printf("  descriptorOffset:    %lld\n", header.descriptorOffset);
-	printf("  descriptorSize:      %lld\n", header.descriptorSize);
+	printf("  grainSize:           %lld\n", (long long)header.grainSize);
+	printf("  descriptorOffset:    %lld\n", (long long)header.descriptorOffset);
+	printf("  descriptorSize:      %lld\n", (long long)header.descriptorSize);
 	printf("  numGTEsPerGT:        %u\n", (unsigned int)header.numGTEsPerGT);
-	printf("  rgdOffset:           %lld\n", header.rgdOffset);
-	printf("  gdOffset:            %lld\n", header.gdOffset);
-	printf("  overHead:            %lld\n", header.overHead);
+	printf("  rgdOffset:           %lld\n", (long long)header.rgdOffset);
+	printf("  gdOffset:            %lld\n", (long long)header.gdOffset);
+	printf("  overHead:            %lld\n", (long long)header.overHead);
 	printf("  uncleanShutdown:     %s\n",
 		header.uncleanShutdown ? "yes" : "no");
 	printf("  singleEndLineChar:   '%c'\n", header.singleEndLineChar);
@@ -348,7 +348,8 @@ main(int argc, char *argv[])
 	sprintf(desc + strlen(desc),
 		"# Extent Description\n"
 		"RW %llu FLAT \"%s\" %llu\n",
-		actualImageSize / 512, name, headerSize / 512);
+		(unsigned long long)actualImageSize / 512, name,
+		(unsigned long long)headerSize / 512);
 	sprintf(desc + strlen(desc),
 		"# Disk Data Base\n"
 		"ddb.toolsVersion = \"0\"\n"
@@ -357,13 +358,14 @@ main(int argc, char *argv[])
 		"ddb.adapterType = \"ide\"\n"
 		"ddb.geometry.heads = \"%llu\"\n"
 		"ddb.geometry.cylinders = \"%llu\"\n",
-		sectors, heads, cylinders);
+		(unsigned long long)sectors, (unsigned long long)heads,
+		(unsigned long long)cylinders);
 
 	if (uuid == NULL) {
 		sprintf(desc + strlen(desc),
 			"ddb.uuid.image=\"%08llx-%04llx-%04llx-%04llx-%012llx\"\n",
-			uuid1 & 0xffffffff, uuid2 & 0xffff, uuid3 & 0xffff, uuid4 & 0xffff,
-			uuid5 & 0xffffffffffffLL);
+			uuid1 & 0xffffffffLL, uuid2 & 0xffffLL, uuid3 & 0xffffLL,
+			uuid4 & 0xffffLL, uuid5 & 0xffffffffffffLL);
 	} else
 		sprintf(desc + strlen(desc), "ddb.uuid.image=\"%s\"\n", uuid);
 
