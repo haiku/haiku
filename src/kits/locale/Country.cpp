@@ -1,7 +1,8 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009, Destugues, pulkomandy@gmail.com.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <Country.h>
@@ -425,14 +426,20 @@ ssize_t
 BCountry::FormatMonetary(char* string, size_t maxSize, double value)
 {
 	BString fullString;
-	FormatMonetary(&fullString, value);
-	strncpy(string, fullString.String(), maxSize);
+	ssize_t written = FormatMonetary(&fullString, value);
+	if (written < 0)
+		return written;
+
+	return strlcpy(string, fullString.String(), maxSize);
 }
 
 
 ssize_t
 BCountry::FormatMonetary(BString* string, double value)
 {
+	if (string == NULL)
+		return B_BAD_VALUE;
+
 	UErrorCode err;
 	NumberFormat* numberFormatter
 		= NumberFormat::createCurrencyInstance(*fICULocale, err);
@@ -447,7 +454,7 @@ BCountry::FormatMonetary(BString* string, double value)
 
 	ICUString.toUTF8(stringConverter);
 
-	return B_OK;
+	return string->Length();
 }
 
 
