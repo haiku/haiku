@@ -53,16 +53,14 @@
 #define O_SYNC			0x00010000	/* write synchronized I/O file integrity */
 #define O_RSYNC			0x00020000	/* read synchronized I/O file integrity */
 #define O_DSYNC			0x00040000	/* write synchronized I/O data integrity */
+#define O_NOFOLLOW		0x00080000	/* fail on symlinks */
+#define O_NOCACHE		0x00100000	/* do not use the file system cache if */
+									/* possible */
+#define O_DIRECT		O_NOCACHE
+#define O_DIRECTORY		0x00200000	/* fail if not a directory */
 
 /* TODO: currently not implemented additions: */
-#define O_NOFOLLOW		0x00080000
-	/* should we implement this? it's similar to O_NOTRAVERSE but will fail on symlinks */
-#define O_NOCACHE		0x00100000	/* doesn't use the file system cache if possible */
-#define O_DIRECT		O_NOCACHE
-#define O_MOUNT			0x00200000	/* for file systems */
 #define O_TEMPORARY		0x00400000	/* used to avoid writing temporary files to disk */
-#define O_SHLOCK		0x01000000	/* obtain shared lock */
-#define O_EXLOCK		0x02000000	/* obtain exclusive lock */
 
 #ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 #define AT_FDCWD		(-1)		/* CWD FD for the *at() functions */

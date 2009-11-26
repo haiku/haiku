@@ -50,16 +50,15 @@
 #define FSSH_O_SYNC			0x00010000	/* write synchronized I/O file integrity */
 #define FSSH_O_RSYNC		0x00020000	/* read synchronized I/O file integrity */
 #define FSSH_O_DSYNC		0x00040000	/* write synchronized I/O data integrity */
+#define FSSH_O_NOFOLLOW		0x00080000	/* fail on symlinks */
+#define FSSH_O_NOCACHE		0x00100000	/* do not use the file system cache if */
+										/* possible */
+#define FSSH_O_DIRECT		FSSH_O_NOCACHE
+#define FSSH_O_DIRECTORY	0x00200000	/* fail if not a directory */
 
 // TODO: currently not implemented additions:
-#define FSSH_O_NOFOLLOW		0x00080000
 	/* should we implement this? it's similar to O_NOTRAVERSE but will fail on symlinks */
-#define FSSH_O_NOCACHE		0x00100000	/* doesn't use the file system cache if possible */
-#define FSSH_O_DIRECT		FSSH_O_NOCACHE
-#define FSSH_O_MOUNT		0x00200000	/* for file systems */
 #define FSSH_O_TEMPORARY	0x00400000	/* used to avoid writing temporary files to disk */
-#define FSSH_O_SHLOCK		0x01000000	/* obtain shared lock */
-#define FSSH_O_EXLOCK		0x02000000	/* obtain exclusive lock */
 
 #define FSSH_S_IREAD		0x0100  /* owner may read */
 #define FSSH_S_IWRITE		0x0080	/* owner may write */

@@ -113,7 +113,21 @@ pidfile_open(const char *path, mode_t mode, pid_t *pidptr)
 	 * pidfile_write() can be called multiple times.
 	 */
 	fd = open(pfh->pf_path,
-	    O_WRONLY | O_CREAT | O_EXLOCK | O_TRUNC | O_NONBLOCK, mode);
+	    O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK, mode);
+
+	if (fd >= 0) {
+		struct flock lock;
+		lock.l_type = F_WRLCK;
+		lock.l_whence = SEEK_SET;
+		lock.l_start = 0;
+		lock.l_len = 0;
+
+		if (fcntl(F_SETLK, &lock) == -1) {
+			close(fd);
+			fd = -1;
+		}
+	}
+
 	if (fd == -1) {
 		if (errno == EWOULDBLOCK && pidptr != NULL) {
 			errno = pidfile_read(pfh->pf_path, pidptr);
@@ -123,6 +137,7 @@ pidfile_open(const char *path, mode_t mode, pid_t *pidptr)
 		free(pfh);
 		return (NULL);
 	}
+	
 	/*
 	 * Remember file information, so in pidfile_write() we are sure we write
 	 * to the proper descriptor.
