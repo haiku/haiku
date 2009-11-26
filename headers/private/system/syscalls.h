@@ -51,7 +51,10 @@ struct user_disk_system_info;
 // * The arguments of the functions must be named to be processed properly.
 
 #ifdef GEN_SYSCALL_INFOS_PROCESSING
-#pragma syscalls begin
+#	define __NO_RETURN
+#	pragma syscalls begin
+#else
+#	define __NO_RETURN	__attribute__((noreturn))
 #endif
 
 extern int			_kern_is_computer_on(void);
@@ -120,7 +123,7 @@ extern thread_id	_kern_load_image(const char* const* flatArgs,
 						size_t flatArgsSize, int32 argCount, int32 envCount,
 						int32 priority, uint32 flags, port_id errorPort,
 						uint32 errorToken);
-extern void			_kern_exit_team(status_t returnValue);
+extern void __NO_RETURN _kern_exit_team(status_t returnValue);
 extern status_t		_kern_kill_team(team_id team);
 extern team_id		_kern_get_current_team();
 extern status_t		_kern_wait_for_team(team_id team, status_t *_returnCode);
@@ -579,6 +582,8 @@ extern status_t		_kern_stop_watching_disks(port_id port, int32 token);
 #ifdef GEN_SYSCALL_INFOS_PROCESSING
 #pragma syscalls end
 #endif
+
+#undef __NO_RETURN
 
 #ifdef __cplusplus
 }
