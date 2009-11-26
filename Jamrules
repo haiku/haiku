@@ -7,7 +7,8 @@ HAIKU_BUILD_DIR						= [ FDirName $(HAIKU_TOP) build ] ;
 HAIKU_BUILD_RULES_DIR				= [ FDirName $(HAIKU_BUILD_DIR) jam ] ;
 HAIKU_OBJECT_DIR					= [ FDirName $(HAIKU_OUTPUT_DIR) objects ] ;
 HAIKU_COMMON_PLATFORM_OBJECT_DIR	= [ FDirName $(HAIKU_OBJECT_DIR) common ] ;
-HAIKU_DOWNLOAD_DIR					= [ FDirName $(HAIKU_OUTPUT_DIR) download ] ;
+HAIKU_DOWNLOAD_DIR					= [ FDirName $(HAIKU_OUTPUT_DIR)
+											download ] ;
 HAIKU_OPTIONAL_BUILD_PACKAGES_DIR	= [ FDirName $(HAIKU_OUTPUT_DIR)
 											build_packages ] ;
 
@@ -86,7 +87,8 @@ if $(HAIKU_BUILD_PROFILE) && ! $(HAIKU_BUILD_PROFILE_DEFINED) {
 # Include embedded board-specific file.
 # UserBuildConfig can override HAIKU_BOOT_BOARD.
 if $(HAIKU_BOOT_BOARD) {
-	include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD) BoardSetup ] ;
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD)
+		BoardSetup ] ;
 }
 
 PrepareConfigVariables ;
