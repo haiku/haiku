@@ -12,5 +12,6 @@ OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies NetSurf : OpenSSL ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
+OptionalPackageDependencies Python : Bzip ;
 OptionalPackageDependencies Mercurial : Python ;
 OptionalPackageDependencies Git : Expat Curl OpenSSL ;
