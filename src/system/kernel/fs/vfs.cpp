@@ -2264,7 +2264,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		// If the new node is a symbolic link, resolve it (if we've been told
 		// to do it)
 		if (S_ISLNK(nextVnode->type)
-			&& !(!traverseLeafLink && nextPath[0] == '\0')) {
+			&& (traverseLeafLink || nextPath[0] != '\0')) {
 			size_t bufferSize;
 			char* buffer;
 
@@ -5025,6 +5025,7 @@ static int
 create_vnode(struct vnode* directory, const char* name, int openMode,
 	int perms, bool kernel)
 {
+	bool traverse = ((openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0);
 	status_t status = B_ERROR;
 	struct vnode* vnode;
 	void* cookie;
@@ -5035,7 +5036,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 	// node the entry refers to. So we can actually never call the create() hook
 	// without O_EXCL. Instead we try to look the entry up first. If it already
 	// exists, we just open the node (unless O_EXCL), otherwise we call create()
-	// with O_EXCL. This introduces a race condition, since we someone else
+	// with O_EXCL. This introduces a race condition, since someone else
 	// might have created the entry in the meantime. We hope the respective
 	// FS returns the correct error code and retry (up to 3 times) again.
 
@@ -5050,7 +5051,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 
 			// If the node is a symlink, we have to follow it, unless
 			// O_NOTRAVERSE is set.
-			if (S_ISLNK(vnode->type) && (openMode & O_NOTRAVERSE) == 0) {
+			if (S_ISLNK(vnode->type) && traverse) {
 				putter.Put();
 				char clonedName[B_FILE_NAME_LENGTH + 1];
 				if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH)
@@ -5065,6 +5066,11 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 					return status;
 
 				putter.SetTo(vnode);
+			}
+
+			if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->type)) {
+				put_vnode(vnode);
+				return B_LINK_LIMIT;
 			}
 
 			int fd = open_vnode(vnode, openMode & ~O_CREAT, kernel);
@@ -5229,7 +5235,7 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 	FUNCTION(("file_open_entry_ref(ref = (%ld, %Ld, %s), openMode = %d)\n",
 		mountID, directoryID, name, openMode));
 
-	bool traverse = ((openMode & O_NOTRAVERSE) == 0);
+	bool traverse = ((openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0);
 
 	// get the vnode matching the entry_ref
 	struct vnode* vnode;
@@ -5237,6 +5243,11 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 		kernel, &vnode);
 	if (status != B_OK)
 		return status;
+
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->type)) {
+		put_vnode(vnode);
+		return B_LINK_LIMIT;
+	}
 
 	int fd = open_vnode(vnode, openMode, kernel);
 	if (fd < 0)
@@ -5251,7 +5262,7 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 static int
 file_open(int fd, char* path, int openMode, bool kernel)
 {
-	bool traverse = ((openMode & O_NOTRAVERSE) == 0);
+	bool traverse = ((openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0);
 
 	FUNCTION(("file_open: fd: %d, entry path = '%s', omode %d, kernel %d\n",
 		fd, path, openMode, kernel));
@@ -5263,6 +5274,11 @@ file_open(int fd, char* path, int openMode, bool kernel)
 		&parentID, kernel);
 	if (status != B_OK)
 		return status;
+
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->type)) {
+		put_vnode(vnode);
+		return B_LINK_LIMIT;
+	}
 
 	// open the vnode
 	int newFD = open_vnode(vnode, openMode, kernel);
