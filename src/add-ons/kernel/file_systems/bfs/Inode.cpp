@@ -2514,7 +2514,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 		if (tree->Find((uint8*)name, (uint16)strlen(name), &offset) == B_OK) {
 			// Return if the file should be a directory/link or opened in
 			// exclusive mode
-			if (S_ISDIR(mode) || S_ISLNK(mode) || openMode & O_EXCL)
+			if (S_ISDIR(mode) || S_ISLNK(mode) || (openMode & O_EXCL) != 0)
 				return B_FILE_EXISTS;
 
 			Vnode vnode(volume, offset);
@@ -2525,28 +2525,25 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 				return B_ENTRY_NOT_FOUND;
 			}
 
-			// if it's a directory, bail out!
-			if (inode->IsDirectory())
+			if (inode->IsDirectory() && (openMode & O_RWMASK) != O_RDONLY)
 				return B_IS_A_DIRECTORY;
+			if ((openMode & O_DIRECTORY) != 0 && !inode->IsDirectory())
+				return B_NOT_A_DIRECTORY;
 
 			// we want to open the file, so we should have the rights to do so
-			if (inode->CheckPermissions(open_mode_to_access(openMode)) != B_OK)
+			if (inode->CheckPermissions(open_mode_to_access(openMode)
+					| ((openMode & O_TRUNC) != 0 ? W_OK : 0)) != B_OK)
 				return B_NOT_ALLOWED;
 
 			if ((openMode & O_TRUNC) != 0) {
-				// we need write access in order to truncate the file
-				status = inode->CheckPermissions(W_OK);
-				if (status != B_OK)
-					return status;
-
 				// truncate the existing file
 				inode->WriteLockInTransaction(transaction);
 
 				status_t status = inode->SetFileSize(transaction, 0);
-				if (status >= B_OK)
+				if (status == B_OK)
 					status = inode->WriteBack(transaction);
 
-				if (status < B_OK)
+				if (status != B_OK)
 					return status;
 			}
 
@@ -2564,8 +2561,12 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 
 			return B_OK;
 		}
-	} else if (parent != NULL && (mode & S_ATTR_DIR) == 0)
+	} else if (parent != NULL && (mode & S_ATTR_DIR) == 0) {
 		return B_BAD_VALUE;
+	} else if ((openMode & O_DIRECTORY) != 0) {
+		// TODO: we might need to return B_NOT_A_DIRECTORY here 
+		return B_ENTRY_NOT_FOUND;
+	}
 
 	status_t status;
 

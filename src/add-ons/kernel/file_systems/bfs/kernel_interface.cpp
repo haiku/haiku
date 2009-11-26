@@ -1229,9 +1229,11 @@ bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	// any data from it.
 	if (inode->IsDirectory() && (openMode & O_RWMASK) != O_RDONLY)
 		return B_IS_A_DIRECTORY;
+	if ((openMode & O_DIRECTORY) != 0 && !inode->IsDirectory())
+		return B_NOT_A_DIRECTORY;
 
 	status_t status = inode->CheckPermissions(open_mode_to_access(openMode)
-		| (openMode & O_TRUNC ? W_OK : 0));
+		| ((openMode & O_TRUNC) != 0 ? W_OK : 0));
 	if (status != B_OK)
 		RETURN_ERROR(status);
 
