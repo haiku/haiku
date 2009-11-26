@@ -14,9 +14,10 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 UsePrivateHeaders fs_shell ;
 UsePrivateHeaders shared ;
 
-local defines = [ FDefines FS_SHELL=1 ] ;
-SubDirCcFlags $(defines) ;
-SubDirC++Flags $(defines) ;
+DEFINES += FS_SHELL=1 ;
+
+# prevent inclusion of HaikuBuildCompatibility.h
+DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 
 # platform specific sources/libraries
 local fsShellCommandSources ;
