@@ -1084,8 +1084,8 @@ TMailApp::NewWindow(const entry_ref* ref, const char* to, bool resend,
 		r.bottom = r.top + screenFrame.Width();
 
 	// cascading windows
-	r.OffsetBy(((fWindowCount + 5) % 10) * 10 - 50,
-		((fWindowCount + 5) % 10) * 10 - 50);
+	r.OffsetBy(((fWindowCount + 5) % 10) * 15 - 75,
+		((fWindowCount + 5) % 10) * 15 - 75);
 
 	// make sure the window is still on screen
 	if (r.left - 6 < screenFrame.left)
