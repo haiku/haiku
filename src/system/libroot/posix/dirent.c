@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -100,10 +100,10 @@ do_seek_dir(DIR* dir)
 DIR*
 __create_dir_struct(int fd)
 {
-	DIR* dir;
-
 	/* allocate the memory for the DIR structure */
-	if ((dir = (DIR*)malloc(DIR_BUFFER_SIZE)) == NULL) {
+
+	DIR* dir = (DIR*)malloc(DIR_BUFFER_SIZE);
+	if (dir == NULL) {
 		errno = B_NO_MEMORY;
 		return NULL;
 	}
@@ -115,7 +115,6 @@ __create_dir_struct(int fd)
 
 	return dir;
 }
-
 
 
 // #pragma mark - public API
