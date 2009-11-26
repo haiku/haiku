@@ -2,11 +2,11 @@
  * Copyright 2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _CONFIG_TYPES_H
-#define _CONFIG_TYPES_H
+#ifndef _CONFIG_BUILD_TYPES_H
+#define _CONFIG_BUILD_TYPES_H
 
 
-#include <config/HaikuConfig.h>
+#include <config_build/HaikuConfig.h>
 
 #include <inttypes.h>
 
@@ -54,4 +54,4 @@ typedef __haiku_std_uint64	__haiku_uint64;
 #define __HAIKU_SADDR_MIN		(-__HAIKU_SADDR_MAX-1)
 
 
-#endif	/* _CONFIG_TYPES_H */
+#endif	/* _CONFIG_BUILD_TYPES_H */

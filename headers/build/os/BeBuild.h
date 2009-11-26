@@ -6,7 +6,7 @@
 #define _BE_BUILD_H
 
 
-#include <config/HaikuConfig.h>
+#include <config_build/HaikuConfig.h>
 
 
 #define B_BEOS_VERSION_4				0x0400

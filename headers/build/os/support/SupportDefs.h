@@ -9,7 +9,7 @@
 #define _SUPPORT_DEFS_H
 
 
-#include <config/types.h>
+#include <config_build/types.h>
 
 #include <BeBuild.h>
 #include <Errors.h>
