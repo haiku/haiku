@@ -168,7 +168,8 @@ dump_map(FILE* file, const char* name, int32* map)
 	for (uint32 i = 0; i < 16; i++) {
 		fprintf(file, "\t\t");
 		for (uint32 j = 0; j < 8; j++) {
-			fprintf(file, "0x%04lx,%s", map[i * 8 + j], j < 7 ? " " : "");
+			fprintf(file, "0x%04" B_PRIx32 ",%s", map[i * 8 + j],
+				j < 7 ? " " : "");
 		}
 		fprintf(file, "\n");
 	}
@@ -184,7 +185,8 @@ dump_keys(FILE* file, const char* name, int32* keys)
 	for (uint32 i = 0; i < 4; i++) {
 		fprintf(file, "\t\t");
 		for (uint32 j = 0; j < 8; j++) {
-			fprintf(file, "0x%04lx,%s", keys[i * 8 + j], j < 7 ? " " : "");
+			fprintf(file, "0x%04" B_PRIx32 ",%s", keys[i * 8 + j],
+				j < 7 ? " " : "");
 		}
 		fprintf(file, "\n");
 	}
@@ -429,42 +431,50 @@ Keymap::LoadSource(FILE* file)
 
 		struct re_registers regs;
 		if (re_search(&versionBuf, buffer, length, 0, length, &regs) >= 0) {
-			sscanf(buffer + regs.start[1], "%ld", &fKeys.version);
+			sscanf(buffer + regs.start[1], "%" B_SCNu32, &fKeys.version);
 		} else if (re_search(&capslockBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.caps_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32, &fKeys.caps_key);
 		} else if (re_search(&scrolllockBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.scroll_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32, &fKeys.scroll_key);
 		} else if (re_search(&numlockBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.num_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32, &fKeys.num_key);
 		} else if (re_search(&lshiftBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.left_shift_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32,
+				&fKeys.left_shift_key);
 		} else if (re_search(&rshiftBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.right_shift_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32,
+				&fKeys.right_shift_key);
 		} else if (re_search(&lcommandBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.left_command_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32,
+				&fKeys.left_command_key);
 		} else if (re_search(&rcommandBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.right_command_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32,
+				&fKeys.right_command_key);
 		} else if (re_search(&lcontrolBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.left_control_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32,
+				&fKeys.left_control_key);
 		} else if (re_search(&rcontrolBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.right_control_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32,
+				&fKeys.right_control_key);
 		} else if (re_search(&loptionBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.left_option_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32,
+				&fKeys.left_option_key);
 		} else if (re_search(&roptionBuf, buffer, length, 0, length, &regs)
 				>= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.right_option_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32,
+				&fKeys.right_option_key);
 		} else if (re_search(&menuBuf, buffer, length, 0, length, &regs) >= 0) {
-			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.menu_key);
+			sscanf(buffer + regs.start[1], "0x%" B_SCNx32, &fKeys.menu_key);
 		} else if (re_search(&locksettingsBuf, buffer, length, 0, length, &regs)
 				>= 0) {
 			fKeys.lock_settings = 0;
@@ -483,7 +493,7 @@ Keymap::LoadSource(FILE* file)
 			}
 		} else if (re_search(&keyBuf, buffer, length, 0, length, &regs) >= 0) {
 			uint32 keyCode;
-			if (sscanf(buffer + regs.start[1], "0x%lx", &keyCode) > 0) {
+			if (sscanf(buffer + regs.start[1], "0x%" B_SCNx32, &keyCode) > 0) {
 				for (int i = 2; i <= 10; i++) {
 					maps[i - 2][keyCode] = offset;
 					_ComputeChars(buffer, regs, i, offset);
@@ -682,20 +692,27 @@ Keymap::SaveAsCppHeader(const char* fileName, const char* mapName)
 	fprintf(file, "#include <InterfaceDefs.h>\n\n");
 	fprintf(file, "const char *kSystemKeymapName = \"%s\";\n\n", name.String());
 	fprintf(file, "const key_map kSystemKeymap = {\n");
-	fprintf(file, "\tversion:%ld,\n", fKeys.version);
-	fprintf(file, "\tcaps_key:0x%lx,\n", fKeys.caps_key);
-	fprintf(file, "\tscroll_key:0x%lx,\n", fKeys.scroll_key);
-	fprintf(file, "\tnum_key:0x%lx,\n", fKeys.num_key);
-	fprintf(file, "\tleft_shift_key:0x%lx,\n", fKeys.left_shift_key);
-	fprintf(file, "\tright_shift_key:0x%lx,\n", fKeys.right_shift_key);
-	fprintf(file, "\tleft_command_key:0x%lx,\n", fKeys.left_command_key);
-	fprintf(file, "\tright_command_key:0x%lx,\n", fKeys.right_command_key);
-	fprintf(file, "\tleft_control_key:0x%lx,\n", fKeys.left_control_key);
-	fprintf(file, "\tright_control_key:0x%lx,\n", fKeys.right_control_key);
-	fprintf(file, "\tleft_option_key:0x%lx,\n", fKeys.left_option_key);
-	fprintf(file, "\tright_option_key:0x%lx,\n", fKeys.right_option_key);
-	fprintf(file, "\tmenu_key:0x%lx,\n", fKeys.menu_key);
-	fprintf(file, "\tlock_settings:0x%lx,\n", fKeys.lock_settings);
+	fprintf(file, "\tversion:%" B_PRIu32 ",\n", fKeys.version);
+	fprintf(file, "\tcaps_key:0x%" B_PRIx32 ",\n", fKeys.caps_key);
+	fprintf(file, "\tscroll_key:0x%" B_PRIx32 ",\n", fKeys.scroll_key);
+	fprintf(file, "\tnum_key:0x%" B_PRIx32 ",\n", fKeys.num_key);
+	fprintf(file, "\tleft_shift_key:0x%" B_PRIx32 ",\n", fKeys.left_shift_key);
+	fprintf(file, "\tright_shift_key:0x%" B_PRIx32 ",\n",
+		fKeys.right_shift_key);
+	fprintf(file, "\tleft_command_key:0x%" B_PRIx32 ",\n",
+		fKeys.left_command_key);
+	fprintf(file, "\tright_command_key:0x%" B_PRIx32 ",\n",
+		fKeys.right_command_key);
+	fprintf(file, "\tleft_control_key:0x%" B_PRIx32 ",\n",
+		fKeys.left_control_key);
+	fprintf(file, "\tright_control_key:0x%" B_PRIx32 ",\n",
+		fKeys.right_control_key);
+	fprintf(file, "\tleft_option_key:0x%" B_PRIx32 ",\n",
+		fKeys.left_option_key);
+	fprintf(file, "\tright_option_key:0x%" B_PRIx32 ",\n",
+		fKeys.right_option_key);
+	fprintf(file, "\tmenu_key:0x%" B_PRIx32 ",\n", fKeys.menu_key);
+	fprintf(file, "\tlock_settings:0x%" B_PRIx32 ",\n", fKeys.lock_settings);
 
 	dump_map(file, "control_map", fKeys.control_map);
 	dump_map(file, "option_caps_shift_map", fKeys.option_caps_shift_map);
@@ -714,11 +731,13 @@ Keymap::SaveAsCppHeader(const char* fileName, const char* mapName)
 	dump_keys(file, "dieresis_dead_key", fKeys.dieresis_dead_key);
 	dump_keys(file, "tilde_dead_key", fKeys.tilde_dead_key);
 
-	fprintf(file, "\tacute_tables:0x%lx,\n", fKeys.acute_tables);
-	fprintf(file, "\tgrave_tables:0x%lx,\n", fKeys.grave_tables);
-	fprintf(file, "\tcircumflex_tables:0x%lx,\n", fKeys.circumflex_tables);
-	fprintf(file, "\tdieresis_tables:0x%lx,\n", fKeys.dieresis_tables);
-	fprintf(file, "\ttilde_tables:0x%lx,\n", fKeys.tilde_tables);
+	fprintf(file, "\tacute_tables:0x%" B_PRIx32 ",\n", fKeys.acute_tables);
+	fprintf(file, "\tgrave_tables:0x%" B_PRIx32 ",\n", fKeys.grave_tables);
+	fprintf(file, "\tcircumflex_tables:0x%" B_PRIx32 ",\n",
+		fKeys.circumflex_tables);
+	fprintf(file, "\tdieresis_tables:0x%" B_PRIx32 ",\n",
+		fKeys.dieresis_tables);
+	fprintf(file, "\ttilde_tables:0x%" B_PRIx32 ",\n", fKeys.tilde_tables);
 
 	fprintf(file, "};\n\n");
 
@@ -735,7 +754,8 @@ Keymap::SaveAsCppHeader(const char* fileName, const char* mapName)
 	}
 	fprintf(file, "\n};\n\n");
 
-	fprintf(file, "const uint32 kSystemKeyCharsSize = %ld;\n", fCharsSize);
+	fprintf(file, "const uint32 kSystemKeyCharsSize = %" B_PRIu32 ";\n",
+		fCharsSize);
 	fclose(file);
 
 	return B_OK;
@@ -1217,19 +1237,19 @@ Keymap::_SaveSourceText(FILE* file)
 	}
 #endif
 
-	bytes += fprintf(file, "Version = %ld\n"
-		"CapsLock = 0x%02lx\n"
-		"ScrollLock = 0x%02lx\n"
-		"NumLock = 0x%02lx\n"
-		"LShift = 0x%02lx\n"
-		"RShift = 0x%02lx\n"
-		"LCommand = 0x%02lx\n"
-		"RCommand = 0x%02lx\n"
-		"LControl = 0x%02lx\n"
-		"RControl = 0x%02lx\n"
-		"LOption = 0x%02lx\n"
-		"ROption = 0x%02lx\n"
-		"Menu = 0x%02lx\n",
+	bytes += fprintf(file, "Version = %" B_PRIu32 "\n"
+		"CapsLock = 0x%02" B_PRIx32 "\n"
+		"ScrollLock = 0x%02" B_PRIx32 "\n"
+		"NumLock = 0x%02" B_PRIx32 "\n"
+		"LShift = 0x%02" B_PRIx32 "\n"
+		"RShift = 0x%02" B_PRIx32 "\n"
+		"LCommand = 0x%02" B_PRIx32 "\n"
+		"RCommand = 0x%02" B_PRIx32 "\n"
+		"LControl = 0x%02" B_PRIx32 "\n"
+		"RControl = 0x%02" B_PRIx32 "\n"
+		"LOption = 0x%02" B_PRIx32 "\n"
+		"ROption = 0x%02" B_PRIx32 "\n"
+		"Menu = 0x%02" B_PRIx32 "\n",
 		fKeys.version, fKeys.caps_key, fKeys.scroll_key, fKeys.num_key,
 		fKeys.left_shift_key, fKeys.right_shift_key, fKeys.left_command_key,
 		fKeys.right_command_key, fKeys.left_control_key, fKeys.right_control_key,
