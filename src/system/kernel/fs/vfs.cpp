@@ -2634,12 +2634,8 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 	if (!S_ISDIR(vnode->type))
 		return B_NOT_A_DIRECTORY;
 
-	KPath pathBuffer(bufferSize);
-	if (pathBuffer.InitCheck() != B_OK)
-		return B_NO_MEMORY;
-
-	char* path = pathBuffer.LockBuffer();
-	int32 insert = pathBuffer.BufferSize();
+	char* path = buffer;
+	int32 insert = bufferSize;
 	int32 maxLevel = 256;
 	int32 length;
 	status_t status;
@@ -2738,12 +2734,9 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 
 	TRACE(("  path is: %s\n", path + insert));
 
-	// copy the path to the output buffer
-	length = pathBuffer.BufferSize() - insert;
-	if (length <= (int)bufferSize)
-		memcpy(buffer, path + insert, length);
-	else
-		status = B_RESULT_NOT_REPRESENTABLE;
+	// move the path to the start of the buffer
+	length = bufferSize - insert;
+	memmove(buffer, path + insert, length);
 
 out:
 	put_vnode(vnode);
