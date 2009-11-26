@@ -112,6 +112,10 @@ const static uint32 kMaxUnusedVnodes = 8192;
 const static uint32 kMaxEntryCacheEntryCount = 8192;
 	// Maximum number of entries per entry cache. It's a hard limit ATM.
 
+const static size_t kMaxPathLength = 65536;
+	// The absolute maximum path length (for getcwd() - this is not depending
+	// on PATH_MAX
+
 struct EntryCacheKey {
 	EntryCacheKey(ino_t dirID, const char* name)
 		:
@@ -2624,14 +2628,13 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 {
 	FUNCTION(("dir_vnode_to_path(%p, %p, %lu)\n", vnode, buffer, bufferSize));
 
-	if (vnode == NULL || buffer == NULL)
+	if (vnode == NULL || buffer == NULL || bufferSize == 0)
 		return B_BAD_VALUE;
 
 	if (!S_ISDIR(vnode->type))
 		return B_NOT_A_DIRECTORY;
 
-	/* this implementation is currently bound to B_PATH_NAME_LENGTH */
-	KPath pathBuffer;
+	KPath pathBuffer(bufferSize);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -2657,6 +2660,7 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 	}
 
 	path[--insert] = '\0';
+		// the path is filled right to left
 
 	while (true) {
 		// the name buffer is also used for fs_read_dir()
@@ -2707,12 +2711,12 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 			break;
 		}
 
-		// ToDo: add an explicit check for loops in about 10 levels to do
+		// TODO: add an explicit check for loops in about 10 levels to do
 		// real loop detection
 
 		// don't go deeper as 'maxLevel' to prevent circular loops
 		if (maxLevel-- < 0) {
-			status = ELOOP;
+			status = B_LINK_LIMIT;
 			goto out;
 		}
 
@@ -2721,7 +2725,7 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 		length = strlen(name);
 		insert -= length;
 		if (insert <= 0) {
-			status = ENOBUFS;
+			status = B_RESULT_NOT_REPRESENTABLE;
 			goto out;
 		}
 		memcpy(path + insert, name, length);
@@ -2739,7 +2743,7 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 	if (length <= (int)bufferSize)
 		memcpy(buffer, path + insert, length);
 	else
-		status = ENOBUFS;
+		status = B_RESULT_NOT_REPRESENTABLE;
 
 out:
 	put_vnode(vnode);
@@ -9354,17 +9358,19 @@ _user_remove_index(dev_t device, const char* userName)
 status_t
 _user_getcwd(char* userBuffer, size_t size)
 {
+	if (size == 0)
+		return B_BAD_VALUE;
 	if (!IS_USER_ADDRESS(userBuffer))
 		return B_BAD_ADDRESS;
 
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (size > kMaxPathLength)
+		size = kMaxPathLength;
+
+	KPath pathBuffer(size);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
 	TRACE(("user_getcwd: buf %p, %ld\n", userBuffer, size));
-
-	if (size > B_PATH_NAME_LENGTH)
-		size = B_PATH_NAME_LENGTH;
 
 	char* path = pathBuffer.LockBuffer();
 
