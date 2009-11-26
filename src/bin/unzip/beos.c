@@ -1097,7 +1097,7 @@ yet, or I'd list a few)
 */
 static int set_file_attrs( const char *name,
                            const unsigned char *attr_buff,
-                           const off_t attr_size )
+                           const off_t total_attr_size )
 {
     int                  retval = EOK;
     unsigned char       *ptr;
@@ -1105,7 +1105,7 @@ static int set_file_attrs( const char *name,
     int                  fd;
 
     ptr   = (unsigned char *)attr_buff;
-    guard = ptr + attr_size;
+    guard = ptr + total_attr_size;
 
 #ifdef HAIKU_USE_KERN_OPEN
     fd = _kern_open( -1, name, O_RDONLY | O_NOTRAVERSE, 0 );
@@ -1120,29 +1120,31 @@ static int set_file_attrs( const char *name,
 
     while( ptr < guard ) {
         ssize_t              wrote_bytes;
-        struct attr_info     fa_info;
         const char          *attr_name;
         unsigned char       *attr_data;
+		uint32				attr_type;
+		int64				attr_size;
 
         attr_name  = (char *)&(ptr[0]);
         ptr       += strlen( attr_name ) + 1;
 
         /* The attr_info data is stored in big-endian format because the */
         /* PowerPC port was here first.                                  */
-        memcpy( &fa_info, ptr, sizeof( struct attr_info ) );
-        fa_info.type = (uint32)B_BENDIAN_TO_HOST_INT32( fa_info.type );
-        fa_info.size = (off_t)B_BENDIAN_TO_HOST_INT64( fa_info.size );
-        ptr     += sizeof( struct attr_info );
+		memcpy( &attr_type, ptr, 4 ); ptr += 4;
+		memcpy( &attr_size, ptr, 8 ); ptr += 8;
 
-        if( fa_info.size < 0LL ) {
+        attr_type = (uint32)B_BENDIAN_TO_HOST_INT32( attr_type );
+        attr_size = (off_t)B_BENDIAN_TO_HOST_INT64( attr_size );
+
+        if( attr_size < 0LL ) {
             Info(slide, 0x201, ((char *)slide,
-                 "warning: skipping attribute with invalid length (%Ld)\n",
-                 fa_info.size));
+                 "warning: skipping attribute with invalid length (%" B_PRIdOFF
+				 ")\n", attr_size));
             break;
         }
 
         attr_data  = ptr;
-        ptr       += fa_info.size;
+        ptr       += attr_size;
 
         if( ptr > guard ) {
             /* We've got a truncated attribute. */
@@ -1152,15 +1154,15 @@ static int set_file_attrs( const char *name,
         }
 
         /* Wave the magic wand... this will swap Be-known types properly. */
-        (void)swap_data( fa_info.type, attr_data, fa_info.size,
+        (void)swap_data( attr_type, attr_data, attr_size,
                          B_SWAP_BENDIAN_TO_HOST );
 
-        wrote_bytes = fs_write_attr( fd, attr_name, fa_info.type, 0,
-                                     attr_data, fa_info.size );
-        if( wrote_bytes != fa_info.size ) {
+        wrote_bytes = fs_write_attr( fd, attr_name, attr_type, 0,
+                                     attr_data, attr_size );
+        if( wrote_bytes != attr_size ) {
             Info(slide, 0x201, ((char *)slide,
                  "warning: wrote %ld attribute bytes of %ld\n",
-                 (unsigned long)wrote_bytes,(unsigned long)fa_info.size));
+                 (unsigned long)wrote_bytes,(unsigned long)attr_size));
         }
     }
 
