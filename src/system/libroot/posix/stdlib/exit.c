@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Haiku Inc. All rights reserved.
+ * Copyright 2004-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author(s):
@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#include <libroot_private.h>
 #include <runtime_loader.h>
 #include <syscalls.h>
 
@@ -33,15 +34,6 @@ struct exit_stack_info {
 
 
 static struct exit_stack_info sExitStackInfo = { {}, 0, -1, 0, -1, 0 };
-
-
-void
-__init_exit_stack_lock()
-{
-	sExitStackInfo.lock = create_sem(0, "exit stack lock");
-	if (sExitStackInfo.lock < 0)
-		debugger("failed to create exit stack lock");
-}
 
 
 static void
@@ -71,6 +63,9 @@ _exit_stack_unlock()
 			release_sem(sExitStackInfo.lock);
 	}
 }
+
+
+// #pragma mark - private API
 
 
 void
@@ -103,6 +98,18 @@ _call_atexit_hooks_for_range(addr_t start, addr_t size)
 
 	_exit_stack_unlock();
 }
+
+
+void
+__init_exit_stack_lock(void)
+{
+	sExitStackInfo.lock = create_sem(0, "exit stack lock");
+	if (sExitStackInfo.lock < 0)
+		debugger("failed to create exit stack lock");
+}
+
+
+// #pragma mark - public API
 
 
 void

@@ -1,7 +1,8 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include <string.h>
 
@@ -13,8 +14,6 @@
 
 
 void initialize_before(image_id imageID);
-void _call_atexit_hooks_for_range(addr_t start, addr_t size);
-void __init_exit_stack_lock();
 
 struct rld_export *__gRuntimeLoader = NULL;
 	// This little bugger is set to something meaningful by the runtime loader

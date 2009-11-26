@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef LIBROOT_PRIVATE_H
@@ -29,6 +29,8 @@ status_t __test_executable(const char *path, char *invoker);
 status_t __flatten_process_args(const char* const* args, int32 argCount,
 			const char* const* env, int32 envCount, char*** _flatArgs,
 			size_t* _flatSize);
+void _call_atexit_hooks_for_range(addr_t start, addr_t size);
+void __init_exit_stack_lock(void);
 void __init_env(const struct user_space_program_args *args);
 void __init_heap(void);
 
