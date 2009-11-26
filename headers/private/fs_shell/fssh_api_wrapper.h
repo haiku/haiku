@@ -5,6 +5,7 @@
 #ifndef _FSSH_API_WRAPPER_H
 #define _FSSH_API_WRAPPER_H
 
+
 #include <stdlib.h>
 
 #include "fssh_dirent.h"
@@ -128,6 +129,8 @@
 // #pragma mark - fssh_defs.h
 
 // 32/64 bitness
+#undef B_HAIKU_32_BIT
+#undef B_HAIKU_64_BIT
 #ifdef FSSH_B_HAIKU_64_BIT
 #	define B_HAIKU_64_BIT		FSSH_B_HAIKU_64_BIT
 #endif
