@@ -326,18 +326,6 @@ TExpandoMenuBar::MouseDown(BPoint where)
 		}
 	}
 
-	// double-click on an item brings the team to front
-	int32 clicks;
-	if (message != NULL && message->FindInt32("clicks", &clicks) == B_OK
-		&& clicks > 1) {
-		if (item == menuItem && item == fLastClickItem) {
-			// activate this team
-			be_roster->ActivateApp((team_id)item->Teams()->ItemAt(0));
-			return;
-		}
-	} else
-		fLastClickItem = item;
-
 	// control click - show all/hide all shortcut
 	int32 modifiers;
 	if (message != NULL && message->FindInt32("modifiers", &modifiers) == B_OK
@@ -368,6 +356,18 @@ TExpandoMenuBar::MouseDown(BPoint where)
 			return;
 		}
 	}
+
+	// double-click on an item brings the team to front
+	int32 clicks;
+	if (message != NULL && message->FindInt32("clicks", &clicks) == B_OK
+		&& clicks > 1) {
+		if (item == menuItem && item == fLastClickItem) {
+			// activate this team
+			be_roster->ActivateApp((team_id)item->Teams()->ItemAt(0));
+			return;
+		}
+	} else
+		fLastClickItem = item;
 
 	BMenuBar::MouseDown(where);
 }
