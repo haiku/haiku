@@ -239,7 +239,8 @@ extern status_t		_kern_read_link(int fd, const char *path, char *buffer,
 						size_t *_bufferSize);
 extern status_t		_kern_create_symlink(int fd, const char *path,
 						const char *toPath, int mode);
-extern status_t		_kern_create_link(const char *path, const char *toPath);
+extern status_t		_kern_create_link(int pathFD, const char *path, int toFD,
+						const char *toPath, bool traverseLeafLink);
 extern status_t		_kern_unlink(int fd, const char *path);
 extern status_t		_kern_rename(int oldDir, const char *oldpath, int newDir,
 						const char *newpath);

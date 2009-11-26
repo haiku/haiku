@@ -134,7 +134,9 @@ extern int		pipe(int fildes[2]);
 extern int		dup(int fd);
 extern int		dup2(int fd1, int fd2);
 extern int		close(int fd);
-extern int		link(const char *name, const char *new_name);
+extern int		link(const char *toPath, const char *path);
+extern int		linkat(int toFD, const char *toPath, int pathFD,
+					const char *path, int flag);
 extern int		unlink(const char *name);
 extern int		unlinkat(int fd, const char *path, int flag);
 extern int		rmdir(const char *path);

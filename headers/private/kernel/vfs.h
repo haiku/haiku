@@ -190,7 +190,8 @@ status_t	_user_read_link(int fd, const char *path, char *buffer,
 status_t	_user_write_link(const char *path, const char *toPath);
 status_t	_user_create_symlink(int fd, const char *path, const char *toPath,
 				int mode);
-status_t	_user_create_link(const char *path, const char *toPath);
+status_t	_user_create_link(int pathFD, const char *path, int toFD,
+				const char *toPath, bool traverseLeafLink);
 status_t	_user_unlink(int fd, const char *path);
 status_t	_user_rename(int oldFD, const char *oldpath, int newFD,
 				const char *newpath);

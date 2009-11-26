@@ -75,8 +75,14 @@ unlinkat(int fd, const char *path, int flag)
 int
 link(const char *toPath, const char *linkPath)
 {
-	int status = _kern_create_link(linkPath, toPath);
+	RETURN_AND_SET_ERRNO(_kern_create_link(-1, linkPath, -1, toPath, true));
+}
 
-	RETURN_AND_SET_ERRNO(status);
+
+int
+linkat(int toFD, const char *toPath, int linkFD, const char *linkPath, int flag)
+{
+	RETURN_AND_SET_ERRNO(_kern_create_link(linkFD, linkPath, toFD, toPath,
+		(flag & AT_SYMLINK_FOLLOW) != 0));
 }
 

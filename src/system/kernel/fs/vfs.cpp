@@ -5995,7 +5995,8 @@ common_create_symlink(int fd, char* path, const char* toPath, int mode,
 
 
 static status_t
-common_create_link(char* path, char* toPath, bool kernel)
+common_create_link(int pathFD, char* path, int toFD, char* toPath,
+	bool traverseLeafLink, bool kernel)
 {
 	// path validity checks have to be in the calling function!
 
@@ -6004,12 +6005,14 @@ common_create_link(char* path, char* toPath, bool kernel)
 
 	char name[B_FILE_NAME_LENGTH];
 	struct vnode* directory;
-	status_t status = path_to_dir_vnode(path, &directory, name, kernel);
+	status_t status = fd_and_path_to_dir_vnode(pathFD, path, &directory, name,
+		kernel);
 	if (status != B_OK)
 		return status;
 
 	struct vnode* vnode;
-	status = path_to_vnode(toPath, true, &vnode, NULL, kernel);
+	status = fd_and_path_to_vnode(toFD, toPath, traverseLeafLink, &vnode, NULL,
+		kernel);
 	if (status != B_OK)
 		goto err;
 
@@ -7992,15 +7995,16 @@ _kern_create_symlink(int fd, const char* path, const char* toPath, int mode)
 
 
 status_t
-_kern_create_link(const char* path, const char* toPath)
+_kern_create_link(int pathFD, const char* path, int toFD, const char* toPath,
+	bool traverseLeafLink)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 	KPath toPathBuffer(toPath, false, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	return common_create_link(pathBuffer.LockBuffer(),
-		toPathBuffer.LockBuffer(), true);
+	return common_create_link(pathFD, pathBuffer.LockBuffer(), toFD,
+		toPathBuffer.LockBuffer(), traverseLeafLink, true);
 }
 
 
@@ -8869,7 +8873,8 @@ _user_create_symlink(int fd, const char* userPath, const char* userToPath,
 
 
 status_t
-_user_create_link(const char* userPath, const char* userToPath)
+_user_create_link(int pathFD, const char* userPath, int toFD,
+	const char* userToPath, bool traverseLeafLink)
 {
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 	KPath toPathBuffer(B_PATH_NAME_LENGTH + 1);
@@ -8889,7 +8894,8 @@ _user_create_link(const char* userPath, const char* userToPath)
 	if (status != B_OK)
 		return status;
 
-	return common_create_link(path, toPath, false);
+	return common_create_link(pathFD, path, toFD, toPath, traverseLeafLink,
+		false);
 }
 
 
