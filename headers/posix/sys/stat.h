@@ -111,23 +111,19 @@ extern "C" {
 
 extern int		chmod(const char *path, mode_t mode);
 extern int		fchmod(int fd, mode_t mode);
+extern int		fchmodat(int fd, const char *path, mode_t mode, int flag);
 extern int		stat(const char *path, struct stat *st);
 extern int		fstat(int fd, struct stat *st);
 extern int		lstat(const char *path, struct stat *st);
-#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 extern int		fstatat(int fd, const char *path, struct stat *st, int flag);
-#endif
 extern int		mkdir(const char *path, mode_t mode);
-#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 extern int		mkdirat(int fd, const char *path, mode_t mode);
-#endif
 extern int		mkfifo(const char *path, mode_t mode);
+extern int		mkfifoat(int fd, const char *path, mode_t mode);
 extern mode_t	umask(mode_t cmask);
 
-#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 extern int		utimensat(int fd, const char *path,
 					const struct timespec times[2], int flag);
-#endif
 extern int		futimens(int fd, const struct timespec times[2]);
 
 #ifdef __cplusplus

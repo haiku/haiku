@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _UNISTD_H_
@@ -124,6 +124,7 @@ extern "C" {
 
 /* file functions */
 extern int		access(const char *path, int accessMode);
+extern int		faccessat(int fd, const char *path, int accessMode, int flag);
 
 extern int		chdir(const char *path);
 extern int		fchdir(int fd);
@@ -135,20 +136,14 @@ extern int		dup2(int fd1, int fd2);
 extern int		close(int fd);
 extern int		link(const char *name, const char *new_name);
 extern int		unlink(const char *name);
-#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 extern int		unlinkat(int fd, const char *path, int flag);
-#endif
 extern int		rmdir(const char *path);
 
 extern ssize_t  readlink(const char *path, char *buffer, size_t bufferSize);
-#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 extern ssize_t	readlinkat(int fd, const char *path, char *buffer,
 					size_t bufferSize);
-#endif
 extern int      symlink(const char *toPath, const char *symlinkPath);
-#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 extern int		symlinkat(const char *toPath, int fd, const char *symlinkPath);
-#endif
 
 extern int      ftruncate(int fd, off_t newSize);
 extern int      truncate(const char *path, off_t newSize);
@@ -168,8 +163,11 @@ extern int		fsync(int fd);
 extern int		chown(const char *path, uid_t owner, gid_t group);
 extern int		fchown(int fd, uid_t owner, gid_t group);
 extern int		lchown(const char *path, uid_t owner, gid_t group);
+extern int		fchownat(int fd, const char *path, uid_t owner, gid_t group,
+					int flag);
 
 extern int		mknod(const char *name, mode_t mode, dev_t dev);
+extern int		mknodat(int fd, const char *name, mode_t mode, dev_t dev);
 
 extern int		getpagesize(void);
 extern int      getdtablesize(void);

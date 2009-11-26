@@ -4,11 +4,8 @@
  */
 
 
-#define B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT 1
-	// make the *at() functions and AT_* macros visible
-
-#include <sys/stat.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 #include <syscalls.h>
 #include <syscall_utils.h>

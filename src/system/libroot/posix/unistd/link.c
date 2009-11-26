@@ -1,14 +1,12 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
-#define B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT 1
-	// make the *at() functions and AT_* macros visible
-
-#include <unistd.h>
 #include <errno.h>
+#include <unistd.h>
+
 #include <syscalls.h>
 #include <syscall_utils.h>
 

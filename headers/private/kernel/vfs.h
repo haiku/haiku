@@ -194,9 +194,10 @@ status_t	_user_create_link(const char *path, const char *toPath);
 status_t	_user_unlink(int fd, const char *path);
 status_t	_user_rename(int oldFD, const char *oldpath, int newFD,
 				const char *newpath);
-status_t	_user_create_fifo(const char *path, mode_t perms);
+status_t	_user_create_fifo(int fd, const char *path, mode_t perms);
 status_t	_user_create_pipe(int *fds);
-status_t	_user_access(const char *path, int mode);
+status_t	_user_access(int fd, const char *path, int mode,
+				bool effectiveUserGroup);
 ssize_t		_user_select(int numfds, fd_set *readSet, fd_set *writeSet,
 				fd_set *errorSet, bigtime_t timeout, const sigset_t *sigMask);
 ssize_t		_user_poll(struct pollfd *fds, int numfds, bigtime_t timeout);

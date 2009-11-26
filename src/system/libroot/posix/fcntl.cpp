@@ -7,13 +7,10 @@
  */
 
 
-#define B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT 1
-	// make the *at() functions and AT_* macros visible
-
+#include <errno.h>
+#include <fcntl.h>
 #include <stdarg.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
 
 #include <syscalls.h>
 #include <syscall_utils.h>

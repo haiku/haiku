@@ -6058,12 +6058,14 @@ common_unlink(int fd, char* path, bool kernel)
 
 
 static status_t
-common_access(char* path, int mode, bool kernel)
+common_access(int fd, char* path, int mode, bool effectiveUserGroup, bool kernel)
 {
 	struct vnode* vnode;
 	status_t status;
 
-	status = path_to_vnode(path, true, &vnode, NULL, kernel);
+	// TODO: honor effectiveUserGroup argument
+
+	status = fd_and_path_to_vnode(fd, path, true, &vnode, NULL, kernel);
 	if (status != B_OK)
 		return status;
 
@@ -8058,13 +8060,14 @@ _kern_rename(int oldFD, const char* oldPath, int newFD, const char* newPath)
 
 
 status_t
-_kern_access(const char* path, int mode)
+_kern_access(int fd, const char* path, int mode, bool effectiveUserGroup)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	return common_access(pathBuffer.LockBuffer(), mode, true);
+	return common_access(fd, pathBuffer.LockBuffer(), mode, effectiveUserGroup,
+		true);
 }
 
 
@@ -8929,7 +8932,7 @@ _user_rename(int oldFD, const char* userOldPath, int newFD,
 
 
 status_t
-_user_create_fifo(const char* userPath, mode_t perms)
+_user_create_fifo(int fd, const char* userPath, mode_t perms)
 {
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
@@ -8945,7 +8948,7 @@ _user_create_fifo(const char* userPath, mode_t perms)
 	// split into directory vnode and filename path
 	char filename[B_FILE_NAME_LENGTH];
 	struct vnode* dir;
-	status_t status = path_to_dir_vnode(path, &dir, filename, false);
+	status_t status = fd_and_path_to_dir_vnode(fd, path, &dir, filename, false);
 	if (status != B_OK)
 		return status;
 
@@ -9024,7 +9027,7 @@ _user_create_pipe(int* userFDs)
 
 
 status_t
-_user_access(const char* userPath, int mode)
+_user_access(int fd, const char* userPath, int mode, bool effectiveUserGroup)
 {
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
@@ -9036,7 +9039,7 @@ _user_access(const char* userPath, int mode)
 		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return common_access(path, mode, false);
+	return common_access(fd, path, mode, effectiveUserGroup, false);
 }
 
 

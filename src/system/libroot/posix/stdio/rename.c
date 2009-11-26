@@ -1,23 +1,25 @@
 /* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
-#include <stdio.h>
-#include <syscalls.h>
 #include <errno.h>
+#include <stdio.h>
+
+#include <syscalls.h>
+#include <syscall_utils.h>
 
 
 int
 rename(const char *from, const char *to)
 {
-	int status = _kern_rename(-1, from, -1, to);
-	if (status < B_OK) {
-		errno = status;
-		return -1;
-	}
-
-	return status;
+	RETURN_AND_SET_ERRNO(_kern_rename(-1, from, -1, to));
 }
 
+
+int
+renameat(int fromFD, const char* from, int toFD, const char* to)
+{
+	RETURN_AND_SET_ERRNO(_kern_rename(fromFD, from, toFD, to));
+}

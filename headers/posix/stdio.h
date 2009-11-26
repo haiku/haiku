@@ -1,6 +1,7 @@
 /*
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2009, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _STDIO_H_
 #define _STDIO_H_
 
@@ -87,6 +88,7 @@ extern int		ftrylockfile(FILE *stream);
 
 extern int		remove(const char *name);
 extern int		rename(const char *from, const char *to);
+extern int		renameat(int fromFD, const char *from, int toFD, const char *to);
 
 /* pipes */
 extern FILE		*popen(const char *command, const char *mode);

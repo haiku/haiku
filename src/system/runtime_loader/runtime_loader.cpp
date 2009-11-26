@@ -304,7 +304,7 @@ test_executable(const char *name, char *invoker)
 		return fd;
 
 	// see if it's executable at all
-	status = _kern_access(path, X_OK);
+	status = _kern_access(-1, path, X_OK, false);
 	if (status != B_OK)
 		goto out;
 
