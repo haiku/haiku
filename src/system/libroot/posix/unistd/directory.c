@@ -1,39 +1,28 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include <syscalls.h>
-
-#include <unistd.h>
-#include <stdlib.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-
-#define RETURN_AND_SET_ERRNO(err) \
-	if (err < 0) { \
-		errno = err; \
-		return -1; \
-	} \
-	return err;
+#include <syscalls.h>
+#include <syscall_utils.h>
 
 
 int 
 chdir(const char *path)
 {
-	int status = _kern_setcwd(-1, path);
-
-	RETURN_AND_SET_ERRNO(status);
+	RETURN_AND_SET_ERRNO(_kern_setcwd(-1, path));
 }
 
 
 int 
 fchdir(int fd)
 {
-	int status = _kern_setcwd(fd, NULL);
-
-	RETURN_AND_SET_ERRNO(status);
+	RETURN_AND_SET_ERRNO(_kern_setcwd(fd, NULL));
 }
 
 
@@ -68,8 +57,6 @@ getcwd(char *buffer, size_t size)
 int
 rmdir(const char *path)
 {
-	int status = _kern_remove_dir(-1, path);
-
-	RETURN_AND_SET_ERRNO(status);
+	RETURN_AND_SET_ERRNO(_kern_remove_dir(-1, path));
 }
 
