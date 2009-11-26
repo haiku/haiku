@@ -108,10 +108,10 @@
 /* #undef _SUN */
 
 /* Workaround for missing 64-bit formats */
-#define PRId64 "lld"
-#define PRIo64 "llo"
-#define PRIx64 "llx"
-#define PRIu64 "llu"
+/* #undef PRId64 */
+/* #undef PRIo64 */
+/* #undef PRIx64 */
+/* #undef PRIu64 */
 
 /* Whether or not to include the possibly-buggy SMB printer */
 #define TCPDUMP_DO_SMB 1
