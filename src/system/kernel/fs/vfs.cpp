@@ -5133,8 +5133,8 @@ open_dir_vnode(struct vnode* vnode, bool kernel)
 	if (status != B_OK)
 		return status;
 
-	// file is opened, create a fd
-	status = get_new_fd(FDTYPE_DIR, NULL, vnode, cookie, 0, kernel);
+	// directory is opened, create a fd
+	status = get_new_fd(FDTYPE_DIR, NULL, vnode, cookie, O_CLOEXEC, kernel);
 	if (status >= 0)
 		return status;
 
@@ -5159,11 +5159,11 @@ open_attr_dir_vnode(struct vnode* vnode, bool kernel)
 		return EOPNOTSUPP;
 
 	status = FS_CALL(vnode, open_attr_dir, &cookie);
-	if (status < 0)
+	if (status != B_OK)
 		return status;
 
-	// file is opened, create a fd
-	status = get_new_fd(FDTYPE_ATTR_DIR, NULL, vnode, cookie, 0, kernel);
+	// directory is opened, create a fd
+	status = get_new_fd(FDTYPE_ATTR_DIR, NULL, vnode, cookie, O_CLOEXEC, kernel);
 	if (status >= 0)
 		return status;
 
@@ -6610,7 +6610,7 @@ index_dir_open(dev_t mountID, bool kernel)
 
 	// get fd for the index directory
 	int fd;
-	fd = get_new_fd(FDTYPE_INDEX_DIR, mount, NULL, cookie, 0, kernel);
+	fd = get_new_fd(FDTYPE_INDEX_DIR, mount, NULL, cookie, O_CLOEXEC, kernel);
 	if (fd >= 0)
 		return fd;
 
@@ -6813,7 +6813,7 @@ query_open(dev_t device, const char* query, uint32 flags, port_id port,
 
 	// get fd for the index directory
 	int fd;
-	fd = get_new_fd(FDTYPE_QUERY, mount, NULL, cookie, 0, kernel);
+	fd = get_new_fd(FDTYPE_QUERY, mount, NULL, cookie, O_CLOEXEC, kernel);
 	if (fd >= 0)
 		return fd;
 
