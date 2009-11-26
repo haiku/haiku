@@ -1715,7 +1715,7 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList& list, team_id team,
 						"cancelled by team %ld (-1 => user)\n", eventTeam));
 
 					if (!debugged)
-						_DisplayAbortingApp(team);
+						_DisplayAbortingApp(eventTeam);
 					throw_error(B_SHUTDOWN_CANCELLED);
 				}
 
