@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 2003 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 
@@ -115,7 +115,7 @@ write_code(uint32 value)
 	if (make_code(value, code))
 		fprintf(sOutputFile, "'%s'", code);
 	else
-		fprintf(sOutputFile, "%lu", value);
+		fprintf(sOutputFile, "%" B_PRIu32, value);
 }
 
 
@@ -188,21 +188,24 @@ static void
 write_rsrc(type_code type, int32 id, const char *name)
 {
 	if (name[0] == '\0') {
-		fprintf(sOutputFile, "resource(%ld) ", id);
+		fprintf(sOutputFile, "resource(%" B_PRId32 ") ", id);
 	} else if ((flags & RDEF_AUTO_NAMES) != 0&& is_ident(name)) {
 		char code[5];
 		if (has_prefix(name)) {
 			fprintf(sOutputFile, "resource(%s) ", name);
-			fprintf(sHeaderFile, "\t%s = %ld,\n", name, id);
+			fprintf(sHeaderFile, "\t%s = %" B_PRId32 ",\n", name, id);
 		} else if (make_code(type, code)) {
 			fprintf(sOutputFile, "resource(%s%s_%s) ", PREFIX, code, name);
-			fprintf(sHeaderFile, "\t%s%s_%s = %ld,\n", PREFIX, code, name, id);
+			fprintf(sHeaderFile, "\t%s%s_%s = %" B_PRId32 ",\n", PREFIX, code,
+				name, id);
 		} else {
-			fprintf(sOutputFile, "resource(%s%ld_%s) ", PREFIX, type, name);
-			fprintf(sHeaderFile, "\t%s%ld_%s = %ld,\n", PREFIX, type, name, id);
+			fprintf(sOutputFile, "resource(%s%" B_PRIu32 "_%s) ", PREFIX,
+				(uint32)type, name);
+			fprintf(sHeaderFile, "\t%s%" B_PRIu32 "_%s = %" B_PRId32 ",\n",
+				PREFIX, (uint32)type, name, id);
 		}
 	} else {
-		fprintf(sOutputFile, "resource(%ld, \"%s\") ", id, name);
+		fprintf(sOutputFile, "resource(%" B_PRId32 ", \"%s\") ", id, name);
 	}
 }
 
@@ -229,7 +232,7 @@ write_raw_line(uint8 *ptr, uint8 *end, size_t bytesPerLine)
 
 
 static void
-write_raw(const char *name, type_code type, const void *data, 
+write_raw(const char *name, type_code type, const void *data,
 	size_t length, size_t bytesPerLine = 32)
 {
 	uint8 *ptr = (uint8 *)data;
@@ -313,7 +316,7 @@ write_int32(const char *name, const void *data, size_t length)
 		write_raw(name, B_INT32_TYPE, data, length);
 	} else {
 		write_field_name(name);
-		fprintf(sOutputFile, "%ld", *(int32 *)data);
+		fprintf(sOutputFile, "%" B_PRId32, *(int32 *)data);
 	}
 }
 
@@ -325,7 +328,7 @@ write_int64(const char *name, const void *data, size_t length)
 		write_raw(name, B_INT64_TYPE, data, length);
 	} else {
 		write_field_name(name);
-		fprintf(sOutputFile, "(int64)%lld", *(int64 *)data);
+		fprintf(sOutputFile, "(int64)%" B_PRId64, *(int64 *)data);
 	}
 }
 
@@ -361,7 +364,7 @@ write_uint32(const char *name, const void *data, size_t length)
 		write_raw(name, B_UINT32_TYPE, data, length);
 	} else {
 		write_field_name(name);
-		fprintf(sOutputFile, "(uint32)%lu", *(uint32 *)data);
+		fprintf(sOutputFile, "(uint32)%" B_PRIu32, *(uint32 *)data);
 	}
 }
 
@@ -373,7 +376,7 @@ write_uint64(const char *name, const void *data, size_t length)
 		write_raw(name, B_UINT64_TYPE, data, length);
 	} else {
 		write_field_name(name);
-		fprintf(sOutputFile, "(uint64)%llu", *(uint64 *)data);
+		fprintf(sOutputFile, "(uint64)%" B_PRIu64, *(uint64 *)data);
 	}
 }
 
@@ -409,7 +412,7 @@ write_size(const char *name, const void *data, size_t length)
 		write_raw(name, B_SIZE_T_TYPE, data, length);
 	} else {
 		write_field_name(name);
-		fprintf(sOutputFile, "(size_t)%lu", *(size_t *)data);
+		fprintf(sOutputFile, "(size_t)%lu", (unsigned long)*(size_t *)data);
 	}
 }
 
@@ -421,7 +424,7 @@ write_ssize(const char *name, const void *data, size_t length)
 		write_raw(name, B_SSIZE_T_TYPE, data, length);
 	} else {
 		write_field_name(name);
-		fprintf(sOutputFile, "(ssize_t)%ld", *(ssize_t *)data);
+		fprintf(sOutputFile, "(ssize_t)%ld", (long)*(ssize_t *)data);
 	}
 }
 
@@ -433,7 +436,7 @@ write_off(const char *name, const void *data, size_t length)
 		write_raw(name, B_OFF_T_TYPE, data, length);
 	} else {
 		write_field_name(name);
-		fprintf(sOutputFile, "(off_t)%lld", *(off_t *)data);
+		fprintf(sOutputFile, "(off_t)%" B_PRIdOFF, *(off_t *)data);
 	}
 }
 
@@ -445,7 +448,7 @@ write_time(const char *name, const void *data, size_t length)
 		write_raw(name, B_TIME_TYPE, data, length);
 	} else {
 		write_field_name(name);
-		fprintf(sOutputFile, "(time_t)%ld", *(time_t *)data);
+		fprintf(sOutputFile, "(time_t)%ld", (long)*(time_t *)data);
 	}
 }
 
@@ -480,7 +483,7 @@ write_rgb(const char *name, const void *data)
 	write_field_name(name);
 	uint8 *b = (uint8 *)data;
 
-	fprintf(sOutputFile, "rgb_color { 0x%02X, 0x%02X, 0x%02X, 0x%02X }", 
+	fprintf(sOutputFile, "rgb_color { 0x%02X, 0x%02X, 0x%02X, 0x%02X }",
 		b[0], b[1], b[2], b[3]);
 }
 
@@ -503,8 +506,8 @@ write_string_line(const char *ptr, const char *end, size_t charsPerLine)
 			case '\r': fprintf(sOutputFile, "\\r");  count += 2; break;
 			case '\t': fprintf(sOutputFile, "\\t");  count += 2; break;
 			case '\v': fprintf(sOutputFile, "\\v");  count += 2; break;
-			case '\"': fprintf(sOutputFile, "\\\""); count += 2; break; 
-			case '\\': fprintf(sOutputFile, "\\\\"); count += 2; break; 
+			case '\"': fprintf(sOutputFile, "\\\""); count += 2; break;
+			case '\\': fprintf(sOutputFile, "\\\\"); count += 2; break;
 
 			case '\0': end_of_item = true; break;
 
@@ -536,10 +539,10 @@ write_string(const char *name, type_code type,
 	const char *end = ptr + length;
 	size_t charsPerLine = 64;
 
-	// We write an "array" resource if the string has more than 64 
-	// characters. A string resource may also be comprised of multiple 
-	// substrings, each terminated by a '\0' char. In that case, we 
-	// must write an "array" resource as well. Sneaky as we are, we use 
+	// We write an "array" resource if the string has more than 64
+	// characters. A string resource may also be comprised of multiple
+	// substrings, each terminated by a '\0' char. In that case, we
+	// must write an "array" resource as well. Sneaky as we are, we use
 	// strlen() to check for that, because it also looks for a '\0'.
 
 	if (length > charsPerLine || strlen(ptr) < length - 1) {
@@ -755,9 +758,10 @@ write_app_version(const void *data, size_t length)
 	fputs("resource app_version", sOutputFile);
 	open_brace();
 
-	fprintf(sOutputFile, "\tmajor  = %ld,\n"
-		"\tmiddle = %ld,\n"
-		"\tminor  = %ld,\n\n", version->major, version->middle, version->minor);
+	fprintf(sOutputFile, "\tmajor  = %" B_PRIu32 ",\n"
+		"\tmiddle = %" B_PRIu32 ",\n"
+		"\tminor  = %" B_PRIu32 ",\n\n", version->major, version->middle,
+		version->minor);
 
 	const char *variety = "B_APPV_DEVELOPMENT";
 	switch (version->variety) {
@@ -778,7 +782,7 @@ write_app_version(const void *data, size_t length)
 			break;
 	}
 	fprintf(sOutputFile, "\tvariety = %s,\n"
-		"\tinternal = %ld,\n\n", variety, version->internal);
+		"\tinternal = %" B_PRIu32 ",\n\n", variety, version->internal);
 
 	fprintf(sOutputFile, "\tshort_info = ");
 	write_string(NULL, B_STRING_TYPE, version->short_info, strlen(version->short_info));
