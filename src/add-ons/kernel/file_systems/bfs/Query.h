@@ -56,6 +56,10 @@ public:
 								int32 type, const uint8* oldKey,
 								size_t oldLength, const uint8* newKey,
 								size_t newLength);
+			void			LiveUpdateRenameMove(Inode* inode,
+								ino_t oldDirectoryID, const char* oldName,
+								size_t oldLength, ino_t newDirectoryID,
+								const char* newName, size_t newLength);
 
 			Expression*		GetExpression() const { return fExpression; }
 

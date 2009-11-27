@@ -1661,3 +1661,31 @@ Query::LiveUpdate(Inode* inode, const char* attribute, int32 type,
 	}
 }
 
+
+void
+Query::LiveUpdateRenameMove(Inode* inode, ino_t oldDirectoryID,
+	const char* oldName, size_t oldLength, ino_t newDirectoryID,
+	const char* newName, size_t newLength)
+{
+	if (fPort < 0 || fExpression == NULL)
+		return;
+
+	// TODO: check if the attribute is part of the query at all...
+
+	status_t oldStatus = fExpression->Root()->Match(inode, "name",
+		B_STRING_TYPE, (const uint8*)oldName, oldLength);
+	status_t newStatus = fExpression->Root()->Match(inode, "name",
+		B_STRING_TYPE, (const uint8*)newName, newLength);
+
+	if (oldStatus != MATCH_OK || oldStatus != newStatus)
+		return;
+
+	// The entry stays in the query, notify query listeners about the rename
+	// or move
+
+	notify_query_entry_removed(fPort, fToken, fVolume->ID(),
+		oldDirectoryID, oldName, inode->ID());
+
+	notify_query_entry_created(fPort, fToken, fVolume->ID(),
+		newDirectoryID, newName, inode->ID());
+}

@@ -117,6 +117,10 @@ public:
 								const char* attribute, int32 type,
 								const uint8* oldKey, size_t oldLength,
 								const uint8* newKey, size_t newLength);
+			void			UpdateLiveQueriesRenameMove(Inode* inode,
+								ino_t oldDirectoryID, const char* oldName,
+								ino_t newDirectoryID, const char* newName);
+
 			bool			CheckForLiveQuery(const char* attribute);
 			void			AddQuery(Query* query);
 			void			RemoveQuery(Query* query);

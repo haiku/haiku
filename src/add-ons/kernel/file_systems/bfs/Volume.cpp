@@ -535,6 +535,24 @@ Volume::UpdateLiveQueries(Inode* inode, const char* attribute, int32 type,
 }
 
 
+void
+Volume::UpdateLiveQueriesRenameMove(Inode* inode, ino_t oldDirectoryID,
+	const char* oldName, ino_t newDirectoryID, const char* newName)
+{
+	MutexLocker _(fQueryLock);
+
+	size_t oldLength = strlen(oldName);
+	size_t newLength = strlen(newName);
+
+	SinglyLinkedList<Query>::Iterator iterator = fQueries.GetIterator();
+	while (iterator.HasNext()) {
+		Query* query = iterator.Next();
+		query->LiveUpdateRenameMove(inode, oldDirectoryID, oldName, oldLength,
+			newDirectoryID, newName, newLength);
+	}
+}
+
+
 /*!	Checks if there is a live query whose results depend on the presence
 	or value of the specified attribute.
 	Don't use it if you already have all the data together to evaluate

@@ -1156,6 +1156,9 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 
 	inode->WriteLockInTransaction(transaction);
 
+	volume->UpdateLiveQueriesRenameMove(inode, oldDirectory->ID(), oldName,
+		newDirectory->ID(), newName);
+
 	// update the name only when they differ
 	bool nameUpdated = false;
 	if (strcmp(oldName, newName)) {
