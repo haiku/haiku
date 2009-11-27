@@ -2783,12 +2783,12 @@ BRoster::_InitMessengers()
 			B_PREFERRED_TOKEN);
 
 		// ask for the MIME messenger
-		// Generous 1s + 1s timeouts. It could actually be synchronous, but
+		// Generous 1s + 5s timeouts. It could actually be synchronous, but
 		// timeouts allow us to debug the registrar main thread.
 		BMessage request(B_REG_GET_MIME_MESSENGER);
 		BMessage reply;
 		status_t error = fMessenger.SendMessage(&request, &reply, 1000000LL,
-			1000000LL);
+			5000000LL);
 		if (error == B_OK && reply.what == B_REG_SUCCESS) {
 			DBG(OUT("  got reply from roster\n"));
 				reply.FindMessenger("messenger", &fMimeMessenger);
