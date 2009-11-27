@@ -678,7 +678,8 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 	}
 
 	register_low_resource_handler(object_cache_low_memory, cache,
-		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 5);
+		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
+			| B_KERNEL_RESOURCE_ADDRESS_SPACE, 5);
 
 	MutexLocker _(sObjectCacheListLock);
 	sObjectCaches.Add(cache);

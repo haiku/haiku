@@ -973,7 +973,8 @@ block_cache::Init()
 		return B_NO_MEMORY;
 
 	return register_low_resource_handler(&_LowMemoryHandler, this,
-		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 0);
+		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
+			| B_KERNEL_RESOURCE_ADDRESS_SPACE, 0);
 }
 
 
