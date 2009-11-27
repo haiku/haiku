@@ -25,5 +25,7 @@ DoCatalogs Keyboard :
 	KeyboardWindow.cpp
 	KeyboardView.cpp
 	: en.catalog
-	: fr.catkeys
+	:
+	fr.catkeys
+	sv.catkeys
 	;
