@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -35,7 +35,7 @@
 struct low_resource_handler
 		: public DoublyLinkedListLinkImpl<low_resource_handler> {
 	low_resource_func	function;
-	void				*data;
+	void*				data;
 	uint32				resources;
 	int32				priority;
 };
@@ -63,6 +63,7 @@ static off_t sCriticalMemoryLimit;
 static int32 sLowPagesState = B_NO_LOW_RESOURCE;
 static int32 sLowMemoryState = B_NO_LOW_RESOURCE;
 static int32 sLowSemaphoresState = B_NO_LOW_RESOURCE;
+static int32 sLowSpaceState = B_NO_LOW_RESOURCE;
 static uint32 sLowResources = 0;	// resources that are not B_NO_LOW_RESOURCE
 static bigtime_t sLastMeasurement;
 
@@ -85,6 +86,8 @@ low_resource_state_no_update(uint32 resources)
 		state = max_c(state, sLowMemoryState);
 	if ((resources & B_KERNEL_RESOURCE_SEMAPHORES) != 0)
 		state = max_c(state, sLowSemaphoresState);
+	if ((resources & B_KERNEL_RESOURCE_ADDRESS_SPACE) != 0)
+		state = max_c(state, sLowSpaceState);
 
 	return state;
 }
@@ -104,7 +107,7 @@ call_handlers(uint32 lowResources)
 	low_resource_handler marker;
 	sLowResourceHandlers.Insert(&marker, false);
 
-	while (low_resource_handler *handler
+	while (low_resource_handler* handler
 			= sLowResourceHandlers.GetNext(&marker)) {
 		// swap with handler
 		sLowResourceHandlers.Swap(&marker, handler);
@@ -173,11 +176,27 @@ compute_state(void)
 		sLowSemaphoresState = B_NO_LOW_RESOURCE;
 		sLowResources &= ~B_KERNEL_RESOURCE_SEMAPHORES;
 	}
+	
+	// free kernel address space state
+	// TODO: this should take fragmentation into account
+	size_t maxSpace = KERNEL_SIZE;
+	size_t freeSpace = vm_kernel_address_space_left();
+
+	if (freeSpace < maxSpace >> 16)
+		sLowSpaceState = B_LOW_RESOURCE_CRITICAL;
+	if (freeSpace < maxSpace >> 8)
+		sLowSpaceState = B_LOW_RESOURCE_WARNING;
+	if (freeSpace < maxSpace >> 4)
+		sLowSpaceState = B_LOW_RESOURCE_NOTE;
+	else {
+		sLowSpaceState = B_NO_LOW_RESOURCE;
+		sLowResources &= ~B_KERNEL_RESOURCE_ADDRESS_SPACE;
+	}
 }
 
 
-static int32
-low_resource_manager(void *)
+static status_t
+low_resource_manager(void*)
 {
 	bigtime_t timeout = kLowResourceInterval;
 	while (true) {
@@ -231,15 +250,17 @@ state_to_string(uint32 state)
 
 
 static int
-dump_handlers(int argc, char **argv)
+dump_handlers(int argc, char** argv)
 {
-	kprintf("current state: %c%c%c\n",
+	kprintf("current state: %c%c%c%c\n",
 		(sLowResources & B_KERNEL_RESOURCE_PAGES) != 0 ? 'p' : '-',
 		(sLowResources & B_KERNEL_RESOURCE_MEMORY) != 0 ? 'm' : '-',
-		(sLowResources & B_KERNEL_RESOURCE_SEMAPHORES) != 0 ? 's' : '-');
+		(sLowResources & B_KERNEL_RESOURCE_SEMAPHORES) != 0 ? 's' : '-',
+		(sLowResources & B_KERNEL_RESOURCE_ADDRESS_SPACE) != 0 ? 'a' : '-');
 	kprintf("  pages:  %s\n", state_to_string(sLowPagesState));
 	kprintf("  memory: %s\n", state_to_string(sLowMemoryState));
-	kprintf("  sems:   %s\n\n", state_to_string(sLowSemaphoresState));
+	kprintf("  sems:   %s\n", state_to_string(sLowSemaphoresState));
+	kprintf("  aspace: %s\n\n", state_to_string(sLowSpaceState));
 
 	HandlerList::Iterator iterator = sLowResourceHandlers.GetIterator();
 	kprintf("function    data         resources  prio  function-name\n");
@@ -282,9 +303,10 @@ low_resource(uint32 resource, uint64 requirements, uint32 flags, uint32 timeout)
 		case B_KERNEL_RESOURCE_PAGES:
 			vm_schedule_page_scanner(requirements);
 			break;
+
 		case B_KERNEL_RESOURCE_MEMORY:
-			break;
 		case B_KERNEL_RESOURCE_SEMAPHORES:
+		case B_KERNEL_RESOURCE_ADDRESS_SPACE:
 			break;
 	}
 
@@ -354,7 +376,7 @@ low_resource_manager_init_post_thread(void)
 
 
 status_t
-unregister_low_resource_handler(low_resource_func function, void *data)
+unregister_low_resource_handler(low_resource_func function, void* data)
 {
 	TRACE(("unregister_low_resource_handler(function = %p, data = %p)\n",
 		function, data));
@@ -363,7 +385,7 @@ unregister_low_resource_handler(low_resource_func function, void *data)
 	HandlerList::Iterator iterator = sLowResourceHandlers.GetIterator();
 
 	while (iterator.HasNext()) {
-		low_resource_handler *handler = iterator.Next();
+		low_resource_handler* handler = iterator.Next();
 
 		if (handler->function == function && handler->data == data) {
 			sLowResourceHandlers.Remove(handler);
@@ -380,13 +402,13 @@ unregister_low_resource_handler(low_resource_func function, void *data)
 	the handler will be called in low resource situations.
 */
 status_t
-register_low_resource_handler(low_resource_func function, void *data,
+register_low_resource_handler(low_resource_func function, void* data,
 	uint32 resources, int32 priority)
 {
 	TRACE(("register_low_resource_handler(function = %p, data = %p)\n",
 		function, data));
 
-	low_resource_handler *newHandler = (low_resource_handler *)malloc(
+	low_resource_handler *newHandler = (low_resource_handler*)malloc(
 		sizeof(low_resource_handler));
 	if (newHandler == NULL)
 		return B_NO_MEMORY;
@@ -402,7 +424,7 @@ register_low_resource_handler(low_resource_func function, void *data,
 
 	HandlerList::ReverseIterator iterator
 		= sLowResourceHandlers.GetReverseIterator();
-	low_resource_handler *last = NULL;
+	low_resource_handler* last = NULL;
 	while (iterator.HasNext()) {
 		low_resource_handler *handler = iterator.Next();
 

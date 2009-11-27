@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_LOW_RESOURCE_MANAGER_H
@@ -22,10 +22,12 @@ enum {
 	B_KERNEL_RESOURCE_PAGES			= 0x01,	/* physical pages */
 	B_KERNEL_RESOURCE_MEMORY		= 0x02,	/* reservable memory */
 	B_KERNEL_RESOURCE_SEMAPHORES	= 0x04,	/* semaphores */
+	B_KERNEL_RESOURCE_ADDRESS_SPACE	= 0x08, /* address space */
 
 	B_ALL_KERNEL_RESOURCES			= B_KERNEL_RESOURCE_PAGES
 										| B_KERNEL_RESOURCE_MEMORY
 										| B_KERNEL_RESOURCE_SEMAPHORES
+										| B_KERNEL_RESOURCE_ADDRESS_SPACE
 };
 
 typedef void (*low_resource_func)(void *data, uint32 resources, int32 level);

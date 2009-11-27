@@ -227,6 +227,9 @@ static status_t map_backing_store(vm_address_space* addressSpace,
 	vm_area** _area, const char* areaName, bool unmapAddressRange, bool kernel);
 
 
+static size_t sKernelAddressSpaceLeft = KERNEL_SIZE;
+
+
 //	#pragma mark -
 
 
@@ -1383,8 +1386,12 @@ insert_area(vm_address_space* addressSpace, void** _address,
 
 	status = find_and_insert_area_slot(addressSpace, searchBase, size,
 		searchEnd, addressSpec, area);
-	if (status == B_OK)
+	if (status == B_OK) {
 		*_address = (void*)area->base;
+		
+		if (addressSpace == vm_kernel_address_space())
+			sKernelAddressSpaceLeft -= area->size;
+	}
 
 	return status;
 }
@@ -1668,8 +1675,16 @@ map_backing_store(vm_address_space* addressSpace, vm_cache* cache,
 	}
 
 	status = insert_area(addressSpace, _virtualAddress, addressSpec, size, area);
-	if (status != B_OK)
+	if (status != B_OK) {
+		// TODO: wait and try again once this is working in the backend
+#if 0
+		if (status == B_NO_MEMORY && addressSpec == B_ANY_KERNEL_ADDRESS) {
+			low_resource(B_KERNEL_RESOURCE_ADDRESS_SPACE, size,
+				0, 0);
+		}
+#endif
 		goto err2;
+	}
 
 	// attach the cache to the area
 	area->cache = cache;
@@ -2006,7 +2021,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 		addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name,
 		(flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0, kernel);
 
-	if (status < B_OK) {
+	if (status != B_OK) {
 		cache->ReleaseRefAndUnlock();
 		goto err1;
 	}
@@ -2750,6 +2765,9 @@ remove_area_from_address_space(vm_address_space* addressSpace, vm_area* area)
 	}
 	if (area == addressSpace->area_hint)
 		addressSpace->area_hint = NULL;
+
+	if (addressSpace == vm_kernel_address_space())
+		sKernelAddressSpaceLeft -= area->size;
 
 	if (temp == NULL)
 		panic("vm_area_release_ref: area not found in aspace's area list\n");
@@ -5261,6 +5279,13 @@ vm_available_not_needed_memory(void)
 {
 	MutexLocker locker(sAvailableMemoryLock);
 	return sAvailableMemory - sNeededMemory;
+}
+
+
+size_t
+vm_kernel_address_space_left(void)
+{
+	return sKernelAddressSpaceLeft;
 }
 
 
