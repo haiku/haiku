@@ -22,14 +22,14 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
-#include <TextView.h>
+
 
 #include "Arguments.h"
-#include "CodeConv.h"
 #include "Globals.h"
 #include "PrefHandler.h"
-#include "TermWindow.h"
 #include "TermConst.h"
+#include "TermView.h"
+#include "TermWindow.h"
 
 
 static bool sUsageRequested = false;
@@ -139,22 +139,7 @@ TermApp::Quit()
 void
 TermApp::AboutRequested()
 {
-	// used spaces instead of tabs to avoid Murai's name being wrapped
-	BAlert *alert = new BAlert("about", "Terminal\n"
-		"    written by Kazuho Okui and Takashi Murai\n"
-		"    updated by Kian Duffy and others\n\n"
-		"    Copyright " B_UTF8_COPYRIGHT "2003-2008, Haiku.\n", "Ok");
-	BTextView *view = alert->TextView();
-	
-	view->SetStylable(true);
-
-	BFont font;
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
-	view->SetFontAndColor(0, 8, &font);
-
-	alert->Go();
+	TermView::AboutRequested();
 }
 
 
@@ -557,7 +542,7 @@ void
 TermApp::_Usage(char *name)
 {
 	fprintf(stderr, "Haiku Terminal\n"
-		"Copyright 2001-2007 Haiku, Inc.\n"
+		"Copyright 2001-2009 Haiku, Inc.\n"
 		"Copyright(C) 1999 Kazuho Okui and Takashi Murai.\n"
 		"\n"
 		"Usage: %s [OPTION] [SHELL]\n", name);

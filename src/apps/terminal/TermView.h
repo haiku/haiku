@@ -92,7 +92,8 @@ public:
 			void			InitiateDrag();
 
 			void			DisableResizeView(int32 disableCount = 1);
-
+	static	void			AboutRequested();
+	
 protected:
 	virtual void			AttachedToWindow();
 	virtual void			DetachedFromWindow();
@@ -134,8 +135,6 @@ private:
 
 			void			_Activate();
 			void			_Deactivate();
-
-			void			_AboutRequested();
 
 			void			_DrawLinePart(int32 x1, int32 y1, uint16 attr,
 								char* buffer, int32 width, bool mouse,

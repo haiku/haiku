@@ -13,7 +13,7 @@
  */
 
 
-#include "TerminalBuffer.h"
+
 #include "TermView.h"
 
 #include <ctype.h>
@@ -50,11 +50,12 @@
 #include "CodeConv.h"
 #include "Shell.h"
 #include "TermConst.h"
+#include "TerminalBuffer.h"
 #include "TerminalCharClassifier.h"
 #include "VTkeymap.h"
 
 
-// defined VTKeyTbl.c
+// defined in VTKeyTbl.c
 extern int function_keycode_table[];
 extern char *function_key_char_table[];
 
@@ -1469,7 +1470,7 @@ TermView::MessageReceived(BMessage *msg)
 	switch (msg->what){
 		case B_ABOUT_REQUESTED:
 			// (replicant) about box requested
-			_AboutRequested();
+			AboutRequested();
 			break;
 
 		case B_SIMPLE_DATA:
@@ -1681,8 +1682,8 @@ TermView::ScrollTo(BPoint where)
 //debug_printf("TermView::ScrollTo(): %f -> %f\n", fScrollOffset, where.y);
 	float diff = where.y - fScrollOffset;
 	if (diff == 0)
-		return;
-
+		return;	
+	
 	float bottom = Bounds().bottom;
 	int32 oldFirstLine = _LineAt(0);
 	int32 oldLastLine = _LineAt(bottom);
@@ -2708,14 +2709,15 @@ TermView::InitiateDrag()
 }
 
 
+/* static */
 void
-TermView::_AboutRequested()
+TermView::AboutRequested()
 {
 	BAlert *alert = new (std::nothrow) BAlert("about",
 		"Terminal\n"
 		"\twritten by Kazuho Okui and Takashi Murai\n"
 		"\tupdated by Kian Duffy and others\n\n"
-		"\tCopyright " B_UTF8_COPYRIGHT "2003-2008, Haiku.\n", "Ok");
+		"\tCopyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n", "Ok");
 	if (alert != NULL)
 		alert->Go();
 }

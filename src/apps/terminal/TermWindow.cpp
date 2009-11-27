@@ -162,14 +162,8 @@ TermWindow::TermWindow(BRect frame, const char* title, Arguments *args)
 
 TermWindow::~TermWindow()
 {
-	// If there's no prefwindow, save the preferences by ourselves.
-	// For example, this saves the columns/rows number.
-	// TODO: Code duplication. Exterminate
 	if (fPrefWindow)
-		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
-	else 
-		PrefHandler::Default()->SaveDefaultAsText();	
-	
+		fPrefWindow->PostMessage(B_QUIT_REQUESTED);	
 		
 	if (fFindPanel && fFindPanel->Lock()) {
 		fFindPanel->Quit();
