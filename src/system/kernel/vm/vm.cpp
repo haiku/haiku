@@ -1107,7 +1107,7 @@ is_valid_spot(addr_t base, addr_t alignedBase, addr_t size, addr_t limit)
 }
 
 
-/*!	Must be called with this address space's sem held */
+/*!	Must be called with this address space's write lock held */
 static status_t
 find_and_insert_area_slot(vm_address_space* addressSpace, addr_t start,
 	addr_t size, addr_t end, uint32 addressSpec, vm_area* area)
@@ -1346,7 +1346,7 @@ second_chance:
 /*!	This inserts the area you pass into the specified address space.
 	It will also set the "_address" argument to its base address when
 	the call succeeds.
-	You need to hold the vm_address_space semaphore.
+	You need to hold the vm_address_space write lock.
 */
 static status_t
 insert_area(vm_address_space* addressSpace, void** _address,
