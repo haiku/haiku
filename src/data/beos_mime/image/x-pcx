@@ -1,0 +1,15 @@
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/x-pcx";
+
+resource(2, "META:SNIFF_RULE") "0.5 (\"\\012\\005\\001\") [3](0x01 | 0x04 | 0x08)";
+	// version 5, encoding 1 is all our translator currently supports
+
+resource(3, "META:S:DESC") #'MSDC' "PCX Image";
+
+resource(4, "META:L:DESC") #'MLDC' "PC Paintbrush Image";
+
+resource(5, "META:EXTENS") message(234) {
+	"extensions" = "pcx",
+	"type" = "image/x-pcx"
+};
