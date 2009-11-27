@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _SYMBOL_VERSIONING_H
-#define _SYMBOL_VERSIONING_H
+#ifndef _SYSTEM_SYMBOL_VERSIONING_H
+#define _SYSTEM_SYMBOL_VERSIONING_H
 
 #include <BeBuild.h>
 
@@ -17,4 +17,4 @@
 #endif
 
 
-#endif	/* _SYMBOL_VERSIONING_H */
+#endif	/* _SYSTEM_SYMBOL_VERSIONING_H */
