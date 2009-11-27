@@ -41,12 +41,21 @@ UsePublicObjectHeaders gen_matypes : opengl ;
 BuildPlatformMain gen_matypes :
 	gen_matypes.c ;
 
-rule MkMaTypes
+rule MkMaTypes header
 {
-	MakeLocateArch $(<) ;
-	Depends $(<) : gen_matypes ;
-	MkMaTypes1 $(<) : gen_matypes ;
-	LocalClean clean : $(<) ;
+	header = [ FGristFiles $(header) ] ;
+
+	# generate the intermediate header
+	local intermediateHeader = $(header:S=.h.cpp) ;
+	MakeLocateArch $(intermediateHeader) ;
+	Depends $(intermediateHeader) : gen_matypes ;
+	MkMaTypes1 $(intermediateHeader) : gen_matypes ;
+	LocalClean clean : $(intermediateHeader) ;
+
+	# generate the final header
+	TARGET_HDRS on $(header) = [ on $(header) return $(TARGET_HDRS) ]
+		$(TARGET_PRIVATE_SYSTEM_HEADERS) ;
+	CreateAsmStructOffsetsHeader $(header) : $(intermediateHeader) ;
 }
 
 actions MkMaTypes1
@@ -78,9 +87,9 @@ actions MkMaTypes1
 local arch_sources ;
 if $(TARGET_ARCH) = x86 {
 
-	MkMaTypes <mesa>matypes.h ;
+	MkMaTypes matypes.h ;
 
-	arch_sources = 
+	arch_sources =
 		common_x86.c
 		common_x86_asm.S
 
@@ -109,13 +118,13 @@ if $(TARGET_ARCH) = x86 {
 		x86sse.c
 		;
 
-	Includes [ FGristFiles $(arch_sources) ] : <mesa>matypes.h ;
+	Includes [ FGristFiles $(arch_sources) ] : [ FGristFiles matypes.h ] ;
 
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) x86 rtasm ] ;
 
 } else if $(TARGET_ARCH) = ppc {
 
-	arch_sources = 
+	arch_sources =
 		common_ppc.c
 		;
 
@@ -123,10 +132,10 @@ if $(TARGET_ARCH) = x86 {
 
 } else if $(TARGET_ARCH) = sparc {
 
-	arch_sources = 
-		sparc.c 
+	arch_sources =
+		sparc.c
 		clip.S
-		norm.S 
+		norm.S
 		xform.S
 		;
 
@@ -135,7 +144,7 @@ if $(TARGET_ARCH) = x86 {
 }
 
 
-StaticLibrary libmesa.a : 
+StaticLibrary libmesa.a :
 
 	# main
 	api_arrayelt.c
@@ -273,7 +282,7 @@ StaticLibrary libmesa.a :
 
 	# swrast_setup
 	ss_context.c
-	ss_triangle.c 	
+	ss_triangle.c
 
 	# shader
 	arbprogparse.c

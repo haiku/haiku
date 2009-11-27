@@ -61,7 +61,12 @@ do {									\
    printf( "\n" );							\
 } while (0)
 
-#if defined(__BEOS__) || defined(__HAIKU__) || defined(_LP64)
+#if 1
+// Haiku build system: support for cross-compilation
+#define OFFSET( s, t, m )						\
+   printf( "#undef %s\n", s); \
+   printf( "DEFINE_COMPUTED_ASM_MACRO(%s, offsetof(%s, %s));\n", s, #t, #m );
+#elif defined(__BEOS__) || defined(__HAIKU__) || defined(_LP64)
 #define OFFSET( s, t, m )						\
    printf( "#define %s\t%ld\n", s, offsetof( t, m ) );
 #else
@@ -69,7 +74,12 @@ do {									\
    printf( "#define %s\t%d\n", s, offsetof( t, m ) );
 #endif
 
-#if defined(__BEOS__) || defined(__HAIKU__) || defined(_LP64)
+#if 1
+// Haiku build system: support for cross-compilation
+#define SIZEOF( s, t )							\
+   printf( "#undef %s\n", s); \
+   printf( "DEFINE_COMPUTED_ASM_MACRO(%s, sizeof(%s));\n", s, #t );
+#elif defined(__BEOS__) || defined(__HAIKU__) || defined(_LP64)
 #define SIZEOF( s, t )							\
    printf( "#define %s\t%ld\n", s, sizeof(t) );
 #else
@@ -77,8 +87,16 @@ do {									\
    printf( "#define %s\t%d\n", s, sizeof(t) );
 #endif
 
+#if 1
+// Haiku build system: support for cross-compilation
+#define DEFINE( s, d )							\
+   printf( "#undef %s\n", s); \
+   printf( "#define %s\t0x%x\n", s, d ); \
+   printf( "DEFINE_COMPUTED_ASM_MACRO(%s, %#x);\n", s, d );
+#else
 #define DEFINE( s, d )							\
    printf( "#define %s\t0x%x\n", s, d );
+#endif
 
 
 
@@ -93,6 +111,16 @@ int main( int argc, char **argv )
    printf( "#define __ASM_TYPES_H__\n" );
    printf( "\n" );
 
+   #if 1
+     // Haiku build system: support for cross-compilation
+      printf("#include <computed_asm_macros.h>");
+      printf( "\n" );
+      printf( "#include \"main/glheader.h\"\n" );
+      printf( "#include \"main/mtypes.h\"\n" );
+      printf( "#include \"tnl/t_context.h\"" );
+      printf( "\n" );
+      printf( "void dummy() {\n" );
+   #endif
 
    /* GLcontext offsets:
     */
@@ -239,6 +267,11 @@ int main( int argc, char **argv )
    OFFSET( "LIGHT_MODEL_TWO_SIDE      ", struct gl_lightmodel, TwoSide );
    OFFSET( "LIGHT_MODEL_COLOR_CONTROL ", struct gl_lightmodel, ColorControl );
 
+   #if 1
+     // Haiku build system: support for cross-compilation
+      printf("}");
+      printf( "\n" );
+   #endif
 
    printf( "\n" );
    printf( "\n" );
