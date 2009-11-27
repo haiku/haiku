@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku Inc.
+ * Copyright 2001-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,9 +8,14 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 //!	Recently launched apps list
 
+
 #include "RecentEntries.h"
+
+#include <new>
+#include <map>
 
 #include <AppFileInfo.h>
 #include <Entry.h>
@@ -20,16 +25,13 @@
 #include <Path.h>
 #include <Roster.h>
 #include <String.h>
+
 #include <storage_support.h>
 
-#include <new>
-#include <map>
+#include "Debug.h"
+
 
 using namespace std;
-
-#define DBG(x) (x)
-//#define DBG(x)
-#define OUT printf
 
 
 /*!	\struct recent_entry
@@ -38,7 +40,7 @@ using namespace std;
 	that launched/used/opened/viewed/whatevered it, and an index used for
 	keeping track of orderings when loading/storing the recent entries list
 	from/to disk.
-	
+
 */
 
 /*! \brief Creates a new recent_entry object.
@@ -49,7 +51,7 @@ recent_entry::recent_entry(const entry_ref *ref, const char *appSig,
 	ref(ref ? *ref : entry_ref()),
 	sig(appSig),
 	index(index)
-{	
+{
 }
 
 
@@ -64,14 +66,14 @@ recent_entry::recent_entry(const entry_ref *ref, const char *appSig,
 
 /*!	\var std::list<std::string> RecentEntries::fEntryList
 	\brief The list of entries and their corresponding app sigs, most recent first
-	
+
 	The signatures are expected to be stored all lowercase, as MIME
 	signatures are case-independent.
 */
 
 
 /*!	\brief Creates a new list.
-	
+
 	The list is initially empty.
 */
 RecentEntries::RecentEntries()
@@ -89,10 +91,10 @@ RecentEntries::~RecentEntries()
 
 /*! \brief Places the given entry Places the app with the given signature at the front of
 	the recent apps list.
-	
+
 	If the app already exists elsewhere in the list, that item is
 	removed so only one instance exists in the list at any time.
-	
+
 	\param appSig The application's signature
 	\param appFlags The application's flags. If \a appFlags contains
 	                either \c B_ARGV_ONLY or \c B_BACKGROUND_APP, the
@@ -134,25 +136,25 @@ RecentEntries::Add(const entry_ref *ref, const char *appSig)
 
 /*! \brief Returns the first \a maxCount recent apps in the \c BMessage
 	pointed to by \a list.
-	
+
 	The message is cleared first, and \c entry_refs for the the apps are
 	stored in the \c "refs" field of the message (\c B_REF_TYPE).
-	
+
 	If there are fewer than \a maxCount items in the list, the entire
 	list is returned.
-	
+
 	Duplicate entries are never returned, i.e. if two instances of the
 	same entry were added under different app sigs, and both instances
 	match the given filter criterion, only the most recent instance is
 	returned; the latter instance is ignored and not counted towards
 	the \a maxCount number of entries to return.
-	
+
 	Since BRoster::GetRecentEntries() returns \c void, the message pointed
 	to by \a list is simply cleared if maxCount is invalid (i.e. <= 0).
-	
+
 	\param fileTypes An array of file type filters. These file types are
 	       expected to be all lowercase.
-*/	
+*/
 status_t
 RecentEntries::Get(int32 maxCount, const char *fileTypes[],
 	int32 fileTypesCount, const char *appSig, BMessage *result)
@@ -181,7 +183,7 @@ RecentEntries::Get(int32 maxCount, const char *fileTypes[],
 			char type[B_MIME_TYPE_LENGTH];
 			if (GetTypeForRef(&(*item)->ref, type) == B_OK) {
 				bool match = false;
-				for (int i = 0; i < fileTypesCount; i++) {						
+				for (int i = 0; i < fileTypesCount; i++) {
 					if (!strcasecmp(type, fileTypes[i])) {
 						match = true;
 						break;
@@ -231,7 +233,7 @@ RecentEntries::Clear()
 		delete *i;
 	}
 	fEntryList.clear();
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -243,9 +245,10 @@ RecentEntries::Print()
 	std::list<recent_entry*>::iterator item;
 	int counter = 1;
 	for (item = fEntryList.begin(); item != fEntryList.end(); item++) {
-		printf("%d: device == '%ld', dir == '%lld', name == '%s', app == '%s', index == %ld\n",
-		       counter++, (*item)->ref.device, (*item)->ref.directory, (*item)->ref.name,
-		       (*item)->sig.c_str(), (*item)->index);
+		printf("%d: device == '%ld', dir == '%lld', name == '%s', app == '%s', "
+			"index == %ld\n", counter++, (*item)->ref.device,
+			(*item)->ref.directory, (*item)->ref.name, (*item)->sig.c_str(),
+			(*item)->index);
 	}
 	return B_OK;
 }
@@ -268,7 +271,7 @@ RecentEntries::Save(FILE* file, const char *description, const char *tag)
 		change over time (whereas ours will). If our implementation
 		proves to be slower that R5, we may want to consider using
 		the data structure pervasively.
-	*/			
+	*/
 	std::map<entry_ref, std::list<recent_entry*> > map;
 	uint32 count = fEntryList.size();
 
@@ -278,12 +281,12 @@ RecentEntries::Save(FILE* file, const char *description, const char *tag)
 			recent_entry *entry = *item;
 			if (entry) {
 				entry->index = count;
-				map[entry->ref].push_back(entry);				
+				map[entry->ref].push_back(entry);
 			} else {
-				DBG(OUT("WARNING: RecentEntries::Save(): The entry %ld entries "
-				        "from the front of fEntryList was found to be NULL\n",
-				        fEntryList.size() - count));
-			}			
+				D(PRINT("WARNING: RecentEntries::Save(): The entry %ld entries "
+					"from the front of fEntryList was found to be NULL\n",
+					fEntryList.size() - count));
+			}
 		}
 	} catch (...) {
 		return B_NO_MEMORY;
@@ -305,22 +308,22 @@ RecentEntries::Save(FILE* file, const char *description, const char *tag)
 			for (std::list<recent_entry*>::iterator item = list.begin();
 					item != list.end(); i++, item++) {
 				recent_entry *entry = *item;
-				if (entry) 
+				if (entry)
 					fprintf(file, " \"%s\" %ld", entry->sig.c_str(), entry->index);
 				else {
-					DBG(OUT("WARNING: RecentEntries::Save(): The entry %ld entries "
-					        "from the front of the compiled recent_entry* list for the "
-					        "entry ref (%ld, %lld, '%s') was found to be NULL\n",
-					        i, mapItem->first.device, mapItem->first.directory,
-					        mapItem->first.name));
+					D(PRINT("WARNING: RecentEntries::Save(): The entry %ld "
+						"entries from the front of the compiled recent_entry* "
+						"list for the entry ref (%ld, %lld, '%s') was found to "
+						"be NULL\n", i, mapItem->first.device,
+						mapItem->first.directory, mapItem->first.name));
 				}
 			}
 			fprintf(file, "\n");
 		} else {
-			DBG(OUT("WARNING: RecentEntries::Save(): entry_ref_to_path() failed on "
-			        "the entry_ref (%ld, %lld, '%s') with error 0x%lx\n",
-			        mapItem->first.device, mapItem->first.directory,
-			        mapItem->first.name, outputError));
+			D(PRINT("WARNING: RecentEntries::Save(): entry_ref_to_path() "
+				"failed on the entry_ref (%ld, %lld, '%s') with error 0x%lx\n",
+				mapItem->first.device, mapItem->first.directory,
+				mapItem->first.name, outputError));
 		}
 	}
 
@@ -353,5 +356,5 @@ RecentEntries::GetTypeForRef(const entry_ref *ref, char *result)
 			result[bytes] = '\0';
 	}
 
-	return error;		
+	return error;
 }

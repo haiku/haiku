@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku Inc.
+ * Copyright 2001-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,7 +8,9 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 //!	Recently launched apps list
+
 
 #include "RecentApps.h"
 
@@ -24,25 +26,25 @@
 
 #include <string.h>
 
-#define DBG(x) (x)
-//#define DBG(x)
-#define OUT printf
+#include "Debug.h"
+
 
 /*!	\class RecentApps
 	\brief Manages the roster's list of recently launched applications
 
 */
 
+
 /*!	\var std::list<std::string> RecentApps::fAppList
 	\brief The list of app sigs, most recent first
-	
+
 	The signatures are expected to be stored all lowercase, as MIME
 	signatures are case-independent.
 */
 
 
 /*!	\brief Creates a new list.
-	
+
 	The list is initially empty.
 */
 RecentApps::RecentApps()
@@ -61,10 +63,10 @@ RecentApps::~RecentApps()
 
 /*! \brief Places the app with the given signature at the front of
 	the recent apps list.
-	
+
 	If the app already exists elsewhere in the list, that item is
 	removed so only one instance exists in the list at any time.
-	
+
 	\param appSig The application's signature
 	\param appFlags The application's flags. If \a appFlags contains
 	                either \c B_ARGV_ONLY or \c B_BACKGROUND_APP, the
@@ -109,7 +111,7 @@ RecentApps::Add(const char *appSig, int32 appFlags)
 
 /*! \brief Adds the signature of the application referred to by \a ref at
 	the front of the recent apps list.
-	
+
 	The entry is checked for a BEOS:APP_SIG attribute. If that fails, the
 	app's resources are checked. If no signature can be found, the call
 	fails.
@@ -123,7 +125,7 @@ RecentApps::Add(const entry_ref *ref, int32 appFlags)
 	BFile file;
 	BAppFileInfo info;
 	char signature[B_MIME_TYPE_LENGTH];
-	
+
 	status_t err = file.SetTo(ref, B_READ_ONLY);
 	if (!err)
 		err = info.SetTo(&file);
@@ -137,16 +139,16 @@ RecentApps::Add(const entry_ref *ref, int32 appFlags)
 
 /*! \brief Returns the first \a maxCount recent apps in the \c BMessage
 	pointed to by \a list.
-	
+
 	The message is cleared first, and \c entry_refs for the the apps are
 	stored in the \c "refs" field of the message (\c B_REF_TYPE).
-	
+
 	If there are fewer than \a maxCount items in the list, the entire
 	list is returned.
-	
+
 	Since BRoster::GetRecentApps() returns \c void, the message pointed
 	to by \a list is simply cleared if maxCount is invalid (i.e. <= 0).
-*/	
+*/
 status_t
 RecentApps::Get(int32 maxCount, BMessage *list)
 {
@@ -166,8 +168,10 @@ RecentApps::Get(int32 maxCount, BMessage *list)
 		entry_ref ref;
 		if (GetRefForApp(item->c_str(), &ref) == B_OK)
 			status = list->AddRef("refs", &ref);
-		else
-			DBG(OUT("WARNING: RecentApps::Get(): No ref found for app '%s'\n", item->c_str()));
+		else {
+			D(PRINT("WARNING: RecentApps::Get(): No ref found for app '%s'\n",
+				item->c_str()));
+		}
 	}
 
 	return status;
@@ -180,7 +184,7 @@ status_t
 RecentApps::Clear()
 {
 	fAppList.clear();
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -220,7 +224,7 @@ RecentApps::Save(FILE* file)
 
 /*! \brief Fetches an \c entry_ref for the application with the
 	given signature.
-	
+
 	First the MIME database is checked for a matching application type
 	with a valid app hint attribute. If that fails, a query is established
 	to track down such an application, if there is one available.
@@ -235,8 +239,8 @@ RecentApps::GetRefForApp(const char *appSig, entry_ref *result)
 	// and Ingo's on vacation :-P :-)
 	BMimeType mime(appSig);
 	status_t err = mime.InitCheck();
-	if (!err) 
+	if (!err)
 		err = mime.GetAppHint(result);
-	return err;	
+	return err;
 }
 

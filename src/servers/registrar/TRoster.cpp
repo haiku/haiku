@@ -1752,19 +1752,20 @@ TRoster::_HandleGetRecentEntries(BMessage* request)
 		switch (request->what) {
 			case B_REG_GET_RECENT_DOCUMENTS:
 				error = fRecentDocuments.Get(maxCount, (const char**)fileTypes,
-		   	                                 fileTypesCount, appSig, &reply);
+					fileTypesCount, appSig, &reply);
 				D(fRecentDocuments.Print());
 		   	    break;
 
 			case B_REG_GET_RECENT_FOLDERS:
 				error = fRecentFolders.Get(maxCount, (const char**)fileTypes,
-			                               fileTypesCount, appSig, &reply);
+					fileTypesCount, appSig, &reply);
 				D(fRecentFolders.Print());
 			    break;
 
 			default:
-				D(PRINT(("WARNING: TRoster::_HandleGetRecentEntries(): unexpected "
-				         "request->what value of 0x%lx\n", request->what)));
+				D(PRINT(("WARNING: TRoster::_HandleGetRecentEntries(): "
+					"unexpected request->what value of 0x%lx\n",
+					request->what)));
 				error = B_BAD_VALUE;
 				break;
 		}
