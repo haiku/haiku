@@ -1,1 +1,2 @@
-#include "arch/generic/generic_gensyscalls.h"
+#define SYSCALL_RETURN_TYPE_ALIGNMENT_TYPE	int
+#define SYSCALL_PARAMETER_ALIGNMENT_TYPE	int

@@ -1,12 +1,8 @@
 /*
- * Copyright 2004-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2004-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
-
-// Don't include arch_gensyscalls.h. It's only needed when creating the
-// syscall vector.
-#define DONT_INCLUDE_ARCH_GENSYSCALLS_H 1
 
 #include "gensyscalls.h"
 
@@ -130,6 +126,19 @@ Syscall::LastParameter() const
 }
 
 
+void
+Syscall::SetReturnType(int size, const char* name)
+{
+	int usedSize = (size + kReturnTypeAlignmentSize - 1)
+		/ kReturnTypeAlignmentSize * kReturnTypeAlignmentSize;
+	const char* alignmentType
+		= size != usedSize && size < kReturnTypeAlignmentSize
+			? kReturnTypeAlignmentType : 0;
+
+	SetReturnType(name, size, usedSize, alignmentType);
+}
+
+
 Type*
 Syscall::SetReturnType(const char* name, int size, int usedSize,
 	const char* alignmentTypeName)
@@ -147,6 +156,24 @@ Syscall::AddParameter(const char* typeName, const char* parameterName,
 		usedSize, offset, alignmentTypeName);
 	fParameters->push_back(parameter);
 	return parameter;
+}
+
+void
+Syscall::AddParameter(int size, const char* typeName, const char* parameterName)
+{
+	// compute offset
+	int offset = 0;
+	if (Parameter* previous = LastParameter())
+		offset = previous->Offset() + previous->UsedSize();
+
+	int usedSize = (size + kParameterAlignmentSize - 1)
+		/ kParameterAlignmentSize * kParameterAlignmentSize;
+	const char* alignmentType
+		= size != usedSize && size < kParameterAlignmentSize
+			? kParameterAlignmentType : 0;
+
+	AddParameter(typeName, parameterName, size, usedSize, offset,
+		alignmentType);
 }
 
 

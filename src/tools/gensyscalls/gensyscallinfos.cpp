@@ -15,9 +15,17 @@
 
 #include "gensyscalls_common.h"
 
+#include "arch_gensyscalls.h"
+	// for the alignment type macros (only for the type names)
+
+
+// macro trickery to create a string literal
+#define MAKE_STRING(x)	#x
+#define EVAL_MACRO(macro, x) macro(x)
+
 
 const char* kUsage =
-	"Usage: gensyscallinfos <header> <syscall infos>\n"
+	"Usage: gensyscallinfos <header> <syscall infos> <syscall types sizes>\n"
 	"\n"
 	"Given the (preprocessed) header file that defines the syscall prototypes "
 		"the\n"
@@ -30,7 +38,11 @@ const char* kUsage =
 	"                           syscall prototypes.\n"
 	"  <syscall infos>        - Output: The syscall infos source file needed "
 		"to\n"
-	"                           build gensyscalls.";
+	"                           build gensyscalls.\n"
+	"  <syscall types sizes>  - Output: A source file that will by another "
+		"build\n"
+	"                           step turned into a header file included by\n"
+	"                           <syscall infos>.\n";
 
 
 static void
@@ -285,12 +297,13 @@ public:
 			print_usage(false);
 			return 0;
 		}
-		if (argc != 3) {
+		if (argc != 4) {
 			print_usage(true);
 			return 1;
 		}
 		_ParseSyscalls(argv[1]);
 		_WriteSyscallInfoFile(argv[2]);
+		_WriteSyscallTypeSizes(argv[3]);
 		return 0;
 	}
 
@@ -335,7 +348,19 @@ private:
 
 		// write preamble
 		file << "#include \"gensyscalls.h\"" << endl;
-		file << "#include \"syscalls.h.pp\"" << endl;
+		file << "#include \"syscall_types_sizes.h\"" << endl;
+		file << endl;
+
+		file << "const char* const kReturnTypeAlignmentType = \""
+			EVAL_MACRO(MAKE_STRING, SYSCALL_RETURN_TYPE_ALIGNMENT_TYPE)
+			<< "\";" << endl;
+		file << "const char* const kParameterAlignmentType = \""
+			EVAL_MACRO(MAKE_STRING, SYSCALL_PARAMETER_ALIGNMENT_TYPE)
+			<< "\";" << endl;
+		file << "const int kReturnTypeAlignmentSize = "
+			"SYSCALL_RETURN_TYPE_ALIGNMENT_SIZE;" << endl;
+		file << "const int kParameterAlignmentSize = "
+			"SYSCALL_PARAMETER_ALIGNMENT_SIZE;" << endl;
 		file << endl;
 
 		file << "SyscallVector* create_syscall_vector() {" << endl;
@@ -355,26 +380,76 @@ private:
 
 			const Type& returnType = syscall.GetReturnType();
 
-			// syscall->SetReturnType<ReturnType>("returnType");
-			file << "\tsyscall->SetReturnType<" << returnType.type
-				<< ">(\"" << returnType.type << "\");" << endl;
+			// syscall->SetReturnType<(SYSCALL_RETURN_TYPE_SIZE_<i>,
+			//		"returnType");
+			file << "\tsyscall->SetReturnType("
+				<< "SYSCALL_RETURN_TYPE_SIZE_" << i << ", \""
+				<< returnType.type << "\");" << endl;
 
 			// parameters
 			int paramCount = syscall.CountParameters();
 			for (int k = 0; k < paramCount; k++) {
 				const NamedType& param = syscall.ParameterAt(k);
-				// syscall->AddParameter<ParameterType>("parameterTypeName",
-				//	"parameterName");
-				file << "\tsyscall->AddParameter<"
-					<< param.type << ">(\""
-					<< param.type << "\", \""
-					<< param.name << "\");" << endl;
+				// syscall->AddParameter(SYSCALL_PARAMETER_SIZE_<i>_<k>,
+				//		"parameterTypeName", "parameterName");
+				file << "\tsyscall->AddParameter("
+					<< "SYSCALL_PARAMETER_SIZE_" << i << "_" << k
+					<< ", \"" << param.type << "\", \"" << param.name << "\");"
+					<< endl;
 			}
 			file << endl;
 		}
 
 		// postamble
 		file << "\treturn syscallVector;" << endl;
+		file << "}" << endl;
+	}
+
+	void _WriteSyscallTypeSizes(const char* filename)
+	{
+		// open the syscall info file
+		ofstream file(filename, ofstream::out | ofstream::trunc);
+		if (!file.is_open())
+			throw new IOException(string("Failed to open `") + filename + "'.");
+
+		// write preamble
+		file << "#include <computed_asm_macros.h>" << endl;
+		file << "#include <syscalls.h>" << endl;
+		file << endl;
+		file << "#include \"arch_gensyscalls.h\"" << endl;
+		file << endl;
+		file << "void dummy() {" << endl;
+
+		file << "DEFINE_COMPUTED_ASM_MACRO(SYSCALL_RETURN_TYPE_ALIGNMENT_SIZE, "
+			"sizeof(SYSCALL_RETURN_TYPE_ALIGNMENT_TYPE));" << endl;
+  		file << "DEFINE_COMPUTED_ASM_MACRO(SYSCALL_PARAMETER_ALIGNMENT_SIZE, "
+			"sizeof(SYSCALL_PARAMETER_ALIGNMENT_TYPE));" << endl;
+		file << endl;
+
+		// syscalls
+		for (int i = 0; i < (int)fSyscalls.size(); i++) {
+			const Syscall& syscall = fSyscalls[i];
+			const Type& returnType = syscall.GetReturnType();
+
+			if (returnType.type == "void") {
+				file << "DEFINE_COMPUTED_ASM_MACRO(SYSCALL_RETURN_TYPE_SIZE_"
+					<< i << ", 0);" << endl;
+			} else {
+				file << "DEFINE_COMPUTED_ASM_MACRO(SYSCALL_RETURN_TYPE_SIZE_"
+					<< i << ", sizeof(" << returnType.type << "));" << endl;
+			}
+
+			// parameters
+			int paramCount = syscall.CountParameters();
+			for (int k = 0; k < paramCount; k++) {
+				const NamedType& param = syscall.ParameterAt(k);
+				file << "DEFINE_COMPUTED_ASM_MACRO(SYSCALL_PARAMETER_SIZE_" << i
+					<< "_" << k << ", sizeof(" << param.type << "));" << endl;
+			}
+			file << endl;
+		}
+
+		// postamble
 		file << "}" << endl;
 	}
 
