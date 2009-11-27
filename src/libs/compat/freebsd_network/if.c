@@ -16,6 +16,7 @@
 
 #include <compat/sys/bus.h>
 #include <compat/sys/kernel.h>
+#include <compat/sys/taskqueue.h>
 
 #include <compat/net/if.h>
 #include <compat/net/if_arp.h>
@@ -24,7 +25,6 @@
 #include <compat/sys/malloc.h>
 
 #include <compat/net/ethernet.h>
-#include <compat/net80211/ieee80211_var.h>
 
 
 /*
@@ -169,16 +169,15 @@ if_alloc(u_char type)
 		case IFT_ETHER:
 		{
 			ifp->if_l2com = _kernel_malloc(sizeof(struct arpcom), M_ZERO);
+			if (ifp->if_l2com == NULL)
+				goto err2;
 			IFP2AC(ifp)->ac_ifp = ifp;
 			break;
 		}
 		case IFT_IEEE80211:
 		{
-			ifp->if_l2com = _kernel_malloc(sizeof(struct ieee80211com), M_ZERO);
-			((struct ieee80211com *)(ifp->if_l2com))->ic_ifp = ifp;
-			if (ifp->if_l2com == NULL)
+			if (wlan_if_l2com_alloc(ifp) != B_OK)
 				goto err2;
-
 			break;
 		}
 	}
@@ -228,7 +227,7 @@ err1:
 void
 if_free(struct ifnet *ifp)
 {
-	// IFT_IEEE80211 devices won't be in this list,
+	// IEEE80211 devices won't be in this list,
 	// so don't try to remove them.
 	if (ifp->if_type == IFT_ETHER)
 		remove_from_device_name_list(ifp);
