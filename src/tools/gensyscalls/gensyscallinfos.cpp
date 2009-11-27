@@ -1,7 +1,8 @@
-// gensyscallinfos.cpp
-//
-// Copyright (c) 2004, Ingo Weinhold <bonefish@cs.tu-berlin.de>
-// All rights reserved. Distributed under the terms of the OpenBeOS License.
+/*
+ * Copyright 2004-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 #include <cstdio>
 #include <cstdlib>
@@ -14,62 +15,64 @@
 
 #include "gensyscalls_common.h"
 
-// usage
-const char *kUsage =
-"Usage: gensyscallinfos <header> <syscall infos>\n"
-"\n"
-"Given the (preprocessed) header file that defines the syscall prototypes the\n"
-"command generates a source file consisting of syscall infos, which is needed\n"
-"to build gensyscalls, which in turn generates the assembly syscall\n"
-"definitions and code for the kernelland syscall dispatcher.\n"
-"\n"
-"  <header>               - Input: The preprocessed header file with the\n"
-"                           syscall prototypes.\n"
-"  <syscall infos>        - Output: The syscall infos source file needed to\n"
-"                           build gensyscalls.";
 
-// print_usage
-static
-void
+const char* kUsage =
+	"Usage: gensyscallinfos <header> <syscall infos>\n"
+	"\n"
+	"Given the (preprocessed) header file that defines the syscall prototypes "
+		"the\n"
+	"command generates a source file consisting of syscall infos, which is "
+		"needed\n"
+	"to build gensyscalls, which in turn generates the assembly syscall\n"
+	"definitions and code for the kernelland syscall dispatcher.\n"
+	"\n"
+	"  <header>               - Input: The preprocessed header file with the\n"
+	"                           syscall prototypes.\n"
+	"  <syscall infos>        - Output: The syscall infos source file needed "
+		"to\n"
+	"                           build gensyscalls.";
+
+
+static void
 print_usage(bool error)
 {
 	fprintf((error ? stderr : stdout), kUsage);
 }
 
-// Type
+
 struct Type {
-	Type(const char *type) : type(type) {}
-	Type(const string &type) : type(type) {}
+	Type(const char* type) : type(type) {}
+	Type(const string& type) : type(type) {}
 
 	string type;
 };
 
-// NamedType
+
 struct NamedType : Type {
-	NamedType(const char *type, const char *name) 
+	NamedType(const char* type, const char* name)
 		: Type(type), name(name) {}
-	NamedType(const string &type, const string &name)
+	NamedType(const string& type, const string& name)
 		: Type(type), name(name) {}
 
 	string name;
 };
 
-// Function
+
 class Function {
 public:
 	Function() : fReturnType("") {}
 
-	void SetName(const string &name)
+	void SetName(const string& name)
 	{
 		fName = name;
 	}
 
-	const string &GetName() const
+	const string& GetName() const
 	{
 		return fName;
 	}
 
-	void AddParameter(const NamedType &type)
+	void AddParameter(const NamedType& type)
 	{
 		fParameters.push_back(type);
 	}
@@ -79,17 +82,17 @@ public:
 		return fParameters.size();
 	}
 
-	const NamedType &ParameterAt(int index) const
+	const NamedType& ParameterAt(int index) const
 	{
 		return fParameters[index];
 	}
 
-	void SetReturnType(const Type &type)
+	void SetReturnType(const Type& type)
 	{
 		fReturnType = type;
 	}
 
-	const Type &GetReturnType() const
+	const Type& GetReturnType() const
 	{
 		return fReturnType;
 	}
@@ -100,7 +103,7 @@ protected:
 	Type				fReturnType;
 };
 
-// Syscall
+
 class Syscall : public Function {
 public:
 	string GetKernelName() const
@@ -116,10 +119,10 @@ public:
 	}
 };
 
-// Tokenizer
+
 class Tokenizer {
 public:
-	Tokenizer(istream &input)
+	Tokenizer(istream& input)
 		: fInput(input),
 		  fHasCurrent(false)
 	{
@@ -137,12 +140,12 @@ public:
 		return GetNextToken(NULL);
 	}
 
-	string GetNextToken(stack<string> &skippedTokens)
+	string GetNextToken(stack<string>& skippedTokens)
 	{
 		return GetNextToken(&skippedTokens);
 	}
 
-	string GetNextToken(stack<string> *skippedTokens)
+	string GetNextToken(stack<string>* skippedTokens)
 	{
 		if (fHasCurrent) {
 			fTokens.pop_front();
@@ -156,7 +159,7 @@ public:
 		return fTokens.front();
 	}
 
-	void ExpectToken(const string &expectedToken)
+	void ExpectToken(const string& expectedToken)
 	{
 		string token = GetCurrentToken();
 		if (expectedToken != token) {
@@ -165,19 +168,19 @@ public:
 		}
 	}
 
-	void ExpectNextToken(const string &expectedToken)
+	void ExpectNextToken(const string& expectedToken)
 	{
 		GetNextToken();
 		ExpectToken(expectedToken);
 	}
 
-	bool CheckToken(const string &expectedToken)
+	bool CheckToken(const string& expectedToken)
 	{
 		string token = GetCurrentToken();
 		return (expectedToken == token);
 	}
 
-	bool CheckNextToken(const string &expectedToken)
+	bool CheckNextToken(const string& expectedToken)
 	{
 		GetNextToken();
 		bool result = CheckToken(expectedToken);
@@ -202,7 +205,7 @@ public:
 		fTokens.push_front(token);
 	}
 
-	void PutTokens(stack<string> &tokens)
+	void PutTokens(stack<string>& tokens)
 	{
 		if (fHasCurrent) {
 			fTokens.pop_front();
@@ -265,17 +268,16 @@ private:
 	}
 
 private:
-	istream			&fInput;
+	istream&		fInput;
 	list<string>	fTokens;
 	bool			fHasCurrent;
 };
 
 
-// Main
 class Main {
 public:
 
-	int Run(int argc, char **argv)
+	int Run(int argc, char** argv)
 	{
 		// parse parameters
 		if (argc >= 2
@@ -292,9 +294,8 @@ public:
 		return 0;
 	}
 
-
 private:
-	void _ParseSyscalls(const char *filename)
+	void _ParseSyscalls(const char* filename)
 	{
 		// open the input file
 		ifstream file(filename, ifstream::in);
@@ -325,7 +326,7 @@ private:
 		tokenizer.ExpectNextToken("end");
 	}
 
-	void _WriteSyscallInfoFile(const char *filename)
+	void _WriteSyscallInfoFile(const char* filename)
 	{
 		// open the syscall info file
 		ofstream file(filename, ofstream::out | ofstream::trunc);
@@ -344,15 +345,15 @@ private:
 
 		// syscalls
 		for (int i = 0; i < (int)fSyscalls.size(); i++) {
-			const Syscall &syscall = fSyscalls[i];
+			const Syscall& syscall = fSyscalls[i];
 
 			// syscall = syscallVector->CreateSyscall("syscallName",
 			//	"syscallKernelName");
 			file << "\tsyscall = syscallVector->CreateSyscall(\""
 				<< syscall.GetName() << "\", \""
 				<< syscall.GetKernelName() << "\");" << endl;
-	
-			const Type &returnType = syscall.GetReturnType();
+
+			const Type& returnType = syscall.GetReturnType();
 
 			// syscall->SetReturnType<ReturnType>("returnType");
 			file << "\tsyscall->SetReturnType<" << returnType.type
@@ -361,7 +362,7 @@ private:
 			// parameters
 			int paramCount = syscall.CountParameters();
 			for (int k = 0; k < paramCount; k++) {
-				const NamedType &param = syscall.ParameterAt(k);
+				const NamedType& param = syscall.ParameterAt(k);
 				// syscall->AddParameter<ParameterType>("parameterTypeName",
 				//	"parameterName");
 				file << "\tsyscall->AddParameter<"
@@ -377,7 +378,7 @@ private:
 		file << "}" << endl;
 	}
 
-	void _ParseSyscall(Tokenizer &tokenizer, Syscall &syscall)
+	void _ParseSyscall(Tokenizer& tokenizer, Syscall& syscall)
 	{
 		// get return type and function name
 		vector<string> returnType;
@@ -410,7 +411,7 @@ private:
 		tokenizer.ExpectNextToken(";");
 	}
 
-	void _ParseParameter(Tokenizer &tokenizer, Syscall &syscall)
+	void _ParseParameter(Tokenizer& tokenizer, Syscall& syscall)
 	{
 		vector<string> type;
 		while (tokenizer.GetNextToken() != ")"
@@ -445,8 +446,8 @@ private:
 		syscall.AddParameter(NamedType(typeString, typeName));
 	}
 
-	void _ParseFunctionPointerParameter(Tokenizer &tokenizer, Syscall &syscall,
-		vector<string> &type)
+	void _ParseFunctionPointerParameter(Tokenizer& tokenizer, Syscall& syscall,
+		vector<string>& type)
 	{
 		// When this method is entered, the return type and the opening
 		// parenthesis must already be parse and stored in the supplied type
@@ -488,15 +489,13 @@ private:
 };
 
 
-// main
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 	try {
 		return Main().Run(argc, argv);
-	} catch (Exception &exception) {
+	} catch (Exception& exception) {
 		fprintf(stderr, "%s\n", exception.what());
 		return 1;
 	}
 }
-
