@@ -87,6 +87,7 @@ MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 		fStreamInfo[i].infoBufferSize = 0;
 		fStreamInfo[i].chunkCache
 			= new ChunkCache(fExtractorWaitSem, kMaxCacheBytes);
+		fStreamInfo[i].lastChunk = NULL;
 		memset(&fStreamInfo[i].encodedFormat, 0,
 			sizeof(fStreamInfo[i].encodedFormat));
 	}
