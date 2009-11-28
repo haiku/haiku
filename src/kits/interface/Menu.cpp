@@ -368,8 +368,10 @@ BMenu::AttachedToWindow()
 
 	// TODO: Move into init_interface_kit().
 	// Currently we can't do that, as get_key_map() blocks forever
-	// when called there. Probably because the BApplication isn't yet
-	// initialized, or running.
+	// when called on input_server initialization, since it tries
+	// to send a synchronous message to itself (input_server is
+	// a BApplication)
+	
 	BMenu::sAltAsCommandKey = true;
 	key_map* keys = NULL;
 	char* chars = NULL;
