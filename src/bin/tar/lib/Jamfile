@@ -45,6 +45,7 @@ StaticLibrary libtar.a :
 	imaxtostr.c
 	lchown.c
 	malloc.c
+	mbchar.c
 	mbscasecmp.c
 	mempcpy.c
 	memrchr.c
@@ -76,6 +77,7 @@ StaticLibrary libtar.a :
 	stpcpy.c
 	strcasecmp.c
 	stripslash.c
+	strnlen1.c
 	strncasecmp.c
 	strndup.c
 	strtol.c
