@@ -64,7 +64,7 @@ l2cap_init_protocol(net_socket* socket)
 {
 	flowf("\n");
 
-	L2capEndpoint* protocol = new (std::nothrow) L2capEndpoint(socket);
+	L2capEndpoint* protocol = new(std::nothrow) L2capEndpoint(socket);
 	if (protocol == NULL)
 		return NULL;
 
@@ -79,10 +79,13 @@ l2cap_uninit_protocol(net_protocol* protocol)
 {
 	flowf("\n");
 	
-	// TODO: Some more checkins	/ uninit
-	EndpointList.Remove((L2capEndpoint*)protocol);
+	L2capEndpoint* endpoint = static_cast<L2capEndpoint*>(protocol);
 	
-	delete protocol;
+	// TODO: Some more checkins	/ uninit
+	EndpointList.Remove(endpoint);
+	
+	delete endpoint;
+
 	return B_OK;
 }
 

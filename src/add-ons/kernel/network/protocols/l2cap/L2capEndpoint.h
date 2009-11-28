@@ -67,6 +67,7 @@ public:
 
 	void 		BindToChannel(L2capChannel* channel);
 	status_t	MarkEstablished();
+	status_t	MarkClosed();
 	
 	static L2capEndpoint* ForPsm(uint16 psm);
 	
@@ -75,17 +76,16 @@ public:
 		return fConfigurationSet;
 	}
 	
-	ChannelConfiguration 	configuration;
-	net_fifo 				fReceivingFifo;
+	ChannelConfiguration 	fConfiguration;	
 	bool 					fConfigurationSet;
+	net_fifo		fReceivingFifo;
 	
 private:
 	typedef enum {
 		// establishing a connection
 		CLOSED,
+		BOUND,
 		LISTEN,
-		SYNCHRONIZE_SENT,
-		SYNCHRONIZE_RECEIVED,
 		ESTABLISHED,
 
 		// peer closes the connection
@@ -101,9 +101,10 @@ private:
 
 	mutex			fLock;
 	State    		fState;
-	L2capEndpoint*	fPeerEndpoint;
 	sem_id			fAcceptSemaphore;
+	L2capEndpoint*	fPeerEndpoint;
 	L2capChannel* 	fChannel;
+
 };
 
 

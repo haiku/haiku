@@ -137,59 +137,59 @@ l2cap_process_signal_cmd(HciConnection* conn, net_buffer* buffer)
 
 		/* Process command processors responsible to delete the command*/
 		switch (processingCode) {
-		case L2CAP_CMD_REJ:
-			l2cap_process_cmd_rej(conn, processingIdent, buffer);
-		break;
+			case L2CAP_CMD_REJ:
+				l2cap_process_cmd_rej(conn, processingIdent, buffer);
+				break;
 
-		case L2CAP_CON_REQ:
-			l2cap_process_con_req(conn, processingIdent, buffer);
-		break;
+			case L2CAP_CON_REQ:
+				l2cap_process_con_req(conn, processingIdent, buffer);
+				break;
 
-		case L2CAP_CON_RSP:
-			l2cap_process_con_rsp(conn, processingIdent, buffer);
-		break;
+			case L2CAP_CON_RSP:
+				l2cap_process_con_rsp(conn, processingIdent, buffer);
+				break;
 
-		case L2CAP_CFG_REQ:
-			l2cap_process_cfg_req(conn, processingIdent, buffer);
-		break;
+			case L2CAP_CFG_REQ:
+				l2cap_process_cfg_req(conn, processingIdent, buffer);
+				break;
 
-		case L2CAP_CFG_RSP:
-			l2cap_process_cfg_rsp(conn, processingIdent, buffer);
-		break;
+			case L2CAP_CFG_RSP:
+				l2cap_process_cfg_rsp(conn, processingIdent, buffer);
+				break;
 
-		case L2CAP_DISCON_REQ:
-			l2cap_process_discon_req(conn, processingIdent, buffer);
-		break;
+			case L2CAP_DISCON_REQ:
+				l2cap_process_discon_req(conn, processingIdent, buffer);
+				break;
 
-		case L2CAP_DISCON_RSP:
-			l2cap_process_discon_rsp(conn, processingIdent, buffer);
-		break;
+			case L2CAP_DISCON_RSP:
+				l2cap_process_discon_rsp(conn, processingIdent, buffer);
+				break;
 
-		case L2CAP_ECHO_REQ:
-			l2cap_process_echo_req(conn, processingIdent, buffer);
-		break;
+			case L2CAP_ECHO_REQ:
+				l2cap_process_echo_req(conn, processingIdent, buffer);
+				break;
 
-		case L2CAP_ECHO_RSP:
-			l2cap_process_echo_rsp(conn, processingIdent, buffer);
-		break;
+			case L2CAP_ECHO_RSP:
+				l2cap_process_echo_rsp(conn, processingIdent, buffer);
+				break;
 
-		case L2CAP_INFO_REQ:
-			l2cap_process_info_req(conn, processingIdent, buffer);
-		break;
+			case L2CAP_INFO_REQ:
+				l2cap_process_info_req(conn, processingIdent, buffer);
+				break;
 
-		case L2CAP_INFO_RSP:
-			l2cap_process_info_rsp(conn, processingIdent, buffer);
-		break;
+			case L2CAP_INFO_RSP:
+				l2cap_process_info_rsp(conn, processingIdent, buffer);
+				break;
 
-		default:
-			debugf("unknown L2CAP signaling command, code=%#x, ident=%d\n",
+			default:
+				debugf("unknown L2CAP signaling command, code=%#x, ident=%d\n",
 						processingCode, processingIdent);
 
-			// Send L2CAP_CommandRej. Do not really care about the result
-			// ORD: Remiaining commands in the same packet are also to be rejected
-/*			send_l2cap_reject(con, processingIdent, L2CAP_REJ_NOT_UNDERSTOOD, 0, 0, 0);*/
-			gBufferModule->free(m);
-			break;
+				// Send L2CAP_CommandRej. Do not really care about the result
+				// ORD: Remiaining commands in the same packet are also to be rejected
+				/*send_l2cap_reject(con, processingIdent, L2CAP_REJ_NOT_UNDERSTOOD, 0, 0, 0);*/
+				gBufferModule->free(m);
+				break;
 		}
 
 		// Is there still remaining size? processors should have pulled its content...
@@ -213,7 +213,7 @@ l2cap_process_signal_cmd(HciConnection* conn, net_buffer* buffer)
 static status_t
 l2cap_process_con_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 {
-	L2capChannel* ch;
+	L2capChannel* channel;
 	uint16 dcid, psm;
 
 	/* Get con req data */
@@ -231,29 +231,29 @@ l2cap_process_con_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 	/*	Create new channel and send L2CA_ConnectInd
 	    notification to the upper layer protocol.
 	 */
-	ch = btCoreData->AddChannel(conn, psm /*, dcid, ident*/);
-	if (ch == NULL) {
+	channel = btCoreData->AddChannel(conn, psm /*, dcid, ident*/);
+	if (channel == NULL) {
 		flowf("No resources to create channel\n");
 		return (send_l2cap_con_rej(conn, ident, 0, dcid, L2CAP_NO_RESOURCES));
 	} else {
-		debugf("New channel created scid=%d\n", ch->scid);
+		debugf("New channel created scid=%d\n", channel->scid);
 	}
 
-	ch->dcid = dcid;
-	ch->ident = ident;
+	channel->dcid = dcid;
+	channel->ident = ident;
 
-	status_t indicationStatus = l2cap_l2ca_con_ind(ch);
+	status_t indicationStatus = l2cap_l2ca_con_ind(channel);
 
 	if ( indicationStatus == B_OK ) {
-		//ch->state = L2CAP_CHAN_W4_L2CA_CON_RSP;
+		//channel->state = L2CAP_CHAN_W4_L2CA_CON_RSP;
 
 	} else if (indicationStatus == B_NO_MEMORY) {
-		/* send_l2cap_con_rej(con, ident, ch->scid, dcid, L2CAP_NO_RESOURCES);*/
-		btCoreData->RemoveChannel(conn, ch->scid);
+		/* send_l2cap_con_rej(con, ident, channel->scid, dcid, L2CAP_NO_RESOURCES);*/
+		btCoreData->RemoveChannel(conn, channel->scid);
 
 	} else {
-		send_l2cap_con_rej(conn, ident, ch->scid, dcid, L2CAP_PSM_NOT_SUPPORTED);
-		btCoreData->RemoveChannel(conn, ch->scid);
+		send_l2cap_con_rej(conn, ident, channel->scid, dcid, L2CAP_PSM_NOT_SUPPORTED);
+		btCoreData->RemoveChannel(conn, channel->scid);
 	}
 
 	return (indicationStatus);
@@ -688,7 +688,7 @@ reject:
 static status_t
 l2cap_process_discon_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 {
-	L2capChannel* ch = NULL;
+	L2capChannel* channel = NULL;
 	L2capFrame* cmd = NULL;
 	net_buffer* buff = NULL;
 	uint16 scid;
@@ -706,26 +706,26 @@ l2cap_process_discon_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 	command.Remove();
 
 	/* Check if we have this channel and it is in valid state */
-	ch = btCoreData->ChannelBySourceID(conn, dcid);
-	if (ch == NULL) {
+	channel = btCoreData->ChannelBySourceID(conn, dcid);
+	if (channel == NULL) {
 		debugf("unexpected L2CAP_DisconnectReq message.Channel does not exist, "
 			"cid=%d\n", dcid);
 		goto reject;
 	}
 
 	/* XXX Verify channel state and reject if invalid -- is that true? */
-	if (ch->state != L2CAP_CHAN_OPEN && ch->state != L2CAP_CHAN_CONFIG &&
-		ch->state != L2CAP_CHAN_W4_L2CAP_DISCON_RSP) {
+	if (channel->state != L2CAP_CHAN_OPEN && channel->state != L2CAP_CHAN_CONFIG &&
+		channel->state != L2CAP_CHAN_W4_L2CAP_DISCON_RSP) {
 		debugf("unexpected L2CAP_DisconnectReq. Invalid channel state, cid=%d, "
-			"state=%d\n", dcid, ch->state);
+			"state=%d\n", dcid, channel->state);
 		goto reject;
 	}
 
 	/* Match destination channel ID */
-	if (ch->dcid != scid || ch->scid != dcid) {
+	if (channel->dcid != scid || channel->scid != dcid) {
 		debugf("unexpected L2CAP_DisconnectReq. Channel IDs does not match, "
 			"channel: scid=%d, dcid=%d, request: scid=%d, dcid=%d\n",
-			ch->scid, ch->dcid, scid, dcid);
+			channel->scid, channel->dcid, scid, dcid);
 		goto reject;
 	}
 
@@ -736,22 +736,22 @@ l2cap_process_discon_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 	 */
 
 	flowf("Responding\n");
+
+	// inform upper if we were not actually already waiting
+	if (channel->state != L2CAP_CHAN_W4_L2CAP_DISCON_RSP) {
+		l2cap_l2ca_discon_ind(channel); // do not care about result
+	}
+
 	/* Send L2CAP_DisconnectRsp */
 	buff = l2cap_discon_rsp(ident, dcid, scid);
-	cmd = btCoreData->SpawnSignal(conn, ch, buff, ident, L2CAP_DISCON_RSP);
+	cmd = btCoreData->SpawnSignal(conn, channel, buff, ident, L2CAP_DISCON_RSP);
 	if (cmd == NULL)
 		return ENOMEM;
 
 	/* Link command to the queue */
 	SchedConnectionPurgeThread(conn);
 
-
-	ch->state = L2CAP_CHAN_W4_L2CA_DISCON_RSP;
-
-	if (ch->state != L2CAP_CHAN_W4_L2CAP_DISCON_RSP) {
-		//INDICATION ng_l2cap_l2ca_discon_ind(ch); /* do not care about result */
-		btCoreData->RemoveChannel(conn, ch->scid);
-	}
+	btCoreData->RemoveChannel(conn, channel->scid);
 
 	return B_OK;
 

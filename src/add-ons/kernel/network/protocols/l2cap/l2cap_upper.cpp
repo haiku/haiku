@@ -94,6 +94,7 @@ l2cap_l2ca_cfg_rsp_ind(L2capChannel* channel)
 
 		} else {
 			// nothing special requested
+			channel->ident = btCoreData->ChannelAllocateIdent(channel->conn);
 			net_buffer* buf = l2cap_cfg_req(channel->ident, channel->dcid, 0, NULL);
 			L2capFrame* cmd = btCoreData->SpawnSignal(channel->conn, channel, buf, 
 				channel->ident, L2CAP_CFG_REQ);
@@ -117,6 +118,13 @@ l2cap_l2ca_cfg_rsp_ind(L2capChannel* channel)
 
 
 status_t
+l2cap_l2ca_discon_ind(L2capChannel* channel)
+{
+	return channel->endpoint->MarkClosed();
+}
+
+
+status_t
 l2cap_upper_cfg_rsp(L2capChannel* channel)
 {
 	channel->cfgState |= L2CAP_CFG_OUT;
@@ -136,6 +144,33 @@ l2cap_upper_con_rsp(HciConnection* conn, L2capChannel* channel)
 
 	return B_OK;
 }
+
+status_t
+l2cap_upper_dis_req(L2capChannel* channel)
+{
+	
+	channel->ident = btCoreData->ChannelAllocateIdent(channel->conn);
+	
+	net_buffer* buf = l2cap_discon_req(channel->ident, channel->scid, channel->dcid);
+	L2capFrame* cmd = btCoreData->SpawnSignal(channel->conn, channel, buf, 
+		channel->ident, L2CAP_DISCON_REQ);	
+	if (cmd == NULL) {
+		gBufferModule->free(buf);
+		return ENOMEM;
+	}
+
+	channel->state = L2CAP_CHAN_W4_L2CA_DISCON_RSP;
+
+	/* Link command to the queue */
+	SchedConnectionPurgeThread(channel->conn);
+	return B_OK;
+
+}
+
+
+#if 0
+#pragma mark -
+#endif
 
 
 status_t

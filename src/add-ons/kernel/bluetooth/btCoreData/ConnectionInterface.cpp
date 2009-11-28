@@ -21,20 +21,35 @@
 
 void PurgeChannels(HciConnection* conn);
 
+
+HciConnection::HciConnection()
+{
+	mutex_init(&fLock, "conn outgoing");
+	mutex_init(&fLockExpected, "frame expected");
+}
+
+
+HciConnection::~HciConnection()
+{
+	mutex_destroy(&fLock);
+	mutex_destroy(&fLockExpected);
+}
+
+
 HciConnection*
 AddConnection(uint16 handle, int type, bdaddr_t* dst, hci_id hid)
 {
 	// Create connection descriptor
-	
+
 	HciConnection* conn = ConnectionByHandle(handle, hid);
-	if (conn != NULL)	
+	if (conn != NULL)
 		goto update;
-		
+
 	conn = new (std::nothrow) HciConnection;
 	if (conn == NULL)
 		goto bail;
-		
-	memset(conn, 0, sizeof(HciConnection));
+
+	//memset(conn, 0, sizeof(HciConnection));
 
 	conn->currentRxPacket = NULL;
 	conn->currentRxExpectedLength = 0;

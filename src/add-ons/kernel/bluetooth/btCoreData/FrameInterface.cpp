@@ -5,21 +5,26 @@
 #define SUBMODULE_COLOR 31
 #include <btDebug.h>
 
+#include <lock.h>
 
 L2capFrame*
 SignalByIdent(HciConnection* conn, uint8 ident)
 {
 	L2capFrame*	frame;
 
+	mutex_lock(&conn->fLockExpected);
 	DoublyLinkedList<L2capFrame>::Iterator iterator = conn->ExpectedResponses.GetIterator();
 
 	while (iterator.HasNext()) {
 
 		frame = iterator.Next();
 		if (frame->type == L2CAP_C_FRAME && frame->ident == ident) {
+			mutex_unlock(&frame->conn->fLockExpected);
 			return frame;
 		}
 	}
+
+	mutex_unlock(&conn->fLockExpected);
 
 	return NULL;
 }
@@ -45,7 +50,7 @@ unTimeoutSignal(L2capFrame* frame)
 
 
 L2capFrame*
-SpawmFrame(HciConnection* conn, net_buffer* buffer, frame_type type)
+SpawmFrame(HciConnection* conn, L2capChannel* channel, net_buffer* buffer, frame_type type)
 {
 	if (buffer == NULL)
 		panic("Null Buffer to outgoing queue");
@@ -53,12 +58,16 @@ SpawmFrame(HciConnection* conn, net_buffer* buffer, frame_type type)
 	L2capFrame* frame = new (std::nothrow) L2capFrame;
 
 	frame->conn = conn;
-	frame->channel = NULL; // TODO: needed?
+	frame->channel = channel; // TODO: maybe only scid needed
 
 	frame->buffer = buffer;
 	frame->type = type;
 
+	mutex_lock(&conn->fLock);
+
 	conn->OutGoingFrames.Add(frame, true);
+
+	mutex_unlock(&conn->fLock);
 
 	return frame;
 }
@@ -73,14 +82,18 @@ SpawmSignal(HciConnection* conn, L2capChannel* channel, net_buffer* buffer, uint
 	L2capFrame* frame = new (std::nothrow) L2capFrame;
 
 	frame->conn = conn;
-	frame->channel = channel; // TODO: needed?
+	frame->channel = channel; // TODO: not specific descriptor should be required
 
 	frame->buffer = buffer;
 	frame->type = L2CAP_C_FRAME;
 	frame->ident = ident;
 	frame->code = code;
 
+	mutex_lock(&conn->fLock);
+
 	conn->OutGoingFrames.Add(frame, true);
+
+	mutex_unlock(&conn->fLock);
 
 	return frame;
 }
@@ -91,16 +104,35 @@ AcknowledgeSignal(L2capFrame* frame)
 {
 
 	if (frame != NULL) {
-		
+
 		if (frame->type == L2CAP_C_FRAME) {
 			unTimeoutSignal(frame);
-			frame->conn->ExpectedResponses.Remove(frame);
+			mutex_lock(&frame->conn->fLockExpected);
+			// frame->conn->ExpectedResponses.Remove(frame);
+			mutex_unlock(&frame->conn->fLockExpected);
 		}
-		
+
 		gBufferModule->free(frame->buffer);
 		delete frame;
-		
+
 		return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
+status_t
+QueueSignal(L2capFrame* frame)
+{
+	if (frame != NULL) {
+
+		if (frame->type == L2CAP_C_FRAME) {
+			mutex_lock(&frame->conn->fLockExpected);
+			frame->conn->ExpectedResponses.Add(frame);
+			mutex_unlock(&frame->conn->fLockExpected);
+			return B_OK;
+		}
 	}
 
 	return B_ERROR;

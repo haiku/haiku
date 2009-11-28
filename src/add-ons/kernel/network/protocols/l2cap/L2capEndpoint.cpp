@@ -4,6 +4,7 @@
  */
 #include "L2capEndpoint.h"
 #include "l2cap_address.h"
+#include "l2cap_upper.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -33,22 +34,23 @@ L2capEndpoint::L2capEndpoint(net_socket* socket)
 	:
 	ProtocolSocket(socket),
 	fConfigurationSet(false),
-	fPeerEndpoint(NULL),
 	fAcceptSemaphore(-1),
+	fPeerEndpoint(NULL),
 	fChannel(NULL)
 {
 	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 	/* Set MTU and flow control settings to defaults */
-	configuration.imtu = L2CAP_MTU_DEFAULT;
-	memcpy(&configuration.iflow, &default_qos , sizeof(l2cap_flow_t) );
+	fConfiguration.imtu = L2CAP_MTU_DEFAULT;
+	memcpy(&fConfiguration.iflow, &default_qos , sizeof(l2cap_flow_t) );
 
-	configuration.omtu = L2CAP_MTU_DEFAULT;
-	memcpy(&configuration.oflow, &default_qos , sizeof(l2cap_flow_t) );
+	fConfiguration.omtu = L2CAP_MTU_DEFAULT;
+	memcpy(&fConfiguration.oflow, &default_qos , sizeof(l2cap_flow_t) );
 
-	configuration.flush_timo = L2CAP_FLUSH_TIMO_DEFAULT;
-	configuration.link_timo  = L2CAP_LINK_TIMO_DEFAULT;
+	fConfiguration.flush_timo = L2CAP_FLUSH_TIMO_DEFAULT;
+	fConfiguration.link_timo  = L2CAP_LINK_TIMO_DEFAULT;
 
+	// TODO: XXX not for listening endpoints, imtu should be known first
 	gStackModule->init_fifo(&fReceivingFifo, "l2cap recvfifo", L2CAP_MTU_DEFAULT);
 }
 
@@ -57,6 +59,7 @@ L2capEndpoint::~L2capEndpoint()
 {
 	debugf("[%ld] %p\n", find_thread(NULL), this);
 
+	gStackModule->uninit_fifo(&fReceivingFifo);
 }
 
 
@@ -95,7 +98,28 @@ L2capEndpoint::Close()
 {
 	debugf("[%ld] %p\n", find_thread(NULL), this);
 
-	return B_OK;
+	if (fAcceptSemaphore != -1) {
+		debugf("server socket not handling any channel %p\n", this);
+		
+		delete_sem(fAcceptSemaphore);
+		// TODO: Clean needed stuff
+		// Unbind?
+		return B_OK;
+		
+	} else {
+		// Client endpoint
+		if (fState == CLOSING) {
+			debugf("Already closed by peer %p\n", this);
+			// TODO: Clean needed stuff
+	
+			return B_OK;
+		} else {
+			// Issue Disconnection request over the channel
+			fState = CLOSED;
+			return l2cap_upper_dis_req(fChannel);
+		}
+	}
+	
 }
 
 
@@ -111,17 +135,17 @@ L2capEndpoint::Free()
 status_t
 L2capEndpoint::Bind(const struct sockaddr *_address)
 {
-	if (_address == NULL)
-		panic("null adrresss!");
+	if (_address == NULL) 
+		return B_ERROR;
 	
 	if (_address->sa_family != AF_BLUETOOTH )
 		return EAFNOSUPPORT;
 
-	// TODO: Check socladdr_l2cap size
+	//if (_address->sa_len != sizeof(struct sockaddr_l2cap))
+	//	return EAFNOSUPPORT;
 
 	// TODO: Check if that PSM is already bound
 	// return EADDRINUSE;
-
 
 	// TODO: Check if the PSM is valid, check assigned numbers document for valid
 	// psm available to applications.
@@ -136,10 +160,9 @@ L2capEndpoint::Bind(const struct sockaddr *_address)
 	memcpy(&socket->address, _address, sizeof(struct sockaddr_l2cap));
 	socket->address.ss_len = sizeof(struct sockaddr_l2cap);
 
-	fState = CLOSED;
+	fState = BOUND;
 
 	return B_OK;
-
 }
 
 
@@ -157,8 +180,8 @@ L2capEndpoint::Listen(int backlog)
 {
 	debugf("[%ld] %p\n", find_thread(NULL), this);
 	
-	if (fState != CLOSED) {
-		flowf("Invalid State\n");
+	if (fState != BOUND) {
+		debugf("Invalid State %p\n", this);
 		return B_BAD_VALUE;
 	}
 
@@ -216,20 +239,17 @@ L2capEndpoint::Accept(net_socket **_acceptedSocket)
 		// locker.Lock();
 		status = gSocketModule->dequeue_connected(socket, _acceptedSocket);
 		
-		if (status != B_OK)
+		if (status != B_OK) {
 			debugf("Could not dequeue socket %s\n", strerror(status));
-
-		//TODO: Establish relationship with the negotiated channel by the parent endpoint
-		((L2capEndpoint*)socket)->fChannel = fChannel;
-
-		// point parent
-		((L2capEndpoint*)socket)->fPeerEndpoint = this;
-
-		// unassign any channel for the parent endpoint
-		fChannel = NULL;
-
-		fState = LISTEN;
-
+		} else {
+						
+			((L2capEndpoint*)((*_acceptedSocket)->first_protocol))->fState = ESTABLISHED;
+			// unassign any channel for the parent endpoint
+			fChannel = NULL;
+			// we are listening again
+			fState = LISTEN;
+		}
+		
 	} while (status != B_OK);
 
 	return status;
@@ -255,6 +275,10 @@ L2capEndpoint::Receive(const iovec *vecs, size_t vecCount,
 	debugf("[%ld] %p Receive(%p, %ld)\n", find_thread(NULL),
 		this, vecs, vecCount);
 
+	if (fState != ESTABLISHED) {
+		debugf("Invalid State %p\n", this);
+		return B_BAD_VALUE;
+	}
 
 	return B_OK;
 }
@@ -263,6 +287,12 @@ L2capEndpoint::Receive(const iovec *vecs, size_t vecCount,
 ssize_t
 L2capEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
+	debugf("e->%p num=%ld, f=%ld)\n", this, numBytes, flags);
+
+	if (fState != ESTABLISHED) {
+		debugf("Invalid State %p\n", this);
+		return B_BAD_VALUE;
+	}	
 
 	return gStackModule->fifo_dequeue_buffer(&fReceivingFifo, flags,
 		B_INFINITE_TIMEOUT, _buffer);
@@ -274,7 +304,7 @@ L2capEndpoint::Sendable()
 {
 	debugf("[%ld] %p\n", find_thread(NULL), this);
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -311,14 +341,31 @@ L2capEndpoint::ForPsm(uint16 psm)
 void
 L2capEndpoint::BindToChannel(L2capChannel* channel)
 {
-	fChannel = channel;
-	fChannel->endpoint = this;
-	
-	fChannel->configuration = &configuration;
-	
-	debugf("Endpoint %p for psm %d, schannel %x dchannel %x\n", this, 
-		channel->psm, channel->scid, channel->dcid);
+	net_socket* newSocket;
+	status_t error = gSocketModule->spawn_pending_socket(socket, &newSocket);
+	if (error != B_OK) {
+		debugf("Could not spawn child for Endpoint %p\n", this);
+		// TODO: Handle situation
+		return;	
+	}
 
+	L2capEndpoint* endpoint = (L2capEndpoint*)newSocket->first_protocol;
+	
+	endpoint->fChannel = channel;
+	endpoint->fPeerEndpoint = this;
+	
+	channel->endpoint = endpoint;
+
+	debugf("new socket %p/e->%p from parent %p/e->%p\n", newSocket, endpoint, socket, this);
+
+	// Provide the channel the configuration set by the user socket
+	channel->configuration = &fConfiguration;
+	
+	// It might be used keep the last negotiated channel
+	// fChannel = channel;
+
+	debugf("New endpoint %p for psm %d, schannel %x dchannel %x\n", endpoint, 
+		channel->psm, channel->scid, channel->dcid);
 }
 
 
@@ -328,12 +375,23 @@ L2capEndpoint::MarkEstablished()
 	debugf("Endpoint %p for psm %d, schannel %x dchannel %x\n", this, 
 		fChannel->psm, fChannel->scid, fChannel->dcid);	
 	
-	net_socket* newSocket;
-	status_t error = gSocketModule->spawn_pending_socket(socket,	&newSocket);
-
-	gSocketModule->set_connected(newSocket);
-
-	release_sem(fAcceptSemaphore);
+	status_t error = gSocketModule->set_connected(socket);
+	if (error == B_OK) {
+		release_sem(fPeerEndpoint->fAcceptSemaphore);
+	} else {
+		debugf("Could not set child Endpoint %p %s\n", this, strerror(error));
+	}
 	
 	return error;
 }
+
+
+status_t
+L2capEndpoint::MarkClosed()
+{
+	flowf("\n");
+	fState = CLOSED;
+	
+	return B_OK;
+}
+	
