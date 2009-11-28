@@ -79,7 +79,7 @@ define("QEMU_ARGS", ""
 	."-parallel none "
 	."-net none "
 	."-usbdevice wacom-tablet "
-	."-vga vmware "
+	//."-vga vmware "
 	."-snapshot ");
 
 // absolute path to the image.
