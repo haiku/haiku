@@ -29,7 +29,7 @@ public:
 			~RemoteDevicesView(void);
 	void	AttachedToWindow(void);
 	void	MessageReceived(BMessage *msg);
-	
+
 	void	LoadSettings(void);
 	bool	IsDefaultable(void);
 
@@ -41,12 +41,12 @@ protected:
 
 	BButton*		addButton;
 	BButton*		removeButton;
-	BButton*		trustButton;
+	BButton*		pairButton;
 	BButton*		blockButton;
 	BButton*		availButton;
-	BListView*		fDeviceList;	
+	BListView*		fDeviceList;
 	BScrollView*	fScrollView;
-	
+
 
 };
 
