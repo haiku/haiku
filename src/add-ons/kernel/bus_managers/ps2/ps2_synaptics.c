@@ -241,6 +241,11 @@ check_scrolling_to_movement(synaptics_cookie *cookie, touch_event *event,
 	bool isSideScrollingV = false;
 	bool isSideScrollingH = false;
 
+	// if a button is pressed don't allow to scroll, we likely be in a drag
+	// action
+	if (cookie->buttons_state != 0)
+		return false;
+
 	if ((SYN_AREA_END_X - SYN_AREA_WIDTH_X * settings->scroll_rightrange
 			< event->xPosition && !cookie->movement_started
 		&& settings->scroll_rightrange > 0.000001)
@@ -402,7 +407,7 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
 
  	status = event_to_movement(cookie, &event, movement);
 
-	return B_OK;
+	return status;
 }
 
 
