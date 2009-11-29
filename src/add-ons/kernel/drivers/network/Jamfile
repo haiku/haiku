@@ -30,3 +30,5 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network rtl81xx ;
 
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm440x ;
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm570x ;
+
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan ;
