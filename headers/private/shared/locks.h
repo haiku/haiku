@@ -60,12 +60,26 @@ typedef struct recursive_lock {
 	int			recursion;
 } recursive_lock;
 
-extern status_t	recursive_lock_init(recursive_lock *lock, const char *name);
-extern void recursive_lock_destroy(recursive_lock *lock);
-extern status_t recursive_lock_lock(recursive_lock *lock);
-extern status_t recursive_lock_trylock(recursive_lock *lock);
-extern void recursive_lock_unlock(recursive_lock *lock);
-extern int32 recursive_lock_get_recursion(recursive_lock *lock);
+status_t	recursive_lock_init(recursive_lock *lock, const char *name);
+void		recursive_lock_destroy(recursive_lock *lock);
+status_t	recursive_lock_lock(recursive_lock *lock);
+void		recursive_lock_unlock(recursive_lock *lock);
+int32		recursive_lock_get_recursion(recursive_lock *lock);
+
+
+typedef struct lazy_recursive_lock {
+	lazy_mutex	lock;
+	thread_id	holder;
+	int			recursion;
+} lazy_recursive_lock;
+
+status_t	lazy_recursive_lock_init(lazy_recursive_lock *lock,
+				const char *name);
+				// name will not be cloned and must rename valid
+void		lazy_recursive_lock_destroy(lazy_recursive_lock *lock);
+status_t	lazy_recursive_lock_lock(lazy_recursive_lock *lock);
+void		lazy_recursive_lock_unlock(lazy_recursive_lock *lock);
+int32		lazy_recursive_lock_get_recursion(lazy_recursive_lock *lock);
 
 #ifdef __cplusplus
 } // extern "C"

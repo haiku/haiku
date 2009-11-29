@@ -427,3 +427,65 @@ recursive_lock_unlock(recursive_lock *lock)
 		mutex_unlock(&lock->lock);
 	}
 }
+
+
+// #pragma mark - lazy recursive lock
+
+
+int32
+lazy_recursive_lock_get_recursion(lazy_recursive_lock *lock)
+{
+	if (lock->holder == find_thread(NULL))
+		return lock->recursion;
+
+	return -1;
+}
+
+
+status_t
+lazy_recursive_lock_init(lazy_recursive_lock *lock, const char *name)
+{
+	lock->holder = -1;
+	lock->recursion = 0;
+	return lazy_mutex_init(&lock->lock, name != NULL ? name : "recursive lock");
+}
+
+
+void
+lazy_recursive_lock_destroy(lazy_recursive_lock *lock)
+{
+	if (lock == NULL)
+		return;
+
+	lazy_mutex_destroy(&lock->lock);
+}
+
+
+status_t
+lazy_recursive_lock_lock(lazy_recursive_lock *lock)
+{
+	thread_id thread = find_thread(NULL);
+
+	if (thread != lock->holder) {
+		lazy_mutex_lock(&lock->lock);
+		lock->holder = thread;
+	}
+
+	lock->recursion++;
+	return B_OK;
+}
+
+
+void
+lazy_recursive_lock_unlock(lazy_recursive_lock *lock)
+{
+	if (find_thread(NULL) != lock->holder) {
+		debugger("lazy_recursive_lock unlocked by non-holder thread!\n");
+		return;
+	}
+
+	if (--lock->recursion == 0) {
+		lock->holder = -1;
+		lazy_mutex_unlock(&lock->lock);
+	}
+}
