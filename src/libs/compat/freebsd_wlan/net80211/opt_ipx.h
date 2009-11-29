@@ -1,0 +1,6 @@
+#ifndef _FBSD_COMPAT_NET80211_OPT_IPX_H_
+#define _FBSD_COMPAT_NET80211_OPT_IPX_H_
+
+//define IPX 1
+
+#endif /* _FBSD_COMPAT_NET80211_OPT_IPX_H_ */
