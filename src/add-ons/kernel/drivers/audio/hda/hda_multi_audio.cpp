@@ -988,7 +988,6 @@ buffer_force_stop(hda_audio_group* audioGroup)
 		hda_stream_stop(audioGroup->codec->controller,
 			audioGroup->record_stream);
 	}	
-	//hda_stream_stop(audioGroup->codec->controller, audioGroup->record_stream);
 
 	return B_OK;
 }

@@ -252,6 +252,7 @@ struct hda_audio_group {
 	uint32			widget_count;
 
 	uint32			association_count;
+	uint32			gpio;
 
 	hda_widget*		widgets;
 	hda_association		associations[MAX_ASSOCIATIONS];

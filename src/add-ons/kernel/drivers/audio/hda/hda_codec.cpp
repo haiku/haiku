@@ -625,6 +625,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		GPIO_COUNT_GPIWAKE(resp[1]) ? "yes" : "no");
 	dump_widget_stream_support(audioGroup->widget);
 
+	audioGroup->gpio = resp[1];
 	audioGroup->widget_start = SUB_NODE_COUNT_START(resp[2]);
 	audioGroup->widget_count = SUB_NODE_COUNT_TOTAL(resp[2]);
 
@@ -987,7 +988,7 @@ TRACE("build tree!\n");
 	
 	// GPIO
 	uint32 gpio = 0;
-	for (int32 i = 0; i < 8; i++) {
+	for (int32 i = 0; i < GPIO_COUNT_NUM_GPIO(audioGroup->gpio); i++) {
 		if (audioGroup->codec->quirks & (1 << i)) {
 			gpio |= (1 << i);
 		}
@@ -996,7 +997,7 @@ TRACE("build tree!\n");
 	if (gpio != 0) {
 		corb_t verb[] = {
 			MAKE_VERB(audioGroup->codec->addr,
-				audioGroup->widget.node_id, VID_SET_GPIODATA, gpio),
+				audioGroup->widget.node_id, VID_SET_GPIO_DATA, gpio),
 			MAKE_VERB(audioGroup->codec->addr,
 				audioGroup->widget.node_id, VID_SET_GPIO_EN, gpio),
 			MAKE_VERB(audioGroup->codec->addr,

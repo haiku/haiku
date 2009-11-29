@@ -523,7 +523,7 @@ status_t
 hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	const char* desc)
 {
-	uint32 bufferSize, bufferPhysicalAddress, alloc;
+	uint32 bufferPhysicalAddress;
 	uint32 response[2];
 	physical_entry pe;
 	bdl_entry_t* bufferDescriptors;
@@ -584,7 +584,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	}
 	
 	/* Calculate size of buffer (aligned to 128 bytes) */
-	bufferSize = stream->sample_size * stream->num_channels
+	uint32 bufferSize = stream->sample_size * stream->num_channels
 		* stream->buffer_length;
 	bufferSize = ALIGN(bufferSize, 128);
 
@@ -594,7 +594,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		stream->rate, stream->bps, format, stream->sample_format);
 
 	/* Calculate total size of all buffers (aligned to size of B_PAGE_SIZE) */
-	alloc = bufferSize * stream->num_buffers;
+	uint32 alloc = bufferSize * stream->num_buffers;
 	alloc = PAGE_ALIGN(alloc);
 
 	/* Allocate memory for buffers */
@@ -623,7 +623,8 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	}
 
 	/* Now allocate BDL for buffer range */
-	alloc = (stream->num_buffers + ((offset > 0) ? 1 : 0)) * sizeof(bdl_entry_t);
+	uint32 bdlCount = stream->num_buffers + (offset > 0 ? 1 : 0);
+	alloc = bdlCount * sizeof(bdl_entry_t);
 	alloc = PAGE_ALIGN(alloc);
 
 	stream->buffer_descriptors_area = create_area("hda buffer descriptors",
@@ -645,7 +646,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	stream->physical_buffer_descriptors = (uint32)pe.address;
 
 	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
-		alloc, stream->num_buffers);
+		alloc, bdlCount);
 
 	uint32 fragments = 0;
 	if (offset > 0) {
