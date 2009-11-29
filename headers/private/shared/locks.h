@@ -22,6 +22,19 @@ status_t	mutex_lock(mutex *lock);
 void		mutex_unlock(mutex *lock);
 
 
+typedef struct lazy_mutex {
+	int32		benaphore;
+	sem_id		semaphore;
+	const char*	name;
+} lazy_mutex;
+
+status_t	lazy_mutex_init(lazy_mutex *lock, const char *name);
+				// name will not be cloned and must rename valid
+void		lazy_mutex_destroy(mutex *lock);
+status_t	lazy_mutex_lock(lazy_mutex *lock);
+void		lazy_mutex_unlock(lazy_mutex *lock);
+
+
 typedef struct rw_lock {
 	const char *			name;
 	mutex					lock;

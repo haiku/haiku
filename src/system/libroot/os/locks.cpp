@@ -67,6 +67,108 @@ mutex_unlock(mutex *lock)
 }
 
 
+// #pragma mark - lazy mutex
+
+
+enum {
+	STATE_UNINITIALIZED	= -1,
+	STATE_INITIALIZING	= -2,
+	STATE_SPIN_LOCKED	= -3,
+	STATE_SPIN_UNLOCKED	= -4
+};
+
+
+static inline bool
+lazy_mutex_ensure_init(lazy_mutex *lock)
+{
+	int32 value = atomic_test_and_set((vint32*)&lock->semaphore,
+		STATE_INITIALIZING, STATE_UNINITIALIZED);
+
+	if (value >= 0)
+		return true;
+
+	if (value == STATE_UNINITIALIZED) {
+		// we're the first -- perform the initialization
+		sem_id semaphore = create_sem(0, lock->name);
+		if (semaphore < 0)
+			semaphore = STATE_SPIN_UNLOCKED;
+		atomic_set((vint32*)&lock->semaphore, semaphore);
+		return semaphore >= 0;
+	}
+
+	if (value == STATE_INITIALIZING) {
+		// someone else is initializing -- spin until that is done
+		while (atomic_get((vint32*)&lock->semaphore) == STATE_INITIALIZING) {
+		}
+	}
+
+	return lock->semaphore >= 0;
+}
+
+
+status_t
+lazy_mutex_init(lazy_mutex *lock, const char *name)
+{
+	if (lock == NULL || name == NULL)
+		return B_BAD_VALUE;
+
+	lock->benaphore = 0;
+	lock->semaphore = STATE_UNINITIALIZED;
+	lock->name = name;
+
+	return B_OK;
+}
+
+
+void
+lazy_mutex_destroy(lazy_mutex *lock)
+{
+	if (lock->semaphore >= 0)
+		delete_sem(lock->semaphore);
+}
+
+
+status_t
+lazy_mutex_lock(lazy_mutex *lock)
+{
+	if (atomic_add(&lock->benaphore, 1) == 0)
+		return B_OK;
+
+	if (lazy_mutex_ensure_init(lock)) {
+		// acquire the semaphore
+		status_t result;
+		do {
+			result = acquire_sem(lock->semaphore);
+		} while (result == B_INTERRUPTED);
+
+		return result;
+	} else {
+		// the semaphore creation failed -- so we use it like a spinlock instead
+		while (atomic_test_and_set((vint32*)&lock->semaphore,
+				STATE_SPIN_LOCKED, STATE_SPIN_UNLOCKED)
+					!= STATE_SPIN_UNLOCKED) {
+		}
+		return B_OK;
+	}
+}
+
+
+void
+lazy_mutex_unlock(lazy_mutex *lock)
+{
+	if (atomic_add(&lock->benaphore, -1) == 1)
+		return;
+
+	if (lazy_mutex_ensure_init(lock)) {
+		// release the semaphore
+		release_sem(lock->semaphore);
+	} else {
+		// the semaphore creation failed -- so we use it like a spinlock instead
+		atomic_set((vint32*)&lock->semaphore, STATE_SPIN_UNLOCKED);
+	}
+}
+
+
 // #pragma mark - R/W lock
 
 
