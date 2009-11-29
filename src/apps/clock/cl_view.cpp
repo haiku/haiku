@@ -20,7 +20,7 @@
 #include <time.h>
 
 
-TOffscreenView::TOffscreenView(BRect frame, char *name, short mRadius,
+TOffscreenView::TOffscreenView(BRect frame, const char *name, short mRadius,
 		short hRadius, short offset, long face, bool show)
 	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
 	  fHours(0),
@@ -168,7 +168,7 @@ TOffscreenView::~TOffscreenView()
 //	#pragma mark -
 
 
-TOnscreenView::TOnscreenView(BRect rect, char *title, short mRadius, 
+TOnscreenView::TOnscreenView(BRect rect, const char *title, short mRadius, 
 		short hRadius, short offset)
 	: BView(rect, title, B_FOLLOW_NONE, 
 		B_WILL_DRAW | B_PULSE_NEEDED | B_DRAW_ON_CHILDREN),

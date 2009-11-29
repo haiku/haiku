@@ -16,7 +16,7 @@ class BMessage;
 
 class TOffscreenView : public BView {
 	public:
-					TOffscreenView(BRect frame, char *name, short mRadius,
+					TOffscreenView(BRect frame, const char *name, short mRadius,
 						short hRadius, short offset, long face, bool show); 
 		virtual		~TOffscreenView();
 		
@@ -46,7 +46,7 @@ class TOffscreenView : public BView {
 
 class TOnscreenView : public BView {
 	public:
-							TOnscreenView(BRect frame, char *name,
+							TOnscreenView(BRect frame, const char *name,
 								short mRadius, short hRadius, short offset); 
 							TOnscreenView(BMessage *data);
 		virtual				~TOnscreenView();
