@@ -226,8 +226,12 @@ enum pin_dev_type {
 #define PIN_CAP_VREF_CTRL_100				(1L << 13)
 #define PIN_CAP_EAPD_CAP				(1L << 16)
 
+#define PIN_CAP_IS_PRES_DETECT_CAP(c)	((c & PIN_CAP_PRES_DETECT) != 0)
 #define PIN_CAP_IS_OUTPUT(c)	((c & PIN_CAP_OUTPUT) != 0)
 #define PIN_CAP_IS_INPUT(c)	((c & PIN_CAP_INPUT) != 0)
+#define PIN_CAP_IS_VREF_CTRL_50_CAP(c)	((c & PIN_CAP_VREF_CTRL_50) != 0)
+#define PIN_CAP_IS_VREF_CTRL_80_CAP(c)	((c & PIN_CAP_VREF_CTRL_80) != 0)
+#define PIN_CAP_IS_VREF_CTRL_100_CAP(c)	((c & PIN_CAP_VREF_CTRL_100) != 0)
 #define PIN_CAP_IS_EAPD_CAP(c)	((c & PIN_CAP_EAPD_CAP) != 0)
 
 /* PCM support */
@@ -268,7 +272,14 @@ enum pin_dev_type {
 #define PIN_ENABLE_HEAD_PHONE			(1L << 7)
 #define PIN_ENABLE_OUTPUT				(1L << 6)
 #define PIN_ENABLE_INPUT				(1L << 5)
-#define PIN_ENABLE_VOLTAGE_REF_MASK		0x3
+#define PIN_ENABLE_VREF_HIZ				0
+#define PIN_ENABLE_VREF_50				1
+#define PIN_ENABLE_VREF_GROUND			2
+#define PIN_ENABLE_VREF_80				4
+#define PIN_ENABLE_VREF_100				5
+
+/* Unsolicited Response */
+#define UNSOLRESP_ENABLE				(1L << 7)
 
 /* Supported power states */
 #define POWER_STATE_D0					(1L << 0)

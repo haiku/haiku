@@ -38,6 +38,7 @@
 #define HDA_MAX_CODECS			15
 #define HDA_MAX_STREAMS			16
 #define MAX_CODEC_RESPONSES		16
+#define MAX_CODEC_UNSOL_RESPONSES 16
 #define MAX_INPUTS				32
 #define MAX_IO_WIDGETS			8
 #define MAX_ASSOCIATIONS		16
@@ -45,6 +46,7 @@
 
 #define STREAM_MAX_BUFFERS	10
 #define STREAM_MIN_BUFFERS	2
+
 
 enum {
 	STREAM_PLAYBACK,
@@ -272,11 +274,16 @@ struct hda_codec {
 	uint8		revision;
 	uint8		stepping;
 	uint8		addr;
+	
+	uint32		quirks;
 
 	sem_id		response_sem;
 	uint32		responses[MAX_CODEC_RESPONSES];
 	uint32		response_count;
-
+	
+	uint32		unsol_responses[MAX_CODEC_UNSOL_RESPONSES];
+	uint32		unsol_response_count;
+	
 	hda_audio_group* audio_groups[HDA_MAX_AUDIO_GROUPS];
 	uint32		num_audio_groups;
 

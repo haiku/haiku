@@ -162,14 +162,23 @@ hda_interrupt_handler(hda_controller* controller)
 					uint32 cad = responseFlags & RESPONSE_FLAGS_CODEC_MASK;
 					hda_codec* codec = controller->codecs[cad];
 
-					if ((responseFlags & RESPONSE_FLAGS_UNSOLICITED) != 0) {
-						dprintf("hda: Unsolicited response: %08lx/%08lx\n",
-							response, responseFlags);
-						continue;
-					}
 					if (codec == NULL) {
 						dprintf("hda: Response for unknown codec %ld: "
 							"%08lx/%08lx\n", cad, response, responseFlags);
+						continue;
+					}
+				
+					if ((responseFlags & RESPONSE_FLAGS_UNSOLICITED) != 0) {
+						dprintf("hda: Unsolicited response: %08lx/%08lx\n",
+							response, responseFlags);
+						if (codec->unsol_response_count >= MAX_CODEC_UNSOL_RESPONSES) {
+							dprintf("hda: too many unsol responses received"
+								" for codec %ld: %08lx/%08lx!\n",
+								cad, response, responseFlags);
+							continue;
+						}
+						codec->unsol_responses[codec->unsol_response_count++] =
+							response;
 						continue;
 					}
 					if (codec->response_count >= MAX_CODEC_RESPONSES) {
@@ -287,6 +296,11 @@ reset_controller(hda_controller* controller)
 	// Wait for codecs to finish their own reset (apparently needs more
 	// time than documented in the specs)
 	snooze(1000);
+	
+	// Enable unsolicited responses
+	control = controller->Read32(HDAC_GLOBAL_CONTROL);
+	controller->Write32(HDAC_GLOBAL_CONTROL, control | GLOBAL_CONTROL_UNSOLICITED);
+	
 	return B_OK;
 }
 
