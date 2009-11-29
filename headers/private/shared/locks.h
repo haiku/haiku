@@ -40,6 +40,20 @@ status_t	rw_lock_read_unlock(rw_lock *lock);
 status_t	rw_lock_write_lock(rw_lock *lock);
 status_t	rw_lock_write_unlock(rw_lock *lock);
 
+
+typedef struct recursive_lock {
+	mutex		lock;
+	thread_id	holder;
+	int			recursion;
+} recursive_lock;
+
+extern status_t	recursive_lock_init(recursive_lock *lock, const char *name);
+extern void recursive_lock_destroy(recursive_lock *lock);
+extern status_t recursive_lock_lock(recursive_lock *lock);
+extern status_t recursive_lock_trylock(recursive_lock *lock);
+extern void recursive_lock_unlock(recursive_lock *lock);
+extern int32 recursive_lock_get_recursion(recursive_lock *lock);
+
 #ifdef __cplusplus
 } // extern "C"
 
