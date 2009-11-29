@@ -51,11 +51,12 @@ struct free_chunk {
 };
 
 
-static const size_t kInitialHeapSize = 50 * B_PAGE_SIZE;
-	// that's about what hoard allocates anyway
+static const size_t kInitialHeapSize = 64 * B_PAGE_SIZE;
+	// that's about what hoard allocates anyway (should be kHeapIncrement
+	// aligned)
 
 static const size_t kHeapIncrement = 16 * B_PAGE_SIZE;
-	// the steps in which to increase the heap size
+	// the steps in which to increase the heap size (must be a power of 2)
 
 static area_id sHeapArea;
 static hoardLockType sHeapLock;
@@ -104,7 +105,7 @@ __init_heap(void)
 
 	atfork(&init_after_fork);
 		// Note: Needs malloc(). Hence we need to be fully initialized.
-		// ToDo: We should actually also install a hook that is called before
+		// TODO: We should actually also install a hook that is called before
 		// fork() is being executed. In a multithreaded app it would need to
 		// acquire *all* allocator locks, so that we don't fork() an
 		// inconsistent state.
@@ -196,12 +197,13 @@ hoardSbrk(long size)
 	size_t oldHeapSize = sFreeHeapSize;
 	sFreeHeapSize += size;
 
-	// round to next page size
-	size_t pageSize = (sFreeHeapSize + kHeapIncrement - 1)
+	// round to next heap increment aligned size
+	size_t incrementAlignedSize = (sFreeHeapSize + kHeapIncrement - 1)
 		& ~(kHeapIncrement - 1);
 
-	if (pageSize < sHeapAreaSize) {
-		SERIAL_PRINT(("HEAP-%ld: heap area large enough for %ld\n", find_thread(NULL), size));
+	if (incrementAlignedSize <= sHeapAreaSize) {
+		SERIAL_PRINT(("HEAP-%ld: heap area large enough for %ld\n",
+			find_thread(NULL), size));
 		// the area is large enough already
 		hoardUnlock(sHeapLock);
 		return (void *)(sFreeHeapBase + oldHeapSize);
@@ -210,16 +212,17 @@ hoardSbrk(long size)
 	// We need to grow the area
 
 	SERIAL_PRINT(("HEAP-%ld: need to resize heap area to %ld (%ld requested)\n",
-		find_thread(NULL), pageSize, size));
+		find_thread(NULL), incrementAlignedSize, size));
 
-	if (resize_area(sHeapArea, pageSize) < B_OK) {
-		// out of memory - ToDo: as a fall back, we could try to allocate another area
+	if (resize_area(sHeapArea, incrementAlignedSize) < B_OK) {
+		// out of memory - TODO: as a fall back, we could try to allocate
+		// another area
 		sFreeHeapSize = oldHeapSize;
 		hoardUnlock(sHeapLock);
 		return NULL;
 	}
 
-	sHeapAreaSize = pageSize;
+	sHeapAreaSize = incrementAlignedSize;
 
 	hoardUnlock(sHeapLock);
 	return (void *)(sFreeHeapBase + oldHeapSize);
