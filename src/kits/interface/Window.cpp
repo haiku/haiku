@@ -582,9 +582,6 @@ BWindow::Minimize(bool minimize)
 	if (IsModal() || IsFloating() || fMinimized == minimize || !Lock())
 		return;
 
-	if (minimize && (Flags() & B_NOT_MINIMIZABLE) != 0)
-		return;
-
 	fMinimized = minimize;
 
 	fLink->StartMessage(AS_MINIMIZE_WINDOW);
