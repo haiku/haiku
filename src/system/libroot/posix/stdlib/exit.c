@@ -16,6 +16,7 @@
 #include <signal.h>
 
 #include <libroot_private.h>
+#include <locks.h>
 #include <runtime_loader.h>
 #include <syscalls.h>
 
@@ -24,44 +25,26 @@ extern void _IO_cleanup(void);
 extern void _thread_do_exit_notification(void);
 
 struct exit_stack_info {
-	void		(*exit_stack[ATEXIT_MAX])(void);
-	int32		stack_size;
-	sem_id		lock;
-	vint32		lock_count;
-	thread_id	lock_owner;
-	size_t		recursion_count;
+	void				(*exit_stack[ATEXIT_MAX])(void);
+	int32				stack_size;
+	lazy_recursive_lock	lock;
 };
 
 
-static struct exit_stack_info sExitStackInfo = { {}, 0, -1, 0, -1, 0 };
+static struct exit_stack_info sExitStackInfo = { {}, 0, {} };
 
 
-static void
+static void inline
 _exit_stack_lock()
 {
-	thread_id self = find_thread(NULL);
-	if (self != sExitStackInfo.lock_owner) {
-		if (atomic_add(&sExitStackInfo.lock_count, 1) > 0) {
-			while (acquire_sem(sExitStackInfo.lock) != B_OK)
-				;
-		}
-		sExitStackInfo.lock_owner = self;
-	}
-	sExitStackInfo.recursion_count++;
+	lazy_recursive_lock_lock(&sExitStackInfo.lock);
 }
 
 
-static void
+static void inline
 _exit_stack_unlock()
 {
-	if (sExitStackInfo.lock_owner != find_thread(NULL))
-		debugger("exit stack lock not owned");
-
-	if (sExitStackInfo.recursion_count-- == 1) {
-		sExitStackInfo.lock_owner = -1;
-		if (atomic_add(&sExitStackInfo.lock_count, -1) == 1)
-			release_sem(sExitStackInfo.lock);
-	}
+	lazy_recursive_lock_unlock(&sExitStackInfo.lock);
 }
 
 
@@ -103,8 +86,9 @@ _call_atexit_hooks_for_range(addr_t start, addr_t size)
 void
 __init_exit_stack_lock(void)
 {
-	sExitStackInfo.lock = create_sem(0, "exit stack lock");
-	if (sExitStackInfo.lock < 0)
+	status_t error = lazy_recursive_lock_init(&sExitStackInfo.lock,
+		"exit stack lock");
+	if (error != B_OK)
 		debugger("failed to create exit stack lock");
 }
 
