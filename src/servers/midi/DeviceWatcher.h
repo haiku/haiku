@@ -39,7 +39,7 @@ private:
 	typedef HashMap<HashString, DeviceEndpoints*> DeviceEndpointsMap;
 	DeviceEndpointsMap		fDeviceEndpointsMap;
 
-	const uint8* fVectorIconData;
+	uint8* fVectorIconData;
 	size_t fVectorIconDataSize;
 	BBitmap* fLargeIcon;
 	BBitmap* fMiniIcon;
