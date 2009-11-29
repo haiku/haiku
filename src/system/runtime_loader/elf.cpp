@@ -22,6 +22,8 @@
 #include <syscalls.h>
 #include <util/kernel_cpp.h>
 
+#include <locks.h>
+
 #include "add_ons.h"
 #include "elf_load_image.h"
 #include "elf_symbol_lookup.h"
@@ -45,31 +47,20 @@ image_t* gProgramImage;
 static image_t** sPreloadedImages = NULL;
 static uint32 sPreloadedImageCount = 0;
 
-// a recursive lock
-static sem_id sSem;
-static thread_id sSemOwner;
-static int32 sSemCount;
+static recursive_lock sLock;
 
 
-static void
-rld_unlock()
+static inline void
+rld_lock()
 {
-	if (sSemCount-- == 1) {
-		sSemOwner = -1;
-		release_sem(sSem);
-	}
+	recursive_lock_lock(&sLock);
 }
 
 
-static void
-rld_lock()
+static inline void
+rld_unlock()
 {
-	thread_id self = find_thread(NULL);
-	if (self != sSemOwner) {
-		acquire_sem(sSem);
-		sSemOwner = self;
-	}
-	sSemCount++;
+	recursive_lock_unlock(&sLock);
 }
 
 
@@ -938,9 +929,7 @@ terminate_program(void)
 void
 rldelf_init(void)
 {
-	sSem = create_sem(1, "runtime loader");
-	sSemOwner = -1;
-	sSemCount = 0;
+	recursive_lock_init(&sLock, "runtime loader");
 
 	init_add_ons();
 
@@ -974,9 +963,9 @@ rldelf_init(void)
 status_t
 elf_reinit_after_fork(void)
 {
-	sSem = create_sem(1, "runtime loader");
-	if (sSem < 0)
-		return sSem;
+	status_t error = recursive_lock_init(&sLock, "runtime loader");
+	if (error != B_OK)
+		return error;
 
 	// We also need to update the IDs of our images. We are the child and
 	// and have cloned images with different IDs. Since in most cases (fork()
