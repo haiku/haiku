@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include <locks.h>
 #include <libroot_private.h>
 #include <runtime_loader.h>
 #include <syscalls.h>
@@ -22,7 +23,7 @@ typedef struct fork_hook {
 
 static fork_hook *sPrepareHooks, *sParentHooks, *sChildHooks;
 static fork_hook *sLastParentHook, *sLastChildHook;
-static sem_id sForkLock;
+static lazy_mutex sForkLock;
 
 extern thread_id __main_thread_id;
 
@@ -95,10 +96,7 @@ call_fork_hooks(fork_hook *hook)
 status_t
 __init_fork(void)
 {
-	sForkLock = create_sem(1, "fork lock");
-	if (sForkLock < B_OK)
-		return sForkLock;
-
+	lazy_mutex_init(&sForkLock, "fork lock");
 	return B_OK;
 }
 
@@ -111,9 +109,7 @@ __init_fork(void)
 status_t
 __register_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
 {
-	status_t status;
-
-	while ((status = acquire_sem(sForkLock)) == B_INTERRUPTED);
+	status_t status = lazy_mutex_lock(&sForkLock);
 	if (status != B_OK)
 		return status;
 
@@ -126,7 +122,7 @@ __register_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(voi
 	if (status == B_OK && child)
 		status = add_fork_hook(&sChildHooks, &sLastChildHook, child);
 
-	release_sem(sForkLock);
+	lazy_mutex_unlock(&sForkLock);
 	return status;
 }
 
@@ -137,7 +133,7 @@ fork(void)
 	thread_id thread;
 	status_t status;
 
-	while ((status = acquire_sem(sForkLock)) == B_INTERRUPTED);
+	status = lazy_mutex_lock(&sForkLock);
 	if (status != B_OK)
 		return status;
 
@@ -147,7 +143,7 @@ fork(void)
 	thread = _kern_fork();
 	if (thread < 0) {
 		// something went wrong
-		release_sem(sForkLock);
+		lazy_mutex_unlock(&sForkLock);
 		errno = thread;
 		return -1;
 	}
@@ -164,7 +160,7 @@ fork(void)
 	} else {
 		// we are the parent
 		call_fork_hooks(sParentHooks);
-		release_sem(sForkLock);
+		lazy_mutex_unlock(&sForkLock);
 	}
 
 	return thread;

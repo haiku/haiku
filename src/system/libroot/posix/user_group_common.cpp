@@ -14,8 +14,8 @@
 
 #include <new>
 
-#include <libroot_lock.h>
 #include <libroot_private.h>
+#include <locks.h>
 #include <RegistrarDefs.h>
 
 #include <util/KMessage.h>
@@ -28,21 +28,22 @@ const char* BPrivate::kPasswdFile = "/etc/passwd";
 const char* BPrivate::kGroupFile = "/etc/group";
 const char* BPrivate::kShadowPwdFile = "/etc/shadow";
 
-static benaphore sUserGroupLock;
+static lazy_mutex sUserGroupLock;
 static port_id sRegistrarPort = -1;
 
 
 status_t
 BPrivate::user_group_lock()
 {
-	return benaphore_lock(&sUserGroupLock);
+	return lazy_mutex_lock(&sUserGroupLock);
 }
 
 
 status_t
 BPrivate::user_group_unlock()
 {
-	return benaphore_unlock(&sUserGroupLock);
+	lazy_mutex_unlock(&sUserGroupLock);
+	return B_OK;
 }
 
 
@@ -86,7 +87,7 @@ public:
 		if (fString != NULL) {
 			*fString = '\0';
 			fString++;
-		} 
+		}
 
 		return token;
 	}
@@ -384,12 +385,12 @@ BPrivate::parse_shadow_pwd_line(char* line, char*& name, char*& password,
 void
 __init_pwd_backend(void)
 {
-	benaphore_init(&sUserGroupLock, "user group");
+	lazy_mutex_init(&sUserGroupLock, "user group");
 }
 
 
 void
 __reinit_pwd_backend_after_fork(void)
 {
-	benaphore_init(&sUserGroupLock, "user group");
+	lazy_mutex_init(&sUserGroupLock, "user group");
 }

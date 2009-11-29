@@ -11,21 +11,14 @@
 
 #include <OS.h>
 
-#include <libroot_lock.h>
 #include <libroot_private.h>
+#include <locks.h>
 #include <runtime_loader.h>
+#include <syscall_utils.h>
 #include <user_runtime.h>
 
 
-#define RETURN_AND_SET_ERRNO(err) \
-	if (err < 0) { \
-		errno = err; \
-		return -1; \
-	} \
-	return err;
-
-
-static benaphore sEnvLock;
+static lazy_mutex sEnvLock;
 static char **sManagedEnviron;
 
 char **environ = NULL;
@@ -34,14 +27,14 @@ char **environ = NULL;
 static inline void
 lock_variables(void)
 {
-	benaphore_lock(&sEnvLock);
+	lazy_mutex_lock(&sEnvLock);
 }
 
 
 static inline void
 unlock_variables(void)
 {
-	benaphore_unlock(&sEnvLock);
+	lazy_mutex_unlock(&sEnvLock);
 }
 
 
@@ -193,7 +186,7 @@ update_variable(const char *name, int32 length, const char *value,
 static void
 environ_fork_hook(void)
 {
-	benaphore_init(&sEnvLock, "env lock");
+	lazy_mutex_init(&sEnvLock, "env lock");
 }
 
 
@@ -206,7 +199,7 @@ __init_env(const struct user_space_program_args *args)
 	// Following POSIX, there is no need to make any of the environment
 	// functions thread-safe - but we do it anyway as much as possible to
 	// protect our implementation
-	benaphore_init(&sEnvLock, "env lock");
+	lazy_mutex_init(&sEnvLock, "env lock");
 	environ = args->env;
 	sManagedEnviron = NULL;
 
