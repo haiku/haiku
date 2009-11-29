@@ -1,0 +1,26 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network wlan broadcom43xx ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] 
+	-Wno-format 
+	-Wno-unused 
+	-Wno-uninitialized 
+	-Wall ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev bwi ] ;
+
+KernelAddon broadcom43xx :
+	if_bwi.c
+	if_bwi_pci.c
+	bwimac.c
+	bwiphy.c
+	bwirf.c
+	:
+	libfreebsd_wlan.a
+	libfreebsd_network.a
+	;

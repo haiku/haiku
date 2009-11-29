@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network wlan iprowifi2200 ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] 
+	-Wno-format 
+	-Wno-unused 
+	-Wno-uninitialized 
+	-Werror ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev iwi ] ;
+
+KernelAddon iprowifi2200 :
+	if_iwi.c
+	glue.c
+	:
+	libfreebsd_wlan.a
+	libfreebsd_network.a
+	;

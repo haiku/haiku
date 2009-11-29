@@ -1,0 +1,138 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network wlan atheros ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] 
+	-Wno-format 
+	-Wno-unused 
+	-Wno-uninitialized ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+UseHeaders [ FDirName $(SUBDIR) dev ath ath_hal ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ] ;
+
+Depends atheros : atheros_hal.o ;
+Depends atheros : atheros_rate.o ;
+
+KernelAddon atheros :
+	if_ath.c
+	if_ath_pci.c
+	glue.c
+	atheros_hal.o
+	atheros_rate.o
+	:
+	libfreebsd_wlan.a
+	libfreebsd_network.a
+	;
+	
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5210 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5211 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5212 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5312 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5416 ] ;
+
+KernelMergeObject atheros_hal.o :
+	ah_osdep.c
+	ah.c
+	ah_regdomain.c
+	ah_eeprom_v3.c
+	
+	# AR5210 support
+	ah_eeprom_v1.c
+	ar5210_attach.c
+	ar5210_beacon.c
+	ar5210_interrupts.c
+	ar5210_keycache.c
+	ar5210_misc.c
+	ar5210_phy.c
+	ar5210_power.c
+	ar5210_recv.c
+	ar5210_reset.c
+	ar5210_xmit.c
+	
+	# AR5211 support
+	ar5211_attach.c
+	ar5211_beacon.c
+	ar5211_interrupts.c
+	ar5211_keycache.c
+	ar5211_misc.c
+	ar5211_phy.c
+	ar5211_power.c
+	ar5211_recv.c
+	ar5211_reset.c
+	ar5211_xmit.c
+	
+	# AR5212 support
+	ar5212_ani.c
+	ar5212_attach.c
+	ar5212_beacon.c
+	ar5212_eeprom.c
+	ar5212_gpio.c
+	ar5212_interrupts.c
+	ar5212_keycache.c
+	ar5212_misc.c
+	ar5212_phy.c
+	ar5212_power.c
+	ar5212_recv.c
+	ar5212_reset.c
+	ar5212_rfgain.c
+	ar5212_xmit.c
+	
+	# RF backends
+	ar5111.c
+	ar5112.c
+	ar2413.c
+	ar2425.c
+	ar5413.c
+	
+	# AR5416 support
+	ah_eeprom_v14.c
+	ar5416_ani.c
+	ar5416_attach.c
+	ar5416_beacon.c
+	ar5416_cal.c
+	ar5416_cal_iq.c
+	ar5416_cal_adcgain.c
+	ar5416_cal_adcdc.c
+	ar5416_eeprom.c
+	ar5416_gpio.c
+	ar5416_interrupts.c
+	ar5416_keycache.c
+	ar5416_misc.c
+	ar5416_phy.c
+	ar5416_power.c
+	ar5416_recv.c
+	ar5416_reset.c
+	ar5416_xmit.c
+	
+	# AR9160 support
+	ar9160_attach.c
+	
+	# RF backend for 5416 and 9160
+	ar2133.c
+	;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_rate sample ] ;
+
+KernelMergeObject atheros_rate.o :
+	sample.c
+	;
+	
+local svn = [ FGristFiles entries ] ;
+SEARCH on $(svn) = [ FDirName $(SUBDIR) .svn ] ;
+AddFileDataAttribute atheros : revision : string : $(svn) ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src tools bosii ] ;
+
+Package atheros-testing :
+	atheros :
+	boot home config add-ons kernel drivers bin ;
+Package atheros-testing :
+	getsysteminfos.sh :
+	boot home Desktop ;
+PackageDriverSymLink atheros-testing : net atheros ;

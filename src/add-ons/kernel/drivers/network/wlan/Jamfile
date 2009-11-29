@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network wlan ;
+
+#FreeBSD 8 WLAN drivers
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan atheros ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan broadcom43xx ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iprowifi2100 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iprowifi2200 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iprowifi3945 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iprowifi4965 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan marvell88w ;
