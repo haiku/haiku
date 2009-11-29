@@ -943,11 +943,13 @@ BTabView::DrawBox(BRect selTabRect)
 	EndLineArray();
 }
 
-#define X_OFFSET 0.0f
 
 BRect
-BTabView::TabFrame(int32 tab_index) const
+BTabView::TabFrame(int32 index) const
 {
+	if (index >= CountTabs() || index < 0)
+		return BRect();
+
 	if (be_control_look != NULL) {
 		float width = 100.0;
 		float height = fTabHeight;;
@@ -955,12 +957,12 @@ BTabView::TabFrame(int32 tab_index) const
 			case B_WIDTH_FROM_LABEL:
 			{
 				float x = 0.0;
-				for (int32 i = 0; i < tab_index; i++){
+				for (int32 i = 0; i < index; i++){
 					x += StringWidth(TabAt(i)->Label()) + 20.0;
 				}
 
 				return BRect(x, 0.0,
-					x + StringWidth(TabAt(tab_index)->Label()) + 20.0,
+					x + StringWidth(TabAt(index)->Label()) + 20.0,
 					height);
 			}
 
@@ -975,8 +977,7 @@ BTabView::TabFrame(int32 tab_index) const
 
 			case B_WIDTH_AS_USUAL:
 			default:
-				return BRect(tab_index * width, 0.0,
-					tab_index * width + width, height);
+				return BRect(index * width, 0.0, index * width + width, height);
 		}
 	}
 
@@ -985,20 +986,13 @@ BTabView::TabFrame(int32 tab_index) const
 		case B_WIDTH_FROM_LABEL:
 		{
 			float x = 6.0f;
-			for (int32 i = 0; i < tab_index; i++){
+			for (int32 i = 0; i < index; i++){
 				x += StringWidth(TabAt(i)->Label()) + 20.0f;
 			}
 
 			return BRect(x - fTabOffset, 0.0f,
-				x - fTabOffset + StringWidth(TabAt(tab_index)->Label()) + 20.0f , fTabHeight);
-
-
-			/*float x = X_OFFSET;
-			for (int32 i = 0; i < tab_index; i++)
-				x += StringWidth(TabAt(i)->Label()) + 20.0f;
-
-			return BRect(x, 0.0f,
-				x + StringWidth(TabAt(tab_index)->Label()) + 20.0f, fTabHeight);*/
+				x - fTabOffset + StringWidth(TabAt(index)->Label()) + 20.0f,
+				fTabHeight);
 		}
 
 		case B_WIDTH_FROM_WIDEST:
@@ -1010,27 +1004,14 @@ BTabView::TabFrame(int32 tab_index) const
 				if (tabWidth > width)
 					width = tabWidth;
 			}
-			return BRect((6.0f + tab_index * width) - fTabOffset, 0.0f,
-				(6.0f + tab_index * width + width) - fTabOffset, fTabHeight);
-			/*float width = 0.0f;
-
-			for (int32 i = 0; i < CountTabs(); i++) {
-				float tabWidth = StringWidth(TabAt(i)->Label()) + 20.0f;
-
-				if (tabWidth > width)
-					width = tabWidth;
-			}
-
-			return BRect(X_OFFSET + tab_index * width, 0.0f,
-				X_OFFSET + tab_index * width + width, fTabHeight);*/
+			return BRect((6.0f + index * width) - fTabOffset, 0.0f,
+				(6.0f + index * width + width) - fTabOffset, fTabHeight);
 		}
 
 		case B_WIDTH_AS_USUAL:
 		default:
-			return BRect((6.0f + tab_index * 100.0f) - fTabOffset, 0.0f,
-						(6.0f + tab_index * 100.0f + 100.0f) - fTabOffset, fTabHeight);
-			/*return BRect(X_OFFSET + tab_index * 100.0f, 0.0f,
-				X_OFFSET + tab_index * 100.0f + 100.0f, fTabHeight);*/
+			return BRect((6.0f + index * 100.0f) - fTabOffset, 0.0f,
+				(6.0f + index * 100.0f + 100.0f) - fTabOffset, fTabHeight);
 	}
 }
 
