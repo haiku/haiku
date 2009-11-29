@@ -34,6 +34,9 @@ public:
 						~OpenDMLIndex();
 
 	status_t			Init();
+private:
+	status_t			ReadIndex(uint32 stream_index, int64 pos, uint32 *lastFrame, bigtime_t *pts, odml_index_header *superIndex);
+	status_t			ReadChunkIndex(uint32 stream_index, int64 pos, uint32 *lastFrame, bigtime_t *pts, const OpenDMLStream *stream);
 };
 
 #endif

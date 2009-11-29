@@ -445,33 +445,36 @@ aviReader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 	mediaHeader->start_time = (cookie->frame_pos * 1000000LL
 		* cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
 	
-	TRACE("stream %d (%s): start_time %.6f, pos %.3f %%, frame %Ld chunk size %ld\n", 
+	TRACE("stream %d (%s): start_time %.6f, pos %.3f %%, frame %Ld chunk size %ld offset %Ld\n", 
 		cookie->stream, cookie->is_audio ? "A" : cookie->is_video ? "V" : "?", 
 		mediaHeader->start_time / 1000000.0, cookie->frame_pos * 100.0
-		/ cookie->frame_count, cookie->frame_pos, size);
+		/ cookie->frame_count, cookie->frame_pos, size, start);
 
 	if (cookie->is_audio) {
 		mediaHeader->type = B_MEDIA_ENCODED_AUDIO;
 		mediaHeader->u.encoded_audio.buffer_flags = keyframe ?
 			B_MEDIA_KEY_FRAME : 0;
 
-		cookie->frame_pos += (uint64)(ceil((double)size / (double)cookie->frame_size)) * cookie->frames_per_sec_scale;
 		cookie->byte_pos += size;
 		// frame_pos is sample no for vbr encoded audio and byte position for everything else
-//		if (cookie->is_vbr) {
+		if (cookie->is_vbr) {
 			// advance by frame_size
-//		} else {
+			cookie->frame_pos += cookie->frame_size;
+		} else {
+			cookie->frame_pos += (uint64)(ceil((double)size / (double)cookie->frame_size)) * cookie->frames_per_sec_scale;
 //			cookie->frame_pos += (uint64)(ceil((double)size / (double)cookie->frame_size)) * cookie->frames_per_sec / cookie->avg_bytes_per_sec;
 			// advance by bytes in chunk and calculate frame_pos
 //			time = cookie->byte_pos * 1000000LL / cookie->bytes_per_second;
 //			cookie->frame_pos = time * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale / 1000000LL;
-//		}
+		}
 	} else if (cookie->is_video) {
 		mediaHeader->type = B_MEDIA_ENCODED_VIDEO;
-		mediaHeader->u.encoded_video.field_flags = keyframe ?
+		mediaHeader->u.encoded_video.field_flags = keyframe ? 
 			B_MEDIA_KEY_FRAME : 0;
 		mediaHeader->u.encoded_video.first_active_line = 0;
 		mediaHeader->u.encoded_video.line_count = cookie->line_count;
+		mediaHeader->u.encoded_video.field_number = 0;
+		mediaHeader->u.encoded_video.field_sequence = cookie->frame_pos;
 		cookie->frame_pos += cookie->frame_size;
 	} else {
 		return B_BAD_VALUE;

@@ -28,6 +28,8 @@
 #include <SupportDefs.h>
 #include <vector>
 
+#include "OpenDMLParser.h"
+
 /*
 	This class handles all indexing of an AVI file
 	Subclasses should override Init and create index entries based on the

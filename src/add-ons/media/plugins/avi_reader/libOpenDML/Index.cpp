@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include "ReaderPlugin.h" // B_MEDIA_*
 #include "Index.h"
-#include "OpenDMLParser.h"
 
 //#define TRACE_INDEX
 #ifdef TRACE_INDEX
@@ -129,7 +128,7 @@ Index::Seek(int stream_index, uint32 seekTo, int64 *frame,
 			if (data->seek_index[i].keyframe) {
 				lastKeyframePos = pos;
 				lastKeyframeIndex = i;
-				TRACE("keyframe at index %ld, frame %ld (seek: %ld)\n", i,
+				TRACE("keyframe at index %ld, frame %Ld (seek: %Ld)\n", i,
 					pos, frame_pos);
 			}
 
@@ -169,7 +168,7 @@ Index::Seek(int stream_index, uint32 seekTo, int64 *frame,
 	return B_ERROR;
 
 done:
-	TRACE("seek done: index: pos %d\n", data->current_chunk);
+	TRACE("seek done: index: pos %Ld\n", data->current_chunk);
 	// recalculate frame and time after seek
 	*frame = frame_pos;
 	*time = (frame_pos * 1000000LL * stream->frames_per_sec_scale)
@@ -199,7 +198,7 @@ Index::DumpIndex(int stream_index)
 	IndexEntry _index;
 	for (uint32 i = 0; i < fStreamData[stream_index].seek_index_next; i++) {
 		_index = fStreamData[stream_index].seek_index[i];
-		printf("Frame %Ld, pos %Ld, size %ld, pts %Ld\n",_index.frame_no, _index.position, _index.size, _index.pts);
+		printf("index %ld Frame %Ld, pos %Ld, size %ld, pts %Ld\n",i,_index.frame_no, _index.position, _index.size, _index.pts);
 	}
 }
 

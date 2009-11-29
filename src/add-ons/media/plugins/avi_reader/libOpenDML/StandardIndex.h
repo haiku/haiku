@@ -26,7 +26,6 @@
 #define _STANDARD_INDEX_H
 
 #include "Index.h"
-#include "avi.h"
 
 class StandardIndex : public Index
 {

@@ -28,8 +28,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <new>
+
 #include "StandardIndex.h"
-#include "OpenDMLParser.h"
 
 
 //#define TRACE_START_INDEX
@@ -95,7 +95,7 @@ StandardIndex::Init()
 	}
 
 	int stream_index;
-	off_t position;
+	int64 position;
 	uint32 size;
 	uint64 frame[fStreamCount];
 	uint64 frame_no;
@@ -111,10 +111,20 @@ StandardIndex::Init()
 
 	for (uint32 i = 0; i < fIndexSize; i++) {
 		
+		if (fIndex[i].chunk_id == 0) {
+			printf("Corrupt Index entry at %ld/%ld\n",i,fIndexSize);
+			continue;
+		}
+				
 		stream_index = ((fIndex[i].chunk_id & 0xff) - '0') * 10;
-        stream_index += ((fIndex[i].chunk_id >> 8) & 0xff) - '0';
+		stream_index += ((fIndex[i].chunk_id >> 8) & 0xff) - '0';
 
 		stream = fParser->StreamInfo(stream_index);
+        
+		if (stream == NULL) {
+			printf("No Stream Info for stream %d\n",stream_index);
+			continue;
+		}
         
         keyframe = (fIndex[i].flags >> AVIIF_KEYFRAME_SHIFT) & 1;
         size = fIndex[i].chunk_length;
