@@ -2,6 +2,9 @@ SubDir HAIKU_TOP src tests kits midi patchbay ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UseLibraryHeaders icon ;
+# UsePrivateHeaders shared ;
+
 SimpleTest PatchBay
 	: 
 	PatchApp.cpp
@@ -12,6 +15,6 @@ SimpleTest PatchBay
 	MidiEventMeter.cpp
 	TToolTip.cpp
 	: 
-	midi midi2 be $(TARGET_LIBSTDC++)
+	midi midi2 be libicon.a $(TARGET_LIBSTDC++)
 ;
 

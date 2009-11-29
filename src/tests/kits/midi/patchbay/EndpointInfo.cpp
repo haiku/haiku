@@ -5,18 +5,21 @@
 // Copyright 1999, Be Incorporated.   All Rights Reserved.
 // This file may be used under the terms of the Be Sample Code License.
 
+#include "EndpointInfo.h"
+
 #include <Bitmap.h>
 #include <Debug.h>
+#include <IconUtils.h>
 #include <Message.h>
 #include <MidiRoster.h>
 #include <MidiEndpoint.h>
 
-#include "EndpointInfo.h"
-
 const char* LARGE_ICON_NAME = "be:large_icon";
 const char* MINI_ICON_NAME = "be:mini_icon";
+const char* VECTOR_ICON_NAME = "icon";   
 const uint32 LARGE_ICON_TYPE = 'ICON';
 const uint32 MINI_ICON_TYPE = 'MICN';
+const uint32 VECTOR_ICON_TYPE = 'VICN';
 extern const uint8 LARGE_ICON_SIZE = 32;
 extern const uint8 MINI_ICON_SIZE = 16;
 extern const icon_size DISPLAY_ICON_SIZE = B_LARGE_ICON;
@@ -93,6 +96,22 @@ static BBitmap* CreateIcon(const BMessage* msg, icon_size which)
 	const void* data;
 	ssize_t size;
 	BBitmap* bitmap = NULL;
+
+#ifdef __HAIKU__
+	iconSize = LARGE_ICON_SIZE;
+	
+	if (msg->FindData(VECTOR_ICON_NAME, VECTOR_ICON_TYPE, &data, 
+		&size) == B_OK)  {
+		BRect r(0, 0, iconSize-1, iconSize-1);
+		bitmap = new BBitmap(r, B_RGBA32);
+		if (BIconUtils::GetVectorIcon((const uint8*)data, size, 
+			bitmap) == B_OK) {
+			printf("Created vector icon bitmap\n");
+			return bitmap;
+		} else 
+			delete bitmap;
+	}
+#endif
 
 	if (msg->FindData(iconName, iconType, &data, &size) == B_OK)
 	{
