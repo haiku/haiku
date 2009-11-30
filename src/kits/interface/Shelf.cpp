@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,10 @@
  */
 
 /*!	BShelf stores replicant views that are dropped onto it */
+
+#include <Shelf.h>
+
+#include <pthread.h>
 
 #include <AutoLock.h>
 #include <Beep.h>
@@ -24,7 +28,6 @@
 #include <Point.h>
 #include <PropertyInfo.h>
 #include <Rect.h>
-#include <Shelf.h>
 #include <String.h>
 #include <View.h>
 
@@ -39,32 +42,78 @@
 #include <utility>
 
 
+namespace {
+
 typedef std::map<BString, std::pair<image_id, int32> > LoadedImageMap;
-static LoadedImageMap	sLoadedImages;
-static BLocker			sLoadedImageMapLocker("BShelf loaded image map");
+
+struct LoadedImages {
+	LoadedImageMap			images;
+
+	LoadedImages()
+		:
+		fLock("BShelf loaded image map")
+	{
+	}
+
+	bool Lock()
+	{
+		return fLock.Lock();
+	}
+
+	void Unlock()
+	{
+		fLock.Unlock();
+	}
+
+	static LoadedImages* Default()
+	{
+		if (sDefaultInstance == NULL)
+			pthread_once(&sDefaultInitOnce, &_InitSingleton);
+
+		return sDefaultInstance;
+	}
+
+private:
+	static void _InitSingleton()
+	{
+		sDefaultInstance = new LoadedImages;
+	}
+
+private:
+	BLocker					fLock;
+
+	static pthread_once_t	sDefaultInitOnce;
+	static LoadedImages*	sDefaultInstance;
+};
+
+pthread_once_t LoadedImages::sDefaultInitOnce = PTHREAD_ONCE_INIT;
+LoadedImages* LoadedImages::sDefaultInstance = NULL;
+
+}	// unnamed namespace
+
 
 static property_info sShelfPropertyList[] = {
 	{
 		"Replicant",
 		{ B_COUNT_PROPERTIES, B_CREATE_PROPERTY },
-		{ B_DIRECT_SPECIFIER }, 
-		NULL, 0, 
+		{ B_DIRECT_SPECIFIER },
+		NULL, 0,
 	},
 
 	{
 		"Replicant",
 		{ B_DELETE_PROPERTY, B_GET_PROPERTY },
-		{ B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_ID_SPECIFIER }, 
-		NULL, 0, 
+		{ B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_ID_SPECIFIER },
+		NULL, 0,
 	},
 
 	{
 		"Replicant",
-		{}, 
+		{},
 		{ B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_ID_SPECIFIER },
 		"... of Replicant {index | name | id} of ...", 0,
 	},
-	
+
 	{ 0, { 0 }, { 0 }, 0, 0 }
 };
 
@@ -75,7 +124,7 @@ static property_info sReplicantPropertyList[] = {
 		{ B_DIRECT_SPECIFIER },
 		NULL, 0, { B_INT32_TYPE }
 	},
-	
+
 	{
 		"Name",
 		{ B_GET_PROPERTY },
@@ -103,7 +152,7 @@ static property_info sReplicantPropertyList[] = {
 		{ B_DIRECT_SPECIFIER },
 		NULL, 0,
 	},
-	
+
 	{ 0, { 0 }, { 0 }, 0, 0 }
 };
 
@@ -123,7 +172,7 @@ struct replicant_data {
 	static int32 IndexOf(BList const *list, BMessage const *msg);
 	static int32 IndexOf(BList const *list, BView const *view, bool allowZombie);
 	static int32 IndexOf(BList const *list, unsigned long id);
-	
+
 	status_t Archive(BMessage *msg);
 
 	BMessage*			message;
@@ -247,7 +296,7 @@ replicant_data::Archive(BMessage* msg)
 	if (view && (view->Archive(&archive) == B_OK)) {
 		msg->AddInt32("uniqueid", id);
 		BPoint pos (0,0);
-		if (view) { 
+		if (view) {
 			msg->AddMessage("message", &archive);
 			pos = view->Frame().LeftTop();
 		} else if (zombie_view)
@@ -364,7 +413,7 @@ replicant_data::IndexOf(BList const *list, unsigned long id)
 ShelfContainerViewFilter::ShelfContainerViewFilter(BShelf *shelf, BView *view)
 	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
 	fShelf(shelf),
-	fView(view)	
+	fView(view)
 {
 }
 
@@ -420,7 +469,7 @@ ShelfContainerViewFilter::_ObjectDropFilter(BMessage *msg, BHandler **_handler)
 			rect = dragger->fTarget->Frame();
 		rect.OffsetTo(point);
 		point = rect.LeftTop() + fShelf->AdjustReplicantBy(rect, msg);
-		
+
 		if (dragger->fRelation == BDragger::TARGET_IS_PARENT)
 			dragger->fTarget->MoveTo(point);
 		else if (dragger->fRelation == BDragger::TARGET_IS_CHILD)
@@ -428,7 +477,7 @@ ShelfContainerViewFilter::_ObjectDropFilter(BMessage *msg, BHandler **_handler)
 		else {
 			//TODO: TARGET_UNKNOWN/TARGET_SIBLING
 		}
-	
+
 	} else {
 		if (fShelf->_AddReplicant(msg, &point, fShelf->fGenCount++) == B_OK)
 			Looper()->DetachCurrentMessage();
@@ -445,7 +494,7 @@ ReplicantViewFilter::ReplicantViewFilter(BShelf *shelf, BView *view)
 	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
 	fShelf(shelf),
 	fView(view)
-{		
+{
 }
 
 
@@ -616,12 +665,12 @@ BShelf::MessageReceived(BMessage *msg)
 				break;
 			}
 			return BHandler::MessageReceived(msg);
-			
-		case B_CREATE_PROPERTY: 
+
+		case B_CREATE_PROPERTY:
 		{
 			BMessage replicantMsg;
 			BPoint pos;
-			if (msg->FindMessage("data", &replicantMsg) == B_OK 
+			if (msg->FindMessage("data", &replicantMsg) == B_OK
 				&& msg->FindPoint("location", &pos) == B_OK) {
 					err = AddReplicant(&replicantMsg, pos);
 			}
@@ -635,7 +684,7 @@ BShelf::MessageReceived(BMessage *msg)
 		if (err == B_BAD_SCRIPT_SYNTAX)
 			replyMsg.AddString("message", "Didn't understand the specifier(s)");
 		else
-			replyMsg.AddString("message", strerror(err));			
+			replyMsg.AddString("message", strerror(err));
 	}
 
 	replyMsg.AddInt32("error", err);
@@ -689,7 +738,7 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 	BPropertyInfo shelfPropInfo(sShelfPropertyList);
 	BHandler *target = NULL;
 	BView *replicant = NULL;
-	
+
 	switch (shelfPropInfo.FindMatch(msg, 0, specifier, form, property)) {
 		case 0:
 			target = this;
@@ -1072,7 +1121,7 @@ BShelf::_Archive(BMessage *data) const
 			data->AddMessage("replicant", &archive);
 		archive.MakeEmpty();
 	}
-	
+
 	return B_OK;
 }
 
@@ -1128,7 +1177,7 @@ BShelf::_InitData(BEntry *entry, BDataIO *stream, BView *view,
 				replmsg = new BMessage();
 				replicant.FindPoint("position", &point);
 				replicant.FindMessage("message", replmsg);
-				AddReplicant(replmsg, point);				
+				AddReplicant(replmsg, point);
 			}
 		}
 	}
@@ -1151,15 +1200,15 @@ BShelf::_DeleteReplicant(replicant_data* item)
 	int32 index = replicant_data::IndexOf(&fReplicants, item->message);
 
 	ReplicantDeleted(index, item->message, view);
-	
-	fReplicants.RemoveItem(item);	
+
+	fReplicants.RemoveItem(item);
 
 	if (item->relation == BDragger::TARGET_IS_PARENT
-		|| item->relation == BDragger::TARGET_IS_SIBLING) {			
-		delete view;			
+		|| item->relation == BDragger::TARGET_IS_SIBLING) {
+		delete view;
 	}
 	if (item->relation == BDragger::TARGET_IS_CHILD
-		|| item->relation == BDragger::TARGET_IS_SIBLING) {	
+		|| item->relation == BDragger::TARGET_IS_SIBLING) {
 		delete item->dragger;
 	}
 
@@ -1167,15 +1216,17 @@ BShelf::_DeleteReplicant(replicant_data* item)
 	const char* signature = NULL;
 	if (item->message->FindString("add_on", &signature) == B_OK
 		&& signature != NULL) {
-		AutoLock<BLocker> lock(sLoadedImageMapLocker);
+		LoadedImages* loadedImages = LoadedImages::Default();
+		AutoLock<LoadedImages> lock(loadedImages);
 		if (lock.IsLocked()) {
-			LoadedImageMap::iterator it = sLoadedImages.find(BString(signature));
+			LoadedImageMap::iterator it = loadedImages->images.find(
+				BString(signature));
 
-			if (it != sLoadedImages.end()) {
+			if (it != loadedImages->images.end()) {
 				(*it).second.second--;
 				if ((*it).second.second <= 0) {
 					unload_add_on((*it).second.first);
-					sLoadedImages.erase(it);
+					loadedImages->images.erase(it);
 				}
 			}
 		}
@@ -1221,8 +1272,8 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		const char *addOn = NULL;
 
 		if (data->FindString("class", &className) == B_OK
-			&& data->FindString("add_on", &addOn) == B_OK) {		
-			if (find_replicant(fReplicants, className, addOn)) {		
+			&& data->FindString("add_on", &addOn) == B_OK) {
+			if (find_replicant(fReplicants, className, addOn)) {
 				printf("Replicant was rejected. Unique replicant already exists. class=%s, signature=%s",
 					className, addOn);
 				return send_reply(data, B_ERROR, uniqueID);
@@ -1264,12 +1315,14 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	// Update use count for image
 	const char* signature = NULL;
 	if (data->FindString("add_on", &signature) == B_OK && signature != NULL) {
-		AutoLock<BLocker> lock(sLoadedImageMapLocker);
+		LoadedImages* loadedImages = LoadedImages::Default();
+		AutoLock<LoadedImages> lock(loadedImages);
 		if (lock.IsLocked()) {
-			LoadedImageMap::iterator it = sLoadedImages.find(BString(signature));
+			LoadedImageMap::iterator it = loadedImages->images.find(
+				BString(signature));
 
-			if (it == sLoadedImages.end())
-				sLoadedImages.insert(LoadedImageMap::value_type(
+			if (it == loadedImages->images.end())
+				loadedImages->images.insert(LoadedImageMap::value_type(
 					BString(signature), std::pair<image_id, int>(image, 1)));
 			else
 				(*it).second.second++;
@@ -1298,7 +1351,7 @@ BShelf::_GetReplicant(BMessage *data, BView *view, const BPoint &point,
 	// TODO: test me -- there seems to be lots of bugs parked here!
 	BView *replicant = NULL;
 	_GetReplicantData(data, view, replicant, dragger, relation);
-	
+
 	if (dragger != NULL)
 		dragger->_SetViewToDrag(replicant);
 
@@ -1306,32 +1359,32 @@ BShelf::_GetReplicant(BMessage *data, BView *view, const BPoint &point,
 	if (!CanAcceptReplicantView(frame, replicant, data)) {
 		// the view has not been accepted
 		if (relation == BDragger::TARGET_IS_PARENT
-			|| relation == BDragger::TARGET_IS_SIBLING) {			
-			delete replicant;			
+			|| relation == BDragger::TARGET_IS_SIBLING) {
+			delete replicant;
 		}
 		if (relation == BDragger::TARGET_IS_CHILD
-			|| relation == BDragger::TARGET_IS_SIBLING) {	
+			|| relation == BDragger::TARGET_IS_SIBLING) {
 			delete dragger;
 		}
 		return NULL;
 	}
 
 	BPoint adjust = AdjustReplicantBy(frame, data);
-	
+
 	if (dragger != NULL)
 		dragger->_SetShelf(this);
 
-	// TODO: could be not correct for some relations	
+	// TODO: could be not correct for some relations
 	view->MoveTo(point + adjust);
 
 	// if it's a sibling or a child, we need to add the dragger
 	if (relation == BDragger::TARGET_IS_SIBLING
 		|| relation == BDragger::TARGET_IS_CHILD)
 		fContainerView->AddChild(dragger);
-	
+
 	if (relation != BDragger::TARGET_IS_CHILD)
 		fContainerView->AddChild(replicant);
-	
+
 	replicant->AddFilter(new ReplicantViewFilter(this, replicant));
 
 	return replicant;
@@ -1349,18 +1402,18 @@ BShelf::_GetReplicantData(BMessage *data, BView *view, BView *&replicant,
 		image_id draggerImage = B_ERROR;
 		replicant = view;
 		dragger = dynamic_cast<BDragger*>(_InstantiateObject(&widget, &draggerImage));
-		// Replicant is a sibling, or unknown, if there isn't a dragger		
-		if (dragger != NULL)			
+		// Replicant is a sibling, or unknown, if there isn't a dragger
+		if (dragger != NULL)
 			relation = BDragger::TARGET_IS_SIBLING;
 
 	} else if ((dragger = dynamic_cast<BDragger*>(view)) != NULL) {
-		// Replicant is child of the dragger			
-		relation = BDragger::TARGET_IS_CHILD;		
-		replicant = dragger->ChildAt(0);		
+		// Replicant is child of the dragger
+		relation = BDragger::TARGET_IS_CHILD;
+		replicant = dragger->ChildAt(0);
 
 	} else {
 		// Replicant is parent of the dragger
-		relation = BDragger::TARGET_IS_PARENT;		
+		relation = BDragger::TARGET_IS_PARENT;
 		replicant = view;
 		dragger = dynamic_cast<BDragger *>(replicant->FindView("_dragger_"));
 			// can be NULL, the replicant could not have a dragger at all
@@ -1411,7 +1464,7 @@ BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 	switch (msg->what) {
 		case B_INDEX_SPECIFIER:	{
 			int32 index = -1;
-			if (msg->FindInt32("index", &index)!=B_OK) 
+			if (msg->FindInt32("index", &index)!=B_OK)
 				break;
 			ReplicantAt(index, &replicant, &ID, &err);
 			break;
@@ -1431,7 +1484,7 @@ BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 				BView *view = NULL;
 				ReplicantAt(i, &view, &ID, &err);
 				if (err == B_OK) {
-					if (view->Name() != NULL && 
+					if (view->Name() != NULL &&
 						strlen(view->Name()) == strlen(name) && !strcmp(view->Name(), name)) {
 						replicant = view;
 						break;
