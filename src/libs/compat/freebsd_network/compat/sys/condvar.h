@@ -10,7 +10,7 @@
 
 
 struct cv {
-	int cv_waiters;
+	int dummy;
 };
 
 

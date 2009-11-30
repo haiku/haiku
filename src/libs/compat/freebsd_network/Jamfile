@@ -33,7 +33,6 @@ KernelStaticLibrary libfreebsd_network.a :
 	mii.c
 	mutex.c
 	priv.c
-	sleepqueue.c
 	synch.c
 	taskqueue.c
 	timeout.c

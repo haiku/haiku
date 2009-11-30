@@ -20,7 +20,7 @@ extern "C" {
 #include "device.h"
 
 
-#define ticks_to_usecs(t) (1000000*(t) / hz)
+#define ticks_to_usecs(t) (1000000*((bigtime_t)t) / hz)
 
 
 static const int kConditionVariableHashSize = 32;
@@ -57,10 +57,14 @@ void
 uninit_condition_variables()
 {
 	InterruptsSpinLocker _(sConditionVariablesLock);
-	ConditionVariableHash::Iterator it = sConditionVariableHash.GetIterator();
-	while (ConditionVariable* variable = it.Next()) {
+	ConditionVariableHashDefinition definition;
+	ConditionVariable* variable = sConditionVariableHash.Clear(true);
+
+	while (variable != NULL) {
+		ConditionVariable* next = definition.GetLink(variable);
 		variable->Unpublish();
-		free(variable);
+		delete variable;
+		variable = next;
 	}
 }
 
@@ -68,38 +72,49 @@ uninit_condition_variables()
 
 
 void
-_cv_init(struct cv* conditionVariablePointer, const char* description)
+_cv_init(const void* object, const char* description)
 {
 	ConditionVariable* conditionVariable 
 		= new(std::nothrow) ConditionVariable();
 	if (conditionVariable == NULL)
 		panic("No memory left.");
-	conditionVariablePointer->cv_waiters = 0;
-	conditionVariable->Init(conditionVariablePointer, description);
+
 	InterruptsSpinLocker _(sConditionVariablesLock);
+	conditionVariable->Publish(object, description);
 	sConditionVariableHash.Insert(conditionVariable);
 }
 
 
 void
-_cv_wait_unlocked(struct cv* conditionVariablePointer)
+_cv_destroy(const void* object)
 {
 	InterruptsSpinLocker _(sConditionVariablesLock);
-	ConditionVariable* conditionVariable
-		= sConditionVariableHash.Lookup(conditionVariablePointer);
-	conditionVariablePointer->cv_waiters++;
-	conditionVariable->Wait();
+	ConditionVariable* conditionVariable 
+		= sConditionVariableHash.Lookup(object);
+	if (conditionVariable == NULL)
+		return;
+
+	conditionVariable->Unpublish();
+	sConditionVariableHash.RemoveUnchecked(conditionVariable);
+	delete conditionVariable;
+}
+
+
+void
+_cv_wait_unlocked(const void* object)
+{
+	ConditionVariableEntry conditionVariableEntry;
+
+	conditionVariableEntry.Wait(object);
 }
 
 
 int
-_cv_timedwait_unlocked(struct cv* conditionVariablePointer, int timeout)
+_cv_timedwait_unlocked(const void* object, int timeout)
 {
-	InterruptsSpinLocker _(sConditionVariablesLock);
-	ConditionVariable* conditionVariable
-		= sConditionVariableHash.Lookup(conditionVariablePointer);
-	conditionVariablePointer->cv_waiters++;
-	status_t status = conditionVariable->Wait(B_ABSOLUTE_TIMEOUT,
+	ConditionVariableEntry conditionVariableEntry;
+	
+	status_t status = conditionVariableEntry.Wait(object, B_ABSOLUTE_TIMEOUT,
 		ticks_to_usecs(timeout));
 
 	if (status == B_OK)
@@ -110,12 +125,26 @@ _cv_timedwait_unlocked(struct cv* conditionVariablePointer, int timeout)
 
 
 void
-_cv_signal(struct cv* conditionVariablePointer)
+_cv_signal(const void* object)
 {
 	InterruptsSpinLocker _(sConditionVariablesLock);
 	ConditionVariable* conditionVariable
-		= sConditionVariableHash.Lookup(conditionVariablePointer);
-	if (conditionVariablePointer->cv_waiters > 0)
-		conditionVariablePointer->cv_waiters--;
+		= sConditionVariableHash.Lookup(object);
+	if (conditionVariable == NULL)
+		return;
+
 	conditionVariable->NotifyOne();
+}
+
+
+void
+_cv_broadcast(const void* object)
+{
+	InterruptsSpinLocker _(sConditionVariablesLock);
+	ConditionVariable* conditionVariable
+		= sConditionVariableHash.Lookup(object);
+	if (conditionVariable == NULL)
+		return;
+
+	conditionVariable->NotifyAll();
 }
