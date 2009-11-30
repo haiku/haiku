@@ -220,7 +220,3 @@ amrr_sysctlattach(struct ieee80211_amrr *amrr,
 	    &amrr->amrr_min_success_threshold, 0, "");
 }
 
-/*
- * Module glue.
- */
-IEEE80211_RATE_MODULE(amrr, 1);
