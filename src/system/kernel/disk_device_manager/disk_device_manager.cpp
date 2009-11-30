@@ -1,9 +1,15 @@
-// disk_device_manager.cpp
+/*
+ * Copyright 2003-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <KernelExport.h>
-#include <stdio.h>
 
 #include "disk_device_manager.h"
+
+#include <stdio.h>
+
+#include <KernelExport.h>
+
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
@@ -17,7 +23,6 @@
 #define OUT dprintf
 
 
-// write_lock_disk_device
 disk_device_data*
 write_lock_disk_device(partition_id partitionID)
 {
@@ -33,7 +38,6 @@ write_lock_disk_device(partition_id partitionID)
 }
 
 
-// write_unlock_disk_device
 void
 write_unlock_disk_device(partition_id partitionID)
 {
@@ -47,7 +51,6 @@ write_unlock_disk_device(partition_id partitionID)
 }
 
 
-// read_lock_disk_device
 disk_device_data*
 read_lock_disk_device(partition_id partitionID)
 {
@@ -63,7 +66,6 @@ read_lock_disk_device(partition_id partitionID)
 }
 
 
-// read_unlock_disk_device
 void
 read_unlock_disk_device(partition_id partitionID)
 {
@@ -77,7 +79,6 @@ read_unlock_disk_device(partition_id partitionID)
 }
 
 
-// find_disk_device
 int32
 find_disk_device(const char* path)
 {
@@ -91,7 +92,6 @@ find_disk_device(const char* path)
 }
 
 
-// find_partition
 int32
 find_partition(const char* path)
 {
@@ -105,7 +105,6 @@ find_partition(const char* path)
 }
 
 
-// get_disk_device
 disk_device_data*
 get_disk_device(partition_id partitionID)
 {
@@ -115,7 +114,6 @@ get_disk_device(partition_id partitionID)
 }
 
 
-// get_partition
 partition_data*
 get_partition(partition_id partitionID)
 {
@@ -125,7 +123,6 @@ get_partition(partition_id partitionID)
 }
 
 
-// get_parent_partition
 partition_data*
 get_parent_partition(partition_id partitionID)
 {
@@ -137,7 +134,6 @@ get_parent_partition(partition_id partitionID)
 }
 
 
-// get_child_partition
 partition_data*
 get_child_partition(partition_id partitionID, int32 index)
 {
@@ -167,7 +163,6 @@ open_partition(partition_id partitionID, int openMode)
 }
 
 
-// create_child_partition
 partition_data*
 create_child_partition(partition_id partitionID, int32 index, off_t offset,
 	off_t size, partition_id childID)
@@ -189,7 +184,6 @@ create_child_partition(partition_id partitionID, int32 index, off_t offset,
 }
 
 
-// delete_partition
 bool
 delete_partition(partition_id partitionID)
 {
@@ -202,7 +196,6 @@ delete_partition(partition_id partitionID)
 }
 
 
-// partition_modified
 void
 partition_modified(partition_id partitionID)
 {
@@ -210,7 +203,6 @@ partition_modified(partition_id partitionID)
 }
 
 
-// scan_partition
 status_t
 scan_partition(partition_id partitionID)
 {
@@ -226,7 +218,6 @@ scan_partition(partition_id partitionID)
 }
 
 
-// get_default_partition_content_name
 status_t
 get_default_partition_content_name(partition_id partitionID,
 	const char* fileSystemName, char* buffer, size_t bufferSize)
@@ -260,7 +251,6 @@ get_default_partition_content_name(partition_id partitionID,
 }
 
 
-// find_disk_system
 disk_system_id
 find_disk_system(const char* name)
 {
@@ -273,7 +263,6 @@ find_disk_system(const char* name)
 }
 
 
-// update_disk_device_job_progress
 bool
 update_disk_device_job_progress(disk_job_id jobID, float progress)
 {
@@ -290,7 +279,6 @@ update_disk_device_job_progress(disk_job_id jobID, float progress)
 }
 
 
-// update_disk_device_job_extra_progress
 bool
 update_disk_device_job_extra_progress(disk_job_id jobID, const char* info)
 {
@@ -307,7 +295,6 @@ update_disk_device_job_extra_progress(disk_job_id jobID, const char* info)
 }
 
 
-// set_disk_device_job_error_message
 bool
 set_disk_device_job_error_message(disk_job_id jobID, const char* message)
 {
@@ -324,10 +311,9 @@ set_disk_device_job_error_message(disk_job_id jobID, const char* message)
 }
 
 
-// update_disk_device_job_interrupt_properties
 uint32
 update_disk_device_job_interrupt_properties(disk_job_id jobID,
-											uint32 interruptProperties)
+	uint32 interruptProperties)
 {
 #if 0
 	bool paused = false;
