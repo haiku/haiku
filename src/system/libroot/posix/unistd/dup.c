@@ -1,35 +1,25 @@
-/* 
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+/*
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include <unistd.h>
-#include <syscalls.h>
 #include <errno.h>
+#include <unistd.h>
+
+#include <syscalls.h>
+#include <syscall_utils.h>
 
 
 int
 dup(int fd)
 {
-	int status = _kern_dup(fd);
-	if (status < 0) {
-		errno = status;
-		status = -1;
-	}
-
-	return status;
+	RETURN_AND_SET_ERRNO(_kern_dup(fd));
 }
 
 
 int
 dup2(int oldFD, int newFD)
 {
-	int status = _kern_dup2(oldFD, newFD);
-	if (status < 0) {
-		errno = status;
-		status = -1;
-	}
-
-	return status;
+	RETURN_AND_SET_ERRNO(_kern_dup2(oldFD, newFD));
 }
