@@ -1,12 +1,12 @@
 /*
  * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
- *
  * Distributed under the terms of the MIT License.
  */
 #ifndef INTEL_WRITE_SUPPORT_H
 #define INTEL_WRITE_SUPPORT_H
 
-#include <ddm_modules.h>
+
+#include <disk_device_manager/ddm_modules.h>
 
 
 uint32		pm_get_supported_operations(partition_data* partition,

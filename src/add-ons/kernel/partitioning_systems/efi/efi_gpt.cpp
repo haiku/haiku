@@ -9,7 +9,7 @@
 #include "efi_gpt.h"
 
 #include <KernelExport.h>
-#include <ddm_modules.h>
+#include <disk_device_manager/ddm_modules.h>
 #include <disk_device_types.h>
 #ifdef _BOOT_MODE
 #	include <boot/partitions.h>

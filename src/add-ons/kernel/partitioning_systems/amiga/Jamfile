@@ -1,19 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel partitioning_systems amiga ;
 
-UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName kernel ] ;
-UsePrivateHeaders [ FDirName storage ] ;
+UsePrivateHeaders kernel storage ;
 UsePrivateSystemHeaders ;
 
 KernelAddon amiga_rdb :
 	amiga_rdb.cpp
-	;
-
-#Addon <partitioning_system>amiga_rdb :
-#	amiga_rdb.cpp
-#	;
-#
-#LinkAgainst <partitioning_system>amiga_rdb :
-#	libkernelland_emu.so
-#	libdisk_device_manager.so
-#	;
+;

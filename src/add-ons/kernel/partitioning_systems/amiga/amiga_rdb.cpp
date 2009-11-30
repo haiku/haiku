@@ -1,14 +1,14 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "amiga_rdb.h"
 
 #include <ByteOrder.h>
 #include <KernelExport.h>
-#include <ddm_modules.h>
+#include <disk_device_manager/ddm_modules.h>
 #include <disk_device_types.h>
 #ifdef _BOOT_MODE
 #	include <boot/partitions.h>
@@ -75,7 +75,8 @@ get_tupel(uint32 id)
 
 
 static status_t
-get_next_partition(int fd, rigid_disk_block &rdb, uint32 &cookie, partition_block &partition)
+get_next_partition(int fd, rigid_disk_block &rdb, uint32 &cookie,
+	partition_block &partition)
 {
 	if (cookie == 0) {
 		// first entry
@@ -85,15 +86,16 @@ get_next_partition(int fd, rigid_disk_block &rdb, uint32 &cookie, partition_bloc
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	ssize_t bytesRead = read_pos(fd, (off_t)cookie * rdb.BlockSize(), (void *)&partition,
-							sizeof(partition_block));
+	ssize_t bytesRead = read_pos(fd, (off_t)cookie * rdb.BlockSize(),
+		(void *)&partition, sizeof(partition_block));
 	if (bytesRead < (ssize_t)sizeof(partition_block))
 		return B_ERROR;
 
-	// ToDo: Should we retry with the next block if the following test fails, as
-	//		long as this we find partition_blocks within a reasonable range?
+	// TODO: Should we retry with the next block if the following test fails, as
+	// long as this we find partition_blocks within a reasonable range?
 
-	if (partition.ID() != RDB_PARTITION_ID || !validate_check_sum<partition_block>(&partition))
+	if (partition.ID() != RDB_PARTITION_ID
+		|| !validate_check_sum<partition_block>(&partition))
 		return B_BAD_DATA;
 
 	cookie = partition.Next();
@@ -113,7 +115,8 @@ search_rdb(int fd, rigid_disk_block **_rdb)
 		}
 
 		rigid_disk_block *rdb = (rigid_disk_block *)buffer;
-		if (rdb->ID() == RDB_DISK_ID && validate_check_sum<rigid_disk_block>(rdb)) {
+		if (rdb->ID() == RDB_DISK_ID
+			&& validate_check_sum<rigid_disk_block>(rdb)) {
 			// copy the RDB to a new piece of memory
 			rdb = new rigid_disk_block();
 			memcpy(rdb, buffer, sizeof(rigid_disk_block));
@@ -127,8 +130,7 @@ search_rdb(int fd, rigid_disk_block **_rdb)
 }
 
 
-//	#pragma mark -
-//	AmigaRDB public module interface
+// #pragma mark - public module interface
 
 
 static status_t
@@ -174,19 +176,25 @@ amiga_rdb_scan_partition(int fd, partition_data *partition, void *_cookie)
 	uint32 index = 0, cookie = 0;
 	status_t status;
 
-	while ((status = get_next_partition(fd, rdb, cookie, partitionBlock)) == B_OK) {
-		disk_environment &environment = *(disk_environment *)&partitionBlock.environment[0];
-		TRACE(("amiga_rdb: file system: %s\n", get_tupel(B_BENDIAN_TO_HOST_INT32(environment.dos_type))));
+	while ((status = get_next_partition(fd, rdb, cookie, partitionBlock))
+			== B_OK) {
+		disk_environment &environment
+			= *(disk_environment *)&partitionBlock.environment[0];
+		TRACE(("amiga_rdb: file system: %s\n",
+			get_tupel(B_BENDIAN_TO_HOST_INT32(environment.dos_type))));
 
-		if (environment.Start() + environment.Size() > (uint64)partition->size) {
-			TRACE(("amiga_rdb: child partition exceeds existing space (%Ld bytes)\n", environment.Size()));
+		if (environment.Start() + environment.Size()
+				> (uint64)partition->size) {
+			TRACE(("amiga_rdb: child partition exceeds existing space (%Ld "
+				"bytes)\n", environment.Size()));
 			continue;
 		}
 
 		partition_data *child = create_child_partition(partition->id, index++,
 			partition->offset + environment.Start(), environment.Size(), -1);
 		if (child == NULL) {
-			TRACE(("amiga_rdb: Creating child at index %ld failed\n", index - 1));
+			TRACE(("amiga_rdb: Creating child at index %ld failed\n",
+				index - 1));
 			return B_ERROR;
 		}
 
@@ -201,7 +209,8 @@ amiga_rdb_scan_partition(int fd, partition_data *partition, void *_cookie)
 
 
 static void
-amiga_rdb_free_identify_partition_cookie(partition_data *partition, void *_cookie)
+amiga_rdb_free_identify_partition_cookie(partition_data *partition,
+	void *_cookie)
 {
 	delete (rigid_disk_block *)_cookie;
 }
@@ -222,12 +231,10 @@ partition_module_info gAmigaPartitionModule = {
 	0,									// flags
 
 	// scanning
-	amiga_rdb_identify_partition,		// identify_partition
-	amiga_rdb_scan_partition,			// scan_partition
-	amiga_rdb_free_identify_partition_cookie,	// free_identify_partition_cookie
+	amiga_rdb_identify_partition,
+	amiga_rdb_scan_partition,
+	amiga_rdb_free_identify_partition_cookie,
 	NULL,
-//	amiga_rdb_free_partition_cookie,			// free_partition_cookie
-//	amiga_rdb_free_partition_content_cookie,	// free_partition_content_cookie
 };
 
 #ifndef _BOOT_MODE

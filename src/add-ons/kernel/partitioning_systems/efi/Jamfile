@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel partitioning_systems efi ;
 
-UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders interface kernel storage ;
 UsePrivateSystemHeaders ;
 

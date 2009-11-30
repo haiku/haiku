@@ -27,7 +27,7 @@
 #include <KernelExport.h>
 
 #include <AutoDeleter.h>
-#include <ddm_modules.h>
+#include <disk_device_manager/ddm_modules.h>
 
 #include "intel.h"
 #include "PartitionLocker.h"

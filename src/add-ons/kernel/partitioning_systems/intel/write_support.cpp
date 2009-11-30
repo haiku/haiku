@@ -7,6 +7,7 @@
  *		Tomas Kucera, kucerat@centrum.cz
  */
 
+
 #include "write_support.h"
 
 #include <errno.h>
@@ -20,7 +21,6 @@
 #include <KernelExport.h>
 
 #include <AutoDeleter.h>
-#include <ddm_modules.h>
 
 #include "intel.h"
 #include "PartitionLocker.h"

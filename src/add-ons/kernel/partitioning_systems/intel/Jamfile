@@ -1,9 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel partitioning_systems intel ;
 
-UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders kernel ;
-UsePrivateHeaders shared ;
-UsePrivateHeaders storage ;
+UsePrivateHeaders kernel shared storage ;
 UsePrivateSystemHeaders ;
 
 KernelAddon intel :

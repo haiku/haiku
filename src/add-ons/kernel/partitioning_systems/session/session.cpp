@@ -10,7 +10,7 @@
 
 #include <unistd.h>
 
-#include <ddm_modules.h>
+#include <disk_device_manager/ddm_modules.h>
 #include <disk_device_types.h>
 #include <DiskDeviceTypes.h>
 #include <KernelExport.h>
