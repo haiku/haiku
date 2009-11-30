@@ -16,6 +16,7 @@
 #include <PrivateScreen.h>
 
 #include <new>
+#include <pthread.h>
 #include <stdlib.h>
 
 #include <Application.h>
@@ -25,6 +26,8 @@
 #include <ObjectList.h>
 #include <Window.h>
 
+#include <AutoLocker.h>
+
 #include <AppMisc.h>
 #include <AppServerLink.h>
 #include <ServerProtocol.h>
@@ -33,10 +36,53 @@
 using namespace BPrivate;
 
 
-static BObjectList<BPrivateScreen> sScreens(2, true);
+namespace {
 
-// used to synchronize creation/deletion of the sScreen objects
-static BLocker sScreenLock("screen lock");
+struct Screens {
+	BObjectList<BPrivateScreen>	list;
+
+	Screens()
+		:
+		list(2, true),
+		fLock("screen list")
+	{
+	}
+
+	bool Lock()
+	{
+		return fLock.Lock();
+	}
+
+	void Unlock()
+	{
+		fLock.Unlock();
+	}
+
+	static Screens* Default()
+	{
+		if (sDefaultInstance == NULL)
+			pthread_once(&sDefaultInitOnce, &_InitSingleton);
+
+		return sDefaultInstance;
+	}
+
+private:
+	static void _InitSingleton()
+	{
+		sDefaultInstance = new Screens;
+	}
+
+private:
+	BLocker					fLock;
+
+	static pthread_once_t	sDefaultInitOnce;
+	static Screens*			sDefaultInstance;
+};
+
+pthread_once_t Screens::sDefaultInitOnce = PTHREAD_ONCE_INIT;
+Screens* Screens::sDefaultInstance = NULL;
+
+}	// unnamed namespace
 
 
 BPrivateScreen*
@@ -72,12 +118,13 @@ BPrivateScreen::_Get(int32 id, bool check)
 	if (be_app == NULL)
 		return NULL;
 
-	BAutolock locker(sScreenLock);
+	Screens* screens = Screens::Default();
+	AutoLocker<Screens> locker(screens);
 
 	// search for the screen ID
 
-	for (int32 i = sScreens.CountItems(); i-- > 0;) {
-		BPrivateScreen* screen = sScreens.ItemAt(i);
+	for (int32 i = screens->list.CountItems(); i-- > 0;) {
+		BPrivateScreen* screen = screens->list.ItemAt(i);
 
 		if (screen->ID() == id) {
 			screen->_Acquire();
@@ -97,7 +144,7 @@ BPrivateScreen::_Get(int32 id, bool check)
 	if (screen == NULL)
 		return NULL;
 
-	sScreens.AddItem(screen);
+	screens->list.AddItem(screen);
 	return screen;
 }
 
@@ -108,13 +155,14 @@ BPrivateScreen::Put(BPrivateScreen* screen)
 	if (screen == NULL)
 		return;
 
-	BAutolock locker(sScreenLock);
+	Screens* screens = Screens::Default();
+	AutoLocker<Screens> locker(screens);
 
 	if (screen->_Release()) {
 		if (screen->ID() != B_MAIN_SCREEN_ID.id) {
 			// we always keep the main screen object around - it will
 			// never go away, even if you disconnect all monitors.
-			sScreens.RemoveItem(screen);
+			screens->list.RemoveItem(screen);
 		}
 	}
 }
@@ -123,7 +171,8 @@ BPrivateScreen::Put(BPrivateScreen* screen)
 BPrivateScreen*
 BPrivateScreen::GetNext(BPrivateScreen* screen)
 {
-	BAutolock locker(sScreenLock);
+	Screens* screens = Screens::Default();
+	AutoLocker<Screens> locker(screens);
 
 	int32 id;
 	status_t status = screen->GetNextID(id);
@@ -277,7 +326,8 @@ const color_map*
 BPrivateScreen::ColorMap()
 {
 	if (fColorMap == NULL) {
-		BAutolock locker(sScreenLock);
+		Screens* screens = Screens::Default();
+		AutoLocker<Screens> locker(screens);
 
 		if (fColorMap != NULL) {
 			// someone could have been faster than us
