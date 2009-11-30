@@ -55,19 +55,22 @@
 
 typedef struct generic_syscall generic_syscall;
 
-struct generic_syscall {
-	list_link		link;
-	char			subsystem[B_FILE_NAME_LENGTH];
-	syscall_hook	hook;
-	uint32			version;
-	uint32			flags;
-	int32			use_count;
-	bool			valid;
-	generic_syscall	*previous;
+struct generic_syscall : DoublyLinkedListLinkImpl<generic_syscall> {
+	char				subsystem[B_FILE_NAME_LENGTH];
+	syscall_hook		hook;
+	uint32				version;
+	uint32				flags;
+	int32				use_count;
+	bool				valid;
+	ConditionVariable	unused_condition;
+	generic_syscall*	previous;
 };
 
+typedef DoublyLinkedList<generic_syscall> GenericSyscallList;
+
+
 static mutex sGenericSyscallLock = MUTEX_INITIALIZER("generic syscall");
-static struct list sGenericSyscalls;
+static GenericSyscallList sGenericSyscalls;
 
 
 #if SYSCALL_TRACING
@@ -78,12 +81,11 @@ static int dump_syscall_tracing(int argc, char** argv);
 static generic_syscall*
 find_generic_syscall(const char* subsystem)
 {
-	generic_syscall* syscall = NULL;
-
 	ASSERT_LOCKED_MUTEX(&sGenericSyscallLock);
 
-	while ((syscall = (generic_syscall*)list_get_next_item(&sGenericSyscalls,
-			syscall)) != NULL) {
+	GenericSyscallList::Iterator iterator = sGenericSyscalls.GetIterator();
+
+	while (generic_syscall* syscall = iterator.Next()) {
 		if (!strcmp(syscall->subsystem, subsystem))
 			return syscall;
 	}
@@ -149,7 +151,9 @@ _user_generic_syscall(const char* userSubsystem, uint32 function,
 				= syscall->hook(subsystem, function, buffer, bufferSize);
 
 			locker.Lock();
-			syscall->use_count--;
+
+			if (--syscall->use_count == 0)
+				syscall->unused_condition.NotifyAll();
 
 			if (status != B_BAD_HANDLER)
 				return status;
@@ -218,7 +222,7 @@ syscall_dispatcher(uint32 callIndex, void* args, uint64* _returnValue)
 status_t
 generic_syscall_init(void)
 {
-	list_init(&sGenericSyscalls);
+	new(&sGenericSyscalls) GenericSyscallList;
 
 #if	SYSCALL_TRACING
 	add_debugger_command_etc("straced", &dump_syscall_tracing,
@@ -257,8 +261,7 @@ register_generic_syscall(const char* subsystem, syscall_hook hook,
 			return B_NOT_ALLOWED;
 	}
 
-	generic_syscall* syscall
-		= (generic_syscall*)malloc(sizeof(struct generic_syscall));
+	generic_syscall* syscall = new(std::nothrow) generic_syscall;
 	if (syscall == NULL)
 		return B_NO_MEMORY;
 
@@ -269,10 +272,12 @@ register_generic_syscall(const char* subsystem, syscall_hook hook,
 	syscall->use_count = 0;
 	syscall->valid = true;
 	syscall->previous = previous;
-	list_add_item(&sGenericSyscalls, syscall);
+	syscall->unused_condition.Init(syscall, "syscall unused");
+
+	sGenericSyscalls.Add(syscall);
 
 	if (previous != NULL)
-		list_remove_link(&previous->link);
+		sGenericSyscalls.Remove(previous);
 
 	return B_OK;
 }
@@ -293,19 +298,23 @@ unregister_generic_syscall(const char* subsystem, uint32 version)
 		syscall->valid = false;
 
 		if (syscall->use_count != 0) {
-			// TODO: we could use a condition variable here instead
+			// Wait until the syscall isn't in use anymore
+			ConditionVariableEntry entry;
+			syscall->unused_condition.Add(&entry);
+
 			locker.Unlock();
-			snooze(6000);
+
+			entry.Wait();
 			continue;
 		}
 
 		if (syscall->previous != NULL) {
 			// reestablish the old syscall
-			list_add_item(&sGenericSyscalls, syscall->previous);
+			sGenericSyscalls.Add(syscall->previous);
 		}
 
-		list_remove_link(&syscall->link);
-		free(syscall);
+		sGenericSyscalls.Remove(syscall);
+		delete syscall;
 
 		return B_OK;
 	}
