@@ -6,10 +6,12 @@
  *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  */
 
+
 /*!	\file PartitionMap.cpp
 	\brief Definitions for "intel" style partitions and implementation
 		   of related classes.
 */
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -356,19 +358,6 @@ Partition::Unset()
 }
 
 
-#ifdef _BOOT_MODE
-void
-Partition::AdjustSize(off_t sessionSize)
-{
-	// To work around buggy (or older) BIOS, we shrink the partition size to
-	// always fit into its session - this should improve detection of boot
-	// partitions (see bug #238 for more information)
-	if (sessionSize < fOffset + fSize && sessionSize > fOffset)
-		fSize = sessionSize - fOffset;
-}
-#endif
-
-
 bool
 Partition::CheckLocation(off_t sessionSize) const
 {
@@ -407,6 +396,20 @@ Partition::CheckLocation(off_t sessionSize) const
 		return false;
 	}
 	return true;
+}
+
+
+void
+Partition::FitSizeToSession(off_t sessionSize)
+{
+	// To work around buggy (or older) BIOS, we shrink the partition size to
+	// always fit into its session - this should improve detection of boot
+	// partitions (see bug #238 for more information).
+	// Also, the drive size is obviously reported differently sometimes; this
+	// should let us read problematic drives - let the file system figure out
+	// if something is wrong.
+	if (sessionSize < fOffset + fSize && sessionSize > fOffset)
+		fSize = sessionSize - fOffset;
 }
 
 

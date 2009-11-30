@@ -110,10 +110,9 @@ PartitionMapParser::_ParsePrimary(const partition_table* table)
 		PrimaryPartition* partition = fMap->PrimaryPartitionAt(i);
 		partition->SetTo(descriptor, 0, fBlockSize);
 
-#ifdef _BOOT_MODE
-		// work-around potential BIOS problems
-		partition->AdjustSize(fSessionSize);
-#endif
+		// work-around potential BIOS/OS problems
+		partition->FitSizeToSession(fSessionSize);
+
 		// ignore, if location is bad
 		if (!partition->CheckLocation(fSessionSize)) {
 			TRACE(("intel: _ParsePrimary(): partition %ld: bad location, "
