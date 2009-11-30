@@ -133,17 +133,24 @@ fdopendir(int fd)
 		return NULL;
 	}
 
+	// Since applications are allowed to use the file descriptor after a call
+	// to fdopendir() without changing its state (like for other *at()
+	// functions), we cannot close it now.
+	// We dup2() the new FD to the previous location instead.
+	if (dup2(dirFD, fd) == -1)
+		close(fd);
+	else {
+		close(dirFD);
+		dirFD = fd;
+		fcntl(dirFD, F_SETFD, FD_CLOEXEC);
+			// reset close-on-exec which is cleared by dup()
+	}
+
 	dir = __create_dir_struct(dirFD);
 	if (dir == NULL) {
 		close(dirFD);
 		return NULL;
 	}
-
-	// According to the spec, "the file descriptor is under the control of the
-	// system" now. It's not quite clear whether we're allowed to close it now,
-	// though. We could dup2() the new FD over the old one and close the new
-	// one, if it turns out to be a problem.
-	close(fd);
 
 	return dir;
 }
