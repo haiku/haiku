@@ -18,8 +18,6 @@
 
 namespace BPrivate {
 
-BLocker gInitializationLock("global init lock");
-
 
 /*!	\brief Returns the path to an application's executable.
 	\param team The application's team ID.

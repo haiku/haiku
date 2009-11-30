@@ -16,9 +16,6 @@ struct entry_ref;
 
 namespace BPrivate {
 
-// Global lock that can be used e.g. to initialize singletons.
-extern BLocker gInitializationLock;
-
 status_t get_app_path(team_id team, char *buffer);
 status_t get_app_path(char *buffer);
 status_t get_app_ref(team_id team, entry_ref *ref, bool traverse = true);
