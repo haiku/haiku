@@ -13,6 +13,7 @@
 #include <sys/_mutex.h>
 #include <sys/pcpu.h>
 #include <machine/atomic.h>
+#include <machine/cpufunc.h>
 
 
 #define MA_OWNED		0x1

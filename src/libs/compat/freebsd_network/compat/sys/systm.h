@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include <machine/atomic.h>
+#include <machine/cpufunc.h>
 
 #include <sys/callout.h>
 #include <sys/cdefs.h>
@@ -75,21 +76,19 @@ extern int sprintf(char *buf, const char *, ...);
 extern void driver_vprintf(const char *format, va_list vl);
 #define	vprintf(fmt, vl) driver_vprintf(fmt, vl)
 
-extern int vsnprintf(char *, size_t, const char *, __va_list) __printflike(3, 0);
+extern int vsnprintf(char *, size_t, const char *, __va_list)
+	__printflike(3, 0);
 
-int	msleep(void* chan, struct mtx* mutex, int pri, const char* wmesg, int timo);
-
-#define	tsleep(chan, pri, wmesg, timo)					\
-	msleep((chan), NULL, (pri), (wmesg), (timo))
-
-// TODO call tsleep with an identifier != NULL
-#define pause(wmesg, timo) tsleep(NULL, 0, wmesg, timo)
-
+int msleep(void *, struct mtx *, int, const char *, int);
+int _pause(const char *, int);
+#define pause(waitMessage, timeout) _pause((waitMessage), (timeout))
+#define tsleep(channel, priority, waitMessage, timeout)					\
+	msleep((channel), NULL, (priority), (waitMessage), (timeout))
 
 struct unrhdr;
 struct unrhdr *new_unrhdr(int low, int high, struct mtx *mutex);
-void delete_unrhdr(struct unrhdr *uh);
-int alloc_unr(struct unrhdr *uh);
-void free_unr(struct unrhdr *uh, u_int item);
+void delete_unrhdr(struct unrhdr *);
+int alloc_unr(struct unrhdr *);
+void free_unr(struct unrhdr *, u_int);
 
 #endif	/* _FBSD_COMPAT_SYS_SYSTM_H_ */
