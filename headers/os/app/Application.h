@@ -144,8 +144,10 @@ private:
 			int32			_CountWindows(bool includeMenus) const;
 			BWindow*		_WindowAt(uint32 index, bool includeMenus) const;
 
+	static	void			_InitAppResources();
+
+private:
 	static	BResources*		sAppResources;
-	static	BLocker			sAppResourcesLock;
 
 			const char*		fAppName;
 			BPrivate::PortLink* fServerLink;

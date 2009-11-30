@@ -12,6 +12,7 @@
 #include <Application.h>
 
 #include <new>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,14 +44,15 @@
 #include <ServerMemoryAllocator.h>
 #include <ServerProtocol.h>
 
+
 using namespace BPrivate;
 
 
 BApplication *be_app = NULL;
 BMessenger be_app_messenger;
 
+pthread_once_t sAppResourcesInitOnce = PTHREAD_ONCE_INIT;
 BResources *BApplication::sAppResources = NULL;
-BLocker BApplication::sAppResourcesLock("_app_resources_lock");
 
 
 enum {
@@ -873,39 +875,8 @@ BApplication::GetAppInfo(app_info *info) const
 BResources *
 BApplication::AppResources()
 {
-	AutoLocker<BLocker> lock(sAppResourcesLock);
-
-	// BApplication caches its resources, so check
-	// if it already happened.
-	if (sAppResources != NULL)
-		return sAppResources;
-
-	entry_ref ref;
-	bool found = false;
-
-	// App is already running. Get its entry ref with
-	// GetAppInfo()
-	app_info appInfo;
-	if (be_app && be_app->GetAppInfo(&appInfo) == B_OK) {
-		ref = appInfo.ref;
-		found = true;
-	} else {
-		// Run() hasn't been called yet
-		found = BPrivate::get_app_ref(&ref) == B_OK;
-	}
-
-	if (!found)
-		return NULL;
-
-	BFile file(&ref, B_READ_ONLY);
-	if (file.InitCheck() == B_OK) {
-		sAppResources = new (std::nothrow) BResources(&file, false);
-		if (sAppResources != NULL
-			&& sAppResources->InitCheck() != B_OK) {
-			delete sAppResources;
-			sAppResources = NULL;
-		}
-	}
+	if (sAppResources == NULL)
+		pthread_once(&sAppResourcesInitOnce, &_InitAppResources);
 
 	return sAppResources;
 }
@@ -1511,6 +1482,40 @@ BApplication::_WindowAt(uint32 index, bool includeMenus) const
 	}
 
 	return NULL;
+}
+
+
+/*static*/ void
+BApplication::_InitAppResources()
+{
+	entry_ref ref;
+	bool found = false;
+
+	// App is already running. Get its entry ref with
+	// GetAppInfo()
+	app_info appInfo;
+	if (be_app && be_app->GetAppInfo(&appInfo) == B_OK) {
+		ref = appInfo.ref;
+		found = true;
+	} else {
+		// Run() hasn't been called yet
+		found = BPrivate::get_app_ref(&ref) == B_OK;
+	}
+
+	if (!found)
+		return;
+
+	BFile file(&ref, B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
+
+	BResources* resources = new (std::nothrow) BResources(&file, false);
+	if (resources == NULL || resources->InitCheck() != B_OK) {
+		delete resources;
+		return;
+	}
+
+	sAppResources = resources;
 }
 
 
