@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2007-2009, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,7 +17,6 @@
 #include <image.h>
 #include <Path.h>
 
-#include <AppMisc.h>
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
@@ -32,7 +31,7 @@
 using std::nothrow;
 
 
-// sManager
+static pthread_once_t sManagerInitOnce = PTHREAD_ONCE_INIT;
 DiskSystemAddOnManager* DiskSystemAddOnManager::sManager = NULL;
 
 
@@ -78,22 +77,8 @@ struct DiskSystemAddOnManager::StringSet : std::set<std::string> {
 DiskSystemAddOnManager*
 DiskSystemAddOnManager::Default()
 {
-	if (!sManager) {
-		DiskSystemAddOnManager* manager = new DiskSystemAddOnManager();
-
-		BPrivate::gInitializationLock.Lock();
-
-		// set manager, if no one beat us to it
-		if (!sManager) {
-			sManager = manager;
-			manager = NULL;
-		}
-
-		BPrivate::gInitializationLock.Unlock();
-
-		// delete the object we created, if someone else was quicker
-		delete manager;
-	}
+	if (sManager == NULL)
+		pthread_once(&sManagerInitOnce, &_InitSingleton);
 
 	return sManager;
 }
@@ -238,6 +223,13 @@ DiskSystemAddOnManager::DiskSystemAddOnManager()
 }
 
 
+/*static*/ void
+DiskSystemAddOnManager::_InitSingleton()
+{
+	sManager = new DiskSystemAddOnManager();
+}
+
+
 // _AddOnAt
 DiskSystemAddOnManager::AddOn*
 DiskSystemAddOnManager::_AddOnAt(int32 index) const
@@ -369,4 +361,3 @@ DiskSystemAddOnManager::_LoadAddOns(StringSet& alreadyLoaded,
 
 	return B_OK;
 }
-

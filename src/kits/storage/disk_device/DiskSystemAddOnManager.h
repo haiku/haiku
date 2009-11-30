@@ -42,6 +42,8 @@ private:
 
 								DiskSystemAddOnManager();
 
+	static	void				_InitSingleton();
+
 			AddOn*				_AddOnAt(int32 index) const;
 			void				_PutAddOn(int32 index);
 
