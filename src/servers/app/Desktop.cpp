@@ -1859,8 +1859,7 @@ Desktop::MinimizeApplication(team_id team)
 		if (window->ServerWindow()->ClientTeam() != team)
 			continue;
 
-		if ((window->Flags() & B_NOT_MINIMIZABLE) == 0)
-			window->ServerWindow()->NotifyMinimize(true);
+		window->ServerWindow()->NotifyMinimize(true);
 	}
 }
 

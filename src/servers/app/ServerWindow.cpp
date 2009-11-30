@@ -425,7 +425,8 @@ ServerWindow::NotifyQuitRequested()
 void
 ServerWindow::NotifyMinimize(bool minimize)
 {
-	if (fWindow->Feel() != B_NORMAL_WINDOW_FEEL)
+	if (fWindow->Feel() != B_NORMAL_WINDOW_FEEL
+		|| ((fWindow->Flags() & B_NOT_MINIMIZABLE) == 0 && minimize))
 		return;
 
 	// The client is responsible for the actual minimization
