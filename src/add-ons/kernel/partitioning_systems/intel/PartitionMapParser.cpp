@@ -215,10 +215,10 @@ PartitionMapParser::_ParseExtended(PrimaryPartition* primary, off_t offset)
 			}
 			if (partition == NULL)
 				break;
-#ifdef _BOOT_MODE
-			// work-around potential BIOS problems
-			partition->AdjustSize(fSessionSize);
-#endif
+
+			// work-around potential BIOS/OS problems
+			partition->FitSizeToSession(fSessionSize);
+
 			// check the partition's location
 			if (!partition->CheckLocation(fSessionSize)) {
 				error = B_BAD_DATA;
