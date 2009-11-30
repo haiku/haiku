@@ -98,11 +98,6 @@ private:
 			void				_BuildDefaultPopUp();
 			void				_ShowPopUp(BView* target, BPoint where);
 
-	static	bool				sVisible;
-	static	bool				sVisibleInitialized;
-	static	BLocker				sLock;
-	static	BList				sList;
-
 			enum relation {
 				TARGET_UNKNOWN,
 				TARGET_IS_CHILD,
