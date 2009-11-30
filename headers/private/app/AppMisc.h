@@ -1,14 +1,16 @@
 /*
- * Copyright 2002-2007, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2002-2009, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _APP_MISC_H
 #define _APP_MISC_H
 
+
 #include <Handler.h>
 #include <Locker.h>
 #include <OS.h>
 #include <SupportDefs.h>
+
 
 struct entry_ref;
 
@@ -24,8 +26,6 @@ status_t get_app_ref(entry_ref *ref, bool traverse = true);
 
 team_id current_team();
 thread_id main_thread_for(team_id team);
-
-bool is_running_on_haiku();
 
 bool is_app_showing_modal_window(team_id team);
 

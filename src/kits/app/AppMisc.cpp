@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,7 +21,6 @@ namespace BPrivate {
 BLocker gInitializationLock("global init lock");
 
 
-// get_app_path
 /*!	\brief Returns the path to an application's executable.
 	\param team The application's team ID.
 	\param buffer A pointer to a pre-allocated character array of at least
@@ -54,7 +53,7 @@ get_app_path(team_id team, char *buffer)
 	return B_ENTRY_NOT_FOUND;
 }
 
-// get_app_path
+
 /*!	\brief Returns the path to the application's executable.
 	\param buffer A pointer to a pre-allocated character array of at least
 		   size B_PATH_NAME_LENGTH to be filled in by this function.
@@ -69,7 +68,7 @@ get_app_path(char *buffer)
 	return get_app_path(B_CURRENT_TEAM, buffer);
 }
 
-// get_app_ref
+
 /*!	\brief Returns an entry_ref referring to an application's executable.
 	\param team The application's team ID.
 	\param ref A pointer to a pre-allocated entry_ref to be initialized
@@ -97,7 +96,7 @@ get_app_ref(team_id team, entry_ref *ref, bool traverse)
 	return error;
 }
 
-// get_app_ref
+
 /*!	\brief Returns an entry_ref referring to the application's executable.
 	\param ref A pointer to a pre-allocated entry_ref to be initialized
 		   to an entry_ref referring to the application's executable.
@@ -113,7 +112,7 @@ get_app_ref(entry_ref *ref, bool traverse)
 	return get_app_ref(B_CURRENT_TEAM, ref, traverse);
 }
 
-// current_team
+
 /*!	\brief Returns the ID of the current team.
 	\return The ID of the current team.
 */
@@ -129,7 +128,7 @@ current_team()
 	return team;
 }
 
-// main_thread_for
+
 /*!	Returns the ID of the supplied team's main thread.
 	\param team The team.
 	\return
@@ -140,44 +139,14 @@ current_team()
 thread_id
 main_thread_for(team_id team)
 {
-#ifdef __HAIKU__
 	// Under Haiku the team ID is equal to it's main thread ID. We just get
 	// a team info to verify the existence of the team.
 	team_info info;
 	status_t error = get_team_info(team, &info);
 	return (error == B_OK ? team : error);
-#else
-	// For I can't find any trace of how to explicitly get the main thread,
-	// I assume the main thread is the one with the least thread ID.
-	thread_id thread = B_BAD_TEAM_ID;
-	int32 cookie = 0;
-	thread_info info;
-	while (get_next_thread_info(team, &cookie, &info) == B_OK) {
-		if (thread < 0 || info.thread < thread)
-			thread = info.thread;
-	}
-	return thread;
-#endif
 }
 
-// is_running_on_haiku
-/*!	Returns whether we're running under Haiku natively.
 
-	This is a runtime check for components compiled only once for both
-	BeOS and Haiku and nevertheless need to behave differently on the two
-	systems, like the registrar, which uses another MIME database directory
-	under BeOS.
-
-	\return \c true, if we're running under Haiku, \c false otherwise.
-*/
-bool
-is_running_on_haiku()
-{
-	struct utsname info;
-	return (uname(&info) == 0 && strcmp(info.sysname, "Haiku") == 0);
-}
-
-// is_app_showing_modal_window
 /*!	\brief Returns whether the application identified by the supplied
 		   \c team_id is currently showing a modal window.
 	\param team the ID of the application in question.
@@ -192,4 +161,3 @@ is_app_showing_modal_window(team_id team)
 }
 
 } // namespace BPrivate
-
