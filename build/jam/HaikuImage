@@ -159,14 +159,17 @@ SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)ati
 ;
 SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki usb_midi ;
-SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x
-	$(X86_ONLY)broadcom570x etherpci $(X86_ONLY)ipro1000
+SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
+	$(X86_ONLY)broadcom440x $(X86_ONLY)broadcom570x etherpci $(X86_ONLY)ipro1000
 	pegasus $(X86_ONLY)rtl8139 rtl8169 $(X86_ONLY)rtl81xx sis900
 	$(X86_ONLY)via_rhine wb840 $(X86_ONLY)ipro100 $(X86_ONLY)nforce
 	#vlance
 	$(X86_ONLY)marvell_yukon $(X86_ONLY)syskonnect
 	$(X86_ONLY)attansic_l1 $(X86_ONLY)attansic_l2 $(X86_ONLY)ar81xx
 	usb_ecm usb_asix
+	
+	#WLAN drivers
+	$(X86_ONLY)atheros
 ;
 #SYSTEM_ADD_ONS_DRIVERS_POWER = $(X86_ONLY)acpi_button ;
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
