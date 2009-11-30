@@ -26,9 +26,9 @@ class BScrollView;
 class BString;
 class BStringView;
 class BasicTerminalBuffer;
+class ResizeWindow;
 class TermBuffer;
 class TerminalBuffer;
-class ResizeWindow;
 class Shell;
 
 class TermView : public BView {
@@ -157,14 +157,6 @@ private:
 
 			void			_WritePTY(const char* text, int32 numBytes);
 
-			// Comunicate Input Method
-			//  void _DoIMStart (BMessage* message);
-			//  void _DoIMStop (BMessage* message);
-			//  void _DoIMChange (BMessage* message);
-			//  void _DoIMLocation (BMessage* message);
-			//  void _DoIMConfirm (void);
-			//	void _ConfirmString(const char *, int32);
-
 			// selection
 			float			_MouseDistanceSinceLastClick(BPoint where);
 			void			_Select(TermPos start, TermPos end, bool inclusive,
@@ -273,15 +265,6 @@ private:
 			bool			fReportButtonMouseEvent;
 			bool			fReportAnyMouseEvent;
 			BClipboard*		fMouseClipboard;
-
-			// Input Method parameter.
-			int				fIMViewPtr;
-			TermPos			fIMStartPos;
-			TermPos			fIMEndPos;
-			BString			fIMString;
-			bool			fIMflag;
-			BMessenger		fIMMessenger;
-			int32			fImCodeState;
 };
 
 

@@ -297,7 +297,6 @@ TermView::_InitObject(int32 argc, const char** argv)
 	fSelStart = TermPos(-1, -1);
 	fSelEnd = TermPos(-1, -1);
 	fMouseTracking = false;
-	fIMflag = false;
 	fCheckMouseTracking = false;
 	fPrevPos = TermPos(-1, - 1);
 	fReportX10MouseEvent = false;
@@ -1216,9 +1215,6 @@ TermView::MakeFocus(bool focusState)
 void
 TermView::KeyDown(const char *bytes, int32 numBytes)
 {
-	if (fIMflag)
-		return;
-
 	int32 key, mod, rawChar;
 	BMessage *currentMessage = Looper()->CurrentMessage();
 	if (currentMessage == NULL)
