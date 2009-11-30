@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Clipboard.h>
 #include <ControlLook.h>
 #include <Font.h>
 #include <Menu.h>
@@ -1027,6 +1028,10 @@ _init_interface_kit_()
 	status_t status = BPrivate::PaletteConverter::InitializeDefault(true);
 	if (status < B_OK)
 		return status;
+
+	// init global clipboard
+	if (be_clipboard == NULL)
+		be_clipboard = new BClipboard(NULL);
 
 	// TODO: Could support different themes here in the future.
 	be_control_look = new BControlLook();
