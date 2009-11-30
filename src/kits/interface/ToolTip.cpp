@@ -110,10 +110,11 @@ BToolTip::Lock()
 	while (true) {
 		lockedLooper = View()->LockLooper();
 		if (!lockedLooper) {
-			BToolTipManager::Lock();
+			BToolTipManager* manager = BToolTipManager::Manager();
+			manager->Lock();
 
 			if (View()->Window() != NULL) {
-				BToolTipManager::Unlock();
+				manager->Unlock();
 				continue;
 			}
 		}
@@ -131,7 +132,7 @@ BToolTip::Unlock()
 	if (fLockedLooper)
 		View()->UnlockLooper();
 	else
-		BToolTipManager::Unlock();
+		BToolTipManager::Manager()->Unlock();
 }
 
 

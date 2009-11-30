@@ -8,6 +8,8 @@
 #include <ToolTipManager.h>
 #include <ToolTipWindow.h>
 
+#include <pthread.h>
+
 #include <Autolock.h>
 #include <LayoutBuilder.h>
 #include <MessageRunner.h>
@@ -17,7 +19,7 @@
 #include <ToolTip.h>
 
 
-BLocker BToolTipManager::sLock("tool tip manager");
+static pthread_once_t sManagerInitOnce = PTHREAD_ONCE_INIT;
 BToolTipManager* BToolTipManager::sDefaultInstance;
 
 static const uint32 kMsgHideToolTip = 'hide';
@@ -59,13 +61,14 @@ public:
 
 	virtual void DetachedFromWindow()
 	{
-		BToolTipManager::Lock();
+		BToolTipManager* manager = BToolTipManager::Manager();
+		manager->Lock();
 
 		RemoveChild(fToolTip->View());
 			// don't delete this one!
 		fToolTip->DetachedFromWindow();
 
-		BToolTipManager::Unlock();
+		manager->Unlock();
 	}
 
 	virtual void MouseMoved(BPoint where, uint32 transit,
@@ -117,9 +120,10 @@ ToolTipWindow::ToolTipWindow(BToolTip* tip, BPoint where)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	BToolTipManager::Lock();
+	BToolTipManager* manager = BToolTipManager::Manager();
+	manager->Lock();
 	AddChild(new ToolTipView(tip));
-	BToolTipManager::Unlock();
+	manager->Unlock();
 
 	BSize size = ChildAt(0)->PreferredSize();
 	ResizeTo(size.width, size.height);
@@ -194,12 +198,20 @@ ToolTipWindow::MessageReceived(BMessage* message)
 /*static*/ BToolTipManager*
 BToolTipManager::Manager()
 {
-	BAutolock _(sLock);
-
+	// Note: The check is not necessary; it's just faster than always calling
+	// pthread_once(). It requires reading/writing of pointers to be atomic
+	// on the architecture.
 	if (sDefaultInstance == NULL)
-		sDefaultInstance = new BToolTipManager();
+		pthread_once(&sManagerInitOnce, &_InitSingleton);
 
 	return sDefaultInstance;
+}
+
+
+/*static*/ void
+BToolTipManager::_InitSingleton()
+{
+	sDefaultInstance = new BToolTipManager();
 }
 
 
@@ -282,6 +294,7 @@ BToolTipManager::HideDelay() const
 
 BToolTipManager::BToolTipManager()
 	:
+	fLock("tool tip manager"),
 	fShowDelay(750000),
 	fHideDelay(50000)
 {

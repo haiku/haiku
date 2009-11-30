@@ -26,19 +26,22 @@ public:
 			void				SetHideDelay(bigtime_t time);
 			bigtime_t			HideDelay() const;
 
-	static	bool				Lock() { return sLock.Lock(); }
-	static	void				Unlock() { sLock.Unlock(); }
+			bool				Lock()		{ return fLock.Lock(); }
+			void				Unlock()	{ fLock.Unlock(); }
 
 private:
 								BToolTipManager();
 	virtual						~BToolTipManager();
 
+	static	void				_InitSingleton();
+
+private:
+			BLocker				fLock;
 			BMessenger			fWindow;
 
 			bigtime_t			fShowDelay;
 			bigtime_t			fHideDelay;
 
-	static	BLocker				sLock;
 	static	BToolTipManager*	sDefaultInstance;
 };
 
