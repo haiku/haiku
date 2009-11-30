@@ -58,12 +58,14 @@ struct family {
 	BObjectList<style> styles;
 };
 
-namespace BPrivate {
+namespace {
 
 class FontList : public BLocker {
 	public:
 		FontList();
 		~FontList();
+
+		static FontList* Default();
 
 		bool UpdatedOnServer();
 
@@ -79,16 +81,21 @@ class FontList : public BLocker {
 		status_t _Update();
 		int32 _RevisionOnServer();
 		family* _FindFamily(font_family name);
+		static void _InitSingleton();
 
 		BObjectList<family> fFamilies;
 		family*		fLastFamily;
 		bigtime_t	fLastUpdate;
 		int32		fRevision;
+
+		static pthread_once_t	sDefaultInitOnce;
+		static FontList*		sDefaultInstance;
 };
 
-}	// namespace BPrivate
+pthread_once_t FontList::sDefaultInitOnce = PTHREAD_ONCE_INIT;
+FontList* FontList::sDefaultInstance = NULL;
 
-static BPrivate::FontList sFontList;
+}	// unnamed namespace
 
 
 //	#pragma mark -
@@ -102,7 +109,7 @@ compare_families(const family* a, const family* b)
 }
 
 
-namespace BPrivate {
+namespace {
 
 FontList::FontList()
 	: BLocker("font list"),
@@ -115,6 +122,16 @@ FontList::FontList()
 
 FontList::~FontList()
 {
+}
+
+
+/*static*/ FontList*
+FontList::Default()
+{
+	if (sDefaultInstance == NULL)
+		pthread_once(&sDefaultInitOnce, &_InitSingleton);
+
+	return sDefaultInstance;
 }
 
 
@@ -301,7 +318,14 @@ FontList::CountStyles(font_family familyName)
 	return family->styles.CountItems();
 }
 
-}	// namespace BPrivate
+
+/*static*/ void
+FontList::_InitSingleton()
+{
+	sDefaultInstance = new FontList;
+}
+
+}	// unnamed namespace
 
 
 //	#pragma mark -
@@ -413,7 +437,7 @@ _get_system_default_font_(const char* which, font_family family,
 int32
 count_font_families()
 {
-	return sFontList.CountFamilies();
+	return FontList::Default()->CountFamilies();
 }
 
 
@@ -424,7 +448,7 @@ count_font_families()
 int32
 count_font_styles(font_family family)
 {
-	return sFontList.CountStyles(family);
+	return FontList::Default()->CountStyles(family);
 }
 
 
@@ -442,7 +466,7 @@ get_font_family(int32 index, font_family *_name, uint32 *_flags)
 	if (_name == NULL)
 		return B_BAD_VALUE;
 
-	return sFontList.FamilyAt(index, _name, _flags);
+	return FontList::Default()->FamilyAt(index, _name, _flags);
 }
 
 
@@ -482,7 +506,7 @@ get_font_style(font_family family, int32 index, font_style *_name,
 	if (_name == NULL)
 		return B_BAD_VALUE;
 
-	return sFontList.StyleAt(family, index, _name, _face, _flags);
+	return FontList::Default()->StyleAt(family, index, _name, _face, _flags);
 }
 
 
@@ -494,7 +518,7 @@ get_font_style(font_family family, int32 index, font_style *_name,
 bool
 update_font_families(bool /*checkOnly*/)
 {
-	return sFontList.UpdatedOnServer();
+	return FontList::Default()->UpdatedOnServer();
 }
 
 
