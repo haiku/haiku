@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku Inc.
+ * Copyright 2006-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,13 +7,16 @@
  */
 
 
+#include <DesktopLink.h>
+
+#include <stdlib.h>
 #include <unistd.h>
 
-#include <DesktopLink.h>
 #include <ServerProtocol.h>
 
 
 namespace BPrivate {
+
 
 DesktopLink::DesktopLink()
 	:
@@ -35,6 +38,8 @@ DesktopLink::DesktopLink()
 	StartMessage(AS_GET_DESKTOP);
 	Attach<port_id>(fReplyPort);
 	Attach<int32>(getuid());
+	AttachString(getenv("TARGET_SCREEN"));
+	Attach<int32>(AS_PROTOCOL_VERSION);
 
 	int32 code;
 	if (FlushWithReply(code) != B_OK || code != B_OK)
@@ -57,5 +62,6 @@ DesktopLink::InitCheck() const
 {
 	return fReplyPort < B_OK ? fReplyPort : B_OK;
 }
+
 
 }	// namespace BPrivate
