@@ -51,6 +51,10 @@ public:
 	static status_t InitializeDefault(bool useServer = false);
 
 private:
+	static void _InitializeDefaultAppServer();
+	static void _InitializeDefaultNoAppServer();
+
+private:
 	const color_map	*fColorMap;
 	color_map		*fOwnColorMap;
 	status_t		fCStatus;

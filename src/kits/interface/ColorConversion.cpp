@@ -437,27 +437,38 @@ PaletteConverter::GrayColorForIndex(uint8 index) const
 }
 
 
-static BLocker		sPaletteConverterLock("PalConvLock");
+static pthread_once_t sPaletteConverterInitOnce = PTHREAD_ONCE_INIT;
 static PaletteConverter	sPaletteConverter;
 
 
 /*!	\brief Initialize the global instance of PaletteConverter using the system color palette.
 	\return B_OK.
 */
-/* static */
-status_t
+/*static*/ status_t
 PaletteConverter::InitializeDefault(bool useServer)
 {
-	if (sPaletteConverterLock.Lock()) {
-		if (sPaletteConverter.InitCheck() != B_OK) {
-			if (useServer)
-				sPaletteConverter.SetTo(system_colors());
-			else
-				sPaletteConverter.SetTo(kSystemPalette);
-		}
-		sPaletteConverterLock.Unlock();
+	if (sPaletteConverter.InitCheck() != B_OK) {
+		pthread_once(&sPaletteConverterInitOnce,
+			useServer
+				? &_InitializeDefaultAppServer
+				: &_InitializeDefaultNoAppServer);
 	}
-	return B_OK;
+
+	return sPaletteConverter.InitCheck();
+}
+
+
+/*static*/ void
+PaletteConverter::_InitializeDefaultAppServer()
+{
+	sPaletteConverter.SetTo(system_colors());
+}
+
+
+/*static*/ void
+PaletteConverter::_InitializeDefaultNoAppServer()
+{
+	sPaletteConverter.SetTo(kSystemPalette);
 }
 
 
