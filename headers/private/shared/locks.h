@@ -30,7 +30,7 @@ typedef struct lazy_mutex {
 
 status_t	lazy_mutex_init(lazy_mutex *lock, const char *name);
 				// name will not be cloned and must rename valid
-void		lazy_mutex_destroy(mutex *lock);
+void		lazy_mutex_destroy(lazy_mutex *lock);
 status_t	lazy_mutex_lock(lazy_mutex *lock);
 void		lazy_mutex_unlock(lazy_mutex *lock);
 

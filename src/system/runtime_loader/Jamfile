@@ -24,7 +24,8 @@ StaticLibrary libruntime_loader.a :
 	kernel_cpp.cpp
 	KMessage.cpp
 	:
-	<src!system!libroot!os>locks.o
+	<src!system!libroot!os>mutex.o
+	<src!system!libroot!os>recursive_lock.o
 	<src!system!libroot!os>syscalls.o
 	<src!system!libroot!os>sem.o
 

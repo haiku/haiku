@@ -5,6 +5,8 @@ UsePrivateHeaders kernel ;
 	# for util/KMessage.h
 UsePrivateHeaders libroot runtime_loader shared ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) locks ] ;
+
 MergeObject os_main.o :
 	area.c
 	atomic.c
@@ -17,7 +19,6 @@ MergeObject os_main.o :
 	fs_query.cpp
 	fs_volume.c
 	image.cpp
-	locks.cpp
 	parsedate.cpp
 	port.c
 	scheduler.c
@@ -28,6 +29,11 @@ MergeObject os_main.o :
 	time.cpp
 	syscalls.S
 	wait_for_objects.cpp
+
+	# locks
+	mutex.cpp
+	recursive_lock.cpp
+	rw_lock.cpp
 
 	KMessage.cpp
 ;
