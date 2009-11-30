@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <ClipboardPrivate.h>
 #include <MessagePrivate.h>
 #include <RosterPrivate.h>
 
@@ -52,9 +51,6 @@ extern "C" void
 initialize_after()
 {
 	DBG(OUT("initialize_after()\n"));
-
-	BPrivate::init_clipboard();
-		// needs to send a message, and that requires gDefaultTokens to be initialized
 
 	DBG(OUT("initialize_after() done\n"));
 }

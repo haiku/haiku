@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold, bonefish@users.sf.net
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 
 #include "Registrar.h"
@@ -14,6 +14,7 @@
 #include <exception>
 
 #include <Application.h>
+#include <Clipboard.h>
 #include <Message.h>
 #include <OS.h>
 #include <RegistrarDefs.h>
@@ -404,6 +405,13 @@ int
 main()
 {
 	FUNCTION_START();
+
+	// Create the global be_clipboard manually -- it will not work, since it
+	// wants to talk to the registrar in its constructor, but it doesn't have
+	// to and we would otherwise deadlock when initializing our GUI in the
+	// app thread.
+	be_clipboard = new BClipboard(NULL);
+
 
 	// create and run the registrar application
 	status_t error;

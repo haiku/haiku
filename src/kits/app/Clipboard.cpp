@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,9 +7,8 @@
  */
 
 
-#include <ClipboardPrivate.h>
-
 #include <Clipboard.h>
+
 #include <Application.h>
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
@@ -30,6 +29,8 @@ using namespace BPrivate;
 
 
 BClipboard::BClipboard(const char *name, bool transient)
+	:
+	fLock("clipboard")
 {
 	if (name != NULL)
 		fName = strdup(name);
@@ -91,7 +92,7 @@ BClipboard::LocalCount() const
 	value directly from the system service managing the clipboards, so it is
 	more expensive, but more up-to-date than LocalCount(), which returns a
 	locally cached value.
-	
+
 	\return The number of commits to the clipboard.
 */
 uint32
@@ -290,18 +291,4 @@ BClipboard::_DownloadFromSystem(bool force)
 		return B_OK;
 
 	return B_ERROR;
-}
-
-
-//	#pragma mark -
-
-
-/*!	\brief Initializes the global \c be_clipboard.
-
-	Invoked at libbe initialization time.
-*/
-void
-BPrivate::init_clipboard()
-{
-	be_clipboard = new BClipboard(NULL);
 }
