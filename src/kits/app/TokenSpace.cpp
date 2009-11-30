@@ -22,6 +22,7 @@ BTokenSpace gDefaultTokens;
 
 BTokenSpace::BTokenSpace()
 	:
+	BLocker("token space"),
 	fTokenCount(1)
 {
 }
