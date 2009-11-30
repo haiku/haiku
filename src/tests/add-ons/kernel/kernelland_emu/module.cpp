@@ -30,7 +30,8 @@
 
 
 static const char *gModuleDirs[] = {
-	"distro/x86.R1/beos/system/add-ons/userland",
+	"generated/objects/haiku/x86/release/add-ons/userland",
+	"generated/objects/haiku/x86/release/tests/add-ons/kernel",
 	NULL
 };
 
