@@ -1,0 +1,72 @@
+SubDir HAIKU_TOP src tests add-ons kernel partitioning_systems ;
+
+UsePrivateHeaders interface kernel shared storage ;
+UsePrivateSystemHeaders ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage disk_device ] ;
+	# DiskDeviceTypes.cpp
+
+SimpleTest PartitioningSystemsTest :
+	PartitioningSystemsTest.cpp
+
+	# disk device types
+	DiskDeviceTypes.cpp
+
+	: libkernelland_emu.so be
+;
+
+{
+	local defines = [ FDefines USERLAND ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ] ;
+
+Addon <userland>amiga_rdb :
+	amiga_rdb.cpp
+	: <nogrist>PartitioningSystemsTest libkernelland_emu.so
+;
+
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;
+
+Addon <userland>intel :
+	intel.cpp
+	PartitionLocker.cpp
+	PartitionMap.cpp
+	PartitionMapParser.cpp
+	PartitionMapWriter.cpp
+	write_support.cpp
+	: <nogrist>PartitioningSystemsTest libkernelland_emu.so
+;
+
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ] ;
+
+Addon <userland>efi_gpt :
+	efi_gpt.cpp
+	PartitionLocker.cpp
+	: <nogrist>PartitioningSystemsTest libkernelland_emu.so
+;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems
+	session ] ;
+
+Addon <userland>session :
+	session.cpp
+	Debug.cpp
+	Disc.cpp
+	: <nogrist>PartitioningSystemsTest libkernelland_emu.so
+;
+
+# for convenience: this target builds all userland modules
+
+NotFile userland_partitioning_modules ;
+Depends userland_partitioning_modules :
+	<userland>amiga_rdb
+	<userland>intel
+	<userland>session
+	<userland>efi_gpt
+;
