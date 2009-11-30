@@ -8,13 +8,15 @@
 
 #include <sys/queue.h>
 
+
 struct cv {
-	struct ConditionVariable* condVar;
+	int cv_waiters;
 };
+
 
 void cv_init(struct cv*, const char*);
 void cv_wait(struct cv*, struct mtx*);
-int	cv_timedwait(struct cv*, struct mtx*, int);
+int cv_timedwait(struct cv*, struct mtx*, int);
 void cv_signal(struct cv*);
 
 #endif /* _FBSD_COMPAT_SYS_CONDVAR_H_ */
