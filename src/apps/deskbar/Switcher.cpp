@@ -1903,11 +1903,13 @@ TIconView::AnimateIcon(BBitmap* startIcon, BBitmap* endIcon)
 	destRect.OffsetBy(BPoint(off, off));
 
 	fOffBitmap->Lock();
-	fOffView->SetDrawingMode(B_OP_ALPHA);
+
 	for (int i = 0; i < 2; i++) {
 		startIconBounds.InsetBy(amount,amount);
 		snooze(20000);
+		fOffView->SetDrawingMode(B_OP_COPY);
 		fOffView->FillRect(fOffView->Bounds());
+		fOffView->SetDrawingMode(B_OP_ALPHA);
 		fOffView->DrawBitmap(startIcon, startIconBounds);
 		fOffView->Sync();
 		DrawBitmap(fOffBitmap, destRect);
@@ -1915,13 +1917,14 @@ TIconView::AnimateIcon(BBitmap* startIcon, BBitmap* endIcon)
 	for (int i = 0; i < 2; i++) {
 		startIconBounds.InsetBy(amount,amount);
 		snooze(20000);
+		fOffView->SetDrawingMode(B_OP_COPY);
 		fOffView->FillRect(fOffView->Bounds());
+		fOffView->SetDrawingMode(B_OP_ALPHA);
 		fOffView->DrawBitmap(endIcon, startIconBounds);
 		fOffView->Sync();
 		DrawBitmap(fOffBitmap, destRect);
 	}
 
-	fOffView->SetDrawingMode(B_OP_COPY);
 	fOffBitmap->Unlock();
 }
 
