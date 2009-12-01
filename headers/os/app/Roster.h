@@ -1,9 +1,6 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Ingo Weinhold (bonefish@users.sf.net)
  */
 #ifndef _ROSTER_H
 #define _ROSTER_H
@@ -166,7 +163,9 @@ class BRoster {
 		status_t _SendToRunning(team_id team, int argc, const char *const *args,
 					const BList *messageList, const entry_ref *ref,
 					bool readyToRun) const;
-		void _InitMessengers();
+		void _InitMessenger();
+		static status_t _InitMimeMessenger(void* data);
+		BMessenger& _MimeMessenger();
 		void _AddToRecentApps(const char *appSig) const;
 		void _ClearRecentDocuments() const;
 		void _ClearRecentFolders() const;
@@ -176,7 +175,8 @@ class BRoster {
 
 		BMessenger	fMessenger;
 		BMessenger	fMimeMessenger;
-		uint32		_reserved[3];
+		int32		fMimeMessengerInitOnce;
+		uint32		_reserved[2];
 };
 
 // global BRoster instance

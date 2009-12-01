@@ -11,7 +11,10 @@
 
 
 #include <RosterPrivate.h>
+
 #include <Roster.h>
+
+#include <locks.h>
 
 
 /*!	\class BRoster::Private
@@ -32,6 +35,7 @@ BRoster::Private::SetTo(BMessenger mainMessenger, BMessenger mimeMessenger)
 	if (fRoster != NULL) {
 		fRoster->fMessenger = mainMessenger;
 		fRoster->fMimeMessenger = mimeMessenger;
+		fRoster->fMimeMessengerInitOnce = INIT_ONCE_INITIALIZED;
 	}
 }
 
@@ -62,7 +66,7 @@ BRoster::Private::SendTo(BMessage *message, BMessage *reply, bool mime)
 		return B_NO_INIT;
 
 	if (mime)
-		return fRoster->fMimeMessenger.SendMessage(message, reply);
+		return fRoster->_MimeMessenger().SendMessage(message, reply);
 
 	return fRoster->fMessenger.SendMessage(message, reply);
 }
@@ -80,7 +84,7 @@ BRoster::Private::SendTo(BMessage *message, BMessage *reply, bool mime)
 bool
 BRoster::Private::IsMessengerValid(bool mime) const
 {
-	return fRoster != NULL && (mime ? fRoster->fMimeMessenger.IsValid()
+	return fRoster != NULL && (mime ? fRoster->_MimeMessenger().IsValid()
 		: fRoster->fMessenger.IsValid());
 }
 

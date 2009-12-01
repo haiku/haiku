@@ -1,9 +1,9 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold (bonefish@users.sf.net)
+ *		Ingo Weinhold (ingo_weinhold@gmx.de)
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
@@ -41,6 +41,8 @@
 #include <RegistrarDefs.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
+
+#include <locks.h>
 
 #include <AppMisc.h>
 #include <DesktopLink.h>
@@ -534,9 +536,10 @@ BRoster::ArgVector::Unset()
 BRoster::BRoster()
 	:
 	fMessenger(),
-	fMimeMessenger()
+	fMimeMessenger(),
+	fMimeMessengerInitOnce(INIT_ONCE_UNINITIALIZED)
 {
-	_InitMessengers();
+	_InitMessenger();
 }
 
 
@@ -2769,7 +2772,7 @@ BRoster::_SendToRunning(team_id team, int argc, const char* const* args,
 
 
 void
-BRoster::_InitMessengers()
+BRoster::_InitMessenger()
 {
 	DBG(OUT("BRoster::InitMessengers()\n"));
 
@@ -2781,26 +2784,43 @@ BRoster::_InitMessengers()
 
 		BMessenger::Private(fMessenger).SetTo(info.team, rosterPort,
 			B_PREFERRED_TOKEN);
-
-		// ask for the MIME messenger
-		// Generous 1s + 5s timeouts. It could actually be synchronous, but
-		// timeouts allow us to debug the registrar main thread.
-		BMessage request(B_REG_GET_MIME_MESSENGER);
-		BMessage reply;
-		status_t error = fMessenger.SendMessage(&request, &reply, 1000000LL,
-			5000000LL);
-		if (error == B_OK && reply.what == B_REG_SUCCESS) {
-			DBG(OUT("  got reply from roster\n"));
-				reply.FindMessenger("messenger", &fMimeMessenger);
-		} else {
-			DBG(OUT("  no (useful) reply from roster: error: %lx: %s\n", error,
-				strerror(error)));
-			if (error == B_OK)
-				DBG(reply.PrintToStream());
-			fMessenger = BMessenger();
-		}
 	}
+
 	DBG(OUT("BRoster::InitMessengers() done\n"));
+}
+
+
+/*static*/ status_t
+BRoster::_InitMimeMessenger(void* data)
+{
+	BRoster* roster = (BRoster*)data;
+
+	// ask for the MIME messenger
+	// Generous 1s + 5s timeouts. It could actually be synchronous, but
+	// timeouts allow us to debug the registrar main thread.
+	BMessage request(B_REG_GET_MIME_MESSENGER);
+	BMessage reply;
+	status_t error = roster->fMessenger.SendMessage(&request, &reply, 1000000LL,
+		5000000LL);
+	if (error == B_OK && reply.what == B_REG_SUCCESS) {
+		DBG(OUT("  got reply from roster\n"));
+			reply.FindMessenger("messenger", &roster->fMimeMessenger);
+	} else {
+		DBG(OUT("  no (useful) reply from roster: error: %lx: %s\n", error,
+			strerror(error)));
+		if (error == B_OK)
+			DBG(reply.PrintToStream());
+	}
+
+	return error;
+}
+
+
+BMessenger&
+BRoster::_MimeMessenger()
+{
+	__init_once(&fMimeMessengerInitOnce, &_InitMimeMessenger, this);
+	return fMimeMessenger;
 }
 
 
