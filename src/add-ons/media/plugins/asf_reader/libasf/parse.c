@@ -363,6 +363,7 @@ asf_parse_index(asf_file_t *file)
 	/* read the raw data of an index header */
 	tmp = asf_byteio_read(idata, 56, iostream);
 	if (tmp < 0) {
+		printf("Could not read index header\n");
 		return tmp;
 	}
 
@@ -392,6 +393,18 @@ asf_parse_index(asf_file_t *file)
 	index->max_packet_count = asf_byteio_getDWLE(idata + 48);
 	index->entry_count = asf_byteio_getDWLE(idata + 52);
 
+	printf("INDEX\n");
+	printf("Total Index Entries %d\n",index->entry_count);
+	printf("Index Size in bytes %Ld\n",index->size);
+	printf("Index Max Packet Count %d\n",index->max_packet_count);
+	printf("Index Entry Time Interval %Ld\n",index->entry_time_interval);
+	
+	if (index->entry_count == 0) {
+		printf("Index has no entries\n");
+		file->index = index;
+		return index->size;
+	}
+
 	if (index->entry_count * 6 + 56 > index->size) {
 		free(index);
 		return ASF_ERROR_INVALID_LENGTH;
@@ -403,8 +416,10 @@ asf_parse_index(asf_file_t *file)
 		free(index);
 		return ASF_ERROR_OUTOFMEM;
 	}
+		
 	tmp = asf_byteio_read(entry_data, entry_data_size, iostream);
 	if (tmp < 0) {
+		printf("Could not read entry data\n");
 		free(index);
 		free(entry_data);
 		return tmp;

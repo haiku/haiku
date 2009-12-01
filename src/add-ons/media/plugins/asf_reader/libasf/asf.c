@@ -96,7 +96,7 @@ asf_init(asf_file_t *file)
 
 	tmp = asf_parse_header(file);
 	if (tmp < 0) {
-		debug_printf("error parsing header: %d", tmp);
+		printf("error parsing header: %d\n", tmp);
 		return tmp;
 	}
 	file->position += tmp;
@@ -104,7 +104,7 @@ asf_init(asf_file_t *file)
 
 	tmp = asf_parse_data(file);
 	if (tmp < 0) {
-		debug_printf("error parsing data object: %d", tmp);
+		printf("error parsing data object: %d\n", tmp);
 		return tmp;
 	}
 	file->position += tmp;
@@ -124,7 +124,7 @@ asf_init(asf_file_t *file)
 			       file->index_position < file->file_size && !file->index) {
 				tmp = asf_parse_index(file);
 				if (tmp < 0) {
-					debug_printf("Error finding index object! %d", tmp);
+					printf("Error finding index object! %d\n", tmp);
 					break;
 				}
 
@@ -152,7 +152,7 @@ asf_init(asf_file_t *file)
 
 	for (tmp = 0; tmp < ASF_MAX_STREAMS; tmp++) {
 		if (file->streams[tmp].type != ASF_STREAM_TYPE_NONE) {
-			debug_printf("stream %d of type %d found!", tmp, file->streams[tmp].type);
+			debug_printf("stream %d of type %s found!", tmp, file->streams[tmp].type == 1 ? "Audio" : file->streams[tmp].type == 2 ? "Video" : "Unknown");
 		}
 	}
 
@@ -269,7 +269,14 @@ asf_seek_to_msec(asf_file_t *file, int64_t msec)
 		return ASF_ERROR_SEEK;
 	}
 
-	if (file->index) {
+	if (file->index && file->index->entry_count == 0) {
+		// Some sort of Constant packet size?
+
+		/* Calculate current packet from index header */
+		packet = msec * 10000 / file->index->entry_time_interval;
+		new_msec = msec;
+		
+	} else if (file->index && file->index->entry_count > 0) {
 		uint32_t index_entry;
 
 		/* Fetch current packet from index entry structure */
