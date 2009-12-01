@@ -8,12 +8,17 @@
 
 
 #include <AppMisc.h>
+
+#include <stdlib.h>
+#include <string.h>
+#include <sys/utsname.h>
+
 #include <Entry.h>
 #include <image.h>
 #include <OS.h>
 
-#include <string.h>
-#include <sys/utsname.h>
+#include <ServerLink.h>
+#include <ServerProtocol.h>
 
 
 namespace BPrivate {
@@ -157,5 +162,56 @@ is_app_showing_modal_window(team_id team)
 	// TODO: Implement!
 	return true;
 }
+
+
+port_id
+get_app_server_port()
+{
+	static port_id sServerPort = -1;
+
+	if (sServerPort < 0) {
+		// No need for synchronization - in the worst case, we'll call
+		// find_port() twice.
+		sServerPort = find_port(SERVER_PORT_NAME);
+	}
+
+	return sServerPort;
+}
+
+
+/*!	Creates a connection with the desktop.
+*/
+status_t
+create_desktop_connection(ServerLink* link, const char* name, int32 capacity)
+{
+	port_id serverPort = get_app_server_port();
+	if (serverPort < 0)
+		return serverPort;
+
+	// Create the port so that the app_server knows where to send messages
+	port_id clientPort = create_port(capacity, name);
+	if (clientPort < 0)
+		return clientPort;
+
+	link->SetTo(serverPort, clientPort);
+
+	link->StartMessage(AS_GET_DESKTOP);
+	link->Attach<port_id>(clientPort);
+	link->Attach<int32>(getuid());
+	link->AttachString(getenv("TARGET_SCREEN"));
+	link->Attach<int32>(AS_PROTOCOL_VERSION);
+
+	int32 code;
+	if (link->FlushWithReply(code) != B_OK || code != B_OK) {
+		link->SetSenderPort(-1);
+		return B_ERROR;
+	}
+
+	link->Read<port_id>(&serverPort);
+	link->SetSenderPort(serverPort);
+
+	return B_OK;
+}
+
 
 } // namespace BPrivate

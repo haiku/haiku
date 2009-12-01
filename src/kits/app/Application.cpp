@@ -1228,33 +1228,10 @@ BApplication::_InitGUIContext()
 status_t
 BApplication::_ConnectToServer()
 {
-	port_id serverPort = find_port(SERVER_PORT_NAME);
-	if (serverPort < B_OK)
-		return serverPort;
-
-	// Create the port so that the app_server knows where to send messages
-	port_id clientPort = create_port(100, "a<app_server");
-	if (clientPort < B_OK)
-		return clientPort;
-
-	// We can't use AppServerLink because be_app == NULL
-	fServerLink->SetTo(serverPort, clientPort);
-
-	fServerLink->StartMessage(AS_GET_DESKTOP);
-	fServerLink->Attach<port_id>(clientPort);
-	fServerLink->Attach<int32>(getuid());
-	fServerLink->AttachString(getenv("TARGET_SCREEN"));
-	fServerLink->Attach<int32>(AS_PROTOCOL_VERSION);
-
-	int32 code;
-	if (fServerLink->FlushWithReply(code) != B_OK || code != B_OK) {
-		fServerLink->SetSenderPort(-1);
-		return B_ERROR;
-	}
-
-	// we talk to the desktop to create our application
-	fServerLink->Read<port_id>(&serverPort);
-	fServerLink->SetSenderPort(serverPort);
+	status_t status
+		= create_desktop_connection(fServerLink, "a<app_server", 100);
+	if (status != B_OK)
+		return status;
 
 	// AS_CREATE_APP:
 	//
@@ -1266,14 +1243,16 @@ BApplication::_ConnectToServer()
 	// 5) char * - signature of the regular app
 
 	fServerLink->StartMessage(AS_CREATE_APP);
-	fServerLink->Attach<port_id>(clientPort);
+	fServerLink->Attach<port_id>(fServerLink->ReceiverPort());
 	fServerLink->Attach<port_id>(_get_looper_port_(this));
 	fServerLink->Attach<team_id>(Team());
 	fServerLink->Attach<int32>(_get_object_token_(this));
 	fServerLink->AttachString(fAppName);
 
 	area_id sharedReadOnlyArea;
+	port_id serverPort;
 
+	int32 code;
 	if (fServerLink->FlushWithReply(code) == B_OK
 		&& code == B_OK) {
 		// We don't need to contact the main app_server anymore
@@ -1288,7 +1267,7 @@ BApplication::_ConnectToServer()
 
 	fServerLink->SetSenderPort(serverPort);
 
-	status_t status = _SetupServerAllocator();
+	status = _SetupServerAllocator();
 	if (status != B_OK)
 		return status;
 

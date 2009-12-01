@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,14 +15,11 @@
 namespace BPrivate {
 
 class DesktopLink : public PortLink {
-	public:
-		DesktopLink();
-		virtual ~DesktopLink();
+public:
+								DesktopLink();
+	virtual						~DesktopLink();
 
-		status_t InitCheck() const;
-
-	private:
-		port_id	fReplyPort;
+			status_t			InitCheck() const;
 };
 
 }	// namespace BPrivate

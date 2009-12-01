@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,11 +7,16 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/** Class for low-overhead port-based messaging */
+
+/*!	Class for low-overhead port-based messaging */
+
+
+#include <ServerLink.h>
 
 #include <stdlib.h>
 #include <string.h>
 #include <new>
+
 #include <Gradient.h>
 #include <GradientLinear.h>
 #include <GradientRadial.h>
@@ -21,8 +26,8 @@
 #include <Region.h>
 #include <Shape.h>
 
-#include <ServerLink.h>
 #include <ServerProtocol.h>
+
 
 //#define TRACE_SERVER_LINK_GRADIENTS
 #ifdef TRACE_SERVER_LINK_GRADIENTS
@@ -35,6 +40,7 @@
 
 namespace BPrivate {
 
+
 ServerLink::ServerLink()
 {
 }
@@ -45,8 +51,16 @@ ServerLink::~ServerLink()
 }
 
 
+void
+ServerLink::SetTo(port_id sender, port_id receiver)
+{
+	fSender->SetPort(sender);
+	fReceiver->SetPort(receiver);
+}
+
+
 status_t
-ServerLink::ReadRegion(BRegion *region)
+ServerLink::ReadRegion(BRegion* region)
 {
 	fReceiver->Read(&region->fCount, sizeof(long));
 	if (region->fCount > 0) {
@@ -55,28 +69,28 @@ ServerLink::ReadRegion(BRegion *region)
 			return B_NO_MEMORY;
 		return fReceiver->Read(region->fData,
 			region->fCount * sizeof(clipping_rect));
-	} else {
-		return fReceiver->Read(&region->fBounds, sizeof(clipping_rect));
 	}
+	
+	return fReceiver->Read(&region->fBounds, sizeof(clipping_rect));
 }
 
 
 status_t
-ServerLink::AttachRegion(const BRegion &region)
+ServerLink::AttachRegion(const BRegion& region)
 {
 	fSender->Attach(&region.fCount, sizeof(long));
 	if (region.fCount > 0) {
 		fSender->Attach(&region.fBounds, sizeof(clipping_rect));
 		return fSender->Attach(region.fData,
 			region.fCount * sizeof(clipping_rect));
-	} else {
-		return fSender->Attach(&region.fBounds, sizeof(clipping_rect));
 	}
+	
+	return fSender->Attach(&region.fBounds, sizeof(clipping_rect));
 }
 
 
 status_t
-ServerLink::ReadShape(BShape *shape)
+ServerLink::ReadShape(BShape* shape)
 {
 	int32 opCount, ptCount;
 	fReceiver->Read(&opCount, sizeof(int32));
@@ -96,11 +110,11 @@ ServerLink::ReadShape(BShape *shape)
 
 
 status_t
-ServerLink::AttachShape(BShape &shape)
+ServerLink::AttachShape(BShape& shape)
 {
 	int32 opCount, ptCount;
-	uint32 *opList;
-	BPoint *ptList;
+	uint32* opList;
+	BPoint* ptList;
 	
 	shape.GetData(&opCount, &ptCount, &opList, &ptList);
 	
@@ -115,15 +129,15 @@ ServerLink::AttachShape(BShape &shape)
 
 
 status_t
-ServerLink::ReadGradient(BGradient **gradient)
+ServerLink::ReadGradient(BGradient** _gradient)
 {
 	GTRACE(("ServerLink::ReadGradient\n"));
-	return fReceiver->ReadGradient(gradient);
+	return fReceiver->ReadGradient(_gradient);
 }
 
 	
 status_t
-ServerLink::AttachGradient(const BGradient &gradient)
+ServerLink::AttachGradient(const BGradient& gradient)
 {
 	GTRACE(("ServerLink::AttachGradient\n"));
 	BGradient::Type gradientType = gradient.GetType();
@@ -196,7 +210,7 @@ ServerLink::AttachGradient(const BGradient &gradient)
 
 
 status_t
-ServerLink::FlushWithReply(int32 &code)
+ServerLink::FlushWithReply(int32& code)
 {
 	status_t status = Flush(B_INFINITE_TIMEOUT, true);
 	if (status < B_OK)
@@ -204,5 +218,6 @@ ServerLink::FlushWithReply(int32 &code)
 
 	return GetNextMessage(code);
 }
+
 
 }	// namespace BPrivate

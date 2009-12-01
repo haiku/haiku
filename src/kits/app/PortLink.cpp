@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc.
+ * Copyright 2005-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,7 @@
 
 
 namespace BPrivate {
+
 
 PortLink::PortLink(port_id send, port_id receive)
 {
@@ -25,12 +26,5 @@ PortLink::~PortLink()
 	delete fSender;
 }
 
-
-void
-PortLink::SetTo(port_id sender, port_id receiver)
-{
-	fSender->SetPort(sender);
-	fReceiver->SetPort(receiver);
-}
 
 }	// namespace BPrivate

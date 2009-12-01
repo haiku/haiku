@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,13 +14,14 @@
 
 namespace BPrivate {
 
-class PortLink : public ServerLink {
-	public:
-		PortLink(port_id sender = -1, port_id receiver = -1);
-		virtual ~PortLink();
 
-		void SetTo(port_id sender, port_id receiver);
+class PortLink : public ServerLink {
+public:
+								PortLink(port_id sender = -1,
+									port_id receiver = -1);
+	virtual						~PortLink();
 };
+
 
 }	// namespace BPrivate
 

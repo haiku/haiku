@@ -32,56 +32,68 @@ class BGradient;
 namespace BPrivate {
 
 class ServerLink {
-	public:
-		ServerLink();
-		virtual ~ServerLink();
+public:
+								ServerLink();
+	virtual						~ServerLink();
 
-		// send methods
+			void				SetTo(port_id sender, port_id receiver);
 
-		void SetSenderPort(port_id port);
-		port_id	SenderPort();
+	// send methods
 
-		status_t StartMessage(int32 code, size_t minSize = 0);
-		void CancelMessage();
-		status_t EndMessage();
+			void				SetSenderPort(port_id port);
+			port_id				SenderPort();
 
-		status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT, bool needsReply = false);
-		status_t Attach(const void *data, ssize_t size);
-		status_t AttachString(const char *string, int32 length = -1);
-		status_t AttachRegion(const BRegion &region);
-		status_t AttachShape(BShape &shape);
-		status_t AttachGradient(const BGradient &gradient);
-		template <class Type> status_t Attach(const Type& data);
+			status_t			StartMessage(int32 code, size_t minSize = 0);
+			void				CancelMessage();
+			status_t			EndMessage();
 
-		// receive methods
+			status_t			Flush(bigtime_t timeout = B_INFINITE_TIMEOUT,
+									bool needsReply = false);
+			status_t			Attach(const void* data, ssize_t size);
+			status_t			AttachString(const char* string,
+									int32 length = -1);
+			status_t			AttachRegion(const BRegion& region);
+			status_t			AttachShape(BShape& shape);
+			status_t			AttachGradient(const BGradient& gradient);
 
-		void SetReceiverPort(port_id port);
-		port_id	ReceiverPort();
+			template <class Type>
+			status_t			Attach(const Type& data);
 
-		status_t GetNextMessage(int32 &code, bigtime_t timeout = B_INFINITE_TIMEOUT);
-		bool NeedsReply() const;
-		status_t Read(void *data, ssize_t size);
-		status_t ReadString(char *buffer, size_t bufferSize);
-		status_t ReadString(BString& string, size_t* _length = NULL);
-		status_t ReadString(char** _string, size_t* _length = NULL);
-		status_t ReadRegion(BRegion *region);
-		status_t ReadShape(BShape *shape);
-		status_t ReadGradient(BGradient **gradient);
-		template <class Type> status_t Read(Type *data);
+	// receive methods
 
-		// convenience methods
+			void				SetReceiverPort(port_id port);
+			port_id				ReceiverPort();
 
-		status_t FlushWithReply(int32 &code);
-		LinkSender &Sender() { return *fSender; }
-		LinkReceiver &Receiver() { return *fReceiver; }
+			status_t			GetNextMessage(int32& code,
+									bigtime_t timeout = B_INFINITE_TIMEOUT);
+			bool				NeedsReply() const;
+			status_t			Read(void* data, ssize_t size);
+			status_t			ReadString(char* buffer, size_t bufferSize);
+			status_t			ReadString(BString& string,
+									size_t* _length = NULL);
+			status_t			ReadString(char** _string,
+									size_t* _length = NULL);
+			status_t			ReadRegion(BRegion* region);
+			status_t			ReadShape(BShape* shape);
+			status_t			ReadGradient(BGradient** _gradient);
+			
+			template <class Type>
+			status_t			Read(Type* data);
 
-	protected:
-		LinkSender *fSender;
-		LinkReceiver *fReceiver;
+	// convenience methods
+
+			status_t			FlushWithReply(int32& code);
+			LinkSender&			Sender() { return *fSender; }
+			LinkReceiver&		Receiver() { return *fReceiver; }
+
+protected:
+			LinkSender*			fSender;
+			LinkReceiver*		fReceiver;
 };
 
 
-// sender inline functions
+// #pragma mark - sender inline functions
+
 
 inline void
 ServerLink::SetSenderPort(port_id port)
@@ -89,11 +101,13 @@ ServerLink::SetSenderPort(port_id port)
 	fSender->SetPort(port);
 }
 
+
 inline port_id
 ServerLink::SenderPort()
 {
 	return fSender->Port();
 }
+
 
 inline status_t
 ServerLink::StartMessage(int32 code, size_t minSize)
@@ -101,11 +115,13 @@ ServerLink::StartMessage(int32 code, size_t minSize)
 	return fSender->StartMessage(code, minSize);
 }
 
+
 inline status_t
 ServerLink::EndMessage()
 {
 	return fSender->EndMessage();
 }
+
 
 inline void
 ServerLink::CancelMessage()
@@ -113,31 +129,37 @@ ServerLink::CancelMessage()
 	fSender->CancelMessage();
 }
 
+
 inline status_t
 ServerLink::Flush(bigtime_t timeout, bool needsReply)
 {
 	return fSender->Flush(timeout, needsReply);
 }
 
+
 inline status_t
-ServerLink::Attach(const void *data, ssize_t size)
+ServerLink::Attach(const void* data, ssize_t size)
 {
 	return fSender->Attach(data, size);
 }
 
+
 inline status_t
-ServerLink::AttachString(const char *string, int32 length)
+ServerLink::AttachString(const char* string, int32 length)
 {
 	return fSender->AttachString(string, length);
 }
 
+
 template<class Type> status_t
-ServerLink::Attach(const Type &data)
+ServerLink::Attach(const Type& data)
 {
 	return Attach(&data, sizeof(Type));
 }
 
+
 // #pragma mark - receiver inline functions
+
 
 inline void
 ServerLink::SetReceiverPort(port_id port)
@@ -145,17 +167,20 @@ ServerLink::SetReceiverPort(port_id port)
 	fReceiver->SetPort(port);
 }
 
+
 inline port_id
 ServerLink::ReceiverPort()
 {
 	return fReceiver->Port();
 }
 
+
 inline status_t
-ServerLink::GetNextMessage(int32 &code, bigtime_t timeout)
+ServerLink::GetNextMessage(int32& code, bigtime_t timeout)
 {
 	return fReceiver->GetNextMessage(code, timeout);
 }
+
 
 inline bool
 ServerLink::NeedsReply() const
@@ -163,17 +188,20 @@ ServerLink::NeedsReply() const
 	return fReceiver->NeedsReply();
 }
 
+
 inline status_t
-ServerLink::Read(void *data, ssize_t size)
+ServerLink::Read(void* data, ssize_t size)
 {
 	return fReceiver->Read(data, size);
 }
 
+
 inline status_t
-ServerLink::ReadString(char *buffer, size_t bufferSize)
+ServerLink::ReadString(char* buffer, size_t bufferSize)
 {
 	return fReceiver->ReadString(buffer, bufferSize);
 }
+
 
 inline status_t
 ServerLink::ReadString(BString& string, size_t* _length)
@@ -181,17 +209,20 @@ ServerLink::ReadString(BString& string, size_t* _length)
 	return fReceiver->ReadString(string, _length);
 }
 
+
 inline status_t
 ServerLink::ReadString(char** _string, size_t* _length)
 {
 	return fReceiver->ReadString(_string, _length);
 }
 
+
 template <class Type> status_t
-ServerLink::Read(Type *data)
+ServerLink::Read(Type* data)
 {
 	return Read(data, sizeof(Type));
 }
+
 
 }	// namespace BPrivate
 
