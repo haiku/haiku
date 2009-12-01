@@ -120,6 +120,7 @@ bus_speed_ok(int bus)
 	switch (bus) {
 		case 100:
 		case 133:
+		case 166:
 		case 333:
 			return true;
 		default:
