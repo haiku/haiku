@@ -538,12 +538,21 @@ ResourceFile::_InitELFXFile(BFile& file, uint64 fileSize)
 		resourceOffset = std::max(resourceOffset,
 			programHeaderTableOffset + programHeaderTableSize);
 
+		// load the program headers into memory
+		uint8* programHeaders = (uint8*)malloc(
+			programHeaderCount * programHeaderSize);
+		if (programHeaders == NULL)
+			throw Exception(B_NO_MEMORY);
+		MemoryDeleter programHeadersDeleter(programHeaders);
+
+		read_exactly(file, programHeaderTableOffset, programHeaders,
+			programHeaderCount * programHeaderSize,
+			"Failed to read ELF program headers.");
+
 		// iterate through the program headers
 		for (uint32 i = 0; i < programHeaderCount; i++) {
-			uint64 shOffset = programHeaderTableOffset + i * programHeaderSize;
-			ElfProgramHeader programHeader;
-			read_exactly(file, shOffset, &programHeader,
-				sizeof(ElfProgramHeader), "Failed to read ELF program header.");
+			ElfProgramHeader& programHeader
+				= *(ElfProgramHeader*)(programHeaders + i * programHeaderSize);
 
 			// get the header values
 			uint32 type			= _GetInt(programHeader.p_type);
@@ -587,12 +596,21 @@ ResourceFile::_InitELFXFile(BFile& file, uint64 fileSize)
 		resourceOffset = std::max(resourceOffset,
 			sectionHeaderTableOffset + sectionHeaderTableSize);
 
+		// load the section headers into memory
+		uint8* sectionHeaders = (uint8*)malloc(
+			sectionHeaderCount * sectionHeaderSize);
+		if (sectionHeaders == NULL)
+			throw Exception(B_NO_MEMORY);
+		MemoryDeleter sectionHeadersDeleter(sectionHeaders);
+
+		read_exactly(file, sectionHeaderTableOffset, sectionHeaders,
+			sectionHeaderCount * sectionHeaderSize,
+			"Failed to read ELF section headers.");
+
 		// iterate through the section headers
 		for (uint32 i = 0; i < sectionHeaderCount; i++) {
-			uint32 shOffset = sectionHeaderTableOffset + i * sectionHeaderSize;
-			ElfSectionHeader sectionHeader;
-			read_exactly(file, shOffset, &sectionHeader,
-				sizeof(ElfSectionHeader), "Failed to read ELF section header.");
+			ElfSectionHeader& sectionHeader
+				= *(ElfSectionHeader*)(sectionHeaders + i * sectionHeaderSize);
 
 			// get the header values
 			uint32 type		= _GetInt(sectionHeader.sh_type);
