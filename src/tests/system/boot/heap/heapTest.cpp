@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <boot/platform.h>
@@ -13,8 +13,9 @@
 #include <stdarg.h>
 
 
-extern "C" void *heap_malloc(size_t size);
-extern "C" void heap_free(void *buffer);
+extern "C" void* heap_malloc(size_t size);
+extern "C" void* heap_realloc(void* oldBuffer, size_t size);
+extern "C" void heap_free(void* buffer);
 extern void dump_chunks(void);
 extern uint32 heap_available(void);
 
@@ -24,29 +25,29 @@ const int32	kHeapSize = 32 * 1024;
 int32 gVerbosity = 1;
 
 
-void 
-platform_release_heap(struct stage2_args *args, void *base)
+void
+platform_release_heap(struct stage2_args* args, void* base)
 {
 	free(base);
 }
 
 
-status_t 
-platform_init_heap(struct stage2_args *args, void **_base, void **_top)
+status_t
+platform_init_heap(struct stage2_args* args, void** _base, void** _top)
 {
-	void *base = malloc(kHeapSize);
+	void* base = malloc(kHeapSize);
 	if (base == NULL)
 		return B_NO_MEMORY;
 
 	*_base = base;
-	*_top = (void *)((uint8 *)base + kHeapSize);
+	*_top = (void*)((uint8*)base + kHeapSize);
 
 	return B_OK;
 }
 
 
 void
-panic(const char *format, ...)
+panic(const char* format, ...)
 {
 	va_list args;
 
@@ -58,32 +59,51 @@ panic(const char *format, ...)
 }
 
 
-//	#pragma mark -
+void
+dprintf(const char* format, ...)
+{
+	va_list args;
+
+	va_start(args, format);
+	vfprintf(stdout, format, args);
+	va_end(args);
+}
+
+
+// #pragma mark -
 
 
 static void
-dump_allocated_chunk(int32 index, void *buffer)
+dump_allocated_chunk(int32 index, void* buffer)
 {
 	if (buffer == NULL || gVerbosity < 3)
 		return;
 
-	size_t *size = (size_t *)((uint8 *)buffer - sizeof(uint32));
-	printf("\t%ld. allocation at %p, chunk at %p, size = %ld\n", index, buffer, size, *size);
+	size_t* size = (size_t*)((uint8*)buffer - sizeof(uint32));
+	printf("\t%ld. allocation at %p, chunk at %p, size = %ld\n", index, buffer,
+		size, *size);
 
 	if (gVerbosity > 3)
 		dump_chunks();
 }
 
 
-static void *
+static void*
 test_malloc(size_t bytes)
 {
 	return heap_malloc(bytes);
 }
 
 
+static void*
+test_realloc(void* oldBuffer, size_t size)
+{
+	return heap_realloc(oldBuffer, size);
+}
+
+
 static void
-test_free(void *buffer)
+test_free(void* buffer)
 {
 	if (gVerbosity > 4) {
 		printf("\tfreeing buffer at %p\n", buffer);
@@ -100,7 +120,7 @@ test_free(void *buffer)
 
 
 static int32
-random_allocations(void *array[], size_t maxSize)
+random_allocations(void* array[], size_t maxSize)
 {
 	printf("* random allocations (up to %ld bytes)\n", maxSize);
 
@@ -108,14 +128,14 @@ random_allocations(void *array[], size_t maxSize)
 	int32 count = 0;
 
 	for (int32 i = 0; i < 100; i++) {
-		size_t size = size_t(rand() * 1. * maxSize / RAND_MAX); 
+		size_t size = size_t(rand() * 1. * maxSize / RAND_MAX);
 		array[i] = test_malloc(size);
 		if (array[i] == NULL) {
 			if ((size > heap_available() || size == 0) && gVerbosity < 2)
 				continue;
 
 			printf(	"%ld. allocating %ld bytes failed (%ld bytes total allocated, "
-					"%ld free (%ld))\n", 
+					"%ld free (%ld))\n",
 					i, size, total, heap_available(), kHeapSize - total);
 		} else {
 			dump_allocated_chunk(i, array[i]);
@@ -134,7 +154,7 @@ random_allocations(void *array[], size_t maxSize)
 
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 	if (argc > 1)
 		gVerbosity = atoi(argv[1]);
@@ -153,7 +173,7 @@ main(int argc, char **argv)
 		dump_chunks();
 
 	puts("* simple allocation of 100 * 128 bytes");
-	void *array[100];
+	void* array[100];
 	for (int32 i = 0; i < 100; i++) {
 		array[i] = test_malloc(128);
 		dump_allocated_chunk(i, array[i]);
@@ -243,6 +263,30 @@ main(int argc, char **argv)
 			}
 		}
 	}
+
+	puts("* realloc() test");
+
+	uint8* buffer = (uint8*)test_malloc(1);
+	buffer[0] = 'h';
+
+	uint8* newBuffer = (uint8*)test_realloc(buffer, 2);
+	if (newBuffer != buffer)
+		panic("  could not reuse buffer");
+	newBuffer[1] = 'a';
+	newBuffer = (uint8*)test_realloc(buffer, 3);
+	if (newBuffer != buffer)
+		panic("  could not reuse buffer");
+	newBuffer[2] = 'i';
+	newBuffer = (uint8*)test_realloc(buffer, 4);
+	if (newBuffer != buffer)
+		panic("  could not reuse buffer");
+	newBuffer[3] = 'k';
+	newBuffer = (uint8*)test_realloc(buffer, 5);
+	if (newBuffer == buffer)
+		panic("  could reuse buffer!");
+	newBuffer[4] = 'u';
+	if (memcmp(newBuffer, "haiku", 5))
+		panic("  contents differ!");
 
 	heap_release(&args);
 	return 0;
