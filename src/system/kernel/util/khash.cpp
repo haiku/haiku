@@ -426,7 +426,7 @@ hash_dump_table(struct hash_table* table)
 			dprintf("%6lu:", i);
 			while (element != NULL) {
 				dprintf(" %p", element);
-				element = NEXT(table, element);
+				element = (hash_element*)NEXT(table, element);
 			}
 			dprintf("\n");
 		}
