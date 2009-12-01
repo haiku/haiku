@@ -242,6 +242,9 @@ mb_free_ext(struct mbuf *memoryBuffer)
 	} else if (memoryBuffer->m_ext.ext_type == EXT_JUMBO9) {
 		object_cache_free(sJumbo9ChunkCache, memoryBuffer->m_ext.ext_buf);
 		memoryBuffer->m_ext.ext_buf = NULL;
+	} else if (memoryBuffer->m_ext.ext_type == EXT_JUMBOP) {
+		object_cache_free(sJumboPageSizeCache, memoryBuffer->m_ext.ext_buf);
+		memoryBuffer->m_ext.ext_buf = NULL;
 	} else
 		panic("unknown type");
 
