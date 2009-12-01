@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,42 +23,45 @@
 #endif
 
 
-/* This is a very simple malloc()/free() implementation - it only
- * manages a free list.
- * After heap_init() is called, all free memory is contained in one
- * big chunk, the only entry in the free link list (which is a single
- * linked list).
- * When memory is allocated, the smallest free chunk that contains
- * the requested size is split (or taken as a whole if it can't be
- * splitted anymore), and it's lower half will be removed from the
- * free list.
- * The free list is ordered by size, starting with the smallest
- * free chunk available. When a chunk is freed, it will be joint
- * with its predecessor or successor, if possible.
- * To ease list handling, the list anchor itself is a free chunk with
- * size 0 that can't be allocated.
- */
+/*!	This is a very simple malloc()/free() implementation - it only
+	manages a free list.
+	After heap_init() is called, all free memory is contained in one
+	big chunk, the only entry in the free link list (which is a single
+	linked list).
+	When memory is allocated, the smallest free chunk that contains
+	the requested size is split (or taken as a whole if it can't be
+	splitted anymore), and it's lower half will be removed from the
+	free list.
+	The free list is ordered by size, starting with the smallest
+	free chunk available. When a chunk is freed, it will be joint
+	with its predecessor or successor, if possible.
+	To ease list handling, the list anchor itself is a free chunk with
+	size 0 that can't be allocated.
+*/
 
 #define DEBUG_ALLOCATIONS
 	// if defined, freed memory is filled with 0xcc
 
 struct free_chunk {
 	uint32		size;
-	free_chunk	*next;
+	free_chunk*	next;
 
-	uint32 Size() const;
-	free_chunk *Split(uint32 splitSize);
-	bool IsTouching(free_chunk *link);
-	free_chunk *Join(free_chunk *link);
-	void Remove(free_chunk *previous = NULL);
-	void Enqueue();
+	uint32		Size() const;
+	free_chunk*	Split(uint32 splitSize);
+	bool		IsTouching(free_chunk* link);
+	free_chunk*	Join(free_chunk* link);
+	void		Remove(free_chunk* previous = NULL);
+	void		Enqueue();
 
-	void *AllocatedAddress() const;
-	static free_chunk *SetToAllocated(void *allocated);
+	void*		AllocatedAddress() const;
+	static free_chunk* SetToAllocated(void* allocated);
 };
 
 
-static void *sHeapBase;
+const static uint32 kAlignment = 4;
+	// all memory chunks will be a multiple of this
+
+static void* sHeapBase;
 static uint32 /*sHeapSize,*/ sMaxHeapSize, sAvailable;
 static free_chunk sFreeAnchor;
 
@@ -76,10 +79,10 @@ free_chunk::Size() const
 /*!	Splits the upper half at the requested location
 	and returns it.
 */
-free_chunk *
+free_chunk*
 free_chunk::Split(uint32 splitSize)
 {
-	free_chunk *chunk = (free_chunk *)((uint8 *)this + sizeof(uint32) + splitSize);
+	free_chunk* chunk = (free_chunk*)((uint8*)this + sizeof(uint32) + splitSize);
 	chunk->size = size - splitSize - sizeof(uint32);
 	chunk->next = next;
 
@@ -93,11 +96,11 @@ free_chunk::Split(uint32 splitSize)
 	that they could be joined.
 */
 bool
-free_chunk::IsTouching(free_chunk *chunk)
+free_chunk::IsTouching(free_chunk* chunk)
 {
 	return chunk
-		&& (((uint8 *)this + size == (uint8 *)chunk)
-			|| (uint8 *)chunk + chunk->size == (uint8 *)this);
+		&& (((uint8*)this + size == (uint8*)chunk)
+			|| (uint8*)chunk + chunk->size == (uint8*)this);
 }
 
 
@@ -108,8 +111,8 @@ free_chunk::IsTouching(free_chunk *chunk)
 	doesn't work correctly. Use free_chunk::IsTouching()
 	to check if this method can be applied.
 */
-free_chunk *
-free_chunk::Join(free_chunk *chunk)
+free_chunk*
+free_chunk::Join(free_chunk* chunk)
 {
 	if (chunk < this) {
 		chunk->size += size;
@@ -126,11 +129,11 @@ free_chunk::Join(free_chunk *chunk)
 
 
 void
-free_chunk::Remove(free_chunk *previous)
+free_chunk::Remove(free_chunk* previous)
 {
 	if (previous == NULL) {
 		// find the previous chunk in the list
-		free_chunk *chunk = sFreeAnchor.next;
+		free_chunk* chunk = sFreeAnchor.next;
 
 		while (chunk != NULL && chunk != this) {
 			previous = chunk;
@@ -149,7 +152,8 @@ free_chunk::Remove(free_chunk *previous)
 void
 free_chunk::Enqueue()
 {
-	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
+	free_chunk* chunk = sFreeAnchor.next;
+	free_chunk* last = &sFreeAnchor;
 	while (chunk && chunk->Size() < size) {
 		last = chunk;
 		chunk = chunk->next;
@@ -164,17 +168,17 @@ free_chunk::Enqueue()
 }
 
 
-void *
+void*
 free_chunk::AllocatedAddress() const
 {
-	return (void *)&next;
+	return (void*)&next;
 }
 
 
-free_chunk *
-free_chunk::SetToAllocated(void *allocated)
+free_chunk*
+free_chunk::SetToAllocated(void* allocated)
 {
-	return (free_chunk *)((uint8 *)allocated - sizeof(uint32));
+	return (free_chunk*)((uint8*)allocated - sizeof(uint32));
 }
 
 
@@ -182,27 +186,28 @@ free_chunk::SetToAllocated(void *allocated)
 
 
 void
-heap_release(stage2_args *args)
+heap_release(stage2_args* args)
 {
 	platform_release_heap(args, sHeapBase);
 }
 
 
 status_t
-heap_init(stage2_args *args)
+heap_init(stage2_args* args)
 {
-	void *base, *top;
+	void* base;
+	void* top;
 	if (platform_init_heap(args, &base, &top) < B_OK)
 		return B_ERROR;
 
 	sHeapBase = base;
-	sMaxHeapSize = (uint8 *)top - (uint8 *)base;
+	sMaxHeapSize = (uint8*)top - (uint8*)base;
 	sAvailable = sMaxHeapSize - sizeof(uint32);
 
 	// declare the whole heap as one chunk, and add it
 	// to the free list
 
-	free_chunk *chunk = (free_chunk *)base;
+	free_chunk* chunk = (free_chunk*)base;
 	chunk->size = sMaxHeapSize;
 	chunk->next = NULL;
 
@@ -214,15 +219,15 @@ heap_init(stage2_args *args)
 
 
 #if 0
-char *
+char*
 grow_heap(uint32 bytes)
 {
-	char *start;
+	char* start;
 
 	if (sHeapSize + bytes > sMaxHeapSize)
 		return NULL;
 
-	start = (char *)sHeapBase + sHeapSize;
+	start = (char*)sHeapBase + sHeapSize;
 	memset(start, 0, bytes);
 	sHeapSize += bytes;
 
@@ -234,11 +239,13 @@ grow_heap(uint32 bytes)
 void
 dump_chunks(void)
 {
-	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
+	free_chunk* chunk = sFreeAnchor.next;
+	free_chunk* last = &sFreeAnchor;
 	while (chunk != NULL) {
 		last = chunk;
 
-		printf("\t%p: chunk size = %ld, end = %p, next = %p\n", chunk, chunk->size, (uint8 *)chunk + chunk->size, chunk->next);
+		printf("\t%p: chunk size = %ld, end = %p, next = %p\n", chunk,
+			chunk->size, (uint8*)chunk + chunk->size, chunk->next);
 		chunk = chunk->next;
 	}
 }
@@ -251,21 +258,22 @@ heap_available(void)
 }
 
 
-void *
+void*
 malloc(size_t size)
 {
 	if (sHeapBase == NULL || size == 0)
 		return NULL;
 
-	// align the size requirement to a 4 bytes boundary
-	size = (size + 3) & 0xfffffffc;
+	// align the size requirement to a kAlignment bytes boundary
+	size = (size - 1 + kAlignment) & ~(size_t)(kAlignment - 1);
 
 	if (size > sAvailable) {
 		dprintf("malloc(): Out of memory!\n");
 		return NULL;
 	}
 
-	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
+	free_chunk* chunk = sFreeAnchor.next;
+	free_chunk* last = &sFreeAnchor;
 	while (chunk && chunk->Size() < size) {
 		last = chunk;
 		chunk = chunk->next;
@@ -277,12 +285,12 @@ malloc(size_t size)
 		return NULL;
 	}
 
-	if (chunk->Size() > size + sizeof(free_chunk) + 4) {
+	if (chunk->Size() > size + sizeof(free_chunk) + kAlignment) {
 		// if this chunk is bigger than the requested size,
 		// we split it to form two chunks (with a minimal
-		// size of 4 allocatable bytes).
+		// size of kAlignment allocatable bytes).
 
-		free_chunk *freeChunk = chunk->Split(size);
+		free_chunk* freeChunk = chunk->Split(size);
 		last->next = freeChunk;
 
 		// re-enqueue the free chunk at the correct position
@@ -301,28 +309,37 @@ malloc(size_t size)
 }
 
 
-void *
-realloc(void *oldBuffer, size_t newSize)
+void*
+realloc(void* oldBuffer, size_t newSize)
 {
-	// ToDo: improve this implementation!
-
 	if (newSize == 0) {
 		TRACE("realloc(%p, %lu) -> NULL\n", oldBuffer, newSize);
 		free(oldBuffer);
 		return NULL;
 	}
 
-	void *newBuffer = malloc(newSize);
+	size_t copySize = newSize;
+	if (oldBuffer != NULL) {
+		free_chunk* oldChunk = free_chunk::SetToAllocated(oldBuffer);
+
+		// Check if the old buffer still fits, and if it makes sense to keep it
+		if (oldChunk->size >= newSize
+			&& (oldChunk->size < 128 || newSize > oldChunk->size / 3)) {
+			TRACE("realloc(%p, %lu) old buffer is large enough\n",
+				oldBuffer, newSize);
+			return oldChunk->AllocatedAddress();
+		}
+
+		if (copySize > oldChunk->size)
+			copySize = oldChunk->size;
+	}
+
+	void* newBuffer = malloc(newSize);
 	if (newBuffer == NULL)
 		return NULL;
 
-	if (oldBuffer) {
-		free_chunk *oldChunk = free_chunk::SetToAllocated(oldBuffer);
-
-		if (newSize > oldChunk->size)
-			newSize = oldChunk->size;
-
-		memcpy(newBuffer, oldBuffer, newSize);
+	if (oldBuffer != NULL) {
+		memcpy(newBuffer, oldBuffer, copySize);
 		free(oldBuffer);
 	}
 
@@ -332,20 +349,20 @@ realloc(void *oldBuffer, size_t newSize)
 
 
 void
-free(void *allocated)
+free(void* allocated)
 {
 	if (allocated == NULL)
 		return;
 
 	TRACE("free(%p)\n", allocated);
 
-	free_chunk *freedChunk = free_chunk::SetToAllocated(allocated);
+	free_chunk* freedChunk = free_chunk::SetToAllocated(allocated);
 
 #ifdef DEBUG_ALLOCATIONS
 	if (freedChunk->size > sMaxHeapSize)
 		panic("freed chunk %p clobbered (%lx)!\n", freedChunk, freedChunk->size);
 {
-	free_chunk *chunk = sFreeAnchor.next;
+	free_chunk* chunk = sFreeAnchor.next;
 	while (chunk) {
 		if (chunk->size > sMaxHeapSize || freedChunk == chunk)
 			panic("invalid chunk in free list, or double free\n");
@@ -359,7 +376,8 @@ free(void *allocated)
 	// try to join the new free chunk with an existing one
 	// it may be joined with up to two chunks
 
-	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
+	free_chunk* chunk = sFreeAnchor.next;
+	free_chunk* last = &sFreeAnchor;
 	int32 joinCount = 0;
 
 	while (chunk) {
