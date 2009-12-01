@@ -267,12 +267,9 @@ private:
 	mutex					fLock;
 };
 
-typedef VMCache vm_cache;
-	// TODO: Remove!
-
 
 #if DEBUG_CACHE_LIST
-extern vm_cache* gDebugCacheList;
+extern VMCache* gDebugCacheList;
 #endif
 
 

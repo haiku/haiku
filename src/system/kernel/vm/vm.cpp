@@ -128,7 +128,7 @@ public:
 		VMAddressSpace** _space = NULL);
 
 	status_t AddAreaCacheAndLock(area_id areaID, bool writeLockThisOne,
-		bool writeLockOthers, VMArea*& _area, vm_cache** _cache = NULL);
+		bool writeLockOthers, VMArea*& _area, VMCache** _cache = NULL);
 
 	status_t Lock();
 	void Unlock();
@@ -158,33 +158,33 @@ private:
 
 class AreaCacheLocking {
 public:
-	inline bool Lock(vm_cache* lockable)
+	inline bool Lock(VMCache* lockable)
 	{
 		return false;
 	}
 
-	inline void Unlock(vm_cache* lockable)
+	inline void Unlock(VMCache* lockable)
 	{
 		vm_area_put_locked_cache(lockable);
 	}
 };
 
-class AreaCacheLocker : public AutoLocker<vm_cache, AreaCacheLocking> {
+class AreaCacheLocker : public AutoLocker<VMCache, AreaCacheLocking> {
 public:
-	inline AreaCacheLocker(vm_cache* cache = NULL)
-		: AutoLocker<vm_cache, AreaCacheLocking>(cache, true)
+	inline AreaCacheLocker(VMCache* cache = NULL)
+		: AutoLocker<VMCache, AreaCacheLocking>(cache, true)
 	{
 	}
 
 	inline AreaCacheLocker(VMArea* area)
-		: AutoLocker<vm_cache, AreaCacheLocking>()
+		: AutoLocker<VMCache, AreaCacheLocking>()
 	{
 		SetTo(area);
 	}
 
 	inline void SetTo(VMArea* area)
 	{
-		return AutoLocker<vm_cache, AreaCacheLocking>::SetTo(
+		return AutoLocker<VMCache, AreaCacheLocking>::SetTo(
 			area != NULL ? vm_area_get_locked_cache(area) : NULL, true, true);
 	}
 };
@@ -205,7 +205,7 @@ static uint32 sPageFaults;
 #if DEBUG_CACHE_LIST
 
 struct cache_info {
-	vm_cache*	cache;
+	VMCache*	cache;
 	addr_t		page_count;
 	addr_t		committed;
 };
@@ -222,7 +222,7 @@ static VMAddressSpace* get_address_space_by_area_id(area_id id);
 static status_t vm_soft_fault(VMAddressSpace* addressSpace, addr_t address,
 	bool isWrite, bool isUser);
 static status_t map_backing_store(VMAddressSpace* addressSpace,
-	vm_cache* cache, void** _virtualAddress, off_t offset, addr_t size,
+	VMCache* cache, void** _virtualAddress, off_t offset, addr_t size,
 	uint32 addressSpec, int wiring, int protection, int mapping,
 	VMArea** _area, const char* areaName, bool unmapAddressRange, bool kernel);
 
@@ -673,7 +673,7 @@ MultiAddressSpaceLocker::Unlock()
 status_t
 MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 	bool writeLockThisOne, bool writeLockOthers, VMArea*& _area,
-	vm_cache** _cache)
+	VMCache** _cache)
 {
 	// remember the original state
 	int originalCount = fCount;
@@ -687,7 +687,7 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 	ArrayDeleter<lock_item> _(originalItems);
 
 	// get the cache
-	vm_cache* cache;
+	VMCache* cache;
 	VMArea* area;
 	status_t error;
 	{
@@ -732,7 +732,7 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 		}
 
 		// lock the cache
-		vm_cache* oldCache = cache;
+		VMCache* oldCache = cache;
 		cache = vm_area_get_locked_cache(area);
 
 		// If neither the area's cache has changed nor its area list we're
@@ -1451,7 +1451,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	}
 
 	AreaCacheLocker cacheLocker(area);
-	vm_cache* cache = area->cache;
+	VMCache* cache = area->cache;
 
 	// Cut the end only?
 	if (areaLast <= lastAddress) {
@@ -1614,7 +1614,7 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 	Note, that in case of error your cache will be temporarily unlocked.
 */
 static status_t
-map_backing_store(VMAddressSpace* addressSpace, vm_cache* cache,
+map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 	void** _virtualAddress, off_t offset, addr_t size, uint32 addressSpec,
 	int wiring, int protection, int mapping, VMArea** _area,
 	const char* areaName, bool unmapAddressRange, bool kernel)
@@ -1634,9 +1634,9 @@ map_backing_store(VMAddressSpace* addressSpace, vm_cache* cache,
 
 	// if this is a private map, we need to create a new cache
 	// to handle the private copies of pages as they are written to
-	vm_cache* sourceCache = cache;
+	VMCache* sourceCache = cache;
 	if (mapping == REGION_PRIVATE_MAP) {
-		vm_cache* newCache;
+		VMCache* newCache;
 
 		// create an anonymous cache
 		status = VMCacheFactory::CreateAnonymousCache(newCache,
@@ -1739,7 +1739,7 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 	VMAddressSpace* addressSpace = locker.AddressSpace();
 
 	// create an anonymous cache
-	vm_cache* cache;
+	VMCache* cache;
 	status = VMCacheFactory::CreateAnonymousCache(cache, false, 0, 0, false);
 	if (status != B_OK)
 		return status;
@@ -1853,7 +1853,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 	addr_t physicalAddress, uint32 flags, bool kernel)
 {
 	VMArea* area;
-	vm_cache* cache;
+	VMCache* cache;
 	vm_page* page = NULL;
 	bool isStack = (protection & B_STACK_AREA) != 0;
 	page_num_t guardPages;
@@ -2182,7 +2182,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	uint32 addressSpec, addr_t size, uint32 protection, addr_t physicalAddress)
 {
 	VMArea* area;
-	vm_cache* cache;
+	VMCache* cache;
 	addr_t mapOffset;
 
 	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, "
@@ -2295,7 +2295,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	}
 
 	// create a device cache
-	vm_cache* cache;
+	VMCache* cache;
 	status_t result = VMCacheFactory::CreateDeviceCache(cache,
 		(addr_t)vecs[0].iov_base);
 	if (result != B_OK)
@@ -2360,7 +2360,7 @@ vm_create_null_area(team_id team, const char* name, void** address,
 	uint32 addressSpec, addr_t size)
 {
 	VMArea* area;
-	vm_cache* cache;
+	VMCache* cache;
 	status_t status;
 
 	AddressSpaceWriteLocker locker(team);
@@ -2523,7 +2523,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 		return B_BAD_TEAM_ID;
 
 	// TODO: this only works for file systems that use the file cache
-	vm_cache* cache;
+	VMCache* cache;
 	status = vfs_get_vnode_cache(vnode, &cache, false);
 	if (status < B_OK)
 		return status;
@@ -2573,13 +2573,13 @@ vm_map_file(team_id aid, const char* name, void** address, uint32 addressSpec,
 }
 
 
-vm_cache*
+VMCache*
 vm_area_get_locked_cache(VMArea* area)
 {
 	mutex_lock(&sAreaCacheLock);
 
 	while (true) {
-		vm_cache* cache = area->cache;
+		VMCache* cache = area->cache;
 
 		if (!cache->SwitchLock(&sAreaCacheLock)) {
 			// cache has been deleted
@@ -2602,7 +2602,7 @@ vm_area_get_locked_cache(VMArea* area)
 
 
 void
-vm_area_put_locked_cache(vm_cache* cache)
+vm_area_put_locked_cache(VMCache* cache)
 {
 	cache->ReleaseRefAndUnlock();
 }
@@ -2655,7 +2655,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 	if (!kernel && (sourceArea->protection & B_KERNEL_AREA) != 0)
 		return B_NOT_ALLOWED;
 
-	vm_cache* cache = vm_area_get_locked_cache(sourceArea);
+	VMCache* cache = vm_area_get_locked_cache(sourceArea);
 
 	// TODO: for now, B_USER_CLONEABLE is disabled, until all drivers
 	//	have been adapted. Maybe it should be part of the kernel settings,
@@ -2830,9 +2830,9 @@ vm_delete_area(team_id team, area_id id, bool kernel)
 	- All of the cache's areas' address spaces must be read locked.
 */
 static status_t
-vm_copy_on_write_area(vm_cache* lowerCache)
+vm_copy_on_write_area(VMCache* lowerCache)
 {
-	vm_cache* upperCache;
+	VMCache* upperCache;
 
 	TRACE(("vm_copy_on_write_area(cache = %p)\n", lowerCache));
 
@@ -2909,7 +2909,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	// the source cache, and the cache itself.
 	MultiAddressSpaceLocker locker;
 	VMAddressSpace* targetAddressSpace;
-	vm_cache* cache;
+	VMCache* cache;
 	VMArea* source;
 	status_t status = locker.AddTeam(team, true, &targetAddressSpace);
 	if (status == B_OK) {
@@ -2962,7 +2962,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 
 //! You need to hold the cache lock when calling this function
 static int32
-count_writable_areas(vm_cache* cache, VMArea* ignoreArea)
+count_writable_areas(VMCache* cache, VMArea* ignoreArea)
 {
 	struct VMArea* area = cache->areas;
 	uint32 count = 0;
@@ -2989,7 +2989,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 
 	// lock address spaces and cache
 	MultiAddressSpaceLocker locker;
-	vm_cache* cache;
+	VMCache* cache;
 	VMArea* area;
 	status_t status = locker.AddAreaCacheAndLock(areaID, true, false, area,
 		&cache);
@@ -3620,8 +3620,8 @@ display_mem(int argc, char** argv)
 
 
 static void
-dump_cache_tree_recursively(vm_cache* cache, int level,
-	vm_cache* highlightCache)
+dump_cache_tree_recursively(VMCache* cache, int level,
+	VMCache* highlightCache)
 {
 	// print this cache
 	for (int i = 0; i < level; i++)
@@ -3632,8 +3632,8 @@ dump_cache_tree_recursively(vm_cache* cache, int level,
 		kprintf("%p\n", cache);
 
 	// recursively print its consumers
-	vm_cache* consumer = NULL;
-	while ((consumer = (vm_cache*)list_get_next_item(&cache->consumers,
+	VMCache* consumer = NULL;
+	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
 			consumer)) != NULL) {
 		dump_cache_tree_recursively(consumer, level + 1, highlightCache);
 	}
@@ -3652,8 +3652,8 @@ dump_cache_tree(int argc, char** argv)
 	if (address == 0)
 		return 0;
 
-	vm_cache* cache = (vm_cache*)address;
-	vm_cache* root = cache;
+	VMCache* cache = (VMCache*)address;
+	VMCache* root = cache;
 
 	// find the root cache (the transitive source)
 	while (root->source != NULL)
@@ -3687,15 +3687,15 @@ cache_type_to_string(int32 type)
 #if DEBUG_CACHE_LIST
 
 static void
-update_cache_info_recursively(vm_cache* cache, cache_info& info)
+update_cache_info_recursively(VMCache* cache, cache_info& info)
 {
 	info.page_count += cache->page_count;
 	if (cache->type == CACHE_TYPE_RAM)
 		info.committed += cache->committed_size;
 
 	// recurse
-	vm_cache* consumer = NULL;
-	while ((consumer = (vm_cache*)list_get_next_item(&cache->consumers,
+	VMCache* consumer = NULL;
+	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
 			consumer)) != NULL) {
 		update_cache_info_recursively(consumer, info);
 	}
@@ -3725,7 +3725,7 @@ cache_info_compare_committed(const void* _a, const void* _b)
 
 
 static void
-dump_caches_recursively(vm_cache* cache, cache_info& info, int level)
+dump_caches_recursively(VMCache* cache, cache_info& info, int level)
 {
 	for (int i = 0; i < level; i++)
 		kprintf("  ");
@@ -3759,8 +3759,8 @@ dump_caches_recursively(vm_cache* cache, cache_info& info, int level)
 	kputs("\n");
 
 	// recurse
-	vm_cache* consumer = NULL;
-	while ((consumer = (vm_cache*)list_get_next_item(&cache->consumers,
+	VMCache* consumer = NULL;
+	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
 			consumer)) != NULL) {
 		dump_caches_recursively(consumer, info, level + 1);
 	}
@@ -3791,7 +3791,7 @@ dump_caches(int argc, char** argv)
 	off_t totalCommitted = 0;
 	page_num_t totalPages = 0;
 
-	vm_cache* cache = gDebugCacheList;
+	VMCache* cache = gDebugCacheList;
 	while (cache) {
 		totalCount++;
 		if (cache->source == NULL) {
@@ -3840,7 +3840,7 @@ dump_caches(int argc, char** argv)
 static int
 dump_cache(int argc, char** argv)
 {
-	vm_cache* cache;
+	VMCache* cache;
 	bool showPages = false;
 	int i = 1;
 
@@ -3868,7 +3868,7 @@ dump_cache(int argc, char** argv)
 	if (address == 0)
 		return 0;
 
-	cache = (vm_cache*)address;
+	cache = (VMCache*)address;
 
 	kprintf("CACHE %p:\n", cache);
 	kprintf("  ref_count:    %ld\n", cache->RefCount());
@@ -3892,8 +3892,8 @@ dump_cache(int argc, char** argv)
 	}
 
 	kprintf("  consumers:\n");
-	vm_cache* consumer = NULL;
-	while ((consumer = (vm_cache*)list_get_next_item(&cache->consumers,
+	VMCache* consumer = NULL;
+	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
 				consumer)) != NULL) {
 		kprintf("\t%p\n", consumer);
 	}
@@ -4545,11 +4545,11 @@ vm_init(kernel_args* args)
 	add_debugger_command("areas", &dump_area_list, "Dump a list of all areas");
 	add_debugger_command("area", &dump_area,
 		"Dump info about a particular area");
-	add_debugger_command("cache", &dump_cache, "Dump vm_cache");
-	add_debugger_command("cache_tree", &dump_cache_tree, "Dump vm_cache tree");
+	add_debugger_command("cache", &dump_cache, "Dump VMCache");
+	add_debugger_command("cache_tree", &dump_cache_tree, "Dump VMCache tree");
 #if DEBUG_CACHE_LIST
 	add_debugger_command_etc("caches", &dump_caches,
-		"List all vm_cache trees",
+		"List all VMCache trees",
 		"[ \"-c\" ]\n"
 		"All cache trees are listed sorted in decreasing order by number of\n"
 		"used pages or, if \"-c\" is specified, by size of committed memory.\n",
@@ -4845,7 +4845,7 @@ struct PageFaultContext {
 	VMCacheChainLocker		cacheChainLocker;
 
 	vm_translation_map*		map;
-	vm_cache*				topCache;
+	VMCache*				topCache;
 	off_t					cacheOffset;
 	bool					isWrite;
 
@@ -4901,8 +4901,8 @@ struct PageFaultContext {
 static inline status_t
 fault_get_page(PageFaultContext& context)
 {
-	vm_cache* cache = context.topCache;
-	vm_cache* lastCache = NULL;
+	VMCache* cache = context.topCache;
+	VMCache* lastCache = NULL;
 	vm_page* page = NULL;
 
 	while (cache != NULL) {
@@ -5387,7 +5387,7 @@ fill_area_info(struct VMArea* area, area_info* info, size_t size)
 	info->out_count = 0;
 		// TODO: retrieve real values here!
 
-	vm_cache* cache = vm_area_get_locked_cache(area);
+	VMCache* cache = vm_area_get_locked_cache(area);
 
 	// Note, this is a simplification; the cache could be larger than this area
 	info->ram_size = cache->page_count * B_PAGE_SIZE;
@@ -5434,7 +5434,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 	// lock all affected address spaces and the cache
 	VMArea* area;
-	vm_cache* cache;
+	VMCache* cache;
 
 	MultiAddressSpaceLocker locker;
 	status_t status = locker.AddAreaCacheAndLock(areaID, true, true, area,
@@ -6633,7 +6633,7 @@ _user_sync_memory(void* _address, size_t size, int flags)
 		AreaCacheLocker cacheLocker(area);
 		if (!cacheLocker)
 			return B_BAD_VALUE;
-		vm_cache* cache = area->cache;
+		VMCache* cache = area->cache;
 
 		locker.Unlock();
 

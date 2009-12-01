@@ -269,7 +269,7 @@ private:
 
 struct vnode : fs_vnode, DoublyLinkedListLinkImpl<vnode> {
 	struct vnode*	next;
-	vm_cache*		cache;
+	VMCache*		cache;
 	dev_t			device;
 	list_link		unused_link;
 	ino_t			id;
@@ -1111,7 +1111,7 @@ free_vnode(struct vnode* vnode, bool reenter)
 	hash_remove(sVnodeTable, vnode);
 	mutex_unlock(&sVnodeMutex);
 
-	// if we have a vm_cache attached, remove it
+	// if we have a VMCache attached, remove it
 	if (vnode->cache)
 		vnode->cache->ReleaseRef();
 
@@ -4459,13 +4459,13 @@ vfs_write_pages(struct vnode* vnode, void* cookie, off_t pos, const iovec* vecs,
 }
 
 
-/*!	Gets the vnode's vm_cache object. If it didn't have one, it will be
+/*!	Gets the vnode's VMCache object. If it didn't have one, it will be
 	created if \a allocate is \c true.
 	In case it's successful, it will also grab a reference to the cache
 	it returns.
 */
 extern "C" status_t
-vfs_get_vnode_cache(struct vnode* vnode, vm_cache** _cache, bool allocate)
+vfs_get_vnode_cache(struct vnode* vnode, VMCache** _cache, bool allocate)
 {
 	if (vnode->cache != NULL) {
 		vnode->cache->AcquireRef();

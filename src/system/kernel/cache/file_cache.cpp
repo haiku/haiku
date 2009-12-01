@@ -43,7 +43,7 @@
 #define LAST_ACCESSES		3
 
 struct file_cache_ref {
-	vm_cache		*cache;
+	VMCache			*cache;
 	struct vnode	*vnode;
 	off_t			last_access[LAST_ACCESSES];
 		// TODO: it would probably be enough to only store the least
@@ -286,7 +286,7 @@ static void
 reserve_pages(file_cache_ref* ref, size_t reservePages, bool isWrite)
 {
 	if (low_resource_state(B_KERNEL_RESOURCE_PAGES) != B_NO_LOW_RESOURCE) {
-		vm_cache* cache = ref->cache;
+		VMCache* cache = ref->cache;
 		cache->Lock();
 
 		if (list_is_empty(&cache->consumers) && cache->areas == NULL
@@ -374,7 +374,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	TRACE(("read_into_cache(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
 		"bufferSize = %lu\n", offset, pageOffset, buffer, bufferSize));
 
-	vm_cache* cache = ref->cache;
+	VMCache* cache = ref->cache;
 
 	// TODO: We're using way too much stack! Rather allocate a sufficiently
 	// large chunk on the heap.
@@ -720,7 +720,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 		panic("cache_io() called with NULL ref!\n");
 
 	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
-	vm_cache* cache = ref->cache;
+	VMCache* cache = ref->cache;
 	off_t fileSize = cache->virtual_end;
 	bool useBuffer = buffer != 0;
 
@@ -945,7 +945,7 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 	if (size == 0)
 		return;
 
-	vm_cache* cache;
+	VMCache* cache;
 	if (vfs_get_vnode_cache(vnode, &cache, false) != B_OK)
 		return;
 
@@ -1036,7 +1036,7 @@ cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size)
 
 
 extern "C" void
-cache_node_opened(struct vnode* vnode, int32 fdType, vm_cache* cache,
+cache_node_opened(struct vnode* vnode, int32 fdType, VMCache* cache,
 	dev_t mountID, ino_t parentID, ino_t vnodeID, const char* name)
 {
 	if (sCacheModule == NULL || sCacheModule->node_opened == NULL)
@@ -1055,7 +1055,7 @@ cache_node_opened(struct vnode* vnode, int32 fdType, vm_cache* cache,
 
 
 extern "C" void
-cache_node_closed(struct vnode* vnode, int32 fdType, vm_cache* cache,
+cache_node_closed(struct vnode* vnode, int32 fdType, VMCache* cache,
 	dev_t mountID, ino_t vnodeID)
 {
 	if (sCacheModule == NULL || sCacheModule->node_closed == NULL)
@@ -1118,7 +1118,7 @@ file_cache_create(dev_t mountID, ino_t vnodeID, off_t size)
 	ref->last_access_index = 0;
 	ref->disabled_count = 0;
 
-	// TODO: delay vm_cache creation until data is
+	// TODO: delay VMCache creation until data is
 	//	requested/written for the first time? Listing lots of
 	//	files in Tracker (and elsewhere) could be slowed down.
 	//	Since the file_cache_ref itself doesn't have a lock,

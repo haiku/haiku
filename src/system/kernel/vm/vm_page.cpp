@@ -1437,7 +1437,7 @@ page_writer(void* /*unused*/)
 			if (!cacheLocker.IsLocked())
 				continue;
 
-			vm_cache *cache = page->cache;
+			VMCache *cache = page->cache;
 
 			// Don't write back wired (locked) pages and don't write RAM pages
 			// until we're low on pages. Also avoid writing temporary pages that
@@ -1696,7 +1696,7 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 
 
 /*!	Writes a range of modified pages of a cache to disk.
-	You need to hold the vm_cache lock when calling this function.
+	You need to hold the VMCache lock when calling this function.
 	Note that the cache lock is released in this function.
 	\param cache The cache.
 	\param firstPage Offset (in page size units) of the first page in the range.
@@ -1810,11 +1810,11 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 }
 
 
-/*!	You need to hold the vm_cache lock when calling this function.
+/*!	You need to hold the VMCache lock when calling this function.
 	Note that the cache lock is released in this function.
 */
 status_t
-vm_page_write_modified_pages(vm_cache *cache)
+vm_page_write_modified_pages(VMCache *cache)
 {
 	return vm_page_write_modified_page_range(cache, 0,
 		(cache->virtual_end + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
@@ -2364,7 +2364,7 @@ vm_lookup_page(addr_t pageNumber)
 	if the page does not equal PAGE_STATE_MODIFIED.
 */
 void
-vm_page_free(vm_cache *cache, vm_page *page)
+vm_page_free(VMCache *cache, vm_page *page)
 {
 	MutexLocker _(sPageLock);
 

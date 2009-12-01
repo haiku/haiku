@@ -81,7 +81,7 @@ PageCacheLocker::Lock(vm_page* page, bool dontWait)
 		return false;
 
 	// Grab a reference to this cache.
-	vm_cache* cache = vm_cache_acquire_locked_page_cache(page, dontWait);
+	VMCache* cache = vm_cache_acquire_locked_page_cache(page, dontWait);
 	if (cache == NULL)
 		return false;
 

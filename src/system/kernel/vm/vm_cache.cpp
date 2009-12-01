@@ -40,7 +40,7 @@
 #if DEBUG_CACHE_LIST
 VMCache* gDebugCacheList;
 #endif
-static mutex sCacheListLock = MUTEX_INITIALIZER("global vm_cache list");
+static mutex sCacheListLock = MUTEX_INITIALIZER("global VMCache list");
 	// The lock is also needed when the debug feature is disabled.
 
 
@@ -323,7 +323,7 @@ vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 	mutex_lock(&sCacheListLock);
 
 	while (dontWait) {
-		vm_cache* cache = page->cache;
+		VMCache* cache = page->cache;
 		if (cache == NULL || !cache->TryLock()) {
 			mutex_unlock(&sCacheListLock);
 			return NULL;
@@ -340,7 +340,7 @@ vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 	}
 
 	while (true) {
-		vm_cache* cache = page->cache;
+		VMCache* cache = page->cache;
 		if (cache == NULL) {
 			mutex_unlock(&sCacheListLock);
 			return NULL;
@@ -392,7 +392,7 @@ VMCache::~VMCache()
 status_t
 VMCache::Init(uint32 cacheType)
 {
-	mutex_init(&fLock, "vm_cache");
+	mutex_init(&fLock, "VMCache");
 	VMCache dummyCache;
 	list_init_etc(&consumers, offset_of_member(dummyCache, consumer_link));
 	areas = NULL;
