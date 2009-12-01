@@ -56,9 +56,10 @@ init_condition_variables()
 void
 uninit_condition_variables()
 {
-	InterruptsSpinLocker _(sConditionVariablesLock);
 	ConditionVariableHashDefinition definition;
+	InterruptsSpinLocker hashLocker(sConditionVariablesLock);
 	ConditionVariable* variable = sConditionVariableHash.Clear(true);
+	hashLocker.Unlock();
 
 	while (variable != NULL) {
 		ConditionVariable* next = definition.GetLink(variable);
@@ -88,9 +89,10 @@ _cv_init(const void* object, const char* description)
 void
 _cv_destroy(const void* object)
 {
-	InterruptsSpinLocker _(sConditionVariablesLock);
+	InterruptsSpinLocker hashLocker(sConditionVariablesLock);
 	ConditionVariable* conditionVariable 
 		= sConditionVariableHash.Lookup(object);
+	hashLocker.Unlock();
 	if (conditionVariable == NULL)
 		return;
 
@@ -114,7 +116,7 @@ _cv_timedwait_unlocked(const void* object, int timeout)
 {
 	ConditionVariableEntry conditionVariableEntry;
 	
-	status_t status = conditionVariableEntry.Wait(object, B_ABSOLUTE_TIMEOUT,
+	status_t status = conditionVariableEntry.Wait(object, B_RELATIVE_TIMEOUT,
 		ticks_to_usecs(timeout));
 
 	if (status == B_OK)
