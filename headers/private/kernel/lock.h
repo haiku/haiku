@@ -22,6 +22,7 @@ typedef struct mutex {
 	thread_id				holder;
 #else
 	int32					count;
+	uint16					ignore_unlock_count;
 #endif
 	uint8					flags;
 } mutex;
@@ -81,7 +82,7 @@ typedef struct rw_lock {
 #	define MUTEX_INITIALIZER(name)			{ name, NULL, -1, 0 }
 #	define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), 0 }
 #else
-#	define MUTEX_INITIALIZER(name)			{ name, NULL, 0, 0 }
+#	define MUTEX_INITIALIZER(name)			{ name, NULL, 0, 0, 0 }
 #	define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), -1, 0 }
 #endif
 
@@ -132,6 +133,8 @@ extern status_t mutex_switch_lock(mutex* from, mutex* to);
 extern status_t _mutex_lock(mutex* lock, bool threadsLocked);
 extern void _mutex_unlock(mutex* lock, bool threadsLocked);
 extern status_t _mutex_trylock(mutex* lock);
+extern status_t _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags,
+	bigtime_t timeout);
 
 
 static inline status_t
@@ -168,6 +171,19 @@ mutex_trylock(mutex* lock)
 #else
 	if (atomic_test_and_set(&lock->count, -1, 0) != 0)
 		return B_WOULD_BLOCK;
+	return B_OK;
+#endif
+}
+
+
+static inline status_t
+mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
+{
+#if KDEBUG
+	return _mutex_lock_with_timeout(lock, timeoutFlags, timeout);
+#else
+	if (atomic_add(&lock->count, -1) < 0)
+		return _mutex_lock_with_timeout(lock, timeoutFlags, timeout);
 	return B_OK;
 #endif
 }

@@ -431,6 +431,7 @@ mutex_init(mutex* lock, const char *name)
 	lock->holder = -1;
 #else
 	lock->count = 0;
+	lock->ignore_unlock_count = 0;
 #endif
 	lock->flags = 0;
 
@@ -448,6 +449,7 @@ mutex_init_etc(mutex* lock, const char *name, uint32 flags)
 	lock->holder = -1;
 #else
 	lock->count = 0;
+	lock->ignore_unlock_count = 0;
 #endif
 	lock->flags = flags & MUTEX_FLAG_CLONE_NAME;
 
@@ -574,6 +576,11 @@ _mutex_unlock(mutex* lock, bool threadsLocked)
 			lock, lock->holder);
 		return;
 	}
+#else
+	if (lock->ignore_unlock_count > 0) {
+		lock->ignore_unlock_count--;
+		return;
+	}
 #endif
 
 	mutex_waiter* waiter = lock->waiters;
@@ -617,6 +624,97 @@ _mutex_trylock(mutex* lock)
 	}
 #endif
 	return B_WOULD_BLOCK;
+}
+
+
+status_t
+_mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
+{
+#if KDEBUG
+	if (!gKernelStartup && !are_interrupts_enabled()) {
+		panic("_mutex_lock(): called with interrupts disabled for lock %p",
+			lock);
+	}
+#endif
+
+	InterruptsSpinLocker locker(gThreadSpinlock);
+
+	// Might have been released after we decremented the count, but before
+	// we acquired the spinlock.
+#if KDEBUG
+	if (lock->holder < 0) {
+		lock->holder = thread_get_current_thread_id();
+		return B_OK;
+	} else if (lock->holder == thread_get_current_thread_id()) {
+		panic("_mutex_lock(): double lock of %p by thread %ld", lock,
+			lock->holder);
+	} else if (lock->holder == 0)
+		panic("_mutex_lock(): using unitialized lock %p", lock);
+#else
+	if ((lock->flags & MUTEX_FLAG_RELEASED) != 0) {
+		lock->flags &= ~MUTEX_FLAG_RELEASED;
+		return B_OK;
+	}
+#endif
+
+	// enqueue in waiter list
+	mutex_waiter waiter;
+	waiter.thread = thread_get_current_thread();
+	waiter.next = NULL;
+
+	if (lock->waiters != NULL) {
+		lock->waiters->last->next = &waiter;
+	} else
+		lock->waiters = &waiter;
+
+	lock->waiters->last = &waiter;
+
+	// block
+	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_MUTEX, lock);
+	status_t error = thread_block_with_timeout_locked(timeoutFlags, timeout);
+
+	if (error == B_OK) {
+#if KDEBUG
+		lock->holder = waiter.thread->id;
+#endif
+	} else {
+		// If the timeout occurred, we must remove our waiter structure from
+		// the queue.
+		mutex_waiter* previousWaiter = NULL;
+		mutex_waiter* otherWaiter = lock->waiters;
+		while (otherWaiter != NULL && otherWaiter != &waiter) {
+			previousWaiter = otherWaiter;
+			otherWaiter = otherWaiter->next;
+		}
+		if (otherWaiter == &waiter) {
+			// the structure is still in the list -- dequeue
+			if (&waiter == lock->waiters) {
+				if (waiter.next != NULL)
+					waiter.next->last = waiter.last;
+				lock->waiters = waiter.next;
+			} else {
+				if (waiter.next == NULL)
+					lock->waiters->last = previousWaiter;
+				previousWaiter->next = waiter.next;
+			}
+
+#if !KDEBUG
+			// we need to fix the lock count
+			if (atomic_add(&lock->count, 1) == -1) {
+				// This means we were the only thread waiting for the lock and
+				// the lock owner has already called atomic_add() in
+				// mutex_unlock(). That is we probably would get the lock very
+				// soon (if the lock holder has a low priority, that might
+				// actually take rather long, though), but the timeout already
+				// occurred, so we don't try to wait. Just increment the ignore
+				// unlock count.
+				lock->ignore_unlock_count++;
+			}
+#endif
+		}
+	}
+
+	return error;
 }
 
 
