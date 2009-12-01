@@ -617,7 +617,7 @@ arch_vm_init_post_modules(kernel_args *args)
 
 
 void
-arch_vm_aspace_swap(struct vm_address_space *from, struct vm_address_space *to)
+arch_vm_aspace_swap(struct VMAddressSpace *from, struct VMAddressSpace *to)
 {
 	// This functions is only invoked when a userland thread is in the process
 	// of dying. It switches to the kernel team and does whatever cleanup is

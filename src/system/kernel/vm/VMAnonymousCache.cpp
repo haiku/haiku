@@ -684,7 +684,7 @@ VMAnonymousCache::CanWritePage(off_t offset)
 
 
 status_t
-VMAnonymousCache::Fault(struct vm_address_space *aspace, off_t offset)
+VMAnonymousCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 {
 	if (fCanOvercommit && LookupPage(offset) == NULL && !HasPage(offset)) {
 		if (fGuardedSize > 0) {

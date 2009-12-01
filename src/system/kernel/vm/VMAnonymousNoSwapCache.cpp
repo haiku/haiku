@@ -113,7 +113,7 @@ VMAnonymousNoSwapCache::Write(off_t offset, const iovec *vecs, size_t count,
 
 
 status_t
-VMAnonymousNoSwapCache::Fault(struct vm_address_space *aspace, off_t offset)
+VMAnonymousNoSwapCache::Fault(struct VMAddressSpace *aspace, off_t offset)
 {
 	if (fCanOvercommit) {
 		if (fGuardedSize > 0) {

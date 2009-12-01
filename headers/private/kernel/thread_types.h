@@ -187,7 +187,7 @@ struct team {
 	team_job_control_children *continued_children;
 	struct job_control_entry* job_control_entry;
 
-	struct vm_address_space *address_space;
+	struct VMAddressSpace *address_space;
 	struct thread	*main_thread;
 	struct thread	*thread_list;
 	struct team_loading_info *loading_info;

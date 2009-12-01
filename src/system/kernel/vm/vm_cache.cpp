@@ -915,7 +915,7 @@ VMCache::CanWritePage(off_t offset)
 
 
 status_t
-VMCache::Fault(struct vm_address_space *aspace, off_t offset)
+VMCache::Fault(struct VMAddressSpace *aspace, off_t offset)
 {
 	return B_BAD_ADDRESS;
 }

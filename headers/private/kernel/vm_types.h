@@ -225,7 +225,7 @@ public:
 	virtual	int32			MaxPagesPerAsyncWrite() const
 								{ return -1; } // no restriction
 
-	virtual	status_t		Fault(struct vm_address_space *aspace,
+	virtual	status_t		Fault(struct VMAddressSpace *aspace,
 								off_t offset);
 
 	virtual	void			Merge(VMCache* source);
@@ -305,7 +305,7 @@ struct vm_area {
 	vm_area_mappings		mappings;
 	uint8*					page_protections;
 
-	struct vm_address_space* address_space;
+	struct VMAddressSpace*	address_space;
 	struct vm_area*			address_space_next;
 	struct vm_area*			cache_next;
 	struct vm_area*			cache_prev;
@@ -318,7 +318,7 @@ enum {
 	VM_ASPACE_STATE_DELETION
 };
 
-struct vm_address_space {
+struct VMAddressSpace {
 	struct vm_area*			areas;
 	struct vm_area*			area_hint;
 	rw_lock					lock;
@@ -330,7 +330,7 @@ struct vm_address_space {
 	int32					ref_count;
 	int32					fault_count;
 	int32					state;
-	struct vm_address_space* hash_next;
+	struct VMAddressSpace*	hash_next;
 };
 
 

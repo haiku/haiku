@@ -681,7 +681,7 @@ ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
 	virtualAddress = ROUNDDOWN(virtualAddress, B_PAGE_SIZE);
 	physicalAddress = ROUNDDOWN(physicalAddress, B_PAGE_SIZE);
 
-	vm_address_space *addressSpace = vm_kernel_address_space();
+	VMAddressSpace *addressSpace = vm_kernel_address_space();
 
 	// map the pages
 	for (; virtualAddress < virtualEnd;
@@ -703,7 +703,7 @@ ppc_unmap_address_range(addr_t virtualAddress, size_t size)
 	addr_t virtualEnd = ROUNDUP(virtualAddress + size, B_PAGE_SIZE);
 	virtualAddress = ROUNDDOWN(virtualAddress, B_PAGE_SIZE);
 
-	vm_address_space *addressSpace = vm_kernel_address_space();
+	VMAddressSpace *addressSpace = vm_kernel_address_space();
 
 	for (0; virtualAddress < virtualEnd; virtualAddress += B_PAGE_SIZE)
 		remove_page_table_entry(&addressSpace->translation_map, virtualAddress);
@@ -716,7 +716,7 @@ ppc_remap_address_range(addr_t *_virtualAddress, size_t size, bool unmap)
 	addr_t virtualAddress = ROUNDDOWN(*_virtualAddress, B_PAGE_SIZE);
 	size = ROUNDUP(*_virtualAddress + size - virtualAddress, B_PAGE_SIZE);
 
-	vm_address_space *addressSpace = vm_kernel_address_space();
+	VMAddressSpace *addressSpace = vm_kernel_address_space();
 
 	// reserve space in the address space
 	void *newAddress = NULL;

@@ -31,7 +31,7 @@ struct team *team_get_kernel_team(void);
 team_id team_get_kernel_team_id(void);
 team_id team_get_current_team_id(void);
 status_t team_get_address_space(team_id id,
-			struct vm_address_space **_addressSpace);
+			struct VMAddressSpace **_addressSpace);
 char **user_team_get_arguments(void);
 int user_team_get_arg_count(void);
 struct job_control_entry* team_get_death_entry(struct team *team,

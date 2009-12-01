@@ -28,7 +28,7 @@ public:
 							AsyncIOCallback* callback);
 	virtual	bool		CanWritePage(off_t offset);
 
-	virtual	status_t	Fault(struct vm_address_space *aspace, off_t offset);
+	virtual	status_t	Fault(struct VMAddressSpace *aspace, off_t offset);
 
 	virtual	status_t	AcquireUnreferencedStoreRef();
 	virtual	void		AcquireStoreRef();

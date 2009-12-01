@@ -27,7 +27,7 @@
 #endif
 
 
-static vm_address_space* sKernelAddressSpace;
+static VMAddressSpace* sKernelAddressSpace;
 
 #define ASPACE_HASH_TABLE_SIZE 1024
 static struct hash_table* sAddressSpaceTable;
@@ -35,7 +35,7 @@ static rw_lock sAddressSpaceTableLock;
 
 
 static void
-_dump_aspace(vm_address_space* aspace)
+_dump_aspace(VMAddressSpace* aspace)
 {
 	vm_area* area;
 
@@ -62,7 +62,7 @@ _dump_aspace(vm_address_space* aspace)
 static int
 dump_aspace(int argc, char** argv)
 {
-	vm_address_space* aspace;
+	VMAddressSpace* aspace;
 
 	if (argc < 2) {
 		kprintf("aspace: not enough arguments\n");
@@ -74,7 +74,7 @@ dump_aspace(int argc, char** argv)
 	{
 		team_id id = strtoul(argv[1], NULL, 0);
 
-		aspace = (vm_address_space*)hash_lookup(sAddressSpaceTable, &id);
+		aspace = (VMAddressSpace*)hash_lookup(sAddressSpaceTable, &id);
 		if (aspace == NULL) {
 			kprintf("invalid aspace id\n");
 		} else {
@@ -89,14 +89,14 @@ dump_aspace(int argc, char** argv)
 static int
 dump_aspace_list(int argc, char** argv)
 {
-	vm_address_space* space;
+	VMAddressSpace* space;
 	struct hash_iterator iter;
 
 	kprintf("   address      id         base         size   area count   "
 		" area size\n");
 
 	hash_open(sAddressSpaceTable, &iter);
-	while ((space = (vm_address_space*)hash_next(sAddressSpaceTable,
+	while ((space = (VMAddressSpace*)hash_next(sAddressSpaceTable,
 			&iter)) != NULL) {
 		int32 areaCount = 0;
 		off_t areaSize = 0;
@@ -119,7 +119,7 @@ dump_aspace_list(int argc, char** argv)
 static int
 aspace_compare(void* _a, const void* key)
 {
-	vm_address_space* aspace = (vm_address_space*)_a;
+	VMAddressSpace* aspace = (VMAddressSpace*)_a;
 	const team_id* id = (const team_id*)key;
 
 	if (aspace->id == *id)
@@ -132,7 +132,7 @@ aspace_compare(void* _a, const void* key)
 static uint32
 aspace_hash(void* _a, const void* key, uint32 range)
 {
-	vm_address_space* aspace = (vm_address_space*)_a;
+	VMAddressSpace* aspace = (VMAddressSpace*)_a;
 	const team_id* id = (const team_id*)key;
 
 	if (aspace != NULL)
@@ -146,7 +146,7 @@ aspace_hash(void* _a, const void* key, uint32 range)
 	have been released, so it's safe to remove it.
 */
 static void
-delete_address_space(vm_address_space* addressSpace)
+delete_address_space(VMAddressSpace* addressSpace)
 {
 	TRACE(("delete_address_space: called on aspace 0x%lx\n", addressSpace->id));
 
@@ -165,13 +165,13 @@ delete_address_space(vm_address_space* addressSpace)
 //	#pragma mark -
 
 
-vm_address_space*
+VMAddressSpace*
 vm_get_address_space(team_id id)
 {
-	vm_address_space* addressSpace;
+	VMAddressSpace* addressSpace;
 
 	rw_lock_read_lock(&sAddressSpaceTableLock);
-	addressSpace = (vm_address_space*)hash_lookup(sAddressSpaceTable, &id);
+	addressSpace = (VMAddressSpace*)hash_lookup(sAddressSpaceTable, &id);
 	if (addressSpace)
 		atomic_add(&addressSpace->ref_count, 1);
 	rw_lock_read_unlock(&sAddressSpaceTableLock);
@@ -180,7 +180,7 @@ vm_get_address_space(team_id id)
 }
 
 
-vm_address_space*
+VMAddressSpace*
 vm_get_kernel_address_space(void)
 {
 	// we can treat this one a little differently since it can't be deleted
@@ -189,7 +189,7 @@ vm_get_kernel_address_space(void)
 }
 
 
-vm_address_space*
+VMAddressSpace*
 vm_kernel_address_space(void)
 {
 	return sKernelAddressSpace;
@@ -203,13 +203,13 @@ vm_kernel_address_space_id(void)
 }
 
 
-vm_address_space*
+VMAddressSpace*
 vm_get_current_user_address_space(void)
 {
 	struct thread* thread = thread_get_current_thread();
 
 	if (thread != NULL) {
-		vm_address_space* addressSpace = thread->team->address_space;
+		VMAddressSpace* addressSpace = thread->team->address_space;
 		if (addressSpace != NULL) {
 			atomic_add(&addressSpace->ref_count, 1);
 			return addressSpace;
@@ -233,7 +233,7 @@ vm_current_user_address_space_id(void)
 
 
 void
-vm_put_address_space(vm_address_space* addressSpace)
+vm_put_address_space(VMAddressSpace* addressSpace)
 {
 	bool remove = false;
 
@@ -257,7 +257,7 @@ vm_put_address_space(vm_address_space* addressSpace)
 	still be in memory until the last reference has been released.
 */
 void
-vm_delete_address_space(vm_address_space* addressSpace)
+vm_delete_address_space(VMAddressSpace* addressSpace)
 {
 	rw_lock_write_lock(&addressSpace->lock);
 	addressSpace->state = VM_ASPACE_STATE_DELETION;
@@ -270,12 +270,12 @@ vm_delete_address_space(vm_address_space* addressSpace)
 
 status_t
 vm_create_address_space(team_id id, addr_t base, addr_t size,
-	bool kernel, vm_address_space** _addressSpace)
+	bool kernel, VMAddressSpace** _addressSpace)
 {
-	vm_address_space* addressSpace;
+	VMAddressSpace* addressSpace;
 	status_t status;
 
-	addressSpace = (vm_address_space*)malloc_nogrow(sizeof(vm_address_space));
+	addressSpace = (VMAddressSpace*)malloc_nogrow(sizeof(VMAddressSpace));
 	if (addressSpace == NULL)
 		return B_NO_MEMORY;
 
@@ -321,7 +321,7 @@ vm_address_space_init(void)
 
 	// create the area and address space hash tables
 	{
-		vm_address_space* aspace;
+		VMAddressSpace* aspace;
 		sAddressSpaceTable = hash_init(ASPACE_HASH_TABLE_SIZE,
 			(addr_t)&aspace->hash_next - (addr_t)aspace, &aspace_compare,
 			&aspace_hash);

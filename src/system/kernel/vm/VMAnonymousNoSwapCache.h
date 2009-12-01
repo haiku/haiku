@@ -27,7 +27,7 @@ public:
 	virtual	status_t	Write(off_t offset, const iovec *vecs, size_t count,
 							uint32 flags, size_t *_numBytes);
 
-	virtual	status_t	Fault(struct vm_address_space *aspace, off_t offset);
+	virtual	status_t	Fault(struct VMAddressSpace *aspace, off_t offset);
 
 	virtual	void		MergeStore(VMCache* source);
 

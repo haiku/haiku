@@ -50,7 +50,7 @@ public:
 	virtual	int32		MaxPagesPerAsyncWrite() const
 							{ return 1; }
 
-	virtual	status_t	Fault(struct vm_address_space *aspace, off_t offset);
+	virtual	status_t	Fault(struct VMAddressSpace* aspace, off_t offset);
 
 	virtual	void		Merge(VMCache* source);
 

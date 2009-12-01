@@ -100,7 +100,7 @@ VMVnodeCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 
 
 status_t
-VMVnodeCache::Fault(struct vm_address_space *aspace, off_t offset)
+VMVnodeCache::Fault(struct VMAddressSpace *aspace, off_t offset)
 {
 	return B_BAD_HANDLER;
 }

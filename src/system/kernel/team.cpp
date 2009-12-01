@@ -2522,7 +2522,7 @@ team_get_current_team_id(void)
 
 
 status_t
-team_get_address_space(team_id id, vm_address_space** _addressSpace)
+team_get_address_space(team_id id, VMAddressSpace** _addressSpace)
 {
 	cpu_status state;
 	struct team* team;
