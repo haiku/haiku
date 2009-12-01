@@ -31,58 +31,63 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef BAR_WINDOW_H
 #define BAR_WINDOW_H
+
 
 #include <Deskbar.h>
 #include <Window.h>
 
+
 class TBeMenu;
 class TBarView;
 
+
 class TBarWindow : public BWindow {
-	public:
-		TBarWindow();
+public:
+								TBarWindow();
 
-		virtual void	MenusBeginning();
-		virtual void	MenusEnded();
-		virtual	bool	QuitRequested();
-		virtual void	WorkspaceActivated(int32 ws, bool activate);
-		virtual void	ScreenChanged(BRect size, color_space depth);
-		virtual void	DispatchMessage(BMessage* message, BHandler* handler);
-		virtual void	MessageReceived(BMessage* m);
+	virtual void				MenusBeginning();
+	virtual void				MenusEnded();
+	virtual	bool				QuitRequested();
+	virtual void				WorkspaceActivated(int32 workspace,
+									bool activate);
+	virtual void				ScreenChanged(BRect size, color_space depth);
+	virtual void				DispatchMessage(BMessage* message,
+									BHandler* handler);
+	virtual void				MessageReceived(BMessage* message);
+	virtual void				Minimize(bool minimize);
 
-		void			SaveSettings();
-		TBarView*		BarView() const { return fBarView; };
-		static 	void	SetBeMenu(TBeMenu* menu);
-		TBeMenu*		BeMenu();
+			void				SaveSettings();
+			TBarView*			BarView() const { return fBarView; };
+	static	void				SetBeMenu(TBeMenu* menu);
+			TBeMenu*			BeMenu();
 
-		void			ShowBeMenu();
-		void			ShowTeamMenu();
+			void				ShowBeMenu();
+			void				ShowTeamMenu();
 
-		void 			GetLocation(BMessage*);
-		deskbar_location 	DeskbarLocation() const;
-		void			SetLocation(BMessage*);
-		void			SetDeskbarLocation(deskbar_location location,
-							bool expand);
-		
-		void			IsExpanded(BMessage*);
-		void			Expand(BMessage*);
-		
-		void			ItemInfo(BMessage*);
-		void			ItemExists(BMessage*);
-		
-		void			CountItems(BMessage*);
-		
-		void			AddItem(BMessage*);
-		void			RemoveItem(BMessage*);
-		
-		void			GetIconFrame(BMessage*);
+			void 				GetLocation(BMessage* message);
+			deskbar_location 	DeskbarLocation() const;
+			void				SetLocation(BMessage* message);
+			void				SetDeskbarLocation(deskbar_location location,
+									bool expand);
+
+			void				IsExpanded(BMessage* message);
+			void				Expand(BMessage* message);
+
+			void				ItemInfo(BMessage* message);
+			void				ItemExists(BMessage* message);
+
+			void				CountItems(BMessage* message);
+
+			void				AddItem(BMessage* message);
+			void				RemoveItem(BMessage* message);
+
+			void				GetIconFrame(BMessage* message);
 
 private:
-		static 	TBeMenu	*sBeMenu;
-		TBarView		*fBarView;
+	static	TBeMenu*			sBeMenu;
+			TBarView*			fBarView;
 };
 
 #endif	/* BAR_WINDOW_H */

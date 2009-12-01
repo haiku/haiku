@@ -32,7 +32,11 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
+#include "BarWindow.h"
+
 #include <stdio.h>
+
 #include <Application.h>
 #include <Directory.h>
 #include <FindDirectory.h>
@@ -43,7 +47,6 @@ All rights reserved.
 #include <MessageFilter.h>
 #include <Screen.h>
 
-#include "BarWindow.h"
 #include "BarApp.h"
 #include "BarMenuBar.h"
 #include "BarView.h"
@@ -220,6 +223,15 @@ TBarWindow::MessageReceived(BMessage* message)
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+TBarWindow::Minimize(bool minimize)
+{
+	// Don't allow the Deskbar to be minimized
+	if (!minimize)
+		BWindow::Minimize(false);
 }
 
 
@@ -405,6 +417,7 @@ TBarWindow::SetDeskbarLocation(deskbar_location location, bool newExpandState)
 
 	fBarView->ChangeState(expand, vertical, left, top);
 }
+
 
 void
 TBarWindow::SetLocation(BMessage* message)

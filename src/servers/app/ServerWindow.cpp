@@ -401,11 +401,8 @@ ServerWindow::SetTitle(const char* newTitle)
 		rename_thread(Thread(), name);
 	}
 
-	if (fWindow != NULL) {
-//fDesktop->UnlockSingleWindow();
+	if (fWindow != NULL)
 		fDesktop->SetWindowTitle(fWindow, newTitle);
-//fDesktop->LockSingleWindow();
-	}
 }
 
 
@@ -425,8 +422,7 @@ ServerWindow::NotifyQuitRequested()
 void
 ServerWindow::NotifyMinimize(bool minimize)
 {
-	if (fWindow->Feel() != B_NORMAL_WINDOW_FEEL
-		|| ((fWindow->Flags() & B_NOT_MINIMIZABLE) == 0 && minimize))
+	if (fWindow->Feel() != B_NORMAL_WINDOW_FEEL)
 		return;
 
 	// The client is responsible for the actual minimization

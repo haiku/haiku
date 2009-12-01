@@ -824,8 +824,10 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				break;
 
 			case DEC_MINIMIZE:
-				fIsMinimizing = true;
-				STRACE_CLICK(("===> DEC_MINIMIZE\n"));
+				if ((Flags() & B_NOT_MINIMIZABLE) == 0) {
+					fIsMinimizing = true;
+					STRACE_CLICK(("===> DEC_MINIMIZE\n"));
+				}
 				break;
 
 			case DEC_DRAG:
