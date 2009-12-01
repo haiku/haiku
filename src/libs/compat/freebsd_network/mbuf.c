@@ -19,6 +19,7 @@
 static object_cache *sMBufCache;
 static object_cache *sChunkCache;
 static object_cache *sJumbo9ChunkCache;
+static object_cache *sJumboPageSizeCache;
 
 
 int max_linkhdr = 16;
@@ -67,16 +68,20 @@ construct_ext_sized_mbuf(struct mbuf *memoryBuffer, int how, int size)
 {
 	object_cache *cache;
 	int extType;
-	if (size != MCLBYTES && size != MJUM9BYTES)
+	if (size != MCLBYTES && size != MJUM9BYTES && size != MJUMPAGESIZE)
 		panic("unsupported size");
 
 	if (size == MCLBYTES) {
 		cache = sChunkCache;
 		extType = EXT_CLUSTER;
-	} else {
+	} else if (size == MJUM9BYTES) {
 		cache = sJumbo9ChunkCache;
 		extType = EXT_JUMBO9;
+	} else {
+		cache = sJumboPageSizeCache;
+		extType = EXT_JUMBOP;
 	}
+
 	memoryBuffer->m_ext.ext_buf = object_cache_alloc(cache, m_to_oc_flags(how));
 	if (memoryBuffer->m_ext.ext_buf == NULL)
 		return B_NO_MEMORY;
@@ -119,6 +124,8 @@ destruct_pkt_mbuf(struct mbuf *memoryBuffer)
 		cache = sChunkCache;
 	else if ((memoryBuffer->m_ext.ext_type & EXT_JUMBO9) != 0)
 		cache = sJumbo9ChunkCache;
+	else if ((memoryBuffer->m_ext.ext_type & EXT_JUMBOP) != 0)
+		cache = sJumboPageSizeCache;
 	else {
 		panic("unknown cache");
 		return;
@@ -289,9 +296,15 @@ init_mbufs()
 		NULL, NULL, NULL);
 	if (sJumbo9ChunkCache == NULL)
 		goto clean;
+	sJumboPageSizeCache = create_object_cache("mbuf jumbo page size chunks", 
+		MJUMPAGESIZE, 0, NULL, NULL, NULL);
+	if (sJumboPageSizeCache == NULL)
+		goto clean;
 	return B_OK;
 
 clean:
+	if (sJumbo9ChunkCache != NULL)
+		delete_object_cache(sJumbo9ChunkCache);
 	if (sChunkCache != NULL)
 		delete_object_cache(sChunkCache);
 	if (sMBufCache != NULL)
@@ -306,4 +319,5 @@ uninit_mbufs()
 	delete_object_cache(sMBufCache);
 	delete_object_cache(sChunkCache);
 	delete_object_cache(sJumbo9ChunkCache);
+	delete_object_cache(sJumboPageSizeCache);
 }

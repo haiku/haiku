@@ -116,7 +116,8 @@ struct mbuf {
 
 #define EXT_CLUSTER		1
 #define EXT_PACKET		3
-#define EXT_JUMBO9		4
+#define EXT_JUMBOP		4
+#define EXT_JUMBO9		5
 #define	EXT_NET_DRV		100
 
 #define CSUM_IP			0x0001
