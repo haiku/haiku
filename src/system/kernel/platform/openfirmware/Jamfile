@@ -4,6 +4,6 @@ SubDirCcFlags $(TARGET_KERNEL_PIC_CCFLAGS) ;
 SubDirC++Flags $(TARGET_KERNEL_PIC_CCFLAGS) ;
 
 KernelMergeObject kernel_platform_openfirmware.o :
-	openfirmware.c
+	openfirmware.cpp
 	openfirmware_devices.cpp
 ;

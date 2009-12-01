@@ -14,20 +14,20 @@ KernelMergeObject kernel_arch_x86.o :
 	arch_commpage.cpp
 	arch_cpu.cpp
 	arch_debug.cpp
-	arch_debug_console.c
-	arch_elf.c
+	arch_debug_console.cpp
+	arch_elf.cpp
 	arch_int.cpp
-	arch_platform.c
-#	arch_selector.c
-	arch_real_time_clock.c
-	arch_smp.c
+	arch_platform.cpp
+#	arch_selector.cpp
+	arch_real_time_clock.cpp
+	arch_smp.cpp
 	arch_thread.cpp
-	arch_timer.c
+	arch_timer.cpp
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
 	arch_x86.S
 	arch_interrupts.S
-	arch_system_info.c
+	arch_system_info.cpp
 	arch_user_debugger.cpp
 	apm.cpp
 	bios.cpp
@@ -37,9 +37,9 @@ KernelMergeObject kernel_arch_x86.o :
 	x86_physical_page_mapper.cpp
 	x86_physical_page_mapper_large_memory.cpp
 
-	x86_pit.c
-	x86_apic.c
+	x86_apic.cpp
 	x86_hpet.cpp
+	x86_pit.cpp
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;

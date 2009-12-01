@@ -8,7 +8,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelMergeObject kernel_arch_mipsel.o :
 	arch_asm.S
-	arch_atomic.c
+	arch_atomic.cpp
 	arch_commpage.cpp
 	arch_cpu.cpp
 	arch_debug_console.cpp
@@ -18,9 +18,9 @@ KernelMergeObject kernel_arch_mipsel.o :
 	arch_int.cpp
 	arch_platform.cpp
 	arch_real_time_clock.cpp
-	arch_smp.c
+	arch_smp.cpp
 	arch_system_info.cpp
-	arch_thread.c
+	arch_thread.cpp
 	arch_timer.cpp
 	arch_user_debugger.cpp
 	arch_vm.cpp

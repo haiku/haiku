@@ -68,7 +68,7 @@ KernelStaticLibrary boot_loader :
 	# utils
 	kernel_cpp.cpp
 	KMessage.cpp
-	list.c
+	list.cpp
 	safemode_settings.cpp
 
 	: -fno-pic
@@ -89,7 +89,7 @@ KernelStaticLibrary boot_partitions :
 	;
 
 # Tell Jam where to find the utility sources
-SEARCH on [ FGristFiles kernel_cpp.cpp list.c ]
+SEARCH on [ FGristFiles kernel_cpp.cpp list.cpp ]
     = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]

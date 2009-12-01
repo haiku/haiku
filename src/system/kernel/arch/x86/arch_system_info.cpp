@@ -62,7 +62,7 @@ get_cpuid(cpuid_info *info, uint32 eaxRegister, uint32 forCPU)
 status_t
 arch_get_system_info(system_info *info, size_t size)
 {
-	info->cpu_type = sCpuType;
+	info->cpu_type = (cpu_types)sCpuType;
 	info->cpu_revision = sCpuRevision;
 
 	// - various cpu_info
@@ -148,7 +148,7 @@ _user_get_cpuid(cpuid_info *userInfo, uint32 eaxRegister, uint32 cpuNum)
 {
 	cpuid_info info;
 	status_t status;
-	
+
 	if (!IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
 

@@ -42,7 +42,7 @@ static uint32 sCPUOSIds[B_MAX_CPU_COUNT];
 static uint32 sAPICVersions[B_MAX_CPU_COUNT];
 
 extern bool gUsingIOAPIC;
-extern void init_sse(void);
+extern "C" void init_sse(void);
 
 static uint32
 apic_read(uint32 offset)

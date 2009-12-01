@@ -43,7 +43,7 @@ queue_remove_item(queue *_q, void *e)
 			if (last)
 				last->next = temp->next;
 			else
-				q->head = temp->next;
+				q->head = (queue_element*)temp->next;
 
 			if (q->tail == temp)
 				q->tail = last;
@@ -51,7 +51,7 @@ queue_remove_item(queue *_q, void *e)
 			return 0;
 		}
 		last = temp;
-		temp = temp->next;
+		temp = (queue_element*)temp->next;
 	}
 
 	return -1;
@@ -85,7 +85,7 @@ queue_dequeue(queue *_q)
 
 	elem = q->head;
 	if (q->head != NULL)
-		q->head = q->head->next;
+		q->head = (queue_element*)q->head->next;
 	if (q->tail == elem)
 		q->tail = NULL;
 
@@ -113,7 +113,7 @@ fixed_queue_init(fixed_queue *q, int size)
 	if (size <= 0)
 		return EINVAL;
 
-	q->table = malloc(size * sizeof(void *));
+	q->table = (void**)malloc(size * sizeof(void *));
 	if (!q->table)
 		return ENOMEM;
 	q->head = 0;

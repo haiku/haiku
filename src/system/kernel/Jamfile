@@ -26,11 +26,11 @@ KernelMergeObject kernel_core.o :
 	boot_splash.cpp
 	commpage.cpp
 	condition_variable.cpp
-	cpu.c
+	cpu.cpp
 	elf.cpp
 	heap.cpp
 	image.cpp
-	int.c
+	int.cpp
 	kernel_daemon.cpp
 	linkhack.c
 	listeners.cpp
@@ -40,9 +40,9 @@ KernelMergeObject kernel_core.o :
 	module.cpp
 	Notifications.cpp
 	port.cpp
-	real_time_clock.c
+	real_time_clock.cpp
 	sem.cpp
-	shutdown.c
+	shutdown.cpp
 	signal.cpp
 	system_info.cpp
 	smp.cpp

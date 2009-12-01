@@ -5,9 +5,9 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 KernelMergeObject kernel_util.o :
 	AVLTreeMap.cpp
 	kernel_cpp.cpp
-	khash.c
-	list.c
-	queue.c
+	khash.cpp
+	list.cpp
+	queue.cpp
 	ring_buffer.cpp
 	RadixBitmap.cpp
 

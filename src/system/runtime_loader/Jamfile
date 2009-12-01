@@ -20,7 +20,7 @@ AddResources runtime_loader : runtime_loader.rdef ;
 
 # needed for "runtime_loader" only
 StaticLibrary libruntime_loader.a :
-	kernel_vsprintf.c
+	kernel_vsprintf.cpp
 	kernel_cpp.cpp
 	KMessage.cpp
 	:
@@ -62,7 +62,7 @@ StaticLibrary libruntime_loader.a :
 
 SEARCH on [ FGristFiles kernel_cpp.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-SEARCH on [ FGristFiles kernel_vsprintf.c ]
+SEARCH on [ FGristFiles kernel_vsprintf.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel lib ] ;
 SEARCH on [ FGristFiles KMessage.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;

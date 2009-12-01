@@ -35,7 +35,7 @@ SEARCH_SOURCE += [ FDirName $(posixSources) unistd ] ;
 
 KernelMergeObject kernel_lib_posix.o :
 	# main
- 	kernel_errno.c
+ 	kernel_errno.cpp
  	dirent.c
 	fcntl.cpp
  	poll.c
@@ -44,7 +44,7 @@ KernelMergeObject kernel_lib_posix.o :
 	ctype.c
 	localeconv.c
 	# stdio (this subdir)
-	kernel_vsprintf.c
+	kernel_vsprintf.cpp
 	# stdlib
 	abs.c
 	atoi.c

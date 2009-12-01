@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src system boot arch x86 ;
 DEFINES += _BOOT_MODE ;
 
 local kernelArchSources =
-	arch_elf.c
+	arch_elf.cpp
 ;
 
 local kernelArchObjects =
