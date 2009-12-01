@@ -1302,7 +1302,7 @@ public:
 	status_t Init(struct team* team)
 	{
 		// find the runtime loader debug area
-		vm_area* area = team->address_space->areas;
+		VMArea* area = team->address_space->areas;
 		while (area != NULL) {
 			if (strcmp(area->name, RUNTIME_LOADER_DEBUG_AREA_NAME) == 0)
 				break;

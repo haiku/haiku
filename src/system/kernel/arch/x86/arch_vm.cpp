@@ -647,7 +647,7 @@ arch_vm_supports_protection(uint32 protection)
 
 
 void
-arch_vm_unset_memory_type(struct vm_area *area)
+arch_vm_unset_memory_type(struct VMArea *area)
 {
 	if (area->memory_type == 0)
 		return;
@@ -657,7 +657,7 @@ arch_vm_unset_memory_type(struct vm_area *area)
 
 
 status_t
-arch_vm_set_memory_type(struct vm_area *area, addr_t physicalBase,
+arch_vm_set_memory_type(struct VMArea *area, addr_t physicalBase,
 	uint32 type)
 {
 	area->memory_type = type >> MEMORY_TYPE_SHIFT;

@@ -19,8 +19,8 @@ struct kernel_args;
 struct team;
 struct system_memory_info;
 struct VMAddressSpace;
+struct VMArea;
 struct VMCache;
-struct vm_area;
 struct vm_page;
 struct vnode;
 
@@ -76,7 +76,7 @@ area_id vm_map_physical_memory_vecs(team_id team, const char* name,
 area_id vm_map_file(team_id aid, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 protection, uint32 mapping,
 			bool unmapAddressRange, int fd, off_t offset);
-struct VMCache *vm_area_get_locked_cache(struct vm_area *area);
+struct VMCache *vm_area_get_locked_cache(struct VMArea *area);
 void vm_area_put_locked_cache(struct VMCache *cache);
 area_id vm_create_null_area(team_id team, const char *name, void **address,
 			uint32 addressSpec, addr_t size);
@@ -87,7 +87,7 @@ area_id vm_clone_area(team_id team, const char *name, void **address,
 			area_id sourceArea, bool kernel);
 status_t vm_delete_area(team_id teamID, area_id areaID, bool kernel);
 status_t vm_create_vnode_cache(struct vnode *vnode, struct VMCache **_cache);
-struct vm_area *vm_area_lookup(struct VMAddressSpace *addressSpace,
+struct VMArea *vm_area_lookup(struct VMAddressSpace *addressSpace,
 			addr_t address);
 status_t vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type);
 status_t vm_get_page_mapping(team_id team, addr_t vaddr, addr_t *paddr);
@@ -95,11 +95,11 @@ bool vm_test_map_modification(struct vm_page *page);
 int32 vm_test_map_activation(struct vm_page *page, bool *_modified);
 void vm_clear_map_flags(struct vm_page *page, uint32 flags);
 void vm_remove_all_page_mappings(struct vm_page *page, uint32 *_flags);
-bool vm_unmap_page(struct vm_area* area, addr_t virtualAddress,
+bool vm_unmap_page(struct VMArea* area, addr_t virtualAddress,
 	bool preserveModified);
-status_t vm_unmap_pages(struct vm_area *area, addr_t base, size_t length,
+status_t vm_unmap_pages(struct VMArea *area, addr_t base, size_t length,
 			bool preserveModified);
-status_t vm_map_page(struct vm_area *area, struct vm_page *page, addr_t address,
+status_t vm_map_page(struct VMArea *area, struct vm_page *page, addr_t address,
 			uint32 protection);
 
 status_t vm_get_physical_page(addr_t paddr, addr_t* vaddr, void** _handle);

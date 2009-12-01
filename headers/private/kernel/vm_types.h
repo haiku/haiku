@@ -32,7 +32,7 @@ typedef struct vm_page_mapping {
 	vm_page_mapping_link page_link;
 	vm_page_mapping_link area_link;
 	struct vm_page *page;
-	struct vm_area *area;
+	struct VMArea *area;
 } vm_page_mapping;
 
 class DoublyLinkedPageLink {
@@ -66,7 +66,7 @@ class DoublyLinkedAreaLink {
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedPageLink>
 	vm_page_mappings;
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedAreaLink>
-	vm_area_mappings;
+	VMAreaMappings;
 
 typedef uint32 page_num_t;
 
@@ -192,8 +192,8 @@ public:
 
 			void			AddConsumer(VMCache* consumer);
 
-			status_t		InsertAreaLocked(vm_area* area);
-			status_t		RemoveArea(vm_area* area);
+			status_t		InsertAreaLocked(VMArea* area);
+			status_t		RemoveArea(VMArea* area);
 
 			status_t		WriteModified();
 			status_t		SetMinimalCommitment(off_t commitment);
@@ -242,7 +242,7 @@ private:
 
 
 public:
-	struct vm_area*			areas;
+	struct VMArea*			areas;
 	struct list_link		consumer_link;
 	struct list				consumers;
 		// list of caches that use this cache as a source
@@ -289,7 +289,7 @@ public:
 };
 
 
-struct vm_area {
+struct VMArea {
 	char*					name;
 	area_id					id;
 	addr_t					base;
@@ -302,14 +302,14 @@ struct vm_area {
 	vint32					no_cache_change;
 	off_t					cache_offset;
 	uint32					cache_type;
-	vm_area_mappings		mappings;
+	VMAreaMappings			mappings;
 	uint8*					page_protections;
 
 	struct VMAddressSpace*	address_space;
-	struct vm_area*			address_space_next;
-	struct vm_area*			cache_next;
-	struct vm_area*			cache_prev;
-	struct vm_area*			hash_next;
+	struct VMArea*			address_space_next;
+	struct VMArea*			cache_next;
+	struct VMArea*			cache_prev;
+	struct VMArea*			hash_next;
 };
 
 
@@ -319,8 +319,8 @@ enum {
 };
 
 struct VMAddressSpace {
-	struct vm_area*			areas;
-	struct vm_area*			area_hint;
+	struct VMArea*			areas;
+	struct VMArea*			area_hint;
 	rw_lock					lock;
 	addr_t					base;
 	addr_t					size;

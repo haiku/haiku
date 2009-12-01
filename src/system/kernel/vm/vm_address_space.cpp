@@ -37,7 +37,7 @@ static rw_lock sAddressSpaceTableLock;
 static void
 _dump_aspace(VMAddressSpace* aspace)
 {
-	vm_area* area;
+	VMArea* area;
 
 	kprintf("dump of address space at %p:\n", aspace);
 	kprintf("id: 0x%lx\n", aspace->id);
@@ -100,7 +100,7 @@ dump_aspace_list(int argc, char** argv)
 			&iter)) != NULL) {
 		int32 areaCount = 0;
 		off_t areaSize = 0;
-		for (vm_area* area = space->areas; area != NULL;
+		for (VMArea* area = space->areas; area != NULL;
 				area = area->address_space_next) {
 			if (area->id != RESERVED_AREA_ID
 				&& area->cache->type != CACHE_TYPE_NULL) {

@@ -205,7 +205,7 @@ class Merge : public VMCacheTraceEntry {
 
 class InsertArea : public VMCacheTraceEntry {
 	public:
-		InsertArea(VMCache* cache, vm_area* area)
+		InsertArea(VMCache* cache, VMArea* area)
 			:
 			VMCacheTraceEntry(cache),
 			fArea(area)
@@ -220,13 +220,13 @@ class InsertArea : public VMCacheTraceEntry {
 		}
 
 	private:
-		vm_area*	fArea;
+		VMArea*	fArea;
 };
 
 
 class RemoveArea : public VMCacheTraceEntry {
 	public:
-		RemoveArea(VMCache* cache, vm_area* area)
+		RemoveArea(VMCache* cache, VMArea* area)
 			:
 			VMCacheTraceEntry(cache),
 			fArea(area)
@@ -241,7 +241,7 @@ class RemoveArea : public VMCacheTraceEntry {
 		}
 
 	private:
-		vm_area*	fArea;
+		VMArea*	fArea;
 };
 
 }	// namespace VMCacheTracing
@@ -647,7 +647,7 @@ VMCache::AddConsumer(VMCache* consumer)
 	Assumes you have the locked the cache.
 */
 status_t
-VMCache::InsertAreaLocked(vm_area* area)
+VMCache::InsertAreaLocked(VMArea* area)
 {
 	TRACE(("VMCache::InsertAreaLocked(cache %p, area %p)\n", this, area));
 	AssertLocked();
@@ -667,7 +667,7 @@ VMCache::InsertAreaLocked(vm_area* area)
 
 
 status_t
-VMCache::RemoveArea(vm_area* area)
+VMCache::RemoveArea(VMArea* area)
 {
 	TRACE(("VMCache::RemoveArea(cache %p, area %p)\n", this, area));
 
