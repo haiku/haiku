@@ -224,7 +224,7 @@ heap_init(stage2_args* args)
 
 	sHeapBase = base;
 	sMaxHeapSize = (uint8*)top - (uint8*)base;
-	sAvailable = sMaxHeapSize - sizeof(uint32);
+	sAvailable = sMaxHeapSize - FreeChunk::NextOffset();
 
 	// declare the whole heap as one chunk, and add it
 	// to the free list
