@@ -31,6 +31,7 @@ MergeObject os_main.o :
 	wait_for_objects.cpp
 
 	# locks
+	init_once.cpp
 	mutex.cpp
 	recursive_lock.cpp
 	rw_lock.cpp
