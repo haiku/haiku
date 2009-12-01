@@ -14,7 +14,6 @@ extern "C" {
 #include <new>
 
 #include <condition_variable.h>
-#include <slab/Slab.h>
 #include <util/AutoLock.h>
 
 #include "device.h"
