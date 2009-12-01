@@ -54,20 +54,7 @@ init_condition_variables()
 
 
 void
-uninit_condition_variables()
-{
-	ConditionVariableHashDefinition definition;
-	InterruptsSpinLocker hashLocker(sConditionVariablesLock);
-	ConditionVariable* variable = sConditionVariableHash.Clear(true);
-	hashLocker.Unlock();
-
-	while (variable != NULL) {
-		ConditionVariable* next = definition.GetLink(variable);
-		variable->Unpublish();
-		delete variable;
-		variable = next;
-	}
-}
+uninit_condition_variables() {}
 
 } /* extern "C" */
 

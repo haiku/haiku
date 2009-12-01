@@ -12,7 +12,7 @@
 
 void cv_init(struct cv* conditionVariable, const char* description)
 {
-	_cv_init(conditionVariable, description);
+	conditionVariable->description = description;
 }
 
 
@@ -26,9 +26,13 @@ int cv_timedwait(struct cv* conditionVariable, struct mtx* mutex, int timeout)
 {
 	int status;
 
+	_cv_init(conditionVariable, conditionVariable->description);
+
 	mtx_unlock(mutex);
 	status = _cv_timedwait_unlocked(conditionVariable, timeout);
 	mtx_lock(mutex);
+
+	_cv_destroy(conditionVariable);
 
 	return status;
 }
@@ -36,7 +40,11 @@ int cv_timedwait(struct cv* conditionVariable, struct mtx* mutex, int timeout)
 
 void cv_wait(struct cv* conditionVariable, struct mtx* mutex)
 {
+	_cv_init(conditionVariable, conditionVariable->description);
+
 	mtx_unlock(mutex);
 	_cv_wait_unlocked(conditionVariable);
 	mtx_lock(mutex);
+
+	_cv_destroy(conditionVariable);
 }

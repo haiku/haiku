@@ -10,7 +10,7 @@
 
 
 struct cv {
-	int dummy;
+	const char* description;
 };
 
 
