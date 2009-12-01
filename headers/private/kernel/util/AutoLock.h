@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -19,7 +19,7 @@
 
 namespace BPrivate {
 
-// MutexLocking
+
 class MutexLocking {
 public:
 	inline bool Lock(mutex *lockable)
@@ -33,10 +33,9 @@ public:
 	}
 };
 
-// MutexLocker
 typedef AutoLocker<mutex, MutexLocking> MutexLocker;
 
-// RecursiveLockLocking
+
 class RecursiveLockLocking {
 public:
 	inline bool Lock(recursive_lock *lockable)
@@ -50,8 +49,8 @@ public:
 	}
 };
 
-// RecursiveLocker
 typedef AutoLocker<recursive_lock, RecursiveLockLocking> RecursiveLocker;
+
 
 class ReadWriteLockReadLocking {
 public:
@@ -82,7 +81,7 @@ public:
 typedef AutoLocker<rw_lock, ReadWriteLockReadLocking> ReadLocker;
 typedef AutoLocker<rw_lock, ReadWriteLockWriteLocking> WriteLocker;
 
-// InterruptsLocking
+
 class InterruptsLocking {
 public:
 	inline bool Lock(int* lockable)
@@ -97,7 +96,7 @@ public:
 	}
 };
 
-// InterruptsLocker
+
 class InterruptsLocker : public AutoLocker<int, InterruptsLocking> {
 public:
 	inline InterruptsLocker(bool alreadyLocked = false,
@@ -111,7 +110,7 @@ private:
 	int	fState;
 };
 
-// SpinLocking
+
 class SpinLocking {
 public:
 	inline bool Lock(spinlock* lockable)
@@ -126,10 +125,9 @@ public:
 	}
 };
 
-// SpinLocker
 typedef AutoLocker<spinlock, SpinLocking> SpinLocker;
 
-// InterruptsSpinLocking
+
 class InterruptsSpinLocking {
 public:
 // NOTE: work-around for annoying GCC 4 "fState may be used uninitialized"
@@ -159,10 +157,9 @@ private:
 	int	fState;
 };
 
-// InterruptsSpinLocker
 typedef AutoLocker<spinlock, InterruptsSpinLocking> InterruptsSpinLocker;
 
-// ThreadCPUPinLocking
+
 class ThreadCPUPinLocking {
 public:
 	inline bool Lock(struct thread* thread)
@@ -177,8 +174,8 @@ public:
 	}
 };
 
-// MutexLocker
 typedef AutoLocker<struct thread, ThreadCPUPinLocking> ThreadCPUPinner;
+
 
 }	// namespace BPrivate
 
