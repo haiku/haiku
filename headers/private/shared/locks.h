@@ -81,6 +81,13 @@ status_t	lazy_recursive_lock_lock(lazy_recursive_lock *lock);
 void		lazy_recursive_lock_unlock(lazy_recursive_lock *lock);
 int32		lazy_recursive_lock_get_recursion(lazy_recursive_lock *lock);
 
+
+#define		INIT_ONCE_UNINITIALIZED	-1
+#define		INIT_ONCE_INITIALIZED	-4
+
+status_t	__init_once(vint32* control, status_t (*initRoutine)(void*),
+				void* data);
+
 #ifdef __cplusplus
 } // extern "C"
 
