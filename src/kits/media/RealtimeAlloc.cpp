@@ -296,7 +296,9 @@ rtm_create_pool(rtm_pool** _pool, size_t totalSize, const char* name)
 		return status;
 	}
 
-	pool->max_size = (totalSize - 1 + B_PAGE_SIZE) & ~(B_PAGE_SIZE - 1);
+	// Allocate enough space for at least one allocation over \a totalSize
+	pool->max_size = (totalSize + sizeof(FreeChunk) - 1 + B_PAGE_SIZE)
+		& ~(B_PAGE_SIZE - 1);
 
 	area_id area = create_area(name, &pool->heap_base, B_ANY_ADDRESS,
 		pool->max_size, B_LAZY_LOCK, B_READ_AREA | B_WRITE_AREA);
@@ -331,6 +333,11 @@ rtm_create_pool(rtm_pool** _pool, size_t totalSize, const char* name)
 status_t
 rtm_delete_pool(rtm_pool* pool)
 {
+	if (pool == NULL)
+		return B_BAD_VALUE;
+
+	mutex_lock(&pool->lock);
+
 	{
 		MutexLocker _(&sPoolsLock);
 		sPools.Remove(pool);
@@ -352,6 +359,8 @@ rtm_alloc(rtm_pool* pool, size_t size)
 
 	if (pool->heap_base == NULL || size == 0)
 		return NULL;
+
+	MutexLocker _(&pool->lock);
 
 	// align the size requirement to a kAlignment bytes boundary
 	size = (size - 1 + kAlignment) & ~(size_t)(kAlignment - 1);
@@ -413,6 +422,7 @@ rtm_free(void* allocated)
 		return B_OK;
 	}
 
+	MutexLocker _(&pool->lock);
 	pool->Free(allocated);
 	return B_OK;
 }
@@ -438,6 +448,8 @@ rtm_realloc(void** _buffer, size_t newSize)
 		}
 		return B_NO_MEMORY;
 	}
+
+	MutexLocker _(&pool->lock);
 
 	if (newSize == 0) {
 		TRACE("realloc(%p, %lu) -> NULL\n", oldBuffer, newSize);
