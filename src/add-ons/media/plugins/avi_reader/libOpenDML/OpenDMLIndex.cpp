@@ -22,6 +22,8 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+
 #include <SupportDefs.h>
 #include <math.h>
 #include <stdio.h>
@@ -39,7 +41,8 @@
 
 
 OpenDMLIndex::OpenDMLIndex(BPositionIO *source, OpenDMLParser *parser)
- :	Index(source, parser)
+	:
+	Index(source, parser)
 {
 }
 
@@ -58,104 +61,106 @@ OpenDMLIndex::Init()
 	bigtime_t pts;
 	odml_index_header superIndex;
 	const OpenDMLStream *stream;
-	
-	int64 pos = 0;
-	uint32 bytesRead;	
 
-	for (uint32 i=0; i < fStreamCount; i++) {
+	int64 pos = 0;
+	uint32 bytesRead;
+
+	for (int32 i = 0; i < fStreamCount; i++) {
 		stream = fParser->StreamInfo(i);
 
 		pos = stream->odml_index_start;
 		bytesRead = sizeof(odml_index_header);
 
 		if ((int32)bytesRead != fSource->ReadAt(pos, &superIndex, bytesRead)) {
-			ERROR("libOpenDML: OpenDMLIndex::Init file reading failed to read superindex\n");
+			ERROR("libOpenDML: OpenDMLIndex::Init file reading failed to read "
+				"superindex\n");
 			return B_IO_ERROR;
 		}
-		
+
 		pos += bytesRead;
-		
+
 		pts = 0;
 		lastFrame = 0;
-		
+
 		ReadIndex(i, pos, &lastFrame, &pts, &superIndex);
 	}
 
 	return B_OK;
 }
 
+
 status_t
-OpenDMLIndex::ReadIndex(uint32 stream_index, int64 pos, uint32 *lastFrame, bigtime_t *pts, odml_index_header *superIndex) {
+OpenDMLIndex::ReadIndex(uint32 stream_index, int64 pos, uint32 *lastFrame,
+	bigtime_t *pts, odml_index_header *superIndex)
+{
+	odml_superindex_entry superIndexEntry;
+	const OpenDMLStream *stream = fParser->StreamInfo(stream_index);
 
-odml_superindex_entry superIndexEntry;
-//odml_field_index_entry fieldIndexEntry;
-uint32 bytesRead;
-
-const OpenDMLStream *stream = fParser->StreamInfo(stream_index);
-	
-	for (uint32 i=0; i < superIndex->entries_used; i++) {
-			
+	for (uint32 i = 0; i < superIndex->entries_used; i++) {
 		if (superIndex->index_type == AVI_INDEX_OF_INDEXES) {
-			
-			bytesRead = sizeof(odml_superindex_entry);
-	
-			if ((int32)bytesRead != fSource->ReadAt(pos, &superIndexEntry, bytesRead)) {
-				ERROR("libOpenDML: OpenDMLIndex::Init file reading failed to read superindex entry\n");
+			ssize_t bytesRead = fSource->ReadAt(pos, &superIndexEntry,
+				sizeof(odml_superindex_entry));
+			if (bytesRead < 0)
+				return bytesRead;
+			if (bytesRead != (ssize_t)sizeof(odml_superindex_entry)) {
+				ERROR("libOpenDML: OpenDMLIndex::Init file reading failed to "
+					"read superindex entry\n");
 				return B_IO_ERROR;
 			}
-			
+
 			pos += bytesRead;
-			
-			if (superIndexEntry.start == 0) {
+
+			if (superIndexEntry.start == 0)
 				continue;
-			}
-			
-			if (superIndex->index_sub_type == AVI_INDEX_2FIELD) {
-			} else {
-				ReadChunkIndex(stream_index, superIndexEntry.start + 8, lastFrame, pts, stream);
+
+			if (superIndex->index_sub_type != AVI_INDEX_2FIELD) {
+				ReadChunkIndex(stream_index, superIndexEntry.start + 8,
+					lastFrame, pts, stream);
 			}
 		}
 	}
-	
+
 	return B_OK;
 }
 
+
 status_t
-OpenDMLIndex::ReadChunkIndex(uint32 stream_index, int64 pos, uint32 *lastFrame, bigtime_t *pts, const OpenDMLStream *stream) {
-	
-odml_index_entry chunkIndexEntry;
-odml_chunk_index_header chunkIndex;
-uint32 bytesRead;
-uint32 frameNo;
-bool keyframe;
-uint32 sample_size;
-int64 position;
-uint32 size;
+OpenDMLIndex::ReadChunkIndex(uint32 stream_index, int64 pos, uint32 *lastFrame,
+	bigtime_t *pts, const OpenDMLStream *stream)
+{
+	odml_index_entry chunkIndexEntry;
+	odml_chunk_index_header chunkIndex;
+	uint32 bytesRead;
+	uint32 frameNo;
+	bool keyframe;
+	uint32 sample_size;
+	int64 position;
+	uint32 size;
 
 	bytesRead = sizeof(odml_chunk_index_header);
-		
+
 	if ((int32)bytesRead != fSource->ReadAt(pos, &chunkIndex, bytesRead)) {
 		ERROR("libOpenDML: OpenDMLIndex::Init file reading failed to read Chunk Index\n");
 		return B_IO_ERROR;
 	}
-	
+
 	pos += bytesRead;
 
 	for (uint32 i=0; i<chunkIndex.entries_used; i++) {
 		bytesRead = sizeof(odml_index_entry);
-					
+
 		if ((int32)bytesRead != fSource->ReadAt(pos, &chunkIndexEntry, bytesRead)) {
 			ERROR("libOpenDML: OpenDMLIndex::Init file reading failed to read Chunk Index Entry\n");
 			return B_IO_ERROR;
 		}
-				
+
 		pos += bytesRead;
-					
+
 		keyframe = (chunkIndexEntry.size & 0x80000000) ? false : true;
 		position = chunkIndex.base_offset + chunkIndexEntry.start - 8;
 		size = chunkIndexEntry.size & 0x7fffffff;
 		frameNo = *lastFrame;
-					
+
 		if (stream->is_video) {
 			// Video is easy enough, it is always 1 frame = 1 index
 			*pts = *lastFrame * 1000000LL * stream->frames_per_sec_scale / stream->frames_per_sec_rate;
@@ -191,10 +196,10 @@ uint32 size;
 				*lastFrame += size / stream->stream_header.sample_size;
 			}
 		}
-			
+
 		AddIndex(stream_index, position, size, frameNo, *pts, keyframe);
 	}
-	
+
 	return B_OK;
 }
 
