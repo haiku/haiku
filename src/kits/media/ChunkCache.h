@@ -8,9 +8,11 @@
 
 #include <Locker.h>
 #include <MediaDefs.h>
-#include "ReaderPlugin.h"
+#include <RealtimeAlloc.h>
 
 #include <kernel/util/DoublyLinkedList.h>
+
+#include "ReaderPlugin.h"
 
 
 namespace BPrivate {
@@ -37,6 +39,8 @@ public:
 								ChunkCache(sem_id waitSem, size_t maxBytes);
 								~ChunkCache();
 
+			status_t			InitCheck() const;
+
 			void				MakeEmpty();
 			bool				SpaceLeft() const;
 
@@ -45,9 +49,9 @@ public:
 			bool				ReadNextChunk(Reader* reader, void* cookie);
 
 private:
+			rtm_pool*			fRealTimePool;
 			sem_id				fWaitSem;
 			size_t				fMaxBytes;
-			size_t				fBytes;
 			ChunkList			fChunks;
 			ChunkList			fUnusedChunks;
 			ChunkList			fInFlightChunks;

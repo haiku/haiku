@@ -24,7 +24,7 @@ chunk_buffer::chunk_buffer()
 
 chunk_buffer::~chunk_buffer()
 {
-	free(buffer);
+	rtm_free(buffer);
 }
 
 
@@ -34,23 +34,26 @@ chunk_buffer::~chunk_buffer()
 ChunkCache::ChunkCache(sem_id waitSem, size_t maxBytes)
 	:
 	BLocker("media chunk cache"),
-	fWaitSem(waitSem),
-	fMaxBytes(maxBytes),
-	fBytes(0)
+	fWaitSem(waitSem)
 {
+	rtm_create_pool(&fRealTimePool, maxBytes, "media chunk cache");
+	fMaxBytes = rtm_available(fRealTimePool);
 }
 
 
 ChunkCache::~ChunkCache()
 {
-	while (chunk_buffer* chunk = fChunks.RemoveHead())
-		delete chunk;
+	rtm_delete_pool(fRealTimePool);
+}
 
-	while (chunk_buffer* chunk = fUnusedChunks.RemoveHead())
-		delete chunk;
 
-	while (chunk_buffer* chunk = fInFlightChunks.RemoveHead())
-		delete chunk;
+status_t
+ChunkCache::InitCheck() const
+{
+	if (fRealTimePool == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 
@@ -60,7 +63,6 @@ ChunkCache::MakeEmpty()
 	ASSERT(IsLocked());
 
 	fUnusedChunks.MoveFrom(&fChunks);
-	fBytes = 0;
 
 	release_sem(fWaitSem);
 }
@@ -71,7 +73,7 @@ ChunkCache::SpaceLeft() const
 {
 	ASSERT(IsLocked());
 
-	return fBytes < fMaxBytes;
+	return sizeof(chunk_buffer) + 2048 < rtm_available(fRealTimePool);
 }
 
 
@@ -82,7 +84,6 @@ ChunkCache::NextChunk()
 
 	chunk_buffer* chunk = fChunks.RemoveHead();
 	if (chunk != NULL) {
-		fBytes -= chunk->capacity;
 		fInFlightChunks.Add(chunk);
 		release_sem(fWaitSem);
 	}
@@ -113,10 +114,11 @@ ChunkCache::ReadNextChunk(Reader* reader, void* cookie)
 	chunk_buffer* chunk = fUnusedChunks.RemoveHead();
 	if (chunk == NULL) {
 		// allocate a new one
-		chunk = new(std::nothrow) chunk_buffer;
+		chunk = (chunk_buffer*)rtm_alloc(fRealTimePool, sizeof(chunk_buffer));
 		if (chunk == NULL)
 			return false;
 
+		new(chunk) chunk_buffer;
 	}
 
 	const void* buffer;
@@ -126,18 +128,17 @@ ChunkCache::ReadNextChunk(Reader* reader, void* cookie)
 	if (chunk->status == B_OK) {
 		if (chunk->capacity < bufferSize) {
 			// adapt buffer size
-			free(chunk->buffer);
+			rtm_free(chunk->buffer);
 			chunk->capacity = (bufferSize + 2047) & ~2047;
-			chunk->buffer = malloc(chunk->capacity);
+			chunk->buffer = rtm_alloc(fRealTimePool, chunk->capacity);
 			if (chunk->buffer == NULL) {
-				delete chunk;
+				rtm_free(chunk);
 				return false;
 			}
 		}
 
 		memcpy(chunk->buffer, buffer, bufferSize);
 		chunk->size = bufferSize;
-		fBytes += chunk->capacity;
 	}
 
 	fChunks.Add(chunk);

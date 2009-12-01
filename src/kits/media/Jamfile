@@ -73,7 +73,7 @@ SharedLibrary libmedia.so :
 	OldMediaModule.cpp
 	OldSoundFile.cpp
 	OldSubscriber.cpp
-	
+
 	# Codec Plugin API
 	ChunkCache.cpp
 	DecoderPlugin.cpp

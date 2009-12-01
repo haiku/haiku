@@ -90,6 +90,11 @@ MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 		fStreamInfo[i].lastChunk = NULL;
 		memset(&fStreamInfo[i].encodedFormat, 0,
 			sizeof(fStreamInfo[i].encodedFormat));
+
+		if (fStreamInfo[i].chunkCache->InitCheck() != B_OK) {
+			fInitStatus = B_NO_MEMORY;
+			return;
+		}
 	}
 
 	// create all stream cookies
