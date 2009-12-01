@@ -38,15 +38,6 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
-static const char *get_user_settings_dir(BPath &path);
-
-static BPath sSettingsDirPath;
-static const std::string sSettingsDir = get_user_settings_dir(sSettingsDirPath);
-
-static const char *sHaikuDBDirName	= "beos_mime";
-	// when running natively under Haiku
-const std::string kDatabaseDir = sSettingsDir + "/" + sHaikuDBDirName;
-const std::string kApplicationDatabaseDir		= kDatabaseDir + "/application";
 
 #define ATTR_PREFIX "META:"
 #define MINI_ICON_ATTR_PREFIX ATTR_PREFIX "M:"
@@ -103,27 +94,47 @@ const char *kMetaMimeType		= "application/x-vnd.Be-meta-mime";
 // Error codes
 const status_t kMimeGuessFailureError	= B_ERRORS_END+1;
 
-// get_settings_dir
-/*!	\brief Sets the supplied BPath to the user settings directory and returns
-		   it as C string.
-	\param path BPath to be set to the user settings path.
-	\return the user settings path as C string (\code path.Path() \endcode).
-*/
-static
-const char*
-get_user_settings_dir(BPath &path)
+static pthread_once_t sDatabaseDirectoryInitOnce = PTHREAD_ONCE_INIT;
+static std::string sDatabaseDirectory;
+static std::string sApplicationDatabaseDirectory;
+
+
+static void
+init_database_directories()
 {
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		path.SetTo("/boot/home/config/settings");
-	return path.Path();
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK)
+		sDatabaseDirectory = path.Path();
+	else
+		sDatabaseDirectory = "/boot/home/config/settings";
+
+	sDatabaseDirectory += "/beos_mime";
+	sApplicationDatabaseDirectory = sDatabaseDirectory + "/application";
 }
+
+
+const std::string
+get_database_directory()
+{
+	pthread_once(&sDatabaseDirectoryInitOnce, &init_database_directories);
+	return sDatabaseDirectory;
+}
+
+
+const std::string
+get_application_database_directory()
+{
+	pthread_once(&sDatabaseDirectoryInitOnce, &init_database_directories);
+	return sApplicationDatabaseDirectory;
+}
+
 
 // type_to_filename
 //! Converts the given MIME type to an absolute path in the MIME database.
 std::string
 type_to_filename(const char *type)
 {
-	return kDatabaseDir + "/" + BPrivate::Storage::to_lower(type);
+	return get_database_directory() + "/" + BPrivate::Storage::to_lower(type);
 }
 
 // open_type
@@ -183,7 +194,7 @@ open_or_create_type(const char *type, BNode *result, bool *didCreate)
 		uint32 pos = typeLower.find_first_of('/');
 		if (pos == std::string::npos) {
 			// Supertype == directory
-			BDirectory parent(kDatabaseDir.c_str());
+			BDirectory parent(get_database_directory().c_str());
 			err = parent.InitCheck();
 			if (!err)
 				err = parent.CreateDirectory(typeLower.c_str(), NULL);
@@ -191,7 +202,7 @@ open_or_create_type(const char *type, BNode *result, bool *didCreate)
 			// Non-supertype == file
 			std::string super(typeLower, 0, pos);
 			std::string sub(typeLower, pos+1);
-			BDirectory parent((kDatabaseDir + "/" + super).c_str());
+			BDirectory parent((get_database_directory() + "/" + super).c_str());
 			err = parent.InitCheck();
 			if (!err)
 				err = parent.CreateFile(sub.c_str(), NULL);

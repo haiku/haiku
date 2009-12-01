@@ -56,11 +56,11 @@ InstalledTypes::~InstalledTypes()
 
 /*! \brief Returns a list of all currently installed types in the
 	pre-allocated \c BMessage pointed to by \c types.
-	
+
 	See \c BMimeType::GetInstalledTypes(BMessage*) for more information.
 */
-status_t 
-InstalledTypes::GetInstalledTypes(BMessage *types) 
+status_t
+InstalledTypes::GetInstalledTypes(BMessage *types)
 {
 	status_t err = types ? B_OK : B_BAD_VALUE;
 	// See if we need to do our initial build still
@@ -81,11 +81,11 @@ InstalledTypes::GetInstalledTypes(BMessage *types)
 
 /*! \brief Returns a list of all currently installed types of the given
 	supertype in the pre-allocated \c BMessage pointed to by \c types.
-	
+
 	See \c BMimeType::GetInstalledTypes(const char*, BMessage*) for more
 	information.
 */
-status_t 
+status_t
 InstalledTypes::GetInstalledTypes(const char *supertype, BMessage *types)
 {
 	if (supertype == NULL || types == NULL)
@@ -107,7 +107,7 @@ InstalledTypes::GetInstalledTypes(const char *supertype, BMessage *types)
 	// Ask the appropriate supertype for its list
 	if (!err) {
 		std::map<std::string, Supertype>::iterator i = fSupertypes.find(supertype);
-		if (i != fSupertypes.end()) 
+		if (i != fSupertypes.end())
 			err = i->second.GetInstalledSubtypes(types);
 		else
 			err = B_NAME_NOT_FOUND;
@@ -118,10 +118,10 @@ InstalledTypes::GetInstalledTypes(const char *supertype, BMessage *types)
 
 /*! \brief Returns a list of all currently installed supertypes in the
 	pre-allocated \c BMessage pointed to by \c types.
-	
+
 	See \c BMimeType::GetInstalledSupertypes() for more information.
 */
-status_t 
+status_t
 InstalledTypes::GetInstalledSupertypes(BMessage *types)
 {
 	if (types == NULL)
@@ -146,7 +146,7 @@ InstalledTypes::GetInstalledSupertypes(BMessage *types)
 
 
 /*! \brief Adds the given type to the appropriate lists of installed types.
-	
+
 	If cached messages exist, the type is simply appended to the end of
 	the current type list.
 */
@@ -177,10 +177,10 @@ InstalledTypes::AddType(const char *type)
 	char super[B_PATH_NAME_LENGTH];
 	strncpy(super, type, i);
 	super[i] = 0;
-	
+
 	// Get a pointer to the subtype
 	const char *sub = &(type[i+1]);
-	
+
 	// Add the subtype (which will add the supertype if necessary)
 	return _AddSubtype(super, sub);
 }
@@ -216,11 +216,11 @@ InstalledTypes::RemoveType(const char *type)
 	char super[B_PATH_NAME_LENGTH];
 	strncpy(super, type, i);
 	super[i] = 0;
-	
+
 	// Get a pointer to the subtype
 	const char *sub = &(type[i+1]);
-	
-	// Remove the subtype 
+
+	// Remove the subtype
 	return _RemoveSubtype(super, sub);
 }
 
@@ -256,7 +256,7 @@ InstalledTypes::_AddSupertype(const char *super,
 /*! \brief Adds the given subtype to the given supertype's lists of installed types.
 
 	If the supertype does not yet exist, it is created.
-	
+
 	\param super The supertype
 	\param sub The subtype (subtype only; no "supertype/subtype" types please)
 	\return
@@ -313,7 +313,7 @@ InstalledTypes::_RemoveSupertype(const char *super)
 		return B_BAD_VALUE;
 
 	status_t err = fSupertypes.erase(super) == 1 ? B_OK : B_NAME_NOT_FOUND;
-	if (!err) 
+	if (!err)
 		_ClearCachedMessages();
 	return err;
 }
@@ -333,7 +333,7 @@ InstalledTypes::_RemoveSubtype(const char *super, const char *sub)
 	if (i != fSupertypes.end()) {
 		err = i->second.RemoveSubtype(sub);
 		if (!err)
-			_ClearCachedMessages();		
+			_ClearCachedMessages();
 	}
 
 	return err;
@@ -368,9 +368,9 @@ InstalledTypes::_ClearCachedMessages()
 status_t
 InstalledTypes::_BuildInstalledTypesList()
 {
-	status_t err = B_OK;	
+	status_t err = B_OK;
 	_Unset();
-	
+
 	// Create empty "cached messages" so proper messages
 	// will be built up as we add new types
 	try {
@@ -379,48 +379,48 @@ InstalledTypes::_BuildInstalledTypesList()
 	} catch (std::bad_alloc) {
 		err = B_NO_MEMORY;
 	}
-	
+
 	BDirectory root;
 	if (!err)
-		err = root.SetTo(kDatabaseDir.c_str());
+		err = root.SetTo(get_database_directory().c_str());
 	if (!err) {
 		root.Rewind();
-		while (true) {		
+		while (true) {
 			BEntry entry;
 			err = root.GetNextEntry(&entry);
 			if (err) {
 				// If we've come to the end of list, it's not an error
-				if (err == B_ENTRY_NOT_FOUND) 
+				if (err == B_ENTRY_NOT_FOUND)
 					err = B_OK;
 				break;
 			} else {
 				// Check that this entry is both a directory and a valid MIME string
-				char supertype[B_PATH_NAME_LENGTH];	
+				char supertype[B_PATH_NAME_LENGTH];
 				if (entry.IsDirectory()
 				      && entry.GetName(supertype) == B_OK
 				         && BMimeType::IsValid(supertype))
 				{
 					// Make sure our string is all lowercase
 					BPrivate::Storage::to_lower(supertype);
-					
+
 					// Add this supertype
 					std::map<std::string, Supertype>::iterator i;
 					if (_AddSupertype(supertype, i) != B_OK)
 						DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList() -- Error adding supertype '%s': 0x%lx\n",
 							supertype, err));
 					Supertype &supertypeRef = fSupertypes[supertype];
-					
+
 					// Now iterate through this supertype directory and add
 					// all of its subtypes
 					BDirectory dir;
 					if (dir.SetTo(&entry) == B_OK) {
 						dir.Rewind();
 						while (true) {
-							BEntry subEntry;						
+							BEntry subEntry;
 							err = dir.GetNextEntry(&subEntry);
 							if (err) {
 								// If we've come to the end of list, it's not an error
-								if (err == B_ENTRY_NOT_FOUND) 
+								if (err == B_ENTRY_NOT_FOUND)
 									err = B_OK;
 								break;
 							} else {
@@ -452,11 +452,11 @@ InstalledTypes::_BuildInstalledTypesList()
 	} else {
 		DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList(): "
 		          "Failed opening mime database directory '%s'\n",
-		            kDatabaseDir.c_str()));
+		            get_database_directory().c_str()));
 	}
 	fHaveDoneFullBuild = true;
 	return err;
-		
+
 }
 
 
@@ -488,7 +488,7 @@ InstalledTypes::_CreateMessageWithTypes(BMessage **_result) const
 				err = i->second.FillMessageWithTypes(msg);
 		}
 	}
-	return err;		
+	return err;
 }
 
 
@@ -518,7 +518,7 @@ InstalledTypes::_CreateMessageWithSupertypes(BMessage **_result) const
 			err = msg.AddString(kSupertypesField, i->first.c_str());
 		}
 	}
-	return err;		
+	return err;
 }
 
 } // namespace Mime

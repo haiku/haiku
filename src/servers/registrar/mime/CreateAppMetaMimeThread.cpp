@@ -90,7 +90,7 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	path.ToLower();
 		// Signatures and MIME types are case insensitive, but we want to
 		// preserve the case wherever possible
-	path.Prepend(kDatabaseDir.c_str());
+	path.Prepend(get_database_directory().c_str());
 
 	status = typeNode.SetTo(path.String());
 	if (status < B_OK)

@@ -53,10 +53,10 @@ SupportingApps::~SupportingApps()
 // GetSupportingApps
 /*! \brief Returns a list of signatures of supporting applications for the
 	given type in the pre-allocated \c BMessage pointed to by \c apps.
-	
+
 	See \c BMimeType::GetSupportingApps() for more information.
 */
-status_t 
+status_t
 SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 {
 	status_t err = type && apps ? B_OK : B_BAD_VALUE;
@@ -81,7 +81,7 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 					count++;
 				}
 				if (!err)
-					err = apps->AddInt32(kSupportingAppsSuperCountField, count);		
+					err = apps->AddInt32(kSupportingAppsSuperCountField, count);
 			} else {
 				// Add the apps that support this subtype (plus their count)
 				std::set<std::string> &subApps = fSupportingApps[type];
@@ -111,7 +111,7 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 					}
 					if (!err)
 						err = apps->AddInt32(kSupportingAppsSuperCountField, count);
-				}			
+				}
 			}
 		}
 	}
@@ -121,26 +121,26 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 // SetSupportedTypes
 /*! \brief Sets the list of supported types for the given application and
 	updates the supporting apps mappings.
-	
+
 	All types listed as being supported types will including the given
 	app signature in their list of supporting apps following this call.
-	
+
 	If \a fullSync is true, all types previously but no longer supported
 	by this application with no longer list this application as a
 	supporting app.
-	
+
 	If \a fullSync is false, said previously supported types will be
 	saved to a "stranded types" mapping and appropriately synchronized
 	the next time SetSupportedTypes() is called with a \c true \a fullSync
 	parameter.
-	
+
 	The stranded types mapping is properly maintained even in the event
 	of types being removed and then re-added to the list of supporting
 	types with consecutive \c false \a fullSync parameters.
 
 	\param app The application whose supported types you are setting
 	\param types Pointer to a \c BMessage containing an array of supported
-	             mime types in its \c Mime::kTypesField field.	             
+	             mime types in its \c Mime::kTypesField field.
 	\param fullSync If \c true, \c app is removed as a supporting application
 	                for any types for which it is no longer a supporting application
 	                (including types which were removed as supporting types with
@@ -216,9 +216,9 @@ SupportingApps::DeleteSupportedTypes(const char *app, bool fullSync)
 // AddSupportingApp
 /*! \brief Adds the given application signature to the set of supporting
 	apps for the given type.
-	
+
 	\param type The full mime type
-	\param app The full application signature (i.e. "application/app-subtype")	
+	\param app The full application signature (i.e. "application/app-subtype")
 	\return
 	- B_OK: success, even if the app was already in the supporting apps list
 	- "error code": failure
@@ -227,7 +227,7 @@ status_t
 SupportingApps::AddSupportingApp(const char *type, const char *app)
 {
 	status_t err = type && app ? B_OK : B_BAD_VALUE;
-	if (!err) 
+	if (!err)
 		fSupportingApps[type].insert(app);
 	return err;
 }
@@ -235,7 +235,7 @@ SupportingApps::AddSupportingApp(const char *type, const char *app)
 // RemoveSupportingApp
 /*! \brief Removes the given application signature from the set of supporting
 	apps for the given type.
-	
+
 	\param type The full mime type
 	\param app The full application signature (i.e. "application/app-subtype")
 	\return
@@ -246,7 +246,7 @@ status_t
 SupportingApps::RemoveSupportingApp(const char *type, const char *app)
 {
 	status_t err = type && app ? B_OK : B_BAD_VALUE;
-	if (!err) 
+	if (!err)
 		fSupportingApps[type].erase(app);
 	return err;
 }
@@ -263,19 +263,19 @@ SupportingApps::BuildSupportingAppsTable()
 	fStrandedTypes.clear();
 
 	BDirectory dir;
-	status_t status = dir.SetTo(kApplicationDatabaseDir.c_str());
+	status_t status = dir.SetTo(get_application_database_directory().c_str());
 
 	// Build the supporting apps table based on the mime database
 	if (status == B_OK) {
 		dir.Rewind();
 
 		// Handle each application type
-		while (true) {		
+		while (true) {
 			entry_ref ref;
 			status = dir.GetNextRef(&ref);
 			if (status < B_OK) {
 				// If we've come to the end of list, it's not an error
-				if (status == B_ENTRY_NOT_FOUND) 
+				if (status == B_ENTRY_NOT_FOUND)
 					status = B_OK;
 				break;
 			}
