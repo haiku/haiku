@@ -1108,10 +1108,10 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 
 # Work-around for GCC 2 problem -- despite -Wno-multichar it reports
 # multichar warnings in headers/private/kernel/debugger_keymaps.h included by
-# src/system/kernel/arch/x86/arch_debug_console.c.
+# src/system/kernel/arch/x86/arch_debug_console.cpp.
 if $(HAIKU_GCC_VERSION[1]) = 2 {
 	local file = <src!system!kernel!arch!x86>arch_debug_console.o ;
-	CCFLAGS on $(file) = [ on $(file) return $(CCFLAGS) ] ;
+	C++FLAGS on $(file) = [ on $(file) return $(C++FLAGS) ] ;
 }
 
 if $(HAIKU_NO_WERROR) != 1 {
