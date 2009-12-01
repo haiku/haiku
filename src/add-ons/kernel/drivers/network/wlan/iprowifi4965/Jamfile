@@ -17,6 +17,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev iwn ] ;
 
 KernelAddon iprowifi4965 :
 	if_iwn.c
+	glue.c
 	:
 	libfreebsd_wlan.a
 	libfreebsd_network.a
