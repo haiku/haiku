@@ -6,26 +6,21 @@
  *		Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  */
 
-#include <net_buffer.h>
-#include <net_device.h>
-#include <net_stack.h>
+#include <new>
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include <KernelExport.h>
 #include <lock.h>
+#include <SupportDefs.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 
-#include <KernelExport.h>
-#include <SupportDefs.h>
-
-#include <errno.h>
-
-#include <new>
-#include <stdlib.h>
-#include <string.h>
+#include <net_buffer.h>
+#include <net_device.h>
+#include <net_stack.h>
 #include <NetBufferUtilities.h>
-
-#include <bluetooth/HCI/btHCI.h>
-#include <bluetooth/bdaddrUtils.h>
 
 #define BT_DEBUG_THIS_MODULE
 #define SUBMODULE_NAME "bluetooth_device"
@@ -35,28 +30,30 @@
 #include <btModules.h>
 #include <CodeHandler.h>
 
-#include <bluetooth/HCI/btHCI_sco.h>
+#include <bluetooth/HCI/btHCI.h>
 #include <bluetooth/HCI/btHCI_acl.h>
-#include <bluetooth/HCI/btHCI_event.h>
 #include <bluetooth/HCI/btHCI_command.h>
+#include <bluetooth/HCI/btHCI_event.h>
+#include <bluetooth/HCI/btHCI_sco.h>
+#include <bluetooth/bdaddrUtils.h>
 
 #include "acl.h"
 
 
-
 struct bluetooth_device : net_device, DoublyLinkedListLinkImpl<bluetooth_device> {
-	net_buffer*	 	fBuffersRx[HCI_NUM_PACKET_TYPES];
-	size_t 			fExpectedPacketSize[HCI_NUM_PACKET_TYPES];
 
-	int fd;
-	uint16 mtu;
+	net_buffer*		fBuffersRx[HCI_NUM_PACKET_TYPES];
+	size_t			fExpectedPacketSize[HCI_NUM_PACKET_TYPES];
+	int				fd;
+	uint16			mtu;
+
 };
+
 
 /* Modules references */
 net_buffer_module_info* gBufferModule = NULL;
 static net_stack_module_info* sStackModule = NULL;
 struct bluetooth_core_data_module_info* btCoreData = NULL;
-
 
 static mutex sListLock;
 static DoublyLinkedList<bluetooth_device> sDeviceList;
@@ -94,19 +91,24 @@ Assemble(net_device* netDevice, bt_packet_t type, void* data, size_t count)
 	while (count) {
 
 		if (nbuf == NULL) {
-			/* new buffer incoming */
+			// new buffer incoming
 			switch (type) {
 				case BT_EVENT:
 					if (count >= HCI_EVENT_HDR_SIZE) {
-						struct hci_event_header* headerPkt = (struct hci_event_header*)data;
-						bluetoothDevice->fExpectedPacketSize[type] = HCI_EVENT_HDR_SIZE + headerPkt->elen;
+						struct hci_event_header* headerPkt
+							= (struct hci_event_header*)data;
+						bluetoothDevice->fExpectedPacketSize[type]
+							= HCI_EVENT_HDR_SIZE + headerPkt->elen;
 
 						if (count > bluetoothDevice->fExpectedPacketSize[type]) {
 							// the whole packet is here so it can be already posted.
-							btCoreData->PostEvent(bluetoothDevice, data, bluetoothDevice->fExpectedPacketSize[type]);
+							btCoreData->PostEvent(bluetoothDevice, data,
+								bluetoothDevice->fExpectedPacketSize[type]);
 						} else {
-							bluetoothDevice->fBuffersRx[type] = nbuf =
-								gBufferModule->create(bluetoothDevice->fExpectedPacketSize[type]);
+							nbuf = gBufferModule->create(
+								bluetoothDevice->fExpectedPacketSize[type]);
+							bluetoothDevice->fBuffersRx[type] = nbuf;
+
 							nbuf->protocol = type;
 						}
 
@@ -124,22 +126,24 @@ Assemble(net_device* netDevice, bt_packet_t type, void* data, size_t count)
 							+ B_LENDIAN_TO_HOST_INT16(headerPkt->alen);
 
 						// Create the buffer -> TODO: this allocation can fail
-						bluetoothDevice->fBuffersRx[type] = nbuf = gBufferModule->create(bluetoothDevice->fExpectedPacketSize[type]);
-						nbuf->protocol = type;
+						nbuf = gBufferModule->create(
+							bluetoothDevice->fExpectedPacketSize[type]);
+						bluetoothDevice->fBuffersRx[type] = nbuf;
 
+						nbuf->protocol = type;
 					} else {
 						flowf("ACL frame corrupted\n");
 						return EILSEQ;
 					}
-				break;
+					break;
 
 				case BT_SCO:
 
-				break;
+					break;
 
 				default:
 					panic("unknown packet type in assembly");
-				break;
+					break;
 			}
 
 			currentPacketLen = bluetoothDevice->fExpectedPacketSize[type];
@@ -157,9 +161,10 @@ Assemble(net_device* netDevice, bt_packet_t type, void* data, size_t count)
 
 			if ((bluetoothDevice->fExpectedPacketSize[type] - nbuf->size) == 0 ) {
 
-				switch(nbuf->protocol) {
+				switch (nbuf->protocol) {
 					case BT_EVENT:
-						btCoreData->PostEvent(netDevice, data, bluetoothDevice->fExpectedPacketSize[type]);
+						btCoreData->PostEvent(netDevice, data,
+							bluetoothDevice->fExpectedPacketSize[type]);
 						break;
 					case BT_ACL:
 						bluetooth_receive_data(netDevice, &nbuf);
@@ -180,7 +185,7 @@ Assemble(net_device* netDevice, bt_packet_t type, void* data, size_t count)
 			}
 
 		}
-		/* in case in the pipe there is info about the next buffer ... */
+		// in case in the pipe there is info about the next buffer
 		count -= currentPacketLen;
 		data = (void*)((uint8*)data + currentPacketLen);
 	}
@@ -192,8 +197,8 @@ Assemble(net_device* netDevice, bt_packet_t type, void* data, size_t count)
 status_t
 HciPacketHandler(void* data, int32 code, size_t size)
 {
-	bluetooth_device* bluetoothDevice =
-		FindDeviceByID(Bluetooth::CodeHandler::Device(code));
+	bluetooth_device* bluetoothDevice
+		= FindDeviceByID(Bluetooth::CodeHandler::Device(code));
 
 	if (bluetoothDevice != NULL)
 		return Assemble(bluetoothDevice, Bluetooth::CodeHandler::Protocol(code),
@@ -202,7 +207,9 @@ HciPacketHandler(void* data, int32 code, size_t size)
 	return B_ERROR;
 }
 
+
 //	#pragma mark -
+
 
 status_t
 bluetooth_init(const char* name, net_device** _device)
@@ -214,7 +221,8 @@ bluetooth_init(const char* name, net_device** _device)
 		return B_BAD_VALUE;
 
 	if (gBufferModule == NULL) { // lazy allocation
-		status_t status = get_module(NET_BUFFER_MODULE_NAME, (module_info**)&gBufferModule);
+		status_t status = get_module(NET_BUFFER_MODULE_NAME,
+			(module_info**)&gBufferModule);
 		if (status < B_OK)
 			return status;
 	}
@@ -235,7 +243,7 @@ bluetooth_init(const char* name, net_device** _device)
 	if (sDeviceList.IsEmpty())
 		device->index = HCI_DEVICE_INDEX_OFFSET; // REVIEW: dev index
 	else
-		device->index = (sDeviceList.Tail())->index + 1; // TODO: index will be assigned by netstack
+		device->index = (sDeviceList.Tail())->index + 1; // REVIEW!
 
 	// TODO: add to list whould be done in up hook
 	sDeviceList.Add(device);
@@ -250,7 +258,7 @@ bluetooth_init(const char* name, net_device** _device)
 status_t
 bluetooth_uninit(net_device* _device)
 {
-	bluetooth_device* device = (bluetooth_device *)_device;
+	bluetooth_device* device = (bluetooth_device*)_device;
 
 	debugf("index %lx\n",device->index);
 
@@ -290,7 +298,7 @@ err:
 void
 bluetooth_down(net_device* _device)
 {
-	bluetooth_device *device = (bluetooth_device*)_device;
+	bluetooth_device* device = (bluetooth_device*)_device;
 
 	debugf("index %ld\n",device->index);
 
@@ -313,17 +321,18 @@ bluetooth_control(net_device* _device, int32 op, void* argument,
 
 
 status_t
-bluetooth_send_data(net_device *_device, net_buffer* buffer)
+bluetooth_send_data(net_device* _device, net_buffer* buffer)
 {
 	bluetooth_device* device = (bluetooth_device*)_device;
 	net_buffer* curr_frame = NULL;
 	net_buffer* next_frame = buffer;
-	uint16 handle = buffer->type; //TODO: CodeHandler?
+	uint16 handle = buffer->type; // TODO: CodeHandler
 	uint8 flag = HCI_ACL_PACKET_START;
 
-	debugf("index %ld try to send bt packet of %lu bytes (flags %ld):\n",device->index, buffer->size, buffer->flags);
+	debugf("index %ld try to send bt packet of %lu bytes (flags %ld):\n",
+		device->index, buffer->size, buffer->flags);
 
-	//TODO: ATOMIC!!! any other thread should stop here
+	// TODO: ATOMIC! any other thread should stop here
 	do {
 		// Divide packet if big enough
 		curr_frame = next_frame;
@@ -342,15 +351,16 @@ bluetooth_send_data(net_device *_device, net_buffer* buffer)
 			continue;
 		}
 
-		bufferHeader->handle = pack_acl_handle_flags(handle, flag, 0); /* Handle & Flags(PB, BC) */
+		bufferHeader->handle = pack_acl_handle_flags(handle, flag, 0);
 		bufferHeader->alen = curr_frame->size - sizeof(struct hci_acl_header);
 
 		bufferHeader.Sync();
 
-		// Send to driver  XXX: another inter-layer trick
+		// Send to driver  XXX: another interlayer trick
 		debugf("tolower nbuf %p\n",curr_frame);
 		curr_frame->protocol = BT_ACL;
-		((status_t(*)(hci_id id, net_buffer* nbuf))device->media)(device->index, curr_frame);
+		((status_t(*)(hci_id id, net_buffer* nbuf))device->media)(device->index,
+			curr_frame);
 
 		flag = HCI_ACL_PACKET_FRAGMENT;
 
@@ -363,10 +373,11 @@ bluetooth_send_data(net_device *_device, net_buffer* buffer)
 status_t
 bluetooth_receive_data(net_device* _device, net_buffer** _buffer)
 {
-	bluetooth_device *device = (bluetooth_device *)_device;
+	bluetooth_device* device = (bluetooth_device*)_device;
 	status_t status = B_OK;
 
-	debugf("index %ld packet of %lu bytes (flags %ld):\n", device->index, (*_buffer)->size, (*_buffer)->flags);
+	debugf("index %ld packet of %lu bytes (flags %ld):\n",
+		device->index, (*_buffer)->size, (*_buffer)->flags);
 
 	if (device->fd == -1)
 		return B_FILE_ERROR;
@@ -427,6 +438,7 @@ bluetooth_add_multicast(struct net_device* _device, const sockaddr* _address)
 	return EOPNOTSUPP;
 }
 
+
 status_t
 bluetooth_remove_multicast(struct net_device* _device, const sockaddr* _address)
 {
@@ -438,17 +450,16 @@ bluetooth_remove_multicast(struct net_device* _device, const sockaddr* _address)
 }
 
 
-
 static int
 dump_bluetooth_devices(int argc, char** argv)
 {
 	bluetooth_device*	device;
 
 	DoublyLinkedList<bluetooth_device>::Iterator iterator = sDeviceList.GetIterator();
-	while (iterator.HasNext()) {
 
+	while (iterator.HasNext()) {
 		device = iterator.Next();
-		kprintf("\tname=%s index=%#lx @%p\n",device->name, device->index, device);
+		kprintf("\tname=%s index=%#lx @%p\n", device->name, device->index, device);
 	}
 
 	return 0;
@@ -490,10 +501,11 @@ bluetooth_std_ops(int32 op, ...)
 
 			mutex_init(&sListLock, "bluetooth devices");
 
-			//status = InitializeAclConnectionThread();
+			// status = InitializeAclConnectionThread();
 			debugf("Connection Thread error=%lx\n", status);
 
-			add_debugger_command("btLocalDevices", &dump_bluetooth_devices, "Lists Bluetooth LocalDevices registered in the Stack");
+			add_debugger_command("btLocalDevices", &dump_bluetooth_devices,
+				"Lists Bluetooth LocalDevices registered in the Stack");
 
 			return B_OK;
 		}
@@ -506,7 +518,7 @@ bluetooth_std_ops(int32 op, ...)
 			put_module(NET_STACK_MODULE_NAME);
 			put_module(BT_CORE_DATA_MODULE_NAME);
 			remove_debugger_command("btLocalDevices", &dump_bluetooth_devices);
-			//status_t status = QuitAclConnectionThread();
+			// status_t status = QuitAclConnectionThread();
 
 			return B_OK;
 		}
@@ -533,13 +545,13 @@ net_device_module_info sBluetoothModule = {
 	bluetooth_set_mtu,
 	bluetooth_set_promiscuous,
 	bluetooth_set_media,
-    bluetooth_add_multicast,
+	bluetooth_add_multicast,
 	bluetooth_remove_multicast,
 };
 
 
-
-module_info *modules[] = {
-	(module_info *)&sBluetoothModule,
+module_info* modules[] = {
+	(module_info*)&sBluetoothModule,
 	NULL
 };
+
