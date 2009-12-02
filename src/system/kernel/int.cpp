@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -89,8 +89,9 @@ dump_int_statistics(int argc, char **argv)
 				if (strchr(imageName, '/') != NULL)
 					imageName = strrchr(imageName, '/') + 1;
 
-				kprintf("\t%s:%s (%p), data %p, handled %8lld\n", imageName, symbol, io->func,
-					io->data, io->handled_count);
+				kprintf("\t%s:%s (%p), data %p, handled %8lld%s\n", imageName,
+					symbol, io->func, io->data, io->handled_count,
+					io->no_handled_info ? ", NO HANDLED INFO" : "");
 			} else
 				kprintf("\t%p, data %p\n", io->func, io->data);
 		}
