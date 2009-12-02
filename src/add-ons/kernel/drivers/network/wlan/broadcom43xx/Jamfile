@@ -21,6 +21,7 @@ KernelAddon broadcom43xx :
 	bwimac.c
 	bwiphy.c
 	bwirf.c
+	glue.c
 	:
 	libfreebsd_wlan.a
 	libfreebsd_network.a
