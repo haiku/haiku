@@ -87,6 +87,147 @@ const char *kAttrNickname = "META:nickname";
 const char *kNetPositiveSignature = "application/x-vnd.Be-NPOS";
 const char *kPeopleSignature = "application/x-vnd.Be-PEPL";
 
+// the following templates are in big endian and we rely on the Tracker
+// translation support to swap them on little endian machines
+//
+// in case there is an attribute (B_RECT_TYPE) that gets swapped by the media (unzip,
+// file system endianness swapping, etc., the correct endianness for the
+// correct machine has to be used here
+
+const BRect kDefaultFrame(40, 40, 500, 350);
+const int32 kDefaultQueryTemplateCount = 3;
+
+const AttributeTemplate kDefaultQueryTemplate[] =
+	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/application_octet-stream */
+{
+	{		 /* default frame */
+		kAttrWindowFrame,
+		B_RECT_TYPE,
+		16,
+		(const char *)&kDefaultFrame
+	},
+	{		 /* attr: _trk/viewstate */
+		kAttrViewState_be,
+		B_RAW_TYPE,
+		49,
+		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
+		"\000\000\000\000\000\000\000\000\000\000\357\323\335RCSTR\000\000\000"
+		"\000\000\000\000\000\000"
+	},
+	{		 /* attr: _trk/columns */
+		kAttrColumns_be,
+		B_RAW_TYPE,
+		223,
+		"O\362VR\000\000\000\025\000\000\000\004Name\000B \000\000C\021\000"
+		"\000\000\000\000\000\000\000\000\012_stat/name\000\357\323\335RCST"
+		"R\001\001O\362VR\000\000\000\025\000\000\000\004Path\000CH\000\000"
+		"Ca\000\000\000\000\000\000\000\000\000\011_trk/path\000\357_\174RC"
+		"STR\000\000O\362VR\000\000\000\025\000\000\000\004Size\000C\334\000"
+		"\000B$\000\000\000\000\000\001\000\000\000\012_stat/size\000\317\317"
+		"\306TOFFT\001\000O\362VR\000\000\000\025\000\000\000\010Modified\000"
+		"C\370\000\000C\012\000\000\000\000\000\000\000\000\000\016_stat/mo"
+		"dified\000]KmETIME\001\000"
+	}
+};
+
+const AttributeTemplate kBookmarkQueryTemplate[] =
+	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/application_x-vnd.Be-bookmark */
+{
+	{		 /* default frame */
+		kAttrWindowFrame,
+		B_RECT_TYPE,
+		16,
+		(const char *)&kDefaultFrame
+	},
+	{		 /* attr: _trk/viewstate */
+		kAttrViewState_be,
+		B_RAW_TYPE,
+		49,
+		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
+		"\000\000\000\000\000\000\000\000\000\000w\373\175RCSTR\000\000\000"
+		"\000\000\000\000\000\000"
+	},
+	{		 /* attr: _trk/columns */
+		kAttrColumns_be,
+		B_RAW_TYPE,
+		163,
+		"O\362VR\000\000\000\025\000\000\000\005Title\000B \000\000C+\000\000"
+		"\000\000\000\000\000\000\000\012META:title\000w\373\175RCSTR\000\001"
+		"O\362VR\000\000\000\025\000\000\000\003URL\000Cb\000\000C\217\200\000"
+		"\000\000\000\000\000\000\000\010META:url\000\343[TRCSTR\000\001O\362"
+		"VR\000\000\000\025\000\000\000\010Keywords\000D\004\000\000C\002\000"
+		"\000\000\000\000\000\000\000\000\011META:keyw\000\333\363\334RCSTR"
+		"\000\001"
+	}
+};
+
+const AttributeTemplate kPersonQueryTemplate[] =
+	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/application_x-vnd.Be-bookmark */
+{
+	{		 /* default frame */
+		kAttrWindowFrame,
+		B_RECT_TYPE,
+		16,
+		(const char *)&kDefaultFrame
+	},
+	{		 /* attr: _trk/viewstate */
+		kAttrViewState_be,
+		B_RAW_TYPE,
+		49,
+		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
+		"\000\000\000\000\000\000\000\000\000\000\357\323\335RCSTR\000\000\000"
+		"\000\000\000\000\000\000"
+	},
+	{		 /* attr: _trk/columns */
+		kAttrColumns_be,
+		B_RAW_TYPE,
+		230,
+		"O\362VR\000\000\000\025\000\000\000\004Name\000B \000\000B\346\000"
+		"\000\000\000\000\000\000\000\000\012_stat/name\000\357\323\335RCST"
+		"R\001\001O\362VR\000\000\000\025\000\000\000\012Work Phone\000C*\000"
+		"\000B\264\000\000\000\000\000\000\000\000\000\013META:wphone\000C_"
+		"uRCSTR\000\001O\362VR\000\000\000\025\000\000\000\006E-mail\000C\211"
+		"\200\000B\272\000\000\000\000\000\000\000\000\000\012META:email\000"
+		"sW\337RCSTR\000\001O\362VR\000\000\000\025\000\000\000\007Company\000"
+		"C\277\200\000B\360\000\000\000\000\000\000\000\000\000\014META:com"
+		"pany\000CS\174RCSTR\000\001"
+	},
+};
+
+const AttributeTemplate kEmailQueryTemplate[] =
+	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/text_x-email */
+{
+	{		 /* default frame */
+		kAttrWindowFrame,
+		B_RECT_TYPE,
+		16,
+		(const char *)&kDefaultFrame
+	},
+	{		 /* attr: _trk/viewstate */
+		kAttrViewState_be,
+		B_RAW_TYPE,
+		49,
+		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
+		"\000\000\000\000\000\000\000\000\000\000\366_\377ETIME\000\000\000"
+		"\000\000\000\000\000\000"
+	},
+	{		 /* attr: _trk/columns */
+		kAttrColumns_be,
+		B_RAW_TYPE,
+		222,
+		"O\362VR\000\000\000\025\000\000\000\007Subject\000B \000\000B\334\000"
+		"\000\000\000\000\000\000\000\000\014MAIL:subject\000\343\173\337RC"
+		"STR\000\000O\362VR\000\000\000\025\000\000\000\004From\000C%\000\000"
+		"C\031\000\000\000\000\000\000\000\000\000\011MAIL:from\000\317s_RC"
+		"STR\000\000O\362VR\000\000\000\025\000\000\000\004When\000C\246\200"
+		"\000B\360\000\000\000\000\000\000\000\000\000\011MAIL:when\000\366"
+		"_\377ETIME\000\000O\362VR\000\000\000\025\000\000\000\006Status\000"
+		"C\352\000\000BH\000\000\000\000\000\001\000\000\000\013MAIL:status"
+		"\000G\363\134RCSTR\000\001"
+	},
+};
+
+
 namespace BPrivate {
 
 class ExtraAttributeLazyInstaller {
@@ -105,11 +246,13 @@ public:
 	bool fDirty;
 };
 
-}
+}	// namespace BPrivate
+
 
 ExtraAttributeLazyInstaller::ExtraAttributeLazyInstaller(const char *type)
-	:	fMimeType(type),
-		fDirty(false)
+	:
+	fMimeType(type),
+	fDirty(false)
 {
 	if (fMimeType.InitCheck() == B_OK)
 		fMimeType.GetAttrInfo(&fExtraAttrs);
@@ -122,33 +265,69 @@ ExtraAttributeLazyInstaller::~ExtraAttributeLazyInstaller()
 		fMimeType.SetAttrInfo(&fExtraAttrs);
 }
 
-bool 
-ExtraAttributeLazyInstaller::AddExtraAttribute(const char *publicName, const char *name,
-	uint32 type, bool viewable, bool editable, float width, int32 alignment,
-	bool extra)
+
+bool
+ExtraAttributeLazyInstaller::AddExtraAttribute(const char *publicName,
+	const char *name, uint32 type, bool viewable, bool editable, float width,
+	int32 alignment, bool extra)
 {
 	for (int32 index = 0; ; index++) {
 		const char *oldPublicName;
 		if (fExtraAttrs.FindString("attr:public_name", index, &oldPublicName) != B_OK)
 			break;
-		
+
 		if (strcmp(oldPublicName, publicName) == 0)
 			// already got this extra atribute, no work left
 			return false;
 	}
 
-	fExtraAttrs.AddString("attr:public_name", publicName); 
-	fExtraAttrs.AddString("attr:name", name); 
-	fExtraAttrs.AddInt32("attr:type", (int32)type); 
-	fExtraAttrs.AddBool("attr:viewable", viewable); 
-	fExtraAttrs.AddBool("attr:editable", editable); 
-	fExtraAttrs.AddInt32("attr:width", (int32)width); 
-	fExtraAttrs.AddInt32("attr:alignment", alignment); 
+	fExtraAttrs.AddString("attr:public_name", publicName);
+	fExtraAttrs.AddString("attr:name", name);
+	fExtraAttrs.AddInt32("attr:type", (int32)type);
+	fExtraAttrs.AddBool("attr:viewable", viewable);
+	fExtraAttrs.AddBool("attr:editable", editable);
+	fExtraAttrs.AddInt32("attr:width", (int32)width);
+	fExtraAttrs.AddInt32("attr:alignment", alignment);
 	fExtraAttrs.AddBool("attr:extra", extra);
 
 	fDirty = true;
 	return true;
 }
+
+
+// #pragma mark -
+
+
+static void
+InstallTemporaryBackgroundImages(BNode* node, BMessage* message)
+{
+	int32 size = message->FlattenedSize();
+
+	try {
+		char* buffer = new char[size];
+		message->Flatten(buffer, size);
+		node->WriteAttr(kBackgroundImageInfo, B_MESSAGE_TYPE, 0, buffer,
+			(size_t)size);
+		delete[] buffer;
+	} catch (...) {
+	}
+}
+
+
+static void
+AddTemporaryBackgroundImages(BMessage *message, const char *imagePath,
+	BackgroundImage::Mode mode, BPoint offset, uint32 workspaces,
+	bool textWidgetOutlines)
+{
+	message->AddString(kBackgroundImageInfoPath, imagePath);
+	message->AddInt32(kBackgroundImageInfoWorkspaces, (int32)workspaces);
+	message->AddInt32(kBackgroundImageInfoMode, mode);
+	message->AddBool(kBackgroundImageInfoTextOutline, textWidgetOutlines);
+	message->AddPoint(kBackgroundImageInfoOffset, offset);
+}
+
+
+// #pragma mark -
 
 
 bool
@@ -162,25 +341,17 @@ TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
 	// be passed for attributes that don't matter; returns true if anything
 	// had to be changed
 
-#ifndef __HAIKU__
-# define B_BITMAP_NO_SERVER_LINK 0
-#endif
-
-#ifdef __HAIKU__
 	BBitmap vectorIcon(BRect(0, 0, 31, 31), B_BITMAP_NO_SERVER_LINK, B_RGBA32);
-#endif
 	BBitmap largeIcon(BRect(0, 0, 31, 31), B_BITMAP_NO_SERVER_LINK, B_CMAP8);
 	BBitmap miniIcon(BRect(0, 0, 15, 15), B_BITMAP_NO_SERVER_LINK, B_CMAP8);
 	char tmp[B_MIME_TYPE_LENGTH];
 
 	BMimeType mime(type);
 	bool installed = mime.IsInstalled();
-	
+
 	if (!installed
-#ifdef __HAIKU__
 		|| (bitsID >= 0 && ((forceMask & kForceLargeIcon)
 			|| mime.GetIcon(&vectorIcon, B_LARGE_ICON) != B_OK))
-#endif
 		|| (bitsID >= 0 && ((forceMask & kForceLargeIcon)
 			|| mime.GetIcon(&largeIcon, B_LARGE_ICON) != B_OK))
 		|| (bitsID >= 0 && ((forceMask & kForceMiniIcon)
@@ -191,50 +362,49 @@ TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
 			|| mime.GetLongDescription(tmp) != B_OK))
 		|| (preferredAppSignature && ((forceMask & kForcePreferredApp)
 			|| mime.GetPreferredApp(tmp) != B_OK))) {
-	
+
 		if (!installed)
 			mime.Install();
 
 		if (bitsID >= 0) {
-#ifdef __HAIKU__
 			const uint8* iconData;
 			size_t iconSize;
 			if (GetTrackerResources()->
 					GetIconResource(bitsID, &iconData, &iconSize) == B_OK)
 				mime.SetIcon(iconData, iconSize);
-#endif
 
 			if (GetTrackerResources()->
-					GetIconResource(bitsID, B_LARGE_ICON, &largeIcon) == B_OK) 
+					GetIconResource(bitsID, B_LARGE_ICON, &largeIcon) == B_OK)
 				mime.SetIcon(&largeIcon, B_LARGE_ICON);
 
 			if (GetTrackerResources()->
-					GetIconResource(bitsID, B_MINI_ICON, &miniIcon) == B_OK) 
+					GetIconResource(bitsID, B_MINI_ICON, &miniIcon) == B_OK)
 				mime.SetIcon(&miniIcon, B_MINI_ICON);
 		}
 
 		if (shortDescription)
 			mime.SetShortDescription(shortDescription);
-		
+
 		if (longDescription)
 			mime.SetLongDescription(longDescription);
-		
+
 		if (preferredAppSignature)
-			mime.SetPreferredApp(preferredAppSignature);	
+			mime.SetPreferredApp(preferredAppSignature);
 
 		return true;
 	}
 	return false;
 }
 
+
 void
 TTracker::InitMimeTypes()
 {
-	InstallMimeIfNeeded(B_DIR_MIMETYPE, kResFolderIcon,
-		"Folder", "Folder container for file system items.", kTrackerSignature);
+	InstallMimeIfNeeded(B_DIR_MIMETYPE, kResFolderIcon, "Folder",
+		"Folder container for file system items.", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_APP_MIME_TYPE, kResAppIcon,
-		"Be Application", "Generic Be Application executable.", kTrackerSignature);
+	InstallMimeIfNeeded(B_APP_MIME_TYPE, kResAppIcon, "Be Application",
+		"Generic Be Application executable.", kTrackerSignature);
 
 	InstallMimeIfNeeded(B_FILE_MIMETYPE, kResFileIcon,
 		"Generic file", "Generic document file.", kTrackerSignature);
@@ -248,25 +418,25 @@ TTracker::InitMimeTypes()
 	InstallMimeIfNeeded(B_QUERY_TEMPLATE_MIMETYPE, kResQueryTemplateIcon,
 		"Be Query Template", "", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_LINK_MIMETYPE, kResBrokenLinkIcon,
-		"Symbolic Link", "Link to another item in the file system.", kTrackerSignature);
+	InstallMimeIfNeeded(B_LINK_MIMETYPE, kResBrokenLinkIcon, "Symbolic Link",
+		"Link to another item in the file system.", kTrackerSignature);
 
 	InstallMimeIfNeeded(B_ROOT_MIMETYPE, kResRootIcon,
 		"Be Root", "File system root.", kTrackerSignature);
 
 	InstallMimeIfNeeded(B_BOOKMARK_MIMETYPE, kResBookmarkIcon,
-		"Bookmark", "Bookmark for a web page.", kNetPositiveSignature);	 
-	
+		"Bookmark", "Bookmark for a web page.", kNetPositiveSignature);
+
 	{
 		// install a couple of extra fields for bookmark
 
 		ExtraAttributeLazyInstaller installer(B_BOOKMARK_MIMETYPE);
 		installer.AddExtraAttribute("URL", "META:url", B_STRING_TYPE, true, true,
-			170, B_ALIGN_LEFT, false); 
+			170, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Keywords", "META:keyw", B_STRING_TYPE, true, true,
-			130, B_ALIGN_LEFT, false); 
+			130, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Title", "META:title", B_STRING_TYPE, true, true,
-			130, B_ALIGN_LEFT, false); 
+			130, B_ALIGN_LEFT, false);
 	}
 
 	InstallMimeIfNeeded(B_PERSON_MIMETYPE, kResPersonIcon,
@@ -275,38 +445,38 @@ TTracker::InitMimeTypes()
 	{
 		ExtraAttributeLazyInstaller installer(B_PERSON_MIMETYPE);
 		installer.AddExtraAttribute("Contact Name", kAttrName, B_STRING_TYPE, true, true,
-			120, B_ALIGN_LEFT, false); 
+			120, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Company", kAttrCompany, B_STRING_TYPE, true, true,
-			120, B_ALIGN_LEFT, false); 
+			120, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Address", kAttrAddress, B_STRING_TYPE, true, true,
-			120, B_ALIGN_LEFT, false); 
+			120, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("City", kAttrCity, B_STRING_TYPE, true, true,
-			90, B_ALIGN_LEFT, false); 
+			90, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("State", kAttrState, B_STRING_TYPE, true, true,
 			50, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Zip", kAttrZip, B_STRING_TYPE, true, true,
-			50, B_ALIGN_LEFT, false); 
+			50, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Country", kAttrCountry, B_STRING_TYPE, true, true,
-			120, B_ALIGN_LEFT, false); 
+			120, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("E-mail", kAttrEmail, B_STRING_TYPE, true, true,
-			120, B_ALIGN_LEFT, false); 
+			120, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Home Phone", kAttrHomePhone, B_STRING_TYPE, true, true,
-			90, B_ALIGN_LEFT, false); 
+			90, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Work Phone", kAttrWorkPhone, B_STRING_TYPE, true, true,
-			90, B_ALIGN_LEFT, false); 
+			90, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Fax", kAttrFax, B_STRING_TYPE, true, true,
-			90, B_ALIGN_LEFT, false); 
+			90, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("URL", kAttrURL, B_STRING_TYPE, true, true,
-			120, B_ALIGN_LEFT, false); 
+			120, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Group", kAttrGroup, B_STRING_TYPE, true, true,
-			120, B_ALIGN_LEFT, false); 
+			120, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Nickname", kAttrNickname, B_STRING_TYPE, true, true,
-			120, B_ALIGN_LEFT, false); 
+			120, B_ALIGN_LEFT, false);
 	}
 
 	InstallMimeIfNeeded(B_PRINTER_SPOOL_MIMETYPE, kResSpoolFileIcon,
 		"Printer spool", "Printer spool file.", "application/x-vnd.Be-PRNT");
-		
+
 	{
 #if B_BEOS_VERSION_DANO
 		ExtraAttributeLazyInstaller installer(B_PRINTER_SPOOL_MIMETYPE);
@@ -332,7 +502,7 @@ TTracker::InitMimeTypes()
 			60, B_ALIGN_LEFT, false);
 #endif
 	}
-		
+
 	InstallMimeIfNeeded(B_PRINTER_MIMETYPE, kResGenericPrinterIcon,
 		"Printer", "Printer queue.", kTrackerSignature /*application/x-vnd.Be-PRNT*/);
 		// for now set tracker as a default handler for the printer because we
@@ -352,7 +522,8 @@ TTracker::InitMimeTypes()
 #endif
 }
 
-void 
+
+void
 TTracker::InstallIndices()
 {
 	BVolumeRoster roster;
@@ -367,18 +538,14 @@ TTracker::InstallIndices()
 	}
 }
 
-void 
+
+void
 TTracker::InstallIndices(dev_t device)
 {
 	status_t error = fs_create_index(device, kAttrQueryLastChange, B_INT32_TYPE, 0);
 	error = fs_create_index(device, "_trk/recentQuery", B_INT32_TYPE, 0);
 }
 
-const int32 kDefaultQueryTemplateCount = 3;
-extern const AttributeTemplate kDefaultQueryTemplate[];
-extern const AttributeTemplate kBookmarkQueryTemplate[];
-extern const AttributeTemplate kPersonQueryTemplate[];
-extern const AttributeTemplate kEmailQueryTemplate[];
 
 void
 TTracker::InstallDefaultTemplates()
@@ -419,43 +586,8 @@ TTracker::InstallDefaultTemplates()
 		}
 }
 
-static void
-InstallTemporaryBackgroundImages(BNode *node, BMessage *message)
-{
-	int32 size = message->FlattenedSize();
-	char *buffer = new char [size];
-	message->Flatten(buffer, size);
-	node->WriteAttr(kBackgroundImageInfo, B_MESSAGE_TYPE, 0, buffer, (size_t)size);
-	delete [] buffer;
-}
 
-static void
-AddTemporaryBackgroundImages(BMessage *message, const char *imagePath,
-	BackgroundImage::Mode mode, BPoint offset, uint32 workspaces, bool textWidgetOutlines)
-{
-	message->AddString(kBackgroundImageInfoPath, imagePath);
-	message->AddInt32(kBackgroundImageInfoWorkspaces, (int32)workspaces);
-	message->AddInt32(kBackgroundImageInfoMode, mode);
-	message->AddBool(kBackgroundImageInfoTextOutline, textWidgetOutlines);
-	message->AddPoint(kBackgroundImageInfoOffset, offset);
-}
-
-#if 0 // dead code, don't know what it was used for
-static void
-InstallTemporaryBackgroundImagesIfNeeded(BNode *node, const char *imagePath,
-	BackgroundImage::Mode mode, BPoint offset, uint32 workspaces, bool textWidgetOutlines)
-{
-	attr_info info;
-	if (node->GetAttrInfo(kBackgroundImageInfo, &info) != B_OK) {
-		BMessage message;
-		AddTemporaryBackgroundImages(&message, imagePath, mode, offset, workspaces,
-			textWidgetOutlines);
-		InstallTemporaryBackgroundImages(node, &message);
-	}
-}
-#endif
-
-void 
+void
 TTracker::InstallTemporaryBackgroundImages()
 {
 	// make the large Haiku Logo the default background
@@ -472,22 +604,8 @@ TTracker::InstallTemporaryBackgroundImages()
 		return;
 	}
 	path.Append("artwork");
-//	FSFindTrackerSettingsDir(&path, false);
-//	path.Append(kDefaultFolderTemplate);
 
 	BString defaultBackgroundImage("/HAIKU logo - white on blue - big.png");
-#if 0
-	BString defaultBackgroundTexture("/backgroundTexture.tga");
-
-	BNode node;
-	if (BContainerWindow::DefaultStateSourceNode(kDefaultFolderTemplate, &node, true)) {
-		// install a default background texture for folders in icon view mode
-		InstallTemporaryBackgroundImagesIfNeeded(&node,
-			(BString(path.Path()) << defaultBackgroundTexture).String(),
-			BackgroundImage::kTiled,
-			BPoint(0, 0), 0xffffffff, false);
-	}
-#endif
 
 	BDirectory dir;
 	if (FSGetBootDeskDir(&dir) == B_OK) {
@@ -496,155 +614,14 @@ TTracker::InstallTemporaryBackgroundImages()
 		if (dir.GetAttrInfo(kBackgroundImageInfo, &info) != B_OK) {
 			BScreen screen(B_MAIN_SCREEN_ID);
 			BPoint logoPos;
-			logoPos.x = floorf((screen.Frame().Width() - 605) * (sqrtf(5) - 1) / 2);
+			logoPos.x
+				= floorf((screen.Frame().Width() - 605) * (sqrtf(5) - 1) / 2);
 			logoPos.y = floorf((screen.Frame().Height() - 190) * 0.9);
 			BMessage message;
 			AddTemporaryBackgroundImages(&message,
 				(BString(path.Path()) << defaultBackgroundImage).String(),
-				BackgroundImage::kAtOffset,
-				logoPos, 0xffffffff, false);
+				BackgroundImage::kAtOffset, logoPos, 0xffffffff, false);
 			::InstallTemporaryBackgroundImages(&dir, &message);
 		}
 	}
 }
-
-
-// the following templates are in big endian and we rely on the Tracker
-// translation support to swap them on little endian machines
-//
-// in case there is an attribute (B_RECT_TYPE) that gets swapped by the media (unzip,
-// file system endianness swapping, etc., the correct endianness for the
-// correct machine has to be used here
-
-const BRect kDefaultFrame(40, 40, 500, 350);
-
-const AttributeTemplate kDefaultQueryTemplate[] =
-	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/application_octet-stream */
-{
-	{		 /* default frame */
-		kAttrWindowFrame, 
-		B_RECT_TYPE,
-		16,
-		(const char *)&kDefaultFrame
-	},
-	{		 /* attr: _trk/viewstate */
-		kAttrViewState_be, 
-		B_RAW_TYPE,
-		49,
-		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
-		"\000\000\000\000\000\000\000\000\000\000\357\323\335RCSTR\000\000\000"
-		"\000\000\000\000\000\000"
-	},
-	{		 /* attr: _trk/columns */
-		kAttrColumns_be, 
-		B_RAW_TYPE,
-		223,
-		"O\362VR\000\000\000\025\000\000\000\004Name\000B \000\000C\021\000"
-		"\000\000\000\000\000\000\000\000\012_stat/name\000\357\323\335RCST"
-		"R\001\001O\362VR\000\000\000\025\000\000\000\004Path\000CH\000\000"
-		"Ca\000\000\000\000\000\000\000\000\000\011_trk/path\000\357_\174RC"
-		"STR\000\000O\362VR\000\000\000\025\000\000\000\004Size\000C\334\000"
-		"\000B$\000\000\000\000\000\001\000\000\000\012_stat/size\000\317\317"
-		"\306TOFFT\001\000O\362VR\000\000\000\025\000\000\000\010Modified\000"
-		"C\370\000\000C\012\000\000\000\000\000\000\000\000\000\016_stat/mo"
-		"dified\000]KmETIME\001\000"
-	}
-};
-
-const AttributeTemplate kBookmarkQueryTemplate[] =
-	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/application_x-vnd.Be-bookmark */
-{
-	{		 /* default frame */
-		kAttrWindowFrame, 
-		B_RECT_TYPE,
-		16,
-		(const char *)&kDefaultFrame
-	},
-	{		 /* attr: _trk/viewstate */
-		kAttrViewState_be, 
-		B_RAW_TYPE,
-		49,
-		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
-		"\000\000\000\000\000\000\000\000\000\000w\373\175RCSTR\000\000\000"
-		"\000\000\000\000\000\000"
-	},
-	{		 /* attr: _trk/columns */
-		kAttrColumns_be, 
-		B_RAW_TYPE,
-		163,
-		"O\362VR\000\000\000\025\000\000\000\005Title\000B \000\000C+\000\000"
-		"\000\000\000\000\000\000\000\012META:title\000w\373\175RCSTR\000\001"
-		"O\362VR\000\000\000\025\000\000\000\003URL\000Cb\000\000C\217\200\000"
-		"\000\000\000\000\000\000\000\010META:url\000\343[TRCSTR\000\001O\362"
-		"VR\000\000\000\025\000\000\000\010Keywords\000D\004\000\000C\002\000"
-		"\000\000\000\000\000\000\000\000\011META:keyw\000\333\363\334RCSTR"
-		"\000\001"
-	}
-};
-
-const AttributeTemplate kPersonQueryTemplate[] =
-	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/application_x-vnd.Be-bookmark */
-{
-	{		 /* default frame */
-		kAttrWindowFrame, 
-		B_RECT_TYPE,
-		16,
-		(const char *)&kDefaultFrame
-	},
-	{		 /* attr: _trk/viewstate */
-		kAttrViewState_be, 
-		B_RAW_TYPE,
-		49,
-		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
-		"\000\000\000\000\000\000\000\000\000\000\357\323\335RCSTR\000\000\000"
-		"\000\000\000\000\000\000"
-	},
-	{		 /* attr: _trk/columns */
-		kAttrColumns_be, 
-		B_RAW_TYPE,
-		230,
-		"O\362VR\000\000\000\025\000\000\000\004Name\000B \000\000B\346\000"
-		"\000\000\000\000\000\000\000\000\012_stat/name\000\357\323\335RCST"
-		"R\001\001O\362VR\000\000\000\025\000\000\000\012Work Phone\000C*\000"
-		"\000B\264\000\000\000\000\000\000\000\000\000\013META:wphone\000C_"
-		"uRCSTR\000\001O\362VR\000\000\000\025\000\000\000\006E-mail\000C\211"
-		"\200\000B\272\000\000\000\000\000\000\000\000\000\012META:email\000"
-		"sW\337RCSTR\000\001O\362VR\000\000\000\025\000\000\000\007Company\000"
-		"C\277\200\000B\360\000\000\000\000\000\000\000\000\000\014META:com"
-		"pany\000CS\174RCSTR\000\001"
-	},
-};
-
-const AttributeTemplate kEmailQueryTemplate[] =
-	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/text_x-email */
-{
-	{		 /* default frame */
-		kAttrWindowFrame, 
-		B_RECT_TYPE,
-		16,
-		(const char *)&kDefaultFrame
-	},
-	{		 /* attr: _trk/viewstate */
-		kAttrViewState_be, 
-		B_RAW_TYPE,
-		49,
-		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
-		"\000\000\000\000\000\000\000\000\000\000\366_\377ETIME\000\000\000"
-		"\000\000\000\000\000\000"
-	},
-	{		 /* attr: _trk/columns */
-		kAttrColumns_be, 
-		B_RAW_TYPE,
-		222,
-		"O\362VR\000\000\000\025\000\000\000\007Subject\000B \000\000B\334\000"
-		"\000\000\000\000\000\000\000\000\014MAIL:subject\000\343\173\337RC"
-		"STR\000\000O\362VR\000\000\000\025\000\000\000\004From\000C%\000\000"
-		"C\031\000\000\000\000\000\000\000\000\000\011MAIL:from\000\317s_RC"
-		"STR\000\000O\362VR\000\000\000\025\000\000\000\004When\000C\246\200"
-		"\000B\360\000\000\000\000\000\000\000\000\000\011MAIL:when\000\366"
-		"_\377ETIME\000\000O\362VR\000\000\000\025\000\000\000\006Status\000"
-		"C\352\000\000BH\000\000\000\000\000\001\000\000\000\013MAIL:status"
-		"\000G\363\134RCSTR\000\001"
-	},
-};
-
