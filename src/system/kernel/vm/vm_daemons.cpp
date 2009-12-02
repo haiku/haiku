@@ -13,10 +13,11 @@
 #include <OS.h>
 
 #include <tracing.h>
-#include <vm.h>
-#include <vm_priv.h>
-#include <vm_cache.h>
-#include <vm_page.h>
+#include <vm/vm.h>
+#include <vm/vm_priv.h>
+#include <vm/vm_page.h>
+#include <vm/VMCache.h>
+
 #include "VMAnonymousCache.h"
 
 

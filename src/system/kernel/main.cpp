@@ -48,7 +48,7 @@
 #include <timer.h>
 #include <user_debugger.h>
 #include <vfs.h>
-#include <vm.h>
+#include <vm/vm.h>
 #include <boot/kernel_args.h>
 
 #include "vm/VMAnonymousCache.h"

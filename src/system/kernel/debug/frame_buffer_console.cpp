@@ -15,7 +15,7 @@
 #include <kernel.h>
 #include <lock.h>
 #include <boot_item.h>
-#include <vm.h>
+#include <vm/vm.h>
 #include <fs/devfs.h>
 #include <boot/kernel_args.h>
 #include <vesa_info.h>

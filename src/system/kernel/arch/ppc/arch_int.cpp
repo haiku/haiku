@@ -22,9 +22,9 @@
 #include <timer.h>
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_priv.h>
+#include <vm/vm.h>
+#include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
 
 #include <string.h>
 

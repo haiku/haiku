@@ -12,7 +12,7 @@
 #include <commpage_defs.h>
 #include <kernel.h>
 #include <util/AutoLock.h>
-#include <vm.h>
+#include <vm/vm.h>
 
 
 //#define TRACE_BREAKPOINT_MANAGER

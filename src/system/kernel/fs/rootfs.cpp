@@ -19,7 +19,7 @@
 #	include <khash.h>
 #	include <lock.h>
 #	include <util/AutoLock.h>
-#	include <vm.h>
+#	include <vm/vm.h>
 
 #	include <NodeMonitor.h>
 

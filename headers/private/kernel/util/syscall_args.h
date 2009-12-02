@@ -4,7 +4,7 @@
 #define _SYSCALL_ARGS_H
 
 #include <kernel.h>
-//#include <vm.h>
+
 
 // Hack to be able to use the IS_USER_ADDRESS macro when compiling for R5.
 #ifdef R5_MEMORY_LAYOUT
@@ -33,5 +33,6 @@ copy_ref_var_to_user(T &kernel, T *user)
 		return B_BAD_ADDRESS;
 	return user_memcpy(user, &kernel, sizeof(T));
 }
+
 
 #endif	// _SYSCALL_ARGS_H

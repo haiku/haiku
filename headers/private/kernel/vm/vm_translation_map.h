@@ -5,8 +5,8 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef KERNEL_VM_TRANSLATION_MAP_H
-#define KERNEL_VM_TRANSLATION_MAP_H
+#ifndef KERNEL_VM_VM_TRANSLATION_MAP_H
+#define KERNEL_VM_VM_TRANSLATION_MAP_H
 
 
 #include <kernel.h>
@@ -73,4 +73,4 @@ typedef struct vm_translation_map_ops {
 
 #include <arch/vm_translation_map.h>
 
-#endif	/* KERNEL_VM_TRANSLATION_MAP_H */
+#endif	/* KERNEL_VM_VM_TRANSLATION_MAP_H */

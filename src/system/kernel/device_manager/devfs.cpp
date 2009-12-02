@@ -34,7 +34,7 @@
 #include <util/AutoLock.h>
 #include <util/khash.h>
 #include <vfs.h>
-#include <vm.h>
+#include <vm/vm.h>
 
 #include "BaseDevice.h"
 #include "FileDevice.h"

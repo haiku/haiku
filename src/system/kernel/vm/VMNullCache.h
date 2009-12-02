@@ -9,7 +9,7 @@
 #ifndef _KERNEL_VM_STORE_NULL_H
 #define _KERNEL_VM_STORE_NULL_H
 
-#include <vm_types.h>
+#include <vm/vm_types.h>
 
 
 class VMNullCache : public VMCache {

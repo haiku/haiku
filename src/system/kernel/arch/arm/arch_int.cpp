@@ -26,9 +26,9 @@
 #include <timer.h>
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_priv.h>
+#include <vm/vm.h>
+#include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
 #include <string.h>
 
 #warning M68K: writeme!
@@ -69,7 +69,7 @@ struct iframe_stack gBootFrameStack;
 //static void *sPICCookie;
 
 
-void 
+void
 arch_int_enable_io_interrupt(int irq)
 {
 #warning ARM WRITEME
@@ -82,7 +82,7 @@ arch_int_enable_io_interrupt(int irq)
 }
 
 
-void 
+void
 arch_int_disable_io_interrupt(int irq)
 {
 #warning ARM WRITEME
@@ -98,7 +98,7 @@ arch_int_disable_io_interrupt(int irq)
 /* arch_int_*_interrupts() and friends are in arch_asm.S */
 
 
-static void 
+static void
 print_iframe(struct iframe *frame)
 {
 /*
@@ -112,7 +112,7 @@ print_iframe(struct iframe *frame)
 #warning ARM WRITEME
 }
 
-status_t 
+status_t
 arch_int_init(kernel_args *args)
 {
 	status_t err;
@@ -129,7 +129,7 @@ arch_int_init(kernel_args *args)
 	/* point VBR to the new table */
 //	asm volatile  ("movec %0,%%vbr" : : "r"(vbr):);
 #warning ARM WRITEME
-	
+
 	return B_OK;
 }
 

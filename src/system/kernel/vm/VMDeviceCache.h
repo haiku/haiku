@@ -9,7 +9,7 @@
 #ifndef _KERNEL_VM_STORE_DEVICE_H
 #define _KERNEL_VM_STORE_DEVICE_H
 
-#include <vm_types.h>
+#include <vm/vm_types.h>
 
 
 class VMDeviceCache : public VMCache {

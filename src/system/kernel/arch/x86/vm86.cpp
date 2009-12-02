@@ -6,7 +6,7 @@
  * Copyright (C) 1998 by Josh Vanderhoof
  */
 
-#include <vm.h>
+#include <vm/vm.h>
 #include <thread.h>
 #include <vm86.h>
 #include <arch_cpu.h>

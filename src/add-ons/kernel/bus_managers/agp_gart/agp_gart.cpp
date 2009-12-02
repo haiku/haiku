@@ -33,8 +33,8 @@
 #include <util/OpenHashTable.h>
 #ifdef __HAIKU__
 #	include <kernel/lock.h>
-#	include <vm_page.h>
-#	include <vm_types.h>
+#	include <vm/vm_page.h>
+#	include <vm/vm_types.h>
 #endif
 
 #include <lock.h>

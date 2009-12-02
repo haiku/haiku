@@ -20,9 +20,9 @@
 #include <kernel.h>
 #include <kimage.h>
 #include <thread.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_types.h>
+#include <vm/vm.h>
+#include <vm/vm_types.h>
+#include <vm/VMAddressSpace.h>
 
 #include <arch_cpu.h>
 

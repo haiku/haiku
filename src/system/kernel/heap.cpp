@@ -21,8 +21,8 @@
 #include <thread.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
-#include <vm.h>
-#include <vm_page.h>
+#include <vm/vm.h>
+#include <vm/vm_page.h>
 
 
 //#define TRACE_HEAP

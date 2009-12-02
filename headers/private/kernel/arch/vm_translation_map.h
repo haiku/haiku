@@ -9,7 +9,7 @@
 #define KERNEL_ARCH_VM_TRANSLATION_MAP_H
 
 
-#include <vm_translation_map.h>
+#include <vm/vm_translation_map.h>
 
 
 #ifdef __cplusplus

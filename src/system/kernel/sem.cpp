@@ -28,7 +28,7 @@
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <vfs.h>
-#include <vm_page.h>
+#include <vm/vm_page.h>
 #include <boot/kernel_args.h>
 #include <syscall_restart.h>
 #include <wait_for_objects.h>

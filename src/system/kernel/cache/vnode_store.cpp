@@ -11,7 +11,7 @@
 
 #include <file_cache.h>
 #include <vfs.h>
-#include <vm.h>
+#include <vm/vm.h>
 
 #include "IORequest.h"
 

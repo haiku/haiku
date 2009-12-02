@@ -22,7 +22,7 @@
 #include <team.h>
 #include <thread.h>
 #include <user_debugger.h>
-#include <vm.h>
+#include <vm/vm.h>
 
 #include <arch/debug.h>
 

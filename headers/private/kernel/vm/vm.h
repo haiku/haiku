@@ -5,8 +5,8 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef _KERNEL_VM_H
-#define _KERNEL_VM_H
+#ifndef _KERNEL_VM_VM_H
+#define _KERNEL_VM_VM_H
 
 #include <OS.h>
 
@@ -154,4 +154,4 @@ status_t _user_unreserve_address_range(addr_t address, addr_t size);
 }
 #endif
 
-#endif	/* _KERNEL_VM_H */
+#endif	/* _KERNEL_VM_VM_H */

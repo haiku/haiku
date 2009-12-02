@@ -7,7 +7,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
-#include <vm_cache.h>
+#include <vm/VMCache.h>
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -23,10 +23,10 @@
 #include <util/khash.h>
 #include <util/AutoLock.h>
 #include <vfs.h>
-#include <vm.h>
-#include <vm_page.h>
-#include <vm_priv.h>
-#include <vm_types.h>
+#include <vm/vm.h>
+#include <vm/vm_page.h>
+#include <vm/vm_priv.h>
+#include <vm/vm_types.h>
 
 
 //#define TRACE_VM_CACHE

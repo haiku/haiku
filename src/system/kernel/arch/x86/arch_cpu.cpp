@@ -21,9 +21,9 @@
 #include <elf.h>
 #include <smp.h>
 #include <tls.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_types.h>
+#include <vm/vm.h>
+#include <vm/vm_types.h>
+#include <vm/VMAddressSpace.h>
 
 #include <arch_system_info.h>
 #include <arch/x86/selector.h>

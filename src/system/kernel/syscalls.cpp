@@ -47,7 +47,7 @@
 #include <usergroup.h>
 #include <util/AutoLock.h>
 #include <vfs.h>
-#include <vm.h>
+#include <vm/vm.h>
 #include <wait_for_objects.h>
 
 #include "syscall_numbers.h"

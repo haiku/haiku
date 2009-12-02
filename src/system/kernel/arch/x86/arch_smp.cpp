@@ -8,7 +8,7 @@
 
 
 #include <boot/kernel_args.h>
-#include <vm.h>
+#include <vm/vm.h>
 #include <int.h>
 #include <smp.h>
 #include <smp_priv.h>

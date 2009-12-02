@@ -5,7 +5,7 @@
 
 #include "generic_vm_physical_page_ops.h"
 
-#include <vm.h>
+#include <vm/vm.h>
 #include <util/AutoLock.h>
 
 

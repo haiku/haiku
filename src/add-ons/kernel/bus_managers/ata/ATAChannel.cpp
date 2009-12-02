@@ -129,17 +129,17 @@ ATAChannel::_DevicePresent(int device)
 	ata_task_file taskFile;
 	taskFile.chs.sector_count = 0x5a;
 	taskFile.chs.sector_number = 0xa5;
-	if (_WriteRegs(&taskFile, ATA_MASK_SECTOR_COUNT 
+	if (_WriteRegs(&taskFile, ATA_MASK_SECTOR_COUNT
 		| ATA_MASK_SECTOR_NUMBER) != B_OK) {
 		TRACE_ERROR("_DevicePresent: writing registers failed\n");
 		return false;
 	}
-	if (_ReadRegs(&taskFile, ATA_MASK_SECTOR_COUNT 
+	if (_ReadRegs(&taskFile, ATA_MASK_SECTOR_COUNT
 		| ATA_MASK_SECTOR_NUMBER) != B_OK) {
 		TRACE_ERROR("_DevicePresent: reading registers failed\n");
 		return false;
 	}
-	bool present = (taskFile.chs.sector_count == 0x5a && 
+	bool present = (taskFile.chs.sector_count == 0x5a &&
 		taskFile.chs.sector_number == 0xa5);
 
 	TRACE_ALWAYS("_DevicePresent: device %i, presence %d\n", device, present);
@@ -179,7 +179,7 @@ ATAChannel::ScanBus()
 		if (Wait(0, ATA_STATUS_BUSY, 0, 3 * 1000 * 1000) != B_OK) {
 			uint8 status = AltStatus();
 			if (status == 0xff || status == 0x7f) {
-				TRACE_ALWAYS("illegal status value 0x%02x for device %d\n", 
+				TRACE_ALWAYS("illegal status value 0x%02x for device %d\n",
 					status, i);
 				continue;
 			} else {
@@ -214,7 +214,7 @@ ATAChannel::ScanBus()
 			TRACE_ERROR("device 0 indicates that device 1 failed"
 				" error code is 0x%02x\n", taskFile.read.error);
 		} else if (taskFile.read.error != 0x01) {
-			TRACE_ERROR("device %d failed, error code is 0x%02x\n", 
+			TRACE_ERROR("device %d failed, error code is 0x%02x\n",
 				i, taskFile.read.error);
 		}
 
@@ -455,7 +455,7 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 		bigtime_t elapsedTime = system_time() - startTime;
 #if ATA_TRACING
 		if (lastStatus != status) {
-			TRACE("wait status changed after %lld, status 0x%02x\n", 
+			TRACE("wait status changed after %lld, status 0x%02x\n",
 				elapsedTime, status);
 			lastStatus = status;
 		}
@@ -990,7 +990,7 @@ ATAChannel::_TransferPIOBlock(ATARequest *request, size_t length,
 
 
 // TODO: this should not be necessary, we could directly use virtual addresses
-#include <vm.h>
+#include <vm/vm.h>
 #include <thread.h>
 
 status_t

@@ -9,7 +9,7 @@
 #ifndef _KERNEL_VM_STORE_ANONYMOUS_NO_SWAP_H
 #define _KERNEL_VM_STORE_ANONYMOUS_NO_SWAP_H
 
-#include <vm_types.h>
+#include <vm/vm_types.h>
 
 
 class VMAnonymousNoSwapCache : public VMCache {

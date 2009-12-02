@@ -21,9 +21,9 @@
 #include <smp.h>
 #include <util/AutoLock.h>
 #include <util/queue.h>
-#include <vm_address_space.h>
-#include <vm_page.h>
-#include <vm_priv.h>
+#include <vm/vm_page.h>
+#include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
 
 #include "x86_paging.h"
 #include "x86_physical_page_mapper.h"

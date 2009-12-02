@@ -35,9 +35,9 @@
 #include <util/OpenHashTable.h>
 #include <util/RadixBitmap.h>
 #include <vfs.h>
-#include <vm.h>
-#include <vm_page.h>
-#include <vm_priv.h>
+#include <vm/vm.h>
+#include <vm/vm_page.h>
+#include <vm/vm_priv.h>
 
 #include "IORequest.h"
 

@@ -31,9 +31,9 @@
 #include <util/AutoLock.h>
 #include <util/khash.h>
 #include <vfs.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_types.h>
+#include <vm/vm.h>
+#include <vm/vm_types.h>
+#include <vm/VMAddressSpace.h>
 
 #include <arch/cpu.h>
 #include <arch/elf.h>

@@ -21,8 +21,8 @@
 #include <thread.h>
 #include <tls.h>
 #include <tracing.h>
-#include <vm_address_space.h>
-#include <vm_types.h>
+#include <vm/vm_types.h>
+#include <vm/VMAddressSpace.h>
 
 #include "x86_paging.h"
 

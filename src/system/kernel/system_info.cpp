@@ -27,8 +27,8 @@
 #include <smp.h>
 #include <team.h>
 #include <thread.h>
-#include <vm.h>
-#include <vm_page.h>
+#include <vm/vm.h>
+#include <vm/vm_page.h>
 
 
 const static int64 kKernelVersion = 0x1;

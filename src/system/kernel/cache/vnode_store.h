@@ -7,7 +7,7 @@
 #define VNODE_STORE_H
 
 
-#include <vm_types.h>
+#include <vm/vm_types.h>
 
 
 struct file_cache_ref;

@@ -5,7 +5,7 @@
 
 
 #include <KernelExport.h>
-#include <vm_types.h>
+#include <vm/vm_types.h>
 
 #include <arch/x86/bios.h>
 

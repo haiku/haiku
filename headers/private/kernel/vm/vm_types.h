@@ -6,8 +6,8 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef _KERNEL_VM_TYPES_H
-#define _KERNEL_VM_TYPES_H
+#ifndef _KERNEL_VM_VM_TYPES_H
+#define _KERNEL_VM_VM_TYPES_H
 
 
 #include <arch/vm_types.h>
@@ -314,4 +314,4 @@ struct VMArea {
 };
 
 
-#endif	// _KERNEL_VM_TYPES_H
+#endif	// _KERNEL_VM_VM_TYPES_H

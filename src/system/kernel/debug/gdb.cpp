@@ -21,7 +21,7 @@
 #include <elf.h>
 #include <elf_priv.h>
 #include <smp.h>
-#include <vm.h>
+#include <vm/vm.h>
 
 
 enum { INIT = 0, CMDREAD, CKSUM1, CKSUM2, WAITACK, QUIT, GDBSTATES };

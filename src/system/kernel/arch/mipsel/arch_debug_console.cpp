@@ -12,7 +12,7 @@
 #include <arch/debug_console.h>
 #include <boot/kernel_args.h>
 #include <kernel.h>
-#include <vm.h>
+#include <vm/vm.h>
 #include <arch/arm/uart.h>
 #include <string.h>
 

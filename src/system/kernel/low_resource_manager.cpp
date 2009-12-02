@@ -20,8 +20,8 @@
 #include <sem.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
-#include <vm_page.h>
-#include <vm_priv.h>
+#include <vm/vm_page.h>
+#include <vm/vm_priv.h>
 
 
 //#define TRACE_LOW_RESOURCE_MANAGER
@@ -176,7 +176,7 @@ compute_state(void)
 		sLowSemaphoresState = B_NO_LOW_RESOURCE;
 		sLowResources &= ~B_KERNEL_RESOURCE_SEMAPHORES;
 	}
-	
+
 	// free kernel address space state
 	// TODO: this should take fragmentation into account
 	size_t maxSpace = KERNEL_SIZE;

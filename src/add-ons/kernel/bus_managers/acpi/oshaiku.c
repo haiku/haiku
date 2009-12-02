@@ -130,7 +130,7 @@
 
 #include <dpc.h>
 #include <PCI.h>
-#include <vm.h>
+#include <vm/vm.h>
 
 
 extern pci_module_info *gPCIManager;

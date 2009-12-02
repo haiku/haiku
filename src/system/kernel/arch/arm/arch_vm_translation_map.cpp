@@ -11,9 +11,9 @@
 
 #include <KernelExport.h>
 #include <kernel.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_priv.h>
+#include <vm/vm.h>
+#include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
 #include <int.h>
 #include <boot/kernel_args.h>
 #include <arch/vm_translation_map.h>
@@ -94,7 +94,7 @@ arch_vm_translation_map_init_post_sem(kernel_args *args)
  */
 
 status_t
-arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress, 
+arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress,
 	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
 {
 	return NULL;
@@ -107,7 +107,7 @@ arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t
 
 // XXX currently assumes this translation map is active
 
-status_t 
+status_t
 arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical)
 {
 	return NULL;

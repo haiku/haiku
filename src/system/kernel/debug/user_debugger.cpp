@@ -26,8 +26,8 @@
 #include <thread.h>
 #include <thread_types.h>
 #include <user_debugger.h>
-#include <vm.h>
-#include <vm_types.h>
+#include <vm/vm.h>
+#include <vm/vm_types.h>
 
 #include <AutoDeleter.h>
 #include <util/AutoLock.h>

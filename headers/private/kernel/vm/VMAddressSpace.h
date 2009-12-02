@@ -6,13 +6,13 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef _KERNEL_VM_ADDRESS_SPACE_H
-#define _KERNEL_VM_ADDRESS_SPACE_H
+#ifndef _KERNEL_VM_VM_ADDRESS_SPACE_H
+#define _KERNEL_VM_VM_ADDRESS_SPACE_H
 
 
 #include <OS.h>
 
-#include <vm_translation_map.h>
+#include <vm/vm_translation_map.h>
 
 
 struct VMArea;
@@ -115,4 +115,4 @@ status_t vm_delete_areas(struct VMAddressSpace *aspace);
 #endif
 
 
-#endif	/* _KERNEL_VM_ADDRESS_SPACE_H */
+#endif	/* _KERNEL_VM_VM_ADDRESS_SPACE_H */

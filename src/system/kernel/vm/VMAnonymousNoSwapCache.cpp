@@ -14,7 +14,7 @@
 #include <arch_config.h>
 #include <heap.h>
 #include <KernelExport.h>
-#include <vm_priv.h>
+#include <vm/vm_priv.h>
 
 
 //#define TRACE_STORE

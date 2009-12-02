@@ -7,7 +7,7 @@
 
 
 #include <vfs.h>
-#include <vm_types.h>
+#include <vm/vm_types.h>
 #include <module.h>
 
 

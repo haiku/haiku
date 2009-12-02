@@ -18,7 +18,7 @@
 #include <team.h>
 #include <thread.h>
 #include <util/AutoLock.h>
-#include <vm.h>
+#include <vm/vm.h>
 
 
 struct tracing_stack_trace {

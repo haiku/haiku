@@ -14,8 +14,8 @@
 #include <kernel.h>
 #include <boot/kernel_args.h>
 
-#include <vm.h>
-#include <vm_types.h>
+#include <vm/vm.h>
+#include <vm/vm_types.h>
 #include <arch/vm.h>
 #include <arch_mmu.h>
 

@@ -27,7 +27,7 @@
 #include <util/AutoLock.h>
 #include <util/ring_buffer.h>
 #include <vfs.h>
-#include <vm.h>
+#include <vm/vm.h>
 
 #include "fifo.h"
 

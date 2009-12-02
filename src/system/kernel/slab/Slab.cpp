@@ -27,8 +27,8 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 #include <util/khash.h>
-#include <vm.h>
-#include <vm_address_space.h>
+#include <vm/vm.h>
+#include <vm/VMAddressSpace.h>
 
 
 // TODO kMagazineCapacity should be dynamically tuned per cache.

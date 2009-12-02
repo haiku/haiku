@@ -27,11 +27,11 @@
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <vfs.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_priv.h>
-#include <vm_page.h>
-#include <vm_cache.h>
+#include <vm/vm.h>
+#include <vm/vm_priv.h>
+#include <vm/vm_page.h>
+#include <vm/VMAddressSpace.h>
+#include <vm/VMCache.h>
 
 #include "VMAnonymousCache.h"
 #include "IORequest.h"

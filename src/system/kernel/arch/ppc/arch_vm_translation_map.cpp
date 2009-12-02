@@ -73,9 +73,9 @@
 
 #include <KernelExport.h>
 #include <kernel.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_priv.h>
+#include <vm/vm.h>
+#include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
 #include <int.h>
 #include <boot/kernel_args.h>
 #include <arch/vm_translation_map.h>

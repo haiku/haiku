@@ -5,7 +5,7 @@
 #ifndef ARCH_ARM_VM_H
 #define ARCH_ARM_VM_H
 
-//#include <vm_translation_map.h>
+//#include <vm/vm_translation_map.h>
 
 /* This many pages will be read/written on I/O if possible */
 
@@ -22,7 +22,7 @@ struct arm_vm_ops {
 	status_t (*arch_vm_translation_map_init)(kernel_args *args);
 	status_t (*arch_vm_translation_map_init_post_area)(kernel_args *args);
 	status_t (*arch_vm_translation_map_init_post_sem)(kernel_args *args);
-	status_t (*arch_vm_translation_map_early_map)(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress, 
+	status_t (*arch_vm_translation_map_early_map)(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress,
 		uint8 attributes, addr_t (*get_free_page)(kernel_args *));
 	status_t (*arch_vm_translation_map_early_query)(addr_t va, addr_t *out_physical);*/
 //	void (*m68k_set_pgdir)(void *);

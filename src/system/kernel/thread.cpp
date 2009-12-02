@@ -41,8 +41,8 @@
 #include <user_runtime.h>
 #include <user_thread.h>
 #include <vfs.h>
-#include <vm.h>
-#include <vm_address_space.h>
+#include <vm/vm.h>
+#include <vm/VMAddressSpace.h>
 #include <wait_for_objects.h>
 
 

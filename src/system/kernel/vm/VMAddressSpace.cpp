@@ -8,17 +8,18 @@
  */
 
 
+#include <vm/VMAddressSpace.h>
+
+#include <stdlib.h>
+
 #include <KernelExport.h>
 
 #include <util/OpenHashTable.h>
 
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_priv.h>
 #include <heap.h>
 #include <thread.h>
-
-#include <stdlib.h>
+#include <vm/vm.h>
+#include <vm/vm_priv.h>
 
 
 //#define TRACE_VM

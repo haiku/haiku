@@ -27,7 +27,7 @@
 #include "scsi_internal.h"
 #include "KernelExport_ext.h"
 
-#include <vm.h>
+#include <vm/vm.h>
 
 #include <string.h>
 

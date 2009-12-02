@@ -6,12 +6,12 @@ UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) device_manager ] ;
 
 KernelMergeObject kernel_vm.o :
 	vm.cpp
-	vm_address_space.cpp
-	vm_cache.cpp
 	vm_daemons.cpp
 	vm_page.cpp
+	VMAddressSpace.cpp
 	VMAnonymousCache.cpp
 	VMAnonymousNoSwapCache.cpp
+	VMCache.cpp
 	VMDeviceCache.cpp
 	VMNullCache.cpp
 	#vm_tests.c

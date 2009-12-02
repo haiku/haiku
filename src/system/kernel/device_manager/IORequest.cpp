@@ -14,8 +14,8 @@
 #include <kernel.h>
 #include <thread.h>
 #include <util/AutoLock.h>
-#include <vm.h>
-#include <vm_address_space.h>
+#include <vm/vm.h>
+#include <vm/VMAddressSpace.h>
 
 #include "dma_resources.h"
 

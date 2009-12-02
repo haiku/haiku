@@ -16,10 +16,10 @@
 
 #include <smp.h>
 #include <util/AutoLock.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_page.h>
-#include <vm_priv.h>
+#include <vm/vm.h>
+#include <vm/vm_page.h>
+#include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
 
 #include <arch/vm.h>
 #include <arch/int.h>

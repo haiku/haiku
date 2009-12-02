@@ -19,8 +19,8 @@
 #include <boot/stage2.h>
 #include <kernel.h>
 #include <thread.h>
-#include <vm_address_space.h>
-#include <vm_types.h>
+#include <vm/vm_types.h>
+#include <vm/VMAddressSpace.h>
 #include <arch_vm.h>
 
 #include <string.h>

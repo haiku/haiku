@@ -24,9 +24,9 @@
 #include <timer.h>
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <vm_priv.h>
+#include <vm/vm.h>
+#include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
 #include <string.h>
 
 
@@ -42,28 +42,28 @@ addr_t gFaultHandler;
 struct iframe_stack gBootFrameStack;
 
 
-void 
+void
 arch_int_enable_io_interrupt(int irq)
 {
 #warning IMPLEMENT arch_int_enable_io_interrupt
 }
 
 
-void 
+void
 arch_int_disable_io_interrupt(int irq)
 {
 #warning IMPLEMENT arch_int_disable_io_interrupt
 }
 
 
-static void 
+static void
 print_iframe(struct iframe* frame)
 {
 #warning IMPLEMENT print_iframe
 }
 
 
-status_t 
+status_t
 arch_int_init(kernel_args* args)
 {
 #warning IMPLEMENT arch_int_init

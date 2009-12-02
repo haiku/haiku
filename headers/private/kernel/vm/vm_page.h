@@ -5,11 +5,11 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef _KERNEL_VM_PAGE_H
-#define _KERNEL_VM_PAGE_H
+#ifndef _KERNEL_VM_VM_PAGE_H
+#define _KERNEL_VM_VM_PAGE_H
 
 
-#include <vm.h>
+#include <vm/vm.h>
 
 
 struct kernel_args;
@@ -62,4 +62,4 @@ struct vm_page *vm_lookup_page(addr_t pageNumber);
 }
 #endif
 
-#endif	/* _KERNEL_VM_PAGE_H */
+#endif	/* _KERNEL_VM_VM_PAGE_H */

@@ -51,8 +51,8 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 #include <vfs.h>
-#include <vm.h>
-#include <vm_cache.h>
+#include <vm/vm.h>
+#include <vm/VMCache.h>
 
 #include "fifo.h"
 #include "IORequest.h"

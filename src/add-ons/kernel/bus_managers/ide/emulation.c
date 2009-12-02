@@ -11,7 +11,7 @@
 #include "ide_internal.h"
 #include "ide_sim.h"
 
-#include <vm.h>
+#include <vm/vm.h>
 
 #include <string.h>
 

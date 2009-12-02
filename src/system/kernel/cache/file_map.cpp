@@ -19,9 +19,9 @@
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <vfs.h>
-#include <vm.h>
-#include <vm_page.h>
-#include <vm_cache.h>
+#include <vm/vm.h>
+#include <vm/vm_page.h>
+#include <vm/VMCache.h>
 
 #include "kernel_debug_config.h"
 

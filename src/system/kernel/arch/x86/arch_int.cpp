@@ -15,8 +15,8 @@
 #include <smp.h>
 #include <team.h>
 #include <thread.h>
-#include <vm.h>
-#include <vm_priv.h>
+#include <vm/vm.h>
+#include <vm/vm_priv.h>
 
 #include <arch/cpu.h>
 #include <arch/int.h>

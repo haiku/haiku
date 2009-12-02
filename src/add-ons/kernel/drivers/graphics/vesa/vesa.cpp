@@ -13,7 +13,7 @@
 #include <frame_buffer_console.h>
 #include <util/kernel_cpp.h>
 #include <arch/x86/vm86.h>
-#include <vm.h>
+#include <vm/vm.h>
 
 #include "driver.h"
 #include "utility.h"

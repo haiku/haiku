@@ -10,8 +10,8 @@
 #include <KernelExport.h>
 
 #include <elf.h>
-#include <vm.h>
-#include <vm_types.h>
+#include <vm/vm.h>
+#include <vm/vm_types.h>
 
 
 static area_id	sCommPageArea;

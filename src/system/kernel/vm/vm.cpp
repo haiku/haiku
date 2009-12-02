@@ -8,7 +8,7 @@
  */
 
 
-#include <vm.h>
+#include <vm/vm.h>
 
 #include <ctype.h>
 #include <stdlib.h>
@@ -44,10 +44,10 @@
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/khash.h>
-#include <vm_address_space.h>
-#include <vm_cache.h>
-#include <vm_page.h>
-#include <vm_priv.h>
+#include <vm/vm_page.h>
+#include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
+#include <vm/VMCache.h>
 
 #include "VMAnonymousCache.h"
 #include "IORequest.h"
