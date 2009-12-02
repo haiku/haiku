@@ -34,6 +34,7 @@
 #include <vm/vm.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
+#include <vm/VMArea.h>
 
 #include <arch/cpu.h>
 #include <arch/elf.h>

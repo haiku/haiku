@@ -31,6 +31,7 @@
 #include <vm/vm_priv.h>
 #include <vm/vm_page.h>
 #include <vm/VMAddressSpace.h>
+#include <vm/VMArea.h>
 #include <vm/VMCache.h>
 
 #include "VMAnonymousCache.h"

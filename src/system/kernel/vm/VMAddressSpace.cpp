@@ -20,6 +20,7 @@
 #include <thread.h>
 #include <vm/vm.h>
 #include <vm/vm_priv.h>
+#include <vm/VMArea.h>
 
 
 //#define TRACE_VM

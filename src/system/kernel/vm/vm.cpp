@@ -47,6 +47,7 @@
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
 #include <vm/VMAddressSpace.h>
+#include <vm/VMArea.h>
 #include <vm/VMCache.h>
 
 #include "VMAnonymousCache.h"
@@ -190,10 +191,7 @@ public:
 };
 
 
-#define AREA_HASH_TABLE_SIZE 1024
 static area_id sNextAreaID = 1;
-static hash_table* sAreaHash;
-static rw_lock sAreaHashLock = RW_LOCK_INITIALIZER("area hash");
 static mutex sMappingLock = MUTEX_INITIALIZER("page mappings");
 static mutex sAreaCacheLock = MUTEX_INITIALIZER("area->cache");
 
@@ -316,9 +314,7 @@ AddressSpaceReadLocker::SetFromArea(area_id areaID, VMArea*& area)
 
 	fSpace->ReadLock();
 
-	rw_lock_read_lock(&sAreaHashLock);
-	area = (VMArea*)hash_lookup(sAreaHash, &areaID);
-	rw_lock_read_unlock(&sAreaHashLock);
+	area = VMAreaHash::Lookup(areaID);
 
 	if (area == NULL || area->address_space != fSpace) {
 		fSpace->ReadUnlock();
@@ -414,9 +410,7 @@ AddressSpaceWriteLocker::SetFromArea(area_id areaID, VMArea*& area)
 
 	fSpace->WriteLock();
 
-	rw_lock_read_lock(&sAreaHashLock);
-	area = (VMArea*)hash_lookup(sAreaHash, &areaID);
-	rw_lock_read_unlock(&sAreaHashLock);
+	area = VMAreaHash::Lookup(areaID);
 
 	if (area == NULL || area->address_space != fSpace) {
 		fSpace->WriteUnlock();
@@ -432,9 +426,9 @@ status_t
 AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 	bool allowKernel, VMArea*& area)
 {
-	rw_lock_read_lock(&sAreaHashLock);
+	VMAreaHash::ReadLock();
 
-	area = (VMArea*)hash_lookup(sAreaHash, &areaID);
+	area = VMAreaHash::LookupLocked(areaID);
 	if (area != NULL
 		&& (area->address_space->ID() == team
 			|| (allowKernel && team == VMAddressSpace::KernelID()))) {
@@ -442,7 +436,7 @@ AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 		fSpace->Get();
 	}
 
-	rw_lock_read_unlock(&sAreaHashLock);
+	VMAreaHash::ReadUnlock();
 
 	if (fSpace == NULL)
 		return B_BAD_VALUE;
@@ -452,9 +446,7 @@ AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 
 	fSpace->WriteLock();
 
-	rw_lock_read_lock(&sAreaHashLock);
-	area = (VMArea*)hash_lookup(sAreaHash, &areaID);
-	rw_lock_read_unlock(&sAreaHashLock);
+	area = VMAreaHash::Lookup(areaID);
 
 	if (area == NULL) {
 		fSpace->WriteUnlock();
@@ -722,9 +714,7 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 		// lock the cache again and check whether anything has changed
 
 		// check whether the area is gone in the meantime
-		rw_lock_read_lock(&sAreaHashLock);
-		area = (VMArea*)hash_lookup(sAreaHash, &areaID);
-		rw_lock_read_unlock(&sAreaHashLock);
+		area = VMAreaHash::Lookup(areaID);
 
 		if (area == NULL) {
 			Unlock();
@@ -892,46 +882,20 @@ private:
 //	#pragma mark -
 
 
-static int
-area_compare(void* _area, const void* key)
-{
-	VMArea* area = (VMArea*)_area;
-	const area_id* id = (const area_id*)key;
-
-	if (area->id == *id)
-		return 0;
-
-	return -1;
-}
-
-
-static uint32
-area_hash(void* _area, const void* key, uint32 range)
-{
-	VMArea* area = (VMArea*)_area;
-	const area_id* id = (const area_id*)key;
-
-	if (area != NULL)
-		return area->id % range;
-
-	return (uint32)*id % range;
-}
-
-
 static VMAddressSpace*
 get_address_space_by_area_id(area_id id)
 {
 	VMAddressSpace* addressSpace = NULL;
 
-	rw_lock_read_lock(&sAreaHashLock);
+	VMAreaHash::ReadLock();
 
-	VMArea* area = (VMArea*)hash_lookup(sAreaHash, &id);
+	VMArea* area = VMAreaHash::LookupLocked(id);
 	if (area != NULL) {
 		addressSpace = area->address_space;
 		addressSpace->Get();
 	}
 
-	rw_lock_read_unlock(&sAreaHashLock);
+	VMAreaHash::ReadUnlock();
 
 	return addressSpace;
 }
@@ -941,13 +905,13 @@ get_address_space_by_area_id(area_id id)
 static VMArea*
 lookup_area(VMAddressSpace* addressSpace, area_id id)
 {
-	rw_lock_read_lock(&sAreaHashLock);
+	VMAreaHash::ReadLock();
 
-	VMArea* area = (VMArea*)hash_lookup(sAreaHash, &id);
+	VMArea* area = VMAreaHash::LookupLocked(id);
 	if (area != NULL && area->address_space != addressSpace)
 		area = NULL;
 
-	rw_lock_read_unlock(&sAreaHashLock);
+	VMAreaHash::ReadUnlock();
 
 	return area;
 }
@@ -1696,9 +1660,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		cache->Unlock();
 
 	// insert the area in the global area hash table
-	rw_lock_write_lock(&sAreaHashLock);
-	hash_insert(sAreaHash, area);
-	rw_lock_write_unlock(&sAreaHashLock);
+	VMAreaHash::Insert(area);
 
 	// grab a ref to the address space (the area holds this)
 	addressSpace->Get();
@@ -2746,9 +2708,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 static void
 delete_area(VMAddressSpace* addressSpace, VMArea* area)
 {
-	rw_lock_write_lock(&sAreaHashLock);
-	hash_remove(sAreaHash, area);
-	rw_lock_write_unlock(&sAreaHashLock);
+	VMAreaHash::Remove(area);
 
 	// At this point the area is removed from the global hash table, but
 	// still exists in the area list.
@@ -3974,10 +3934,9 @@ dump_area(int argc, char** argv)
 		dump_area_struct((struct VMArea*)num, mappings);
 	} else {
 		// walk through the area list, looking for the arguments as a name
-		struct hash_iterator iter;
 
-		hash_open(sAreaHash, &iter);
-		while ((area = (VMArea*)hash_next(sAreaHash, &iter)) != NULL) {
+		VMAreaHashTable::Iterator it = VMAreaHash::GetIterator();
+		while ((area = it.Next()) != NULL) {
 			if (((mode & 4) != 0 && area->name != NULL
 					&& !strcmp(argv[index], area->name))
 				|| (num != 0 && (((mode & 1) != 0 && (addr_t)area->id == num)
@@ -4000,7 +3959,6 @@ static int
 dump_area_list(int argc, char** argv)
 {
 	VMArea* area;
-	struct hash_iterator iter;
 	const char* name = NULL;
 	int32 id = 0;
 
@@ -4012,8 +3970,8 @@ dump_area_list(int argc, char** argv)
 
 	kprintf("addr          id  base\t\tsize    protect lock  name\n");
 
-	hash_open(sAreaHash, &iter);
-	while ((area = (VMArea*)hash_next(sAreaHash, &iter)) != NULL) {
+	VMAreaHashTable::Iterator it = VMAreaHash::GetIterator();
+	while ((area = it.Next()) != NULL) {
 		if ((id != 0 && area->address_space->ID() != id)
 			|| (name != NULL && strstr(area->name, name) == NULL))
 			continue;
@@ -4022,7 +3980,6 @@ dump_area_list(int argc, char** argv)
 			(void*)area->base, (void*)area->size, area->protection, area->wiring,
 			area->name);
 	}
-	hash_close(sAreaHash, &iter, false);
 	return 0;
 }
 
@@ -4456,12 +4413,9 @@ vm_init(kernel_args* args)
 	vm_cache_init(args);
 
 	{
-		VMArea* area;
-		sAreaHash = hash_init(AREA_HASH_TABLE_SIZE,
-			(addr_t)&area->hash_next - (addr_t)area,
-			&area_compare, &area_hash);
-		if (sAreaHash == NULL)
-			panic("vm_init: error creating aspace hash table\n");
+		status_t error = VMAreaHash::Init();
+		if (error != B_OK)
+			panic("vm_init: error initializing area hash table\n");
 	}
 
 	VMAddressSpace::Init();
@@ -5898,26 +5852,7 @@ area_for(void* address)
 area_id
 find_area(const char* name)
 {
-	rw_lock_read_lock(&sAreaHashLock);
-	struct hash_iterator iterator;
-	hash_open(sAreaHash, &iterator);
-
-	VMArea* area;
-	area_id id = B_NAME_NOT_FOUND;
-	while ((area = (VMArea*)hash_next(sAreaHash, &iterator)) != NULL) {
-		if (area->id == RESERVED_AREA_ID)
-			continue;
-
-		if (!strcmp(area->name, name)) {
-			id = area->id;
-			break;
-		}
-	}
-
-	hash_close(sAreaHash, &iterator, false);
-	rw_lock_read_unlock(&sAreaHashLock);
-
-	return id;
+	return VMAreaHash::Find(name);
 }
 
 

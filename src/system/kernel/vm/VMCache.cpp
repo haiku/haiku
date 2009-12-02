@@ -27,6 +27,7 @@
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
 #include <vm/vm_types.h>
+#include <vm/VMArea.h>
 
 
 //#define TRACE_VM_CACHE

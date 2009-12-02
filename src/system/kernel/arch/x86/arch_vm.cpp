@@ -20,6 +20,7 @@
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
 #include <vm/VMAddressSpace.h>
+#include <vm/VMArea.h>
 
 #include <arch/vm.h>
 #include <arch/int.h>

@@ -287,31 +287,4 @@ public:
 };
 
 
-struct VMArea {
-	char*					name;
-	area_id					id;
-	addr_t					base;
-	addr_t					size;
-	uint32					protection;
-	uint16					wiring;
-	uint16					memory_type;
-
-	VMCache*				cache;
-	vint32					no_cache_change;
-	off_t					cache_offset;
-	uint32					cache_type;
-	VMAreaMappings			mappings;
-	uint8*					page_protections;
-
-	struct VMAddressSpace*	address_space;
-	struct VMArea*			address_space_next;
-	struct VMArea*			cache_next;
-	struct VMArea*			cache_prev;
-	struct VMArea*			hash_next;
-
-	bool ContainsAddress(addr_t address) const
-		{ return address >= base && address <= base + (size - 1); }
-};
-
-
 #endif	// _KERNEL_VM_VM_TYPES_H
