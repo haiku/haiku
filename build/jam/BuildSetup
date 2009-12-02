@@ -389,6 +389,7 @@ HAIKU_PRIVATE_KERNEL_HEADERS =
 	[ PrivateHeaders $(DOT) kernel libroot
 		kernel/boot/platform/$(HAIKU_BOOT_PLATFORM) ]
 	[ ArchHeaders $(HAIKU_ARCH) ]
+	[ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) system kernel ]
 	$(HAIKU_PRIVATE_SYSTEM_HEADERS)
 ;
 
