@@ -23,7 +23,6 @@ AddResources checkitout : checkitout.rdef ;
 StdBinCommands
 	badblocks.c
 	cal.c
-	catattr.cpp
 	chop.c
 	clear.c
 	clockconfig.c
@@ -77,6 +76,7 @@ StdBinCommands
 # standard commands that need libbe.so
 StdBinCommands
 	beep.cpp
+	catattr.cpp
 	checkfs.cpp
 	clipboard.cpp
 	df.cpp

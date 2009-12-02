@@ -1,6 +1,6 @@
 /*
  * Copyright 2005, Stephan Aßmus, superstippi@yellowbites.com.
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Sebastian Nozzi.
  *
  * Distributed under the terms of the MIT license.
@@ -20,8 +20,7 @@
 #include <unistd.h>
 
 
-/** Used to present the characters in the raw data view */
-
+/*!	Used to present the characters in the raw data view */
 static void
 putCharOrDot(uchar c)
 {
@@ -29,12 +28,11 @@ putCharOrDot(uchar c)
 }
 
 
-/** Dumps the contents of the attribute in the form of
- *	raw data. This view is used for the type B_RAW_DATA_TYPE,
- *	for custom types and for any type that is not directly
- *	supported by the utility "addattr"
- */
-
+/*!	Dumps the contents of the attribute in the form of
+	raw data. This view is used for the type B_RAW_DATA_TYPE,
+	for custom types and for any type that is not directly
+	supported by the utility "addattr"
+*/
 static void
 dumpRawData(const char *buffer, size_t size)
 {
@@ -82,8 +80,11 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 
 	// limit size of the attribute, only the first 64k will make it on screen
 	off_t size = info.size;
-	if (size > 64 * 1024)
+	bool cut = false;
+	if (size > 64 * 1024) {
 		size = 64 * 1024;
+		cut = true;
+	}
 
 	char* buffer = (char*)malloc(size);
 	if (!buffer) {
@@ -98,7 +99,8 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 	}
 
 	if (bytesRead != size) {
-		fprintf(stderr, "Could only read %ld bytes from attribute!\n", bytesRead);
+		fprintf(stderr, "Could only read %ld bytes from attribute!\n",
+			bytesRead);
 		free(buffer);
 		return B_ERROR;
 	}
@@ -112,21 +114,28 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 			// check for write error
 			if (written < bytesRead) {
 				if (written >= 0) {
-					fprintf(stderr, "Could only write %ld bytes to stream!\n", written);
+					fprintf(stderr, "Could only write %ld bytes to stream!\n",
+						written);
 					written = B_ERROR;
-				} else
-					fprintf(stderr, "Failed to write to stream: %s\n", strerror(written));
+				} else {
+					fprintf(stderr, "Failed to write to stream: %s\n",
+						strerror(written));
+				}
 				break;
 			}
 			// read next chunk of data at pos
 			pos += bytesRead;
-			bytesRead = fs_read_attr(fd, attribute, info.type, pos, buffer, size);
+			bytesRead = fs_read_attr(fd, attribute, info.type, pos, buffer,
+				size);
 			// check for read error
 			if (bytesRead < size && pos + bytesRead < info.size) {
-				if (bytesRead >= 0)
-					fprintf(stderr, "Could only read %ld bytes from attribute!\n", bytesRead);
-				else
-					fprintf(stderr, "Failed to read from attribute: %s\n", strerror(bytesRead));
+				if (bytesRead >= 0) {
+					fprintf(stderr, "Could only read %ld bytes from "
+						"attribute!\n", bytesRead);
+				} else {
+					fprintf(stderr, "Failed to read from attribute: %s\n",
+						strerror(bytesRead));
+				}
 				written = B_ERROR;
 				break;
 			}
@@ -172,9 +181,30 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 			printf("%s : bool : %d\n", fileName, *((unsigned char *)buffer));
 			break;
 		case B_STRING_TYPE:
-		case B_MIME_STRING_TYPE:
 			printf("%s : string : %s\n", fileName, buffer);
 			break;
+
+		case B_MIME_STRING_TYPE:
+		case 'MSIG':
+		case 'MSDC':
+		case 'MPTH':
+			printf("%s : '%c%c%c%c' : %s\n", fileName,
+				(int)((info.type >> 24) & 0xff),
+				(int)((info.type >> 16) & 0xff),
+				(int)((info.type >> 8) & 0xff), (int)(info.type & 0xff),
+				buffer);
+			break;
+
+		case B_MESSAGE_TYPE:
+		{
+			BMessage message;
+			if (!cut && message.Unflatten(buffer) == B_OK) {
+				printf("%s : message :\n", fileName);
+				message.PrintToStream();
+				break;
+			}
+			// supposed to fall through
+		}
 
 		default:
 			// The rest of the attributes types are displayed as raw data

@@ -62,9 +62,12 @@ show_attr_contents(BNode& node, const char* attribute, const attr_info& info)
 	// limit size of the attribute, only the first kLimit byte will make it on
 	// screen
 	int kLimit = 256;
+	bool cut = false;
 	off_t size = info.size;
-	if (size > kLimit)
+	if (size > kLimit) {
 		size = kLimit;
+		cut = true;
+	}
 
 	char buffer[kLimit];
 	ssize_t bytesRead = node.ReadAttr(attribute, info.type, 0, buffer, size);
@@ -110,8 +113,23 @@ show_attr_contents(BNode& node, const char* attribute, const attr_info& info)
 			break;
 		case B_STRING_TYPE:
 		case B_MIME_STRING_TYPE:
+		case 'MSIG':
+		case 'MSDC':
+		case 'MPTH':
 			printf("%s\n", buffer);
 			break;
+
+		case B_MESSAGE_TYPE:
+		{
+			BMessage message;
+			if (!cut && message.Unflatten(buffer) == B_OK) {
+				putchar('\n');
+				message.PrintToStream();
+				putchar('\n');
+				break;
+			}
+			// supposed to fall through
+		}
 
 		default:
 			// The rest of the attributes types are displayed as raw data
