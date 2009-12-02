@@ -9,6 +9,7 @@ KernelMergeObject kernel_vm.o :
 	vm_daemons.cpp
 	vm_page.cpp
 	VMAddressSpace.cpp
+	VMAddressSpaceLocking.cpp
 	VMAnonymousCache.cpp
 	VMAnonymousNoSwapCache.cpp
 	VMArea.cpp
