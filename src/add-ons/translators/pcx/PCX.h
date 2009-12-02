@@ -25,7 +25,7 @@ struct pcx_header {
 	uint16	hDpi, vDpi;
 	uint8	colormap[48];
 	uint8	reserved;
-	uint8	nPlanes;
+	uint8	numPlanes;
 	uint16	bytesPerLine;
 	uint16	paletteInfo;
 	uint16	hScreenSize, vScreenSize;
