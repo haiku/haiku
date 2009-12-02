@@ -1,3 +1,12 @@
+/*
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marcus Overhagen
+ */
+
+
 #include <MediaDefs.h>
 #include <OS.h>
 #include <stdio.h>
@@ -119,7 +128,7 @@ fix_multiaudio_format(media_multi_audio_format *format)
 				format->matrix_mask = 0;
 			}
 			break;
-		
+
 		default:
 			if (count_nonzero_bits(format->channel_mask) != (int)format->channel_count) {
 				format->channel_mask = 0xffffffff;

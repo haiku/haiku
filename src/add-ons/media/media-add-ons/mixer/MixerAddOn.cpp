@@ -4,21 +4,28 @@
  * Copyright 2007 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
+
+#include "MixerAddOn.h"
+
+#include <stdio.h>
+#include <string.h>
+
 #include <MediaRoster.h>
 #include <MediaNode.h>
-#include <cstring>
-#include <cstdio>
 
 #include "AudioMixer.h"
-#include "MixerAddOn.h"
+
 
 // instantiation function
 extern "C" _EXPORT BMediaAddOn* make_media_addon(image_id image) {
 	return new AudioMixerAddon(image);
 }
 
+
 AudioMixerAddon::AudioMixerAddon(image_id image)
-	: BMediaAddOn(image),
+	:
+	BMediaAddOn(image),
 	fFormat(new media_format),
 	fInfo(new flavor_info)
 {
@@ -38,15 +45,16 @@ AudioMixerAddon::AudioMixerAddon(image_id image)
 	fInfo->out_formats = fFormat;
 }
 
+
 AudioMixerAddon::~AudioMixerAddon()
 {
 	delete fFormat;
 	delete fInfo;
 }
 
-// -------------------------------------------------------- //
-// BMediaAddOn impl
-// -------------------------------------------------------- //
+
+// #pragma mark - BMediaAddOn implementation
+
 
 status_t
 AudioMixerAddon::InitCheck(const char** out_failure_text)
@@ -54,11 +62,13 @@ AudioMixerAddon::InitCheck(const char** out_failure_text)
 	return B_OK;
 }
 
+
 int32
 AudioMixerAddon::CountFlavors()
 {
 	return 1;
 }
+
 
 status_t
 AudioMixerAddon::GetFlavorAt(int32 n, const flavor_info** out_info)
@@ -66,24 +76,28 @@ AudioMixerAddon::GetFlavorAt(int32 n, const flavor_info** out_info)
 	// only the 0th flavor exists
 	if (n != 0)
 		return B_ERROR;
-	
+
 	*out_info = fInfo;
 	return B_OK;
 }
 
+
 BMediaNode *
 AudioMixerAddon::InstantiateNodeFor(const flavor_info* info, BMessage* config,
-									status_t* out_error)
+	status_t* out_error)
 {
 	return new AudioMixer(this, false);
 }
 
+
 status_t
-AudioMixerAddon::GetConfigurationFor(BMediaNode* your_node,	BMessage* into_message)
+AudioMixerAddon::GetConfigurationFor(BMediaNode* your_node,
+	BMessage* into_message)
 {
 	// no config yet
 	return B_ERROR;
 }
+
 
 bool
 AudioMixerAddon::WantsAutoStart()
@@ -91,9 +105,10 @@ AudioMixerAddon::WantsAutoStart()
 	return true;
 }
 
+
 status_t
 AudioMixerAddon::AutoStart(int in_index, BMediaNode **out_node,
-							int32 *out_internal_id, bool *out_has_more)
+	int32 *out_internal_id, bool *out_has_more)
 {
 	*out_has_more = false;
 
@@ -103,6 +118,6 @@ AudioMixerAddon::AutoStart(int in_index, BMediaNode **out_node,
 	*out_internal_id = 0;
 	AudioMixer *mixer = new AudioMixer(this, true);
 	*out_node = mixer;
-	
+
 	return B_OK;
 }

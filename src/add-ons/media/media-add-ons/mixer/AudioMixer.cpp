@@ -6,23 +6,27 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "AudioMixer.h"
+
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <Buffer.h>
+#include <FindDirectory.h>
+#include <MediaRoster.h>
+#include <ParameterWeb.h>
+#include <Path.h>
+#include <RealtimeAlloc.h>
+#include <TimeSource.h>
+
 #include "MixerCore.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerUtils.h"
 
-#include <Buffer.h>
-#include <FindDirectory.h>
-#include <math.h>
-#include <MediaRoster.h>
-#include <ParameterWeb.h>
-#include <Path.h>
-#include <RealtimeAlloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <TimeSource.h>
 
 // the range of the gain sliders (in dB)
 #define DB_MAX	18.0
@@ -84,7 +88,8 @@ multi_audio_format_specialize(media_multi_audio_format *format,
 
 
 AudioMixer::AudioMixer(BMediaAddOn *addOn, bool isSystemMixer)
-	: BMediaNode("Audio Mixer"),
+	:
+	BMediaNode("Audio Mixer"),
 	BBufferConsumer(B_MEDIA_RAW_AUDIO),
 	BBufferProducer(B_MEDIA_RAW_AUDIO),
 	BControllable(),

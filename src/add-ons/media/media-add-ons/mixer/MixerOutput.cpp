@@ -1,19 +1,24 @@
 /*
- * Copyright 2007 Haiku Inc. All rights reserved.
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              probably Marcus Overhagen
+ *		Marcus Overhagen
  */
-#include "MixerCore.h"
-#include "MixerDebug.h"
+
+
 #include "MixerOutput.h"
-#include "MixerUtils.h"
 
 #include <MediaNode.h>
 
+#include "MixerCore.h"
+#include "MixerDebug.h"
+#include "MixerUtils.h"
+
+
 MixerOutput::MixerOutput(MixerCore *core, const media_output &output)
- :	fCore(core),
+	:
+	fCore(core),
 	fOutput(output),
 	fOutputChannelCount(0),
 	fOutputChannelInfo(0),
@@ -28,11 +33,13 @@ MixerOutput::MixerOutput(MixerCore *core, const media_output &output)
 	UpdateByteOrderSwap();
 }
 
+
 MixerOutput::~MixerOutput()
 {
 	delete fOutputChannelInfo;
 	delete fOutputByteSwap;
 }
+
 
 media_output &
 MixerOutput::MediaOutput()
@@ -40,18 +47,20 @@ MixerOutput::MediaOutput()
 	return fOutput;
 }
 
+
 void
 MixerOutput::ChangeFormat(const media_multi_audio_format &format)
 {
 	fOutput.format.u.raw_audio = format;
 	fix_multiaudio_format(&fOutput.format.u.raw_audio);
-	
+
 	PRINT_OUTPUT("MixerOutput::ChangeFormat", fOutput);
 	PRINT_CHANNEL_MASK(fOutput.format);
 
 	UpdateOutputChannels();
 	UpdateByteOrderSwap();
 }
+
 
 void
 MixerOutput::UpdateByteOrderSwap()
@@ -68,6 +77,7 @@ MixerOutput::UpdateByteOrderSwap()
 		}
 	}
 }
+
 
 void
 MixerOutput::UpdateOutputChannels()
@@ -115,12 +125,13 @@ MixerOutput::UpdateOutputChannels()
 		TRACE("UpdateOutputChannels: output channel %d, type %2d, gain %.3f\n", i, fOutputChannelInfo[i].channel_type, fOutputChannelInfo[i].channel_gain);
 }
 
+
 void
 MixerOutput::AssignDefaultSources()
 {
 	uint32 mask = fOutput.format.u.raw_audio.channel_mask;
 	int count = fOutputChannelCount;
-	
+
 	// assign default sources for a few known setups,
 	// everything else is left unchanged (it already is 1:1)
 	if (count == 1 && mask & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT)) {
@@ -296,6 +307,7 @@ MixerOutput::AssignDefaultSources()
 	}
 }
 
+
 int
 MixerOutput::GetOutputChannelType(int channel)
 {
@@ -303,6 +315,7 @@ MixerOutput::GetOutputChannelType(int channel)
 		return 0;
 	return fOutputChannelInfo[channel].channel_type;
 }
+
 
 void
 MixerOutput::SetOutputChannelGain(int channel, float gain)
@@ -312,6 +325,7 @@ MixerOutput::SetOutputChannelGain(int channel, float gain)
 		return;
 	fOutputChannelInfo[channel].channel_gain = gain;
 }
+
 
 void
 MixerOutput::AddOutputChannelSource(int channel, int source_type)
@@ -333,6 +347,7 @@ MixerOutput::AddOutputChannelSource(int channel, int source_type)
 	fOutputChannelInfo[channel].source_count++;
 }
 
+
 void
 MixerOutput::RemoveOutputChannelSource(int channel, int source_type)
 {
@@ -350,6 +365,7 @@ MixerOutput::RemoveOutputChannelSource(int channel, int source_type)
 		}
 	}
 }
+
 
 void
 MixerOutput::SetOutputChannelSourceGain(int channel, int source_type, float source_gain)
@@ -369,6 +385,7 @@ MixerOutput::SetOutputChannelSourceGain(int channel, int source_type, float sour
 	fOutputChannelInfo[channel].source_gain_cache[source_type] = source_gain;
 }
 
+
 float
 MixerOutput::GetOutputChannelSourceGain(int channel, int source_type)
 {
@@ -386,6 +403,7 @@ MixerOutput::GetOutputChannelSourceGain(int channel, int source_type)
 	return fOutputChannelInfo[channel].source_gain_cache[source_type];
 }
 
+
 bool
 MixerOutput::HasOutputChannelSource(int channel, int source_type)
 {
@@ -398,6 +416,7 @@ MixerOutput::HasOutputChannelSource(int channel, int source_type)
 	}
 	return false;
 }
+
 
 void
 MixerOutput::SetMuted(bool yesno)

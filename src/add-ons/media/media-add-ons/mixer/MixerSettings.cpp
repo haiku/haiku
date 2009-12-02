@@ -1,30 +1,37 @@
 /*
- * Copyright 2007 Haiku Inc. All rights reserved.
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              probably Marcus Overhagen
+ *		Marcus Overhagen
  */
-#include "MixerCore.h"
-#include "MixerDebug.h"
-#include "MixerInput.h"
-#include "MixerOutput.h"
+
+
 #include "MixerSettings.h"
+
+#include <string.h>
 
 #include <File.h>
 #include <Locker.h>
 #include <MediaDefs.h>
 #include <OS.h>
 #include <Path.h>
-#include <string.h>
+
+#include "MixerCore.h"
+#include "MixerDebug.h"
+#include "MixerInput.h"
+#include "MixerOutput.h"
+
 
 #define SAVE_DELAY		5000000		// delay saving of settings for 5s
 #define SAVE_RUNTIME	30000000	// stop save thread after 30s inactivity
 
 #define SETTINGS_VERSION ((int32)0x94251601)
 
+
 MixerSettings::MixerSettings()
- :	fLocker(new BLocker("mixer settings lock")),
+	:
+	fLocker(new BLocker("mixer settings lock")),
  	fSettingsFile(0),
 	fSettingsDirty(false),
 	fSettingsLastChange(0),
@@ -35,6 +42,7 @@ MixerSettings::MixerSettings()
 	Load();
 }
 
+
 MixerSettings::~MixerSettings()
 {
 	StopDeferredSave();
@@ -43,6 +51,7 @@ MixerSettings::~MixerSettings()
 	delete fLocker;
 	delete fSettingsFile;
 }
+
 
 void
 MixerSettings::SetSettingsFile(const char *file)
@@ -54,6 +63,7 @@ MixerSettings::SetSettingsFile(const char *file)
 	Load();
 }
 
+
 bool
 MixerSettings::AttenuateOutput()
 {
@@ -64,6 +74,7 @@ MixerSettings::AttenuateOutput()
 	return temp;
 }
 
+
 void
 MixerSettings::SetAttenuateOutput(bool yesno)
 {
@@ -72,6 +83,7 @@ MixerSettings::SetAttenuateOutput(bool yesno)
 	fLocker->Unlock();
 	StartDeferredSave();
 }
+
 
 bool
 MixerSettings::NonLinearGainSlider()
@@ -83,6 +95,7 @@ MixerSettings::NonLinearGainSlider()
 	return temp;
 }
 
+
 void
 MixerSettings::SetNonLinearGainSlider(bool yesno)
 {
@@ -91,6 +104,7 @@ MixerSettings::SetNonLinearGainSlider(bool yesno)
 	fLocker->Unlock();
 	StartDeferredSave();
 }
+
 
 bool
 MixerSettings::UseBalanceControl()
@@ -102,6 +116,7 @@ MixerSettings::UseBalanceControl()
 	return temp;
 }
 
+
 void
 MixerSettings::SetUseBalanceControl(bool yesno)
 {
@@ -110,6 +125,7 @@ MixerSettings::SetUseBalanceControl(bool yesno)
 	fLocker->Unlock();
 	StartDeferredSave();
 }
+
 
 bool
 MixerSettings::AllowOutputChannelRemapping()
@@ -121,6 +137,7 @@ MixerSettings::AllowOutputChannelRemapping()
 	return temp;
 }
 
+
 void
 MixerSettings::SetAllowOutputChannelRemapping(bool yesno)
 {
@@ -129,6 +146,7 @@ MixerSettings::SetAllowOutputChannelRemapping(bool yesno)
 	fLocker->Unlock();
 	StartDeferredSave();
 }
+
 
 bool
 MixerSettings::AllowInputChannelRemapping()
@@ -140,6 +158,7 @@ MixerSettings::AllowInputChannelRemapping()
 	return temp;
 }
 
+
 void
 MixerSettings::SetAllowInputChannelRemapping(bool yesno)
 {
@@ -148,6 +167,7 @@ MixerSettings::SetAllowInputChannelRemapping(bool yesno)
 	fLocker->Unlock();
 	StartDeferredSave();
 }
+
 
 int
 MixerSettings::InputGainControls()
@@ -159,6 +179,7 @@ MixerSettings::InputGainControls()
 	return temp;
 }
 
+
 void
 MixerSettings::SetInputGainControls(int value)
 {
@@ -167,6 +188,7 @@ MixerSettings::SetInputGainControls(int value)
 	fLocker->Unlock();
 	StartDeferredSave();
 }
+
 
 int
 MixerSettings::ResamplingAlgorithm()
@@ -178,6 +200,7 @@ MixerSettings::ResamplingAlgorithm()
 	return temp;
 }
 
+
 void
 MixerSettings::SetResamplingAlgorithm(int value)
 {
@@ -186,6 +209,7 @@ MixerSettings::SetResamplingAlgorithm(int value)
 	fLocker->Unlock();
 	StartDeferredSave();
 }
+
 
 bool
 MixerSettings::RefuseOutputFormatChange()
@@ -197,6 +221,7 @@ MixerSettings::RefuseOutputFormatChange()
 	return temp;
 }
 
+
 void
 MixerSettings::SetRefuseOutputFormatChange(bool yesno)
 {
@@ -205,6 +230,7 @@ MixerSettings::SetRefuseOutputFormatChange(bool yesno)
 	fLocker->Unlock();
 	StartDeferredSave();
 }
+
 
 bool
 MixerSettings::RefuseInputFormatChange()
@@ -216,6 +242,7 @@ MixerSettings::RefuseInputFormatChange()
 	return temp;
 }
 
+
 void
 MixerSettings::SetRefuseInputFormatChange(bool yesno)
 {
@@ -225,17 +252,18 @@ MixerSettings::SetRefuseInputFormatChange(bool yesno)
 	StartDeferredSave();
 }
 
+
 void
 MixerSettings::SaveConnectionSettings(MixerInput *input)
 {
 	fLocker->Lock();
 	int index = -1;
-	
+
 	// try to find matching name first
 	for (int i = 0; i < MAX_INPUT_SETTINGS; i++) {
 		if (fInputSetting[i].IsEmpty())
 			continue;
-		if (0 == strcmp(fInputSetting[i].FindString("name"), input->MediaInput().name)) {
+		if (!strcmp(fInputSetting[i].FindString("name"), input->MediaInput().name)) {
 			index = i;
 			break;
 		}
@@ -267,7 +295,7 @@ MixerSettings::SaveConnectionSettings(MixerInput *input)
 	int count = input->GetInputChannelCount();
 	fInputSetting[index].AddInt32("InputChannelCount", count);
 	fInputSetting[index].AddBool("InputIsEnabled", input->IsEnabled());
-	
+
 	for (int i = 0; i < count; i++)
 		fInputSetting[index].AddFloat("InputChannelGain", input->GetInputChannelGain(i));
 
@@ -277,6 +305,7 @@ MixerSettings::SaveConnectionSettings(MixerInput *input)
 	StartDeferredSave();
 }
 
+
 void
 MixerSettings::LoadConnectionSettings(MixerInput *input)
 {
@@ -285,7 +314,7 @@ MixerSettings::LoadConnectionSettings(MixerInput *input)
 	for (index = 0; index < MAX_INPUT_SETTINGS; index++) {
 		if (fInputSetting[index].IsEmpty())
 			continue;
-		if (0 == strcmp(fInputSetting[index].FindString("name"), input->MediaInput().name))
+		if (!strcmp(fInputSetting[index].FindString("name"), input->MediaInput().name))
 			break;
 	}
 	if (index == MAX_INPUT_SETTINGS) {
@@ -293,57 +322,60 @@ MixerSettings::LoadConnectionSettings(MixerInput *input)
 		fLocker->Unlock();
 		return;
 	}
-	
+
 	TRACE("LoadConnectionSettings: found entry %d\n", index);
-	
+
 	int count = input->GetInputChannelCount();
 	if (fInputSetting[index].FindInt32("InputChannelCount") == count) {
 		for (int i = 0; i < count; i++)
 			input->SetInputChannelGain(i, fInputSetting[index].FindFloat("InputChannelGain", i));
 		input->SetEnabled(fInputSetting[index].FindBool("InputIsEnabled"));
 	}
-	
+
 	// XXX should load channel destinations and mixer channels
-		
+
 	fInputSetting[index].ReplaceInt64("lru", system_time());
 	fLocker->Unlock();
 	StartDeferredSave();
 }
 
+
 void
 MixerSettings::SaveConnectionSettings(MixerOutput *output)
 {
 	fLocker->Lock();
-	
+
 	fOutputSetting.MakeEmpty();
-	
+
 	int count = output->GetOutputChannelCount();
 	fOutputSetting.AddInt32("OutputChannelCount", count);
 	for (int i = 0; i < count; i++)
 		fOutputSetting.AddFloat("OutputChannelGain", output->GetOutputChannelGain(i));
 	fOutputSetting.AddBool("OutputIsMuted", output->IsMuted());
-	
+
 	// XXX should save channel sources and source gains
-	
+
 	fLocker->Unlock();
 	StartDeferredSave();
 }
+
 
 void
 MixerSettings::LoadConnectionSettings(MixerOutput *output)
 {
 	fLocker->Lock();
-	
+
 	int count = output->GetOutputChannelCount();
 	if (fOutputSetting.FindInt32("OutputChannelCount") == count) {
 		for (int i = 0; i < count; i++)
 			output->SetOutputChannelGain(i, fOutputSetting.FindFloat("OutputChannelGain", i));
 		output->SetMuted(fOutputSetting.FindBool("OutputIsMuted"));
 	}
-	
+
 	// XXX should load channel sources and source gains
 	fLocker->Unlock();
 }
+
 
 void
 MixerSettings::Save()
@@ -355,29 +387,30 @@ MixerSettings::Save()
 		return;
 	}
 	TRACE("MixerSettings: SAVE!\n");
-	
+
 	BMessage msg;
 	msg.AddInt32("version", SETTINGS_VERSION);
 	msg.AddData("settings", B_RAW_TYPE, (void *)&fSettings, sizeof(fSettings));
 	msg.AddMessage("output", &fOutputSetting);
 	for (int i = 0; i < MAX_INPUT_SETTINGS; i++)
 		msg.AddMessage("input", &fInputSetting[i]);
-		
+
 	char *buffer;
-    size_t length; 
-    
+    size_t length;
+
     length = msg.FlattenedSize();
     buffer = new char [length];
     msg.Flatten(buffer, length);
 
 	BFile file(fSettingsFile->Path(), B_READ_WRITE | B_CREATE_FILE);
 	file.Write(buffer, length);
-	
+
    	delete [] buffer;
-		
+
 	fSettingsDirty = false;
 	fLocker->Unlock();
 }
+
 
 void
 MixerSettings::Load()
@@ -393,13 +426,13 @@ MixerSettings::Load()
 	fSettings.ResamplingAlgorithm = 0;
 	fSettings.RefuseOutputFormatChange = true;
 	fSettings.RefuseInputFormatChange = true;
-	
+
 	// if we don't have a settings file, don't continue
 	if (!fSettingsFile) {
 		fLocker->Unlock();
 		return;
 	}
-	
+
 	BFile file(fSettingsFile->Path(), B_READ_WRITE);
 	off_t size = 0;
 	file.GetSize(&size);
@@ -432,10 +465,10 @@ MixerSettings::Load()
 		TRACE("MixerSettings: settings have wrong version\n");
 		return;
 	}
-	
+
 	const void *data;
 	ssize_t datasize = 0;
-	
+
 	msg.FindData("settings", B_RAW_TYPE, &data, &datasize);
 	if (datasize != sizeof(fSettings)) {
 		fLocker->Unlock();
@@ -443,19 +476,20 @@ MixerSettings::Load()
 		return;
 	}
 	memcpy((void *)&fSettings, data, sizeof(fSettings));
-	
+
 	msg.FindMessage("output", &fOutputSetting);
 	for (int i = 0; i < MAX_INPUT_SETTINGS; i++)
 		msg.FindMessage("input", i, &fInputSetting[i]);
-	
+
 	fLocker->Unlock();
 }
+
 
 void
 MixerSettings::StartDeferredSave()
 {
 	fLocker->Lock();
-	
+
 	// if we don't have a settings file, don't save the settings
 	if (!fSettingsFile) {
 		fLocker->Unlock();
@@ -464,14 +498,14 @@ MixerSettings::StartDeferredSave()
 
 	fSettingsDirty = true;
 	fSettingsLastChange = system_time();
-	
+
 	if (fSaveThreadRunning) {
 		fLocker->Unlock();
 		return;
 	}
-	
+
 	StopDeferredSave();
-	
+
 	ASSERT(fSaveThreadWaitSem < 0);
 	fSaveThreadWaitSem = create_sem(0, "save thread wait");
 	if (fSaveThreadWaitSem < B_OK) {
@@ -491,42 +525,44 @@ MixerSettings::StartDeferredSave()
 		return;
 	}
 	resume_thread(fSaveThread);
-	
+
 	fSaveThreadRunning = true;
 	fLocker->Unlock();
 }
+
 
 void
 MixerSettings::StopDeferredSave()
 {
 	fLocker->Lock();
 
-	if (fSaveThread > 0) {
+	if (fSaveThread >= 0) {
 		ASSERT(fSaveThreadWaitSem > 0);
 
 		status_t unused;
 		delete_sem(fSaveThreadWaitSem);
 		wait_for_thread(fSaveThread, &unused);
-		
+
 		fSaveThread = -1;
 		fSaveThreadWaitSem = -1;
 	}
-	
+
 	fLocker->Unlock();
 }
+
 
 void
 MixerSettings::SaveThread()
 {
 	bigtime_t timeout;
 	status_t rv;
-	
+
 	TRACE("MixerSettings: save thread started\n");
 
 	fLocker->Lock();
 	timeout = fSettingsLastChange + SAVE_DELAY;
 	fLocker->Unlock();
-	
+
 	for (;;) {
 		rv = acquire_sem_etc(fSaveThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, timeout);
 		if (rv == B_INTERRUPTED)
@@ -535,11 +571,11 @@ MixerSettings::SaveThread()
 			break;
 		if (B_OK != fLocker->LockWithTimeout(200000))
 			continue;
-			
+
 		TRACE("MixerSettings: save thread running\n");
-			
+
 		bigtime_t delta = system_time() - fSettingsLastChange;
-			
+
 		if (fSettingsDirty && delta > SAVE_DELAY) {
 			Save();
 		}
@@ -553,10 +589,11 @@ MixerSettings::SaveThread()
 		timeout = system_time() + SAVE_DELAY;
 		fLocker->Unlock();
 	}
-	
+
 	TRACE("MixerSettings: save thread ended\n");
 }
-	
+
+
 int32
 MixerSettings::_save_thread_(void *arg)
 {

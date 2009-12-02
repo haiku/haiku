@@ -6,23 +6,26 @@
 #ifndef _BYTE_SWAP_H
 #define _BYTE_SWAP_H
 
+
 #include <SupportDefs.h>
 
-class ByteSwap
-{
-	public:
-							ByteSwap(uint32 format);
-							~ByteSwap();
-	
-		void				Swap(void *buffer, size_t bytecount);
 
-	private:
-		void 				(*fFunc)(void *, size_t);
+class ByteSwap {
+public:
+								ByteSwap(uint32 format);
+								~ByteSwap();
+
+			void				Swap(void *buffer, size_t bytecount);
+
+private:
+			void 				(*fFunc)(void *, size_t);
 };
+
 
 inline void
 ByteSwap::Swap(void *buffer, size_t bytecount)
 {
 	(*fFunc)(buffer, bytecount);
 }
-#endif
+
+#endif	// _BYTE_SWAP_H

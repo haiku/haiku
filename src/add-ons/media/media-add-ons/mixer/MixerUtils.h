@@ -1,11 +1,20 @@
+/*
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marcus Overhagen
+ */
 #ifndef _MIXER_UTILS_H
 #define _MIXER_UTILS_H
+
 
 #ifndef __SGI_STL_INTERNAL_ALGOBASE_H
 template<class t> const t & max(const t &t1, const t &t2) { return (t1 > t2) ?  t1 : t2; }
 template<class t> const t & min(const t &t1, const t &t2) { return (t1 < t2) ?  t1 : t2; }
 #endif
 template<class t> const t abs(const t t1) { return (t1 < 0) ?  - t1 : t1; }
+
 
 void fix_multiaudio_format(media_multi_audio_format *format);
 
@@ -42,4 +51,4 @@ const char *StringForFormat(char *buf, MixerInput *input);
 const char *StringForChannelMask(char *buf, uint32 mask);
 const char *StringForChannelType(char *buf, int type);
 
-#endif //_MIXER_UTILS_H
+#endif // _MIXER_UTILS_H

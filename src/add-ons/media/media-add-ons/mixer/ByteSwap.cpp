@@ -3,16 +3,21 @@
  * Copyright 2007 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
+
 #include "ByteSwap.h"
-#include "MixerDebug.h"
 
 #include <ByteOrder.h>
 #include <MediaDefs.h>
+
+#include "MixerDebug.h"
+
 
 static void swap_float(void *buffer, size_t bytecount);
 static void swap_int32(void *buffer, size_t bytecount);
 static void swap_int16(void *buffer, size_t bytecount);
 static void do_nothing(void *buffer, size_t bytecount);
+
 
 ByteSwap::ByteSwap(uint32 format)
 {
@@ -32,18 +37,21 @@ ByteSwap::ByteSwap(uint32 format)
 	}
 }
 
+
 ByteSwap::~ByteSwap()
 {
 }
+
 
 void
 do_nothing(void *buffer, size_t bytecount)
 {
 }
 
-#if __INTEL__
 
-// optimized for IA32 platform
+#if __INTEL__
+// #pragma mark - optimized for IA32 platform
+
 
 void
 swap_float(void *buffer, size_t bytecount)
@@ -52,12 +60,14 @@ swap_float(void *buffer, size_t bytecount)
 	swap_data(B_FLOAT_TYPE, buffer, bytecount, B_SWAP_ALWAYS);
 }
 
+
 void
 swap_int32(void *buffer, size_t bytecount)
 {
 	// XXX Should be optimized
 	swap_data(B_INT32_TYPE, buffer, bytecount, B_SWAP_ALWAYS);
 }
+
 
 void
 swap_int16(void *buffer, size_t bytecount)
@@ -111,9 +121,10 @@ swap_int16(void *buffer, size_t bytecount)
 	: "cc", "memory");
 }
 
-#else
 
-// non optimized default versions, do not remove
+#else	// !__INTEL__
+// #pragma mark - generic versions
+
 
 void
 swap_float(void *buffer, size_t bytecount)
@@ -121,15 +132,19 @@ swap_float(void *buffer, size_t bytecount)
 	swap_data(B_FLOAT_TYPE, buffer, bytecount, B_SWAP_ALWAYS);
 }
 
+
 void
 swap_int32(void *buffer, size_t bytecount)
 {
 	swap_data(B_INT32_TYPE, buffer, bytecount, B_SWAP_ALWAYS);
 }
 
+
 void
 swap_int16(void *buffer, size_t bytecount)
 {
 	swap_data(B_INT16_TYPE, buffer, bytecount, B_SWAP_ALWAYS);
 }
+
+
 #endif

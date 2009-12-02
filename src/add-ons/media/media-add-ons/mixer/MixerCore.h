@@ -1,9 +1,13 @@
 /*
- * Copyright 2007-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marcus Overhagen
  */
 #ifndef _MIXER_CORE_H
 #define _MIXER_CORE_H
+
 
 #include "MixerSettings.h"
 
@@ -11,24 +15,26 @@
 #include <Locker.h>
 #include <TimeSource.h>
 
+
 class AudioMixer;
 class BBufferGroup;
 class MixerInput;
 class MixerOutput;
 class Resampler;
 
+
 // The number of "enum media_multi_channels" types from MediaDefs.h
 // XXX should be 18, but limited to 12 here
 #define MAX_CHANNEL_TYPES	12
 // XXX using a dedicated mono channel, this should be channel type 31
-//     but for now we redefine type 12 
+//     but for now we redefine type 12
 #define B_CHANNEL_MONO		B_CHANNEL_TOP_CENTER
 
 class MixerCore {
 public:
 								MixerCore(AudioMixer *node);
 	virtual						~MixerCore();
-	
+
 			MixerSettings*		Settings();
 
 	// To avoid calling Settings()->AttenuateOutput() for every outgoing
@@ -41,11 +47,11 @@ public:
 			bool				RemoveInput(int32 inputID);
 			bool				RemoveOutput();
 			int32				CreateInputID();
-	
+
 	// index = 0 to count-1, NOT inputID
 			MixerInput*			Input(int index);
 			MixerOutput*		Output();
-	
+
 			void				Lock();
 			bool				LockWithTimeout(bigtime_t timeout);
 			bool				LockFromMixThread();
@@ -53,28 +59,28 @@ public:
 
 			void				BufferReceived(BBuffer* buffer,
 									bigtime_t lateness);
-	
-			void				InputFormatChanged(int32 inputID, 
+
+			void				InputFormatChanged(int32 inputID,
 									const media_multi_audio_format& format);
 			void				OutputFormatChanged(
 									const media_multi_audio_format& format);
 
 			void				SetOutputBufferGroup(BBufferGroup* group);
-			void				SetTimingInfo(BTimeSource* timeSource, 
+			void				SetTimingInfo(BTimeSource* timeSource,
 									bigtime_t downstream_latency);
 			void				EnableOutput(bool enabled);
 			bool				Start();
 			bool				Stop();
-	
+
 			void				StartMixThread();
-			void				StopMixThread();	
+			void				StopMixThread();
 			uint32				OutputChannelCount();
 
 private:
 			void				ApplyOutputFormat();
 	static	int32				_mix_thread_(void* arg);
 			void				MixThread();
-	
+
 private:
 			BLocker*			fLocker;
 			BList*				fInputs;
@@ -84,7 +90,7 @@ private:
 									// true = the mix thread is running
 
 			bool				fStarted;
-									// true = mix thread should be 
+									// true = mix thread should be
 									// started of it is not running
 
 			bool				fOutputEnabled;
@@ -104,7 +110,7 @@ private:
 			BBufferGroup*		fBufferGroup;
 			BTimeSource*		fTimeSource;
 			thread_id			fMixThread;
-			sem_id				fMixThreadWaitSem;	
+			sem_id				fMixThreadWaitSem;
 			float				fOutputGain;
 
 	friend class MixerInput;
@@ -112,28 +118,28 @@ private:
 };
 
 
-inline void 
+inline void
 MixerCore::Lock()
 {
 	fLocker->Lock();
 }
 
 
-inline bool 
+inline bool
 MixerCore::LockWithTimeout(bigtime_t timeout)
 {
 	return fLocker->LockWithTimeout(timeout) == B_OK;
 }
 
 
-inline void 
+inline void
 MixerCore::Unlock()
 {
 	fLocker->Unlock();
 }
 
 
-inline bool 
+inline bool
 MixerCore::LockFromMixThread()
 {
 	for (;;) {

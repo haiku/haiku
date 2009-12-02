@@ -7,6 +7,7 @@
 #ifndef _AUDIOMIXER_H
 #define _AUDIOMIXER_H
 
+
 #include <BufferConsumer.h>
 #include <BufferGroup.h>
 #include <BufferProducer.h>
@@ -14,20 +15,18 @@
 #include <MediaEventLooper.h>
 #include <MediaNode.h>
 
+
 class MixerCore;
 
-class AudioMixer :
-		public BBufferConsumer,
-		public BBufferProducer,
-		public BControllable,
-		public BMediaEventLooper
-{
-	public:
+
+class AudioMixer : public BBufferConsumer, public BBufferProducer,
+	public BControllable, public BMediaEventLooper {
+public:
 							AudioMixer(BMediaAddOn *addOn, bool isSystemMixer);
 							~AudioMixer();
 
 		void				DisableNodeStop();
-		
+
 		// AudioMixer support
 		void				ApplySettings();
 
@@ -48,9 +47,9 @@ class AudioMixer :
 		void 				SetTimeSource(BTimeSource * time_source);
 		using BBufferProducer::SendBuffer;
 
-	protected:
+protected:
 		// BControllable methods
-		status_t 			GetParameterValue(int32 id, 
+		status_t 			GetParameterValue(int32 id,
 											bigtime_t *last_change,
 											void *value,
 											size_t *ioSize);
@@ -69,10 +68,10 @@ class AudioMixer :
 		void				DisposeInputCookie(int32 cookie);
 		void				BufferReceived(BBuffer *buffer);
 		void				ProducerDataStatus(const media_destination &for_whom,
-											int32 status, 
+											int32 status,
 											bigtime_t at_performance_time);
 		status_t			GetLatencyFor(const media_destination &for_whom,
-											bigtime_t *out_latency, 
+											bigtime_t *out_latency,
 											media_node_id *out_timesource);
 		status_t			Connected(const media_source &producer,
 											const media_destination &where,
@@ -128,7 +127,7 @@ class AudioMixer :
 											bigtime_t lateness,
 											bool realTimeEvent = false);
 
-	private:
+private:
 		BMediaAddOn			*fAddOn;
 		MixerCore			*fCore;
 		BParameterWeb		*fWeb; // local pointer to parameterweb
@@ -138,4 +137,5 @@ class AudioMixer :
 		bool				fDisableStop;
 		media_format		fDefaultFormat;
 };
-#endif
+
+#endif	// _AUDIOMIXER_H
