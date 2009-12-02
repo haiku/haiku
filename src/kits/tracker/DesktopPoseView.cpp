@@ -37,13 +37,14 @@ All rights reserved.
 //
 //	Used by the Desktop window and by the root view in file panels
 
+#include "DesktopPoseView.h"
+
 #include <NodeMonitor.h>
 #include <Path.h>
-#include <VolumeRoster.h>
 #include <Volume.h>
+#include <VolumeRoster.h>
 
 #include "Commands.h"
-#include "DesktopPoseView.h"
 #include "FSUtils.h"
 #include "PoseList.h"
 #include "Tracker.h"
@@ -82,9 +83,9 @@ DesktopEntryListCollection::DesktopEntryListCollection()
 
 DesktopPoseView::DesktopPoseView(Model *model, BRect frame, uint32 viewMode,
 	uint32 resizeMask)
-	:	BPoseView(model, frame, viewMode, resizeMask)
+	:
+	BPoseView(model, frame, viewMode, resizeMask)
 {
-	SetWidgetTextOutline(true);
 	SetFlags(Flags() | B_DRAW_ON_CHILDREN);
 }
 
