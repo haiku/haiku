@@ -67,6 +67,34 @@ dumpRawData(const char *buffer, size_t size)
 }
 
 
+static const char*
+type_to_string(uint32 type)
+{
+	if (type == B_RAW_TYPE)
+		return "raw_data";
+
+	static char buffer[32];
+
+	int32 missed = 0, shift = 24;
+	uint8 value[4];
+	for (int32 i = 0; i < 4; i++, shift -= 8) {
+		value[i] = uint8(type >> shift);
+		if (value[i] < ' ' || value[i] > 127) {
+			value[i] = '.';
+			missed++;
+		}
+	}
+
+	if (missed < 2) {
+		sprintf(buffer, "'%c%c%c%c'", value[0], value[1], value[2],
+			value[3]);
+	} else
+		sprintf(buffer, "0x%08lx", type);
+
+	return buffer;
+}
+
+
 static status_t
 catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 {
@@ -188,10 +216,7 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 		case 'MSIG':
 		case 'MSDC':
 		case 'MPTH':
-			printf("%s : '%c%c%c%c' : %s\n", fileName,
-				(int)((info.type >> 24) & 0xff),
-				(int)((info.type >> 16) & 0xff),
-				(int)((info.type >> 8) & 0xff), (int)(info.type & 0xff),
+			printf("%s : %s : %s\n", fileName, type_to_string(info.type),
 				buffer);
 			break;
 
@@ -208,7 +233,7 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 
 		default:
 			// The rest of the attributes types are displayed as raw data
-			printf("%s : raw_data : \n", fileName);
+			printf("%s : %s : \n", fileName, type_to_string(info.type));
 			dumpRawData(buffer, size);
 			break;
 	}
@@ -248,7 +273,8 @@ main(int argc, char *argv[])
 		}
 	} else {
 		// Issue usage message
-		fprintf(stderr, "usage: %s [--raw|-r] attr_name file1 [file2...]\n", program);
+		fprintf(stderr, "usage: %s [--raw|-r] <attribute-name> <file1> "
+			"[<file2>...]\n", program);
 		// Be's original version -only- returned 1 if the
 		// amount of parameters was wrong, not if the file
 		// or attribute couldn't be found (!)
@@ -258,5 +284,3 @@ main(int argc, char *argv[])
 
 	return 0;
 }
-
-
