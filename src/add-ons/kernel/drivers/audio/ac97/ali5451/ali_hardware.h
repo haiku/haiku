@@ -4,10 +4,9 @@
  * All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-
-
 #ifndef _ALI_HARDWARE_H
 #define _ALI_HARDWARE_H
+
 
 // AC97 codec registers
 

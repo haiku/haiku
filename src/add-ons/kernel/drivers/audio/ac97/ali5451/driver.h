@@ -4,10 +4,9 @@
  * All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-
-
 #ifndef _ALI_AUDIO_DRIVER_H
 #define _ALI_AUDIO_DRIVER_H
+
 
 #define MULTI_AUDIO_BASE_ID 1024
 #define MULTI_AUDIO_DEV_PATH "audio/hmulti"

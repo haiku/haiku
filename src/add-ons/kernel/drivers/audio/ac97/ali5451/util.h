@@ -7,10 +7,9 @@
  * All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-
-
 #ifndef _UTIL_H
 #define _UTIL_H
+
 
 void *ali_mem_alloc(ali_dev *card, size_t size);
 void ali_mem_free(ali_dev *card, void *ptr);

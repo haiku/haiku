@@ -4,10 +4,9 @@
  * All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-
-
 #ifndef _ALI_DEBUG_H
 #define _ALI_DEBUG_H
+
 
 #ifdef TRACE
 #undef TRACE
