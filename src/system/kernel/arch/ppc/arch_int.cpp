@@ -49,7 +49,7 @@ static struct interrupt_controller_module_info *sPIC;
 static void *sPICCookie;
 
 
-void 
+void
 arch_int_enable_io_interrupt(int irq)
 {
 	if (!sPIC)
@@ -60,7 +60,7 @@ arch_int_enable_io_interrupt(int irq)
 }
 
 
-void 
+void
 arch_int_disable_io_interrupt(int irq)
 {
 	if (!sPIC)
@@ -73,7 +73,7 @@ arch_int_disable_io_interrupt(int irq)
 /* arch_int_*_interrupts() and friends are in arch_asm.S */
 
 
-static void 
+static void
 print_iframe(struct iframe *frame)
 {
 	dprintf("iframe at %p:\n", frame);
@@ -93,7 +93,7 @@ print_iframe(struct iframe *frame)
 
 
 extern "C" void ppc_exception_entry(int vector, struct iframe *iframe);
-void 
+void
 ppc_exception_entry(int vector, struct iframe *iframe)
 {
 	int ret = B_HANDLED_INTERRUPT;
@@ -165,7 +165,7 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 			}
  			break;
 		}
-		
+
 		case 0x500: // external interrupt
 		{
 			if (!sPIC) {
@@ -251,7 +251,7 @@ dprintf("handling I/O interrupts done\n");
 }
 
 
-status_t 
+status_t
 arch_int_init(kernel_args *args)
 {
 	return B_OK;
@@ -279,7 +279,7 @@ arch_int_init_post_vm(kernel_args *args)
 
 	// create a region to map the irq vector code into (physical address 0x0)
 	area_id exceptionArea = create_area("exception_handlers",
-		&handlers, B_EXACT_ADDRESS, args->arch_args.exception_handlers.size, 
+		&handlers, B_EXACT_ADDRESS, args->arch_args.exception_handlers.size,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (exceptionArea < B_OK)
 		panic("arch_int_init2: could not create exception handler region\n");
@@ -415,7 +415,7 @@ get_interrupt_controller_modules(PICModuleList &list)
 {
 	const char *namePrefix = "interrupt_controllers/";
 	size_t namePrefixLen = strlen(namePrefix);
-	
+
 	char name[B_PATH_NAME_LENGTH];
 	size_t length;
 	uint32 cookie = 0;
@@ -470,7 +470,7 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 		panic("arch_int_init_post_device_manager(): Found no PIC modules!");
 		return B_ENTRY_NOT_FOUND;
 	}
-	
+
 	// get the device manager module
 	device_manager_info *deviceManager;
 	status_t error = get_module(B_DEVICE_MANAGER_MODULE_NAME,
@@ -536,14 +536,14 @@ ppc_set_current_cpu_exception_context(struct ppc_cpu_exception_context *context)
 	// translate to physical address
 	addr_t physicalPage;
 	addr_t inPageOffset = (addr_t)context & (B_PAGE_SIZE - 1);
-	status_t error = vm_get_page_mapping(vm_kernel_address_space_id(),
+	status_t error = vm_get_page_mapping(VMAddressSpace::KernelID(),
 		(addr_t)context - inPageOffset, &physicalPage);
 	if (error != B_OK) {
 		panic("ppc_set_current_cpu_exception_context(): Failed to get physical "
 			"address!");
 		return;
 	}
-	
+
 	asm volatile("mtsprg0 %0" : : "r"(physicalPage + inPageOffset));
 }
 

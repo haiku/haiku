@@ -1229,7 +1229,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	vfs_exec_io_context(team->io_context);
 
 	// create an address space for this team
-	status = vm_create_address_space(team->id, USER_BASE, USER_SIZE, false,
+	status = VMAddressSpace::Create(team->id, USER_BASE, USER_SIZE, false,
 		&team->address_space);
 	if (status != B_OK)
 		goto err3;
@@ -1301,7 +1301,7 @@ err5:
 	sNotificationService.Notify(TEAM_REMOVED, team);
 	delete_team_user_data(team);
 err4:
-	vm_put_address_space(team->address_space);
+	team->address_space->Put();
 err3:
 	vfs_put_io_context(team->io_context);
 err2:
@@ -1567,7 +1567,7 @@ fork_team(void)
 	}
 
 	// create an address space for this team
-	status = vm_create_address_space(team->id, USER_BASE, USER_SIZE, false,
+	status = VMAddressSpace::Create(team->id, USER_BASE, USER_SIZE, false,
 		&team->address_space);
 	if (status < B_OK)
 		goto err3;
@@ -1590,7 +1590,7 @@ fork_team(void)
 			forkArgs->user_thread = team_allocate_user_thread(team);
 		} else {
 			void* address;
-			area_id area = vm_copy_area(team->address_space->id, info.name,
+			area_id area = vm_copy_area(team->address_space->ID(), info.name,
 				&address, B_CLONE_ADDRESS, info.protection, info.area);
 			if (area < B_OK) {
 				status = area;
@@ -1659,7 +1659,7 @@ err5:
 	sNotificationService.Notify(TEAM_REMOVED, team);
 	remove_images(team);
 err4:
-	vm_delete_address_space(team->address_space);
+	team->address_space->RemoveAndPut();
 err3:
 	delete_realtime_sem_context(team->realtime_sem_context);
 err25:
@@ -2488,7 +2488,7 @@ team_delete_team(struct team* team)
 	delete_owned_ports(team);
 	sem_delete_owned_sems(team);
 	remove_images(team);
-	vm_delete_address_space(team->address_space);
+	team->address_space->RemoveAndPut();
 
 	delete_team_struct(team);
 
@@ -2532,7 +2532,7 @@ team_get_address_space(team_id id, VMAddressSpace** _addressSpace)
 	if (id == 1) {
 		// we're the kernel team, so we don't have to go through all
 		// the hassle (locking and hash lookup)
-		*_addressSpace = vm_get_kernel_address_space();
+		*_addressSpace = VMAddressSpace::GetKernel();
 		return B_OK;
 	}
 
@@ -2541,7 +2541,7 @@ team_get_address_space(team_id id, VMAddressSpace** _addressSpace)
 
 	team = team_get_team_struct_locked(id);
 	if (team != NULL) {
-		atomic_add(&team->address_space->ref_count, 1);
+		team->address_space->Get();
 		*_addressSpace = team->address_space;
 		status = B_OK;
 	} else

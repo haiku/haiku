@@ -17,6 +17,7 @@
 #include <boot/stage2.h>
 #include <kernel.h>
 #include <thread.h>
+#include <vm_address_space.h>
 #include <vm_types.h>
 //#include <arch/vm_translation_map.h>
 
@@ -189,7 +190,8 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 		// the target thread has is user space
 		if (t_from->team != t_to->team) {
 			// switching to a new address space
-			ppc_translation_map_change_asid(&t_to->team->address_space->translation_map);
+			ppc_translation_map_change_asid(
+				&t_to->team->address_space->TranslationMap());
 		}
 	}
 

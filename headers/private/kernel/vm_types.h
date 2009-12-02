@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -307,27 +308,9 @@ struct VMArea {
 	struct VMArea*			cache_next;
 	struct VMArea*			cache_prev;
 	struct VMArea*			hash_next;
-};
 
-
-enum {
-	VM_ASPACE_STATE_NORMAL = 0,
-	VM_ASPACE_STATE_DELETION
-};
-
-struct VMAddressSpace {
-	struct VMArea*			areas;
-	struct VMArea*			area_hint;
-	rw_lock					lock;
-	addr_t					base;
-	addr_t					size;
-	int32					change_count;
-	vm_translation_map		translation_map;
-	team_id					id;
-	int32					ref_count;
-	int32					fault_count;
-	int32					state;
-	struct VMAddressSpace*	hash_next;
+	bool ContainsAddress(addr_t address) const
+		{ return address >= base && address <= base + (size - 1); }
 };
 
 

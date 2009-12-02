@@ -536,7 +536,7 @@ LargeMemoryPhysicalPageMapper::InitPostArea(kernel_args* args)
 
 	// create an area for the virtual address space
 	temp = (void*)fInitialPool.virtualBase;
-	area = vm_create_null_area(vm_kernel_address_space_id(),
+	area = vm_create_null_area(VMAddressSpace::KernelID(),
 		"physical page pool space", &temp, B_EXACT_ADDRESS,
 		1024 * B_PAGE_SIZE);
 	if (area < B_OK) {
@@ -736,7 +736,7 @@ LargeMemoryPhysicalPageMapper::_AllocatePool(PhysicalPageSlotPool*& _pool)
 	// create the null area for the virtual address space
 	void* virtualBase;
 	area_id virtualArea = vm_create_null_area(
-		vm_kernel_address_space_id(), "physical page pool space",
+		VMAddressSpace::KernelID(), "physical page pool space",
 		&virtualBase, B_ANY_KERNEL_BLOCK_ADDRESS, 1024 * B_PAGE_SIZE);
 	if (virtualArea < 0) {
 		delete_area(dataArea);
@@ -748,7 +748,7 @@ LargeMemoryPhysicalPageMapper::_AllocatePool(PhysicalPageSlotPool*& _pool)
 
 	// get the page table's physical address
 	addr_t physicalTable;
-	vm_translation_map* map = &vm_kernel_address_space()->translation_map;
+	vm_translation_map* map = &VMAddressSpace::Kernel()->TranslationMap();
 	uint32 dummyFlags;
 	cpu_status state = disable_interrupts();
 	map->ops->query_interrupt(map, (addr_t)data, &physicalTable,

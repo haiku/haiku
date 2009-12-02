@@ -21,6 +21,7 @@
 #include <kimage.h>
 #include <thread.h>
 #include <vm.h>
+#include <vm_address_space.h>
 #include <vm_types.h>
 
 #include <arch_cpu.h>
@@ -297,7 +298,7 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 		VMArea *area = NULL;
 		if (thread != NULL && thread->team != NULL
 			&& thread->team->address_space != NULL) {
-			area = vm_area_lookup(thread->team->address_space, eip);
+			area = thread->team->address_space->LookupArea(eip);
 		}
 		if (area != NULL) {
 			kprintf("%ld:%s@%p + %#lx\n", area->id, area->name,
@@ -643,7 +644,7 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	} else {
 		VMArea *area = NULL;
 		if (thread->team->address_space != NULL)
-			area = vm_area_lookup(thread->team->address_space, eip);
+			area = thread->team->address_space->LookupArea(eip);
 		if (area != NULL) {
 			kprintf("%ld:%s@%p + %#lx", area->id, area->name,
 				(void *)area->base, eip - area->base);

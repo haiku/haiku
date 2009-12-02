@@ -196,9 +196,9 @@ x86_next_page_directory(struct thread *from, struct thread *to)
 	}
 
 	if (toAddressSpace == NULL)
-		toAddressSpace = vm_kernel_address_space();
+		toAddressSpace = VMAddressSpace::Kernel();
 
-	return i386_translation_map_get_pgdir(&toAddressSpace->translation_map);
+	return i386_translation_map_get_pgdir(&toAddressSpace->TranslationMap());
 }
 
 
@@ -377,7 +377,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 	addr_t newPageDirectory;
 	vm_translation_map_arch_info* toMap;
 	if (toAddressSpace != NULL
-		&& (toMap = toAddressSpace->translation_map.arch_data) != activeMap) {
+		&& (toMap = toAddressSpace->TranslationMap().arch_data) != activeMap) {
 		// update on which CPUs the address space is used
 		int cpu = cpuData->cpu_num;
 		atomic_and(&activeMap->active_on_cpus, ~((uint32)1 << cpu));

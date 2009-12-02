@@ -307,7 +307,7 @@ generic_vm_physical_page_mapper_init_post_area(kernel_args *args)
 
 	TRACE(("generic_vm_physical_page_mapper_init_post_area: creating iospace\n"));
 	temp = (void *)sIOSpaceBase;
-	area_id ioSpaceArea = vm_create_null_area(vm_kernel_address_space_id(),
+	area_id ioSpaceArea = vm_create_null_area(VMAddressSpace::KernelID(),
 		"iospace", &temp, B_EXACT_ADDRESS, sIOSpaceSize);
 	if (ioSpaceArea < 0) {
 		panic("generic_vm_physical_page_mapper_init_post_area(): Failed to "

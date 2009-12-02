@@ -781,7 +781,7 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 			map->arch_data->page_mapper->Delete();
 			return B_NO_MEMORY;
 		}
-		vm_get_page_mapping(vm_kernel_address_space_id(),
+		vm_get_page_mapping(VMAddressSpace::KernelID(),
 			(addr_t)map->arch_data->pgdir_virt,
 			(addr_t*)&map->arch_data->pgdir_phys);
 	} else {

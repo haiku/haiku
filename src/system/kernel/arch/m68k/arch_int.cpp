@@ -69,7 +69,7 @@ struct iframe_stack gBootFrameStack;
 //static void *sPICCookie;
 
 
-void 
+void
 arch_int_enable_io_interrupt(int irq)
 {
 	//if (!sPIC)
@@ -81,7 +81,7 @@ arch_int_enable_io_interrupt(int irq)
 }
 
 
-void 
+void
 arch_int_disable_io_interrupt(int irq)
 {
 	//if (!sPIC)
@@ -95,7 +95,7 @@ arch_int_disable_io_interrupt(int irq)
 /* arch_int_*_interrupts() and friends are in arch_asm.S */
 
 
-static void 
+static void
 print_iframe(struct iframe *frame)
 {
 	dprintf("iframe at %p:\n", frame);
@@ -163,7 +163,7 @@ fault_was_write(struct iframe *iframe)
 }
 
 extern "C" void m68k_exception_entry(struct iframe *iframe);
-void 
+void
 m68k_exception_entry(struct iframe *iframe)
 {
 	int vector = iframe->cpu.vector >> 2;
@@ -199,7 +199,7 @@ m68k_exception_entry(struct iframe *iframe)
 					break;
 				}
 
-				
+
 				// otherwise, not really
 				panic("page fault in debugger without fault handler! Touching "
 					"address %p from ip %p\n", (void *)fault_address(iframe),
@@ -245,7 +245,7 @@ m68k_exception_entry(struct iframe *iframe)
 			}
  			break;
 		}
-		
+
 		case 24: // spurious interrupt
 			dprintf("spurious interrupt\n");
 			break;
@@ -318,7 +318,7 @@ dprintf("handling I/O interrupts done\n");
 }
 
 
-status_t 
+status_t
 arch_int_init(kernel_args *args)
 {
 	status_t err;
@@ -334,7 +334,7 @@ arch_int_init(kernel_args *args)
 	vbr = args->arch_args.phys_vbr;
 	/* point VBR to the new table */
 	asm volatile  ("movec %0,%%vbr" : : "r"(vbr):);
-	
+
 	return B_OK;
 }
 
@@ -457,7 +457,7 @@ get_interrupt_controller_modules(PICModuleList &list)
 {
 	const char *namePrefix = "interrupt_controllers/";
 	size_t namePrefixLen = strlen(namePrefix);
-	
+
 	char name[B_PATH_NAME_LENGTH];
 	size_t length;
 	uint32 cookie = 0;
@@ -513,7 +513,7 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 		panic("arch_int_init_post_device_manager(): Found no PIC modules!");
 		return B_ENTRY_NOT_FOUND;
 	}
-	
+
 	// get the device manager module
 	device_manager_info *deviceManager;
 	status_t error = get_module(B_DEVICE_MANAGER_MODULE_NAME,
@@ -579,14 +579,14 @@ m68k_set_current_cpu_exception_context(struct m68k_cpu_exception_context *contex
 	// translate to physical address
 	addr_t physicalPage;
 	addr_t inPageOffset = (addr_t)context & (B_PAGE_SIZE - 1);
-	status_t error = vm_get_page_mapping(vm_kernel_address_space_id(),
+	status_t error = vm_get_page_mapping(VMAddressSpace::KernelID(),
 		(addr_t)context - inPageOffset, &physicalPage);
 	if (error != B_OK) {
 		panic("m68k_set_current_cpu_exception_context(): Failed to get physical "
 			"address!");
 		return;
 	}
-	
+
 	asm volatile("mtsprg0 %0" : : "r"(physicalPage + inPageOffset));
 }
 

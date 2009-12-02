@@ -652,7 +652,7 @@ arch_cpu_init_post_vm(kernel_args *args)
 		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	vm_translation_map_arch_info* kernelArchTranslationMap
-		= vm_kernel_address_space()->translation_map.arch_data;
+		= VMAddressSpace::Kernel()->TranslationMap().arch_data;
 
 	// setup task-state segments
 	for (i = 0; i < args->num_cpus; i++) {

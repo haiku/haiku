@@ -681,12 +681,12 @@ ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
 	virtualAddress = ROUNDDOWN(virtualAddress, B_PAGE_SIZE);
 	physicalAddress = ROUNDDOWN(physicalAddress, B_PAGE_SIZE);
 
-	VMAddressSpace *addressSpace = vm_kernel_address_space();
+	VMAddressSpace *addressSpace = VMAddressSpace::Kernel();
 
 	// map the pages
 	for (; virtualAddress < virtualEnd;
 		 virtualAddress += B_PAGE_SIZE, physicalAddress += B_PAGE_SIZE) {
-		status_t error = map_tmap(&addressSpace->translation_map,
+		status_t error = map_tmap(&addressSpace->TranslationMap(),
 			virtualAddress, physicalAddress,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (error != B_OK)
@@ -703,10 +703,11 @@ ppc_unmap_address_range(addr_t virtualAddress, size_t size)
 	addr_t virtualEnd = ROUNDUP(virtualAddress + size, B_PAGE_SIZE);
 	virtualAddress = ROUNDDOWN(virtualAddress, B_PAGE_SIZE);
 
-	VMAddressSpace *addressSpace = vm_kernel_address_space();
+	VMAddressSpace *addressSpace = VMAddressSpace::Kernel();
 
 	for (0; virtualAddress < virtualEnd; virtualAddress += B_PAGE_SIZE)
-		remove_page_table_entry(&addressSpace->translation_map, virtualAddress);
+		remove_page_table_entry(&addressSpace->TranslationMap(),
+			virtualAddress);
 }
 
 
@@ -716,18 +717,18 @@ ppc_remap_address_range(addr_t *_virtualAddress, size_t size, bool unmap)
 	addr_t virtualAddress = ROUNDDOWN(*_virtualAddress, B_PAGE_SIZE);
 	size = ROUNDUP(*_virtualAddress + size - virtualAddress, B_PAGE_SIZE);
 
-	VMAddressSpace *addressSpace = vm_kernel_address_space();
+	VMAddressSpace *addressSpace = VMAddressSpace::Kernel();
 
 	// reserve space in the address space
 	void *newAddress = NULL;
-	status_t error = vm_reserve_address_range(addressSpace->id, &newAddress,
+	status_t error = vm_reserve_address_range(addressSpace->ID(), &newAddress,
 		B_ANY_KERNEL_ADDRESS, size, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (error != B_OK)
 		return error;
 
 	// get the area's first physical page
 	page_table_entry *entry = lookup_page_table_entry(
-		&addressSpace->translation_map, virtualAddress);
+		&addressSpace->TranslationMap(), virtualAddress);
 	if (!entry)
 		return B_ERROR;
 	addr_t physicalBase = entry->physical_page_number << 12;

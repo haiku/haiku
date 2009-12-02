@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -9,12 +10,13 @@
 
 #include <KernelExport.h>
 
+#include <util/OpenHashTable.h>
+
 #include <vm.h>
 #include <vm_address_space.h>
 #include <vm_priv.h>
 #include <heap.h>
 #include <thread.h>
-#include <util/khash.h>
 
 #include <stdlib.h>
 
@@ -27,29 +29,309 @@
 #endif
 
 
-static VMAddressSpace* sKernelAddressSpace;
-
 #define ASPACE_HASH_TABLE_SIZE 1024
-static struct hash_table* sAddressSpaceTable;
-static rw_lock sAddressSpaceTableLock;
 
 
-static void
-_dump_aspace(VMAddressSpace* aspace)
+// #pragma mark - AddressSpaceHashDefinition
+
+
+struct AddressSpaceHashDefinition {
+	typedef team_id			KeyType;
+	typedef VMAddressSpace	ValueType;
+
+	size_t HashKey(team_id key) const
+	{
+		return key;
+	}
+
+	size_t Hash(const VMAddressSpace* value) const
+	{
+		return HashKey(value->ID());
+	}
+
+	bool Compare(team_id key, const VMAddressSpace* value) const
+	{
+		return value->ID() == key;
+	}
+
+	VMAddressSpace*& GetLink(VMAddressSpace* value) const
+	{
+		return value->HashTableLink();
+	}
+};
+
+typedef BOpenHashTable<AddressSpaceHashDefinition> AddressSpaceTable;
+
+static AddressSpaceTable	sAddressSpaceTable;
+static rw_lock				sAddressSpaceTableLock;
+
+VMAddressSpace* VMAddressSpace::sKernelAddressSpace;
+
+
+// #pragma mark - VMAddressSpace
+
+
+VMAddressSpace::VMAddressSpace(team_id id, addr_t base, size_t size,
+	bool kernel)
+	:
+	areas(NULL),
+
+	fBase(base),
+	fSize(size),
+	fID(id),
+	fRefCount(1),
+	fFaultCount(0),
+	fChangeCount(0),
+	fAreaHint(NULL),
+	fDeleting(false)
 {
-	VMArea* area;
+	rw_lock_init(&fLock, kernel ? "kernel address space" : "address space");
+}
 
-	kprintf("dump of address space at %p:\n", aspace);
-	kprintf("id: 0x%lx\n", aspace->id);
-	kprintf("ref_count: %ld\n", aspace->ref_count);
-	kprintf("fault_count: %ld\n", aspace->fault_count);
-	kprintf("translation_map: %p\n", &aspace->translation_map);
-	kprintf("base: 0x%lx\n", aspace->base);
-	kprintf("size: 0x%lx\n", aspace->size);
-	kprintf("change_count: 0x%lx\n", aspace->change_count);
-	kprintf("area_hint: %p\n", aspace->area_hint);
+
+VMAddressSpace::~VMAddressSpace()
+{
+	if (this == sKernelAddressSpace)
+		panic("deleting the kernel aspace!\n");
+
+	TRACE(("VMAddressSpace::~VMAddressSpace: called on aspace %" B_PRId32 "\n",
+		ID()));
+
+	WriteLock();
+
+	fTranslationMap.ops->destroy(&fTranslationMap);
+
+	rw_lock_destroy(&fLock);
+}
+
+
+/*static*/ status_t
+VMAddressSpace::Init()
+{
+	rw_lock_init(&sAddressSpaceTableLock, "address spaces table");
+
+	// create the area and address space hash tables
+	{
+		new(&sAddressSpaceTable) AddressSpaceTable;
+		status_t error = sAddressSpaceTable.Init(ASPACE_HASH_TABLE_SIZE);
+		if (error != B_OK)
+			panic("vm_init: error creating aspace hash table\n");
+	}
+
+	// create the initial kernel address space
+	if (Create(B_SYSTEM_TEAM, KERNEL_BASE, KERNEL_SIZE, true,
+			&sKernelAddressSpace) != B_OK) {
+		panic("vm_init: error creating kernel address space!\n");
+	}
+
+	add_debugger_command("aspaces", &_DumpListCommand,
+		"Dump a list of all address spaces");
+	add_debugger_command("aspace", &_DumpCommand,
+		"Dump info about a particular address space");
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+VMAddressSpace::InitPostSem()
+{
+	status_t status = arch_vm_translation_map_init_kernel_map_post_sem(
+		&sKernelAddressSpace->fTranslationMap);
+	if (status != B_OK)
+		return status;
+
+	return B_OK;
+}
+
+
+void
+VMAddressSpace::Put()
+{
+	bool remove = false;
+
+	rw_lock_write_lock(&sAddressSpaceTableLock);
+	if (atomic_add(&fRefCount, -1) == 1) {
+		sAddressSpaceTable.RemoveUnchecked(this);
+		remove = true;
+	}
+	rw_lock_write_unlock(&sAddressSpaceTableLock);
+
+	if (remove)
+		delete this;
+}
+
+
+/*! Deletes all areas in the specified address space, and the address
+	space by decreasing all reference counters. It also marks the
+	address space of being in deletion state, so that no more areas
+	can be created in it.
+	After this, the address space is not operational anymore, but might
+	still be in memory until the last reference has been released.
+*/
+void
+VMAddressSpace::RemoveAndPut()
+{
+	WriteLock();
+	fDeleting = true;
+	WriteUnlock();
+
+	vm_delete_areas(this);
+	Put();
+}
+
+
+/*static*/ status_t
+VMAddressSpace::Create(team_id teamID, addr_t base, size_t size, bool kernel,
+	VMAddressSpace** _addressSpace)
+{
+	VMAddressSpace* addressSpace = new(nogrow) VMAddressSpace(teamID, base,
+		size, kernel);
+	if (addressSpace == NULL)
+		return B_NO_MEMORY;
+
+	TRACE(("vm_create_aspace: team %ld (%skernel): %#lx bytes starting at "
+		"%#lx => %p\n", id, kernel ? "!" : "", size, base, addressSpace));
+
+	// initialize the corresponding translation map
+	status_t status = arch_vm_translation_map_init_map(
+		&addressSpace->fTranslationMap, kernel);
+	if (status != B_OK) {
+		delete addressSpace;
+		return status;
+	}
+
+	// add the aspace to the global hash table
+	rw_lock_write_lock(&sAddressSpaceTableLock);
+	sAddressSpaceTable.InsertUnchecked(addressSpace);
+	rw_lock_write_unlock(&sAddressSpaceTableLock);
+
+	*_addressSpace = addressSpace;
+	return B_OK;
+}
+
+
+/*static*/ VMAddressSpace*
+VMAddressSpace::GetKernel()
+{
+	// we can treat this one a little differently since it can't be deleted
+	sKernelAddressSpace->Get();
+	return sKernelAddressSpace;
+}
+
+
+/*static*/ team_id
+VMAddressSpace::CurrentID()
+{
+	struct thread* thread = thread_get_current_thread();
+
+	if (thread != NULL && thread->team->address_space != NULL)
+		return thread->team->id;
+
+	return B_ERROR;
+}
+
+
+/*static*/ VMAddressSpace*
+VMAddressSpace::GetCurrent()
+{
+	struct thread* thread = thread_get_current_thread();
+
+	if (thread != NULL) {
+		VMAddressSpace* addressSpace = thread->team->address_space;
+		if (addressSpace != NULL) {
+			addressSpace->Get();
+			return addressSpace;
+		}
+	}
+
+	return NULL;
+}
+
+
+/*static*/ VMAddressSpace*
+VMAddressSpace::Get(team_id teamID)
+{
+	rw_lock_read_lock(&sAddressSpaceTableLock);
+	VMAddressSpace* addressSpace = sAddressSpaceTable.Lookup(teamID);
+	if (addressSpace)
+		addressSpace->Get();
+	rw_lock_read_unlock(&sAddressSpaceTableLock);
+
+	return addressSpace;
+}
+
+
+//! You must hold the address space's read lock.
+VMArea*
+VMAddressSpace::LookupArea(addr_t address)
+{
+	// check the area hint first
+	VMArea* area = fAreaHint;
+	if (area != NULL && area->ContainsAddress(address))
+		return area;
+
+	for (area = areas; area != NULL; area = area->address_space_next) {
+		if (area->id == RESERVED_AREA_ID)
+			continue;
+
+		if (area->ContainsAddress(address)) {
+			fAreaHint = area;
+			return area;
+		}
+	}
+
+	return NULL;
+}
+
+
+//! You must hold the address space's write lock.
+void
+VMAddressSpace::RemoveArea(VMArea* area)
+{
+	VMArea* temp = areas;
+	VMArea* last = NULL;
+
+	while (temp != NULL) {
+		if (area == temp) {
+			if (last != NULL) {
+				last->address_space_next = temp->address_space_next;
+			} else {
+				areas = temp->address_space_next;
+			}
+			IncrementChangeCount();
+			break;
+		}
+		last = temp;
+		temp = temp->address_space_next;
+	}
+	if (area == fAreaHint)
+		fAreaHint = NULL;
+
+	if (temp == NULL) {
+		panic("VMAddressSpace::RemoveArea(): area not found in aspace's area "
+			"list\n");
+	}
+}
+
+
+void
+VMAddressSpace::Dump() const
+{
+	kprintf("dump of address space at %p:\n", this);
+	kprintf("id: 0x%lx\n", fID);
+	kprintf("ref_count: %ld\n", fRefCount);
+	kprintf("fault_count: %ld\n", fFaultCount);
+	kprintf("translation_map: %p\n", &fTranslationMap);
+	kprintf("base: 0x%lx\n", fBase);
+	kprintf("size: 0x%lx\n", fSize);
+	kprintf("change_count: 0x%lx\n", fChangeCount);
+	kprintf("area_hint: %p\n", fAreaHint);
+
 	kprintf("area_list:\n");
-	for (area = aspace->areas; area != NULL; area = area->address_space_next) {
+
+	VMArea* area;
+	for (area = areas; area != NULL; area = area->address_space_next) {
 		kprintf(" area 0x%lx: ", area->id);
 		kprintf("base_addr = 0x%lx ", area->base);
 		kprintf("size = 0x%lx ", area->size);
@@ -59,8 +341,8 @@ _dump_aspace(VMAddressSpace* aspace)
 }
 
 
-static int
-dump_aspace(int argc, char** argv)
+/*static*/ int
+VMAddressSpace::_DumpCommand(int argc, char** argv)
 {
 	VMAddressSpace* aspace;
 
@@ -74,11 +356,11 @@ dump_aspace(int argc, char** argv)
 	{
 		team_id id = strtoul(argv[1], NULL, 0);
 
-		aspace = (VMAddressSpace*)hash_lookup(sAddressSpaceTable, &id);
+		aspace = sAddressSpaceTable.Lookup(id);
 		if (aspace == NULL) {
 			kprintf("invalid aspace id\n");
 		} else {
-			_dump_aspace(aspace);
+			aspace->Dump();
 		}
 		return 0;
 	}
@@ -86,18 +368,14 @@ dump_aspace(int argc, char** argv)
 }
 
 
-static int
-dump_aspace_list(int argc, char** argv)
+/*static*/ int
+VMAddressSpace::_DumpListCommand(int argc, char** argv)
 {
-	VMAddressSpace* space;
-	struct hash_iterator iter;
-
 	kprintf("   address      id         base         size   area count   "
 		" area size\n");
 
-	hash_open(sAddressSpaceTable, &iter);
-	while ((space = (VMAddressSpace*)hash_next(sAddressSpaceTable,
-			&iter)) != NULL) {
+	AddressSpaceTable::Iterator it = sAddressSpaceTable.GetIterator();
+	while (VMAddressSpace* space = it.Next()) {
 		int32 areaCount = 0;
 		off_t areaSize = 0;
 		for (VMArea* area = space->areas; area != NULL;
@@ -109,248 +387,9 @@ dump_aspace_list(int argc, char** argv)
 			}
 		}
 		kprintf("%p  %6ld   %#010lx   %#10lx   %10ld   %10lld\n",
-			space, space->id, space->base, space->size, areaCount, areaSize);
+			space, space->ID(), space->Base(), space->Size(), areaCount,
+			areaSize);
 	}
-	hash_close(sAddressSpaceTable, &iter, false);
+
 	return 0;
-}
-
-
-static int
-aspace_compare(void* _a, const void* key)
-{
-	VMAddressSpace* aspace = (VMAddressSpace*)_a;
-	const team_id* id = (const team_id*)key;
-
-	if (aspace->id == *id)
-		return 0;
-
-	return -1;
-}
-
-
-static uint32
-aspace_hash(void* _a, const void* key, uint32 range)
-{
-	VMAddressSpace* aspace = (VMAddressSpace*)_a;
-	const team_id* id = (const team_id*)key;
-
-	if (aspace != NULL)
-		return aspace->id % range;
-
-	return *id % range;
-}
-
-
-/*! When this function is called, all references to this address space
-	have been released, so it's safe to remove it.
-*/
-static void
-delete_address_space(VMAddressSpace* addressSpace)
-{
-	TRACE(("delete_address_space: called on aspace 0x%lx\n", addressSpace->id));
-
-	if (addressSpace == sKernelAddressSpace)
-		panic("tried to delete the kernel aspace!\n");
-
-	rw_lock_write_lock(&addressSpace->lock);
-
-	addressSpace->translation_map.ops->destroy(&addressSpace->translation_map);
-
-	rw_lock_destroy(&addressSpace->lock);
-	free(addressSpace);
-}
-
-
-//	#pragma mark -
-
-
-VMAddressSpace*
-vm_get_address_space(team_id id)
-{
-	VMAddressSpace* addressSpace;
-
-	rw_lock_read_lock(&sAddressSpaceTableLock);
-	addressSpace = (VMAddressSpace*)hash_lookup(sAddressSpaceTable, &id);
-	if (addressSpace)
-		atomic_add(&addressSpace->ref_count, 1);
-	rw_lock_read_unlock(&sAddressSpaceTableLock);
-
-	return addressSpace;
-}
-
-
-VMAddressSpace*
-vm_get_kernel_address_space(void)
-{
-	// we can treat this one a little differently since it can't be deleted
-	atomic_add(&sKernelAddressSpace->ref_count, 1);
-	return sKernelAddressSpace;
-}
-
-
-VMAddressSpace*
-vm_kernel_address_space(void)
-{
-	return sKernelAddressSpace;
-}
-
-
-team_id
-vm_kernel_address_space_id(void)
-{
-	return sKernelAddressSpace->id;
-}
-
-
-VMAddressSpace*
-vm_get_current_user_address_space(void)
-{
-	struct thread* thread = thread_get_current_thread();
-
-	if (thread != NULL) {
-		VMAddressSpace* addressSpace = thread->team->address_space;
-		if (addressSpace != NULL) {
-			atomic_add(&addressSpace->ref_count, 1);
-			return addressSpace;
-		}
-	}
-
-	return NULL;
-}
-
-
-team_id
-vm_current_user_address_space_id(void)
-{
-	struct thread* thread = thread_get_current_thread();
-
-	if (thread != NULL && thread->team->address_space != NULL)
-		return thread->team->id;
-
-	return B_ERROR;
-}
-
-
-void
-vm_put_address_space(VMAddressSpace* addressSpace)
-{
-	bool remove = false;
-
-	rw_lock_write_lock(&sAddressSpaceTableLock);
-	if (atomic_add(&addressSpace->ref_count, -1) == 1) {
-		hash_remove(sAddressSpaceTable, addressSpace);
-		remove = true;
-	}
-	rw_lock_write_unlock(&sAddressSpaceTableLock);
-
-	if (remove)
-		delete_address_space(addressSpace);
-}
-
-
-/*! Deletes all areas in the specified address space, and the address
-	space by decreasing all reference counters. It also marks the
-	address space of being in deletion state, so that no more areas
-	can be created in it.
-	After this, the address space is not operational anymore, but might
-	still be in memory until the last reference has been released.
-*/
-void
-vm_delete_address_space(VMAddressSpace* addressSpace)
-{
-	rw_lock_write_lock(&addressSpace->lock);
-	addressSpace->state = VM_ASPACE_STATE_DELETION;
-	rw_lock_write_unlock(&addressSpace->lock);
-
-	vm_delete_areas(addressSpace);
-	vm_put_address_space(addressSpace);
-}
-
-
-status_t
-vm_create_address_space(team_id id, addr_t base, addr_t size,
-	bool kernel, VMAddressSpace** _addressSpace)
-{
-	VMAddressSpace* addressSpace;
-	status_t status;
-
-	addressSpace = (VMAddressSpace*)malloc_nogrow(sizeof(VMAddressSpace));
-	if (addressSpace == NULL)
-		return B_NO_MEMORY;
-
-	TRACE(("vm_create_aspace: team %ld (%skernel):"
-			" %lx bytes starting at 0x%lx => %p\n",
-			id, kernel ? "!" : "", size, base, addressSpace));
-
-	addressSpace->base = base;
-	addressSpace->size = size;
-	addressSpace->areas = NULL;
-	addressSpace->area_hint = NULL;
-	addressSpace->change_count = 0;
-	rw_lock_init(&addressSpace->lock,
-		kernel ? "kernel address space" : "address space");
-
-	addressSpace->id = id;
-	addressSpace->ref_count = 1;
-	addressSpace->state = VM_ASPACE_STATE_NORMAL;
-	addressSpace->fault_count = 0;
-
-	// initialize the corresponding translation map
-	status = arch_vm_translation_map_init_map(&addressSpace->translation_map,
-		kernel);
-	if (status != B_OK) {
-		free(addressSpace);
-		return status;
-	}
-
-	// add the aspace to the global hash table
-	rw_lock_write_lock(&sAddressSpaceTableLock);
-	hash_insert(sAddressSpaceTable, addressSpace);
-	rw_lock_write_unlock(&sAddressSpaceTableLock);
-
-	*_addressSpace = addressSpace;
-	return B_OK;
-}
-
-
-status_t
-vm_address_space_init(void)
-{
-	rw_lock_init(&sAddressSpaceTableLock, "address spaces table");
-
-	// create the area and address space hash tables
-	{
-		VMAddressSpace* aspace;
-		sAddressSpaceTable = hash_init(ASPACE_HASH_TABLE_SIZE,
-			(addr_t)&aspace->hash_next - (addr_t)aspace, &aspace_compare,
-			&aspace_hash);
-		if (sAddressSpaceTable == NULL)
-			panic("vm_init: error creating aspace hash table\n");
-	}
-
-	// create the initial kernel address space
-	if (vm_create_address_space(B_SYSTEM_TEAM, KERNEL_BASE, KERNEL_SIZE,
-			true, &sKernelAddressSpace) != B_OK) {
-		panic("vm_init: error creating kernel address space!\n");
-	}
-
-	add_debugger_command("aspaces", &dump_aspace_list,
-		"Dump a list of all address spaces");
-	add_debugger_command("aspace", &dump_aspace,
-		"Dump info about a particular address space");
-
-	return B_OK;
-}
-
-
-status_t
-vm_address_space_init_post_sem(void)
-{
-	status_t status = arch_vm_translation_map_init_kernel_map_post_sem(
-		&sKernelAddressSpace->translation_map);
-	if (status != B_OK)
-		return status;
-
-	return B_OK;
 }

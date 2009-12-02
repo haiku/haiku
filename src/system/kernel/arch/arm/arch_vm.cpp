@@ -76,7 +76,7 @@ void
 arch_vm_aspace_swap(struct VMAddressSpace *from, struct VMAddressSpace *to)
 {
 #warning ARM:WRITEME
-//	m68k_set_pgdir(m68k_translation_map_get_pgdir(&to->translation_map));
+//	m68k_set_pgdir(m68k_translation_map_get_pgdir(&to->TranslationMap()));
 }
 
 

@@ -162,7 +162,7 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 		addr_t mappedSize;
 
 		cookie->mapped_area = vm_map_physical_memory_vecs(
-			vm_kernel_address_space_id(), "io buffer mapped physical vecs",
+			VMAddressSpace::KernelID(), "io buffer mapped physical vecs",
 			&mappedAddress, B_ANY_KERNEL_ADDRESS, &mappedSize,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, fVecs, fVecCount);
 

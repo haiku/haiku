@@ -274,18 +274,18 @@ AddressSpaceReadLocker::Unset()
 {
 	Unlock();
 	if (fSpace != NULL)
-		vm_put_address_space(fSpace);
+		fSpace->Put();
 }
 
 
 status_t
 AddressSpaceReadLocker::SetTo(team_id team)
 {
-	fSpace = vm_get_address_space(team);
+	fSpace = VMAddressSpace::Get(team);
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
 
-	rw_lock_read_lock(&fSpace->lock);
+	fSpace->ReadLock();
 	fLocked = true;
 	return B_OK;
 }
@@ -300,9 +300,9 @@ AddressSpaceReadLocker::SetTo(VMAddressSpace* space, bool getNewReference)
 	fSpace = space;
 
 	if (getNewReference)
-		atomic_add(&fSpace->ref_count, 1);
+		fSpace->Get();
 
-	rw_lock_read_lock(&fSpace->lock);
+	fSpace->ReadLock();
 	fLocked = true;
 }
 
@@ -314,14 +314,14 @@ AddressSpaceReadLocker::SetFromArea(area_id areaID, VMArea*& area)
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
 
-	rw_lock_read_lock(&fSpace->lock);
+	fSpace->ReadLock();
 
 	rw_lock_read_lock(&sAreaHashLock);
 	area = (VMArea*)hash_lookup(sAreaHash, &areaID);
 	rw_lock_read_unlock(&sAreaHashLock);
 
 	if (area == NULL || area->address_space != fSpace) {
-		rw_lock_read_unlock(&fSpace->lock);
+		fSpace->ReadUnlock();
 		return B_BAD_VALUE;
 	}
 
@@ -338,7 +338,7 @@ AddressSpaceReadLocker::Lock()
 	if (fSpace == NULL)
 		return false;
 
-	rw_lock_read_lock(&fSpace->lock);
+	fSpace->ReadLock();
 	fLocked = true;
 
 	return true;
@@ -349,7 +349,7 @@ void
 AddressSpaceReadLocker::Unlock()
 {
 	if (fLocked) {
-		rw_lock_read_unlock(&fSpace->lock);
+		fSpace->ReadUnlock();
 		fLocked = false;
 	}
 }
@@ -388,18 +388,18 @@ AddressSpaceWriteLocker::Unset()
 {
 	Unlock();
 	if (fSpace != NULL)
-		vm_put_address_space(fSpace);
+		fSpace->Put();
 }
 
 
 status_t
 AddressSpaceWriteLocker::SetTo(team_id team)
 {
-	fSpace = vm_get_address_space(team);
+	fSpace = VMAddressSpace::Get(team);
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
 
-	rw_lock_write_lock(&fSpace->lock);
+	fSpace->WriteLock();
 	fLocked = true;
 	return B_OK;
 }
@@ -412,14 +412,14 @@ AddressSpaceWriteLocker::SetFromArea(area_id areaID, VMArea*& area)
 	if (fSpace == NULL)
 		return B_BAD_VALUE;
 
-	rw_lock_write_lock(&fSpace->lock);
+	fSpace->WriteLock();
 
 	rw_lock_read_lock(&sAreaHashLock);
 	area = (VMArea*)hash_lookup(sAreaHash, &areaID);
 	rw_lock_read_unlock(&sAreaHashLock);
 
 	if (area == NULL || area->address_space != fSpace) {
-		rw_lock_write_unlock(&fSpace->lock);
+		fSpace->WriteUnlock();
 		return B_BAD_VALUE;
 	}
 
@@ -436,10 +436,10 @@ AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 
 	area = (VMArea*)hash_lookup(sAreaHash, &areaID);
 	if (area != NULL
-		&& (area->address_space->id == team
-			|| (allowKernel && team == vm_kernel_address_space_id()))) {
+		&& (area->address_space->ID() == team
+			|| (allowKernel && team == VMAddressSpace::KernelID()))) {
 		fSpace = area->address_space;
-		atomic_add(&fSpace->ref_count, 1);
+		fSpace->Get();
 	}
 
 	rw_lock_read_unlock(&sAreaHashLock);
@@ -450,14 +450,14 @@ AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 	// Second try to get the area -- this time with the address space
 	// write lock held
 
-	rw_lock_write_lock(&fSpace->lock);
+	fSpace->WriteLock();
 
 	rw_lock_read_lock(&sAreaHashLock);
 	area = (VMArea*)hash_lookup(sAreaHash, &areaID);
 	rw_lock_read_unlock(&sAreaHashLock);
 
 	if (area == NULL) {
-		rw_lock_write_unlock(&fSpace->lock);
+		fSpace->WriteUnlock();
 		return B_BAD_VALUE;
 	}
 
@@ -479,9 +479,9 @@ AddressSpaceWriteLocker::Unlock()
 {
 	if (fLocked) {
 		if (fDegraded)
-			rw_lock_read_unlock(&fSpace->lock);
+			fSpace->ReadUnlock();
 		else
-			rw_lock_write_unlock(&fSpace->lock);
+			fSpace->WriteUnlock();
 		fLocked = false;
 		fDegraded = false;
 	}
@@ -492,8 +492,8 @@ void
 AddressSpaceWriteLocker::DegradeToReadLock()
 {
 	// TODO: the current R/W lock implementation just keeps the write lock here
-	rw_lock_read_lock(&fSpace->lock);
-	rw_lock_write_unlock(&fSpace->lock);
+	fSpace->ReadLock();
+	fSpace->WriteUnlock();
 	fDegraded = true;
 }
 
@@ -523,7 +523,7 @@ MultiAddressSpaceLocker::_CompareItems(const void* _a, const void* _b)
 {
 	lock_item* a = (lock_item*)_a;
 	lock_item* b = (lock_item*)_b;
-	return a->space->id - b->space->id;
+	return a->space->ID() - b->space->ID();
 }
 
 
@@ -566,7 +566,7 @@ MultiAddressSpaceLocker::_AddAddressSpace(VMAddressSpace* space,
 	int32 index = _IndexOfAddressSpace(space);
 	if (index < 0) {
 		if (!_ResizeIfNeeded()) {
-			vm_put_address_space(space);
+			space->Put();
 			return B_NO_MEMORY;
 		}
 
@@ -576,7 +576,7 @@ MultiAddressSpaceLocker::_AddAddressSpace(VMAddressSpace* space,
 	} else {
 
 		// one reference is enough
-		vm_put_address_space(space);
+		space->Put();
 
 		fItems[index].write_lock |= writeLock;
 	}
@@ -592,7 +592,7 @@ inline status_t
 MultiAddressSpaceLocker::AddTeam(team_id team, bool writeLock,
 	VMAddressSpace** _space)
 {
-	return _AddAddressSpace(vm_get_address_space(team), writeLock,
+	return _AddAddressSpace(VMAddressSpace::Get(team), writeLock,
 		_space);
 }
 
@@ -612,7 +612,7 @@ MultiAddressSpaceLocker::Unset()
 	Unlock();
 
 	for (int32 i = 0; i < fCount; i++)
-		vm_put_address_space(fItems[i].space);
+		fItems[i].space->Put();
 
 	fCount = 0;
 }
@@ -628,16 +628,16 @@ MultiAddressSpaceLocker::Lock()
 	for (int32 i = 0; i < fCount; i++) {
 		status_t status;
 		if (fItems[i].write_lock)
-			status = rw_lock_write_lock(&fItems[i].space->lock);
+			status = fItems[i].space->WriteLock();
 		else
-			status = rw_lock_read_lock(&fItems[i].space->lock);
+			status = fItems[i].space->ReadLock();
 
 		if (status < B_OK) {
 			while (--i >= 0) {
 				if (fItems[i].write_lock)
-					rw_lock_write_unlock(&fItems[i].space->lock);
+					fItems[i].space->WriteUnlock();
 				else
-					rw_lock_read_unlock(&fItems[i].space->lock);
+					fItems[i].space->ReadUnlock();
 			}
 			return status;
 		}
@@ -656,9 +656,9 @@ MultiAddressSpaceLocker::Unlock()
 
 	for (int32 i = 0; i < fCount; i++) {
 		if (fItems[i].write_lock)
-			rw_lock_write_unlock(&fItems[i].space->lock);
+			fItems[i].space->WriteUnlock();
 		else
-			rw_lock_read_unlock(&fItems[i].space->lock);
+			fItems[i].space->ReadUnlock();
 	}
 
 	fLocked = false;
@@ -752,11 +752,11 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 
 		// Get an additional reference to the original address spaces.
 		for (int32 i = 0; i < originalCount; i++)
-			atomic_add(&originalItems[i].space->ref_count, 1);
+			originalItems[i].space->Get();
 
 		// Release all references to the current address spaces.
 		for (int32 i = 0; i < fCount; i++)
-			vm_put_address_space(fItems[i].space);
+			fItems[i].space->Put();
 
 		// Copy over the original state.
 		fCount = originalCount;
@@ -928,7 +928,7 @@ get_address_space_by_area_id(area_id id)
 	VMArea* area = (VMArea*)hash_lookup(sAreaHash, &id);
 	if (area != NULL) {
 		addressSpace = area->address_space;
-		atomic_add(&addressSpace->ref_count, 1);
+		addressSpace->Get();
 	}
 
 	rw_lock_read_unlock(&sAreaHashLock);
@@ -1056,7 +1056,7 @@ find_reserved_area(VMAddressSpace* addressSpace, addr_t start,
 		if (size == next->size) {
 			// the new area fully covers the reversed range
 			area->address_space_next = next->address_space_next;
-			vm_put_address_space(addressSpace);
+			addressSpace->Put();
 			free(next);
 		} else {
 			// resize the reserved range behind the area
@@ -1079,7 +1079,7 @@ find_reserved_area(VMAddressSpace* addressSpace, addr_t start,
 		if (reserved == NULL)
 			return B_NO_MEMORY;
 
-		atomic_add(&addressSpace->ref_count, 1);
+		addressSpace->Get();
 		reserved->address_space_next = next->address_space_next;
 		area->address_space_next = reserved;
 		next->address_space_next = area;
@@ -1093,7 +1093,7 @@ find_reserved_area(VMAddressSpace* addressSpace, addr_t start,
 
 	area->base = start;
 	area->size = size;
-	addressSpace->change_count++;
+	addressSpace->IncrementChangeCount();
 
 	return B_OK;
 }
@@ -1124,8 +1124,8 @@ find_and_insert_area_slot(VMAddressSpace* addressSpace, addr_t start,
 		size, end, addressSpec, area));
 
 	// do some sanity checking
-	if (start < addressSpace->base || size == 0
-		|| end > addressSpace->base + (addressSpace->size - 1)
+	if (start < addressSpace->Base() || size == 0
+		|| end > addressSpace->Base() + (addressSpace->Size() - 1)
 		|| start + (size - 1) > end)
 		return B_BAD_ADDRESS;
 
@@ -1173,8 +1173,8 @@ second_chance:
 			// find a hole big enough for a new area
 			if (last == NULL) {
 				// see if we can build it at the beginning of the virtual map
-				addr_t alignedBase = ROUNDUP(addressSpace->base, alignment);
-				if (is_valid_spot(addressSpace->base, alignedBase, size,
+				addr_t alignedBase = ROUNDUP(addressSpace->Base(), alignment);
+				if (is_valid_spot(addressSpace->Base(), alignedBase, size,
 						next == NULL ? end : next->base)) {
 					foundSpot = true;
 					area->base = alignedBase;
@@ -1310,7 +1310,7 @@ second_chance:
 
 			// we didn't find a free spot in the requested range, so we'll
 			// try again without any restrictions
-			start = addressSpace->base;
+			start = addressSpace->Base();
 			addressSpec = B_ANY_ADDRESS;
 			last = NULL;
 			goto second_chance;
@@ -1341,7 +1341,7 @@ second_chance:
 		addressSpace->areas = area;
 	}
 
-	addressSpace->change_count++;
+	addressSpace->IncrementChangeCount();
 	return B_OK;
 }
 
@@ -1366,18 +1366,18 @@ insert_area(VMAddressSpace* addressSpace, void** _address,
 
 		case B_BASE_ADDRESS:
 			searchBase = (addr_t)*_address;
-			searchEnd = addressSpace->base + (addressSpace->size - 1);
+			searchEnd = addressSpace->Base() + (addressSpace->Size() - 1);
 			break;
 
 		case B_ANY_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
-			searchBase = addressSpace->base;
+			searchBase = addressSpace->Base();
 			// TODO: remove this again when vm86 mode is moved into the kernel
 			// completely (currently needs a userland address space!)
 			if (searchBase == USER_BASE)
 				searchBase = USER_BASE_ANY;
-			searchEnd = addressSpace->base + (addressSpace->size - 1);
+			searchEnd = addressSpace->Base() + (addressSpace->Size() - 1);
 			break;
 
 		default:
@@ -1389,7 +1389,7 @@ insert_area(VMAddressSpace* addressSpace, void** _address,
 	if (status == B_OK) {
 		*_address = (void*)area->base;
 
-		if (addressSpace == vm_kernel_address_space())
+		if (addressSpace == VMAddressSpace::Kernel())
 			sKernelAddressSpaceLeft -= area->size;
 	}
 
@@ -1660,7 +1660,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		goto err2;
 
 	// check to see if this address space has entered DELETE state
-	if (addressSpace->state == VM_ASPACE_STATE_DELETION) {
+	if (addressSpace->IsBeingDeleted()) {
 		// okay, someone is trying to delete this address space now, so we can't
 		// insert the area, so back out
 		status = B_BAD_TEAM_ID;
@@ -1701,7 +1701,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 	rw_lock_write_unlock(&sAreaHashLock);
 
 	// grab a ref to the address space (the area holds this)
-	atomic_add(&addressSpace->ref_count, 1);
+	addressSpace->Get();
 
 //	ktrace_printf("map_backing_store: cache: %p (source: %p), \"%s\" -> %p",
 //		cache, sourceCache, areaName, area);
@@ -1732,7 +1732,7 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 		return B_NOT_SUPPORTED;
 
 	AddressSpaceWriteLocker locker;
-	status_t status = locker.SetTo(vm_kernel_address_space_id());
+	status_t status = locker.SetTo(VMAddressSpace::KernelID());
 	if (status != B_OK)
 		return status;
 
@@ -1773,7 +1773,7 @@ vm_unreserve_address_range(team_id team, void* address, addr_t size)
 		return B_BAD_TEAM_ID;
 
 	// check to see if this address space has entered DELETE state
-	if (locker.AddressSpace()->state == VM_ASPACE_STATE_DELETION) {
+	if (locker.AddressSpace()->IsBeingDeleted()) {
 		// okay, someone is trying to delete this address space now, so we can't
 		// insert the area, so back out
 		return B_BAD_TEAM_ID;
@@ -1795,7 +1795,7 @@ vm_unreserve_address_range(team_id team, void* address, addr_t size)
 				locker.AddressSpace()->areas = reserved->address_space_next;
 
 			area = reserved->address_space_next;
-			vm_put_address_space(locker.AddressSpace());
+			locker.AddressSpace()->Put();
 			free(reserved);
 			continue;
 		}
@@ -1820,7 +1820,7 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 		return B_BAD_TEAM_ID;
 
 	// check to see if this address space has entered DELETE state
-	if (locker.AddressSpace()->state == VM_ASPACE_STATE_DELETION) {
+	if (locker.AddressSpace()->IsBeingDeleted()) {
 		// okay, someone is trying to delete this address space now, so we
 		// can't insert the area, let's back out
 		return B_BAD_TEAM_ID;
@@ -1842,7 +1842,7 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 	area->cache_offset = area->base;
 		// we cache the original base address here
 
-	atomic_add(&locker.AddressSpace()->ref_count, 1);
+	locker.AddressSpace()->Get();
 	return B_OK;
 }
 
@@ -1928,7 +1928,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 		if (status != B_OK)
 			return status;
 
-		vm_translation_map* map = &locker.AddressSpace()->translation_map;
+		vm_translation_map* map = &locker.AddressSpace()->TranslationMap();
 		reservedMapPages = map->ops->map_max_pages_need(map, 0, size - 1);
 	}
 
@@ -2073,7 +2073,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			// The pages should already be mapped. This is only really useful
 			// during boot time. Find the appropriate vm_page objects and stick
 			// them in the cache object.
-			vm_translation_map* map = &addressSpace->translation_map;
+			vm_translation_map* map = &addressSpace->TranslationMap();
 			off_t offset = 0;
 
 			if (!gKernelStartup)
@@ -2111,7 +2111,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 		{
 			// We have already allocated our continuous pages run, so we can now
 			// just map them in the address space
-			vm_translation_map* map = &addressSpace->translation_map;
+			vm_translation_map* map = &addressSpace->TranslationMap();
 			addr_t physicalAddress = page->physical_page_number * B_PAGE_SIZE;
 			addr_t virtualAddress = area->base;
 			off_t offset = 0;
@@ -2235,7 +2235,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	if (status >= B_OK) {
 		// make sure our area is mapped in completely
 
-		vm_translation_map* map = &locker.AddressSpace()->translation_map;
+		vm_translation_map* map = &locker.AddressSpace()->TranslationMap();
 		size_t reservePages = map->ops->map_max_pages_need(map, area->base,
 			area->base + (size - 1));
 
@@ -2320,7 +2320,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	if (result != B_OK)
 		return result;
 
-	vm_translation_map* map = &locker.AddressSpace()->translation_map;
+	vm_translation_map* map = &locker.AddressSpace()->TranslationMap();
 	size_t reservePages = map->ops->map_max_pages_need(map, area->base,
 		area->base + (size - 1));
 
@@ -2495,7 +2495,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 		if (status != B_OK)
 			return status;
 
-		vm_translation_map* map = &locker.AddressSpace()->translation_map;
+		vm_translation_map* map = &locker.AddressSpace()->TranslationMap();
 		reservedPreMapPages = map->ops->map_max_pages_need(map, 0, size - 1);
 
 		locker.Unlock();
@@ -2661,8 +2661,8 @@ vm_clone_area(team_id team, const char* name, void** address,
 	//	have been adapted. Maybe it should be part of the kernel settings,
 	//	anyway (so that old drivers can always work).
 #if 0
-	if (sourceArea->aspace == vm_kernel_address_space()
-		&& addressSpace != vm_kernel_address_space()
+	if (sourceArea->aspace == VMAddressSpace::Kernel()
+		&& addressSpace != VMAddressSpace::Kernel()
 		&& !(sourceArea->protection & B_USER_CLONEABLE_AREA)) {
 		// kernel areas must not be cloned in userland, unless explicitly
 		// declared user-cloneable upon construction
@@ -2689,7 +2689,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 		if (sourceArea->cache_type == CACHE_TYPE_DEVICE) {
 			// we don't have actual pages to map but a physical area
 			vm_translation_map* map
-				= &sourceArea->address_space->translation_map;
+				= &sourceArea->address_space->TranslationMap();
 			map->ops->lock(map);
 
 			addr_t physicalAddress;
@@ -2699,7 +2699,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 
 			map->ops->unlock(map);
 
-			map = &targetAddressSpace->translation_map;
+			map = &targetAddressSpace->TranslationMap();
 			size_t reservePages = map->ops->map_max_pages_need(map,
 				newArea->base, newArea->base + (newArea->size - 1));
 
@@ -2715,7 +2715,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 			map->ops->unlock(map);
 			vm_page_unreserve_pages(reservePages);
 		} else {
-			vm_translation_map* map = &targetAddressSpace->translation_map;
+			vm_translation_map* map = &targetAddressSpace->TranslationMap();
 			size_t reservePages = map->ops->map_max_pages_need(map,
 				newArea->base, newArea->base + (newArea->size - 1));
 			vm_page_reserve_pages(reservePages);
@@ -2743,37 +2743,6 @@ vm_clone_area(team_id team, const char* name, void** address,
 }
 
 
-//! The address space must be write locked at this point
-static void
-remove_area_from_address_space(VMAddressSpace* addressSpace, VMArea* area)
-{
-	VMArea* temp = addressSpace->areas;
-	VMArea* last = NULL;
-
-	while (temp != NULL) {
-		if (area == temp) {
-			if (last != NULL) {
-				last->address_space_next = temp->address_space_next;
-			} else {
-				addressSpace->areas = temp->address_space_next;
-			}
-			addressSpace->change_count++;
-			break;
-		}
-		last = temp;
-		temp = temp->address_space_next;
-	}
-	if (area == addressSpace->area_hint)
-		addressSpace->area_hint = NULL;
-
-	if (addressSpace == vm_kernel_address_space())
-		sKernelAddressSpaceLeft -= area->size;
-
-	if (temp == NULL)
-		panic("vm_area_release_ref: area not found in aspace's area list\n");
-}
-
-
 static void
 delete_area(VMAddressSpace* addressSpace, VMArea* area)
 {
@@ -2791,8 +2760,11 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area)
 		area->cache->WriteModified();
 
 	arch_vm_unset_memory_type(area);
-	remove_area_from_address_space(addressSpace, area);
-	vm_put_address_space(addressSpace);
+	addressSpace->RemoveArea(area);
+	addressSpace->Put();
+
+	if (addressSpace == VMAddressSpace::Kernel())
+		sKernelAddressSpaceLeft -= area->size;
 
 	area->cache->RemoveArea(area);
 	area->cache->ReleaseRef();
@@ -2879,7 +2851,7 @@ vm_copy_on_write_area(VMCache* lowerCache)
 		if ((tempArea->protection & B_READ_AREA) != 0)
 			protection |= B_READ_AREA;
 
-		vm_translation_map* map = &tempArea->address_space->translation_map;
+		vm_translation_map* map = &tempArea->address_space->TranslationMap();
 		map->ops->lock(map);
 		map->ops->protect(map, tempArea->base,
 			tempArea->base - 1 + tempArea->size, protection);
@@ -3001,8 +2973,8 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 	if (area->protection == newProtection)
 		return B_OK;
 
-	if (team != vm_kernel_address_space_id()
-		&& area->address_space->id != team) {
+	if (team != VMAddressSpace::KernelID()
+		&& area->address_space->ID() != team) {
 		// unless you're the kernel, you are only allowed to set
 		// the protection of your own areas
 		return B_NOT_ALLOWED;
@@ -3050,7 +3022,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 				changePageProtection = false;
 
 				struct vm_translation_map* map
-					= &area->address_space->translation_map;
+					= &area->address_space->TranslationMap();
 				map->ops->lock(map);
 
 				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
@@ -3070,7 +3042,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 
 	if (status == B_OK) {
 		// remap existing pages in this cache
-		struct vm_translation_map* map = &area->address_space->translation_map;
+		struct vm_translation_map* map = &area->address_space->TranslationMap();
 
 		if (changePageProtection) {
 			map->ops->lock(map);
@@ -3089,15 +3061,15 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 status_t
 vm_get_page_mapping(team_id team, addr_t vaddr, addr_t* paddr)
 {
-	VMAddressSpace* addressSpace = vm_get_address_space(team);
+	VMAddressSpace* addressSpace = VMAddressSpace::Get(team);
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
 	uint32 dummyFlags;
-	status_t status = addressSpace->translation_map.ops->query(
-		&addressSpace->translation_map, vaddr, paddr, &dummyFlags);
+	status_t status = addressSpace->TranslationMap().ops->query(
+		&addressSpace->TranslationMap(), vaddr, paddr, &dummyFlags);
 
-	vm_put_address_space(addressSpace);
+	addressSpace->Put();
 	return status;
 }
 
@@ -3119,7 +3091,7 @@ vm_test_map_modification(vm_page* page)
 	vm_page_mapping* mapping;
 	while ((mapping = iterator.Next()) != NULL) {
 		VMArea* area = mapping->area;
-		vm_translation_map* map = &area->address_space->translation_map;
+		vm_translation_map* map = &area->address_space->TranslationMap();
 
 		addr_t physicalAddress;
 		uint32 flags;
@@ -3148,7 +3120,7 @@ vm_test_map_activation(vm_page* page, bool* _modified)
 	vm_page_mapping* mapping;
 	while ((mapping = iterator.Next()) != NULL) {
 		VMArea* area = mapping->area;
-		vm_translation_map* map = &area->address_space->translation_map;
+		vm_translation_map* map = &area->address_space->TranslationMap();
 
 		addr_t physicalAddress;
 		uint32 flags;
@@ -3179,7 +3151,7 @@ vm_clear_map_flags(vm_page* page, uint32 flags)
 	vm_page_mapping* mapping;
 	while ((mapping = iterator.Next()) != NULL) {
 		VMArea* area = mapping->area;
-		vm_translation_map* map = &area->address_space->translation_map;
+		vm_translation_map* map = &area->address_space->TranslationMap();
 
 		map->ops->lock(map);
 		map->ops->clear_flags(map, virtual_page_address(area, page), flags);
@@ -3205,7 +3177,7 @@ vm_remove_all_page_mappings(vm_page* page, uint32* _flags)
 	vm_page_mapping* mapping;
 	while ((mapping = iterator.Next()) != NULL) {
 		VMArea* area = mapping->area;
-		vm_translation_map* map = &area->address_space->translation_map;
+		vm_translation_map* map = &area->address_space->TranslationMap();
 		addr_t physicalAddress;
 		uint32 flags;
 
@@ -3240,7 +3212,7 @@ vm_remove_all_page_mappings(vm_page* page, uint32* _flags)
 bool
 vm_unmap_page(VMArea* area, addr_t virtualAddress, bool preserveModified)
 {
-	vm_translation_map* map = &area->address_space->translation_map;
+	vm_translation_map* map = &area->address_space->TranslationMap();
 
 	map->ops->lock(map);
 
@@ -3313,7 +3285,7 @@ vm_unmap_page(VMArea* area, addr_t virtualAddress, bool preserveModified)
 status_t
 vm_unmap_pages(VMArea* area, addr_t base, size_t size, bool preserveModified)
 {
-	vm_translation_map* map = &area->address_space->translation_map;
+	vm_translation_map* map = &area->address_space->TranslationMap();
 	addr_t end = base + (size - 1);
 
 	map->ops->lock(map);
@@ -3409,7 +3381,7 @@ vm_unmap_pages(VMArea* area, addr_t base, size_t size, bool preserveModified)
 status_t
 vm_map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection)
 {
-	vm_translation_map* map = &area->address_space->translation_map;
+	vm_translation_map* map = &area->address_space->TranslationMap();
 	vm_page_mapping* mapping = NULL;
 
 	if (area->wiring == B_NO_LOCK) {
@@ -3748,7 +3720,7 @@ dump_caches_recursively(VMCache* cache, cache_info& info, int level)
 	if (cache->areas != NULL) {
 		VMArea* area = cache->areas;
 		kprintf(", areas: %ld (%s, team: %ld)", area->id, area->name,
-			area->address_space->id);
+			area->address_space->ID());
 
 		while (area->cache_next != NULL) {
 			area = area->cache_next;
@@ -3888,7 +3860,7 @@ dump_cache(int argc, char** argv)
 		kprintf("    area 0x%lx, %s\n", area->id, area->name);
 		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->base, area->size);
 		kprintf("\tprotection: 0x%lx\n", area->protection);
-		kprintf("\towner:      0x%lx\n", area->address_space->id);
+		kprintf("\towner:      0x%lx\n", area->address_space->ID());
 	}
 
 	kprintf("  consumers:\n");
@@ -3925,7 +3897,7 @@ dump_area_struct(VMArea* area, bool mappings)
 {
 	kprintf("AREA: %p\n", area);
 	kprintf("name:\t\t'%s'\n", area->name);
-	kprintf("owner:\t\t0x%lx\n", area->address_space->id);
+	kprintf("owner:\t\t0x%lx\n", area->address_space->ID());
 	kprintf("id:\t\t0x%lx\n", area->id);
 	kprintf("base:\t\t0x%lx\n", area->base);
 	kprintf("size:\t\t0x%lx\n", area->size);
@@ -4042,7 +4014,7 @@ dump_area_list(int argc, char** argv)
 
 	hash_open(sAreaHash, &iter);
 	while ((area = (VMArea*)hash_next(sAreaHash, &iter)) != NULL) {
-		if ((id != 0 && area->address_space->id != id)
+		if ((id != 0 && area->address_space->ID() != id)
 			|| (name != NULL && strstr(area->name, name) == NULL))
 			continue;
 
@@ -4072,9 +4044,9 @@ vm_delete_areas(struct VMAddressSpace* addressSpace)
 	VMArea* last = NULL;
 
 	TRACE(("vm_delete_areas: called on address space 0x%lx\n",
-		addressSpace->id));
+		addressSpace->ID()));
 
-	rw_lock_write_lock(&addressSpace->lock);
+	addressSpace->WriteLock();
 
 	// remove all reserved areas in this address space
 
@@ -4088,7 +4060,7 @@ vm_delete_areas(struct VMAddressSpace* addressSpace)
 			else
 				addressSpace->areas = area->address_space_next;
 
-			vm_put_address_space(addressSpace);
+			addressSpace->Put();
 			free(area);
 			continue;
 		}
@@ -4103,7 +4075,7 @@ vm_delete_areas(struct VMAddressSpace* addressSpace)
 		delete_area(addressSpace, area);
 	}
 
-	rw_lock_write_unlock(&addressSpace->lock);
+	addressSpace->WriteUnlock();
 	return B_OK;
 }
 
@@ -4114,17 +4086,17 @@ vm_area_for(addr_t address, bool kernel)
 	team_id team;
 	if (IS_USER_ADDRESS(address)) {
 		// we try the user team address space, if any
-		team = vm_current_user_address_space_id();
+		team = VMAddressSpace::CurrentID();
 		if (team < 0)
 			return team;
 	} else
-		team = vm_kernel_address_space_id();
+		team = VMAddressSpace::KernelID();
 
 	AddressSpaceReadLocker locker(team);
 	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
 
-	VMArea* area = vm_area_lookup(locker.AddressSpace(), address);
+	VMArea* area = locker.AddressSpace()->LookupArea(address);
 	if (area != NULL) {
 		if (!kernel && (area->protection & (B_READ_AREA | B_WRITE_AREA)) == 0)
 			return B_ERROR;
@@ -4162,7 +4134,7 @@ unmap_and_free_physical_pages(vm_translation_map* map, addr_t start, addr_t end)
 void
 vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 {
-	vm_translation_map* map = &vm_kernel_address_space()->translation_map;
+	vm_translation_map* map = &VMAddressSpace::Kernel()->TranslationMap();
 	addr_t end = start + size;
 	addr_t lastEnd = start;
 	VMArea* area;
@@ -4176,7 +4148,7 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 
 	map->ops->lock(map);
 
-	for (area = vm_kernel_address_space()->areas; area != NULL;
+	for (area = VMAddressSpace::Kernel()->areas; area != NULL;
 			area = area->address_space_next) {
 		addr_t areaStart = area->base;
 		addr_t areaEnd = areaStart + area->size;
@@ -4287,7 +4259,7 @@ unreserve_boot_loader_ranges(kernel_args* args)
 	TRACE(("unreserve_boot_loader_ranges()\n"));
 
 	for (uint32 i = 0; i < args->num_virtual_allocated_ranges; i++) {
-		vm_unreserve_address_range(vm_kernel_address_space_id(),
+		vm_unreserve_address_range(VMAddressSpace::KernelID(),
 			(void*)args->virtual_allocated_range[i].start,
 			args->virtual_allocated_range[i].size);
 	}
@@ -4310,7 +4282,7 @@ reserve_boot_loader_ranges(kernel_args* args)
 			continue;
 		}
 
-		status_t status = vm_reserve_address_range(vm_kernel_address_space_id(),
+		status_t status = vm_reserve_address_range(VMAddressSpace::KernelID(),
 			&address, B_EXACT_ADDRESS, args->virtual_allocated_range[i].size, 0);
 		if (status < B_OK)
 			panic("could not reserve boot loader ranges\n");
@@ -4492,7 +4464,7 @@ vm_init(kernel_args* args)
 			panic("vm_init: error creating aspace hash table\n");
 	}
 
-	vm_address_space_init();
+	VMAddressSpace::Init();
 	reserve_boot_loader_ranges(args);
 
 	// Do any further initialization that the architecture dependant layers may
@@ -4582,7 +4554,7 @@ vm_init_post_sem(kernel_args* args)
 	// exists, it isn't that hard to find all of the ones we need to create
 
 	arch_vm_translation_map_init_post_sem(args);
-	vm_address_space_init_post_sem();
+	VMAddressSpace::InitPostSem();
 
 	slab_init_post_sem();
 	return heap_init_post_sem();
@@ -4641,9 +4613,9 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 	atomic_add((int32*)&sPageFaults, 1);
 
 	if (IS_KERNEL_ADDRESS(pageAddress)) {
-		addressSpace = vm_get_kernel_address_space();
+		addressSpace = VMAddressSpace::GetKernel();
 	} else if (IS_USER_ADDRESS(pageAddress)) {
-		addressSpace = vm_get_current_user_address_space();
+		addressSpace = VMAddressSpace::GetCurrent();
 		if (addressSpace == NULL) {
 			if (!isUser) {
 				dprintf("vm_page_fault: kernel thread accessing invalid user "
@@ -4690,11 +4662,11 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			}
 		} else {
 #if 1
-			rw_lock_read_lock(&addressSpace->lock);
+			addressSpace->ReadLock();
 
 			// TODO: remove me once we have proper userland debugging support
 			// (and tools)
-			VMArea* area = vm_area_lookup(addressSpace, faultAddress);
+			VMArea* area = addressSpace->LookupArea(faultAddress);
 
 			struct thread* thread = thread_get_current_thread();
 			dprintf("vm_page_fault: thread \"%s\" (%ld) in team \"%s\" (%ld) "
@@ -4744,7 +4716,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 				while (status == B_OK && --maxFrames >= 0
 						&& frame.return_address != NULL) {
 					dprintf("  %p", frame.return_address);
-					area = vm_area_lookup(addressSpace,
+					area = addressSpace->LookupArea(
 						(addr_t)frame.return_address);
 					if (area) {
 						dprintf(" (%s + %#lx)", area->name,
@@ -4758,7 +4730,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			}
 #	endif	// 0 (stack trace)
 
-			rw_lock_read_unlock(&addressSpace->lock);
+			addressSpace->ReadUnlock();
 #endif
 
 			// TODO: the fault_callback is a temporary solution for vm86
@@ -4781,7 +4753,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 	}
 
 	if (addressSpace != NULL)
-		vm_put_address_space(addressSpace);
+		addressSpace->Put();
 
 	return B_HANDLED_INTERRUPT;
 }
@@ -4857,7 +4829,7 @@ struct PageFaultContext {
 	PageFaultContext(VMAddressSpace* addressSpace, bool isWrite)
 		:
 		addressSpaceLocker(addressSpace, true),
-		map(&addressSpace->translation_map),
+		map(&addressSpace->TranslationMap()),
 		isWrite(isWrite)
 	{
 	}
@@ -5034,7 +5006,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 	addr_t address = ROUNDDOWN(originalAddress, B_PAGE_SIZE);
 	status_t status = B_OK;
 
-	atomic_add(&addressSpace->fault_count, 1);
+	addressSpace->IncrementFaultCount();
 
 	// We may need up to 2 pages plus pages needed for mapping them -- reserving
 	// the pages upfront makes sure we don't have any cache locked, so that the
@@ -5048,7 +5020,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 		context.addressSpaceLocker.Lock();
 
 		// get the area the fault was in
-		VMArea* area = vm_area_lookup(addressSpace, address);
+		VMArea* area = addressSpace->LookupArea(address);
 		if (area == NULL) {
 			dprintf("vm_soft_fault: va 0x%lx not covered by area in address "
 				"space\n", originalAddress);
@@ -5170,47 +5142,17 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 }
 
 
-/*! You must have the address space's sem held */
-VMArea*
-vm_area_lookup(VMAddressSpace* addressSpace, addr_t address)
-{
-	VMArea* area;
-
-	// check the areas list first
-	area = addressSpace->area_hint;
-	if (area != NULL
-		&& area->base <= address
-		&& area->base + (area->size - 1) >= address)
-		goto found;
-
-	for (area = addressSpace->areas; area != NULL;
-			area = area->address_space_next) {
-		if (area->id == RESERVED_AREA_ID)
-			continue;
-
-		if (area->base <= address && area->base + (area->size - 1) >= address)
-			break;
-	}
-
-found:
-	if (area)
-		addressSpace->area_hint = area;
-
-	return area;
-}
-
-
 status_t
 vm_get_physical_page(addr_t paddr, addr_t* _vaddr, void** _handle)
 {
-	return vm_kernel_address_space()->translation_map.ops->get_physical_page(
+	return VMAddressSpace::Kernel()->TranslationMap().ops->get_physical_page(
 		paddr, _vaddr, _handle);
 }
 
 status_t
 vm_put_physical_page(addr_t vaddr, void* handle)
 {
-	return vm_kernel_address_space()->translation_map.ops->put_physical_page(
+	return VMAddressSpace::Kernel()->TranslationMap().ops->put_physical_page(
 		vaddr, handle);
 }
 
@@ -5218,14 +5160,14 @@ vm_put_physical_page(addr_t vaddr, void* handle)
 status_t
 vm_get_physical_page_current_cpu(addr_t paddr, addr_t* _vaddr, void** _handle)
 {
-	return vm_kernel_address_space()->translation_map.ops
+	return VMAddressSpace::Kernel()->TranslationMap().ops
 		->get_physical_page_current_cpu(paddr, _vaddr, _handle);
 }
 
 status_t
 vm_put_physical_page_current_cpu(addr_t vaddr, void* handle)
 {
-	return vm_kernel_address_space()->translation_map.ops
+	return VMAddressSpace::Kernel()->TranslationMap().ops
 		->put_physical_page_current_cpu(vaddr, handle);
 }
 
@@ -5233,14 +5175,14 @@ vm_put_physical_page_current_cpu(addr_t vaddr, void* handle)
 status_t
 vm_get_physical_page_debug(addr_t paddr, addr_t* _vaddr, void** _handle)
 {
-	return vm_kernel_address_space()->translation_map.ops
+	return VMAddressSpace::Kernel()->TranslationMap().ops
 		->get_physical_page_debug(paddr, _vaddr, _handle);
 }
 
 status_t
 vm_put_physical_page_debug(addr_t vaddr, void* handle)
 {
-	return vm_kernel_address_space()->translation_map.ops
+	return VMAddressSpace::Kernel()->TranslationMap().ops
 		->put_physical_page_debug(vaddr, handle);
 }
 
@@ -5381,7 +5323,7 @@ fill_area_info(struct VMArea* area, area_info* info, size_t size)
 	info->size = area->size;
 	info->protection = area->protection;
 	info->lock = B_FULL_LOCK;
-	info->team = area->address_space->id;
+	info->team = area->address_space->ID();
 	info->copy_count = 0;
 	info->in_count = 0;
 	info->out_count = 0;
@@ -5405,9 +5347,9 @@ static status_t
 test_lock_memory(VMAddressSpace* addressSpace, addr_t address,
 	bool& needsLocking)
 {
-	rw_lock_read_lock(&addressSpace->lock);
+	addressSpace->ReadLock();
 
-	VMArea* area = vm_area_lookup(addressSpace, address);
+	VMArea* area = addressSpace->LookupArea(address);
 	if (area != NULL) {
 		// This determines if we need to lock the memory at all
 		needsLocking = area->cache_type != CACHE_TYPE_NULL
@@ -5416,7 +5358,7 @@ test_lock_memory(VMAddressSpace* addressSpace, addr_t address,
 			&& area->wiring != B_CONTIGUOUS;
 	}
 
-	rw_lock_read_unlock(&addressSpace->lock);
+	addressSpace->ReadUnlock();
 
 	if (area == NULL)
 		return B_BAD_ADDRESS;
@@ -5546,7 +5488,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 status_t
 vm_memset_physical(addr_t address, int value, size_t length)
 {
-	return vm_kernel_address_space()->translation_map.ops->memset_physical(
+	return VMAddressSpace::Kernel()->TranslationMap().ops->memset_physical(
 		address, value, length);
 }
 
@@ -5554,7 +5496,7 @@ vm_memset_physical(addr_t address, int value, size_t length)
 status_t
 vm_memcpy_from_physical(void* to, addr_t from, size_t length, bool user)
 {
-	return vm_kernel_address_space()->translation_map.ops->memcpy_from_physical(
+	return VMAddressSpace::Kernel()->TranslationMap().ops->memcpy_from_physical(
 		to, from, length, user);
 }
 
@@ -5562,7 +5504,7 @@ vm_memcpy_from_physical(void* to, addr_t from, size_t length, bool user)
 status_t
 vm_memcpy_to_physical(addr_t to, const void* _from, size_t length, bool user)
 {
-	return vm_kernel_address_space()->translation_map.ops->memcpy_to_physical(
+	return VMAddressSpace::Kernel()->TranslationMap().ops->memcpy_to_physical(
 		to, _from, length, user);
 }
 
@@ -5570,7 +5512,7 @@ vm_memcpy_to_physical(addr_t to, const void* _from, size_t length, bool user)
 void
 vm_memcpy_physical_page(addr_t to, addr_t from)
 {
-	return vm_kernel_address_space()->translation_map.ops->memcpy_physical_page(
+	return VMAddressSpace::Kernel()->TranslationMap().ops->memcpy_physical_page(
 		to, from);
 }
 
@@ -5655,17 +5597,17 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 
 	if (isUser) {
 		if (team == B_CURRENT_TEAM)
-			addressSpace = vm_get_current_user_address_space();
+			addressSpace = VMAddressSpace::GetCurrent();
 		else
-			addressSpace = vm_get_address_space(team);
+			addressSpace = VMAddressSpace::Get(team);
 	} else
-		addressSpace = vm_get_kernel_address_space();
+		addressSpace = VMAddressSpace::GetKernel();
 	if (addressSpace == NULL)
 		return B_ERROR;
 
 	// test if we're on an area that allows faults at all
 
-	map = &addressSpace->translation_map;
+	map = &addressSpace->TranslationMap();
 
 	status_t status = test_lock_memory(addressSpace, base, needsLocking);
 	if (status < B_OK)
@@ -5736,7 +5678,7 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 	}
 
 out:
-	vm_put_address_space(addressSpace);
+	addressSpace->Put();
 	return status;
 }
 
@@ -5760,15 +5702,15 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 
 	if (IS_USER_ADDRESS(address)) {
 		if (team == B_CURRENT_TEAM)
-			addressSpace = vm_get_current_user_address_space();
+			addressSpace = VMAddressSpace::GetCurrent();
 		else
-			addressSpace = vm_get_address_space(team);
+			addressSpace = VMAddressSpace::Get(team);
 	} else
-		addressSpace = vm_get_kernel_address_space();
+		addressSpace = VMAddressSpace::GetKernel();
 	if (addressSpace == NULL)
 		return B_ERROR;
 
-	map = &addressSpace->translation_map;
+	map = &addressSpace->TranslationMap();
 
 	status_t status = test_lock_memory(addressSpace, base, needsLocking);
 	if (status < B_OK)
@@ -5800,7 +5742,7 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 	}
 
 out:
-	vm_put_address_space(addressSpace);
+	addressSpace->Put();
 	return status;
 }
 
@@ -5845,16 +5787,16 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 	// in which address space is the address to be found?
 	if (IS_USER_ADDRESS(virtualAddress)) {
 		if (team == B_CURRENT_TEAM)
-			addressSpace = vm_get_current_user_address_space();
+			addressSpace = VMAddressSpace::GetCurrent();
 		else
-			addressSpace = vm_get_address_space(team);
+			addressSpace = VMAddressSpace::Get(team);
 	} else
-		addressSpace = vm_get_kernel_address_space();
+		addressSpace = VMAddressSpace::GetKernel();
 
 	if (addressSpace == NULL)
 		return B_ERROR;
 
-	vm_translation_map* map = &addressSpace->translation_map;
+	vm_translation_map* map = &addressSpace->TranslationMap();
 
 	if (interrupts)
 		map->ops->lock(map);
@@ -6039,7 +5981,7 @@ set_area_protection(area_id area, uint32 newProtection)
 {
 	fix_protection(&newProtection);
 
-	return vm_set_area_protection(vm_kernel_address_space_id(), area,
+	return vm_set_area_protection(VMAddressSpace::KernelID(), area,
 		newProtection, true);
 }
 
@@ -6089,7 +6031,7 @@ map_physical_memory(const char* name, void* physicalAddress, size_t numBytes,
 
 	fix_protection(&protection);
 
-	return vm_map_physical_memory(vm_kernel_address_space_id(), name,
+	return vm_map_physical_memory(VMAddressSpace::KernelID(), name,
 		_virtualAddress, addressSpec, numBytes, protection,
 		(addr_t)physicalAddress);
 }
@@ -6102,7 +6044,7 @@ clone_area(const char* name, void** _address, uint32 addressSpec,
 	if ((protection & B_KERNEL_PROTECTION) == 0)
 		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 
-	return vm_clone_area(vm_kernel_address_space_id(), name, _address,
+	return vm_clone_area(VMAddressSpace::KernelID(), name, _address,
 		addressSpec, protection, REGION_NO_PRIVATE_MAP, source, true);
 }
 
@@ -6125,7 +6067,7 @@ create_area(const char* name, void** _address, uint32 addressSpec, size_t size,
 {
 	fix_protection(&protection);
 
-	return vm_create_anonymous_area(vm_kernel_address_space_id(), (char*)name,
+	return vm_create_anonymous_area(VMAddressSpace::KernelID(), (char*)name,
 		_address, addressSpec, size, lock, protection, 0, 0, true);
 }
 
@@ -6133,7 +6075,7 @@ create_area(const char* name, void** _address, uint32 addressSpec, size_t size,
 status_t
 delete_area(area_id area)
 {
-	return vm_delete_area(vm_kernel_address_space_id(), area, true);
+	return vm_delete_area(VMAddressSpace::KernelID(), area, true);
 }
 
 
@@ -6158,13 +6100,13 @@ _user_reserve_address_range(addr_t* userAddress, uint32 addressSpec,
 		return B_BAD_ADDRESS;
 
 	status_t status = vm_reserve_address_range(
-		vm_current_user_address_space_id(), (void**)&address, addressSpec, size,
+		VMAddressSpace::CurrentID(), (void**)&address, addressSpec, size,
 		RESERVED_AVOID_BASE);
 	if (status != B_OK)
 		return status;
 
 	if (user_memcpy(userAddress, &address, sizeof(address)) != B_OK) {
-		vm_unreserve_address_range(vm_current_user_address_space_id(),
+		vm_unreserve_address_range(VMAddressSpace::CurrentID(),
 			(void*)address, size);
 		return B_BAD_ADDRESS;
 	}
@@ -6176,7 +6118,7 @@ _user_reserve_address_range(addr_t* userAddress, uint32 addressSpec,
 status_t
 _user_unreserve_address_range(addr_t address, addr_t size)
 {
-	return vm_unreserve_address_range(vm_current_user_address_space_id(),
+	return vm_unreserve_address_range(VMAddressSpace::CurrentID(),
 		(void*)address, size);
 }
 
@@ -6256,7 +6198,7 @@ _user_set_area_protection(area_id area, uint32 newProtection)
 
 	fix_protection(&newProtection);
 
-	return vm_set_area_protection(vm_current_user_address_space_id(), area,
+	return vm_set_area_protection(VMAddressSpace::CurrentID(), area,
 		newProtection, false);
 }
 
@@ -6321,7 +6263,7 @@ _user_clone_area(const char* userName, void** userAddress, uint32 addressSpec,
 
 	fix_protection(&protection);
 
-	area_id clonedArea = vm_clone_area(vm_current_user_address_space_id(), name,
+	area_id clonedArea = vm_clone_area(VMAddressSpace::CurrentID(), name,
 		&address, addressSpec, protection, REGION_NO_PRIVATE_MAP, sourceArea,
 		false);
 	if (clonedArea < B_OK)
@@ -6364,7 +6306,7 @@ _user_create_area(const char* userName, void** userAddress, uint32 addressSpec,
 
 	fix_protection(&protection);
 
-	area_id area = vm_create_anonymous_area(vm_current_user_address_space_id(),
+	area_id area = vm_create_anonymous_area(VMAddressSpace::CurrentID(),
 		(char*)name, &address, addressSpec, size, lock, protection, 0, 0,
 		false);
 
@@ -6385,7 +6327,7 @@ _user_delete_area(area_id area)
 	// that you have created yourself from userland.
 	// The documentation to delete_area() explicitly states that this
 	// will be restricted in the future, and so it will.
-	return vm_delete_area(vm_current_user_address_space_id(), area, false);
+	return vm_delete_area(VMAddressSpace::CurrentID(), area, false);
 }
 
 
@@ -6418,7 +6360,7 @@ _user_map_file(const char* userName, void** userAddress, int addressSpec,
 	protection |= B_KERNEL_READ_AREA
 		| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
 
-	area = _vm_map_file(vm_current_user_address_space_id(), name, &address,
+	area = _vm_map_file(VMAddressSpace::CurrentID(), name, &address,
 		addressSpec, size, protection, mapping, unmapAddressRange, fd, offset,
 		false);
 	if (area < B_OK)
@@ -6489,7 +6431,7 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 	addr_t currentAddress = address;
 	size_t sizeLeft = size;
 	while (sizeLeft > 0) {
-		VMArea* area = vm_area_lookup(locker.AddressSpace(), currentAddress);
+		VMArea* area = locker.AddressSpace()->LookupArea(currentAddress);
 		if (area == NULL)
 			return B_NO_MEMORY;
 
@@ -6509,11 +6451,11 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 
 	// Second round: If the protections differ from that of the area, create a
 	// page protection array and re-map mapped pages.
-	vm_translation_map* map = &locker.AddressSpace()->translation_map;
+	vm_translation_map* map = &locker.AddressSpace()->TranslationMap();
 	currentAddress = address;
 	sizeLeft = size;
 	while (sizeLeft > 0) {
-		VMArea* area = vm_area_lookup(locker.AddressSpace(), currentAddress);
+		VMArea* area = locker.AddressSpace()->LookupArea(currentAddress);
 		if (area == NULL)
 			return B_NO_MEMORY;
 
@@ -6621,7 +6563,7 @@ _user_sync_memory(void* _address, size_t size, int flags)
 			return error;
 
 		// get the first area
-		VMArea* area = vm_area_lookup(locker.AddressSpace(), address);
+		VMArea* area = locker.AddressSpace()->LookupArea(address);
 		if (area == NULL)
 			return B_NO_MEMORY;
 

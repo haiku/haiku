@@ -2062,7 +2062,7 @@ load_kernel_add_on(const char *path)
 	}
 
 	// reserve that space and allocate the areas from that one
-	if (vm_reserve_address_range(vm_kernel_address_space_id(), &reservedAddress,
+	if (vm_reserve_address_range(VMAddressSpace::KernelID(), &reservedAddress,
 			B_ANY_KERNEL_ADDRESS, reservedSize, 0) < B_OK) {
 		status = B_NO_MEMORY;
 		goto error3;
@@ -2183,7 +2183,7 @@ load_kernel_add_on(const char *path)
 
 	// There might be a hole between the two segments, and we don't need to
 	// reserve this any longer
-	vm_unreserve_address_range(vm_kernel_address_space_id(), reservedAddress,
+	vm_unreserve_address_range(VMAddressSpace::KernelID(), reservedAddress,
 		reservedSize);
 
 	// ToDo: this should be enabled by kernel settings!
@@ -2203,7 +2203,7 @@ done:
 
 error5:
 error4:
-	vm_unreserve_address_range(vm_kernel_address_space_id(), reservedAddress,
+	vm_unreserve_address_range(VMAddressSpace::KernelID(), reservedAddress,
 		reservedSize);
 error3:
 	free(programHeaders);

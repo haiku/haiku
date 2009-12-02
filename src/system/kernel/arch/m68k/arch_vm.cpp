@@ -105,7 +105,7 @@ arch_vm_init_post_modules(kernel_args *args)
 void
 arch_vm_aspace_swap(struct VMAddressSpace *from, struct VMAddressSpace *to)
 {
-	m68k_set_pgdir(m68k_translation_map_get_pgdir(&to->translation_map));
+	m68k_set_pgdir(m68k_translation_map_get_pgdir(&to->TranslationMap()));
 }
 
 

@@ -465,7 +465,7 @@ area_allocate_pages(object_cache *cache, void **pages, uint32 flags,
 	// if we are allocating, it is because we need the pages immediatly
 	// so we lock them. when moving the slab to the empty list we should
 	// unlock them, and lock them again when getting one from the empty list.
-	area_id areaId = create_area_etc(vm_kernel_address_space_id(),
+	area_id areaId = create_area_etc(VMAddressSpace::KernelID(),
 		cache->name, pages, addressSpec, cache->slab_size, lock,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
 		(flags & CACHE_DONT_SLEEP) != 0 ? CREATE_AREA_DONT_WAIT : 0);

@@ -1190,7 +1190,7 @@ m68k_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 			recursive_lock_destroy(&map->lock);
 			return B_NO_MEMORY;
 		}
-		vm_get_page_mapping(vm_kernel_address_space_id(),
+		vm_get_page_mapping(VMAddressSpace::KernelID(),
 			(addr_t)map->arch_data->rtdir_virt, (addr_t *)&map->arch_data->rtdir_phys);
 	} else {
 		// kernel
@@ -1360,7 +1360,7 @@ m68k_vm_translation_map_init_post_area(kernel_args *args)
 	//	page table, which is not yet enforced (or even tested)!
 	// Note we don't support SMP which makes things simpler.
 
-	area = vm_create_null_area(vm_kernel_address_space_id(),
+	area = vm_create_null_area(VMAddressSpace::KernelID(),
 		"interrupt query pages", (void **)&queryPage, B_ANY_ADDRESS,
 		B_PAGE_SIZE);
 	if (area < B_OK)

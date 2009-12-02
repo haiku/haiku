@@ -102,16 +102,19 @@ m68k_next_page_directory(struct thread *from, struct thread *to)
 			return NULL;
 		}
 		// switching to a new address space
-		return m68k_translation_map_get_pgdir(&to->team->address_space->translation_map);
+		return m68k_translation_map_get_pgdir(
+			&to->team->address_space->TranslationMap());
 	} else if (from->team->address_space == NULL && to->team->address_space == NULL) {
 		// they must both be kernel space threads
 		return NULL;
 	} else if (to->team->address_space == NULL) {
 		// the one we're switching to is kernel space
-		return m68k_translation_map_get_pgdir(&vm_kernel_address_space()->translation_map);
+		return m68k_translation_map_get_pgdir(
+			&VMAddressSpace::Kernel()->TranslationMap());
 	}
 
-	return m68k_translation_map_get_pgdir(&to->team->address_space->translation_map);
+	return m68k_translation_map_get_pgdir(
+		&to->team->address_space->TranslationMap());
 }
 
 // #pragma mark -
