@@ -144,9 +144,10 @@ BPrintJob::BPrintJob(const char* jobName)
 	:
 	fPrintJobName(NULL),
 	fSpoolFile(NULL),
-	fError(B_ERROR),
+	fError(B_NO_INIT),
 	fSetupMessage(NULL),
 	fDefaultSetupMessage(NULL),
+	fAbort(0),
 	fCurrentPageHeader(NULL)
 {
 	memset(&fSpoolFileHeader, 0, sizeof(print_file_header));
@@ -200,6 +201,7 @@ BPrintJob::ConfigJob()
 	if (!_HandlePrintSetup(fSetupMessage))
 		return B_ERROR;
 
+	fError = B_OK;
 	return B_OK;
 }
 
@@ -207,6 +209,8 @@ BPrintJob::ConfigJob()
 void
 BPrintJob::BeginJob()
 {
+	fError = B_ERROR;
+
 	// can not start a new job until it has been commited or cancelled
 	if (fSpoolFile != NULL || fCurrentPageHeader == NULL)
 		return;
@@ -253,7 +257,7 @@ BPrintJob::BeginJob()
 	fSpoolFileHeader.first_page = (off_t)-1;
 
 	if (fSpoolFile->Write(&fSpoolFileHeader, sizeof(print_file_header))
-		!= sizeof(print_file_header)) {
+			!= sizeof(print_file_header)) {
 		CancelJob();
 		return;
 	}
