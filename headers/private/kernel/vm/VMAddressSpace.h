@@ -66,6 +66,8 @@ public:
 			status_t			InsertArea(void** _address, uint32 addressSpec,
 									addr_t size, VMArea* area);
 			void				RemoveArea(VMArea* area);
+			status_t			ResizeAreaHead(VMArea* area, size_t size);
+			status_t			ResizeAreaTail(VMArea* area, size_t size);
 
 	inline	Iterator			GetIterator();
 

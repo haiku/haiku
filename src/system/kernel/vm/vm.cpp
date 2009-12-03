@@ -335,37 +335,46 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 	// Cut the end only?
 	if (areaLast <= lastAddress) {
-		addr_t newSize = address - area->Base();
+		size_t oldSize = area->Size();
+		size_t newSize = address - area->Base();
+
+		status_t error = addressSpace->ResizeAreaTail(area, newSize);
+		if (error != B_OK)
+			return error;
 
 		// unmap pages
-		vm_unmap_pages(area, address, area->Size() - newSize, false);
+		vm_unmap_pages(area, address, oldSize - newSize, false);
 
 		// If no one else uses the area's cache, we can resize it, too.
 		if (cache->areas == area && area->cache_next == NULL
 			&& list_is_empty(&cache->consumers)) {
-			status_t error = cache->Resize(cache->virtual_base + newSize);
-			if (error != B_OK)
+			error = cache->Resize(cache->virtual_base + newSize);
+			if (error != B_OK) {
+				addressSpace->ResizeAreaTail(area, oldSize);
 				return error;
+			}
 		}
-
-		area->SetSize(newSize);
 
 		return B_OK;
 	}
 
 	// Cut the beginning only?
 	if (area->Base() >= address) {
+		addr_t oldBase = area->Base();
 		addr_t newBase = lastAddress + 1;
-		addr_t newSize = areaLast - lastAddress;
+		size_t newSize = areaLast - lastAddress;
 
 		// unmap pages
-		vm_unmap_pages(area, area->Base(), newBase - area->Base(), false);
+		vm_unmap_pages(area, oldBase, newBase - oldBase, false);
+
+		// resize the area
+		status_t error = addressSpace->ResizeAreaHead(area, newSize);
+		if (error != B_OK)
+			return error;
 
 		// TODO: If no one else uses the area's cache, we should resize it, too!
 
-		area->cache_offset += newBase - area->Base();
-		area->SetBase(newBase);
-		area->SetSize(newSize);
+		area->cache_offset += newBase - oldBase;
 
 		return B_OK;
 	}
@@ -383,7 +392,9 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 	// resize the area
 	addr_t oldSize = area->Size();
-	area->SetSize(firstNewSize);
+	status_t error = addressSpace->ResizeAreaTail(area, firstNewSize);
+	if (error != B_OK)
+		return error;
 
 	// TODO: If no one else uses the area's cache, we might want to create a
 	// new cache for the second area, transfer the concerned pages from the
@@ -392,12 +403,12 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	// map the second area
 	VMArea* secondArea;
 	void* secondBaseAddress = (void*)secondBase;
-	status_t error = map_backing_store(addressSpace, cache, &secondBaseAddress,
+	error = map_backing_store(addressSpace, cache, &secondBaseAddress,
 		area->cache_offset + (secondBase - area->Base()), secondSize,
 		B_EXACT_ADDRESS, area->wiring, area->protection, REGION_NO_PRIVATE_MAP,
 		&secondArea, area->name, false, kernel);
 	if (error != B_OK) {
-		area->SetSize(oldSize);
+		addressSpace->ResizeAreaTail(area, oldSize);
 		return error;
 	}
 
@@ -4283,8 +4294,8 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 					next->address_space->RemoveArea(next);
 					free(next);
 				} else {
-					next->SetSize(next->Size() - offset);
-					next->SetBase(next->Base() + offset);
+					next->address_space->ResizeAreaHead(next,
+						next->Size() - offset);
 				}
 			} else {
 				panic("resize situation for area %p has changed although we "
@@ -4294,7 +4305,9 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 			}
 		}
 
-		current->SetSize(newSize);
+		status = current->address_space->ResizeAreaTail(current, newSize);
+		if (status != B_OK)
+			break;
 
 		// We also need to unmap all pages beyond the new size, if the area has
 		// shrinked
@@ -4308,11 +4321,16 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 	if (status == B_OK && newSize < oldSize)
 		status = cache->Resize(cache->virtual_base + newSize);
 
-	if (status < B_OK) {
-		// This shouldn't really be possible, but hey, who knows
+	if (status != B_OK) {
+		// Something failed -- resize the areas back to their original size.
+		// This can fail, too, in which case we're seriously screwed.
 		for (VMArea* current = cache->areas; current != NULL;
 				current = current->cache_next) {
-			current->SetSize(oldSize);
+			if (current->address_space->ResizeAreaTail(current, oldSize)
+					!= B_OK) {
+				panic("vm_resize_area(): Failed and not being able to restore "
+					"original state.");
+			}
 		}
 
 		cache->Resize(cache->virtual_base + oldSize);

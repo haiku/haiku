@@ -361,6 +361,33 @@ VMAddressSpace::RemoveArea(VMArea* area)
 }
 
 
+status_t
+VMAddressSpace::ResizeAreaHead(VMArea* area, size_t size)
+{
+	size_t oldSize = area->Size();
+	if (size == oldSize)
+		return B_OK;
+
+	area->SetBase(area->Base() + oldSize - size);
+	area->SetSize(size);
+
+	return B_OK;
+}
+
+
+status_t
+VMAddressSpace::ResizeAreaTail(VMArea* area, size_t size)
+{
+	size_t oldSize = area->Size();
+	if (size == oldSize)
+		return B_OK;
+
+	area->SetSize(size);
+
+	return B_OK;
+}
+
+
 void
 VMAddressSpace::Dump() const
 {

@@ -42,9 +42,6 @@ struct VMArea {
 			addr_t				Base() const	{ return fBase; }
 			size_t				Size() const	{ return fSize; }
 
-			void				SetBase(addr_t base)	{ fBase = base; }
-			void				SetSize(size_t size)	{ fSize = size; }
-
 			bool				ContainsAddress(addr_t address) const
 									{ return address >= fBase
 										&& address <= fBase + (fSize - 1); }
@@ -59,6 +56,13 @@ struct VMArea {
 									{ return fAddressSpaceLink; }
 			const DoublyLinkedListLink<VMArea>& AddressSpaceLink() const
 									{ return fAddressSpaceLink; }
+
+private:
+			friend class VMAddressSpace;
+
+private:
+			void				SetBase(addr_t base)	{ fBase = base; }
+			void				SetSize(size_t size)	{ fSize = size; }
 
 private:
 			DoublyLinkedListLink<VMArea> fAddressSpaceLink;
