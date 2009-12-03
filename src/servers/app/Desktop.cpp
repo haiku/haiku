@@ -1664,19 +1664,13 @@ Desktop::SetFocusWindow(Window* focus)
 	}
 
 	uint32 list = fCurrentWorkspace;
-
 	if (fSettings->FocusFollowsMouse())
 		list = kFocusList;
 
 	if (focus == NULL || hasModal || hasWindowScreen) {
-		if (!fSettings->FocusFollowsMouse()) {
-			focus = FrontWindow();
-			if (focus == NULL) {
-				// there might be no front window in case of only a single
-				// window with B_FLOATING_ALL_WINDOW_FEEL
-				focus = _CurrentWindows().LastWindow();
-			}
-		} else
+		if (!fSettings->FocusFollowsMouse())
+			focus = _CurrentWindows().LastWindow();
+		else
 			focus = fFocusList.LastWindow();
 	}
 
