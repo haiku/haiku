@@ -103,7 +103,6 @@ public:
 };
 
 
-static area_id sNextAreaID = 1;
 static mutex sMappingLock = MUTEX_INITIALIZER("page mappings");
 static mutex sAreaCacheLock = MUTEX_INITIALIZER("area->cache");
 
@@ -134,9 +133,6 @@ static status_t map_backing_store(VMAddressSpace* addressSpace,
 	VMCache* cache, void** _virtualAddress, off_t offset, addr_t size,
 	uint32 addressSpec, int wiring, int protection, int mapping,
 	VMArea** _area, const char* areaName, bool unmapAddressRange, bool kernel);
-
-
-static size_t sKernelAddressSpaceLeft = KERNEL_SIZE;
 
 
 //	#pragma mark -
@@ -278,450 +274,6 @@ lookup_area(VMAddressSpace* addressSpace, area_id id)
 	VMAreaHash::ReadUnlock();
 
 	return area;
-}
-
-
-static VMArea*
-create_reserved_area_struct(VMAddressSpace* addressSpace, uint32 flags)
-{
-	VMArea* reserved = (VMArea*)malloc_nogrow(sizeof(VMArea));
-	if (reserved == NULL)
-		return NULL;
-
-	memset(reserved, 0, sizeof(VMArea));
-	reserved->id = RESERVED_AREA_ID;
-		// this marks it as reserved space
-	reserved->protection = flags;
-	reserved->address_space = addressSpace;
-
-	return reserved;
-}
-
-
-static VMArea*
-create_area_struct(VMAddressSpace* addressSpace, const char* name,
-	uint32 wiring, uint32 protection)
-{
-	// restrict the area name to B_OS_NAME_LENGTH
-	size_t length = strlen(name) + 1;
-	if (length > B_OS_NAME_LENGTH)
-		length = B_OS_NAME_LENGTH;
-
-	VMArea* area = (VMArea*)malloc_nogrow(sizeof(VMArea));
-	if (area == NULL)
-		return NULL;
-
-	area->name = (char*)malloc_nogrow(length);
-	if (area->name == NULL) {
-		free(area);
-		return NULL;
-	}
-	strlcpy(area->name, name, length);
-
-	area->id = atomic_add(&sNextAreaID, 1);
-	area->base = 0;
-	area->size = 0;
-	area->protection = protection;
-	area->wiring = wiring;
-	area->memory_type = 0;
-
-	area->cache = NULL;
-	area->cache_offset = 0;
-
-	area->address_space = addressSpace;
-	area->address_space_next = NULL;
-	area->cache_next = area->cache_prev = NULL;
-	area->hash_next = NULL;
-	new (&area->mappings) VMAreaMappings;
-	area->page_protections = NULL;
-
-	return area;
-}
-
-
-/*!	Finds a reserved area that covers the region spanned by \a start and
-	\a size, inserts the \a area into that region and makes sure that
-	there are reserved regions for the remaining parts.
-*/
-static status_t
-find_reserved_area(VMAddressSpace* addressSpace, addr_t start,
-	addr_t size, VMArea* area)
-{
-	VMArea* last = NULL;
-	VMArea* next;
-
-	next = addressSpace->areas;
-	while (next != NULL) {
-		if (next->base <= start
-			&& next->base + (next->size - 1) >= start + (size - 1)) {
-			// This area covers the requested range
-			if (next->id != RESERVED_AREA_ID) {
-				// but it's not reserved space, it's a real area
-				return B_BAD_VALUE;
-			}
-
-			break;
-		}
-
-		last = next;
-		next = next->address_space_next;
-	}
-
-	if (next == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	// Now we have to transfer the requested part of the reserved
-	// range to the new area - and remove, resize or split the old
-	// reserved area.
-
-	if (start == next->base) {
-		// the area starts at the beginning of the reserved range
-		if (last)
-			last->address_space_next = area;
-		else
-			addressSpace->areas = area;
-
-		if (size == next->size) {
-			// the new area fully covers the reversed range
-			area->address_space_next = next->address_space_next;
-			addressSpace->Put();
-			free(next);
-		} else {
-			// resize the reserved range behind the area
-			area->address_space_next = next;
-			next->base += size;
-			next->size -= size;
-		}
-	} else if (start + size == next->base + next->size) {
-		// the area is at the end of the reserved range
-		area->address_space_next = next->address_space_next;
-		next->address_space_next = area;
-
-		// resize the reserved range before the area
-		next->size = start - next->base;
-	} else {
-		// the area splits the reserved range into two separate ones
-		// we need a new reserved area to cover this space
-		VMArea* reserved = create_reserved_area_struct(addressSpace,
-			next->protection);
-		if (reserved == NULL)
-			return B_NO_MEMORY;
-
-		addressSpace->Get();
-		reserved->address_space_next = next->address_space_next;
-		area->address_space_next = reserved;
-		next->address_space_next = area;
-
-		// resize regions
-		reserved->size = next->base + next->size - start - size;
-		next->size = start - next->base;
-		reserved->base = start + size;
-		reserved->cache_offset = next->cache_offset;
-	}
-
-	area->base = start;
-	area->size = size;
-	addressSpace->IncrementChangeCount();
-
-	return B_OK;
-}
-
-
-/*!	Verifies that an area with the given aligned base and size fits into
-	the spot defined by base and limit and does check for overflows.
-*/
-static inline bool
-is_valid_spot(addr_t base, addr_t alignedBase, addr_t size, addr_t limit)
-{
-	return (alignedBase >= base && alignedBase + (size - 1) > alignedBase
-		&& alignedBase + (size - 1) <= limit);
-}
-
-
-/*!	Must be called with this address space's write lock held */
-static status_t
-find_and_insert_area_slot(VMAddressSpace* addressSpace, addr_t start,
-	addr_t size, addr_t end, uint32 addressSpec, VMArea* area)
-{
-	VMArea* last = NULL;
-	VMArea* next;
-	bool foundSpot = false;
-
-	TRACE(("find_and_insert_area_slot: address space %p, start 0x%lx, "
-		"size %ld, end 0x%lx, addressSpec %ld, area %p\n", addressSpace, start,
-		size, end, addressSpec, area));
-
-	// do some sanity checking
-	if (start < addressSpace->Base() || size == 0
-		|| end > addressSpace->Base() + (addressSpace->Size() - 1)
-		|| start + (size - 1) > end)
-		return B_BAD_ADDRESS;
-
-	if (addressSpec == B_EXACT_ADDRESS && area->id != RESERVED_AREA_ID) {
-		// search for a reserved area
-		status_t status = find_reserved_area(addressSpace, start, size, area);
-		if (status == B_OK || status == B_BAD_VALUE)
-			return status;
-
-		// There was no reserved area, and the slot doesn't seem to be used
-		// already
-		// TODO: this could be further optimized.
-	}
-
-	size_t alignment = B_PAGE_SIZE;
-	if (addressSpec == B_ANY_KERNEL_BLOCK_ADDRESS) {
-		// align the memory to the next power of two of the size
-		while (alignment < size)
-			alignment <<= 1;
-	}
-
-	start = ROUNDUP(start, alignment);
-
-	// walk up to the spot where we should start searching
-second_chance:
-	next = addressSpace->areas;
-	while (next != NULL) {
-		if (next->base > start + (size - 1)) {
-			// we have a winner
-			break;
-		}
-
-		last = next;
-		next = next->address_space_next;
-	}
-
-	// find the right spot depending on the address specification - the area
-	// will be inserted directly after "last" ("next" is not referenced anymore)
-
-	switch (addressSpec) {
-		case B_ANY_ADDRESS:
-		case B_ANY_KERNEL_ADDRESS:
-		case B_ANY_KERNEL_BLOCK_ADDRESS:
-		{
-			// find a hole big enough for a new area
-			if (last == NULL) {
-				// see if we can build it at the beginning of the virtual map
-				addr_t alignedBase = ROUNDUP(addressSpace->Base(), alignment);
-				if (is_valid_spot(addressSpace->Base(), alignedBase, size,
-						next == NULL ? end : next->base)) {
-					foundSpot = true;
-					area->base = alignedBase;
-					break;
-				}
-
-				last = next;
-				next = next->address_space_next;
-			}
-
-			// keep walking
-			while (next != NULL) {
-				addr_t alignedBase = ROUNDUP(last->base + last->size, alignment);
-				if (is_valid_spot(last->base + (last->size - 1), alignedBase,
-						size, next->base)) {
-					foundSpot = true;
-					area->base = alignedBase;
-					break;
-				}
-
-				last = next;
-				next = next->address_space_next;
-			}
-
-			if (foundSpot)
-				break;
-
-			addr_t alignedBase = ROUNDUP(last->base + last->size, alignment);
-			if (is_valid_spot(last->base + (last->size - 1), alignedBase,
-					size, end)) {
-				// got a spot
-				foundSpot = true;
-				area->base = alignedBase;
-				break;
-			} else if (area->id != RESERVED_AREA_ID) {
-				// We didn't find a free spot - if there are any reserved areas,
-				// we can now test those for free space
-				// TODO: it would make sense to start with the biggest of them
-				next = addressSpace->areas;
-				for (last = NULL; next != NULL;
-						next = next->address_space_next) {
-					if (next->id != RESERVED_AREA_ID) {
-						last = next;
-						continue;
-					}
-
-					// TODO: take free space after the reserved area into
-					// account!
-					addr_t alignedBase = ROUNDUP(next->base, alignment);
-					if (next->base == alignedBase && next->size == size) {
-						// The reserved area is entirely covered, and thus,
-						// removed
-						if (last)
-							last->address_space_next = next->address_space_next;
-						else
-							addressSpace->areas = next->address_space_next;
-
-						foundSpot = true;
-						area->base = alignedBase;
-						free(next);
-						break;
-					}
-
-					if ((next->protection & RESERVED_AVOID_BASE) == 0
-						&&  alignedBase == next->base && next->size >= size) {
-						// The new area will be placed at the beginning of the
-						// reserved area and the reserved area will be offset
-						// and resized
-						foundSpot = true;
-						next->base += size;
-						next->size -= size;
-						area->base = alignedBase;
-						break;
-					}
-
-					if (is_valid_spot(next->base, alignedBase, size,
-							next->base + (next->size - 1))) {
-						// The new area will be placed at the end of the
-						// reserved area, and the reserved area will be resized
-						// to make space
-						alignedBase = ROUNDDOWN(next->base + next->size - size,
-							alignment);
-
-						foundSpot = true;
-						next->size = alignedBase - next->base;
-						area->base = alignedBase;
-						last = next;
-						break;
-					}
-
-					last = next;
-				}
-			}
-			break;
-		}
-
-		case B_BASE_ADDRESS:
-		{
-			// find a hole big enough for a new area beginning with "start"
-			if (last == NULL) {
-				// see if we can build it at the beginning of the specified start
-				if (next == NULL || next->base > start + (size - 1)) {
-					foundSpot = true;
-					area->base = start;
-					break;
-				}
-
-				last = next;
-				next = next->address_space_next;
-			}
-
-			// keep walking
-			while (next != NULL) {
-				if (next->base - (last->base + last->size) >= size) {
-					// we found a spot (it'll be filled up below)
-					break;
-				}
-
-				last = next;
-				next = next->address_space_next;
-			}
-
-			addr_t lastEnd = last->base + (last->size - 1);
-			if (next != NULL || end - lastEnd >= size) {
-				// got a spot
-				foundSpot = true;
-				if (lastEnd < start)
-					area->base = start;
-				else
-					area->base = lastEnd + 1;
-				break;
-			}
-
-			// we didn't find a free spot in the requested range, so we'll
-			// try again without any restrictions
-			start = addressSpace->Base();
-			addressSpec = B_ANY_ADDRESS;
-			last = NULL;
-			goto second_chance;
-		}
-
-		case B_EXACT_ADDRESS:
-			// see if we can create it exactly here
-			if ((last == NULL || last->base + (last->size - 1) < start)
-				&& (next == NULL || next->base > start + (size - 1))) {
-				foundSpot = true;
-				area->base = start;
-				break;
-			}
-			break;
-		default:
-			return B_BAD_VALUE;
-	}
-
-	if (!foundSpot)
-		return addressSpec == B_EXACT_ADDRESS ? B_BAD_VALUE : B_NO_MEMORY;
-
-	area->size = size;
-	if (last) {
-		area->address_space_next = last->address_space_next;
-		last->address_space_next = area;
-	} else {
-		area->address_space_next = addressSpace->areas;
-		addressSpace->areas = area;
-	}
-
-	addressSpace->IncrementChangeCount();
-	return B_OK;
-}
-
-
-/*!	This inserts the area you pass into the specified address space.
-	It will also set the "_address" argument to its base address when
-	the call succeeds.
-	You need to hold the VMAddressSpace write lock.
-*/
-static status_t
-insert_area(VMAddressSpace* addressSpace, void** _address,
-	uint32 addressSpec, addr_t size, VMArea* area)
-{
-	addr_t searchBase, searchEnd;
-	status_t status;
-
-	switch (addressSpec) {
-		case B_EXACT_ADDRESS:
-			searchBase = (addr_t)*_address;
-			searchEnd = (addr_t)*_address + (size - 1);
-			break;
-
-		case B_BASE_ADDRESS:
-			searchBase = (addr_t)*_address;
-			searchEnd = addressSpace->Base() + (addressSpace->Size() - 1);
-			break;
-
-		case B_ANY_ADDRESS:
-		case B_ANY_KERNEL_ADDRESS:
-		case B_ANY_KERNEL_BLOCK_ADDRESS:
-			searchBase = addressSpace->Base();
-			// TODO: remove this again when vm86 mode is moved into the kernel
-			// completely (currently needs a userland address space!)
-			if (searchBase == USER_BASE)
-				searchBase = USER_BASE_ANY;
-			searchEnd = addressSpace->Base() + (addressSpace->Size() - 1);
-			break;
-
-		default:
-			return B_BAD_VALUE;
-	}
-
-	status = find_and_insert_area_slot(addressSpace, searchBase, size,
-		searchEnd, addressSpec, area);
-	if (status == B_OK) {
-		*_address = (void*)area->base;
-
-		if (addressSpace == VMAddressSpace::Kernel())
-			sKernelAddressSpaceLeft -= area->size;
-	}
-
-	return status;
 }
 
 
@@ -896,12 +448,9 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 	addr_t lastAddress = address + (size - 1);
 
 	// Check, whether the caller is allowed to modify the concerned areas.
-	VMArea* area;
 	if (!kernel) {
-		area = addressSpace->areas;
-		while (area != NULL) {
-			VMArea* nextArea = area->address_space_next;
-
+		for (VMAddressSpace::Iterator it = addressSpace->GetIterator();
+				VMArea* area = it.Next();) {
 			if (area->id != RESERVED_AREA_ID) {
 				addr_t areaLast = area->base + (area->size - 1);
 				if (area->base < lastAddress && address < areaLast) {
@@ -909,15 +458,11 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 						return B_NOT_ALLOWED;
 				}
 			}
-
-			area = nextArea;
 		}
 	}
 
-	area = addressSpace->areas;
-	while (area != NULL) {
-		VMArea* nextArea = area->address_space_next;
-
+	for (VMAddressSpace::Iterator it = addressSpace->GetIterator();
+			VMArea* area = it.Next();) {
 		if (area->id != RESERVED_AREA_ID) {
 			addr_t areaLast = area->base + (area->size - 1);
 			if (area->base < lastAddress && address < areaLast) {
@@ -929,8 +474,6 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 					// can't do anything about it.
 			}
 		}
-
-		area = nextArea;
 	}
 
 	return B_OK;
@@ -953,8 +496,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		addressSpec, wiring, protection, _area, areaName));
 	cache->AssertLocked();
 
-	VMArea* area = create_area_struct(addressSpace, areaName, wiring,
-		protection);
+	VMArea* area = VMArea::Create(addressSpace, areaName, wiring, protection);
 	if (area == NULL)
 		return B_NO_MEMORY;
 
@@ -1002,7 +544,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 			goto err2;
 	}
 
-	status = insert_area(addressSpace, _virtualAddress, addressSpec, size, area);
+	status = addressSpace->InsertArea(_virtualAddress, addressSpec, size, area);
 	if (status != B_OK) {
 		// TODO: wait and try again once this is working in the backend
 #if 0
@@ -1106,28 +648,18 @@ vm_unreserve_address_range(team_id team, void* address, addr_t size)
 	}
 
 	// search area list and remove any matching reserved ranges
-
-	VMArea* area = locker.AddressSpace()->areas;
-	VMArea* last = NULL;
-	while (area) {
+	addr_t endAddress = (addr_t)address + (size - 1);
+	for (VMAddressSpace::Iterator it = locker.AddressSpace()->GetIterator();
+			VMArea* area = it.Next();) {
 		// the area must be completely part of the reserved range
-		if (area->id == RESERVED_AREA_ID && area->base >= (addr_t)address
-			&& area->base + area->size <= (addr_t)address + size) {
+		if (area->base + (area->size - 1) > endAddress)
+			break;
+		if (area->id == RESERVED_AREA_ID && area->base >= (addr_t)address) {
 			// remove reserved range
-			VMArea* reserved = area;
-			if (last)
-				last->address_space_next = reserved->address_space_next;
-			else
-				locker.AddressSpace()->areas = reserved->address_space_next;
-
-			area = reserved->address_space_next;
+			locker.AddressSpace()->RemoveArea(area);
 			locker.AddressSpace()->Put();
-			free(reserved);
-			continue;
+			free(area);
 		}
-
-		last = area;
-		area = area->address_space_next;
 	}
 
 	return B_OK;
@@ -1152,11 +684,11 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 		return B_BAD_TEAM_ID;
 	}
 
-	VMArea* area = create_reserved_area_struct(locker.AddressSpace(), flags);
+	VMArea* area = VMArea::CreateReserved(locker.AddressSpace(), flags);
 	if (area == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = insert_area(locker.AddressSpace(), _address, addressSpec,
+	status_t status = locker.AddressSpace()->InsertArea(_address, addressSpec,
 		size, area);
 	if (status != B_OK) {
 		free(area);
@@ -2086,9 +1618,6 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area)
 	arch_vm_unset_memory_type(area);
 	addressSpace->RemoveArea(area);
 	addressSpace->Put();
-
-	if (addressSpace == VMAddressSpace::Kernel())
-		sKernelAddressSpaceLeft -= area->size;
 
 	area->cache->RemoveArea(area);
 	area->cache->ReleaseRef();
@@ -3360,10 +2889,6 @@ dump_available_memory(int argc, char** argv)
 status_t
 vm_delete_areas(struct VMAddressSpace* addressSpace)
 {
-	VMArea* area;
-	VMArea* next;
-	VMArea* last = NULL;
-
 	TRACE(("vm_delete_areas: called on address space 0x%lx\n",
 		addressSpace->ID()));
 
@@ -3371,30 +2896,19 @@ vm_delete_areas(struct VMAddressSpace* addressSpace)
 
 	// remove all reserved areas in this address space
 
-	for (area = addressSpace->areas; area; area = next) {
-		next = area->address_space_next;
-
+	for (VMAddressSpace::Iterator it = addressSpace->GetIterator();
+			VMArea* area = it.Next();) {
 		if (area->id == RESERVED_AREA_ID) {
 			// just remove it
-			if (last)
-				last->address_space_next = area->address_space_next;
-			else
-				addressSpace->areas = area->address_space_next;
-
+			addressSpace->RemoveArea(area);
 			addressSpace->Put();
 			free(area);
-			continue;
 		}
-
-		last = area;
 	}
 
 	// delete all the areas in this address space
-
-	for (area = addressSpace->areas; area; area = next) {
-		next = area->address_space_next;
+	while (VMArea* area = addressSpace->FirstArea())
 		delete_area(addressSpace, area);
-	}
 
 	addressSpace->WriteUnlock();
 	return B_OK;
@@ -3430,6 +2944,7 @@ vm_area_for(addr_t address, bool kernel)
 
 
 /*!	Frees physical pages that were used during the boot process.
+	\a end is inclusive.
 */
 static void
 unmap_and_free_physical_pages(vm_translation_map* map, addr_t start, addr_t end)
@@ -3448,7 +2963,7 @@ unmap_and_free_physical_pages(vm_translation_map* map, addr_t start, addr_t end)
 	}
 
 	// unmap the memory
-	map->ops->unmap(map, start, end - 1);
+	map->ops->unmap(map, start, end);
 }
 
 
@@ -3456,9 +2971,8 @@ void
 vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 {
 	vm_translation_map* map = &VMAddressSpace::Kernel()->TranslationMap();
-	addr_t end = start + size;
+	addr_t end = start + (size - 1);
 	addr_t lastEnd = start;
-	VMArea* area;
 
 	TRACE(("vm_free_unused_boot_loader_range(): asked to free %p - %p\n",
 		(void*)start, (void*)end));
@@ -3469,17 +2983,17 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 
 	map->ops->lock(map);
 
-	for (area = VMAddressSpace::Kernel()->areas; area != NULL;
-			area = area->address_space_next) {
+	for (VMAddressSpace::Iterator it = VMAddressSpace::Kernel()->GetIterator();
+			VMArea* area = it.Next();) {
 		addr_t areaStart = area->base;
-		addr_t areaEnd = areaStart + area->size;
+		addr_t areaEnd = areaStart + (area->size - 1);
 
-		if (area->id == RESERVED_AREA_ID)
+		if (area->id == RESERVED_AREA_ID || areaEnd < start)
 			continue;
 
-		if (areaEnd >= end) {
-			// we are done, the areas are already beyond of what we have to free
-			lastEnd = end;
+		if (areaStart > end) {
+			// we are done, the area is already beyond of what we have to free
+			end = areaStart - 1;
 			break;
 		}
 
@@ -3487,10 +3001,16 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 			// this is something we can free
 			TRACE(("free boot range: get rid of %p - %p\n", (void*)lastEnd,
 				(void*)areaStart));
-			unmap_and_free_physical_pages(map, lastEnd, areaStart);
+			unmap_and_free_physical_pages(map, lastEnd, areaStart - 1);
 		}
 
-		lastEnd = areaEnd;
+		if (areaEnd >= end) {
+			lastEnd = areaEnd;
+				// no +1 to prevent potential overflow
+			break;
+		}
+
+		lastEnd = areaEnd + 1;
 	}
 
 	if (lastEnd < end) {
@@ -3747,8 +3267,6 @@ vm_init(kernel_args* args)
 	err = arch_vm_init(args);
 
 	// initialize some globals
-	sNextAreaID = 1;
-
 	vm_page_init_num_pages(args);
 	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
 
@@ -4545,7 +4063,7 @@ vm_available_not_needed_memory(void)
 size_t
 vm_kernel_address_space_left(void)
 {
-	return sKernelAddressSpaceLeft;
+	return VMAddressSpace::Kernel()->FreeSpace();
 }
 
 
@@ -4724,7 +4242,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 		for (VMArea* current = cache->areas; current != NULL;
 				current = current->cache_next) {
-			VMArea* next = current->address_space_next;
+			VMArea* next = current->address_space->NextArea(current);
 			if (next != NULL && next->base <= (current->base + newSize)) {
 				// If the area was created inside a reserved area, it can
 				// also be resized in that area
@@ -4752,7 +4270,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 	for (VMArea* current = cache->areas; current != NULL;
 			current = current->cache_next) {
-		VMArea* next = current->address_space_next;
+		VMArea* next = current->address_space->NextArea(current);
 		if (next != NULL && next->base <= (current->base + newSize)) {
 			if (next->id == RESERVED_AREA_ID
 				&& next->cache_offset <= current->base
@@ -4760,7 +4278,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 				// resize reserved area
 				addr_t offset = current->base + newSize - next->base;
 				if (next->size <= offset) {
-					current->address_space_next = next->address_space_next;
+					next->address_space->RemoveArea(next);
 					free(next);
 				} else {
 					next->size -= offset;
@@ -5254,8 +4772,8 @@ _get_next_area_info(team_id team, int32* cookie, area_info* info, size_t size)
 		return B_BAD_TEAM_ID;
 
 	VMArea* area;
-	for (area = locker.AddressSpace()->areas; area != NULL;
-			area = area->address_space_next) {
+	for (VMAddressSpace::Iterator it = locker.AddressSpace()->GetIterator();
+			(area = it.Next()) != NULL;) {
 		if (area->id == RESERVED_AREA_ID)
 			continue;
 

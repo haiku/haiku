@@ -13,12 +13,14 @@
 #include <OS.h>
 
 #include <vm/vm_translation_map.h>
-
-
-struct VMArea;
+#include <vm/VMArea.h>
 
 
 struct VMAddressSpace {
+public:
+			class Iterator;
+
+public:
 								VMAddressSpace(team_id id, addr_t base,
 									size_t size, bool kernel);
 								~VMAddressSpace();
@@ -29,6 +31,7 @@ struct VMAddressSpace {
 			team_id				ID() const				{ return fID; }
 			addr_t				Base() const			{ return fBase; }
 			size_t				Size() const			{ return fSize; }
+			size_t				FreeSpace() const		{ return fFreeSpace; }
 			bool				IsBeingDeleted() const	{ return fDeleting; }
 
 			vm_translation_map&	TranslationMap()	{ return fTranslationMap; }
@@ -54,8 +57,17 @@ struct VMAddressSpace {
 			void				IncrementChangeCount()
 									{ fChangeCount++; }
 
-			VMArea*				LookupArea(addr_t address);
+			VMArea*				FirstArea() const
+									{ return fAreas.Head(); }
+			VMArea*				NextArea(VMArea* area) const
+									{ return fAreas.GetNext(area); }
+
+			VMArea*				LookupArea(addr_t address) const;
+			status_t			InsertArea(void** _address, uint32 addressSpec,
+									addr_t size, VMArea* area);
 			void				RemoveArea(VMArea* area);
+
+	inline	Iterator			GetIterator();
 
 	static	status_t			Create(team_id teamID, addr_t base, size_t size,
 									bool kernel,
@@ -77,30 +89,75 @@ struct VMAddressSpace {
 			void				Dump() const;
 
 private:
+			status_t			_InsertAreaIntoReservedRegion(addr_t start,
+									size_t size, VMArea* area);
+			status_t			_InsertAreaSlot(addr_t start, addr_t size,
+									addr_t end, uint32 addressSpec,
+									VMArea* area);
+
 	static	int					_DumpCommand(int argc, char** argv);
 	static	int					_DumpListCommand(int argc, char** argv);
 
-public:
-			VMArea*				areas;
-
 private:
+			friend class Iterator;
+
 			struct HashDefinition;
 
 private:
 			VMAddressSpace*		fHashTableLink;
 			addr_t				fBase;
 			size_t				fSize;
+			size_t				fFreeSpace;
 			rw_lock				fLock;
 			team_id				fID;
 			int32				fRefCount;
 			int32				fFaultCount;
 			int32				fChangeCount;
 			vm_translation_map	fTranslationMap;
-			VMArea*				fAreaHint;
+			VMAddressSpaceAreaList fAreas;
+	mutable	VMArea*				fAreaHint;
 			bool				fDeleting;
 	static	VMAddressSpace*		sKernelAddressSpace;
 };
 
+
+class VMAddressSpace::Iterator {
+public:
+	Iterator()
+	{
+	}
+
+	Iterator(VMAddressSpace* addressSpace)
+		:
+		fIterator(addressSpace->fAreas.GetIterator())
+	{
+	}
+
+	bool HasNext() const
+	{
+		return fIterator.HasNext();
+	}
+
+	VMArea* Next()
+	{
+		return fIterator.Next();
+	}
+
+	void Rewind()
+	{
+		fIterator.Rewind();
+	}
+
+private:
+	VMAddressSpaceAreaList::Iterator fIterator;
+};
+
+
+inline VMAddressSpace::Iterator
+VMAddressSpace::GetIterator()
+{
+	return Iterator(this);
+}
 
 
 #ifdef __cplusplus

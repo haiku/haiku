@@ -34,6 +34,17 @@
 #define ASPACE_HASH_TABLE_SIZE 1024
 
 
+/*!	Verifies that an area with the given aligned base and size fits into
+	the spot defined by base and limit and checks for overflows.
+*/
+static inline bool
+is_valid_spot(addr_t base, addr_t alignedBase, addr_t size, addr_t limit)
+{
+	return (alignedBase >= base && alignedBase + (size - 1) > alignedBase
+		&& alignedBase + (size - 1) <= limit);
+}
+
+
 // #pragma mark - AddressSpaceHashDefinition
 
 
@@ -76,10 +87,9 @@ VMAddressSpace* VMAddressSpace::sKernelAddressSpace;
 VMAddressSpace::VMAddressSpace(team_id id, addr_t base, size_t size,
 	bool kernel)
 	:
-	areas(NULL),
-
 	fBase(base),
 	fSize(size),
+	fFreeSpace(size),
 	fID(id),
 	fRefCount(1),
 	fFaultCount(0),
@@ -266,14 +276,14 @@ VMAddressSpace::Get(team_id teamID)
 
 //! You must hold the address space's read lock.
 VMArea*
-VMAddressSpace::LookupArea(addr_t address)
+VMAddressSpace::LookupArea(addr_t address) const
 {
 	// check the area hint first
-	VMArea* area = fAreaHint;
-	if (area != NULL && area->ContainsAddress(address))
-		return area;
+	if (fAreaHint != NULL && fAreaHint->ContainsAddress(address))
+		return fAreaHint;
 
-	for (area = areas; area != NULL; area = area->address_space_next) {
+	for (VMAddressSpaceAreaList::ConstIterator it = fAreas.GetIterator();
+			VMArea* area = it.Next();) {
 		if (area->id == RESERVED_AREA_ID)
 			continue;
 
@@ -287,32 +297,66 @@ VMAddressSpace::LookupArea(addr_t address)
 }
 
 
+/*!	This inserts the area you pass into the address space.
+	It will also set the "_address" argument to its base address when
+	the call succeeds.
+	You need to hold the VMAddressSpace write lock.
+*/
+status_t
+VMAddressSpace::InsertArea(void** _address, uint32 addressSpec, addr_t size,
+	VMArea* area)
+{
+	addr_t searchBase, searchEnd;
+	status_t status;
+
+	switch (addressSpec) {
+		case B_EXACT_ADDRESS:
+			searchBase = (addr_t)*_address;
+			searchEnd = (addr_t)*_address + (size - 1);
+			break;
+
+		case B_BASE_ADDRESS:
+			searchBase = (addr_t)*_address;
+			searchEnd = fBase + (fSize - 1);
+			break;
+
+		case B_ANY_ADDRESS:
+		case B_ANY_KERNEL_ADDRESS:
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
+			searchBase = fBase;
+			// TODO: remove this again when vm86 mode is moved into the kernel
+			// completely (currently needs a userland address space!)
+			if (searchBase == USER_BASE)
+				searchBase = USER_BASE_ANY;
+			searchEnd = fBase + (fSize - 1);
+			break;
+
+		default:
+			return B_BAD_VALUE;
+	}
+
+	status = _InsertAreaSlot(searchBase, size, searchEnd, addressSpec, area);
+	if (status == B_OK) {
+		*_address = (void*)area->base;
+		fFreeSpace -= area->size;
+	}
+
+	return status;
+}
+
+
 //! You must hold the address space's write lock.
 void
 VMAddressSpace::RemoveArea(VMArea* area)
 {
-	VMArea* temp = areas;
-	VMArea* last = NULL;
+	fAreas.Remove(area);
 
-	while (temp != NULL) {
-		if (area == temp) {
-			if (last != NULL) {
-				last->address_space_next = temp->address_space_next;
-			} else {
-				areas = temp->address_space_next;
-			}
-			IncrementChangeCount();
-			break;
-		}
-		last = temp;
-		temp = temp->address_space_next;
-	}
-	if (area == fAreaHint)
-		fAreaHint = NULL;
+	if (area->id != RESERVED_AREA_ID) {
+		IncrementChangeCount();
+		fFreeSpace += area->size;
 
-	if (temp == NULL) {
-		panic("VMAddressSpace::RemoveArea(): area not found in aspace's area "
-			"list\n");
+		if (area == fAreaHint)
+			fAreaHint = NULL;
 	}
 }
 
@@ -332,14 +376,321 @@ VMAddressSpace::Dump() const
 
 	kprintf("area_list:\n");
 
-	VMArea* area;
-	for (area = areas; area != NULL; area = area->address_space_next) {
+	for (VMAddressSpaceAreaList::ConstIterator it = fAreas.GetIterator();
+			VMArea* area = it.Next();) {
 		kprintf(" area 0x%lx: ", area->id);
 		kprintf("base_addr = 0x%lx ", area->base);
 		kprintf("size = 0x%lx ", area->size);
 		kprintf("name = '%s' ", area->name);
 		kprintf("protection = 0x%lx\n", area->protection);
 	}
+}
+
+
+/*!	Finds a reserved area that covers the region spanned by \a start and
+	\a size, inserts the \a area into that region and makes sure that
+	there are reserved regions for the remaining parts.
+*/
+status_t
+VMAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
+	VMArea* area)
+{
+	VMArea* next;
+
+	for (VMAddressSpaceAreaList::Iterator it = fAreas.GetIterator();
+			(next = it.Next()) != NULL;) {
+		if (next->base <= start
+			&& next->base + (next->size - 1) >= start + (size - 1)) {
+			// This area covers the requested range
+			if (next->id != RESERVED_AREA_ID) {
+				// but it's not reserved space, it's a real area
+				return B_BAD_VALUE;
+			}
+
+			break;
+		}
+	}
+
+	if (next == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// Now we have to transfer the requested part of the reserved
+	// range to the new area - and remove, resize or split the old
+	// reserved area.
+
+	if (start == next->base) {
+		// the area starts at the beginning of the reserved range
+		fAreas.Insert(next, area);
+
+		if (size == next->size) {
+			// the new area fully covers the reversed range
+			fAreas.Remove(next);
+			Put();
+			free(next);
+		} else {
+			// resize the reserved range behind the area
+			next->base += size;
+			next->size -= size;
+		}
+	} else if (start + size == next->base + next->size) {
+		// the area is at the end of the reserved range
+		fAreas.Insert(fAreas.GetNext(next), area);
+
+		// resize the reserved range before the area
+		next->size = start - next->base;
+	} else {
+		// the area splits the reserved range into two separate ones
+		// we need a new reserved area to cover this space
+		VMArea* reserved = VMArea::CreateReserved(this, next->protection);
+		if (reserved == NULL)
+			return B_NO_MEMORY;
+
+		Get();
+		fAreas.Insert(fAreas.GetNext(next), reserved);
+		fAreas.Insert(reserved, area);
+
+		// resize regions
+		reserved->size = next->base + next->size - start - size;
+		next->size = start - next->base;
+		reserved->base = start + size;
+		reserved->cache_offset = next->cache_offset;
+	}
+
+	area->base = start;
+	area->size = size;
+	IncrementChangeCount();
+
+	return B_OK;
+}
+
+
+/*!	Must be called with this address space's write lock held */
+status_t
+VMAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
+	uint32 addressSpec, VMArea* area)
+{
+	VMArea* last = NULL;
+	VMArea* next;
+	bool foundSpot = false;
+
+	TRACE(("VMAddressSpace::InsertAreaSlot: address space %p, start 0x%lx, "
+		"size %ld, end 0x%lx, addressSpec %ld, area %p\n", this, start,
+		size, end, addressSpec, area));
+
+	// do some sanity checking
+	if (start < fBase || size == 0 || end > fBase + fSize - 1
+		|| start + (size - 1) > end)
+		return B_BAD_ADDRESS;
+
+	if (addressSpec == B_EXACT_ADDRESS && area->id != RESERVED_AREA_ID) {
+		// search for a reserved area
+		status_t status = _InsertAreaIntoReservedRegion(start, size, area);
+		if (status == B_OK || status == B_BAD_VALUE)
+			return status;
+
+		// There was no reserved area, and the slot doesn't seem to be used
+		// already
+		// TODO: this could be further optimized.
+	}
+
+	size_t alignment = B_PAGE_SIZE;
+	if (addressSpec == B_ANY_KERNEL_BLOCK_ADDRESS) {
+		// align the memory to the next power of two of the size
+		while (alignment < size)
+			alignment <<= 1;
+	}
+
+	start = ROUNDUP(start, alignment);
+
+	// walk up to the spot where we should start searching
+second_chance:
+	VMAddressSpaceAreaList::Iterator it = fAreas.GetIterator();
+	while ((next = it.Next()) != NULL) {
+		if (next->base > start + (size - 1)) {
+			// we have a winner
+			break;
+		}
+
+		last = next;
+	}
+
+	// find the right spot depending on the address specification - the area
+	// will be inserted directly after "last" ("next" is not referenced anymore)
+
+	switch (addressSpec) {
+		case B_ANY_ADDRESS:
+		case B_ANY_KERNEL_ADDRESS:
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
+		{
+			// find a hole big enough for a new area
+			if (last == NULL) {
+				// see if we can build it at the beginning of the virtual map
+				addr_t alignedBase = ROUNDUP(fBase, alignment);
+				if (is_valid_spot(fBase, alignedBase, size,
+						next == NULL ? end : next->base)) {
+					foundSpot = true;
+					area->base = alignedBase;
+					break;
+				}
+
+				last = next;
+				next = it.Next();
+			}
+
+			// keep walking
+			while (next != NULL) {
+				addr_t alignedBase = ROUNDUP(last->base + last->size,
+					alignment);
+				if (is_valid_spot(last->base + (last->size - 1), alignedBase,
+						size, next->base)) {
+					foundSpot = true;
+					area->base = alignedBase;
+					break;
+				}
+
+				last = next;
+				next = it.Next();
+			}
+
+			if (foundSpot)
+				break;
+
+			addr_t alignedBase = ROUNDUP(last->base + last->size, alignment);
+			if (is_valid_spot(last->base + (last->size - 1), alignedBase,
+					size, end)) {
+				// got a spot
+				foundSpot = true;
+				area->base = alignedBase;
+				break;
+			} else if (area->id != RESERVED_AREA_ID) {
+				// We didn't find a free spot - if there are any reserved areas,
+				// we can now test those for free space
+				// TODO: it would make sense to start with the biggest of them
+				it.Rewind();
+				next = it.Next();
+				for (last = NULL; next != NULL; next = it.Next()) {
+					if (next->id != RESERVED_AREA_ID) {
+						last = next;
+						continue;
+					}
+
+					// TODO: take free space after the reserved area into
+					// account!
+					addr_t alignedBase = ROUNDUP(next->base, alignment);
+					if (next->base == alignedBase && next->size == size) {
+						// The reserved area is entirely covered, and thus,
+						// removed
+						fAreas.Remove(next);
+
+						foundSpot = true;
+						area->base = alignedBase;
+						free(next);
+						break;
+					}
+
+					if ((next->protection & RESERVED_AVOID_BASE) == 0
+						&&  alignedBase == next->base && next->size >= size) {
+						// The new area will be placed at the beginning of the
+						// reserved area and the reserved area will be offset
+						// and resized
+						foundSpot = true;
+						next->base += size;
+						next->size -= size;
+						area->base = alignedBase;
+						break;
+					}
+
+					if (is_valid_spot(next->base, alignedBase, size,
+							next->base + (next->size - 1))) {
+						// The new area will be placed at the end of the
+						// reserved area, and the reserved area will be resized
+						// to make space
+						alignedBase = ROUNDDOWN(next->base + next->size - size,
+							alignment);
+
+						foundSpot = true;
+						next->size = alignedBase - next->base;
+						area->base = alignedBase;
+						last = next;
+						break;
+					}
+
+					last = next;
+				}
+			}
+			break;
+		}
+
+		case B_BASE_ADDRESS:
+		{
+			// find a hole big enough for a new area beginning with "start"
+			if (last == NULL) {
+				// see if we can build it at the beginning of the specified
+				// start
+				if (next == NULL || next->base > start + (size - 1)) {
+					foundSpot = true;
+					area->base = start;
+					break;
+				}
+
+				last = next;
+				next = it.Next();
+			}
+
+			// keep walking
+			while (next != NULL) {
+				if (next->base - (last->base + last->size) >= size) {
+					// we found a spot (it'll be filled up below)
+					break;
+				}
+
+				last = next;
+				next = it.Next();
+			}
+
+			addr_t lastEnd = last->base + (last->size - 1);
+			if (next != NULL || end - lastEnd >= size) {
+				// got a spot
+				foundSpot = true;
+				if (lastEnd < start)
+					area->base = start;
+				else
+					area->base = lastEnd + 1;
+				break;
+			}
+
+			// we didn't find a free spot in the requested range, so we'll
+			// try again without any restrictions
+			start = fBase;
+			addressSpec = B_ANY_ADDRESS;
+			last = NULL;
+			goto second_chance;
+		}
+
+		case B_EXACT_ADDRESS:
+			// see if we can create it exactly here
+			if ((last == NULL || last->base + (last->size - 1) < start)
+				&& (next == NULL || next->base > start + (size - 1))) {
+				foundSpot = true;
+				area->base = start;
+				break;
+			}
+			break;
+		default:
+			return B_BAD_VALUE;
+	}
+
+	if (!foundSpot)
+		return addressSpec == B_EXACT_ADDRESS ? B_BAD_VALUE : B_NO_MEMORY;
+
+	area->size = size;
+	if (last)
+		fAreas.Insert(fAreas.GetNext(last), area);
+	else
+		fAreas.Insert(fAreas.Head(), area);
+
+	IncrementChangeCount();
+	return B_OK;
 }
 
 
@@ -380,8 +731,8 @@ VMAddressSpace::_DumpListCommand(int argc, char** argv)
 	while (VMAddressSpace* space = it.Next()) {
 		int32 areaCount = 0;
 		off_t areaSize = 0;
-		for (VMArea* area = space->areas; area != NULL;
-				area = area->address_space_next) {
+		for (VMAddressSpaceAreaList::Iterator it = space->fAreas.GetIterator();
+				VMArea* area = it.Next();) {
 			if (area->id != RESERVED_AREA_ID
 				&& area->cache->type != CACHE_TYPE_NULL) {
 				areaCount++;

@@ -11,6 +11,7 @@
 
 
 #include <lock.h>
+#include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 #include <vm/vm_types.h>
 
@@ -36,14 +37,45 @@ struct VMArea {
 	uint8*					page_protections;
 
 	struct VMAddressSpace*	address_space;
-	struct VMArea*			address_space_next;
 	struct VMArea*			cache_next;
 	struct VMArea*			cache_prev;
 	struct VMArea*			hash_next;
 
-	bool ContainsAddress(addr_t address) const
-		{ return address >= base && address <= base + (size - 1); }
+			bool				ContainsAddress(addr_t address) const
+									{ return address >= base
+										&& address <= base + (size - 1); }
+
+	static	VMArea*				Create(VMAddressSpace* addressSpace,
+									const char* name, uint32 wiring,
+									uint32 protection);
+	static	VMArea*				CreateReserved(VMAddressSpace* addressSpace,
+									uint32 flags);
+
+			DoublyLinkedListLink<VMArea>& AddressSpaceLink()
+									{ return fAddressSpaceLink; }
+			const DoublyLinkedListLink<VMArea>& AddressSpaceLink() const
+									{ return fAddressSpaceLink; }
+
+private:
+			DoublyLinkedListLink<VMArea> fAddressSpaceLink;
 };
+
+
+struct VMAddressSpaceAreaGetLink {
+    inline DoublyLinkedListLink<VMArea>* operator()(VMArea* area) const
+    {
+        return &area->AddressSpaceLink();
+    }
+
+    inline const DoublyLinkedListLink<VMArea>* operator()(
+		const VMArea* area) const
+    {
+        return &area->AddressSpaceLink();
+    }
+};
+
+typedef DoublyLinkedList<VMArea, VMAddressSpaceAreaGetLink>
+	VMAddressSpaceAreaList;
 
 
 struct VMAreaHashDefinition {

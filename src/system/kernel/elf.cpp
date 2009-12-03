@@ -1303,11 +1303,11 @@ public:
 	status_t Init(struct team* team)
 	{
 		// find the runtime loader debug area
-		VMArea* area = team->address_space->areas;
-		while (area != NULL) {
+		VMArea* area;
+		for (VMAddressSpace::Iterator it = team->address_space->GetIterator();
+				(area = it.Next()) != NULL;) {
 			if (strcmp(area->name, RUNTIME_LOADER_DEBUG_AREA_NAME) == 0)
 				break;
-			area = area->address_space_next;
 		}
 
 		if (area == NULL)
