@@ -8,8 +8,7 @@ UsePrivateKernelHeaders ;
 SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] 
 	-Wno-format 
 	-Wno-unused 
-	-Wno-uninitialized 
-	-Werror ;
+	-Wno-uninitialized ;
 
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 
