@@ -5,12 +5,27 @@
  * Authors:
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
- 
-#ifndef PREFERENCESWINDOW_h
-#define PREFERENCESWINDOW_h
+#ifndef PREFERENCES_WINDOW_h
+#define PREFERENCES_WINDOW_h
 
-#define DEBUG 1
+
+#include <Application.h>
+#include <Button.h>
+#include <Catalog.h>
 #include <Debug.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <File.h>
+#include <GroupView.h>
+#include <Locale.h>
+#include <MessageFilter.h>
+#include <NodeMonitor.h>
+#include <Path.h>
+#include <Screen.h>
+#include <SpaceLayoutItem.h>
+#include <String.h>
+#include <Window.h>
+
 
 #if DEBUG
 #	define LOG(text...) PRINT((text))
@@ -18,103 +33,84 @@
 #	define LOG(text...)
 #endif
 
-#include <Button.h>
-#include <Catalog.h>
-#include <Locale.h>
-#include <NodeMonitor.h>
-#include <Path.h>
-#include <Window.h>
-
-// headers PreferencesStorage
-#include <Entry.h>
-#include <FindDirectory.h>
-#include <File.h>
-#include <String.h>
-
-// headers PrefFileWatcher
-#include <MessageFilter.h>
-
-// headers PreferencesWindow
-#include <Application.h>
-#include <GroupView.h>
-#include <Screen.h>
-#include <SpaceLayoutItem.h>
 
 #define TR_CONTEXT "Pref Window"
 
 // messages PrefFileWatcher
 const uint32 kUpdatedPreferences = '&UdP';
 
+
 template<typename Preferences>
-class PreferencesStorage
-{
-	public:
-							PreferencesStorage(const char* file,
-												const Preferences& defaultPreferences);
-							~PreferencesStorage();
+class PreferencesStorage {
+public:
+								PreferencesStorage(const char* file,
+									const Preferences& defaultPreferences);
+								~PreferencesStorage();
 			
-		void				Revert();
-		void				Defaults();
+			void				Revert();
+			void				Defaults();
 		
-		BPoint 				WindowPosition(){return fWindowPosition;}
-		void				SetWindowPosition(BPoint position){
-								fWindowPosition = position;}
-		
-		Preferences*		GetPreferences(){return &fPreferences;}
-		
-		status_t			LoadPreferences();
-		status_t			SavePreferences();
-		
-		BString&			PreferencesFile() {	return fPreferencesFile;	}
-		status_t			GetPreferencesPath(BPath &path);
-		
-	private:
-		BString				fPreferencesFile;
-		
-		Preferences			fPreferences;
-		Preferences			fStartPreferences;
-		const Preferences&	fDefaultPreferences;
-		BPoint				fWindowPosition;
+			BPoint 				WindowPosition() {return fWindowPosition; }
+			void				SetWindowPosition(BPoint position)
+									{ fWindowPosition = position; }
+			
+			Preferences*		GetPreferences() { return &fPreferences; }
+			
+			status_t			LoadPreferences();
+			status_t			SavePreferences();
+			
+			BString&			PreferencesFile() {	return fPreferencesFile; }
+			status_t			GetPreferencesPath(BPath &path);
+			
+private:
+			BString				fPreferencesFile;
+			
+			Preferences			fPreferences;
+			Preferences			fStartPreferences;
+			const Preferences&	fDefaultPreferences;
+			BPoint				fWindowPosition;
 };
 
 
 template<typename Preferences>
-class PrefFileWatcher : public BMessageFilter
-{
-	public:
-								PrefFileWatcher(PreferencesStorage<Preferences>* storage,
-													BHandler* target);
-								~PrefFileWatcher();
-		virtual filter_result	Filter(BMessage *message, BHandler **target);
+class PrefFileWatcher : public BMessageFilter {
+public:
+								PrefFileWatcher(
+									PreferencesStorage<Preferences>* storage,
+									BHandler* target);
+	virtual						~PrefFileWatcher();
+
+	virtual filter_result		Filter(BMessage* message, BHandler** _target);
 		
-	private:
-		PreferencesStorage<Preferences>* fPreferencesStorage;
-		node_ref				fPreferencesNode;
-		node_ref				fPreferencesDirectoryNode;
-		
-		BHandler*				fTarget;
+private:
+			PreferencesStorage<Preferences>* fPreferencesStorage;
+			node_ref			fPreferencesNode;
+			node_ref			fPreferencesDirectoryNode;
+			
+			BHandler*			fTarget;
 };
 
 
 template<typename Preferences>
-class PreferencesWindow : public BWindow, public PreferencesStorage<Preferences>
-{
-	public:
+class PreferencesWindow : public BWindow,
+	public PreferencesStorage<Preferences> {
+public:
 								PreferencesWindow(const char* title,
-													const char* file,
-													const Preferences& defaultPreferences);
-								~PreferencesWindow();
-		virtual void			MessageReceived(BMessage *msg);
-		virtual bool			QuitRequested();
+									const char* file,
+									const Preferences& defaultPreferences);
+	virtual						~PreferencesWindow();
+	virtual void				MessageReceived(BMessage *msg);
+	virtual bool				QuitRequested();
 		
-		virtual bool			SetPreferencesView(BView* prefView);
+	virtual bool				SetPreferencesView(BView* prefView);
 		
-	private:
-		void					_MoveToPosition();
-		BView*					fPreferencesView;
-		BButton*				fRevertButton;
-		BButton*				fDefaultButton;	
-		BGroupLayout*			fRootLayout;
+private:
+			void				_MoveToPosition();
+
+			BView*				fPreferencesView;
+			BButton*			fRevertButton;
+			BButton*			fDefaultButton;	
+			BGroupLayout*		fRootLayout;
 };
 
 
@@ -122,10 +118,12 @@ const uint32 kDefaultMsg = 'dems';
 const uint32 kRevertMsg = 'rems';
 const uint32 kConfigChangedMsg = '&cgh';
 
+
 template<typename Preferences>
 PreferencesStorage<Preferences>::PreferencesStorage(const char* file,
-														const Preferences& defaultPreferences)
-	:	fDefaultPreferences(defaultPreferences)
+	const Preferences& defaultPreferences)
+	:
+	fDefaultPreferences(defaultPreferences)
 {
 	// default center position
 	fWindowPosition.x = -1;
@@ -236,23 +234,25 @@ PreferencesStorage<Preferences>::SavePreferences()
 
 
 template<typename Preferences>
-PrefFileWatcher<Preferences>::PrefFileWatcher(PreferencesStorage<Preferences>* storage,
-												BHandler* target)
-	:	BMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE),
-		fPreferencesStorage(storage),
-		fTarget(target)
+PrefFileWatcher<Preferences>::PrefFileWatcher(
+	PreferencesStorage<Preferences>* storage, BHandler* target)
+	:
+	BMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE),
+	fPreferencesStorage(storage),
+	fTarget(target)
 {
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+
 	BEntry entry(path.Path()); 
-	entry.GetNodeRef(&fPreferencesDirectoryNode);
-	watch_node(&fPreferencesDirectoryNode, B_WATCH_DIRECTORY,
-							fTarget);
+	if (entry.GetNodeRef(&fPreferencesDirectoryNode) == B_OK)
+		watch_node(&fPreferencesDirectoryNode, B_WATCH_DIRECTORY, fTarget);
+
 	path.Append(fPreferencesStorage->PreferencesFile().String());
 	entry.SetTo(path.Path());
-	entry.GetNodeRef(&fPreferencesNode);
-	watch_node(&fPreferencesNode, B_WATCH_STAT,
-						fTarget);
+
+	if (entry.GetNodeRef(&fPreferencesNode) == B_OK)
+		watch_node(&fPreferencesNode, B_WATCH_STAT, fTarget);
 }
 
 
@@ -278,12 +278,12 @@ PrefFileWatcher<Preferences>::Filter(BMessage *msg, BHandler **target)
 			|| msg->FindInt32("opcode", &opcode) != B_OK)
 		return result;
 		
-	switch(opcode)
-	{
+	switch (opcode) {
 		case B_ENTRY_MOVED:
 			msg->FindInt64("to directory", dir);
 			if (dir != fPreferencesDirectoryNode.node)
 				break;
+			// supposed to fall through
 
 		case B_ENTRY_CREATED:
 			msg->FindString("name", &name);
@@ -305,7 +305,7 @@ PrefFileWatcher<Preferences>::Filter(BMessage *msg, BHandler **target)
 				stop_watching(fTarget);
 				// and start watching the directory again
 				watch_node(&fPreferencesDirectoryNode, B_WATCH_DIRECTORY,
-							fTarget);
+					fTarget);
 				msg->what = kUpdatedPreferences;
 			}
 			break;
@@ -325,17 +325,15 @@ PrefFileWatcher<Preferences>::Filter(BMessage *msg, BHandler **target)
 
 template<typename Preferences>
 PreferencesWindow<Preferences>::PreferencesWindow(const char* title,
-														const char* file,
-														const Preferences& defaultPreferences)
-	:	BWindow(BRect(50, 50, 400, 350), title, B_TITLED_WINDOW,
-			 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT
-			 		| B_ASYNCHRONOUS_CONTROLS),
-		PreferencesStorage<Preferences>(file, defaultPreferences),
-		fPreferencesView(NULL)
+	const char* file, const Preferences& defaultPreferences)
+	:
+	BWindow(BRect(50, 50, 400, 350), title, B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
+	PreferencesStorage<Preferences>(file, defaultPreferences),
+	fPreferencesView(NULL)
 {
 	BGroupView* buttonView = new BGroupView(B_HORIZONTAL);
-	fDefaultButton = new BButton(TR("Defaults"),
-									new BMessage(kDefaultMsg));
+	fDefaultButton = new BButton(TR("Defaults"), new BMessage(kDefaultMsg));
 
 	buttonView->AddChild(fDefaultButton);
 	buttonView->GetLayout()->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(7));
@@ -431,7 +429,7 @@ PreferencesWindow<Preferences>::_MoveToPosition()
 {
 	BPoint position = PreferencesStorage<Preferences>::WindowPosition();
 	// center window on screen if it had a bad position
-	if(position.x < 0 && position.y < 0){
+	if (position.x < 0 && position.y < 0){
 		BRect rect = BScreen().Frame();
 		BRect windowFrame = Frame();
 		position.x = (rect.Width() - windowFrame.Width()) / 2;
@@ -440,4 +438,6 @@ PreferencesWindow<Preferences>::_MoveToPosition()
 	MoveTo(position);
 }
 
-#endif
+#undef TR_CONTEXT
+
+#endif	// PREFERENCES_WINDOW_h

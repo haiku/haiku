@@ -6,6 +6,7 @@
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 
+
 #include "StatusView.h"
 
 #include <string.h>
@@ -24,12 +25,11 @@
 
 #include "CPUFrequencyView.h"
 
-#define TR_CONTEXT "Status view"
-
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 
 
+#define TR_CONTEXT "Status view"
 #define MAX_FREQ_STRING "9999MHz"
 
 // messages FrequencySwitcher
@@ -48,7 +48,8 @@ const char* kDeskbarItemName = "CPUFreqStatusView";
 
 FrequencySwitcher::FrequencySwitcher(CPUFreqDriverInterface* interface,
 		BHandler* target)
-	: BMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE),
+	:
+	BMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE),
 	fDriverInterface(interface),
 	fTarget(target),
 	fMessageRunner(NULL),
@@ -194,21 +195,21 @@ FrequencyMenu::FrequencyMenu(BMenu* menu, BHandler* target,
 	fStorage(storage),
 	fInterface(interface)
 {
-	BCatalog cat("x-vnd.Haiku-CPUFrequencyPref");
+	BCatalog catalog("x-vnd.Haiku-CPUFrequencyPref");
 	fDynamicPerformance = new BMenuItem(
-		cat.GetString("Dynamic Performance",TR_CONTEXT),
+		catalog.GetString("Dynamic Performance",TR_CONTEXT),
 		new BMessage(kMsgPolicyDynamic));
 	fHighPerformance = new BMenuItem(
-		cat.GetString("High Performance",TR_CONTEXT),
+		catalog.GetString("High Performance",TR_CONTEXT),
 		new BMessage(kMsgPolicyPerformance));
-	fLowEnergie = new BMenuItem(cat.GetString("Low Energy",TR_CONTEXT),
+	fLowEnergie = new BMenuItem(catalog.GetString("Low Energy",TR_CONTEXT),
 		new BMessage(kMsgPolicyLowEnergy));
 
 	menu->AddItem(fDynamicPerformance);
 	menu->AddItem(fHighPerformance);
 	menu->AddItem(fLowEnergie);
 
-	fCustomStateMenu = new BMenu(cat.GetString("Set State",TR_CONTEXT));
+	fCustomStateMenu = new BMenu(catalog.GetString("Set State",TR_CONTEXT));
 
 	StateList* stateList = fInterface->GetCpuFrequencyStates();
 	for (int i = 0; i < stateList->CountItems(); i++) {
@@ -345,14 +346,15 @@ FrequencyMenu::UpdateMenu()
 //	#pragma mark -
 
 
-StatusView::StatusView(BRect frame,	bool inDeskbar,
-		PreferencesStorage<freq_preferences>* storage)
-	: BView(frame, kDeskbarItemName, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+StatusView::StatusView(BRect frame,	bool inDeskbar,	
+	PreferencesStorage<freq_preferences>* storage)
+	:
+	BView(frame, kDeskbarItemName, B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_FRAME_EVENTS),
 	fInDeskbar(inDeskbar),
 	fCurrentFrequency(NULL),
 	fDragger(NULL),
-	cat("x-vnd.Haiku-CPUFrequencyPref")
+	fCatalog("x-vnd.Haiku-CPUFrequencyPref")
 {
 	if (!inDeskbar) {
 		// we were obviously added to a standard window - let's add a dragger
@@ -405,9 +407,10 @@ StatusView::~StatusView()
 void
 StatusView::_AboutRequested()
 {
-	BAlert *alert = new BAlert("about", cat.GetString("CPU Frequency\n"
-		"\twritten by Clemens Zeidler\n"
-		"\tCopyright 2009, Haiku, Inc.\n",TR_CONTEXT), cat.GetString("Ok",TR_CONTEXT));
+	BAlert *alert = new BAlert("about", fCatalog.GetString("CPU Frequency\n"
+			"\twritten by Clemens Zeidler\n"
+			"\tCopyright 2009, Haiku, Inc.\n", TR_CONTEXT),
+		fCatalog.GetString("Ok", TR_CONTEXT));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -487,14 +490,14 @@ StatusView::AttachedToWindow()
 	fPreferencesMenu->SetFont(be_plain_font);
 
 	fPreferencesMenu->AddSeparatorItem();
-	fOpenPrefItem = new BMenuItem(
-		cat.GetString("Open Speedstep Preferences" B_UTF8_ELLIPSIS, TR_CONTEXT),
+	fOpenPrefItem = new BMenuItem(fCatalog.GetString(
+			"Open Speedstep Preferences" B_UTF8_ELLIPSIS, TR_CONTEXT),
 		new BMessage(kMsgOpenSSPreferences));
 	fPreferencesMenu->AddItem(fOpenPrefItem);
 	fOpenPrefItem->SetTarget(this);
 
 	if (fInDeskbar) {
-		fQuitItem= new BMenuItem(cat.GetString("Quit", TR_CONTEXT),
+		fQuitItem= new BMenuItem(fCatalog.GetString("Quit", TR_CONTEXT),
 			new BMessage(B_QUIT_REQUESTED));
 		fPreferencesMenu->AddItem(fQuitItem);
 		fQuitItem->SetTarget(this);
