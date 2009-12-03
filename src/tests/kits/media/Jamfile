@@ -22,5 +22,6 @@ SubInclude HAIKU_TOP src tests kits media notificationtest ;
 SubInclude HAIKU_TOP src tests kits media nodetest ;
 SubInclude HAIKU_TOP src tests kits media playwav ;
 SubInclude HAIKU_TOP src tests kits media mp3_reader_test ;
+SubInclude HAIKU_TOP src tests kits media soundplayer ;
 SubInclude HAIKU_TOP src tests kits media wav_reader_test ;
 
