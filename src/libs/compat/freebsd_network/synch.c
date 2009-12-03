@@ -7,11 +7,9 @@
 #include <compat/sys/systm.h>
 #include <compat/sys/kernel.h>
 #include <compat/sys/mutex.h>
+#include <compat/sys/condvar.h>
 
 #include "condvar.h"
-
-
-static int sPauseWaitChannel;
 
 
 int
@@ -19,14 +17,16 @@ msleep(void* identifier, struct mtx* mutex, int priority,
 	const char* description, int timeout)
 {
 	int status;
+	struct cv sleep;
 
-	_cv_init(identifier, description);
-	
+	conditionPublish(&sleep, identifier, description);
+
 	mtx_unlock(mutex);
-	status = _cv_timedwait_unlocked(identifier, timeout);
+	status = conditionTimedWait(&sleep, timeout);
 	mtx_lock(mutex);
-	
-	_cv_destroy(identifier);
+
+	conditionUnpublish(&sleep);
+
 	return status;
 }
 
@@ -34,14 +34,14 @@ msleep(void* identifier, struct mtx* mutex, int priority,
 void
 wakeup(void* identifier)
 {
-	_cv_broadcast(identifier);
+	conditionNotifyAll(identifier);
 }
 
 
 int
 _pause(const char* waitMessage, int timeout)
 {
-
+	int waitChannel;
 	KASSERT(timeout != 0, ("pause: timeout required"));
-	return tsleep(&sPauseWaitChannel, 0, waitMessage, timeout);
+	return tsleep(&waitChannel, 0, waitMessage, timeout);
 }

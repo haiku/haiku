@@ -4,8 +4,6 @@
  */
 
 
-#include "condvar.h"
-
 extern "C" {
 #include <compat/sys/condvar.h>
 #include <compat/sys/kernel.h>
@@ -14,125 +12,76 @@ extern "C" {
 #include <new>
 
 #include <condition_variable.h>
-#include <util/AutoLock.h>
 
+#include "condvar.h"
 #include "device.h"
 
 
 #define ticks_to_usecs(t) (1000000*((bigtime_t)t) / hz)
 
 
-static const int kConditionVariableHashSize = 32;
-
-
-struct ConditionVariableHashDefinition {
-	typedef const void* KeyType;
-	typedef	ConditionVariable ValueType;
-
-	size_t HashKey(const void* key) const
-		{ return (size_t)key; }
-	size_t Hash(ConditionVariable* variable) const
-		{ return (size_t)variable->fObject; }
-	bool Compare(const void* key, ConditionVariable* variable) const
-		{ return key == variable->fObject; }
-	ConditionVariable*& GetLink(ConditionVariable* variable) const
-		{ return variable->fNext; }
-};
-
-typedef BOpenHashTable<ConditionVariableHashDefinition> ConditionVariableHash;
-static ConditionVariableHash sConditionVariableHash;
-static spinlock sConditionVariablesLock;
-
-extern "C" {
-
 status_t
 init_condition_variables()
 {
-	return sConditionVariableHash.Init(kConditionVariableHashSize);
+	return B_OK;
 }
 
 
 void
 uninit_condition_variables() {}
 
-} /* extern "C" */
-
 
 void
-_cv_init(const void* object, const char* description)
+conditionPublish(struct cv* variable, const void* waitChannel, 
+	const char* description)
 {
-	ConditionVariable* conditionVariable 
-		= new(std::nothrow) ConditionVariable();
-	if (conditionVariable == NULL)
-		panic("No memory left.");
-
-	InterruptsSpinLocker _(sConditionVariablesLock);
-	conditionVariable->Publish(object, description);
-	sConditionVariableHash.Insert(conditionVariable);
+	variable->waitChannel = waitChannel;
+	variable->description = description;
+	variable->condition = new(std::nothrow) ConditionVariable();
+	variable->condition->Publish(waitChannel, description);
 }
 
 
 void
-_cv_destroy(const void* object)
+conditionUnpublish(const struct cv* variable)
 {
-	InterruptsSpinLocker hashLocker(sConditionVariablesLock);
-	ConditionVariable* conditionVariable 
-		= sConditionVariableHash.Lookup(object);
-	hashLocker.Unlock();
-	if (conditionVariable == NULL)
-		return;
-
-	conditionVariable->Unpublish();
-	sConditionVariableHash.RemoveUnchecked(conditionVariable);
-	delete conditionVariable;
-}
-
-
-void
-_cv_wait_unlocked(const void* object)
-{
-	ConditionVariableEntry conditionVariableEntry;
-
-	conditionVariableEntry.Wait(object);
+	variable->condition->Unpublish();
+	delete variable->condition;
 }
 
 
 int
-_cv_timedwait_unlocked(const void* object, int timeout)
+conditionTimedWait(const struct cv* variable, const int timeout)
 {
-	ConditionVariableEntry conditionVariableEntry;
-	
-	status_t status = conditionVariableEntry.Wait(object, B_RELATIVE_TIMEOUT,
-		ticks_to_usecs(timeout));
+	ConditionVariableEntry variableEntry;
 
-	if (status == B_OK)
-		return ENOERR;
-	else
-		return EWOULDBLOCK;
+	status_t status = variableEntry.Wait(variable->waitChannel,
+		B_RELATIVE_TIMEOUT, ticks_to_usecs(timeout));
+
+	if (status != B_OK)
+		status = EWOULDBLOCK;
+	return status;
 }
 
 
 void
-_cv_signal(const void* object)
+conditionWait(const struct cv* variable)
 {
-	InterruptsSpinLocker _(sConditionVariablesLock);
-	ConditionVariable* conditionVariable
-		= sConditionVariableHash.Lookup(object);
-	if (conditionVariable == NULL)
-		return;
+	ConditionVariableEntry variableEntry;
 
-	conditionVariable->NotifyOne();
+	variableEntry.Wait(variable->waitChannel);
 }
 
 
 void
-_cv_broadcast(const void* object)
+conditionNotifyOne(const void* waitChannel)
 {
-	InterruptsSpinLocker _(sConditionVariablesLock);
-	ConditionVariable* conditionVariable
-		= sConditionVariableHash.Lookup(object);
-	if (conditionVariable == NULL)
-		return;
+	ConditionVariable::NotifyOne(waitChannel);
+}
 
-	conditionVariable->NotifyAll();
+
+void
+conditionNotifyAll(const void* waitChannel)
+{
+	ConditionVariable::NotifyAll(waitChannel);
 }

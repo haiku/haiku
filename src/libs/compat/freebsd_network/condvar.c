@@ -10,41 +10,39 @@
 #include "condvar.h"
 
 
-void cv_init(struct cv* conditionVariable, const char* description)
+void cv_init(struct cv* variable, const char* description)
 {
-	conditionVariable->description = description;
+	conditionPublish(variable, variable, description);
 }
 
 
-void cv_signal(struct cv* conditionVariable)
+void cv_destroy(struct cv* variable)
 {
-	_cv_signal(conditionVariable);
+	conditionUnpublish(variable);
 }
 
 
-int cv_timedwait(struct cv* conditionVariable, struct mtx* mutex, int timeout)
+void cv_signal(struct cv* variable)
+{
+	conditionNotifyOne(variable);
+}
+
+
+int cv_timedwait(struct cv* variable, struct mtx* mutex, int timeout)
 {
 	int status;
 
-	_cv_init(conditionVariable, conditionVariable->description);
-
 	mtx_unlock(mutex);
-	status = _cv_timedwait_unlocked(conditionVariable, timeout);
+	status = conditionTimedWait(variable, timeout);
 	mtx_lock(mutex);
-
-	_cv_destroy(conditionVariable);
 
 	return status;
 }
 
 
-void cv_wait(struct cv* conditionVariable, struct mtx* mutex)
+void cv_wait(struct cv* variable, struct mtx* mutex)
 {
-	_cv_init(conditionVariable, conditionVariable->description);
-
 	mtx_unlock(mutex);
-	_cv_wait_unlocked(conditionVariable);
+	conditionWait(variable);
 	mtx_lock(mutex);
-
-	_cv_destroy(conditionVariable);
 }

@@ -10,12 +10,12 @@
 extern "C" {
 #endif
 
-void _cv_init(const void*, const char*);
-void _cv_destroy(const void*);
-void _cv_wait_unlocked(const void*);
-int _cv_timedwait_unlocked(const void*, int);
-void _cv_signal(const void*);
-void _cv_broadcast(const void*);
+void conditionPublish(struct cv*, const void*, const char*);
+void conditionUnpublish(const struct cv*);
+void conditionNotifyOne(const void*);
+void conditionNotifyAll(const void*);
+int conditionTimedWait(const struct cv*, const int);
+void conditionWait(const struct cv*);
 
 #ifdef __cplusplus
 }
