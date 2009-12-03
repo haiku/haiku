@@ -13,7 +13,7 @@ extern "C" {
 
 #include <condition_variable.h>
 
-#include "condvar.h"
+#include "Condvar.h"
 #include "device.h"
 
 
@@ -21,11 +21,17 @@ extern "C" {
 
 
 void
+conditionInit(struct cv* variable, const char* description)
+{
+	variable->condition = new(std::nothrow) ConditionVariable();
+	variable->condition->Init(variable, description);
+}
+
+
+void
 conditionPublish(struct cv* variable, const void* waitChannel, 
 	const char* description)
 {
-	variable->waitChannel = waitChannel;
-	variable->description = description;
 	variable->condition = new(std::nothrow) ConditionVariable();
 	variable->condition->Publish(waitChannel, description);
 }
@@ -42,10 +48,8 @@ conditionUnpublish(const struct cv* variable)
 int
 conditionTimedWait(const struct cv* variable, const int timeout)
 {
-	ConditionVariableEntry variableEntry;
-
-	status_t status = variableEntry.Wait(variable->waitChannel,
-		B_RELATIVE_TIMEOUT, ticks_to_usecs(timeout));
+	status_t status = variable->condition->Wait(B_RELATIVE_TIMEOUT,
+		ticks_to_usecs(timeout));
 
 	if (status != B_OK)
 		status = EWOULDBLOCK;
@@ -56,21 +60,33 @@ conditionTimedWait(const struct cv* variable, const int timeout)
 void
 conditionWait(const struct cv* variable)
 {
+	variable->condition->Wait();
+}
+
+
+void
+conditionNotifyOne(const struct cv* variable)
+{
+	variable->condition->NotifyOne();
+}
+
+
+int
+publishedConditionTimedWait(const void* waitChannel, const int timeout)
+{
 	ConditionVariableEntry variableEntry;
 
-	variableEntry.Wait(variable->waitChannel);
+	status_t status = variableEntry.Wait(waitChannel, B_RELATIVE_TIMEOUT,
+		ticks_to_usecs(timeout));
+
+	if (status != B_OK)
+		status = EWOULDBLOCK;
+	return status;
 }
 
 
 void
-conditionNotifyOne(const void* waitChannel)
-{
-	ConditionVariable::NotifyOne(waitChannel);
-}
-
-
-void
-conditionNotifyAll(const void* waitChannel)
+publishedConditionNotifyAll(const void* waitChannel)
 {
 	ConditionVariable::NotifyAll(waitChannel);
 }

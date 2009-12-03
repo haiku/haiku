@@ -9,7 +9,7 @@
 #include <compat/sys/mutex.h>
 #include <compat/sys/condvar.h>
 
-#include "condvar.h"
+#include "Condvar.h"
 
 
 int
@@ -22,7 +22,7 @@ msleep(void* identifier, struct mtx* mutex, int priority,
 	conditionPublish(&sleep, identifier, description);
 
 	mtx_unlock(mutex);
-	status = conditionTimedWait(&sleep, timeout);
+	status = publishedConditionTimedWait(identifier, timeout);
 	mtx_lock(mutex);
 
 	conditionUnpublish(&sleep);
@@ -34,7 +34,7 @@ msleep(void* identifier, struct mtx* mutex, int priority,
 void
 wakeup(void* identifier)
 {
-	conditionNotifyAll(identifier);
+	publishedConditionNotifyAll(identifier);
 }
 
 

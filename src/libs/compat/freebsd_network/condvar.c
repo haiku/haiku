@@ -7,18 +7,12 @@
 #include <compat/sys/mutex.h>
 #include <compat/sys/condvar.h>
 
-#include "condvar.h"
+#include "Condvar.h"
 
 
 void cv_init(struct cv* variable, const char* description)
 {
-	conditionPublish(variable, variable, description);
-}
-
-
-void cv_destroy(struct cv* variable)
-{
-	conditionUnpublish(variable);
+	conditionInit(variable, description);
 }
 
 

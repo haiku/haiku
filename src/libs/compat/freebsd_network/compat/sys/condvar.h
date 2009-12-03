@@ -11,8 +11,6 @@
 
 struct cv {
 	struct ConditionVariable* condition;
-	const char* description;
-	const void* waitChannel;
 };
 
 

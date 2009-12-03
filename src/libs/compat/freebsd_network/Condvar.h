@@ -10,12 +10,14 @@
 extern "C" {
 #endif
 
+void conditionInit(struct cv*, const char*);
 void conditionPublish(struct cv*, const void*, const char*);
 void conditionUnpublish(const struct cv*);
-void conditionNotifyOne(const void*);
-void conditionNotifyAll(const void*);
 int conditionTimedWait(const struct cv*, const int);
 void conditionWait(const struct cv*);
+void conditionNotifyOne(const struct cv*);
+int publishedConditionTimedWait(const void*, const int);
+void publishedConditionNotifyAll(const void*);
 
 #ifdef __cplusplus
 }
