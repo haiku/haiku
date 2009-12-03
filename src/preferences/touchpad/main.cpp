@@ -14,6 +14,7 @@
 #include <GroupLayoutBuilder.h>
 #include <Locale.h>
 
+
 #include "TouchpadPrefView.h"
 
 
@@ -21,7 +22,8 @@ class TouchpadPrefWindow : public BWindow {
 public:
 	TouchpadPrefWindow(BRect frame, const char* title, window_type type,
 			uint32 flags)
-		: BWindow(frame, title, type, flags)
+		:
+		BWindow(frame, title, type, flags)
 	{
 	}
 
@@ -32,16 +34,19 @@ public:
 	}
 };
 
+
 #undef TR_CONTEXT
 #define TR_CONTEXT "TouchpadMain"
+
 
 int
 main(int argc, char* argv[])
 {
 	BApplication* app = new BApplication("application/x-vnd.Haiku-Touchpad");
-	BCatalog fCatalog;
 
-	be_locale->GetAppCatalog(&fCatalog);
+	BCatalog catalog;
+	be_locale->GetAppCatalog(&catalog);
+
 	TouchpadPrefWindow* window = new TouchpadPrefWindow(BRect(50, 50, 450, 350),
 		TR("Touchpad"), B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS);
@@ -52,8 +57,9 @@ main(int argc, char* argv[])
 		.SetInsets(5, 5, 5, 5)
 	);
 	window->Show();
-	app->Run();
 
+	app->Run();
 	delete app;
+
 	return 0;
 }
