@@ -15,6 +15,7 @@
 #include <hmulti_audio.h>
 #include <string.h>
 
+#include "ac97.h"
 #include "queue.h"
 #include "driver.h"
 #include "util.h"

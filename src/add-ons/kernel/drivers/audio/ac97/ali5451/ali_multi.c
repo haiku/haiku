@@ -12,6 +12,7 @@
 #include <hmulti_audio.h>
 #include <string.h>
 
+#include "ac97.h"
 #include "queue.h"
 #include "driver.h"
 #include "util.h"
@@ -63,14 +64,14 @@ typedef struct {
 #define ALI_ALL_MIXERS (ALI_OUTPUT_MIXERS + ALI_INPUT_MIXERS)
 
 static const ali_ac97_mixer_info ali_ac97_mixers[ALI_ALL_MIXERS] = {
-	{S_MASTER, NULL, AC97_MIX_MASTER, -46.5f, 0.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
-	{S_WAVE, NULL, AC97_MIX_PCM, -34.5f, 12.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
-	{S_HEADPHONE, NULL, AC97_MIX_HEADPHONE, -34.5f, 12.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
-	{S_CD, NULL, AC97_MIX_CD, -34.5f, 12.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
-	{S_LINE, NULL, AC97_MIX_LINEIN, -34.5f, 12.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
-	{S_MIC, NULL, AC97_MIX_MIC, -34.5f, 12.0f, ALI_MIX_FT_MUTE | ALI_MIX_FT_MICBST},
-	{S_AUX, NULL, AC97_MIX_AUX, -34.5f, 12.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
-	{S_null, "Record", AC97_MIX_RECORDGAIN, 0.0f, 22.5f,
+	{S_MASTER, NULL, AC97_MASTER_VOLUME, -46.5f, 0.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
+	{S_WAVE, NULL, AC97_PCM_OUT_VOLUME, -34.5f, 12.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
+	{S_HEADPHONE, NULL, AC97_AUX_OUT_VOLUME, -34.5f, 12.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
+	{S_CD, NULL, AC97_CD_VOLUME, -34.5f, 12.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
+	{S_LINE, NULL, AC97_LINE_IN_VOLUME, -34.5f, 12.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
+	{S_MIC, NULL, AC97_MIC_VOLUME, -34.5f, 12.0f, ALI_MIX_FT_MUTE | ALI_MIX_FT_MICBST},
+	{S_AUX, NULL, AC97_AUX_IN_VOLUME, -34.5f, 12.0f, ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE},
+	{S_null, "Record", AC97_RECORD_GAIN, 0.0f, 22.5f,
 		ALI_MIX_FT_STEREO | ALI_MIX_FT_MUTE | ALI_MIX_FT_GAIN | ALI_MIX_FT_INSEL},
 };
 
@@ -210,30 +211,32 @@ get_mix_mixer(ali_dev *card, multi_mix_value *mmv, int32 id)
 
 	switch (gadget_id) {
 		case ALI_MIX_MUTE_ID:
-			mmv->u.enable = ((ac97_read(card, mixer_info->reg) & 0x8000)
-					== 0x8000);
+			mmv->u.enable = ((ac97_reg_cached_read(card->codec, mixer_info->reg)
+					& 0x8000) == 0x8000);
 			break;
 
 		case ALI_MIX_LEFT_ID:
 		case ALI_MIX_RIGHT_ID:
 			{
 				float val = (ALI_MIXER_GRANULARITY
-						* ((ac97_read(card, mixer_info->reg) >>
-							((gadget_id==ALI_MIX_LEFT_ID)?8:0)) & 0x1f));
+						* ((ac97_reg_cached_read(card->codec, mixer_info->reg)
+							>> ((gadget_id==ALI_MIX_LEFT_ID)?8:0)) & 0x1f));
 				mmv->u.gain = ((mixer_info->features&ALI_MIX_FT_GAIN)
 					? mixer_info->min_gain+val:mixer_info->max_gain-val);
 			}
 			break;
 
 		case ALI_MIX_MIC_BOOST_ID:
-			mmv->u.enable = ((ac97_read(card, mixer_info->reg) & 0x40) == 0x40);
+			mmv->u.enable = ((ac97_reg_cached_read(card->codec, mixer_info->reg)
+					& 0x40) == 0x40);
 			break;
 
 		case ALI_MIX_INPUT_SELECTOR_ID:
-			mmv->u.mux = (ac97_read(card, AC97_MIX_RECORDSELECT) & 0x7);
+			mmv->u.mux = (ac97_reg_cached_read(card->codec,
+					AC97_RECORD_SELECT) & 0x7);
 			if (ALI_MUX_INPUTS <= mmv->u.mux) {
 				mmv->u.mux = 0x2;
-				ac97_write(card, AC97_MIX_RECORDSELECT, 0x202);
+				ac97_reg_cached_write(card->codec, AC97_RECORD_SELECT, 0x202);
 			}
 			break;
 	}
@@ -266,32 +269,32 @@ set_mix_mixer(ali_dev *card, multi_mix_value *mmv, int32 id)
 
 	switch (gadget_id) {
 		case ALI_MIX_MUTE_ID:
-			val = ac97_read(card, mixer_info->reg);
+			val = ac97_reg_cached_read(card->codec, mixer_info->reg);
 			val = mmv->u.enable ? val | 0x8000 : val & 0x7fff;
-			ac97_write(card, mixer_info->reg, val);
+			ac97_reg_cached_write(card->codec, mixer_info->reg, val);
 			break;
 
 		case ALI_MIX_LEFT_ID:
 		case ALI_MIX_RIGHT_ID:
-			val = ac97_read(card, mixer_info->reg);
+			val = ac97_reg_cached_read(card->codec, mixer_info->reg);
 			val &= (gadget_id == ALI_MIX_LEFT_ID) ? 0x805f : 0x9f00;
 			val |= (uint16) (((mixer_info->features&ALI_MIX_FT_GAIN)
 					? mixer_info->min_gain+mmv->u.gain
 					: mixer_info->max_gain-mmv->u.gain)
 						/ ALI_MIXER_GRANULARITY) << 
 							((gadget_id == ALI_MIX_LEFT_ID) ? 8 : 0);
-			ac97_write(card, mixer_info->reg, val);
+			ac97_reg_cached_write(card->codec, mixer_info->reg, val);
 			break;
 
 		case ALI_MIX_MIC_BOOST_ID:
-			val = ac97_read(card, mixer_info->reg);
+			val = ac97_reg_cached_read(card->codec, mixer_info->reg);
 			val = mmv->u.enable ? val | 0x40 : val & 0xffbf;
-			ac97_write(card, mixer_info->reg, val);
+			ac97_reg_cached_write(card->codec, mixer_info->reg, val);
 			break;
 
 		case ALI_MIX_INPUT_SELECTOR_ID:
 			val = (mmv->u.mux << 8) | mmv->u.mux;
-			ac97_write(card, AC97_MIX_RECORDSELECT, val);
+			ac97_reg_cached_write(card->codec, AC97_RECORD_SELECT, val);
 			break;
 	}
 }

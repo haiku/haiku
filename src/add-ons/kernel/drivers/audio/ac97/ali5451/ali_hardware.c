@@ -11,6 +11,7 @@
 #include <drivers/PCI.h>
 #include <hmulti_audio.h>
 
+#include "ac97.h"
 #include "queue.h"
 #include "driver.h"
 #include "util.h"
@@ -19,8 +20,6 @@
 
 
 #define ALI_5451_V02 0x02
-#define ALI_AC97_CODEC_ID 0x41445374
-#define ALI_AC97_CAPS_HEAD 0x10
 
 // ALI registers
 
@@ -137,9 +136,10 @@ ac97_is_stimer_ready(ali_dev *card)
 }
 
 
-uint16
-ac97_read(ali_dev *card, uint8 reg)
+static uint16
+ac97_read(void *cookie, uint8 reg)
 {
+	ali_dev *card = (ali_dev *) cookie;
 	uint32 ac_reg;
 
 	ac_reg = (card->info.revision == ALI_5451_V02)?ALI_ACR0:ALI_ACR1;
@@ -156,9 +156,10 @@ ac97_read(ali_dev *card, uint8 reg)
 }
 
 
-void
-ac97_write(ali_dev *card, uint8 reg, uint16 val)
+static void
+ac97_write(void *cookie, uint8 reg, uint16 val)
 {
+	ali_dev *card = (ali_dev *) cookie;
 	uint32 dw_val;
 
 	if (!ac97_is_ready(card, ALI_ACR0) || !ac97_is_stimer_ready(card))
@@ -173,45 +174,9 @@ ac97_write(ali_dev *card, uint8 reg, uint16 val)
 
 
 static bool
-ac97_init(ali_dev *card)
-{
-	uint16 capabilities;
-	uint32 id;
-
-	// ac97 reset
-	ac97_write(card, AC97_REG_POWER, 0);
-	ac97_write(card, AC97_REG_RESET, 0);
-	snooze(100000);
-	ac97_write(card, AC97_REG_POWER, 0);
-	ac97_write(card, AC97_REG_GEN, 0);
-
-	capabilities = ac97_read(card, AC97_REG_RESET);
-	TRACE("ac97 capabilities: %04x\n", capabilities & 0x3ff);
-
-	id = (uint32) ac97_read(card, AC97_REG_ID1) << 16
-		| ac97_read(card, AC97_REG_ID2);
-	TRACE("ac97 id: %08x\n", (uint) id);
-	if (id != ALI_AC97_CODEC_ID)
-		return false;
-
-	if ((capabilities & ALI_AC97_CAPS_HEAD) != 0)
-		ac97_write(card, AC97_JACK_SENSE, (uint16) 1 << 10);
-			// enable headphone jack sense
-
-	// some sane default values
-	ac97_write(card, AC97_MIX_MASTER, 0x707);
-	ac97_write(card, AC97_MIX_PCM, 0x707);
-	ac97_write(card, AC97_MIX_HEADPHONE, 0x707);
-
-	return true;
-}
-
-
-static bool
 hardware_reset(ali_dev *card)
 {
 	uint32 cmd_reg;
-	uint16 val;
 	uint8 bval;
 
 	// pci reset
@@ -234,18 +199,6 @@ hardware_reset(ali_dev *card)
 	bval &= 0xfd;
 	io_write8(card, ALI_ACR2, bval);
 	snooze(15000);
-
-	cmd_reg = 200;
-	while (cmd_reg--) {
-		val = ac97_read(card, AC97_REG_POWER);
-		if ((val & 0xf) == 0xf)
-			break;
-		snooze(5000);
-	}
-	if (cmd_reg == 0xffffffff) {
-		TRACE("hardware reset: not ready\n");
-		return false;
-	}
 
 	return true;
 }
@@ -271,8 +224,8 @@ hardware_init(ali_dev *card)
 
 	UNLOCK(card->lock_hw);
 
-	if (!ac97_init(card))
-		return B_ERROR;
+	ac97_attach(&card->codec, ac97_read, ac97_write, card,
+		card->info.u.h0.subsystem_vendor_id, card->info.u.h0.subsystem_id);
 
 	TRACE("hardware init ok\n");
 	return B_OK;
@@ -290,6 +243,8 @@ hardware_terminate(ali_dev *card)
 		// clr voice interrupt flags
 
 	UNLOCK(card->lock_hw);
+
+	ac97_detach(card->codec);
 }
 
 

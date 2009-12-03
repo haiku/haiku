@@ -73,6 +73,8 @@ typedef struct _ali_dev
 	ulong io_base;
 	uint8 irq;
 
+	ac97_dev *codec;
+
 	spinlock lock_hw;
 	spinlock lock_sts;
 	spinlock lock_voices;

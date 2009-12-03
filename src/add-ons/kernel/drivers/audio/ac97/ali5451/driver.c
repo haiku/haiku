@@ -13,6 +13,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "ac97.h"
 #include "queue.h"
 #include "ali_multi.h"
 #include "driver.h"
@@ -293,6 +294,7 @@ ali_setup(ali_dev *card)
 	card->irq = card->info.u.h0.interrupt_line;
 	TRACE("setup: irq is: %02x\n", card->irq);
 
+	card->codec = NULL;
 	card->lock_hw = 0;
 	card->lock_sts = 0;
 	card->lock_voices = 0;
