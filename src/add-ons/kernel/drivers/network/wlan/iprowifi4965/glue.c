@@ -3,6 +3,7 @@
  * All Rights Reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <sys/bus.h>
 #include <sys/kernel.h>
 
@@ -30,27 +31,27 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	struct iwn_softc* sc = (struct iwn_softc*)device_get_softc(dev);
 	uint32 r1, r2;
 	HAIKU_INTR_REGISTER_STATE;
-	
+
 	HAIKU_INTR_REGISTER_ENTER();
 	r1 = IWN_READ(sc, IWN_INTR);
 	r2 = IWN_READ(sc, IWN_INTR_STATUS);
 
 	if (r1 == 0 && r2 == 0) {
-                /* not for us */
+		/* not for us */
 		IWN_WRITE(sc, IWN_MASK, IWN_INTR_MASK);
 		HAIKU_INTR_REGISTER_LEAVE();
 		return 0;
 	}
 
 	if (r1 == 0xffffffff) {
-	        /* hardware gone */
+		/* hardware gone */
 		HAIKU_INTR_REGISTER_LEAVE();
 		return 0;
 	}
 
 	/* disable interrupts */
 	IWN_WRITE(sc, IWN_MASK, 0);
-	
+
 	HAIKU_INTR_REGISTER_LEAVE();
 
 	return 1;

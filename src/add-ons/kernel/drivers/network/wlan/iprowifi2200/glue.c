@@ -3,6 +3,7 @@
  * All Rights Reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <sys/bus.h>
 #include <sys/kernel.h>
 
@@ -29,7 +30,7 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	struct iwi_softc* sc = (struct iwi_softc*)device_get_softc(dev);
 	uint32 r;
 	HAIKU_INTR_REGISTER_STATE;
-	
+
 	HAIKU_INTR_REGISTER_ENTER();
 	if ((r = CSR_READ_4(sc, IWI_CSR_INTR)) == 0 || r == 0xffffffff) {
 		HAIKU_INTR_REGISTER_LEAVE();
