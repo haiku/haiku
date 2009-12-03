@@ -23,9 +23,9 @@ int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
 	struct ath_softc* ath = (struct ath_softc*)device_get_softc(dev);
-	struct ath_hal* ah = ath->sc_ah;	
+	struct ath_hal* ah = ath->sc_ah;
 	HAIKU_INTR_REGISTER_STATE;
-	
+
 	if (ath->sc_invalid) {
 		/*
 		 * The hardware is not ready/present, don't touch anything.
@@ -39,7 +39,7 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 		HAIKU_INTR_REGISTER_LEAVE();
 		return 0;
 	}
-		
+
 	/*
 	 * We have to save the isr status right now.
 	 * Some devices don't like having the interrupt disabled
@@ -53,7 +53,7 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	 */
 	ath_hal_getisr(ah, &ath->sc_lastisr);
 	ath_hal_intrset(ah, 0); // disable further intr's
-	
+
 	HAIKU_INTR_REGISTER_LEAVE();
 	return 1;
 }
@@ -63,7 +63,7 @@ void
 HAIKU_REENABLE_INTERRUPTS(device_t dev)
 {
 	struct ath_softc* ath = (struct ath_softc*)device_get_softc(dev);
-	struct ath_hal* ah = ath->sc_ah;	
+	struct ath_hal* ah = ath->sc_ah;
 
 	ath_hal_intrset(ah, ath->sc_imask);
 }
