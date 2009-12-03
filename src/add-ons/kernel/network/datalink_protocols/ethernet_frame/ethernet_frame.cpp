@@ -49,7 +49,7 @@ ethernet_deframe(net_device *device, net_buffer *buffer)
 	struct sockaddr_dl &destination = *(struct sockaddr_dl *)buffer->destination;
 
 	source.sdl_len = sizeof(sockaddr_dl);
-	source.sdl_family = AF_DLI;
+	source.sdl_family = AF_LINK;
 	source.sdl_index = device->index;
 	source.sdl_type = IFT_ETHER;
 	source.sdl_e_type = type;
@@ -58,7 +58,7 @@ ethernet_deframe(net_device *device, net_buffer *buffer)
 	memcpy(source.sdl_data, header.source, ETHER_ADDRESS_LENGTH);
 
 	destination.sdl_len = sizeof(sockaddr_dl);
-	destination.sdl_family = AF_DLI;
+	destination.sdl_family = AF_LINK;
 	destination.sdl_index = device->index;
 	destination.sdl_type = IFT_ETHER;
 	destination.sdl_nlen = destination.sdl_slen = 0;
