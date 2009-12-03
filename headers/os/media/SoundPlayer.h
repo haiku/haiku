@@ -28,47 +28,40 @@ public:
 
 
 class BSoundPlayer {
-	friend class _SoundPlayNode;
 public:
-			enum sound_player_notification {
-				B_STARTED = 1,
-				B_STOPPED,
-				B_SOUND_DONE
-			};
+	enum sound_player_notification {
+		B_STARTED = 1,
+		B_STOPPED,
+		B_SOUND_DONE
+	};
 
+	typedef void (*BufferPlayerFunc)(void*, void* buffer, size_t size,
+		const media_raw_audio_format& format);
+	typedef void (*EventNotifierFunc)(void*, sound_player_notification what,
+		...);
+
+public:
 								BSoundPlayer(const char* name = NULL,
-									void (*PlayBuffer)(void*, void* buffer,
-										size_t size,
-										const media_raw_audio_format& format)
-										= NULL,
-									void (*Notifier)(void*,
-										sound_player_notification what, ...)
-										= NULL,
+									BufferPlayerFunc playerFunction = NULL,
+									EventNotifierFunc
+										eventNotifierFunction = NULL,
 									void* cookie = NULL);
 								BSoundPlayer(
 									const media_raw_audio_format* format,
 									const char* name = NULL,
-									void (*PlayBuffer)(void*, void* buffer,
-										size_t size,
-										const media_raw_audio_format& format)
-										= NULL,
-									void (*Notifier)(void*,
-										sound_player_notification what, ...)
-										= NULL,
+									BufferPlayerFunc playerFunction = NULL,
+									EventNotifierFunc
+										eventNotifierFunction = NULL,
 									void* cookie = NULL);
 								BSoundPlayer(
 									const media_node& toNode,
-									const media_multi_audio_format* format
-										= NULL,
+									const media_multi_audio_format*
+										format = NULL,
 									const char* name = NULL,
 									const media_input* input = NULL,
-									void (*PlayBuffer)(void*, void* buffer,
-										size_t size,
-										const media_raw_audio_format& format)
-										= NULL,
-									void (*Notifier)(void*,
-										sound_player_notification what, ...)
-										= NULL,
+									BufferPlayerFunc playerFunction = NULL,
+									EventNotifierFunc
+										eventNotifierFunction = NULL,
 									void* cookie = NULL);
 	virtual						~BSoundPlayer();
 
@@ -78,27 +71,20 @@ public:
 			status_t			Start();
 			void				Stop(bool block = true, bool flush = true);
 
-	typedef void (*BufferPlayerFunc)(void*, void*, size_t,
-		const media_raw_audio_format&);
-
 			BufferPlayerFunc	BufferPlayer() const;
 			void				SetBufferPlayer(void (*PlayBuffer)(void*,
 									void* buffer, size_t size,
 									const media_raw_audio_format& format));
-	typedef void (*EventNotifierFunc)(void*, sound_player_notification what,
-		...);
+
 			EventNotifierFunc	EventNotifier() const;
-			void				SetNotifier(void (*Notifier)(void*,
-									sound_player_notification what, ...));
+			void				SetNotifier(
+									EventNotifierFunc eventNotifierFunction);
 			void*				Cookie() const;
 			void				SetCookie(void* cookie);
-			void				SetCallbacks(void (*PlayBuffer)(void*,
-									void* buffer, size_t size,
-									const media_raw_audio_format& format)
-										= NULL,
-									void (*Notifier)(void*,
-										sound_player_notification what, ...)
-										= NULL,
+			void				SetCallbacks(
+									BufferPlayerFunc playerFunction = NULL,
+									EventNotifierFunc
+										eventNotifierFunction = NULL,
 									void* cookie = NULL);
 
 	typedef int32 play_id;
@@ -137,7 +123,7 @@ public:
 
 protected:
 
-			void				SetInitError(status_t inError);
+			void				SetInitError(status_t error);
 
 private:
 	static	void				_SoundPlayBufferFunc(void* cookie,
@@ -154,37 +140,50 @@ private:
 	virtual	status_t			_Reserved_SoundPlayer_6(void*, ...);
 	virtual	status_t			_Reserved_SoundPlayer_7(void*, ...);
 
+			void				_Init(const media_node* node,
+									const media_multi_audio_format* format,
+									const char* name, const media_input* input,
+									BufferPlayerFunc playerFunction,
+									EventNotifierFunc eventNotifierFunction,
+									void* cookie);
+			void				_GetVolumeSlider();
+
+			void				_NotifySoundDone(play_id sound, bool gotToPlay);
+
+	virtual	void				_Notify(sound_player_notification what, ...);
+	virtual	void				_PlayBuffer(void* buffer, size_t size,
+									const media_raw_audio_format& format);
+
 private:
+	friend class _SoundPlayNode;
+
+	struct _playing_sound {
+		_playing_sound*	next;
+		off_t			current_offset;
+		BSound*			sound;
+		play_id			id;
+		int32			delta;
+		int32			rate;
+		sem_id			wait_sem;
+		float			volume;
+	};
+
+	struct _waiting_sound {
+		_waiting_sound*	next;
+		bigtime_t		start_time;
+		BSound*			sound;
+		play_id			id;
+		int32			rate;
+		float			volume;
+	};
+
 			_SoundPlayNode*		fPlayerNode;
 
-			struct _playing_sound {
-				_playing_sound*	next;
-				off_t			current_offset;
-				BSound*			sound;
-				play_id			id;
-				int32			delta;
-				int32			rate;
-				sem_id			wait_sem;
-				float			volume;
-			};
-
 			_playing_sound*		fPlayingSounds;
-
-			struct _waiting_sound {
-				_waiting_sound*	next;
-				bigtime_t		start_time;
-				BSound*			sound;
-				play_id			id;
-				int32			rate;
-				float			volume;
-			};
-
 			_waiting_sound*		fWaitingSounds;
 
-			void (*fPlayBufferFunc)(void* cookie, void* buffer,
-				size_t size, const media_raw_audio_format& format);
-			void (*fNotifierFunc)(void* cookie, sound_player_notification what,
-				...);
+			BufferPlayerFunc	fPlayBufferFunc;
+			EventNotifierFunc	fNotifierFunc;
 
 			BLocker				fLocker;
 			float				fVolumeDB;
@@ -201,31 +200,7 @@ private:
 			bigtime_t			fLastVolumeUpdate;
 			BParameterWeb*		fParameterWeb;
 
-			uint32				_m_reserved[15];
-
-private:
-			void				NotifySoundDone(play_id sound, bool gotToPlay);
-
-			void				get_volume_slider();
-			void				Init(const media_node* node,
-									const media_multi_audio_format* format,
-									const char* name,
-									const media_input* input,
-									void (*PlayBuffer)(void*, void* buffer,
-										size_t size,
-										const media_raw_audio_format& format),
-									void (*Notifier)(void*,
-										sound_player_notification what, ...),
-									void* cookie);
-	// For B_STARTED and B_STOPPED, the argument is BSoundPlayer* (this).
-	// For B_SOUND_DONE, the arguments are play_id and true/false for
-	// whether it got to play data at all.
-	virtual	void				Notify(sound_player_notification what,
-									...);
-	// Get data into the buffer to play -- this version will use the
-	// queued BSound system.
-	virtual	void				PlayBuffer(void* buffer, size_t size,
-									const media_raw_audio_format& format);
+			uint32				_reserved[15];
 };
 
 #endif // _SOUND_PLAYER_H

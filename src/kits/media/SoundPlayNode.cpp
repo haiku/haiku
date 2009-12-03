@@ -1,29 +1,42 @@
-/***********************************************************************
- * AUTHOR: Marcus Overhagen, Jérôme Duval
- *   FILE: SoundPlayNode.cpp
- *  DESCR: This is the BBufferProducer, used internally by BSoundPlayer
- *         This belongs into a private namespace, but isn't for 
- *         compatibility reasons.
- ***********************************************************************/
+/*
+ * Copyright 2002-2009, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marcus Overhagen
+ *		Jérôme Duval
+ */
 
-#include <TimeSource.h>
-#include <MediaRoster.h>
+
+/*!	This is the BBufferProducer, used internally by BSoundPlayer
+	This belongs into a private namespace, but isn't for
+	compatibility reasons.
+*/
+
+
+#include "SoundPlayNode.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "SoundPlayNode.h"
+
+#include <TimeSource.h>
+#include <MediaRoster.h>
 #include "debug.h"
+
 
 #define SEND_NEW_BUFFER_EVENT (BTimedEventQueue::B_USER_EVENT + 1)
 
-_SoundPlayNode::_SoundPlayNode(const char *name, BSoundPlayer *player) : 
+
+_SoundPlayNode::_SoundPlayNode(const char* name, BSoundPlayer* player)
+	:
 	BMediaNode(name),
 	BBufferProducer(B_MEDIA_RAW_AUDIO),
 	BMediaEventLooper(),
 	mPlayer(player),
 	mInitCheckStatus(B_OK),
 	mOutputEnabled(true),
-	mBufferGroup(NULL),	
+	mBufferGroup(NULL),
 	mFramesSent(0),
 	mTooEarlyCount(0)
 {
@@ -39,60 +52,71 @@ _SoundPlayNode::~_SoundPlayNode()
 	Quit();
 }
 
+
 bool
 _SoundPlayNode::IsPlaying()
 {
 	return RunState() == B_STARTED;
 }
 
+
 bigtime_t
 _SoundPlayNode::CurrentTime()
 {
-	int frame_rate = (int)mOutput.format.u.raw_audio.frame_rate;
-	return frame_rate == 0 ? 0 : bigtime_t((1000000LL * mFramesSent) / frame_rate);
+	int frameRate = (int)mOutput.format.u.raw_audio.frame_rate;
+	return frameRate == 0 ? 0
+		: bigtime_t((1000000LL * mFramesSent) / frameRate);
 }
 
-media_multi_audio_format 
+
+media_multi_audio_format
 _SoundPlayNode::Format() const
 {
 	return mOutput.format.u.raw_audio;
 }
 
-// -------------------------------------------------------- //
-// implementation of BMediaNode
-// -------------------------------------------------------- //
 
-BMediaAddOn * _SoundPlayNode::AddOn(int32 * internal_id) const
+// #pragma mark - implementation of BMediaNode
+
+
+BMediaAddOn*
+_SoundPlayNode::AddOn(int32* _internalID) const
 {
 	CALLED();
-	// BeBook says this only gets called if we were in an add-on.
+	// This only gets called if we are in an add-on.
 	return NULL;
 }
 
-void _SoundPlayNode::Preroll(void)
+
+void
+_SoundPlayNode::Preroll()
 {
 	CALLED();
-	// XXX:Performance opportunity
+	// TODO: Performance opportunity
 	BMediaNode::Preroll();
 }
 
-status_t _SoundPlayNode::HandleMessage(int32 message, const void * data, size_t size)
+
+status_t
+_SoundPlayNode::HandleMessage(int32 message, const void* data, size_t size)
 {
 	CALLED();
 	return B_ERROR;
 }
 
-void _SoundPlayNode::NodeRegistered(void)
+
+void
+_SoundPlayNode::NodeRegistered()
 {
 	CALLED();
-	
+
 	if (mInitCheckStatus != B_OK) {
 		ReportError(B_NODE_IN_DISTRESS);
 		return;
 	}
-	
+
 	SetPriority(B_URGENT_PRIORITY);
-	
+
 	mOutput.format.type = B_MEDIA_RAW_AUDIO;
 	mOutput.format.u.raw_audio = media_multi_audio_format::wildcard;
 	mOutput.destination = media_destination::null;
@@ -100,21 +124,26 @@ void _SoundPlayNode::NodeRegistered(void)
 	mOutput.source.id = 0;
 	mOutput.node = Node();
 	strcpy(mOutput.name, Name());
-	
-	Run();	
+
+	Run();
 }
 
-status_t _SoundPlayNode::RequestCompleted(const media_request_info &info)
+
+status_t
+_SoundPlayNode::RequestCompleted(const media_request_info& info)
 {
 	CALLED();
 	return B_OK;
 }
 
-void _SoundPlayNode::SetTimeSource(BTimeSource *timeSource)
+
+void
+_SoundPlayNode::SetTimeSource(BTimeSource* timeSource)
 {
 	CALLED();
 	BMediaNode::SetTimeSource(timeSource);
 }
+
 
 void
 _SoundPlayNode::SetRunMode(run_mode mode)
@@ -123,16 +152,18 @@ _SoundPlayNode::SetRunMode(run_mode mode)
 	BMediaNode::SetRunMode(mode);
 }
 
-// -------------------------------------------------------- //
-// implementation for BBufferProducer
-// -------------------------------------------------------- //
 
-status_t 
-_SoundPlayNode::FormatSuggestionRequested(media_type type, int32 /*quality*/, media_format* format)
+// #pragma mark - implementation for BBufferProducer
+
+
+status_t
+_SoundPlayNode::FormatSuggestionRequested(media_type type, int32 /*quality*/,
+	media_format* format)
 {
-	// FormatSuggestionRequested() is not necessarily part of the format negotiation
-	// process; it's simply an interrogation -- the caller wants to see what the node's
-	// preferred data format is, given a suggestion by the caller.
+	// FormatSuggestionRequested() is not necessarily part of the format
+	// negotiation process; it's simply an interrogation -- the caller wants
+	// to see what the node's preferred data format is, given a suggestion by
+	// the caller.
 	CALLED();
 
 	// a wildcard type is okay; but we only support raw audio
@@ -146,11 +177,13 @@ _SoundPlayNode::FormatSuggestionRequested(media_type type, int32 /*quality*/, me
 	return B_OK;
 }
 
-status_t 
+
+status_t
 _SoundPlayNode::FormatProposal(const media_source& output, media_format* format)
 {
-	// FormatProposal() is the first stage in the BMediaRoster::Connect() process.  We hand
-	// out a suggested format, with wildcards for any variations we support.
+	// FormatProposal() is the first stage in the BMediaRoster::Connect()
+	// process. We hand out a suggested format, with wildcards for any
+	// variations we support.
 	CALLED();
 
 	// is this a proposal for our one output?
@@ -168,7 +201,7 @@ _SoundPlayNode::FormatProposal(const media_source& output, media_format* format)
 		TRACE("_SoundPlayNode::FormatProposal returning B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	
+
 #if DEBUG >0
 	char buf[100];
 	string_for_format(*format, buf, sizeof(buf));
@@ -178,8 +211,11 @@ _SoundPlayNode::FormatProposal(const media_source& output, media_format* format)
 	return B_OK;
 }
 
-status_t 
-_SoundPlayNode::FormatChangeRequested(const media_source& source, const media_destination& destination, media_format* io_format, int32* _deprecated_)
+
+status_t
+_SoundPlayNode::FormatChangeRequested(const media_source& source,
+	const media_destination& destination, media_format* _format,
+	int32* /* deprecated */)
 {
 	CALLED();
 
@@ -187,13 +223,14 @@ _SoundPlayNode::FormatChangeRequested(const media_source& source, const media_de
 	return B_ERROR;
 }
 
-status_t 
-_SoundPlayNode::GetNextOutput(int32* cookie, media_output* out_output)
+
+status_t
+_SoundPlayNode::GetNextOutput(int32* cookie, media_output* _output)
 {
 	CALLED();
 
 	if (*cookie == 0) {
-		*out_output = mOutput;
+		*_output = mOutput;
 		*cookie += 1;
 		return B_OK;
 	} else {
@@ -201,7 +238,8 @@ _SoundPlayNode::GetNextOutput(int32* cookie, media_output* out_output)
 	}
 }
 
-status_t 
+
+status_t
 _SoundPlayNode::DisposeOutputCookie(int32 cookie)
 {
 	CALLED();
@@ -209,13 +247,15 @@ _SoundPlayNode::DisposeOutputCookie(int32 cookie)
 	return B_OK;
 }
 
-status_t 
-_SoundPlayNode::SetBufferGroup(const media_source& for_source, BBufferGroup* newGroup)
+
+status_t
+_SoundPlayNode::SetBufferGroup(const media_source& forSource,
+	BBufferGroup* newGroup)
 {
 	CALLED();
 
 	// is this our output?
-	if (for_source != mOutput.source) {
+	if (forSource != mOutput.source) {
 		TRACE("_SoundPlayNode::SetBufferGroup returning B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
@@ -224,20 +264,18 @@ _SoundPlayNode::SetBufferGroup(const media_source& for_source, BBufferGroup* new
 	if (newGroup == mBufferGroup)
 		return B_OK;
 
-	// Ahh, someone wants us to use a different buffer group.  At this point we delete
-	// the one we are using and use the specified one instead.  If the specified group is
-	// NULL, we need to recreate one ourselves, and use *that*.  Note that if we're
-	// caching a BBuffer that we requested earlier, we have to Recycle() that buffer
-	// *before* deleting the buffer group, otherwise we'll deadlock waiting for that
-	// buffer to be recycled!
-	delete mBufferGroup;		// waits for all buffers to recycle
-	if (newGroup != NULL)
-	{
+	// Ahh, someone wants us to use a different buffer group. At this point we
+	// delete the one we are using and use the specified one instead.
+	// If the specified group is NULL, we need to recreate one ourselves, and
+	// use *that*. Note that if we're caching a BBuffer that we requested
+	// earlier, we have to Recycle() that buffer *before* deleting the buffer
+	// group, otherwise we'll deadlock waiting for that buffer to be recycled!
+	delete mBufferGroup;
+		// waits for all buffers to recycle
+	if (newGroup != NULL) {
 		// we were given a valid group; just use that one from now on
 		mBufferGroup = newGroup;
-	}
-	else
-	{
+	} else {
 		// we were passed a NULL group pointer; that means we construct
 		// our own buffer group to use from now on
 		size_t size = mOutput.format.u.raw_audio.buffer_size;
@@ -250,29 +288,35 @@ _SoundPlayNode::SetBufferGroup(const media_source& for_source, BBufferGroup* new
 	return B_OK;
 }
 
-status_t 
-_SoundPlayNode::GetLatency(bigtime_t* out_latency)
+
+status_t
+_SoundPlayNode::GetLatency(bigtime_t* _latency)
 {
 	CALLED();
-	
+
 	// report our *total* latency:  internal plus downstream plus scheduling
-	*out_latency = EventLatency() + SchedulingLatency();
+	*_latency = EventLatency() + SchedulingLatency();
 	return B_OK;
 }
 
-status_t 
-_SoundPlayNode::PrepareToConnect(const media_source& what, const media_destination& where, media_format* format, media_source* out_source, char* out_name)
+
+status_t
+_SoundPlayNode::PrepareToConnect(const media_source& what,
+	const media_destination& where, media_format* format,
+	media_source* _source, char* _name)
 {
-	// PrepareToConnect() is the second stage of format negotiations that happens
-	// inside BMediaRoster::Connect(). At this point, the consumer's AcceptFormat()
-	// method has been called, and that node has potentially changed the proposed
-	// format. It may also have left wildcards in the format. PrepareToConnect()
-	// *must* fully specialize the format before returning!
+	// PrepareToConnect() is the second stage of format negotiations that
+	// happens inside BMediaRoster::Connect(). At this point, the consumer's
+	// AcceptFormat() method has been called, and that node has potentially
+	// changed the proposed format. It may also have left wildcards in the
+	// format. PrepareToConnect() *must* fully specialize the format before
+	// returning!
 	CALLED();
 
 	// is this our output?
 	if (what != mOutput.source)	{
-		TRACE("_SoundPlayNode::PrepareToConnect returning B_MEDIA_BAD_SOURCE\n");
+		TRACE("_SoundPlayNode::PrepareToConnect returning "
+			"B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
 
@@ -291,8 +335,10 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 #endif
 
 	// if not raw audio, we can't support it
-	if (format->type != B_MEDIA_UNKNOWN_TYPE && format->type != B_MEDIA_RAW_AUDIO) {
-		TRACE("_SoundPlayNode::PrepareToConnect: non raw format, returning B_MEDIA_BAD_FORMAT\n");
+	if (format->type != B_MEDIA_UNKNOWN_TYPE
+		&& format->type != B_MEDIA_RAW_AUDIO) {
+		TRACE("_SoundPlayNode::PrepareToConnect: non raw format, returning "
+			"B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
 
@@ -304,27 +350,30 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 	uint32 channel_count = 0;
 	float frame_rate = 0;
 	if (format->user_data_type == FORMAT_USER_DATA_TYPE
-			&& *(uint32 *)&format->user_data[0] == FORMAT_USER_DATA_MAGIC_1
-			&& *(uint32 *)&format->user_data[44] == FORMAT_USER_DATA_MAGIC_2) {
+		&& *(uint32 *)&format->user_data[0] == FORMAT_USER_DATA_MAGIC_1
+		&& *(uint32 *)&format->user_data[44] == FORMAT_USER_DATA_MAGIC_2) {
 		channel_count = *(uint32 *)&format->user_data[4];
 		frame_rate = *(float *)&format->user_data[20];
-		TRACE("_SoundPlayNode::PrepareToConnect: found mixer info: channel_count %ld, frame_rate %.1f\n", channel_count, frame_rate);
+		TRACE("_SoundPlayNode::PrepareToConnect: found mixer info: "
+			"channel_count %ld, frame_rate %.1f\n", channel_count, frame_rate);
 	}
 
 	media_format default_format;
 	default_format.type = B_MEDIA_RAW_AUDIO;
 	default_format.u.raw_audio.frame_rate = frame_rate > 0 ? frame_rate : 44100;
-	default_format.u.raw_audio.channel_count = channel_count > 0 ? channel_count : 2;
+	default_format.u.raw_audio.channel_count = channel_count > 0
+		? channel_count : 2;
 	default_format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 	default_format.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 	default_format.u.raw_audio.buffer_size = 0;
 	format->SpecializeTo(&default_format);
-	
-	if (format->u.raw_audio.buffer_size == 0)
-		format->u.raw_audio.buffer_size = BMediaRoster::Roster()->AudioBufferSizeFor(
-			format->u.raw_audio.channel_count,
-			format->u.raw_audio.format,
-			format->u.raw_audio.frame_rate);
+
+	if (format->u.raw_audio.buffer_size == 0) {
+		format->u.raw_audio.buffer_size
+			= BMediaRoster::Roster()->AudioBufferSizeFor(
+				format->u.raw_audio.channel_count, format->u.raw_audio.format,
+				format->u.raw_audio.frame_rate);
+	}
 
 #if DEBUG > 0
 	string_for_format(*format, buf, sizeof(buf));
@@ -334,25 +383,28 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 	// Now reserve the connection, and return information about it
 	mOutput.destination = where;
 	mOutput.format = *format;
-	*out_source = mOutput.source;
-	strcpy(out_name, Name());
+	*_source = mOutput.source;
+	strcpy(_name, Name());
 	return B_OK;
 }
 
-void 
-_SoundPlayNode::Connect(status_t error, const media_source& source, const media_destination& destination, const media_format& format, char* io_name)
+
+void
+_SoundPlayNode::Connect(status_t error, const media_source& source,
+	const media_destination& destination, const media_format& format,
+	char* name)
 {
 	CALLED();
-	
+
 	// is this our output?
 	if (source != mOutput.source) {
 		TRACE("_SoundPlayNode::Connect returning\n");
 		return;
 	}
-	
-	// If something earlier failed, Connect() might still be called, but with a non-zero
-	// error code.  When that happens we simply unreserve the connection and do
-	// nothing else.
+
+	// If something earlier failed, Connect() might still be called, but with
+	// a non-zero error code.  When that happens we simply unreserve the
+	// connection and do nothing else.
 	if (error) {
 		mOutput.destination = media_destination::null;
 		mOutput.format.type = B_MEDIA_RAW_AUDIO;
@@ -360,11 +412,11 @@ _SoundPlayNode::Connect(status_t error, const media_source& source, const media_
 		return;
 	}
 
-	// Okay, the connection has been confirmed.  Record the destination and format
-	// that we agreed on, and report our connection name again.
+	// Okay, the connection has been confirmed.  Record the destination and
+	// format that we agreed on, and report our connection name again.
 	mOutput.destination = destination;
 	mOutput.format = format;
-	strcpy(io_name, Name());
+	strcpy(name, Name());
 
 	// Now that we're connected, we can determine our downstream latency.
 	// Do so, then make sure we get our events early enough.
@@ -374,83 +426,83 @@ _SoundPlayNode::Connect(status_t error, const media_source& source, const media_
 
 	// reset our buffer duration, etc. to avoid later calculations
 	bigtime_t duration = ((mOutput.format.u.raw_audio.buffer_size * 1000000LL)
-		/ ((mOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK) * mOutput.format.u.raw_audio.channel_count))
+		/ ((mOutput.format.u.raw_audio.format
+				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
+			* mOutput.format.u.raw_audio.channel_count))
 		/ (int32)mOutput.format.u.raw_audio.frame_rate;
 	SetBufferDuration(duration);
 	TRACE("_SoundPlayNode::Connect: buffer duration is %Ld\n", duration);
 
 	mInternalLatency = (3 * BufferDuration()) / 4;
-	TRACE("_SoundPlayNode::Connect: using %Ld as internal latency\n", mInternalLatency);
+	TRACE("_SoundPlayNode::Connect: using %Ld as internal latency\n",
+		mInternalLatency);
 	SetEventLatency(mLatency + mInternalLatency);
 
-	// Set up the buffer group for our connection, as long as nobody handed us a
-	// buffer group (via SetBufferGroup()) prior to this.  That can happen, for example,
-	// if the consumer calls SetOutputBuffersFor() on us from within its Connected()
-	// method.
-	if (!mBufferGroup) 
+	// Set up the buffer group for our connection, as long as nobody handed us
+	// a buffer group (via SetBufferGroup()) prior to this.
+	// That can happen, for example, if the consumer calls SetOutputBuffersFor()
+	// on us from within its Connected() method.
+	if (!mBufferGroup)
 		AllocateBuffers();
 }
 
-void 
-_SoundPlayNode::Disconnect(const media_source& what, const media_destination& where)
+
+void
+_SoundPlayNode::Disconnect(const media_source& what,
+	const media_destination& where)
 {
 	CALLED();
-	
+
 	// is this our output?
-	if (what != mOutput.source)
-	{
+	if (what != mOutput.source) {
 		TRACE("_SoundPlayNode::Disconnect returning\n");
 		return;
 	}
 
 	// Make sure that our connection is the one being disconnected
-	if ((where == mOutput.destination) && (what == mOutput.source))
-	{
+	if (where == mOutput.destination && what == mOutput.source) {
 		mOutput.destination = media_destination::null;
 		mOutput.format.type = B_MEDIA_RAW_AUDIO;
 		mOutput.format.u.raw_audio = media_multi_audio_format::wildcard;
 		delete mBufferGroup;
 		mBufferGroup = NULL;
-	}
-	else
-	{
+	} else {
 		fprintf(stderr, "\tDisconnect() called with wrong source/destination (%ld/%ld), ours is (%ld/%ld)\n",
 			what.id, where.id, mOutput.source.id, mOutput.destination.id);
 	}
 }
 
-void 
-_SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much, bigtime_t performance_time)
+
+void
+_SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
+	bigtime_t performanceTime)
 {
 	CALLED();
-	
-	TRACE("_SoundPlayNode::LateNoticeReceived, %Ld too late at %Ld\n", how_much, performance_time);
-	
+
+	TRACE("_SoundPlayNode::LateNoticeReceived, %Ld too late at %Ld\n", howMuch,
+		performanceTime);
+
 	// is this our output?
-	if (what != mOutput.source)
-	{
+	if (what != mOutput.source) {
 		TRACE("_SoundPlayNode::LateNoticeReceived returning\n");
 		return;
 	}
 
-	if (RunMode() != B_DROP_DATA)
-	{
+	if (RunMode() != B_DROP_DATA) {
 		// We're late, and our run mode dictates that we try to produce buffers
 		// earlier in order to catch up.  This argues that the downstream nodes are
 		// not properly reporting their latency, but there's not much we can do about
 		// that at the moment, so we try to start producing buffers earlier to
 		// compensate.
-		
-		mInternalLatency += how_much;
+
+		mInternalLatency += howMuch;
 
 		if (mInternalLatency > 30000)	// avoid getting a too high latency
 			mInternalLatency = 30000;
 
 		SetEventLatency(mLatency + mInternalLatency);
 		TRACE("_SoundPlayNode::LateNoticeReceived: increasing latency to %Ld\n", mLatency + mInternalLatency);
-	}
-	else
-	{
+	} else {
 		// The other run modes dictate various strategies for sacrificing data quality
 		// in the interests of timely data delivery.  The way *we* do this is to skip
 		// a buffer, which catches us up in time by one buffer duration.
@@ -465,61 +517,67 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 	}
 }
 
-void 
-_SoundPlayNode::EnableOutput(const media_source& what, bool enabled, int32* _deprecated_)
+
+void
+_SoundPlayNode::EnableOutput(const media_source& what, bool enabled,
+	int32* /* deprecated */)
 {
 	CALLED();
 
-	// If I had more than one output, I'd have to walk my list of output records to see
-	// which one matched the given source, and then enable/disable that one.  But this
-	// node only has one output, so I just make sure the given source matches, then set
-	// the enable state accordingly.
+	// If I had more than one output, I'd have to walk my list of output
+	// records to see which one matched the given source, and then
+	// enable/disable that one.
+	// But this node only has one output, so I just make sure the given source
+	// matches, then set the enable state accordingly.
+
 	// is this our output?
-	if (what != mOutput.source)
-	{
+	if (what != mOutput.source) {
 		fprintf(stderr, "_SoundPlayNode::EnableOutput returning\n");
 		return;
 	}
-	
+
 	mOutputEnabled = enabled;
 }
 
-void 
-_SoundPlayNode::AdditionalBufferRequested(const media_source& source, media_buffer_id prev_buffer, bigtime_t prev_time, const media_seek_tag* prev_tag)
+
+void
+_SoundPlayNode::AdditionalBufferRequested(const media_source& source,
+	media_buffer_id previousBuffer, bigtime_t previousTime,
+	const media_seek_tag* previousTag)
 {
 	CALLED();
 	// we don't support offline mode
 	return;
 }
 
-void 
-_SoundPlayNode::LatencyChanged(const media_source& source, const media_destination& destination, bigtime_t new_latency, uint32 flags)
+
+void
+_SoundPlayNode::LatencyChanged(const media_source& source,
+	const media_destination& destination, bigtime_t newLatency, uint32 flags)
 {
 	CALLED();
-	
-	TRACE("_SoundPlayNode::LatencyChanged: new_latency %Ld\n", new_latency);
-	
+
+	TRACE("_SoundPlayNode::LatencyChanged: new_latency %Ld\n", newLatency);
+
 	// something downstream changed latency, so we need to start producing
 	// buffers earlier (or later) than we were previously.  Make sure that the
 	// connection that changed is ours, and adjust to the new downstream
 	// latency if so.
-	if ((source == mOutput.source) && (destination == mOutput.destination))
-	{
-		mLatency = new_latency;
+	if (source == mOutput.source && destination == mOutput.destination) {
+		mLatency = newLatency;
 		SetEventLatency(mLatency + mInternalLatency);
 	} else {
 		TRACE("_SoundPlayNode::LatencyChanged: ignored\n");
 	}
 }
 
-// -------------------------------------------------------- //
-// implementation for BMediaEventLooper
-// -------------------------------------------------------- //
 
-void _SoundPlayNode::HandleEvent(
-				const media_timed_event *event,
-				bigtime_t lateness,
-				bool realTimeEvent)
+// #pragma mark - implementation for BMediaEventLooper
+
+
+void
+_SoundPlayNode::HandleEvent(const media_timed_event* event, bigtime_t lateness,
+	bool realTimeEvent)
 {
 	CALLED();
 	switch (event->type) {
@@ -539,9 +597,8 @@ void _SoundPlayNode::HandleEvent(
 			// we don't get any buffers
 			break;
 		case SEND_NEW_BUFFER_EVENT:
-			if (RunState() == BMediaEventLooper::B_STARTED) {
+			if (RunState() == BMediaEventLooper::B_STARTED)
 				SendNewBuffer(event, lateness, realTimeEvent);
-			}
 			break;
 		case BTimedEventQueue::B_DATA_STATUS:
 			HandleDataStatus(event,lateness,realTimeEvent);
@@ -550,35 +607,41 @@ void _SoundPlayNode::HandleEvent(
 			HandleParameter(event,lateness,realTimeEvent);
 			break;
 		default:
-			fprintf(stderr,"  unknown event type: %li\n",event->type);
+			fprintf(stderr,"  unknown event type: %li\n", event->type);
 			break;
 	}
 }
 
-// protected:
+
+// #pragma mark - protected methods
+
 
 // how should we handle late buffers?  drop them?
 // notify the producer?
-status_t 
-_SoundPlayNode::SendNewBuffer(const media_timed_event *event, bigtime_t lateness, bool realTimeEvent)
+status_t
+_SoundPlayNode::SendNewBuffer(const media_timed_event* event,
+	bigtime_t lateness, bool realTimeEvent)
 {
 	CALLED();
 	// printf("latency = %12Ld, event = %12Ld, sched = %5Ld, arrive at %12Ld, now %12Ld, current lateness %12Ld\n", EventLatency() + SchedulingLatency(), EventLatency(), SchedulingLatency(), event->event_time, TimeSource()->Now(), lateness);
 
 	// make sure we're both started *and* connected before delivering a buffer
-	if ((RunState() != BMediaEventLooper::B_STARTED) || (mOutput.destination == media_destination::null))
+	if (RunState() != BMediaEventLooper::B_STARTED
+		|| mOutput.destination == media_destination::null)
 		return B_OK;
-		
-	// The event->event_time is the time at which the buffer we are preparing here should
-	// arrive at it's destination. The MediaEventLooper should have scheduled us early enough
-	// (based on EventLatency() and the SchedulingLatency()) to make this possible.
+
+	// The event->event_time is the time at which the buffer we are preparing
+	// here should arrive at it's destination. The MediaEventLooper should have
+	// scheduled us early enough (based on EventLatency() and the
+	// SchedulingLatency()) to make this possible.
 	// lateness is independent of EventLatency()!
 
 	if (lateness > (BufferDuration() / 3) ) {
-		printf("_SoundPlayNode::SendNewBuffer, event scheduled much too late, lateness is %Ld\n", lateness);
+		printf("_SoundPlayNode::SendNewBuffer, event scheduled much too late, "
+			"lateness is %Ld\n", lateness);
 	}
 
-	// skip buffer creation if output not enabled	
+	// skip buffer creation if output not enabled
 	if (mOutputEnabled) {
 
 		// Get the next buffer of data
@@ -607,7 +670,8 @@ _SoundPlayNode::SendNewBuffer(const media_timed_event *event, bigtime_t lateness
 			if (B_OK != SendBuffer(buffer, mOutput.destination)) {
 				// we need to recycle the buffer
 				// if the call to SendBuffer() fails
-				printf("_SoundPlayNode::SendNewBuffer: Buffer sending failed\n");
+				printf("_SoundPlayNode::SendNewBuffer: Buffer sending "
+					"failed\n");
 				buffer->Recycle();
 			}
 		}
@@ -615,27 +679,31 @@ _SoundPlayNode::SendNewBuffer(const media_timed_event *event, bigtime_t lateness
 
 	// track how much media we've delivered so far
 	size_t nFrames = mOutput.format.u.raw_audio.buffer_size
-		/ ((mOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
+		/ ((mOutput.format.u.raw_audio.format
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK)
 		* mOutput.format.u.raw_audio.channel_count);
 	mFramesSent += nFrames;
 
 	// The buffer is on its way; now schedule the next one to go
-	// nextEvent is the time at which the buffer should arrive at it's destination
-	bigtime_t nextEvent = mStartTime + bigtime_t((1000000LL * mFramesSent) / (int32)mOutput.format.u.raw_audio.frame_rate);
+	// nextEvent is the time at which the buffer should arrive at it's
+	// destination
+	bigtime_t nextEvent = mStartTime + bigtime_t((1000000LL * mFramesSent)
+		/ (int32)mOutput.format.u.raw_audio.frame_rate);
 	media_timed_event nextBufferEvent(nextEvent, SEND_NEW_BUFFER_EVENT);
 	EventQueue()->AddEvent(nextBufferEvent);
-	
+
 	return B_OK;
 }
 
-status_t 
-_SoundPlayNode::HandleDataStatus(
-						const media_timed_event *event,
-						bigtime_t lateness,
-						bool realTimeEvent)
+
+status_t
+_SoundPlayNode::HandleDataStatus(const media_timed_event* event,
+	bigtime_t lateness, bool realTimeEvent)
 {
-	TRACE("_SoundPlayNode::HandleDataStatus status: %li, lateness: %Li\n", event->data, lateness);
-	switch(event->data) {
+	TRACE("_SoundPlayNode::HandleDataStatus status: %li, lateness: %Li\n",
+		event->data, lateness);
+
+	switch (event->data) {
 		case B_DATA_NOT_AVAILABLE:
 			break;
 		case B_DATA_AVAILABLE:
@@ -648,25 +716,24 @@ _SoundPlayNode::HandleDataStatus(
 	return B_OK;
 }
 
-status_t 
-_SoundPlayNode::HandleStart(
-						const media_timed_event *event,
-						bigtime_t lateness,
-						bool realTimeEvent)
+
+status_t
+_SoundPlayNode::HandleStart(const media_timed_event* event, bigtime_t lateness,
+	bool realTimeEvent)
 {
 	CALLED();
 	// don't do anything if we're already running
-	if (RunState() != B_STARTED)
-	{
-		// We want to start sending buffers now, so we set up the buffer-sending bookkeeping
-		// and fire off the first "produce a buffer" event.
-	
-		mFramesSent = 0;	
-		mStartTime = event->event_time;
-		media_timed_event firstBufferEvent(event->event_time, SEND_NEW_BUFFER_EVENT);
+	if (RunState() != B_STARTED) {
+		// We want to start sending buffers now, so we set up the buffer-sending
+		// bookkeeping and fire off the first "produce a buffer" event.
 
-		// Alternatively, we could call HandleEvent() directly with this event, to avoid a trip through
-		// the event queue, like this:
+		mFramesSent = 0;
+		mStartTime = event->event_time;
+		media_timed_event firstBufferEvent(event->event_time,
+			SEND_NEW_BUFFER_EVENT);
+
+		// Alternatively, we could call HandleEvent() directly with this event,
+		// to avoid a trip through the event queue, like this:
 		//
 		//		this->HandleEvent(&firstBufferEvent, 0, false);
 		//
@@ -675,51 +742,50 @@ _SoundPlayNode::HandleStart(
 	return B_OK;
 }
 
-status_t 
-_SoundPlayNode::HandleSeek(
-						const media_timed_event *event,
-						bigtime_t lateness,
-						bool realTimeEvent)
+
+status_t
+_SoundPlayNode::HandleSeek(const media_timed_event* event, bigtime_t lateness,
+	bool realTimeEvent)
 {
 	CALLED();
-	TRACE("_SoundPlayNode::HandleSeek(t=%lld, d=%li, bd=%lld)\n", event->event_time, event->data, event->bigdata);
+	TRACE("_SoundPlayNode::HandleSeek(t=%lld, d=%li, bd=%lld)\n",
+		event->event_time, event->data, event->bigdata);
 	return B_OK;
 }
-						
-status_t 
-_SoundPlayNode::HandleWarp(
-						const media_timed_event *event,
-						bigtime_t lateness,
-						bool realTimeEvent)
+
+
+status_t
+_SoundPlayNode::HandleWarp(const media_timed_event* event, bigtime_t lateness,
+	bool realTimeEvent)
 {
 	CALLED();
 	return B_OK;
 }
 
-status_t 
-_SoundPlayNode::HandleStop(
-						const media_timed_event *event,
-						bigtime_t lateness,
-						bool realTimeEvent)
+
+status_t
+_SoundPlayNode::HandleStop(const media_timed_event* event, bigtime_t lateness,
+	bool realTimeEvent)
 {
 	CALLED();
 	// flush the queue so downstreamers don't get any more
-	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true, SEND_NEW_BUFFER_EVENT);
-	
+	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true,
+		SEND_NEW_BUFFER_EVENT);
+
 	return B_OK;
 }
 
-status_t 
-_SoundPlayNode::HandleParameter(
-				const media_timed_event *event,
-				bigtime_t lateness,
-				bool realTimeEvent)
+
+status_t
+_SoundPlayNode::HandleParameter(const media_timed_event* event,
+	bigtime_t lateness, bool realTimeEvent)
 {
 	CALLED();
 	return B_OK;
 }
 
-void 
+
+void
 _SoundPlayNode::AllocateBuffers()
 {
 	CALLED();
@@ -728,18 +794,22 @@ _SoundPlayNode::AllocateBuffers()
 	size_t size = mOutput.format.u.raw_audio.buffer_size;
 	int32 count = int32(mLatency / BufferDuration() + 1 + 1);
 
-	TRACE("_SoundPlayNode::AllocateBuffers: latency = %Ld, buffer duration = %Ld, count %ld\n", mLatency, BufferDuration(), count);
-	
+	TRACE("_SoundPlayNode::AllocateBuffers: latency = %Ld, buffer duration "
+		"= %Ld, count %ld\n", mLatency, BufferDuration(), count);
+
 	if (count < 3)
 		count = 3;
-	
-	TRACE("_SoundPlayNode::AllocateBuffers: creating group of %ld buffers, size = %lu\n", count, size);
-	
+
+	TRACE("_SoundPlayNode::AllocateBuffers: creating group of %ld buffers, "
+		"size = %lu\n", count, size);
+
 	mBufferGroup = new BBufferGroup(size, count);
 	if (mBufferGroup->InitCheck() != B_OK) {
-		ERROR("_SoundPlayNode::AllocateBuffers: BufferGroup::InitCheck() failed\n");
-	}		
+		ERROR("_SoundPlayNode::AllocateBuffers: BufferGroup::InitCheck() "
+			"failed\n");
+	}
 }
+
 
 BBuffer*
 _SoundPlayNode::FillNextBuffer(bigtime_t event_time)
@@ -747,22 +817,24 @@ _SoundPlayNode::FillNextBuffer(bigtime_t event_time)
 	CALLED();
 
 	// get a buffer from our buffer group
-	BBuffer* buf = mBufferGroup->RequestBuffer(mOutput.format.u.raw_audio.buffer_size, BufferDuration() / 2);
+	BBuffer* buf = mBufferGroup->RequestBuffer(
+		mOutput.format.u.raw_audio.buffer_size, BufferDuration() / 2);
 
-	// if we fail to get a buffer (for example, if the request times out), we skip this
-	// buffer and go on to the next, to avoid locking up the control thread
+	// If we fail to get a buffer (for example, if the request times out), we
+	// skip this buffer and go on to the next, to avoid locking up the control
+	// thread
 	if (!buf) {
 		ERROR("_SoundPlayNode::FillNextBuffer: RequestBuffer failed\n");
 		return NULL;
 	}
-	
+
 	if (mPlayer->HasData()) {
-		mPlayer->PlayBuffer(buf->Data(), 
+		mPlayer->_PlayBuffer(buf->Data(),
 			mOutput.format.u.raw_audio.buffer_size, mOutput.format.u.raw_audio);
 	} else {
 		memset(buf->Data(), 0, mOutput.format.u.raw_audio.buffer_size);
 	}
-	
+
 	// fill in the buffer header
 	media_header* hdr = buf->Header();
 	hdr->type = B_MEDIA_RAW_AUDIO;
