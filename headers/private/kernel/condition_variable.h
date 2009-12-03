@@ -63,6 +63,13 @@ public:
 	inline	void				NotifyAll(bool threadsLocked = false,
 									status_t result = B_OK);
 
+	static void					NotifyOne(const void* object,
+									bool threadsLocked = false,
+									status_t result = B_OK);
+	static void					NotifyAll(const void* object,
+									bool threadsLocked = false,
+									status_t result = B_OK);
+
 			void				Add(ConditionVariableEntry* entry);
 
 			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);

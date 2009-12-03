@@ -261,6 +261,34 @@ ConditionVariable::Wait(uint32 flags, bigtime_t timeout)
 }
 
 
+void
+ConditionVariable::NotifyOne(const void* object, bool threadsLocked,
+	status_t result)
+{
+	InterruptsSpinLocker locker(sConditionVariablesLock);
+	ConditionVariable* variable = sConditionVariableHash.Lookup(object);
+	locker.Unlock();
+	if (variable == NULL)
+		return;
+
+	variable->NotifyOne(threadsLocked, result);
+}
+
+
+void
+ConditionVariable::NotifyAll(const void* object,
+	bool threadsLocked, status_t result)
+{
+	InterruptsSpinLocker locker(sConditionVariablesLock);
+	ConditionVariable* variable = sConditionVariableHash.Lookup(object);
+	locker.Unlock();
+	if (variable == NULL)
+		return;
+
+	variable->NotifyAll(threadsLocked, result);
+}
+
+
 /*static*/ void
 ConditionVariable::ListAll()
 {
