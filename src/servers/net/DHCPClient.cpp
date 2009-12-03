@@ -456,12 +456,10 @@ DHCPClient::_Negotiate(dhcp_state state)
 	_PrepareMessage(request, state);
 
 	// send discover/request message
-	status = _SendMessage(socket, state == INIT ? discover : request,
+	_SendMessage(socket, state == INIT ? discover : request,
 		state != RENEWAL ? broadcast : fServer);
-	if (status < B_OK) {
-		close(socket);
-		return status;
-	}
+		// no need to check the status; in case of an error we'll just send
+		// the message again
 
 	// receive loop until we've got an offer and acknowledged it
 
@@ -477,17 +475,14 @@ DHCPClient::_Negotiate(dhcp_state state)
 			}
 
 			if (state == INIT)
-				status = _SendMessage(socket, discover, broadcast);
+				_SendMessage(socket, discover, broadcast);
 			else {
-				status = _SendMessage(socket, request, state != RENEWAL
-					? broadcast : fServer);
+				_SendMessage(socket, request,
+					state != RENEWAL ? broadcast : fServer);
 			}
 
-			if (status != B_OK)
-				break;
-
 			continue;
-		} else if (bytesReceived < B_OK)
+		} else if (bytesReceived < 0)
 			break;
 
 		dhcp_message *message = (dhcp_message *)buffer;
