@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network wlan marvell88w ;
+SubDir HAIKU_TOP src add-ons kernel drivers network wlan marv88w8363 ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
@@ -17,7 +17,7 @@ UseHeaders [ FDirName $(SUBDIR) ] : true ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mwl ] ;
 
-KernelAddon marvell88w :
+KernelAddon marv88w8363 :
 	if_mwl.c
 	if_mwl_pci.c
 	mwlhal.c
