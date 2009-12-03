@@ -331,6 +331,8 @@ struct mwl_softc {
 
 	struct mwl_tx_radiotap_header sc_tx_th;
 	struct mwl_rx_radiotap_header sc_rx_th;
+
+	uint32_t sc_lastisr;
 };
 
 #define	MWL_LOCK_INIT(_sc) \

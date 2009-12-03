@@ -821,21 +821,11 @@ mwl_intr(void *arg)
 	struct mwl_softc *sc = arg;
 	struct mwl_hal *mh = sc->sc_mh;
 	uint32_t status;
+	HAIKU_INTR_REGISTER_STATE;
 
-	if (sc->sc_invalid) {
-		/*
-		 * The hardware is not ready/present, don't touch anything.
-		 * Note this can happen early on if the IRQ is shared.
-		 */
-		DPRINTF(sc, MWL_DEBUG_ANY, "%s: invalid; ignored\n", __func__);
-		return;
-	}
-	/*
-	 * Figure out the reason(s) for the interrupt.
-	 */
-	mwl_hal_getisr(mh, &status);		/* NB: clears ISR too */
-	if (status == 0)			/* must be a shared irq */
-		return;
+	HAIKU_INTR_REGISTER_ENTER();
+	status = sc->sc_lastisr;
+	HAIKU_INTR_REGISTER_LEAVE();
 
 	DPRINTF(sc, MWL_DEBUG_INTR, "%s: status 0x%x imask 0x%x\n",
 	    __func__, status, sc->sc_imask);

@@ -21,6 +21,7 @@ KernelAddon marv88w8363 :
 	if_mwl.c
 	if_mwl_pci.c
 	mwlhal.c
+	glue.c
 	:
 	libfreebsd_wlan.a
 	libfreebsd_network.a
