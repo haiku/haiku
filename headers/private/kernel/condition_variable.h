@@ -69,6 +69,9 @@ public:
 	static void					NotifyAll(const void* object,
 									bool threadsLocked = false,
 									status_t result = B_OK);
+									// (both methods) caller must ensure that
+									// the variable is not unpublished
+									// concurrently
 
 			void				Add(ConditionVariableEntry* entry);
 
