@@ -70,9 +70,11 @@ struct net_datalink_module_info {
 					struct net_domain *domain, struct net_buffer *buffer);
 
 	bool (*is_local_address)(struct net_domain *domain,
-					const struct sockaddr *address,
-					net_interface **_interface,
+					const struct sockaddr *address, net_interface **_interface,
 					uint32 *_matchedType);
+	bool (*is_local_link_address)(struct net_domain *domain, bool unconfigured,
+					const struct sockaddr *address, net_interface **_interface);
+				
 	net_interface *(*get_interface)(struct net_domain *domain, uint32 index);
 	net_interface *(*get_interface_with_address)(struct net_domain *domain,
 					const struct sockaddr *address);

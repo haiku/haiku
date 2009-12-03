@@ -750,13 +750,14 @@ raw_receive_data(net_buffer* buffer)
 }
 
 
-static sockaddr*
-fill_sockaddr_in(sockaddr_in* destination, const in_addr &source)
+static inline sockaddr*
+fill_sockaddr_in(sockaddr_in* target, in_addr_t address)
 {
-	memset(destination, 0, sizeof(sockaddr_in));
-	destination->sin_family = AF_INET;
-	destination->sin_addr = source;
-	return (sockaddr*)destination;
+	target->sin_family = AF_INET;
+	target->sin_len = sizeof(sockaddr_in);
+	target->sin_port = 0;
+	target->sin_addr.s_addr = address;
+	return (sockaddr*)target;
 }
 
 
@@ -770,7 +771,7 @@ IPv4Multicast::JoinGroup(IPv4GroupInterface* state)
 
 	status_t status = interface->first_info->join_multicast(
 		interface->first_protocol,
-		fill_sockaddr_in(&groupAddr, state->Address()));
+		fill_sockaddr_in(&groupAddr, state->Address().s_addr));
 	if (status != B_OK)
 		return status;
 
@@ -791,7 +792,7 @@ IPv4Multicast::LeaveGroup(IPv4GroupInterface* state)
 
 	return interface->first_protocol->module->join_multicast(
 		interface->first_protocol,
-		fill_sockaddr_in(&groupAddr, state->Address()));
+		fill_sockaddr_in(&groupAddr, state->Address().s_addr));
 }
 
 
@@ -813,17 +814,6 @@ receiving_protocol(uint8 protocol)
 		sReceivingProtocol[protocol] = module;
 
 	return module;
-}
-
-
-static inline sockaddr*
-fill_sockaddr_in(sockaddr_in* target, in_addr_t address)
-{
-	memset(target, 0, sizeof(sockaddr_in));
-	target->sin_family = AF_INET;
-	target->sin_len = sizeof(sockaddr_in);
-	target->sin_addr.s_addr = address;
-	return (sockaddr*)target;
 }
 
 
@@ -1572,14 +1562,11 @@ ipv4_receive_data(net_buffer* buffer)
 	if (gBufferModule->checksum(buffer, 0, headerLength, true) != 0)
 		return B_BAD_DATA;
 
-	struct sockaddr_in& source = *(struct sockaddr_in*)buffer->source;
-	struct sockaddr_in& destination = *(struct sockaddr_in*)buffer->destination;
-
-	fill_sockaddr_in(&source, header.source);
-	fill_sockaddr_in(&destination, header.destination);
-
 	// lower layers notion of Broadcast or Multicast have no relevance to us
 	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
+
+	sockaddr_in destination;
+	fill_sockaddr_in(&destination, header.destination);
 
 	if (header.destination == INADDR_BROADCAST) {
 		buffer->flags |= MSG_BCAST;
@@ -1587,9 +1574,12 @@ ipv4_receive_data(net_buffer* buffer)
 		buffer->flags |= MSG_MCAST;
 	} else {
 		uint32 matchedAddressType = 0;
+
 		// test if the packet is really for us
 		if (!sDatalinkModule->is_local_address(sDomain, (sockaddr*)&destination,
-			&buffer->interface, &matchedAddressType)) {
+				&buffer->interface, &matchedAddressType)
+			&& !sDatalinkModule->is_local_link_address(sDomain, true,
+				buffer->destination, &buffer->interface)) {
 			TRACE("  ReceiveData(): packet was not for us %lx -> %lx",
 				ntohl(header.source), ntohl(header.destination));
 			return B_ERROR;
@@ -1598,6 +1588,10 @@ ipv4_receive_data(net_buffer* buffer)
 		// copy over special address types (MSG_BCAST or MSG_MCAST):
 		buffer->flags |= matchedAddressType;
 	}
+
+	// set net_buffer's source/destination address
+	fill_sockaddr_in((struct sockaddr_in*)buffer->source, header.source);
+	memcpy(buffer->destination, &destination, sizeof(sockaddr_in));
 
 	uint8 protocol = buffer->protocol = header.protocol;
 

@@ -20,6 +20,7 @@
 #include <util/AutoLock.h>
 
 #include <net/if.h>
+#include <net/if_dl.h>
 #include <net/if_media.h>
 #include <net/route.h>
 #include <sys/sockio.h>
@@ -399,8 +400,8 @@ datalink_send_datagram(net_protocol* protocol, net_domain* domain,
 }
 
 
-/*!
-	Tests if \a address is a local address in the domain.
+/*!	Tests if \a address is a local address in the domain.
+
 	\param _interface will be set to the interface belonging to that address
 		if non-NULL.
 	\param _matchedType will be set to either zero or MSG_BCAST if non-NULL.
@@ -416,7 +417,6 @@ datalink_is_local_address(net_domain* _domain, const struct sockaddr* address,
 	RecursiveLocker locker(domain->lock);
 
 	net_interface* interface = NULL;
-	net_interface* fallback = NULL;
 	uint32 matchedType = 0;
 
 	while (true) {
@@ -424,10 +424,8 @@ datalink_is_local_address(net_domain* _domain, const struct sockaddr* address,
 			&domain->interfaces, interface);
 		if (interface == NULL)
 			break;
-		if (interface->address == NULL) {
-			fallback = interface;
+		if (interface->address == NULL)
 			continue;
-		}
 
 		// check for matching unicast address first
 		if (domain->address_module->equal_addresses(interface->address, address))
@@ -436,7 +434,7 @@ datalink_is_local_address(net_domain* _domain, const struct sockaddr* address,
 		// check for matching broadcast address if interface supports
 		// broadcasting (IFF_BROADCAST is a link-level flag, so it is
 		// a property of the device)
-		if ((interface->device->flags & IFF_BROADCAST)
+		if ((interface->device->flags & IFF_BROADCAST) != 0
 			&& domain->address_module->equal_addresses(interface->destination,
 				address)) {
 			matchedType = MSG_BCAST;
@@ -444,17 +442,57 @@ datalink_is_local_address(net_domain* _domain, const struct sockaddr* address,
 		}
 	}
 
-	if (interface == NULL) {
-		interface = fallback;
-		if (interface == NULL)
-			return false;
-	}
+	if (interface == NULL)
+		return false;
 
 	if (_interface != NULL)
 		*_interface = interface;
 	if (_matchedType != NULL)
 		*_matchedType = matchedType;
 	return true;
+}
+
+
+/*!	Tests if \a address is a local link address in the domain.
+
+	\param unconfigured only unconfigured interfaces are taken into account.
+	\param _interface will be set to the interface belonging to that address
+		if non-NULL.
+*/
+bool
+datalink_is_local_link_address(net_domain* _domain, bool unconfigured,
+	const struct sockaddr* address, net_interface** _interface)
+{
+	net_domain_private* domain = (net_domain_private*)_domain;
+	if (domain == NULL || address == NULL || address->sa_family != AF_LINK)
+		return false;
+
+	RecursiveLocker locker(domain->lock);
+
+	sockaddr_dl& linkAddress = *(sockaddr_dl*)address;
+	net_interface* interface = NULL;
+
+	while (true) {
+		interface = (net_interface*)list_get_next_item(
+			&domain->interfaces, interface);
+		if (interface == NULL)
+			break;
+
+		if (unconfigured && interface->address != NULL
+			&& (interface->flags & IFF_CONFIGURING) == 0)
+			continue;
+
+		if (linkAddress.sdl_alen == interface->device->address.length
+			&& memcmp(LLADDR(&linkAddress), interface->device->address.data,
+				linkAddress.sdl_alen) == 0) {
+			// link address matches
+			if (_interface != NULL)
+				*_interface = interface;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
@@ -859,6 +897,7 @@ net_datalink_module_info gNetDatalinkModule = {
 	datalink_send_data,
 	datalink_send_datagram,
 	datalink_is_local_address,
+	datalink_is_local_link_address,
 	datalink_get_interface,
 	datalink_get_interface_with_address,
 
