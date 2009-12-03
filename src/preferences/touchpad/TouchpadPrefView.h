@@ -15,6 +15,7 @@
 #include <Invoker.h>
 #include <Slider.h>
 #include <View.h>
+#include <GroupView.h>
 
 #include "TouchpadPref.h"
 #include "touchpad_settings.h"
@@ -78,9 +79,9 @@ private:
 };
 
 
-class TouchpadPrefView : public BView {
+class TouchpadPrefView : public BGroupView {
 public:
-							TouchpadPrefView(BRect frame, const char* name);
+							TouchpadPrefView();
 	virtual					~TouchpadPrefView();
 	virtual	void			MessageReceived(BMessage* msg);
 	virtual void			AttachedToWindow();

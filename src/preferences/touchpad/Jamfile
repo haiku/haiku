@@ -2,10 +2,18 @@ SubDir HAIKU_TOP src preferences touchpad ;
 
 UsePrivateHeaders input ;
 
-Preference Touchpad : 
+Preference Touchpad :
 	TouchpadPref.cpp
 	TouchpadPrefView.cpp
 	main.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++) liblocale.so
 	: Touchpad.rdef
+	;
+
+DoCatalogs Touchpad :
+	x-vnd.Haiku-Appearance
+	:
+	TouchpadPrefView.cpp
+	main.cpp
+	: en.catalog
 	;

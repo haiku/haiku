@@ -1,0 +1,18 @@
+1	english	x-vnd.Haiku-Touchpad	363566569
+Scrolling	TouchpadPrefView		Scrolling
+Revert	TouchpadPrefView		Revert
+Two Finger Scrolling	TouchpadPrefView		Two Finger Scrolling
+Defaults	TouchpadPrefView		Defaults
+Slow	TouchpadPrefView		Slow
+Tap Gesture	TouchpadPrefView		Tap Gesture
+Tap Click Sensitivity	TouchpadPrefView		Tap Click Sensitivity
+High	TouchpadPrefView		High
+Horizontal Scroll Step Size	TouchpadPrefView		Horizontal Scroll Step Size
+Wide	TouchpadPrefView		Wide
+Fast	TouchpadPrefView		Fast
+Vertical Scroll Step Size	TouchpadPrefView		Vertical Scroll Step Size
+Off	TouchpadPrefView		Off
+Small	TouchpadPrefView		Small
+Scroll Acceleration	TouchpadPrefView		Scroll Acceleration
+Touchpad	TouchpadMain		Touchpad
+Horizontal Scrolling	TouchpadPrefView		Horizontal Scrolling
