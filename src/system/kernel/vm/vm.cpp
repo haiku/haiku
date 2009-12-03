@@ -281,7 +281,7 @@ static inline void
 set_area_page_protection(VMArea* area, addr_t pageAddress, uint32 protection)
 {
 	protection &= B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA;
-	uint32 pageIndex = (pageAddress - area->base) / B_PAGE_SIZE;
+	uint32 pageIndex = (pageAddress - area->Base()) / B_PAGE_SIZE;
 	uint8& entry = area->page_protections[pageIndex / 2];
 	if (pageIndex % 2 == 0)
 		entry = (entry & 0xf0) | protection;
@@ -296,7 +296,7 @@ get_area_page_protection(VMArea* area, addr_t pageAddress)
 	if (area->page_protections == NULL)
 		return area->protection;
 
-	uint32 pageIndex = (pageAddress - area->base) / B_PAGE_SIZE;
+	uint32 pageIndex = (pageAddress - area->Base()) / B_PAGE_SIZE;
 	uint32 protection = area->page_protections[pageIndex / 2];
 	if (pageIndex % 2 == 0)
 		protection &= 0x0f;
@@ -320,12 +320,12 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	addr_t lastAddress, VMArea** _secondArea, bool kernel)
 {
 	// Does the cut range intersect with the area at all?
-	addr_t areaLast = area->base + (area->size - 1);
-	if (area->base > lastAddress || areaLast < address)
+	addr_t areaLast = area->Base() + (area->Size() - 1);
+	if (area->Base() > lastAddress || areaLast < address)
 		return B_OK;
 
 	// Is the area fully covered?
-	if (area->base >= address && areaLast <= lastAddress) {
+	if (area->Base() >= address && areaLast <= lastAddress) {
 		delete_area(addressSpace, area);
 		return B_OK;
 	}
@@ -335,10 +335,10 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 	// Cut the end only?
 	if (areaLast <= lastAddress) {
-		addr_t newSize = address - area->base;
+		addr_t newSize = address - area->Base();
 
 		// unmap pages
-		vm_unmap_pages(area, address, area->size - newSize, false);
+		vm_unmap_pages(area, address, area->Size() - newSize, false);
 
 		// If no one else uses the area's cache, we can resize it, too.
 		if (cache->areas == area && area->cache_next == NULL
@@ -348,24 +348,24 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 				return error;
 		}
 
-		area->size = newSize;
+		area->SetSize(newSize);
 
 		return B_OK;
 	}
 
 	// Cut the beginning only?
-	if (area->base >= address) {
+	if (area->Base() >= address) {
 		addr_t newBase = lastAddress + 1;
 		addr_t newSize = areaLast - lastAddress;
 
 		// unmap pages
-		vm_unmap_pages(area, area->base, newBase - area->base, false);
+		vm_unmap_pages(area, area->Base(), newBase - area->Base(), false);
 
 		// TODO: If no one else uses the area's cache, we should resize it, too!
 
-		area->cache_offset += newBase - area->base;
-		area->base = newBase;
-		area->size = newSize;
+		area->cache_offset += newBase - area->Base();
+		area->SetBase(newBase);
+		area->SetSize(newSize);
 
 		return B_OK;
 	}
@@ -374,16 +374,16 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	// We do that by shrinking the area to the begin section and creating a
 	// new area for the end section.
 
-	addr_t firstNewSize = address - area->base;
+	addr_t firstNewSize = address - area->Base();
 	addr_t secondBase = lastAddress + 1;
 	addr_t secondSize = areaLast - lastAddress;
 
 	// unmap pages
-	vm_unmap_pages(area, address, area->size - firstNewSize, false);
+	vm_unmap_pages(area, address, area->Size() - firstNewSize, false);
 
 	// resize the area
-	addr_t oldSize = area->size;
-	area->size = firstNewSize;
+	addr_t oldSize = area->Size();
+	area->SetSize(firstNewSize);
 
 	// TODO: If no one else uses the area's cache, we might want to create a
 	// new cache for the second area, transfer the concerned pages from the
@@ -393,11 +393,11 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	VMArea* secondArea;
 	void* secondBaseAddress = (void*)secondBase;
 	status_t error = map_backing_store(addressSpace, cache, &secondBaseAddress,
-		area->cache_offset + (secondBase - area->base), secondSize,
+		area->cache_offset + (secondBase - area->Base()), secondSize,
 		B_EXACT_ADDRESS, area->wiring, area->protection, REGION_NO_PRIVATE_MAP,
 		&secondArea, area->name, false, kernel);
 	if (error != B_OK) {
-		area->size = oldSize;
+		area->SetSize(oldSize);
 		return error;
 	}
 
@@ -452,8 +452,8 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 		for (VMAddressSpace::Iterator it = addressSpace->GetIterator();
 				VMArea* area = it.Next();) {
 			if (area->id != RESERVED_AREA_ID) {
-				addr_t areaLast = area->base + (area->size - 1);
-				if (area->base < lastAddress && address < areaLast) {
+				addr_t areaLast = area->Base() + (area->Size() - 1);
+				if (area->Base() < lastAddress && address < areaLast) {
 					if ((area->protection & B_KERNEL_AREA) != 0)
 						return B_NOT_ALLOWED;
 				}
@@ -464,8 +464,8 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 	for (VMAddressSpace::Iterator it = addressSpace->GetIterator();
 			VMArea* area = it.Next();) {
 		if (area->id != RESERVED_AREA_ID) {
-			addr_t areaLast = area->base + (area->size - 1);
-			if (area->base < lastAddress && address < areaLast) {
+			addr_t areaLast = area->Base() + (area->Size() - 1);
+			if (area->Base() < lastAddress && address < areaLast) {
 				status_t error = cut_area(addressSpace, area, address,
 					lastAddress, NULL, kernel);
 				if (error != B_OK)
@@ -652,9 +652,9 @@ vm_unreserve_address_range(team_id team, void* address, addr_t size)
 	for (VMAddressSpace::Iterator it = locker.AddressSpace()->GetIterator();
 			VMArea* area = it.Next();) {
 		// the area must be completely part of the reserved range
-		if (area->base + (area->size - 1) > endAddress)
+		if (area->Base() + (area->Size() - 1) > endAddress)
 			break;
-		if (area->id == RESERVED_AREA_ID && area->base >= (addr_t)address) {
+		if (area->id == RESERVED_AREA_ID && area->Base() >= (addr_t)address) {
 			// remove reserved range
 			locker.AddressSpace()->RemoveArea(area);
 			locker.AddressSpace()->Put();
@@ -697,7 +697,7 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 
 	// the area is now reserved!
 
-	area->cache_offset = area->base;
+	area->cache_offset = area->Base();
 		// we cache the original base address here
 
 	locker.AddressSpace()->Get();
@@ -897,15 +897,15 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			// Allocate and map all pages for this area
 
 			off_t offset = 0;
-			for (addr_t address = area->base;
-					address < area->base + (area->size - 1);
+			for (addr_t address = area->Base();
+					address < area->Base() + (area->Size() - 1);
 					address += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
 #ifdef DEBUG_KERNEL_STACKS
 #	ifdef STACK_GROWS_DOWNWARDS
-				if (isStack && address < area->base + KERNEL_STACK_GUARD_PAGES
-						* B_PAGE_SIZE)
+				if (isStack && address < area->Base()
+						+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
 #	else
-				if (isStack && address >= area->base + area->size
+				if (isStack && address >= area->Base() + area->Size()
 						- KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE)
 #	endif
 					continue;
@@ -939,9 +939,9 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 
 			map->ops->lock(map);
 
-			for (addr_t virtualAddress = area->base; virtualAddress < area->base
-					+ (area->size - 1); virtualAddress += B_PAGE_SIZE,
-					offset += B_PAGE_SIZE) {
+			for (addr_t virtualAddress = area->Base();
+					virtualAddress < area->Base() + (area->Size() - 1);
+					virtualAddress += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
 				addr_t physicalAddress;
 				uint32 flags;
 				status = map->ops->query(map, virtualAddress,
@@ -971,13 +971,13 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			// just map them in the address space
 			vm_translation_map* map = &addressSpace->TranslationMap();
 			addr_t physicalAddress = page->physical_page_number * B_PAGE_SIZE;
-			addr_t virtualAddress = area->base;
+			addr_t virtualAddress = area->Base();
 			off_t offset = 0;
 
 			map->ops->lock(map);
 
-			for (virtualAddress = area->base; virtualAddress < area->base
-					+ (area->size - 1); virtualAddress += B_PAGE_SIZE,
+			for (virtualAddress = area->Base(); virtualAddress < area->Base()
+					+ (area->Size() - 1); virtualAddress += B_PAGE_SIZE,
 					offset += B_PAGE_SIZE, physicalAddress += B_PAGE_SIZE) {
 				page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 				if (page == NULL)
@@ -1094,14 +1094,14 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 		// make sure our area is mapped in completely
 
 		vm_translation_map* map = &locker.AddressSpace()->TranslationMap();
-		size_t reservePages = map->ops->map_max_pages_need(map, area->base,
-			area->base + (size - 1));
+		size_t reservePages = map->ops->map_max_pages_need(map, area->Base(),
+			area->Base() + (size - 1));
 
 		vm_page_reserve_pages(reservePages);
 		map->ops->lock(map);
 
 		for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
-			map->ops->map(map, area->base + offset, physicalAddress + offset,
+			map->ops->map(map, area->Base() + offset, physicalAddress + offset,
 				protection);
 		}
 
@@ -1179,8 +1179,8 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 		return result;
 
 	vm_translation_map* map = &locker.AddressSpace()->TranslationMap();
-	size_t reservePages = map->ops->map_max_pages_need(map, area->base,
-		area->base + (size - 1));
+	size_t reservePages = map->ops->map_max_pages_need(map, area->Base(),
+		area->Base() + (size - 1));
 
 	vm_page_reserve_pages(reservePages);
 	map->ops->lock(map);
@@ -1196,7 +1196,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 		if (vecIndex >= vecCount)
 			break;
 
-		map->ops->map(map, area->base + offset,
+		map->ops->map(map, area->Base() + offset,
 			(addr_t)vecs[vecIndex].iov_base + vecOffset, protection);
 
 		vecOffset += B_PAGE_SIZE;
@@ -1269,10 +1269,10 @@ vm_create_vnode_cache(struct vnode* vnode, struct VMCache** cache)
 static void
 pre_map_area_pages(VMArea* area, VMCache* cache)
 {
-	addr_t baseAddress = area->base;
+	addr_t baseAddress = area->Base();
 	addr_t cacheOffset = area->cache_offset;
 	page_num_t firstPage = cacheOffset / B_PAGE_SIZE;
-	page_num_t endPage = firstPage + area->size / B_PAGE_SIZE;
+	page_num_t endPage = firstPage + area->Size() / B_PAGE_SIZE;
 
 	for (VMCachePagesTree::Iterator it
 				= cache->pages.GetIterator(firstPage, true, true);
@@ -1531,7 +1531,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 		status = B_NOT_ALLOWED;
 	else {
 		status = map_backing_store(targetAddressSpace, cache, address,
-			sourceArea->cache_offset, sourceArea->size, addressSpec,
+			sourceArea->cache_offset, sourceArea->Size(), addressSpec,
 			sourceArea->wiring, protection, mapping, &newArea, name, false,
 			kernel);
 	}
@@ -1552,21 +1552,21 @@ vm_clone_area(team_id team, const char* name, void** address,
 
 			addr_t physicalAddress;
 			uint32 oldProtection;
-			map->ops->query(map, sourceArea->base, &physicalAddress,
+			map->ops->query(map, sourceArea->Base(), &physicalAddress,
 				&oldProtection);
 
 			map->ops->unlock(map);
 
 			map = &targetAddressSpace->TranslationMap();
 			size_t reservePages = map->ops->map_max_pages_need(map,
-				newArea->base, newArea->base + (newArea->size - 1));
+				newArea->Base(), newArea->Base() + (newArea->Size() - 1));
 
 			vm_page_reserve_pages(reservePages);
 			map->ops->lock(map);
 
-			for (addr_t offset = 0; offset < newArea->size;
+			for (addr_t offset = 0; offset < newArea->Size();
 					offset += B_PAGE_SIZE) {
-				map->ops->map(map, newArea->base + offset,
+				map->ops->map(map, newArea->Base() + offset,
 					physicalAddress + offset, protection);
 			}
 
@@ -1575,13 +1575,13 @@ vm_clone_area(team_id team, const char* name, void** address,
 		} else {
 			vm_translation_map* map = &targetAddressSpace->TranslationMap();
 			size_t reservePages = map->ops->map_max_pages_need(map,
-				newArea->base, newArea->base + (newArea->size - 1));
+				newArea->Base(), newArea->Base() + (newArea->Size() - 1));
 			vm_page_reserve_pages(reservePages);
 
 			// map in all pages from source
 			for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 					vm_page* page  = it.Next();) {
-				vm_map_page(newArea, page, newArea->base
+				vm_map_page(newArea, page, newArea->Base()
 					+ ((page->cache_offset << PAGE_SHIFT)
 					- newArea->cache_offset), protection);
 			}
@@ -1610,7 +1610,7 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area)
 	// still exists in the area list.
 
 	// Unmap the virtual address space the area occupied
-	vm_unmap_pages(area, area->base, area->size, !area->cache->temporary);
+	vm_unmap_pages(area, area->Base(), area->Size(), !area->cache->temporary);
 
 	if (!area->cache->temporary)
 		area->cache->WriteModified();
@@ -1706,8 +1706,8 @@ vm_copy_on_write_area(VMCache* lowerCache)
 
 		vm_translation_map* map = &tempArea->address_space->TranslationMap();
 		map->ops->lock(map);
-		map->ops->protect(map, tempArea->base,
-			tempArea->base - 1 + tempArea->size, protection);
+		map->ops->protect(map, tempArea->Base(),
+			tempArea->Base() - 1 + tempArea->Size(), protection);
 		map->ops->unlock(map);
 	}
 
@@ -1748,7 +1748,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 
 	if (addressSpec == B_CLONE_ADDRESS) {
 		addressSpec = B_EXACT_ADDRESS;
-		*_address = (void*)source->base;
+		*_address = (void*)source->Base();
 	}
 
 	bool sharedArea = (source->protection & B_SHARED_AREA) != 0;
@@ -1758,7 +1758,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 
 	VMArea* target;
 	status = map_backing_store(targetAddressSpace, cache, _address,
-		source->cache_offset, source->size, addressSpec, source->wiring,
+		source->cache_offset, source->Size(), addressSpec, source->wiring,
 		protection, sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
 		&target, name, false, true);
 	if (status < B_OK)
@@ -1880,7 +1880,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 
 				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 						vm_page* page = it.Next();) {
-					addr_t address = area->base
+					addr_t address = area->Base()
 						+ (page->cache_offset << PAGE_SHIFT);
 					map->ops->protect(map, address, address - 1 + B_PAGE_SIZE,
 						newProtection);
@@ -1899,8 +1899,8 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 
 		if (changePageProtection) {
 			map->ops->lock(map);
-			map->ops->protect(map, area->base, area->base - 1 + area->size,
-				newProtection);
+			map->ops->protect(map,
+				area->Base(), area->Base() - 1 + area->Size(), newProtection);
 			map->ops->unlock(map);
 		}
 
@@ -1930,7 +1930,7 @@ vm_get_page_mapping(team_id team, addr_t vaddr, addr_t* paddr)
 static inline addr_t
 virtual_page_address(VMArea* area, vm_page* page)
 {
-	return area->base
+	return area->Base()
 		+ ((page->cache_offset << PAGE_SHIFT) - area->cache_offset);
 }
 
@@ -2191,7 +2191,7 @@ vm_unmap_pages(VMArea* area, addr_t base, size_t size, bool preserveModified)
 	map->ops->unlock(map);
 
 	if (area->wiring == B_NO_LOCK) {
-		uint32 startOffset = (area->cache_offset + base - area->base)
+		uint32 startOffset = (area->cache_offset + base - area->Base())
 			>> PAGE_SHIFT;
 		uint32 endOffset = startOffset + (size >> PAGE_SHIFT);
 		vm_page_mapping* mapping;
@@ -2711,7 +2711,8 @@ dump_cache(int argc, char** argv)
 
 	for (VMArea* area = cache->areas; area != NULL; area = area->cache_next) {
 		kprintf("    area 0x%lx, %s\n", area->id, area->name);
-		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->base, area->size);
+		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->Base(),
+			area->Size());
 		kprintf("\tprotection: 0x%lx\n", area->protection);
 		kprintf("\towner:      0x%lx\n", area->address_space->ID());
 	}
@@ -2752,8 +2753,8 @@ dump_area_struct(VMArea* area, bool mappings)
 	kprintf("name:\t\t'%s'\n", area->name);
 	kprintf("owner:\t\t0x%lx\n", area->address_space->ID());
 	kprintf("id:\t\t0x%lx\n", area->id);
-	kprintf("base:\t\t0x%lx\n", area->base);
-	kprintf("size:\t\t0x%lx\n", area->size);
+	kprintf("base:\t\t0x%lx\n", area->Base());
+	kprintf("size:\t\t0x%lx\n", area->Size());
 	kprintf("protection:\t0x%lx\n", area->protection);
 	kprintf("wiring:\t\t0x%x\n", area->wiring);
 	kprintf("memory_type:\t0x%x\n", area->memory_type);
@@ -2833,8 +2834,8 @@ dump_area(int argc, char** argv)
 			if (((mode & 4) != 0 && area->name != NULL
 					&& !strcmp(argv[index], area->name))
 				|| (num != 0 && (((mode & 1) != 0 && (addr_t)area->id == num)
-					|| (((mode & 2) != 0 && area->base <= num
-						&& area->base + area->size > num))))) {
+					|| (((mode & 2) != 0 && area->Base() <= num
+						&& area->Base() + area->Size() > num))))) {
 				dump_area_struct(area, mappings);
 				found = true;
 			}
@@ -2870,8 +2871,8 @@ dump_area_list(int argc, char** argv)
 			continue;
 
 		kprintf("%p %5lx  %p\t%p %4lx\t%4d  %s\n", area, area->id,
-			(void*)area->base, (void*)area->size, area->protection, area->wiring,
-			area->name);
+			(void*)area->Base(), (void*)area->Size(), area->protection,
+			area->wiring, area->name);
 	}
 	return 0;
 }
@@ -2985,8 +2986,8 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 
 	for (VMAddressSpace::Iterator it = VMAddressSpace::Kernel()->GetIterator();
 			VMArea* area = it.Next();) {
-		addr_t areaStart = area->base;
-		addr_t areaEnd = areaStart + (area->size - 1);
+		addr_t areaStart = area->Base();
+		addr_t areaEnd = areaStart + (area->Size() - 1);
 
 		if (area->id == RESERVED_AREA_ID || areaEnd < start)
 			continue;
@@ -3510,7 +3511,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 				thread->name, thread->id, thread->team->name, thread->team->id,
 				isWrite ? "write" : "read", address, faultAddress,
 				area ? area->name : "???",
-				faultAddress - (area ? area->base : 0x0));
+				faultAddress - (area ? area->Base() : 0x0));
 
 			// We can print a stack trace of the userland thread here.
 // TODO: The user_memcpy() below can cause a deadlock, if it causes a page
@@ -3556,7 +3557,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 						(addr_t)frame.return_address);
 					if (area) {
 						dprintf(" (%s + %#lx)", area->name,
-							(addr_t)frame.return_address - area->base);
+							(addr_t)frame.return_address - area->Base());
 					}
 					dprintf("\n");
 
@@ -3899,7 +3900,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 		// At first, the top most cache from the area is investigated.
 
 		context.Prepare(vm_area_get_locked_cache(area),
-			address - area->base + area->cache_offset);
+			address - area->Base() + area->cache_offset);
 
 		// See if this cache has a fault handler -- this will do all the work
 		// for us.
@@ -4155,8 +4156,8 @@ fill_area_info(struct VMArea* area, area_info* info, size_t size)
 {
 	strlcpy(info->name, area->name, B_OS_NAME_LENGTH);
 	info->area = area->id;
-	info->address = (void*)area->base;
-	info->size = area->size;
+	info->address = (void*)area->Base();
+	info->size = area->Size();
 	info->protection = area->protection;
 	info->lock = B_FULL_LOCK;
 	info->team = area->address_space->ID();
@@ -4228,7 +4229,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 		// TODO: Enforce all restrictions (team, etc.)!
 	}
 
-	size_t oldSize = area->size;
+	size_t oldSize = area->Size();
 	if (newSize == oldSize)
 		return B_OK;
 
@@ -4243,15 +4244,15 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 		for (VMArea* current = cache->areas; current != NULL;
 				current = current->cache_next) {
 			VMArea* next = current->address_space->NextArea(current);
-			if (next != NULL && next->base <= (current->base + newSize)) {
+			if (next != NULL && next->Base() <= (current->Base() + newSize)) {
 				// If the area was created inside a reserved area, it can
 				// also be resized in that area
 				// TODO: if there is free space after the reserved area, it could
 				// be used as well...
 				if (next->id == RESERVED_AREA_ID
-					&& next->cache_offset <= current->base
-					&& next->base - 1 + next->size
-						>= current->base - 1 + newSize)
+					&& next->cache_offset <= current->Base()
+					&& next->Base() - 1 + next->Size()
+						>= current->Base() - 1 + newSize)
 					continue;
 
 				return B_ERROR;
@@ -4271,18 +4272,19 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 	for (VMArea* current = cache->areas; current != NULL;
 			current = current->cache_next) {
 		VMArea* next = current->address_space->NextArea(current);
-		if (next != NULL && next->base <= (current->base + newSize)) {
+		if (next != NULL && next->Base() <= (current->Base() + newSize)) {
 			if (next->id == RESERVED_AREA_ID
-				&& next->cache_offset <= current->base
-				&& next->base - 1 + next->size >= current->base - 1 + newSize) {
+				&& next->cache_offset <= current->Base()
+				&& next->Base() - 1 + next->Size()
+					>= current->Base() - 1 + newSize) {
 				// resize reserved area
-				addr_t offset = current->base + newSize - next->base;
-				if (next->size <= offset) {
+				addr_t offset = current->Base() + newSize - next->Base();
+				if (next->Size() <= offset) {
 					next->address_space->RemoveArea(next);
 					free(next);
 				} else {
-					next->size -= offset;
-					next->base += offset;
+					next->SetSize(next->Size() - offset);
+					next->SetBase(next->Base() + offset);
 				}
 			} else {
 				panic("resize situation for area %p has changed although we "
@@ -4292,12 +4294,12 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 			}
 		}
 
-		current->size = newSize;
+		current->SetSize(newSize);
 
 		// We also need to unmap all pages beyond the new size, if the area has
 		// shrinked
 		if (newSize < oldSize) {
-			vm_unmap_pages(current, current->base + newSize, oldSize - newSize,
+			vm_unmap_pages(current, current->Base() + newSize, oldSize - newSize,
 				false);
 		}
 	}
@@ -4310,7 +4312,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 		// This shouldn't really be possible, but hey, who knows
 		for (VMArea* current = cache->areas; current != NULL;
 				current = current->cache_next) {
-			current->size = oldSize;
+			current->SetSize(oldSize);
 		}
 
 		cache->Resize(cache->virtual_base + oldSize);
@@ -4777,7 +4779,7 @@ _get_next_area_info(team_id team, int32* cookie, area_info* info, size_t size)
 		if (area->id == RESERVED_AREA_ID)
 			continue;
 
-		if (area->base > nextBase)
+		if (area->Base() > nextBase)
 			break;
 	}
 
@@ -4787,7 +4789,7 @@ _get_next_area_info(team_id team, int32* cookie, area_info* info, size_t size)
 	}
 
 	fill_area_info(area, info, size);
-	*cookie = (int32)(area->base);
+	*cookie = (int32)(area->Base());
 
 	return B_OK;
 }
@@ -5259,8 +5261,8 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 		// protections are compatible with the file permissions. We don't have
 		// a way to do that yet, though.
 
-		addr_t offset = currentAddress - area->base;
-		size_t rangeSize = min_c(area->size - offset, sizeLeft);
+		addr_t offset = currentAddress - area->Base();
+		size_t rangeSize = min_c(area->Size() - offset, sizeLeft);
 
 		currentAddress += rangeSize;
 		sizeLeft -= rangeSize;
@@ -5276,8 +5278,8 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 		if (area == NULL)
 			return B_NO_MEMORY;
 
-		addr_t offset = currentAddress - area->base;
-		size_t rangeSize = min_c(area->size - offset, sizeLeft);
+		addr_t offset = currentAddress - area->Base();
+		size_t rangeSize = min_c(area->Size() - offset, sizeLeft);
 
 		currentAddress += rangeSize;
 		sizeLeft -= rangeSize;
@@ -5288,7 +5290,7 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 
 			// In the page protections we store only the three user protections,
 			// so we use 4 bits per page.
-			uint32 bytes = (area->size / B_PAGE_SIZE + 1) / 2;
+			uint32 bytes = (area->Size() / B_PAGE_SIZE + 1) / 2;
 			area->page_protections = (uint8*)malloc(bytes);
 			if (area->page_protections == NULL)
 				return B_NO_MEMORY;
@@ -5300,7 +5302,7 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 				areaProtection | (areaProtection << 4), bytes);
 		}
 
-		for (addr_t pageAddress = area->base + offset;
+		for (addr_t pageAddress = area->Base() + offset;
 				pageAddress < currentAddress; pageAddress += B_PAGE_SIZE) {
 			map->ops->lock(map);
 
@@ -5384,8 +5386,8 @@ _user_sync_memory(void* _address, size_t size, int flags)
 		if (area == NULL)
 			return B_NO_MEMORY;
 
-		uint32 offset = address - area->base;
-		size_t rangeSize = min_c(area->size - offset, size);
+		uint32 offset = address - area->Base();
+		size_t rangeSize = min_c(area->Size() - offset, size);
 		offset += area->cache_offset;
 
 		// lock the cache

@@ -46,8 +46,8 @@ VMArea::Create(VMAddressSpace* addressSpace, const char* name,
 	strlcpy(area->name, name, length);
 
 	area->id = atomic_add(&sNextAreaID, 1);
-	area->base = 0;
-	area->size = 0;
+	area->fBase = 0;
+	area->fSize = 0;
 	area->protection = protection;
 	area->wiring = wiring;
 	area->memory_type = 0;

@@ -337,8 +337,8 @@ VMAddressSpace::InsertArea(void** _address, uint32 addressSpec, addr_t size,
 
 	status = _InsertAreaSlot(searchBase, size, searchEnd, addressSpec, area);
 	if (status == B_OK) {
-		*_address = (void*)area->base;
-		fFreeSpace -= area->size;
+		*_address = (void*)area->Base();
+		fFreeSpace -= area->Size();
 	}
 
 	return status;
@@ -353,7 +353,7 @@ VMAddressSpace::RemoveArea(VMArea* area)
 
 	if (area->id != RESERVED_AREA_ID) {
 		IncrementChangeCount();
-		fFreeSpace += area->size;
+		fFreeSpace += area->Size();
 
 		if (area == fAreaHint)
 			fAreaHint = NULL;
@@ -379,8 +379,8 @@ VMAddressSpace::Dump() const
 	for (VMAddressSpaceAreaList::ConstIterator it = fAreas.GetIterator();
 			VMArea* area = it.Next();) {
 		kprintf(" area 0x%lx: ", area->id);
-		kprintf("base_addr = 0x%lx ", area->base);
-		kprintf("size = 0x%lx ", area->size);
+		kprintf("base_addr = 0x%lx ", area->Base());
+		kprintf("size = 0x%lx ", area->Size());
 		kprintf("name = '%s' ", area->name);
 		kprintf("protection = 0x%lx\n", area->protection);
 	}
@@ -399,8 +399,8 @@ VMAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 
 	for (VMAddressSpaceAreaList::Iterator it = fAreas.GetIterator();
 			(next = it.Next()) != NULL;) {
-		if (next->base <= start
-			&& next->base + (next->size - 1) >= start + (size - 1)) {
+		if (next->Base() <= start
+			&& next->Base() + (next->Size() - 1) >= start + (size - 1)) {
 			// This area covers the requested range
 			if (next->id != RESERVED_AREA_ID) {
 				// but it's not reserved space, it's a real area
@@ -418,26 +418,26 @@ VMAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 	// range to the new area - and remove, resize or split the old
 	// reserved area.
 
-	if (start == next->base) {
+	if (start == next->Base()) {
 		// the area starts at the beginning of the reserved range
 		fAreas.Insert(next, area);
 
-		if (size == next->size) {
+		if (size == next->Size()) {
 			// the new area fully covers the reversed range
 			fAreas.Remove(next);
 			Put();
 			free(next);
 		} else {
 			// resize the reserved range behind the area
-			next->base += size;
-			next->size -= size;
+			next->SetBase(next->Base() + size);
+			next->SetSize(next->Size() - size);
 		}
-	} else if (start + size == next->base + next->size) {
+	} else if (start + size == next->Base() + next->Size()) {
 		// the area is at the end of the reserved range
 		fAreas.Insert(fAreas.GetNext(next), area);
 
 		// resize the reserved range before the area
-		next->size = start - next->base;
+		next->SetSize(start - next->Base());
 	} else {
 		// the area splits the reserved range into two separate ones
 		// we need a new reserved area to cover this space
@@ -450,14 +450,14 @@ VMAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 		fAreas.Insert(reserved, area);
 
 		// resize regions
-		reserved->size = next->base + next->size - start - size;
-		next->size = start - next->base;
-		reserved->base = start + size;
+		reserved->SetSize(next->Base() + next->Size() - start - size);
+		next->SetSize(start - next->Base());
+		reserved->SetBase(start + size);
 		reserved->cache_offset = next->cache_offset;
 	}
 
-	area->base = start;
-	area->size = size;
+	area->SetBase(start);
+	area->SetSize(size);
 	IncrementChangeCount();
 
 	return B_OK;
@@ -506,7 +506,7 @@ VMAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 second_chance:
 	VMAddressSpaceAreaList::Iterator it = fAreas.GetIterator();
 	while ((next = it.Next()) != NULL) {
-		if (next->base > start + (size - 1)) {
+		if (next->Base() > start + (size - 1)) {
 			// we have a winner
 			break;
 		}
@@ -527,9 +527,9 @@ second_chance:
 				// see if we can build it at the beginning of the virtual map
 				addr_t alignedBase = ROUNDUP(fBase, alignment);
 				if (is_valid_spot(fBase, alignedBase, size,
-						next == NULL ? end : next->base)) {
+						next == NULL ? end : next->Base())) {
 					foundSpot = true;
-					area->base = alignedBase;
+					area->SetBase(alignedBase);
 					break;
 				}
 
@@ -539,12 +539,12 @@ second_chance:
 
 			// keep walking
 			while (next != NULL) {
-				addr_t alignedBase = ROUNDUP(last->base + last->size,
+				addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
 					alignment);
-				if (is_valid_spot(last->base + (last->size - 1), alignedBase,
-						size, next->base)) {
+				if (is_valid_spot(last->Base() + (last->Size() - 1),
+						alignedBase, size, next->Base())) {
 					foundSpot = true;
-					area->base = alignedBase;
+					area->SetBase(alignedBase);
 					break;
 				}
 
@@ -555,12 +555,13 @@ second_chance:
 			if (foundSpot)
 				break;
 
-			addr_t alignedBase = ROUNDUP(last->base + last->size, alignment);
-			if (is_valid_spot(last->base + (last->size - 1), alignedBase,
+			addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
+				alignment);
+			if (is_valid_spot(last->Base() + (last->Size() - 1), alignedBase,
 					size, end)) {
 				// got a spot
 				foundSpot = true;
-				area->base = alignedBase;
+				area->SetBase(alignedBase);
 				break;
 			} else if (area->id != RESERVED_AREA_ID) {
 				// We didn't find a free spot - if there are any reserved areas,
@@ -576,41 +577,42 @@ second_chance:
 
 					// TODO: take free space after the reserved area into
 					// account!
-					addr_t alignedBase = ROUNDUP(next->base, alignment);
-					if (next->base == alignedBase && next->size == size) {
+					addr_t alignedBase = ROUNDUP(next->Base(), alignment);
+					if (next->Base() == alignedBase && next->Size() == size) {
 						// The reserved area is entirely covered, and thus,
 						// removed
 						fAreas.Remove(next);
 
 						foundSpot = true;
-						area->base = alignedBase;
+						area->SetBase(alignedBase);
 						free(next);
 						break;
 					}
 
 					if ((next->protection & RESERVED_AVOID_BASE) == 0
-						&&  alignedBase == next->base && next->size >= size) {
+						&&  alignedBase == next->Base()
+						&& next->Size() >= size) {
 						// The new area will be placed at the beginning of the
 						// reserved area and the reserved area will be offset
 						// and resized
 						foundSpot = true;
-						next->base += size;
-						next->size -= size;
-						area->base = alignedBase;
+						next->SetBase(next->Base() + size);
+						next->SetSize(next->Size() - size);
+						area->SetBase(alignedBase);
 						break;
 					}
 
-					if (is_valid_spot(next->base, alignedBase, size,
-							next->base + (next->size - 1))) {
+					if (is_valid_spot(next->Base(), alignedBase, size,
+							next->Base() + (next->Size() - 1))) {
 						// The new area will be placed at the end of the
 						// reserved area, and the reserved area will be resized
 						// to make space
-						alignedBase = ROUNDDOWN(next->base + next->size - size,
-							alignment);
+						alignedBase = ROUNDDOWN(
+							next->Base() + next->Size() - size, alignment);
 
 						foundSpot = true;
-						next->size = alignedBase - next->base;
-						area->base = alignedBase;
+						next->SetSize(alignedBase - next->Base());
+						area->SetBase(alignedBase);
 						last = next;
 						break;
 					}
@@ -627,9 +629,9 @@ second_chance:
 			if (last == NULL) {
 				// see if we can build it at the beginning of the specified
 				// start
-				if (next == NULL || next->base > start + (size - 1)) {
+				if (next == NULL || next->Base() > start + (size - 1)) {
 					foundSpot = true;
-					area->base = start;
+					area->SetBase(start);
 					break;
 				}
 
@@ -639,7 +641,7 @@ second_chance:
 
 			// keep walking
 			while (next != NULL) {
-				if (next->base - (last->base + last->size) >= size) {
+				if (next->Base() - (last->Base() + last->Size()) >= size) {
 					// we found a spot (it'll be filled up below)
 					break;
 				}
@@ -648,14 +650,14 @@ second_chance:
 				next = it.Next();
 			}
 
-			addr_t lastEnd = last->base + (last->size - 1);
+			addr_t lastEnd = last->Base() + (last->Size() - 1);
 			if (next != NULL || end - lastEnd >= size) {
 				// got a spot
 				foundSpot = true;
 				if (lastEnd < start)
-					area->base = start;
+					area->SetBase(start);
 				else
-					area->base = lastEnd + 1;
+					area->SetBase(lastEnd + 1);
 				break;
 			}
 
@@ -669,10 +671,10 @@ second_chance:
 
 		case B_EXACT_ADDRESS:
 			// see if we can create it exactly here
-			if ((last == NULL || last->base + (last->size - 1) < start)
-				&& (next == NULL || next->base > start + (size - 1))) {
+			if ((last == NULL || last->Base() + (last->Size() - 1) < start)
+				&& (next == NULL || next->Base() > start + (size - 1))) {
 				foundSpot = true;
-				area->base = start;
+				area->SetBase(start);
 				break;
 			}
 			break;
@@ -683,7 +685,7 @@ second_chance:
 	if (!foundSpot)
 		return addressSpec == B_EXACT_ADDRESS ? B_BAD_VALUE : B_NO_MEMORY;
 
-	area->size = size;
+	area->SetSize(size);
 	if (last)
 		fAreas.Insert(fAreas.GetNext(last), area);
 	else
@@ -736,7 +738,7 @@ VMAddressSpace::_DumpListCommand(int argc, char** argv)
 			if (area->id != RESERVED_AREA_ID
 				&& area->cache->type != CACHE_TYPE_NULL) {
 				areaCount++;
-				areaSize += area->size;
+				areaSize += area->Size();
 			}
 		}
 		kprintf("%p  %6ld   %#010lx   %#10lx   %10ld   %10lld\n",

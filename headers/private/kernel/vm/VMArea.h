@@ -23,8 +23,6 @@ struct VMCache;
 struct VMArea {
 	char*					name;
 	area_id					id;
-	addr_t					base;
-	addr_t					size;
 	uint32					protection;
 	uint16					wiring;
 	uint16					memory_type;
@@ -41,9 +39,15 @@ struct VMArea {
 	struct VMArea*			cache_prev;
 	struct VMArea*			hash_next;
 
+			addr_t				Base() const	{ return fBase; }
+			size_t				Size() const	{ return fSize; }
+
+			void				SetBase(addr_t base)	{ fBase = base; }
+			void				SetSize(size_t size)	{ fSize = size; }
+
 			bool				ContainsAddress(addr_t address) const
-									{ return address >= base
-										&& address <= base + (size - 1); }
+									{ return address >= fBase
+										&& address <= fBase + (fSize - 1); }
 
 	static	VMArea*				Create(VMAddressSpace* addressSpace,
 									const char* name, uint32 wiring,
@@ -58,6 +62,8 @@ struct VMArea {
 
 private:
 			DoublyLinkedListLink<VMArea> fAddressSpaceLink;
+			addr_t				fBase;
+			size_t				fSize;
 };
 
 

@@ -662,5 +662,5 @@ arch_vm_set_memory_type(struct VMArea *area, addr_t physicalBase,
 	uint32 type)
 {
 	area->memory_type = type >> MEMORY_TYPE_SHIFT;
-	return add_memory_type_range(area->id, physicalBase, area->size, type);
+	return add_memory_type_range(area->id, physicalBase, area->Size(), type);
 }

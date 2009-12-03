@@ -1314,7 +1314,7 @@ public:
 			return B_ERROR;
 
 		// copy the runtime loader data structure
-		if (!_Read((runtime_loader_debug_area*)area->base, fDebugArea))
+		if (!_Read((runtime_loader_debug_area*)area->Base(), fDebugArea))
 			return B_BAD_ADDRESS;
 
 		return B_OK;

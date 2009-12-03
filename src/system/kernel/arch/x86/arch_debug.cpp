@@ -303,7 +303,7 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 		}
 		if (area != NULL) {
 			kprintf("%ld:%s@%p + %#lx\n", area->id, area->name,
-				(void*)area->base, eip - area->base);
+				(void*)area->Base(), eip - area->Base());
 		} else
 			kprintf("\n");
 	}
@@ -648,7 +648,7 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 			area = thread->team->address_space->LookupArea(eip);
 		if (area != NULL) {
 			kprintf("%ld:%s@%p + %#lx", area->id, area->name,
-				(void *)area->base, eip - area->base);
+				(void *)area->Base(), eip - area->Base());
 		}
 	}
 
