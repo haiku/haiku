@@ -7,4 +7,4 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iprowifi2100 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iprowifi2200 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iprowifi3945 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iprowifi4965 ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network wlan marv88w8363 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan marvell88w8363 ;
