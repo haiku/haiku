@@ -261,7 +261,7 @@ ConditionVariable::Wait(uint32 flags, bigtime_t timeout)
 }
 
 
-void
+/*static*/ void
 ConditionVariable::NotifyOne(const void* object, bool threadsLocked,
 	status_t result)
 {
@@ -275,7 +275,7 @@ ConditionVariable::NotifyOne(const void* object, bool threadsLocked,
 }
 
 
-void
+/*static*/ void
 ConditionVariable::NotifyAll(const void* object,
 	bool threadsLocked, status_t result)
 {

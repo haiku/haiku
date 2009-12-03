@@ -63,10 +63,10 @@ public:
 	inline	void				NotifyAll(bool threadsLocked = false,
 									status_t result = B_OK);
 
-	static void					NotifyOne(const void* object,
+	static	void				NotifyOne(const void* object,
 									bool threadsLocked = false,
 									status_t result = B_OK);
-	static void					NotifyAll(const void* object,
+	static	void				NotifyAll(const void* object,
 									bool threadsLocked = false,
 									status_t result = B_OK);
 									// (both methods) caller must ensure that
