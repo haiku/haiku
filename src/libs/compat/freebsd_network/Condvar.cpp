@@ -20,17 +20,6 @@ extern "C" {
 #define ticks_to_usecs(t) (1000000*((bigtime_t)t) / hz)
 
 
-status_t
-init_condition_variables()
-{
-	return B_OK;
-}
-
-
-void
-uninit_condition_variables() {}
-
-
 void
 conditionPublish(struct cv* variable, const void* waitChannel, 
 	const char* description)

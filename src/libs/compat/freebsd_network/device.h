@@ -64,9 +64,6 @@ void uninit_mutexes(void);
 status_t init_taskqueues(void);
 void uninit_taskqueues(void);
 
-status_t init_condition_variables(void);
-void uninit_condition_variables(void);
-
 status_t init_hard_clock(void);
 void uninit_hard_clock(void);
 
