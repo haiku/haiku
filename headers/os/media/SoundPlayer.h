@@ -16,7 +16,9 @@
 class BContinuousParameter;
 class BParameterWeb;
 class BSound;
-class _SoundPlayNode;
+namespace BPrivate {
+	class SoundPlayNode;
+}
 
 
 class sound_error : public std::exception {
@@ -155,10 +157,10 @@ private:
 									const media_raw_audio_format& format);
 
 private:
-	friend class _SoundPlayNode;
+	friend class BPrivate::SoundPlayNode;
 
-	struct _playing_sound {
-		_playing_sound*	next;
+	struct playing_sound {
+		playing_sound*	next;
 		off_t			current_offset;
 		BSound*			sound;
 		play_id			id;
@@ -168,8 +170,8 @@ private:
 		float			volume;
 	};
 
-	struct _waiting_sound {
-		_waiting_sound*	next;
+	struct waiting_sound {
+		waiting_sound*	next;
 		bigtime_t		start_time;
 		BSound*			sound;
 		play_id			id;
@@ -177,10 +179,10 @@ private:
 		float			volume;
 	};
 
-			_SoundPlayNode*		fPlayerNode;
+			BPrivate::SoundPlayNode* fPlayerNode;
 
-			_playing_sound*		fPlayingSounds;
-			_waiting_sound*		fWaitingSounds;
+			playing_sound*		fPlayingSounds;
+			waiting_sound*		fWaitingSounds;
 
 			BufferPlayerFunc	fPlayBufferFunc;
 			EventNotifierFunc	fNotifierFunc;

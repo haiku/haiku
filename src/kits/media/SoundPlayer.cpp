@@ -23,7 +23,6 @@
 
 #include "debug.h"
 
-#define atomic_read(a)	atomic_or(a, 0)
 
 // Flags used internally in BSoundPlayer
 enum {
@@ -293,10 +292,10 @@ BSoundPlayer::Latency()
 
 
 void
-BSoundPlayer::SetHasData(bool has_data)
+BSoundPlayer::SetHasData(bool hasData)
 {
 	CALLED();
-	if (has_data)
+	if (hasData)
 		atomic_or(&fFlags, F_HAS_DATA);
 	else
 		atomic_and(&fFlags, ~F_HAS_DATA);
@@ -307,7 +306,7 @@ bool
 BSoundPlayer::HasData()
 {
 	CALLED();
-	return (atomic_read(&fFlags) & F_HAS_DATA) != 0;
+	return (atomic_get(&fFlags) & F_HAS_DATA) != 0;
 }
 
 
@@ -445,7 +444,7 @@ BSoundPlayer::StartPlaying(BSound* sound, bigtime_t atTime, float withVolume)
 	CALLED();
 
 	// TODO: support the at_time and with_volume parameters
-	_playing_sound *item = (_playing_sound *)malloc(sizeof(_playing_sound));
+	playing_sound* item = (playing_sound*)malloc(sizeof(playing_sound));
 	if (item == NULL)
 		return B_NO_MEMORY;
 
@@ -478,7 +477,7 @@ BSoundPlayer::SetSoundVolume(play_id id, float newVolume)
 	if (!fLocker.Lock())
 		return B_ERROR;
 
-	_playing_sound *item = fPlayingSounds;
+	playing_sound *item = fPlayingSounds;
 	while (item) {
 		if (item->id == id) {
 			item->volume = newVolume;
@@ -501,7 +500,7 @@ BSoundPlayer::IsPlaying(play_id id)
 	if (!fLocker.Lock())
 		return B_ERROR;
 
-	_playing_sound *item = fPlayingSounds;
+	playing_sound *item = fPlayingSounds;
 	while (item) {
 		if (item->id == id) {
 			fLocker.Unlock();
@@ -523,8 +522,8 @@ BSoundPlayer::StopPlaying(play_id id)
 	if (!fLocker.Lock())
 		return B_ERROR;
 
-	_playing_sound** link = &fPlayingSounds;
-	_playing_sound* item = fPlayingSounds;
+	playing_sound** link = &fPlayingSounds;
+	playing_sound* item = fPlayingSounds;
 
 	while (item != NULL) {
 		if (item->id == id) {
@@ -557,7 +556,7 @@ BSoundPlayer::WaitForSound(play_id id)
 	if (!fLocker.Lock())
 		return B_ERROR;
 
-	_playing_sound* item = fPlayingSounds;
+	playing_sound* item = fPlayingSounds;
 	while (item != NULL) {
 		if (item->id == id) {
 			sem_id waitSem = item->wait_sem;
@@ -684,7 +683,7 @@ BSoundPlayer::_SoundPlayBufferFunc(void *cookie, void *buffer, size_t size,
 		return;
 	}
 
-	_playing_sound *sound = player->fPlayingSounds;
+	playing_sound *sound = player->fPlayingSounds;
 	if (sound == NULL) {
 		player->SetHasData(false);
 		player->fLocker.Unlock();
@@ -774,7 +773,7 @@ BSoundPlayer::_Init(const media_node* node,
 	media_format tryFormat;
 
 	// Create the player node and register it
-	fPlayerNode = new _SoundPlayNode(name, this);
+	fPlayerNode = new BPrivate::SoundPlayNode(name, this);
 	fInitStatus = roster->RegisterNode(fPlayerNode);
 	if (fInitStatus != B_OK) {
 		TRACE("BSoundPlayer::_Init: Couldn't RegisterNode: %s\n",
