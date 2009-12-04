@@ -49,7 +49,6 @@ VMUserAddressSpace::VMUserAddressSpace(team_id id, addr_t base, size_t size)
 
 VMUserAddressSpace::~VMUserAddressSpace()
 {
-	panic("deleting the kernel aspace!\n");
 }
 
 
