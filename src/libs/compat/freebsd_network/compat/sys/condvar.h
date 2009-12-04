@@ -8,9 +8,17 @@
 
 #include <sys/queue.h>
 
+#ifdef __cplusplus
+} /* extern "C" */
+#include <kernel_c++_structs.h>
+extern "C" {
+#else
+#include <kernel_c++_structs.h>
+#endif
+
 
 struct cv {
-	struct ConditionVariable* condition;
+	struct ConditionVariable condition;
 };
 
 

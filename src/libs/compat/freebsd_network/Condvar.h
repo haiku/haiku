@@ -12,10 +12,10 @@ extern "C" {
 
 void conditionInit(struct cv*, const char*);
 void conditionPublish(struct cv*, const void*, const char*);
-void conditionUnpublish(const struct cv*);
-int conditionTimedWait(const struct cv*, const int);
-void conditionWait(const struct cv*);
-void conditionNotifyOne(const struct cv*);
+void conditionUnpublish(struct cv*);
+int conditionTimedWait(struct cv*, const int);
+void conditionWait(struct cv*);
+void conditionNotifyOne(struct cv*);
 int publishedConditionTimedWait(const void*, const int);
 void publishedConditionNotifyAll(const void*);
 
