@@ -18,6 +18,8 @@
 
 struct VMAddressSpace;
 struct VMCache;
+struct VMKernelAddressSpace;
+struct VMUserAddressSpace;
 
 
 struct VMArea {
@@ -59,6 +61,8 @@ struct VMArea {
 
 private:
 			friend class VMAddressSpace;
+			friend class VMKernelAddressSpace;
+			friend class VMUserAddressSpace;
 
 private:
 			void				SetBase(addr_t base)	{ fBase = base; }
