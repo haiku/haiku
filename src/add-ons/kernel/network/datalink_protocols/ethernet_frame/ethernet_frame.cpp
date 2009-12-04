@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -122,7 +122,7 @@ ethernet_frame_send_data(net_datalink_protocol *protocol,
 	struct sockaddr_dl &source = *(struct sockaddr_dl *)buffer->source;
 	struct sockaddr_dl &destination = *(struct sockaddr_dl *)buffer->destination;
 
-	if (source.sdl_family != AF_DLI || source.sdl_type != IFT_ETHER)
+	if (source.sdl_family != AF_LINK || source.sdl_type != IFT_ETHER)
 		return B_ERROR;
 
 	NetBufferPrepend<ether_header> bufferHeader(buffer);

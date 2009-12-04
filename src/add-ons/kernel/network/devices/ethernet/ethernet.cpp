@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -384,12 +384,12 @@ ethernet_add_multicast(struct net_device *_device, const sockaddr *_address)
 {
 	ethernet_device *device = (ethernet_device *)_device;
 
-	if (_address->sa_family != AF_DLI)
-		return EINVAL;
+	if (_address->sa_family != AF_LINK)
+		return B_BAD_VALUE;
 
 	const sockaddr_dl *address = (const sockaddr_dl *)_address;
 	if (address->sdl_type != IFT_ETHER)
-		return EINVAL;
+		return B_BAD_VALUE;
 
 	return ioctl(device->fd, ETHER_ADDMULTI, LLADDR(address), 6);
 }
@@ -400,12 +400,12 @@ ethernet_remove_multicast(struct net_device *_device, const sockaddr *_address)
 {
 	ethernet_device *device = (ethernet_device *)_device;
 
-	if (_address->sa_family != AF_DLI)
-		return EINVAL;
+	if (_address->sa_family != AF_LINK)
+		return B_BAD_VALUE;
 
 	const sockaddr_dl *address = (const sockaddr_dl *)_address;
 	if (address->sdl_type != IFT_ETHER)
-		return EINVAL;
+		return B_BAD_VALUE;
 
 	return ioctl(device->fd, ETHER_REMMULTI, LLADDR(address), 6);
 }

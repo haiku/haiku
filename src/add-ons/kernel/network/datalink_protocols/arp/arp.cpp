@@ -327,7 +327,7 @@ ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
 	//   01-00-5E-00-00-00 (hex).''
 
 	destination->sdl_len = sizeof(sockaddr_dl);
-	destination->sdl_family = AF_DLI;
+	destination->sdl_family = AF_LINK;
 	destination->sdl_index = 0;
 	destination->sdl_type = IFT_ETHER;
 	destination->sdl_e_type = ETHER_TYPE_IP;
@@ -424,7 +424,7 @@ arp_update_local(arp_protocol *protocol)
 
 	sockaddr_dl address;
 	address.sdl_len = sizeof(sockaddr_dl);
-	address.sdl_family = AF_DLI;
+	address.sdl_family = AF_LINK;
 	address.sdl_type = IFT_ETHER;
 	address.sdl_e_type = ETHER_TYPE_IP;
 	address.sdl_nlen = 0;
@@ -703,7 +703,7 @@ arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address,
 	struct sockaddr_dl &source = *(struct sockaddr_dl *)
 		entry->request_buffer->source;
 	source.sdl_len = sizeof(sockaddr_dl);
-	source.sdl_family = AF_DLI;
+	source.sdl_family = AF_LINK;
 	source.sdl_index = device->index;
 	source.sdl_type = IFT_ETHER;
 	source.sdl_e_type = ETHER_TYPE_ARP;
@@ -742,7 +742,7 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 			sockaddr_dl hardwareAddress;
 
 			hardwareAddress.sdl_len = sizeof(sockaddr_dl);
-			hardwareAddress.sdl_family = AF_DLI;
+			hardwareAddress.sdl_family = AF_LINK;
 			hardwareAddress.sdl_index = 0;
 			hardwareAddress.sdl_type = IFT_ETHER;
 			hardwareAddress.sdl_e_type = ETHER_TYPE_IP;
