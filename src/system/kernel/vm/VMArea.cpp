@@ -11,7 +11,6 @@
 #include <vm/VMArea.h>
 
 #include <heap.h>
-#include <vm/vm_priv.h>
 
 
 #define AREA_HASH_TABLE_SIZE 1024
@@ -24,61 +23,49 @@ static area_id sNextAreaID = 1;
 
 // #pragma mark - VMArea
 
+VMArea::VMArea(VMAddressSpace* addressSpace, uint32 wiring, uint32 protection)
+	:
+	name(NULL),
+	protection(protection),
+	wiring(wiring),
+	memory_type(0),
+	cache(NULL),
+	no_cache_change(0),
+	cache_offset(0),
+	cache_type(0),
+	page_protections(NULL),
+	address_space(addressSpace),
+	cache_next(NULL),
+	cache_prev(NULL),
+	hash_next(NULL)
+{
+	new (&mappings) VMAreaMappings;
+}
 
-/*static*/ VMArea*
-VMArea::Create(VMAddressSpace* addressSpace, const char* name,
-	uint32 wiring, uint32 protection)
+
+VMArea::~VMArea()
+{
+	free(page_protections);
+	free(name);
+}
+
+
+status_t
+VMArea::Init(const char* name)
 {
 	// restrict the area name to B_OS_NAME_LENGTH
 	size_t length = strlen(name) + 1;
 	if (length > B_OS_NAME_LENGTH)
 		length = B_OS_NAME_LENGTH;
 
-	VMArea* area = (VMArea*)malloc_nogrow(sizeof(VMArea));
-	if (area == NULL)
-		return NULL;
+	// clone the name
+	this->name = (char*)malloc_nogrow(length);
+	if (this->name == NULL)
+		return B_NO_MEMORY;
+	strlcpy(this->name, name, length);
 
-	area->name = (char*)malloc_nogrow(length);
-	if (area->name == NULL) {
-		free(area);
-		return NULL;
-	}
-	strlcpy(area->name, name, length);
-
-	area->id = atomic_add(&sNextAreaID, 1);
-	area->fBase = 0;
-	area->fSize = 0;
-	area->protection = protection;
-	area->wiring = wiring;
-	area->memory_type = 0;
-
-	area->cache = NULL;
-	area->cache_offset = 0;
-
-	area->address_space = addressSpace;
-	area->cache_next = area->cache_prev = NULL;
-	area->hash_next = NULL;
-	new (&area->mappings) VMAreaMappings;
-	area->page_protections = NULL;
-
-	return area;
-}
-
-
-/*static*/ VMArea*
-VMArea::CreateReserved(VMAddressSpace* addressSpace, uint32 flags)
-{
-	VMArea* reserved = (VMArea*)malloc_nogrow(sizeof(VMArea));
-	if (reserved == NULL)
-		return NULL;
-
-	memset(reserved, 0, sizeof(VMArea));
-	reserved->id = RESERVED_AREA_ID;
-		// this marks it as reserved space
-	reserved->protection = flags;
-	reserved->address_space = addressSpace;
-
-	return reserved;
+	id = atomic_add(&sNextAreaID, 1);
+	return B_OK;
 }
 
 
@@ -114,9 +101,6 @@ VMAreaHash::Find(const char* name)
 
 	for (VMAreaHashTable::Iterator it = sTable.GetIterator();
 			VMArea* area = it.Next();) {
-		if (area->id == RESERVED_AREA_ID)
-			continue;
-
 		if (strcmp(area->name, name) == 0) {
 			id = area->id;
 			break;

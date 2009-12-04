@@ -12,6 +12,8 @@
 
 #include <vm/VMAddressSpace.h>
 
+#include "VMUserArea.h"
+
 
 struct VMUserAddressSpace : VMAddressSpace {
 public:
@@ -23,6 +25,9 @@ public:
 	virtual	VMArea*				NextArea(VMArea* area) const;
 
 	virtual	VMArea*				LookupArea(addr_t address) const;
+	virtual	VMArea*				CreateArea(const char* name, uint32 wiring,
+									uint32 protection);
+	virtual	void				DeleteArea(VMArea* area);
 	virtual	status_t			InsertArea(void** _address, uint32 addressSpec,
 									addr_t size, VMArea* area);
 	virtual	void				RemoveArea(VMArea* area);
@@ -43,13 +48,13 @@ public:
 
 private:
 			status_t			_InsertAreaIntoReservedRegion(addr_t start,
-									size_t size, VMArea* area);
+									size_t size, VMUserArea* area);
 			status_t			_InsertAreaSlot(addr_t start, addr_t size,
 									addr_t end, uint32 addressSpec,
-									VMArea* area);
+									VMUserArea* area);
 
 private:
-			VMAddressSpaceAreaList fAreas;
+			VMUserAreaList	fAreas;
 	mutable	VMArea*				fAreaHint;
 };
 

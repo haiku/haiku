@@ -56,7 +56,7 @@ VMKernelAddressSpace::~VMKernelAddressSpace()
 inline VMArea*
 VMKernelAddressSpace::FirstArea() const
 {
-	VMArea* area = fAreas.Head();
+	VMKernelArea* area = fAreas.Head();
 	while (area != NULL && area->id == RESERVED_AREA_ID)
 		area = fAreas.GetNext(area);
 	return area;
@@ -64,12 +64,28 @@ VMKernelAddressSpace::FirstArea() const
 
 
 inline VMArea*
-VMKernelAddressSpace::NextArea(VMArea* area) const
+VMKernelAddressSpace::NextArea(VMArea* _area) const
 {
+	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
 	area = fAreas.GetNext(area);
 	while (area != NULL && area->id == RESERVED_AREA_ID)
 		area = fAreas.GetNext(area);
 	return area;
+}
+
+
+VMArea*
+VMKernelAddressSpace::CreateArea(const char* name, uint32 wiring,
+	uint32 protection)
+{
+	return VMKernelArea::Create(this, name, wiring, protection);
+}
+
+
+void
+VMKernelAddressSpace::DeleteArea(VMArea* area)
+{
+	delete static_cast<VMKernelArea*>(area);
 }
 
 
@@ -81,8 +97,8 @@ VMKernelAddressSpace::LookupArea(addr_t address) const
 	if (fAreaHint != NULL && fAreaHint->ContainsAddress(address))
 		return fAreaHint;
 
-	for (VMAddressSpaceAreaList::ConstIterator it = fAreas.GetIterator();
-			VMArea* area = it.Next();) {
+	for (VMKernelAreaList::ConstIterator it = fAreas.GetIterator();
+			VMKernelArea* area = it.Next();) {
 		if (area->id == RESERVED_AREA_ID)
 			continue;
 
@@ -103,8 +119,10 @@ VMKernelAddressSpace::LookupArea(addr_t address) const
 */
 status_t
 VMKernelAddressSpace::InsertArea(void** _address, uint32 addressSpec,
-	addr_t size, VMArea* area)
+	addr_t size, VMArea* _area)
 {
+	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
+
 	addr_t searchBase, searchEnd;
 	status_t status;
 
@@ -146,8 +164,10 @@ VMKernelAddressSpace::InsertArea(void** _address, uint32 addressSpec,
 
 //! You must hold the address space's write lock.
 void
-VMKernelAddressSpace::RemoveArea(VMArea* area)
+VMKernelAddressSpace::RemoveArea(VMArea* _area)
 {
+	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
+
 	fAreas.Remove(area);
 
 	if (area->id != RESERVED_AREA_ID) {
@@ -163,7 +183,7 @@ VMKernelAddressSpace::RemoveArea(VMArea* area)
 bool
 VMKernelAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 {
-	VMArea* next = fAreas.GetNext(area);
+	VMKernelArea* next = fAreas.GetNext(static_cast<VMKernelArea*>(area));
 	addr_t newEnd = area->Base() + (newSize - 1);
 	if (next == NULL) {
 		if (fEndAddress >= newEnd)
@@ -187,10 +207,12 @@ VMKernelAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 
 
 status_t
-VMKernelAddressSpace::ResizeArea(VMArea* area, size_t newSize)
+VMKernelAddressSpace::ResizeArea(VMArea* _area, size_t newSize)
 {
+	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
+
 	addr_t newEnd = area->Base() + (newSize - 1);
-	VMArea* next = fAreas.GetNext(area);
+	VMKernelArea* next = fAreas.GetNext(area);
 	if (next != NULL && next->Base() <= newEnd) {
 		if (next->id != RESERVED_AREA_ID
 			|| next->cache_offset > area->Base()
@@ -256,7 +278,7 @@ VMKernelAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 		return B_BAD_TEAM_ID;
 	}
 
-	VMArea* area = VMArea::CreateReserved(this, flags);
+	VMKernelArea* area = VMKernelArea::CreateReserved(this, flags);
 	if (area == NULL)
 		return B_NO_MEMORY;
 
@@ -286,8 +308,8 @@ VMKernelAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
 
 	// search area list and remove any matching reserved ranges
 	addr_t endAddress = address + (size - 1);
-	for (VMAddressSpaceAreaList::Iterator it = fAreas.GetIterator();
-			VMArea* area = it.Next();) {
+	for (VMKernelAreaList::Iterator it = fAreas.GetIterator();
+			VMKernelArea* area = it.Next();) {
 		// the area must be completely part of the reserved range
 		if (area->Base() + (area->Size() - 1) > endAddress)
 			break;
@@ -306,8 +328,8 @@ VMKernelAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
 void
 VMKernelAddressSpace::UnreserveAllAddressRanges()
 {
-	for (VMAddressSpaceAreaList::Iterator it = fAreas.GetIterator();
-			VMArea* area = it.Next();) {
+	for (VMKernelAreaList::Iterator it = fAreas.GetIterator();
+			VMKernelArea* area = it.Next();) {
 		if (area->id == RESERVED_AREA_ID) {
 			RemoveArea(area);
 			Put();
@@ -325,8 +347,8 @@ VMKernelAddressSpace::Dump() const
 
 	kprintf("area_list:\n");
 
-	for (VMAddressSpaceAreaList::ConstIterator it = fAreas.GetIterator();
-			VMArea* area = it.Next();) {
+	for (VMKernelAreaList::ConstIterator it = fAreas.GetIterator();
+			VMKernelArea* area = it.Next();) {
 		kprintf(" area 0x%lx: ", area->id);
 		kprintf("base_addr = 0x%lx ", area->Base());
 		kprintf("size = 0x%lx ", area->Size());
@@ -342,11 +364,11 @@ VMKernelAddressSpace::Dump() const
 */
 status_t
 VMKernelAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
-	VMArea* area)
+	VMKernelArea* area)
 {
-	VMArea* next;
+	VMKernelArea* next;
 
-	for (VMAddressSpaceAreaList::Iterator it = fAreas.GetIterator();
+	for (VMKernelAreaList::Iterator it = fAreas.GetIterator();
 			(next = it.Next()) != NULL;) {
 		if (next->Base() <= start
 			&& next->Base() + (next->Size() - 1) >= start + (size - 1)) {
@@ -390,7 +412,8 @@ VMKernelAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 	} else {
 		// the area splits the reserved range into two separate ones
 		// we need a new reserved area to cover this space
-		VMArea* reserved = VMArea::CreateReserved(this, next->protection);
+		VMKernelArea* reserved = VMKernelArea::CreateReserved(this,
+			next->protection);
 		if (reserved == NULL)
 			return B_NO_MEMORY;
 
@@ -416,10 +439,10 @@ VMKernelAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 /*!	Must be called with this address space's write lock held */
 status_t
 VMKernelAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
-	uint32 addressSpec, VMArea* area)
+	uint32 addressSpec, VMKernelArea* area)
 {
-	VMArea* last = NULL;
-	VMArea* next;
+	VMKernelArea* last = NULL;
+	VMKernelArea* next;
 	bool foundSpot = false;
 
 	TRACE(("VMKernelAddressSpace::_InsertAreaSlot: address space %p, start "
@@ -453,7 +476,7 @@ VMKernelAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 
 	// walk up to the spot where we should start searching
 second_chance:
-	VMAddressSpaceAreaList::Iterator it = fAreas.GetIterator();
+	VMKernelAreaList::Iterator it = fAreas.GetIterator();
 	while ((next = it.Next()) != NULL) {
 		if (next->Base() > start + (size - 1)) {
 			// we have a winner

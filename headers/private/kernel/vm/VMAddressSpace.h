@@ -66,6 +66,9 @@ public:
 	virtual	VMArea*				NextArea(VMArea* area) const = 0;
 
 	virtual	VMArea*				LookupArea(addr_t address) const = 0;
+	virtual	VMArea*				CreateArea(const char* name, uint32 wiring,
+									uint32 protection) = 0;
+	virtual	void				DeleteArea(VMArea* area) = 0;
 	virtual	status_t			InsertArea(void** _address, uint32 addressSpec,
 									addr_t size, VMArea* area) = 0;
 	virtual	void				RemoveArea(VMArea* area) = 0;

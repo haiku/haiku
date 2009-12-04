@@ -48,48 +48,26 @@ struct VMArea {
 									{ return address >= fBase
 										&& address <= fBase + (fSize - 1); }
 
-	static	VMArea*				Create(VMAddressSpace* addressSpace,
-									const char* name, uint32 wiring,
-									uint32 protection);
-	static	VMArea*				CreateReserved(VMAddressSpace* addressSpace,
-									uint32 flags);
+protected:
+								VMArea(VMAddressSpace* addressSpace,
+									uint32 wiring, uint32 protection);
+								~VMArea();
 
-			DoublyLinkedListLink<VMArea>& AddressSpaceLink()
-									{ return fAddressSpaceLink; }
-			const DoublyLinkedListLink<VMArea>& AddressSpaceLink() const
-									{ return fAddressSpaceLink; }
+			status_t			Init(const char* name);
 
-private:
+protected:
 			friend class VMAddressSpace;
 			friend class VMKernelAddressSpace;
 			friend class VMUserAddressSpace;
 
-private:
+protected:
 			void				SetBase(addr_t base)	{ fBase = base; }
 			void				SetSize(size_t size)	{ fSize = size; }
 
-private:
-			DoublyLinkedListLink<VMArea> fAddressSpaceLink;
+protected:
 			addr_t				fBase;
 			size_t				fSize;
 };
-
-
-struct VMAddressSpaceAreaGetLink {
-    inline DoublyLinkedListLink<VMArea>* operator()(VMArea* area) const
-    {
-        return &area->AddressSpaceLink();
-    }
-
-    inline const DoublyLinkedListLink<VMArea>* operator()(
-		const VMArea* area) const
-    {
-        return &area->AddressSpaceLink();
-    }
-};
-
-typedef DoublyLinkedList<VMArea, VMAddressSpaceAreaGetLink>
-	VMAddressSpaceAreaList;
 
 
 struct VMAreaHashDefinition {

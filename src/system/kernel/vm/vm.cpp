@@ -503,7 +503,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		addressSpec, wiring, protection, _area, areaName));
 	cache->AssertLocked();
 
-	VMArea* area = VMArea::Create(addressSpace, areaName, wiring, protection);
+	VMArea* area = addressSpace->CreateArea(areaName, wiring, protection);
 	if (area == NULL)
 		return B_NO_MEMORY;
 
@@ -594,8 +594,7 @@ err2:
 		sourceCache->Lock();
 	}
 err1:
-	free(area->name);
-	free(area);
+	addressSpace->DeleteArea(area);
 	return status;
 }
 
@@ -1584,9 +1583,7 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area)
 	area->cache->RemoveArea(area);
 	area->cache->ReleaseRef();
 
-	free(area->page_protections);
-	free(area->name);
-	free(area);
+	addressSpace->DeleteArea(area);
 }
 
 

@@ -16,8 +16,10 @@ KernelMergeObject kernel_vm.o :
 	VMCache.cpp
 	VMDeviceCache.cpp
 	VMKernelAddressSpace.cpp
+	VMKernelArea.cpp
 	VMNullCache.cpp
 	VMUserAddressSpace.cpp
+	VMUserArea.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
