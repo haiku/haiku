@@ -460,30 +460,26 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 
 	// Check, whether the caller is allowed to modify the concerned areas.
 	if (!kernel) {
-		for (VMAddressSpace::Iterator it = addressSpace->GetIterator();
+		for (VMAddressSpace::AreaIterator it = addressSpace->GetAreaIterator();
 				VMArea* area = it.Next();) {
-			if (area->id != RESERVED_AREA_ID) {
-				addr_t areaLast = area->Base() + (area->Size() - 1);
-				if (area->Base() < lastAddress && address < areaLast) {
-					if ((area->protection & B_KERNEL_AREA) != 0)
-						return B_NOT_ALLOWED;
-				}
+			addr_t areaLast = area->Base() + (area->Size() - 1);
+			if (area->Base() < lastAddress && address < areaLast) {
+				if ((area->protection & B_KERNEL_AREA) != 0)
+					return B_NOT_ALLOWED;
 			}
 		}
 	}
 
-	for (VMAddressSpace::Iterator it = addressSpace->GetIterator();
+	for (VMAddressSpace::AreaIterator it = addressSpace->GetAreaIterator();
 			VMArea* area = it.Next();) {
-		if (area->id != RESERVED_AREA_ID) {
-			addr_t areaLast = area->Base() + (area->Size() - 1);
-			if (area->Base() < lastAddress && address < areaLast) {
-				status_t error = cut_area(addressSpace, area, address,
-					lastAddress, NULL, kernel);
-				if (error != B_OK)
-					return error;
-					// Failing after already messing with areas is ugly, but we
-					// can't do anything about it.
-			}
+		addr_t areaLast = area->Base() + (area->Size() - 1);
+		if (area->Base() < lastAddress && address < areaLast) {
+			status_t error = cut_area(addressSpace, area, address,
+				lastAddress, NULL, kernel);
+			if (error != B_OK)
+				return error;
+				// Failing after already messing with areas is ugly, but we
+				// can't do anything about it.
 		}
 	}
 
@@ -651,29 +647,7 @@ vm_unreserve_address_range(team_id team, void* address, addr_t size)
 	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
 
-	// check to see if this address space has entered DELETE state
-	if (locker.AddressSpace()->IsBeingDeleted()) {
-		// okay, someone is trying to delete this address space now, so we can't
-		// insert the area, so back out
-		return B_BAD_TEAM_ID;
-	}
-
-	// search area list and remove any matching reserved ranges
-	addr_t endAddress = (addr_t)address + (size - 1);
-	for (VMAddressSpace::Iterator it = locker.AddressSpace()->GetIterator();
-			VMArea* area = it.Next();) {
-		// the area must be completely part of the reserved range
-		if (area->Base() + (area->Size() - 1) > endAddress)
-			break;
-		if (area->id == RESERVED_AREA_ID && area->Base() >= (addr_t)address) {
-			// remove reserved range
-			locker.AddressSpace()->RemoveArea(area);
-			locker.AddressSpace()->Put();
-			free(area);
-		}
-	}
-
-	return B_OK;
+	return locker.AddressSpace()->UnreserveAddressRange((addr_t)address, size);
 }
 
 
@@ -688,31 +662,8 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
 
-	// check to see if this address space has entered DELETE state
-	if (locker.AddressSpace()->IsBeingDeleted()) {
-		// okay, someone is trying to delete this address space now, so we
-		// can't insert the area, let's back out
-		return B_BAD_TEAM_ID;
-	}
-
-	VMArea* area = VMArea::CreateReserved(locker.AddressSpace(), flags);
-	if (area == NULL)
-		return B_NO_MEMORY;
-
-	status_t status = locker.AddressSpace()->InsertArea(_address, addressSpec,
-		size, area);
-	if (status != B_OK) {
-		free(area);
-		return status;
-	}
-
-	// the area is now reserved!
-
-	area->cache_offset = area->Base();
-		// we cache the original base address here
-
-	locker.AddressSpace()->Get();
-	return B_OK;
+	return locker.AddressSpace()->ReserveAddressRange(_address, addressSpec,
+		size, flags);
 }
 
 
@@ -2907,16 +2858,7 @@ vm_delete_areas(struct VMAddressSpace* addressSpace)
 	addressSpace->WriteLock();
 
 	// remove all reserved areas in this address space
-
-	for (VMAddressSpace::Iterator it = addressSpace->GetIterator();
-			VMArea* area = it.Next();) {
-		if (area->id == RESERVED_AREA_ID) {
-			// just remove it
-			addressSpace->RemoveArea(area);
-			addressSpace->Put();
-			free(area);
-		}
-	}
+	addressSpace->UnreserveAllAddressRanges();
 
 	// delete all the areas in this address space
 	while (VMArea* area = addressSpace->FirstArea())
@@ -2995,12 +2937,13 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 
 	map->ops->lock(map);
 
-	for (VMAddressSpace::Iterator it = VMAddressSpace::Kernel()->GetIterator();
+	for (VMAddressSpace::AreaIterator it
+				= VMAddressSpace::Kernel()->GetAreaIterator();
 			VMArea* area = it.Next();) {
 		addr_t areaStart = area->Base();
 		addr_t areaEnd = areaStart + (area->Size() - 1);
 
-		if (area->id == RESERVED_AREA_ID || areaEnd < start)
+		if (areaEnd < start)
 			continue;
 
 		if (areaStart > end) {
@@ -4251,23 +4194,10 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 	if (oldSize < newSize) {
 		// We need to check if all areas of this cache can be resized
-
 		for (VMArea* current = cache->areas; current != NULL;
 				current = current->cache_next) {
-			VMArea* next = current->address_space->NextArea(current);
-			if (next != NULL && next->Base() <= (current->Base() + newSize)) {
-				// If the area was created inside a reserved area, it can
-				// also be resized in that area
-				// TODO: if there is free space after the reserved area, it could
-				// be used as well...
-				if (next->id == RESERVED_AREA_ID
-					&& next->cache_offset <= current->Base()
-					&& next->Base() - 1 + next->Size()
-						>= current->Base() - 1 + newSize)
-					continue;
-
+			if (!current->address_space->CanResizeArea(current, newSize))
 				return B_ERROR;
-			}
 		}
 	}
 
@@ -4282,35 +4212,12 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 	for (VMArea* current = cache->areas; current != NULL;
 			current = current->cache_next) {
-		VMArea* next = current->address_space->NextArea(current);
-		if (next != NULL && next->Base() <= (current->Base() + newSize)) {
-			if (next->id == RESERVED_AREA_ID
-				&& next->cache_offset <= current->Base()
-				&& next->Base() - 1 + next->Size()
-					>= current->Base() - 1 + newSize) {
-				// resize reserved area
-				addr_t offset = current->Base() + newSize - next->Base();
-				if (next->Size() <= offset) {
-					next->address_space->RemoveArea(next);
-					free(next);
-				} else {
-					next->address_space->ResizeAreaHead(next,
-						next->Size() - offset);
-				}
-			} else {
-				panic("resize situation for area %p has changed although we "
-					"should have the address space lock", current);
-				status = B_ERROR;
-				break;
-			}
-		}
-
-		status = current->address_space->ResizeAreaTail(current, newSize);
+		status = current->address_space->ResizeArea(current, newSize);
 		if (status != B_OK)
 			break;
 
 		// We also need to unmap all pages beyond the new size, if the area has
-		// shrinked
+		// shrunk
 		if (newSize < oldSize) {
 			vm_unmap_pages(current, current->Base() + newSize, oldSize - newSize,
 				false);
@@ -4326,7 +4233,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 		// This can fail, too, in which case we're seriously screwed.
 		for (VMArea* current = cache->areas; current != NULL;
 				current = current->cache_next) {
-			if (current->address_space->ResizeAreaTail(current, oldSize)
+			if (current->address_space->ResizeArea(current, oldSize)
 					!= B_OK) {
 				panic("vm_resize_area(): Failed and not being able to restore "
 					"original state.");
@@ -4792,11 +4699,9 @@ _get_next_area_info(team_id team, int32* cookie, area_info* info, size_t size)
 		return B_BAD_TEAM_ID;
 
 	VMArea* area;
-	for (VMAddressSpace::Iterator it = locker.AddressSpace()->GetIterator();
+	for (VMAddressSpace::AreaIterator it
+				= locker.AddressSpace()->GetAreaIterator();
 			(area = it.Next()) != NULL;) {
-		if (area->id == RESERVED_AREA_ID)
-			continue;
-
 		if (area->Base() > nextBase)
 			break;
 	}

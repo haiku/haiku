@@ -1304,7 +1304,8 @@ public:
 	{
 		// find the runtime loader debug area
 		VMArea* area;
-		for (VMAddressSpace::Iterator it = team->address_space->GetIterator();
+		for (VMAddressSpace::AreaIterator it
+					= team->address_space->GetAreaIterator();
 				(area = it.Next()) != NULL;) {
 			if (strcmp(area->name, RUNTIME_LOADER_DEBUG_AREA_NAME) == 0)
 				break;

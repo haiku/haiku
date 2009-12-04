@@ -12,13 +12,14 @@
 
 #include <OS.h>
 
+#include <vm/vm_priv.h>
 #include <vm/vm_translation_map.h>
 #include <vm/VMArea.h>
 
 
 struct VMAddressSpace {
 public:
-			class Iterator;
+			class AreaIterator;
 
 public:
 								VMAddressSpace(team_id id, addr_t base,
@@ -30,7 +31,7 @@ public:
 
 			team_id				ID() const				{ return fID; }
 			addr_t				Base() const			{ return fBase; }
-			size_t				Size() const			{ return fSize; }
+			addr_t				EndAddress() const		{ return fEndAddress; }
 			size_t				FreeSpace() const		{ return fFreeSpace; }
 			bool				IsBeingDeleted() const	{ return fDeleting; }
 
@@ -57,19 +58,26 @@ public:
 			void				IncrementChangeCount()
 									{ fChangeCount++; }
 
-			VMArea*				FirstArea() const
-									{ return fAreas.Head(); }
-			VMArea*				NextArea(VMArea* area) const
-									{ return fAreas.GetNext(area); }
+			VMArea*				FirstArea() const;
 
 			VMArea*				LookupArea(addr_t address) const;
 			status_t			InsertArea(void** _address, uint32 addressSpec,
 									addr_t size, VMArea* area);
 			void				RemoveArea(VMArea* area);
+
+			bool				CanResizeArea(VMArea* area, size_t newSize);
+			status_t			ResizeArea(VMArea* area, size_t newSize);
 			status_t			ResizeAreaHead(VMArea* area, size_t size);
 			status_t			ResizeAreaTail(VMArea* area, size_t size);
 
-	inline	Iterator			GetIterator();
+			status_t			ReserveAddressRange(void** _address,
+									uint32 addressSpec, size_t size,
+									uint32 flags);
+			status_t			UnreserveAddressRange(addr_t address,
+									size_t size);
+			void				UnreserveAllAddressRanges();
+
+	inline	AreaIterator		GetAreaIterator();
 
 	static	status_t			Create(team_id teamID, addr_t base, size_t size,
 									bool kernel,
@@ -108,7 +116,7 @@ private:
 private:
 			VMAddressSpace*		fHashTableLink;
 			addr_t				fBase;
-			size_t				fSize;
+			addr_t				fEndAddress;		// base + (size - 1)
 			size_t				fFreeSpace;
 			rw_lock				fLock;
 			team_id				fID;
@@ -123,42 +131,65 @@ private:
 };
 
 
-class VMAddressSpace::Iterator {
+class VMAddressSpace::AreaIterator {
 public:
-	Iterator()
+	AreaIterator()
 	{
 	}
 
-	Iterator(VMAddressSpace* addressSpace)
+	AreaIterator(VMAddressSpace* addressSpace)
 		:
 		fIterator(addressSpace->fAreas.GetIterator())
 	{
+		_SkipReserved();
 	}
 
 	bool HasNext() const
 	{
-		return fIterator.HasNext();
+		return fNext != NULL;
 	}
 
 	VMArea* Next()
 	{
-		return fIterator.Next();
+		VMArea* result = fNext;
+		_SkipReserved();
+		return result;
 	}
 
 	void Rewind()
 	{
 		fIterator.Rewind();
+		_SkipReserved();
 	}
 
 private:
-	VMAddressSpaceAreaList::Iterator fIterator;
+	void _SkipReserved()
+	{
+		while ((fNext = fIterator.Next()) != NULL
+			&& fNext->id == RESERVED_AREA_ID) {
+		}
+	}
+
+private:
+	VMAddressSpaceAreaList::Iterator	fIterator;
+	VMArea*								fNext;
 };
 
 
-inline VMAddressSpace::Iterator
-VMAddressSpace::GetIterator()
+inline VMArea*
+VMAddressSpace::FirstArea() const
 {
-	return Iterator(this);
+	VMArea* area = fAreas.Head();
+	while (area != NULL && area->id == RESERVED_AREA_ID)
+		area = fAreas.GetNext(area);
+	return area;
+}
+
+
+inline VMAddressSpace::AreaIterator
+VMAddressSpace::GetAreaIterator()
+{
+	return AreaIterator(this);
 }
 
 

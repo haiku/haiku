@@ -19,7 +19,6 @@
 #include <heap.h>
 #include <thread.h>
 #include <vm/vm.h>
-#include <vm/vm_priv.h>
 #include <vm/VMArea.h>
 
 
@@ -88,7 +87,7 @@ VMAddressSpace::VMAddressSpace(team_id id, addr_t base, size_t size,
 	bool kernel)
 	:
 	fBase(base),
-	fSize(size),
+	fEndAddress(base + (size - 1)),
 	fFreeSpace(size),
 	fID(id),
 	fRefCount(1),
@@ -317,7 +316,7 @@ VMAddressSpace::InsertArea(void** _address, uint32 addressSpec, addr_t size,
 
 		case B_BASE_ADDRESS:
 			searchBase = (addr_t)*_address;
-			searchEnd = fBase + (fSize - 1);
+			searchEnd = fEndAddress;
 			break;
 
 		case B_ANY_ADDRESS:
@@ -328,7 +327,7 @@ VMAddressSpace::InsertArea(void** _address, uint32 addressSpec, addr_t size,
 			// completely (currently needs a userland address space!)
 			if (searchBase == USER_BASE)
 				searchBase = USER_BASE_ANY;
-			searchEnd = fBase + (fSize - 1);
+			searchEnd = fEndAddress;
 			break;
 
 		default:
@@ -361,6 +360,64 @@ VMAddressSpace::RemoveArea(VMArea* area)
 }
 
 
+bool
+VMAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
+{
+	VMArea* next = fAreas.GetNext(area);
+	addr_t newEnd = area->Base() + (newSize - 1);
+	if (next == NULL) {
+		if (fEndAddress >= newEnd)
+			return true;
+	} else {
+		if (next->Base() > newEnd)
+			return true;
+	}
+
+	// If the area was created inside a reserved area, it can
+	// also be resized in that area
+	// TODO: if there is free space after the reserved area, it could
+	// be used as well...
+	if (next->id == RESERVED_AREA_ID && next->cache_offset <= area->Base()
+		&& next->Base() + (next->Size() - 1) >= newEnd) {
+		return true;
+	}
+
+	return false;
+}
+
+
+status_t
+VMAddressSpace::ResizeArea(VMArea* area, size_t newSize)
+{
+	addr_t newEnd = area->Base() + (newSize - 1);
+	VMArea* next = fAreas.GetNext(area);
+	if (next != NULL && next->Base() <= newEnd) {
+		if (next->id != RESERVED_AREA_ID
+			|| next->cache_offset > area->Base()
+			|| next->Base() + (next->Size() - 1) < newEnd) {
+			panic("resize situation for area %p has changed although we "
+				"should have the address space lock", area);
+			return B_ERROR;
+		}
+
+		// resize reserved area
+		addr_t offset = area->Base() + newSize - next->Base();
+		if (next->Size() <= offset) {
+			RemoveArea(next);
+			free(next);
+		} else {
+			status_t error = ResizeAreaHead(next, next->Size() - offset);
+			if (error != B_OK)
+				return error;
+		}
+	}
+
+	return ResizeAreaTail(area, newSize);
+		// TODO: In case of error we should undo the change to the reserved
+		// area.
+}
+
+
 status_t
 VMAddressSpace::ResizeAreaHead(VMArea* area, size_t size)
 {
@@ -388,6 +445,78 @@ VMAddressSpace::ResizeAreaTail(VMArea* area, size_t size)
 }
 
 
+status_t
+VMAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
+	size_t size, uint32 flags)
+{
+	// check to see if this address space has entered DELETE state
+	if (fDeleting) {
+		// okay, someone is trying to delete this address space now, so we
+		// can't insert the area, let's back out
+		return B_BAD_TEAM_ID;
+	}
+
+	VMArea* area = VMArea::CreateReserved(this, flags);
+	if (area == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = InsertArea(_address, addressSpec, size, area);
+	if (status != B_OK) {
+		free(area);
+		return status;
+	}
+
+	area->cache_offset = area->Base();
+		// we cache the original base address here
+
+	Get();
+	return B_OK;
+}
+
+
+status_t
+VMAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
+{
+	// check to see if this address space has entered DELETE state
+	if (fDeleting) {
+		// okay, someone is trying to delete this address space now, so we can't
+		// insert the area, so back out
+		return B_BAD_TEAM_ID;
+	}
+
+	// search area list and remove any matching reserved ranges
+	addr_t endAddress = address + (size - 1);
+	for (VMAddressSpaceAreaList::Iterator it = fAreas.GetIterator();
+			VMArea* area = it.Next();) {
+		// the area must be completely part of the reserved range
+		if (area->Base() + (area->Size() - 1) > endAddress)
+			break;
+		if (area->id == RESERVED_AREA_ID && area->Base() >= (addr_t)address) {
+			// remove reserved range
+			RemoveArea(area);
+			Put();
+			free(area);
+		}
+	}
+
+	return B_OK;
+}
+
+
+void
+VMAddressSpace::UnreserveAllAddressRanges()
+{
+	for (VMAddressSpaceAreaList::Iterator it = fAreas.GetIterator();
+			VMArea* area = it.Next();) {
+		if (area->id == RESERVED_AREA_ID) {
+			RemoveArea(area);
+			Put();
+			free(area);
+		}
+	}
+}
+
+
 void
 VMAddressSpace::Dump() const
 {
@@ -397,7 +526,7 @@ VMAddressSpace::Dump() const
 	kprintf("fault_count: %ld\n", fFaultCount);
 	kprintf("translation_map: %p\n", &fTranslationMap);
 	kprintf("base: 0x%lx\n", fBase);
-	kprintf("size: 0x%lx\n", fSize);
+	kprintf("end: 0x%lx\n", fEndAddress);
 	kprintf("change_count: 0x%lx\n", fChangeCount);
 	kprintf("area_hint: %p\n", fAreaHint);
 
@@ -505,7 +634,7 @@ VMAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 		size, end, addressSpec, area));
 
 	// do some sanity checking
-	if (start < fBase || size == 0 || end > fBase + fSize - 1
+	if (start < fBase || size == 0 || end > fEndAddress
 		|| start + (size - 1) > end)
 		return B_BAD_ADDRESS;
 
@@ -753,7 +882,7 @@ VMAddressSpace::_DumpCommand(int argc, char** argv)
 /*static*/ int
 VMAddressSpace::_DumpListCommand(int argc, char** argv)
 {
-	kprintf("   address      id         base         size   area count   "
+	kprintf("   address      id         base          end   area count   "
 		" area size\n");
 
 	AddressSpaceTable::Iterator it = sAddressSpaceTable.GetIterator();
@@ -769,7 +898,7 @@ VMAddressSpace::_DumpListCommand(int argc, char** argv)
 			}
 		}
 		kprintf("%p  %6ld   %#010lx   %#10lx   %10ld   %10lld\n",
-			space, space->ID(), space->Base(), space->Size(), areaCount,
+			space, space->ID(), space->Base(), space->EndAddress(), areaCount,
 			areaSize);
 	}
 
