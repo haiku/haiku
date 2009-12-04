@@ -9,10 +9,7 @@ extern "C" {
 #include <compat/sys/kernel.h>
 }
 
-#include <new>
-
 #include "Condvar.h"
-#include "device.h"
 
 
 #define ticks_to_usecs(t) (1000000*((bigtime_t)t) / hz)
