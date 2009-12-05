@@ -61,13 +61,14 @@ SharedLibrary libmedia.so :
 	SoundPlayNode.cpp
 
 	# Old (R3) Media Kit
-	OldAudioModule.cpp
-	OldAudioStream.cpp
-	OldBufferStream.cpp
-	OldBufferStreamManager.cpp
-	OldMediaModule.cpp
-	OldSoundFile.cpp
-	OldSubscriber.cpp
+	# TODO: removed for now, since it's not implemented anyway
+	#OldAudioModule.cpp
+	#OldAudioStream.cpp
+	#OldBufferStream.cpp
+	#OldBufferStreamManager.cpp
+	#OldMediaModule.cpp
+	#OldSoundFile.cpp
+	#OldSubscriber.cpp
 
 	# Codec Plugin API
 	ChunkCache.cpp
