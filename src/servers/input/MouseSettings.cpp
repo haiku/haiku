@@ -1,19 +1,12 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2004, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:			MouseSettings.h
-//  Authors:		Jérôme Duval,
-//					Andrew McCall (mccall@digitalparadise.co.uk),
-//					Axel Dörfler (axeld@pinc-software.de)
-//  Description:	Input Server
-//  Created:		August 29, 2004
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2004-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 
 
 #include "MouseSettings.h"
@@ -56,7 +49,7 @@ MouseSettings::~MouseSettings()
 }
 
 
-status_t 
+status_t
 MouseSettings::GetSettingsPath(BPath &path)
 {
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
@@ -68,7 +61,7 @@ MouseSettings::GetSettingsPath(BPath &path)
 }
 
 
-void 
+void
 MouseSettings::RetrieveSettings()
 {
 	// retrieve current values
@@ -76,7 +69,7 @@ MouseSettings::RetrieveSettings()
 	fMode = mouse_mode();
 	fAcceptFirstClick = accept_first_click();
 	Defaults();
-	
+
 	// also try to load the window position from disk
 
 	BPath path;
@@ -87,24 +80,10 @@ MouseSettings::RetrieveSettings()
 	if (file.InitCheck() < B_OK)
 		return;
 
-#ifdef COMPILE_FOR_R5
-	// we have to do this because mouse_map counts 16 buttons in OBOS
-	
-	if ((file.Read(&fSettings.type, sizeof(int32)) != sizeof(int32))
-		|| (file.Read(&fSettings.map, sizeof(int32) * 3) != sizeof(int32) * 3)
-		|| (file.Read(&fSettings.accel, sizeof(mouse_accel))
-			!= sizeof(mouse_accel))
-		|| (file.Read(&fSettings.click_speed, sizeof(bigtime_t))
-			.282
-			!= sizeof(bigtime_t))) {
-		Defaults();
-	}
-#else
 	if (file.ReadAt(0, &fSettings, sizeof(mouse_settings))
-		!= sizeof(mouse_settings)) {
+			!= sizeof(mouse_settings)) {
 		Defaults();
 	}
-#endif
 
 	if ((fSettings.click_speed == 0)
 		|| (fSettings.type == 0)) {
@@ -113,13 +92,13 @@ MouseSettings::RetrieveSettings()
 }
 
 
-status_t 
+status_t
 MouseSettings::SaveSettings()
 {
 #ifdef DEBUG
 	Dump();
 #endif
-	
+
 	BPath path;
 	status_t status = GetSettingsPath(path);
 	if (status < B_OK)
@@ -129,15 +108,7 @@ MouseSettings::SaveSettings()
 	if (status < B_OK)
 		return status;
 
-	// we have to do this because mouse_map counts 16 buttons in OBOS
-#ifdef COMPILE_FOR_R5
-	file.Write(&fSettings.type, sizeof(fSettings.type));
-	file.Write(&fSettings.map, 3*sizeof(int32));
-	file.Write(&fSettings.accel, sizeof(fSettings.accel));
-	file.Write(&fSettings.click_speed, sizeof(fSettings.click_speed));
-#else
 	file.Write(&fSettings, sizeof(fSettings));
-#endif
 
 	// who is responsible for saving the mouse mode and accept_first_click?
 
@@ -220,7 +191,7 @@ MouseSettings::SetMouseType(int32 type)
 }
 
 
-bigtime_t 
+bigtime_t
 MouseSettings::ClickSpeed() const
 {
 	return fSettings.click_speed;
@@ -255,14 +226,14 @@ MouseSettings::Mapping(int32 index) const
 }
 
 
-void 
+void
 MouseSettings::Mapping(mouse_map &map) const
 {
 	map = fSettings.map;
 }
 
 
-void 
+void
 MouseSettings::SetMapping(int32 index, uint32 button)
 {
 	fSettings.map.button[index] = button;
@@ -276,7 +247,7 @@ MouseSettings::SetMapping(mouse_map &map)
 }
 
 
-void 
+void
 MouseSettings::SetMouseMode(mode_mouse mode)
 {
 	fMode = mode;
@@ -286,14 +257,14 @@ MouseSettings::SetMouseMode(mode_mouse mode)
 void
 MouseSettings::SetFocusFollowsMouseMode(mode_focus_follows_mouse mode)
 {
-	fFocusFollowsMouseMode = mode;	
+	fFocusFollowsMouseMode = mode;
 }
 
 
-void 
+void
 MouseSettings::SetAcceptFirstClick(bool acceptFirstClick)
 {
-	fAcceptFirstClick = acceptFirstClick;	
+	fAcceptFirstClick = acceptFirstClick;
 }
 
 

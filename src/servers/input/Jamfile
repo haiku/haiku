@@ -2,10 +2,6 @@ SubDir HAIKU_TOP src servers input ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-if $(COMPILE_FOR_R5) {
-	SubDirC++Flags -DCOMPILE_FOR_R5 ;
-}
-
 rule MkKeymapHeader {
 	local binary = $(1) ;
 	local source = $(2) ;
@@ -32,10 +28,7 @@ AddResources input_server : input_server.rdef ;
 UsePrivateHeaders app input interface shared storage ;
 UsePrivateSystemHeaders ;
 
-
-SubDirC++Flags -DADD_ON_STABLE_SECONDS=1 ;	# for AddOnMonitorHandler.cpp
 if $(TARGET_PLATFORM) != haiku {
-	SubDirC++Flags -DCOMPILE_FOR_R5 ;
 	#APPSERVER_TEST_MODE = 1 ;
 	if $(APPSERVER_TEST_MODE) {
 		SubDirC++Flags -DAPPSERVER_TEST_MODE ;
