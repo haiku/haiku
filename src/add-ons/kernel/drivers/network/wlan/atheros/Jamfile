@@ -28,7 +28,7 @@ KernelAddon atheros :
 	libfreebsd_wlan.a
 	libfreebsd_network.a
 	;
-	
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5210 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5211 ] ;
@@ -41,7 +41,7 @@ KernelMergeObject atheros_hal.o :
 	ah.c
 	ah_regdomain.c
 	ah_eeprom_v3.c
-	
+
 	# AR5210 support
 	ah_eeprom_v1.c
 	ar5210_attach.c
@@ -54,7 +54,7 @@ KernelMergeObject atheros_hal.o :
 	ar5210_recv.c
 	ar5210_reset.c
 	ar5210_xmit.c
-	
+
 	# AR5211 support
 	ar5211_attach.c
 	ar5211_beacon.c
@@ -66,7 +66,7 @@ KernelMergeObject atheros_hal.o :
 	ar5211_recv.c
 	ar5211_reset.c
 	ar5211_xmit.c
-	
+
 	# AR5212 support
 	ar5212_ani.c
 	ar5212_attach.c
@@ -82,14 +82,14 @@ KernelMergeObject atheros_hal.o :
 	ar5212_reset.c
 	ar5212_rfgain.c
 	ar5212_xmit.c
-	
+
 	# RF backends
 	ar5111.c
 	ar5112.c
 	ar2413.c
 	ar2425.c
 	ar5413.c
-	
+
 	# AR5416 support
 	ah_eeprom_v14.c
 	ar5416_ani.c
@@ -109,7 +109,7 @@ KernelMergeObject atheros_hal.o :
 	ar5416_recv.c
 	ar5416_reset.c
 	ar5416_xmit.c
-	
+
 	# AR9160 support
 	ar9160_attach.c
 	
@@ -122,7 +122,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_rate sample ] ;
 KernelMergeObject atheros_rate.o :
 	sample.c
 	;
-	
+
 local svn = [ FGristFiles entries ] ;
 SEARCH on $(svn) = [ FDirName $(SUBDIR) .svn ] ;
 AddFileDataAttribute atheros : revision : string : $(svn) ;
