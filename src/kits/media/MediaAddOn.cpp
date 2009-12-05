@@ -104,7 +104,7 @@ dormant_flavor_info::dormant_flavor_info()
 }
 
 
-/* virtual */ 
+/* virtual */
 dormant_flavor_info::~dormant_flavor_info()
 {
 	delete [] name;
@@ -182,7 +182,7 @@ dormant_flavor_info::operator=(const flavor_info &clone)
 	// initialize node_info with default values from dormant_node_info constructor
 	dormant_node_info defaultValues;
 	node_info = defaultValues;
-	
+
 	return *this;
 }
 
@@ -284,7 +284,7 @@ dormant_flavor_info::Flatten(void *buffer,
 	if (size < FlattenedSize())
 		return B_ERROR;
 
-	char *buf = (char *)buffer;	
+	char *buf = (char *)buffer;
 	int32 nameLength = name ? (int32)strlen(name) : -1;
 	int32 infoLength = info ? (int32)strlen(info) : -1;
 	int32 inFormatCount = 0;
@@ -362,7 +362,7 @@ dormant_flavor_info::Unflatten(type_code c,
 	if (size < 8)
 		return B_ERROR;
 
-	const char *buf = (const char *)buffer;	
+	const char *buf = (const char *)buffer;
 	int32 nameLength;
 	int32 infoLength;
 
@@ -409,7 +409,7 @@ dormant_flavor_info::Unflatten(type_code c,
 	}
 
 	int32 count;
-	
+
 	kinds = *(uint64*)buf; buf += sizeof(uint64);
 	flavor_flags = *(uint32*)buf; buf += sizeof(uint32);
 	internal_id = *(int32*)buf; buf += sizeof(int32);
@@ -423,12 +423,12 @@ dormant_flavor_info::Unflatten(type_code c,
 			if (!in_formats)
 				return B_NO_MEMORY;
 			// XXX FIXME! we should not!!! make flat copies	of media_format
-			memcpy(const_cast<media_format *>(in_formats), buf, count * sizeof(media_format)); 
+			memcpy(const_cast<media_format *>(in_formats), buf, count * sizeof(media_format));
 			in_format_count = count;
 		}
 		buf += count * sizeof(media_format); // XXX not save
 	}
-	
+
 	count = *(int32*)buf; buf += sizeof(int32);
 	out_format_flags = *(uint32*)buf; buf += sizeof(uint32);
 
@@ -438,14 +438,14 @@ dormant_flavor_info::Unflatten(type_code c,
 			if (!out_formats)
 				return B_NO_MEMORY;
 			// XXX FIXME! we should not!!! make flat copies	of media_format
-			memcpy(const_cast<media_format *>(out_formats), buf, count * sizeof(media_format)); 
+			memcpy(const_cast<media_format *>(out_formats), buf, count * sizeof(media_format));
 			out_format_count = count;
 		}
 		buf += count * sizeof(media_format); // XXX not save
 	}
 
 	node_info = *(dormant_node_info*)buf; buf += sizeof(dormant_node_info);
-	
+
 	return B_OK;
 }
 
@@ -453,7 +453,7 @@ dormant_flavor_info::Unflatten(type_code c,
  * public BMediaAddOn
  *************************************************************/
 
-/* explicit */ 
+/* explicit */
 BMediaAddOn::BMediaAddOn(image_id image) :
 	fImage(image),
 	fAddon(0)
@@ -462,7 +462,7 @@ BMediaAddOn::BMediaAddOn(image_id image) :
 }
 
 
-/* virtual */ 
+/* virtual */
 BMediaAddOn::~BMediaAddOn()
 {
 	CALLED();
@@ -617,7 +617,7 @@ BMediaAddOn::NotifyFlavorChange()
 		return B_ERROR;
 
 	addonserver_rescan_mediaaddon_flavors_command command;
-	command.addonid = fAddon;
+	command.addon_id = fAddon;
 	return SendToAddonServer(ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS, &command, sizeof(command));
 }
 

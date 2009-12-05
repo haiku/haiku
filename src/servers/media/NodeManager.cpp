@@ -77,7 +77,7 @@ NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 
 	BAutolock lock(fLocker);
 	bool b;
 	registered_node rn;
-	rn.nodeid = fNextNodeID;
+	rn.node_id = fNextNodeID;
 	rn.addon_id = addon_id;
 	rn.addon_flavor_id = addon_flavor_id;
 	strcpy(rn.name, name);
@@ -87,7 +87,7 @@ NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 
 	rn.creator = -1; // will be set later
 	rn.globalrefcount = 1;
 	rn.teamrefcount.Insert(team, 1);
-	
+
 	b = fRegisteredNodeMap->Insert(fNextNodeID, rn);
 	ASSERT(b);
 	*nodeid = fNextNodeID;
@@ -194,12 +194,12 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 		ASSERT(b);
 	}
 	rn->globalrefcount -= 1;
-	
+
 	if (rn->globalrefcount == 0) {
 		printf("NodeManager::DecrementGlobalRefCount: detected released node is now unused, node %ld\n", nodeid);
 		FinalReleaseNode(nodeid);
 	}
-	
+
 	TRACE("NodeManager::DecrementGlobalRefCount leave: node %ld, team %ld, count %ld, globalcount %ld\n", nodeid, team, debug_count, rn->globalrefcount);
 	return B_OK;
 }
@@ -218,12 +218,12 @@ NodeManager::SetNodeCreator(media_node_id nodeid, team_id creator)
 		ERROR("NodeManager::SetNodeCreator: node %ld not found\n", nodeid);
 		return B_ERROR;
 	}
-	
+
 	if (rn->creator != -1) {
 		ERROR("NodeManager::SetNodeCreator: node %ld is already assigned creator %ld\n", nodeid, rn->creator);
 		return B_ERROR;
 	}
-	
+
 	rn->creator = creator;
 	return B_OK;
 }
@@ -253,47 +253,52 @@ NodeManager::FinalReleaseNode(media_node_id nodeid)
 
 
 status_t
-NodeManager::GetCloneForId(media_node *node, media_node_id nodeid, team_id team)
+NodeManager::GetCloneForID(media_node* node, media_node_id nodeID, team_id team)
 {
 	BAutolock lock(fLocker);
-	registered_node *rn;
-	bool b;
-	TRACE("NodeManager::GetCloneForId enter: node %ld team %ld\n", nodeid, team);
+	TRACE("NodeManager::GetCloneForID enter: node %ld team %ld\n", nodeID,
+		team);
 
-	if (B_OK != IncrementGlobalRefCount(nodeid, team)) {
-		ERROR("NodeManager::GetCloneForId: couldn't increment ref count, node %ld team %ld\n", nodeid, team);
+	if (IncrementGlobalRefCount(nodeID, team) != B_OK) {
+		ERROR("NodeManager::GetCloneForID: couldn't increment ref count, "
+			"node %ld team %ld\n", nodeID, team);
 		return B_ERROR;
 	}
 
-	b = fRegisteredNodeMap->Get(nodeid, &rn);
-	if (!b) {
-		ERROR("NodeManager::GetCloneForId: node %ld not found\n", nodeid);
-		DecrementGlobalRefCount(nodeid, team);
+	registered_node* registeredNode;
+	if (!fRegisteredNodeMap->Get(nodeID, &registeredNode)) {
+		ERROR("NodeManager::GetCloneForID: node %ld not found\n", nodeID);
+		DecrementGlobalRefCount(nodeID, team);
 		return B_ERROR;
 	}
 
-	node->node = rn->nodeid;
-	node->port = rn->port;
-	node->kind = rn->kinds;
+	node->node = registeredNode->node_id;
+	node->port = registeredNode->port;
+	node->kind = registeredNode->kinds;
 
-	TRACE("NodeManager::GetCloneForId leave: node %ld team %ld\n", nodeid, team);
+	TRACE("NodeManager::GetCloneForID leave: node %ld team %ld\n", nodeID,
+		team);
 	return B_OK;
 }
 
 
-/* This function locates the default "node" for the requested "type" and returnes a clone.
- * If the requested type is AUDIO_OUTPUT_EX, also "input_name" and "input_id" need to be set and returned,
- * as this is required by BMediaRoster::GetAudioOutput(media_node *out_node, int32 *out_input_id, BString *out_input_name)
- */
+/*!	This function locates the default "node" for the requested "type" and
+	returns a clone.
+	If the requested type is AUDIO_OUTPUT_EX, also "input_name" and "input_id"
+	need to be set and returned, as this is required by
+	BMediaRoster::GetAudioOutput(media_node *out_node, int32 *out_input_id,
+		BString *out_input_name).
+*/
 status_t
-NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_type type, team_id team)
+NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id,
+	node_type type, team_id team)
 {
 	BAutolock lock(fLocker);
 	status_t status;
 	media_node_id id;
 
 	TRACE("NodeManager::GetClone enter: team %ld, type %d (%s)\n", team, type, get_node_type(type));
-	
+
 	status = GetDefaultNode(&id, input_name, input_id, type);
 	if (status != B_OK) {
 		ERROR("NodeManager::GetClone: couldn't GetDefaultNode, team %ld, type %d (%s)\n", team, type, get_node_type(type));
@@ -302,9 +307,9 @@ NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_
 	}
 	ASSERT(id > 0);
 
-	status = GetCloneForId(node, id, team);
+	status = GetCloneForID(node, id, team);
 	if (status != B_OK) {
-		ERROR("NodeManager::GetClone: couldn't GetCloneForId, id %ld, team %ld, type %d (%s)\n", id, team, type, get_node_type(type));
+		ERROR("NodeManager::GetClone: couldn't GetCloneForID, id %ld, team %ld, type %d (%s)\n", id, team, type, get_node_type(type));
 		*node = media_node::null;
 		return status;
 	}
@@ -366,36 +371,38 @@ NodeManager::PublishOutputs(const media_node &node, const media_output *outputs,
 
 
 status_t
-NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
+NodeManager::FindNodeID(media_node_id* nodeID, port_id port)
 {
 	BAutolock lock(fLocker);
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		if (rn->port == port) {
-			*nodeid = rn->nodeid;
-			TRACE("NodeManager::FindNodeId found port %ld, node %ld\n", port, *nodeid);
+			*nodeID = rn->node_id;
+			TRACE("NodeManager::FindNodeID found port %ld, node %ld\n", port,
+				*nodeID);
 			return B_OK;
 		}
 		media_output *output;
 		for (rn->outputlist.Rewind(); rn->outputlist.GetNext(&output); ) {
 			if (output->source.port == port) {
-				*nodeid = rn->nodeid;
-				TRACE("NodeManager::FindNodeId found output port %ld, node %ld\n", port, *nodeid);
+				*nodeID = rn->node_id;
+				TRACE("NodeManager::FindNodeID found output port %ld, node %ld\n", port, *nodeid);
 				return B_OK;
 			}
 		}
 		media_input *input;
 		for (rn->inputlist.Rewind(); rn->inputlist.GetNext(&input); ) {
 			if (input->destination.port == port) {
-				*nodeid = rn->nodeid;
-				TRACE("NodeManager::FindNodeId found input port %ld, node %ld\n", port, *nodeid);
+				*nodeID = rn->node_id;
+				TRACE("NodeManager::FindNodeID found input port %ld, node %ld\n", port, *nodeid);
 				return B_OK;
 			}
 		}
 	}
-	ERROR("NodeManager::FindNodeId failed, port %ld\n", port);
+	ERROR("NodeManager::FindNodeID failed, port %ld\n", port);
 	return B_ERROR;
 }
+
 
 status_t
 NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &node)
@@ -404,7 +411,7 @@ NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &
 	// XXX not sure if this is correct
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
-		if (rn->nodeid == node.node) {
+		if (rn->node_id == node.node) {
 			if (rn->addon_id == -1 && node.node != NODE_SYSTEM_TIMESOURCE_ID) { // This function must return an error if the node is application owned
 				TRACE("NodeManager::GetDormantNodeInfo NODE IS APPLICATION OWNED! node %ld, addon_id %ld, addon_flavor_id %ld, name \"%s\"\n", node.node, rn->addon_id, rn->addon_flavor_id, rn->name);
 				return B_ERROR;
@@ -422,13 +429,14 @@ NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &
 	return B_ERROR;
 }
 
+
 status_t
 NodeManager::GetLiveNodeInfo(live_node_info *live_info, const media_node &node)
 {
 	BAutolock lock(fLocker);
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
-		if (rn->nodeid == node.node) {
+		if (rn->node_id == node.node) {
 			ASSERT(node.port == rn->port);
 			ASSERT((node.kind & NODE_KIND_COMPARE_MASK) == (rn->kinds & NODE_KIND_COMPARE_MASK));
 			live_info->node = node;
@@ -451,7 +459,7 @@ NodeManager::GetInstances(media_node_id *node_ids, int32* count, int32 maxcount,
 	*count = 0;
 	for (fRegisteredNodeMap->Rewind(); (maxcount > 0) &&  fRegisteredNodeMap->GetNext(&rn); ) {
 		if (rn->addon_id == addon_id && rn->addon_flavor_id == addon_flavor_id) {
-			node_ids[*count] = rn->nodeid;
+			node_ids[*count] = rn->node_id;
 			*count += 1;
 			maxcount -= 1;
 		}
@@ -467,7 +475,7 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 	BAutolock lock(fLocker);
 	registered_node *rn;
 	int namelen;
-	
+
 	TRACE("NodeManager::GetLiveNodes: maxcount %ld, in-format %p, out-format %p, name %s, require_kinds 0x%Lx\n",
 		  maxcount, inputformat, outputformat, (name ? name : "NULL"), require_kinds);
 
@@ -513,7 +521,7 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 		}
 
 		live_node_info lni;
-		lni.node.node = rn->nodeid;
+		lni.node.node = rn->node_id;
 		lni.node.port = rn->port;
 		lni.node.kind = rn->kinds;
 		lni.hint_point = BPoint(0, 0);
@@ -526,16 +534,17 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 	return B_OK;
 }
 
-/* Add media_node_id of all live nodes to the message
- * int32 "media_node_id" (multiple items)
- */
+
+/*!	Add media_node_id of all live nodes to the message
+	int32 "media_node_id" (multiple items)
+*/
 status_t
 NodeManager::GetLiveNodes(BMessage *msg)
 {
 	BAutolock lock(fLocker);
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
-		msg->AddInt32("media_node_id", rn->nodeid);
+		msg->AddInt32("media_node_id", rn->node_id);
 	}
 	return B_OK;
 }
@@ -544,16 +553,16 @@ NodeManager::GetLiveNodes(BMessage *msg)
  * Registration of BMediaAddOns
  **********************************************************************/
 
-void 
+void
 NodeManager::RegisterAddon(const entry_ref &ref, media_addon_id *newid)
 {
 	BAutolock lock(fLocker);
 	media_addon_id id;
 	id = fNextAddOnID;
 	fNextAddOnID += 1;
-	
+
 	printf("NodeManager::RegisterAddon: ref-name \"%s\", assigning id %ld\n", ref.name, id);
-	
+
 	fAddonPathMap->Insert(id, ref);
 	*newid = id;
 }
@@ -579,7 +588,7 @@ NodeManager::GetAddonRef(entry_ref *ref, media_addon_id id)
 		*ref = *tempref;
 		return B_OK;
 	}
-	
+
 	return B_ERROR;
 }
 
@@ -592,7 +601,7 @@ void
 NodeManager::AddDormantFlavorInfo(const dormant_flavor_info &dfi)
 {
 	BAutolock lock(fLocker);
-	
+
 	printf("NodeManager::AddDormantFlavorInfo, addon-id %ld, flavor-id %ld, name \"%s\", flavor-name \"%s\", flavor-info \"%s\"\n", dfi.node_info.addon, dfi.node_info.flavor_id, dfi.node_info.name, dfi.name, dfi.info);
 
 	// Try to find the addon-id/flavor-id in the list.
@@ -670,8 +679,8 @@ NodeManager::IncrementAddonFlavorInstancesCount(media_addon_id addonid, int32 fl
 			ERROR("NodeManager::IncrementAddonFlavorInstancesCount addonid %ld, flavorid %ld maximum (or more) instances already exist\n", addonid, flavorid);
 			return B_ERROR; // maximum (or more) instances already exist
 		}
-			
-		bool b;		
+
+		bool b;
 		int32 *count;
 		b = dafi->TeamInstancesCount.Get(team, &count);
 		if (b) {
@@ -697,7 +706,7 @@ NodeManager::DecrementAddonFlavorInstancesCount(media_addon_id addonid, int32 fl
 		if (dafi->AddonID != addonid || dafi->AddonFlavorID != flavorid)
 			continue;
 
-		bool b;	
+		bool b;
 		int32 *count;
 		b = dafi->TeamInstancesCount.Get(team, &count);
 		if (!b) {
@@ -728,7 +737,7 @@ NodeManager::CleanupDormantFlavorInfos()
 	// XXX FlavorsChanged(media_addon_id addonid, int32 newcount, int32 gonecount)
 }
 
-status_t 
+status_t
 NodeManager::GetDormantNodes(dormant_node_info * out_info,
 							  int32 * io_count,
 							  const media_format * has_input /* = NULL */,
@@ -751,7 +760,7 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 		namelen = 0;
 	}
 
-	maxcount = *io_count;	
+	maxcount = *io_count;
 	*io_count = 0;
 	for (fDormantAddonFlavorList->Rewind(); (*io_count < maxcount) && fDormantAddonFlavorList->GetNext(&dafi); ) {
 		if (!dafi->InfoValid)
@@ -788,7 +797,7 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 			if (!hasit)
 				continue;
 		}
-		
+
 		out_info[*io_count] = dfi->node_info;
 		*io_count += 1;
 	}
@@ -796,7 +805,7 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 	return B_OK;
 }
 
-status_t 
+status_t
 NodeManager::GetDormantFlavorInfoFor(media_addon_id addon,
 									 int32 flavor_id,
 									 dormant_flavor_info *outFlavor)
@@ -807,7 +816,7 @@ NodeManager::GetDormantFlavorInfoFor(media_addon_id addon,
 		if (dafi->AddonID == addon && dafi->AddonFlavorID == flavor_id && dafi->InfoValid == true) {
 			*outFlavor = dafi->Info;
 			return B_OK;
-		}	
+		}
 	}
 	return B_ERROR;
 }
@@ -867,9 +876,9 @@ NodeManager::CleanupTeam(team_id team)
 	PRINT(1, "NodeManager::CleanupTeam: team %ld\n", team);
 
 	// XXX send notifications after removing nodes
-	
+
 	// Cleanup node references
-	
+
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		// if the gone team was the creator of some global dormant node instance, we now invalidate that
@@ -901,11 +910,11 @@ NodeManager::CleanupTeam(team_id team)
 			fRegisteredNodeMap->RemoveCurrent();
 		}
 	}
-	
+
 	// Cleanup addon references
 	dormant_addon_flavor_info *dafi;
 	for (fDormantAddonFlavorList->Rewind(); fDormantAddonFlavorList->GetNext(&dafi); ) {
-		bool b;	
+		bool b;
 		int32 *count;
 		b = dafi->TeamInstancesCount.Get(team, &count);
 		if (b) {
@@ -946,7 +955,7 @@ NodeManager::Dump()
 {
 	BAutolock lock(fLocker);
 	printf("\n");
-	
+
 	/* for each addon-id, the addon path map contains an entry_ref
 	 */
 	printf("NodeManager: addon path map follows:\n");
@@ -966,7 +975,7 @@ NodeManager::Dump()
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		printf("  node-id %ld, addon-id %ld, addon-flavor-id %ld, port %ld, creator %ld, team %ld, kinds %#08Lx, name \"%s\"\n",
-			rn->nodeid, rn->addon_id, rn->addon_flavor_id, rn->port, rn->creator, rn->team, rn->kinds, rn->name);
+			rn->node_id, rn->addon_id, rn->addon_flavor_id, rn->port, rn->creator, rn->team, rn->kinds, rn->name);
 		printf("    teams (refcount): ");
 		team_id *team;
 		int32 *refcount;
@@ -993,7 +1002,7 @@ NodeManager::Dump()
 	printf("NodeManager: list end\n");
 	printf("\n");
 
-	/* 
+	/*
 	 */
 	printf("NodeManager: dormant flavor list follows:\n");
 	dormant_addon_flavor_info *dafi;

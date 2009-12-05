@@ -27,9 +27,14 @@
  *
  */
 
+
 /* to comply with the license above, do not remove the following line */
 char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 	"Marcus Overhagen <Marcus@Overhagen.de>";
+
+
+#include <stdio.h>
+#include <string.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -39,9 +44,6 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 #include <Messenger.h>
-
-#include <stdio.h>
-#include <string.h>
 
 #include "AddOnManager.h"
 #include "AppManager.h"
@@ -56,12 +58,6 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 #include "debug.h"
 #include "media_server.h"
 
-/*
- *
- * An implementation of a new media_server for the OpenBeOS MediaKit
- * Started by Marcus Overhagen <marcus@overhagen.de> on 2001-10-25
- *
- */
 
 AddOnManager *			gAddOnManager;
 AppManager *			gAppManager;
@@ -217,7 +213,7 @@ ServerApp::ArgvReceived(int32 argc, char **argv)
 
 void
 ServerApp::StartAddonServer()
-{	
+{
 	// Try to launch media_addon_server by mime signature.
 	// If it fails (for example on the Live CD, where the executable
 	// hasn't yet been mimesetted), try from this application's
@@ -225,7 +221,7 @@ ServerApp::StartAddonServer()
 	status_t err = be_roster->Launch(B_MEDIA_ADDON_SERVER_SIGNATURE);
 	if (err == B_OK)
 		return;
-	
+
 	app_info info;
 	BEntry entry;
 	BDirectory dir;
@@ -310,10 +306,10 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			ASSERT(request->delta == 1 || request->delta == -1);
 			if (request->delta == 1) {
 				rv = gNodeManager->IncrementAddonFlavorInstancesCount(
-					request->addonid,	request->flavorid, request->team);
+					request->addon_id, request->flavor_id, request->team);
 			} else {
 				rv = gNodeManager->DecrementAddonFlavorInstancesCount(
-					request->addonid,	request->flavorid, request->team);
+					request->addon_id, request->flavor_id, request->team);
 			}
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
@@ -352,7 +348,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 				= (server_get_mediaaddon_ref_request *)data;
 			server_get_mediaaddon_ref_reply reply;
 			entry_ref tempref;
-			reply.result = gNodeManager->GetAddonRef(&tempref, msg->addonid);
+			reply.result = gNodeManager->GetAddonRef(&tempref, msg->addon_id);
 			reply.ref = tempref;
 			write_port(msg->reply_port, 0, &reply, sizeof(reply));
 			break;
@@ -363,7 +359,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			const server_node_id_for_request *request
 				= reinterpret_cast<const server_node_id_for_request *>(data);
 			server_node_id_for_reply reply;
-			rv = gNodeManager->FindNodeId(&reply.nodeid, request->port);
+			rv = gNodeManager->FindNodeID(&reply.node_id, request->port);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
@@ -432,7 +428,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			const server_get_node_for_request *request
 				= reinterpret_cast<const server_get_node_for_request *>(data);
 			server_get_node_for_reply reply;
-			rv = gNodeManager->GetCloneForId(&reply.clone, request->nodeid,
+			rv = gNodeManager->GetCloneForID(&reply.clone, request->node_id,
 				request->team);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
@@ -453,7 +449,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			const server_register_node_request *request
 				= reinterpret_cast<const server_register_node_request *>(data);
 			server_register_node_reply reply;
-			rv = gNodeManager->RegisterNode(&reply.nodeid, request->addon_id,
+			rv = gNodeManager->RegisterNode(&reply.node_id, request->addon_id,
 				request->addon_flavor_id, request->name, request->kinds,
 				request->port, request->team);
 			request->SendReply(rv, &reply, sizeof(reply));
@@ -466,8 +462,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 				= reinterpret_cast<const server_unregister_node_request *>(
 					data);
 			server_unregister_node_reply reply;
-			rv = gNodeManager->UnregisterNode(&reply.addonid, &reply.flavorid,
-				request->nodeid, request->team);
+			rv = gNodeManager->UnregisterNode(&reply.addon_id, &reply.flavor_id,
+				request->node_id, request->team);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
@@ -588,7 +584,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			server_register_mediaaddon_request *msg
 				= (server_register_mediaaddon_request *)data;
 			server_register_mediaaddon_reply reply;
-			gNodeManager->RegisterAddon(msg->ref, &reply.addonid);
+			gNodeManager->RegisterAddon(msg->ref, &reply.addon_id);
 			write_port(msg->reply_port, 0, &reply, sizeof(reply));
 			break;
 		}
@@ -597,20 +593,22 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			server_unregister_mediaaddon_command *msg
 				= (server_unregister_mediaaddon_command *)data;
-			gNodeManager->UnregisterAddon(msg->addonid);
+			gNodeManager->UnregisterAddon(msg->addon_id);
 			break;
 		}
 
 		case SERVER_REGISTER_DORMANT_NODE:
 		{
-			xfer_server_register_dormant_node *msg
-				= (xfer_server_register_dormant_node *)data;
-			dormant_flavor_info dfi;
+			xfer_server_register_dormant_node* msg
+				= (xfer_server_register_dormant_node*)data;
 			if (msg->purge_id > 0)
 				gNodeManager->InvalidateDormantFlavorInfo(msg->purge_id);
-			rv = dfi.Unflatten(msg->dfi_type, &(msg->dfi), msg->dfi_size);
-			ASSERT(rv == B_OK);
-			gNodeManager->AddDormantFlavorInfo(dfi);
+
+			dormant_flavor_info dormantFlavorInfo;
+			status_t status = dormantFlavorInfo.Unflatten(msg->type,
+				msg->flattened_data, msg->flattened_size);
+			if (status == B_OK)
+				gNodeManager->AddDormantFlavorInfo(dormantFlavorInfo);
 			break;
 		}
 
@@ -618,24 +616,29 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			xfer_server_get_dormant_nodes *msg
 				= (xfer_server_get_dormant_nodes *)data;
+
 			xfer_server_get_dormant_nodes_reply reply;
-			dormant_node_info * infos = new dormant_node_info[msg->maxcount];
-			reply.count = msg->maxcount;
-			reply.result = gNodeManager->GetDormantNodes(
-				infos,
-				&reply.count,
-				msg->has_input ? &msg->inputformat : NULL,
-				msg->has_output ? &msg->outputformat : NULL,
-				msg->has_name ? msg->name : NULL,
-				msg->require_kinds,
-				msg->deny_kinds);
+			reply.count = msg->max_count;
+
+			dormant_node_info* infos
+				= new(std::nothrow) dormant_node_info[reply.count];
+			if (infos != NULL) {
+				reply.result = gNodeManager->GetDormantNodes(infos,
+					&reply.count, msg->has_input ? &msg->input_format : NULL,
+					msg->has_output ? &msg->output_format : NULL,
+					msg->has_name ? msg->name : NULL, msg->require_kinds,
+					msg->deny_kinds);
+			} else
+				reply.result = B_NO_MEMORY;
+
 			if (reply.result != B_OK)
 				reply.count = 0;
 			write_port(msg->reply_port, 0, &reply, sizeof(reply));
-			if (reply.count > 0)
-				write_port(msg->reply_port, 0, infos, reply.count
-					* sizeof(dormant_node_info));
-			delete [] infos;
+			if (reply.count > 0) {
+				write_port(msg->reply_port, 0, infos,
+					reply.count * sizeof(dormant_node_info));
+			}
+			delete[] infos;
 			break;
 		}
 
@@ -643,40 +646,48 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			xfer_server_get_dormant_flavor_info *msg
 				= (xfer_server_get_dormant_flavor_info *)data;
-			dormant_flavor_info dfi;
+			dormant_flavor_info dormantFlavorInfo;
 			status_t rv;
 
 			rv = gNodeManager->GetDormantFlavorInfoFor(msg->addon,
-				msg->flavor_id, &dfi);
+				msg->flavor_id, &dormantFlavorInfo);
 			if (rv != B_OK) {
 				xfer_server_get_dormant_flavor_info_reply reply;
 				reply.result = rv;
 				write_port(msg->reply_port, 0, &reply, sizeof(reply));
 			} else {
-				xfer_server_get_dormant_flavor_info_reply *reply;
-				int replysize;
-				replysize = sizeof(xfer_server_get_dormant_flavor_info_reply)
-					+ dfi.FlattenedSize();
-				reply = (xfer_server_get_dormant_flavor_info_reply *)malloc(
-					replysize);
+				size_t replySize
+					= sizeof(xfer_server_get_dormant_flavor_info_reply)
+						+ dormantFlavorInfo.FlattenedSize();
+				xfer_server_get_dormant_flavor_info_reply* reply
+					= (xfer_server_get_dormant_flavor_info_reply*)malloc(
+						replySize);
+				if (reply != NULL) {
+					reply->type = dormantFlavorInfo.TypeCode();
+					reply->flattened_size = dormantFlavorInfo.FlattenedSize();
+					reply->result = dormantFlavorInfo.Flatten(
+						reply->flattened_data, reply->flattened_size);
 
-				reply->dfi_size = dfi.FlattenedSize();
-				reply->dfi_type = dfi.TypeCode();
-				reply->result = dfi.Flatten(reply->dfi, reply->dfi_size);
-				write_port(msg->reply_port, 0, reply, replysize);
-				free(reply);
+					write_port(msg->reply_port, 0, reply, replySize);
+					free(reply);
+				} else {
+					xfer_server_get_dormant_flavor_info_reply reply;
+					reply.result = B_NO_MEMORY;
+					write_port(msg->reply_port, 0, &reply, sizeof(reply));
+				}
 			}
 			break;
 		}
 
 		case SERVER_SET_NODE_CREATOR:
 		{
-			const server_set_node_creator_request *request
-				= reinterpret_cast<const server_set_node_creator_request *>(
+			const server_set_node_creator_request* request
+				= reinterpret_cast<const server_set_node_creator_request*>(
 					data);
 			server_set_node_creator_reply reply;
-			rv = gNodeManager->SetNodeCreator(request->node, request->creator);
-			request->SendReply(rv, &reply, sizeof(reply));
+			status_t status = gNodeManager->SetNodeCreator(request->node,
+				request->creator);
+			request->SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
@@ -687,7 +698,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 					const server_get_shared_buffer_area_request *>(data);
 			server_get_shared_buffer_area_reply reply;
 
-			reply.area = gBufferManager->SharedBufferListID();
+			reply.area = gBufferManager->SharedBufferListArea();
 			request->SendReply(B_OK, &reply, sizeof(reply));
 			break;
 		}
@@ -722,7 +733,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			const server_unregister_buffer_command *cmd = reinterpret_cast<
 				const server_unregister_buffer_command *>(data);
 
-			gBufferManager->UnregisterBuffer(cmd->team, cmd->bufferid);
+			gBufferManager->UnregisterBuffer(cmd->team, cmd->buffer_id);
 			break;
 		}
 

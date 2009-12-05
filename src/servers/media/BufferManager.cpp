@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2002, Marcus Overhagen. All rights reserved.
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -15,28 +15,30 @@
 
 BufferManager::BufferManager()
 	:
-	fSharedBufferList(_shared_buffer_list::Clone()),
+	fSharedBufferList(NULL),
+	fSharedBufferListArea(-1),
 	fNextBufferID(1),
 	fLocker("buffer manager locker")
 {
-	fSharedBufferListID = area_for(fSharedBufferList);
+	fSharedBufferListArea
+		= BPrivate::SharedBufferList::Create(&fSharedBufferList);
 }
 
 
 BufferManager::~BufferManager()
 {
-	fSharedBufferList->Unmap();
+	fSharedBufferList->Put();
 }
 
 
 area_id
-BufferManager::SharedBufferListID()
+BufferManager::SharedBufferListArea()
 {
-	return fSharedBufferListID;
+	return fSharedBufferListArea;
 }
 
 
-status_t	
+status_t
 BufferManager::RegisterBuffer(team_id team, media_buffer_id bufferID,
 	size_t* _size, int32* _flags, size_t* _offset, area_id* _area)
 {
@@ -55,7 +57,7 @@ BufferManager::RegisterBuffer(team_id team, media_buffer_id bufferID,
 
 	*_area = info->area;
 	*_offset = info->offset;
-	*_size = info->size, 
+	*_size = info->size,
 	*_flags = info->flags;
 
 	return B_OK;
@@ -69,7 +71,7 @@ BufferManager::RegisterBuffer(team_id team, size_t size, int32 flags,
 	BAutolock lock(fLocker);
 	TRACE("RegisterBuffer team = %ld, area = %ld, offset = %ld, size = %ld\n",
 		team, area, offset, size);
-	
+
 	area_id clonedArea = _CloneArea(area);
 	if (clonedArea < 0) {
 		ERROR("RegisterBuffer: failed to clone buffer! error = %#lx, team = "
@@ -84,14 +86,19 @@ BufferManager::RegisterBuffer(team_id team, size_t size, int32 flags,
 	info.offset = offset;
 	info.size = size;
 	info.flags = flags;
-	info.teams.insert(team);
 
-	*_bufferID = info.id;
-
-	fBufferInfoMap.Put(info.id, info);
+	try {
+		info.teams.insert(team);
+		if (fBufferInfoMap.Put(info.id, info) != B_OK)
+			throw std::bad_alloc();
+	} catch (std::bad_alloc& exception) {
+		_ReleaseClonedArea(clonedArea);
+		return B_NO_MEMORY;
+	}
 
 	TRACE("RegisterBuffer: done, bufferID = %ld\n", info.id);
 
+	*_bufferID = info.id;
 	return B_OK;
 }
 
@@ -100,12 +107,12 @@ status_t
 BufferManager::UnregisterBuffer(team_id team, media_buffer_id bufferID)
 {
 	BAutolock lock(fLocker);
-	TRACE("UnregisterBuffer: team = %ld, bufferid = %ld\n", team, bufferID);
+	TRACE("UnregisterBuffer: team = %ld, bufferID = %ld\n", team, bufferID);
 
 	buffer_info* info;
 	if (!fBufferInfoMap.Get(bufferID, info)) {
 		ERROR("UnregisterBuffer: failed to unregister buffer! team = %ld, "
-			"bufferid = %ld\n", team, bufferID);
+			"bufferID = %ld\n", team, bufferID);
 		return B_ERROR;
 	}
 
@@ -114,7 +121,7 @@ BufferManager::UnregisterBuffer(team_id team, media_buffer_id bufferID)
 			"bufferID = %ld\n", team, bufferID);
 		return B_ERROR;
 	}
-	
+
 	info->teams.erase(team);
 
 	TRACE("UnregisterBuffer: team = %ld removed from bufferID = %ld\n", team,
@@ -146,7 +153,7 @@ BufferManager::CleanupTeam(team_id team)
 
 		if (entry.value.teams.empty()) {
 			PRINT(1, "BufferManager::CleanupTeam: removing buffer id %ld that "
-				"has no teams\n", entry.key);
+				"has no teams\n", entry.key.GetHashCode());
 			_ReleaseClonedArea(entry.value.area);
 			iterator.Remove();
 		}
@@ -182,14 +189,16 @@ BufferManager::Dump()
 area_id
 BufferManager::_CloneArea(area_id area)
 {
-	clone_info* info;
-	if (fCloneInfoMap.Get(area, info)) {
-		// we have already cloned this particular area
-		TRACE("BufferManager::_CloneArea() area %ld has already been cloned "
-			"(id %ld)\n", area, info->clone);
+	{
+		clone_info* info;
+		if (fCloneInfoMap.Get(area, info)) {
+			// we have already cloned this particular area
+			TRACE("BufferManager::_CloneArea() area %ld has already been "
+				"cloned (id %ld)\n", area, info->clone);
 
-		info->ref_count++;
-		return info->clone;
+			info->ref_count++;
+			return info->clone;
+		}
 	}
 
 	void* address;
@@ -199,16 +208,22 @@ BufferManager::_CloneArea(area_id area)
 	TRACE("BufferManager::_CloneArea() cloned area %ld, clone id %ld\n",
 		area, clonedArea);
 
-	if (clonedArea >= 0) {
-		clone_info info;
-		info.clone = clonedArea;
-		info.ref_count = 1;
+	if (clonedArea < 0)
+		return clonedArea;
 
-		fCloneInfoMap.Put(area, info);
-		fSourceInfoMap.Put(clonedArea, area);
+	clone_info info;
+	info.clone = clonedArea;
+	info.ref_count = 1;
+
+	if (fCloneInfoMap.Put(area, info) == B_OK) {
+		if (fSourceInfoMap.Put(clonedArea, area) == B_OK)
+			return clonedArea;
+
+		fCloneInfoMap.Remove(area);
 	}
 
-	return clonedArea;
+	delete_area(clonedArea);
+	return B_NO_MEMORY;
 }
 
 

@@ -7,16 +7,11 @@ if $(TARGET_PLATFORM) != haiku {
 		# We need the public media headers also when not compiling for Haiku.
 }
 
-UsePrivateHeaders media shared ;
+UsePrivateHeaders app media shared ;
 
 if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
 }
-
-# That's ugly. The header (ServerInterface.h) should reside in
-# headers/private/media.
-SubDirHdrs [ FDirName $(HAIKU_TOP) src servers media ] ;
-SubDirSysHdrs $(SUBDIR) ; # for the Old*.h headers
 
 SharedLibrary libmedia.so :
 	# Private Media Kit
@@ -52,7 +47,7 @@ SharedLibrary libmedia.so :
 	TimeSource.cpp
 
 	# Internal Functionality
-	BufferIdCache.cpp
+	BufferCache.cpp
 	DataExchange.cpp
 	DefaultMediaTheme.cpp
 	DormantNodeManager.cpp

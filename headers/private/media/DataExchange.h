@@ -286,8 +286,8 @@ enum {
 };
 
 struct addonserver_instantiate_dormant_node_request : request_data {
-	media_addon_id			addonid;
-	int32					flavorid;
+	media_addon_id			addon_id;
+	int32					flavor_id;
 	team_id					creator_team;
 };
 
@@ -605,8 +605,8 @@ struct server_set_node_creator_reply : reply_data {
 };
 
 struct server_change_addon_flavor_instances_count_request : request_data {
-	media_addon_id			addonid;
-	int32					flavorid;
+	media_addon_id			addon_id;
+	int32					flavor_id;
 	int32					delta; // must be +1 or -1
 	team_id					team;
 };
@@ -624,17 +624,17 @@ struct server_register_node_request : request_data {
 };
 
 struct server_register_node_reply : reply_data {
-	media_node_id			nodeid;
+	media_node_id			node_id;
 };
 
 struct server_unregister_node_request : request_data {
-	media_node_id			nodeid;
+	media_node_id			node_id;
 	team_id					team;
 };
 
 struct server_unregister_node_reply : reply_data {
-	media_addon_id			addonid;
-	int32					flavorid;
+	media_addon_id			addon_id;
+	int32					flavor_id;
 };
 
 struct server_get_live_node_info_request : request_data {
@@ -669,11 +669,11 @@ struct server_node_id_for_request : request_data {
 };
 
 struct server_node_id_for_reply : reply_data {
-	media_node_id			nodeid;
+	media_node_id			node_id;
 };
 
 struct server_get_node_for_request : request_data {
-	media_node_id			nodeid;
+	media_node_id			node_id;
 	team_id					team;
 };
 
@@ -713,7 +713,7 @@ struct server_rescan_defaults_command : command_data {
 };
 
 struct addonserver_rescan_mediaaddon_flavors_command : command_data {
-	media_addon_id			addonid;
+	media_addon_id			addon_id;
 };
 
 struct addonserver_rescan_finished_notify_command : command_data {
@@ -724,15 +724,15 @@ struct server_register_mediaaddon_request : request_data {
 };
 
 struct server_register_mediaaddon_reply : reply_data {
-	media_addon_id			addonid;
+	media_addon_id			addon_id;
 };
 
 struct server_unregister_mediaaddon_command : command_data {
-	media_addon_id			addonid;
+	media_addon_id			addon_id;
 };
 
 struct server_get_mediaaddon_ref_request : request_data {
-	media_addon_id			addonid;
+	media_addon_id			addon_id;
 };
 
 struct server_get_mediaaddon_ref_reply : reply_data {
@@ -757,7 +757,7 @@ struct server_register_buffer_reply : reply_data {
 
 struct server_unregister_buffer_command : command_data {
 	team_id					team;
-	media_buffer_id			bufferid;
+	media_buffer_id			buffer_id;
 };
 
 struct server_rewindtypes_request : request_data {

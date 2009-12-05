@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2002, Marcus Overhagen. All rights reserved.
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -13,16 +13,18 @@
 #include <HashMap.h>
 
 
-struct _shared_buffer_list;
+namespace BPrivate {
+	class SharedBufferList;
+}
 
 
 class BufferManager {
 public:
 							BufferManager();
 							~BufferManager();
-	
-			area_id			SharedBufferListID();
-	
+
+			area_id			SharedBufferListArea();
+
 			status_t		RegisterBuffer(team_id team,
 								media_buffer_id bufferID, size_t* _size,
 								int32* _flags, size_t* _offset, area_id* _area);
@@ -56,7 +58,7 @@ private:
 		int32				flags;
 		std::set<team_id>	teams;
 	};
-	
+
 	template<typename Type> struct id_hash {
 		id_hash()
 			:
@@ -84,7 +86,7 @@ private:
 		{
 			return fID;
 		}
-	
+
 		id_hash& operator=(const id_hash& other)
 		{
 			fID = other.fID;
@@ -99,8 +101,8 @@ private:
 	typedef HashMap<id_hash<area_id>, clone_info> CloneInfoMap;
 	typedef HashMap<id_hash<area_id>, area_id> SourceInfoMap;
 
-			_shared_buffer_list* fSharedBufferList;
-			area_id			fSharedBufferListID;
+			BPrivate::SharedBufferList* fSharedBufferList;
+			area_id			fSharedBufferListArea;
 			media_buffer_id	fNextBufferID;
 			BLocker			fLocker;
 			BufferInfoMap	fBufferInfoMap;

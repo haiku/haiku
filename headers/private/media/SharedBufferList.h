@@ -1,53 +1,66 @@
-/***********************************************************************
- * Copyright (c) 2002 Marcus Overhagen. All Rights Reserved.
- * This file may be used under the terms of the OpenBeOS License.
- *
- * Used for BBufferGroup and BBuffer management across teams
- ***********************************************************************/
+/*
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002, Marcus Overhagen. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _SHARED_BUFFER_LIST_H_
 #define _SHARED_BUFFER_LIST_H_
 
+
 #include <Buffer.h>
 
-// created in the media server, cloned into 
-// each BBufferGroup (visible in all address spaces / teams)
-struct _shared_buffer_list
-{
-	struct _shared_buffer_info
-	{
-		media_buffer_id id;
-		BBuffer *		buffer;
-		bool 			reclaimed;
-		// the reclaim_sem belonging to the BBufferGroup of this BBuffer
-		// also used as a unique identifier of the group
-		sem_id			reclaim_sem; 
+
+namespace BPrivate {
+
+
+class SharedBufferList {
+public:
+	static	area_id				Create(SharedBufferList** _list);
+	static	SharedBufferList*	Get(area_id area);
+
+			void				Put();
+			void 				DeleteGroupAndPut(sem_id groupReclaimSem);
+
+			status_t			Lock();
+			status_t			Unlock();
+
+			status_t			AddBuffer(sem_id groupReclaimSem,
+									BBuffer* buffer);
+			status_t			RequestBuffer(sem_id groupReclaimSem,
+									int32 buffersInGroup, size_t size,
+									media_buffer_id wantID, BBuffer** _buffer,
+									bigtime_t timeout);
+			status_t			RecycleBuffer(BBuffer* buffer);
+			status_t			GetBufferList(sem_id groupReclaimSem,
+									int32 bufferCount, BBuffer** buffers);
+
+private:
+	struct _shared_buffer_info {
+		media_buffer_id			id;
+		BBuffer*				buffer;
+		bool 					reclaimed;
+		// The reclaim_sem belonging to the BBufferGroup of this BBuffer
+		// is also used as a unique identifier of the group
+		sem_id					reclaim_sem;
 	};
-	enum { MAX_BUFFER = 666 };			// this fixed limit is probably very evil
 
-	sem_id		locker_sem;
-	int32		locker_atom;
-	
-	// always only the first "buffercount" entries in the "info" array are used
-	int32		buffercount;
-	_shared_buffer_info info[MAX_BUFFER];
+	enum { kMaxBuffers = 2047 };
+		// 16 bytes per buffer, 8 pages in total (one entry less for the list)
 
-	status_t	AddBuffer(sem_id group_reclaim_sem, BBuffer *buffer);
-	status_t	RequestBuffer(sem_id group_reclaim_sem, int32 buffers_in_group, size_t size, media_buffer_id wantID, BBuffer **buffer, bigtime_t timeout);
-	status_t	GetBufferList(sem_id group_reclaim_sem, int32 buf_count, BBuffer **out_buffers);
-	status_t	RecycleBuffer(BBuffer *buffer);
-	
-		
-	status_t 	Init();
+			status_t			_Init();
+			void 				_RequestBufferInOtherGroups(
+									sem_id groupReclaimSem, media_buffer_id id);
 
-	static _shared_buffer_list *Clone(area_id id = -1);
-	void 		Terminate(sem_id group_reclaim_sem);
-	void 		Unmap();
+private:
+			sem_id				fSemaphore;
+			vint32				fAtom;
 
-	status_t	Lock();
-	status_t	Unlock();
-	
-	// used by RequestBuffer, call this one with the list locked!
-	void 		RequestBufferInOtherGroups(sem_id group_reclaim_sem, media_buffer_id id);
+			_shared_buffer_info	fInfos[kMaxBuffers];
+			int32				fCount;
 };
 
-#endif
+
+}	// namespace BPrivate
+
+
+#endif	// _SHARED_BUFFER_LIST_H_

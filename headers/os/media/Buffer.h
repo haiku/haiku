@@ -9,7 +9,10 @@
 #include <MediaDefs.h>
 
 
-struct _shared_buffer_list;
+namespace BPrivate {
+	class BufferCache;
+	class SharedBufferList;
+}
 
 
 struct buffer_clone_info {
@@ -54,8 +57,8 @@ public:
 			size_t				Size();
 
 private:
-	friend struct _buffer_id_cache;
-	friend struct _shared_buffer_list;
+	friend class BPrivate::BufferCache;
+	friend class BPrivate::SharedBufferList;
 	friend class BMediaRoster;
 	friend class BBufferProducer;
 	friend class BBufferConsumer;
@@ -73,15 +76,14 @@ private:
 			void				SetHeader(const media_header* header);
 
 			media_header		fMediaHeader;
-			_shared_buffer_list* fBufferList;
+			BPrivate::SharedBufferList* fBufferList;
 			area_id				fArea;
 			void*				fData;
 			size_t				fOffset;
 			size_t				fSize;
-			media_buffer_id		fBufferID;
 			int32				fFlags;
 
-			uint32				_reserved[11];
+			uint32				_reserved[12];
 };
 
 

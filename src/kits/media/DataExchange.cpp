@@ -1,52 +1,54 @@
-/* 
+/*
  * Copyright 2002-2007, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
-#include <OS.h>
-#include <Messenger.h>
+
+#include <DataExchange.h>
+
 #include <string.h>
 #include <unistd.h>
+
+#include <Messenger.h>
+#include <OS.h>
+
 #include "debug.h"
 #include "PortPool.h"
 #include "MediaMisc.h"
-#include "DataExchange.h"
 #include "ServerInterface.h"
+
 
 #define TIMEOUT 15000000 // 15 seconds timeout!
 
+
 namespace BPrivate {
 namespace media {
-
-team_id team;
-
 namespace dataexchange {
 
-BMessenger *MediaServerMessenger;
+
+BMessenger* MediaServerMessenger;
 static port_id MediaServerPort;
 static port_id MediaAddonServerPort;
 
 void find_media_server_port();
 void find_media_addon_server_port();
 
-static BMessenger * GetMediaServerMessenger() {
-	static BMessenger * messenger = new BMessenger(B_MEDIA_SERVER_SIGNATURE);
+static BMessenger*
+GetMediaServerMessenger()
+{
+	static BMessenger* messenger = new BMessenger(B_MEDIA_SERVER_SIGNATURE);
 	return MediaServerMessenger = messenger;
 }
 
-class initit
-{
+class initit {
 public:
 	initit()
 	{
 		MediaServerMessenger = 0;
 		find_media_server_port();
 		find_media_addon_server_port();
-
-		thread_info info; 
-		get_thread_info(find_thread(NULL), &info); 
-		team = info.team; 
 	}
+
 	~initit()
 	{
 		delete MediaServerMessenger;
@@ -55,7 +57,8 @@ public:
 initit _initit;
 
 
-void find_media_server_port()
+void
+find_media_server_port()
 {
 	MediaServerPort = find_port(MEDIA_SERVER_PORT_NAME);
 	if (MediaServerPort < 0) {
@@ -64,7 +67,9 @@ void find_media_server_port()
 	}
 }
 
-void find_media_addon_server_port()
+
+void
+find_media_addon_server_port()
 {
 	MediaAddonServerPort = find_port(MEDIA_ADDON_SERVER_PORT_NAME);
 	if (MediaAddonServerPort < 0) {
@@ -84,7 +89,8 @@ request_data::SendReply(status_t result, reply_data *reply, int replysize) const
 
 
 // BMessage based data exchange with the media_server
-status_t SendToServer(BMessage *msg)
+status_t
+SendToServer(BMessage *msg)
 {
 	status_t rv;
 	rv = GetMediaServerMessenger()->SendMessage(msg, static_cast<BHandler *>(NULL), TIMEOUT);
@@ -96,7 +102,7 @@ status_t SendToServer(BMessage *msg)
 }
 
 
-status_t 
+status_t
 QueryServer(BMessage &request, BMessage &reply)
 {
 	status_t status = GetMediaServerMessenger()->SendMessage(&request, &reply, TIMEOUT, TIMEOUT);
@@ -110,32 +116,37 @@ QueryServer(BMessage &request, BMessage &reply)
 
 
 // Raw data based data exchange with the media_server
-status_t SendToServer(int32 msgcode, command_data *msg, int size)
+status_t
+SendToServer(int32 msgcode, command_data *msg, int size)
 {
 	return SendToPort(MediaServerPort, msgcode, msg, size);
 }
 
-status_t QueryServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize)
+status_t
+QueryServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize)
 {
 	return QueryPort(MediaServerPort, msgcode, request, requestsize, reply, replysize);
 }
 
 
 // Raw data based data exchange with the media_addon_server
-status_t SendToAddonServer(int32 msgcode, command_data *msg, int size)
+status_t
+SendToAddonServer(int32 msgcode, command_data *msg, int size)
 {
 	return SendToPort(MediaAddonServerPort, msgcode, msg, size);
 }
 
 
-status_t QueryAddonServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize)
+status_t
+QueryAddonServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize)
 {
 	return QueryPort(MediaAddonServerPort, msgcode, request, requestsize, reply, replysize);
 }
 
 
 // Raw data based data exchange with the media_server
-status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size)
+status_t
+SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size)
 {
 	status_t rv;
 
@@ -162,7 +173,8 @@ status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size
 }
 
 
-status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize)
+status_t
+QueryPort(port_id requestport, int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize)
 {
 	status_t rv;
 	int32 code;
@@ -170,7 +182,7 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 	request->reply_port = _PortPool->GetPort();
 
 	rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
-	
+
 	if (rv != B_OK) {
 		ERROR("QueryPort: write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, requestport, rv, strerror(rv));
 		if (rv == B_BAD_PORT_ID && requestport == MediaServerPort) {
@@ -198,11 +210,10 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 	if (rv < B_OK) {
 		ERROR("QueryPort: read_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, request->reply_port, rv, strerror(rv));
 	}
-	
+
 	return (rv < B_OK) ? rv : reply->result;
 }
 
-}; // dataexchange
-}; // media
-}; // BPrivate
-
+}	// dataexchange
+}	// media
+}	// BPrivate

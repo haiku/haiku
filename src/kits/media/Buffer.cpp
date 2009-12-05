@@ -1,4 +1,9 @@
 /*
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
+
+/*
  * Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -24,12 +29,12 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
  */
 
 
 #include <Buffer.h>
 
+#include <AppMisc.h>
 #include <MediaDefs.h>
 
 #include "debug.h"
@@ -37,9 +42,6 @@
 #include "SharedBufferList.h"
 
 
-namespace BPrivate { namespace media {
-	extern team_id team;
-} }
 using namespace BPrivate::media;
 
 
@@ -49,11 +51,11 @@ using namespace BPrivate::media;
 buffer_clone_info::buffer_clone_info()
 {
 	CALLED();
-	buffer	= 0;
-	area 	= 0;
-	offset 	= 0;
-	size 	= 0;
-	flags 	= 0;
+	buffer = 0;
+	area = 0;
+	offset = 0;
+	size = 0;
+	flags = 0;
 }
 
 
@@ -122,11 +124,11 @@ BBuffer::CloneInfo() const
 	CALLED();
 	buffer_clone_info info;
 
-	info.buffer	= fBufferID;
-	info.area	= fArea;
-	info.offset	= fOffset;
-	info.size	= fSize;
-	info.flags	= fFlags;
+	info.buffer = fMediaHeader.buffer;
+	info.area = fArea;
+	info.offset = fOffset;
+	info.size = fSize;
+	info.flags = fFlags;
 
 	return info;
 }
@@ -137,7 +139,6 @@ BBuffer::ID()
 {
 	CALLED();
 	return fMediaHeader.buffer;
-	//return fBufferID;
 }
 
 
@@ -181,19 +182,20 @@ BBuffer::Size()
 }
 
 
-//	#pragma mark - private BBuffer
+// #pragma mark - private BBuffer
 
 
 BBuffer::BBuffer(const buffer_clone_info& info)
 	:
-	// must all be NULL/0 if not correct initialized
-	fBufferList(NULL), 
+	// must all be NULL/0 if not correctly initialized
+	fBufferList(NULL),
 	fData(NULL),
-	fSize(0),
-	fBufferID(0)
-		// must be 0 if not registered
+	fSize(0)
 {
 	CALLED();
+
+	fMediaHeader.buffer = 0;
+		// must be 0 if not registered
 
 	// special case for BSmallBuffer
 	if (info.area == 0 && info.buffer == 0)
@@ -208,7 +210,7 @@ BBuffer::BBuffer(const buffer_clone_info& info)
 		return;
 	}
 
-	fBufferList = _shared_buffer_list::Clone(areaReply.area);
+	fBufferList = BPrivate::SharedBufferList::Get(areaReply.area);
 	if (fBufferList == NULL) {
 		ERROR("BBuffer::BBuffer: _shared_buffer_list::Clone() failed\n");
 		return;
@@ -217,7 +219,7 @@ BBuffer::BBuffer(const buffer_clone_info& info)
 	server_register_buffer_request request;
 	server_register_buffer_reply reply;
 
-	request.team = team;
+	request.team = BPrivate::current_team();
 	request.info = info;
 
 	// ask media_server to register this buffer,
@@ -241,10 +243,11 @@ BBuffer::BBuffer(const buffer_clone_info& info)
 
 	// the response from media server contains enough information
 	// to clone the memory for this buffer
-	fBufferID = reply.info.buffer;
 	fSize = reply.info.size;
 	fFlags = reply.info.flags;
 	fOffset = reply.info.offset;
+	fMediaHeader.size_used = 0;
+	fMediaHeader.buffer = reply.info.buffer;
 
 	fArea = clone_area("a cloned BBuffer", &fData, B_ANY_ADDRESS,
 		B_READ_AREA | B_WRITE_AREA, reply.info.area);
@@ -256,28 +259,26 @@ BBuffer::BBuffer(const buffer_clone_info& info)
 	}
 
 	fData = (char*)fData + fOffset;
-	fMediaHeader.size_used = 0;
-	fMediaHeader.buffer = fBufferID;
 }
 
 
 BBuffer::~BBuffer()
 {
 	CALLED();
+
 	// unmap the BufferList
 	if (fBufferList != NULL)
-		fBufferList->Unmap();
+		fBufferList->Put();
 
 	// unmap the Data
 	if (fData != NULL) {
 		delete_area(fArea);
 
-		// ask media_server to unregister the buffer
-		// when the last clone of this buffer is gone,
-		// media_server will also remove it's cached area
+		// Ask media_server to unregister the buffer when the last clone of
+		// this buffer is gone, media_server will also remove its cached area.
 		server_unregister_buffer_command cmd;
-		cmd.team = team;
-		cmd.bufferid = fBufferID;
+		cmd.team = BPrivate::current_team();
+		cmd.buffer_id = fMediaHeader.buffer;
 		SendToServer(SERVER_UNREGISTER_BUFFER, &cmd, sizeof(cmd));
 	}
 }
@@ -287,14 +288,14 @@ void
 BBuffer::SetHeader(const media_header* header)
 {
 	CALLED();
+	ASSERT(header->buffer == fMediaHeader.buffer);
+	if (header->buffer != fMediaHeader.buffer)
+		debugger("oops");
 	fMediaHeader = *header;
-
-//  TODO: why can't we do this without crash? what's wrong?
-//	fMediaHeader.buffer = fBufferID;
 }
 
 
-//	#pragma mark - public BSmallBuffer
+// #pragma mark - public BSmallBuffer
 
 
 static const buffer_clone_info sSmallBufferInfo;

@@ -43,9 +43,9 @@ BBufferGroup::BBufferGroup(size_t size, int32 count, uint32 placement,
 	CALLED();
 	if (_Init() != B_OK)
 		return;
-		
+
 	// This one is easy. We need to create "count" BBuffers,
-	// each one "size" bytes large. They all go into one 
+	// each one "size" bytes large. They all go into one
 	// area, with "placement" and "lock" attributes.
 	// The BBuffers created will clone the area, and
 	// then we delete our area. This way BBuffers are
@@ -57,7 +57,7 @@ BBufferGroup::BBufferGroup(size_t size, int32 count, uint32 placement,
 			"&& placement != B_ANY_KERNEL_ADDRESS (0x%08lx)\n", placement);
 		placement = B_ANY_ADDRESS;
 	}
-	
+
 	// first we roundup for a better placement in memory
 	size_t allocSize = (size + 63) & ~63;
 
@@ -76,7 +76,7 @@ BBufferGroup::BBufferGroup(size_t size, int32 count, uint32 placement,
 
 	buffer_clone_info info;
 
-	for (int32 i = 0; i < count; i++) {	
+	for (int32 i = 0; i < count; i++) {
 		info.area = bufferArea;
 		info.offset = i * allocSize;
 		info.size = size;
@@ -95,7 +95,7 @@ BBufferGroup::BBufferGroup()
 	CALLED();
 	if (_Init() != B_OK)
 		return;
-		
+
 	// this one simply creates an empty BBufferGroup
 }
 
@@ -105,16 +105,16 @@ BBufferGroup::BBufferGroup(int32 count, const media_buffer_id* buffers)
 	CALLED();
 	if (_Init() != B_OK)
 		return;
-		
+
 	// TODO: we need to make sure that a media_buffer_id is only added
 	// once to each group
 
-	// this one creates "BBuffer"s from "media_buffer_id"s passed 
+	// this one creates "BBuffer"s from "media_buffer_id"s passed
 	// by the application.
 
 	buffer_clone_info info;
 
-	for (int32 i = 0; i < count; i++) {	
+	for (int32 i = 0; i < count; i++) {
 		info.buffer = buffers[i];
 
 		fInitError = AddBuffer(info);
@@ -127,8 +127,8 @@ BBufferGroup::BBufferGroup(int32 count, const media_buffer_id* buffers)
 BBufferGroup::~BBufferGroup()
 {
 	CALLED();
-	if (fBufferList)
-		fBufferList->Terminate(fReclaimSem);
+	if (fBufferList != NULL)
+		fBufferList->DeleteGroupAndPut(fReclaimSem);
 
 	delete_sem(fReclaimSem);
 }
@@ -188,7 +188,7 @@ BBufferGroup::RequestBuffer(size_t size, bigtime_t timeout)
 
 	if (size <= 0)
 		return NULL;
-		
+
 	BBuffer *buffer;
 	status_t status;
 
@@ -207,7 +207,7 @@ BBufferGroup::RequestBuffer(BBuffer* buffer, bigtime_t timeout)
 	CALLED();
 	if (fInitError != B_OK)
 		return B_NO_INIT;
-	
+
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
@@ -215,7 +215,7 @@ BBufferGroup::RequestBuffer(BBuffer* buffer, bigtime_t timeout)
 	status = fBufferList->RequestBuffer(fReclaimSem, fBufferCount, 0, 0,
 		&buffer, timeout);
 	fRequestError = status;
-		
+
 	return status;
 }
 
@@ -249,7 +249,7 @@ BBufferGroup::GetBufferList(int32 bufferCount, BBuffer** _buffers)
 	CALLED();
 	if (fInitError != B_OK)
 		return B_NO_INIT;
-		
+
 	if (bufferCount <= 0 || bufferCount > fBufferCount)
 		return B_BAD_VALUE;
 
@@ -264,7 +264,7 @@ BBufferGroup::WaitForBuffers()
 	if (fInitError != B_OK)
 		return B_NO_INIT;
 
-	// TODO: this function is not really useful anyway, and will 
+	// TODO: this function is not really useful anyway, and will
 	// not work exactly as documented, but it is close enough
 
 	if (fBufferCount < 0)
@@ -281,7 +281,7 @@ BBufferGroup::WaitForBuffers()
 		;
 	if (status != B_OK)
 		return status;
-		
+
 	// we need to release the "fReclaimSem" now, else we would block
 	// requesting of new buffers
 
@@ -297,7 +297,7 @@ BBufferGroup::ReclaimAllBuffers()
 		return B_NO_INIT;
 
 	// because additional BBuffers might get added to this group betweeen
-	// acquire and release		
+	// acquire and release
 	int32 count = fBufferCount;
 
 	if (count < 0)
@@ -313,10 +313,10 @@ BBufferGroup::ReclaimAllBuffers()
 	do {
 		status = acquire_sem_etc(fReclaimSem, count, 0, 0);
 	} while (status == B_INTERRUPTED);
-	
+
 	if (status != B_OK)
 		return status;
-		
+
 	// we need to release the "fReclaimSem" now, else we would block
 	// requesting of new buffers
 
@@ -333,7 +333,7 @@ BBufferGroup::AddBuffersTo(BMessage* message, const char* name, bool needLock)
 	CALLED();
 	if (fInitError != B_OK)
 		return B_NO_INIT;
-	
+
 	// BeOS R4 legacy API. Implemented as a wrapper around GetBufferList
 	// "needLock" is ignored, GetBufferList will do locking
 
@@ -342,17 +342,17 @@ BBufferGroup::AddBuffersTo(BMessage* message, const char* name, bool needLock)
 
 	if (name == NULL || strlen(name) == 0)
 		return B_BAD_VALUE;
-	
+
 	BBuffer** buffers;
 	int32 count;
-	
+
 	count = fBufferCount;
 	buffers = new BBuffer * [count];
 
 	status_t status = GetBufferList(count, buffers);
 	if (status != B_OK)
 		goto end;
-		
+
 	for (int32 i = 0; i < count; i++) {
 		status = message->AddInt32(name, int32(buffers[i]->ID()));
 		if (status != B_OK)
@@ -377,7 +377,7 @@ status_t
 BBufferGroup::_Init()
 {
 	CALLED();
-	
+
 	// some defaults in case we drop out early
 	fBufferList = 0;
 	fInitError = B_ERROR;
@@ -404,9 +404,9 @@ BBufferGroup::_Init()
 		return fInitError;
 	}
 
-	fBufferList = _shared_buffer_list::Clone(areaReply.area);
+	fBufferList = BPrivate::SharedBufferList::Get(areaReply.area);
 	if (fBufferList == NULL) {
-		ERROR("BBufferGroup::InitBufferGroup: _shared_buffer_list::Clone "
+		ERROR("BBufferGroup::InitBufferGroup: SharedBufferList::Get() "
 			"failed\n");
 		fInitError = B_ERROR;
 		return fInitError;

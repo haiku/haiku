@@ -10,7 +10,9 @@
 
 
 class BBuffer;
-struct _shared_buffer_list;
+namespace BPrivate {
+	struct SharedBufferList;
+}
 
 
 class BBufferGroup {
@@ -53,12 +55,12 @@ private:
 			status_t		_Init();
 
 private:
-	friend struct _shared_buffer_list;
+	friend struct BPrivate::SharedBufferList;
 
 			status_t		fInitError;
 			status_t		fRequestError;
 			int32			fBufferCount;
-			_shared_buffer_list* fBufferList;
+			BPrivate::SharedBufferList* fBufferList;
 			sem_id			fReclaimSem;
 
 			uint32			_reserved[9];

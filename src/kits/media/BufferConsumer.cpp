@@ -24,37 +24,35 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
  */
 
+
+#include "BufferCache.h"
 #include <BufferConsumer.h>
+
+#include <stdlib.h>
+
 #include <BufferProducer.h>
 #include <BufferGroup.h>
 #include <Buffer.h>
-#include <TimeSource.h> //for debugging
-#include <stdlib.h>
-#include "debug.h"
-#include "MediaMisc.h"
-#include "DataExchange.h"
-#include "BufferIdCache.h"
+#include <TimeSource.h>
 
-/*************************************************************
- * protected BBufferConsumer
- *************************************************************/
+#include <debug.h>
+#include <MediaMisc.h>
+#include <DataExchange.h>
 
-/* virtual */
+
+
 BBufferConsumer::~BBufferConsumer()
 {
 	CALLED();
 	delete fBufferCache;
-	if (fDeleteBufferGroup)
-		delete fDeleteBufferGroup;
+	delete fDeleteBufferGroup;
 }
 
 
-/*************************************************************
- * public BBufferConsumer
- *************************************************************/
+// #pragma mark - public BBufferConsumer
+
 
 media_type
 BBufferConsumer::ConsumerType()
@@ -64,97 +62,97 @@ BBufferConsumer::ConsumerType()
 }
 
 
-/* static */ status_t
-BBufferConsumer::RegionToClipData(const BRegion *region,
-								  int32 *format,
-								  int32 *ioSize,
-								  void *data)
+/*static*/ status_t
+BBufferConsumer::RegionToClipData(const BRegion* region, int32* _format,
+	int32 *_size, void* data)
 {
 	CALLED();
-	
-	status_t rv;
-	int count;
 
-	count = *ioSize / sizeof(int16);
-	rv = BBufferProducer::clip_region_to_shorts(region, static_cast<int16 *>(data), count, &count);
-	*ioSize	= count * sizeof(int16);
-	*format = BBufferProducer::B_CLIP_SHORT_RUNS;
-	
-	return rv;
+	int count = *_size / sizeof(int16);
+	status_t status = BBufferProducer::clip_region_to_shorts(region,
+		static_cast<int16 *>(data), count, &count);
+
+	*_size = count * sizeof(int16);
+	*_format = BBufferProducer::B_CLIP_SHORT_RUNS;
+
+	return status;
 }
 
-/*************************************************************
- * protected BBufferConsumer
- *************************************************************/
 
-/* explicit */
-BBufferConsumer::BBufferConsumer(media_type consumer_type) :
+// #pragma mark - protected BBufferConsumer
+
+
+BBufferConsumer::BBufferConsumer(media_type consumerType)
+	:
 	BMediaNode("called by BBufferConsumer"),
-	fConsumerType(consumer_type),
-	fBufferCache(new _buffer_id_cache),
+	fConsumerType(consumerType),
+	fBufferCache(new BPrivate::BufferCache),
 	fDeleteBufferGroup(0)
 {
 	CALLED();
-	
+
 	AddNodeKind(B_BUFFER_CONSUMER);
 }
 
 
-/* static */ void
-BBufferConsumer::NotifyLateProducer(const media_source &what_source,
-									bigtime_t how_much,
-									bigtime_t performance_time)
+/*static*/ void
+BBufferConsumer::NotifyLateProducer(const media_source& whatSource,
+	bigtime_t howMuch, bigtime_t performanceTime)
 {
 	CALLED();
-	if (IS_INVALID_SOURCE(what_source))
+	if (IS_INVALID_SOURCE(whatSource))
 		return;
 
 	producer_late_notice_received_command command;
-	command.source = what_source;
-	command.how_much = how_much;
-	command.performance_time = performance_time;
-	
-	SendToPort(what_source.port, PRODUCER_LATE_NOTICE_RECEIVED, &command, sizeof(command));
+	command.source = whatSource;
+	command.how_much = howMuch;
+	command.performance_time = performanceTime;
+
+	SendToPort(whatSource.port, PRODUCER_LATE_NOTICE_RECEIVED, &command,
+		sizeof(command));
 }
 
 
 status_t
-BBufferConsumer::SetVideoClippingFor(const media_source &output,
-									 const media_destination &destination,
-									 const int16 *shorts,
-									 int32 short_count,
-									 const media_video_display_info &display,
-									 void *user_data,
-									 int32 *change_tag,
-									 void *_reserved_)
+BBufferConsumer::SetVideoClippingFor(const media_source& output,
+	const media_destination& destination, const int16* shorts, int32 shortCount,
+	const media_video_display_info& display, void* userData, int32* _changeTag,
+	void *_reserved_)
 {
 	CALLED();
 	if (IS_INVALID_SOURCE(output))
 		return B_MEDIA_BAD_SOURCE;
 	if (IS_INVALID_DESTINATION(destination))
 		return B_MEDIA_BAD_DESTINATION;
-	if (short_count > int(B_MEDIA_MESSAGE_SIZE - sizeof(producer_video_clipping_changed_command)) / 2)
-		debugger("BBufferConsumer::SetVideoClippingFor short_count too large (8000 limit)\n");
-		
-	producer_video_clipping_changed_command *command;
-	size_t size;
-	status_t rv;
+	if (shortCount > int(B_MEDIA_MESSAGE_SIZE
+			- sizeof(producer_video_clipping_changed_command)) / 2) {
+		debugger("BBufferConsumer::SetVideoClippingFor short_count too large "
+			"(8000 limit)\n");
+	}
 
-	size = sizeof(producer_video_clipping_changed_command) + short_count * sizeof(short);
-	command = static_cast<producer_video_clipping_changed_command *>(malloc(size));
+	producer_video_clipping_changed_command* command;
+	size_t size = sizeof(producer_video_clipping_changed_command)
+		+ shortCount * sizeof(short);
+	command
+		= static_cast<producer_video_clipping_changed_command*>(malloc(size));
+	if (command == NULL)
+		return B_NO_MEMORY;
+
 	command->source = output;
 	command->destination = destination;
 	command->display = display;
-	command->user_data = user_data;
+	command->user_data = userData;
 	command->change_tag = NewChangeTag();
-	command->short_count = short_count;
-	memcpy(command->shorts, shorts, short_count * sizeof(short));
-	if (change_tag != NULL)
-		*change_tag = command->change_tag;
-	
-	rv = SendToPort(output.port, PRODUCER_VIDEO_CLIPPING_CHANGED, command, size);
+	command->short_count = shortCount;
+	memcpy(command->shorts, shorts, shortCount * sizeof(short));
+	if (_changeTag != NULL)
+		*_changeTag = command->change_tag;
+
+	status_t status = SendToPort(output.port, PRODUCER_VIDEO_CLIPPING_CHANGED,
+		command, size);
+
 	free(command);
-	return rv;
+	return status;
 }
 
 
@@ -173,7 +171,7 @@ BBufferConsumer::SetOutputEnabled(const media_source &source,
 		return B_MEDIA_BAD_DESTINATION;
 
 	producer_enable_output_command command;
-	
+
 	command.source = source;
 	command.destination = destination;
 	command.enabled = enabled;
@@ -181,7 +179,7 @@ BBufferConsumer::SetOutputEnabled(const media_source &source,
 	command.change_tag = NewChangeTag();
 	if (change_tag != NULL)
 		*change_tag = command.change_tag;
-	
+
 	return SendToPort(source.port, PRODUCER_ENABLE_OUTPUT, &command, sizeof(command));
 }
 
@@ -201,7 +199,7 @@ BBufferConsumer::RequestFormatChange(const media_source &source,
 		return B_MEDIA_BAD_DESTINATION;
 
 	producer_format_change_requested_command command;
-	
+
 	command.source = source;
 	command.destination = destination;
 	command.format = to_format;
@@ -209,7 +207,7 @@ BBufferConsumer::RequestFormatChange(const media_source &source,
 	command.change_tag = NewChangeTag();
 	if (change_tag != NULL)
 		*change_tag = command.change_tag;
-	
+
 	return SendToPort(source.port, PRODUCER_FORMAT_CHANGE_REQUESTED, &command, sizeof(command));
 }
 
@@ -224,46 +222,41 @@ BBufferConsumer::RequestAdditionalBuffer(const media_source &source,
 		return B_MEDIA_BAD_SOURCE;
 
 	producer_additional_buffer_requested_command command;
-	
+
 	command.source = source;
 	command.prev_buffer = prev_buffer->ID();
 	command.prev_time = 0;
 	command.has_seek_tag = false;
-	//command.prev_tag = 
-	
+	//command.prev_tag =
+
 	return SendToPort(source.port, PRODUCER_ADDITIONAL_BUFFER_REQUESTED, &command, sizeof(command));
 }
 
 
 status_t
-BBufferConsumer::RequestAdditionalBuffer(const media_source &source,
-										 bigtime_t start_time,
-										 void *_reserved)
+BBufferConsumer::RequestAdditionalBuffer(const media_source& source,
+	bigtime_t startTime, void *_reserved)
 {
 	CALLED();
 	if (IS_INVALID_SOURCE(source))
 		return B_MEDIA_BAD_SOURCE;
 
 	producer_additional_buffer_requested_command command;
-	
+
 	command.source = source;
 	command.prev_buffer = 0;
-	command.prev_time = start_time;
+	command.prev_time = startTime;
 	command.has_seek_tag = false;
-	//command.prev_tag = 
-	
-	return SendToPort(source.port, PRODUCER_ADDITIONAL_BUFFER_REQUESTED, &command, sizeof(command));
+
+	return SendToPort(source.port, PRODUCER_ADDITIONAL_BUFFER_REQUESTED,
+		&command, sizeof(command));
 }
 
 
 status_t
 BBufferConsumer::SetOutputBuffersFor(const media_source &source,
-									 const media_destination &destination,
-									 BBufferGroup *group,
-									 void *user_data,
-									 int32 *change_tag,
-									 bool will_reclaim,
-									 void *_reserved_)
+	const media_destination &destination, BBufferGroup *group, void *user_data,
+	int32 *change_tag, bool will_reclaim, void *_reserved_)
 {
 	CALLED();
 
@@ -271,10 +264,10 @@ BBufferConsumer::SetOutputBuffersFor(const media_source &source,
 		return B_MEDIA_BAD_SOURCE;
 	if (IS_INVALID_DESTINATION(destination))
 		return B_MEDIA_BAD_DESTINATION;
-	
+
 	producer_set_buffer_group_command *command;
 	BBuffer **buffers;
-	int32 buffer_count;	
+	int32 buffer_count;
 	size_t size;
 	status_t rv;
 
@@ -284,8 +277,8 @@ BBufferConsumer::SetOutputBuffersFor(const media_source &source,
 		if (B_OK != group->CountBuffers(&buffer_count))
 			return B_ERROR;
 	}
-	
-	if (buffer_count != 0) {	
+
+	if (buffer_count != 0) {
 		buffers = new BBuffer * [buffer_count];
 		if (B_OK != group->GetBufferList(buffer_count, buffers)) {
 			delete [] buffers;
@@ -309,11 +302,11 @@ BBufferConsumer::SetOutputBuffersFor(const media_source &source,
 
 	if (change_tag != NULL)
 		*change_tag = command->change_tag;
-	
+
 	rv = SendToPort(source.port, PRODUCER_SET_BUFFER_GROUP, command, size);
 	free(command);
 
-	if (rv == B_OK) {	
+	if (rv == B_OK) {
 		if (fDeleteBufferGroup) // XXX will leak memory if port write failed
 			delete fDeleteBufferGroup;
 		fDeleteBufferGroup = will_reclaim ? NULL : group;
@@ -323,10 +316,8 @@ BBufferConsumer::SetOutputBuffersFor(const media_source &source,
 
 
 status_t
-BBufferConsumer::SendLatencyChange(const media_source &source,
-								   const media_destination &destination,
-								   bigtime_t my_new_latency,
-								   uint32 flags)
+BBufferConsumer::SendLatencyChange(const media_source& source,
+	const media_destination& destination, bigtime_t newLatency, uint32 flags)
 {
 	CALLED();
 	if (IS_INVALID_SOURCE(source))
@@ -335,37 +326,36 @@ BBufferConsumer::SendLatencyChange(const media_source &source,
 		return B_MEDIA_BAD_DESTINATION;
 
 	producer_latency_changed_command command;
-	
+
 	command.source = source;
 	command.destination = destination;
-	command.latency = my_new_latency;
+	command.latency = newLatency;
 	command.flags = flags;
-	
-	TRACE("###### BBufferConsumer::SendLatencyChange: latency from %ld/%ld to %ld/%ld changed to %Ld\n",
-		source.port, source.id, destination.port, destination.id, my_new_latency);
-	
-	return SendToPort(source.port, PRODUCER_LATENCY_CHANGED, &command, sizeof(command));
+
+	TRACE("###### BBufferConsumer::SendLatencyChange: latency from %ld/%ld to "
+		"%ld/%ld changed to %Ld\n", source.port, source.id, destination.port,
+		destination.id, newLatency);
+
+	return SendToPort(source.port, PRODUCER_LATENCY_CHANGED, &command,
+		sizeof(command));
 }
 
-/*************************************************************
- * protected BBufferConsumer
- *************************************************************/
 
-/* virtual */ status_t
-BBufferConsumer::HandleMessage(int32 message,
-							   const void *data,
-							   size_t size)
+status_t
+BBufferConsumer::HandleMessage(int32 message, const void* data, size_t size)
 {
 	PRINT(4, "BBufferConsumer::HandleMessage %#lx, node %ld\n", message, ID());
 	status_t rv;
 	switch (message) {
 		case CONSUMER_ACCEPT_FORMAT:
 		{
-			const consumer_accept_format_request *request = static_cast<const consumer_accept_format_request *>(data);
+			const consumer_accept_format_request* request
+				= static_cast<const consumer_accept_format_request*>(data);
+
 			consumer_accept_format_reply reply;
 			reply.format = request->format;
-			rv = AcceptFormat(request->dest, &reply.format);
-			request->SendReply(rv, &reply, sizeof(reply));
+			status_t status = AcceptFormat(request->dest, &reply.format);
+			request->SendReply(status, &reply, sizeof(reply));
 			return B_OK;
 		}
 
@@ -390,12 +380,17 @@ BBufferConsumer::HandleMessage(int32 message,
 
 		case CONSUMER_BUFFER_RECEIVED:
 		{
-			const consumer_buffer_received_command *command = static_cast<const consumer_buffer_received_command *>(data);
-			BBuffer *buffer;
-			buffer = fBufferCache->GetBuffer(command->buffer);
+			const consumer_buffer_received_command* command
+				= static_cast<const consumer_buffer_received_command*>(data);
+
+			BBuffer* buffer = fBufferCache->GetBuffer(command->buffer);
 			buffer->SetHeader(&command->header);
-			PRINT(4, "calling BBufferConsumer::BufferReceived buffer %ld at perf %Ld and TimeSource()->Now() is %Ld\n", buffer->Header()->buffer, buffer->Header()->start_time, TimeSource()->Now());
-			//printf("BBufferConsumer::BufferReceived node %2ld, buffer %2ld, start_time %12Ld with lateness %6Ld\n", ID(), buffer->Header()->buffer, buffer->Header()->start_time, TimeSource()->Now() - buffer->Header()->start_time);
+
+			PRINT(4, "calling BBufferConsumer::BufferReceived buffer %ld at "
+				"perf %Ld and TimeSource()->Now() is %Ld\n",
+				buffer->Header()->buffer, buffer->Header()->start_time,
+				TimeSource()->Now());
+
 			BufferReceived(buffer);
 			return B_OK;
 		}
@@ -425,7 +420,7 @@ BBufferConsumer::HandleMessage(int32 message,
 			request->SendReply(rv, &reply, sizeof(reply));
 			return B_OK;
 		}
-				
+
 		case CONSUMER_DISCONNECTED:
 		{
 			const consumer_disconnected_request *request = static_cast<const consumer_disconnected_request *>(data);
@@ -464,8 +459,7 @@ BBufferConsumer::HandleMessage(int32 message,
 			request->SendReply(rv, &reply, sizeof(reply));
 			return B_OK;
 		}
-
-	};
+	}
 	return B_ERROR;
 }
 
@@ -482,9 +476,9 @@ BBufferConsumer::SeekTagRequested(const media_destination &destination,
 	return B_ERROR;
 }
 
-/*************************************************************
- * private BBufferConsumer
- *************************************************************/
+
+// #pragma mark - private BBufferConsumer
+
 
 /*
 not implemented:
@@ -493,7 +487,9 @@ BBufferConsumer::BBufferConsumer(const BBufferConsumer &clone)
 BBufferConsumer & BBufferConsumer::operator=(const BBufferConsumer &clone)
 */
 
-/* deprecated function for R4 */
+
+/*!	Deprecated function for BeOS R4.
+*/
 /* static */ status_t
 BBufferConsumer::SetVideoClippingFor(const media_source &output,
 									 const int16 *shorts,
@@ -506,7 +502,7 @@ BBufferConsumer::SetVideoClippingFor(const media_source &output,
 		return B_MEDIA_BAD_SOURCE;
 	if (short_count > int(B_MEDIA_MESSAGE_SIZE - sizeof(producer_video_clipping_changed_command)) / 2)
 		debugger("BBufferConsumer::SetVideoClippingFor short_count too large (8000 limit)\n");
-		
+
 	producer_video_clipping_changed_command *command;
 	size_t size;
 	status_t rv;
@@ -522,19 +518,19 @@ BBufferConsumer::SetVideoClippingFor(const media_source &output,
 	memcpy(command->shorts, shorts, short_count * sizeof(short));
 	if (change_tag != NULL)
 		*change_tag = command->change_tag;
-	
+
 	rv = SendToPort(output.port, PRODUCER_VIDEO_CLIPPING_CHANGED, command, size);
 	free(command);
 	return rv;
 }
 
 
-/* deprecated function for R4 */
-/* static */ status_t
-BBufferConsumer::RequestFormatChange(const media_source &source,
-									 const media_destination &destination,
-									 media_format *in_to_format,
-									 int32 *change_tag)
+/*!	Deprecated function for BeOS R4.
+*/
+/*static*/ status_t
+BBufferConsumer::RequestFormatChange(const media_source& source,
+	const media_destination& destination, media_format* format,
+	int32* _changeTag)
 {
 	CALLED();
 	if (IS_INVALID_SOURCE(source))
@@ -543,57 +539,59 @@ BBufferConsumer::RequestFormatChange(const media_source &source,
 		return B_MEDIA_BAD_DESTINATION;
 
 	producer_format_change_requested_command command;
-	
+
 	command.source = source;
 	command.destination = destination;
-	command.format = *in_to_format;
+	command.format = *format;
 	command.user_data = 0;
 	command.change_tag = NewChangeTag();
-	if (change_tag != NULL)
-		*change_tag = command.change_tag;
-	
-	return SendToPort(source.port, PRODUCER_FORMAT_CHANGE_REQUESTED, &command, sizeof(command));
+	if (_changeTag != NULL)
+		*_changeTag = command.change_tag;
+
+	return SendToPort(source.port, PRODUCER_FORMAT_CHANGE_REQUESTED, &command,
+		sizeof(command));
 }
 
 
-/* deprecated function for R4 */
-/* static */ status_t
-BBufferConsumer::SetOutputEnabled(const media_source &source,
-								  bool enabled,
-								  int32 *change_tag)
+/*!	Deprecated function for BeOS R4.
+*/
+/*static*/ status_t
+BBufferConsumer::SetOutputEnabled(const media_source& source, bool enabled,
+	int32* _changeTag)
 {
 	CALLED();
 	if (IS_INVALID_SOURCE(source))
 		return B_MEDIA_BAD_SOURCE;
 
 	producer_enable_output_command command;
-	
+
 	command.source = source;
 	command.destination = media_destination::null;
 	command.enabled = enabled;
 	command.user_data = 0;
 	command.change_tag = NewChangeTag();
-	if (change_tag != NULL)
-		*change_tag = command.change_tag;
-	
-	return SendToPort(source.port, PRODUCER_ENABLE_OUTPUT, &command, sizeof(command));
+	if (_changeTag != NULL)
+		*_changeTag = command.change_tag;
+
+	return SendToPort(source.port, PRODUCER_ENABLE_OUTPUT, &command,
+		sizeof(command));
 }
 
 
-status_t BBufferConsumer::_Reserved_BufferConsumer_0(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_1(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_2(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_3(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_4(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_5(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_6(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_7(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_8(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_9(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_10(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_11(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_12(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_13(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_14(void *) { return B_ERROR; }
-status_t BBufferConsumer::_Reserved_BufferConsumer_15(void *) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_0(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_1(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_2(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_3(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_4(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_5(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_6(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_7(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_8(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_9(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_10(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_11(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_12(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_13(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_14(void*) { return B_ERROR; }
+status_t BBufferConsumer::_Reserved_BufferConsumer_15(void*) { return B_ERROR; }
 

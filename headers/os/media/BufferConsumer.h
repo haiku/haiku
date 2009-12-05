@@ -13,9 +13,9 @@
 class BBuffer;
 class BBufferGroup;
 class BRegion;
-class _buffer_id_cache;
 
 namespace BPrivate {
+	class BufferCache;
 	namespace media {
 		class BMediaRosterEx;
 	}
@@ -147,7 +147,7 @@ private:
 
 private:
 			media_type			fConsumerType;
-			_buffer_id_cache*	fBufferCache;
+			BPrivate::BufferCache* fBufferCache;
 			BBufferGroup*		fDeleteBufferGroup;
 			uint32				_reserved[14];
 };
