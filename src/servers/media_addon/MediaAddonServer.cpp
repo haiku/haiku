@@ -37,15 +37,20 @@
 #include <Application.h>
 #include <Beep.h>
 #include <Directory.h>
+#include <driver_settings.h>
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <MediaAddOn.h>
 #include <MediaRoster.h>
-#include <NodeMonitor.h>
+#include <MessageRunner.h>
 #include <Path.h>
 #include <Roster.h>
 #include <String.h>
 
+#include <safemode_defs.h>
+#include <syscalls.h>
+
+#include <AddOnMonitorHandler.h>
 #include <debug.h>
 #include <DataExchange.h>
 #include <DormantNodeManager.h>
@@ -86,7 +91,9 @@ public:
 	virtual void				MessageReceived(BMessage* message);
 
 private:
-			void				_WatchDir(BEntry* dir);
+	class MonitorHandler;
+	friend class MonitorHandler;
+
 			void				_AddOnAdded(const char* path, ino_t fileNode);
 			void				_AddOnRemoved(ino_t fileNode);
 			void				_HandleMessage(int32 code, const void* data,
@@ -112,12 +119,24 @@ private:
 			InfoMap				fInfoMap;
 
 			BMediaRoster*		fMediaRoster;
-			ino_t				fSystemAddOnsNode;
-			ino_t				fUserAddOnsNode;
+			MonitorHandler*		fMonitorHandler;
+			BMessageRunner*		fPulseRunner;
 			port_id				fControlPort;
 			thread_id			fControlThread;
 			bool				fStartup;
 			bool				fStartupSound;
+};
+
+
+class MediaAddonServer::MonitorHandler : public AddOnMonitorHandler {
+public:
+							MonitorHandler(MediaAddonServer* server);
+
+	virtual void			AddOnEnabled(const add_on_entry_info* info);
+	virtual void			AddOnDisabled(const add_on_entry_info* info);
+
+private:
+	MediaAddonServer* fServer;
 };
 
 
@@ -148,6 +167,35 @@ DumpFlavorInfo(const flavor_info* info)
 	printf("  out_format_count = %ld\n", info->out_format_count);
 }
 #endif
+
+
+// #pragma mark -
+
+
+MediaAddonServer::MonitorHandler::MonitorHandler(MediaAddonServer* server)
+{
+	fServer = server;
+}
+
+
+void
+MediaAddonServer::MonitorHandler::AddOnEnabled(const add_on_entry_info* info)
+{
+	entry_ref ref;
+	make_entry_ref(info->dir_nref.device, info->dir_nref.node,
+		info->name, &ref);
+
+	BPath path(&ref);
+	if (path.InitCheck() == B_OK)
+		fServer->_AddOnAdded(path.Path(), info->nref.node);
+}
+
+
+void
+MediaAddonServer::MonitorHandler::AddOnDisabled(const add_on_entry_info* info)
+{
+	fServer->_AddOnRemoved(info->nref.node);
+}
 
 
 // #pragma mark -
@@ -223,27 +271,50 @@ MediaAddonServer::ReadyToRun()
 	// will be autostarted. Finally, add-ons that don't have
 	// any active nodes (flavors) will be unloaded.
 
-	// load dormant media nodes
-	BPath path;
-	find_directory(B_BEOS_ADDONS_DIRECTORY, &path);
-	path.Append("media");
+	char parameter[32];
+	size_t parameterLength = sizeof(parameter);
+	bool safeMode = false;
+	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
+			&parameterLength) == B_OK) {
+		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
+			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
+			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
+			safeMode = true;
+	}
 
-	node_ref nref;
-	BEntry entry(path.Path());
-	entry.GetNodeRef(&nref);
-	fSystemAddOnsNode = nref.node;
-	_WatchDir(&entry);
+	fMonitorHandler = new MonitorHandler(this);
+	AddHandler(fMonitorHandler);
+
+	BMessage pulse(B_PULSE);
+	fPulseRunner = new BMessageRunner(fMonitorHandler, &pulse, 1000000LL);
+		// the monitor handler needs a pulse to check if add-ons are ready
+
+	// load dormant media nodes
+	const directory_which directories[] = {
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_BEOS_ADDONS_DIRECTORY
+	};
+
+	// when safemode, only B_BEOS_ADDONS_DIRECTORY is used
+	for (uint32 i = safeMode ? 2 : 0;
+			i < sizeof(directories) / sizeof(directory_which); i++) {
+		BDirectory directory;
+		node_ref nodeRef;
+		BPath path;
+		if (find_directory(directories[i], &path) == B_OK
+			&& path.Append("media") == B_OK
+			&& directory.SetTo(path.Path()) == B_OK
+			&& directory.GetNodeRef(&nodeRef) == B_OK)
+			fMonitorHandler->AddDirectory(&nodeRef);
+	}
 
 #ifdef USER_ADDON_PATH
-	entry.SetTo(USER_ADDON_PATH);
-#else
-	find_directory(B_USER_ADDONS_DIRECTORY, &path);
-	path.Append("media");
-	entry.SetTo(path.Path());
+	node_ref nodeRef;
+	if (entry.SetTo(USER_ADDON_PATH) == B_OK
+		&& entry.GetNodeRef(&nodeRef) == B_OK)
+		fMonitorHandler->AddDirectory(&nodeRef);
 #endif
-	entry.GetNodeRef(&nref);
-	fUserAddOnsNode = nref.node;
-	_WatchDir(&entry);
 
 	fStartup = false;
 
@@ -297,66 +368,6 @@ MediaAddonServer::MessageReceived(BMessage* message)
 			message->SendReply((uint32)B_OK);
 				// TODO: don't know which reply is expected
 			return;
-		}
-
-		case B_NODE_MONITOR:
-		{
-			switch (message->FindInt32("opcode")) {
-				case B_ENTRY_CREATED:
-				{
-					const char *name;
-					entry_ref ref;
-					ino_t node;
-					BEntry e;
-					BPath p;
-					message->FindString("name", &name);
-					message->FindInt64("node", &node);
-					message->FindInt32("device", &ref.device);
-					message->FindInt64("directory", &ref.directory);
-					ref.set_name(name);
-					e.SetTo(&ref,false);// build a BEntry for the created file/link/dir
-					e.GetPath(&p); 		// get the path to the file/link/dir
-					e.SetTo(&ref,true); // travese links to see
-					if (e.IsFile()) {		// if it's a link to a file, or a file
-						if (!message->FindBool("nowait")) {
-							// TODO: wait 5 seconds if this is a regular notification
-							// because the file creation may not be finshed when the
-							// notification arrives (very ugly, how can we fix this?)
-							// this will also fail if copying takes longer than 5 seconds
-							snooze(5000000);
-						}
-						_AddOnAdded(p.Path(), node);
-					}
-					return;
-				}
-				case B_ENTRY_REMOVED:
-				{
-					ino_t node;
-					message->FindInt64("node", &node);
-					_AddOnRemoved(node);
-					return;
-				}
-				case B_ENTRY_MOVED:
-				{
-					ino_t from;
-					ino_t to;
-					message->FindInt64("from directory", &from);
-					message->FindInt64("to directory", &to);
-					if (fSystemAddOnsNode == from || fUserAddOnsNode == from) {
-						message->ReplaceInt32("opcode", B_ENTRY_REMOVED);
-						message->AddInt64("directory", from);
-						MessageReceived(message);
-					}
-					if (fSystemAddOnsNode == to || fUserAddOnsNode == to) {
-						message->ReplaceInt32("opcode", B_ENTRY_CREATED);
-						message->AddInt64("directory", to);
-						message->AddBool("nowait", true);
-						MessageReceived(message);
-					}
-					return;
-				}
-			}
-			break;
 		}
 
 		default:
@@ -801,34 +812,6 @@ MediaAddonServer::_AddOnRemoved(ino_t fileNode)
 	_DormantNodeManager->UnregisterAddon(id);
 
 	BPrivate::media::notifications::FlavorsChanged(id, 0, oldFlavorCount);
-}
-
-
-void
-MediaAddonServer::_WatchDir(BEntry* dir)
-{
-	// send fake notices to trigger add-on loading
-	BDirectory directory(dir);
-	BEntry entry;
-	while (directory.GetNextEntry(&entry, false) == B_OK) {
-		node_ref nodeRef;
-		entry_ref ref;
-		if (entry.GetRef(&ref) != B_OK || entry.GetNodeRef(&nodeRef) != B_OK)
-			continue;
-
-		BMessage msg(B_NODE_MONITOR);
-		msg.AddInt32("opcode", B_ENTRY_CREATED);
-		msg.AddInt32("device", ref.device);
-		msg.AddInt64("directory", ref.directory);
-		msg.AddInt64("node", nodeRef.node);
-		msg.AddString("name", ref.name);
-		msg.AddBool("nowait", true);
-		MessageReceived(&msg);
-	}
-
-	node_ref nodeRef;
-	if (dir->GetNodeRef(&nodeRef) == B_OK)
-		watch_node(&nodeRef, B_WATCH_DIRECTORY, be_app_messenger);
 }
 
 
