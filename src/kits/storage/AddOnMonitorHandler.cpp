@@ -1,10 +1,11 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Andrew Bachmann
  */
+
 
 #include "AddOnMonitorHandler.h"
 
@@ -14,12 +15,13 @@
 
 
 #ifndef ADD_ON_STABLE_SECONDS
-#	define ADD_ON_STABLE_SECONDS 5
+#	define ADD_ON_STABLE_SECONDS 1
 #endif
 
 
 AddOnMonitorHandler::AddOnMonitorHandler(const char* name)
-	: NodeMonitorHandler(name != NULL ? name : "AddOnMonitorHandler")
+	:
+	NodeMonitorHandler(name != NULL ? name : "AddOnMonitorHandler")
 {
 }
 
