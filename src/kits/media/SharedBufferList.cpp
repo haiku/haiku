@@ -17,9 +17,18 @@
 
 #include <string.h>
 
+#include <Autolock.h>
 #include <Buffer.h>
+#include <Locker.h>
 
-#include "debug.h"
+#include <debug.h>
+#include <DataExchange.h>
+
+
+static BPrivate::SharedBufferList* sList;
+static area_id sArea;
+static int32 sRefCount;
+static BLocker sLocker("shared buffer list");
 
 
 namespace BPrivate {
@@ -50,21 +59,41 @@ SharedBufferList::Create(SharedBufferList** _list)
 
 
 /*static*/ SharedBufferList*
-SharedBufferList::Get(area_id id)
+SharedBufferList::Get()
 {
 	CALLED();
-	// TODO: map this only once per team!
 
-	SharedBufferList* list;
-	area_id area = clone_area("shared buffer list clone", (void**)&list,
-		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, id);
-	if (area < 0) {
-		ERROR("SharedBufferList::Clone() clone area: %ld err = %s\n", id,
-			strerror(area));
+	BAutolock _(sLocker);
+
+	if (atomic_add(&sRefCount, 1) > 0 && sList != NULL)
+		return sList;
+
+	// ask media_server to get the area_id of the shared buffer list
+	server_get_shared_buffer_area_request areaRequest;
+	server_get_shared_buffer_area_reply areaReply;
+	if (QueryServer(SERVER_GET_SHARED_BUFFER_AREA, &areaRequest,
+			sizeof(areaRequest), &areaReply, sizeof(areaReply)) != B_OK) {
+		ERROR("SharedBufferList::Get() SERVER_GET_SHARED_BUFFER_AREA failed\n");
 		return NULL;
 	}
 
-	return list;
+	sArea = clone_area("shared buffer list clone", (void**)&sList,
+		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, areaReply.area);
+	if (sArea < 0) {
+		ERROR("SharedBufferList::Get() clone area %ld: %s\n",
+			areaReply.area, strerror(sArea));
+		return NULL;
+	}
+
+	return sList;
+}
+
+
+/*static*/ void
+SharedBufferList::Invalidate()
+{
+	delete_area(sArea);
+	sList = NULL;
 }
 
 
@@ -72,10 +101,10 @@ void
 SharedBufferList::Put()
 {
 	CALLED();
+	BAutolock _(sLocker);
 
-	area_id area = area_for(this);
-	if (area >= 0)
-		delete_area(area);
+	if (atomic_add(&sRefCount, -1) == 1)
+		Invalidate();
 }
 
 

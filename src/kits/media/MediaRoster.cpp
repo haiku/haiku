@@ -57,15 +57,18 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 
 #include <AppMisc.h>
 
-#include "debug.h"
-#include "MediaRosterEx.h"
-#include "MediaMisc.h"
-#include "PortPool.h"
-#include "ServerInterface.h"
-#include "DataExchange.h"
-#include "DormantNodeManager.h"
-#include "Notifications.h"
+#include <debug.h>
+#include <DataExchange.h>
+#include <DormantNodeManager.h>
+#include <MediaRosterEx.h>
+#include <MediaMisc.h>
+#include <Notifications.h>
+#include <PortPool.h>
+#include <ServerInterface.h>
+#include <SharedBufferList.h>
+
 #include "TimeSourceObjectManager.h"
+
 
 namespace BPrivate { namespace media {
 
@@ -3206,6 +3209,8 @@ BMediaRoster::~BMediaRoster()
 	QueryServer(SERVER_UNREGISTER_APP, &request, sizeof(request), &reply,
 		sizeof(reply));
 
+	BPrivate::SharedBufferList::Invalidate();
+
 	// Unset the global instance pointer, the destructor is also called
 	// if a client app calls Lock(); and Quit(); directly.
 	sDefaultInstance = NULL;
@@ -3238,7 +3243,8 @@ status_t BMediaRoster::_Reserved_MediaRoster_7(void *) { return B_ERROR; }
 
 
 BMediaRoster::BMediaRoster()
-	: BLooper("_BMediaRoster_", B_URGENT_DISPLAY_PRIORITY,
+	:
+	BLooper("_BMediaRoster_", B_URGENT_DISPLAY_PRIORITY,
 		B_LOOPER_PORT_DEFAULT_CAPACITY)
 {
 	CALLED();

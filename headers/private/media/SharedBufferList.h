@@ -16,7 +16,8 @@ namespace BPrivate {
 class SharedBufferList {
 public:
 	static	area_id				Create(SharedBufferList** _list);
-	static	SharedBufferList*	Get(area_id area);
+	static	SharedBufferList*	Get();
+	static	void				Invalidate();
 
 			void				Put();
 			void 				DeleteGroupAndPut(sem_id groupReclaimSem);

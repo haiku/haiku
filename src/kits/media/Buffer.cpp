@@ -201,16 +201,7 @@ BBuffer::BBuffer(const buffer_clone_info& info)
 	if (info.area == 0 && info.buffer == 0)
 		return;
 
-	// ask media_server to get the area_id of the shared buffer list
-	server_get_shared_buffer_area_request areaRequest;
-	server_get_shared_buffer_area_reply areaReply;
-	if (QueryServer(SERVER_GET_SHARED_BUFFER_AREA, &areaRequest,
-			sizeof(areaRequest), &areaReply, sizeof(areaReply)) != B_OK) {
-		ERROR("BBuffer::BBuffer: SERVER_GET_SHARED_BUFFER_AREA failed\n");
-		return;
-	}
-
-	fBufferList = BPrivate::SharedBufferList::Get(areaReply.area);
+	fBufferList = BPrivate::SharedBufferList::Get();
 	if (fBufferList == NULL) {
 		ERROR("BBuffer::BBuffer: _shared_buffer_list::Clone() failed\n");
 		return;
