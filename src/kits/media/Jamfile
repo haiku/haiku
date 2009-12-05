@@ -81,5 +81,5 @@ SharedLibrary libmedia.so :
 	ReaderPlugin.cpp
 	WriterPlugin.cpp
 	:
-	be $(TARGET_LIBSUPC++)
+	be $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
 ;
