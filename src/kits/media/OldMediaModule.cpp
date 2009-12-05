@@ -1,10 +1,13 @@
-/***********************************************************************
- * AUTHOR: Marcus Overhagen
- *   FILE: OldMediaModule.cpp
- *  DESCR: 
- ***********************************************************************/
-#include <OldMediaModule.h>
-#include "debug.h"
+/*
+ * Copyright 2002, Marcus Overhagen. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "OldMediaModule.h"
+
+#include <debug.h>
+
 
 /*************************************************************
  * public BMediaEvent

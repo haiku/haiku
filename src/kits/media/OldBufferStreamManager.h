@@ -8,11 +8,13 @@
 #ifndef _BUFFER_STREAM_MANAGER_H
 #define _BUFFER_STREAM_MANAGER_H
 
-#include <OldBufferStream.h>
+
 #include <OS.h>
 #include <SupportDefs.h>
 #include <ClassInfo.h>
 #include <Locker.h>
+
+#include "OldBufferStream.h"
 
 
 /* ================
@@ -57,7 +59,7 @@ public:
   /* Get or set the minimum delay between sending out successive buffers.
    * Although the StreamManager automatically shuts down when there
    * are no more subscribers, setting the minumum delay can prevent
-   * prevent runaway streams.  A zero or negative value means no 
+   * prevent runaway streams.  A zero or negative value means no
    * delay.
    */
 	bigtime_t		BufferDelay() const;
@@ -68,7 +70,7 @@ public:
    * will go hunting for it.  When it finds the offending subscriber,
    * it will be removed from the chain with impunity.
    *
-   * The default is B_DEFAULT_TIMEOUT.  Setting the timeout to 0 or a 
+   * The default is B_DEFAULT_TIMEOUT.  Setting the timeout to 0 or a
    * negative number will disable this.
    */
 	bigtime_t		Timeout() const;
@@ -93,17 +95,17 @@ public:
 	stream_state	Stop();
 
   /* Set the desired state to B_IDLE.  The processing thread will
-   * stop immediately and all buffers will be "reclaimed" back 
+   * stop immediately and all buffers will be "reclaimed" back
    * to the StreamManager.
    */
 	stream_state	Abort();
-  
+
   /* Return the current state of the stream (B_RUNNING, B_STOPPING, or B_IDLE).
    */
 	stream_state	State() const;
 
   /* When NotificationPort is set, the receiver will get a message
-   * whenever the state of the StreamManager changes.  The msg_id of the 
+   * whenever the state of the StreamManager changes.  The msg_id of the
    * message will be the new state of the StreamManager.
    */
 	port_id			NotificationPort() const;
@@ -130,7 +132,7 @@ public:
 protected:
 
   /****************************************************************
-   * 
+   *
    * The processing thread.  This thread waits to acquire a Buffer
    * (or for the timeout to expire) and takes appropriate action.
    */
@@ -147,7 +149,7 @@ protected:
    */
 	virtual void			SetState(stream_state newState);
 
-  /* Snooze until the desired time arrives.  Returns the 
+  /* Snooze until the desired time arrives.  Returns the
    * current time upon returning.
    */
 	bigtime_t				SnoozeUntil(bigtime_t sys_time);

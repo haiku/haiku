@@ -1,10 +1,14 @@
-/***********************************************************************
- * AUTHOR: Marcus Overhagen
- *   FILE: OldBufferStream.cpp
- *  DESCR: 
- ***********************************************************************/
-#include <OldBufferStream.h>
-#include "debug.h"
+/*
+ * Copyright 2002, Marcus Overhagen. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "OldBufferStream.h"
+
+#include <debug.h>
+#include <new>
+
 
 /*************************************************************
  * public BAbstractBufferStream
@@ -36,7 +40,7 @@ BAbstractBufferStream::SetStreamBuffers(size_t bufferSize,
 
 	return B_ERROR;
 }
-		
+
 
 status_t
 BAbstractBufferStream::StartStreaming()
@@ -181,8 +185,7 @@ BBufferStream::operator new(size_t size)
 
 
 void
-BBufferStream::operator delete(void *stream,
-							   size_t size)
+BBufferStream::operator delete(void *stream, size_t size)
 {
 	UNIMPLEMENTED();
 }

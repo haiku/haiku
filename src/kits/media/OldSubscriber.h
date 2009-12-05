@@ -13,7 +13,8 @@
 
 #include <MediaDefs.h>
 #include <ClassInfo.h>
-#include <OldBufferStream.h>
+
+#include "OldBufferStream.h"
 
 /* ================
    declarations

@@ -1,18 +1,19 @@
-/***********************************************************************
- * AUTHOR: Marcus Overhagen
- *   FILE: OldAudioModule.cpp
- *  DESCR: 
- ***********************************************************************/
-#include <OldAudioModule.h>
-#include "debug.h"
+/*
+ * Copyright 2002, Marcus Overhagen. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "OldAudioModule.h"
+
+#include <debug.h>
+
 
 /*************************************************************
  * public BAudioEvent
  *************************************************************/
 
-BAudioEvent::BAudioEvent(int32 frames,
-						 bool stereo,
-						 float *samples)
+BAudioEvent::BAudioEvent(int32 frames, bool stereo, float *samples)
 {
 	UNIMPLEMENTED();
 }
@@ -108,9 +109,7 @@ BAudioEvent::SetDestination(int32)
 
 
 bool
-BAudioEvent::MixIn(float *dst,
-				   int32 frames,
-				   mk_time time)
+BAudioEvent::MixIn(float *dst, int32 frames, mk_time time)
 {
 	UNIMPLEMENTED();
 
@@ -224,9 +223,8 @@ BDACRenderer::Wakeup()
 
 
 void
-BDACRenderer::TransportChanged(mk_time time,
-							   mk_rate rate,
-							   transport_status status)
+BDACRenderer::TransportChanged(mk_time time, mk_rate rate,
+	transport_status status)
 {
 	UNIMPLEMENTED();
 }
@@ -252,10 +250,7 @@ BDACRenderer::Channel()
 
 
 bool
-BDACRenderer::_WriteDAC(void *arg,
-						char *buf,
-						uint32 bytes,
-						void *header)
+BDACRenderer::_WriteDAC(void *arg, char *buf, uint32 bytes, void *header)
 {
 	UNIMPLEMENTED();
 
@@ -264,9 +259,7 @@ BDACRenderer::_WriteDAC(void *arg,
 
 
 bool
-BDACRenderer::WriteDAC(short *buf,
-					   int32 frames,
-					   audio_buffer_header *header)
+BDACRenderer::WriteDAC(short *buf, int32 frames, audio_buffer_header *header)
 {
 	UNIMPLEMENTED();
 
@@ -294,9 +287,8 @@ BDACRenderer::MixOutput(short *dst)
  * public BAudioFileStream
  *************************************************************/
 
-BAudioFileStream::BAudioFileStream(BMediaChannel *channel,
-								   BFile *file,
-								   mk_time start)
+BAudioFileStream::BAudioFileStream(BMediaChannel *channel, BFile *file,
+	mk_time start)
 {
 	UNIMPLEMENTED();
 }
@@ -317,8 +309,7 @@ BAudioFileStream::GetEvent(BMediaChannel *channel)
 
 
 BMediaEvent *
-BAudioFileStream::PeekEvent(BMediaChannel *channel,
-							mk_time asap)
+BAudioFileStream::PeekEvent(BMediaChannel *channel, mk_time asap)
 {
 	UNIMPLEMENTED();
 	return NULL;
@@ -326,8 +317,7 @@ BAudioFileStream::PeekEvent(BMediaChannel *channel,
 
 
 status_t
-BAudioFileStream::SeekToTime(BMediaChannel *channel,
-							 mk_time time)
+BAudioFileStream::SeekToTime(BMediaChannel *channel, mk_time time)
 {
 	UNIMPLEMENTED();
 
@@ -362,8 +352,7 @@ BAudioFileStream::Channel()
  * public BADCSource
  *************************************************************/
 
-BADCSource::BADCSource(BMediaChannel *channel,
-					   mk_time start)
+BADCSource::BADCSource(BMediaChannel *channel, mk_time start)
 	:
 	fEventLock("BADCSource lock")
 {
@@ -386,8 +375,7 @@ BADCSource::GetEvent(BMediaChannel *channel)
 
 
 BMediaEvent *
-BADCSource::PeekEvent(BMediaChannel *channel,
-					  mk_time asap)
+BADCSource::PeekEvent(BMediaChannel *channel, mk_time asap)
 {
 	UNIMPLEMENTED();
 	return NULL;
@@ -395,8 +383,7 @@ BADCSource::PeekEvent(BMediaChannel *channel,
 
 
 status_t
-BADCSource::SeekToTime(BMediaChannel *channel,
-					   mk_time time)
+BADCSource::SeekToTime(BMediaChannel *channel, mk_time time)
 {
 	UNIMPLEMENTED();
 
@@ -423,10 +410,7 @@ BADCSource::Channel()
  *************************************************************/
 
 bool
-BADCSource::_ReadADC(void *arg,
-					 char *buf,
-					 uint32 bytes,
-					 void *header)
+BADCSource::_ReadADC(void *arg, char *buf, uint32 bytes, void *header)
 {
 	UNIMPLEMENTED();
 
@@ -435,9 +419,7 @@ BADCSource::_ReadADC(void *arg,
 
 
 void
-BADCSource::ReadADC(short *buf,
-					int32 frames,
-					audio_buffer_header *header)
+BADCSource::ReadADC(short *buf, int32 frames, audio_buffer_header *header)
 {
 	UNIMPLEMENTED();
 }

@@ -8,8 +8,10 @@
 #ifndef _AUDIO_STREAM_H
 #define _AUDIO_STREAM_H
 
-#include <OldBufferStream.h>
+
 #include <ClassInfo.h>
+
+#include "OldBufferStream.h"
 
 
 /* ================
@@ -69,7 +71,7 @@ public:
 							  float *l_volume,
 							  float *r_volume,
 							  bool *enabled) const;
-	
+
 	status_t		EnableDevice(int32 device, bool enable);
 	bool			IsDeviceEnabled(int32 device) const;
 

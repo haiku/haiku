@@ -1,10 +1,13 @@
-/***********************************************************************
- * AUTHOR: Marcus Overhagen
- *   FILE: OldSubscriber.cpp
- *  DESCR: 
- ***********************************************************************/
-#include <OldSubscriber.h>
+/*
+ * Copyright 2002, Marcus Overhagen. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "OldSubscriber.h"
+
 #include "debug.h"
+
 
 /*************************************************************
  * public BSubscriber

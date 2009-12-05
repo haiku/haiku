@@ -11,9 +11,10 @@
 #ifndef _AUDIO_MODULE_H
 #define _AUDIO_MODULE_H
 
-#include <OldMediaModule.h>
-#include <OldMediaDefs.h>
 #include <File.h>
+
+#include "OldMediaModule.h"
+#include "OldMediaDefs.h"
 
 class BADCStream;
 class BDACStream;
