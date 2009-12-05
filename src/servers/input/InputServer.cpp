@@ -11,6 +11,7 @@
 #include "MethodReplicant.h"
 
 #include <safemode_defs.h>
+#include <syscalls.h>
 
 #include <AppServerLink.h>
 #include <MessagePrivate.h>
@@ -37,15 +38,6 @@
 #include <ServerProtocol.h>
 
 using std::nothrow;
-
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-extern "C" status_t _kern_get_safemode_option(const char *parameter,
-	char *buffer, size_t *_bufferSize);
-#else
-extern "C" status_t _kget_safemode_option_(const char *parameter,
-	char *buffer, size_t *_bufferSize);
-#endif
 
 
 // Global InputServer member variables.
@@ -172,63 +164,21 @@ InputServer::InputServer()
 	char parameter[32];
 	size_t parameterLength = sizeof(parameter);
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
-#else
-	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
-#endif
-	{
+	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
+			&parameterLength) == B_OK) {
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
 			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
 			fSafeMode = true;
 	}
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
-#else
-	if (_kget_safemode_option_(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
-#endif
-	{
+	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter,
+			&parameterLength) == B_OK) {
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
 			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
 			fSafeMode = true;
 	}
-
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-	if (has_data(find_thread(NULL))) {
-		PRINT(("HasData == YES\n"));
-		int32 buffer[2];
-		thread_id appThreadId;
-		memset(buffer, 0, sizeof(buffer));
-		int32 code = receive_data(&appThreadId, buffer, sizeof(buffer));
-		(void)code;	// suppresses warning in non-debug build
-		PRINT(("tid : %ld, code :%ld\n", appThreadId, code));
-		for (int32 i = 0; i < 2; i++) {
-			PRINT(("data : %lx\n", buffer[i]));
-		}
-		fCursorSem = buffer[0];
-		area_id appArea = buffer[1];
-
-		fCursorArea = clone_area("isClone", (void**)&fCursorBuffer,
-			B_ANY_ADDRESS, B_READ_AREA|B_WRITE_AREA, appArea);
-		if (fCursorArea < B_OK) {
-			PRINTERR(("clone_area error : %s\n", strerror(fCloneArea)));
-		}
-
-		fAppServerPort = create_port(100, "is_as");
-
-		PRINT(("is_as port :%ld\n", fAppServerPort));
-
-		buffer[1] = fEventLooperPort;
-		buffer[0] = fAppServerPort;
-
-		status_t err;
-		if ((err = send_data(appThreadId, 0, buffer, sizeof(buffer)))!=B_OK)
-			PRINTERR(("error when send_data %s\n", strerror(err)));
-	}
-#endif
 
 	_InitKeyboardMouseStates();
 
@@ -477,9 +427,7 @@ InputServer::_ReleaseInput(BMessage* /*message*/)
 {
 	if (fCursorBuffer != NULL) {
 		fCursorBuffer = NULL;
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		delete_sem(fCursorSem);
-#endif
 		delete_area(fCursorArea);
 
 		fCursorSem = -1;
@@ -1538,28 +1486,6 @@ InputServer::_SanitizeEvents(EventList& events)
 	for (int32 index = 0; BMessage* event = (BMessage*)events.ItemAt(index);
 			index++) {
 		switch (event->what) {
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-	   		case IS_SCREEN_BOUNDS_UPDATED:
-	   		{
-				// This is what the R5 app_server sends us when the screen
-				// configuration changes
-				BRect frame;
-				if (event->FindRect("screen_bounds", &frame) != B_OK)
-					frame = fScreen.Frame();
-
-				if (frame != fFrame) {
-					fMousePos.x = fMousePos.x * frame.Width() / fFrame.Width();
-					fMousePos.y = fMousePos.y * frame.Height() / fFrame.Height();
-					fFrame = frame;
-				} else {
-					// TODO: discard event
-				}
-
-				event->what = B_MOUSE_MOVED;
-				event->AddPoint("where", fMousePos);
-				// supposed to fall through
-			}
-#endif
 	   		case B_MOUSE_MOVED:
 	   		case B_MOUSE_DOWN:
 	   		{
@@ -1819,19 +1745,10 @@ InputServer::_DispatchEvent(BMessage* event)
 		case B_MOUSE_DOWN:
 		case B_MOUSE_UP:
 			if (fCursorBuffer) {
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-				fCursorBuffer[0] = (0x3 << 30L)
-               		| ((uint32)fMousePos.x & 0x7fff) << 15
-               		| ((uint32)fMousePos.y & 0x7fff);
-
-				PRINT(("released cursorSem with value : %08lx\n", fCursorBuffer[0]));
-                	release_sem(fCursorSem);
-#else
 				atomic_set((int32*)&fCursorBuffer->pos, (uint32)fMousePos.x << 16UL
 					| ((uint32)fMousePos.y & 0xffff));
 				if (atomic_or(&fCursorBuffer->read, 1) == 0)
 					release_sem(fCursorSem);
-#endif
         	}
         	break;
 
@@ -1868,19 +1785,9 @@ InputServer::_DispatchEvent(BMessage* event)
 			break;
 	}
 
-#if defined(HAIKU_TARGET_PLATFORM_HAIKU)
 	BMessenger reply;
 	BMessage::Private messagePrivate(event);
 	return messagePrivate.SendMessage(fAppServerPort, -1, 0, true, 0, reply);
-#else
-	ssize_t length = event->FlattenedSize();
-	char buffer[length];
-	status_t err;
-	if ((err = event->Flatten(buffer,length)) < B_OK)
-		return err;
-
-	return write_port(fAppServerPort, 0, buffer, length);
-#endif
 }
 
 

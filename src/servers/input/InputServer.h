@@ -243,11 +243,7 @@ class InputServer : public BApplication {
 		sem_id 			fCursorSem;
 		port_id			fAppServerPort;
 		area_id			fCursorArea;
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		shared_cursor*	fCursorBuffer;
-#else
-		uint32*			fCursorBuffer;
-#endif
 };
 
 extern InputServer* gInputServer;
