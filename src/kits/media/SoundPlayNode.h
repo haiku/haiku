@@ -128,7 +128,7 @@ protected:
 									bigtime_t lateness,
 									bool realTimeEvent = false);
 
-			void 				AllocateBuffers();
+			status_t 			AllocateBuffers();
 			BBuffer*			FillNextBuffer(bigtime_t eventTime);
 
 private:

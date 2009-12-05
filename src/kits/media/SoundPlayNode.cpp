@@ -273,20 +273,16 @@ SoundPlayNode::SetBufferGroup(const media_source& forSource,
 	// group, otherwise we'll deadlock waiting for that buffer to be recycled!
 	delete fBufferGroup;
 		// waits for all buffers to recycle
+
 	if (newGroup != NULL) {
 		// we were given a valid group; just use that one from now on
 		fBufferGroup = newGroup;
-	} else {
-		// we were passed a NULL group pointer; that means we construct
-		// our own buffer group to use from now on
-		size_t size = fOutput.format.u.raw_audio.buffer_size;
-		int32 count = int32(fLatency / BufferDuration() + 1 + 1);
-		if (count < 3)
-			count = 3;
-		fBufferGroup = new BBufferGroup(size, count);
+		return B_OK;
 	}
 
-	return B_OK;
+	// we were passed a NULL group pointer; that means we construct
+	// our own buffer group to use from now on
+	return AllocateBuffers();
 }
 
 
@@ -786,7 +782,7 @@ SoundPlayNode::HandleParameter(const media_timed_event* event,
 }
 
 
-void
+status_t
 SoundPlayNode::AllocateBuffers()
 {
 	CALLED();
@@ -809,6 +805,8 @@ SoundPlayNode::AllocateBuffers()
 		ERROR("SoundPlayNode::AllocateBuffers: BufferGroup::InitCheck() "
 			"failed\n");
 	}
+
+	return fBufferGroup->InitCheck();
 }
 
 
