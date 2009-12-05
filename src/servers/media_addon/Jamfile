@@ -7,7 +7,7 @@ UsePrivateHeaders media shared ;
 AddResources media_addon_server : media_addon_server.rdef ;
 
 Server media_addon_server :
-	main.cpp
+	MediaAddonServer.cpp
 	MediaFilePlayer.cpp
 	SystemTimeSource.cpp
 	:
