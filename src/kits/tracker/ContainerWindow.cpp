@@ -2254,6 +2254,8 @@ BContainerWindow::PopulateMoveCopyNavMenu(BNavMenu *navMenu, uint32 what,
 
 	int32 volumeCount = 0;
 
+	navMenu->RemoveItems(0, navMenu->CountItems(), true);
+
 	// count persistent writable volumes
 	volumeRoster.Rewind();
 	while (volumeRoster.GetNextVolume(&volume) == B_OK)
