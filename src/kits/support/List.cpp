@@ -1,44 +1,26 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2008, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		List.cpp
-//	Author(s):		The Storage kit Team
-//					Isaac Yonemoto
-//					Rene Gollent
-//	Description:	BList class provides storage for pointers.
-//					Not thread safe.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		The Storage kit Team
+ *		Isaac Yonemoto
+ *		Rene Gollent
+ *		Stephan Aßmus
+ */
+
+//!	BList class provides storage for pointers. Not thread safe.
 
 
-// Standard Includes -----------------------------------------------------------
 #include <List.h>
 
-// System Includes -------------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+
 // helper function
-static inline
-void
+static inline void
 move_items(void** items, int32 offset, int32 count)
 {
 	if (count > 0 && offset != 0)
@@ -46,13 +28,13 @@ move_items(void** items, int32 offset, int32 count)
 }
 
 
-// constructor
 BList::BList(int32 count)
-	  :		 fObjectList(NULL),
-			 fPhysicalSize(0),
-			 fItemCount(0),
-			 fBlockSize(count),
-			 fResizeThreshold(0)
+	:
+	fObjectList(NULL),
+	fPhysicalSize(0),
+	fItemCount(0),
+	fBlockSize(count),
+	fResizeThreshold(0)
 {
 	if (fBlockSize <= 0)
 		fBlockSize = 1;
@@ -60,41 +42,65 @@ BList::BList(int32 count)
 }
 
 
-// copy constructor
 BList::BList(const BList& anotherList)
-	  :		 fObjectList(NULL),
-			 fPhysicalSize(0),
-			 fItemCount(0),
-			 fBlockSize(anotherList.fBlockSize)
+	:
+	fObjectList(NULL),
+	fPhysicalSize(0),
+	fItemCount(0),
+	fBlockSize(anotherList.fBlockSize)
 {
 	*this = anotherList;
 }
 
 
-// destructor
 BList::~BList()
 {
 	free(fObjectList);
 }
 
 
-// =
 BList&
-BList::operator =(const BList &list)
+BList::operator=(const BList& list)
 {
-	fBlockSize = list.fBlockSize;
-	if (_ResizeArray(list.fItemCount)) {
-		fItemCount = list.fItemCount;
-		memcpy(fObjectList, list.fObjectList, fItemCount * sizeof(void*));
+	if (&list != this) {
+		fBlockSize = list.fBlockSize;
+		if (_ResizeArray(list.fItemCount)) {
+			fItemCount = list.fItemCount;
+			memcpy(fObjectList, list.fObjectList, fItemCount * sizeof(void*));
+		}
 	}
 
 	return *this;
 }
 
 
-// AddItem
 bool
-BList::AddItem(void *item, int32 index)
+BList::operator==(const BList& list) const
+{
+	if (&list == this)
+		return true;
+
+	if (list.fItemCount != fItemCount)
+		return false;
+
+	if (fItemCount > 0) {
+		return memcmp(fObjectList, list.fObjectList,
+			fItemCount * sizeof(void*)) == 0;
+	}
+
+	return true;
+}
+
+
+bool
+BList::operator!=(const BList& list) const
+{
+	return !(*this == list);
+}
+
+
+bool
+BList::AddItem(void* item, int32 index)
 {
 	if (index < 0 || index > fItemCount)
 		return false;
@@ -112,9 +118,8 @@ BList::AddItem(void *item, int32 index)
 }
 
 
-// AddItem
 bool
-BList::AddItem(void *item)
+BList::AddItem(void* item)
 {
 	bool result = true;
 	if (fPhysicalSize > fItemCount) {
@@ -130,9 +135,8 @@ BList::AddItem(void *item)
 }
 
 
-// AddList
 bool
-BList::AddList(const BList *list, int32 index)
+BList::AddList(const BList* list, int32 index)
 {
 	bool result = (list && index >= 0 && index <= fItemCount);
 	if (result && list->fItemCount > 0) {
@@ -143,16 +147,15 @@ BList::AddList(const BList *list, int32 index)
 			fItemCount += count;
 			move_items(fObjectList + index, count, fItemCount - index - count);
 			memcpy(fObjectList + index, list->fObjectList,
-				   list->fItemCount * sizeof(void *));
+				list->fItemCount * sizeof(void*));
 		}
 	}
 	return result;
 }
 
 
-// AddList
 bool
-BList::AddList(const BList *list)
+BList::AddList(const BList* list)
 {
 	bool result = (list != NULL);
 	if (result && list->fItemCount > 0) {
@@ -163,16 +166,15 @@ BList::AddList(const BList *list)
 		if (result) {
 			fItemCount += count;
 			memcpy(fObjectList + index, list->fObjectList,
-				   list->fItemCount * sizeof(void *));
+				list->fItemCount * sizeof(void*));
 		}
 	}
 	return result;
 }
 
 
-// RemoveItem
 bool
-BList::RemoveItem(void *item)
+BList::RemoveItem(void* item)
 {
 	int32 index = IndexOf(item);
 	bool result = (index >= 0);
@@ -182,11 +184,10 @@ BList::RemoveItem(void *item)
 }
 
 
-// RemoveItem
-void *
+void*
 BList::RemoveItem(int32 index)
 {
-	void *item = NULL;
+	void* item = NULL;
 	if (index >= 0 && index < fItemCount) {
 		item = fObjectList[index];
 		move_items(fObjectList + index + 1, -1, fItemCount - index - 1);
@@ -198,7 +199,6 @@ BList::RemoveItem(int32 index)
 }
 
 
-// RemoveItems
 bool
 BList::RemoveItems(int32 index, int32 count)
 {
@@ -219,9 +219,8 @@ BList::RemoveItems(int32 index, int32 count)
 }
 
 
-//ReplaceItem
 bool
-BList::ReplaceItem(int32 index, void *newItem)
+BList::ReplaceItem(int32 index, void* newItem)
 {
 	bool result = false;
 
@@ -233,7 +232,6 @@ BList::ReplaceItem(int32 index, void *newItem)
 }
 
 
-// MakeEmpty
 void
 BList::MakeEmpty()
 {
@@ -242,17 +240,17 @@ BList::MakeEmpty()
 }
 
 
-/* Reordering items. */
-// SortItems
+// #pragma mark - Reordering items.
+
+
 void
-BList::SortItems(int (*compareFunc)(const void *, const void *))
+BList::SortItems(int (*compareFunc)(const void*, const void*))
 {
 	if (compareFunc)
-		qsort(fObjectList, fItemCount, sizeof(void *), compareFunc);
+		qsort(fObjectList, fItemCount, sizeof(void*), compareFunc);
 }
 
 
-//SwapItems
 bool
 BList::SwapItems(int32 indexA, int32 indexB)
 {
@@ -261,7 +259,7 @@ BList::SwapItems(int32 indexA, int32 indexB)
 	if (indexA >= 0 && indexA < fItemCount
 		&& indexB >= 0 && indexB < fItemCount) {
 
-		void *tmpItem = fObjectList[indexA];
+		void* tmpItem = fObjectList[indexA];
 		fObjectList[indexA] = fObjectList[indexB];
 		fObjectList[indexB] = tmpItem;
 
@@ -272,26 +270,28 @@ BList::SwapItems(int32 indexA, int32 indexB)
 }
 
 
-// MoveItem
-// This moves a list item from posititon a to position b, moving the appropriate
-// block of list elements to make up for the move. For example, in the array:
-//	A B C D E F G H I J
-//		Moveing 1(B)->6(G) would result in this:
-// A C D E F G B H I J
+/*! This moves a list item from posititon a to position b, moving the
+	appropriate block of list elements to make up for the move. For example,
+	in the array:
+	A B C D E F G H I J
+		Moveing 1(B)->6(G) would result in this:
+	A C D E F G B H I J
+*/
 bool
 BList::MoveItem(int32 fromIndex, int32 toIndex)
 {
 	if ((fromIndex >= fItemCount) || (toIndex >= fItemCount) || (fromIndex < 0)
-		|| (toIndex < 0))
+		|| (toIndex < 0)) {
 		return false;
+	}
 
-	void * tmpMover = fObjectList[fromIndex];
+	void* tmpMover = fObjectList[fromIndex];
 	if (fromIndex < toIndex) {
 		memmove(fObjectList + fromIndex, fObjectList + fromIndex + 1,
-			(toIndex - fromIndex) * sizeof(void *));
+			(toIndex - fromIndex) * sizeof(void*));
 	} else if (fromIndex > toIndex) {
 		memmove(fObjectList + toIndex + 1, fObjectList + toIndex,
-			(fromIndex - toIndex) * sizeof(void *));
+			(fromIndex - toIndex) * sizeof(void*));
 	};
 	fObjectList[toIndex] = tmpMover;
 
@@ -299,9 +299,10 @@ BList::MoveItem(int32 fromIndex, int32 toIndex)
 }
 
 
-/* Retrieving items. */
-// ItemAt
-void *
+// #pragma mark - Retrieving items.
+
+
+void*
 BList::ItemAt(int32 index) const
 {
 	void *item = NULL;
@@ -311,8 +312,7 @@ BList::ItemAt(int32 index) const
 }
 
 
-// FirstItem
-void *
+void*
 BList::FirstItem() const
 {
 	void *item = NULL;
@@ -322,45 +322,49 @@ BList::FirstItem() const
 }
 
 
-// ItemAtFast
-void *
+void*
 BList::ItemAtFast(int32 index) const
 {
 	return fObjectList[index];
 }
 
 
-// Items
-void *
+void*
 BList::Items() const
 {
 	return fObjectList;
 }
 
 
-// LastItem
-void *
+void*
 BList::LastItem() const
 {
-	void *item = NULL;
+	void* item = NULL;
 	if (fItemCount > 0)
 		item = fObjectList[fItemCount - 1];
 	return item;
 }
 
 
-/* Querying the list. */
-// HasItem
+// #pragma mark - Querying the list.
+
+
 bool
-BList::HasItem(void *item) const
+BList::HasItem(void* item) const
 {
 	return (IndexOf(item) >= 0);
 }
 
 
-// IndexOf
+bool
+BList::HasItem(const void* item) const
+{
+	return (IndexOf(item) >= 0);
+}
+
+
 int32
-BList::IndexOf(void *item) const
+BList::IndexOf(void* item) const
 {
 	for (int32 i = 0; i < fItemCount; i++) {
 		if (fObjectList[i] == item)
@@ -370,7 +374,17 @@ BList::IndexOf(void *item) const
 }
 
 
-// CountItems
+int32
+BList::IndexOf(const void* item) const
+{
+	for (int32 i = 0; i < fItemCount; i++) {
+		if (fObjectList[i] == item)
+			return i;
+	}
+	return -1;
+}
+
+
 int32
 BList::CountItems() const
 {
@@ -378,48 +392,51 @@ BList::CountItems() const
 }
 
 
-// IsEmpty
 bool
 BList::IsEmpty() const
 {
-	return (fItemCount == 0);
+	return fItemCount == 0;
 }
 
 
-/* Iterating over the list. */
-//iterate a function over the whole list.  If the function outputs a true
-//value, then the process is terminated.
+// #pragma mark - Iterating over the list.
 
+/*!	Iterate a function over the whole list. If the function outputs a true
+	value, then the process is terminated.
+*/
 void
-BList::DoForEach(bool (*func)(void *))
+BList::DoForEach(bool (*func)(void*))
 {
-	bool terminate = false; int32 index = 0;		//set terminate condition variables to go.
-	if (func != NULL)
-	{
-		while ((!terminate) && (index < fItemCount))	//check terminate condition.
-		{
-			terminate = func(fObjectList[index]);			//reset immediate terminator
-			index++;									//advance along the list.
-		};
+	if (func == NULL)
+		return;
+
+	bool terminate = false;
+	int32 index = 0;
+
+	while ((!terminate) && (index < fItemCount)) {
+		terminate = func(fObjectList[index]);
+		index++;
 	}
-
 }
 
 
-//same as above, except this function takes an argument.
+/*!	Iterate a function over the whole list. If the function outputs a true
+	value, then the process is terminated. This version takes an additional
+	argument which is passed to the function.
+*/
 void
-BList::DoForEach(bool (*func)(void *, void*), void * arg)
+BList::DoForEach(bool (*func)(void*, void*), void* arg)
 {
+	if (func == NULL)
+		return;
+
 	bool terminate = false; int32 index = 0;
-	if (func != NULL)
-	{
-		while ((!terminate) && (index < fItemCount))
-		{
-			terminate = func(fObjectList[index], arg);
-			index++;
-		};
+	while ((!terminate) && (index < fItemCount)) {
+		terminate = func(fObjectList[index], arg);
+		index++;
 	}
 }
+
 
 #if (__GNUC__ == 2)
 
@@ -441,7 +458,7 @@ AddList__5BListP5BListl(BList* self, BList* list, int32 index)
 extern "C" bool
 AddList__5BListP5BList(BList* self, BList* list)
 {
-	return self->AddList((const BList *)list);
+	return self->AddList((const BList*)list);
 }
 #endif
 
@@ -449,9 +466,9 @@ AddList__5BListP5BList(BList* self, BList* list)
 void BList::_ReservedList1() {}
 void BList::_ReservedList2() {}
 
-// Resize
-//
-// Resizes fObjectList to be large enough to contain count items.
+
+/*!	Resizes fObjectList to be large enough to contain count items.
+*/
 bool
 BList::_ResizeArray(int32 count)
 {

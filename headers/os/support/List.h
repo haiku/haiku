@@ -1,8 +1,8 @@
 /*
- * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _BE_LIST_H 
+#ifndef _BE_LIST_H
 #define _BE_LIST_H
 
 
@@ -10,60 +10,70 @@
 
 
 class BList {
-	public:	
-		BList(int32 count = 20);
-		BList(const BList& anotherList);
-		virtual ~BList();
+public:
+								BList(int32 count = 20);
+								BList(const BList& anotherList);
+	virtual						~BList();
 
-		BList& operator =(const BList &);
+			BList&				operator=(const BList& other);
+			bool				operator==(const BList& other) const;
+			bool				operator!=(const BList& other) const;
 
-		/* Adding and removing items. */
-		bool AddItem(void* item, int32 index);
-		bool AddItem(void* item);
-		bool AddList(const BList* list, int32 index);
-		bool AddList(const BList* list);
-		bool RemoveItem(void* item);
-		void* RemoveItem(int32 index);
-		bool RemoveItems(int32 index, int32 count);
-		bool ReplaceItem(int32 index, void* newItem);
-		void MakeEmpty();
+	// Adding and removing items.
+			bool				AddItem(void* item, int32 index);
+			bool				AddItem(void* item);
+			bool				AddList(const BList* list, int32 index);
+			bool				AddList(const BList* list);
 
-		// Reorder items
-		void SortItems(int (*compareFunc)(const void*, const void*));
-		bool SwapItems(int32 indexA, int32 indexB);
-		bool MoveItem(int32 fromIndex, int32 toIndex);
+			bool				RemoveItem(void* item);
+			void*				RemoveItem(int32 index);
+			bool				RemoveItems(int32 index, int32 count);
+			bool				ReplaceItem(int32 index, void* newItem);
 
-		// Retrieve items
-		void* ItemAt(int32 index) const;
-		void* FirstItem() const;
-		void* ItemAtFast(int32) const;
-			// does not check the array bounds!
+			void				MakeEmpty();
 
-		void* LastItem() const;
-		void* Items() const;
+	// Reorder items
+			void				SortItems(int (*compareFunc)(const void*,
+									const void*));
+			bool				SwapItems(int32 indexA, int32 indexB);
+			bool				MoveItem(int32 fromIndex, int32 toIndex);
 
-		// Query
-		bool HasItem(void* item) const;
-		int32 IndexOf(void* item) const;
-		int32 CountItems() const;
-		bool IsEmpty() const;
+	// Retrieve items
+			void*				ItemAt(int32 index) const;
+			void*				FirstItem() const;
+			void*				ItemAtFast(int32 index) const;
+									// does not check the array bounds!
 
-		// Iteration
-		void DoForEach(bool (*func)(void* item));
-		void DoForEach(bool (*func)(void* item, void* arg2), void *arg2);	
+			void*				LastItem() const;
+			void*				Items() const;
 
-	private:
-		virtual void _ReservedList1();
-		virtual void _ReservedList2();
+	// Query
+			bool				HasItem(void* item) const;
+			bool				HasItem(const void* item) const;
+			int32				IndexOf(void* item) const;
+			int32				IndexOf(const void* item) const;
+			int32				CountItems() const;
+			bool				IsEmpty() const;
 
-		bool _ResizeArray(int32 count);
-	private:
-		void**	fObjectList;
-		int32	fPhysicalSize;
-		int32	fItemCount;
-		int32	fBlockSize;
-		int32	fResizeThreshold;
-		uint32	_reserved[1];
+	// Iteration
+			void				DoForEach(bool (*func)(void* item));
+			void				DoForEach(bool (*func)(void* item,
+									void* arg2), void* arg2);
+
+private:
+	virtual	void				_ReservedList1();
+	virtual	void				_ReservedList2();
+
+			bool				_ResizeArray(int32 count);
+
+private:
+			void**				fObjectList;
+			int32				fPhysicalSize;
+			int32				fItemCount;
+			int32				fBlockSize;
+			int32				fResizeThreshold;
+
+			uint32				_reserved[1];
 };
 
-#endif // _BE_LIST_H 
+#endif // _BE_LIST_H
