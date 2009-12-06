@@ -833,6 +833,12 @@ TermWindow::_AddTab(Arguments *args)
 	} catch (...) {
 		// most probably out of memory. That's bad.
 		// TODO: Should cleanup, I guess
+		
+		// Quit the application if we don't have a shell already
+		if (fTabView->CountTabs() == 0) {
+			fprintf(stderr, "Terminal couldn't open a shell\n");
+			PostMessage(B_QUIT_REQUESTED);
+		}
 	}
 }
 
@@ -1027,14 +1033,14 @@ void
 CustomTermView::NotifyQuit(int32 reason)
 {
 	BWindow *window = Window();
-	if (window == NULL)
-		window = be_app->WindowAt(0);
-
 	// TODO: If we got this from a view in a tab not currently selected,
 	// Window() will be NULL, as the view is detached.
 	// So we send the message to the first application window
-	// This isn't so cool, but for now, a Terminal app has only one
-	// window.
+	// This isn't so cool, but should be safe, since a Terminal
+	// application has only one window, at least for now.
+	if (window == NULL)
+		window = be_app->WindowAt(0);
+
 	if (window != NULL) {
 		BMessage message(kCloseView);
 		message.AddPointer("termView", this);

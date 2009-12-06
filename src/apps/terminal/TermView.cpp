@@ -178,7 +178,9 @@ TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize
 	fReportButtonMouseEvent(false),
 	fReportAnyMouseEvent(false)
 {
-	_InitObject(argc, argv);
+	status_t status = _InitObject(argc, argv);
+	if (status != B_OK)
+		throw status;
 	SetTermSize(frame);
 }
 
@@ -197,7 +199,9 @@ TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 	fReportButtonMouseEvent(false),
 	fReportAnyMouseEvent(false)
 {
-	_InitObject(argc, argv);
+	status_t status = _InitObject(argc, argv);
+	if (status != B_OK)
+		throw status;
 
 	// TODO: Don't show the dragger, since replicant capabilities
 	// don't work very well ATM.
@@ -247,8 +251,10 @@ TermView::TermView(BMessage* archive)
 	}
 
 	// TODO: Retrieve colors, history size, etc. from archive
-	_InitObject(argc, argv);
-	
+	status_t status = _InitObject(argc, argv);
+	if (status != B_OK)
+		throw status;
+
 	bool useRect = false;
 	if ((archive->FindBool("use_rect", &useRect) == B_OK) && useRect)
 		SetTermSize(frame);
@@ -2710,10 +2716,10 @@ void
 TermView::AboutRequested()
 {
 	BAlert *alert = new (std::nothrow) BAlert("about",
-		"Terminal\n"
-		"\twritten by Kazuho Okui and Takashi Murai\n"
-		"\tupdated by Kian Duffy and others\n\n"
-		"\tCopyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n", "Ok");
+		"Terminal\n\n"
+		"written by Kazuho Okui and Takashi Murai\n"
+		"updated by Kian Duffy and others\n\n"
+		"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n", "Ok");
 	if (alert != NULL)
 		alert->Go();
 }
