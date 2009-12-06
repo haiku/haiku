@@ -391,6 +391,11 @@ is_kernel_stack_address(struct thread* thread, addr_t address)
 	if (thread == NULL)
 		return IS_KERNEL_ADDRESS(address);
 
+	// Also in the early boot process we might have a thread structure, but it
+	// might not have its kernel stack attributes set yet.
+	if (thread->kernel_stack_top == 0)
+		return IS_KERNEL_ADDRESS(address);
+
 	return (address >= thread->kernel_stack_base
 			&& address < thread->kernel_stack_top)
 		|| (thread->cpu != NULL
