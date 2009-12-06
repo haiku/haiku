@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src system kernel util ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelMergeObject kernel_util.o :
-	AVLTreeMap.cpp
+	AVLTreeBase.cpp
 	kernel_cpp.cpp
 	khash.cpp
 	list.cpp

@@ -1,9 +1,32 @@
 /*
- * Copyright 2003-2007, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2003-2009, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * Distributed under the terms of the MIT License.
  */
 
-#include <util/AVLTreeMap.h>
+
+#include <util/AVLTreeBase.h>
+
+#include <algorithm>
+
+#include <KernelExport.h>
+
+
+#ifdef _KERNEL_MODE
+#	define CHECK_FAILED(message...)	panic(message)
+#else
+#	include <stdio.h>
+#	include <OS.h>
+#	define CHECK_FAILED(message...)					\
+		do {										\
+			fprintf(stderr, message);				\
+			fprintf(stderr, "\n");					\
+			debugger("AVLTreeBase check failed");	\
+		} while (false)
+#endif
+
+
+// maximal height of a tree
+static const int kMaxAVLTreeHeight = 32;
 
 
 // #pragma mark - AVLTreeCompare
@@ -14,10 +37,10 @@ AVLTreeCompare::~AVLTreeCompare()
 }
 
 
-// #pragma mark - AVLTree
+// #pragma mark - AVLTreeBase
 
 
-AVLTree::AVLTree(AVLTreeCompare* compare)
+AVLTreeBase::AVLTreeBase(AVLTreeCompare* compare)
 	: fRoot(NULL),
 	  fNodeCount(0),
 	  fCompare(compare)
@@ -25,77 +48,21 @@ AVLTree::AVLTree(AVLTreeCompare* compare)
 }
 
 
-AVLTree::~AVLTree()
+AVLTreeBase::~AVLTreeBase()
 {
 }
 
 
 void
-AVLTree::MakeEmpty()
+AVLTreeBase::MakeEmpty()
 {
 	fRoot = NULL;
 	fNodeCount = 0;
 }
 
 
-status_t
-AVLTree::Insert(AVLTreeNode* nodeToInsert)
-{
-	int result = _Insert(nodeToInsert);
-	switch (result) {
-		case OK:
-		case HEIGHT_CHANGED:
-			return B_OK;
-		case NO_MEMORY:
-			return B_NO_MEMORY;
-		case DUPLICATE:
-		default:
-			return B_BAD_VALUE;
-	}
-}
-
-
 AVLTreeNode*
-AVLTree::Remove(const void* key)
-{
-	// find node
-	AVLTreeNode* node = fRoot;
-	while (node) {
-		int cmp = fCompare->CompareKeyNode(key, node);
-		if (cmp == 0)
-			break;
-		else {
-			if (cmp < 0)
-				node = node->left;
-			else
-				node = node->right;
-		}
-	}
-
-	// remove it
-	if (node)
-		_Remove(node);
-
-	return node;
-}
-
-
-bool
-AVLTree::Remove(AVLTreeNode* node)
-{
-	switch (_Remove(node)) {
-		case OK:
-		case HEIGHT_CHANGED:
-			return true;
-		case NOT_FOUND:
-		default:
-			return false;
-	}
-}
-
-
-AVLTreeNode*
-AVLTree::LeftMost(AVLTreeNode* node) const
+AVLTreeBase::LeftMost(AVLTreeNode* node) const
 {
 	if (node) {
 		while (node->left)
@@ -107,7 +74,7 @@ AVLTree::LeftMost(AVLTreeNode* node) const
 
 
 AVLTreeNode*
-AVLTree::RightMost(AVLTreeNode* node) const
+AVLTreeBase::RightMost(AVLTreeNode* node) const
 {
 	if (node) {
 		while (node->right)
@@ -119,7 +86,7 @@ AVLTree::RightMost(AVLTreeNode* node) const
 
 
 AVLTreeNode*
-AVLTree::Previous(AVLTreeNode* node) const
+AVLTreeBase::Previous(AVLTreeNode* node) const
 {
 	if (node) {
 		// The previous node cannot be in the right subtree.
@@ -144,7 +111,7 @@ AVLTree::Previous(AVLTreeNode* node) const
 
 
 AVLTreeNode*
-AVLTree::Next(AVLTreeNode* node) const
+AVLTreeBase::Next(AVLTreeNode* node) const
 {
 	if (node) {
 		// The next node cannot be in the left subtree.
@@ -169,7 +136,7 @@ AVLTree::Next(AVLTreeNode* node) const
 
 
 AVLTreeNode*
-AVLTree::Find(const void* key)
+AVLTreeBase::Find(const void* key) const
 {
 	AVLTreeNode* node = fRoot;
 
@@ -189,7 +156,7 @@ AVLTree::Find(const void* key)
 
 
 AVLTreeNode*
-AVLTree::FindClose(const void* key, bool less)
+AVLTreeBase::FindClosest(const void* key, bool less) const
 {
 	AVLTreeNode* node = fRoot;
 	AVLTreeNode* parent = NULL;
@@ -225,8 +192,76 @@ AVLTree::FindClose(const void* key, bool less)
 }
 
 
+status_t
+AVLTreeBase::Insert(AVLTreeNode* nodeToInsert)
+{
+	int result = _Insert(nodeToInsert);
+	switch (result) {
+		case OK:
+		case HEIGHT_CHANGED:
+			return B_OK;
+		case NO_MEMORY:
+			return B_NO_MEMORY;
+		case DUPLICATE:
+		default:
+			return B_BAD_VALUE;
+	}
+}
+
+
+AVLTreeNode*
+AVLTreeBase::Remove(const void* key)
+{
+	// find node
+	AVLTreeNode* node = fRoot;
+	while (node) {
+		int cmp = fCompare->CompareKeyNode(key, node);
+		if (cmp == 0)
+			break;
+		else {
+			if (cmp < 0)
+				node = node->left;
+			else
+				node = node->right;
+		}
+	}
+
+	// remove it
+	if (node)
+		_Remove(node);
+
+	return node;
+}
+
+
+bool
+AVLTreeBase::Remove(AVLTreeNode* node)
+{
+	switch (_Remove(node)) {
+		case OK:
+		case HEIGHT_CHANGED:
+			return true;
+		case NOT_FOUND:
+		default:
+			return false;
+	}
+}
+
+
 void
-AVLTree::_RotateRight(AVLTreeNode** nodeP)
+AVLTreeBase::CheckTree() const
+{
+	int nodeCount = 0;
+	_CheckTree(NULL, fRoot, nodeCount);
+	if (nodeCount != fNodeCount) {
+		CHECK_FAILED("AVLTreeBase::CheckTree(): node count mismatch: %d vs %d",
+			nodeCount, fNodeCount);
+	}
+}
+
+
+void
+AVLTreeBase::_RotateRight(AVLTreeNode** nodeP)
 {
 	// rotate the nodes
 	AVLTreeNode* node = *nodeP;
@@ -257,7 +292,7 @@ AVLTree::_RotateRight(AVLTreeNode** nodeP)
 
 
 void
-AVLTree::_RotateLeft(AVLTreeNode** nodeP)
+AVLTreeBase::_RotateLeft(AVLTreeNode** nodeP)
 {
 	// rotate the nodes
 	AVLTreeNode* node = *nodeP;
@@ -288,7 +323,7 @@ AVLTree::_RotateLeft(AVLTreeNode** nodeP)
 
 
 int
-AVLTree::_BalanceInsertLeft(AVLTreeNode** node)
+AVLTreeBase::_BalanceInsertLeft(AVLTreeNode** node)
 {
 	if ((*node)->balance_factor < LEFT) {
 		// tree is left heavy
@@ -312,7 +347,7 @@ AVLTree::_BalanceInsertLeft(AVLTreeNode** node)
 
 
 int
-AVLTree::_BalanceInsertRight(AVLTreeNode** node)
+AVLTreeBase::_BalanceInsertRight(AVLTreeNode** node)
 {
 	if ((*node)->balance_factor > RIGHT) {
 		// tree is right heavy
@@ -336,7 +371,7 @@ AVLTree::_BalanceInsertRight(AVLTreeNode** node)
 
 
 int
-AVLTree::_Insert(AVLTreeNode* nodeToInsert)
+AVLTreeBase::_Insert(AVLTreeNode* nodeToInsert)
 {
 	struct node_info {
 		AVLTreeNode**	node;
@@ -378,10 +413,6 @@ AVLTree::_Insert(AVLTreeNode* nodeToInsert)
 	else
 		(*node)->parent = *top[-1].node;
 
-	// init the iterator
-//	if (iterator)
-//		*iterator = Iterator(this, *node);
-
 	// do the balancing
 	int result = HEIGHT_CHANGED;
 	while (result == HEIGHT_CHANGED && top != bottom) {
@@ -403,7 +434,7 @@ AVLTree::_Insert(AVLTreeNode* nodeToInsert)
 
 
 int
-AVLTree::_BalanceRemoveLeft(AVLTreeNode** node)
+AVLTreeBase::_BalanceRemoveLeft(AVLTreeNode** node)
 {
 	int result = HEIGHT_CHANGED;
 
@@ -430,7 +461,7 @@ AVLTree::_BalanceRemoveLeft(AVLTreeNode** node)
 
 
 int
-AVLTree::_BalanceRemoveRight(AVLTreeNode** node)
+AVLTreeBase::_BalanceRemoveRight(AVLTreeNode** node)
 {
 	int result = HEIGHT_CHANGED;
 
@@ -457,7 +488,7 @@ AVLTree::_BalanceRemoveRight(AVLTreeNode** node)
 
 
 int
-AVLTree::_RemoveRightMostChild(AVLTreeNode** node, AVLTreeNode** foundNode)
+AVLTreeBase::_RemoveRightMostChild(AVLTreeNode** node, AVLTreeNode** foundNode)
 {
 	AVLTreeNode** stack[kMaxAVLTreeHeight];
 	AVLTreeNode*** top = stack;
@@ -495,7 +526,7 @@ AVLTree::_RemoveRightMostChild(AVLTreeNode** node, AVLTreeNode** foundNode)
 
 
 int
-AVLTree::_Remove(AVLTreeNode* node)
+AVLTreeBase::_Remove(AVLTreeNode* node)
 {
 	if (!node)
 		return NOT_FOUND;
@@ -562,4 +593,37 @@ AVLTree::_Remove(AVLTreeNode* node)
 	}
 
 	return result;
+}
+
+
+int
+AVLTreeBase::_CheckTree(AVLTreeNode* parent, AVLTreeNode* node,
+	int& _nodeCount) const
+{
+	if (node == NULL) {
+		_nodeCount = 0;
+		return 0;
+	}
+
+	if (parent != node->parent) {
+		CHECK_FAILED("AVLTreeBase::_CheckTree(): node %p parent mismatch: "
+			"%p vs %p", node, parent, node->parent);
+	}
+
+	int leftNodeCount;
+	int leftDepth = _CheckTree(node, node->left, leftNodeCount);
+
+	int rightNodeCount;
+	int rightDepth = _CheckTree(node, node->right, rightNodeCount);
+
+	int balance = rightDepth - leftDepth;
+	if (balance < LEFT || balance > RIGHT) {
+		CHECK_FAILED("AVLTreeBase::_CheckTree(): unbalanced subtree: %p", node);
+	} else if (balance != node->balance_factor) {
+		CHECK_FAILED("AVLTreeBase::_CheckTree(): subtree %p balance mismatch: "
+			"%d vs %d", node, balance, node->balance_factor);
+	}
+
+	_nodeCount = leftNodeCount + rightNodeCount + 1;
+	return std::max(leftDepth, rightDepth) + 1;
 }

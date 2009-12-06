@@ -1,209 +1,13 @@
 /*
- * Copyright 2003-2007, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2003-2009, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _AVL_TREE_MAP_H
-#define _AVL_TREE_MAP_H
+#ifndef _KERNEL_UTIL_AVL_TREE_MAP_H
+#define _KERNEL_UTIL_AVL_TREE_MAP_H
 
-
-#include <OS.h>
-#include <util/kernel_cpp.h>
 
 #include <util/MallocFreeAllocator.h>
-
-
-// maximal height of a tree
-static const int kMaxAVLTreeHeight = 32;
-
-class AVLTreeIterator;
-
-
-// AVLTreeNode
-struct AVLTreeNode {
-	AVLTreeNode*	parent;
-	AVLTreeNode*	left;
-	AVLTreeNode*	right;
-	int				balance_factor;
-};
-
-
-// AVLTreeCompare
-class AVLTreeCompare {
-public:
-	virtual						~AVLTreeCompare();
-
-	virtual	int					CompareKeyNode(const void* key,
-									const AVLTreeNode* node) = 0;
-	virtual	int					CompareNodes(const AVLTreeNode* node1,
-									const AVLTreeNode* node2) = 0;
-};
-
-
-// AVLTree
-class AVLTree {
-public:
-								AVLTree(AVLTreeCompare* compare);
-								~AVLTree();
-
-	inline	int					Count() const	{ return fNodeCount; }
-	inline	bool				IsEmpty() const	{ return (fNodeCount == 0); }
-			void				MakeEmpty();
-
-	inline	AVLTreeNode*		Root() const	{ return fRoot; }
-
-			AVLTreeNode*		LeftMost(AVLTreeNode* node) const;
-			AVLTreeNode*		RightMost(AVLTreeNode* node) const;
-
-			AVLTreeNode*		Previous(AVLTreeNode* node) const;
-			AVLTreeNode*		Next(AVLTreeNode* node) const;
-
-	inline	AVLTreeIterator		GetIterator() const;
-	inline	AVLTreeIterator		GetIterator(AVLTreeNode* node) const;
-
-			AVLTreeNode*		Find(const void* key);
-			AVLTreeNode*		FindClose(const void* key, bool less);
-
-			status_t			Insert(AVLTreeNode* element);
-			AVLTreeNode*		Remove(const void* key);
-			bool				Remove(AVLTreeNode* element);
-
-private:
-			enum {
-				NOT_FOUND		= -3,
-				DUPLICATE		= -2,
-				NO_MEMORY		= -1,
-				OK				= 0,
-				HEIGHT_CHANGED	= 1,
-
-				LEFT			= -1,
-				BALANCED		= 0,
-				RIGHT			= 1,
-			};
-
-			// rotations
-			void				_RotateRight(AVLTreeNode** nodeP);
-			void				_RotateLeft(AVLTreeNode** nodeP);
-
-			// insert
-			int					_BalanceInsertLeft(AVLTreeNode** node);
-			int					_BalanceInsertRight(AVLTreeNode** node);
-			int					_Insert(AVLTreeNode* nodeToInsert);
-
-			// remove
-			int					_BalanceRemoveLeft(AVLTreeNode** node);
-			int					_BalanceRemoveRight(AVLTreeNode** node);
-			int					_RemoveRightMostChild(AVLTreeNode** node,
-									AVLTreeNode** foundNode);
-			int					_Remove(AVLTreeNode* node);
-
-			AVLTreeNode*		fRoot;
-			int					fNodeCount;
-			AVLTreeCompare*		fCompare;
-};
-
-
-// AVLTreeIterator
-class AVLTreeIterator {
-public:
-	inline AVLTreeIterator()
-		: fParent(NULL),
-		  fCurrent(NULL),
-		  fNext(NULL)
-	{
-	}
-
-	inline AVLTreeIterator(const AVLTreeIterator& other)
-		: fParent(other.fParent),
-		  fCurrent(other.fCurrent),
-		  fNext(other.fNext)
-	{
-	}
-
-	inline AVLTreeNode* Current() const
-	{
-		return fCurrent;
-	}
-
-	inline bool HasNext() const
-	{
-		return fNext;
-	}
-
-	inline AVLTreeNode* Next()
-	{
-		fCurrent = fNext;
-
-		if (fNext)
-			fNext = fParent->Next(fNext);
-
-		return fCurrent;
-	}
-
-	inline AVLTreeNode* Previous()
-	{
-		if (fCurrent) {
-			fNext = fCurrent;
-			fCurrent = fParent->Previous(fCurrent);
-		} else if (fNext)
-			fCurrent = fParent->Previous(fNext);
-
-		return fCurrent;
-	}
-
-	inline AVLTreeNode* Remove()
-	{
-		if (!fCurrent)
-			return NULL;
-
-		AVLTreeNode* node = fCurrent;
-		fCurrent = NULL;
-
-		return (const_cast<AVLTree*>(fParent)->Remove(node) ? node : NULL);
-	}
-
-	inline AVLTreeIterator& operator=(const AVLTreeIterator& other)
-	{
-		fParent = other.fParent;
-		fCurrent = other.fCurrent;
-		fNext = other.fNext;
-		return *this;
-	}
-
-private:
-	inline AVLTreeIterator(const AVLTree* parent, AVLTreeNode* current,
-			AVLTreeNode* next)
-		: fParent(parent),
-		  fCurrent(current),
-		  fNext(next)
-	{
-	}
-
-protected:
-	friend class AVLTree;
-
-	const AVLTree*	fParent;
-	AVLTreeNode*	fCurrent;
-	AVLTreeNode*	fNext;
-};
-
-
-// GetIterator
-inline AVLTreeIterator
-AVLTree::GetIterator() const
-{
-	return AVLTreeIterator(this, NULL, LeftMost(fRoot));
-}
-
-
-// GetIterator
-inline AVLTreeIterator
-AVLTree::GetIterator(AVLTreeNode* node) const
-{
-	return AVLTreeIterator(this, node, Next(node));
-}
-
-
-// #pragma mark - AVLTreeMap and friends
+#include <util/AVLTreeBase.h>
 
 
 // strategies
@@ -299,7 +103,7 @@ protected:
 			friend class Iterator;
 			friend class ConstIterator;
 
-			AVLTree				fTree;
+			AVLTreeBase			fTree;
 			NodeStrategy		fStrategy;
 
 public:
@@ -518,7 +322,7 @@ _AVL_TREE_MAP_TEMPLATE_LIST
 typename _AVL_TREE_MAP_CLASS_NAME::Iterator
 _AVL_TREE_MAP_CLASS_NAME::FindClose(const Key& key, bool less)
 {
-	if (AVLTreeNode* node = fTree.FindClose(&key, less))
+	if (AVLTreeNode* node = fTree.FindClosest(&key, less))
 		return Iterator(this, fTree.GetIterator(node));
 	return Iterator();
 }
@@ -776,4 +580,4 @@ private:
 };
 }
 
-#endif	// _AVL_TREE_MAP_H
+#endif	// _KERNEL_UTIL_AVL_TREE_MAP_H
