@@ -26,11 +26,11 @@
 
 /**
  * Gets index of the variable.
- * 
+ *
  * @return the index of the variable
  */
 int32
-Variable::Index()
+Variable::Index() const
 {
 	int32 i = fLS->Variables()->IndexOf(this);
 	if (i == -1) {
@@ -43,7 +43,7 @@ Variable::Index()
 
 /**
  * Gets the current linear specification.
- * 
+ *
  * @return the current linear specification
  */
 LinearSpec*
@@ -55,7 +55,7 @@ Variable::LS() const
 
 /**
  * Gets the value.
- * 
+ *
  * @return the value
  */
 double
@@ -67,7 +67,7 @@ Variable::Value() const
 
 /**
  * Sets the value.
- * 
+ *
  * @param value	the value
  */
 void
@@ -79,7 +79,7 @@ Variable::SetValue(double value)
 
 /**
  * Gets the minimum value of the variable.
- * 
+ *
  * @return the minimum value of variable
  */
 double
@@ -91,7 +91,7 @@ Variable::Min() const
 
 /**
  * Sets the minimum value of the variable.
- * 
+ *
  * @param min	minimum value
  */
 void
@@ -107,7 +107,7 @@ Variable::SetMin(double min)
 
 /**
  * Gets the maximum value of the variable.
- * 
+ *
  * @return the maximum value of variable
  */
 double
@@ -119,7 +119,7 @@ Variable::Max() const
 
 /**
  * Sets the maximum value of the variable.
- * 
+ *
  * @param max	maximum value
  */
 void
@@ -135,7 +135,7 @@ Variable::SetMax(double max)
 
 /**
  * Sets the minimum and maximum values of the variable.
- * 
+ *
  * @param min	minimum value
  * @param max	maximum value
  */
@@ -166,45 +166,40 @@ Variable::SetLabel(const char* label)
 }
 
 
-/**
- * Returns index of the variable as String.
- * E.g. "Var2"
- * 
- * @return the <code>String</code> index of the variable
- */
-BString*
-Variable::ToBString()
+Variable::operator BString() const
 {
-	BString* str = new BString();
-	if (fLabel) {
-		*str << fLabel;
-		if (!fIsValid)
-			*str << "(invalid)";
-	} else {
-		*str << "Var";
-		if (!fIsValid)
-			*str << "(invalid," << (int32)this << ")";
-		else
-			*str << Index();
-	}
-	return str;
+	BString string;
+	GetString(string);
+	return string;
 }
 
 
-const char*
-Variable::ToString()
+/**
+ * Returns index of the variable as String.
+ * E.g. "Var2"
+ *
+ * @return the <code>String</code> index of the variable
+ */
+void
+Variable::GetString(BString& string) const
 {
-	BString* str = ToBString();
-	char* result = (char*) malloc(str->Length() + 1);
-	str->CopyInto(result, 0, str->Length());
-	delete str;
-	return result;
+	if (fLabel) {
+		string << fLabel;
+		if (!fIsValid)
+			string << "(invalid)";
+	} else {
+		string << "Var";
+		if (!fIsValid)
+			string << "(invalid," << (int32)this << ")";
+		else
+			string << Index();
+	}
 }
 
 
 /**
  * Adds a constraint that sets this variable equal to the given one.
- * 
+ *
  * @param var	variable that should have the same value
  * @return the new equality constraint
  */
@@ -220,7 +215,7 @@ Variable::IsEqual(Variable* var)
 
 /**
  * Adds a constraint that sets this variable smaller or equal to the given one.
- * 
+ *
  * @param var	variable that should have a larger or equal value
  * @return the new constraint
  */
@@ -236,7 +231,7 @@ Variable::IsSmallerOrEqual(Variable* var)
 
 /**
  * Adds a constraint that sets this variable greater or equal to the given one.
- * 
+ *
  * @param var	variable that should have a smaller or equal value
  * @return the new constraint
  */
@@ -341,7 +336,7 @@ Variable::Variable(LinearSpec* ls)
 	fIsValid(true)
 {
 	fLS->Variables()->AddItem(this);
-	
+
 	if (fLS->Variables()->CountItems() > fLS->CountColumns()) {
 		double d = 0;
 		int i = 0;

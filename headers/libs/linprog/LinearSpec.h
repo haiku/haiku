@@ -25,7 +25,7 @@
 
 
 namespace LinearProgramming {
-	
+
 class Constraint;
 class ObjFunctionSummand;
 class PenaltyFunction;
@@ -35,52 +35,52 @@ class Variable;
  * Specification of a linear programming problem.
  */
 class LinearSpec {
-	
+
 public:
 						LinearSpec();
 	virtual				~LinearSpec();
 
 	Variable*			AddVariable();
 
-	Constraint*			AddConstraint(BList* summands, 
-								OperatorType op, double rightSide);
-	Constraint*			AddConstraint(double coeff1, Variable* var1, 
-								OperatorType op, double rightSide);
-	Constraint*			AddConstraint(double coeff1, Variable* var1, 
-								double coeff2, Variable* var2, 
+	Constraint*			AddConstraint(BList* summands,
 								OperatorType op, double rightSide);
 	Constraint*			AddConstraint(double coeff1, Variable* var1,
-								double coeff2, Variable* var2, 
-								double coeff3, Variable* var3, 
 								OperatorType op, double rightSide);
 	Constraint*			AddConstraint(double coeff1, Variable* var1,
-								double coeff2, Variable* var2, 
-								double coeff3, Variable* var3, 
-								double coeff4, Variable* var4, 
+								double coeff2, Variable* var2,
+								OperatorType op, double rightSide);
+	Constraint*			AddConstraint(double coeff1, Variable* var1,
+								double coeff2, Variable* var2,
+								double coeff3, Variable* var3,
+								OperatorType op, double rightSide);
+	Constraint*			AddConstraint(double coeff1, Variable* var1,
+								double coeff2, Variable* var2,
+								double coeff3, Variable* var3,
+								double coeff4, Variable* var4,
 								OperatorType op, double rightSide);
 
-	Constraint*			AddConstraint(BList* summands, 
-								OperatorType op, double rightSide, 
+	Constraint*			AddConstraint(BList* summands,
+								OperatorType op, double rightSide,
 								double penaltyNeg, double penaltyPos);
 	Constraint*			AddConstraint(double coeff1, Variable* var1,
-								OperatorType op, double rightSide, 
+								OperatorType op, double rightSide,
 								double penaltyNeg, double penaltyPos);
 	Constraint*			AddConstraint(double coeff1, Variable* var1,
-								double coeff2, Variable* var2, 
-								OperatorType op, double rightSide, 
+								double coeff2, Variable* var2,
+								OperatorType op, double rightSide,
 								double penaltyNeg, double penaltyPos);
 	Constraint*			AddConstraint(double coeff1, Variable* var1,
-								double coeff2, Variable* var2, 
-								double coeff3, Variable* var3, 
-								OperatorType op, double rightSide, 
+								double coeff2, Variable* var2,
+								double coeff3, Variable* var3,
+								OperatorType op, double rightSide,
 								double penaltyNeg, double penaltyPos);
 	Constraint*			AddConstraint(double coeff1, Variable* var1,
-								double coeff2, Variable* var2, 
-								double coeff3, Variable* var3, 
-								double coeff4, Variable* var4, 
-								OperatorType op, double rightSide, 
+								double coeff2, Variable* var2,
+								double coeff3, Variable* var3,
+								double coeff4, Variable* var4,
+								OperatorType op, double rightSide,
 								double penaltyNeg, double penaltyPos);
-	
+
 	PenaltyFunction*	AddPenaltyFunction(Variable* var, BList* xs, BList* gs);
 
 	BList*				ObjFunction();
@@ -90,7 +90,7 @@ public:
 	ResultType			Presolve();
 	void				RemovePresolved();
 	ResultType			Solve();
-	void				Save(char* fname);
+	void				Save(const char* fileName);
 
 	int32				CountColumns() const;
 	OptimizationType	Optimization() const;
@@ -101,8 +101,8 @@ public:
 	double				ObjectiveValue() const;
 	double				SolvingTime() const;
 
-	BString*			ToBString();
-	const char*			ToString();
+						operator BString() const;
+	void				GetString(BString& string) const;
 
 protected:
 	int32 				fCountColumns;

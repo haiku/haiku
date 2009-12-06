@@ -29,7 +29,7 @@ class BALMLayout;
  * Rectangular area in the GUI, defined by a tab on each side.
  */
 class Area {
-	
+
 public:
 	XTab*				Left() const;
 	void				SetLeft(XTab* left);
@@ -83,32 +83,32 @@ public:
 	bool				AutoPreferredContentSize() const;
 	void				SetAutoPreferredContentSize(bool value);
 
-	BString*			ToBString();
-	const char*			ToString();
+						operator BString() const;
+	void				GetString(BString& string) const;
 
 	Constraint*			HasSameWidthAs(Area* area);
 	Constraint*			HasSameHeightAs(Area* area);
 	BList*				HasSameSizeAs(Area* area);
 
 						~Area();
-	
+
 protected:
 						Area(BALMLayout* ls, XTab* left, YTab* top,
-								XTab* right, YTab* bottom, 
-								BView* content, 
+								XTab* right, YTab* bottom,
+								BView* content,
 								BSize minContentSize);
-						Area(BALMLayout* ls, Row* row, Column* column, 
+						Area(BALMLayout* ls, Row* row, Column* column,
 								BView* content,
 								BSize minContentSize);
 	void				DoLayout();
-	
+
 private:
 	void				InitChildArea();
 	void				UpdateHorizontal();
 	void				UpdateVertical();
-	void				Init(BALMLayout* ls, XTab* left, YTab* top, 
-							XTab* right, YTab* bottom, 
-							BView* content, 
+	void				Init(BALMLayout* ls, XTab* left, YTab* top,
+							XTab* right, YTab* bottom,
+							BView* content,
 							BSize minContentSize);
 
 public:
@@ -152,7 +152,7 @@ private:
 	Constraint*			fTopConstraint;
 	Constraint*			fRightConstraint;
 	Constraint*			fBottomConstraint;
-	
+
 public:
 	friend class		BALMLayout;
 

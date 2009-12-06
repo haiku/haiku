@@ -19,29 +19,29 @@
  * Constructor.
  * Creates new layout engine.
  */
-BALMLayout::BALMLayout() 
+BALMLayout::BALMLayout()
 	: BLayout(),
 	LinearSpec()
 {
 	fLayoutStyle = FIT_TO_SIZE;
 	fActivated = true;
-	
+
 	fAreas = new BList(1);
 	fLeft = new XTab(this);
 	fRight = new XTab(this);
 	fTop = new YTab(this);
 	fBottom = new YTab(this);
-	
+
 	// the Left tab is always at x-position 0, and the Top tab is always at y-position 0
 	fLeft->SetRange(0, 0);
 	fTop->SetRange(0, 0);
-	
+
 	// cached layout values
 	// need to be invalidated whenever the layout specification is changed
 	fMinSize = Area::kUndefinedSize;
 	fMaxSize = Area::kUndefinedSize;
 	fPreferredSize = Area::kUndefinedSize;
-	
+
 	fPerformancePath = NULL;
 }
 
@@ -61,23 +61,28 @@ BALMLayout::SolveLayout()
 		if (currentArea->AutoPreferredContentSize())
 			currentArea->SetDefaultBehavior();
 	}
-	
-	// try to solve the layout until the result is OPTIMAL or INFEASIBLE, maximally 
-	// 15 tries sometimes the solving algorithm encounters numerical problems 
-	// (NUMFAILURE), and repeating the solving often helps to overcome them
-	BFile* file = new BFile(fPerformancePath, 
-				B_READ_WRITE | B_CREATE_FILE | B_OPEN_AT_END);
-	
+
+	// Try to solve the layout until the result is OPTIMAL or INFEASIBLE,
+	// maximally 15 tries sometimes the solving algorithm encounters numerical
+	// problems (NUMFAILURE), and repeating the solving often helps to overcome
+	// them.
+	BFile* file = NULL;
+	if (fPerformancePath != NULL) {
+		file = new BFile(fPerformancePath,
+			B_READ_WRITE | B_CREATE_FILE | B_OPEN_AT_END);
+	}
+
 	ResultType result;
 	for (int32 tries = 0; tries < 15; tries++) {
 		result = Solve();
 		if (fPerformancePath != NULL) {
 			char buffer [100];
-			file->Write(buffer, sprintf(buffer, "%d\t%fms\t#vars=%ld\t#constraints=%ld\n", 
-					result, SolvingTime(), Variables()->CountItems(), 
-					Constraints()->CountItems()));
+			file->Write(buffer, sprintf(buffer, "%d\t%fms\t#vars=%ld\t"
+				"#constraints=%ld\n", result, SolvingTime(),
+				Variables()->CountItems(), Constraints()->CountItems()));
 		}
-		if (result == OPTIMAL || result == INFEASIBLE) break;
+		if (result == OPTIMAL || result == INFEASIBLE)
+			break;
 	}
 	delete file;
 }
@@ -85,7 +90,7 @@ BALMLayout::SolveLayout()
 
 /**
  * Adds a new x-tab to the specification.
- * 
+ *
  * @return the new x-tab
  */
 XTab*
@@ -93,11 +98,11 @@ BALMLayout::AddXTab()
 {
 	return new XTab(this);
 }
-	
+
 
 /**
  * Adds a new y-tab to the specification.
- * 
+ *
  * @return the new y-tab
  */
 YTab*
@@ -109,7 +114,7 @@ BALMLayout::AddYTab()
 
 /**
  * Adds a new row to the specification.
- * 
+ *
  * @return the new row
  */
 Row*
@@ -121,7 +126,7 @@ BALMLayout::AddRow()
 
 /**
  * Adds a new row to the specification that is glued to the given y-tabs.
- * 
+ *
  * @param top
  * @param bottom
  * @return the new row
@@ -130,15 +135,17 @@ Row*
 BALMLayout::AddRow(YTab* top, YTab* bottom)
 {
 	Row* row = new Row(this);
-	if (top != NULL) row->Constraints()->AddItem(row->Top()->IsEqual(top));
-	if (bottom != NULL) row->Constraints()->AddItem(row->Bottom()->IsEqual(bottom));
+	if (top != NULL)
+		row->Constraints()->AddItem(row->Top()->IsEqual(top));
+	if (bottom != NULL)
+		row->Constraints()->AddItem(row->Bottom()->IsEqual(bottom));
 	return row;
 }
 
 
 /**
  * Adds a new column to the specification.
- * 
+ *
  * @return the new column
  */
 Column*
@@ -150,7 +157,7 @@ BALMLayout::AddColumn()
 
 /**
  * Adds a new column to the specification that is glued to the given x-tabs.
- * 
+ *
  * @param left
  * @param right
  * @return the new column
@@ -167,7 +174,7 @@ BALMLayout::AddColumn(XTab* left, XTab* right)
 
 /**
  * Adds a new area to the specification, setting only the necessary minimum size constraints.
- * 
+ *
  * @param left				left border
  * @param top				top border
  * @param right			right border
@@ -179,7 +186,7 @@ BALMLayout::AddColumn(XTab* left, XTab* right)
 Area*
 BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 	BView* content, BSize minContentSize)
-{			
+{
 	InvalidateLayout();
 	if (content != NULL)
 		View()->AddChild(content);
@@ -191,7 +198,7 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 
 /**
  * Adds a new area to the specification, setting only the necessary minimum size constraints.
- * 
+ *
  * @param row				the row that defines the top and bottom border
  * @param column			the column that defines the left and right border
  * @param content			the control which is the area content
@@ -201,7 +208,7 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 Area*
 BALMLayout::AddArea(Row* row, Column* column, BView* content,
 	BSize minContentSize)
-{	
+{
 	InvalidateLayout();
 	if (content != NULL)
 		View()->AddChild(content);
@@ -213,7 +220,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content,
 
 /**
  * Adds a new area to the specification, automatically setting preferred size constraints.
- * 
+ *
  * @param left			left border
  * @param top			top border
  * @param right		right border
@@ -224,7 +231,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content,
 Area*
 BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 	BView* content)
-{	
+{
 	InvalidateLayout();
 	if (content != NULL)
 		View()->AddChild(content);
@@ -238,11 +245,11 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 
 /**
  * Adds a new area to the specification, automatically setting preferred size constraints.
- * 
+ *
  * @param row			the row that defines the top and bottom border
  * @param column		the column that defines the left and right border
  * @param content		the control which is the area content
- * @return the new area    
+ * @return the new area
  */
 Area*
 BALMLayout::AddArea(Row* row, Column* column, BView* content)
@@ -260,7 +267,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content)
 
 /**
  * Finds the area that contains the given control.
- * 
+ *
  * @param control	the control to look for
  * @return the area that contains the control
  */
@@ -270,7 +277,7 @@ BALMLayout::AreaOf(BView* control)
 	Area* area;
 	for (int32 i = 0; i < fAreas->CountItems(); i++) {
 		area = (Area*)fAreas->ItemAt(i);
-		if (area->Content() == control) 
+		if (area->Content() == control)
 			return area;
 	}
 	return NULL;
@@ -516,45 +523,45 @@ BALMLayout::LayoutView()
 	if (!fActivated)
 		return;
 	fActivated = false;
-	
+
 	if (View() == NULL)
 		return;
-	
+
 	// reverse engineer a layout specification if none was given
 	//~ if (this == NULL) RecoverLayout(View());
-	
+
 	// if the layout engine is set to fit the GUI to the given size,
 	// then the given size is enforced by setting absolute positions for Right and Bottom
 	if (fLayoutStyle == FIT_TO_SIZE) {
 		Right()->SetRange(View()->Bounds().Width(), View()->Bounds().Width());
 		Bottom()->SetRange(View()->Bounds().Height(), View()->Bounds().Height());
 	}
-	
+
 	SolveLayout();
-	
+
 	// if new layout is infasible, use previous layout
 	if (Result() == INFEASIBLE) {
 		fActivated = true; // now layout calculation is allowed to run again
 		return;
 	}
-	
+
 	if (Result() != OPTIMAL) {
 		Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). ", Result());
 		printf("Saved specification in file failed-layout.txt\n");
 	}
-	
-	// change the size of the GUI according to the calculated size 
+
+	// change the size of the GUI according to the calculated size
 	// if the layout engine was configured to do so
 	if (fLayoutStyle == ADJUST_SIZE) {
 		View()->ResizeTo(floor(Right()->Value() - Left()->Value() + 0.5),
 				floor(Bottom()->Value() - Top()->Value() + 0.5));
 	}
-	
+
 	// set the calculated positions and sizes for every area
 	for (int32 i = 0; i < Areas()->CountItems(); i++)
 		((Area*)Areas()->ItemAt(i))->DoLayout();
-	
+
 	fActivated = true;
 }
 
@@ -600,14 +607,14 @@ BALMLayout::CalculateMinSize()
 	delete (Summand*)newObjFunction->ItemAt(0);
 	delete (Summand*)newObjFunction->ItemAt(1);
 	delete newObjFunction;
-	
+
 	if (Result() == UNBOUNDED)
 		return Area::kMinSize;
 	if (Result() != OPTIMAL) {
 		Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). Saved specification in file failed-layout.txt", Result());
 	}
-	
+
 	return BSize(Right()->Value() - Left()->Value(), Bottom()->Value() - Top()->Value());
 }
 
@@ -629,14 +636,14 @@ BALMLayout::CalculateMaxSize()
 	delete (Summand*)newObjFunction->ItemAt(0);
 	delete (Summand*)newObjFunction->ItemAt(1);
 	delete newObjFunction;
-	
+
 	if (Result() == UNBOUNDED)
 		return Area::kMaxSize;
 	if (Result() != OPTIMAL) {
 		Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). Saved specification in file failed-layout.txt", Result());
 	}
-	
+
 	return BSize(Right()->Value() - Left()->Value(), Bottom()->Value() - Top()->Value());
 }
 
@@ -652,7 +659,7 @@ BALMLayout::CalculatePreferredSize()
 		Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). Saved specification in file failed-layout.txt", Result());
 	}
-	
+
 	return BSize(Right()->Value() - Left()->Value(), Bottom()->Value() - Top()->Value());
 }
 

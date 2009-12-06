@@ -24,7 +24,7 @@ class Summand;
 class Variable {
 
 public:
-	int32				Index();
+	int32				Index() const;
 	LinearSpec*			LS() const;
 	double				Value() const;
 	void				SetValue(double value);
@@ -36,9 +36,9 @@ public:
 
 	const char*			Label();
 	void				SetLabel(const char* label);
-	
-	BString*			ToBString();
-	const char*			ToString();
+
+						operator BString() const;
+	void				GetString(BString& string) const;
 
 	Constraint*			IsEqual(Variable* var);
 	Constraint*			IsSmallerOrEqual(Variable* var);

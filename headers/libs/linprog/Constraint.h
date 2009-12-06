@@ -19,28 +19,28 @@
 
 
 namespace LinearProgramming {
-	
+
 class LinearSpec;
 
 /**
- * Hard linear constraint, i.e.&nbsp;one that must be satisfied. 
+ * Hard linear constraint, i.e.&nbsp;one that must be satisfied.
  * May render a specification infeasible.
  */
 class Constraint {
-	
+
 public:
-	int32				Index();
+	int32				Index() const;
 
 	BList*				LeftSide();
 	void				SetLeftSide(BList* summands);
 	void				UpdateLeftSide();
 	void				SetLeftSide(double coeff1, Variable* var1);
-	void				SetLeftSide(double coeff1, Variable* var1, 
+	void				SetLeftSide(double coeff1, Variable* var1,
 							double coeff2, Variable* var2);
-	void				SetLeftSide(double coeff1, Variable* var1, 
+	void				SetLeftSide(double coeff1, Variable* var1,
 							double coeff2, Variable* var2,
 							double coeff3, Variable* var3);
-	void				SetLeftSide(double coeff1, Variable* var1, 
+	void				SetLeftSide(double coeff1, Variable* var1,
 							double coeff2, Variable* var2,
 							double coeff3, Variable* var3,
 							double coeff4, Variable* var4);
@@ -68,8 +68,8 @@ public:
 	bool				IsValid();
 	void				Invalidate();
 
-	BString*			ToBString();
-	const char*			ToString();
+						operator BString() const;
+	void				GetString(BString& string) const;
 
 						~Constraint();
 
