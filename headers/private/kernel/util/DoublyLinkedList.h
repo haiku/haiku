@@ -1,5 +1,5 @@
-/* 
- * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net.
+/*
+ * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
  * Copyright 2006-2009, Axel Dörfler, axeld@pinc-software.de.
  *
  * Distributed under the terms of the MIT License.
@@ -25,9 +25,6 @@
 template<typename Element>
 class DoublyLinkedListLink {
 public:
-	DoublyLinkedListLink() : next(NULL), previous(NULL) {}
-	~DoublyLinkedListLink() {}
-
 	Element*	next;
 	Element*	previous;
 };
@@ -42,7 +39,7 @@ public:
 	DoublyLinkedListLinkImpl() : fDoublyLinkedListLink() {}
 	~DoublyLinkedListLinkImpl() {}
 
-	DLL_Link* GetDoublyLinkedListLink()	
+	DLL_Link* GetDoublyLinkedListLink()
 		{ return &fDoublyLinkedListLink; }
 	const DLL_Link* GetDoublyLinkedListLink() const
 		{ return &fDoublyLinkedListLink; }
@@ -541,7 +538,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::RemoveAll()
 
 // RemoveHead
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
-Element* 
+Element*
 DOUBLY_LINKED_LIST_CLASS_NAME::RemoveHead()
 {
 	Element* element = Head();
@@ -551,7 +548,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::RemoveHead()
 
 // RemoveTail
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
-Element* 
+Element*
 DOUBLY_LINKED_LIST_CLASS_NAME::RemoveTail()
 {
 	Element* element = Tail();
@@ -561,7 +558,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::RemoveTail()
 
 // GetPrevious
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
-Element* 
+Element*
 DOUBLY_LINKED_LIST_CLASS_NAME::GetPrevious(Element* element) const
 {
 	Element* result = NULL;
@@ -572,7 +569,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::GetPrevious(Element* element) const
 
 // GetNext
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
-Element* 
+Element*
 DOUBLY_LINKED_LIST_CLASS_NAME::GetNext(Element* element) const
 {
 	Element* result = NULL;
