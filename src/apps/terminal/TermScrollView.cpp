@@ -37,10 +37,13 @@ TermScrollView::TermScrollView(const char* name, BView* child, BView* target,
 	:
 	BScrollView(name, child, resizingMode, 0, false, true, B_NO_BORDER)
 {
+	child->TargetedByScrollView(NULL);
+	
 	// replace the vertical scroll bar with our own
 	if (fVerticalScrollBar != NULL) {
 		BRect frame(fVerticalScrollBar->Frame());
 		RemoveChild(fVerticalScrollBar);
+		delete fVerticalScrollBar;
 
 		// Overlap one pixel at the top (if required) and the bottom of the
 		// scroll bar with the menu respectively resize knob for aesthetical
@@ -54,6 +57,8 @@ TermScrollView::TermScrollView(const char* name, BView* child, BView* target,
 		AddChild(scrollBar);
 		fVerticalScrollBar = scrollBar;
 	}
+	
+	target->TargetedByScrollView(this);
 }
 
 
