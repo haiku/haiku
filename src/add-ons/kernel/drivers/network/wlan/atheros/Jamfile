@@ -122,17 +122,3 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_rate sample ] ;
 KernelMergeObject atheros_rate.o :
 	sample.c
 	;
-
-local svn = [ FGristFiles entries ] ;
-SEARCH on $(svn) = [ FDirName $(SUBDIR) .svn ] ;
-AddFileDataAttribute atheros : revision : string : $(svn) ;
-
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src tools bosii ] ;
-
-Package atheros-testing :
-	atheros :
-	boot home config add-ons kernel drivers bin ;
-Package atheros-testing :
-	getsysteminfos.sh :
-	boot home Desktop ;
-PackageDriverSymLink atheros-testing : net atheros ;
