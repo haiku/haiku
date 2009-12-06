@@ -1,10 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
- * Distributed under the terms of the NewOS License.
  */
 #ifndef VM_USER_ADDRESS_SPACE_H
 #define VM_USER_ADDRESS_SPACE_H
@@ -29,13 +25,13 @@ public:
 									uint32 protection);
 	virtual	void				DeleteArea(VMArea* area);
 	virtual	status_t			InsertArea(void** _address, uint32 addressSpec,
-									addr_t size, VMArea* area);
+									size_t size, VMArea* area);
 	virtual	void				RemoveArea(VMArea* area);
 
 	virtual	bool				CanResizeArea(VMArea* area, size_t newSize);
 	virtual	status_t			ResizeArea(VMArea* area, size_t newSize);
-	virtual	status_t			ResizeAreaHead(VMArea* area, size_t size);
-	virtual	status_t			ResizeAreaTail(VMArea* area, size_t size);
+	virtual	status_t			ShrinkAreaHead(VMArea* area, size_t newSize);
+	virtual	status_t			ShrinkAreaTail(VMArea* area, size_t newSize);
 
 	virtual	status_t			ReserveAddressRange(void** _address,
 									uint32 addressSpec, size_t size,

@@ -338,7 +338,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		size_t oldSize = area->Size();
 		size_t newSize = address - area->Base();
 
-		status_t error = addressSpace->ResizeAreaTail(area, newSize);
+		status_t error = addressSpace->ShrinkAreaTail(area, newSize);
 		if (error != B_OK)
 			return error;
 
@@ -350,7 +350,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			&& list_is_empty(&cache->consumers)) {
 			error = cache->Resize(cache->virtual_base + newSize);
 			if (error != B_OK) {
-				addressSpace->ResizeAreaTail(area, oldSize);
+				addressSpace->ShrinkAreaTail(area, oldSize);
 				return error;
 			}
 		}
@@ -368,7 +368,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		vm_unmap_pages(area, oldBase, newBase - oldBase, false);
 
 		// resize the area
-		status_t error = addressSpace->ResizeAreaHead(area, newSize);
+		status_t error = addressSpace->ShrinkAreaHead(area, newSize);
 		if (error != B_OK)
 			return error;
 
@@ -392,7 +392,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 	// resize the area
 	addr_t oldSize = area->Size();
-	status_t error = addressSpace->ResizeAreaTail(area, firstNewSize);
+	status_t error = addressSpace->ShrinkAreaTail(area, firstNewSize);
 	if (error != B_OK)
 		return error;
 
@@ -408,7 +408,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		B_EXACT_ADDRESS, area->wiring, area->protection, REGION_NO_PRIVATE_MAP,
 		&secondArea, area->name, false, kernel);
 	if (error != B_OK) {
-		addressSpace->ResizeAreaTail(area, oldSize);
+		addressSpace->ShrinkAreaTail(area, oldSize);
 		return error;
 	}
 

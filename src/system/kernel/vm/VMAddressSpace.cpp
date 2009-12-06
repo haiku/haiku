@@ -12,6 +12,8 @@
 
 #include <stdlib.h>
 
+#include <new>
+
 #include <KernelExport.h>
 
 #include <util/OpenHashTable.h>
@@ -181,17 +183,24 @@ VMAddressSpace::RemoveAndPut()
 }
 
 
+status_t
+VMAddressSpace::InitObject()
+{
+	return B_OK;
+}
+
+
 void
 VMAddressSpace::Dump() const
 {
 	kprintf("dump of address space at %p:\n", this);
-	kprintf("id: 0x%lx\n", fID);
-	kprintf("ref_count: %ld\n", fRefCount);
-	kprintf("fault_count: %ld\n", fFaultCount);
+	kprintf("id: %" B_PRId32 "\n", fID);
+	kprintf("ref_count: %" B_PRId32 "\n", fRefCount);
+	kprintf("fault_count: %" B_PRId32 "\n", fFaultCount);
 	kprintf("translation_map: %p\n", &fTranslationMap);
-	kprintf("base: 0x%lx\n", fBase);
-	kprintf("end: 0x%lx\n", fEndAddress);
-	kprintf("change_count: 0x%lx\n", fChangeCount);
+	kprintf("base: %#" B_PRIxADDR "\n", fBase);
+	kprintf("end: %#" B_PRIxADDR "\n", fEndAddress);
+	kprintf("change_count: %" B_PRId32 "\n", fChangeCount);
 }
 
 
@@ -205,11 +214,17 @@ VMAddressSpace::Create(team_id teamID, addr_t base, size_t size, bool kernel,
 	if (addressSpace == NULL)
 		return B_NO_MEMORY;
 
+	status_t status = addressSpace->InitObject();
+	if (status != B_OK) {
+		delete addressSpace;
+		return status;
+	}
+
 	TRACE(("vm_create_aspace: team %ld (%skernel): %#lx bytes starting at "
 		"%#lx => %p\n", id, kernel ? "!" : "", size, base, addressSpace));
 
 	// initialize the corresponding translation map
-	status_t status = arch_vm_translation_map_init_map(
+	status = arch_vm_translation_map_init_map(
 		&addressSpace->fTranslationMap, kernel);
 	if (status != B_OK) {
 		delete addressSpace;
@@ -321,9 +336,9 @@ VMAddressSpace::_DumpListCommand(int argc, char** argv)
 				areaSize += area->Size();
 			}
 		}
-		kprintf("%p  %6ld   %#010lx   %#10lx   %10ld   %10lld\n",
-			space, space->ID(), space->Base(), space->EndAddress(), areaCount,
-			areaSize);
+		kprintf("%p  %6" B_PRId32 "   %#010" B_PRIxADDR "   %#10" B_PRIxADDR
+			"   %10" B_PRId32 "   %10" B_PRIdOFF "\n", space, space->ID(),
+			space->Base(), space->EndAddress(), areaCount, areaSize);
 	}
 
 	return 0;

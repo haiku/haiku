@@ -41,7 +41,7 @@ is_valid_spot(addr_t base, addr_t alignedBase, addr_t size, addr_t limit)
 
 VMUserAddressSpace::VMUserAddressSpace(team_id id, addr_t base, size_t size)
 	:
-	VMAddressSpace(id, base, size, "kernel address space"),
+	VMAddressSpace(id, base, size, "address space"),
 	fAreaHint(NULL)
 {
 }
@@ -118,7 +118,7 @@ VMUserAddressSpace::LookupArea(addr_t address) const
 */
 status_t
 VMUserAddressSpace::InsertArea(void** _address, uint32 addressSpec,
-	addr_t size, VMArea* _area)
+	size_t size, VMArea* _area)
 {
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
 
@@ -225,22 +225,21 @@ VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize)
 		addr_t offset = area->Base() + newSize - next->Base();
 		if (next->Size() <= offset) {
 			RemoveArea(next);
-			free(next);
+			delete next;
 		} else {
-			status_t error = ResizeAreaHead(next, next->Size() - offset);
+			status_t error = ShrinkAreaHead(next, next->Size() - offset);
 			if (error != B_OK)
 				return error;
 		}
 	}
 
-	return ResizeAreaTail(area, newSize);
-		// TODO: In case of error we should undo the change to the reserved
-		// area.
+	area->SetSize(newSize);
+	return B_OK;
 }
 
 
 status_t
-VMUserAddressSpace::ResizeAreaHead(VMArea* area, size_t size)
+VMUserAddressSpace::ShrinkAreaHead(VMArea* area, size_t size)
 {
 	size_t oldSize = area->Size();
 	if (size == oldSize)
@@ -254,7 +253,7 @@ VMUserAddressSpace::ResizeAreaHead(VMArea* area, size_t size)
 
 
 status_t
-VMUserAddressSpace::ResizeAreaTail(VMArea* area, size_t size)
+VMUserAddressSpace::ShrinkAreaTail(VMArea* area, size_t size)
 {
 	size_t oldSize = area->Size();
 	if (size == oldSize)
@@ -283,7 +282,7 @@ VMUserAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 
 	status_t status = InsertArea(_address, addressSpec, size, area);
 	if (status != B_OK) {
-		free(area);
+		delete area;
 		return status;
 	}
 
@@ -316,7 +315,7 @@ VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
 			// remove reserved range
 			RemoveArea(area);
 			Put();
-			free(area);
+			delete area;
 		}
 	}
 
@@ -332,7 +331,7 @@ VMUserAddressSpace::UnreserveAllAddressRanges()
 		if (area->id == RESERVED_AREA_ID) {
 			RemoveArea(area);
 			Put();
-			free(area);
+			delete area;
 		}
 	}
 }
@@ -396,7 +395,7 @@ VMUserAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 			// the new area fully covers the reversed range
 			fAreas.Remove(next);
 			Put();
-			free(next);
+			delete next;
 		} else {
 			// resize the reserved range behind the area
 			next->SetBase(next->Base() + size);
@@ -556,7 +555,7 @@ second_chance:
 
 						foundSpot = true;
 						area->SetBase(alignedBase);
-						free(next);
+						delete next;
 						break;
 					}
 

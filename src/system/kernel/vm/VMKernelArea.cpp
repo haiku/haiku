@@ -39,13 +39,3 @@ VMKernelArea::Create(VMAddressSpace* addressSpace, const char* name,
 
 	return area;
 }
-
-
-/*static*/ VMKernelArea*
-VMKernelArea::CreateReserved(VMAddressSpace* addressSpace, uint32 flags)
-{
-	VMKernelArea* area = new(nogrow) VMKernelArea(addressSpace, 0, 0);
-	if (area != NULL)
-		area->id = RESERVED_AREA_ID;
-	return area;
-}

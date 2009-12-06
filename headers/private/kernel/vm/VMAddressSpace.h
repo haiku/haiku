@@ -62,6 +62,8 @@ public:
 
 			VMAddressSpace*&	HashTableLink()	{ return fHashTableLink; }
 
+	virtual	status_t			InitObject();
+
 	virtual	VMArea*				FirstArea() const = 0;
 	virtual	VMArea*				NextArea(VMArea* area) const = 0;
 
@@ -70,13 +72,15 @@ public:
 									uint32 protection) = 0;
 	virtual	void				DeleteArea(VMArea* area) = 0;
 	virtual	status_t			InsertArea(void** _address, uint32 addressSpec,
-									addr_t size, VMArea* area) = 0;
+									size_t size, VMArea* area) = 0;
 	virtual	void				RemoveArea(VMArea* area) = 0;
 
 	virtual	bool				CanResizeArea(VMArea* area, size_t newSize) = 0;
 	virtual	status_t			ResizeArea(VMArea* area, size_t newSize) = 0;
-	virtual	status_t			ResizeAreaHead(VMArea* area, size_t size) = 0;
-	virtual	status_t			ResizeAreaTail(VMArea* area, size_t size) = 0;
+	virtual	status_t			ShrinkAreaHead(VMArea* area, size_t newSize)
+									= 0;
+	virtual	status_t			ShrinkAreaTail(VMArea* area, size_t newSize)
+									= 0;
 
 	virtual	status_t			ReserveAddressRange(void** _address,
 									uint32 addressSpec, size_t size,

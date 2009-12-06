@@ -22,14 +22,39 @@
 
 //#define TRACE_VM
 #ifdef TRACE_VM
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
+
+
+//#define PARANOIA_CHECKS
+#ifdef PARANOIA_CHECKS
+#	define PARANOIA_CHECK_STRUCTURES()	_CheckStructures()
+#else
+#	define PARANOIA_CHECK_STRUCTURES()	do {} while (false)
+#endif
+
+
+static int
+ld(size_t value)
+{
+	int index = -1;
+	while (value > 0) {
+		value >>= 1;
+		index++;
+	}
+
+	return index;
+}
 
 
 /*!	Verifies that an area with the given aligned base and size fits into
 	the spot defined by base and limit and checks for overflows.
+	\param base Minimum base address valid for the area.
+	\param alignedBase The base address of the range to check.
+	\param size The size of the area.
+	\param limit The last (inclusive) addresss of the range to check.
 */
 static inline bool
 is_valid_spot(addr_t base, addr_t alignedBase, addr_t size, addr_t limit)
@@ -39,10 +64,12 @@ is_valid_spot(addr_t base, addr_t alignedBase, addr_t size, addr_t limit)
 }
 
 
+// #pragma mark - VMKernelAddressSpace
+
+
 VMKernelAddressSpace::VMKernelAddressSpace(team_id id, addr_t base, size_t size)
 	:
-	VMAddressSpace(id, base, size, "kernel address space"),
-	fAreaHint(NULL)
+	VMAddressSpace(id, base, size, "kernel address space")
 {
 }
 
@@ -53,24 +80,48 @@ VMKernelAddressSpace::~VMKernelAddressSpace()
 }
 
 
+status_t
+VMKernelAddressSpace::InitObject()
+{
+	// create the free lists
+	size_t size = fEndAddress - fBase + 1;
+	fFreeListCount = ld(size) - PAGE_SHIFT + 1;
+	fFreeLists = new(nogrow) RangeFreeList[fFreeListCount];
+	if (fFreeLists == NULL)
+		return B_NO_MEMORY;
+
+	Range* range = new(nogrow) Range(fBase, size, Range::RANGE_FREE);
+	if (range == NULL)
+		return B_NO_MEMORY;
+
+	_InsertRange(range);
+
+	TRACE("VMKernelAddressSpace::InitObject(): address range: %#" B_PRIxADDR
+		" - %#" B_PRIxADDR ", free lists: %d\n", fBase, fEndAddress,
+		fFreeListCount);
+
+	return B_OK;
+}
+
+
 inline VMArea*
 VMKernelAddressSpace::FirstArea() const
 {
-	VMKernelArea* area = fAreas.Head();
-	while (area != NULL && area->id == RESERVED_AREA_ID)
-		area = fAreas.GetNext(area);
-	return area;
+	Range* range = fRangeList.Head();
+	while (range != NULL && range->type != Range::RANGE_AREA)
+		range = fRangeList.GetNext(range);
+	return range != NULL ? range->area : NULL;
 }
 
 
 inline VMArea*
 VMKernelAddressSpace::NextArea(VMArea* _area) const
 {
-	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
-	area = fAreas.GetNext(area);
-	while (area != NULL && area->id == RESERVED_AREA_ID)
-		area = fAreas.GetNext(area);
-	return area;
+	Range* range = static_cast<VMKernelArea*>(_area)->Range();
+	do {
+		range = fRangeList.GetNext(range);
+	} while (range != NULL && range->type != Range::RANGE_AREA);
+	return range != NULL ? range->area : NULL;
 }
 
 
@@ -85,6 +136,8 @@ VMKernelAddressSpace::CreateArea(const char* name, uint32 wiring,
 void
 VMKernelAddressSpace::DeleteArea(VMArea* area)
 {
+	TRACE("VMKernelAddressSpace::DeleteArea(%p)\n", area);
+
 	delete static_cast<VMKernelArea*>(area);
 }
 
@@ -93,22 +146,12 @@ VMKernelAddressSpace::DeleteArea(VMArea* area)
 VMArea*
 VMKernelAddressSpace::LookupArea(addr_t address) const
 {
-	// check the area hint first
-	if (fAreaHint != NULL && fAreaHint->ContainsAddress(address))
-		return fAreaHint;
+	Range* range = fRangeTree.FindClosest(address, true);
+	if (range == NULL || range->type != Range::RANGE_AREA)
+		return NULL;
 
-	for (VMKernelAreaList::ConstIterator it = fAreas.GetIterator();
-			VMKernelArea* area = it.Next();) {
-		if (area->id == RESERVED_AREA_ID)
-			continue;
-
-		if (area->ContainsAddress(address)) {
-			fAreaHint = area;
-			return area;
-		}
-	}
-
-	return NULL;
+	VMKernelArea* area = range->area;
+	return area->ContainsAddress(address) ? area : NULL;
 }
 
 
@@ -119,46 +162,31 @@ VMKernelAddressSpace::LookupArea(addr_t address) const
 */
 status_t
 VMKernelAddressSpace::InsertArea(void** _address, uint32 addressSpec,
-	addr_t size, VMArea* _area)
+	size_t size, VMArea* _area)
 {
+	TRACE("VMKernelAddressSpace::InsertArea(%p, %" B_PRIu32 ", %#" B_PRIxSIZE
+		", %p \"%s\")\n", *_address, addressSpec, size, _area, _area->name);
+
 	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
 
-	addr_t searchBase, searchEnd;
-	status_t status;
+	Range* range;
+	status_t error = _AllocateRange((addr_t)*_address, addressSpec, size,
+		addressSpec == B_EXACT_ADDRESS, range);
+	if (error != B_OK)
+		return error;
 
-	switch (addressSpec) {
-		case B_EXACT_ADDRESS:
-			searchBase = (addr_t)*_address;
-			searchEnd = (addr_t)*_address + (size - 1);
-			break;
+	range->type = Range::RANGE_AREA;
+	range->area = area;
+	area->SetRange(range);
+	area->SetBase(range->base);
+	area->SetSize(range->size);
 
-		case B_BASE_ADDRESS:
-			searchBase = (addr_t)*_address;
-			searchEnd = fEndAddress;
-			break;
+	*_address = (void*)area->Base();
+	fFreeSpace -= area->Size();
 
-		case B_ANY_ADDRESS:
-		case B_ANY_KERNEL_ADDRESS:
-		case B_ANY_KERNEL_BLOCK_ADDRESS:
-			searchBase = fBase;
-			// TODO: remove this again when vm86 mode is moved into the kernel
-			// completely (currently needs a userland address space!)
-			if (searchBase == USER_BASE)
-				searchBase = USER_BASE_ANY;
-			searchEnd = fEndAddress;
-			break;
+	PARANOIA_CHECK_STRUCTURES();
 
-		default:
-			return B_BAD_VALUE;
-	}
-
-	status = _InsertAreaSlot(searchBase, size, searchEnd, addressSpec, area);
-	if (status == B_OK) {
-		*_address = (void*)area->Base();
-		fFreeSpace -= area->Size();
-	}
-
-	return status;
+	return B_OK;
 }
 
 
@@ -166,104 +194,157 @@ VMKernelAddressSpace::InsertArea(void** _address, uint32 addressSpec,
 void
 VMKernelAddressSpace::RemoveArea(VMArea* _area)
 {
+	TRACE("VMKernelAddressSpace::RemoveArea(%p)\n", _area);
+
 	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
 
-	fAreas.Remove(area);
+	_FreeRange(area->Range());
 
-	if (area->id != RESERVED_AREA_ID) {
-		IncrementChangeCount();
-		fFreeSpace += area->Size();
+	fFreeSpace += area->Size();
 
-		if (area == fAreaHint)
-			fAreaHint = NULL;
-	}
+	PARANOIA_CHECK_STRUCTURES();
 }
 
 
 bool
 VMKernelAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 {
-	VMKernelArea* next = fAreas.GetNext(static_cast<VMKernelArea*>(area));
-	addr_t newEnd = area->Base() + (newSize - 1);
-	if (next == NULL) {
-		if (fEndAddress >= newEnd)
-			return true;
-	} else {
-		if (next->Base() > newEnd)
-			return true;
-	}
+	Range* range = static_cast<VMKernelArea*>(area)->Range();
 
-	// If the area was created inside a reserved area, it can
-	// also be resized in that area
-	// TODO: if there is free space after the reserved area, it could
-	// be used as well...
-	if (next->id == RESERVED_AREA_ID && next->cache_offset <= area->Base()
-		&& next->Base() + (next->Size() - 1) >= newEnd) {
+	if (newSize <= range->size)
 		return true;
+
+	Range* nextRange = fRangeList.GetNext(range);
+	if (nextRange == NULL || nextRange->type == Range::RANGE_AREA)
+		return false;
+
+	if (nextRange->type == Range::RANGE_RESERVED
+		&& nextRange->reserved.base > range->base) {
+		return false;
 	}
 
-	return false;
+	// TODO: If there is free space after a reserved range (or vice versa), it
+	// could be used as well.
+	return newSize - range->size <= nextRange->size;
 }
 
 
 status_t
 VMKernelAddressSpace::ResizeArea(VMArea* _area, size_t newSize)
 {
+	TRACE("VMKernelAddressSpace::ResizeArea(%p, %#" B_PRIxSIZE ")\n", _area,
+		newSize);
+
 	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
+	Range* range = area->Range();
 
-	addr_t newEnd = area->Base() + (newSize - 1);
-	VMKernelArea* next = fAreas.GetNext(area);
-	if (next != NULL && next->Base() <= newEnd) {
-		if (next->id != RESERVED_AREA_ID
-			|| next->cache_offset > area->Base()
-			|| next->Base() + (next->Size() - 1) < newEnd) {
-			panic("resize situation for area %p has changed although we "
-				"should have the address space lock", area);
-			return B_ERROR;
-		}
+	if (newSize == range->size)
+		return B_OK;
 
-		// resize reserved area
-		addr_t offset = area->Base() + newSize - next->Base();
-		if (next->Size() <= offset) {
-			RemoveArea(next);
-			free(next);
+	Range* nextRange = fRangeList.GetNext(range);
+
+	if (newSize < range->size) {
+		if (nextRange != NULL && nextRange->type == Range::RANGE_FREE) {
+			// a free range is following -- just enlarge it
+			_FreeListRemoveRange(nextRange, nextRange->size);
+			nextRange->size += range->size - newSize;
+			nextRange->base = range->base + newSize;
+			_FreeListInsertRange(nextRange, nextRange->size);
 		} else {
-			status_t error = ResizeAreaHead(next, next->Size() - offset);
-			if (error != B_OK)
-				return error;
+			// no free range following -- we need to allocate a new one and
+			// insert it
+			nextRange = new(nogrow) Range(range->base + newSize,
+				range->size - newSize, Range::RANGE_FREE);
+			if (nextRange == NULL)
+				return B_NO_MEMORY;
+			_InsertRange(nextRange);
+		}
+	} else {
+		if (nextRange == NULL
+			|| (nextRange->type == Range::RANGE_RESERVED
+				&& nextRange->reserved.base > range->base)) {
+			return B_BAD_VALUE;
+		}
+		// TODO: If there is free space after a reserved range (or vice versa),
+		// it could be used as well.
+		size_t sizeDiff = newSize - range->size;
+		if (sizeDiff > nextRange->size)
+			return B_BAD_VALUE;
+
+		if (sizeDiff == nextRange->size) {
+			// The next range is completely covered -- remove and delete it.
+			_RemoveRange(nextRange);
+			delete nextRange;
+		} else {
+			// The next range is only partially covered -- shrink it.
+			if (nextRange->type == Range::RANGE_FREE)
+				_FreeListRemoveRange(nextRange, nextRange->size);
+			nextRange->size -= sizeDiff;
+			nextRange->base = range->base + newSize;
+			if (nextRange->type == Range::RANGE_FREE)
+				_FreeListInsertRange(nextRange, nextRange->size);
 		}
 	}
 
-	return ResizeAreaTail(area, newSize);
-		// TODO: In case of error we should undo the change to the reserved
-		// area.
-}
+	range->size = newSize;
+	area->SetSize(newSize);
 
-
-status_t
-VMKernelAddressSpace::ResizeAreaHead(VMArea* area, size_t size)
-{
-	size_t oldSize = area->Size();
-	if (size == oldSize)
-		return B_OK;
-
-	area->SetBase(area->Base() + oldSize - size);
-	area->SetSize(size);
-
+	IncrementChangeCount();
+	PARANOIA_CHECK_STRUCTURES();
 	return B_OK;
 }
 
 
 status_t
-VMKernelAddressSpace::ResizeAreaTail(VMArea* area, size_t size)
+VMKernelAddressSpace::ShrinkAreaHead(VMArea* _area, size_t newSize)
 {
-	size_t oldSize = area->Size();
-	if (size == oldSize)
+	TRACE("VMKernelAddressSpace::ShrinkAreaHead(%p, %#" B_PRIxSIZE ")\n", _area,
+		newSize);
+
+	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
+	Range* range = area->Range();
+
+	if (newSize == range->size)
 		return B_OK;
 
-	area->SetSize(size);
+	if (newSize > range->size)
+		return B_BAD_VALUE;
 
+	Range* previousRange = fRangeList.GetPrevious(range);
+
+	size_t sizeDiff = range->size - newSize;
+	if (previousRange != NULL && previousRange->type == Range::RANGE_FREE) {
+		// the previous range is free -- just enlarge it
+		_FreeListRemoveRange(previousRange, previousRange->size);
+		previousRange->size += sizeDiff;
+		_FreeListInsertRange(previousRange, previousRange->size);
+		range->base += sizeDiff;
+		range->size = newSize;
+	} else {
+		// no free range before -- we need to allocate a new one and
+		// insert it
+		previousRange = new(nogrow) Range(range->base, sizeDiff,
+			Range::RANGE_FREE);
+		if (previousRange == NULL)
+			return B_NO_MEMORY;
+		range->base += sizeDiff;
+		range->size = newSize;
+		_InsertRange(previousRange);
+	}
+
+	area->SetBase(range->base);
+	area->SetSize(range->size);
+
+	IncrementChangeCount();
+	PARANOIA_CHECK_STRUCTURES();
 	return B_OK;
+}
+
+
+status_t
+VMKernelAddressSpace::ShrinkAreaTail(VMArea* area, size_t newSize)
+{
+	return ResizeArea(area, newSize);
 }
 
 
@@ -271,27 +352,28 @@ status_t
 VMKernelAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 	size_t size, uint32 flags)
 {
-	// check to see if this address space has entered DELETE state
-	if (fDeleting) {
-		// okay, someone is trying to delete this address space now, so we
-		// can't insert the area, let's back out
+	TRACE("VMKernelAddressSpace::ReserveAddressRange(%p, %" B_PRIu32 ", %#"
+		B_PRIxSIZE ", %#" B_PRIx32 ")\n", *_address, addressSpec, size, flags);
+
+	// Don't allow range reservations, if the address space is about to be
+	// deleted.
+	if (fDeleting)
 		return B_BAD_TEAM_ID;
-	}
 
-	VMKernelArea* area = VMKernelArea::CreateReserved(this, flags);
-	if (area == NULL)
-		return B_NO_MEMORY;
+	Range* range;
+	status_t error = _AllocateRange((addr_t)*_address, addressSpec, size, false,
+		range);
+	if (error != B_OK)
+		return error;
 
-	status_t status = InsertArea(_address, addressSpec, size, area);
-	if (status != B_OK) {
-		free(area);
-		return status;
-	}
+	range->type = Range::RANGE_RESERVED;
+	range->reserved.base = range->base;
+	range->reserved.flags = flags;
 
-	area->cache_offset = area->Base();
-		// we cache the original base address here
+	*_address = (void*)range->base;
 
 	Get();
+	PARANOIA_CHECK_STRUCTURES();
 	return B_OK;
 }
 
@@ -299,28 +381,34 @@ VMKernelAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 status_t
 VMKernelAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
 {
-	// check to see if this address space has entered DELETE state
-	if (fDeleting) {
-		// okay, someone is trying to delete this address space now, so we can't
-		// insert the area, so back out
+	TRACE("VMKernelAddressSpace::UnreserveAddressRange(%#" B_PRIxADDR ", %#"
+		B_PRIxSIZE ")\n", address, size);
+
+	// Don't allow range unreservations, if the address space is about to be
+	// deleted. UnreserveAllAddressRanges() must be used.
+	if (fDeleting)
 		return B_BAD_TEAM_ID;
-	}
 
-	// search area list and remove any matching reserved ranges
+	// search range list and remove any matching reserved ranges
 	addr_t endAddress = address + (size - 1);
-	for (VMKernelAreaList::Iterator it = fAreas.GetIterator();
-			VMKernelArea* area = it.Next();) {
-		// the area must be completely part of the reserved range
-		if (area->Base() + (area->Size() - 1) > endAddress)
-			break;
-		if (area->id == RESERVED_AREA_ID && area->Base() >= (addr_t)address) {
-			// remove reserved range
-			RemoveArea(area);
+	Range* range = fRangeTree.FindClosest(address, false);
+	while (range != NULL && range->base + (range->size - 1) <= endAddress) {
+		// Get the next range for the iteration -- we need to skip free ranges,
+		// since _FreeRange() might join them with the current range and delete
+		// them.
+		Range* nextRange = fRangeList.GetNext(range);
+		while (nextRange != NULL && nextRange->type == Range::RANGE_FREE)
+			nextRange = fRangeList.GetNext(nextRange);
+
+		if (range->type == Range::RANGE_RESERVED) {
+			_FreeRange(range);
 			Put();
-			free(area);
 		}
+
+		range = nextRange;
 	}
 
+	PARANOIA_CHECK_STRUCTURES();
 	return B_OK;
 }
 
@@ -328,14 +416,24 @@ VMKernelAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
 void
 VMKernelAddressSpace::UnreserveAllAddressRanges()
 {
-	for (VMKernelAreaList::Iterator it = fAreas.GetIterator();
-			VMKernelArea* area = it.Next();) {
-		if (area->id == RESERVED_AREA_ID) {
-			RemoveArea(area);
+	Range* range = fRangeList.Head();
+	while (range != NULL) {
+		// Get the next range for the iteration -- we need to skip free ranges,
+		// since _FreeRange() might join them with the current range and delete
+		// them.
+		Range* nextRange = fRangeList.GetNext(range);
+		while (nextRange != NULL && nextRange->type == Range::RANGE_FREE)
+			nextRange = fRangeList.GetNext(nextRange);
+
+		if (range->type == Range::RANGE_RESERVED) {
+			_FreeRange(range);
 			Put();
-			free(area);
 		}
+
+		range = nextRange;
 	}
+
+	PARANOIA_CHECK_STRUCTURES();
 }
 
 
@@ -343,326 +441,467 @@ void
 VMKernelAddressSpace::Dump() const
 {
 	VMAddressSpace::Dump();
-	kprintf("area_hint: %p\n", fAreaHint);
 
 	kprintf("area_list:\n");
 
-	for (VMKernelAreaList::ConstIterator it = fAreas.GetIterator();
-			VMKernelArea* area = it.Next();) {
-		kprintf(" area 0x%lx: ", area->id);
-		kprintf("base_addr = 0x%lx ", area->Base());
-		kprintf("size = 0x%lx ", area->Size());
+	for (RangeList::ConstIterator it = fRangeList.GetIterator();
+			Range* range = it.Next();) {
+		if (range->type != Range::RANGE_AREA)
+			continue;
+
+		VMKernelArea* area = range->area;
+		kprintf(" area %" B_PRId32 ": ", area->id);
+		kprintf("base_addr = %#" B_PRIxADDR " ", area->Base());
+		kprintf("size = %#" B_PRIxSIZE " ", area->Size());
 		kprintf("name = '%s' ", area->name);
-		kprintf("protection = 0x%lx\n", area->protection);
+		kprintf("protection = %#" B_PRIx32 "\n", area->protection);
 	}
 }
 
 
-/*!	Finds a reserved area that covers the region spanned by \a start and
-	\a size, inserts the \a area into that region and makes sure that
-	there are reserved regions for the remaining parts.
-*/
-status_t
-VMKernelAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
-	VMKernelArea* area)
+inline void
+VMKernelAddressSpace::_FreeListInsertRange(Range* range, size_t size)
 {
-	VMKernelArea* next;
+	TRACE("    VMKernelAddressSpace::_FreeListInsertRange(%p (%#" B_PRIxADDR
+		", %#" B_PRIxSIZE ", %d), %#" B_PRIxSIZE " (%d))\n", range, range->base,
+		range->size, range->type, size, ld(size) - PAGE_SHIFT);
 
-	for (VMKernelAreaList::Iterator it = fAreas.GetIterator();
-			(next = it.Next()) != NULL;) {
-		if (next->Base() <= start
-			&& next->Base() + (next->Size() - 1) >= start + (size - 1)) {
-			// This area covers the requested range
-			if (next->id != RESERVED_AREA_ID) {
-				// but it's not reserved space, it's a real area
-				return B_BAD_VALUE;
-			}
-
-			break;
-		}
-	}
-
-	if (next == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	// Now we have to transfer the requested part of the reserved
-	// range to the new area - and remove, resize or split the old
-	// reserved area.
-
-	if (start == next->Base()) {
-		// the area starts at the beginning of the reserved range
-		fAreas.Insert(next, area);
-
-		if (size == next->Size()) {
-			// the new area fully covers the reversed range
-			fAreas.Remove(next);
-			Put();
-			free(next);
-		} else {
-			// resize the reserved range behind the area
-			next->SetBase(next->Base() + size);
-			next->SetSize(next->Size() - size);
-		}
-	} else if (start + size == next->Base() + next->Size()) {
-		// the area is at the end of the reserved range
-		fAreas.Insert(fAreas.GetNext(next), area);
-
-		// resize the reserved range before the area
-		next->SetSize(start - next->Base());
-	} else {
-		// the area splits the reserved range into two separate ones
-		// we need a new reserved area to cover this space
-		VMKernelArea* reserved = VMKernelArea::CreateReserved(this,
-			next->protection);
-		if (reserved == NULL)
-			return B_NO_MEMORY;
-
-		Get();
-		fAreas.Insert(fAreas.GetNext(next), reserved);
-		fAreas.Insert(reserved, area);
-
-		// resize regions
-		reserved->SetSize(next->Base() + next->Size() - start - size);
-		next->SetSize(start - next->Base());
-		reserved->SetBase(start + size);
-		reserved->cache_offset = next->cache_offset;
-	}
-
-	area->SetBase(start);
-	area->SetSize(size);
-	IncrementChangeCount();
-
-	return B_OK;
+	fFreeLists[ld(size) - PAGE_SHIFT].Add(range);
 }
 
 
-/*!	Must be called with this address space's write lock held */
-status_t
-VMKernelAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
-	uint32 addressSpec, VMKernelArea* area)
+inline void
+VMKernelAddressSpace::_FreeListRemoveRange(Range* range, size_t size)
 {
-	VMKernelArea* last = NULL;
-	VMKernelArea* next;
-	bool foundSpot = false;
+	TRACE("    VMKernelAddressSpace::_FreeListRemoveRange(%p (%#" B_PRIxADDR
+		", %#" B_PRIxSIZE ", %d), %#" B_PRIxSIZE " (%d))\n", range, range->base,
+		range->size, range->type, size, ld(size) - PAGE_SHIFT);
 
-	TRACE(("VMKernelAddressSpace::_InsertAreaSlot: address space %p, start "
-		"0x%lx, size %ld, end 0x%lx, addressSpec %ld, area %p\n", this, start,
-		size, end, addressSpec, area));
+	fFreeLists[ld(size) - PAGE_SHIFT].Remove(range);
+}
 
-	// do some sanity checking
-	if (start < fBase || size == 0 || end > fEndAddress
-		|| start + (size - 1) > end)
-		return B_BAD_ADDRESS;
 
-	if (addressSpec == B_EXACT_ADDRESS && area->id != RESERVED_AREA_ID) {
-		// search for a reserved area
-		status_t status = _InsertAreaIntoReservedRegion(start, size, area);
-		if (status == B_OK || status == B_BAD_VALUE)
-			return status;
+void
+VMKernelAddressSpace::_InsertRange(Range* range)
+{
+	TRACE("    VMKernelAddressSpace::_InsertRange(%p (%#" B_PRIxADDR ", %#"
+		B_PRIxSIZE ", %d))\n", range, range->base, range->size, range->type);
 
-		// There was no reserved area, and the slot doesn't seem to be used
-		// already
-		// TODO: this could be further optimized.
-	}
+	// insert at the correct position in the range list
+	Range* insertBeforeRange = fRangeTree.FindClosest(range->base, true);
+	fRangeList.Insert(
+		insertBeforeRange != NULL
+			? fRangeList.GetNext(insertBeforeRange) : fRangeList.Head(),
+		range);
 
+	// insert into tree
+	fRangeTree.Insert(range);
+
+	// insert in the free ranges list, if the range is free
+	if (range->type == Range::RANGE_FREE)
+		_FreeListInsertRange(range, range->size);
+}
+
+
+void
+VMKernelAddressSpace::_RemoveRange(Range* range)
+{
+	TRACE("    VMKernelAddressSpace::_RemoveRange(%p (%#" B_PRIxADDR ", %#"
+		B_PRIxSIZE ", %d))\n", range, range->base, range->size, range->type);
+
+	// remove from tree and range list
+	// insert at the correct position in the range list
+	fRangeTree.Remove(range);
+	fRangeList.Remove(range);
+
+	// if it is a free range, also remove it from the free list
+	if (range->type == Range::RANGE_FREE)
+		_FreeListRemoveRange(range, range->size);
+}
+
+
+status_t
+VMKernelAddressSpace::_AllocateRange(addr_t address, uint32 addressSpec,
+	size_t size, bool allowReservedRange, Range*& _range)
+{
+	TRACE("  VMKernelAddressSpace::_AllocateRange(address: %#" B_PRIxADDR
+		", size: %#" B_PRIxSIZE ", addressSpec: %#" B_PRIx32 ", reserved "
+		"allowed: %d)\n", address, size, addressSpec, allowReservedRange);
+
+	// prepare size, alignment and the base address for the range search
+	size = ROUNDUP(size, B_PAGE_SIZE);
 	size_t alignment = B_PAGE_SIZE;
-	if (addressSpec == B_ANY_KERNEL_BLOCK_ADDRESS) {
-		// align the memory to the next power of two of the size
-		while (alignment < size)
-			alignment <<= 1;
-	}
-
-	start = ROUNDUP(start, alignment);
-
-	// walk up to the spot where we should start searching
-second_chance:
-	VMKernelAreaList::Iterator it = fAreas.GetIterator();
-	while ((next = it.Next()) != NULL) {
-		if (next->Base() > start + (size - 1)) {
-			// we have a winner
-			break;
-		}
-
-		last = next;
-	}
-
-	// find the right spot depending on the address specification - the area
-	// will be inserted directly after "last" ("next" is not referenced anymore)
 
 	switch (addressSpec) {
-		case B_ANY_ADDRESS:
-		case B_ANY_KERNEL_ADDRESS:
-		case B_ANY_KERNEL_BLOCK_ADDRESS:
+		case B_EXACT_ADDRESS:
 		{
-			// find a hole big enough for a new area
-			if (last == NULL) {
-				// see if we can build it at the beginning of the virtual map
-				addr_t alignedBase = ROUNDUP(fBase, alignment);
-				if (is_valid_spot(fBase, alignedBase, size,
-						next == NULL ? end : next->Base())) {
-					foundSpot = true;
-					area->SetBase(alignedBase);
-					break;
-				}
-
-				last = next;
-				next = it.Next();
-			}
-
-			// keep walking
-			while (next != NULL) {
-				addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
-					alignment);
-				if (is_valid_spot(last->Base() + (last->Size() - 1),
-						alignedBase, size, next->Base())) {
-					foundSpot = true;
-					area->SetBase(alignedBase);
-					break;
-				}
-
-				last = next;
-				next = it.Next();
-			}
-
-			if (foundSpot)
-				break;
-
-			addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
-				alignment);
-			if (is_valid_spot(last->Base() + (last->Size() - 1), alignedBase,
-					size, end)) {
-				// got a spot
-				foundSpot = true;
-				area->SetBase(alignedBase);
-				break;
-			} else if (area->id != RESERVED_AREA_ID) {
-				// We didn't find a free spot - if there are any reserved areas,
-				// we can now test those for free space
-				// TODO: it would make sense to start with the biggest of them
-				it.Rewind();
-				next = it.Next();
-				for (last = NULL; next != NULL; next = it.Next()) {
-					if (next->id != RESERVED_AREA_ID) {
-						last = next;
-						continue;
-					}
-
-					// TODO: take free space after the reserved area into
-					// account!
-					addr_t alignedBase = ROUNDUP(next->Base(), alignment);
-					if (next->Base() == alignedBase && next->Size() == size) {
-						// The reserved area is entirely covered, and thus,
-						// removed
-						fAreas.Remove(next);
-
-						foundSpot = true;
-						area->SetBase(alignedBase);
-						free(next);
-						break;
-					}
-
-					if ((next->protection & RESERVED_AVOID_BASE) == 0
-						&&  alignedBase == next->Base()
-						&& next->Size() >= size) {
-						// The new area will be placed at the beginning of the
-						// reserved area and the reserved area will be offset
-						// and resized
-						foundSpot = true;
-						next->SetBase(next->Base() + size);
-						next->SetSize(next->Size() - size);
-						area->SetBase(alignedBase);
-						break;
-					}
-
-					if (is_valid_spot(next->Base(), alignedBase, size,
-							next->Base() + (next->Size() - 1))) {
-						// The new area will be placed at the end of the
-						// reserved area, and the reserved area will be resized
-						// to make space
-						alignedBase = ROUNDDOWN(
-							next->Base() + next->Size() - size, alignment);
-
-						foundSpot = true;
-						next->SetSize(alignedBase - next->Base());
-						area->SetBase(alignedBase);
-						last = next;
-						break;
-					}
-
-					last = next;
-				}
-			}
+			if (address % B_PAGE_SIZE != 0)
+				return B_BAD_VALUE;
 			break;
 		}
 
 		case B_BASE_ADDRESS:
-		{
-			// find a hole big enough for a new area beginning with "start"
-			if (last == NULL) {
-				// see if we can build it at the beginning of the specified
-				// start
-				if (next == NULL || next->Base() > start + (size - 1)) {
-					foundSpot = true;
-					area->SetBase(start);
-					break;
-				}
-
-				last = next;
-				next = it.Next();
-			}
-
-			// keep walking
-			while (next != NULL) {
-				if (next->Base() - (last->Base() + last->Size()) >= size) {
-					// we found a spot (it'll be filled up below)
-					break;
-				}
-
-				last = next;
-				next = it.Next();
-			}
-
-			addr_t lastEnd = last->Base() + (last->Size() - 1);
-			if (next != NULL || end - lastEnd >= size) {
-				// got a spot
-				foundSpot = true;
-				if (lastEnd < start)
-					area->SetBase(start);
-				else
-					area->SetBase(lastEnd + 1);
-				break;
-			}
-
-			// we didn't find a free spot in the requested range, so we'll
-			// try again without any restrictions
-			start = fBase;
-			addressSpec = B_ANY_ADDRESS;
-			last = NULL;
-			goto second_chance;
-		}
-
-		case B_EXACT_ADDRESS:
-			// see if we can create it exactly here
-			if ((last == NULL || last->Base() + (last->Size() - 1) < start)
-				&& (next == NULL || next->Base() > start + (size - 1))) {
-				foundSpot = true;
-				area->SetBase(start);
-				break;
-			}
+			address = ROUNDUP(address, B_PAGE_SIZE);
 			break;
+
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
+			// align the memory to the next power of two of the size
+			while (alignment < size)
+				alignment <<= 1;
+
+			// fall through...
+
+		case B_ANY_ADDRESS:
+		case B_ANY_KERNEL_ADDRESS:
+			address = fBase;
+			// TODO: remove this again when vm86 mode is moved into the kernel
+			// completely (currently needs a userland address space!)
+			if (address == USER_BASE)
+				address = USER_BASE_ANY;
+			break;
+
 		default:
 			return B_BAD_VALUE;
 	}
 
-	if (!foundSpot)
+	// find a range
+	Range* range = _FindFreeRange(address, size, alignment, addressSpec,
+		allowReservedRange, address);
+	if (range == NULL)
 		return addressSpec == B_EXACT_ADDRESS ? B_BAD_VALUE : B_NO_MEMORY;
 
-	area->SetSize(size);
-	if (last)
-		fAreas.Insert(fAreas.GetNext(last), area);
-	else
-		fAreas.Insert(fAreas.Head(), area);
+	TRACE("  VMKernelAddressSpace::_AllocateRange() found range:(%p (%#"
+		B_PRIxADDR ", %#" B_PRIxSIZE ", %d)\n", range, range->base, range->size,
+		range->type);
+
+	// We have found a range. It might not be a perfect fit, in which case
+	// we have to split the range.
+	size_t rangeSize = range->size;
+
+	if (address == range->base) {
+		// allocation at the beginning of the range
+		if (range->size > size) {
+			// only partial -- split the range
+			Range* leftOverRange = new(nogrow) Range(address + size,
+				range->size - size, range);
+			if (leftOverRange == NULL)
+				return B_NO_MEMORY;
+
+			range->size = size;
+			_InsertRange(leftOverRange);
+		}
+	} else if (address + size == range->base + range->size) {
+		// allocation at the end of the range -- split the range
+		Range* leftOverRange = new(nogrow) Range(range->base,
+			range->size - size, range);
+		if (leftOverRange == NULL)
+			return B_NO_MEMORY;
+
+		range->base = address;
+		range->size = size;
+		_InsertRange(leftOverRange);
+	} else {
+		// allocation in the middle of the range -- split the range in three
+		Range* leftOverRange1 = new(nogrow) Range(range->base,
+			address - range->base, range);
+		if (leftOverRange1 == NULL)
+			return B_NO_MEMORY;
+		Range* leftOverRange2 = new(nogrow) Range(address + size,
+			range->size - size - leftOverRange1->size, range);
+		if (leftOverRange2 == NULL) {
+			delete leftOverRange1;
+			return B_NO_MEMORY;
+		}
+
+		range->base = address;
+		range->size = size;
+		_InsertRange(leftOverRange1);
+		_InsertRange(leftOverRange2);
+	}
+
+	// If the range is a free range, remove it from the respective free list.
+	if (range->type == Range::RANGE_FREE)
+		_FreeListRemoveRange(range, rangeSize);
 
 	IncrementChangeCount();
+
+	TRACE("  VMKernelAddressSpace::_AllocateRange() -> %p (%#" B_PRIxADDR ", %#"
+		B_PRIxSIZE ")\n", range, range->base, range->size);
+
+	_range = range;
 	return B_OK;
 }
+
+
+VMKernelAddressSpace::Range*
+VMKernelAddressSpace::_FindFreeRange(addr_t start, size_t size,
+	size_t alignment, uint32 addressSpec, bool allowReservedRange,
+	addr_t& _foundAddress)
+{
+	TRACE("  VMKernelAddressSpace::_FindFreeRange(start: %#" B_PRIxADDR
+		", size: %#" B_PRIxSIZE ", alignment: %#" B_PRIxSIZE ", addressSpec: %#"
+		B_PRIx32 ", reserved allowed: %d)\n", start, size, alignment,
+		addressSpec, allowReservedRange);
+
+	switch (addressSpec) {
+		case B_BASE_ADDRESS:
+		{
+			// We have to iterate through the range list starting at the given
+			// address. This is the most inefficient case.
+			Range* range = fRangeTree.FindClosest(start, true);
+			while (range != NULL) {
+				if (range->type == Range::RANGE_FREE) {
+					addr_t alignedBase = ROUNDUP(range->base, alignment);
+					if (is_valid_spot(start, alignedBase, size,
+							range->base + (range->size - 1))) {
+						_foundAddress = alignedBase;
+						return range;
+					}
+				}
+				range = fRangeList.GetNext(range);
+			}
+
+			// We didn't find a free spot in the requested range, so we'll
+			// try again without any restrictions.
+			start = fBase;
+			addressSpec = B_ANY_ADDRESS;
+			// fall through...
+		}
+
+		case B_ANY_ADDRESS:
+		case B_ANY_KERNEL_ADDRESS:
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
+		{
+			// We want to allocate from the first non-empty free list that is
+			// guaranteed to contain the size. Finding a free range is O(1),
+			// unless there are constraints (min base address, alignment).
+			int freeListIndex = ld((size * 2 - 1) >> PAGE_SHIFT);
+
+			for (int32 i = freeListIndex; i < fFreeListCount; i++) {
+				RangeFreeList& freeList = fFreeLists[i];
+				if (freeList.IsEmpty())
+					continue;
+
+				for (RangeFreeList::Iterator it = freeList.GetIterator();
+						Range* range = it.Next();) {
+					addr_t alignedBase = ROUNDUP(range->base, alignment);
+					if (is_valid_spot(start, alignedBase, size,
+							range->base + (range->size - 1))) {
+						_foundAddress = alignedBase;
+						return range;
+					}
+				}
+			}
+
+			if (!allowReservedRange)
+				return NULL;
+
+			// We haven't found any free ranges, but we're supposed to look
+			// for reserved ones, too. Iterate through the range list starting
+			// at the given address.
+			Range* range = fRangeTree.FindClosest(start, true);
+			while (range != NULL) {
+				if (range->type == Range::RANGE_RESERVED) {
+					addr_t alignedBase = ROUNDUP(range->base, alignment);
+					if (is_valid_spot(start, alignedBase, size,
+							range->base + (range->size - 1))) {
+						// allocation from the back might be preferred
+						// -- adjust the base accordingly
+						if ((range->reserved.flags & RESERVED_AVOID_BASE)
+								!= 0) {
+							alignedBase = ROUNDDOWN(
+								range->base + (range->size - size), alignment);
+						}
+
+						_foundAddress = alignedBase;
+						return range;
+					}
+				}
+				range = fRangeList.GetNext(range);
+			}
+
+			return NULL;
+		}
+
+		case B_EXACT_ADDRESS:
+		{
+			Range* range = fRangeTree.FindClosest(start, true);
+TRACE("    B_EXACT_ADDRESS: range: %p\n", range);
+			if (range == NULL || range->type == Range::RANGE_AREA
+				|| range->base + (range->size - 1) < start + (size - 1)) {
+				// TODO: Support allocating if the area range covers multiple
+				// free and reserved ranges!
+TRACE("    -> no suitable range\n");
+				return NULL;
+			}
+
+			if (range->type != Range::RANGE_FREE && !allowReservedRange)
+{
+TRACE("    -> reserved range not allowed\n");
+				return NULL;
+}
+
+			_foundAddress = start;
+			return range;
+		}
+
+		default:
+			return NULL;
+	}
+}
+
+
+void
+VMKernelAddressSpace::_FreeRange(Range* range)
+{
+	TRACE("  VMKernelAddressSpace::_FreeRange(%p (%#" B_PRIxADDR ", %#"
+		B_PRIxSIZE ", %d))\n", range, range->base, range->size, range->type);
+
+	// Check whether one or both of the neighboring ranges are free already,
+	// and join them, if so.
+	Range* previousRange = fRangeList.GetPrevious(range);
+	Range* nextRange = fRangeList.GetNext(range);
+
+	if (previousRange != NULL && previousRange->type == Range::RANGE_FREE) {
+		if (nextRange != NULL && nextRange->type == Range::RANGE_FREE) {
+			// join them all -- keep the first one, delete the others
+			_FreeListRemoveRange(previousRange, previousRange->size);
+			_RemoveRange(range);
+			_RemoveRange(nextRange);
+			previousRange->size += range->size + nextRange->size;
+			delete range;
+			delete nextRange;
+			_FreeListInsertRange(previousRange, previousRange->size);
+		} else {
+			// join with the previous range only, delete the supplied one
+			_FreeListRemoveRange(previousRange, previousRange->size);
+			_RemoveRange(range);
+			previousRange->size += range->size;
+			delete range;
+			_FreeListInsertRange(previousRange, previousRange->size);
+		}
+	} else {
+		if (nextRange != NULL && nextRange->type == Range::RANGE_FREE) {
+			// join with the next range and delete it
+			_RemoveRange(nextRange);
+			range->size += nextRange->size;
+			delete nextRange;
+		}
+
+		// mark the range free and add it to the respective free list
+		range->type = Range::RANGE_FREE;
+		_FreeListInsertRange(range, range->size);
+	}
+
+	IncrementChangeCount();
+}
+
+
+#ifdef PARANOIA_CHECKS
+
+void
+VMKernelAddressSpace::_CheckStructures() const
+{
+	// general tree structure check
+	fRangeTree.CheckTree();
+
+	// check range list and tree
+	size_t spaceSize = fEndAddress - fBase + 1;
+	addr_t nextBase = fBase;
+	Range* previousRange = NULL;
+	int previousRangeType = Range::RANGE_AREA;
+	uint64 freeRanges = 0;
+
+	RangeList::ConstIterator listIt = fRangeList.GetIterator();
+	RangeTree::ConstIterator treeIt = fRangeTree.GetIterator();
+	while (true) {
+		Range* range = listIt.Next();
+		Range* treeRange = treeIt.Next();
+		if (range != treeRange) {
+			panic("VMKernelAddressSpace::_CheckStructures(): list/tree range "
+				"mismatch: %p vs %p", range, treeRange);
+		}
+		if (range == NULL)
+			break;
+
+		if (range->base != nextBase) {
+			panic("VMKernelAddressSpace::_CheckStructures(): range base %#"
+				B_PRIxADDR ", expected: %#" B_PRIxADDR, range->base, nextBase);
+		}
+
+		if (range->size == 0) {
+			panic("VMKernelAddressSpace::_CheckStructures(): empty range %p",
+				range);
+		}
+
+		if (range->size % B_PAGE_SIZE != 0) {
+			panic("VMKernelAddressSpace::_CheckStructures(): range %p (%#"
+				B_PRIxADDR ", %#" B_PRIxSIZE ") not page aligned", range,
+				range->base, range->size);
+		}
+
+		if (range->size > spaceSize - (range->base - fBase)) {
+			panic("VMKernelAddressSpace::_CheckStructures(): range too large: "
+				"(%#" B_PRIxADDR ", %#" B_PRIxSIZE "), address space end: %#"
+				B_PRIxADDR, range->base, range->size, fEndAddress);
+		}
+
+		if (range->type == Range::RANGE_FREE) {
+			freeRanges++;
+
+			if (previousRangeType == Range::RANGE_FREE) {
+				panic("VMKernelAddressSpace::_CheckStructures(): adjoining "
+					"free ranges: %p (%#" B_PRIxADDR ", %#" B_PRIxSIZE
+					"), %p (%#" B_PRIxADDR ", %#" B_PRIxSIZE ")", previousRange,
+					previousRange->base, previousRange->size, range,
+					range->base, range->size);
+			}
+		}
+
+		previousRange = range;
+		nextBase = range->base + range->size;
+		previousRangeType = range->type;
+	}
+
+	if (nextBase - 1 != fEndAddress) {
+		panic("VMKernelAddressSpace::_CheckStructures(): space not fully "
+			"covered by ranges: last: %#" B_PRIxADDR ", expected %#" B_PRIxADDR,
+			nextBase - 1, fEndAddress);
+	}
+
+	// check free lists
+	uint64 freeListRanges = 0;
+	for (int i = 0; i < fFreeListCount; i++) {
+		RangeFreeList& freeList = fFreeLists[i];
+		if (freeList.IsEmpty())
+			continue;
+
+		for (RangeFreeList::Iterator it = freeList.GetIterator();
+				Range* range = it.Next();) {
+			if (range->type != Range::RANGE_FREE) {
+				panic("VMKernelAddressSpace::_CheckStructures(): non-free "
+					"range %p (%#" B_PRIxADDR ", %#" B_PRIxSIZE ", %d) in "
+					"free list %d", range, range->base, range->size,
+					range->type, i);
+			}
+
+			if (fRangeTree.Find(range->base) != range) {
+				panic("VMKernelAddressSpace::_CheckStructures(): unknown "
+					"range %p (%#" B_PRIxADDR ", %#" B_PRIxSIZE ", %d) in "
+					"free list %d", range, range->base, range->size,
+					range->type, i);
+			}
+
+			if (ld(range->size) - PAGE_SHIFT != i) {
+				panic("VMKernelAddressSpace::_CheckStructures(): "
+					"range %p (%#" B_PRIxADDR ", %#" B_PRIxSIZE ", %d) in "
+					"wrong free list %d", range, range->base, range->size,
+					range->type, i);
+			}
+
+			freeListRanges++;
+		}
+	}
+}
+
+#endif	// PARANOIA_CHECKS

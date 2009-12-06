@@ -45,7 +45,9 @@ VMUserArea::Create(VMAddressSpace* addressSpace, const char* name,
 VMUserArea::CreateReserved(VMAddressSpace* addressSpace, uint32 flags)
 {
 	VMUserArea* area = new(nogrow) VMUserArea(addressSpace, 0, 0);
-	if (area != NULL)
+	if (area != NULL) {
 		area->id = RESERVED_AREA_ID;
+		area->protection = flags;
+	}
 	return area;
 }

@@ -10,6 +10,8 @@
 
 #include <vm/VMArea.h>
 
+#include <new>
+
 #include <heap.h>
 
 
