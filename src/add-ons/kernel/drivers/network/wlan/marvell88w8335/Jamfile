@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network wlan marvell88w8335 ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] 
+	-Wno-format 
+	-Wno-unused 
+	-Wno-uninitialized ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev malo ] ;
+
+KernelAddon marvell88w8335 :
+	if_malo_pci.c
+	if_malo.c
+	if_malohal.c
+	:
+	libfreebsd_wlan.a
+	libfreebsd_network.a
+	;
