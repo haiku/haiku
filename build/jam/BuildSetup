@@ -487,6 +487,8 @@ if $(HAIKU_HOST_USE_32BIT) = 1 {
 } else {
 	switch $(HOST_GCC_MACHINE) {
 		case x86_64-*	: HOST_PLATFORM_IS_64_BIT = 1 ;
+		case i686-apple-darwin10	:
+			HOST_PLATFORM_IS_64_BIT = 1 ;
 	}
 }
 
