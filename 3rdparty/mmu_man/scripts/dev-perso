@@ -51,7 +51,7 @@
 
 
 # automagically find them on different machines...
-DRLIST="/Data /work $HOME/devel"
+DRLIST="$HOME/devel /Data /work /Volumes/Data/devel"
 PWLIST="/Data /fat32 $HOME"
 for d in $DRLIST; do
 	test -d $d && DEVROOT=$d && break;
@@ -67,7 +67,8 @@ export PASSWDS
 
 function dev() {
 	if [ $# -lt 1 ]; then 
-		ls $DEVROOT/*/.profile | sed 's,.*/\([^/]*\)/.profile,\1,'
+		#ls $DEVROOT/*/.profile | sed 's,.*/\([^/]*\)/.profile,\1,'
+		for f in "$DEVROOT/"*; do test -e "$f/.profile" || continue; echo ${f##*/}; done
 		return 0
 	fi
 	if [ "x$1" = "x--help" ]; then
@@ -116,7 +117,10 @@ function dev() {
 	esac
 	
 	# source the specific profile file
-	source .profile
+	test -f .profile && . .profile
+
+	# if no editor defined, set one
+	test -z "$EDITOR" -a -z "$SVN_EDITOR" && export EDITOR=vim
 	
 	# make sure the update action is the first found in history.
 	test -d .svn && history -s svn up
