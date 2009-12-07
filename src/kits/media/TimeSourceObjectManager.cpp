@@ -1,102 +1,107 @@
-/***********************************************************************
- * Copyright (c) 2002 Marcus Overhagen. All Rights Reserved.
+/*
+ * Copyright 2002 Marcus Overhagen. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
- *
- * This works like a cache for time source objects, to make sure
- * each team only has one object representation for each time source.
- *
- ***********************************************************************/
+ */
 
-#include <OS.h>
-#include <stdio.h>
-#include <MediaRoster.h>
-#include <Autolock.h>
+
+/*!	This works like a cache for time source objects, to make sure
+	each team only has one object representation for each time source.
+*/
+
+
 #include "TimeSourceObjectManager.h"
+
+#include <stdio.h>
+
+#include <Autolock.h>
+#include <MediaRoster.h>
+
+#include <debug.h>
+#include <MediaMisc.h>
+
 #include "TimeSourceObject.h"
-#include "MediaMisc.h"
-#include "debug.h"
 
 
-static BPrivate::media::TimeSourceObjectManager manager;
-BPrivate::media::TimeSourceObjectManager *_TimeSourceObjectManager = &manager;
+static BPrivate::media::TimeSourceObjectManager sManager;
+BPrivate::media::TimeSourceObjectManager* gTimeSourceObjectManager = &sManager;
+
 
 namespace BPrivate {
 namespace media {
 
+
 TimeSourceObjectManager::TimeSourceObjectManager()
-// :	fSystemTimeSource(0)
+	:
+	BLocker("time source object manager")
 {
-	CALLED();
-	fLock = new BLocker("timesource object manager locker");
-	fMap = new Map<media_node_id, BTimeSource *>;
 }
 
 
 TimeSourceObjectManager::~TimeSourceObjectManager()
 {
 	CALLED();
-	delete fLock;
 
-	// force unloading all currently loaded 
-	BTimeSource **pts;
-	for (fMap->Rewind(); fMap->GetNext(&pts); ) {
-		PRINT(1, "Forcing release of TimeSource id %ld...\n", (*pts)->ID());
-		int debugcnt = 0;
-		while ((*pts)->Release() != NULL)
-			debugcnt++;
-		PRINT(1, "Forcing release of TimeSource done, released %d times\n", debugcnt);
+	// force unloading all currently loaded time sources
+	NodeMap::iterator iterator = fMap.begin();
+	for (; iterator != fMap.end(); iterator++) {
+		BTimeSource* timeSource = iterator->second;
+
+		PRINT(1, "Forcing release of TimeSource id %ld...\n", timeSource->ID());
+		int32 debugCount = 0;
+		while (timeSource->Release() != NULL)
+			debugCount++;
+
+		PRINT(1, "Forcing release of TimeSource done, released %d times\n",
+			debugCount);
 	}
-	
-	delete fMap;
 }
 
-/* BMediaRoster::MakeTimeSourceFor does use this function to request
- * a time source object. If it is already in memory, it will be
- * Acquired(), if not, a new TimeSourceObject will be created.
- */
-BTimeSource *
-TimeSourceObjectManager::GetTimeSource(const media_node &node)
+
+/*!	BMediaRoster::MakeTimeSourceFor does use this function to request
+	a time source object. If it is already in memory, it will be
+	Acquired(), if not, a new TimeSourceObject will be created.
+*/
+BTimeSource*
+TimeSourceObjectManager::GetTimeSource(const media_node& node)
 {
 	CALLED();
-	BAutolock lock(fLock);
+	BAutolock _(this);
 
-//	printf("TimeSourceObjectManager::GetTimeSource, node id %ld\n", node.node);
+	PRINT("TimeSourceObjectManager::GetTimeSource, node id %ld\n", node.node);
 
-	BTimeSource **pts;
-	if (fMap->Get(node.node, &pts))
-		return dynamic_cast<BTimeSource *>((*pts)->Acquire());
+	NodeMap::iterator found = fMap.find(node.node);
+	if (found != fMap.end())
+		return dynamic_cast<BTimeSource*>(found->second->Acquire());
 
 	// time sources are not accounted in node reference counting
-	BTimeSource *ts;
-	ts = new TimeSourceObject(node);
-	fMap->Insert(node.node, ts);
-	return ts;
+	BTimeSource* timeSource = new(std::nothrow) TimeSourceObject(node);
+	if (timeSource == NULL)
+		return NULL;
+
+	fMap.insert(std::make_pair(node.node, timeSource));
+	return timeSource;
 }
 
-/* This function is called during deletion of the time source object.
- *
- * I'm not sure if there is a race condition with the function above.
- */
+
+/*!	This function is called during deletion of the time source object.
+*/
 void
-TimeSourceObjectManager::ObjectDeleted(BTimeSource *timesource)
+TimeSourceObjectManager::ObjectDeleted(BTimeSource* timeSource)
 {
 	CALLED();
-	BAutolock lock(fLock);
+	BAutolock _(this);
 
-//	printf("TimeSourceObjectManager::ObjectDeleted, node id %ld\n", timesource->ID());
-	
-	bool b;
-	b = fMap->Remove(timesource->ID());
-	if (!b) {
-		ERROR("TimeSourceObjectManager::ObjectDeleted, Remove failed\n");
-	}
-	
-	status_t rv;
-	rv = BMediaRoster::Roster()->ReleaseNode(timesource->Node());
-	if (rv != B_OK) {
+	PRINT("TimeSourceObjectManager::ObjectDeleted, node id %ld\n",
+		timeSource->ID());
+
+	fMap.erase(timeSource->ID());
+
+	status_t status = BMediaRoster::Roster()->ReleaseNode(timeSource->Node());
+	if (status != B_OK) {
 		ERROR("TimeSourceObjectManager::ObjectDeleted, ReleaseNode failed\n");
 	}
 }
 
-}; // namespace media
-}; // namespace BPrivate
+
+}	// namespace media
+}	// namespace BPrivate

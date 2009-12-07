@@ -1,35 +1,47 @@
 /*
- * Copyright (c) 2002 Marcus Overhagen. All Rights Reserved.
+ * Copyright 2002 Marcus Overhagen. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
  */
-#ifndef _TIME_SOURCE_OBJECT_MANAGER_H_
-#define _TIME_SOURCE_OBJECT_MANAGER_H_
+#ifndef TIME_SOURCE_OBJECT_MANAGER_H
+#define TIME_SOURCE_OBJECT_MANAGER_H
 
 
-#include "TMap.h"
+#include <map>
 
-class BLocker;
+#include <Locker.h>
+#include <MediaDefs.h>
+
+
+class BTimeSource;
 
 
 namespace BPrivate {
 namespace media {
 
-class TimeSourceObjectManager {
-public:
-	TimeSourceObjectManager();
-	~TimeSourceObjectManager();
 
-	BTimeSource *GetTimeSource(const media_node &node);
-	void ObjectDeleted(BTimeSource *timesource);
+class TimeSourceObjectManager : BLocker {
+public:
+								TimeSourceObjectManager();
+								~TimeSourceObjectManager();
+
+			BTimeSource*		GetTimeSource(const media_node& node);
+			void				ObjectDeleted(BTimeSource* timeSource);
 
 private:
-	Map<media_node_id, BTimeSource *> *fMap;
-	BLocker *fLock;
+			typedef std::map<media_node_id, BTimeSource*> NodeMap;
+
+			NodeMap				fMap;
 };
 
-} // namespace media
-} // namespace BPrivate
 
-extern BPrivate::media::TimeSourceObjectManager *_TimeSourceObjectManager;
+extern TimeSourceObjectManager* gTimeSourceObjectManager;
+
+
+}	// namespace media
+}	// namespace BPrivate
+
+
+using BPrivate::media::gTimeSourceObjectManager;
+
 
 #endif	// _TIME_SOURCE_OBJECT_MANAGER_H_

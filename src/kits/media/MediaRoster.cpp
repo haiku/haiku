@@ -495,19 +495,17 @@ BMediaRosterEx::PublishInputs(const media_node& node, List<media_input>* list)
 
 
 BTimeSource*
-BMediaRosterEx::MakeTimeSourceObject(media_node_id timesourceID)
+BMediaRosterEx::MakeTimeSourceObject(media_node_id timeSourceID)
 {
-	BTimeSource* source;
 	media_node clone;
-	status_t rv;
-
-	rv = GetNodeFor(timesourceID, &clone);
-	if (rv != B_OK) {
-		ERROR("BMediaRosterEx::MakeTimeSourceObject: GetNodeFor failed\n");
+	status_t status = GetNodeFor(timeSourceID, &clone);
+	if (status != B_OK) {
+		ERROR("BMediaRosterEx::MakeTimeSourceObject: GetNodeFor failed: %s\n",
+			strerror(status));
 		return NULL;
 	}
 
-	source = _TimeSourceObjectManager->GetTimeSource(clone);
+	BTimeSource* source = gTimeSourceObjectManager->GetTimeSource(clone);
 	if (source == NULL) {
 		ERROR("BMediaRosterEx::MakeTimeSourceObject: GetTimeSource failed\n");
 		return NULL;
