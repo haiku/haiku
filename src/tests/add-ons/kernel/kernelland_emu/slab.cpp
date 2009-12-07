@@ -98,7 +98,8 @@ object_cache_reserve(object_cache *cache, size_t object_count, uint32 flags)
 }
 
 
-void object_cache_get_usage(object_cache *cache, size_t *_allocatedMemory)
+void
+object_cache_get_usage(object_cache *cache, size_t *_allocatedMemory)
 {
 	*_allocatedMemory = 0;
 }
