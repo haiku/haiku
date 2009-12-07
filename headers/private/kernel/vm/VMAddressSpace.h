@@ -150,7 +150,8 @@ public:
 	VMArea* Next()
 	{
 		VMArea* result = fNext;
-		fNext = fAddressSpace->NextArea(fNext);
+		if (fNext != NULL)
+			fNext = fAddressSpace->NextArea(fNext);
 		return result;
 	}
 
