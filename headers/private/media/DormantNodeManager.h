@@ -70,9 +70,15 @@ private:
 			AddOnMap			fAddOnMap;
 };
 
+
+extern DormantNodeManager* gDormantNodeManager;
+
+
 }	// namespace media
 }	// namespace BPrivate
 
-extern BPrivate::media::DormantNodeManager* gDormantNodeManager;
+
+using BPrivate::media::gDormantNodeManager;
+
 
 #endif /* _DORMANT_NODE_MANAGER_H */
