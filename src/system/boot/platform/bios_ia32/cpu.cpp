@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -37,6 +38,107 @@ uint32 gTimeConversionFactor;
 
 #define CPUID_EFLAGS	(1UL << 21)
 #define RDTSC_FEATURE	(1UL << 4)
+
+
+struct uint128 {
+	uint128(uint64 low, uint64 high = 0)
+		:
+		low(low),
+		high(high)
+	{
+	}
+
+	bool operator<(const uint128& other) const
+	{
+		return high < other.high || (high == other.high && low < other.low);
+	}
+
+	bool operator<=(const uint128& other) const
+	{
+		return !(other < *this);
+	}
+
+	uint128 operator<<(int count) const
+	{
+		if (count == 0)
+			return *this;
+
+		if (count >= 128)
+			return 0;
+
+		if (count >= 64)
+			return uint128(0, low << (count - 64));
+
+		return uint128(low << count, (high << count) | (low >> (64 - count)));
+	}
+
+	uint128 operator>>(int count) const
+	{
+		if (count == 0)
+			return *this;
+
+		if (count >= 128)
+			return 0;
+
+		if (count >= 64)
+			return uint128(high >> (count - 64), 0);
+
+		return uint128((low >> count) | (high << (64 - count)), high >> count);
+	}
+
+	uint128 operator+(const uint128& other) const
+	{
+		uint64 resultLow = low + other.low;
+		return uint128(resultLow,
+			high + other.high + (resultLow < low ? 1 : 0));
+	}
+
+	uint128 operator-(const uint128& other) const
+	{
+		uint64 resultLow = low - other.low;
+		return uint128(resultLow,
+			high - other.high - (resultLow > low ? 1 : 0));
+	}
+
+	uint128 operator*(uint32 other) const
+	{
+		uint64 resultMid = (low >> 32) * other;
+		uint64 resultLow = (low & 0xffffffff) * other + (resultMid << 32);
+		return uint128(resultLow,
+			high * other + (resultMid >> 32)
+				+ (resultLow < resultMid << 32 ? 1 : 0));
+	}
+
+	uint128 operator/(const uint128& other) const
+	{
+		int shift = 0;
+		uint128 shiftedDivider = other;
+		while (shiftedDivider.high >> 63 == 0 && shiftedDivider < *this) {
+			shiftedDivider = shiftedDivider << 1;
+			shift++;
+		}
+
+		uint128 result = 0;
+		uint128 temp = *this;
+		for (; shift >= 0; shift--, shiftedDivider = shiftedDivider >> 1) {
+			if (shiftedDivider <= temp) {
+				result = result + (uint128(1) << shift);
+				temp = temp - shiftedDivider;
+			}
+		}
+
+		return result;
+	}
+
+	operator uint64() const
+	{
+		return low;
+	}
+
+private:
+	uint64	low;
+	uint64	high;
+};
 
 
 static void
@@ -124,83 +226,8 @@ not_so_quick_sample:
 	expired = ((s_high << 8) | s_low) - ((high << 8) | low);
 	p3 *= TIMER_CLKNUM_HZ;
 
-	/*
-	 * cv_factor contains time in usecs per CPU cycle * 2^32
-	 *
-	 * The code below is a bit fancy. Originally Michael Noistering
-	 * had it like:
-	 *
-	 *     cv_factor = ((uint64)1000000<<32) * expired / p3;
-	 *
-	 * whic is perfect, but unfortunately 1000000ULL<<32*expired
-	 * may overflow in fast cpus with the long sampling period
-	 * i put there for being as accurate as possible under
-	 * vmware.
-	 *
-	 * The below calculation is based in that we are trying
-	 * to calculate:
-	 *
-	 *     (C*expired)/p3 -> (C*(x0<<k + x1))/p3 ->
-	 *     (C*(x0<<k))/p3 + (C*x1)/p3
-	 *
-	 * Now the term (C*(x0<<k))/p3 is rewritten as:
-	 *
-	 *     (C*(x0<<k))/p3 -> ((C*x0)/p3)<<k + reminder
-	 *
-	 * where reminder is:
-	 *
-	 *     floor((1<<k)*decimalPart((C*x0)/p3))
-	 *
-	 * which is approximated as:
-	 *
-	 *     floor((1<<k)*decimalPart(((C*x0)%p3)/p3)) ->
-	 *     (((C*x0)%p3)<<k)/p3
-	 *
-	 * So the final expression is:
-	 *
-	 *     ((C*x0)/p3)<<k + (((C*x0)%p3)<<k)/p3 + (C*x1)/p3
-	 */
-	 /*
-	 * To get the highest accuracy with this method
-	 * x0 should have the 12 most significant bits of expired
-	 * to minimize the error upon <<k.
-	 */
-	 /*
-	 * Of course, you are not expected to understand any of this.
-	 */
-	{
-		unsigned i;
-		unsigned k;
-		uint64 C;
-		uint64 x0;
-		uint64 x1;
-		uint64 a, b, c;
-
-		/* first calculate k*/
-		k = 0;
-		for (i = 12; i < 16; i++) {
-			if (expired & (1<<i))
-				k = i - 11;
-		}
-
-		C = 1000000ULL << 32;
-		x0 = expired >> k;
-		x1 = expired & ((1 << k) - 1);
-
-		a = ((C * x0) / p3) << k;
-		b = (((C * x0) % p3) << k) / p3;
-		c = (C * x1) / p3;
-#if 0
-		dprintf("a=%Ld\n", a);
-		dprintf("b=%Ld\n", b);
-		dprintf("c=%Ld\n", c);
-		dprintf("%d %Ld\n", expired, p3);
-#endif
-		gTimeConversionFactor = a + b + c;
-#if 0
-		dprintf("cvf=%Ld\n", cv_factor);
-#endif
-	}
+	gTimeConversionFactor = ((uint128(expired) * uint32(1000000)) << 32)
+		/ uint128(p3);
 
 #ifdef TRACE_CPU
 	if (p3 / expired / 1000000000LL)
@@ -210,7 +237,7 @@ not_so_quick_sample:
 #endif
 
 	gKernelArgs.arch_args.system_time_cv_factor = gTimeConversionFactor;
-	gKernelArgs.arch_args.cpu_clock_speed = p3/expired;
+	gKernelArgs.arch_args.cpu_clock_speed = p3 / expired;
 }
 
 
