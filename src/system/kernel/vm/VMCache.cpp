@@ -7,6 +7,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <vm/VMCache.h>
 
 #include <stddef.h>
@@ -43,6 +44,14 @@ VMCache* gDebugCacheList;
 #endif
 static mutex sCacheListLock = MUTEX_INITIALIZER("global VMCache list");
 	// The lock is also needed when the debug feature is disabled.
+
+
+struct VMCache::PageEventWaiter {
+	struct thread*		thread;
+	PageEventWaiter*	next;
+	vm_page*			page;
+	uint32				events;
+};
 
 
 #if VM_CACHE_TRACING
@@ -406,6 +415,7 @@ VMCache::Init(uint32 cacheType)
 	scan_skip = 0;
 	page_count = 0;
 	type = cacheType;
+	fPageEventWaiters = NULL;
 
 #if DEBUG_CACHE_LIST
 	mutex_lock(&sCacheListLock);
@@ -622,6 +632,37 @@ VMCache::RemovePage(vm_page* page)
 }
 
 
+/*!	Waits until one or more events happened for a given page which belongs to
+	this cache.
+	The cache must be locked. It will be unlocked by the method. \a relock
+	specifies whether the method shall re-lock the cache before returning.
+	\param page The page for which to wait.
+	\param events The mask of events the caller is interested in.
+	\param relock If \c true, the cache will be locked when returning,
+		otherwise it won't be locked.
+*/
+void
+VMCache::WaitForPageEvents(vm_page* page, uint32 events, bool relock)
+{
+	PageEventWaiter waiter;
+	waiter.thread = thread_get_current_thread();
+	waiter.next = fPageEventWaiters;
+	waiter.page = page;
+	waiter.events = events;
+
+	fPageEventWaiters = &waiter;
+
+	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_OTHER,
+		"cache page events");
+
+	Unlock();
+	thread_block();
+
+	if (relock)
+		Lock();
+}
+
+
 /*!	Makes this case the source of the \a consumer cache,
 	and adds the \a consumer to its list.
 	This also grabs a reference to the source cache.
@@ -778,11 +819,7 @@ VMCache::Resize(off_t newSize)
 						// this will notify the writer to free the page
 				} else {
 					// wait for page to become unbusy
-					ConditionVariableEntry entry;
-					entry.Add(page);
-					Unlock();
-					entry.Wait();
-					Lock();
+					WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
 
 					// restart from the start of the list
 					it = pages.GetIterator(newPageCount, true, true);
@@ -824,11 +861,7 @@ VMCache::FlushAndRemoveAllPages()
 				vm_page* page = it.Next();) {
 			if (page->state == PAGE_STATE_BUSY) {
 				// wait for page to become unbusy
-				ConditionVariableEntry entry;
-				entry.Add(page);
-				Unlock();
-				entry.Wait();
-				Lock();
+				WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
 
 				// restart from the start of the list
 				it = pages.GetIterator();
@@ -966,6 +999,26 @@ VMCache::AcquireStoreRef()
 void
 VMCache::ReleaseStoreRef()
 {
+}
+
+
+/*!	Wakes up threads waiting for page events.
+	\param page The page for which events occurred.
+	\param events The mask of events that occurred.
+*/
+void
+VMCache::_NotifyPageEvents(vm_page* page, uint32 events)
+{
+	PageEventWaiter** it = &fPageEventWaiters;
+	while (PageEventWaiter* waiter = *it) {
+		if (waiter->page == page && (waiter->events & events) != 0) {
+			// remove from list and unblock
+			*it = waiter->next;
+			InterruptsSpinLocker threadsLocker(gThreadSpinlock);
+			thread_unblock_locked(waiter->thread, B_OK);
+		} else
+			it = &waiter->next;
+	}
 }
 
 

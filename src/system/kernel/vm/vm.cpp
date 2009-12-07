@@ -3574,7 +3574,7 @@ public:
 		return fBottomCache;
 	}
 
-	void Unlock()
+	void Unlock(VMCache* exceptCache = NULL)
 	{
 		if (fTopCache == NULL)
 			return;
@@ -3582,7 +3582,8 @@ public:
 		VMCache* cache = fTopCache;
 		while (cache != NULL) {
 			VMCache* nextCache = cache->source;
-			cache->ReleaseRefAndUnlock();
+			if (cache != exceptCache)
+				cache->ReleaseRefAndUnlock();
 
 			if (cache == fBottomCache)
 				break;
@@ -3637,11 +3638,11 @@ struct PageFaultContext {
 		cacheChainLocker.SetTo(topCache);
 	}
 
-	void UnlockAll()
+	void UnlockAll(VMCache* exceptCache = NULL)
 	{
 		topCache = NULL;
 		addressSpaceLocker.Unlock();
-		cacheChainLocker.Unlock();
+		cacheChainLocker.Unlock(exceptCache);
 	}
 };
 
@@ -3678,10 +3679,9 @@ fault_get_page(PageFaultContext& context)
 			}
 
 			// page must be busy -- wait for it to become unbusy
-			ConditionVariableEntry entry;
-			entry.Add(page);
-			context.UnlockAll();
-			entry.Wait();
+			context.UnlockAll(cache);
+			cache->ReleaseRefLocked();
+			cache->WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, false);
 
 			// restart the whole process
 			context.restart = true;
@@ -3698,9 +3698,6 @@ fault_get_page(PageFaultContext& context)
 			// insert a fresh page and mark it busy -- we're going to read it in
 			page = vm_page_allocate_page(PAGE_STATE_FREE, true);
 			cache->InsertPage(page, context.cacheOffset);
-
-			ConditionVariable busyCondition;
-			busyCondition.Publish(page, "page");
 
 			// We need to unlock all caches and the address space while reading
 			// the page in. Keep a reference to the cache around.
@@ -3722,7 +3719,7 @@ fault_get_page(PageFaultContext& context)
 				dprintf("reading page from cache %p returned: %s!\n",
 					cache, strerror(status));
 
-				busyCondition.Unpublish();
+				cache->NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 				cache->RemovePage(page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
 
@@ -3732,7 +3729,7 @@ fault_get_page(PageFaultContext& context)
 
 			// mark the page unbusy again
 			page->state = PAGE_STATE_ACTIVE;
-			busyCondition.Unpublish();
+			cache->NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 
 			// Since we needed to unlock everything temporarily, the area
 			// situation might have changed. So we need to restart the whole

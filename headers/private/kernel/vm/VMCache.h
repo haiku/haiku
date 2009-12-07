@@ -27,6 +27,11 @@ enum {
 	CACHE_TYPE_NULL
 };
 
+enum {
+	PAGE_EVENT_NOT_BUSY	= 0x01		// page not busy anymore
+};
+
+
 struct VMCachePagesTreeDefinition {
 	typedef page_num_t KeyType;
 	typedef	vm_page NodeType;
@@ -81,6 +86,12 @@ public:
 			void				ReleaseRef();
 			void				ReleaseRefAndUnlock()
 									{ ReleaseRefLocked(); Unlock(); }
+
+			void				WaitForPageEvents(vm_page* page, uint32 events,
+									bool relock);
+			void				NotifyPageEvents(vm_page* page, uint32 events)
+									{ if (fPageEventWaiters != NULL)
+										_NotifyPageEvents(page, events); }
 
 			vm_page*			LookupPage(off_t offset);
 			void				InsertPage(vm_page* page, off_t offset);
@@ -153,6 +164,11 @@ public:
 #endif
 
 private:
+			struct PageEventWaiter;
+
+private:
+			void				_NotifyPageEvents(vm_page* page, uint32 events);
+
 	inline	bool				_IsMergeable() const;
 
 			void				_MergeWithOnlyConsumer();
@@ -161,6 +177,7 @@ private:
 private:
 			int32				fRefCount;
 			mutex				fLock;
+			PageEventWaiter*	fPageEventWaiters;
 };
 
 

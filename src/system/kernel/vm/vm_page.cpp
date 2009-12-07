@@ -1038,7 +1038,6 @@ private:
 	bool				fDequeuedPage;
 	bool				fIsActive;
 	int					fOldPageState;
-	ConditionVariable	fBusyCondition;
 };
 
 
@@ -1073,8 +1072,6 @@ PageWriteWrapper::SetTo(vm_page* page, bool dequeuedPage)
 	fOldPageState = fPage->state;
 	fPage->state = PAGE_STATE_BUSY;
 	fPage->busy_writing = true;
-
-	fBusyCondition.Publish(fPage, "page");
 }
 
 
@@ -1143,7 +1140,8 @@ PageWriteWrapper::Done(status_t result)
 			fPage->busy_writing = false;
 	}
 
-	fBusyCondition.Unpublish();
+
+	fCache->NotifyPageEvents(fPage, PAGE_EVENT_NOT_BUSY);
 	fIsActive = false;
 }
 

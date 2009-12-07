@@ -114,7 +114,6 @@ PrecacheIO::PrecacheIO(file_cache_ref* ref, off_t offset, size_t size)
 	fRef(ref),
 	fCache(ref->cache),
 	fPages(NULL),
-	fBusyConditions(NULL),
 	fVecs(NULL),
 	fOffset(offset),
 	fVecCount(0),
@@ -128,7 +127,6 @@ PrecacheIO::PrecacheIO(file_cache_ref* ref, off_t offset, size_t size)
 PrecacheIO::~PrecacheIO()
 {
 	delete[] fPages;
-	delete[] fBusyConditions;
 	delete[] fVecs;
 	fCache->ReleaseRefLocked();
 }
@@ -144,10 +142,6 @@ PrecacheIO::Prepare()
 	if (fPages == NULL)
 		return B_NO_MEMORY;
 
-	fBusyConditions = new(std::nothrow) ConditionVariable[fPageCount];
-	if (fBusyConditions == NULL)
-		return B_NO_MEMORY;
-
 	fVecs = new(std::nothrow) iovec[fPageCount];
 	if (fVecs == NULL)
 		return B_NO_MEMORY;
@@ -159,7 +153,6 @@ PrecacheIO::Prepare()
 		if (page == NULL)
 			break;
 
-		fBusyConditions[i].Publish(page, "page");
 		fCache->InsertPage(page, fOffset + pos);
 
 		add_to_iovec(fVecs, fVecCount, fPageCount,
@@ -170,7 +163,7 @@ PrecacheIO::Prepare()
 	if (i != fPageCount) {
 		// allocating pages failed
 		while (i-- > 0) {
-			fBusyConditions[i].Unpublish();
+			fCache->NotifyPageEvents(fPages[i], PAGE_EVENT_NOT_BUSY);
 			fCache->RemovePage(fPages[i]);
 			vm_page_set_state(fPages[i], PAGE_STATE_FREE);
 		}
@@ -215,12 +208,12 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 		}
 
 		fPages[i]->state = PAGE_STATE_ACTIVE;
-		fBusyConditions[i].Unpublish();
+		fCache->NotifyPageEvents(fPages[i], PAGE_EVENT_NOT_BUSY);
 	}
 
 	// Free pages after failed I/O
 	for (uint32 i = pagesTransferred; i < fPageCount; i++) {
-		fBusyConditions[i].Unpublish();
+		fCache->NotifyPageEvents(fPages[i], PAGE_EVENT_NOT_BUSY);
 		fCache->RemovePage(fPages[i]);
 		vm_page_set_state(fPages[i], PAGE_STATE_FREE);
 	}
@@ -383,7 +376,6 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
 	vm_page* pages[MAX_IO_VECS];
-	ConditionVariable busyConditions[MAX_IO_VECS];
 	int32 pageIndex = 0;
 
 	// allocate pages for the cache and mark them busy
@@ -392,8 +384,6 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 			PAGE_STATE_FREE, true);
 		if (page == NULL)
 			panic("no more pages!");
-
-		busyConditions[pageIndex - 1].Publish(page, "page");
 
 		cache->InsertPage(page, offset + pos);
 
@@ -417,7 +407,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		cache->Lock();
 
 		for (int32 i = 0; i < pageIndex; i++) {
-			busyConditions[i].Unpublish();
+			cache->NotifyPageEvents(pages[i], PAGE_EVENT_NOT_BUSY);
 			cache->RemovePage(pages[i]);
 			vm_page_set_state(pages[i], PAGE_STATE_FREE);
 		}
@@ -448,7 +438,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	for (int32 i = pageIndex; i-- > 0;) {
 		pages[i]->state = PAGE_STATE_ACTIVE;
 
-		busyConditions[i].Unpublish();
+		cache->NotifyPageEvents(pages[i], PAGE_EVENT_NOT_BUSY);
 	}
 
 	return B_OK;
@@ -504,7 +494,6 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	vm_page* pages[MAX_IO_VECS];
 	int32 pageIndex = 0;
 	status_t status = B_OK;
-	ConditionVariable busyConditions[MAX_IO_VECS];
 
 	// ToDo: this should be settable somewhere
 	bool writeThrough = false;
@@ -518,7 +507,6 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		//	in cache_io()
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
 			PAGE_STATE_FREE, true);
-		busyConditions[pageIndex - 1].Publish(page, "page");
 
 		ref->cache->InsertPage(page, offset + pos);
 
@@ -616,7 +604,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
-		busyConditions[i].Unpublish();
+		ref->cache->NotifyPageEvents(pages[i], PAGE_EVENT_NOT_BUSY);
 
 		if (writeThrough)
 			pages[i]->state = PAGE_STATE_ACTIVE;
@@ -796,11 +784,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 				return status;
 
 			if (page->state == PAGE_STATE_BUSY) {
-				ConditionVariableEntry entry;
-				entry.Add(page);
-				locker.Unlock();
-				entry.Wait();
-				locker.Lock();
+				cache->WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
 				continue;
 			}
 		}
@@ -845,6 +829,8 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 				page->state = oldPageState;
 				if (doWrite && page->state != PAGE_STATE_MODIFIED)
 					vm_page_set_state(page, PAGE_STATE_MODIFIED);
+
+				cache->NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 			}
 
 			if (bytesLeft <= bytesInPage) {
