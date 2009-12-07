@@ -4710,6 +4710,7 @@ _get_next_area_info(team_id team, int32* cookie, area_info* info, size_t size)
 
 	fill_area_info(area, info, size);
 	*cookie = (int32)(area->Base());
+		// TODO: Not 64 bit safe!
 
 	return B_OK;
 }
