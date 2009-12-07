@@ -1378,14 +1378,14 @@ BMediaRoster::SetProducerRate(const media_node& producer, int32 numer,
 
 	msg.numer = numer;
 	msg.denom = denom;
-	msg.reply_port = _PortPool->GetPort();
+	msg.reply_port = gPortPool->GetPort();
 	rv = write_port(producer.node, PRODUCER_SET_PLAY_RATE, &msg, sizeof(msg));
 	if (rv != B_OK) {
-		_PortPool->PutPort(msg.reply_port);
+		gPortPool->PutPort(msg.reply_port);
 		return rv;
 	}
 	rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-	_PortPool->PutPort(msg.reply_port);
+	gPortPool->PutPort(msg.reply_port);
 	return (rv < B_OK) ? rv : reply.result;
 }
 
@@ -2298,11 +2298,11 @@ BMediaRoster::GetDormantNodes(dormant_node_info* _info, int32* _count,
 	}
 	msg.require_kinds = requireKinds;
 	msg.deny_kinds = denyKinds;
-	msg.reply_port = _PortPool->GetPort();
+	msg.reply_port = gPortPool->GetPort();
 
 	rv = write_port(port, SERVER_GET_DORMANT_NODES, &msg, sizeof(msg));
 	if (rv != B_OK) {
-		_PortPool->PutPort(msg.reply_port);
+		gPortPool->PutPort(msg.reply_port);
 		return rv;
 	}
 
@@ -2311,7 +2311,7 @@ BMediaRoster::GetDormantNodes(dormant_node_info* _info, int32* _count,
 
 	rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
 	if (rv < B_OK) {
-		_PortPool->PutPort(msg.reply_port);
+		gPortPool->PutPort(msg.reply_port);
 		return rv;
 	}
 
@@ -2323,7 +2323,7 @@ BMediaRoster::GetDormantNodes(dormant_node_info* _info, int32* _count,
 		if (rv < B_OK)
 			reply.result = rv;
 	}
-	_PortPool->PutPort(msg.reply_port);
+	gPortPool->PutPort(msg.reply_port);
 
 	return reply.result;
 }
@@ -2624,18 +2624,18 @@ BMediaRosterEx::GetDormantFlavorInfo(media_addon_id addonID, int32 flavorID,
 	xfer_server_get_dormant_flavor_info msg;
 	msg.addon = addonID;
 	msg.flavor_id = flavorID;
-	msg.reply_port = _PortPool->GetPort();
+	msg.reply_port = gPortPool->GetPort();
 	status_t status = write_port(port, SERVER_GET_DORMANT_FLAVOR_INFO, &msg,
 		sizeof(msg));
 	if (status != B_OK) {
 		free(reply);
-		_PortPool->PutPort(msg.reply_port);
+		gPortPool->PutPort(msg.reply_port);
 		return status;
 	}
 
 	int32 code;
 	status = read_port(msg.reply_port, &code, reply, 16000);
-	_PortPool->PutPort(msg.reply_port);
+	gPortPool->PutPort(msg.reply_port);
 
 	if (status < B_OK) {
 		free(reply);

@@ -179,7 +179,7 @@ QueryPort(port_id requestport, int32 msgcode, request_data *request, int request
 	status_t rv;
 	int32 code;
 
-	request->reply_port = _PortPool->GetPort();
+	request->reply_port = gPortPool->GetPort();
 
 	rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
 
@@ -192,20 +192,20 @@ QueryPort(port_id requestport, int32 msgcode, request_data *request, int request
 			find_media_addon_server_port();
 			requestport = MediaAddonServerPort;
 		} else {
-			_PortPool->PutPort(request->reply_port);
+			gPortPool->PutPort(request->reply_port);
 			return rv;
 		}
 
 		rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
 		if (rv != B_OK) {
 			ERROR("QueryPort: retrying write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, requestport, rv, strerror(rv));
-			_PortPool->PutPort(request->reply_port);
+			gPortPool->PutPort(request->reply_port);
 			return rv;
 		}
 	}
 
 	rv = read_port_etc(request->reply_port, &code, reply, replysize, B_RELATIVE_TIMEOUT, TIMEOUT);
-	_PortPool->PutPort(request->reply_port);
+	gPortPool->PutPort(request->reply_port);
 
 	if (rv < B_OK) {
 		ERROR("QueryPort: read_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, request->reply_port, rv, strerror(rv));

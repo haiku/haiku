@@ -213,12 +213,12 @@ DormantNodeManager::RegisterAddOn(const char* path)
 		return 0;
 	}
 
-	msg.reply_port = _PortPool->GetPort();
+	msg.reply_port = gPortPool->GetPort();
 	msg.ref = ref;
 
 	status = write_port(port, SERVER_REGISTER_MEDIAADDON, &msg, sizeof(msg));
 	if (status != B_OK) {
-		_PortPool->PutPort(msg.reply_port);
+		gPortPool->PutPort(msg.reply_port);
 		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to "
 			"media server\n");
 		return 0;
@@ -228,7 +228,7 @@ DormantNodeManager::RegisterAddOn(const char* path)
 	int32 code;
 	status = read_port(msg.reply_port, &code, &reply, sizeof(reply));
 
-	_PortPool->PutPort(msg.reply_port);
+	gPortPool->PutPort(msg.reply_port);
 
 	if (status < B_OK) {
 		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to "
@@ -269,11 +269,11 @@ DormantNodeManager::FindAddOnPath(BPath* path, media_addon_id id)
 
 	server_get_mediaaddon_ref_request msg;
 	msg.addon_id = id;
-	msg.reply_port = _PortPool->GetPort();
+	msg.reply_port = gPortPool->GetPort();
 	status_t status = write_port(port, SERVER_GET_MEDIAADDON_REF, &msg,
 		sizeof(msg));
 	if (status != B_OK) {
-		_PortPool->PutPort(msg.reply_port);
+		gPortPool->PutPort(msg.reply_port);
 		return status;
 	}
 
@@ -281,7 +281,7 @@ DormantNodeManager::FindAddOnPath(BPath* path, media_addon_id id)
 	int32 code;
 	status = read_port(msg.reply_port, &code, &reply, sizeof(reply));
 
-	_PortPool->PutPort(msg.reply_port);
+	gPortPool->PutPort(msg.reply_port);
 
 	if (status < B_OK)
 		return status;

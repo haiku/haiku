@@ -1,88 +1,68 @@
-/***********************************************************************
- * Copyright (c) 2002 Marcus Overhagen. All Rights Reserved.
- * This file may be used under the terms of the OpenBeOS License.
- *
- * A pool of kernel ports
- ***********************************************************************/
-#include <OS.h>
-#include <stdlib.h>
-#include "PortPool.h"
-#include "debug.h"
+/*
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
-PortPool _ThePortPool;
-PortPool *_PortPool = &_ThePortPool;
+
+#include <PortPool.h>
+
+#include <Autolock.h>
+
+#include <debug.h>
+
+
+namespace BPrivate {
+
+
+static PortPool sPortPool;
+PortPool* gPortPool = &sPortPool;
+
 
 PortPool::PortPool()
+	:
+	BLocker("port pool")
 {
-	locker_atom = 0;
-	locker_sem = create_sem(0,"port pool lock");
-	count = 0;
-	maxcount = 0;
-	pool = 0;
 }
+
 
 PortPool::~PortPool()
 {
-	for (int i = 0; i < maxcount; i++)
-		delete_port(pool[i].port);
-	delete_sem(locker_sem);
-	if (pool)
-		free(pool);
+	PortSet::iterator iterator = fPool.begin();
+
+	for (; iterator != fPool.end(); iterator++)
+		delete_port(*iterator);
 }
 
-port_id 
+
+port_id
 PortPool::GetPort()
 {
-	port_id port = -1;
-	Lock();
-	if (count == maxcount) {
-		maxcount += 3;
-		pool = (PortInfo *)realloc(pool,sizeof(PortInfo) * maxcount);
-		if (pool == NULL)
-			debugger("out of memory in PortPool::GetPort()\n");
-		for (int i = count; i < maxcount; i++) {
-			pool[i].used = false;
-			pool[i].port = create_port(1,"some reply port");
-		}
-	}
-	count++;
-	for (int i = 0; i < maxcount; i++)
-		if (pool[i].used == false) {
-			port = pool[i].port;
-			pool[i].used = true;
-			break;
-		}
-	Unlock();
-	if (port < 0)
-		debugger("wrong port in PortPool::GetPort()\n");
+	BAutolock _(this);
+
+	if (fPool.empty())
+		return create_port(1, "media reply port");
+
+	port_id port = *fPool.begin();
+	fPool.erase(port);
+
+	ASSERT(port >= 0);
 	return port;
 }
+
 
 void
 PortPool::PutPort(port_id port)
 {
-	Lock();
-	count--;
-	for (int i = 0; i < maxcount; i++)
-		if (pool[i].port == port) {
-			pool[i].used = false;
-			break;
-		}
-	Unlock();
-}
+	ASSERT(port >= 0);
 
-void
-PortPool::Lock()
-{ 
-	if (atomic_add(&locker_atom, 1) > 0) {
-		while (B_INTERRUPTED == acquire_sem(locker_sem))
-			;
+	BAutolock _(this);
+
+	try {
+		fPool.insert(port);
+	} catch (std::bad_alloc& exception) {
+		delete_port(port);
 	}
 }
 
-void
-PortPool::Unlock()
-{ 
-	if (atomic_add(&locker_atom, -1) > 1)
-		release_sem(locker_sem);
-}
+
+}	// namespace BPrivate

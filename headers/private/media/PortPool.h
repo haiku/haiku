@@ -1,35 +1,41 @@
 /*
- * Copyright 2002, Marcus Overhagen. All Rights Reserved.
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _POOL_PORT_H_
-#define _POOL_PORT_H_
+#ifndef PORT_POOL_H
+#define PORT_POOL_H
 
 
-class PortPool {
+#include <set>
+
+#include <Locker.h>
+
+
+namespace BPrivate {
+
+
+class PortPool : BLocker {
 public:
-	PortPool();
-	~PortPool();
+								PortPool();
+								~PortPool();
 
-	port_id GetPort();
-	void PutPort(port_id port);
+			port_id				GetPort();
+			void				PutPort(port_id port);
 
 private:
-	void Lock();
-	void Unlock();
+			typedef std::set<port_id> PortSet;
 
-	struct PortInfo {
-		port_id port;
-		bool used;
-	};
-
-	PortInfo *	pool;
-	int 		count;
-	int 		maxcount;
-	int32		locker_atom;
-	sem_id		locker_sem;
+			PortSet				fPool;
 };
 
-extern PortPool *_PortPool;
 
-#endif
+extern PortPool* gPortPool;
+
+
+}	// namespace BPrivate
+
+
+using BPrivate::gPortPool;
+
+
+#endif	// PORT_POOL_H
