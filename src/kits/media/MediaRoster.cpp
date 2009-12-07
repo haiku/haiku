@@ -2005,7 +2005,7 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 
 	TRACE("BMediaRoster::UnregisterNode %ld (%p)\n", node->ID(), node);
 
-	if (node->fKinds & NODE_KIND_NO_REFCOUNTING) {
+	if ((node->fKinds & NODE_KIND_NO_REFCOUNTING) !=0) {
 		TRACE("BMediaRoster::UnregisterNode, trying to unregister reference "
 			"counting disabled timesource, node %ld, port %ld, team %ld\n",
 			node->ID(), node->ControlPort(), BPrivate::current_team());
@@ -2030,35 +2030,34 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 	// might have been called).
 
 	server_unregister_node_request request;
-	server_unregister_node_reply reply;
-	status_t rv;
-
 	request.node_id = node->ID();
 	request.team = BPrivate::current_team();
 
 	// send a notification
 	BPrivate::media::notifications::NodesDeleted(&request.node_id, 1);
 
-	rv = QueryServer(SERVER_UNREGISTER_NODE, &request, sizeof(request), &reply,
-		sizeof(reply));
-	if (rv != B_OK) {
+	server_unregister_node_reply reply;
+	status_t status = QueryServer(SERVER_UNREGISTER_NODE, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (status != B_OK) {
 		ERROR("BMediaRoster::UnregisterNode: failed to unregister node id %ld, "
-			"name '%s' (error %#lx)\n", node->ID(), node->Name(), rv);
-		return rv;
+			"name '%s': %s\n", node->ID(), node->Name(), strerror(status));
+		return status;
 	}
 
 	if (reply.addon_id != -1) {
-		// Small problem here, we can't use DormantNodeManager::PutAddon(), as
+		// TODO: this doesn't look right
+		// Small problem here, we can't use DormantNodeManager::PutAddOn(), as
 		// UnregisterNode() is called by a dormant node itself (by the
 		// destructor).
 		// The add-on that contains the node needs to remain in memory until the
 		// destructor execution is finished.
-		// DormantNodeManager::PutAddonDelayed() will delay unloading.
-		_DormantNodeManager->PutAddonDelayed(reply.addon_id);
+		// DormantNodeManager::PutAddOnDelayed() will delay unloading.
+		gDormantNodeManager->PutAddOnDelayed(reply.addon_id);
 
-		rv = MediaRosterEx(this)->DecrementAddonFlavorInstancesCount(
+		status = MediaRosterEx(this)->DecrementAddonFlavorInstancesCount(
 			reply.addon_id, reply.flavor_id);
-		if (rv != B_OK) {
+		if (status != B_OK) {
 			ERROR("BMediaRoster::UnregisterNode: "
 				"DecrementAddonFlavorInstancesCount() failed\n");
 			// this is really a problem, but we can't fail now
@@ -2377,8 +2376,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 	ASSERT(info.internal_id == flavorID);
 
 	// load the BMediaAddOn object
-	BMediaAddOn* addon;
-	addon = _DormantNodeManager->GetAddon(addonID);
+	BMediaAddOn* addon = gDormantNodeManager->GetAddOn(addonID);
 	if (addon == NULL) {
 		ERROR("BMediaRosterEx::InstantiateDormantNode: GetAddon failed\n");
 		return B_ERROR;
@@ -2392,7 +2390,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 		ERROR("BMediaRosterEx::InstantiateDormantNode error: can't create "
 			"more nodes for addon-id %ld, flavor-id %ld\n", addonID, flavorID);
 		// Put the addon back into the pool
-		_DormantNodeManager->PutAddon(addonID);
+		gDormantNodeManager->PutAddOn(addonID);
 		return B_ERROR;
 	}
 
@@ -2412,7 +2410,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 			"failed\n");
 
 		// Put the addon back into the pool
-		_DormantNodeManager->PutAddon(addonID);
+		gDormantNodeManager->PutAddOn(addonID);
 
 		// We must decrement the use count of this addon flavor in the
 		// server to compensate the increment done in the beginning.
@@ -2429,7 +2427,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonID, int32 flavorID,
 		ERROR("BMediaRosterEx::InstantiateDormantNode: RegisterNode failed\n");
 		delete node;
 		// Put the addon back into the pool
-		_DormantNodeManager->PutAddon(addonID);
+		gDormantNodeManager->PutAddOn(addonID);
 		// We must decrement the use count of this addon flavor in the
 		// server to compensate the increment done in the beginning.
 		rv = DecrementAddonFlavorInstancesCount(addonID, flavorID);

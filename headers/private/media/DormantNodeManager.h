@@ -1,12 +1,19 @@
-/* 
+/*
  * Copyright 2002, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _DORMANT_NODE_MANAGER_H
 #define _DORMANT_NODE_MANAGER_H
 
-#include "TMap.h"
+
+#include <map>
+
+#include <Locker.h>
+#include <MediaAddOn.h>
+
+
+class BPath;
+
 
 namespace BPrivate {
 namespace media {
@@ -22,48 +29,50 @@ namespace media {
 // but will delay the unloading slightly, because it is called
 // from a node destructor of the loaded add-on.
 
-class DormantNodeManager
-{
+class DormantNodeManager {
 public:
-	DormantNodeManager();
-	~DormantNodeManager();
+								DormantNodeManager();
+								~DormantNodeManager();
 
 	// Be careful, GetAddon and PutAddon[Delayed] must be balanced.
-	BMediaAddOn *GetAddon(media_addon_id id);
-	void PutAddon(media_addon_id id);
-	void PutAddonDelayed(media_addon_id id);
+			BMediaAddOn*		GetAddOn(media_addon_id id);
+			void				PutAddOn(media_addon_id id);
+			void				PutAddOnDelayed(media_addon_id id);
 
 	// For use by media_addon_server only
-	media_addon_id RegisterAddon(const char *path);
-	void UnregisterAddon(media_addon_id id);
-	
+			media_addon_id		RegisterAddOn(const char* path);
+			void				UnregisterAddOn(media_addon_id id);
+
 	// query the server for the path
-	status_t FindAddonPath(BPath *path, media_addon_id id);
+			status_t			FindAddOnPath(BPath* path, media_addon_id id);
 
 private:
-	struct loaded_addon_info
-	{
-		BMediaAddOn *addon;
-		image_id image;
-		int32 usecount;
-	};
+			struct loaded_add_on_info {
+				BMediaAddOn*	add_on;
+				image_id		image;
+				int32			use_count;
+			};
 
 	// returns the addon or NULL if it needs to be loaded
-	BMediaAddOn *TryGetAddon(media_addon_id id);
-	
-	// manage loading and unloading add-ons from images
-	status_t LoadAddon(BMediaAddOn **newaddon, image_id *newimage, const char *path, media_addon_id id);
-	void UnloadAddon(BMediaAddOn *addon, image_id image);
-	
-private:
+			BMediaAddOn*		_LookupAddOn(media_addon_id id);
 
-	Map<media_addon_id,loaded_addon_info> *fAddonmap;
-	BLocker *fLock;
+	// manage loading and unloading add-ons from images
+			status_t			_LoadAddOn(const char* path, media_addon_id id,
+									BMediaAddOn** _newAddOn,
+									image_id* _newImage);
+			void				_UnloadAddOn(BMediaAddOn* addOn,
+									image_id image);
+
+private:
+			typedef std::map<media_addon_id, loaded_add_on_info> AddOnMap;
+
+			BLocker				fLock;
+			AddOnMap			fAddOnMap;
 };
 
-}; // namespace media
-}; // namespace BPrivate
+}	// namespace media
+}	// namespace BPrivate
 
-extern BPrivate::media::DormantNodeManager *_DormantNodeManager;
+extern BPrivate::media::DormantNodeManager* gDormantNodeManager;
 
 #endif /* _DORMANT_NODE_MANAGER_H */

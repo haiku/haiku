@@ -78,7 +78,7 @@ struct AddOnInfo {
 	NodeVector			active_flavors;
 
 	BMediaAddOn*		addon;
-		// if != NULL, need to call _DormantNodeManager->PutAddon(id)
+		// if != NULL, need to call gDormantNodeManager->PutAddOn(id)
 };
 
 
@@ -226,7 +226,7 @@ MediaAddonServer::~MediaAddonServer()
 	// unregister all media add-ons
 	FileMap::iterator iterator = fFileMap.begin();
 	for (; iterator != fFileMap.end(); iterator++)
-		_DormantNodeManager->UnregisterAddon(iterator->second);
+		gDormantNodeManager->UnregisterAddOn(iterator->second);
 
 	// TODO: unregister system time source
 }
@@ -402,14 +402,14 @@ MediaAddonServer::_HandleMessage(int32 code, const void* data, size_t size)
 				= static_cast<
 					const addonserver_rescan_mediaaddon_flavors_command*>(data);
 			BMediaAddOn* addon
-				= _DormantNodeManager->GetAddon(command->addon_id);
+				= gDormantNodeManager->GetAddOn(command->addon_id);
 			if (addon == NULL) {
 				ERROR("rescan flavors: Can't find a addon object for id %d\n",
 					(int)command->addon_id);
 				break;
 			}
 			_ScanAddOnFlavors(addon);
-			_DormantNodeManager->PutAddon(command->addon_id);
+			gDormantNodeManager->PutAddOn(command->addon_id);
 			break;
 		}
 
@@ -533,7 +533,7 @@ MediaAddonServer::_AddOnAdded(const char* path, ino_t fileNode)
 {
 	TRACE("\n\nMediaAddonServer::_AddOnAdded: path %s\n", path);
 
-	media_addon_id id = _DormantNodeManager->RegisterAddon(path);
+	media_addon_id id = gDormantNodeManager->RegisterAddOn(path);
 	if (id <= 0) {
 		ERROR("MediaAddonServer::_AddOnAdded: failed to register add-on %s\n",
 			path);
@@ -542,10 +542,10 @@ MediaAddonServer::_AddOnAdded(const char* path, ino_t fileNode)
 
 	TRACE("MediaAddonServer::_AddOnAdded: loading addon %ld now...\n", id);
 
-	BMediaAddOn* addon = _DormantNodeManager->GetAddon(id);
+	BMediaAddOn* addon = gDormantNodeManager->GetAddOn(id);
 	if (addon == NULL) {
 		ERROR("MediaAddonServer::_AddOnAdded: failed to get add-on %s\n", path);
-		_DormantNodeManager->UnregisterAddon(id);
+		gDormantNodeManager->UnregisterAddOn(id);
 		return;
 	}
 
@@ -598,7 +598,7 @@ MediaAddonServer::_AddOnAdded(const char* path, ino_t fileNode)
 		SendToServer(SERVER_RESCAN_DEFAULTS, &cmd, sizeof(cmd));
 	}
 
-	// we do not call _DormantNodeManager->PutAddon(id)
+	// we do not call gDormantNodeManager->PutAddOn(id)
 	// since it is done by _PutAddonIfPossible()
 }
 
@@ -689,7 +689,7 @@ void
 MediaAddonServer::_PutAddonIfPossible(AddOnInfo& info)
 {
 	if (info.addon && info.active_flavors.empty()) {
-		_DormantNodeManager->PutAddon(info.id);
+		gDormantNodeManager->PutAddOn(info.id);
 		info.addon = NULL;
 	}
 }
@@ -809,7 +809,7 @@ MediaAddonServer::_AddOnRemoved(ino_t fileNode)
 		fInfoMap.erase(foundInfo);
 	}
 
-	_DormantNodeManager->UnregisterAddon(id);
+	gDormantNodeManager->UnregisterAddOn(id);
 
 	BPrivate::media::notifications::FlavorsChanged(id, 0, oldFlavorCount);
 }

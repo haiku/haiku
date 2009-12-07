@@ -368,9 +368,9 @@ DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type, bo
 			msg->FindInt32(kDefaultManagerInput, &input_id);
 			msg->FindString(kDefaultManagerFlavorName, &name);
 			msg->FindString(kDefaultManagerPath, &path);
-			if(name)
+			if (name)
 				strcpy(msgDninfo.name, name);
-			if(path)
+			if (path)
 				msgPath = BPath(path);
 			break;
 		}
@@ -411,28 +411,30 @@ DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type, bo
 					continue;
 			}
 		}
-		if(msg) {	// we have a default info msg
+		if (msg) {	// we have a default info msg
 			dormant_node_info dninfo;
-			if(BMediaRoster::Roster()->GetDormantNodeFor(info[i].node, &dninfo) != B_OK) {
+			if (BMediaRoster::Roster()->GetDormantNodeFor(info[i].node,
+					&dninfo) != B_OK) {
 				ERROR("Couldn't GetDormantNodeFor\n");
 				continue;
 			}
-			if(dninfo.flavor_id!=msgDninfo.flavor_id
-				|| strcmp(dninfo.name, msgDninfo.name)!=0) {
+			if (dninfo.flavor_id != msgDninfo.flavor_id
+				|| strcmp(dninfo.name, msgDninfo.name) != 0) {
 				ERROR("Doesn't match flavor or name\n");
 				continue;
 			}
 			BPath path;
-			if((_DormantNodeManager->FindAddonPath(&path, dninfo.addon)!=B_OK)
-				|| (path != msgPath)) {
+			if (gDormantNodeManager->FindAddOnPath(&path, dninfo.addon) != B_OK
+				|| path != msgPath) {
 				ERROR("Doesn't match : path\n");
 				continue;
 			}
 		}
 		TRACE("Default physical %s %s \"%s\" created!\n",
-			isAudio ? "audio" : "video", isInput ? "input" : "output", info[i].name);
+			isAudio ? "audio" : "video", isInput ? "input" : "output",
+			info[i].name);
 		*id = info[i].node.node;
-		if(msg && isAudio && !isInput)
+		if (msg && isAudio && !isInput)
 			fPhysicalAudioOutInputID = input_id;
 		return;
 	}

@@ -27,136 +27,161 @@
  *
  */
 
-/* This is a management class for dormant media nodes.
- * It is private to the media kit and only accessed by the BMediaRoster class
- * and the media_addon_server.
- * It handles loading/unloading of dormant nodes.
- *
- * Dormant media nodes can be instantiated on demand. The reside on harddisk in the
- * directories /boot/beos/system/add-ons/media and /boot/home/config/add-ons/media
- * Multiple media nodes can be included in one file, they can be accessed using the
- * BMediaAddOn that each file implements.
- * The BMediaAddOn allows getting a list of supported flavors. Each flavor represents
- * a media node.
- * The media_addon_server does the initial scanning of files and getting the list
- * of supported flavors. It uses the flavor_info to do this, and reports the list
- * of flavors to the media_server packed into individual dormant_media_node
- * structures.
- */
+
+/*!	This is a management class for dormant media nodes.
+	It is private to the media kit and only accessed by the BMediaRoster class
+	and the media_addon_server.
+	It handles loading/unloading of dormant nodes.
+
+	Dormant media nodes can be instantiated on demand. The reside on harddisk in
+	the directories /boot/beos/system/add-ons/media, /boot/common/add-ons/media,
+	and /boot/home/config/add-ons/media.
+	Multiple media nodes can be included in one file, they can be accessed using
+	the BMediaAddOn that each file implements.
+	The BMediaAddOn allows getting a list of supported flavors. Each flavor
+	represents a media node.
+	The media_addon_server does the initial scanning of files and getting the
+	list of supported flavors. It uses the flavor_info to do this, and reports
+	the list of flavors to the media_server packed into individual
+	dormant_media_node structures.
+*/
+
+
+#include "DormantNodeManager.h"
 
 #include <stdio.h>
 #include <string.h>
-#include <Locker.h>
-#include <Path.h>
+
+#include <Autolock.h>
 #include <Entry.h>
-#include <MediaAddOn.h>
-#include "debug.h"
-#include "PortPool.h"
-#include "MediaMisc.h"
-#include "ServerInterface.h"
-#include "DataExchange.h"
-#include "DormantNodeManager.h"
+#include <Path.h>
+
+#include <debug.h>
+#include <PortPool.h>
+#include <MediaMisc.h>
+#include <ServerInterface.h>
+#include <DataExchange.h>
+
 
 static BPrivate::media::DormantNodeManager manager;
-BPrivate::media::DormantNodeManager *_DormantNodeManager = &manager;
+BPrivate::media::DormantNodeManager* gDormantNodeManager = &manager;
+
 
 namespace BPrivate {
 namespace media {
 
+
 DormantNodeManager::DormantNodeManager()
+	:
+	fLock("dormant node manager locker")
 {
-	fLock = new BLocker("dormant node manager locker");
-	fAddonmap = new Map<media_addon_id,loaded_addon_info>;
 }
 
 
 DormantNodeManager::~DormantNodeManager()
 {
-	delete fLock;
-
 	// force unloading all currently loaded images
-	loaded_addon_info *info;
-	for (fAddonmap->Rewind(); fAddonmap->GetNext(&info); ) {
-		ERROR("Forcing unload of add-on id %ld with usecount %ld\n", info->addon->AddonID(), info->usecount);
-		UnloadAddon(info->addon, info->image);
-	}
 
-	delete fAddonmap;
+	AddOnMap::iterator iterator = fAddOnMap.begin();
+	for (; iterator != fAddOnMap.end(); iterator++) {
+		loaded_add_on_info& info = iterator->second;
+
+		ERROR("Forcing unload of add-on id %ld with usecount %ld\n",
+			info.add_on->AddonID(), info.use_count);
+		_UnloadAddOn(info.add_on, info.image);
+	}
 }
 
 
-BMediaAddOn *
-DormantNodeManager::TryGetAddon(media_addon_id id)
+BMediaAddOn*
+DormantNodeManager::GetAddOn(media_addon_id id)
 {
-	loaded_addon_info *info;
-	BMediaAddOn *addon;
-
-	fLock->Lock();
-	if (fAddonmap->Get(id, &info)) {
-		info->usecount += 1;
-		addon = info->addon;
-		ASSERT(id == addon->AddonID());
-	} else {
-		addon = NULL;
-	}
-	fLock->Unlock();
-	return addon;
-}
-
-
-BMediaAddOn *
-DormantNodeManager::GetAddon(media_addon_id id)
-{
-	BMediaAddOn *addon;
-
-	TRACE("DormantNodeManager::GetAddon, id %ld\n",id);
+	TRACE("DormantNodeManager::GetAddon, id %ld\n", id);
 
 	// first try to use a already loaded add-on
-	addon = TryGetAddon(id);
-	if (addon)
-		return addon;
+	BMediaAddOn* addOn = _LookupAddOn(id);
+	if (addOn != NULL)
+		return addOn;
 
 	// Be careful, we avoid locking here!
 
 	// ok, it's not loaded, try to get the path
 	BPath path;
-	if (B_OK != FindAddonPath(&path, id)) {
-		ERROR("DormantNodeManager::GetAddon: can't find path for add-on %ld\n",id);
+	if (FindAddOnPath(&path, id) != B_OK) {
+		ERROR("DormantNodeManager::GetAddon: can't find path for add-on "
+			"%ld\n", id);
 		return NULL;
 	}
 
 	// try to load it
-	BMediaAddOn *newaddon;
+	BMediaAddOn* newAddOn;
 	image_id image;
-	if (B_OK != LoadAddon(&newaddon, &image, path.Path(), id)) {
-		ERROR("DormantNodeManager::GetAddon: can't load add-on %ld from path %s\n",id, path.Path());
+	if (_LoadAddOn(path.Path(), id, &newAddOn, &image) != B_OK) {
+		ERROR("DormantNodeManager::GetAddon: can't load add-on %ld from path "
+			"%s\n",id, path.Path());
 		return NULL;
 	}
 
 	// ok, we successfully loaded it. Now lock and insert it into the map,
 	// or unload it if the map already contains one that was loaded by another
 	// thread at the same time
-	fLock->Lock();
-	addon = TryGetAddon(id);
-	if (addon) {
-		UnloadAddon(newaddon, image);
-	} else {
+
+	BAutolock _(fLock);
+
+	addOn = _LookupAddOn(id);
+	if (addOn == NULL) {
 		// we use the loaded one
-		addon = newaddon;
+		addOn = newAddOn;
+
 		// and save it into the list
-		loaded_addon_info info;
-		info.addon = newaddon;
+		loaded_add_on_info info;
+		info.add_on = newAddOn;
 		info.image = image;
-		info.usecount = 1;
-		fAddonmap->Insert(id, info);
-	}
-	fLock->Unlock();
-	ASSERT(addon->AddonID() == id);
-	return addon;
+		info.use_count = 1;
+		try {
+			fAddOnMap.insert(std::make_pair(id, info));
+		} catch (std::bad_alloc& exception) {
+			_UnloadAddOn(newAddOn, image);
+			return NULL;
+		}
+	} else
+		_UnloadAddOn(newAddOn, image);
+
+	ASSERT(addOn->AddonID() == id);
+	return addOn;
 }
 
+
 void
-DormantNodeManager::PutAddonDelayed(media_addon_id id)
+DormantNodeManager::PutAddOn(media_addon_id id)
+{
+	TRACE("DormantNodeManager::PutAddon, id %ld\n", id);
+
+	BAutolock locker(fLock);
+
+	AddOnMap::iterator found = fAddOnMap.find(id);
+	if (found == fAddOnMap.end()) {
+		ERROR("DormantNodeManager::PutAddon: failed to find add-on %ld\n", id);
+		return;
+	}
+
+	loaded_add_on_info& info = found->second;
+
+	if (--info.use_count == 0) {
+		// unload add-on
+
+		BMediaAddOn* addOn = info.add_on;
+		image_id image = info.image;
+		fAddOnMap.erase(found);
+
+		locker.Unlock();
+		_UnloadAddOn(addOn, image);
+	}
+}
+
+
+void
+DormantNodeManager::PutAddOnDelayed(media_addon_id id)
 {
 	// Called from a node destructor of the loaded media-add-on.
 	// We must make sure that the media-add-on stays in memory
@@ -165,70 +190,49 @@ DormantNodeManager::PutAddonDelayed(media_addon_id id)
 	UNIMPLEMENTED();
 }
 
-void
-DormantNodeManager::PutAddon(media_addon_id id)
-{
-	loaded_addon_info *info;
-	BMediaAddOn *addon = 0; /* avoid compiler warning */
-	image_id image = 0; /* avoid compiler warning */
-	bool unload;
 
-	TRACE("DormantNodeManager::PutAddon, id %ld\n",id);
-
-	fLock->Lock();
-	if (!fAddonmap->Get(id, &info)) {
-		ERROR("DormantNodeManager::PutAddon: failed to find add-on %ld\n",id);
-		fLock->Unlock();
-		return;
-	}
-	info->usecount -= 1;
-	unload = (info->usecount == 0);
-	if (unload) {
-		addon	= info->addon;
-		image	= info->image;
-		fAddonmap->Remove(id);
-	}
-	fLock->Unlock();
-
-	if (unload)
-		UnloadAddon(addon, image);
-}
-
-// For use by media_addon_server only
+//!	For use by media_addon_server only
 media_addon_id
-DormantNodeManager::RegisterAddon(const char *path)
+DormantNodeManager::RegisterAddOn(const char* path)
 {
-	server_register_mediaaddon_request msg;
-	server_register_mediaaddon_reply reply;
-	port_id port;
-	status_t rv;
-	int32 code;
-	entry_ref tempref;
-
 	TRACE("DormantNodeManager::RegisterAddon, path %s\n",path);
 
-	rv = get_ref_for_path(path, &tempref);
-	if (rv != B_OK) {
-		ERROR("DormantNodeManager::RegisterAddon failed, couldn't get ref for path %s\n",path);
+	server_register_mediaaddon_request msg;
+	entry_ref ref;
+	status_t status = get_ref_for_path(path, &ref);
+	if (status != B_OK) {
+		ERROR("DormantNodeManager::RegisterAddon failed, couldn't get ref "
+			"for path %s: %s\n", path, strerror(status));
 		return 0;
 	}
-	msg.ref = tempref;
-	port = find_port(MEDIA_SERVER_PORT_NAME);
-	if (port <= B_OK) {
-		ERROR("DormantNodeManager::RegisterAddon failed, couldn't find media server\n");
+
+	port_id port = find_port(MEDIA_SERVER_PORT_NAME);
+	if (port < 0) {
+		ERROR("DormantNodeManager::RegisterAddon failed, couldn't find media "
+			"server\n");
 		return 0;
 	}
+
 	msg.reply_port = _PortPool->GetPort();
-	rv = write_port(port, SERVER_REGISTER_MEDIAADDON, &msg, sizeof(msg));
-	if (rv != B_OK) {
+	msg.ref = ref;
+
+	status = write_port(port, SERVER_REGISTER_MEDIAADDON, &msg, sizeof(msg));
+	if (status != B_OK) {
 		_PortPool->PutPort(msg.reply_port);
-		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to media server\n");
+		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to "
+			"media server\n");
 		return 0;
 	}
-	rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
+
+	server_register_mediaaddon_reply reply;
+	int32 code;
+	status = read_port(msg.reply_port, &code, &reply, sizeof(reply));
+
 	_PortPool->PutPort(msg.reply_port);
-	if (rv < B_OK) {
-		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to media server (2)\n");
+
+	if (status < B_OK) {
+		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to "
+			"media server: %s\n", strerror(status));
 		return 0;
 	}
 
@@ -238,104 +242,128 @@ DormantNodeManager::RegisterAddon(const char *path)
 	return reply.addon_id;
 }
 
-// For use by media_addon_server only
+
+//!	For use by media_addon_server only
 void
-DormantNodeManager::UnregisterAddon(media_addon_id id)
+DormantNodeManager::UnregisterAddOn(media_addon_id id)
 {
-	ASSERT(id > 0);
-	server_unregister_mediaaddon_command msg;
-
 	TRACE("DormantNodeManager::UnregisterAddon id %ld\n",id);
+	ASSERT(id > 0);
 
-	port_id port;
-	port = find_port(MEDIA_SERVER_PORT_NAME);
-	if (port <= B_OK)
+	port_id port = find_port(MEDIA_SERVER_PORT_NAME);
+	if (port < 0)
 		return;
+
+	server_unregister_mediaaddon_command msg;
 	msg.addon_id = id;
 	write_port(port, SERVER_UNREGISTER_MEDIAADDON, &msg, sizeof(msg));
 }
 
 
 status_t
-DormantNodeManager::FindAddonPath(BPath *path, media_addon_id id)
+DormantNodeManager::FindAddOnPath(BPath* path, media_addon_id id)
 {
-	server_get_mediaaddon_ref_request msg;
-	server_get_mediaaddon_ref_reply reply;
-	port_id port;
-	entry_ref tempref;
-	status_t rv;
-	int32 code;
-	port = find_port(MEDIA_SERVER_PORT_NAME);
-	if (port <= B_OK)
-		return B_ERROR;
-	msg.addon_id = id;
-	msg.reply_port = _PortPool->GetPort();
-	rv = write_port(port, SERVER_GET_MEDIAADDON_REF, &msg, sizeof(msg));
-	if (rv != B_OK) {
-		_PortPool->PutPort(msg.reply_port);
-		return B_ERROR;
-	}
-	rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-	_PortPool->PutPort(msg.reply_port);
-	if (rv < B_OK)
+	port_id port = find_port(MEDIA_SERVER_PORT_NAME);
+	if (port < 0)
 		return B_ERROR;
 
-	tempref = reply.ref;
-	return path->SetTo(&tempref);
+	server_get_mediaaddon_ref_request msg;
+	msg.addon_id = id;
+	msg.reply_port = _PortPool->GetPort();
+	status_t status = write_port(port, SERVER_GET_MEDIAADDON_REF, &msg,
+		sizeof(msg));
+	if (status != B_OK) {
+		_PortPool->PutPort(msg.reply_port);
+		return status;
+	}
+
+	server_get_mediaaddon_ref_reply reply;
+	int32 code;
+	status = read_port(msg.reply_port, &code, &reply, sizeof(reply));
+
+	_PortPool->PutPort(msg.reply_port);
+
+	if (status < B_OK)
+		return status;
+
+	entry_ref ref = reply.ref;
+	return path->SetTo(&ref);
+}
+
+
+BMediaAddOn*
+DormantNodeManager::_LookupAddOn(media_addon_id id)
+{
+	BAutolock _(fLock);
+
+	AddOnMap::iterator found = fAddOnMap.find(id);
+	if (found == fAddOnMap.end())
+		return NULL;
+
+	loaded_add_on_info& info = found->second;
+
+	ASSERT(id == info.add_on->AddonID());
+	info.use_count++;
+
+	return info.add_on;
 }
 
 
 status_t
-DormantNodeManager::LoadAddon(BMediaAddOn **newaddon, image_id *newimage, const char *path, media_addon_id id)
+DormantNodeManager::_LoadAddOn(const char* path, media_addon_id id,
+	BMediaAddOn** _newAddOn, image_id* _newImage)
 {
-	BMediaAddOn *(*make_addon)(image_id you);
-	BMediaAddOn *addon;
-	image_id image;
-	status_t rv;
-
-	image = load_add_on(path);
-	if (image < B_OK) {
-		ERROR("DormantNodeManager::LoadAddon: loading failed, error %lx (%s), path %s\n", image, strerror(image), path);
-		return B_ERROR;
+	image_id image = load_add_on(path);
+	if (image < 0) {
+		ERROR("DormantNodeManager::LoadAddon: loading \"%s\" failed: %s\n",
+			path, strerror(image));
+		return image;
 	}
 
-	rv = get_image_symbol(image, "make_media_addon", B_SYMBOL_TYPE_TEXT, (void**)&make_addon);
-	if (rv < B_OK) {
-		ERROR("DormantNodeManager::LoadAddon: loading failed, function not found, error %lx (%s)\n", rv, strerror(rv));
+	BMediaAddOn* (*makeAddOn)(image_id);
+	status_t status = get_image_symbol(image, "make_media_addon",
+		B_SYMBOL_TYPE_TEXT, (void**)&makeAddOn);
+	if (status != B_OK) {
+		ERROR("DormantNodeManager::LoadAddon: loading failed, function not "
+			"found: %s\n", strerror(status));
 		unload_add_on(image);
-		return B_ERROR;
+		return status;
 	}
 
-	addon = make_addon(image);
-	if (addon == 0) {
+	BMediaAddOn* addOn = makeAddOn(image);
+	if (addOn == NULL) {
 		ERROR("DormantNodeManager::LoadAddon: creating BMediaAddOn failed\n");
 		unload_add_on(image);
 		return B_ERROR;
 	}
 
-	ASSERT(addon->ImageID() == image); // this should be true for a well behaving add-on
+	ASSERT(addOn->ImageID() == image);
+		// this should be true for a well behaving add-ons
+
+	// We are a friend class of BMediaAddOn and initialize these member
+	// variables
+	addOn->fAddon = id;
+	addOn->fImage = image;
 
 	// everything ok
-	*newaddon = addon;
-	*newimage = image;
-
-	// we are a friend class of BMediaAddOn and initialize these member variables
-	addon->fAddon = id;
-	addon->fImage = image;
+	*_newAddOn = addOn;
+	*_newImage = image;
 
 	return B_OK;
 }
 
 
 void
-DormantNodeManager::UnloadAddon(BMediaAddOn *addon, image_id image)
+DormantNodeManager::_UnloadAddOn(BMediaAddOn* addOn, image_id image)
 {
-	ASSERT(addon);
-	ASSERT(addon->ImageID() == image); // if this failes, something bad happened to the add-on
-	delete addon;
+	ASSERT(addOn != NULL);
+	ASSERT(addOn->ImageID() == image);
+		// if this fails, something bad happened to the add-on
+
+	delete addOn;
 	unload_add_on(image);
 }
 
-}; // namespace media
-}; // namespace BPrivate
 
+}	// namespace media
+}	// namespace BPrivate
