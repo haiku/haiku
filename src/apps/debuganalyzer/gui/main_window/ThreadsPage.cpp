@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "main_window/ThreadsPage.h"
 
 #include <stdio.h>
@@ -120,27 +121,27 @@ MainWindow::ThreadsPage::ThreadsPage(MainWindow* parent)
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 	fThreadsTable->AddColumn(new StringTableColumn(2, "Team", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(3, "Creation", 80, 40, 1000,
-		true, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(4, "Deletion", 80, 40, 1000,
-		false, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new NanotimeTableColumn(3, "Creation", 80, 40,
+		1000, true, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new NanotimeTableColumn(4, "Deletion", 80, 40,
+		1000, false, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new Int64TableColumn(5, "Runs", 80, 20, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(6, "Run Time", 80, 20, 1000,
-		false, B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new NanotimeTableColumn(6, "Run Time", 80, 20,
+		1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new Int64TableColumn(7, "Latencies", 80, 20, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(8, "Latency Time", 80, 20,
+	fThreadsTable->AddColumn(new NanotimeTableColumn(8, "Latency Time", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new Int64TableColumn(9, "Preemptions", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(10, "Preemption Time", 80,
+	fThreadsTable->AddColumn(new NanotimeTableColumn(10, "Preemption Time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new Int64TableColumn(11, "Waits", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(12, "Wait Time", 80,
+	fThreadsTable->AddColumn(new NanotimeTableColumn(12, "Wait Time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new BigtimeTableColumn(13, "Unspecified Time", 80,
+	fThreadsTable->AddColumn(new NanotimeTableColumn(13, "Unspecified Time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fThreadsTable->AddTableListener(this);

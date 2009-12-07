@@ -58,25 +58,25 @@ public:
 
 			void				LoadingFinished();
 
-	inline	bigtime_t			BaseTime() const;
-			void				SetBaseTime(bigtime_t time);
+	inline	nanotime_t			BaseTime() const;
+			void				SetBaseTime(nanotime_t time);
 
-	inline	bigtime_t			LastEventTime() const;
-			void				SetLastEventTime(bigtime_t time);
+	inline	nanotime_t			LastEventTime() const;
+			void				SetLastEventTime(nanotime_t time);
 
 			int32				CountTeams() const;
 			Team*				TeamAt(int32 index) const;
 			Team*				TeamByID(team_id id) const;
 			Team*				AddTeam(
 									const system_profiler_team_added* event,
-									bigtime_t time);
+									nanotime_t time);
 
 			int32				CountThreads() const;
 			Thread*				ThreadAt(int32 index) const;
 			Thread*				ThreadByID(thread_id id) const;
 			Thread*				AddThread(
 									const system_profiler_thread_added* event,
-									bigtime_t time);
+									nanotime_t time);
 
 			WaitObject*			AddWaitObject(
 									const system_profiler_wait_object_info*
@@ -101,7 +101,7 @@ public:
 									off_t eventOffset);
 									// must be added in order (of time)
 			const CompactSchedulingState* ClosestSchedulingState(
-									bigtime_t eventTime) const;
+									nanotime_t eventTime) const;
 									// returns the closest previous state
 
 private:
@@ -111,15 +111,15 @@ private:
 			typedef BObjectList<CompactSchedulingState> SchedulingStateList;
 
 private:
-	static	int			_CompareEventTimeSchedulingState(const bigtime_t* time,
+	static	int			_CompareEventTimeSchedulingState(const nanotime_t* time,
 							const CompactSchedulingState* state);
 
 private:
 			BString				fDataSourceName;
 			void*				fEventData;
 			size_t				fEventDataSize;
-			bigtime_t			fBaseTime;
-			bigtime_t			fLastEventTime;
+			nanotime_t			fBaseTime;
+			nanotime_t			fLastEventTime;
 			TeamList			fTeams;		// sorted by ID
 			ThreadList			fThreads;	// sorted by ID
 			WaitObjectGroupList	fWaitObjectGroups;
@@ -128,7 +128,7 @@ private:
 
 
 struct Model::creation_time_id {
-	bigtime_t	time;
+	nanotime_t	time;
 	thread_id	id;
 };
 
@@ -152,9 +152,9 @@ public:
 	inline	addr_t				ReferencedObject();
 
 	inline	int64				Waits() const;
-	inline	bigtime_t			TotalWaitTime() const;
+	inline	nanotime_t			TotalWaitTime() const;
 
-			void				AddWait(bigtime_t waitTime);
+			void				AddWait(nanotime_t waitTime);
 
 	static inline int			CompareByTypeObject(const WaitObject* a,
 									const WaitObject* b);
@@ -167,7 +167,7 @@ private:
 
 private:
 			int64				fWaits;
-			bigtime_t			fTotalWaitTime;
+			nanotime_t			fTotalWaitTime;
 };
 
 
@@ -181,7 +181,7 @@ public:
 	inline	const char*			Name() const;
 
 			int64				Waits();
-			bigtime_t			TotalWaitTime();
+			nanotime_t			TotalWaitTime();
 
 	inline	WaitObject*			MostRecentWaitObject() const;
 
@@ -204,7 +204,7 @@ private:
 private:
 			WaitObjectList		fWaitObjects;
 			int64				fWaits;
-			bigtime_t			fTotalWaitTime;
+			nanotime_t			fTotalWaitTime;
 };
 
 
@@ -222,14 +222,14 @@ public:
 	inline	addr_t				ReferencedObject();
 
 	inline	int64				Waits() const;
-	inline	bigtime_t			TotalWaitTime() const;
+	inline	nanotime_t			TotalWaitTime() const;
 
-			void				AddWait(bigtime_t waitTime);
+			void				AddWait(nanotime_t waitTime);
 
 private:
 			WaitObject*			fWaitObject;
 			int64				fWaits;
-			bigtime_t			fTotalWaitTime;
+			nanotime_t			fTotalWaitTime;
 };
 
 
@@ -266,18 +266,18 @@ private:
 class Model::Team {
 public:
 								Team(const system_profiler_team_added* event,
-									bigtime_t time);
+									nanotime_t time);
 								~Team();
 
 	inline	team_id				ID() const;
 	inline	const char*			Name() const;
 
-	inline	bigtime_t			CreationTime() const;
-	inline	bigtime_t			DeletionTime() const;
+	inline	nanotime_t			CreationTime() const;
+	inline	nanotime_t			DeletionTime() const;
 
 			bool				AddThread(Thread* thread);
 
-	inline	void				SetDeletionTime(bigtime_t time);
+	inline	void				SetDeletionTime(nanotime_t time);
 
 	static inline int			CompareByID(const Team* a, const Team* b);
 	static inline int			CompareWithID(const team_id* id,
@@ -288,8 +288,8 @@ private:
 
 private:
 			const system_profiler_team_added* fCreationEvent;
-			bigtime_t			fCreationTime;
-			bigtime_t			fDeletionTime;
+			nanotime_t			fCreationTime;
+			nanotime_t			fDeletionTime;
 			ThreadList			fThreads;	// sorted by creation time, ID
 };
 
@@ -298,7 +298,7 @@ class Model::Thread {
 public:
 								Thread(Team* team,
 									const system_profiler_thread_added* event,
-									bigtime_t time);
+									nanotime_t time);
 								~Thread();
 
 	inline	thread_id			ID() const;
@@ -308,33 +308,33 @@ public:
 	inline	int32				Index() const;
 	inline	void				SetIndex(int32 index);
 
-	inline	bigtime_t			CreationTime() const;
-	inline	bigtime_t			DeletionTime() const;
+	inline	nanotime_t			CreationTime() const;
+	inline	nanotime_t			DeletionTime() const;
 
 	inline	int64				Runs() const;
-	inline	bigtime_t			TotalRunTime() const;
+	inline	nanotime_t			TotalRunTime() const;
 	inline	int64				Reruns() const;
-	inline	bigtime_t			TotalRerunTime() const;
+	inline	nanotime_t			TotalRerunTime() const;
 	inline	int64				Latencies() const;
-	inline	bigtime_t			TotalLatency() const;
+	inline	nanotime_t			TotalLatency() const;
 	inline	int64				Preemptions() const;
 	inline	int64				Waits() const;
-	inline	bigtime_t			TotalWaitTime() const;
-	inline	bigtime_t			UnspecifiedWaitTime() const;
+	inline	nanotime_t			TotalWaitTime() const;
+	inline	nanotime_t			UnspecifiedWaitTime() const;
 
 			ThreadWaitObjectGroup* ThreadWaitObjectGroupFor(uint32 type,
 									addr_t object) const;
 	inline	int32				CountThreadWaitObjectGroups() const;
 	inline	ThreadWaitObjectGroup* ThreadWaitObjectGroupAt(int32 index) const;
 
-	inline	void				SetDeletionTime(bigtime_t time);
+	inline	void				SetDeletionTime(nanotime_t time);
 
-			void				AddRun(bigtime_t runTime);
-			void				AddRerun(bigtime_t runTime);
-			void				AddLatency(bigtime_t latency);
-			void				AddPreemption(bigtime_t runTime);
-			void				AddWait(bigtime_t waitTime);
-			void				AddUnspecifiedWait(bigtime_t waitTime);
+			void				AddRun(nanotime_t runTime);
+			void				AddRerun(nanotime_t runTime);
+			void				AddLatency(nanotime_t latency);
+			void				AddPreemption(nanotime_t runTime);
+			void				AddWait(nanotime_t waitTime);
+			void				AddUnspecifiedWait(nanotime_t waitTime);
 
 			ThreadWaitObject*	AddThreadWaitObject(WaitObject* waitObject,
 									ThreadWaitObjectGroup**
@@ -357,27 +357,27 @@ private:
 private:
 			Team*				fTeam;
 			const system_profiler_thread_added* fCreationEvent;
-			bigtime_t			fCreationTime;
-			bigtime_t			fDeletionTime;
+			nanotime_t			fCreationTime;
+			nanotime_t			fDeletionTime;
 
 			int64				fRuns;
-			bigtime_t			fTotalRunTime;
-			bigtime_t			fMinRunTime;
-			bigtime_t			fMaxRunTime;
+			nanotime_t			fTotalRunTime;
+			nanotime_t			fMinRunTime;
+			nanotime_t			fMaxRunTime;
 
 			int64				fLatencies;
-			bigtime_t			fTotalLatency;
-			bigtime_t			fMinLatency;
-			bigtime_t			fMaxLatency;
+			nanotime_t			fTotalLatency;
+			nanotime_t			fMinLatency;
+			nanotime_t			fMaxLatency;
 
 			int64				fReruns;
-			bigtime_t			fTotalRerunTime;
-			bigtime_t			fMinRerunTime;
-			bigtime_t			fMaxRerunTime;
+			nanotime_t			fTotalRerunTime;
+			nanotime_t			fMinRerunTime;
+			nanotime_t			fMaxRerunTime;
 
 			int64				fWaits;
-			bigtime_t			fTotalWaitTime;
-			bigtime_t			fUnspecifiedWaitTime;
+			nanotime_t			fTotalWaitTime;
+			nanotime_t			fUnspecifiedWaitTime;
 
 			int64				fPreemptions;
 
@@ -388,7 +388,7 @@ private:
 
 
 struct Model::CompactThreadSchedulingState {
-			bigtime_t			lastTime;
+			nanotime_t			lastTime;
 			Model::Thread*		thread;
 			ThreadWaitObject*	waitObject;
 			ThreadState			state;
@@ -438,8 +438,8 @@ public:
 			status_t			Init(const CompactSchedulingState* state);
 			void				Clear();
 
-	inline	bigtime_t			LastEventTime() const { return fLastEventTime; }
-	inline	void				SetLastEventTime(bigtime_t time);
+	inline	nanotime_t			LastEventTime() const { return fLastEventTime; }
+	inline	void				SetLastEventTime(nanotime_t time);
 
 	inline	ThreadSchedulingState* LookupThread(thread_id threadID) const;
 	inline	void				InsertThread(ThreadSchedulingState* thread);
@@ -447,7 +447,7 @@ public:
 	inline	const ThreadSchedulingStateTable& ThreadStates() const;
 
 private:
-			bigtime_t			fLastEventTime;
+			nanotime_t			fLastEventTime;
 			ThreadSchedulingStateTable fThreadStates;
 };
 
@@ -459,7 +459,7 @@ public:
 			void				Delete();
 
 	inline	off_t				EventOffset() const;
-	inline	bigtime_t			LastEventTime() const;
+	inline	nanotime_t			LastEventTime() const;
 
 	inline	int32				CountThreadsStates() const;
 	inline	const CompactThreadSchedulingState* ThreadStateAt(int32 index)
@@ -474,7 +474,7 @@ private:
 	inline						~CompactSchedulingState() {}
 
 private:
-			bigtime_t			fLastEventTime;
+			nanotime_t			fLastEventTime;
 			off_t				fEventOffset;
 			int32				fThreadCount;
 			CompactThreadSchedulingState fThreadStates[0];
@@ -505,14 +505,14 @@ Model::EventDataSize() const
 }
 
 
-bigtime_t
+nanotime_t
 Model::BaseTime() const
 {
 	return fBaseTime;
 }
 
 
-bigtime_t
+nanotime_t
 Model::LastEventTime() const
 {
 	return fLastEventTime;
@@ -557,7 +557,7 @@ Model::WaitObject::Waits() const
 }
 
 
-bigtime_t
+nanotime_t
 Model::WaitObject::TotalWaitTime() const
 {
 	return fTotalWaitTime;
@@ -704,7 +704,7 @@ Model::ThreadWaitObject::Waits() const
 }
 
 
-bigtime_t
+nanotime_t
 Model::ThreadWaitObject::TotalWaitTime() const
 {
 	return fTotalWaitTime;
@@ -771,14 +771,14 @@ Model::Team::Name() const
 }
 
 
-bigtime_t
+nanotime_t
 Model::Team::CreationTime() const
 {
 	return fCreationTime;
 }
 
 
-bigtime_t
+nanotime_t
 Model::Team::DeletionTime() const
 {
 	return fDeletionTime;
@@ -786,7 +786,7 @@ Model::Team::DeletionTime() const
 
 
 void
-Model::Team::SetDeletionTime(bigtime_t time)
+Model::Team::SetDeletionTime(nanotime_t time)
 {
 	fDeletionTime = time;
 }
@@ -830,14 +830,14 @@ Model::Thread::GetTeam() const
 }
 
 
-bigtime_t
+nanotime_t
 Model::Thread::CreationTime() const
 {
 	return fCreationTime;
 }
 
 
-bigtime_t
+nanotime_t
 Model::Thread::DeletionTime() const
 {
 	return fDeletionTime;
@@ -865,7 +865,7 @@ Model::Thread::Runs() const
 }
 
 
-bigtime_t
+nanotime_t
 Model::Thread::TotalRunTime() const
 {
 	return fTotalRunTime;
@@ -879,7 +879,7 @@ Model::Thread::Reruns() const
 }
 
 
-bigtime_t
+nanotime_t
 Model::Thread::TotalRerunTime() const
 {
 	return fTotalRerunTime;
@@ -893,7 +893,7 @@ Model::Thread::Latencies() const
 }
 
 
-bigtime_t
+nanotime_t
 Model::Thread::TotalLatency() const
 {
 	return fTotalLatency;
@@ -914,14 +914,14 @@ Model::Thread::Waits() const
 }
 
 
-bigtime_t
+nanotime_t
 Model::Thread::TotalWaitTime() const
 {
 	return fTotalWaitTime;
 }
 
 
-bigtime_t
+nanotime_t
 Model::Thread::UnspecifiedWaitTime() const
 {
 	return fUnspecifiedWaitTime;
@@ -943,7 +943,7 @@ Model::Thread::ThreadWaitObjectGroupAt(int32 index) const
 
 
 void
-Model::Thread::SetDeletionTime(bigtime_t time)
+Model::Thread::SetDeletionTime(nanotime_t time)
 {
 	fDeletionTime = time;
 }
@@ -977,7 +977,7 @@ Model::Thread::CompareByCreationTimeID(const Thread* a, const Thread* b)
 Model::Thread::CompareWithCreationTimeID(const creation_time_id* key,
 	const Thread* thread)
 {
-	bigtime_t cmp = key->time - thread->fCreationTime;
+	nanotime_t cmp = key->time - thread->fCreationTime;
 	if (cmp == 0)
 		return key->id - thread->ID();
 	return cmp < 0 ? -1 : 1;
@@ -1029,7 +1029,7 @@ Model::SchedulingState::SchedulingState()
 
 
 void
-Model::SchedulingState::SetLastEventTime(bigtime_t time)
+Model::SchedulingState::SetLastEventTime(nanotime_t time)
 {
 	fLastEventTime = time;
 }
@@ -1073,7 +1073,7 @@ Model::CompactSchedulingState::EventOffset() const
 }
 
 
-bigtime_t
+nanotime_t
 Model::CompactSchedulingState::LastEventTime() const
 {
 	return fLastEventTime;

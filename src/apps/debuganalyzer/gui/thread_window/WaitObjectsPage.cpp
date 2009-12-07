@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "thread_window/WaitObjectsPage.h"
 
 #include <stdio.h>
@@ -290,7 +291,7 @@ ThreadWindow::WaitObjectsPage::WaitObjectsPage()
 		1000, B_TRUNCATE_END, B_ALIGN_LEFT));
 	fWaitObjectsTree->AddColumn(new Int64TableColumn(4, "Waits", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fWaitObjectsTree->AddColumn(new BigtimeTableColumn(5, "Wait Time", 80,
+	fWaitObjectsTree->AddColumn(new NanotimeTableColumn(5, "Wait Time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fWaitObjectsTree->AddTreeTableListener(this);

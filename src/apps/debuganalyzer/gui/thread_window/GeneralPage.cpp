@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 
+#include "util/TimeUtils.h"
+
 
 ThreadWindow::GeneralPage::GeneralPage()
 	:
@@ -60,29 +62,38 @@ ThreadWindow::GeneralPage::SetModel(Model* model, Model::Thread* thread)
 		fTeamView->SetText(thread->GetTeam()->Name());
 
 		// run time
-		snprintf(buffer, sizeof(buffer), "%lld μs (%lld)",
-			fThread->TotalRunTime(), fThread->Runs());
+		char timeBuffer[64];
+		format_nanotime(fThread->TotalRunTime(), timeBuffer,
+			sizeof(timeBuffer));
+		snprintf(buffer, sizeof(buffer), "%s (%lld)", timeBuffer,
+			fThread->Runs());
 		fRunTimeView->SetText(buffer);
 
 		// wait time
-		snprintf(buffer, sizeof(buffer), "%lld μs (%lld)",
-			fThread->TotalWaitTime(), fThread->Waits());
+		format_nanotime(fThread->TotalWaitTime(), timeBuffer,
+			sizeof(timeBuffer));
+		snprintf(buffer, sizeof(buffer), "%s (%lld)", timeBuffer,
+			fThread->Waits());
 		fWaitTimeView->SetText(buffer);
 
 		// latencies
-		snprintf(buffer, sizeof(buffer), "%lld μs (%lld)",
-			fThread->TotalLatency(), fThread->Latencies());
+		format_nanotime(fThread->TotalLatency(), timeBuffer,
+			sizeof(timeBuffer));
+		snprintf(buffer, sizeof(buffer), "%s (%lld)", timeBuffer,
+			fThread->Latencies());
 		fLatencyView->SetText(buffer);
 
 		// preemptions
-		snprintf(buffer, sizeof(buffer), "%lld μs (%lld)",
-			fThread->TotalRerunTime(), fThread->Preemptions());
+		format_nanotime(fThread->TotalRerunTime(), timeBuffer,
+			sizeof(timeBuffer));
+		snprintf(buffer, sizeof(buffer), "%s (%lld)", timeBuffer,
+			fThread->Preemptions());
 		fPreemptionView->SetText(buffer);
 
 		// unspecified time
-		snprintf(buffer, sizeof(buffer), "%lld μs",
-			fThread->UnspecifiedWaitTime());
-		fUnspecifiedTimeView->SetText(buffer);
+		format_nanotime(fThread->UnspecifiedWaitTime(), timeBuffer,
+			sizeof(timeBuffer));
+		fUnspecifiedTimeView->SetText(timeBuffer);
 	} else {
 		fThreadNameView->SetText("");
 		fThreadIDView->SetText("");

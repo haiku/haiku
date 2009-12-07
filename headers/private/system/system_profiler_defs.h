@@ -5,6 +5,7 @@
 #ifndef _SYSTEM_SYSTEM_PROFILER_DEFS_H
 #define _SYSTEM_SYSTEM_PROFILER_DEFS_H
 
+
 #include <image.h>
 
 
@@ -130,13 +131,13 @@ struct system_profiler_samples {
 
 // base structure for the following three
 struct system_profiler_thread_scheduling_event {
-	bigtime_t	time;
+	nanotime_t	time;
 	thread_id	thread;
 };
 
 // B_SYSTEM_PROFILER_THREAD_SCHEDULED
 struct system_profiler_thread_scheduled {
-	bigtime_t	time;
+	nanotime_t	time;
 	thread_id	thread;
 	thread_id	previous_thread;
 	uint16		previous_thread_state;
@@ -146,14 +147,14 @@ struct system_profiler_thread_scheduled {
 
 // B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE
 struct system_profiler_thread_enqueued_in_run_queue {
-	bigtime_t	time;
+	nanotime_t	time;
 	thread_id	thread;
 	uint8		priority;
 };
 
 // B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE
 struct system_profiler_thread_removed_from_run_queue {
-	bigtime_t	time;
+	nanotime_t	time;
 	thread_id	thread;
 };
 

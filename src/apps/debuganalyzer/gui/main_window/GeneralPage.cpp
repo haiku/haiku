@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 
+#include "util/TimeUtils.h"
+
 
 MainWindow::GeneralPage::GeneralPage()
 	:
@@ -43,8 +45,8 @@ MainWindow::GeneralPage::SetModel(Model* model)
 
 		// run time
 		char buffer[128];
-		snprintf(buffer, sizeof(buffer), "%lld μs", fModel->LastEventTime());
-		fRunTimeView->SetText(buffer);
+		fRunTimeView->SetText(format_nanotime(fModel->LastEventTime(), buffer,
+			sizeof(buffer)));
 
 		// team count
 		snprintf(buffer, sizeof(buffer), "%ld", fModel->CountTeams());

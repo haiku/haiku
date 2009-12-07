@@ -22,7 +22,7 @@
 
 #include "Array.h"
 
-#include "chart/BigtimeChartAxisLegendSource.h"
+#include "chart/NanotimeChartAxisLegendSource.h"
 #include "chart/LegendChartAxis.h"
 #include "chart/StringChartLegend.h"
 #include "HeaderView.h"
@@ -34,11 +34,11 @@ static const float kViewSeparationMargin = 5.0f;
 
 
 struct MainWindow::SchedulingPage::SchedulingEvent {
-	bigtime_t						time;
+	nanotime_t						time;
 	Model::ThreadWaitObjectGroup*	waitObject;
 	ThreadState						state;
 
-	SchedulingEvent(bigtime_t time, ThreadState state,
+	SchedulingEvent(nanotime_t time, ThreadState state,
 		Model::ThreadWaitObjectGroup* waitObject)
 		:
 		time(time),
@@ -95,7 +95,7 @@ public:
 		return fDataArrays[index];
 	}
 
-	void AddState(Model::Thread* thread, bigtime_t time, ThreadState state,
+	void AddState(Model::Thread* thread, nanotime_t time, ThreadState state,
 		Model::ThreadWaitObjectGroup* waitObject)
 	{
 		DataArray& array = fDataArrays[thread->Index()];
@@ -117,28 +117,28 @@ public:
 		array.Add(event);
 	}
 
-	void AddRun(Model::Thread* thread, bigtime_t time)
+	void AddRun(Model::Thread* thread, nanotime_t time)
 	{
 		AddState(thread, time, RUNNING, NULL);
 	}
 
-	void AddLatency(Model::Thread* thread, bigtime_t time)
+	void AddLatency(Model::Thread* thread, nanotime_t time)
 	{
 		AddState(thread, time, READY, NULL);
 	}
 
-	void AddPreemption(Model::Thread* thread, bigtime_t time)
+	void AddPreemption(Model::Thread* thread, nanotime_t time)
 	{
 		AddState(thread, time, PREEMPTED, NULL);
 	}
 
-	void AddWait(Model::Thread* thread, bigtime_t time,
+	void AddWait(Model::Thread* thread, nanotime_t time,
 		Model::ThreadWaitObjectGroup* waitObject)
 	{
 		AddState(thread, time, WAITING, waitObject);
 	}
 
-	void AddUnspecifiedWait(Model::Thread* thread, bigtime_t time)
+	void AddUnspecifiedWait(Model::Thread* thread, nanotime_t time)
 	{
 		AddState(thread, time, WAITING, NULL);
 	}
@@ -154,10 +154,10 @@ private:
 
 
 struct MainWindow::SchedulingPage::TimeRange : BReferenceable {
-	bigtime_t	startTime;
-	bigtime_t	endTime;
+	nanotime_t	startTime;
+	nanotime_t	endTime;
 
-	TimeRange(bigtime_t startTime, bigtime_t endTime)
+	TimeRange(nanotime_t startTime, nanotime_t endTime)
 		:
 		startTime(startTime),
 		endTime(endTime)
@@ -171,7 +171,7 @@ class MainWindow::SchedulingPage::TimelineHeaderRenderer
 public:
 	TimelineHeaderRenderer()
 		:
-		fAxis(new BigtimeChartAxisLegendSource, new StringChartLegendRenderer)
+		fAxis(new NanotimeChartAxisLegendSource, new StringChartLegendRenderer)
 	{
 		fAxis.SetLocation(CHART_AXIS_TOP);
 	}
@@ -367,14 +367,14 @@ public:
 		}
 	}
 
-	void GetDataRange(bigtime_t& _startTime, bigtime_t& _endTime)
+	void GetDataRange(nanotime_t& _startTime, nanotime_t& _endTime)
 	{
 		_GetEventTimeRange(_startTime, _endTime);
 	}
 
 	virtual BSize MinSize()
 	{
-		bigtime_t timeSpan = fModel != NULL ? fModel->LastEventTime() : 0;
+		nanotime_t timeSpan = fModel != NULL ? fModel->LastEventTime() : 0;
 		float width = std::max(float(timeSpan / fUSecsPerPixel), 100.0f);
 		return BSize(width, TotalHeight());
 	}
@@ -446,8 +446,8 @@ public:
 //printf("drawing events for thread %ld: %ld events\n", thread->Index(), eventCount);
 			for (int32 k = 0; k < eventCount; k++) {
 				const SchedulingEvent& event = events[k];
-				bigtime_t startTime = std::max(event.time, fStartTime);
-				bigtime_t endTime = k + 1 < eventCount
+				nanotime_t startTime = std::max(event.time, fStartTime);
+				nanotime_t endTime = k + 1 < eventCount
 					? std::min(events[k + 1].time, fEndTime) : fEndTime;
 
 				rgb_color color;
@@ -488,8 +488,8 @@ private:
 	void _UpdateData()
 	{
 		// get the interesting event time range
-		bigtime_t startTime;
-		bigtime_t endTime;
+		nanotime_t startTime;
+		nanotime_t endTime;
 		_GetEventTimeRange(startTime, endTime);
 
 		if (startTime == fStartTime && endTime == fEndTime)
@@ -593,12 +593,12 @@ printf("failed to read event!\n");
 		}
 	}
 
-	void _GetEventTimeRange(bigtime_t& _startTime, bigtime_t& _endTime)
+	void _GetEventTimeRange(nanotime_t& _startTime, nanotime_t& _endTime)
 	{
 		if (fModel != NULL) {
 			float scrollOffset = _ScrollOffset();
-			_startTime = (bigtime_t)scrollOffset * fUSecsPerPixel;
-			_endTime = (bigtime_t)(scrollOffset + Bounds().Width() + 1)
+			_startTime = (nanotime_t)scrollOffset * fUSecsPerPixel;
+			_endTime = (nanotime_t)(scrollOffset + Bounds().Width() + 1)
 				* fUSecsPerPixel;
 		} else {
 			_startTime = 0;
@@ -652,7 +652,7 @@ printf("failed to read event!\n");
 		}
 	}
 
-	inline void _UpdateLastEventTime(bigtime_t time)
+	inline void _UpdateLastEventTime(nanotime_t time)
 	{
 		fState.SetLastEventTime(time - fModel->BaseTime());
 	}
@@ -834,7 +834,7 @@ return B_BAD_DATA;
 			thread->state = STILL_RUNNING;
 		} else {
 			// Thread was waiting and is ready now.
-			bigtime_t diffTime = fState.LastEventTime() - thread->lastTime;
+			nanotime_t diffTime = fState.LastEventTime() - thread->lastTime;
 			if (thread->waitObject != NULL) {
 				thread->waitObject->AddWait(diffTime);
 				thread->waitObject = NULL;
@@ -870,8 +870,8 @@ return B_BAD_DATA;
 private:
 	Model::SchedulingState	fState;
 	SchedulingData			fSchedulingData;
-	bigtime_t				fStartTime;
-	bigtime_t				fEndTime;
+	nanotime_t				fStartTime;
+	nanotime_t				fEndTime;
 	uint32					fUSecsPerPixel;
 	BPoint					fLastMousePos;
 	Listener*				fListener;
@@ -996,8 +996,8 @@ private:
 		if (header == NULL)
 			return;
 
-		bigtime_t startTime;
-		bigtime_t endTime;
+		nanotime_t startTime;
+		nanotime_t endTime;
 		fSchedulingView->GetDataRange(startTime, endTime);
 		TimeRange* range = new(std::nothrow) TimeRange(startTime, endTime);
 		if (range != NULL) {

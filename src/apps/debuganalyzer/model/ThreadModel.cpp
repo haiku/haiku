@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "ThreadModel.h"
 
 #include <new>
@@ -93,7 +94,7 @@ ThreadModel::AddSchedulingEvent(const system_profiler_event_header* eventHeader)
 
 
 int32
-ThreadModel::FindSchedulingEvent(bigtime_t time)
+ThreadModel::FindSchedulingEvent(nanotime_t time)
 {
 	if (time < 0)
 		return 0;

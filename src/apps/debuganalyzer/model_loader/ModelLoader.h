@@ -47,7 +47,7 @@ private:
 			status_t			_ProcessEvent(uint32 event, uint32 cpu,
 									const void* buffer, size_t size);
 
-	inline	void				_UpdateLastEventTime(bigtime_t time);
+	inline	void				_UpdateLastEventTime(nanotime_t time);
 
 			void				_HandleTeamAdded(
 									system_profiler_team_added* event);
@@ -76,7 +76,7 @@ private:
 private:
 			Model*				fModel;
 			DataSource*			fDataSource;
-			bigtime_t			fBaseTime;
+			nanotime_t			fBaseTime;
 			Model::SchedulingState fState;
 };
 

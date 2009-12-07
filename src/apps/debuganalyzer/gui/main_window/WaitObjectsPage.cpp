@@ -116,7 +116,7 @@ MainWindow::WaitObjectsPage::WaitObjectsPage(MainWindow* parent)
 //		1000, B_TRUNCATE_END, B_ALIGN_LEFT));
 	fWaitObjectsTable->AddColumn(new Int64TableColumn(4, "Waits", 80, 40,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fWaitObjectsTable->AddColumn(new BigtimeTableColumn(5, "Wait Time", 80,
+	fWaitObjectsTable->AddColumn(new NanotimeTableColumn(5, "Wait Time", 80,
 		40, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 }
 

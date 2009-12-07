@@ -5,6 +5,7 @@
 #ifndef THREAD_MODEL_H
 #define THREAD_MODEL_H
 
+
 #include <string.h>
 
 #include "Model.h"
@@ -36,7 +37,7 @@ public:
 	inline	int32				CountSchedulingEvents() const;
 	inline	const system_profiler_event_header* SchedulingEventAt(
 									int32 index) const;
-			int32				FindSchedulingEvent(bigtime_t time);
+			int32				FindSchedulingEvent(nanotime_t time);
 
 private:
 			typedef BObjectList<WaitObjectGroup> WaitObjectGroupList;
@@ -67,7 +68,7 @@ public:
 	inline	const char*			Name() const;
 
 	inline	int64				Waits() const;
-	inline	bigtime_t			TotalWaitTime() const;
+	inline	nanotime_t			TotalWaitTime() const;
 
 	inline	int32				CountWaitObjects() const;
 	inline	Model::ThreadWaitObject* WaitObjectAt(int32 index) const;
@@ -82,7 +83,7 @@ private:
 			Model::ThreadWaitObject** fWaitObjects;
 			int32				fCount;
 			int64				fWaits;
-			bigtime_t			fTotalWaitTime;
+			nanotime_t			fTotalWaitTime;
 };
 
 
@@ -141,7 +142,7 @@ ThreadModel::WaitObjectGroup::Waits() const
 }
 
 
-bigtime_t
+nanotime_t
 ThreadModel::WaitObjectGroup::TotalWaitTime() const
 {
 	return fTotalWaitTime;

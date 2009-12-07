@@ -3,7 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "chart/BigtimeChartAxisLegendSource.h"
+
+#include "chart/NanotimeChartAxisLegendSource.h"
 
 #include <stdio.h>
 
@@ -13,33 +14,33 @@
 
 
 int32
-BigtimeChartAxisLegendSource::GetAxisLegends(const ChartDataRange& range,
+NanotimeChartAxisLegendSource::GetAxisLegends(const ChartDataRange& range,
 	ChartLegend** legends, double* values, int32 maxLegends)
 {
 	// interpret range as time range
-	bigtime_t startTime = (bigtime_t)range.min;
-	bigtime_t endTime = (bigtime_t)range.max;
-// TODO: Handle sub-microsecs ranges!
+	nanotime_t startTime = (nanotime_t)range.min;
+	nanotime_t endTime = (nanotime_t)range.max;
+// TODO: Handle sub-nanosecs ranges!
 	if (startTime >= endTime)
 		return 0;
 
-	bigtime_t positionFactors[4];
+	nanotime_t positionFactors[4];
 	positionFactors[3] = 1;
-	positionFactors[2] = 1000000;
+	positionFactors[2] = 1000000000;
 	positionFactors[1] = positionFactors[2] * 60;
 	positionFactors[0] = positionFactors[1] * 60;
 
 	// find the main position (h, m, s, us) we want to play with
 	int32 position = 0;
-	bigtime_t rangeTime = endTime - startTime;
+	nanotime_t rangeTime = endTime - startTime;
 	while (rangeTime / positionFactors[position] + 1 < maxLegends / 2
 			&& position < 3) {
 		position++;
 	}
 
 	// adjust the factor so that we get maxLegends / 2 to maxLegends legends
-	bigtime_t baseInterval = positionFactors[position];
-	bigtime_t relativeFactor = 1;
+	nanotime_t baseInterval = positionFactors[position];
+	nanotime_t relativeFactor = 1;
 	while (rangeTime / (baseInterval * relativeFactor) >= maxLegends) {
 		if (relativeFactor == 1) {
 			relativeFactor = 2;
@@ -53,16 +54,16 @@ BigtimeChartAxisLegendSource::GetAxisLegends(const ChartDataRange& range,
 
 	// generate the legends
 	int32 count = 0;
-	bigtime_t interval = baseInterval * relativeFactor;
-	bigtime_t time = (startTime + interval - 1) / interval * interval;
+	nanotime_t interval = baseInterval * relativeFactor;
+	nanotime_t time = (startTime + interval - 1) / interval * interval;
 	for (; time <= endTime; time += interval) {
-		decomposed_bigtime decomposed;
+		decomposed_nanotime decomposed;
 		decompose_time(time, decomposed);
 		char buffer[128];
-		snprintf(buffer, sizeof(buffer), "%02lld:%02d:%02d.%06d",
+		snprintf(buffer, sizeof(buffer), "%02lld:%02d:%02d.%09d",
 			decomposed.hours, decomposed.minutes, decomposed.seconds,
-			decomposed.micros);
-// TODO: Drop superfluous micro seconds digits, or even microseconds and seconds
+			decomposed.nanos);
+// TODO: Drop superfluous nanoseconds digits, or even nanoseconds and seconds
 // completely.
 
 		StringChartLegend* legend

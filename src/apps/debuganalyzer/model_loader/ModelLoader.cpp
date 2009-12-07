@@ -48,7 +48,7 @@ static const SimpleWaitObjectInfo kSignalWaitObjectInfo(
 
 
 inline void
-ModelLoader::_UpdateLastEventTime(bigtime_t time)
+ModelLoader::_UpdateLastEventTime(nanotime_t time)
 {
 	if (fBaseTime < 0) {
 		fBaseTime = time;
@@ -392,7 +392,7 @@ ModelLoader::_HandleThreadScheduled(system_profiler_thread_scheduled* event)
 		return;
 	}
 
-	bigtime_t diffTime = fState.LastEventTime() - thread->lastTime;
+	nanotime_t diffTime = fState.LastEventTime() - thread->lastTime;
 
 	if (thread->state == READY) {
 		// thread scheduled after having been woken up
@@ -493,7 +493,7 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 		thread->state = STILL_RUNNING;
 	} else {
 		// Thread was waiting and is ready now.
-		bigtime_t diffTime = fState.LastEventTime() - thread->lastTime;
+		nanotime_t diffTime = fState.LastEventTime() - thread->lastTime;
 		if (thread->waitObject != NULL) {
 			thread->waitObject->AddWait(diffTime);
 			thread->waitObject = NULL;
@@ -523,7 +523,7 @@ ModelLoader::_HandleThreadRemovedFromRunQueue(
 	// This really only happens when the thread priority is changed
 	// while the thread is ready.
 
-	bigtime_t diffTime = fState.LastEventTime() - thread->lastTime;
+	nanotime_t diffTime = fState.LastEventTime() - thread->lastTime;
 	if (thread->state == RUNNING) {
 		// This should never happen.
 		thread->thread->AddRun(diffTime);

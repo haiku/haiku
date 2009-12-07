@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "thread_window/ActivityPage.h"
 
 #include <new>
@@ -18,7 +19,7 @@
 #include "MessageCodes.h"
 #include "ThreadModel.h"
 
-#include "chart/BigtimeChartAxisLegendSource.h"
+#include "chart/NanotimeChartAxisLegendSource.h"
 #include "chart/Chart.h"
 #include "chart/ChartDataSource.h"
 #include "chart/DefaultChartAxisLegendSource.h"
@@ -69,8 +70,8 @@ public:
 
 		double sampleLength = (end - start) / (double)sampleCount;
 
-		int32 startIndex = fModel->FindSchedulingEvent((bigtime_t)start);
-		bigtime_t baseTime = fModel->GetModel()->BaseTime();
+		int32 startIndex = fModel->FindSchedulingEvent((nanotime_t)start);
+		nanotime_t baseTime = fModel->GetModel()->BaseTime();
 
 		enum ScheduleState {
 			RUNNING,
@@ -375,11 +376,11 @@ ThreadWindow::ActivityPage::ActivityPage()
 
 // TODO: Allocation management...
 	LegendChartAxis* axis = new LegendChartAxis(
-		new BigtimeChartAxisLegendSource, new StringChartLegendRenderer);
+		new NanotimeChartAxisLegendSource, new StringChartLegendRenderer);
 	fActivityChart->SetAxis(CHART_AXIS_BOTTOM, axis);
 
 	axis = new LegendChartAxis(
-		new BigtimeChartAxisLegendSource, new StringChartLegendRenderer);
+		new NanotimeChartAxisLegendSource, new StringChartLegendRenderer);
 	fActivityChart->SetAxis(CHART_AXIS_TOP, axis);
 
 	axis = new LegendChartAxis(

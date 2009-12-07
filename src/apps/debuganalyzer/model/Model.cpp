@@ -32,7 +32,7 @@ Model::WaitObject::~WaitObject()
 
 
 void
-Model::WaitObject::AddWait(bigtime_t waitTime)
+Model::WaitObject::AddWait(nanotime_t waitTime)
 {
 	fWaits++;
 	fTotalWaitTime += waitTime;
@@ -66,7 +66,7 @@ Model::WaitObjectGroup::Waits()
 }
 
 
-bigtime_t
+nanotime_t
 Model::WaitObjectGroup::TotalWaitTime()
 {
 	if (fTotalWaitTime < 0)
@@ -109,7 +109,7 @@ Model::ThreadWaitObject::~ThreadWaitObject()
 
 
 void
-Model::ThreadWaitObject::AddWait(bigtime_t waitTime)
+Model::ThreadWaitObject::AddWait(nanotime_t waitTime)
 {
 	fWaits++;
 	fTotalWaitTime += waitTime;
@@ -150,7 +150,7 @@ Model::ThreadWaitObjectGroup::GetThreadWaitObjects(
 // #pragma mark - Team
 
 
-Model::Team::Team(const system_profiler_team_added* event, bigtime_t time)
+Model::Team::Team(const system_profiler_team_added* event, nanotime_t time)
 	:
 	fCreationEvent(event),
 	fCreationTime(time),
@@ -176,7 +176,7 @@ Model::Team::AddThread(Thread* thread)
 
 
 Model::Thread::Thread(Team* team, const system_profiler_thread_added* event,
-	bigtime_t time)
+	nanotime_t time)
 	:
 	fTeam(team),
 	fCreationEvent(event),
@@ -222,7 +222,7 @@ Model::Thread::ThreadWaitObjectGroupFor(uint32 type, addr_t object) const
 
 
 void
-Model::Thread::AddRun(bigtime_t runTime)
+Model::Thread::AddRun(nanotime_t runTime)
 {
 	fRuns++;
 	fTotalRunTime += runTime;
@@ -235,7 +235,7 @@ Model::Thread::AddRun(bigtime_t runTime)
 
 
 void
-Model::Thread::AddRerun(bigtime_t runTime)
+Model::Thread::AddRerun(nanotime_t runTime)
 {
 	fReruns++;
 	fTotalRerunTime += runTime;
@@ -248,7 +248,7 @@ Model::Thread::AddRerun(bigtime_t runTime)
 
 
 void
-Model::Thread::AddLatency(bigtime_t latency)
+Model::Thread::AddLatency(nanotime_t latency)
 {
 	fLatencies++;
 	fTotalLatency += latency;
@@ -261,14 +261,14 @@ Model::Thread::AddLatency(bigtime_t latency)
 
 
 void
-Model::Thread::AddPreemption(bigtime_t runTime)
+Model::Thread::AddPreemption(nanotime_t runTime)
 {
 	fPreemptions++;
 }
 
 
 void
-Model::Thread::AddWait(bigtime_t waitTime)
+Model::Thread::AddWait(nanotime_t waitTime)
 {
 	fWaits++;
 	fTotalWaitTime += waitTime;
@@ -276,7 +276,7 @@ Model::Thread::AddWait(bigtime_t waitTime)
 
 
 void
-Model::Thread::AddUnspecifiedWait(bigtime_t waitTime)
+Model::Thread::AddUnspecifiedWait(nanotime_t waitTime)
 {
 	fUnspecifiedWaitTime += waitTime;
 }
@@ -388,7 +388,7 @@ Model::SchedulingState::Clear()
 Model::CompactSchedulingState::Create(const SchedulingState& state,
 	off_t eventOffset)
 {
-	bigtime_t lastEventTime = state.LastEventTime();
+	nanotime_t lastEventTime = state.LastEventTime();
 
 	// count the active threads
 	int32 threadCount = 0;
@@ -475,14 +475,14 @@ Model::LoadingFinished()
 
 
 void
-Model::SetBaseTime(bigtime_t time)
+Model::SetBaseTime(nanotime_t time)
 {
 	fBaseTime = time;
 }
 
 
 void
-Model::SetLastEventTime(bigtime_t time)
+Model::SetLastEventTime(nanotime_t time)
 {
 	fLastEventTime = time;
 }
@@ -510,7 +510,7 @@ Model::TeamByID(team_id id) const
 
 
 Model::Team*
-Model::AddTeam(const system_profiler_team_added* event, bigtime_t time)
+Model::AddTeam(const system_profiler_team_added* event, nanotime_t time)
 {
 	Team* team = TeamByID(event->team);
 	if (team != NULL) {
@@ -554,7 +554,7 @@ Model::ThreadByID(thread_id id) const
 
 
 Model::Thread*
-Model::AddThread(const system_profiler_thread_added* event, bigtime_t time)
+Model::AddThread(const system_profiler_thread_added* event, nanotime_t time)
 {
 	// check whether we do already know the thread
 	Thread* thread = ThreadByID(event->thread);
@@ -696,7 +696,7 @@ Model::AddSchedulingStateSnapshot(const SchedulingState& state,
 
 
 const Model::CompactSchedulingState*
-Model::ClosestSchedulingState(bigtime_t eventTime) const
+Model::ClosestSchedulingState(nanotime_t eventTime) const
 {
 	int32 index = fSchedulingStates.BinarySearchIndexByKey(eventTime,
 		&_CompareEventTimeSchedulingState);
@@ -710,7 +710,7 @@ Model::ClosestSchedulingState(bigtime_t eventTime) const
 
 
 /*static*/ int
-Model::_CompareEventTimeSchedulingState(const bigtime_t* time,
+Model::_CompareEventTimeSchedulingState(const nanotime_t* time,
 	const CompactSchedulingState* state)
 {
 	if (*time < state->LastEventTime())

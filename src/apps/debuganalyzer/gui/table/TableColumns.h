@@ -131,4 +131,24 @@ private:
 };
 
 
+class NanotimeTableColumn : public StringTableColumn {
+public:
+								NanotimeTableColumn(int32 modelIndex,
+									const char* title, float width,
+									float minWidth, float maxWidth,
+									bool invalidFirst,
+									uint32 truncate = B_TRUNCATE_MIDDLE,
+									alignment align = B_ALIGN_RIGHT);
+
+protected:
+	virtual	BField*				PrepareField(const BVariant& value) const;
+
+	virtual	int					CompareValues(const BVariant& a,
+									const BVariant& b);
+
+private:
+			bool				fInvalidFirst;
+};
+
+
 #endif	// TABLE_COLUMNS_H

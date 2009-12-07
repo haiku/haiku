@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "main_window/TeamsPage.h"
 
 #include <stdio.h>
@@ -82,9 +83,9 @@ MainWindow::TeamsPage::TeamsPage(MainWindow* parent)
 		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 	fTeamsTable->AddColumn(new StringTableColumn(1, "Name", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
-	fTeamsTable->AddColumn(new BigtimeTableColumn(2, "Creation", 80, 40, 1000,
+	fTeamsTable->AddColumn(new NanotimeTableColumn(2, "Creation", 80, 40, 1000,
 		true, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
-	fTeamsTable->AddColumn(new BigtimeTableColumn(3, "Deletion", 80, 40, 1000,
+	fTeamsTable->AddColumn(new NanotimeTableColumn(3, "Deletion", 80, 40, 1000,
 		false, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 
 	fTeamsTable->AddTableListener(this);

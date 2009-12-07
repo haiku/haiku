@@ -19,5 +19,6 @@ MergeObject DebugAnalyzer_gui_chart.o
 	DefaultChartAxisLegendSource.cpp
 	LegendChartAxis.cpp
 	LineChartRenderer.cpp
+	NanotimeChartAxisLegendSource.cpp
 	StringChartLegend.cpp
 ;

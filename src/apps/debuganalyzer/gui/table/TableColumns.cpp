@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 
+#include "util/TimeUtils.h"
+
 
 // #pragma mark - DelegateBasedTableColumn
 
@@ -211,16 +213,8 @@ BigtimeTableColumn::PrepareField(const BVariant& value) const
 			BVariant("-", B_VARIANT_DONT_COPY_DATA));
 	}
 
-	int micros = int(time % 1000000);
-	time /= 1000000;
-	int seconds = int(time % 60);
-	time /= 60;
-	int minutes = int(time % 60);
-	time /= 60;
-
 	char buffer[64];
-	snprintf(buffer, sizeof(buffer), "%02lld:%02d:%02d:%06d", time, minutes,
-		seconds, micros);
+	format_bigtime(time, buffer, sizeof(buffer));
 	return StringTableColumn::PrepareField(
 		BVariant(buffer, B_VARIANT_DONT_COPY_DATA));
 }
@@ -231,6 +225,54 @@ BigtimeTableColumn::CompareValues(const BVariant& _a, const BVariant& _b)
 {
 	bigtime_t a = _a.ToInt64();
 	bigtime_t b = _b.ToInt64();
+
+	if (a == b)
+		return 0;
+
+	if (a < 0)
+		return fInvalidFirst ? -1 : 1;
+	if (b < 0)
+		return fInvalidFirst ? 1 : -1;
+
+	return a - b < 0 ? -1 : 1;
+}
+
+
+// #pragma mark - NanotimeTableColumn
+
+
+NanotimeTableColumn::NanotimeTableColumn(int32 modelIndex, const char* title,
+	float width, float minWidth, float maxWidth, bool invalidFirst,
+	uint32 truncate, alignment align)
+	:
+	StringTableColumn(modelIndex, title, width, minWidth, maxWidth, truncate,
+		align),
+	fInvalidFirst(invalidFirst)
+{
+}
+
+
+BField*
+NanotimeTableColumn::PrepareField(const BVariant& value) const
+{
+	nanotime_t time = value.ToInt64();
+	if (time < 0) {
+		return StringTableColumn::PrepareField(
+			BVariant("-", B_VARIANT_DONT_COPY_DATA));
+	}
+
+	char buffer[64];
+	format_nanotime(time, buffer, sizeof(buffer));
+	return StringTableColumn::PrepareField(
+		BVariant(buffer, B_VARIANT_DONT_COPY_DATA));
+}
+
+
+int
+NanotimeTableColumn::CompareValues(const BVariant& _a, const BVariant& _b)
+{
+	nanotime_t a = _a.ToInt64();
+	nanotime_t b = _b.ToInt64();
 
 	if (a == b)
 		return 0;

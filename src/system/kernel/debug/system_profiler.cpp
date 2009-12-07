@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <system_profiler.h>
 
 #include <AutoDeleter.h>
@@ -627,7 +628,7 @@ SystemProfiler::ThreadEnqueuedInRunQueue(struct thread* thread)
 	if (event == NULL)
 		return;
 
-	event->time = system_time();
+	event->time = system_time_nsecs();
 	event->thread = thread->id;
 	event->priority = thread->priority;
 
@@ -658,7 +659,7 @@ SystemProfiler::ThreadRemovedFromRunQueue(struct thread* thread)
 	if (event == NULL)
 		return;
 
-	event->time = system_time();
+	event->time = system_time_nsecs();
 	event->thread = thread->id;
 
 	fHeader->size = fBufferSize;
@@ -688,7 +689,7 @@ SystemProfiler::ThreadScheduled(struct thread* oldThread,
 	if (event == NULL)
 		return;
 
-	event->time = system_time();
+	event->time = system_time_nsecs();
 	event->thread = newThread->id;
 	event->previous_thread = oldThread->id;
 	event->previous_thread_state = oldThread->state;
