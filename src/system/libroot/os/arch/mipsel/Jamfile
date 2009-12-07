@@ -5,6 +5,8 @@ UsePrivateKernelHeaders ;
 	# time.c!
 UsePrivateSystemHeaders ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+
 MergeObject os_arch_$(TARGET_ARCH).o :
 	atomic.S
 	byteorder.S
@@ -17,4 +19,6 @@ MergeObject os_arch_$(TARGET_ARCH).o :
 	thread.c
 	time.c
 	tls.c
+
+	generic_system_time_nsecs.cpp
 ;

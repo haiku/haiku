@@ -626,7 +626,19 @@ arch_cpu_init_percpu(kernel_args *args, int cpu)
 status_t
 arch_cpu_init(kernel_args *args)
 {
-	__x86_setup_system_time(args->arch_args.system_time_cv_factor);
+	// init the TSC -> system_time() conversion factors
+
+	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
+	uint64 conversionFactorNsecs = (uint64)conversionFactor * 1000;
+
+	if (conversionFactorNsecs >> 32 != 0) {
+		// the TSC frequency is < 1 GHz, which forces us to shift the factor
+		__x86_setup_system_time(conversionFactor, conversionFactorNsecs >> 16,
+			true);
+	} else {
+		// the TSC frequency is >= 1 GHz
+		__x86_setup_system_time(conversionFactor, conversionFactorNsecs, false);
+	}
 
 	return B_OK;
 }

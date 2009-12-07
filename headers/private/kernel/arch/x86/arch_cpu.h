@@ -262,7 +262,8 @@ extern "C" {
 
 struct arch_thread;
 
-void __x86_setup_system_time(uint32 conversionFactor);
+void __x86_setup_system_time(uint32 conversionFactor,
+	uint32 conversionFactorNsecs, bool conversionFactorNsecsShift);
 void i386_context_switch(struct arch_thread* oldState,
 	struct arch_thread* newState, addr_t newPageDir);
 void x86_userspace_thread_exit(void);

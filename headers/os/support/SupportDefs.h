@@ -52,6 +52,7 @@ typedef unsigned short          unichar;
 /* descriptive types */
 typedef int32					status_t;
 typedef int64					bigtime_t;
+typedef int64					nanotime_t;
 typedef uint32					type_code;
 typedef uint32					perform_code;
 
