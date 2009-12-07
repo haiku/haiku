@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "Model.h"
 
 #include <new>
@@ -18,7 +19,9 @@
 
 Model::WaitObject::WaitObject(const system_profiler_wait_object_info* event)
 	:
-	fEvent(event)
+	fEvent(event),
+	fWaits(0),
+	fTotalWaitTime(0)
 {
 }
 
@@ -28,17 +31,63 @@ Model::WaitObject::~WaitObject()
 }
 
 
+void
+Model::WaitObject::AddWait(bigtime_t waitTime)
+{
+	fWaits++;
+	fTotalWaitTime += waitTime;
+}
+
+
 // #pragma mark - WaitObjectGroup
 
 
 Model::WaitObjectGroup::WaitObjectGroup(WaitObject* waitObject)
+	:
+	fWaits(-1),
+	fTotalWaitTime(-1)
 {
-	fWaitObjects.Add(waitObject);
+	fWaitObjects.AddItem(waitObject);
 }
 
 
 Model::WaitObjectGroup::~WaitObjectGroup()
 {
+}
+
+
+int64
+Model::WaitObjectGroup::Waits()
+{
+	if (fWaits < 0)
+		_ComputeWaits();
+
+	return fWaits;
+}
+
+
+bigtime_t
+Model::WaitObjectGroup::TotalWaitTime()
+{
+	if (fTotalWaitTime < 0)
+		_ComputeWaits();
+
+	return fTotalWaitTime;
+}
+
+
+void
+Model::WaitObjectGroup::_ComputeWaits()
+{
+	fWaits = 0;
+	fTotalWaitTime = 0;
+
+	for (int32 i = fWaitObjects.CountItems(); i-- > 0;) {
+		WaitObject* waitObject = fWaitObjects.ItemAt(i);
+
+		fWaits += waitObject->Waits();
+		fTotalWaitTime += waitObject->TotalWaitTime();
+	}
 }
 
 
@@ -64,6 +113,8 @@ Model::ThreadWaitObject::AddWait(bigtime_t waitTime)
 {
 	fWaits++;
 	fTotalWaitTime += waitTime;
+
+	fWaitObject->AddWait(waitTime);
 }
 
 
@@ -574,6 +625,20 @@ Model::AddWaitObject(const system_profiler_wait_object_info* event,
 		*_waitObjectGroup = waitObjectGroup;
 
 	return waitObject;
+}
+
+
+int32
+Model::CountWaitObjectGroups() const
+{
+	return fWaitObjectGroups.CountItems();
+}
+
+
+Model::WaitObjectGroup*
+Model::WaitObjectGroupAt(int32 index) const
+{
+	return fWaitObjectGroups.ItemAt(index);
 }
 
 

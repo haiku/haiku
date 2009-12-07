@@ -26,6 +26,7 @@
 #include "main_window/SchedulingPage.h"
 #include "main_window/TeamsPage.h"
 #include "main_window/ThreadsPage.h"
+#include "main_window/WaitObjectsPage.h"
 
 #include "thread_window/ThreadWindow.h"
 
@@ -39,6 +40,7 @@ MainWindow::MainWindow(DataSource* dataSource)
 	fTeamsPage(NULL),
 	fThreadsPage(NULL),
 	fSchedulingPage(NULL),
+	fWaitObjectsPage(NULL),
 	fModel(NULL),
 	fModelLoader(NULL),
 	fSubWindowManager(NULL)
@@ -57,6 +59,7 @@ MainWindow::MainWindow(DataSource* dataSource)
 	fMainTabView->AddTab(fTeamsPage = new TeamsPage(this));
 	fMainTabView->AddTab(fThreadsPage = new ThreadsPage(this));
 	fMainTabView->AddTab(fSchedulingPage = new SchedulingPage(this));
+	fMainTabView->AddTab(fWaitObjectsPage = new WaitObjectsPage(this));
 
 	// create a model loader, if we have a data source
 	if (dataSource != NULL)
@@ -204,4 +207,5 @@ MainWindow::_SetModel(Model* model)
 	fTeamsPage->SetModel(fModel);
 	fThreadsPage->SetModel(fModel);
 	fSchedulingPage->SetModel(fModel);
+	fWaitObjectsPage->SetModel(fModel);
 }

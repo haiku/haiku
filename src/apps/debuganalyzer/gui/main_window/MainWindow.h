@@ -35,6 +35,7 @@ private:
 			class TeamsPage;
 			class ThreadsPage;
 			class SchedulingPage;
+			class WaitObjectsPage;
 
 private:
 			void				_SetModel(Model* model);
@@ -45,6 +46,7 @@ private:
 			TeamsPage*			fTeamsPage;
 			ThreadsPage*		fThreadsPage;
 			SchedulingPage*		fSchedulingPage;
+			WaitObjectsPage*	fWaitObjectsPage;
 			Model*				fModel;
 			ModelLoader*		fModelLoader;
 			SubWindowManager*	fSubWindowManager;

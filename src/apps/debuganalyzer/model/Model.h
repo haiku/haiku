@@ -82,6 +82,9 @@ public:
 									const system_profiler_wait_object_info*
 										event,
 									WaitObjectGroup** _waitObjectGroup);
+
+			int32				CountWaitObjectGroups() const;
+			WaitObjectGroup*	WaitObjectGroupAt(int32 index) const;
 			WaitObjectGroup*	WaitObjectGroupFor(uint32 type,
 									addr_t object) const;
 
@@ -136,7 +139,7 @@ struct Model::type_and_object {
 };
 
 
-class Model::WaitObject : public SinglyLinkedListLinkImpl<WaitObject> {
+class Model::WaitObject {
 public:
 								WaitObject(
 									const system_profiler_wait_object_info*
@@ -148,6 +151,11 @@ public:
 	inline	const char*			Name() const;
 	inline	addr_t				ReferencedObject();
 
+	inline	int64				Waits() const;
+	inline	bigtime_t			TotalWaitTime() const;
+
+			void				AddWait(bigtime_t waitTime);
+
 	static inline int			CompareByTypeObject(const WaitObject* a,
 									const WaitObject* b);
 	static inline int			CompareWithTypeObject(
@@ -156,6 +164,10 @@ public:
 
 private:
 			const system_profiler_wait_object_info* fEvent;
+
+private:
+			int64				fWaits;
+			bigtime_t			fTotalWaitTime;
 };
 
 
@@ -168,7 +180,13 @@ public:
 	inline	addr_t				Object() const;
 	inline	const char*			Name() const;
 
+			int64				Waits();
+			bigtime_t			TotalWaitTime();
+
 	inline	WaitObject*			MostRecentWaitObject() const;
+
+	inline	int32				CountWaitObjects() const;
+	inline	Model::WaitObject*	WaitObjectAt(int32 index) const;
 
 	inline	void				AddWaitObject(WaitObject* waitObject);
 
@@ -179,10 +197,14 @@ public:
 									const WaitObjectGroup* group);
 
 private:
-			typedef SinglyLinkedList<WaitObject> WaitObjectList;
+			typedef BObjectList<WaitObject> WaitObjectList;
+
+			void				_ComputeWaits();
 
 private:
 			WaitObjectList		fWaitObjects;
+			int64				fWaits;
+			bigtime_t			fTotalWaitTime;
 };
 
 
@@ -528,6 +550,20 @@ Model::WaitObject::ReferencedObject()
 }
 
 
+int64
+Model::WaitObject::Waits() const
+{
+	return fWaits;
+}
+
+
+bigtime_t
+Model::WaitObject::TotalWaitTime() const
+{
+	return fTotalWaitTime;
+}
+
+
 /*static*/ int
 Model::WaitObject::CompareByTypeObject(const WaitObject* a, const WaitObject* b)
 {
@@ -580,14 +616,28 @@ Model::WaitObjectGroup::Name() const
 Model::WaitObject*
 Model::WaitObjectGroup::MostRecentWaitObject() const
 {
-	return fWaitObjects.Head();
+	return fWaitObjects.ItemAt(fWaitObjects.CountItems() - 1);
+}
+
+
+int32
+Model::WaitObjectGroup::CountWaitObjects() const
+{
+	return fWaitObjects.CountItems();
+}
+
+
+Model::WaitObject*
+Model::WaitObjectGroup::WaitObjectAt(int32 index) const
+{
+	return fWaitObjects.ItemAt(index);
 }
 
 
 void
 Model::WaitObjectGroup::AddWaitObject(WaitObject* waitObject)
 {
-	fWaitObjects.Add(waitObject);
+	fWaitObjects.AddItem(waitObject);
 }
 
 

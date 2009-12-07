@@ -25,5 +25,6 @@ MergeObject DebugAnalyzer_gui.o
 
 HaikuSubInclude chart ;
 HaikuSubInclude main_window ;
+#HaikuSubInclude model ;
 HaikuSubInclude table ;
 HaikuSubInclude thread_window ;
