@@ -22,6 +22,7 @@
 #include <thread.h>
 #include <vm/vm.h>
 #include <vm/VMArea.h>
+#include <vm/VMCache.h>
 
 #include "VMKernelAddressSpace.h"
 #include "VMUserAddressSpace.h"

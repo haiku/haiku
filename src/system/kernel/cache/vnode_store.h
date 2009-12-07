@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -7,7 +7,7 @@
 #define VNODE_STORE_H
 
 
-#include <vm/vm_types.h>
+#include <vm/VMCache.h>
 
 
 struct file_cache_ref;
