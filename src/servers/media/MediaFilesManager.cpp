@@ -19,10 +19,9 @@
 #include <MediaSounds.h>
 
 
-const char* kMediaFilesManagerSettingsDirectory = "Media";
-const char* kMediaFilesManagerSettingsFile = "MediaFilesManager";
-
-const uint32 kHeader[] = {0xac00150c, 0x18723462, 0x00000001};
+static const char* kSettingsDirectory = "Media";
+static const char* kSettingsFile = "MediaFiles";
+static const uint32 kSettingsWhat = 'mfil';
 
 
 MediaFilesManager::MediaFilesManager()
@@ -46,7 +45,7 @@ MediaFilesManager::MediaFilesManager()
 	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_RESTORED, ref, false);
 	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_ZOOMED, ref, false);
 
-	LoadState();
+	_LoadState();
 #if DEBUG >=3
 	Dump();
 #endif
@@ -60,124 +59,49 @@ MediaFilesManager::~MediaFilesManager()
 }
 
 
-//! This is called by the media_server *before* any add-ons have been loaded.
-status_t
-MediaFilesManager::LoadState()
-{
-	CALLED();
-	BPath path;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (status == B_OK)
-		status = path.Append(kMediaFilesManagerSettingsDirectory);
-	if (status == B_OK)
-		status = path.Append(kMediaFilesManagerSettingsFile);
-	if (status != B_OK)
-		return status;
-
-	BFile file;
-	status = file.SetTo(path.Path(), B_READ_ONLY);
-	if (status != B_OK)
-		return status;
-
-	uint32 header[3];
-	if (file.Read(header, sizeof(header)) < (int32)sizeof(header))
-		return B_ERROR;
-	if (memcmp(header, kHeader, sizeof(kHeader)) != 0)
-		return B_ERROR;
-
-	uint32 categoryCount;
-	if (file.Read(&categoryCount, sizeof(uint32)) < (int32)sizeof(uint32))
-		return B_ERROR;
-
-	while (categoryCount--) {
-		BString type;
-		ssize_t length = _ReadSettingsString(file, type);
-		if (length < 0)
-			return length;
-		if (length == 0)
-			break;
-
-		TRACE("%s {\n", type.String());
-
-		do {
-			BString key;
-			length = _ReadSettingsString(file, key);
-			if (length < 0)
-				return length;
-			if (length == 0)
-				break;
-
-			BString value;
-			length = _ReadSettingsString(file, value);
-
-			entry_ref ref;
-			if (length > 1)
-				get_ref_for_path(value.String(), &ref);
-
-			SetRefFor(type, key.String(), ref, false);
-		} while (true);
-
-		TRACE("}\n");
-	}
-
-	return B_OK;
-}
-
-
 status_t
 MediaFilesManager::SaveState()
 {
 	CALLED();
-	BPath path;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (status == B_OK)
-		status = path.Append(kMediaFilesManagerSettingsDirectory);
-	if (status == B_OK) {
-		status = create_directory(path.Path(),
-			S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-	}
-	if (status == B_OK)
-		status = path.Append(kMediaFilesManagerSettingsFile);
-	if (status != B_OK)
-		return status;
-
-	BFile file;
-	status = file.SetTo(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-	if (status != B_OK)
-		return status;
-
-	if (file.Write(kHeader, sizeof(kHeader)) < (ssize_t)sizeof(kHeader))
-		return B_ERROR;
-
-	BAutolock _(this);
-
-	uint32 categoryCount = fMap.size();
-	if (file.Write(&categoryCount, sizeof(uint32)) < (ssize_t)sizeof(uint32))
-		return B_ERROR;
-
-	uint32 zero = 0;
+	BMessage settings(kSettingsWhat);
+	status_t status;
 
 	TypeMap::iterator iterator = fMap.begin();
 	for (; iterator != fMap.end(); iterator++) {
 		const BString& type = iterator->first;
 		FileMap& fileMap = iterator->second;
 
-		_WriteSettingsString(file, type.String());
+		BMessage items;
+		status = items.AddString("type", type.String());
+		if (status != B_OK)
+			return status;
 
 		FileMap::iterator fileIterator = fileMap.begin();
 		for (; fileIterator != fileMap.end(); fileIterator++) {
 			const BString& item = fileIterator->first;
 			BPath path(&fileIterator->second);
 
-			_WriteSettingsString(file, item.String());
-			_WriteSettingsString(file, path.Path() ? path.Path() : "");
+			status = items.AddString("item", item.String());
+			if (status == B_OK) {
+				status = items.AddString("path",
+					path.Path() ? path.Path() : "");
+			}
+			if (status != B_OK)
+				return status;
 		}
 
-		file.Write(&zero, sizeof(uint32));
+		status = settings.AddMessage("type items", &items);
+		if (status != B_OK)
+			return status;
 	}
-	file.Write(&zero, sizeof(uint32));
 
-	return B_OK;
+	BFile file;
+	status = _OpenSettingsFile(file,
+		B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (status != B_OK)
+		return status;
+
+	return settings.Flatten(&file);
 }
 
 
@@ -419,47 +343,67 @@ MediaFilesManager::_LaunchTimer()
 }
 
 
-/*static*/ int32
-MediaFilesManager::_ReadSettingsString(BFile& file, BString& string)
+status_t
+MediaFilesManager::_OpenSettingsFile(BFile& file, int mode)
 {
-	uint32 length;
-	if (file.Read(&length, 4) < 4)
-		return -1;
-
-	if (length == 0) {
-		string.Truncate(0);
-		return 0;
+	bool createFile = (mode & O_ACCMODE) != O_RDONLY;
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path,
+		createFile);
+	if (status == B_OK)
+		status = path.Append(kSettingsDirectory);
+	if (status == B_OK && createFile) {
+		status = create_directory(path.Path(),
+			S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 	}
+	if (status == B_OK)
+		status = path.Append(kSettingsFile);
+	if (status != B_OK)
+		return status;
 
-	char* buffer = string.LockBuffer(length);
-	if (buffer == NULL)
-		return -1;
-
-	ssize_t bytesRead = file.Read(buffer, length);
-	string.UnlockBuffer(length);
-
-	if (bytesRead < (ssize_t)length)
-		return -1;
-
-	return length;
+	return file.SetTo(path.Path(), mode);
 }
 
 
+//! This is called by the media_server *before* any add-ons have been loaded.
 status_t
-MediaFilesManager::_WriteSettingsString(BFile& file, const char* string)
+MediaFilesManager::_LoadState()
 {
-	if (string == NULL)
-		return B_BAD_VALUE;
+	CALLED();
 
-	uint32 length = strlen(string);
-	if (file.Write(&length, 4) < 4)
-		return B_ERROR;
+	BFile file;
+	status_t status = _OpenSettingsFile(file, B_READ_ONLY);
+	if (status != B_OK)
+		return status;
 
-	if (length == 0)
-		return B_OK;
+	BMessage settings;
+	status = settings.Unflatten(&file);
+	if (status != B_OK)
+		return status;
 
-	if (file.Write(string, length) < (ssize_t)length)
-		return B_ERROR;
+	if (settings.what != kSettingsWhat)
+		return B_BAD_TYPE;
+
+	BMessage items;
+	for (int32 i = 0; settings.FindMessage("type items", i, &items) == B_OK;
+			i++) {
+		const char* type;
+		if (items.FindString("type", &type) != B_OK)
+			continue;
+
+		const char* item;
+		for (int32 j = 0; items.FindString("item", j, &item) == B_OK; j++) {
+			const char* path;
+			if (items.FindString("path", j, &path) != B_OK)
+				return B_BAD_DATA;
+
+			entry_ref ref;
+			get_ref_for_path(path, &ref);
+				// it's okay for this to fail
+
+			SetRefFor(type, item, ref, false);
+		}
+	}
 
 	return B_OK;
 }

@@ -23,7 +23,6 @@ public:
 								MediaFilesManager();
 								~MediaFilesManager();
 
-			status_t			LoadState();
 			status_t			SaveState();
 
 			void				Dump();
@@ -45,11 +44,8 @@ public:
 
 private:
 			void				_LaunchTimer();
-
-	static	ssize_t				_ReadSettingsString(BFile& file,
-									BString& string);
-	static	status_t			_WriteSettingsString(BFile& file,
-									const char* string);
+			status_t			_OpenSettingsFile(BFile& file, int mode);
+			status_t			_LoadState();
 
 private:
 			// for each type, the map contains a map of item/entry_ref
