@@ -80,11 +80,13 @@ find_media_addon_server_port()
 
 
 status_t
-request_data::SendReply(status_t result, reply_data *reply, int replysize) const
+request_data::SendReply(status_t result, reply_data *reply,
+	size_t replySize) const
 {
 	reply->result = result;
 	// we cheat and use the (command_data *) version of SendToPort
-	return SendToPort(reply_port, 0, reinterpret_cast<command_data *>(reply), replysize);
+	return SendToPort(reply_port, 0, reinterpret_cast<command_data *>(reply),
+		replySize);
 }
 
 
