@@ -14,6 +14,7 @@
 
 #include <ControlLook.h>
 #include <LayoutUtils.h>
+#include <Looper.h>
 
 
 // #pragma mark - HeaderRenderer
@@ -539,20 +540,176 @@ struct HeaderView::HeaderEntry {
 };
 
 
-// #pragma mark - HeaderEntry
+// #pragma mark - States
 
 
-class HeaderView::DragState {
+class HeaderView::State {
 public:
-	virtual ~DragState()
+	State(HeaderView* parent)
+		:
+		fParent(parent)
 	{
 	}
 
-	virtual void MouseDown(BPoint where) = 0;
-	virtual	void DragTo(BPoint where) = 0;
-	virtual void MouseUp();
+	virtual ~State()
+	{
+	}
 
+	virtual void Entering(State* previousState)
+	{
+	}
+
+	virtual void Leaving(State* nextState)
+	{
+	}
+
+	virtual void MouseDown(BPoint where, uint32 buttons, uint32 modifiers)
+	{
+	}
+
+	virtual void MouseUp(BPoint where, uint32 buttons, uint32 modifiers)
+	{
+	}
+
+	virtual void MouseMoved(BPoint where, uint32 transit,
+		const BMessage* dragMessage)
+	{
+	}
+
+protected:
+	HeaderView*	fParent;
 };
+
+
+class HeaderView::DefaultState : public State {
+public:
+								DefaultState(HeaderView* parent);
+
+	virtual	void				MouseDown(BPoint where, uint32 buttons,
+									uint32 modifiers);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+									const BMessage* dragMessage);
+};
+
+
+class HeaderView::ResizeState : public State {
+public:
+	virtual	void				Entering(State* previousState);
+	virtual	void				Leaving(State* nextState);
+
+								ResizeState(HeaderView* parent,
+									int32 headerIndex, BPoint startPoint);
+
+	virtual	void				MouseUp(BPoint where, uint32 buttons,
+									uint32 modifiers);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+									const BMessage* dragMessage);
+
+private:
+			Header*				fHeader;
+			float				fStartX;
+			float				fStartWidth;
+};
+
+
+// #pragma mark - DefaultState
+
+
+HeaderView::DefaultState::DefaultState(HeaderView* parent)
+	:
+	State(parent)
+{
+}
+
+
+void
+HeaderView::DefaultState::MouseDown(BPoint where, uint32 buttons,
+	uint32 modifiers)
+{
+	HeaderModel* model = fParent->Model();
+	if (model == NULL)
+		return;
+
+	if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0)
+		return;
+
+	int32 headerIndex = fParent->HeaderIndexAt(where);
+	if (headerIndex < 0) {
+		int32 headerCount = model->CountHeaders();
+		if (headerCount == 0)
+			return;
+
+		headerIndex = headerCount - 1;
+	}
+
+	// Check whether the mouse is close to the left or the right side of the
+	// header.
+	BRect headerFrame = fParent->HeaderFrame(headerIndex);
+	if (fabs(headerFrame.left - where.x) <= 3) {
+		if (headerIndex == 0)
+			return;
+		headerIndex--;
+	} else if (fabs(headerFrame.right + 1 - where.x) > 3)
+		return;
+
+	// start resizing the header
+	fParent->_SwitchState(new ResizeState(fParent, headerIndex, where));
+}
+
+
+void
+HeaderView::DefaultState::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
+}
+
+
+// #pragma mark - ResizeState
+
+
+void
+HeaderView::ResizeState::Entering(State* previousState)
+{
+	fParent->SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+}
+
+
+void
+HeaderView::ResizeState::Leaving(State* nextState)
+{
+	fParent->SetEventMask(0, 0);
+}
+
+
+HeaderView::ResizeState::ResizeState(HeaderView* parent, int32 headerIndex,
+	BPoint startPoint)
+	:
+	State(parent),
+	fHeader(parent->Model()->HeaderAt(headerIndex)),
+	fStartX(startPoint.x),
+	fStartWidth(fHeader->Width())
+{
+}
+
+
+void
+HeaderView::ResizeState::MouseUp(BPoint where, uint32 buttons,
+	uint32 modifiers)
+{
+	if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0)
+		fParent->_SwitchState(NULL);
+}
+
+
+void
+HeaderView::ResizeState::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
+	float width = fStartWidth + where.x - fStartX;
+	width = std::max(width, fHeader->MinWidth());
+	width = std::min(width, fHeader->MaxWidth());
+	fHeader->SetWidth(width);
+}
 
 
 // #pragma mark - HeaderView
@@ -563,7 +720,9 @@ HeaderView::HeaderView()
  	BView("header view", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
  	fModel(NULL),
  	fHeaderEntries(10, true),
- 	fLayoutValid(false)
+ 	fLayoutValid(false),
+ 	fDefaultState(new DefaultState(this)),
+ 	fState(fDefaultState)
 {
  	HeaderModel* model = new(std::nothrow) HeaderModel;
  	Reference<HeaderModel> modelReference(model, true);
@@ -576,6 +735,9 @@ HeaderView::HeaderView()
 HeaderView::~HeaderView()
 {
 	SetModel(NULL);
+
+	_SwitchState(NULL);
+	delete fDefaultState;
 }
 
 
@@ -652,12 +814,32 @@ HeaderView::Model() const
 void
 HeaderView::MouseDown(BPoint where)
 {
+	// get buttons and modifiers
+	BMessage* message = Looper()->CurrentMessage();
+	int32 buttons;
+	if (message == NULL || message->FindInt32("buttons", &buttons) != B_OK)
+		buttons = 0;
+	int32 modifiers;
+	if (message == NULL || message->FindInt32("modifiers", &modifiers) != B_OK)
+		modifiers = 0;
+
+	fState->MouseDown(where, buttons, modifiers);
 }
 
 
 void
 HeaderView::MouseUp(BPoint where)
 {
+	// get buttons and modifiers
+	BMessage* message = Looper()->CurrentMessage();
+	int32 buttons;
+	if (message == NULL || message->FindInt32("buttons", &buttons) != B_OK)
+		buttons = 0;
+	int32 modifiers;
+	if (message == NULL || message->FindInt32("modifiers", &modifiers) != B_OK)
+		modifiers = 0;
+
+	fState->MouseUp(where, buttons, modifiers);
 }
 
 
@@ -665,6 +847,7 @@ void
 HeaderView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 {
+	fState->MouseMoved(where, transit, dragMessage);
 }
 
 
@@ -673,6 +856,8 @@ HeaderView::SetModel(HeaderModel* model)
 {
 	if (model == fModel)
 		return B_OK;
+
+	_SwitchState(NULL);
 
 	if (fModel != NULL) {
 		// remove all headers
@@ -708,6 +893,34 @@ HeaderView::SetModel(HeaderModel* model)
 	Invalidate();
 
 	return B_OK;
+}
+
+
+BRect
+HeaderView::HeaderFrame(int32 index) const
+{
+	float bottom = Bounds().Height();
+
+	if (HeaderEntry* entry = fHeaderEntries.ItemAt(index)) {
+		return BRect(entry->position, 0, entry->position + entry->width - 1,
+			bottom);
+	}
+
+	return BRect();
+}
+
+
+int32
+HeaderView::HeaderIndexAt(BPoint point) const
+{
+	float x = point.x;
+
+	for (int32 i = 0; HeaderEntry* entry = fHeaderEntries.ItemAt(i); i++) {
+		if (x >= entry->position && x < entry->position + entry->width)
+			return i;
+	}
+
+	return -1;
 }
 
 
@@ -860,6 +1073,22 @@ HeaderView::_ValidateHeadersLayout()
 	}
 
 	fLayoutValid = true;
+}
+
+
+void
+HeaderView::_SwitchState(State* newState)
+{
+	if (newState == NULL)
+		newState = fDefaultState;
+
+	fState->Leaving(newState);
+	newState->Entering(fState);
+
+	if (fState != fDefaultState)
+		delete fState;
+
+	fState = newState;
 }
 
 

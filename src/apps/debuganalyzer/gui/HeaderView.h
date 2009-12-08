@@ -178,6 +178,9 @@ public:
 			HeaderModel*		Model() const;
 			status_t			SetModel(HeaderModel* model);
 
+			BRect				HeaderFrame(int32 index) const;
+			int32				HeaderIndexAt(BPoint point) const;
+
 			void				AddListener(HeaderViewListener* listener);
 			void				RemoveListener(HeaderViewListener* listener);
 
@@ -187,7 +190,9 @@ private:
 			typedef BObjectList<HeaderEntry> HeaderEntryList;
 			typedef BObjectList<HeaderViewListener> ListenerList;
 
-			class DragState;
+			class State;
+			class DefaultState;
+			class ResizeState;
 
 private:
 	// HeaderModelListener
@@ -209,6 +214,8 @@ private:
 									int32 endIndex);
 			void				_ValidateHeadersLayout();
 
+			void				_SwitchState(State* newState);
+
 private:
 			HeaderModel*		fModel;
 			HeaderEntryList		fHeaderEntries;
@@ -216,7 +223,8 @@ private:
 			float				fPreferredHeight;
 			bool				fLayoutValid;
 			ListenerList		fListeners;
-			DragState*			fDragState;
+			State*				fDefaultState;
+			State*				fState;
 };
 
 
