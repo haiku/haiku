@@ -69,6 +69,7 @@ BMediaFiles::GetNextType(BString* _type)
 {
 	CALLED();
 	if (fTypeIndex < 0 || fTypeIndex >= fTypes.CountItems()) {
+		_ClearTypes();
 		fTypeIndex = -1;
 		return B_BAD_INDEX;
 	}
@@ -122,6 +123,7 @@ BMediaFiles::GetNextRef(BString* _type, entry_ref* _ref)
 {
 	CALLED();
 	if (fItemIndex < 0 || fItemIndex >= fItems.CountItems()) {
+		_ClearItems();
 		fItemIndex = -1;
 		return B_BAD_INDEX;
 	}
