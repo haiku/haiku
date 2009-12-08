@@ -724,13 +724,13 @@ ServerApp::_HandleMessage(int32 code, void* data, size_t size)
 					data);
 
 			server_get_media_types_reply reply;
-			reply.area = gMediaFilesManager->GetTypesArea(reply.count);
-			if (reply.area >= 0) {
+			area_id area = gMediaFilesManager->GetTypesArea(reply.count);
+			if (area >= 0) {
 				// transfer the area to the target team
-				status_t status = _kern_transfer_area(reply.area,
-					&reply.address, B_ANY_ADDRESS, request.team);
-				if (status != B_OK) {
-					delete_area(reply.area);
+				reply.area = _kern_transfer_area(area, &reply.address,
+					B_ANY_ADDRESS, request.team);
+				if (reply.area < 0) {
+					delete_area(area);
 					reply.area = B_ERROR;
 					reply.count = 0;
 				}
@@ -756,8 +756,8 @@ ServerApp::_HandleMessage(int32 code, void* data, size_t size)
 				reply.count);
 			if (area >= 0) {
 				// transfer the area to the target team
-				reply.area = _kern_transfer_area(reply.area,
-					&reply.address, B_ANY_ADDRESS, request.team);
+				reply.area = _kern_transfer_area(area, &reply.address,
+					B_ANY_ADDRESS, request.team);
 				if (reply.area < 0) {
 					delete_area(area);
 					reply.area = B_ERROR;
