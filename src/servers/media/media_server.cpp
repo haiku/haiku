@@ -45,13 +45,15 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 #include <MediaFormats.h>
 #include <Messenger.h>
 
+#include <syscalls.h>
+
 #include "AddOnManager.h"
 #include "AppManager.h"
 #include "BufferManager.h"
 #include "DataExchange.h"
 #include "FormatManager.h"
 #include "MediaMisc.h"
-#include "MMediaFilesManager.h"
+#include "MediaFilesManager.h"
 #include "NodeManager.h"
 #include "NotificationManager.h"
 #include "ServerInterface.h"
@@ -59,86 +61,80 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 #include "media_server.h"
 
 
-AddOnManager *			gAddOnManager;
-AppManager *			gAppManager;
-BufferManager *			gBufferManager;
-FormatManager *			gFormatManager;
-MMediaFilesManager *	gMMediaFilesManager;
-NodeManager *			gNodeManager;
-NotificationManager *	gNotificationManager;
-
-namespace BPrivate { namespace media {
-	extern team_id team;
-} } // BPrivate::media
+AddOnManager* gAddOnManager;
+AppManager* gAppManager;
+BufferManager* gBufferManager;
+FormatManager* gFormatManager;
+MediaFilesManager* gMediaFilesManager;
+NodeManager* gNodeManager;
+NotificationManager* gNotificationManager;
 
 
 #define REPLY_TIMEOUT ((bigtime_t)500000)
 
-class ServerApp : BApplication
-{
+
+class ServerApp : BApplication {
 public:
 	ServerApp();
 	~ServerApp();
 
-private:
-	bool		QuitRequested();
-	void		HandleMessage(int32 code, void *data, size_t size);
-	void		ArgvReceived(int32 argc, char **argv);
-
-	void		StartAddonServer();
-	void		TerminateAddonServer();
-
-/* functionality not yet implemented
-00014a00 T _ServerApp::_ServerApp(void)
-00014e1c T _ServerApp::~_ServerApp(void)
-00014ff4 T _ServerApp::MessageReceived(BMessage *);
-00015840 T _ServerApp::QuitRequested(void)
-00015b50 T _ServerApp::_DoNotify(command_data *)
-00015d18 T _ServerApp::_UnregisterApp(long, bool)
-00018e90 T _ServerApp::AddOnHost(void)
-00019530 T _ServerApp::AboutRequested(void)
-00019d04 T _ServerApp::AddPurgableBufferGroup(long, long, long, void *)
-00019db8 T _ServerApp::CancelPurgableBufferGroupCleanup(long)
-00019e50 T _ServerApp::DirtyWork(void)
-0001a4bc T _ServerApp::ArgvReceived(long, char **)
-0001a508 T _ServerApp::CleanupPurgedBufferGroup(_ServerApp::purgable_buffer_group const &, bool)
-0001a5dc T _ServerApp::DirtyWorkLaunch(void *)
-0001a634 T _ServerApp::SetQuitMode(bool)
-0001a648 T _ServerApp::IsQuitMode(void) const
-0001a658 T _ServerApp::BroadcastCurrentStateTo(BMessenger &)
-0001adcc T _ServerApp::ReadyToRun(void)
-*/
-
-	static int32 controlthread(void *arg);
+protected:
+	virtual void				ArgvReceived(int32 argc, char** argv);
+	virtual void				ReadyToRun();
+	virtual bool				QuitRequested();
+	virtual void				MessageReceived(BMessage* message);
 
 private:
-	port_id		control_port;
-	thread_id	control_thread;
+			void				_HandleMessage(int32 code, void* data,
+									size_t size);
+			void				_LaunchAddOnServer();
+			void				_QuitAddOnServer();
 
-	BLocker *fLocker;
+private:
+			port_id				_ControlPort() const { return fControlPort; }
 
-	virtual void MessageReceived(BMessage *msg);
-	virtual void ReadyToRun();
-	typedef BApplication inherited;
+	static	int32				_ControlThread(void* arg);
+
+			BLocker				fLocker;
+			port_id				fControlPort;
+			thread_id			fControlThread;
 };
 
 
 ServerApp::ServerApp()
- 	: BApplication(B_MEDIA_SERVER_SIGNATURE),
-	fLocker(new BLocker("media server locker"))
+ 	:
+ 	BApplication(B_MEDIA_SERVER_SIGNATURE),
+	fLocker("media server locker")
 {
  	gNotificationManager = new NotificationManager;
  	gBufferManager = new BufferManager;
 	gAppManager = new AppManager;
 	gNodeManager = new NodeManager;
-	gMMediaFilesManager = new MMediaFilesManager;
+	gMediaFilesManager = new MediaFilesManager;
 	gFormatManager = new FormatManager;
 	gAddOnManager = new AddOnManager;
 
-	control_port = create_port(64, MEDIA_SERVER_PORT_NAME);
-	control_thread = spawn_thread(controlthread, "media_server control", 105,
+	fControlPort = create_port(64, MEDIA_SERVER_PORT_NAME);
+	fControlThread = spawn_thread(_ControlThread, "media_server control", 105,
 		this);
-	resume_thread(control_thread);
+	resume_thread(fControlThread);
+}
+
+
+ServerApp::~ServerApp()
+{
+	TRACE("ServerApp::~ServerApp()\n");
+
+	delete_port(fControlPort);
+	wait_for_thread(fControlThread, NULL);
+
+	delete gAddOnManager;
+	delete gNotificationManager;
+	delete gBufferManager;
+	delete gAppManager;
+	delete gNodeManager;
+	delete gMediaFilesManager;
+	delete gFormatManager;
 }
 
 
@@ -149,28 +145,11 @@ ServerApp::ReadyToRun()
 	gFormatManager->LoadState();
 
 	// make sure any previous media_addon_server is gone
-	TerminateAddonServer();
+	_QuitAddOnServer();
 	// and start a new one
-	StartAddonServer();
+	_LaunchAddOnServer();
 
 	gAddOnManager->LoadState();
-}
-
-
-ServerApp::~ServerApp()
-{
-	TRACE("ServerApp::~ServerApp()\n");
-	delete gAddOnManager;
-	delete gNotificationManager;
-	delete gBufferManager;
-	delete gAppManager;
-	delete gNodeManager;
-	delete gMMediaFilesManager;
-	delete gFormatManager;
-	delete fLocker;
-	delete_port(control_port);
-	status_t err;
-	wait_for_thread(control_thread,&err);
 }
 
 
@@ -178,11 +157,13 @@ bool
 ServerApp::QuitRequested()
 {
 	TRACE("ServerApp::QuitRequested()\n");
-	gMMediaFilesManager->SaveState();
+	gMediaFilesManager->SaveState();
 	gNodeManager->SaveState();
 	gFormatManager->SaveState();
 	gAddOnManager->SaveState();
-	TerminateAddonServer();
+
+	_QuitAddOnServer();
+
 	return true;
 }
 
@@ -191,28 +172,27 @@ void
 ServerApp::ArgvReceived(int32 argc, char **argv)
 {
 	for (int arg = 1; arg < argc; arg++) {
-		if (strstr(argv[arg], "dump")) {
+		if (strstr(argv[arg], "dump") != NULL) {
 			gAppManager->Dump();
 			gNodeManager->Dump();
 			gBufferManager->Dump();
 			gNotificationManager->Dump();
-			gMMediaFilesManager->Dump();
+			gMediaFilesManager->Dump();
 		}
-		if (strstr(argv[arg], "buffer")) {
+		if (strstr(argv[arg], "buffer") != NULL)
 			gBufferManager->Dump();
-		}
-		if (strstr(argv[arg], "node")) {
+		if (strstr(argv[arg], "node") != NULL)
 			gNodeManager->Dump();
-		}
-		if (strstr(argv[arg], "quit")) {
+		if (strstr(argv[arg], "files") != NULL)
+			gMediaFilesManager->Dump();
+		if (strstr(argv[arg], "quit") != NULL)
 			PostMessage(B_QUIT_REQUESTED);
-		}
 	}
 }
 
 
 void
-ServerApp::StartAddonServer()
+ServerApp::_LaunchAddOnServer()
 {
 	// Try to launch media_addon_server by mime signature.
 	// If it fails (for example on the Live CD, where the executable
@@ -248,7 +228,7 @@ ServerApp::StartAddonServer()
 
 
 void
-ServerApp::TerminateAddonServer()
+ServerApp::_QuitAddOnServer()
 {
 	// nothing to do if it's already terminated
 	if (!be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
@@ -291,7 +271,7 @@ ServerApp::TerminateAddonServer()
 
 
 void
-ServerApp::HandleMessage(int32 code, void *data, size_t size)
+ServerApp::_HandleMessage(int32 code, void* data, size_t size)
 {
 	status_t rv;
 	TRACE("ServerApp::HandleMessage %#lx enter\n", code);
@@ -737,140 +717,115 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			break;
 		}
 
-		case SERVER_REWINDTYPES:
+		case SERVER_GET_MEDIA_FILE_TYPES:
 		{
-			const server_rewindtypes_request *request
-				= reinterpret_cast<const server_rewindtypes_request *>(data);
-			server_rewindtypes_reply reply;
+			const server_get_media_types_request& request
+				= *reinterpret_cast<const server_get_media_types_request*>(
+					data);
 
-			BString **types = NULL;
-
-			rv = gMMediaFilesManager->RewindTypes(
-					&types, &reply.count);
-			if (reply.count > 0) {
-				// we create an area here, and pass it to the library,
-				// where it will be deleted.
-				char *start_addr;
-				size_t size = ((reply.count * B_MEDIA_NAME_LENGTH)
-					+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
-				reply.area = create_area("rewind types",
-					reinterpret_cast<void **>(&start_addr), B_ANY_ADDRESS,
-						size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-				if (reply.area < B_OK) {
-					ERROR("SERVER_REWINDTYPES: failed to create area, "
-						"error %s\n", strerror(reply.area));
+			server_get_media_types_reply reply;
+			reply.area = gMediaFilesManager->GetTypesArea(reply.count);
+			if (reply.area >= 0) {
+				// transfer the area to the target team
+				status_t status = _kern_transfer_area(reply.area,
+					&reply.address, B_ANY_ADDRESS, request.team);
+				if (status != B_OK) {
+					delete_area(reply.area);
+					reply.area = B_ERROR;
 					reply.count = 0;
-					rv = B_ERROR;
-				} else {
-					for (int32 index = 0; index < reply.count; index++) {
-						strncpy(start_addr + B_MEDIA_NAME_LENGTH * index,
-							types[index]->String(), B_MEDIA_NAME_LENGTH);
-					}
 				}
 			}
 
-			delete[] types;
-
-			rv = request->SendReply(rv, &reply, sizeof(reply));
-			if (rv != B_OK) {
+			status_t status = request.SendReply(
+				reply.area < 0 ? reply.area : B_OK, &reply, sizeof(reply));
+			if (status != B_OK) {
 				// if we couldn't send the message, delete the area
 				delete_area(reply.area);
 			}
 			break;
 		}
 
-		case SERVER_REWINDREFS:
+		case SERVER_GET_MEDIA_FILE_ITEMS:
 		{
-			const server_rewindrefs_request *request
-				= reinterpret_cast<const server_rewindrefs_request *>(data);
-			server_rewindrefs_reply reply;
+			const server_get_media_items_request& request
+				= *reinterpret_cast<const server_get_media_items_request*>(
+					data);
 
-			BString **items = NULL;
-
-			rv = gMMediaFilesManager->RewindRefs(request->type,
-					&items, &reply.count);
-			// we create an area here, and pass it to the library,
-			// where it will be deleted.
-			if (reply.count > 0) {
-				char *start_addr;
-				size_t size = ((reply.count * B_MEDIA_NAME_LENGTH)
-					+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
-				reply.area = create_area("rewind refs",
-					reinterpret_cast<void **>(&start_addr), B_ANY_ADDRESS,
-						size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-				if (reply.area < B_OK) {
-					ERROR("SERVER_REWINDREFS: failed to create area, "
-						"error %s\n", strerror(reply.area));
+			server_get_media_items_reply reply;
+			area_id area = gMediaFilesManager->GetItemsArea(request.type,
+				reply.count);
+			if (area >= 0) {
+				// transfer the area to the target team
+				reply.area = _kern_transfer_area(reply.area,
+					&reply.address, B_ANY_ADDRESS, request.team);
+				if (reply.area < 0) {
+					delete_area(area);
+					reply.area = B_ERROR;
 					reply.count = 0;
-					rv = B_ERROR;
-				} else {
-					for (int32 index = 0; index < reply.count; index++) {
-						strncpy(start_addr + B_MEDIA_NAME_LENGTH * index,
-							items[index]->String(), B_MEDIA_NAME_LENGTH);
-					}
 				}
-			}
+			} else
+				reply.area = area;
 
-			delete[] items;
-
-			rv = request->SendReply(rv, &reply, sizeof(reply));
-			if (rv != B_OK) {
+			status_t status = request.SendReply(
+				reply.area < 0 ? reply.area : B_OK, &reply, sizeof(reply));
+			if (status != B_OK) {
 				// if we couldn't send the message, delete the area
 				delete_area(reply.area);
 			}
 			break;
 		}
 
-		case SERVER_GETREFFOR:
+		case SERVER_GET_REF_FOR:
 		{
-			const server_getreffor_request *request
-				= reinterpret_cast<const server_getreffor_request *>(data);
-			server_getreffor_reply reply;
-			entry_ref *ref;
+			const server_get_ref_for_request* request
+				= reinterpret_cast<const server_get_ref_for_request*>(data);
+			server_get_ref_for_reply reply;
+			entry_ref* ref;
 
-			rv = gMMediaFilesManager->GetRefFor(request->type, request->item,
-				&ref);
-			if (rv == B_OK)
+			status_t status = gMediaFilesManager->GetRefFor(request->type,
+				request->item, &ref);
+			if (status == B_OK)
 				reply.ref = *ref;
 
-			request->SendReply(rv, &reply, sizeof(reply));
+			request->SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
-		case SERVER_SETREFFOR:
+		case SERVER_SET_REF_FOR:
 		{
-			const server_setreffor_request *request
-				= reinterpret_cast<const server_setreffor_request *>(data);
-			server_setreffor_reply reply;
+			const server_set_ref_for_request* request
+				= reinterpret_cast<const server_set_ref_for_request*>(data);
+			server_set_ref_for_reply reply;
 			entry_ref ref = request->ref;
 
-			rv = gMMediaFilesManager->SetRefFor(request->type, request->item,
-				ref);
-			request->SendReply(rv, &reply, sizeof(reply));
-			break;
-		}
-
-		case SERVER_REMOVEREFFOR:
-		{
-			const server_removereffor_request *request
-				= reinterpret_cast<const server_removereffor_request *>(data);
-			server_removereffor_reply reply;
-			entry_ref ref = request->ref;
-
-			rv = gMMediaFilesManager->RemoveRefFor(request->type,
+			status_t status = gMediaFilesManager->SetRefFor(request->type,
 				request->item, ref);
-			request->SendReply(rv, &reply, sizeof(reply));
+			request->SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
-		case SERVER_REMOVEITEM:
+		case SERVER_REMOVE_REF_FOR:
 		{
-			const server_removeitem_request *request
-				= reinterpret_cast<const server_removeitem_request *>(data);
-			server_removeitem_reply reply;
+			const server_remove_ref_for_request* request
+				= reinterpret_cast<const server_remove_ref_for_request*>(data);
+			server_remove_ref_for_reply reply;
 
-			rv = gMMediaFilesManager->RemoveItem(request->type, request->item);
-			request->SendReply(rv, &reply, sizeof(reply));
+			status_t status = gMediaFilesManager->InvalidateRefFor(
+				request->type, request->item);
+			request->SendReply(status, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_REMOVE_MEDIA_ITEM:
+		{
+			const server_remove_media_item_request* request
+				= reinterpret_cast<const server_remove_media_item_request*>(
+					data);
+			server_remove_media_item_reply reply;
+
+			status_t status = gMediaFilesManager->RemoveItem(request->type,
+				request->item);
+			request->SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
@@ -951,26 +906,25 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 }
 
 
-int32
-ServerApp::controlthread(void *arg)
+status_t
+ServerApp::_ControlThread(void* _server)
 {
+	ServerApp* server = (ServerApp*)_server;
+
 	char data[B_MEDIA_MESSAGE_SIZE];
-	ServerApp *app;
 	ssize_t size;
 	int32 code;
-
-	app = (ServerApp *)arg;
-	while ((size = read_port_etc(app->control_port, &code, data, sizeof(data),
-		0, 0)) > 0) {
-		app->HandleMessage(code, data, size);
+	while ((size = read_port_etc(server->_ControlPort(), &code, data,
+			sizeof(data), 0, 0)) > 0) {
+		server->_HandleMessage(code, data, size);
 	}
 
-	return 0;
+	return B_OK;
 }
 
 
 void
-ServerApp::MessageReceived(BMessage *msg)
+ServerApp::MessageReceived(BMessage* msg)
 {
 	TRACE("ServerApp::MessageReceived %lx enter\n", msg->what);
 	switch (msg->what) {
@@ -980,8 +934,8 @@ ServerApp::MessageReceived(BMessage *msg)
 			gNotificationManager->EnqueueMessage(msg);
 			break;
 
-		case MMEDIAFILESMANAGER_SAVE_TIMER:
-			gMMediaFilesManager->TimerMessage();
+		case MEDIA_FILES_MANAGER_SAVE_TIMER:
+			gMediaFilesManager->TimerMessage();
 			break;
 
 		case MEDIA_SERVER_GET_FORMATS:
@@ -993,10 +947,10 @@ ServerApp::MessageReceived(BMessage *msg)
 			break;
 
 		case MEDIA_SERVER_ADD_SYSTEM_BEEP_EVENT:
-			gMMediaFilesManager->HandleAddSystemBeepEvent(msg);
+			gMediaFilesManager->HandleAddSystemBeepEvent(msg);
 			break;
 		default:
-			inherited::MessageReceived(msg);
+			BApplication::MessageReceived(msg);
 			printf("\nmedia_server: unknown message received:\n");
 			msg->PrintToStream();
 			break;

@@ -14,7 +14,7 @@ Server media_server :
 	BufferManager.cpp
 	DefaultManager.cpp
 	FormatManager.cpp
-	MMediaFilesManager.cpp
+	MediaFilesManager.cpp
 	NodeManager.cpp
 	NotificationManager.cpp
 	Queue.cpp
@@ -23,10 +23,10 @@ Server media_server :
 	AddOnMonitor.cpp
 	AddOnMonitorHandler.cpp
 	NodeMonitorHandler.cpp
-	
+
 	: be libmedia.so $(TARGET_LIBSTDC++)
 ;
 
-SEARCH on [ FGristFiles AddOnMonitor.cpp
-	AddOnMonitorHandler.cpp
-	NodeMonitorHandler.cpp ] += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits storage ] ;
+SEARCH on [ FGristFiles AddOnMonitor.cpp AddOnMonitorHandler.cpp
+		NodeMonitorHandler.cpp ]
+	+= [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits storage ] ;

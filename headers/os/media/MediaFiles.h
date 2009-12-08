@@ -40,9 +40,9 @@ public:
 	virtual	status_t			RemoveRefFor(const char* type,
 									const char* item, const entry_ref& ref);
 
-	static	const char			B_SOUNDS[];
-
 	virtual	status_t			RemoveItem(const char* type, const char* item);
+
+	static	const char			B_SOUNDS[];
 
 	// TODO: Needs Perform() for FBC reasons!
 
@@ -57,6 +57,9 @@ private:
 	virtual	status_t			_Reserved_MediaFiles_5(void*, ...);
 	virtual	status_t			_Reserved_MediaFiles_6(void*, ...);
 	virtual	status_t			_Reserved_MediaFiles_7(void*, ...);
+
+			void				_ClearTypes();
+			void				_ClearItems();
 
 private:
 			BList				fTypes;

@@ -50,7 +50,8 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request,
 struct request_data {
 	port_id					reply_port;
 
-	status_t SendReply(status_t result, reply_data *reply, int replysize) const;
+	status_t SendReply(status_t result, reply_data* reply,
+		size_t replySize) const;
 };
 
 // The base struct used for all raw replys
@@ -73,9 +74,15 @@ struct area_request_data : request_data {
 	area_id					area;
 };
 
+// The base struct used for all requests requesting an area
+struct request_area_data : request_data {
+	team_id					team;
+};
+
 // The base struct used for all replies using an area
 struct area_reply_data : reply_data {
 	area_id					area;
+	void*					address;
 };
 
 } // namespace dataexchange
@@ -128,12 +135,12 @@ enum {
 	SERVER_RESCAN_DEFAULTS,
 	SERVER_SET_NODE_CREATOR,
 	SERVER_CHANGE_ADDON_FLAVOR_INSTANCES_COUNT,
-	SERVER_REWINDTYPES,
-	SERVER_REWINDREFS,
-	SERVER_GETREFFOR,
-	SERVER_SETREFFOR,
-	SERVER_REMOVEREFFOR,
-	SERVER_REMOVEITEM,
+	SERVER_GET_MEDIA_FILE_TYPES,
+	SERVER_GET_MEDIA_FILE_ITEMS,
+	SERVER_GET_REF_FOR,
+	SERVER_SET_REF_FOR,
+	SERVER_REMOVE_REF_FOR,
+	SERVER_REMOVE_MEDIA_ITEM,
 	SERVER_GET_FORMAT_FOR_DESCRIPTION,
 	SERVER_GET_DESCRIPTION_FOR_FORMAT,
 	SERVER_GET_READERS,
@@ -760,54 +767,53 @@ struct server_unregister_buffer_command : command_data {
 	media_buffer_id			buffer_id;
 };
 
-struct server_rewindtypes_request : request_data {
+struct server_get_media_types_request : request_area_data {
 };
 
-struct server_rewindtypes_reply : area_reply_data {
+struct server_get_media_types_reply : area_reply_data {
 	int32					count;
 };
 
-struct server_rewindrefs_request : request_data {
+struct server_get_media_items_request : request_area_data {
 	char					type[B_MEDIA_NAME_LENGTH];
 };
 
-struct server_rewindrefs_reply : area_reply_data {
+struct server_get_media_items_reply : area_reply_data {
 	int32					count;
 };
 
-struct server_getreffor_request : request_data {
+struct server_get_ref_for_request : request_data {
 	char					type[B_MEDIA_NAME_LENGTH];
 	char					item[B_MEDIA_NAME_LENGTH];
 };
 
-struct server_getreffor_reply : reply_data {
+struct server_get_ref_for_reply : reply_data {
 	xfer_entry_ref			ref;
 };
 
-struct server_setreffor_request : request_data {
-	char					type[B_MEDIA_NAME_LENGTH];
-	char					item[B_MEDIA_NAME_LENGTH];
-	xfer_entry_ref			ref;
-};
-
-struct server_setreffor_reply : reply_data {
-};
-
-struct server_removereffor_request : request_data {
+struct server_set_ref_for_request : request_data {
 	char					type[B_MEDIA_NAME_LENGTH];
 	char					item[B_MEDIA_NAME_LENGTH];
 	xfer_entry_ref			ref;
 };
 
-struct server_removereffor_reply : reply_data {
+struct server_set_ref_for_reply : reply_data {
 };
 
-struct server_removeitem_request : request_data {
+struct server_remove_ref_for_request : request_data {
 	char					type[B_MEDIA_NAME_LENGTH];
 	char					item[B_MEDIA_NAME_LENGTH];
 };
 
-struct server_removeitem_reply : reply_data {
+struct server_remove_ref_for_reply : reply_data {
+};
+
+struct server_remove_media_item_request : request_data {
+	char					type[B_MEDIA_NAME_LENGTH];
+	char					item[B_MEDIA_NAME_LENGTH];
+};
+
+struct server_remove_media_item_reply : reply_data {
 };
 
 struct server_get_decoder_for_format_request : request_data {
