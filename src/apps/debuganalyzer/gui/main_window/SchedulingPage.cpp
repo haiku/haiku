@@ -881,15 +881,14 @@ private:
 class MainWindow::SchedulingPage::ViewPort : public BaseView,
 	private HeaderListener, private SchedulingView::Listener {
 public:
-	ViewPort(ThreadsView* threadsView, SchedulingView* schedulingView,
-		FontInfo& fontInfo)
+	ViewPort(HeaderView* headerView, ThreadsView* threadsView,
+		SchedulingView* schedulingView, FontInfo& fontInfo)
 		:
 		BaseView("viewport", fontInfo),
-		fHeaderView(NULL),
+		fHeaderView(headerView),
 		fThreadsView(threadsView),
 		fSchedulingView(schedulingView)
 	{
-		AddChild(fHeaderView = new HeaderView);
 		AddChild(threadsView);
 		AddChild(schedulingView);
 
@@ -912,18 +911,37 @@ public:
 
 	~ViewPort()
 	{
-		fHeaderView->Model()->HeaderAt(0)->RemoveListener(this);
-//		fHeaderView->Model()->HeaderAt(1)->RemoveListener(this);
 	}
 
-	void TargetedByScrollView(BScrollView* scrollView)
+	void RemoveListeners()
 	{
-		_UpdateScrollBars();
+		fHeaderView->Model()->HeaderAt(0)->RemoveListener(this);
+	}
+
+	void UpdateScrollBars()
+	{
+		float height = Frame().Height();
+		float dataHeight = std::max(height, fSchedulingView->MinSize().height);
+
+		fSchedulingView->UpdateScrollBar();
+
+		if (BScrollBar* scrollBar = ScrollBar(B_VERTICAL)) {
+			float range = dataHeight - height;
+			if (range > 0) {
+				scrollBar->SetRange(0, range);
+				scrollBar->SetProportion(
+					(height + 1) / (dataHeight + 1));
+				scrollBar->SetSteps(fFontInfo.lineHeight, height + 1);
+			} else {
+				scrollBar->SetRange(0, 0);
+				scrollBar->SetProportion(1);
+			}
+		}
 	}
 
 	virtual BSize MinSize()
 	{
-		return BSize(10, fHeaderView->MinSize().Height());
+		return BSize(10, 10);
 	}
 
 	virtual BSize MaxSize()
@@ -933,38 +951,27 @@ public:
 
 	BSize PreferredSize()
 	{
-		BSize headerViewSize(fHeaderView->PreferredSize());
 		BSize threadsViewSize(fThreadsView->PreferredSize());
 		BSize schedulingViewSize(fSchedulingView->PreferredSize());
-		BSize size(BLayoutUtils::AddDistances(
+		return BSize(BLayoutUtils::AddDistances(
 				threadsViewSize.width + kViewSeparationMargin,
 				schedulingViewSize.width),
 			std::max(threadsViewSize.height, schedulingViewSize.height));
-
-		return BSize(std::max(size.width, headerViewSize.width),
-			BLayoutUtils::AddDistances(size.height, headerViewSize.height));
 	}
 
 	void DoLayout()
 	{
-		float headerHeight = fHeaderView->MinSize().Height();
 		float width = Bounds().Width();
 		float height = fThreadsView->MinSize().Height();
 		float threadsViewWidth = fThreadsView->MinSize().width;
 		float schedulingViewLeft = threadsViewWidth + 1 + kViewSeparationMargin;
 		float schedulingViewWidth = width - schedulingViewLeft;
 
-		fHeaderView->MoveTo(0, 0);
-		fHeaderView->ResizeTo(width, headerHeight);
-
-		fThreadsView->MoveTo(0, headerHeight + 1);
+		fThreadsView->MoveTo(0, 0);
 		fThreadsView->ResizeTo(threadsViewWidth, height);
 
-		fSchedulingView->MoveTo(schedulingViewLeft, headerHeight + 1);
+		fSchedulingView->MoveTo(schedulingViewLeft, 0);
 		fSchedulingView->ResizeTo(schedulingViewWidth, height);
-
-//		if (Header* header = fHeaderView->Model()->HeaderAt(0)) {
-//		}
 
 		if (Header* header = fHeaderView->Model()->HeaderAt(1)) {
 			float headerWidth = schedulingViewWidth + 1 + kViewSeparationMargin;
@@ -974,7 +981,7 @@ public:
 			header->SetWidth(headerWidth);
 		}
 
-		_UpdateScrollBars();
+		UpdateScrollBars();
 	}
 
 private:
@@ -1006,27 +1013,6 @@ private:
 		}
 	}
 
-	void _UpdateScrollBars()
-	{
-		float height = Frame().Height();
-		float dataHeight = std::max(height, fSchedulingView->MinSize().height);
-
-		fSchedulingView->UpdateScrollBar();
-
-		if (BScrollBar* scrollBar = ScrollBar(B_VERTICAL)) {
-			float range = dataHeight - height;
-			if (range > 0) {
-				scrollBar->SetRange(0, range);
-				scrollBar->SetProportion(
-					(height + 1) / (dataHeight + 1));
-				scrollBar->SetSteps(fFontInfo.lineHeight, height + 1);
-			} else {
-				scrollBar->SetRange(0, 0);
-				scrollBar->SetProportion(1);
-			}
-		}
-	}
-
 private:
 	HeaderView*		fHeaderView;
 	ThreadsView*	fThreadsView;
@@ -1050,17 +1036,26 @@ MainWindow::SchedulingPage::SchedulingPage(MainWindow* parent)
 	fFontInfo.lineHeight = ceilf(fFontInfo.fontHeight.ascent)
 		+ ceilf(fFontInfo.fontHeight.descent);
 
-	fViewPort = new ViewPort(fThreadsView = new ThreadsView(fFontInfo),
-		fSchedulingView = new SchedulingView(fFontInfo), fFontInfo);
+	HeaderView* headerView = new HeaderView;
+	BView* scrollChild = BLayoutBuilder::Group<>(B_VERTICAL)
+		.Add(headerView)
+		.Add(fViewPort = new ViewPort(headerView,
+			fThreadsView = new ThreadsView(fFontInfo),
+			fSchedulingView = new SchedulingView(fFontInfo), fFontInfo))
+	;
 
-	AddChild(fScrollView = new BScrollView("scroll", fViewPort, 0, true, true));
+	AddChild(fScrollView = new BScrollView("scroll", scrollChild, 0, true,
+		true));
 
 	fScrollView->ScrollBar(B_HORIZONTAL)->SetTarget(fSchedulingView);
+	fScrollView->ScrollBar(B_VERTICAL)->SetTarget(fViewPort);
+	fViewPort->UpdateScrollBars();
 }
 
 
 MainWindow::SchedulingPage::~SchedulingPage()
 {
+	fViewPort->RemoveListeners();
 }
 
 
