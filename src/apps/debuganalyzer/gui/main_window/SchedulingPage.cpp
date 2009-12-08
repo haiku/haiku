@@ -302,7 +302,7 @@ public:
 
 	virtual BSize MaxSize()
 	{
-		return BSize(MinSize().width, B_SIZE_UNLIMITED);
+		return BSize(1000, B_SIZE_UNLIMITED);
 	}
 };
 
@@ -963,7 +963,15 @@ public:
 	{
 		float width = Bounds().Width();
 		float height = fThreadsView->MinSize().Height();
-		float threadsViewWidth = fThreadsView->MinSize().width;
+
+		float threadsViewWidth = 0;
+		if (fHeaderView->Model()->HeaderAt(0) != NULL)
+			threadsViewWidth = fHeaderView->HeaderFrame(0).Width();
+		threadsViewWidth = std::max(threadsViewWidth,
+			fThreadsView->MinSize().width);
+		threadsViewWidth = std::min(threadsViewWidth,
+			fThreadsView->MaxSize().width);
+
 		float schedulingViewLeft = threadsViewWidth + 1 + kViewSeparationMargin;
 		float schedulingViewWidth = width - schedulingViewLeft;
 
@@ -987,10 +995,8 @@ public:
 private:
 	virtual void HeaderWidthChanged(Header* header)
 	{
-		if (header->ModelIndex() != 0)
-			return;
-
-		// first column changed
+		if (header->ModelIndex() == 0)
+			InvalidateLayout();
 	}
 
 	virtual void DataWidthChanged()
