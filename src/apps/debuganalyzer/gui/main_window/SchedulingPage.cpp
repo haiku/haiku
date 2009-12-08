@@ -324,7 +324,7 @@ public:
 		BaseView("scheduling", fontInfo),
 		fStartTime(0),
 		fEndTime(0),
-		fUSecsPerPixel(1000),
+		fNSecsPerPixel(1000000),
 		fLastMousePos(-1, -1),
 		fListener(NULL)
 	{
@@ -375,7 +375,7 @@ public:
 	virtual BSize MinSize()
 	{
 		nanotime_t timeSpan = fModel != NULL ? fModel->LastEventTime() : 0;
-		float width = std::max(float(timeSpan / fUSecsPerPixel), 100.0f);
+		float width = std::max(float(timeSpan / fNSecsPerPixel), 100.0f);
 		return BSize(width, TotalHeight());
 	}
 
@@ -470,8 +470,8 @@ public:
 
 				SetHighColor(color);
 				BRect rect = LineRect(i);
-				rect.left = startTime / fUSecsPerPixel;
-				rect.right = endTime / fUSecsPerPixel - 1;
+				rect.left = startTime / fNSecsPerPixel;
+				rect.right = endTime / fNSecsPerPixel - 1;
 				FillRect(rect);
 			}
 		}
@@ -597,9 +597,9 @@ printf("failed to read event!\n");
 	{
 		if (fModel != NULL) {
 			float scrollOffset = _ScrollOffset();
-			_startTime = (nanotime_t)scrollOffset * fUSecsPerPixel;
+			_startTime = (nanotime_t)scrollOffset * fNSecsPerPixel;
 			_endTime = (nanotime_t)(scrollOffset + Bounds().Width() + 1)
-				* fUSecsPerPixel;
+				* fNSecsPerPixel;
 		} else {
 			_startTime = 0;
 			_endTime = 1;
@@ -620,7 +620,7 @@ printf("failed to read event!\n");
 
 		// compute the domain point where to zoom in
 		float scrollOffset = _ScrollOffset();
-		double timeForX = (scrollOffset + x) * fUSecsPerPixel;
+		double timeForX = (scrollOffset + x) * fNSecsPerPixel;
 
 		uint32 factor = 4;
 		if (steps < 0) {
@@ -628,23 +628,23 @@ printf("failed to read event!\n");
 			factor = 1;
 		}
 
-		uint32 oldUsecPerPixel = fUSecsPerPixel;
+		uint32 oldNsecPerPixel = fNSecsPerPixel;
 		for (; steps > 0; steps--)
-			fUSecsPerPixel = fUSecsPerPixel * factor / 2;
+			fNSecsPerPixel = fNSecsPerPixel * factor / 2;
 
-		if (fUSecsPerPixel < 1)
-			fUSecsPerPixel = 1;
-		else if (fUSecsPerPixel > 1000)
-			fUSecsPerPixel = 1000;
+		if (fNSecsPerPixel < 1)
+			fNSecsPerPixel = 1;
+		else if (fNSecsPerPixel > 1000000)
+			fNSecsPerPixel = 1000000;
 
-		if (fUSecsPerPixel == oldUsecPerPixel)
+		if (fNSecsPerPixel == oldNsecPerPixel)
 			return;
 
 		Invalidate();
 
 		UpdateScrollBar();
 		if (BScrollBar* scrollBar = ScrollBar(B_HORIZONTAL))
-			scrollBar->SetValue(timeForX / fUSecsPerPixel - x);
+			scrollBar->SetValue(timeForX / fNSecsPerPixel - x);
 
 		if (fListener != NULL) {
 			fListener->DataWidthChanged();
@@ -872,7 +872,7 @@ private:
 	SchedulingData			fSchedulingData;
 	nanotime_t				fStartTime;
 	nanotime_t				fEndTime;
-	uint32					fUSecsPerPixel;
+	uint32					fNSecsPerPixel;
 	BPoint					fLastMousePos;
 	Listener*				fListener;
 };
