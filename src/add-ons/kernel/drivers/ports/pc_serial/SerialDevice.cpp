@@ -334,7 +334,7 @@ SerialDevice::InterruptHandler()
 
 		switch (iir & (IIR_IMASK | IIR_TO)) {
 		case IIR_THRE:
-			dprintf("IIR_THRE\n");
+			TRACE(("IIR_THRE\n"));
 			// check how much fifo we can use
 			//XXX: move to Init() ?
 			if (iir & IIR_FMASK == IIR_FMASK)
@@ -354,19 +354,19 @@ SerialDevice::InterruptHandler()
 		case IIR_TO | IIR_RDA:
 			// timeout: FALLTHROUGH
 		case IIR_RDA:
-			dprintf("IIR_TO/RDA\n");
+			TRACE(("IIR_TO/RDA\n"));
 			// while data is ready... get it
 			while (ReadReg8(LSR) & LSR_DR)
 				gTTYModule->ttyin(&fTTY, &fRover, ReadReg8(RBR));
 			break;
 		case IIR_RLS:
-			dprintf("IIR_RLS\n");
+			TRACE(("IIR_RLS\n"));
 			// ack
 			lsr = ReadReg8(LSR);
 			//XXX: handle this somehow
 			break;
 		case IIR_MS:
-			dprintf("IIR_MS\n");
+			TRACE(("IIR_MS\n"));
 			// modem signals changed
 			msr = ReadReg8(MSR);
 			if (msr & MSR_DDCD)
@@ -379,12 +379,12 @@ SerialDevice::InterruptHandler()
 				gTTYModule->ttyhwsignal(&fTTY, &fRover, TTYHWRI, msr & MSR_RI);
 			break;
 		default:
-			dprintf("IIR_?\n");
+			TRACE(("IIR_?\n"));
 			// something happened
 			break;
 		}
 		ret = B_HANDLED_INTERRUPT;
-		dprintf("IRQ:h\n");
+		TRACE(("IRQ:h\n"));
 	}
 
 
@@ -916,7 +916,7 @@ SerialDevice::ReadReg8(int reg)
 		ret = 0;
 	//XXX:pcmcia ?
 	}
-	TRACE_ALWAYS("RR8(%d) = %d [%02x]\n", reg, ret, ret);
+	TRACE/*_ALWAYS*/("RR8(%d) = %d [%02x]\n", reg, ret, ret);
 	//spin(1000);
 	return ret;
 }
@@ -925,7 +925,7 @@ void
 SerialDevice::WriteReg8(int reg, uint8 value)
 {
 //	TRACE_ALWAYS("WR8(0x%04x+%d, %d [0x%x])\n", IOBase(), reg, value, value);
-	TRACE_ALWAYS("WR8(%d, %d [0x%x])\n", reg, value, value);
+	TRACE/*_ALWAYS*/("WR8(%d, %d [0x%x])\n", reg, value, value);
 	switch (fBus) {
 	case B_ISA_BUS:
 		gISAModule->write_io_8(IOBase() + reg, value);
