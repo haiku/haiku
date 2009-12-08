@@ -804,11 +804,11 @@ ServerApp::_HandleMessage(int32 code, void* data, size_t size)
 			break;
 		}
 
-		case SERVER_REMOVE_REF_FOR:
+		case SERVER_INVALIDATE_MEDIA_ITEM:
 		{
-			const server_remove_ref_for_request* request
-				= reinterpret_cast<const server_remove_ref_for_request*>(data);
-			server_remove_ref_for_reply reply;
+			const server_invalidate_item_request* request
+				= reinterpret_cast<const server_invalidate_item_request*>(data);
+			server_invalidate_item_reply reply;
 
 			status_t status = gMediaFilesManager->InvalidateItem(
 				request->type, request->item);
@@ -826,6 +826,32 @@ ServerApp::_HandleMessage(int32 code, void* data, size_t size)
 			status_t status = gMediaFilesManager->RemoveItem(request->type,
 				request->item);
 			request->SendReply(status, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_GET_ITEM_AUDIO_GAIN:
+		{
+			const server_get_item_audio_gain_request& request
+				= *reinterpret_cast<const server_get_item_audio_gain_request*>(
+					data);
+			server_get_item_audio_gain_reply reply;
+
+			status_t status = gMediaFilesManager->GetAudioGainFor(request.type,
+				request.item, &reply.gain);
+			request.SendReply(status, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_SET_ITEM_AUDIO_GAIN:
+		{
+			const server_set_item_audio_gain_request& request
+				= *reinterpret_cast<const server_set_item_audio_gain_request*>(
+					data);
+			server_set_ref_for_reply reply;
+
+			status_t status = gMediaFilesManager->SetAudioGainFor(request.type,
+				request.item, request.gain);
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 

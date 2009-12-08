@@ -139,8 +139,10 @@ enum {
 	SERVER_GET_MEDIA_FILE_ITEMS,
 	SERVER_GET_REF_FOR,
 	SERVER_SET_REF_FOR,
-	SERVER_REMOVE_REF_FOR,
+	SERVER_INVALIDATE_MEDIA_ITEM,
 	SERVER_REMOVE_MEDIA_ITEM,
+	SERVER_GET_ITEM_AUDIO_GAIN,
+	SERVER_SET_ITEM_AUDIO_GAIN,
 	SERVER_GET_FORMAT_FOR_DESCRIPTION,
 	SERVER_GET_DESCRIPTION_FOR_FORMAT,
 	SERVER_GET_READERS,
@@ -800,12 +802,12 @@ struct server_set_ref_for_request : request_data {
 struct server_set_ref_for_reply : reply_data {
 };
 
-struct server_remove_ref_for_request : request_data {
+struct server_invalidate_item_request : request_data {
 	char					type[B_MEDIA_NAME_LENGTH];
 	char					item[B_MEDIA_NAME_LENGTH];
 };
 
-struct server_remove_ref_for_reply : reply_data {
+struct server_invalidate_item_reply : reply_data {
 };
 
 struct server_remove_media_item_request : request_data {
@@ -814,6 +816,24 @@ struct server_remove_media_item_request : request_data {
 };
 
 struct server_remove_media_item_reply : reply_data {
+};
+
+struct server_get_item_audio_gain_request : request_data {
+	char					type[B_MEDIA_NAME_LENGTH];
+	char					item[B_MEDIA_NAME_LENGTH];
+};
+
+struct server_get_item_audio_gain_reply : reply_data {
+	float					gain;
+};
+
+struct server_set_item_audio_gain_request : request_data {
+	char					type[B_MEDIA_NAME_LENGTH];
+	char					item[B_MEDIA_NAME_LENGTH];
+	float					gain;
+};
+
+struct server_set_item_audio_gain_reply : reply_data {
 };
 
 struct server_get_decoder_for_format_request : request_data {

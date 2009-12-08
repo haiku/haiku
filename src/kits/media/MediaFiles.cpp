@@ -162,11 +162,26 @@ BMediaFiles::GetRefFor(const char* type, const char* item, entry_ref* _ref)
 
 
 status_t
-BMediaFiles::GetAudioGainFor(const char* type, const char* item,
-	float* _audioGain)
+BMediaFiles::GetAudioGainFor(const char* type, const char* item, float* _gain)
 {
-	UNIMPLEMENTED();
-	*_audioGain = 1.0f;
+	CALLED();
+
+	if (type == NULL || item == NULL || _gain == NULL)
+		return B_BAD_VALUE;
+
+	server_get_item_audio_gain_request request;
+	strncpy(request.type, type, B_MEDIA_NAME_LENGTH);
+	strncpy(request.item, item, B_MEDIA_NAME_LENGTH);
+
+	server_get_item_audio_gain_reply reply;
+	status_t status = QueryServer(SERVER_GET_ITEM_AUDIO_GAIN, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (status != B_OK) {
+		ERROR("BMediaFiles::GetRefFor: failed: %s\n", strerror(status));
+		return status;
+	}
+
+	*_gain = reply.gain;
 	return B_OK;
 }
 
@@ -195,10 +210,23 @@ BMediaFiles::SetRefFor(const char* type, const char* item,
 
 
 status_t
-BMediaFiles::SetAudioGainFor(const char* type, const char* item,
-	float audioGain)
+BMediaFiles::SetAudioGainFor(const char* type, const char* item, float gain)
 {
-	UNIMPLEMENTED();
+	CALLED();
+
+	server_set_item_audio_gain_request request;
+	strncpy(request.type, type, B_MEDIA_NAME_LENGTH);
+	strncpy(request.item, item, B_MEDIA_NAME_LENGTH);
+	request.gain = gain;
+
+	server_set_item_audio_gain_reply reply;
+	status_t status = QueryServer(SERVER_SET_ITEM_AUDIO_GAIN, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (status != B_OK) {
+		ERROR("BMediaFiles::SetAudioGainFor: failed: %s\n", strerror(status));
+		return status;
+	}
+
 	return B_OK;
 }
 
@@ -209,12 +237,12 @@ BMediaFiles::RemoveRefFor(const char* type, const char* item,
 {
 	CALLED();
 
-	server_remove_ref_for_request request;
+	server_invalidate_item_request request;
 	strncpy(request.type, type, B_MEDIA_NAME_LENGTH);
 	strncpy(request.item, item, B_MEDIA_NAME_LENGTH);
 
-	server_remove_ref_for_reply reply;
-	status_t status = QueryServer(SERVER_REMOVE_REF_FOR, &request,
+	server_invalidate_item_reply reply;
+	status_t status = QueryServer(SERVER_INVALIDATE_MEDIA_ITEM, &request,
 		sizeof(request), &reply, sizeof(reply));
 	if (status != B_OK) {
 		ERROR("BMediaFiles::RemoveRefFor: failed: %s\n", strerror(status));
