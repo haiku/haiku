@@ -27,99 +27,84 @@
  *
  */
 
-#include <OS.h>
-#include <Application.h>
-#include <Roster.h>
-#include <Messenger.h>
-#include <Autolock.h>
-#include <stdio.h>
-#include "debug.h"
-#include "MediaMisc.h"
+
 #include "AppManager.h"
-#include "NodeManager.h"
+
+#include <stdio.h>
+
+#include <Application.h>
+#include <Autolock.h>
+#include <OS.h>
+#include <Roster.h>
+
+#include <debug.h>
+#include <MediaMisc.h>
+
 #include "BufferManager.h"
-#include "NotificationManager.h"
 #include "media_server.h"
+#include "NodeManager.h"
+#include "NotificationManager.h"
+
 
 AppManager::AppManager()
+	:
+	BLocker("media app manager")
 {
-	fAppMap = new Map<team_id, App>;
-	fLocker = new BLocker("app manager locker");
 	fQuit = create_sem(0, "big brother waits");
-	fBigBrother = spawn_thread(bigbrother, "big brother is watching you", B_NORMAL_PRIORITY, this);
+	fBigBrother = spawn_thread(_BigBrotherEntry, "big brother is watching you",
+		B_NORMAL_PRIORITY, this);
 	resume_thread(fBigBrother);
 }
 
 
 AppManager::~AppManager()
 {
-	status_t err;
 	delete_sem(fQuit);
-	wait_for_thread(fBigBrother, &err);
-	delete fLocker;
-	delete fAppMap;
+	wait_for_thread(fBigBrother, NULL);
 }
 
 
 bool
 AppManager::HasTeam(team_id team)
 {
-	BAutolock lock(fLocker);
-	return fAppMap->Has(team);
+	BAutolock lock(this);
+	return fMap.find(team) != fMap.end();
 }
 
 
 status_t
-AppManager::RegisterTeam(team_id team, BMessenger messenger)
+AppManager::RegisterTeam(team_id team, const BMessenger& messenger)
 {
-	BAutolock lock(fLocker);
+	BAutolock lock(this);
+
 	TRACE("AppManager::RegisterTeam %ld\n", team);
 	if (HasTeam(team)) {
 		ERROR("AppManager::RegisterTeam: team %ld already registered\n", team);
 		return B_ERROR;
 	}
-	App app;
-	app.team = team;
-	app.messenger = messenger;
-	return fAppMap->Insert(team, app) ? B_OK : B_ERROR;
+
+	try {
+		fMap.insert(std::make_pair(team, messenger));
+	} catch (std::bad_alloc& exception) {
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
 }
 
 
 status_t
 AppManager::UnregisterTeam(team_id team)
 {
-	bool is_removed;
-	
 	TRACE("AppManager::UnregisterTeam %ld\n", team);
-	
-	fLocker->Lock();
-	is_removed = fAppMap->Remove(team);
-	fLocker->Unlock();
-	
-	CleanupTeam(team);
-	
-	return is_removed ? B_OK : B_ERROR;
-}
 
+	Lock();
+	bool isRemoved = fMap.erase(team) != 0;
+	Unlock();
 
-status_t
-AppManager::SendMessage(team_id team, BMessage *msg)
-{
-	BAutolock lock(fLocker);
-	App *app;
-	if (!fAppMap->Get(team, &app))
-		return B_ERROR;
-	return app->messenger.SendMessage(msg);
-}
+	_CleanupTeam(team);
 
-
-void
-AppManager::TeamDied(team_id team)
-{
-	CleanupTeam(team);
-	fLocker->Lock();
-	fAppMap->Remove(team);
-	fLocker->Unlock();
+	return isRemoved ? B_OK : B_ERROR;
 }
 
 
@@ -135,55 +120,44 @@ AppManager::AddonServerTeam()
 }
 
 
-//=========================================================================
-// The BigBrother thread send ping messages to the BMediaRoster of
-// all currently running teams. If the reply times out or is wrong,
-// the team cleanup function TeamDied() will be called.
-//=========================================================================
-
-int32
-AppManager::bigbrother(void *self)
+status_t
+AppManager::SendMessage(team_id team, BMessage* message)
 {
-	static_cast<AppManager *>(self)->BigBrother();
-	return 0;
+	BAutolock lock(this);
+
+	AppMap::iterator found = fMap.find(team);
+	if (found == fMap.end())
+		return B_NAME_NOT_FOUND;
+
+	return found->second.SendMessage(message);
 }
 
 
 void
-AppManager::BigBrother()
+AppManager::Dump()
 {
-	status_t status;
-	BMessage msg('PING');
-	BMessage reply;
-	team_id team;
-	App *app;
-	do {
-		if (!fLocker->Lock())
-			break;
-		for (fAppMap->Rewind(); fAppMap->GetNext(&app); ) {
-			reply.what = 0;
-			status = app->messenger.SendMessage(&msg, &reply, 5000000, 2000000);
-			if (status != B_OK || reply.what != 'PONG') {
-				team = app->team;
-				fLocker->Unlock();
-				TeamDied(team);
-				continue;
-			}
-		}
-		fLocker->Unlock();
-		status = acquire_sem_etc(fQuit, 1, B_RELATIVE_TIMEOUT, 2000000);
-	} while (status == B_TIMED_OUT || status == B_INTERRUPTED);
+	BAutolock lock(this);
+
+	printf("\n");
+	printf("AppManager: list of applications follows:\n");
+
+	app_info info;
+	AppMap::iterator iterator = fMap.begin();
+	for (; iterator != fMap.end(); iterator++) {
+		app_info info;
+		be_roster->GetRunningAppInfo(iterator->first, &info);
+		printf(" team %ld \"%s\", messenger %svalid\n", iterator->first,
+			info.ref.name, iterator->second.IsValid() ? "" : "NOT ");
+	}
+
+	printf("AppManager: list end\n");
 }
 
-//=========================================================================
-// The following functions must be called unlocked.
-// They clean up after a crash, or start/terminate the media_addon_server.
-//=========================================================================
 
 void
-AppManager::CleanupTeam(team_id team)
+AppManager::_CleanupTeam(team_id team)
 {
-	ASSERT(false == fLocker->IsLocked());
+	ASSERT(!IsLocked());
 
 	TRACE("AppManager: cleaning up team %ld\n", team);
 
@@ -194,16 +168,50 @@ AppManager::CleanupTeam(team_id team)
 
 
 void
-AppManager::Dump()
+AppManager::_TeamDied(team_id team)
 {
-	BAutolock lock(fLocker);
-	printf("\n");
-	printf("AppManager: list of applications follows:\n");
-	App *app;
-	app_info info;
-	for (fAppMap->Rewind(); fAppMap->GetNext(&app); ) {
-		be_roster->GetRunningAppInfo(app->team, &info);
-		printf(" team %ld \"%s\", messenger %svalid\n", app->team, info.ref.name, app->messenger.IsValid() ? "" : "NOT ");
-	}
-	printf("AppManager: list end\n");
+	UnregisterTeam(team);
+}
+
+
+status_t
+AppManager::_BigBrotherEntry(void* self)
+{
+	static_cast<AppManager*>(self)->_BigBrother();
+	return 0;
+}
+
+
+/*!	The BigBrother thread send ping messages to the BMediaRoster of
+	all currently running teams. If the reply times out or is wrong,
+	the team cleanup function _TeamDied() will be called.
+*/
+void
+AppManager::_BigBrother()
+{
+	status_t status;
+	BMessage ping('PING');
+	BMessage reply;
+
+	do {
+		if (!Lock())
+			break;
+
+		AppMap::iterator iterator = fMap.begin();
+		for (; iterator != fMap.end(); iterator++) {
+			reply.what = 0;
+			status = iterator->second.SendMessage(&ping, &reply, 5000000,
+				2000000);
+			if (status != B_OK || reply.what != 'PONG') {
+				team_id team = iterator->first;
+				Unlock();
+
+				_TeamDied(team);
+				continue;
+			}
+		}
+		Unlock();
+
+		status = acquire_sem_etc(fQuit, 1, B_RELATIVE_TIMEOUT, 2000000);
+	} while (status == B_TIMED_OUT || status == B_INTERRUPTED);
 }
