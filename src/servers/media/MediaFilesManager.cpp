@@ -1,5 +1,6 @@
 /*
  * Copyright 2003, Jérôme Duval. All rights reserved.
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -30,20 +31,30 @@ MediaFilesManager::MediaFilesManager()
 	fSaveTimerRunner(NULL)
 {
 	CALLED();
-	entry_ref ref;
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_BEEP, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_STARTUP, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_KEY_DOWN, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_KEY_REPEAT, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_KEY_UP, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_MOUSE_DOWN, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_MOUSE_UP, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_ACTIVATED, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_CLOSE, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_MINIMIZED, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_OPEN, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_RESTORED, ref, false);
-	SetRefFor(MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_ZOOMED, ref, false);
+
+	static const struct {
+		const char* type;
+		const char* item;
+	} kInitialItems[] = {
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_BEEP},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_STARTUP},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_KEY_DOWN},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_KEY_REPEAT},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_KEY_UP},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_MOUSE_DOWN},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_MOUSE_UP},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_ACTIVATED},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_CLOSE},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_MINIMIZED},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_OPEN},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_RESTORED},
+		{MEDIA_TYPE_SOUNDS, MEDIA_SOUNDS_WINDOW_ZOOMED}
+	};
+
+	for (size_t i = 0; i < sizeof(kInitialItems) / sizeof(kInitialItems[0]);
+			i++) {
+		_SetItem(kInitialItems[i].type, kInitialItems[i].item);
+	}
 
 	_LoadState();
 #if DEBUG >=3
@@ -69,23 +80,26 @@ MediaFilesManager::SaveState()
 	TypeMap::iterator iterator = fMap.begin();
 	for (; iterator != fMap.end(); iterator++) {
 		const BString& type = iterator->first;
-		FileMap& fileMap = iterator->second;
+		ItemMap& itemMap = iterator->second;
 
 		BMessage items;
 		status = items.AddString("type", type.String());
 		if (status != B_OK)
 			return status;
 
-		FileMap::iterator fileIterator = fileMap.begin();
-		for (; fileIterator != fileMap.end(); fileIterator++) {
-			const BString& item = fileIterator->first;
-			BPath path(&fileIterator->second);
+		ItemMap::iterator itemIterator = itemMap.begin();
+		for (; itemIterator != itemMap.end(); itemIterator++) {
+			const BString& item = itemIterator->first;
+			item_info& info = itemIterator->second;
 
 			status = items.AddString("item", item.String());
 			if (status == B_OK) {
+				BPath path(&info.ref);
 				status = items.AddString("path",
 					path.Path() ? path.Path() : "");
 			}
+			if (status == B_OK)
+				status = items.AddFloat("gain", info.gain);
 			if (status != B_OK)
 				return status;
 		}
@@ -115,16 +129,19 @@ MediaFilesManager::Dump()
 	TypeMap::iterator iterator = fMap.begin();
 	for (; iterator != fMap.end(); iterator++) {
 		const BString& type = iterator->first;
-		FileMap& fileMap = iterator->second;
+		ItemMap& itemMap = iterator->second;
 
-		FileMap::iterator fileIterator = fileMap.begin();
-		for (; fileIterator != fileMap.end(); fileIterator++) {
+		ItemMap::iterator fileIterator = itemMap.begin();
+		for (; fileIterator != itemMap.end(); fileIterator++) {
 			const BString& item = fileIterator->first;
-			BPath path(&fileIterator->second);
+			const item_info& info = fileIterator->second;
 
-			printf(" type \"%s\", item \"%s\", path \"%s\"\n",
+			BPath path(&info.ref);
+
+			printf(" type \"%s\", item \"%s\", path \"%s\", gain %g\n",
 				type.String(), item.String(),
-				path.InitCheck() == B_OK ? path.Path() : "INVALID");
+				path.InitCheck() == B_OK ? path.Path() : "INVALID",
+				info.gain);
 		}
 	}
 
@@ -178,8 +195,8 @@ MediaFilesManager::GetItemsArea(const char* type, int32& count)
 		return B_NAME_NOT_FOUND;
 	}
 
-	FileMap& fileMap = found->second;
-	count = fileMap.size();
+	ItemMap& itemMap = found->second;
+	count = itemMap.size();
 
 	size_t size = (count * B_MEDIA_NAME_LENGTH + B_PAGE_SIZE - 1)
 		& ~(B_PAGE_SIZE - 1);
@@ -194,8 +211,8 @@ MediaFilesManager::GetItemsArea(const char* type, int32& count)
 		return area;
 	}
 
-	FileMap::iterator iterator = fileMap.begin();
-	for (; iterator != fileMap.end();
+	ItemMap::iterator iterator = itemMap.begin();
+	for (; iterator != itemMap.end();
 			iterator++, start += B_MEDIA_NAME_LENGTH) {
 		const BString& item = iterator->first;
 		strncpy(start, item.String(), B_MEDIA_NAME_LENGTH);
@@ -212,59 +229,67 @@ MediaFilesManager::GetRefFor(const char* type, const char* item,
 	CALLED();
 	BAutolock _(this);
 
-	TypeMap::iterator found = fMap.find(BString(type));
-	if (found == fMap.end())
-		return B_NAME_NOT_FOUND;
+	item_info* info;
+	status_t status = _GetItem(type, item, info);
+	if (status == B_OK)
+		*_ref = &info->ref;
 
-	FileMap::iterator foundFile = found->second.find(item);
-	if (foundFile == found->second.end())
-		return B_NAME_NOT_FOUND;
-
-	*_ref = &foundFile->second;
-	return B_OK;
+	return status;
 }
 
 
 status_t
-MediaFilesManager::SetRefFor(const char* _type, const char* _item,
-	const entry_ref& ref, bool save)
+MediaFilesManager::GetAudioGainFor(const char* type, const char* item,
+	float* _gain)
 {
 	CALLED();
-	TRACE("MediaFilesManager::SetRefFor %s %s\n", _type, _item);
+	BAutolock _(this);
 
-	BString type(_type);
-	type.Truncate(B_MEDIA_NAME_LENGTH);
-	BString item(_item);
-	item.Truncate(B_MEDIA_NAME_LENGTH);
+	item_info* info;
+	status_t status = _GetItem(type, item, info);
+	if (status == B_OK)
+		*_gain = info->gain;
+
+	return status;
+}
+
+
+status_t
+MediaFilesManager::SetRefFor(const char* type, const char* item,
+	const entry_ref& ref)
+{
+	CALLED();
+	TRACE("MediaFilesManager::SetRefFor %s %s\n", type, item);
 
 	BAutolock _(this);
 
-	try {
-		TypeMap::iterator found = fMap.find(type);
-		if (found == fMap.end()) {
-			// add new type
-			FileMap fileMap;
-			// TODO: For some reason, this does not work:
-			//found = fMap.insert(TypeMap::value_type(type, fileMap));
-			fMap[type] = fileMap;
-			found = fMap.find(type);
-		}
-
-		FileMap& fileMap = found->second;
-		fileMap[item] = ref;
-	} catch (std::bad_alloc& exception) {
-		return B_NO_MEMORY;
-	}
-
-	if (save)
+	status_t status = _SetItem(type, item, &ref);
+	if (status == B_OK)
 		_LaunchTimer();
 
-	return B_OK;
+	return status;
 }
 
 
 status_t
-MediaFilesManager::InvalidateRefFor(const char* type, const char* item)
+MediaFilesManager::SetAudioGainFor(const char* type, const char* item,
+	float gain)
+{
+	CALLED();
+	TRACE("MediaFilesManager::SetAudioGainFor %s %s %g\n", type, item, gain);
+
+	BAutolock _(this);
+
+	status_t status = _SetItem(type, item, NULL, &gain);
+	if (status == B_OK)
+		_LaunchTimer();
+
+	return status;
+}
+
+
+status_t
+MediaFilesManager::InvalidateItem(const char* type, const char* item)
 {
 	CALLED();
 	BAutolock _(this);
@@ -273,10 +298,8 @@ MediaFilesManager::InvalidateRefFor(const char* type, const char* item)
 	if (found == fMap.end())
 		return B_NAME_NOT_FOUND;
 
-	FileMap& fileMap = found->second;
-
-	entry_ref emptyRef;
-	fileMap[item] = emptyRef;
+	ItemMap& itemMap = found->second;
+	itemMap[item] = item_info();
 
 	_LaunchTimer();
 	return B_OK;
@@ -343,6 +366,71 @@ MediaFilesManager::_LaunchTimer()
 }
 
 
+/*!	You need to have the manager locked when calling this method.
+*/
+status_t
+MediaFilesManager::_GetItem(const char* type, const char* item,
+	item_info*& info)
+{
+	ASSERT(IsLocked());
+
+	TypeMap::iterator found = fMap.find(type);
+	if (found == fMap.end())
+		return B_NAME_NOT_FOUND;
+
+	ItemMap::iterator foundFile = found->second.find(item);
+	if (foundFile == found->second.end())
+		return B_NAME_NOT_FOUND;
+
+	info = &foundFile->second;
+	return B_OK;
+}
+
+
+/*!	You need to have the manager locked when calling this method after
+	launch.
+*/
+status_t
+MediaFilesManager::_SetItem(const char* _type, const char* _item,
+	const entry_ref* ref, const float* gain)
+{
+	CALLED();
+	TRACE("MediaFilesManager::_SetItem(%s, %s)\n", _type, _item);
+
+	BString type(_type);
+	type.Truncate(B_MEDIA_NAME_LENGTH);
+	BString item(_item);
+	item.Truncate(B_MEDIA_NAME_LENGTH);
+
+	try {
+		TypeMap::iterator found = fMap.find(type);
+		if (found == fMap.end()) {
+			// add new type
+			ItemMap itemMap;
+			// TODO: For some reason, this does not work:
+			//found = fMap.insert(TypeMap::value_type(type, itemMap));
+			fMap[type] = itemMap;
+			found = fMap.find(type);
+		}
+
+		ItemMap& itemMap = found->second;
+		item_info info = itemMap[item];
+
+		// only update what we've got
+		if (gain != NULL)
+			info.gain = *gain;
+		if (ref != NULL)
+			info.ref = *ref;
+
+		itemMap[item] = info;
+	} catch (std::bad_alloc& exception) {
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
 status_t
 MediaFilesManager::_OpenSettingsFile(BFile& file, int mode)
 {
@@ -397,11 +485,15 @@ MediaFilesManager::_LoadState()
 			if (items.FindString("path", j, &path) != B_OK)
 				return B_BAD_DATA;
 
+			float gain;
+			if (items.FindFloat("gain", j, &gain) != B_OK)
+				gain = 1.0f;
+
 			entry_ref ref;
 			get_ref_for_path(path, &ref);
 				// it's okay for this to fail
 
-			SetRefFor(type, item, ref, false);
+			_SetItem(type, item, &ref, &gain);
 		}
 	}
 

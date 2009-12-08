@@ -32,9 +32,13 @@ public:
 
 			status_t			GetRefFor(const char* type, const char* item,
 									entry_ref** _ref);
+			status_t			GetAudioGainFor(const char* type,
+									const char* item, float* _gain);
 			status_t			SetRefFor(const char* type, const char* item,
-									const entry_ref& ref, bool save = true);
-			status_t			InvalidateRefFor(const char* type,
+									const entry_ref& ref);
+			status_t			SetAudioGainFor(const char* type,
+									const char* item, float gain);
+			status_t			InvalidateItem(const char* type,
 									const char* item);
 			status_t			RemoveItem(const char* type, const char* item);
 
@@ -43,14 +47,25 @@ public:
 			void				HandleAddSystemBeepEvent(BMessage* message);
 
 private:
+			struct item_info {
+				item_info() : gain(1.0f) {}
+
+				entry_ref		ref;
+				float			gain;
+			};
+
 			void				_LaunchTimer();
+			status_t			_GetItem(const char* type, const char* item,
+									item_info*& info);
+			status_t			_SetItem(const char* type, const char* item,
+									const entry_ref* ref = NULL,
+									const float* gain = NULL);
 			status_t			_OpenSettingsFile(BFile& file, int mode);
 			status_t			_LoadState();
 
 private:
-			// for each type, the map contains a map of item/entry_ref
-			typedef std::map<BString, entry_ref> FileMap;
-			typedef std::map<BString, FileMap> TypeMap;
+			typedef std::map<BString, item_info> ItemMap;
+			typedef std::map<BString, ItemMap> TypeMap;
 
 			TypeMap				fMap;
 			BMessageRunner*		fSaveTimerRunner;

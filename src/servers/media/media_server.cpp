@@ -810,7 +810,7 @@ ServerApp::_HandleMessage(int32 code, void* data, size_t size)
 				= reinterpret_cast<const server_remove_ref_for_request*>(data);
 			server_remove_ref_for_reply reply;
 
-			status_t status = gMediaFilesManager->InvalidateRefFor(
+			status_t status = gMediaFilesManager->InvalidateItem(
 				request->type, request->item);
 			request->SendReply(status, &reply, sizeof(reply));
 			break;
