@@ -49,6 +49,7 @@ private:
 			ThreadsView*		fThreadsView;
 			SchedulingView*		fSchedulingView;
 			FontInfo			fFontInfo;
+			ListSelectionModel	fFilterModel;
 			ListSelectionModel	fSelectionModel;
 };
 

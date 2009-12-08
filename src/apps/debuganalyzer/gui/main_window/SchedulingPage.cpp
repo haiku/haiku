@@ -13,6 +13,8 @@
 
 #include <LayoutBuilder.h>
 #include <LayoutUtils.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
 #include <ScrollView.h>
 #include <SplitView.h>
 
@@ -31,6 +33,12 @@
 
 static const float kThreadNameMargin = 3.0f;
 static const float kViewSeparationMargin = 1.0f;
+
+
+enum {
+	MSG_SCHEDULING_FILTER			= 'schf',
+	MSG_SCHEDULING_RESET_FILTER		= 'schr'
+};
 
 
 struct MainWindow::SchedulingPage::SchedulingEvent {
@@ -223,10 +231,12 @@ private:
 
 class MainWindow::SchedulingPage::BaseView : public BView {
 public:
-	BaseView(const char* name, FontInfo& fontInfo, uint32 flags = 0)
+	BaseView(const char* name, FontInfo& fontInfo,
+		ListSelectionModel* filterModel, uint32 flags = 0)
 		:
 		BView(name, flags),
 		fModel(NULL),
+		fFilterModel(filterModel),
 		fFontInfo(fontInfo)
 	{
 	}
@@ -241,7 +251,7 @@ public:
 protected:
 	int32 CountLines() const
 	{
-		return fModel != NULL ? fModel->CountThreads() : 0;
+		return fFilterModel->CountSelectedItems();
 	}
 
 	float TotalHeight() const
@@ -271,8 +281,9 @@ protected:
 	}
 
 protected:
-	Model*		fModel;
-	FontInfo&	fFontInfo;
+	Model*				fModel;
+	ListSelectionModel*	fFilterModel;
+	FontInfo&			fFontInfo;
 };
 
 
@@ -280,21 +291,71 @@ class MainWindow::SchedulingPage::LineBaseView : public BaseView,
 	protected ListSelectionModel::Listener {
 public:
 	LineBaseView(const char* name, FontInfo& fontInfo,
-		ListSelectionModel* selectionModel)
+		ListSelectionModel* filterModel, ListSelectionModel* selectionModel)
 		:
-		BaseView(name, fontInfo, B_WILL_DRAW),
+		BaseView(name, fontInfo, filterModel, B_WILL_DRAW),
 		fSelectionModel(selectionModel),
 		fTextColor(ui_color(B_DOCUMENT_TEXT_COLOR)),
 		fSelectedTextColor(fTextColor),
 		fBackgroundColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR)),
 		fSelectedBackgroundColor(tint_color(fBackgroundColor, B_DARKEN_2_TINT))
 	{
+		fFilterModel->AddListener(this);
 		fSelectionModel->AddListener(this);
 	}
 
 	void RemoveListeners()
 	{
 		fSelectionModel->RemoveListener(this);
+		fFilterModel->RemoveListener(this);
+	}
+
+	virtual void MessageReceived(BMessage* message)
+	{
+		switch (message->what) {
+			case MSG_SCHEDULING_FILTER:
+			{
+				int32 threadCount = fModel->CountThreads();
+				int32 selectedCount = fSelectionModel->CountSelectedItems();
+				if (selectedCount == 0 || selectedCount == threadCount)
+					break;
+
+				// Set the filter model to the selected items.
+				// There might already be a filter applied, so we have to
+				// build the new filter model manually.
+				ListSelectionModel tempModel;
+				for (int32 i = 0; i < selectedCount; i++) {
+					int32 index = fFilterModel->SelectedItemAt(
+						fSelectionModel->SelectedItemAt(i));
+					if (index >= 0)
+						tempModel.SelectItem(index, true);
+				}
+
+				fSelectionModel->Clear();
+				*fFilterModel = tempModel;
+				Invalidate();
+				break;
+			}
+
+			case MSG_SCHEDULING_RESET_FILTER:
+			{
+				int32 threadCount = fModel->CountThreads();
+				if (fFilterModel->CountSelectedItems() == threadCount)
+					break;
+
+				// unset the filter
+				ListSelectionModel tempModel = *fFilterModel;
+				fSelectionModel->Clear();
+				fFilterModel->SelectItems(0, threadCount, false);
+				*fSelectionModel = tempModel;
+				Invalidate();
+				break;
+			}
+
+			default:
+				BaseView::MessageReceived(message);
+				break;
+		}
 	}
 
 	virtual void MouseDown(BPoint where)
@@ -312,6 +373,7 @@ public:
 		if (message->FindInt32("modifiers", &modifiers) != B_OK)
 			modifiers = 0;
 
+		// update selection
 		int32 line = LineAt(where);
 		if (line >= 0) {
 			if ((modifiers & B_SHIFT_KEY) != 0) {
@@ -337,18 +399,49 @@ public:
 			}
 		} else
 			fSelectionModel->Clear();
+
+		// on right mouse button open context menu
+		if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0 && fModel != NULL) {
+			BPopUpMenu* contextMenu = new BPopUpMenu("scheduling context menu",
+				false, false);
+
+			BMenuItem* item = new BMenuItem("Filter",
+				new BMessage(MSG_SCHEDULING_FILTER));
+			contextMenu->AddItem(item);
+			item->SetTarget(this);
+			if (fSelectionModel->CountSelectedItems() == 0)
+				item->SetEnabled(false);
+
+			item = new BMenuItem("Reset Filter",
+				new BMessage(MSG_SCHEDULING_RESET_FILTER));
+			contextMenu->AddItem(item);
+			item->SetTarget(this);
+			if (fFilterModel->CountSelectedItems() == fModel->CountThreads())
+				item->SetEnabled(false);
+
+			BPoint screenWhere = ConvertToScreen(where);
+			BRect mouseRect(screenWhere, screenWhere);
+			mouseRect.InsetBy(-4.0, -4.0);
+			contextMenu->Go(screenWhere, true, false, mouseRect, true);
+		}
 	}
 
 	virtual void ItemsSelected(ListSelectionModel* model, int32 index,
 		int32 count)
 	{
-		InvalidateLines(index, count);
+		if (model == fFilterModel)
+			Invalidate();
+		else
+			InvalidateLines(index, count);
 	}
 
 	virtual void ItemsDeselected(ListSelectionModel* model, int32 index,
 		int32 count)
 	{
-		InvalidateLines(index, count);
+		if (model == fFilterModel)
+			Invalidate();
+		else
+			InvalidateLines(index, count);
 	}
 
 	void InvalidateLines(int32 index, int32 count)
@@ -370,9 +463,10 @@ protected:
 
 class MainWindow::SchedulingPage::ThreadsView : public LineBaseView {
 public:
-	ThreadsView(FontInfo& fontInfo, ListSelectionModel* selectionModel)
+	ThreadsView(FontInfo& fontInfo, ListSelectionModel* filterModel,
+		ListSelectionModel* selectionModel)
 		:
-		LineBaseView("threads", fontInfo, selectionModel)
+		LineBaseView("threads", fontInfo, filterModel, selectionModel)
 	{
 		SetViewColor(B_TRANSPARENT_32_BIT);
 	}
@@ -402,10 +496,14 @@ public:
 			}
 			FillRect(lineRect, B_SOLID_LOW);
 
+			Model::Thread* thread = fModel->ThreadAt(
+				fFilterModel->SelectedItemAt(i));
+			if (thread == NULL)
+				continue;
+
 			// draw the string
 			float y = lineRect.bottom - fFontInfo.fontHeight.descent + 1;
-			DrawString(fModel->ThreadAt(i)->Name(),
-				BPoint(kThreadNameMargin, y));
+			DrawString(thread->Name(), BPoint(kThreadNameMargin, y));
 		}
 
 		BRect bounds(Bounds());
@@ -449,9 +547,10 @@ private:
 	};
 
 public:
-	SchedulingView(FontInfo& fontInfo, ListSelectionModel* selectionModel)
+	SchedulingView(FontInfo& fontInfo, ListSelectionModel* filterModel,
+		ListSelectionModel* selectionModel)
 		:
-		LineBaseView("scheduling", fontInfo, selectionModel),
+		LineBaseView("scheduling", fontInfo, filterModel, selectionModel),
 		fStartTime(0),
 		fEndTime(0),
 		fNSecsPerPixel(1000000),
@@ -557,7 +656,7 @@ public:
 			}
 		}
 
-		BView::MessageReceived(message);
+		LineBaseView::MessageReceived(message);
 	}
 
 	void MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
@@ -579,9 +678,12 @@ public:
 		_UpdateData();
 
 		// draw the events
-// TODO: Draw only the threads currently visible.
-		int32 threadCount = fModel->CountThreads();
-		for (int32 i = 0; i < threadCount; i++) {
+
+		// get the lines intersecting with the update rect
+		int32 minLine, maxLine;
+		GetLineRange(updateRect, minLine, maxLine);
+
+		for (int32 i = minLine; i <= maxLine; i++) {
 			// draw the background
 			const rgb_color* activityColors;
 			if (fSelectionModel->IsItemSelected(i)) {
@@ -591,9 +693,14 @@ public:
 				activityColors = fActivityColors;
 				SetLowColor(fBackgroundColor);
 			}
-			FillRect(LineRect(i), B_SOLID_LOW);
+			BRect lineRect = LineRect(i);
+			FillRect(lineRect, B_SOLID_LOW);
 
-			Model::Thread* thread = fModel->ThreadAt(i);
+			Model::Thread* thread = fModel->ThreadAt(
+				fFilterModel->SelectedItemAt(i));
+			if (thread == NULL)
+				continue;
+
 			const Array<SchedulingEvent>& events
 				= fSchedulingData.EventsForThread(thread->Index());
 
@@ -622,7 +729,7 @@ public:
 						continue;
 				}
 
-				BRect rect = LineRect(i);
+				BRect rect = lineRect;
 				rect.left = startTime / fNSecsPerPixel;
 				rect.right = endTime / fNSecsPerPixel - 1;
 				FillRect(rect);
@@ -1038,9 +1145,10 @@ class MainWindow::SchedulingPage::ViewPort : public BaseView,
 	private HeaderListener, private SchedulingView::Listener {
 public:
 	ViewPort(HeaderView* headerView, ThreadsView* threadsView,
-		SchedulingView* schedulingView, FontInfo& fontInfo)
+		SchedulingView* schedulingView, FontInfo& fontInfo,
+		ListSelectionModel* filterModel)
 		:
-		BaseView("viewport", fontInfo),
+		BaseView("viewport", fontInfo, filterModel),
 		fHeaderView(headerView),
 		fThreadsView(threadsView),
 		fSchedulingView(schedulingView)
@@ -1191,6 +1299,7 @@ MainWindow::SchedulingPage::SchedulingPage(MainWindow* parent)
 	fViewPort(NULL),
 	fThreadsView(NULL),
 	fSchedulingView(NULL),
+	fFilterModel(),
 	fSelectionModel()
 {
 	SetName("Scheduling");
@@ -1203,9 +1312,11 @@ MainWindow::SchedulingPage::SchedulingPage(MainWindow* parent)
 	BView* scrollChild = BLayoutBuilder::Group<>(B_VERTICAL)
 		.Add(headerView)
 		.Add(fViewPort = new ViewPort(headerView,
-			fThreadsView = new ThreadsView(fFontInfo, &fSelectionModel),
-			fSchedulingView = new SchedulingView(fFontInfo, &fSelectionModel),
-			fFontInfo))
+			fThreadsView = new ThreadsView(fFontInfo, &fFilterModel,
+				&fSelectionModel),
+			fSchedulingView = new SchedulingView(fFontInfo, &fFilterModel,
+				&fSelectionModel),
+			fFontInfo, &fFilterModel))
 	;
 
 	AddChild(fScrollView = new BScrollView("scroll", scrollChild, 0, true,
@@ -1232,6 +1343,7 @@ MainWindow::SchedulingPage::SetModel(Model* model)
 		return;
 
 	fSelectionModel.Clear();
+	fFilterModel.Clear();
 
 	if (fModel != NULL) {
 	}
@@ -1239,6 +1351,7 @@ MainWindow::SchedulingPage::SetModel(Model* model)
 	fModel = model;
 
 	if (fModel != NULL) {
+		fFilterModel.SelectItems(0, fModel->CountThreads(), false);
 	}
 
 	fViewPort->SetModel(fModel);
