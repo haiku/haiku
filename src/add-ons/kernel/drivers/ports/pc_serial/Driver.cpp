@@ -7,6 +7,7 @@
  */
 #include <KernelExport.h>
 #include <Drivers.h>
+#include <image.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +22,8 @@ char *gDeviceNames[DEVICES_COUNT + 1];
 config_manager_for_driver_module_info *gConfigManagerModule = NULL;
 isa_module_info *gISAModule = NULL;
 pci_module_info *gPCIModule = NULL;
-tty_module_info *gTTYModule = NULL;
+//XXX: ifndef __HAIKU__
+tty_module_info_v1_bone *gTTYModule = NULL;
 struct ddomain gSerialDomain;
 sem_id gDriverLock = -1;
 bool gHandleISA = false;
@@ -236,7 +238,7 @@ scan_bus(bus_type bus)
 {
 	const char *bus_name = "Unknown";
 	uint64 cookie = 0;
-	status_t status;
+	//status_t status;
 	struct {
 		device_info di;
 		pci_info pi;
@@ -342,7 +344,7 @@ scan_bus(bus_type bus)
 			resource_descriptor res[16];
 		} config;
 		if (gConfigManagerModule->get_size_of_current_configuration_for(
-			cookie) > sizeof(config)) {
+			cookie) > (int)sizeof(config)) {
 			TRACE_ALWAYS("config size too big for device\n");
 			continue;
 		}
@@ -450,6 +452,7 @@ next_split:
 #endif
 		}
 	}
+	return B_OK;
 }
 
 // this version doesn't use config_manager, but can't probe the IRQ yet
@@ -541,6 +544,52 @@ init_driver()
 	if (status < B_OK)
 		goto err_tty;
 
+#ifndef __HAIKU__
+	// due to BONE having a different function count and ordering,
+	// but the same version, to avoid crashing we detect it at runtime.
+	{
+		static tty_module_info_v1_bone sTTYModuleBONE;
+		static tty_module_info_v1_r5 *ttyModuleR5 =
+			(tty_module_info_v1_r5 *)gTTYModule;
+		image_info info;
+		int32 cookie = 0;
+		while (get_next_image_info(/*B_KERNEL_TEAM*/1, &cookie, &info) == B_OK) {
+			//dprintf(DRIVER_NAME ": checking image %32s\n", info.name);
+			if ((char *)(gTTYModule->ttyopen) >= (char *)info.text
+				&& (char *)(gTTYModule->ttyopen) < ((char *)info.text + info.text_size)) {
+				void *symbol;
+				dprintf(DRIVER_NAME ": detected tty module %32s\n", info.name);
+				if (get_image_symbol(info.id, "ttydeselect",
+					B_SYMBOL_TYPE_ANY, &symbol) != B_OK) {
+					dprintf(DRIVER_NAME ": no ttydeselect() in tty module, assuming R5\n");
+					// let's fake a BONE module with NULL select hooks
+					memcpy(&sTTYModuleBONE.mi, &ttyModuleR5->mi, sizeof(ttyModuleR5->mi));
+					sTTYModuleBONE.ttyopen = ttyModuleR5->ttyopen;
+					sTTYModuleBONE.ttyclose = ttyModuleR5->ttyclose;
+					sTTYModuleBONE.ttyfree = ttyModuleR5->ttyfree;
+					sTTYModuleBONE.ttyread = ttyModuleR5->ttyread;
+					sTTYModuleBONE.ttywrite = ttyModuleR5->ttywrite;
+					sTTYModuleBONE.ttycontrol = ttyModuleR5->ttycontrol;
+					sTTYModuleBONE.ttyinit = ttyModuleR5->ttyinit;
+					sTTYModuleBONE.ttyilock = ttyModuleR5->ttyilock;
+					sTTYModuleBONE.ttyhwsignal = ttyModuleR5->ttyhwsignal;
+					sTTYModuleBONE.ttyin = ttyModuleR5->ttyin;
+					sTTYModuleBONE.ttyout = ttyModuleR5->ttyout;
+					sTTYModuleBONE.ddrstart = ttyModuleR5->ddrstart;
+					sTTYModuleBONE.ddrdone = ttyModuleR5->ddrdone;
+					sTTYModuleBONE.ddacquire = ttyModuleR5->ddacquire;
+					// no select hooks
+					sTTYModuleBONE.ttyselect = NULL;
+					sTTYModuleBONE.ttydeselect = NULL;
+
+					gTTYModule = &sTTYModuleBONE;
+				}
+				break;
+			}
+		}
+	}
+#endif
+
 	status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCIModule);
 	if (status < B_OK)
 		goto err_pci;
@@ -582,7 +631,7 @@ init_driver()
 	TRACE_FUNCRET("< init_driver() returns\n");
 	return B_OK;
 
-err_none:
+//err_none:
 	delete_sem(gDriverLock);
 err_sem:
 	put_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME);
