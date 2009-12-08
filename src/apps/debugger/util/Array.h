@@ -5,9 +5,12 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <OS.h>
 
 
 template<typename Element>
@@ -25,7 +28,8 @@ public:
 	inline	bool				Add(const Element& element);
 	inline	bool				AddUninitialized(int elementCount);
 	inline	bool				Insert(const Element& element, int index);
-	inline	bool				Remove(int index);
+	inline	bool				InsertUninitialized(int index, int count);
+	inline	bool				Remove(int index, int count = 1);
 
 			void				Clear();
 	inline	void				MakeEmpty();
@@ -82,10 +86,8 @@ template<typename Element>
 bool
 Array<Element>::Add(const Element& element)
 {
-	if (fSize == fCapacity) {
-		if (!_Resize(fSize, 1))
-			return false;
-	}
+	if (!_Resize(fSize, 1))
+		return false;
 
 	fElements[fSize] = element;
 	fSize++;
@@ -94,19 +96,10 @@ Array<Element>::Add(const Element& element)
 
 
 template<typename Element>
-bool
+inline bool
 Array<Element>::AddUninitialized(int elementCount)
 {
-	if (elementCount < 0)
-		return false;
-
-	if (fSize + elementCount > fCapacity) {
-		if (!_Resize(fSize, elementCount))
-			return false;
-	}
-
-	fSize += elementCount;
-	return true;
+	return InsertUninitialized(fSize, elementCount);
 }
 
 
@@ -117,13 +110,8 @@ Array<Element>::Insert(const Element& element, int index)
 	if (index < 0 || index > fSize)
 		index = fSize;
 
-	if (fSize == fCapacity) {
-		if (!_Resize(index, 1))
-			return false;
-	} else if (index < fSize) {
-		memmove(fElements + index + 1, fElements + index,
-			sizeof(Element) * (fSize - index));
-	}
+	if (!_Resize(index, 1))
+		return false;
 
 	fElements[index] = element;
 	fSize++;
@@ -133,23 +121,45 @@ Array<Element>::Insert(const Element& element, int index)
 
 template<typename Element>
 bool
-Array<Element>::Remove(int index)
+Array<Element>::InsertUninitialized(int index, int count)
 {
-	if (index < 0 || index >= fSize) {
+	if (index < 0 || index > fSize || count < 0)
+		return false;
+	if (count == 0)
+		return true;
+
+	if (!_Resize(index, count))
+		return false;
+
+	fSize += count;
+	return true;
+}
+
+
+template<typename Element>
+bool
+Array<Element>::Remove(int index, int count)
+{
+	if (index < 0 || count < 0 || index + count > fSize) {
+#if DEBUG
 		char buffer[128];
-		snprintf(buffer, sizeof(buffer), "Array::Remove(): index: %d, size: %d",
-			index, fSize);
+		snprintf(buffer, sizeof(buffer), "Array::Remove(): index: %d, "
+			"count: %d, size: %d", index, count, fSize);
+		debugger(buffer);
+#endif
 		return false;
 	}
+	if (count == 0)
+		return true;
 
-	if (fSize <= fCapacity / 2 && fCapacity > kMinCapacity) {
-		_Resize(index, -1);
-	} else if (index < fSize) {
-		memmove(fElements + index, fElements + index + 1,
-			sizeof(Element) * (fSize - index - 1));
+	if (index + count < fSize) {
+		memmove(fElements + index, fElements + index + count,
+			sizeof(Element) * (fSize - index - count));
 	}
 
-	fSize--;
+	_Resize(index, -count);
+
+	fSize -= count;
 	return true;
 }
 
@@ -234,8 +244,22 @@ Array<Element>::_Resize(int index, int delta)
 	while (newCapacity < newSize)
 		newCapacity *= 2;
 
-	if (newCapacity == fCapacity)
+	if (newCapacity == fCapacity) {
+		// the capacity doesn't change -- still make room for/remove elements
+		if (index < fSize) {
+			if (delta > 0) {
+				// leave a gap of delta elements
+				memmove(fElements + index + delta, fElements + index,
+					(fSize - index) * sizeof(Element));
+			} else if (index < fSize + delta) {
+				// drop -delta elements
+				memcpy(fElements + index, fElements + index - delta,
+					(fSize - index + delta) * sizeof(Element));
+			}
+		}
+
 		return true;
+	}
 
 	// allocate new array
 	Element* elements = (Element*)malloc(newCapacity * sizeof(Element));
