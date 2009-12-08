@@ -13,6 +13,7 @@ MergeObject DebugAnalyzer_gui.o
 	AbstractGeneralPage.cpp
 	ColorCheckBox.cpp
 	HeaderView.cpp
+	ListSelectionModel.cpp
 	SubWindow.cpp
 	SubWindowManager.cpp
 	:
