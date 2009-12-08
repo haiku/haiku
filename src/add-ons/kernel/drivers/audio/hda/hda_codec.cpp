@@ -22,6 +22,7 @@
 #define ERROR(a...) dprintf(a)
 
 #define HDA_ALL 0xffffffff
+#define HDA_QUIRK_GPIO_COUNT	8
 #define HDA_QUIRK_GPIO0		(1 << 0)
 #define HDA_QUIRK_GPIO1		(1 << 1)
 #define HDA_QUIRK_GPIO2		(1 << 2)
@@ -988,7 +989,7 @@ TRACE("build tree!\n");
 	
 	// GPIO
 	uint32 gpio = 0;
-	for (int32 i = 0; i < GPIO_COUNT_NUM_GPIO(audioGroup->gpio); i++) {
+	for (int32 i = 0; i < HDA_QUIRK_GPIO_COUNT; i++) {
 		if (audioGroup->codec->quirks & (1 << i)) {
 			gpio |= (1 << i);
 		}
