@@ -4731,7 +4731,7 @@ resize_area(area_id areaID, size_t newSize)
 
 
 /*!	Transfers the specified area to a new team. The caller must be the owner
-	of the area (not yet enforced but probably should be).
+	of the area.
 */
 area_id
 transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
@@ -4742,6 +4742,9 @@ transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 	if (status != B_OK)
 		return status;
 
+	if (info.team != thread_get_current_thread()->team->id)
+		return B_PERMISSION_DENIED;
+		
 	area_id clonedArea = vm_clone_area(target, info.name, _address,
 		addressSpec, info.protection, REGION_NO_PRIVATE_MAP, id, kernel);
 	if (clonedArea < 0)
