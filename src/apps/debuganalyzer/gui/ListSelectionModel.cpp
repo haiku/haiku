@@ -11,9 +11,13 @@
 
 
 ListSelectionModel::ListSelectionModel()
-	:
-	fItemCount(0)
 {
+}
+
+
+ListSelectionModel::ListSelectionModel(const ListSelectionModel& other)
+{
+	*this = other;
 }
 
 
@@ -145,6 +149,24 @@ void
 ListSelectionModel::RemoveListener(Listener* listener)
 {
 	fListeners.RemoveItem(listener);
+}
+
+
+ListSelectionModel&
+ListSelectionModel::operator=(const ListSelectionModel& other)
+{
+	Clear();
+
+	fSelectedItems = other.fSelectedItems;
+
+	int32 selectedCount = CountSelectedItems();
+	if (selectedCount > 0) {
+		int32 firstSelected = fSelectedItems[0];
+		int32 lastSelected = fSelectedItems[selectedCount - 1];
+		_NotifyItemsDeselected(firstSelected, lastSelected - firstSelected + 1);
+	}
+
+	return *this;
 }
 
 

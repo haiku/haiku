@@ -19,6 +19,8 @@ public:
 
 public:
 								ListSelectionModel();
+								ListSelectionModel(
+									const ListSelectionModel& other);
 								~ListSelectionModel();
 
 			int32				CountSelectedItems() const
@@ -40,6 +42,8 @@ public:
 			bool				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);
 
+			ListSelectionModel&	operator=(const ListSelectionModel& other);
+
 private:
 			typedef BObjectList<Listener> ListenerList;
 
@@ -53,7 +57,6 @@ private:
 									int32 count);
 
 private:
-			int32				fItemCount;
 			Array<int32>		fSelectedItems;
 			ListenerList		fListeners;
 };
