@@ -944,7 +944,6 @@ HeaderView::HeaderAdded(HeaderModel* model, int32 index)
 	if (Header* header = fModel->HeaderAt(index)) {
 		HeaderEntry* entry = new(std::nothrow) HeaderEntry(
 			fModel->HeaderAt(index));
-printf("HeaderView::HeaderAdded(%p, %ld): header: %p, entry: %p\n", model, index, entry->header, entry);
 		if (entry == NULL || !fHeaderEntries.AddItem(entry)) {
 			delete entry;
 			return;
