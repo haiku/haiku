@@ -22,12 +22,12 @@
 #include "TimeSourceObject.h"
 
 
-static BPrivate::media::TimeSourceObjectManager sManager;
-BPrivate::media::TimeSourceObjectManager* gTimeSourceObjectManager = &sManager;
-
-
 namespace BPrivate {
 namespace media {
+
+
+static TimeSourceObjectManager sManager;
+TimeSourceObjectManager* gTimeSourceObjectManager = &sManager;
 
 
 TimeSourceObjectManager::TimeSourceObjectManager()

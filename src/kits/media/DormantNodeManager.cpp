@@ -63,12 +63,12 @@
 #include <DataExchange.h>
 
 
-static BPrivate::media::DormantNodeManager manager;
-BPrivate::media::DormantNodeManager* gDormantNodeManager = &manager;
-
-
 namespace BPrivate {
 namespace media {
+
+
+static DormantNodeManager sManager;
+DormantNodeManager* gDormantNodeManager = &sManager;
 
 
 DormantNodeManager::DormantNodeManager()
