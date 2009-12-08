@@ -30,7 +30,7 @@
 
 
 static const float kThreadNameMargin = 3.0f;
-static const float kViewSeparationMargin = 5.0f;
+static const float kViewSeparationMargin = 1.0f;
 
 
 struct MainWindow::SchedulingPage::SchedulingEvent {
@@ -223,9 +223,9 @@ private:
 
 class MainWindow::SchedulingPage::BaseView : public BView {
 public:
-	BaseView(const char* name, FontInfo& fontInfo)
+	BaseView(const char* name, FontInfo& fontInfo, uint32 flags = 0)
 		:
-		BView(name, B_WILL_DRAW),
+		BView(name, flags),
 		fModel(NULL),
 		fFontInfo(fontInfo)
 	{
@@ -239,14 +239,20 @@ public:
 	}
 
 protected:
-	int32 _CountLines() const
+	int32 CountLines() const
 	{
 		return fModel != NULL ? fModel->CountThreads() : 0;
 	}
 
 	float TotalHeight() const
 	{
-		return fFontInfo.lineHeight * _CountLines();
+		return fFontInfo.lineHeight * CountLines();
+	}
+
+	int32 LineAt(BPoint point) const
+	{
+		int32 line = (int32)point.y / (int32)fFontInfo.lineHeight;
+		return line < CountLines() ? line : -1;
 	}
 
 	void GetLineRange(BRect rect, int32& minLine, int32& maxLine) const
@@ -255,7 +261,7 @@ protected:
 		minLine = (int32)rect.top / lineHeight;
 		maxLine = ((int32)ceilf(rect.bottom) + lineHeight - 1) / lineHeight;
 		minLine = std::max(minLine, 0L);
-		maxLine = std::min(maxLine, _CountLines() - 1);
+		maxLine = std::min(maxLine, CountLines() - 1);
 	}
 
 	BRect LineRect(uint32 line) const
@@ -270,11 +276,108 @@ protected:
 };
 
 
-class MainWindow::SchedulingPage::ThreadsView : public BaseView {
+class MainWindow::SchedulingPage::LineBaseView : public BaseView,
+	protected ListSelectionModel::Listener {
 public:
-	ThreadsView(FontInfo& fontInfo)
+	LineBaseView(const char* name, FontInfo& fontInfo,
+		ListSelectionModel* selectionModel)
 		:
-		BaseView("threads", fontInfo)
+		BaseView(name, fontInfo, B_WILL_DRAW),
+		fSelectionModel(selectionModel),
+		fTextColor(ui_color(B_DOCUMENT_TEXT_COLOR)),
+		fSelectedTextColor(fTextColor),
+		fBackgroundColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR)),
+		fSelectedBackgroundColor(tint_color(fBackgroundColor, B_DARKEN_2_TINT))
+	{
+		fSelectionModel->AddListener(this);
+	}
+
+	void RemoveListeners()
+	{
+		fSelectionModel->RemoveListener(this);
+	}
+
+	virtual void MouseDown(BPoint where)
+	{
+		// get buttons and modifiers
+		BMessage* message = Looper()->CurrentMessage();
+		if (message == NULL)
+			return;
+
+		int32 buttons;
+		if (message->FindInt32("buttons", &buttons) != B_OK)
+			return;
+
+		int32 modifiers;
+		if (message->FindInt32("modifiers", &modifiers) != B_OK)
+			modifiers = 0;
+
+		int32 line = LineAt(where);
+		if (line >= 0) {
+			if ((modifiers & B_SHIFT_KEY) != 0) {
+				int32 selectedLines = fSelectionModel->CountSelectedItems();
+				if (selectedLines > 0) {
+					int32 firstLine = fSelectionModel->SelectedItemAt(0);
+					int32 lastLine = fSelectionModel->SelectedItemAt(
+						selectedLines - 1);
+					firstLine = std::min(firstLine, line);
+					lastLine = std::max(lastLine, line);
+					fSelectionModel->SelectItems(firstLine,
+						lastLine - firstLine + 1, false);
+				} else
+					fSelectionModel->SelectItem(line, true);
+			} else {
+				if (fSelectionModel->IsItemSelected(line)) {
+					if ((modifiers & B_COMMAND_KEY) != 0)
+						fSelectionModel->DeselectItem(line);
+				} else {
+					fSelectionModel->SelectItem(line,
+						(modifiers & B_COMMAND_KEY) != 0);
+				}
+			}
+		} else
+			fSelectionModel->Clear();
+	}
+
+	virtual void ItemsSelected(ListSelectionModel* model, int32 index,
+		int32 count)
+	{
+		InvalidateLines(index, count);
+	}
+
+	virtual void ItemsDeselected(ListSelectionModel* model, int32 index,
+		int32 count)
+	{
+		InvalidateLines(index, count);
+	}
+
+	void InvalidateLines(int32 index, int32 count)
+	{
+		float top = (float)index * fFontInfo.lineHeight;
+		float bottom = (float)(index + count) * fFontInfo.lineHeight - 1;
+		BRect bounds(Bounds());
+		Invalidate(BRect(bounds.left, top, bounds.right, bottom));
+	}
+
+protected:
+	ListSelectionModel*		fSelectionModel;
+	rgb_color				fTextColor;
+	rgb_color				fSelectedTextColor;
+	rgb_color				fBackgroundColor;
+	rgb_color				fSelectedBackgroundColor;
+};
+
+
+class MainWindow::SchedulingPage::ThreadsView : public LineBaseView {
+public:
+	ThreadsView(FontInfo& fontInfo, ListSelectionModel* selectionModel)
+		:
+		LineBaseView("threads", fontInfo, selectionModel)
+	{
+		SetViewColor(B_TRANSPARENT_32_BIT);
+	}
+
+	~ThreadsView()
 	{
 	}
 
@@ -288,10 +391,29 @@ public:
 		GetLineRange(updateRect, minLine, maxLine);
 
 		for (int32 i = minLine; i <= maxLine; i++) {
-			float y = (float)(i + 1) * fFontInfo.lineHeight
-				- fFontInfo.fontHeight.descent;
+			// draw the line background
+			BRect lineRect = LineRect(i);
+			if (fSelectionModel->IsItemSelected(i)) {
+				SetLowColor(fSelectedBackgroundColor);
+				SetHighColor(fTextColor);
+			} else {
+				SetLowColor(fBackgroundColor);
+				SetHighColor(fSelectedTextColor);
+			}
+			FillRect(lineRect, B_SOLID_LOW);
+
+			// draw the string
+			float y = lineRect.bottom - fFontInfo.fontHeight.descent + 1;
 			DrawString(fModel->ThreadAt(i)->Name(),
 				BPoint(kThreadNameMargin, y));
+		}
+
+		BRect bounds(Bounds());
+		BRect lowerRect(0, (float)CountLines() * fFontInfo.lineHeight,
+			bounds.Width(), bounds.Height());
+		if (lowerRect.Intersects(updateRect)) {
+			SetHighColor(fBackgroundColor);
+			FillRect(lowerRect);
 		}
 	}
 
@@ -307,7 +429,7 @@ public:
 };
 
 
-class MainWindow::SchedulingPage::SchedulingView : public BaseView {
+class MainWindow::SchedulingPage::SchedulingView : public LineBaseView {
 public:
 	struct Listener {
 		virtual ~Listener()
@@ -318,21 +440,43 @@ public:
 		virtual void DataRangeChanged() = 0;
 	};
 
+private:
+	enum {
+		COLOR_RUNNING = 0,
+		COLOR_PREEMPTED,
+		COLOR_READY,
+		ACTIVITY_COLOR_COUNT
+	};
+
 public:
-	SchedulingView(FontInfo& fontInfo)
+	SchedulingView(FontInfo& fontInfo, ListSelectionModel* selectionModel)
 		:
-		BaseView("scheduling", fontInfo),
+		LineBaseView("scheduling", fontInfo, selectionModel),
 		fStartTime(0),
 		fEndTime(0),
 		fNSecsPerPixel(1000000),
 		fLastMousePos(-1, -1),
 		fListener(NULL)
 	{
+		fActivityColors[COLOR_RUNNING].set_to(0, 255, 0);
+		fActivityColors[COLOR_PREEMPTED].set_to(255, 127, 0);
+		fActivityColors[COLOR_READY].set_to(255, 0, 0);
+		fActivitySelectedColors[COLOR_RUNNING] = tint_color(
+			fActivityColors[COLOR_RUNNING], B_DARKEN_2_TINT);
+		fActivitySelectedColors[COLOR_PREEMPTED] = tint_color(
+			fActivityColors[COLOR_PREEMPTED], B_DARKEN_2_TINT);
+		fActivitySelectedColors[COLOR_READY] = tint_color(
+			fActivityColors[COLOR_READY], B_DARKEN_2_TINT);
+
+	}
+
+	~SchedulingView()
+	{
 	}
 
 	virtual void SetModel(Model* model)
 	{
-		BaseView::SetModel(model);
+		LineBaseView::SetModel(model);
 		fSchedulingData.SetModel(model);
 		fStartTime = 0;
 		fEndTime = 0;
@@ -386,7 +530,7 @@ public:
 
 	virtual void ScrollTo(BPoint where)
 	{
-		BaseView::ScrollTo(where);
+		LineBaseView::ScrollTo(where);
 		fStartTime = 0;
 		fEndTime = 0;
 
@@ -438,6 +582,17 @@ public:
 // TODO: Draw only the threads currently visible.
 		int32 threadCount = fModel->CountThreads();
 		for (int32 i = 0; i < threadCount; i++) {
+			// draw the background
+			const rgb_color* activityColors;
+			if (fSelectionModel->IsItemSelected(i)) {
+				activityColors = fActivitySelectedColors;
+				SetLowColor(fSelectedBackgroundColor);
+			} else {
+				activityColors = fActivityColors;
+				SetLowColor(fBackgroundColor);
+			}
+			FillRect(LineRect(i), B_SOLID_LOW);
+
 			Model::Thread* thread = fModel->ThreadAt(i);
 			const Array<SchedulingEvent>& events
 				= fSchedulingData.EventsForThread(thread->Index());
@@ -450,17 +605,16 @@ public:
 				nanotime_t endTime = k + 1 < eventCount
 					? std::min(events[k + 1].time, fEndTime) : fEndTime;
 
-				rgb_color color;
 				switch (event.state) {
 					case RUNNING:
 					case STILL_RUNNING:
-						color.set_to(0, 255, 0);
+						SetHighColor(activityColors[COLOR_RUNNING]);
 						break;
 					case PREEMPTED:
-						color.set_to(255, 127, 0);
+						SetHighColor(activityColors[COLOR_PREEMPTED]);
 						break;
 					case READY:
-						color.set_to(255, 0, 0);
+						SetHighColor(activityColors[COLOR_READY]);
 						break;
 					case WAITING:
 					case UNKNOWN:
@@ -468,7 +622,6 @@ public:
 						continue;
 				}
 
-				SetHighColor(color);
 				BRect rect = LineRect(i);
 				rect.left = startTime / fNSecsPerPixel;
 				rect.right = endTime / fNSecsPerPixel - 1;
@@ -875,6 +1028,9 @@ private:
 	uint32					fNSecsPerPixel;
 	BPoint					fLastMousePos;
 	Listener*				fListener;
+
+	rgb_color				fActivityColors[ACTIVITY_COLOR_COUNT];
+	rgb_color				fActivitySelectedColors[ACTIVITY_COLOR_COUNT];
 };
 
 
@@ -1034,7 +1190,8 @@ MainWindow::SchedulingPage::SchedulingPage(MainWindow* parent)
 	fScrollView(NULL),
 	fViewPort(NULL),
 	fThreadsView(NULL),
-	fSchedulingView(NULL)
+	fSchedulingView(NULL),
+	fSelectionModel()
 {
 	SetName("Scheduling");
 
@@ -1046,8 +1203,9 @@ MainWindow::SchedulingPage::SchedulingPage(MainWindow* parent)
 	BView* scrollChild = BLayoutBuilder::Group<>(B_VERTICAL)
 		.Add(headerView)
 		.Add(fViewPort = new ViewPort(headerView,
-			fThreadsView = new ThreadsView(fFontInfo),
-			fSchedulingView = new SchedulingView(fFontInfo), fFontInfo))
+			fThreadsView = new ThreadsView(fFontInfo, &fSelectionModel),
+			fSchedulingView = new SchedulingView(fFontInfo, &fSelectionModel),
+			fFontInfo))
 	;
 
 	AddChild(fScrollView = new BScrollView("scroll", scrollChild, 0, true,
@@ -1062,6 +1220,8 @@ MainWindow::SchedulingPage::SchedulingPage(MainWindow* parent)
 MainWindow::SchedulingPage::~SchedulingPage()
 {
 	fViewPort->RemoveListeners();
+	fThreadsView->RemoveListeners();
+	fSchedulingView->RemoveListeners();
 }
 
 
@@ -1070,6 +1230,8 @@ MainWindow::SchedulingPage::SetModel(Model* model)
 {
 	if (model == fModel)
 		return;
+
+	fSelectionModel.Clear();
 
 	if (fModel != NULL) {
 	}

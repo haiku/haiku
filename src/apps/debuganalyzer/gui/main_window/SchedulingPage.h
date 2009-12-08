@@ -10,6 +10,7 @@
 
 #include "table/Table.h"
 
+#include "ListSelectionModel.h"
 #include "main_window/MainWindow.h"
 
 
@@ -24,11 +25,13 @@ public:
 			void				SetModel(Model* model);
 
 private:
+			struct SelectionModel;
 			struct SchedulingEvent;
 			class SchedulingData;
 			struct TimeRange;
 			class TimelineHeaderRenderer;
 			class BaseView;
+			class LineBaseView;
 			class ThreadsView;
 			class SchedulingView;
 			class ViewPort;
@@ -46,6 +49,7 @@ private:
 			ThreadsView*		fThreadsView;
 			SchedulingView*		fSchedulingView;
 			FontInfo			fFontInfo;
+			ListSelectionModel	fSelectionModel;
 };
 
 
