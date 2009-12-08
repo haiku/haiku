@@ -654,7 +654,7 @@ void
 AcpiOsDeleteLock(ACPI_SPINLOCK handle)
 {
 	DEBUG_FUNCTION();
-	free(handle);
+	free((void*)handle);
 }
 
 
@@ -1259,3 +1259,66 @@ AcpiOsReleaseGlobalLock(uint32 *lock)
 	} while (*lock == old);
 	return (old & GL_BIT_PENDING);
 }
+
+
+ACPI_STATUS
+AcpiOsCreateMutex(ACPI_MUTEX* outHandle)
+{
+	*outHandle = (ACPI_MUTEX) malloc(sizeof(mutex));
+	DEBUG_FUNCTION_F("result: %p", *outHandle);
+	if (*outHandle == NULL)
+		return AE_NO_MEMORY;
+
+	mutex_init(*outHandle, "acpi mutex");
+	return AE_OK;
+}
+
+
+void
+AcpiOsDeleteMutex(ACPI_MUTEX handle)
+{
+	DEBUG_FUNCTION_F("mutex: %ld", handle);
+	mutex_destroy(handle);
+	free((void*)handle);
+}
+
+
+ACPI_STATUS
+AcpiOsAcquireMutex(ACPI_MUTEX handle, UINT16 timeout)
+{
+	ACPI_STATUS result = AE_OK;
+	DEBUG_FUNCTION_VF("mutex: %ld; timeout: %u", handle, timeout);
+
+	if (timeout == ACPI_WAIT_FOREVER) {
+		result = mutex_lock_with_timeout(handle, 0, 0)
+			== B_OK ? AE_OK : AE_BAD_PARAMETER;
+	} else {
+		switch (mutex_lock_with_timeout(handle, B_RELATIVE_TIMEOUT,
+			(bigtime_t)timeout * 1000)) {
+			case B_OK:
+				result = AE_OK;
+				break;
+			case B_INTERRUPTED:
+			case B_TIMED_OUT:
+			case B_WOULD_BLOCK:
+				result = AE_TIME;
+				break;
+			case B_BAD_VALUE:
+			default:
+				result = AE_BAD_PARAMETER;
+				break;
+		}
+	}
+	DEBUG_FUNCTION_VF("mutex: %ld; timeout: %u result: %lu",
+		handle, timeout, (uint32)result);
+	return result;
+}
+
+
+void
+AcpiOsReleaseMutex(ACPI_MUTEX handle)
+{
+	DEBUG_FUNCTION_F("mutex: %p", handle);
+	mutex_unlock(handle);
+}
+

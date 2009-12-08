@@ -119,7 +119,11 @@
 
 #include "acgcc.h"
 
+
 #include <SupportDefs.h>
+
+
+#include "lock.h"
 
 
 /* Host-dependent types and defines for user- and kernel-space ACPICA */
@@ -127,12 +131,9 @@
 #define ACPI_USE_SYSTEM_CLIBRARY
 #define ACPI_USE_STANDARD_HEADERS
 
-/* TODO: add mutex or benaphore code
- we don't use mutex atm as it doesn't support timeout.
- define ACPI_MUTEX_TYPE				ACPI_OSL_MUTEX
- define ACPI_MUTEX					mutex *				
-*/
-	
+#define ACPI_MUTEX_TYPE				ACPI_OSL_MUTEX
+#define ACPI_MUTEX					mutex *
+
 #define ACPI_USE_NATIVE_DIVIDE
 
 #define ACPI_THREAD_ID				thread_id
