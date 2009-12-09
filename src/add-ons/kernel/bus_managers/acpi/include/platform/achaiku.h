@@ -144,8 +144,12 @@
 #define COMPILER_DEPENDENT_INT64	int64
 #define COMPILER_DEPENDENT_UINT64	uint64
 
-/* TODO: Add 64 bit when Haiku goes 64 bit */
+
+#ifdef B_HAIKU_64_BIT
+#define ACPI_MACHINE_WIDTH				64
+#else
 #define ACPI_MACHINE_WIDTH				32
+#endif
 
 
 #ifdef _KERNEL_MODE
