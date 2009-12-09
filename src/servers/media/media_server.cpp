@@ -600,8 +600,9 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_REGISTER_DORMANT_NODE:
 		{
-			server_register_dormant_node_command& command
-				= *static_cast<server_register_dormant_node_command*>(data);
+			const server_register_dormant_node_command& command
+				= *static_cast<const server_register_dormant_node_command*>(
+					data);
 			if (command.purge_id > 0)
 				gNodeManager->InvalidateDormantFlavorInfo(command.purge_id);
 
@@ -615,8 +616,8 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_GET_DORMANT_NODES:
 		{
-			server_get_dormant_nodes_request& request
-				= *static_cast<server_get_dormant_nodes_request*>(data);
+			const server_get_dormant_nodes_request& request
+				= *static_cast<const server_get_dormant_nodes_request*>(data);
 
 			server_get_dormant_nodes_reply reply;
 			reply.count = request.max_count;
@@ -647,8 +648,9 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_GET_DORMANT_FLAVOR_INFO:
 		{
-			server_get_dormant_flavor_info_request& request
-				= *static_cast<server_get_dormant_flavor_info_request*>(data);
+			const server_get_dormant_flavor_info_request& request
+				= *static_cast<const server_get_dormant_flavor_info_request*>(
+					data);
 			dormant_flavor_info dormantFlavorInfo;
 
 			status_t status = gNodeManager->GetDormantFlavorInfoFor(
