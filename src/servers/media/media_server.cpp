@@ -273,7 +273,6 @@ ServerApp::_QuitAddOnServer()
 void
 ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 {
-	status_t rv;
 	TRACE("ServerApp::HandleMessage %#lx enter\n", code);
 	switch (code) {
 		case SERVER_CHANGE_FLAVOR_INSTANCES_COUNT:
@@ -466,55 +465,59 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_PUBLISH_INPUTS:
 		{
-			const server_publish_inputs_request *request
-				= static_cast<const server_publish_inputs_request *>(data);
+			const server_publish_inputs_request& request
+				= *static_cast<const server_publish_inputs_request*>(data);
 			server_publish_inputs_reply reply;
-			if (request->count <= MAX_INPUTS) {
-				rv = gNodeManager->PublishInputs(request->node,
-					request->inputs, request->count);
+			status_t status;
+
+			if (request.count <= MAX_INPUTS) {
+				status = gNodeManager->PublishInputs(request.node,
+					request.inputs, request.count);
 			} else {
-				media_input *inputs;
+				media_input* inputs;
 				area_id clone;
 				clone = clone_area("media_inputs clone", (void**)&inputs,
-					B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
+					B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request.area);
 				if (clone < B_OK) {
 					ERROR("SERVER_PUBLISH_INPUTS: failed to clone area, "
 						"error %#lx\n", clone);
-					rv = B_ERROR;
+					status = clone;
 				} else {
-					rv = gNodeManager->PublishInputs(request->node, inputs,
-						request->count);
+					status = gNodeManager->PublishInputs(request.node, inputs,
+						request.count);
 					delete_area(clone);
 				}
 			}
-			request->SendReply(rv, &reply, sizeof(reply));
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_PUBLISH_OUTPUTS:
 		{
-			const server_publish_outputs_request *request
-				= static_cast<const server_publish_outputs_request *>(data);
+			const server_publish_outputs_request& request
+				= *static_cast<const server_publish_outputs_request*>(data);
 			server_publish_outputs_reply reply;
-			if (request->count <= MAX_OUTPUTS) {
-				rv = gNodeManager->PublishOutputs(request->node,
-					request->outputs, request->count);
+			status_t status;
+
+			if (request.count <= MAX_OUTPUTS) {
+				status = gNodeManager->PublishOutputs(request.node,
+					request.outputs, request.count);
 			} else {
-				media_output *outputs;
+				media_output* outputs;
 				area_id clone;
 				clone = clone_area("media_outputs clone", (void**)&outputs,
-					B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
+					B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request.area);
 				if (clone < B_OK) {
 					ERROR("SERVER_PUBLISH_OUTPUTS: failed to clone area, "
 						"error %#lx\n", clone);
-					rv = B_ERROR;
+					status = clone;
 				} else {
-					rv = gNodeManager->PublishOutputs(request->node, outputs,
-						request->count);
+					status = gNodeManager->PublishOutputs(request.node, outputs,
+						request.count);
 					delete_area(clone);
 				}
 			}
-			request->SendReply(rv, &reply, sizeof(reply));
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
@@ -597,14 +600,14 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_REGISTER_DORMANT_NODE:
 		{
-			xfer_server_register_dormant_node* msg
-				= (xfer_server_register_dormant_node*)data;
-			if (msg->purge_id > 0)
-				gNodeManager->InvalidateDormantFlavorInfo(msg->purge_id);
+			xfer_server_register_dormant_node& request
+				= *static_cast<xfer_server_register_dormant_node*>(data);
+			if (request.purge_id > 0)
+				gNodeManager->InvalidateDormantFlavorInfo(request.purge_id);
 
 			dormant_flavor_info dormantFlavorInfo;
-			status_t status = dormantFlavorInfo.Unflatten(msg->type,
-				msg->flattened_data, msg->flattened_size);
+			status_t status = dormantFlavorInfo.Unflatten(request.type,
+				request.flattened_data, request.flattened_size);
 			if (status == B_OK)
 				gNodeManager->AddDormantFlavorInfo(dormantFlavorInfo);
 			break;
@@ -612,28 +615,29 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_GET_DORMANT_NODES:
 		{
-			xfer_server_get_dormant_nodes *msg
-				= (xfer_server_get_dormant_nodes *)data;
+			xfer_server_get_dormant_nodes& request
+				= *static_cast<xfer_server_get_dormant_nodes*>(data);
 
 			xfer_server_get_dormant_nodes_reply reply;
-			reply.count = msg->max_count;
+			reply.count = request.max_count;
 
 			dormant_node_info* infos
 				= new(std::nothrow) dormant_node_info[reply.count];
 			if (infos != NULL) {
 				reply.result = gNodeManager->GetDormantNodes(infos,
-					&reply.count, msg->has_input ? &msg->input_format : NULL,
-					msg->has_output ? &msg->output_format : NULL,
-					msg->has_name ? msg->name : NULL, msg->require_kinds,
-					msg->deny_kinds);
+					&reply.count,
+					request.has_input ? &request.input_format : NULL,
+					request.has_output ? &request.output_format : NULL,
+					request.has_name ? request.name : NULL,
+					request.require_kinds, request.deny_kinds);
 			} else
 				reply.result = B_NO_MEMORY;
 
 			if (reply.result != B_OK)
 				reply.count = 0;
-			write_port(msg->reply_port, 0, &reply, sizeof(reply));
+			write_port(request.reply_port, 0, &reply, sizeof(reply));
 			if (reply.count > 0) {
-				write_port(msg->reply_port, 0, infos,
+				write_port(request.reply_port, 0, infos,
 					reply.count * sizeof(dormant_node_info));
 			}
 			delete[] infos;
@@ -642,17 +646,16 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_GET_DORMANT_FLAVOR_INFO:
 		{
-			xfer_server_get_dormant_flavor_info *msg
-				= (xfer_server_get_dormant_flavor_info *)data;
+			xfer_server_get_dormant_flavor_info& request
+				= *static_cast<xfer_server_get_dormant_flavor_info*>(data);
 			dormant_flavor_info dormantFlavorInfo;
-			status_t rv;
 
-			rv = gNodeManager->GetDormantFlavorInfoFor(msg->addon,
-				msg->flavor_id, &dormantFlavorInfo);
-			if (rv != B_OK) {
+			status_t status = gNodeManager->GetDormantFlavorInfoFor(
+				request.add_on_id, request.flavor_id, &dormantFlavorInfo);
+			if (status != B_OK) {
 				xfer_server_get_dormant_flavor_info_reply reply;
-				reply.result = rv;
-				write_port(msg->reply_port, 0, &reply, sizeof(reply));
+				reply.result = status;
+				write_port(request.reply_port, 0, &reply, sizeof(reply));
 			} else {
 				size_t replySize
 					= sizeof(xfer_server_get_dormant_flavor_info_reply)
@@ -666,12 +669,12 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 					reply->result = dormantFlavorInfo.Flatten(
 						reply->flattened_data, reply->flattened_size);
 
-					write_port(msg->reply_port, 0, reply, replySize);
+					write_port(request.reply_port, 0, reply, replySize);
 					free(reply);
 				} else {
 					xfer_server_get_dormant_flavor_info_reply reply;
 					reply.result = B_NO_MEMORY;
-					write_port(msg->reply_port, 0, &reply, sizeof(reply));
+					write_port(request.reply_port, 0, &reply, sizeof(reply));
 				}
 			}
 			break;
@@ -679,12 +682,12 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_SET_NODE_CREATOR:
 		{
-			const server_set_node_creator_request* request
-				= static_cast<const server_set_node_creator_request*>(data);
+			const server_set_node_creator_request& request
+				= *static_cast<const server_set_node_creator_request*>(data);
 			server_set_node_creator_reply reply;
-			status_t status = gNodeManager->SetNodeCreator(request->node,
-				request->creator);
-			request->SendReply(status, &reply, sizeof(reply));
+			status_t status = gNodeManager->SetNodeCreator(request.node,
+				request.creator);
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
@@ -703,34 +706,35 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_REGISTER_BUFFER:
 		{
-			const server_register_buffer_request *request
-				= static_cast<const server_register_buffer_request *>(data);
+			const server_register_buffer_request& request
+				= *static_cast<const server_register_buffer_request*>(data);
 			server_register_buffer_reply reply;
 			status_t status;
-			if (request->info.buffer == 0) {
-				reply.info = request->info;
+
+			if (request.info.buffer == 0) {
+				reply.info = request.info;
 				// size, offset, flags, area is kept
 				// get a new beuffer id into reply.info.buffer
-				status = gBufferManager->RegisterBuffer(request->team,
-					request->info.size, request->info.flags,
-					request->info.offset, request->info.area,
+				status = gBufferManager->RegisterBuffer(request.team,
+					request.info.size, request.info.flags,
+					request.info.offset, request.info.area,
 					&reply.info.buffer);
 			} else {
-				reply.info = request->info; // buffer id is kept
-				status = gBufferManager->RegisterBuffer(request->team,
-					request->info.buffer, &reply.info.size, &reply.info.flags,
+				reply.info = request.info; // buffer id is kept
+				status = gBufferManager->RegisterBuffer(request.team,
+					request.info.buffer, &reply.info.size, &reply.info.flags,
 					&reply.info.offset, &reply.info.area);
 			}
-			request->SendReply(status, &reply, sizeof(reply));
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_UNREGISTER_BUFFER:
 		{
-			const server_unregister_buffer_command *cmd = static_cast<
-				const server_unregister_buffer_command *>(data);
+			const server_unregister_buffer_command& request = *static_cast<
+				const server_unregister_buffer_command*>(data);
 
-			gBufferManager->UnregisterBuffer(cmd->team, cmd->buffer_id);
+			gBufferManager->UnregisterBuffer(request.team, request.buffer_id);
 			break;
 		}
 
@@ -792,54 +796,54 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_GET_REF_FOR:
 		{
-			const server_get_ref_for_request* request
-				= static_cast<const server_get_ref_for_request*>(data);
+			const server_get_ref_for_request& request
+				= *static_cast<const server_get_ref_for_request*>(data);
 			server_get_ref_for_reply reply;
 			entry_ref* ref;
 
-			status_t status = gMediaFilesManager->GetRefFor(request->type,
-				request->item, &ref);
+			status_t status = gMediaFilesManager->GetRefFor(request.type,
+				request.item, &ref);
 			if (status == B_OK)
 				reply.ref = *ref;
 
-			request->SendReply(status, &reply, sizeof(reply));
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_SET_REF_FOR:
 		{
-			const server_set_ref_for_request* request
-				= static_cast<const server_set_ref_for_request*>(data);
+			const server_set_ref_for_request& request
+				= *static_cast<const server_set_ref_for_request*>(data);
 			server_set_ref_for_reply reply;
-			entry_ref ref = request->ref;
+			entry_ref ref = request.ref;
 
-			status_t status = gMediaFilesManager->SetRefFor(request->type,
-				request->item, ref);
-			request->SendReply(status, &reply, sizeof(reply));
+			status_t status = gMediaFilesManager->SetRefFor(request.type,
+				request.item, ref);
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_INVALIDATE_MEDIA_ITEM:
 		{
-			const server_invalidate_item_request* request
-				= static_cast<const server_invalidate_item_request*>(data);
+			const server_invalidate_item_request& request
+				= *static_cast<const server_invalidate_item_request*>(data);
 			server_invalidate_item_reply reply;
 
-			status_t status = gMediaFilesManager->InvalidateItem(
-				request->type, request->item);
-			request->SendReply(status, &reply, sizeof(reply));
+			status_t status = gMediaFilesManager->InvalidateItem(request.type,
+				request.item);
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_REMOVE_MEDIA_ITEM:
 		{
-			const server_remove_media_item_request* request
-				= static_cast<const server_remove_media_item_request*>(data);
+			const server_remove_media_item_request& request
+				= *static_cast<const server_remove_media_item_request*>(data);
 			server_remove_media_item_reply reply;
 
-			status_t status = gMediaFilesManager->RemoveItem(request->type,
-				request->item);
-			request->SendReply(status, &reply, sizeof(reply));
+			status_t status = gMediaFilesManager->RemoveItem(request.type,
+				request.item);
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
@@ -869,68 +873,74 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_GET_READERS:
 		{
-			const server_get_readers_request *request
-				= static_cast<const server_get_readers_request *>(data);
+			const server_get_readers_request& request
+				= *static_cast<const server_get_readers_request*>(data);
 			server_get_readers_reply reply;
-			rv = gAddOnManager->GetReaders(reply.ref, &reply.count,
+
+			status_t status = gAddOnManager->GetReaders(reply.ref, &reply.count,
 				MAX_READERS);
-			request->SendReply(rv, &reply, sizeof(reply));
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_GET_DECODER_FOR_FORMAT:
 		{
-			const server_get_decoder_for_format_request *request
-				= static_cast<
-					const server_get_decoder_for_format_request *>(data);
+			const server_get_decoder_for_format_request& request
+				= *static_cast<
+					const server_get_decoder_for_format_request*>(data);
 			server_get_decoder_for_format_reply reply;
-			rv = gAddOnManager->GetDecoderForFormat(&reply.ref,
-				request->format);
-			request->SendReply(rv, &reply, sizeof(reply));
+
+			status_t status = gAddOnManager->GetDecoderForFormat(&reply.ref,
+				request.format);
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_GET_WRITER_FOR_FORMAT_FAMILY:
 		{
-			const server_get_writer_request *request
-				= static_cast<const server_get_writer_request *>(data);
+			const server_get_writer_request& request
+				= *static_cast<const server_get_writer_request*>(data);
 			server_get_writer_reply reply;
-			rv = gAddOnManager->GetWriter(&reply.ref, request->internal_id);
-			request->SendReply(rv, &reply, sizeof(reply));
+
+			status_t status = gAddOnManager->GetWriter(&reply.ref,
+				request.internal_id);
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_GET_FILE_FORMAT_FOR_COOKIE:
 		{
-			const server_get_file_format_request *request
-				= static_cast<const server_get_file_format_request *>(data);
+			const server_get_file_format_request& request
+				= *static_cast<const server_get_file_format_request*>(data);
 			server_get_file_format_reply reply;
-			rv = gAddOnManager->GetFileFormat(&reply.file_format,
-				request->cookie);
-			request->SendReply(rv, &reply, sizeof(reply));
+
+			status_t status = gAddOnManager->GetFileFormat(&reply.file_format,
+				request.cookie);
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_GET_CODEC_INFO_FOR_COOKIE:
 		{
-			const server_get_codec_info_request *request
-				= static_cast<const server_get_codec_info_request *>(data);
+			const server_get_codec_info_request& request
+				= *static_cast<const server_get_codec_info_request*>(data);
 			server_get_codec_info_reply reply;
-			rv = gAddOnManager->GetCodecInfo(&reply.codec_info,
+
+			status_t status = gAddOnManager->GetCodecInfo(&reply.codec_info,
 				&reply.format_family, &reply.input_format,
-				&reply.output_format, request->cookie);
-			request->SendReply(rv, &reply, sizeof(reply));
+				&reply.output_format, request.cookie);
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_GET_ENCODER_FOR_CODEC_INFO:
 		{
-			const server_get_encoder_for_codec_info_request *request
-				= static_cast<
-					const server_get_encoder_for_codec_info_request *>(data);
+			const server_get_encoder_for_codec_info_request& request
+				= *static_cast<
+					const server_get_encoder_for_codec_info_request*>(data);
 			server_get_encoder_for_codec_info_reply reply;
-			rv = gAddOnManager->GetEncoder(&reply.ref, request->id);
-			request->SendReply(rv, &reply, sizeof(reply));
+			status_t status = gAddOnManager->GetEncoder(&reply.ref, request.id);
+			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 

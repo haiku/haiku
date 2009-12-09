@@ -2602,7 +2602,7 @@ BMediaRosterEx::GetDormantFlavorInfo(media_addon_id addonID, int32 flavorID,
 		return B_NO_MEMORY;
 
 	xfer_server_get_dormant_flavor_info msg;
-	msg.addon = addonID;
+	msg.add_on_id = addonID;
 	msg.flavor_id = flavorID;
 	msg.reply_port = gPortPool->GetPort();
 	status_t status = write_port(port, SERVER_GET_DORMANT_FLAVOR_INFO, &msg,

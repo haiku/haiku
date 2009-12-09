@@ -26,7 +26,7 @@ enum {
 
 
 struct xfer_server_get_dormant_flavor_info {
-	media_addon_id	addon;
+	media_addon_id	add_on_id;
 	int32			flavor_id;
 	port_id			reply_port;
 };
