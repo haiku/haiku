@@ -28,6 +28,9 @@ enum ThreadState {
 	UNKNOWN
 };
 
+const char* thread_state_name(ThreadState state);
+const char* wait_object_type_name(uint32 type);
+
 
 class Model : public Referenceable {
 public:
@@ -50,12 +53,20 @@ public:
 
 public:
 								Model(const char* dataSourceName,
-									void* eventData, size_t eventDataSize);
+									void* eventData, size_t eventDataSize,
+									system_profiler_event_header** events,
+									size_t eventCount);
 								~Model();
 
 	inline	const char*			DataSourceName() const;
 	inline	void*				EventData() const;
 	inline	size_t				EventDataSize() const;
+	inline	system_profiler_event_header** Events() const;
+	inline	size_t				CountEvents() const;
+			size_t				ClosestEventIndex(nanotime_t eventTime) const;
+									// finds the greatest event with event
+									// time >= eventTime; may return
+									// CountEvents()
 
 			void				LoadingFinished();
 
@@ -119,13 +130,16 @@ private:
 			typedef BObjectList<CompactSchedulingState> SchedulingStateList;
 
 private:
-	static	int			_CompareEventTimeSchedulingState(const nanotime_t* time,
-							const CompactSchedulingState* state);
+	static	int					_CompareEventTimeSchedulingState(
+									const nanotime_t* time,
+									const CompactSchedulingState* state);
 
 private:
 			BString				fDataSourceName;
 			void*				fEventData;
+			system_profiler_event_header** fEvents;
 			size_t				fEventDataSize;
+			size_t				fEventCount;
 			int32				fCPUCount;
 			nanotime_t			fBaseTime;
 			nanotime_t			fLastEventTime;
@@ -261,6 +275,10 @@ public:
 								ThreadWaitObjectGroup(
 									ThreadWaitObject* threadWaitObject);
 								~ThreadWaitObjectGroup();
+
+	inline	uint32				Type() const;
+	inline	addr_t				Object() const;
+	inline	const char*			Name() const;
 
 	inline	ThreadWaitObject*	MostRecentThreadWaitObject() const;
 	inline	WaitObject*			MostRecentWaitObject() const;
@@ -529,6 +547,20 @@ Model::EventDataSize() const
 }
 
 
+system_profiler_event_header**
+Model::Events() const
+{
+	return fEvents;
+}
+
+
+size_t
+Model::CountEvents() const
+{
+	return fEventCount;
+}
+
+
 nanotime_t
 Model::BaseTime() const
 {
@@ -767,6 +799,27 @@ Model::ThreadWaitObject::TotalWaitTime() const
 
 
 // #pragma mark - ThreadWaitObjectGroup
+
+
+uint32
+Model::ThreadWaitObjectGroup::Type() const
+{
+	return MostRecentThreadWaitObject()->Type();
+}
+
+
+addr_t
+Model::ThreadWaitObjectGroup::Object() const
+{
+	return MostRecentThreadWaitObject()->Object();
+}
+
+
+const char*
+Model::ThreadWaitObjectGroup::Name() const
+{
+	return MostRecentThreadWaitObject()->Name();
+}
 
 
 Model::ThreadWaitObject*

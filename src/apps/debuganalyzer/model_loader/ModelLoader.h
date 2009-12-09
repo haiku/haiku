@@ -46,6 +46,10 @@ private:
 			status_t			_Load();
 			status_t			_ReadDebugEvents(void** _eventData,
 									size_t* _size);
+			status_t			_CreateDebugEventArray(void* eventData,
+									size_t eventDataSize,
+									system_profiler_event_header**& _events,
+									size_t& _eventCount);
 			status_t			_ProcessEvent(uint32 event, uint32 cpu,
 									const void* buffer, size_t size);
 

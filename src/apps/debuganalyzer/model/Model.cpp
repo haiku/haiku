@@ -13,6 +13,50 @@
 
 #include <AutoDeleter.h>
 
+#include <thread_defs.h>
+
+
+
+static const char* const kThreadStateNames[] = {
+	"running",
+	"still running",
+	"preempted",
+	"ready",
+	"waiting",
+	"unknown"
+};
+
+
+const char*
+thread_state_name(ThreadState state)
+{
+	return kThreadStateNames[state];
+}
+
+
+const char*
+wait_object_type_name(uint32 type)
+{
+	switch (type) {
+		case THREAD_BLOCK_TYPE_SEMAPHORE:
+			return "semaphore";
+		case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
+			return "condition";
+		case THREAD_BLOCK_TYPE_MUTEX:
+			return "mutex";
+		case THREAD_BLOCK_TYPE_RW_LOCK:
+			return "rw lock";
+		case THREAD_BLOCK_TYPE_OTHER:
+			return "other";
+		case THREAD_BLOCK_TYPE_SNOOZE:
+			return "snooze";
+		case THREAD_BLOCK_TYPE_SIGNAL:
+			return "signal";
+		default:
+			return "unknown";
+	}
+}
+
 
 // #pragma mark - CPU
 
@@ -457,11 +501,14 @@ Model::CompactSchedulingState::Delete()
 // #pragma mark - Model
 
 
-Model::Model(const char* dataSourceName, void* eventData, size_t eventDataSize)
+Model::Model(const char* dataSourceName, void* eventData, size_t eventDataSize,
+	system_profiler_event_header** events, size_t eventCount)
 	:
 	fDataSourceName(dataSourceName),
 	fEventData(eventData),
+	fEvents(events),
 	fEventDataSize(eventDataSize),
+	fEventCount(eventCount),
 	fCPUCount(1),
 	fBaseTime(0),
 	fLastEventTime(0),
@@ -483,6 +530,50 @@ Model::~Model()
 	}
 
 	free(fEventData);
+}
+
+
+size_t
+Model::ClosestEventIndex(nanotime_t eventTime) const
+{
+	// The events themselves are unmodified and use an absolute time.
+	eventTime += fBaseTime;
+
+	// Binary search the event. Since not all events have a timestamp, we have
+	// to do a bit of iteration, too.
+	size_t lower = 0;
+	size_t upper = CountEvents();
+	while (lower < upper) {
+		size_t mid = (lower + upper) / 2;
+		while (mid < upper) {
+			system_profiler_event_header* header = fEvents[mid];
+			switch (header->event) {
+				case B_SYSTEM_PROFILER_THREAD_SCHEDULED:
+				case B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE:
+				case B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE:
+					break;
+				default:
+					mid++;
+					continue;
+			}
+
+			break;
+		}
+
+		if (mid == upper) {
+			lower = mid;
+			break;
+		}
+
+		system_profiler_thread_scheduling_event* event
+			= (system_profiler_thread_scheduling_event*)(fEvents[mid] + 1);
+		if (event->time < eventTime)
+			lower = mid + 1;
+		else
+			upper = mid;
+	}
+
+	return lower;
 }
 
 

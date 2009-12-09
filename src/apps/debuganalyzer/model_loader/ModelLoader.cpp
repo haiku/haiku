@@ -160,6 +160,16 @@ ModelLoader::_Load()
 	status_t error = _ReadDebugEvents(&eventData, &eventDataSize);
 	if (error != B_OK)
 		return error;
+	MemoryDeleter eventDataDeleter(eventData);
+
+	// create a debug event array
+	system_profiler_event_header** events;
+	size_t eventCount;
+	error = _CreateDebugEventArray(eventData, eventDataSize, events,
+		eventCount);
+	if (error != B_OK)
+		return error;
+	ArrayDeleter<system_profiler_event_header*> eventsDeleter(events);
 
 	// get the data source name
 	BString dataSourceName;
@@ -167,19 +177,15 @@ ModelLoader::_Load()
 
 	// create a model
 	fModel = new(std::nothrow) Model(dataSourceName.String(), eventData,
-		eventDataSize);
-	if (fModel == NULL) {
-		free(eventData);
+		eventDataSize, events, eventCount);
+	if (fModel == NULL)
 		return B_NO_MEMORY;
-	}
+	eventDataDeleter.Detach();
+	eventsDeleter.Detach();
 
 	// create a debug input stream
-	BDebugEventInputStream* input = new(std::nothrow) BDebugEventInputStream;
-	if (input == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<BDebugEventInputStream> inputDeleter(input);
-
-	error = input->SetTo(eventData, eventDataSize, false);
+	BDebugEventInputStream input;
+	error = input.SetTo(eventData, eventDataSize, false);
 	if (error != B_OK)
 		return error;
 
@@ -201,7 +207,7 @@ ModelLoader::_Load()
 		uint32 cpu;
 		const void* buffer;
 		off_t offset;
-		ssize_t bufferSize = input->ReadNextEvent(&event, &cpu, &buffer,
+		ssize_t bufferSize = input.ReadNextEvent(&event, &cpu, &buffer,
 			&offset);
 		if (bufferSize < 0)
 			return bufferSize;
@@ -316,6 +322,65 @@ ModelLoader::_ReadDebugEvents(void** _eventData, size_t* _size)
 	dataDeleter.Detach();
 	*_eventData = data;
 	*_size = size;
+	return B_OK;
+}
+
+
+status_t
+ModelLoader::_CreateDebugEventArray(void* eventData, size_t eventDataSize,
+	system_profiler_event_header**& _events, size_t& _eventCount)
+{
+	// count the events
+	BDebugEventInputStream input;
+	status_t error = input.SetTo(eventData, eventDataSize, false);
+	if (error != B_OK)
+		return error;
+
+	size_t eventCount = 0;
+	while (true) {
+		// get next event
+		uint32 event;
+		uint32 cpu;
+		const void* buffer;
+		ssize_t bufferSize = input.ReadNextEvent(&event, &cpu, &buffer, NULL);
+		if (bufferSize < 0)
+			return bufferSize;
+		if (buffer == NULL)
+			break;
+
+		eventCount++;
+	}
+
+	// create the array
+	system_profiler_event_header** events = new(std::nothrow)
+		system_profiler_event_header*[eventCount];
+	if (events == NULL)
+		return B_NO_MEMORY;
+
+	// populate the array
+	error = input.SetTo(eventData, eventDataSize, false);
+	if (error != B_OK) {
+		delete[] events;
+		return error;
+	}
+
+	size_t eventIndex = 0;
+	while (true) {
+		// get next event
+		uint32 event;
+		uint32 cpu;
+		const void* buffer;
+		off_t offset;
+		input.ReadNextEvent(&event, &cpu, &buffer, &offset);
+		if (buffer == NULL)
+			break;
+
+		events[eventIndex++]
+			= (system_profiler_event_header*)((uint8*)eventData + offset);
+	}
+
+	_events = events;
+	_eventCount = eventCount;
 	return B_OK;
 }
 
