@@ -1289,10 +1289,9 @@ AcpiOsAcquireMutex(ACPI_MUTEX handle, UINT16 timeout)
 	ACPI_STATUS result = AE_OK;
 	DEBUG_FUNCTION_VF("mutex: %ld; timeout: %u", handle, timeout);
 
-	if (timeout == ACPI_WAIT_FOREVER) {
-		result = mutex_lock_with_timeout(handle, 0, 0)
-			== B_OK ? AE_OK : AE_BAD_PARAMETER;
-	} else {
+	if (timeout == ACPI_WAIT_FOREVER)
+		result = mutex_lock(handle) == B_OK ? AE_OK : AE_BAD_PARAMETER;
+	else {
 		switch (mutex_lock_with_timeout(handle, B_RELATIVE_TIMEOUT,
 			(bigtime_t)timeout * 1000)) {
 			case B_OK:
