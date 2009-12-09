@@ -32,13 +32,17 @@
  *
  */
 
-#include <OS.h>
 #include <Controllable.h>
+
+#include <string.h>
+
+#include <OS.h>
 #include <ParameterWeb.h>
 #include <Roster.h>
-#include "debug.h"
-#include "DataExchange.h"
-#include "Notifications.h"
+
+#include <debug.h>
+#include <DataExchange.h>
+#include <Notifications.h>
 
 
 namespace BPrivate { namespace media {
@@ -78,7 +82,7 @@ public:
 	{
 		return fData != NULL ? B_OK : fArea;
 	}
-	
+
 	void* Data() const
 	{
 		return fData;
@@ -241,7 +245,7 @@ BControllable::HandleMessage(int32 message, const void* data, size_t size)
 				= *static_cast<const controllable_get_parameter_web_request*>(
 					data);
 			controllable_get_parameter_web_reply reply;
-			
+
 			status_t status = B_OK;
 			bool wasLocked = true;
 			if (!LockParameterWeb()) {
