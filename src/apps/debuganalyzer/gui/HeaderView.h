@@ -194,6 +194,9 @@ private:
 			class DefaultState;
 			class ResizeState;
 
+			friend class DefaultState;
+			friend class ResizeState;
+
 private:
 	// HeaderModelListener
 	virtual	void				HeaderAdded(HeaderModel* model, int32 index);
