@@ -223,6 +223,29 @@ static devclass_t vge_devclass;
 DRIVER_MODULE(vge, pci, vge_driver, vge_devclass, 0, 0);
 DRIVER_MODULE(miibus, vge, miibus_driver, miibus_devclass, 0, 0);
 
+#ifdef __HAIKU__
+int
+__haiku_disable_interrupts(device_t dev)
+{
+	struct vge_softc *sc = device_get_softc(dev);
+
+	if (CSR_READ_4(sc, VGE_ISR) == 0)
+		return 0;
+
+	CSR_WRITE_4(sc, VGE_IMR, 0x00000000);
+	return 1;
+}
+
+
+void
+__haiku_reenable_interrupts(device_t dev)
+{
+	struct vge_softc *sc = device_get_softc(dev);
+
+	CSR_WRITE_4(sc, VGE_IMR, VGE_INTRS);
+}
+#endif	/* __HAIKU__ */
+
 #ifdef VGE_EEPROM
 /*
  * Read a word of data stored in the EEPROM at address 'addr.'
