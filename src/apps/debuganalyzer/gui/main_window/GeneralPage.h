@@ -22,7 +22,9 @@ public:
 private:
 			Model*				fModel;
 			TextDataView*		fDataSourceView;
+			TextDataView*		fCPUCountView;
 			TextDataView*		fRunTimeView;
+			TextDataView*		fIdleTimeView;
 			TextDataView*		fTeamCountView;
 			TextDataView*		fThreadCountView;
 };

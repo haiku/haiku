@@ -40,6 +40,8 @@ private:
 			typedef system_profiler_thread_removed_from_run_queue
 				thread_removed_from_run_queue;
 
+			struct CPUInfo;
+
 private:
 			status_t			_Load();
 			status_t			_ReadDebugEvents(void** _eventData,
@@ -59,11 +61,11 @@ private:
 									system_profiler_thread_added* event);
 			void				_HandleThreadRemoved(
 									system_profiler_thread_removed* event);
-			void				_HandleThreadScheduled(
+			void				_HandleThreadScheduled(uint32 cpu,
 									system_profiler_thread_scheduled* event);
 			void				_HandleThreadEnqueuedInRunQueue(
 									thread_enqueued_in_run_queue* event);
-			void				_HandleThreadRemovedFromRunQueue(
+			void				_HandleThreadRemovedFromRunQueue(uint32 cpu,
 									thread_removed_from_run_queue* event);
 			void				_HandleWaitObjectInfo(
 									system_profiler_wait_object_info* event);
@@ -73,11 +75,15 @@ private:
 			void				_AddThreadWaitObject(Model::ThreadSchedulingState* thread,
 									uint32 type, addr_t object);
 
+			void				_AddIdleTime(uint32 cpu, nanotime_t time);
+
 private:
 			Model*				fModel;
 			DataSource*			fDataSource;
+			CPUInfo*			fCPUInfos;
 			nanotime_t			fBaseTime;
 			Model::SchedulingState fState;
+			uint32				fMaxCPUIndex;
 };
 
 

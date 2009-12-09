@@ -33,6 +33,7 @@ class Model : public Referenceable {
 public:
 			struct creation_time_id;
 			struct type_and_object;
+			class CPU;
 			class WaitObjectGroup;
 			class WaitObject;
 			class ThreadWaitObject;
@@ -63,6 +64,12 @@ public:
 
 	inline	nanotime_t			LastEventTime() const;
 			void				SetLastEventTime(nanotime_t time);
+
+	inline	nanotime_t			IdleTime() const;
+
+	inline	int32				CountCPUs() const;
+			bool				SetCPUCount(int32 count);
+	inline	CPU*				CPUAt(int32 index) const;
 
 			int32				CountTeams() const;
 			Team*				TeamAt(int32 index) const;
@@ -105,6 +112,7 @@ public:
 									// returns the closest previous state
 
 private:
+			typedef BObjectList<CPU> CPUList;
 			typedef BObjectList<Team> TeamList;
 			typedef BObjectList<Thread> ThreadList;
 			typedef BObjectList<WaitObjectGroup> WaitObjectGroupList;
@@ -118,8 +126,11 @@ private:
 			BString				fDataSourceName;
 			void*				fEventData;
 			size_t				fEventDataSize;
+			int32				fCPUCount;
 			nanotime_t			fBaseTime;
 			nanotime_t			fLastEventTime;
+			nanotime_t			fIdleTime;
+			CPUList				fCPUs;
 			TeamList			fTeams;		// sorted by ID
 			ThreadList			fThreads;	// sorted by ID
 			WaitObjectGroupList	fWaitObjectGroups;
@@ -136,6 +147,18 @@ struct Model::creation_time_id {
 struct Model::type_and_object {
 	uint32		type;
 	addr_t		object;
+};
+
+
+class Model::CPU {
+public:
+								CPU();
+
+	inline	nanotime_t			IdleTime() const;
+			void				SetIdleTime(nanotime_t time);
+
+private:
+			nanotime_t			fIdleTime;
 };
 
 
@@ -392,6 +415,7 @@ struct Model::CompactThreadSchedulingState {
 			Model::Thread*		thread;
 			ThreadWaitObject*	waitObject;
 			ThreadState			state;
+			uint8				priority;
 
 public:
 			thread_id			ID() const	{ return thread->ID(); }
@@ -516,6 +540,37 @@ nanotime_t
 Model::LastEventTime() const
 {
 	return fLastEventTime;
+}
+
+
+nanotime_t
+Model::IdleTime() const
+{
+	return fIdleTime;
+}
+
+
+int32
+Model::CountCPUs() const
+{
+	return fCPUCount;
+}
+
+
+Model::CPU*
+Model::CPUAt(int32 index) const
+{
+	return fCPUs.ItemAt(index);
+}
+
+
+// #pragma mark - CPU
+
+
+nanotime_t
+Model::CPU::IdleTime() const
+{
+	return fIdleTime;
 }
 
 
@@ -995,6 +1050,7 @@ Model::CompactThreadSchedulingState::operator=(
 	thread = other.thread;
 	waitObject = other.waitObject;
 	state = other.state;
+	priority = other.priority;
 	return *this;
 }
 

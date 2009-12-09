@@ -26,6 +26,8 @@
 // add a scheduling state snapshot every x events
 static const uint32 kSchedulingSnapshotInterval = 1024;
 
+static const uint32 kMaxCPUCount = 1024;
+
 
 struct SimpleWaitObjectInfo : system_profiler_wait_object_info {
 	SimpleWaitObjectInfo(uint32 type)
@@ -42,6 +44,17 @@ static const SimpleWaitObjectInfo kSnoozeWaitObjectInfo(
 	THREAD_BLOCK_TYPE_SNOOZE);
 static const SimpleWaitObjectInfo kSignalWaitObjectInfo(
 	THREAD_BLOCK_TYPE_SIGNAL);
+
+
+struct ModelLoader::CPUInfo {
+	nanotime_t	idleTime;
+
+	CPUInfo()
+		:
+		idleTime(0)
+	{
+	}
+};
 
 
 // #pragma mark -
@@ -64,13 +77,15 @@ ModelLoader::ModelLoader(DataSource* dataSource,
 	:
 	AbstractModelLoader(target, targetCookie),
 	fModel(NULL),
-	fDataSource(dataSource)
+	fDataSource(dataSource),
+	fCPUInfos(NULL)
 {
 }
 
 
 ModelLoader::~ModelLoader()
 {
+	delete[] fCPUInfos;
 	delete fDataSource;
 	delete fModel;
 }
@@ -102,6 +117,10 @@ ModelLoader::PrepareForLoading()
 	if (error != B_OK)
 		return error;
 
+	fCPUInfos = new(std::nothrow) CPUInfo[kMaxCPUCount];
+	if (fCPUInfos == NULL)
+		return B_NO_MEMORY;
+
 	return B_OK;
 }
 
@@ -126,6 +145,9 @@ ModelLoader::FinishLoading(bool success)
 		delete fModel;
 		fModel = NULL;
 	}
+
+	delete[] fCPUInfos;
+	fCPUInfos = NULL;
 }
 
 
@@ -168,6 +190,7 @@ ModelLoader::_Load()
 	}
 
 	// process the events
+	fMaxCPUIndex = 0;
 	fState.Clear();
 	fBaseTime = -1;
 	uint64 count = 0;
@@ -190,6 +213,12 @@ ModelLoader::_Load()
 		if (error != B_OK)
 			return error;
 
+		if (cpu > fMaxCPUIndex) {
+			if (cpu + 1 > kMaxCPUCount)
+				return B_BAD_DATA;
+			fMaxCPUIndex = cpu;
+		}
+
 		// periodically check whether we're supposed to abort
 		if (++count % 32 == 0) {
 			AutoLocker<BLocker> locker(fLock);
@@ -201,6 +230,12 @@ ModelLoader::_Load()
 		if (count % kSchedulingSnapshotInterval == 0)
 			fModel->AddSchedulingStateSnapshot(fState, offset);
 	}
+
+	if (!fModel->SetCPUCount(fMaxCPUIndex + 1))
+		return B_NO_MEMORY;
+
+	for (uint32 i = 0; i <= fMaxCPUIndex; i++)
+		fModel->CPUAt(i)->SetIdleTime(fCPUInfos[i].idleTime);
 
 	fModel->SetLastEventTime(fState.LastEventTime());
 	fModel->LoadingFinished();
@@ -311,7 +346,8 @@ ModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 			break;
 
 		case B_SYSTEM_PROFILER_THREAD_SCHEDULED:
-			_HandleThreadScheduled((system_profiler_thread_scheduled*)buffer);
+			_HandleThreadScheduled(cpu,
+				(system_profiler_thread_scheduled*)buffer);
 			break;
 
 		case B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE:
@@ -320,7 +356,7 @@ ModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 			break;
 
 		case B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE:
-			_HandleThreadRemovedFromRunQueue(
+			_HandleThreadRemovedFromRunQueue(cpu,
 				(thread_removed_from_run_queue*)buffer);
 			break;
 
@@ -382,7 +418,8 @@ ModelLoader::_HandleThreadRemoved(system_profiler_thread_removed* event)
 
 
 void
-ModelLoader::_HandleThreadScheduled(system_profiler_thread_scheduled* event)
+ModelLoader::_HandleThreadScheduled(uint32 cpu,
+	system_profiler_thread_scheduled* event)
 {
 	_UpdateLastEventTime(event->time);
 
@@ -430,6 +467,8 @@ ModelLoader::_HandleThreadScheduled(system_profiler_thread_scheduled* event)
 		// thread preempted
 		thread->thread->AddPreemption(diffTime);
 		thread->thread->AddRun(diffTime);
+		if (thread->priority == 0)
+			_AddIdleTime(cpu, diffTime);
 
 		thread->lastTime = fState.LastEventTime();
 		thread->state = PREEMPTED;
@@ -437,6 +476,8 @@ ModelLoader::_HandleThreadScheduled(system_profiler_thread_scheduled* event)
 		// thread starts waiting (it hadn't been added to the run
 		// queue before being unscheduled)
 		thread->thread->AddRun(diffTime);
+		if (thread->priority == 0)
+			_AddIdleTime(cpu, diffTime);
 
 		if (event->previous_thread_state == B_THREAD_WAITING) {
 			addr_t waitObject = event->previous_thread_wait_object;
@@ -504,11 +545,13 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 		thread->lastTime = fState.LastEventTime();
 		thread->state = READY;
 	}
+
+	thread->priority = event->priority;
 }
 
 
 void
-ModelLoader::_HandleThreadRemovedFromRunQueue(
+ModelLoader::_HandleThreadRemovedFromRunQueue(uint32 cpu,
 	thread_removed_from_run_queue* event)
 {
 	_UpdateLastEventTime(event->time);
@@ -527,6 +570,8 @@ ModelLoader::_HandleThreadRemovedFromRunQueue(
 	if (thread->state == RUNNING) {
 		// This should never happen.
 		thread->thread->AddRun(diffTime);
+		if (thread->priority == 0)
+			_AddIdleTime(cpu, diffTime);
 	} else if (thread->state == READY || thread->state == PREEMPTED) {
 		// Not really correct, but the case is rare and we keep it
 		// simple.
@@ -566,6 +611,13 @@ ModelLoader::_AddThread(system_profiler_thread_added* event)
 	if (info == NULL)
 		return NULL;
 
+	// TODO: The priority is missing from the system_profiler_thread_added
+	// struct. For now guess at least whether this is an idle thread.
+	if (strncmp(event->name, "idle thread", strlen("idle thread")) == 0)
+		info->priority = 0;
+	else
+		info->priority = B_NORMAL_PRIORITY;
+
 	fState.InsertThread(info);
 
 	return info;
@@ -600,4 +652,11 @@ printf("ModelLoader::_AddThreadWaitObject(): Unknown wait object: type: %lu, "
 	}
 
 	thread->waitObject = threadWaitObjectGroup->MostRecentThreadWaitObject();
+}
+
+
+void
+ModelLoader::_AddIdleTime(uint32 cpu, nanotime_t time)
+{
+	fCPUInfos[cpu].idleTime += time;
 }

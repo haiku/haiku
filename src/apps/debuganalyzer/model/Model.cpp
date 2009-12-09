@@ -14,6 +14,23 @@
 #include <AutoDeleter.h>
 
 
+// #pragma mark - CPU
+
+
+Model::CPU::CPU()
+	:
+	fIdleTime(0)
+{
+}
+
+
+void
+Model::CPU::SetIdleTime(nanotime_t time)
+{
+	fIdleTime = time;
+}
+
+
 // #pragma mark - WaitObject
 
 
@@ -445,8 +462,11 @@ Model::Model(const char* dataSourceName, void* eventData, size_t eventDataSize)
 	fDataSourceName(dataSourceName),
 	fEventData(eventData),
 	fEventDataSize(eventDataSize),
+	fCPUCount(1),
 	fBaseTime(0),
 	fLastEventTime(0),
+	fIdleTime(0),
+	fCPUs(20, true),
 	fTeams(20, true),
 	fThreads(20, true),
 	fWaitObjectGroups(20, true),
@@ -469,8 +489,14 @@ Model::~Model()
 void
 Model::LoadingFinished()
 {
+	// set the thread indices
 	for (int32 i = 0; Thread* thread = fThreads.ItemAt(i); i++)
 		thread->SetIndex(i);
+
+	// compute the total idle time
+	fIdleTime = 0;
+	for (int32 i = 0; CPU* cpu = CPUAt(i); i++)
+		fIdleTime += cpu->IdleTime();
 }
 
 
@@ -485,6 +511,25 @@ void
 Model::SetLastEventTime(nanotime_t time)
 {
 	fLastEventTime = time;
+}
+
+
+bool
+Model::SetCPUCount(int32 count)
+{
+	fCPUCount = count;
+
+	fCPUs.MakeEmpty();
+
+	for (int32 i = 0; i < fCPUCount; i++) {
+		CPU* cpu = new(std::nothrow) CPU;
+		if (cpu == NULL || !fCPUs.AddItem(cpu)) {
+			delete cpu;
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
