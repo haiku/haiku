@@ -193,34 +193,12 @@ private:
 	};
 
 private:
-	static const char* _TypeToString(uint32 type)
-	{
-		switch (type) {
-			case THREAD_BLOCK_TYPE_SEMAPHORE:
-				return "semaphore";
-			case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
-				return "condition";
-			case THREAD_BLOCK_TYPE_MUTEX:
-				return "mutex";
-			case THREAD_BLOCK_TYPE_RW_LOCK:
-				return "rw lock";
-			case THREAD_BLOCK_TYPE_OTHER:
-				return "other";
-			case THREAD_BLOCK_TYPE_SNOOZE:
-				return "snooze";
-			case THREAD_BLOCK_TYPE_SIGNAL:
-				return "signal";
-			default:
-				return "unknown";
-		}
-	}
-
 	static bool _GetWaitObjectValueAt(Model::ThreadWaitObject* waitObject,
 		int32 columnIndex, BVariant& value)
 	{
 		switch (columnIndex) {
 			case 0:
-				value.SetTo(_TypeToString(waitObject->Type()),
+				value.SetTo(wait_object_type_name(waitObject->Type()),
 					B_VARIANT_DONT_COPY_DATA);
 				return true;
 			case 1:
