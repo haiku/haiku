@@ -22,7 +22,7 @@ public:
 			status_t			UnregisterTeam(team_id team);
 			bool				HasTeam(team_id team);
 
-			team_id				AddonServerTeam();
+			team_id				AddOnServerTeam();
 
 			status_t			SendMessage(team_id team, BMessage* message);
 

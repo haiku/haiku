@@ -197,7 +197,7 @@ DormantNodeManager::RegisterAddOn(const char* path)
 {
 	TRACE("DormantNodeManager::RegisterAddon, path %s\n",path);
 
-	server_register_mediaaddon_request msg;
+	server_register_add_on_request msg;
 	entry_ref ref;
 	status_t status = get_ref_for_path(path, &ref);
 	if (status != B_OK) {
@@ -216,7 +216,7 @@ DormantNodeManager::RegisterAddOn(const char* path)
 	msg.reply_port = gPortPool->GetPort();
 	msg.ref = ref;
 
-	status = write_port(port, SERVER_REGISTER_MEDIAADDON, &msg, sizeof(msg));
+	status = write_port(port, SERVER_REGISTER_ADD_ON, &msg, sizeof(msg));
 	if (status != B_OK) {
 		gPortPool->PutPort(msg.reply_port);
 		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to "
@@ -224,7 +224,7 @@ DormantNodeManager::RegisterAddOn(const char* path)
 		return 0;
 	}
 
-	server_register_mediaaddon_reply reply;
+	server_register_add_on_reply reply;
 	int32 code;
 	status = read_port(msg.reply_port, &code, &reply, sizeof(reply));
 
@@ -237,9 +237,9 @@ DormantNodeManager::RegisterAddOn(const char* path)
 	}
 
 	TRACE("DormantNodeManager::RegisterAddon finished with id %ld\n",
-		reply.addon_id);
+		reply.add_on_id);
 
-	return reply.addon_id;
+	return reply.add_on_id;
 }
 
 
@@ -254,9 +254,9 @@ DormantNodeManager::UnregisterAddOn(media_addon_id id)
 	if (port < 0)
 		return;
 
-	server_unregister_mediaaddon_command msg;
-	msg.addon_id = id;
-	write_port(port, SERVER_UNREGISTER_MEDIAADDON, &msg, sizeof(msg));
+	server_unregister_add_on_command msg;
+	msg.add_on_id = id;
+	write_port(port, SERVER_UNREGISTER_ADD_ON, &msg, sizeof(msg));
 }
 
 
@@ -267,17 +267,17 @@ DormantNodeManager::FindAddOnPath(BPath* path, media_addon_id id)
 	if (port < 0)
 		return B_ERROR;
 
-	server_get_mediaaddon_ref_request msg;
-	msg.addon_id = id;
+	server_get_add_on_ref_request msg;
+	msg.add_on_id = id;
 	msg.reply_port = gPortPool->GetPort();
-	status_t status = write_port(port, SERVER_GET_MEDIAADDON_REF, &msg,
+	status_t status = write_port(port, SERVER_GET_ADD_ON_REF, &msg,
 		sizeof(msg));
 	if (status != B_OK) {
 		gPortPool->PutPort(msg.reply_port);
 		return status;
 	}
 
-	server_get_mediaaddon_ref_reply reply;
+	server_get_add_on_ref_reply reply;
 	int32 code;
 	status = read_port(msg.reply_port, &code, &reply, sizeof(reply));
 

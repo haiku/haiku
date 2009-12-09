@@ -354,7 +354,7 @@ void
 MediaAddonServer::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MEDIA_ADDON_SERVER_PLAY_MEDIA:
+		case MEDIA_ADD_ON_SERVER_PLAY_MEDIA:
 		{
 			const char* name;
 			const char* type;
@@ -381,39 +381,39 @@ void
 MediaAddonServer::_HandleMessage(int32 code, const void* data, size_t size)
 {
 	switch (code) {
-		case ADDONSERVER_INSTANTIATE_DORMANT_NODE:
+		case ADD_ON_SERVER_INSTANTIATE_DORMANT_NODE:
 		{
-			const addonserver_instantiate_dormant_node_request* request
+			const add_on_server_instantiate_dormant_node_request* request
 				= static_cast<
-					const addonserver_instantiate_dormant_node_request*>(data);
-			addonserver_instantiate_dormant_node_reply reply;
+					const add_on_server_instantiate_dormant_node_request*>(
+						data);
+			add_on_server_instantiate_dormant_node_reply reply;
 
 			status_t status
 				= MediaRosterEx(fMediaRoster)->InstantiateDormantNode(
-					request->addon_id, request->flavor_id,
+					request->add_on_id, request->flavor_id,
 					request->creator_team, &reply.node);
 			request->SendReply(status, &reply, sizeof(reply));
 			break;
 		}
 
-		case ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS:
+		case ADD_ON_SERVER_RESCAN_ADD_ON_FLAVORS:
 		{
-			const addonserver_rescan_mediaaddon_flavors_command* command
-				= static_cast<
-					const addonserver_rescan_mediaaddon_flavors_command*>(data);
-			BMediaAddOn* addon
-				= gDormantNodeManager->GetAddOn(command->addon_id);
-			if (addon == NULL) {
+			const add_on_server_rescan_flavors_command* command = static_cast<
+				const add_on_server_rescan_flavors_command*>(data);
+			BMediaAddOn* addOn
+				= gDormantNodeManager->GetAddOn(command->add_on_id);
+			if (addOn == NULL) {
 				ERROR("rescan flavors: Can't find a addon object for id %d\n",
-					(int)command->addon_id);
+					(int)command->add_on_id);
 				break;
 			}
-			_ScanAddOnFlavors(addon);
-			gDormantNodeManager->PutAddOn(command->addon_id);
+			_ScanAddOnFlavors(addOn);
+			gDormantNodeManager->PutAddOn(command->add_on_id);
 			break;
 		}
 
-		case ADDONSERVER_RESCAN_FINISHED_NOTIFY:
+		case ADD_ON_SERVER_RESCAN_FINISHED_NOTIFY:
 			if (fStartupSound) {
 				system_beep(MEDIA_SOUNDS_STARTUP);
 				fStartupSound = false;

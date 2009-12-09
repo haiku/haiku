@@ -109,7 +109,7 @@ AppManager::UnregisterTeam(team_id team)
 
 
 team_id
-AppManager::AddonServerTeam()
+AppManager::AddOnServerTeam()
 {
 	team_id id = be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE);
 	if (id < 0) {

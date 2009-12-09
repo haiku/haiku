@@ -616,9 +616,10 @@ BMediaAddOn::NotifyFlavorChange()
 	if (fAddon == 0)
 		return B_ERROR;
 
-	addonserver_rescan_mediaaddon_flavors_command command;
-	command.addon_id = fAddon;
-	return SendToAddonServer(ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS, &command, sizeof(command));
+	add_on_server_rescan_flavors_command command;
+	command.add_on_id = fAddon;
+	return SendToAddOnServer(ADD_ON_SERVER_RESCAN_ADD_ON_FLAVORS, &command,
+		sizeof(command));
 }
 
 /*************************************************************

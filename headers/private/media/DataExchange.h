@@ -27,24 +27,24 @@ struct request_data;
 struct command_data;
 
 // BMessage based data exchange with the media_server
-status_t SendToServer(BMessage *msg);
-status_t QueryServer(BMessage &request, BMessage &reply);
+status_t SendToServer(BMessage* msg);
+status_t QueryServer(BMessage& request, BMessage& reply);
 
 // Raw data based data exchange with the media_server
-status_t SendToServer(int32 msgcode, command_data *msg, int size);
-status_t QueryServer(int32 msgcode, request_data *request, int requestsize,
-	reply_data *reply, int replysize);
+status_t SendToServer(int32 msgCode, command_data* msg, size_t size);
+status_t QueryServer(int32 msgCode, request_data* request, size_t requestSize,
+	reply_data* reply, size_t replySize);
 
 // Raw data based data exchange with the media_addon_server
-status_t SendToAddonServer(int32 msgcode, command_data *msg, int size);
-status_t QueryAddonServer(int32 msgcode, request_data *request, int requestSize,
-	reply_data *reply, int replysize);
+status_t SendToAddOnServer(int32 msgCode, command_data *msg, size_t size);
+status_t QueryAddOnServer(int32 msgCode, request_data* request,
+	size_t requestSize, reply_data* reply, size_t replySize);
 
 // Raw data based data exchange with any (media node control-) port
-status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg,
-	int size);
-status_t QueryPort(port_id requestport, int32 msgcode, request_data *request,
-	int requestsize, reply_data *reply, int replysize);
+status_t SendToPort(port_id sendPort, int32 msgCode, command_data* msg,
+	size_t size);
+status_t QueryPort(port_id requestPort, int32 msgCode, request_data* request,
+	size_t requestSize, reply_data* reply, size_t replySize);
 
 // The base struct used for all raw requests
 struct request_data {
@@ -104,14 +104,14 @@ enum {
 	// add_system_beep_event()
 	MEDIA_SERVER_ADD_SYSTEM_BEEP_EVENT,
 
-	// media addon server
-	MEDIA_ADDON_SERVER_PLAY_MEDIA = '_TRU'
+	// media add-on server
+	MEDIA_ADD_ON_SERVER_PLAY_MEDIA = '_TRU'
 };
 
 // Raw port based communication
 enum {
-	ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS = 0x50,
-	ADDONSERVER_RESCAN_FINISHED_NOTIFY,
+	ADD_ON_SERVER_RESCAN_ADD_ON_FLAVORS = 0x50,
+	ADD_ON_SERVER_RESCAN_FINISHED_NOTIFY,
 
 	SERVER_MESSAGE_START = 0x100,
 	SERVER_REGISTER_APP,
@@ -134,7 +134,7 @@ enum {
 	SERVER_UNREGISTER_BUFFER,
 	SERVER_RESCAN_DEFAULTS,
 	SERVER_SET_NODE_CREATOR,
-	SERVER_CHANGE_ADDON_FLAVOR_INSTANCES_COUNT,
+	SERVER_CHANGE_FLAVOR_INSTANCES_COUNT,
 	SERVER_GET_MEDIA_FILE_TYPES,
 	SERVER_GET_MEDIA_FILE_ITEMS,
 	SERVER_GET_REF_FOR,
@@ -294,15 +294,30 @@ enum {
 	MAX_READERS = 40,
 };
 
-struct addonserver_instantiate_dormant_node_request : request_data {
-	media_addon_id			addon_id;
+
+// #pragma mark - media add-on server commands
+
+
+struct add_on_server_instantiate_dormant_node_request : request_data {
+	media_addon_id			add_on_id;
 	int32					flavor_id;
 	team_id					creator_team;
 };
 
-struct addonserver_instantiate_dormant_node_reply : reply_data {
+struct add_on_server_instantiate_dormant_node_reply : reply_data {
 	media_node				node;
 };
+
+struct add_on_server_rescan_flavors_command : command_data {
+	media_addon_id			add_on_id;
+};
+
+struct add_on_server_rescan_finished_notify_command : command_data {
+};
+
+
+// #pragma mark - media server commands
+
 
 struct server_set_node_request : request_data {
 	node_type				type;
@@ -330,158 +345,6 @@ struct server_get_node_reply : public reply_data {
 	int32					input_id;
 };
 
-struct producer_format_proposal_request : public request_data {
-	media_source			output;
-	media_format			format;
-};
-
-struct producer_format_proposal_reply : reply_data {
-	media_format			format;
-};
-
-struct producer_prepare_to_connect_request : request_data {
-	media_source			source;
-	media_destination		destination;
-	media_format			format;
-	char					name[B_MEDIA_NAME_LENGTH];
-};
-
-struct producer_prepare_to_connect_reply : reply_data {
-	media_format			format;
-	media_source			out_source;
-	char					name[B_MEDIA_NAME_LENGTH];
-};
-
-struct producer_connect_request : request_data {
-	status_t				error;
-	media_source			source;
-	media_destination		destination;
-	media_format			format;
-	char					name[B_MEDIA_NAME_LENGTH];
-};
-
-struct producer_connect_reply : reply_data {
-	char					name[B_MEDIA_NAME_LENGTH];
-};
-
-struct producer_disconnect_request : request_data {
-	media_source			source;
-	media_destination		destination;
-};
-
-struct producer_disconnect_reply : reply_data {
-};
-
-struct producer_format_suggestion_requested_request : request_data {
-	media_type				type;
-	int32					quality;
-};
-
-struct producer_format_suggestion_requested_reply : reply_data {
-	media_format			format;
-};
-
-struct producer_set_play_rate_request : request_data {
-	int32					numer;
-	int32					denom;
-};
-
-struct producer_set_play_rate_reply : reply_data {
-};
-
-struct producer_get_initial_latency_request : request_data {
-};
-
-struct producer_get_initial_latency_reply : reply_data {
-	bigtime_t				initial_latency;
-	uint32					flags;
-};
-
-struct producer_get_latency_request : request_data {
-};
-
-struct producer_get_latency_reply : reply_data {
-	bigtime_t				latency;
-};
-
-struct producer_set_buffer_group_command : command_data {
-	media_source			source;
-	media_destination		destination;
-	void*					user_data;
-	int32					change_tag;
-	int32					buffer_count;
-	media_buffer_id			buffers[1];
-};
-
-struct producer_format_change_requested_command : command_data {
-	media_source			source;
-	media_destination		destination;
-	media_format			format;
-	void*					user_data;
-	int32					change_tag;
-};
-
-struct producer_video_clipping_changed_command : command_data {
-	media_source			source;
-	media_destination		destination;
-	media_video_display_info display;
-	void*					user_data;
-	int32					change_tag;
-	int32					short_count;
-	int16					shorts[1];
-};
-
-struct producer_additional_buffer_requested_command : command_data {
-	media_source			source;
-	media_buffer_id			prev_buffer;
-	bigtime_t				prev_time;
-	bool					has_seek_tag;
-	media_seek_tag			prev_tag;
-};
-
-struct producer_latency_changed_command : command_data {
-	media_source			source;
-	media_destination		destination;
-	bigtime_t				latency;
-	uint32					flags;
-};
-
-struct producer_enable_output_command : command_data {
-	media_source			source;
-	media_destination		destination;
-	bool					enabled;
-	void*					user_data;
-	int32					change_tag;
-};
-
-struct producer_late_notice_received_command : command_data {
-	media_source			source;
-	bigtime_t				how_much;
-	bigtime_t				performance_time;
-};
-
-struct producer_set_run_mode_delay_command : command_data {
-	BMediaNode::run_mode	mode;
-	bigtime_t				delay;
-};
-
-struct consumer_accept_format_request : request_data {
-	media_destination		dest;
-	media_format			format;
-};
-
-struct consumer_accept_format_reply : reply_data {
-	media_format			format;
-};
-
-struct consumer_connected_request : request_data {
-	media_input				input;
-};
-
-struct consumer_connected_reply : reply_data {
-	media_input				input;
-};
-
 struct server_publish_inputs_request : request_data {
 	media_node				node;
 	int32					count;
@@ -504,90 +367,6 @@ struct server_publish_outputs_request : area_request_data {
 };
 
 struct server_publish_outputs_reply : reply_data {
-};
-
-struct producer_get_next_output_request : request_data {
-	int32					cookie;
-};
-
-struct producer_get_next_output_reply : reply_data
-{
-	int32					cookie;
-	media_output			output;
-};
-
-struct producer_dispose_output_cookie_request : request_data
-{
-	int32					cookie;
-};
-
-struct producer_dispose_output_cookie_reply : reply_data {
-};
-
-struct consumer_get_next_input_request : request_data {
-	int32					cookie;
-};
-
-struct consumer_get_next_input_reply : reply_data {
-	int32					cookie;
-	media_input				input;
-};
-
-struct consumer_dispose_input_cookie_request : request_data {
-	int32					cookie;
-};
-
-struct consumer_dispose_input_cookie_reply : reply_data {
-};
-
-struct consumer_disconnected_request : request_data {
-	media_source			source;
-	media_destination		destination;
-};
-
-struct consumer_disconnected_reply : reply_data {
-};
-
-struct consumer_buffer_received_command : command_data {
-	media_buffer_id			buffer;
-	media_header			header;
-};
-
-struct consumer_producer_data_status_command : command_data {
-	media_destination		for_whom;
-	int32					status;
-	bigtime_t				at_performance_time;
-};
-
-struct consumer_get_latency_for_request : request_data {
-	media_destination		for_whom;
-};
-
-struct consumer_get_latency_for_reply : reply_data {
-	bigtime_t				latency;
-	media_node_id			timesource;
-};
-
-struct consumer_format_changed_request : request_data {
-	media_source			producer;
-	media_destination		consumer;
-	int32					change_tag;
-	media_format			format;
-};
-
-struct consumer_format_changed_reply : reply_data {
-};
-
-struct consumer_seek_tag_requested_request : request_data {
-	media_destination		destination;
-	bigtime_t				target_time;
-	uint32					flags;
-};
-
-struct consumer_seek_tag_requested_reply : reply_data {
-	media_seek_tag			seek_tag;
-	bigtime_t				tagged_time;
-	uint32					flags;
 };
 
 struct server_register_app_request : request_data {
@@ -613,19 +392,19 @@ struct server_set_node_creator_request : request_data {
 struct server_set_node_creator_reply : reply_data {
 };
 
-struct server_change_addon_flavor_instances_count_request : request_data {
-	media_addon_id			addon_id;
+struct server_change_flavor_instances_count_request : request_data {
+	media_addon_id			add_on_id;
 	int32					flavor_id;
 	int32					delta; // must be +1 or -1
 	team_id					team;
 };
 
-struct server_change_addon_flavor_instances_count_reply : reply_data {
+struct server_change_flavor_instances_count_reply : reply_data {
 };
 
 struct server_register_node_request : request_data {
-	media_addon_id			addon_id;
-	int32					addon_flavor_id;
+	media_addon_id			add_on_id;
+	int32					flavor_id;
 	char					name[B_MEDIA_NAME_LENGTH];
 	uint64					kinds;
 	port_id					port;
@@ -642,7 +421,7 @@ struct server_unregister_node_request : request_data {
 };
 
 struct server_unregister_node_reply : reply_data {
-	media_addon_id			addon_id;
+	media_addon_id			add_on_id;
 	int32					flavor_id;
 };
 
@@ -654,13 +433,13 @@ struct server_get_live_node_info_reply : reply_data {
 	live_node_info			live_info;
 };
 
-struct server_get_live_nodes_request : request_data {
-	int32					maxcount;
+struct server_get_live_nodes_request : request_area_data {
+	int32					max_count;
 	bool					has_input;
 	bool					has_output;
 	bool					has_name;
-	media_format			inputformat;
-	media_format			outputformat;
+	media_format			input_format;
+	media_format			output_format;
 	char					name[B_MEDIA_NAME_LENGTH + 1];
 								// +1 for a trailing "*"
 	uint64					require_kinds;
@@ -707,9 +486,9 @@ struct server_get_dormant_node_for_reply : reply_data {
 };
 
 struct server_get_instances_for_request : request_data {
-	int32					maxcount;
-	media_addon_id			addon_id;
-	int32					addon_flavor_id;
+	media_addon_id			add_on_id;
+	int32					flavor_id;
+	int32					max_count;
 };
 
 struct server_get_instances_for_reply : reply_data {
@@ -721,30 +500,23 @@ struct server_get_instances_for_reply : reply_data {
 struct server_rescan_defaults_command : command_data {
 };
 
-struct addonserver_rescan_mediaaddon_flavors_command : command_data {
-	media_addon_id			addon_id;
-};
-
-struct addonserver_rescan_finished_notify_command : command_data {
-};
-
-struct server_register_mediaaddon_request : request_data {
+struct server_register_add_on_request : request_data {
 	xfer_entry_ref			ref;
 };
 
-struct server_register_mediaaddon_reply : reply_data {
-	media_addon_id			addon_id;
+struct server_register_add_on_reply : reply_data {
+	media_addon_id			add_on_id;
 };
 
-struct server_unregister_mediaaddon_command : command_data {
-	media_addon_id			addon_id;
+struct server_unregister_add_on_command : command_data {
+	media_addon_id			add_on_id;
 };
 
-struct server_get_mediaaddon_ref_request : request_data {
-	media_addon_id			addon_id;
+struct server_get_add_on_ref_request : request_data {
+	media_addon_id			add_on_id;
 };
 
-struct server_get_mediaaddon_ref_reply : reply_data {
+struct server_get_add_on_ref_reply : reply_data {
 	xfer_entry_ref			ref;
 };
 
@@ -893,6 +665,254 @@ struct server_get_codec_info_reply : reply_data {
 		// the codec info matching the cookie
 };
 
+
+// #pragma mark - buffer producer commands
+
+
+struct producer_format_proposal_request : public request_data {
+	media_source			output;
+	media_format			format;
+};
+
+struct producer_format_proposal_reply : reply_data {
+	media_format			format;
+};
+
+struct producer_prepare_to_connect_request : request_data {
+	media_source			source;
+	media_destination		destination;
+	media_format			format;
+	char					name[B_MEDIA_NAME_LENGTH];
+};
+
+struct producer_prepare_to_connect_reply : reply_data {
+	media_format			format;
+	media_source			out_source;
+	char					name[B_MEDIA_NAME_LENGTH];
+};
+
+struct producer_connect_request : request_data {
+	status_t				error;
+	media_source			source;
+	media_destination		destination;
+	media_format			format;
+	char					name[B_MEDIA_NAME_LENGTH];
+};
+
+struct producer_connect_reply : reply_data {
+	char					name[B_MEDIA_NAME_LENGTH];
+};
+
+struct producer_disconnect_request : request_data {
+	media_source			source;
+	media_destination		destination;
+};
+
+struct producer_disconnect_reply : reply_data {
+};
+
+struct producer_format_suggestion_requested_request : request_data {
+	media_type				type;
+	int32					quality;
+};
+
+struct producer_format_suggestion_requested_reply : reply_data {
+	media_format			format;
+};
+
+struct producer_set_play_rate_request : request_data {
+	int32					numer;
+	int32					denom;
+};
+
+struct producer_set_play_rate_reply : reply_data {
+};
+
+struct producer_get_initial_latency_request : request_data {
+};
+
+struct producer_get_initial_latency_reply : reply_data {
+	bigtime_t				initial_latency;
+	uint32					flags;
+};
+
+struct producer_get_latency_request : request_data {
+};
+
+struct producer_get_latency_reply : reply_data {
+	bigtime_t				latency;
+};
+
+struct producer_set_buffer_group_command : command_data {
+	media_source			source;
+	media_destination		destination;
+	void*					user_data;
+	int32					change_tag;
+	int32					buffer_count;
+	media_buffer_id			buffers[1];
+};
+
+struct producer_format_change_requested_command : command_data {
+	media_source			source;
+	media_destination		destination;
+	media_format			format;
+	void*					user_data;
+	int32					change_tag;
+};
+
+struct producer_video_clipping_changed_command : command_data {
+	media_source			source;
+	media_destination		destination;
+	media_video_display_info display;
+	void*					user_data;
+	int32					change_tag;
+	int32					short_count;
+	int16					shorts[1];
+};
+
+struct producer_additional_buffer_requested_command : command_data {
+	media_source			source;
+	media_buffer_id			prev_buffer;
+	bigtime_t				prev_time;
+	bool					has_seek_tag;
+	media_seek_tag			prev_tag;
+};
+
+struct producer_latency_changed_command : command_data {
+	media_source			source;
+	media_destination		destination;
+	bigtime_t				latency;
+	uint32					flags;
+};
+
+struct producer_enable_output_command : command_data {
+	media_source			source;
+	media_destination		destination;
+	bool					enabled;
+	void*					user_data;
+	int32					change_tag;
+};
+
+struct producer_late_notice_received_command : command_data {
+	media_source			source;
+	bigtime_t				how_much;
+	bigtime_t				performance_time;
+};
+
+struct producer_set_run_mode_delay_command : command_data {
+	BMediaNode::run_mode	mode;
+	bigtime_t				delay;
+};
+
+struct producer_get_next_output_request : request_data {
+	int32					cookie;
+};
+
+struct producer_get_next_output_reply : reply_data
+{
+	int32					cookie;
+	media_output			output;
+};
+
+struct producer_dispose_output_cookie_request : request_data
+{
+	int32					cookie;
+};
+
+struct producer_dispose_output_cookie_reply : reply_data {
+};
+
+
+// #pragma mark - buffer consumer commands
+
+
+struct consumer_accept_format_request : request_data {
+	media_destination		dest;
+	media_format			format;
+};
+
+struct consumer_accept_format_reply : reply_data {
+	media_format			format;
+};
+
+struct consumer_connected_request : request_data {
+	media_input				input;
+};
+
+struct consumer_connected_reply : reply_data {
+	media_input				input;
+};
+
+struct consumer_get_next_input_request : request_data {
+	int32					cookie;
+};
+
+struct consumer_get_next_input_reply : reply_data {
+	int32					cookie;
+	media_input				input;
+};
+
+struct consumer_dispose_input_cookie_request : request_data {
+	int32					cookie;
+};
+
+struct consumer_dispose_input_cookie_reply : reply_data {
+};
+
+struct consumer_disconnected_request : request_data {
+	media_source			source;
+	media_destination		destination;
+};
+
+struct consumer_disconnected_reply : reply_data {
+};
+
+struct consumer_buffer_received_command : command_data {
+	media_buffer_id			buffer;
+	media_header			header;
+};
+
+struct consumer_producer_data_status_command : command_data {
+	media_destination		for_whom;
+	int32					status;
+	bigtime_t				at_performance_time;
+};
+
+struct consumer_get_latency_for_request : request_data {
+	media_destination		for_whom;
+};
+
+struct consumer_get_latency_for_reply : reply_data {
+	bigtime_t				latency;
+	media_node_id			timesource;
+};
+
+struct consumer_format_changed_request : request_data {
+	media_source			producer;
+	media_destination		consumer;
+	int32					change_tag;
+	media_format			format;
+};
+
+struct consumer_format_changed_reply : reply_data {
+};
+
+struct consumer_seek_tag_requested_request : request_data {
+	media_destination		destination;
+	bigtime_t				target_time;
+	uint32					flags;
+};
+
+struct consumer_seek_tag_requested_reply : reply_data {
+	media_seek_tag			seek_tag;
+	bigtime_t				tagged_time;
+	uint32					flags;
+};
+
+
+// #pragma mark - node commands
+
+
 struct node_request_completed_command : command_data {
 	media_request_info		info;
 };
@@ -934,6 +954,10 @@ struct node_get_timesource_reply : reply_data {
 struct node_final_release_command : command_data {
 };
 
+
+// #pragma mark - time source commands
+
+
 struct timesource_add_slave_node_command : command_data {
 	media_node				node;
 };
@@ -948,6 +972,10 @@ struct timesource_get_start_latency_request : request_data {
 struct timesource_get_start_latency_reply : reply_data {
 	bigtime_t				start_latency;
 };
+
+
+// #pragma mark - file interface commands
+
 
 struct fileinterface_set_ref_request : request_data {
 	dev_t					device;
@@ -981,6 +1009,10 @@ struct fileinterface_sniff_ref_reply : reply_data {
 	char					mimetype[B_MIME_TYPE_LENGTH];
 	float					capability;
 };
+
+
+// #pragma mark - controllable commands
+
 
 struct controllable_get_parameter_web_request : area_request_data {
 	int32					max_size;

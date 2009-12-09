@@ -26,55 +26,55 @@ namespace media {
 namespace dataexchange {
 
 
-BMessenger* MediaServerMessenger;
-static port_id MediaServerPort;
-static port_id MediaAddonServerPort;
+BMessenger* gMediaServerMessenger;
+static port_id sMediaServerPort;
+static port_id sMediaAddonServerPort;
 
-void find_media_server_port();
-void find_media_addon_server_port();
+static void find_media_server_port();
+static void find_media_addon_server_port();
 
 static BMessenger*
 GetMediaServerMessenger()
 {
 	static BMessenger* messenger = new BMessenger(B_MEDIA_SERVER_SIGNATURE);
-	return MediaServerMessenger = messenger;
+	return gMediaServerMessenger = messenger;
 }
 
 class initit {
 public:
 	initit()
 	{
-		MediaServerMessenger = 0;
+		gMediaServerMessenger = 0;
 		find_media_server_port();
 		find_media_addon_server_port();
 	}
 
 	~initit()
 	{
-		delete MediaServerMessenger;
+		delete gMediaServerMessenger;
 	}
 };
 initit _initit;
 
 
-void
+static void
 find_media_server_port()
 {
-	MediaServerPort = find_port(MEDIA_SERVER_PORT_NAME);
-	if (MediaServerPort < 0) {
-		ERROR("couldn't find MediaServerPort\n");
-		MediaServerPort = BAD_MEDIA_SERVER_PORT; // make this a unique number
+	sMediaServerPort = find_port(MEDIA_SERVER_PORT_NAME);
+	if (sMediaServerPort < 0) {
+		ERROR("couldn't find sMediaServerPort\n");
+		sMediaServerPort = BAD_MEDIA_SERVER_PORT; // make this a unique number
 	}
 }
 
 
-void
+static void
 find_media_addon_server_port()
 {
-	MediaAddonServerPort = find_port(MEDIA_ADDON_SERVER_PORT_NAME);
-	if (MediaAddonServerPort < 0) {
-		ERROR("couldn't find MediaAddonServerPort\n");
-		MediaAddonServerPort = BAD_MEDIA_ADDON_SERVER_PORT; // make this a unique number
+	sMediaAddonServerPort = find_port(MEDIA_ADDON_SERVER_PORT_NAME);
+	if (sMediaAddonServerPort < 0) {
+		ERROR("couldn't find sMediaAddonServerPort\n");
+		sMediaAddonServerPort = BAD_MEDIA_ADDON_SERVER_PORT; // make this a unique number
 	}
 }
 
@@ -90,26 +90,27 @@ request_data::SendReply(status_t result, reply_data *reply,
 }
 
 
-// BMessage based data exchange with the media_server
+//! BMessage based data exchange with the media_server
 status_t
-SendToServer(BMessage *msg)
+SendToServer(BMessage* msg)
 {
-	status_t rv;
-	rv = GetMediaServerMessenger()->SendMessage(msg, static_cast<BHandler *>(NULL), TIMEOUT);
-	if (rv != B_OK) {
-		ERROR("SendToServer: SendMessage failed, error 0x%08lx (%s)\n", rv, strerror(rv));
+	status_t status = GetMediaServerMessenger()->SendMessage(msg,
+		static_cast<BHandler*>(NULL), TIMEOUT);
+	if (status != B_OK) {
+		ERROR("SendToServer: SendMessage failed: %s\n", strerror(status));
 		DEBUG_ONLY(msg->PrintToStream());
 	}
-	return rv;
+	return status;
 }
 
 
 status_t
-QueryServer(BMessage &request, BMessage &reply)
+QueryServer(BMessage& request, BMessage& reply)
 {
-	status_t status = GetMediaServerMessenger()->SendMessage(&request, &reply, TIMEOUT, TIMEOUT);
+	status_t status = GetMediaServerMessenger()->SendMessage(&request, &reply,
+		TIMEOUT, TIMEOUT);
 	if (status != B_OK) {
-		ERROR("QueryServer: SendMessage failed, error 0x%08lx (%s)\n", status, strerror(status));
+		ERROR("QueryServer: SendMessage failed: %s\n", strerror(status));
 		DEBUG_ONLY(request.PrintToStream());
 		DEBUG_ONLY(reply.PrintToStream());
 	}
@@ -117,58 +118,64 @@ QueryServer(BMessage &request, BMessage &reply)
 }
 
 
-// Raw data based data exchange with the media_server
+//! Raw data based data exchange with the media_server
 status_t
-SendToServer(int32 msgcode, command_data *msg, int size)
+SendToServer(int32 msgCode, command_data* msg, size_t size)
 {
-	return SendToPort(MediaServerPort, msgcode, msg, size);
+	return SendToPort(sMediaServerPort, msgCode, msg, size);
 }
 
 status_t
-QueryServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize)
+QueryServer(int32 msgCode, request_data* request, size_t requestSize,
+	reply_data* reply, size_t replySize)
 {
-	return QueryPort(MediaServerPort, msgcode, request, requestsize, reply, replysize);
+	return QueryPort(sMediaServerPort, msgCode, request, requestSize, reply,
+		replySize);
 }
 
 
-// Raw data based data exchange with the media_addon_server
+//! Raw data based data exchange with the media_addon_server
 status_t
-SendToAddonServer(int32 msgcode, command_data *msg, int size)
+SendToAddOnServer(int32 msgCode, command_data* msg, size_t size)
 {
-	return SendToPort(MediaAddonServerPort, msgcode, msg, size);
+	return SendToPort(sMediaAddonServerPort, msgCode, msg, size);
 }
 
 
 status_t
-QueryAddonServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize)
+QueryAddOnServer(int32 msgCode, request_data* request, size_t requestSize,
+	reply_data* reply, size_t replySize)
 {
-	return QueryPort(MediaAddonServerPort, msgcode, request, requestsize, reply, replysize);
+	return QueryPort(sMediaAddonServerPort, msgCode, request, requestSize,
+		reply, replySize);
 }
 
 
-// Raw data based data exchange with the media_server
+//! Raw data based data exchange with the media_server
 status_t
-SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size)
+SendToPort(port_id sendPort, int32 msgCode, command_data* msg, size_t size)
 {
-	status_t rv;
-
-	rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);
-	if (rv != B_OK) {
-		ERROR("SendToPort: write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, sendport, rv, strerror(rv));
-		if (rv == B_BAD_PORT_ID && sendport == MediaServerPort) {
+	status_t status = write_port_etc(sendPort, msgCode, msg, size,
+		B_RELATIVE_TIMEOUT, TIMEOUT);
+	if (status != B_OK) {
+		ERROR("SendToPort: write_port failed, msgcode 0x%lx, port %ld: %s\n",
+			msgCode, sendPort, strerror(status));
+		if (status == B_BAD_PORT_ID && sendPort == sMediaServerPort) {
 			find_media_server_port();
-			sendport = MediaServerPort;
-		} else if (rv == B_BAD_PORT_ID && sendport == MediaAddonServerPort) {
+			sendPort = sMediaServerPort;
+		} else if (status == B_BAD_PORT_ID
+			&& sendPort == sMediaAddonServerPort) {
 			find_media_addon_server_port();
-			sendport = MediaAddonServerPort;
-		} else {
-			return rv;
-		}
+			sendPort = sMediaAddonServerPort;
+		} else
+			return status;
 
-		rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);
-		if (rv != B_OK) {
-			ERROR("SendToPort: retrying write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, sendport, rv, strerror(rv));
-			return rv;
+		status = write_port_etc(sendPort, msgCode, msg, size,
+			B_RELATIVE_TIMEOUT, TIMEOUT);
+		if (status != B_OK) {
+			ERROR("SendToPort: retrying write_port failed, msgCode 0x%lx, "
+				"port %ld: %s\n", msgCode, sendPort, strerror(status));
+			return status;
 		}
 	}
 	return B_OK;
@@ -176,45 +183,54 @@ SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size)
 
 
 status_t
-QueryPort(port_id requestport, int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize)
+QueryPort(port_id requestPort, int32 msgCode, request_data* request,
+	size_t requestSize, reply_data* reply, size_t replySize)
 {
-	status_t rv;
-	int32 code;
 
 	request->reply_port = gPortPool->GetPort();
 
-	rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
+	status_t status = write_port_etc(requestPort, msgCode, request, requestSize,
+		B_RELATIVE_TIMEOUT, TIMEOUT);
+	if (status != B_OK) {
+		ERROR("QueryPort: write_port failed, msgcode 0x%lx, port %ld: %s\n",
+			msgCode, requestPort, strerror(status));
 
-	if (rv != B_OK) {
-		ERROR("QueryPort: write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, requestport, rv, strerror(rv));
-		if (rv == B_BAD_PORT_ID && requestport == MediaServerPort) {
+		if (status == B_BAD_PORT_ID && requestPort == sMediaServerPort) {
 			find_media_server_port();
-			requestport = MediaServerPort;
-		} else if (rv == B_BAD_PORT_ID && requestport == MediaAddonServerPort) {
+			requestPort = sMediaServerPort;
+		} else if (status == B_BAD_PORT_ID
+			&& requestPort == sMediaAddonServerPort) {
 			find_media_addon_server_port();
-			requestport = MediaAddonServerPort;
+			requestPort = sMediaAddonServerPort;
 		} else {
 			gPortPool->PutPort(request->reply_port);
-			return rv;
+			return status;
 		}
 
-		rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
-		if (rv != B_OK) {
-			ERROR("QueryPort: retrying write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, requestport, rv, strerror(rv));
+		status = write_port_etc(requestPort, msgCode, request, requestSize,
+			B_RELATIVE_TIMEOUT, TIMEOUT);
+		if (status != B_OK) {
+			ERROR("QueryPort: retrying write_port failed, msgcode 0x%lx, port "
+				"%ld: %s\n", msgCode, requestPort, strerror(status));
 			gPortPool->PutPort(request->reply_port);
-			return rv;
+			return status;
 		}
 	}
 
-	rv = read_port_etc(request->reply_port, &code, reply, replysize, B_RELATIVE_TIMEOUT, TIMEOUT);
+	int32 code;
+	status = read_port_etc(request->reply_port, &code, reply, replySize,
+		B_RELATIVE_TIMEOUT, TIMEOUT);
+
 	gPortPool->PutPort(request->reply_port);
 
-	if (rv < B_OK) {
-		ERROR("QueryPort: read_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, request->reply_port, rv, strerror(rv));
+	if (status < B_OK) {
+		ERROR("QueryPort: read_port failed, msgcode 0x%lx, port %ld: %s\n",
+			msgCode, request->reply_port, strerror(status));
 	}
 
-	return (rv < B_OK) ? rv : reply->result;
+	return status < B_OK ? status : reply->result;
 }
+
 
 }	// dataexchange
 }	// media

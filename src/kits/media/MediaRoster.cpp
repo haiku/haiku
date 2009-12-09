@@ -154,14 +154,14 @@ status_t
 BMediaRosterEx::IncrementAddonFlavorInstancesCount(media_addon_id addonID,
 	int32 flavorID)
 {
-	server_change_addon_flavor_instances_count_request request;
-	server_change_addon_flavor_instances_count_reply reply;
+	server_change_flavor_instances_count_request request;
+	server_change_flavor_instances_count_reply reply;
 
-	request.addon_id = addonID;
+	request.add_on_id = addonID;
 	request.flavor_id = flavorID;
 	request.delta = 1;
 	request.team = BPrivate::current_team();
-	return QueryServer(SERVER_CHANGE_ADDON_FLAVOR_INSTANCES_COUNT, &request,
+	return QueryServer(SERVER_CHANGE_FLAVOR_INSTANCES_COUNT, &request,
 		sizeof(request), &reply, sizeof(reply));
 }
 
@@ -170,14 +170,14 @@ status_t
 BMediaRosterEx::DecrementAddonFlavorInstancesCount(media_addon_id addonID,
 	int32 flavorID)
 {
-	server_change_addon_flavor_instances_count_request request;
-	server_change_addon_flavor_instances_count_reply reply;
+	server_change_flavor_instances_count_request request;
+	server_change_flavor_instances_count_reply reply;
 
-	request.addon_id = addonID;
+	request.add_on_id = addonID;
 	request.flavor_id = flavorID;
 	request.delta = -1;
 	request.team = BPrivate::current_team();
-	return QueryServer(SERVER_CHANGE_ADDON_FLAVOR_INSTANCES_COUNT, &request,
+	return QueryServer(SERVER_CHANGE_FLAVOR_INSTANCES_COUNT, &request,
 		sizeof(request), &reply, sizeof(reply));
 }
 
@@ -1419,77 +1419,59 @@ BMediaRoster::GetLiveNodeInfo(const media_node& node,
 
 
 status_t
-BMediaRoster::GetLiveNodes(live_node_info* _liveNodes, int32* _totalCount,
+BMediaRoster::GetLiveNodes(live_node_info* liveNodes, int32* _totalCount,
 	const media_format* hasInput, const media_format* hasOutput,
 	const char* name, uint64 nodeKinds)
 {
 	CALLED();
-	if (_liveNodes == NULL || _totalCount == NULL || *_totalCount <= 0)
+	if (liveNodes == NULL || _totalCount == NULL || *_totalCount <= 0)
 		return B_BAD_VALUE;
 
 	// TODO: we also support the wildcard search as GetDormantNodes does.
 	// This needs to be documented
 
 	server_get_live_nodes_request request;
-	server_get_live_nodes_reply reply;
-	status_t rv;
+	request.team = BPrivate::current_team();
 
-	request.maxcount = *_totalCount;
+	request.max_count = *_totalCount;
 	request.has_input = hasInput != NULL;
 	if (hasInput != NULL) {
 		// TODO: we should not make a flat copy of media_format
-		request.inputformat = *hasInput;
+		request.input_format = *hasInput;
 	}
 	request.has_output = hasOutput != NULL;
 	if (hasOutput != NULL) {
 		// TODO: we should not make a flat copy of media_format
-		request.outputformat = *hasOutput;
+		request.output_format = *hasOutput;
 	}
 	request.has_name = name != NULL;
-	if (name != NULL) {
-		int len = strlen(name);
-		len = min_c(len, (int)sizeof(request.name) - 1);
-		memcpy(request.name, name, len);
-		request.name[len] = 0;
-	}
+	if (name != NULL)
+		strlcpy(request.name, name, sizeof(request.name));
 	request.require_kinds = nodeKinds;
 
-	rv = QueryServer(SERVER_GET_LIVE_NODES, &request, sizeof(request),
-		&reply, sizeof(reply));
-	if (rv != B_OK) {
-		ERROR("BMediaRoster::GetLiveNodes failed querying server\n");
+	server_get_live_nodes_reply reply;
+	status_t status = QueryServer(SERVER_GET_LIVE_NODES, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (status != B_OK) {
+		ERROR("BMediaRoster::GetLiveNodes failed querying server: %s\n",
+			strerror(status));
 		*_totalCount = 0;
-		return rv;
+		return status;
 	}
 
-	if (reply.count > MAX_LIVE_INFO) {
-		live_node_info* liveInfo;
-		area_id clone;
+	const live_node_info* info;
+	if (reply.area >= 0)
+		info = (live_node_info*)reply.address;
+	else
+		info = reply.live_info;
 
-		clone = clone_area("live_node_info clone",
-			reinterpret_cast<void **>(&liveInfo), B_ANY_ADDRESS,
-			B_READ_AREA | B_WRITE_AREA, reply.area);
-		if (clone < B_OK) {
-			ERROR("BMediaRoster::GetLiveNodes failed to clone area, %#lx\n",
-				clone);
-			delete_area(reply.area);
-			*_totalCount = 0;
-			return B_ERROR;
-		}
+	for (int32 i = 0; i < reply.count; i++)
+		liveNodes[i] = info[i];
 
-		for (int32 i = 0; i < reply.count; i++) {
-			_liveNodes[i] = liveInfo[i];
-		}
-
-		delete_area(clone);
+	if (reply.area >= 0)
 		delete_area(reply.area);
-	} else {
-		for (int32 i = 0; i < reply.count; i++) {
-			_liveNodes[i] = reply.live_info[i];
-		}
-	}
-	*_totalCount = reply.count;
 
+	*_totalCount = reply.count;
 	return B_OK;
 }
 
@@ -1885,7 +1867,7 @@ BMediaRoster::RegisterNode(BMediaNode* node)
 
 
 status_t
-BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addonID,
+BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addOnID,
 	int32 flavorID)
 {
 	CALLED();
@@ -1899,16 +1881,15 @@ BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addonID,
 		int32 testFlavorID;
 		BMediaAddOn* addon = node->AddOn(&testFlavorID);
 
-		ASSERT(addonID == addon != NULL ? addon->AddonID() : -1);
+		ASSERT(addOnID == addon != NULL ? addon->AddonID() : -1);
 		ASSERT(flavorID == testFlavorID);
 	);
 
-	status_t rv;
 	server_register_node_request request;
 	server_register_node_reply reply;
 
-	request.addon_id = addonID;
-	request.addon_flavor_id = flavorID;
+	request.add_on_id = addOnID;
+	request.flavor_id = flavorID;
 	strcpy(request.name, node->Name());
 	request.kinds = node->Kinds();
 	request.port = node->ControlPort();
@@ -1918,12 +1899,12 @@ BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addonID,
 		"%ld, kinds 0x%Lx, team %ld, name '%s'\n", request.port, request.kinds,
 		request.team, request.name);
 
-	rv = QueryServer(SERVER_REGISTER_NODE, &request, sizeof(request), &reply,
-		sizeof(reply));
-	if (rv != B_OK) {
-		ERROR("BMediaRoster::RegisterNode: failed to register node %s (error "
-			"%#lx)\n", node->Name(), rv);
-		return rv;
+	status_t status = QueryServer(SERVER_REGISTER_NODE, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (status != B_OK) {
+		ERROR("BMediaRoster::RegisterNode: failed to register node %s: %s\n",
+			node->Name(), strerror(status));
+		return status;
 	}
 
 	TRACE("BMediaRoster::RegisterNode: QueryServer SERVER_REGISTER_NODE "
@@ -1941,11 +1922,9 @@ BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addonID,
 
 	// if the BMediaNode also inherits from BTimeSource, we need to call
 	// BTimeSource::FinishCreate()
-	if (node->Kinds() & B_TIME_SOURCE) {
-		BTimeSource *ts;
-		ts = dynamic_cast<BTimeSource *>(node);
-		if (ts)
-			ts->FinishCreate();
+	if ((node->Kinds() & B_TIME_SOURCE) != 0) {
+		if (BTimeSource* timeSource = dynamic_cast<BTimeSource*>(node))
+			timeSource->FinishCreate();
 	}
 
 	TRACE("BMediaRoster::RegisterNode: publishing inputs/outputs\n");
@@ -1957,18 +1936,15 @@ BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addonID,
 	// if we send a message and wait for a reply here.
 	// We have a pointer to the node, and thus call the functions directly
 
-	if (node->Kinds() & B_BUFFER_PRODUCER) {
-		BBufferProducer *bp;
-		bp = dynamic_cast<BBufferProducer *>(node);
-		if (bp) {
+	if ((node->Kinds() & B_BUFFER_PRODUCER) != 0) {
+		if (BBufferProducer* producer = dynamic_cast<BBufferProducer*>(node)) {
 			List<media_output> list;
-			if (B_OK == GetAllOutputs(bp, &list))
+			if (GetAllOutputs(producer, &list) == B_OK)
 				PublishOutputs(node->Node(), &list);
 		}
 	}
 	if ((node->Kinds() & B_BUFFER_CONSUMER) != 0) {
-		BBufferConsumer* consumer = dynamic_cast<BBufferConsumer*>(node);
-		if (consumer != NULL) {
+		if (BBufferConsumer* consumer = dynamic_cast<BBufferConsumer*>(node)) {
 			List<media_input> list;
 			if (GetAllInputs(consumer, &list) == B_OK)
 				PublishInputs(node->Node(), &list);
@@ -1982,13 +1958,19 @@ BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addonID,
 	TRACE("BMediaRoster::RegisterNode: finished\n");
 
 /*
-	TRACE("BMediaRoster::RegisterNode: registered node name '%s', id %ld, addon %ld, flavor %ld\n", node->Name(), node->ID(), addon_id, addon_flavor_id);
+	TRACE("BMediaRoster::RegisterNode: registered node name '%s', id %ld,
+		addon %ld, flavor %ld\n", node->Name(), node->ID(), addOnID, flavorID);
 	TRACE("BMediaRoster::RegisterNode: node this               %p\n", node);
-	TRACE("BMediaRoster::RegisterNode: node fConsumerThis      %p\n", node->fConsumerThis);
-	TRACE("BMediaRoster::RegisterNode: node fProducerThis      %p\n", node->fProducerThis);
-	TRACE("BMediaRoster::RegisterNode: node fFileInterfaceThis %p\n", node->fFileInterfaceThis);
-	TRACE("BMediaRoster::RegisterNode: node fControllableThis  %p\n", node->fControllableThis);
-	TRACE("BMediaRoster::RegisterNode: node fTimeSourceThis    %p\n", node->fTimeSourceThis);
+	TRACE("BMediaRoster::RegisterNode: node fConsumerThis      %p\n",
+		node->fConsumerThis);
+	TRACE("BMediaRoster::RegisterNode: node fProducerThis      %p\n",
+		node->fProducerThis);
+	TRACE("BMediaRoster::RegisterNode: node fFileInterfaceThis %p\n",
+		node->fFileInterfaceThis);
+	TRACE("BMediaRoster::RegisterNode: node fControllableThis  %p\n",
+		node->fControllableThis);
+	TRACE("BMediaRoster::RegisterNode: node fTimeSourceThis    %p\n",
+		node->fTimeSourceThis);
 */
 	return B_OK;
 }
@@ -2043,7 +2025,7 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 		return status;
 	}
 
-	if (reply.addon_id != -1) {
+	if (reply.add_on_id != -1) {
 		// TODO: this doesn't look right
 		// Small problem here, we can't use DormantNodeManager::PutAddOn(), as
 		// UnregisterNode() is called by a dormant node itself (by the
@@ -2051,10 +2033,10 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 		// The add-on that contains the node needs to remain in memory until the
 		// destructor execution is finished.
 		// DormantNodeManager::PutAddOnDelayed() will delay unloading.
-		gDormantNodeManager->PutAddOnDelayed(reply.addon_id);
+		gDormantNodeManager->PutAddOnDelayed(reply.add_on_id);
 
 		status = MediaRosterEx(this)->DecrementAddonFlavorInstancesCount(
-			reply.addon_id, reply.flavor_id);
+			reply.add_on_id, reply.flavor_id);
 		if (status != B_OK) {
 			ERROR("BMediaRoster::UnregisterNode: "
 				"DecrementAddonFlavorInstancesCount() failed\n");
@@ -2545,13 +2527,13 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info& info,
 		TRACE("BMediaRoster::InstantiateDormantNode: creating global object "
 			"in media_addon_server\n");
 
-		addonserver_instantiate_dormant_node_request request;
-		addonserver_instantiate_dormant_node_reply reply;
-		request.addon_id = info.addon;
+		add_on_server_instantiate_dormant_node_request request;
+		add_on_server_instantiate_dormant_node_reply reply;
+		request.add_on_id = info.addon;
 		request.flavor_id = info.flavor_id;
 		request.creator_team = BPrivate::current_team();
 			// creator team is allowed to also release global nodes
-		rv = QueryAddonServer(ADDONSERVER_INSTANTIATE_DORMANT_NODE, &request,
+		rv = QueryAddOnServer(ADD_ON_SERVER_INSTANTIATE_DORMANT_NODE, &request,
 			sizeof(request), &reply, sizeof(reply));
 		if (rv == B_OK)
 			*_node = reply.node;
@@ -3045,9 +3027,9 @@ BMediaRoster::GetInstancesFor(media_addon_id addon, int32 flavor,
 	server_get_instances_for_reply reply;
 	status_t rv;
 
-	request.maxcount = (_count ? *_count : 1);
-	request.addon_id = addon;
-	request.addon_flavor_id = flavor;
+	request.max_count = (_count ? *_count : 1);
+	request.add_on_id = addon;
+	request.flavor_id = flavor;
 
 	rv = QueryServer(SERVER_GET_INSTANCES_FOR, &request, sizeof(request),
 		&reply, sizeof(reply));

@@ -136,13 +136,12 @@ DefaultManager::SaveState(NodeManager *node_manager)
 		dormant_node_info info;
 		media_node node;
 		entry_ref ref;
-		if (node_manager->GetCloneForID(&node, media_node_ids[i], be_app->Team()) != B_OK)
-			continue;
-		if (node_manager->GetDormantNodeInfo(&info, node) != B_OK)
-			continue;
-		if (node_manager->DecrementGlobalRefCount(media_node_ids[i], be_app->Team()) != B_OK)
-			continue;
-		if (node_manager->GetAddonRef(&ref, info.addon)!=B_OK)
+		if (node_manager->GetCloneForID(media_node_ids[i], be_app->Team(),
+				&node) != B_OK
+			|| node_manager->GetDormantNodeInfo(node, &info) != B_OK
+			|| node_manager->ReleaseNodeReference(media_node_ids[i],
+				be_app->Team()) != B_OK
+			|| node_manager->GetAddOnRef(info.addon, &ref) != B_OK)
 			continue;
 
 		BPath path(&ref);
@@ -337,15 +336,16 @@ DefaultManager::RescanThread()
 		ERROR("DefaultManager: Did not try to connect mixer and soundcard\n");
 	}
 
-	addonserver_rescan_finished_notify_command cmd;
-	SendToAddonServer(ADDONSERVER_RESCAN_FINISHED_NOTIFY, &cmd, sizeof(cmd));
+	add_on_server_rescan_finished_notify_command cmd;
+	SendToAddOnServer(ADD_ON_SERVER_RESCAN_FINISHED_NOTIFY, &cmd, sizeof(cmd));
 
 	printf("DefaultManager::RescanThread() leave\n");
 }
 
 
 void
-DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type, bool isInput, media_type type)
+DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type,
+	bool isInput, media_type type)
 {
 	live_node_info info[MAX_NODE_INFOS];
 	media_format format;
