@@ -12,10 +12,8 @@
 #include <Messenger.h>
 #include <OS.h>
 
-#include "debug.h"
-#include "PortPool.h"
-#include "MediaMisc.h"
-#include "ServerInterface.h"
+#include <debug.h>
+#include <MediaMisc.h>
 
 
 #define TIMEOUT 15000000 // 15 seconds timeout!
@@ -79,15 +77,7 @@ find_media_addon_server_port()
 }
 
 
-status_t
-request_data::SendReply(status_t result, reply_data *reply,
-	size_t replySize) const
-{
-	reply->result = result;
-	// we cheat and use the (command_data *) version of SendToPort
-	return SendToPort(reply_port, 0, reinterpret_cast<command_data *>(reply),
-		replySize);
-}
+// #pragma mark -
 
 
 //! BMessage based data exchange with the media_server
@@ -186,9 +176,6 @@ status_t
 QueryPort(port_id requestPort, int32 msgCode, request_data* request,
 	size_t requestSize, reply_data* reply, size_t replySize)
 {
-
-	request->reply_port = gPortPool->GetPort();
-
 	status_t status = write_port_etc(requestPort, msgCode, request, requestSize,
 		B_RELATIVE_TIMEOUT, TIMEOUT);
 	if (status != B_OK) {
@@ -202,17 +189,14 @@ QueryPort(port_id requestPort, int32 msgCode, request_data* request,
 			&& requestPort == sMediaAddonServerPort) {
 			find_media_addon_server_port();
 			requestPort = sMediaAddonServerPort;
-		} else {
-			gPortPool->PutPort(request->reply_port);
+		} else
 			return status;
-		}
 
 		status = write_port_etc(requestPort, msgCode, request, requestSize,
 			B_RELATIVE_TIMEOUT, TIMEOUT);
 		if (status != B_OK) {
 			ERROR("QueryPort: retrying write_port failed, msgcode 0x%lx, port "
 				"%ld: %s\n", msgCode, requestPort, strerror(status));
-			gPortPool->PutPort(request->reply_port);
 			return status;
 		}
 	}
@@ -220,9 +204,6 @@ QueryPort(port_id requestPort, int32 msgCode, request_data* request,
 	int32 code;
 	status = read_port_etc(request->reply_port, &code, reply, replySize,
 		B_RELATIVE_TIMEOUT, TIMEOUT);
-
-	gPortPool->PutPort(request->reply_port);
-
 	if (status < B_OK) {
 		ERROR("QueryPort: read_port failed, msgcode 0x%lx, port %ld: %s\n",
 			msgCode, request->reply_port, strerror(status));

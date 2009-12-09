@@ -37,9 +37,9 @@ status_t QueryPort(port_id requestPort, int32 msgCode, request_data* request,
 	size_t requestSize, reply_data* reply, size_t replySize);
 
 
-} // namespace dataexchange
-} // namespace media
-} // namespace BPrivate
+}	// namespace dataexchange
+}	// namespace media
+}	// namespace BPrivate
 
 
 using namespace BPrivate::media::dataexchange;

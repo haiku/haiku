@@ -154,6 +154,10 @@ enum {
 };
 
 
+namespace BPrivate {
+namespace media {
+
+
 struct reply_data;
 struct request_data;
 struct command_data;
@@ -162,6 +166,9 @@ struct command_data;
 // The base struct used for all raw requests
 struct request_data {
 	port_id					reply_port;
+
+	request_data();
+	~request_data();
 
 	status_t SendReply(status_t result, reply_data* reply,
 		size_t replySize) const;
@@ -235,6 +242,12 @@ private:
 	ino_t	directory;
 	char	name[B_FILE_NAME_LENGTH];
 };
+
+
+}	// namespace media
+}	// namespace BPrivate
+
+using namespace BPrivate::media;
 
 // used by SERVER_GET_NODE and SERVER_SET_NODE
 enum node_type {

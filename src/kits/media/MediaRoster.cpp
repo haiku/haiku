@@ -63,7 +63,6 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 #include <MediaRosterEx.h>
 #include <MediaMisc.h>
 #include <Notifications.h>
-#include <PortPool.h>
 #include <ServerInterface.h>
 #include <SharedBufferList.h>
 
@@ -1369,22 +1368,19 @@ BMediaRoster::SetProducerRate(const media_node& producer, int32 numer,
 	if ((producer.kind & B_BUFFER_PRODUCER) == 0)
 		return B_MEDIA_BAD_NODE;
 
-	producer_set_play_rate_request msg;
-	producer_set_play_rate_reply reply;
-	status_t rv;
-	int32 code;
+	producer_set_play_rate_request request;
+	request.numer = numer;
+	request.denom = denom;
+	status_t status = write_port(producer.node, PRODUCER_SET_PLAY_RATE,
+		&request, sizeof(request));
+	if (status != B_OK)
+		return status;
 
-	msg.numer = numer;
-	msg.denom = denom;
-	msg.reply_port = gPortPool->GetPort();
-	rv = write_port(producer.node, PRODUCER_SET_PLAY_RATE, &msg, sizeof(msg));
-	if (rv != B_OK) {
-		gPortPool->PutPort(msg.reply_port);
-		return rv;
-	}
-	rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-	gPortPool->PutPort(msg.reply_port);
-	return (rv < B_OK) ? rv : reply.result;
+	producer_set_play_rate_reply reply;
+	int32 code;
+	status = read_port(request.reply_port, &code, &reply, sizeof(reply));
+
+	return status < B_OK ? status : reply.result;
 }
 
 
@@ -2268,15 +2264,12 @@ BMediaRoster::GetDormantNodes(dormant_node_info* _info, int32* _count,
 
 	request.require_kinds = requireKinds;
 	request.deny_kinds = denyKinds;
-	request.reply_port = gPortPool->GetPort();
 
 	server_get_dormant_nodes_reply reply;
 	status_t status = QueryServer(SERVER_GET_DORMANT_NODES, &request,
 		sizeof(request), &reply, sizeof(reply));
-	if (status != B_OK) {
-		gPortPool->PutPort(request.reply_port);
+	if (status != B_OK)
 		return status;
-	}
 
 	*_count = reply.count;
 
@@ -2287,7 +2280,6 @@ BMediaRoster::GetDormantNodes(dormant_node_info* _info, int32* _count,
 		if (status < B_OK)
 			reply.result = status;
 	}
-	gPortPool->PutPort(request.reply_port);
 
 	return reply.result;
 }
@@ -2587,13 +2579,9 @@ BMediaRosterEx::GetDormantFlavorInfo(media_addon_id addonID, int32 flavorID,
 	server_get_dormant_flavor_info_request request;
 	request.add_on_id = addonID;
 	request.flavor_id = flavorID;
-	request.reply_port = gPortPool->GetPort();
 
 	status_t status = QueryServer(SERVER_GET_DORMANT_FLAVOR_INFO, &request,
 		sizeof(request), reply, 16300);
-
-	gPortPool->PutPort(request.reply_port);
-
 	if (status != B_OK) {
 		free(reply);
 		return status;

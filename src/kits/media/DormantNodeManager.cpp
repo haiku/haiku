@@ -57,7 +57,6 @@
 #include <Path.h>
 
 #include <debug.h>
-#include <PortPool.h>
 #include <MediaMisc.h>
 #include <ServerInterface.h>
 #include <DataExchange.h>
@@ -197,7 +196,6 @@ DormantNodeManager::RegisterAddOn(const char* path)
 {
 	TRACE("DormantNodeManager::RegisterAddon, path %s\n",path);
 
-	server_register_add_on_request msg;
 	entry_ref ref;
 	status_t status = get_ref_for_path(path, &ref);
 	if (status != B_OK) {
@@ -206,29 +204,17 @@ DormantNodeManager::RegisterAddOn(const char* path)
 		return 0;
 	}
 
-	port_id port = find_port(MEDIA_SERVER_PORT_NAME);
-	if (port < 0) {
-		ERROR("DormantNodeManager::RegisterAddon failed, couldn't find media "
-			"server\n");
-		return 0;
-	}
+	server_register_add_on_request request;
+	request.ref = ref;
 
-	msg.reply_port = gPortPool->GetPort();
-	msg.ref = ref;
-
-	status = write_port(port, SERVER_REGISTER_ADD_ON, &msg, sizeof(msg));
+	server_register_add_on_reply reply;
+	status = QueryServer(SERVER_REGISTER_ADD_ON, &request, sizeof(request),
+		&reply, sizeof(reply));
 	if (status != B_OK) {
-		gPortPool->PutPort(msg.reply_port);
 		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to "
 			"media server\n");
 		return 0;
 	}
-
-	server_register_add_on_reply reply;
-	int32 code;
-	status = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-
-	gPortPool->PutPort(msg.reply_port);
 
 	if (status < B_OK) {
 		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to "
@@ -263,27 +249,13 @@ DormantNodeManager::UnregisterAddOn(media_addon_id id)
 status_t
 DormantNodeManager::FindAddOnPath(BPath* path, media_addon_id id)
 {
-	port_id port = find_port(MEDIA_SERVER_PORT_NAME);
-	if (port < 0)
-		return B_ERROR;
-
-	server_get_add_on_ref_request msg;
-	msg.add_on_id = id;
-	msg.reply_port = gPortPool->GetPort();
-	status_t status = write_port(port, SERVER_GET_ADD_ON_REF, &msg,
-		sizeof(msg));
-	if (status != B_OK) {
-		gPortPool->PutPort(msg.reply_port);
-		return status;
-	}
+	server_get_add_on_ref_request request;
+	request.add_on_id = id;
 
 	server_get_add_on_ref_reply reply;
-	int32 code;
-	status = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-
-	gPortPool->PutPort(msg.reply_port);
-
-	if (status < B_OK)
+	status_t status = QueryServer(SERVER_GET_ADD_ON_REF, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (status != B_OK)
 		return status;
 
 	entry_ref ref = reply.ref;

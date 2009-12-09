@@ -4,18 +4,37 @@
  */
 
 
-#include <PortPool.h>
+#include <ServerInterface.h>
+
+#include <set>
 
 #include <Autolock.h>
+#include <Locker.h>
 
+#include <DataExchange.h>
 #include <debug.h>
 
 
 namespace BPrivate {
+namespace media {
+
+
+class PortPool : BLocker {
+public:
+								PortPool();
+								~PortPool();
+
+			port_id				GetPort();
+			void				PutPort(port_id port);
+
+private:
+			typedef std::set<port_id> PortSet;
+
+			PortSet				fPool;
+};
 
 
 static PortPool sPortPool;
-PortPool* gPortPool = &sPortPool;
 
 
 PortPool::PortPool()
@@ -65,4 +84,31 @@ PortPool::PutPort(port_id port)
 }
 
 
+// #pragma mark -
+
+
+request_data::request_data()
+{
+	reply_port = sPortPool.GetPort();
+}
+
+
+request_data::~request_data()
+{
+	sPortPool.PutPort(reply_port);
+}
+
+
+status_t
+request_data::SendReply(status_t result, reply_data *reply,
+	size_t replySize) const
+{
+	reply->result = result;
+	// we cheat and use the (command_data *) version of SendToPort
+	return SendToPort(reply_port, 0, reinterpret_cast<command_data *>(reply),
+		replySize);
+}
+
+
+}	// namespace media
 }	// namespace BPrivate
