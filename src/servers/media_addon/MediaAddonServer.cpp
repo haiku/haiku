@@ -451,12 +451,6 @@ MediaAddonServer::_ScanAddOnFlavors(BMediaAddOn* addon)
 
 	TRACE("MediaAddonServer::_ScanAddOnFlavors: id %ld\n", addon->AddonID());
 
-	port_id port = find_port(MEDIA_SERVER_PORT_NAME);
-	if (port <= B_OK) {
-		ERROR("couldn't find media_server port\n");
-		return;
-	}
-
 	// cache the media_addon_id in a local variable to avoid
 	// calling BMediaAddOn::AddonID() too often
 	media_addon_id addonID = addon->AddonID();
@@ -496,9 +490,9 @@ MediaAddonServer::_ScanAddOnFlavors(BMediaAddOn* addon)
 
 		size_t flattenedSize = dormantFlavorInfo.FlattenedSize();
 		size_t messageSize = flattenedSize
-			+ sizeof(xfer_server_register_dormant_node);
-		xfer_server_register_dormant_node* message
-			= (xfer_server_register_dormant_node*)malloc(messageSize);
+			+ sizeof(server_register_dormant_node_command);
+		server_register_dormant_node_command* message
+			= (server_register_dormant_node_command*)malloc(messageSize);
 		if (message == NULL)
 			break;
 
@@ -511,7 +505,7 @@ MediaAddonServer::_ScanAddOnFlavors(BMediaAddOn* addon)
 		message->flattened_size = flattenedSize;
 		dormantFlavorInfo.Flatten(message->flattened_data, flattenedSize);
 
-		status_t status = write_port(port, SERVER_REGISTER_DORMANT_NODE,
+		status_t status = SendToServer(SERVER_REGISTER_DORMANT_NODE,
 			message, messageSize);
 		if (status != B_OK) {
 			ERROR("MediaAddonServer::_ScanAddOnFlavors: couldn't register "

@@ -640,21 +640,19 @@ struct server_get_codec_info_reply : reply_data {
 		// the codec info matching the cookie
 };
 
-struct xfer_server_get_dormant_flavor_info {
+struct server_get_dormant_flavor_info_request : request_data {
 	media_addon_id	add_on_id;
 	int32			flavor_id;
-	port_id			reply_port;
 };
 
-struct xfer_server_get_dormant_flavor_info_reply {
-	status_t 		result;
+struct server_get_dormant_flavor_info_reply : reply_data {
 	type_code		type; // the flatten type_code
 	size_t 			flattened_size;
 	char 			flattened_data[1];
 		// a flattened dormant_flavor_info, flattened_size large
 };
 
-struct xfer_server_get_dormant_nodes {
+struct server_get_dormant_nodes_request : request_data {
 	int32			max_count;
 	bool			has_input;
 	media_format	input_format;
@@ -664,17 +662,15 @@ struct xfer_server_get_dormant_nodes {
 	char			name[B_MEDIA_NAME_LENGTH + 1]; // 1 for a trailing "*"
 	uint64			require_kinds;
 	uint64			deny_kinds;
-	port_id			reply_port;
 };
 
-struct xfer_server_get_dormant_nodes_reply {
-	status_t		result;
+struct server_get_dormant_nodes_reply : reply_data {
 	int32			count;
 		// if count > 0, a second reply containing count dormant_node_infos
 		// is send
 };
 
-struct xfer_server_register_dormant_node {
+struct server_register_dormant_node_command : command_data {
 	media_addon_id	purge_id;
 		// if > 0, server must first remove all dormant_flavor_infos
 		// belonging to that id

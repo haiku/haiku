@@ -600,14 +600,14 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_REGISTER_DORMANT_NODE:
 		{
-			xfer_server_register_dormant_node& request
-				= *static_cast<xfer_server_register_dormant_node*>(data);
-			if (request.purge_id > 0)
-				gNodeManager->InvalidateDormantFlavorInfo(request.purge_id);
+			server_register_dormant_node_command& command
+				= *static_cast<server_register_dormant_node_command*>(data);
+			if (command.purge_id > 0)
+				gNodeManager->InvalidateDormantFlavorInfo(command.purge_id);
 
 			dormant_flavor_info dormantFlavorInfo;
-			status_t status = dormantFlavorInfo.Unflatten(request.type,
-				request.flattened_data, request.flattened_size);
+			status_t status = dormantFlavorInfo.Unflatten(command.type,
+				command.flattened_data, command.flattened_size);
 			if (status == B_OK)
 				gNodeManager->AddDormantFlavorInfo(dormantFlavorInfo);
 			break;
@@ -615,10 +615,10 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_GET_DORMANT_NODES:
 		{
-			xfer_server_get_dormant_nodes& request
-				= *static_cast<xfer_server_get_dormant_nodes*>(data);
+			server_get_dormant_nodes_request& request
+				= *static_cast<server_get_dormant_nodes_request*>(data);
 
-			xfer_server_get_dormant_nodes_reply reply;
+			server_get_dormant_nodes_reply reply;
 			reply.count = request.max_count;
 
 			dormant_node_info* infos
@@ -635,7 +635,8 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 			if (reply.result != B_OK)
 				reply.count = 0;
-			write_port(request.reply_port, 0, &reply, sizeof(reply));
+
+			request.SendReply(reply.result, &reply, sizeof(reply));
 			if (reply.count > 0) {
 				write_port(request.reply_port, 0, infos,
 					reply.count * sizeof(dormant_node_info));
@@ -646,22 +647,22 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 		case SERVER_GET_DORMANT_FLAVOR_INFO:
 		{
-			xfer_server_get_dormant_flavor_info& request
-				= *static_cast<xfer_server_get_dormant_flavor_info*>(data);
+			server_get_dormant_flavor_info_request& request
+				= *static_cast<server_get_dormant_flavor_info_request*>(data);
 			dormant_flavor_info dormantFlavorInfo;
 
 			status_t status = gNodeManager->GetDormantFlavorInfoFor(
 				request.add_on_id, request.flavor_id, &dormantFlavorInfo);
 			if (status != B_OK) {
-				xfer_server_get_dormant_flavor_info_reply reply;
+				server_get_dormant_flavor_info_reply reply;
 				reply.result = status;
-				write_port(request.reply_port, 0, &reply, sizeof(reply));
+				request.SendReply(reply.result, &reply, sizeof(reply));
 			} else {
 				size_t replySize
-					= sizeof(xfer_server_get_dormant_flavor_info_reply)
+					= sizeof(server_get_dormant_flavor_info_reply)
 						+ dormantFlavorInfo.FlattenedSize();
-				xfer_server_get_dormant_flavor_info_reply* reply
-					= (xfer_server_get_dormant_flavor_info_reply*)malloc(
+				server_get_dormant_flavor_info_reply* reply
+					= (server_get_dormant_flavor_info_reply*)malloc(
 						replySize);
 				if (reply != NULL) {
 					reply->type = dormantFlavorInfo.TypeCode();
@@ -669,12 +670,12 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 					reply->result = dormantFlavorInfo.Flatten(
 						reply->flattened_data, reply->flattened_size);
 
-					write_port(request.reply_port, 0, reply, replySize);
+					request.SendReply(reply->result, reply, replySize);
 					free(reply);
 				} else {
-					xfer_server_get_dormant_flavor_info_reply reply;
+					server_get_dormant_flavor_info_reply reply;
 					reply.result = B_NO_MEMORY;
-					write_port(request.reply_port, 0, &reply, sizeof(reply));
+					request.SendReply(reply.result, &reply, sizeof(reply));
 				}
 			}
 			break;

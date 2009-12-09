@@ -2249,64 +2249,49 @@ BMediaRoster::GetDormantNodes(dormant_node_info* _info, int32* _count,
 	if (_info == NULL || _count == NULL || *_count <= 0)
 		return B_BAD_VALUE;
 
-	xfer_server_get_dormant_nodes msg;
-	port_id port;
-	status_t rv;
-
-	port = find_port(MEDIA_SERVER_PORT_NAME);
-	if (port <= B_OK)
-		return B_ERROR;
-
-	msg.max_count = *_count;
-	msg.has_input = hasInput != NULL;
+	server_get_dormant_nodes_request request;
+	request.max_count = *_count;
+	request.has_input = hasInput != NULL;
 	if (hasInput != NULL) {
 		// TODO: we should not make a flat copy of media_format
-		msg.input_format = *hasInput;
+		request.input_format = *hasInput;
 	}
-	msg.has_output = hasOutput != NULL;
+	request.has_output = hasOutput != NULL;
 	if (hasOutput != NULL) {
 		// TODO: we should not make a flat copy of media_format
-		msg.output_format = *hasOutput;
+		request.output_format = *hasOutput;
 	}
 
-	msg.has_name = name != NULL;
-	if (name != NULL) {
-		int len = strlen(name);
-		len = min_c(len, (int)sizeof(msg.name) - 1);
-		memcpy(msg.name, name, len);
-		msg.name[len] = 0;
-	}
-	msg.require_kinds = requireKinds;
-	msg.deny_kinds = denyKinds;
-	msg.reply_port = gPortPool->GetPort();
+	request.has_name = name != NULL;
+	if (name != NULL)
+		strlcpy(request.name, name, sizeof(request.name));
 
-	rv = write_port(port, SERVER_GET_DORMANT_NODES, &msg, sizeof(msg));
-	if (rv != B_OK) {
-		gPortPool->PutPort(msg.reply_port);
-		return rv;
-	}
+	request.require_kinds = requireKinds;
+	request.deny_kinds = denyKinds;
+	request.reply_port = gPortPool->GetPort();
 
-	xfer_server_get_dormant_nodes_reply reply;
-	int32 code;
-
-	rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-	if (rv < B_OK) {
-		gPortPool->PutPort(msg.reply_port);
-		return rv;
+	server_get_dormant_nodes_reply reply;
+	status_t status = QueryServer(SERVER_GET_DORMANT_NODES, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (status != B_OK) {
+		gPortPool->PutPort(request.reply_port);
+		return status;
 	}
 
 	*_count = reply.count;
 
-	if (*_count > 0) {
-		rv = read_port(msg.reply_port, &code, _info,
-			*_count * sizeof(dormant_node_info));
-		if (rv < B_OK)
-			reply.result = rv;
+	if (reply.count > 0) {
+		int32 code;
+		status = read_port(request.reply_port, &code, _info,
+			reply.count * sizeof(dormant_node_info));
+		if (status < B_OK)
+			reply.result = status;
 	}
-	gPortPool->PutPort(msg.reply_port);
+	gPortPool->PutPort(request.reply_port);
 
 	return reply.result;
 }
+
 
 /*!	This function is used to do the real work of instantiating a dormant node.
 	It is either called by the media_addon_server to instantiate a global node,
@@ -2592,32 +2577,24 @@ BMediaRosterEx::GetDormantFlavorInfo(media_addon_id addonID, int32 flavorID,
 	if (_flavor == NULL)
 		return B_BAD_VALUE;
 
-	port_id port = find_port(MEDIA_SERVER_PORT_NAME);
-	if (port < 0)
-		return B_ERROR;
+	// TODO: better use an area here as well!
 
-	xfer_server_get_dormant_flavor_info_reply* reply
-		= (xfer_server_get_dormant_flavor_info_reply*)malloc(16300);
+	server_get_dormant_flavor_info_reply* reply
+		= (server_get_dormant_flavor_info_reply*)malloc(16300);
 	if (reply == NULL)
 		return B_NO_MEMORY;
 
-	xfer_server_get_dormant_flavor_info msg;
-	msg.add_on_id = addonID;
-	msg.flavor_id = flavorID;
-	msg.reply_port = gPortPool->GetPort();
-	status_t status = write_port(port, SERVER_GET_DORMANT_FLAVOR_INFO, &msg,
-		sizeof(msg));
+	server_get_dormant_flavor_info_request request;
+	request.add_on_id = addonID;
+	request.flavor_id = flavorID;
+	request.reply_port = gPortPool->GetPort();
+
+	status_t status = QueryServer(SERVER_GET_DORMANT_FLAVOR_INFO, &request,
+		sizeof(request), reply, 16300);
+
+	gPortPool->PutPort(request.reply_port);
+
 	if (status != B_OK) {
-		free(reply);
-		gPortPool->PutPort(msg.reply_port);
-		return status;
-	}
-
-	int32 code;
-	status = read_port(msg.reply_port, &code, reply, 16000);
-	gPortPool->PutPort(msg.reply_port);
-
-	if (status < B_OK) {
 		free(reply);
 		return status;
 	}
