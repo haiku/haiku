@@ -71,6 +71,14 @@ format_bigtime(bigtime_t time, char* buffer, size_t bufferSize)
 }
 
 
+static inline BString
+format_bigtime(bigtime_t time)
+{
+	char buffer[64];
+	format_bigtime(time, buffer, sizeof(buffer));
+	return BString(buffer);
+}
+
 
 static inline const char*
 format_nanotime(nanotime_t time, char* buffer, size_t bufferSize)
@@ -81,6 +89,15 @@ format_nanotime(nanotime_t time, char* buffer, size_t bufferSize)
 	snprintf(buffer, bufferSize, "%02lld:%02d:%02d:%09d", decomposed.hours,
 		decomposed.minutes, decomposed.seconds, decomposed.nanos);
 	return buffer;
+}
+
+
+static inline BString
+format_nanotime(nanotime_t time)
+{
+	char buffer[64];
+	format_nanotime(time, buffer, sizeof(buffer));
+	return BString(buffer);
 }
 
 
