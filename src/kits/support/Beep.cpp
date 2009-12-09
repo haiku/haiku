@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Copyright 2007, Jérôme Duval. All rights reserved.
 ** Distributed under the terms of the Haiku License.
@@ -15,13 +15,15 @@
 status_t
 system_beep(const char *eventName)
 {
+// TODO: Axel, fix me!
+static const uint32 MEDIA_ADDON_SERVER_PLAY_MEDIA = 0;
 	BMessenger messenger("application/x-vnd.Be.addon-host");
 	if (!messenger.IsValid())
 		return B_ERROR;
 	BMessage msg(MEDIA_ADDON_SERVER_PLAY_MEDIA), reply;
 	msg.AddString(MEDIA_NAME_KEY, eventName ? eventName : MEDIA_SOUNDS_BEEP);
 	msg.AddString(MEDIA_TYPE_KEY, MEDIA_TYPE_SOUNDS);
-	
+
 	status_t err = messenger.SendMessage(&msg, &reply);
 	if ((err != B_OK)
 		|| (reply.FindInt32("error", &err) != B_OK))
@@ -47,7 +49,7 @@ add_system_beep_event(const char *name, uint32 flags)
 	msg.AddString(MEDIA_NAME_KEY, name);
 	msg.AddString(MEDIA_TYPE_KEY, MEDIA_TYPE_SOUNDS);
 	msg.AddInt32(MEDIA_FLAGS_KEY, flags);
-	
+
 	status_t err = messenger.SendMessage(&msg, &reply);
 	if ((err != B_OK)
 		|| (reply.FindInt32("error", &err) != B_OK))
