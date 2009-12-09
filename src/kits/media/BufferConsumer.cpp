@@ -31,6 +31,7 @@
 #include <BufferConsumer.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 #include <BufferProducer.h>
 #include <BufferGroup.h>

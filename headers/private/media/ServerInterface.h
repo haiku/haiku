@@ -7,6 +7,8 @@
 #define _SERVER_INTERFACE_H_
 
 
+#include <string.h>
+
 #include <Buffer.h>
 #include <Entry.h>
 #include <MediaAddOn.h>

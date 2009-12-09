@@ -1,7 +1,7 @@
 /***********************************************************************
  * AUTHOR: Marcus Overhagen
  *   FILE: FileInterface.cpp
- *  DESCR: 
+ *  DESCR:
  ***********************************************************************/
 /*
  * Copyright 2008 Maurice Kalinowski, haiku@kaldience.com
@@ -12,6 +12,7 @@
 
 #include "debug.h"
 #include "DataExchange.h"
+#include <string.h>
 #include <FileInterface.h>
 #include <MimeType.h>
 
@@ -55,7 +56,7 @@ BFileInterface::HandleMessage(int32 message,
 	switch(message) {
 		case FILEINTERFACE_SET_REF:
 		{
-			const fileinterface_set_ref_request *request = 
+			const fileinterface_set_ref_request *request =
 					(const fileinterface_set_ref_request*) data;
 			fileinterface_set_ref_reply reply;
 			entry_ref ref(request->device, request->directory,
@@ -69,7 +70,7 @@ BFileInterface::HandleMessage(int32 message,
 		}
 		case FILEINTERFACE_GET_REF:
 		{
-			const fileinterface_get_ref_request *request = 
+			const fileinterface_get_ref_request *request =
 					(const fileinterface_get_ref_request*) data;
 			fileinterface_get_ref_reply reply;
 			entry_ref resultRef;
@@ -84,7 +85,7 @@ BFileInterface::HandleMessage(int32 message,
 		}
 		case FILEINTERFACE_SNIFF_REF:
 		{
-			const fileinterface_sniff_ref_request *request = 
+			const fileinterface_sniff_ref_request *request =
 					(const fileinterface_sniff_ref_request*) data;
 			fileinterface_sniff_ref_reply reply;
 
