@@ -17,6 +17,7 @@
 #include <PopUpMenu.h>
 #include <ScrollView.h>
 #include <SplitView.h>
+#include <ToolTip.h>
 
 #include <DebugEventStream.h>
 
@@ -29,6 +30,7 @@
 #include "chart/StringChartLegend.h"
 #include "HeaderView.h"
 #include "Model.h"
+#include "util/TimeUtils.h"
 
 
 static const float kThreadNameMargin = 3.0f;
@@ -637,7 +639,7 @@ public:
 			fListener->DataRangeChanged();
 	}
 
-	void MessageReceived(BMessage* message)
+	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
 			case B_MOUSE_WHEEL_CHANGED:
@@ -659,7 +661,8 @@ public:
 		LineBaseView::MessageReceived(message);
 	}
 
-	void MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
+	virtual void MouseMoved(BPoint where, uint32 code,
+		const BMessage* dragMessage)
 	{
 		fLastMousePos = where - LeftTop();
 
@@ -668,6 +671,105 @@ public:
 //
 //		ScrollBar(B_HORIZONTAL)->SetValue(fDraggingStartScrollValue
 //			+ fDraggingStartPos.x - where.x);
+	}
+
+	virtual bool GetToolTipAt(BPoint point, BToolTip** _tip)
+	{
+		Model::Thread* thread;
+		nanotime_t time;
+		_GetThreadAndTimeAt(point, thread, time);
+		if (thread == NULL)
+			return false;
+
+		ThreadState threadState = UNKNOWN;
+		nanotime_t threadStateTime = time;
+		nanotime_t threadStateEndTime = time;
+		Model::ThreadWaitObjectGroup* threadWaitObject = NULL;
+
+		// get the thread's state
+		{
+			const Array<SchedulingEvent>& threadEvents
+				= fSchedulingData.EventsForThread(thread->Index());
+			int32 threadEventCount = threadEvents.Size();
+
+			int32 lower = 0;
+			int32 upper = threadEventCount - 1;
+			while (lower < upper) {
+				int32 mid = (lower + upper + 1) / 2;
+				const SchedulingEvent& event = threadEvents[mid];
+				if (event.time > time)
+					upper = mid - 1;
+				else
+					lower = mid;
+			}
+
+			if (lower >= 0 && lower < threadEventCount) {
+				threadState = threadEvents[lower].state;
+				threadStateTime = threadEvents[lower].time;
+				threadWaitObject = threadEvents[lower].waitObject;
+				if (lower + 1 < threadEventCount)
+					threadStateEndTime = threadEvents[lower + 1].time;
+				else
+					threadStateEndTime = fModel->LastEventTime();
+			}
+		}
+
+		// find out which threads are running
+		system_profiler_event_header** events = fModel->Events();
+		size_t eventIndex = fModel->ClosestEventIndex(time + 1);
+			// find the first event after the one we're interested in; we'll
+			// skip it in the loop
+
+		int32 cpuCount = fModel->CountCPUs();
+		int32 missingThreads = cpuCount;
+		Model::Thread* runningThreads[cpuCount];
+		memset(runningThreads, 0, sizeof(Model::Thread*) * cpuCount);
+
+		while (missingThreads > 0 && eventIndex > 0) {
+			eventIndex--;
+			system_profiler_event_header* header = events[eventIndex];
+			if (header->event != B_SYSTEM_PROFILER_THREAD_SCHEDULED
+				|| runningThreads[header->cpu] != NULL) {
+				continue;
+			}
+
+			system_profiler_thread_scheduled* event
+				= (system_profiler_thread_scheduled*)(header + 1);
+			if (Model::Thread* thread = fModel->ThreadByID(event->thread)) {
+				runningThreads[header->cpu] = thread;
+				missingThreads--;
+			}
+		}
+
+		// create the tool tip
+		BString text;
+		text << "Time: " << format_nanotime(time) << "\n";
+		text << "Thread: " << thread->Name() << "\n";
+		text << "State: " << thread_state_name(threadState);
+		if (threadWaitObject != NULL) {
+			char objectName[32];
+			snprintf(objectName, sizeof(objectName), "%#lx",
+				threadWaitObject->Object());
+			text << " at " << wait_object_type_name(threadWaitObject->Type())
+				<< " \"" << threadWaitObject->Name() << "\" "
+				<< objectName << "\n";
+		} else
+			text << "\n";
+		text << "For: " << format_nanotime(time - threadStateTime) << " of "
+			<< format_nanotime(threadStateEndTime - threadStateTime) << "\n";
+
+		text << "\n";
+		text << "Running Threads:";
+		for (int32 i = 0; i < cpuCount; i++) {
+			text << "\n  " << i << ": ";
+			if (Model::Thread* thread = runningThreads[i])
+				text << thread->Name() << " (" << thread->ID() << ")";
+			else
+				text << "?";
+		}
+
+		*_tip = new(std::nothrow) BTextToolTip(text);
+		return *_tip != NULL;
 	}
 
 	virtual void Draw(BRect updateRect)
@@ -864,6 +966,14 @@ printf("failed to read event!\n");
 			_startTime = 0;
 			_endTime = 1;
 		}
+	}
+
+	void _GetThreadAndTimeAt(BPoint point, Model::Thread*& _thread,
+		nanotime_t& _time)
+	{
+		_thread = fModel->ThreadAt(
+			fFilterModel->SelectedItemAt(LineAt(point)));
+		_time = (nanotime_t)point.x * fNSecsPerPixel;
 	}
 
 	float _ScrollOffset() const
