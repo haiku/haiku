@@ -249,7 +249,7 @@ BSoundPlayer::Stop(bool block, bool flush)
 		for (tries = 250; fPlayerNode->IsPlaying() && tries != 0; tries--)
 			snooze(2000);
 
-		DEBUG_ONLY(if (maxtrys == 0)
+		DEBUG_ONLY(if (tries == 0)
 			TRACE("BSoundPlayer::Stop: waiting for node stop failed\n"));
 
 		// Wait until all buffers on the way to the physical output have been

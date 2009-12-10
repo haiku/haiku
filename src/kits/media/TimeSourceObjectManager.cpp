@@ -67,7 +67,8 @@ TimeSourceObjectManager::GetTimeSource(const media_node& node)
 	CALLED();
 	BAutolock _(this);
 
-	PRINT("TimeSourceObjectManager::GetTimeSource, node id %ld\n", node.node);
+	PRINT(1, "TimeSourceObjectManager::GetTimeSource, node id %ld\n",
+		node.node);
 
 	NodeMap::iterator found = fMap.find(node.node);
 	if (found != fMap.end())
@@ -91,7 +92,7 @@ TimeSourceObjectManager::ObjectDeleted(BTimeSource* timeSource)
 	CALLED();
 	BAutolock _(this);
 
-	PRINT("TimeSourceObjectManager::ObjectDeleted, node id %ld\n",
+	PRINT(1, "TimeSourceObjectManager::ObjectDeleted, node id %ld\n",
 		timeSource->ID());
 
 	fMap.erase(timeSource->ID());

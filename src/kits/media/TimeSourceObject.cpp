@@ -84,10 +84,10 @@ TimeSourceObject::DeleteHook(BMediaNode* node)
 //		ERROR("TimeSourceObject::DeleteHook: system time source clone delete hook called\n");
 //		return B_ERROR;
 //	}
-	PRINT("TimeSourceObject::DeleteHook enter\n");
+	PRINT(1, "TimeSourceObject::DeleteHook enter\n");
 	gTimeSourceObjectManager->ObjectDeleted(this);
 	status_t status = BTimeSource::DeleteHook(node);
-	PRINT("TimeSourceObject::DeleteHook leave\n");
+	PRINT(1, "TimeSourceObject::DeleteHook leave\n");
 	return status;
 }
 
