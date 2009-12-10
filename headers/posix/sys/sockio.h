@@ -57,6 +57,9 @@
 #define SIOCSDRVSPEC		8943	/* set driver-specific parameters */
 #define SIOCGDRVSPEC		8944	/* get driver-specific parameters */
 
-#define SIOCEND				8944	/* Always set to highest SIOC* */
+#define SIOCSIFGENERIC		8945	/* generic IF set op */
+#define SIOCGIFGENERIC		8946	/* generic IF get op */
+
+#define SIOCEND				8946	/* Always set to highest SIOC* */
 
 #endif	/* _SYS_SOCKIO_H */
