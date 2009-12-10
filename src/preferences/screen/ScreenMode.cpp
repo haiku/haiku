@@ -328,6 +328,15 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 			+ info.height * info.height) / 0.254) / 10.0;
 	}
 
+	// Some older CRT monitors do not contain the monitor range information
+	// (EDID1_MONITOR_RANGES) in their EDID info resulting in the min/max
+	// horizontal/vertical frequencies being zero.  In this case, set the
+	// vertical frequency range to 60..85 Hz.
+	if (info.min_vertical_frequency == 0) {
+		info.min_vertical_frequency = 60;
+		info.max_vertical_frequency = 85;
+	}
+
 	// TODO: If the names aren't sound, we could see if we find/create a
 	// database for the entries with user presentable names; they are fine
 	// for the models I could test with so far.
