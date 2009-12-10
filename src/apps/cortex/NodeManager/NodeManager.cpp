@@ -38,7 +38,7 @@ __USE_CORTEX_NAMESPACE
 const char* const _connectionField = "__connection_id";
 const char* const _sourceNodeField = "__source_node_id";
 const char* const _destNodeField = "__destination_node_id";
-	
+
 
 
 
@@ -57,7 +57,7 @@ void NodeManager::nodeCreated(
 
 void NodeManager::nodeDeleted(
 	const NodeRef*								ref) {}
-	
+
 void NodeManager::connectionMade(
 	Connection*										connection) {}
 
@@ -95,7 +95,7 @@ void _do_for_each_connected(
 	bool															recurse,
 	Op																operation,
 	_for_each_state*									state) {
-	
+
 //	PRINT(("### _do_for_each_connected()\n"));
 
 	ASSERT(manager->IsLocked());
@@ -109,7 +109,7 @@ void _do_for_each_connected(
 		// already visited
 		return;
 	}
-	
+
 	// used to walk connections
 	vector<Connection>		connections;
 
@@ -119,32 +119,32 @@ void _do_for_each_connected(
 	// walk input connections
 	origin->getInputConnections(connections);
 	for(uint32 n = 0; n < connections.size(); ++n) {
-		
+
 		if(!connections[n].isValid())
 			continue;
-		
+
 //		PRINT(("# source: %ld\n", connections[n].sourceNode()));
-		
+
 		NodeRef* targetRef;
 		err = manager->getNodeRef(
 			connections[n].sourceNode(),
 			&targetRef);
 		ASSERT(err == B_OK);
 		ASSERT(targetRef);
-		
+
 		if(inGroup && targetRef->group() != inGroup) {
 //			PRINT(("# .group mismatch\n"));
 			// don't need to visit
 			return;
 		}
-	
+
 		// invoke operation
 //		if(lockRef)
 //			targetRef->lock();
 		operation(targetRef);
 //		if(lockRef)
 //			targetRef->unlock();
-		
+
 		// recurse?
 		if(recurse)
 			_do_for_each_connected(
@@ -155,7 +155,7 @@ void _do_for_each_connected(
 				operation,
 				state);
 	}
-	
+
 	// walk output connections
 	connections.clear();
 	origin->getOutputConnections(connections);
@@ -164,14 +164,14 @@ void _do_for_each_connected(
 
 		if(!connections[n].isValid())
 			continue;
-		
+
 		NodeRef* targetRef;
 		err = manager->getNodeRef(
 			connections[n].destinationNode(),
 			&targetRef);
 		ASSERT(err == B_OK);
 		ASSERT(targetRef);
-		
+
 		if(inGroup && targetRef->group() != inGroup) {
 //			PRINT(("# .group mismatch\n"));
 			// don't need to visit
@@ -184,7 +184,7 @@ void _do_for_each_connected(
 		operation(targetRef);
 //		if(lockRef)
 //			targetRef->unlock();
-		
+
 		// recurse?
 		if(recurse)
 			_do_for_each_connected(
@@ -206,12 +206,12 @@ inline void NodeManager::_clearGroup(
 
 	// stop group before clearing [10aug99]
 	group->_stop();
-	
+
 	int32 n;
 	while((n = group->countNodes()) > 0) {
 		group->removeNode(n-1);
 	}
-	
+
 //	// [e.moon 7nov99] release the group
 //	status_t err = remove_observer(this, group);
 //	if(err < B_OK) {
@@ -221,7 +221,7 @@ inline void NodeManager::_clearGroup(
 //			"    %s\n",
 //			group->id(),
 //			strerror(err)));
-//	}	
+//	}
 }
 
 inline void NodeManager::_freeConnection(
@@ -237,7 +237,7 @@ inline void NodeManager::_freeConnection(
 		connection->isValid() &&
 		connection->flags() & Connection::INTERNAL &&
 		!(connection->flags() & Connection::LOCKED)) {
-		
+
 		D_METHOD((
 			"! breaking connection:\n"
 			"  source node:  %ld\n"
@@ -267,7 +267,7 @@ inline void NodeManager::_freeConnection(
 				strerror(err)));
 		}
 	}
-		
+
 	// delete
 	delete connection;
 }
@@ -289,9 +289,9 @@ NodeManager::~NodeManager() {
 		it != m_nodeRefMap.end(); ++it) {
 		deadNodes.push_back((*it).second);
 	}
-	
+
 	// ungroup all nodes
-	
+
 // [e.moon 13oct99] making PPC compiler happy
 //	for_each(
 //		m_nodeGroupSet.begin(),
@@ -305,14 +305,14 @@ NodeManager::~NodeManager() {
 		it != m_nodeGroupSet.end(); ++it) {
 		_clearGroup(*it);
 	}
-	
+
 	// delete groups
 	ptr_set_delete(
 		m_nodeGroupSet.begin(),
 		m_nodeGroupSet.end());
 	m_nodeGroupSet.clear();
 
-	
+
 	// deallocate all connections; disconnect internal nodes
 // [e.moon 13oct99] making PPC compiler happy
 //	for_each(
@@ -332,15 +332,15 @@ NodeManager::~NodeManager() {
 	}
 	m_conSourceMap.clear();
 	m_conDestinationMap.clear();
-	
+
 	// release all nodes
 	for(list<NodeRef*>::const_iterator it = deadNodes.begin();
 		it != deadNodes.end(); ++it) {
 		(*it)->release();
 	}
-	
+
 	if(m_nodeRefMap.size()) {
-		// +++++ nodes will only remain if they have observers; cope!		
+		// +++++ nodes will only remain if they have observers; cope!
 		PRINT(("*** %ld nodes remaining!\n", m_nodeRefMap.size()));
 
 		deadNodes.clear();
@@ -350,9 +350,9 @@ NodeManager::~NodeManager() {
 
 		ptr_set_delete(
 			deadNodes.begin(),
-			deadNodes.end());		
+			deadNodes.end());
 	}
-	
+
 //	for_each(
 //		m_nodeRefMap.begin(),
 //		m_nodeRefMap.end(),
@@ -363,12 +363,12 @@ NodeManager::~NodeManager() {
 //			)
 //		)
 //	);
-//	
+//
 //	// delete all nodes
 //	ptr_map_delete(
 //		m_nodeRefMap.begin(),
 //		m_nodeRefMap.end());
-//		
+//
 //
 //	PRINT((
 //		"~NodeManager() done\n"));
@@ -400,13 +400,13 @@ NodeManager::NodeManager(
 		"NodeManager()\n"));
 
 	ASSERT(roster);
-	
+
 	// create refs for common nodes
 	_initCommonNodes();
 
-	// start the looper	
+	// start the looper
 	Run();
-	
+
 	// initialize connection to the media roster
 	D_ROSTER(("# roster->StartWatching(%p)\n", this));
 	roster->StartWatching(BMessenger(this));
@@ -435,26 +435,26 @@ status_t NodeManager::getNodeRef(
 		*outRef = 0;
 		return B_BAD_VALUE;
 	}
-	
+
 	*outRef = (*it).second;
 	return B_OK;
 }
 
-// [13aug99]	
+// [13aug99]
 // fetches Connection corresponding to a given source/destination
 // on a given node.  Returns an invalid connection and B_BAD_VALUE
 // if no matching connection was found.
-	
+
 status_t NodeManager::findConnection(
 	media_node_id									node,
 	const media_source&						source,
 	Connection*										outConnection) const {
 	Autolock _l(this);
-	
+
 	D_METHOD((
 		"NodeManager::findConnection()\n"));
 	ASSERT(source != media_source::null);
-	
+
 	con_map::const_iterator it = m_conSourceMap.lower_bound(node);
 	con_map::const_iterator itEnd = m_conSourceMap.upper_bound(node);
 	for(; it != itEnd; ++it)
@@ -463,21 +463,21 @@ status_t NodeManager::findConnection(
 			*outConnection = *((*it).second);
 			return B_OK;
 		}
-	
+
 	*outConnection = Connection();
 	return B_BAD_VALUE;
 }
-	
+
 status_t NodeManager::findConnection(
 	media_node_id									node,
 	const media_destination&			destination,
 	Connection*										outConnection) const {
 	Autolock _l(this);
-	
+
 	D_METHOD((
 		"NodeManager::findConnection()\n"));
 	ASSERT(destination != media_destination::null);
-	
+
 	con_map::const_iterator it = m_conDestinationMap.lower_bound(node);
 	con_map::const_iterator itEnd = m_conDestinationMap.upper_bound(node);
 	for(; it != itEnd; ++it)
@@ -486,7 +486,7 @@ status_t NodeManager::findConnection(
 			*outConnection = *((*it).second);
 			return B_OK;
 		}
-	
+
 	*outConnection = Connection();
 	return B_BAD_VALUE;
 }
@@ -495,7 +495,7 @@ status_t NodeManager::findConnection(
 // fetches a Connection matching the given source and destination
 // nodes.  Returns an invalid connection and B_BAD_VALUE if
 // no matching connection was found
-	
+
 status_t NodeManager::findConnection(
 	media_node_id									sourceNode,
 	media_node_id									destinationNode,
@@ -504,7 +504,7 @@ status_t NodeManager::findConnection(
 
 	D_METHOD((
 		"NodeManager::findConnection(source %ld, dest %ld)\n", sourceNode, destinationNode));
-	
+
 	con_map::const_iterator it = m_conSourceMap.lower_bound(sourceNode);
 	con_map::const_iterator itEnd = m_conSourceMap.upper_bound(sourceNode);
 	for(; it != itEnd; ++it) {
@@ -513,7 +513,7 @@ status_t NodeManager::findConnection(
 			return B_OK;
 		}
 	}
-				
+
 	*outConnection = Connection();
 	return B_BAD_VALUE;
 }
@@ -531,11 +531,11 @@ bool NodeManager::findRoute(
 	media_node_id									nodeA,
 	media_node_id									nodeB) {
 	Autolock _l(this);
-	
+
 	D_METHOD((
 		"NodeManager::findRoute(%ld, %ld)\n", nodeA, nodeB));
 	status_t err;
-	
+
 	NodeRef* ref;
 	err = getNodeRef(nodeA, &ref);
 	if(err < B_OK) {
@@ -544,9 +544,9 @@ bool NodeManager::findRoute(
 			nodeA, nodeB, nodeA));
 		return false;
 	}
-		
+
 	_find_route_state st;
-	return _find_route_recurse(ref, nodeB, &st);	
+	return _find_route_recurse(ref, nodeB, &st);
 }
 
 // implementation of above
@@ -555,17 +555,17 @@ bool NodeManager::_find_route_recurse(
 	NodeRef*													origin,
 	media_node_id											target,
 	_find_route_state*								state) {
-	
+
 	ASSERT(IsLocked());
 	ASSERT(origin);
 	ASSERT(state);
 	status_t err;
-	
+
 	// node already visited?
 	if(state->visited.find(origin->id()) != state->visited.end()) {
 		return false;
 	}
-	
+
 	// mark node visited
 	state->visited.insert(origin->id());
 
@@ -577,7 +577,7 @@ bool NodeManager::_find_route_recurse(
 
 		if(!connections[n].isValid())
 			continue;
-		
+
 		// test against target
 		if(connections[n].sourceNode() == target)
 			return true; // SUCCESS
@@ -589,14 +589,14 @@ bool NodeManager::_find_route_recurse(
 			&ref);
 		ASSERT(err == B_OK);
 		ASSERT(ref);
-		
+
 		if(_find_route_recurse(
 			ref,
 			target,
 			state))
 			return true; // SUCCESS
 	}
-	
+
 	// walk output connections
 	connections.clear();
 	origin->getOutputConnections(connections);
@@ -604,7 +604,7 @@ bool NodeManager::_find_route_recurse(
 
 		if(!connections[n].isValid())
 			continue;
-		
+
 		// test against target
 		if(connections[n].destinationNode() == target)
 			return true; // SUCCESS
@@ -616,7 +616,7 @@ bool NodeManager::_find_route_recurse(
 			&ref);
 		ASSERT(err == B_OK);
 		ASSERT(ref);
-		
+
 		if(_find_route_recurse(
 			ref,
 			target,
@@ -644,7 +644,7 @@ status_t NodeManager::findConnection(
 	const media_source&						source,
 	Connection*										outConnection) const {
 	Autolock _l(this);
-	
+
 	D_METHOD((
 		"NodeManager::findConnection()\n"));
 	ASSERT(source != media_source::null);
@@ -666,7 +666,7 @@ status_t NodeManager::findConnection(
 	const media_destination&			destination,
 	Connection*										outConnection) const {
 	Autolock _l(this);
-	
+
 	D_METHOD((
 		"NodeManager::findConnection()\n"));
 	ASSERT(destination != media_destination::null);
@@ -687,7 +687,7 @@ status_t NodeManager::findConnection(
 
 // fetch NodeRefs for system nodes (if a particular node doesn't
 // exist, these methods return 0)
-	
+
 NodeRef* NodeManager::audioInputNode() const {
 	Autolock _l(this);
 	return m_audioInputNode;
@@ -713,7 +713,7 @@ NodeRef* NodeManager::videoOutputNode() const {
 // - you can write-lock the manager during sets of calls to these methods;
 //   this ensures that the group set won't change.  The methods do lock
 //   the group internally, so locking isn't explicitly required.
-	
+
 uint32 NodeManager::countGroups() const {
 	Autolock _l(this);
 	D_METHOD((
@@ -735,7 +735,7 @@ NodeGroup* NodeManager::groupAt(
 
 // look up a group by unique ID; returns B_BAD_VALUE if no
 // matching group was found
-	
+
 class match_group_by_id :
 	public binary_function<const NodeGroup*, uint32, bool> {
 public:
@@ -757,12 +757,12 @@ status_t NodeManager::findGroup(
 			m_nodeGroupSet.end(),
 			bind2nd(match_group_by_id(), id)
 		);
-		
+
 	if(it == m_nodeGroupSet.end()) {
 		*outGroup = 0;
 		return B_BAD_VALUE;
 	}
-	
+
 	*outGroup = *it;
 	return B_OK;
 }
@@ -791,35 +791,35 @@ status_t NodeManager::findGroup(
 			m_nodeGroupSet.end(),
 			bind2nd(match_group_by_name(), name)
 		);
-		
+
 	if(it == m_nodeGroupSet.end()) {
 		*outGroup = 0;
 		return B_BAD_VALUE;
 	}
-	
+
 	*outGroup = *it;
 	return B_OK;
 }
 
 // merge the given source group to the given destination;
 // empties and releases the source group
-	
+
 status_t NodeManager::mergeGroups(
 	NodeGroup*										sourceGroup,
 	NodeGroup*										destinationGroup) {
 	Autolock _l(this);
-	D_METHOD(( 
-		"NodeManager::mergeGroups(name)\n")); 
+	D_METHOD((
+		"NodeManager::mergeGroups(name)\n"));
 
 	status_t err;
-	
-	// [5feb00 c.lenz] already merged 
-	if(sourceGroup->id() == destinationGroup->id()) 
-		return B_OK; 
+
+	// [5feb00 c.lenz] already merged
+	if(sourceGroup->id() == destinationGroup->id())
+		return B_OK;
 
 	if(sourceGroup->isReleased() || destinationGroup->isReleased())
 		return B_NOT_ALLOWED;
-	
+
 	for(uint32 n = sourceGroup->countNodes(); n; --n) {
 		NodeRef* node = sourceGroup->nodeAt(n-1);
 		ASSERT(node);
@@ -828,11 +828,11 @@ status_t NodeManager::mergeGroups(
 		err = destinationGroup->addNode(node);
 		ASSERT(err == B_OK);
 	}
-	
+
 	// [7nov99 e.moon] delete the source group
 	_removeGroup(sourceGroup);
 	sourceGroup->release();
-	
+
 	return B_OK;
 }
 
@@ -855,12 +855,12 @@ class _changeNodeGroupFn :
 	public	unary_function<NodeRef*, void> {
 public:
 	NodeGroup*										newGroup;
-	
+
 	_changeNodeGroupFn(
 		NodeGroup*									_newGroup) : newGroup(_newGroup) {
 		ASSERT(newGroup);
 	}
-		
+
 	void operator()(
 		NodeRef*										node) {
 
@@ -873,7 +873,7 @@ public:
 			err = oldGroup->removeNode(node);
 			ASSERT(err == B_OK);
 		}
-		
+
 		err = newGroup->addNode(node);
 		ASSERT(err == B_OK);
 	}
@@ -886,7 +886,7 @@ status_t NodeManager::splitGroup(
 
 	ASSERT(insideNode);
 	ASSERT(outsideNode);
-	
+
 	Autolock _l(this);
 
 	// ensure that no route exists from insideNode to outsideNode
@@ -896,7 +896,7 @@ status_t NodeManager::splitGroup(
 			insideNode->id(), outsideNode->id()));
 		return B_NOT_ALLOWED;
 	}
-	
+
 	// make sure the nodes share a common group
 	NodeGroup* oldGroup = insideNode->group();
 	if(!oldGroup) {
@@ -922,11 +922,11 @@ status_t NodeManager::splitGroup(
 		nameBuffer.String(),
 		oldGroup->runMode());
 	*outGroup = newGroup;
-	
+
 	// move nodes connected to outsideNode from old to new group
 	_changeNodeGroupFn fn(newGroup);
 	fn(outsideNode);
-	
+
 	_for_each_state st;
 	_do_for_each_connected(
 		this,
@@ -935,7 +935,7 @@ status_t NodeManager::splitGroup(
 		true,
 		fn,
 		&st);
-	
+
 	// [e.moon 1dec99] a single-node group takes that node's name
 	if(newGroup->countNodes() == 1)
 		newGroup->setName(newGroup->nodeAt(0)->name());
@@ -953,26 +953,26 @@ status_t NodeManager::splitGroup(
 //   can be properly serialized & reconstituted.
 
 // basic BMediaRoster::InstantiateDormantNode() wrapper
-	
+
 status_t NodeManager::instantiate(
 	const dormant_node_info&			info,
 	NodeRef**											outRef,
 	bigtime_t											timeout,
 	uint32												nodeFlags) {
-	
+
 	Autolock _l(this);
 	status_t err;
 	D_METHOD((
 		"NodeManager::instantiate()\n"));
-	
+
 	// * instantiate
-	
+
 	media_node node;
-	
+
 	if(m_useAddOnHost) {
 		err = AddOnHost::InstantiateDormantNode(
 			info, &node, timeout);
-			
+
 		if(err < B_OK) {
 			node = media_node::null;
 
@@ -989,15 +989,15 @@ status_t NodeManager::instantiate(
 				err = AddOnHost::InstantiateDormantNode(
 					info, &node, timeout);
 			}
-		}		
+		}
 	}
-	
+
 	if(!m_useAddOnHost || node == media_node::null) {
 		D_ROSTER((
 			"# roster->InstantiateDormantNode()\n"));
 		err = roster->InstantiateDormantNode(info, &node);
 	}
-	
+
 	if(err < B_OK) {
 		*outRef = 0;
 		return err;
@@ -1015,7 +1015,7 @@ status_t NodeManager::instantiate(
 		*outRef = 0;
 		return B_BAD_INDEX;
 	}
-	
+
 	// * create NodeRef
 	NodeRef* ref = new NodeRef(
 		node,
@@ -1025,12 +1025,12 @@ status_t NodeManager::instantiate(
 
 	ref->_setAddonHint(&info);
 	_addRef(ref);
-	
+
 	// * return it
 	*outRef = ref;
 	return B_OK;
 }
-		
+
 // SniffRef/Instantiate.../SetRefFor: a one-call interface
 // to create a node capable of playing a given media file.
 
@@ -1046,12 +1046,12 @@ status_t NodeManager::instantiate(
 		"NodeManager::instantiate(ref)\n"));
 
 	// [no lock needed; calls the full form of instantiate()]
-	
+
 	status_t err;
-	
+
 	// * Find matching add-on
 	dormant_node_info info;
-	
+
 	D_ROSTER((
 		"# roster->SniffRef()\n"));
 	err = roster->SniffRef(
@@ -1062,15 +1062,15 @@ status_t NodeManager::instantiate(
 		*outRef = 0;
 		return err;
 	}
-	
+
 	// * Instantiate
-	err = instantiate(info, outRef, timeout, nodeFlags);	
-	
+	err = instantiate(info, outRef, timeout, nodeFlags);
+
 	if(err < B_OK)
 		return err;
-	
+
 	ASSERT(*outRef);
-	
+
 	// * Set file to play
 	bigtime_t dur;
 	D_ROSTER(("# roster->SetRefFor()\n"));
@@ -1090,7 +1090,7 @@ status_t NodeManager::instantiate(
 	// * update info [e.moon 29sep99]
 	Autolock _l(*outRef);
 	(*outRef)->_setAddonHint(&info, &file);
-		
+
 	return err;
 }
 
@@ -1105,11 +1105,11 @@ status_t NodeManager::reference(
 	Autolock _l(this);
 	D_METHOD((
 		"NodeManager::reference()\n"));
-	
+
 	// should this node be marked _NO_RELEASE?
 	NodeRef* ref = new NodeRef(node->Node(), this, nodeFlags, 0);
 	_addRef(ref);
-	
+
 	*outRef = ref;
 	return B_OK;
 }
@@ -1122,12 +1122,12 @@ status_t NodeManager::connect(
 	const media_input&						input,
 	const media_format&						templateFormat,
 	Connection*										outConnection /*=0*/) {
-	
+
 	Autolock _l(this);
 	status_t err;
 	D_METHOD((
 		"NodeManager::connect()\n"));
-	
+
 	// * Find (& create if necessary) NodeRefs
 
 	NodeRef* outputRef;
@@ -1137,13 +1137,13 @@ status_t NodeManager::connect(
 	NodeRef* inputRef;
 	if(getNodeRef(input.node.node, &inputRef) < B_OK)
 		inputRef = _addRefFor(input.node, 0);
-	
+
 	// * Connect the nodes
-	
+
 	media_output finalOutput;
 	media_input finalInput;
 	media_format finalFormat = templateFormat;
-	
+
 	D_ROSTER(("# roster->Connect()\n"));
 	err = roster->Connect(
 		output.source,
@@ -1151,14 +1151,14 @@ status_t NodeManager::connect(
 		&finalFormat,
 		&finalOutput,
 		&finalInput);
-		
+
 	if(err < B_OK) {
 		if(outConnection)
 			*outConnection = Connection();
 		connectionFailed(output, input, templateFormat, err);
 		return err;
 	}
-	
+
 	// * Create Connection instance; mark it INTERNAL
 	//   to automatically remove it upon shutdown.
 
@@ -1193,16 +1193,16 @@ status_t NodeManager::connect(
 	con->setOutputHint(
 		output.name,
 		output.format);
-		
+
 	con->setInputHint(
 		input.name,
 		input.format);
 
 	con->setRequestedFormat(
 		templateFormat);
-		
+
 	_addConnection(con);
-	
+
 	// [e.moon 10aug99]
 	// fetch updated latencies;
 	// [e.moon 28sep99]
@@ -1210,15 +1210,15 @@ status_t NodeManager::connect(
 	// newly-connected nodes and update their latencies -- this includes
 	// recalculating the node's 'producer delay' if in B_RECORDING mode.
 
-	_updateLatenciesFrom(inputRef, true);		
-	
+	_updateLatenciesFrom(inputRef, true);
+
 	// copy connection
 	if(outConnection) {
 		*outConnection = *con;
 	}
-	return B_OK;	
+	return B_OK;
 }
-		
+
 // format-guessing form of connect(): tries to find
 // a common format between output & input before connection;
 // returns B_MEDIA_BAD_FORMAT if no common format appears
@@ -1227,7 +1227,7 @@ status_t NodeManager::connect(
 // NOTE: the specifics of the input and output formats are ignored;
 //       this method only looks at the format type, and properly
 //       handles wildcards at that level (B_MEDIA_NO_TYPE).
-	
+
 status_t NodeManager::connect(
 	const media_output&						output,
 	const media_input&						input,
@@ -1240,7 +1240,7 @@ status_t NodeManager::connect(
 
 	// defer to the pickier endpoint
 	media_format f;
-	
+
 	if(output.format.type > B_MEDIA_UNKNOWN_TYPE) {
 		f = output.format;
 		if ((input.format.type > B_MEDIA_UNKNOWN_TYPE) &&
@@ -1259,7 +1259,7 @@ status_t NodeManager::connect(
 	}
 
 	// +++++ ? revert to wildcard ?
-			
+
 	// let the nodes try to work out a common format from here
 	return connect(
 		output,
@@ -1273,7 +1273,7 @@ status_t NodeManager::connect(
 
 status_t NodeManager::disconnect(
 	const Connection&								connection) {
-	
+
 	Autolock _l(this);
 	status_t err;
 	D_METHOD((
@@ -1282,7 +1282,7 @@ status_t NodeManager::disconnect(
 	// don't bother trying to disconnect an invalid connection
 	if(!connection.isValid())
 		return B_NOT_ALLOWED;
-	
+
 	// make sure connection can be released
 	if(connection.flags() & Connection::LOCKED) {
 		PRINT((
@@ -1358,10 +1358,10 @@ NodeGroup* NodeManager::createGroup(
 	Autolock _l(this);
 	D_METHOD((
 		"NodeManager::createGroup()\n"));
-	
+
 	NodeGroup* g = new NodeGroup(name, this, runMode);
 	_addGroup(g);
-	
+
 	return g;
 }
 
@@ -1369,23 +1369,23 @@ NodeGroup* NodeManager::createGroup(
 // *** node/connection iteration
 // *** MUST BE LOCKED for any of these calls
 // -------------------------------------------------------- //
-	
+
 // usage:
 //   For the first call, pass 'cookie' a pointer to a void* set to 0.
 //   Returns B_BAD_INDEX when the set of nodes has been exhausted (and
 //   re-zeroes the cookie, cleaning up any unused memory.)
-	
+
 status_t NodeManager::getNextRef(
 	NodeRef**											ref,
 	void**												cookie) {
 	ASSERT(IsLocked());
 	ASSERT(cookie);
-	
+
 	if(!*cookie)
 		*cookie = new node_ref_map::iterator(m_nodeRefMap.begin());
 
 	node_ref_map::iterator* pit = (node_ref_map::iterator*)*cookie;
-	
+
 	// at end of set?
 	if(*pit == m_nodeRefMap.end()) {
 		delete pit;
@@ -1402,28 +1402,28 @@ status_t NodeManager::getNextRef(
 // +++++ reworked 13sep99: dtors wouldn't have been called with 'delete *cookie'! +++++
 void NodeManager::disposeRefCookie(
 	void**												cookie) {
-	
+
 	if(!cookie)
 		return;
-		
+
 	node_ref_map::iterator* it =
 		reinterpret_cast<node_ref_map::iterator*>(*cookie);
 	ASSERT(it);
 	if(it)
 		delete it;
-}	
-		
+}
+
 status_t NodeManager::getNextConnection(
 	Connection*										connection,
 	void**												cookie) {
 	ASSERT(IsLocked());
 	ASSERT(cookie);
-	
+
 	if(!*cookie)
 		*cookie = new con_map::iterator(m_conSourceMap.begin());
 
 	con_map::iterator* pit = (con_map::iterator*)*cookie;
-	
+
 	// at end of set?
 	if(*pit == m_conSourceMap.end()) {
 		delete pit;
@@ -1440,17 +1440,17 @@ status_t NodeManager::getNextConnection(
 // +++++ reworked 13sep99: dtors wouldn't have been called with 'delete *cookie'! +++++
 void NodeManager::disposeConnectionCookie(
 	void**												cookie) {
-	
+
 	if(!cookie)
 		return;
-		
+
 	con_map::iterator* it =
 		reinterpret_cast<con_map::iterator*>(*cookie);
 	ASSERT(it);
 	if(it)
 		delete it;
-}	
-		
+}
+
 
 // -------------------------------------------------------- //
 // *** BHandler impl
@@ -1471,7 +1471,7 @@ void NodeManager::MessageReceived(BMessage* message) {
 	switch(message->what) {
 
 		// *** Media Roster messages ***
-		
+
 		case B_MEDIA_NODE_CREATED:
 			if(_handleNodesCreated(message) == B_OK)
 				notify(message);
@@ -1481,22 +1481,22 @@ void NodeManager::MessageReceived(BMessage* message) {
 			_handleNodesDeleted(message);
 			notify(message);
 			break;
-	
+
 		case B_MEDIA_CONNECTION_MADE:
 			_handleConnectionMade(message);
 			notify(message);
 			break;
-			
+
 		case B_MEDIA_CONNECTION_BROKEN:
 			_handleConnectionBroken(message); // augments message!
 			notify(message);
 			break;
-			
+
 		case B_MEDIA_FORMAT_CHANGED:
 			_handleFormatChanged(message);
 			notify(message);
 			break;
-			
+
 		default:
 			_inherited::MessageReceived(message);
 			break;
@@ -1552,30 +1552,30 @@ bool NodeManager::lock(
 	bigtime_t											timeout) {
 
 	D_LOCK(("*** NodeManager::lock(): %ld\n", find_thread(0)));
-	
+
 	status_t err = LockWithTimeout(timeout);
 
-	
+
 	D_LOCK(("*** NodeManager::lock() ACQUIRED: %ld\n", find_thread(0)));
-	
+
 	return err == B_OK;
 }
-	
+
 bool NodeManager::unlock(
 	lock_t												type) {
-		
+
 	D_LOCK(("*** NodeManager::unlock(): %ld\n", find_thread(0)));
-	
+
 	Unlock();
 
 	D_LOCK(("*** NodeManager::unlock() RELEASED: %ld\n", find_thread(0)));
 
 	return true;
 }
-	
+
 bool NodeManager::isLocked(
 	lock_t												type) const {
-	
+
 	return IsLocked();
 }
 
@@ -1591,10 +1591,10 @@ void NodeManager::_initCommonNodes() {
 
 	D_METHOD((
 		"NodeManager::_initCommonNodes()\n"));
-	
+
 	uint32 disableTransport =
 		(NodeRef::NO_START_STOP | NodeRef::NO_SEEK | NodeRef::NO_PREROLL);
-	
+
 	// video input
 	D_ROSTER(("# roster->GetVideoInput()\n"));
 	err = roster->GetVideoInput(&node);
@@ -1647,7 +1647,7 @@ void NodeManager::_initCommonNodes() {
 			// input and output nodes identical
 			// [e.moon 20dec99]
 			m_audioOutputNode = m_audioInputNode;
-			
+
 			// disable transport controls (the default audio output must always
 			// be running, and can't be seeked.)
 
@@ -1665,13 +1665,13 @@ void NodeManager::_initCommonNodes() {
 
 void NodeManager::_addRef(
 	NodeRef*											ref) {
-	
+
 	ASSERT(ref);
 	ASSERT(IsLocked());
 
 	D_METHOD((
 		"NodeManager::_addRef()\n"));
-	
+
 	// precondition: no NodeRef yet exists for this node
 	// +++++
 	// [e.moon 21oct99]
@@ -1681,7 +1681,7 @@ void NodeManager::_addRef(
 
 	// add it
 	// [e.moon 13oct99] PPC-friendly
-	m_nodeRefMap.insert(node_ref_map::value_type(ref->id(), ref));	
+	m_nodeRefMap.insert(node_ref_map::value_type(ref->id(), ref));
 
 	// [e.moon 8nov99] call hook
 	nodeCreated(ref);
@@ -1695,7 +1695,7 @@ void NodeManager::_removeRef(
 		"NodeManager::_removeRef()\n"));
 
 	node_ref_map::iterator it = m_nodeRefMap.find(id);
-		
+
 	// precondition: a NodeRef w/ matching ID is in the map
 	ASSERT(it != m_nodeRefMap.end());
 
@@ -1717,11 +1717,11 @@ NodeRef* NodeManager::_addRefFor(
 
 	D_METHOD((
 		"NodeManager::_addRefFor()\n"));
-	
+
 	// precondition: no NodeRef yet exists for this node
 	ASSERT(
-		m_nodeRefMap.find(node.node) == m_nodeRefMap.end());			
-			
+		m_nodeRefMap.find(node.node) == m_nodeRefMap.end());
+
 //	// precondition: the node actually exists
 //	live_node_info info;
 //	D_ROSTER(("# roster->GetLiveNodeInfo()\n"));
@@ -1730,7 +1730,7 @@ NodeRef* NodeManager::_addRefFor(
 	// * create & add ref
 	NodeRef* ref = new NodeRef(node, this, nodeFlags, nodeImplFlags);
 	_addRef(ref);
-	
+
 	return ref;
 }
 
@@ -1739,11 +1739,11 @@ void NodeManager::_addConnection(
 
 	ASSERT(connection);
 	ASSERT(IsLocked());
-	
+
 	D_METHOD((
 		"NodeManager::_addConnection()\n"));
-	
-	// precondition: not already entered in either source or dest map	
+
+	// precondition: not already entered in either source or dest map
 	// +++++ a more rigorous test would be a very good thing
 #ifdef DEBUG
 	for(con_map::iterator it = m_conSourceMap.lower_bound(connection->sourceNode());
@@ -1755,7 +1755,7 @@ void NodeManager::_addConnection(
 		ASSERT((*it).second->id() != connection->id());
 	}
 #endif
-			
+
 	// add to both maps
 	// [e.moon 13oct99] PPC-friendly
 	m_conSourceMap.insert(
@@ -1773,16 +1773,16 @@ void NodeManager::_addConnection(
 
 void NodeManager::_removeConnection(
 	const Connection&							connection) {
-	
+
 	ASSERT(IsLocked());
 	con_map::iterator itSource, itDestination;
-	
+
 	D_METHOD((
 		"NodeManager::_removeConnection()\n"));
 
 	// [e.moon 8nov99] call hook
 	connectionBroken(&connection);
-	
+
 	// precondition: one entry in both source & dest maps
 	// +++++ a more rigorous test would be a very good thing
 
@@ -1803,7 +1803,7 @@ void NodeManager::_removeConnection(
 			break;
 
 	ASSERT(itDestination != m_conDestinationMap.end());
-	
+
 	// delete & remove from both maps
 	delete (*itSource).second;
 	m_conSourceMap.erase(itSource);
@@ -1812,36 +1812,36 @@ void NodeManager::_removeConnection(
 
 void NodeManager::_addGroup(
 	NodeGroup*										group) {
-	
+
 	ASSERT(group);
 	ASSERT(IsLocked());
-	
+
 	D_METHOD((
 		"NodeManager::_addGroup()\n"));
-	
+
 	// precondition: group not already in set
 	ASSERT(
 		find(
 			m_nodeGroupSet.begin(),
 			m_nodeGroupSet.end(),
 			group) == m_nodeGroupSet.end());
-	
+
 	// add
 	m_nodeGroupSet.push_back(group);
-	
+
 //	// [e.moon 7nov99] observe
 //	add_observer(this, group);
 }
 
 void NodeManager::_removeGroup(
 	NodeGroup*										group) {
-	
+
 	ASSERT(group);
 	ASSERT(IsLocked());
-	
+
 	D_METHOD((
 		"NodeManager::_removeGroup()\n"));
-	
+
 	node_group_set::iterator it = find(
 		m_nodeGroupSet.begin(),
 		m_nodeGroupSet.end(),
@@ -1855,7 +1855,7 @@ void NodeManager::_removeGroup(
 		return;
 	}
 
-	// remove it	
+	// remove it
 	m_nodeGroupSet.erase(it);
 }
 
@@ -1872,7 +1872,7 @@ inline status_t NodeManager::_handleNodesCreated(
 	ASSERT(IsLocked());
 
 	status_t err = B_OK;
-	
+
 	// fetch number of new nodes
 	type_code type;
 	int32 count;
@@ -1901,7 +1901,7 @@ inline status_t NodeManager::_handleNodesCreated(
 	//   afterwards.
 	//   These nodes are mapped by port ID because that's the only criterion
 	//   available for matching a media_source to a node.
-	
+
 	typedef map<port_id, NodeRef*> port_ref_map;
 	port_ref_map* initialNodes = m_existingNodesInit ? 0 : new port_ref_map;
 
@@ -1928,7 +1928,7 @@ inline status_t NodeManager::_handleNodesCreated(
 				id, strerror(err)));
 			continue;
 		}
-		
+
 		// look for an existing NodeRef; if not found, create one:
 		NodeRef* ref = 0;
 		if(getNodeRef(node.node, &ref) < B_OK) {
@@ -1942,21 +1942,21 @@ inline status_t NodeManager::_handleNodesCreated(
 
 //			// [e.moon 7nov99] call hook
 //			nodeCreated(ref);
-			
+
 		} else {
 //			PRINT((
 //				"* NodeManager::_handleNodesCreated():\n"
 //				"  found existing ref for '%s' (%ld)\n",
 //				ref->name(), id));
-			
-			
+
+
 			// set _CREATE_NOTIFIED to prevent notification from being passed on
 			// twice [e.moon 11oct99]
 			if(!(ref->m_implFlags & NodeRef::_CREATE_NOTIFIED)) {
 				ref->m_implFlags |= NodeRef::_CREATE_NOTIFIED;
 				refsCreated = true;
 			}
-				
+
 			// release the (duplicate) media_node reference
 			err = roster->ReleaseNode(node);
 			if(err < B_OK) {
@@ -1966,7 +1966,7 @@ inline status_t NodeManager::_handleNodesCreated(
 					id, strerror(err)));
 			}
 		}
-		
+
 		// add to the 'initial nodes' set if necessary
 		// [e.moon 13oct99] PPC-friendly
 		if(initialNodes)
@@ -1974,25 +1974,25 @@ inline status_t NodeManager::_handleNodesCreated(
 				port_ref_map::value_type(
 					node.port, ref));
 	}
-	
+
 	if(initialNodes) {
 		// populate current connections from each node in the set
 //		PRINT((
 //			"* NodeManager::_handleNodesCreated(): POPULATING CONNECTIONS (%ld)\n",
 //			initialNodes->size()));
-			
+
 		for(port_ref_map::const_iterator itDest = initialNodes->begin();
 			itDest != initialNodes->end(); ++itDest) {
 
 			// walk each connected input for this node; find corresponding
 			// output & fill in a new Connection instance.
-			
+
 			NodeRef* destRef = (*itDest).second;
 			ASSERT(destRef);
 			if(!(destRef->kind() & B_BUFFER_CONSUMER))
 				// no inputs
 				continue;
-			
+
 			vector<media_input> inputs;
 			err = destRef->getConnectedInputs(inputs);
 
@@ -2005,16 +2005,16 @@ inline status_t NodeManager::_handleNodesCreated(
 					"    NodeRef('%s')::getConnectedInputs() failed:\n"
 					"    %s\n",
 					destRef->name(), strerror(err)));
-					
+
 				continue;
 			}
-													
-			
+
+
 //			PRINT((" - %s: %ld inputs\n", destRef->name(), inputs.size()));
 
 			for(vector<media_input>::const_iterator itInput = inputs.begin();
 				itInput != inputs.end(); ++itInput) {
-				
+
 				// look for a matching source node by port ID:
 				const media_input& input = *itInput;
 				port_ref_map::const_iterator itSource = initialNodes->find(
@@ -2070,14 +2070,6 @@ inline status_t NodeManager::_handleNodesCreated(
 
 				// instantiate & add connection
 
-				uint32 flags = 0;
-				
-				// 22sep99: lock audio-mixer connection
-				if(
-					sourceRef == m_audioMixerNode &&
-					destRef == m_audioOutputNode)
-					flags |= Connection::LOCKED;
-					
 				Connection* con = new Connection(
 					m_nextConID++,
 					output.node,
@@ -2087,13 +2079,13 @@ inline status_t NodeManager::_handleNodesCreated(
 					input.destination,
 					input.name,
 					input.format,
-					flags);
-				
+					0);
+
 				_addConnection(con);
-				
+
 //				// [e.moon 7nov99] call hook
 //				connectionMade(con);
-								
+
 //				PRINT((
 //					"* NodeManager::_handleNodesCreated(): Found initial connection:\n"
 //					"  %s:%s -> %s:%s\n",
@@ -2105,11 +2097,11 @@ inline status_t NodeManager::_handleNodesCreated(
 		} // for(port_ref_map ...
 
 		// mark the ordeal as over & done with
-		m_existingNodesInit = true;		
+		m_existingNodesInit = true;
 		// clean up
 		delete initialNodes;
 	}
-	
+
 	// don't relay message if no new create notifications were received [e.moon 11oct99]
 	return refsCreated ? B_OK : B_ERROR;
 }
@@ -2117,13 +2109,13 @@ inline status_t NodeManager::_handleNodesCreated(
 inline void NodeManager::_handleNodesDeleted(
 	BMessage*											message) {
 	ASSERT(IsLocked());
-	
+
 	D_METHOD((
 		"NodeManager::_handleNodesDeleted()\n"));
-		
+
 	// walk the list of deleted nodes, removing & cleaning up refs
 	// (and any straggler connections)
-	
+
 	type_code type;
 	int32 count;
 	status_t err = message->GetInfo("media_node_id", &type, &count);
@@ -2136,7 +2128,7 @@ inline void NodeManager::_handleNodesDeleted(
 	}
 	if(!count)
 		return;
-		
+
 	for(int32 n = 0; n < count; n++) {
 
 		int32 id;
@@ -2167,13 +2159,13 @@ inline void NodeManager::_handleNodesDeleted(
 		ref->getOutputConnections(stuckConnections);
 
 		BMessage message(B_MEDIA_CONNECTION_BROKEN);
-		
+
 		for(uint32 n = 0; n < stuckConnections.size(); ++n) {
 			Connection& c = stuckConnections[n];
-		
+
 			// generate a complete B_MEDIA_CONNECTION_BROKEN message
 			// +++++ the message format may be extended in the future -- ick
-			
+
 			message.AddData("source", B_RAW_TYPE, &c.source(), sizeof(media_source));
 			message.AddData("destination", B_RAW_TYPE, &c.destination(), sizeof(media_destination));
 			message.AddInt32(_connectionField, c.id());
@@ -2183,9 +2175,9 @@ inline void NodeManager::_handleNodesDeleted(
 			_removeConnection(c);
 		}
 
-		// +++++ don't notify if no stuck connections were found		
+		// +++++ don't notify if no stuck connections were found
 		notify(&message);
-		
+
 		// ungroup if necessary
 		if(ref->m_group) {
 			ASSERT(!ref->isReleased());
@@ -2197,10 +2189,10 @@ inline void NodeManager::_handleNodesDeleted(
 
 //		// [e.moon 7nov99] call hook
 //		nodeDeleted(ref);
-		
+
 		// release it
 		ref->release();
-		
+
 	} // for(int32 n ...
 }
 
@@ -2210,13 +2202,13 @@ inline void NodeManager::_handleConnectionMade(
 	D_METHOD((
 		"NodeManager::_handleConnectionMade()\n"));
 	status_t err;
-	
+
 	for(int32 n = 0;;++n) {
 		media_input input;
 		media_output output;
 		const void* data;
 		ssize_t dataSize;
-		
+
 		// fetch output
 		err = message->FindData("output", B_RAW_TYPE, n, &data, &dataSize);
 		if(err < B_OK) {
@@ -2232,7 +2224,7 @@ inline void NodeManager::_handleConnectionMade(
 			break;
 		}
 		output = *(media_output*)data;
-		
+
 		// fetch input
 		err = message->FindData("input", B_RAW_TYPE, n, &data, &dataSize);
 		if(err < B_OK) {
@@ -2248,7 +2240,7 @@ inline void NodeManager::_handleConnectionMade(
 			break;
 		}
 		input = *(media_input*)data;
-		
+
 		// look for existing Connection instance
 		Connection found;
 		err = findConnection(
@@ -2261,7 +2253,7 @@ inline void NodeManager::_handleConnectionMade(
 				found.outputName(), found.inputName()));
 			continue;
 		}
-		
+
 		// instantiate & add Connection
 		Connection* con = new Connection(
 			m_nextConID++,
@@ -2273,7 +2265,7 @@ inline void NodeManager::_handleConnectionMade(
 			input.name,
 			input.format,
 			0);
-		
+
 		_addConnection(con);
 	}
 }
@@ -2281,7 +2273,7 @@ inline void NodeManager::_handleConnectionMade(
 // augments message with source and destination node ID's
 inline void NodeManager::_handleConnectionBroken(
 	BMessage*											message) {
-	
+
 	D_METHOD((
 		"NodeManager::_handleConnectionBroken()\n"));
 	status_t err;
@@ -2293,7 +2285,7 @@ inline void NodeManager::_handleConnectionBroken(
 		const void* data;
 		ssize_t dataSize;
 
-		// fetch source		
+		// fetch source
 		err = message->FindData("source", B_RAW_TYPE, n, &data, &dataSize);
 		if(err < B_OK) {
 			if(!n) {
@@ -2317,7 +2309,7 @@ inline void NodeManager::_handleConnectionBroken(
 				"* NodeManager::_handleConnectionBroken(): connection not found:\n"
 				"  %ld:%ld\n",
 				source.port, source.id));
-				
+
 			// add empty entry to message
 			message->AddInt32(_connectionField, 0);
 			message->AddInt32(_sourceNodeField, 0);
@@ -2329,23 +2321,23 @@ inline void NodeManager::_handleConnectionBroken(
 		message->AddInt32(_connectionField, con.id());
 		message->AddInt32(_sourceNodeField, con.sourceNode());
 		message->AddInt32(_destNodeField, con.destinationNode());
-		
+
 //		// [e.moon 7nov99] call hook
 //		connectionBroken(&con);
-		
+
 		// home free; delete the connection
 		_removeConnection(con);
-		
+
 	} // for(int32 n ...
 }
 
-inline void 
+inline void
 NodeManager::_handleFormatChanged(BMessage *message)
 {
 	D_METHOD((
 		"NodeManager::_handleFormatChanged()\n"));
 	status_t err;
-	
+
 	ssize_t dataSize;
 
 	// fetch source
@@ -2356,16 +2348,16 @@ NodeManager::_handleFormatChanged(BMessage *message)
 			"* NodeManager::_handleFormatChanged(): incomplete entry in message.\n"));
 		return;
 	}
-	
+
 	// fetch destination
-	media_destination* destination;	
+	media_destination* destination;
 	err = message->FindData("be:destination", B_RAW_TYPE, (const void**)&destination, &dataSize);
 	if(err < B_OK) {
 		PRINT((
 			"* NodeManager::_handleFormatChanged(): incomplete entry in message.\n"));
 		return;
 	}
-	
+
 	// fetch format
 	media_format* format;
 	err = message->FindData("be:format", B_RAW_TYPE, (const void**)&format, &dataSize);
@@ -2374,7 +2366,7 @@ NodeManager::_handleFormatChanged(BMessage *message)
 			"* NodeManager::_handleFormatChanged(): incomplete entry in message.\n"));
 		return;
 	}
-	
+
 	// find matching connection
 	for(con_map::const_iterator it = m_conSourceMap.begin();
 		it != m_conSourceMap.end(); ++it) {
@@ -2383,15 +2375,15 @@ NodeManager::_handleFormatChanged(BMessage *message)
 				// connection defunct
 				return;
 			}
-				
+
 			// found
 			(*it).second->m_format = *format;
-			
+
 			// attach node IDs to message
 			message->AddInt32(_connectionField, (*it).second->id());
 			message->AddInt32(_sourceNodeField, (*it).second->sourceNode());
 			message->AddInt32(_destNodeField, (*it).second->destinationNode());
-			
+
 			break;
 		}
 	}
@@ -2403,7 +2395,7 @@ NodeManager::_handleFormatChanged(BMessage *message)
 
 inline uint32 NodeManager::_userFlagsForKind(
 	uint32												kind) {
-	
+
 	uint32 f = 0;
 	if(
 //		kind & B_TIME_SOURCE ||
@@ -2411,7 +2403,7 @@ inline uint32 NodeManager::_userFlagsForKind(
 		// || kind & B_SYSTEM_MIXER [now in initCommonNodes() e.moon 17nov99]
 		)
 		f |= (NodeRef::NO_START_STOP | NodeRef::NO_SEEK | NodeRef::NO_PREROLL);
-	
+
 //	// [28sep99 e.moon] physical inputs may not be stopped for now; at
 //	// least one sound input node (for emu10k) stops working when requested
 //	// to stop.
@@ -2419,41 +2411,41 @@ inline uint32 NodeManager::_userFlagsForKind(
 //	if(
 //		kind & B_PHYSICAL_INPUT)
 //		f |= NodeRef::NO_STOP;
-		
+
 	return f;
 }
 
 inline uint32 NodeManager::_implFlagsForKind(
 	uint32												kind) {
-	
+
 	return 0;
 }
 
 // [e.moon 28sep99] latency updating
 // These methods must set the recording-mode delay for
 // any B_RECORDING nodes they handle.
-	
+
 // +++++ abstract to 'for each' and 'for each from'
 //       methods (template or callback?)
 
-	
+
 // refresh cached latency for every node in the given group
 // (or all nodes if no group given.)
-	
+
 inline void NodeManager::_updateLatencies(
 	NodeGroup*										group) {
-	
+
 	ASSERT(IsLocked());
 	if(group) {
 		ASSERT(group->isLocked());
 	}
-	
+
 	if(group) {
 		for(NodeGroup::node_set::iterator it = group->m_nodes.begin();
 			it != group->m_nodes.end(); ++it) {
-			
+
 			(*it)->_updateLatency();
-		}	
+		}
 	}
 	else {
 		for(node_ref_map::iterator it = m_nodeRefMap.begin();
@@ -2463,7 +2455,7 @@ inline void NodeManager::_updateLatencies(
 		}
 	}
 }
-	
+
 // refresh cached latency for every node attached to
 // AND INCLUDING the given origin node.
 // if 'recurse' is true, affects indirectly attached
@@ -2475,13 +2467,13 @@ inline void NodeManager::_updateLatenciesFrom(
 	bool													recurse) {
 
 	ASSERT(IsLocked());
-		
+
 //	PRINT(("### NodeManager::_updateLatenciesFrom()\n"));
-	
+
 	origin->lock();
 	origin->_updateLatency();
 	origin->unlock();
-	
+
 	_lockAllGroups(); // [e.moon 13oct99]
 
 	_for_each_state st;
