@@ -88,13 +88,21 @@ dump_int_statistics(int argc, char **argv)
 			if (error == B_OK && exactMatch) {
 				if (strchr(imageName, '/') != NULL)
 					imageName = strrchr(imageName, '/') + 1;
-
-				kprintf("\t%s:%s (%p), data %p, handled %8lld%s\n", imageName,
-					symbol, io->func, io->data, io->handled_count,
-					io->no_handled_info ? ", NO HANDLED INFO" : "");
+				
+				int length = 4 + strlen(imageName);
+				kprintf("   %s:%-*s (%p)", imageName, 45 - length, symbol,
+					io->func);
 			} else
-				kprintf("\t%p, data %p\n", io->func, io->data);
+				kprintf("\t\t\t\t\t   func %p", io->func);
+
+			kprintf(", data %p, handled ", io->data);
+			if (io->no_handled_info)
+				kprintf("<unknown>\n");
+			else
+				kprintf("%8lld\n", io->handled_count);
 		}
+		
+		kprintf("\n");
 	}
 	return 0;
 }
@@ -180,18 +188,21 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	}
 #endif
 
-	/* For level-triggered interrupts, we actually handle the return
-	 * value (ie. B_HANDLED_INTERRUPT) to decide wether or not we
-	 * want to call another interrupt handler.
-	 * For edge-triggered interrupts, however, we always need to call
-	 * all handlers, as multiple interrupts cannot be identified. We
-	 * still make sure the return code of this function will issue
-	 * whatever the driver thought would be useful (ie. B_INVOKE_SCHEDULER)
-	 */
+	// For level-triggered interrupts, we actually handle the return
+	// value (ie. B_HANDLED_INTERRUPT) to decide wether or not we
+	// want to call another interrupt handler.
+	// For edge-triggered interrupts, however, we always need to call
+	// all handlers, as multiple interrupts cannot be identified. We
+	// still make sure the return code of this function will issue
+	// whatever the driver thought would be useful (ie. B_INVOKE_SCHEDULER)
 
 	for (io = sVectors[vector].handler_list; io != NULL; io = io->next) {
 		status = io->func(io->data);
 
+#if DEBUG_INTERRUPTS
+		if (status != B_UNHANDLED_INTERRUPT)
+			io->handled_count++;
+#endif
 		if (levelTriggered && status != B_UNHANDLED_INTERRUPT)
 			break;
 
@@ -199,9 +210,6 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 			handled = true;
 		else if (status == B_INVOKE_SCHEDULER)
 			invokeScheduler = true;
-#if DEBUG_INTERRUPTS
-		io->handled_count++;
-#endif
 	}
 
 #if DEBUG_INTERRUPTS
