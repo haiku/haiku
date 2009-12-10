@@ -13,6 +13,7 @@
 #include <sys/cdefs.h>
 #include <sys/errno.h>
 #include <sys/time.h>
+#include <sys/priority.h>
 
 
 /* The version this compatibility layer is based on */

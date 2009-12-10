@@ -18,7 +18,9 @@ struct sysctl_req {
 struct sysctl_ctx_list {
 };
 
-#define SYSCTL_HANDLER_ARGS void *oidp, void *arg1, void *arg2, struct sysctl_req *req
+
+#define SYSCTL_HANDLER_ARGS void *oidp, void *arg1, int arg2, \
+	struct sysctl_req *req
 
 #define OID_AUTO	(-1)
 
@@ -46,6 +48,7 @@ struct sysctl_ctx_list {
 #define CTLFLAG_TUN	0x00080000	/* Tunable variable */
 #define CTLFLAG_RDTUN	(CTLFLAG_RD|CTLFLAG_TUN)
 
+
 static inline int
 sysctl_ctx_init(struct sysctl_ctx_list *clist)
 {
@@ -61,11 +64,9 @@ sysctl_ctx_free(struct sysctl_ctx_list *clist)
 
 
 static inline void *
-sysctl_add_oid(struct sysctl_ctx_list *clist,
-		void *parent, int nbr, const char *name,
-		int kind, void *arg1, int arg2,
-		int (*handler) (SYSCTL_HANDLER_ARGS),
-		const char *fmt, const char *descr)
+sysctl_add_oid(struct sysctl_ctx_list *clist, void *parent, int nbr, 
+	const char *name, int kind, void *arg1, int arg2,
+	int (*handler) (SYSCTL_HANDLER_ARGS), const char *fmt, const char *descr)
 {
 	return NULL;
 }
@@ -83,47 +84,52 @@ static inline int sysctl_handle_string(SYSCTL_HANDLER_ARGS) { return -1; }
 #define __DESCR(x) ""
 
 #define SYSCTL_ADD_OID(ctx, parent, nbr, name, kind, a1, a2, handler, fmt, descr) \
-	sysctl_add_oid(ctx, parent, nbr, name, kind, a1, a2, handler, fmt, __DESCR(descr))
+	sysctl_add_oid(ctx, parent, nbr, name, kind, a1, a2, handler, fmt, \
+	__DESCR(descr))
 
-#define SYSCTL_ADD_NODE(ctx, parent, nbr, name, access, handler, descr)	    \
-	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_NODE|(access),	    \
+#define SYSCTL_ADD_NODE(ctx, parent, nbr, name, access, handler, descr)	\
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_NODE|(access),		\
 	0, 0, handler, "N", __DESCR(descr))
 
-#define SYSCTL_ADD_STRING(ctx, parent, nbr, name, access, arg, len, descr)  \
-	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_STRING|(access),	    \
+#define SYSCTL_ADD_STRING(ctx, parent, nbr, name, access, arg, len, descr)	\
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_STRING|(access),			\
 	arg, len, sysctl_handle_string, "A", __DESCR(descr))
 
-#define SYSCTL_ADD_INT(ctx, parent, nbr, name, access, ptr, val, descr)	    \
-	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_INT|(access),	    \
+#define SYSCTL_ADD_INT(ctx, parent, nbr, name, access, ptr, val, descr)	\
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_INT|(access),		\
 	ptr, val, sysctl_handle_int, "I", __DESCR(descr))
 
-#define SYSCTL_ADD_UINT(ctx, parent, nbr, name, access, ptr, val, descr)    \
-	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_UINT|(access),	    \
+#define SYSCTL_ADD_UINT(ctx, parent, nbr, name, access, ptr, val, descr)	\
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_UINT|(access),			\
 	ptr, val, sysctl_handle_int, "IU", __DESCR(descr))
 
-#define SYSCTL_ADD_LONG(ctx, parent, nbr, name, access, ptr, descr)	    \
-	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_LONG|(access),	    \
+#define SYSCTL_ADD_XINT(ctx, parent, nbr, name, access, ptr, val, descr)	\
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_UINT|(access),			\
+	ptr, val, sysctl_handle_int, "IX", __DESCR(descr))
+
+#define SYSCTL_ADD_LONG(ctx, parent, nbr, name, access, ptr, descr)	\
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_LONG|(access),	\
 	ptr, 0, sysctl_handle_long, "L", __DESCR(descr))
 
-#define SYSCTL_ADD_ULONG(ctx, parent, nbr, name, access, ptr, descr)	    \
-	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_ULONG|(access),	    \
+#define SYSCTL_ADD_ULONG(ctx, parent, nbr, name, access, ptr, descr)	\
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_ULONG|(access),		\
 	ptr, 0, sysctl_handle_long, "LU", __DESCR(descr))
 
-#define SYSCTL_ADD_QUAD(ctx, parent, nbr, name, access, ptr, descr)		\
-	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_QUAD|(access),		\
+#define SYSCTL_ADD_QUAD(ctx, parent, nbr, name, access, ptr, descr)	\
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_QUAD|(access),	\
 	ptr, 0, sysctl_handle_quad, "Q", __DESCR(descr))
 
-#define SYSCTL_ADD_OPAQUE(ctx, parent, nbr, name, access, ptr, len, fmt, descr)\
-	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_OPAQUE|(access),	    \
+#define SYSCTL_ADD_OPAQUE(ctx, parent, nbr, name, access, ptr, len, fmt, descr) \
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_OPAQUE|(access), \
 	ptr, len, sysctl_handle_opaque, fmt, __DESCR(descr))
 
-#define SYSCTL_ADD_STRUCT(ctx, parent, nbr, name, access, ptr, type, descr) \
-	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_OPAQUE|(access),	    \
+#define SYSCTL_ADD_STRUCT(ctx, parent, nbr, name, access, ptr, type, descr)	\
+	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_OPAQUE|(access),			\
 	ptr, sizeof(struct type), sysctl_handle_opaque, "S," #type, __DESCR(descr))
 
 #define SYSCTL_ADD_PROC(ctx, parent, nbr, name, access, ptr, arg, handler, fmt, descr) \
-	sysctl_add_oid(ctx, parent, nbr, name, (access),			    \
-	ptr, arg, handler, fmt, __DESCR(descr))
+	sysctl_add_oid(ctx, parent, nbr, name, (access), ptr, arg, handler, fmt, \
+	__DESCR(descr))
 
 
 static inline void *
@@ -133,9 +139,9 @@ SYSCTL_CHILDREN(void *ptr)
 }
 
 
-#define SYSCTL_STATIC_CHILDREN(...)	NULL
+#define SYSCTL_STATIC_CHILDREN(...) NULL
 
-#define SYSCTL_DECL(name)					\
+#define SYSCTL_DECL(name) \
 	extern struct sysctl_oid_list sysctl_##name##_children
 
 #define SYSCTL_NODE(...)

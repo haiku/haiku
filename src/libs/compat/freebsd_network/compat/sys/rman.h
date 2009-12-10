@@ -25,5 +25,7 @@ struct resource {
 
 bus_space_handle_t rman_get_bushandle(struct resource *);
 bus_space_tag_t rman_get_bustag(struct resource *);
+uint32_t rman_make_alignment_flags(uint32_t);
+u_long rman_get_start(struct resource *);
 
 #endif	/* _FBSD_COMPAT_SYS_RMAN_H_ */

@@ -25,15 +25,15 @@ int printf(const char *format, ...) __printflike(1, 2);
 
 #define ovbcopy(f, t, l) bcopy((f), (t), (l))
 
-#define bootverbose		1
+#define bootverbose 1
 
-#ifdef	INVARIANTS
-#define KASSERT(cond,msg) do { \
-	if (!(cond)) \
-		panic msg; \
+#ifdef INVARIANTS
+#define KASSERT(cond,msg) do {	\
+	if (!(cond))				\
+		panic msg;				\
 } while (0)
 #else
-#define	KASSERT(exp,msg) do { \
+#define KASSERT(exp,msg) do { \
 } while (0)
 #endif
 
@@ -47,10 +47,10 @@ int printf(const char *format, ...) __printflike(1, 2);
 
 void wakeup(void *);
 
-#ifndef CTASSERT		/* Allow lint to override */
-#define	CTASSERT(x)		_CTASSERT(x, __LINE__)
-#define	_CTASSERT(x, y)		__CTASSERT(x, y)
-#define	__CTASSERT(x, y)	typedef char __assert ## y[(x) ? 1 : -1]
+#ifndef CTASSERT /* Allow lint to override */
+#define CTASSERT(x)			_CTASSERT(x, __LINE__)
+#define _CTASSERT(x, y)		__CTASSERT(x, y)
+#define __CTASSERT(x, y)	typedef char __assert ## y[(x) ? 1 : -1]
 #endif
 
 
@@ -70,11 +70,14 @@ copyout(const void * __restrict kaddr, void * __restrict udaddr,
 }
 
 
-int	snprintf(char *, size_t, const char *, ...) __printflike(3, 4);
+static inline void log(int level, const char *fmt, ...) { }
+
+
+int snprintf(char *, size_t, const char *, ...) __printflike(3, 4);
 extern int sprintf(char *buf, const char *, ...);
 
 extern void driver_vprintf(const char *format, va_list vl);
-#define	vprintf(fmt, vl) driver_vprintf(fmt, vl)
+#define vprintf(fmt, vl) driver_vprintf(fmt, vl)
 
 extern int vsnprintf(char *, size_t, const char *, __va_list)
 	__printflike(3, 0);
@@ -82,7 +85,7 @@ extern int vsnprintf(char *, size_t, const char *, __va_list)
 int msleep(void *, struct mtx *, int, const char *, int);
 int _pause(const char *, int);
 #define pause(waitMessage, timeout) _pause((waitMessage), (timeout))
-#define tsleep(channel, priority, waitMessage, timeout)					\
+#define tsleep(channel, priority, waitMessage, timeout) \
 	msleep((channel), NULL, (priority), (waitMessage), (timeout))
 
 struct unrhdr;
