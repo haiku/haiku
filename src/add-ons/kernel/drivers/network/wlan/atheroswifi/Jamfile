@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network wlan atheros ;
+SubDir HAIKU_TOP src add-ons kernel drivers network wlan atheroswifi ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
@@ -15,15 +15,15 @@ UseHeaders [ FDirName $(SUBDIR) dev ath ath_hal ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ] ;
 
-Depends atheros : atheros_hal.o ;
-Depends atheros : atheros_rate.o ;
+Depends atheroswifi : atheroswifi_hal.o ;
+Depends atheroswifi : atheroswifi_rate.o ;
 
-KernelAddon atheros :
+KernelAddon atheroswifi :
 	if_ath.c
 	if_ath_pci.c
 	glue.c
-	atheros_hal.o
-	atheros_rate.o
+	atheroswifi_hal.o
+	atheroswifi_rate.o
 	:
 	libfreebsd_wlan.a
 	libfreebsd_network.a
@@ -36,7 +36,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5212 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5312 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5416 ] ;
 
-KernelMergeObject atheros_hal.o :
+KernelMergeObject atheroswifi_hal.o :
 	ah_osdep.c
 	ah.c
 	ah_regdomain.c
@@ -119,6 +119,6 @@ KernelMergeObject atheros_hal.o :
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_rate sample ] ;
 
-KernelMergeObject atheros_rate.o :
+KernelMergeObject atheroswifi_rate.o :
 	sample.c
 	;
