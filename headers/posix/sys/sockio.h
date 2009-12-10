@@ -60,6 +60,6 @@
 #define SIOCSIFGENERIC		8945	/* generic IF set op */
 #define SIOCGIFGENERIC		8946	/* generic IF get op */
 
-#define SIOCEND				8946	/* Always set to highest SIOC* */
+#define SIOCEND				9000	/* SIOCEND >= highest SIOC* */
 
 #endif	/* _SYS_SOCKIO_H */
