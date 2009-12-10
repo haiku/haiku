@@ -30,126 +30,271 @@ static const uint32 kMsgCloseToolTip = 'clos';
 
 namespace BPrivate {
 
+
 class ToolTipView : public BView {
 public:
-	ToolTipView(BToolTip* tip)
-		:
-		BView("tool tip", B_WILL_DRAW),
-		fToolTip(tip),
-		fHidden(false)
-	{
-		fToolTip->AcquireReference();
-		SetViewColor(ui_color(B_TOOL_TIP_BACKGROUND_COLOR));
+								ToolTipView(BToolTip* tip);
+	virtual						~ToolTipView();
 
-		BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
-		layout->SetInsets(5, 5, 5, 5);
-		SetLayout(layout);
+	virtual	void				AttachedToWindow();
+	virtual	void				DetachedFromWindow();
 
-		AddChild(fToolTip->View());
+	virtual	void				FrameResized(float width, float height);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+									const BMessage* dragMessage);
+
+			void				HideTip();
+			void				ShowTip();
+			void				ResetWindowFrame(BPoint where);
+
+			BToolTip*			Tip() const { return fToolTip; }
+			bool				IsTipHidden() const { return fHidden; }
+
+private:
+			BToolTip*			fToolTip;
+			bool				fHidden;
+};
+
+
+ToolTipView::ToolTipView(BToolTip* tip)
+	:
+	BView("tool tip", B_WILL_DRAW | B_FRAME_EVENTS),
+	fToolTip(tip),
+	fHidden(false)
+{
+	fToolTip->AcquireReference();
+	SetViewColor(ui_color(B_TOOL_TIP_BACKGROUND_COLOR));
+
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	layout->SetInsets(5, 5, 5, 5);
+	SetLayout(layout);
+
+	AddChild(fToolTip->View());
+}
+
+
+ToolTipView::~ToolTipView()
+{
+	fToolTip->ReleaseReference();
+}
+
+
+void
+ToolTipView::AttachedToWindow()
+{
+	SetEventMask(B_POINTER_EVENTS, 0);
+	fToolTip->AttachedToWindow();
+}
+
+
+void
+ToolTipView::DetachedFromWindow()
+{
+	BToolTipManager* manager = BToolTipManager::Manager();
+	manager->Lock();
+
+	RemoveChild(fToolTip->View());
+		// don't delete this one!
+	fToolTip->DetachedFromWindow();
+
+	manager->Unlock();
+}
+
+
+void
+ToolTipView::FrameResized(float width, float height)
+{
+	BPoint where;
+	GetMouse(&where, NULL, false);
+
+	ResetWindowFrame(ConvertToScreen(where));
+}
+
+
+void
+ToolTipView::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
+	if (fToolTip->IsSticky()) {
+		ResetWindowFrame(ConvertToScreen(where));
+	} else if (transit == B_ENTERED_VIEW) {
+		// close instantly if the user managed to enter
+		Window()->Quit();
+	} else {
+		// close with the preferred delay in case the mouse just moved
+		HideTip();
 	}
+}
 
-	virtual ~ToolTipView()
-	{
-		fToolTip->ReleaseReference();
-	}
 
-	virtual void AttachedToWindow()
-	{
-		SetEventMask(B_POINTER_EVENTS, 0);
-		fToolTip->AttachedToWindow();
-	}
+void
+ToolTipView::HideTip()
+{
+	if (fHidden)
+		return;
 
-	virtual void DetachedFromWindow()
-	{
-		BToolTipManager* manager = BToolTipManager::Manager();
-		manager->Lock();
+	BMessage quit(kMsgCloseToolTip);
+	BMessageRunner::StartSending(Window(), &quit,
+		BToolTipManager::Manager()->HideDelay(), 1);
+	fHidden = true;
+}
 
-		RemoveChild(fToolTip->View());
-			// don't delete this one!
-		fToolTip->DetachedFromWindow();
 
-		manager->Unlock();
-	}
+void
+ToolTipView::ShowTip()
+{
+	fHidden = false;
+}
 
-	virtual void MouseMoved(BPoint where, uint32 transit,
-		const BMessage* dragMessage)
-	{
-		if (fToolTip->IsSticky()) {
-			// TODO: move window with mouse!
-			Window()->MoveTo(
-				ConvertToScreen(where) + fToolTip->MouseRelativeLocation());
-		} else if (transit == B_ENTERED_VIEW) {
-			// close instantly if the user managed to enter
-			Window()->Quit();
-		} else {
-			// close with the preferred delay in case the mouse just moved
-			HideTip();
+
+/*!	Tries to find the right frame to show the tool tip in, trying to use the
+	alignment that the tool tip specifies.
+	Makes sure the tool tip can be shown on screen in its entirety, ie. it will
+	resize the window if necessary.
+*/
+void
+ToolTipView::ResetWindowFrame(BPoint where)
+{
+	if (Window() == NULL)
+		return;
+
+	BSize size = PreferredSize();
+
+	BScreen screen(Window());
+	BRect screenFrame = screen.Frame().InsetBySelf(2, 2);
+	BPoint offset = fToolTip->MouseRelativeLocation();
+
+	// Ensure that the tip can be placed on screen completely
+
+	if (size.width > screenFrame.Width())
+		size.width = screenFrame.Width();
+
+	if (size.width > where.x - screenFrame.left
+		&& size.width > screenFrame.right - where.x) {
+		// There is no space to put the tip to the left or the right of the
+		// cursor, it can either be below or above it
+		if (size.height > where.y - screenFrame.top
+			&& where.y - screenFrame.top > screenFrame.Height() / 2) {
+			size.height = where.y - offset.y - screenFrame.top;
+		} else if (size.height > screenFrame.bottom - where.y
+			&& screenFrame.bottom - where.y > screenFrame.Height() / 2) {
+			size.height = screenFrame.bottom - where.y - offset.y;
 		}
 	}
 
-	void HideTip()
-	{
-		if (fHidden)
-			return;
+	// Find best alignment, starting with the requested one
 
-		BMessage quit(kMsgCloseToolTip);
-		BMessageRunner::StartSending(Window(), &quit,
-			BToolTipManager::Manager()->HideDelay(), 1);
-		fHidden = true;
+	BAlignment alignment = fToolTip->Alignment();
+	BPoint location = where;
+	bool doesNotFit = false;
+
+	switch (alignment.horizontal) {
+		case B_ALIGN_LEFT:
+			location.x -= size.width + offset.x;
+			if (location.x < screenFrame.left) {
+				location.x = screenFrame.left;
+				doesNotFit = true;
+			}
+			break;
+		case B_ALIGN_CENTER:
+			location.x -= size.width / 2 - offset.x;
+			if (location.x < screenFrame.left) {
+				location.x = screenFrame.left;
+				doesNotFit = true;
+			} else if (location.x + size.width > screenFrame.right) {
+				location.x = screenFrame.right - size.width;
+				doesNotFit = true;
+			}
+			break;
+
+		default:
+			location.x += offset.x;
+			if (location.x + size.width > screenFrame.right) {
+				location.x = screenFrame.right - size.width;
+				doesNotFit = true;
+			}
+			break;
 	}
 
-	void ShowTip()
-	{
-		fHidden = false;
+	if ((doesNotFit && alignment.vertical == B_ALIGN_MIDDLE)
+		|| (alignment.vertical == B_ALIGN_MIDDLE
+			&& alignment.horizontal == B_ALIGN_CENTER))
+		alignment.vertical = B_ALIGN_BOTTOM;
+
+	while (true) {
+		switch (alignment.vertical) {
+			case B_ALIGN_TOP:
+				location.y = where.y - size.height - offset.y;
+				if (location.y < screenFrame.top) {
+					alignment.vertical = B_ALIGN_BOTTOM;
+					continue;
+				}
+				break;
+
+			case B_ALIGN_MIDDLE:
+				location.y -= size.height / 2 - offset.y;
+				if (location.y < screenFrame.top)
+					location.y = screenFrame.top;
+				else if (location.y + size.height > screenFrame.bottom)
+					location.y = screenFrame.bottom - size.height;
+				break;
+
+			default:
+				location.y = where.y + offset.y;
+				if (location.y + size.height > screenFrame.bottom) {
+					alignment.vertical = B_ALIGN_TOP;
+					continue;
+				}
+				break;
+		}
+		break;
 	}
 
-	BToolTip* Tip() const { return fToolTip; }
-	bool IsTipHidden() const { return fHidden; }
+	where = location;
 
-private:
-	BToolTip*	fToolTip;
-	bool		fHidden;
-};
+	// Cut off any out-of-screen areas
+
+	if (screenFrame.left > where.x) {
+		size.width -= where.x - screenFrame.left;
+		where.x = screenFrame.left;
+	} else if (screenFrame.right < where.x + size.width)
+		size.width = screenFrame.right - where.x;
+
+	if (screenFrame.top > where.y) {
+		size.height -= where.y - screenFrame.top;
+		where.y = screenFrame.top;
+	} else if (screenFrame.bottom < where.y + size.height)
+		size.height -= screenFrame.bottom - where.y;
+
+	// Change window frame
+
+	Window()->ResizeTo(size.width, size.height);
+	Window()->MoveTo(where);
+}
+
+
+// #pragma mark -
 
 
 ToolTipWindow::ToolTipWindow(BToolTip* tip, BPoint where)
 	:
-	BWindow(BRect(0, 0, 250, 10), "tool tip", B_BORDERED_WINDOW_LOOK,
-		kMenuWindowFeel, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS | B_AVOID_FRONT | B_AVOID_FOCUS)
+	BWindow(BRect(0, 0, 250, 10).OffsetBySelf(where), "tool tip",
+		B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
+		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS
+			| B_AVOID_FRONT | B_AVOID_FOCUS)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	BToolTipManager* manager = BToolTipManager::Manager();
+	ToolTipView* view = new ToolTipView(tip);
+
 	manager->Lock();
-	AddChild(new ToolTipView(tip));
+	AddChild(view);
 	manager->Unlock();
 
-	BSize size = ChildAt(0)->PreferredSize();
-	ResizeTo(size.width, size.height);
-	//AddChild(BLayoutBuilder::Group<>(B_VERTICAL).Add(new ToolTipView(tip)));
+	// figure out size and location
 
-	// figure out location
-	// TODO: take alignment into account!
-	where += tip->MouseRelativeLocation();
-
-	BScreen screen(this);
-	if (screen.IsValid()) {
-		BRect screenFrame = screen.Frame().InsetBySelf(5, 5);
-		BRect frame = Frame().OffsetToSelf(where);
-		if (!screenFrame.Contains(frame)) {
-			if (screenFrame.top > frame.top)
-				where.y -= frame.top - screenFrame.top;
-			else if (screenFrame.bottom < frame.bottom)
-				where.y -= frame.bottom - screenFrame.bottom;
-			if (screenFrame.left > frame.left)
-				where.x -= frame.left - screenFrame.left;
-			else if (screenFrame.right < frame.right)
-				where.x -= frame.right - screenFrame.right;
-		}
-	}
-
-	MoveTo(where);
+	view->ResetWindowFrame(where);
 }
 
 
@@ -189,10 +334,11 @@ ToolTipWindow::MessageReceived(BMessage* message)
 	}
 }
 
+
 }	// namespace BPrivate
 
 
-//	#pragma mark -
+// #pragma mark -
 
 
 /*static*/ BToolTipManager*
