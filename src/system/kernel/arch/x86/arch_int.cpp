@@ -1010,7 +1010,10 @@ hardware_interrupt(struct iframe* frame)
 		cpu_status state = disable_interrupts();
 		GRAB_THREAD_LOCK();
 
-		scheduler_reschedule();
+		if (ret == B_INVOKE_SCHEDULER || !thread->cpu->invoke_scheduler_if_idle
+			|| thread->priority == B_IDLE_PRIORITY) {
+			scheduler_reschedule();
+		}
 
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);

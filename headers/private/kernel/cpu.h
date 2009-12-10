@@ -43,6 +43,7 @@ typedef struct cpu_ent {
 	jmp_buf		fault_jump_buffer;
 
 	bool		invoke_scheduler;
+	bool		invoke_scheduler_if_idle;
 	bool		disabled;
 
 	// arch-specific stuff

@@ -55,8 +55,9 @@ KernelMergeObject kernel_core.o :
 
 	# scheduler
 	scheduler.cpp
+#	scheduler_affine.cpp
 	scheduler_simple.cpp
-	scheduler_affine.cpp
+	scheduler_simple_smp.cpp
 	scheduler_tracing.cpp
 	scheduling_analysis.cpp
 

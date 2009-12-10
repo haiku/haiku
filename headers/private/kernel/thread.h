@@ -197,7 +197,7 @@ thread_unblock_locked(struct thread* thread, status_t status)
 	// wake up the thread, if it is sleeping
 	if (thread->state == B_THREAD_WAITING)
 		return scheduler_enqueue_in_run_queue(thread);
-		
+
 	return false;
 }
 
@@ -226,20 +226,6 @@ static inline void
 thread_unpin_from_current_cpu(struct thread* thread)
 {
 	thread->pinned_to_cpu--;
-}
-
-
-static inline void
-thread_disable_scheduling(struct thread* thread)
-{
-	thread->keep_scheduled++;
-}
-
-
-static inline void
-thread_enable_scheduling(struct thread* thread)
-{
-	thread->keep_scheduled--;
 }
 
 

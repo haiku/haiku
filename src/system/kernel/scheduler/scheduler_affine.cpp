@@ -346,11 +346,10 @@ context_switch(struct thread *fromThread, struct thread *toThread)
 static int32
 reschedule_event(timer *unused)
 {
-	if (thread_get_current_thread()->keep_scheduled > 0)
-		return B_HANDLED_INTERRUPT;
-
 	// this function is called as a result of the timer event set by the
 	// scheduler returning this causes a reschedule on the timer event
+	thread_get_current_thread()->cpu->invoke_scheduler = true;
+	thread_get_current_thread()->cpu->invoke_scheduler_if_idle = false;
 	thread_get_current_thread()->cpu->preempted = 1;
 	return B_INVOKE_SCHEDULER;
 }

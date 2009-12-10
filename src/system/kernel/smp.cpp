@@ -702,8 +702,21 @@ process_pending_ici(int32 currentCPU)
 			break;
 		}
 		case SMP_MSG_RESCHEDULE:
-			thread_get_current_thread()->cpu->invoke_scheduler = true;
+		{
+			cpu_ent* cpu = thread_get_current_thread()->cpu;
+			cpu->invoke_scheduler = true;
+			cpu->invoke_scheduler_if_idle = false;
 			break;
+		}
+		case SMP_MSG_RESCHEDULE_IF_IDLE:
+		{
+			cpu_ent* cpu = thread_get_current_thread()->cpu;
+			if (!cpu->invoke_scheduler) {
+				cpu->invoke_scheduler = true;
+				cpu->invoke_scheduler_if_idle = true;
+			}
+			break;
+		}
 		default:
 			dprintf("smp_intercpu_int_handler: got unknown message %ld\n", msg->message);
 	}

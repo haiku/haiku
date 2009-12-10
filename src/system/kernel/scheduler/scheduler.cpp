@@ -9,6 +9,7 @@
 
 #include "scheduler_affine.h"
 #include "scheduler_simple.h"
+#include "scheduler_simple_smp.h"
 
 
 struct scheduler_ops* gScheduler;
@@ -46,8 +47,13 @@ scheduler_init(void)
 		cpuCount != 1 ? "s" : "");
 
 	if (cpuCount > 1) {
+#if 0
 		dprintf("scheduler_init: using affine scheduler\n");
 		scheduler_affine_init();
+#else
+		dprintf("scheduler_init: using simple SMP scheduler\n");
+		scheduler_simple_smp_init();
+#endif
 	} else {
 		dprintf("scheduler_init: using simple scheduler\n");
 		scheduler_simple_init();
