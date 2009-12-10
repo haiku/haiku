@@ -52,4 +52,11 @@
 #define SIOCSPGRP			8939	/* set process group */
 #define SIOCGPGRP			8940	/* get process group */
 
+#define SIOCGPRIVATE_0		8941	/* device private 0 */
+#define SIOCGPRIVATE_1		8942	/* device private 1 */
+#define SIOCSDRVSPEC		8943	/* set driver-specific parameters */
+#define SIOCGDRVSPEC		8944	/* get driver-specific parameters */
+
+#define SIOCEND				8944	/* Always set to highest SIOC* */
+
 #endif	/* _SYS_SOCKIO_H */
