@@ -589,16 +589,6 @@ wi_intr(void *arg)
 
 	WI_LOCK(sc);
 
-	if (sc->wi_gone || !sc->sc_enabled || (ifp->if_flags & IFF_UP) == 0) {
-		CSR_WRITE_2(sc, WI_INT_EN, 0);
-		CSR_WRITE_2(sc, WI_EVENT_ACK, 0xFFFF);
-		WI_UNLOCK(sc);
-		return;
-	}
-
-	/* Disable interrupts. */
-	CSR_WRITE_2(sc, WI_INT_EN, 0);
-
 	status = CSR_READ_2(sc, WI_EVENT_STAT);
 	if (status & WI_EV_RX)
 		wi_rx_intr(sc);
