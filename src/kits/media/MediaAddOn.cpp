@@ -27,6 +27,7 @@
  *
  */
 
+
 #include <MediaAddOn.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,12 +35,16 @@
 #include "debug.h"
 #include "DataExchange.h"
 
-/*
- * some little helper function
- */
 
-static inline char *_newstrdup(const char *str);
-char *_newstrdup(const char *str)
+#define MAX_FLAVOR_IN_FORMAT_COUNT	300
+#define MAX_FLAVOR_OUT_FORMAT_COUNT	300
+
+#define FLATTEN_MAGIC 		'CODE'
+#define FLATTEN_TYPECODE	'DFIT'
+
+
+static char *
+_newstrdup(const char *str)
 {
 	if (str == NULL)
 		return NULL;
@@ -50,72 +55,69 @@ char *_newstrdup(const char *str)
 	return p;
 }
 
-#define MAX_FLAVOR_IN_FORMAT_COUNT	300
-#define MAX_FLAVOR_OUT_FORMAT_COUNT	300
 
-#define FLATTEN_MAGIC 		'CODE'
-#define FLATTEN_TYPECODE	'DFIT'
+// #pragma mark - dormant_node_info
 
-/*************************************************************
- * public dormant_node_info
- *************************************************************/
 
-// final & verified
 dormant_node_info::dormant_node_info()
-	: addon(-1),
+	:
+	addon(-1),
 	flavor_id(-1)
 {
 	name[0] = '\0';
 }
 
-// final
+
 dormant_node_info::~dormant_node_info()
 {
 }
 
-/*************************************************************
- * private flavor_info
- *************************************************************/
+
+// #pragma mark - flavor_info
+
 
 /* DO NOT IMPLEMENT */
 /*
 flavor_info &flavor_info::operator=(const flavor_info &other)
 */
 
-/*************************************************************
- * public dormant_flavor_info
- *************************************************************/
 
-// final & verified
+// #pragma mark - dormant_flavor_info
+
+
 dormant_flavor_info::dormant_flavor_info()
 {
-	name = 0;
-	info = 0;
+	name = NULL;
+	info = NULL;
 	kinds = 0;
 	flavor_flags = 0;
 	internal_id = 0;
 	possible_count = 0;
 	in_format_count = 0;
 	in_format_flags = 0;
-	in_formats = 0;
+	in_formats = NULL;
 	out_format_count = 0;
 	out_format_flags = 0;
-	out_formats = 0;
+	out_formats = NULL;
 }
 
 
-/* virtual */
 dormant_flavor_info::~dormant_flavor_info()
 {
-	delete [] name;
-	delete [] info;
-	delete [] in_formats;
-	delete [] out_formats;
+	delete[] name;
+	delete[] info;
+	delete[] in_formats;
+	delete[] out_formats;
 }
 
 
 dormant_flavor_info::dormant_flavor_info(const dormant_flavor_info &clone)
 {
+	name = NULL;
+	info = NULL;
+	in_formats = NULL;
+	out_formats = NULL;
+
 	*this = clone;
 }
 
@@ -146,40 +148,54 @@ dormant_flavor_info::operator=(const flavor_info &clone)
 	name = _newstrdup(clone.name);
 
 	delete [] in_formats;
-	in_formats = 0;
+	in_formats = NULL;
 	in_format_count = 0;
 	in_format_flags = clone.in_format_flags;
-	if (kinds & B_BUFFER_CONSUMER) {
-		if (clone.in_format_count >= 0 && clone.in_format_count <= MAX_FLAVOR_IN_FORMAT_COUNT) {
+	if ((kinds & B_BUFFER_CONSUMER) != 0) {
+		if (clone.in_format_count >= 0
+			&& clone.in_format_count <= MAX_FLAVOR_IN_FORMAT_COUNT) {
 			in_formats = new(std::nothrow) media_format[clone.in_format_count];
 			if (in_formats != NULL && clone.in_formats != NULL) {
 				in_format_count = clone.in_format_count;
-				for (int i = 0; i < in_format_count; i++)
-					const_cast<media_format &>(in_formats[i]) = clone.in_formats[i];
+				for (int i = 0; i < in_format_count; i++) {
+					const_cast<media_format &>(in_formats[i])
+						= clone.in_formats[i];
+				}
 			}
-		} else
-			fprintf(stderr, "error: dormant_flavor_info::operator= clone.in_format_count is invalid\n");
-	} else if (clone.in_format_count)
-		fprintf(stderr, "warning: dormant_flavor_info::operator= not B_BUFFER_CONSUMER and clone.in_format_count is != 0\n");
+		} else {
+			fprintf(stderr, "error: dormant_flavor_info::operator= clone.in_"
+				"format_count is invalid\n");
+		}
+	} else if (clone.in_format_count) {
+		fprintf(stderr, "warning: dormant_flavor_info::operator= not "
+			"B_BUFFER_CONSUMER and clone.in_format_count is != 0\n");
+	}
 
 	delete [] out_formats;
-	out_formats = 0;
+	out_formats = NULL;
 	out_format_count = 0;
 	out_format_flags = clone.out_format_flags;
 	if (kinds & B_BUFFER_PRODUCER) {
-		if (clone.out_format_count >= 0 && clone.out_format_count <= MAX_FLAVOR_OUT_FORMAT_COUNT) {
+		if (clone.out_format_count >= 0
+			&& clone.out_format_count <= MAX_FLAVOR_OUT_FORMAT_COUNT) {
 			out_formats = new(std::nothrow) media_format[clone.out_format_count];
 			if (out_formats != NULL && clone.out_formats != NULL) {
 				out_format_count = clone.out_format_count;
-				for (int i = 0; i < out_format_count; i++)
-					const_cast<media_format &>(out_formats[i]) = clone.out_formats[i];
+				for (int i = 0; i < out_format_count; i++) {
+					const_cast<media_format &>(out_formats[i])
+						= clone.out_formats[i];
+				}
 			}
-		} else
-			fprintf(stderr, "error dormant_flavor_info::operator= clone.out_format_count is invalid\n");
-	} else if (clone.out_format_count)
-		fprintf(stderr, "warning: dormant_flavor_info::operator= not B_BUFFER_PRODUCER and clone.out_format_count is != 0\n");
+		} else {
+			fprintf(stderr, "error dormant_flavor_info::operator= clone.out_"
+				"format_count is invalid\n");
+		}
+	} else if (clone.out_format_count) {
+		fprintf(stderr, "warning: dormant_flavor_info::operator= not "
+			"B_BUFFER_PRODUCER and clone.out_format_count is != 0\n");
+	}
 
-	// initialize node_info with default values from dormant_node_info constructor
+	// initialize node_info with default values
 	dormant_node_info defaultValues;
 	node_info = defaultValues;
 
@@ -188,18 +204,18 @@ dormant_flavor_info::operator=(const flavor_info &clone)
 
 
 void
-dormant_flavor_info::set_name(const char *in_name)
+dormant_flavor_info::set_name(const char *newName)
 {
-	delete [] name;
-	name = _newstrdup(in_name);
+	delete[] name;
+	name = _newstrdup(newName);
 }
 
 
 void
-dormant_flavor_info::set_info(const char *in_info)
+dormant_flavor_info::set_info(const char *newInfo)
 {
-	delete [] info;
-	info = _newstrdup(in_info);
+	delete[] info;
+	info = _newstrdup(newInfo);
 }
 
 
@@ -233,21 +249,21 @@ dormant_flavor_info::add_out_format(const media_format &out_format)
 }
 
 
-/* virtual */ bool
+bool
 dormant_flavor_info::IsFixedSize() const
 {
 	return false;
 }
 
 
-/* virtual */ type_code
+type_code
 dormant_flavor_info::TypeCode() const
 {
 	return FLATTEN_TYPECODE;
 }
 
 
-/* virtual */ ssize_t
+ssize_t
 dormant_flavor_info::FlattenedSize() const
 {
 	ssize_t size = 0;
@@ -264,11 +280,13 @@ dormant_flavor_info::FlattenedSize() const
 	size += sizeof(possible_count);
 	size += sizeof(in_format_count);
 	size += sizeof(in_format_flags);
-	if (in_format_count > 0 && in_format_count <= MAX_FLAVOR_IN_FORMAT_COUNT && in_formats != NULL)
+	if (in_format_count > 0 && in_format_count <= MAX_FLAVOR_IN_FORMAT_COUNT
+		&& in_formats != NULL)
 		size += in_format_count * sizeof(media_format);
 	size += sizeof(out_format_count);
 	size += sizeof(out_format_flags);
-	if (out_format_count > 0 && out_format_count <= MAX_FLAVOR_OUT_FORMAT_COUNT && out_formats != NULL)
+	if (out_format_count > 0 && out_format_count <= MAX_FLAVOR_OUT_FORMAT_COUNT
+		&& out_formats != NULL)
 		size += out_format_count * sizeof(media_format);
 	// struct dormant_node_info	node_info
 	size += sizeof(node_info);
@@ -277,9 +295,8 @@ dormant_flavor_info::FlattenedSize() const
 }
 
 
-/* virtual */ status_t
-dormant_flavor_info::Flatten(void *buffer,
-							 ssize_t size) const
+status_t
+dormant_flavor_info::Flatten(void *buffer, ssize_t size) const
 {
 	if (size < FlattenedSize())
 		return B_ERROR;
@@ -292,22 +309,26 @@ dormant_flavor_info::Flatten(void *buffer,
 	int32 outFormatCount = 0;
 	size_t outFormatSize = 0;
 
-	if ((kinds & B_BUFFER_CONSUMER) && in_format_count > 0 && in_formats != NULL) {
+	if ((kinds & B_BUFFER_CONSUMER) != 0 && in_format_count > 0
+		&& in_formats != NULL) {
 		if (in_format_count <= MAX_FLAVOR_IN_FORMAT_COUNT) {
 			inFormatCount = in_format_count;
 			inFormatSize = in_format_count * sizeof(media_format);
 		} else {
-			fprintf(stderr, "error dormant_flavor_info::Flatten: in_format_count is too large\n");
+			fprintf(stderr, "error dormant_flavor_info::Flatten: "
+				"in_format_count is too large\n");
 			return B_ERROR;
 		}
 	}
 
-	if ((kinds & B_BUFFER_PRODUCER) && out_format_count > 0 && out_formats != NULL) {
+	if ((kinds & B_BUFFER_PRODUCER) != 0 && out_format_count > 0
+		&& out_formats != NULL) {
 		if (out_format_count <= MAX_FLAVOR_OUT_FORMAT_COUNT) {
 			outFormatCount = out_format_count;
 			outFormatSize = out_format_count * sizeof(media_format);
 		} else {
-			fprintf(stderr, "error dormant_flavor_info::Flatten: out_format_count is too large\n");
+			fprintf(stderr, "error dormant_flavor_info::Flatten: "
+				"out_format_count is too large\n");
 			return B_ERROR;
 		}
 	}
@@ -352,10 +373,8 @@ dormant_flavor_info::Flatten(void *buffer,
 }
 
 
-/* virtual */ status_t
-dormant_flavor_info::Unflatten(type_code c,
-							   const void *buffer,
-							   ssize_t size)
+status_t
+dormant_flavor_info::Unflatten(type_code c, const void *buffer, ssize_t size)
 {
 	if (c != FLATTEN_TYPECODE)
 		return B_ERROR;
@@ -376,14 +395,14 @@ dormant_flavor_info::Unflatten(type_code c,
 		return B_ERROR;
 	buf += sizeof(int32);
 
-	delete [] name;
+	delete[] name;
 	name = NULL;
-	delete [] info;
+	delete[] info;
 	info = NULL;
-	delete [] in_formats;
+	delete[] in_formats;
 	in_formats = NULL;
 	in_format_count = 0;
-	delete [] out_formats;
+	delete[] out_formats;
 	out_formats = NULL;
 	out_format_count = 0;
 
@@ -422,11 +441,12 @@ dormant_flavor_info::Unflatten(type_code c,
 			in_formats = new(std::nothrow) media_format[count];
 			if (!in_formats)
 				return B_NO_MEMORY;
-			// XXX FIXME! we should not!!! make flat copies	of media_format
-			memcpy(const_cast<media_format *>(in_formats), buf, count * sizeof(media_format));
+			// TODO: we should not!!! make flat copies of media_format
+			memcpy(const_cast<media_format *>(in_formats), buf,
+				count * sizeof(media_format));
 			in_format_count = count;
 		}
-		buf += count * sizeof(media_format); // XXX not save
+		buf += count * sizeof(media_format); // TODO: not save
 	}
 
 	count = *(int32*)buf; buf += sizeof(int32);
@@ -437,11 +457,12 @@ dormant_flavor_info::Unflatten(type_code c,
 			out_formats = new(std::nothrow) media_format[count];
 			if (!out_formats)
 				return B_NO_MEMORY;
-			// XXX FIXME! we should not!!! make flat copies	of media_format
-			memcpy(const_cast<media_format *>(out_formats), buf, count * sizeof(media_format));
+			// TODO: we should not!!! make flat copies of media_format
+			memcpy(const_cast<media_format *>(out_formats), buf,
+				count * sizeof(media_format));
 			out_format_count = count;
 		}
-		buf += count * sizeof(media_format); // XXX not save
+		buf += count * sizeof(media_format); // TODO: not save
 	}
 
 	node_info = *(dormant_node_info*)buf; buf += sizeof(dormant_node_info);
@@ -449,12 +470,12 @@ dormant_flavor_info::Unflatten(type_code c,
 	return B_OK;
 }
 
-/*************************************************************
- * public BMediaAddOn
- *************************************************************/
 
-/* explicit */
-BMediaAddOn::BMediaAddOn(image_id image) :
+// #pragma mark - BMediaAddOn
+
+
+BMediaAddOn::BMediaAddOn(image_id image)
+	:
 	fImage(image),
 	fAddon(0)
 {
@@ -462,24 +483,23 @@ BMediaAddOn::BMediaAddOn(image_id image) :
 }
 
 
-/* virtual */
 BMediaAddOn::~BMediaAddOn()
 {
 	CALLED();
 }
 
 
-/* virtual */ status_t
-BMediaAddOn::InitCheck(const char **out_failure_text)
+status_t
+BMediaAddOn::InitCheck(const char **_failureText)
 {
 	CALLED();
 	// only to be implemented by derived classes
-	*out_failure_text = "no error";
+	*_failureText = "no error";
 	return B_OK;
 }
 
 
-/* virtual */ int32
+int32
 BMediaAddOn::CountFlavors()
 {
 	CALLED();
@@ -488,9 +508,8 @@ BMediaAddOn::CountFlavors()
 }
 
 
-/* virtual */ status_t
-BMediaAddOn::GetFlavorAt(int32 n,
-						 const flavor_info **out_info)
+status_t
+BMediaAddOn::GetFlavorAt(int32 n, const flavor_info **_info)
 {
 	CALLED();
 	// only to be implemented by derived classes
@@ -498,10 +517,9 @@ BMediaAddOn::GetFlavorAt(int32 n,
 }
 
 
-/* virtual */ BMediaNode *
-BMediaAddOn::InstantiateNodeFor(const flavor_info *info,
-								BMessage *config,
-								status_t *out_error)
+BMediaNode*
+BMediaAddOn::InstantiateNodeFor(const flavor_info *info, BMessage *config,
+	status_t *_error)
 {
 	CALLED();
 	// only to be implemented by derived classes
@@ -509,9 +527,8 @@ BMediaAddOn::InstantiateNodeFor(const flavor_info *info,
 }
 
 
-/* virtual */ status_t
-BMediaAddOn::GetConfigurationFor(BMediaNode *your_node,
-								 BMessage *into_message)
+status_t
+BMediaAddOn::GetConfigurationFor(BMediaNode *node, BMessage *toMessage)
 {
 	CALLED();
 	// only to be implemented by derived classes
@@ -519,7 +536,7 @@ BMediaAddOn::GetConfigurationFor(BMediaNode *your_node,
 }
 
 
-/* virtual */ bool
+bool
 BMediaAddOn::WantsAutoStart()
 {
 	CALLED();
@@ -528,11 +545,9 @@ BMediaAddOn::WantsAutoStart()
 }
 
 
-/* virtual */ status_t
-BMediaAddOn::AutoStart(int in_count,
-					   BMediaNode **out_node,
-					   int32 *out_internal_id,
-					   bool *out_has_more)
+status_t
+BMediaAddOn::AutoStart(int count, BMediaNode **_node, int32 *_internalID,
+	bool *_hasMore)
 {
 	CALLED();
 	// only to be implemented by derived classes
@@ -540,11 +555,9 @@ BMediaAddOn::AutoStart(int in_count,
 }
 
 
-/* virtual */ status_t
-BMediaAddOn::SniffRef(const entry_ref &file,
-					  BMimeType *io_mime_type,
-					  float *out_quality,
-					  int32 *out_internal_id)
+status_t
+BMediaAddOn::SniffRef(const entry_ref &file, BMimeType *mimeType,
+	float *_quality, int32 *_internalID)
 {
 	CALLED();
 	// only to be implemented by BFileInterface derived classes
@@ -552,10 +565,9 @@ BMediaAddOn::SniffRef(const entry_ref &file,
 }
 
 
-/* virtual */ status_t
-BMediaAddOn::SniffType(const BMimeType &type,
-					   float *out_quality,
-					   int32 *out_internal_id)
+status_t
+BMediaAddOn::SniffType(const BMimeType &type, float *_quality,
+	int32 *_internalID)
 {
 	CALLED();
 	// only to be implemented by BFileInterface derived classes
@@ -563,15 +575,11 @@ BMediaAddOn::SniffType(const BMimeType &type,
 }
 
 
-/* virtual */ status_t
-BMediaAddOn::GetFileFormatList(int32 flavor_id,
-							   media_file_format *out_writable_formats,
-							   int32 in_write_items,
-							   int32 *out_write_items,
-							   media_file_format *out_readable_formats,
-							   int32 in_read_items,
-							   int32 *out_read_items,
-							   void *_reserved)
+status_t
+BMediaAddOn::GetFileFormatList(int32 flavorID,
+	media_file_format *writableFormats, int32 maxWriteItems, int32 *_writeItems,
+	media_file_format *readableFormats, int32 maxReadItems, int32 *_readItems,
+	void *_reserved)
 {
 	CALLED();
 	// only to be implemented by BFileInterface derived classes
@@ -579,12 +587,9 @@ BMediaAddOn::GetFileFormatList(int32 flavor_id,
 }
 
 
-/* virtual */ status_t
-BMediaAddOn::SniffTypeKind(const BMimeType &type,
-						   uint64 in_kinds,
-						   float *out_quality,
-						   int32 *out_internal_id,
-						   void *_reserved)
+status_t
+BMediaAddOn::SniffTypeKind(const BMimeType &type, uint64 kinds, float *_quality,
+	int32 *_internalID, void *_reserved)
 {
 	CALLED();
 	// only to be implemented by BFileInterface derived classes
@@ -605,9 +610,9 @@ BMediaAddOn::AddonID()
 	return fAddon;
 }
 
-/*************************************************************
- * protected BMediaAddOn
- *************************************************************/
+
+// #pragma mark - protected BMediaAddOn
+
 
 status_t
 BMediaAddOn::NotifyFlavorChange()
@@ -622,9 +627,9 @@ BMediaAddOn::NotifyFlavorChange()
 		sizeof(command));
 }
 
-/*************************************************************
- * private BMediaAddOn
- *************************************************************/
+
+// #pragma mark - private BMediaAddOn
+
 
 /*
 unimplemented:
@@ -633,10 +638,6 @@ BMediaAddOn::BMediaAddOn(const BMediaAddOn &clone)
 BMediaAddOn & BMediaAddOn::operator=(const BMediaAddOn &clone)
 */
 
-
-/*************************************************************
- * private BMediaAddOn
- *************************************************************/
 
 extern "C" {
 	// declared here to remove them from the class header file
