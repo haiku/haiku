@@ -44,7 +44,7 @@
 struct internal_intr {
 	device_t		dev;
 	driver_filter_t	filter;
-	driver_intr_t	handler;
+	driver_intr_t	*handler;
 	void			*arg;
 	int				irq;
 	uint32			flags;

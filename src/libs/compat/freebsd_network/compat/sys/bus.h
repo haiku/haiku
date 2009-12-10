@@ -66,7 +66,7 @@ int bus_generic_resume(device_t dev);
 void bus_generic_shutdown(device_t dev);
 
 typedef int (*driver_filter_t)(void *);
-typedef void (*driver_intr_t)(void *);
+typedef void driver_intr_t(void *);
 
 
 int resource_int_value(const char *name, int unit, const char *resname,
@@ -103,6 +103,7 @@ void device_set_desc(device_t dev, const char *desc);
 void device_set_desc_copy(device_t dev, const char *desc);
 const char *device_get_desc(device_t dev);
 device_t device_get_parent(device_t dev);
+u_int32_t device_get_flags(device_t dev);
 
 void device_set_ivars(device_t dev, void *);
 void *device_get_ivars(device_t dev);
