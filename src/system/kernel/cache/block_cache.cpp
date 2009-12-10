@@ -109,6 +109,9 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	object_cache*	buffer_cache;
 	block_list		unused_blocks;
 
+	ConditionVariable busy_condition;
+	uint32			busy_count;
+
 	uint32			num_dirty_blocks;
 	bool			read_only;
 
@@ -929,6 +932,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	last_transaction(NULL),
 	transaction_hash(NULL),
 	buffer_cache(NULL),
+	busy_count(0),
 	num_dirty_blocks(0),
 	read_only(readOnly)
 {
@@ -952,6 +956,7 @@ block_cache::~block_cache()
 status_t
 block_cache::Init()
 {
+	busy_condition.Init(this, "cache block busy");
 	condition_variable.Init(this, "cache transaction sync");
 	mutex_init(&lock, "block cache");
 
@@ -1058,6 +1063,8 @@ block_cache::NewBlock(off_t blockNumber)
 	block->transaction = block->previous_transaction = NULL;
 	block->original_data = NULL;
 	block->parent_data = NULL;
+	block->busy = false;
+	block->is_writing = false;
 	block->is_dirty = false;
 	block->unused = false;
 	block->discard = false;
@@ -1287,39 +1294,60 @@ put_cached_block(block_cache* cache, off_t blockNumber)
 
 /*!	Retrieves the block \a blockNumber from the hash table, if it's already
 	there, or reads it from the disk.
+	You need to have the cache locked when calling this function.
 
 	\param _allocated tells you wether or not a new block has been allocated
 		to satisfy your request.
 	\param readBlock if \c false, the block will not be read in case it was
 		not already in the cache. The block you retrieve may contain random
-		data.
+		data. If \c true, the cache will be temporarily unlocked while the
+		block is read in.
 */
 static cached_block*
 get_cached_block(block_cache* cache, off_t blockNumber, bool* _allocated,
 	bool readBlock = true)
 {
+	ASSERT_LOCKED_MUTEX(&cache->lock);
+
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
 		panic("get_cached_block: invalid block number %lld (max %lld)",
 			blockNumber, cache->max_blocks - 1);
 		return NULL;
 	}
 
+retry:
 	cached_block* block = (cached_block*)hash_lookup(cache->hash,
 		&blockNumber);
 	*_allocated = false;
 
 	if (block == NULL) {
-		// read block into cache
+		// put block into cache
 		block = cache->NewBlock(blockNumber);
 		if (block == NULL)
 			return NULL;
 
 		hash_insert_grow(cache->hash, block);
 		*_allocated = true;
+	} else if (block->busy) {
+		// The block is currently busy - wait and try again later
+		ConditionVariableEntry entry;
+		cache->busy_condition.Add(&entry);
+		
+		mutex_unlock(&cache->lock);
+		
+		entry.Wait();
+
+		mutex_lock(&cache->lock);
+		goto retry;
 	}
 
 	if (*_allocated && readBlock) {
+		// read block into cache
 		int32 blockSize = cache->block_size;
+
+		cache->busy_count++;
+		block->busy = true;
+		mutex_unlock(&cache->lock);
 
 		ssize_t bytesRead = read_pos(cache->fd, blockNumber * blockSize,
 			block->current_data, blockSize);
@@ -1332,6 +1360,12 @@ get_cached_block(block_cache* cache, off_t blockNumber, bool* _allocated,
 			return NULL;
 		}
 		TB(Read(cache, block));
+
+		mutex_lock(&cache->lock);
+		block->busy = false;
+		cache->busy_count--;
+
+		cache->busy_condition.NotifyAll();
 	}
 
 	if (block->unused) {
@@ -1602,6 +1636,8 @@ dump_cache(int argc, char** argv)
 			kprintf(" ref_count:     %ld\n", block->ref_count);
 			kprintf(" accessed:      %ld\n", block->accessed);
 			kprintf(" flags:        ");
+			if (block->busy)
+				kprintf(" busy");
 			if (block->is_writing)
 				kprintf(" is-writing");
 			if (block->is_dirty)
@@ -1698,8 +1734,8 @@ dump_cache(int argc, char** argv)
 	}
 
 	kprintf(" %ld blocks total, %ld dirty, %ld discarded, %ld referenced, %ld "
-		"in unused.\n", count, dirty, discarded, referenced,
-		cache->unused_blocks.Count());
+		"busy, %ld in unused.\n", count, dirty, discarded, referenced,
+		cache->busy_count, cache->unused_blocks.Count());
 
 	hash_close(cache->hash, &iterator, false);
 	return 0;
@@ -1980,7 +2016,7 @@ block_notifier_and_writer(void* /*data*/)
 				while (count < kMaxCount
 					&& (block = (cached_block*)hash_next(cache->hash,
 							&iterator)) != NULL) {
-					if (block->is_dirty)
+					if (block->is_dirty && !block->is_writing)
 						blocks[count++] = block;
 				}
 
@@ -2739,6 +2775,18 @@ block_cache_delete(void* _cache, bool allowWrites)
 	mutex_unlock(&sCachesLock);
 
 	mutex_lock(&cache->lock);
+
+	while (cache->busy_count != 0) {
+		// wait for all blocks to be read in/written back
+		ConditionVariableEntry entry;
+		cache->busy_condition.Add(&entry);
+
+		mutex_unlock(&cache->lock);
+		
+		entry.Wait();
+
+		mutex_lock(&cache->lock);
+	}
 
 	// free all blocks
 
