@@ -38,7 +38,8 @@
 
 // The run queue. Holds the threads ready to run ordered by priority.
 static struct thread *sRunQueue = NULL;
-static cpu_mask_t sIdleCPUs = 0;
+static int32 sCPUCount = 1;
+static int32 sNextCPUForSelection = 0;
 
 
 static int
@@ -72,6 +73,46 @@ dump_run_queue(int argc, char **argv)
 	}
 
 	return 0;
+}
+
+
+static int32
+select_cpu(int32 currentCPU, struct thread* thread, int32& targetPriority)
+{
+	if (thread->pinned_to_cpu > 0) {
+		// the thread is pinned to a specific CPU
+		int32 targetCPU = thread->previous_cpu->cpu_num;
+		targetPriority = gCPU[targetCPU].running_thread->priority;
+		return targetCPU;
+	}
+
+	// Choose the CPU running the lowest priority thread. Favor the current CPU
+	// as it doesn't require ICI to be notified.
+	int32 targetCPU = currentCPU;
+	targetPriority = B_IDLE_PRIORITY;
+	if (gCPU[currentCPU].disabled)
+		targetCPU = -1;
+	else
+		targetPriority = gCPU[currentCPU].running_thread->priority;
+
+	int32 cpu = sNextCPUForSelection;
+	for (int32 i = 0; i < sCPUCount; i++, cpu++) {
+		if (cpu >= sCPUCount)
+			cpu = 0;
+
+		if (!gCPU[cpu].disabled) {
+			int32 cpuPriority = gCPU[cpu].running_thread->priority;
+			if (targetCPU < 0 || cpuPriority < targetPriority) {
+				targetCPU = cpu;
+				targetPriority = cpuPriority;
+			}
+		}
+	}
+
+	if (++sNextCPUForSelection >= sCPUCount)
+		sNextCPUForSelection = 0;
+
+	return targetCPU;
 }
 
 
@@ -113,60 +154,27 @@ enqueue_in_run_queue(struct thread *thread)
 
 	bool reschedule = false;
 	if (thread->priority != B_IDLE_PRIORITY) {
+		// Select a CPU for the thread to run on. It's not certain that the
+		// thread will actually run on it, but we will notify the CPU to
+		// preempt the thread it is currently running, if the new thread has
+		// a higher priority.
 		int32 currentCPU = smp_get_current_cpu();
-		int32 targetCPU = currentCPU;
-		int32 targetPriority = B_IDLE_PRIORITY;
+		int32 targetPriority;
+		int32 targetCPU = select_cpu(currentCPU, thread, targetPriority);
 
-		if (thread->pinned_to_cpu > 0) {
-			// the thread is pinned to a specific CPU
-			targetCPU = thread->previous_cpu->cpu_num;
-			targetPriority = gCPU[targetCPU].running_thread->priority;
-		} else if (sIdleCPUs != 0) {
-			// The thread is not pinned to any CPU and there are idle CPUs
-			// -- pick the first available one.
-			if (!CHECK_BIT(sIdleCPUs, currentCPU)) {
-				for (int32 i = 0; i < B_MAX_CPU_COUNT; i++) {
-					if (CHECK_BIT(sIdleCPUs, i)) {
-						targetCPU = i;
-						break;
-					}
-				}
-			}
-		} else {
-			// No idle CPUs -- choose the CPU running the lowest priority
-			// thread. Favor the current CPU as it doesn't require ICI to be
-			// notified.
-			targetPriority = gCPU[currentCPU].running_thread->priority;
-			int32 cpuCount = smp_get_num_cpus();
-			for (int32 i = 0; i < cpuCount; i++) {
-				struct thread* runningThread = gCPU[i].running_thread;
-				if (runningThread->priority < targetPriority) {
-					targetPriority = runningThread->priority;
-					targetCPU = i;
-				}
-			}
-		}
-
-		// Notify the (potential) target CPU, if appropriate.
-		cpu_mask_t idleBit = 1 << targetCPU;
-		if ((sIdleCPUs & idleBit) != 0) {
-			// The target CPU is idle. Clear its idle bit to avoid it from
-			// being picked by the next
-			sIdleCPUs ^= idleBit;
+		// If the target CPU runs a thread with a lower priority, tell it to
+		// reschedule.
+		if (thread->priority > targetPriority) {
 			if (targetCPU == currentCPU) {
 				reschedule = true;
 			} else {
-				smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
-					0, NULL, SMP_MSG_FLAG_ASYNC);
-			}
-		} else if (thread->priority > targetPriority) {
-			// The target CPU is not idle, but runs a thread with a lower
-			// priority. Tell it to reschedule.
-			if (targetCPU == currentCPU) {
-				reschedule = true;
-			} else {
-				smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE, 0, 0, 0, NULL,
-					SMP_MSG_FLAG_ASYNC);
+				if (targetPriority == B_IDLE_PRIORITY) {
+					smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
+						0, NULL, SMP_MSG_FLAG_ASYNC);
+				} else {
+					smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE, 0, 0, 0, NULL,
+						SMP_MSG_FLAG_ASYNC);
+				}
 			}
 		}
 	}
@@ -407,13 +415,6 @@ reschedule(void)
 		add_timer(quantumTimer, &reschedule_event, quantum,
 			B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_THREAD_LOCK);
 
-		// update the idle bit for this CPU in the CPU mask
-		int32 cpuNum = smp_get_current_cpu();
-		if (nextThread->priority == B_IDLE_PRIORITY)
-			sIdleCPUs = SET_BIT(sIdleCPUs, cpuNum);
-		else
-			sIdleCPUs = CLEAR_BIT(sIdleCPUs, cpuNum);
-
 		if (nextThread != oldThread)
 			context_switch(oldThread, nextThread);
 	}
@@ -472,6 +473,8 @@ static scheduler_ops kSimpleSMPOps = {
 void
 scheduler_simple_smp_init()
 {
+	sCPUCount = smp_get_num_cpus();
+
 	gScheduler = &kSimpleSMPOps;
 
 	add_debugger_command_etc("run_queue", &dump_run_queue,
