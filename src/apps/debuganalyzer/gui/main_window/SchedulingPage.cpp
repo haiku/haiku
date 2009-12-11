@@ -38,8 +38,9 @@ static const float kViewSeparationMargin = 1.0f;
 
 
 enum {
-	MSG_SCHEDULING_FILTER			= 'schf',
-	MSG_SCHEDULING_RESET_FILTER		= 'schr'
+	MSG_SCHEDULING_FILTER_HIDE_SELECTED		= 'schs',
+	MSG_SCHEDULING_FILTER_HIDE_UNSELECTED	= 'schu',
+	MSG_SCHEDULING_FILTER_SHOW_ALL			= 'scsa'
 };
 
 
@@ -315,11 +316,33 @@ public:
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
-			case MSG_SCHEDULING_FILTER:
+			case MSG_SCHEDULING_FILTER_HIDE_SELECTED:
 			{
-				int32 threadCount = fModel->CountThreads();
+				int32 filteredCount = fFilterModel->CountSelectedItems();
 				int32 selectedCount = fSelectionModel->CountSelectedItems();
-				if (selectedCount == 0 || selectedCount == threadCount)
+				if (selectedCount == 0 || selectedCount == filteredCount)
+					break;
+
+				// Set the filter model to the unselected items.
+				ListSelectionModel tempModel;
+				for (int32 i = 0; i < filteredCount; i++) {
+					if (!fSelectionModel->IsItemSelected(i)) {
+						tempModel.SelectItem(fFilterModel->SelectedItemAt(i),
+							true);
+					}
+				}
+
+				fSelectionModel->Clear();
+				*fFilterModel = tempModel;
+				Invalidate();
+				break;
+			}
+
+			case MSG_SCHEDULING_FILTER_HIDE_UNSELECTED:
+			{
+				int32 filteredCount = fFilterModel->CountSelectedItems();
+				int32 selectedCount = fSelectionModel->CountSelectedItems();
+				if (selectedCount == 0 || selectedCount == filteredCount)
 					break;
 
 				// Set the filter model to the selected items.
@@ -339,7 +362,7 @@ public:
 				break;
 			}
 
-			case MSG_SCHEDULING_RESET_FILTER:
+			case MSG_SCHEDULING_FILTER_SHOW_ALL:
 			{
 				int32 threadCount = fModel->CountThreads();
 				if (fFilterModel->CountSelectedItems() == threadCount)
@@ -407,18 +430,28 @@ public:
 			BPopUpMenu* contextMenu = new BPopUpMenu("scheduling context menu",
 				false, false);
 
-			BMenuItem* item = new BMenuItem("Filter",
-				new BMessage(MSG_SCHEDULING_FILTER));
+			int32 filteredCount = fFilterModel->CountSelectedItems();
+			int32 selectedCount = fSelectionModel->CountSelectedItems();
+
+			BMenuItem* item = new BMenuItem("Hide Selected Threads",
+				new BMessage(MSG_SCHEDULING_FILTER_HIDE_SELECTED));
 			contextMenu->AddItem(item);
 			item->SetTarget(this);
-			if (fSelectionModel->CountSelectedItems() == 0)
+			if (selectedCount == 0 || selectedCount == filteredCount)
 				item->SetEnabled(false);
 
-			item = new BMenuItem("Reset Filter",
-				new BMessage(MSG_SCHEDULING_RESET_FILTER));
+			item = new BMenuItem("Hide Unselected Threads",
+				new BMessage(MSG_SCHEDULING_FILTER_HIDE_UNSELECTED));
 			contextMenu->AddItem(item);
 			item->SetTarget(this);
-			if (fFilterModel->CountSelectedItems() == fModel->CountThreads())
+			if (selectedCount == 0 || selectedCount == filteredCount)
+				item->SetEnabled(false);
+
+			item = new BMenuItem("Show All Threads",
+				new BMessage(MSG_SCHEDULING_FILTER_SHOW_ALL));
+			contextMenu->AddItem(item);
+			item->SetTarget(this);
+			if (filteredCount == fModel->CountThreads())
 				item->SetEnabled(false);
 
 			BPoint screenWhere = ConvertToScreen(where);
