@@ -16,6 +16,7 @@
 #include <OS.h>
 
 #include <cpu.h>
+#include <debug.h>
 #include <int.h>
 #include <kernel.h>
 #include <kscheduler.h>
@@ -31,7 +32,7 @@
 
 //#define TRACE_SCHEDULER
 #ifdef TRACE_SCHEDULER
-#	define TRACE(x) dprintf x
+#	define TRACE(x) dprintf_no_syslog x
 #else
 #	define TRACE(x) ;
 #endif
