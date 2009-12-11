@@ -2141,6 +2141,8 @@ thread_init(kernel_args *args)
 			return B_NO_MEMORY;
 		}
 
+		gCPU[i].running_thread = thread;
+
 		thread->team = team_get_kernel_team();
 		thread->priority = thread->next_priority = B_IDLE_PRIORITY;
 		thread->state = B_THREAD_RUNNING;

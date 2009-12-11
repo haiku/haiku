@@ -23,28 +23,32 @@
 #endif
 
 
+struct thread;
+
+
 /* CPU local data structure */
 
 typedef struct cpu_ent {
-	int			cpu_num;
+	int				cpu_num;
 
 	// thread.c: used to force a reschedule at quantum expiration time
-	int			preempted;
-	timer		quantum_timer;
+	int				preempted;
+	timer			quantum_timer;
 
 	// keeping track of CPU activity
-	bigtime_t	active_time;
-	bigtime_t	last_kernel_time;
-	bigtime_t	last_user_time;
+	bigtime_t		active_time;
+	bigtime_t		last_kernel_time;
+	bigtime_t		last_user_time;
 
 	// used in the kernel debugger
-	addr_t		fault_handler;
-	addr_t		fault_handler_stack_pointer;
-	jmp_buf		fault_jump_buffer;
+	addr_t			fault_handler;
+	addr_t			fault_handler_stack_pointer;
+	jmp_buf			fault_jump_buffer;
 
-	bool		invoke_scheduler;
-	bool		invoke_scheduler_if_idle;
-	bool		disabled;
+	struct thread*	running_thread;
+	bool			invoke_scheduler;
+	bool			invoke_scheduler_if_idle;
+	bool			disabled;
 
 	// arch-specific stuff
 	arch_cpu_info arch;

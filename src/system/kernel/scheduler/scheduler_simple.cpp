@@ -162,8 +162,10 @@ context_switch(struct thread *fromThread, struct thread *toThread)
 	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
 		user_debug_thread_unscheduled(fromThread);
 
-	toThread->previous_cpu = toThread->cpu = fromThread->cpu;
+	cpu_ent* cpu = fromThread->cpu;
+	toThread->previous_cpu = toThread->cpu = cpu;
 	fromThread->cpu = NULL;
+	cpu->running_thread = toThread;
 
 	arch_thread_set_current_thread(toThread);
 	arch_thread_context_switch(fromThread, toThread);

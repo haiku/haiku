@@ -111,39 +111,62 @@ enqueue_in_run_queue(struct thread *thread)
 
 	thread->next_priority = thread->priority;
 
+	bool reschedule = false;
 	if (thread->priority != B_IDLE_PRIORITY) {
 		int32 currentCPU = smp_get_current_cpu();
-		if (sIdleCPUs != 0) {
-			if (thread->pinned_to_cpu > 0) {
-				// thread is pinned to a CPU -- notify it, if it is idle
-				int32 targetCPU = thread->previous_cpu->cpu_num;
-				if ((sIdleCPUs & (1 << targetCPU)) != 0) {
-					sIdleCPUs &= ~(1 << targetCPU);
-					smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
-						0, NULL, SMP_MSG_FLAG_ASYNC);
-				}
-			} else {
-				// Thread is not pinned to any CPU -- take it ourselves, if we
-				// are idle, otherwise notify the next idle CPU. In either case
-				// we clear the idle bit of the chosen CPU, so that the
-				// enqueue_in_run_queue() won't try to bother the
-				// same CPU again, if invoked before it handled the interrupt.
-				cpu_mask_t idleCPUs = CLEAR_BIT(sIdleCPUs, currentCPU);
-				if ((sIdleCPUs & (1 << currentCPU)) != 0) {
-					sIdleCPUs = idleCPUs;
-				} else {
-					int32 targetCPU = 0;
-					for (; targetCPU < B_MAX_CPU_COUNT; targetCPU++) {
-						cpu_mask_t mask = 1 << targetCPU;
-						if ((idleCPUs & mask) != 0) {
-							sIdleCPUs &= ~mask;
-							break;
-						}
-					}
+		int32 targetCPU = currentCPU;
+		int32 targetPriority = B_IDLE_PRIORITY;
 
-					smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
-						0, NULL, SMP_MSG_FLAG_ASYNC);
+		if (thread->pinned_to_cpu > 0) {
+			// the thread is pinned to a specific CPU
+			targetCPU = thread->previous_cpu->cpu_num;
+			targetPriority = gCPU[targetCPU].running_thread->priority;
+		} else if (sIdleCPUs != 0) {
+			// The thread is not pinned to any CPU and there are idle CPUs
+			// -- pick the first available one.
+			if (!CHECK_BIT(sIdleCPUs, currentCPU)) {
+				for (int32 i = 0; i < B_MAX_CPU_COUNT; i++) {
+					if (CHECK_BIT(sIdleCPUs, i)) {
+						targetCPU = i;
+						break;
+					}
 				}
+			}
+		} else {
+			// No idle CPUs -- choose the CPU running the lowest priority
+			// thread. Favor the current CPU as it doesn't require ICI to be
+			// notified.
+			targetPriority = gCPU[currentCPU].running_thread->priority;
+			int32 cpuCount = smp_get_num_cpus();
+			for (int32 i = 0; i < cpuCount; i++) {
+				struct thread* runningThread = gCPU[i].running_thread;
+				if (runningThread->priority < targetPriority) {
+					targetPriority = runningThread->priority;
+					targetCPU = i;
+				}
+			}
+		}
+
+		// Notify the (potential) target CPU, if appropriate.
+		cpu_mask_t idleBit = 1 << targetCPU;
+		if ((sIdleCPUs & idleBit) != 0) {
+			// The target CPU is idle. Clear its idle bit to avoid it from
+			// being picked by the next
+			sIdleCPUs ^= idleBit;
+			if (targetCPU == currentCPU) {
+				reschedule = true;
+			} else {
+				smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
+					0, NULL, SMP_MSG_FLAG_ASYNC);
+			}
+		} else if (thread->priority > targetPriority) {
+			// The target CPU is not idle, but runs a thread with a lower
+			// priority. Tell it to reschedule.
+			if (targetCPU == currentCPU) {
+				reschedule = true;
+			} else {
+				smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE, 0, 0, 0, NULL,
+					SMP_MSG_FLAG_ASYNC);
 			}
 		}
 	}
@@ -151,7 +174,8 @@ enqueue_in_run_queue(struct thread *thread)
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
-	return false;
+
+	return reschedule;
 }
 
 
@@ -208,8 +232,10 @@ context_switch(struct thread *fromThread, struct thread *toThread)
 	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
 		user_debug_thread_unscheduled(fromThread);
 
-	toThread->previous_cpu = toThread->cpu = fromThread->cpu;
+	cpu_ent* cpu = fromThread->cpu;
+	toThread->previous_cpu = toThread->cpu = cpu;
 	fromThread->cpu = NULL;
+	cpu->running_thread = toThread;
 
 	arch_thread_set_current_thread(toThread);
 	arch_thread_context_switch(fromThread, toThread);
