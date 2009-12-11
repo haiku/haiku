@@ -1645,7 +1645,7 @@ MultiAudioNode::_CreateFrequencyParameterGroup(BParameterGroup* parentGroup,
 		const sample_rate_info& info = kSampleRateInfos[i];
 		if ((rateMask & info.multiAudioRate) != 0) {
 			frequencyParam->AddItem(info.multiAudioRate,
-				BString(info.name) << " kHz");
+				BString(info.name) << " Hz");
 		}
 	}
 }
