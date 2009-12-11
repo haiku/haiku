@@ -46,6 +46,75 @@ MultiAudioDevice::InitCheck() const
 
 
 status_t
+MultiAudioDevice::BufferExchange(multi_buffer_info *info)
+{
+	return buffer_exchange(fDevice, info);
+}
+
+
+status_t
+MultiAudioDevice::SetMix(multi_mix_value_info *info)
+{
+	return set_mix(fDevice, info);
+}
+
+
+status_t
+MultiAudioDevice::GetMix(multi_mix_value_info *info)
+{
+	return get_mix(fDevice, info);
+}
+
+
+status_t
+MultiAudioDevice::SetInputFrameRate(uint32 multiAudioRate)
+{
+	if ((fDescription.input_rates & multiAudioRate) == 0)
+		return B_BAD_VALUE;
+
+	if (fFormatInfo.input.rate == multiAudioRate)
+		return B_OK;
+
+	uint32 oldRate = fFormatInfo.input.rate;
+	fFormatInfo.input.rate = multiAudioRate;
+
+	status_t status = set_global_format(fDevice, &fFormatInfo);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed on B_MULTI_SET_GLOBAL_FORMAT: %s\n",
+			strerror(status));
+		fFormatInfo.input.rate = oldRate;
+		return status;
+	}
+
+	return _GetBuffers();
+}
+
+
+status_t
+MultiAudioDevice::SetOutputFrameRate(uint32 multiAudioRate)
+{
+	if ((fDescription.output_rates & multiAudioRate) == 0)
+		return B_BAD_VALUE;
+
+	if (fFormatInfo.output.rate == multiAudioRate)
+		return B_OK;
+
+	uint32 oldRate = fFormatInfo.output.rate;
+	fFormatInfo.output.rate = multiAudioRate;
+
+	status_t status = set_global_format(fDevice, &fFormatInfo);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed on B_MULTI_SET_GLOBAL_FORMAT: %s\n",
+			strerror(status));
+		fFormatInfo.output.rate = oldRate;
+		return status;
+	}
+
+	return _GetBuffers();
+}
+
+
+status_t
 MultiAudioDevice::_InitDriver()
 {
 	int num_outputs, num_inputs, num_channels;
@@ -154,7 +223,29 @@ MultiAudioDevice::_InitDriver()
 	}
 
 	// Get the buffers
+	status = _GetBuffers();
+	if (status != B_OK)
+		return status;
 
+
+	fMixControlInfo.info_size = sizeof(fMixControlInfo);
+	fMixControlInfo.control_count = MAX_CONTROLS;
+	fMixControlInfo.controls = fMixControl;
+
+	status = list_mix_controls(fDevice, &fMixControlInfo);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed on DRIVER_LIST_MIX_CONTROLS: %s\n",
+			strerror(status));
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+MultiAudioDevice::_GetBuffers()
+{
 	for (uint32 i = 0; i < MAX_BUFFERS; i++) {
 		fPlayBuffers[i] = &fPlayBufferList[i * MAX_CHANNELS];
 		fRecordBuffers[i] = &fRecordBufferList[i * MAX_CHANNELS];
@@ -163,15 +254,15 @@ MultiAudioDevice::_InitDriver()
 	fBufferList.request_playback_buffer_size = 0;
 		// use the default...
 	fBufferList.request_playback_buffers = MAX_BUFFERS;
-	fBufferList.request_playback_channels = num_outputs;
+	fBufferList.request_playback_channels = fDescription.output_channel_count;
 	fBufferList.playback_buffers = (buffer_desc **) fPlayBuffers;
 	fBufferList.request_record_buffer_size = 0;
 		// use the default...
 	fBufferList.request_record_buffers = MAX_BUFFERS;
-	fBufferList.request_record_channels = num_inputs;
+	fBufferList.request_record_channels = fDescription.input_channel_count;
 	fBufferList.record_buffers = /*(buffer_desc **)*/ fRecordBuffers;
 
-	status = get_buffers(fDevice, &fBufferList);
+	status_t status = get_buffers(fDevice, &fBufferList);
 	if (status != B_OK) {
 		fprintf(stderr, "Failed on B_MULTI_GET_BUFFERS: %s\n",
 			strerror(status));
@@ -196,37 +287,5 @@ MultiAudioDevice::_InitDriver()
 		}
 	}
 
-	fMixControlInfo.info_size = sizeof(fMixControlInfo);
-	fMixControlInfo.control_count = MAX_CONTROLS;
-	fMixControlInfo.controls = fMixControl;
-
-	status = list_mix_controls(fDevice, &fMixControlInfo);
-	if (status != B_OK) {
-		fprintf(stderr, "Failed on DRIVER_LIST_MIX_CONTROLS: %s\n",
-			strerror(status));
-		return status;
-	}
-
 	return B_OK;
-}
-
-
-status_t
-MultiAudioDevice::BufferExchange(multi_buffer_info *info)
-{
-	return buffer_exchange(fDevice, info);
-}
-
-
-status_t
-MultiAudioDevice::SetMix(multi_mix_value_info *info)
-{
-	return set_mix(fDevice, info);
-}
-
-
-status_t
-MultiAudioDevice::GetMix(multi_mix_value_info *info)
-{
-	return get_mix(fDevice, info);
 }

@@ -31,9 +31,14 @@ public:
 	status_t			SetMix(multi_mix_value_info* mixValueInfo);
 	status_t			GetMix(multi_mix_value_info* mixValueInfo);
 
+	status_t			SetInputFrameRate(uint32 multiAudioRate);
+	status_t			SetOutputFrameRate(uint32 multiAudioRate);
+
 private:
 	status_t			_InitDriver();
+	status_t			_GetBuffers();
 
+private:
 	status_t 			fInitStatus;
 	int					fDevice;
 	char				fPath[B_PATH_NAME_LENGTH];

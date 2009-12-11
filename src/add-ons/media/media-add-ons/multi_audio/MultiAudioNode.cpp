@@ -5,20 +5,30 @@
 
 //! Multi-audio replacement media addon for BeOS
 
+
 #include "MultiAudioNode.h"
 
 #include <stdio.h>
 #include <string.h>
 
+#include <Autolock.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
 #include <ParameterWeb.h>
+#include <String.h>
+
+#include <Referenceable.h>
 
 #include "MultiAudioUtility.h"
 #ifdef DEBUG
 #	define PRINTING
 #endif
 #include "debug.h"
+
+
+#define PARAMETER_ID_INPUT_FREQUENCY	1
+#define PARAMETER_ID_OUTPUT_FREQUENCY	2
+
 
 class node_input {
 public:
@@ -52,6 +62,37 @@ public:
 };
 
 
+struct OutputFrameRateChangeCookie : public BReferenceable {
+	float	oldFrameRate;
+};
+
+
+struct sample_rate_info {
+	uint32		multiAudioRate;
+	const char*	name;
+};
+
+static const sample_rate_info kSampleRateInfos[] = {
+	{B_SR_8000,		"8000"},
+	{B_SR_11025,	"11025"},
+	{B_SR_12000,	"12000"},
+	{B_SR_16000,	"16000"},
+	{B_SR_22050,	"22050"},
+	{B_SR_24000,	"24000"},
+	{B_SR_32000,	"32000"},
+	{B_SR_44100,	"44100"},
+	{B_SR_48000,	"48000"},
+	{B_SR_64000,	"64000"},
+	{B_SR_88200,	"88200"},
+	{B_SR_96000,	"96000"},
+	{B_SR_176400,	"176400"},
+	{B_SR_192000,	"192000"},
+	{B_SR_384000,	"384000"},
+	{B_SR_1536000,	"1536000"},
+	{}
+};
+
+
 const char* kMultiControlString[] = {
 	"NAME IS ATTACHED",
 	"Output", "Input", "Setup", "Tone Control", "Extended Setup", "Enhanced Setup", "Master",
@@ -59,6 +100,9 @@ const char* kMultiControlString[] = {
 	"Mute", "Enable", "Stereo Mix", "Mono Mix", "Output Stereo Mix", "Output Mono Mix", "Output Bass",
 	"Output Treble", "Output 3D Center", "Output 3D Depth", "Headphones", "SPDIF"
 };
+
+
+//	#pragma mark -
 
 
 node_input::node_input(media_input& input, media_format format)
@@ -105,6 +149,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 		MultiAudioDevice* device, int32 internalID, BMessage* config)
 	: BMediaNode(name), BBufferConsumer(B_MEDIA_RAW_AUDIO),
 	BBufferProducer(B_MEDIA_RAW_AUDIO),
+	fBufferLock("multi audio buffers"),
 	fThread(-1),
 	fDevice(device),
 	fTimeSourceStarted(false),
@@ -178,6 +223,52 @@ MultiAudioNode::InitCheck() const
 {
 	CALLED();
 	return fInitStatus;
+}
+
+
+void
+MultiAudioNode::GetFlavor(flavor_info* info, int32 id)
+{
+	CALLED();
+	if (info == NULL)
+		return;
+
+	info->flavor_flags = 0;
+	info->possible_count = 1;	// one flavor at a time
+	info->in_format_count = 0; // no inputs
+	info->in_formats = 0;
+	info->out_format_count = 0; // no outputs
+	info->out_formats = 0;
+	info->internal_id = id;
+
+	info->name = (char*)"MultiAudioNode Node";
+	info->info = (char*)"The MultiAudioNode node outputs to multi_audio "
+		"drivers.";
+	info->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_TIME_SOURCE
+		| B_PHYSICAL_OUTPUT | B_PHYSICAL_INPUT | B_CONTROLLABLE;
+	info->in_format_count = 1; // 1 input
+	media_format* inFormats = new media_format[info->in_format_count];
+	GetFormat(&inFormats[0]);
+	info->in_formats = inFormats;
+
+	info->out_format_count = 1; // 1 output
+	media_format* outFormats = new media_format[info->out_format_count];
+	GetFormat(&outFormats[0]);
+	info->out_formats = outFormats;
+}
+
+
+void
+MultiAudioNode::GetFormat(media_format* format)
+{
+	CALLED();
+	if (format == NULL)
+		return;
+
+	format->type = B_MEDIA_RAW_AUDIO;
+	format->require_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
+	format->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
+	format->u.raw_audio = media_raw_audio_format::wildcard;
 }
 
 
@@ -344,6 +435,25 @@ status_t
 MultiAudioNode::RequestCompleted(const media_request_info& info)
 {
 	CALLED();
+
+	if (info.what != media_request_info::B_REQUEST_FORMAT_CHANGE)
+		return B_OK;
+
+	OutputFrameRateChangeCookie* cookie
+		= (OutputFrameRateChangeCookie*)info.user_data;
+	if (cookie == NULL)
+		return B_OK;
+
+	BReference<OutputFrameRateChangeCookie> cookieReference(cookie, true);
+
+	// if the request failed, we reset the frame rate
+	if (info.status != B_OK) {
+		_SetNodeInputFrameRate(cookie->oldFrameRate);
+
+		// TODO: If we have multiple connections, we should request to change
+		// the format back!
+	}
+
 	return B_OK;
 }
 
@@ -529,15 +639,7 @@ MultiAudioNode::Connected(const media_source& producer,
 		return B_MEDIA_BAD_DESTINATION;
 	}
 
-	// use one buffer length latency
-	fInternalLatency = with_format.u.raw_audio.buffer_size * 10000 / 2
-		/ ( (with_format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
-			* with_format.u.raw_audio.channel_count)
-		/ ((int32)(with_format.u.raw_audio.frame_rate / 100));
-
-	PRINT(("  internal latency = %lld\n",fInternalLatency));
-
-	SetEventLatency(fInternalLatency);
+	_UpdateInternalLatency(with_format);
 
 	// record the agreed upon values
 	channel->fInput.source = producer;
@@ -563,6 +665,8 @@ MultiAudioNode::Disconnected(const media_source& producer,
 
 	channel->fInput.source = media_source::null;
 	channel->fInput.format = channel->fPreferredFormat;
+
+	BAutolock locker(fBufferLock);
 	_FillWithZeros(*channel);
 	//GetFormat(&channel->fInput.format);
 }
@@ -1201,6 +1305,20 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 		return B_ERROR;
 	}
 
+	if (id == PARAMETER_ID_INPUT_FREQUENCY
+		|| id == PARAMETER_ID_OUTPUT_FREQUENCY) {
+		const multi_format_info& info = fDevice->FormatInfo();
+		uint32 rate = id == PARAMETER_ID_INPUT_FREQUENCY
+			? info.input.rate : info.output.rate;
+
+		if (*size < sizeof(rate))
+			return B_ERROR;
+
+		memcpy(value, &rate, sizeof(rate));
+		*size = sizeof(rate);
+		return B_OK;
+	}
+
 	multi_mix_value_info info;
 	multi_mix_value values[2];
 	info.values = values;
@@ -1279,6 +1397,58 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 	if (parameter == NULL)
 		return;
 
+	if (id == PARAMETER_ID_INPUT_FREQUENCY) {
+		// TODO: Support!
+		return;
+	}
+
+	if (id == PARAMETER_ID_OUTPUT_FREQUENCY) {
+		uint32 rate;
+		if (size < sizeof(rate))
+			return;
+		memcpy(&rate, value, sizeof(rate));
+
+		// create a cookie RequestCompleted() can get the old frame rate from,
+		// if anything goes wrong
+		OutputFrameRateChangeCookie* cookie
+			= new(std::nothrow) OutputFrameRateChangeCookie;
+		if (cookie == NULL)
+			return;
+
+		cookie->oldFrameRate = fOutputPreferredFormat.u.raw_audio.frame_rate;
+		BReference<OutputFrameRateChangeCookie> cookieReference(cookie, true);
+
+		// NOTE: What we should do is call RequestFormatChange() for all
+		// connections and change the device's format in RequestCompleted().
+		// Unfortunately we need the new buffer size first, which we only get
+		// from the device after changing the format. So we do that now and
+		// reset it in RequestCompleted(), if something went wrong. This causes
+		// the buffers we receive until then to be played incorrectly leading
+		// to unpleasant noise.
+		float frameRate = MultiAudio::convert_to_sample_rate(rate);
+		if (_SetNodeInputFrameRate(frameRate) != B_OK)
+			return;
+
+		for (int32 i = 0; i < fInputs.CountItems(); i++) {
+			node_input* channel = (node_input*)fInputs.ItemAt(i);
+			if (channel->fInput.source == media_source::null)
+				continue;
+
+			media_format newFormat = channel->fInput.format;
+			newFormat.u.raw_audio.frame_rate = frameRate;
+			newFormat.u.raw_audio.buffer_size
+				= fOutputPreferredFormat.u.raw_audio.buffer_size;
+
+			int32 changeTag = 0;
+			status_t error = RequestFormatChange(channel->fInput.source,
+				channel->fInput.destination, newFormat, NULL, &changeTag);
+			if (error == B_OK)
+				cookie->AcquireReference();
+		}
+
+		return;
+	}
+
 	multi_mix_value_info info;
 	multi_mix_value values[2];
 	info.values = values;
@@ -1332,6 +1502,15 @@ MultiAudioNode::MakeParameterWeb()
 
 	PRINT(("MixControlInfo().control_count : %li\n",
 		fDevice->MixControlInfo().control_count));
+
+	BParameterGroup* generalGroup = web->MakeGroup("General");
+
+	const multi_description& description = fDevice->Description();
+//	_CreateFrequencyParameterGroup(generalGroup, "Input",
+//		PARAMETER_ID_INPUT_FREQUENCY, description.input_rates);
+		// TODO: Enable when implemented correctly in SetParameterValue()!
+	_CreateFrequencyParameterGroup(generalGroup, "Output",
+		PARAMETER_ID_OUTPUT_FREQUENCY, description.output_rates);
 
 	multi_mix_control* controls = fDevice->MixControlInfo().controls;
 
@@ -1453,6 +1632,25 @@ MultiAudioNode::_ProcessMux(BDiscreteParameter* parameter, int32 index)
 }
 
 
+void
+MultiAudioNode::_CreateFrequencyParameterGroup(BParameterGroup* parentGroup,
+	const char* name, int32 parameterID, uint32 rateMask)
+{
+	BParameterGroup* group = parentGroup->MakeGroup(name);
+	BDiscreteParameter* frequencyParam = group->MakeDiscreteParameter(
+		parameterID, B_MEDIA_NO_TYPE, BString(name) << " Frequency:",
+		B_GENERIC);
+
+	for (int32 i = 0; kSampleRateInfos[i].name != NULL; i++) {
+		const sample_rate_info& info = kSampleRateInfos[i];
+		if ((rateMask & info.multiAudioRate) != 0) {
+			frequencyParam->AddItem(info.multiAudioRate,
+				BString(info.name) << " kHz");
+		}
+	}
+}
+
+
 //	#pragma mark - MultiAudioNode specific functions
 
 
@@ -1467,11 +1665,17 @@ MultiAudioNode::_RunThread()
 	bufferInfo.playback_buffer_cycle = 0;
 	bufferInfo.record_buffer_cycle = 0;
 
+	// reset the info for the performance time computation
+	fResetPerformanceTimeBase = true;
+
 	while (true) {
 		// TODO: why this semaphore??
 		if (acquire_sem_etc(fBufferFreeSem, 1, B_RELATIVE_TIMEOUT, 0)
 				== B_BAD_SEM_ID)
 			return B_OK;
+
+		BAutolock locker(fBufferLock);
+			// make sure the buffers don't change while we're playing with them
 
 		// send buffer
 		fDevice->BufferExchange(&bufferInfo);
@@ -1924,11 +2128,23 @@ MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info,
 	if (!fTimeSourceStarted || oldInfo.played_real_time == 0)
 		return;
 
-	bigtime_t performanceTime = (bigtime_t)(info.played_frames_count /
-		input.fInput.format.u.raw_audio.frame_rate * 1000000LL);
+	if (fResetPerformanceTimeBase) {
+		fPerformanceTimeBase = info.played_real_time;
+		fPerformanceTimeBaseFrames = info.played_frames_count;
+		fResetPerformanceTimeBase = false;
+		return;
+	}
+
+	double usecsPerFrame = 1000000 / input.fInput.format.u.raw_audio.frame_rate;
+	uint64 frameCount = info.played_frames_count
+		- fPerformanceTimeBaseFrames;
+	uint64 oldFrameCount = oldInfo.played_frames_count
+		- fPerformanceTimeBaseFrames;
+
+	bigtime_t performanceTime = (bigtime_t)(frameCount * usecsPerFrame)
+		+ fPerformanceTimeBase;
 	bigtime_t realTime = info.played_real_time;
-	float drift = ((info.played_frames_count - oldInfo.played_frames_count)
-		/ input.fInput.format.u.raw_audio.frame_rate * 1000000LL)
+	float drift = ((frameCount - oldFrameCount) * usecsPerFrame)
 		/ (info.played_real_time - oldInfo.played_real_time);
 
 	PublishTime(performanceTime, realTime, drift);
@@ -2092,47 +2308,69 @@ MultiAudioNode::_run_thread_(void* data)
 }
 
 
-void
-MultiAudioNode::GetFlavor(flavor_info* info, int32 id)
+status_t
+MultiAudioNode::_SetNodeInputFrameRate(float frameRate)
 {
-	CALLED();
-	if (info == NULL)
-		return;
+	// check whether the frame rate is supported
+	uint32 multiAudioRate = MultiAudio::convert_from_sample_rate(frameRate);
+	if ((fDevice->Description().output_rates & multiAudioRate) == 0)
+		return B_BAD_VALUE;
 
-	info->flavor_flags = 0;
-	info->possible_count = 1;	// one flavor at a time
-	info->in_format_count = 0; // no inputs
-	info->in_formats = 0;
-	info->out_format_count = 0; // no outputs
-	info->out_formats = 0;
-	info->internal_id = id;
+	BAutolock locker(fBufferLock);
 
-	info->name = "MultiAudioNode Node";
-	info->info = "The MultiAudioNode node outputs to multi_audio drivers.";
-	info->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_TIME_SOURCE
-		| B_PHYSICAL_OUTPUT | B_PHYSICAL_INPUT | B_CONTROLLABLE;
-	info->in_format_count = 1; // 1 input
-	media_format* inFormats = new media_format[info->in_format_count];
-	GetFormat(&inFormats[0]);
-	info->in_formats = inFormats;
+	// already set?
+	if (fDevice->FormatInfo().output.rate == multiAudioRate)
+		return B_OK;
 
-	info->out_format_count = 1; // 1 output
-	media_format* outFormats = new media_format[info->out_format_count];
-	GetFormat(&outFormats[0]);
-	info->out_formats = outFormats;
+	// set the frame rate on the device
+	status_t error = fDevice->SetOutputFrameRate(multiAudioRate);
+	if (error != B_OK)
+		return error;
+
+	// it went fine -- update all formats
+	fOutputPreferredFormat.u.raw_audio.frame_rate = frameRate;
+	fOutputPreferredFormat.u.raw_audio.buffer_size
+		= fDevice->BufferList().return_playback_buffer_size
+			* (fOutputPreferredFormat.u.raw_audio.format
+				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
+			* fOutputPreferredFormat.u.raw_audio.channel_count;
+
+	for (int32 i = 0; node_input* channel = (node_input*)fInputs.ItemAt(i);
+			i++) {
+		channel->fPreferredFormat.u.raw_audio.frame_rate = frameRate;
+		channel->fPreferredFormat.u.raw_audio.buffer_size
+			= fOutputPreferredFormat.u.raw_audio.buffer_size;
+
+		channel->fFormat.u.raw_audio.frame_rate = frameRate;
+		channel->fFormat.u.raw_audio.buffer_size
+			= fOutputPreferredFormat.u.raw_audio.buffer_size;
+
+		channel->fInput.format.u.raw_audio.frame_rate = frameRate;
+		channel->fInput.format.u.raw_audio.buffer_size
+			= fOutputPreferredFormat.u.raw_audio.buffer_size;
+	}
+
+	// make sure the time base is reset
+	fResetPerformanceTimeBase = true;
+
+	// update internal latency
+	_UpdateInternalLatency(fOutputPreferredFormat);
+
+	return B_OK;
 }
 
 
 void
-MultiAudioNode::GetFormat(media_format* format)
+MultiAudioNode::_UpdateInternalLatency(const media_format& format)
 {
-	CALLED();
-	if (format == NULL)
-		return;
+	// use one buffer length latency
+	fInternalLatency = format.u.raw_audio.buffer_size * 10000 / 2
+		/ ((format.u.raw_audio.format
+				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
+			* format.u.raw_audio.channel_count)
+		/ ((int32)(format.u.raw_audio.frame_rate / 100));
 
-	format->type = B_MEDIA_RAW_AUDIO;
-	format->require_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
-	format->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
-	format->u.raw_audio = media_raw_audio_format::wildcard;
+	PRINT(("  internal latency = %lld\n",fInternalLatency));
+
+	SetEventLatency(fInternalLatency);
 }
-

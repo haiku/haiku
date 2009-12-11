@@ -9,6 +9,7 @@
 #include <BufferConsumer.h>
 #include <BufferProducer.h>
 #include <Controllable.h>
+#include <Locker.h>
 #include <MediaAddOn.h>
 #include <MediaDefs.h>
 #include <MediaEventLooper.h>
@@ -188,6 +189,12 @@ private:
 								int32& numParameters);
 			void 			_ProcessMux(BDiscreteParameter* parameter,
 								int32 index);
+			void			_CreateFrequencyParameterGroup(
+								BParameterGroup* parentGroup, const char* name,
+								int32 parameterID, uint32 rateMask);
+
+			status_t		_SetNodeInputFrameRate(float frameRate);
+			void			_UpdateInternalLatency(const media_format& format);
 
 private:
 	status_t			fInitStatus;
@@ -195,7 +202,12 @@ private:
 	BMediaAddOn*		fAddOn;
 	int32				fId;
 
+	BLocker				fBufferLock;
+
 	BList				fInputs;
+	bool				fResetPerformanceTimeBase;
+	bigtime_t			fPerformanceTimeBase;
+	uint64				fPerformanceTimeBaseFrames;
 
 	bigtime_t 			fLatency;
 	BList				fOutputs;
