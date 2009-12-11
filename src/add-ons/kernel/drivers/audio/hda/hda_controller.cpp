@@ -82,19 +82,21 @@ next_corb(hda_controller *controller)
 }
 
 
-//! Called with interrupts off
-static void
+/*! Called with interrupts off.
+	Returns \c true, if the scheduler shall be invoked.
+*/
+static bool
 stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 {
 	uint8 status;
 	uint32 position, bufferSize;
 
 	if (!stream->running)
-		return;
+		return false;
 
 	status = stream->Read8(HDAC_STREAM_STATUS);
 	if (status == 0)
-		return;
+		return false;
 
 	stream->Write8(HDAC_STREAM_STATUS, status);
 
@@ -105,11 +107,11 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 
 	if ((status & STATUS_BUFFER_COMPLETED) == 0) {
 		dprintf("hda: stream buffer not completed (id:%ld)\n", stream->id);
-		return;
+		return false;
 	}
 
 	position = stream->Read32(HDAC_STREAM_POSITION);
-	bufferSize = ALIGN(stream->sample_size * stream->num_channels 
+	bufferSize = ALIGN(stream->sample_size * stream->num_channels
 		* stream->buffer_length, 128);
 
 	// Buffer Completed Interrupt
@@ -122,13 +124,15 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 	release_spinlock(&stream->lock);
 
 	release_sem_etc(controller->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
-	
-	if (stream->warn_count < 20 
+
+	if (stream->warn_count < 20
 		&& (position - stream->buffer_cycle * bufferSize) > (bufferSize >> 1)) {
 		dprintf("hda: stream incorrect position %ld %ld %ld\n",
 			stream->id, stream->buffer_cycle, position);
 		stream->warn_count++;
 	}
+
+	return true;
 }
 
 
@@ -167,7 +171,7 @@ hda_interrupt_handler(hda_controller* controller)
 							"%08lx/%08lx\n", cad, response, responseFlags);
 						continue;
 					}
-				
+
 					if ((responseFlags & RESPONSE_FLAGS_UNSOLICITED) != 0) {
 						dprintf("hda: Unsolicited response: %08lx/%08lx\n",
 							response, responseFlags);
@@ -211,8 +215,10 @@ hda_interrupt_handler(hda_controller* controller)
 		for (uint32 index = 0; index < HDA_MAX_STREAMS; index++) {
 			if ((intrStatus & (1 << index)) != 0) {
 				if (controller->streams[index]) {
-					stream_handle_interrupt(controller,
-						controller->streams[index]);
+					if (stream_handle_interrupt(controller,
+							controller->streams[index])) {
+						handled = B_INVOKE_SCHEDULER;
+					}
 				} else {
 					dprintf("hda: Stream interrupt for unconfigured stream "
 						"%ld!\n", index);
@@ -296,11 +302,11 @@ reset_controller(hda_controller* controller)
 	// Wait for codecs to finish their own reset (apparently needs more
 	// time than documented in the specs)
 	snooze(1000);
-	
+
 	// Enable unsolicited responses
 	control = controller->Read32(HDAC_GLOBAL_CONTROL);
 	controller->Write32(HDAC_GLOBAL_CONTROL, control | GLOBAL_CONTROL_UNSOLICITED);
-	
+
 	return B_OK;
 }
 
@@ -488,7 +494,7 @@ status_t
 hda_stream_start(hda_controller* controller, hda_stream* stream)
 {
 	dprintf("hda_stream_start() offset %lx\n", stream->offset);
-	
+
 	controller->Write32(HDAC_INTR_CONTROL, controller->Read32(HDAC_INTR_CONTROL)
 		| (1 << (stream->offset / HDAC_STREAM_SIZE)));
 	stream->Write8(HDAC_STREAM_CONTROL0, stream->Read8(HDAC_STREAM_CONTROL0)
@@ -577,12 +583,12 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 			else if (stream->sample_size > 2)
 				offset = 4;
 		} else {
-			offset = 11;	
+			offset = 11;
 		}
 		offset *= 64;
 		offset = ALIGN(offset, 128);
 	}
-	
+
 	/* Calculate size of buffer (aligned to 128 bytes) */
 	uint32 bufferSize = stream->sample_size * stream->num_channels
 		* stream->buffer_length;
@@ -659,7 +665,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	}
 
 	/* Setup buffer descriptor list (BDL) entries */
-	for (uint32 index = 0; index < stream->num_buffers; index++, 
+	for (uint32 index = 0; index < stream->num_buffers; index++,
 		bufferDescriptors++) {
 		bufferDescriptors->lower = stream->physical_buffers[index] + offset;
 		bufferDescriptors->upper = 0;
@@ -689,7 +695,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		stream->controller->Read32(HDAC_DMA_POSITION_BASE_LOWER)
 		| DMA_POSITION_ENABLED);
 
-	dprintf("hda: stream: %ld fifo size: %d num_io_widgets: %ld\n", stream->id, 
+	dprintf("hda: stream: %ld fifo size: %d num_io_widgets: %ld\n", stream->id,
 		stream->Read16(HDAC_STREAM_FIFO_SIZE), stream->num_io_widgets);
 	dprintf("hda: widgets: ");
 
@@ -710,7 +716,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		dprintf("%ld ", stream->io_widgets[i]);
 	}
 	dprintf("\n");
-	
+
 	snooze(1000);
 	return B_OK;
 }
@@ -880,7 +886,7 @@ hda_hw_init(hda_controller* controller)
 			break;
 		}
 	}
-	
+
 	controller->buffer_ready_sem = create_sem(0, "hda_buffer_sem");
 	if (controller->buffer_ready_sem < B_OK) {
 		dprintf("hda: failed to create semaphore\n");
@@ -893,7 +899,7 @@ hda_hw_init(hda_controller* controller)
 
 	dprintf("hda: no active codec\n");
 	status = ENODEV;
-	
+
 	delete_sem(controller->buffer_ready_sem);
 
 corb_rirb_failed:
@@ -940,7 +946,7 @@ hda_hw_uninit(hda_controller* controller)
 
 	/* Stop all audio streams */
 	hda_hw_stop(controller);
-	
+
 	if (controller->buffer_ready_sem >= B_OK) {
 		delete_sem(controller->buffer_ready_sem);
 		controller->buffer_ready_sem = B_ERROR;
