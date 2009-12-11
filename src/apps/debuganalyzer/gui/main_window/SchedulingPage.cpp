@@ -536,9 +536,13 @@ public:
 			if (thread == NULL)
 				continue;
 
+			// compose name string
+			BString name = thread->Name();
+			name << " (" << thread->ID() << ")";
+
 			// draw the string
 			float y = lineRect.bottom - fFontInfo.fontHeight.descent + 1;
-			DrawString(thread->Name(), BPoint(kThreadNameMargin, y));
+			DrawString(name, BPoint(kThreadNameMargin, y));
 		}
 
 		BRect bounds(Bounds());
@@ -555,9 +559,14 @@ public:
 		return BSize(100, TotalHeight());
 	}
 
+	virtual BSize PreferredSize()
+	{
+		return BSize(250, TotalHeight());
+	}
+
 	virtual BSize MaxSize()
 	{
-		return BSize(1000, B_SIZE_UNLIMITED);
+		return BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
 	}
 };
 
@@ -777,7 +786,7 @@ public:
 		// create the tool tip
 		BString text;
 		text << "Time: " << format_nanotime(time) << "\n";
-		text << "Thread: " << thread->Name() << "\n";
+		text << "Thread: " << thread->Name() << " (" << thread->ID() << ")\n";
 		text << "State: " << thread_state_name(threadState);
 		if (threadWaitObject != NULL) {
 			char objectName[32];
@@ -1303,7 +1312,10 @@ public:
 
 		HeaderModel* headerModel = fHeaderView->Model();
 
-		Header* header = new Header(100, 100, 10000, 200, 0);
+		Header* header = new Header((int32)fThreadsView->PreferredSize().width,
+			(int32)fThreadsView->MinSize().width,
+			(int32)fThreadsView->MaxSize().width,
+			(int32)fThreadsView->PreferredSize().width, 0);
 		header->SetValue("Thread");
 		headerModel->AddHeader(header);
 		header->AddListener(this);
