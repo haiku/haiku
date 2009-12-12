@@ -66,6 +66,7 @@ public:
 
 	inline	uint32				Type() const;
 	inline	const char*			Name() const;
+	inline	addr_t				Object() const;
 
 	inline	int64				Waits() const;
 	inline	nanotime_t			TotalWaitTime() const;
@@ -132,6 +133,13 @@ const char*
 ThreadModel::WaitObjectGroup::Name() const
 {
 	return fWaitObjects[0]->Name();
+}
+
+
+addr_t
+ThreadModel::WaitObjectGroup::Object() const
+{
+	return fWaitObjects[0]->Object();
 }
 
 
