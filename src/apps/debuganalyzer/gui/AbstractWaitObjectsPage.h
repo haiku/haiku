@@ -52,15 +52,12 @@ protected:
 			ModelType*			fModel;
 			BCheckBox*			fGroupByNameCheckBox;
 			bool				fGroupByName;
-};
 
 
-// #pragma mark - WaitObjectsTreeModel
+// #pragma mark - WaitObjectsTreeModel (inner class)
 
 
-ABSTRACT_WAIT_OBJECTS_PAGE_TEMPLATE
-class ABSTRACT_WAIT_OBJECTS_PAGE_CLASS::WaitObjectsTreeModel
-	: public TreeTableModel {
+class WaitObjectsTreeModel : public TreeTableModel {
 public:
 	WaitObjectsTreeModel(ModelType* model, bool groupByName)
 		:
@@ -418,7 +415,9 @@ private:
 private:
 	ModelType*	fModel;
 	RootNode*	fRootNode;
-};
+};	// WaitObjectsTreeModel
+
+};	// AbstractWaitObjectsPage
 
 
 // #pragma mark - WaitObjectsPage
