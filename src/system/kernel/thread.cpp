@@ -1233,6 +1233,7 @@ _dump_thread_info(struct thread *thread, bool shortInfo)
 	kprintf("user_stack_area:    %ld\n", thread->user_stack_area);
 	kprintf("user_stack_base:    %p\n", (void *)thread->user_stack_base);
 	kprintf("user_local_storage: %p\n", (void *)thread->user_local_storage);
+	kprintf("user_thread:        %p\n", (void *)thread->user_thread);
 	kprintf("kernel_errno:       %#x (%s)\n", thread->kernel_errno,
 		strerror(thread->kernel_errno));
 	kprintf("kernel_time:        %Ld\n", thread->kernel_time);

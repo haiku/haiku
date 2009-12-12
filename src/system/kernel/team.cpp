@@ -336,27 +336,30 @@ static void
 _dump_team_info(struct team* team)
 {
 	kprintf("TEAM: %p\n", team);
-	kprintf("id:          %ld (%#lx)\n", team->id, team->id);
-	kprintf("name:        '%s'\n", team->name);
-	kprintf("args:        '%s'\n", team->args);
-	kprintf("next:        %p\n", team->next);
-	kprintf("parent:      %p", team->parent);
+	kprintf("id:               %ld (%#lx)\n", team->id, team->id);
+	kprintf("name:             '%s'\n", team->name);
+	kprintf("args:             '%s'\n", team->args);
+	kprintf("next:             %p\n", team->next);
+	kprintf("parent:           %p", team->parent);
 	if (team->parent != NULL) {
 		kprintf(" (id = %ld)\n", team->parent->id);
 	} else
 		kprintf("\n");
 
-	kprintf("children:    %p\n", team->children);
-	kprintf("num_threads: %d\n", team->num_threads);
-	kprintf("state:       %d\n", team->state);
-	kprintf("flags:       0x%lx\n", team->flags);
-	kprintf("io_context:  %p\n", team->io_context);
+	kprintf("children:         %p\n", team->children);
+	kprintf("num_threads:      %d\n", team->num_threads);
+	kprintf("state:            %d\n", team->state);
+	kprintf("flags:            0x%lx\n", team->flags);
+	kprintf("io_context:       %p\n", team->io_context);
 	if (team->address_space)
-		kprintf("address_space: %p\n", team->address_space);
-	kprintf("main_thread: %p\n", team->main_thread);
-	kprintf("thread_list: %p\n", team->thread_list);
-	kprintf("group_id:    %ld\n", team->group_id);
-	kprintf("session_id:  %ld\n", team->session_id);
+		kprintf("address_space:    %p\n", team->address_space);
+	kprintf("user data:        %p (area %ld)\n", (void*)team->user_data,
+		team->user_data_area);
+	kprintf("free user thread: %p\n", team->free_user_threads);
+	kprintf("main_thread:      %p\n", team->main_thread);
+	kprintf("thread_list:      %p\n", team->thread_list);
+	kprintf("group_id:         %ld\n", team->group_id);
+	kprintf("session_id:       %ld\n", team->session_id);
 }
 
 
