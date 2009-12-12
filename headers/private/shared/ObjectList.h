@@ -159,7 +159,7 @@ public:
 	T *RemoveItemAt(int32);
 		// returns the removed item
 
-	void MakeEmpty();
+	void MakeEmpty(bool deleteIfOwning = true);
 
 	// item access
 	T *ItemAt(int32) const;
@@ -561,9 +561,9 @@ BObjectList<T>::CountItems() const
 
 template<class T>
 void
-BObjectList<T>::MakeEmpty()
+BObjectList<T>::MakeEmpty(bool deleteIfOwning)
 {
-	if (owning) {
+	if (owning && deleteIfOwning) {
 		int32 count = CountItems();
 		for (int32 index = 0; index < count; index++)
 			delete ItemAt(index);
