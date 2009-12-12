@@ -280,8 +280,7 @@ NetServer::ReadyToRun()
 	_StartServices();
 	
 	BPrivate::BPathMonitor::StartWatching("/dev/net", B_ENTRY_CREATED
-			| B_ENTRY_REMOVED | B_ENTRY_MOVED | B_WATCH_FILES_ONLY
-			| B_WATCH_RECURSIVELY, this);
+		| B_ENTRY_REMOVED | B_WATCH_FILES_ONLY | B_WATCH_RECURSIVELY, this);
 }
 
 
@@ -879,71 +878,28 @@ void
 NetServer::_HandleDeviceMonitor(int socket, BMessage* message)
 {
 	int32 opcode;
-	if (message->FindInt32("opcode", &opcode) != B_OK)
+	if (message->FindInt32("opcode", &opcode) != B_OK
+		|| (opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED))
 		return;
 
-	if (opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED)
-		return;
-		
 	const char* path;
 	const char* watchedPath;
 	if (message->FindString("watched_path", &watchedPath) != B_OK
 		|| message->FindString("path", &path) != B_OK)
 		return;
 		
-	if (opcode == B_ENTRY_CREATED) {
+	if (opcode == B_ENTRY_CREATED)
 		_ConfigureDevice(socket, path);
-		return;	
-	}
-		
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
-		return;
-
-	uint32 count = (uint32)config.ifc_value;
-	if (count == 0) {
-		// there are no interfaces yet
-		return;
-	}
-
-	void *buffer = malloc(count * sizeof(struct ifreq));
-	if (buffer == NULL) {
-		fprintf(stderr, "%s: Out of memory.\n", Name());
-		return;
-	}
-
-	config.ifc_len = count * sizeof(struct ifreq);
-	config.ifc_buf = buffer;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
-		free(buffer);
-		return;
-	}
-
-	ifreq *interface = (ifreq *)buffer;
-	int32 pathLength = strlen(path);
-	
-	for (uint32 i = 0; i < count; i++) {
-		if (strncmp(interface->ifr_name, path, pathLength)) {
-			interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
-			+ interface->ifr_addr.sa_len);
-			continue;
-		}
-		
+	else {
 		ifreq request;
-		if (!prepare_request(request, interface->ifr_name))
-			break;
-
+		if (!prepare_request(request, path))
+			return;
+		
 		if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
 			fprintf(stderr, "%s: Could not delete interface %s: %s\n",
-				Name(), interface->ifr_name, strerror(errno));
+				Name(), path, strerror(errno));
 		}
-		break;
 	}
-
-	free(buffer);
-	
-	
 }
 
 
