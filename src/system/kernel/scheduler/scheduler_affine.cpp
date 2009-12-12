@@ -42,7 +42,6 @@
 // TODO: consolidate this such that HT/SMT entities on the same physical core
 // share a queue, once we have the necessary API for retrieving the topology
 // information
-static struct thread* sRunningThreads[B_MAX_CPU_COUNT];
 static struct thread* sRunQueue[B_MAX_CPU_COUNT];
 static int32 sRunQueueSize[B_MAX_CPU_COUNT];
 static struct thread* sIdleThreads;
@@ -192,8 +191,7 @@ affine_enqueue_in_run_queue(struct thread *thread)
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
 
-	if (sRunningThreads[targetCPU] != NULL
-		&& thread->priority > sRunningThreads[targetCPU]->priority) {
+	if (thread->priority > gCPU[targetCPU].running_thread->priority) {
 		if (targetCPU == smp_get_current_cpu()) {
 			return true;
 		} else {
@@ -503,10 +501,8 @@ affine_reschedule(void)
 		add_timer(quantumTimer, &reschedule_event, quantum,
 			B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_THREAD_LOCK);
 
-		if (nextThread != oldThread) {
-			sRunningThreads[currentCPU] = nextThread;
+		if (nextThread != oldThread)
 			context_switch(oldThread, nextThread);
-		}
 	}
 }
 
