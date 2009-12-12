@@ -5,33 +5,17 @@
 #ifndef THREAD_WAIT_OBJECTS_PAGE_H
 #define THREAD_WAIT_OBJECTS_PAGE_H
 
-#include <GroupView.h>
 
-#include "table/TreeTable.h"
-
+#include "AbstractWaitObjectsPage.h"
+#include "ThreadModel.h"
 #include "thread_window/ThreadWindow.h"
 
 
-class ThreadWindow::WaitObjectsPage : public BGroupView,
-	private TreeTableListener {
+class ThreadWindow::WaitObjectsPage
+	: public AbstractWaitObjectsPage<ThreadModel, ThreadModel::WaitObjectGroup,
+		Model::ThreadWaitObject> {
 public:
 								WaitObjectsPage();
-	virtual						~WaitObjectsPage();
-
-			void				SetModel(ThreadModel* model);
-
-private:
-			class WaitObjectsTreeModel;
-
-private:
-	// TreeTableListener
-	virtual	void				TreeTableNodeInvoked(TreeTable* table,
-									const TreeTablePath& path);
-
-private:
-			TreeTable*			fWaitObjectsTree;
-			WaitObjectsTreeModel* fWaitObjectsTreeModel;
-			ThreadModel*		fThreadModel;
 };
 
 
