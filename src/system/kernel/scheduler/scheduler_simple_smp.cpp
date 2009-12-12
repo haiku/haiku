@@ -1,12 +1,13 @@
 /*
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 
 /*! The thread scheduler */
 
@@ -336,22 +337,32 @@ reschedule(void)
 				if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
 					break;
 
-				// never skip last non-idle normal thread
-				if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
-					break;
-
-				// skip normal threads sometimes (roughly 20%)
-				if (_rand() > 0x1a00)
-					break;
-
-				// skip until next lower priority
+				// find next thread with lower priority
+				struct thread *lowerNextThread = nextThread->queue_next;
+				struct thread *lowerPrevThread = nextThread;
 				int32 priority = nextThread->priority;
-				do {
-					prevThread = nextThread;
-					nextThread = nextThread->queue_next;
-				} while (nextThread->queue_next != NULL
-					&& priority == nextThread->queue_next->priority
-					&& nextThread->queue_next->priority > B_IDLE_PRIORITY);
+
+				while (lowerNextThread != NULL
+					&& priority == lowerNextThread->priority) {
+					lowerPrevThread = lowerNextThread;
+					lowerNextThread = lowerNextThread->queue_next;
+				}
+				// never skip last non-idle normal thread
+				if (lowerNextThread == NULL
+					|| lowerNextThread->priority == B_IDLE_PRIORITY)
+					break;
+
+				int32 priorityDiff = priority - lowerNextThread->priority;
+				if (priorityDiff > 15)
+					break;
+
+				// skip normal threads sometimes
+				// (twice as probable per priority level)
+				if ((_rand() >> (15 - priorityDiff)) != 0)
+					break;
+
+				nextThread = lowerNextThread;
+				prevThread = lowerPrevThread;
 			}
 
 			if (nextThread->cpu
