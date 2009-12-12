@@ -45,6 +45,7 @@ typedef std::map<std::string, AutoconfigLooper*> LooperMap;
 class NetServer : public BServer {
 	public:
 		NetServer(status_t& status);
+		virtual ~NetServer();
 
 		virtual void AboutRequested();
 		virtual void ReadyToRun();
@@ -64,6 +65,7 @@ class NetServer : public BServer {
 		void _ConfigureInterfaces(int socket, BMessage* _missingDevice = NULL);
 		void _BringUpInterfaces();
 		void _StartServices();
+		void _HandleDeviceMonitor(int socket, BMessage* message);
 
 		Settings	fSettings;
 		LooperMap	fDeviceMap;
@@ -245,6 +247,12 @@ NetServer::NetServer(status_t& error)
 }
 
 
+NetServer::~NetServer()
+{
+	BPrivate::BPathMonitor::StopWatching("/dev/net", this);	
+}
+
+
 void
 NetServer::AboutRequested()
 {
@@ -270,6 +278,10 @@ NetServer::ReadyToRun()
 	fSettings.StartMonitoring(this);
 	_BringUpInterfaces();
 	_StartServices();
+	
+	BPrivate::BPathMonitor::StartWatching("/dev/net", B_ENTRY_CREATED
+			| B_ENTRY_REMOVED | B_ENTRY_MOVED | B_WATCH_FILES_ONLY
+			| B_WATCH_RECURSIVELY, this);
 }
 
 
@@ -278,9 +290,17 @@ NetServer::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_PATH_MONITOR:
+		{
 			fSettings.Update(message);
+			
+			// we need a socket to talk to the networking stack
+			int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+			if (socket < 0)
+				break;
+			_HandleDeviceMonitor(socket, message);
+			close(socket);
 			break;
-
+		}
 		case kMsgInterfaceSettingsUpdated:
 		{
 			// we need a socket to talk to the networking stack
@@ -413,8 +433,10 @@ NetServer::_RemoveInvalidInterfaces(int socket)
 
 	config.ifc_len = count * sizeof(struct ifreq);
 	config.ifc_buf = buffer;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
+		free(buffer);
 		return;
+	}
 
 	ifreq *interface = (ifreq *)buffer;
 
@@ -423,7 +445,7 @@ NetServer::_RemoveInvalidInterfaces(int socket)
 			// remove invalid interface
 			ifreq request;
 			if (!prepare_request(request, interface->ifr_name))
-				return;
+				break;
 
 			if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
 				fprintf(stderr, "%s: Could not delete interface %s: %s\n",
@@ -431,7 +453,8 @@ NetServer::_RemoveInvalidInterfaces(int socket)
 			}
 		}
 
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE + interface->ifr_addr.sa_len);
+		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
+			+ interface->ifr_addr.sa_len);
 	}
 
 	free(buffer);
@@ -462,8 +485,10 @@ NetServer::_TestForInterface(int socket, const char* name)
 
 	config.ifc_len = count * sizeof(struct ifreq);
 	config.ifc_buf = buffer;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
+		free(buffer);
 		return false;
+	}
 
 	ifreq *interface = (ifreq *)buffer;
 	int32 nameLength = strlen(name);
@@ -847,6 +872,78 @@ NetServer::_StartServices()
 		AddHandler(services);
 		fServices = BMessenger(services);
 	}
+}
+
+
+void
+NetServer::_HandleDeviceMonitor(int socket, BMessage* message)
+{
+	int32 opcode;
+	if (message->FindInt32("opcode", &opcode) != B_OK)
+		return;
+
+	if (opcode != B_ENTRY_CREATED && opcode != B_ENTRY_REMOVED)
+		return;
+		
+	const char* path;
+	const char* watchedPath;
+	if (message->FindString("watched_path", &watchedPath) != B_OK
+		|| message->FindString("path", &path) != B_OK)
+		return;
+		
+	if (opcode == B_ENTRY_CREATED) {
+		_ConfigureDevice(socket, path);
+		return;	
+	}
+		
+	ifconf config;
+	config.ifc_len = sizeof(config.ifc_value);
+	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
+		return;
+
+	uint32 count = (uint32)config.ifc_value;
+	if (count == 0) {
+		// there are no interfaces yet
+		return;
+	}
+
+	void *buffer = malloc(count * sizeof(struct ifreq));
+	if (buffer == NULL) {
+		fprintf(stderr, "%s: Out of memory.\n", Name());
+		return;
+	}
+
+	config.ifc_len = count * sizeof(struct ifreq);
+	config.ifc_buf = buffer;
+	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
+		free(buffer);
+		return;
+	}
+
+	ifreq *interface = (ifreq *)buffer;
+	int32 pathLength = strlen(path);
+	
+	for (uint32 i = 0; i < count; i++) {
+		if (strncmp(interface->ifr_name, path, pathLength)) {
+			interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
+			+ interface->ifr_addr.sa_len);
+			continue;
+		}
+		
+		ifreq request;
+		if (!prepare_request(request, interface->ifr_name))
+			break;
+
+		if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
+			fprintf(stderr, "%s: Could not delete interface %s: %s\n",
+				Name(), interface->ifr_name, strerror(errno));
+		}
+		break;
+	}
+
+	free(buffer);
+	
+	
 }
 
 
