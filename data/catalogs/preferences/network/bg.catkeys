@@ -1,0 +1,17 @@
+1	Bulgarian	x-vnd.Haiku-Network	1787390642
+Gateway:	EthernetSettingsView		Gateway:
+Netmask:	EthernetSettingsView		Маска:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		Вторичен DNS:
+Apply	EthernetSettingsView		Приложи
+DNS #1:	EthernetSettingsView		Първичен DNS:
+Network	NetworkWindow		Мрежа
+Adapter:	EthernetSettingsView		Адаптер:
+IP Address:	EthernetSettingsView		IP-адрес:
+Revert	EthernetSettingsView		Върни
+Sending auto-config message failed: 	EthernetSettingsView		Изпращането на съобщението за автоматична конфигурация се провали: 
+Mode:	EthernetSettingsView		Режим:
+The net_server needs to run for the auto configuration!	EthernetSettingsView		Мрежовия сървър трябва да е стартиран!
+Auto-configuring failed: 	EthernetSettingsView		Автоматичната конфигурация се провали: 
+Static	EthernetSettingsView		Статистика
+Ok	EthernetSettingsView		Ок

@@ -1,0 +1,24 @@
+1	Bulgarian	x-vnd.Haiku-Mouse	3306943515
+Mouse type:	SettingsView		Тип на мишката:
+Warp	SettingsView		Телепортиране
+2-Button	SettingsView		2-бутнонна
+Double-click test area	SettingsView		Тестово поле за двоен клик.
+Revert	MouseWindow		Върни
+...by Andrew Edward McCall	MouseApplication		...от Andrew Edward McCall
+Focus Follows Mouse	SettingsView		Фокусирането следва мишката
+Mouse Acceleration	SettingsView		Ускорение на мишката
+Click to Focus	SettingsView		Кликни за фокусиране
+3-Button	SettingsView		3-бутонна
+Focus mode:	SettingsView		Метод на фокусиране:
+Mouse Speed	SettingsView		Скорост на мишката
+Dig Deal	MouseApplication		Dig Deal
+1-Button	SettingsView		1-бутонна
+Double-click speed	SettingsView		Скорост на двойно кликване
+Instant Warp	SettingsView		Моментално телепортиране
+Defaults	MouseWindow		По подразбиране
+Accept first click	SettingsView		Приемане на първия клик
+Fast	SettingsView		Бързо
+Normal	SettingsView		Нормално
+Mouse	MouseWindow		Мишка
+Slow	SettingsView		Бавно
+Click to Activate	SettingsView		Кликване за активиране

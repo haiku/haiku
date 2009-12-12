@@ -1,0 +1,34 @@
+1	Bulgarian	x-vnd.Haiku-Media	1721947718
+Show Volume Control on Deskbar	Media views		Покажи регулатора на нивото на звука в Deskbar
+Audio Input:	Media views		Звуков Вход:
+Restarting Media Services\nStarting Media Server…\n	Media Window		Рестартиране на Медия Сървъра\nСтартиране на Медия Сървъра…\n
+Video Input:	Media views		Видео Вход:
+Waiting for media_server to quit.	Media Window		Изчакайте Медия Сървъра да преустанови работа.
+Defaults	Media views		По подразбиране
+Stopping Media Server…	Media Window		Спиране на Медия Сървъра…
+Video Output:	Media views		Видео Изход::
+Enable Real-Time Audio	Media views		Аудио режим в реално време
+Quit	Media Window		Изход
+OK	Media Window		Ок
+Enabling Real-Time Video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режимът на видео в реално време позволява видео операциите да бъдат възможно най-бързи и с плавни преходи. Постига се оптимална производителност чрез използване на повече RAM памет.\n\nВключете тази услуга само ако се нуждаете от възможно най-малка латентност.
+Default Nodes	Media views		По подразбиране
+Starting Media Server…	Media Window		Стартиране на Медия Сървъра…
+Restart the Media Server to apply changes.	Media views		Рестартиране на Медия Сървъра за прилагане на корекциите.
+Done Shutting Down.	Media Window		Процеса на спиране приключи.
+Cleaning Up.	Media Window		Изчистване.
+Telling media_addon_server to quit.	Media Window		Заявка  за спиране към Медия Сървъра.
+Enable Real-Time Video	Media views		Видео режим в реално време
+This hardware has no controls.	Media Window		Това устройство няма контролни линии.
+Restarting Media Services\nShutting down Media Server\n	Media Window		Рестартиране на мултимедийните услуги\nСпиране на Медия Сървъра\n
+Audio Output:	Media views		Аудио изход:
+Start Media Server	Media Window		Стартиране на Медия Сървъра
+Audio Settings	Media Window		Настройки звука
+Could not connect to the Media Server.\nWould you like to start it ?	Media Window		Няма връзка с Медия Сървъра\n Желаете ли да го стартирате?\n
+Ready For Use…	Media Window		Готов…
+Real-Time	Media views		Реално време
+Restart Media Services	Media views		Рестартиране на Медия Сървъра
+Enabling Real-time Audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режимът на обработката на звук в реално време позволява аудио операциите да бъдат възможно най-бързи и с плавни преходи. Постига се оптимална производителност чрез използване на повече RAM памет и процесорни ресурси.\n\nВключете тази услуга само ако се нуждаете от възможно най-малка латентност.
+Couldn't remove Volume control in Deskbar: %s\n	Media Window		Невъзможно е премахването на регулатора на нивото на звука от Deskbar : %s\n
+Couldn't add Volume control in Deskbar: %s\n	Media Window		Невъзможно е добавянето на регулатора на нивото на звука към Deskbar: %s\n
+Media	Media Window		Media
+Channel:	Media views		Канал:
