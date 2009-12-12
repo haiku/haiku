@@ -10,6 +10,7 @@
 
 #include <new>
 
+#include <CheckBox.h>
 #include <GroupView.h>
 
 #include "table/TableColumns.h"
@@ -31,13 +32,26 @@ public:
 
 			void				SetModel(ModelType* model);
 
+	virtual	void				MessageReceived(BMessage* message);
+
+	virtual	void				AttachedToWindow();
+
 protected:
 			class WaitObjectsTreeModel;
+
+			enum {
+				MSG_ABSTRACT_WAIT_OBJECTS_GROUP_BY_NAME		= 'awog'
+			};
+
+protected:
+			void				_UpdateTreeModel();
 
 protected:
 			TreeTable*			fWaitObjectsTree;
 			WaitObjectsTreeModel* fWaitObjectsTreeModel;
 			ModelType*			fModel;
+			BCheckBox*			fGroupByNameCheckBox;
+			bool				fGroupByName;
 };
 
 
@@ -48,12 +62,12 @@ ABSTRACT_WAIT_OBJECTS_PAGE_TEMPLATE
 class ABSTRACT_WAIT_OBJECTS_PAGE_CLASS::WaitObjectsTreeModel
 	: public TreeTableModel {
 public:
-	WaitObjectsTreeModel(ModelType* model)
+	WaitObjectsTreeModel(ModelType* model, bool groupByName)
 		:
 		fModel(model),
 		fRootNode(NULL)
 	{
-		fRootNode = new RootNode(fModel);
+		fRootNode = new RootNode(fModel, groupByName);
 	}
 
 	~WaitObjectsTreeModel()
@@ -90,9 +104,64 @@ private:
 	struct Node {
 		virtual ~Node() {}
 
+		virtual const char* Name() const = 0;
+		virtual uint32 Type() const = 0;
+		virtual addr_t Object() const = 0;
+		virtual addr_t ReferencedObject() const = 0;
+		virtual int64 Waits() const = 0;
+		virtual nanotime_t TotalWaitTime() const = 0;
+
 		virtual int32 CountChildren() const = 0;
 		virtual void* ChildAt(int32 index) const = 0;
-		virtual bool GetValueAt(int32 columnIndex, BVariant& value) = 0;
+
+		static int CompareByName(const Node* a, const Node* b)
+		{
+			int cmp = (int)a->Type() - (int)b->Type();
+			return cmp == 0 ? strcmp(a->Name(), b->Name()) : cmp;
+		}
+
+		bool GetValueAt(int32 columnIndex, BVariant& value)
+		{
+			switch (columnIndex) {
+				case 0:
+					value.SetTo(wait_object_type_name(Type()),
+						B_VARIANT_DONT_COPY_DATA);
+					return true;
+				case 1:
+					value.SetTo(Name(), B_VARIANT_DONT_COPY_DATA);
+					return true;
+				case 2:
+				{
+					addr_t object = Object();
+					if (object == 0)
+						return false;
+
+					char buffer[16];
+					snprintf(buffer, sizeof(buffer), "%#lx", object);
+					value.SetTo(buffer);
+					return true;
+				}
+				case 3:
+				{
+					addr_t object = ReferencedObject();
+					if (object == 0)
+						return false;
+
+					char buffer[16];
+					snprintf(buffer, sizeof(buffer), "%#lx", object);
+					value.SetTo(buffer);
+					return true;
+				}
+				case 4:
+					value.SetTo(Waits());
+					return true;
+				case 5:
+					value.SetTo(TotalWaitTime());
+					return true;
+				default:
+					return false;
+			}
+		}
 	};
 
 	struct ObjectNode : Node {
@@ -104,6 +173,36 @@ private:
 		{
 		}
 
+		virtual const char* Name() const
+		{
+			return object->Name();
+		}
+
+		virtual uint32 Type() const
+		{
+			return object->Type();
+		}
+
+		virtual addr_t Object() const
+		{
+			return object->Object();
+		}
+
+		virtual addr_t ReferencedObject() const
+		{
+			return object->ReferencedObject();
+		}
+
+		virtual int64 Waits() const
+		{
+			return object->Waits();
+		}
+
+		virtual nanotime_t TotalWaitTime() const
+		{
+			return object->TotalWaitTime();
+		}
+
 		virtual int32 CountChildren() const
 		{
 			return 0;
@@ -112,11 +211,6 @@ private:
 		virtual void* ChildAt(int32 index) const
 		{
 			return NULL;
-		}
-
-		virtual bool GetValueAt(int32 columnIndex, BVariant& value)
-		{
-			return _GetWaitObjectValueAt(object, columnIndex, value);
 		}
 	};
 
@@ -139,6 +233,36 @@ private:
 			}
 		}
 
+		virtual const char* Name() const
+		{
+			return group->Name();
+		}
+
+		virtual uint32 Type() const
+		{
+			return group->Type();
+		}
+
+		virtual addr_t Object() const
+		{
+			return group->Object();
+		}
+
+		virtual addr_t ReferencedObject() const
+		{
+			return 0;
+		}
+
+		virtual int64 Waits() const
+		{
+			return group->Waits();
+		}
+
+		virtual nanotime_t TotalWaitTime() const
+		{
+			return group->TotalWaitTime();
+		}
+
 		virtual int32 CountChildren() const
 		{
 			return objectNodes.CountItems();
@@ -148,60 +272,136 @@ private:
 		{
 			return objectNodes.ItemAt(index);
 		}
-
-		virtual bool GetValueAt(int32 columnIndex, BVariant& value)
-		{
-			if (columnIndex <= 2) {
-				return _GetWaitObjectValueAt(group->WaitObjectAt(0),
-					columnIndex, value);
-			}
-
-			switch (columnIndex) {
-				case 4:
-					value.SetTo(group->Waits());
-					return true;
-				case 5:
-					value.SetTo(group->TotalWaitTime());
-					return true;
-				default:
-					return false;
-			}
-		}
 	};
 
 	// For GCC 2
 	friend struct GroupNode;
 
-	struct RootNode : Node {
-		ModelType*			model;
-		BObjectList<Node>	groupNodes;
-
-		RootNode(ModelType* model)
+	struct NodeContainerNode : Node {
+		NodeContainerNode()
 			:
-			model(model),
-			groupNodes(20, true)
+			fChildren(20, true)
 		{
-			int32 count = model->CountWaitObjectGroups();
-			for (int32 i = 0; i < count; i++) {
-				WaitObjectGroupType* group = model->WaitObjectGroupAt(i);
-				if (!groupNodes.AddItem(_CreateGroupNode(group)))
-					throw std::bad_alloc();
+		}
+
+		NodeContainerNode(BObjectList<Node>& nodes)
+			:
+			fChildren(20, true)
+		{
+			fChildren.AddList(&nodes);
+
+			// compute total waits and total wait time
+			fWaits = 0;
+			fTotalWaitTime = 0;
+
+			for (int32 i = 0; Node* node = fChildren.ItemAt(i); i++) {
+				fWaits += node->Waits();
+				fTotalWaitTime += node->TotalWaitTime();
 			}
+		}
+
+		virtual const char* Name() const
+		{
+			Node* child = fChildren.ItemAt(0);
+			return child != NULL ? child->Name() : "";
+		}
+
+		virtual uint32 Type() const
+		{
+			Node* child = fChildren.ItemAt(0);
+			return child != NULL ? child->Type() : 0;
+		}
+
+		virtual addr_t Object() const
+		{
+			return 0;
+		}
+
+		virtual addr_t ReferencedObject() const
+		{
+			return 0;
+		}
+
+		virtual int64 Waits() const
+		{
+			return fWaits;
+		}
+
+		virtual nanotime_t TotalWaitTime() const
+		{
+			return fTotalWaitTime;
 		}
 
 		virtual int32 CountChildren() const
 		{
-			return groupNodes.CountItems();
+			return fChildren.CountItems();
 		}
 
 		virtual void* ChildAt(int32 index) const
 		{
-			return groupNodes.ItemAt(index);
+			return fChildren.ItemAt(index);
 		}
 
-		virtual bool GetValueAt(int32 columnIndex, BVariant& value)
+	protected:
+		BObjectList<Node>	fChildren;
+		int64				fWaits;
+		nanotime_t			fTotalWaitTime;
+	};
+
+	struct RootNode : public NodeContainerNode {
+		ModelType*			model;
+
+		RootNode(ModelType* model, bool groupByName)
+			:
+			model(model)
 		{
-			return false;
+			// create nodes for the wait object groups
+			BObjectList<Node> tempChildren;
+			BObjectList<Node>& children
+				= groupByName ? tempChildren : NodeContainerNode::fChildren;
+			int32 count = model->CountWaitObjectGroups();
+			for (int32 i = 0; i < count; i++) {
+				WaitObjectGroupType* group = model->WaitObjectGroupAt(i);
+				if (!children.AddItem(_CreateGroupNode(group)))
+					throw std::bad_alloc();
+			}
+
+			// If we shall group the nodes by name, we create grouping nodes.
+			if (groupByName) {
+				if (children.CountItems() < 2) {
+					NodeContainerNode::fChildren.AddList(&children);
+					return;
+				}
+
+				// sort the nodes by name
+				children.SortItems(&Node::CompareByName);
+
+				// create groups
+				int32 nodeCount = children.CountItems();
+				BObjectList<Node> nameGroup;
+				Node* previousNode = children.ItemAt(0);
+				int32 groupNodeIndex = 0;
+				for (int32 i = 1; i < nodeCount; i++) {
+					Node* node = children.ItemAt(i);
+					if (strcmp(node->Name(), previousNode->Name())) {
+						// create the group -- or just add the node, if it's
+						// the only one
+						if (nameGroup.CountItems() > 1) {
+							NodeContainerNode::fChildren.AddItem(
+								new NodeContainerNode(nameGroup));
+						} else
+							NodeContainerNode::fChildren.AddItem(previousNode);
+
+						nameGroup.MakeEmpty();
+						groupNodeIndex = i;
+					}
+
+					// add the node
+					nameGroup.AddItem(node);
+
+					previousNode = node;
+				}
+			}
 		}
 
 	private:
@@ -213,53 +413,7 @@ private:
 
 			return new GroupNode(group);
 		}
-
 	};
-
-private:
-	static bool _GetWaitObjectValueAt(WaitObjectType* waitObject,
-		int32 columnIndex, BVariant& value)
-	{
-		switch (columnIndex) {
-			case 0:
-				value.SetTo(wait_object_type_name(waitObject->Type()),
-					B_VARIANT_DONT_COPY_DATA);
-				return true;
-			case 1:
-				value.SetTo(waitObject->Name(), B_VARIANT_DONT_COPY_DATA);
-				return true;
-			case 2:
-			{
-				if (waitObject->Object() == 0)
-					return false;
-
-				char buffer[16];
-				snprintf(buffer, sizeof(buffer), "%#lx",
-					waitObject->Object());
-				value.SetTo(buffer);
-				return true;
-			}
-			case 3:
-			{
-				if (waitObject->ReferencedObject() == 0)
-					return false;
-
-				char buffer[16];
-				snprintf(buffer, sizeof(buffer), "%#lx",
-					waitObject->ReferencedObject());
-				value.SetTo(buffer);
-				return true;
-			}
-			case 4:
-				value.SetTo(waitObject->Waits());
-				return true;
-			case 5:
-				value.SetTo(waitObject->TotalWaitTime());
-				return true;
-			default:
-				return false;
-		}
-	}
 
 private:
 	ModelType*	fModel;
@@ -273,16 +427,23 @@ private:
 ABSTRACT_WAIT_OBJECTS_PAGE_TEMPLATE
 ABSTRACT_WAIT_OBJECTS_PAGE_CLASS::AbstractWaitObjectsPage()
 	:
-	BGroupView(B_VERTICAL),
+	BGroupView(B_VERTICAL, 10),
 	fWaitObjectsTree(NULL),
 	fWaitObjectsTreeModel(NULL),
-	fModel(NULL)
-
+	fModel(NULL),
+	fGroupByNameCheckBox(NULL),
+	fGroupByName(false)
 {
 	SetName("Wait Objects");
 
 	fWaitObjectsTree = new TreeTable("wait object list", 0);
 	AddChild(fWaitObjectsTree->ToView());
+
+	fGroupByNameCheckBox = new BCheckBox("group by name checkbox",
+		"Group by Name", new BMessage(MSG_ABSTRACT_WAIT_OBJECTS_GROUP_BY_NAME));
+	fGroupByNameCheckBox->SetValue(
+		fGroupByName ? B_CONTROL_ON : B_CONTROL_OFF);
+	AddChild(fGroupByNameCheckBox);
 
 	fWaitObjectsTree->AddColumn(new StringTableColumn(0, "Type", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
@@ -324,9 +485,49 @@ ABSTRACT_WAIT_OBJECTS_PAGE_CLASS::SetModel(ModelType* model)
 
 	fModel = model;
 
+	if (fModel != NULL)
+		_UpdateTreeModel();
+}
+
+
+ABSTRACT_WAIT_OBJECTS_PAGE_TEMPLATE
+void
+ABSTRACT_WAIT_OBJECTS_PAGE_CLASS::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_ABSTRACT_WAIT_OBJECTS_GROUP_BY_NAME:
+			fGroupByName = fGroupByNameCheckBox->Value() == B_CONTROL_ON;
+			_UpdateTreeModel();
+			break;
+		default:
+			BGroupView::MessageReceived(message);
+			break;
+	}
+}
+
+
+ABSTRACT_WAIT_OBJECTS_PAGE_TEMPLATE
+void
+ABSTRACT_WAIT_OBJECTS_PAGE_CLASS::AttachedToWindow()
+{
+	fGroupByNameCheckBox->SetTarget(this);
+}
+
+
+ABSTRACT_WAIT_OBJECTS_PAGE_TEMPLATE
+void
+ABSTRACT_WAIT_OBJECTS_PAGE_CLASS::_UpdateTreeModel()
+{
+	if (fModel != NULL) {
+		fWaitObjectsTree->SetTreeTableModel(NULL);
+		delete fWaitObjectsTreeModel;
+		fWaitObjectsTreeModel = NULL;
+	}
+
 	if (fModel != NULL) {
 		try {
-			fWaitObjectsTreeModel = new WaitObjectsTreeModel(fModel);
+			fWaitObjectsTreeModel = new WaitObjectsTreeModel(fModel,
+				fGroupByName);
 		} catch (std::bad_alloc) {
 			// TODO: Report error!
 		}
