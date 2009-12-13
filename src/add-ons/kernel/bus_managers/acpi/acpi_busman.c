@@ -623,11 +623,10 @@ reboot(void)
 
 	TRACE("reboot\n");
 
-	if ((AcpiGbl_FADT.Flags & ACPI_FADT_RESET_REGISTER) == 0)
+	status = AcpiReset();
+	if (status == AE_NOT_EXIST)
 		return B_UNSUPPORTED;
-
-	status = AcpiWrite(AcpiGbl_FADT.ResetValue, &AcpiGbl_FADT.ResetRegister);
-
+	
 	if (status != AE_OK) {
 		ERROR("Reset failed, status = %d\n", status);
 		return B_ERROR;
