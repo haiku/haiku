@@ -147,7 +147,11 @@ TrackSlider::_DrawCounter(bigtime_t timestamp, float position, bool isTracking)
 	EndLineArray();
 	FillRect(BRect(counterX-halfwidth-3,SLIDER_BASE-8,counterX+halfwidth+3,SLIDER_BASE));
 
+#ifdef __HAIKU__
+	SetDrawingMode(B_OP_OVER);
+#else
 	SetDrawingMode(B_OP_COPY);
+#endif
 	if (isTracking)
 		SetHighColor(255,255,255);
 	else
