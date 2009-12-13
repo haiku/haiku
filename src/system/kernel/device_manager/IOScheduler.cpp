@@ -625,7 +625,7 @@ IOScheduler::_Scheduler()
 				if (request == NULL) {
 					resourcesAvailable = false;
 if (operationCount == 0)
-panic("no more requests");
+panic("no more requests for owner %p (thread %ld)", owner, owner->thread);
 					break;
 				}
 
