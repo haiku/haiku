@@ -692,6 +692,7 @@ IOOperation::Dump() const
 
 IORequest::IORequest()
 	:
+	fIsNotified(false),
 	fFinishedCallback(NULL),
 	fFinishedCookie(NULL),
 	fIterationCallback(NULL),
@@ -869,7 +870,7 @@ IORequest::Wait(uint32 flags, bigtime_t timeout)
 {
 	MutexLocker locker(fLock);
 
-	if (IsFinished())
+	if (IsFinished() && fIsNotified)
 		return Status();
 
 	ConditionVariableEntry entry;
@@ -932,6 +933,7 @@ IORequest::NotifyFinished()
 	bool deleteRequest = (fFlags & B_DELETE_IO_REQUEST) != 0;
 
 	// unblock waiters
+	fIsNotified = true;
 	fFinishedCondition.NotifyAll();
 
 	locker.Unlock();

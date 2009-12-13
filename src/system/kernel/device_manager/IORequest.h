@@ -334,6 +334,7 @@ private:
 			bool				fIsWrite;
 			bool				fPartialTransfer;
 			bool				fSuppressChildNotifications;
+			bool				fIsNotified;
 
 			io_request_finished_callback	fFinishedCallback;
 			void*				fFinishedCookie;
