@@ -274,16 +274,7 @@ MediaExtractor::FindKeyFrame(int32 stream, uint32 seekTo, int64* _frame,
 	if (info.status != B_OK)
 		return info.status;
 
-	BAutolock _(info.chunkCache);
-
-	status_t status = fReader->FindKeyFrame(info.cookie, seekTo, _frame, _time);
-	if (status != B_OK)
-		return status;
-
-	// clear buffered chunks after seek
-	info.chunkCache->MakeEmpty();
-
-	return B_OK;
+	return fReader->FindKeyFrame(info.cookie, seekTo, _frame, _time);
 }
 
 
@@ -307,13 +298,7 @@ MediaExtractor::GetNextChunk(int32 stream, const void** _chunkBuffer,
 	_RecycleLastChunk(info);
 
 	// Retrieve next chunk - read it directly, if the cache is drained
-	chunk_buffer* chunk;
-	do {
-		chunk = info.chunkCache->NextChunk();
-		if (chunk == NULL
-			&& !info.chunkCache->ReadNextChunk(fReader, info.cookie))
-			break;
-	} while (chunk == NULL);
+	chunk_buffer* chunk = info.chunkCache->NextChunk(fReader, info.cookie);
 
 	if (chunk == NULL)
 		return B_NO_MEMORY;

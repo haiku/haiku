@@ -10,23 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <Debug.h>
-
-
-chunk_buffer::chunk_buffer()
-	:
-	buffer(NULL),
-	size(0),
-	capacity(0)
-{
-}
-
-
-chunk_buffer::~chunk_buffer()
-{
-	rtm_free(buffer);
-}
-
+#include "debug.h"
 
 // #pragma mark -
 
@@ -62,8 +46,11 @@ ChunkCache::MakeEmpty()
 {
 	ASSERT(IsLocked());
 
-	fUnusedChunks.MoveFrom(&fChunks);
-
+	while (!fChunkCache.empty()) {
+		RecycleChunk(fChunkCache.front());
+		fChunkCache.pop();
+	}
+	
 	release_sem(fWaitSem);
 }
 
@@ -73,18 +60,31 @@ ChunkCache::SpaceLeft() const
 {
 	ASSERT(IsLocked());
 
+	if (fChunkCache.size() >= CACHE_MAX_ENTRIES) {
+		return false;
+	}
+
+	// If there is no more memory we are likely to fail soon after
 	return sizeof(chunk_buffer) + 2048 < rtm_available(fRealTimePool);
 }
 
 
 chunk_buffer*
-ChunkCache::NextChunk()
+ChunkCache::NextChunk(Reader* reader, void* cookie)
 {
 	ASSERT(IsLocked());
 
-	chunk_buffer* chunk = fChunks.RemoveHead();
-	if (chunk != NULL) {
-		fInFlightChunks.Add(chunk);
+	chunk_buffer* chunk = NULL;
+
+	if (fChunkCache.empty()) {
+		TRACE("ChunkCache is empty, going direct to reader\n");
+		if (ReadNextChunk(reader, cookie)) {
+			return NextChunk(reader, cookie);
+		}
+	} else {
+		chunk = fChunkCache.front();
+		fChunkCache.pop();
+		
 		release_sem(fWaitSem);
 	}
 
@@ -92,7 +92,7 @@ ChunkCache::NextChunk()
 }
 
 
-/*!	Moves the specified chunk from the in-flight list to the unused list.
+/*	Moves the specified chunk to the unused list.
 	This means the chunk data can be overwritten again.
 */
 void
@@ -100,8 +100,11 @@ ChunkCache::RecycleChunk(chunk_buffer* chunk)
 {
 	ASSERT(IsLocked());
 
-	fInFlightChunks.Remove(chunk);
-	fUnusedChunks.Add(chunk);
+	rtm_free(chunk->buffer);
+	chunk->capacity = 0;
+	chunk->size = 0;
+	chunk->buffer = NULL;
+	fUnusedChunks.push_back(chunk);
 }
 
 
@@ -111,14 +114,22 @@ ChunkCache::ReadNextChunk(Reader* reader, void* cookie)
 	ASSERT(IsLocked());
 
 	// retrieve chunk buffer
-	chunk_buffer* chunk = fUnusedChunks.RemoveHead();
-	if (chunk == NULL) {
+	chunk_buffer* chunk = NULL;
+	if (fUnusedChunks.empty()) {
 		// allocate a new one
 		chunk = (chunk_buffer*)rtm_alloc(fRealTimePool, sizeof(chunk_buffer));
-		if (chunk == NULL)
+		if (chunk == NULL) {
+			ERROR("RTM Pool empty allocating chunk buffer structure");
 			return false;
+		}
+		
+		chunk->size = 0;
+		chunk->capacity = 0;
+		chunk->buffer = NULL;
 
-		new(chunk) chunk_buffer;
+	} else {
+		chunk = fUnusedChunks.front();
+		fUnusedChunks.pop_front();
 	}
 
 	const void* buffer;
@@ -133,6 +144,7 @@ ChunkCache::ReadNextChunk(Reader* reader, void* cookie)
 			chunk->buffer = rtm_alloc(fRealTimePool, chunk->capacity);
 			if (chunk->buffer == NULL) {
 				rtm_free(chunk);
+				ERROR("RTM Pool empty allocating chunk buffer\n");
 				return false;
 			}
 		}
@@ -141,6 +153,6 @@ ChunkCache::ReadNextChunk(Reader* reader, void* cookie)
 		chunk->size = bufferSize;
 	}
 
-	fChunks.Add(chunk);
+	fChunkCache.push(chunk);
 	return chunk->status == B_OK;
 }

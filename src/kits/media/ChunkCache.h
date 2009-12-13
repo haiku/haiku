@@ -9,8 +9,8 @@
 #include <Locker.h>
 #include <MediaDefs.h>
 #include <RealtimeAlloc.h>
-
-#include <kernel/util/DoublyLinkedList.h>
+#include <queue>
+#include <deque>
 
 #include "ReaderPlugin.h"
 
@@ -18,14 +18,10 @@
 namespace BPrivate {
 namespace media {
 
+// Limit to 10 entries, we might want to instead limit to a length of time
+#define CACHE_MAX_ENTRIES 10
 
-struct chunk_buffer;
-typedef DoublyLinkedList<chunk_buffer> ChunkList;
-
-struct chunk_buffer : public DoublyLinkedListLinkImpl<chunk_buffer> {
-	chunk_buffer();
-	~chunk_buffer();
-
+struct chunk_buffer {
 	void*			buffer;
 	size_t			size;
 	size_t			capacity;
@@ -33,6 +29,8 @@ struct chunk_buffer : public DoublyLinkedListLinkImpl<chunk_buffer> {
 	status_t		status;
 };
 
+typedef queue<chunk_buffer*> ChunkQueue;
+typedef deque<chunk_buffer*> ChunkList;
 
 class ChunkCache : public BLocker {
 public:
@@ -44,7 +42,7 @@ public:
 			void				MakeEmpty();
 			bool				SpaceLeft() const;
 
-			chunk_buffer*		NextChunk();
+			chunk_buffer*		NextChunk(Reader* reader, void* cookie);
 			void				RecycleChunk(chunk_buffer* chunk);
 			bool				ReadNextChunk(Reader* reader, void* cookie);
 
@@ -52,9 +50,8 @@ private:
 			rtm_pool*			fRealTimePool;
 			sem_id				fWaitSem;
 			size_t				fMaxBytes;
-			ChunkList			fChunks;
+			ChunkQueue			fChunkCache;
 			ChunkList			fUnusedChunks;
-			ChunkList			fInFlightChunks;
 };
 
 
