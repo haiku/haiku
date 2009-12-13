@@ -29,8 +29,8 @@ struct chunk_buffer {
 	status_t		status;
 };
 
-typedef queue<chunk_buffer*> ChunkQueue;
-typedef deque<chunk_buffer*> ChunkList;
+typedef std::queue<chunk_buffer*> ChunkQueue;
+typedef std::deque<chunk_buffer*> ChunkList;
 
 class ChunkCache : public BLocker {
 public:
