@@ -987,7 +987,6 @@ hardware_interrupt(struct iframe* frame)
 {
 	int32 vector = frame->vector - ARCH_INTERRUPT_BASE;
 	bool levelTriggered = false;
-	int ret;
 	struct thread* thread = thread_get_current_thread();
 
 	if (sCurrentPIC->is_spurious_interrupt(vector)) {
@@ -1001,23 +1000,19 @@ hardware_interrupt(struct iframe* frame)
 	if (!levelTriggered)
 		sCurrentPIC->end_of_interrupt(vector);
 
-	ret = int_io_interrupt_handler(vector, levelTriggered);
+	int_io_interrupt_handler(vector, levelTriggered);
 
 	if (levelTriggered)
 		sCurrentPIC->end_of_interrupt(vector);
 
-	if (ret == B_INVOKE_SCHEDULER || thread->cpu->invoke_scheduler) {
-		cpu_status state = disable_interrupts();
+	cpu_status state = disable_interrupts();
+	if (thread->cpu->invoke_scheduler) {
 		GRAB_THREAD_LOCK();
-
-		if (ret == B_INVOKE_SCHEDULER || !thread->cpu->invoke_scheduler_if_idle
-			|| thread->priority == B_IDLE_PRIORITY) {
-			scheduler_reschedule();
-		}
-
+		scheduler_reschedule();
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
 	} else if (thread->post_interrupt_callback != NULL) {
+		restore_interrupts(state);
 		void (*callback)(void*) = thread->post_interrupt_callback;
 		void* data = thread->post_interrupt_data;
 

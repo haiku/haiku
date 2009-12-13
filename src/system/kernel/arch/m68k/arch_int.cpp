@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku Inc. All rights reserved.
+ * Copyright 2003-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -167,7 +167,6 @@ void
 m68k_exception_entry(struct iframe *iframe)
 {
 	int vector = iframe->cpu.vector >> 2;
-	int ret = B_HANDLED_INTERRUPT;
 	bool hardwareInterrupt = false;
 
 	if (vector != -1) {
@@ -234,7 +233,7 @@ m68k_exception_entry(struct iframe *iframe)
 
 			addr_t newip;
 
-			ret = vm_page_fault(fault_address(iframe), iframe->cpu.pc,
+			vm_page_fault(fault_address(iframe), iframe->cpu.pc,
 				fault_was_write(iframe), // store or load
 				iframe->cpu.sr & SR_S, // was the system in user or supervisor
 				&newip);
@@ -261,18 +260,17 @@ m68k_exception_entry(struct iframe *iframe)
 			if (!sPIC) {
 				panic("m68k_exception_entry(): external interrupt although we "
 					"don't have a PIC driver!");
-				ret = B_HANDLED_INTERRUPT;
 				break;
 			}
 #endif
 			M68KPlatform::Default()->AcknowledgeIOInterrupt(vector);
 
 dprintf("handling I/O interrupts...\n");
-			ret = int_io_interrupt_handler(vector, true);
+			int_io_interrupt_handler(vector, true);
 #if 0
 			while ((irq = sPIC->acknowledge_io_interrupt(sPICCookie)) >= 0) {
 // TODO: correctly pass level-triggered vs. edge-triggered to the handler!
-				ret = int_io_interrupt_handler(irq, true);
+				int_io_interrupt_handler(irq, true);
 			}
 #endif
 dprintf("handling I/O interrupts done\n");
@@ -285,7 +283,7 @@ dprintf("handling I/O interrupts done\n");
 			// vectors >= 64 are user defined vectors, used for IRQ
 			if (vector >= 64) {
 				if (M68KPlatform::Default()->AcknowledgeIOInterrupt(vector)) {
-					ret = int_io_interrupt_handler(vector, true);
+					int_io_interrupt_handler(vector, true);
 					break;
 				}
 			}
@@ -294,13 +292,14 @@ dprintf("handling I/O interrupts done\n");
 			panic("unhandled exception type\n");
 	}
 
-	if (ret == B_INVOKE_SCHEDULER) {
-		int state = disable_interrupts();
+	int state = disable_interrupts();
+	if (thread->cpu->invoke_scheduler) {
 		GRAB_THREAD_LOCK();
 		scheduler_reschedule();
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
 	} else if (hardwareInterrupt && thread->post_interrupt_callback != NULL) {
+		restore_interrupts(state);
 		void (*callback)(void*) = thread->post_interrupt_callback;
 		void* data = thread->post_interrupt_data;
 

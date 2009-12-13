@@ -120,17 +120,9 @@ select_cpu(int32 currentCPU, struct thread* thread, int32& targetPriority)
 /*!	Enqueues the thread into the run queue.
 	Note: thread lock must be held when entering this function
 */
-static bool
+static void
 enqueue_in_run_queue(struct thread *thread)
 {
-	if (thread->state == B_THREAD_RUNNING) {
-		// The thread is currently running (on another CPU) and we cannot
-		// insert it into the run queue. Set the next state to ready so the
-		// thread is inserted into the run queue on the next reschedule.
-		thread->next_state = B_THREAD_READY;
-		return false;
-	}
-
 	thread->state = thread->next_state = B_THREAD_READY;
 
 	struct thread *curr, *prev;
@@ -153,7 +145,6 @@ enqueue_in_run_queue(struct thread *thread)
 
 	thread->next_priority = thread->priority;
 
-	bool reschedule = false;
 	if (thread->priority != B_IDLE_PRIORITY) {
 		// Select a CPU for the thread to run on. It's not certain that the
 		// thread will actually run on it, but we will notify the CPU to
@@ -167,7 +158,8 @@ enqueue_in_run_queue(struct thread *thread)
 		// reschedule.
 		if (thread->priority > targetPriority) {
 			if (targetCPU == currentCPU) {
-				reschedule = true;
+				gCPU[targetCPU].invoke_scheduler = true;
+				gCPU[targetCPU].invoke_scheduler_if_idle = false;
 			} else {
 				if (targetPriority == B_IDLE_PRIORITY) {
 					smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
@@ -183,8 +175,6 @@ enqueue_in_run_queue(struct thread *thread)
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
-
-	return reschedule;
 }
 
 
@@ -260,12 +250,12 @@ context_switch(struct thread *fromThread, struct thread *toThread)
 static int32
 reschedule_event(timer *unused)
 {
-	// this function is called as a result of the timer event set by the
-	// scheduler returning this causes a reschedule on the timer event
+	// This function is called as a result of the timer event set by the
+	// scheduler. Make sure the reschedule() is invoked.
 	thread_get_current_thread()->cpu->invoke_scheduler = true;
 	thread_get_current_thread()->cpu->invoke_scheduler_if_idle = false;
 	thread_get_current_thread()->cpu->preempted = 1;
-	return B_INVOKE_SCHEDULER;
+	return B_HANDLED_INTERRUPT;
 }
 
 
@@ -278,9 +268,18 @@ reschedule(void)
 	struct thread *oldThread = thread_get_current_thread();
 	struct thread *nextThread, *prevThread;
 
-	TRACE(("reschedule(): cpu %ld, cur_thread = %ld\n", smp_get_current_cpu(), thread_get_current_thread()->id));
+	// check whether we're only supposed to reschedule, if the current thread
+	// is idle
+	if (oldThread->cpu->invoke_scheduler) {
+		oldThread->cpu->invoke_scheduler = false;
+		if (oldThread->cpu->invoke_scheduler_if_idle
+			&& oldThread->priority != B_IDLE_PRIORITY) {
+			oldThread->cpu->invoke_scheduler_if_idle = false;
+			return;
+		}
+	}
 
-	oldThread->cpu->invoke_scheduler = false;
+	TRACE(("reschedule(): cpu %ld, cur_thread = %ld\n", smp_get_current_cpu(), thread_get_current_thread()->id));
 
 	oldThread->state = oldThread->next_state;
 	switch (oldThread->next_state) {

@@ -7,7 +7,10 @@
 #define KERNEL_SCHEDULER_H
 
 
-#include <SupportDefs.h>
+#include <cpu.h>
+#include <int.h>
+#include <smp.h>
+#include <thread_types.h>
 
 
 struct scheduling_analysis;
@@ -16,7 +19,7 @@ struct SchedulerListener;
 
 
 struct scheduler_ops {
-	bool (*enqueue_in_run_queue)(struct thread* thread);
+	void (*enqueue_in_run_queue)(struct thread* thread);
 	void (*reschedule)(void);
 	void (*set_thread_priority)(struct thread* thread, int32 priority);
 	// called when the thread structure is first created -
@@ -64,5 +67,33 @@ status_t _user_analyze_scheduling(bigtime_t from, bigtime_t until, void* buffer,
 #ifdef __cplusplus
 }
 #endif
+
+
+/*!	Reschedules, if necessary.
+	The thread spinlock must be held.
+*/
+static inline void
+scheduler_reschedule_if_necessary_locked()
+{
+	if (gCPU[smp_get_current_cpu()].invoke_scheduler)
+		scheduler_reschedule();
+}
+
+
+/*!	Reschedules, if necessary.
+	Is a no-op, if interrupts are disabled.
+*/
+static inline void
+scheduler_reschedule_if_necessary()
+{
+	if (are_interrupts_enabled()) {
+		cpu_status state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+		scheduler_reschedule_if_necessary_locked();
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+	}
+}
+
 
 #endif /* KERNEL_SCHEDULER_H */

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -2269,10 +2270,7 @@ thread_block_timeout(timer* timer)
 	// easy.
 
 	struct thread* thread = (struct thread*)timer->user_data;
-	// the scheduler will tell us whether to reschedule or not via
-	// thread_unblock_locked's return
-	if (thread_unblock_locked(thread, B_TIMED_OUT))
-		return B_INVOKE_SCHEDULER;
+	thread_unblock_locked(thread, B_TIMED_OUT);
 
 	return B_HANDLED_INTERRUPT;
 }
@@ -2286,15 +2284,14 @@ thread_block()
 }
 
 
-bool
+void
 thread_unblock(status_t threadID, status_t status)
 {
 	InterruptsSpinLocker _(gThreadSpinlock);
 
 	struct thread* thread = thread_get_thread_struct_locked(threadID);
-	if (thread == NULL)
-		return false;
-	return thread_unblock_locked(thread, status);
+	if (thread != NULL)
+		thread_unblock_locked(thread, status);
 }
 
 
@@ -2989,7 +2986,9 @@ status_t
 _user_unblock_thread(thread_id threadID, status_t status)
 {
 	InterruptsSpinLocker locker(gThreadSpinlock);
-	return user_unblock_thread(threadID, status);
+	status_t error = user_unblock_thread(threadID, status);
+	scheduler_reschedule_if_necessary_locked();
+	return error;
 }
 
 
@@ -3009,8 +3008,11 @@ _user_unblock_threads(thread_id* userThreads, uint32 count, status_t status)
 	if (user_memcpy(threads, userThreads, count * sizeof(thread_id)) != B_OK)
 		return B_BAD_ADDRESS;
 
+	InterruptsSpinLocker locker(gThreadSpinlock);
 	for (uint32 i = 0; i < count; i++)
 		user_unblock_thread(threads[i], status);
+
+	scheduler_reschedule_if_necessary_locked();
 
 	return B_OK;
 }

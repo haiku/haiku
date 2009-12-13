@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -97,7 +98,7 @@ status_t thread_block();
 status_t thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout);
 status_t thread_block_with_timeout_locked(uint32 timeoutFlags,
 			bigtime_t timeout);
-bool thread_unblock(status_t threadID, status_t status);
+void thread_unblock(status_t threadID, status_t status);
 
 // used in syscalls.c
 status_t _user_set_thread_priority(thread_id thread, int32 newPriority);
@@ -188,17 +189,15 @@ thread_block_locked(struct thread* thread)
 }
 
 
-static inline bool
+static inline void
 thread_unblock_locked(struct thread* thread, status_t status)
 {
 	if (atomic_test_and_set(&thread->wait.status, status, 1) != 1)
-		return false;
+		return;
 
 	// wake up the thread, if it is sleeping
 	if (thread->state == B_THREAD_WAITING)
-		return scheduler_enqueue_in_run_queue(thread);
-
-	return false;
+		scheduler_enqueue_in_run_queue(thread);
 }
 
 

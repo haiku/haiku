@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -11,30 +11,32 @@
 /*! Semaphore code */
 
 
+#include <sem.h>
+
+#include <stdlib.h>
+#include <string.h>
+
 #include <OS.h>
 
-#include <sem.h>
-#include <kernel.h>
-#include <kscheduler.h>
-#include <ksignal.h>
-#include <smp.h>
-#include <int.h>
 #include <arch/int.h>
+#include <boot/kernel_args.h>
+#include <cpu.h>
 #include <debug.h>
+#include <int.h>
+#include <kernel.h>
+#include <ksignal.h>
+#include <kscheduler.h>
 #include <listeners.h>
 #include <scheduling_analysis.h>
-#include <thread.h>
+#include <smp.h>
+#include <syscall_restart.h>
 #include <team.h>
+#include <thread.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <vfs.h>
 #include <vm/vm_page.h>
-#include <boot/kernel_args.h>
-#include <syscall_restart.h>
 #include <wait_for_objects.h>
-
-#include <string.h>
-#include <stdlib.h>
 
 #include "kernel_debug_config.h"
 
@@ -383,6 +385,10 @@ delete_sem_internal(sem_id id, bool checkPermission)
 	char* name;
 	uninit_sem_locked(sSems[slot], &name);
 
+	GRAB_THREAD_LOCK();
+	scheduler_reschedule_if_necessary_locked();
+	RELEASE_THREAD_LOCK();
+
 	restore_interrupts(state);
 
 	free(name);
@@ -709,6 +715,8 @@ sem_delete_owned_sems(struct team* team)
 
 		free(name);
 	}
+
+	scheduler_reschedule_if_necessary();
 }
 
 
@@ -977,8 +985,6 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		flags |= B_RELEASE_IF_WAITING_ONLY;
 	}
 
-	bool reschedule = false;
-
 	SpinLocker threadLocker(gThreadSpinlock);
 
 	while (count > 0) {
@@ -1000,7 +1006,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 				break;
 			}
 
-			reschedule |= thread_unblock_locked(entry->thread, B_OK);
+			thread_unblock_locked(entry->thread, B_OK);
 
 			int delta = min_c(count, entry->count);
 			sSems[slot].u.used.count += delta;
@@ -1023,10 +1029,10 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 
 	// If we've unblocked another thread reschedule, if we've not explicitly
 	// been told not to.
-	if (reschedule && (flags & B_DO_NOT_RESCHEDULE) == 0) {
+	if ((flags & B_DO_NOT_RESCHEDULE) == 0) {
 		semLocker.Unlock();
 		threadLocker.Lock();
-		scheduler_reschedule();
+		scheduler_reschedule_if_necessary_locked();
 	}
 
 	return B_OK;

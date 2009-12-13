@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku. All rights reserved.
+ * Copyright 2002-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -77,7 +77,6 @@ timer_interrupt()
 	spinlock *spinlock;
 	per_cpu_timer_data& cpuData = sPerCPU[smp_get_current_cpu()];
 	int32 rc = B_HANDLED_INTERRUPT;
-	bool invokeScheduler = false;
 
 	TRACE(("timer_interrupt: time %lld, cpu %ld\n", system_time(),
 		smp_get_current_cpu()));
@@ -122,9 +121,6 @@ timer_interrupt()
 
 			if ((mode & B_TIMER_ACQUIRE_THREAD_LOCK) != 0)
 				RELEASE_THREAD_LOCK();
-
-			if (rc == B_INVOKE_SCHEDULER)
-				invokeScheduler = true;
 		}
 
 		cpuData.current_event_in_progress = 0;
@@ -157,7 +153,7 @@ timer_interrupt()
 
 	release_spinlock(spinlock);
 
-	return invokeScheduler ? B_INVOKE_SCHEDULER : rc;
+	return rc;
 }
 
 

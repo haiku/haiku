@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku Inc. All rights reserved.
+ * Copyright 2003-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -96,8 +96,6 @@ extern "C" void ppc_exception_entry(int vector, struct iframe *iframe);
 void
 ppc_exception_entry(int vector, struct iframe *iframe)
 {
-	int ret = B_HANDLED_INTERRUPT;
-
 	if (vector != 0x900) {
 		dprintf("ppc_exception_entry: time %lld vector 0x%x, iframe %p, "
 			"srr0: %p\n", system_time(), vector, iframe, (void*)iframe->srr0);
@@ -154,7 +152,7 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 
 			addr_t newip;
 
-			ret = vm_page_fault(iframe->dar, iframe->srr0,
+			vm_page_fault(iframe->dar, iframe->srr0,
 				iframe->dsisr & (1 << 25), // store or load
 				iframe->srr1 & (1 << 14), // was the system in user or supervisor
 				&newip);
@@ -171,7 +169,6 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 			if (!sPIC) {
 				panic("ppc_exception_entry(): external interrupt although we "
 					"don't have a PIC driver!");
-				ret = B_HANDLED_INTERRUPT;
 				break;
 			}
 
@@ -179,7 +176,7 @@ dprintf("handling I/O interrupts...\n");
 			int irq;
 			while ((irq = sPIC->acknowledge_io_interrupt(sPICCookie)) >= 0) {
 // TODO: correctly pass level-triggered vs. edge-triggered to the handler!
-				ret = int_io_interrupt_handler(irq, true);
+				int_io_interrupt_handler(irq, true);
 			}
 dprintf("handling I/O interrupts done\n");
 			break;
@@ -195,7 +192,7 @@ dprintf("handling I/O interrupts done\n");
 			panic("FP unavailable exception: unimplemented\n");
 			break;
 		case 0x900: // decrementer exception
-			ret = timer_interrupt();
+			timer_interrupt();
 			break;
 		case 0xc00: // system call
 			panic("system call exception: unimplemented\n");
@@ -235,12 +232,21 @@ dprintf("handling I/O interrupts done\n");
 			panic("unhandled exception type\n");
 	}
 
-	if (ret == B_INVOKE_SCHEDULER) {
-		int state = disable_interrupts();
+	cpu_status state = disable_interrupts();
+	if (thread->cpu->invoke_scheduler) {
 		GRAB_THREAD_LOCK();
 		scheduler_reschedule();
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
+	} else if (thread->post_interrupt_callback != NULL) {
+		restore_interrupts(state);
+		void (*callback)(void*) = thread->post_interrupt_callback;
+		void* data = thread->post_interrupt_data;
+
+		thread->post_interrupt_callback = NULL;
+		thread->post_interrupt_data = NULL;
+
+		callback(data);
 	}
 
 	// pop iframe

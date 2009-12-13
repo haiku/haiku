@@ -88,7 +88,7 @@ dump_int_statistics(int argc, char **argv)
 			if (error == B_OK && exactMatch) {
 				if (strchr(imageName, '/') != NULL)
 					imageName = strrchr(imageName, '/') + 1;
-				
+
 				int length = 4 + strlen(imageName);
 				kprintf("   %s:%-*s (%p)", imageName, 45 - length, symbol,
 					io->func);
@@ -101,7 +101,7 @@ dump_int_statistics(int argc, char **argv)
 			else
 				kprintf("%8lld\n", io->handled_count);
 		}
-		
+
 		kprintf("\n");
 	}
 	return 0;
@@ -173,7 +173,7 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 {
 	int status = B_UNHANDLED_INTERRUPT;
 	struct io_handler *io;
-	bool invokeScheduler = false, handled = false;
+	bool handled = false;
 
 	if (!sVectors[vector].no_lock_vector)
 		acquire_spinlock(&sVectors[vector].vector_lock);
@@ -194,7 +194,7 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	// For edge-triggered interrupts, however, we always need to call
 	// all handlers, as multiple interrupts cannot be identified. We
 	// still make sure the return code of this function will issue
-	// whatever the driver thought would be useful (ie. B_INVOKE_SCHEDULER)
+	// whatever the driver thought would be useful.
 
 	for (io = sVectors[vector].handler_list; io != NULL; io = io->next) {
 		status = io->func(io->data);
@@ -206,15 +206,13 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 		if (levelTriggered && status != B_UNHANDLED_INTERRUPT)
 			break;
 
-		if (status == B_HANDLED_INTERRUPT)
+		if (status == B_HANDLED_INTERRUPT || status == B_INVOKE_SCHEDULER)
 			handled = true;
-		else if (status == B_INVOKE_SCHEDULER)
-			invokeScheduler = true;
 	}
 
 #if DEBUG_INTERRUPTS
 	sVectors[vector].trigger_count++;
-	if (status != B_UNHANDLED_INTERRUPT || handled || invokeScheduler) {
+	if (status != B_UNHANDLED_INTERRUPT || handled) {
 		sVectors[vector].handled_count++;
 	} else {
 		sVectors[vector].unhandled_count++;
@@ -260,8 +258,6 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 
 	// edge triggered return value
 
-	if (invokeScheduler)
-		return B_INVOKE_SCHEDULER;
 	if (handled)
 		return B_HANDLED_INTERRUPT;
 

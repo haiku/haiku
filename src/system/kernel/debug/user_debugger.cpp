@@ -2892,6 +2892,7 @@ _user_debug_thread(thread_id threadID)
 					// about to acquire a semaphore (before
 					// thread_prepare_to_block()), we won't interrupt it.
 					// Maybe we should rather send a signal (SIGTRAP).
+				scheduler_reschedule_if_necessary_locked();
 				break;
 		}
 	}
