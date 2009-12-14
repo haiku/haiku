@@ -56,6 +56,8 @@ public:
 			status_t		GetMonitorInfo(monitor_info& info,
 								float* _diagonalInches = NULL);
 
+			status_t		GetDeviceInfo(accelerant_device_info& info);
+
 			screen_mode		ModeAt(int32 index);
 			int32			CountModes();
 

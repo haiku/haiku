@@ -102,12 +102,15 @@ private:
 
 			BButton*		fBackgroundsButton;
 
-			ScreenMode		fScreenMode, fTempScreenMode;
+			ScreenMode		fScreenMode;
+			ScreenMode		fUndoScreenMode;
 				// screen modes for all workspaces
-			uint32			fOriginalWorkspacesColumns;
-			uint32			fOriginalWorkspacesRows;
+
 			screen_mode		fActive, fSelected, fOriginal;
 				// screen modes for the current workspace
+
+			uint32			fOriginalWorkspacesColumns;
+			uint32			fOriginalWorkspacesRows;
 			bool			fModified;
 };
 

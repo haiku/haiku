@@ -165,7 +165,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		B_ALL_WORKSPACES),
 	fBootWorkspaceApplied(false),
 	fScreenMode(this),
-	fTempScreenMode(this),
+	fUndoScreenMode(this),
 	fModified(false)
 {
 	BScreen screen(this);
@@ -1034,7 +1034,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 		}
 
 		case BUTTON_UNDO_MSG:
-			fTempScreenMode.Revert();
+			fUndoScreenMode.Revert();
 			_UpdateActiveMode();
 			break;
 
@@ -1216,9 +1216,26 @@ ScreenWindow::_UpdateMonitor()
 		if (info.produced.week != 0 && info.produced.year != 0
 			&& length < sizeof(text)) {
 			length += snprintf(text + length, sizeof(text) - length,
-				"(%u/%u)", info.produced.week, info.produced.year);
+				" (%u/%u)", info.produced.week, info.produced.year);
  		}
 	}
+
+	// Add info about the graphics device
+
+	accelerant_device_info deviceInfo;
+	if (fScreenMode.GetDeviceInfo(deviceInfo) == B_OK
+		&& length < sizeof(text)) {
+		if (deviceInfo.name[0] && deviceInfo.chipset[0]) {
+			length += snprintf(text + length, sizeof(text) - length,
+				"%s%s (%s)", length != 0 ? "\n\n" : "", deviceInfo.name,
+				deviceInfo.chipset);
+		} else if (deviceInfo.name[0] || deviceInfo.chipset[0]) {
+			length += snprintf(text + length, sizeof(text) - length,
+				"%s%s", length != 0 ? "\n\n" : "", deviceInfo.name[0]
+					? deviceInfo.name : deviceInfo.chipset);
+		}
+	}
+
 	if (text[0])
 		fMonitorView->SetToolTip(text);
 }
@@ -1237,7 +1254,8 @@ void
 ScreenWindow::_Apply()
 {
 	// make checkpoint, so we can undo these changes
-	fTempScreenMode.UpdateOriginalModes();
+	fUndoScreenMode.UpdateOriginalModes();
+
 	status_t status = fScreenMode.Set(fSelected);
 	if (status == B_OK) {
 		// use the mode that has eventually been set and

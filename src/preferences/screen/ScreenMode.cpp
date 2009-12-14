@@ -533,6 +533,14 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 }
 
 
+status_t
+ScreenMode::GetDeviceInfo(accelerant_device_info& info)
+{
+	BScreen screen(fWindow);
+	return screen.GetDeviceInfo(&info);
+}
+
+
 screen_mode
 ScreenMode::ModeAt(int32 index)
 {
