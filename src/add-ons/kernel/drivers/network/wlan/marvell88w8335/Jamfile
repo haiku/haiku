@@ -18,6 +18,7 @@ KernelAddon marvell88w8335 :
 	if_malo_pci.c
 	if_malo.c
 	if_malohal.c
+	glue.c
 	:
 	libfreebsd_wlan.a
 	libfreebsd_network.a
