@@ -1179,45 +1179,46 @@ ScreenWindow::_UpdateMonitor()
 	monitor_info info;
 	float diagonalInches;
 	status_t status = fScreenMode.GetMonitorInfo(info, &diagonalInches);
+	if (status == B_OK) {
+		char text[512];
+		snprintf(text, sizeof(text), "%s%s%s %g\"", info.vendor,
+			info.name[0] ? " " : "", info.name, diagonalInches);
 
-	if (status != B_OK) {
+		fMonitorInfo->SetText(text);
+
+		if (fMonitorInfo->IsHidden())
+			fMonitorInfo->Show();
+	} else {
 		if (!fMonitorInfo->IsHidden())
 			fMonitorInfo->Hide();
-		return;
 	}
 
 	char text[512];
-	snprintf(text, sizeof(text), "%s%s%s %g\"", info.vendor,
-		info.name[0] ? " " : "", info.name, diagonalInches);
-
-	fMonitorInfo->SetText(text);
-
-	if (fMonitorInfo->IsHidden())
-		fMonitorInfo->Show();
-
 	size_t length = 0;
 	text[0] = 0;
 
-	if (info.min_horizontal_frequency != 0
-		&& info.min_vertical_frequency != 0
-		&& info.max_pixel_clock != 0) {
-		length = snprintf(text, sizeof(text),
-			"Horizonal Frequency:\t%lu - %lu kHz\n"
-			"Vertical Frequency:\t%lu - %lu Hz\n\n"
-			"Maximum Pixel Clock:\t%g MHz",
-			info.min_horizontal_frequency, info.max_horizontal_frequency,
-			info.min_vertical_frequency, info.max_vertical_frequency,
-			info.max_pixel_clock / 1000.0);
-	}
-	if (info.serial_number[0] && length < sizeof(text)) {
-		length += snprintf(text + length, sizeof(text) - length,
-			"%sSerial no.: %s", length ? "\n\n" : "",
-			info.serial_number);
-		if (info.produced.week != 0 && info.produced.year != 0
-			&& length < sizeof(text)) {
+	if (status == B_OK) {
+		if (info.min_horizontal_frequency != 0
+			&& info.min_vertical_frequency != 0
+			&& info.max_pixel_clock != 0) {
+			length = snprintf(text, sizeof(text),
+				"Horizonal Frequency:\t%lu - %lu kHz\n"
+				"Vertical Frequency:\t%lu - %lu Hz\n\n"
+				"Maximum Pixel Clock:\t%g MHz",
+				info.min_horizontal_frequency, info.max_horizontal_frequency,
+				info.min_vertical_frequency, info.max_vertical_frequency,
+				info.max_pixel_clock / 1000.0);
+		}
+		if (info.serial_number[0] && length < sizeof(text)) {
 			length += snprintf(text + length, sizeof(text) - length,
-				" (%u/%u)", info.produced.week, info.produced.year);
- 		}
+				"%sSerial no.: %s", length ? "\n\n" : "",
+				info.serial_number);
+			if (info.produced.week != 0 && info.produced.year != 0
+				&& length < sizeof(text)) {
+				length += snprintf(text + length, sizeof(text) - length,
+					" (%u/%u)", info.produced.week, info.produced.year);
+	 		}
+		}
 	}
 
 	// Add info about the graphics device
