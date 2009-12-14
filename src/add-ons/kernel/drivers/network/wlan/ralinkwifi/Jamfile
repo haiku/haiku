@@ -18,6 +18,7 @@ KernelAddon ralinkwifi :
 	if_ral_pci.c
 	rt2560.c
 	rt2661.c
+	glue.c
 	:
 	libfreebsd_wlan.a
 	libfreebsd_network.a
