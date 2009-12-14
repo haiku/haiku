@@ -5,7 +5,6 @@
 
 
 #include <sys/bus.h>
-#include <sys/kernel.h>
 
 
 HAIKU_FBSD_WLAN_DRIVER_GLUE(marvell8335, malo, pci)
