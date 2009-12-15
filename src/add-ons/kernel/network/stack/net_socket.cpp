@@ -266,17 +266,17 @@ process_ancillary_data(net_socket* socket,
 		messageHeader->msg_controllen = 0;
 		return B_OK;
 	}
-	
+
 	if (socket->first_info->process_ancillary_data_no_container == NULL)
 		return EOPNOTSUPP;
-	
+
 	bytesWritten = socket->first_info->process_ancillary_data_no_container(
 		socket->first_protocol, buffer, dataBuffer,
 		messageHeader->msg_controllen);
 	if (bytesWritten < 0)
 		return bytesWritten;
 	messageHeader->msg_controllen = bytesWritten;
-	
+
 	return B_OK;
 }
 
@@ -975,6 +975,7 @@ socket_bind(net_socket* socket, const struct sockaddr* address,
 	}
 
 	memcpy(&socket->address, address, sizeof(sockaddr));
+	socket->address.ss_len = sizeof(sockaddr_storage);
 
 	status_t status = socket->first_info->bind(socket->first_protocol,
 		(sockaddr*)address);
@@ -1201,7 +1202,7 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 				= gNetBufferModule.get_ancillary_data(buffer);
 			if (container != NULL)
 				status = process_ancillary_data(socket, container, header);
-			else 
+			else
 				status = process_ancillary_data(socket, buffer, header);
 			if (status != B_OK) {
 				gNetBufferModule.free(buffer);
@@ -1424,6 +1425,7 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 		buffer->flags = flags;
 		memcpy(buffer->source, &socket->address, socket->address.ss_len);
 		memcpy(buffer->destination, address, addressLength);
+		buffer->destination->sa_len = addressLength;
 
 		if (status == B_OK) {
 			status = socket->first_info->send_data(socket->first_protocol,
