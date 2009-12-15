@@ -34,6 +34,7 @@ elf_init()
 	void *settings = load_driver_settings("kernel");
 	sLoadElfSymbols = !get_driver_boolean_parameter(settings, "load_symbols",
 		false, false);
+	unload_driver_settings(settings);
 }
 
 
