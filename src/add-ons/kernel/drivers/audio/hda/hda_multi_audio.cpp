@@ -16,7 +16,7 @@
 #	undef TRACE
 #endif
 
-#define TRACE_MULTI_AUDIO
+//#define TRACE_MULTI_AUDIO
 #ifdef TRACE_MULTI_AUDIO
 #	define TRACE(a...) dprintf("\33[34mhda:\33[0m " a)
 #else
@@ -193,7 +193,7 @@ set_global_format(hda_audio_group* audioGroup, multi_format_info* data)
 }
 
 
-static enum strind_id 
+static enum strind_id
 hda_find_multi_string(hda_widget& widget)
 {
 	switch (CONF_DEFAULT_DEVICE(widget.d.pin.config)) {
@@ -272,7 +272,7 @@ hda_create_group_control(hda_multi *multi, uint32 *index, int32 parent,
 	multi->controls[i].mix_control.string = string;
 	if (name)
 		strcpy(multi->controls[i].mix_control.name, name);
-	
+
 	return multi->controls[i].mix_control.id;
 }
 
@@ -282,7 +282,7 @@ hda_create_channel_control(hda_multi *multi, uint32 *index, int32 parent, int32 
 	hda_widget& widget, bool input, uint32 capabilities, int32 inputIndex, bool &gain, bool& mute) {
 	uint32 i = *index, id;
 	hda_multi_mixer_control control;
-	
+
 	control.nid = widget.node_id;
 	control.input = input;
 	control.mute = 0;
@@ -301,7 +301,7 @@ hda_create_channel_control(hda_multi *multi, uint32 *index, int32 parent, int32 
 		TRACE("control nid %ld mute\n", control.nid);
 		mute = false;
 	}
-		
+
 	if (gain && AMP_CAP_NUM_STEPS(capabilities) >= 1) {
 		control.mix_control.gain.granularity = AMP_CAP_STEP_SIZE(capabilities);
 		control.mix_control.gain.min_gain = (0.0 - AMP_CAP_OFFSET(capabilities))
@@ -316,8 +316,8 @@ hda_create_channel_control(hda_multi *multi, uint32 *index, int32 parent, int32 
 		strcpy(control.mix_control.name, "Gain");
 		multi->controls[i++] = control;
 		id = control.mix_control.id;
-				
-		// second channel	
+
+		// second channel
 		control.mix_control.id = MULTI_CONTROL_FIRSTID + i;
 		control.mix_control.master = id;
 		multi->controls[i++] = control;
@@ -325,7 +325,7 @@ hda_create_channel_control(hda_multi *multi, uint32 *index, int32 parent, int32 
 			control.mix_control.gain.min_gain, control.mix_control.gain.max_gain);
 		gain = false;
 	}
-	
+
 	*index = i;
 }
 
@@ -335,7 +335,7 @@ hda_create_mux_control(hda_multi *multi, uint32 *index, int32 parent, hda_widget
 	uint32 i = *index, parent2;
 	hda_multi_mixer_control control;
 	hda_audio_group *audioGroup = multi->group;
-	
+
 	control.nid = widget.node_id;
 	control.input = true;
 	control.mute = 0;
@@ -350,7 +350,7 @@ hda_create_mux_control(hda_multi *multi, uint32 *index, int32 parent, hda_widget
 	strcpy(multi->controls[i].mix_control.name, "");
 	i++;
 	parent2 = control.mix_control.id;
-	
+
 	for (uint32 j = 0; j < widget.num_inputs; j++) {
 		hda_widget *input = hda_audio_group_get_widget(audioGroup, widget.inputs[j]);
 		if (input->type != WT_PIN_COMPLEX)
@@ -365,7 +365,7 @@ hda_create_mux_control(hda_multi *multi, uint32 *index, int32 parent, hda_widget
 		strcpy(multi->controls[i].mix_control.name, hda_find_multi_custom_string(*input));
 		i++;
 	}
-		
+
 	*index = i;
 }
 
@@ -385,28 +385,28 @@ hda_create_control_for_complex(hda_multi *multi, uint32 *index, uint32 parent,
 		default:
 			return;
 	}
-	
+
 	if (widget.flags & WIDGET_FLAG_WIDGET_PATH)
 		return;
-	
+
 	TRACE("  create widget nid %lu\n", widget.node_id);
-	hda_create_channel_control(multi, index, parent, 0, 
+	hda_create_channel_control(multi, index, parent, 0,
 		widget, false, widget.capabilities.output_amplifier, 0, gain, mute);
-	
+
 	if (!gain && !mute) {
 		widget.flags |= WIDGET_FLAG_WIDGET_PATH;
 		return;
 	}
 
 	if (widget.type & WT_AUDIO_MIXER) {
-		hda_create_channel_control(multi, index, parent, 0, 
+		hda_create_channel_control(multi, index, parent, 0,
 			widget, true, widget.capabilities.input_amplifier, 0, gain, mute);
 		if (!gain && !mute) {
 			widget.flags |= WIDGET_FLAG_WIDGET_PATH;
 			return;
 		}
 	}
-	
+
 	if ((widget.type & WT_AUDIO_OUTPUT) == 0
 		&& widget.num_inputs > 0) {
 		hda_widget &child = * hda_audio_group_get_widget(audioGroup, widget.inputs[widget.active_input]);
@@ -419,10 +419,10 @@ hda_create_control_for_complex(hda_multi *multi, uint32 *index, uint32 parent,
 
 static status_t
 hda_create_controls_list(hda_multi *multi)
-{				
+{
 	uint32 index = 0, parent, parent2;
 	hda_audio_group *audioGroup = multi->group;
-			
+
 	parent = hda_create_group_control(multi, &index, 0, S_OUTPUT, NULL);
 
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
@@ -437,7 +437,7 @@ hda_create_controls_list(hda_multi *multi)
 
 		TRACE("create complex nid %lu\n", complex.node_id);
 
-		parent2 = hda_create_group_control(multi, &index, 
+		parent2 = hda_create_group_control(multi, &index,
 			parent, S_null, hda_find_multi_custom_string(complex));
 		bool gain = true, mute = true;
 
@@ -446,7 +446,7 @@ hda_create_controls_list(hda_multi *multi)
 
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		hda_widget& widget = audioGroup->widgets[i];
-		
+
 		if (widget.type != WT_AUDIO_MIXER)
 			continue;
 		if (widget.flags & WIDGET_FLAG_WIDGET_PATH)
@@ -455,7 +455,7 @@ hda_create_controls_list(hda_multi *multi)
 		TRACE("create widget nid %lu\n", widget.node_id);
 
 		if (AMP_CAP_NUM_STEPS(widget.capabilities.input_amplifier) >= 1) {
-			
+
 			for (uint32 j = 0; j < widget.num_inputs; j++) {
 				hda_widget *complex = hda_audio_group_get_widget(audioGroup, widget.inputs[j]);
 				if (complex->type != WT_PIN_COMPLEX)
@@ -465,17 +465,17 @@ hda_create_controls_list(hda_multi *multi)
 				if (complex->flags & WIDGET_FLAG_OUTPUT_PATH)
 					continue;
 				TRACE("  create widget input nid %lu\n", widget.inputs[j]);
-				parent2 = hda_create_group_control(multi, &index, 
+				parent2 = hda_create_group_control(multi, &index,
 					parent, S_null, hda_find_multi_custom_string(*complex));
 				bool gain = true, mute = true;
-				hda_create_channel_control(multi, &index, parent2, 0, 
+				hda_create_channel_control(multi, &index, parent2, 0,
 					widget, true, widget.capabilities.input_amplifier, j, gain, mute);
 			}
 		}
 
 		widget.flags |= WIDGET_FLAG_WIDGET_PATH;
 	}
-	
+
 	parent = hda_create_group_control(multi, &index, 0, S_INPUT, NULL);
 
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
@@ -483,24 +483,24 @@ hda_create_controls_list(hda_multi *multi)
 
 		if (widget.type != WT_AUDIO_INPUT)
 			continue;
-		
+
 		uint32 capabilities = widget.capabilities.input_amplifier;
 		if (AMP_CAP_NUM_STEPS(capabilities) < 1)
 			continue;
-		
-		parent2 = hda_create_group_control(multi, &index, 
+
+		parent2 = hda_create_group_control(multi, &index,
 			parent, hda_find_multi_string(widget), "Input");
 		bool gain = true, mute = true;
-		hda_create_channel_control(multi, &index, parent2, 0, 
+		hda_create_channel_control(multi, &index, parent2, 0,
 			widget, true, capabilities, 0, gain, mute);
-				
+
 		hda_widget *mixer = hda_audio_group_get_widget(audioGroup, widget.inputs[0]);
 		if (mixer->type != WT_AUDIO_MIXER && mixer->type != WT_AUDIO_SELECTOR)
 			continue;
 		TRACE("  create mixer nid %lu\n", mixer->node_id);
 		hda_create_mux_control(multi, &index, parent2, *mixer);
 	}
-	
+
 	multi->control_count = index;
 	TRACE("multi->control_count %lu\n", multi->control_count);
 	return B_OK;
@@ -513,13 +513,13 @@ list_mix_controls(hda_audio_group* audioGroup, multi_mix_control_info* mmci)
 	multi_mix_control *mmc = mmci->controls;
 	if (mmci->control_count < 24)
 		return B_ERROR;
-			
+
 	if (hda_create_controls_list(audioGroup->multi) < B_OK)
 		return B_ERROR;
 	for (uint32 i = 0; i < audioGroup->multi->control_count; i++) {
 		mmc[i] = audioGroup->multi->controls[i].mix_control;
 	}
-	
+
 	mmci->control_count = audioGroup->multi->control_count;
 	return B_OK;
 }
@@ -559,7 +559,7 @@ get_control_gain_mute(hda_audio_group* audioGroup, hda_multi_mixer_control *cont
 }
 
 
-static status_t 
+static status_t
 get_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 {
 	uint32 id;
@@ -571,7 +571,7 @@ get_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 			continue;
 		}
 		control = &audioGroup->multi->controls[id];
-	
+
 		if (control->mix_control.flags & (B_MULTI_MIX_GAIN | B_MULTI_MIX_ENABLE)) {
 			uint32 resp[2];
 			get_control_gain_mute(audioGroup, control, resp);
@@ -588,7 +588,7 @@ get_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 						* AMP_CAP_STEP_SIZE(control->capabilities);
 				TRACE("get_mix: %ld gain: %f (%ld)\n", control->nid, mmvi->values[i].gain, value);
 			}
-			
+
 		} else if (control->mix_control.flags & B_MIX_MUX_MIXER) {
 			hda_widget *mixer = hda_audio_group_get_widget(audioGroup, control->nid);
 			mmvi->values[i].mux = 0;
@@ -622,7 +622,7 @@ get_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 }
 
 
-static status_t 
+static status_t
 set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 {
 	uint32 id;
@@ -634,13 +634,13 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 			continue;
 		}
 		control = &audioGroup->multi->controls[id];
-					
+
 		if (control->mix_control.flags & B_MULTI_MIX_ENABLE) {
 			control->mute = (mmvi->values[i].enable ? AMP_MUTE : 0);
 			TRACE("set_mix: %ld mute: %lx\n", control->nid, control->mute);
 			uint32 resp[2];
 			get_control_gain_mute(audioGroup, control, resp);
-			
+
 			uint32 verb[2];
 			verb[0] = MAKE_VERB(audioGroup->codec->addr,
 				control->nid,
@@ -650,7 +650,7 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 				| AMP_SET_INPUT_INDEX(control->index)
 				| control->mute
 				| (resp[0] & AMP_GAIN_MASK));
-			TRACE("set_mix: sending verb to %ld: %lx %lx %x %lx\n", control->nid, 
+			TRACE("set_mix: sending verb to %ld: %lx %lx %x %lx\n", control->nid,
 				control->mute, resp[0] & AMP_GAIN_MASK, control->input,
 				(control->input ? AMP_SET_INPUT : AMP_SET_OUTPUT)
 				| AMP_SET_LEFT_CHANNEL
@@ -680,22 +680,22 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 						control2 = NULL;
 				}
 			}
-			
+
 			if (control->mix_control.master == MULTI_CONTROL_MASTERID)
 				control->gain = (uint32)(mmvi->values[i].gain / AMP_CAP_STEP_SIZE(control->capabilities)
 					+ AMP_CAP_OFFSET(control->capabilities));
-				
+
 			if (control2 && control2->mix_control.master != MULTI_CONTROL_MASTERID)
 				control2->gain = (uint32)(mmvi->values[i+1].gain / AMP_CAP_STEP_SIZE(control2->capabilities)
 					+ AMP_CAP_OFFSET(control2->capabilities));
-			TRACE("set_mix: %ld gain: %lx and %ld gain: %lx\n", 
+			TRACE("set_mix: %ld gain: %lx and %ld gain: %lx\n",
 				control->nid, control->gain, control2->nid, control2->gain);
 			uint32 resp[2];
 			get_control_gain_mute(audioGroup, control, resp);
 			control->mute = resp[0] & AMP_MUTE;
 			if (control2)
 				control2->mute = resp[1] & AMP_MUTE;
-			
+
 			uint32 verb[2];
 			verb[0] = MAKE_VERB(audioGroup->codec->addr,
 				control->nid,
@@ -705,7 +705,7 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 				| AMP_SET_INPUT_INDEX(control->index)
 				| (control->mute & AMP_MUTE)
 				| (control->gain & AMP_GAIN_MASK));
-			TRACE("set_mix: sending verb to %ld: %lx %lx %x %lx\n", control->nid, 
+			TRACE("set_mix: sending verb to %ld: %lx %lx %x %lx\n", control->nid,
 				control->mute, control->gain, control->input,
 				(control->input ? AMP_SET_INPUT : AMP_SET_OUTPUT)
 				| AMP_SET_LEFT_CHANNEL
@@ -725,7 +725,7 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 					control2->mute, control2->gain, control2->input);
 			}
 			hda_send_verbs(audioGroup->codec, verb, NULL, control2 ? 2 : 1);
-			
+
 			if (control2)
 				i++;
 		} else if (control->mix_control.flags & B_MIX_MUX_MIXER) {
@@ -742,7 +742,7 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 			}
 			if (hda_send_verbs(audioGroup->codec, verb, NULL, mixer->num_inputs) != B_OK)
 				dprintf("hda: Setting mixer %ld failed on widget %ld!\n",
-					mmvi->values[i].mux, control->nid);	
+					mmvi->values[i].mux, control->nid);
 		} else if (control->mix_control.flags & B_MIX_MUX_SELECTOR) {
 			uint32 verb = MAKE_VERB(audioGroup->codec->addr, control->nid,
 				VID_SET_CONNECTION_SELECT, mmvi->values[i].mux);
@@ -804,7 +804,7 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 
 	data->return_playback_buffers = data->request_playback_buffers;
 	data->return_playback_channels = data->request_playback_channels;
-	data->return_playback_buffer_size = data->request_playback_buffer_size;	
+	data->return_playback_buffer_size = data->request_playback_buffer_size;
 	data->return_record_buffers = data->request_record_buffers;
 	data->return_record_channels = data->request_record_channels;
 	data->return_record_buffer_size = data->request_record_buffer_size;
@@ -910,7 +910,7 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 	cpu_status status;
 	status_t err;
 	multi_buffer_info buffer_info;
-	
+
 	if (audioGroup->playback_stream == NULL)
 		return B_ERROR;
 
@@ -967,7 +967,7 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 
 #if 0
 	static int debug_buffers_exchanged = 0;
-	
+
 	debug_buffers_exchanged++;
 	if (((debug_buffers_exchanged % 100) == 1) && (debug_buffers_exchanged < 1111)) {
 		dprintf("%s: %d buffers processed\n", __func__, debug_buffers_exchanged);
@@ -987,7 +987,7 @@ buffer_force_stop(hda_audio_group* audioGroup)
 	if (audioGroup->record_stream != NULL) {
 		hda_stream_stop(audioGroup->codec->controller,
 			audioGroup->record_stream);
-	}	
+	}
 
 	return B_OK;
 }
@@ -1060,7 +1060,7 @@ multi_audio_control(void* cookie, uint32 op, void* arg, size_t len)
 			return get_mix(audioGroup, (multi_mix_value_info *)arg);
 		case B_MULTI_SET_MIX:
 			return set_mix(audioGroup, (multi_mix_value_info *)arg);
-		
+
 		case B_MULTI_GET_BUFFERS:
 			return get_buffers(audioGroup, (multi_buffer_list*)arg);
 
