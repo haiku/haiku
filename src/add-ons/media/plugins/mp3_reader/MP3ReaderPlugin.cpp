@@ -447,31 +447,35 @@ mp3Reader::GetNextChunk(void *cookie,
 	mp3data *data = reinterpret_cast<mp3data *>(cookie);
 	
 	int64 maxbytes = fDataSize - data->position;
+	mediaHeader->file_pos = data->position;
+
+#if 1
+	// TEST CODE to return a chunk of MAX_CHUNK_SIZE - 16 instead of frame size
+
+	if (maxbytes <= 0) {
+		return B_LAST_BUFFER_ERROR;
+	}
+
+	size_t size = min_c(MAX_CHUNK_SIZE - 16, maxbytes);
+	if (size != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer, size)) {
+		printf("mp3Reader::GetNextChunk: unexpected read error\n");
+		return B_ERROR;
+	}
+	data->position += size;
+	*chunkBuffer = data->chunkBuffer;
+	*chunkSize = size;
+
+	return B_OK;
+
+#else
 	if (maxbytes < 4)
 		return B_LAST_BUFFER_ERROR;
 
 	mediaHeader->start_time = (data->framePosition * 1000000) / data->frameRate;
-	mediaHeader->file_pos = data->position;
-
-#if 0
-// XXXX TEST
-	size_t size = min_c(MAX_CHUNK_SIZE - 16, maxbytes);
-	if (size != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer,size)) {
-		TRACE("mp3Reader::GetNextChunk: unexpected read error\n");
-		return B_ERROR;
-	}
-	data->position += size;
-	data->framePosition += data->framesPerFrame;
-	*chunkBuffer = data->chunkBuffer;
-	*chunkSize = size;
-	return B_OK;
-
-// XXXX TEST
-#else
 
 retry:
 	if (4 != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer, 4)) {
-		TRACE("mp3Reader::GetNextChunk: unexpected read error\n");
+		printf("mp3Reader::GetNextChunk: unexpected read error\n");
 		return B_ERROR;
 	}
 	
