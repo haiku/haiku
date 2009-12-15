@@ -60,6 +60,7 @@ load_kernel(stage2_args *args, Directory *volume)
 
 	dprintf("load kernel...\n");
 
+	elf_init();
 	status_t status = elf_load_image(fd, &gKernelArgs.kernel_image);
 
 	close(fd);

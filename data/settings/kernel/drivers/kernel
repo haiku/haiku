@@ -42,7 +42,7 @@
 	# Activates a hack that allows single-stepping under qemu
 	# to work.
 
-#load_symbols true
+load_symbols true
 	# load kernel and kernel add-on symbols, default is off
 
 #apm true

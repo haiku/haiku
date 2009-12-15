@@ -10,6 +10,7 @@
 #include <boot/vfs.h>
 
 
+extern void elf_init();
 extern status_t elf_load_image(Directory *directory, const char *path);
 extern status_t elf_load_image(int fd, preloaded_image *image);
 

@@ -9,6 +9,7 @@
 #include <boot/arch.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
+#include <driver_settings.h>
 #include <elf32.h>
 #include <kernel.h>
 
@@ -22,6 +23,17 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+
+static bool _loadElfSymbols = false;
+
+
+void
+elf_init() {
+	void *settings = load_driver_settings("kernel");
+	_loadElfSymbols = !get_driver_boolean_parameter(settings, "load_symbols",
+		false, false);
+}
 
 
 static status_t
@@ -370,8 +382,7 @@ elf_load_image(int fd, preloaded_image *image)
 	image->debug_symbols = NULL;
 	image->debug_string_table = NULL;
 
-	// ToDo: this should be enabled by kernel settings!
-	if (1)
+	if (_loadElfSymbols)
 		load_elf_symbol_table(fd, image);
 
 	free(programHeaders);
