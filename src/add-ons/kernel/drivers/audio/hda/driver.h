@@ -57,7 +57,7 @@ struct hda_codec;
 struct hda_stream;
 struct hda_multi;
 
-/*!	This structure describes a single HDA compliant 
+/*!	This structure describes a single HDA compliant
 	controller. It contains a list of available streams
 	for use by the codecs contained, and the messaging queue
 	(verb/response) buffers for communication.
@@ -91,7 +91,7 @@ struct hda_controller {
 
 	hda_stream*		streams[HDA_MAX_STREAMS];
 	sem_id			buffer_ready_sem;
-	
+
 	uint8 Read8(uint32 reg)
 	{
 		return *(regs + reg);
@@ -140,20 +140,22 @@ struct hda_stream {
 	uint32		io_widgets[MAX_IO_WIDGETS];	/* Input/Output Converter Widget ID */
 	uint32		num_io_widgets;
 
-	uint32		sample_rate;	
+	uint32		sample_rate;
 	uint32		sample_format;
 
 	uint32		num_buffers;
 	uint32		num_channels;
-	uint32		buffer_length;		/* size of buffer in samples */
+	uint32		buffer_length;	/* size of buffer in samples */
+	uint32		buffer_size;	/* actual (aligned) size of buffer in bytes */
 	uint32		sample_size;
 	uint8*		buffers[STREAM_MAX_BUFFERS];
 					/* Virtual addresses for buffer */
 	uint32		physical_buffers[STREAM_MAX_BUFFERS];
 					/* Physical addresses for buffer */
-	
+
 	volatile bigtime_t	real_time;
 	volatile uint64		frames_count;
+	uint32				last_link_frame_position;
 	volatile int32		buffer_cycle;
 
 	uint32		rate, bps;			/* Samplerate & bits per sample */
@@ -275,16 +277,16 @@ struct hda_codec {
 	uint8		revision;
 	uint8		stepping;
 	uint8		addr;
-	
+
 	uint32		quirks;
 
 	sem_id		response_sem;
 	uint32		responses[MAX_CODEC_RESPONSES];
 	uint32		response_count;
-	
+
 	uint32		unsol_responses[MAX_CODEC_UNSOL_RESPONSES];
 	uint32		unsol_response_count;
-	
+
 	hda_audio_group* audio_groups[HDA_MAX_AUDIO_GROUPS];
 	uint32		num_audio_groups;
 
@@ -314,7 +316,7 @@ struct hda_multi {
 	hda_audio_group *group;
 	hda_multi_mixer_control controls[MULTI_MAX_CONTROLS];
 	uint32 control_count;
-	
+
 	multi_channel_info chans[MULTI_MAX_CHANNELS];
 	uint32 output_channel_count;
 	uint32 input_channel_count;

@@ -8,8 +8,11 @@
  */
 
 
-#include "driver.h"
 #include "hda_controller_defs.h"
+
+#include <algorithm>
+
+#include "driver.h"
 #include "hda_codec_defs.h"
 
 
@@ -89,13 +92,10 @@ static bool
 stream_handle_interrupt(hda_controller* controller, hda_stream* stream,
 	uint32 index)
 {
-	uint8 status;
-	uint32 position, bufferSize;
-
 	if (!stream->running)
 		return false;
 
-	status = stream->Read8(HDAC_STREAM_STATUS);
+	uint8 status = stream->Read8(HDAC_STREAM_STATUS);
 	if (status == 0)
 		return false;
 
@@ -111,16 +111,40 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream,
 		return false;
 	}
 
-	position = controller->stream_positions[index * 2];
-	bufferSize = ALIGN(stream->sample_size * stream->num_channels
-		* stream->buffer_length, 128);
+	// Determine the buffer we're switching to. Some chipsets seem to trigger
+	// the interrupt before the DMA position in memory has been updated. We
+	// round it, so we still get the right buffer.
+	uint32 dmaPosition = controller->stream_positions[index * 2];
+	uint32 bufferIndex = (dmaPosition + stream->buffer_size / 2)
+		/ stream->buffer_size;
 
-	// Buffer Completed Interrupt
+	// get the current recording/playing position and the system time
+	uint32 linkBytePosition = stream->Read32(HDAC_STREAM_POSITION);
+	bigtime_t now = system_time();
+
+	// compute the frame position for the byte position
+	uint32 linkFramePosition = 0;
+	while (linkBytePosition >= stream->buffer_size) {
+		linkFramePosition += stream->buffer_length;
+		linkBytePosition -= stream->buffer_size;
+	}
+	linkFramePosition += std::min(
+		linkBytePosition / (stream->num_channels * stream->sample_size),
+		stream->buffer_length);
+
+	// compute the number of frames processed since the previous interrupt
+	int32 framesProcessed = (int32)linkFramePosition
+		- (int32)stream->last_link_frame_position;
+	if (framesProcessed < 0)
+		framesProcessed += stream->num_buffers * stream->buffer_length;
+	stream->last_link_frame_position = linkFramePosition;
+
+	// update stream playing/recording state and notify buffer_exchange()
 	acquire_spinlock(&stream->lock);
 
-	stream->real_time = system_time();
-	stream->frames_count += stream->buffer_length;
-	stream->buffer_cycle = position / bufferSize;
+	stream->real_time = now;
+	stream->frames_count += framesProcessed;
+	stream->buffer_cycle = bufferIndex;
 
 	release_spinlock(&stream->lock);
 
@@ -489,6 +513,9 @@ hda_stream_start(hda_controller* controller, hda_stream* stream)
 {
 	dprintf("hda_stream_start() offset %lx\n", stream->offset);
 
+	stream->frames_count = 0;
+	stream->last_link_frame_position = 0;
+
 	controller->Write32(HDAC_INTR_CONTROL, controller->Read32(HDAC_INTR_CONTROL)
 		| (1 << (stream->offset / HDAC_STREAM_SIZE)));
 	stream->Write8(HDAC_STREAM_CONTROL0, stream->Read8(HDAC_STREAM_CONTROL0)
@@ -566,9 +593,8 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	}
 
 	/* Calculate size of buffer (aligned to 128 bytes) */
-	uint32 bufferSize = stream->sample_size * stream->num_channels
-		* stream->buffer_length;
-	bufferSize = ALIGN(bufferSize, 128);
+	stream->buffer_size = ALIGN(stream->buffer_length * stream->num_channels
+		* stream->sample_size, 128);
 
 	dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld, **********\n",
 		stream->sample_size, stream->num_channels, stream->buffer_length);
@@ -576,7 +602,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		stream->rate, stream->bps, format, stream->sample_format);
 
 	/* Calculate total size of all buffers (aligned to size of B_PAGE_SIZE) */
-	uint32 alloc = bufferSize * stream->num_buffers;
+	uint32 alloc = stream->buffer_size * stream->num_buffers;
 	alloc = PAGE_ALIGN(alloc);
 
 	/* Allocate memory for buffers */
@@ -599,9 +625,9 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 
 	/* Store pointers (both virtual/physical) */
 	for (uint32 index = 0; index < stream->num_buffers; index++) {
-		stream->buffers[index] = buffer + (index * bufferSize);
+		stream->buffers[index] = buffer + (index * stream->buffer_size);
 		stream->physical_buffers[index] = bufferPhysicalAddress
-			+ (index * bufferSize);
+			+ (index * stream->buffer_size);
 	}
 
 	/* Now allocate BDL for buffer range */
@@ -638,7 +664,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		bufferDescriptors->lower = stream->physical_buffers[index];
 		bufferDescriptors->upper = 0;
 		fragments++;
-		bufferDescriptors->length = bufferSize;
+		bufferDescriptors->length = stream->buffer_size;
 		bufferDescriptors->ioc = 1;
 			// we want an interrupt after every buffer
 	}
@@ -650,7 +676,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	stream->Write32(HDAC_STREAM_BUFFERS_BASE_UPPER, 0);
 	stream->Write16(HDAC_STREAM_LAST_VALID, fragments);
 	/* total cyclic buffer size in _bytes_ */
-	stream->Write32(HDAC_STREAM_BUFFER_SIZE, bufferSize
+	stream->Write32(HDAC_STREAM_BUFFER_SIZE, stream->buffer_size
 		* stream->num_buffers);
 	stream->Write8(HDAC_STREAM_CONTROL2, stream->id << CONTROL2_STREAM_SHIFT);
 
