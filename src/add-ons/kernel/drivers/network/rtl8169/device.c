@@ -449,9 +449,6 @@ rtl8169_int(void *data)
 	PROFILING_ONLY(device->intTotalCount++);
 	PROFILING_ONLY(device->intCurrentCount++);
 
-	if (stat & INT_FOVW) {
-		TRACE("INT_FOVW\n");
-	}
 
 	if (stat & INT_TimeOut) {
 		PROFILING_ONLY(device->intTimerTotalCount++);
@@ -469,7 +466,7 @@ rtl8169_int(void *data)
 		ret = B_INVOKE_SCHEDULER;
 	}
 
-	if (stat & (INT_ROK | INT_RER)) {
+	if (stat & (INT_ROK | INT_RER | INT_FOVW)) {
 		rtl8169_rx_int(device);
 		PROFILING_ONLY(device->intRxTotalCount++);
 		PROFILING_ONLY(device->intRxCurrentCount++);
