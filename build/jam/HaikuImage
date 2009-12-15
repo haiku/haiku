@@ -167,7 +167,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
 	$(X86_ONLY)marvell_yukon $(X86_ONLY)syskonnect $(X86_ONLY)vt612x 
 	$(X86_ONLY)attansic_l1 $(X86_ONLY)attansic_l2 $(X86_ONLY)ar81xx
 	usb_ecm usb_asix
-	
+
 	#WLAN drivers
 	$(X86_ONLY)atheroswifi
 ;
@@ -507,7 +507,7 @@ AddFilesToHaikuImage system add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToHaikuImage system add-ons media plugins
 	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 AddFilesToHaikuImage system add-ons Tracker
-	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O OpenTerminal-T
+	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O Open\ Terminal-T
 	ZipOMatic-Z ;
 AddSymlinkToHaikuImage system add-ons Tracker
 	: /boot/system/preferences/Backgrounds : Background-B ;
