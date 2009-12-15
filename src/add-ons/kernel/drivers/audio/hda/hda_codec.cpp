@@ -41,8 +41,8 @@
 	| HDA_QUIRK_IVREF100)
 #define HDA_QUIRK_OVREF (HDA_QUIRK_OVREF50 | HDA_QUIRK_OVREF80 \
 	| HDA_QUIRK_OVREF100)
-	
-	
+
+
 #define ANALOGDEVICES_VENDORID		0x11d4
 #define CIRRUSLOGIC_VENDORID		0x1013
 #define CONEXANT_VENDORID			0x14f1
@@ -118,7 +118,7 @@ dump_widget_audio_capabilities(uint32 capabilities)
 		{AUDIO_CAP_AMPLIFIER_OVERRIDE, "Amplifier Override"},
 		{AUDIO_CAP_OUTPUT_AMPLIFIER, "Out Amplifier"},
 		{AUDIO_CAP_INPUT_AMPLIFIER, "In Amplifier"},
-		{AUDIO_CAP_STEREO, "Stereo"},			
+		{AUDIO_CAP_STEREO, "Stereo"},
 	};
 
 	char buffer[256];
@@ -214,14 +214,14 @@ dump_widget_stream_support(hda_widget& widget)
 		widget.d.io.rates & B_SR_176400 ? "176khz " : "",
 		widget.d.io.rates & B_SR_192000 ? "192khz " : "",
 		widget.d.io.rates & B_SR_384000 ? "384khz " : "");
-		
+
 }
 
 
 static void
 dump_pin_complex_capabilities(hda_widget& widget)
 {
-	TRACE("\t%s%s%s%s%s%s%s%s%s%s%s%s%s\n", 
+	TRACE("\t%s%s%s%s%s%s%s%s%s%s%s%s%s\n",
 		widget.d.pin.capabilities & PIN_CAP_IMP_SENSE ? "[Imp Sense] " : "",
 		widget.d.pin.capabilities & PIN_CAP_TRIGGER_REQ ? "[Trigger Req]" : "",
 		widget.d.pin.capabilities & PIN_CAP_PRES_DETECT ? "[Pres Detect]" : "",
@@ -234,7 +234,7 @@ dump_pin_complex_capabilities(hda_widget& widget)
 		widget.d.pin.capabilities & PIN_CAP_VREF_CTRL_GROUND ? "[VRef Gr]" : "",
 		widget.d.pin.capabilities & PIN_CAP_VREF_CTRL_80 ? "[VRef 80]" : "",
 		widget.d.pin.capabilities & PIN_CAP_VREF_CTRL_100 ? "[VRef 100]" : "",
-		widget.d.pin.capabilities & PIN_CAP_EAPD_CAP ? "[EAPD]" : "");	
+		widget.d.pin.capabilities & PIN_CAP_EAPD_CAP ? "[EAPD]" : "");
 }
 
 
@@ -568,7 +568,7 @@ hda_widget_prepare_pin_ctrl(hda_audio_group* audioGroup, hda_widget *widget,
 		ctrl = PIN_ENABLE_HEAD_PHONE | PIN_ENABLE_OUTPUT;
 	else
 		ctrl = PIN_ENABLE_INPUT;
-	
+
 	if (PIN_CAP_IS_VREF_CTRL_50_CAP(widget->d.pin.capabilities)
 		&& (audioGroup->codec->quirks & (isOutput ? HDA_QUIRK_OVREF50
 			: HDA_QUIRK_IVREF50))) {
@@ -587,7 +587,7 @@ hda_widget_prepare_pin_ctrl(hda_audio_group* audioGroup, hda_widget *widget,
 		ctrl |= PIN_ENABLE_VREF_100;
 		TRACE("%s vref 100 enabled\n", isOutput ? "output" : "input");
 	}
-	
+
 	return ctrl;
 }
 
@@ -604,7 +604,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	hda_widget_get_stream_support(audioGroup, &audioGroup->widget);
 	hda_widget_get_pm_support(audioGroup, &audioGroup->widget);
 	hda_widget_get_amplifier_capabilities(audioGroup, &audioGroup->widget);
-	
+
 	verbs[0] = MAKE_VERB(audioGroup->codec->addr, audioGroup->widget.node_id,
 		VID_GET_PARAMETER, PID_AUDIO_GROUP_CAP);
 	verbs[1] = MAKE_VERB(audioGroup->codec->addr, audioGroup->widget.node_id,
@@ -617,7 +617,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 
 	TRACE("hda: Audio Group: Output delay: %ld samples, Input delay: %ld "
 		"samples, Beep Generator: %s\n", AUDIO_GROUP_CAP_OUTPUT_DELAY(resp[0]),
-		AUDIO_GROUP_CAP_INPUT_DELAY(resp[0]), 
+		AUDIO_GROUP_CAP_INPUT_DELAY(resp[0]),
 		AUDIO_GROUP_CAP_BEEPGEN(resp[0]) ? "yes" : "no");
 
 	TRACE("hda:   #GPIO: %ld, #GPO: %ld, #GPI: %ld, unsol: %s, wake: %s\n",
@@ -653,7 +653,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 
 		widget.type = (hda_widget_type)((capabilities & AUDIO_CAP_TYPE_MASK)
 			>> AUDIO_CAP_TYPE_SHIFT);
-		
+
 		/* Check specific node ids declared as inputs as beepers */
 		switch ((audioGroup->codec->vendor_id << 16) | audioGroup->codec->product_id) {
 			case 0x11d41882:
@@ -715,7 +715,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 					VID_GET_PARAMETER, PID_PIN_CAP);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
 					widget.d.pin.capabilities = resp[0];
-					
+
 					TRACE("\t%s%s\n", PIN_CAP_IS_INPUT(resp[0]) ? "[Input] " : "",
 						PIN_CAP_IS_OUTPUT(resp[0]) ? "[Output]" : "");
 				} else {
@@ -755,7 +755,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	}
 
 	hda_widget_get_associations(audioGroup);
-	
+
 	return B_OK;
 }
 
@@ -780,7 +780,7 @@ TRACE("      %*soutput: added output widget %ld\n", (int)depth * 2, "", widget->
 			// already used
 			if (widget->flags & WIDGET_FLAG_OUTPUT_PATH)
 				return false;
-			
+
 			// search for output in this path
 			bool found = false;
 			for (uint32 i = 0; i < widget->num_inputs; i++) {
@@ -820,7 +820,7 @@ hda_widget_find_input_path(hda_audio_group* audioGroup, hda_widget* widget,
 			// already used
 			if (widget->flags & WIDGET_FLAG_INPUT_PATH)
 				return false;
-			
+
 			if (PIN_CAP_IS_INPUT(widget->d.pin.capabilities)) {
 				switch (CONF_DEFAULT_DEVICE(widget->d.pin.config)) {
 					case PIN_DEV_CD:
@@ -840,7 +840,7 @@ TRACE("      %*sinput: added input widget %ld\n", (int)depth * 2, "", widget->no
 			// already used
 			if (widget->flags & WIDGET_FLAG_INPUT_PATH)
 				return false;
-			
+
 			// search for pin complex in this path
 			bool found = false;
 			for (uint32 i = 0; i < widget->num_inputs; i++) {
@@ -931,7 +931,7 @@ TRACE("  look at input widget %ld (%ld inputs)\n", widget.node_id, widget.num_in
 TRACE("    try widget %ld: %p\n", widget.inputs[j], inputWidget);
 			if (inputWidget == NULL)
 				continue;
-			
+
 TRACE("    widget %ld is candidate\n", inputWidget->node_id);
 
 			if (hda_widget_find_input_path(audioGroup, inputWidget, 0)) {
@@ -961,10 +961,10 @@ TRACE("try without mixer!\n");
 
 	if (!hda_audio_group_build_input_tree(audioGroup)) {
 		ERROR("hda: build input tree failed\n");
-	}	
+	}
 
 TRACE("build tree!\n");
-	
+
 	// select active connections
 
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
@@ -974,7 +974,7 @@ TRACE("build tree!\n");
 			widget.active_input = 0;
 		if (widget.num_inputs < 2)
 			continue;
-			
+
 		if (widget.type != WT_AUDIO_INPUT
 			&& widget.type != WT_AUDIO_SELECTOR
 			&& widget.type != WT_PIN_COMPLEX)
@@ -986,7 +986,7 @@ TRACE("build tree!\n");
 			ERROR("hda: Setting output selector %ld failed on widget %ld!\n",
 				widget.active_input, widget.node_id);
 	}
-	
+
 	// GPIO
 	uint32 gpio = 0;
 	for (int32 i = 0; i < HDA_QUIRK_GPIO_COUNT; i++) {
@@ -994,7 +994,7 @@ TRACE("build tree!\n");
 			gpio |= (1 << i);
 		}
 	}
-	
+
 	if (gpio != 0) {
 		corb_t verb[] = {
 			MAKE_VERB(audioGroup->codec->addr,
@@ -1022,7 +1022,7 @@ hda_codec_switch_init(hda_audio_group* audioGroup)
 		hda_widget& widget = audioGroup->widgets[i];
 		if (widget.type != WT_PIN_COMPLEX)
 			continue;
-		
+
 		if (widget.capabilities.audio & AUDIO_CAP_UNSOLICITED_RESPONSES
 			&& widget.d.pin.capabilities & PIN_CAP_PRES_DETECT
 			&& (CONF_DEFAULT_MISC(widget.d.pin.config) & 1 == 0)) {
@@ -1081,7 +1081,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 	if (hda_audio_group_build_tree(audioGroup) != B_OK)
 		goto err;
 	hda_codec_switch_init(audioGroup);
-	
+
 	audioGroup->playback_stream = hda_stream_new(audioGroup, STREAM_PLAYBACK);
 	audioGroup->record_stream = hda_stream_new(audioGroup, STREAM_RECORD);
 	TRACE("hda: streams playback %p, record %p\n", audioGroup->playback_stream,
@@ -1127,7 +1127,7 @@ hda_audio_group_get_widgets(hda_audio_group* audioGroup, hda_stream* stream)
 		if ((widget.flags & flags) != 0) {
 			if (widget.type == WT_PIN_COMPLEX) {
 				stream->pin_widget = widget.node_id;
-				
+
 				uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
 					flags == WIDGET_FLAG_OUTPUT_PATH);
 
@@ -1140,19 +1140,19 @@ TRACE("ENABLE pin widget %ld\n", widget.node_id);
 
 				if (PIN_CAP_IS_EAPD_CAP(widget.d.pin.capabilities)) {
 					uint32 result;
-					verb = MAKE_VERB(audioGroup->codec->addr, 
+					verb = MAKE_VERB(audioGroup->codec->addr,
 						widget.node_id, VID_GET_EAPDBTL_EN, 0);
-					if (hda_send_verbs(audioGroup->codec, &verb, 
+					if (hda_send_verbs(audioGroup->codec, &verb,
 						&result, 1) == B_OK) {
 						result &= 0xff;
-						verb = MAKE_VERB(audioGroup->codec->addr, 
+						verb = MAKE_VERB(audioGroup->codec->addr,
 							widget.node_id, VID_SET_EAPDBTL_EN,
 							result | EAPDBTL_ENABLE_EAPD);
-						hda_send_verbs(audioGroup->codec, 
+						hda_send_verbs(audioGroup->codec,
 							&verb, NULL, 1);
 TRACE("ENABLE EAPD pin widget %ld\n", widget.node_id);
 					}
-				}				
+				}
 			}
 
 			if (widget.capabilities.output_amplifier != 0) {
@@ -1217,7 +1217,7 @@ static const struct {
 	{ HDA_ALL, HDA_ALL, HDA_ALL, HDA_ALL, HDA_QUIRK_IVREF, 0 },
 	{ 0x10de, 0xcb79, CIRRUSLOGIC_VENDORID, 0x4206, HDA_QUIRK_GPIO1 | HDA_QUIRK_GPIO3, 0 },		// MacBook Pro 5.5
 	{ 0x8384, 0x7680, SIGMATEL_VENDORID, 0x7680, HDA_QUIRK_GPIO0 | HDA_QUIRK_GPIO1, 0},	// Apple Intel Mac
-	{ 0x106b, 0x00a3, REALTEK_VENDORID, 0x0885, HDA_QUIRK_GPIO0, 0},	// MacBook 
+	{ 0x106b, 0x00a3, REALTEK_VENDORID, 0x0885, HDA_QUIRK_GPIO0, 0},	// MacBook
 };
 
 
@@ -1229,21 +1229,21 @@ hda_codec_get_quirks(hda_codec* codec)
 	uint32 subsystem_vendor_id = codec->controller->pci_info.u.h0.subsystem_vendor_id;
 	uint32 codec_vendor_id = codec->vendor_id;
 	uint32 codec_id = codec->product_id;
-	for (uint32 i = 0; i < (sizeof(hda_codec_quirks) 
+	for (uint32 i = 0; i < (sizeof(hda_codec_quirks)
 		/ sizeof(hda_codec_quirks[0])); i++) {
-		if (hda_codec_quirks[i].subsystem_id != 0xffffffff 
+		if (hda_codec_quirks[i].subsystem_id != 0xffffffff
 			&& hda_codec_quirks[i].subsystem_id != subsystem_id)
 			continue;
-		if (hda_codec_quirks[i].subsystem_vendor_id != 0xffffffff 
+		if (hda_codec_quirks[i].subsystem_vendor_id != 0xffffffff
 			&& hda_codec_quirks[i].subsystem_vendor_id != subsystem_vendor_id)
 			continue;
-		if (hda_codec_quirks[i].codec_vendor_id != 0xffffffff 
+		if (hda_codec_quirks[i].codec_vendor_id != 0xffffffff
 			&& hda_codec_quirks[i].codec_vendor_id != codec_vendor_id)
 			continue;
-		if (hda_codec_quirks[i].codec_id != 0xffffffff 
+		if (hda_codec_quirks[i].codec_id != 0xffffffff
 			&& hda_codec_quirks[i].codec_id != codec_id)
 			continue;
-		
+
 		codec->quirks |= hda_codec_quirks[i].quirks;
 		codec->quirks &= ~(hda_codec_quirks[i].nonquirks);
 	}
@@ -1302,7 +1302,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 
 	verbs[0] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_VENDOR_ID);
 	verbs[1] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_REVISION_ID);
-	verbs[2] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, 
+	verbs[2] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER,
 		PID_SUB_NODE_COUNT);
 
 	if (hda_send_verbs(codec, verbs, (uint32*)&response, 3) != B_OK) {
