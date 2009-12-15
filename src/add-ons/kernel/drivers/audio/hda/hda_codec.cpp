@@ -1023,9 +1023,9 @@ hda_codec_switch_init(hda_audio_group* audioGroup)
 		if (widget.type != WT_PIN_COMPLEX)
 			continue;
 
-		if (widget.capabilities.audio & AUDIO_CAP_UNSOLICITED_RESPONSES
-			&& widget.d.pin.capabilities & PIN_CAP_PRES_DETECT
-			&& (CONF_DEFAULT_MISC(widget.d.pin.config) & 1 == 0)) {
+		if ((widget.capabilities.audio & AUDIO_CAP_UNSOLICITED_RESPONSES) != 0
+			&& (widget.d.pin.capabilities & PIN_CAP_PRES_DETECT) != 0
+			&& (CONF_DEFAULT_MISC(widget.d.pin.config) & 1) == 0) {
 			corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
 				VID_SET_UNSOLRESP, UNSOLRESP_ENABLE);
 			hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
