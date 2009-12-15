@@ -86,7 +86,8 @@ next_corb(hda_controller *controller)
 	Returns \c true, if the scheduler shall be invoked.
 */
 static bool
-stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
+stream_handle_interrupt(hda_controller* controller, hda_stream* stream,
+	uint32 index)
 {
 	uint8 status;
 	uint32 position, bufferSize;
@@ -110,7 +111,7 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 		return false;
 	}
 
-	position = stream->Read32(HDAC_STREAM_POSITION);
+	position = controller->stream_positions[index * 2];
 	bufferSize = ALIGN(stream->sample_size * stream->num_channels
 		* stream->buffer_length, 128);
 
@@ -124,13 +125,6 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 	release_spinlock(&stream->lock);
 
 	release_sem_etc(controller->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
-
-	if (stream->warn_count < 20
-		&& (position - stream->buffer_cycle * bufferSize) > (bufferSize >> 1)) {
-		dprintf("hda: stream incorrect position %ld %ld %ld\n",
-			stream->id, stream->buffer_cycle, position);
-		stream->warn_count++;
-	}
 
 	return true;
 }
@@ -216,7 +210,7 @@ hda_interrupt_handler(hda_controller* controller)
 			if ((intrStatus & (1 << index)) != 0) {
 				if (controller->streams[index]) {
 					if (stream_handle_interrupt(controller,
-							controller->streams[index])) {
+							controller->streams[index], index)) {
 						handled = B_INVOKE_SCHEDULER;
 					}
 				} else {
@@ -571,31 +565,13 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		}
 	}
 
-	// Stream interrupts seem to arrive too early on most HDA
-	// so we adjust buffer descriptors to take this into account
-	// TODO check on other vendors, see in stream_handle_interrupt()
-	// Tested only on Intel ICH8
-	uint32 offset = 0;
-	if (stream->type == STREAM_PLAYBACK) {
-		if (stream->controller->pci_info.vendor_id == INTEL_VENDORID) {
-			if (stream->sample_size == 2)
-				offset = 3;
-			else if (stream->sample_size > 2)
-				offset = 4;
-		} else {
-			offset = 11;
-		}
-		offset *= 64;
-		offset = ALIGN(offset, 128);
-	}
-
 	/* Calculate size of buffer (aligned to 128 bytes) */
 	uint32 bufferSize = stream->sample_size * stream->num_channels
 		* stream->buffer_length;
 	bufferSize = ALIGN(bufferSize, 128);
 
-	dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld, offset %ld **********\n",
-		stream->sample_size, stream->num_channels, stream->buffer_length, offset);
+	dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld, **********\n",
+		stream->sample_size, stream->num_channels, stream->buffer_length);
 	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld F=0x%x (0x%lx)\n", __func__, stream->id,
 		stream->rate, stream->bps, format, stream->sample_format);
 
@@ -629,7 +605,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	}
 
 	/* Now allocate BDL for buffer range */
-	uint32 bdlCount = stream->num_buffers + (offset > 0 ? 1 : 0);
+	uint32 bdlCount = stream->num_buffers;
 	alloc = bdlCount * sizeof(bdl_entry_t);
 	alloc = PAGE_ALIGN(alloc);
 
@@ -654,30 +630,17 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
 		alloc, bdlCount);
 
-	uint32 fragments = 0;
-	if (offset > 0) {
-		bufferDescriptors->lower = stream->physical_buffers[0];
-		bufferDescriptors->upper = 0;
-		bufferDescriptors->length = offset;
-		bufferDescriptors->ioc = 1;
-		bufferDescriptors++;
-		fragments++;
-	}
 
 	/* Setup buffer descriptor list (BDL) entries */
-	for (uint32 index = 0; index < stream->num_buffers; index++,
-		bufferDescriptors++) {
-		bufferDescriptors->lower = stream->physical_buffers[index] + offset;
+	uint32 fragments = 0;
+	for (uint32 index = 0; index < stream->num_buffers;
+			index++, bufferDescriptors++) {
+		bufferDescriptors->lower = stream->physical_buffers[index];
 		bufferDescriptors->upper = 0;
 		fragments++;
-		if (index == (stream->num_buffers - 1) && offset > 0) {
-			bufferDescriptors->length = bufferSize - offset;
-			bufferDescriptors->ioc = 0;
-		} else {
-			bufferDescriptors->length = bufferSize;
-			bufferDescriptors->ioc = 1;
+		bufferDescriptors->length = bufferSize;
+		bufferDescriptors->ioc = 1;
 			// we want an interrupt after every buffer
-		}
 	}
 
 	/* Configure stream registers */
