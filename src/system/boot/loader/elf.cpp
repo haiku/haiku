@@ -25,13 +25,14 @@
 #endif
 
 
-static bool _loadElfSymbols = false;
+static bool sLoadElfSymbols = false;
 
 
 void
-elf_init() {
+elf_init()
+{
 	void *settings = load_driver_settings("kernel");
-	_loadElfSymbols = !get_driver_boolean_parameter(settings, "load_symbols",
+	sLoadElfSymbols = !get_driver_boolean_parameter(settings, "load_symbols",
 		false, false);
 }
 
@@ -382,7 +383,7 @@ elf_load_image(int fd, preloaded_image *image)
 	image->debug_symbols = NULL;
 	image->debug_string_table = NULL;
 
-	if (_loadElfSymbols)
+	if (sLoadElfSymbols)
 		load_elf_symbol_table(fd, image);
 
 	free(programHeaders);
