@@ -30,6 +30,8 @@ SimpleTest port_close_test_2 : port_close_test_2.cpp ;
 
 SimpleTest port_delete_test : port_delete_test.cpp ;
 
+SimpleTest port_multi_read_test : port_multi_read_test.cpp ;
+
 SimpleTest port_wakeup_test_1 : port_wakeup_test_1.cpp ;
 SimpleTest port_wakeup_test_2 : port_wakeup_test_2.cpp ;
 SimpleTest port_wakeup_test_3 : port_wakeup_test_3.cpp ;
