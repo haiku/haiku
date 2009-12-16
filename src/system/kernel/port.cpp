@@ -57,7 +57,7 @@ struct port_entry {
 	team_id				owner;
 	int32		 		capacity;
 	mutex				lock;
-	int32				read_count;
+	uint32				read_count;
 	int32				write_count;
 	ConditionVariable	read_condition;
 	ConditionVariable	write_condition;
@@ -529,11 +529,7 @@ fill_port_info(struct port_entry* port, port_info* info, size_t size)
 	info->team = port->owner;
 	info->capacity = port->capacity;
 
-	int32 count = port->read_count;
-	if (count < 0)
-		count = 0;
-
-	info->queue_count = count;
+	info->queue_count = port->read_count;
 	info->total_count = port->total_count;
 
 	strlcpy(info->name, port->lock.name, B_OS_NAME_LENGTH);
@@ -1057,12 +1053,12 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 	if (sPorts[slot].id != id
 		|| (is_port_closed(slot) && sPorts[slot].messages.IsEmpty())) {
 		T(Info(sPorts[slot], 0, B_BAD_PORT_ID));
-		TRACE(("port_buffer_size_etc(): %s port %ld\n",
+		TRACE(("_get_port_message_info_etc(): %s port %ld\n",
 			sPorts[slot].id == id ? "closed" : "invalid", id));
 		return B_BAD_PORT_ID;
 	}
 
-	if (sPorts[slot].read_count <= 0) {
+	while (sPorts[slot].read_count == 0) {
 		// We need to wait for a message to appear
 		if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0)
 			return B_WOULD_BLOCK;
@@ -1126,13 +1122,8 @@ port_count(port_id id)
 		return B_BAD_PORT_ID;
 	}
 
-	int32 count = sPorts[slot].read_count;
-	// do not return negative numbers
-	if (count < 0)
-		count = 0;
-
 	// return count of messages
-	return count;
+	return sPorts[slot].read_count;
 }
 
 
@@ -1171,11 +1162,9 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 		return B_BAD_PORT_ID;
 	}
 
-	if (sPorts[slot].read_count <= 0) {
+	while (sPorts[slot].read_count == 0) {
 		if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0)
 			return B_WOULD_BLOCK;
-
-		sPorts[slot].read_count--;
 
 		// We need to wait for a message to appear
 		ConditionVariableEntry entry;
@@ -1200,8 +1189,7 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 			sPorts[slot].read_count++;
 			return status != B_OK ? status : entry.WaitStatus();
 		}
-	} else
-		sPorts[slot].read_count--;
+	}
 
 	// determine tail & get the length of the message
 	port_message* message = sPorts[slot].messages.Head();
@@ -1216,7 +1204,6 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 
 		T(Read(sPorts[slot], message->code, size));
 
-		sPorts[slot].read_count++;
 		sPorts[slot].read_condition.NotifyOne();
 			// we only peeked, but didn't grab the message
 		return size;
@@ -1225,6 +1212,7 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 	sPorts[slot].messages.RemoveHead();
 	sPorts[slot].total_count++;
 	sPorts[slot].write_count++;
+	sPorts[slot].read_count--;
 
 	notify_port_select_events(slot, B_EVENT_WRITE);
 	sPorts[slot].write_condition.NotifyOne();

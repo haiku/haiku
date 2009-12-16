@@ -21,16 +21,15 @@ read_thread(void* _data)
 	printf("[%ld] read port...\n", find_thread(NULL));
 	
 	while (true) {
-		ssize_t bytesWaiting = port_buffer_size(port);
-		printf("[%ld] buffer size %ld waiting\n", find_thread(NULL),
-			bytesWaiting);
+		ssize_t bytes = port_buffer_size(port);
+		printf("[%ld] buffer size %ld waiting\n", find_thread(NULL), bytes);
 
 		char buffer[256];
 		int32 code;
-		status_t status = read_port(port, &code, buffer, sizeof(buffer));
+		bytes = read_port(port, &code, buffer, sizeof(buffer));
 		printf("[%ld] read port result (code %lx): %s\n", find_thread(NULL),
-			code, strerror(status));
-		if (status == B_OK)
+			code, strerror(bytes));
+		if (bytes >= 0)
 			break;
 	}
 
@@ -51,7 +50,7 @@ main()
 		resume_thread(threads[i]);
 	}
 
-	printf("snooze for a bit, all threads should be waiting now.");
+	printf("snooze for a bit, all threads should be waiting now.\n");
 	snooze(100000);
 
 	for (int32 i = 0; i < THREAD_COUNT; i++) {
