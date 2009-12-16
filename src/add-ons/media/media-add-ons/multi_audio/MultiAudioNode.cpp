@@ -1408,6 +1408,9 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 			return;
 		memcpy(&rate, value, sizeof(rate));
 
+		if (rate == fOutputPreferredFormat.u.raw_audio.frame_rate)
+			return;
+
 		// create a cookie RequestCompleted() can get the old frame rate from,
 		// if anything goes wrong
 		OutputFrameRateChangeCookie* cookie
@@ -1665,8 +1668,12 @@ MultiAudioNode::_RunThread()
 	bufferInfo.playback_buffer_cycle = 0;
 	bufferInfo.record_buffer_cycle = 0;
 
-	// reset the info for the performance time computation
-	fResetPerformanceTimeBase = true;
+	// init the performance time computation
+	{
+		BAutolock locker(fBufferLock);
+		fTimeComputer.Init(fOutputPreferredFormat.u.raw_audio.frame_rate,
+			system_time());
+	}
 
 	while (true) {
 		// TODO: why this semaphore??
@@ -1861,6 +1868,14 @@ MultiAudioNode::_FillNextBuffer(node_input& input, BBuffer* buffer)
 	// the need for checking all over again
 
 	uint32 bufferSize = fDevice->BufferList().return_playback_buffer_size;
+
+	if (buffer->SizeUsed()
+		/ (input.fInput.format.u.raw_audio.format
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK)
+		/ input.fInput.format.u.raw_audio.channel_count != bufferSize) {
+		_WriteZeros(input, input.fBufferCycle);
+		return;
+	}
 
 	switch (input.fInput.format.u.raw_audio.format) {
 		case media_raw_audio_format::B_AUDIO_FLOAT:
@@ -2128,27 +2143,9 @@ MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info,
 	if (!fTimeSourceStarted || oldInfo.played_real_time == 0)
 		return;
 
-	if (fResetPerformanceTimeBase) {
-		fPerformanceTimeBase = info.played_real_time;
-		fPerformanceTimeBaseFrames = info.played_frames_count;
-		fResetPerformanceTimeBase = false;
-		return;
-	}
-
-	double usecsPerFrame = 1000000 / input.fInput.format.u.raw_audio.frame_rate;
-	uint64 frameCount = info.played_frames_count
-		- fPerformanceTimeBaseFrames;
-	uint64 oldFrameCount = oldInfo.played_frames_count
-		- fPerformanceTimeBaseFrames;
-
-	bigtime_t performanceTime = (bigtime_t)(frameCount * usecsPerFrame)
-		+ fPerformanceTimeBase;
-	bigtime_t realTime = info.played_real_time;
-	float drift = ((frameCount - oldFrameCount) * usecsPerFrame)
-		/ (info.played_real_time - oldInfo.played_real_time);
-
-	PublishTime(performanceTime, realTime, drift);
-	//PRINT(("_UpdateTimeSource() perf_time : %lli, real_time : %lli, drift : %f\n", performanceTime, realTime, drift));
+	fTimeComputer.AddTimeStamp(info.played_real_time, info.played_frames_count);
+	PublishTime(fTimeComputer.PerformanceTime(), fTimeComputer.RealTime(),
+		fTimeComputer.Drift());
 }
 
 
@@ -2351,7 +2348,7 @@ MultiAudioNode::_SetNodeInputFrameRate(float frameRate)
 	}
 
 	// make sure the time base is reset
-	fResetPerformanceTimeBase = true;
+	fTimeComputer.SetFrameRate(frameRate);
 
 	// update internal latency
 	_UpdateInternalLatency(fOutputPreferredFormat);
@@ -2363,7 +2360,7 @@ MultiAudioNode::_SetNodeInputFrameRate(float frameRate)
 void
 MultiAudioNode::_UpdateInternalLatency(const media_format& format)
 {
-	// use one buffer length latency
+	// use half a buffer length latency
 	fInternalLatency = format.u.raw_audio.buffer_size * 10000 / 2
 		/ ((format.u.raw_audio.format
 				& media_raw_audio_format::B_AUDIO_SIZE_MASK)

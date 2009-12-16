@@ -19,6 +19,8 @@
 
 #include "hmulti_audio.h"
 #include "MultiAudioDevice.h"
+#include "TimeComputer.h"
+
 
 class BDiscreteParameter;
 class BParameterGroup;
@@ -205,9 +207,7 @@ private:
 	BLocker				fBufferLock;
 
 	BList				fInputs;
-	bool				fResetPerformanceTimeBase;
-	bigtime_t			fPerformanceTimeBase;
-	uint64				fPerformanceTimeBaseFrames;
+	TimeComputer		fTimeComputer;
 
 	bigtime_t 			fLatency;
 	BList				fOutputs;
