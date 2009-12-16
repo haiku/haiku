@@ -164,6 +164,9 @@ struct hda_stream {
 	area_id		buffer_descriptors_area;
 	uint32		physical_buffer_descriptors;	/* BDL physical address */
 
+	int32		incorrect_position_count;
+	bool		use_dma_position;
+
 	uint8 Read8(uint32 reg)
 	{
 		return controller->Read8(HDAC_STREAM_BASE + offset + reg);

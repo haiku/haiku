@@ -111,12 +111,25 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream,
 		return false;
 	}
 
+	// Normally we should use the DMA position for the stream. Apparently there
+	// are broken chipsets, which don't support it correctly. If we detect this,
+	// we switch to using the LPIB instead. The link position is ahead of the
+	// DMA position for recording and behind for playback streams, but just
+	// for determining the currently active buffer, it should be good enough.
+	if (stream->use_dma_position && stream->incorrect_position_count >= 32) {
+		dprintf("hda: DMA position for stream (id:%ld) seems to be broken. "
+			"Switching to using LPIB.\n", stream->id);
+		stream->use_dma_position = false;
+	}
+
 	// Determine the buffer we're switching to. Some chipsets seem to trigger
 	// the interrupt before the DMA position in memory has been updated. We
 	// round it, so we still get the right buffer.
-	uint32 dmaPosition = controller->stream_positions[index * 2];
-	uint32 bufferIndex = (dmaPosition + stream->buffer_size / 2)
-		/ stream->buffer_size;
+	uint32 dmaPosition = stream->use_dma_position
+		? controller->stream_positions[index * 2]
+		: stream->Read32(HDAC_STREAM_POSITION);
+	uint32 bufferIndex = ((dmaPosition + stream->buffer_size / 2)
+		/ stream->buffer_size) % stream->num_buffers;
 
 	// get the current recording/playing position and the system time
 	uint32 linkBytePosition = stream->Read32(HDAC_STREAM_POSITION);
@@ -141,6 +154,11 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream,
 
 	// update stream playing/recording state and notify buffer_exchange()
 	acquire_spinlock(&stream->lock);
+
+	if (bufferIndex == (stream->buffer_cycle + 1) % stream->num_buffers)
+		stream->incorrect_position_count = 0;
+	else
+		stream->incorrect_position_count++;
 
 	stream->real_time = now;
 	stream->frames_count += framesProcessed;
@@ -464,6 +482,8 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 	stream->type = type;
 	stream->controller = controller;
 	stream->warn_count = 0;
+	stream->incorrect_position_count = 0;
+	stream->use_dma_position = true;
 
 	switch (type) {
 		case STREAM_PLAYBACK:
