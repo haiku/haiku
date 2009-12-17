@@ -1175,7 +1175,8 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 
 		locker.Lock();
 
-		if (sPorts[slot].id != id) {
+		if (sPorts[slot].id != id
+			|| (is_port_closed(slot) && sPorts[slot].messages.IsEmpty())) {
 			// the port is no longer there
 			T(Read(sPorts[slot], 0, B_BAD_PORT_ID));
 			return B_BAD_PORT_ID;
@@ -1183,7 +1184,6 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 
 		if (status != B_OK) {
 			T(Read(sPorts[slot], 0, status));
-			sPorts[slot].read_count++;
 			return status;
 		}
 	}
