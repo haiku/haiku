@@ -12,6 +12,5 @@
 #include <OldBufferStream.h>
 #include <OldBufferStreamManager.h>
 #include <OldMediaDefs.h>
-#include <OldSoundFile.h>
 #include <OldSubscriber.h>
 

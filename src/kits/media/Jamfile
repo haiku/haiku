@@ -60,15 +60,13 @@ SharedLibrary libmedia.so :
 	TimeSourceObjectManager.cpp
 	SoundPlayNode.cpp
 
-	# Old (R3) Media Kit
-	# TODO: removed for now, since it's not implemented anyway
-	#OldAudioModule.cpp
-	#OldAudioStream.cpp
-	#OldBufferStream.cpp
-	#OldBufferStreamManager.cpp
-	#OldMediaModule.cpp
-	#OldSoundFile.cpp
-	#OldSubscriber.cpp
+	# Old (R3) Media Kit (built only for GCC2)
+	OldAudioModule.cpp
+	OldAudioStream.cpp
+	OldBufferStream.cpp
+	OldBufferStreamManager.cpp
+	OldMediaModule.cpp
+	OldSubscriber.cpp
 
 	# Codec Plugin API
 	ChunkCache.cpp

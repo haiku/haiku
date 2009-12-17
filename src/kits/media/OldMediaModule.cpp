@@ -4,6 +4,12 @@
  */
 
 
+// This is deprecated API that is not even implemented - no need to export
+// it on a GCC4 build (BeIDE needs it to run, though, so it's worthwhile for
+// GCC2)
+#if __GNUC__ < 3
+
+
 #include "OldMediaModule.h"
 
 #include <debug.h>
@@ -665,3 +671,4 @@ BMediaChannel::StreamChanged()
 }
 
 
+#endif	// __GNUC__ < 3

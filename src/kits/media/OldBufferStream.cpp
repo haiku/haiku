@@ -4,6 +4,12 @@
  */
 
 
+// This is deprecated API that is not even implemented - no need to export
+// it on a GCC4 build (BeIDE needs it to run, though, so it's worthwhile for
+// GCC2)
+#if __GNUC__ < 3
+
+
 #include "OldBufferStream.h"
 
 #include <debug.h>
@@ -642,4 +648,6 @@ BBufferStream::FreeAllSubscribers()
 	UNIMPLEMENTED();
 }
 
+
+#endif	// __GNUC__ < 3
 
