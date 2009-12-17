@@ -1070,8 +1070,6 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 
 		// block if no message, or, if B_TIMEOUT flag set, block with timeout
 		status_t status = entry.Wait(flags, timeout);
-		if (status == B_OK && entry.WaitStatus() != B_OK)
-			status = entry.WaitStatus();
 
 		if (status != B_OK) {
 			T(Info(sPorts[slot], 0, status));
@@ -1183,11 +1181,10 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 			return B_BAD_PORT_ID;
 		}
 
-		if (status != B_OK || entry.WaitStatus() != B_OK) {
-			T(Read(sPorts[slot], 0,
-				status != B_OK ? status : entry.WaitStatus()));
+		if (status != B_OK) {
+			T(Read(sPorts[slot], 0, status));
 			sPorts[slot].read_count++;
-			return status != B_OK ? status : entry.WaitStatus();
+			return status;
 		}
 	}
 
@@ -1307,11 +1304,8 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 			return B_BAD_PORT_ID;
 		}
 
-		if (status != B_OK || entry.WaitStatus() != B_OK) {
-			if (status == B_OK)
-				status = entry.WaitStatus();
+		if (status != B_OK)
 			goto error;
-		}
 	} else
 		sPorts[slot].write_count--;
 
