@@ -1000,6 +1000,8 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 		: Haiku-doc.css ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/welcome/welcome.html : Welcome ;
+	AddSymlinkToHaikuImage home Desktop
+		: /boot/system/documentation/userguide/en/contents.html : User\ Guide ;
 }
 
 
