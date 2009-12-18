@@ -188,11 +188,11 @@ m_getjcl(int how, short type, int flags, int size)
 		(struct mbuf *)object_cache_alloc(sMBufCache, m_to_oc_flags(how));
 	if (mb == NULL)
 		return NULL;
+	construct_mbuf(mb, type, flags);
 	if (construct_ext_sized_mbuf(mb, how, size) < 0) {
 		object_cache_free(sMBufCache, mb);
 		return NULL;
 	}
-	mb->m_flags |= flags;
 	return mb;
 }
 
