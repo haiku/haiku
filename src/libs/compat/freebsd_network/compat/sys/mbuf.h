@@ -114,11 +114,10 @@ struct mbuf {
     (M_PKTHDR|M_RDONLY|M_BCAST|M_MCAST|\
      M_FRAG|M_FIRSTFRAG|M_LASTFRAG|M_VLANTAG)
 
-#define EXT_CLUSTER		1
-#define EXT_PACKET		3
-#define EXT_JUMBOP		4
-#define EXT_JUMBO9		5
-#define	EXT_NET_DRV		100
+#define EXT_CLUSTER		1			/* 2048 bytes */
+#define EXT_JUMBOP		4			/* Page size */
+#define EXT_JUMBO9		5			/* 9 * 1024 bytes */
+#define	EXT_NET_DRV		100			/* custom ext_buf provided by net driver */
 
 #define CSUM_IP			0x0001
 #define CSUM_TCP		0x0002

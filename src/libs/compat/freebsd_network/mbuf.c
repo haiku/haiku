@@ -111,59 +111,39 @@ construct_pkt_mbuf(int how, struct mbuf *memoryBuffer, short type, int flags)
 	construct_mbuf(memoryBuffer, type, flags);
 	if (construct_ext_mbuf(memoryBuffer, how) < 0)
 		return -1;
-	memoryBuffer->m_ext.ext_type |= EXT_PACKET;
+	memoryBuffer->m_ext.ext_type = EXT_CLUSTER;
 	return 0;
-}
-
-
-static void
-destruct_pkt_mbuf(struct mbuf *memoryBuffer)
-{
-	object_cache *cache;
-	if ((memoryBuffer->m_ext.ext_type & EXT_CLUSTER) != 0)
-		cache = sChunkCache;
-	else if ((memoryBuffer->m_ext.ext_type & EXT_JUMBO9) != 0)
-		cache = sJumbo9ChunkCache;
-	else if ((memoryBuffer->m_ext.ext_type & EXT_JUMBOP) != 0)
-		cache = sJumboPageSizeCache;
-	else {
-		panic("unknown cache");
-		return;
-	}
-
-	object_cache_free(cache, memoryBuffer->m_ext.ext_buf);
-	memoryBuffer->m_ext.ext_buf = NULL;
 }
 
 
 struct mbuf *
 m_getcl(int how, short type, int flags)
 {
-	struct mbuf *mb =
+	struct mbuf *memoryBuffer =
 		(struct mbuf *)object_cache_alloc(sMBufCache, m_to_oc_flags(how));
-	if (mb == NULL)
+	if (memoryBuffer == NULL)
 		return NULL;
 
-	if (construct_pkt_mbuf(how, mb, type, flags) < 0) {
-		object_cache_free(sMBufCache, mb);
+	if (construct_pkt_mbuf(how, memoryBuffer, type, flags) < 0) {
+		object_cache_free(sMBufCache, memoryBuffer);
 		return NULL;
 	}
 
-	return mb;
+	return memoryBuffer;
 }
 
 
 static struct mbuf *
 _m_get(int how, short type, int flags)
 {
-	struct mbuf *mb =
+	struct mbuf *memoryBuffer =
 		(struct mbuf *)object_cache_alloc(sMBufCache, m_to_oc_flags(how));
-	if (mb == NULL)
+	if (memoryBuffer == NULL)
 		return NULL;
 
-	construct_mbuf(mb, type, flags);
+	construct_mbuf(memoryBuffer, type, flags);
 
-	return mb;
+	return memoryBuffer;
 }
 
 
@@ -184,16 +164,16 @@ m_gethdr(int how, short type)
 struct mbuf *
 m_getjcl(int how, short type, int flags, int size)
 {
-	struct mbuf *mb =
+	struct mbuf *memoryBuffer =
 		(struct mbuf *)object_cache_alloc(sMBufCache, m_to_oc_flags(how));
-	if (mb == NULL)
+	if (memoryBuffer == NULL)
 		return NULL;
-	construct_mbuf(mb, type, flags);
-	if (construct_ext_sized_mbuf(mb, how, size) < 0) {
-		object_cache_free(sMBufCache, mb);
+	construct_mbuf(memoryBuffer, type, flags);
+	if (construct_ext_sized_mbuf(memoryBuffer, how, size) < 0) {
+		object_cache_free(sMBufCache, memoryBuffer);
 		return NULL;
 	}
-	return mb;
+	return memoryBuffer;
 }
 
 
@@ -234,20 +214,19 @@ mb_free_ext(struct mbuf *memoryBuffer)
 		panic("unsupported");
 	*/
 
-	if (memoryBuffer->m_ext.ext_type == EXT_PACKET)
-		destruct_pkt_mbuf(memoryBuffer);
-	else if (memoryBuffer->m_ext.ext_type == EXT_CLUSTER) {
-		object_cache_free(sChunkCache, memoryBuffer->m_ext.ext_buf);
-		memoryBuffer->m_ext.ext_buf = NULL;
-	} else if (memoryBuffer->m_ext.ext_type == EXT_JUMBO9) {
-		object_cache_free(sJumbo9ChunkCache, memoryBuffer->m_ext.ext_buf);
-		memoryBuffer->m_ext.ext_buf = NULL;
-	} else if (memoryBuffer->m_ext.ext_type == EXT_JUMBOP) {
-		object_cache_free(sJumboPageSizeCache, memoryBuffer->m_ext.ext_buf);
-		memoryBuffer->m_ext.ext_buf = NULL;
-	} else
+	object_cache *cache = NULL;
+
+	if (memoryBuffer->m_ext.ext_type == EXT_CLUSTER)
+		cache = sChunkCache;
+	else if (memoryBuffer->m_ext.ext_type == EXT_JUMBO9)
+		cache = sJumbo9ChunkCache;
+	else if (memoryBuffer->m_ext.ext_type == EXT_JUMBOP)
+		cache = sJumboPageSizeCache;
+	else
 		panic("unknown type");
 
+	object_cache_free(cache, memoryBuffer->m_ext.ext_buf);
+	memoryBuffer->m_ext.ext_buf = NULL;
 	object_cache_free(sMBufCache, memoryBuffer);
 }
 
