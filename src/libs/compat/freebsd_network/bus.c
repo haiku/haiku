@@ -130,8 +130,8 @@ bus_alloc_resource(device_t dev, int type, int *rid, unsigned long start,
 		&& type != SYS_RES_IOPORT)
 		return NULL;
 
-	device_printf(dev, "bus_alloc_resource(%i, [%i], 0x%lx, 0x%lx, 0x%lx, 0x%lx)\n",
-		type, *rid, start, end, count, flags);
+	device_printf(dev, "bus_alloc_resource(%i, [%i], 0x%lx, 0x%lx, 0x%lx,"
+		"0x%lx)\n", type, *rid, start, end, count, flags);
 
 	// maybe a local array of resources is enough
 	res = malloc(sizeof(struct resource));
@@ -171,7 +171,7 @@ bus_release_resource(device_t dev, int type, int rid, struct resource *res)
 
 int
 bus_alloc_resources(device_t dev, struct resource_spec *resourceSpec,
-    struct resource **resources)
+	struct resource **resources)
 {
 	int i;
 
@@ -194,7 +194,7 @@ bus_alloc_resources(device_t dev, struct resource_spec *resourceSpec,
 
 void
 bus_release_resources(device_t dev, const struct resource_spec *resourceSpec,
-    struct resource **resources)
+	struct resource **resources)
 {
 	int i;
 
@@ -466,6 +466,7 @@ bus_child_present(device_t child)
 	return bus_child_present(parent);
 }
 
+
 //	#pragma mark - PCI functions
 
 
@@ -665,14 +666,14 @@ pci_msi_count(device_t dev)
 int
 pci_alloc_msi(device_t dev, int *count)
 {
-    return ENODEV;
+	return ENODEV;
 }
 
 
 int
 pci_release_msi(device_t dev)
 {
-    return ENODEV;
+	return ENODEV;
 }
 
 
@@ -686,6 +687,5 @@ pci_msix_count(device_t dev)
 int
 pci_alloc_msix(device_t dev, int *count)
 {
-    return ENODEV;
+	return ENODEV;
 }
-
