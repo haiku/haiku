@@ -5,6 +5,9 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;
 UsePrivateHeaders shared ;
 
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) device_manager ] ;
+
+
 KernelMergeObject kernel_debug.o :
 	blue_screen.cpp
 	BreakpointManager.cpp
