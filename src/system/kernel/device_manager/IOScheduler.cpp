@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -28,6 +28,9 @@
 #else
 #	define TRACE(x...) ;
 #endif
+
+
+// #pragma mark - IOCallback
 
 
 IOCallback::~IOCallback()
@@ -99,21 +102,51 @@ struct IOScheduler::RequestOwnerHashTable
 IOScheduler::IOScheduler(DMAResource* resource)
 	:
 	fDMAResource(resource),
+	fName(NULL),
+	fID(-1),
+	fSchedulerThread(-1),
+	fRequestNotifierThread(-1),
 	fOperationArray(NULL),
 	fAllocatedRequestOwners(NULL),
 	fRequestOwners(NULL),
 	fBlockSize(0),
-	fPendingOperations(0)
+	fPendingOperations(0),
+	fTerminating(false)
 {
 	mutex_init(&fLock, "I/O scheduler");
 	B_INITIALIZE_SPINLOCK(&fFinisherLock);
+
+	fNewRequestCondition.Init(this, "I/O new request");
+	fFinishedOperationCondition.Init(this, "I/O finished operation");
+	fFinishedRequestCondition.Init(this, "I/O finished request");
+
 }
 
 
 IOScheduler::~IOScheduler()
 {
-	// TODO: Shutdown threads.
+	if (InitCheck() == B_OK)
+		IOSchedulerRoster::Default()->RemoveScheduler(this);
 
+	// shutdown threads
+	MutexLocker locker(fLock);
+	InterruptsSpinLocker finisherLocker(fFinisherLock);
+	fTerminating = true;
+
+	fNewRequestCondition.NotifyAll();
+	fFinishedOperationCondition.NotifyAll();
+	fFinishedRequestCondition.NotifyAll();
+
+	finisherLocker.Unlock();
+	locker.Unlock();
+
+	if (fSchedulerThread >= 0)
+		wait_for_thread(fSchedulerThread, NULL);
+
+	if (fRequestNotifierThread >= 0)
+		wait_for_thread(fRequestNotifierThread, NULL);
+
+	// destroy our belongings
 	mutex_lock(&fLock);
 	mutex_destroy(&fLock);
 
@@ -124,15 +157,17 @@ IOScheduler::~IOScheduler()
 
 	delete fRequestOwners;
 	delete[] fAllocatedRequestOwners;
+
+	free(fName);
 }
 
 
 status_t
 IOScheduler::Init(const char* name)
 {
-	fNewRequestCondition.Init(this, "I/O new request");
-	fFinishedOperationCondition.Init(this, "I/O finished operation");
-	fFinishedRequestCondition.Init(this, "I/O finished request");
+	fName = strdup(name);
+	if (fName == NULL)
+		return B_NO_MEMORY;
 
 	size_t count = fDMAResource != NULL ? fDMAResource->BufferCount() : 16;
 	for (size_t i = 0; i < count; i++) {
@@ -195,7 +230,17 @@ IOScheduler::Init(const char* name)
 
 	resume_thread(fSchedulerThread);
 	resume_thread(fRequestNotifierThread);
+
+	IOSchedulerRoster::Default()->AddScheduler(this);
+
 	return B_OK;
+}
+
+
+status_t
+IOScheduler::InitCheck() const
+{
+	return fRequestNotifierThread >= 0 ? B_OK : B_NO_INIT;
 }
 
 
@@ -258,6 +303,9 @@ IOScheduler::ScheduleRequest(IORequest* request)
 
 	if (!wasActive)
 		fActiveRequestOwners.Add(owner);
+
+	IOSchedulerRoster::Default()->Notify(IO_SCHEDULER_REQUEST_SCHEDULED, this,
+		request);
 
 	fNewRequestCondition.NotifyAll();
 
@@ -325,7 +373,14 @@ IOScheduler::_Finisher()
 
 		TRACE("IOScheduler::_Finisher(): operation: %p\n", operation);
 
-		if (!operation->Finish()) {
+		bool operationFinished = operation->Finish();
+
+		IOSchedulerRoster::Default()->Notify(IO_SCHEDULER_OPERATION_FINISHED,
+			this, operation->Parent(), operation);
+			// Notify for every time the operation is passed to the I/O hook,
+			// not only when it is fully finished.
+
+		if (!operationFinished) {
 			TRACE("  operation: %p not finished yet\n", operation);
 			MutexLocker _(fLock);
 			operation->SetTransferredBytes(0);
@@ -379,6 +434,8 @@ IOScheduler::_Finisher()
 					fFinishedRequestCondition.NotifyAll();
 				} else {
 					// No callbacks -- finish the request right now.
+					IOSchedulerRoster::Default()->Notify(
+						IO_SCHEDULER_REQUEST_FINISHED, this, request);
 					request->NotifyFinished();
 				}
 			}
@@ -472,10 +529,13 @@ IOScheduler::_ComputeRequestOwnerBandwidth(int32 priority) const
 }
 
 
-void
+bool
 IOScheduler::_NextActiveRequestOwner(IORequestOwner*& owner, off_t& quantum)
 {
 	while (true) {
+		if (fTerminating)
+			return false;
+
 		if (owner != NULL)
 			owner = fActiveRequestOwners.GetNext(owner);
 		if (owner == NULL)
@@ -483,7 +543,7 @@ IOScheduler::_NextActiveRequestOwner(IORequestOwner*& owner, off_t& quantum)
 
 		if (owner != NULL) {
 			quantum = _ComputeRequestOwnerBandwidth(owner->priority);
-			return;
+			return true;
 		}
 
 		// Wait for new requests owners. First check whether any finisher work
@@ -579,7 +639,7 @@ IOScheduler::_Scheduler()
 	IORequestOwner* owner = NULL;
 	off_t quantum = 0;
 
-	while (true) {
+	while (!fTerminating) {
 //dprintf("IOScheduler::_Scheduler(): next iteration: request owner: %p, quantum: %lld\n", owner, quantum);
 		MutexLocker locker(fLock);
 
@@ -594,8 +654,12 @@ IOScheduler::_Scheduler()
 			fActiveRequestOwners.Remove(&marker);
 		}
 
-		if (owner == NULL || quantum < fBlockSize)
-			_NextActiveRequestOwner(owner, quantum);
+		if (owner == NULL || quantum < fBlockSize) {
+			if (!_NextActiveRequestOwner(owner, quantum)) {
+				// we've been asked to terminate
+				return B_OK;
+			}
+		}
 
 		while (resourcesAvailable && iterationBandwidth >= fBlockSize) {
 //dprintf("IOScheduler::_Scheduler(): request owner: %p (thread %ld)\n",
@@ -673,13 +737,16 @@ panic("no more requests for owner %p (thread %ld)", owner, owner->thread);
 			TRACE("IOScheduler::_Scheduler(): calling callback for "
 				"operation %ld: %p\n", i++, operation);
 
+			IOSchedulerRoster::Default()->Notify(IO_SCHEDULER_OPERATION_STARTED,
+				this, operation->Parent(), operation);
+
 			fIOCallback(fIOCallbackData, operation);
 
 			_Finisher();
 		}
 
 		// wait for all operations to finish
-		while (true) {
+		while (!fTerminating) {
 			locker.Lock();
 
 			if (fPendingOperations == 0)
@@ -729,6 +796,9 @@ IOScheduler::_RequestNotifier()
 		IORequest* request = fFinishedRequests.RemoveHead();
 
 		if (request == NULL) {
+			if (fTerminating)
+				return B_OK;
+
 			ConditionVariableEntry entry;
 			fFinishedRequestCondition.Add(&entry);
 
@@ -739,6 +809,9 @@ IOScheduler::_RequestNotifier()
 		}
 
 		locker.Unlock();
+
+		IOSchedulerRoster::Default()->Notify(IO_SCHEDULER_REQUEST_FINISHED,
+			this, request);
 
 		// notify the request
 		request->NotifyFinished();
@@ -796,3 +869,72 @@ IOScheduler::_IOCallbackWrapper(void* data, io_operation* operation)
 	return ((IOCallback*)data)->DoIO(operation);
 }
 
+
+// #pragma mark - IOSchedulerNotificationService
+
+
+/*static*/ IOSchedulerRoster IOSchedulerRoster::sDefaultInstance;
+
+
+/*static*/ void
+IOSchedulerRoster::Init()
+{
+	new(&sDefaultInstance) IOSchedulerRoster;
+}
+
+
+void
+IOSchedulerRoster::AddScheduler(IOScheduler* scheduler)
+{
+	AutoLocker<IOSchedulerRoster> locker(this);
+	scheduler->SetID(fNextID++);
+	fSchedulers.Add(scheduler);
+	locker.Unlock();
+
+	Notify(IO_SCHEDULER_ADDED, scheduler);
+}
+
+
+void
+IOSchedulerRoster::RemoveScheduler(IOScheduler* scheduler)
+{
+	AutoLocker<IOSchedulerRoster> locker(this);
+	fSchedulers.Remove(scheduler);
+	locker.Unlock();
+
+	Notify(IO_SCHEDULER_REMOVED, scheduler);
+}
+
+
+void
+IOSchedulerRoster::Notify(uint32 eventCode, const IOScheduler* scheduler,
+	IORequest* request, IOOperation* operation)
+{
+	char eventBuffer[128];
+	KMessage event;
+	event.SetTo(eventBuffer, sizeof(eventBuffer), IO_SCHEDULER_MONITOR);
+	event.AddInt32("event", eventCode);
+	event.AddPointer("scheduler", scheduler);
+	if (request != NULL) {
+		event.AddPointer("request", request);
+		if (operation != NULL)
+			event.AddPointer("operation", operation);
+	}
+
+	fNotificationService.Notify(event, eventCode);
+}
+
+
+IOSchedulerRoster::IOSchedulerRoster()
+	:
+	fNextID(1),
+	fNotificationService("I/O")
+{
+	mutex_init(&fLock, "IOSchedulerRoster");
+}
+
+
+IOSchedulerRoster::~IOSchedulerRoster()
+{
+	mutex_destroy(&fLock);
+}

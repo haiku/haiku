@@ -1,20 +1,32 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef IO_SCHEDULER_H
 #define IO_SCHEDULER_H
 
+
 #include <KernelExport.h>
 
 #include <condition_variable.h>
 #include <lock.h>
+#include <Notifications.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
 #include "dma_resources.h"
 #include "IORequest.h"
+
+
+// I/O scheduler notifications
+#define IO_SCHEDULER_MONITOR			'_io_'
+#define IO_SCHEDULER_ADDED				0x01
+#define IO_SCHEDULER_REMOVED			0x02
+#define IO_SCHEDULER_REQUEST_SCHEDULED	0x04
+#define IO_SCHEDULER_REQUEST_FINISHED	0x08
+#define IO_SCHEDULER_OPERATION_STARTED	0x10
+#define IO_SCHEDULER_OPERATION_FINISHED	0x20
 
 
 class IOCallback {
@@ -45,12 +57,13 @@ struct IORequestOwner : DoublyLinkedListLinkImpl<IORequestOwner> {
 };
 
 
-class IOScheduler {
+class IOScheduler : public DoublyLinkedListLinkImpl<IOScheduler> {
 public:
 								IOScheduler(DMAResource* resource);
 								~IOScheduler();
 
 			status_t			Init(const char* name);
+			status_t			InitCheck() const;
 
 			void				SetCallback(IOCallback& callback);
 			void				SetCallback(io_callback callback, void* data);
@@ -65,6 +78,11 @@ public:
 									// has been completed successfully or failed
 									// for some reason
 
+			const char*			Name() const	{ return fName; }
+
+			int32				ID() const		{ return fID; }
+			void				SetID(int32 id)	{ fID = id; }
+
 			void				Dump() const;
 
 private:
@@ -77,7 +95,7 @@ private:
 			bool				_FinisherWorkPending();
 			off_t				_ComputeRequestOwnerBandwidth(
 									int32 priority) const;
-			void				_NextActiveRequestOwner(IORequestOwner*& owner,
+			bool				_NextActiveRequestOwner(IORequestOwner*& owner,
 									off_t& quantum);
 			bool				_PrepareRequestOperations(IORequest* request,
 									IOOperationList& operations,
@@ -102,6 +120,8 @@ private:
 
 private:
 			DMAResource*		fDMAResource;
+			char*				fName;
+			int32				fID;
 			spinlock			fFinisherLock;
 			mutex				fLock;
 			thread_id			fSchedulerThread;
@@ -126,6 +146,45 @@ private:
 			off_t				fIterationBandwidth;
 			off_t				fMinOwnerBandwidth;
 			off_t				fMaxOwnerBandwidth;
+	volatile bool				fTerminating;
 };
+
+typedef DoublyLinkedList<IOScheduler> IOSchedulerList;
+
+
+class IOSchedulerRoster {
+public:
+	static	void				Init();
+	static	IOSchedulerRoster*	Default()	{ return &sDefaultInstance; }
+
+			bool				Lock()	{ return mutex_lock(&fLock) == B_OK; }
+			void				Unlock()	{ mutex_unlock(&fLock); }
+
+			const IOSchedulerList& SchedulerList() const
+									{ return fSchedulers; }
+									// caller must keep the roster locked,
+									// while accessing the list
+
+			void				AddScheduler(IOScheduler* scheduler);
+			void				RemoveScheduler(IOScheduler* scheduler);
+
+			void				Notify(uint32 eventCode,
+									const IOScheduler* scheduler,
+									IORequest* request = NULL,
+									IOOperation* operation = NULL);
+
+private:
+								IOSchedulerRoster();
+								~IOSchedulerRoster();
+
+private:
+			mutex				fLock;
+			int32				fNextID;
+			IOSchedulerList		fSchedulers;
+			DefaultNotificationService fNotificationService;
+
+	static	IOSchedulerRoster	sDefaultInstance;
+};
+
 
 #endif	// IO_SCHEDULER_H
