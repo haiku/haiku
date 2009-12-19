@@ -989,7 +989,8 @@ TRACE("build tree!\n");
 
 	// GPIO
 	uint32 gpio = 0;
-	for (int32 i = 0; i < HDA_QUIRK_GPIO_COUNT; i++) {
+	for (int32 i = 0; i < GPIO_COUNT_NUM_GPIO(audioGroup->gpio) 
+		&& i < HDA_QUIRK_GPIO_COUNT; i++) {
 		if (audioGroup->codec->quirks & (1 << i)) {
 			gpio |= (1 << i);
 		}
