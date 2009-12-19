@@ -21,6 +21,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev an ] ;
 KernelAddon aironetwifi :
 	if_an.c
 	if_an_pci.c
+	glue.c
 	:
 	libfreebsd_wlan.a
 	libfreebsd_network.a
