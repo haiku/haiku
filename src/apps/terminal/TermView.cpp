@@ -26,6 +26,7 @@
 #include <new>
 
 #include <Alert.h>
+#include <Application.h>
 #include <Beep.h>
 #include <Clipboard.h>
 #include <Debug.h>
@@ -48,6 +49,7 @@
 #include <Window.h>
 
 #include "CodeConv.h"
+#include "InlineInput.h"
 #include "Shell.h"
 #include "TermConst.h"
 #include "TerminalBuffer.h"
@@ -229,9 +231,6 @@ TermView::TermView(BMessage* archive)
 	fReportButtonMouseEvent(false),
 	fReportAnyMouseEvent(false)
 {
-	SetFlags(Flags() | B_WILL_DRAW | B_FRAME_EVENTS
-		| B_FULL_UPDATE_ON_RESIZE);
-
 	BRect frame = Bounds();
 	
 	if (archive->FindInt32("encoding", (int32*)&fEncoding) < B_OK)
@@ -270,6 +269,9 @@ TermView::TermView(BMessage* archive)
 status_t
 TermView::_InitObject(int32 argc, const char** argv)
 {
+	SetFlags(Flags() | B_WILL_DRAW | B_FRAME_EVENTS
+		| B_FULL_UPDATE_ON_RESIZE/* | B_INPUT_METHOD_AWARE*/);
+
 	fShell = NULL;
 	fWinchRunner = NULL;
 	fCursorBlinkRunner = NULL;
@@ -793,9 +795,8 @@ TermView::_AttachShell(Shell *shell)
 		return B_BAD_VALUE;
 
 	fShell = shell;
-	fShell->AttachBuffer(TextBuffer());
-
-	return B_OK;
+	
+	return fShell->AttachBuffer(TextBuffer());
 }
 
 
@@ -823,7 +824,6 @@ TermView::_Activate()
 void
 TermView::_Deactivate()
 {
-	// DoIMConfirm();
 	// make sure the cursor becomes visible
 	fCursorState = 0;
 	_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
@@ -955,6 +955,9 @@ void
 TermView::_BlinkCursor()
 {
 	bool wasVisible = _IsCursorVisible();
+	
+	if (!wasVisible && fInline && fInline->IsActive())
+		return;
 
 	bigtime_t now = system_time();
 	if (Window()->IsActive() && now - fLastActivityTime >= kCursorBlinkInterval)
@@ -1138,6 +1141,9 @@ TermView::Draw(BRect updateRect)
 		}
 	}
 
+	if (fInline && fInline->IsActive())
+		_DrawInlineMethodString();
+	
 	if (fCursor >= TermPos(x1, y1) && fCursor <= TermPos(x2, y2))
 		_DrawCursor();
 }
@@ -1565,35 +1571,49 @@ TermView::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
+		
+		case B_INPUT_METHOD_EVENT:
+		{
+			int32 opcode;
+			if (msg->FindInt32("be:opcode", &opcode) == B_OK) {
+				switch (opcode) {
+					case B_INPUT_METHOD_STARTED:
+					{
+						BMessenger messenger;
+						if (msg->FindMessenger("be:reply_to",
+								&messenger) == B_OK) {
+							fInline = new (std::nothrow)
+								InlineInput(messenger);
+						}
+						break;
+					}
+
+					case B_INPUT_METHOD_STOPPED:
+						delete fInline;
+						fInline = NULL;
+						break;
+
+					case B_INPUT_METHOD_CHANGED:
+						if (fInline != NULL)
+							_HandleInputMethodChanged(msg);
+						break;
+
+					case B_INPUT_METHOD_LOCATION_REQUEST:
+						if (fInline != NULL)
+							_HandleInputMethodLocationRequest();
+						break;
+
+					default:
+						break;
+				}
+			}
+			break;
+		}
 
 		case MENU_CLEAR_ALL:
 			Clear();
 			fShell->Write(ctrl_l, 1);
 			break;
-
-
-//  case B_INPUT_METHOD_EVENT:
-//    {
-   //   int32 op;
-  //    msg->FindInt32("be:opcode", &op);
-   //   switch (op){
-   //   case B_INPUT_METHOD_STARTED:
-	//DoIMStart(msg);
-//	break;
-
-//      case B_INPUT_METHOD_STOPPED:
-//	DoIMStop(msg);
-//	break;
-
-//      case B_INPUT_METHOD_CHANGED:
-//	DoIMChange(msg);
-//	break;
-
-//      case B_INPUT_METHOD_LOCATION_REQUEST:
-//	DoIMLocation(msg);
-//	break;
-    //  }
-   // }
 		case kBlinkCursor:
 			_BlinkCursor();
 			break;
@@ -1726,7 +1746,7 @@ TermView::TargetedByScrollView(BScrollView *scrollView)
 {
 	BView::TargetedByScrollView(scrollView);
 	
-	SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
+	SetScrollBar(scrollView ? scrollView->ScrollBar(B_VERTICAL) : NULL);
 }
 
 
@@ -2779,9 +2799,176 @@ TermView::_ScrollToRange(TermPos start, TermPos end)
 	}
 }
 
+
 void
 TermView::DisableResizeView(int32 disableCount)
 {
 	fResizeViewDisableCount += disableCount;
+}
+
+
+void
+TermView::_DrawInlineMethodString()
+{
+	if (!fInline->String())
+		return;
+	
+	const int32 numChars = BString(fInline->String()).CountChars();
+	
+	BPoint startPoint = _ConvertFromTerminal(fCursor);
+	BPoint endPoint = startPoint;
+	endPoint.x += fFontWidth * numChars;
+	endPoint.y += fFontHeight + 1;
+	
+	BRect eraseRect(startPoint, endPoint);
+	
+	PushState();
+	SetHighColor(kTermColorTable[7]);
+	FillRect(eraseRect);
+	PopState();
+		
+	BPoint loc = _ConvertFromTerminal(fCursor);
+	loc.y += fFontHeight;
+	SetFont(&fHalfFont);
+	SetHighColor(kTermColorTable[0]);
+	SetLowColor(kTermColorTable[7]);	
+	DrawString(fInline->String(), loc);
+}
+
+
+void
+TermView::_HandleInputMethodChanged(BMessage *message)
+{
+	const char *string = NULL;
+	if (message->FindString("be:string", &string) < B_OK || string == NULL)
+		return;
+
+	_ActivateCursor(false);
+
+	if (IsFocus())
+		be_app->ObscureCursor();	
+
+	// If we find the "be:confirmed" boolean (and the boolean is true),
+	// it means it's over for now, so the current InlineInput object
+	// should become inactive. We will probably receive a
+	// B_INPUT_METHOD_STOPPED message after this one.
+	bool confirmed;
+	if (message->FindBool("be:confirmed", &confirmed) != B_OK)
+		confirmed = false;
+	
+	fInline->SetString("");
+	
+	Invalidate();
+	// TODO: Debug only
+	snooze(100000);
+	
+	fInline->SetString(string);
+	fInline->ResetClauses();
+
+	if (!confirmed && !fInline->IsActive())
+		fInline->SetActive(true);
+
+	// Get the clauses, and pass them to the InlineInput object
+	// TODO: Find out if what we did it's ok, currently we don't consider
+	// clauses at all, while the bebook says we should; though the visual
+	// effect we obtained seems correct. Weird.
+	int32 clauseCount = 0;
+	int32 clauseStart;
+	int32 clauseEnd;
+	while (message->FindInt32("be:clause_start", clauseCount, &clauseStart)
+			== B_OK
+		&& message->FindInt32("be:clause_end", clauseCount, &clauseEnd)
+			== B_OK) {
+		if (!fInline->AddClause(clauseStart, clauseEnd))
+			break;
+		clauseCount++;
+	}
+
+	if (confirmed) {
+		fInline->SetString("");
+		_ActivateCursor(true);
+
+		// now we need to feed ourselves the individual characters as if the
+		// user would have pressed them now - this lets KeyDown() pick out all
+		// the special characters like B_BACKSPACE, cursor keys and the like:
+		const char* currPos = string;
+		const char* prevPos = currPos;
+		while (*currPos != '\0') {
+			if ((*currPos & 0xC0) == 0xC0) {
+				// found the start of an UTF-8 char, we collect while it lasts
+				++currPos;
+				while ((*currPos & 0xC0) == 0x80)
+					++currPos;
+			} else if ((*currPos & 0xC0) == 0x80) {
+				// illegal: character starts with utf-8 intermediate byte, skip it
+				prevPos = ++currPos;
+			} else {
+				// single byte character/code, just feed that
+				++currPos;
+			}
+			KeyDown(prevPos, currPos - prevPos);
+			prevPos = currPos;
+		}
+
+		Invalidate();
+	} else {
+		// temporarily show transient state of inline input
+		int32 selectionStart = 0;
+		int32 selectionEnd = 0;
+		message->FindInt32("be:selection", 0, &selectionStart);
+		message->FindInt32("be:selection", 1, &selectionEnd);
+
+		fInline->SetSelectionOffset(selectionStart);
+		fInline->SetSelectionLength(selectionEnd - selectionStart);
+		Invalidate();
+	}
+}
+
+
+void
+TermView::_HandleInputMethodLocationRequest()
+{
+	BMessage message(B_INPUT_METHOD_EVENT);
+	message.AddInt32("be:opcode", B_INPUT_METHOD_LOCATION_REQUEST);
+
+	BString string(fInline->String());
+
+	const int32 &limit = string.CountChars();
+	BPoint where = _ConvertFromTerminal(fCursor);
+	where.y += fFontHeight;
+	
+	for (int32 i = 0; i < limit; i++) { 
+		// Add the location of the UTF8 characters
+	
+		where.x += fFontWidth;
+		ConvertToScreen(&where);
+
+		message.AddPoint("be:location_reply", where);
+		message.AddFloat("be:height_reply", fFontHeight);
+	}
+
+	fInline->Method()->SendMessage(&message);
+}
+
+
+
+void
+TermView::_CancelInputMethod()
+{
+	if (!fInline)
+		return;
+
+	InlineInput *inlineInput = fInline;
+	fInline = NULL;
+
+	if (inlineInput->IsActive() && Window()) {
+		Invalidate();
+		
+		BMessage message(B_INPUT_METHOD_EVENT);
+		message.AddInt32("be:opcode", B_INPUT_METHOD_STOPPED);
+		inlineInput->Method()->SendMessage(&message);
+	}
+
+	delete inlineInput;
 }
 

@@ -70,7 +70,9 @@ private:
 	void			_SetTermColors(TermViewContainerView *termView);
 	void			_InitWindow();
 	void			_SetupMenu();
-	static void		_MakeEncodingMenu(BMenu *eMenu, bool withShortcuts);
+	static BMenu*	_MakeEncodingMenu();
+	static BMenu*	_MakeWindowSizeMenu();
+	
 	void			_GetPreferredFont(BFont &font);
 	status_t		_DoPageSetup();
 	void			_DoPrint();
@@ -83,7 +85,7 @@ private:
 	int32			_IndexOfTermView(TermView* termView) const;
 	void			_CheckChildren();
 	void			_ResizeView(TermView *view);
-	void			_BuildWindowSizeMenu(BMenu *menu);
+	
 	int32			_NewSessionID();
 
 	BString			fInitialTitle;

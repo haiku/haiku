@@ -31,7 +31,7 @@
 #ifndef TERMCONST_H_INCLUDED
 #define TERMCONST_H_INCLUDED
 
-// Application signature (Must same in Muterminal.rsrc)
+// Application signature (Must same in Terminal.rdef)
 #define TERM_SIGNATURE "application/x-vnd.Haiku-Terminal"
 #define PREFFILE_MIMETYPE "text/x-terminal-pref"
 

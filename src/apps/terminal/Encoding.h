@@ -37,12 +37,11 @@
 
 #define M_UTF8 (-1)
 
-status_t	get_nth_encoding(int i, int *id);
+status_t	get_next_encoding(int i, int *id);
 
 int 			EncodingID(const char *longname);
 const char *	EncodingAsShortString(int id);
 const char *	EncodingAsString(int id);
-const char 		id2shortcut(int id);
 
 
 #endif /* _CODING_H_ */

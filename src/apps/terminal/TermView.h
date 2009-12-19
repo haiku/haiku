@@ -26,6 +26,7 @@ class BScrollView;
 class BString;
 class BStringView;
 class BasicTerminalBuffer;
+class InlineInput;
 class ResizeWindow;
 class TermBuffer;
 class TerminalBuffer;
@@ -183,6 +184,11 @@ private:
 
 			void			_SendMouseEvent(int32 button, int32 mode, int32 x,
 								int32 y, bool motion);
+
+			void			_DrawInlineMethodString();
+			void			_HandleInputMethodChanged(BMessage* message);
+			void			_HandleInputMethodLocationRequest();
+			void			_CancelInputMethod();
 private:
 	class CharClassifier;
 
@@ -222,10 +228,12 @@ private:
 
 			int				fEncoding;
 			bool				fActive;
+
 			// Object pointer.
 			TerminalBuffer*	fTextBuffer;
 			BasicTerminalBuffer* fVisibleTextBuffer;
 			BScrollBar*		fScrollBar;
+			InlineInput*		fInline;
 
 			// Color and Attribute.
 			rgb_color		fTextForeColor;

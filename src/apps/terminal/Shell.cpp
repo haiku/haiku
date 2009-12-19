@@ -226,19 +226,13 @@ Shell::FD() const
 }
 
 
-void
+status_t
 Shell::AttachBuffer(TerminalBuffer *buffer)
 {
 	if (fAttached)
-		return;
+		return B_ERROR;
 
-	status_t status = fTermParse->StartThreads(buffer);
-	if (status < B_OK) {
-		// TODO: What can we do here ?
-		fprintf(stderr, "Shell:AttachBuffer():"
-				" cannot start parser threads: %s",
-				strerror(status));
-	}
+	return fTermParse->StartThreads(buffer);
 }
 
 

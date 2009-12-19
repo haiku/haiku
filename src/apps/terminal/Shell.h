@@ -40,7 +40,7 @@ public:
 	int			FD() const;
 	pid_t		ProcessID() const	{ return fProcessID; }
 	
-	virtual	void	AttachBuffer(TerminalBuffer *buffer);
+	virtual	status_t	AttachBuffer(TerminalBuffer *buffer);
 	virtual void	DetachBuffer();
 	
 private:

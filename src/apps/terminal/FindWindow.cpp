@@ -20,12 +20,13 @@
 
 const uint32 MSG_FIND_HIDE = 'Fhid';
 
+const BRect kWindowFrame(0, 0, 240, 170);
 
-FindWindow::FindWindow(BRect frame, BMessenger messenger, BString &str,
+FindWindow::FindWindow(BMessenger messenger, BString &str,
 		bool findSelection, bool matchWord, bool matchCase,
 		bool forwardSearch)
 	:
-	BWindow(frame, "Find", B_FLOATING_WINDOW,
+	BWindow(kWindowFrame, "Find", B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
 		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFindDlgMessenger(messenger)
@@ -82,7 +83,7 @@ FindWindow::FindWindow(BRect frame, BMessenger messenger, BString &str,
 
 	AddShortcut((ulong)'W', (ulong)B_COMMAND_KEY,
 		new BMessage(MSG_FIND_HIDE));
-		
+	
 	Show();
 }
 

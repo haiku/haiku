@@ -24,6 +24,12 @@ public:
 									uint32 flags = B_FULL_UPDATE_ON_RESIZE
 										| B_WILL_DRAW | B_NAVIGABLE_JUMP
 										| B_FRAME_EVENTS | B_NAVIGABLE);
+								SmartTabView(const char* name,
+									button_width width = B_WIDTH_AS_USUAL,
+									uint32 flags = B_FULL_UPDATE_ON_RESIZE
+										| B_WILL_DRAW | B_NAVIGABLE_JUMP
+										| B_FRAME_EVENTS | B_NAVIGABLE
+										| B_SUPPORTS_LAYOUT);
 	virtual						~SmartTabView();
 
 			void				SetInsets(float left, float top, float right,

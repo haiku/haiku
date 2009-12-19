@@ -9,6 +9,7 @@
 
 #include "TermWindow.h"
 
+#include <new>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -228,12 +229,13 @@ TermWindow::_InitWindow()
 void
 TermWindow::MenusBeginning()
 {
+	TermView *view = _ActiveTermView();
+	
 	// Syncronize Encode Menu Pop-up menu and Preference.
-	BMenuItem *item = fEncodingmenu->FindItem(EncodingAsString(_ActiveTermView()->Encoding()));
+	BMenuItem *item = fEncodingmenu->FindItem(
+		EncodingAsString(view->Encoding()));
 	if (item != NULL)
 		item->SetMarked(true);
-
-	TermView *view = _ActiveTermView();
 
 	BFont font;
 	view->GetTermFont(&font);
@@ -248,23 +250,28 @@ TermWindow::MenusBeginning()
 
 
 /* static */
-void
-TermWindow::_MakeEncodingMenu(BMenu *eMenu, bool withShortcuts)
+BMenu *
+TermWindow::_MakeEncodingMenu()
 {
+	BMenu *menu = new (std::nothrow) BMenu("Text Encoding");
+	if (menu == NULL)
+		return NULL;
+	
 	int encoding;
 	int i = 0;
-	while (get_nth_encoding(i, &encoding) == B_OK) {
-		BMessage *msg = new BMessage(MENU_ENCODING);
-		msg->AddInt32("op", (int32)encoding);
-		if (withShortcuts) {
-			eMenu->AddItem(new BMenuItem(EncodingAsString(encoding),
-				msg, id2shortcut(encoding)));
-		} else 
-			eMenu->AddItem(new BMenuItem(EncodingAsString(encoding),
-				msg));
-
+	while (get_next_encoding(i, &encoding) == B_OK) {
+		BMessage *message = new BMessage(MENU_ENCODING);
+		if (message != NULL) {
+			message->AddInt32("op", (int32)encoding);
+			menu->AddItem(new BMenuItem(EncodingAsString(encoding),
+				message));
+		}
 		i++;
 	}
+	
+	menu->SetRadioMode(true);
+	
+	return menu;
 }
 
 
@@ -321,12 +328,9 @@ TermWindow::_SetupMenu()
 
 	// Make Help Menu.
 	fHelpmenu = new BMenu("Settings");
-	fWindowSizeMenu = new BMenu("Window Size");
-	_BuildWindowSizeMenu(fWindowSizeMenu);
+	fWindowSizeMenu = _MakeWindowSizeMenu();
 
-	fEncodingmenu = new BMenu("Text Encoding");
-	fEncodingmenu->SetRadioMode(true);
-	_MakeEncodingMenu(fEncodingmenu, false);
+	fEncodingmenu = _MakeEncodingMenu();
 
 	fSizeMenu = new BMenu("Text Size");
 
@@ -415,8 +419,10 @@ TermWindow::MessageReceived(BMessage *message)
 		}
 
 		case MENU_PREF_OPEN:
-			if (!fPrefWindow)
+			if (!fPrefWindow) {
 				fPrefWindow = new PrefWindow(this);
+				//fPrefWindow->
+			}
 			else
 				fPrefWindow->Activate();
 			break;
@@ -427,12 +433,8 @@ TermWindow::MessageReceived(BMessage *message)
 
 		case MENU_FIND_STRING:
 			if (!fFindPanel) {
-				BRect r = Frame();
-				r.left += 20;
-				r.top += 20;
-				r.right = r.left + 260;
-				r.bottom = r.top + 190;
-				fFindPanel = new FindWindow(r, this, fFindString, fFindSelection, fMatchWord, fMatchCase, fForwardSearch);
+				fFindPanel = new FindWindow(this, fFindString, fFindSelection,
+					fMatchWord, fMatchCase, fForwardSearch);
 			}
 			else
 				fFindPanel->Activate();
@@ -970,16 +972,21 @@ TermWindow::_ResizeView(TermView *view)
 }
 
 
-void
-TermWindow::_BuildWindowSizeMenu(BMenu *menu)
+/* static */
+BMenu*
+TermWindow::_MakeWindowSizeMenu()
 {
+	BMenu *menu = new (std::nothrow) BMenu("Window Size");
+	if (menu == NULL)
+		return NULL;
+	
 	const int32 windowSizes[4][2] = {
 		{ 80, 25 },
 		{ 80, 40 },
 		{ 132, 25 },
 		{ 132, 40 }
-	};
-
+	};	
+	
 	const int32 sizeNum = sizeof(windowSizes) / sizeof(windowSizes[0]);
 	for (int32 i = 0; i < sizeNum; i++) {
 		char label[32];
@@ -995,6 +1002,8 @@ TermWindow::_BuildWindowSizeMenu(BMenu *menu)
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Fullscreen", new BMessage(FULLSCREEN),
 		B_ENTER));
+		
+	return menu;
 }
 
 

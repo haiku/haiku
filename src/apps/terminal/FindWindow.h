@@ -22,7 +22,7 @@ class BCheckBox;
 
 class FindWindow : public BWindow {
 	public:
-		FindWindow (BRect frame, BMessenger messenger, BString &str,
+		FindWindow (BMessenger messenger, BString &str,
 			bool findSelection, bool matchWord, bool matchCase, bool forwardSearch);
 		virtual ~FindWindow();
 
