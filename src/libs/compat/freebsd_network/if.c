@@ -442,7 +442,7 @@ if_addmulti(struct ifnet *ifp, struct sockaddr *address,
 	if (result == NULL)
 		return ENOBUFS;
 
-	if (refcount == 1)
+	if (refcount == 1 && ifp->if_ioctl != NULL)
 		ifp->if_ioctl(ifp, SIOCADDMULTI, NULL);
 
 	if (out)
@@ -477,7 +477,7 @@ if_delmulti(struct ifnet *ifp, struct sockaddr *address)
 	}
 	IF_ADDR_UNLOCK(ifp);
 
-	if (deleted)
+	if (deleted && ifp->if_ioctl != NULL)
 		ifp->if_ioctl(ifp, SIOCDELMULTI, NULL);
 
 	return 0;
