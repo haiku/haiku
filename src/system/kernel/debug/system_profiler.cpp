@@ -27,11 +27,14 @@
 
 #include <arch/debug.h>
 
+#include "IOScheduler.h"
+
 
 // This is the kernel-side implementation of the system profiling support.
 // A userland team can register as system profiler, providing an area as buffer
-// for events. Those events are team, thread, and image changes (added/removed)
-// and periodic sampling of the return address stack for each CPU.
+// for events. Those events are team, thread, and image changes (added/removed),
+// periodic sampling of the return address stack for each CPU, as well as
+// scheduling and I/O scheduling events.
 
 
 class SystemProfiler;
@@ -88,6 +91,17 @@ private:
 
 			bool				_ImageAdded(struct image* image);
 			bool				_ImageRemoved(struct image* image);
+
+			bool				_IOSchedulerAdded(IOScheduler* scheduler);
+			bool				_IOSchedulerRemoved(IOScheduler* scheduler);
+			bool				_IORequestScheduled(IOScheduler* scheduler,
+									IORequest* request);
+			bool				_IORequestFinished(IOScheduler* scheduler,
+									IORequest* request);
+			bool				_IOOperationStarted(IOScheduler* scheduler,
+									IORequest* request, IOOperation* operation);
+			bool				_IOOperationFinished(IOScheduler* scheduler,
+									IORequest* request, IOOperation* operation);
 
 			void				_WaitObjectCreated(addr_t object, uint32 type);
 			void				_WaitObjectUsed(addr_t object, uint32 type);
@@ -182,6 +196,8 @@ private:
 			bool				fThreadNotificationsEnabled;
 			bool				fImageNotificationsRequested;
 			bool				fImageNotificationsEnabled;
+			bool				fIONotificationsRequested;
+			bool				fIONotificationsEnabled;
 			bool				fSchedulerNotificationsRequested;
 			bool				fWaitObjectNotificationsRequested;
 			ConditionVariable	fProfilerWaitCondition;
@@ -247,6 +263,8 @@ SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 	fThreadNotificationsEnabled(false),
 	fImageNotificationsRequested(false),
 	fImageNotificationsEnabled(false),
+	fIONotificationsRequested(false),
+	fIONotificationsEnabled(false),
 	fSchedulerNotificationsRequested(false),
 	fWaitObjectNotificationsRequested(false),
 	fProfilerWaiting(false),
@@ -321,6 +339,12 @@ SystemProfiler::~SystemProfiler()
 	if (fTeamNotificationsRequested) {
 		fTeamNotificationsRequested = false;
 		notificationManager.RemoveListener("teams", NULL, *this);
+	}
+
+	// I/O
+	if (fIONotificationsRequested) {
+		fIONotificationsRequested = false;
+		notificationManager.RemoveListener("I/O", NULL, *this);
 	}
 
 	// delete wait object related allocations
@@ -407,6 +431,19 @@ SystemProfiler::Init()
 		fImageNotificationsRequested = true;
 	}
 
+	// I/O events
+	if ((fFlags & B_SYSTEM_PROFILER_IO_SCHEDULING_EVENTS) != 0) {
+		error = notificationManager.AddListener("I/O",
+			IO_SCHEDULER_ADDED | IO_SCHEDULER_REMOVED
+				| IO_SCHEDULER_REQUEST_SCHEDULED | IO_SCHEDULER_REQUEST_FINISHED
+				| IO_SCHEDULER_OPERATION_STARTED
+				| IO_SCHEDULER_OPERATION_FINISHED,
+			*this);
+		if (error != B_OK)
+			return error;
+		fIONotificationsRequested = true;
+	}
+
 	// We need to fill the buffer with the initial state of teams, threads,
 	// and images.
 
@@ -462,6 +499,20 @@ SystemProfiler::Init()
 	}
 
 	threadsLocker.Unlock();
+
+	// I/O scheduling
+	if ((fFlags & B_SYSTEM_PROFILER_IO_SCHEDULING_EVENTS) != 0) {
+		IOSchedulerRoster* roster = IOSchedulerRoster::Default();
+		AutoLocker<IOSchedulerRoster> rosterLocker(roster);
+
+		for (IOSchedulerList::ConstIterator it
+				= roster->SchedulerList().GetIterator();
+			IOScheduler* scheduler = it.Next();) {
+			_IOSchedulerAdded(scheduler);
+		}
+
+		fIONotificationsEnabled = true;
+	}
 
 	// activate the profiling timers on all CPUs
 	if ((fFlags & B_SYSTEM_PROFILER_SAMPLING_EVENTS) != 0)
@@ -606,6 +657,44 @@ SystemProfiler::EventOccurred(NotificationService& service,
 				_ImageRemoved(image);
 				break;
 		}
+	} else if (strcmp(service.Name(), "I/O") == 0) {
+		if (!fIONotificationsEnabled)
+			return;
+
+		IOScheduler* scheduler = (IOScheduler*)event->GetPointer("scheduler",
+			NULL);
+		if (scheduler == NULL)
+			return;
+
+		IORequest* request = (IORequest*)event->GetPointer("request", NULL);
+		IOOperation* operation = (IOOperation*)event->GetPointer("operation",
+			NULL);
+
+		switch (eventCode) {
+			case IO_SCHEDULER_ADDED:
+				_IOSchedulerAdded(scheduler);
+				break;
+
+			case IO_SCHEDULER_REMOVED:
+				_IOSchedulerRemoved(scheduler);
+				break;
+
+			case IO_SCHEDULER_REQUEST_SCHEDULED:
+				_IORequestScheduled(scheduler, request);
+				break;
+
+			case IO_SCHEDULER_REQUEST_FINISHED:
+				_IORequestFinished(scheduler, request);
+				break;
+
+			case IO_SCHEDULER_OPERATION_STARTED:
+				_IOOperationStarted(scheduler, request, operation);
+				break;
+
+			case IO_SCHEDULER_OPERATION_FINISHED:
+				_IOOperationFinished(scheduler, request, operation);
+				break;
+		}
 	}
 
 	_MaybeNotifyProfilerThread();
@@ -734,10 +823,10 @@ SystemProfiler::RWLockInitialized(rw_lock* lock)
 bool
 SystemProfiler::_TeamAdded(struct team* team)
 {
-	InterruptsSpinLocker locker(fLock);
-
 	size_t nameLen = strlen(team->name);
 	size_t argsLen = strlen(team->args);
+
+	InterruptsSpinLocker locker(fLock);
 
 	system_profiler_team_added* event = (system_profiler_team_added*)
 		_AllocateBuffer(
@@ -779,9 +868,9 @@ SystemProfiler::_TeamRemoved(struct team* team)
 bool
 SystemProfiler::_TeamExec(struct team* team)
 {
-	InterruptsSpinLocker locker(fLock);
-
 	size_t argsLen = strlen(team->args);
+
+	InterruptsSpinLocker locker(fLock);
 
 	system_profiler_team_exec* event = (system_profiler_team_exec*)
 		_AllocateBuffer(sizeof(system_profiler_team_exec) + argsLen,
@@ -875,6 +964,156 @@ SystemProfiler::_ImageRemoved(struct image* image)
 
 	event->team = image->team;
 	event->image = image->info.id;
+
+	fHeader->size = fBufferSize;
+
+	return true;
+}
+
+
+bool
+SystemProfiler::_IOSchedulerAdded(IOScheduler* scheduler)
+{
+	size_t nameLen = strlen(scheduler->Name());
+
+	InterruptsSpinLocker locker(fLock);
+
+	system_profiler_io_scheduler_added* event
+		= (system_profiler_io_scheduler_added*)_AllocateBuffer(
+			sizeof(system_profiler_io_scheduler_added) + nameLen,
+			B_SYSTEM_PROFILER_IO_SCHEDULER_ADDED, 0, 0);
+	if (event == NULL)
+		return false;
+
+	event->scheduler = scheduler->ID();
+	strcpy(event->name, scheduler->Name());
+
+	fHeader->size = fBufferSize;
+
+	return true;
+}
+
+
+bool
+SystemProfiler::_IOSchedulerRemoved(IOScheduler* scheduler)
+{
+	InterruptsSpinLocker locker(fLock);
+
+	system_profiler_io_scheduler_removed* event
+		= (system_profiler_io_scheduler_removed*)_AllocateBuffer(
+			sizeof(system_profiler_io_scheduler_removed),
+			B_SYSTEM_PROFILER_IO_SCHEDULER_REMOVED, 0, 0);
+	if (event == NULL)
+		return false;
+
+	event->scheduler = scheduler->ID();
+
+	fHeader->size = fBufferSize;
+
+	return true;
+}
+
+
+bool
+SystemProfiler::_IORequestScheduled(IOScheduler* scheduler, IORequest* request)
+{
+	InterruptsSpinLocker locker(fLock);
+
+	system_profiler_io_request_scheduled* event
+		= (system_profiler_io_request_scheduled*)_AllocateBuffer(
+			sizeof(system_profiler_io_request_scheduled),
+			B_SYSTEM_PROFILER_IO_REQUEST_SCHEDULED, 0, 0);
+	if (event == NULL)
+		return false;
+
+	IORequestOwner* owner = request->Owner();
+
+	event->time = system_time_nsecs();
+	event->scheduler = scheduler->ID();
+	event->team = owner->team;
+	event->thread = owner->thread;
+	event->request = request;
+	event->offset = request->Offset();
+	event->length = request->Length();
+	event->write = request->IsWrite();
+	event->priority = owner->priority;
+
+	fHeader->size = fBufferSize;
+
+	return true;
+}
+
+
+bool
+SystemProfiler::_IORequestFinished(IOScheduler* scheduler, IORequest* request)
+{
+	InterruptsSpinLocker locker(fLock);
+
+	system_profiler_io_request_finished* event
+		= (system_profiler_io_request_finished*)_AllocateBuffer(
+			sizeof(system_profiler_io_request_finished),
+			B_SYSTEM_PROFILER_IO_REQUEST_FINISHED, 0, 0);
+	if (event == NULL)
+		return false;
+
+	event->time = system_time_nsecs();
+	event->scheduler = scheduler->ID();
+	event->request = request;
+	event->status = request->Status();
+	event->transferred = request->TransferredBytes();
+
+	fHeader->size = fBufferSize;
+
+	return true;
+}
+
+
+bool
+SystemProfiler::_IOOperationStarted(IOScheduler* scheduler, IORequest* request,
+	IOOperation* operation)
+{
+	InterruptsSpinLocker locker(fLock);
+
+	system_profiler_io_operation_started* event
+		= (system_profiler_io_operation_started*)_AllocateBuffer(
+			sizeof(system_profiler_io_operation_started),
+			B_SYSTEM_PROFILER_IO_OPERATION_STARTED, 0, 0);
+	if (event == NULL)
+		return false;
+
+	event->time = system_time_nsecs();
+	event->scheduler = scheduler->ID();
+	event->request = request;
+	event->operation = operation;
+	event->offset = request->Offset();
+	event->length = request->Length();
+	event->write = request->IsWrite();
+
+	fHeader->size = fBufferSize;
+
+	return true;
+}
+
+
+bool
+SystemProfiler::_IOOperationFinished(IOScheduler* scheduler, IORequest* request,
+	IOOperation* operation)
+{
+	InterruptsSpinLocker locker(fLock);
+
+	system_profiler_io_operation_finished* event
+		= (system_profiler_io_operation_finished*)_AllocateBuffer(
+			sizeof(system_profiler_io_operation_finished),
+			B_SYSTEM_PROFILER_IO_OPERATION_FINISHED, 0, 0);
+	if (event == NULL)
+		return false;
+
+	event->time = system_time_nsecs();
+	event->scheduler = scheduler->ID();
+	event->request = request;
+	event->operation = operation;
+	event->status = request->Status();
+	event->transferred = request->TransferredBytes();
 
 	fHeader->size = fBufferSize;
 
@@ -1188,6 +1427,7 @@ start_system_profiler(size_t areaSize, uint32 stackDepth, bigtime_t interval)
 	sRecordedParameters->buffer_area = area;
 	sRecordedParameters->flags = B_SYSTEM_PROFILER_TEAM_EVENTS
 		| B_SYSTEM_PROFILER_THREAD_EVENTS | B_SYSTEM_PROFILER_IMAGE_EVENTS
+		| B_SYSTEM_PROFILER_IO_SCHEDULING_EVENTS
 		| B_SYSTEM_PROFILER_SAMPLING_EVENTS;
 	sRecordedParameters->locking_lookup_size = 4096;
 	sRecordedParameters->interval = interval;

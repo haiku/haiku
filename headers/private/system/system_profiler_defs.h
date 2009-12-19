@@ -26,11 +26,12 @@ struct system_profiler_parameters {
 
 // event flags
 enum {
-	B_SYSTEM_PROFILER_TEAM_EVENTS		= 0x01,
-	B_SYSTEM_PROFILER_THREAD_EVENTS		= 0x02,
-	B_SYSTEM_PROFILER_IMAGE_EVENTS		= 0x04,
-	B_SYSTEM_PROFILER_SAMPLING_EVENTS	= 0x08,
-	B_SYSTEM_PROFILER_SCHEDULING_EVENTS	= 0x10
+	B_SYSTEM_PROFILER_TEAM_EVENTS			= 0x01,
+	B_SYSTEM_PROFILER_THREAD_EVENTS			= 0x02,
+	B_SYSTEM_PROFILER_IMAGE_EVENTS			= 0x04,
+	B_SYSTEM_PROFILER_SAMPLING_EVENTS		= 0x08,
+	B_SYSTEM_PROFILER_SCHEDULING_EVENTS		= 0x10,
+	B_SYSTEM_PROFILER_IO_SCHEDULING_EVENTS	= 0x20
 };
 
 
@@ -62,7 +63,15 @@ enum {
 	B_SYSTEM_PROFILER_THREAD_SCHEDULED,
 	B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE,
 	B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE,
-	B_SYSTEM_PROFILER_WAIT_OBJECT_INFO
+	B_SYSTEM_PROFILER_WAIT_OBJECT_INFO,
+
+	// I/O scheduling
+	B_SYSTEM_PROFILER_IO_SCHEDULER_ADDED,
+	B_SYSTEM_PROFILER_IO_SCHEDULER_REMOVED,
+	B_SYSTEM_PROFILER_IO_REQUEST_SCHEDULED,
+	B_SYSTEM_PROFILER_IO_REQUEST_FINISHED,
+	B_SYSTEM_PROFILER_IO_OPERATION_STARTED,
+	B_SYSTEM_PROFILER_IO_OPERATION_FINISHED
 };
 
 
@@ -164,6 +173,60 @@ struct system_profiler_wait_object_info {
 	addr_t		object;
 	addr_t		referenced_object;
 	char		name[1];
+};
+
+// B_SYSTEM_PROFILER_IO_SCHEDULER_ADDED
+struct system_profiler_io_scheduler_added {
+	int32		scheduler;
+	char		name[1];
+};
+
+// B_SYSTEM_PROFILER_IO_SCHEDULER_REMOVED
+struct system_profiler_io_scheduler_removed {
+	int32		scheduler;
+};
+
+// B_SYSTEM_PROFILER_IO_REQUEST_SCHEDULED
+struct system_profiler_io_request_scheduled {
+	nanotime_t	time;
+	int32		scheduler;
+	team_id		team;
+	thread_id	thread;
+	void*		request;
+	off_t		offset;
+	size_t		length;
+	bool		write;
+	uint8		priority;
+};
+
+// B_SYSTEM_PROFILER_IO_REQUEST_FINISHED
+struct system_profiler_io_request_finished {
+	nanotime_t	time;
+	int32		scheduler;
+	void*		request;
+	status_t	status;
+	size_t		transferred;
+};
+
+// B_SYSTEM_PROFILER_IO_OPERATION_STARTED
+struct system_profiler_io_operation_started {
+	nanotime_t	time;
+	int32		scheduler;
+	void*		request;
+	void*		operation;
+	off_t		offset;
+	size_t		length;
+	bool		write;
+};
+
+// B_SYSTEM_PROFILER_IO_OPERATION_FINISHED
+struct system_profiler_io_operation_finished {
+	nanotime_t	time;
+	int32		scheduler;
+	void*		request;
+	void*		operation;
+	status_t	status;
+	size_t		transferred;
 };
 
 
