@@ -217,6 +217,13 @@ device_get_softc(device_t dev)
 }
 
 
+u_int32_t
+device_get_flags(device_t dev)
+{
+	return dev->flags;
+}
+
+
 int
 device_set_driver(device_t dev, driver_t *driver)
 {
