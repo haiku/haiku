@@ -429,6 +429,14 @@ ModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 			_HandleWaitObjectInfo((system_profiler_wait_object_info*)buffer);
 			break;
 
+		case B_SYSTEM_PROFILER_IO_SCHEDULER_ADDED:
+		case B_SYSTEM_PROFILER_IO_SCHEDULER_REMOVED:
+		case B_SYSTEM_PROFILER_IO_REQUEST_SCHEDULED:
+		case B_SYSTEM_PROFILER_IO_REQUEST_FINISHED:
+		case B_SYSTEM_PROFILER_IO_OPERATION_STARTED:
+		case B_SYSTEM_PROFILER_IO_OPERATION_FINISHED:
+			break;
+
 		default:
 printf("unsupported event type %lu, size: %lu\n", event, size);
 return B_BAD_DATA;

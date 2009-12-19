@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
@@ -24,9 +25,10 @@
 
 #define SCHEDULING_RECORDING_AREA_SIZE	(4 * 1024 * 1024)
 
-#define DEBUG_EVENT_MASK (B_SYSTEM_PROFILER_TEAM_EVENTS				\
-							| B_SYSTEM_PROFILER_THREAD_EVENTS		\
-							| B_SYSTEM_PROFILER_SCHEDULING_EVENTS)
+#define DEBUG_EVENT_MASK \
+	(B_SYSTEM_PROFILER_TEAM_EVENTS | B_SYSTEM_PROFILER_THREAD_EVENTS	\
+		| B_SYSTEM_PROFILER_SCHEDULING_EVENTS							\
+		| B_SYSTEM_PROFILER_IO_SCHEDULING_EVENTS)
 
 
 extern const char* __progname;
