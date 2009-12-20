@@ -45,8 +45,8 @@ ExpanderRules::ExpanderRules()
 	fList.AddItem(new ExpanderRule("", 								".tar.Z", 	"tar -Ztvf %s", 				"tar -Zxf %s"));
 	fList.AddItem(new ExpanderRule("", 								".tgz", 	"tar -ztvf %s", 				"tar -zxf %s"));
 	fList.AddItem(new ExpanderRule("application/x-tar", 			".tar", 	"tar -tvf %s", 					"tar -xf %s"));
-	fList.AddItem(new ExpanderRule("application/x-gzip",			".gz", 		"echo %s | sed 's/.gz$//g'", 	"gunzip %s"));
-	fList.AddItem(new ExpanderRule("application/x-bzip2",			".bz2", 	"echo %s | sed 's/.bz2$//g'", 	"bunzip2 %s"));
+	fList.AddItem(new ExpanderRule("application/x-gzip",			".gz", 		"echo %s | sed 's/.gz$//g'", 	"gunzip -c %s > `echo %s | sed 's/.gz$//g'`"));
+	fList.AddItem(new ExpanderRule("application/x-bzip2",			".bz2", 	"echo %s | sed 's/.bz2$//g'", 	"bunzip2 -k %s"));
 	fList.AddItem(new ExpanderRule("application/zip", 				".zip", 	"unzip -l %s", 					"unzip -o %s"));
 	fList.AddItem(new ExpanderRule("application/x-zip-compressed", 	".zip", 	"unzip -l %s", 					"unzip -o %s"));
 	fList.AddItem(new ExpanderRule("application/x-rar",				".rar", 	"unrar v %s", 					"unrar x -y %s"));
