@@ -689,3 +689,99 @@ pci_alloc_msix(device_t dev, int *count)
 {
 	return ENODEV;
 }
+
+
+int
+pci_get_powerstate(device_t dev)
+{
+	int capabilityRegister;
+	uint16 status;
+	int powerState = PCI_POWERSTATE_D0;
+
+	if (pci_find_extcap(dev, PCIY_PMG, &capabilityRegister) != EOK)
+		return powerState;
+
+	status = pci_read_config(dev, capabilityRegister + PCIR_POWER_STATUS, 2);
+	switch (status & PCI_pm_mask) {
+		case PCI_pm_state_d0:
+			break;
+		case PCI_pm_state_d1:
+			powerState = PCI_POWERSTATE_D1;
+			break;
+		case PCI_pm_state_d2:
+			powerState = PCI_POWERSTATE_D2;
+			break;
+		case PCI_pm_state_d3:
+			powerState = PCI_POWERSTATE_D3;
+			break;
+		default:
+			powerState = PCI_POWERSTATE_UNKNOWN;
+			break;
+	}
+
+	TRACE_PCI(dev, "%s: D%i\n", __func__, powerState);
+	return powerState;
+}
+
+
+int
+pci_set_powerstate(device_t dev, int newPowerState)
+{
+	int capabilityRegister;
+	int oldPowerState;
+	uint8 currentPowerManagementStatus;
+	uint8 newPowerManagementStatus;
+	uint16 powerManagementCapabilities;
+	bigtime_t stateTransitionDelayInUs = 0;
+
+	if (pci_find_extcap(dev, PCIY_PMG, &capabilityRegister) != EOK)
+		return EOPNOTSUPP;
+
+	oldPowerState = pci_get_powerstate(dev);
+	if (oldPowerState == newPowerState)
+		return EOK;
+
+	switch (max(oldPowerState, newPowerState)) {
+		case PCI_POWERSTATE_D2:
+			stateTransitionDelayInUs = 200;
+			break;
+		case PCI_POWERSTATE_D3:
+			stateTransitionDelayInUs = 10000;
+			break;
+	}
+
+	currentPowerManagementStatus = pci_read_config(dev, capabilityRegister
+		+ PCIR_POWER_STATUS, 2);
+	newPowerManagementStatus = currentPowerManagementStatus & ~PCI_pm_mask;
+	powerManagementCapabilities = pci_read_config(dev, capabilityRegister
+		+ PCIR_POWER_CAP, 2);
+
+	switch (newPowerState) {
+		case PCI_POWERSTATE_D0:
+			newPowerManagementStatus |= PCIM_PSTAT_D0;
+			break;
+		case PCI_POWERSTATE_D1:
+			if ((powerManagementCapabilities & PCI_pm_d1supp) == 0)
+				return EOPNOTSUPP;
+			newPowerManagementStatus |= PCIM_PSTAT_D1;
+			break;
+		case PCI_POWERSTATE_D2:
+			if ((powerManagementCapabilities & PCI_pm_d2supp) == 0)
+				return EOPNOTSUPP;
+			newPowerManagementStatus |= PCIM_PSTAT_D2;
+			break;
+		case PCI_POWERSTATE_D3:
+			newPowerManagementStatus |= PCIM_PSTAT_D3;
+			break;
+		default:
+			return EINVAL;
+	}
+
+	TRACE_PCI(dev, "%s: D%i -> D%i\n", __func__, oldPowerState, newPowerState);
+	pci_write_config(dev, capabilityRegister + PCIR_POWER_STATUS, newPowerState,
+		2);
+	if (stateTransitionDelayInUs != 0)
+		snooze(stateTransitionDelayInUs);
+
+	return EOK;
+}
