@@ -127,6 +127,7 @@ public:
 			void			AddCopyrightEntry(const char* name,
 								const char* text,
 								const StringVector& licenses,
+								const StringVector& sources,
 								const char* url);
 			void			AddCopyrightEntry(const char* name,
 								const char* text, const char* url = NULL);
@@ -536,13 +537,13 @@ void
 AboutView::AddCopyrightEntry(const char* name, const char* text,
 	const char* url)
 {
-	AddCopyrightEntry(name, text, StringVector(), url);
+	AddCopyrightEntry(name, text, StringVector(), StringVector(), url);
 }
 
 
 void
 AboutView::AddCopyrightEntry(const char* name, const char* text,
-	const StringVector& licenses, const char* url)
+	const StringVector& licenses, const StringVector& sources, const char* url)
 {
 	BFont font(be_bold_font);
 	//font.SetSize(be_bold_font->Size());
@@ -577,6 +578,27 @@ AboutView::AddCopyrightEntry(const char* name, const char* text,
 					new OpenFileAction(licensePath.Path()));
 			} else
 				fCreditsView->Insert(licenseName);
+		}
+
+		fCreditsView->Insert("\n");
+	}
+
+	if (sources.CountStrings() > 0) {
+		fCreditsView->Insert("Source Code: ");
+
+		for (int32 i = 0; i < sources.CountStrings(); i++) {
+			const char* source = sources.StringAt(i);
+
+			if (i > 0)
+				fCreditsView->Insert(", ");
+
+			BString urlName;
+			BString urlAddress;
+			parse_named_url(source, urlName, urlAddress);
+
+			fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL,
+				&kLinkBlue);
+			fCreditsView->InsertHyperText(urlName, new URLAction(urlAddress));
 		}
 
 		fCreditsView->Insert("\n");
@@ -996,6 +1018,7 @@ AboutView::_CreateCreditsView()
 		"Bourne Again Shell.\n"
 		COPYRIGHT_STRING "The Free Software Foundation.",
 		StringVector("GNU LGPL v2.1", "GNU GPL v2", "GNU GPL v3", NULL),
+		StringVector(),
 		"http://www.gnu.org");
 
 	// FreeBSD copyrights
@@ -1394,7 +1417,7 @@ AboutView::_AddPackageCreditEntries()
 			text << "\n" << package->CopyrightAt(i);
 
 		AddCopyrightEntry(package->PackageName(), text.String(),
-			package->Licenses(), package->URL());
+			package->Licenses(), package->Sources(), package->URL());
 	}
 }
 

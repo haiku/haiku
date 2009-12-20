@@ -69,6 +69,8 @@ public:
 			PackageCredit&		SetCopyright(const char* copyright);
 			PackageCredit&		SetLicenses(const char* license,...);
 			PackageCredit&		SetLicense(const char* license);
+			PackageCredit&		SetSources(const char* source,...);
+			PackageCredit&		SetSource(const char* source);
 			PackageCredit&		SetURL(const char* url);
 
 			const char*			PackageName() const;
@@ -81,6 +83,10 @@ public:
 			int32				CountLicenses() const;
 			const char*			LicenseAt(int32 index) const;
 
+			const StringVector& Sources() const;
+			int32				CountSources() const;
+			const char*			SourceAt(int32 index) const;
+
 			const char*			URL() const;
 
 private:
@@ -90,6 +96,7 @@ private:
 			BString				fPackageName;
 			StringVector		fCopyrights;
 			StringVector		fLicenses;
+			StringVector		fSources;
 			BString				fURL;
 };
 

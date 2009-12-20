@@ -233,6 +233,7 @@ PackageCredit::PackageCredit(const BMessage& packageDescription)
 	fPackageName = package;
 	fCopyrights.SetTo(packageDescription, "Copyright", COPYRIGHT_STRING);
 	fLicenses.SetTo(packageDescription, "License");
+	fSources.SetTo(packageDescription, "SourceURL");
 	fURL = url;
 }
 
@@ -242,6 +243,7 @@ PackageCredit::PackageCredit(const PackageCredit& other)
 	fPackageName(other.fPackageName),
 	fCopyrights(other.fCopyrights),
 	fLicenses(other.fLicenses),
+	fSources(other.fSources),
 	fURL(other.fURL)
 {
 }
@@ -311,6 +313,25 @@ PackageCredit::SetLicense(const char* license)
 
 
 PackageCredit&
+PackageCredit::SetSources(const char* source,...)
+{
+	va_list list;
+	va_start(list, source);
+	fSources.SetTo(source, list);
+	va_end(list);
+
+	return *this;
+}
+
+
+PackageCredit&
+PackageCredit::SetSource(const char* source)
+{
+	return SetSources(source, NULL);
+}
+
+
+PackageCredit&
 PackageCredit::SetURL(const char* url)
 {
 	fURL = url;
@@ -365,6 +386,27 @@ const char*
 PackageCredit::LicenseAt(int32 index) const
 {
 	return fLicenses.StringAt(index);
+}
+
+
+const StringVector&
+PackageCredit::Sources() const
+{
+	return fSources;
+}
+
+
+int32
+PackageCredit::CountSources() const
+{
+	return fSources.CountStrings();
+}
+
+
+const char*
+PackageCredit::SourceAt(int32 index) const
+{
+	return fSources.StringAt(index);
 }
 
 
