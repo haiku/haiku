@@ -315,19 +315,9 @@ if $(HAIKU_ARCH) = m68k {
 	HAIKU_KERNEL_C++FLAGS += -m68020-60 ;
 }
 if $(HAIKU_ARCH) = mipsel {
-	# todo: verify correctness of this
+	# TODO: verify correctness of this
 	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 	HAIKU_KERNEL_PIC_LINKFLAGS = ;
-}
-
-# If the environment variable DEBUG_PRINTF is defined we define an equally
-# named macro to the variable value. Some components use the macro to allow
-# another function than printf() to print the debug output. The variable should
-# be set to the name of the alternative function.
-#
-if $(DEBUG_PRINTF) {
-	HAIKU_CCFLAGS += [ FDefines DEBUG_PRINTF=$(DEBUG_PRINTF) ] ;
-	HAIKU_C++FLAGS += [ FDefines DEBUG_PRINTF=$(DEBUG_PRINTF) ] ;
 }
 
 # If the environment variable HAIKU_INCLUDE_PATENTED_CODE is defined, we
@@ -336,10 +326,8 @@ if $(DEBUG_PRINTF) {
 # techniques, for example the Freetype bytecode hinter or sub-pixel rendering
 # as well as some problematic media codecs.
 if $(HAIKU_INCLUDE_PATENTED_CODE) {
-	HAIKU_CCFLAGS += [ FDefines
-		HAIKU_INCLUDE_PATENTED_CODE=$(HAIKU_INCLUDE_PATENTED_CODE) ] ;
-	HAIKU_C++FLAGS += [ FDefines
-		HAIKU_INCLUDE_PATENTED_CODE=$(HAIKU_INCLUDE_PATENTED_CODE) ] ;
+	HAIKU_DEFINES
+		+= HAIKU_INCLUDE_PATENTED_CODE=$(HAIKU_INCLUDE_PATENTED_CODE) ;
 }
 
 # warning flags
