@@ -291,6 +291,7 @@ TermView::_InitObject(int32 argc, const char** argv)
 	fTextBuffer = NULL;
 	fVisibleTextBuffer = NULL;
 	fScrollBar = NULL;
+	fInline = NULL;
 	fTextForeColor = kBlackColor;
 	fTextBackColor = kWhiteColor;
 	fCursorForeColor = kWhiteColor;
@@ -2810,7 +2811,7 @@ TermView::DisableResizeView(int32 disableCount)
 void
 TermView::_DrawInlineMethodString()
 {
-	if (!fInline->String())
+	if (!fInline || !fInline->String())
 		return;
 	
 	const int32 numChars = BString(fInline->String()).CountChars();
