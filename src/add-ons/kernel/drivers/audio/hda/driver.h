@@ -336,6 +336,7 @@ extern hda_controller gCards[MAX_CARDS];
 extern uint32 gNumCards;
 
 /* hda_codec.c */
+const char* get_widget_location(uint32 location);
 hda_widget* hda_audio_group_get_widget(hda_audio_group* audioGroup, uint32 nodeID);
 
 status_t hda_audio_group_get_widgets(hda_audio_group* audioGroup,

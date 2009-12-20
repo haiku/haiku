@@ -100,6 +100,57 @@ get_widget_type_name(hda_widget_type type)
 }
 
 
+const char*
+get_widget_location(uint32 location)
+{
+	switch (location >> 4) {
+		case 0:
+		case 2:
+			switch (location & 0xf) {
+				case 2:
+					return "Front";
+				case 3:
+					return "Left";
+				case 4:
+					return "Right";
+				case 5:
+					return "Top";
+				case 6:
+					return "Bottom";
+				case 7:
+					return "Rear panel";
+				case 8:
+					return "Drive bay";
+				case 0: 
+				case 1:
+				default:
+					return NULL; 
+			}
+		case 1:
+			switch (location & 0xf) {
+				case 7:
+					return "Riser";
+				case 8:
+					return "HDMI";
+				default:
+					return NULL;
+			}
+		case 3:
+			switch (location & 0xf) {
+				case 6:
+					return "Bottom";
+				case 7:
+					return "Inside lid";
+				case 8:
+					return "Outside lid";
+				default:
+					return NULL;
+			}
+	}
+	return NULL;
+}
+
+
 static void
 dump_widget_audio_capabilities(uint32 capabilities)
 {
@@ -726,8 +777,12 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 					VID_GET_CONFIGURATION_DEFAULT, 0);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
 					widget.d.pin.config = resp[0];
-					TRACE("\t%s, %s, %s, %s, Association:%ld\n",
+					const char* location = 
+						get_widget_location(CONF_DEFAULT_LOCATION(resp[0]));
+					TRACE("\t%s, %s%s%s, %s, %s, Association:%ld\n",
 						kPortConnector[CONF_DEFAULT_CONNECTIVITY(resp[0])],
+						location ? location : "",
+						location ? " " : "",
 						kDefaultDevice[CONF_DEFAULT_DEVICE(resp[0])],
 						kConnectionType[CONF_DEFAULT_CONNTYPE(resp[0])],
 						kJackColor[CONF_DEFAULT_COLOR(resp[0])],
