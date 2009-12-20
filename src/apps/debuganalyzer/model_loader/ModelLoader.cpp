@@ -46,6 +46,9 @@ static const SimpleWaitObjectInfo kSignalWaitObjectInfo(
 	THREAD_BLOCK_TYPE_SIGNAL);
 
 
+// #pragma mark - CPUInfo
+
+
 struct ModelLoader::CPUInfo {
 	nanotime_t	idleTime;
 
@@ -57,7 +60,94 @@ struct ModelLoader::CPUInfo {
 };
 
 
-// #pragma mark -
+// #pragma mark - ExtendedThreadSchedulingState
+
+
+struct ModelLoader::ExtendedThreadSchedulingState
+		: Model::ThreadSchedulingState {
+
+	ExtendedThreadSchedulingState(Model::Thread* thread)
+		:
+		Model::ThreadSchedulingState(thread),
+		fEvents(NULL),
+		fEventIndex(0),
+		fEventCount(0)
+	{
+	}
+
+	~ExtendedThreadSchedulingState()
+	{
+		delete[] fEvents;
+	}
+
+	system_profiler_event_header** Events() const
+	{
+		return fEvents;
+	}
+
+	size_t CountEvents() const
+	{
+		return fEventCount;
+	}
+
+	system_profiler_event_header** DetachEvents()
+	{
+		system_profiler_event_header** events = fEvents;
+		fEvents = NULL;
+		return events;
+	}
+
+	void IncrementEventCount()
+	{
+		fEventCount++;
+	}
+
+	void AddEvent(system_profiler_event_header* event)
+	{
+		fEvents[fEventIndex++] = event;
+	}
+
+	bool AllocateEventArray()
+	{
+		if (fEventCount == 0)
+			return true;
+
+		fEvents = new(std::nothrow) system_profiler_event_header*[fEventCount];
+		if (fEvents == NULL)
+			return false;
+
+		return true;
+	}
+
+private:
+	system_profiler_event_header**	fEvents;
+	size_t							fEventIndex;
+	size_t							fEventCount;
+};
+
+
+// #pragma mark - ExtendedSchedulingState
+
+
+struct ModelLoader::ExtendedSchedulingState : Model::SchedulingState {
+	inline ExtendedThreadSchedulingState* LookupThread(thread_id threadID) const
+	{
+		Model::ThreadSchedulingState* thread
+			= Model::SchedulingState::LookupThread(threadID);
+		return thread != NULL
+			? static_cast<ExtendedThreadSchedulingState*>(thread) : NULL;
+	}
+
+
+protected:
+	virtual void DeleteThread(Model::ThreadSchedulingState* thread)
+	{
+		delete static_cast<ExtendedThreadSchedulingState*>(thread);
+	}
+};
+
+
+// #pragma mark - ModelLoader
 
 
 inline void
@@ -68,7 +158,7 @@ ModelLoader::_UpdateLastEventTime(nanotime_t time)
 		fModel->SetBaseTime(time);
 	}
 
-	fState.SetLastEventTime(time - fBaseTime);
+	fState->SetLastEventTime(time - fBaseTime);
 }
 
 
@@ -112,8 +202,12 @@ ModelLoader::PrepareForLoading()
 	if (fModel != NULL || fDataSource == NULL)
 		return B_BAD_VALUE;
 
-	// init the state
-	status_t error = fState.Init();
+	// create and init the state
+	fState = new(std::nothrow) ExtendedSchedulingState;
+	if (fState == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = fState->Init();
 	if (error != B_OK)
 		return error;
 
@@ -139,7 +233,8 @@ ModelLoader::Load()
 void
 ModelLoader::FinishLoading(bool success)
 {
-	fState.Clear();
+	delete fState;
+	fState = NULL;
 
 	if (!success) {
 		delete fModel;
@@ -197,7 +292,7 @@ ModelLoader::_Load()
 
 	// process the events
 	fMaxCPUIndex = 0;
-	fState.Clear();
+	fState->Clear();
 	fBaseTime = -1;
 	uint64 count = 0;
 
@@ -234,7 +329,7 @@ ModelLoader::_Load()
 
 		// periodically add scheduling snapshots
 		if (count % kSchedulingSnapshotInterval == 0)
-			fModel->AddSchedulingStateSnapshot(fState, offset);
+			fModel->AddSchedulingStateSnapshot(*fState, offset);
 	}
 
 	if (!fModel->SetCPUCount(fMaxCPUIndex + 1))
@@ -243,7 +338,11 @@ ModelLoader::_Load()
 	for (uint32 i = 0; i <= fMaxCPUIndex; i++)
 		fModel->CPUAt(i)->SetIdleTime(fCPUInfos[i].idleTime);
 
-	fModel->SetLastEventTime(fState.LastEventTime());
+	fModel->SetLastEventTime(fState->LastEventTime());
+
+	if (!_SetThreadEvents())
+		return B_NO_MEMORY;
+
 	fModel->LoadingFinished();
 
 	return B_OK;
@@ -447,10 +546,92 @@ return B_BAD_DATA;
 }
 
 
+bool
+ModelLoader::_SetThreadEvents()
+{
+	// allocate the threads' events arrays
+	for (int32 i = 0; Model::Thread* thread = fModel->ThreadAt(i); i++) {
+		ExtendedThreadSchedulingState* state
+			= fState->LookupThread(thread->ID());
+		if (!state->AllocateEventArray())
+			return false;
+	}
+
+	// fill the threads' event arrays
+	system_profiler_event_header** events = fModel->Events();
+	size_t eventCount = fModel->CountEvents();
+	for (size_t i = 0; i < eventCount; i++) {
+		system_profiler_event_header* header = events[i];
+		void* buffer = header + 1;
+
+		switch (header->event) {
+			case B_SYSTEM_PROFILER_THREAD_ADDED:
+			{
+				system_profiler_thread_added* event
+					= (system_profiler_thread_added*)buffer;
+				fState->LookupThread(event->thread)->AddEvent(header);
+				break;
+			}
+
+			case B_SYSTEM_PROFILER_THREAD_REMOVED:
+			{
+				system_profiler_thread_removed* event
+					= (system_profiler_thread_removed*)buffer;
+				fState->LookupThread(event->thread)->AddEvent(header);
+				break;
+			}
+
+			case B_SYSTEM_PROFILER_THREAD_SCHEDULED:
+			{
+				system_profiler_thread_scheduled* event
+					= (system_profiler_thread_scheduled*)buffer;
+				fState->LookupThread(event->thread)->AddEvent(header);
+
+				if (event->thread != event->previous_thread) {
+					fState->LookupThread(event->previous_thread)
+						->AddEvent(header);
+				}
+				break;
+			}
+
+			case B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE:
+			{
+				thread_enqueued_in_run_queue* event
+					= (thread_enqueued_in_run_queue*)buffer;
+				fState->LookupThread(event->thread)->AddEvent(header);
+				break;
+			}
+
+			case B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE:
+			{
+				thread_removed_from_run_queue* event
+					= (thread_removed_from_run_queue*)buffer;
+				fState->LookupThread(event->thread)->AddEvent(header);
+				break;
+			}
+
+			default:
+				break;
+		}
+	}
+
+	// transfer the events arrays from the scheduling states to the thread
+	// objects
+	for (int32 i = 0; Model::Thread* thread = fModel->ThreadAt(i); i++) {
+		ExtendedThreadSchedulingState* state
+			= fState->LookupThread(thread->ID());
+		thread->SetEvents(state->Events(), state->CountEvents());
+		state->DetachEvents();
+	}
+
+	return true;
+}
+
+
 void
 ModelLoader::_HandleTeamAdded(system_profiler_team_added* event)
 {
-	if (fModel->AddTeam(event, fState.LastEventTime()) == NULL)
+	if (fModel->AddTeam(event, fState->LastEventTime()) == NULL)
 		throw std::bad_alloc();
 }
 
@@ -459,7 +640,7 @@ void
 ModelLoader::_HandleTeamRemoved(system_profiler_team_removed* event)
 {
 	if (Model::Team* team = fModel->TeamByID(event->team))
-		team->SetDeletionTime(fState.LastEventTime());
+		team->SetDeletionTime(fState->LastEventTime());
 	else
 		printf("Removed event for unknown team: %ld\n", event->team);
 }
@@ -475,17 +656,22 @@ ModelLoader::_HandleTeamExec(system_profiler_team_exec* event)
 void
 ModelLoader::_HandleThreadAdded(system_profiler_thread_added* event)
 {
-	if (_AddThread(event) == NULL)
+	ExtendedThreadSchedulingState* thread = _AddThread(event);
+	if (thread == NULL)
 		throw std::bad_alloc();
+
+	thread->IncrementEventCount();
 }
 
 
 void
 ModelLoader::_HandleThreadRemoved(system_profiler_thread_removed* event)
 {
-	if (Model::Thread* thread = fModel->ThreadByID(event->thread))
-		thread->SetDeletionTime(fState.LastEventTime());
-	else
+	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
+	if (thread != NULL) {
+		thread->thread->SetDeletionTime(fState->LastEventTime());
+		thread->IncrementEventCount();
+	} else
 		printf("Removed event for unknown team: %ld\n", event->thread);
 }
 
@@ -496,13 +682,13 @@ ModelLoader::_HandleThreadScheduled(uint32 cpu,
 {
 	_UpdateLastEventTime(event->time);
 
-	Model::ThreadSchedulingState* thread = fState.LookupThread(event->thread);
+	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
 		printf("Schedule event for unknown thread: %ld\n", event->thread);
 		return;
 	}
 
-	nanotime_t diffTime = fState.LastEventTime() - thread->lastTime;
+	nanotime_t diffTime = fState->LastEventTime() - thread->lastTime;
 
 	if (thread->state == READY) {
 		// thread scheduled after having been woken up
@@ -518,23 +704,25 @@ ModelLoader::_HandleThreadScheduled(uint32 cpu,
 	}
 
 	if (thread->state != RUNNING) {
-		thread->lastTime = fState.LastEventTime();
+		thread->lastTime = fState->LastEventTime();
 		thread->state = RUNNING;
 	}
+
+	thread->IncrementEventCount();
 
 	// unscheduled thread
 
 	if (event->thread == event->previous_thread)
 		return;
 
-	thread = fState.LookupThread(event->previous_thread);
+	thread = fState->LookupThread(event->previous_thread);
 	if (thread == NULL) {
 		printf("Schedule event for unknown previous thread: %ld\n",
 			event->previous_thread);
 		return;
 	}
 
-	diffTime = fState.LastEventTime() - thread->lastTime;
+	diffTime = fState->LastEventTime() - thread->lastTime;
 
 	if (thread->state == STILL_RUNNING) {
 		// thread preempted
@@ -543,7 +731,7 @@ ModelLoader::_HandleThreadScheduled(uint32 cpu,
 		if (thread->priority == 0)
 			_AddIdleTime(cpu, diffTime);
 
-		thread->lastTime = fState.LastEventTime();
+		thread->lastTime = fState->LastEventTime();
 		thread->state = PREEMPTED;
 	} else if (thread->state == RUNNING) {
 		// thread starts waiting (it hadn't been added to the run
@@ -572,19 +760,21 @@ ModelLoader::_HandleThreadScheduled(uint32 cpu,
 				event->previous_thread_wait_object_type, waitObject);
 		}
 
-		thread->lastTime = fState.LastEventTime();
+		thread->lastTime = fState->LastEventTime();
 		thread->state = WAITING;
 	} else if (thread->state == UNKNOWN) {
 		uint32 threadState = event->previous_thread_state;
 		if (threadState == B_THREAD_WAITING
 			|| threadState == B_THREAD_SUSPENDED) {
-			thread->lastTime = fState.LastEventTime();
+			thread->lastTime = fState->LastEventTime();
 			thread->state = WAITING;
 		} else if (threadState == B_THREAD_READY) {
-			thread->lastTime = fState.LastEventTime();
+			thread->lastTime = fState->LastEventTime();
 			thread->state = PREEMPTED;
 		}
 	}
+
+	thread->IncrementEventCount();
 }
 
 
@@ -594,7 +784,7 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 {
 	_UpdateLastEventTime(event->time);
 
-	Model::ThreadSchedulingState* thread = fState.LookupThread(event->thread);
+	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
 		printf("Enqueued in run queue event for unknown thread: %ld\n",
 			event->thread);
@@ -607,7 +797,7 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 		thread->state = STILL_RUNNING;
 	} else {
 		// Thread was waiting and is ready now.
-		nanotime_t diffTime = fState.LastEventTime() - thread->lastTime;
+		nanotime_t diffTime = fState->LastEventTime() - thread->lastTime;
 		if (thread->waitObject != NULL) {
 			thread->waitObject->AddWait(diffTime);
 			thread->waitObject = NULL;
@@ -615,11 +805,13 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 		} else if (thread->state != UNKNOWN)
 			thread->thread->AddUnspecifiedWait(diffTime);
 
-		thread->lastTime = fState.LastEventTime();
+		thread->lastTime = fState->LastEventTime();
 		thread->state = READY;
 	}
 
 	thread->priority = event->priority;
+
+	thread->IncrementEventCount();
 }
 
 
@@ -629,7 +821,7 @@ ModelLoader::_HandleThreadRemovedFromRunQueue(uint32 cpu,
 {
 	_UpdateLastEventTime(event->time);
 
-	Model::ThreadSchedulingState* thread = fState.LookupThread(event->thread);
+	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
 		printf("Removed from run queue event for unknown thread: %ld\n",
 			event->thread);
@@ -639,7 +831,7 @@ ModelLoader::_HandleThreadRemovedFromRunQueue(uint32 cpu,
 	// This really only happens when the thread priority is changed
 	// while the thread is ready.
 
-	nanotime_t diffTime = fState.LastEventTime() - thread->lastTime;
+	nanotime_t diffTime = fState->LastEventTime() - thread->lastTime;
 	if (thread->state == RUNNING) {
 		// This should never happen.
 		thread->thread->AddRun(diffTime);
@@ -651,8 +843,10 @@ ModelLoader::_HandleThreadRemovedFromRunQueue(uint32 cpu,
 		thread->thread->AddUnspecifiedWait(diffTime);
 	}
 
-	thread->lastTime = fState.LastEventTime();
+	thread->lastTime = fState->LastEventTime();
 	thread->state = WAITING;
+
+	thread->IncrementEventCount();
 }
 
 
@@ -664,23 +858,23 @@ ModelLoader::_HandleWaitObjectInfo(system_profiler_wait_object_info* event)
 }
 
 
-Model::ThreadSchedulingState*
+ModelLoader::ExtendedThreadSchedulingState*
 ModelLoader::_AddThread(system_profiler_thread_added* event)
 {
 	// do we know the thread already?
-	Model::ThreadSchedulingState* info = fState.LookupThread(event->thread);
+	ExtendedThreadSchedulingState* info = fState->LookupThread(event->thread);
 	if (info != NULL) {
 		// TODO: ?
 		return info;
 	}
 
 	// add the thread to the model
-	Model::Thread* thread = fModel->AddThread(event, fState.LastEventTime());
+	Model::Thread* thread = fModel->AddThread(event, fState->LastEventTime());
 	if (thread == NULL)
 		return NULL;
 
 	// create and add a ThreadSchedulingState
-	info = new(std::nothrow) Model::ThreadSchedulingState(thread);
+	info = new(std::nothrow) ExtendedThreadSchedulingState(thread);
 	if (info == NULL)
 		return NULL;
 
@@ -691,14 +885,14 @@ ModelLoader::_AddThread(system_profiler_thread_added* event)
 	else
 		info->priority = B_NORMAL_PRIORITY;
 
-	fState.InsertThread(info);
+	fState->InsertThread(info);
 
 	return info;
 }
 
 
 void
-ModelLoader::_AddThreadWaitObject(Model::ThreadSchedulingState* thread,
+ModelLoader::_AddThreadWaitObject(ExtendedThreadSchedulingState* thread,
 	uint32 type, addr_t object)
 {
 	Model::WaitObjectGroup* waitObjectGroup

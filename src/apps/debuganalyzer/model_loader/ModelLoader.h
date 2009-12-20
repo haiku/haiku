@@ -41,6 +41,8 @@ private:
 				thread_removed_from_run_queue;
 
 			struct CPUInfo;
+			struct ExtendedThreadSchedulingState;
+			struct ExtendedSchedulingState;
 
 private:
 			status_t			_Load();
@@ -52,6 +54,7 @@ private:
 									size_t& _eventCount);
 			status_t			_ProcessEvent(uint32 event, uint32 cpu,
 									const void* buffer, size_t size);
+			bool				_SetThreadEvents();
 
 	inline	void				_UpdateLastEventTime(nanotime_t time);
 
@@ -74,9 +77,10 @@ private:
 			void				_HandleWaitObjectInfo(
 									system_profiler_wait_object_info* event);
 
-			Model::ThreadSchedulingState* _AddThread(
+			ExtendedThreadSchedulingState* _AddThread(
 									system_profiler_thread_added* event);
-			void				_AddThreadWaitObject(Model::ThreadSchedulingState* thread,
+			void				_AddThreadWaitObject(
+									ExtendedThreadSchedulingState* thread,
 									uint32 type, addr_t object);
 
 			void				_AddIdleTime(uint32 cpu, nanotime_t time);
@@ -86,7 +90,7 @@ private:
 			DataSource*			fDataSource;
 			CPUInfo*			fCPUInfos;
 			nanotime_t			fBaseTime;
-			Model::SchedulingState fState;
+			ExtendedSchedulingState* fState;
 			uint32				fMaxCPUIndex;
 };
 

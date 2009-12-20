@@ -133,35 +133,21 @@ printf("new wait object group at %ld\n", i);
 		i = k;
 	}
 
-	// create a debug input stream
-	BDebugEventInputStream input;
-	uint8* eventData = (uint8*)fModel->EventData();
-	status_t error = input.SetTo(eventData, fModel->EventDataSize(), false);
-	if (error != B_OK)
-		return error;
-
-	// process the events
+	// filter the events
 	thread_id threadID = fThread->ID();
 	bool done = false;
 	uint32 count = 0;
 
-	while (!done) {
-		// get next event
-		uint32 eventType;
-		uint32 cpu;
-		const void* buffer;
-		off_t streamOffset;
-		ssize_t bufferSize = input.ReadNextEvent(&eventType, &cpu, &buffer,
-			&streamOffset);
-		if (bufferSize < 0)
-			return bufferSize;
-		if (buffer == NULL)
-			break;
+	system_profiler_event_header** events = fModel->Events();
+	size_t eventCount = fModel->CountEvents();
+	for (size_t i = 0; i < eventCount; i++) {
+		system_profiler_event_header* header = events[i];
+		void* buffer = header + 1;
 
 		// process the event
 		bool keepEvent = false;
 
-		switch (eventType) {
+		switch (header->event) {
 			case B_SYSTEM_PROFILER_THREAD_REMOVED:
 			{
 				system_profiler_thread_removed* event
@@ -179,7 +165,7 @@ printf("new wait object group at %ld\n", i);
 					|| event->previous_thread == threadID ;
 				break;
 			}
-	
+
 			case B_SYSTEM_PROFILER_THREAD_ENQUEUED_IN_RUN_QUEUE:
 			{
 				thread_enqueued_in_run_queue* event
@@ -187,7 +173,7 @@ printf("new wait object group at %ld\n", i);
 				keepEvent = event->thread == threadID;
 				break;
 			}
-	
+
 			case B_SYSTEM_PROFILER_THREAD_REMOVED_FROM_RUN_QUEUE:
 			{
 				thread_removed_from_run_queue* event
@@ -200,10 +186,8 @@ printf("new wait object group at %ld\n", i);
 				break;
 		}
 
-		if (keepEvent) {
-			fThreadModel->AddSchedulingEvent(
-				(system_profiler_event_header*)(eventData + streamOffset));
-		}
+		if (keepEvent)
+			fThreadModel->AddSchedulingEvent(header);
 
 		// periodically check whether we're supposed to abort
 		if (++count % 32 == 0) {

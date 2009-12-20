@@ -349,6 +349,11 @@ public:
 	inline	int32				Index() const;
 	inline	void				SetIndex(int32 index);
 
+	inline	system_profiler_event_header** Events() const;
+	inline	size_t				CountEvents() const;
+			void				SetEvents(system_profiler_event_header** events,
+									size_t eventCount);
+
 	inline	nanotime_t			CreationTime() const;
 	inline	nanotime_t			DeletionTime() const;
 
@@ -396,6 +401,9 @@ private:
 				ThreadWaitObjectGroupList;
 
 private:
+			system_profiler_event_header** fEvents;
+			size_t				fEventCount;
+
 			Team*				fTeam;
 			const system_profiler_thread_added* fCreationEvent;
 			nanotime_t			fCreationTime;
@@ -474,7 +482,7 @@ struct Model::ThreadSchedulingStateDefinition {
 class Model::SchedulingState {
 public:
 	inline						SchedulingState();
-								~SchedulingState();
+	virtual						~SchedulingState();
 
 			status_t			Init();
 			status_t			Init(const CompactSchedulingState* state);
@@ -487,6 +495,9 @@ public:
 	inline	void				InsertThread(ThreadSchedulingState* thread);
 	inline	void				RemoveThread(ThreadSchedulingState* thread);
 	inline	const ThreadSchedulingStateTable& ThreadStates() const;
+
+protected:
+	virtual	void				DeleteThread(ThreadSchedulingState* thread);
 
 private:
 			nanotime_t			fLastEventTime;
@@ -963,6 +974,20 @@ void
 Model::Thread::SetIndex(int32 index)
 {
 	fIndex = index;
+}
+
+
+system_profiler_event_header**
+Model::Thread::Events() const
+{
+	return fEvents;
+}
+
+
+size_t
+Model::Thread::CountEvents() const
+{
+	return fEventCount;
 }
 
 

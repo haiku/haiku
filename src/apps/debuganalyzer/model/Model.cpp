@@ -239,6 +239,8 @@ Model::Team::AddThread(Thread* thread)
 Model::Thread::Thread(Team* team, const system_profiler_thread_added* event,
 	nanotime_t time)
 	:
+	fEvents(NULL),
+	fEventCount(0),
 	fTeam(team),
 	fCreationEvent(event),
 	fCreationTime(time),
@@ -267,6 +269,16 @@ Model::Thread::Thread(Team* team, const system_profiler_thread_added* event,
 
 Model::Thread::~Thread()
 {
+	delete[] fEvents;
+}
+
+
+void
+Model::Thread::SetEvents(system_profiler_event_header** events,
+	size_t eventCount)
+{
+	fEvents = events;
+	fEventCount = eventCount;
 }
 
 
@@ -434,11 +446,17 @@ Model::SchedulingState::Clear()
 	ThreadSchedulingState* state = fThreadStates.Clear(true);
 	while (state != NULL) {
 		ThreadSchedulingState* next = state->next;
-		delete state;
+		DeleteThread(state);
 		state = next;
 	}
 
 	fLastEventTime = -1;
+}
+
+void
+Model::SchedulingState::DeleteThread(ThreadSchedulingState* thread)
+{
+	delete thread;
 }
 
 
@@ -528,6 +546,8 @@ Model::~Model()
 		= fSchedulingStates.ItemAt(i); i++) {
 		state->Delete();
 	}
+
+	delete[] fEvents;
 
 	free(fEventData);
 }
