@@ -1073,11 +1073,6 @@ printf("failed to read event!\n");
 		size_t size)
 	{
 		switch (event) {
-			case B_SYSTEM_PROFILER_TEAM_ADDED:
-			case B_SYSTEM_PROFILER_TEAM_REMOVED:
-			case B_SYSTEM_PROFILER_TEAM_EXEC:
-				break;
-
 			case B_SYSTEM_PROFILER_THREAD_ADDED:
 				_HandleThreadAdded((system_profiler_thread_added*)buffer);
 				break;
@@ -1101,12 +1096,7 @@ printf("failed to read event!\n");
 					(thread_removed_from_run_queue*)buffer);
 				break;
 
-			case B_SYSTEM_PROFILER_WAIT_OBJECT_INFO:
-				break;
-
 			default:
-printf("unsupported event type %lu, size: %lu\n", event, size);
-return B_BAD_DATA;
 				break;
 		}
 
