@@ -7,6 +7,7 @@
  *		René Gollent
  */
 
+
 #include <ctype.h>
 #include <stdio.h>
 #include <sys/utsname.h>
@@ -56,9 +57,9 @@
 #define SCROLL_CREDITS_VIEW 'mviv'
 
 
-static const char *UptimeToString(char string[], size_t size);
-static const char *MemUsageToString(char string[], size_t size,
-	system_info *info);
+static const char* UptimeToString(char string[], size_t size);
+static const char* MemUsageToString(char string[], size_t size,
+	system_info* info);
 
 static const rgb_color kDarkGrey = { 100, 100, 100, 255 };
 static const rgb_color kHaikuGreen = { 42, 131, 36, 255 };
@@ -508,12 +509,12 @@ AboutView::Pulse()
 
 
 void
-AboutView::MessageReceived(BMessage *msg)
+AboutView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case SCROLL_CREDITS_VIEW:
 		{
-			BScrollBar *scrollBar = fCreditsView->ScrollBar(B_VERTICAL);
+			BScrollBar* scrollBar = fCreditsView->ScrollBar(B_VERTICAL);
 			if (scrollBar == NULL)
 				break;
 			float max, min;
@@ -532,16 +533,16 @@ AboutView::MessageReceived(BMessage *msg)
 
 
 void
-AboutView::AddCopyrightEntry(const char *name, const char *text,
-	const char *url)
+AboutView::AddCopyrightEntry(const char* name, const char* text,
+	const char* url)
 {
 	AddCopyrightEntry(name, text, StringVector(), url);
 }
 
 
 void
-AboutView::AddCopyrightEntry(const char *name, const char *text,
-	const StringVector& licenses, const char *url)
+AboutView::AddCopyrightEntry(const char* name, const char* text,
+	const StringVector& licenses, const char* url)
 {
 	BFont font(be_bold_font);
 	//font.SetSize(be_bold_font->Size());
@@ -609,16 +610,16 @@ AboutView::PickRandomHaiku()
 		return;
 	if (fortunes.GetStat(&st) < B_OK)
 		return;
-	char *buff = (char *)malloc((size_t)st.st_size + 1);
+	char* buff = (char*)malloc((size_t)st.st_size + 1);
 	if (!buff)
 		return;
 	buff[(size_t)st.st_size] = '\0';
 	BList haikuList;
 	if (fortunes.Read(buff, (size_t)st.st_size) == (ssize_t)st.st_size) {
-		char *p = buff;
+		char* p = buff;
 		while (p && *p) {
-			char *e = strchr(p, '%');
-			BString *s = new BString(p, e ? (e - p) : -1);
+			char* e = strchr(p, '%');
+			BString* s = new BString(p, e ? (e - p) : -1);
 			haikuList.AddItem(s);
 			p = e;
 			if (p && (*p == '%'))
@@ -630,7 +631,7 @@ AboutView::PickRandomHaiku()
 	free(buff);
 	if (haikuList.CountItems() < 1)
 		return;
-	BString *s = (BString *)haikuList.ItemAt(rand() % haikuList.CountItems());
+	BString* s = (BString*)haikuList.ItemAt(rand() % haikuList.CountItems());
 	BFont font(be_bold_font);
 	font.SetSize(be_bold_font->Size());
 	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
@@ -639,7 +640,7 @@ AboutView::PickRandomHaiku()
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(s->String());
 	fCreditsView->Insert("\n");
-	while ((s = (BString *)haikuList.RemoveItem((int32)0))) {
+	while ((s = (BString*)haikuList.RemoveItem((int32)0))) {
 		delete s;
 	}
 }
@@ -1423,8 +1424,8 @@ AboutView::_AddPackageCredit(const PackageCredit& package)
 //	#pragma mark -
 
 
-static const char *
-MemUsageToString(char string[], size_t size, system_info *info)
+static const char*
+MemUsageToString(char string[], size_t size, system_info* info)
 {
 	snprintf(string, size, "%d MB total, %d MB used (%d%%)",
 			int(info->max_pages / 256.0f + 0.5f),
@@ -1435,7 +1436,7 @@ MemUsageToString(char string[], size_t size, system_info *info)
 }
 
 
-static const char *
+static const char*
 UptimeToString(char string[], size_t size)
 {
 	int64 days, hours, minutes, seconds, remainder;
@@ -1452,7 +1453,7 @@ UptimeToString(char string[], size_t size)
 
 	seconds = remainder / 1000000;
 
-	char *str = string;
+	char* str = string;
 	if (days) {
 		str += snprintf(str, size, "%lld day%s",days, days > 1 ? "s" : "");
 	}
