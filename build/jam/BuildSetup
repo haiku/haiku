@@ -516,6 +516,12 @@ if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
 	}
 }
 
+# TODO: Temporary work-around for mixup of GNU and Sun linker on OpenSolaris.
+# Should be moved to configure.
+if $(HOST_PLATFORM) = sunos && $(HOST_LD) = ld {
+	HOST_LD = /usr/ccs/bin/ld ;
+}
+
 if $(HOST_PLATFORM) = cygwin {
 	HOST_LINKFLAGS += -Xlinker --allow-multiple-definition -Xlinker
 		--enable-auto-import ;
