@@ -51,25 +51,13 @@ int pci_release_msi(device_t dev);
 int pci_msix_count(device_t dev);
 int pci_alloc_msix(device_t dev, int *count);
 
+int pci_get_powerstate(device_t dev);
+int pci_set_powerstate(device_t dev, int newPowerState);
 
 static inline int
 pci_get_vpd_ident(device_t dev, const char **identptr)
 {
 	return -1;
-}
-
-
-static inline int
-pci_set_powerstate(device_t dev, int state)
-{
-	return PCI_POWERSTATE_UNKNOWN;
-}
-
-
-static inline int
-pci_get_powerstate(device_t dev)
-{
-	return PCI_POWERSTATE_D0;
 }
 
 #endif	/* _FBSD_COMPAT_DEV_PCI_PCIVAR_H_ */
