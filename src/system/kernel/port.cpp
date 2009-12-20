@@ -579,8 +579,8 @@ uninit_port_locked(struct port_entry& port)
 
 	// Release the threads that were blocking on this port.
 	// read_port() will see the B_BAD_PORT_ID return value, and act accordingly
-	port.read_condition.NotifyAll(B_BAD_PORT_ID);
-	port.write_condition.NotifyAll(B_BAD_PORT_ID);
+	port.read_condition.NotifyAll(false, B_BAD_PORT_ID);
+	port.write_condition.NotifyAll(false, B_BAD_PORT_ID);
 	sNotificationService.Notify(PORT_REMOVED, id);
 }
 
@@ -1077,11 +1077,13 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 		}
 
 		locker.Lock();
-	}
 
-	if (sPorts[slot].id != id) {
-		// the port is no longer there
-		return B_BAD_PORT_ID;
+		if (sPorts[slot].id != id
+			|| (is_port_closed(slot) && sPorts[slot].messages.IsEmpty())) {
+			// the port is no longer there
+			T(Info(sPorts[slot], 0, B_BAD_PORT_ID));
+			return B_BAD_PORT_ID;
+		}
 	}
 
 	// determine tail & get the length of the message
