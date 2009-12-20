@@ -566,20 +566,28 @@ AboutView::AddCopyrightEntry(const char *name, const char *text,
 			if (i > 0)
 				fCreditsView->Insert(", ");
 
+			BString licenseName;
+			BString licenseURL;
+			parse_named_url(license, licenseName, licenseURL);
+
 			BPath licensePath;
-			if (_GetLicensePath(license, licensePath) == B_OK) {
-				fCreditsView->InsertHyperText(license,
+			if (_GetLicensePath(licenseURL, licensePath) == B_OK) {
+				fCreditsView->InsertHyperText(licenseName,
 					new OpenFileAction(licensePath.Path()));
 			} else
-				fCreditsView->Insert(license);
+				fCreditsView->Insert(licenseName);
 		}
 
 		fCreditsView->Insert("\n");
 	}
 
 	if (url) {
+		BString urlName;
+		BString urlAddress;
+		parse_named_url(url, urlName, urlAddress);
+
 		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
-		fCreditsView->InsertHyperText(url, new URLAction(url));
+		fCreditsView->InsertHyperText(urlName, new URLAction(urlAddress));
 		fCreditsView->Insert("\n");
 	}
 	fCreditsView->Insert("\n");

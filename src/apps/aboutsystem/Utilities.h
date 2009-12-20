@@ -21,6 +21,8 @@ BString trim_string(const char* string, size_t len);
 	// Removes leading and trailing white space and replaces all sequences
 	// of white space by a single space.
 
+void parse_named_url(const BString& namedURL, BString& name, BString& url);
+
 
 class StringVector {
 public:

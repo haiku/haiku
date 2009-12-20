@@ -45,6 +45,26 @@ trim_string(const char* string, size_t len)
 }
 
 
+void
+parse_named_url(const BString& namedURL, BString& name, BString& url)
+{
+	int32 urlStart = namedURL.FindFirst('<');
+	int32 urlEnd = namedURL.FindLast('>');
+	if (urlStart < 0 || urlEnd < 0 || urlStart + 1 >= urlEnd) {
+		name = namedURL;
+		url = namedURL;
+		return;
+	}
+
+	url.SetTo(namedURL.String() + urlStart + 1, urlEnd - urlStart - 1);
+
+	if (urlStart > 0)
+		name = trim_string(namedURL, urlStart);
+	else
+		name = url;
+}
+
+
 // #pragma mark - StringVector
 
 
