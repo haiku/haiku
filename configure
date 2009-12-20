@@ -26,8 +26,6 @@ options:
                               To disable building the alternative libraries
                               the variable HAIKU_ADD_ALTERNATIVE_GCC_LIBS can be
                               unset in the UserBuildConfig file.
-  --bochs-debug               Enables bochs serial debug emulation (activated
-                              via kernel settings file).
   --build-cross-tools <build tools dir>
                               Assume cross compilation. <build tools dir>
                               defines the location of the build tools sources.
@@ -267,7 +265,6 @@ haikuSharedLibSupCxx=
 haikuCxxHeadersDir=
 hostGCCVersion=`gcc -dumpversion`
 hostGCCMachine=`gcc -dumpmachine`
-bochsDebug=0
 includeGPLAddOns=0
 includePatentedCode=0
 include3rdParty=0
@@ -315,7 +312,6 @@ while [ $# -gt 0 ] ; do
 			cd $currentDir
 			shift 2
 			;;
-		--bochs-debug)	bochsDebug=1; shift 1;;
 		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; shift 2;;
 		--build-cross-tools-gcc4)
 			assertparams "$1" 2 $#
@@ -474,8 +470,7 @@ cat << EOF > "$buildOutputDir/BuildConfig"
 TARGET_PLATFORM 			?= "${target}" ;
 HOST_PLATFORM				?= "${buildPlatform}" ;
 
-BOCHS_DEBUG_HACK					?= "${bochsDebug}" ;
-INCLUDE_GPL_ADDONS					?= "${includeGPLAddOns}" ;
+HAIKU_INCLUDE_GPL_ADDONS			?= "${includeGPLAddOns}" ;
 HAIKU_INCLUDE_PATENTED_CODE			?= "${includePatentedCode}" ;
 HAIKU_INCLUDE_3RDPARTY				?= "${include3rdParty}" ;
 HAIKU_ENABLE_MULTIUSER				?= "${enableMultiuser}" ;

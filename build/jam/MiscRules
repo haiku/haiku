@@ -62,7 +62,7 @@ rule SubIncludeGPL
 {
 	# SubInclude rule that can be used to conditionally include GPL licensed
 	# add-ons
-	if $(INCLUDE_GPL_ADDONS) = 1 {
+	if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
 		SubInclude $(1) ;
 	}
 }

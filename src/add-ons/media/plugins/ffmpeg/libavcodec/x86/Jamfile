@@ -33,7 +33,7 @@ if $(HAIKU_FFMPEG_USE_MMX) = 1 {
 		fft_mmx.nasm
 		dsputil_yasm.nasm
 	;
-	if $(INCLUDE_GPL_ADDONS) = 1 {
+	if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
 		mmxSources +=
 			idct_mmx.c
 		;
@@ -49,7 +49,7 @@ if $(HAIKU_FFMPEG_USE_SSSE3) = 1 {
 		vp3dsp_sse2.c
 		vp6dsp_sse2.c
 	;
-	if $(INCLUDE_GPL_ADDONS) = 1 {
+	if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
 		sseSources +=
 			h264_idct_sse2.nasm
 			h264_deblock_sse2.nasm

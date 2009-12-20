@@ -23,16 +23,6 @@
 #include <stdlib.h>
 
 
-/* If you've enabled Bochs debug output in the kernel driver
- * settings and has defined this, serial debug output will be
- * disabled and redirected to Bochs.
- * Define this only if not used as compile parameter.
- */
-#ifndef BOCHS_DEBUG_HACK
-#	define BOCHS_DEBUG_HACK 0
-#endif
-
-
 enum serial_register_offsets {
 	SERIAL_TRANSMIT_BUFFER		= 0,
 	SERIAL_RECEIVE_BUFFER		= 0,
@@ -74,9 +64,6 @@ static uint16 sSerialBasePort = 0x3f8;
 	// COM1 is the default debug output port
 
 static bool sKeyboardHandlerInstalled = false;
-#if BOCHS_DEBUG_HACK
-static bool sBochsOutput = false;
-#endif
 
 static spinlock sSerialOutputSpinlock = B_SPINLOCK_INITIALIZER;
 
@@ -84,13 +71,6 @@ static spinlock sSerialOutputSpinlock = B_SPINLOCK_INITIALIZER;
 static void
 put_char(const char c)
 {
-#if BOCHS_DEBUG_HACK
-	if (sBochsOutput) {
-		out8(c, 0xe9);
-		return;
-	}
-#endif
-
 	// wait until the transmitter empty bit is set
 	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0)
 		asm volatile ("pause;");
@@ -319,11 +299,6 @@ arch_debug_blue_screen_getchar(void)
 char
 arch_debug_serial_getchar(void)
 {
-#if BOCHS_DEBUG_HACK
-	if (sBochsOutput)
-		return arch_debug_blue_screen_getchar();
-#endif
-
 	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x1) == 0)
 		asm volatile ("pause;");
 
@@ -419,12 +394,8 @@ arch_debug_console_init_settings(kernel_args *args)
 	// get debug settings
 	handle = load_driver_settings("kernel");
 	if (handle != NULL) {
-		const char *value;
-
-#if BOCHS_DEBUG_HACK
-		sBochsOutput = get_driver_boolean_parameter(handle, "bochs_debug_output", false, false);
-#endif
-		value = get_driver_parameter(handle, "serial_debug_port", NULL, NULL);
+		const char *value = get_driver_parameter(handle, "serial_debug_port",
+			NULL, NULL);
 		if (value != NULL) {
 			int32 number = strtol(value, NULL, 0);
 			if (number >= MAX_SERIAL_PORTS) {

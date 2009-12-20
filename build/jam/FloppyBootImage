@@ -12,7 +12,7 @@ if $(TARGET_ARCH) = x86 {
 }
 
 local GPL_ONLY = ;
-if $(INCLUDE_GPL_ADDONS) = 1 {
+if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = "" ;
 }
 

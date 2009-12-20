@@ -275,10 +275,8 @@ SetIncludePropertiesVariables HAIKU ;
 HAIKU_ASFLAGS = ;
 
 # C/C++ flags
-HAIKU_KERNEL_CCFLAGS += -finline -fno-builtin
-	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
-HAIKU_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions
-	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
+HAIKU_KERNEL_CCFLAGS += -finline -fno-builtin ;
+HAIKU_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions ;
 HAIKU_KERNEL_DEFINES += _KERNEL_MODE ;
 
 if $(HAIKU_GCC_VERSION[1]) >= 3 {
@@ -561,9 +559,9 @@ if $(HOST_PLATFORM) != cygwin {
 }
 
 HOST_KERNEL_CCFLAGS += $(HOST_GCC_BASE_FLAGS) -finline -fno-builtin
-	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
+	-D_KERNEL_MODE ;
 HOST_KERNEL_C++FLAGS += $(HOST_GCC_BASE_FLAGS) -finline -fno-builtin
-	-fno-exceptions -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
+	-fno-exceptions -D_KERNEL_MODE ;
 HOST_KERNEL_DEFINES += _KERNEL_MODE ;
 
 HOST_KERNEL_PIC_CCFLAGS = -fno-pic ;
