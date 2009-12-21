@@ -26,7 +26,7 @@ public:
 
 	virtual int32 CountColumns() const
 	{
-		return 14;
+		return 16;
 	}
 
 	virtual int32 CountRows() const
@@ -89,6 +89,12 @@ public:
 			case 13:
 				value.SetTo(thread->UnspecifiedWaitTime());
 				return true;
+			case 14:
+				value.SetTo(thread->IOCount());
+				return true;
+			case 15:
+				value.SetTo(thread->IOTime());
+				return true;
 			default:
 				return false;
 		}
@@ -142,6 +148,10 @@ MainWindow::ThreadsPage::ThreadsPage(MainWindow* parent)
 	fThreadsTable->AddColumn(new NanotimeTableColumn(12, "Wait Time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new NanotimeTableColumn(13, "Unspecified Time", 80,
+		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new Int64TableColumn(14, "I/O Count", 80, 20,
+		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fThreadsTable->AddColumn(new NanotimeTableColumn(15, "I/O Time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fThreadsTable->AddTableListener(this);
