@@ -48,7 +48,7 @@
 #define WINDOW_START_X 30
 #define WINDOW_START_Y 100
 
-#define ERROR "Shortcuts Error"
+#define ERROR "Shortcuts error"
 #define WARNING "Shortcuts warning"
 
 // Global constants for Shortcuts
@@ -106,10 +106,10 @@ ShortcutsWindow::ShortcutsWindow()
 		new BMessage(OPEN_KEYSET), 'O'));
 	fileMenu->AddItem(new BMenuItem("Append KeySet...", 
 		new BMessage(APPEND_KEYSET), 'A'));
-	fileMenu->AddItem(new BMenuItem("Revert to Saved", 
+	fileMenu->AddItem(new BMenuItem("Revert to saved", 
 		new BMessage(REVERT_KEYSET), 'A'));
 	fileMenu->AddItem(new BSeparatorItem);
-	fileMenu->AddItem(new BMenuItem("Save KeySet As...", 
+	fileMenu->AddItem(new BMenuItem("Save KeySet as...", 
 		new BMessage(SAVE_KEYSET_AS), 'S'));
 	fileMenu->AddItem(new BSeparatorItem);
 	fileMenu->AddItem(new BMenuItem("About Shortcuts",
@@ -150,7 +150,7 @@ ShortcutsWindow::ShortcutsWindow()
 		CLV_SORT_KEYABLE));
 
 	BPopUpMenu* popup = new BPopUpMenu(NULL, false);
-	popup->AddItem(new BMenuItem("(Choose App with File Requester)", NULL));
+	popup->AddItem(new BMenuItem("(Choose application with file requester)", NULL));
 	popup->AddItem(new BMenuItem("*InsertString \"Your Text Here\"", NULL));
 	popup->AddItem(new BMenuItem("*MoveMouse +20 +0", NULL));
 	popup->AddItem(new BMenuItem("*MoveMouseTo 50% 50%", NULL));
@@ -183,11 +183,11 @@ ShortcutsWindow::ShortcutsWindow()
 	buttonBounds.right = (buttonBounds.left + origRight) * 0.40f - 
 		(V_SPACING / 2);
 	AddChild(fAddButton = new ResizableButton(Bounds(), buttonBounds, "add", 
-		"Add New Shortcut", new BMessage(ADD_HOTKEY_ITEM)));
+		"Add new shortcut", new BMessage(ADD_HOTKEY_ITEM)));
 	buttonBounds.left = buttonBounds.right + V_SPACING;
 	buttonBounds.right = origRight;
 	AddChild(fRemoveButton = new ResizableButton(Bounds(), buttonBounds, 
-		"remove", "Remove Selected Shortcut", 
+		"remove", "Remove selected shortcut", 
 		new BMessage(REMOVE_HOTKEY_ITEM)));
 	
 	fRemoveButton->SetEnabled(false);
@@ -197,7 +197,7 @@ ShortcutsWindow::ShortcutsWindow()
 	saveButtonBounds.right = Bounds().right - B_V_SCROLL_BAR_WIDTH - offset;
 	saveButtonBounds.left = buttonBounds.right + V_SPACING + offset;
 	AddChild(fSaveButton = new ResizableButton(Bounds(), saveButtonBounds, 
-		"save", "Save & Apply", new BMessage(SAVE_KEYSET)));
+		"save", "Save & apply", new BMessage(SAVE_KEYSET)));
 	
 	fSaveButton->SetEnabled(false);
 
@@ -228,7 +228,7 @@ ShortcutsWindow::QuitRequested()
 
 	if (fKeySetModified) {
 		BAlert* alert = new BAlert(WARNING, 
-			"Really quit without saving your changes?", "Don't Save", "Cancel",
+			"Really quit without saving your changes?", "Don't save", "Cancel",
 			"Save");
 		switch(alert->Go()) {
 			case 1:

@@ -1,19 +1,20 @@
 1	Russian	x-vnd.Haiku-CPUFrequencyPref	2623066734
 Ok	Status view		Ок
-Integration Time [ms]	CPU Frequency View		Время интеграции	 [мс]
-High Performance	Status view		Высокая производительность
+Integration time [ms]: 	CPU Frequency View		Время интеграции [мс]:
+High performance	Status view		Высокая производительность
 Defaults	Pref Window		По умолчанию
-CPU Frequency Status View	CPU Frequency View		Представление состояния частоты ЦП
-Dynamic Performance	Status view		Динамическая производительность
+CPU frequency status view	CPU Frequency View		Представление состояния частоты ЦП
+Dynamic performance	Status view		Динамическая производительность
 Step up by CPU usage:	Color Step View		Шаг вверх по производительности ЦП:
-Stepping Policy	CPU Frequency View		Пошаговое изменение частоты ЦП
-Open Speedstep Preferences…	Status view		Открытые пошаговые настройки
-Set State	Status view		Выбрать страну
-Launching the CPU Frequency preflet failed.\n\nError: 	Status view		Запуск CPU Frequency не удалось.\n\nErreur: 
+Stepping policy	CPU Frequency View		Пошаговое изменение частоты ЦП
+Stepping policy: 	CPU Frequency View		Пошаговое изменение частоты ЦП: 
+Open Speedstep preferences…	Status view		Открытые пошаговые настройки
+Set state	Status view		Выбрать страну
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Запуск CPU Frequency не удалось.\n\nErreur: 
 Install Replicant into Deskbar	CPU Frequency View		Установить репликант в  Deskbar
-Low Energy	Status view		Экономия энергии
+Low energy	Status view		Экономия энергии
 Revert	Pref Window		Вернуться
-Dynamic Stepping	CPU Frequency View		Динамическое изменение
+Dynamic stepping	CPU Frequency View		Динамическое изменение
 CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU Frequency\n\tразраьотан  Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 CPU Frequency	Main window		CPU Frequency
  

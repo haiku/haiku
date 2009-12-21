@@ -70,36 +70,36 @@ CreateDateMenu(BMenuField** field, bool longFormat = true)
 	// Not all available ICU settings are listed here. It's possible to add some
 	// other things if you ever need.
 	menu->AddItem(dayMenu);
-		dayMenu->AddItem(new DateMenuItem(TR("day in month"), "d", *field));
-		dayMenu->AddItem(new DateMenuItem(TR("day in month (2 digits)"), "dd",
+		dayMenu->AddItem(new DateMenuItem(TR("Day in month"), "d", *field));
+		dayMenu->AddItem(new DateMenuItem(TR("Day in month (2 digits)"), "dd",
 			*field));
 		/*
-		dayMenu->AddItem(new DateMenuItem(TR("day in year"), "D", *field));
-		dayMenu->AddItem(new DateMenuItem(TR("day in year (2 digits)"), "DD",
+		dayMenu->AddItem(new DateMenuItem(TR("Day in year"), "D", *field));
+		dayMenu->AddItem(new DateMenuItem(TR("Day in year (2 digits)"), "DD",
 			*field));
-		dayMenu->AddItem(new DateMenuItem(TR("day in year (3 digits)"), "DDD",
+		dayMenu->AddItem(new DateMenuItem(TR("Day in year (3 digits)"), "DDD",
 			*field));
 		*/
-		dayMenu->AddItem(new DateMenuItem(TR("day of week"), "e",
+		dayMenu->AddItem(new DateMenuItem(TR("Day of week"), "e",
 			*field));
-		//dayMenu->AddItem(new DateMenuItem("day of week (short text)", "eee",
+		//dayMenu->AddItem(new DateMenuItem("Day of week (short text)", "eee",
 		//	*field));
-		//dayMenu->AddItem(new DateMenuItem("day of week (full text)", "eeee",
+		//dayMenu->AddItem(new DateMenuItem("Day of week (full text)", "eeee",
 		//	*field));
-		dayMenu->AddItem(new DateMenuItem(TR("day of week (short name)"), "E",
+		dayMenu->AddItem(new DateMenuItem(TR("Day of week (short name)"), "E",
 			*field));
-		dayMenu->AddItem(new DateMenuItem(TR("day of week (name)"), "EEEE",
+		dayMenu->AddItem(new DateMenuItem(TR("Day of week (name)"), "EEEE",
 			*field));
-		dayMenu->AddItem(new DateMenuItem(TR("day of week in month"), "F",
+		dayMenu->AddItem(new DateMenuItem(TR("Day of week in month"), "F",
 			*field));
 		//dayMenu->AddItem(new DateMenuItem(TR("julian day"), "g", *field));
 		//dayMenu->AddItem(new BMenuItem("c", msg));
 	BPopUpMenu* monthMenu = new BPopUpMenu("Month");
 	menu->AddItem(monthMenu);
-		monthMenu->AddItem(new DateMenuItem(TR("month number"), "M", *field));
-		monthMenu->AddItem(new DateMenuItem(TR("month number (2 digits)"), "MM",
+		monthMenu->AddItem(new DateMenuItem(TR("Month number"), "M", *field));
+		monthMenu->AddItem(new DateMenuItem(TR("Month number (2 digits)"), "MM",
 			*field));
-		monthMenu->AddItem(new DateMenuItem(TR("month name"), "MMMM", *field));
+		monthMenu->AddItem(new DateMenuItem(TR("Month name"), "MMMM", *field));
 		//monthMenu->AddItem(new DateMenuItem("L", "L", *field));
 	BPopUpMenu* yearMenu = new BPopUpMenu(TR("Year"));
 	menu->AddItem(yearMenu);
@@ -155,10 +155,10 @@ FormatView::FormatView(BCountry* country)
 	clockBox->SetLabel(TR("Clock"));
 
 	{
-		f24HrRadioButton = new BRadioButton("", TR("24 Hour"),
+		f24HrRadioButton = new BRadioButton("", TR("24 hour"),
 				new BMessage(kSettingsContentsModified));
 
-		f12HrRadioButton = new BRadioButton("", TR("12 Hour"),
+		f12HrRadioButton = new BRadioButton("", TR("12 hour"),
 				new BMessage(kSettingsContentsModified));
 
 		clockBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 3)
@@ -174,13 +174,13 @@ FormatView::FormatView(BCountry* country)
 	fNumberFormatExampleView = new BStringView("", "");
 
 	BTextControl* numberThousand = new BTextControl("",
-		TR("Thousand separator"), "", new BMessage(kSettingsContentsModified));
-	BTextControl* numberDecimal = new BTextControl("", TR("Decimal separator"),
+		TR("Thousand separator: "), "", new BMessage(kSettingsContentsModified));
+	BTextControl* numberDecimal = new BTextControl("", TR("Decimal separator: "),
 		"", new BMessage(kSettingsContentsModified));
 	// TODO number of decimal digits (spinbox ?)
 	BCheckBox* numberLeadingZero = new BCheckBox("", TR("Leading 0"),
 		new BMessage(kSettingsContentsModified));
-	BTextControl* numberList = new BTextControl("", TR("List separator"),"",
+	BTextControl* numberList = new BTextControl("", TR("List separator: "),"",
 		new BMessage(kSettingsContentsModified));
 	// Unit system (US/Metric) (radio)
 
@@ -193,7 +193,7 @@ FormatView::FormatView(BCountry* country)
 	BMenuField* currencyNegative = new BMenuField(TR("Negative marker:"), menu);
 
 	BTextControl* currencyDecimal = new BTextControl("",
-		TR("Decimal separator"), "", new BMessage(kSettingsContentsModified));
+		TR("Decimal separator: "), "", new BMessage(kSettingsContentsModified));
 	BCheckBox* currencyLeadingZero = new BCheckBox("", TR("Leading 0"),
 		new BMessage(kSettingsContentsModified));
 

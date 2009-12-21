@@ -1,43 +1,43 @@
 1	french	x-vnd.Haiku-Appearance	959674221
-Navigation Pulse	Colors tab		Pulsation de navigation
+Navigation pulse	Colors tab		Pulsation de navigation
 Shadow	Colors tab		Ombre
 On	AntialiasingSettingsView		Activé
 Defaults	APRWindow		Défaut
 Grayscale	AntialiasingSettingsView		Niveaux de gris
 Shine	Colors tab		Lumière
 Off	AntialiasingSettingsView		Désactivé
-Anti-aliasing type:	AntialiasingSettingsView		Type de lissage :
+Antialiasing type:	AntialiasingSettingsView		Type de lissage :
 Success	Colors tab		Réussite
-Inactive Window Tab	Colors tab		Onglet de fenêtre inactive
+Inactivewindow tab	Colors tab		Onglet de fenêtre inactive
 Failure	Colors tab		Échec
 Hinting menu	AntialiasingSettingsView		Menu hinting
-Control Border	Colors tab		Bordure de contrôle
-Document Background	Colors tab		Arrière plan de document
+Control border	Colors tab		Bordure de contrôle
+Document background	Colors tab		Arrière plan de document
 Revert	APRWindow		Défaire
-Selected Menu Item Border	Colors tab		Bordure d'entrée de menu sélectionnée
-Selected Menu Item Text	Colors tab		Texte d'entrée de menu sélectionnée
+Selected menu item border	Colors tab		Bordure d'entrée de menu sélectionnée
+Selected menu item text	Colors tab		Texte d'entrée de menu sélectionnée
 Antialiasing	APRWindow		Lissage
-Window Tab Text	Colors tab		Texte d'onglet de fenêtre
-Tooltip Background	Colors tab		Arrière plan de bulle d'aide
-Document Text	Colors tab		Texte de document
-Navigation Base	Colors tab		Base de navigation
-Menu Background	Colors tab		Arrière plan de menu
+Window tab text	Colors tab		Texte d'onglet de fenêtre
+Tooltip background	Colors tab		Arrière plan de bulle d'aide
+Document text	Colors tab		Texte de document
+Navigation base	Colors tab		Base de navigation
+Menu background	Colors tab		Arrière plan de menu
 Appearance	APRWindow		Apparence
-Control Background	Colors tab		Arrière plan de contrôle
+Control background	Colors tab		Arrière plan de contrôle
 Colors	APRWindow		Couleurs
-Panel Background	Colors tab		Arrière plan de panneau
-Window Tab	Colors tab		Onglet de fenêtre
+Panel background	Colors tab		Arrière plan de panneau
+Window tab	Colors tab		Onglet de fenêtre
 Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Le lissage sous-pixel n'est pas disponible en même temps que le hinting de glyphes dans cette version de Haiku afin d'éviter des problèmes de brevets logiciels. Pour activer cette fonctionnalité, vous devez compiler Haiku vous-même et activer certaines options dans l'en-tête de configuration de libfreetype.
-Menu Item Text	Colors tab		Texte d'entrée de menu
-Monospaced Fonts Only	AntialiasingSettingsView		Seulement les polices à chasse fixe
+Menu item text	Colors tab		Texte d'entrée de menu
+Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
 LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
-Inactive Window Tab Text	Colors tab		Texte d'onglet de fenêtre inactive
+Inactivewindow tab text	Colors tab		Texte d'onglet de fenêtre inactive
 Strong	AntialiasingSettingsView		Important
-Control Highlight	Colors tab		Mise en valeur de contrôle
-Control Text	Colors tab		Texte de contrôle
-Tooltip Text	Colors tab		Texte de bulle d'aide
+Control highlight	Colors tab		Mise en valeur de contrôle
+Control text	Colors tab		Texte de contrôle
+Tooltip text	Colors tab		Texte de bulle d'aide
 Antialiasing menu	AntialiasingSettingsView		Menu Antialiasing
-Selected Menu Item Background	Colors tab		Arrière plan d'entrée de menu sélectionnée
+Selected menu item background	Colors tab		Arrière plan d'entrée de menu sélectionnée
 Glyph hinting:	AntialiasingSettingsView		Hinting de glyphes :
-Panel Text	Colors tab		Texte de panneau
+Panel text	Colors tab		Texte de panneau

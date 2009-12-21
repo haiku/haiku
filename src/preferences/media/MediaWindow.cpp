@@ -202,7 +202,7 @@ MediaWindow::InitWindow(void)
 	// StringViews
 	rgb_color titleFontColor = { 0, 0, 0, 0 };
 	fTitleView = new BStringView("AudioSettings",
-		TR("Audio Settings"), B_WILL_DRAW);
+		TR("Audio settings"), B_WILL_DRAW);
 	fTitleView->SetFont(be_bold_font);
 	fTitleView->SetHighColor(titleFontColor);
 	
@@ -254,15 +254,15 @@ MediaWindow::InitMedia(bool first)
 	
 	if (first && err != B_OK) {
 		BAlert *alert = new BAlert("start_media_server",
-			TR("Could not connect to the Media Server.\n"
+			TR("Could not connect to the media server.\n"
 			"Would you like to start it ?"), TR("Quit"),
-			TR("Start Media Server"), NULL,
+			TR("Start media server"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go()==0)
 			return B_ERROR;
 		
 		fAlert = new MediaAlert(BRect(0, 0, 300, 60),
-			"restart_alert", TR("Restarting Media Services\nStarting Media Server" B_UTF8_ELLIPSIS "\n"));
+			"restart_alert", TR("Restarting media services\nStarting media server" B_UTF8_ELLIPSIS "\n"));
 		fAlert->Show();
 		
 		Show();
@@ -279,7 +279,7 @@ MediaWindow::InitMedia(bool first)
 	if ((!first || (first && err) ) && fAlert) {
 		BAutolock locker(fAlert);
 		if (locker.IsLocked())
-			fAlert->TextView()->SetText(TR("Ready For Use" B_UTF8_ELLIPSIS));
+			fAlert->TextView()->SetText(TR("Ready for use" B_UTF8_ELLIPSIS));
 	}
 	
 	void *listItem;
@@ -318,10 +318,10 @@ MediaWindow::InitMedia(bool first)
 	fVideoView->AddNodes(fVideoOutputs, false);
 	fVideoView->AddNodes(fVideoInputs, true);
 	
-	fListView->AddItem(audio = new MediaListItem("Audio Settings", 0, false, &fIcons));
-	fListView->AddItem(video = new MediaListItem("Video Settings", 0, true, &fIcons));
+	fListView->AddItem(audio = new MediaListItem("Audio settings", 0, false, &fIcons));
+	fListView->AddItem(video = new MediaListItem("Video settings", 0, true, &fIcons));
 	
-	fListView->AddItem(mixer = new MediaListItem("Audio Mixer", 1, false, &fIcons));
+	fListView->AddItem(mixer = new MediaListItem("Audio mixer", 1, false, &fIcons));
 	mixer->SetAudioMixer(true);
 	
 	fListView->SortItems(&MediaListItem::Compare);
@@ -530,13 +530,13 @@ MediaWindow::MessageReceived (BMessage *message)
 					status = deskbar.AddItem(&ref, &id);
 
 				if (status != B_OK) {
-					fprintf(stderr, TR("Couldn't add Volume control in Deskbar: %s\n"),
+					fprintf(stderr, TR("Couldn't add volume control in Deskbar: %s\n"),
 						strerror(status));
 				}
 			} else {
 				status_t status = deskbar.RemoveItem("MediaReplicant");
 				if (status != B_OK) {
-					fprintf(stderr, TR("Couldn't remove Volume control in Deskbar: %s\n"),
+					fprintf(stderr, TR("Couldn't remove volume control in Deskbar: %s\n"),
 						strerror(status));
 				}
 			}
@@ -637,7 +637,7 @@ MediaWindow::MessageReceived (BMessage *message)
 					&& (strcmp(mimeSig, "application/x-vnd.Be.addon-host")==0 
 						|| strcmp(mimeSig, "application/x-vnd.Be.media-server")==0)) {
 					fAlert->Lock();
-					fAlert->TextView()->SetText(TR("Starting Media Server" B_UTF8_ELLIPSIS));
+					fAlert->TextView()->SetText(TR("Starting media server" B_UTF8_ELLIPSIS));
 					fAlert->Unlock();
 				}
 			}
@@ -668,7 +668,7 @@ MediaWindow::RestartMediaServices(void *data)
 {
 	MediaWindow *window = (MediaWindow *)data;
 	window->fAlert = new MediaAlert(BRect(0, 0, 300, 60), 
-		"restart_alert", TR("Restarting Media Services\nShutting down Media Server\n"));
+		"restart_alert", TR("Restarting media services\nShutting down media server\n"));
 	
 	window->fAlert->Show();
 	
@@ -677,7 +677,7 @@ MediaWindow::RestartMediaServices(void *data)
 	{
 		BAutolock locker(window->fAlert);
 		if (locker.IsLocked())
-			window->fAlert->TextView()->SetText(TR("Starting Media Server" B_UTF8_ELLIPSIS));
+			window->fAlert->TextView()->SetText(TR("Starting media server" B_UTF8_ELLIPSIS));
 	}
 	launch_media_server();
 	
@@ -692,7 +692,7 @@ MediaWindow::UpdateProgress(int stage, const char * message, void * cookie)
 	const char *string = "Unknown stage";
 	switch (stage) {
 		case 10:
-			string = TR("Stopping Media Server" B_UTF8_ELLIPSIS);
+			string = TR("Stopping media server" B_UTF8_ELLIPSIS);
 			break;
 		case 20:
 			string = TR("Telling media_addon_server to quit.");
@@ -701,10 +701,10 @@ MediaWindow::UpdateProgress(int stage, const char * message, void * cookie)
 			string = TR("Waiting for media_server to quit.");
 			break;
 		case 70:
-			string = TR("Cleaning Up.");
+			string = TR("Cleaning up.");
 			break;
 		case 100:
-			string = TR("Done Shutting Down.");
+			string = TR("Done shutting down.");
 			break;
 	}
 	

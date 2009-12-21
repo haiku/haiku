@@ -1,54 +1,55 @@
-1	french	x-vnd.Haiku-BluetoothPrefs	406799883
+1	french	x-vnd.Haiku-BluetoothPrefs	1441422651
 About…	Window		À propos…
 Handheld	Settings view		Appareil de poche
-Only from Trusted devices	Settings view		Seulement les appareils de confiance
+Default inquiry time:	Settings view		Temps de requête par défaut:
 Add device to list	Inquiry panel		Ajouter l'appareil à la liste
 Starting scan...	Inquiry panel		Démarrage de la recherche...
-Smart Phone	Settings view		Téléphone
+Show bluetooth console…	Window		Montrer le terminal bluetooth…
+Smart phone	Settings view		Téléphone
  seconds	Inquiry panel		 secondes
-Remote Devices	Window		Appareils distants
 Server	Settings view		Serveur
-Default Inquiry time:	Settings view		Temps de requête par défaut:
+Stop bluetooth services…	Window		Arrêter les services bluetooth…
 Identify host as:	Settings view		Identifier l'hôte comme :
 View	Window		Vue
 Refresh…	Remote devices		Rafraîchir…
-Show Bluetooth console…	Window		Montrer le terminal bluetooth…
+Pair…	Remote devices		Associer…
 Incoming connections policy:	Settings view		Attitude envers les connexions entrantes :
 From all devices	Settings view		Tous les appareils
-Start Bluetooth Services…	Window		Démarrer les services bluetooth…
+Show name	Extended local device view		Montrer le nom
+Local devices found on system:	Settings view		Appareils locaux trouvés sur le système :
+Haiku bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système bluetoothHaiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec le soutien de :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nMerci à toutes les personnes qui ont aidé...\n\nDons de matériel :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinancièrement :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nRustines :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nQui m'ont tout appris :\n\t- l'équipe yellowTAB
 Server	Window		Serveur
 Scanning completed.	Inquiry panel		Recherche complète.
+Remote devices list…	Window		Liste des appareils distants…
 Remove	Remote devices		Enlever
 15 secs	Settings view		15 secs
+Start bluetooth services…	Window		Démarrer les services bluetooth…
 Policy...	Settings view		Attitude...
 61 secs	Settings view		61 secs
-Haiku Bluetooth System, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système Bluetooth Haiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec le soutien de :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nMerci à toutes les personnes qui ont aidé...\n\nDons de matériel :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinancièrement :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nRustines :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nQui m'ont tout appris :\n\t- l'équipe yellowTAB
 Identify us as...	Settings view		S'identifier comme...
 Remaining 	Inquiry panel		Restant 
-Connections & Channels list…	Window		Liste des canaux et connexions…
+As blocked	Remote devices		Comme bloqué
 Pick LocalDevice...	Settings view		Choisir LocalDevice...
 Defaults	Window		Défauts
 Inquiry	Inquiry panel		Requête
 Desktop	Settings view		Bureau
 Revert	Window		Défaire
+Remote devices	Window		Appareils distants
 Laptop	Settings view		Portable
 Retrieving name of 	Inquiry panel		Récupérer le nom de 
 Bluetooth	Window		Bluetooth
-Local Devices found on system:	Settings view		Appareils locaux trouvés sur le système :
-As Trusted	Remote devices		Comme de confiance
 Discoverable	Extended local device view		Découvrable
-As Blocked	Remote devices		Comme bloqué
-Service Classes: 	Device View		Classes de services: 
+Service classes: 	Device View		Classes de services: 
+Connections & channels list…	Window		Liste des canaux et connexions…
 Refresh LocalDevices…	Window		Rafraîchir les LocalDevices…
 Settings	Window		Paramètres
+Only from trusted devices	Settings view		Seulement les appareils de confiance
 Check that the bluetooth capabilities of your remote device are activated. Press Inquiry to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them	Inquiry panel		Vérifiez que les fonctionnalités bluetooth de votre appareil distant sont activées. Appuyez sur "Requête" pour lancer la recherche. Le temps nécessaire pour récupérer les noms n'est pas connu, mais ça ne devrait pas prendre plus de 3 secondes par appareil. Ensuite vous pourrez les ajouter à la liste principale, où vous pourrez vous associer avec eux.
 Scanning progress	Inquiry panel		Avancée de la recherche
 Always ask	Settings view		Toujours demander
-Remote Devices List…	Window		Liste des appareils distants…
 Retrieving names...	Inquiry panel		Récupération des noms...
 Help	Window		Aide
+Service Classes: 	Device View		Classes de services: 
 Ok	main		Ok
 Add…	Remote devices		Ajouter…
 There has not been found any bluetooth LocalDevice device registered on the system	Inquiry panel		Aucun matériel bluetooth trouvé sur le système
-Stop Bluetooth Services…	Window		Arrêter les services bluetooth…
-Show Name	Extended local device view		Montrer le nom

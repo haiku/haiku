@@ -1,18 +1,19 @@
 1	french	x-vnd.Haiku-CPUFrequencyPref	2623066734
 Ok	Status view		Ok
-Integration Time [ms]	CPU Frequency View		Temps d'intégration	 [ms]
-High Performance	Status view		Haute performance
+Integration time [ms]: 	CPU Frequency View		Temps d'intégration	 [ms]: 
+High performance	Status view		Haute performance
 Defaults	Pref Window		Défaire
-CPU Frequency Status View	CPU Frequency View		État de la fréquence du processeur
-Dynamic Performance	Status view		Performance dynamique
+CPU frequency status view	CPU Frequency View		État de la fréquence du processeur
+Dynamic performance	Status view		performance dynamique
 Step up by CPU usage:	Color Step View		Accélération par utilisation processeur:
-Stepping Policy	CPU Frequency View		Attitude d'accélération
-Open Speedstep Preferences…	Status view		Ouvrir les préférences Speestep…
-Set State	Status view		Changer l'état
-Launching the CPU Frequency preflet failed.\n\nError: 	Status view		Échec de lancement des préférences de fréquence du processeur.\n\nErreur: 
+Stepping policy	CPU Frequency View		Attitude d'accélération
+Stepping policy: 	CPU Frequency View		Attitude d'accélération: 
+Open Speedstep preferences…	Status view		Ouvrir les préférences Speestep…
+Set state	Status view		Changer l'état
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Échec de lancement des préférences de fréquence du processeur.\n\nErreur: 
 Install Replicant into Deskbar	CPU Frequency View		Installer le réplicant dans la Deskbar
-Low Energy	Status view		Basse consommation
+Low energy	Status view		Basse consommation
 Revert	Pref Window		Défaire
-Dynamic Stepping	CPU Frequency View		Accélération dynamique
+Dynamic stepping	CPU Frequency View		Accélération dynamique
 CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Fréquence du processeur\n\técrit par Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 CPU Frequency	Main window		Fréquence du processeur

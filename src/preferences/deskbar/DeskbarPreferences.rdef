@@ -12,8 +12,8 @@ resource app_version {
 
 	internal = 0,
 
-	short_info = "Deskbar Preferences",
-	long_info  = "Deskbar Preferences ©2009 Haiku Inc."
+	short_info = "Deskbar preferences",
+	long_info  = "Deskbar preferences ©2009 Haiku Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH | B_BACKGROUND_APP;

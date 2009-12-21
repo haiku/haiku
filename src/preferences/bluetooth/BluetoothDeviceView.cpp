@@ -93,7 +93,7 @@ BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 		fName->SetText(bDevice->GetFriendlyName().String());
 		fBdaddr->SetText(bdaddrUtils::ToString(bDevice->GetBluetoothAddress()));
 	
-		BString str(TR("Service Classes: "));
+		BString str(TR("Service classes: "));
 		bDevice->GetDeviceClass().GetServiceClass(str);
 		fClassService->SetText(str.String());
 	

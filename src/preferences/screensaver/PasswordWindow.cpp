@@ -52,7 +52,7 @@ PasswordWindow::_Setup()
 	AddChild(topView);
 
 	bounds.InsetBy(10.0, 10.0);
-	fUseNetwork = new BRadioButton(bounds, "useNetwork", "Use Network password",
+	fUseNetwork = new BRadioButton(bounds, "useNetwork", "Use network password",
 		new BMessage(kMsgPasswordTypeChanged), B_FOLLOW_NONE);
 	topView->AddChild(fUseNetwork);
 	fUseNetwork->ResizeToPreferred();
@@ -170,7 +170,7 @@ PasswordWindow::MessageReceived(BMessage *message)
 			if (fUseCustom->Value()) {
 				if (strcmp(fPasswordControl->Text(), fConfirmControl->Text())) {
 					BAlert *alert = new BAlert("noMatch",
-						"Passwords don't match. Try again.","OK");
+						"Passwords don't match. Please try again.","OK");
 					alert->Go();
 					break;
 				}

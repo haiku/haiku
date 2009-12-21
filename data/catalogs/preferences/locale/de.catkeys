@@ -1,48 +1,48 @@
-1	de	x-vnd.Haiku-Locale	2750813901
-day of week (short name)	TimeFormatSettings		Wochentag (Abkz.)
+1	de	x-vnd.Haiku-Locale	363644875
+Day in month (2 digits)	TimeFormatSettings		Tag des Monats (2-stellig)
 Available languages	Locale Preflet Window		Verfügbare Sprachen
-Decimal separator	TimeFormatSettings		Dezimaltrennzeichen
+Day of week (name)	TimeFormatSettings		Wochentag (Name)
 Separator:	TimeFormatSettings		Trennzeichen:
 Year (4 digits)	TimeFormatSettings		Jahr (4-stellig)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Unmöglich die verfügbaren Sprachen zu laden. Preflet kann nicht geladen werden!
+Thousand separator: 	TimeFormatSettings		Tausendertrennzeichen: 
 After	TimeFormatSettings		Danach
+Month name	TimeFormatSettings		Monatsname
 Long format:	TimeFormatSettings		Langformat:
 Currency	TimeFormatSettings		Währung
 Before	TimeFormatSettings		Davor
 Year	TimeFormatSettings		Jahr
+Day of week in month	TimeFormatSettings		Wochentag im Monat
 Short format:	TimeFormatSettings		Kurzformat:
 Currency symbol:	TimeFormatSettings		Währungssymbol:
 Space	TimeFormatSettings		Abstand
 Language	Locale Preflet Window		Sprache
-Thousand separator	TimeFormatSettings		Tausendertrennzeichen
-24 Hour	TimeFormatSettings		24 Stunden
+Month number	TimeFormatSettings		Monatsnummer
 Year (2 digits)	TimeFormatSettings		Jahr (2-stellig)
 Preferred languages	Locale Preflet Window		Bevorzugte Sprache
+Decimal separator: 	TimeFormatSettings		Dezimaltrennzeichen: 
 Symbol position	TimeFormatSettings		Symbolposition
-month number	TimeFormatSettings		Monatsnummer
-month number (2 digits)	TimeFormatSettings		Monatsnummer (2-stellig)
+Day of week (short name)	TimeFormatSettings		Wochentag (Abkz.)
 Numbers	TimeFormatSettings		Zahlen
+24 hour	TimeFormatSettings		24 Stunden
  (unknown format)	TimeFormatSettings		 (unbekanntes Format)
 Negative marker:	TimeFormatSettings		Minuszeichen:
-12 Hour	TimeFormatSettings		12 Stunden
+Day in month	TimeFormatSettings		Tag des Monats
 Defaults	Locale Preflet Window		Standardwerte
 Separator	TimeFormatSettings		Trennzeichen
 Country	Locale Preflet Window		Land
+Month number (2 digits)	TimeFormatSettings		Monatsnummer (2-stellig)
 Revert	Locale Preflet Window		Zurücknehmen
-day in month	TimeFormatSettings		Tag des Monats
-day of week in month	TimeFormatSettings		Wochentag im Monat
 Negative marker	TimeFormatSettings		Minuszeichen
 Ok	Locale Preflet Window		Ok
+Day of week	TimeFormatSettings		Wochentag
+List separator: 	TimeFormatSettings		Listentrennzeichen: 
 Time	TimeFormatSettings		Zeit
 Date	TimeFormatSettings		Datum
-List separator	TimeFormatSettings		Listentrennzeichen
-day of week	TimeFormatSettings		Wochentag
+12 hour	TimeFormatSettings		12 Stunden
 Locale	Locale Preflet		Locale
 None	TimeFormatSettings		Ohne
-day in month (2 digits)	TimeFormatSettings		Tag des Monats (2-stellig)
 Clock	TimeFormatSettings		Uhr
 Example:	TimeFormatSettings		Beispiel:
-day of week (name)	TimeFormatSettings		Wochentag (Name)
-month name	TimeFormatSettings		Monatsname
 Day	TimeFormatSettings		Tag
 Leading 0	TimeFormatSettings		Führende 0

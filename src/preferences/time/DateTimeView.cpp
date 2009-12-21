@@ -254,7 +254,7 @@ DateTimeView::_InitView()
 
 	bounds.left += 10.0f;
 	bounds.top = text->Frame().bottom;
-	fLocalTime = new BRadioButton(bounds, "localTime", "Local Time",
+	fLocalTime = new BRadioButton(bounds, "localTime", "Local time",
 		new BMessage(kRTCUpdate));
 	AddChild(fLocalTime);
 	fLocalTime->ResizeToPreferred();

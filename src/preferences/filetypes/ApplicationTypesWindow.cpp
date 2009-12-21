@@ -160,7 +160,7 @@ ProgressWindow::MessageReceived(BMessage* message)
 
 
 ApplicationTypesWindow::ApplicationTypesWindow(const BMessage &settings)
-	: BWindow(_Frame(settings), "Application Types", B_TITLED_WINDOW,
+	: BWindow(_Frame(settings), "Application types", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	// Application list
@@ -170,7 +170,7 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage &settings)
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(topView);
 
-	BButton* button = new BButton(rect, "remove", "Remove Uninstalled",
+	BButton* button = new BButton(rect, "remove", "Remove uninstalled",
 		new BMessage(kMsgRemoveUninstalled), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveTo(8.0f, rect.bottom - 8.0f - button->Bounds().Height());
@@ -268,7 +268,7 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage &settings)
 	rect = box->Frame();
 	rect.top = rect.bottom + 8.0f;
 	rect.bottom = rect.top + 20.0f;
-	fTrackerButton = new BButton(rect, "tracker", "Show In Tracker" B_UTF8_ELLIPSIS, NULL,
+	fTrackerButton = new BButton(rect, "tracker", "Show in Tracker" B_UTF8_ELLIPSIS, NULL,
 		B_FOLLOW_RIGHT);
 	fTrackerButton->ResizeToPreferred();
 	fTrackerButton->MoveTo(rect.right - fTrackerButton->Bounds().Width(), rect.top);
@@ -375,7 +375,7 @@ ApplicationTypesWindow::_RemoveUninstalled()
 	progressWindow->PostMessage(B_QUIT_REQUESTED);
 
 	char message[512];
-	snprintf(message, sizeof(message), "%ld Application Type%s could be removed.",
+	snprintf(message, sizeof(message), "%ld Application type%s could be removed.",
 		removed, removed == 1 ? "" : "s");
 	error_alert(message, B_OK, B_INFO_ALERT);
 }

@@ -362,14 +362,14 @@ TouchpadPrefView::SetupView()
 
 	// Create the "Mouse Speed" slider...
 	fScrollAccelSlider = new BSlider("scroll_accel",
-		TR("Scroll Acceleration"), new BMessage(SCROLL_CONTROL_CHANGED),
+		TR("Scroll acceleration"), new BMessage(SCROLL_CONTROL_CHANGED),
 		0, 20, B_HORIZONTAL);
 	fScrollAccelSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fScrollAccelSlider->SetHashMarkCount(7);
 	fScrollAccelSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
 
 	fScrollStepXSlider = new BSlider("scroll_stepX",
-		TR("Horizontal Scroll Step Size"),
+		TR("Horizontal scroll step size"),
 		new BMessage(SCROLL_CONTROL_CHANGED),
 		0, 20, B_HORIZONTAL);
 	fScrollStepXSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
@@ -377,15 +377,15 @@ TouchpadPrefView::SetupView()
 	fScrollStepXSlider->SetLimitLabels(TR("Wide"), TR("Small"));
 
 	fScrollStepYSlider = new BSlider("scroll_stepY",
-		TR("Vertical Scroll Step Size"), new BMessage(SCROLL_CONTROL_CHANGED),
+		TR("Vertical scroll step size"), new BMessage(SCROLL_CONTROL_CHANGED),
 		0, 20, B_HORIZONTAL);
 	fScrollStepYSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fScrollStepYSlider->SetHashMarkCount(7);
 	fScrollStepYSlider->SetLimitLabels(TR("Wide"), TR("Small"));
 
-	fTwoFingerBox = new BCheckBox(TR("Two Finger Scrolling"),
+	fTwoFingerBox = new BCheckBox(TR("Two finger scrolling"),
 		new BMessage(SCROLL_CONTROL_CHANGED));
-	fTwoFingerHorizontalBox = new BCheckBox(TR("Horizontal Scrolling"),
+	fTwoFingerHorizontalBox = new BCheckBox(TR("Horizontal scrolling"),
 		new BMessage(SCROLL_CONTROL_CHANGED));
 
 	BGroupView* scrollPrefLeftLayout = new BGroupView(B_VERTICAL);
@@ -412,13 +412,13 @@ TouchpadPrefView::SetupView()
 	scrollPrefLayout->AddView(scrollPrefRightLayout);
 
 	BBox* tapBox = new BBox("tapbox");
-	tapBox->SetLabel(TR("Tap Gesture"));
+	tapBox->SetLabel(TR("Tap gesture"));
 
 	BGroupLayout* tapPrefLayout = new BGroupLayout(B_HORIZONTAL);
 	tapPrefLayout->SetInsets(10, tapBox->TopBorderOffset() * 2 + 10, 10, 10);
 	tapBox->SetLayout(tapPrefLayout);
 
-	fTapSlider = new BSlider("tap_sens", TR("Tap Click Sensitivity"),
+	fTapSlider = new BSlider("tap_sens", TR("Tap click sensitivity"),
 		new BMessage(TAP_CONTROL_CHANGED), 0, 20, B_HORIZONTAL);
 	fTapSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fTapSlider->SetHashMarkCount(7);

@@ -1,4 +1,4 @@
-1	Bulgarian	x-vnd.Haiku-Network	1787390642
+1	Bulgarian	x-vnd.Haiku-Network	2768265170
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Маска:
 DHCP	EthernetSettingsView		DHCP
@@ -7,7 +7,7 @@ Apply	EthernetSettingsView		Приложи
 DNS #1:	EthernetSettingsView		Първичен DNS:
 Network	NetworkWindow		Мрежа
 Adapter:	EthernetSettingsView		Адаптер:
-IP Address:	EthernetSettingsView		IP-адрес:
+IP address:	EthernetSettingsView		IP-адрес:
 Revert	EthernetSettingsView		Върни
 Sending auto-config message failed: 	EthernetSettingsView		Изпращането на съобщението за автоматична конфигурация се провали: 
 Mode:	EthernetSettingsView		Режим:

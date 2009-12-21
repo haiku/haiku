@@ -255,7 +255,7 @@ TimeZoneView::InitView()
 	fPreview->ResizeToPreferred();
 
 	// set button
-	fSetZone = new BButton(frameRight, "setTimeZone", "Set Time Zone",
+	fSetZone = new BButton(frameRight, "setTimeZone", "Set time zone",
 		new BMessage(H_SET_TIME_ZONE));
 	AddChild(fSetZone);
 	fSetZone->SetEnabled(false);

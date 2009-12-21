@@ -44,21 +44,21 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	BRect rect = Bounds();
 	rect.InsetBy(5, 5);
 	BBox *policyBox = new BBox(rect, "policyBox");
-	policyBox->SetLabel(TR("Stepping Policy"));
+	policyBox->SetLabel(TR("Stepping policy"));
 	BGroupLayout* policyLayout = new BGroupLayout(B_VERTICAL);
 	policyLayout->SetInsets(10, policyBox->TopBorderOffset() * 2 + 10, 10, 10);
 	policyLayout->SetSpacing(10);
 	policyBox->SetLayout(policyLayout);
 	mainLayout->AddView(policyBox);
 	
-	fPolicyMenu = new BMenu(TR("Stepping Policy"));
-	BMenuField *menuField = new BMenuField(TR("Stepping Policy"), fPolicyMenu);
+	fPolicyMenu = new BMenu(TR("Stepping policy: "));
+	BMenuField *menuField = new BMenuField(TR("Stepping policy: "), fPolicyMenu);
 	
 	policyLayout->AddView(menuField);
 	
 	// dynamic stepping
 	BBox *dynamicBox = new BBox(rect, "dynamicBox");
-	dynamicBox->SetLabel(TR("Dynamic Stepping"));
+	dynamicBox->SetLabel(TR("Dynamic stepping"));
 	BGroupLayout* dynamicLayout = new BGroupLayout(B_VERTICAL);
 	dynamicLayout->SetInsets(10, dynamicBox->TopBorderOffset() * 2 + 10,
 								10, 10);
@@ -71,7 +71,7 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	
 	fIntegrationTime = new BTextControl(BRect(0,0,Bounds().Width(),10),
 											"intergal",
-											TR("Integration Time [ms]"), "",
+											TR("Integration time [ms]: "), "",
 											new BMessage(kIntegrationTimeChanged));
 	
 	dynamicLayout->AddView(fColorStepView);
@@ -79,7 +79,7 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	
 	// status view
 	BBox *statusBox = new BBox(rect, "statusBox");
-	statusBox->SetLabel(TR("CPU Frequency Status View"));
+	statusBox->SetLabel(TR("CPU frequency status view"));
 	BGroupLayout* statusLayout = new BGroupLayout(B_HORIZONTAL);
 	statusLayout->SetInsets(10, statusBox->TopBorderOffset() * 2 + 10, 10, 10);
 	statusLayout->SetSpacing(10);

@@ -33,7 +33,7 @@ ExtendedLocalDeviceView::ExtendedLocalDeviceView(BRect frame, LocalDevice* bDevi
 
 	fDiscoverable = new BCheckBox(iDontCare, "Discoverable", TR("Discoverable"),
 		new BMessage(SET_DISCOVERABLE));
-	fVisible = new BCheckBox(iDontCare, "Visible", TR("Show Name"), new BMessage(SET_VISIBLE));
+	fVisible = new BCheckBox(iDontCare, "Visible", TR("Show name"), new BMessage(SET_VISIBLE));
 
 	fDiscoverable->SetEnabled(false);
 	fVisible->SetEnabled(false);

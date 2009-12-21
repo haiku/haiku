@@ -1,18 +1,19 @@
 1	swedish	x-vnd.Haiku-CPUFrequencyPref	2623066734
 Ok	Status view		Ok
-Integration Time [ms]	CPU Frequency View		Integreringstid	 [ms]
-High Performance	Status view		Högprestanda
+Integration time [ms]: 	CPU Frequency View		Integreringstid	 [ms]: 
+High performance	Status view		Högprestanda
 Defaults	Pref Window		Förval
-CPU Frequency Status View	CPU Frequency View		Statusvy för processorfrekvens
-Dynamic Performance	Status view		Dynamisk prestanda
+CPU frequency status view	CPU Frequency View		Statusvy för processorfrekvens
+Dynamic performance	Status view		Dynamisk prestanda
 Step up by CPU usage:	Color Step View		Öka med processoranvändande:
-Stepping Policy	CPU Frequency View		Accelerationspolicy
-Open Speedstep Preferences…	Status view		Öppna inställningar för Speestep…
-Set State	Status view		Ändra läge
-Launching the CPU Frequency preflet failed.\n\nError: 	Status view		Misslyckades med att starta Processorfrekevens-prefleten.\n\nFel: 
+Stepping policy	CPU Frequency View		Accelerationspolicy
+Stepping policy: 	CPU Frequency View		Accelerationspolicy: 
+Open Speedstep preferences…	Status view		Öppna inställningar för Speestep…
+Set state	Status view		Ändra läge
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Misslyckades med att starta Processorfrekevens-prefleten.\n\nFel: 
 Install Replicant into Deskbar	CPU Frequency View		Installera replikant på Deskbar
-Low Energy	Status view		Lågenergiläge
+Low energy	Status view		Lågenergiläge
 Revert	Pref Window		Återgå
-Dynamic Stepping	CPU Frequency View		Dynamisk acceleration
+Dynamic stepping	CPU Frequency View		Dynamisk acceleration
 CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Processfrekvens\n\twkriven av Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 CPU Frequency	Main window		Processorfrekvens

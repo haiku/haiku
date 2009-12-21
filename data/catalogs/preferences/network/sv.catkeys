@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Network	1787390642
+1	swedish	x-vnd.Haiku-Network	2768265170
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Nätmask:
 DHCP	EthernetSettingsView		DHCP
@@ -7,7 +7,7 @@ Apply	EthernetSettingsView		Använd
 DNS #1:	EthernetSettingsView		Primär DNS:
 Network	NetworkWindow		Nätverk
 Adapter:	EthernetSettingsView		Nätverkskort:
-IP Address:	EthernetSettingsView		IP-adress:
+IP address:	EthernetSettingsView		IP-adress:
 Revert	EthernetSettingsView		Återställ
 Sending auto-config message failed: 	EthernetSettingsView		Sändning av autokonfigurationsmeddelande misslyckades: 
 Mode:	EthernetSettingsView		Konfiguration:

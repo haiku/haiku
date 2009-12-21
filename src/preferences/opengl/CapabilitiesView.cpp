@@ -143,47 +143,47 @@ CapabilitiesView::CapabilitiesView()
 
 	tempString.SetTo("");
 	tempString << (int32) maxTex3d;
-	AddStringView(rootView, "MaxTex3D", "Maximum 3D texture size:",
+	AddStringView(rootView, "MaxTex3D", "Max. 3D texture size:",
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxTex2d;
-	AddStringView(rootView, "MaxTex2D", "Maximum 2D texture size:",
+	AddStringView(rootView, "MaxTex2D", "Max. 2D texture size:",
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) textureUnits;
-	AddStringView(rootView, "MaxTexUnits", "Maximum texture units:",
+	AddStringView(rootView, "MaxTexUnits", "Max. texture units:",
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) lights;
-	AddStringView(rootView, "MaxLights", "Maximum lights:",
+	AddStringView(rootView, "MaxLights", "Max. lights:",
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) clippingPlanes;
-	AddStringView(rootView, "MaxClippingPlanes", "Maximum clipping planes:",
+	AddStringView(rootView, "MaxClippingPlanes", "Max. clipping planes:",
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxPoly;
-	AddStringView(rootView, "MaxPoly", "Maximum evaluators equation order:",
+	AddStringView(rootView, "MaxPoly", "Max. evaluators equation order:",
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) convolutionWidth << "x" << convolutionHeight;
-	AddStringView(rootView, "MaxConvultion", "Maximum convolution:",
+	AddStringView(rootView, "MaxConvultion", "Max. convolution:",
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxIndex;
-	AddStringView(rootView, "MaxIndex", "Maximum recommended index elements:",
+	AddStringView(rootView, "MaxIndex", "Max. recommended index elements:",
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxVertex;
-	AddStringView(rootView, "MaxVertex", "Maximum recommended vertex elements:",
+	AddStringView(rootView, "MaxVertex", "Max. recommended vertex elements:",
 		tempString.String(), true);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)

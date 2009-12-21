@@ -100,7 +100,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	AddChild(topView);
 
 	rect.InsetBy(8.0f, 8.0f);
-	fPublicNameControl = new BTextControl(rect, "public", "Attribute Name:",
+	fPublicNameControl = new BTextControl(rect, "public", "Attribute name:",
 		fAttribute.PublicName(), NULL, B_FOLLOW_LEFT_RIGHT);
 	fPublicNameControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
 
@@ -115,7 +115,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 
 	rect = fPublicNameControl->Frame();
 	rect.OffsetBy(0.0f, rect.Height() + 5.0f);
-	fAttributeControl = new BTextControl(rect, "internal", "Internal Name:",
+	fAttributeControl = new BTextControl(rect, "internal", "Internal name:",
 		fAttribute.Name(), NULL, B_FOLLOW_LEFT_RIGHT);
 	fAttributeControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
 	fAttributeControl->SetDivider(labelWidth);
@@ -185,7 +185,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	rect.OffsetTo(8.0f, fVisibleCheckBox->Bounds().Height());
 	rect.right -= 18.0f;
 	fDisplayAsMenuField = new BMenuField(rect, "display as",
-		"Display As:", menu);
+		"Display as:", menu);
 	fDisplayAsMenuField->SetDivider(labelWidth);
 	fDisplayAsMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fDisplayAsMenuField->ResizeTo(rect.Width(), height);

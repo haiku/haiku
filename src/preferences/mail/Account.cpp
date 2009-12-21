@@ -103,7 +103,7 @@ Account::Account(BMailChain *inbound,BMailChain *outbound)
 
 	fInboundItem = new AccountItem(MDR_DIALECT_CHOICE ("   · Incoming","   - 受信"),this,INBOUND_ITEM);
 	fOutboundItem = new AccountItem(MDR_DIALECT_CHOICE ("   · Outgoing","   - 送信"),this,OUTBOUND_ITEM);
-	fFilterItem = new AccountItem(MDR_DIALECT_CHOICE ("   · E-mail Filters","   - フィルタ"),this,FILTER_ITEM);
+	fFilterItem = new AccountItem(MDR_DIALECT_CHOICE ("   · E-mail filters","   - フィルタ"),this,FILTER_ITEM);
 }
 
 
@@ -294,11 +294,11 @@ void Account::CreateInbound()
 	// New Mail Notification
 	path = addOnPath;
 	path.Append(kSystemFilterAddOnPath);
-	path.Append(MDR_DIALECT_CHOICE ("New Mail Notification", "着信通知方法"));
+	path.Append(MDR_DIALECT_CHOICE ("New mail notification", "着信通知方法"));
 	if (!BEntry(path.Path()).Exists()) {
 		find_directory(B_BEOS_ADDONS_DIRECTORY,&path);
 		path.Append(kSystemFilterAddOnPath);
-		path.Append(MDR_DIALECT_CHOICE ("New Mail Notification", "着信通知方法"));
+		path.Append(MDR_DIALECT_CHOICE ("New mail notification", "着信通知方法"));
 	}
 	BEntry(path.Path()).GetRef(&ref);
 	fInbound->AddFilter(msg,ref);

@@ -119,7 +119,7 @@ TTimeWindow::_InitWindow()
 
 	tab = new BTab();
 	tabView->AddTab(fTimeZoneView, tab);
-	tab->SetLabel("Timezone");
+	tab->SetLabel("Time zone");
 
 	fBaseView->AddChild(tabView);
 	tabView->ResizeBy(0.0, tabView->TabHeight());

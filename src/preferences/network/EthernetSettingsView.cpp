@@ -139,7 +139,7 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 1);
 	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1);
 
-	fIPTextControl = new BTextControl(TR("IP Address:"), "", NULL);
+	fIPTextControl = new BTextControl(TR("IP address:"), "", NULL);
 	SetupTextControl(fIPTextControl);
 
 	BLayoutItem* layoutItem = fIPTextControl->CreateTextViewLayoutItem();

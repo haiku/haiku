@@ -197,19 +197,19 @@ FrequencyMenu::FrequencyMenu(BMenu* menu, BHandler* target,
 {
 	BCatalog catalog("x-vnd.Haiku-CPUFrequencyPref");
 	fDynamicPerformance = new BMenuItem(
-		catalog.GetString("Dynamic Performance",TR_CONTEXT),
+		catalog.GetString("Dynamic performance",TR_CONTEXT),
 		new BMessage(kMsgPolicyDynamic));
 	fHighPerformance = new BMenuItem(
-		catalog.GetString("High Performance",TR_CONTEXT),
+		catalog.GetString("High performance",TR_CONTEXT),
 		new BMessage(kMsgPolicyPerformance));
-	fLowEnergie = new BMenuItem(catalog.GetString("Low Energy",TR_CONTEXT),
+	fLowEnergie = new BMenuItem(catalog.GetString("Low energy",TR_CONTEXT),
 		new BMessage(kMsgPolicyLowEnergy));
 
 	menu->AddItem(fDynamicPerformance);
 	menu->AddItem(fHighPerformance);
 	menu->AddItem(fLowEnergie);
 
-	fCustomStateMenu = new BMenu(catalog.GetString("Set State",TR_CONTEXT));
+	fCustomStateMenu = new BMenu(catalog.GetString("Set state",TR_CONTEXT));
 
 	StateList* stateList = fInterface->GetCpuFrequencyStates();
 	for (int i = 0; i < stateList->CountItems(); i++) {
@@ -491,7 +491,7 @@ StatusView::AttachedToWindow()
 
 	fPreferencesMenu->AddSeparatorItem();
 	fOpenPrefItem = new BMenuItem(fCatalog.GetString(
-			"Open Speedstep Preferences" B_UTF8_ELLIPSIS, TR_CONTEXT),
+			"Open Speedstep preferences" B_UTF8_ELLIPSIS, TR_CONTEXT),
 		new BMessage(kMsgOpenSSPreferences));
 	fPreferencesMenu->AddItem(fOpenPrefItem);
 	fOpenPrefItem->SetTarget(this);
@@ -662,7 +662,7 @@ StatusView::_OpenPreferences()
 			ret = be_roster->ActivateApp(info.team);
 	}
 	if (ret < B_OK) {
-		BString errorMessage(TR("Launching the CPU Frequency preflet failed.\n\n"
+		BString errorMessage(TR("Launching the CPU frequency preflet failed.\n\n"
 			"Error: "));
 		errorMessage << strerror(ret);
 		BAlert* alert = new BAlert("launch error", errorMessage.String(),

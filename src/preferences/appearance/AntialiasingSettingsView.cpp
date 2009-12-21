@@ -41,7 +41,7 @@ static const int32 kMsgSetAverageWeight = 'avrg';
 static const char* kSubpixelLabel = TR_MARK("LCD subpixel");
 static const char* kGrayscaleLabel = TR_MARK("Grayscale");
 static const char* kNoHintingLabel = TR_MARK("Off");
-static const char* kMonospacedHintingLabel = TR_MARK("Monospaced Fonts Only");
+static const char* kMonospacedHintingLabel = TR_MARK("Monospaced fonts only");
 static const char* kFullHintingLabel = TR_MARK("On");
 
 
@@ -86,7 +86,7 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	// antialiasing menu
 	_BuildAntialiasingMenu();
 	fAntialiasingMenuField = new BMenuField("antialiasing",
-		TR("Anti-aliasing type:"), fAntialiasingMenu, NULL);
+		TR("Antialiasing type:"), fAntialiasingMenu, NULL);
 
 	// "average weight" in subpixel filtering
 	fAverageWeightControl = new BSlider("averageWeightControl",

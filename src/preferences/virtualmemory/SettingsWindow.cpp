@@ -116,7 +116,7 @@ SettingsWindow::SettingsWindow()
 
 	float lineHeight = ceil(fontHeight.ascent + fontHeight.descent + fontHeight.ascent);
 
-	fSwapEnabledCheckBox = new BCheckBox(rect, "enable swap", "Enable Virtual Memory",
+	fSwapEnabledCheckBox = new BCheckBox(rect, "enable swap", "Enable virtual memory",
 		new BMessage(kMsgSwapEnabledUpdate));
 	fSwapEnabledCheckBox->SetValue(fSettings.SwapEnabled());
 	fSwapEnabledCheckBox->ResizeToPreferred();
@@ -131,7 +131,7 @@ SettingsWindow::SettingsWindow()
 
 	rect.right -= 20;
 	rect.top = lineHeight;
-	BString string = "Physical Memory: ";
+	BString string = "Physical memory: ";
 	string << byte_string((off_t)info.max_pages * B_PAGE_SIZE);
 	BStringView* stringView = new BStringView(rect, "physical memory", string.String(),
 		B_FOLLOW_NONE);
@@ -139,7 +139,7 @@ SettingsWindow::SettingsWindow()
 	box->AddChild(stringView);
 
 	rect.OffsetBy(0, lineHeight);
-	string = "Current Swap File Size: ";
+	string = "Current swap file size: ";
 	string << byte_string(fSettings.SwapSize());
 	stringView = new BStringView(rect, "current swap size", string.String(),
 		B_FOLLOW_NONE);
@@ -167,7 +167,7 @@ SettingsWindow::SettingsWindow()
 	}
 
 	rect.OffsetBy(0, lineHeight);
-	BMenuField* field = new BMenuField(rect, "devices", "Use Volume:", menu);
+	BMenuField* field = new BMenuField(rect, "devices", "Use volume:", menu);
 	field->SetDivider(field->StringWidth(field->Label()) + 8);
 	field->ResizeToPreferred();
 	field->SetEnabled(false);
@@ -177,7 +177,7 @@ SettingsWindow::SettingsWindow()
 	_GetSwapFileLimits(minSize, maxSize);
 
 	rect.OffsetBy(0, lineHeight + 8);
-	fSizeSlider = new SizeSlider(rect, "size slider", "Requested Swap File Size:",
+	fSizeSlider = new SizeSlider(rect, "size slider", "Requested swap file size:",
 		new BMessage(kMsgSliderUpdate), minSize / kMegaByte, maxSize / kMegaByte,
 		B_FOLLOW_LEFT_RIGHT);
 	fSizeSlider->SetLimitLabels("999 MB", "999 MB");
@@ -353,7 +353,7 @@ SettingsWindow::MessageReceived(BMessage* message)
 					"Virtual memory does not affect system performance "
 					"until this point is reached.\n\n"
 					"Are you really sure you want to turn it off?",
-					"Turn Off", "Keep Enabled", NULL,
+					"Turn off", "Keep enabled", NULL,
 					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 				if (choice == 1) {
 					fSwapEnabledCheckBox->SetValue(1);

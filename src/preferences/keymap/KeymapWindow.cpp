@@ -78,7 +78,7 @@ KeymapWindow::KeymapWindow()
 	fKeyboardLayoutView = new KeyboardLayoutView("layout");
 	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 
-	fTextControl = new BTextControl(TR("Sample and Clipboard:"), "", NULL);
+	fTextControl = new BTextControl(TR("Sample and clipboard:"), "", NULL);
 
 	fSwitchShortcutsButton = new BButton("switch", "",
 		new BMessage(kMsgSwitchShortcuts));
@@ -93,7 +93,7 @@ KeymapWindow::KeymapWindow()
 			.Add(_CreateMapLists(), 0.25)
 			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
 				.Add(fKeyboardLayoutView)
-				//.Add(new BStringView("text label", "Sample and Clipboard:"))
+				//.Add(new BStringView("text label", "Sample and clipboard:"))
 				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 					.Add(_CreateDeadKeyMenuField(), 0.0)
 					.AddGlue()
@@ -381,7 +381,7 @@ KeymapWindow::_CreateMenu()
 	menu->AddItem(new BMenuItem(TR("Open" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgMenuFileOpen), 'O'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Save As" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(TR("Save as" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgMenuFileSaveAs)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(TR("Quit"),
@@ -428,9 +428,9 @@ KeymapWindow::_CreateMenu()
 BMenuField*
 KeymapWindow::_CreateDeadKeyMenuField()
 {
-	BPopUpMenu* deadKeyMenu = new BPopUpMenu(TR("Select Dead Keys"), false, false);
+	BPopUpMenu* deadKeyMenu = new BPopUpMenu(TR("Select dead keys"), false, false);
 
-	fAcuteMenu = new BMenu(TR("Acute Trigger"));
+	fAcuteMenu = new BMenu(TR("Acute trigger"));
 	fAcuteMenu->SetRadioMode(true);
 	fAcuteMenu->AddItem(new BMenuItem("\xC2\xB4",
 		new BMessage(kMsgDeadKeyAcuteChanged)));
@@ -440,7 +440,7 @@ KeymapWindow::_CreateDeadKeyMenuField()
 		new BMessage(kMsgDeadKeyAcuteChanged)));
 	deadKeyMenu->AddItem(fAcuteMenu);
 
-	fCircumflexMenu = new BMenu(TR("Circumflex Trigger"));
+	fCircumflexMenu = new BMenu(TR("Circumflex trigger"));
 	fCircumflexMenu->SetRadioMode(true);
 	fCircumflexMenu->AddItem(new BMenuItem("^",
 		new BMessage(kMsgDeadKeyCircumflexChanged)));
@@ -448,7 +448,7 @@ KeymapWindow::_CreateDeadKeyMenuField()
 		new BMessage(kMsgDeadKeyCircumflexChanged)));
 	deadKeyMenu->AddItem(fCircumflexMenu);
 
-	fDiaeresisMenu = new BMenu(TR("Diaeresis Trigger"));
+	fDiaeresisMenu = new BMenu(TR("Diaeresis trigger"));
 	fDiaeresisMenu->SetRadioMode(true);
 	fDiaeresisMenu->AddItem(new BMenuItem("\xC2\xA8",
 		new BMessage(kMsgDeadKeyDiaeresisChanged)));
@@ -458,7 +458,7 @@ KeymapWindow::_CreateDeadKeyMenuField()
 		new BMessage(kMsgDeadKeyDiaeresisChanged)));
 	deadKeyMenu->AddItem(fDiaeresisMenu);
 
-	fGraveMenu = new BMenu(TR("Grave Trigger"));
+	fGraveMenu = new BMenu(TR("Grave trigger"));
 	fGraveMenu->SetRadioMode(true);
 	fGraveMenu->AddItem(new BMenuItem("`",
 		new BMessage(kMsgDeadKeyGraveChanged)));
@@ -466,7 +466,7 @@ KeymapWindow::_CreateDeadKeyMenuField()
 		new BMessage(kMsgDeadKeyGraveChanged)));
 	deadKeyMenu->AddItem(fGraveMenu);
 
-	fTildeMenu = new BMenu(TR("Tilde Trigger"));
+	fTildeMenu = new BMenu(TR("Tilde trigger"));
 	fTildeMenu->SetRadioMode(true);
 	fTildeMenu->AddItem(new BMenuItem("~",
 		new BMessage(kMsgDeadKeyTildeChanged)));
@@ -587,13 +587,13 @@ KeymapWindow::_SetKeyboardLayout(const char* path)
 void
 KeymapWindow::_UpdateSwitchShortcutButton()
 {
-	const char* label = TR("Switch Shortcut Keys");
+	const char* label = TR("Switch shortcut keys");
 	if (fCurrentMap.KeyForModifier(B_LEFT_COMMAND_KEY) == 0x5d
 		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5c) {
-		label = TR("Switch Shortcut Keys To Windows/Linux Mode");
+		label = TR("Switch shortcut keys to Windows/Linux mode");
 	} else if (fCurrentMap.KeyForModifier(B_LEFT_COMMAND_KEY) == 0x5c
 		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5d) {
-		label = TR("Switch Shortcut Keys To Haiku Mode");
+		label = TR("Switch Shortcut keys to Haiku mode");
 	}
 
 	fSwitchShortcutsButton->SetLabel(label);

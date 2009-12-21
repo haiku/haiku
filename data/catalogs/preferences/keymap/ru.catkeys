@@ -1,22 +1,22 @@
-1	Russian	x-vnd-Haiku-Keymap	3527348353
-Select Dead Keys	Keymap window		Выбор мертвых клавиш
-Tilde Trigger	Keymap window		Тильда
-Grave Trigger	Keymap window		Апостроф
+1	Russian	x-vnd-Haiku-Keymap	1405412929
+Tilde trigger	Keymap window		Тильда
+Grave trigger	Keymap window		Апостроф
+Select dead keys	Keymap window		Выбор мертвых клавиш
 Quit	Keymap window		Выйти
-Circumflex Trigger	Keymap window		Циркумфлекс
+Circumflex trigger	Keymap window		Циркумфлекс
+Diaeresis trigger	Keymap window		Диерезис
 Open…	Keymap window		Открыть…
 System:	Keymap window		Системные:
-Diaeresis Trigger	Keymap window		Диерезис
+Switch shortcut keys	Keymap window		Переключение раскладки
 User:	Keymap window		Пользовательские:
-Sample and Clipboard:	Keymap window		Выборка и буфер обмена:
+Switch shortcut keys to Windows/Linux mode	Keymap window		Переключение раскладки для Windows/Linux режима
 Keymap	Keymap window		Keymap
-Switch Shortcut Keys	Keymap window		Переключение раскладки
-Switch Shortcut Keys To Windows/Linux Mode	Keymap window		Переключение раскладки для Windows/Linux режима
+Sample and clipboard:	Keymap window		Выборка и буфер обмена:
 Layout	Keymap window		Макет
+Switch Shortcut keys to Haiku mode	Keymap window		Переключение раскладки в Haiku режим
 Revert	Keymap window		Вернуть
-Save As…	Keymap window		Сохранить как…
-Switch Shortcut Keys To Haiku Mode	Keymap window		Переключение раскладки в Haiku режим
+Save as…	Keymap window		Сохранить как…
 File	Keymap window		Файл
 (Current)	Keymap window		(Текущий)
 Font	Keymap window		Шрифт
-Acute Trigger	Keymap window		Аксант эгю
+Acute trigger	Keymap window		Аксант эгю

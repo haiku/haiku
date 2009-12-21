@@ -1,43 +1,43 @@
 1	german	x-vnd.Haiku-Appearance	959674221
-Navigation Pulse	Colors tab		Navigation - Leuchtfarbe
+Navigation pulse	Colors tab		Navigation - Leuchtfarbe
 Shadow	Colors tab		Schatten
 On	AntialiasingSettingsView		An
 Defaults	APRWindow		Standardwerte
 Grayscale	AntialiasingSettingsView		Graustufen
 Shine	Colors tab		Glanz
 Off	AntialiasingSettingsView		Aus
-Anti-aliasing type:	AntialiasingSettingsView		Kantenglättungstyp:
+Antialiasing type:	AntialiasingSettingsView		Kantenglättungstyp:
 Success	Colors tab		Erfolg
-Inactive Window Tab	Colors tab		Fenstertitel (inaktiv)
+Inactivewindow tab	Colors tab		Fenstertitel (inaktiv)
 Failure	Colors tab		Fehler
 Hinting menu	AntialiasingSettingsView		Hinting-Menü
-Control Border	Colors tab		Steuerelement - Rahmen
-Document Background	Colors tab		Dokument - Hintergrund
+Control border	Colors tab		Steuerelement - Rahmen
+Document background	Colors tab		Dokument - Hintergrund
 Revert	APRWindow		Zurücknehmen
-Selected Menu Item Border	Colors tab		Menü - Rahmen (ausgewählt)
-Selected Menu Item Text	Colors tab		Menü - Text (ausgewählt)
+Selected menu item border	Colors tab		Menü - Rahmen (ausgewählt)
+Selected menu item text	Colors tab		Menü - text (ausgewählt)
 Antialiasing	APRWindow		Kantenglättung
-Window Tab Text	Colors tab		Fenstertitel - Text
-Tooltip Background	Colors tab		Hinweis - Hintergrund
-Document Text	Colors tab		Dokument - Text
-Navigation Base	Colors tab		Navigation - Grundfarbe
-Menu Background	Colors tab		Menü - Hintergrund
+Window tab text	Colors tab		Fenstertitel - text
+Tooltip background	Colors tab		Hinweis - Hintergrund
+Document text	Colors tab		Dokument - text
+Navigation base	Colors tab		Navigation - Grundfarbe
+Menu background	Colors tab		Menü - Hintergrund
 Appearance	APRWindow		Aussehen
-Control Background	Colors tab		Steuerelement - Hintergrund
+Control background	Colors tab		Steuerelement - Hintergrund
 Colors	APRWindow		Farben
-Panel Background	Colors tab		Oberfläche - Hintergrund
-Window Tab	Colors tab		Fenstertitel
+Panel background	Colors tab		Oberfläche - Hintergrund
+Window tab	Colors tab		Fenstertitel
 Reduce colored edges filter strength:	AntialiasingSettingsView		Stärke des Farbsaumfilters
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Zur Vermeidung von möglichen Patentproblemen ist die Kombination von Subpixel-Kantenglättung und Glyph-hinting deaktiviert. Um diese Funktion zu aktivieren müssen Sie spezielle Funktionen im Konfigurationsheader der Freetype-Bibliothek freischalten und anschließend Haiku selbst kompilieren.
-Menu Item Text	Colors tab		Menü - Text
-Monospaced Fonts Only	AntialiasingSettingsView		Nur Monospace Schriften
+Menu item text	Colors tab		Menü - text
+Monospaced fonts only	AntialiasingSettingsView		Nur Monospace Schriften
 LCD subpixel	AntialiasingSettingsView		LCD Subpixel
-Inactive Window Tab Text	Colors tab		Fenstertitel - Text (inaktiv)
+Inactivewindow tab text	Colors tab		Fenstertitel - text (inaktiv)
 Strong	AntialiasingSettingsView		Stark
-Control Highlight	Colors tab		Steuerelement - Beleuchtung
-Control Text	Colors tab		Steuerelement - Text
-Tooltip Text	Colors tab		Hinweis - Text
+Control highlight	Colors tab		Steuerelement - Beleuchtung
+Control text	Colors tab		Steuerelement - text
+Tooltip text	Colors tab		Hinweis - text
 Antialiasing menu	AntialiasingSettingsView		Kantenglättungs-Menü
-Selected Menu Item Background	Colors tab		Menü - Hintergrund (ausgewählt)
+Selected menu item background	Colors tab		Menü - Hintergrund (ausgewählt)
 Glyph hinting:	AntialiasingSettingsView		Glyph-hinting:
-Panel Text	Colors tab		Oberfläche - Text
+Panel text	Colors tab		Oberfläche - text

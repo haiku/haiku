@@ -1,48 +1,48 @@
-1	french	x-vnd.Haiku-Locale	2750813901
-day of week (short name)	TimeFormatSettings		jour de la semaine (abrégé)
+1	french	x-vnd.Haiku-Locale	363644875
+Day in month (2 digits)	TimeFormatSettings		jour du mois (2 chiffres)
 Available languages	Locale Preflet Window		Langues disponibles
-Decimal separator	TimeFormatSettings		Séparateur décimal
+Day of week (name)	TimeFormatSettings		jour de la semaine (nom)
 Separator:	TimeFormatSettings		Separateur:
 Year (4 digits)	TimeFormatSettings		Année (4 chiffres)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La liste des langages disponibles est introuvable, ce preflet est donc inutilisable !
+Thousand separator: 	TimeFormatSettings		Séparateur de milliers
 After	TimeFormatSettings		Après
+Month name	TimeFormatSettings		nom du mois
 Long format:	TimeFormatSettings		Format long:
-Before	TimeFormatSettings		Avant
 Currency	TimeFormatSettings		Devise
+Before	TimeFormatSettings		Avant
 Year	TimeFormatSettings		Année
+Day of week in month	TimeFormatSettings		jour de la semaine dans le mois
 Short format:	TimeFormatSettings		Format court:
 Currency symbol:	TimeFormatSettings		Symbole monétaire:
 Space	TimeFormatSettings		Espace
 Language	Locale Preflet Window		Langage
-Thousand separator	TimeFormatSettings		Séparateur de milliers
-24 Hour	TimeFormatSettings		24 Heures
+Month number	TimeFormatSettings		numéro du mois
 Year (2 digits)	TimeFormatSettings		Année (2 chiffres)
 Preferred languages	Locale Preflet Window		Langues préférées
+Decimal separator: 	TimeFormatSettings		Séparateur décimal
 Symbol position	TimeFormatSettings		Position du symbole
-month number	TimeFormatSettings		numéro du mois
-month number (2 digits)	TimeFormatSettings		numéro du mois (2 chiffres)
+Day of week (short name)	TimeFormatSettings		jour de la semaine (abrégé)
 Numbers	TimeFormatSettings		Nombres
+24 hour	TimeFormatSettings		24 Heures
  (unknown format)	TimeFormatSettings		 (format inconnu)
 Negative marker:	TimeFormatSettings		Marqueur de nombre négatifs:
-12 Hour	TimeFormatSettings		12 Heures
+Day in month	TimeFormatSettings		jour du mois
 Defaults	Locale Preflet Window		Défauts
 Separator	TimeFormatSettings		Separateur
 Country	Locale Preflet Window		Pays
+Month number (2 digits)	TimeFormatSettings		numéro du mois (2 chiffres)
 Revert	Locale Preflet Window		Défaire
-day in month	TimeFormatSettings		jour du mois
-day of week in month	TimeFormatSettings		jour de la semaine dans le mois
 Negative marker	TimeFormatSettings		Marqueur de nombres n�gatifs
 Ok	Locale Preflet Window		Ok
+Day of week	TimeFormatSettings		jour de la semaine
+List separator: 	TimeFormatSettings		Séparateur de liste
 Time	TimeFormatSettings		Heure
 Date	TimeFormatSettings		Date
-List separator	TimeFormatSettings		Séparateur de liste
-day of week	TimeFormatSettings		jour de la semaine
+12 hour	TimeFormatSettings		12 Heures
 Locale	Locale Preflet		Locale
 None	TimeFormatSettings		Aucun
-day in month (2 digits)	TimeFormatSettings		jour du mois (2 chiffres)
 Clock	TimeFormatSettings		Horloge
 Example:	TimeFormatSettings		Exemple:
-day of week (name)	TimeFormatSettings		jour de la semaine (nom)
-month name	TimeFormatSettings		nom du mois
 Day	TimeFormatSettings		Jour
 Leading 0	TimeFormatSettings		0 initial

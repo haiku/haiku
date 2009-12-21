@@ -48,7 +48,7 @@ RemoteDevicesView::RemoteDevicesView(const char *name, uint32 flags)
 										new BMessage(kMsgPairDevice));
 
 
-	blockButton = new BButton("block", TR("As Blocked"),
+	blockButton = new BButton("block", TR("As blocked"),
 										new BMessage(kMsgBlockDevice));
 
 

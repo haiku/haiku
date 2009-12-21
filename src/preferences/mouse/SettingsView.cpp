@@ -93,7 +93,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 	fClickSpeedSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
 
 	// Create the "Mouse Speed" slider...
-	fMouseSpeedSlider = new BSlider("mouse_speed", TR("Mouse Speed"), 
+	fMouseSpeedSlider = new BSlider("mouse_speed", TR("Mouse speed"), 
 		new BMessage(kMsgMouseSpeed), 0, 1000, B_HORIZONTAL);
 	fMouseSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fMouseSpeedSlider->SetHashMarkCount(7);
@@ -101,7 +101,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 
 	// Create the "Mouse Acceleration" slider...
 	fAccelerationSlider = new BSlider("mouse_acceleration",
-		TR("Mouse Acceleration"), new BMessage(kMsgAccelerationFactor),
+		TR("Mouse acceleration"), new BMessage(kMsgAccelerationFactor),
 		0, 1000, B_HORIZONTAL);
 	fAccelerationSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAccelerationSlider->SetHashMarkCount(5);
@@ -116,10 +116,10 @@ SettingsView::SettingsView(MouseSettings &settings)
 	fDoubleClick->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
 
 	// Add the "Mouse focus mode" pop up menu
-	fFocusMenu = new BPopUpMenu(TR("Click to Activate"));
+	fFocusMenu = new BPopUpMenu(TR("Click to activate"));
 	
-	const char *focusLabels[] = {TR_MARK("Click to Activate"),
-		TR_MARK("Click to Focus"),TR_MARK("Focus Follows Mouse")};
+	const char *focusLabels[] = {TR_MARK("Click to activate"),
+		TR_MARK("Click to focus"),TR_MARK("Focus follows mouse")};
 	const mode_mouse focusModes[] = {B_NORMAL_MOUSE, B_CLICK_TO_FOCUS_MOUSE,
 										B_FOCUS_FOLLOWS_MOUSE};
 
@@ -138,7 +138,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 	fFocusFollowsMouseMenu = new BPopUpMenu(TR("Normal"));
 	
 	const char *focusFollowsMouseLabels[] = {TR_MARK("Normal"),
-		TR_MARK("Warp"), TR_MARK("Instant Warp")};
+		TR_MARK("Warp"), TR_MARK("Instant warp")};
 	const mode_focus_follows_mouse focusFollowsMouseModes[] =
 		{B_NORMAL_FOCUS_FOLLOWS_MOUSE, B_WARP_FOCUS_FOLLOWS_MOUSE,
 			B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE};

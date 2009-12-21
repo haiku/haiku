@@ -325,7 +325,7 @@ rule ExtractCatalogEntries target : source : signature
 
 	MakeLocatePlatform $(target) ;
 	Depends $(target) : $(source) <build>collectcatkeys ;
-	LocalClean clean : $(target) ;
+	LocalClean clean : $(target).pre ;
 	ExtractCatalogEntries1 $(target) : <build>collectcatkeys $(source) ;
 }
 

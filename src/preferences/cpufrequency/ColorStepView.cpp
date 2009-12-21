@@ -285,7 +285,7 @@ ColorStepView::_InitView()
 	
 	BRect sliderFrame(Bounds());
 	
-	fSlider = new BSlider(sliderFrame, "StepSlider", TR("Step up by CPU usage:"),
+	fSlider = new BSlider(sliderFrame, "StepSlider", TR("Step up by CPU usage"),
 							new BMessage(kSteppingChanged), 0, 100);
 	fSlider->SetModificationMessage(new BMessage(kMSGSliderChanged));
 	

@@ -1,22 +1,22 @@
-1	French	x-vnd-Haiku-Keymap	3527348353
-Select Dead Keys	Keymap window		Touches mortes
-Tilde Trigger	Keymap window		Tilde
-Grave Trigger	Keymap window		Accent grave
+1	French	x-vnd.Haiku-Keymap	1405412929
+Tilde trigger	Keymap window		Tilde
+Grave trigger	Keymap window		Accent grave
+Select dead keys	Keymap window		Touches mortes
 Quit	Keymap window		Quitter
-Circumflex Trigger	Keymap window		Accent circonflexe
+Circumflex trigger	Keymap window		Accent circonflexe
+Diaeresis trigger	Keymap window		Trema
 Open…	Keymap window		Ouvrir…
 System:	Keymap window		Système:
-Diaeresis Trigger	Keymap window		Trema
+Switch shortcut keys	Keymap window		Touches raccourci
 User:	Keymap window		Utilisateur:
-Sample and Clipboard:	Keymap window		Exemple et presse-papier:
+Switch Shortcut keys to Haiku mode	Keymap window		Touches raccourci en mode Haiku
 Keymap	Keymap window		Keymap
-Switch Shortcut Keys	Keymap window		Touches raccourci
-Switch Shortcut Keys To Windows/Linux Mode	Keymap window		Touches raccourci en mode Linux/Windows
+Sample and clipboard:	Keymap window		Exemple et presse-papier:
 Layout	Keymap window		Disposition
+Switch shortcut keys to Windows/Linux mode	Keymap window		Touches raccourci en mode Linux/Windows
 Revert	Keymap window		Défaire
-Save As…	Keymap window		Enregistrer sous…
-Switch Shortcut Keys To Haiku Mode	Keymap window		Touches raccourci en mode Haiku
+Save as…	Keymap window		Enregistrer sous…
 File	Keymap window		Fichier
 (Current)	Keymap window		(Actif)
 Font	Keymap window		Police
-Acute Trigger	Keymap window		Accent aigu
+Acute trigger	Keymap window		Accent aigu

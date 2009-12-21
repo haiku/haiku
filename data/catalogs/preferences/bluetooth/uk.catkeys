@@ -1,54 +1,55 @@
-1	Ukrainian 	x-vnd.Haiku-BluetoothPrefs	406799883
+1	Ukrainian	x-vnd.Haiku-BluetoothPrefs	1441422651
 About…	Window		Про…
 Handheld	Settings view		Переносний
-Only from Trusted devices	Settings view		Тільки для перевірених  приладів
+Default inquiry time:	Settings view		Час довідки по замовчуванню:
 Add device to list	Inquiry panel		Додати прилад  до списку
 Starting scan...	Inquiry panel		Почати сканування...
-Smart Phone	Settings view		Смартфон
+Show bluetooth console…	Window		Показати термінал Bluetooth...
+Smart phone	Settings view		Смартфон
  seconds	Inquiry panel		 секунд
-Remote Devices	Window		Віддалені прилади
 Server	Settings view		Сервер
-Default Inquiry time:	Settings view		Час довідки по замовчуванню:
+Stop bluetooth services…	Window		Зупинити сервіси Bluetooth…
 Identify host as:	Settings view		Визначити хост як :
 View	Window		Вигляд
 Refresh…	Remote devices		Обновити…
-Show Bluetooth console…	Window		Показати термінал Bluetooth...
+Pair…	Remote devices		Pair…
 Incoming connections policy:	Settings view		Правило вхідних під"єднань :
 From all devices	Settings view		Для всіх приладів
-Start Bluetooth Services…	Window		Запуск сервісів Bluetooth…
+Show name	Extended local device view		Показати Ім"я
+Local devices found on system:	Settings view		Локальны прилади знайдені в системі :
+Haiku bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Система bluetoothHaiku, (ARCE)\n\nАвтор Oliver Ruiz Dorantes\n\nза підтримки :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nПодяка людям які допомагали...\n\nобладнанням :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nфінансово :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nзаплатками :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nТим хто навчив :\n\t- команда yellowTAB
 Server	Window		Сервер
 Scanning completed.	Inquiry panel		Сканування завершене.
+Remote devices list…	Window		Список віддалених приладів…
 Remove	Remote devices		Видалити
 15 secs	Settings view		15 сек.
+Start bluetooth services…	Window		Запуск сервісів Bluetooth…
 Policy...	Settings view		Правило...
 61 secs	Settings view		61 сек.
-Haiku Bluetooth System, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Система Bluetooth Haiku, (ARCE)\n\nАвтор Oliver Ruiz Dorantes\n\nза підтримки :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nПодяка людям які допомагали...\n\nобладнанням :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nфінансово :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nзаплатками :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nТим хто навчив :\n\t- команда yellowTAB
 Identify us as...	Settings view		Визначити нас як...
 Remaining 	Inquiry panel		Залишилось 
-Connections & Channels list…	Window		Список під"єднань і каналів…
+As blocked	Remote devices		Як заблоковані
 Pick LocalDevice...	Settings view		Вибір локальних  приладів...
 Defaults	Window		По замовчуванню
 Inquiry	Inquiry panel		Запрос
 Desktop	Settings view		Десктоп
 Revert	Window		Повернути
+Remote devices	Window		Віддалені прилади
 Laptop	Settings view		Ноутбук
 Retrieving name of 	Inquiry panel		Змінити імя на 
 Bluetooth	Window		Bluetooth
-Local Devices found on system:	Settings view		Локальны прилади знайдені в системі :
-As Trusted	Remote devices		Як перевірені
 Discoverable	Extended local device view		Відкриті	
-As Blocked	Remote devices		Як заблоковані
-Service Classes: 	Device View		Класи сервісу: 
+Service classes: 	Device View		Класи сервісу: 
+Connections & channels list…	Window		Список під"єднань і каналів…
 Refresh LocalDevices…	Window		Обновити локальні прилади…
 Settings	Window		Настройки
-Check that the bluetooth capabilities of your remote device are activated. Press Inquiry to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them	Inquiry panel		Переконайтесь що функція Bluetooth віддалених приладів  активована. Натисніть  Запрос для початку  сканування. Час для отримання імен не повинен перевищувати 3 секунди. Після цього ви зможете під"єднатись до них. 
+Only from trusted devices	Settings view		Тільки для перевірених  приладів
+Check that the bluetooth capabilities of your remote device are activated. Press Inquiry to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them	Inquiry panel		Переконайтесь що функція bluetoothвіддалених приладів  активована. Натисніть  Запрос для початку  сканування. Час для отримання імен не повинен перевищувати 3 секунди. Після цього ви зможете під"єднатись до них. 
 Scanning progress	Inquiry panel		Хід сканування
 Always ask	Settings view		Завжди питати
-Remote Devices List…	Window		Список віддалених приладів…
 Retrieving names...	Inquiry panel		Відновлення імен...
 Help	Window		Допомога
+Service Classes: 	Device View		Service Classes: 
 Ok	main		Ok
 Add…	Remote devices		Додати…
 There has not been found any bluetooth LocalDevice device registered on the system	Inquiry panel		Не знайдено жодного приладу з Bluetoth  
-Stop Bluetooth Services…	Window		Зупинити сервіси Bluetooth…
-Show Name	Extended local device view		Показати Ім"я

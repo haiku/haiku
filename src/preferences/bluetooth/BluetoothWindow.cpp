@@ -50,16 +50,16 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 
 	// Add File menu to menu bar
 	BMenu *menu = new BMenu(TR("Server"));
-	menu->AddItem(new BMenuItem(TR("Start Bluetooth Services" B_UTF8_ELLIPSIS), new BMessage(kMsgStartServices), 0));
-	menu->AddItem(new BMenuItem(TR("Stop Bluetooth Services" B_UTF8_ELLIPSIS), new BMessage(kMsgStopServices), 0));
+	menu->AddItem(new BMenuItem(TR("Start bluetooth services" B_UTF8_ELLIPSIS), new BMessage(kMsgStartServices), 0));
+	menu->AddItem(new BMenuItem(TR("Stop bluetooth services" B_UTF8_ELLIPSIS), new BMessage(kMsgStopServices), 0));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Show Bluetooth console" B_UTF8_ELLIPSIS), new BMessage(kMsgStartServices), 0));
+	menu->AddItem(new BMenuItem(TR("Show bluetooth console" B_UTF8_ELLIPSIS), new BMessage(kMsgStartServices), 0));
 	menu->AddItem(new BMenuItem(TR("Refresh LocalDevices" B_UTF8_ELLIPSIS), new BMessage(kMsgRefresh), 0));
 	fMenubar->AddItem(menu);
 	
 	menu = new BMenu(TR("View"));
-	menu->AddItem(new BMenuItem(TR("Connections & Channels list" B_UTF8_ELLIPSIS), NULL, 0));
-	menu->AddItem(new BMenuItem(TR("Remote Devices List" B_UTF8_ELLIPSIS), NULL, 0));	
+	menu->AddItem(new BMenuItem(TR("Connections & channels list" B_UTF8_ELLIPSIS), NULL, 0));
+	menu->AddItem(new BMenuItem(TR("Remote devices list" B_UTF8_ELLIPSIS), NULL, 0));	
 	fMenubar->AddItem(menu);
 	
 	menu = new BMenu(TR("Help"));
@@ -70,7 +70,7 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 
 	fSettingsView = new BluetoothSettingsView(TR("Settings"));
 //	fConnChan = new ConnChanView("Connections & Channels", B_WILL_DRAW);
-	fRemoteDevices = new RemoteDevicesView(TR("Remote Devices"), B_WILL_DRAW);
+	fRemoteDevices = new RemoteDevicesView(TR("Remote devices"), B_WILL_DRAW);
 
 	tabView->AddTab(fRemoteDevices);
 //	tabView->AddTab(fConnChan);

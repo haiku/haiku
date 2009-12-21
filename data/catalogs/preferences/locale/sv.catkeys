@@ -1,7 +1,7 @@
-1	swedish	x-vnd.Haiku-Locale	2750813901
-day of week (short name)	TimeFormatSettings		veckodag (kortnamn)
+1	swedish	x-vnd.Haiku-Locale	363644875
+Day of week (short name)	TimeFormatSettings		veckodag (kortnamn)
 Available languages	Locale Preflet Window		Tillgängliga språk
-Decimal separator	TimeFormatSettings		Decimalseparerare
+Decimal separator: 	TimeFormatSettings		Decimalseparerare
 Separator:	TimeFormatSettings		Separerare:
 Year (4 digits)	TimeFormatSettings		År (4 siffror)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kan inte hitta listan över tillgängliga språk! Prefleten kan inte användas!
@@ -14,35 +14,35 @@ Short format:	TimeFormatSettings		Kort datum:
 Currency symbol:	TimeFormatSettings		Valutasymbol:
 Space	TimeFormatSettings		Mellanrum
 Language	Locale Preflet Window		Språk
-Thousand separator	TimeFormatSettings		Tusentalsseparerare
-24 Hour	TimeFormatSettings		24 Hour
+Thousand separator: 	TimeFormatSettings		Tusentalsseparerare
+24 hour	TimeFormatSettings		24 hour
 Year (2 digits)	TimeFormatSettings		År (2 siffror)
 Preferred languages	Locale Preflet Window		Föredragna språk
 Symbol position	TimeFormatSettings		Symbolposition
-month number	TimeFormatSettings		månadsnummer
-month number (2 digits)	TimeFormatSettings		månadsnummer (2 siffror)
+Month number	TimeFormatSettings		månadsnummer
+Month number (2 digits)	TimeFormatSettings		månadsnummer (2 siffror)
 Numbers	TimeFormatSettings		Nummer
  (unknown format)	TimeFormatSettings		 (okänt format)
 Negative marker:	TimeFormatSettings		Negativmarkör:
-12 Hour	TimeFormatSettings		12 Hour
+12 hour	TimeFormatSettings		12 hour
 Defaults	Locale Preflet Window		Förval
 Separator	TimeFormatSettings		Separerare
 Country	Locale Preflet Window		Land
 Revert	Locale Preflet Window		Återgå
-day in month	TimeFormatSettings		dag i månad
-day of week in month	TimeFormatSettings		veckodag i månad
+Day in month	TimeFormatSettings		dag i månad
+Day of week in month	TimeFormatSettings		veckodag i månad
 Negative marker	TimeFormatSettings		Negativmarkör
 Ok	Locale Preflet Window		Ok
 Time	TimeFormatSettings		Tid
 Date	TimeFormatSettings		Datum
-List separator	TimeFormatSettings		Listseparerare
-day of week	TimeFormatSettings		veckodag
+List separator: 	TimeFormatSettings		Listseparerare
+Day of week	TimeFormatSettings		veckodag
 Locale	Locale Preflet		Locale
 None	TimeFormatSettings		Ingen
-day in month (2 digits)	TimeFormatSettings		dag i månad (2 siffror)
+Day in month (2 digits)	TimeFormatSettings		dag i månad (2 siffror)
 Clock	TimeFormatSettings		Klocka
 Example:	TimeFormatSettings		Exempel:
-day of week (name)	TimeFormatSettings		veckodag (namn)
-month name	TimeFormatSettings		månadsnamn
+Day of week (name)	TimeFormatSettings		veckodag (namn)
+Month name	TimeFormatSettings		månadsnamn
 Day	TimeFormatSettings		Dag
 Leading 0	TimeFormatSettings		Inledande 0

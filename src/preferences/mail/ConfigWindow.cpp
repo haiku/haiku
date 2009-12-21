@@ -304,7 +304,7 @@ ConfigWindow::ConfigWindow()
 	rect = view->Bounds().InsetByCopy(8,8);
 	rect.right -= 1;	rect.bottom = rect.top + height * 5 + 15;
 	BBox *box = new BBox(rect);
-	box->SetLabel(MDR_DIALECT_CHOICE ("Mail Checking","メールチェック間隔"));
+	box->SetLabel(MDR_DIALECT_CHOICE ("Mail checking","メールチェック間隔"));
 	view->AddChild(box);
 
 	rect = box->Bounds().InsetByCopy(8,8);
@@ -319,10 +319,10 @@ ConfigWindow::ConfigWindow()
 
 	BPopUpMenu *frequencyPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *frequencyStrings[] = {
-		MDR_DIALECT_CHOICE ("Never","チェックしない"),
-		MDR_DIALECT_CHOICE ("Minutes","分毎チェック"),
-		MDR_DIALECT_CHOICE ("Hours","時間毎チェック"),
-		MDR_DIALECT_CHOICE ("Days","日間毎チェック")};
+		MDR_DIALECT_CHOICE ("never","チェックしない"),
+		MDR_DIALECT_CHOICE ("minutes","分毎チェック"),
+		MDR_DIALECT_CHOICE ("hours","時間毎チェック"),
+		MDR_DIALECT_CHOICE ("days","日間毎チェック")};
 	BMenuItem *item;
 	for (int32 i = 0;i < 4;i++)
 	{
@@ -338,12 +338,12 @@ ConfigWindow::ConfigWindow()
 
 	rect.OffsetBy(0,height + 9);	rect.bottom -= 2;
 	fPPPActiveCheckBox = new BCheckBox(rect,"ppp active",
-		MDR_DIALECT_CHOICE ("Only When Dial-Up is Connected","PPP接続中時のみ"), NULL);
+		MDR_DIALECT_CHOICE ("Only when dial-up is connected","PPP接続中時のみ"), NULL);
 	box->AddChild(fPPPActiveCheckBox);
 	
 	rect.OffsetBy(0,height + 9);	rect.bottom -= 2;
 	fPPPActiveSendCheckBox = new BCheckBox(rect,"ppp activesend",
-		MDR_DIALECT_CHOICE ("Schedule Outgoing Mail When Dial-Up is Disconnected","PPP切断時、送信メールを送信箱に入れる"), NULL);
+		MDR_DIALECT_CHOICE ("Schedule outgoing mail when dial-up is disconnected","PPP切断時、送信メールを送信箱に入れる"), NULL);
 	box->AddChild(fPPPActiveSendCheckBox);
 
 	// Miscellaneous settings box
@@ -356,8 +356,8 @@ ConfigWindow::ConfigWindow()
 	BPopUpMenu *statusPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *statusModes[] = {
 		MDR_DIALECT_CHOICE ("Never","表示しない"),
-		MDR_DIALECT_CHOICE ("While Sending","送信時"),
-		MDR_DIALECT_CHOICE ("While Sending and Receiving","送受信時"),
+		MDR_DIALECT_CHOICE ("While sending","送信時"),
+		MDR_DIALECT_CHOICE ("While sending and receiving","送受信時"),
 		MDR_DIALECT_CHOICE ("Always","常に表示")};
 	BMessage *msg;
 	for (int32 i = 0;i < 4;i++)
@@ -371,9 +371,9 @@ ConfigWindow::ConfigWindow()
 	rect.top += 7;
 	rect.bottom = rect.top + height + 5;
 	labelWidth = (int32)view->StringWidth(
-		MDR_DIALECT_CHOICE ("Show Connection Status Window:","ステータスの表示：")) + 8;
+		MDR_DIALECT_CHOICE ("Show connection status window:","ステータスの表示：")) + 8;
 	fStatusModeField = new BMenuField(rect,"show status",
-		MDR_DIALECT_CHOICE ("Show Connection Status Window:","ステータスの表示："),
+		MDR_DIALECT_CHOICE ("Show connection status window:","ステータスの表示："),
 	statusPopUp);
 	fStatusModeField->SetDivider(labelWidth);
 	box->AddChild(fStatusModeField);
@@ -381,7 +381,7 @@ ConfigWindow::ConfigWindow()
 	rect = fStatusModeField->Frame();;
 	rect.OffsetBy(0, rect.Height() + 10);
 	BButton *button = new BButton(rect,B_EMPTY_STRING,
-		MDR_DIALECT_CHOICE ("Edit Mailbox Menu…","メニューリンクの設定"),
+		MDR_DIALECT_CHOICE ("Edit mailbox menu…","メニューリンクの設定"),
 		msg = new BMessage(B_REFS_RECEIVED));
 	button->ResizeToPreferred();
 	box->AddChild(button);
@@ -402,7 +402,7 @@ ConfigWindow::ConfigWindow()
 	rect = button->Frame();
 	rect.OffsetBy(rect.Width() + 30,0);
 	fAutoStartCheckBox = new BCheckBox(rect,"start daemon",
-		MDR_DIALECT_CHOICE ("Start Mail Services on Startup","Mail Servicesを自動起動"),NULL);
+		MDR_DIALECT_CHOICE ("Start mail services on startup","Mail Servicesを自動起動"),NULL);
 	fAutoStartCheckBox->ResizeToPreferred();
 	box->AddChild(fAutoStartCheckBox);
 
@@ -487,7 +487,7 @@ ConfigWindow::MakeHowToView()
 	text->SetViewColor(fConfigView->Parent()->ViewColor());
 	text->SetAlignment(B_ALIGN_CENTER);
 	text->SetText(
-		MDR_DIALECT_CHOICE ("\n\nMake a new account with the Add button.\n\n"
+		MDR_DIALECT_CHOICE ("\n\nCreate a new account with the Add button.\n\n"
 		"Remove an account with the Remove button on the selected item.\n\n"
 		"Select an item in the list to change its settings.",
 		"\n\nアカウントの新規作成は\"追加\"ボタンを\n使います。"

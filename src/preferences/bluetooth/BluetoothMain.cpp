@@ -29,7 +29,7 @@ void
 BluetoothApplication::AboutRequested()
 {
 	
-	(new BAlert("about", TR("Haiku Bluetooth System, (ARCE)\n\n"
+	(new BAlert("about", TR("Haiku bluetooth system, (ARCE)\n\n"
                              "Created by Oliver Ruiz Dorantes\n\n"
                              "With support of:\n"
                              "	- Mika Lindqvist\n"

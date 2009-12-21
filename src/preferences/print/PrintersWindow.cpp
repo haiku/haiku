@@ -77,14 +77,14 @@ PrintersWindow::MessageReceived(BMessage* msg)
 				fSelectedPrinter = fPrinterListView->SelectedItem();
 				if (fSelectedPrinter)
 				{
-					fJobsBox->SetLabel((BString("Print Jobs for ") << fSelectedPrinter->Name()).String());
+					fJobsBox->SetLabel((BString("Print jobs for ") << fSelectedPrinter->Name()).String());
 					fMakeDefault->SetEnabled(true);
 					fRemove->SetEnabled(true);
 					fJobListView->SetSpoolFolder(fSelectedPrinter->Folder());
 				}
 				else
 				{
-					fJobsBox->SetLabel("Print Jobs: No printer selected");
+					fJobsBox->SetLabel("Print jobs: No printer selected");
 					fMakeDefault->SetEnabled(false);
 					fRemove->SetEnabled(false);
 					fSelectedPrinter = NULL;
@@ -200,7 +200,7 @@ PrintersWindow::BuildGUI()
 		maxWidth = fRemove->Bounds().Width();
 
 		// Make Default button
-	fMakeDefault = new BButton(BRect(5,60,5,60), "default", "Make Default", new BMessage(kMsgMakeDefaultPrinter), B_FOLLOW_RIGHT);
+	fMakeDefault = new BButton(BRect(5,60,5,60), "default", "Make default", new BMessage(kMsgMakeDefaultPrinter), B_FOLLOW_RIGHT);
 	printersBox->AddChild(fMakeDefault);
 	fMakeDefault->ResizeToPreferred();
 
@@ -240,7 +240,7 @@ PrintersWindow::BuildGUI()
 	backdrop->AddChild(fJobsBox);
 
 		// Cancel Job Button
-	BButton* cancelButton = new BButton(BRect(5,5,5,5), "cancel", "Cancel Job", new BMessage(kMsgCancelJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
+	BButton* cancelButton = new BButton(BRect(5,5,5,5), "cancel", "Cancel job", new BMessage(kMsgCancelJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
 	fJobsBox->AddChild(cancelButton);
 	cancelButton->ResizeToPreferred();
 	fCancel = cancelButton;
@@ -248,7 +248,7 @@ PrintersWindow::BuildGUI()
 	maxWidth = cancelButton->Bounds().Width();
 
 		// Restart Job button
-	BButton* restartButton = new BButton(BRect(5,30,5,30), "restart", "Restart Job", new BMessage(kMsgRestartJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
+	BButton* restartButton = new BButton(BRect(5,30,5,30), "restart", "Restart job", new BMessage(kMsgRestartJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
 	fJobsBox->AddChild(restartButton);
 	restartButton->ResizeToPreferred();
 	fRestart = restartButton;

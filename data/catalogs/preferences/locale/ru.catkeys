@@ -1,7 +1,7 @@
-1	Russian	x-vnd.Haiku-Locale	1910872713
-day of week (short name)	TimeFormatSettings		день недели (короткое название)
+1	Russian	x-vnd.Haiku-Locale	363644875
+Day of week (short name)	TimeFormatSettings		день недели (короткое название)
 Available languages	Locale Preflet Window		Доступные языки
-Decimal separator	TimeFormatSettings		Десятичный разделитель
+Decimal separator: 	TimeFormatSettings		Десятичный разделитель
 Separator:	TimeFormatSettings		Разделитель:
 Year (4 digits)	TimeFormatSettings		Год (4 цифры)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Не удаётся найти доступные языки! Вы не можете использовать данную функцию!
@@ -14,35 +14,35 @@ Short format:	TimeFormatSettings		Краткий формат:
 Currency symbol:	TimeFormatSettings		Символ валюты:
 Space	TimeFormatSettings		Пространство
 Language	Locale Preflet Window		Язык
-Thousand separator	TimeFormatSettings		Разделитель тысячи
-24 Hour	TimeFormatSettings		24 Часа
+Thousand separator: 	TimeFormatSettings		Разделитель тысячи
+24 hour	TimeFormatSettings		24 Часа
 Year (2 digits)	TimeFormatSettings		Год (2 цифры)
 Preferred languages	Locale Preflet Window		Предпочтительные языки
 Symbol position	TimeFormatSettings		Символ позиции
-month number	TimeFormatSettings		номер месяца 
-month number (2 digits)	TimeFormatSettings		номер месяца (2 цифры)
+Month number	TimeFormatSettings		номер месяца 
+Month number (2 digits)	TimeFormatSettings		номер месяца (2 цифры)
 Numbers	TimeFormatSettings		Числа
  (unknown format)	TimeFormatSettings		 (неизвестный формат)
 Negative marker:	TimeFormatSettings		Отрицательный маркер:
-12 Hour	TimeFormatSettings		12 Часов
+12 hour	TimeFormatSettings		12 Часов
 Defaults	Locale Preflet Window		По умолчанию
-Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\tразработал Axel Dörfler\n\tCopyright 2009, Haiku.\n\n
 Separator	TimeFormatSettings		Разделитель
 Country	Locale Preflet Window		Страна
 Revert	Locale Preflet Window		Вернуться
-day in month	TimeFormatSettings		день в месяце
-day of week in month	TimeFormatSettings		день недели в месяце
+Day in month	TimeFormatSettings		день в месяце
+Day of week in month	TimeFormatSettings		день недели в месяце
 Negative marker	TimeFormatSettings		Отрицательный маркер
 Ok	Locale Preflet Window		Ок
 Time	TimeFormatSettings		Время
 Date	TimeFormatSettings		Дата
-List separator	TimeFormatSettings		Разделитель списка
-day of week	TimeFormatSettings		день недели
+Locale	Locale Preflet		Locale
+List separator: 	TimeFormatSettings		Разделитель списка
+Day of week	TimeFormatSettings		день недели
 None	TimeFormatSettings		Ни один
-day in month (2 digits)	TimeFormatSettings		день в месяце (2 цифры)
+Day in month (2 digits)	TimeFormatSettings		день в месяце (2 цифры)
 Clock	TimeFormatSettings		Часы
 Example:	TimeFormatSettings		Пример:
-day of week (name)	TimeFormatSettings		день недели (название)
-month name	TimeFormatSettings		название месяца
+Day of week (name)	TimeFormatSettings		день недели (название)
+Month name	TimeFormatSettings		название месяца
 Day	TimeFormatSettings		День
 Leading 0	TimeFormatSettings		Межстрочный интервал 0

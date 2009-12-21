@@ -1,17 +1,17 @@
-1	german	x-vnd.Haiku-Backgrounds	3254422720
+1	bulgarian	x-vnd.Haiku-Backgrounds	739979648
 X:	Main View		X:
 Resolution: 	Image Filepanel		Разделителна способност:
 pick one	Main View		избери
 Default	Main View		Стандартно
 Center	Main View		Центрирано
 Manual	Main View		Ръчно
-All Workspaces	Main View		Всички работни площи
 Default folder	Main View		Папка по подразбиране
 Revert	Main View		Върни
 None	Main View		Никой
-Current Workspace	Main View		Активната работна площ
+All workspaces	Main View		Всички работни площи
 Icon label outline	Main View		Контур около името на иконата
 Other…	Main View		Друг…
+Current workspace	Main View		Активната работна площ
 Folder: 	Main View		Папка:
 Apply	Main View		Приложи
 Other folder…	Main View		Друга папка…

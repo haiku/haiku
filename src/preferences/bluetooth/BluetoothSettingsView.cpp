@@ -39,14 +39,14 @@ static const int32 kMsgSetAverageWeight = 'afEa';
 static const int32 kMsgLocalSwitched = 'lDsW';
 
 static const char* kAllLabel = TR_MARK("From all devices");
-static const char* kTrustedLabel = TR_MARK("Only from Trusted devices");
+static const char* kTrustedLabel = TR_MARK("Only from trusted devices");
 static const char* kAlwaysLabel = TR_MARK("Always ask");
 
 static const char* kDesktopLabel = TR_MARK("Desktop");
 static const char* kServerLabel = TR_MARK("Server");
 static const char* kLaptopLabel = TR_MARK("Laptop");
 static const char* kHandheldLabel = TR_MARK("Handheld");
-static const char* kPhoneLabel = TR_MARK("Smart Phone");
+static const char* kPhoneLabel = TR_MARK("Smart phone");
 
 
 //	#pragma mark -
@@ -60,7 +60,7 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 		TR("Incoming connections policy:"), fAntialiasingMenu, NULL);
 
 	fAverageWeightControl = new BSlider("averageWeightControl",
-		TR("Default Inquiry time:"), new BMessage(kMsgSetAverageWeight), 0, 255,
+		TR("Default inquiry time:"), new BMessage(kMsgSetAverageWeight), 0, 255,
 		B_HORIZONTAL);
 	fAverageWeightControl->SetLimitLabels(TR("15 secs"), TR("61 secs"));
 	fAverageWeightControl->SetHashMarks(B_HASH_MARKS_BOTTOM);
@@ -75,7 +75,7 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 	// localdevices menu
 	_BuildLocalDevicesMenu();
 	fLocalDevicesMenuField = new BMenuField("devices",
-		TR("Local Devices found on system:"), fLocalDevicesMenu, NULL);
+		TR("Local devices found on system:"), fLocalDevicesMenu, NULL);
 
 	fExtDeviceView = new ExtendedLocalDeviceView(BRect(0,0,5,5), NULL);
 

@@ -35,7 +35,7 @@
 
 AddPrinterDialog::AddPrinterDialog(BWindow *parent)
 	:
-	Inherited(BRect(78.0, 71.0, 400, 300), "Add Printer",
+	Inherited(BRect(78.0, 71.0, 400, 300), "Add printer",
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fPrintersPrefletMessenger(parent)
@@ -171,7 +171,7 @@ void
 AddPrinterDialog::BuildGUI(int stage)
 {
 	// add a "printer name" input field
-	fName = new BTextControl("printer_name", "Printer Name:", B_EMPTY_STRING,
+	fName = new BTextControl("printer_name", "Printer name:", B_EMPTY_STRING,
 		NULL);
 	fName->SetFont(be_bold_font);
 	fName->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
@@ -180,7 +180,7 @@ AddPrinterDialog::BuildGUI(int stage)
 	// add a "driver" popup menu field
 	fPrinter = new BPopUpMenu("<pick one>");
 	BMenuField *printerMenuField = new BMenuField("drivers_list",
-		"Printer Type:", fPrinter);
+		"Printer type:", fPrinter);
 	printerMenuField->SetAlignment(B_ALIGN_RIGHT);
 	FillMenu(fPrinter, "Print", kPrinterSelectedMsg);
 

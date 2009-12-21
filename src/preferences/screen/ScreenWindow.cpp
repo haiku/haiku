@@ -69,11 +69,11 @@ static const struct {
 	int32		bits_per_pixel;
 	const char*	label;
 } kColorSpaces[] = {
-	{ B_CMAP8, 8, "8 Bits/Pixel, 256 Colors" },
-	{ B_RGB15, 15, "15 Bits/Pixel, 32768 Colors" },
-	{ B_RGB16, 16, "16 Bits/Pixel, 65536 Colors" },
-	{ B_RGB24, 24, "24 Bits/Pixel, 16 Million Colors" },
-	{ B_RGB32, 32, "32 Bits/Pixel, 16 Million Colors" }
+	{ B_CMAP8, 8, "8 bits/pixel, 256 colors" },
+	{ B_RGB15, 15, "15 bits/pixel, 32768 colors" },
+	{ B_RGB16, 16, "16 bits/pixel, 65536 colors" },
+	{ B_RGB24, 24, "24 bits/pixel, 16 Million colors" },
+	{ B_RGB32, 32, "32 bits/pixel, 16 Million colors" }
 };
 static const int32 kColorSpaceCount
 	= sizeof(kColorSpaces) / sizeof(kColorSpaces[0]);
@@ -146,7 +146,7 @@ screen_errors(status_t status)
 {
 	switch (status) {
 		case B_ENTRY_NOT_FOUND:
-			return "Unknown Mode";
+			return "Unknown mode";
 		// TODO: add more?
 
 		default:
@@ -183,11 +183,11 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	// we need the "Current Workspace" first to get its height
 
-	BPopUpMenu *popUpMenu = new BPopUpMenu("Current Workspace", true, true);
-	fAllWorkspacesItem = new BMenuItem("All Workspaces",
+	BPopUpMenu *popUpMenu = new BPopUpMenu("Current workspace", true, true);
+	fAllWorkspacesItem = new BMenuItem("All workspaces",
 		new BMessage(WORKSPACE_CHECK_MSG));
 	popUpMenu->AddItem(fAllWorkspacesItem);
-	BMenuItem *item = new BMenuItem("Current Workspace",
+	BMenuItem *item = new BMenuItem("Current workspace",
 		new BMessage(WORKSPACE_CHECK_MSG));
 
 	popUpMenu->AddItem(item);
@@ -230,7 +230,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		.End());
 
 	fBackgroundsButton = new BButton("BackgroundsButton",
-		"Set Background" B_UTF8_ELLIPSIS,
+		"Set background" B_UTF8_ELLIPSIS,
 		new BMessage(BUTTON_LAUNCH_BACKGROUNDS_MSG));
 	fBackgroundsButton->SetFontSize(be_plain_font->Size() * 0.9);
 	screenBox->AddChild(fBackgroundsButton);
@@ -344,7 +344,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		fRefreshMenu->AddItem(fOtherRefresh);
 	}
 
-	fRefreshField = new BMenuField("RefreshMenu", "Refresh Rate:",
+	fRefreshField = new BMenuField("RefreshMenu", "Refresh rate:",
 		fRefreshMenu, NULL);
 
 	if (_IsVesa())
@@ -376,7 +376,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		}
 
 		fCombineField = new BMenuField("CombineMenu",
-			"Combine Displays:", fCombineMenu, NULL);
+			"Combine displays:", fCombineMenu, NULL);
 
 		if (!multiMonSupport)
 			fCombineField->Hide();
@@ -392,7 +392,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		message->AddBool("swap", true);
 		fSwapDisplaysMenu->AddItem(new BMenuItem("yes", message));
 
-		fSwapDisplaysField = new BMenuField("SwapMenu", "Swap Displays:",
+		fSwapDisplaysField = new BMenuField("SwapMenu", "Swap displays:",
 			fSwapDisplaysMenu, NULL);
 
 		if (!multiMonSupport)
@@ -410,7 +410,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		fUseLaptopPanelMenu->AddItem(new BMenuItem("always", message));
 
 		fUseLaptopPanelField = new BMenuField("UseLaptopPanel",
-			"Use Laptop Panel:", fUseLaptopPanelMenu, NULL);
+			"Use laptop panel:", fUseLaptopPanelMenu, NULL);
 
 		if (!useLaptopPanelSupport)
 			fUseLaptopPanelField->Hide();
@@ -432,7 +432,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			fTVStandardMenu->AddItem(new BMenuItem(name.String(), message));
 		}
 
-		fTVStandardField = new BMenuField("tv standard", "Video Format:",
+		fTVStandardField = new BMenuField("tv standard", "Video format:",
 			fTVStandardMenu, NULL);
 		fTVStandardField->SetAlignment(B_ALIGN_RIGHT);
 
@@ -508,7 +508,7 @@ ScreenWindow::QuitRequested()
 		if (status < B_OK) {
 			BString warning = "Could not write VESA mode settings file:\n\t";
 			warning << strerror(status);
-			(new BAlert("VesaAlert", warning.String(), "Okay", NULL, NULL,
+			(new BAlert("VesaAlert", warning.String(), "OK", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 		}
 	}
@@ -676,7 +676,7 @@ ScreenWindow::_UpdateRefreshControl()
 
 	fRefreshMenu->Superitem()->SetLabel(string.String());
 
-	string.Append("/Other" B_UTF8_ELLIPSIS);
+	string.Append("/other" B_UTF8_ELLIPSIS);
 	fOtherRefresh->SetLabel(string.String());
 }
 
@@ -1202,9 +1202,9 @@ ScreenWindow::_UpdateMonitor()
 			&& info.min_vertical_frequency != 0
 			&& info.max_pixel_clock != 0) {
 			length = snprintf(text, sizeof(text),
-				"Horizonal Frequency:\t%lu - %lu kHz\n"
-				"Vertical Frequency:\t%lu - %lu Hz\n\n"
-				"Maximum Pixel Clock:\t%g MHz",
+				"Horizonal frequency:\t%lu - %lu kHz\n"
+				"Vertical frequency:\t%lu - %lu Hz\n\n"
+				"Maximum pixel clock:\t%g MHz",
 				info.min_horizontal_frequency, info.max_horizontal_frequency,
 				info.min_vertical_frequency, info.max_vertical_frequency,
 				info.max_pixel_clock / 1000.0);
@@ -1246,7 +1246,7 @@ void
 ScreenWindow::_UpdateColorLabel()
 {
 	BString string;
-	string << fSelected.BitsPerPixel() << " Bits/Pixel";
+	string << fSelected.BitsPerPixel() << " bits/pixel";
 	fColorsMenu->Superitem()->SetLabel(string.String());
 }
 
@@ -1287,7 +1287,7 @@ ScreenWindow::_Apply()
 		char message[256];
 		snprintf(message, sizeof(message),
 			"The screen mode could not be set:\n\t%s\n", screen_errors(status));
-		BAlert* alert = new BAlert("Screen Alert", message, "Okay", NULL, NULL,
+		BAlert* alert = new BAlert("Screen Alert", message, "OK", NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go();
 	}

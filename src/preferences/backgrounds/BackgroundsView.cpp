@@ -171,10 +171,10 @@ BackgroundsView::BackgroundsView()
 	BBox* rightbox = new BBox("rightbox");
 
 	fWorkspaceMenu = new BPopUpMenu(TR("pick one"));
-	fWorkspaceMenu->AddItem(new BMenuItem(TR("All Workspaces"),
+	fWorkspaceMenu->AddItem(new BMenuItem(TR("All workspaces"),
 		new BMessage(kMsgAllWorkspaces)));
 	BMenuItem* menuItem;
-	fWorkspaceMenu->AddItem(menuItem = new BMenuItem(TR("Current Workspace"),
+	fWorkspaceMenu->AddItem(menuItem = new BMenuItem(TR("Current workspace"),
 		new BMessage(kMsgCurrentWorkspace)));
 	menuItem->SetMarked(true);
 	fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(fWorkspaceMenu->FindMarked());

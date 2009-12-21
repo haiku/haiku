@@ -1,17 +1,17 @@
-1	svenska	x-vnd.Haiku-Backgrounds	3254422720
+1	svenska	x-vnd.Haiku-Backgrounds	739979648
 X:	Main View		X:
 Resolution: 	Image Filepanel		Upplösning:
 pick one	Main View		Välj en
 Default	Main View		Standard
 Center	Main View		Centrerad
 Manual	Main View		Manuell
-All Workspaces	Main View		Alla arbetsytor
 Default folder	Main View		Standardmapp
 Revert	Main View		Återställ
 None	Main View		Ingen
-Current Workspace	Main View		Den här arbetsytan
+All workspaces	Main View		Alla arbetsytor
 Icon label outline	Main View		Extra filnamnskontur
 Other…	Main View		Annan…
+Current workspace	Main View		Den här arbetsytan
 Folder: 	Main View		Mapp:
 Apply	Main View		Använd
 Other folder…	Main View		Annan mapp…

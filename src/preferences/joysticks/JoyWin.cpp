@@ -75,10 +75,10 @@ JoyWin::JoyWin(BRect frame, const char *title)
 	fConControllerL->SetInvocationMessage(new BMessage(JOY_INVOKE));
 
 	fGamePortS = new BStringView(BRect(15, 5, 160, 25), "gpString",
-		"Game Port");
+		"Game port");
 	fGamePortS->SetFont(be_bold_font);
 	fConControllerS = new BStringView(BRect(170, 5, 330, 25), "ccString",
-		"Connected Controller");
+		"Connected controller");
 
 	fConControllerS->SetFont(be_bold_font);
 
@@ -394,9 +394,9 @@ JoyWin::_ShowProbeMesage(const char* device)
 {
 	BString str("An attempt will be made to probe the port '");
 	str << device << "' to try to figure out what kind of joystick (if any) ";
-	str << "are attached.There is a small chance this process might cause ";
+	str << "are attached. There is a small chance this process might cause ";
 	str << "your machine to lock up and require a reboot. Make sure you have ";
-	str << "savedchanges in all open applications before you Probe";
+	str << "saved changes in all open applications before you start probing.";
 
 	BAlert *alert = new BAlert("test1", str.String(), "Probe", "Cancel");
 	alert->SetShortcut(1, B_ESCAPE);
@@ -416,7 +416,7 @@ JoyWin::_ShowCantFindFileMessage(const char* port)
 	BString str("The file '");
 	str <<  _FixPathToName(port).String() << "' used by '" << port;
 	str << "' cannot be found.\n Do you want to ";
-	str << "try to auto-detect a joystick for this port?";
+	str << "try auto-detecting a joystick for this port?";
 
 	BAlert *alert = new BAlert("test1", str.String(), "Stop", "Probe");
 	alert->SetShortcut(1, B_ENTER);
@@ -432,8 +432,8 @@ JoyWin::_ShowCantFindFileMessage(const char* port)
 void
 JoyWin::_ShowNoCompatibleJoystickMessage()
 {
-	BString str("There where no compatible joysticks detected on this game");
-	str << " port. Try another port, or ask the manufacture of your jostick";
+	BString str("There were no compatible joysticks detected on this game");
+	str << " port. Try another port, or ask the manufacturer of your joystick";
 	str << " for a driver designed for Haiku or BeOS.";
 
 	BAlert *alert = new BAlert("test1", str.String(), "Ok");

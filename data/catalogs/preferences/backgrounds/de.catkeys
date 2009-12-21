@@ -1,17 +1,17 @@
-1	german	x-vnd.Haiku-Backgrounds	3254422720
+1	german	x-vnd.Haiku-Backgrounds	739979648
 X:	Main View		X:
 Resolution: 	Image Filepanel		Auflösung:
 pick one	Main View		Auswählen
 Default	Main View		Standard
 Center	Main View		Zentriert
 Manual	Main View		Manuell
-All Workspaces	Main View		Alle Arbeitsflächen
 Default folder	Main View		Vorgabeordner
 Revert	Main View		Zurücksetzen
 None	Main View		Keiner
-Current Workspace	Main View		Aktuelle Arbeitsfläche
+All workspaces	Main View		Alle Arbeitsflächen
 Icon label outline	Main View		Icon-Beschriftungsumriss
 Other…	Main View		Anderer…
+Current workspace	Main View		Aktuelle Arbeitsfläche
 Folder: 	Main View		Ordner:
 Apply	Main View		Anwenden
 Other folder…	Main View		Spezifischer Ordner…

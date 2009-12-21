@@ -658,7 +658,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	float radioButtonOffset = 2 * floorf(textHeight / 2 - 2) + floorf(textHeight / 2);
 
 	fEnableCheckBox = new BCheckBox(BRect(0, 0, 1, 1), "EnableCheckBox",
-		"Enable Screen Saver", new BMessage(kMsgEnableScreenSaverBox));
+		"Enable screen saver", new BMessage(kMsgEnableScreenSaverBox));
 	fEnableCheckBox->ResizeToPreferred();
 
 	rect.InsetBy(8, 8);

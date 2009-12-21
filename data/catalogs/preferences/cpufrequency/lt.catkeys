@@ -1,19 +1,20 @@
 1	Lithuanian	x-vnd.Haiku-CPUFrequencyPref	2623066734
 Ok	Status view		Gerai
-Integration Time [ms]	CPU Frequency View		Atsistatymo laikas	 [ms]
-High Performance	Status view		Prisitaikantis našumas
+Integration time [ms]: 	CPU Frequency View		Atsistatymo laikas	 [ms]: 
+High performance	Status view		Prisitaikantis našumas
 Defaults	Pref Window		Įprastai
-CPU Frequency Status View	CPU Frequency View		CP dažnio rodymas
-Dynamic Performance	Status view		Prisitaikantis našumas
+CPU frequency status view	CPU Frequency View		CP dažnio rodymas
+Dynamic performance	Status view		Prisitaikantis našumas
 Step up by CPU usage:	Color Step View		Daugiau CP našumo:
-Stepping Policy	CPU Frequency View		Žingsniavimas
-Open Speedstep Preferences…	Status view		Atidaryti žingsniavimo nustatymus…
-Set State	Status view		Pasirinkite šalį
-Launching the CPU Frequency preflet failed.\n\nError: 	Status view		Nepavyko paleisti „CP dažnio“.\n\nErreur: 
+Stepping policy	CPU Frequency View		Žingsniavimas
+Stepping policy: 	CPU Frequency View		Žingsniavimas: 
+Open Speedstep preferences…	Status view		Atidaryti žingsniavimo nustatymus…
+Set state	Status view		Pasirinkite šalį
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Nepavyko paleisti „CP dažnio“.\n\nErreur: 
 Install Replicant into Deskbar	CPU Frequency View		Įdėti ženkliuką  Deskbar'an
-Low Energy	Status view		Energijos taupymas
+Low energy	Status view		Energijos taupymas
 Revert	Pref Window		Grįžti
-Dynamic Stepping	CPU Frequency View		Prisitaikantis žingsniavimas
+Dynamic stepping	CPU Frequency View		Prisitaikantis žingsniavimas
 CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU Frequency\n\tsukurtas  Clemens'o Zeidler'io\n\tCopyright 2009, Haiku, Inc.\n
 CPU Frequency	Main window		CP dažnis
  

@@ -19,7 +19,7 @@ HApp::HApp()
 	: BApplication("application/x-vnd.Haiku-Sounds")
 {
 	BRect rect;
-	rect.Set(200, 150, 500, 450);
+	rect.Set(200, 150, 590, 570);
 
 	HWindow *win = new HWindow(rect, "Sounds");
 	win->Show();

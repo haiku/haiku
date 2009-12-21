@@ -54,10 +54,10 @@ FontView::FontView()
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
  
-	fPlainView = new FontSelectionView("plain", TR("Plain Font:"));
-	fBoldView = new FontSelectionView("bold", TR("Bold Font:"));
-	fFixedView = new FontSelectionView("fixed", TR("Fixed Font:"));
-	fMenuView = new FontSelectionView("menu", TR("Menu Font:"));
+	fPlainView = new FontSelectionView("plain", TR("Plain font:"));
+	fBoldView = new FontSelectionView("bold", TR("Bold font:"));
+	fFixedView = new FontSelectionView("fixed", TR("Fixed font:"));
+	fMenuView = new FontSelectionView("menu", TR("Menu font:"));
 
 	BGridLayout* layout = new BGridLayout(5, 5);
 	layout->SetInsets(10, 10, 10, 10);
