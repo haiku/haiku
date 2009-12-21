@@ -481,7 +481,6 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 	stream->buffer_descriptors_area = B_ERROR;
 	stream->type = type;
 	stream->controller = controller;
-	stream->warn_count = 0;
 	stream->incorrect_position_count = 0;
 	stream->use_dma_position = true;
 
@@ -694,7 +693,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	stream->Write32(HDAC_STREAM_BUFFERS_BASE_LOWER,
 		stream->physical_buffer_descriptors);
 	stream->Write32(HDAC_STREAM_BUFFERS_BASE_UPPER, 0);
-	stream->Write16(HDAC_STREAM_LAST_VALID, fragments);
+	stream->Write16(HDAC_STREAM_LAST_VALID, fragments - 1);
 	/* total cyclic buffer size in _bytes_ */
 	stream->Write32(HDAC_STREAM_BUFFER_SIZE, stream->buffer_size
 		* stream->num_buffers);

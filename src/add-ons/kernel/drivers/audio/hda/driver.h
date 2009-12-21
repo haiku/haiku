@@ -132,7 +132,6 @@ struct hda_stream {
 	bool		running;
 	spinlock	lock;				/* Write lock */
 	uint32		type;
-	int32		warn_count;
 
 	hda_controller* controller;
 
