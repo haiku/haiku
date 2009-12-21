@@ -13,6 +13,7 @@
 
 #include <Button.h>
 #include <ColorControl.h>
+#include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <Menu.h>
@@ -27,12 +28,12 @@
 
 
 
-AppearancePrefView::AppearancePrefView(const char *name,
-		const BMessenger &messenger)
+AppearancePrefView::AppearancePrefView(const char* name,
+		const BMessenger& messenger)
 	: BView(name, B_WILL_DRAW),
 	fTerminalMessenger(messenger)
 {
-  	const char *kColorTable[] = {
+  	const char* kColorTable[] = {
 		PREF_TEXT_FORE_COLOR,
 		PREF_TEXT_BACK_COLOR,
 		PREF_CURSOR_FORE_COLOR,
@@ -59,24 +60,35 @@ AppearancePrefView::AppearancePrefView(const char *name,
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	
-	BMenu *fontMenu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
+	BMenu* fontMenu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
 		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),
 		PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE));
 	
-	BMenu *sizeMenu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
+	BMenu* sizeMenu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
 		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
 	
-	BView *layoutView = BLayoutBuilder::Group<>()
+	fFont = new BMenuField("Font:", fontMenu);
+	fFontSize = new BMenuField("Size:", sizeMenu);
+	fColorField = new BMenuField("Color:",
+		_MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
+		kColorTable[0]));
+
+	BView* layoutView = BLayoutBuilder::Group<>()
 		.SetInsets(5, 5, 5, 5)
 		.AddGroup(B_VERTICAL, 5)
-			.Add(fFont = new BMenuField("font", "Font:", fontMenu))
-			.Add(fFontSize = new BMenuField("size", "Size:", sizeMenu))
-			.Add(fColorField = new BMenuField("color", "Color:",
-				_MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
-					kColorTable[0])))
-			.Add(BSpaceLayoutItem::CreateGlue())
-			.Add(fColorControl = new BColorControl(BPoint(10, 10),
-				B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
+			.Add(BGridLayoutBuilder(5, 5)
+				.Add(fFont->CreateLabelLayoutItem(), 0, 0)
+				.Add(fFont->CreateMenuBarLayoutItem(), 1, 0)
+				.Add(fFontSize->CreateLabelLayoutItem(), 0, 1)
+				.Add(fFontSize->CreateMenuBarLayoutItem(), 1, 1)
+				.Add(fColorField->CreateLabelLayoutItem(), 0, 2)
+				.Add(fColorField->CreateMenuBarLayoutItem(), 1, 2)
+				)
+			.AddGroup(B_VERTICAL, 5)
+				.AddGlue()
+				.Add(fColorControl = new BColorControl(BPoint(10, 10),
+					B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
+			.End()
 		.End();
 	
 	AddChild(layoutView);
@@ -98,7 +110,7 @@ AppearancePrefView::AppearancePrefView(const char *name,
 
 
 void
-AppearancePrefView::GetPreferredSize(float *_width, float *_height)
+AppearancePrefView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width)
 		*_width = Bounds().Width();
@@ -112,10 +124,13 @@ void
 AppearancePrefView::Revert()
 {
 	fColorField->Menu()->ItemAt(0)->SetMarked(true);
-	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
+	fColorControl->SetValue(PrefHandler::Default()->
+		getRGB(PREF_TEXT_FORE_COLOR));
 
-	fFont->Menu()->FindItem(PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
-	fFontSize->Menu()->FindItem(PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
+	fFont->Menu()->FindItem(PrefHandler::Default()->getString(
+		PREF_HALF_FONT_FAMILY))->SetMarked(true);
+	fFontSize->Menu()->FindItem(PrefHandler::Default()->getString(
+		PREF_HALF_FONT_FAMILY))->SetMarked(true);
 }
 
 
@@ -131,22 +146,22 @@ AppearancePrefView::AttachedToWindow()
 
 
 void
-AppearancePrefView::MessageReceived(BMessage *msg)
+AppearancePrefView::MessageReceived(BMessage* msg)
 {
 	bool modified = false;
 
 	switch (msg->what) {
 		case MSG_HALF_FONT_CHANGED:
 		{
-			const char *family = NULL;
-			const char *style = NULL;
+			const char* family = NULL;
+			const char* style = NULL;
 			msg->FindString("font_family", &family);
 			msg->FindString("font_style", &style);
 			
-			PrefHandler *pref = PrefHandler::Default();
-			const char *currentFamily 
+			PrefHandler* pref = PrefHandler::Default();
+			const char* currentFamily 
 				= pref->getString(PREF_HALF_FONT_FAMILY);
-			const char *currentStyle
+			const char* currentStyle
 				= pref->getString(PREF_HALF_FONT_STYLE);
 			if (currentFamily == NULL || strcmp(currentFamily, family)
 				|| currentStyle == NULL || strcmp(currentStyle, style)) {
@@ -198,7 +213,7 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 
 
 static bool
-IsFontUsable(const BFont &font)
+IsFontUsable(const BFont& font)
 {
 	// TODO: If BFont::IsFullAndHalfFixed() was implemented, we could
 	// use that. But I don't think it's easily implementable using
@@ -228,11 +243,11 @@ IsFontUsable(const BFont &font)
 
 
 /* static */
-BMenu *
+BMenu*
 AppearancePrefView::_MakeFontMenu(uint32 command,
-	const char *defaultFamily, const char *defaultStyle)
+	const char* defaultFamily, const char* defaultStyle)
 {
-	BPopUpMenu *menu = new BPopUpMenu("");
+	BPopUpMenu* menu = new BPopUpMenu("");
 	int32 numFamilies = count_font_families();
 	uint32 flags;
 	
@@ -246,13 +261,13 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 				if (get_font_style(family, j, &style) == B_OK) {
 					font.SetFamilyAndStyle(family, style);
 					if (IsFontUsable(font)) {
-						BMessage *message = new BMessage(command);
+						BMessage* message = new BMessage(command);
 						message->AddString("font_family", family);
 						message->AddString("font_style", style);
 						char itemLabel[134];
 						snprintf(itemLabel, sizeof(itemLabel),
 							"%s - %s", family, style);
-						BMenuItem *item = new BMenuItem(itemLabel,
+						BMenuItem* item = new BMenuItem(itemLabel,
 							message);
 						menu->AddItem(item);
 						if (!strcmp(defaultFamily, family)
@@ -272,10 +287,10 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 
 
 /* static */
-BMenu *
+BMenu*
 AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 {
-	BPopUpMenu *menu = new BPopUpMenu("size");
+	BPopUpMenu* menu = new BPopUpMenu("size");
 	int32 sizes[] = {9, 10, 11, 12, 14, 16, 18, 0};
 
 	bool found = false;
@@ -284,7 +299,7 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 		BString string;
 		string << sizes[i];
 
-		BMenuItem *item = new BMenuItem(string.String(), new BMessage(command));
+		BMenuItem* item = new BMenuItem(string.String(), new BMessage(command));
 		menu->AddItem(item);
 
 		if (sizes[i] == defaultSize) {
@@ -297,7 +312,7 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 			if (sizes[i] > defaultSize) {
 				BString string;
 				string << defaultSize;
-				BMenuItem *item = new BMenuItem(string.String(), new BMessage(command));
+				BMenuItem* item = new BMenuItem(string.String(), new BMessage(command));
 				item->SetMarked(true);
 				menu->AddItem(item, i);
 				break;
@@ -310,11 +325,11 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 
 
 /* static */
-BPopUpMenu *
-AppearancePrefView::_MakeMenu(uint32 msg, const char **items,
-	const char *defaultItemName)
+BPopUpMenu*
+AppearancePrefView::_MakeMenu(uint32 msg, const char** items,
+	const char* defaultItemName)
 {
-	BPopUpMenu *menu = new BPopUpMenu("");
+	BPopUpMenu* menu = new BPopUpMenu("");
 
 	int32 i = 0;
 	while (*items) {
