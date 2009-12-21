@@ -131,8 +131,18 @@ public:
 								DefaultNotificationService(const char* name);
 	virtual						~DefaultNotificationService();
 
-			void				Notify(const KMessage& event, uint32 eventMask);
+	inline	bool				Lock()
+									{ return recursive_lock_lock(&fLock)
+										== B_OK; }
+	inline	void				Unlock()
+									{ recursive_lock_unlock(&fLock); }
 
+	inline	void				Notify(const KMessage& event, uint32 eventMask);
+			void				NotifyLocked(const KMessage& event,
+									uint32 eventMask);
+
+	inline	bool				HasListeners() const
+									{ return !fListeners.IsEmpty(); }
 	virtual status_t			AddListener(const KMessage* eventSpecifier,
 									NotificationListener& listener);
 	virtual status_t			UpdateListener(const KMessage* eventSpecifier,
@@ -237,6 +247,15 @@ private:
 			mutex				fLock;
 			ServiceHash			fServiceHash;
 };
+
+
+void
+DefaultNotificationService::Notify(const KMessage& event, uint32 eventMask)
+{
+	RecursiveLocker _(fLock);
+	NotifyLocked(event, eventMask);
+}
+
 
 extern "C" {
 

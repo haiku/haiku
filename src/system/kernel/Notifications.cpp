@@ -173,10 +173,8 @@ DefaultNotificationService::~DefaultNotificationService()
 		common bit with this mask will receive the event.
 */
 void
-DefaultNotificationService::Notify(const KMessage& event, uint32 eventMask)
+DefaultNotificationService::NotifyLocked(const KMessage& event, uint32 eventMask)
 {
-	RecursiveLocker _(fLock);
-
 	// Note: The following iterations support that the listener removes itself
 	// in the hook method. That's a property of the DoublyLinkedList iterator.
 
