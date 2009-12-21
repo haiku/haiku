@@ -1,11 +1,11 @@
-1	swedish	x-vnd.Haiku-CPUFrequencyPref	2623066734
+1	swedish	x-vnd.Haiku-CPUFrequencyPref	2670455659
 Ok	Status view		Ok
 Integration time [ms]: 	CPU Frequency View		Integreringstid	 [ms]: 
 High performance	Status view		Högprestanda
 Defaults	Pref Window		Förval
 CPU frequency status view	CPU Frequency View		Statusvy för processorfrekvens
 Dynamic performance	Status view		Dynamisk prestanda
-Step up by CPU usage:	Color Step View		Öka med processoranvändande:
+Step up by CPU usage	Color Step View		Öka med processoranvändande:
 Stepping policy	CPU Frequency View		Accelerationspolicy
 Stepping policy: 	CPU Frequency View		Accelerationspolicy: 
 Open Speedstep preferences…	Status view		Öppna inställningar för Speestep…
@@ -17,3 +17,4 @@ Revert	Pref Window		Återgå
 Dynamic stepping	CPU Frequency View		Dynamisk acceleration
 CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Processfrekvens\n\twkriven av Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 CPU Frequency	Main window		Processorfrekvens
+Quit	Status view		Quit

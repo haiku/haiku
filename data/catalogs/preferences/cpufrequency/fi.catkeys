@@ -1,11 +1,11 @@
-1	finnish	x-vnd.Haiku-CPUFrequencyPref	2623066734
+1	finnish	x-vnd.Haiku-CPUFrequencyPref	2670455659
 Ok	Status view		Ok
 Integration time [ms]: 	CPU Frequency View		Integraatio Aika [ms]: 
 High performance	Status view		Korkea Suorituskyky
 Defaults	Pref Window		Oletusasetukset
 CPU frequency status view	CPU Frequency View		CPU Taajuuden Tilanäkymä
 Dynamic performance	Status view		Dynaaminen Suorituskyky
-Step up by CPU usage:	Color Step View		Muuta ylöspäin tämän CPU:n käyttömäärän kohdalla:
+Step up by CPU usage	Color Step View		Muuta ylöspäin tämän CPU:n käyttömäärän kohdalla:
 Stepping policy	CPU Frequency View		Muutostapa
 Stepping policy: 	CPU Frequency View		Muutostapa: 
 Open Speedstep preferences…	Status view		Avaa Speedstep Valinnat...
@@ -17,3 +17,4 @@ Revert	Pref Window		Palauta
 Dynamic stepping	CPU Frequency View		Dynaaminen Muutos
 CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Prosessorin Kellotaajuus\n\ttekijä Clemens Zeidler\n\tTekijänoikeudet 2009, Haiku, Inc.\n
 CPU Frequency	Main window		CPU Taajuus
+Quit	Status view		Quit

@@ -1,11 +1,12 @@
-1	Ukrainian	 x-vnd.Haiku-CPUFrequencyPref	2623066734
+1	Ukrainian	 x-vnd.Haiku-CPUFrequencyPref	2670455659
 Ok	Status view		Ok
 Integration time [ms]: 	CPU Frequency View		Час інтеграції [ms]: 
 High performance	Status view		Висока продуктивність
 Defaults	Pref Window		По замовчуванню
+Quit	Status view		Quit
 CPU frequency status view	CPU Frequency View		 Частота ЦПУ
 Dynamic performance	Status view		Динамічна продуктивність
-Step up by CPU usage:	Color Step View		Крок вгору  використання процесора:
+Step up by CPU usage	Color Step View		Крок вгору  використання процесора:
 Stepping policy	CPU Frequency View		Покрокова зміна
 Stepping policy: 	CPU Frequency View		Покрокова зміна: 
 Open Speedstep preferences…	Status view		Відкриття покрокової настройки

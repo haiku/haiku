@@ -1,20 +1,20 @@
-1	Bulgarian	x-vnd.Haiku-CPUFrequencyPref	2623066734
+1	Bulgarian	x-vnd.Haiku-CPUFrequencyPref	2670455659
 Ok	Status view		Ок
-Integration time [ms]: 	CPU Frequency View		Време на интеграция [мс]: 
-High performance	Status view		Висока производителност
-Defaults	Pref Window		По подразбиране
 CPU frequency status view	CPU Frequency View		Статус на CPU честотата
-Dynamic performance	Status view		Динамична производителност
-Step up by CPU usage:	Color Step View		Стъпка на производителност на CPU:
-Stepping policy	CPU Frequency View		Постъпково изменение на частотата на CPU
-Stepping policy: 	CPU Frequency View		Постъпково изменение на частотата на CPU: 
-Open Speedstep preferences…	Status view		Отвори постъпковите настройки
 Set state	Status view		Изберете състояние
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Старта на CPU Frequency не се състоя.\n\nГрешка: 
-Install Replicant into Deskbar	CPU Frequency View		Инсталирай репликант в Deskbar
-Low energy	Status view		Икономия на енергия
-Revert	Pref Window		Върни
+Defaults	Pref Window		По подразбиране
+Quit	Status view		Quit
+High performance	Status view		Висока производителност
+Stepping policy	CPU Frequency View		Постъпково изменение на частотата на CPU
+Dynamic performance	Status view		Динамична производителност
+Step up by CPU usage	Color Step View		Стъпка на производителност на CPU:
 Dynamic stepping	CPU Frequency View		Динамично изменение
+Stepping policy: 	CPU Frequency View		Постъпково изменение на частотата на CPU: 
+Integration time [ms]: 	CPU Frequency View		Време на интеграция [мс]: 
+Install Replicant into Deskbar	CPU Frequency View		Инсталирай репликант в Deskbar
+Open Speedstep preferences…	Status view		Отвори постъпковите настройки
+Revert	Pref Window		Върни
+Low energy	Status view		Икономия на енергия
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Старта на CPU Frequency не се състоя.\n\nГрешка: 
 CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU Frequency\n\tе разработен от Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 CPU Frequency	Main window		CPU Frequency
- 
