@@ -114,6 +114,18 @@ Model::IORequest::~IORequest()
 }
 
 
+// #pragma mark - IOScheduler
+
+
+Model::IOScheduler::IOScheduler(system_profiler_io_scheduler_added* event,
+	int32 index)
+	:
+	fAddedEvent(event),
+	fIndex(index)
+{
+}
+
+
 // #pragma mark - WaitObject
 
 
@@ -601,6 +613,7 @@ Model::Model(const char* dataSourceName, void* eventData, size_t eventDataSize,
 	fTeams(20, true),
 	fThreads(20, true),
 	fWaitObjectGroups(20, true),
+	fIOSchedulers(10, true),
 	fSchedulingStates(100)
 {
 }
@@ -896,6 +909,46 @@ Model::ThreadWaitObjectGroupFor(thread_id threadID, uint32 type, addr_t object) 
 		return NULL;
 
 	return thread->ThreadWaitObjectGroupFor(type, object);
+}
+
+
+int32
+Model::CountIOSchedulers() const
+{
+	return fIOSchedulers.CountItems();
+}
+
+
+Model::IOScheduler*
+Model::IOSchedulerAt(int32 index) const
+{
+	return fIOSchedulers.ItemAt(index);
+}
+
+
+Model::IOScheduler*
+Model::IOSchedulerByID(int32 id) const
+{
+	for (int32 i = 0; IOScheduler* scheduler = fIOSchedulers.ItemAt(i); i++) {
+		if (scheduler->ID() == id)
+			return scheduler;
+	}
+
+	return NULL;
+}
+
+
+Model::IOScheduler*
+Model::AddIOScheduler(system_profiler_io_scheduler_added* event)
+{
+	IOScheduler* scheduler = new(std::nothrow) IOScheduler(event,
+		fIOSchedulers.CountItems());
+	if (scheduler == NULL || !fIOSchedulers.AddItem(scheduler)) {
+		delete scheduler;
+		return NULL;
+	}
+
+	return scheduler;
 }
 
 

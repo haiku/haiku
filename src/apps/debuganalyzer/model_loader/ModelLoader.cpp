@@ -708,8 +708,12 @@ ModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 			break;
 
 		case B_SYSTEM_PROFILER_IO_SCHEDULER_ADDED:
+			_HandleIOSchedulerAdded(
+				(system_profiler_io_scheduler_added*)buffer);
+			break;
+
 		case B_SYSTEM_PROFILER_IO_SCHEDULER_REMOVED:
-			// TODO: Handle!
+			// not so interesting
 			break;
 
 		case B_SYSTEM_PROFILER_IO_REQUEST_SCHEDULED:
@@ -871,6 +875,9 @@ ModelLoader::_SetThreadIORequests(Model::Thread* thread,
 
 	ioCount++;
 	ioTime += previousEnd - ioStart;
+
+	// sort requests by start time
+	std::sort(requests, requests + requestCount, Model::IORequest::TimeLess);
 
 	// set the computed values
 	thread->SetIORequests(requests, requestCount);
@@ -1109,6 +1116,21 @@ ModelLoader::_HandleWaitObjectInfo(system_profiler_wait_object_info* event)
 
 
 void
+ModelLoader::_HandleIOSchedulerAdded(system_profiler_io_scheduler_added* event)
+{
+	Model::IOScheduler* scheduler = fModel->IOSchedulerByID(event->scheduler);
+	if (scheduler != NULL) {
+		printf("Duplicate added event for I/O scheduler %ld\n",
+			event->scheduler);
+		return;
+	}
+
+	if (fModel->AddIOScheduler(event) == NULL)
+		throw std::bad_alloc();
+}
+
+
+void
 ModelLoader::_HandleIORequestScheduled(io_request_scheduled* event)
 {
 	IORequest* request = fIORequests->Lookup(event->request);
@@ -1120,6 +1142,11 @@ ModelLoader::_HandleIORequestScheduled(io_request_scheduled* event)
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
 		printf("I/O request for unknown thread %ld\n", event->thread);
+		return;
+	}
+
+	if (fModel->IOSchedulerByID(event->scheduler) == NULL) {
+		printf("I/O requests for unknown scheduler %ld\n", event->scheduler);
 		return;
 	}
 
@@ -1151,8 +1178,11 @@ void
 ModelLoader::_HandleIOOperationStarted(io_operation_started* event)
 {
 	IORequest* request = fIORequests->Lookup(event->request);
-	if (request == NULL)
+	if (request == NULL) {
+		printf("ModelLoader::_HandleIOOperationStarted(): I/O request for operation %p not found\n",
+			event->operation);
 		return;
+	}
 
 	IOOperation* operation = new(std::nothrow) IOOperation(event);
 	if (operation == NULL)
@@ -1166,12 +1196,18 @@ void
 ModelLoader::_HandleIOOperationFinished(io_operation_finished* event)
 {
 	IORequest* request = fIORequests->Lookup(event->request);
-	if (request == NULL)
+	if (request == NULL) {
+		printf("ModelLoader::_HandleIOOperationFinished(): I/O request for "
+			"operation %p not found\n", event->operation);
 		return;
+	}
 
 	IOOperation* operation = request->FindOperation(event->operation);
-	if (operation == NULL)
+	if (operation == NULL) {
+		printf("ModelLoader::_HandleIOOperationFinished(): operation %p not "
+			"found\n", event->operation);
 		return;
+	}
 
 	operation->finishedEvent = event;
 }

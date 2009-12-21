@@ -39,6 +39,7 @@ public:
 			class CPU;
 			struct IOOperation;
 			struct IORequest;
+			class IOScheduler;
 			class WaitObjectGroup;
 			class WaitObject;
 			class ThreadWaitObject;
@@ -116,6 +117,12 @@ public:
 									thread_id threadID, uint32 type,
 									addr_t object) const;
 
+			int32				CountIOSchedulers() const;
+			IOScheduler*		IOSchedulerAt(int32 index) const;
+			IOScheduler*		IOSchedulerByID(int32 id) const;
+			IOScheduler*		AddIOScheduler(
+									system_profiler_io_scheduler_added* event);
+
 			bool				AddSchedulingStateSnapshot(
 									const SchedulingState& state,
 									off_t eventOffset);
@@ -129,6 +136,7 @@ private:
 			typedef BObjectList<Team> TeamList;
 			typedef BObjectList<Thread> ThreadList;
 			typedef BObjectList<WaitObjectGroup> WaitObjectGroupList;
+			typedef BObjectList<IOScheduler> IOSchedulerList;
 			typedef BObjectList<CompactSchedulingState> SchedulingStateList;
 
 private:
@@ -150,6 +158,7 @@ private:
 			TeamList			fTeams;		// sorted by ID
 			ThreadList			fThreads;	// sorted by ID
 			WaitObjectGroupList	fWaitObjectGroups;
+			IOSchedulerList		fIOSchedulers;
 			SchedulingStateList	fSchedulingStates;
 };
 
@@ -181,6 +190,9 @@ private:
 struct Model::IOOperation {
 	system_profiler_io_operation_started*	startedEvent;
 	system_profiler_io_operation_finished*	finishedEvent;
+
+	static inline int			CompareByTime(const IOOperation* a,
+									const IOOperation* b);
 };
 
 
@@ -198,6 +210,8 @@ struct Model::IORequest {
 									size_t operationCount);
 			void				Delete();
 
+	static inline bool			TimeLess(const IORequest* a,
+									const IORequest* b);
 	static inline bool			SchedulerTimeLess(const IORequest* a,
 									const IORequest* b);
 
@@ -209,6 +223,22 @@ private:
 										finishedEvent,
 									size_t operationCount);
 								~IORequest();
+};
+
+
+class Model::IOScheduler {
+public:
+								IOScheduler(
+									system_profiler_io_scheduler_added* event,
+									int32 index);
+
+	inline	int32				ID() const;
+	inline	const char*			Name() const;
+	inline	int32				Index() const;
+
+private:
+			system_profiler_io_scheduler_added* fAddedEvent;
+			int32				fIndex;
 };
 
 
@@ -669,7 +699,29 @@ Model::CPU::IdleTime() const
 }
 
 
-// #pragma mark - WaitObject
+// #pragma mark - IOOperation
+
+
+/*static*/ int
+Model::IOOperation::CompareByTime(const IOOperation* a, const IOOperation* b)
+{
+	nanotime_t timeA = a->startedEvent->time;
+	nanotime_t timeB = b->startedEvent->time;
+
+	if (timeA < timeB)
+		return -1;
+	return timeA == timeB ? 0 : 1;
+}
+
+
+// #pragma mark - IORequest
+
+
+/*static*/ bool
+Model::IORequest::TimeLess(const IORequest* a, const IORequest* b)
+{
+	return a->scheduledEvent->time < b->scheduledEvent->time;
+}
 
 
 /*static*/ bool
@@ -680,6 +732,30 @@ Model::IORequest::SchedulerTimeLess(const IORequest* a, const IORequest* b)
 		return cmp < 0;
 
 	return a->scheduledEvent->time < b->scheduledEvent->time;
+}
+
+
+// #pragma mark - IOScheduler
+
+
+int32
+Model::IOScheduler::ID() const
+{
+	return fAddedEvent->scheduler;
+}
+
+
+const char*
+Model::IOScheduler::Name() const
+{
+	return fAddedEvent->name;
+}
+
+
+int32
+Model::IOScheduler::Index() const
+{
+	return fIndex;
 }
 
 

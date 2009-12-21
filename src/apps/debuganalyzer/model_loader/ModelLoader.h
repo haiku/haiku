@@ -93,6 +93,8 @@ private:
 									thread_removed_from_run_queue* event);
 			void				_HandleWaitObjectInfo(
 									system_profiler_wait_object_info* event);
+			void				_HandleIOSchedulerAdded(
+									system_profiler_io_scheduler_added* event);
 			void				_HandleIORequestScheduled(
 									io_request_scheduled* event);
 			void				_HandleIORequestFinished(
