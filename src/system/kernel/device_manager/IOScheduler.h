@@ -182,6 +182,7 @@ private:
 			int32				fNextID;
 			IOSchedulerList		fSchedulers;
 			DefaultNotificationService fNotificationService;
+			char				fEventBuffer[256];
 
 	static	IOSchedulerRoster	sDefaultInstance;
 };

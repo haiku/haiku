@@ -910,9 +910,13 @@ void
 IOSchedulerRoster::Notify(uint32 eventCode, const IOScheduler* scheduler,
 	IORequest* request, IOOperation* operation)
 {
-	char eventBuffer[128];
+	AutoLocker<DefaultNotificationService> locker(fNotificationService);
+
+	if (!fNotificationService.HasListeners())
+		return;
+
 	KMessage event;
-	event.SetTo(eventBuffer, sizeof(eventBuffer), IO_SCHEDULER_MONITOR);
+	event.SetTo(fEventBuffer, sizeof(fEventBuffer), IO_SCHEDULER_MONITOR);
 	event.AddInt32("event", eventCode);
 	event.AddPointer("scheduler", scheduler);
 	if (request != NULL) {
@@ -921,7 +925,7 @@ IOSchedulerRoster::Notify(uint32 eventCode, const IOScheduler* scheduler,
 			event.AddPointer("operation", operation);
 	}
 
-	fNotificationService.Notify(event, eventCode);
+	fNotificationService.NotifyLocked(event, eventCode);
 }
 
 
