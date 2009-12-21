@@ -44,6 +44,13 @@ enum {
 };
 
 
+enum {
+	IO_SCHEDULING_STATE_IDLE,
+	IO_SCHEDULING_STATE_PENDING_REQUEST,
+	IO_SCHEDULING_STATE_PENDING_OPERATION
+};
+
+
 struct MainWindow::SchedulingPage::SchedulingEvent {
 	nanotime_t						time;
 	Model::ThreadWaitObjectGroup*	waitObject;
@@ -60,30 +67,50 @@ struct MainWindow::SchedulingPage::SchedulingEvent {
 };
 
 
+struct MainWindow::SchedulingPage::IOSchedulingEvent {
+	nanotime_t	time;
+	uint32		state;
+
+	IOSchedulingEvent(nanotime_t time, uint32 state)
+		:
+		time(time),
+		state(state)
+	{
+	}
+};
+
+
 class MainWindow::SchedulingPage::SchedulingData {
 public:
 	SchedulingData()
 		:
 		fModel(NULL),
 		fDataArrays(NULL),
+		fIODataArrays(NULL),
 		fRecordingEnabled(false)
 	{
 	}
 
 	status_t InitCheck() const
 	{
-		return fDataArrays != NULL ? B_OK : B_NO_MEMORY;
+		return fDataArrays != NULL && fIODataArrays != NULL
+			? B_OK : B_NO_MEMORY;
 	}
 
 	void SetModel(Model* model)
 	{
 		delete[] fDataArrays;
+		delete[] fIODataArrays;
 
 		fModel = model;
 		fDataArrays = NULL;
+		fIODataArrays = NULL;
 
-		if (fModel != NULL)
-			fDataArrays = new(std::nothrow) DataArray[fModel->CountThreads()];
+		if (fModel != NULL) {
+			int32 threadCount = fModel->CountThreads();
+			fDataArrays = new(std::nothrow) DataArray[threadCount];
+			fIODataArrays = new(std::nothrow) IODataArray[threadCount];
+		}
 	}
 
 	void SetRecordingEnabled(bool enabled)
@@ -93,17 +120,27 @@ public:
 
 	void Clear()
 	{
-		if (fDataArrays == NULL)
-			return;
-
 		int32 count = fModel->CountThreads();
-		for (int32 i = 0; i < count; i++)
-			fDataArrays[i].Clear();
+
+		if (fDataArrays != NULL) {
+			for (int32 i = 0; i < count; i++)
+				fDataArrays[i].Clear();
+		}
+
+		if (fIODataArrays != NULL) {
+			for (int32 i = 0; i < count; i++)
+				fIODataArrays[i].Clear();
+		}
 	}
 
 	const Array<SchedulingEvent>& EventsForThread(int32 index)
 	{
 		return fDataArrays[index];
+	}
+
+	const Array<IOSchedulingEvent>& IOEventsForThread(int32 index)
+	{
+		return fIODataArrays[index];
 	}
 
 	void AddState(Model::Thread* thread, nanotime_t time, ThreadState state,
@@ -126,6 +163,12 @@ public:
 
 		SchedulingEvent event(time, state, waitObject);
 		array.Add(event);
+	}
+
+	void AddIOState(Model::Thread* thread, nanotime_t time, uint32 state)
+	{
+		IODataArray& array = fIODataArrays[thread->Index()];
+		array.Add(IOSchedulingEvent(time, state));
 	}
 
 	void AddRun(Model::Thread* thread, nanotime_t time)
@@ -156,11 +199,13 @@ public:
 
 private:
 	typedef Array<SchedulingEvent> DataArray;
+	typedef Array<IOSchedulingEvent> IODataArray;
 
 private:
-	Model*		fModel;
-	DataArray*	fDataArrays;
-	bool		fRecordingEnabled;
+	Model*			fModel;
+	DataArray*		fDataArrays;
+	IODataArray*	fIODataArrays;
+	bool			fRecordingEnabled;
 };
 
 
@@ -587,6 +632,8 @@ private:
 		COLOR_RUNNING = 0,
 		COLOR_PREEMPTED,
 		COLOR_READY,
+		COLOR_IO_REQUEST,
+		COLOR_IO_OPERATION,
 		ACTIVITY_COLOR_COUNT
 	};
 
@@ -604,13 +651,19 @@ public:
 		fActivityColors[COLOR_RUNNING].set_to(0, 255, 0);
 		fActivityColors[COLOR_PREEMPTED].set_to(255, 127, 0);
 		fActivityColors[COLOR_READY].set_to(255, 0, 0);
+		fActivityColors[COLOR_IO_REQUEST].set_to(127, 127, 255);
+		fActivityColors[COLOR_IO_OPERATION].set_to(0, 0, 200);
+
 		fActivitySelectedColors[COLOR_RUNNING] = tint_color(
 			fActivityColors[COLOR_RUNNING], B_DARKEN_2_TINT);
 		fActivitySelectedColors[COLOR_PREEMPTED] = tint_color(
 			fActivityColors[COLOR_PREEMPTED], B_DARKEN_2_TINT);
 		fActivitySelectedColors[COLOR_READY] = tint_color(
 			fActivityColors[COLOR_READY], B_DARKEN_2_TINT);
-
+		fActivitySelectedColors[COLOR_IO_REQUEST] = tint_color(
+			fActivityColors[COLOR_IO_REQUEST], B_DARKEN_2_TINT);
+		fActivitySelectedColors[COLOR_IO_OPERATION] = tint_color(
+			fActivityColors[COLOR_IO_OPERATION], B_DARKEN_2_TINT);
 	}
 
 	~SchedulingView()
@@ -845,6 +898,11 @@ public:
 			if (thread == NULL)
 				continue;
 
+			BRect schedulingLineRect = lineRect;
+			schedulingLineRect.bottom -= lineRect.IntegerHeight() / 2;
+			BRect ioLineRect = lineRect;
+			ioLineRect.top = schedulingLineRect.bottom + 1;
+
 			const Array<SchedulingEvent>& events
 				= fSchedulingData.EventsForThread(thread->Index());
 
@@ -873,7 +931,35 @@ public:
 						continue;
 				}
 
-				BRect rect = lineRect;
+				BRect rect = schedulingLineRect;
+				rect.left = startTime / fNSecsPerPixel;
+				rect.right = endTime / fNSecsPerPixel - 1;
+				FillRect(rect);
+			}
+
+			const Array<IOSchedulingEvent>& ioEvents
+				= fSchedulingData.IOEventsForThread(thread->Index());
+			eventCount = ioEvents.Size();
+
+			for (int32 k = 0; k < eventCount; k++) {
+				const IOSchedulingEvent& event = ioEvents[k];
+				nanotime_t startTime = std::max(event.time, fStartTime);
+				nanotime_t endTime = k + 1 < eventCount
+					? std::min(ioEvents[k + 1].time, fEndTime) : fEndTime;
+
+				switch (event.state) {
+					case IO_SCHEDULING_STATE_PENDING_REQUEST:
+						SetHighColor(activityColors[COLOR_IO_REQUEST]);
+						break;
+					case IO_SCHEDULING_STATE_PENDING_OPERATION:
+						SetHighColor(activityColors[COLOR_IO_OPERATION]);
+						break;
+					case IO_SCHEDULING_STATE_IDLE:
+					default:
+						continue;
+				}
+
+				BRect rect = ioLineRect;
 				rect.left = startTime / fNSecsPerPixel;
 				rect.right = endTime / fNSecsPerPixel - 1;
 				FillRect(rect);
@@ -995,6 +1081,109 @@ printf("failed to read event!\n");
 			if (fState.LastEventTime() >= endTime)
 				break;
 		}
+
+		// process each thread's I/O events
+		nanotime_t lastEventTime = fModel->BaseTime() - fModel->LastEventTime();
+		int32 threadCount = fModel->CountThreads();
+		for (int32 i = 0; i < threadCount; i++) {
+			Model::Thread* thread = fModel->ThreadAt(i);
+			Model::IORequest** requests = thread->IORequests();
+			size_t requestCount = thread->CountIORequests();
+			if (requestCount == 0)
+				continue;
+
+			// first request
+			nanotime_t clusterStart = requests[0]->scheduledEvent->time;
+			nanotime_t clusterEnd = requests[0]->finishedEvent != NULL
+				? requests[0]->finishedEvent->time : lastEventTime;
+			BObjectList<Model::IOOperation> operations;
+
+			// add first request operations
+			for (size_t l = 0; l < requests[0]->operationCount; l++)
+				operations.AddItem(&requests[0]->operations[l]);
+
+			for (size_t k = 1; k < requestCount; k++) {
+				nanotime_t requestStart = requests[k]->scheduledEvent->time;
+				nanotime_t requestEnd = requests[k]->finishedEvent != NULL
+					? requests[k]->finishedEvent->time : lastEventTime;
+
+				if (requestStart >= endTime)
+					break;
+
+				if (requestStart > clusterEnd) {
+					if (clusterEnd > startTime) {
+						_AddThreadIOData(thread, clusterStart, clusterEnd,
+							operations);
+					}
+					operations.MakeEmpty();
+					clusterStart = requestStart;
+					clusterEnd = requestEnd;
+				} else
+					clusterEnd = std::max(clusterEnd, requestEnd);
+
+				// add request operations
+				for (size_t l = 0; l < requests[k]->operationCount; l++)
+					operations.AddItem(&requests[k]->operations[l]);
+			}
+
+			if (clusterEnd > startTime)
+				_AddThreadIOData(thread, clusterStart, clusterEnd, operations);
+		}
+	}
+
+	void _AddThreadIOData(Model::Thread* thread, nanotime_t startTime,
+		nanotime_t endTime, BObjectList<Model::IOOperation>& operations)
+	{
+//printf("  IORequest cluster: %lld - %lld\n", startTime, endTime);
+		// start in pending request state
+		fSchedulingData.AddIOState(thread, startTime - fModel->BaseTime(),
+			IO_SCHEDULING_STATE_PENDING_REQUEST);
+
+		int32 operationCount = operations.CountItems();
+		if (operationCount == 0)
+			return;
+
+		// sort the operations
+		if (operationCount > 1)
+			operations.SortItems(Model::IOOperation::CompareByTime);
+
+		nanotime_t lastEventTime = fModel->BaseTime() + fModel->LastEventTime();
+
+		// process the operations
+		Model::IOOperation* operation = operations.ItemAt(0);
+		nanotime_t clusterStart = operation->startedEvent->time;
+		nanotime_t clusterEnd = operation->finishedEvent != NULL
+			? operation->finishedEvent->time : lastEventTime;
+
+		for (int32 i = 1; i < operationCount; i++) {
+			operation = operations.ItemAt(i);
+			nanotime_t operationStart = operation->startedEvent->time;
+			nanotime_t operationEnd = operation->finishedEvent != NULL
+				? operation->finishedEvent->time : lastEventTime;
+
+			if (operationStart > clusterEnd) {
+				fSchedulingData.AddIOState(thread,
+					clusterStart - fModel->BaseTime(),
+					IO_SCHEDULING_STATE_PENDING_OPERATION);
+				fSchedulingData.AddIOState(thread,
+					clusterEnd - fModel->BaseTime(),
+					IO_SCHEDULING_STATE_PENDING_REQUEST);
+
+				clusterStart = operationStart;
+				clusterEnd = operationEnd;
+			} else
+				clusterEnd = std::max(clusterEnd, operationEnd);
+		}
+
+		// add the last cluster
+		fSchedulingData.AddIOState(thread, clusterStart - fModel->BaseTime(),
+			IO_SCHEDULING_STATE_PENDING_OPERATION);
+		fSchedulingData.AddIOState(thread, clusterEnd - fModel->BaseTime(),
+			IO_SCHEDULING_STATE_PENDING_REQUEST);
+
+		// after the end of the request cluster, state is idle again
+		fSchedulingData.AddIOState(thread, endTime - fModel->BaseTime(),
+			IO_SCHEDULING_STATE_IDLE);
 	}
 
 	void _GetEventTimeRange(nanotime_t& _startTime, nanotime_t& _endTime)

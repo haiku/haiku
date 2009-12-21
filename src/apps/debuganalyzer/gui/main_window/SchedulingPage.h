@@ -25,8 +25,8 @@ public:
 			void				SetModel(Model* model);
 
 private:
-			struct SelectionModel;
 			struct SchedulingEvent;
+			struct IOSchedulingEvent;
 			class SchedulingData;
 			struct TimeRange;
 			class TimelineHeaderRenderer;
