@@ -37,6 +37,8 @@ public:
 			struct creation_time_id;
 			struct type_and_object;
 			class CPU;
+			struct IOOperation;
+			struct IORequest;
 			class WaitObjectGroup;
 			class WaitObject;
 			class ThreadWaitObject;
@@ -173,6 +175,40 @@ public:
 
 private:
 			nanotime_t			fIdleTime;
+};
+
+
+struct Model::IOOperation {
+	system_profiler_io_operation_started*	startedEvent;
+	system_profiler_io_operation_finished*	finishedEvent;
+};
+
+
+struct Model::IORequest {
+	system_profiler_io_request_scheduled*	scheduledEvent;
+	system_profiler_io_request_finished*	finishedEvent;
+	size_t									operationCount;
+	IOOperation								operations[0];
+
+	static	IORequest*			Create(
+									system_profiler_io_request_scheduled*
+										scheduledEvent,
+									system_profiler_io_request_finished*
+									finishedEvent,
+									size_t operationCount);
+			void				Delete();
+
+	static inline bool			SchedulerTimeLess(const IORequest* a,
+									const IORequest* b);
+
+private:
+								IORequest(
+									system_profiler_io_request_scheduled*
+										scheduledEvent,
+									system_profiler_io_request_finished*
+										finishedEvent,
+									size_t operationCount);
+								~IORequest();
 };
 
 
@@ -354,6 +390,11 @@ public:
 			void				SetEvents(system_profiler_event_header** events,
 									size_t eventCount);
 
+	inline	IORequest**			IORequests() const;
+	inline	size_t				CountIORequests() const;
+			void				SetIORequests(IORequest** requests,
+									size_t requestCount);
+
 	inline	nanotime_t			CreationTime() const;
 	inline	nanotime_t			DeletionTime() const;
 
@@ -367,6 +408,9 @@ public:
 	inline	int64				Waits() const;
 	inline	nanotime_t			TotalWaitTime() const;
 	inline	nanotime_t			UnspecifiedWaitTime() const;
+
+	inline	int64				IOCount() const;
+	inline	nanotime_t			IOTime() const;
 
 			ThreadWaitObjectGroup* ThreadWaitObjectGroupFor(uint32 type,
 									addr_t object) const;
@@ -386,6 +430,8 @@ public:
 									ThreadWaitObjectGroup**
 										_threadWaitObjectGroup);
 
+			void				SetIOs(int64 count, nanotime_t time);
+
 	static inline int			CompareByID(const Thread* a, const Thread* b);
 	static inline int			CompareWithID(const thread_id* id,
 									const Thread* thread);
@@ -403,6 +449,9 @@ private:
 private:
 			system_profiler_event_header** fEvents;
 			size_t				fEventCount;
+
+			IORequest**			fIORequests;
+			size_t				fIORequestCount;
 
 			Team*				fTeam;
 			const system_profiler_thread_added* fCreationEvent;
@@ -427,6 +476,9 @@ private:
 			int64				fWaits;
 			nanotime_t			fTotalWaitTime;
 			nanotime_t			fUnspecifiedWaitTime;
+
+			int64				fIOCount;
+			nanotime_t			fIOTime;
 
 			int64				fPreemptions;
 
@@ -614,6 +666,20 @@ nanotime_t
 Model::CPU::IdleTime() const
 {
 	return fIdleTime;
+}
+
+
+// #pragma mark - WaitObject
+
+
+/*static*/ bool
+Model::IORequest::SchedulerTimeLess(const IORequest* a, const IORequest* b)
+{
+	int32 cmp = a->scheduledEvent->scheduler - b->scheduledEvent->scheduler;
+	if (cmp != 0)
+		return cmp < 0;
+
+	return a->scheduledEvent->time < b->scheduledEvent->time;
 }
 
 
@@ -991,6 +1057,20 @@ Model::Thread::CountEvents() const
 }
 
 
+Model::IORequest**
+Model::Thread::IORequests() const
+{
+	return fIORequests;
+}
+
+
+size_t
+Model::Thread::CountIORequests() const
+{
+	return fIORequestCount;
+}
+
+
 int64
 Model::Thread::Runs() const
 {
@@ -1058,6 +1138,20 @@ nanotime_t
 Model::Thread::UnspecifiedWaitTime() const
 {
 	return fUnspecifiedWaitTime;
+}
+
+
+int64
+Model::Thread::IOCount() const
+{
+	return fIOCount;
+}
+
+
+nanotime_t
+Model::Thread::IOTime() const
+{
+	return fIOTime;
 }
 
 

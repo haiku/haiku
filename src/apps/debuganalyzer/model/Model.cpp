@@ -75,6 +75,45 @@ Model::CPU::SetIdleTime(nanotime_t time)
 }
 
 
+// #pragma mark - IORequest
+
+
+/*static*/ Model::IORequest*
+Model::IORequest::Create(system_profiler_io_request_scheduled* scheduledEvent,
+	system_profiler_io_request_finished* finishedEvent, size_t operationCount)
+{
+	void* memory = malloc(
+		sizeof(IORequest) + operationCount * sizeof(IOOperation));
+	if (memory == NULL)
+		return NULL;
+
+	return new(memory) IORequest(scheduledEvent, finishedEvent, operationCount);
+}
+
+
+void
+Model::IORequest::Delete()
+{
+	free(this);
+}
+
+
+Model::IORequest::IORequest(
+	system_profiler_io_request_scheduled* scheduledEvent,
+	system_profiler_io_request_finished* finishedEvent, size_t operationCount)
+	:
+	scheduledEvent(scheduledEvent),
+	finishedEvent(finishedEvent),
+	operationCount(operationCount)
+{
+}
+
+
+Model::IORequest::~IORequest()
+{
+}
+
+
 // #pragma mark - WaitObject
 
 
@@ -241,6 +280,8 @@ Model::Thread::Thread(Team* team, const system_profiler_thread_added* event,
 	:
 	fEvents(NULL),
 	fEventCount(0),
+	fIORequests(NULL),
+	fIORequestCount(0),
 	fTeam(team),
 	fCreationEvent(event),
 	fCreationTime(time),
@@ -260,6 +301,8 @@ Model::Thread::Thread(Team* team, const system_profiler_thread_added* event,
 	fWaits(0),
 	fTotalWaitTime(0),
 	fUnspecifiedWaitTime(0),
+	fIOCount(0),
+	fIOTime(0),
 	fPreemptions(0),
 	fIndex(-1),
 	fWaitObjectGroups(20, true)
@@ -269,6 +312,13 @@ Model::Thread::Thread(Team* team, const system_profiler_thread_added* event,
 
 Model::Thread::~Thread()
 {
+	if (fIORequests != NULL) {
+		for (size_t i = 0; i < fIORequestCount; i++)
+			fIORequests[i]->Delete();
+
+		delete[] fIORequests;
+	}
+
 	delete[] fEvents;
 }
 
@@ -279,6 +329,14 @@ Model::Thread::SetEvents(system_profiler_event_header** events,
 {
 	fEvents = events;
 	fEventCount = eventCount;
+}
+
+
+void
+Model::Thread::SetIORequests(IORequest** requests, size_t requestCount)
+{
+	fIORequests = requests;
+	fIORequestCount = requestCount;
 }
 
 
@@ -392,6 +450,14 @@ Model::Thread::AddThreadWaitObject(WaitObject* waitObject,
 		*_threadWaitObjectGroup = threadWaitObjectGroup;
 
 	return threadWaitObject;
+}
+
+
+void
+Model::Thread::SetIOs(int64 count, nanotime_t time)
+{
+	fIOCount = count;
+	fIOTime = time;
 }
 
 

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <algorithm>
 #include <new>
 
 #include <AutoDeleter.h>
@@ -60,6 +61,108 @@ struct ModelLoader::CPUInfo {
 };
 
 
+// #pragma mark - IOOperation
+
+
+struct ModelLoader::IOOperation : DoublyLinkedListLinkImpl<IOOperation> {
+	io_operation_started*	startedEvent;
+	io_operation_finished*	finishedEvent;
+
+	IOOperation(io_operation_started* startedEvent)
+		:
+		startedEvent(startedEvent),
+		finishedEvent(NULL)
+	{
+	}
+};
+
+
+// #pragma mark - IORequest
+
+
+struct ModelLoader::IORequest : DoublyLinkedListLinkImpl<IORequest> {
+	io_request_scheduled*	scheduledEvent;
+	io_request_finished*	finishedEvent;
+	IOOperationList			operations;
+	size_t					operationCount;
+	IORequest*				hashNext;
+
+	IORequest(io_request_scheduled* scheduledEvent)
+		:
+		scheduledEvent(scheduledEvent),
+		finishedEvent(NULL),
+		operationCount(0)
+	{
+	}
+
+	~IORequest()
+	{
+		while (IOOperation* operation = operations.RemoveHead())
+			delete operation;
+	}
+
+	void AddOperation(IOOperation* operation)
+	{
+		operations.Add(operation);
+		operationCount++;
+	}
+
+	IOOperation* FindOperation(void* address) const
+	{
+		for (IOOperationList::ConstReverseIterator it
+				= operations.GetReverseIterator();
+			IOOperation* operation = it.Next();) {
+			if (operation->startedEvent->operation == address)
+				return operation;
+		}
+
+		return NULL;
+	}
+
+	Model::IORequest* CreateModelRequest() const
+	{
+		size_t operationCount = operations.Count();
+
+		Model::IORequest* modelRequest = Model::IORequest::Create(
+			scheduledEvent, finishedEvent, operationCount);
+		if (modelRequest == NULL)
+			return NULL;
+
+		size_t index = 0;
+		for (IOOperationList::ConstIterator it = operations.GetIterator();
+				IOOperation* operation = it.Next();) {
+			Model::IOOperation& modelOperation
+				= modelRequest->operations[index++];
+			modelOperation.startedEvent = operation->startedEvent;
+			modelOperation.finishedEvent = operation->finishedEvent;
+		}
+
+		return modelRequest;
+	}
+};
+
+
+// #pragma mark - IORequestHashDefinition
+
+
+struct ModelLoader::IORequestHashDefinition {
+	typedef void*		KeyType;
+	typedef	IORequest	ValueType;
+
+	size_t HashKey(KeyType key) const
+		{ return (size_t)key; }
+
+	size_t Hash(const IORequest* value) const
+		{ return HashKey(value->scheduledEvent->request); }
+
+	bool Compare(KeyType key, const IORequest* value) const
+		{ return key == value->scheduledEvent->request; }
+
+	IORequest*& GetLink(IORequest* value) const
+		{ return value->hashNext; }
+};
+
+
 // #pragma mark - ExtendedThreadSchedulingState
 
 
@@ -78,6 +181,11 @@ struct ModelLoader::ExtendedThreadSchedulingState
 	~ExtendedThreadSchedulingState()
 	{
 		delete[] fEvents;
+
+		while (IORequest* request = fIORequests.RemoveHead())
+			delete request;
+		while (IORequest* request = fPendingIORequests.RemoveHead())
+			delete request;
 	}
 
 	system_profiler_event_header** Events() const
@@ -119,10 +227,59 @@ struct ModelLoader::ExtendedThreadSchedulingState
 		return true;
 	}
 
+	void AddIORequest(IORequest* request)
+	{
+		fPendingIORequests.Add(request);
+	}
+
+	void IORequestFinished(IORequest* request)
+	{
+		fPendingIORequests.Remove(request);
+		fIORequests.Add(request);
+	}
+
+	bool PrepareThreadIORequests(Model::IORequest**& _requests,
+		size_t& _requestCount)
+	{
+		fIORequests.MoveFrom(&fPendingIORequests);
+		size_t requestCount = fIORequests.Count();
+
+		if (requestCount == 0) {
+			_requests = NULL;
+			_requestCount = 0;
+			return true;
+		}
+
+		Model::IORequest** requests
+			= new(std::nothrow) Model::IORequest*[requestCount];
+		if (requests == NULL)
+			return false;
+
+		size_t index = 0;
+		while (IORequest* request = fIORequests.RemoveHead()) {
+			ObjectDeleter<IORequest> requestDeleter(request);
+
+			Model::IORequest* modelRequest = request->CreateModelRequest();
+			if (modelRequest == NULL) {
+				for (size_t i = 0; i < index; i++)
+					requests[i]->Delete();
+				return false;
+			}
+
+			requests[index++] = modelRequest;
+		}
+
+		_requests = requests;
+		_requestCount = requestCount;
+		return true;
+	}
+
 private:
 	system_profiler_event_header**	fEvents;
 	size_t							fEventIndex;
 	size_t							fEventCount;
+	IORequestList					fIORequests;
+	IORequestList					fPendingIORequests;
 };
 
 
@@ -168,7 +325,9 @@ ModelLoader::ModelLoader(DataSource* dataSource,
 	AbstractModelLoader(target, targetCookie),
 	fModel(NULL),
 	fDataSource(dataSource),
-	fCPUInfos(NULL)
+	fCPUInfos(NULL),
+	fState(NULL),
+	fIORequests(NULL)
 {
 }
 
@@ -178,6 +337,8 @@ ModelLoader::~ModelLoader()
 	delete[] fCPUInfos;
 	delete fDataSource;
 	delete fModel;
+	delete fState;
+	delete fIORequests;
 }
 
 
@@ -211,8 +372,14 @@ ModelLoader::PrepareForLoading()
 	if (error != B_OK)
 		return error;
 
+	// create CPU info array
 	fCPUInfos = new(std::nothrow) CPUInfo[kMaxCPUCount];
 	if (fCPUInfos == NULL)
+		return B_NO_MEMORY;
+
+	// create IORequest hash table
+	fIORequests = new(std::nothrow) IORequestTable;
+	if (fIORequests == NULL || fIORequests->Init() != B_OK)
 		return B_NO_MEMORY;
 
 	return B_OK;
@@ -243,6 +410,18 @@ ModelLoader::FinishLoading(bool success)
 
 	delete[] fCPUInfos;
 	fCPUInfos = NULL;
+
+	if (fIORequests != NULL) {
+		IORequest* request = fIORequests->Clear(true);
+		while (request != NULL) {
+			IORequest* next = request->hashNext;
+			delete request;
+			request = next;
+		}
+
+		delete fIORequests;
+		fIORequests = NULL;
+	}
 }
 
 
@@ -340,7 +519,7 @@ ModelLoader::_Load()
 
 	fModel->SetLastEventTime(fState->LastEventTime());
 
-	if (!_SetThreadEvents())
+	if (!_SetThreadEvents() || !_SetThreadIORequests())
 		return B_NO_MEMORY;
 
 	fModel->LoadingFinished();
@@ -530,10 +709,20 @@ ModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 
 		case B_SYSTEM_PROFILER_IO_SCHEDULER_ADDED:
 		case B_SYSTEM_PROFILER_IO_SCHEDULER_REMOVED:
+			// TODO: Handle!
+			break;
+
 		case B_SYSTEM_PROFILER_IO_REQUEST_SCHEDULED:
+			_HandleIORequestScheduled((io_request_scheduled*)buffer);
+			break;
 		case B_SYSTEM_PROFILER_IO_REQUEST_FINISHED:
+			_HandleIORequestFinished((io_request_finished*)buffer);
+			break;
 		case B_SYSTEM_PROFILER_IO_OPERATION_STARTED:
+			_HandleIOOperationStarted((io_operation_started*)buffer);
+			break;
 		case B_SYSTEM_PROFILER_IO_OPERATION_FINISHED:
+			_HandleIOOperationFinished((io_operation_finished*)buffer);
 			break;
 
 		default:
@@ -625,6 +814,67 @@ ModelLoader::_SetThreadEvents()
 	}
 
 	return true;
+}
+
+
+bool
+ModelLoader::_SetThreadIORequests()
+{
+	for (int32 i = 0; Model::Thread* thread = fModel->ThreadAt(i); i++) {
+		ExtendedThreadSchedulingState* state
+			= fState->LookupThread(thread->ID());
+		Model::IORequest** requests;
+		size_t requestCount;
+		if (!state->PrepareThreadIORequests(requests, requestCount))
+			return false;
+		if (requestCount > 0)
+			_SetThreadIORequests(thread, requests, requestCount);
+	}
+
+	return true;
+}
+
+
+void
+ModelLoader::_SetThreadIORequests(Model::Thread* thread,
+	Model::IORequest** requests, size_t requestCount)
+{
+	// compute some totals
+	int64 ioCount = 0;
+	nanotime_t ioTime = 0;
+
+	// sort requests by scheduler and start time
+	std::sort(requests, requests + requestCount,
+		Model::IORequest::SchedulerTimeLess);
+
+	nanotime_t endTime = fBaseTime + fModel->LastEventTime();
+
+	// compute the summed up I/O times
+	nanotime_t ioStart = requests[0]->scheduledEvent->time;
+	nanotime_t previousEnd = requests[0]->finishedEvent != NULL
+		? requests[0]->finishedEvent->time : endTime;
+	int32 scheduler = requests[0]->scheduledEvent->scheduler;
+
+	for (size_t i = 1; i < requestCount; i++) {
+		system_profiler_io_request_scheduled* scheduledEvent
+			= requests[i]->scheduledEvent;
+		if (scheduledEvent->scheduler != scheduler
+			|| scheduledEvent->time >= previousEnd) {
+			ioCount++;
+			ioTime += previousEnd - ioStart;
+			ioStart = scheduledEvent->time;
+		}
+
+		previousEnd = requests[i]->finishedEvent != NULL
+			? requests[i]->finishedEvent->time : endTime;
+	}
+
+	ioCount++;
+	ioTime += previousEnd - ioStart;
+
+	// set the computed values
+	thread->SetIORequests(requests, requestCount);
+	thread->SetIOs(ioCount, ioTime);
 }
 
 
@@ -855,6 +1105,75 @@ ModelLoader::_HandleWaitObjectInfo(system_profiler_wait_object_info* event)
 {
 	if (fModel->AddWaitObject(event, NULL) == NULL)
 		throw std::bad_alloc();
+}
+
+
+void
+ModelLoader::_HandleIORequestScheduled(io_request_scheduled* event)
+{
+	IORequest* request = fIORequests->Lookup(event->request);
+	if (request != NULL) {
+		printf("Duplicate schedule event for I/O request %p\n", event->request);
+		return;
+	}
+
+	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
+	if (thread == NULL) {
+		printf("I/O request for unknown thread %ld\n", event->thread);
+		return;
+	}
+
+	request = new(std::nothrow) IORequest(event);
+	if (request == NULL)
+		throw std::bad_alloc();
+
+	fIORequests->Insert(request);
+	thread->AddIORequest(request);
+}
+
+
+void
+ModelLoader::_HandleIORequestFinished(io_request_finished* event)
+{
+	IORequest* request = fIORequests->Lookup(event->request);
+	if (request == NULL)
+		return;
+
+	request->finishedEvent = event;
+
+	fIORequests->Remove(request);
+	fState->LookupThread(request->scheduledEvent->thread)
+		->IORequestFinished(request);
+}
+
+
+void
+ModelLoader::_HandleIOOperationStarted(io_operation_started* event)
+{
+	IORequest* request = fIORequests->Lookup(event->request);
+	if (request == NULL)
+		return;
+
+	IOOperation* operation = new(std::nothrow) IOOperation(event);
+	if (operation == NULL)
+		throw std::bad_alloc();
+
+	request->AddOperation(operation);
+}
+
+
+void
+ModelLoader::_HandleIOOperationFinished(io_operation_finished* event)
+{
+	IORequest* request = fIORequests->Lookup(event->request);
+	if (request == NULL)
+		return;
+
+	IOOperation* operation = request->FindOperation(event->operation);
+	if (operation == NULL)
+		return;
+
+	operation->finishedEvent = event;
 }
 
 
