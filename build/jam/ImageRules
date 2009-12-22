@@ -764,6 +764,8 @@ rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
 	local zipFile = [ DownloadOptionalPackage $(package) : $(url) ] ;
 
 	if ( $(isCDPackage) = true || $(isCDPackage) = 1 ) && $(HAIKU_CD_NAME) {
+		# TODO: If HAIKU_CD_NAME is set, that doesn't mean we're building a CD
+		# image!
 		# copy onto image
 		AddFilesToHaikuImage _packages_ : $(zipFile) ;
 	} else {
