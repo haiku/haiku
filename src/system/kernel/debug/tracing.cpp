@@ -1529,7 +1529,7 @@ alloc_tracing_buffer_strcpy(const char* source, size_t maxSize, bool user)
 
 
 tracing_stack_trace*
-capture_tracing_stack_trace(int32 maxCount, int32 skipFrames, bool userOnly)
+capture_tracing_stack_trace(int32 maxCount, int32 skipFrames, bool kernelOnly)
 {
 #if	ENABLE_TRACING
 	// TODO: page_fault_exception() doesn't allow us to gracefully handle
@@ -1544,7 +1544,7 @@ capture_tracing_stack_trace(int32 maxCount, int32 skipFrames, bool userOnly)
 	if (stackTrace != NULL) {
 		stackTrace->depth = arch_debug_get_stack_trace(
 			stackTrace->return_addresses, maxCount, 0, skipFrames + 1,
-			userOnly);
+			STACK_TRACE_KERNEL | (kernelOnly ? 0 : STACK_TRACE_KERNEL));
 	}
 
 	return stackTrace;

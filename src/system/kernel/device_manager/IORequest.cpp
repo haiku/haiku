@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -1322,7 +1322,8 @@ get_caller()
 	// this makes certain assumptions about how the code for the functions
 	// ends up in the kernel object.
 	addr_t returnAddresses[5];
-	int32 depth = arch_debug_get_stack_trace(returnAddresses, 5, 0, 1, false);
+	int32 depth = arch_debug_get_stack_trace(returnAddresses, 5, 0, 1,
+		STACK_TRACE_KERNEL | STACK_TRACE_USER);
 
 	// find the first return address inside the VIP allocator
 	int32 i = 0;

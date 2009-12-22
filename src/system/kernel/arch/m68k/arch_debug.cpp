@@ -279,18 +279,9 @@ arch_debug_get_caller(void)
 }
 
 
-/*!	Captures a stack trace (the return addresses) of the current thread.
-	\param returnAddresses The array the return address shall be written to.
-	\param maxCount The maximum number of return addresses to be captured.
-	\param skipIframes The number of interrupt frames that shall be skipped. If
-		greater than 0, \a skipFrames is ignored.
-	\param skipFrames The number of stack frames that shall be skipped.
-	\param userOnly If \c true, only userland return addresses are captured.
-	\return The number of return addresses written to the given array.
-*/
 int32
 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
-	int32 skipIframes, int32 skipFrames, bool userOnly)
+	int32 skipIframes, int32 skipFrames, uint32 flags)
 {
 	struct iframe_stack *frameStack;
 	addr_t framePointer;
@@ -299,15 +290,12 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 
 	// Keep skipping normal stack frames until we've skipped the iframes we're
 	// supposed to skip.
-	if (skipIframes > 0) {
+	if (skipIframes > 0)
 		skipFrames = INT_MAX;
-	} else {
-		// always skip our own frame
-		skipFrames++;
-	}
 
 	struct thread* thread = thread_get_current_thread();
 	framePointer = (addr_t)get_current_stack_frame();
+	bool onKernelStack = true;
 
 	// We don't have a thread pointer early in the boot process
 	if (thread != NULL)
@@ -316,6 +304,12 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		frameStack = &gBootFrameStack;
 
 	while (framePointer != 0 && count < maxCount) {
+		onKernelStack = onKernelStack
+			&& IS_KERNEL_ADDRESS(thread, framePointer);
+			// TODO: Correctly determine whether this is a kernel address!
+		if (!onKernelStack && (flags & STACK_TRACE_USER) == 0)
+			break;
+
 		// see if the frame pointer matches the iframe
 		struct iframe *frame = NULL;
 		for (i = 0; i < frameStack->index; i++) {
@@ -342,9 +336,10 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 				break;
 		}
 
-		if (skipFrames <= 0 && (!userOnly || IS_USER_ADDRESS(framePointer)))
+		if (skipFrames <= 0
+			&& ((flags & STACK_TRACE_KERNEL) != 0 || onKernelStack)) {
 			returnAddresses[count++] = ip;
-		else
+		} else
 			skipFrames--;
 
 		framePointer = nextFrame;

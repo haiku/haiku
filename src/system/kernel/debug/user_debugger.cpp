@@ -1344,14 +1344,14 @@ profiling_do_sample(bool& flushBuffer)
 	if (debugInfo.profile.variable_stack_depth) {
 		// variable sample count per hit
 		*returnAddresses = arch_debug_get_stack_trace(returnAddresses + 1,
-			stackDepth - 1, 1, 0, false);
+			stackDepth - 1, 1, 0, STACK_TRACE_KERNEL | STACK_TRACE_USER);
 
 		debugInfo.profile.sample_count += *returnAddresses + 1;
 	} else {
 		// fixed sample count per hit
 		if (stackDepth > 1) {
 			int32 count = arch_debug_get_stack_trace(returnAddresses,
-				stackDepth, 1, 0, false);
+				stackDepth, 1, 0, STACK_TRACE_KERNEL | STACK_TRACE_USER);
 
 			for (int32 i = count; i < stackDepth; i++)
 				returnAddresses[i] = 0;

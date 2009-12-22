@@ -50,7 +50,7 @@ arch_debug_contains_call(struct thread* thread, const char* symbol,
 }
 
 
-void* 
+void*
 arch_debug_get_caller(void)
 {
 #warning IMPLEMENT arch_debug_get_caller
@@ -60,7 +60,7 @@ arch_debug_get_caller(void)
 
 int32
 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
-	int32 skipIframes, int32 skipFrames, bool userOnly)
+	int32 skipIframes, int32 skipFrames, uint32 flags)
 {
 #warning IMPLEMENT arch_debug_get_stack_trace
 	return 0;

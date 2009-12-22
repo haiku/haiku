@@ -18,6 +18,11 @@ struct kernel_args;
 struct thread;
 
 
+// arch_debug_get_stack_trace() flags
+#define STACK_TRACE_KERNEL	0x01
+#define STACK_TRACE_USER	0x02
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,7 +31,7 @@ status_t arch_debug_init(kernel_args *args);
 void arch_debug_stack_trace(void);
 void *arch_debug_get_caller(void);
 int32 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
-		int32 skipIframes, int32 skipFrames, bool userOnly);
+		int32 skipIframes, int32 skipFrames, uint32 flags);
 void* arch_debug_get_interrupt_pc(bool* _isSyscall);
 bool arch_debug_contains_call(struct thread *thread, const char *symbol,
 		addr_t start, addr_t end);

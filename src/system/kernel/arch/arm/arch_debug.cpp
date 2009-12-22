@@ -261,78 +261,10 @@ arch_debug_get_caller(void)
 }
 
 
-/*!	Captures a stack trace (the return addresses) of the current thread.
-	\param returnAddresses The array the return address shall be written to.
-	\param maxCount The maximum number of return addresses to be captured.
-	\param skipIframes The number of interrupt frames that shall be skipped. If
-		greater than 0, \a skipFrames is ignored.
-	\param skipFrames The number of stack frames that shall be skipped.
-	\param userOnly If \c true, only userland return addresses are captured.
-	\return The number of return addresses written to the given array.
-*/
 int32
 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
-	int32 skipIframes, int32 skipFrames, bool userOnly)
+	int32 skipIframes, int32 skipFrames, uint32 flags)
 {
-/*	struct iframe_stack *frameStack;
-	addr_t framePointer;
-	int32 count = 0;
-	int32 i, num = 0, last = 0;
-
-	// Keep skipping normal stack frames until we've skipped the iframes we're
-	// supposed to skip.
-	if (skipIframes > 0) {
-		skipFrames = INT_MAX;
-	} else {
-		// always skip our own frame
-		skipFrames++;
-	}
-
-	struct thread* thread = thread_get_current_thread();
-	framePointer = (addr_t)get_current_stack_frame();
-
-	// We don't have a thread pointer early in the boot process
-	if (thread != NULL)
-		frameStack = &thread->arch_info.iframes;
-	else
-		frameStack = &gBootFrameStack;
-
-	while (framePointer != 0 && count < maxCount) {
-		// see if the frame pointer matches the iframe
-		struct iframe *frame = NULL;
-		for (i = 0; i < frameStack->index; i++) {
-			if (framePointer == (addr_t)frameStack->frames[i]) {
-				// it's an iframe
-				frame = frameStack->frames[i];
-				break;
-			}
-		}
-
-		addr_t ip;
-		addr_t nextFrame;
-
-		if (frame) {
-			ip = frame->cpu.pc;
- 			nextFrame = frame->a[6];
-
-			if (skipIframes > 0) {
-				if (--skipIframes == 0)
-					skipFrames = 0;
-			}
-		} else {
-			if (get_next_frame(framePointer, &nextFrame, &ip) != B_OK)
-				break;
-		}
-
-		if (skipFrames <= 0 && (!userOnly || IS_USER_ADDRESS(framePointer)))
-			returnAddresses[count++] = ip;
-		else
-			skipFrames--;
-
-		framePointer = nextFrame;
-	}
-
-	return count;*/
 #warning ARM:IMPLEMENT
 
 	return 0;

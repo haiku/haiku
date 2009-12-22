@@ -956,21 +956,19 @@ arch_debug_get_caller(void)
 	\param skipIframes The number of interrupt frames that shall be skipped. If
 		greater than 0, \a skipFrames is ignored.
 	\param skipFrames The number of stack frames that shall be skipped.
-	\param userOnly If \c true, only userland return addresses are captured.
+	\param flags A combination of one or two of the following:
+		- \c STACK_TRACE_KERNEL: Capture kernel return addresses.
+		- \c STACK_TRACE_USER: Capture user return addresses.
 	\return The number of return addresses written to the given array.
 */
 int32
 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
-	int32 skipIframes, int32 skipFrames, bool userOnly)
+	int32 skipIframes, int32 skipFrames, uint32 flags)
 {
 	// Keep skipping normal stack frames until we've skipped the iframes we're
 	// supposed to skip.
-	if (skipIframes > 0) {
+	if (skipIframes > 0)
 		skipFrames = INT_MAX;
-	} else {
-		// always skip our own frame
-		skipFrames++;
-	}
 
 	struct thread* thread = thread_get_current_thread();
 	int32 count = 0;
@@ -980,6 +978,8 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	while (ebp != 0 && count < maxCount) {
 		onKernelStack = onKernelStack
 			&& is_kernel_stack_address(thread, ebp);
+		if (!onKernelStack && (flags & STACK_TRACE_USER) == 0)
+			break;
 
 		addr_t eip;
 		addr_t nextEbp;
@@ -998,9 +998,10 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 				break;
 		}
 
-		if (skipFrames <= 0 && (!userOnly || IS_USER_ADDRESS(ebp)))
+		if (skipFrames <= 0
+			&& ((flags & STACK_TRACE_KERNEL) != 0 || onKernelStack)) {
 			returnAddresses[count++] = eip;
-		else
+		} else
 			skipFrames--;
 
 		ebp = nextEbp;

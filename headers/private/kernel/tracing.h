@@ -208,7 +208,7 @@ uint8* alloc_tracing_buffer_memcpy(const void* source, size_t size, bool user);
 char* alloc_tracing_buffer_strcpy(const char* source, size_t maxSize,
 			bool user);
 struct tracing_stack_trace* capture_tracing_stack_trace(int32 maxCount,
-			int32 skipFrames, bool userOnly);
+			int32 skipFrames, bool kernelOnly);
 void lock_tracing_buffer();
 void unlock_tracing_buffer();
 status_t tracing_init(void);

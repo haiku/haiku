@@ -64,10 +64,26 @@ class VMCacheTraceEntry : public AbstractTraceEntry {
 			:
 			fCache(cache)
 		{
+#if VM_CACHE_TRACING_STACK_TRACE
+			fStackTrace = capture_tracing_stack_trace(
+				VM_CACHE_TRACING_STACK_TRACE, 0, true);
+				// Don't capture userland stack trace to avoid potential
+				// deadlocks.
+#endif
 		}
+
+#if VM_CACHE_TRACING_STACK_TRACE
+		virtual void DumpStackTrace(TraceOutput& out)
+		{
+			out.PrintStackTrace(fStackTrace);
+		}
+#endif
 
 	protected:
 		VMCache*	fCache;
+#if VM_CACHE_TRACING_STACK_TRACE
+		tracing_stack_trace* fStackTrace;
+#endif
 };
 
 

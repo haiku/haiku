@@ -1348,7 +1348,7 @@ SystemProfiler::_DoSample()
 
 	// get the samples
 	int32 count = arch_debug_get_stack_trace(cpuData.buffer, fStackDepth, 1,
-		0, false);
+		0, STACK_TRACE_KERNEL | STACK_TRACE_USER);
 
 	InterruptsSpinLocker locker(fLock);
 
