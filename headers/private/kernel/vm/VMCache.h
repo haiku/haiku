@@ -101,6 +101,8 @@ public:
 
 			status_t			InsertAreaLocked(VMArea* area);
 			status_t			RemoveArea(VMArea* area);
+			void				TransferAreas(VMCache* fromCache);
+			uint32				CountWritableAreas(VMArea* ignoreArea) const;
 
 			status_t			WriteModified();
 			status_t			SetMinimalCommitment(off_t commitment);
@@ -204,6 +206,7 @@ extern "C" {
 #endif
 
 status_t vm_cache_init(struct kernel_args *args);
+void vm_cache_init_post_heap();
 struct VMCache *vm_cache_acquire_locked_page_cache(struct vm_page *page,
 	bool dontWait);
 

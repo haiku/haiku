@@ -79,6 +79,11 @@ class VMCacheTraceEntry : public AbstractTraceEntry {
 		}
 #endif
 
+		VMCache* Cache() const
+		{
+			return fCache;
+		}
+
 	protected:
 		VMCache*	fCache;
 #if VM_CACHE_TRACING_STACK_TRACE
@@ -182,6 +187,11 @@ class AddConsumer : public VMCacheTraceEntry {
 				fConsumer);
 		}
 
+		VMCache* Consumer() const
+		{
+			return fConsumer;
+		}
+
 	private:
 		VMCache*	fConsumer;
 };
@@ -243,6 +253,11 @@ class InsertArea : public VMCacheTraceEntry {
 		{
 			out.Print("vm cache insert area: cache: %p, area: %p", fCache,
 				fArea);
+		}
+
+		VMArea*	Area() const
+		{
+			return fArea;
 		}
 
 	private:
@@ -333,6 +348,115 @@ class RemovePage : public VMCacheTraceEntry {
 #endif
 
 
+//	#pragma mark - debugger commands
+
+
+#if VM_CACHE_TRACING
+
+
+static void*
+cache_stack_find_area_cache(const TraceEntryIterator& baseIterator, void* area)
+{
+	using namespace VMCacheTracing;
+
+	// find the previous "insert area" entry for the given area
+	TraceEntryIterator iterator = baseIterator;
+	TraceEntry* entry = iterator.Current();
+	while (entry != NULL) {
+		if (InsertArea* insertAreaEntry = dynamic_cast<InsertArea*>(entry)) {
+			if (insertAreaEntry->Area() == area)
+				return insertAreaEntry->Cache();
+		}
+
+		entry = iterator.Previous();
+	}
+
+	return NULL;
+}
+
+
+static void*
+cache_stack_find_consumer(const TraceEntryIterator& baseIterator, void* cache)
+{
+	using namespace VMCacheTracing;
+
+	// find the previous "add consumer" or "create" entry for the given cache
+	TraceEntryIterator iterator = baseIterator;
+	TraceEntry* entry = iterator.Current();
+	while (entry != NULL) {
+		if (Create* createEntry = dynamic_cast<Create*>(entry)) {
+			if (createEntry->Cache() == cache)
+				return NULL;
+		} else if (AddConsumer* addEntry = dynamic_cast<AddConsumer*>(entry)) {
+			if (addEntry->Consumer() == cache)
+				return addEntry->Cache();
+		}
+
+		entry = iterator.Previous();
+	}
+
+	return NULL;
+}
+
+
+static int
+command_cache_stack(int argc, char** argv)
+{
+	if (argc < 3 || argc > 4) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	bool isArea = false;
+
+	int argi = 1;
+	if (argc == 4) {
+		if (strcmp(argv[argi], "area") != 0) {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+
+		argi++;
+		isArea = true;
+	}
+
+	uint64 addressValue;
+	uint64 debugEntryIndex;
+	if (!evaluate_debug_expression(argv[argi++], &addressValue, false)
+		|| !evaluate_debug_expression(argv[argi++], &debugEntryIndex, false)) {
+		return 0;
+	}
+
+	TraceEntryIterator baseIterator;
+	if (baseIterator.MoveTo((int32)debugEntryIndex) == NULL) {
+		kprintf("Invalid tracing entry index %" B_PRIu64 "\n", debugEntryIndex);
+		return 0;
+	}
+
+	void* address = (void*)(addr_t)addressValue;
+
+	kprintf("cache stack for %s %p at %" B_PRIu64 ":\n",
+		isArea ? "area" : "cache", address, debugEntryIndex);
+	if (isArea) {
+		address = cache_stack_find_area_cache(baseIterator, address);
+		if (address == NULL) {
+			kprintf("  cache not found\n");
+			return 0;
+		}
+	}
+
+	while (address != NULL) {
+		kprintf("  %p\n", address);
+		address = cache_stack_find_consumer(baseIterator, address);
+	}
+
+	return 0;
+}
+
+
+#endif	// VM_CACHE_TRACING
+
+
 //	#pragma mark -
 
 
@@ -340,6 +464,23 @@ status_t
 vm_cache_init(kernel_args* args)
 {
 	return B_OK;
+}
+
+
+void
+vm_cache_init_post_heap()
+{
+#if VM_CACHE_TRACING
+	add_debugger_command_etc("cache_stack", &command_cache_stack,
+		"List the ancestors (sources) of a VMCache at the time given by "
+			"tracing entry index",
+		"[ \"area\" ] <address> <tracing entry index>\n"
+		"All ancestors (sources) of a given VMCache at the time given by the\n"
+		"tracing entry index are listed. If \"area\" is given the supplied\n"
+		"address is an area instead of a cache address. The listing will\n"
+		"start with the area's cache at that point.\n",
+		0);
+#endif	// VM_CACHE_TRACING
 }
 
 
@@ -747,6 +888,46 @@ VMCache::RemoveArea(VMArea* area)
 		areas = area->cache_next;
 
 	return B_OK;
+}
+
+
+/*!	Transfers the areas from \a fromCache to this cache. This cache must not
+	have areas yet. Both caches must be locked.
+*/
+void
+VMCache::TransferAreas(VMCache* fromCache)
+{
+	AssertLocked();
+	fromCache->AssertLocked();
+	ASSERT(areas == NULL);
+
+	areas = fromCache->areas;
+	fromCache->areas = NULL;
+
+	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
+		area->cache = this;
+		AcquireRefLocked();
+		fromCache->ReleaseRefLocked();
+
+		T(RemoveArea(fromCache, area));
+		T(InsertArea(this, area));
+	}
+}
+
+
+uint32
+VMCache::CountWritableAreas(VMArea* ignoreArea) const
+{
+	uint32 count = 0;
+
+	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
+		if (area != ignoreArea
+			&& (area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
+			count++;
+		}
+	}
+
+	return count;
 }
 
 

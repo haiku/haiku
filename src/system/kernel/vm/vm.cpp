@@ -1638,17 +1638,7 @@ vm_copy_on_write_area(VMCache* lowerCache)
 
 	// transfer the lower cache areas to the upper cache
 	mutex_lock(&sAreaCacheLock);
-
-	upperCache->areas = lowerCache->areas;
-	lowerCache->areas = NULL;
-
-	for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
-			tempArea = tempArea->cache_next) {
-		tempArea->cache = upperCache;
-		upperCache->AcquireRefLocked();
-		lowerCache->ReleaseRefLocked();
-	}
-
+	upperCache->TransferAreas(lowerCache);
 	mutex_unlock(&sAreaCacheLock);
 
 	lowerCache->AddConsumer(upperCache);
@@ -1744,23 +1734,6 @@ vm_copy_area(team_id team, const char* name, void** _address,
 }
 
 
-//! You need to hold the cache lock when calling this function
-static int32
-count_writable_areas(VMCache* cache, VMArea* ignoreArea)
-{
-	struct VMArea* area = cache->areas;
-	uint32 count = 0;
-
-	for (; area != NULL; area = area->cache_next) {
-		if (area != ignoreArea
-			&& (area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0)
-			count++;
-	}
-
-	return count;
-}
-
-
 static status_t
 vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 	bool kernel)
@@ -1799,7 +1772,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 		// writable -> !writable
 
 		if (cache->source != NULL && cache->temporary) {
-			if (count_writable_areas(cache, area) == 0) {
+			if (cache->CountWritableAreas(area) == 0) {
 				// Since this cache now lives from the pages in its source cache,
 				// we can change the cache's commitment to take only those pages
 				// into account that really are in this cache.
@@ -3325,6 +3298,8 @@ vm_init(kernel_args* args)
 
 	TRACE(("vm_init: exit\n"));
 
+	vm_cache_init_post_heap();
+
 	return err;
 }
 
@@ -4744,7 +4719,7 @@ transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 
 	if (info.team != thread_get_current_thread()->team->id)
 		return B_PERMISSION_DENIED;
-		
+
 	area_id clonedArea = vm_clone_area(target, info.name, _address,
 		addressSpec, info.protection, REGION_NO_PRIVATE_MAP, id, kernel);
 	if (clonedArea < 0)
