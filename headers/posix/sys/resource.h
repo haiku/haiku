@@ -24,7 +24,7 @@ struct rlimit {
 /* ToDo: the only supported mode is RLIMIT_NOFILE right now */
 #define RLIMIT_CORE		0	/* size of the core file */
 #define RLIMIT_CPU		1	/* CPU time per team */
-#define	RLIMIT_DATA		2	/* data segment size */
+#define RLIMIT_DATA		2	/* data segment size */
 #define RLIMIT_FSIZE	3	/* file size */
 #define RLIMIT_NOFILE	4	/* number of open files */
 #define RLIMIT_STACK	5	/* stack size */
@@ -32,7 +32,7 @@ struct rlimit {
 /* Haiku-specifics */
 #define RLIMIT_NOVMON	7	/* number of open vnode monitors */
 
-#define	RLIM_NLIMITS	8	/* number of resource limits */
+#define RLIM_NLIMITS	8	/* number of resource limits */
 
 #define RLIM_INFINITY	(0xffffffffUL)
 #define RLIM_SAVED_MAX	RLIM_INFINITY
