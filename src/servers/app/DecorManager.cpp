@@ -184,7 +184,6 @@ DecorManager::RescanDecorators()
 		create_decorator* createFunc;
 
 		// Get the instantiation function
-		// TODO : this is not working for some reason
 		status_t status = get_image_symbol(image, "instantiate_decorator",
 								B_SYMBOL_TYPE_TEXT, (void**)&createFunc);
 		if (status != B_OK) {

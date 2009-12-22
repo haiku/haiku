@@ -1186,7 +1186,7 @@ extern "C" float get_decorator_version(void)
 	return 1.00;
 }
 
-extern "C" Decorator *(create_decorator)(DesktopSettings &desktopSetting, BRect rec,
+extern "C" Decorator *(instantiate_decorator)(DesktopSettings &desktopSetting, BRect rec,
 										window_look loo, uint32 flag)
 {
 	return (new BeDecorator(desktopSetting, rec, loo, flag));
