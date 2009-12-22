@@ -304,8 +304,7 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		frameStack = &gBootFrameStack;
 
 	while (framePointer != 0 && count < maxCount) {
-		onKernelStack = onKernelStack
-			&& IS_KERNEL_ADDRESS(thread, framePointer);
+		onKernelStack = onKernelStack && IS_KERNEL_ADDRESS(framePointer);
 			// TODO: Correctly determine whether this is a kernel address!
 		if (!onKernelStack && (flags & STACK_TRACE_USER) == 0)
 			break;
