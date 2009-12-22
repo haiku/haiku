@@ -166,7 +166,8 @@ BeDecorator::SetLook(DesktopSettings& settings,
 
 	font.SetFlags(B_FORCE_ANTIALIASING);
 	font.SetSpacing(B_STRING_SPACING);
-	SetFont(&font);
+	// TODO Make this work...
+	// SetFont(&font);
 
 	Decorator::SetLook(settings, look, updateRegion);
 	_DoLayout();
@@ -639,8 +640,9 @@ BeDecorator::_DoLayout()
 			fMinTabSize += offset + size;
 
 		// fMaxTabSize contains fMinWidth + the width required for the title
-		fMaxTabSize = fDrawingEngine ? ceilf(fDrawingEngine->StringWidth(Title(), strlen(Title()),
-			&fDrawState)) : 0.0;
+		// TODO : check what escapement_delta is supposed to do
+		fMaxTabSize = fDrawingEngine ? ceilf(fDrawingEngine->StringWidth(Title(), strlen(Title())/*,
+			&fDrawState*/)) : 0.0;
 		if (fMaxTabSize > 0.0)
 			fMaxTabSize += fTextOffset;
 		fMaxTabSize += fMinTabSize;
@@ -985,7 +987,7 @@ BeDecorator::_DrawTitle(BRect r)
 			: fTabRect.bottom - fTextOffset;
 	}
 
-	fDrawingEngine->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength, titlePos, &fDrawState);
+	fDrawingEngine->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength, titlePos/*, &fDrawState*/);
 }
 
 // _DrawZoom

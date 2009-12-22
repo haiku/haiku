@@ -12,6 +12,7 @@
 
 #include "Decorator.h"
 #include <Region.h>
+#include "RGBColor.h"
 
 class Desktop;
 

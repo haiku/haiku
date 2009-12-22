@@ -13,6 +13,8 @@
 #include <Path.h>
 #include <Rect.h>
 
+#include <syslog.h>
+
 #include "AppServer.h"
 #include "DefaultDecorator.h"
 #include "Desktop.h"
@@ -115,9 +117,9 @@ DecorManager::DecorManager()
 	DecorInfo *defaultDecor = new DecorInfo(-1, "Default", NULL);
 	fDecorList.AddItem(defaultDecor);
 
-#if 0
 	// Add any on disk
 	RescanDecorators();
+#if 0
 
 	// Find out which one should be the active one
 	BDirectory dir;
@@ -171,7 +173,7 @@ DecorManager::RescanDecorators()
 			continue;
 
 		image_id image = load_add_on(path.Path());
-		if (image != B_OK)
+		if (image < 0)
 			continue;
 
 		// As of now, we do nothing with decorator versions, but the possibility
@@ -182,6 +184,7 @@ DecorManager::RescanDecorators()
 		create_decorator* createFunc;
 
 		// Get the instantiation function
+		// TODO : this is not working for some reason
 		status_t status = get_image_symbol(image, "instantiate_decorator",
 								B_SYMBOL_TYPE_TEXT, (void**)&createFunc);
 		if (status != B_OK) {
