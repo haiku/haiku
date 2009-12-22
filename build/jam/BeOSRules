@@ -362,7 +362,7 @@ rule DoCatalogs appName	# Application name
 						# declared in the sourcecode)
 	: sources 			# List of cpp files where to search keys
 	: generatedCatalog	# Name of the generated catalog (most probably
-						# english.catalog)
+						# en.catalog)
 	: translatedCatalogs # List of available translations
 {
 	genCat = [ FGristFiles $(generatedCatalog) ] ;
