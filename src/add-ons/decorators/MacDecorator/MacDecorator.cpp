@@ -1,8 +1,8 @@
 #include <Point.h>
-#include "DisplayDriver.h"
+#include "DrawingEngine.h"
 #include <View.h>
-#include "LayerData.h"
-#include "ColorUtils.h"
+//#include "LayerData.h"
+//#include "ColorUtils.h"
 #include "MacDecorator.h"
 #include "RGBColor.h"
 #include "PatternHandler.h"
@@ -13,8 +13,50 @@
 #include <stdio.h>
 #endif
 
-MacDecorator::MacDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
- : Decorator(rect,wlook,wfeel,wflags)
+
+static inline uint8
+blend_color_value(uint8 a, uint8 b, float position)
+{
+	int16 delta = (int16)b - a;
+	int32 value = a + (int32)(position * delta);
+	if (value > 255)
+		return 255;
+	if (value < 0)
+		return 0;
+
+	return (uint8)value;
+}
+
+
+/*!
+	\brief Function mostly for calculating gradient colors
+	\param col Start color
+	\param col2 End color
+	\param position A floating point number such that 0.0 <= position <= 1.0. 0.0 results in the
+		start color and 1.0 results in the end color.
+	\return The blended color. If an invalid position was given, {0,0,0,0} is returned.
+*/
+static rgb_color
+make_blend_color(rgb_color colorA, rgb_color colorB, float position)
+{
+	if (position < 0)
+		return colorA;
+	if (position > 1)
+		return colorB;
+
+	rgb_color blendColor;
+	blendColor.red = blend_color_value(colorA.red, colorB.red, position);
+	blendColor.green = blend_color_value(colorA.green, colorB.green, position);
+	blendColor.blue = blend_color_value(colorA.blue, colorB.blue, position);
+	blendColor.alpha = blend_color_value(colorA.alpha, colorB.alpha, position);
+
+	return blendColor;
+}
+
+
+
+MacDecorator::MacDecorator(DesktopSettings& settings, BRect frame, window_look look, uint32 flags)
+ : Decorator(settings, frame, look, flags)
 {
 #ifdef DEBUG_DECOR
 printf("MacDecorator()\n");
@@ -46,7 +88,7 @@ printf("~MacDecorator()\n");
 
 click_type MacDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
-	if(_closerect.Contains(pt))
+	if(fCloseRect.Contains(pt))
 	{
 
 #ifdef DEBUG_DECOR
@@ -56,7 +98,7 @@ printf("MacDecorator():Clicked() - Close\n");
 		return DEC_CLOSE;
 	}
 
-	if(_zoomrect.Contains(pt))
+	if(fZoomRect.Contains(pt))
 	{
 
 #ifdef DEBUG_DECOR
@@ -67,16 +109,18 @@ printf("MacDecorator():Clicked() - Zoom\n");
 	}
 	
 	// Clicking in the tab?
-	if(_tabrect.Contains(pt))
+	if(fTabRect.Contains(pt))
 	{
 		// Here's part of our window management stuff
-		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
+		/* TODO This is missing DEC_MOVETOFRONT
+		if(buttons==B_PRIMARY_MOUSE_BUTTON && !IsFocus())
 			return DEC_MOVETOFRONT;
+		*/
 		return DEC_DRAG;
 	}
 
 	// We got this far, so user is clicking on the border?
-	BRect srect(_frame);
+	BRect srect(fFrame);
 	srect.top+=19;
 	BRect clientrect(srect.InsetByCopy(3,3));
 	if(srect.Contains(pt) && !clientrect.Contains(pt))
@@ -99,38 +143,38 @@ void MacDecorator::_DoLayout(void)
 #ifdef DEBUG_DECOR
 printf("MacDecorator()::_DoLayout()\n");
 #endif
-	_borderrect=_frame;
-	_borderrect.top+=19;
-	_tabrect=_frame;
+	fBorderRect=fFrame;
+	fBorderRect.top+=19;
+	fTabRect=fFrame;
 
-	_tabrect.bottom=_tabrect.top+19;
+	fTabRect.bottom=fTabRect.top+19;
 
-	_zoomrect=_tabrect;
-	_zoomrect.left=_zoomrect.right-12;
-	_zoomrect.bottom=_zoomrect.top+12;
-	_zoomrect.OffsetBy(-4,4);
+	fZoomRect=fTabRect;
+	fZoomRect.left=fZoomRect.right-12;
+	fZoomRect.bottom=fZoomRect.top+12;
+	fZoomRect.OffsetBy(-4,4);
 	
-	_closerect=_zoomrect;
-	_minimizerect=_zoomrect;
+	fCloseRect=fZoomRect;
+	fMinimizeRect=fZoomRect;
 
-	_closerect.OffsetTo(_tabrect.left+4,_tabrect.top+4);
+	fCloseRect.OffsetTo(fTabRect.left+4,fTabRect.top+4);
 	
-	_zoomrect.OffsetBy(0-(_zoomrect.Width()+4),0);
-	if(GetTitle() && _driver)
+	fZoomRect.OffsetBy(0-(fZoomRect.Width()+4),0);
+	if(Title() && fDrawingEngine)
 	{
-		titlepixelwidth=_driver->StringWidth(GetTitle(),strlen(GetTitle()),&_drawdata);
+		titlepixelwidth=fDrawingEngine->StringWidth(Title(),strlen(Title())/*,&fDrawState*/);
 		
-		if(titlepixelwidth<(_zoomrect.left-_closerect.right-10))
+		if(titlepixelwidth<(fZoomRect.left-fCloseRect.right-10))
 		{
 			// start with offset from closerect.right
-			textoffset=int(((_zoomrect.left-5)-(_closerect.right+5))/2);
+			textoffset=int(((fZoomRect.left-5)-(fCloseRect.right+5))/2);
 			textoffset-=int(titlepixelwidth/2);
 			
-			// now make it the offset from _tabrect.left
-			textoffset+=int(_closerect.right+5-_tabrect.left);
+			// now make it the offset from fTabRect.left
+			textoffset+=int(fCloseRect.right+5-fTabRect.left);
 		}
 		else
-			textoffset=int(_closerect.right)+5;
+			textoffset=int(fCloseRect.right)+5;
 	}
 	else
 	{
@@ -139,41 +183,77 @@ printf("MacDecorator()::_DoLayout()\n");
 	}
 }
 
-void MacDecorator::MoveBy(float x, float y)
-{
-	MoveBy(BPoint(x,y));
-}
-
 void MacDecorator::MoveBy(BPoint pt)
 {
 	// Move all internal rectangles the appropriate amount
-	_frame.OffsetBy(pt);
-	_closerect.OffsetBy(pt);
-	_tabrect.OffsetBy(pt);
-	_borderrect.OffsetBy(pt);
-	_zoomrect.OffsetBy(pt);
-	_minimizerect.OffsetBy(pt);
+	fFrame.OffsetBy(pt);
+	fCloseRect.OffsetBy(pt);
+	fTabRect.OffsetBy(pt);
+	fBorderRect.OffsetBy(pt);
+	fZoomRect.OffsetBy(pt);
+	fMinimizeRect.OffsetBy(pt);
 }
+
+
+void
+MacDecorator::ResizeBy(BPoint pt, BRegion* dirty)
+{
+	// Move all internal rectangles the appropriate amount
+	fFrame.right += pt.x;
+	fFrame.bottom += pt.y;
+
+	fTabRect.right += pt.x;
+	fBorderRect.right += pt.x;
+	fBorderRect.bottom += pt.y;
+	fZoomRect.OffsetBy(pt.x,0);
+	fMinimizeRect.OffsetBy(pt.x,0);
+
+	// handle invalidation of resize rect
+	if (dirty && !(fFlags & B_NOT_RESIZABLE)) {
+		BRect realResizeRect;
+		switch (fLook) {
+			case B_DOCUMENT_WINDOW_LOOK:
+				realResizeRect = fResizeRect;
+				// resize rect at old location
+				dirty->Include(realResizeRect);
+				realResizeRect.OffsetBy(pt);
+				// resize rect at new location
+				dirty->Include(realResizeRect);
+				break;
+			case B_TITLED_WINDOW_LOOK:
+			case B_FLOATING_WINDOW_LOOK:
+			case B_MODAL_WINDOW_LOOK:
+				// resize rect at old location
+				dirty->Include(fBorderRect);
+				fBorderRect.OffsetBy(pt);
+				// resize rect at new location
+				dirty->Include(fBorderRect);
+				break;
+			default:
+				break;
+		}
+	}
+
+	// TODO probably some other layouting stuff here
+}
+
 
 void MacDecorator::_DrawTitle(BRect r)
 {
-	if(GetFocus())
-		_drawdata.SetHighColor(textcol);
+	if(IsFocus())
+		fDrawState.SetHighColor(textcol);
 	else
-		_drawdata.SetHighColor(inactive_textcol);
+		fDrawState.SetHighColor(inactive_textcol);
 		
-	_drawdata.SetLowColor(frame_midcol);
+	fDrawState.SetLowColor(frame_midcol);
 
-	int32 titlecount=_ClipTitle((_zoomrect.left-5)-(_closerect.right+5));
-	BString titlestr=GetTitle();
-	if(titlecount<titlestr.CountChars())
-	{
-		titlestr.Truncate(titlecount-1);
-		titlestr+="...";
-		titlecount+=2;
-	}
-	_driver->DrawString(titlestr.String(),titlecount,
-		BPoint(_tabrect.left+textoffset,_closerect.bottom-1),&_drawdata);
+	fTruncatedTitle = Title();
+	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END,
+		(fZoomRect.left - 5) - (fCloseRect.right + 5));
+	fTruncatedTitleLength = fTruncatedTitle.Length();
+
+	fDrawingEngine->DrawString(fTruncatedTitle,fTruncatedTitleLength,
+		BPoint(fTabRect.left+textoffset,fCloseRect.bottom-1)/*,&fDrawState*/);
 }
 
 void MacDecorator::GetFootprint(BRegion *region)
@@ -184,8 +264,8 @@ void MacDecorator::GetFootprint(BRegion *region)
 	if(!region)
 		return;
 	
-	region->Set(_borderrect);
-	region->Include(_tabrect);
+	region->Set(fBorderRect);
+	region->Include(fTabRect);
 }
 
 void MacDecorator::Draw(BRect update)
@@ -193,12 +273,13 @@ void MacDecorator::Draw(BRect update)
 #ifdef DEBUG_DECOR
 printf("MacDecorator::Draw(): "); update.PrintToStream();
 #endif
+/*
 	// Draw the top view's client area - just a hack :)
-	_driver->FillRect(_borderrect,_colors->document_background);
+	fDrawingEngine->FillRect(fBorderRect,_colors->document_background);
 
-	if(_borderrect.Intersects(update))
-		_driver->FillRect(_borderrect,_colors->document_background);
-	
+	if(fBorderRect.Intersects(update))
+		fDrawingEngine->FillRect(fBorderRect,_colors->document_background);
+*/	
 	_DrawFrame(update);
 	_DrawTab(update);
 }
@@ -211,10 +292,10 @@ printf("MacDecorator::Draw()\n");
 
 	// Draw the top view's client area - just a hack :)
 //	RGBColor blue(100,100,255);
-//	_drawdata.SetHighColor(blue);
+//	fDrawState.SetHighColor(blue);
 
-	_driver->FillRect(_borderrect,_colors->document_background);
-	_driver->FillRect(_borderrect,_colors->document_background);
+//	fDrawingEngine->FillRect(fBorderRect,_colors->document_background);
+//	fDrawingEngine->FillRect(fBorderRect,_colors->document_background);
 	DrawFrame();
 
 	DrawTab();
@@ -230,26 +311,26 @@ void MacDecorator::_DrawZoom(BRect r)
 	BPoint pt(r.LeftTop()),pt2(r.RightTop());
 	
 	pt2.x--;
-	_drawdata.SetHighColor(RGBColor(136,136,136));
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(136,136,136));
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.y--;
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 	
 	pt=r.RightBottom();
 	pt2=r.RightTop();
 	pt2.y++;
-	_drawdata.SetHighColor(RGBColor(255,255,255));
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(255,255,255));
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 
 	rect.InsetBy(1,1);
-	_drawdata.SetHighColor(RGBColor(0,0,0));
-	_driver->StrokeRect(rect,_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(0,0,0));
+	fDrawingEngine->StrokeRect(rect,fDrawState.HighColor());
 	
 	rect.InsetBy(1,1);
 	DrawBlendedRect(rect,down);
@@ -260,8 +341,8 @@ void MacDecorator::_DrawZoom(BRect r)
 	rect.left--;
 	rect.right++;
 	
-	_drawdata.SetHighColor(RGBColor(0,0,0));
-	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(0,0,0));
+	fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightTop(),fDrawState.HighColor());
 }
 
 void MacDecorator::_DrawClose(BRect r)
@@ -274,26 +355,26 @@ void MacDecorator::_DrawClose(BRect r)
 	BPoint pt(r.LeftTop()),pt2(r.RightTop());
 	
 	pt2.x--;
-	_drawdata.SetHighColor(RGBColor(136,136,136));
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(136,136,136));
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.y--;
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 	
 	pt=r.RightBottom();
 	pt2=r.RightTop();
 	pt2.y++;
-	_drawdata.SetHighColor(RGBColor(255,255,255));
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(255,255,255));
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 
 	rect.InsetBy(1,1);
-	_drawdata.SetHighColor(RGBColor(0,0,0));
-	_driver->StrokeRect(rect,_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(0,0,0));
+	fDrawingEngine->StrokeRect(rect,fDrawState.HighColor());
 	
 	rect.InsetBy(1,1);
 	DrawBlendedRect(rect,down);
@@ -304,8 +385,8 @@ void MacDecorator::_DrawClose(BRect r)
 //	rect.left++;
 //	rect.right--;
 	
-//	_drawdata.SetHighColor(RGBColor(0,0,0));
-//	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_drawdata,pat_solidhigh);
+//	fDrawState.SetHighColor(RGBColor(0,0,0));
+//	fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightTop(),&fDrawState,pat_solidhigh);
 }
 
 void MacDecorator::_DrawMinimize(BRect r)
@@ -318,26 +399,26 @@ void MacDecorator::_DrawMinimize(BRect r)
 	BPoint pt(r.LeftTop()),pt2(r.RightTop());
 	
 	pt2.x--;
-	_drawdata.SetHighColor(RGBColor(136,136,136));
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(136,136,136));
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.y--;
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 	
 	pt=r.RightBottom();
 	pt2=r.RightTop();
 	pt2.y++;
-	_drawdata.SetHighColor(RGBColor(255,255,255));
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(255,255,255));
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+	fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 
 	rect.InsetBy(1,1);
-	_drawdata.SetHighColor(RGBColor(0,0,0));
-	_driver->StrokeRect(rect,_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(0,0,0));
+	fDrawingEngine->StrokeRect(rect,fDrawState.HighColor());
 	
 	rect.InsetBy(1,1);
 	DrawBlendedRect(rect,down);
@@ -348,83 +429,83 @@ void MacDecorator::_DrawMinimize(BRect r)
 	rect.bottom-=4;
 	rect.InsetBy(-2,0);
 	
-	_drawdata.SetHighColor(RGBColor(0,0,0));
-	_driver->StrokeRect(rect,_drawdata.HighColor());
+	fDrawState.SetHighColor(RGBColor(0,0,0));
+	fDrawingEngine->StrokeRect(rect,fDrawState.HighColor());
 }
 
 void MacDecorator::_DrawTab(BRect r)
 {
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
-	if(_look==B_NO_BORDER_WINDOW_LOOK)
+	if(fLook==B_NO_BORDER_WINDOW_LOOK)
 		return;
 	
-//	_drawdata.SetHighColor(frame_lowcol);
-//	_driver->StrokeRect(_tabrect,_drawdata.HighColor());
+//	fDrawState.SetHighColor(frame_lowcol);
+//	fDrawingEngine->StrokeRect(fTabRect,fDrawState.HighColor());
 
 //	UpdateTitle(layer->name->String());
-	BRect rect(_tabrect);
-	_drawdata.SetHighColor(RGBColor(frame_midcol));
-	_driver->FillRect(rect,frame_midcol);
+	BRect rect(fTabRect);
+	fDrawState.SetHighColor(RGBColor(frame_midcol));
+	fDrawingEngine->FillRect(rect,frame_midcol);
 	
 	
-	if(GetFocus())
+	if(IsFocus())
 	{
-		_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),frame_lowercol);
-		_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),frame_lowercol);
-		_driver->StrokeLine(rect.RightBottom(),rect.RightTop(),frame_lowercol);
+		fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightTop(),frame_lowercol);
+		fDrawingEngine->StrokeLine(rect.LeftTop(),rect.LeftBottom(),frame_lowercol);
+		fDrawingEngine->StrokeLine(rect.RightBottom(),rect.RightTop(),frame_lowercol);
 	
 		rect.InsetBy(1,1);
 		rect.bottom++;
 		
-		_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),frame_highcol);
-		_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),frame_highcol);
-		_driver->StrokeLine(rect.RightBottom(),rect.RightTop(),frame_lowcol);
+		fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightTop(),frame_highcol);
+		fDrawingEngine->StrokeLine(rect.LeftTop(),rect.LeftBottom(),frame_highcol);
+		fDrawingEngine->StrokeLine(rect.RightBottom(),rect.RightTop(),frame_lowcol);
 		
 		// Draw the neat little lines on either side of the title if there's room
-		if((_tabrect.left+textoffset)>(_closerect.right+5))
+		if((fTabRect.left+textoffset)>(fCloseRect.right+5))
 		{
 			// Left side
 
-			BPoint pt(_closerect.right+5,_closerect.top),
-				pt2(_tabrect.left+textoffset-5,_closerect.top);
-			_drawdata.SetHighColor(RGBColor(frame_highcol));
+			BPoint pt(fCloseRect.right+5,fCloseRect.top),
+				pt2(fTabRect.left+textoffset-5,fCloseRect.top);
+			fDrawState.SetHighColor(RGBColor(frame_highcol));
 			for(int32 i=0;i<6;i++)
 			{
-				_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+				fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 				pt.y+=2;
 				pt2.y+=2;
 			}
 			
-			pt.Set(_closerect.right+6,_closerect.top+1),
-				pt2.Set(_tabrect.left+textoffset-4,_closerect.top+1);
-			_drawdata.SetHighColor(RGBColor(frame_lowcol));
+			pt.Set(fCloseRect.right+6,fCloseRect.top+1),
+				pt2.Set(fTabRect.left+textoffset-4,fCloseRect.top+1);
+			fDrawState.SetHighColor(RGBColor(frame_lowcol));
 			for(int32 i=0;i<6;i++)
 			{
-				_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+				fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 				pt.y+=2;
 				pt2.y+=2;
 			}
 			
 			// Right side
 			
-			pt.Set(_tabrect.left+textoffset+titlepixelwidth+6,_zoomrect.top),
-				pt2.Set(_zoomrect.left-6,_zoomrect.top);
+			pt.Set(fTabRect.left+textoffset+titlepixelwidth+6,fZoomRect.top),
+				pt2.Set(fZoomRect.left-6,fZoomRect.top);
 			if(pt.x<pt2.x)
 			{
-				_drawdata.SetHighColor(RGBColor(frame_highcol));
+				fDrawState.SetHighColor(RGBColor(frame_highcol));
 				for(int32 i=0;i<6;i++)
 				{
-					_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+					fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 					pt.y+=2;
 					pt2.y+=2;
 				}
-				pt.Set(_tabrect.left+textoffset+titlepixelwidth+7,_zoomrect.top+1),
-					pt2.Set(_zoomrect.left-5,_zoomrect.top+1);
-				_drawdata.SetHighColor(frame_lowcol);
+				pt.Set(fTabRect.left+textoffset+titlepixelwidth+7,fZoomRect.top+1),
+					pt2.Set(fZoomRect.left-5,fZoomRect.top+1);
+				fDrawState.SetHighColor(frame_lowcol);
 				for(int32 i=0;i<6;i++)
 				{
-					_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
+					fDrawingEngine->StrokeLine(pt,pt2,fDrawState.HighColor());
 					pt.y+=2;
 					pt2.y+=2;
 				}
@@ -432,66 +513,72 @@ void MacDecorator::_DrawTab(BRect r)
 		}
 		
 		// Draw the buttons if we're supposed to	
-		if(!(_flags & B_NOT_CLOSABLE))
-			_DrawClose(_closerect);
-		if(!(_flags & B_NOT_ZOOMABLE))
-			_DrawZoom(_zoomrect);
+		if(!(fFlags & B_NOT_CLOSABLE))
+			_DrawClose(fCloseRect);
+		if(!(fFlags & B_NOT_ZOOMABLE))
+			_DrawZoom(fZoomRect);
 	}
 	
 }
 
 void MacDecorator::DrawBlendedRect(BRect r, bool down)
 {
-	// This bad boy is used to draw a rectangle with a gradient.
-	// Note that it is not part of the Decorator API - it's specific
-	// to just the BeDecorator. Called by DrawZoom and DrawClose
+	BRect r1 = r;
+	BRect r2 = r;
 
-	// Actually just draws a blended square
+	r1.left += 1.0;
+	r1.top  += 1.0;
 
-	rgb_color tmpcol,halfcol, startcol, endcol;
-	float rstep,gstep,bstep,i;
+	r2.bottom -= 1.0;
+	r2.right  -= 1.0;
 
-	BRect rect(r);
+	// TODO: replace these with cached versions? does R5 use different colours?
+	RGBColor tabColorLight = RGBColor(tint_color(tab_col.GetColor32(),B_LIGHTEN_2_TINT));
+	RGBColor tabColorShadow = RGBColor(tint_color(tab_col.GetColor32(),B_DARKEN_2_TINT));
 
-	if(down)
-	{
-		startcol=button_lowcol.GetColor32();
-		endcol=button_highcol.GetColor32();
+	int32 w = r.IntegerWidth();
+	int32 h = r.IntegerHeight();
+
+	RGBColor temprgbcol;
+	rgb_color halfColor, startColor, endColor;
+	float rstep, gstep, bstep;
+
+	int steps = w < h ? w : h;
+
+	if (down) {
+		startColor = button_lowcol.GetColor32();
+		endColor = button_highcol.GetColor32();
+	} else {
+		startColor = button_highcol.GetColor32();
+		endColor = button_lowcol.GetColor32();
 	}
-	else
-	{
-		startcol=button_highcol.GetColor32();
-		endcol=button_lowcol.GetColor32();
+
+	halfColor = make_blend_color(startColor, endColor, 0.5);
+
+	rstep = float(startColor.red - halfColor.red) / steps;
+	gstep = float(startColor.green - halfColor.green) / steps;
+	bstep = float(startColor.blue - halfColor.blue) / steps;
+
+	for (int32 i = 0; i <= steps; i++) {
+		temprgbcol.SetColor(uint8(startColor.red - (i * rstep)),
+							uint8(startColor.green - (i * gstep)),
+							uint8(startColor.blue - (i * bstep)));
+
+		fDrawingEngine->StrokeLine(BPoint(r.left, r.top + i),
+							BPoint(r.left + i, r.top), temprgbcol);
+
+		temprgbcol.SetColor(uint8(halfColor.red - (i * rstep)),
+							uint8(halfColor.green - (i * gstep)),
+							uint8(halfColor.blue - (i * bstep)));
+
+		fDrawingEngine->StrokeLine(BPoint(r.left + steps, r.top + i),
+							BPoint(r.left + i, r.top + steps), temprgbcol);
 	}
-	
-	int32 w=rect.IntegerWidth(),  h=rect.IntegerHeight();
-	int steps=(w<h)?w:h;
-	
-	halfcol=MakeBlendColor(startcol,endcol,0.5);
 
-	rstep=float(startcol.red-halfcol.red)/steps;
-	gstep=float(startcol.green-halfcol.green)/steps;
-	bstep=float(startcol.blue-halfcol.blue)/steps;
-
-	for(i=0;i<=steps; i++)
-	{
-		SetRGBColor(&tmpcol, uint8(startcol.red-(i*rstep)),
-			uint8(startcol.green-(i*gstep)),
-			uint8(startcol.blue-(i*bstep)));
-		_drawdata.SetHighColor(tmpcol);
-
-		_driver->StrokeLine(BPoint(rect.left,rect.top+i),
-			BPoint(rect.left+i,rect.top),_drawdata.HighColor());
-
-		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
-			uint8(halfcol.green-(i*gstep)),
-			uint8(halfcol.blue-(i*bstep)) );
-		_drawdata.SetHighColor(tmpcol);
-
-		_driver->StrokeLine(BPoint(rect.left+steps,rect.top+i),
-			BPoint(rect.left+i,rect.top+steps),_drawdata.HighColor());
-
-	}
+	// draw bevelling effect on box
+	fDrawingEngine->StrokeRect(r2, tabColorShadow); // inner dark box
+	fDrawingEngine->StrokeRect(r,  tabColorShadow); // outer dark box
+	fDrawingEngine->StrokeRect(r1, tabColorLight);  // light box
 }
 
 /*
@@ -502,78 +589,78 @@ void MacDecorator::_SetColors(void)
 */
 void MacDecorator::_DrawFrame(BRect rect)
 {
-	if(_look==B_NO_BORDER_WINDOW_LOOK)
+	if(fLook==B_NO_BORDER_WINDOW_LOOK)
 		return;
 
-	BRect r=_borderrect;
+	BRect r=fBorderRect;
 	BPoint pt,pt2,topleftpt,toprightpt;
 	
 	pt=r.LeftTop();
 	pt2=r.LeftBottom();
 
 	// Draw the left side of the frame
-	_driver->StrokeLine(pt,pt2,frame_lowercol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_lowercol);
 	pt.x++;
 	pt2.x++;
 	pt2.y--;
 	
-	_driver->StrokeLine(pt,pt2,frame_highcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_highcol);
 	pt.x++;
 	pt2.x++;
 	pt2.y--;
 	
-	_driver->StrokeLine(pt,pt2,frame_midcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_midcol);
 	pt.x++;
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,frame_midcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_midcol);
 	pt.x++;
 	pt2.x++;
 	pt2.y--;
 
-	_driver->StrokeLine(pt,pt2,frame_lowcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_lowcol);
 	pt.x++;
 	pt.y+=2;
 	topleftpt=pt;
 	pt2.x++;
 	pt2.y--;
 
-	_driver->StrokeLine(pt,pt2,frame_lowercol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_lowercol);
 
 
 	pt=r.RightTop();
 	pt2=r.RightBottom();
 	
 	// Draw the right side of the frame
-	_driver->StrokeLine(pt,pt2,frame_lowercol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_lowercol);
 	pt.x--;
 	pt2.x--;
 
-	_driver->StrokeLine(pt,pt2,frame_lowcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_lowcol);
 	pt.x--;
 	pt2.x--;
 
-	_driver->StrokeLine(pt,pt2,frame_midcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_midcol);
 	pt.x--;
 	pt2.x--;
-	_driver->StrokeLine(pt,pt2,frame_midcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_midcol);
 	pt.x--;
 	pt2.x--;
 
-	_driver->StrokeLine(pt,pt2,frame_highcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_highcol);
 	pt.x--;
 	pt.y+=2;
 	toprightpt=pt;
 	pt2.x--;
 	
-	_driver->StrokeLine(pt,pt2,frame_lowercol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_lowercol);
 
 	// Draw the top side of the frame that is not in the tab
-	_driver->StrokeLine(topleftpt,toprightpt,frame_lowercol);
+	fDrawingEngine->StrokeLine(topleftpt,toprightpt,frame_lowercol);
 	topleftpt.y--;
 	toprightpt.x++;
 	toprightpt.y--;
 
-	_driver->StrokeLine(topleftpt,toprightpt,frame_lowcol);
+	fDrawingEngine->StrokeLine(topleftpt,toprightpt,frame_lowcol);
 	
 	pt=r.RightTop();
 	pt2=r.RightBottom();
@@ -583,37 +670,37 @@ void MacDecorator::_DrawFrame(BRect rect)
 	pt2=r.RightBottom();
 	
 	// Draw the bottom side of the frame
-	_driver->StrokeLine(pt,pt2,frame_lowercol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_lowercol);
 	pt.x++;
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
 
-	_driver->StrokeLine(pt,pt2,frame_lowcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_lowcol);
 	pt.x++;
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
 
-	_driver->StrokeLine(pt,pt2,frame_midcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_midcol);
 	pt.x++;
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
 
-	_driver->StrokeLine(pt,pt2,frame_midcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_midcol);
 	pt.x++;
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
 
-	_driver->StrokeLine(pt,pt2,frame_highcol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_highcol);
 	pt.x+=2;
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
 	
-	_driver->StrokeLine(pt,pt2,frame_lowercol);
+	fDrawingEngine->StrokeLine(pt,pt2,frame_lowercol);
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
@@ -624,7 +711,9 @@ extern "C" float get_decorator_version(void)
 	return 1.00;
 }
 
-extern "C" Decorator *instantiate_decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
+
+extern "C" Decorator *(instantiate_decorator)(DesktopSettings &desktopSetting, BRect rec,
+										window_look loo, uint32 flag)
 {
-	return (new MacDecorator(rect,wlook,wfeel,wflags));
+	return (new MacDecorator(desktopSetting, rec, loo, flag));
 }

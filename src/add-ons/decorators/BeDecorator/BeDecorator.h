@@ -19,10 +19,10 @@ class Desktop;
 
 class BeDecorator: public Decorator {
  public:
-								BeDecorator(DesktopSettings& settings,
-												 BRect frame,
-												 window_look look,
-												 uint32 flags);
+					BeDecorator(DesktopSettings& settings,
+						BRect frame,
+						window_look look,
+						uint32 flags);
 	virtual						~BeDecorator();
 
 	virtual	void				SetTitle(const char* string,
