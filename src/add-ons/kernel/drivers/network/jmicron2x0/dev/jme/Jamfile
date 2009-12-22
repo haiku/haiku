@@ -9,6 +9,10 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : tr
 UsePrivateHeaders net ;
 UsePrivateKernelHeaders ;
 
+# Enabling C++ structures in C only code
+Includes [ FGristFiles kernel_c++_structs.h ]
+	: <src!system!kernel>kernel_c++_struct_sizes.h ;
+
 SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 
 KernelAddon jmicron2x0 :
