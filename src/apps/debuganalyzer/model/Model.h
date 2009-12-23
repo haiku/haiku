@@ -193,6 +193,15 @@ struct Model::IOOperation {
 
 	static inline int			CompareByTime(const IOOperation* a,
 									const IOOperation* b);
+
+	inline	nanotime_t			StartedTime() const;
+	inline	nanotime_t			FinishedTime() const;
+	inline	bool				IsFinished() const;
+	inline	off_t				Offset() const;
+	inline	size_t				Length() const;
+	inline	bool				IsWrite() const;
+	inline	status_t			Status() const;
+	inline	size_t				BytesTransferred() const;
 };
 
 
@@ -202,6 +211,14 @@ struct Model::IORequest {
 	size_t									operationCount;
 	IOOperation								operations[0];
 
+								IORequest(
+									system_profiler_io_request_scheduled*
+										scheduledEvent,
+									system_profiler_io_request_finished*
+										finishedEvent,
+									size_t operationCount);
+								~IORequest();
+
 	static	IORequest*			Create(
 									system_profiler_io_request_scheduled*
 										scheduledEvent,
@@ -210,19 +227,24 @@ struct Model::IORequest {
 									size_t operationCount);
 			void				Delete();
 
+	inline	nanotime_t			ScheduledTime() const;
+	inline	nanotime_t			FinishedTime() const;
+	inline	bool				IsFinished() const;
+	inline	int32				Scheduler() const;
+	inline	off_t				Offset() const;
+	inline	size_t				Length() const;
+	inline	bool				IsWrite() const;
+	inline	uint8				Priority() const;
+	inline	status_t			Status() const;
+	inline	size_t				BytesTransferred() const;
+
+
 	static inline bool			TimeLess(const IORequest* a,
 									const IORequest* b);
 	static inline bool			SchedulerTimeLess(const IORequest* a,
 									const IORequest* b);
-
-private:
-								IORequest(
-									system_profiler_io_request_scheduled*
-										scheduledEvent,
-									system_profiler_io_request_finished*
-										finishedEvent,
-									size_t operationCount);
-								~IORequest();
+	static inline int			CompareSchedulerTime(const IORequest* a,
+									const IORequest* b);
 };
 
 
@@ -424,6 +446,12 @@ public:
 	inline	size_t				CountIORequests() const;
 			void				SetIORequests(IORequest** requests,
 									size_t requestCount);
+			size_t				ClosestRequestStartIndex(
+									nanotime_t minRequestStartTime) const;
+									// Returns the index of the first request
+									// with a start time >= minRequestStartTime.
+									// minRequestStartTime is absolute, not
+									// base time relative.
 
 	inline	nanotime_t			CreationTime() const;
 	inline	nanotime_t			DeletionTime() const;
@@ -702,6 +730,62 @@ Model::CPU::IdleTime() const
 // #pragma mark - IOOperation
 
 
+nanotime_t
+Model::IOOperation::StartedTime() const
+{
+	return startedEvent->time;
+}
+
+
+nanotime_t
+Model::IOOperation::FinishedTime() const
+{
+	return finishedEvent != NULL ? finishedEvent->time : 0;
+}
+
+
+bool
+Model::IOOperation::IsFinished() const
+{
+	return finishedEvent != NULL;
+}
+
+
+off_t
+Model::IOOperation::Offset() const
+{
+	return startedEvent->offset;
+}
+
+
+size_t
+Model::IOOperation::Length() const
+{
+	return startedEvent->length;
+}
+
+
+bool
+Model::IOOperation::IsWrite() const
+{
+	return startedEvent->write;
+}
+
+
+status_t
+Model::IOOperation::Status() const
+{
+	return finishedEvent != NULL ? finishedEvent->status : B_OK;
+}
+
+
+size_t
+Model::IOOperation::BytesTransferred() const
+{
+	return finishedEvent != NULL ? finishedEvent->transferred : 0;
+}
+
+
 /*static*/ int
 Model::IOOperation::CompareByTime(const IOOperation* a, const IOOperation* b)
 {
@@ -715,6 +799,76 @@ Model::IOOperation::CompareByTime(const IOOperation* a, const IOOperation* b)
 
 
 // #pragma mark - IORequest
+
+
+nanotime_t
+Model::IORequest::ScheduledTime() const
+{
+	return scheduledEvent->time;
+}
+
+
+nanotime_t
+Model::IORequest::FinishedTime() const
+{
+	return finishedEvent != NULL ? finishedEvent->time : 0;
+}
+
+
+bool
+Model::IORequest::IsFinished() const
+{
+	return finishedEvent != NULL;
+}
+
+
+int32
+Model::IORequest::Scheduler() const
+{
+	return scheduledEvent->scheduler;
+}
+
+
+off_t
+Model::IORequest::Offset() const
+{
+	return scheduledEvent->offset;
+}
+
+
+size_t
+Model::IORequest::Length() const
+{
+	return scheduledEvent->length;
+}
+
+
+bool
+Model::IORequest::IsWrite() const
+{
+	return scheduledEvent->write;
+}
+
+
+uint8
+Model::IORequest::Priority() const
+{
+	return scheduledEvent->priority;
+}
+
+
+status_t
+Model::IORequest::Status() const
+{
+	return finishedEvent != NULL ? finishedEvent->status : B_OK;
+}
+
+
+size_t
+Model::IORequest::BytesTransferred() const
+{
+	return finishedEvent != NULL ? finishedEvent->transferred : 0;
+}
 
 
 /*static*/ bool
@@ -732,6 +886,20 @@ Model::IORequest::SchedulerTimeLess(const IORequest* a, const IORequest* b)
 		return cmp < 0;
 
 	return a->scheduledEvent->time < b->scheduledEvent->time;
+}
+
+
+/*static*/ int
+Model::IORequest::CompareSchedulerTime(const IORequest* a, const IORequest* b)
+{
+	int32 cmp = a->scheduledEvent->scheduler - b->scheduledEvent->scheduler;
+	if (cmp != 0)
+		return cmp < 0;
+
+	nanotime_t timeCmp = a->scheduledEvent->time - b->scheduledEvent->time;
+	if (timeCmp == 0)
+		return 0;
+	return timeCmp < 0 ? -1 : 1;
 }
 
 

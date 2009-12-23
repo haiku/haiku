@@ -78,6 +78,22 @@ Model::CPU::SetIdleTime(nanotime_t time)
 // #pragma mark - IORequest
 
 
+Model::IORequest::IORequest(
+	system_profiler_io_request_scheduled* scheduledEvent,
+	system_profiler_io_request_finished* finishedEvent, size_t operationCount)
+	:
+	scheduledEvent(scheduledEvent),
+	finishedEvent(finishedEvent),
+	operationCount(operationCount)
+{
+}
+
+
+Model::IORequest::~IORequest()
+{
+}
+
+
 /*static*/ Model::IORequest*
 Model::IORequest::Create(system_profiler_io_request_scheduled* scheduledEvent,
 	system_profiler_io_request_finished* finishedEvent, size_t operationCount)
@@ -95,22 +111,6 @@ void
 Model::IORequest::Delete()
 {
 	free(this);
-}
-
-
-Model::IORequest::IORequest(
-	system_profiler_io_request_scheduled* scheduledEvent,
-	system_profiler_io_request_finished* finishedEvent, size_t operationCount)
-	:
-	scheduledEvent(scheduledEvent),
-	finishedEvent(finishedEvent),
-	operationCount(operationCount)
-{
-}
-
-
-Model::IORequest::~IORequest()
-{
 }
 
 
@@ -349,6 +349,25 @@ Model::Thread::SetIORequests(IORequest** requests, size_t requestCount)
 {
 	fIORequests = requests;
 	fIORequestCount = requestCount;
+}
+
+
+size_t
+Model::Thread::ClosestRequestStartIndex(nanotime_t minRequestStartTime) const
+{
+	size_t lower = 0;
+	size_t upper = fIORequestCount;
+	while (lower < upper) {
+		size_t mid = (lower + upper) / 2;
+		IORequest* request = fIORequests[mid];
+
+		if (request->ScheduledTime() < minRequestStartTime)
+			lower = mid + 1;
+		else
+			upper = mid;
+	}
+
+	return lower;
 }
 
 
