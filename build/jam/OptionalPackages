@@ -310,8 +310,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 		: $(baseURL)/autoconf-2.65-x86-gcc2-2009-11-28.zip
 		:
 		: true ;
-	InstallOptionalHaikuImagePackage automake-1.11-r1a1-x86-gcc2-2009-08-27
-		: $(baseURL)/automake-1.11-r1a1-x86-gcc2-2009-08-27.zip
+	InstallOptionalHaikuImagePackage automake-1.11.1-x86-gcc2-2009-12-23
+		: $(baseURL)/automake-1.11.1-x86-gcc2-2009-12-23.zip
 		:
 		: true ;
 	InstallOptionalHaikuImagePackage libtool-2.2.6b-x86-gcc2-2009-11-18
