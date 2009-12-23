@@ -776,38 +776,41 @@ public:
 		if (thread == NULL)
 			return false;
 
+		// get the thread's state
 		ThreadState threadState = UNKNOWN;
 		nanotime_t threadStateTime = time;
 		nanotime_t threadStateEndTime = time;
 		Model::ThreadWaitObjectGroup* threadWaitObject = NULL;
-
-		// get the thread's state
 		{
-			const Array<SchedulingEvent>& threadEvents
+			const Array<SchedulingEvent>& events
 				= fSchedulingData.EventsForThread(thread->Index());
-			int32 threadEventCount = threadEvents.Size();
+			int32 eventCount = events.Size();
 
 			int32 lower = 0;
-			int32 upper = threadEventCount - 1;
+			int32 upper = eventCount - 1;
 			while (lower < upper) {
 				int32 mid = (lower + upper + 1) / 2;
-				const SchedulingEvent& event = threadEvents[mid];
+				const SchedulingEvent& event = events[mid];
 				if (event.time > time)
 					upper = mid - 1;
 				else
 					lower = mid;
 			}
 
-			if (lower >= 0 && lower < threadEventCount) {
-				threadState = threadEvents[lower].state;
-				threadStateTime = threadEvents[lower].time;
-				threadWaitObject = threadEvents[lower].waitObject;
-				if (lower + 1 < threadEventCount)
-					threadStateEndTime = threadEvents[lower + 1].time;
+			if (lower >= 0 && lower < eventCount) {
+				threadState = events[lower].state;
+				threadStateTime = events[lower].time;
+				threadWaitObject = events[lower].waitObject;
+				if (lower + 1 < eventCount)
+					threadStateEndTime = events[lower + 1].time;
 				else
 					threadStateEndTime = fModel->LastEventTime();
 			}
 		}
+
+		// get the thread's I/O state
+		BObjectList<Model::IORequest> ioRequests;
+		_GetIORequests(thread, time, ioRequests);
 
 		// find out which threads are running
 		system_profiler_event_header** events = fModel->Events();
@@ -851,9 +854,51 @@ public:
 		} else
 			text << "\n";
 		text << "For: " << format_nanotime(time - threadStateTime) << " of "
-			<< format_nanotime(threadStateEndTime - threadStateTime) << "\n";
+			<< format_nanotime(threadStateEndTime - threadStateTime);
 
-		text << "\n";
+		if (!ioRequests.IsEmpty()) {
+			int32 scheduler;
+			for (int32 i = 0; Model::IORequest* request = ioRequests.ItemAt(i);
+					i++) {
+				if (i == 0 || scheduler != request->Scheduler()) {
+					scheduler = request->Scheduler();
+					text << "\nI/O channel " << scheduler << ":";
+				}
+				text << "\n  " << (request->IsWrite() ? "write" : "read")
+					<< " request: " << request->BytesTransferred() << "/"
+					<< request->Length() << " ";
+				if (request->IsFinished()) {
+					text << (request->Status() == B_OK ? "ok" : "failed");
+					text << ", "
+						<< format_nanotime(
+							request->FinishedTime() - request->ScheduledTime());
+				} else
+					text << "unfinished";
+
+				for (size_t k = 0; k < request->operationCount; k++) {
+					Model::IOOperation& operation = request->operations[k];
+					if (operation.startedEvent->time > fModel->BaseTime() + time
+						|| (operation.IsFinished()
+							&& operation.FinishedTime()
+								<= fModel->BaseTime() + time)) {
+						continue;
+					}
+
+					text << "\n    " << (operation.IsWrite() ? "write" : "read")
+						<< ": " << operation.BytesTransferred() << "/"
+						<< operation.Length() << " ";
+					if (operation.IsFinished()) {
+						text << (request->Status() == B_OK ? "ok" : "failed");
+						text << ", "
+							<< format_nanotime(operation.FinishedTime()
+								- operation.StartedTime());
+					} else
+						text << "unfinished";
+				}
+			}
+		}
+
+		text << "\n\n";
 		text << "Running Threads:";
 		for (int32 i = 0; i < cpuCount; i++) {
 			text << "\n  " << i << ": ";
@@ -1205,6 +1250,76 @@ printf("failed to read event!\n");
 		_thread = fModel->ThreadAt(
 			fFilterModel->SelectedItemAt(LineAt(point)));
 		_time = (nanotime_t)point.x * fNSecsPerPixel;
+	}
+
+	void _GetIORequests(Model::Thread* thread, nanotime_t time,
+		BObjectList<Model::IORequest>& ioRequests)
+	{
+		// find the time in the event data
+		const Array<IOSchedulingEvent>& events
+			= fSchedulingData.IOEventsForThread(thread->Index());
+		int32 eventCount = events.Size();
+
+		int32 lower = 0;
+		int32 upper = eventCount - 1;
+		while (lower < upper) {
+			int32 mid = (lower + upper + 1) / 2;
+			const IOSchedulingEvent& event = events[mid];
+			if (event.time > time)
+				upper = mid - 1;
+			else
+				lower = mid;
+		}
+
+		if (lower < 0 || lower >= eventCount)
+			return;
+
+		if (events[lower].state == IO_SCHEDULING_STATE_IDLE)
+			return;
+
+		// find the beginning and end of the I/O request cluster
+		while (lower > 0) {
+			if (events[lower - 1].state == IO_SCHEDULING_STATE_IDLE)
+				break;
+			lower--;
+		}
+
+		while (upper + 1 < eventCount) {
+			upper++;
+			if (events[upper].state == IO_SCHEDULING_STATE_IDLE)
+				break;
+		}
+
+		nanotime_t startTime = events[lower].time;
+		nanotime_t endTime = events[upper].state == IO_SCHEDULING_STATE_IDLE
+			? events[upper].time : fEndTime;
+
+		// convert to absolute time -- as used by the I/O requests
+		startTime += fModel->BaseTime();
+		endTime += fModel->BaseTime();
+		time += fModel->BaseTime();
+
+		// collect the requests in the range
+		Model::IORequest** requests = thread->IORequests();
+		size_t requestCount = thread->CountIORequests();
+		size_t index = thread->ClosestRequestStartIndex(startTime);
+		for (; index < requestCount; index++) {
+			Model::IORequest* request = requests[index];
+
+			if (request->ScheduledTime() >= endTime)
+				break;
+
+			if (request->ScheduledTime() > time
+				|| (request->finishedEvent != NULL
+					&& request->finishedEvent->time <= time)) {
+				continue;
+			}
+
+			ioRequests.AddItem(request);
+		}
+
+		if (ioRequests.CountItems() > 1)
+			ioRequests.SortItems(Model::IORequest::CompareSchedulerTime);
 	}
 
 	float _ScrollOffset() const
