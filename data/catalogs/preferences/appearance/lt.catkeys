@@ -1,4 +1,4 @@
-1	Lithuanian	x-vnd.Haiku-Appearance	959674221
+1	Lithuanian	x-vnd.Haiku-Appearance	3612090060
 Navigation pulse	Colors tab		Išskirto rėmelio žybsniai
 Shadow	Colors tab		Šešėlis
 On	AntialiasingSettingsView		Įjungta
@@ -8,7 +8,7 @@ Shine	Colors tab		Šviesa
 Off	AntialiasingSettingsView		Išjungta
 Antialiasing type:	AntialiasingSettingsView		Glotninimo rūšis:
 Success	Colors tab		Sėkmė
-Inactivewindow tab	Colors tab		Neveikiančio lango antraštė
+Inactive window tab	Colors tab		Neveikiančio lango antraštė
 Failure	Colors tab		Nesėkmė
 Hinting menu	AntialiasingSettingsView		Glodinimas
 Control border	Colors tab		Valdiklių rėmelis
@@ -32,7 +32,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Menu item text	Colors tab		Meniu dėmens tekstas
 Monospaced fonts only	AntialiasingSettingsView		Tik lygiaplotiems rašmenims
 LCD subpixel	AntialiasingSettingsView		Subpikselinis
-Inactivewindow tab text	Colors tab		Neveikiančio lango antraštės tekstas
+Inactive window tab text	Colors tab		Neveikiančio lango antraštės tekstas
 Strong	AntialiasingSettingsView		Stipriai
 Control highlight	Colors tab		Valdiklių apšvietimas
 Control text	Colors tab		Valdiklių tekstas

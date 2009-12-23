@@ -1,4 +1,4 @@
-1	Russian	x-vnd.Haiku-Appearance	959674221
+1	Russian	x-vnd.Haiku-Appearance	3612090060
 Navigation pulse	Colors tab		Навигация Pulse
 Shadow	Colors tab		Тень
 On	AntialiasingSettingsView		Включение
@@ -8,7 +8,7 @@ Shine	Colors tab		Сияние
 Off	AntialiasingSettingsView		Выключение
 Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
 Success	Colors tab		Успех
-Inactivewindow tab	Colors tab		Неактивный
+Inactive window tab	Colors tab		Неактивный
 Failure	Colors tab		Неудача
 Hinting menu	AntialiasingSettingsView		Корректировка (Hinting)
 Control border	Colors tab		Управление границами
@@ -32,7 +32,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Menu item text	Colors tab		Текст пункта меню
 Monospaced fonts only	AntialiasingSettingsView		Для моноширных шрифтов
 LCD subpixel	AntialiasingSettingsView		Настройка попиксельного сглаживания
-Inactivewindow tab text	Colors tab		Неактивный текст табуляции окна
+Inactive window tab text	Colors tab		Неактивный текст табуляции окна
 Strong	AntialiasingSettingsView		Сильный
 Control highlight	Colors tab		Управление выделением
 Control text	Colors tab		Управление текстом

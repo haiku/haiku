@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	959674221
+1	italian	x-vnd.Haiku-Appearance	3612090060
 Navigation pulse	Colors tab		Pulsation de navigation
 Shadow	Colors tab		Ombre
 On	AntialiasingSettingsView		Activé
@@ -8,7 +8,7 @@ Shine	Colors tab		Lumière
 Off	AntialiasingSettingsView		Désactivé
 Antialiasing type:	AntialiasingSettingsView		Type de lissage :
 Success	Colors tab		Réussite
-Inactivewindow tab	Colors tab		Onglet de fenêtre inactive
+Inactive window tab	Colors tab		Onglet de fenêtre inactive
 Failure	Colors tab		Échec
 Hinting menu	AntialiasingSettingsView		Menu hinting
 Control border	Colors tab		Bordure de contrôle
@@ -32,7 +32,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Menu item text	Colors tab		Texte d'entrée de menu
 Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
 LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
-Inactivewindow tab text	Colors tab		Texte d'onglet de fenêtre inactive
+Inactive window tab text	Colors tab		Texte d'onglet de fenêtre inactive
 Strong	AntialiasingSettingsView		Important
 Control highlight	Colors tab		Mise en valeur de contrôle
 Control text	Colors tab		Texte de contrôle

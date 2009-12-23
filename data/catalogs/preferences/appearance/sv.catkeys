@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Appearance	959674221
+1	swedish	x-vnd.Haiku-Appearance	3612090060
 Navigation pulse	Colors tab		Navigeringspuls
 Shadow	Colors tab		Skugga
 On	AntialiasingSettingsView		Aktiv
@@ -8,7 +8,7 @@ Shine	Colors tab		Ljusstyrka
 Off	AntialiasingSettingsView		Inaktiv
 Antialiasing type:	AntialiasingSettingsView		Kantutjämningstyp:
 Success	Colors tab		Framgång
-Inactivewindow tab	Colors tab		Flikfärg för inaktiva fönster
+Inactive window tab	Colors tab		Flikfärg för inaktiva fönster
 Failure	Colors tab		Misslyckande
 Hinting menu	AntialiasingSettingsView		Hinting-meny
 Control border	Colors tab		Kontrollkant
@@ -32,7 +32,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Menu item text	Colors tab		Menyalternativstext
 Monospaced fonts only	AntialiasingSettingsView		Endast teckensnitt med fast bredd
 LCD subpixel	AntialiasingSettingsView		LCD-subpixel
-Inactivewindow tab text	Colors tab		Fliktext för inaktiva fönster
+Inactive window tab text	Colors tab		Fliktext för inaktiva fönster
 Strong	AntialiasingSettingsView		Framhävd
 Control highlight	Colors tab		Framhävd kontroll
 Control text	Colors tab		Kontrolltext

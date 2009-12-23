@@ -11,7 +11,7 @@ Preference Touchpad :
 	;
 
 DoCatalogs Touchpad :
-	x-vnd.Haiku-Appearance
+	x-vnd.Haiku-Touchpad
 	:
 	TouchpadPrefView.cpp
 	main.cpp

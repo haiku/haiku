@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	959674221
+1	finnish	x-vnd.Haiku-Appearance	3612090060
 Navigation pulse	Colors tab		Navigoinnin välke
 Shadow	Colors tab		Varjo
 On	AntialiasingSettingsView		Päällä
@@ -8,7 +8,7 @@ Shine	Colors tab		Hohto
 Off	AntialiasingSettingsView		Pois päältä
 Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa :
 Success	Colors tab		Onnistuminen
-Inactivewindow tab	Colors tab		Epäaktiivisen ikkunakahvan väri
+Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
 Failure	Colors tab		Epäonnistuminen
 Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
 Control border	Colors tab		Kontrollin reuna
@@ -32,7 +32,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Menu item text	Colors tab		Valikkovalinnan teksti
 Monospaced fonts only	AntialiasingSettingsView		Vain monospace fontti
 LCD subpixel	AntialiasingSettingsView		LCD alipikseli
-Inactivewindow tab text	Colors tab		Epäaktiivisen ikkunakahvan tekstin väri
+Inactive window tab text	Colors tab		Epäaktiivisen ikkunakahvan tekstin väri
 Strong	AntialiasingSettingsView		Vahva
 Control highlight	Colors tab		Kontrollin korostus
 Control text	Colors tab		Kontrollin teksti

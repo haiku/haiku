@@ -1,4 +1,4 @@
-1	Japanese	x-vnd.Haiku-Appearance	959674221
+1	Japanese	x-vnd.Haiku-Appearance	3612090060
 Navigation pulse	Colors tab		ナビゲーションの点滅
 Shadow	Colors tab		影
 On	AntialiasingSettingsView		有効
@@ -8,7 +8,7 @@ Shine	Colors tab		光
 Off	AntialiasingSettingsView		無効
 Antialiasing type:	AntialiasingSettingsView		アンチエイリアスのタイプ：
 Success	Colors tab		成功
-Inactivewindow tab	Colors tab		非アクティブウィンドウタブ
+Inactive window tab	Colors tab		非アクティブウィンドウタブ
 Failure	Colors tab		失敗
 Hinting menu	AntialiasingSettingsView		ヒンティングメニュー
 Control border	Colors tab		コントロールの境界
@@ -32,7 +32,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Menu item text	Colors tab		メニュー項目の文字
 Monospaced fonts only	AntialiasingSettingsView		等幅フォントのみ有効
 LCD subpixel	AntialiasingSettingsView		LCD サブピクセル
-Inactivewindow tab text	Colors tab		非アクティブウィンドウタブの文字
+Inactive window tab text	Colors tab		非アクティブウィンドウタブの文字
 Strong	AntialiasingSettingsView		強い
 Control highlight	Colors tab		コントロールのハイライト
 Control text	Colors tab		コントロールの文字

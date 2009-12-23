@@ -1,4 +1,4 @@
-1	ukrainian 	x-vnd.Haiku-Appearance	959674221
+1	ukrainian 	x-vnd.Haiku-Appearance	3612090060
 Navigation pulse	Colors tab		Навігація Pulse
 Shadow	Colors tab		Тінь
 On	AntialiasingSettingsView		Увімкнути
@@ -8,7 +8,7 @@ Shine	Colors tab		Сяйво
 Off	AntialiasingSettingsView		Вимкнути
 Antialiasing type:	AntialiasingSettingsView		Тип зглажування :
 Success	Colors tab		Успіх
-Inactivewindow tab	Colors tab		Неактивний
+Inactive window tab	Colors tab		Неактивний
 Failure	Colors tab		Невдача
 Hinting menu	AntialiasingSettingsView		Натяк меню
 Control border	Colors tab		Керування межею
@@ -32,7 +32,7 @@ Subpixel based anti-aliasing in combination with glyph hinting is not available 
 Menu item text	Colors tab		Текст пункта меню
 Monospaced fonts only	AntialiasingSettingsView		Тільки моноширинні шрифти
 LCD subpixel	AntialiasingSettingsView		Субпіксель LCD
-Inactivewindow tab text	Colors tab		Неактивний текст
+Inactive window tab text	Colors tab		Неактивний текст
 Strong	AntialiasingSettingsView		Сильний
 Control highlight	Colors tab		Керування виділенням
 Control text	Colors tab		Керування текстом
