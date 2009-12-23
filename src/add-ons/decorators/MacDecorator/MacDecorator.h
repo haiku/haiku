@@ -19,14 +19,14 @@ public:
 									uint32 flags);
 								~MacDecorator();
 
-	//		void				SetTitle(const char* string,
-	// 								BRegion* updateRegion = NULL);
-	//		void				FontsChanged(DesktopSettings& settings,
-	//								BRegion* updateRegion);
-	// 		void				SetLook(DesktopSettings& settings,
-	//								BRegion* updateRegion = NULL);
-	// 		void				SetFlags(uint32 flags,
-	//								BRegion* updateRegion = NULL);
+			void				SetTitle(const char* string,
+	 								BRegion* updateRegion = NULL);
+			void				FontsChanged(DesktopSettings& settings,
+									BRegion* updateRegion);
+	 		void				SetLook(DesktopSettings& settings, window_look look,
+									BRegion* updateRegion = NULL);
+	 		void				SetFlags(uint32 flags,
+									BRegion* updateRegion = NULL);
 	
 			void				MoveBy(BPoint offset);
 			void 				ResizeBy(BPoint offset, BRegion* dirty);
@@ -59,20 +59,21 @@ protected:
 			void				_DrawMinimize(BRect r);
 
 		// 	void				_SetFocus();
-		//	void				_SetColors();
+			void				_SetColors();
 private:
+			void				_UpdateFont(DesktopSettings& settings);
 			void				_DrawBlendedRect(DrawingEngine* engine,
 									BRect r, bool down);
 
 			rgb_color			fButtonHighColor;
 			rgb_color			fButtonLowColor;
-			rgb_color			fTabColor;
 			rgb_color			frame_highcol;
 			rgb_color			frame_midcol;
 			rgb_color			frame_lowcol;
 			rgb_color			frame_lowercol;
 			rgb_color			fFocusTextColor;
 			rgb_color			fNonFocusTextColor;
+
 			uint64 solidhigh, solidlow;
 
 			BString				fTruncatedTitle;
