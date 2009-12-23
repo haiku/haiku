@@ -24,7 +24,6 @@
 #include <Rect.h>
 #include <View.h>
 
-#include <stdio.h>
 
 //#define DEBUG_DECORATOR
 #ifdef DEBUG_DECORATOR
@@ -98,14 +97,15 @@ BeDecorator::BeDecorator(DesktopSettings& settings, BRect rect,
 	fFrameColors[4].SetColor(152, 152, 152);
 	fFrameColors[5].SetColor(96, 96, 96);
 
-	// Set appropriate colors based on the current focus value. In this case, each decorator
-	// defaults to not having the focus.
+	// Set appropriate colors based on the current focus value. In this case,
+	// each decorator defaults to not having the focus.
 	_SetFocus();
 
 	// Do initial decorator setup
 	_DoLayout();
 
-	// ToDo: if the decorator was created with a frame too small, it should resize itself!
+	// TODO: If the decorator was created with a frame too small, it should
+	// resize itself!
 
 	STRACE(("BeDecorator:\n"));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
@@ -144,8 +144,8 @@ BeDecorator::SetTitle(const char* string, BRegion* updateRegion)
 
 
 void
-BeDecorator::SetLook(DesktopSettings& settings,
-	window_look look, BRegion* updateRegion)
+BeDecorator::SetLook(DesktopSettings& settings,	window_look look,
+	BRegion* updateRegion)
 {
 	// TODO: we could be much smarter about the update region
 
@@ -155,6 +155,8 @@ BeDecorator::SetLook(DesktopSettings& settings,
 		GetFootprint(&extent);
 		updateRegion->Include(&extent);
 	}
+	
+	Decorator::SetLook(settings, look, updateRegion);
 
 	ServerFont font;
 	if (look == B_FLOATING_WINDOW_LOOK || look == kLeftTitledWindowLook) {
@@ -166,10 +168,8 @@ BeDecorator::SetLook(DesktopSettings& settings,
 
 	font.SetFlags(B_FORCE_ANTIALIASING);
 	font.SetSpacing(B_STRING_SPACING);
-	// TODO Make this work...
-	// SetFont(&font);
+	fDrawState.SetFont(font);
 
-	Decorator::SetLook(settings, look, updateRegion);
 	_DoLayout();
 
 	if (updateRegion != NULL) {
@@ -247,7 +247,7 @@ BeDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 			case B_MODAL_WINDOW_LOOK:
 			case kLeftTitledWindowLook:
 				realResizeRect.Set(fRightBorder.right - 22, fBottomBorder.top,
-								   fRightBorder.right - 22, fBottomBorder.bottom - 1);
+					fRightBorder.right - 22, fBottomBorder.bottom - 1);
 				// resize rect at old location
 				dirty->Include(realResizeRect);
 				realResizeRect.OffsetBy(pt);
@@ -255,7 +255,7 @@ BeDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 				dirty->Include(realResizeRect);
 
 				realResizeRect.Set(fRightBorder.left, fBottomBorder.bottom - 22,
-								   fRightBorder.right - 1, fBottomBorder.bottom - 22);
+					fRightBorder.right - 1, fBottomBorder.bottom - 22);
 				// resize rect at old location
 				dirty->Include(realResizeRect);
 				realResizeRect.OffsetBy(pt);
@@ -269,11 +269,11 @@ BeDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 
 	fResizeRect.OffsetBy(pt);
 
-	fBorderRect.right	+= pt.x;
-	fBorderRect.bottom	+= pt.y;
+	fBorderRect.right += pt.x;
+	fBorderRect.bottom += pt.y;
 
-	fLeftBorder.bottom	+= pt.y;
-	fTopBorder.right	+= pt.x;
+	fLeftBorder.bottom += pt.y;
+	fTopBorder.right += pt.x;
 
 	fRightBorder.OffsetBy(pt.x, 0.0);
 	fRightBorder.bottom	+= pt.y;
@@ -284,22 +284,22 @@ BeDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 	if (dirty) {
 		if (pt.x > 0.0) {
 			BRect t(fRightBorder.left - pt.x, fTopBorder.top,
-					fRightBorder.right, fTopBorder.bottom);
+				fRightBorder.right, fTopBorder.bottom);
 			dirty->Include(t);
 			t.Set(fRightBorder.left - pt.x, fBottomBorder.top,
-				  fRightBorder.right, fBottomBorder.bottom);
+				fRightBorder.right, fBottomBorder.bottom);
 			dirty->Include(t);
 			dirty->Include(fRightBorder);
 		} else if (pt.x < 0.0) {
 			dirty->Include(BRect(fRightBorder.left, fTopBorder.top,
-								 fRightBorder.right, fBottomBorder.bottom));
+				fRightBorder.right, fBottomBorder.bottom));
 		}
 		if (pt.y > 0.0) {
 			BRect t(fLeftBorder.left, fLeftBorder.bottom - pt.y,
-					fLeftBorder.right, fLeftBorder.bottom);
+				fLeftBorder.right, fLeftBorder.bottom);
 			dirty->Include(t);
 			t.Set(fRightBorder.left, fRightBorder.bottom - pt.y,
-				  fRightBorder.right, fRightBorder.bottom);
+				fRightBorder.right, fRightBorder.bottom);
 			dirty->Include(t);
 			dirty->Include(fBottomBorder);
 		} else if (pt.y < 0.0) {
@@ -337,7 +337,8 @@ BeDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 
 		if (fLook != kLeftTitledWindowLook && tabSize != fTabRect.Width()) {
 			fTabRect.right = fTabRect.left + tabSize;
-		} else if (fLook == kLeftTitledWindowLook && tabSize != fTabRect.Height()) {
+		} else if (fLook == kLeftTitledWindowLook
+			&& tabSize != fTabRect.Height()) {
 			fTabRect.bottom = fTabRect.top + tabSize;
 		}
 
@@ -374,7 +375,8 @@ BeDecorator::SetTabLocation(float location, BRegion* updateRegion)
 	if (location < 0)
 		location = 0;
 
-	float maxLocation = fRightBorder.right - fLeftBorder.left - fTabRect.Width();
+	float maxLocation
+		= fRightBorder.right - fLeftBorder.left - fTabRect.Width();
 	if (location > maxLocation)
 		location = maxLocation;
 
@@ -433,40 +435,46 @@ BeDecorator::Draw(BRect update)
 
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
+	fDrawingEngine->SetDrawState(&fDrawState);
 
 	_DrawFrame(update);
 	_DrawTab(update);
 }
 
-// Draw
+
 void
 BeDecorator::Draw()
 {
 	// Easy way to draw everything - no worries about drawing only certain
 	// things
+	fDrawingEngine->SetDrawState(&fDrawState);
 
 	_DrawFrame(BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom()));
 	_DrawTab(fTabRect);
 }
 
-// GetSizeLimits
+
 void
 BeDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
-								int32* maxWidth, int32* maxHeight) const
+	int32* maxWidth, int32* maxHeight) const
 {
-	if (fTabRect.IsValid())
-		*minWidth = (int32)roundf(max_c(*minWidth, fMinTabSize - 2 * fBorderWidth));
-	if (fResizeRect.IsValid())
-		*minHeight = (int32)roundf(max_c(*minHeight, fResizeRect.Height() - fBorderWidth));
+	if (fTabRect.IsValid()) {
+		*minWidth = (int32)roundf(max_c(*minWidth,
+			fMinTabSize - 2 * fBorderWidth));
+	}
+	if (fResizeRect.IsValid()) {
+		*minHeight = (int32)roundf(max_c(*minHeight,
+			fResizeRect.Height() - fBorderWidth));
+	}
 }
 
-// GetFootprint
+
 void
-BeDecorator::GetFootprint(BRegion *region)
+BeDecorator::GetFootprint(BRegion* region)
 {
 	STRACE(("BeDecorator: Get Footprint\n"));
 	// This function calculates the decorator's footprint in coordinates
-	// relative to the layer. This is most often used to set a WindowLayer
+	// relative to the view. This is most often used to set a Window
 	// object's visible region.
 	if (!region)
 		return;
@@ -476,9 +484,9 @@ BeDecorator::GetFootprint(BRegion *region)
 	if (fLook == B_NO_BORDER_WINDOW_LOOK)
 		return;
 
+	region->Include(fTopBorder);
 	region->Include(fLeftBorder);
 	region->Include(fRightBorder);
-	region->Include(fTopBorder);
 	region->Include(fBottomBorder);
 
 	if (fLook == B_BORDERED_WINDOW_LOOK)
@@ -489,7 +497,7 @@ BeDecorator::GetFootprint(BRegion *region)
 	if (fLook == B_DOCUMENT_WINDOW_LOOK) {
 		// include the rectangular resize knob on the bottom right
 		region->Include(BRect(fFrame.right - 13.0f, fFrame.bottom - 13.0f,
-							  fFrame.right, fFrame.bottom));
+			fFrame.right, fFrame.bottom));
 	}
 }
 
@@ -499,19 +507,21 @@ BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
 #ifdef DEBUG_DECORATOR
 	printf("BeDecorator: Clicked\n");
-	printf("\tPoint: (%.1f,%.1f)\n", pt.x,pt.y);
+	printf("\tPoint: (%.1f,%.1f)\n", pt.x, pt.y);
 	printf("\tButtons: %ld, Modifiers: 0x%lx\n", buttons, modifiers);
 #endif // DEBUG_DECORATOR
 
-	// TODO: have a real double-click mechanism, ie. take user settings into account
+	// TODO: have a real double-click mechanism, ie. take user settings into
+	// account
 	bigtime_t now = system_time();
 	if (buttons != 0) {
 		fWasDoubleClick = now - fLastClicked < 200000;
 		fLastClicked = now;
 	}
 
-	// In checking for hit test stuff, we start with the smallest rectangles the user might
-	// be clicking on and gradually work our way out into larger rectangles.
+	// In checking for hit test stuff, we start with the smallest rectangles
+	// the user might be clicking on and gradually work our way out into larger
+	// rectangles.
 	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(pt))
 		return DEC_CLOSE;
 
@@ -542,7 +552,7 @@ BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 				|| fLook == B_MODAL_WINDOW_LOOK
 				|| fLook == kLeftTitledWindowLook)) {
 			BRect temp(BPoint(fBottomBorder.right - 18, fBottomBorder.bottom - 18),
-					   fBottomBorder.RightBottom());
+				fBottomBorder.RightBottom());
 			if (temp.Contains(pt))
 				return DEC_RESIZE;
 		}
@@ -551,12 +561,13 @@ BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	}
 
 	if (clicked) {
-		// NOTE: On R5, windows are not moved to back if clicked inside the resize area
-		// with the second mouse button. So we check this after the check above
-		if (buttons == B_SECONDARY_MOUSE_BUTTON)
+		// NOTE: On R5, windows are not moved to back if clicked inside the
+		// resize area with the second mouse button. So we check this after
+		// the check above
+		if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
 			return DEC_MOVETOBACK;
 
-		if (fWasDoubleClick)
+		if (fWasDoubleClick && !(fFlags & B_NOT_MINIMIZABLE))
 			return DEC_MINIMIZE;
 
 		return DEC_DRAG;
@@ -604,21 +615,23 @@ BeDecorator::_DoLayout()
 	if (hasTab) {
 		// distance from one item of the tab bar to another.
 		// In this case the text and close/zoom rects
-		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
-			? 10 : 18;
+		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK
+			|| fLook == kLeftTitledWindowLook) ? 10 : 18;
 
 		font_height fontHeight;
 		fDrawState.Font().GetHeight(fontHeight);
 
 		if (fLook != kLeftTitledWindowLook) {
 			fTabRect.Set(fFrame.left - fBorderWidth,
-				fFrame.top - fBorderWidth - ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
+				fFrame.top - fBorderWidth
+					- ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
 				((fFrame.right - fFrame.left) < 35.0 ?
 					fFrame.left + 35.0 : fFrame.right) + fBorderWidth,
 				fFrame.top - fBorderWidth);
 		} else {
-			fTabRect.Set(fFrame.left - fBorderWidth - ceilf(fontHeight.ascent + fontHeight.descent + 5.0),
-				fFrame.top - fBorderWidth, fFrame.left - fBorderWidth,
+			fTabRect.Set(fFrame.left - fBorderWidth
+				- ceilf(fontHeight.ascent + fontHeight.descent + 5.0),
+					fFrame.top - fBorderWidth, fFrame.left - fBorderWidth,
 				fFrame.bottom + fBorderWidth);
 		}
 
@@ -640,14 +653,15 @@ BeDecorator::_DoLayout()
 			fMinTabSize += offset + size;
 
 		// fMaxTabSize contains fMinWidth + the width required for the title
-		// TODO : check what escapement_delta is supposed to do
-		fMaxTabSize = fDrawingEngine ? ceilf(fDrawingEngine->StringWidth(Title(), strlen(Title())/*,
-			&fDrawState*/)) : 0.0;
+		fMaxTabSize = fDrawingEngine
+			? ceilf(fDrawingEngine->StringWidth(Title(), strlen(Title()),
+				fDrawState.Font())) : 0.0;
 		if (fMaxTabSize > 0.0)
 			fMaxTabSize += fTextOffset;
 		fMaxTabSize += fMinTabSize;
 
-		float tabSize = fLook != kLeftTitledWindowLook ? fFrame.Width() : fFrame.Height();
+		float tabSize = fLook != kLeftTitledWindowLook
+			? fFrame.Width() : fFrame.Height();
 		if (tabSize < fMinTabSize)
 			tabSize = fMinTabSize;
 		if (tabSize > fMaxTabSize)
@@ -691,8 +705,14 @@ BeDecorator::_DoLayout()
 	}
 
 	// calculate resize rect
-	fResizeRect.Set(fBottomBorder.right - 18.0, fBottomBorder.bottom - 18.0,
-					fBottomBorder.right, fBottomBorder.bottom);
+	if (fBorderWidth > 1) {
+		fResizeRect.Set(fBottomBorder.right - 18.0,
+			fBottomBorder.bottom - 18.0, fBottomBorder.right,
+			fBottomBorder.bottom);
+	} else {
+		// no border or one pixel border (menus and such)
+		fResizeRect.Set(0, 0, -1, -1);
+	}
 
 	if (hasTab) {
 		// make sure fTabOffset is within limits and apply it to
@@ -700,8 +720,10 @@ BeDecorator::_DoLayout()
 		if (fTabOffset < 0)
 			fTabOffset = 0;
 		if (fTabLocation != 0.0
-			&& fTabOffset > (fRightBorder.right - fLeftBorder.left - fTabRect.Width()))
-			fTabOffset = uint32(fRightBorder.right - fLeftBorder.left - fTabRect.Width());
+			&& fTabOffset > (fRightBorder.right - fLeftBorder.left
+				- fTabRect.Width()))
+			fTabOffset = uint32(fRightBorder.right - fLeftBorder.left
+				- fTabRect.Width());
 		fTabRect.OffsetBy(fTabOffset, 0);
 
 		// finally, layout the buttons and text within the tab rect
@@ -709,7 +731,7 @@ BeDecorator::_DoLayout()
 	}
 }
 
-// _DrawFrame
+
 void
 BeDecorator::_DrawFrame(BRect invalid)
 {
@@ -736,38 +758,38 @@ BeDecorator::_DrawFrame(BRect invalid)
 			if (invalid.Intersects(fTopBorder)) {
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-										BPoint(r.right - i, r.top + i),
-										fFrameColors[i]);
+						BPoint(r.right - i, r.top + i), fFrameColors[i]);
 				}
 				if (fTabRect.IsValid()) {
-					// grey along the bottom of the tab (overwrites "white" from frame)
-					fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
-										BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
-										fFrameColors[2]);
+					// grey along the bottom of the tab
+					// (overwrites "white" from frame)
+					fDrawingEngine->StrokeLine(
+						BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
+						BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
+						fFrameColors[2]);
 				}
 			}
 			// left
 			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-										BPoint(r.left + i, r.bottom - i),
-										fFrameColors[i]);
+						BPoint(r.left + i, r.bottom - i), fFrameColors[i]);
 				}
 			}
 			// bottom
 			if (invalid.Intersects(fBottomBorder)) {
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
-										BPoint(r.right - i, r.bottom - i),
-										fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+						BPoint(r.right - i, r.bottom - i),
+						fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
 				}
 			}
 			// right
 			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
-										BPoint(r.right - i, r.bottom - i),
-										fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+						BPoint(r.right - i, r.bottom - i),
+						fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
 				}
 			}
 			break;
@@ -780,44 +802,46 @@ BeDecorator::_DrawFrame(BRect invalid)
 			if (invalid.Intersects(fTopBorder)) {
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-										BPoint(r.right - i, r.top + i),
-										fFrameColors[i * 2]);
+						BPoint(r.right - i, r.top + i), fFrameColors[i * 2]);
 				}
 				if (fTabRect.IsValid() && fLook != kLeftTitledWindowLook) {
-					// grey along the bottom of the tab (overwrites "white" from frame)
-					fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
-										BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
-										fFrameColors[2]);
+					// grey along the bottom of the tab
+					// (overwrites "white" from frame)
+					fDrawingEngine->StrokeLine(
+						BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
+						BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
+						fFrameColors[2]);
 				}
 			}
 			// left
 			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-										BPoint(r.left + i, r.bottom - i),
-										fFrameColors[i * 2]);
+						BPoint(r.left + i, r.bottom - i), fFrameColors[i * 2]);
 				}
 				if (fLook == kLeftTitledWindowLook && fTabRect.IsValid()) {
-					// grey along the right side of the tab (overwrites "white" from frame)
-					fDrawingEngine->StrokeLine(BPoint(fTabRect.right + 1, fTabRect.top + 2),
-										BPoint(fTabRect.right + 1, fTabRect.bottom - 2),
-										fFrameColors[2]);
+					// grey along the right side of the tab
+					// (overwrites "white" from frame)
+					fDrawingEngine->StrokeLine(
+						BPoint(fTabRect.right + 1, fTabRect.top + 2),
+						BPoint(fTabRect.right + 1, fTabRect.bottom - 2),
+						fFrameColors[2]);
 				}
 			}
 			// bottom
 			if (invalid.Intersects(fBottomBorder)) {
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
-										BPoint(r.right - i, r.bottom - i),
-										fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+						BPoint(r.right - i, r.bottom - i),
+						fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
 				}
 			}
 			// right
 			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
-										BPoint(r.right - i, r.bottom - i),
-										fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+						BPoint(r.right - i, r.bottom - i),
+						fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
 				}
 			}
 			break;
@@ -860,8 +884,8 @@ BeDecorator::_DrawFrame(BRect invalid)
 
 				for (int8 i = 1; i <= 4; i++) {
 					for (int8 j = 1; j <= i; j++) {
-						BPoint		pt1(x - (3 * j) + 1, y - (3 * (5 - i)) + 1);
-						BPoint		pt2(x - (3 * j) + 2, y - (3 * (5 - i)) + 2);
+						BPoint pt1(x - (3 * j) + 1, y - (3 * (5 - i)) + 1);
+						BPoint pt2(x - (3 * j) + 2, y - (3 * (5 - i)) + 2);
 						fDrawingEngine->StrokePoint(pt1, fFrameColors[0]);
 						fDrawingEngine->StrokePoint(pt2, fFrameColors[1]);
 					}
@@ -875,16 +899,18 @@ BeDecorator::_DrawFrame(BRect invalid)
 			case kLeftTitledWindowLook:
 			{
 				if (!invalid.Intersects(BRect(fRightBorder.right - 22,
-						fBottomBorder.bottom - 22, fRightBorder.right - 1,
-						fBottomBorder.bottom - 1)))
+					fBottomBorder.bottom - 22, fRightBorder.right - 1,
+					fBottomBorder.bottom - 1)))
 					break;
 
-				fDrawingEngine->StrokeLine(BPoint(fRightBorder.left, fBottomBorder.bottom - 22),
-									BPoint(fRightBorder.right - 1, fBottomBorder.bottom - 22),
-									fFrameColors[0]);
-				fDrawingEngine->StrokeLine(BPoint(fRightBorder.right - 22, fBottomBorder.top),
-									BPoint(fRightBorder.right - 22, fBottomBorder.bottom - 1),
-									fFrameColors[0]);
+				fDrawingEngine->StrokeLine(
+					BPoint(fRightBorder.left, fBottomBorder.bottom - 22),
+					BPoint(fRightBorder.right - 1, fBottomBorder.bottom - 22),
+					fFrameColors[0]);
+				fDrawingEngine->StrokeLine(
+					BPoint(fRightBorder.right - 22, fBottomBorder.top),
+					BPoint(fRightBorder.right - 22, fBottomBorder.bottom - 1),
+					fFrameColors[0]);
 				break;
 			}
 
@@ -895,7 +921,7 @@ BeDecorator::_DrawFrame(BRect invalid)
 	}
 }
 
-// _DrawTab
+
 void
 BeDecorator::_DrawTab(BRect invalid)
 {
@@ -911,26 +937,34 @@ BeDecorator::_DrawTab(BRect invalid)
 	RGBColor tabColorShadow = RGBColor(tint_color(fTabColor.GetColor32(),B_DARKEN_2_TINT));
 
 	// outer frame
-	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(), fFrameColors[0]);
-	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.RightTop(), fFrameColors[0]);
-	if (fLook != kLeftTitledWindowLook)
-		fDrawingEngine->StrokeLine(fTabRect.RightTop(),fTabRect.RightBottom(), fFrameColors[5]);
-	else
-		fDrawingEngine->StrokeLine(fTabRect.LeftBottom(),fTabRect.RightBottom(), fFrameColors[5]);
+	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(),
+		fFrameColors[0]);
+	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.RightTop(),
+		fFrameColors[0]);
+	if (fLook != kLeftTitledWindowLook) {
+		fDrawingEngine->StrokeLine(fTabRect.RightTop(), fTabRect.RightBottom(),
+			fFrameColors[5]);
+	} else {
+		fDrawingEngine->StrokeLine(fTabRect.LeftBottom(),
+			fTabRect.RightBottom(), fFrameColors[5]);
+	}
 
 	// bevel
 	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
-		BPoint(fTabRect.left + 1, fTabRect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
+		BPoint(fTabRect.left + 1,
+			fTabRect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
 		tabColorLight);
 	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
-		BPoint(fTabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1), fTabRect.top + 1),
+		BPoint(fTabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1),
+			fTabRect.top + 1),
 		tabColorLight);
 
 	if (fLook != kLeftTitledWindowLook) {
 		fDrawingEngine->StrokeLine(BPoint(fTabRect.right - 1, fTabRect.top + 2),
 			BPoint(fTabRect.right - 1, fTabRect.bottom), tabColorShadow);
 	} else {
-		fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 2, fTabRect.bottom - 1),
+		fDrawingEngine->StrokeLine(
+			BPoint(fTabRect.left + 2, fTabRect.bottom - 1),
 			BPoint(fTabRect.right, fTabRect.bottom - 1), tabColorShadow);
 	}
 
@@ -952,7 +986,7 @@ BeDecorator::_DrawTab(BRect invalid)
 		_DrawZoom(fZoomRect);
 }
 
-// _DrawClose
+
 void
 BeDecorator::_DrawClose(BRect r)
 {
@@ -961,14 +995,16 @@ BeDecorator::_DrawClose(BRect r)
 	_DrawBlendedRect(r, GetClose());
 }
 
-// _DrawTitle
+
 void
 BeDecorator::_DrawTitle(BRect r)
 {
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 
-	fDrawState.SetHighColor(fTextColor);
-	fDrawState.SetLowColor(fTabColor);
+	fDrawingEngine->SetDrawingMode(B_OP_OVER);
+	fDrawingEngine->SetHighColor(fTextColor);
+	fDrawingEngine->SetLowColor(fTabColor);
+	fDrawingEngine->SetFont(fDrawState.Font());
 
 	// figure out position of text
 	font_height fontHeight;
@@ -978,19 +1014,24 @@ BeDecorator::_DrawTitle(BRect r)
 	if (fLook != kLeftTitledWindowLook) {
 		titlePos.x = fCloseRect.IsValid() ? fCloseRect.right + fTextOffset
 			: fTabRect.left + fTextOffset;
-		titlePos.y = floorf(((fTabRect.top + 2.0) + fTabRect.bottom + fontHeight.ascent
-			+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
+		titlePos.y = floorf(((fTabRect.top + 2.0) + fTabRect.bottom
+			+ fontHeight.ascent + fontHeight.descent) / 2.0
+			- fontHeight.descent + 0.5);
 	} else {
-		titlePos.x = floorf(((fTabRect.left + 2.0) + fTabRect.right + fontHeight.ascent
-			+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
+		titlePos.x = floorf(((fTabRect.left + 2.0) + fTabRect.right
+			+ fontHeight.ascent + fontHeight.descent) / 2.0
+			- fontHeight.descent + 0.5);
 		titlePos.y = fZoomRect.IsValid() ? fZoomRect.top - fTextOffset
 			: fTabRect.bottom - fTextOffset;
 	}
 
-	fDrawingEngine->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength, titlePos/*, &fDrawState*/);
+	fDrawingEngine->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength,
+		titlePos);
+
+	fDrawingEngine->SetDrawingMode(B_OP_COPY);
 }
 
-// _DrawZoom
+
 void
 BeDecorator::_DrawZoom(BRect r)
 {
@@ -1009,14 +1050,15 @@ BeDecorator::_DrawZoom(BRect r)
 	_DrawBlendedRect(zr, GetZoom());
 }
 
-// _SetFocus
+
 void
 BeDecorator::_SetFocus()
 {
 	// SetFocus() performs necessary duties for color swapping and
 	// other things when a window is deactivated or activated.
 
-	if (IsFocus() || ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
+	if (IsFocus()
+		|| ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
 			&& (fFlags & B_AVOID_FOCUS) != 0)) {
 		fTabColor = UIColor(B_WINDOW_TAB_COLOR);
 		fTextColor = UIColor(B_WINDOW_TEXT_COLOR);
@@ -1044,7 +1086,7 @@ BeDecorator::_SetFocus()
 	}
 }
 
-// _SetColors
+
 void
 BeDecorator::_SetColors()
 {
@@ -1168,7 +1210,7 @@ BeDecorator::_LayoutTabItems(const BRect& tabRect)
 	}
 
 	// calculate room for title
-	// ToDo: the +2 is there because the title often appeared
+	// TODO: the +2 is there because the title often appeared
 	//	truncated for no apparent reason - OTOH the title does
 	//	also not appear perfectly in the middle
 	if (fLook != kLeftTitledWindowLook)

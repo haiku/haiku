@@ -1,8 +1,6 @@
 #include <Point.h>
 #include "DrawingEngine.h"
 #include <View.h>
-//#include "LayerData.h"
-//#include "ColorUtils.h"
 #include "MacDecorator.h"
 #include "RGBColor.h"
 #include "PatternHandler.h"
