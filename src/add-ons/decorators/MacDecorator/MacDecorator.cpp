@@ -172,36 +172,16 @@ MacDecorator::ResizeBy(BPoint offset, BRegion* dirty)
 	fTabRect.right += offset.x;
 	fBorderRect.right += offset.x;
 	fBorderRect.bottom += offset.y;
-	fZoomRect.OffsetBy(offset.x,0);
-	fMinimizeRect.OffsetBy(offset.x,0);
-
-	// handle invalidation of resize rect
-	if (dirty && !(fFlags & B_NOT_RESIZABLE)) {
-		BRect realResizeRect;
-		switch (fLook) {
-			case B_DOCUMENT_WINDOW_LOOK:
-				realResizeRect = fResizeRect;
-				// resize rect at old location
-				dirty->Include(realResizeRect);
-				realResizeRect.OffsetBy(offset);
-				// resize rect at new location
-				dirty->Include(realResizeRect);
-				break;
-			case B_TITLED_WINDOW_LOOK:
-			case B_FLOATING_WINDOW_LOOK:
-			case B_MODAL_WINDOW_LOOK:
-				// resize rect at old location
-				dirty->Include(fBorderRect);
-				fBorderRect.OffsetBy(offset);
-				// resize rect at new location
-				dirty->Include(fBorderRect);
-				break;
-			default:
-				break;
-		}
+	// fZoomRect.OffsetBy(offset.x,0);
+	// fMinimizeRect.OffsetBy(offset.x,0);
+	if (dirty) {
+		dirty->Include(fTabRect);
+		dirty->Include(fBorderRect);
 	}
 
+
 	// TODO probably some other layouting stuff here
+	_DoLayout();
 }
 
 // settablocation
@@ -282,14 +262,11 @@ MacDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 	}
 
 	// We got this far, so user is clicking on the border?
-	BRect srect(fFrame);
-	srect.top+=19;
-	BRect clientrect(srect.InsetByCopy(3,3));
 	if (!(fFlags & B_NOT_RESIZABLE)
 		&& (fLook == B_TITLED_WINDOW_LOOK
 			|| fLook == B_FLOATING_WINDOW_LOOK
 			|| fLook == B_MODAL_WINDOW_LOOK)
-		&& srect.Contains(point) && !clientrect.Contains(point)) {
+		&& fBorderRect.Contains(point) && !fFrame.Contains(point)) {
 		STRACE(("MacDecorator():Clicked() - Resize\n"));
 		return DEC_RESIZE;
 	}
@@ -341,10 +318,10 @@ MacDecorator::_DoLayout(void)
 
 		// TODO the tab is drawn in a fixed height for now
 		fTabRect.Set(fFrame.left - fBorderWidth,
-			fFrame.top - 20,
+			fFrame.top - 23,
 			((fFrame.right - fFrame.left) < 32.0 ?
 				fFrame.left + 32.0 : fFrame.right) + fBorderWidth,
-			fFrame.top);
+			fFrame.top - 3);
 
 		fZoomRect=fTabRect;
 		fZoomRect.left=fZoomRect.right-12;
