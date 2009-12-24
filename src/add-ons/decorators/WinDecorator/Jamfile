@@ -2,9 +2,12 @@ SubDir HAIKU_TOP src add-ons decorators WinDecorator ;
 
 UseFreeTypeHeaders ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
-UsePrivateHeaders [ FDirName servers app ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UsePrivateHeaders app shared interface graphics ;
+UseLibraryHeaders agg ;
 
 Addon WinDecorator :
 	WinDecorator.cpp
-	: be libappserver.so
+	: be <nogrist>app_server $(TARGET_LIBSTDC++)
 ;

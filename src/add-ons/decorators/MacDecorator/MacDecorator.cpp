@@ -247,7 +247,7 @@ MacDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 	}
 
 	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(point)) {
-		STRACE("MacDecorator():Clicked() - Zoom\n");
+		STRACE(("MacDecorator():Clicked() - Zoom\n"));
 		return DEC_ZOOM;
 	}
 	
@@ -278,7 +278,7 @@ MacDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 
 
 void
-MacDecorator::_DoLayout(void)
+MacDecorator::_DoLayout()
 {
 	int32 kDefaultBorderWidth = 6;
 	STRACE(("MacDecorator: Do Layout\n"));
@@ -607,7 +607,7 @@ MacDecorator::_DrawTab(BRect invalid)
 }
 
 
-	void
+void
 MacDecorator::_DrawClose(BRect r)
 {
 	bool down=GetClose();
@@ -650,7 +650,7 @@ MacDecorator::_DrawClose(BRect r)
 }
 
 
-	void
+void
 MacDecorator::_DrawTitle(BRect rect)
 {
 	if(IsFocus())
@@ -716,7 +716,8 @@ void MacDecorator::_DrawZoom(BRect r)
 }
 
 
-void MacDecorator::_DrawMinimize(BRect r)
+void
+MacDecorator::_DrawMinimize(BRect r)
 {
 	bool down=GetClose();
 
@@ -761,14 +762,14 @@ void MacDecorator::_DrawMinimize(BRect r)
 }
 
 
-	void
+void
 MacDecorator::_SetColors()
 {
 	_SetFocus();
 }
 
 
-	void
+void
 MacDecorator::_UpdateFont(DesktopSettings& settings)
 {
 	ServerFont font;
@@ -785,8 +786,8 @@ MacDecorator::_UpdateFont(DesktopSettings& settings)
 
 /*!	\brief Draws a rectangle with a gradient.
   \param down The rectangle should be drawn recessed or not
-  */
-	void
+*/
+void
 MacDecorator::_DrawBlendedRect(DrawingEngine* engine, BRect rect,
 		bool down/*, bool focus*/)
 {
@@ -820,5 +821,5 @@ extern "C" float get_decorator_version(void)
 extern "C" Decorator *(instantiate_decorator)(DesktopSettings &desktopSetting, BRect rec,
 		window_look loo, uint32 flag)
 {
-	return (new MacDecorator(desktopSetting, rec, loo, flag));
+	return new MacDecorator(desktopSetting, rec, loo, flag);
 }
