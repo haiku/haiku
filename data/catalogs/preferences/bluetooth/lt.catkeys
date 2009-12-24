@@ -49,7 +49,7 @@ Settings	Window		Nustatymai
 Only from trusted devices	Settings view		Tik iš patikimų įrenginių
 Scanning progress	Inquiry panel		Žvalgymo pažanga
 Always ask	Settings view		Visada atsiklausti
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them	Inquiry panel		Įsitikinkite, kad nuotoliniame įrenginyje įjungtas Bluetooth. Pradžiai spauskite mygtuką „Užklausti“. Laikas, reikalingas vardų gavimui nežinomas, nors ir neturėtų viršyti 3s vienam įrenginiui. Po to galėsite prisijungti prie jų.
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Įsitikinkite, kad nuotoliniame įrenginyje įjungtas Bluetooth. Pradžiai spauskite mygtuką „Užklausti“. Laikas, reikalingas vardų gavimui nežinomas, nors ir neturėtų viršyti 3s vienam įrenginiui. Po to galėsite prisijungti prie jų.
 Retrieving names...	Inquiry panel		Vardų gavimas...
 Help	Window		Pagalba
 Add…	Remote devices		Pridėti…
