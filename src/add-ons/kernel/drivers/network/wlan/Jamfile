@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan ;
 
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan ipw2100 ;
+
 #FreeBSD 8 WLAN drivers
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan aironetwifi ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan atheroswifi ;

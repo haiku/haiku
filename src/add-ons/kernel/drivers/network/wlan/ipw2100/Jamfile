@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network ipw2100 ;
+SubDir HAIKU_TOP src add-ons kernel drivers network wlan ipw2100 ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
