@@ -14,7 +14,6 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
-#include <CatalogInAddOn.h>
 #include <Deskbar.h>
 #include <GroupLayout.h>
 #include <Locale.h>
@@ -196,20 +195,21 @@ FrequencyMenu::FrequencyMenu(BMenu* menu, BHandler* target,
 	fStorage(storage),
 	fInterface(interface)
 {
+	BCatalog catalog("x-vnd.Haiku-CPUFrequencyPref");
 	fDynamicPerformance = new BMenuItem(
-		TR("Dynamic performance"),
+		catalog.GetString("Dynamic performance",TR_CONTEXT),
 		new BMessage(kMsgPolicyDynamic));
 	fHighPerformance = new BMenuItem(
-		TR("High performance"),
+		catalog.GetString("High performance",TR_CONTEXT),
 		new BMessage(kMsgPolicyPerformance));
-	fLowEnergie = new BMenuItem(TR("Low energy"),
+	fLowEnergie = new BMenuItem(catalog.GetString("Low energy",TR_CONTEXT),
 		new BMessage(kMsgPolicyLowEnergy));
 
 	menu->AddItem(fDynamicPerformance);
 	menu->AddItem(fHighPerformance);
 	menu->AddItem(fLowEnergie);
 
-	fCustomStateMenu = new BMenu(TR("Set state"));
+	fCustomStateMenu = new BMenu(catalog.GetString("Set state",TR_CONTEXT));
 
 	StateList* stateList = fInterface->GetCpuFrequencyStates();
 	for (int i = 0; i < stateList->CountItems(); i++) {
@@ -353,9 +353,9 @@ StatusView::StatusView(BRect frame,	bool inDeskbar,
 		B_WILL_DRAW | B_FRAME_EVENTS),
 	fInDeskbar(inDeskbar),
 	fCurrentFrequency(NULL),
-	fDragger(NULL)
+	fDragger(NULL),
+	fCatalog("x-vnd.Haiku-CPUFrequencyPref")
 {
-	get_add_on_catalog(&fCatalog,"x-vnd.Haiku-CPUFrequencyPref");
 	if (!inDeskbar) {
 		// we were obviously added to a standard window - let's add a dragger
 		BRect bounds = Bounds();
@@ -407,10 +407,10 @@ StatusView::~StatusView()
 void
 StatusView::_AboutRequested()
 {
-	BAlert *alert = new BAlert("about", TR("CPU Frequency\n"
+	BAlert *alert = new BAlert("about", fCatalog.GetString("CPU Frequency\n"
 			"\twritten by Clemens Zeidler\n"
-			"\tCopyright 2009, Haiku, Inc.\n"),
-		TR("Ok"));
+			"\tCopyright 2009, Haiku, Inc.\n", TR_CONTEXT),
+		fCatalog.GetString("Ok", TR_CONTEXT));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -490,14 +490,14 @@ StatusView::AttachedToWindow()
 	fPreferencesMenu->SetFont(be_plain_font);
 
 	fPreferencesMenu->AddSeparatorItem();
-	fOpenPrefItem = new BMenuItem(TR(
-			"Open Speedstep preferences" B_UTF8_ELLIPSIS),
+	fOpenPrefItem = new BMenuItem(fCatalog.GetString(
+			"Open Speedstep preferences" B_UTF8_ELLIPSIS, TR_CONTEXT),
 		new BMessage(kMsgOpenSSPreferences));
 	fPreferencesMenu->AddItem(fOpenPrefItem);
 	fOpenPrefItem->SetTarget(this);
 
 	if (fInDeskbar) {
-		fQuitItem= new BMenuItem(TR("Quit"),
+		fQuitItem= new BMenuItem(fCatalog.GetString("Quit", TR_CONTEXT),
 			new BMessage(B_QUIT_REQUESTED));
 		fPreferencesMenu->AddItem(fQuitItem);
 		fQuitItem->SetTarget(this);
