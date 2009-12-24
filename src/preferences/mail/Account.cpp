@@ -1,6 +1,6 @@
 /* Account - provides an "account" view on the mail chains
 **
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+** Copyright 2001-2009 Dr. Zoidberg Enterprises. All rights reserved.
 */
 
 
@@ -328,7 +328,7 @@ void Account::CreateOutbound()
 		(new BAlert(
 			MDR_DIALECT_CHOICE ("E-mail","メール"),
 			MDR_DIALECT_CHOICE ("Could not create outbound chain.","送信チェーンは作成できませんでした。"),
-			MDR_DIALECT_CHOICE ("Ok","了解")))->Go();
+			MDR_DIALECT_CHOICE ("OK","了解")))->Go();
 		return;
 	}
 	fOutbound->SetChainDirection(outbound);

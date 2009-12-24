@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008 Haiku Inc. All rights reserved.
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -112,7 +112,7 @@ HEventList::SelectionChanged()
 		} else {
 			printf("name %s\n", ref.name);
 			BMediaFiles().RemoveRefFor(fType, row->Name(), ref);
-			(new BAlert("alert", "No such file or directory", "Ok"))->Go();
+			(new BAlert("alert", "No such file or directory", "OK"))->Go();
 			return;
 		}
 		BMessage msg(M_EVENT_CHANGED);

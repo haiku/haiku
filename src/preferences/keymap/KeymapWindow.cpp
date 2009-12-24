@@ -593,7 +593,7 @@ KeymapWindow::_UpdateSwitchShortcutButton()
 		label = TR("Switch shortcut keys to Windows/Linux mode");
 	} else if (fCurrentMap.KeyForModifier(B_LEFT_COMMAND_KEY) == 0x5c
 		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5d) {
-		label = TR("Switch Shortcut keys to Haiku mode");
+		label = TR("Switch shortcut keys to Haiku mode");
 	}
 
 	fSwitchShortcutsButton->SetLabel(label);

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Locale	363644875
+1	swedish	x-vnd.Haiku-Locale	1007621035
 Day of week (short name)	TimeFormatSettings		veckodag (kortnamn)
 Available languages	Locale Preflet Window		Tillgängliga språk
 Decimal separator: 	TimeFormatSettings		Decimalseparerare
@@ -32,7 +32,7 @@ Revert	Locale Preflet Window		Återgå
 Day in month	TimeFormatSettings		dag i månad
 Day of week in month	TimeFormatSettings		veckodag i månad
 Negative marker	TimeFormatSettings		Negativmarkör
-Ok	Locale Preflet Window		Ok
+OK	Locale Preflet Window		Ok
 Time	TimeFormatSettings		Tid
 Date	TimeFormatSettings		Datum
 List separator: 	TimeFormatSettings		Listseparerare

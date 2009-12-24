@@ -436,7 +436,7 @@ JoyWin::_ShowNoCompatibleJoystickMessage()
 	str << " port. Try another port, or ask the manufacturer of your joystick";
 	str << " for a driver designed for Haiku or BeOS.";
 
-	BAlert *alert = new BAlert("test1", str.String(), "Ok");
+	BAlert *alert = new BAlert("test1", str.String(), "OK");
 	alert->SetShortcut(0, B_ENTER);
 	alert->Go();
 }

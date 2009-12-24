@@ -407,7 +407,7 @@ StatusView::~StatusView()
 void
 StatusView::_AboutRequested()
 {
-	BAlert *alert = new BAlert("about", fCatalog.GetString("CPU Frequency\n"
+	BAlert *alert = new BAlert("about", fCatalog.GetString("CPUFrequency\n"
 			"\twritten by Clemens Zeidler\n"
 			"\tCopyright 2009, Haiku, Inc.\n", TR_CONTEXT),
 		fCatalog.GetString("Ok", TR_CONTEXT));

@@ -1,4 +1,4 @@
-1	Bulgarian	x-vnd.Haiku-Network	2768265170
+1	Bulgarian	x-vnd.Haiku-Network	2897060402
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Маска:
 DHCP	EthernetSettingsView		DHCP
@@ -14,4 +14,4 @@ Mode:	EthernetSettingsView		Режим:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Мрежовия сървър трябва да е стартиран!
 Auto-configuring failed: 	EthernetSettingsView		Автоматичната конфигурация се провали: 
 Static	EthernetSettingsView		Статистика
-Ok	EthernetSettingsView		Ок
+OK	EthernetSettingsView		Ок

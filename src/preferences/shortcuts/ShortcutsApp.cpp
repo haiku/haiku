@@ -43,7 +43,7 @@ ShortcutsApp::AboutRequested()
 {
 	BAlert* alert = new BAlert("About Shortcuts", 
 		"Shortcuts\n\n"
-		"Based on SpicyKeys for BeOS made by Jeremy Friesner.", "Ok");
+		"Based on SpicyKeys for BeOS made by Jeremy Friesner.", "OK");
 	alert->Go();
 }
 

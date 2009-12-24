@@ -96,7 +96,7 @@ TouchpadView::MouseUp(BPoint point)
 	if (GetRightScrollRatio() > 0.7 || GetBottomScrollRatio() > 0.7) {
 		BAlert* alert = new BAlert("ReallyChangeScrollArea",
 			"The new scroll area is very small. Do you really want to change "
-				"the scroll area?", "Ok", "Cancel", NULL, B_WIDTH_AS_USUAL,
+				"it?", "OK", "Cancel", NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
 		result = alert->Go();
 	}

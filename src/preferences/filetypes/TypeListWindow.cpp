@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,7 +18,7 @@ const uint32 kMsgSelected = 'seld';
 
 
 TypeListWindow::TypeListWindow(const char* currentType, uint32 what, BWindow* target)
-	: BWindow(BRect(100, 100, 360, 440), "Choose Type", B_MODAL_WINDOW,
+	: BWindow(BRect(100, 100, 360, 440), "Choose type", B_MODAL_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target),
 	fWhat(what)

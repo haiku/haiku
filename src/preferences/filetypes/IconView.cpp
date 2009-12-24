@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -817,11 +817,11 @@ IconView::MouseDown(BPoint where)
 
 		bool hasIcon = fHasType ? fSource == kOwnIcon : fIcon != NULL;
 		if (hasIcon)
-			menu->AddItem(new BMenuItem("Edit Icon" B_UTF8_ELLIPSIS, new BMessage(kMsgEditIcon)));
+			menu->AddItem(new BMenuItem("Edit icon" B_UTF8_ELLIPSIS, new BMessage(kMsgEditIcon)));
 		else
-			menu->AddItem(new BMenuItem("Add Icon" B_UTF8_ELLIPSIS, new BMessage(kMsgAddIcon)));
+			menu->AddItem(new BMenuItem("Add icon" B_UTF8_ELLIPSIS, new BMessage(kMsgAddIcon)));
 
-		BMenuItem* item = new BMenuItem("Remove Icon", new BMessage(kMsgRemoveIcon));
+		BMenuItem* item = new BMenuItem("Remove icon", new BMessage(kMsgRemoveIcon));
 		if (!hasIcon)
 			item->SetEnabled(false);
 

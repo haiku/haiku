@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Network	2768265170
+1	swedish	x-vnd.Haiku-Network	2897060402
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Nätmask:
 DHCP	EthernetSettingsView		DHCP
@@ -14,4 +14,4 @@ Mode:	EthernetSettingsView		Konfiguration:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Automatisk konfiguration kan inte ske utan att net_server kör!
 Auto-configuring failed: 	EthernetSettingsView		Automatisk konfiguration misslyckades: 
 Static	EthernetSettingsView		Statisk
-Ok	EthernetSettingsView		Ok
+OK	EthernetSettingsView		Ok

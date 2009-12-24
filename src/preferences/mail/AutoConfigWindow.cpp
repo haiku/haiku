@@ -15,7 +15,7 @@
 
 
 AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
-	:	BWindow(rect, "Create New Account", B_TITLED_WINDOW_LOOK,
+	:	BWindow(rect, "Create new account", B_TITLED_WINDOW_LOOK,
 				B_MODAL_APP_WINDOW_FEEL,
 			 	B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT,
 				B_ALL_WORKSPACES),
@@ -44,7 +44,7 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
 	
 	buttonRect.left+= 5 + buttonWidth;
 	buttonRect.right = buttonRect.left + buttonWidth;
-	fNextButton = new BButton(buttonRect, "ok", "Ok", new BMessage(kOkMsg));
+	fNextButton = new BButton(buttonRect, "ok", "OK", new BMessage(kOkMsg));
 	fRootView->AddChild(fNextButton);
 	
 	fBoxRect = Bounds();
@@ -52,7 +52,7 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
 	fBoxRect.bottom-= buttonHeight + 5;
 	
 	fMainView = new AutoConfigView(fBoxRect, fAutoConfig);
-	fMainView->SetLabel("Account Settings");
+	fMainView->SetLabel("Account settings");
 	fRootView->AddChild(fMainView);
 }
 
@@ -77,7 +77,7 @@ AutoConfigWindow::MessageReceived(BMessage* msg)
 				if (!fMainView->IsValidMailAddress(fAccountInfo.email)) {
 					invalidMailAlert = new BAlert("invalidMailAlert",
 													"Enter a valid e-mail address.",
-													"Ok");
+													"OK");
 					invalidMailAlert->Go();
 					return;
 				}

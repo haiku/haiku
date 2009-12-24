@@ -1,4 +1,4 @@
-1	Lithuanian	x-vnd.Haiku-Locale	363644875
+1	Lithuanian	x-vnd.Haiku-Locale	1007621035
 Day in month (2 digits)	TimeFormatSettings		diena mėnesyje (2 skaitmenys)
 Available languages	Locale Preflet Window		Galimos kalbos
 Day of week (name)	TimeFormatSettings		savaitės diena (pavadinimas)
@@ -34,7 +34,7 @@ Country	Locale Preflet Window		Šalis
 Month number (2 digits)	TimeFormatSettings		mėnesio skaitmuo (2 skaitmenys)
 Revert	Locale Preflet Window		Grįžti
 Negative marker	TimeFormatSettings		Neigiamumo ženkliukas
-Ok	Locale Preflet Window		Gerai
+OK	Locale Preflet Window		Gerai
 Day of week	TimeFormatSettings		savaitės diena
 List separator: 	TimeFormatSettings		Sarašo skirtukas
 12 hour	TimeFormatSettings		12 Valandos

@@ -1,4 +1,4 @@
-1	Lithuanian	x-vnd-Haiku-Keymap	1405412929
+1	Lithuanian	x-vnd-Haiku-Keymap	4175672673
 Tilde trigger	Keymap window		Tildė
 Grave trigger	Keymap window		Apostrofas
 Select dead keys	Keymap window		Mirūs mygtukai
@@ -9,7 +9,7 @@ Open…	Keymap window		Atidaryti…
 System:	Keymap window		Sisteminės:
 Switch shortcut keys	Keymap window		Derinių mygtukas
 User:	Keymap window		Vartotojo:
-Switch Shortcut keys to Haiku mode	Keymap window		Derinių mygtukai kaip Haiku
+Switch shortcut keys to Haiku mode	Keymap window		Derinių mygtukai kaip Haiku
 Keymap	Keymap window		Klaviatūros išdėstymas
 Sample and clipboard:	Keymap window		Pavyzdys ir iškarpa:
 Layout	Keymap window		Išdėstymas

@@ -461,7 +461,7 @@ EthernetSettingsView::_TriggerAutoConfig(const char* device)
 	BMessenger networkServer(kNetServerSignature);
 	if (!networkServer.IsValid()) {
 		(new BAlert("error", TR("The net_server needs to run for the auto "
-			"configuration!"), TR("Ok")))->Go();
+			"configuration!"), TR("OK")))->Go();
 		return B_ERROR;
 	}
 
@@ -477,13 +477,13 @@ EthernetSettingsView::_TriggerAutoConfig(const char* device)
 	if (status != B_OK) {
 		BString errorMessage(TR("Sending auto-config message failed: "));
 		errorMessage << strerror(status);
-		(new BAlert("error", errorMessage.String(), TR("Ok")))->Go();
+		(new BAlert("error", errorMessage.String(), TR("OK")))->Go();
 		return status;
 	} else if (reply.FindInt32("status", &status) == B_OK
 			&& status != B_OK) {
 		BString errorMessage(TR("Auto-configuring failed: "));
 		errorMessage << strerror(status);
-		(new BAlert("error", errorMessage.String(), "Ok"))->Go();
+		(new BAlert("error", errorMessage.String(), "OK"))->Go();
 		return status;
 	}
 

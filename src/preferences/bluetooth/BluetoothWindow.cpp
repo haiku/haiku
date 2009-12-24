@@ -63,7 +63,7 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 	fMenubar->AddItem(menu);
 	
 	menu = new BMenu(TR("Help"));
-	menu->AddItem(new BMenuItem(TR("About" B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED), 0));
+	menu->AddItem(new BMenuItem(TR("About Bluetooth" B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED), 0));
 	fMenubar->AddItem(menu);
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);

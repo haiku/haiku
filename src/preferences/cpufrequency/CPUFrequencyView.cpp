@@ -91,7 +91,7 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	fStatusView->ShowPopUpMenu(false);
 		
 	fInstallButton = new BButton("installButton",
-									TR("Install Replicant into Deskbar"),
+									TR("Install replicant into Deskbar"),
 									new BMessage(kInstallIntoDeskbar));
 	
 	statusLayout->AddView(fStatusView);

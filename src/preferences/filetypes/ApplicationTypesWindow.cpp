@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -76,7 +76,7 @@ variety_to_text(uint32 variety)
 		case B_GAMMA_VERSION:
 			return "Gamma";
 		case B_GOLDEN_MASTER_VERSION:
-			return "Golden Master";
+			return "Golden master";
 		case B_FINAL_VERSION:
 			return "Final";
 	}

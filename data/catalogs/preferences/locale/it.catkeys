@@ -1,4 +1,4 @@
-1	italiano	x-vnd.Haiku-Locale	363644875
+1	italiano	x-vnd.Haiku-Locale	1007621035
 Day of week (short name)	TimeFormatSettings		giornate della settimana
 Available languages	Locale Preflet Window		Localizzazioni disponibili
 Decimal separator: 	TimeFormatSettings		Separatore decimale
@@ -33,7 +33,7 @@ Revert	Locale Preflet Window		Ripristina
 Day in month	TimeFormatSettings		Numero del giorno
 Day of week in month	TimeFormatSettings		Giorni della settimana nel mese
 Negative marker	TimeFormatSettings		Segno meno
-Ok	Locale Preflet Window		Ok
+OK	Locale Preflet Window		Ok
 Time	TimeFormatSettings		Ora
 Date	TimeFormatSettings		Data
 List separator: 	TimeFormatSettings		Separatore dell'elenco

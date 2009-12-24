@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,7 +44,7 @@ void
 FontsApp::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", TR("Fonts\n"
-		"\tCopyright 2004-2005, Haiku.\n\n"), TR("Ok"));
+		"\tCopyright 2004-2005, Haiku.\n\n"), TR("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 

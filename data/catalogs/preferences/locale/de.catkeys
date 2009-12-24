@@ -1,4 +1,4 @@
-1	de	x-vnd.Haiku-Locale	363644875
+1	de	x-vnd.Haiku-Locale	1007621035
 Day in month (2 digits)	TimeFormatSettings		Tag des Monats (2-stellig)
 Available languages	Locale Preflet Window		Verfügbare Sprachen
 Day of week (name)	TimeFormatSettings		Wochentag (Name)
@@ -34,7 +34,7 @@ Country	Locale Preflet Window		Land
 Month number (2 digits)	TimeFormatSettings		Monatsnummer (2-stellig)
 Revert	Locale Preflet Window		Zurücknehmen
 Negative marker	TimeFormatSettings		Minuszeichen
-Ok	Locale Preflet Window		Ok
+OK	Locale Preflet Window		Ok
 Day of week	TimeFormatSettings		Wochentag
 List separator: 	TimeFormatSettings		Listentrennzeichen: 
 Time	TimeFormatSettings		Zeit

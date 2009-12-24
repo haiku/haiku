@@ -25,9 +25,9 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	// type view
 	BPopUpMenu *chainsPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *chainModes[] = {
-		"Receive Mail Only",
-		"Send Mail Only",
-		"Send and Receive Mail"};
+		"Receive mail only",
+		"Send mail only",
+		"Send and receive mail"};
 	BMenuItem *item;
 	for (int32 i = 0; i < 3; i++)
 		chainsPopUp->AddItem(item = new BMenuItem(chainModes[i], NULL));
@@ -55,7 +55,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fEmailView = new BTextControl(BRect(topLeft, rightDown),
-									"email", "E-mail Address", "",
+									"email", "E-mail address:", "",
 									new BMessage(kEMailChangedMsg));
 	fEmailView->SetDivider(divider);
 	AddChild(fEmailView);
@@ -64,7 +64,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fLoginNameView = new BTextControl(BRect(topLeft, rightDown),
-									"login", "Login Name", "",
+									"login", "Login name:", "",
 									NULL);
 	fLoginNameView->SetDivider(divider);
 	AddChild(fLoginNameView);
@@ -73,7 +73,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fPasswordView = new BTextControl(BRect(topLeft, rightDown),
-									"password", "Password", "",
+									"password", "Password:", "",
 									NULL);
 	fPasswordView->SetDivider(divider);
 	fPasswordView->TextView()->HideTyping(true);
@@ -83,7 +83,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fAccountNameView = new BTextControl(BRect(topLeft, rightDown),
-									"account", "Account Name", "",
+									"account", "Account name:", "",
 									NULL);
 	fAccountNameView->SetDivider(divider);
 	AddChild(fAccountNameView);
@@ -92,7 +92,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fNameView = new BTextControl(BRect(topLeft, rightDown),
-									"name", "Real Name", "",
+									"name", "Real name:", "",
 									NULL);
 	AddChild(fNameView);
 	fNameView->SetDivider(divider);
@@ -327,7 +327,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 		serverName = info.providerInfo.pop_server;
 
 	fInboundNameView = new BTextControl(BRect(10, 20, rect.Width() - 20, 35),
-										"inbound", "Server Name",
+										"inbound", "Server Name:",
 										serverName.String(),
 										new BMessage(kServerChangedMsg));
 	fInboundNameView->SetDivider(divider);
@@ -383,7 +383,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 
 	serverName = info.providerInfo.smtp_server;
 	fOutboundNameView = new BTextControl(BRect(10, 20, rect.Width() - 20, 30),
-									"outbound", "Server Name",
+									"outbound", "Server name:",
 									serverName.String(),
 									new BMessage(kServerChangedMsg));
 	fOutboundNameView->SetDivider(divider);

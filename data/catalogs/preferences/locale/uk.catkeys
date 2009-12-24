@@ -1,4 +1,4 @@
-1	Ukrainian	 x-vnd.Haiku-Locale	363644875
+1	Ukrainian	 x-vnd.Haiku-Locale	1007621035
 Day of week (short name)	TimeFormatSettings		день тижня (скорочено)
 Available languages	Locale Preflet Window		Доступні мови
 Decimal separator: 	TimeFormatSettings		Десятковий розділювач 
@@ -32,7 +32,7 @@ Revert	Locale Preflet Window		Повернути
 Day in month	TimeFormatSettings		день місяця
 Day of week in month	TimeFormatSettings		день тижня в місяці
 Negative marker	TimeFormatSettings		Негативний маркер
-Ok	Locale Preflet Window		Ok
+OK	Locale Preflet Window		Ok
 Time	TimeFormatSettings		Час
 Date	TimeFormatSettings		Дата
 List separator: 	TimeFormatSettings		Розділювач листів

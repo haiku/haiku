@@ -1,4 +1,4 @@
-1	Bulgarian	x-vnd.Haiku-Locale	363644875
+1	Bulgarian	x-vnd.Haiku-Locale	1007621035
 Day of week (short name)	TimeFormatSettings		ден от седмицата (кратко название)
 Available languages	Locale Preflet Window		Достъпи езици
 Decimal separator: 	TimeFormatSettings		Десетичен разделител
@@ -33,7 +33,7 @@ Revert	Locale Preflet Window		Върни
 Day in month	TimeFormatSettings		ден в месец
 Day of week in month	TimeFormatSettings		ден от седмица в месец
 Negative marker	TimeFormatSettings		Отрицателен маркер
-Ok	Locale Preflet Window		Ок
+OK	Locale Preflet Window		Ок
 Time	TimeFormatSettings		Време
 Date	TimeFormatSettings		Дата
 List separator: 	TimeFormatSettings		Разделител в списък

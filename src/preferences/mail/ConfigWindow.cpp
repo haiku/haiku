@@ -1,5 +1,5 @@
 /* 
- * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -750,7 +750,7 @@ ConfigWindow::RevertToLastSettings()
 			"Error retrieving general settings:\n%s\n",
 			"\n一般設定を戻せませんでした。\n\n一般設定収得エラー：\n%s\n"),
 			strerror(status));
-		(new BAlert("Error",text,"Ok",NULL,NULL,B_WIDTH_AS_USUAL,B_WARNING_ALERT))->Go();
+		(new BAlert("Error",text,"OK",NULL,NULL,B_WIDTH_AS_USUAL,B_WARNING_ALERT))->Go();
 	}
 
 	// revert account data

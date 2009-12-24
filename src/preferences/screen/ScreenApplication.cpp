@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,7 +33,7 @@ void
 ScreenApplication::AboutRequested()
 {
 	BAlert *aboutAlert = new BAlert("About", "Screen preferences by the Haiku team",
-		"Ok", NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
+		"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
 	aboutAlert->SetShortcut(0, B_OK);
 	aboutAlert->Go();
 }

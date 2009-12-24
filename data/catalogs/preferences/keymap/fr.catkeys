@@ -1,4 +1,4 @@
-1	French	x-vnd.Haiku-Keymap	1405412929
+1	French	x-vnd.Haiku-Keymap	4175672673
 Tilde trigger	Keymap window		Tilde
 Grave trigger	Keymap window		Accent grave
 Select dead keys	Keymap window		Touches mortes
@@ -9,7 +9,7 @@ Open…	Keymap window		Ouvrir…
 System:	Keymap window		Système:
 Switch shortcut keys	Keymap window		Touches raccourci
 User:	Keymap window		Utilisateur:
-Switch Shortcut keys to Haiku mode	Keymap window		Touches raccourci en mode Haiku
+Switch shortcut keys to Haiku mode	Keymap window		Touches raccourci en mode Haiku
 Keymap	Keymap window		Keymap
 Sample and clipboard:	Keymap window		Exemple et presse-papier:
 Layout	Keymap window		Disposition

@@ -1,4 +1,4 @@
-1	Russian	x-vnd-Haiku-Keymap	1405412929
+1	Russian	x-vnd-Haiku-Keymap	4175672673
 Tilde trigger	Keymap window		Тильда
 Grave trigger	Keymap window		Апостроф
 Select dead keys	Keymap window		Выбор мертвых клавиш
@@ -13,7 +13,7 @@ Switch shortcut keys to Windows/Linux mode	Keymap window		Переключени
 Keymap	Keymap window		Keymap
 Sample and clipboard:	Keymap window		Выборка и буфер обмена:
 Layout	Keymap window		Макет
-Switch Shortcut keys to Haiku mode	Keymap window		Переключение раскладки в Haiku режим
+Switch shortcut keys to Haiku mode	Keymap window		Переключение раскладки в Haiku режим
 Revert	Keymap window		Вернуть
 Save as…	Keymap window		Сохранить как…
 File	Keymap window		Файл

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc.
+ * Copyright 2002-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -54,7 +54,7 @@ DataTranslationsApplication::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "DataTranslations\n"
 		"\twritten by Oliver Siebenmarck and others\n"
-		"\tCopyright 2002-2006, Haiku.\n", "Ok");
+		"\tCopyright 2002-2006, Haiku.\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

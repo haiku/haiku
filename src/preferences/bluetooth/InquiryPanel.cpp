@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-09, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
+ * Copyright 2008-2009, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -124,11 +124,11 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	if (fLocalDevice != NULL) {	
-		fMessage->SetText(TR("Check that the bluetooth capabilities of your remote device"
-							" are activated. Press Inquiry to start scanning. The needed time"
+		fMessage->SetText(TR("Check that the Bluetooth capabilities of your remote device"
+							" are activated. Press 'Inquiry' to start scanning. The needed time"
 							" for the retrieval of the names is unknown, although should not"
 							" take more than 3 seconds per device. Afterwards you will be able"
-							" to add them to your main list, where you will be able to pair with them"));
+							" to add them to your main list, where you will be able to pair with them."));
 		fInquiryButton->SetEnabled(true);
 		fDiscoveryAgent = fLocalDevice->GetDiscoveryAgent();
 		fDiscoveryListener = new PanelDiscoveryListener(this);
@@ -138,8 +138,8 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 		
 		
 	} else {
-		fMessage->SetText(TR("There has not been found any bluetooth LocalDevice device registered"
-							" on the system"));
+		fMessage->SetText(TR("There isn't any Bluetooth LocalDevice registered"
+							" on the system."));
 		fInquiryButton->SetEnabled(false);
 	}
 

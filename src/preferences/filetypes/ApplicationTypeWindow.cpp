@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -243,7 +243,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	fSaveMenuItem->SetEnabled(false);
 	menu->AddItem(fSaveMenuItem);
 	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem("Save Into Resource File" B_UTF8_ELLIPSIS,
+	menu->AddItem(item = new BMenuItem("Save into resource file" B_UTF8_ELLIPSIS,
 		NULL));
 	item->SetEnabled(false);
 
@@ -296,40 +296,40 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	BBox* box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
 	topView->AddChild(box);
 
-	fFlagsCheckBox = new BCheckBox(rect, "flags", "Application Flags",
+	fFlagsCheckBox = new BCheckBox(rect, "flags", "Application flags",
 		new BMessage(kMsgToggleAppFlags));
 	fFlagsCheckBox->SetValue(B_CONTROL_ON);
 	fFlagsCheckBox->ResizeToPreferred();
 	box->SetLabel(fFlagsCheckBox);
 
 	rect.top = fFlagsCheckBox->Bounds().Height() + 4.0f;
-	fSingleLaunchButton = new BRadioButton(rect, "single", "Single Launch",
+	fSingleLaunchButton = new BRadioButton(rect, "single", "Single launch",
 		new BMessage(kMsgAppFlagsChanged));
 	fSingleLaunchButton->ResizeToPreferred();
 	box->AddChild(fSingleLaunchButton);
 
 	rect.OffsetBy(0.0f, fSingleLaunchButton->Bounds().Height() + 0.0f);
 	fMultipleLaunchButton = new BRadioButton(rect, "multiple",
-		"Multiple Launch", new BMessage(kMsgAppFlagsChanged));
+		"Multiple launch", new BMessage(kMsgAppFlagsChanged));
 	fMultipleLaunchButton->ResizeToPreferred();
 	box->AddChild(fMultipleLaunchButton);
 
 	rect.OffsetBy(0.0f, fSingleLaunchButton->Bounds().Height() + 0.0f);
 	fExclusiveLaunchButton = new BRadioButton(rect, "exclusive",
-		"Exclusive Launch", new BMessage(kMsgAppFlagsChanged));
+		"Exclusive launch", new BMessage(kMsgAppFlagsChanged));
 	fExclusiveLaunchButton->ResizeToPreferred();
 	box->AddChild(fExclusiveLaunchButton);
 
 	rect.top = fSingleLaunchButton->Frame().top;
 	rect.left = fExclusiveLaunchButton->Frame().right + 4.0f;
-	fArgsOnlyCheckBox = new BCheckBox(rect, "args only", "Args Only",
+	fArgsOnlyCheckBox = new BCheckBox(rect, "args only", "Args only",
 		new BMessage(kMsgAppFlagsChanged));
 	fArgsOnlyCheckBox->ResizeToPreferred();
 	box->AddChild(fArgsOnlyCheckBox);
 
 	rect.top += fArgsOnlyCheckBox->Bounds().Height();
 	fBackgroundAppCheckBox = new BCheckBox(rect, "background",
-		"Background App", new BMessage(kMsgAppFlagsChanged));
+		"Background app", new BMessage(kMsgAppFlagsChanged));
 	fBackgroundAppCheckBox->ResizeToPreferred();
 	box->AddChild(fBackgroundAppCheckBox);
 
@@ -373,7 +373,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.left = 8.0f;
 	rect.right = Bounds().Width() - 8.0f;
 	BBox* typeBox = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	typeBox->SetLabel("Supported Types");
+	typeBox->SetLabel("Supported types");
 	topView->AddChild(typeBox);
 
 	rect = typeBox->Bounds().InsetByCopy(8.0f, 6.0f);
@@ -426,7 +426,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.right = Bounds().Width() - 8.0f;
 	box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
 		// the resizing mode will later also be set to B_FOLLOW_BOTTOM
-	box->SetLabel("Version Info");
+	box->SetLabel("Version info");
 	topView->AddChild(box);
 
 	BMenuField* menuField;
@@ -479,7 +479,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	fVarietyMenu->AddItem(new BMenuItem("Alpha", NULL));
 	fVarietyMenu->AddItem(new BMenuItem("Beta", NULL));
 	fVarietyMenu->AddItem(new BMenuItem("Gamma", NULL));
-	fVarietyMenu->AddItem(item = new BMenuItem("Golden Master", NULL));
+	fVarietyMenu->AddItem(item = new BMenuItem("Golden master", NULL));
 	item->SetMarked(true);
 	fVarietyMenu->AddItem(new BMenuItem("Final", NULL));
 
@@ -503,7 +503,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 
 	rect = box->Bounds().InsetByCopy(8.0f, 0.0f);
 	rect.top = fInternalVersionControl->Frame().bottom + 8.0f;
-	fShortDescriptionControl = new BTextControl(rect, "short desc", "Short Description:",
+	fShortDescriptionControl = new BTextControl(rect, "short desc", "Short description:",
 		NULL, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	float labelWidth = fShortDescriptionControl->StringWidth(
 		fShortDescriptionControl->Label()) + 4.0f;
@@ -518,7 +518,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 
 	rect.OffsetBy(0.0f, fShortDescriptionControl->Bounds().Height() + 5.0f);
 	rect.right = rect.left + labelWidth;
-	StringView* label = new StringView(rect, NULL, "Long Description:", NULL);
+	StringView* label = new StringView(rect, NULL, "Long description:", NULL);
 	label->SetDivider(labelWidth);
 	box->AddChild(label);
 
@@ -570,7 +570,7 @@ ApplicationTypeWindow::_Title(const BEntry& entry)
 		strcpy(name, "\"-\"");
 
 	BString title(name);
-	title.Append(" Application Type");
+	title.Append(" application type");
 	return title;
 }
 
@@ -1088,8 +1088,8 @@ bool
 ApplicationTypeWindow::QuitRequested()
 {
 	if (_NeedsSaving(CHECK_ALL) != 0) {
-		BAlert* alert = new BAlert("Save Request", "Do you want to save "
-			"the changes?", "Quit, Don't save", "Cancel", "Save",
+		BAlert* alert = new BAlert("Save request", "Do you want to save "
+			"the changes?", "Quit, don't save", "Cancel", "Save",
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 choice = alert->Go();
 		switch (choice) {

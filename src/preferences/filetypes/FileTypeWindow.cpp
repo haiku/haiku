@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -40,7 +40,7 @@ const uint32 kMsgSamePreferredAppAsOpened = 'spaO';
 
 FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	: BWindow(BRect(0.0f, 0.0f, 200.0f, 200.0f).OffsetBySelf(position),
-		"File Type", B_TITLED_WINDOW,
+		"File type", B_TITLED_WINDOW,
 		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BRect rect = Bounds();
@@ -56,7 +56,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 
 	rect.InsetBy(8.0f, 8.0f);
 	BBox* box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	box->SetLabel("File Type");
+	box->SetLabel("File type");
 	topView->AddChild(box);
 
 	rect = box->Bounds();
@@ -83,7 +83,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	box->AddChild(fSelectTypeButton);
 
 	rect.OffsetBy(fSelectTypeButton->Bounds().Width() + 8.0f, 0.0f);
-	fSameTypeAsButton = new BButton(rect, "same type as", "Same As" B_UTF8_ELLIPSIS,
+	fSameTypeAsButton = new BButton(rect, "same type as", "Same as" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgSameTypeAs), B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	fSameTypeAsButton->ResizeToPreferred();
 	box->AddChild(fSameTypeAsButton);
@@ -121,12 +121,12 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	rect.left = 8.0f;
 	rect.right = Bounds().Width() - 8.0f;
 	box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	box->SetLabel("Preferred Application");
+	box->SetLabel("Preferred application");
 	topView->AddChild(box);
 
 	BMenu* menu = new BPopUpMenu("preferred");
 	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem("Default Application",
+	menu->AddItem(item = new BMenuItem("Default application",
 		new BMessage(kMsgPreferredAppChosen)));
 	item->SetMarked(true);
 
@@ -153,7 +153,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	box->AddChild(fSelectAppButton);
 
 	rect.OffsetBy(fSelectAppButton->Bounds().Width() + 8.0f, 0.0f);
-	fSameAppAsButton = new BButton(rect, "same app as", "Same As" B_UTF8_ELLIPSIS,
+	fSameAppAsButton = new BButton(rect, "same app as", "Same as" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgSamePreferredAppAs), B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	fSameAppAsButton->ResizeToPreferred();
 	box->AddChild(fSameAppAsButton);
@@ -203,15 +203,15 @@ FileTypeWindow::_Title(const BMessage& refs)
 
 		char name[B_FILE_NAME_LENGTH];
 		if (same && parent.GetName(name) == B_OK) {
-			title = "Multiple Files from \"";
+			title = "Multiple files from \"";
 			title.Append(name);
 			title.Append("\"");
 		} else
-			title = "[Multiple Files]";
+			title = "[Multiple files]";
 	} else if (refs.FindRef("refs", 0, &ref) == B_OK)
 		title = ref.name;
 
-	title.Append(" File Type");
+	title.Append(" file type");
 	return title;
 }
 
@@ -391,7 +391,7 @@ FileTypeWindow::MessageReceived(BMessage* message)
 		case kMsgSameTypeAs:
 		{
 			BMessage panel(kMsgOpenFilePanel);
-			panel.AddString("title", "Select Same Type As");
+			panel.AddString("title", "Select same type as");
 			panel.AddInt32("message", kMsgSameTypeAsOpened);
 			panel.AddMessenger("target", this);
 
@@ -419,7 +419,7 @@ FileTypeWindow::MessageReceived(BMessage* message)
 		case kMsgSelectPreferredApp:
 		{
 			BMessage panel(kMsgOpenFilePanel);
-			panel.AddString("title", "Select Preferred Application");
+			panel.AddString("title", "Select preferred application");
 			panel.AddInt32("message", kMsgPreferredAppOpened);
 			panel.AddMessenger("target", this);
 
@@ -433,7 +433,7 @@ FileTypeWindow::MessageReceived(BMessage* message)
 		case kMsgSamePreferredAppAs:
 		{
 			BMessage panel(kMsgOpenFilePanel);
-			panel.AddString("title", "Select Same Preferred Application As");
+			panel.AddString("title", "Select same preferred application as");
 			panel.AddInt32("message", kMsgSamePreferredAppAsOpened);
 			panel.AddMessenger("target", this);
 

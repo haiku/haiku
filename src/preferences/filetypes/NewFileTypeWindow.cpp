@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -28,7 +28,7 @@ const uint32 kMsgAddType = 'atyp';
 
 
 NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* currentType)
-	: BWindow(BRect(100, 100, 350, 200), "New File Type", B_TITLED_WINDOW,
+	: BWindow(BRect(100, 100, 350, 200), "New file type", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target)
 {
@@ -37,7 +37,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(topView);
 
-	float labelWidth = be_plain_font->StringWidth("Internal Name:") + 2.0f;
+	float labelWidth = be_plain_font->StringWidth("Internal name:") + 2.0f;
 
 	rect.InsetBy(8.0f, 6.0f);
 	fSupertypesMenu = new BPopUpMenu("supertypes");
@@ -61,7 +61,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 		if (i > 1)
 			fSupertypesMenu->AddSeparatorItem();
 	}
-	fSupertypesMenu->AddItem(new BMenuItem("Add New Group",
+	fSupertypesMenu->AddItem(new BMenuItem("Add new group",
 		new BMessage(kMsgNewSupertypeChosen)));
 
 	BMenuField* menuField = new BMenuField(rect, "supertypes",
@@ -73,7 +73,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 	menuField->ResizeTo(rect.Width(), height);
 	topView->AddChild(menuField);
 
-	fNameControl = new BTextControl(rect, "internal", "Internal Name:", "",
+	fNameControl = new BTextControl(rect, "internal", "Internal name:", "",
 		NULL, B_FOLLOW_LEFT_RIGHT);
 	fNameControl->SetModificationMessage(new BMessage(kMsgNameUpdated));
 	fNameControl->SetDivider(labelWidth);
@@ -91,7 +91,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 	fNameControl->MoveTo(8.0f, 12.0f + menuField->Bounds().Height());
 	topView->AddChild(fNameControl);
 
-	fAddButton = new BButton(rect, "add", "Add Type", new BMessage(kMsgAddType),
+	fAddButton = new BButton(rect, "add", "Add type", new BMessage(kMsgAddType),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fAddButton->ResizeToPreferred();
 	fAddButton->MoveTo(Bounds().Width() - 8.0f - fAddButton->Bounds().Width(),
@@ -128,14 +128,14 @@ NewFileTypeWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgSupertypeChosen:
-			fAddButton->SetLabel("Add Type");
-			fNameControl->SetLabel("Internal Name:");
+			fAddButton->SetLabel("Add type");
+			fNameControl->SetLabel("Internal name:");
 			fNameControl->MakeFocus(true);
 			break;
 
 		case kMsgNewSupertypeChosen:
-			fAddButton->SetLabel("Add Group");
-			fNameControl->SetLabel("Group Name:");
+			fAddButton->SetLabel("Add group");
+			fNameControl->SetLabel("Group name:");
 			fNameControl->MakeFocus(true);
 			break;
 

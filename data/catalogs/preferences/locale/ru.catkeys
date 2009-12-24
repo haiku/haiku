@@ -1,4 +1,4 @@
-1	Russian	x-vnd.Haiku-Locale	363644875
+1	Russian	x-vnd.Haiku-Locale	1007621035
 Day of week (short name)	TimeFormatSettings		день недели (короткое название)
 Available languages	Locale Preflet Window		Доступные языки
 Decimal separator: 	TimeFormatSettings		Десятичный разделитель
@@ -32,7 +32,7 @@ Revert	Locale Preflet Window		Вернуться
 Day in month	TimeFormatSettings		день в месяце
 Day of week in month	TimeFormatSettings		день недели в месяце
 Negative marker	TimeFormatSettings		Отрицательный маркер
-Ok	Locale Preflet Window		Ок
+OK	Locale Preflet Window		Ок
 Time	TimeFormatSettings		Время
 Date	TimeFormatSettings		Дата
 Locale	Locale Preflet		Locale

@@ -1,4 +1,4 @@
-1	hu	x-vnd.Haiku-Locale	363644875
+1	hu	x-vnd.Haiku-Locale	1007621035
 Day of week (short name)	TimeFormatSettings		A hét napja (rövid)
 Available languages	Locale Preflet Window		Elérhető nyelvek
 Decimal separator: 	TimeFormatSettings		Tizedesjel
@@ -32,7 +32,7 @@ Revert	Locale Preflet Window		Visszaállítás
 Day in month	TimeFormatSettings		Hónap napja
 Day of week in month	TimeFormatSettings		A hét napja a hónapban
 Negative marker	TimeFormatSettings		Negatív előjel
-Ok	Locale Preflet Window		Ok
+OK	Locale Preflet Window		Ok
 Time	TimeFormatSettings		Idő
 Date	TimeFormatSettings		Dátum
 List separator: 	TimeFormatSettings		Listaelválasztó

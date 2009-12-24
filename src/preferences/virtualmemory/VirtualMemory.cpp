@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -35,7 +35,7 @@ VirtualMemory::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "VirtualMemory\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2005, Haiku.\n", "Ok");
+		"\tCopyright 2005, Haiku.\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 
