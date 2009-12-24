@@ -8,8 +8,10 @@
 
 #include "CapabilitiesView.h"
 
+#include <Catalog.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <Message.h>
 #include <String.h>
 #include <StringView.h>
@@ -17,6 +19,9 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+
+
+#define TR_CONTEXT "Capabilities"
 
 
 void
@@ -58,7 +63,7 @@ AddStringView(BView* view, const char* viewName, const char* name,
 
 
 CapabilitiesView::CapabilitiesView()
-	: BView("Capabilities", 0, NULL)
+	: BView(TR("Capabilities"), 0, NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -108,82 +113,82 @@ CapabilitiesView::CapabilitiesView()
 	rootView->SetLayout(new BGroupLayout(B_VERTICAL));
 
 	tempString << (int32) buffers;
-	AddStringView(rootView, "Buffers", "Auxiliary buffer(s):",
+	AddStringView(rootView, "Buffers", TR("Auxiliary buffer(s):"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) modelStack;
-	AddStringView(rootView, "ModelStack", "Model stack size:",
+	AddStringView(rootView, "ModelStack", TR("Model stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) projectionStack;
-	AddStringView(rootView, "ProjectionStack", "Projection stack size:",
+	AddStringView(rootView, "ProjectionStack", TR("Projection stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) textureStack;
-	AddStringView(rootView, "TextureStack", "Texture stack size:",
+	AddStringView(rootView, "TextureStack", TR("Texture stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) nameStack;
-	AddStringView(rootView, "NameStack", "Name stack size:",
+	AddStringView(rootView, "NameStack", TR("Name stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) listStack;
-	AddStringView(rootView, "ListStack", "List stack size:",
+	AddStringView(rootView, "ListStack", TR("List stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) attribStack;
-	AddStringView(rootView, "AttribStack", "Attributes stack size:",
+	AddStringView(rootView, "AttribStack", TR("Attributes stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxTex3d;
-	AddStringView(rootView, "MaxTex3D", "Max. 3D texture size:",
+	AddStringView(rootView, "MaxTex3D", TR("Max. 3D texture size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxTex2d;
-	AddStringView(rootView, "MaxTex2D", "Max. 2D texture size:",
+	AddStringView(rootView, "MaxTex2D", TR("Max. 2D texture size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) textureUnits;
-	AddStringView(rootView, "MaxTexUnits", "Max. texture units:",
+	AddStringView(rootView, "MaxTexUnits", TR("Max. texture units:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) lights;
-	AddStringView(rootView, "MaxLights", "Max. lights:",
+	AddStringView(rootView, "MaxLights", TR("Max. lights:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) clippingPlanes;
-	AddStringView(rootView, "MaxClippingPlanes", "Max. clipping planes:",
+	AddStringView(rootView, "MaxClippingPlanes", TR("Max. clipping planes:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxPoly;
-	AddStringView(rootView, "MaxPoly", "Max. evaluators equation order:",
+	AddStringView(rootView, "MaxPoly", TR("Max. evaluators equation order:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) convolutionWidth << "x" << convolutionHeight;
-	AddStringView(rootView, "MaxConvultion", "Max. convolution:",
+	AddStringView(rootView, "MaxConvultion", TR("Max. convolution:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxIndex;
-	AddStringView(rootView, "MaxIndex", "Max. recommended index elements:",
+	AddStringView(rootView, "MaxIndex", TR("Max. recommended index elements:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxVertex;
-	AddStringView(rootView, "MaxVertex", "Max. recommended vertex elements:",
+	AddStringView(rootView, "MaxVertex", TR("Max. recommended vertex elements:"),
 		tempString.String(), true);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)

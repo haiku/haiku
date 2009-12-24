@@ -8,8 +8,10 @@
 
 #include "InfoView.h"
 
+#include <Catalog.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <Message.h>
 #include <String.h>
 #include <StringView.h>
@@ -19,8 +21,11 @@
 #include <GL/glut.h>
 
 
+#define TR_CONTEXT "InfoView"
+
+
 InfoView::InfoView()
-	: BView("Information", 0, NULL)
+	: BView(TR("Information"), 0, NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -28,23 +33,23 @@ InfoView::InfoView()
 	BRect dummyRect(0, 0, 0, 0);
 
 	BStringView *version = new BStringView(dummyRect, "Version",
-		"OpenGL version:", B_FOLLOW_NONE);
+		TR("OpenGL version:"), B_FOLLOW_NONE);
 	BStringView *versionValue = new BStringView(dummyRect, "VersionVal",
 		(const char*)glGetString(GL_VERSION), B_FOLLOW_NONE);
 	BStringView *vendor = new BStringView(dummyRect, "Vendor",
-		"Vendor name:", B_FOLLOW_NONE);
+		TR("Vendor name:"), B_FOLLOW_NONE);
 	BStringView *vendorValue = new BStringView(dummyRect, "VendorVal",
 		(const char*)glGetString(GL_VENDOR), B_FOLLOW_NONE);
 	BStringView *renderer = new BStringView(dummyRect, "Renderer",
-		"Renderer name:", B_FOLLOW_NONE);
+		TR("Renderer name:"), B_FOLLOW_NONE);
 	BStringView *rendererValue = new BStringView(dummyRect, "RendererVal",
 		(const char*)glGetString(GL_RENDERER), B_FOLLOW_NONE);
 	BStringView *gluVersion = new BStringView(dummyRect, "GLUVersion",
-		"GLU version:", B_FOLLOW_NONE);
+		TR("GLU version:"), B_FOLLOW_NONE);
 	BStringView *gluVersionValue = new BStringView(dummyRect, "GLUVersionVal",
 		(const char*)gluGetString(GLU_VERSION), B_FOLLOW_NONE);
 	BStringView *glutVersion = new BStringView(dummyRect, "GLUTVersion",
-		"GLUT API version:", B_FOLLOW_NONE);
+		TR("GLUT API version:"), B_FOLLOW_NONE);
 	BString glutApiVer;
 	glutApiVer << (int32)GLUT_API_VERSION;
 	BStringView *glutVersionValue = new BStringView(dummyRect, "GLUTVersionVal",

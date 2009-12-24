@@ -8,8 +8,10 @@
 #include "ExtensionsView.h"
 #include "ExtensionsList.h"
 
+#include <Catalog.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <Message.h>
 #include <SpaceLayoutItem.h>
 #include <String.h>
@@ -17,8 +19,11 @@
 #include <GL/glu.h>
 
 
+#define TR_CONTEXT "Extensions"
+
+
 ExtensionsView::ExtensionsView()
-	: BView("Extensions", 0, NULL)
+	: BView(TR("Extensions"), 0, NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLayout(new BGroupLayout(B_VERTICAL));

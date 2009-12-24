@@ -8,8 +8,13 @@
 
 #include "ExtensionsList.h"
 
+#include <Catalog.h>
 #include <ColumnTypes.h>
+#include <Locale.h>
 #include <String.h>
+
+
+#define TR_CONTEXT "Extensions"
 
 
 ExtensionRow::ExtensionRow(const char* extensionName)
@@ -29,7 +34,7 @@ ExtensionRow::~ExtensionRow()
 ExtensionsList::ExtensionsList()
 	: BColumnListView("ExtensionsList", B_FOLLOW_ALL)
 {
-	BStringColumn* column = new BStringColumn("Available", 280, 280, 280,
+	BStringColumn* column = new BStringColumn(TR("Available"), 280, 280, 280,
 		B_TRUNCATE_MIDDLE);
 	AddColumn(column, 0);
 	SetSortingEnabled(true);
