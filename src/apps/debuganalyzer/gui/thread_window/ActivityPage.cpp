@@ -352,17 +352,17 @@ ThreadWindow::ActivityPage::ActivityPage()
 		.Add(new BScrollView("activity scroll", fActivityChart, 0, true, false))
 		.AddStrut(20)
 		.Add(BGridLayoutBuilder()
-			.Add(fRunTimeCheckBox = new ColorCheckBox("Run Time", kRunTimeColor,
+			.Add(fRunTimeCheckBox = new ColorCheckBox("Run time", kRunTimeColor,
 					new BMessage(MSG_CHECK_BOX_RUN_TIME)),
 				0, 0)
-			.Add(fWaitTimeCheckBox = new ColorCheckBox("Wait Time",
+			.Add(fWaitTimeCheckBox = new ColorCheckBox("Wait time",
 					kWaitTimeColor, new BMessage(MSG_CHECK_BOX_WAIT_TIME)),
 				1, 0)
-			.Add(fPreemptionTimeCheckBox = new ColorCheckBox("Preemption Time",
+			.Add(fPreemptionTimeCheckBox = new ColorCheckBox("Preemption time",
 					kPreemptionTimeColor,
 					new BMessage(MSG_CHECK_BOX_PREEMPTION_TIME)),
 				0, 1)
-			.Add(fLatencyTimeCheckBox = new ColorCheckBox("Latency Time",
+			.Add(fLatencyTimeCheckBox = new ColorCheckBox("Latency time",
 					kLatencyTimeColor,
 					new BMessage(MSG_CHECK_BOX_LATENCY_TIME)),
 				1, 1)

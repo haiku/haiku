@@ -27,11 +27,11 @@ ThreadWindow::GeneralPage::GeneralPage()
 	fThreadNameView = AddDataView("Name:");
 	fThreadIDView = AddDataView("ID:");
 	fTeamView = AddDataView("Team:");
-	fRunTimeView = AddDataView("Run Time:");
-	fWaitTimeView = AddDataView("Wait Time:");
+	fRunTimeView = AddDataView("Run time:");
+	fWaitTimeView = AddDataView("Wait time:");
 	fLatencyView = AddDataView("Latencies:");
 	fPreemptionView = AddDataView("Preemptions:");
-	fUnspecifiedTimeView = AddDataView("Unspecified Time:");
+	fUnspecifiedTimeView = AddDataView("Unspecified time:");
 }
 
 

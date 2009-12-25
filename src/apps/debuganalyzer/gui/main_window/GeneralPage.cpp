@@ -21,10 +21,10 @@ MainWindow::GeneralPage::GeneralPage()
 	fTeamCountView(NULL),
 	fThreadCountView(NULL)
 {
-	fDataSourceView = AddDataView("Data Source:");
+	fDataSourceView = AddDataView("Data source:");
 	fCPUCountView = AddDataView("Number of CPUs:");
-	fRunTimeView = AddDataView("Total Time:");
-	fIdleTimeView = AddDataView("Idle Time:");
+	fRunTimeView = AddDataView("Total time:");
+	fIdleTimeView = AddDataView("Idle time:");
 	fTeamCountView = AddDataView("Teams:");
 	fThreadCountView = AddDataView("Threads:");
 }

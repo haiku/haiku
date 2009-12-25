@@ -133,21 +133,21 @@ MainWindow::ThreadsPage::ThreadsPage(MainWindow* parent)
 		1000, false, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new Int64TableColumn(5, "Runs", 80, 20, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new NanotimeTableColumn(6, "Run Time", 80, 20,
+	fThreadsTable->AddColumn(new NanotimeTableColumn(6, "Run time", 80, 20,
 		1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new Int64TableColumn(7, "Latencies", 80, 20, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new NanotimeTableColumn(8, "Latency Time", 80, 20,
+	fThreadsTable->AddColumn(new NanotimeTableColumn(8, "Latency time", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new Int64TableColumn(9, "Preemptions", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new NanotimeTableColumn(10, "Preemption Time", 80,
+	fThreadsTable->AddColumn(new NanotimeTableColumn(10, "Preemption time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new Int64TableColumn(11, "Waits", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new NanotimeTableColumn(12, "Wait Time", 80,
+	fThreadsTable->AddColumn(new NanotimeTableColumn(12, "Wait time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new NanotimeTableColumn(13, "Unspecified Time", 80,
+	fThreadsTable->AddColumn(new NanotimeTableColumn(13, "Unspecified time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fThreadsTable->AddColumn(new Int64TableColumn(14, "I/O Count", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));

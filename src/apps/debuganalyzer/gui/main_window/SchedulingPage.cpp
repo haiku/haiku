@@ -478,21 +478,21 @@ public:
 			int32 filteredCount = fFilterModel->CountSelectedItems();
 			int32 selectedCount = fSelectionModel->CountSelectedItems();
 
-			BMenuItem* item = new BMenuItem("Hide Selected Threads",
+			BMenuItem* item = new BMenuItem("Hide selected threads",
 				new BMessage(MSG_SCHEDULING_FILTER_HIDE_SELECTED));
 			contextMenu->AddItem(item);
 			item->SetTarget(this);
 			if (selectedCount == 0 || selectedCount == filteredCount)
 				item->SetEnabled(false);
 
-			item = new BMenuItem("Hide Unselected Threads",
+			item = new BMenuItem("Hide unselected threads",
 				new BMessage(MSG_SCHEDULING_FILTER_HIDE_UNSELECTED));
 			contextMenu->AddItem(item);
 			item->SetTarget(this);
 			if (selectedCount == 0 || selectedCount == filteredCount)
 				item->SetEnabled(false);
 
-			item = new BMenuItem("Show All Threads",
+			item = new BMenuItem("Show all threads",
 				new BMessage(MSG_SCHEDULING_FILTER_SHOW_ALL));
 			contextMenu->AddItem(item);
 			item->SetTarget(this);
@@ -899,7 +899,7 @@ public:
 		}
 
 		text << "\n\n";
-		text << "Running Threads:";
+		text << "Running threads:";
 		for (int32 i = 0; i < cpuCount; i++) {
 			text << "\n  " << i << ": ";
 			if (Model::Thread* thread = runningThreads[i])
