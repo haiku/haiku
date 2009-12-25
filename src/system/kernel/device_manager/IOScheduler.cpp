@@ -8,6 +8,7 @@
 #include "IOScheduler.h"
 
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -103,7 +104,7 @@ IOScheduler::IOScheduler(DMAResource* resource)
 	:
 	fDMAResource(resource),
 	fName(NULL),
-	fID(-1),
+	fID(IOSchedulerRoster::Default()->NextID()),
 	fSchedulerThread(-1),
 	fRequestNotifierThread(-1),
 	fOperationArray(NULL),
@@ -215,14 +216,20 @@ IOScheduler::Init(const char* name)
 	// start threads
 	char buffer[B_OS_NAME_LENGTH];
 	strlcpy(buffer, name, sizeof(buffer));
-	strlcat(buffer, " scheduler", sizeof(buffer));
+	strlcat(buffer, " scheduler ", sizeof(buffer));
+	size_t nameLength = strlen(buffer);
+	snprintf(buffer + nameLength, sizeof(buffer) - nameLength, "%" B_PRId32,
+		fID);
 	fSchedulerThread = spawn_kernel_thread(&_SchedulerThread, buffer,
 		B_NORMAL_PRIORITY + 2, (void *)this);
 	if (fSchedulerThread < B_OK)
 		return fSchedulerThread;
 
 	strlcpy(buffer, name, sizeof(buffer));
-	strlcat(buffer, " notifier", sizeof(buffer));
+	strlcat(buffer, " notifier ", sizeof(buffer));
+	nameLength = strlen(buffer);
+	snprintf(buffer + nameLength, sizeof(buffer) - nameLength, "%" B_PRId32,
+		fID);
 	fRequestNotifierThread = spawn_kernel_thread(&_RequestNotifierThread,
 		buffer, B_NORMAL_PRIORITY + 2, (void *)this);
 	if (fRequestNotifierThread < B_OK)
@@ -887,7 +894,6 @@ void
 IOSchedulerRoster::AddScheduler(IOScheduler* scheduler)
 {
 	AutoLocker<IOSchedulerRoster> locker(this);
-	scheduler->SetID(fNextID++);
 	fSchedulers.Add(scheduler);
 	locker.Unlock();
 
@@ -926,6 +932,14 @@ IOSchedulerRoster::Notify(uint32 eventCode, const IOScheduler* scheduler,
 	}
 
 	fNotificationService.NotifyLocked(event, eventCode);
+}
+
+
+int32
+IOSchedulerRoster::NextID()
+{
+	AutoLocker<IOSchedulerRoster> locker(this);
+	return fNextID++;
 }
 
 

@@ -81,7 +81,6 @@ public:
 			const char*			Name() const	{ return fName; }
 
 			int32				ID() const		{ return fID; }
-			void				SetID(int32 id)	{ fID = id; }
 
 			void				Dump() const;
 
@@ -172,6 +171,8 @@ public:
 									const IOScheduler* scheduler,
 									IORequest* request = NULL,
 									IOOperation* operation = NULL);
+
+			int32				NextID();
 
 private:
 								IOSchedulerRoster();
