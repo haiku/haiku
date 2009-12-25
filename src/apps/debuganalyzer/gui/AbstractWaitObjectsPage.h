@@ -433,13 +433,13 @@ ABSTRACT_WAIT_OBJECTS_PAGE_CLASS::AbstractWaitObjectsPage()
 	fGroupByNameCheckBox(NULL),
 	fGroupByName(false)
 {
-	SetName("Wait Objects");
+	SetName("Wait objects");
 
 	fWaitObjectsTree = new TreeTable("wait object list", 0);
 	AddChild(fWaitObjectsTree->ToView());
 
 	fGroupByNameCheckBox = new BCheckBox("group by name checkbox",
-		"Group by Name", new BMessage(MSG_ABSTRACT_WAIT_OBJECTS_GROUP_BY_NAME));
+		"Group by name", new BMessage(MSG_ABSTRACT_WAIT_OBJECTS_GROUP_BY_NAME));
 	fGroupByNameCheckBox->SetValue(
 		fGroupByName ? B_CONTROL_ON : B_CONTROL_OFF);
 	AddChild(fGroupByNameCheckBox);
@@ -454,7 +454,7 @@ ABSTRACT_WAIT_OBJECTS_PAGE_CLASS::AbstractWaitObjectsPage()
 		1000, B_TRUNCATE_END, B_ALIGN_LEFT));
 	fWaitObjectsTree->AddColumn(new Int64TableColumn(4, "Waits", 80, 20,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fWaitObjectsTree->AddColumn(new NanotimeTableColumn(5, "Wait Time", 80,
+	fWaitObjectsTree->AddColumn(new NanotimeTableColumn(5, "Wait time", 80,
 		20, 1000, false, B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fWaitObjectsTree->AddTreeTableListener(this);
