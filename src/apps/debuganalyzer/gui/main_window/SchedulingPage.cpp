@@ -857,7 +857,7 @@ public:
 			<< format_nanotime(threadStateEndTime - threadStateTime);
 
 		if (!ioRequests.IsEmpty()) {
-			int32 scheduler;
+			int32 scheduler = 0;
 			for (int32 i = 0; Model::IORequest* request = ioRequests.ItemAt(i);
 					i++) {
 				if (i == 0 || scheduler != request->Scheduler()) {
