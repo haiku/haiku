@@ -34,19 +34,19 @@ public:
 protected:
 	BluetoothDevice*	fDevice;
 
-	BStringView*	fName;
-	BStringView*	fBdaddr;
-	BStringView*	fClassService;
-	BStringView*	fClass;
+	BStringView*		fName;
+	BStringView*		fBdaddr;
+	BStringView*		fClassService;
+	BStringView*		fClass;
 
-	BStringView*	fHCIVersionProperties;
-	BStringView*	fLMPVersionProperties;
-	BStringView*	fManufacturerProperties;
+	BStringView*		fHCIVersionProperties;
+	BStringView*		fLMPVersionProperties;
+	BStringView*		fManufacturerProperties;
 
-	BStringView*	fACLBuffersProperties;
-	BStringView*	fSCOBuffersProperties;
+	BStringView*		fACLBuffersProperties;
+	BStringView*		fSCOBuffersProperties;
 
-	BView*			fIcon;
+	BView*				fIcon;
 };
 
 
