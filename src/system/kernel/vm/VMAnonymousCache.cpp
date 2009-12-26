@@ -8,6 +8,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include "VMAnonymousCache.h"
 
 #include <errno.h>
@@ -64,13 +65,14 @@
 #define SWAP_BLOCK_SHIFT 5		/* 1 << SWAP_BLOCK_SHIFT == SWAP_BLOCK_PAGES */
 #define SWAP_BLOCK_MASK  (SWAP_BLOCK_PAGES - 1)
 
+
 struct swap_file : DoublyLinkedListLinkImpl<swap_file> {
 	int				fd;
-	struct vnode	*vnode;
-	void			*cookie;
+	struct vnode*	vnode;
+	void*			cookie;
 	swap_addr_t		first_slot;
 	swap_addr_t		last_slot;
-	radix_bitmap    *bmp;
+	radix_bitmap*	bmp;
 };
 
 struct swap_hash_key {
@@ -96,23 +98,23 @@ struct SwapHashTableDefinition {
 	size_t HashKey(const swap_hash_key& key) const
 	{
 		off_t blockIndex = key.page_index >> SWAP_BLOCK_SHIFT;
-		VMAnonymousCache *cache = key.cache;
-		return blockIndex ^ (int)(int *)cache;
+		VMAnonymousCache* cache = key.cache;
+		return blockIndex ^ (size_t)(int*)cache;
 	}
 
-	size_t Hash(const swap_block *value) const
+	size_t Hash(const swap_block* value) const
 	{
 		return HashKey(value->key);
 	}
 
-	bool Compare(const swap_hash_key& key, const swap_block *value) const
+	bool Compare(const swap_hash_key& key, const swap_block* value) const
 	{
 		return (key.page_index & ~(off_t)SWAP_BLOCK_MASK)
 				== (value->key.page_index & ~(off_t)SWAP_BLOCK_MASK)
 			&& key.cache == value->key.cache;
 	}
 
-	swap_block*& GetLink(swap_block *value) const
+	swap_block*& GetLink(swap_block* value) const
 	{
 		return value->hash_link;
 	}
@@ -126,13 +128,13 @@ static rw_lock sSwapHashLock;
 
 static SwapFileList sSwapFileList;
 static mutex sSwapFileListLock;
-static swap_file *sSwapFileAlloc = NULL; // allocate from here
+static swap_file* sSwapFileAlloc = NULL; // allocate from here
 static uint32 sSwapFileCount = 0;
 
 static off_t sAvailSwapSpace = 0;
 static mutex sAvailSwapSpaceLock;
 
-static object_cache *sSwapBlockCache;
+static object_cache* sSwapBlockCache;
 
 
 #if SWAP_TRACING
@@ -288,11 +290,11 @@ swap_slot_alloc(uint32 count)
 }
 
 
-static swap_file *
+static swap_file*
 find_swap_file(swap_addr_t slotIndex)
 {
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
-			swap_file *swapFile = it.Next();) {
+			swap_file* swapFile = it.Next();) {
 		if (slotIndex >= swapFile->first_slot
 				&& slotIndex < swapFile->last_slot)
 			return swapFile;
@@ -310,7 +312,7 @@ swap_slot_dealloc(swap_addr_t slotIndex, uint32 count)
 		return;
 
 	mutex_lock(&sSwapFileListLock);
-	swap_file *swapFile = find_swap_file(slotIndex);
+	swap_file* swapFile = find_swap_file(slotIndex);
 	slotIndex -= swapFile->first_slot;
 	radix_bitmap_dealloc(swapFile->bmp, slotIndex, count);
 	mutex_unlock(&sSwapFileListLock);
@@ -497,8 +499,8 @@ VMAnonymousCache::HasPage(off_t offset)
 
 
 status_t
-VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
-	uint32 flags, size_t *_numBytes)
+VMAnonymousCache::Read(off_t offset, const iovec* vecs, size_t count,
+	uint32 flags, size_t* _numBytes)
 {
 	off_t pageIndex = offset >> PAGE_SHIFT;
 
@@ -513,7 +515,7 @@ VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
 		T(ReadPage(this, pageIndex, startSlotIndex));
 			// TODO: Assumes that only one page is read.
 
-		swap_file *swapFile = find_swap_file(startSlotIndex);
+		swap_file* swapFile = find_swap_file(startSlotIndex);
 
 		off_t pos = (off_t)(startSlotIndex - swapFile->first_slot)
 			* B_PAGE_SIZE;
@@ -529,8 +531,8 @@ VMAnonymousCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 
 status_t
-VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
-	uint32 flags, size_t *_numBytes)
+VMAnonymousCache::Write(off_t offset, const iovec* vecs, size_t count,
+	uint32 flags, size_t* _numBytes)
 {
 	off_t pageIndex = offset >> PAGE_SHIFT;
 
@@ -562,7 +564,7 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 	for (uint32 i = 0; i < count; i++) {
 		uint32 pageCount = (vecs[i].iov_len + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
 
-		void *vectorBase = vecs[i].iov_base;
+		void* vectorBase = vecs[i].iov_base;
 		size_t vectorLength = vecs[i].iov_len;
 		uint32 n = pageCount;
 
@@ -578,7 +580,7 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 			T(WritePage(this, pageIndex, slotIndex));
 				// TODO: Assumes that only one page is written.
 
-			swap_file *swapFile = find_swap_file(slotIndex);
+			swap_file* swapFile = find_swap_file(slotIndex);
 
 			off_t pos = (off_t)(slotIndex - swapFile->first_slot) * B_PAGE_SIZE;
 
@@ -602,7 +604,7 @@ VMAnonymousCache::Write(off_t offset, const iovec *vecs, size_t count,
 			pagesLeft -= n;
 
 			if (n != pageCount) {
-				vectorBase = (void *)((addr_t)vectorBase + n * B_PAGE_SIZE);
+				vectorBase = (void*)((addr_t)vectorBase + n * B_PAGE_SIZE);
 				vectorLength -= n * B_PAGE_SIZE;
 			}
 		}
@@ -683,6 +685,13 @@ VMAnonymousCache::CanWritePage(off_t offset)
 }
 
 
+int32
+VMAnonymousCache::MaxPagesPerAsyncWrite() const
+{
+	return 1;
+}
+
+
 status_t
 VMAnonymousCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 {
@@ -744,38 +753,7 @@ VMAnonymousCache::Merge(VMCache* _source)
 
 	// Move all not shadowed pages from the source to the consumer cache.
 
-	for (VMCachePagesTree::Iterator it = source->pages.GetIterator();
-			vm_page* page = it.Next();) {
-		// Note: Removing the current node while iterating through a
-		// IteratableSplayTree is safe.
-		vm_page* consumerPage = LookupPage(
-			(off_t)page->cache_offset << PAGE_SHIFT);
-		swap_addr_t consumerSwapSlot = _SwapBlockGetAddress(page->cache_offset);
-		if (consumerPage == NULL && consumerSwapSlot == SWAP_SLOT_NONE) {
-			// the page is not yet in the consumer cache - move it upwards
-			source->RemovePage(page);
-			InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
-
-			// If the moved-up page has a swap page associated, we mark it, so
-			// that the swap page is moved upwards, too. We would lose if the
-			// page was modified and written to swap, and is now not marked
-			// modified.
-			if (source->_SwapBlockGetAddress(page->cache_offset)
-					!= SWAP_SLOT_NONE) {
-				page->merge_swap = true;
-			}
-#if DEBUG_PAGE_CACHE_TRANSITIONS
-		} else {
-			page->debug_flags = 0;
-			if (consumerPage->state == PAGE_STATE_BUSY)
-				page->debug_flags |= 0x1;
-			if (consumerPage->type == PAGE_TYPE_DUMMY)
-				page->debug_flags |= 0x2;
-			page->collided_page = consumerPage;
-			consumerPage->collided_page = page;
-#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
-		}
-	}
+	_MergePagesSmallerSource(source);
 
 	// Move all not shadowed swap pages from the source to the consumer cache.
 
@@ -844,7 +822,7 @@ VMAnonymousCache::Merge(VMCache* _source)
 		}
 
 		// All source swap pages that have not been freed yet are taken over by
-		// by the consumer.
+		// the consumer.
 		fAllocatedSwapSize += B_PAGE_SIZE * (off_t)sourceSwapBlock->used;
 
 		if (sourceSwapBlock->used == 0) {
@@ -887,9 +865,9 @@ VMAnonymousCache::_SwapBlockBuild(off_t startPageIndex,
 
 		swap_hash_key key = { this, pageIndex };
 
-		swap_block *swap = sSwapHashTable.Lookup(key);
+		swap_block* swap = sSwapHashTable.Lookup(key);
 		while (swap == NULL) {
-			swap = (swap_block *)object_cache_alloc(sSwapBlockCache,
+			swap = (swap_block*)object_cache_alloc(sSwapBlockCache,
 				CACHE_DONT_SLEEP);
 			if (swap == NULL) {
 				// Wait a short time until memory is available again.
@@ -929,7 +907,7 @@ VMAnonymousCache::_SwapBlockFree(off_t startPageIndex, uint32 count)
 	for (uint32 i = 0, j = 0; i < count; i += j) {
 		off_t pageIndex = startPageIndex + i;
 		swap_hash_key key = { this, pageIndex };
-		swap_block *swap = sSwapHashTable.Lookup(key);
+		swap_block* swap = sSwapHashTable.Lookup(key);
 
 		ASSERT(swap != NULL);
 
@@ -954,7 +932,7 @@ VMAnonymousCache::_SwapBlockGetAddress(off_t pageIndex)
 	ReadLocker locker(sSwapHashLock);
 
 	swap_hash_key key = { this, pageIndex };
-	swap_block *swap = sSwapHashTable.Lookup(key);
+	swap_block* swap = sSwapHashTable.Lookup(key);
 	swap_addr_t slotIndex = SWAP_SLOT_NONE;
 
 	if (swap != NULL) {
@@ -1028,11 +1006,49 @@ VMAnonymousCache::_Commit(off_t size)
 }
 
 
+void
+VMAnonymousCache::_MergePagesSmallerSource(VMAnonymousCache* source)
+{
+	for (VMCachePagesTree::Iterator it = source->pages.GetIterator();
+			vm_page* page = it.Next();) {
+		// Note: Removing the current node while iterating through a
+		// IteratableSplayTree is safe.
+		vm_page* consumerPage = LookupPage(
+			(off_t)page->cache_offset << PAGE_SHIFT);
+		swap_addr_t consumerSwapSlot = _SwapBlockGetAddress(page->cache_offset);
+		if (consumerPage == NULL && consumerSwapSlot == SWAP_SLOT_NONE) {
+			// the page is not yet in the consumer cache - move it upwards
+			source->RemovePage(page);
+			InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
+
+			// If the moved-up page has a swap page associated, we mark it, so
+			// that the swap page is moved upwards, too. We would lose if the
+			// page was modified and written to swap, and is now not marked
+			// modified.
+			if (source->_SwapBlockGetAddress(page->cache_offset)
+					!= SWAP_SLOT_NONE) {
+				page->merge_swap = true;
+			}
+#if DEBUG_PAGE_CACHE_TRANSITIONS
+		} else {
+			page->debug_flags = 0;
+			if (consumerPage->state == PAGE_STATE_BUSY)
+				page->debug_flags |= 0x1;
+			if (consumerPage->type == PAGE_TYPE_DUMMY)
+				page->debug_flags |= 0x2;
+			page->collided_page = consumerPage;
+			consumerPage->collided_page = page;
+#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
+		}
+	}
+}
+
+
 // #pragma mark -
 
 
 status_t
-swap_file_add(const char *path)
+swap_file_add(const char* path)
 {
 	// open the file
 	int fd = open(path, O_RDWR | O_NOCACHE, S_IRUSR | S_IWUSR);
@@ -1060,14 +1076,14 @@ swap_file_add(const char *path)
 	file_descriptor* descriptor = get_fd(get_current_io_context(true), fd);
 	put_fd(descriptor);
 
-	vnode *node = fd_vnode(descriptor);
+	vnode* node = fd_vnode(descriptor);
 	if (node == NULL) {
 		close(fd);
 		return B_BAD_VALUE;
 	}
 
 	// do the allocations and prepare the swap_file structure
-	swap_file *swap = (swap_file *)malloc(sizeof(swap_file));
+	swap_file* swap = (swap_file*)malloc(sizeof(swap_file));
 	if (swap == NULL) {
 		close(fd);
 		return B_NO_MEMORY;
@@ -1109,16 +1125,16 @@ swap_file_add(const char *path)
 
 
 status_t
-swap_file_delete(const char *path)
+swap_file_delete(const char* path)
 {
-	vnode *node = NULL;
+	vnode* node = NULL;
 	status_t status = vfs_get_vnode_from_path(path, true, &node);
 	if (status != B_OK)
 		return status;
 
 	MutexLocker locker(sSwapFileListLock);
 
-	swap_file *swapFile = NULL;
+	swap_file* swapFile = NULL;
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
 			(swapFile = it.Next()) != NULL;) {
 		if (swapFile->vnode == node)
@@ -1206,12 +1222,12 @@ swap_init_post_modules()
 
 	off_t size = 0;
 
-	void *settings = load_driver_settings("virtual_memory");
+	void* settings = load_driver_settings("virtual_memory");
 	if (settings != NULL) {
 		if (!get_driver_boolean_parameter(settings, "vm", false, false))
 			return;
 
-		const char *string = get_driver_parameter(settings, "swap_size", NULL,
+		const char* string = get_driver_parameter(settings, "swap_size", NULL,
 			NULL);
 		size = string ? atoll(string) : 0;
 
@@ -1247,9 +1263,9 @@ swap_init_post_modules()
 
 //! Used by page daemon to free swap space.
 bool
-swap_free_page_swap_space(vm_page *page)
+swap_free_page_swap_space(vm_page* page)
 {
-	VMAnonymousCache *cache = dynamic_cast<VMAnonymousCache *>(page->cache);
+	VMAnonymousCache* cache = dynamic_cast<VMAnonymousCache*>(page->cache);
 	if (cache == NULL)
 		return false;
 
@@ -1283,7 +1299,7 @@ swap_total_swap_pages()
 
 	uint32 totalSwapSlots = 0;
 	for (SwapFileList::Iterator it = sSwapFileList.GetIterator();
-			swap_file *swapFile = it.Next();)
+			swap_file* swapFile = it.Next();)
 		totalSwapSlots += swapFile->last_slot - swapFile->first_slot;
 
 	mutex_unlock(&sSwapFileListLock);
@@ -1294,7 +1310,7 @@ swap_total_swap_pages()
 #endif	// ENABLE_SWAP_SUPPORT
 
 void
-swap_get_info(struct system_memory_info *info)
+swap_get_info(struct system_memory_info* info)
 {
 #if ENABLE_SWAP_SUPPORT
 	info->max_swap_space = (uint64)swap_total_swap_pages() * B_PAGE_SIZE;
