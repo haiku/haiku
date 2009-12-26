@@ -11,6 +11,7 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
 #include "OpenGLWindow.h"
 
 
@@ -23,6 +24,7 @@ public:
 
 private:
     OpenGLWindow* fWindow;
+	BCatalog fCatalog;
 };
 
 #endif /* OPENGL_APP_H_ */

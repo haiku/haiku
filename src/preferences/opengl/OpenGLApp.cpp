@@ -6,6 +6,8 @@
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
+#include <Locale.h>
+
 #include "OpenGLApp.h"
 #include "OpenGLWindow.h"
 
@@ -24,6 +26,7 @@ OpenGLApp::~OpenGLApp()
 void
 OpenGLApp::ReadyToRun()
 {
+	be_locale->GetAppCatalog(&fCatalog);
     fWindow = new OpenGLWindow();
     fWindow->Show();
 
