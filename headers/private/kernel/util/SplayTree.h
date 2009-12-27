@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold <ingo_weinhold@gmx.de>.
+ * Copyright 2008-2009, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * Distributed under the terms of the MIT License.
  *
  * Original Java implementation:
@@ -23,12 +23,12 @@
 	struct SplayTreeDefinition {
 		typedef xxx KeyType;
 		typedef	yyy NodeType;
-	
+
 		static const KeyType& GetKey(const NodeType* node);
 		static SplayTreeLink<NodeType>* GetLink(NodeType* node);
-	
+
 		static int Compare(const KeyType& key, const NodeType* node);
-	
+
 		// for IteratableSplayTree only
 		static NodeType** GetListLink(NodeType* node);
 	};
@@ -255,16 +255,22 @@ public:
 		return closestNode;
 	}
 
+	SplayTree& operator=(const SplayTree& other)
+	{
+		fRoot = other.fRoot;
+		return *this;
+	}
+
 private:
 	/*!
 		Internal method to perform a top-down splay.
-		
+
 		_Splay(key) does the splay operation on the given key.
 		If key is in the tree, then the node containing
 		that key becomes the root.  If key is not in the tree,
 		then after the splay, key.root is either the greatest key
 		< key in the tree, or the least key > key in the tree.
-		
+
 		This means, among other things, that if you splay with
 		a key that's larger than any in the tree, the rightmost
 		node of the tree becomes the root.  This property is used
@@ -585,6 +591,13 @@ public:
 	ConstIterator GetIterator(const Key& key, bool greater, bool orEqual) const
 	{
 		return ConstIterator(this, FindClosest(key, greater, orEqual));
+	}
+
+	IteratableSplayTree& operator=(const IteratableSplayTree& other)
+	{
+		fTree = other.fTree;
+		fFirst = other.fFirst;
+		return *this;
 	}
 
 protected:
