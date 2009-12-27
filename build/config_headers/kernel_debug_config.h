@@ -84,10 +84,6 @@
 // be in.
 #define DEBUG_PAGE_QUEUE				0
 
-// Enables extra debug fields in the vm_page used to track page transitions
-// between caches.
-#define DEBUG_PAGE_CACHE_TRANSITIONS	0
-
 // Enables a global list of all vm_cache structures.
 #define DEBUG_CACHE_LIST				KDEBUG_LEVEL_1
 

@@ -564,10 +564,6 @@ dump_page(int argc, char **argv)
 	#if DEBUG_PAGE_QUEUE
 		kprintf("queue:           %p\n", page->queue);
 	#endif
-	#if DEBUG_PAGE_CACHE_TRANSITIONS
-		kprintf("debug_flags:     0x%lx\n", page->debug_flags);
-		kprintf("collided page:   %p\n", page->collided_page);
-	#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
 	kprintf("area mappings:\n");
 
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
@@ -1906,15 +1902,10 @@ vm_page_init(kernel_args *args)
 		sPages[i].wired_count = 0;
 		sPages[i].usage_count = 0;
 		sPages[i].busy_writing = false;
-		sPages[i].merge_swap = false;
 		sPages[i].cache = NULL;
 		#if DEBUG_PAGE_QUEUE
 			sPages[i].queue = NULL;
 		#endif
-		#if DEBUG_PAGE_CACHE_TRANSITIONS
-			sPages[i].debug_flags = 0;
-			sPages[i].collided_page = NULL;
-		#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
 		enqueue_page(&sFreePageQueue, &sPages[i]);
 	}
 

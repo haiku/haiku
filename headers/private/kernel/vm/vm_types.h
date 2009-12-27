@@ -90,18 +90,13 @@ struct vm_page {
 	void*					queue;
 #endif
 
-#if DEBUG_PAGE_CACHE_TRANSITIONS
-	uint32					debug_flags;
-	struct vm_page*			collided_page;
-#endif
-
 	uint8					type : 2;
 	uint8					state : 3;
 
 	uint8					is_cleared : 1;
 		// is currently only used in vm_page_allocate_page_run()
 	uint8					busy_writing : 1;
-	uint8					merge_swap : 1;
+	uint8					unused : 1;
 		// used in VMAnonymousCache::Merge()
 
 	int8					usage_count;

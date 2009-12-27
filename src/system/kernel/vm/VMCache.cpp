@@ -13,6 +13,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include <algorithm>
+
 #include <arch/cpu.h>
 #include <condition_variable.h>
 #include <debug.h>
@@ -789,6 +791,53 @@ VMCache::RemovePage(vm_page* page)
 }
 
 
+/*!	Moves the given page from its current cache inserts it into this cache.
+	Both caches must be locked.
+*/
+void
+VMCache::MovePage(vm_page* page)
+{
+	VMCache* oldCache = page->cache;
+
+	AssertLocked();
+	oldCache->AssertLocked();
+
+	// remove from old cache
+	oldCache->pages.Remove(page);
+	oldCache->page_count--;
+	T2(RemovePage(oldCache, page));
+
+	// insert here
+	pages.Insert(page);
+	page_count++;
+	page->cache = this;
+	T2(InsertPage(this, page, page->cache_offset << PAGE_SHIFT));
+}
+
+
+/*!	Moves all pages from the given cache to this one.
+	Both caches must be locked. This cache must be empty.
+*/
+void
+VMCache::MoveAllPages(VMCache* fromCache)
+{
+	AssertLocked();
+	fromCache->AssertLocked();
+	ASSERT(page_count == 0);
+
+	std::swap(fromCache->pages, pages);
+	page_count = fromCache->page_count;
+	fromCache->page_count = 0;
+
+	for (VMCachePagesTree::Iterator it = pages.GetIterator();
+			vm_page* page = it.Next();) {
+		page->cache = this;
+		T2(RemovePage(fromCache, page));
+		T2(InsertPage(this, page, page->cache_offset << PAGE_SHIFT));
+	}
+}
+
+
 /*!	Waits until one or more events happened for a given page which belongs to
 	this cache.
 	The cache must be locked. It will be unlocked by the method. \a relock
@@ -1165,16 +1214,6 @@ VMCache::Merge(VMCache* source)
 			// the page is not yet in the consumer cache - move it upwards
 			source->RemovePage(page);
 			InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
-#if DEBUG_PAGE_CACHE_TRANSITIONS
-		} else {
-			page->debug_flags = 0;
-			if (consumerPage->state == PAGE_STATE_BUSY)
-				page->debug_flags |= 0x1;
-			if (consumerPage->type == PAGE_TYPE_DUMMY)
-				page->debug_flags |= 0x2;
-			page->collided_page = consumerPage;
-			consumerPage->collided_page = page;
-#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
 		}
 	}
 }

@@ -96,6 +96,8 @@ public:
 			vm_page*			LookupPage(off_t offset);
 			void				InsertPage(vm_page* page, off_t offset);
 			void				RemovePage(vm_page* page);
+			void				MovePage(vm_page* page);
+			void				MoveAllPages(VMCache* fromCache);
 
 			void				AddConsumer(VMCache* consumer);
 
