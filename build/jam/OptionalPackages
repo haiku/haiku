@@ -348,6 +348,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	# other commonly used tools
 	InstallOptionalHaikuImagePackage bison-2.4.1-r1a1-x86-gcc2-2009-08-31
 		: $(baseURL)/bison-2.4.1-r1a1-x86-gcc2-2009-08-31.zip ;
+	InstallOptionalHaikuImagePackage sed-4.2.1-r1a1-x86-gcc2-2009-08-30
+		: $(baseURL)/sed-4.2.1-r1a1-x86-gcc2-2009-08-30.zip ;
 	InstallOptionalHaikuImagePackage m4-1.4.13-r1a1-x86-gcc2-2009-08-28
 		: $(baseURL)/m4-1.4.13-r1a1-x86-gcc2-2009-08-28.zip ;
 	InstallOptionalHaikuImagePackage flex-2.5.35-r1a1-x86-gcc2-2009-08-31
