@@ -12,55 +12,57 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 
 
 # Available Optional Packages:
-#	APR					- support libraries used for example by Subversion
+#	APR						- support libraries used for example by Subversion
 #	APR-util
-#	Beam				- powerful native e-mail client
-#	BeBook				- the classic BeOS API documentation
-#	BeHappy				- special documentation (i.e. BeBook) browser
-#	BeOSCompatibility	- creates links within the system to support old apps
-#	BePDF				- native PDF reader
-#	Bluetooth			- experimental Haiku components for Bluetooth
-#	CDRecord			- the command line CD writing tools
-#	Clockwerk			- native audio/video compositing
-#	CLucene				- indexed file search
-#	Curl				- a client that groks URLs
-#	CMake				- cross platform make
-#	CVS					- the version control system
-#	Development			- more complete dev environment (including autotools)
-#	DevelopmentBase		- basic development environment (gcc, headers, libs,...)
-#	DevelopmentMin		- development headers, libs, tools, from sources only
-#	Expat				- XML parsing libraries
-#	Firefox				- the webbrowser
-#	Git					- the distributed version control system
-#	KeymapSwitcher		- Desktop utility
-#	LibIconv			- text encoding conversion library
-#	LibLayout			- GCC2 package needed by some BeOS apps to compile
-#	LibXML2				- the XML support libary
-#	Links				- the web browser
-#	Mercurial			- the distributed version control system
-#	Nano				- the command line text editor
-#	Neon				- support libraries used for example by SVN
-#	NetSurf				- the web browser
-#	OCaml				- the Objective Caml language
-#	OpenSound			- additional audio driver package
-#	OpenSSH				- the secure shell
-#	OpenSSL				- secure sockets library
-#	P7zip				- file archiving utility
-#	PCRE				- the (Perl-compatible) regex engine
-#	Pe					- the powerful native Programmer's Editor
-#	Perl				- the scripting language
-#	Python				- the scripting language
-#	Rsync				- remote directory synchronization
-#	SQLite				- the database implementation
-#	Subversion			- the version control system
-#	Tar					- archiving utility
-#	UserlandFS			- aids native file system development (like FUSE)
-#	Vim					- the command line text editor
-#	Vision				- powerful native IRC client
-#	VLC					- the multi media player with native interface
-#	Welcome				- introductory documentation to Haiku
-#	WonderBrush			- native graphics application
-#	Yasm				- the assembler utility
+#	Beam					- powerful native e-mail client
+#	BeBook					- the classic BeOS API documentation
+#	BeHappy					- special documentation (i.e. BeBook) browser
+#	BeOSCompatibility		- creates links within the system to support old apps
+#	BePDF					- native PDF reader
+#	Bluetooth				- experimental Haiku components for Bluetooth
+#	CDRecord				- the command line CD writing tools
+#	Clockwerk				- native audio/video compositing
+#	CLucene					- indexed file search
+#	Curl					- a client that groks URLs
+#	CMake					- cross platform make
+#	CVS						- the version control system
+#	Development				- more complete dev environment (including autotools)
+#	DevelopmentBase			- basic development environment (gcc, headers, libs,...)
+#	DevelopmentMin			- development headers, libs, tools, from sources only
+#	Expat					- XML parsing libraries
+#	Firefox					- the webbrowser
+#	Git						- the distributed version control system
+#	KeymapSwitcher			- Desktop utility
+#	LibIconv				- text encoding conversion library
+#	LibLayout				- GCC2 package needed by some BeOS apps to compile
+#	LibXML2					- the XML support libary
+#	Links					- the web browser
+#	Mercurial				- the distributed version control system
+#	Nano					- the command line text editor
+#	Neon					- support libraries used for example by SVN
+#	NetSurf					- the web browser
+#	OCaml					- the Objective Caml language
+#	OpenSound				- additional audio driver package
+#	OpenSSH					- the secure shell
+#	OpenSSL					- secure sockets library
+#	P7zip					- file archiving utility
+#	PCRE					- the (Perl-compatible) regex engine
+#	Pe						- the powerful native Programmer's Editor
+#	Perl					- the scripting language
+#	Python					- the scripting language
+#	Rsync					- remote directory synchronization
+#	SQLite					- the database implementation
+#	Subversion				- the version control system
+#	Tar						- archiving utility
+#	UserlandFS				- aids native file system development (like FUSE)
+#	Vim						- the command line text editor
+#	Vision					- powerful native IRC client
+#	VLC						- the multi media player with native interface
+#	Welcome					- introductory documentation to Haiku
+#	Wifi-ipw2100+fw			- driver, firmware, and installer script for Intel PRO/Wireless 2100
+#	Wifi-iprowifi2200+fw	- driver, firmware, and installer script for Intel PRO/Wireless 2200
+#	WonderBrush				- native graphics application
+#	Yasm					- the assembler utility
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
 
@@ -1002,6 +1004,36 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 		: /boot/system/documentation/welcome/welcome.html : Welcome ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/userguide/en/contents.html : User\ Guide ;
+}
+
+# Wifi-ipw2100+fw
+if [ IsOptionalHaikuImagePackageAdded Wifi-ipw2100+fw ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Wifi-ipw2100+fw available for $(TARGET_ARCH)" ;
+	} else {
+		AddDriversToHaikuImage net :  ipw2100 ;
+		InstallOptionalHaikuImagePackage ipw2100-firmware-installer-2009-12-26
+			: $(baseURL)/ipw2100-firmware-installer-2009-12-26.zip
+			: 
+		;
+		AddSymlinkToHaikuImage home config boot launch
+			: /boot/common/bin/install_firmware_iprowifi2100 ;
+	}
+}
+
+# Wifi-iprowifi2200+fw
+if [ IsOptionalHaikuImagePackageAdded Wifi-iprowifi2200+fw ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Wifi-iprowifi2200+fw available for $(TARGET_ARCH)" ;
+	} else {
+		AddDriversToHaikuImage net :  iprowifi2200 ;
+		InstallOptionalHaikuImagePackage iprowifi2200-firmware-installer-2009-12-26
+			: $(baseURL)/iprowifi2200-firmware-installer-2009-12-26.zip
+			: 
+		;
+		AddSymlinkToHaikuImage home config boot launch
+			: /boot/common/bin/install_firmware_iprowifi2200 ;
+	}
 }
 
 
