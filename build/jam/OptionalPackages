@@ -202,8 +202,8 @@ if [ IsOptionalHaikuImagePackageAdded Bzip ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Bzip available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage bzip2-1.0.5-x86-gcc2-2009-10-22
-			: $(baseURL)/bzip2-1.0.5-x86-gcc2-2009-10-22.zip
+		InstallOptionalHaikuImagePackage bzip2-1.0.5-x86-gcc2-2009-12-27
+			: $(baseURL)/bzip2-1.0.5-x86-gcc2-2009-12-27.zip
 			:
 			: true
 		;
@@ -627,8 +627,8 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Neon available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage neon-0.29.0-r1a1-x86-gcc2-2009-10-11
-			: $(baseURL)/neon-0.29.0-r1a1-x86-gcc2-2009-10-11.zip
+		InstallOptionalHaikuImagePackage neon-0.29.1-x86-gcc2-2009-12-26
+			: $(baseURL)/neon-0.29.1-x86-gcc2-2009-12-26.zip
 			:
 			: true
 		;
