@@ -373,7 +373,7 @@ load_image(char const* name, image_type type, const char* rpath,
 	if (type != B_ADD_ON_IMAGE) {
 		found = find_loaded_image_by_name(name, APP_OR_LIBRARY_TYPE);
 
-		if (found == NULL && type != B_APP_IMAGE) {
+		if (found == NULL && type != B_APP_IMAGE && gProgramImage != NULL) {
 			// Special case for add-ons that link against the application
 			// executable, with the executable not having a soname set.
 			if (const char* lastSlash = strrchr(name, '/')) {
