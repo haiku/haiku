@@ -411,9 +411,12 @@ rule SharedLibraryFromObjects
 		return ;
 	}
 
+	local soname = [ on $(_lib) return $(HAIKU_SONAME) ] ;
+	soname ?= $(_lib:BS) ;
+
 	MainFromObjects $(_lib) : $(2) ;
 	LINKFLAGS on $(_lib) = [ on $(_lib) return $(LINKFLAGS) ]
-		-nostart -Xlinker -soname=\"$(_lib:G=)\" ;
+		-nostart -Xlinker -soname=\"$(soname)\" ;
 	LinkAgainst $(_lib) : $(3) ;
 
 	AddSharedObjectGlueCode $(_lib) : false ;
