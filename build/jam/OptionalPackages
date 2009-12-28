@@ -383,9 +383,13 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	# kernel
 	AddFilesToHaikuHybridImage $(abiDirTokens) lib : kernel.so : _KERNEL_ ;
 
+	# additional libraries
+	local developmentLibs = <revisioned>libroot_debug.so ;
+	AddFilesToHaikuHybridImage system lib : $(developmentLibs) : : true ;
+
 	# library symlinks
 	local lib ;
-	for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) {
+	for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) $(developmentLibs) {
 		AddSymlinkToHaikuHybridImage $(abiDirTokens) lib
 			: /system/lib $(lib:BS) : : true ;
 	}
