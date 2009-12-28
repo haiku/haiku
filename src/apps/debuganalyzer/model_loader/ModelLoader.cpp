@@ -411,17 +411,8 @@ ModelLoader::FinishLoading(bool success)
 	delete[] fCPUInfos;
 	fCPUInfos = NULL;
 
-	if (fIORequests != NULL) {
-		IORequest* request = fIORequests->Clear(true);
-		while (request != NULL) {
-			IORequest* next = request->hashNext;
-			delete request;
-			request = next;
-		}
-
-		delete fIORequests;
-		fIORequests = NULL;
-	}
+	delete fIORequests;
+	fIORequests = NULL;
 }
 
 
