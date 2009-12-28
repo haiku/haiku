@@ -27,12 +27,7 @@
 #include <compat/net/ethernet.h>
 
 
-/*
- * The allocation of network interfaces is a rather non-atomic affair; we
- * need to select an index before we are ready to expose the interface for
- * use, so will use this pointer value to indicate reservation.
- */
-#define	IFNET_HOLD	(void *)(uintptr_t)(-1)
+#define IFNET_HOLD (void *)(uintptr_t)(-1)
 
 
 static void
@@ -116,10 +111,6 @@ ifnet_setbyindex(u_short idx, struct ifnet *ifp)
 }
 
 
-/*
- * Allocate an ifindex array entry; return 0 on success or an error on
- * failure.
- */
 static int
 ifindex_alloc_locked(u_short *idxp)
 {
@@ -188,8 +179,8 @@ if_alloc(u_char type)
 	ifp->if_type = type;
 	ifq_init(&ifp->receive_queue, semName);
 
-	/* WLAN specific, doesn't hurt when initilized for other devices */
 	ifp->scan_done_sem = -1;
+		// WLAN specific, doesn't hurt when initilized for other devices
 
 	// Search for the first free device slot, and use that one
 	IFNET_WLOCK();
@@ -269,15 +260,13 @@ if_initname(struct ifnet *ifp, const char *name, int unit)
 
 	driver_printf("%s: /dev/%s\n", gDriverName, ifp->device_name);
 
-	/*
-	 * For wlan devices we only want to see the cloned wlan device
-	 * in the list.
-	 * Remember: For each wlan device, there is a base device of type
-	 *           IFT_IEEE80211. On top of that a clone device is created of
-	 *           typpe IFT_ETHER.
-	 *           Haiku shall only see the cloned device as it is the one
-	 *           FreeBSD 8 uses for wireless i/o, too.
-	 */
+	// For wlan devices we only want to see the cloned wlan device
+	// in the list.
+	// Remember: For each wlan device, there is a base device of type
+	//           IFT_IEEE80211. On top of that a clone device is created of
+	//           type IFT_ETHER.
+	//           Haiku shall only see the cloned device as it is the one
+	//           FreeBSD 8 uses for wireless i/o, too.
 	if (ifp->if_type == IFT_ETHER)
 		insert_into_device_name_list(ifp);
 
@@ -428,7 +417,7 @@ _if_addmulti(struct ifnet *ifp, struct sockaddr *address)
 
 int
 if_addmulti(struct ifnet *ifp, struct sockaddr *address,
-		struct ifmultiaddr **out)
+	struct ifmultiaddr **out)
 {
 	struct ifmultiaddr *result;
 	int refcount = 0;
@@ -484,21 +473,9 @@ if_delmulti(struct ifnet *ifp, struct sockaddr *address)
 }
 
 
-/*
- * if_freemulti: free ifmultiaddr structure and possibly attached related
- * addresses.  The caller is responsible for implementing reference
- * counting, notifying the driver, handling routing messages, and releasing
- * any dependent link layer state.
- */
 static void
 if_freemulti(struct ifmultiaddr *ifma)
 {
-
-	KASSERT(ifma->ifma_refcount == 0, ("if_freemulti: refcount %d",
-		ifma->ifma_refcount));
-	KASSERT(ifma->ifma_protospec == NULL,
-		("if_freemulti: protospec not NULL"));
-
 	if (ifma->ifma_lladdr != NULL)
 		free(ifma->ifma_lladdr);
 	free(ifma->ifma_addr);
@@ -506,40 +483,13 @@ if_freemulti(struct ifmultiaddr *ifma)
 }
 
 
-/*
- * Perform deletion of network-layer and/or link-layer multicast address.
- *
- * Return 0 if the reference count was decremented.
- * Return 1 if the final reference was released, indicating that the
- * hardware hash filter should be reprogrammed.
- */
 static int
 if_delmulti_locked(struct ifnet *ifp, struct ifmultiaddr *ifma,
-		int detaching)
+	int detaching)
 {
-	if (ifp != NULL && ifma->ifma_ifp != NULL) {
-		KASSERT(ifma->ifma_ifp == ifp,
-			("%s: inconsistent ifp %p", __func__, ifp));
-		IF_ADDR_LOCK_ASSERT(ifp);
-	}
-
 	ifp = ifma->ifma_ifp;
 
-	/*
-	 * If the ifnet is detaching, null out references to ifnet,
-	 * so that upper protocol layers will notice, and not attempt
-	 * to obtain locks for an ifnet which no longer exists. The
-	 * routing socket announcement must happen before the ifnet
-	 * instance is detached from the system.
-	 */
 	if (detaching) {
-#ifdef DIAGNOSTIC
-		printf("%s: detaching ifnet instance %p\n", __func__, ifp);
-#endif
-		/*
-		 * ifp may already be nulled out if we are being reentered
-		 * to delete the ll_ifma.
-		 */
 		if (ifp != NULL) {
 			ifma->ifma_ifp = NULL;
 		}
@@ -553,17 +503,10 @@ if_delmulti_locked(struct ifnet *ifp, struct ifmultiaddr *ifma,
 
 	if_freemulti(ifma);
 
-	/*
-	 * The last reference to this instance of struct ifmultiaddr
-	 * was released; the hardware should be notified of this change.
-	 */
 	return 1;
 }
 
 
-/*
- * Remove any multicast network addresses from an interface.
- */
 void
 if_purgemaddrs(struct ifnet *ifp)
 {
@@ -607,7 +550,7 @@ if_maddr_runlock(struct ifnet *ifp)
 
 int
 ether_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *dst,
-		struct route *ro)
+	struct route *ro)
 {
 	int error = 0;
 	IFQ_HANDOFF(ifp, m, error);
@@ -631,13 +574,13 @@ ether_ifattach(struct ifnet *ifp, const uint8_t *macAddress)
 	ifp->if_mtu = ETHERMTU;
 	ifp->if_output = ether_output;
 	ifp->if_input = ether_input;
-	ifp->if_resolvemulti = NULL; /* done in the stack */
+	ifp->if_resolvemulti = NULL; // done in the stack
 	ifp->if_broadcastaddr = etherbroadcastaddr;
 
 	memcpy(IF_LLADDR(ifp), macAddress, ETHER_ADDR_LEN);
 
 	// TODO: according to FreeBSD's if_ethersubr.c, this should be removed
-	//		once all drivers are cleaned up.
+	//       once all drivers are cleaned up.
 	if (macAddress != IFP2ENADDR(ifp))
 		memcpy(IFP2ENADDR(ifp), macAddress, ETHER_ADDR_LEN);
 }
@@ -661,8 +604,8 @@ ether_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 				return EINVAL;
 			else
 				;
-			/* need to fix our ifreq to work with C... */
-			/* ifp->ifr_mtu = ifr->ifr_mtu; */
+			// need to fix our ifreq to work with C...
+			// ifp->ifr_mtu = ifr->ifr_mtu;
 			break;
 
 		default:
