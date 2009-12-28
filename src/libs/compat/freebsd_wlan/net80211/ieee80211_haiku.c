@@ -85,9 +85,9 @@ start_wlan(device_t device)
 {
 	int i;
 	int unit = device_get_unit(device);
-	struct ifnet *ifp;
-	struct ieee80211com *ic;
-	struct ieee80211vap *vap;
+	struct ifnet* ifp;
+	struct ieee80211com* ic;
+	struct ieee80211vap* vap;
 
 	for (i = 0; i < MAX_DEVICES; i++) {
 		if (gDevices[i] != NULL && gDevices[i]->if_dunit == unit)
@@ -141,9 +141,9 @@ stop_wlan(device_t device)
 {
 	int i;
 	int unit = device_get_unit(device);
-	struct ifnet *ifp;
-	struct ieee80211com *ic;
-	struct ieee80211vap *vap;
+	struct ifnet* ifp;
+	struct ieee80211com* ic;
+	struct ieee80211vap* vap;
 
 	for (i = 0; i < MAX_DEVICES; i++) {
 		if (gDevices[i] != NULL && gDevices[i]->if_dunit == unit)
@@ -177,7 +177,7 @@ stop_wlan(device_t device)
 
 
 status_t
-wlan_control(void *cookie, uint32 op, void *arg, size_t length)
+wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 {
 	struct ifnet* ifp = cookie;
 
@@ -258,7 +258,7 @@ wlan_control(void *cookie, uint32 op, void *arg, size_t length)
 
 			if (user_memcpy(&ifRequest, arg, sizeof(ifRequest)) < B_OK)
 				return B_BAD_ADDRESS;
-			
+
 			if (user_memcpy(&network, networkRequest->source,
 				sizeof(network)) < B_OK)
 				return B_BAD_ADDRESS;
@@ -325,7 +325,7 @@ wlan_control(void *cookie, uint32 op, void *arg, size_t length)
 
 
 status_t
-wlan_close(void *cookie)
+wlan_close(void* cookie)
 {
 	struct ifnet* ifp = cookie;
 
@@ -337,12 +337,12 @@ wlan_close(void *cookie)
 
 
 status_t
-wlan_if_l2com_alloc(void *data)
+wlan_if_l2com_alloc(void* data)
 {
 	struct ifnet* ifp = data;
-	
+
 	ifp->if_l2com = _kernel_malloc(sizeof(struct ieee80211com), M_ZERO);
-	((struct ieee80211com *)(ifp->if_l2com))->ic_ifp = ifp;
+	((struct ieee80211com*)(ifp->if_l2com))->ic_ifp = ifp;
 	if (ifp->if_l2com == NULL)
 		return B_NO_MEMORY;
 	return B_OK;
@@ -350,9 +350,9 @@ wlan_if_l2com_alloc(void *data)
 
 
 void
-get_random_bytes(void *p, size_t n)
+get_random_bytes(void* p, size_t n)
 {
-	uint8_t *dp = p;
+	uint8_t* dp = p;
 
 	while (n > 0) {
 		uint32_t v = arc4random();
@@ -363,10 +363,10 @@ get_random_bytes(void *p, size_t n)
 }
 
 
-struct mbuf *
-ieee80211_getmgtframe(uint8_t **frm, int headroom, int pktlen)
+struct mbuf*
+ieee80211_getmgtframe(uint8_t** frm, int headroom, int pktlen)
 {
-	struct mbuf *m;
+	struct mbuf* m;
 	u_int len;
 
 	len = roundup2(headroom + pktlen, 4);
@@ -391,32 +391,33 @@ ieee80211_getmgtframe(uint8_t **frm, int headroom, int pktlen)
 /*
  * Decrements the reference-counter and
  * tests whether it became zero.
- * NB: The negation is not atomar. Must work until sth. better is found.
+ * NB: The negation of atomic_add is not atomar. Must work until sth. better is
+ *     found.
  *
  * @return 1 reference-counter became zero
  * @return 0 reference-counter didn't became zero
  */
 int
-ieee80211_node_dectestref(struct ieee80211_node *ni)
+ieee80211_node_dectestref(struct ieee80211_node* ni)
 {
-	/* XXX need equivalent of atomic_dec_and_test */
-	atomic_add((vint32 *)&ni->ni_refcnt, -1);
-	return 	!atomic_add((vint32 *)&ni->ni_refcnt, 0);
+	// XXX need equivalent of atomic_dec_and_test
+	atomic_add((vint32*)&ni->ni_refcnt, -1);
+	return !atomic_add((vint32*)&ni->ni_refcnt, 0);
 }
 
 
 void
-ieee80211_drain_ifq(struct ifqueue *ifq)
+ieee80211_drain_ifq(struct ifqueue* ifq)
 {
-	struct ieee80211_node *ni;
-	struct mbuf *m;
+	struct ieee80211_node* ni;
+	struct mbuf* m;
 
 	for (;;) {
 		IF_DEQUEUE(ifq, m);
 		if (m == NULL)
 			break;
 
-		ni = (struct ieee80211_node *)m->m_pkthdr.rcvif;
+		ni = (struct ieee80211_node*)m->m_pkthdr.rcvif;
 		KASSERT(ni != NULL, ("frame w/o node"));
 		ieee80211_free_node(ni);
 		m->m_pkthdr.rcvif = NULL;
@@ -427,46 +428,48 @@ ieee80211_drain_ifq(struct ifqueue *ifq)
 
 
 void
-ieee80211_flush_ifq(struct ifqueue *ifq, struct ieee80211vap *vap)
+ieee80211_flush_ifq(struct ifqueue* ifq, struct ieee80211vap* vap)
 {
-	struct ieee80211_node *ni;
-	struct mbuf *m, **mprev;
+	struct ieee80211_node* ni;
+	struct mbuf* m;
+	struct mbuf** mprev;
 
 	IF_LOCK(ifq);
 	mprev = &ifq->ifq_head;
 	while ((m = *mprev) != NULL) {
-		ni = (struct ieee80211_node *)m->m_pkthdr.rcvif;
+		ni = (struct ieee80211_node*)m->m_pkthdr.rcvif;
 		if (ni != NULL && ni->ni_vap == vap) {
-			*mprev = m->m_nextpkt;		/* remove from list */
+			*mprev = m->m_nextpkt;
+				// remove from list
 			ifq->ifq_len--;
 
 			m_freem(m);
-			ieee80211_free_node(ni);	/* reclaim ref */
+			ieee80211_free_node(ni);
+				// reclaim ref
 		} else
 			mprev = &m->m_nextpkt;
 	}
-	/* recalculate tail ptr */
+	// recalculate tail ptr
 	m = ifq->ifq_head;
-	for (; m != NULL && m->m_nextpkt != NULL; m = m->m_nextpkt)
-		;
+	for (; m != NULL && m->m_nextpkt != NULL; m = m->m_nextpkt);
 	ifq->ifq_tail = m;
 	IF_UNLOCK(ifq);
 }
 
 
 int
-ieee80211_add_callback(struct mbuf *m,
-	void (*func)(struct ieee80211_node *, void *, int), void *arg)
+ieee80211_add_callback(struct mbuf* m,
+	void (*func)(struct ieee80211_node*, void*, int), void* arg)
 {
-	struct m_tag *mtag;
-	struct ieee80211_cb *cb;
+	struct m_tag* mtag;
+	struct ieee80211_cb* cb;
 
 	mtag = m_tag_alloc(MTAG_ABI_NET80211, NET80211_TAG_CALLBACK,
 		sizeof(struct ieee80211_cb), M_NOWAIT);
 	if (mtag == NULL)
 		return 0;
 
-	cb = (struct ieee80211_cb *)(mtag+1);
+	cb = (struct ieee80211_cb*)(mtag+1);
 	cb->func = func;
 	cb->arg = arg;
 	m_tag_prepend(m, mtag);
@@ -476,24 +479,23 @@ ieee80211_add_callback(struct mbuf *m,
 
 
 void
-ieee80211_process_callback(struct ieee80211_node *ni,
-	struct mbuf *m, int status)
+ieee80211_process_callback(struct ieee80211_node* ni, struct mbuf* m,
+	int status)
 {
-	struct m_tag *mtag;
+	struct m_tag* mtag;
 
 	mtag = m_tag_locate(m, MTAG_ABI_NET80211, NET80211_TAG_CALLBACK, NULL);
 	if (mtag != NULL) {
-		struct ieee80211_cb *cb = (struct ieee80211_cb *)(mtag+1);
+		struct ieee80211_cb* cb = (struct ieee80211_cb*)(mtag+1);
 		cb->func(ni, cb->arg, status);
 	}
 }
 
 
 void
-ieee80211_sysctl_vattach(struct ieee80211vap *vap)
+ieee80211_sysctl_vattach(struct ieee80211vap* vap)
 {
 	vap->iv_debug = IEEE80211_MSG_XRATE
-		| IEEE80211_MSG_ELEMID
 		| IEEE80211_MSG_NODE
 		| IEEE80211_MSG_ASSOC
 		| IEEE80211_MSG_AUTH
@@ -510,55 +512,53 @@ ieee80211_sysctl_vattach(struct ieee80211vap *vap)
 
 
 void
-ieee80211_sysctl_vdetach(struct ieee80211vap *vap)
+ieee80211_sysctl_vdetach(struct ieee80211vap* vap)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
-ieee80211_vap_destroy(struct ieee80211vap *vap)
+ieee80211_vap_destroy(struct ieee80211vap* vap)
 {
-	struct ieee80211com *ic = vap->iv_ic;
-		
+	struct ieee80211com* ic = vap->iv_ic;
+
 	ic->ic_vap_delete(vap);
 	dprintf("%s: done.\n", __func__);
 }
 
 
 void
-ieee80211_load_module(const char *modname)
+ieee80211_load_module(const char* modname)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
-ieee80211_notify_node_join(struct ieee80211_node *ni, int newassoc)
+ieee80211_notify_node_join(struct ieee80211_node* ni, int newassoc)
 {
-	struct ieee80211vap *vap = ni->ni_vap;
-	struct ifnet *ifp = vap->iv_ifp;
+	struct ieee80211vap* vap = ni->ni_vap;
+	struct ifnet* ifp = vap->iv_ifp;
 
-	if (ni == vap->iv_bss) {
+	if (ni == vap->iv_bss)
 		if_link_state_change(ifp, LINK_STATE_UP);
-	}
 }
 
 
 void
-ieee80211_notify_node_leave(struct ieee80211_node *ni)
+ieee80211_notify_node_leave(struct ieee80211_node* ni)
 {
-	struct ieee80211vap *vap = ni->ni_vap;
-	struct ifnet *ifp = vap->iv_ifp;
+	struct ieee80211vap* vap = ni->ni_vap;
+	struct ifnet* ifp = vap->iv_ifp;
 
-	if (ni == vap->iv_bss) {
+	if (ni == vap->iv_bss)
 		if_link_state_change(ifp, LINK_STATE_DOWN);
-	}
 }
 
 
 void
-ieee80211_notify_scan_done(struct ieee80211vap *vap)
+ieee80211_notify_scan_done(struct ieee80211vap* vap)
 {
 	release_sem_etc(vap->iv_ifp->scan_done_sem, 1,
 		B_DO_NOT_RESCHEDULE | B_RELEASE_ALL);
@@ -566,8 +566,8 @@ ieee80211_notify_scan_done(struct ieee80211vap *vap)
 
 
 void
-ieee80211_notify_replay_failure(struct ieee80211vap *vap,
-	const struct ieee80211_frame *wh, const struct ieee80211_key *k,
+ieee80211_notify_replay_failure(struct ieee80211vap* vap,
+	const struct ieee80211_frame* wh, const struct ieee80211_key* k,
 	u_int64_t rsc, int tid)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
@@ -575,60 +575,60 @@ ieee80211_notify_replay_failure(struct ieee80211vap *vap,
 
 
 void
-ieee80211_notify_michael_failure(struct ieee80211vap *vap,
-	const struct ieee80211_frame *wh, u_int keyix)
+ieee80211_notify_michael_failure(struct ieee80211vap* vap,
+	const struct ieee80211_frame* wh, u_int keyix)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
-ieee80211_notify_wds_discover(struct ieee80211_node *ni)
+ieee80211_notify_wds_discover(struct ieee80211_node* ni)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
-ieee80211_notify_csa(struct ieee80211com *ic,
-	const struct ieee80211_channel *c, int mode, int count)
+ieee80211_notify_csa(struct ieee80211com* ic,
+	const struct ieee80211_channel* c, int mode, int count)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
-ieee80211_notify_radar(struct ieee80211com *ic,
-	const struct ieee80211_channel *c)
+ieee80211_notify_radar(struct ieee80211com* ic,
+	const struct ieee80211_channel* c)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
-ieee80211_notify_cac(struct ieee80211com *ic,
-	const struct ieee80211_channel *c, enum ieee80211_notify_cac_event type)
+ieee80211_notify_cac(struct ieee80211com* ic,
+	const struct ieee80211_channel* c, enum ieee80211_notify_cac_event type)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
-ieee80211_notify_node_deauth(struct ieee80211_node *ni)
+ieee80211_notify_node_deauth(struct ieee80211_node* ni)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
-ieee80211_notify_node_auth(struct ieee80211_node *ni)
+ieee80211_notify_node_auth(struct ieee80211_node* ni)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
-ieee80211_notify_country(struct ieee80211vap *vap,
+ieee80211_notify_country(struct ieee80211vap* vap,
 	const uint8_t bssid[IEEE80211_ADDR_LEN], const uint8_t cc[2])
 {
 	dprintf("%s not implemented, yet.\n", __func__);
@@ -636,19 +636,19 @@ ieee80211_notify_country(struct ieee80211vap *vap,
 
 
 void
-ieee80211_notify_radio(struct ieee80211com *ic, int state)
+ieee80211_notify_radio(struct ieee80211com* ic, int state)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
-ieee80211_sysctl_attach(struct ieee80211com *ic)
+ieee80211_sysctl_attach(struct ieee80211com* ic)
 {
 }
 
 
 void
-ieee80211_sysctl_detach(struct ieee80211com *ic)
+ieee80211_sysctl_detach(struct ieee80211com* ic)
 {
 }
