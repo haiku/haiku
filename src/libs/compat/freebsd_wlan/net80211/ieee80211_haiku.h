@@ -33,6 +33,21 @@
 #include <sys/sysctl.h>
 #include <sys/taskqueue.h>
 
+
+#define IEEE80211_CRYPTO_MODULE(name, version) \
+	void \
+	ieee80211_crypto_##name##_load() { \
+		ieee80211_crypto_register(&name); \
+	} \
+\
+\
+	void \
+	ieee80211_crypto_##name##_unload() \
+	{ \
+		ieee80211_crypto_unregister(&name); \
+	}
+
+
 /*
  * Common state locking definitions.
  */

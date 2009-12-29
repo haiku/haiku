@@ -159,6 +159,11 @@ int	ieee80211_crypto_setkey(struct ieee80211vap *, struct ieee80211_key *);
 void	ieee80211_crypto_delglobalkeys(struct ieee80211vap *);
 void	ieee80211_crypto_reload_keys(struct ieee80211com *);
 
+#if defined (__HAIKU__)
+void ieee80211_crypto_wep_load(void);
+void ieee80211_crypto_wep_unload(void);
+#endif
+
 /*
  * Template for a supported cipher.  Ciphers register with the
  * crypto code and are typically loaded as separate modules
@@ -216,7 +221,7 @@ ieee80211_crypto_enmic(struct ieee80211vap *vap,
 	return (cip->ic_miclen > 0 ? cip->ic_enmic(k, m, force) : 1);
 }
 
-/* 
+/*
  * Reset key state to an unused state.  The crypto
  * key allocation mechanism insures other state (e.g.
  * key data) is properly setup before a key is used.
