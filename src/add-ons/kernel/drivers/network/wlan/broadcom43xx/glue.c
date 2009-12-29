@@ -3,6 +3,7 @@
  * All Rights Reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <sys/bus.h>
 #include <sys/kernel.h>
 
@@ -25,6 +26,7 @@ NO_HAIKU_REENABLE_INTERRUPTS();
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(0);
 
+
 int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
@@ -37,9 +39,10 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 		return 0;
 
 	intr_status = CSR_READ_4(sc, BWI_MAC_INTR_STATUS);
-	if (intr_status == 0xffffffff)
+	if (intr_status == 0xffffffff) {
 		// Not for us
 		return 0;
+	}
 
 	atomic_set((int32*)&sc->sc_intr_status, intr_status);
 

@@ -27,14 +27,16 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	struct ath_hal* ah = sc->sc_ah;
 	HAL_INT intr_status;
 
-	if (sc->sc_invalid)
+	if (sc->sc_invalid) {
 		// The hardware is not ready/present, don't touch anything.
 		// Note this can happen early on if the IRQ is shared.
 		return 0;
+	}
 
-	if (!ath_hal_intrpend(ah))
+	if (!ath_hal_intrpend(ah)) {
 		// shared irq, not for us
 		return 0;
+	}
 
 	 // We have to save the isr status right now.
 	 // Some devices don't like having the interrupt disabled

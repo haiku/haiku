@@ -41,9 +41,10 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 		return 0;
 	}
 
-	if (r1 == 0xffffffff)
+	if (r1 == 0xffffffff) {
 		// hardware gone
 		return 0;
+	}
 
 	atomic_set((int32*)&sc->sc_intr_status_1, r1);
 	atomic_set((int32*)&sc->sc_intr_status_2, r2);

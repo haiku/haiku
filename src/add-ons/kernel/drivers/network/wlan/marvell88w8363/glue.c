@@ -30,17 +30,19 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	struct mwl_hal* mh = sc->sc_mh;
 	uint32_t intr_status;
 
-	if (sc->sc_invalid)
+	if (sc->sc_invalid) {
 		 // The hardware is not ready/present, don't touch anything.
 		 // Note this can happen early on if the IRQ is shared.
 		return 0;
+	}
 
 	mwl_hal_getisr(mh, &intr_status);
 		// NB: clears ISR too
 
-	if (intr_status == 0)
+	if (intr_status == 0) {
 		// must be a shared irq
 		return 0;
+	}
 
 	atomic_set((int32*)&sc->sc_intr_status, intr_status);
 
