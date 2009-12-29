@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <BufferIO.h>
 #include <File.h>
 #include <MediaTrack.h>
 
@@ -432,9 +433,25 @@ BMediaFile::_InitReader(BDataIO* source, int32 flags)
 		return;
 	}
 
-	fSource = source;
+	if (dynamic_cast<BBufferIO *>(source)) {
+		// Already buffered
+		fSource = source;
+	} else {
+		// Source needs to be at least a BPositionIO to wrap with a BBufferIO
+		if (dynamic_cast<BPositionIO *>(source)) {
+			fSource = new(std::nothrow) BBufferIO(dynamic_cast<BPositionIO *>(source), 65536, fDeleteSource);
+			if (fSource == NULL) {
+				fErr = B_NO_MEMORY;
+				return;
+			}
+			fDeleteSource = true;
+		} else {
+			TRACE("Unable to improve performance with a BufferIO\n");
+			fSource = source;
+		}
+	}
 
-	fExtractor = new(std::nothrow) MediaExtractor(source, flags);
+	fExtractor = new(std::nothrow) MediaExtractor(fSource, flags);
 	if (fExtractor == NULL)
 		fErr = B_NO_MEMORY;
 	else
