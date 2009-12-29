@@ -16,6 +16,8 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
 	-Wno-unused 
 	-Wno-uninitialized ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) .. crypto rijndael ] ;
+
 KernelStaticLibrary libfreebsd_wlan.a :
 	ieee80211.c
 	ieee80211_action.c
@@ -23,6 +25,7 @@ KernelStaticLibrary libfreebsd_wlan.a :
 	ieee80211_ageq.c
 	ieee80211_amrr.c
 	ieee80211_crypto.c
+	ieee80211_crypto_ccmp.c
 	ieee80211_crypto_none.c
 	ieee80211_crypto_tkip.c
 	ieee80211_crypto_wep.c
@@ -45,8 +48,11 @@ KernelStaticLibrary libfreebsd_wlan.a :
 	ieee80211_sta.c
 	ieee80211_wds.c
 
+	# Rijndael (aka AES) cryptographic support for crypto_ccmp
+	rijndael-alg-fst.c
+	rijndael-api.c
+
 	# NOT SUPPORTED YET ieee80211_acl.c
-	# NOT SUPPORTED YET ieee80211_crypto_ccmp.c
 	# NOT SUPPORTED YET ieee80211_ddb.c
 	# NOT SUPPORTED YET ieee80211_hwmp.c
 	# NOT SUPPORTED YET ieee80211_mesh.c

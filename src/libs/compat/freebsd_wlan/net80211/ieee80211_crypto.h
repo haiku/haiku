@@ -160,6 +160,8 @@ void	ieee80211_crypto_delglobalkeys(struct ieee80211vap *);
 void	ieee80211_crypto_reload_keys(struct ieee80211com *);
 
 #if defined (__HAIKU__)
+void ieee80211_crypto_ccmp_load(void);
+void ieee80211_crypto_ccmp_unload(void);
 void ieee80211_crypto_tkip_load(void);
 void ieee80211_crypto_tkip_unload(void);
 void ieee80211_crypto_wep_load(void);
