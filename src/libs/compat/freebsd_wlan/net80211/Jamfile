@@ -24,6 +24,7 @@ KernelStaticLibrary libfreebsd_wlan.a :
 	ieee80211_amrr.c
 	ieee80211_crypto.c
 	ieee80211_crypto_none.c
+	ieee80211_crypto_tkip.c
 	ieee80211_crypto_wep.c
 	ieee80211_dfs.c
 	ieee80211_haiku.c
@@ -46,7 +47,6 @@ KernelStaticLibrary libfreebsd_wlan.a :
 
 	# NOT SUPPORTED YET ieee80211_acl.c
 	# NOT SUPPORTED YET ieee80211_crypto_ccmp.c
-	# NOT SUPPORTED YET ieee80211_crypto_tkip.c
 	# NOT SUPPORTED YET ieee80211_ddb.c
 	# NOT SUPPORTED YET ieee80211_hwmp.c
 	# NOT SUPPORTED YET ieee80211_mesh.c
