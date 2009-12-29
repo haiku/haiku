@@ -201,6 +201,10 @@ struct wpi_softc {
 	struct wpi_power_group	groups[WPI_POWER_GROUPS_COUNT];
 	int8_t			maxpwr[IEEE80211_CHAN_MAX];
 	char			domain[4];	/*reglatory domain XXX */
+
+#if defined(__HAIKU__)
+	uint32_t sc_intr_status;
+#endif
 };
 #define WPI_LOCK_INIT(_sc) \
 	mtx_init(&(_sc)->sc_mtx, device_get_nameunit((_sc)->sc_dev), \

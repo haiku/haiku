@@ -966,7 +966,7 @@ wpi_alloc_rx_ring(struct wpi_softc *sc, struct wpi_rx_ring *ring)
 		goto fail;
 	}
 
-        error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0, 
+        error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0,
 	    BUS_SPACE_MAXADDR_32BIT,
             BUS_SPACE_MAXADDR, NULL, NULL, MJUMPAGESIZE, 1,
             MJUMPAGESIZE, BUS_DMA_NOWAIT, NULL, NULL, &ring->data_dmat);
@@ -1011,7 +1011,7 @@ wpi_alloc_rx_ring(struct wpi_softc *sc, struct wpi_rx_ring *ring)
 			error = ENOMEM;	/* XXX unique code */
 			goto fail;
 		}
-		bus_dmamap_sync(ring->data_dmat, data->map, 
+		bus_dmamap_sync(ring->data_dmat, data->map,
 		    BUS_DMASYNC_PREWRITE);
 
 		data->m = m;
@@ -1764,6 +1764,7 @@ wpi_intr(void *arg)
 
 	WPI_LOCK(sc);
 
+#if !defined(__HAIKU__)
 	r = WPI_READ(sc, WPI_INTR);
 	if (r == 0 || r == 0xffffffff) {
 		WPI_UNLOCK(sc);
@@ -1772,6 +1773,10 @@ wpi_intr(void *arg)
 
 	/* disable interrupts */
 	WPI_WRITE(sc, WPI_MASK, 0);
+#else
+	r = atomic_and((int32 *)&sc->sc_intr_status, 0);
+#endif
+
 	/* ack interrupts */
 	WPI_WRITE(sc, WPI_INTR, r);
 
