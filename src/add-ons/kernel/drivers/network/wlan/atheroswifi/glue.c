@@ -46,7 +46,7 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	 // Note: Haiku's pcnet driver uses the same technique of
 	 //       appending a sc_lastisr field.
 	ath_hal_getisr(ah, &intr_status);
-	atomic_or((int32*)&sc->sc_intr_status, intr_status);
+	atomic_set((int32*)&sc->sc_intr_status, intr_status);
 
 	ath_hal_intrset(ah, 0);
 		// disable further intr's

@@ -34,7 +34,7 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	if ((r = WPI_READ(sc, WPI_INTR)) == 0 || r == 0xffffffff)
 		return 0;
 
-	atomic_or((int32*)&sc->sc_intr_status, r);
+	atomic_set((int32*)&sc->sc_intr_status, r);
 
 	WPI_WRITE(sc, WPI_MASK, 0);
 		// disable interrupts

@@ -45,8 +45,8 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 		// hardware gone
 		return 0;
 
-	atomic_or((int32*)&sc->sc_intr_status_1, r1);
-	atomic_or((int32*)&sc->sc_intr_status_2, r2);
+	atomic_set((int32*)&sc->sc_intr_status_1, r1);
+	atomic_set((int32*)&sc->sc_intr_status_2, r2);
 
 	IWN_WRITE(sc, IWN_MASK, 0);
 		// disable interrupts

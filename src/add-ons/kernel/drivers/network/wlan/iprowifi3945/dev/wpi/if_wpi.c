@@ -1774,7 +1774,7 @@ wpi_intr(void *arg)
 	/* disable interrupts */
 	WPI_WRITE(sc, WPI_MASK, 0);
 #else
-	r = atomic_and((int32 *)&sc->sc_intr_status, 0);
+	r = atomic_get((int32 *)&sc->sc_intr_status);
 #endif
 
 	/* ack interrupts */

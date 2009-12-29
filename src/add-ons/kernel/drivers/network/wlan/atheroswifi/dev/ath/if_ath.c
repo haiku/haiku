@@ -1310,7 +1310,7 @@ ath_intr(void *arg)
 	 * value to insure we only process bits we requested.
 	 */
 #if defined(__HAIKU__)
-	status = atomic_and((int32 *)&sc->sc_intr_status, 0);
+	status = atomic_get((int32 *)&sc->sc_intr_status);
 #else
 	ath_hal_getisr(ah, &status);		/* NB: clears ISR too */
 #endif
