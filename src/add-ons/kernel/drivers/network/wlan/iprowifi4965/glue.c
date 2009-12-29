@@ -21,6 +21,7 @@
 
 HAIKU_FBSD_WLAN_DRIVER_GLUE(iprowifi4965, iwn, pci)
 NO_HAIKU_FBSD_MII_DRIVER();
+NO_HAIKU_REENABLE_INTERRUPTS();
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(44417);
 
@@ -35,31 +36,20 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	r2 = IWN_READ(sc, IWN_INTR_STATUS);
 
 	if (r1 == 0 && r2 == 0) {
-		/* not for us */
+		// not for us
 		IWN_WRITE(sc, IWN_MASK, IWN_INTR_MASK);
 		return 0;
 	}
 
-	if (r1 == 0xffffffff) {
-		/* hardware gone */
+	if (r1 == 0xffffffff)
+		// hardware gone
 		return 0;
-	}
 
 	atomic_or((int32*)&sc->sc_intr_status_1, r1);
 	atomic_or((int32*)&sc->sc_intr_status_2, r2);
 
-	/* disable interrupts */
 	IWN_WRITE(sc, IWN_MASK, 0);
+		// disable interrupts
 
 	return 1;
-}
-
-
-void
-HAIKU_REENABLE_INTERRUPTS(device_t dev)
-{
-	struct iwn_softc* sc = (struct iwn_softc*)device_get_softc(dev);
-
-	/* enable interrupts */
-	IWN_WRITE(sc, IWN_MASK, IWN_INTR_MASK);
 }
