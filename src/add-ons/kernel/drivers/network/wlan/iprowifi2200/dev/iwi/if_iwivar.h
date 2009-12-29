@@ -216,6 +216,10 @@ struct iwi_softc {
 
 	struct iwi_rx_radiotap_header sc_rxtap;
 	struct iwi_tx_radiotap_header sc_txtap;
+
+#if defined(__HAIKU__)
+	uint32_t sc_intr_status;
+#endif;
 };
 
 #define	IWI_STATE_BEGIN(_sc, _state)	do {			\

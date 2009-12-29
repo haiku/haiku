@@ -29,19 +29,15 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
 	struct iwi_softc* sc = (struct iwi_softc*)device_get_softc(dev);
 	uint32 r;
-	HAIKU_INTR_REGISTER_STATE;
 
-	HAIKU_INTR_REGISTER_ENTER();
-	if ((r = CSR_READ_4(sc, IWI_CSR_INTR)) == 0 || r == 0xffffffff) {
-		HAIKU_INTR_REGISTER_LEAVE();
+	r = CSR_READ_4(sc, IWI_CSR_INTR);
+	if (r  == 0 || r == 0xffffffff)
 		return 0;
-	}
 
-	/* disable interrupts */
+	atomic_set((int32*)&sc->sc_intr_status, r);
+
 	CSR_WRITE_4(sc, IWI_CSR_INTR_MASK, 0);
-	
-	HAIKU_INTR_REGISTER_LEAVE();
-
+		// disable interrupts
 	return 1;
 }
 
@@ -51,6 +47,6 @@ HAIKU_REENABLE_INTERRUPTS(device_t dev)
 {
 	struct iwi_softc* sc = (struct iwi_softc*)device_get_softc(dev);
 
-	/* enable interrupts */
 	CSR_WRITE_4(sc, IWI_CSR_INTR_MASK, IWI_INTR_MASK);
+		// reenable interrupts
 }
