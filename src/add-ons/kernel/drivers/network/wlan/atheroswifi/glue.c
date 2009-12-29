@@ -23,21 +23,18 @@ HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
-	struct ath_softc* ath = (struct ath_softc*)device_get_softc(dev);
-	struct ath_hal* ah = ath->sc_ah;
-	HAIKU_INTR_REGISTER_STATE;
+	struct ath_softc* sc = (struct ath_softc*)device_get_softc(dev);
+	struct ath_hal* ah = sc->sc_ah;
+	HAL_INT intr_status;
 
-	if (ath->sc_invalid)
+	if (sc->sc_invalid)
 		// The hardware is not ready/present, don't touch anything.
 		// Note this can happen early on if the IRQ is shared.
 		return 0;
 
-	HAIKU_INTR_REGISTER_ENTER();
-	if (!ath_hal_intrpend(ah)) {
+	if (!ath_hal_intrpend(ah))
 		// shared irq, not for us
-		HAIKU_INTR_REGISTER_LEAVE();
 		return 0;
-	}
 
 	 // We have to save the isr status right now.
 	 // Some devices don't like having the interrupt disabled
@@ -48,12 +45,12 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	 //
 	 // Note: Haiku's pcnet driver uses the same technique of
 	 //       appending a sc_lastisr field.
-	ath_hal_getisr(ah, &ath->sc_lastisr);
+	ath_hal_getisr(ah, &intr_status);
+	atomic_or((int32*)&sc->sc_intr_status, intr_status);
 
 	ath_hal_intrset(ah, 0);
 		// disable further intr's
 
-	HAIKU_INTR_REGISTER_LEAVE();
 	return 1;
 }
 
@@ -61,8 +58,8 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 void
 HAIKU_REENABLE_INTERRUPTS(device_t dev)
 {
-	struct ath_softc* ath = (struct ath_softc*)device_get_softc(dev);
-	struct ath_hal* ah = ath->sc_ah;
+	struct ath_softc* sc = (struct ath_softc*)device_get_softc(dev);
+	struct ath_hal* ah = sc->sc_ah;
 
-	ath_hal_intrset(ah, ath->sc_imask);
+	ath_hal_intrset(ah, sc->sc_imask);
 }

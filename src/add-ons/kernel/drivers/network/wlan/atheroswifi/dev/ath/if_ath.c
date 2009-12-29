@@ -42,9 +42,9 @@ __FBSDID("$FreeBSD$");
 #include "opt_wlan.h"
 
 #include <sys/param.h>
-#include <sys/systm.h> 
+#include <sys/systm.h>
 #include <sys/sysctl.h>
-#include <sys/mbuf.h>   
+#include <sys/mbuf.h>
 #include <sys/malloc.h>
 #include <sys/lock.h>
 #include <sys/mutex.h>
@@ -60,7 +60,7 @@ __FBSDID("$FreeBSD$");
 #include <sys/priv.h>
 
 #include <machine/bus.h>
- 
+
 #include <net/if.h>
 #include <net/if_dl.h>
 #include <net/if_media.h>
@@ -81,7 +81,7 @@ __FBSDID("$FreeBSD$");
 #include <net/bpf.h>
 
 #ifdef INET
-#include <netinet/in.h> 
+#include <netinet/in.h>
 #include <netinet/if_ether.h>
 #endif
 
@@ -754,7 +754,7 @@ ath_detach(struct ath_softc *sc)
 	DPRINTF(sc, ATH_DEBUG_ANY, "%s: if_flags %x\n",
 		__func__, ifp->if_flags);
 
-	/* 
+	/*
 	 * NB: the order of these is important:
 	 * o stop the chip so no more interrupts will fire
 	 * o call the 802.11 layer before detaching the hal to
@@ -1280,11 +1280,8 @@ ath_intr(void *arg)
 	struct ifnet *ifp = sc->sc_ifp;
 	struct ath_hal *ah = sc->sc_ah;
 	HAL_INT status;
-#ifdef __HAIKU__
-	HAIKU_INTR_REGISTER_STATE;
-#endif
 
-#ifndef __HAIKU__
+#if !defined(__HAIKU__)
 	if (sc->sc_invalid) {
 		/*
 		 * The hardware is not ready/present, don't touch anything.
@@ -1312,10 +1309,8 @@ ath_intr(void *arg)
 	 * bits we haven't explicitly enabled so we mask the
 	 * value to insure we only process bits we requested.
 	 */
-#ifdef __HAIKU__
-	HAIKU_INTR_REGISTER_ENTER();
-	status = sc->sc_lastisr;
-	HAIKU_INTR_REGISTER_LEAVE();
+#if defined(__HAIKU__)
+	status = atomic_and((int32 *)&sc->sc_intr_status, 0);
 #else
 	ath_hal_getisr(ah, &status);		/* NB: clears ISR too */
 #endif
@@ -1482,7 +1477,7 @@ ath_bmiss_proc(void *arg, int pending)
 	DPRINTF(sc, ATH_DEBUG_ANY, "%s: pending %u\n", __func__, pending);
 
 	if (ath_hal_gethangstate(sc->sc_ah, 0xff, &hangs) && hangs != 0) {
-		if_printf(ifp, "bb hang detected (0x%x), reseting\n", hangs); 
+		if_printf(ifp, "bb hang detected (0x%x), reseting\n", hangs);
 		ath_reset(ifp);
 	} else
 		ieee80211_beacon_miss(ifp->if_l2com);
@@ -1845,7 +1840,7 @@ ath_start(struct ifnet *ifp)
 		 * go out or none...
 		 */
 		STAILQ_INIT(&frags);
-		if ((m->m_flags & M_FRAG) && 
+		if ((m->m_flags & M_FRAG) &&
 		    !ath_txfrag_setup(sc, &frags, m, ni)) {
 			DPRINTF(sc, ATH_DEBUG_XMIT,
 			    "%s: out of txfrag buffers\n", __func__);
@@ -3352,7 +3347,7 @@ ath_descdma_setup(struct ath_softc *sc,
 	}
 
 	error = bus_dmamem_alloc(dd->dd_dmat, (void**) &dd->dd_desc,
-				 BUS_DMA_NOWAIT | BUS_DMA_COHERENT, 
+				 BUS_DMA_NOWAIT | BUS_DMA_COHERENT,
 				 &dd->dd_dmamap);
 	if (error != 0) {
 		if_printf(ifp, "unable to alloc memory for %u %s descriptors, "
@@ -3788,7 +3783,7 @@ ath_rx_proc(void *arg, int npending)
 			/*
 			 * If mbuf allocation failed previously there
 			 * will be no mbuf; try again to re-populate it.
-			 */ 
+			 */
 			/* XXX make debug msg */
 			if_printf(ifp, "%s: no mbuf!\n", __func__);
 			STAILQ_REMOVE_HEAD(&sc->sc_rxbuf, bf_list);
@@ -3859,7 +3854,7 @@ ath_rx_proc(void *arg, int npending)
 					bus_dmamap_sync(sc->sc_dmat,
 					    bf->bf_dmamap,
 					    BUS_DMASYNC_POSTREAD);
-					ath_handle_micerror(ic, 
+					ath_handle_micerror(ic,
 					    mtod(m, struct ieee80211_frame *),
 					    sc->sc_splitmic ?
 						rs->rs_keyix-32 : rs->rs_keyix);
@@ -4036,7 +4031,7 @@ rx_accept:
 			 */
 			if (type == IEEE80211_FC0_TYPE_DATA) {
 				const HAL_RATE_TABLE *rt = sc->sc_currates;
-				ath_led_event(sc, 
+				ath_led_event(sc,
 				    rt->rateCodeToIndex[rs->rs_rate]);
 			} else if (ticks - sc->sc_ledevent >= sc->sc_ledidle)
 				ath_led_event(sc, 0);
@@ -5318,7 +5313,7 @@ ath_startrecv(struct ath_softc *sc)
 	return 0;
 }
 
-/* 
+/*
  * Update internal state after a channel change.
  */
 static void
@@ -5537,7 +5532,7 @@ ath_set_channel(struct ieee80211com *ic)
 		sc->sc_syncbeacon = 1;
 }
 
-/* 
+/*
  * Walk the vap list and check if there any vap's in RUN state.
  */
 static int
@@ -5799,7 +5794,7 @@ ath_newassoc(struct ieee80211_node *ni, int isnew)
 	an->an_mgmtrix = ath_tx_findrix(sc, tp->mgmtrate);
 
 	ath_rate_newassoc(sc, an, isnew);
-	if (isnew && 
+	if (isnew &&
 	    (vap->iv_flags & IEEE80211_F_PRIVACY) == 0 && sc->sc_hasclrkey &&
 	    ni->ni_ucastkey.wk_keyix == IEEE80211_KEYIX_NONE)
 		ath_setup_stationkey(ni);
@@ -6119,7 +6114,7 @@ ath_watchdog(void *arg)
 		if (ath_hal_gethangstate(sc->sc_ah, 0xffff, &hangs) &&
 		    hangs != 0) {
 			if_printf(ifp, "%s hang detected (0x%x)\n",
-			    hangs & 0xff ? "bb" : "mac", hangs); 
+			    hangs & 0xff ? "bb" : "mac", hangs);
 		} else
 			if_printf(ifp, "device timeout\n");
 		ath_reset(ifp);
@@ -6800,7 +6795,7 @@ ath_tx_raw_start(struct ath_softc *sc, struct ieee80211_node *ni,
 	if (IFF_DUMPPKTS(sc, ATH_DEBUG_XMIT))
 		ieee80211_dump_pkt(ic, mtod(m0, caddr_t), m0->m_len,
 		    sc->sc_hwmap[rix].ieeerate, -1);
-	
+
 	if (ieee80211_radiotap_active_vap(vap)) {
 		u_int64_t tsf = ath_hal_gettsf64(ah);
 

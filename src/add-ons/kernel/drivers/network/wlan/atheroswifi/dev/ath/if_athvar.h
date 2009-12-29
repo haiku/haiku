@@ -306,7 +306,7 @@ struct ath_softc {
 	u_int			sc_txqsetup;	/* h/w queues setup */
 	u_int			sc_txintrperiod;/* tx interrupt batching */
 	struct ath_txq		sc_txq[HAL_NUM_TX_QUEUES];
-	struct ath_txq		*sc_ac2q[5];	/* WME AC -> h/w q map */ 
+	struct ath_txq		*sc_ac2q[5];	/* WME AC -> h/w q map */
 	struct task		sc_txtask;	/* tx int processing */
 	int			sc_wd_timer;	/* count down for wd timer */
 	struct callout		sc_wd_ch;	/* tx watchdog timer */
@@ -343,8 +343,8 @@ struct ath_softc {
 	u_int32_t		sc_avgtsfdeltap;/* TDMA slot adjust (+) */
 	u_int32_t		sc_avgtsfdeltam;/* TDMA slot adjust (-) */
 
-#ifdef __HAIKU__
-	HAL_INT			sc_lastisr;
+#if defined(__HAIKU__)
+	HAL_INT sc_intr_status;
 #endif
 };
 
