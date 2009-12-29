@@ -27,33 +27,31 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	struct ath_hal* ah = ath->sc_ah;
 	HAIKU_INTR_REGISTER_STATE;
 
-	if (ath->sc_invalid) {
-		/*
-		 * The hardware is not ready/present, don't touch anything.
-		 * Note this can happen early on if the IRQ is shared.
-		 */
+	if (ath->sc_invalid)
+		// The hardware is not ready/present, don't touch anything.
+		// Note this can happen early on if the IRQ is shared.
 		return 0;
-	}
 
 	HAIKU_INTR_REGISTER_ENTER();
-	if (!ath_hal_intrpend(ah)) {		/* shared irq, not for us */
+	if (!ath_hal_intrpend(ah)) {
+		// shared irq, not for us
 		HAIKU_INTR_REGISTER_LEAVE();
 		return 0;
 	}
 
-	/*
-	 * We have to save the isr status right now.
-	 * Some devices don't like having the interrupt disabled
-	 * before accessing the isr status.
-	 *
-	 * Those devices return status 0, when status access
-	 * occurs after disabling the interrupts with ath_hal_intrset.
-	 *
-	 * Note: Haiku's pcnet driver uses the same technique of
-	 *       appending a sc_lastisr field.
-	 */
+	 // We have to save the isr status right now.
+	 // Some devices don't like having the interrupt disabled
+	 // before accessing the isr status.
+	 //
+	 // Those devices return status 0, when status access
+	 // occurs after disabling the interrupts with ath_hal_intrset.
+	 //
+	 // Note: Haiku's pcnet driver uses the same technique of
+	 //       appending a sc_lastisr field.
 	ath_hal_getisr(ah, &ath->sc_lastisr);
-	ath_hal_intrset(ah, 0); // disable further intr's
+
+	ath_hal_intrset(ah, 0);
+		// disable further intr's
 
 	HAIKU_INTR_REGISTER_LEAVE();
 	return 1;
