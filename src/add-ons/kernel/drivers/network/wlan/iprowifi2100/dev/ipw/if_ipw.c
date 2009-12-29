@@ -1070,7 +1070,7 @@ ipw_rx_newstate_intr(struct ipw_softc *sc, struct ipw_soft_buf *sbuf)
 
 	case IPW_STATE_DISABLED:
 		/* XXX? is this right? */
-		sc->flags &= ~(IPW_FLAG_HACK | IPW_FLAG_SCANNING | 
+		sc->flags &= ~(IPW_FLAG_HACK | IPW_FLAG_SCANNING |
 		    IPW_FLAG_ASSOCIATING | IPW_FLAG_ASSOCIATED);
 		DPRINTFN(2, ("Firmware disabled (%s flags 0x%x)\n",
 			IEEESTATE(vap), sc->flags));
@@ -1392,12 +1392,16 @@ ipw_intr(void *arg)
 
 	IPW_LOCK(sc);
 
+#if !defined(__HAIKU__)
 	r = CSR_READ_4(sc, IPW_CSR_INTR);
 	if (r == 0 || r == 0xffffffff)
 		goto done;
 
 	/* disable interrupts */
 	CSR_WRITE_4(sc, IPW_CSR_INTR_MASK, 0);
+#else
+	r = atomic_get((int32 *)&sc->sc_intr_status);
+#endif
 
 	/* acknowledge all interrupts */
 	CSR_WRITE_4(sc, IPW_CSR_INTR, r);

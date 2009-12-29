@@ -158,6 +158,10 @@ struct ipw_softc {
 
 	struct ipw_rx_radiotap_header	sc_rxtap;
 	struct ipw_tx_radiotap_header	sc_txtap;
+
+#if defined(__HAIKU__)
+	uint32_t sc_intr_status;
+#endif
 };
 
 /*
