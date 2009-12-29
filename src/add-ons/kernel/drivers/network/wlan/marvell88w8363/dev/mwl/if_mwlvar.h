@@ -332,7 +332,9 @@ struct mwl_softc {
 	struct mwl_tx_radiotap_header sc_tx_th;
 	struct mwl_rx_radiotap_header sc_rx_th;
 
-	uint32_t sc_lastisr;
+#if defined(__HAIKU__)
+	uint32_t sc_intr_status;
+#endif
 };
 
 #define	MWL_LOCK_INIT(_sc) \

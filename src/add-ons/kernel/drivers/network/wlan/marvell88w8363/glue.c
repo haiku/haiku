@@ -28,41 +28,24 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
 	struct mwl_softc* sc = (struct mwl_softc*)device_get_softc(dev);
 	struct mwl_hal* mh = sc->sc_mh;
-	HAIKU_INTR_REGISTER_STATE;
+	uint32_t intr_status;
 
-	if (sc->sc_invalid) {
-		/*
-		 * The hardware is not ready/present, don't touch anything.
-		 * Note this can happen early on if the IRQ is shared.
-		 */
+	if (sc->sc_invalid)
+		 // The hardware is not ready/present, don't touch anything.
+		 // Note this can happen early on if the IRQ is shared.
 		return 0;
-	}
 
-	HAIKU_INTR_REGISTER_ENTER();
+	mwl_hal_getisr(mh, &intr_status);
+		// NB: clears ISR too
 
-	/*
-	 * We have to save the isr status right now.
-	 * Some devices don't like having the interrupt disabled
-	 * before accessing the isr status.
-	 *
-	 * Those devices return status 0, when status access
-	 * occurs after disabling the interrupts with mwl_hal_intrset.
-	 *
-	 * Note: This glue.c is based on the one for the atheros wlan driver.
-	 *       So the comment above isn't based on tests on real marvell hardware.
-	 *       But due to the similarities in both drivers I just go the safe
-	 *       route here. It doesn't do any harm, but may prevent hard to spot
-	 *       bugs.
-	 */
-	mwl_hal_getisr(mh, &sc->sc_lastisr);	/* NB: clears ISR too */
-	if (sc->sc_lastisr == 0) {				/* must be a shared irq */
-		HAIKU_INTR_REGISTER_LEAVE();
+	if (intr_status == 0)
+		// must be a shared irq
 		return 0;
-	}
 
-	mwl_hal_intrset(mh, 0); // disable further intr's
+	atomic_set((int32*)&sc->sc_intr_status, intr_status);
 
-	HAIKU_INTR_REGISTER_LEAVE();
+	mwl_hal_intrset(mh, 0);
+		// disable further intr's
 	return 1;
 }
 
