@@ -156,6 +156,7 @@ struct mbuf {
 
 void			m_adj(struct mbuf*, int);
 void			m_align(struct mbuf*, int);
+int				m_append(struct mbuf*, int, c_caddr_t);
 void			m_cat(struct mbuf*, struct mbuf*);
 void			m_clget(struct mbuf*, int);
 void*			m_cljget(struct mbuf*, int, int);

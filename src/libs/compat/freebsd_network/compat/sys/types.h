@@ -16,5 +16,6 @@
 
 
 typedef int boolean_t;
+typedef __const char* c_caddr_t;
 
 #endif

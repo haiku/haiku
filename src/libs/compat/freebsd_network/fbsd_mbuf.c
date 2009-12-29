@@ -500,6 +500,52 @@ out:	if (((m = m0)->m_flags & M_PKTHDR) && (m->m_pkthdr.len < totlen))
 }
 
 /*
+ * Append the specified data to the indicated mbuf chain,
+ * Extend the mbuf chain if the new data does not fit in
+ * existing space.
+ *
+ * Return 1 if able to complete the job; otherwise 0.
+ */
+int
+m_append(struct mbuf *m0, int len, c_caddr_t cp)
+{
+	struct mbuf *m, *n;
+	int remainder, space;
+
+	for (m = m0; m->m_next != NULL; m = m->m_next)
+		;
+	remainder = len;
+	space = M_TRAILINGSPACE(m);
+	if (space > 0) {
+		/*
+		 * Copy into available space.
+		 */
+		if (space > remainder)
+			space = remainder;
+		bcopy(cp, mtod(m, caddr_t) + m->m_len, space);
+		m->m_len += space;
+		cp += space, remainder -= space;
+	}
+	while (remainder > 0) {
+		/*
+		 * Allocate a new mbuf; could check space
+		 * and allocate a cluster instead.
+		 */
+		n = m_get(M_DONTWAIT, m->m_type);
+		if (n == NULL)
+			break;
+		n->m_len = min(MLEN, remainder);
+		bcopy(cp, mtod(n, caddr_t), n->m_len);
+		cp += n->m_len, remainder -= n->m_len;
+		m->m_next = n;
+		m = n;
+	}
+	if (m0->m_flags & M_PKTHDR)
+		m0->m_pkthdr.len += len - remainder;
+	return (remainder == 0);
+}
+
+/*
  * Defragment an mbuf chain, returning at most maxfrags separate
  * mbufs+clusters.  If this is not possible NULL is returned and
  * the original mbuf chain is left in it's present (potentially
