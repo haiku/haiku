@@ -897,7 +897,7 @@ an_rxeof(struct an_softc *sc)
 			 */
 
 			if (!(sc->an_monitor & AN_MONITOR_INCLUDE_BEACON) &&
-			    (rx_frame.an_frame_ctl & 
+			    (rx_frame.an_frame_ctl &
 			     IEEE80211_FC0_SUBTYPE_BEACON)) {
 				return;
 			}
@@ -1233,8 +1233,10 @@ an_intr(void *xsc)
 
 	ifp = sc->an_ifp;
 
+#if !defined(__HAIKU__)
 	/* Disable interrupts. */
 	CSR_WRITE_2(sc, AN_INT_EN(sc->mpi350), 0);
+#endif
 
 	status = CSR_READ_2(sc, AN_EVENT_STAT(sc->mpi350));
 	CSR_WRITE_2(sc, AN_EVENT_ACK(sc->mpi350), ~AN_INTRS(sc->mpi350));
