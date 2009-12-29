@@ -38,8 +38,8 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 		return 0;
 	}
 
-	/* Disable interrupts. */
 	CSR_WRITE_2(sc, WI_INT_EN, 0);
+		// Disable interrupts.
 
 	return 1;
 }
