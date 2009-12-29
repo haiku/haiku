@@ -48,9 +48,10 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 		RAL_WRITE(sc, RT2661_MCU_INT_MASK_CSR, 0xffffffff);
 	}
 
-	if (!(ifp->if_drv_flags & IFF_DRV_RUNNING))
+	if (!(ifp->if_drv_flags & IFF_DRV_RUNNING)) {
 		// don't re-enable interrupts if we're shutting down
 		return 0;
+	}
 
 	return 1;
 }

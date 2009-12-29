@@ -1186,6 +1186,7 @@ rt2661_intr(void *arg)
 
 	RAL_LOCK(sc);
 
+#if !defined(__HAIKU__)
 	/* disable MAC and MCU interrupts */
 	RAL_WRITE(sc, RT2661_INT_MASK_CSR, 0xffffff7f);
 	RAL_WRITE(sc, RT2661_MCU_INT_MASK_CSR, 0xffffffff);
@@ -1195,6 +1196,7 @@ rt2661_intr(void *arg)
 		RAL_UNLOCK(sc);
 		return;
 	}
+#endif
 
 	r1 = RAL_READ(sc, RT2661_INT_SOURCE_CSR);
 	RAL_WRITE(sc, RT2661_INT_SOURCE_CSR, r1);

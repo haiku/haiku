@@ -1387,6 +1387,7 @@ rt2560_intr(void *arg)
 
 	RAL_LOCK(sc);
 
+#if !defined(__HAIKU__)
 	/* disable interrupts */
 	RAL_WRITE(sc, RT2560_CSR8, 0xffffffff);
 
@@ -1395,6 +1396,7 @@ rt2560_intr(void *arg)
 		RAL_UNLOCK(sc);
 		return;
 	}
+#endif
 
 	r = RAL_READ(sc, RT2560_CSR7);
 	RAL_WRITE(sc, RT2560_CSR7, r);
