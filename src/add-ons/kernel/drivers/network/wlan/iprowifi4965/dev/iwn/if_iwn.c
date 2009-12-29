@@ -1823,8 +1823,8 @@ iwn_intr(void *arg)
 	if (r1 == 0xffffffff)
 		goto done;	/* hardware gone */
 #else
-	r1 = atomic_and((int32*)&sc->sc_intr_status_1, 0);
-	r2 = atomic_and((int32*)&sc->sc_intr_status_2, 0);
+	r1 = atomic_and((int32 *)&sc->sc_intr_status_1, 0);
+	r2 = atomic_and((int32 *)&sc->sc_intr_status_2, 0);
 #endif
 
 	/* ack interrupts */
