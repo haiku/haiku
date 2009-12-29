@@ -318,6 +318,12 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 
 			return B_OK;
 		}
+
+		case SIOCG80211:
+		case SIOCS80211:
+			// Allowing FreeBSD based WLAN ioctls to pass, as those will become
+			// the future Haiku WLAN ioctls anyway.
+			return ifp->if_ioctl(ifp, op, (caddr_t)arg);
 	}
 
 	return B_BAD_VALUE;
