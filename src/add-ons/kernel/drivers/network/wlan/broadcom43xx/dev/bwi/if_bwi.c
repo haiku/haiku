@@ -1,13 +1,13 @@
 /*
  * Copyright (c) 2007 The DragonFly Project.  All rights reserved.
- * 
+ *
  * This code is derived from software contributed to The DragonFly Project
  * by Sepherosa Ziehau <sepherosa@gmail.com>
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
@@ -17,7 +17,7 @@
  * 3. Neither the name of The DragonFly Project nor the names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific, prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -30,7 +30,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- * 
+ *
  * $DragonFly: src/sys/dev/netif/bwi/if_bwi.c,v 1.19 2008/02/15 11:15:38 sephe Exp $
  */
 
@@ -52,7 +52,7 @@ __FBSDID("$FreeBSD$");
 #include <sys/sysctl.h>
 #include <sys/systm.h>
 #include <sys/taskqueue.h>
- 
+
 #include <net/if.h>
 #include <net/if_dl.h>
 #include <net/if_media.h>
@@ -70,7 +70,7 @@ __FBSDID("$FreeBSD$");
 #include <net/bpf.h>
 
 #ifdef INET
-#include <netinet/in.h> 
+#include <netinet/in.h>
 #include <netinet/if_ether.h>
 #endif
 
@@ -1567,6 +1567,7 @@ bwi_intr(void *xsc)
 
 	BWI_LOCK(sc);
 
+#if !defined(__HAIKU__)
 	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) == 0 ||
 	    (sc->sc_flags & BWI_F_STOP)) {
 		BWI_UNLOCK(sc);
@@ -1580,6 +1581,9 @@ bwi_intr(void *xsc)
 		BWI_UNLOCK(sc);
 		return;
 	}
+#else
+	intr_status = atomic_get((int32 *)&sc->sc_intr_status);
+#endif
 
 	DPRINTF(sc, BWI_DBG_INTR, "intr status 0x%08x\n", intr_status);
 
@@ -1626,8 +1630,10 @@ bwi_intr(void *xsc)
 	for (i = 0; i < BWI_TXRX_NRING; ++i)
 		CSR_WRITE_4(sc, BWI_TXRX_INTR_STATUS(i), txrx_intr_status[i]);
 
+#if !defined(__HAIKU__)
 	/* Disable all interrupts */
 	bwi_disable_intrs(sc, BWI_ALL_INTRS);
+#endif
 
 	/*
 	 * http://bcm-specs.sipsolutions.net/Interrupts
@@ -1802,7 +1808,7 @@ bwi_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
 			 * the same AP, this will reinialize things
 			 * correctly...
 			 */
-			if (ic->ic_opmode == IEEE80211_M_STA && 
+			if (ic->ic_opmode == IEEE80211_M_STA &&
 			    !(sc->sc_flags & BWI_F_STOP))
 				bwi_set_bssid(sc, bwi_zero_addr);
 		}

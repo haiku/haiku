@@ -21,6 +21,7 @@
 
 HAIKU_FBSD_WLAN_DRIVER_GLUE(broadcom43xx, bwi, pci)
 NO_HAIKU_FBSD_MII_DRIVER();
+NO_HAIKU_REENABLE_INTERRUPTS();
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(0);
 
@@ -28,29 +29,22 @@ int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
 	struct bwi_softc* sc = (struct bwi_softc*)device_get_softc(dev);
-	HAIKU_INTR_REGISTER_STATE;
-	
-	HAIKU_INTR_REGISTER_ENTER();
-	if (CSR_READ_4(sc, BWI_MAC_INTR_STATUS) == 0xffffffff) {
-		/* Not for us */
-		HAIKU_INTR_REGISTER_LEAVE();
-		return 0;
-	}
+	struct ifnet* ifp = sc->sc_ifp;
+	uint32 intr_status;
 
-	/* Disable all interrupts */
+	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) == 0
+		|| (sc->sc_flags & BWI_F_STOP))
+		return 0;
+
+	intr_status = CSR_READ_4(sc, BWI_MAC_INTR_STATUS);
+	if (intr_status == 0xffffffff)
+		// Not for us
+		return 0;
+
+	atomic_set((int32*)&sc->sc_intr_status, intr_status);
+
 	CSR_CLRBITS_4(sc, BWI_MAC_INTR_MASK, BWI_ALL_INTRS);
-	
-	HAIKU_INTR_REGISTER_LEAVE();
+		// Disable all interrupts
 
 	return 1;
-}
-
-
-void
-HAIKU_REENABLE_INTERRUPTS(device_t dev)
-{
-	struct bwi_softc* sc = (struct bwi_softc*)device_get_softc(dev);
-
-	/* enable interrupts */
-	CSR_SETBITS_4(sc, BWI_MAC_INTR_MASK, BWI_INIT_INTRS);
 }
