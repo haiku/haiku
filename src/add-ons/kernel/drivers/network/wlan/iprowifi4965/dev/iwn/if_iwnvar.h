@@ -200,6 +200,11 @@ struct iwn_softc {
 	int16_t			eeprom_voltage;
 	int8_t			maxpwr2GHz;
 	int8_t			maxpwr5GHz;
+
+#if defined(__HAIKU__)
+	uint32_t sc_intr_status_1;
+	uint32_t sc_intr_status_2;
+#endif
 };
 
 #define IWN_LOCK_INIT(_sc) \

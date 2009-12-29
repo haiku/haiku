@@ -275,7 +275,7 @@ iwn_attach(device_t dev)
 					 RF_ACTIVE);
 	if (sc->mem == NULL ) {
 		device_printf(dev, "could not allocate memory resources\n");
-		error = ENOMEM; 
+		error = ENOMEM;
 		return error;
 	}
 
@@ -366,7 +366,7 @@ iwn_attach(device_t dev)
 	}
 	ic = ifp->if_l2com;
 
-	ic->ic_ifp = ifp;	
+	ic->ic_ifp = ifp;
 	ic->ic_phytype = IEEE80211_T_OFDM;	/* not only, but not used */
 	ic->ic_opmode = IEEE80211_M_STA;	/* default to BSS mode */
 
@@ -582,7 +582,7 @@ iwn_dma_map_addr(void *arg, bus_dma_segment_t *segs, int nsegs, int error)
         *(bus_addr_t *)arg = segs[0].ds_addr;
 }
 
-static int 
+static int
 iwn_dma_contig_alloc(struct iwn_softc *sc, struct iwn_dma_info *dma,
 	void **kvap, bus_size_t size, bus_size_t alignment, int flags)
 {
@@ -732,7 +732,7 @@ iwn_alloc_rx_ring(struct iwn_softc *sc, struct iwn_rx_ring *ring)
 		goto fail;
 	}
 
-        error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0, 
+        error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0,
 	    BUS_SPACE_MAXADDR_32BIT,
             BUS_SPACE_MAXADDR, NULL, NULL, MJUMPAGESIZE, 1,
             MJUMPAGESIZE, BUS_DMA_NOWAIT, NULL, NULL, &ring->data_dmat);
@@ -777,7 +777,7 @@ iwn_alloc_rx_ring(struct iwn_softc *sc, struct iwn_rx_ring *ring)
 			error = ENOMEM;	/* XXX unique code */
 			goto fail;
 		}
-		bus_dmamap_sync(ring->data_dmat, data->map, 
+		bus_dmamap_sync(ring->data_dmat, data->map,
 		    BUS_DMASYNC_PREWRITE);
 
 		data->m = m;
@@ -856,7 +856,7 @@ iwn_alloc_tx_ring(struct iwn_softc *sc, struct iwn_tx_ring *ring, int qid)
 		goto fail;
 	}
 
-        error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0, 
+        error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0,
 	    BUS_SPACE_MAXADDR_32BIT,
             BUS_SPACE_MAXADDR, NULL, NULL, MCLBYTES, IWN_MAX_SCATTER - 1,
             MCLBYTES, BUS_DMA_NOWAIT, NULL, NULL, &ring->data_dmat);
@@ -877,7 +877,7 @@ iwn_alloc_tx_ring(struct iwn_softc *sc, struct iwn_tx_ring *ring, int qid)
 			    __func__, error);
 			goto fail;
 		}
-		bus_dmamap_sync(ring->data_dmat, data->map, 
+		bus_dmamap_sync(ring->data_dmat, data->map,
 		    BUS_DMASYNC_PREWRITE);
 	}
 	return 0;
@@ -1099,7 +1099,7 @@ iwn_read_prom_data(struct iwn_softc *sc, uint32_t addr, void *data, int len)
 	iwn_mem_lock(sc);
 	for (; len > 0; len -= 2, addr++) {
 		IWN_WRITE(sc, IWN_EEPROM_CTL, addr << 2);
-		tmp = IWN_READ(sc, IWN_EEPROM_CTL);	
+		tmp = IWN_READ(sc, IWN_EEPROM_CTL);
 		IWN_WRITE(sc, IWN_EEPROM_CTL, tmp & ~IWN_EEPROM_MSK );
 
 		for (ntries = 0; ntries < 10; ntries++) {
@@ -1808,6 +1808,7 @@ iwn_intr(void *arg)
 
 	IWN_LOCK(sc);
 
+#if !defined(__HAIKU__)
 	/* disable interrupts */
 	IWN_WRITE(sc, IWN_MASK, 0);
 
@@ -1821,6 +1822,10 @@ iwn_intr(void *arg)
 
 	if (r1 == 0xffffffff)
 		goto done;	/* hardware gone */
+#else
+	r1 = atomic_and((int32*)&sc->sc_intr_status_1, 0);
+	r2 = atomic_and((int32*)&sc->sc_intr_status_2, 0);
+#endif
 
 	/* ack interrupts */
 	IWN_WRITE(sc, IWN_INTR, r1);
@@ -2928,7 +2933,7 @@ iwn_power_calibration(struct iwn_softc *sc, int temp)
 	DPRINTF(sc, IWN_DEBUG_CALIBRATE, "%s: temperature %d->%d\n",
 	    __func__, sc->temp, temp);
 
-	/* adjust Tx power if need be (delta >= 3°C) */
+	/* adjust Tx power if need be (delta >= 3ï¿½C) */
 	if (abs(temp - sc->temp) < 3)
 		return;
 
@@ -3443,7 +3448,7 @@ iwn_send_sensitivity(struct iwn_softc *sc)
 	cmd.corr_barker      = htole16(190);
 	cmd.corr_barker_mrc  = htole16(390);
 
-	DPRINTF(sc, IWN_DEBUG_RESET, 
+	DPRINTF(sc, IWN_DEBUG_RESET,
 	    "%s: set sensitivity %d/%d/%d/%d/%d/%d/%d\n", __func__,
 	    calib->corr_ofdm_x1, calib->corr_ofdm_mrc_x1, calib->corr_ofdm_x4,
 	    calib->corr_ofdm_mrc_x4, calib->corr_cck_x4,
