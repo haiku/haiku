@@ -349,7 +349,7 @@ MediaFilesManager::HandleAddSystemBeepEvent(BMessage* message)
 	}
 
 	entry_ref* ref = NULL;
-	if (GetRefFor(type, name, &ref) == B_ENTRY_NOT_FOUND) {
+	if (GetRefFor(type, name, &ref) != B_OK) {
 		entry_ref newRef;
 		SetRefFor(type, name, newRef);
 	}
