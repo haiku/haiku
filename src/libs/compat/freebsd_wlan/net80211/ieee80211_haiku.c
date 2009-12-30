@@ -397,8 +397,6 @@ ieee80211_getmgtframe(uint8_t** frm, int headroom, int pktlen)
 /*
  * Decrements the reference-counter and
  * tests whether it became zero.
- * NB: The negation of atomic_add is not atomar. Must work until sth. better is
- *     found.
  *
  * @return 1 reference-counter became zero
  * @return 0 reference-counter didn't became zero
@@ -406,9 +404,8 @@ ieee80211_getmgtframe(uint8_t** frm, int headroom, int pktlen)
 int
 ieee80211_node_dectestref(struct ieee80211_node* ni)
 {
-	// XXX need equivalent of atomic_dec_and_test
-	atomic_add((vint32*)&ni->ni_refcnt, -1);
-	return !atomic_add((vint32*)&ni->ni_refcnt, 0);
+	// atomic_add returns old value
+	return 1 == atomic_add((vint32*)&ni->ni_refcnt, -1);
 }
 
 
