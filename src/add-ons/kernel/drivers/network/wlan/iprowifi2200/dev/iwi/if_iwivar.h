@@ -219,7 +219,7 @@ struct iwi_softc {
 
 #if defined(__HAIKU__)
 	uint32_t sc_intr_status;
-#endif;
+#endif
 };
 
 #define	IWI_STATE_BEGIN(_sc, _state)	do {			\
