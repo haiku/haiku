@@ -268,24 +268,18 @@ void	ieee80211_load_module(const char *);
  */
 #define	_IEEE80211_POLICY_MODULE(policy, name, version)			\
 typedef void (*policy##_setup)(int);					\
-SET_DECLARE(policy##_set, policy##_setup);				\
+SET_DECLARE(policy##_set, policy##_setup);
 
 /*
  * Scanner modules provide scanning policy.
  */
-#define	IEEE80211_SCANNER_MODULE(name, version)				\
-	_IEEE80211_POLICY_MODULE(scanner, name, version)
+#define	IEEE80211_SCANNER_MODULE(name, version)
+#define	IEEE80211_SCANNER_ALG(name, alg, v)
 
-#define	IEEE80211_SCANNER_ALG(name, alg, v)				\
-static void								\
-name##_modevent(int type)						\
-{									\
-	if (type == MOD_LOAD)						\
-		ieee80211_scanner_register(alg, &v);			\
-	else								\
-		ieee80211_scanner_unregister(alg, &v);			\
-}									\
-TEXT_SET(scanner_set, name##_modevent);					\
+
+void	ieee80211_scan_sta_init(void);
+void	ieee80211_scan_sta_uninit(void);
+
 
 struct ieee80211req;
 typedef int ieee80211_ioctl_getfunc(struct ieee80211vap *,

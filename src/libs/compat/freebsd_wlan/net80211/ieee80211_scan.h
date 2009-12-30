@@ -123,7 +123,6 @@ struct ieee80211_scan_state {
 #define	IEEE80211_SCAN_NOSSID	0x80000000	/* don't update ssid list */
 
 struct ieee80211com;
-void 	ieee80211_scan_sta_init(void);
 void	ieee80211_scan_attach(struct ieee80211com *);
 void	ieee80211_scan_detach(struct ieee80211com *);
 void	ieee80211_scan_vattach(struct ieee80211vap *);

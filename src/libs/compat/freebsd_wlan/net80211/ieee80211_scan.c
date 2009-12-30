@@ -117,8 +117,9 @@ ieee80211_scan_attach(struct ieee80211com *ic)
 	ic->ic_scan_curchan = scan_curchan;
 	ic->ic_scan_mindwell = scan_mindwell;
 
+#if defined(__HAIKU__)
 	ieee80211_scan_sta_init();
-
+#endif
 }
 
 void
@@ -142,6 +143,11 @@ ieee80211_scan_detach(struct ieee80211com *ic)
 		ic->ic_scan = NULL;
 		free(SCAN_PRIVATE(ss), M_80211_SCAN);
 	}
+	
+
+#if defined(__HAIKU__)
+	ieee80211_scan_sta_uninit();
+#endif
 }
 
 static const struct ieee80211_roamparam defroam[IEEE80211_MODE_MAX] = {
