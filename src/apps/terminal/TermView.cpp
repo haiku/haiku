@@ -1436,7 +1436,7 @@ TermView::MessageReceived(BMessage *msg)
 	const char *ctrl_l = "\x0c";
 
 	// first check for any dropped message
-	if (msg->WasDropped()) {
+	if (msg->WasDropped() && msg->what == B_SIMPLE_DATA) {
 		char *text;
 		int32 numBytes;
 		//rgb_color *color;
