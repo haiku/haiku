@@ -1815,10 +1815,6 @@ skc_attach(dev)
 		goto fail;
 	}
 
-	/* Hook interrupt last to avoid having to lock softc */
-#ifdef __HAIKU__
-	atomic_and((int32 *)&sc->sk_intstatus, 0);
-#endif
 	error = bus_setup_intr(dev, sc->sk_res[1], INTR_TYPE_NET|INTR_MPSAFE/*|INTR_FAST*/,
 	    NULL, sk_intr, sc, &sc->sk_intrhand);
 
@@ -3264,8 +3260,8 @@ sk_intr(xsc)
 
 #ifndef __HAIKU__
 	for (; (status &= sc->sk_intrmask) != 0;) {
-#else 	 
-	status = atomic_and((int32 *)&sc->sk_intstatus, 0);
+#else
+	status = atomic_get((int32 *)&sc->sk_intstatus);
 	status &= sc->sk_intrmask;
 	while (true) {
 

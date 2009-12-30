@@ -47,7 +47,7 @@ __haiku_disable_interrupts(device_t dev)
 
 	CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_STAT_ENB);
 	CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_INTR_ACK | (status & XL_INTRS));
-	atomic_or((int32 *)&sc->xl_intr_status, status);
+	atomic_set((int32 *)&sc->xl_intr_status, status);
 	return 1;
 }
 

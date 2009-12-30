@@ -2289,8 +2289,8 @@ xl_intr(void *arg)
 #ifndef __HAIKU__
 	while ((status = CSR_READ_2(sc, XL_STATUS)) & XL_INTRS &&
 	    status != 0xFFFF) {
-#else 	 
-	status = atomic_and((int32 *)&sc->xl_intr_status, 0); 	 
+#else
+	status = atomic_get((int32 *)&sc->xl_intr_status);
 	while (true) {
 #endif
 		if (status & XL_STAT_UP_COMPLETE) {

@@ -71,7 +71,7 @@ __haiku_disable_interrupts(device_t dev)
 
 	HAIKU_INTR_REGISTER_LEAVE();
 
-	atomic_or((int32 *)&sc->sk_intstatus, status);
+	atomic_set((int32 *)&sc->sk_intstatus, status);
 	return status & sc->sk_intrmask;
 }
 
