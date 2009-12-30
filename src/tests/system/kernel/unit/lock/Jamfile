@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src tests system kernel unit lock ;
+
+UsePrivateKernelHeaders ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+
+KernelMergeObject kernel_unit_tests_lock.o :
+	LockTestSuite.cpp
+	RWLockTests.cpp
+;

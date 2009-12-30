@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src tests system kernel unit ;
+
+UsePrivateKernelHeaders ;
+
+
+KernelAddon kernel_unit_tests :
+	kernel_unit_tests.cpp
+	Test.cpp
+	TestContext.cpp
+	TestError.cpp
+	TestManager.cpp
+	TestOutput.cpp
+	TestSuite.cpp
+	TestVisitor.cpp
+
+	:
+	<nogrist>kernel_unit_tests_lock.o
+
+	$(TARGET_STATIC_LIBSUPC++)
+;
+
+
+HaikuSubInclude lock ;
