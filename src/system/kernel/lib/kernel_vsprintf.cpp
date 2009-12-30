@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2008, Axel Dörfler. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
@@ -9,10 +10,12 @@
 
 #include <SupportDefs.h>
 
-#include <stdarg.h>
-#include <string.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
+
+#include <algorithm>
 
 
 #define ZEROPAD	1		/* pad with zero */
@@ -24,6 +27,73 @@
 #define LARGE	64		/* use 'ABCDEF' instead of 'abcdef' */
 
 #define FLOATING_SUPPORT
+
+
+struct Buffer {
+	Buffer(char* buffer, size_t size)
+		:
+		fCurrent(buffer),
+		fSize(size),
+		fBytesWritten(0)
+	{
+	}
+
+	size_t BytesWritten() const
+	{
+		return fBytesWritten;
+	}
+
+	void PutCharacter(char c)
+	{
+		if (fBytesWritten < fSize) {
+			*fCurrent = c;
+			fCurrent++;
+		}
+
+		fBytesWritten++;
+	}
+
+	void PutPadding(int32 count)
+	{
+		if (count <= 0)
+			return;
+
+		if (fBytesWritten < fSize) {
+			int32 toWrite = std::min(fSize - fBytesWritten, (size_t)count);
+			while (--toWrite >= 0)
+				*fCurrent++ = ' ';
+		}
+
+		fBytesWritten += count;
+	}
+
+	void PutString(const char *source, int32 length)
+	{
+		if (length <= 0)
+			return;
+
+		if (fBytesWritten < fSize) {
+			int32 toWrite = std::min(fSize - fBytesWritten, (size_t)length);
+			memcpy(fCurrent, source, toWrite);
+			fCurrent += toWrite;
+		}
+
+		fBytesWritten += length;
+	}
+
+	void NullTerminate()
+	{
+		if (fBytesWritten < fSize)
+			*fCurrent = '\0';
+		else if (fSize > 0)
+			fCurrent[-1] = '\0';
+	}
+
+private:
+	char*	fCurrent;
+	size_t	fSize;
+	size_t	fBytesWritten;
+};
 
 
 static int
@@ -48,88 +118,6 @@ do_div(uint64 *_number, uint32 base)
 }
 
 
-static bool
-put_padding(char **_buffer, int32 *_bytesLeft, int32 count)
-{
-	int32 left = *_bytesLeft;
-	char *string = *_buffer;
-	int32 written;
-	bool allWritten;
-
-	if (count <= 0)
-		return true;
-	if (left == 0)
-		return false;
-
-	if (left < count) {
-		count = left;
-		allWritten = false;
-	} else
-		allWritten = true;
-
-	written = count;
-
-	while (count-- > 0)
-		*string++ = ' ';
-
-	*_buffer = string;
-	*_bytesLeft = left - written;
-
-	return allWritten;
-}
-
-
-static inline bool
-put_string(char **_buffer, int32 *_bytesLeft, const char *source, int32 length)
-{
-	int32 left = *_bytesLeft;
-	char *target = *_buffer;
-	bool allWritten;
-
-	if (length == 0)
-		return true;
-	if (left == 0)
-		return false;
-
-	if (left < length) {
-		length = left;
-		allWritten = false;
-	} else
-		allWritten = true;
-
-#if 0
-	// take care of string arguments in user space
-	if (CHECK_USER_ADDRESS(source)) {
-		if (user_memcpy(target, source, length) < B_OK)
-			return put_string(_buffer, _bytesLeft, "<FAULT>", 7);
-	} else
-#endif
-		memcpy(target, source, length);
-
-	*_bytesLeft = left - length;
-	*_buffer = target + length;
-
-	return allWritten;
-}
-
-
-static inline bool
-put_character(char **_buffer, int32 *_bytesLeft, char c)
-{
-	int32 left = *_bytesLeft;
-	char *string = *_buffer;
-
-	if (left > 0) {
-		*string++ = c;
-		*_buffer = string;
-		*_bytesLeft = left - 1;
-		return true;
-	}
-
-	return false;
-}
-
-
 static char
 sign_symbol(int flags, bool negative)
 {
@@ -148,7 +136,7 @@ sign_symbol(int flags, bool negative)
 
 
 static void
-number(char **_string, int32 *_bytesLeft, uint64 num, uint32 base, int size,
+number(Buffer& outBuffer, uint64 num, uint32 base, int size,
 	int precision, int flags)
 {
 	const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -191,31 +179,31 @@ number(char **_string, int32 *_bytesLeft, uint64 num, uint32 base, int size,
 	size -= precision;
 
 	if (!(flags & (ZEROPAD + LEFT))) {
-		put_padding(_string, _bytesLeft, size);
+		outBuffer.PutPadding(size);
 		size = 0;
 	}
 	if (sign)
-		put_character(_string, _bytesLeft, sign);
+		outBuffer.PutCharacter(sign);
 
 	if ((flags & SPECIAL) != 0) {
 		if (base == 8)
-			put_character(_string, _bytesLeft, '0');
+			outBuffer.PutCharacter('0');
 		else if (base == 16) {
-			put_character(_string, _bytesLeft, '0');
-			put_character(_string, _bytesLeft, digits[33]);
+			outBuffer.PutCharacter('0');
+			outBuffer.PutCharacter(digits[33]);
 		}
 	}
 
 	if (!(flags & LEFT)) {
 		while (size-- > 0)
-			put_character(_string, _bytesLeft, c);
+			outBuffer.PutCharacter(c);
 	}
 	while (i < precision--)
-		put_character(_string, _bytesLeft, '0');
+		outBuffer.PutCharacter('0');
 	while (i-- > 0)
-		put_character(_string, _bytesLeft, tmp[i]);
+		outBuffer.PutCharacter(tmp[i]);
 
-	put_padding(_string, _bytesLeft, size);
+	outBuffer.PutPadding(size);
 }
 
 
@@ -225,9 +213,8 @@ number(char **_string, int32 *_bytesLeft, uint64 num, uint32 base, int size,
 	It prints up to 3 fraction digits, and doesn't support any precision arguments.
 	It's just here for your convenience so that you can use it for debug output.
 */
-static bool
-floating(char **_string, int32 *_bytesLeft, double value, int fieldWidth,
-	int flags)
+static void
+floating(Buffer& outBuffer, double value, int fieldWidth, int flags)
 {
 	char buffer[66];
 	uint64 fraction;
@@ -259,29 +246,26 @@ floating(char **_string, int32 *_bytesLeft, double value, int fieldWidth,
 
 	// put integer part
 
-	if (integer == 0)
+	if (integer == 0) {
 		buffer[length++] = '0';
-	else while (integer != 0) {
-		buffer[length++] = '0' + do_div(&integer, 10);
+	} else {
+		while (integer != 0)
+			buffer[length++] = '0' + do_div(&integer, 10);
 	}
 
 	// write back to string
 
-	if (!(flags & LEFT) && !put_padding(_string, _bytesLeft, fieldWidth))
-		return false;
+	if (!(flags & LEFT))
+		outBuffer.PutPadding(fieldWidth);
 
-	if (sign && !put_character(_string, _bytesLeft, sign))
-		return false;
+	if (sign)
+		outBuffer.PutCharacter(sign);
 
-	while (length-- > 0) {
-		if (!put_character(_string, _bytesLeft, buffer[length]))
-			return false;
-	}
+	while (length-- > 0)
+		outBuffer.PutCharacter(buffer[length]);
 
-	if ((flags & LEFT) != 0 && !put_padding(_string, _bytesLeft, fieldWidth))
-		return false;
-
-	return true;
+	if ((flags & LEFT) != 0)
+		outBuffer.PutPadding(fieldWidth);
 }
 #endif	// FLOATING_SUPPORT
 
@@ -289,28 +273,19 @@ floating(char **_string, int32 *_bytesLeft, double value, int fieldWidth,
 int
 vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 {
-	int32 bytesLeft;
 	uint64 num;
 	int base;
-	char *string;
 	int flags;			/* flags to number() */
 	int fieldWidth;	/* width of output field */
 	int precision;
 		/* min. # of digits for integers; max number of chars for from string */
 	int qualifier;		/* 'h', 'l', or 'L' for integer fields */
 
-	if (bufferSize == 0)
-		return 0;
+	Buffer outBuffer(buffer, bufferSize);
 
-	bytesLeft = ((int32)bufferSize - 1) & 0x7fffffff;
-		// make space for the terminating '\0' byte, and we
-		// only allow 2G characters :)
-
-	for (string = buffer; format[0] && bytesLeft > 0; format++) {
+	for (; format[0]; format++) {
 		if (format[0] != '%') {
-			if (!put_character(&string, &bytesLeft, format[0]))
-				break;
-
+			outBuffer.PutCharacter(format[0]);
 			continue;
 		}
 
@@ -329,8 +304,7 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 			case '0': flags |= ZEROPAD; goto repeat;
 
 			case '%':
-				if (!put_character(&string, &bytesLeft, format[0]))
-					break;
+				outBuffer.PutCharacter(format[0]);
 				continue;
 		}
 
@@ -384,15 +358,13 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 
 		switch (format[0]) {
 			case 'c':
-				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft,
-						fieldWidth - 1))
-					goto out;
+				if (!(flags & LEFT))
+					outBuffer.PutPadding(fieldWidth - 1);
 
-				put_character(&string, &bytesLeft, (char)va_arg(args, int));
+				outBuffer.PutCharacter((char)va_arg(args, int));
 
-				if ((flags & LEFT) != 0 && !put_padding(&string, &bytesLeft,
-						fieldWidth - 1))
-					goto out;
+				if ((flags & LEFT) != 0)
+					outBuffer.PutPadding(fieldWidth - 1);
 				continue;
 
 			case 's':
@@ -406,16 +378,13 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 				length = strnlen(argument, precision);
 				fieldWidth -= length;
 
-				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft,
-						fieldWidth))
-					goto out;
+				if (!(flags & LEFT))
+					outBuffer.PutPadding(fieldWidth);
 
-				if (!put_string(&string, &bytesLeft, argument, length))
-					goto out;
+				outBuffer.PutString(argument, length);
 
-				if ((flags & LEFT) != 0 && !put_padding(&string, &bytesLeft,
-						fieldWidth))
-					goto out;
+				if ((flags & LEFT) != 0)
+					outBuffer.PutPadding(fieldWidth);
 				continue;
 			}
 
@@ -426,9 +395,7 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 			case 'G':
 			{
 				double value = va_arg(args, double);
-				if (!floating(&string, &bytesLeft, value, fieldWidth,
-						flags | SIGN))
-					goto out;
+				floating(outBuffer, value, fieldWidth, flags | SIGN);
 				continue;
 			}
 #endif	// FLOATING_SUPPORT
@@ -439,19 +406,18 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 					flags |= ZEROPAD;
 				}
 
-				if (!put_string(&string, &bytesLeft, "0x", 2))
-					goto out;
-				number(&string, &bytesLeft, (uint32)va_arg(args, void *), 16,
-						fieldWidth, precision, flags);
+				outBuffer.PutString("0x", 2);
+				number(outBuffer, (uint32)va_arg(args, void *), 16, fieldWidth,
+					precision, flags);
 				continue;
 
 			case 'n':
 				if (qualifier == 'l') {
 					long *ip = va_arg(args, long *);
-					*ip = (string - buffer);
+					*ip = outBuffer.BytesWritten();
 				} else {
 					int *ip = va_arg(args, int *);
-					*ip = (string - buffer);
+					*ip = outBuffer.BytesWritten();
 				}
 				continue;
 
@@ -474,12 +440,12 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 
 			default:
 				if (format[0] != '%')
-					put_character(&string, &bytesLeft, '%');
+					outBuffer.PutCharacter('%');
 
 				if (!format[0])
 					goto out;
 
-				put_character(&string, &bytesLeft, format[0]);
+				outBuffer.PutCharacter(format[0]);
 				continue;
 		}
 
@@ -498,12 +464,12 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 		else
 			num = va_arg(args, unsigned int);
 
-		number(&string, &bytesLeft, num, base, fieldWidth, precision, flags);
+		number(outBuffer, num, base, fieldWidth, precision, flags);
 	}
 
 out:
-	*string = '\0';
-	return string - buffer;
+	outBuffer.NullTerminate();
+	return outBuffer.BytesWritten();
 }
 
 

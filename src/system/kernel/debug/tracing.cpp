@@ -10,6 +10,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+#include <algorithm>
+
 #include <arch/debug.h>
 #include <debug.h>
 #include <elf.h>
@@ -596,10 +598,14 @@ TraceOutput::Print(const char* format,...)
 	if (IsFull())
 		return;
 
-	va_list args;
-	va_start(args, format);
-	fSize += vsnprintf(fBuffer + fSize, fCapacity - fSize, format, args);
-	va_end(args);
+	if (fSize < fCapacity) {
+		va_list args;
+		va_start(args, format);
+		size_t length = vsnprintf(fBuffer + fSize, fCapacity - fSize, format,
+			args);
+		fSize += std::min(length, fCapacity - fSize - 1);
+		va_end(args);
+	}
 #endif
 }
 

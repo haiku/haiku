@@ -7,8 +7,12 @@
  *		Niels S. Reedijk
  */
 
+
 #include "usb_p.h"
+
 #include <stdio.h>
+
+#include <algorithm>
 
 
 Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
@@ -386,18 +390,30 @@ Hub::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 	status_t result = Device::BuildDeviceName(string, index, bufferSize, device);
 	if (result < B_OK) {
 		// recursion to parent failed, we're at the root(hub)
-		int32 managerIndex = GetStack()->IndexOfBusManager(GetBusManager());
-		*index += snprintf(string + *index, bufferSize - *index, "%ld", managerIndex);
+		if (*index < bufferSize) {
+			int32 managerIndex = GetStack()->IndexOfBusManager(GetBusManager());
+			size_t totalBytes = snprintf(string + *index, bufferSize - *index,
+				"%ld", managerIndex);
+			*index += std::min(totalBytes, bufferSize - *index - 1);
+		}
 	}
 
 	if (!device) {
 		// no device was specified - report the hub
-		*index += snprintf(string + *index, bufferSize - *index, "/hub");
+		if (*index < bufferSize) {
+			size_t totalBytes = snprintf(string + *index, bufferSize - *index,
+				"/hub");
+			*index += std::min(totalBytes, bufferSize - *index - 1);
+		}
 	} else {
 		// find out where the requested device sitts
 		for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
 			if (fChildren[i] == device) {
-				*index += snprintf(string + *index, bufferSize - *index, "/%ld", i);
+				if (*index < bufferSize) {
+					size_t totalBytes = snprintf(string + *index,
+						bufferSize - *index, "/%ld", i);
+					*index += std::min(totalBytes, bufferSize - *index - 1);
+				}
 				break;
 			}
 		}

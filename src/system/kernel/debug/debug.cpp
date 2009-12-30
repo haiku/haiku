@@ -1169,7 +1169,8 @@ syslog_init(struct kernel_args* args)
 	length = snprintf(revisionBuffer, sizeof(revisionBuffer),
 		"Welcome to syslog debug output!\nHaiku revision: %lu\n",
 		get_haiku_revision());
-	syslog_write(revisionBuffer, length);
+	syslog_write(revisionBuffer,
+		std::min(length, (ssize_t)sizeof(revisionBuffer) - 1));
 
 	add_debugger_command_etc("syslog", &cmd_dump_syslog,
 		"Dumps the syslog buffer.",
@@ -1267,6 +1268,7 @@ flush_pending_repeats(bool syslogOutput)
 		static char temp[40];
 		size_t length = snprintf(temp, sizeof(temp),
 			"Last message repeated %ld times.\n", sMessageRepeatCount);
+		length = std::min(length, sizeof(temp) - 1);
 
 		if (sSerialDebugEnabled)
 			arch_debug_serial_puts(temp);
@@ -1328,8 +1330,9 @@ dprintf_args(const char* format, va_list args, bool syslogOutput)
 	if (are_interrupts_enabled()) {
 		MutexLocker locker(sOutputLock);
 
-		int32 length = vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE,
-			format, args);
+		int32 length = vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format,
+			args);
+		length = std::min(length, (int32)OUTPUT_BUFFER_SIZE - 1);
 
 		InterruptsSpinLocker _(sSpinlock);
 		debug_output(sOutputBuffer, length, syslogOutput);
@@ -1338,6 +1341,7 @@ dprintf_args(const char* format, va_list args, bool syslogOutput)
 
 		int32 length = vsnprintf(sInterruptOutputBuffer, OUTPUT_BUFFER_SIZE,
 			format, args);
+		length = std::min(length, (int32)OUTPUT_BUFFER_SIZE - 1);
 
 		debug_output(sInterruptOutputBuffer, length, syslogOutput);
 	}

@@ -11,6 +11,9 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include <algorithm>
+
+
 //#undef stdout
 //#undef stdin
 //extern FILE *stdout;
@@ -28,6 +31,7 @@ vfprintf(FILE *file, const char *format, va_list list)
 		// the buffer handling could (or should) be done better...
 
 	int length = vsnprintf(buffer, sizeof(buffer), format, list);
+	length = std::min(length, (int)sizeof(buffer) - 1);
 	if (length > 0)
 		node->Write(buffer, length);
 
@@ -77,7 +81,7 @@ fputc(int c, FILE *file)
     status_t status;
 	char character = (char)c;
 
-	// we only support direct console output right now...	
+	// we only support direct console output right now...
 	status = ((ConsoleNode *)file)->Write(&character, 1);
 
 	if (status > 0)

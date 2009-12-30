@@ -46,6 +46,9 @@ dprintf(const char *format, ...)
 	length = vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
 
+	if (length >= (int)sizeof(buffer))
+		length = sizeof(buffer) - 1;
+
 	serial_puts(buffer, length);
 
 	if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)

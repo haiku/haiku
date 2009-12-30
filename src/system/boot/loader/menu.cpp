@@ -9,6 +9,8 @@
 #include "RootFileSystem.h"
 #include "load_driver_settings.h"
 
+#include <algorithm>
+
 #include <OS.h>
 
 #include <util/kernel_cpp.h>
@@ -503,8 +505,9 @@ apply_safe_mode_options(Menu *menu)
 			|| item->Data() == NULL || (uint32)pos > sizeof(buffer))
 			continue;
 
-		pos += snprintf(buffer + pos, sizeof(buffer) - pos, "%s true\n",
-			(const char *)item->Data());
+		size_t totalBytes = snprintf(buffer + pos, sizeof(buffer) - pos,
+			"%s true\n", (const char *)item->Data());
+		pos += std::min(totalBytes, sizeof(buffer) - pos - 1);
 	}
 
 	add_safe_mode_settings(buffer);

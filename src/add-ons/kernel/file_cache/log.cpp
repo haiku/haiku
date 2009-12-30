@@ -276,6 +276,7 @@ log_writer_daemon(void *arg, int /*iteration*/)
 								log->team, log->timestamp, log->team_name,
 								log->device, log->parent, log->launch.parent,
 								log->launch.args[0]);
+					length = std::min(length, (ssize_t)sizeof(line) - 1);
 
 					for (int32 j = 1; j < log->launch.arg_count; j++) {
 						// write argument list one by one, so that we can deal
@@ -302,12 +303,14 @@ log_writer_daemon(void *arg, int /*iteration*/)
 					length = snprintf(line, sizeof(line), "%ld: %Ld \"%s\" c%d %ld:%Ld %ld\n",
 						log->team, log->timestamp, log->team_name, log->type,
 						log->device, log->node, log->access_type);
+					length = std::min(length, (ssize_t)sizeof(line) - 1);
 					break;
 
 				default:	// open, ?
 					length = snprintf(line, sizeof(line), "%ld: %Ld \"%s\" %c%d %ld:%Ld:%Ld:\"%s\"\n",
 						log->team, log->timestamp, log->team_name, log->action, log->type, log->device,
 						log->parent, log->node, log->file_name);
+					length = std::min(length, (ssize_t)sizeof(line) - 1);
 					break;
 			}
 

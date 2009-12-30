@@ -7,11 +7,14 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include "debug_commands.h"
 
 #include <setjmp.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <algorithm>
 
 #include <KernelExport.h>
 
@@ -111,8 +114,12 @@ public:
 			return;
 
 		// print directly into the buffer
-		fBufferSize += vsnprintf(fBuffer + fBufferSize,
-			fBufferCapacity - fBufferSize, format, args);
+		if (fBufferSize < fBufferCapacity) {
+			size_t totalBytes = vsnprintf(fBuffer + fBufferSize,
+				fBufferCapacity - fBufferSize, format, args);
+			fBufferSize += std::min(totalBytes,
+				fBufferCapacity - fBufferSize - 1);
+		}
 
 		// execute every complete line
 		fBuffer[fBufferSize] = '\0';

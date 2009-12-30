@@ -7,6 +7,8 @@
 
 #include <stdarg.h>
 
+#include <algorithm>
+
 
 static char sTraceBuffer[256];
 static uint32 sTraceBufferOffset = 0;
@@ -15,11 +17,15 @@ static uint32 sTraceBufferOffset = 0;
 void
 ata_trace_printf(uint32 flags, const char *format, ...)
 {
-	va_list arguments;
-	va_start(arguments, format);
-	sTraceBufferOffset += vsnprintf(sTraceBuffer + sTraceBufferOffset,
-		sizeof(sTraceBuffer) - sTraceBufferOffset, format, arguments);
-	va_end(arguments);
+	if (sTraceBufferOffset < sizeof(sTraceBuffer)) {
+		va_list arguments;
+		va_start(arguments, format);
+		size_t totalBytes = vsnprintf(sTraceBuffer + sTraceBufferOffset,
+			sizeof(sTraceBuffer) - sTraceBufferOffset, format, arguments);
+		sTraceBufferOffset += std::min(totalBytes,
+			sizeof(sTraceBuffer) - sTraceBufferOffset - 1);
+		va_end(arguments);
+	}
 
 	if (flags & ATA_TRACE_FLUSH) {
 #if ATA_TRACING

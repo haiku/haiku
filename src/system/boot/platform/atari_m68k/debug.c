@@ -21,7 +21,6 @@ panic(const char *format, ...)
 	const char greetings[] = "\n*** PANIC ***";
 	char buffer[512];
 	va_list list;
-	int length;
 
 	//platform_switch_to_text_mode();
 
@@ -31,7 +30,7 @@ panic(const char *format, ...)
 	nat_feat_debugprintf("\n");
 
 	va_start(list, format);
-	length = vsnprintf(buffer, sizeof(buffer), format, list);
+	vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
 
 	Bconputs(DEV_CONSOLE, buffer);
@@ -52,10 +51,9 @@ dprintf(const char *format, ...)
 {
 	char buffer[512];
 	va_list list;
-	int length;
 
 	va_start(list, format);
-	length = vsnprintf(buffer, sizeof(buffer), format, list);
+	vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
 
 	Bconput(DEV_AUX, buffer);
