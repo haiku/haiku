@@ -1538,10 +1538,13 @@ tracing_stack_trace*
 capture_tracing_stack_trace(int32 maxCount, int32 skipFrames, bool kernelOnly)
 {
 #if	ENABLE_TRACING
-	// TODO: page_fault_exception() doesn't allow us to gracefully handle
-	// a bad address in the stack trace, if interrupts are disabled.
+	// page_fault_exception() doesn't allow us to gracefully handle a bad
+	// address in the stack trace, if interrupts are disabled, so we always
+	// restrict the stack traces to the kernel only in this case. A bad address
+	// in the kernel stack trace would still cause a panic(), but this is
+	// probably even desired.
 	if (!are_interrupts_enabled())
-		return NULL;
+		kernelOnly = true;
 
 	tracing_stack_trace* stackTrace
 		= (tracing_stack_trace*)alloc_tracing_buffer(
@@ -1550,7 +1553,7 @@ capture_tracing_stack_trace(int32 maxCount, int32 skipFrames, bool kernelOnly)
 	if (stackTrace != NULL) {
 		stackTrace->depth = arch_debug_get_stack_trace(
 			stackTrace->return_addresses, maxCount, 0, skipFrames + 1,
-			STACK_TRACE_KERNEL | (kernelOnly ? 0 : STACK_TRACE_KERNEL));
+			STACK_TRACE_KERNEL | (kernelOnly ? 0 : STACK_TRACE_USER));
 	}
 
 	return stackTrace;
