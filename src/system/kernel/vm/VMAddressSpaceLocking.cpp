@@ -292,7 +292,6 @@ AddressSpaceWriteLocker::Unlock()
 void
 AddressSpaceWriteLocker::DegradeToReadLock()
 {
-	// TODO: the current R/W lock implementation just keeps the write lock here
 	fSpace->ReadLock();
 	fSpace->WriteUnlock();
 	fDegraded = true;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -170,43 +170,50 @@ rw_lock_wait(rw_lock* lock, bool writer)
 }
 
 
-static void
+static int32
 rw_lock_unblock(rw_lock* lock)
 {
 	// Check whether there are any waiting threads at all and whether anyone
 	// has the write lock.
 	rw_lock_waiter* waiter = lock->waiters;
-	if (waiter == NULL || lock->holder > 0)
-		return;
+	if (waiter == NULL || lock->holder >= 0)
+		return 0;
 
 	// writer at head of queue?
 	if (waiter->writer) {
-		if (lock->reader_count == 0) {
-			// dequeue writer
-			lock->waiters = waiter->next;
-			if (lock->waiters != NULL)
-				lock->waiters->last = waiter->last;
+		if (lock->active_readers > 0 || lock->pending_readers > 0)
+			return 0;
 
-			lock->holder = waiter->thread->id;
+		// dequeue writer
+		lock->waiters = waiter->next;
+		if (lock->waiters != NULL)
+			lock->waiters->last = waiter->last;
 
-			// unblock thread
-			thread_unblock_locked(waiter->thread, B_OK);
-		}
-		return;
+		lock->holder = waiter->thread->id;
+
+		// unblock thread
+		thread_unblock_locked(waiter->thread, B_OK);
+		return RW_LOCK_WRITER_COUNT_BASE;
 	}
 
 	// wake up one or more readers
-	while ((waiter = lock->waiters) != NULL && !waiter->writer) {
+	uint32 readerCount = 0;
+	do {
 		// dequeue reader
 		lock->waiters = waiter->next;
 		if (lock->waiters != NULL)
 			lock->waiters->last = waiter->last;
 
-		lock->reader_count++;
+		readerCount++;
 
 		// unblock thread
 		thread_unblock_locked(waiter->thread, B_OK);
-	}
+	} while ((waiter = lock->waiters) != NULL && !waiter->writer);
+
+	if (lock->count >= RW_LOCK_WRITER_COUNT_BASE)
+		lock->active_readers += readerCount;
+
+	return readerCount;
 }
 
 
@@ -216,9 +223,10 @@ rw_lock_init(rw_lock* lock, const char* name)
 	lock->name = name;
 	lock->waiters = NULL;
 	lock->holder = -1;
-	lock->reader_count = 0;
-	lock->writer_count = 0;
+	lock->count = 0;
 	lock->owner_count = 0;
+	lock->active_readers = 0;
+	lock->pending_readers = 0;
 	lock->flags = 0;
 
 	T_SCHEDULING_ANALYSIS(InitRWLock(lock, name));
@@ -232,9 +240,10 @@ rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags)
 	lock->name = (flags & RW_LOCK_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
 	lock->waiters = NULL;
 	lock->holder = -1;
-	lock->reader_count = 0;
-	lock->writer_count = 0;
+	lock->count = 0;
 	lock->owner_count = 0;
+	lock->active_readers = 0;
+	lock->pending_readers = 0;
 	lock->flags = flags & RW_LOCK_FLAG_CLONE_NAME;
 
 	T_SCHEDULING_ANALYSIS(InitRWLock(lock, name));
@@ -253,7 +262,7 @@ rw_lock_destroy(rw_lock* lock)
 
 #if KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
-		!= lock->holder) {
+			!= lock->holder) {
 		panic("rw_lock_destroy(): there are blocking threads, but the caller "
 			"doesn't hold the write lock (%p)", lock);
 
@@ -280,59 +289,65 @@ rw_lock_destroy(rw_lock* lock)
 }
 
 
+#if !KDEBUG_RW_LOCK_DEBUG
+
 status_t
-rw_lock_read_lock(rw_lock* lock)
+_rw_lock_read_lock(rw_lock* lock)
 {
-#if KDEBUG_RW_LOCK_DEBUG
-	return rw_lock_write_lock(lock);
-#else
 	InterruptsSpinLocker locker(gThreadSpinlock);
 
-	if (lock->writer_count == 0) {
-		lock->reader_count++;
-		return B_OK;
-	}
+	// We might be the writer ourselves.
 	if (lock->holder == thread_get_current_thread_id()) {
 		lock->owner_count++;
 		return B_OK;
 	}
 
-	return rw_lock_wait(lock, false);
-#endif
-}
+	// The writer that originally had the lock when we called atomic_add() might
+	// already have gone and another writer could have overtaken us. In this
+	// case the original writer set pending_readers, so we know that we don't
+	// have to wait.
+	if (lock->pending_readers > 0) {
+		lock->pending_readers--;
 
+		if (lock->count >= RW_LOCK_WRITER_COUNT_BASE)
+			lock->active_readers++;
 
-status_t
-rw_lock_read_unlock(rw_lock* lock)
-{
-#if KDEBUG_RW_LOCK_DEBUG
-	return rw_lock_write_unlock(lock);
-#else
-	InterruptsSpinLocker locker(gThreadSpinlock);
-
-	if (lock->holder == thread_get_current_thread_id()) {
-		if (--lock->owner_count > 0)
-			return B_OK;
-
-		// this originally has been a write lock
-		lock->writer_count--;
-		lock->holder = -1;
-
-		rw_lock_unblock(lock);
 		return B_OK;
 	}
 
-	if (lock->reader_count <= 0) {
-		panic("rw_lock_read_unlock(): lock %p not read-locked", lock);
-		return B_BAD_VALUE;
+	ASSERT(lock->count >= RW_LOCK_WRITER_COUNT_BASE);
+
+	// we need to wait
+	return rw_lock_wait(lock, false);
+}
+
+
+void
+_rw_lock_read_unlock(rw_lock* lock)
+{
+	InterruptsSpinLocker locker(gThreadSpinlock);
+
+	// If we're still holding the write lock or if there are other readers,
+	// no-one can be woken up.
+	if (lock->holder == thread_get_current_thread_id()) {
+		ASSERT(lock->owner_count % RW_LOCK_WRITER_COUNT_BASE > 0);
+		lock->owner_count--;
+		return;
 	}
 
-	lock->reader_count--;
+	if (--lock->active_readers > 0)
+		return;
+
+ 	if (lock->active_readers < 0) {
+ 		panic("rw_lock_read_unlock(): lock %p not read-locked", lock);
+		lock->active_readers = 0;
+ 		return;
+ 	}
 
 	rw_lock_unblock(lock);
-	return B_OK;
-#endif
 }
+
+#endif	// !KDEBUG_RW_LOCK_DEBUG
 
 
 status_t
@@ -340,29 +355,40 @@ rw_lock_write_lock(rw_lock* lock)
 {
 	InterruptsSpinLocker locker(gThreadSpinlock);
 
-	if (lock->reader_count == 0 && lock->writer_count == 0) {
-		lock->writer_count++;
-		lock->holder = thread_get_current_thread_id();
-		lock->owner_count = 1;
-		return B_OK;
-	}
-	if (lock->holder == thread_get_current_thread_id()) {
-		lock->owner_count++;
+	// If we're already the lock holder, we just need to increment the owner
+	// count.
+	thread_id thread = thread_get_current_thread_id();
+	if (lock->holder == thread) {
+		lock->owner_count += RW_LOCK_WRITER_COUNT_BASE;
 		return B_OK;
 	}
 
-	lock->writer_count++;
+	// announce our claim
+	int32 oldCount = atomic_add(&lock->count, RW_LOCK_WRITER_COUNT_BASE);
+
+	if (oldCount == 0) {
+		// No-one else held a read or write lock, so it's ours now.
+		lock->holder = thread;
+		lock->owner_count = RW_LOCK_WRITER_COUNT_BASE;
+		return B_OK;
+	}
+
+	// We have to wait. If we're the first writer, note the current reader
+	// count.
+	if (oldCount < RW_LOCK_WRITER_COUNT_BASE)
+		lock->active_readers = oldCount - lock->pending_readers;
 
 	status_t status = rw_lock_wait(lock, true);
 	if (status == B_OK) {
-		lock->holder = thread_get_current_thread_id();
-		lock->owner_count = 1;
+		lock->holder = thread;
+		lock->owner_count = RW_LOCK_WRITER_COUNT_BASE;
 	}
+
 	return status;
 }
 
 
-status_t
+void
 rw_lock_write_unlock(rw_lock* lock)
 {
 	InterruptsSpinLocker locker(gThreadSpinlock);
@@ -370,17 +396,41 @@ rw_lock_write_unlock(rw_lock* lock)
 	if (thread_get_current_thread_id() != lock->holder) {
 		panic("rw_lock_write_unlock(): lock %p not write-locked by this thread",
 			lock);
-		return B_BAD_VALUE;
+		return;
 	}
-	if (--lock->owner_count > 0)
-		return B_OK;
 
-	lock->writer_count--;
+	ASSERT(lock->owner_count >= RW_LOCK_WRITER_COUNT_BASE);
+
+	lock->owner_count -= RW_LOCK_WRITER_COUNT_BASE;
+	if (lock->owner_count >= RW_LOCK_WRITER_COUNT_BASE)
+		return;
+
+	// We gave up our last write lock -- clean up and unblock waiters.
+	int32 readerCount = lock->owner_count;
 	lock->holder = -1;
+	lock->owner_count = 0;
 
-	rw_lock_unblock(lock);
+	int32 oldCount = atomic_add(&lock->count, -RW_LOCK_WRITER_COUNT_BASE);
+	oldCount -= RW_LOCK_WRITER_COUNT_BASE;
 
-	return B_OK;
+	if (oldCount != 0) {
+		// If writers are waiting, take over our reader count.
+		if (oldCount >= RW_LOCK_WRITER_COUNT_BASE) {
+			lock->active_readers = readerCount;
+			rw_lock_unblock(lock);
+		} else {
+			// No waiting writer, but there are one or more readers. We will
+			// unblock all waiting readers -- that's the easy part -- and must
+			// also make sure that all readers that haven't entered the critical
+			// section yet, won't start to wait. Otherwise a writer overtaking
+			// such a reader will correctly start to wait, but the reader,
+			// seeing the writer count > 0, would also start to wait. We set
+			// pending_readers to the number of readers that are still expected
+			// to enter the critical section.
+			lock->pending_readers = oldCount - readerCount
+				- rw_lock_unblock(lock);
+		}
+	}
 }
 
 
@@ -402,9 +452,10 @@ dump_rw_lock_info(int argc, char** argv)
 	kprintf("rw lock %p:\n", lock);
 	kprintf("  name:            %s\n", lock->name);
 	kprintf("  holder:          %ld\n", lock->holder);
-	kprintf("  reader count:    %ld\n", lock->reader_count);
-	kprintf("  writer count:    %ld\n", lock->writer_count);
-	kprintf("  owner count:     %ld\n", lock->owner_count);
+	kprintf("  count:           %#lx\n", lock->count);
+	kprintf("  active readers   %d\n", lock->active_readers);
+	kprintf("  pending readers  %d\n", lock->pending_readers);
+	kprintf("  owner count:     %#lx\n", lock->owner_count);
 	kprintf("  flags:           %#lx\n", lock->flags);
 
 	kprintf("  waiting threads:");
