@@ -1012,27 +1012,29 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 		: /boot/system/documentation/userguide/en/contents.html : User\ Guide ;
 }
 
+
 # Wifi-ipw2100+fw
 if [ IsOptionalHaikuImagePackageAdded Wifi-ipw2100+fw ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Wifi-ipw2100+fw available for $(TARGET_ARCH)" ;
 	} else {
-		AddDriversToHaikuImage net :  ipw2100 ;
-		InstallOptionalHaikuImagePackage ipw2100-firmware-installer-2009-12-26
-			: $(baseURL)/ipw2100-firmware-installer-2009-12-26.zip
+		AddDriversToHaikuImage net : ipw2100 ;
+		InstallOptionalHaikuImagePackage ipw2100-firmware-installer-2009-12-26b
+			: $(baseURL)/ipw2100-firmware-installer-2009-12-26b.zip
 			: 
 		;
 		AddSymlinkToHaikuImage home config boot launch
-			: /boot/common/bin/install_firmware_iprowifi2100 ;
+			: /boot/common/bin/install_firmware_ipw2100 ;
 	}
 }
+
 
 # Wifi-iprowifi2200+fw
 if [ IsOptionalHaikuImagePackageAdded Wifi-iprowifi2200+fw ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Wifi-iprowifi2200+fw available for $(TARGET_ARCH)" ;
 	} else {
-		AddDriversToHaikuImage net :  iprowifi2200 ;
+		AddDriversToHaikuImage net : iprowifi2200 ;
 		InstallOptionalHaikuImagePackage iprowifi2200-firmware-installer-2009-12-26
 			: $(baseURL)/iprowifi2200-firmware-installer-2009-12-26.zip
 			: 

@@ -1160,10 +1160,20 @@ IPW2100::LoadMicrocodeAndFirmware()
 {
 	const char *firmware;
 	switch (fMode) {
-		case IPW_MODE_BSS:	firmware = "/etc/firmware/ipw2100/ipw2100-1.3.fw"; break;
-		case IPW_MODE_IBSS:	firmware = "/etc/firmware/ipw2100/ipw2100-1.3-i.fw"; break;
-		case IPW_MODE_MONITOR: firmware = "/etc/firmware/ipw2100/ipw2100-1.3-p.fw"; break;
-		default: return B_BAD_VALUE;
+		case IPW_MODE_BSS:
+			firmware = "/system/data/firmware/ipw2100/ipw_bss";
+			break;
+
+		case IPW_MODE_IBSS:
+			firmware = "/system/data/firmware/ipw2100/ipw_ibss";
+			break;
+
+		case IPW_MODE_MONITOR:
+			firmware = "/system/data/firmware/ipw2100/ipw_monitor";
+			break;
+
+		default:
+			return B_BAD_VALUE;
 	}
 
 	TRACE_ALWAYS(("IPW2100: loading firmware %s\n", firmware));
