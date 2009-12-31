@@ -38,10 +38,10 @@ public:
 	{
 		for (int32 i = 0; i < 3; i++) {
 			TEST_ASSERT(rw_lock_read_lock(&fLock) == B_OK);
-			TEST_ASSERT(rw_lock_read_unlock(&fLock) == B_OK);
+			rw_lock_read_unlock(&fLock);
 
 			TEST_ASSERT(rw_lock_write_lock(&fLock) == B_OK);
-			TEST_ASSERT(rw_lock_write_unlock(&fLock) == B_OK);
+			rw_lock_write_unlock(&fLock);
 		}
 
 		return true;
@@ -53,7 +53,7 @@ public:
 			TEST_ASSERT(rw_lock_write_lock(&fLock) == B_OK);
 
 		for (int32 i = 0; i < 10; i++)
-			TEST_ASSERT(rw_lock_write_unlock(&fLock) == B_OK);
+			rw_lock_write_unlock(&fLock);
 
 		return true;
 	}
@@ -66,9 +66,19 @@ public:
 			TEST_ASSERT(rw_lock_read_lock(&fLock) == B_OK);
 
 		for (int32 i = 0; i < 10; i++)
-			TEST_ASSERT(rw_lock_read_unlock(&fLock) == B_OK);
+			rw_lock_read_unlock(&fLock);
 
-		TEST_ASSERT(rw_lock_write_unlock(&fLock) == B_OK);
+		rw_lock_write_unlock(&fLock);
+
+		return true;
+	}
+
+	bool TestDegrade(TestContext& context)
+	{
+		TEST_ASSERT(rw_lock_write_lock(&fLock) == B_OK);
+		TEST_ASSERT(rw_lock_read_lock(&fLock) == B_OK);
+		rw_lock_write_unlock(&fLock);
+		rw_lock_read_unlock(&fLock);
 
 		return true;
 	}
@@ -85,6 +95,12 @@ public:
 			&RWLockTest::TestConcurrentWriteNestedReadThread);
 	}
 
+	bool TestConcurrentDegrade(TestContext& context)
+	{
+		return _RunConcurrentTest(context,
+			&RWLockTest::TestConcurrentDegradeThread);
+	}
+
 
 	// thread function wrappers
 
@@ -97,6 +113,12 @@ public:
 	void TestConcurrentWriteNestedReadThread(TestContext& context, void* _index)
 	{
 		if (!_TestConcurrentWriteNestedReadThread(context, (addr_t)_index))
+			fTestOK = false;
+	}
+
+	void TestConcurrentDegradeThread(TestContext& context, void* _index)
+	{
+		if (!_TestConcurrentDegradeThread(context, (addr_t)_index))
 			fTestOK = false;
 	}
 
@@ -153,11 +175,11 @@ private:
 			for (int k = 0; fTestOK && k < 255; k++) {
 				TEST_ASSERT(rw_lock_read_lock(&fLock) == B_OK);
 				uint64 count = fLockCount;
-				TEST_ASSERT(rw_lock_read_unlock(&fLock) == B_OK);
+				rw_lock_read_unlock(&fLock);
 
 				TEST_ASSERT(rw_lock_write_lock(&fLock) == B_OK);
 				fLockCount += (uint64)1 << bitShift;
-				TEST_ASSERT(rw_lock_write_unlock(&fLock) == B_OK);
+				rw_lock_write_unlock(&fLock);
 
 				int value = (count >> bitShift) & 0xff;
 				TEST_ASSERT_PRINT(value == k,
@@ -168,7 +190,7 @@ private:
 
 			TEST_ASSERT(rw_lock_write_lock(&fLock) == B_OK);
 			fLockCount -= (uint64)255 << bitShift;
-			TEST_ASSERT(rw_lock_write_unlock(&fLock) == B_OK);
+			rw_lock_write_unlock(&fLock);
 
 			iteration++;
 		} while (fTestOK && system_time() - startTime < kConcurrentTestTime);
@@ -195,11 +217,11 @@ private:
 
 				TEST_ASSERT(rw_lock_read_lock(&fLock) == B_OK);
 				uint64 count = fLockCount;
-				TEST_ASSERT(rw_lock_read_unlock(&fLock) == B_OK);
+				rw_lock_read_unlock(&fLock);
 
 				fLockCount += (uint64)1 << bitShift;
 
-				TEST_ASSERT(rw_lock_write_unlock(&fLock) == B_OK);
+				rw_lock_write_unlock(&fLock);
 
 				int value = (count >> bitShift) & 0xff;
 				TEST_ASSERT_PRINT(value == k,
@@ -210,7 +232,55 @@ private:
 
 			TEST_ASSERT(rw_lock_write_lock(&fLock) == B_OK);
 			fLockCount -= (uint64)255 << bitShift;
-			TEST_ASSERT(rw_lock_write_unlock(&fLock) == B_OK);
+			rw_lock_write_unlock(&fLock);
+
+			iteration++;
+		} while (fTestOK && system_time() - startTime < kConcurrentTestTime);
+
+		return true;
+	}
+
+	bool _TestConcurrentDegradeThread(TestContext& context, int32 threadIndex)
+	{
+		if (!fTestOK)
+			return false;
+
+		int bitShift = 8 * threadIndex;
+
+		while (!fTestGo) {
+		}
+
+		bigtime_t startTime = system_time();
+		uint64 iteration = 0;
+		do {
+			for (int k = 0; fTestOK && k < 255; k++) {
+				TEST_ASSERT(rw_lock_read_lock(&fLock) == B_OK);
+				uint64 count = fLockCount;
+				rw_lock_read_unlock(&fLock);
+
+				TEST_ASSERT(rw_lock_write_lock(&fLock) == B_OK);
+				fLockCount += (uint64)1 << bitShift;
+				uint64 newCount = fLockCount;
+
+				// degrade
+				TEST_ASSERT(rw_lock_read_lock(&fLock) == B_OK);
+				rw_lock_write_unlock(&fLock);
+
+				uint64 unchangedCount = fLockCount;
+
+				rw_lock_read_unlock(&fLock);
+
+				int value = (count >> bitShift) & 0xff;
+				TEST_ASSERT_PRINT(value == k,
+					"thread index: %" B_PRId32 ", iteration: %" B_PRId32
+					", value: %d vs %d, count: %#" B_PRIx64, threadIndex,
+					iteration, value, k, count);
+				TEST_ASSERT(newCount == unchangedCount);
+			}
+
+			TEST_ASSERT(rw_lock_write_lock(&fLock) == B_OK);
+			fLockCount -= (uint64)255 << bitShift;
+			rw_lock_write_unlock(&fLock);
 
 			iteration++;
 		} while (fTestOK && system_time() - startTime < kConcurrentTestTime);
@@ -234,8 +304,10 @@ create_rw_lock_test_suite()
 	ADD_STANDARD_TEST(suite, RWLockTest, TestSimple);
 	ADD_STANDARD_TEST(suite, RWLockTest, TestNestedWrite);
 	ADD_STANDARD_TEST(suite, RWLockTest, TestNestedWriteRead);
+	ADD_STANDARD_TEST(suite, RWLockTest, TestDegrade);
 	ADD_STANDARD_TEST(suite, RWLockTest, TestConcurrentWriteRead);
 	ADD_STANDARD_TEST(suite, RWLockTest, TestConcurrentWriteNestedRead);
+	ADD_STANDARD_TEST(suite, RWLockTest, TestConcurrentDegrade);
 
 	return suite;
 }
