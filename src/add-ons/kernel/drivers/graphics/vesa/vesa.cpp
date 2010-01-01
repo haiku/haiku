@@ -344,8 +344,8 @@ vesa_init(vesa_info& info)
 	sharedInfo.frame_buffer_area = bufferInfo->area;
 
 	remap_frame_buffer(info, bufferInfo->physical_frame_buffer,
-		bufferInfo->width, bufferInfo->height, bufferInfo->bytes_per_row,
-		bufferInfo->depth, true);
+		bufferInfo->width, bufferInfo->height, bufferInfo->depth,
+		bufferInfo->bytes_per_row, true);
 		// Does not matter if this fails - the frame buffer was already mapped
 		// before.
 
@@ -415,8 +415,8 @@ vesa_set_display_mode(vesa_info& info, uint32 mode)
 
 	// Map new frame buffer if necessary
 
-	status = remap_frame_buffer(info, modeInfo.width, modeInfo.height,
-		modeInfo.physical_base, modeInfo.bytes_per_row, modeInfo.bits_per_pixel,
+	status = remap_frame_buffer(info, modeInfo.physical_base, modeInfo.width,
+		modeInfo.height, modeInfo.bits_per_pixel, modeInfo.bytes_per_row,
 		false);
 	if (status == B_OK) {
 		// Update shared frame buffer information
