@@ -1,9 +1,6 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "InputTextView.h"
@@ -69,10 +66,6 @@ InputTextView::KeyDown(const char* bytes, int32 numBytes)
 				// revert any typing changes
 				RevertChanges();
 				break;
-			case B_TAB:
-				// skip BTextView implementation
-				BView::KeyDown(bytes, numBytes);
-				// fall through
 			case B_RETURN:
 				ApplyChanges();
 				break;
@@ -89,12 +82,21 @@ InputTextView::KeyDown(const char* bytes, int32 numBytes)
 void
 InputTextView::MakeFocus(bool focus)
 {
-	if (focus != IsFocus()) {
-		if (BView* view = Parent())
-			view->Invalidate();
-		BTextView::MakeFocus(focus);
-		if (focus)
-			SelectAll();
+	if (focus == IsFocus())
+		return;
+
+	if (BView* view = Parent())
+		view->Invalidate();
+	BTextView::MakeFocus(focus);
+	if (focus) {
+		SelectAll();
+		fTextBeforeFocus = Text();
+	} else {
+		// Only pressing ESC is supposed to revert to the previous
+		// value and not invoke, but in that case, the text will already
+		// be the previous value when we lose focus here.
+		if (fTextBeforeFocus != Text())
+			Invoke();
 	}
 }
 

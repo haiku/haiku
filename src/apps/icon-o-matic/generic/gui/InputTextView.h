@@ -1,15 +1,12 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef INPUT_TEXT_VIEW_H
 #define INPUT_TEXT_VIEW_H
 
 #include <Invoker.h>
+#include <String.h>
 #include <TextView.h>
 
 class InputTextView : public BTextView,
@@ -50,6 +47,8 @@ protected:
 			void				_CheckTextRect();
 
 			bool				fWasFocus;
+			BString				fTextBeforeFocus;
+
 };
 
 #endif // INPUT_TEXT_VIEW_H
