@@ -277,14 +277,25 @@ struct vnode : fs_vnode, DoublyLinkedListLinkImpl<vnode> {
 	struct fs_mount* mount;
 	struct vnode*	covered_by;
 	int32			ref_count;
-	uint32			type : 29;
-						// TODO: S_INDEX_DIR actually needs another bit.
-						// Better combine this field with the following ones.
-	uint32			remove : 1;
-	uint32			busy : 1;
-	uint32			unpublished : 1;
+private:
+	uint32			fType : 20;	// right-shifted by 12
+	uint32			fUnused : 9;
+public:
+	bool			remove : 1;
+	bool			busy : 1;
+	bool			unpublished : 1;
 	struct advisory_locking* advisory_locking;
 	struct file_descriptor* mandatory_locked_by;
+
+	void SetType(uint32 type)
+	{
+		fType = type >> 12;
+	}
+
+	uint32 Type() const
+	{
+		return fType << 12;
+	}
 };
 
 struct vnode_hash_key {
@@ -1238,7 +1249,7 @@ is_special_node_type(int type)
 static status_t
 create_special_sub_node(struct vnode* vnode, uint32 flags)
 {
-	if (S_ISFIFO(vnode->type))
+	if (S_ISFIFO(vnode->Type()))
 		return create_fifo_vnode(vnode->mount->volume, vnode);
 
 	return B_BAD_VALUE;
@@ -1316,7 +1327,7 @@ restart:
 		bool gotNode = status == B_OK;
 		bool publishSpecialSubNode = false;
 		if (gotNode) {
-			vnode->type = type;
+			vnode->SetType(type);
 			publishSpecialSubNode = is_special_node_type(type)
 				&& (flags & B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE) == 0;
 		}
@@ -2249,7 +2260,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		}
 
 		// check if vnode is really a directory
-		if (status == B_OK && !S_ISDIR(vnode->type))
+		if (status == B_OK && !S_ISDIR(vnode->Type()))
 			status = B_NOT_A_DIRECTORY;
 
 		// Check if we have the right to search the current directory vnode.
@@ -2270,7 +2281,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 
 		// If the new node is a symbolic link, resolve it (if we've been told
 		// to do it)
-		if (S_ISLNK(nextVnode->type)
+		if (S_ISLNK(nextVnode->Type())
 			&& (traverseLeafLink || nextPath[0] != '\0')) {
 			size_t bufferSize;
 			char* buffer;
@@ -2638,7 +2649,7 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 	if (vnode == NULL || buffer == NULL || bufferSize == 0)
 		return B_BAD_VALUE;
 
-	if (!S_ISDIR(vnode->type))
+	if (!S_ISDIR(vnode->Type()))
 		return B_NOT_A_DIRECTORY;
 
 	char* path = buffer;
@@ -2973,7 +2984,7 @@ normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
 			}
 		}
 
-		if (!fileExists || !traverseLink || !S_ISLNK(fileVnode->type)) {
+		if (!fileExists || !traverseLink || !S_ISLNK(fileVnode->Type())) {
 			// we're done -- construct the path
 			bool hasLeaf = true;
 			if (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0) {
@@ -3613,7 +3624,7 @@ publish_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 	bool publishSpecialSubNode = false;
 
 	if (status == B_OK) {
-		vnode->type = type;
+		vnode->SetType(type);
 		vnode->remove = (flags & B_VNODE_PUBLISH_REMOVED) != 0;
 		publishSpecialSubNode = is_special_node_type(type)
 			&& (flags & B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE) == 0;
@@ -4191,7 +4202,7 @@ vfs_get_module_path(const char* basePath, const char* moduleName,
 			return status;
 		}
 
-		if (S_ISDIR(file->type)) {
+		if (S_ISDIR(file->Type())) {
 			// goto the next directory
 			path[length] = '/';
 			path[length + 1] = '\0';
@@ -4199,14 +4210,14 @@ vfs_get_module_path(const char* basePath, const char* moduleName,
 			bufferSize -= length + 1;
 
 			dir = file;
-		} else if (S_ISREG(file->type)) {
+		} else if (S_ISREG(file->Type())) {
 			// it's a file so it should be what we've searched for
 			put_vnode(file);
 
 			return B_OK;
 		} else {
 			TRACE(("vfs_get_module_path(): something is strange here: "
-				"0x%08lx...\n", file->type));
+				"0x%08lx...\n", file->Type()));
 			status = B_ERROR;
 			dir = file;
 			goto err;
@@ -5051,7 +5062,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 
 			// If the node is a symlink, we have to follow it, unless
 			// O_NOTRAVERSE is set.
-			if (S_ISLNK(vnode->type) && traverse) {
+			if (S_ISLNK(vnode->Type()) && traverse) {
 				putter.Put();
 				char clonedName[B_FILE_NAME_LENGTH + 1];
 				if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH)
@@ -5068,7 +5079,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 				putter.SetTo(vnode);
 			}
 
-			if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->type)) {
+			if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type())) {
 				put_vnode(vnode);
 				return B_LINK_LIMIT;
 			}
@@ -5244,7 +5255,7 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 	if (status != B_OK)
 		return status;
 
-	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->type)) {
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type())) {
 		put_vnode(vnode);
 		return B_LINK_LIMIT;
 	}
@@ -5275,7 +5286,7 @@ file_open(int fd, char* path, int openMode, bool kernel)
 	if (status != B_OK)
 		return status;
 
-	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->type)) {
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type())) {
 		put_vnode(vnode);
 		return B_LINK_LIMIT;
 	}
@@ -5335,7 +5346,7 @@ file_read(struct file_descriptor* descriptor, off_t pos, void* buffer,
 	FUNCTION(("file_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length,
 		*length));
 
-	if (S_ISDIR(vnode->type))
+	if (S_ISDIR(vnode->Type()))
 		return B_IS_A_DIRECTORY;
 
 	return FS_CALL(vnode, read, descriptor->cookie, pos, buffer, length);
@@ -5349,7 +5360,7 @@ file_write(struct file_descriptor* descriptor, off_t pos, const void* buffer,
 	struct vnode* vnode = descriptor->u.vnode;
 	FUNCTION(("file_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
 
-	if (S_ISDIR(vnode->type))
+	if (S_ISDIR(vnode->Type()))
 		return B_IS_A_DIRECTORY;
 	if (!HAS_FS_CALL(vnode, write))
 		return EROFS;
@@ -5367,7 +5378,7 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 	FUNCTION(("file_seek(pos = %Ld, seekType = %d)\n", pos, seekType));
 
 	// some kinds of files are not seekable
-	switch (vnode->type & S_IFMT) {
+	switch (vnode->Type() & S_IFMT) {
 		case S_IFIFO:
 		case S_IFSOCK:
 			return ESPIPE;
@@ -7112,7 +7123,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 			goto err2;
 
 		// make sure covered_vnode is a directory
-		if (!S_ISDIR(mount->covers_vnode->type)) {
+		if (!S_ISDIR(mount->covers_vnode->Type())) {
 			status = B_NOT_A_DIRECTORY;
 			goto err3;
 		}
@@ -7605,7 +7616,7 @@ set_cwd(int fd, char* path, bool kernel)
 	if (status < 0)
 		return status;
 
-	if (!S_ISDIR(vnode->type)) {
+	if (!S_ISDIR(vnode->Type())) {
 		// nope, can't cwd to here
 		status = B_NOT_A_DIRECTORY;
 		goto err;
