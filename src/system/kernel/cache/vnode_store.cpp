@@ -25,6 +25,7 @@ VMVnodeCache::Init(struct vnode *vnode)
 
 	fVnode = vnode;
 	fFileCacheRef = NULL;
+	fVnodeDeleted = false;
 
 	vfs_vnode_to_node_ref(fVnode, &fDevice, &fInode);
 
@@ -117,13 +118,23 @@ VMVnodeCache::CanWritePage(off_t offset)
 status_t
 VMVnodeCache::AcquireUnreferencedStoreRef()
 {
+	// Quick check whether getting a vnode reference is still allowed. Only
+	// after a successful vfs_get_vnode() the check is safe (since then we've
+	// either got the reference to our vnode, or have been notified that it is
+	// toast), but the check is cheap and saves quite a bit of work in case the
+	// condition holds.
+	if (fVnodeDeleted)
+		return B_BUSY;
+
 	struct vnode *vnode;
 	status_t status = vfs_get_vnode(fDevice, fInode, false, &vnode);
 
 	// If successful, update the store's vnode pointer, so that release_ref()
 	// won't use a stale pointer.
-	if (status == B_OK)
-		fVnode = vnode;
+	if (status == B_OK && fVnodeDeleted) {
+		vfs_put_vnode(fVnode);
+		status = B_BUSY;
+	}
 
 	return status;
 }

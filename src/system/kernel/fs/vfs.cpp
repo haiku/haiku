@@ -56,6 +56,7 @@
 
 #include "fifo.h"
 #include "IORequest.h"
+#include "../cache/vnode_store.h"
 
 
 //#define TRACE_VFS
@@ -1092,12 +1093,6 @@ free_vnode(struct vnode* vnode, bool reenter)
 	// count, so that it will neither become negative nor 0.
 	vnode->ref_count = 2;
 
-	// TODO: Usually, when the vnode is unreferenced, no one can get hold of the
-	// cache either (i.e. no one can get a cache reference while we're deleting
-	// the vnode).. This is, however, not the case for the page daemon. It gets
-	// its cache references via the pages it scans, so it can in fact get a
-	// vnode reference while we're deleting the vnode.
-
 	if (!vnode->unpublished) {
 		if (vnode->remove)
 			FS_CALL(vnode, remove_vnode, reenter);
@@ -1105,8 +1100,16 @@ free_vnode(struct vnode* vnode, bool reenter)
 			FS_CALL(vnode, put_vnode, reenter);
 	}
 
+	// If the vnode has a VMCache attached, make sure that it won't try to get
+	// another reference via VMVnodeCache::AcquireUnreferencedStoreRef(). As
+	// long as the vnode is busy and in the hash, that won't happen, but as
+	// soon as we've removed it from the hash, it could reload the vnode -- with
+	// a new cache attached!
+	if (vnode->cache != NULL)
+		((VMVnodeCache*)vnode->cache)->VnodeDeleted();
+
 	// The file system has removed the resources of the vnode now, so we can
-	// make it available again (and remove the busy vnode from the hash)
+	// make it available again (by removing the busy vnode from the hash).
 	mutex_lock(&sVnodeMutex);
 	hash_remove(sVnodeTable, vnode);
 	mutex_unlock(&sVnodeMutex);
@@ -1277,6 +1280,7 @@ restart:
 				vnodeID);
 			return B_BUSY;
 		}
+// TODO: Replace this mechanism!
 		snooze(10000); // 10 ms
 		mutex_lock(&sVnodeMutex);
 		goto restart;
@@ -1323,8 +1327,11 @@ restart:
 		mutex_lock(&sVnodeMutex);
 
 		if (status != B_OK) {
-			if (gotNode)
+			if (gotNode) {
+				mutex_unlock(&sVnodeMutex);
 				FS_CALL(vnode, put_vnode, reenter);
+				mutex_lock(&sVnodeMutex);
+			}
 
 			goto err1;
 		}

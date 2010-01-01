@@ -39,11 +39,14 @@ public:
 	file_cache_ref*		FileCacheRef() const
 							{ return fFileCacheRef; }
 
+			void		VnodeDeleted()	{ fVnodeDeleted = true; }
+
 private:
 	struct vnode*	fVnode;
-	dev_t			fDevice;
-	ino_t			fInode;
 	file_cache_ref*	fFileCacheRef;
+	ino_t			fInode;
+	dev_t			fDevice;
+	volatile bool	fVnodeDeleted;
 };
 
 
