@@ -1126,7 +1126,7 @@ get_vnode(dev_t mountID, ino_t vnodeID, struct vnode** _vnode, bool canWait,
 
 	mutex_lock(&sVnodeMutex);
 
-	int32 tries = 1000;
+	int32 tries = 2000;
 		// try for 10 secs
 restart:
 	struct vnode* vnode = lookup_vnode(mountID, vnodeID);
@@ -1138,8 +1138,7 @@ restart:
 				vnodeID);
 			return B_BUSY;
 		}
-// TODO: Replace this mechanism!
-		snooze(10000); // 10 ms
+		snooze(5000); // 5 ms
 		mutex_lock(&sVnodeMutex);
 		goto restart;
 	}
