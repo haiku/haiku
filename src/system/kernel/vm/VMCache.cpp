@@ -17,7 +17,6 @@
 
 #include <arch/cpu.h>
 #include <condition_variable.h>
-#include <debug.h>
 #include <heap.h>
 #include <int.h>
 #include <kernel.h>
@@ -676,44 +675,6 @@ VMCache::Unlock()
 		Delete();
 	} else
 		mutex_unlock(&fLock);
-}
-
-
-void
-VMCache::AcquireRefLocked()
-{
-// TODO: Inline!
-	ASSERT_LOCKED_MUTEX(&fLock);
-
-	fRefCount++;
-}
-
-
-void
-VMCache::AcquireRef()
-{
-	Lock();
-	fRefCount++;
-	Unlock();
-}
-
-
-void
-VMCache::ReleaseRefLocked()
-{
-// TODO: Inline!
-	ASSERT_LOCKED_MUTEX(&fLock);
-
-	fRefCount--;
-}
-
-
-void
-VMCache::ReleaseRef()
-{
-	Lock();
-	fRefCount--;
-	Unlock();
 }
 
 

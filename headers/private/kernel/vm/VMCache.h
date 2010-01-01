@@ -10,6 +10,7 @@
 #define _KERNEL_VM_VM_CACHE_H
 
 
+#include <debug.h>
 #include <kernel.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
@@ -69,23 +70,17 @@ public:
 
 	virtual	void				Delete();
 
-			bool				Lock()
-									{ return mutex_lock(&fLock) == B_OK; }
-			bool				TryLock()
-									{ return mutex_trylock(&fLock) == B_OK; }
-			bool				SwitchLock(mutex* from)
-									{ return mutex_switch_lock(from, &fLock)
-											== B_OK; }
+	inline	bool				Lock();
+	inline	bool				TryLock();
+	inline	bool				SwitchLock(mutex* from);
 			void				Unlock();
-			void				AssertLocked()
-									{ ASSERT_LOCKED_MUTEX(&fLock); }
+	inline	void				AssertLocked();
 
-			void				AcquireRefLocked();
-			void				AcquireRef();
-			void				ReleaseRefLocked();
-			void				ReleaseRef();
-			void				ReleaseRefAndUnlock()
-									{ ReleaseRefLocked(); Unlock(); }
+	inline	void				AcquireRefLocked();
+	inline	void				AcquireRef();
+	inline	void				ReleaseRefLocked();
+	inline	void				ReleaseRef();
+	inline	void				ReleaseRefAndUnlock();
 
 			void				WaitForPageEvents(vm_page* page, uint32 events,
 									bool relock);
@@ -201,6 +196,79 @@ public:
 								addr_t baseAddress);
 	static	status_t		CreateNullCache(VMCache*& cache);
 };
+
+
+
+bool
+VMCache::Lock()
+{
+	return mutex_lock(&fLock) == B_OK;
+}
+
+
+bool
+VMCache::TryLock()
+{
+	return mutex_trylock(&fLock) == B_OK;
+}
+
+
+bool
+VMCache::SwitchLock(mutex* from)
+{
+	return mutex_switch_lock(from, &fLock) == B_OK;
+}
+
+
+void
+VMCache::AssertLocked()
+{
+	ASSERT_LOCKED_MUTEX(&fLock);
+}
+
+
+void
+VMCache::AcquireRefLocked()
+{
+	ASSERT_LOCKED_MUTEX(&fLock);
+
+	fRefCount++;
+}
+
+
+void
+VMCache::AcquireRef()
+{
+	Lock();
+	fRefCount++;
+	Unlock();
+}
+
+
+void
+VMCache::ReleaseRefLocked()
+{
+	ASSERT_LOCKED_MUTEX(&fLock);
+
+	fRefCount--;
+}
+
+
+void
+VMCache::ReleaseRef()
+{
+	Lock();
+	fRefCount--;
+	Unlock();
+}
+
+
+void
+VMCache::ReleaseRefAndUnlock()
+{
+	ReleaseRefLocked();
+	Unlock();
+}
 
 
 #ifdef __cplusplus
