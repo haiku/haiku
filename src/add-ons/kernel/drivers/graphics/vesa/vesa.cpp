@@ -238,8 +238,8 @@ vbe_set_bits_per_gun(vesa_info& info, uint8 bits)
 	frame buffer, there is no need to map it again.
 */
 static status_t
-remap_frame_buffer(vesa_info& info, addr_t physicalBase,
-	uint32 bytesPerRow, uint32 height, bool initializing)
+remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
+	uint32 height, int8 depth, uint32 bytesPerRow, bool initializing)
 {
 	vesa_shared_info& sharedInfo = *info.shared_info;
 	addr_t frameBuffer;
@@ -262,6 +262,14 @@ remap_frame_buffer(vesa_info& info, addr_t physicalBase,
 				(void**)&frameBuffer);
 			if (area < 0)
 				return area;
+
+			if (initializing) {
+				// We need to manually update the kernel's frame buffer address,
+				// since this frame buffer remapping has not been issued by the
+				// app_server (which would otherwise take care of this)
+				frame_buffer_update(frameBuffer, width, height, depth,
+					bytesPerRow);
+			}
 
 			delete_area(info.shared_info->frame_buffer_area);
 
@@ -336,7 +344,8 @@ vesa_init(vesa_info& info)
 	sharedInfo.frame_buffer_area = bufferInfo->area;
 
 	remap_frame_buffer(info, bufferInfo->physical_frame_buffer,
-		bufferInfo->bytes_per_row, bufferInfo->height, true);
+		bufferInfo->width, bufferInfo->height, bufferInfo->bytes_per_row,
+		bufferInfo->depth, true);
 		// Does not matter if this fails - the frame buffer was already mapped
 		// before.
 
@@ -406,8 +415,9 @@ vesa_set_display_mode(vesa_info& info, uint32 mode)
 
 	// Map new frame buffer if necessary
 
-	status = remap_frame_buffer(info, modeInfo.physical_base,
-		modeInfo.bytes_per_row, modeInfo.height, false);
+	status = remap_frame_buffer(info, modeInfo.width, modeInfo.height,
+		modeInfo.physical_base, modeInfo.bytes_per_row, modeInfo.bits_per_pixel,
+		false);
 	if (status == B_OK) {
 		// Update shared frame buffer information
 		info.shared_info->current_mode.virtual_width = modeInfo.width;

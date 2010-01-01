@@ -363,7 +363,17 @@ console_module_info gFrameBufferConsoleModule = {
 };
 
 
-static status_t
+//	#pragma mark -
+
+
+bool
+frame_buffer_console_available(void)
+{
+	return sConsole.frame_buffer != 0;
+}
+
+
+status_t
 frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth,
 	int32 bytesPerRow)
 {
@@ -391,16 +401,6 @@ frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth,
 
 	mutex_unlock(&sConsole.lock);
 	return B_OK;
-}
-
-
-//	#pragma mark -
-
-
-bool
-frame_buffer_console_available(void)
-{
-	return sConsole.frame_buffer != 0;
 }
 
 
