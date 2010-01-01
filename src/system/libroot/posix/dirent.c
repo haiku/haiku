@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <syscalls.h>
 #include <syscall_utils.h>
