@@ -32,6 +32,7 @@ typedef struct __DIR DIR;
 extern "C" {
 #endif
 
+DIR*			fdopendir(int fd);
 DIR*			opendir(const char* dirName);
 struct dirent*	readdir(DIR* dir);
 int				readdir_r(DIR* dir, struct dirent* entry,
@@ -41,7 +42,6 @@ void			rewinddir(DIR* dir);
 void 			seekdir(DIR* dir, long int position);
 long int		telldir(DIR* dir);
 int				dirfd(const DIR* dir);
-DIR*			fdopendir(int fd);
 
 int				alphasort(const struct dirent** entry1,
 					const struct dirent** entry2);
