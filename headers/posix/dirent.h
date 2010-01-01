@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DIRENT_H
@@ -32,7 +32,6 @@ typedef struct __DIR DIR;
 extern "C" {
 #endif
 
-DIR*			fdopendir(int fd);
 DIR*			opendir(const char* dirName);
 struct dirent*	readdir(DIR* dir);
 int				readdir_r(DIR* dir, struct dirent* entry,
@@ -42,6 +41,14 @@ void			rewinddir(DIR* dir);
 void 			seekdir(DIR* dir, long int position);
 long int		telldir(DIR* dir);
 int				dirfd(const DIR* dir);
+DIR*			fdopendir(int fd);
+
+int				alphasort(const struct dirent** entry1,
+					const struct dirent** entry2);
+int				scandir(const char* dir, struct dirent*** _entryArray,
+					int (*selectFunc)(const struct dirent*),
+					int (*compareFunc)(const struct dirent** entry1,
+						const struct dirent** entry2));
 
 #ifdef __cplusplus
 }
