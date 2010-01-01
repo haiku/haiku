@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -364,7 +364,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 		vm_page *page;
 
 		// we need to allocate a pgtable
-		page = vm_page_allocate_page(PAGE_STATE_CLEAR, true);
+		page = vm_page_allocate_page(PAGE_STATE_CLEAR);
 
 		// mark the page WIRED
 		vm_page_set_state(page, PAGE_STATE_WIRED);

@@ -49,9 +49,7 @@ void vm_page_unreserve_pages(uint32 count);
 void vm_page_reserve_pages(uint32 count);
 bool vm_page_try_reserve_pages(uint32 count);
 
-struct vm_page *vm_page_allocate_page(int pageState, bool reserved);
-status_t vm_page_allocate_pages(int pageState, struct vm_page **pages,
-	uint32 numPages);
+struct vm_page *vm_page_allocate_page(int pageState);
 struct vm_page *vm_page_allocate_page_run(int state, addr_t base,
 	addr_t length);
 struct vm_page *vm_page_allocate_page_run_no_base(int state, addr_t count);

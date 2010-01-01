@@ -127,9 +127,7 @@ class UnreservePages : public AbstractTraceEntry {
 
 class AllocatePage : public AbstractTraceEntry {
 	public:
-		AllocatePage(bool reserved)
-			:
-			fReserved(reserved)
+		AllocatePage()
 		{
 			Initialized();
 		}
@@ -137,12 +135,7 @@ class AllocatePage : public AbstractTraceEntry {
 		virtual void AddDump(TraceOutput& out)
 		{
 			out.Print("page alloc");
-			if (fReserved)
-				out.Print(" reserved");
 		}
-
-	private:
-		bool		fReserved;
 };
 
 
@@ -1511,7 +1504,7 @@ page_writer(void* /*unused*/)
 
 
 static vm_page *
-find_page_candidate(struct vm_page &marker, bool stealActive)
+find_page_candidate(struct vm_page &marker)
 {
 	MutexLocker locker(sPageLock);
 	page_queue *queue;
@@ -1521,10 +1514,6 @@ find_page_candidate(struct vm_page &marker, bool stealActive)
 		// Get the first free pages of the (in)active queue
 		queue = &sInactivePageQueue;
 		page = sInactivePageQueue.head;
-		if (page == NULL && stealActive) {
-			queue = &sActivePageQueue;
-			page = sActivePageQueue.head;
-		}
 	} else {
 		// Get the next page of the current queue
 		if (marker.state == PAGE_STATE_INACTIVE)
@@ -1542,10 +1531,7 @@ find_page_candidate(struct vm_page &marker, bool stealActive)
 	}
 
 	while (page != NULL) {
-		if (!is_marker_page(page)
-			&& (page->state == PAGE_STATE_INACTIVE
-				|| (stealActive && page->state == PAGE_STATE_ACTIVE
-					&& page->wired_count == 0))) {
+		if (!is_marker_page(page) && page->state == PAGE_STATE_INACTIVE) {
 			// we found a candidate, insert marker
 			marker.state = queue == &sActivePageQueue
 				? PAGE_STATE_ACTIVE : PAGE_STATE_INACTIVE;
@@ -1554,10 +1540,6 @@ find_page_candidate(struct vm_page &marker, bool stealActive)
 		}
 
 		page = page->queue_next;
-		if (page == NULL && stealActive && queue != &sActivePageQueue) {
-			queue = &sActivePageQueue;
-			page = sActivePageQueue.head;
-		}
 	}
 
 	return NULL;
@@ -1565,7 +1547,7 @@ find_page_candidate(struct vm_page &marker, bool stealActive)
 
 
 static bool
-steal_page(vm_page *page, bool stealActive)
+steal_page(vm_page *page)
 {
 	// try to lock the page's cache
 	if (vm_cache_acquire_locked_page_cache(page, false) == NULL)
@@ -1575,9 +1557,7 @@ steal_page(vm_page *page, bool stealActive)
 	MethodDeleter<VMCache> _2(page->cache, &VMCache::ReleaseRefLocked);
 
 	// check again if that page is still a candidate
-	if (page->state != PAGE_STATE_INACTIVE
-		&& (!stealActive || page->state != PAGE_STATE_ACTIVE
-			|| page->wired_count != 0))
+	if (page->state != PAGE_STATE_INACTIVE)
 		return false;
 
 	// recheck eventual last minute changes
@@ -1608,10 +1588,8 @@ steal_page(vm_page *page, bool stealActive)
 
 
 static size_t
-steal_pages(vm_page **pages, size_t count, bool reserve)
+steal_pages(vm_page **pages, size_t count)
 {
-	size_t maxCount = count;
-
 	while (true) {
 		vm_page marker;
 		marker.type = PAGE_TYPE_DUMMY;
@@ -1622,19 +1600,17 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 		size_t stolen = 0;
 
 		while (count > 0) {
-			vm_page *page = find_page_candidate(marker, false);
+			vm_page *page = find_page_candidate(marker);
 			if (page == NULL)
 				break;
 
-			if (steal_page(page, false)) {
-				if (reserve || stolen >= maxCount) {
-					MutexLocker _(sPageLock);
-					enqueue_page(&sFreePageQueue, page);
-					page->state = PAGE_STATE_FREE;
+			if (steal_page(page)) {
+				MutexLocker locker(sPageLock);
+				enqueue_page(&sFreePageQueue, page);
+				page->state = PAGE_STATE_FREE;
+				locker.Unlock();
 
-					T(StolenPage());
-				} else if (stolen < maxCount)
-					pages[stolen] = page;
+				T(StolenPage());
 
 				stolen++;
 				count--;
@@ -1646,11 +1622,11 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 
 		MutexLocker locker(sPageLock);
 
-		if ((reserve && sReservedPages <= free_page_queue_count())
+		if (sReservedPages <= free_page_queue_count()
 			|| count == 0
-			|| ((!reserve && (sInactivePageQueue.count > 0))
-				|| free_page_queue_count() > sReservedPages))
+			|| free_page_queue_count() > sReservedPages) {
 			return stolen;
+		}
 
 		if (stolen && !tried && sInactivePageQueue.count > 0) {
 			count++;
@@ -1681,7 +1657,7 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 		locker.Lock();
 		sPageDeficit--;
 
-		if (reserve && sReservedPages <= free_page_queue_count())
+		if (sReservedPages <= free_page_queue_count())
 			return stolen;
 	}
 }
@@ -2046,6 +2022,7 @@ vm_page_unreserve_pages(uint32 count)
 	They will only be handed out to someone who has actually reserved them.
 	This call returns as soon as the number of requested pages has been
 	reached.
+	The caller must not hold any cache lock or the function might deadlock.
 */
 void
 vm_page_reserve_pages(uint32 count)
@@ -2065,7 +2042,7 @@ vm_page_reserve_pages(uint32 count)
 	count = sReservedPages - freePages;
 	locker.Unlock();
 
-	steal_pages(NULL, count + 1, true);
+	steal_pages(NULL, count + 1);
 		// we get one more, just in case we can do something someone
 		// else can't
 }
@@ -2090,10 +2067,8 @@ vm_page_try_reserve_pages(uint32 count)
 }
 
 
-// TODO: you must not have locked a cache when calling this function with
-// reserved == false. See vm_cache_acquire_locked_page_cache().
 vm_page *
-vm_page_allocate_page(int pageState, bool reserved)
+vm_page_allocate_page(int pageState)
 {
 	page_queue *queue;
 	page_queue *otherQueue;
@@ -2113,37 +2088,21 @@ vm_page_allocate_page(int pageState, bool reserved)
 
 	MutexLocker locker(sPageLock);
 
-	T(AllocatePage(reserved));
+	T(AllocatePage());
 
-	vm_page *page = NULL;
-	while (true) {
-		if (reserved || sReservedPages < free_page_queue_count()) {
-			page = dequeue_page(queue);
-			if (page == NULL) {
+	vm_page *page = dequeue_page(queue);
+	if (page == NULL) {
 #if DEBUG_PAGE_QUEUE
-				if (queue->count != 0)
-					panic("queue %p corrupted, count = %d\n", queue, queue->count);
+		if (queue->count != 0)
+			panic("queue %p corrupted, count = %d\n", queue, queue->count);
 #endif
 
-				// if the primary queue was empty, grab the page from the
-				// secondary queue
-				page = dequeue_page(otherQueue);
-			}
-		}
+		// if the primary queue was empty, grab the page from the
+		// secondary queue
+		page = dequeue_page(otherQueue);
 
-		if (page != NULL)
-			break;
-
-		if (reserved)
+		if (page == NULL)
 			panic("Had reserved page, but there is none!");
-
-		// steal one from the inactive list
-		locker.Unlock();
-		size_t stolen = steal_pages(&page, 1, false);
-		locker.Lock();
-
-		if (stolen > 0)
-			break;
 	}
 
 	if (page->cache != NULL)
@@ -2162,31 +2121,6 @@ vm_page_allocate_page(int pageState, bool reserved)
 		clear_page(page);
 
 	return page;
-}
-
-
-/*!	Allocates a number of pages and puts their pointers into the provided
-	array. All pages are marked busy.
-	Returns B_OK on success, and B_NO_MEMORY when there aren't any free
-	pages left to allocate.
-*/
-status_t
-vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages)
-{
-	uint32 i;
-
-	for (i = 0; i < numPages; i++) {
-		pages[i] = vm_page_allocate_page(pageState, false);
-		if (pages[i] == NULL) {
-			// allocation failed, we need to free what we already have
-			while (i-- > 0)
-				vm_page_set_state(pages[i], pageState);
-
-			return B_NO_MEMORY;
-		}
-	}
-
-	return B_OK;
 }
 
 

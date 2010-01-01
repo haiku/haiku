@@ -871,7 +871,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 #	endif
 					continue;
 #endif
-				vm_page* page = vm_page_allocate_page(newPageState, true);
+				vm_page* page = vm_page_allocate_page(newPageState);
 				cache->InsertPage(page, offset);
 				vm_map_page(area, page, address, protection);
 
@@ -3671,7 +3671,7 @@ fault_get_page(PageFaultContext& context)
 		// see if the backing store has it
 		if (cache->HasPage(context.cacheOffset)) {
 			// insert a fresh page and mark it busy -- we're going to read it in
-			page = vm_page_allocate_page(PAGE_STATE_FREE, true);
+			page = vm_page_allocate_page(PAGE_STATE_FREE);
 			cache->InsertPage(page, context.cacheOffset);
 
 			// We need to unlock all caches and the address space while reading
@@ -3724,7 +3724,7 @@ fault_get_page(PageFaultContext& context)
 		cache = context.isWrite ? context.topCache : lastCache;
 
 		// allocate a clean page
-		page = vm_page_allocate_page(PAGE_STATE_CLEAR, true);
+		page = vm_page_allocate_page(PAGE_STATE_CLEAR);
 		FTRACE(("vm_soft_fault: just allocated page 0x%lx\n",
 			page->physical_page_number));
 
@@ -3739,7 +3739,7 @@ fault_get_page(PageFaultContext& context)
 		// TODO: If memory is low, it might be a good idea to steal the page
 		// from our source cache -- if possible, that is.
 		FTRACE(("get new page, copy it, and put it into the topmost cache\n"));
-		page = vm_page_allocate_page(PAGE_STATE_FREE, true);
+		page = vm_page_allocate_page(PAGE_STATE_FREE);
 
 		// copy the page
 		vm_memcpy_physical_page(page->physical_page_number * B_PAGE_SIZE,

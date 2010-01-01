@@ -149,7 +149,7 @@ PrecacheIO::Prepare()
 	// allocate pages for the cache and mark them busy
 	uint32 i = 0;
 	for (size_t pos = 0; pos < fSize; pos += B_PAGE_SIZE) {
-		vm_page* page = vm_page_allocate_page(PAGE_STATE_FREE, true);
+		vm_page* page = vm_page_allocate_page(PAGE_STATE_FREE);
 		if (page == NULL)
 			break;
 
@@ -381,7 +381,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
-			PAGE_STATE_FREE, true);
+			PAGE_STATE_FREE);
 		if (page == NULL)
 			panic("no more pages!");
 
@@ -506,7 +506,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		// TODO: the pages we allocate here should have been reserved upfront
 		//	in cache_io()
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
-			PAGE_STATE_FREE, true);
+			PAGE_STATE_FREE);
 
 		ref->cache->InsertPage(page, offset + pos);
 

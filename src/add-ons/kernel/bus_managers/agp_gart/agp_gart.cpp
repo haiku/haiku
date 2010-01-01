@@ -545,18 +545,10 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 		if (memory->pages == NULL)
 			return B_NO_MEMORY;
 
-		for (uint32 i = 0; i < count; i++) {
-			memory->pages[i] = vm_page_allocate_page(PAGE_STATE_CLEAR, false);
-			if (memory->pages[i] == NULL) {
-				// Free pages we already allocated
-				while (i-- > 0) {
-					vm_page_set_state(memory->pages[i], PAGE_STATE_CLEAR);
-				}
-				free(memory->pages);
-				memory->pages = NULL;
-				return B_NO_MEMORY;
-			}
-		}
+		vm_page_reserve_pages(count);
+		for (uint32 i = 0; i < count; i++)
+			memory->pages[i] = vm_page_allocate_page(PAGE_STATE_CLEAR);
+		vm_page_unreserve_pages(count);
 	}
 #else
 	void *address;
