@@ -273,7 +273,7 @@ lookup_page_table_entry(vm_translation_map *map, addr_t virtualAddress)
 	// lookup the vsid based off the va
 	uint32 virtualSegmentID = VADDR_TO_VSID(map, virtualAddress);
 
-//	dprintf("vm_translation_map.lookup_page_table_entry: vsid %d, va 0x%lx\n", vsid, va);
+//	dprintf("vm_translation_map.lookup_page_table_entry: vsid %ld, va 0x%lx\n", virtualSegmentID, virtualAddress);
 
 
 	// Search for the page table entry using the primary hash value
