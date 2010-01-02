@@ -52,6 +52,41 @@ hex_dump(const void *_data, int length)
 #endif	// !TRACE_NETWORK
 
 
+static int
+parse_ip_address_component(const char *sz, int len)
+{
+	const int base = 10;
+		// only decimal numbers for now
+	int r = 0;
+	for (int i = 0; i < len; i++) {
+		int x = sz[i] - '0';
+		for (int j = 1; j < len - i; j++)
+			x *= base;
+		r += x;
+	}
+	return r;
+}
+
+
+static ip_addr_t
+parse_ip_address(const char *sz)
+{
+	ip_addr_t addr = 0;
+	int i = 0;
+	const char *psz = sz;
+	// TODO: Handles only IPv4 addresses for now.
+	char *p = strchr(psz, '.');
+	while (p != NULL && i < 4) {
+		int len = p - psz;
+		addr |= parse_ip_address_component(psz, len) << ((4 - i - 1) * 8);
+		p = strchr(psz = p + 1, '.');
+		i++;
+	}
+	addr |= parse_ip_address_component(psz, sz + strlen(sz) - psz);
+	return addr;
+}
+
+
 class OFEthernetInterface : public EthernetInterface {
 public:
 	OFEthernetInterface();
@@ -128,8 +163,20 @@ OFEthernetInterface::Init(const char *device)
 	} dhcpResponse;
 	bytesRead = of_getprop(gChosen, "dhcp-response", &dhcpResponse,
 		sizeof(dhcpResponse));
-	if (bytesRead != OF_FAILED && bytesRead == (int)sizeof(dhcpResponse))
+	if (bytesRead != OF_FAILED && bytesRead == (int)sizeof(dhcpResponse)) {
 		SetIPAddress(ntohl(dhcpResponse.ip_address));
+	} else {
+		char saddr[16];
+		package = of_finddevice("/options");
+		bytesRead = of_getprop(package, "default-client-ip", saddr, sizeof(saddr));
+		if (bytesRead != OF_FAILED) {
+			saddr[bytesRead] = '\0';
+			printf("default-client-ip: %s\n", saddr);
+			ip_addr_t addr = parse_ip_address(saddr);
+			printf("addr = %x\n", (unsigned int)addr);
+			SetIPAddress(addr);
+		}
+	}
 
 	return B_OK;
 }
