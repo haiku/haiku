@@ -17,4 +17,6 @@
 #error Unable to determine byte order!
 #endif
 
+#define __BYTE_ORDER	BYTE_ORDER
+
 #endif	// _HAIKU_BUILD_COMPATIBILITY_SUNOS_ENDIAN
