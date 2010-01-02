@@ -1,22 +1,22 @@
-1	Lithuanian	x-vnd-Haiku-Keymap	4175672673
-Tilde trigger	Keymap window		Tildė
-Grave trigger	Keymap window		Apostrofas
-Select dead keys	Keymap window		Mirūs mygtukai
+1	lithuanian	x-vnd-Haiku-Keymap	3527348353
+Select Dead Keys	Keymap window		Kombinaciniai klavišai
+Tilde Trigger	Keymap window		Riestinis
+Grave Trigger	Keymap window		Kairinis
 Quit	Keymap window		Baigti
-Circumflex trigger	Keymap window		Cirkumfleksas
-Diaeresis trigger	Keymap window		Trema
+Circumflex Trigger	Keymap window		Stogelis
 Open…	Keymap window		Atidaryti…
 System:	Keymap window		Sisteminės:
-Switch shortcut keys	Keymap window		Derinių mygtukas
+Diaeresis Trigger	Keymap window		Trema
 User:	Keymap window		Vartotojo:
-Switch shortcut keys to Haiku mode	Keymap window		Derinių mygtukai kaip Haiku
+Sample and Clipboard:	Keymap window		Pavyzdys ir iškarpa:
 Keymap	Keymap window		Klaviatūros išdėstymas
-Sample and clipboard:	Keymap window		Pavyzdys ir iškarpa:
+Switch Shortcut Keys	Keymap window		Derinių klavišai
+Switch Shortcut Keys To Windows/Linux Mode	Keymap window		Naudoti derinių klavišus kaip Windows/Linux
 Layout	Keymap window		Išdėstymas
-Switch shortcut keys to Windows/Linux mode	Keymap window		Derinių mygtukai kaip Windows/Linux
 Revert	Keymap window		Grįžti
-Save as…	Keymap window		Išsaugoti kaip…
+Save As…	Keymap window		Išsaugoti kaip…
+Switch Shortcut Keys To Haiku Mode	Keymap window		Naudoti derinių klavišus kaip Haiku
 File	Keymap window		Byla
 (Current)	Keymap window		(Esamas)
 Font	Keymap window		Rašmenys
-Acute trigger	Keymap window		Akūtas
+Acute Trigger	Keymap window		Dešininis

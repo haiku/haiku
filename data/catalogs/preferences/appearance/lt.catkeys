@@ -1,43 +1,43 @@
-1	Lithuanian	x-vnd.Haiku-Appearance	3612090060
-Navigation pulse	Colors tab		Išskirto rėmelio žybsniai
+1	lithuanian	x-vnd.Haiku-Appearance	959674221
+Navigation Pulse	Colors tab		Išskirto rėmelio žybsniai
 Shadow	Colors tab		Šešėlis
 On	AntialiasingSettingsView		Įjungta
 Defaults	APRWindow		Įprastai
 Grayscale	AntialiasingSettingsView		Pilkšvai
 Shine	Colors tab		Šviesa
 Off	AntialiasingSettingsView		Išjungta
-Antialiasing type:	AntialiasingSettingsView		Glotninimo rūšis:
+Anti-aliasing type:	AntialiasingSettingsView		Glotninimo rūšis:
 Success	Colors tab		Sėkmė
-Inactive window tab	Colors tab		Neveikiančio lango antraštė
+Inactive Window Tab	Colors tab		Neveikiančio lango antraštė
 Failure	Colors tab		Nesėkmė
 Hinting menu	AntialiasingSettingsView		Glodinimas
-Control border	Colors tab		Valdiklių rėmelis
-Document background	Colors tab		Dokumento fonas
+Control Border	Colors tab		Valdiklių rėmelis
+Document Background	Colors tab		Dokumento fonas
 Revert	APRWindow		Grįžti
-Selected menu item border	Colors tab		Išskirtojo meniu dėmens rėmelis
-Selected menu item text	Colors tab		Išskirtojo meniu dėmens tekstas
+Selected Menu Item Border	Colors tab		Išskirtojo meniu dėmens rėmelis
+Selected Menu Item Text	Colors tab		Išskirtojo meniu dėmens tekstas
 Antialiasing	APRWindow		Glotninimas
-Window tab text	Colors tab		Lango antraštės tekstas
-Tooltip background	Colors tab		Patarimo fonas
-Document text	Colors tab		Dokumento tekstas
-Navigation base	Colors tab		Pasirinkimo rėmelis
-Menu background	Colors tab		Meniu fonas
+Window Tab Text	Colors tab		Lango antraštės tekstas
+Tooltip Background	Colors tab		Patarimo fonas
+Document Text	Colors tab		Dokumento tekstas
+Navigation Base	Colors tab		Pasirinkimo rėmelis
+Menu Background	Colors tab		Meniu fonas
 Appearance	APRWindow		Išvaizda
-Control background	Colors tab		Valdiklių fonas
+Control Background	Colors tab		Valdiklių fonas
 Colors	APRWindow		Spalvos
-Panel background	Colors tab		Sydelio fonas
-Window tab	Colors tab		Lango antraštė
+Panel Background	Colors tab		Skydelio fonas
+Window Tab	Colors tab		Lango antraštė
 Reduce colored edges filter strength:	AntialiasingSettingsView		Spalvotų kraštų filtro stiprumo mažinimas
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpikselinis glotninimas kartu su pilkšvuoju glodinimu šioje Haiku versijoje yra neprieinamas dėl patentinio nesuderinamumo. Norėdami įjungti šią ypatybę, turite savarankiškai susirinkti Haiku įjungdami atitinkamą sąvybę bibliotekos FreeType antraštinėje derinimo byloje.
-Menu item text	Colors tab		Meniu dėmens tekstas
-Monospaced fonts only	AntialiasingSettingsView		Tik lygiaplotiems rašmenims
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		SubpSubpikselinis glotninimas kartu su pilkšvuoju glodinimu šioje Haiku versijoje yra neprieinamas dėl patentų nesuderinamumo. Norėdami įjungti šią ypatybę, turite savarankiškai susirinkti Haiku įjungdami atitinkamą sąvybę bibliotekos FreeType antraštinėje derinimo byloje.
+Menu Item Text	Colors tab		Meniu dėmens tekstas
+Monospaced Fonts Only	AntialiasingSettingsView		Tik lygiaplotiems rašmenims
 LCD subpixel	AntialiasingSettingsView		Subpikselinis
-Inactive window tab text	Colors tab		Neveikiančio lango antraštės tekstas
+Inactive Window Tab Text	Colors tab		Neveikiančio lango antraštės tekstas
 Strong	AntialiasingSettingsView		Stipriai
-Control highlight	Colors tab		Valdiklių apšvietimas
-Control text	Colors tab		Valdiklių tekstas
-Tooltip text	Colors tab		Patarimų tekstas
+Control Highlight	Colors tab		Valdiklių apšvietimas
+Control Text	Colors tab		Valdiklių tekstas
+Tooltip Text	Colors tab		Patarimų tekstas
 Antialiasing menu	AntialiasingSettingsView		Glotninimo meniu
-Selected menu item background	Colors tab		Išskirtojo meniu dėmens fonas
+Selected Menu Item Background	Colors tab		Išskirtojo meniu dėmens fonas
 Glyph hinting:	AntialiasingSettingsView		Rašmens glodinimas:
-Panel text	Colors tab		Teksto skydas
+Panel Text	Colors tab		Skydelio tekstas
