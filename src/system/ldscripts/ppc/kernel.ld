@@ -83,7 +83,6 @@ SECTIONS
 
 	/* unintialized data (in same segment as writable data) */
 	__bss_start = .;
-	__bss_start = .;
 	.sbss : { *(.sbss .sbss.* .gnu.linkonce.sb.*) }
 	.bss : {
 		*(.bss .bss.* .gnu.linkonce.b.*)
