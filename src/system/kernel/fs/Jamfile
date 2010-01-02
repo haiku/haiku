@@ -14,6 +14,7 @@ KernelMergeObject kernel_fs.o :
 	node_monitor.cpp
 	rootfs.cpp
 	socket.cpp
+	Vnode.cpp
 	vfs.cpp
 	vfs_boot.cpp
 	vfs_net_boot.cpp

@@ -56,6 +56,7 @@
 #include "EntryCache.h"
 #include "fifo.h"
 #include "IORequest.h"
+#include "Vnode.h"
 #include "../cache/vnode_store.h"
 
 
@@ -115,36 +116,6 @@ const static size_t kMaxPathLength = 65536;
 	// on PATH_MAX
 
 
-struct vnode : fs_vnode, DoublyLinkedListLinkImpl<vnode> {
-	struct vnode*	next;
-	VMCache*		cache;
-	dev_t			device;
-	list_link		unused_link;
-	ino_t			id;
-	struct fs_mount* mount;
-	struct vnode*	covered_by;
-	int32			ref_count;
-private:
-	uint32			fType : 20;	// right-shifted by 12
-	uint32			fUnused : 9;
-public:
-	bool			remove : 1;
-	bool			busy : 1;
-	bool			unpublished : 1;
-	struct advisory_locking* advisory_locking;
-	struct file_descriptor* mandatory_locked_by;
-
-	void SetType(uint32 type)
-	{
-		fType = type >> 12;
-	}
-
-	uint32 Type() const
-	{
-		return fType << 12;
-	}
-};
-
 struct vnode_hash_key {
 	dev_t	device;
 	ino_t	vnode;
@@ -195,6 +166,7 @@ struct fs_mount {
 	fs_volume*		volume;
 	char*			device_name;
 	recursive_lock	rlock;	// guards the vnodes list
+		// TODO: Make this a mutex! It is never used recursively.
 	struct vnode*	root_vnode;
 	struct vnode*	covers_vnode;
 	KPartition*		partition;
@@ -254,7 +226,7 @@ static mutex sMountMutex = MUTEX_INITIALIZER("vfs_mount_lock");
 	  sMountsTable will not be modified,
 	- vnode::covered_by of any vnode in sVnodeTable will not be modified.
 
-	The thread trying to lock the lock must not hold sVnodeMutex or
+	The thread trying to lock the lock must not hold sVnodeLock or
 	sMountMutex.
 */
 static recursive_lock sMountOpLock;
@@ -264,7 +236,7 @@ static recursive_lock sMountOpLock;
 	The holder is allowed to read access the vnode::covered_by field of any
 	vnode. Additionally holding sMountOpLock allows for write access.
 
-	The thread trying to lock the must not hold sVnodeMutex.
+	The thread trying to lock the must not hold sVnodeLock.
 */
 static mutex sVnodeCoveredByMutex
 	= MUTEX_INITIALIZER("vfs_vnode_covered_by_lock");
@@ -281,7 +253,7 @@ static mutex sVnodeCoveredByMutex
 	You must not have this mutex held when calling create_sem(), as this
 	might call vfs_free_unused_vnodes().
 */
-static mutex sVnodeMutex = MUTEX_INITIALIZER("vfs_vnode_lock");
+static rw_lock sVnodeLock = RW_LOCK_INITIALIZER("vfs_vnode_lock");
 
 /*!	\brief Guards io_context::root.
 
@@ -290,6 +262,13 @@ static mutex sVnodeMutex = MUTEX_INITIALIZER("vfs_vnode_lock");
 	setting the field is inc_vnode_ref_count() on io_context::root.
 */
 static mutex sIOContextRootLock = MUTEX_INITIALIZER("io_context::root lock");
+
+/*!	\brief Guards sUnusedVnodeList and sUnusedVnodes.
+
+	Innermost lock. Must not be held when acquiring any other lock.
+*/
+static mutex sUnusedVnodesLock = MUTEX_INITIALIZER("unused vnodes");
+
 
 #define VNODE_HASH_TABLE_SIZE 1024
 static hash_table* sVnodeTable;
@@ -723,7 +702,7 @@ get_mount(dev_t id, struct fs_mount** _mount)
 {
 	struct fs_mount* mount;
 
-	MutexLocker nodeLocker(sVnodeMutex);
+	ReadLocker nodeLocker(sVnodeLock);
 	MutexLocker mountLocker(sMountMutex);
 
 	mount = find_mount(id);
@@ -731,7 +710,7 @@ get_mount(dev_t id, struct fs_mount** _mount)
 		return B_BAD_VALUE;
 
 	struct vnode* rootNode = mount->root_vnode;
-	if (rootNode == NULL || rootNode->busy || rootNode->ref_count == 0) {
+	if (rootNode == NULL || rootNode->IsBusy() || rootNode->ref_count == 0) {
 		// might have been called during a mount/unmount operation
 		return B_BUSY;
 	}
@@ -888,10 +867,49 @@ remove_vnode_from_mount_list(struct vnode* vnode, struct fs_mount* mount)
 }
 
 
-static status_t
-create_new_vnode(struct vnode** _vnode, dev_t mountID, ino_t vnodeID)
+/*!	\brief Looks up a vnode by mount and node ID in the sVnodeTable.
+
+	The caller must hold the sVnodeLock (read lock at least).
+
+	\param mountID the mount ID.
+	\param vnodeID the node ID.
+
+	\return The vnode structure, if it was found in the hash table, \c NULL
+			otherwise.
+*/
+static struct vnode*
+lookup_vnode(dev_t mountID, ino_t vnodeID)
 {
-	FUNCTION(("create_new_vnode()\n"));
+	struct vnode_hash_key key;
+
+	key.device = mountID;
+	key.vnode = vnodeID;
+
+	return (vnode*)hash_lookup(sVnodeTable, &key);
+}
+
+
+/*!	Creates a new vnode with the given mount and node ID.
+	If the node already exists, it is returned instead and no new node is
+	created. In either case -- but not, if an error occurs -- the function write
+	locks \c sVnodeLock and keeps it locked for the caller when returning. On
+	error the lock is not not held on return.
+
+	\param mountID The mount ID.
+	\param vnodeID The vnode ID.
+	\param _vnode Will be set to the new vnode on success.
+	\param _nodeCreated Will be set to \c true when the returned vnode has
+		been newly created, \c false when it already existed. Will not be
+		changed on error.
+	\return \c B_OK, when the vnode was successfully created and inserted or
+		a node with the given ID was found, \c B_NO_MEMORY or
+		\c B_ENTRY_NOT_FOUND on error.
+*/
+static status_t
+create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
+	bool& _nodeCreated)
+{
+	FUNCTION(("create_new_vnode_and_lock()\n"));
 
 	struct vnode* vnode = (struct vnode*)malloc(sizeof(struct vnode));
 	if (vnode == NULL)
@@ -901,24 +919,40 @@ create_new_vnode(struct vnode** _vnode, dev_t mountID, ino_t vnodeID)
 	memset(vnode, 0, sizeof(struct vnode));
 	vnode->device = mountID;
 	vnode->id = vnodeID;
+	vnode->ref_count = 1;
+	vnode->SetBusy(true);
 
-	// add the vnode to the mount structure
+	// look up the the node -- it might have been added by someone else in the
+	// meantime
+	rw_lock_write_lock(&sVnodeLock);
+	struct vnode* existingVnode = lookup_vnode(mountID, vnodeID);
+	if (existingVnode != NULL) {
+		free(vnode);
+		_vnode = existingVnode;
+		_nodeCreated = false;
+		return B_OK;
+	}
+
+	// get the mount structure
 	mutex_lock(&sMountMutex);
 	vnode->mount = find_mount(mountID);
 	if (!vnode->mount || vnode->mount->unmounting) {
 		mutex_unlock(&sMountMutex);
+		rw_lock_write_unlock(&sVnodeLock);
 		free(vnode);
 		return B_ENTRY_NOT_FOUND;
 	}
 
+	// add the vnode to the mount's node list and the hash table
 	hash_insert(sVnodeTable, vnode);
 	add_vnode_to_mount_list(vnode, vnode->mount);
 
 	mutex_unlock(&sMountMutex);
 
-	vnode->ref_count = 1;
-	*_vnode = vnode;
+	_vnode = vnode;
+	_nodeCreated = true;
 
+	// keep the vnode lock locked
 	return B_OK;
 }
 
@@ -930,13 +964,14 @@ create_new_vnode(struct vnode** _vnode, dev_t mountID, ino_t vnodeID)
 static void
 free_vnode(struct vnode* vnode, bool reenter)
 {
-	ASSERT_PRINT(vnode->ref_count == 0 && vnode->busy, "vnode: %p\n", vnode);
+	ASSERT_PRINT(vnode->ref_count == 0 && vnode->IsBusy(), "vnode: %p\n",
+		vnode);
 
 	// write back any changes in this vnode's cache -- but only
 	// if the vnode won't be deleted, in which case the changes
 	// will be discarded
 
-	if (!vnode->remove && HAS_FS_CALL(vnode, fsync))
+	if (!vnode->IsRemoved() && HAS_FS_CALL(vnode, fsync))
 		FS_CALL_NO_PARAMS(vnode, fsync);
 
 	// Note: If this vnode has a cache attached, there will still be two
@@ -951,8 +986,8 @@ free_vnode(struct vnode* vnode, bool reenter)
 	// count, so that it will neither become negative nor 0.
 	vnode->ref_count = 2;
 
-	if (!vnode->unpublished) {
-		if (vnode->remove)
+	if (!vnode->IsUnpublished()) {
+		if (vnode->IsRemoved())
 			FS_CALL(vnode, remove_vnode, reenter);
 		else
 			FS_CALL(vnode, put_vnode, reenter);
@@ -968,9 +1003,9 @@ free_vnode(struct vnode* vnode, bool reenter)
 
 	// The file system has removed the resources of the vnode now, so we can
 	// make it available again (by removing the busy vnode from the hash).
-	mutex_lock(&sVnodeMutex);
+	rw_lock_write_lock(&sVnodeLock);
 	hash_remove(sVnodeTable, vnode);
-	mutex_unlock(&sVnodeMutex);
+	rw_lock_write_unlock(&sVnodeLock);
 
 	// if we have a VMCache attached, remove it
 	if (vnode->cache)
@@ -989,7 +1024,7 @@ free_vnode(struct vnode* vnode, bool reenter)
 
 	The caller must, of course, own a reference to the vnode to call this
 	function.
-	The caller must not hold the sVnodeMutex or the sMountMutex.
+	The caller must not hold the sVnodeLock or the sMountMutex.
 
 	\param vnode the vnode.
 	\param alwaysFree don't move this vnode into the unused list, but really
@@ -1001,7 +1036,8 @@ free_vnode(struct vnode* vnode, bool reenter)
 static status_t
 dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 {
-	MutexLocker locker(sVnodeMutex);
+	ReadLocker locker(sVnodeLock);
+	AutoLocker<Vnode> nodeLocker(vnode);
 
 	int32 oldRefCount = atomic_add(&vnode->ref_count, -1);
 
@@ -1013,17 +1049,18 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 	if (oldRefCount != 1)
 		return B_OK;
 
-	if (vnode->busy)
+	if (vnode->IsBusy())
 		panic("dec_vnode_ref_count: called on busy vnode %p\n", vnode);
 
 	bool freeNode = false;
 
 	// Just insert the vnode into an unused list if we don't need
 	// to delete it
-	if (vnode->remove || alwaysFree) {
-		vnode->busy = true;
+	if (vnode->IsRemoved() || alwaysFree) {
+		vnode->SetBusy(true);
 		freeNode = true;
 	} else {
+		MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
 		list_add_item(&sUnusedVnodeList, vnode);
 		if (++sUnusedVnodes > kMaxUnusedVnodes
 			&& low_resource_state(
@@ -1032,12 +1069,13 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 			// there are too many unused vnodes so we free the oldest one
 			// TODO: evaluate this mechanism
 			vnode = (struct vnode*)list_remove_head_item(&sUnusedVnodeList);
-			vnode->busy = true;
+			vnode->SetBusy(true);
 			freeNode = true;
 			sUnusedVnodes--;
 		}
 	}
 
+	nodeLocker.Unlock();
 	locker.Unlock();
 
 	if (freeNode)
@@ -1049,8 +1087,17 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 
 /*!	\brief Increments the reference counter of the given vnode.
 
-	The caller must either already have a reference to the vnode or hold
-	the sVnodeMutex.
+	The caller must make sure that the node isn't deleted while this function
+	is called. This can be done either:
+	- by ensuring that a reference to the node exists and remains in existence,
+	  or
+	- by holding the vnode's lock (which also requires read locking sVnodeLock)
+	  or by holding sVnodeLock write locked.
+
+	In the second case the caller is responsible for dealing with the ref count
+	0 -> 1 transition. That is 1. this function must not be invoked when the
+	node is busy in the first place and 2. the node must possibly be removed
+	from the unused node list and the unused node counter must be incremented.
 
 	\param vnode the vnode.
 */
@@ -1060,28 +1107,6 @@ inc_vnode_ref_count(struct vnode* vnode)
 	atomic_add(&vnode->ref_count, 1);
 	TRACE(("inc_vnode_ref_count: vnode %p, ref now %ld\n", vnode,
 		vnode->ref_count));
-}
-
-
-/*!	\brief Looks up a vnode by mount and node ID in the sVnodeTable.
-
-	The caller must hold the sVnodeMutex.
-
-	\param mountID the mount ID.
-	\param vnodeID the node ID.
-
-	\return The vnode structure, if it was found in the hash table, \c NULL
-			otherwise.
-*/
-static struct vnode*
-lookup_vnode(dev_t mountID, ino_t vnodeID)
-{
-	struct vnode_hash_key key;
-
-	key.device = mountID;
-	key.vnode = vnodeID;
-
-	return (vnode*)hash_lookup(sVnodeTable, &key);
 }
 
 
@@ -1107,7 +1132,7 @@ create_special_sub_node(struct vnode* vnode, uint32 flags)
 
 	If the node is not yet in memory, it will be loaded.
 
-	The caller must not hold the sVnodeMutex or the sMountMutex.
+	The caller must not hold the sVnodeLock or the sMountMutex.
 
 	\param mountID the mount ID.
 	\param vnodeID the node ID.
@@ -1124,14 +1149,17 @@ get_vnode(dev_t mountID, ino_t vnodeID, struct vnode** _vnode, bool canWait,
 	FUNCTION(("get_vnode: mountid %ld vnid 0x%Lx %p\n", mountID, vnodeID,
 		_vnode));
 
-	mutex_lock(&sVnodeMutex);
+	rw_lock_read_lock(&sVnodeLock);
 
 	int32 tries = 2000;
 		// try for 10 secs
 restart:
 	struct vnode* vnode = lookup_vnode(mountID, vnodeID);
-	if (vnode && vnode->busy) {
-		mutex_unlock(&sVnodeMutex);
+	AutoLocker<Vnode> nodeLocker(vnode);
+
+	if (vnode && vnode->IsBusy()) {
+		nodeLocker.Unlock();
+		rw_lock_read_unlock(&sVnodeLock);
 		if (!canWait || --tries < 0) {
 			// vnode doesn't seem to become unbusy
 			dprintf("vnode %ld:%Ld is not becoming unbusy!\n", mountID,
@@ -1139,7 +1167,7 @@ restart:
 			return B_BUSY;
 		}
 		snooze(5000); // 5 ms
-		mutex_lock(&sVnodeMutex);
+		rw_lock_read_lock(&sVnodeLock);
 		goto restart;
 	}
 
@@ -1150,18 +1178,31 @@ restart:
 	if (vnode) {
 		if (vnode->ref_count == 0) {
 			// this vnode has been unused before
+			MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
 			list_remove_item(&sUnusedVnodeList, vnode);
 			sUnusedVnodes--;
 		}
 		inc_vnode_ref_count(vnode);
+
+		nodeLocker.Unlock();
+		rw_lock_read_unlock(&sVnodeLock);
 	} else {
 		// we need to create a new vnode and read it in
-		status = create_new_vnode(&vnode, mountID, vnodeID);
+		rw_lock_read_unlock(&sVnodeLock);
+			// unlock -- create_new_vnode_and_lock() write-locks on success
+		bool nodeCreated;
+		status = create_new_vnode_and_lock(mountID, vnodeID, vnode,
+			nodeCreated);
 		if (status != B_OK)
-			goto err;
+			return status;
 
-		vnode->busy = true;
-		mutex_unlock(&sVnodeMutex);
+		if (!nodeCreated) {
+			rw_lock_read_lock(&sVnodeLock);
+			rw_lock_write_unlock(&sVnodeLock);
+			goto restart;
+		}
+
+		rw_lock_write_unlock(&sVnodeLock);
 
 		int type;
 		uint32 flags;
@@ -1181,38 +1222,33 @@ restart:
 		if (gotNode && publishSpecialSubNode)
 			status = create_special_sub_node(vnode, flags);
 
-		mutex_lock(&sVnodeMutex);
-
 		if (status != B_OK) {
-			if (gotNode) {
-				mutex_unlock(&sVnodeMutex);
+			if (gotNode)
 				FS_CALL(vnode, put_vnode, reenter);
-				mutex_lock(&sVnodeMutex);
-			}
 
-			goto err1;
+			rw_lock_write_lock(&sVnodeLock);
+			hash_remove(sVnodeTable, vnode);
+			remove_vnode_from_mount_list(vnode, vnode->mount);
+			rw_lock_write_unlock(&sVnodeLock);
+
+			free(vnode);
+			return status;
 		}
 
-		vnode->remove = (flags & B_VNODE_PUBLISH_REMOVED) != 0;
-		vnode->busy = false;
-	}
+		rw_lock_read_lock(&sVnodeLock);
+		vnode->Lock();
 
-	mutex_unlock(&sVnodeMutex);
+		vnode->SetRemoved((flags & B_VNODE_PUBLISH_REMOVED) != 0);
+		vnode->SetBusy(false);
+
+		vnode->Unlock();
+		rw_lock_read_unlock(&sVnodeLock);
+	}
 
 	TRACE(("get_vnode: returning %p\n", vnode));
 
 	*_vnode = vnode;
 	return B_OK;
-
-err1:
-	hash_remove(sVnodeTable, vnode);
-	remove_vnode_from_mount_list(vnode, vnode->mount);
-err:
-	mutex_unlock(&sVnodeMutex);
-	if (vnode)
-		free(vnode);
-
-	return status;
 }
 
 
@@ -1221,7 +1257,7 @@ err:
 
 	The caller must, of course, own a reference to the vnode to call this
 	function.
-	The caller must not hold the sVnodeMutex or the sMountMutex.
+	The caller must not hold the sVnodeLock or the sMountMutex.
 
 	\param vnode the vnode.
 */
@@ -1237,39 +1273,62 @@ vnode_low_resource_handler(void* /*data*/, uint32 resources, int32 level)
 {
 	TRACE(("vnode_low_resource_handler(level = %ld)\n", level));
 
+	// determine how many nodes to free
 	uint32 count = 1;
-	switch (level) {
-		case B_NO_LOW_RESOURCE:
-			return;
-		case B_LOW_RESOURCE_NOTE:
-			count = sUnusedVnodes / 100;
-			break;
-		case B_LOW_RESOURCE_WARNING:
-			count = sUnusedVnodes / 10;
-			break;
-		case B_LOW_RESOURCE_CRITICAL:
-			count = sUnusedVnodes;
-			break;
-	}
+	{
+		MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
 
-	if (count > sUnusedVnodes)
-		count = sUnusedVnodes;
-
-	// Write back the modified pages of some unused vnodes and free them
-
-	for (uint32 i = 0; i < count; i++) {
-		mutex_lock(&sVnodeMutex);
-		struct vnode* vnode = (struct vnode*)list_remove_head_item(
-			&sUnusedVnodeList);
-		if (vnode == NULL) {
-			mutex_unlock(&sVnodeMutex);
-			break;
+		switch (level) {
+			case B_NO_LOW_RESOURCE:
+				return;
+			case B_LOW_RESOURCE_NOTE:
+				count = sUnusedVnodes / 100;
+				break;
+			case B_LOW_RESOURCE_WARNING:
+				count = sUnusedVnodes / 10;
+				break;
+			case B_LOW_RESOURCE_CRITICAL:
+				count = sUnusedVnodes;
+				break;
 		}
 
-		inc_vnode_ref_count(vnode);
-		sUnusedVnodes--;
+		if (count > sUnusedVnodes)
+			count = sUnusedVnodes;
+	}
 
-		mutex_unlock(&sVnodeMutex);
+	// Write back the modified pages of some unused vnodes and free them.
+
+	for (uint32 i = 0; i < count; i++) {
+		ReadLocker vnodesReadLocker(sVnodeLock);
+
+		// get the first node
+		MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
+		struct vnode* vnode = (struct vnode*)list_get_first_item(
+			&sUnusedVnodeList);
+		unusedVnodesLocker.Unlock();
+
+		if (vnode == NULL)
+			break;
+
+		// lock the node
+		AutoLocker<Vnode> nodeLocker(vnode);
+
+		// check whether the node is still unused
+		unusedVnodesLocker.Lock();
+		if (vnode != list_get_first_item(&sUnusedVnodeList))
+			continue;
+
+		// remove it
+		list_remove_head_item(&sUnusedVnodeList);
+		sUnusedVnodes--;
+		unusedVnodesLocker.Unlock();
+
+		// grab a reference
+		inc_vnode_ref_count(vnode);
+
+		// write back changes and free the node
+		nodeLocker.Unlock();
+		vnodesReadLocker.Unlock();
 
 		if (vnode->cache != NULL)
 			vnode->cache->WriteModified();
@@ -1297,12 +1356,14 @@ put_advisory_locking(struct advisory_locking* locking)
 static struct advisory_locking*
 get_advisory_locking(struct vnode* vnode)
 {
-	mutex_lock(&sVnodeMutex);
+	rw_lock_read_lock(&sVnodeLock);
+	vnode->Lock();
 
 	struct advisory_locking* locking = vnode->advisory_locking;
 	sem_id lock = locking != NULL ? locking->lock : B_ERROR;
 
-	mutex_unlock(&sVnodeMutex);
+	vnode->Unlock();
+	rw_lock_read_unlock(&sVnodeLock);
 
 	if (lock >= 0)
 		lock = acquire_sem(lock);
@@ -1350,7 +1411,8 @@ create_advisory_locking(struct vnode* vnode)
 		}
 
 		// set our newly created locking object
-		MutexLocker _(sVnodeMutex);
+		ReadLocker _(sVnodeLock);
+		AutoLocker<Vnode> nodeLocker(vnode);
 		if (vnode->advisory_locking == NULL) {
 			vnode->advisory_locking = locking;
 			lockingDeleter.Detach();
@@ -1490,11 +1552,13 @@ release_advisory_lock(struct vnode* vnode, struct flock* flock)
 		// longer used
 		locking = get_advisory_locking(vnode);
 		if (locking != NULL) {
-			MutexLocker locker(sVnodeMutex);
+			ReadLocker locker(sVnodeLock);
+			AutoLocker<Vnode> nodeLocker(vnode);
 
 			// the locking could have been changed in the mean time
 			if (locking->locks.IsEmpty()) {
 				vnode->advisory_locking = NULL;
+				nodeLocker.Unlock();
 				locker.Unlock();
 
 				// we've detached the locking from the vnode, so we can
@@ -1504,6 +1568,7 @@ release_advisory_lock(struct vnode* vnode, struct flock* flock)
 				delete locking;
 			} else {
 				// the locking is in use again
+				nodeLocker.Unlock();
 				locker.Unlock();
 				release_sem_etc(locking->lock, 1, B_DO_NOT_RESCHEDULE);
 			}
@@ -2007,6 +2072,10 @@ entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char* name,
 }
 
 
+/*!	Looks up the entry with name \a name in the directory represented by \a dir
+	and returns the respective vnode.
+	On success a reference to the vnode is acquired for the caller.
+*/
 static status_t
 lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 {
@@ -2019,9 +2088,11 @@ lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 	if (status != B_OK)
 		return status;
 
-	mutex_lock(&sVnodeMutex);
+	// The lookup() hook call get_vnode() or publish_vnode(), so we do already
+	// have a reference and just need to look the node up.
+	rw_lock_read_lock(&sVnodeLock);
 	*_vnode = lookup_vnode(dir->device, id);
-	mutex_unlock(&sVnodeMutex);
+	rw_lock_read_unlock(&sVnodeLock);
 
 	if (*_vnode == NULL) {
 		panic("lookup_dir_entry(): could not lookup vnode (mountid 0x%lx vnid "
@@ -2946,8 +3017,8 @@ _dump_vnode(struct vnode* vnode)
 	kprintf(" mount:         %p\n", vnode->mount);
 	kprintf(" covered_by:    %p\n", vnode->covered_by);
 	kprintf(" cache:         %p\n", vnode->cache);
-	kprintf(" flags:         %s%s%s\n", vnode->remove ? "r" : "-",
-		vnode->busy ? "b" : "-", vnode->unpublished ? "u" : "-");
+	kprintf(" flags:         %s%s%s\n", vnode->IsRemoved() ? "r" : "-",
+		vnode->IsBusy() ? "b" : "-", vnode->IsUnpublished() ? "u" : "-");
 	kprintf(" advisory_lock: %p\n", vnode->advisory_locking);
 
 	_dump_advisory_locking(vnode->advisory_locking);
@@ -3079,8 +3150,8 @@ dump_vnodes(int argc, char** argv)
 
 		kprintf("%p%4ld%10Ld%5ld %p %p %p %s%s%s\n", vnode, vnode->device,
 			vnode->id, vnode->ref_count, vnode->cache, vnode->private_node,
-			vnode->advisory_locking, vnode->remove ? "r" : "-",
-			vnode->busy ? "b" : "-", vnode->unpublished ? "u" : "-");
+			vnode->advisory_locking, vnode->IsRemoved() ? "r" : "-",
+			vnode->IsBusy() ? "b" : "-", vnode->IsUnpublished() ? "u" : "-");
 	}
 
 	hash_close(sVnodeTable, &iterator, false);
@@ -3417,27 +3488,31 @@ new_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 	if (privateNode == NULL)
 		return B_BAD_VALUE;
 
-	mutex_lock(&sVnodeMutex);
+	// create the node
+	bool nodeCreated;
+	struct vnode* vnode;
+	status_t status = create_new_vnode_and_lock(volume->id, vnodeID, vnode,
+		nodeCreated);
+	if (status != B_OK)
+		return status;
+
+	WriteLocker nodeLocker(sVnodeLock, true);
+		// create_new_vnode_and_lock() has locked for us
 
 	// file system integrity check:
 	// test if the vnode already exists and bail out if this is the case!
-	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
-	if (vnode != NULL) {
+	if (!nodeCreated) {
 		panic("vnode %ld:%Ld already exists (node = %p, vnode->node = %p)!",
 			volume->id, vnodeID, privateNode, vnode->private_node);
+		return B_ERROR;
 	}
 
-	status_t status = create_new_vnode(&vnode, volume->id, vnodeID);
-	if (status == B_OK) {
-		vnode->private_node = privateNode;
-		vnode->ops = ops;
-		vnode->busy = true;
-		vnode->unpublished = true;
-	}
+	vnode->private_node = privateNode;
+	vnode->ops = ops;
+	vnode->SetUnpublished(true);
 
 	TRACE(("returns: %s\n", strerror(status)));
 
-	mutex_unlock(&sVnodeMutex);
 	return status;
 }
 
@@ -3448,38 +3523,47 @@ publish_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 {
 	FUNCTION(("publish_vnode()\n"));
 
-	MutexLocker locker(sVnodeMutex);
+	WriteLocker locker(sVnodeLock);
 
 	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
-	status_t status = B_OK;
 
-	if (vnode != NULL && vnode->busy && vnode->unpublished
+	bool nodeCreated = false;
+	if (vnode == NULL) {
+		if (privateNode == NULL)
+			return B_BAD_VALUE;
+
+		// create the node
+		locker.Unlock();
+			// create_new_vnode_and_lock() will re-lock for us on success
+		status_t status = create_new_vnode_and_lock(volume->id, vnodeID, vnode,
+			nodeCreated);
+		if (status != B_OK)
+			return status;
+
+		locker.SetTo(sVnodeLock, true);
+	}
+
+	if (nodeCreated) {
+		vnode->private_node = privateNode;
+		vnode->ops = ops;
+		vnode->SetUnpublished(true);
+	} else if (vnode->IsBusy() && vnode->IsUnpublished()
 		&& vnode->private_node == privateNode && vnode->ops == ops) {
 		// already known, but not published
-	} else if (vnode == NULL && privateNode != NULL) {
-		status = create_new_vnode(&vnode, volume->id, vnodeID);
-		if (status == B_OK) {
-			vnode->private_node = privateNode;
-			vnode->ops = ops;
-			vnode->busy = true;
-			vnode->unpublished = true;
-		}
 	} else
-		status = B_BAD_VALUE;
+		return B_BAD_VALUE;
 
 	bool publishSpecialSubNode = false;
 
-	if (status == B_OK) {
-		vnode->SetType(type);
-		vnode->remove = (flags & B_VNODE_PUBLISH_REMOVED) != 0;
-		publishSpecialSubNode = is_special_node_type(type)
-			&& (flags & B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE) == 0;
-	}
+	vnode->SetType(type);
+	vnode->SetRemoved((flags & B_VNODE_PUBLISH_REMOVED) != 0);
+	publishSpecialSubNode = is_special_node_type(type)
+		&& (flags & B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE) == 0;
 
+	status_t status = B_OK;
 
 	// create sub vnodes, if necessary
-	if (status == B_OK
-			&& (volume->sub_volume != NULL || publishSpecialSubNode)) {
+	if (volume->sub_volume != NULL || publishSpecialSubNode) {
 		locker.Unlock();
 
 		fs_volume* subVolume = volume;
@@ -3502,18 +3586,21 @@ publish_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 			}
 		}
 
-		locker.Lock();
-
-		if (status != B_OK) {
+		if (status == B_OK) {
+			ReadLocker vnodesReadLocker(sVnodeLock);
+			AutoLocker<Vnode> nodeLocker(vnode);
+			vnode->SetBusy(false);
+			vnode->SetUnpublished(false);
+		} else {
+			locker.Lock();
 			hash_remove(sVnodeTable, vnode);
 			remove_vnode_from_mount_list(vnode, vnode->mount);
 			free(vnode);
 		}
-	}
-
-	if (status == B_OK) {
-		vnode->busy = false;
-		vnode->unpublished = false;
+	} else {
+		// we still hold the write lock -- mark the node unbusy and published
+		vnode->SetBusy(false);
+		vnode->SetUnpublished(false);
 	}
 
 	TRACE(("returns: %s\n", strerror(status)));
@@ -3561,9 +3648,9 @@ acquire_vnode(fs_volume* volume, ino_t vnodeID)
 {
 	struct vnode* vnode;
 
-	mutex_lock(&sVnodeMutex);
+	rw_lock_read_lock(&sVnodeLock);
 	vnode = lookup_vnode(volume->id, vnodeID);
-	mutex_unlock(&sVnodeMutex);
+	rw_lock_read_unlock(&sVnodeLock);
 
 	if (vnode == NULL)
 		return B_BAD_VALUE;
@@ -3578,9 +3665,9 @@ put_vnode(fs_volume* volume, ino_t vnodeID)
 {
 	struct vnode* vnode;
 
-	mutex_lock(&sVnodeMutex);
+	rw_lock_read_lock(&sVnodeLock);
 	vnode = lookup_vnode(volume->id, vnodeID);
-	mutex_unlock(&sVnodeMutex);
+	rw_lock_read_unlock(&sVnodeLock);
 
 	if (vnode == NULL)
 		return B_BAD_VALUE;
@@ -3593,7 +3680,7 @@ put_vnode(fs_volume* volume, ino_t vnodeID)
 extern "C" status_t
 remove_vnode(fs_volume* volume, ino_t vnodeID)
 {
-	MutexLocker locker(sVnodeMutex);
+	ReadLocker locker(sVnodeLock);
 
 	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
 	if (vnode == NULL)
@@ -3604,15 +3691,18 @@ remove_vnode(fs_volume* volume, ino_t vnodeID)
 		return B_BUSY;
 	}
 
-	vnode->remove = true;
+	vnode->Lock();
+
+	vnode->SetRemoved(true);
 	bool removeUnpublished = false;
 
-	if (vnode->unpublished) {
+	if (vnode->IsUnpublished()) {
 		// prepare the vnode for deletion
 		removeUnpublished = true;
-		vnode->busy = true;
+		vnode->SetBusy(true);
 	}
 
+	vnode->Unlock();
 	locker.Unlock();
 
 	if (removeUnpublished) {
@@ -3630,13 +3720,15 @@ unremove_vnode(fs_volume* volume, ino_t vnodeID)
 {
 	struct vnode* vnode;
 
-	mutex_lock(&sVnodeMutex);
+	rw_lock_read_lock(&sVnodeLock);
 
 	vnode = lookup_vnode(volume->id, vnodeID);
-	if (vnode)
-		vnode->remove = false;
+	if (vnode) {
+		AutoLocker<Vnode> nodeLocker(vnode);
+		vnode->SetRemoved(false);
+	}
 
-	mutex_unlock(&sVnodeMutex);
+	rw_lock_read_unlock(&sVnodeLock);
 	return B_OK;
 }
 
@@ -3644,11 +3736,11 @@ unremove_vnode(fs_volume* volume, ino_t vnodeID)
 extern "C" status_t
 get_vnode_removed(fs_volume* volume, ino_t vnodeID, bool* _removed)
 {
-	MutexLocker _(sVnodeMutex);
+	ReadLocker _(sVnodeLock);
 
 	if (struct vnode* vnode = lookup_vnode(volume->id, vnodeID)) {
 		if (_removed != NULL)
-			*_removed = vnode->remove;
+			*_removed = vnode->IsRemoved();
 		return B_OK;
 	}
 
@@ -3896,9 +3988,9 @@ vfs_open_vnode(struct vnode* vnode, int openMode, bool kernel)
 extern "C" status_t
 vfs_lookup_vnode(dev_t mountID, ino_t vnodeID, struct vnode** _vnode)
 {
-	mutex_lock(&sVnodeMutex);
+	rw_lock_read_lock(&sVnodeLock);
 	struct vnode* vnode = lookup_vnode(mountID, vnodeID);
-	mutex_unlock(&sVnodeMutex);
+	rw_lock_read_unlock(&sVnodeLock);
 
 	if (vnode == NULL)
 		return B_ERROR;
@@ -4188,9 +4280,9 @@ vfs_create_special_node(const char* path, fs_vnode* subVnode, mode_t mode,
 		return status;
 
 	// lookup the node
-	mutex_lock(&sVnodeMutex);
+	rw_lock_read_lock(&sVnodeLock);
 	*_createdVnode = lookup_vnode(dirNode->mount->id, nodeID);
-	mutex_unlock(&sVnodeMutex);
+	rw_lock_read_unlock(&sVnodeLock);
 
 	if (*_createdVnode == NULL) {
 		panic("vfs_create_special_node(): lookup of node failed");
@@ -4337,28 +4429,33 @@ vfs_get_vnode_cache(struct vnode* vnode, VMCache** _cache, bool allocate)
 		return B_OK;
 	}
 
-	mutex_lock(&sVnodeMutex);
+	rw_lock_read_lock(&sVnodeLock);
+	vnode->Lock();
 
 	status_t status = B_OK;
 
 	// The cache could have been created in the meantime
 	if (vnode->cache == NULL) {
 		if (allocate) {
-			// TODO: actually the vnode need to be busy already here, or
+			// TODO: actually the vnode needs to be busy already here, or
 			//	else this won't work...
-			bool wasBusy = vnode->busy;
-			vnode->busy = true;
-			mutex_unlock(&sVnodeMutex);
+			bool wasBusy = vnode->IsBusy();
+			vnode->SetBusy(true);
+
+			vnode->Unlock();
+			rw_lock_read_unlock(&sVnodeLock);
 
 			status = vm_create_vnode_cache(vnode, &vnode->cache);
 
-			mutex_lock(&sVnodeMutex);
-			vnode->busy = wasBusy;
+			rw_lock_read_lock(&sVnodeLock);
+			vnode->Lock();
+			vnode->SetBusy(wasBusy);
 		} else
 			status = B_BAD_VALUE;
 	}
 
-	mutex_unlock(&sVnodeMutex);
+	vnode->Unlock();
+	rw_lock_read_unlock(&sVnodeLock);
 
 	if (status == B_OK) {
 		vnode->cache->AcquireRef();
@@ -4801,6 +4898,8 @@ vfs_setrlimit(int resource, const struct rlimit* rlp)
 status_t
 vfs_init(kernel_args* args)
 {
+	vnode::StaticInit();
+
 	struct vnode dummyVnode;
 	sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE,
 		offset_of_member(dummyVnode, next), &vnode_compare, &vnode_hash);
@@ -4889,12 +4988,12 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 	ino_t newID;
 
 	// This is somewhat tricky: If the entry already exists, the FS responsible
-	// for the directory might not necessarily the one also responsible for the
-	// node the entry refers to. So we can actually never call the create() hook
-	// without O_EXCL. Instead we try to look the entry up first. If it already
-	// exists, we just open the node (unless O_EXCL), otherwise we call create()
-	// with O_EXCL. This introduces a race condition, since someone else
-	// might have created the entry in the meantime. We hope the respective
+	// for the directory might not necessarily also be the one responsible for
+	// the node the entry refers to. So we can actually never call the create()
+	// hook without O_EXCL. Instead we try to look the entry up first. If it
+	// already exists, we just open the node (unless O_EXCL), otherwise we call
+	// create() with O_EXCL. This introduces a race condition, since someone
+	// else might have created the entry in the meantime. We hope the respective
 	// FS returns the correct error code and retry (up to 3 times) again.
 
 	for (int i = 0; i < 3 && status != B_OK; i++) {
@@ -4956,9 +5055,9 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 
 	// the node has been created successfully
 
-	mutex_lock(&sVnodeMutex);
+	rw_lock_read_lock(&sVnodeLock);
 	vnode = lookup_vnode(directory->device, newID);
-	mutex_unlock(&sVnodeMutex);
+	rw_lock_read_unlock(&sVnodeLock);
 
 	if (vnode == NULL) {
 		panic("vfs: fs_create() returned success but there is no vnode, "
@@ -5481,7 +5580,7 @@ fix_dirent(struct vnode* parent, struct dirent* entry,
 		}
 	} else {
 		// resolve mount points
-		MutexLocker _(&sVnodeMutex);
+		ReadLocker _(&sVnodeLock);
 
 		struct vnode* vnode = lookup_vnode(entry->d_dev, entry->d_ino);
 		if (vnode != NULL) {
@@ -7063,15 +7162,15 @@ err1:
 static status_t
 fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 {
-	struct vnode* vnode = NULL;
 	struct fs_mount* mount;
 	status_t err;
 
 	FUNCTION(("fs_unmount(path '%s', dev %ld, kernel %d\n", path, mountID,
 		kernel));
 
+	struct vnode* pathVnode = NULL;
 	if (path != NULL) {
-		err = path_to_vnode(path, true, &vnode, NULL, kernel);
+		err = path_to_vnode(path, true, &pathVnode, NULL, kernel);
 		if (err != B_OK)
 			return B_ENTRY_NOT_FOUND;
 	}
@@ -7081,17 +7180,17 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	// this lock is not strictly necessary, but here in case of KDEBUG
 	// to keep the ASSERT in find_mount() working.
 	KDEBUG_ONLY(mutex_lock(&sMountMutex));
-	mount = find_mount(path != NULL ? vnode->device : mountID);
+	mount = find_mount(path != NULL ? pathVnode->device : mountID);
 	KDEBUG_ONLY(mutex_unlock(&sMountMutex));
 	if (mount == NULL) {
 		panic("fs_unmount: find_mount() failed on root vnode @%p of mount\n",
-			vnode);
+			pathVnode);
 	}
 
 	if (path != NULL) {
-		put_vnode(vnode);
+		put_vnode(pathVnode);
 
-		if (mount->root_vnode != vnode) {
+		if (mount->root_vnode != pathVnode) {
 			// not mountpoint
 			return B_BAD_VALUE;
 		}
@@ -7125,7 +7224,7 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 
 	// grab the vnode master mutex to keep someone from creating
 	// a vnode while we're figuring out if we can continue
-	mutex_lock(&sVnodeMutex);
+	ReadLocker vnodesReadLocker(&sVnodeLock);
 
 	bool disconnectedDescriptors = false;
 
@@ -7134,14 +7233,15 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 
 		// cycle through the list of vnodes associated with this mount and
 		// make sure all of them are not busy or have refs on them
-		vnode = NULL;
 		VnodeList::Iterator iterator = mount->vnodes.GetIterator();
-		while (iterator.HasNext()) {
+		while (struct vnode* vnode = iterator.Next()) {
 			vnode = iterator.Next();
+
+			AutoLocker<Vnode> nodeLocker(vnode);
 
 			// The root vnode ref_count needs to be 1 here (the mount has a
 			// reference).
-			if (vnode->busy
+			if (vnode->IsBusy()
 				|| ((vnode->ref_count != 0 && mount->root_vnode != vnode)
 					|| (vnode->ref_count != 1 && mount->root_vnode == vnode))) {
 				// there are still vnodes in use on this mount, so we cannot
@@ -7154,19 +7254,16 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		if (!busy)
 			break;
 
-		if ((flags & B_FORCE_UNMOUNT) == 0) {
-			mutex_unlock(&sVnodeMutex);
-
+		if ((flags & B_FORCE_UNMOUNT) == 0)
 			return B_BUSY;
-		}
 
 		if (disconnectedDescriptors) {
 			// wait a bit until the last access is finished, and then try again
-			mutex_unlock(&sVnodeMutex);
+			vnodesReadLocker.Unlock();
 			snooze(100000);
 			// TODO: if there is some kind of bug that prevents the ref counts
 			// from getting back to zero, this will fall into an endless loop...
-			mutex_lock(&sVnodeMutex);
+			vnodesReadLocker.Lock();
 			continue;
 		}
 
@@ -7176,12 +7273,12 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		mount->unmounting = true;
 			// prevent new vnodes from being created
 
-		mutex_unlock(&sVnodeMutex);
+		vnodesReadLocker.Unlock();
 
 		disconnect_mount_or_vnode_fds(mount, NULL);
 		disconnectedDescriptors = true;
 
-		mutex_lock(&sVnodeMutex);
+		vnodesReadLocker.Lock();
 	}
 
 	// we can safely continue, mark all of the vnodes busy and this mount
@@ -7189,21 +7286,26 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	mount->unmounting = true;
 
 	VnodeList::Iterator iterator = mount->vnodes.GetIterator();
-	while (iterator.HasNext()) {
-		vnode = iterator.Next();
-		vnode->busy = true;
+	while (struct vnode* vnode = iterator.Next()) {
+		AutoLocker<Vnode> nodeLocker(vnode);
+		vnode->SetBusy(true);
 
 		if (vnode->ref_count == 0) {
 			// this vnode has been unused before
+			MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
 			list_remove_item(&sUnusedVnodeList, vnode);
 			sUnusedVnodes--;
 		}
 	}
 
 	// The ref_count of the root node is 1 at this point, see above why this is
+	mount->root_vnode->Lock();
+	MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
 	mount->root_vnode->ref_count--;
+	unusedVnodesLocker.Unlock();
+	mount->root_vnode->Unlock();
 
-	mutex_unlock(&sVnodeMutex);
+	vnodesReadLocker.Unlock();
 
 	mutex_lock(&sVnodeCoveredByMutex);
 	mount->covers_vnode->covered_by = NULL;
@@ -7213,9 +7315,8 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	// Free all vnodes associated with this mount.
 	// They will be removed from the mount list by free_vnode(), so
 	// we don't have to do this.
-	while ((vnode = mount->vnodes.Head()) != NULL) {
+	while (struct vnode* vnode = mount->vnodes.Head())
 		free_vnode(vnode, false);
-	}
 
 	// remove the mount structure from the hash table
 	mutex_lock(&sMountMutex);
@@ -7251,26 +7352,34 @@ fs_sync(dev_t device)
 		return status;
 
 	struct vnode marker;
-	marker.remove = true;
+	memset(&marker, 0, sizeof(marker));
+	marker.SetBusy(true);
+	marker.SetRemoved(true);
 
 	// First, synchronize all file caches
 
 	while (true) {
-		MutexLocker locker(sVnodeMutex);
+		WriteLocker locker(sVnodeLock);
+			// Note: That's the easy way. Which is probably OK for sync(),
+			// since it's a relatively rare call and doesn't need to allow for
+			// a lot of concurrency. Using a read lock would be possible, but
+			// also more involved, since we had to lock the individual nodes
+			// and take care of the locking order, which we might not want to
+			// do while holding fs_mount::rlock.
 
 		// synchronize access to vnode list
 		recursive_lock_lock(&mount->rlock);
 
 		struct vnode* vnode;
-		if (!marker.remove) {
+		if (!marker.IsRemoved()) {
 			vnode = mount->vnodes.GetNext(&marker);
 			mount->vnodes.Remove(&marker);
-			marker.remove =	true;
+			marker.SetRemoved(true);
 		} else
 			vnode = mount->vnodes.First();
 
 		while (vnode != NULL && (vnode->cache == NULL
-			|| vnode->remove || vnode->busy)) {
+			|| vnode->IsRemoved() || vnode->IsBusy())) {
 			// TODO: we could track writes (and writable mapped vnodes)
 			//	and have a simple flag that we could test for here
 			vnode = mount->vnodes.GetNext(vnode);
@@ -7279,7 +7388,7 @@ fs_sync(dev_t device)
 		if (vnode != NULL) {
 			// insert marker vnode again
 			mount->vnodes.Insert(mount->vnodes.GetNext(vnode), &marker);
-			marker.remove = false;
+			marker.SetRemoved(false);
 		}
 
 		recursive_lock_unlock(&mount->rlock);
@@ -7288,11 +7397,12 @@ fs_sync(dev_t device)
 			break;
 
 		vnode = lookup_vnode(mount->id, vnode->id);
-		if (vnode == NULL || vnode->busy)
+		if (vnode == NULL || vnode->IsBusy())
 			continue;
 
 		if (vnode->ref_count == 0) {
 			// this vnode has been unused before
+			MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
 			list_remove_item(&sUnusedVnodeList, vnode);
 			sUnusedVnodes--;
 		}
@@ -7300,7 +7410,7 @@ fs_sync(dev_t device)
 
 		locker.Unlock();
 
-		if (vnode->cache != NULL && !vnode->remove)
+		if (vnode->cache != NULL && !vnode->IsRemoved())
 			vnode->cache->WriteModified();
 
 		put_vnode(vnode);
