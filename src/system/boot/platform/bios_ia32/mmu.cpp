@@ -158,7 +158,7 @@ add_page_table(addr_t base)
 	// Get new page table and clear it out
 	uint32 *pageTable = get_next_page_table();
 	if (pageTable > (uint32 *)(8 * 1024 * 1024)) {
-		panic("tried to add page table beyond the indentity mapped 8 MB "
+		panic("tried to add page table beyond the identity mapped 8 MB "
 			"region\n");
 	}
 
