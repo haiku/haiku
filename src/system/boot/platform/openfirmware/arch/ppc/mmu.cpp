@@ -462,16 +462,22 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 			puts("found page table!");
 			*_physicalPageTable
 				= (page_table_entry_group *)map->physical_address;
-			keepRange = false;	// we keep it explicitely anyway
+			keepRange = false;
+				// we keep it explicitely anyway
 		}
 		if ((addr_t)map->physical_address <= 0x100
 			&& (addr_t)map->physical_address + map->length >= 0x1000) {
 			puts("found exception handlers!");
 			*_exceptionHandlers = map->virtual_address;
-			keepRange = false;	// we keep it explicitely anyway
+			keepRange = false;
+				// we keep it explicitely anyway
 		}
 		if (map->virtual_address == oldPageTable)
 			keepRange = false;
+		if (!is_physical_memory(map->physical_address)) {
+			keepRange = false;
+				// we only get vm_pages for physical memory
+		}
 
 		// insert range in virtual allocated
 
