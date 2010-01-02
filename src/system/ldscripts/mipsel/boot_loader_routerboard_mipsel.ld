@@ -22,7 +22,7 @@ SECTIONS
 	_gp = .;
 		/* needed for GPREL16 relocation to small-data section */
 
-	/* unintialized data (in same segment as writable data) */
+	/* uninitialized data (in same segment as writable data) */
 	__bss_start = .;
 	.bss : { *(.bss) }
 

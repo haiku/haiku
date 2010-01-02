@@ -83,7 +83,7 @@ SECTIONS
 
 	__data_end = .;
 
-	/* unintialized data (in same segment as writable data) */
+	/* uninitialized data (in same segment as writable data) */
 	. = ALIGN(4);
 	__bss_start = .;
 	.bss : { *(.bss .bss.*) }

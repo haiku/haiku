@@ -21,7 +21,7 @@ SECTIONS
 	__data_start = .;
 	.data : { *(.data .gnu.linkonce.d.*) }
 
-	/* unintialized data (in same segment as writable data) */
+	/* uninitialized data (in same segment as writable data) */
 	__bss_start = .;
 	.bss : { *(.bss) }
 

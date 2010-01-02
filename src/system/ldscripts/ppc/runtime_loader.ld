@@ -51,7 +51,7 @@ SECTIONS
 	PROVIDE (__ctor_end = .);
 
 
-	/* unintialized data (in same segment as writable data) */
+	/* uninitialized data (in same segment as writable data) */
 	PROVIDE (__bss_start = .);
 	.bss : { *(.bss) }
 

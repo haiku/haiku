@@ -61,7 +61,7 @@ SECTIONS
 	.dynamic : { *(.dynamic) }
 
 
-	/* unintialized data (in same segment as writable data) */
+	/* uninitialized data (in same segment as writable data) */
 	PROVIDE (__bss_start = .);
 	.bss : { *(.bss) }
 

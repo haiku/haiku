@@ -54,7 +54,7 @@ SECTIONS
 	.got : { *(.got.plt) *(.got) }
 	.dynamic : { *(.dynamic) }
 	
-	/* unintialized data (in same segment as writable data) */
+	/* uninitialized data (in same segment as writable data) */
 	__bss_start = .;
 	.bss : { *(.bss) }
 

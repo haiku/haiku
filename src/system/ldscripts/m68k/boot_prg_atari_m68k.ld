@@ -55,7 +55,7 @@ SECTIONS
 	/*	*(.rel.data) *(.rel.gnu.linkonce.d*)
 		*(.rela.data) *(.rela.gnu.linkonce.d*) */
 	}
-	/* unintialized data (in same segment as writable data) */
+	/* uninitialized data (in same segment as writable data) */
 	__bss_start = .;
 	.bss : {
 		*(.bss)
