@@ -1088,8 +1088,9 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	uint32 vecCount)
 {
 	TRACE(("vm_map_physical_memory_vecs(team = %ld, \"%s\", virtual = %p, "
-		"spec = %ld, size = %lu, protection = %ld, phys = %#lx)\n", team,
-		name, _address, addressSpec, size, protection, physicalAddress));
+		"spec = %ld, _size = %p, protection = %ld, vecs = %p, "
+		"vecCount = %ld)\n", team, name, _address, addressSpec, _size,
+		protection, vecs, vecCount));
 
 	if (!arch_vm_supports_protection(protection)
 		|| (addressSpec & B_MTR_MASK) != 0) {
