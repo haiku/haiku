@@ -11,6 +11,7 @@
 
 #include <OS.h>
 
+#include <boot/platform.h>
 #include <boot/net/Ethernet.h>
 #include <boot/net/NetStack.h>
 #include <platform/openfirmware/openfirmware.h>
