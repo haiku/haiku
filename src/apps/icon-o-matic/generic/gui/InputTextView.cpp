@@ -65,9 +65,11 @@ InputTextView::KeyDown(const char* bytes, int32 numBytes)
 			case B_ESCAPE:
 				// revert any typing changes
 				RevertChanges();
+				fTextBeforeFocus = Text();
 				break;
 			case B_RETURN:
 				ApplyChanges();
+				fTextBeforeFocus = Text();
 				break;
 			default:
 				handled = false;
