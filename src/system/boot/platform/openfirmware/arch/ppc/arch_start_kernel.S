@@ -31,6 +31,7 @@ FUNCTION(arch_start_kernel):
 
 	// enter the kernel
 	mtlr	%r4
+	li		%r4, 0
 	blrl
 
 	/* Actually we should never get here, but at least for debugging purposes
