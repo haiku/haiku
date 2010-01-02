@@ -181,15 +181,25 @@ switch $(HAIKU_DISTRO_COMPATIBILITY) {
 
 # analyze the gcc machine spec to determine HAIKU_CPU
 switch $(HAIKU_GCC_MACHINE) {
-	case i386-*		: HAIKU_CPU = x86 ;
-	case i486-*		: HAIKU_CPU = x86 ;
-	case i586-*		: HAIKU_CPU = x86 ;
-	case i686-*		: HAIKU_CPU = x86 ;
+	case i?86-*		: HAIKU_CPU = x86 ;
 	case powerpc-*	: HAIKU_CPU = ppc ;
-	case m68k-*	: HAIKU_CPU = m68k ;
+	case m68k-*		: HAIKU_CPU = m68k ;
 	case mipsel-*	: HAIKU_CPU = mipsel ;
-	case arm-*	: HAIKU_CPU = arm ;
-	case * : Exit "Unsupported gcc target machine:" $(HAIKU_GCC_MACHINE) ;
+	case arm-*		: HAIKU_CPU = arm ;
+	case *			: Exit "Unsupported gcc target machine:" 
+						$(HAIKU_GCC_MACHINE) ;
+}
+
+# determine the endianness of the host
+switch $(HOST_GCC_MACHINE) {
+	case i?86-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+	case x86_64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+	case powerpc-*	: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
+	# the following are rather unlikely as hosts ...
+	case m68k-*		: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
+	case mipsel-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+	case arm-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+	case *			: Exit "Unsupported gcc host machine:" $(HOST_GCC_MACHINE) ;
 }
 
 switch $(HAIKU_CPU) {

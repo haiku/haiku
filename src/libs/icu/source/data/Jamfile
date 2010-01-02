@@ -3,11 +3,18 @@ SubDir HAIKU_TOP src libs icu source data ;
 ICU_UNICODE_VERSION = 5.1 ;
 ICU_CLDR_VERSION = $(ICU_GENRB_CLDR_VERSION) ;
 ICU_DAT_FILES = pnames.icu unames.icu cnvalias.icu ucadata.icu invuca.icu ;
-ICU_DATA_DIR = [ FDirName $(HOST_COMMON_DEBUG_OBJECT_DIR) icudt42l ] ;
 ICU_VERSION = 42.1 ;
 ICU_DATA_SYMBOL = icudt42 ;
-ICU_ENDIANNESS_INDICATOR = l ;	# TODO: little endian is hardcoded, for now
+# ICU is endianness-aware, so we need to set the endianness indicator such
+# that it matches the endianness of the host platform
+if $(HAIKU_HOST_IS_BIG_ENDIAN) = 1 {
+	ICU_ENDIANNESS_INDICATOR = b ;
+} else {
+	ICU_ENDIANNESS_INDICATOR = l ;
+}
 ICU_DATA_VERSION = icudt42$(ICU_ENDIANNESS_INDICATOR) ;
+ICU_DATA_DIR 
+	= [ FDirName $(HOST_COMMON_DEBUG_OBJECT_DIR) $(ICU_DATA_VERSION) ] ;
 
 rule MakeLocateICUData files : subdir
 {
