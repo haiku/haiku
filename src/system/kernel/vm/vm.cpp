@@ -680,7 +680,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 	uint32 newPageState = (flags & CREATE_AREA_DONT_CLEAR) != 0
 		? PAGE_STATE_FREE : PAGE_STATE_CLEAR;
 
-	TRACE(("create_anonymous_area [%d] %s: size 0x%lx\n", team, name, size));
+	TRACE(("create_anonymous_area [%ld] %s: size 0x%lx\n", team, name, size));
 
 	size = PAGE_ALIGN(size);
 
