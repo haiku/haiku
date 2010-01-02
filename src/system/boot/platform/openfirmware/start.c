@@ -103,7 +103,7 @@ platform_start_kernel(void)
 void
 platform_exit(void)
 {
-	of_exit();
+	of_interpret("reset-all", 0, 0);
 }
 
 
@@ -157,10 +157,10 @@ start(void *openFirmwareEntry)
 	arch_mmu_init();
 
 	if (boot_arch_cpu_init() != B_OK)
-		platform_exit();
+		of_exit();
 
 	if (init_real_time_clock() != B_OK)
-		platform_exit();
+		of_exit();
 
 	gKernelArgs.platform_args.openfirmware_entry = openFirmwareEntry;
 
