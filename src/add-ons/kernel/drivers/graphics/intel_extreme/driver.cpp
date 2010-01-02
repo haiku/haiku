@@ -79,7 +79,7 @@ get_next_intel_extreme(int32 *_cookie, pci_info &info, uint32 &type)
 		// check vendor
 		if (info.vendor_id != VENDOR_ID_INTEL
 			|| info.class_base != PCI_display
-			|| info.class_sub != 0)
+			|| info.class_sub != PCI_vga)
 			continue;
 
 		// check device
