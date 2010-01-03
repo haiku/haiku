@@ -16,6 +16,7 @@
 
 #include <vm/vm.h>
 #include <vm/vm_types.h>
+#include <vm/VMAddressSpace.h>
 #include <arch/vm.h>
 #include <arch_mmu.h>
 
