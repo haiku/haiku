@@ -17,23 +17,24 @@ public:
 	/*
 	 * Used:
 	 * - From HCI layer to send events to bluetooth server.
-	 * - L2cap lower to dispatch TX packets to HCI Layer informing about connection handle
+	 * - L2cap lower to dispatch TX packets to HCI Layer 
+	 * - informing about connection handle
 	 * - Transport drivers dispatch its data to HCI layer
 	 *
 	 */
-	static inline hci_id Device(uint32 code)
+	static hci_id Device(uint32 code)
 	{
-		return ((code & 0xFF) >> 24);
+		return ((code & 0xFF000000) >> 24);
 	}
 
 
-	static inline void SetDevice(uint32* code, hci_id device)
+	static void SetDevice(uint32* code, hci_id device)
 	{
 		*code = *code | ((device & 0xFF) << 24);
 	}
 
 
-	static inline uint16 Handler(uint32 code)
+	static uint16 Handler(uint32 code)
 	{
 		return ((code & 0xFFFF) >> 0);
 	}
@@ -47,7 +48,7 @@ public:
 
 	static bt_packet_t Protocol(uint32 code)
 	{
-		return (bt_packet_t)((code && 0xFF) >> 16);
+		return (bt_packet_t)((code & 0xFF0000) >> 16);
 	}
 
 
@@ -59,6 +60,8 @@ public:
 
 };
 
+
 } // namespace
+
 
 #endif
