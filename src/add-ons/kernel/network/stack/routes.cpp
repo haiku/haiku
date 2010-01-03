@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -213,10 +213,6 @@ put_route_internal(struct net_domain_private* domain, net_route* _route)
 		return;
 
 	// delete route - it must already have been removed at this point
-
-	ASSERT(route->GetDoublyLinkedListLink()->next == NULL
-		&& route->GetDoublyLinkedListLink()->previous == NULL);
-
 	delete route;
 }
 
