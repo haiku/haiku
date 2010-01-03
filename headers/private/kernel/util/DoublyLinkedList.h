@@ -19,6 +19,7 @@
 #	endif
 #endif
 
+
 #ifdef __cplusplus
 
 // DoublyLinkedListLink
@@ -36,9 +37,6 @@ private:
 	typedef DoublyLinkedListLink<Element> DLL_Link;
 
 public:
-	DoublyLinkedListLinkImpl() : fDoublyLinkedListLink() {}
-	~DoublyLinkedListLinkImpl() {}
-
 	DLL_Link* GetDoublyLinkedListLink()
 		{ return &fDoublyLinkedListLink; }
 	const DLL_Link* GetDoublyLinkedListLink() const
@@ -334,8 +332,11 @@ public:
 
 	inline bool IsEmpty() const			{ return (fFirst == NULL); }
 
+	inline void InsertBefore(Element* insertBefore, Element* element);
+	inline void InsertAfter(Element* insertAfter, Element* element);
 	inline void Insert(Element* element, bool back = true);
 	inline void Insert(Element* before, Element* element);
+		// TODO: Obsolete! Use InsertBefore() instead!
 	inline void Add(Element* element, bool back = true);
 	inline void Remove(Element* element);
 
@@ -414,17 +415,17 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element* element, bool back)
 	}
 }
 
-// Insert
+
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
-DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element* before, Element* element)
+DOUBLY_LINKED_LIST_CLASS_NAME::InsertBefore(Element* before, Element* element)
 {
+	ASSERT(element != NULL);
+
 	if (before == NULL) {
 		Insert(element);
 		return;
 	}
-	if (element == NULL)
-		return;
 
 #if DEBUG_DOUBLY_LINKED_LIST
 	ASSERT_PRINT(fFirst == NULL ? fLast == NULL : fLast != NULL,
@@ -436,13 +437,60 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element* before, Element* element)
 
 	link->next = before;
 	link->previous = beforeLink->previous;
-	if (link->previous != NULL)
-		sGetLink(link->previous)->next = element;
 	beforeLink->previous = element;
 
-	if (fFirst == before)
+	if (link->previous != NULL)
+		sGetLink(link->previous)->next = element;
+	else
 		fFirst = element;
 }
+
+
+DOUBLY_LINKED_LIST_TEMPLATE_LIST
+void
+DOUBLY_LINKED_LIST_CLASS_NAME::InsertAfter(Element* insertAfter,
+	Element* element)
+{
+	ASSERT(element != NULL);
+
+#if DEBUG_DOUBLY_LINKED_LIST
+	ASSERT_PRINT(fFirst == NULL ? fLast == NULL : fLast != NULL,
+		"list: %p\n", this);
+#endif
+
+	if (insertAfter == NULL) {
+		// insert at the head
+		Link* elLink = sGetLink(element);
+		elLink->previous = NULL;
+		elLink->next = fFirst;
+		if (fFirst != NULL)
+			sGetLink(fFirst)->previous = element;
+		else
+			fLast = element;
+		fFirst = element;
+	} else {
+		Link* afterLink = sGetLink(insertAfter);
+		Link* link = sGetLink(element);
+
+		link->previous = insertAfter;
+		link->next = afterLink->next;
+		afterLink->next = element;
+
+		if (link->next != NULL)
+			sGetLink(link->next)->previous = element;
+		else
+			fLast = element;
+	}
+}
+
+
+DOUBLY_LINKED_LIST_TEMPLATE_LIST
+void
+DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element* before, Element* element)
+{
+	InsertBefore(before, element);
+}
+
 
 // Add
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
@@ -473,8 +521,6 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Remove(Element* element)
 			sGetLink(elLink->next)->previous = elLink->previous;
 		else
 			fLast = elLink->previous;
-		elLink->previous = NULL;
-		elLink->next = NULL;
 	}
 }
 
@@ -525,13 +571,6 @@ DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
 DOUBLY_LINKED_LIST_CLASS_NAME::RemoveAll()
 {
-	Element* element = fFirst;
-	while (element) {
-		Link* elLink = sGetLink(element);
-		element = elLink->next;
-		elLink->previous = NULL;
-		elLink->next = NULL;
-	}
 	fFirst = NULL;
 	fLast = NULL;
 }
