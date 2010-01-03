@@ -1000,6 +1000,13 @@ block_cache::Allocate()
 		RemoveUnusedBlocks(1, 2);
 	}
 
+	void* block = object_cache_alloc(buffer_cache, 0);
+	if (block != NULL)
+		return block;
+
+	// recycle existing before allocating a new one
+	RemoveUnusedBlocks(1, 2);
+
 	return object_cache_alloc(buffer_cache, 0);
 }
 
@@ -1332,9 +1339,9 @@ retry:
 		// The block is currently busy - wait and try again later
 		ConditionVariableEntry entry;
 		cache->busy_condition.Add(&entry);
-		
+
 		mutex_unlock(&cache->lock);
-		
+
 		entry.Wait();
 
 		mutex_lock(&cache->lock);
@@ -2125,10 +2132,6 @@ wait_for_notifications(block_cache* cache)
 
 	// wait for notification hook to be called
 	entry.Wait();
-
-	ASSERT(notification.GetDoublyLinkedListLink()->next == NULL
-		&& notification.GetDoublyLinkedListLink()->previous == NULL
-		&& cache->pending_notifications.Head() != &notification);
 }
 
 
@@ -2782,7 +2785,7 @@ block_cache_delete(void* _cache, bool allowWrites)
 		cache->busy_condition.Add(&entry);
 
 		mutex_unlock(&cache->lock);
-		
+
 		entry.Wait();
 
 		mutex_lock(&cache->lock);
