@@ -174,18 +174,15 @@ KernelDaemon::_NextDaemon(struct daemon& marker)
 {
 	struct daemon* daemon;
 
-	if (marker.GetDoublyLinkedListLink()->next == NULL
-		&& marker.GetDoublyLinkedListLink()->previous == NULL
-		&& fDaemons.Head() != &marker) {
-		// Marker is not part of the list yet, just return the first entry
+	if (marker.arg == NULL) {
+		// The marker is not part of the list yet, just return the first entry
 		daemon = fDaemons.Head();
 	} else {
 		daemon = marker.GetDoublyLinkedListLink()->next;
 		fDaemons.Remove(&marker);
-
-		marker.GetDoublyLinkedListLink()->next = NULL;
-		marker.GetDoublyLinkedListLink()->previous = NULL;
 	}
+
+	marker.arg = daemon;
 
 	if (daemon != NULL)
 		fDaemons.Insert(daemon->GetDoublyLinkedListLink()->next, &marker);
@@ -199,6 +196,8 @@ KernelDaemon::_DaemonThread()
 {
 	struct daemon marker;
 	int32 iteration = 0;
+
+	marker.arg = NULL;
 
 	while (true) {
 		RecursiveLocker locker(fLock);
