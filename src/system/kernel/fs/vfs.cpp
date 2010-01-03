@@ -56,6 +56,7 @@
 #include "EntryCache.h"
 #include "fifo.h"
 #include "IORequest.h"
+#include "unused_vnodes.h"
 #include "Vnode.h"
 #include "../cache/vnode_store.h"
 
@@ -103,13 +104,6 @@
 			mount->volume->ops->op(mount->volume)
 #endif
 
-
-const static uint32 kMaxUnusedVnodes = 8192;
-	// This is the maximum number of unused vnodes that the system
-	// will keep around (weak limit, if there is enough memory left,
-	// they won't get flushed even when hitting that limit).
-	// It may be chosen with respect to the available memory or enhanced
-	// by some timestamp/frequency heurism.
 
 const static size_t kMaxPathLength = 65536;
 	// The absolute maximum path length (for getcwd() - this is not depending
@@ -263,17 +257,9 @@ static rw_lock sVnodeLock = RW_LOCK_INITIALIZER("vfs_vnode_lock");
 */
 static mutex sIOContextRootLock = MUTEX_INITIALIZER("io_context::root lock");
 
-/*!	\brief Guards sUnusedVnodeList and sUnusedVnodes.
-
-	Innermost lock. Must not be held when acquiring any other lock.
-*/
-static mutex sUnusedVnodesLock = MUTEX_INITIALIZER("unused vnodes");
-
 
 #define VNODE_HASH_TABLE_SIZE 1024
 static hash_table* sVnodeTable;
-static list sUnusedVnodeList;
-static uint32 sUnusedVnodes = 0;
 static struct vnode* sRoot;
 
 #define MOUNTS_HASH_TABLE_SIZE 16
@@ -285,6 +271,8 @@ static dev_t sNextMountID = 1;
 mode_t __gUmask = 022;
 
 /* function declarations */
+
+static void free_unused_vnodes();
 
 // file descriptor operation prototypes
 static status_t file_read(struct file_descriptor* descriptor, off_t pos,
@@ -1053,33 +1041,24 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 		panic("dec_vnode_ref_count: called on busy vnode %p\n", vnode);
 
 	bool freeNode = false;
+	bool freeUnusedNodes = false;
 
 	// Just insert the vnode into an unused list if we don't need
 	// to delete it
 	if (vnode->IsRemoved() || alwaysFree) {
+		vnode_to_be_freed(vnode);
 		vnode->SetBusy(true);
 		freeNode = true;
-	} else {
-		MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
-		list_add_item(&sUnusedVnodeList, vnode);
-		if (++sUnusedVnodes > kMaxUnusedVnodes
-			&& low_resource_state(
-				B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)
-					!= B_NO_LOW_RESOURCE) {
-			// there are too many unused vnodes so we free the oldest one
-			// TODO: evaluate this mechanism
-			vnode = (struct vnode*)list_remove_head_item(&sUnusedVnodeList);
-			vnode->SetBusy(true);
-			freeNode = true;
-			sUnusedVnodes--;
-		}
-	}
+	} else
+		freeUnusedNodes = vnode_unused(vnode);
 
 	nodeLocker.Unlock();
 	locker.Unlock();
 
 	if (freeNode)
 		free_vnode(vnode, reenter);
+	else if (freeUnusedNodes)
+		free_unused_vnodes();
 
 	return B_OK;
 }
@@ -1178,9 +1157,7 @@ restart:
 	if (vnode) {
 		if (vnode->ref_count == 0) {
 			// this vnode has been unused before
-			MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
-			list_remove_item(&sUnusedVnodeList, vnode);
-			sUnusedVnodes--;
+			vnode_used(vnode);
 		}
 		inc_vnode_ref_count(vnode);
 
@@ -1269,9 +1246,16 @@ put_vnode(struct vnode* vnode)
 
 
 static void
-vnode_low_resource_handler(void* /*data*/, uint32 resources, int32 level)
+free_unused_vnodes(int32 level)
 {
-	TRACE(("vnode_low_resource_handler(level = %ld)\n", level));
+	unused_vnodes_check_started();
+
+	if (level == B_NO_LOW_RESOURCE) {
+		unused_vnodes_check_done();
+		return;
+	}
+
+	flush_hot_vnodes();
 
 	// determine how many nodes to free
 	uint32 count = 1;
@@ -1279,8 +1263,6 @@ vnode_low_resource_handler(void* /*data*/, uint32 resources, int32 level)
 		MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
 
 		switch (level) {
-			case B_NO_LOW_RESOURCE:
-				return;
 			case B_LOW_RESOURCE_NOTE:
 				count = sUnusedVnodes / 100;
 				break;
@@ -1336,6 +1318,25 @@ vnode_low_resource_handler(void* /*data*/, uint32 resources, int32 level)
 		dec_vnode_ref_count(vnode, true, false);
 			// this should free the vnode when it's still unused
 	}
+
+	unused_vnodes_check_done();
+}
+
+
+static void
+free_unused_vnodes()
+{
+	free_unused_vnodes(
+		low_resource_state(B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY));
+}
+
+
+static void
+vnode_low_resource_handler(void* /*data*/, uint32 resources, int32 level)
+{
+	TRACE(("vnode_low_resource_handler(level = %ld)\n", level));
+
+	free_unused_vnodes(level);
 }
 
 
@@ -7292,9 +7293,7 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 
 		if (vnode->ref_count == 0) {
 			// this vnode has been unused before
-			MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
-			list_remove_item(&sUnusedVnodeList, vnode);
-			sUnusedVnodes--;
+			vnode_used(vnode);
 		}
 	}
 
@@ -7402,9 +7401,7 @@ fs_sync(dev_t device)
 
 		if (vnode->ref_count == 0) {
 			// this vnode has been unused before
-			MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
-			list_remove_item(&sUnusedVnodeList, vnode);
-			sUnusedVnodes--;
+			vnode_used(vnode);
 		}
 		inc_vnode_ref_count(vnode);
 

@@ -45,6 +45,12 @@ public:
 	inline	bool				IsUnpublished() const;
 	inline	void				SetUnpublished(bool unpublished);
 
+	inline	bool				IsUnused() const;
+	inline	void				SetUnused(bool unused);
+
+	inline	bool				IsHot() const;
+	inline	void				SetHot(bool hot);
+
 	inline	uint32				Type() const;
 	inline	void				SetType(uint32 type);
 
@@ -59,6 +65,8 @@ private:
 	static	const uint32		kFlagsBusy			= 0x00000004;
 	static	const uint32		kFlagsRemoved		= 0x00000008;
 	static	const uint32		kFlagsUnpublished	= 0x00000010;
+	static	const uint32		kFlagsUnused		= 0x00000020;
+	static	const uint32		kFlagsHot			= 0x00000040;
 	static	const uint32		kFlagsType			= 0xfffff000;
 
 	static	const uint32		kBucketCount		 = 32;
@@ -139,6 +147,40 @@ vnode::SetUnpublished(bool unpublished)
 		atomic_or(&fFlags, kFlagsUnpublished);
 	else
 		atomic_and(&fFlags, ~kFlagsUnpublished);
+}
+
+
+bool
+vnode::IsUnused() const
+{
+	return (fFlags & kFlagsUnused) != 0;
+}
+
+
+void
+vnode::SetUnused(bool unused)
+{
+	if (unused)
+		atomic_or(&fFlags, kFlagsUnused);
+	else
+		atomic_and(&fFlags, ~kFlagsUnused);
+}
+
+
+bool
+vnode::IsHot() const
+{
+	return (fFlags & kFlagsHot) != 0;
+}
+
+
+void
+vnode::SetHot(bool hot)
+{
+	if (hot)
+		atomic_or(&fFlags, kFlagsHot);
+	else
+		atomic_and(&fFlags, ~kFlagsHot);
 }
 
 
