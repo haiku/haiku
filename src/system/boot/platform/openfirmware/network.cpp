@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <new>
 
 #include <stdio.h>
@@ -23,6 +24,27 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+
+class OFEthernetInterface : public EthernetInterface {
+public:
+	OFEthernetInterface();
+	virtual ~OFEthernetInterface();
+
+	status_t Init(const char *device);
+
+	virtual mac_addr_t MACAddress() const;
+
+	virtual	void *AllocateSendReceiveBuffer(size_t size);
+	virtual	void FreeSendReceiveBuffer(void *buffer);
+
+	virtual ssize_t Send(const void *buffer, size_t size);
+	virtual ssize_t Receive(void *buffer, size_t size);
+
+private:
+	int			fHandle;
+	mac_addr_t	fMACAddress;
+};
 
 
 #ifdef TRACE_NETWORK
@@ -53,77 +75,47 @@ hex_dump(const void *_data, int length)
 #endif	// !TRACE_NETWORK
 
 
-static int
-parse_ip_address_component(const char *sz, int len)
-{
-	const int base = 10;
-		// only decimal numbers for now
-	int r = 0;
-	for (int i = 0; i < len; i++) {
-		int x = sz[i] - '0';
-		for (int j = 1; j < len - i; j++)
-			x *= base;
-		r += x;
-	}
-	return r;
-}
-
-
 static ip_addr_t
-parse_ip_address(const char *sz)
+parse_ip_address(const char *string)
 {
-	ip_addr_t addr = 0;
-	int i = 0;
-	const char *psz = sz;
+	ip_addr_t address = 0;
+	int components = 0;
+
 	// TODO: Handles only IPv4 addresses for now.
-	char *p = strchr(psz, '.');
-	while (p != NULL && i < 4) {
-		int len = p - psz;
-		addr |= parse_ip_address_component(psz, len) << ((4 - i - 1) * 8);
-		p = strchr(psz = p + 1, '.');
-		i++;
+	while (components < 4) {
+		address |= strtol(string, NULL, 0) << ((4 - components - 1) * 8);
+
+		const char *dot = strchr(string, '.');
+		if (dot == NULL)
+			break;
+		
+		string = dot + 1;
+		components++;
 	}
-	addr |= parse_ip_address_component(psz, sz + strlen(sz) - psz);
-	return addr;
+
+	return address;
 }
 
 
-class OFEthernetInterface : public EthernetInterface {
-public:
-	OFEthernetInterface();
-	virtual ~OFEthernetInterface();
+// #pragma mark -
 
-	status_t Init(const char *device);
 
-	virtual mac_addr_t MACAddress() const;
-
-	virtual	void *AllocateSendReceiveBuffer(size_t size);
-	virtual	void FreeSendReceiveBuffer(void *buffer);
-
-	virtual ssize_t Send(const void *buffer, size_t size);
-	virtual ssize_t Receive(void *buffer, size_t size);
-
-private:
-	int			fHandle;
-	mac_addr_t	fMACAddress;
-};
-
-// constructor
 OFEthernetInterface::OFEthernetInterface()
-	: EthernetInterface(),
-	  fHandle(OF_FAILED),
-	  fMACAddress(kNoMACAddress)
+	:
+	EthernetInterface(),
+	fHandle(OF_FAILED),
+	fMACAddress(kNoMACAddress)
 {
 }
 
-// destructor
+
 OFEthernetInterface::~OFEthernetInterface()
 {
 	if (fHandle != OF_FAILED)
 		of_close(fHandle);
 }
 
-// Init
+
 status_t
 OFEthernetInterface::Init(const char *device)
 {
@@ -154,9 +146,10 @@ OFEthernetInterface::Init(const char *device)
 	}
 
 	// get IP address
+
 	// Note: This is a non-standardized way. On my Mac mini the response of the
-	// DHCP server is stored as property of /chosen. We try to get that it and
-	// use the IP address we find in there.
+	// DHCP server is stored as property of /chosen. We try to get it and use
+	// the IP address we find in there.
 	struct {
 		uint8	irrelevant[16];
 		uint32	ip_address;
@@ -169,7 +162,8 @@ OFEthernetInterface::Init(const char *device)
 	} else {
 		char saddr[16];
 		package = of_finddevice("/options");
-		bytesRead = of_getprop(package, "default-client-ip", saddr, sizeof(saddr));
+		bytesRead = of_getprop(package, "default-client-ip", saddr,
+			sizeof(saddr));
 		if (bytesRead != OF_FAILED) {
 			saddr[bytesRead] = '\0';
 			printf("default-client-ip: %s\n", saddr);
@@ -182,14 +176,14 @@ OFEthernetInterface::Init(const char *device)
 	return B_OK;
 }
 
-// MACAddress
+
 mac_addr_t
 OFEthernetInterface::MACAddress() const
 {
 	return fMACAddress;
 }
 
-// AllocateSendReceiveBuffer
+
 void *
 OFEthernetInterface::AllocateSendReceiveBuffer(size_t size)
 {
@@ -201,7 +195,7 @@ OFEthernetInterface::AllocateSendReceiveBuffer(size_t size)
 	return dmaMemory;
 }
 
-// FreeSendReceiveBuffer
+
 void
 OFEthernetInterface::FreeSendReceiveBuffer(void *buffer)
 {
@@ -209,7 +203,7 @@ OFEthernetInterface::FreeSendReceiveBuffer(void *buffer)
 		of_call_method(fHandle, "dma-free", 1, 0, buffer);
 }
 
-// Send
+
 ssize_t
 OFEthernetInterface::Send(const void *buffer, size_t size)
 {
@@ -224,7 +218,7 @@ OFEthernetInterface::Send(const void *buffer, size_t size)
 	return (result == OF_FAILED ? B_ERROR : result);
 }
 
-// Receive
+
 ssize_t
 OFEthernetInterface::Receive(void *buffer, size_t size)
 {
@@ -245,7 +239,7 @@ OFEthernetInterface::Receive(void *buffer, size_t size)
 
 // #pragma mark -
 
-// platform_net_stack_init
+
 status_t
 platform_net_stack_init()
 {
