@@ -1075,8 +1075,8 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 
 	In the second case the caller is responsible for dealing with the ref count
 	0 -> 1 transition. That is 1. this function must not be invoked when the
-	node is busy in the first place and 2. the node must possibly be removed
-	from the unused node list and the unused node counter must be incremented.
+	node is busy in the first place and 2. vnode_used() must be called for the
+	node.
 
 	\param vnode the vnode.
 */
@@ -1295,18 +1295,22 @@ free_unused_vnodes(int32 level)
 		// lock the node
 		AutoLocker<Vnode> nodeLocker(vnode);
 
-		// check whether the node is still unused
+		// Check whether the node is still unused -- since we only append to the
+		// the tail of the unused queue, the vnode should still be at its head.
+		// Alternatively we could check its ref count for 0 and its busy flag,
+		// but if the node is no longer at the head of the queue, it means it
+		// has been touched in the meantime, i.e. it is no longer the least
+		// recently used unused vnode and we rather don't free it.
 		unusedVnodesLocker.Lock();
 		if (vnode != list_get_first_item(&sUnusedVnodeList))
 			continue;
-
-		// remove it
-		list_remove_head_item(&sUnusedVnodeList);
-		sUnusedVnodes--;
 		unusedVnodesLocker.Unlock();
+
+		ASSERT(!vnode->IsBusy());
 
 		// grab a reference
 		inc_vnode_ref_count(vnode);
+		vnode_used(vnode);
 
 		// write back changes and free the node
 		nodeLocker.Unlock();
@@ -7236,8 +7240,6 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		// make sure all of them are not busy or have refs on them
 		VnodeList::Iterator iterator = mount->vnodes.GetIterator();
 		while (struct vnode* vnode = iterator.Next()) {
-			vnode = iterator.Next();
-
 			AutoLocker<Vnode> nodeLocker(vnode);
 
 			// The root vnode ref_count needs to be 1 here (the mount has a
@@ -7290,18 +7292,13 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	while (struct vnode* vnode = iterator.Next()) {
 		AutoLocker<Vnode> nodeLocker(vnode);
 		vnode->SetBusy(true);
-
-		if (vnode->ref_count == 0) {
-			// this vnode has been unused before
-			vnode_used(vnode);
-		}
+		vnode_to_be_freed(vnode);
 	}
 
 	// The ref_count of the root node is 1 at this point, see above why this is
 	mount->root_vnode->Lock();
-	MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
 	mount->root_vnode->ref_count--;
-	unusedVnodesLocker.Unlock();
+	vnode_to_be_freed(mount->root_vnode);
 	mount->root_vnode->Unlock();
 
 	vnodesReadLocker.Unlock();
