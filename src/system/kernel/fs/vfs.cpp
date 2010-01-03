@@ -7229,7 +7229,7 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 
 	// grab the vnode master mutex to keep someone from creating
 	// a vnode while we're figuring out if we can continue
-	ReadLocker vnodesReadLocker(&sVnodeLock);
+	WriteLocker vnodesWriteLocker(&sVnodeLock);
 
 	bool disconnectedDescriptors = false;
 
@@ -7240,8 +7240,6 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		// make sure all of them are not busy or have refs on them
 		VnodeList::Iterator iterator = mount->vnodes.GetIterator();
 		while (struct vnode* vnode = iterator.Next()) {
-			AutoLocker<Vnode> nodeLocker(vnode);
-
 			// The root vnode ref_count needs to be 1 here (the mount has a
 			// reference).
 			if (vnode->IsBusy()
@@ -7262,11 +7260,11 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 
 		if (disconnectedDescriptors) {
 			// wait a bit until the last access is finished, and then try again
-			vnodesReadLocker.Unlock();
+			vnodesWriteLocker.Unlock();
 			snooze(100000);
 			// TODO: if there is some kind of bug that prevents the ref counts
 			// from getting back to zero, this will fall into an endless loop...
-			vnodesReadLocker.Lock();
+			vnodesWriteLocker.Lock();
 			continue;
 		}
 
@@ -7276,12 +7274,12 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		mount->unmounting = true;
 			// prevent new vnodes from being created
 
-		vnodesReadLocker.Unlock();
+		vnodesWriteLocker.Unlock();
 
 		disconnect_mount_or_vnode_fds(mount, NULL);
 		disconnectedDescriptors = true;
 
-		vnodesReadLocker.Lock();
+		vnodesWriteLocker.Lock();
 	}
 
 	// we can safely continue, mark all of the vnodes busy and this mount
@@ -7290,18 +7288,15 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 
 	VnodeList::Iterator iterator = mount->vnodes.GetIterator();
 	while (struct vnode* vnode = iterator.Next()) {
-		AutoLocker<Vnode> nodeLocker(vnode);
 		vnode->SetBusy(true);
 		vnode_to_be_freed(vnode);
 	}
 
 	// The ref_count of the root node is 1 at this point, see above why this is
-	mount->root_vnode->Lock();
 	mount->root_vnode->ref_count--;
 	vnode_to_be_freed(mount->root_vnode);
-	mount->root_vnode->Unlock();
 
-	vnodesReadLocker.Unlock();
+	vnodesWriteLocker.Unlock();
 
 	mutex_lock(&sVnodeCoveredByMutex);
 	mount->covers_vnode->covered_by = NULL;
