@@ -2,7 +2,7 @@
 Ok	Status view		Daŭrigu
 Integration time [ms]: 	CPU Frequency View		Integralada tempo [ms]: 
 High performance	Status view		Plejbona rendimento
-Defaults	Pref Window		Malfari
+Defaults	Pref Window		Aprioraj
 CPU frequency status view	CPU Frequency View		Procesorofteca stato
 Dynamic performance	Status view		Dinamika rendimento
 Step up by CPU usage	Color Step View		Akcelo par procesora uzo:
@@ -13,7 +13,7 @@ Set state	Status view		Ŝanĝu staton
 Launching the CPU frequency preflet failed.\n\nError: 	Status view		Malsukcesis lanĉi la procesorofteca prefileto.\n\nEraro: 
 Install Replicant into Deskbar	CPU Frequency View		Instalu la kopianton en la Deskbar-on
 Low energy	Status view		Malgranda energio
-Revert	Pref Window		Malfari
+Revert	Pref Window		Malfaru
 Dynamic stepping	CPU Frequency View		Dinamika akcelo
 CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Procesorofteco\n\tskribita per Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 CPU Frequency	Main window		Procesorofteco
