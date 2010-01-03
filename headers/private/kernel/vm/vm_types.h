@@ -15,6 +15,7 @@
 #include <condition_variable.h>
 #include <kernel.h>
 #include <lock.h>
+#include <util/DoublyLinkedList.h>
 #include <util/DoublyLinkedQueue.h>
 #include <util/SplayTree.h>
 
@@ -72,8 +73,7 @@ typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedAreaLink>
 typedef uint32 page_num_t;
 
 struct vm_page {
-	struct vm_page*			queue_prev;
-	struct vm_page*			queue_next;
+	DoublyLinkedListLink<vm_page> queue_link;
 
 	addr_t					physical_page_number;
 

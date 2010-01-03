@@ -6,6 +6,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,9 +35,10 @@
 #include <vm/VMArea.h>
 #include <vm/VMCache.h>
 
-#include "VMAnonymousCache.h"
 #include "IORequest.h"
 #include "PageCacheLocker.h"
+#include "VMAnonymousCache.h"
+#include "VMPageQueue.h"
 
 
 //#define TRACE_VM_PAGE
@@ -56,19 +58,13 @@
 	// be written
 
 
-typedef struct page_queue {
-	vm_page *head;
-	vm_page *tail;
-	uint32	count;
-} page_queue;
-
 int32 gMappedPagesCount;
 
-static page_queue sFreePageQueue;
-static page_queue sClearPageQueue;
-static page_queue sModifiedPageQueue;
-static page_queue sInactivePageQueue;
-static page_queue sActivePageQueue;
+static VMPageQueue sFreePageQueue;
+static VMPageQueue sClearPageQueue;
+static VMPageQueue sModifiedPageQueue;
+static VMPageQueue sInactivePageQueue;
+static VMPageQueue sActivePageQueue;
 
 static vm_page *sPages;
 static addr_t sPhysicalPageOffset;
@@ -265,167 +261,6 @@ class WritePage : public AbstractTraceEntry {
 #endif	// PAGE_WRITER_TRACING
 
 
-/*!	Dequeues a page from the head of the given queue */
-static vm_page *
-dequeue_page(page_queue *queue)
-{
-	vm_page *page;
-
-	page = queue->head;
-	if (page != NULL) {
-		if (queue->tail == page)
-			queue->tail = NULL;
-		if (page->queue_next != NULL)
-			page->queue_next->queue_prev = NULL;
-
-		queue->head = page->queue_next;
-		if (page->type != PAGE_TYPE_DUMMY)
-			queue->count--;
-
-#if DEBUG_PAGE_QUEUE
-		if (page->queue != queue) {
-			panic("dequeue_page(queue: %p): page %p thinks it is in queue "
-				"%p", queue, page, page->queue);
-		}
-
-		page->queue = NULL;
-#endif	// DEBUG_PAGE_QUEUE
-	}
-
-	return page;
-}
-
-
-/*!	Enqueues a page to the tail of the given queue */
-static void
-enqueue_page(page_queue *queue, vm_page *page)
-{
-#if DEBUG_PAGE_QUEUE
-	if (page->queue != NULL) {
-		panic("enqueue_page(queue: %p, page: %p): page thinks it is "
-			"already in queue %p", queue, page, page->queue);
-	}
-#endif	// DEBUG_PAGE_QUEUE
-
-	if (queue->tail != NULL)
-		queue->tail->queue_next = page;
-	page->queue_prev = queue->tail;
-	queue->tail = page;
-	page->queue_next = NULL;
-	if (queue->head == NULL)
-		queue->head = page;
-	if (page->type != PAGE_TYPE_DUMMY)
-		queue->count++;
-
-#if DEBUG_PAGE_QUEUE
-	page->queue = queue;
-#endif
-}
-
-
-/*!	Enqueues a page to the head of the given queue */
-static void
-enqueue_page_to_head(page_queue *queue, vm_page *page)
-{
-#if DEBUG_PAGE_QUEUE
-	if (page->queue != NULL) {
-		panic("enqueue_page_to_head(queue: %p, page: %p): page thinks it is "
-			"already in queue %p", queue, page, page->queue);
-	}
-#endif	// DEBUG_PAGE_QUEUE
-
-	if (queue->head != NULL)
-		queue->head->queue_prev = page;
-	page->queue_next = queue->head;
-	queue->head = page;
-	page->queue_prev = NULL;
-	if (queue->tail == NULL)
-		queue->tail = page;
-	if (page->type != PAGE_TYPE_DUMMY)
-		queue->count++;
-
-#if DEBUG_PAGE_QUEUE
-	page->queue = queue;
-#endif
-}
-
-
-static void
-remove_page_from_queue(page_queue *queue, vm_page *page)
-{
-#if DEBUG_PAGE_QUEUE
-	if (page->queue != queue) {
-		panic("remove_page_from_queue(queue: %p, page: %p): page thinks it "
-			"is in queue %p", queue, page, page->queue);
-	}
-#endif	// DEBUG_PAGE_QUEUE
-
-	if (page->queue_next != NULL)
-		page->queue_next->queue_prev = page->queue_prev;
-	else
-		queue->tail = page->queue_prev;
-
-	if (page->queue_prev != NULL)
-		page->queue_prev->queue_next = page->queue_next;
-	else
-		queue->head = page->queue_next;
-
-	if (page->type != PAGE_TYPE_DUMMY)
-		queue->count--;
-
-#if DEBUG_PAGE_QUEUE
-	page->queue = NULL;
-#endif
-}
-
-
-/*!	Moves a page to the tail of the given queue, but only does so if
-	the page is currently in another queue.
-*/
-static void
-move_page_to_queue(page_queue *fromQueue, page_queue *toQueue, vm_page *page)
-{
-	if (fromQueue != toQueue) {
-		remove_page_from_queue(fromQueue, page);
-		enqueue_page(toQueue, page);
-	}
-}
-
-
-/*! Inserts \a page after the \a before page in the \a queue. */
-static void
-insert_page_after(page_queue *queue, vm_page *before, vm_page *page)
-{
-#if DEBUG_PAGE_QUEUE
-	if (page->queue != NULL) {
-		panic("enqueue_page(queue: %p, page: %p): page thinks it is "
-			"already in queue %p", queue, page, page->queue);
-	}
-#endif	// DEBUG_PAGE_QUEUE
-
-	if (before == NULL) {
-		enqueue_page(queue, page);
-		return;
-	}
-
-	page->queue_next = before->queue_next;
-	if (page->queue_next != NULL)
-		page->queue_next->queue_prev = page;
-	page->queue_prev = before;
-	before->queue_next = page;
-
-	if (queue->tail == before)
-		queue->tail = page;
-
-	if (page->type != PAGE_TYPE_DUMMY)
-		queue->count++;
-
-#if DEBUG_PAGE_QUEUE
-	page->queue = queue;
-#endif
-}
-
-
 static int
 find_page(int argc, char **argv)
 {
@@ -436,7 +271,7 @@ find_page(int argc, char **argv)
 
 	struct {
 		const char*	name;
-		page_queue*	queue;
+		VMPageQueue*	queue;
 	} pageQueueInfos[] = {
 		{ "free",		&sFreePageQueue },
 		{ "clear",		&sClearPageQueue },
@@ -457,14 +292,13 @@ find_page(int argc, char **argv)
 	page = (vm_page*)address;
 
 	for (i = 0; pageQueueInfos[i].name; i++) {
-		vm_page* p = pageQueueInfos[i].queue->head;
-		while (p) {
+		VMPageQueue::Iterator it = pageQueueInfos[i].queue->GetIterator();
+		while (vm_page* p = it.Next()) {
 			if (p == page) {
 				kprintf("found page %p in queue %p (%s)\n", page,
 					pageQueueInfos[i].queue, pageQueueInfos[i].name);
 				return 0;
 			}
-			p = p->queue_next;
 		}
 	}
 
@@ -544,7 +378,8 @@ dump_page(int argc, char **argv)
 		page = (struct vm_page *)address;
 
 	kprintf("PAGE: %p\n", page);
-	kprintf("queue_next,prev: %p, %p\n", page->queue_next, page->queue_prev);
+	kprintf("queue_next,prev: %p, %p\n", page->queue_link.next,
+		page->queue_link.previous);
 	kprintf("physical_number: %lx\n", page->physical_page_number);
 	kprintf("cache:           %p\n", page->cache);
 	kprintf("cache_offset:    %ld\n", page->cache_offset);
@@ -573,7 +408,7 @@ dump_page(int argc, char **argv)
 static int
 dump_page_queue(int argc, char **argv)
 {
-	struct page_queue *queue;
+	struct VMPageQueue *queue;
 
 	if (argc < 2) {
 		kprintf("usage: page_queue <address/name> [list]\n");
@@ -581,7 +416,7 @@ dump_page_queue(int argc, char **argv)
 	}
 
 	if (strlen(argv[1]) >= 2 && argv[1][0] == '0' && argv[1][1] == 'x')
-		queue = (struct page_queue *)strtoul(argv[1], NULL, 16);
+		queue = (VMPageQueue*)strtoul(argv[1], NULL, 16);
 	if (!strcmp(argv[1], "free"))
 		queue = &sFreePageQueue;
 	else if (!strcmp(argv[1], "clear"))
@@ -598,10 +433,10 @@ dump_page_queue(int argc, char **argv)
 	}
 
 	kprintf("queue = %p, queue->head = %p, queue->tail = %p, queue->count = %ld\n",
-		queue, queue->head, queue->tail, queue->count);
+		queue, queue->Head(), queue->Tail(), queue->Count());
 
 	if (argc == 3) {
-		struct vm_page *page = queue->head;
+		struct vm_page *page = queue->Head();
 		const char *type = "none";
 		int i;
 
@@ -626,7 +461,7 @@ dump_page_queue(int argc, char **argv)
 		}
 
 		kprintf("page        cache       type       state  wired  usage\n");
-		for (i = 0; page; i++, page = page->queue_next) {
+		for (i = 0; page; i++, page = queue->Next(page)) {
 			kprintf("%p  %p  %-7s %8s  %5d  %5d\n", page, page->cache,
 				type, page_state_to_string(page->state),
 				page->wired_count, page->usage_count);
@@ -673,16 +508,16 @@ dump_page_stats(int argc, char **argv)
 	kprintf("mapped pages: %lu\n", gMappedPagesCount);
 
 	kprintf("\nfree queue: %p, count = %ld\n", &sFreePageQueue,
-		sFreePageQueue.count);
+		sFreePageQueue.Count());
 	kprintf("clear queue: %p, count = %ld\n", &sClearPageQueue,
-		sClearPageQueue.count);
+		sClearPageQueue.Count());
 	kprintf("modified queue: %p, count = %ld (%ld temporary, %lu swappable, "
-		"inactive: %lu)\n", &sModifiedPageQueue, sModifiedPageQueue.count,
+		"inactive: %lu)\n", &sModifiedPageQueue, sModifiedPageQueue.Count(),
 		sModifiedTemporaryPages, swappableModified, swappableModifiedInactive);
 	kprintf("active queue: %p, count = %ld\n", &sActivePageQueue,
-		sActivePageQueue.count);
+		sActivePageQueue.Count());
 	kprintf("inactive queue: %p, count = %ld\n", &sInactivePageQueue,
-		sInactivePageQueue.count);
+		sInactivePageQueue.Count());
 	return 0;
 }
 
@@ -690,7 +525,7 @@ dump_page_stats(int argc, char **argv)
 static inline size_t
 free_page_queue_count(void)
 {
-	return sFreePageQueue.count + sClearPageQueue.count;
+	return sFreePageQueue.Count() + sClearPageQueue.Count();
 }
 
 
@@ -700,8 +535,8 @@ set_page_state_nolock(vm_page *page, int pageState)
 	if (pageState == page->state)
 		return B_OK;
 
-	page_queue *fromQueue = NULL;
-	page_queue *toQueue = NULL;
+	VMPageQueue *fromQueue = NULL;
+	VMPageQueue *toQueue = NULL;
 
 	switch (page->state) {
 		case PAGE_STATE_BUSY:
@@ -783,7 +618,7 @@ set_page_state_nolock(vm_page *page, int pageState)
 #endif	// PAGE_ALLOCATION_TRACING
 
 	page->state = pageState;
-	move_page_to_queue(fromQueue, toQueue, page);
+	toQueue->MoveFrom(fromQueue, page);
 
 	return B_OK;
 }
@@ -805,8 +640,9 @@ move_page_to_active_or_inactive_queue(vm_page *page, bool dequeued)
 
 	if (dequeued) {
 		page->state = state;
-		enqueue_page(state == PAGE_STATE_ACTIVE
-			? &sActivePageQueue : &sInactivePageQueue, page);
+		VMPageQueue& queue = state == PAGE_STATE_ACTIVE
+			? sActivePageQueue : sInactivePageQueue;
+		queue.Append(page);
 		if (page->cache->temporary)
 			sModifiedTemporaryPages--;
 	} else
@@ -838,7 +674,7 @@ page_scrubber(void *unused)
 	for (;;) {
 		snooze(100000); // 100ms
 
-		if (sFreePageQueue.count == 0)
+		if (sFreePageQueue.Count() == 0)
 			continue;
 
 		MutexLocker locker(sPageLock);
@@ -859,7 +695,7 @@ page_scrubber(void *unused)
 		// get some pages from the free queue
 		vm_page *page[SCRUB_SIZE];
 		for (int32 i = 0; i < scrubCount; i++) {
-			page[i] = dequeue_page(&sFreePageQueue);
+			page[i] = sFreePageQueue.RemoveHead();
 			if (page[i] == NULL) {
 				scrubCount = i;
 				break;
@@ -883,7 +719,7 @@ page_scrubber(void *unused)
 		// and put them into the clear queue
 		for (int32 i = 0; i < scrubCount; i++) {
 			page[i]->state = PAGE_STATE_CLEAR;
-			enqueue_page(&sClearPageQueue, page[i]);
+			sClearPageQueue.Append(page[i]);
 		}
 
 		T(ScrubbedPages(scrubCount));
@@ -906,7 +742,7 @@ remove_page_marker(struct vm_page &marker)
 	if (marker.state == PAGE_STATE_UNUSED)
 		return;
 
-	page_queue *queue;
+	VMPageQueue *queue;
 
 	switch (marker.state) {
 		case PAGE_STATE_ACTIVE:
@@ -924,7 +760,7 @@ remove_page_marker(struct vm_page &marker)
 	}
 
 	MutexLocker locker(sPageLock);
-	remove_page_from_queue(queue, &marker);
+	queue->Remove(&marker);
 
 	marker.state = PAGE_STATE_UNUSED;
 }
@@ -937,17 +773,17 @@ next_modified_page(struct vm_page &marker)
 	vm_page *page;
 
 	if (marker.state == PAGE_STATE_MODIFIED) {
-		page = marker.queue_next;
-		remove_page_from_queue(&sModifiedPageQueue, &marker);
+		page = sModifiedPageQueue.Next(&marker);
+		sModifiedPageQueue.Remove(&marker);
 		marker.state = PAGE_STATE_UNUSED;
 	} else
-		page = sModifiedPageQueue.head;
+		page = sModifiedPageQueue.Head();
 
-	for (; page != NULL; page = page->queue_next) {
+	for (; page != NULL; page = sModifiedPageQueue.Next(page)) {
 		if (!is_marker_page(page) && page->state != PAGE_STATE_BUSY) {
 			// insert marker
 			marker.state = PAGE_STATE_MODIFIED;
-			insert_page_after(&sModifiedPageQueue, page, &marker);
+			sModifiedPageQueue.InsertAfter(page, &marker);
 			return page;
 		}
 	}
@@ -1108,7 +944,7 @@ PageWriteWrapper::Done(status_t result)
 		// explicitly, which will take care of moving between the queues.
 		if (fDequeuedPage) {
 			fPage->state = PAGE_STATE_MODIFIED;
-			enqueue_page(&sModifiedPageQueue, fPage);
+			sModifiedPageQueue.Append(fPage);
 		} else {
 			fPage->state = fOldPageState;
 			set_page_state_nolock(fPage, PAGE_STATE_MODIFIED);
@@ -1376,7 +1212,7 @@ page_writer(void* /*unused*/)
 	marker.state = PAGE_STATE_UNUSED;
 
 	while (true) {
-		if (sModifiedPageQueue.count - sModifiedTemporaryPages < 1024) {
+		if (sModifiedPageQueue.Count() - sModifiedTemporaryPages < 1024) {
 			int32 count = 0;
 			get_sem_count(sWriterWaitSem, &count);
 			if (count == 0)
@@ -1388,7 +1224,7 @@ page_writer(void* /*unused*/)
 
 		// depending on how urgent it becomes to get pages to disk, we adjust
 		// our I/O priority
-		page_num_t modifiedPages = sModifiedPageQueue.count
+		page_num_t modifiedPages = sModifiedPageQueue.Count()
 			- sModifiedTemporaryPages;
 		uint32 lowPagesState = low_resource_state(B_KERNEL_RESOURCE_PAGES);
 		int32 ioPriority = B_IDLE_PRIORITY;
@@ -1459,7 +1295,7 @@ page_writer(void* /*unused*/)
 				continue;
 			}
 
-			remove_page_from_queue(&sModifiedPageQueue, page);
+			sModifiedPageQueue.Remove(page);
 
 			run.AddPage(page);
 
@@ -1507,39 +1343,36 @@ static vm_page *
 find_page_candidate(struct vm_page &marker)
 {
 	MutexLocker locker(sPageLock);
-	page_queue *queue;
+	VMPageQueue *queue;
 	vm_page *page;
 
 	if (marker.state == PAGE_STATE_UNUSED) {
 		// Get the first free pages of the (in)active queue
 		queue = &sInactivePageQueue;
-		page = sInactivePageQueue.head;
+		page = sInactivePageQueue.Head();
 	} else {
 		// Get the next page of the current queue
-		if (marker.state == PAGE_STATE_INACTIVE)
+		if (marker.state == PAGE_STATE_INACTIVE) {
 			queue = &sInactivePageQueue;
-		else if (marker.state == PAGE_STATE_ACTIVE)
-			queue = &sActivePageQueue;
-		else {
+		} else {
 			panic("invalid marker %p state", &marker);
 			queue = NULL;
 		}
 
-		page = marker.queue_next;
-		remove_page_from_queue(queue, &marker);
+		page = queue->Next(&marker);
+		queue->Remove(&marker);
 		marker.state = PAGE_STATE_UNUSED;
 	}
 
 	while (page != NULL) {
 		if (!is_marker_page(page) && page->state == PAGE_STATE_INACTIVE) {
 			// we found a candidate, insert marker
-			marker.state = queue == &sActivePageQueue
-				? PAGE_STATE_ACTIVE : PAGE_STATE_INACTIVE;
-			insert_page_after(queue, page, &marker);
+			marker.state = PAGE_STATE_INACTIVE;
+			queue->InsertAfter(page, &marker);
 			return page;
 		}
 
-		page = page->queue_next;
+		page = queue->Next(page);
 	}
 
 	return NULL;
@@ -1581,8 +1414,7 @@ steal_page(vm_page *page)
 	page->cache->RemovePage(page);
 
 	MutexLocker _(sPageLock);
-	remove_page_from_queue(page->state == PAGE_STATE_ACTIVE
-		? &sActivePageQueue : &sInactivePageQueue, page);
+	sInactivePageQueue.Remove(page);
 	return true;
 }
 
@@ -1606,7 +1438,7 @@ steal_pages(vm_page **pages, size_t count)
 
 			if (steal_page(page)) {
 				MutexLocker locker(sPageLock);
-				enqueue_page(&sFreePageQueue, page);
+				sFreePageQueue.Append(page);
 				page->state = PAGE_STATE_FREE;
 				locker.Unlock();
 
@@ -1628,7 +1460,7 @@ steal_pages(vm_page **pages, size_t count)
 			return stolen;
 		}
 
-		if (stolen && !tried && sInactivePageQueue.count > 0) {
+		if (stolen && !tried && sInactivePageQueue.Count() > 0) {
 			count++;
 			continue;
 		}
@@ -1715,7 +1547,7 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 		if (page != NULL) {
 			if (page->state == PAGE_STATE_MODIFIED) {
 				MutexLocker locker(&sPageLock);
-				remove_page_from_queue(&sModifiedPageQueue, page);
+				sModifiedPageQueue.Remove(page);
 				dequeuedPage = true;
 			} else if (page->state == PAGE_STATE_BUSY
 					|| !vm_test_map_modification(page)) {
@@ -1882,7 +1714,7 @@ vm_page_init(kernel_args *args)
 		#if DEBUG_PAGE_QUEUE
 			sPages[i].queue = NULL;
 		#endif
-		enqueue_page(&sFreePageQueue, &sPages[i]);
+		sFreePageQueue.Append(&sPages[i]);
 	}
 
 	TRACE(("initialized table\n"));
@@ -2070,8 +1902,8 @@ vm_page_try_reserve_pages(uint32 count)
 vm_page *
 vm_page_allocate_page(int pageState)
 {
-	page_queue *queue;
-	page_queue *otherQueue;
+	VMPageQueue *queue;
+	VMPageQueue *otherQueue;
 
 	switch (pageState) {
 		case PAGE_STATE_FREE:
@@ -2090,16 +1922,16 @@ vm_page_allocate_page(int pageState)
 
 	T(AllocatePage());
 
-	vm_page *page = dequeue_page(queue);
+	vm_page *page = queue->RemoveHead();
 	if (page == NULL) {
 #if DEBUG_PAGE_QUEUE
-		if (queue->count != 0)
-			panic("queue %p corrupted, count = %d\n", queue, queue->count);
+		if (queue->Count() != 0)
+			panic("queue %p corrupted, count = %d\n", queue, queue->Count());
 #endif
 
 		// if the primary queue was empty, grab the page from the
 		// secondary queue
-		page = dequeue_page(otherQueue);
+		page = otherQueue->RemoveHead();
 
 		if (page == NULL)
 			panic("Had reserved page, but there is none!");
@@ -2112,7 +1944,7 @@ vm_page_allocate_page(int pageState)
 	page->state = PAGE_STATE_BUSY;
 	page->usage_count = 2;
 
-	enqueue_page(&sActivePageQueue, page);
+	sActivePageQueue.Append(page);
 
 	locker.Unlock();
 
@@ -2194,8 +2026,8 @@ vm_page_allocate_page_run_no_base(int pageState, addr_t count)
 		return NULL;
 	}
 
-	page_queue *queue;
-	page_queue *otherQueue;
+	VMPageQueue *queue;
+	VMPageQueue *otherQueue;
 	switch (pageState) {
 		case PAGE_STATE_FREE:
 			queue = &sFreePageQueue;
@@ -2211,8 +2043,8 @@ vm_page_allocate_page_run_no_base(int pageState, addr_t count)
 
 	vm_page *firstPage = NULL;
 	for (uint32 twice = 0; twice < 2; twice++) {
-		vm_page *page = queue->head;
-		for (; page != NULL; page = page->queue_next) {
+		VMPageQueue::Iterator it = queue->GetIterator();
+		while (vm_page *page = it.Next()) {
 			vm_page *current = page;
 			if (current >= &sPages[sNumPages - count])
 				continue;
@@ -2317,7 +2149,7 @@ void
 vm_page_requeue(struct vm_page *page, bool tail)
 {
 	MutexLocker _(sPageLock);
-	page_queue *queue = NULL;
+	VMPageQueue *queue = NULL;
 
 	switch (page->state) {
 		case PAGE_STATE_BUSY:
@@ -2344,12 +2176,12 @@ vm_page_requeue(struct vm_page *page, bool tail)
 			break;
 	}
 
-	remove_page_from_queue(queue, page);
+	queue->Remove(page);
 
 	if (tail)
-		enqueue_page(queue, page);
+		queue->Append(page);
 	else
-		enqueue_page_to_head(queue, page);
+		queue->Prepend(page);
 }
 
 
@@ -2378,7 +2210,7 @@ size_t
 vm_page_num_free_pages(void)
 {
 	size_t reservedPages = sReservedPages;
-	size_t count = free_page_queue_count() + sInactivePageQueue.count;
+	size_t count = free_page_queue_count() + sInactivePageQueue.Count();
 	if (reservedPages >= count)
 		return 0;
 
