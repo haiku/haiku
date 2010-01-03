@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-09, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
+ * Copyright 2008-10, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "BluetoothWindow.h"
@@ -34,8 +34,7 @@ LocalDevice* ActiveLocalDevice = NULL;
 
 BluetoothWindow::BluetoothWindow(BRect frame)
  :	BWindow(frame, TR("Bluetooth"), B_TITLED_WINDOW,
- 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
- 		B_ALL_WORKSPACES)
+ 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
@@ -49,21 +48,28 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 	fMenubar = new BMenuBar(Bounds(), "menu_bar");
 
 	// Add File menu to menu bar
-	BMenu *menu = new BMenu(TR("Server"));
-	menu->AddItem(new BMenuItem(TR("Start bluetooth services" B_UTF8_ELLIPSIS), new BMessage(kMsgStartServices), 0));
-	menu->AddItem(new BMenuItem(TR("Stop bluetooth services" B_UTF8_ELLIPSIS), new BMessage(kMsgStopServices), 0));
+	BMenu* menu = new BMenu(TR("Server"));
+	menu->AddItem(new BMenuItem(TR("Start bluetooth services" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgStartServices), 0));
+	menu->AddItem(new BMenuItem(TR("Stop bluetooth services" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgStopServices), 0));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Show bluetooth console" B_UTF8_ELLIPSIS), new BMessage(kMsgStartServices), 0));
-	menu->AddItem(new BMenuItem(TR("Refresh LocalDevices" B_UTF8_ELLIPSIS), new BMessage(kMsgRefresh), 0));
+	menu->AddItem(new BMenuItem(TR("Show bluetooth console" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgStartServices), 0));
+	menu->AddItem(new BMenuItem(TR("Refresh LocalDevices" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgRefresh), 0));
 	fMenubar->AddItem(menu);
 	
 	menu = new BMenu(TR("View"));
-	menu->AddItem(new BMenuItem(TR("Connections & channels list" B_UTF8_ELLIPSIS), NULL, 0));
-	menu->AddItem(new BMenuItem(TR("Remote devices list" B_UTF8_ELLIPSIS), NULL, 0));	
+	menu->AddItem(new BMenuItem(TR("Connections & channels" B_UTF8_ELLIPSIS),
+		NULL, 0));
+	menu->AddItem(new BMenuItem(TR("Remote devices list" B_UTF8_ELLIPSIS),
+		NULL, 0));
 	fMenubar->AddItem(menu);
 	
 	menu = new BMenu(TR("Help"));
-	menu->AddItem(new BMenuItem(TR("About Bluetooth" B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED), 0));
+	menu->AddItem(new BMenuItem(TR("About Bluetooth" B_UTF8_ELLIPSIS),
+		new BMessage(B_ABOUT_REQUESTED), 0));
 	fMenubar->AddItem(menu);
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
@@ -95,7 +101,7 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 
 
 void
-BluetoothWindow::MessageReceived(BMessage *message)
+BluetoothWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgSetDefaults:
@@ -114,16 +120,21 @@ BluetoothWindow::MessageReceived(BMessage *message)
 */			break;
 		case kMsgStartServices:
 			printf("kMsgStartServices\n");
-			if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE))
-			{
-				printf("kMsgStopServices: %s\n", strerror(be_roster->Launch(BLUETOOTH_SIGNATURE)));
+			if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
+				status_t error;
+				
+				error = be_roster->Launch(BLUETOOTH_SIGNATURE);
+				printf("kMsgStopServices: %s\n", strerror(error));
 			}
 			break;
+
 		case kMsgStopServices:
 			printf("kMsgStopServices\n");
-			if (be_roster->IsRunning(BLUETOOTH_SIGNATURE))
-			{
-				printf("kMsgStopServices: %s\n", strerror(BMessenger(BLUETOOTH_SIGNATURE).SendMessage(B_QUIT_REQUESTED)));
+			if (be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
+				status_t error;
+				
+				error = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(B_QUIT_REQUESTED);
+				printf("kMsgStopServices: %s\n", strerror(error));
 			}
 			break;
 		
@@ -141,7 +152,6 @@ BluetoothWindow::MessageReceived(BMessage *message)
 			break;
 	}
 }
-
 
 
 bool
