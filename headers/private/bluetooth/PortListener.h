@@ -51,15 +51,12 @@ public:
 	}
 
 
-	status_t Trigger(int32 code, TYPE* buffer, size_t size = 0)
+	status_t Trigger(int32 code, TYPE* buffer, size_t size)
 	{
 		if (buffer == NULL)
 			return B_ERROR;
 
-		if (size == 0)
-			return write_port(fPort, code, buffer, sizeof(TYPE));
-		else
-			return write_port(fPort, code, buffer, size);
+		return write_port(fPort, code, buffer, size);
 	}
 
 
