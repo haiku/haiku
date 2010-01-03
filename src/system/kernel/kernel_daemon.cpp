@@ -182,6 +182,9 @@ KernelDaemon::_NextDaemon(struct daemon& marker)
 	} else {
 		daemon = marker.GetDoublyLinkedListLink()->next;
 		fDaemons.Remove(&marker);
+
+		marker.GetDoublyLinkedListLink()->next = NULL;
+		marker.GetDoublyLinkedListLink()->previous = NULL;
 	}
 
 	if (daemon != NULL)
