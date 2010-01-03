@@ -22,10 +22,13 @@ public:
 		fInformation.func = handler;
 		fInformation.port = &fPort;
 
-		InitCheck();
 		fPortName = strdup(name);
-		fThreadName = strdup(name);
+
+		fThreadName = (char*)malloc(strlen(name) + strlen(" thread") + 1);
+		fThreadName = strcpy(fThreadName, fPortName);
 		fThreadName = strcat(fThreadName, " thread");
+
+		InitCheck();
 	}
 
 
@@ -37,8 +40,8 @@ public:
 		// Closing the port	should provoke the thread to finish
 		wait_for_thread(fThread, &status);
 
-		delete fThreadName;
-		delete fPortName;
+		free(fThreadName);
+		free(fPortName);
 	}
 
 
@@ -52,7 +55,7 @@ public:
 	{
 		if (buffer == NULL)
 			return B_ERROR;
-		
+
 		if (size == 0)
 			return write_port(fPort, code, buffer, sizeof(TYPE));
 		else
@@ -68,7 +71,7 @@ public:
 			fPort = create_port(MAX_MESSAGE_DEEP, fPortName);
 		}
 
-		if (fPort < B_OK) 
+		if (fPort < B_OK)
 			return fPort;
 
 		// Create Thread
@@ -96,7 +99,7 @@ public:
 	status_t Launch()
 	{
 		status_t check = InitCheck();
-		
+
 		if (check < B_OK)
 			return check;
 
@@ -144,12 +147,12 @@ private:
 		while ((ssizePort = port_buffer_size(*port)) != B_BAD_PORT_ID) {
 
 			if (ssizePort <= 0) {
-				snooze(500*1000);
+				snooze(500 * 1000);
 				continue;
 			}
 
 			if (ssizePort >	MAX_MESSAGE_SIZE) {
-				snooze(500*1000);
+				snooze(500 * 1000);
 				continue;
 			}
 
@@ -168,7 +171,7 @@ private:
 
 		if (ssizePort == B_BAD_PORT_ID) // the port disappeared
 			return ssizePort;
-			
+
 		return status;
 	}
 
