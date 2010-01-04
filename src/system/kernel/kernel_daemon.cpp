@@ -178,14 +178,14 @@ KernelDaemon::_NextDaemon(struct daemon& marker)
 		// The marker is not part of the list yet, just return the first entry
 		daemon = fDaemons.Head();
 	} else {
-		daemon = marker.GetDoublyLinkedListLink()->next;
+		daemon = fDaemons.GetNext(&marker);
 		fDaemons.Remove(&marker);
 	}
 
 	marker.arg = daemon;
 
 	if (daemon != NULL)
-		fDaemons.Insert(daemon->GetDoublyLinkedListLink()->next, &marker);
+		fDaemons.InsertAfter(daemon, &marker);
 
 	return daemon;
 }
