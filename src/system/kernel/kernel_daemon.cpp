@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -144,7 +144,8 @@ KernelDaemon::Dump()
 
 	while (iterator.HasNext()) {
 		struct daemon* daemon = iterator.Next();
-		const char *symbol, *imageName;
+		const char* imageName;
+		const char* symbol;
 		bool exactMatch;
 
 		status_t status = elf_debug_lookup_symbol_address(
@@ -279,6 +280,7 @@ kernel_daemon_init(void)
 	if (sResourceResizer.Init("resource resizer") != B_OK)
 		panic("kernel_daemon_init(): failed to init resource resizer");
 
-	add_debugger_command("daemons", dump_daemons, "Shows registered kernel daemons.");
+	add_debugger_command("daemons", dump_daemons,
+		"Shows registered kernel daemons.");
 	return B_OK;
 }
