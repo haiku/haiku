@@ -1454,11 +1454,8 @@ steal_pages(vm_page **pages, size_t count)
 
 		MutexLocker locker(sPageLock);
 
-		if (sReservedPages <= free_page_queue_count()
-			|| count == 0
-			|| free_page_queue_count() > sReservedPages) {
+		if (count == 0 || sReservedPages <= free_page_queue_count())
 			return stolen;
-		}
 
 		if (stolen && !tried && sInactivePageQueue.Count() > 0) {
 			count++;
