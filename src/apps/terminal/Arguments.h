@@ -10,7 +10,7 @@
 
 class Arguments {
 public:
-	Arguments();
+	Arguments(int defaultArgcNum, const char *const *defaultArgv);
 	~Arguments();
 
 	void Parse(int argc, const char *const *argv);

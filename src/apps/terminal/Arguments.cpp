@@ -10,7 +10,7 @@
 #include "Arguments.h"
 
 
-Arguments::Arguments()
+Arguments::Arguments(int defaultArgsNum, const char * const *defaultArgs)
 	: fUsageRequested(false),
 	  fBounds(50, 50, 630, 435),
 	  fStandardShell(true),
@@ -19,9 +19,7 @@ Arguments::Arguments()
 	  fShellArguments(NULL),
 	  fTitle(NULL)
 {
-	const char *argv[] = { "/bin/bash", "--login" };
-
-	_SetShellArguments(2, argv);
+	_SetShellArguments(defaultArgsNum, defaultArgs);
 }
 
 
