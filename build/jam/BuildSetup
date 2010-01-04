@@ -186,7 +186,7 @@ switch $(HAIKU_GCC_MACHINE) {
 	case m68k-*		: HAIKU_CPU = m68k ;
 	case mipsel-*	: HAIKU_CPU = mipsel ;
 	case arm-*		: HAIKU_CPU = arm ;
-	case *			: Exit "Unsupported gcc target machine:" 
+	case *			: Exit "Unsupported gcc target machine:"
 						$(HAIKU_GCC_MACHINE) ;
 }
 
@@ -494,8 +494,6 @@ HOST_AR				?= $(AR) ;
 HOST_CC				?= $(CC) ;
 HOST_C++			?= $(C++) ;
 HOST_LINK			?= $(LINK) ;
-HOST_LD				?= ld ;			# TODO: Fix this!
-HOST_OBJCOPY		?= objcopy ;	#
 HOST_RANLIB			?= $(RANLIB) ;
 HOST_CPPFLAGS		?= $(CPPFLAGS) ;
 HOST_CCFLAGS		?= $(HOST_GCC_BASE_FLAGS) $(CCFLAGS) ;
@@ -524,12 +522,6 @@ if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
 	if $(LEX) = lex {
 		LEX = flex ;
 	}
-}
-
-# TODO: Temporary work-around for mixup of GNU and Sun linker on OpenSolaris.
-# Should be moved to configure.
-if $(HOST_PLATFORM) = sunos && $(HOST_LD) = ld {
-	HOST_LD = /usr/ccs/bin/ld ;
 }
 
 if $(HOST_PLATFORM) = cygwin {

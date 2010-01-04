@@ -268,6 +268,8 @@ haikuSharedLibSupCxx=
 haikuCxxHeadersDir=
 hostGCCVersion=`gcc -dumpversion`
 hostGCCMachine=`gcc -dumpmachine`
+hostGCCLD=`gcc -print-prog-name=ld`
+hostGCCObjcopy=`gcc -print-prog-name=objcopy`
 includeGPLAddOns=0
 includePatentedCode=0
 include3rdParty=0
@@ -514,6 +516,8 @@ HAIKU_UNARFLAGS				?= ${HAIKU_UNARFLAGS} ;
 
 HOST_GCC_RAW_VERSION		?= ${hostGCCVersion} ;
 HOST_GCC_MACHINE			?= ${hostGCCMachine} ;
+HOST_LD						?= ${hostGCCLD} ;
+HOST_OBJCOPY				?= ${hostGCCObjcopy} ;
 
 EOF
 
