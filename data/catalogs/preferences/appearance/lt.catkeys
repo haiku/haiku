@@ -9,7 +9,7 @@ Grayscale	AntialiasingSettingsView		Pilkšvai
 Shine	Colors tab		Šviesa
 Off	AntialiasingSettingsView		Išjungta
 Success	Colors tab		Sėkmė
-Inactive window tab text	Colors tab		Neveikiančio lango antraštės tekstas
+Inactive window tab text	Colors tab		Neveikiančio lango antraštė
 Failure	Colors tab		Nesėkmė
 Hinting menu	AntialiasingSettingsView		Glodinimas
 Document background	Colors tab		Dokumento fonas
@@ -29,15 +29,15 @@ Panel background	Colors tab		Skydelio fonas
 Colors	APRWindow		Spalvos
 Control background	Colors tab		Valdiklių fonas
 Inactive window tab	Colors tab		Neveikiančio lango antraštė
-Reduce colored edges filter strength:	AntialiasingSettingsView		Spalvotų kraštų filtro stiprumo mažinimas
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		SubpSubpikselinis glotninimas kartu su pilkšvuoju glodinimu šioje Haiku versijoje yra neprieinamas dėl patentų nesuderinamumo. Norėdami įjungti šią ypatybę, turite savarankiškai susirinkti Haiku įjungdami atitinkamą sąvybę bibliotekos FreeType antraštinėje derinimo byloje.
+Reduce colored edges filter strength:	AntialiasingSettingsView		Spalvotų kraštų filtro stiprumo mažinimas:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpikselinis glotninimas kartu su pilkšvuoju glodinimu šioje Haiku versijoje yra neprieinamas dėl patentų nesuderinamumo. Norėdami įjungti šią ypatybę, turite savarankiškai susirinkti Haiku įjungdami atitinkamą sąvybę bibliotekos FreeType antraštinėje derinimo byloje.
 Control text	Colors tab		Valdiklių tekstas
 Tooltip text	Colors tab		Patarimų tekstas
 Menu item text	Colors tab		Meniu dėmens tekstas
-LCD subpixel	AntialiasingSettingsView		Subpikselinis
+LCD subpixel	AntialiasingSettingsView		Subpikselinis LCD
 Selected menu item border	Colors tab		Išskirtojo meniu dėmens rėmelis
 Strong	AntialiasingSettingsView		Stipriai
 Panel text	Colors tab		Skydelio tekstas
 Monospaced fonts only	AntialiasingSettingsView		Tik lygiaplotiems rašmenims
-Antialiasing menu	AntialiasingSettingsView		Glotninimo meniu
+Antialiasing menu	AntialiasingSettingsView		Glotninimas
 Glyph hinting:	AntialiasingSettingsView		Rašmens glodinimas:

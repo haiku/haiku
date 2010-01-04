@@ -21,7 +21,7 @@ DoCatalogs Locale		# application name
 	TimeFormatSettingsView.cpp
 	: en.catalog		# default catalog generated from sourcecode
 	:					# translations
-	fi.catkeys fr.catkeys de.catkeys hu.catkeys lt.catkeys ru.catkeys sv.catkeys
-	uk.catkeys eo.catkeys
+	de.catkeys eo.catkeys fi.catkeys fr.catkeys hu.catkeys lt.catkeys ru.catkeys sv.catkeys
+	uk.catkeys
 	;
 
