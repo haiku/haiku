@@ -101,7 +101,7 @@ TermParse::StartThreads(TerminalBuffer *buffer)
 
 	status = _InitTermParse();
 	if (status < B_OK) {
-		StopPtyReader();
+		_StopPtyReader();
 		fBuffer = NULL;
 		return status;
 	}
