@@ -57,25 +57,62 @@ All rights reserved.
 #include "Tracker.h"
 #include "TemplatesMenu.h"
 
-#if OPEN_TRACKER
-#include "DeviceMap.h"
-#else
-#include <private/storage/DeviceMap.h>
-#endif
 
 const char *kShelfPath = "tracker_shelf";
 	// replicant support
 
 
+static void
+WatchAddOnDir(directory_which dirName, BDeskWindow *window)
+{
+	BPath path;
+	if (find_directory(dirName, &path) == B_OK) {
+		path.Append("Tracker");
+		BNode node(path.Path());
+		node_ref nodeRef;
+		node.GetNodeRef(&nodeRef);
+		TTracker::WatchNode(&nodeRef, B_WATCH_DIRECTORY, window);
+	}
+}
+
+
+struct AddOneShortcutParams {
+	BDeskWindow *window;
+	std::set<uint32> *currentAddonShortcuts;
+};
+
+static bool
+AddOneShortcut(const Model *model, const char *, uint32 shortcut, bool /*primary*/, void *context)
+{
+	if (!shortcut)
+		// no shortcut, bail
+		return false;
+
+	AddOneShortcutParams *params = (AddOneShortcutParams *)context;
+	BMessage *runAddon = new BMessage(kLoadAddOn);
+	runAddon->AddRef("refs", model->EntryRef());
+
+	params->window->AddShortcut(shortcut, B_OPTION_KEY | B_COMMAND_KEY,
+		runAddon);
+	params->currentAddonShortcuts->insert(shortcut);
+	PRINT(("adding new shortcut %c\n", (char)shortcut));
+
+	return false;
+}
+
+
+// #pragma mark -
+
+
 BDeskWindow::BDeskWindow(LockingList<BWindow> *windowList)
-	:	BContainerWindow(windowList, 0,
-			kPrivateDesktopWindowLook, kPrivateDesktopWindowFeel,
-			B_NOT_MOVABLE | B_WILL_ACCEPT_FIRST_CLICK |
-			B_NOT_CLOSABLE | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS,
-			B_ALL_WORKSPACES),
-		fDeskShelf(0),
-		fTrashContextMenu(0),
-		fShouldUpdateAddonShortcuts(true)
+	:
+	BContainerWindow(windowList, 0, kPrivateDesktopWindowLook,
+		kPrivateDesktopWindowFeel, B_NOT_MOVABLE | B_WILL_ACCEPT_FIRST_CLICK
+			| B_NOT_ZOOMABLE | B_NOT_CLOSABLE | B_NOT_MINIMIZABLE
+			| B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES),
+	fDeskShelf(0),
+	fTrashContextMenu(0),
+	fShouldUpdateAddonShortcuts(true)
 {
 	// Add icon view switching shortcuts. These are displayed in the context
 	// menu, although they obviously don't work from those menu items.
@@ -104,20 +141,6 @@ BDeskWindow::~BDeskWindow()
 		// prevent double-saving, this would slow down quitting
 	PoseView()->StopSettingsWatch();
 	stop_watching(this);
-}
-
-
-static void
-WatchAddOnDir(directory_which dirName, BDeskWindow *window)
-{
-	BPath path;
-	if (find_directory(dirName, &path) == B_OK) {
-		path.Append("Tracker");
-		BNode node(path.Path());
-		node_ref nodeRef;
-		node.GetNodeRef(&nodeRef);
-		TTracker::WatchNode(&nodeRef, B_WATCH_DIRECTORY, window);
-	}
 }
 
 
@@ -154,31 +177,6 @@ BDeskWindow::Init(const BMessage *)
 	WatchAddOnDir(B_COMMON_ADDONS_DIRECTORY, this);
 	
 	_inherited::Init();
-}
-
-
-struct AddOneShortcutParams {
-	BDeskWindow *window;
-	std::set<uint32> *currentAddonShortcuts;
-};
-
-static bool
-AddOneShortcut(const Model *model, const char *, uint32 shortcut, bool /*primary*/, void *context)
-{
-	if (!shortcut)
-		// no shortcut, bail
-		return false;
-
-	AddOneShortcutParams *params = (AddOneShortcutParams *)context;
-	BMessage *runAddon = new BMessage(kLoadAddOn);
-	runAddon->AddRef("refs", model->EntryRef());
-
-	params->window->AddShortcut(shortcut, B_OPTION_KEY | B_COMMAND_KEY,
-		runAddon);
-	params->currentAddonShortcuts->insert(shortcut);
-	PRINT(("adding new shortcut %c\n", (char)shortcut));
-
-	return false;
 }
 
 
