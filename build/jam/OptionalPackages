@@ -13,7 +13,8 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 
 # Available Optional Packages:
 #	APR						- support libraries used for example by Subversion
-#	APR-util
+#	APR-util				- Apache portable runtime utility library
+#	BasicCommandLineTools	- basic commandline tools
 #	Beam					- powerful native e-mail client
 #	BeBook					- the classic BeOS API documentation
 #	BeHappy					- special documentation (i.e. BeBook) browser
@@ -91,6 +92,17 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 			: true
 		;
 	}
+}
+
+
+# BasicCommandLineTools
+if [ IsOptionalHaikuImagePackageAdded BasicCommandLineTools ]
+		&& $(TARGET_ARCH) = x86 {
+	# sed
+	InstallOptionalHaikuImagePackage sed-4.2.1-r1a1-x86-gcc2-2009-08-30
+		: $(baseURL)/sed-4.2.1-r1a1-x86-gcc2-2009-08-30.zip
+		:
+		: true ;
 }
 
 
@@ -348,8 +360,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	# other commonly used tools
 	InstallOptionalHaikuImagePackage bison-2.4.1-r1a1-x86-gcc2-2009-08-31
 		: $(baseURL)/bison-2.4.1-r1a1-x86-gcc2-2009-08-31.zip ;
-	InstallOptionalHaikuImagePackage sed-4.2.1-r1a1-x86-gcc2-2009-08-30
-		: $(baseURL)/sed-4.2.1-r1a1-x86-gcc2-2009-08-30.zip ;
 	InstallOptionalHaikuImagePackage m4-1.4.13-r1a1-x86-gcc2-2009-08-28
 		: $(baseURL)/m4-1.4.13-r1a1-x86-gcc2-2009-08-28.zip ;
 	InstallOptionalHaikuImagePackage flex-2.5.35-r1a1-x86-gcc2-2009-08-31
