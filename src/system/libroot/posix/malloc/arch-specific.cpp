@@ -58,6 +58,9 @@ static const size_t kInitialHeapSize = 64 * B_PAGE_SIZE;
 static const size_t kHeapIncrement = 16 * B_PAGE_SIZE;
 	// the steps in which to increase the heap size (must be a power of 2)
 
+static const addr_t kHeapReservationBase = 0x18000000;
+static const addr_t kHeapReservationSize = 0x48000000;
+
 static area_id sHeapArea;
 static hoardLockType sHeapLock;
 static void *sHeapBase;
@@ -70,7 +73,7 @@ static void
 init_after_fork(void)
 {
 	// find the heap area
-	sHeapArea = area_for(sHeapBase);
+	sHeapArea = area_for((void*)sFreeHeapBase);
 	if (sHeapArea < 0) {
 		// Where is it gone?
 		debug_printf("hoard: init_after_fork(): thread %ld, Heap area not "
@@ -88,9 +91,11 @@ __init_heap(void)
 	// This will locate the heap base at 384 MB and reserve the next 1152 MB
 	// for it. They may get reclaimed by other areas, though, but the maximum
 	// size of the heap is guaranteed until the space is really needed.
-	sHeapBase = (void *)0x18000000;
+	sHeapBase = (void *)kHeapReservationBase;
 	status_t status = _kern_reserve_address_range((addr_t *)&sHeapBase,
-		B_EXACT_ADDRESS, 0x48000000);
+		B_EXACT_ADDRESS, kHeapReservationSize);
+	if (status != B_OK)
+		sHeapBase = NULL;
 
 	sHeapArea = create_area("heap", (void **)&sHeapBase,
 		status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS,
@@ -214,15 +219,62 @@ hoardSbrk(long size)
 	SERIAL_PRINT(("HEAP-%ld: need to resize heap area to %ld (%ld requested)\n",
 		find_thread(NULL), incrementAlignedSize, size));
 
-	if (resize_area(sHeapArea, incrementAlignedSize) < B_OK) {
-		// out of memory - TODO: as a fall back, we could try to allocate
-		// another area
+	status_t status = resize_area(sHeapArea, incrementAlignedSize);
+	if (status != B_OK) {
+		// Either the system is out of memory or another area is in the way and
+		// prevents ours from being resized. As a special case of the latter
+		// the user might have mmap()ed something over malloc()ed memory. This
+		// splits the heap area in two, the first one retaining the original
+		// area ID. In either case, if there's still memory, it is a good idea
+		// to try and allocate a new area.
 		sFreeHeapSize = oldHeapSize;
-		hoardUnlock(sHeapLock);
-		return NULL;
-	}
 
-	sHeapAreaSize = incrementAlignedSize;
+		if (status == B_NO_MEMORY) {
+			hoardUnlock(sHeapLock);
+			return NULL;
+		}
+
+		size_t newHeapSize = (size + kHeapIncrement - 1) / kHeapIncrement
+			* kHeapIncrement;
+
+		// First try at the location directly after the current heap area, if
+		// that is still in the reserved memory region.
+		void* base = (void*)(sFreeHeapBase + sHeapAreaSize);
+		area_id area = -1;
+		if (sHeapBase != NULL
+			&& base >= sHeapBase
+			&& (addr_t)base + newHeapSize
+				<= (addr_t)sHeapBase + kHeapReservationSize) {
+			area = create_area("heap", &base, B_EXACT_ADDRESS, newHeapSize,
+				B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+
+			if (area == B_NO_MEMORY) {
+				hoardUnlock(sHeapLock);
+				return NULL;
+			}
+		}
+
+		// If we don't have an area yet, try again with a free location
+		// allocation.
+		if (area < 0) {
+			base = (void*)(sFreeHeapBase + sHeapAreaSize);
+			area = create_area("heap", &base, B_BASE_ADDRESS, newHeapSize,
+				B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		}
+
+		if (area < 0) {
+			hoardUnlock(sHeapLock);
+			return NULL;
+		}
+
+		// We have a new area, so make it the new heap area.
+		sHeapArea = area;
+		sFreeHeapBase = (addr_t)base;
+		sHeapAreaSize = newHeapSize;
+		sFreeHeapSize = size;
+		oldHeapSize = 0;
+	} else
+		sHeapAreaSize = incrementAlignedSize;
 
 	hoardUnlock(sHeapLock);
 	return (void *)(sFreeHeapBase + oldHeapSize);
