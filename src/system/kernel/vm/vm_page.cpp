@@ -1470,8 +1470,14 @@ steal_pages(vm_page **pages, size_t count)
 
 		// we need to wait for pages to become inactive
 
-		ConditionVariableEntry freeConditionEntry;
 		sPageDeficit++;
+		if (sUnreservedFreePages >= 0) {
+			// There are enough pages available now. No need to wait after all.
+			sPageDeficit--;
+			return stolen;
+		}
+
+		ConditionVariableEntry freeConditionEntry;
 		freeConditionEntry.Add(&sFreePageQueue);
 		locker.Unlock();
 
