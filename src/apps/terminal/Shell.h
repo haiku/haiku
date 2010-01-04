@@ -29,12 +29,12 @@ public:
 	
 	const char *	TTYName() const;
 
-	ssize_t		Read(void *buffer, size_t numBytes);
+	ssize_t		Read(void *buffer, size_t numBytes) const;
 	ssize_t		Write(const void *buffer, size_t numBytes);
 
 	status_t	UpdateWindowSize(int row, int columns);
 
-	status_t	GetAttr(struct termios &attr);
+	status_t	GetAttr(struct termios &attr) const;
 	status_t	SetAttr(struct termios &attr);
 
 	int			FD() const;

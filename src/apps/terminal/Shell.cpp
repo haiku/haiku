@@ -170,7 +170,7 @@ Shell::TTYName() const
 
 
 ssize_t
-Shell::Read(void *buffer, size_t numBytes)
+Shell::Read(void *buffer, size_t numBytes) const
 {
 	if (fFd < 0)
 		return B_NO_INIT;
@@ -202,7 +202,7 @@ Shell::UpdateWindowSize(int rows, int columns)
 
 
 status_t
-Shell::GetAttr(struct termios &attr)
+Shell::GetAttr(struct termios &attr) const
 {
 	if (tcgetattr(fFd, &attr) < 0)
 		return errno;
@@ -232,6 +232,8 @@ Shell::AttachBuffer(TerminalBuffer *buffer)
 	if (fAttached)
 		return B_ERROR;
 
+	fAttached = true;
+	
 	return fTermParse->StartThreads(buffer);
 }
 
@@ -257,6 +259,60 @@ receive_handshake_message(handshake_t& handshake)
 {
 	thread_id sender;
 	receive_data(&sender, &handshake, sizeof(handshake_t));
+}
+
+
+static void
+initialize_termios(struct termios &tio)
+{
+	/*
+	 * Set Terminal interface.
+	 */
+
+	tio.c_line = 0;
+	tio.c_lflag |= ECHOE; 
+
+	/* input: nl->nl, cr->nl */
+	tio.c_iflag &= ~(INLCR|IGNCR);
+	tio.c_iflag |= ICRNL;
+	tio.c_iflag &= ~ISTRIP;
+
+	/* output: cr->cr, nl in not retrun, no delays, ln->cr/ln */
+	tio.c_oflag &= ~(OCRNL|ONLRET|NLDLY|CRDLY|TABDLY|BSDLY|VTDLY|FFDLY);
+	tio.c_oflag |= ONLCR;
+	tio.c_oflag |= OPOST;
+
+	/* baud rate is 19200 (equal beterm) */
+	tio.c_cflag &= ~(CBAUD);
+	tio.c_cflag |= B19200;
+
+	tio.c_cflag &= ~CSIZE;
+	tio.c_cflag |= CS8;
+	tio.c_cflag |= CREAD;
+
+	tio.c_cflag |= HUPCL;
+	tio.c_iflag &= ~(IGNBRK|BRKINT);
+
+	/*
+	 * enable signals, canonical processing (erase, kill, etc), echo.
+	*/
+	tio.c_lflag |= ISIG|ICANON|ECHO|ECHOE|ECHONL;
+	tio.c_lflag &= ~(ECHOK | IEXTEN);
+
+	/* set control characters. */
+	tio.c_cc[VINTR]  = 'C' & 0x1f;	/* '^C'	*/
+	tio.c_cc[VQUIT]  = CQUIT;		/* '^\'	*/
+	tio.c_cc[VERASE] = 0x7f;		/* '^?'	*/
+	tio.c_cc[VKILL]  = 'U' & 0x1f;	/* '^U'	*/
+	tio.c_cc[VEOF]   = CEOF;		/* '^D' */
+	tio.c_cc[VEOL]   = CEOL;		/* '^@' */
+	tio.c_cc[VMIN]   = 4;
+	tio.c_cc[VTIME]  = 0;
+	tio.c_cc[VEOL2]  = CEOL;		/* '^@' */
+	tio.c_cc[VSWTCH] = CSWTCH;		/* '^@' */
+	tio.c_cc[VSTART] = CSTART;		/* '^S' */
+	tio.c_cc[VSTOP]  = CSTOP;		/* '^Q' */
+	tio.c_cc[VSUSP]  = CSUSP;		/* '^Z' */
 }
 
 
@@ -379,55 +435,8 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		 * TODO: so why are we doing it ?
 		 */
 		tcgetattr(slave, &tio);
-
-		/*
-		 * Set Terminal interface.
-		 */
-
-		tio.c_line = 0;
-		tio.c_lflag |= ECHOE; 
-
-		/* input: nl->nl, cr->nl */
-		tio.c_iflag &= ~(INLCR|IGNCR);
-		tio.c_iflag |= ICRNL;
-		tio.c_iflag &= ~ISTRIP;
-
-		/* output: cr->cr, nl in not retrun, no delays, ln->cr/ln */
-		tio.c_oflag &= ~(OCRNL|ONLRET|NLDLY|CRDLY|TABDLY|BSDLY|VTDLY|FFDLY);
-		tio.c_oflag |= ONLCR;
-		tio.c_oflag |= OPOST;
-
-		/* baud rate is 19200 (equal beterm) */
-		tio.c_cflag &= ~(CBAUD);
-		tio.c_cflag |= B19200;
-
-		tio.c_cflag &= ~CSIZE;
-		tio.c_cflag |= CS8;
-		tio.c_cflag |= CREAD;
-
-		tio.c_cflag |= HUPCL;
-		tio.c_iflag &= ~(IGNBRK|BRKINT);
-
-		/*
-		 * enable signals, canonical processing (erase, kill, etc), echo.
-		*/
-		tio.c_lflag |= ISIG|ICANON|ECHO|ECHOE|ECHONL;
-		tio.c_lflag &= ~(ECHOK | IEXTEN);
-
-		/* set control characters. */
-		tio.c_cc[VINTR]  = 'C' & 0x1f;	/* '^C'	*/
-		tio.c_cc[VQUIT]  = CQUIT;		/* '^\'	*/
-		tio.c_cc[VERASE] = 0x7f;		/* '^?'	*/
-		tio.c_cc[VKILL]  = 'U' & 0x1f;	/* '^U'	*/
-		tio.c_cc[VEOF]   = CEOF;		/* '^D' */
-		tio.c_cc[VEOL]   = CEOL;		/* '^@' */
-		tio.c_cc[VMIN]   = 4;
-		tio.c_cc[VTIME]  = 0;
-		tio.c_cc[VEOL2]  = CEOL;		/* '^@' */
-		tio.c_cc[VSWTCH] = CSWTCH;		/* '^@' */
-		tio.c_cc[VSTART] = CSTART;		/* '^S' */
-		tio.c_cc[VSTOP]  = CSTOP;		/* '^Q' */
-		tio.c_cc[VSUSP]  = CSUSP;		/* '^Z' */
+		
+		initialize_termios(tio);
 
 		/*
 		 * change control tty. 
@@ -468,10 +477,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 			exit(1);
 		}
 
-		struct winsize ws;
-  	
-		ws.ws_row = handshake.row;
-		ws.ws_col = handshake.col;
+		struct winsize ws = { handshake.row, handshake.col };
 
 		ioctl(0, TIOCSWINSZ, &ws);
 
@@ -498,6 +504,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 
 		/*
 		 * Exec failed.
+		 * TODO: This doesn't belong here.
 		 */
 		
 		sleep(1);
