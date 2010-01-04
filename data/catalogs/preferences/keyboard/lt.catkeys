@@ -1,0 +1,14 @@
+1	lithuanian	x-vnd.Haiku-Keyboard	914649575
+Keyboard	KeyboardWindow		Klaviatūra
+Written by Andrew Edward McCall	KeyboardApplication		Sukurta Andrew Edward McCall'o
+Typing test area	KeyboardView		Vieta pabandymui
+Defaults	KeyboardWindow		Įprastai
+Key repeat rate	KeyboardView		Pakartojimo dažnis
+Revert	KeyboardWindow		Grįžti
+Delay until key repeat	KeyboardView		Užlaikymas prieš pakartojant
+OK	KeyboardApplication		Gerai
+Fast	KeyboardView		Greitai
+Slow	KeyboardView		Lėtai
+Something has gone wrong!	KeyboardApplication		Kažkas ne taip!
+Long	KeyboardView		Ilgiau
+Short	KeyboardView		Trumpiau

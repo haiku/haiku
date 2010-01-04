@@ -1,0 +1,17 @@
+1	lithuanian	x-vnd.Haiku-Network	2897060402
+Gateway:	EthernetSettingsView		Sietuvas:
+Netmask:	EthernetSettingsView		Tinklo kaukė:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Taikyti
+DNS #1:	EthernetSettingsView		DNS #1:
+Network	NetworkWindow		Tinklas
+Adapter:	EthernetSettingsView		Tinklo plokštė:
+IP Address:	EthernetSettingsView		IP adresas:
+Revert	EthernetSettingsView		Grįžti
+Sending auto-config message failed: 	EthernetSettingsView		Nusistatymų siuntimas nepavyko: 
+Mode:	EthernetSettingsView		Mode :
+The net_server needs to run for the auto configuration!	EthernetSettingsView		Nusistatymui reikalingas paleistas net_server'is!!
+Auto-configuring failed: 	EthernetSettingsView		Nusistatyti nepavyko: 
+Static	EthernetSettingsView		Statinis
+Ok	EthernetSettingsView		Gerai
