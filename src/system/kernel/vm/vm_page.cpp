@@ -69,7 +69,7 @@ static VMPageQueue sActivePageQueue;
 static vm_page *sPages;
 static addr_t sPhysicalPageOffset;
 static size_t sNumPages;
-static size_t sReservedPages;
+static vint32 sUnreservedFreePages;
 static vint32 sPageDeficit;
 static size_t sModifiedTemporaryPages;
 
@@ -503,7 +503,7 @@ dump_page_stats(int argc, char **argv)
 	kprintf("wired: %lu\nmodified: %lu\nfree: %lu\nclear: %lu\n",
 		counter[PAGE_STATE_WIRED], counter[PAGE_STATE_MODIFIED],
 		counter[PAGE_STATE_FREE], counter[PAGE_STATE_CLEAR]);
-	kprintf("reserved pages: %lu\n", sReservedPages);
+	kprintf("unreserved free pages: %lu\n", sUnreservedFreePages);
 	kprintf("page deficit: %lu\n", sPageDeficit);
 	kprintf("mapped pages: %lu\n", gMappedPagesCount);
 
@@ -522,13 +522,6 @@ dump_page_stats(int argc, char **argv)
 }
 
 
-static inline size_t
-free_page_queue_count(void)
-{
-	return sFreePageQueue.Count() + sClearPageQueue.Count();
-}
-
-
 static status_t
 set_page_state_nolock(vm_page *page, int pageState)
 {
@@ -537,6 +530,8 @@ set_page_state_nolock(vm_page *page, int pageState)
 
 	VMPageQueue *fromQueue = NULL;
 	VMPageQueue *toQueue = NULL;
+
+	int32 freeCountDiff = 0;
 
 	switch (page->state) {
 		case PAGE_STATE_BUSY:
@@ -553,9 +548,11 @@ set_page_state_nolock(vm_page *page, int pageState)
 			break;
 		case PAGE_STATE_FREE:
 			fromQueue = &sFreePageQueue;
+			freeCountDiff = -1;
 			break;
 		case PAGE_STATE_CLEAR:
 			fromQueue = &sClearPageQueue;
+			freeCountDiff = -1;
 			break;
 		default:
 			panic("vm_page_set_state: vm_page %p in invalid state %d\n",
@@ -583,9 +580,11 @@ set_page_state_nolock(vm_page *page, int pageState)
 			break;
 		case PAGE_STATE_FREE:
 			toQueue = &sFreePageQueue;
+			freeCountDiff++;
 			break;
 		case PAGE_STATE_CLEAR:
 			toQueue = &sClearPageQueue;
+			freeCountDiff++;
 			break;
 		default:
 			panic("vm_page_set_state: invalid target state %d\n", pageState);
@@ -619,6 +618,9 @@ set_page_state_nolock(vm_page *page, int pageState)
 
 	page->state = pageState;
 	toQueue->MoveFrom(fromQueue, page);
+
+	if (freeCountDiff != 0)
+		atomic_add(&sUnreservedFreePages, freeCountDiff);
 
 	return B_OK;
 }
@@ -677,38 +679,36 @@ page_scrubber(void *unused)
 		if (sFreePageQueue.Count() == 0)
 			continue;
 
-		MutexLocker locker(sPageLock);
-
 		// Since we temporarily remove pages from the free pages reserve,
 		// we must make sure we don't cause a violation of the page
 		// reservation warranty. The following is usually stricter than
 		// necessary, because we don't have information on how many of the
 		// reserved pages have already been allocated.
-		int32 scrubCount = SCRUB_SIZE;
-		uint32 freeCount = free_page_queue_count();
-		if (freeCount <= sReservedPages)
+		if (!vm_page_try_reserve_pages(SCRUB_SIZE))
 			continue;
-
-		if ((uint32)scrubCount > freeCount - sReservedPages)
-			scrubCount = freeCount - sReservedPages;
 
 		// get some pages from the free queue
+		MutexLocker locker(sPageLock);
+
 		vm_page *page[SCRUB_SIZE];
-		for (int32 i = 0; i < scrubCount; i++) {
+		int32 scrubCount = 0;
+		for (int32 i = 0; i < SCRUB_SIZE; i++) {
 			page[i] = sFreePageQueue.RemoveHead();
-			if (page[i] == NULL) {
-				scrubCount = i;
+			if (page[i] == NULL)
 				break;
-			}
 
 			page[i]->state = PAGE_STATE_BUSY;
+			scrubCount++;
 		}
 
-		if (scrubCount == 0)
+		locker.Unlock();
+
+		if (scrubCount == 0) {
+			vm_page_unreserve_pages(SCRUB_SIZE);
 			continue;
+		}
 
 		T(ScrubbingPages(scrubCount));
-		locker.Unlock();
 
 		// clear them
 		for (int32 i = 0; i < scrubCount; i++)
@@ -721,6 +721,10 @@ page_scrubber(void *unused)
 			page[i]->state = PAGE_STATE_CLEAR;
 			sClearPageQueue.Append(page[i]);
 		}
+
+		locker.Unlock();
+
+		vm_page_unreserve_pages(SCRUB_SIZE);
 
 		T(ScrubbedPages(scrubCount));
 	}
@@ -1442,6 +1446,8 @@ steal_pages(vm_page **pages, size_t count)
 				page->state = PAGE_STATE_FREE;
 				locker.Unlock();
 
+				atomic_add(&sUnreservedFreePages, 1);
+
 				T(StolenPage());
 
 				stolen++;
@@ -1454,7 +1460,7 @@ steal_pages(vm_page **pages, size_t count)
 
 		MutexLocker locker(sPageLock);
 
-		if (count == 0 || sReservedPages <= free_page_queue_count())
+		if (count == 0 || sUnreservedFreePages >= 0)
 			return stolen;
 
 		if (stolen && !tried && sInactivePageQueue.Count() > 0) {
@@ -1486,7 +1492,7 @@ steal_pages(vm_page **pages, size_t count)
 		locker.Lock();
 		sPageDeficit--;
 
-		if (sReservedPages <= free_page_queue_count())
+		if (sUnreservedFreePages >= 0)
 			return stolen;
 	}
 }
@@ -1714,6 +1720,8 @@ vm_page_init(kernel_args *args)
 		sFreePageQueue.Append(&sPages[i]);
 	}
 
+	atomic_add(&sUnreservedFreePages, sNumPages);
+
 	TRACE(("initialized table\n"));
 
 	// mark some of the page ranges inuse
@@ -1835,15 +1843,15 @@ vm_page_unreserve_pages(uint32 count)
 	if (count == 0)
 		return;
 
-	MutexLocker locker(sPageLock);
-	ASSERT(sReservedPages >= count);
-
 	T(UnreservePages(count));
 
-	sReservedPages -= count;
+	atomic_add(&sUnreservedFreePages, count);
 
-	if (sPageDeficit > 0)
-		sFreePageCondition.NotifyAll();
+	if (sPageDeficit > 0) {
+		MutexLocker locker(sPageLock);
+		if (sPageDeficit > 0)
+			sFreePageCondition.NotifyAll();
+	}
 }
 
 
@@ -1859,16 +1867,17 @@ vm_page_reserve_pages(uint32 count)
 	if (count == 0)
 		return;
 
-	MutexLocker locker(sPageLock);
-
 	T(ReservePages(count));
 
-	sReservedPages += count;
-	size_t freePages = free_page_queue_count();
-	if (sReservedPages <= freePages)
+	int32 oldFreePages = atomic_add(&sUnreservedFreePages, -count);
+	if (oldFreePages >= (int32)count)
 		return;
 
-	count = sReservedPages - freePages;
+	MutexLocker locker(sPageLock);
+
+	if (oldFreePages > 0)
+		count -= oldFreePages;
+
 	locker.Unlock();
 
 	steal_pages(NULL, count + 1);
@@ -1883,16 +1892,20 @@ vm_page_try_reserve_pages(uint32 count)
 	if (count == 0)
 		return true;
 
-	MutexLocker locker(sPageLock);
-
 	T(ReservePages(count));
 
-	size_t freePages = free_page_queue_count();
-	if (sReservedPages + count > freePages)
-		return false;
+	while (true) {
+		int32 freePages = sUnreservedFreePages;
+		if (freePages < (int32)count)
+			return false;
 
-	sReservedPages += count;
-	return true;
+		if (atomic_test_and_set(&sUnreservedFreePages, freePages - count,
+				freePages) == freePages) {
+			return true;
+		}
+
+		// the count changed in the meantime -- retry
+	}
 }
 
 
@@ -1914,6 +1927,8 @@ vm_page_allocate_page(int pageState)
 		default:
 			return NULL; // invalid
 	}
+
+	atomic_add(&sUnreservedFreePages, -1);
 
 	MutexLocker locker(sPageLock);
 
@@ -1959,13 +1974,12 @@ vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 	vm_page *firstPage = NULL;
 	uint32 start = base >> PAGE_SHIFT;
 
-	MutexLocker locker(sPageLock);
-
-	if (free_page_queue_count() - sReservedPages < length) {
+	if (!vm_page_try_reserve_pages(length))
+		return NULL;
 		// TODO: add more tries, ie. free some inactive, ...
 		// no free space
-		return NULL;
-	}
+
+	MutexLocker locker(sPageLock);
 
 	for (;;) {
 		bool foundRun = true;
@@ -2001,6 +2015,8 @@ vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 
 	locker.Unlock();
 
+	vm_page_unreserve_pages(length);
+
 	if (firstPage != NULL && pageState == PAGE_STATE_CLEAR) {
 		for (uint32 i = 0; i < length; i++) {
 			if (!sPages[start + i].is_cleared)
@@ -2015,14 +2031,6 @@ vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 vm_page *
 vm_page_allocate_page_run_no_base(int pageState, addr_t count)
 {
-	MutexLocker locker(sPageLock);
-
-	if (free_page_queue_count() - sReservedPages < count) {
-		// TODO: add more tries, ie. free some inactive, ...
-		// no free space
-		return NULL;
-	}
-
 	VMPageQueue *queue;
 	VMPageQueue *otherQueue;
 	switch (pageState) {
@@ -2037,6 +2045,13 @@ vm_page_allocate_page_run_no_base(int pageState, addr_t count)
 		default:
 			return NULL; // invalid
 	}
+
+	if (!vm_page_try_reserve_pages(count))
+		return NULL;
+		// TODO: add more tries, ie. free some inactive, ...
+		// no free space
+
+	MutexLocker locker(sPageLock);
 
 	vm_page *firstPage = NULL;
 	for (uint32 twice = 0; twice < 2; twice++) {
@@ -2056,6 +2071,8 @@ vm_page_allocate_page_run_no_base(int pageState, addr_t count)
 			}
 
 			if (foundRun) {
+				atomic_add(&sUnreservedFreePages, -count);
+
 				// pull the pages out of the appropriate queues
 				current = page;
 				for (uint32 i = 0; i < count; i++, current++) {
@@ -2078,6 +2095,8 @@ vm_page_allocate_page_run_no_base(int pageState, addr_t count)
 	T(AllocatePageRun(count));
 
 	locker.Unlock();
+
+	vm_page_unreserve_pages(count);
 
 	if (firstPage != NULL && pageState == PAGE_STATE_CLEAR) {
 		vm_page *current = firstPage;
@@ -2206,24 +2225,16 @@ vm_page_num_available_pages(void)
 size_t
 vm_page_num_free_pages(void)
 {
-	size_t reservedPages = sReservedPages;
-	size_t count = free_page_queue_count() + sInactivePageQueue.Count();
-	if (reservedPages >= count)
-		return 0;
-
-	return count - reservedPages;
+	int32 count = sUnreservedFreePages + sInactivePageQueue.Count();
+	return count > 0 ? count : 0;
 }
 
 
 size_t
 vm_page_num_unused_pages(void)
 {
-	size_t reservedPages = sReservedPages;
-	size_t count = free_page_queue_count();
-	if (reservedPages >= count)
-		return 0;
-
-	return count - reservedPages;
+	int32 count = sUnreservedFreePages;
+	return count > 0 ? count : 0;
 }
 
 
@@ -2234,9 +2245,9 @@ vm_page_get_stats(system_info *info)
 	// of the reserved pages have already been allocated, but good citizens
 	// unreserve chunk-wise as they are allocating the pages, if they have
 	// reserved a larger quantity.
-	page_num_t reserved = sReservedPages;
-	page_num_t free = free_page_queue_count();
-	free = free > reserved ? free - reserved : 0;
+	int32 free = sUnreservedFreePages;
+	if (free < 0)
+		free = 0;
 
 	// The pages used for the block cache buffers. Those should not be counted
 	// as used but as cached pages.
@@ -2246,7 +2257,7 @@ vm_page_get_stats(system_info *info)
 
 	info->max_pages = sNumPages;
 	info->used_pages = gMappedPagesCount - blockCachePages;
-	info->cached_pages = sNumPages >= free + info->used_pages
+	info->cached_pages = sNumPages >= (uint32)free + info->used_pages
 		? sNumPages - free - info->used_pages : 0;
 	info->page_faults = vm_num_page_faults();
 
