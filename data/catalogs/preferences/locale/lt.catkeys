@@ -5,6 +5,7 @@ Day of week (name)	TimeFormatSettings		savaitės diena (pavadinimas)
 Separator:	TimeFormatSettings		Skirtukas:
 Year (4 digits)	TimeFormatSettings		Metai (4 skaitmenys)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Neprieinamos kalbos! Nepavyks šituo pasinaudoti!
+Thousand separator: 	TimeFormatSettings		Thousand separator: 
 After	TimeFormatSettings		Po
 Month name	TimeFormatSettings		mėnesio pavadinimas
 Long format:	TimeFormatSettings		Pilnai:
@@ -27,18 +28,18 @@ Numbers	TimeFormatSettings		Skaičiai
  (unknown format)	TimeFormatSettings		 (nežinomas)
 Negative marker:	TimeFormatSettings		Neigiamumo žymuo:
 Day in month	TimeFormatSettings		diena mėnesyje
+OK	Locale Preflet Window		Gerai
 Defaults	Locale Preflet Window		Įprastai
 Separator	TimeFormatSettings		Skirtukas
 Country	Locale Preflet Window		Šalis
 Month number (2 digits)	TimeFormatSettings		mėnesio skaičius (2 skaitmenys)
 Revert	Locale Preflet Window		Grįžti
 Negative marker	TimeFormatSettings		Neigiamumo žymuo
-OK	Locale Preflet Window		Gerai
 Day of week	TimeFormatSettings		savaitės diena
 List separator: 	TimeFormatSettings		Sąrašo skirtukas
+12 hour	TimeFormatSettings		12 valandų
 Time	TimeFormatSettings		Laikas
 Date	TimeFormatSettings		Data
-12 hour	TimeFormatSettings		12 valandų
 Locale	Locale Preflet		Kalba
 None	TimeFormatSettings		Jokio
 Clock	TimeFormatSettings		Laikrodis
