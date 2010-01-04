@@ -48,7 +48,7 @@
 #include <StringView.h>
 #include <Window.h>
 
-#include "CodeConv.h"
+#include "Encoding.h"
 #include "InlineInput.h"
 #include "Shell.h"
 #include "TermConst.h"
@@ -343,15 +343,15 @@ TermView::_InitObject(int32 argc, const char** argv)
 
 	SetTermFont(be_fixed_font);
 	
-	status_t status = fShell->Open(fRows, fColumns,
+	error = fShell->Open(fRows, fColumns,
 		EncodingAsShortString(fEncoding), argc, argv);
 
-	if (status < B_OK)
-		return status;
+	if (error < B_OK)
+		return error;
 
-	status = _AttachShell(fShell);
-	if (status < B_OK)
-		return status;
+	error = _AttachShell(fShell);
+	if (error < B_OK)
+		return error;
 
 	SetLowColor(fTextBackColor);
 	SetViewColor(B_TRANSPARENT_32_BIT);
@@ -1243,10 +1243,12 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	if (numBytes > 1) {
 		if (fEncoding != M_UTF8) {
 			char destBuffer[16];
-			int cnum = CodeConv::ConvertFromInternal(bytes, numBytes,
-				(char *)destBuffer, fEncoding);
+			int32 destLen;
+			long state = 0;
+			convert_from_utf8(fEncoding, bytes, &numBytes, destBuffer,
+				&destLen, &state, '?');
 			_ScrollTo(0, true);
-			fShell->Write(destBuffer, cnum);
+			fShell->Write(destBuffer, destLen);
 			return;
 		}
 

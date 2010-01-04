@@ -152,6 +152,8 @@ enum{
   SCRDOWN
 };
 
+#define M_UTF8 -1
+
 #define TAB_WIDTH 8
 
 #define MIN_COLS 10

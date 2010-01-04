@@ -35,7 +35,6 @@
 #include <SupportDefs.h>
 #include <UTF8.h>
 
-#define M_UTF8 (-1)
 
 status_t	get_next_encoding(int i, int *id);
 

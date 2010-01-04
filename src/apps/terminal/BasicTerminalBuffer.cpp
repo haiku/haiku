@@ -13,7 +13,6 @@
 
 #include <String.h>
 
-#include "CodeConv.h"
 #include "TermConst.h"
 #include "TerminalCharClassifier.h"
 #include "TerminalLine.h"
@@ -550,8 +549,6 @@ BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width, uint32 attributes)
 {
 //debug_printf("BasicTerminalBuffer::InsertChar('%.*s' (%d), %#lx)\n",
 //(int)c.ByteCount(), c.bytes, c.bytes[0], attributes);
-	// TODO: Check if this method can be removed completely
-	//int width = CodeConv::UTF8GetFontWidth(c.bytes);
 	if ((int32)width == FULL_WIDTH)
 		attributes |= A_WIDTH;
 
@@ -589,8 +586,6 @@ BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width, uint32 attributes)
 void
 BasicTerminalBuffer::FillScreen(UTF8Char c, uint32 width, uint32 attributes)
 {
-	// TODO: Check if this method can be removed completely
-	//int width = CodeConv::UTF8GetFontWidth(c.bytes);
 	if ((int32)width == FULL_WIDTH)
 		attributes |= A_WIDTH;
 

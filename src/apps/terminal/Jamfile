@@ -8,7 +8,6 @@ Application Terminal :
 	AppearPrefView.cpp
 	Arguments.cpp
 	BasicTerminalBuffer.cpp
-	CodeConv.cpp
 	Encoding.cpp
 	FindWindow.cpp
 	Globals.cpp
@@ -25,7 +24,6 @@ Application Terminal :
 	TermScrollView.cpp
 	TermView.cpp
 	TermWindow.cpp
-	UTF8WidthTbl.c
 	VTKeyTbl.c
 	VTPrsTbl.c
 	: be tracker textencoding $(TARGET_LIBSUPC++)

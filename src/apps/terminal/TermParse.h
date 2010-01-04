@@ -56,14 +56,14 @@ public:
 	status_t StopThreads();
   
 private:
-	inline status_t _NextParseChar(uchar &c);
+	inline uchar _NextParseChar();
 
 	// Initialize TermParse and PtyReader thread.
-	status_t InitTermParse();
-	status_t InitPtyReader();
+	status_t _InitTermParse();
+	status_t _InitPtyReader();
 
-	void StopTermParse();
-	void StopPtyReader();
+	void _StopTermParse();
+	void _StopPtyReader();
 
 	int32 EscParse();
 	int32 PtyReader();

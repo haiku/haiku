@@ -4,6 +4,7 @@
  */
 
 #include "Encoding.h"
+#include "TermConst.h"
 
 #include <string.h>
 

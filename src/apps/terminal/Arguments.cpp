@@ -19,7 +19,7 @@ Arguments::Arguments()
 	  fShellArguments(NULL),
 	  fTitle(NULL)
 {
-	const char *argv[] = { "/bin/sh", "--login" };
+	const char *argv[] = { "/bin/bash", "--login" };
 
 	_SetShellArguments(2, argv);
 }
