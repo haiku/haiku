@@ -66,8 +66,11 @@ options:
   -j<n>                       Only relevant for --build-cross-tools and
                               --build-cross-tools-gcc4. Is passed on to the
                               make building the build tools.
-  --target=TARGET             Select build target platform. [default=${target}]
+  --target=TARGET             Select build target platform. 
+                              [default=${TARGET_PLATFORM}]
                               valid targets=r5,bone,dano,haiku
+  --update                    re-runs last configure invocation [must be given 
+                              as first option!]
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
                               process, but uses more memory.
   --use-32bit                 Use -m32 flag on 64bit host gcc compiler.
@@ -141,8 +144,8 @@ standard_gcc_settings()
 	gcclib=`$HAIKU_CC -print-libgcc-file-name`
 	gccdir=`dirname ${gcclib}`
 
-	haikuGCCVersion=`$HAIKU_CC -dumpversion`
-	haikuGCCMachine=`$HAIKU_CC -dumpmachine`
+	HAIKU_GCC_RAW_VERSION=`$HAIKU_CC -dumpversion`
+	HAIKU_GCC_MACHINE=`$HAIKU_CC -dumpmachine`
 
 	HAIKU_GCC_LIB_DIR=${gccdir}
 	HAIKU_GCC_LIBGCC=${gccdir}/libgcc.a
@@ -153,27 +156,27 @@ standard_gcc_settings()
 		# Note: We filter out eabi.o. It's present in gcc's libgcc for PPC and
 		# neither needed nor wanted.
 
-	case $haikuGCCVersion in
+	case $HAIKU_GCC_RAW_VERSION in
 		4.*)
 			# for gcc 4 we use the libstdc++ and libsupc++ that come with the
 			# compiler
-			haikuStaticLibStdCxx=`$HAIKU_CC -print-file-name=libstdc++.a`
-			haikuSharedLibStdCxx=`$HAIKU_CC -print-file-name=libstdc++.so`
-			haikuStaticLibSupCxx=`$HAIKU_CC -print-file-name=libsupc++.a`
-			haikuSharedLibSupCxx=`$HAIKU_CC -print-file-name=libsupc++.so`
+			HAIKU_STATIC_LIBSTDCXX=`$HAIKU_CC -print-file-name=libstdc++.a`
+			HAIKU_SHARED_LIBSTDCXX=`$HAIKU_CC -print-file-name=libstdc++.so`
+			HAIKU_STATIC_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++.a`
+			HAIKU_SHARED_LIBSUPCXX=`$HAIKU_CC -print-file-name=libsupc++.so`
 
 			local headers
-			if [ -d $gccdir/../../../../$haikuGCCMachine/include/c++/$haikuGCCVersion ]; then
-				headers=$gccdir/../../../../$haikuGCCMachine/include/c++/$haikuGCCVersion
+			if [ -d $gccdir/../../../../$HAIKU_GCC_MACHINE/include/c++/$HAIKU_GCC_RAW_VERSION ]; then
+				headers=$gccdir/../../../../$HAIKU_GCC_MACHINE/include/c++/$HAIKU_GCC_RAW_VERSION
 			else
-				headers=$gccdir/../../../../include/c++/$haikuGCCVersion
+				headers=$gccdir/../../../../include/c++/$HAIKU_GCC_RAW_VERSION
 			fi
 
-			haikuCxxHeadersDir=$headers
-			for d in $haikuGCCMachine backward ext; do
+			HAIKU_CXX_HEADERS_DIR=$headers
+			for d in $HAIKU_GCC_MACHINE backward ext; do
 				# Note: We need the line break, otherwise the line might become
 				# too long for jam (512 bytes max).
-				haikuCxxHeadersDir="$haikuCxxHeadersDir
+				HAIKU_CXX_HEADERS_DIR="$HAIKU_CXX_HEADERS_DIR
 					$headers/$d"
 			done
 
@@ -181,28 +184,28 @@ standard_gcc_settings()
 			# when not building the crosscompiler, to use cpp headers from
 			# tree first, but fallback to local C++ system headers (like <new>)
 			# if [ "$buildCrossTools" = "" ]; then
-			#	haikuCxxHeadersDir="headers/cpp $haikuCxxHeadersDir"
+			#	HAIKU_CXX_HEADERS_DIR="headers/cpp $HAIKU_CXX_HEADERS_DIR"
 			# fi
 
-			if [ $haikuStaticLibStdCxx = libstdc++.a ]; then
-				haikuStaticLibStdCxx=
+			if [ $HAIKU_STATIC_LIBSTDCXX = libstdc++.a ]; then
+				HAIKU_STATIC_LIBSTDCXX=
 			fi
 			# we build libstdc++.so ourselves, so we can leave it as is
-			# if [ $haikuSharedLibStdCxx = libstdc++.so ]; then
-			#	haikuSharedLibStdCxx=
+			# if [ $HAIKU_SHARED_LIBSTDCXX = libstdc++.so ]; then
+			#	HAIKU_SHARED_LIBSTDCXX=
 			# fi
-			if [ $haikuStaticLibSupCxx = libsupc++.a ]; then
-				haikuStaticLibSupCxx=
+			if [ $HAIKU_STATIC_LIBSUPCXX = libsupc++.a ]; then
+				HAIKU_STATIC_LIBSUPCXX=
 			fi
 			# we build libsupc++.so ourselves, so we can leave it as is
-			# if [ $haikuSharedLibSupCxx = libsupc++.so ]; then
-			# 	haikuSharedLibSupCxx=
+			# if [ $HAIKU_SHARED_LIBSUPCXX = libsupc++.so ]; then
+			# 	HAIKU_SHARED_LIBSUPCXX=
 			# fi
 		;;
 		2.9*)
 			# check for correct (most up-to-date) legacy compiler and complain
 			# if an older one is installed
-			if [ $haikuGCCVersion != $haikuRequiredLegacyGCCVersion ]; then
+			if [ $HAIKU_GCC_RAW_VERSION != $haikuRequiredLegacyGCCVersion ]; then
 				echo "GCC version $haikuRequiredLegacyGCCVersion is required!";
 				echo "Please download it from www.haiku-os.org...";
 				exit 1;
@@ -255,38 +258,41 @@ cd "$currentDir"
 # backup the passed arguments
 configureArgs="$@"
 
-# default parameter values
+# internal default parameter values
 #
 platform=`uname`
 platformMachine=`uname  -m`
-haikuGCCVersion=
-haikuGCCMachine=i586-pc-haiku
-haikuStaticLibStdCxx=
-haikuSharedLibStdCxx=
-haikuStaticLibSupCxx=
-haikuSharedLibSupCxx=
-haikuCxxHeadersDir=
-hostGCCVersion=`gcc -dumpversion`
-hostGCCMachine=`gcc -dumpmachine`
-hostGCCLD=`gcc -print-prog-name=ld`
-hostGCCObjcopy=`gcc -print-prog-name=objcopy`
-includeGPLAddOns=0
-includePatentedCode=0
-include3rdParty=0
-enableMultiuser=0
-distroCompatibility=default
-target=haiku
 targetArch=x86
-useGCCPipe=0
-use32bit=0
-useXattr=0
 crossToolsPrefix=
 buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
 buildCrossToolsMachine=
 buildCrossToolsJobs=
-alternativeGCCOutputDir=
-addAlternativeGCCLibs=
+
+# exported (BuildSetup) default parameter values
+#
+HAIKU_GCC_RAW_VERSION=
+HAIKU_GCC_MACHINE=i586-pc-haiku
+HAIKU_STATIC_LIBSTDCXX=
+HAIKU_SHARED_LIBSTDCXX=
+HAIKU_STATIC_LIBSUPCXX=
+HAIKU_SHARED_LIBSUPCXX=
+HAIKU_CXX_HEADERS_DIR=
+HOST_GCC_RAW_VERSION=`gcc -dumpversion`
+HOST_GCC_MACHINE=`gcc -dumpmachine`
+HAIKU_INCLUDE_GPL_ADDONS=0
+HAIKU_INCLUDE_PATENTED_CODE=0
+HAIKU_INCLUDE_3RDPARTY=0
+HAIKU_ENABLE_MULTIUSER=0
+HAIKU_DISTRO_COMPATIBILITY=default
+TARGET_PLATFORM=haiku
+HAIKU_USE_GCC_PIPE=0
+HAIKU_USE_32BIT=0
+HAIKU_USE_XATTR=0
+HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR=
+HAIKU_ADD_ALTERNATIVE_GCC_LIBS=
+HOST_GCC_LD=`gcc -print-prog-name=ld`
+HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 
 haikuRequiredLegacyGCCVersion="2.95.3-haiku-090629"
 export haikuRequiredLegacyGCCVersion
@@ -305,6 +311,35 @@ set_default_value HAIKU_LDFLAGS		""
 set_default_value HAIKU_ARFLAGS		cru
 set_default_value HAIKU_UNARFLAGS	x
 
+# determine output directory
+if [ "$currentDir" = "$sourceDir" ]; then
+	outputDir=$currentDir/generated
+else
+	outputDir=$currentDir
+fi
+buildOutputDir="$outputDir/build"
+HAIKU_BUILD_ATTRIBUTES_DIR="$outputDir/attributes"
+buildConfigFile="$buildOutputDir/BuildConfig"
+
+# check for update request
+if [ "$1" = "--update" ]; then
+	if ! [ -e "$buildConfigFile" ]; then
+		echo $0 --update: \'$buildConfigFile\' not found - updating not possible.
+		exit 1
+	fi
+	if ! type perl >/dev/null 2>&1; then
+		echo $0 --update: \'perl\' not found - updating not possible.
+		exit 1
+	fi
+	# convert BuildConfig from jam format to shell format and evaluate it
+	shellConfigFile="${buildConfigFile}.shell"
+	perl "$sourceDir/build/scripts/convert_build_config_to_shell_format.pl" \
+		<"$buildConfigFile" >"$shellConfigFile"
+	. "$shellConfigFile"
+	rm "$shellConfigFile"
+	shift
+fi
+
 # parse parameters
 #
 while [ $# -gt 0 ] ; do
@@ -312,8 +347,8 @@ while [ $# -gt 0 ] ; do
 		--alternative-gcc-output-dir)
 			assertparam "$1" $#
 			cd $2 || exit 1
-			alternativeGCCOutputDir=`pwd`
-			addAlternativeGCCLibs=1
+			HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR=`pwd`
+			HAIKU_ADD_ALTERNATIVE_GCC_LIBS=1
 			cd $currentDir
 			shift 2
 			;;
@@ -323,15 +358,15 @@ while [ $# -gt 0 ] ; do
 			buildCrossTools=$3
 			buildCrossToolsScript="${buildCrossToolsScript}_gcc4"
 			case "$2" in
-				x86)	haikuGCCMachine=i586-pc-haiku;;
-				ppc)	haikuGCCMachine=powerpc-apple-haiku; targetArch=ppc;;
-				m68k)	haikuGCCMachine=m68k-unknown-haiku; targetArch=m86k;;
-				arm)	haikuGCCMachine=arm-unknown-haiku; targetArch=arm;;
-				mipsel)	haikuGCCMachine=mipsel-unknown-haiku; targetArch=mips;;
+				x86)	HAIKU_GCC_MACHINE=i586-pc-haiku;;
+				ppc)	HAIKU_GCC_MACHINE=powerpc-apple-haiku; targetArch=ppc;;
+				m68k)	HAIKU_GCC_MACHINE=m68k-unknown-haiku; targetArch=m86k;;
+				arm)	HAIKU_GCC_MACHINE=arm-unknown-haiku; targetArch=arm;;
+				mipsel)	HAIKU_GCC_MACHINE=mipsel-unknown-haiku; targetArch=mips;;
 				*)		echo "Unsupported target architecture: $2"
 						exit 1;;
 			esac
-			buildCrossToolsMachine=$haikuGCCMachine
+			buildCrossToolsMachine=$HAIKU_GCC_MACHINE
 			shift 3
 			;;
 		--cross-tools-prefix)
@@ -341,27 +376,27 @@ while [ $# -gt 0 ] ; do
 			;;
 		--distro-compatibility)
 			assertparam "$1" $#
-			distroCompatibility=$2
-			case "$distroCompatibility" in
+			HAIKU_DISTRO_COMPATIBILITY=$2
+			case "$HAIKU_DISTRO_COMPATIBILITY" in
 				official)	;;
 				compatible)	;;
 				default)	;;
 				*)			echo "Invalid distro compatibility" \
-								"level: $distroCompatibility"
+								"level: $HAIKU_DISTRO_COMPATIBILITY"
 							exit 1;;
 			esac
 			shift 2
 			;;
-		--enable-multiuser)	enableMultiuser=1; shift 1;;
+		--enable-multiuser)	HAIKU_ENABLE_MULTIUSER=1; shift 1;;
 		--help | -h)	usage; exit 0;;
-		--include-gpl-addons)	includeGPLAddOns=1; shift 1;;
-		--include-patented-code)	includePatentedCode=1; shift 1;;
-		--include-3rdparty)	include3rdParty=1; shift 1;;
+		--include-gpl-addons)	HAIKU_INCLUDE_GPL_ADDONS=1; shift 1;;
+		--include-patented-code)	HAIKU_INCLUDE_PATENTED_CODE=1; shift 1;;
+		--include-3rdparty)	HAIKU_INCLUDE_3RDPARTY=1; shift 1;;
         -j*)				buildCrossToolsJobs="$1"; shift 1;;
-		--target=*)     target=`echo $1 | cut -d'=' -f2-`; shift 1;;
-		--use-gcc-pipe)	useGCCPipe=1; shift 1;;
-		--use-32bit)	use32bit=1; shift 1;;
-		--use-xattr)	useXattr=1; shift 1;;
+		--target=*)     TARGET_PLATFORM=`echo $1 | cut -d'=' -f2-`; shift 1;;
+		--use-gcc-pipe)	HAIKU_USE_GCC_PIPE=1; shift 1;;
+		--use-32bit)	HAIKU_USE_32BIT=1; shift 1;;
+		--use-xattr)	HAIKU_USE_XATTR=1; shift 1;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
 done
@@ -370,25 +405,25 @@ done
 case "${platform}" in
 	BeOS)	revision=`uname -r`
 			case "$revision" in
-				6.*)	buildPlatform=dano ;;
-				5.1)	buildPlatform=dano ;;
-				5.0.4)	buildPlatform=bone ;;
-				5.0*)	buildPlatform=r5 ;;
+				6.*)	HOST_PLATFORM=dano ;;
+				5.1)	HOST_PLATFORM=dano ;;
+				5.0.4)	HOST_PLATFORM=bone ;;
+				5.0*)	HOST_PLATFORM=r5 ;;
 				*)		echo Unknown BeOS version: $revision
 						exit 1 ;;
 			esac
 			;;
-	Darwin)	buildPlatform=darwin ;;
-	FreeBSD)	buildPlatform=freebsd
-				if [ "$use32bit" = 1 ] ; then
+	Darwin)	HOST_PLATFORM=darwin ;;
+	FreeBSD)	HOST_PLATFORM=freebsd
+				if [ "$HAIKU_USE_32BIT" = 1 ] ; then
 					echo Unsupported platform: FreeBSD ${platformMachine}
 					exit 1
 				fi	;;
-	Haiku)	buildPlatform=haiku_host ;;
-	Linux)	buildPlatform=linux ;;
-	OpenBSD) buildPlatform=openbsd ;;
-	SunOS)	buildPlatform=sunos ;;
-	CYGWIN_NT-*) buildPlatform=cygwin ;;
+	Haiku)	HOST_PLATFORM=haiku_host ;;
+	Linux)	HOST_PLATFORM=linux ;;
+	OpenBSD) HOST_PLATFORM=openbsd ;;
+	SunOS)	HOST_PLATFORM=sunos ;;
+	CYGWIN_NT-*) HOST_PLATFORM=cygwin ;;
 	*)		echo Unsupported platform: ${platform}
 			exit 1 ;;
 esac
@@ -417,7 +452,7 @@ if [ $targetArch = "x86" ]; then
 fi
 
 # check for case-sensitive filesystem if on darwin
-if [ $buildPlatform = "darwin" ]; then
+if [ $HOST_PLATFORM = "darwin" ]; then
 	diskutil info $(pwd) | grep -i "case-sensitive" > /dev/null
 	if [ $? != 0 ]; then
 		echo "You need a case-sensitive file-system to build Haiku."
@@ -428,20 +463,13 @@ if [ $buildPlatform = "darwin" ]; then
 fi
 
 # create output directory
-if [ "$currentDir" = "$sourceDir" ]; then
-	outputDir=$currentDir/generated
-else
-	outputDir=$currentDir
-fi
-buildOutputDir="$outputDir/build"
-buildAttributesDir="$outputDir/attributes"
 mkdir -p "$buildOutputDir" || exit 1
 
 # build cross tools from sources
 if [ -n "$buildCrossTools" ]; then
 	"$buildCrossToolsScript" $buildCrossToolsMachine "$sourceDir" \
 		"$buildCrossTools" "$outputDir" $buildCrossToolsJobs || exit 1
-	crossToolsPrefix="$outputDir/cross-tools/bin/${haikuGCCMachine}-"
+	crossToolsPrefix="$outputDir/cross-tools/bin/${HAIKU_GCC_MACHINE}-"
 fi
 
 # cross tools
@@ -457,49 +485,49 @@ fi
 standard_gcc_settings
 
 # check whether the Haiku compiler really targets Haiku or BeOS
-case "$haikuGCCMachine" in
+case "$HAIKU_GCC_MACHINE" in
 	*-*-haiku)	;;
 	*-*-beos)	;;
 	*) echo The compiler specified as Haiku target compiler is not a valid \
 			Haiku cross-compiler. Please see ReadMe.cross-compile. >&2
 	   echo compiler: $HAIKU_CC
-	   echo compiler is configured for target: $haikuGCCMachine
+	   echo compiler is configured for target: $HAIKU_GCC_MACHINE
 	   exit 1 ;;
 esac
 
 # Generate BuildConfig
-cat << EOF > "$buildOutputDir/BuildConfig"
+cat << EOF > "$buildConfigFile"
 # BuildConfig
 # Note: This file has been automatically generated by configure with the following arguments:
 # ${configureArgs}
 
-TARGET_PLATFORM 			?= "${target}" ;
-HOST_PLATFORM				?= "${buildPlatform}" ;
+TARGET_PLATFORM 			?= "${TARGET_PLATFORM}" ;
+HOST_PLATFORM				?= "${HOST_PLATFORM}" ;
 
-HAIKU_INCLUDE_GPL_ADDONS			?= "${includeGPLAddOns}" ;
-HAIKU_INCLUDE_PATENTED_CODE			?= "${includePatentedCode}" ;
-HAIKU_INCLUDE_3RDPARTY				?= "${include3rdParty}" ;
-HAIKU_ENABLE_MULTIUSER				?= "${enableMultiuser}" ;
-HAIKU_DISTRO_COMPATIBILITY			?= "${distroCompatibility}" ;
-HAIKU_USE_GCC_PIPE					?= "${useGCCPipe}" ;
-HAIKU_HOST_USE_32BIT				?= "${use32bit}" ;
-HAIKU_HOST_USE_XATTR				?= "${useXattr}" ;
-HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR	?= ${alternativeGCCOutputDir} ;
-HAIKU_ADD_ALTERNATIVE_GCC_LIBS		?= ${addAlternativeGCCLibs} ;
+HAIKU_INCLUDE_GPL_ADDONS			?= "${HAIKU_INCLUDE_GPL_ADDONS}" ;
+HAIKU_INCLUDE_PATENTED_CODE			?= "${HAIKU_INCLUDE_PATENTED_CODE}" ;
+HAIKU_INCLUDE_3RDPARTY				?= "${HAIKU_INCLUDE_3RDPARTY}" ;
+HAIKU_ENABLE_MULTIUSER				?= "${HAIKU_ENABLE_MULTIUSER}" ;
+HAIKU_DISTRO_COMPATIBILITY			?= "${HAIKU_DISTRO_COMPATIBILITY}" ;
+HAIKU_USE_GCC_PIPE					?= "${HAIKU_USE_GCC_PIPE}" ;
+HAIKU_HOST_USE_32BIT				?= "${HAIKU_USE_32BIT}" ;
+HAIKU_HOST_USE_XATTR				?= "${HAIKU_USE_XATTR}" ;
+HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR	?= ${HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR} ;
+HAIKU_ADD_ALTERNATIVE_GCC_LIBS		?= ${HAIKU_ADD_ALTERNATIVE_GCC_LIBS} ;
 
-HAIKU_GCC_RAW_VERSION		?= ${haikuGCCVersion} ;
-HAIKU_GCC_MACHINE			?= ${haikuGCCMachine} ;
+HAIKU_GCC_RAW_VERSION		?= ${HAIKU_GCC_RAW_VERSION} ;
+HAIKU_GCC_MACHINE			?= ${HAIKU_GCC_MACHINE} ;
 HAIKU_GCC_LIB_DIR			?= ${HAIKU_GCC_LIB_DIR} ;
 HAIKU_GCC_HEADERS_DIR		?= ${HAIKU_GCC_HEADERS_DIR} ;
 HAIKU_GCC_LIBGCC			?= ${HAIKU_GCC_LIBGCC} ;
 
-HAIKU_STATIC_LIBSTDC++		?= ${haikuStaticLibStdCxx} ;
-HAIKU_SHARED_LIBSTDC++		?= ${haikuSharedLibStdCxx} ;
-HAIKU_STATIC_LIBSUPC++		?= ${haikuStaticLibSupCxx} ;
-HAIKU_SHARED_LIBSUPC++		?= ${haikuSharedLibSupCxx} ;
-HAIKU_C++_HEADERS_DIR		?= ${haikuCxxHeadersDir} ;
+HAIKU_STATIC_LIBSTDC++		?= ${HAIKU_STATIC_LIBSTDCXX} ;
+HAIKU_SHARED_LIBSTDC++		?= ${HAIKU_SHARED_LIBSTDCXX} ;
+HAIKU_STATIC_LIBSUPC++		?= ${HAIKU_STATIC_LIBSUPCXX} ;
+HAIKU_SHARED_LIBSUPC++		?= ${HAIKU_SHARED_LIBSUPCXX} ;
+HAIKU_C++_HEADERS_DIR		?= ${HAIKU_CXX_HEADERS_DIR} ;
 
-HAIKU_BUILD_ATTRIBUTES_DIR	?= ${buildAttributesDir} ;
+HAIKU_BUILD_ATTRIBUTES_DIR	?= ${HAIKU_BUILD_ATTRIBUTES_DIR} ;
 
 HAIKU_AR					?= ${HAIKU_AR} ;
 HAIKU_CC					?= ${HAIKU_CC} ;
@@ -514,10 +542,10 @@ HAIKU_LDFLAGS				?= ${HAIKU_LDFLAGS} ;
 HAIKU_ARFLAGS				?= ${HAIKU_ARFLAGS} ;
 HAIKU_UNARFLAGS				?= ${HAIKU_UNARFLAGS} ;
 
-HOST_GCC_RAW_VERSION		?= ${hostGCCVersion} ;
-HOST_GCC_MACHINE			?= ${hostGCCMachine} ;
-HOST_LD						?= ${hostGCCLD} ;
-HOST_OBJCOPY				?= ${hostGCCObjcopy} ;
+HOST_GCC_RAW_VERSION		?= ${HOST_GCC_RAW_VERSION} ;
+HOST_GCC_MACHINE			?= ${HOST_GCC_MACHINE} ;
+HOST_LD						?= ${HOST_GCC_LD} ;
+HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
 
 EOF
 
