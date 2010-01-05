@@ -13,8 +13,10 @@ that is being used in BuildSetup into a format that's understood by sh.
 my $data;
 while (my $line = <>) {
 	$data .= $line;
-	if ($data =~ m{\s*(\w+)\s*\?=\s*\"?([^;]*?)\"?\s*;}gms) {
-		print "$1='$2'\n";
+	if ($data =~ m{\s*([+\w]+)\s*\?=\s*\"?([^;]*?)\"?\s*;}gms) {
+		my ($variable, $value) = ($1, $2);
+		$variable =~ tr{+}{X};	# '+' is illegal as part of shell variable
+		print "$variable='$value'\n";
 		$data = '';
 	}
 }
