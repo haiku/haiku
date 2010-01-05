@@ -712,7 +712,7 @@ NodeManager::RegisterAddOn(const entry_ref& ref, media_addon_id* _newID)
 void
 NodeManager::UnregisterAddOn(media_addon_id addOnID)
 {
-	PRINT("NodeManager::UnregisterAddOn: id %ld\n", addOnID);
+	PRINT(1, "NodeManager::UnregisterAddOn: id %ld\n", addOnID);
 
 	BAutolock _(this);
 
@@ -742,7 +742,7 @@ NodeManager::GetAddOnRef(media_addon_id addOnID, entry_ref* ref)
 status_t
 NodeManager::AddDormantFlavorInfo(const dormant_flavor_info& flavorInfo)
 {
-	PRINT("NodeManager::AddDormantFlavorInfo, addon-id %ld, flavor-id %ld, "
+	PRINT(1, "NodeManager::AddDormantFlavorInfo, addon-id %ld, flavor-id %ld, "
 		"name \"%s\", flavor-name \"%s\", flavor-info \"%s\"\n",
 		flavorInfo.node_info.addon, flavorInfo.node_info.flavor_id,
 		flavorInfo.node_info.name, flavorInfo.name, flavorInfo.info);
