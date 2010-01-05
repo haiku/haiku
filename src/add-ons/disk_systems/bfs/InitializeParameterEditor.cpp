@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2009, Bryce Groff, brycegroff@gmail.com.
  * Distributed under the terms of the MIT License.
  */
@@ -9,13 +10,15 @@
 #include "InitializeParameterEditor.h"
 
 #include <Button.h>
-#include <GroupLayoutBuilder.h>
+#include <CheckBox.h>
+#include <ControlLook.h>
 #include <GridLayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PartitionParameterEditor.h>
 #include <PopUpMenu.h>
 #include <SpaceLayoutItem.h>
+#include <TextControl.h>
 #include <View.h>
 #include <Window.h>
 
@@ -29,6 +32,7 @@ InitializeBFSEditor::InitializeBFSEditor()
 	fView(NULL),
 	fNameTC(NULL),
 	fBlockSizeMF(NULL),
+	fUseIndicesCB(NULL),
 	fParameters(NULL)
 {
 	_CreateViewControls();
@@ -59,6 +63,9 @@ InitializeBFSEditor::FinishedEditing()
 		// TODO: use libroot driver settings API
 		fParameters << "block_size " << size << ";\n";
 	}
+	if (fUseIndicesCB->Value() == B_CONTROL_OFF)
+		fParameters << "noindex;\n";
+
 	fParameters << "name \"" << fNameTC->Text() << "\";\n";
 
 	return true;
@@ -111,26 +118,28 @@ InitializeBFSEditor::_CreateViewControls()
 	fBlockSizeMF = new BMenuField("Blocksize", blocksizeMenu, NULL);
 	defaultItem->SetMarked(true);
 
-	fView = BGroupLayoutBuilder(B_VERTICAL, 5)
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(10))
+	fUseIndicesCB = new BCheckBox("Enable query support", NULL);
+	fUseIndicesCB->SetValue(true);
+	fUseIndicesCB->SetToolTip("Disabling query support may speed up "
+		"certain file system operations, but should only be used "
+		"if one is absolutely certain that one will not need queries.\n"
+		"Any volume that is intended for booting Haiku must have query "
+		"support enabled.");
 
-		// test views
-		.Add(BGridLayoutBuilder(10, 10)
-			// row 1
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5), 0, 0)
+	float spacing = be_control_look->DefaultItemSpacing();
 
-			.Add(fNameTC->CreateLabelLayoutItem(), 1, 0)
-			.Add(fNameTC->CreateTextViewLayoutItem(), 2, 0)
+	fView = BGridLayoutBuilder(spacing, spacing)
+		// row 1
+		.Add(fNameTC->CreateLabelLayoutItem(), 0, 0)
+		.Add(fNameTC->CreateTextViewLayoutItem(), 1, 0)
 
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 3, 0)
+		// row 2
+		.Add(fBlockSizeMF->CreateLabelLayoutItem(), 0, 1)
+		.Add(fBlockSizeMF->CreateMenuBarLayoutItem(), 1, 1)
 
-			// row 2
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 0, 1)
+		// row 3
+		.Add(fUseIndicesCB, 0, 2, 2)
 
-			.Add(fBlockSizeMF->CreateLabelLayoutItem(), 1, 1)
-			.Add(fBlockSizeMF->CreateMenuBarLayoutItem(), 2, 1)
-
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5), 3, 1)
-		)
+		.SetInsets(spacing, spacing, spacing, spacing)
 	;
 }

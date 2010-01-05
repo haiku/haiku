@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2009, Bryce Groff, brycegroff@gmail.com.
  * Distributed under the terms of the MIT License.
  */
@@ -7,11 +8,12 @@
 
 
 #include <PartitionParameterEditor.h>
-
-#include <MenuField.h>
-#include <TextControl.h>
 #include <String.h>
-#include <View.h>
+
+class BCheckBox;
+class BMenuField;
+class BTextControl;
+class BView;
 
 
 class InitializeBFSEditor : public BPartitionParameterEditor {
@@ -31,6 +33,8 @@ private:
 				BView*			fView;
 				BTextControl*	fNameTC;
 				BMenuField*		fBlockSizeMF;
+				BCheckBox*		fUseIndicesCB;
+
 				BString			fParameters;
 };
 
