@@ -15,4 +15,4 @@ Drop files to zip.	file:ZipOMaticWindow.cpp		Déposer des fichiers pour compress
 Error creating archive	file:ZipOMaticWindow.cpp		Erreur de création de l'archive
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Vous avez %ld Zip-O-Matic en fonctionnement.\n\n
 Archive created OK	file:ZipOMaticWindow.cpp		Création de l'archive réussie
-Stop them	file:ZipOMatic.cpp		
+Stop them	file:ZipOMatic.cpp		Les arrêter
