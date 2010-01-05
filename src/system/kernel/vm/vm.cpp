@@ -2880,8 +2880,9 @@ unmap_and_free_physical_pages(vm_translation_map* map, addr_t start, addr_t end)
 		addr_t physicalAddress;
 		uint32 flags;
 
-		if (map->ops->query(map, current, &physicalAddress, &flags) == B_OK) {
-			vm_page* page = vm_lookup_page(current / B_PAGE_SIZE);
+		if (map->ops->query(map, current, &physicalAddress, &flags) == B_OK
+			&& (flags & PAGE_PRESENT) != 0) {
+			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page != NULL)
 				vm_page_set_state(page, PAGE_STATE_FREE);
 		}
