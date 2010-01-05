@@ -204,7 +204,8 @@ bfs_read_fs_stat(fs_volume* _volume, struct fs_info* info)
 
 	// File system flags.
 	info->flags = B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME
-		| B_FS_HAS_QUERY | (volume->IsReadOnly() ? B_FS_IS_READONLY : 0);
+		| (volume->IndicesNode() != NULL ? B_FS_HAS_QUERY : 0)
+		| (volume->IsReadOnly() ? B_FS_IS_READONLY : 0);
 
 	info->io_size = BFS_IO_SIZE;
 		// whatever is appropriate here?
