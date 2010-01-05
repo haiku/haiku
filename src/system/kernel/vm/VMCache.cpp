@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -1170,8 +1170,7 @@ VMCache::Merge(VMCache* source)
 			(off_t)page->cache_offset << PAGE_SHIFT);
 		if (consumerPage == NULL) {
 			// the page is not yet in the consumer cache - move it upwards
-			source->RemovePage(page);
-			InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
+			MovePage(page);
 		}
 	}
 }
