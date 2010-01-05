@@ -24,35 +24,12 @@ namespace media {
 namespace dataexchange {
 
 
-BMessenger* gMediaServerMessenger;
+static BMessenger sMediaServerMessenger;
 static port_id sMediaServerPort;
 static port_id sMediaAddonServerPort;
 
 static void find_media_server_port();
 static void find_media_addon_server_port();
-
-static BMessenger*
-GetMediaServerMessenger()
-{
-	static BMessenger* messenger = new BMessenger(B_MEDIA_SERVER_SIGNATURE);
-	return gMediaServerMessenger = messenger;
-}
-
-class initit {
-public:
-	initit()
-	{
-		gMediaServerMessenger = 0;
-		find_media_server_port();
-		find_media_addon_server_port();
-	}
-
-	~initit()
-	{
-		delete gMediaServerMessenger;
-	}
-};
-initit _initit;
 
 
 static void
@@ -80,11 +57,20 @@ find_media_addon_server_port()
 // #pragma mark -
 
 
+void
+InitDataExchange()
+{
+	sMediaServerMessenger = BMessenger(B_MEDIA_SERVER_SIGNATURE);
+	find_media_server_port();
+	find_media_addon_server_port();
+}
+
+
 //! BMessage based data exchange with the media_server
 status_t
 SendToServer(BMessage* msg)
 {
-	status_t status = GetMediaServerMessenger()->SendMessage(msg,
+	status_t status = sMediaServerMessenger.SendMessage(msg,
 		static_cast<BHandler*>(NULL), TIMEOUT);
 	if (status != B_OK) {
 		ERROR("SendToServer: SendMessage failed: %s\n", strerror(status));
@@ -97,7 +83,7 @@ SendToServer(BMessage* msg)
 status_t
 QueryServer(BMessage& request, BMessage& reply)
 {
-	status_t status = GetMediaServerMessenger()->SendMessage(&request, &reply,
+	status_t status = sMediaServerMessenger.SendMessage(&request, &reply,
 		TIMEOUT, TIMEOUT);
 	if (status != B_OK) {
 		ERROR("QueryServer: SendMessage failed: %s\n", strerror(status));

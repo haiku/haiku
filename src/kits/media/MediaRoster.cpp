@@ -69,21 +69,26 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 #include "TimeSourceObjectManager.h"
 
 
-namespace BPrivate { namespace media {
+namespace BPrivate {
+namespace media {
 
-// the BMediaRoster destructor is private,
-// but _DefaultDeleter is a friend class of
-// the BMediaRoster an thus can delete it
-class DefaultDeleter {
+
+class MediaInitializer {
 public:
-	~DefaultDeleter()
+	MediaInitializer()
 	{
-		if (BMediaRoster::sDefaultInstance != NULL) {
-			BMediaRoster::sDefaultInstance->Lock();
-			BMediaRoster::sDefaultInstance->Quit();
+		InitDataExchange();
+	}
+
+	~MediaInitializer()
+	{
+		if (BMediaRoster::CurrentRoster() != NULL) {
+			BMediaRoster::CurrentRoster()->Lock();
+			BMediaRoster::CurrentRoster()->Quit();
 		}
 	}
 };
+
 
 }	// namespace media
 }	// namespace BPrivate
@@ -91,14 +96,18 @@ public:
 using namespace BPrivate::media;
 
 
-// DefaultDeleter will delete the BMediaRoster object in it's destructor.
-DefaultDeleter _deleter;
+static MediaInitializer sInitializer;
 
 
 BMediaRosterEx::BMediaRosterEx(status_t* _error)
 	:
 	BMediaRoster()
 {
+	InitDataExchange();
+
+	gDormantNodeManager = new DormantNodeManager;
+	gTimeSourceObjectManager = new TimeSourceObjectManager;
+
 	// register this application with the media server
 	server_register_app_request request;
 	server_register_app_reply reply;
@@ -3145,6 +3154,9 @@ BMediaRoster::~BMediaRoster()
 {
 	CALLED();
 
+	delete gTimeSourceObjectManager;
+	delete gDormantNodeManager;
+
 	// unregister this application with the media server
 	server_unregister_app_request request;
 	server_unregister_app_reply reply;
@@ -3163,7 +3175,7 @@ BMediaRoster::~BMediaRoster()
 //	#pragma mark - private BMediaRoster
 
 
-// deprecated call
+//! Deprecated call.
 status_t
 BMediaRoster::SetOutputBuffersFor(const media_source& output,
 	BBufferGroup* group, bool willReclaim)
@@ -3174,15 +3186,15 @@ BMediaRoster::SetOutputBuffersFor(const media_source& output,
 }
 
 
-/* FBC reserved virtuals */
-status_t BMediaRoster::_Reserved_MediaRoster_0(void *) { return B_ERROR; }
-status_t BMediaRoster::_Reserved_MediaRoster_1(void *) { return B_ERROR; }
-status_t BMediaRoster::_Reserved_MediaRoster_2(void *) { return B_ERROR; }
-status_t BMediaRoster::_Reserved_MediaRoster_3(void *) { return B_ERROR; }
-status_t BMediaRoster::_Reserved_MediaRoster_4(void *) { return B_ERROR; }
-status_t BMediaRoster::_Reserved_MediaRoster_5(void *) { return B_ERROR; }
-status_t BMediaRoster::_Reserved_MediaRoster_6(void *) { return B_ERROR; }
-status_t BMediaRoster::_Reserved_MediaRoster_7(void *) { return B_ERROR; }
+// FBC reserved virtuals
+status_t BMediaRoster::_Reserved_MediaRoster_0(void*) { return B_ERROR; }
+status_t BMediaRoster::_Reserved_MediaRoster_1(void*) { return B_ERROR; }
+status_t BMediaRoster::_Reserved_MediaRoster_2(void*) { return B_ERROR; }
+status_t BMediaRoster::_Reserved_MediaRoster_3(void*) { return B_ERROR; }
+status_t BMediaRoster::_Reserved_MediaRoster_4(void*) { return B_ERROR; }
+status_t BMediaRoster::_Reserved_MediaRoster_5(void*) { return B_ERROR; }
+status_t BMediaRoster::_Reserved_MediaRoster_6(void*) { return B_ERROR; }
+status_t BMediaRoster::_Reserved_MediaRoster_7(void*) { return B_ERROR; }
 
 
 BMediaRoster::BMediaRoster()

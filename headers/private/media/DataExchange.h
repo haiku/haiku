@@ -16,6 +16,8 @@ namespace media {
 namespace dataexchange {
 
 
+void InitDataExchange();
+
 // BMessage based data exchange with the media_server
 status_t SendToServer(BMessage* msg);
 status_t QueryServer(BMessage& request, BMessage& reply);

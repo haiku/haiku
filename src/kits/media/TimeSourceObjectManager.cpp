@@ -26,8 +26,8 @@ namespace BPrivate {
 namespace media {
 
 
-static TimeSourceObjectManager sManager;
-TimeSourceObjectManager* gTimeSourceObjectManager = &sManager;
+TimeSourceObjectManager* gTimeSourceObjectManager;
+	// initialized by BMediaRoster.
 
 
 TimeSourceObjectManager::TimeSourceObjectManager()

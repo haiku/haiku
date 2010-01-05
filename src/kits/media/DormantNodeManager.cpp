@@ -66,8 +66,8 @@ namespace BPrivate {
 namespace media {
 
 
-static DormantNodeManager sManager;
-DormantNodeManager* gDormantNodeManager = &sManager;
+DormantNodeManager* gDormantNodeManager;
+	// initialized by BMediaRoster.
 
 
 DormantNodeManager::DormantNodeManager()
