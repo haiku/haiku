@@ -109,7 +109,7 @@ private:
 struct Node {
 	Node(const char* path, bool traverseSymlinks)
 	{
-		fFileFD = open(path, O_RDWR | (traverseSymlinks ? 0 : O_NOTRAVERSE));
+		fFileFD = open(path, O_RDONLY | (traverseSymlinks ? 0 : O_NOTRAVERSE));
 		fOwnsFileFD = true;
 	}
 
@@ -146,7 +146,7 @@ struct Node {
 		attributeName.Init(attribute);
 
 		int attributeFD = fs_fopen_attr(fFileFD, attributeName.name,
-			B_XATTR_TYPE, openMode);
+			attributeName.type, openMode);
 		if (attributeFD < 0) {
 			// translate B_ENTRY_NOT_FOUND to ENOATTR
 			if (errno == B_ENTRY_NOT_FOUND)
@@ -195,7 +195,7 @@ struct Node {
 		}
 
 		ssize_t bytesRead = fs_read_attr(fFileFD, attributeName.name,
-			B_XATTR_TYPE, 0, buffer, info.size);
+			info.type, 0, buffer, info.size);
 
 		// translate B_ENTRY_NOT_FOUND to ENOATTR
 		if (bytesRead < 0 && errno == B_ENTRY_NOT_FOUND)
@@ -308,15 +308,16 @@ setxattr(const char* path, const char* attribute, const void* buffer,
 
 
 int
-lsetxattr(const char* path, const char* attribute, const void* buffer, size_t size,
-	int flags)
+lsetxattr(const char* path, const char* attribute, const void* buffer,
+	size_t size, int flags)
 {
 	return Node(path, false).Set(attribute, flags, buffer, size);
 }
 
 
 int
-fsetxattr(int fd, const char* attribute, const void* buffer, size_t size, int flags)
+fsetxattr(int fd, const char* attribute, const void* buffer, size_t size,
+	int flags)
 {
 	return Node(fd).Set(attribute, flags, buffer, size);
 }
