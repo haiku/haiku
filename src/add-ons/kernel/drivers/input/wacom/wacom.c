@@ -73,18 +73,18 @@ static usb_module_info* usb;
 static uint32 sDeviceNumbers = 0;
 
 // get_number
-static int 
+static int
 get_number()
 {
 	int num;
-	
+
 	for (num = 0; num < 32; num++) {
 		if (!(sDeviceNumbers & (1 << num))) {
 			sDeviceNumbers |= (1 << num);
 			return num;
 		}
 	}
-	
+
 	return -1;
 }
 
@@ -102,7 +102,7 @@ put_number(int num)
 // and device_removed() which are invoked by the USB bus manager.
 
 // add_device
-static wacom_device* 
+static wacom_device*
 add_device(usb_device dev)
 {
 	wacom_device *device = NULL;
@@ -121,7 +121,7 @@ add_device(usb_device dev)
 
 	conf = usb->get_configuration(dev);
 	DPRINTF_INFO((ID "add_device(%ld, %p)\n", dev, conf));
-	
+
 	if ((num = get_number()) < 0)
 		return NULL;
 
@@ -174,7 +174,7 @@ fail:
 got_one:
 	if ((device = (wacom_device *) malloc(sizeof(wacom_device))) == NULL)
 		goto fail;
-	
+
 	device->dev = dev;
 	device->number = num;
 	device->open = 1;
@@ -206,7 +206,7 @@ got_one:
 		if (udd->vendor_id == 0x056a) {
 			// do the control transfers to set up absolute mode (default is HID
 			// mode)
-			
+
 			// see 'Device Class Definition for HID 1.11' (HID1_11.pdf),
 			// par. 7.2 (available at www.usb.org/developers/hidpage)
 
@@ -233,34 +233,34 @@ got_one:
 				// Interface #0 (=0) to repData (== { 0x02, 0x02 })
 				st = usb->send_request(dev, 0x21, 0x09, (3 << 8) + 2, 0, 2,
 					repData, &controlTransferLength);
-	
+
 				if (st < B_OK) {
 					dprintf(ID "add_device() - control transfer 2 failed: %ld\
 						\n", st);
 				}
-	
+
 				// check if registers are set correctly
-	
+
 				// HID Class-Specific Request, Device to host (=0xA1):
 				// GET_REPORT (=0x01) type Feature (=3) with ID 2 (=2) of
 				// Interface #0 (=0) to retData
 				st = usb->send_request(dev, 0xA1, 0x01, (3 << 8) + 2, 0, 2,
 					retData, &controlTransferLength);
-	
+
 				if (st < B_OK) {
 					dprintf(ID "add_device() - control transfer 3 failed: %ld\
 						\n", st);
 				}
-	
+
 				dprintf(ID "retData: %u - %u\n", retData[0], retData[1]);
 				dprintf("====================================\n");
-				
+
 				if (retData[0] == repData[0] && retData[1] == repData[1]) break;
-				
+
 			}
 
 			dprintf(ID "count: %u\n", i);
-			
+
 			if (i > 4) {
 				dprintf(ID "add_device() - set 'Wacom'-mode failed\n");
 			}
@@ -283,19 +283,19 @@ got_one:
 
 	DPRINTF_INFO((ID "add_device() - added %p (/dev/%s%d)\n", device,
 		kBasePublishPath, num));
-	
+
 	// add it to the list of devices so it will be published, etc
 	acquire_sem(sDeviceListLock);
 	device->next = sDeviceList;
 	sDeviceList = device;
 	sDeviceCount++;
 	release_sem(sDeviceListLock);
-	
+
 	return device;
 }
 
 // remove_device
-static void 
+static void
 remove_device(wacom_device *device)
 {
 	put_number(device->number);
@@ -309,7 +309,7 @@ remove_device(wacom_device *device)
 }
 
 // device_added
-static status_t 
+static status_t
 device_added(usb_device dev, void** cookie)
 {
 	wacom_device* device;
@@ -340,7 +340,7 @@ device_added(usb_device dev, void** cookie)
 }
 
 // device_removed
-static status_t 
+static status_t
 device_removed(void *cookie)
 {
 	wacom_device *device = (wacom_device *) cookie;
@@ -348,9 +348,9 @@ device_removed(void *cookie)
 	DPRINTF_INFO((ID "device_removed(%p)\n", device));
 
 	if (device) {
-		
+
 		acquire_sem(sDeviceListLock);
-	
+
 		// remove it from the list of devices
 		if (device == sDeviceList) {
 			sDeviceList = device->next;
@@ -364,10 +364,10 @@ device_removed(void *cookie)
 			}
 		}
 		sDeviceCount--;
-		
-		// tear it down if it's not open -- 
+
+		// tear it down if it's not open --
 		// otherwise the last device_free() will handle it
-		
+
 		device->open--;
 
 		DPRINTF_ERR((ID "device_removed() open: %d\n", device->open));
@@ -378,7 +378,7 @@ device_removed(void *cookie)
 			dprintf(ID "device /dev/%s%d still open -- marked for removal\n",
 				kBasePublishPath, device->number);
 		}
-		
+
 		release_sem(sDeviceListLock);
 	}
 
@@ -392,7 +392,7 @@ device_removed(void *cookie)
 // device_open
 static status_t
 device_open(const char *dname, uint32 flags, void** cookie)
-{	
+{
 	wacom_device *device;
 	int n;
 	status_t ret = B_ERROR;
@@ -404,7 +404,7 @@ device_open(const char *dname, uint32 flags, void** cookie)
 		return B_ERROR;
 	}
 
-	n = atoi(dname + strlen(kBasePublishPath)); 
+	n = atoi(dname + strlen(kBasePublishPath));
 
 	DPRINTF_INFO((ID "device_open(\"%s\",%d,...)\n", dname, flags));
 
@@ -413,7 +413,7 @@ device_open(const char *dname, uint32 flags, void** cookie)
 		if (device->number == n) {
 //			if (device->open <= 1) {
 				device->open++;
-				*cookie = device;	
+				*cookie = device;
 				DPRINTF_ERR((ID "device_open() open: %d\n", device->open));
 
 				if (device->notify_lock < 0) {
@@ -458,10 +458,10 @@ static status_t
 device_free(void *cookie)
 {
 	wacom_device *device = (wacom_device *)cookie;
-	
+
 	DPRINTF_INFO((ID "device_free() name = \"%s%d\"\n", kBasePublishPath,
 		device->number));
-	
+
 	acquire_sem(sDeviceListLock);
 
 	device->open--;
@@ -619,7 +619,7 @@ device_control (void *cookie, uint32 msg, void *arg1, size_t len)
 // the driver and also handle registering with the USB bus manager
 // to receive device added and removed events
 
-static usb_notify_hooks notify_hooks = 
+static usb_notify_hooks notify_hooks =
 {
 	&device_added,
 	&device_removed
@@ -631,7 +631,7 @@ static const usb_support_descriptor kSupportedDevices[] =
 };
 
 // init_hardware
-status_t 
+status_t
 init_hardware(void)
 {
 	return B_OK;
@@ -654,7 +654,7 @@ init_driver(void)
 	if (get_module(B_USB_MODULE_NAME, (module_info**) &usb) != B_OK) {
 		DPRINTF_ERR((ID "cannot get module \"%s\"\n", B_USB_MODULE_NAME));
 		return B_ERROR;
-	} 
+	}
 
 	if ((sDeviceListLock = create_sem(1,"sDeviceListLock")) < 0) {
 		put_module(B_USB_MODULE_NAME);
@@ -672,11 +672,11 @@ void
 uninit_driver(void)
 {
 	int i;
-	
+
 	DPRINTF_INFO((ID "uninit_driver()\n"));
-	
+
 	usb->uninstall_notify(kDriverName);
-	
+
 	delete_sem(sDeviceListLock);
 
 	put_module(B_USB_MODULE_NAME);
@@ -686,7 +686,7 @@ uninit_driver(void)
 			free(sDeviceNames[i]);
 		free(sDeviceNames);
 	}
-	
+
 	DPRINTF_INFO((ID "uninit_driver() done\n"));
 }
 
@@ -696,16 +696,16 @@ publish_devices()
 {
 	wacom_device *device;
 	int i;
-	
+
 	DPRINTF_INFO((ID "publish_devices()\n"));
-	
+
 	if (sDeviceNames) {
 		for (i = 0; sDeviceNames[i]; i++)
 			free((char *) sDeviceNames[i]);
 		free(sDeviceNames);
 	}
 
-	acquire_sem(sDeviceListLock);	
+	acquire_sem(sDeviceListLock);
 	sDeviceNames = (char**)malloc(sizeof(char*) * (sDeviceCount + 2));
 	if (sDeviceNames) {
 		for (i = 0, device = sDeviceList; device; device = device->next) {
@@ -720,22 +720,22 @@ publish_devices()
 		sDeviceNames[i] = (char*)malloc(strlen(kBasePublishPath) + 8);
 		if (sDeviceNames[i])
 			sprintf(sDeviceNames[i], "%s%s", kBasePublishPath, "control");
-	
+
 		sDeviceNames[i + 1] = NULL;
 	}
 
 	release_sem(sDeviceListLock);
-	
+
 	return (const char**)sDeviceNames;
 }
 
 static device_hooks sDeviceHooks = {
-	device_open, 			
-	device_close, 			
-	device_free,			
-	device_control, 		
-	device_read,			
-	device_write			 
+	device_open,
+	device_close,
+	device_free,
+	device_control,
+	device_read,
+	device_write
 };
 
 // find_device
