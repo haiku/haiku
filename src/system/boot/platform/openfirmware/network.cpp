@@ -89,7 +89,7 @@ parse_ip_address(const char *string)
 		const char *dot = strchr(string, '.');
 		if (dot == NULL)
 			break;
-		
+
 		string = dot + 1;
 		components++;
 	}
