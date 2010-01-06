@@ -142,7 +142,7 @@ actions BuildUImageScript1
 rule BuildUBootSDImage image : files 
 {
 	Depends $(image) : $(files) ;
-	SDIMAGE_BLOCK_SIZE on $(image) = 1MB ;
+	SDIMAGE_BLOCK_SIZE on $(image) = 1M ;
 	SDIMAGE_SIZE on $(image) = $(HAIKU_BOARD_SDIMAGE_SIZE) ;
 	SDIMAGE_FDISK on $(image) = /sbin/sfdisk ;
 	SDIMAGE_FDISK_SCRIPT on $(image) = 
