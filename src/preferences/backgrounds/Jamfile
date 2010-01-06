@@ -18,6 +18,6 @@ DoCatalogs Backgrounds :
 	BackgroundsView.cpp
 	ImageFilePanel.cpp
 	: en.catalog
-	: bg.catkeys de.catkeys eo.catkeys sv.catkeys
+	: bg.catkeys de.catkeys eo.catkeys lt.catkeys sv.catkeys
 	;
 

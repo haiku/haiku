@@ -20,6 +20,6 @@ DoCatalogs Mouse :
 	SettingsView.cpp
 	: en.catalog
 	:
-	bg.catkeys eo.catkeys fr.catkeys
+	bg.catkeys eo.catkeys fr.catkeys lt.catkeys
 	sv.catkeys
 	;

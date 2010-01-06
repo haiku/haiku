@@ -20,6 +20,6 @@ DoCatalogs Network :
 	NetworkWindow.cpp
 	: en.catalog
 	:
-	bg.catkeys fr.catkeys
+	bg.catkeys fr.catkeys lt.catkeys
 	sv.catkeys
 	;
