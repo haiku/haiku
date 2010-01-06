@@ -1,5 +1,6 @@
 /*
  * Copyright 2005, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2010, Andreas Faerber <andreas.faerber@web.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -31,7 +32,7 @@ public:
 	OFEthernetInterface();
 	virtual ~OFEthernetInterface();
 
-	status_t Init(const char *device);
+	status_t Init(const char *device, const char *parameters);
 
 	virtual mac_addr_t MACAddress() const;
 
@@ -117,7 +118,7 @@ OFEthernetInterface::~OFEthernetInterface()
 
 
 status_t
-OFEthernetInterface::Init(const char *device)
+OFEthernetInterface::Init(const char *device, const char *parameters)
 {
 	if (!device)
 		return B_BAD_VALUE;
@@ -160,16 +161,24 @@ OFEthernetInterface::Init(const char *device)
 	if (bytesRead != OF_FAILED && bytesRead == (int)sizeof(dhcpResponse)) {
 		SetIPAddress(ntohl(dhcpResponse.ip_address));
 	} else {
-		char saddr[16];
-		package = of_finddevice("/options");
-		bytesRead = of_getprop(package, "default-client-ip", saddr,
-			sizeof(saddr));
-		if (bytesRead != OF_FAILED) {
-			saddr[bytesRead] = '\0';
-			printf("default-client-ip: %s\n", saddr);
-			ip_addr_t addr = parse_ip_address(saddr);
-			printf("addr = %x\n", (unsigned int)addr);
-			SetIPAddress(addr);
+		// try to read manual client IP from boot path
+		if (parameters != NULL) {
+			char *comma = strrchr(parameters, ',');
+			if (comma != NULL && comma != strchr(parameters, ',')) {
+				SetIPAddress(parse_ip_address(comma + 1));
+			}
+		}
+		if (fIPAddress == 0) {
+			// try to read default-client-ip setting
+			char defaultClientIP[16];
+			package = of_finddevice("/options");
+			bytesRead = of_getprop(package, "default-client-ip",
+				defaultClientIP, sizeof(defaultClientIP) - 1);
+			if (bytesRead != OF_FAILED && bytesRead > 1) {
+				defaultClientIP[bytesRead] = '\0';
+				ip_addr_t address = parse_ip_address(defaultClientIP);
+				SetIPAddress(address);
+			}
 		}
 	}
 
@@ -278,7 +287,7 @@ platform_net_stack_init()
 	if (!interface)
 		return B_NO_MEMORY;
 
-	status_t error = interface->Init(bootPath);
+	status_t error = interface->Init(bootPath, parameters + 1);
 	if (error != B_OK) {
 		delete interface;
 		return error;
