@@ -30,13 +30,14 @@ extern "C" {
 // will become:
 typedef void (*gfx_convert_func) (AVFrame *in, AVFrame *out, int width, int height);
 
-// this function will try to find the best colorspaces for both the ff-codec and 
+// this function will try to find the best colorspaces for both the ff-codec and
 // the Media Kit sides.
 gfx_convert_func resolve_colorspace(color_space cs, PixelFormat pixelFormat);
 
-const char *pixfmt_to_string(int p);
+const char *pixfmt_to_string(int format);
 
-color_space pixfmt_to_colorspace(int p);
+color_space pixfmt_to_colorspace(int format);
+PixelFormat colorspace_to_pixfmt(color_space format);
 
 void dump_ffframe(AVFrame *frame, const char *name);
 
