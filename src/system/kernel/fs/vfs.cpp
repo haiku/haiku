@@ -225,27 +225,19 @@ static mutex sMountMutex = MUTEX_INITIALIZER("vfs_mount_lock");
 */
 static recursive_lock sMountOpLock;
 
-/*!	\brief Guards the vnode::covered_by field of any vnode
-
-	The holder is allowed to read access the vnode::covered_by field of any
-	vnode. Additionally holding sMountOpLock allows for write access.
-
-	The thread trying to lock the must not hold sVnodeLock.
-*/
-static mutex sVnodeCoveredByMutex
-	= MUTEX_INITIALIZER("vfs_vnode_covered_by_lock");
-
 /*!	\brief Guards sVnodeTable.
 
 	The holder is allowed read/write access to sVnodeTable and to
 	any unbusy vnode in that table, save to the immutable fields (device, id,
-	private_node, mount) to which
-	only read-only access is allowed, and to the field covered_by, which is
-	guarded by sMountOpLock and sVnodeCoveredByMutex.
+	private_node, mount) to which only read-only access is allowed.
+	The mutable fields advisory_locking, mandatory_locked_by, and ref_count, as
+	well as the busy, removed, unused flags, and the vnode's type can also be
+	write access when holding a read lock to sVnodeLock *and* having the vnode
+	locked. Writing access to covered_by requires to write lock sVnodeLock.
 
-	The thread trying to lock the mutex must not hold sMountMutex.
-	You must not have this mutex held when calling create_sem(), as this
-	might call vfs_free_unused_vnodes().
+	The thread trying to acquire the lock must not hold sMountMutex.
+	You must not have this lock held when calling create_sem(), as this
+	might call vfs_free_unused_vnodes() and thus cause a deadlock.
 */
 static rw_lock sVnodeLock = RW_LOCK_INITIALIZER("vfs_vnode_lock");
 
@@ -1910,12 +1902,14 @@ resolve_mount_point_to_volume_root(struct vnode* vnode)
 
 	struct vnode* volumeRoot = NULL;
 
-	mutex_lock(&sVnodeCoveredByMutex);
+	rw_lock_read_lock(&sVnodeLock);
+
 	if (vnode->covered_by) {
 		volumeRoot = vnode->covered_by;
 		inc_vnode_ref_count(volumeRoot);
 	}
-	mutex_unlock(&sVnodeCoveredByMutex);
+
+	rw_lock_read_unlock(&sVnodeLock);
 
 	return volumeRoot;
 }
@@ -5589,7 +5583,6 @@ fix_dirent(struct vnode* parent, struct dirent* entry,
 
 		struct vnode* vnode = lookup_vnode(entry->d_dev, entry->d_ino);
 		if (vnode != NULL) {
-			MutexLocker _(&sVnodeCoveredByMutex);
 			if (vnode->covered_by != NULL) {
 				entry->d_dev = vnode->covered_by->device;
 				entry->d_ino = vnode->covered_by->id;
@@ -7117,10 +7110,10 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 	// No race here, since fs_mount() is the only function changing
 	// covers_vnode (and holds sMountOpLock at that time).
-	mutex_lock(&sVnodeCoveredByMutex);
+	rw_lock_write_lock(&sVnodeLock);
 	if (mount->covers_vnode)
 		mount->covers_vnode->covered_by = mount->root_vnode;
-	mutex_unlock(&sVnodeCoveredByMutex);
+	rw_lock_write_unlock(&sVnodeLock);
 
 	if (!sRoot) {
 		sRoot = mount->root_vnode;
@@ -7296,11 +7289,10 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	mount->root_vnode->ref_count--;
 	vnode_to_be_freed(mount->root_vnode);
 
+	mount->covers_vnode->covered_by = NULL;
+
 	vnodesWriteLocker.Unlock();
 
-	mutex_lock(&sVnodeCoveredByMutex);
-	mount->covers_vnode->covered_by = NULL;
-	mutex_unlock(&sVnodeCoveredByMutex);
 	put_vnode(mount->covers_vnode);
 
 	// Free all vnodes associated with this mount.
