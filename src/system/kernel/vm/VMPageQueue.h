@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -10,6 +10,13 @@
 #define VM_PAGE_QUEUE_H
 
 
+#include <util/DoublyLinkedList.h>
+
+#include <lock.h>
+#include <vm/vm_types.h>
+
+
+
 struct VMPageQueue {
 public:
 	typedef DoublyLinkedList<vm_page, DoublyLinkedListMemberGetLink<vm_page,
@@ -17,7 +24,15 @@ public:
 	typedef PageList::ConstIterator Iterator;
 
 public:
-	inline						VMPageQueue();
+			void				Init(const char* name, int lockingOrder);
+
+			const char*			Name() const	{ return fName; }
+			int					LockingOrder() const { return fLockingOrder; }
+
+	inline	bool				Lock();
+	inline	void				Unlock();
+
+	inline	void				LockMultiple(VMPageQueue* other);
 
 	inline	void				Append(vm_page* page);
 	inline	void				Prepend(vm_page* page);
@@ -31,22 +46,43 @@ public:
 	inline	vm_page*			Previous(vm_page* page) const;
 	inline	vm_page*			Next(vm_page* page) const;
 
-	inline	void				MoveFrom(VMPageQueue* from, vm_page* page);
-
 	inline	uint32				Count() const	{ return fCount; }
 
 	inline	Iterator			GetIterator() const;
 
 private:
-			PageList			fPages;
+			const char*			fName;
+			int					fLockingOrder;
+			mutex				fLock;
 			uint32				fCount;
+			PageList			fPages;
 };
 
 
-VMPageQueue::VMPageQueue()
-	:
-	fCount(0)
+bool
+VMPageQueue::Lock()
 {
+	return mutex_lock(&fLock) == B_OK;
+}
+
+
+void
+VMPageQueue::Unlock()
+{
+	mutex_unlock(&fLock);
+}
+
+
+void
+VMPageQueue::LockMultiple(VMPageQueue* other)
+{
+	if (fLockingOrder < other->fLockingOrder) {
+		Lock();
+		other->Lock();
+	} else {
+		other->Lock();
+		Lock();
+	}
 }
 
 
@@ -147,18 +183,6 @@ VMPageQueue::RemoveHead()
 }
 
 
-/*!	Moves a page to the tail of this queue, but only does so if
-	the page is currently in another queue.
-*/
-void
-VMPageQueue::MoveFrom(VMPageQueue* from, vm_page* page)
-{
-	if (from != this) {
-		from->Remove(page);
-		Append(page);
-	}
-}
-
 vm_page*
 VMPageQueue::Head() const
 {
@@ -192,6 +216,89 @@ VMPageQueue::GetIterator() const
 {
 	return fPages.GetIterator();
 }
+
+
+// #pragma mark - VMPageQueuePairLocker
+
+
+struct VMPageQueuePairLocker {
+	VMPageQueuePairLocker()
+		:
+		fQueue1(NULL),
+		fQueue2(NULL)
+	{
+	}
+
+	VMPageQueuePairLocker(VMPageQueue& queue1, VMPageQueue& queue2)
+		:
+		fQueue1(&queue1),
+		fQueue2(&queue2)
+	{
+		_Lock();
+	}
+
+	~VMPageQueuePairLocker()
+	{
+		_Unlock();
+	}
+
+	void SetTo(VMPageQueue* queue1, VMPageQueue* queue2)
+	{
+		_Unlock();
+		fQueue1 = queue1;
+		fQueue2 = queue2;
+		_Lock();
+	}
+
+	void Unlock()
+	{
+		if (fQueue1 != NULL) {
+			fQueue1->Unlock();
+			fQueue1 = NULL;
+		}
+
+		if (fQueue2 != NULL) {
+			fQueue2->Unlock();
+			fQueue2 = NULL;
+		}
+	}
+
+private:
+	void _Lock()
+	{
+		if (fQueue1 == fQueue2) {
+			if (fQueue1 == NULL)
+				return;
+			fQueue1->Lock();
+			fQueue2 = NULL;
+		} else {
+			if (fQueue1 == NULL) {
+				fQueue2->Lock();
+			} else if (fQueue2 == NULL) {
+				fQueue1->Lock();
+			} else if (fQueue1->LockingOrder() < fQueue2->LockingOrder()) {
+				fQueue1->Lock();
+				fQueue2->Lock();
+			} else {
+				fQueue2->Lock();
+				fQueue1->Lock();
+			}
+		}
+	}
+
+	void _Unlock()
+	{
+		if (fQueue1 != NULL)
+			fQueue1->Unlock();
+
+		if (fQueue2 != NULL)
+			fQueue2->Unlock();
+	}
+
+private:
+	VMPageQueue*	fQueue1;
+	VMPageQueue*	fQueue2;
+};
 
 
 #endif	// VM_PAGE_QUEUE_H

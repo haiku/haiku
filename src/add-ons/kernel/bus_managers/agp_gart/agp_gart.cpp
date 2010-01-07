@@ -83,6 +83,9 @@ struct aperture_memory {
 		vm_page	**pages;
 		vm_page *page;
 	};
+#ifdef DEBUG_PAGE_ACCESS
+	thread_id	allocating_thread;
+#endif
 #else
 	area_id		area;
 #endif
@@ -550,6 +553,11 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 			memory->pages[i] = vm_page_allocate_page(PAGE_STATE_CLEAR);
 		vm_page_unreserve_pages(count);
 	}
+
+#ifdef DEBUG_PAGE_ACCESS
+	memory->allocating_thread = find_thread(NULL);
+#endif
+
 #else
 	void *address;
 	memory->area = create_area("GART memory", &address, B_ANY_KERNEL_ADDRESS,
@@ -682,12 +690,15 @@ Aperture::_Free(aperture_memory *memory)
 	if ((memory->flags & B_APERTURE_NEED_PHYSICAL) != 0) {
 		vm_page *page = memory->page;
 		for (uint32 i = 0; i < count; i++, page++) {
+			DEBUG_PAGE_ACCESS_TRANSFER(page, memory->allocating_thread);
 			vm_page_set_state(page, PAGE_STATE_FREE);
 		}
 
 		memory->page = NULL;
 	} else {
 		for (uint32 i = 0; i < count; i++) {
+			DEBUG_PAGE_ACCESS_TRANSFER(memory->pages[i],
+				memory->allocating_thread);
 			vm_page_set_state(memory->pages[i], PAGE_STATE_FREE);
 		}
 

@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Zhao Shuai, upczhsh@163.com.
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -952,6 +952,7 @@ VMAnonymousCache::_MergePagesSmallerConsumer(VMAnonymousCache* source)
 		vm_page* sourcePage = source->LookupPage(
 			(off_t)page->cache_offset << PAGE_SHIFT);
 		if (sourcePage != NULL) {
+			DEBUG_PAGE_ACCESS_START(sourcePage);
 			source->RemovePage(sourcePage);
 			vm_page_free(source, sourcePage);
 		}
@@ -1000,6 +1001,7 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 				if (swapBlock->swap_slots[i] != SWAP_SLOT_NONE) {
 					vm_page* page = source->LookupPage(
 						(off_t)(swapBlockPageIndex + i) << PAGE_SHIFT);
+					DEBUG_PAGE_ACCESS_START(page);
 					source->RemovePage(page);
 					vm_page_free(source, page);
 				}

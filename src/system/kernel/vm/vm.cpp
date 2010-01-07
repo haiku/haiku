@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -344,6 +344,9 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		// unmap pages
 		vm_unmap_pages(area, address, oldSize - newSize, false);
+			// TODO: preserveModified = false is wrong, since this could be a
+			// cloned area or a write-mmap()ed file, in which case we'd lose
+			// information.
 
 		// If no one else uses the area's cache, we can resize it, too.
 		if (cache->areas == area && area->cache_next == NULL
@@ -366,6 +369,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		// unmap pages
 		vm_unmap_pages(area, oldBase, newBase - oldBase, false);
+			// TODO: See the vm_unmap_pages() above.
 
 		// resize the area
 		status_t error = addressSpace->ShrinkAreaHead(area, newSize);
@@ -389,6 +393,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 	// unmap pages
 	vm_unmap_pages(area, address, area->Size() - firstNewSize, false);
+		// TODO: See the vm_unmap_pages() above.
 
 	// resize the area
 	addr_t oldSize = area->Size();
@@ -874,6 +879,10 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 				vm_page* page = vm_page_allocate_page(newPageState);
 				cache->InsertPage(page, offset);
 				vm_map_page(area, page, address, protection);
+					// TODO: This sets the page state to "active", but it would
+					// make more sense to set it to "wired".
+
+				DEBUG_PAGE_ACCESS_END(page);
 
 				// Periodically unreserve pages we've already allocated, so that
 				// we don't unnecessarily increase the pressure on the VM.
@@ -917,9 +926,13 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 						physicalAddress);
 				}
 
+				DEBUG_PAGE_ACCESS_START(page);
+
 				increment_page_wired_count(page);
-				vm_page_set_state(page, PAGE_STATE_WIRED);
 				cache->InsertPage(page, offset);
+				vm_page_set_state(page, PAGE_STATE_WIRED);
+
+				DEBUG_PAGE_ACCESS_END(page);
 			}
 
 			map->ops->unlock(map);
@@ -950,8 +963,10 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 					panic("couldn't map physical page in page run\n");
 
 				increment_page_wired_count(page);
-				vm_page_set_state(page, PAGE_STATE_WIRED);
 				cache->InsertPage(page, offset);
+				vm_page_set_state(page, PAGE_STATE_WIRED);
+
+				DEBUG_PAGE_ACCESS_END(page);
 			}
 
 			map->ops->unlock(map);
@@ -1246,9 +1261,11 @@ pre_map_area_pages(VMArea* area, VMCache* cache)
 		if (page->state == PAGE_STATE_BUSY || page->usage_count <= 0)
 			continue;
 
+		DEBUG_PAGE_ACCESS_START(page);
 		vm_map_page(area, page,
 			baseAddress + (page->cache_offset * B_PAGE_SIZE - cacheOffset),
 			B_READ_AREA | B_KERNEL_READ_AREA);
+		DEBUG_PAGE_ACCESS_END(page);
 	}
 }
 
@@ -1543,10 +1560,17 @@ vm_clone_area(team_id team, const char* name, void** address,
 			// map in all pages from source
 			for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 					vm_page* page  = it.Next();) {
-				vm_map_page(newArea, page, newArea->Base()
-					+ ((page->cache_offset << PAGE_SHIFT)
-					- newArea->cache_offset), protection);
+				if (page->state != PAGE_STATE_BUSY) {
+					DEBUG_PAGE_ACCESS_START(page);
+					vm_map_page(newArea, page,
+						newArea->Base() + ((page->cache_offset << PAGE_SHIFT)
+							- newArea->cache_offset),
+						protection);
+					DEBUG_PAGE_ACCESS_END(page);
+				}
 			}
+			// TODO: B_FULL_LOCK means that all pages are locked. We are not
+			// ensuring that!
 
 			vm_page_unreserve_pages(reservePages);
 		}
@@ -1573,6 +1597,9 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area)
 
 	// Unmap the virtual address space the area occupied
 	vm_unmap_pages(area, area->Base(), area->Size(), !area->cache->temporary);
+		// TODO: Even if the cache is temporary we might need to preserve the
+		// modified flag, since the area could be a clone and backed by swap.
+		// We would lose information in this case.
 
 	if (!area->cache->temporary)
 		area->cache->WriteModified();
@@ -1995,6 +2022,9 @@ vm_remove_all_page_mappings(vm_page* page, uint32* _flags)
 }
 
 
+/*!	If \a preserveModified is \c true, the caller must hold the lock of the
+	page's cache and the page must not be busy.
+*/
 bool
 vm_unmap_page(VMArea* area, addr_t virtualAddress, bool preserveModified)
 {
@@ -2068,6 +2098,11 @@ vm_unmap_page(VMArea* area, addr_t virtualAddress, bool preserveModified)
 }
 
 
+/*!	If \a preserveModified is \c true, the caller must hold the lock of all
+	mapped pages' caches and none of the pages must be busy.
+	TODO: Particularly the latter is very inconvenient. See the TODOs below for
+	reasons for this requirement.
+*/
 status_t
 vm_unmap_pages(VMArea* area, addr_t base, size_t size, bool preserveModified)
 {
@@ -2116,9 +2151,18 @@ vm_unmap_pages(VMArea* area, addr_t base, size_t size, bool preserveModified)
 					physicalAddress);
 			}
 
+			DEBUG_PAGE_ACCESS_START(page);
+				// TODO: No guarantee for that. See below.
+
 			if ((flags & PAGE_MODIFIED) != 0
-				&& page->state != PAGE_STATE_MODIFIED)
+				&& page->state != PAGE_STATE_MODIFIED) {
 				vm_page_set_state(page, PAGE_STATE_MODIFIED);
+					// TODO: We are only allowed to do this, if (a) we have also
+					// locked the cache and (b) the page is not busy! Not doing
+					// it is problematic, too, since we'd lose information.
+			}
+
+			DEBUG_PAGE_ACCESS_END(page);
 		}
 	}
 	map->ops->unlock(map);
@@ -2169,6 +2213,8 @@ vm_map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection)
 {
 	vm_translation_map* map = &area->address_space->TranslationMap();
 	vm_page_mapping* mapping = NULL;
+
+	DEBUG_PAGE_ACCESS_CHECK(page);
 
 	if (area->wiring == B_NO_LOCK) {
 		mapping = (vm_page_mapping*)malloc_nogrow(sizeof(vm_page_mapping));
@@ -2883,8 +2929,10 @@ unmap_and_free_physical_pages(vm_translation_map* map, addr_t start, addr_t end)
 		if (map->ops->query(map, current, &physicalAddress, &flags) == B_OK
 			&& (flags & PAGE_PRESENT) != 0) {
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
-			if (page != NULL)
+			if (page != NULL) {
+				DEBUG_PAGE_ACCESS_START(page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
+			}
 		}
 	}
 
@@ -3708,6 +3756,8 @@ fault_get_page(PageFaultContext& context)
 			page->state = PAGE_STATE_ACTIVE;
 			cache->NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 
+			DEBUG_PAGE_ACCESS_END(page);
+
 			// Since we needed to unlock everything temporarily, the area
 			// situation might have changed. So we need to restart the whole
 			// process.
@@ -3749,7 +3799,8 @@ fault_get_page(PageFaultContext& context)
 
 		// insert the new page into our cache
 		context.topCache->InsertPage(page, context.cacheOffset);
-	}
+	} else
+		DEBUG_PAGE_ACCESS_START(page);
 
 	context.page = page;
 	return B_OK;
@@ -3870,7 +3921,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 
 		addr_t physicalAddress;
 		uint32 flags;
-		vm_page* mappedPage;
+		vm_page* mappedPage = NULL;
 		if (context.map->ops->query(context.map, address, &physicalAddress,
 				&flags) == B_OK
 			&& (flags & PAGE_PRESENT) != 0
@@ -3889,11 +3940,25 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 
 		context.map->ops->unlock(context.map);
 
-		if (unmapPage)
+		if (unmapPage) {
+			// Note: The mapped page is a page of a lower cache. We are
+			// guaranteed to have that cached locked, our new page is a copy of
+			// that page, and the page is not busy. The logic for that guarantee
+			// is as follows: Since the page is mapped, it must live in the top
+			// cache (ruled out above) or any of its lower caches, and there is
+			// (was before the new page was inserted) no other page in any
+			// cache between the top cache and the page's cache (otherwise that
+			// would be mapped instead). That in turn means that our algorithm
+			// must have found it and therefore it cannot be busy either.
+			DEBUG_PAGE_ACCESS_START(mappedPage);
 			vm_unmap_page(area, address, true);
+			DEBUG_PAGE_ACCESS_END(mappedPage);
+		}
 
 		if (mapPage)
 			vm_map_page(area, context.page, address, newProtection);
+
+		DEBUG_PAGE_ACCESS_END(context.page);
 
 		break;
 	}
@@ -5241,6 +5306,8 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 
 			if (unmapPage)
 				vm_unmap_page(area, pageAddress, true);
+					// TODO: We need to lock the page's cache for that, since
+					// it potentially changes the page's state.
 		}
 	}
 

@@ -271,6 +271,8 @@ check_page_activation(int32 index)
 	if (!locker.IsLocked())
 		return false;
 
+	DEBUG_PAGE_ACCESS_START(page);
+
 	bool modified;
 	int32 activation = vm_test_map_activation(page, &modified);
 	if (modified && page->state != PAGE_STATE_MODIFIED) {
@@ -293,6 +295,7 @@ check_page_activation(int32 index)
 		track_page_usage(page);
 #endif
 
+		DEBUG_PAGE_ACCESS_END(page);
 		return false;
 	}
 
@@ -310,8 +313,10 @@ check_page_activation(int32 index)
 		// recheck eventual last minute changes
 		if ((flags & PAGE_MODIFIED) != 0 && page->state != PAGE_STATE_MODIFIED)
 			vm_page_set_state(page, PAGE_STATE_MODIFIED);
-		if ((flags & PAGE_ACCESSED) != 0 && ++page->usage_count >= 0)
+		if ((flags & PAGE_ACCESSED) != 0 && ++page->usage_count >= 0) {
+			DEBUG_PAGE_ACCESS_END(page);
 			return false;
+		}
 
 		if (page->state == PAGE_STATE_MODIFIED)
 			vm_page_schedule_write_page(page);
@@ -321,6 +326,7 @@ check_page_activation(int32 index)
 		T(DeactivatePage(page));
 	}
 
+	DEBUG_PAGE_ACCESS_END(page);
 	return true;
 }
 
@@ -334,6 +340,8 @@ free_page_swap_space(int32 index)
 	if (!locker.IsLocked())
 		return false;
 
+	DEBUG_PAGE_ACCESS_START(page);
+
 	if (page->cache->temporary && page->wired_count == 0
 			&& page->cache->HasPage(page->cache_offset << PAGE_SHIFT)
 			&& page->usage_count > 0) {
@@ -343,9 +351,11 @@ free_page_swap_space(int32 index)
 			// stolen and we'd lose its data.
 			vm_page_set_state(page, PAGE_STATE_MODIFIED);
 			T(FreedPageSwap(page));
+			DEBUG_PAGE_ACCESS_END(page);
 			return true;
 		}
 	}
+	DEBUG_PAGE_ACCESS_END(page);
 	return false;
 }
 #endif

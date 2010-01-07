@@ -92,6 +92,9 @@ private:
 			off_t				fOffset;
 			uint32				fVecCount;
 			size_t				fSize;
+#if DEBUG_PAGE_ACCESS
+			thread_id			fAllocatingThread;
+#endif
 };
 
 typedef status_t (*cache_func)(file_cache_ref* ref, void* cookie, off_t offset,
@@ -150,8 +153,6 @@ PrecacheIO::Prepare()
 	uint32 i = 0;
 	for (size_t pos = 0; pos < fSize; pos += B_PAGE_SIZE) {
 		vm_page* page = vm_page_allocate_page(PAGE_STATE_FREE);
-		if (page == NULL)
-			break;
 
 		fCache->InsertPage(page, fOffset + pos);
 
@@ -160,15 +161,9 @@ PrecacheIO::Prepare()
 		fPages[i++] = page;
 	}
 
-	if (i != fPageCount) {
-		// allocating pages failed
-		while (i-- > 0) {
-			fCache->NotifyPageEvents(fPages[i], PAGE_EVENT_NOT_BUSY);
-			fCache->RemovePage(fPages[i]);
-			vm_page_set_state(fPages[i], PAGE_STATE_FREE);
-		}
-		return B_NO_MEMORY;
-	}
+#if DEBUG_PAGE_ACCESS
+	fAllocatingThread = find_thread(NULL);
+#endif
 
 	return B_OK;
 }
@@ -207,12 +202,17 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 				+ bytesTouched, 0, B_PAGE_SIZE - bytesTouched);
 		}
 
+		DEBUG_PAGE_ACCESS_TRANSFER(fPages[i], fAllocatingThread);
+
 		fPages[i]->state = PAGE_STATE_ACTIVE;
 		fCache->NotifyPageEvents(fPages[i], PAGE_EVENT_NOT_BUSY);
+
+		DEBUG_PAGE_ACCESS_END(fPages[i]);
 	}
 
 	// Free pages after failed I/O
 	for (uint32 i = pagesTransferred; i < fPageCount; i++) {
+		DEBUG_PAGE_ACCESS_TRANSFER(fPages[i], fAllocatingThread);
 		fCache->NotifyPageEvents(fPages[i], PAGE_EVENT_NOT_BUSY);
 		fCache->RemovePage(fPages[i]);
 		vm_page_set_state(fPages[i], PAGE_STATE_FREE);
@@ -305,6 +305,7 @@ reserve_pages(file_cache_ref* ref, size_t reservePages, bool isWrite)
 						(page = it.Next()) != NULL && left > 0;) {
 					if (page->state != PAGE_STATE_MODIFIED
 						&& page->state != PAGE_STATE_BUSY) {
+						DEBUG_PAGE_ACCESS_START(page);
 						cache->RemovePage(page);
 						vm_page_set_state(page, PAGE_STATE_FREE);
 						left--;
@@ -382,8 +383,6 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	for (size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
 			PAGE_STATE_FREE);
-		if (page == NULL)
-			panic("no more pages!");
 
 		cache->InsertPage(page, offset + pos);
 
@@ -436,6 +435,8 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
+		DEBUG_PAGE_ACCESS_END(pages[i]);
+
 		pages[i]->state = PAGE_STATE_ACTIVE;
 
 		cache->NotifyPageEvents(pages[i], PAGE_EVENT_NOT_BUSY);
@@ -610,6 +611,8 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 			pages[i]->state = PAGE_STATE_ACTIVE;
 		else
 			vm_page_set_state(pages[i], PAGE_STATE_MODIFIED);
+
+		DEBUG_PAGE_ACCESS_END(pages[i]);
 	}
 
 	return status;
@@ -798,6 +801,9 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 			// Since we don't actually map pages as part of an area, we have
 			// to manually maintain their usage_count
 			page->usage_count = 2;
+				// TODO: Just because this request comes from the FS API, it
+				// doesn't mean the page is not mapped. We might actually
+				// decrease the usage count of a hot page here.
 
 			if (doWrite || useBuffer) {
 				// Since the following user_mem{cpy,set}() might cause a page
@@ -827,8 +833,11 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 				locker.Lock();
 
 				page->state = oldPageState;
-				if (doWrite && page->state != PAGE_STATE_MODIFIED)
+				if (doWrite && page->state != PAGE_STATE_MODIFIED) {
+					DEBUG_PAGE_ACCESS_START(page);
 					vm_page_set_state(page, PAGE_STATE_MODIFIED);
+					DEBUG_PAGE_ACCESS_END(page);
+				}
 
 				cache->NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 			}
@@ -1001,6 +1010,8 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 
 	cache->ReleaseRefAndUnlock();
 	vm_page_unreserve_pages(reservePages);
+		// TODO: We should periodically unreserve as we go, so we don't
+		// unnecessarily put pressure on the free page pool.
 }
 
 

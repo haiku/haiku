@@ -376,10 +376,13 @@ destroy_tmap(vm_translation_map *map)
 					panic("destroy_tmap: didn't find pgtable page\n");
 					return;
 				}
+				DEBUG_PAGE_ACCESS_START(page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
 			}
-			if (((i+1)%NUM_DIRTBL_PER_PAGE) == 0)
+			if (((i + 1) % NUM_DIRTBL_PER_PAGE) == 0) {
+				DEBUG_PAGE_ACCESS_END(dirpage);
 				vm_page_set_state(dirpage, PAGE_STATE_FREE);
+			}
 		}
 		free(map->arch_data->rtdir_virt);
 	}
@@ -545,6 +548,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 		// mark the page WIRED
 		vm_page_set_state(page, PAGE_STATE_WIRED);
 
+		DEBUG_PAGE_ACCESS_END(page);
+
 		pgdir = page->physical_page_number * B_PAGE_SIZE;
 
 		TRACE(("map_tmap: asked for free page for pgdir. 0x%lx\n", pgdir));
@@ -590,6 +595,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 
 		// mark the page WIRED
 		vm_page_set_state(page, PAGE_STATE_WIRED);
+
+		DEBUG_PAGE_ACCESS_END(page);
 
 		pgtable = page->physical_page_number * B_PAGE_SIZE;
 

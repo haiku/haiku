@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -90,6 +90,10 @@ struct vm_page {
 	void*					queue;
 #endif
 
+#if DEBUG_PAGE_ACCESS
+	vint32					accessing_thread;
+#endif
+
 	uint8					type : 2;
 	uint8					state : 3;
 
@@ -119,6 +123,72 @@ enum {
 	PAGE_STATE_WIRED,
 	PAGE_STATE_UNUSED
 };
+
+
+#if DEBUG_PAGE_ACCESS
+#	include <thread.h>
+
+static inline void
+vm_page_debug_access_start(vm_page* page)
+{
+	thread_id threadID = thread_get_current_thread_id();
+	thread_id previousThread = atomic_test_and_set(&page->accessing_thread,
+		threadID, -1);
+	if (previousThread != -1) {
+		panic("Invalid concurrent access to page %p (start), currently "
+			"accessed by: %" B_PRId32, page, previousThread);
+	}
+}
+
+
+static inline void
+vm_page_debug_access_end(vm_page* page)
+{
+	thread_id threadID = thread_get_current_thread_id();
+	thread_id previousThread = atomic_test_and_set(&page->accessing_thread, -1,
+		threadID);
+	if (previousThread != threadID) {
+		panic("Invalid concurrent access to page %p (end) by current thread, "
+			"current accessor is: %" B_PRId32, page, previousThread);
+	}
+}
+
+
+static inline void
+vm_page_debug_access_check(vm_page* page)
+{
+	thread_id thread = page->accessing_thread;
+	if (thread != thread_get_current_thread_id()) {
+		panic("Invalid concurrent access to page %p (check), currently "
+			"accessed by: %" B_PRId32, page, thread);
+	}
+}
+
+
+static inline void
+vm_page_debug_access_transfer(vm_page* page, thread_id expectedPreviousThread)
+{
+	thread_id threadID = thread_get_current_thread_id();
+	thread_id previousThread = atomic_test_and_set(&page->accessing_thread,
+		threadID, expectedPreviousThread);
+	if (previousThread != expectedPreviousThread) {
+		panic("Invalid access transfer for page %p, currently accessed by: "
+			"%" B_PRId32 ", expected: %" B_PRId32, page, previousThread,
+			expectedPreviousThread);
+	}
+}
+
+#	define DEBUG_PAGE_ACCESS_START(page)	vm_page_debug_access_start(page)
+#	define DEBUG_PAGE_ACCESS_END(page)		vm_page_debug_access_end(page)
+#	define DEBUG_PAGE_ACCESS_CHECK(page)	vm_page_debug_access_check(page)
+#	define DEBUG_PAGE_ACCESS_TRANSFER(page, thread)	\
+		vm_page_debug_access_transfer(page, thread)
+#else
+#	define DEBUG_PAGE_ACCESS_START(page)			do {} while (false)
+#	define DEBUG_PAGE_ACCESS_END(page)				do {} while (false)
+#	define DEBUG_PAGE_ACCESS_CHECK(page)			do {} while (false)
+#	define DEBUG_PAGE_ACCESS_TRANSFER(page, thread)	do {} while (false)
+#endif
 
 
 #endif	// _KERNEL_VM_VM_TYPES_H

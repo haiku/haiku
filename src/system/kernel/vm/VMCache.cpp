@@ -612,6 +612,7 @@ VMCache::Delete()
 
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
 			oldPage->physical_page_number));
+		DEBUG_PAGE_ACCESS_START(page);
 		vm_page_free(this, page);
 	}
 
@@ -1032,6 +1033,7 @@ VMCache::Resize(off_t newSize)
 			}
 
 			// remove the page and put it into the free queue
+			DEBUG_PAGE_ACCESS_START(page);
 			vm_remove_all_page_mappings(page, NULL);
 			ASSERT(page->wired_count == 0);
 				// TODO: Find a real solution! Unmapping is probably fine, but
@@ -1081,6 +1083,7 @@ VMCache::FlushAndRemoveAllPages()
 			if (page->wired_count > 0 || !page->mappings.IsEmpty())
 				return B_BUSY;
 
+			DEBUG_PAGE_ACCESS_START(page);
 			RemovePage(page);
 			vm_page_free(this, page);
 				// Note: When iterating through a IteratableSplayTree

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -274,6 +274,7 @@ destroy_tmap(vm_translation_map *map)
 				page = vm_lookup_page(pgtable_addr);
 				if (!page)
 					panic("destroy_tmap: didn't find pgtable page\n");
+				DEBUG_PAGE_ACCESS_START(page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
 			}
 		}
@@ -368,6 +369,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 
 		// mark the page WIRED
 		vm_page_set_state(page, PAGE_STATE_WIRED);
+
+		DEBUG_PAGE_ACCESS_END(page);
 
 		pgtable = page->physical_page_number * B_PAGE_SIZE;
 

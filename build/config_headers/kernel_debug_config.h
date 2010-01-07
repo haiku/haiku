@@ -80,9 +80,13 @@
 
 // VM
 
-// Enables the vm_page::queue, i.e. it is tracked which queue the page should
-// be in.
+// Enables the vm_page::queue field, i.e. it is tracked which queue the page
+// should be in.
 #define DEBUG_PAGE_QUEUE				0
+
+// Enables the vm_page::access_count field, which is used to detect invalid
+// concurrent access to the page.
+#define DEBUG_PAGE_ACCESS				1
 
 // Enables a global list of all vm_cache structures.
 #define DEBUG_CACHE_LIST				KDEBUG_LEVEL_1

@@ -18,6 +18,7 @@ KernelMergeObject kernel_vm.o :
 	VMKernelAddressSpace.cpp
 	VMKernelArea.cpp
 	VMNullCache.cpp
+	VMPageQueue.cpp
 	VMUserAddressSpace.cpp
 	VMUserArea.cpp
 
