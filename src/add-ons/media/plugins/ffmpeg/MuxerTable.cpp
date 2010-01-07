@@ -26,6 +26,22 @@ const media_file_format gMuxerTable[] = {
 	},
 	{
 		media_file_format::B_WRITABLE
+			| media_file_format::B_KNOWS_RAW_VIDEO
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_AVI_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/x-matroska",
+		"Matroska file format",
+		"mkv",
+		"mkv",
+		{ 0 }
+	},
+	{
+		media_file_format::B_WRITABLE
 			| media_file_format::B_KNOWS_ENCODED_VIDEO
 			| media_file_format::B_KNOWS_ENCODED_AUDIO,
 		{ 0 },
