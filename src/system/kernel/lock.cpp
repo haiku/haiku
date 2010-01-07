@@ -323,9 +323,9 @@ _rw_lock_read_lock(rw_lock* lock)
 
 
 void
-_rw_lock_read_unlock(rw_lock* lock)
+_rw_lock_read_unlock(rw_lock* lock, bool threadsLocked)
 {
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock, false, !threadsLocked);
 
 	// If we're still holding the write lock or if there are other readers,
 	// no-one can be woken up.
@@ -389,9 +389,9 @@ rw_lock_write_lock(rw_lock* lock)
 
 
 void
-rw_lock_write_unlock(rw_lock* lock)
+_rw_lock_write_unlock(rw_lock* lock, bool threadsLocked)
 {
-	InterruptsSpinLocker locker(gThreadSpinlock);
+	InterruptsSpinLocker locker(gThreadSpinlock, false, !threadsLocked);
 
 	if (thread_get_current_thread_id() != lock->holder) {
 		panic("rw_lock_write_unlock(): lock %p not write-locked by this thread",
@@ -553,6 +553,23 @@ mutex_switch_lock(mutex* from, mutex* to)
 	if (atomic_add(&from->count, 1) < -1)
 #endif
 		_mutex_unlock(from, true);
+
+	return mutex_lock_threads_locked(to);
+}
+
+
+status_t
+mutex_switch_from_read_lock(rw_lock* from, mutex* to)
+{
+	InterruptsSpinLocker locker(gThreadSpinlock);
+
+#if KDEBUG_RW_LOCK_DEBUG
+	_rw_lock_write_unlock(from, true);
+#else
+	int32 oldCount = atomic_add(&from->count, -1);
+	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
+		_rw_lock_read_unlock(from, true);
+#endif
 
 	return mutex_lock_threads_locked(to);
 }

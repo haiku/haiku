@@ -124,7 +124,6 @@ extern void rw_lock_init(rw_lock* lock, const char* name);
 extern void rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags);
 extern void rw_lock_destroy(rw_lock* lock);
 extern status_t rw_lock_write_lock(rw_lock* lock);
-extern void rw_lock_write_unlock(rw_lock* lock);
 
 extern void mutex_init(mutex* lock, const char* name);
 	// name is *not* cloned nor freed in mutex_destroy()
@@ -135,12 +134,16 @@ extern status_t mutex_switch_lock(mutex* from, mutex* to);
 	// for the lock is atomically. I.e. if "from" guards the object "to" belongs
 	// to, the operation is safe as long as "from" is held while destroying
 	// "to".
+extern status_t mutex_switch_from_read_lock(rw_lock* from, mutex* to);
+	// Like mutex_switch_lock(), just for a switching from a read-locked
+	// rw_lock.
 
 
 // implementation private:
 
 extern status_t _rw_lock_read_lock(rw_lock* lock);
-extern void _rw_lock_read_unlock(rw_lock* lock);
+extern void _rw_lock_read_unlock(rw_lock* lock, bool threadsLocked);
+extern void _rw_lock_write_unlock(rw_lock* lock, bool threadsLocked);
 
 extern status_t _mutex_lock(mutex* lock, bool threadsLocked);
 extern void _mutex_unlock(mutex* lock, bool threadsLocked);
@@ -171,8 +174,15 @@ rw_lock_read_unlock(rw_lock* lock)
 #else
 	int32 oldCount = atomic_add(&lock->count, -1);
 	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
-		_rw_lock_read_unlock(lock);
+		_rw_lock_read_unlock(lock, false);
 #endif
+}
+
+
+static inline void
+rw_lock_write_unlock(rw_lock* lock)
+{
+	_rw_lock_write_unlock(lock, false);
 }
 
 
