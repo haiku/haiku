@@ -15,9 +15,11 @@ extern "C" {
 	#include "rational.h"
 }
 
+#include "gfx_util.h"
+
 
 #undef TRACE
-#define TRACE_AV_CODEC_ENCODER
+//#define TRACE_AV_CODEC_ENCODER
 #ifdef TRACE_AV_CODEC_ENCODER
 #	define TRACE	printf
 #	define TRACE_IO(a...)
@@ -309,10 +311,10 @@ AVCodecEncoder::_Setup()
 		fFrame->linesize[2] = fDstFrame.linesize[2];
 		fFrame->linesize[3] = fDstFrame.linesize[3];
 
-		// TODO: Use actual pixel format from media_format!
 		fSwsContext = sws_getContext(fContext->width, fContext->height,
-			PIX_FMT_RGB32, fContext->width, fContext->height,
-			fContext->pix_fmt, SWS_BICUBIC, NULL, NULL, NULL);
+			colorspace_to_pixfmt(fInputFormat.u.raw_video.display.format),
+			fContext->width, fContext->height,
+			fContext->pix_fmt, SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
 	} else if (fInputFormat.type == B_MEDIA_RAW_AUDIO) {
 		TRACE("  B_MEDIA_RAW_AUDIO\n");
