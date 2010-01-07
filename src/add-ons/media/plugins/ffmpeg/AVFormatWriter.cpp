@@ -26,7 +26,7 @@ extern "C" {
 #include "gfx_util.h"
 
 
-#define TRACE_AVFORMAT_WRITER
+//#define TRACE_AVFORMAT_WRITER
 #ifdef TRACE_AVFORMAT_WRITER
 #	define TRACE printf
 #	define TRACE_IO(a...)
