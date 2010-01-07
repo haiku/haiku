@@ -104,7 +104,7 @@ public:
 
 
 static mutex sMappingLock = MUTEX_INITIALIZER("page mappings");
-static mutex sAreaCacheLock = MUTEX_INITIALIZER("area->cache");
+static rw_lock sAreaCacheLock = RW_LOCK_INITIALIZER("area->cache");
 
 static off_t sAvailableMemory;
 static off_t sNeededMemory;
@@ -1413,22 +1413,22 @@ vm_map_file(team_id aid, const char* name, void** address, uint32 addressSpec,
 VMCache*
 vm_area_get_locked_cache(VMArea* area)
 {
-	mutex_lock(&sAreaCacheLock);
+	rw_lock_read_lock(&sAreaCacheLock);
 
 	while (true) {
 		VMCache* cache = area->cache;
 
-		if (!cache->SwitchLock(&sAreaCacheLock)) {
+		if (!cache->SwitchFromReadLock(&sAreaCacheLock)) {
 			// cache has been deleted
-			mutex_lock(&sAreaCacheLock);
+			rw_lock_read_lock(&sAreaCacheLock);
 			continue;
 		}
 
-		mutex_lock(&sAreaCacheLock);
+		rw_lock_read_lock(&sAreaCacheLock);
 
 		if (cache == area->cache) {
 			cache->AcquireRefLocked();
-			mutex_unlock(&sAreaCacheLock);
+			rw_lock_read_unlock(&sAreaCacheLock);
 			return cache;
 		}
 
@@ -1665,9 +1665,9 @@ vm_copy_on_write_area(VMCache* lowerCache)
 	upperCache->virtual_end = lowerCache->virtual_end;
 
 	// transfer the lower cache areas to the upper cache
-	mutex_lock(&sAreaCacheLock);
+	rw_lock_write_lock(&sAreaCacheLock);
 	upperCache->TransferAreas(lowerCache);
-	mutex_unlock(&sAreaCacheLock);
+	rw_lock_write_unlock(&sAreaCacheLock);
 
 	lowerCache->AddConsumer(upperCache);
 
