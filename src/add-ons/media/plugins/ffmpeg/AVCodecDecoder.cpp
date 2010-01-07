@@ -36,6 +36,8 @@
 	static int sDumpedPackets = 0;
 #endif
 
+#define USE_SWS_FOR_COLOR_SPACE_CONVERSION 0
+
 
 struct wave_format_ex {
 	uint16 format_tag;
@@ -72,7 +74,11 @@ AVCodecDecoder::AVCodecDecoder()
 
 	fCodecInitDone(false),
 
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+	fSwsContext(NULL),
+#else
 	fFormatConversionFunc(NULL),
+#endif
 
 	fExtraData(NULL),
 	fExtraDataSize(0),
@@ -115,6 +121,11 @@ AVCodecDecoder::~AVCodecDecoder()
 	free(fInputPicture);
 	free(fContext);
 
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+	if (fSwsContext != NULL)
+		sws_freeContext(fSwsContext);
+#endif
+
 	delete[] fExtraData;
 	delete[] fOutputBuffer;
 }
@@ -126,6 +137,8 @@ AVCodecDecoder::GetCodecInfo(media_codec_info* mci)
 	sprintf(mci->short_name, "ff:%s", fCodec->name);
 	sprintf(mci->pretty_name, "%s (libavcodec %s)",
 		gCodecTable[fCodecIndexInTable].prettyname, fCodec->name);
+	mci->id = 0;
+	mci->sub_id = gCodecTable[fCodecIndexInTable].id;
 }
 
 
@@ -453,7 +466,11 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	// time using another pixel-format that is supported by the decoder.
 	// But libavcodec doesn't seem to offer any way to tell the decoder
 	// which format it should use.
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+	fSwsContext = NULL;
+#else
 	fFormatConversionFunc = 0;
+#endif
 	// Iterate over supported codec formats
 	for (int i = 0; i < 1; i++) {
 		// close any previous instance
@@ -465,11 +482,19 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		if (avcodec_open(fContext, fCodec) >= 0) {
 			fCodecInitDone = true;
 
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+			fSwsContext = sws_getContext(fContext->width, fContext->height,
+				fContext->pix_fmt, fContext->width, fContext->height,
+				colorspace_to_pixfmt(fOutputVideoFormat.display.format),
+				SWS_FAST_BILINEAR, NULL, NULL, NULL);
+		}
+#else
 			fFormatConversionFunc = resolve_colorspace(
 				fOutputVideoFormat.display.format, fContext->pix_fmt);
 		}
 		if (fFormatConversionFunc != NULL)
 			break;
+#endif
 	}
 
 	if (!fCodecInitDone) {
@@ -477,10 +502,17 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		return B_ERROR;
 	}
 
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+	if (fSwsContext == NULL) {
+		TRACE("No SWS Scale context or decoder has not set the pixel format "
+			"yet!\n");
+	}
+#else
 	if (fFormatConversionFunc == NULL) {
 		TRACE("no pixel format conversion function found or decoder has "
 			"not set the pixel format yet!\n");
 	}
+#endif
 
 	if (fOutputVideoFormat.display.format == B_YCbCr422) {
 		fOutputVideoFormat.display.bytes_per_row
@@ -707,15 +739,29 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 //				pixfmt_to_string(fContext->pix_fmt));
 
 			// Some decoders do not set pix_fmt until they have decoded 1 frame
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+			if (fSwsContext == NULL) {
+				fSwsContext = sws_getContext(fContext->width, fContext->height,
+					fContext->pix_fmt, fContext->width, fContext->height,
+					colorspace_to_pixfmt(fOutputVideoFormat.display.format),
+					SWS_FAST_BILINEAR, NULL, NULL, NULL);
+			}
+#else
 			if (fFormatConversionFunc == NULL) {
 				fFormatConversionFunc = resolve_colorspace(
 					fOutputVideoFormat.display.format, fContext->pix_fmt);
 			}
+#endif
+
 			fOutputPicture->data[0] = (uint8_t*)outBuffer;
 			fOutputPicture->linesize[0]
 				= fOutputVideoFormat.display.bytes_per_row;
 
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+			if (fSwsContext != NULL) {
+#else
 			if (fFormatConversionFunc != NULL) {
+#endif
 				if (useDeinterlacedPicture) {
 					AVFrame inputFrame;
 					inputFrame.data[0] = deinterlacedPicture.data[0];
@@ -727,11 +773,23 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 					inputFrame.linesize[2] = deinterlacedPicture.linesize[2];
 					inputFrame.linesize[3] = deinterlacedPicture.linesize[3];
 
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+					sws_scale(fSwsContext, inputFrame.data,
+						inputFrame.linesize, 0, fContext->height,
+						fOutputPicture->data, fOutputPicture->linesize);
+#else
 					(*fFormatConversionFunc)(&inputFrame,
 						fOutputPicture, width, height);
+#endif
 				} else {
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+					sws_scale(fSwsContext, fInputPicture->data,
+						fInputPicture->linesize, 0, fContext->height,
+						fOutputPicture->data, fOutputPicture->linesize);
+#else
 					(*fFormatConversionFunc)(fInputPicture, fOutputPicture,
 						width, height);
+#endif
 				}
 			}
 			if (fInputPicture->interlaced_frame)

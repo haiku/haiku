@@ -14,6 +14,10 @@
 
 #include <MediaFormats.h>
 
+extern "C" {
+	#include "swscale.h"
+}
+
 #include "DecoderPlugin.h"
 #include "ReaderPlugin.h"
 
@@ -80,6 +84,7 @@ private:
 			bool 				fCodecInitDone;
 
 			gfx_convert_func	fFormatConversionFunc;
+			SwsContext*			fSwsContext;
 
 			char*				fExtraData;
 			int					fExtraDataSize;
