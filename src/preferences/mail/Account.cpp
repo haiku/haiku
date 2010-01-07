@@ -1,6 +1,6 @@
 /* Account - provides an "account" view on the mail chains
 **
-** Copyright 2001-2009 Dr. Zoidberg Enterprises. All rights reserved.
+** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
 */
 
 
