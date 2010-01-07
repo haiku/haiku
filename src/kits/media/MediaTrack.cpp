@@ -313,7 +313,6 @@ BMediaTrack::ReadFrames(void* buffer, int64* _frameCount,
 		result = fDecoder->Decode(buffer, _frameCount, _header, info);
 	if (result == B_OK) {
 		fCurrentFrame += *_frameCount;
-printf("ReadFrames() - next frame: %lld\n", fCurrentFrame);
 		fCurrentTime = _header->start_time
 			+ *_frameCount * 1000000LL / _FrameRate();
 	} else {
@@ -526,7 +525,6 @@ BMediaTrack::ReadChunk(char** _buffer, int32* _size, media_header* _header)
 		// to the next frame.
 		if (fCurrentTime != _header->start_time) {
 			fCurrentFrame++;
-printf("ReadChunk() - next frame: %lld\n", fCurrentFrame);
 			fCurrentTime = _header->start_time + 1000000LL / _FrameRate();
 		}
 	}
