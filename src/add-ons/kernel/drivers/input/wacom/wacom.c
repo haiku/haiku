@@ -548,6 +548,9 @@ device_read(void* cookie, off_t pos, void* buf, size_t* count)
 				// handle time out
 				if (ret < B_OK) {
 					usb->cancel_queued_transfers(device->pipe);
+					acquire_sem(device->notify_lock);
+						// collect the sem released by the cancel
+
 					if (ret == B_TIMED_OUT) {
 						// a time_out is ok, since it only means that the device
 						// had nothing to report (ie mouse/pen was not moved)
