@@ -788,7 +788,7 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	uint32_t seekFlags = incr < 0 ? AVSEEK_FLAG_BACKWARD : 0;
 
 	pos = av_rescale_q(pos, AV_TIME_BASE_Q, fStream->time_base);
-	
+
 	ret = av_seek_frame(fContext, Index(), pos, seekFlags);
 #endif
 
@@ -839,17 +839,18 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
 		*time = (bigtime_t)(*frame * 1000000LL / frameRate);
 
-	double timeBase = av_q2d(fStream->time_base);
 	int64_t timeStamp;
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
 		// Can use frame, because stream timeStamp is actually in frame
 		// units.
 		timeStamp = *frame;
-	} else
-		timeStamp = (int64_t)(*time / timeBase / 1000000.0);
+	} else {
+		timeStamp = *time * fStream->time_base.num
+			/ ((int64_t)fStream->time_base.den * 1000000);
+	}
 
-	TRACE_SEEK("  time: %.2fs -> %lld (time_base: %f)\n", *time / 1000000.0,
-		timeStamp, timeBase);
+	TRACE_SEEK("  time: %.2fs -> %lld (time_base: %d/%d)\n", *time / 1000000.0,
+		timeStamp, fStream->time_base.num, fStream->time_base.den);
 
 	int searchFlags = AVSEEK_FLAG_BACKWARD;
 	if ((flags & B_MEDIA_SEEK_CLOSEST_FORWARD) != 0)
@@ -867,7 +868,8 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 
 	const AVIndexEntry& entry = fStream->index_entries[index];
 	timeStamp = entry.timestamp;
-	*time = (bigtime_t)(timeStamp * 1000000.0 * timeBase);
+	*time = (bigtime_t)(timeStamp * 1000000 * fStream->time_base.num
+		/ fStream->time_base.den);
 
 	TRACE_SEEK("  seeked time: %.2fs (%lld)\n", *time / 1000000.0, timeStamp);
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
