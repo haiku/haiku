@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2002-2007, Marcus Overhagen <marcus@overhagen.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
@@ -23,19 +23,20 @@
 
 //#define TRACE_MEDIA_TRACK
 #ifdef TRACE_MEDIA_TRACK
-  #ifndef TRACE
-    #define TRACE printf
-  #endif
+#	ifndef TRACE
+#		define TRACE printf
+#	endif
 #else
-  #ifndef TRACE
-    #define TRACE(a...)
-  #endif
+#	ifndef TRACE
+#		define TRACE(a...)
+#	endif
 #endif
 
 #define ERROR(a...) fprintf(stderr, a)
 
 
-#define CONVERT_TO_INT32 0 // XXX test! this triggers a few bugs!
+#define CONVERT_TO_INT32 0
+	// TODO: Test! This triggers a few bugs!
 
 // flags used for workarounds
 enum {
@@ -49,21 +50,24 @@ enum {
 	IGNORE_ENCODED_VIDEO 			= 0x2000,
 };
 
-#define B_MEDIA_DISABLE_FORMAT_TRANSLATION 0x4000 // XXX move this (after name change?) to MediaDefs.h
+#define B_MEDIA_DISABLE_FORMAT_TRANSLATION 0x4000
+	// TODO: move this (after name change?) to MediaDefs.h
 
-class RawDecoderChunkProvider : public ChunkProvider
-{
+
+class RawDecoderChunkProvider : public ChunkProvider {
 public:
-				RawDecoderChunkProvider(Decoder *decoder, int buffer_size, int frame_size);
+				RawDecoderChunkProvider(Decoder* decoder, int buffer_size,
+					int frame_size);
 	virtual 	~RawDecoderChunkProvider();
 
-	status_t	GetNextChunk(const void **chunkBuffer, size_t *chunkSize, media_header *mediaHeader);
+	status_t	GetNextChunk(const void** chunkBuffer, size_t* chunkSize,
+					media_header* mediaHeader);
 
 private:
-	Decoder *fDecoder;
-	void *fBuffer;
-	int	fBufferSize;
-	int	fFrameSize;
+	Decoder*	fDecoder;
+	void*		fBuffer;
+	int			fBufferSize;
+	int			fFrameSize;
 };
 
 
@@ -87,19 +91,19 @@ status_t
 BMediaTrack::InitCheck() const
 {
 	CALLED();
-	return fErr;
+	return fInitStatus;
 }
 
 
 status_t
-BMediaTrack::GetCodecInfo(media_codec_info *mci) const
+BMediaTrack::GetCodecInfo(media_codec_info* mci) const
 {
 	CALLED();
 	if (!fDecoder)
 		return B_NO_INIT;
 
-	*mci = fMCI;
-	strlcpy(mci->pretty_name, fMCI.pretty_name, sizeof(mci->pretty_name));
+	*mci = fCodecInfo;
+	strlcpy(mci->pretty_name, fCodecInfo.pretty_name, sizeof(mci->pretty_name));
 
 	return B_OK;
 }
@@ -145,7 +149,7 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 		return B_NO_INIT;
 
 	_plugin_manager.DestroyDecoder(fRawDecoder);
-	fRawDecoder = 0;
+	fRawDecoder = NULL;
 
 #ifdef TRACE_MEDIA_TRACK
 	char s[200];
@@ -177,7 +181,7 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 	printf("BMediaTrack::DecodedFormat: req2: %s\n", s);
 #endif
 
-	media_format requested_format = *inout_format;
+	fFormat = *inout_format;
 
 	status_t res;
 
@@ -210,15 +214,17 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 	}
 
 	if (0 == (flags & B_MEDIA_DISABLE_FORMAT_TRANSLATION)) {
-		if (requested_format.type == B_MEDIA_RAW_AUDIO
+		if (fFormat.type == B_MEDIA_RAW_AUDIO
 			&& inout_format->type == B_MEDIA_RAW_AUDIO
-			&& requested_format.u.raw_audio.format != 0
-			&& requested_format.u.raw_audio.format != inout_format->u.raw_audio.format) {
-				if (SetupFormatTranslation(*inout_format, &requested_format)) {
-					*inout_format = requested_format;
+			&& fFormat.u.raw_audio.format != 0
+			&& fFormat.u.raw_audio.format != inout_format->u.raw_audio.format) {
+				if (SetupFormatTranslation(*inout_format, &fFormat)) {
+					*inout_format = fFormat;
 				}
 		}
 	}
+
+	fFormat = *inout_format;
 
 //	string_for_format(*inout_format, s, sizeof(s));
 //	printf("BMediaTrack::DecodedFormat: res: %s\n", s);
@@ -250,14 +256,14 @@ BMediaTrack::Duration() const
 int64
 BMediaTrack::CurrentFrame() const
 {
-	return fCurFrame;
+	return fCurrentFrame;
 }
 
 
 bigtime_t
 BMediaTrack::CurrentTime() const
 {
-	return fCurTime;
+	return fCurrentTime;
 }
 
 // BMediaTrack::ReadFrames(char *, long long *, media_header *)
@@ -276,46 +282,49 @@ ReadFrames__11BMediaTrackPcPxP12media_header(BMediaTrack *self,
 #endif	// __GNUC__ < 3
 
 status_t
-BMediaTrack::ReadFrames(void *out_buffer,
-						int64 *out_frameCount,
-						media_header *mh)
+BMediaTrack::ReadFrames(void* buffer, int64* _frameCount,
+	media_header* mediaHeader)
 {
-	return ReadFrames(out_buffer, out_frameCount, mh, 0);
+	return ReadFrames(buffer, _frameCount, mediaHeader, NULL);
 }
 
 
 status_t
-BMediaTrack::ReadFrames(void *out_buffer,
-						int64 *out_frameCount,
-						media_header *mh /* = 0 */,
-						media_decode_info *info /* = 0 */)
+BMediaTrack::ReadFrames(void* buffer, int64* _frameCount,
+	media_header* _header, media_decode_info* info)
 {
 //	CALLED();
 	if (!fDecoder)
 		return B_NO_INIT;
-	if (!out_buffer || !out_frameCount)
+	if (!buffer || !_frameCount)
 		return B_BAD_VALUE;
 
-	status_t result;
 	media_header header;
+	if (_header == NULL)
+		_header = &header;
 
-	memset(&header, 0, sizeof(header)); // always clear it first, as the decoder doesn't set all fields
+	// Always clear the header first, as the decoder may not set all fields.
+	memset(_header, 0, sizeof(media_header));
 
+	status_t result;
 	if (fRawDecoder)
-		result = fRawDecoder->Decode(out_buffer, out_frameCount, &header, info);
+		result = fRawDecoder->Decode(buffer, _frameCount, _header, info);
 	else
-		result = fDecoder->Decode(out_buffer, out_frameCount, &header, info);
+		result = fDecoder->Decode(buffer, _frameCount, _header, info);
 	if (result == B_OK) {
-		fCurFrame += *out_frameCount;
-		fCurTime = header.start_time;
+		fCurrentFrame += *_frameCount;
+printf("ReadFrames() - next frame: %lld\n", fCurrentFrame);
+		fCurrentTime = _header->start_time
+			+ *_frameCount * 1000000LL / _FrameRate();
 	} else {
-		ERROR("BMediaTrack::ReadFrames: decoder returned error 0x%08lx (%s)\n", result, strerror(result));
-		*out_frameCount = 0;
+		ERROR("BMediaTrack::ReadFrames: decoder returned error 0x%08lx (%s)\n",
+			result, strerror(result));
+		*_frameCount = 0;
 	}
-	if (mh)
-		*mh = header;
 
-//	PRINT(1, "BMediaTrack::ReadFrames: stream %ld, start-time %5Ld.%06Ld, %Ld frames\n", fStream,  header.start_time / 1000000, header.start_time % 1000000, *out_frameCount);
+//	PRINT(1, "BMediaTrack::ReadFrames: stream %ld, start-time %5Ld.%06Ld, "
+//		"%Ld frames\n", fStream,  _header->start_time / 1000000,
+//		_header->start_time % 1000000, *out_frameCount);
 
 	return result;
 }
@@ -375,8 +384,8 @@ BMediaTrack::SeekToTime(bigtime_t* inOutTime, int32 flags)
 	}
 
 	*inOutTime = time;
-	fCurFrame = frame;
-	fCurTime = time;
+	fCurrentFrame = frame;
+	fCurrentTime = time;
 
 	PRINT(1, "BMediaTrack::SeekToTime finished, requested %.6f, result %.6f\n",
 		seekTime / 1000000.0, *inOutTime / 1000000.0);
@@ -425,8 +434,8 @@ BMediaTrack::SeekToFrame(int64 *inout_frame, int32 flags)
 	}
 
 	*inout_frame = frame;
-	fCurFrame = frame;
-	fCurTime = time;
+	fCurrentFrame = frame;
+	fCurrentTime = time;
 
 	PRINT(1, "BMediaTrack::SeekToTime SeekToFrame, requested %Ld, result %Ld\n", seekFrame, *inout_frame);
 
@@ -488,30 +497,38 @@ BMediaTrack::FindKeyFrameForFrame(int64 *inoutFrame,
 
 
 status_t
-BMediaTrack::ReadChunk(char **out_buffer,
-					   int32 *out_size,
-					   media_header *mh /* = 0 */)
+BMediaTrack::ReadChunk(char** _buffer, int32* _size, media_header* _header)
 {
 	CALLED();
-	if (!fExtractor)
+	if (fExtractor == NULL)
 		return B_NO_INIT;
-	if (!out_buffer || !out_size)
+	if (_buffer == NULL || _size == NULL)
 		return B_BAD_VALUE;
 
-	status_t result;
 	media_header header;
-	const void *buffer;
+	if (_header == NULL)
+		_header = &header;
+
+	// Always clear the header first, as the extractor may not set all fields.
+	memset(_header, 0, sizeof(media_header));
+
+	const void* buffer;
 	size_t size;
+	status_t result = fExtractor->GetNextChunk(fStream, &buffer, &size,
+		_header);
 
-	memset(&header, 0, sizeof(header)); // always clear it first, as the reader doesn't set all fields
-
-	result = fExtractor->GetNextChunk(fStream, &buffer, &size, &header);
 	if (result == B_OK) {
-		*out_buffer = const_cast<char *>(static_cast<const char *>(buffer)); // yes this *is* ugly
-		*out_size  = size;
-		fCurTime = header.start_time;
-		if (mh)
-			*mh = header;
+		*_buffer = const_cast<char*>(static_cast<const char*>(buffer));
+			// TODO: Change the pointer type when we break the API.
+		*_size = size;
+		// Several chunks may belong to the same frame. If the start time is
+		// different from the previous chunk's time, the next chunk will belong
+		// to the next frame.
+		if (fCurrentTime != _header->start_time) {
+			fCurrentFrame++;
+printf("ReadChunk() - next frame: %lld\n", fCurrentFrame);
+			fCurrentTime = _header->start_time + 1000000LL / _FrameRate();
+		}
 	}
 
 	return result;
@@ -737,20 +754,20 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor* extractor,
 	fRawDecoder = NULL;
 	fExtractor = extractor;
 	fStream = stream;
-	fErr = B_OK;
+	fInitStatus = B_OK;
 
 	SetupWorkaround();
 
-	status_t ret = fExtractor->CreateDecoder(fStream, &fDecoder, &fMCI);
+	status_t ret = fExtractor->CreateDecoder(fStream, &fDecoder, &fCodecInfo);
 	if (ret != B_OK) {
 		TRACE("BMediaTrack::BMediaTrack: Error: creating decoder failed: "
 			"%s\n", strerror(ret));
-		// We do not set fErr here, because ReadChunk should still work.
+		// We do not set fInitStatus here, because ReadChunk should still work.
 		fDecoder = NULL;
 	}
 
-	fCurFrame = 0;
-	fCurTime = 0;
+	fCurrentFrame = 0;
+	fCurrentTime = 0;
 
 	// not used:
 	fEncoder = NULL;
@@ -770,9 +787,9 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaWriter* writer,
 	fEncoderID = -1;
 		// TODO: Not yet sure what this was needed for...
 	fWriter = writer;
-	fWriterFormat = *format;
+	fFormat = *format;
 	fStream = streamIndex;
-	fErr = B_OK;
+	fInitStatus = B_OK;
 
 	SetupWorkaround();
 
@@ -781,17 +798,17 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaWriter* writer,
 		if (ret != B_OK) {
 			TRACE("BMediaTrack::BMediaTrack: Error: creating decoder failed: "
 				"%s\n", strerror(ret));
-			// We do not set fErr here, because WriteChunk should still work.
+			// We do not set fInitStatus here, because WriteChunk should still work.
 			fEncoder = NULL;
 		} else {
-			fMCI = *codecInfo;
-			fErr = fEncoder->SetUp(&fWriterFormat);
+			fCodecInfo = *codecInfo;
+			fInitStatus = fEncoder->SetUp(&fFormat);
 		}
 	}
 
 	// not used:
-	fCurFrame = 0;
-	fCurTime = 0;
+	fCurrentFrame = 0;
+	fCurrentTime = 0;
 	fDecoder = NULL;
 	fRawDecoder = NULL;
 	fExtractor = NULL;
@@ -825,7 +842,8 @@ BMediaTrack::SetupWorkaround()
 		printf("BMediaTrack::SetupWorkaround: MediaPlayer workaround active\n");
 	}
 
-#if CONVERT_TO_INT32 // XXX test
+#if CONVERT_TO_INT32
+	// TODO: Test
 	if (!(fWorkaroundFlags & FORCE_RAW_AUDIO_INT16_FORMAT))
 		fWorkaroundFlags |= FORCE_RAW_AUDIO_INT32_FORMAT;
 #endif
@@ -895,6 +913,24 @@ error:
 	_plugin_manager.DestroyDecoder(fRawDecoder);
 	fRawDecoder = NULL;
 	return false;
+}
+
+
+double
+BMediaTrack::_FrameRate() const
+{
+	switch (fFormat.type) {
+		case B_MEDIA_RAW_VIDEO:
+			return fFormat.u.raw_video.field_rate;
+		case B_MEDIA_ENCODED_VIDEO:
+			return fFormat.u.encoded_video.output.field_rate;
+		case B_MEDIA_RAW_AUDIO:
+			return fFormat.u.raw_audio.frame_rate;
+		case B_MEDIA_ENCODED_AUDIO:
+			return fFormat.u.encoded_audio.output.frame_rate;
+		default:
+			return 1.0;
+	}
 }
 
 /*
