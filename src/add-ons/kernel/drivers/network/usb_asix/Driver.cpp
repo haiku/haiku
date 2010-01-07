@@ -2,8 +2,8 @@
  *	ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver.
  *	Copyright (c) 2008 S.Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
- *	
- *	Heavily based on code of the 
+ *
+ *	Heavily based on code of the
  *	Driver for USB Ethernet Control Model devices
  *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
  *	Distributed under the terms of the MIT license.
@@ -53,7 +53,7 @@ create_asix_device(usb_device device)
 	}
 
 #define IDS(__vendor, __product) (((__vendor) << 16) | (__product))
-	
+
 	switch(IDS(deviceDescriptor->vendor_id, deviceDescriptor->product_id)) {
 		// AX88172
 		case IDS(0x0b95, 0x1720): return new AX88172Device(device, "ASIX 88172 10/100");
@@ -95,7 +95,7 @@ usb_asix_device_added(usb_device device, void **cookie)
 	*cookie = NULL;
 
 	DriverSmartLock driverLock; // released on exit
-	
+
 	// check if this is a replug of an existing device first
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
 		if (gASIXDevices[i] == NULL)
@@ -114,7 +114,7 @@ usb_asix_device_added(usb_device device, void **cookie)
 	if (asixDevice == 0) {
 		return ENODEV;
 	}
-	
+
 	status_t status = asixDevice->InitCheck();
 	if (status < B_OK) {
 		delete asixDevice;
@@ -140,7 +140,7 @@ usb_asix_device_added(usb_device device, void **cookie)
 
 	// no space for the device
 	TRACE_ALWAYS("Error: no more device entries availble.\n");
-	
+
 	delete asixDevice;
 	return B_ERROR;
 }
@@ -189,9 +189,9 @@ init_driver()
 		return status;
 
 	load_settings();
-	
+
 	TRACE_ALWAYS("%s\n", kVersion);
-	
+
 	for (int32 i = 0; i < MAX_DEVICES; i++)
 		gASIXDevices[i] = NULL;
 
@@ -229,7 +229,7 @@ uninit_driver()
 
 	mutex_destroy(&gDriverLock);
 	put_module(B_USB_MODULE_NAME);
-	
+
 	release_settings();
 }
 
@@ -288,9 +288,9 @@ static status_t
 usb_asix_free(void *cookie)
 {
 	ASIXDevice *device = (ASIXDevice *)cookie;
-	
+
 	DriverSmartLock driverLock; // released on exit
-	
+
 	status_t status = device->Free();
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
 		if (gASIXDevices[i] == device) {
@@ -316,7 +316,7 @@ publish_devices()
 	}
 
 	DriverSmartLock driverLock; // released on exit
-	
+
 	int32 deviceCount = 0;
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
 		if (gASIXDevices[i] == NULL)
