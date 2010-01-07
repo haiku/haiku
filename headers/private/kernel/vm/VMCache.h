@@ -73,6 +73,7 @@ public:
 	inline	bool				Lock();
 	inline	bool				TryLock();
 	inline	bool				SwitchLock(mutex* from);
+	inline	bool				SwitchFromReadLock(rw_lock* from);
 			void				Unlock();
 	inline	void				AssertLocked();
 
@@ -217,6 +218,13 @@ bool
 VMCache::SwitchLock(mutex* from)
 {
 	return mutex_switch_lock(from, &fLock) == B_OK;
+}
+
+
+bool
+VMCache::SwitchFromReadLock(rw_lock* from)
+{
+	return mutex_switch_from_read_lock(from, &fLock) == B_OK;
 }
 
 
