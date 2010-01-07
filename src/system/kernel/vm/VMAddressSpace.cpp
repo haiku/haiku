@@ -148,23 +148,6 @@ VMAddressSpace::InitPostSem()
 }
 
 
-void
-VMAddressSpace::Put()
-{
-	bool remove = false;
-
-	rw_lock_write_lock(&sAddressSpaceTableLock);
-	if (atomic_add(&fRefCount, -1) == 1) {
-		sAddressSpaceTable.RemoveUnchecked(this);
-		remove = true;
-	}
-	rw_lock_write_unlock(&sAddressSpaceTableLock);
-
-	if (remove)
-		delete this;
-}
-
-
 /*! Deletes all areas in the specified address space, and the address
 	space by decreasing all reference counters. It also marks the
 	address space of being in deletion state, so that no more areas
@@ -290,6 +273,25 @@ VMAddressSpace::Get(team_id teamID)
 	rw_lock_read_unlock(&sAddressSpaceTableLock);
 
 	return addressSpace;
+}
+
+
+/*static*/ void
+VMAddressSpace::_DeleteIfUnreferenced(team_id id)
+{
+	rw_lock_write_lock(&sAddressSpaceTableLock);
+
+	bool remove = false;
+	VMAddressSpace* addressSpace = sAddressSpaceTable.Lookup(id);
+	if (addressSpace != NULL && addressSpace->fRefCount == 0) {
+		sAddressSpaceTable.RemoveUnchecked(addressSpace);
+		remove = true;
+	}
+
+	rw_lock_write_unlock(&sAddressSpaceTableLock);
+
+	if (remove)
+		delete addressSpace;
 }
 
 

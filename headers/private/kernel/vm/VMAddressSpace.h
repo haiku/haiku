@@ -49,8 +49,8 @@ public:
 			int32				RefCount() const
 									{ return fRefCount; }
 
-			void				Get()	{ atomic_add(&fRefCount, 1); }
-			void 				Put();
+	inline	void				Get()	{ atomic_add(&fRefCount, 1); }
+	inline	void 				Put();
 			void				RemoveAndPut();
 
 			void				IncrementFaultCount()
@@ -107,6 +107,8 @@ public:
 	static	VMAddressSpace*		Get(team_id teamID);
 
 protected:
+	static	void				_DeleteIfUnreferenced(team_id id);
+
 	static	int					_DumpCommand(int argc, char** argv);
 	static	int					_DumpListCommand(int argc, char** argv);
 
@@ -127,6 +129,15 @@ protected:
 			bool				fDeleting;
 	static	VMAddressSpace*		sKernelAddressSpace;
 };
+
+
+void
+VMAddressSpace::Put()
+{
+	team_id id = fID;
+	if (atomic_add(&fRefCount, -1) == 1)
+		_DeleteIfUnreferenced(id);
+}
 
 
 class VMAddressSpace::AreaIterator {
