@@ -293,6 +293,8 @@ HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR=
 HAIKU_ADD_ALTERNATIVE_GCC_LIBS=
 HOST_GCC_LD=`gcc -print-prog-name=ld`
 HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
+SFDISK_BINARY=sfdisk
+HOST_SFDISK=$SFDISK_BINARY
 
 haikuRequiredLegacyGCCVersion="2.95.3-haiku-090629"
 export haikuRequiredLegacyGCCVersion
@@ -415,6 +417,7 @@ case "${platform}" in
 			;;
 	Darwin)	HOST_PLATFORM=darwin ;;
 	FreeBSD)	HOST_PLATFORM=freebsd
+				SFDISK_BINARY=sfdisk-linux
 				if [ "$HAIKU_USE_32BIT" = 1 ] ; then
 					echo Unsupported platform: FreeBSD ${platformMachine}
 					exit 1
@@ -450,6 +453,13 @@ if [ $targetArch = "x86" ]; then
 		exit 1
 	fi
 fi
+
+# check common locations for sfdisk
+for sfdiskDir in /sbin /usr/sbin /usr/local/sbin ; do
+	if [ -e ${sfdiskDir}/${SFDISK_BINARY} ]; then
+		HOST_SFDISK=${sfdiskDir}/${SFDISK_BINARY}
+	fi
+done	
 
 # check for case-sensitive filesystem if on darwin
 if [ $HOST_PLATFORM = "darwin" ]; then
@@ -546,6 +556,7 @@ HOST_GCC_RAW_VERSION		?= ${HOST_GCC_RAW_VERSION} ;
 HOST_GCC_MACHINE			?= ${HOST_GCC_MACHINE} ;
 HOST_LD						?= ${HOST_GCC_LD} ;
 HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
+HOST_SFDISK					?= ${HOST_SFDISK} ;
 
 EOF
 
