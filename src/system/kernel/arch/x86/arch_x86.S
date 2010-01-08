@@ -164,7 +164,7 @@ FUNCTION(x86_end_userspace_thread_exit):
 FUNCTION(x86_enter_userspace):
 	movl	4(%esp), %eax	// get entry point
 	movl	8(%esp), %ebx	// get user stack
-	movw	$USER_DATA_SEG, %cx
+	movl	$USER_DATA_SEG, %ecx
 	movw	%cx, %ds
 	movw	%cx, %es
 	//movw	$0x33 + cpu_num, %fs	-> fs points to the TLS storage (CPU dependent segment)
@@ -172,7 +172,7 @@ FUNCTION(x86_enter_userspace):
 
 	xorl	%ebp, %ebp		// this is the last stack frame - we don't need one on return
 							// (%ebp marks the beginning of this stack frame)
-	pushl	$USER_DATA_SEG	// user data segment
+	pushl	%ecx			// user data segment
 	pushl	%ebx			// user stack
 	pushl	$(1 << 9) | 2	// user flags
 	pushl	$USER_CODE_SEG	// user code segment
