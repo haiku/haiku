@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ENTRY_CACHE_H
@@ -9,13 +9,9 @@
 #include <stdlib.h>
 
 #include <util/AutoLock.h>
-#include <util/DoublyLinkedList.h>
 #include <util/khash.h>
 #include <util/OpenHashTable.h>
 
-
-const static uint32 kMaxEntryCacheEntryCount = 8192;
-	// Maximum number of entries per entry cache. It's a hard limit ATM.
 
 struct EntryCacheKey {
 	EntryCacheKey(ino_t dirID, const char* name)
@@ -23,18 +19,35 @@ struct EntryCacheKey {
 		dir_id(dirID),
 		name(name)
 	{
+		hash = (uint32)dir_id ^ (uint32)(dir_id >> 32) ^ hash_hash_string(name);
+			// We cache the hash value, so we can easily compute it before
+			// holding any locks.
 	}
 
 	ino_t		dir_id;
 	const char*	name;
+	size_t		hash;
 };
 
 
-struct EntryCacheEntry : DoublyLinkedListLinkImpl<EntryCacheEntry> {
-	EntryCacheEntry*	hash_link;
-	ino_t				node_id;
-	ino_t				dir_id;
-	char				name[1];
+struct EntryCacheEntry {
+			EntryCacheEntry*	hash_link;
+			ino_t				node_id;
+			ino_t				dir_id;
+			vint32				generation;
+			vint32				index;
+			char				name[1];
+};
+
+
+struct EntryCacheGeneration {
+			vint32				next_index;
+			EntryCacheEntry**	entries;
+
+								EntryCacheGeneration();
+								~EntryCacheGeneration();
+
+			status_t			Init();
 };
 
 
@@ -44,8 +57,7 @@ struct EntryCacheHashDefinition {
 
 	uint32 HashKey(const EntryCacheKey& key) const
 	{
-		return (uint32)key.dir_id ^ (uint32)(key.dir_id >> 32)
-			^ hash_hash_string(key.name);
+		return key.hash;
 	}
 
 	size_t Hash(const EntryCacheEntry* value) const
@@ -69,102 +81,34 @@ struct EntryCacheHashDefinition {
 
 class EntryCache {
 public:
-	EntryCache()
-	{
-		mutex_init(&fLock, "entry cache");
+								EntryCache();
+								~EntryCache();
 
-		new(&fEntries) EntryTable;
-		new(&fUsedEntries) EntryList;
-		fEntryCount = 0;
-	}
+			status_t			Init();
 
-	~EntryCache()
-	{
-		while (EntryCacheEntry* entry = fUsedEntries.Head())
-			_Remove(entry);
+			status_t			Add(ino_t dirID, const char* name,
+									ino_t nodeID);
 
-		mutex_destroy(&fLock);
-	}
+			status_t			Remove(ino_t dirID, const char* name);
 
-	status_t Init()
-	{
-		return fEntries.Init();
-	}
-
-	status_t Add(ino_t dirID, const char* name, ino_t nodeID)
-	{
-		MutexLocker _(fLock);
-
-		EntryCacheEntry* entry = fEntries.Lookup(EntryCacheKey(dirID, name));
-		if (entry != NULL) {
-			entry->node_id = nodeID;
-			return B_OK;
-		}
-
-		if (fEntryCount >= kMaxEntryCacheEntryCount)
-			_Remove(fUsedEntries.Head());
-
-		entry = (EntryCacheEntry*)malloc(sizeof(EntryCacheEntry)
-			+ strlen(name));
-		if (entry == NULL)
-			return B_NO_MEMORY;
-
-		entry->node_id = nodeID;
-		entry->dir_id = dirID;
-		strcpy(entry->name, name);
-
-		fEntries.Insert(entry);
-		fUsedEntries.Add(entry);
-		fEntryCount++;
-
-		return B_OK;
-	}
-
-	status_t Remove(ino_t dirID, const char* name)
-	{
-		MutexLocker _(fLock);
-
-		EntryCacheEntry* entry = fEntries.Lookup(EntryCacheKey(dirID, name));
-		if (entry == NULL)
-			return B_ENTRY_NOT_FOUND;
-
-		_Remove(entry);
-
-		return B_OK;
-	}
-
-	bool Lookup(ino_t dirID, const char* name, ino_t& nodeID)
-	{
-		MutexLocker _(fLock);
-
-		EntryCacheEntry* entry = fEntries.Lookup(EntryCacheKey(dirID, name));
-		if (entry == NULL)
-			return false;
-
-		// requeue at the end
-		fUsedEntries.Remove(entry);
-		fUsedEntries.Add(entry);
-
-		nodeID = entry->node_id;
-		return true;
-	}
-
-	void _Remove(EntryCacheEntry* entry)
-	{
-		fEntries.Remove(entry);
-		fUsedEntries.Remove(entry);
-		free(entry);
-		fEntryCount--;
-	}
+			bool				Lookup(ino_t dirID, const char* name,
+									ino_t& nodeID);
 
 private:
-	typedef BOpenHashTable<EntryCacheHashDefinition> EntryTable;
-	typedef DoublyLinkedList<EntryCacheEntry> EntryList;
+	static	const int32			kGenerationCount = 8;
 
-	mutex		fLock;
-	EntryTable	fEntries;
-	EntryList	fUsedEntries;	// LRU queue (LRU entry at the head)
-	uint32		fEntryCount;
+			typedef BOpenHashTable<EntryCacheHashDefinition> EntryTable;
+			typedef DoublyLinkedList<EntryCacheEntry> EntryList;
+
+private:
+			void				_AddEntryToCurrentGeneration(
+									EntryCacheEntry* entry);
+
+private:
+			rw_lock				fLock;
+			EntryTable			fEntries;
+			EntryCacheGeneration fGenerations[kGenerationCount];
+			int32				fCurrentGeneration;
 };
 
 

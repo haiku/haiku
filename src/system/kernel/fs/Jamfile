@@ -8,6 +8,7 @@ UsePrivateHeaders net shared storage ;
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) device_manager ] ;
 
 KernelMergeObject kernel_fs.o :
+	EntryCache.cpp
 	fd.cpp
 	fifo.cpp
 	KPath.cpp
