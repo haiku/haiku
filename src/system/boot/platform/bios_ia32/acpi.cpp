@@ -44,8 +44,10 @@ acpi_check_rsdt(acpi_rsdp *rsdp)
 	// map and validate the root system description table
 	acpi_descriptor_header *rsdt
 		= (acpi_descriptor_header *)mmu_map_physical_memory(
-		rsdp->rsdt_address, B_PAGE_SIZE, kDefaultPageFlags);
+		rsdp->rsdt_address, sizeof(acpi_descriptor_header), kDefaultPageFlags);
 	if (rsdt == NULL || strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
+		if (rsdt != NULL)
+			mmu_free(rsdt, sizeof(acpi_descriptor_header));
 		TRACE(("acpi: invalid root system description table\n"));
 		return B_ERROR;
 	}
@@ -78,9 +80,12 @@ acpi_find_table(const char *signature)
 
 	for (int32 j = 0; j < numEntries; j++, pointer++) {
 		acpi_descriptor_header *header = (acpi_descriptor_header *)
-			mmu_map_physical_memory(*pointer, B_PAGE_SIZE, kDefaultPageFlags);
+			mmu_map_physical_memory(*pointer, sizeof(acpi_descriptor_header),
+				kDefaultPageFlags);
 		if (header == NULL || strncmp(header->signature, signature, 4) != 0) {
 			// not interesting for us
+			if (header != NULL)
+				mmu_free(header, sizeof(acpi_descriptor_header));
 			TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n", signature,
 				header->signature));
 			continue;
