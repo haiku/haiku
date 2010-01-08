@@ -28,7 +28,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 }
 
 SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
-	cal cat catattr checkfs chgrp chmod chop chown chroot cksum clear
+	cal cat catattr checkfs checkitout chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
 	draggers driveinfo dstcheck du dumpcatalog
