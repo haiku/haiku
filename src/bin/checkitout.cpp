@@ -165,11 +165,23 @@ CheckItOut::_DoCheckItOut(entry_ref *ref, const char *name)
 	BString user = url.User();
 	BString pass = url.Pass();
 	BString path = url.Path();
-printf("url %s\n", url.String());
+	PRINT(("url %s\n", url.String()));
 	BPath refPath(ref);
 
 	if (proto == "git") {
 		BString cmd("git clone ");
+		cmd << url;
+		cmd << " '" << refPath.Path() << "/" << name << "'";
+		PRINT(("CMD='%s'\n", cmd.String()));
+		cmd << " && open '" << refPath.Path() << "/" << name << "'";
+		cmd << failc;
+		PRINT(("CMD='%s'\n", cmd.String()));
+		args[2] = (char*)cmd.String();
+		be_roster->Launch(kTerminalSig, 3, args);
+		return B_OK;
+	}
+	if (proto == "rsync") {
+		BString cmd("rsync ");
 		cmd << url;
 		cmd << " '" << refPath.Path() << "/" << name << "'";
 		PRINT(("CMD='%s'\n", cmd.String()));

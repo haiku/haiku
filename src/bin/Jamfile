@@ -110,7 +110,6 @@ StdBinCommands
 # standard commands that need libbe.so and libsupc++.so
 StdBinCommands
 	alert.cpp
-	checkitout.cpp
 	dstcheck.cpp
 	hey.cpp
 	reindex.cpp
@@ -183,6 +182,7 @@ StdBinCommands
 
 # standard commands that need libbe.so, libtracker.so
 StdBinCommands
+	checkitout.cpp
 	filepanel.cpp
 	: be tracker $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 

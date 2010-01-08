@@ -4,8 +4,10 @@ resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;
 
 resource(1, "BEOS:FILE_TYPES") message
 {
+	/*"types" = "application/x-vnd.Be.URL.cvs",*/
+	"types" = "application/x-vnd.Be.URL.git",
+	"types" = "application/x-vnd.Be.URL.rsync",
 	"types" = "application/x-vnd.Be.URL.svn",
-	"types" = "application/x-vnd.Be.URL.svn+ssh",
-	"types" = "application/x-vnd.Be.URL.git"
+	"types" = "application/x-vnd.Be.URL.svn+ssh"
 };
 
