@@ -1659,17 +1659,16 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 
 		bool dequeuedPage = false;
 		if (page != NULL) {
-			DEBUG_PAGE_ACCESS_START(page);
-
 			if (page->state == PAGE_STATE_MODIFIED) {
+				DEBUG_PAGE_ACCESS_START(page);
 				AutoLocker<VMPageQueue> locker(sModifiedPageQueue);
 				sModifiedPageQueue.Remove(page);
 				dequeuedPage = true;
 			} else if (page->state == PAGE_STATE_BUSY
 					|| !vm_test_map_modification(page)) {
-				DEBUG_PAGE_ACCESS_END(page);
 				page = NULL;
-			}
+			} else
+				DEBUG_PAGE_ACCESS_START(page);
 		}
 
 		PageWriteWrapper* wrapper = NULL;
