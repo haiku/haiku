@@ -46,7 +46,7 @@ CPUCapabilities cpu;
 			}
 
 			if (pixelFormat == PIX_FMT_YUV420P || pixelFormat == PIX_FMT_YUVJ420P) {
-				if (cpu.HasSSE2() &&  width % 8 == 0 && height % 2 == 0 ) {
+				if (cpu.HasSSE2() && width % 8 == 0 && height % 2 == 0) {
 					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgba32_sse2\n");
 					return gfx_conv_yuv420p_rgba32_sse2;
 				} else {
