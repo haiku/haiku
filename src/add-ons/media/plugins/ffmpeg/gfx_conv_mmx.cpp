@@ -41,27 +41,29 @@ void gfx_conv_yuv420p_rgb32_mmx(AVFrame *in, AVFrame *out, int width, int height
 // Planar YUV420
 void gfx_conv_yuv420p_rgba32_sse2(AVFrame *in, AVFrame *out, int width, int height)
 {
-	// width must be divisible by 8 and height divisible by 2
-	// also in and out must be aligned to 32 bytes
-	if (width % 8 == 0 && height % 2 == 0 
-		&& (off_t)out->data[0] % 32 == 0 && (off_t)in->data[0] % 32 == 0 
-		&& (off_t)in->data[1] % 32 == 0 && (off_t)in->data[2] % 32 == 0) {
+	// in and out buffers must be aligned to 32 bytes, in should be as ffmpeg allocates it
+	if ((off_t)out->data[0] % 32 == 0) {
 	
 		uint8 *ybase = (uint8 *)in->data[0];
 		uint8 *ubase = (uint8 *)in->data[1];
 		uint8 *vbase = (uint8 *)in->data[2];
 		uint8 *rgbbase = (uint8 *)out->data[0];
-	
+		
+		int yBaseInc = in->linesize[0];
+		int uBaseInc = in->linesize[1];
+		int vBaseInc = in->linesize[2];
+		int rgbBaseInc = out->linesize[0];
+		
 		for (int i=0;i<height;i+=2) {
 			_Convert_YUV420P_RGBA32_SSE2(ybase, ubase, vbase, rgbbase, width);	// First Y row
-			ybase += in->linesize[0];
-			rgbbase += out->linesize[0];
+			ybase += yBaseInc;
+			rgbbase += rgbBaseInc;
 		
 			_Convert_YUV420P_RGBA32_SSE2(ybase, ubase, vbase, rgbbase, width);	// Second Y row but same u and v row
-			ybase += in->linesize[0];
-			ubase += in->linesize[1];
-			vbase += in->linesize[2];
-			rgbbase += out->linesize[0];
+			ybase += yBaseInc;
+			ubase += uBaseInc;
+			vbase += vBaseInc;
+			rgbbase += rgbBaseInc;
 		}
 	} else {
 		gfx_conv_YCbCr420p_RGB32_c(in, out, width, height);
@@ -71,10 +73,8 @@ void gfx_conv_yuv420p_rgba32_sse2(AVFrame *in, AVFrame *out, int width, int heig
 // Packed YUV422
 void gfx_conv_yuv422p_rgba32_sse2(AVFrame *in, AVFrame *out, int width, int height)
 {
-	// width must be divisibile by 8 
-	// also in and out must be aligned to 32 bytes
-	if (width % 8 == 0
-		&& (off_t)out->data[0] % 32 == 0 && (off_t)in->data[0] % 32 == 0) {
+	// in and out buffers must be aligned to 32 bytes, in should be as ffmpeg allocates it
+	if ((off_t)out->data[0] % 32 == 0) {
 		
 		uint8 *ybase = (uint8 *)in->data[0];
 		uint8 *rgbbase = (uint8 *)out->data[0];

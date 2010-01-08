@@ -32,7 +32,7 @@ typedef void (*gfx_convert_func) (AVFrame *in, AVFrame *out, int width, int heig
 
 // this function will try to find the best colorspaces for both the ff-codec and
 // the Media Kit sides.
-gfx_convert_func resolve_colorspace(color_space cs, PixelFormat pixelFormat);
+gfx_convert_func resolve_colorspace(color_space cs, PixelFormat pixelFormat, int width, int height);
 
 const char *pixfmt_to_string(int format);
 

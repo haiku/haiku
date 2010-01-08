@@ -490,7 +490,8 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		}
 #else
 			fFormatConversionFunc = resolve_colorspace(
-				fOutputVideoFormat.display.format, fContext->pix_fmt);
+				fOutputVideoFormat.display.format, fContext->pix_fmt, 
+				fContext->width, fContext->height);
 		}
 		if (fFormatConversionFunc != NULL)
 			break;
@@ -749,7 +750,8 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 #else
 			if (fFormatConversionFunc == NULL) {
 				fFormatConversionFunc = resolve_colorspace(
-					fOutputVideoFormat.display.format, fContext->pix_fmt);
+					fOutputVideoFormat.display.format, fContext->pix_fmt, 
+					fContext->width, fContext->height);
 			}
 #endif
 
