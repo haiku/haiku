@@ -1137,11 +1137,11 @@ BTextView::SetText(const char *inText, int32 inLength,
 
 	// hide the caret/unhilite the selection
 	if (fActive) {
-		if (fSelStart != fSelEnd)
-			Highlight(fSelStart, fSelEnd);
-		else {
+		if (fSelStart != fSelEnd) {
+			if (fSelectable)
+				Highlight(fSelStart, fSelEnd);
+		} else
 			_HideCaret();
-		}
 	}
 
 	// remove data from buffer
@@ -1157,8 +1157,7 @@ BTextView::SetText(const char *inText, int32 inLength,
 	ScrollTo(B_ORIGIN);
 
 	// draw the caret
-	if (fActive)
-		_ShowCaret();
+	_ShowCaret();
 }
 
 
@@ -1197,8 +1196,7 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 	ScrollToOffset(fSelStart);
 
 	// draw the caret
-	if (fActive)
-		_ShowCaret();
+	_ShowCaret();
 }
 
 
@@ -1251,9 +1249,10 @@ BTextView::Delete(int32 startOffset, int32 endOffset)
 
 	// hide the caret/unhilite the selection
 	if (fActive) {
-		if (fSelStart != fSelEnd)
-			Highlight(fSelStart, fSelEnd);
-		else
+		if (fSelStart != fSelEnd) {
+			if (fSelectable)
+				Highlight(fSelStart, fSelEnd);
+		} else
 			_HideCaret();
 	}
 	// remove data from buffer
@@ -1271,8 +1270,7 @@ BTextView::Delete(int32 startOffset, int32 endOffset)
 	_Refresh(startOffset, endOffset, false);
 
 	// draw the caret
-	if (fActive)
-		_ShowCaret();
+	_ShowCaret();
 }
 
 
@@ -2338,15 +2336,8 @@ BTextView::MakeSelectable(bool selectable)
 
 	fSelectable = selectable;
 
-	if (Window() != NULL) {
-		if (fActive) {
-			// show/hide the caret, hilite/unhilite the selection
-			if (fSelStart != fSelEnd)
-				Highlight(fSelStart, fSelEnd);
-			else
-				_InvertCaret();
-		}
-	}
+	if (fActive && fSelStart != fSelEnd && Window() != NULL)
+		Highlight(fSelStart, fSelEnd);
 }
 
 
@@ -2410,11 +2401,11 @@ BTextView::SetWordWrap(bool wrap)
 	bool updateOnScreen = fActive && Window() != NULL;
 	if (updateOnScreen) {
 		// hide the caret, unhilite the selection
-		if (fSelStart != fSelEnd)
-			Highlight(fSelStart, fSelEnd);
-		else {
+		if (fSelStart != fSelEnd) {
+			if (fSelectable)
+				Highlight(fSelStart, fSelEnd);
+		} else
 			_HideCaret();
-		}
 	}
 
 	fWrap = wrap;
@@ -2424,9 +2415,10 @@ BTextView::SetWordWrap(bool wrap)
 
 	if (updateOnScreen) {
 		// show the caret, hilite the selection
-		if (fSelStart != fSelEnd && fSelectable)
-			Highlight(fSelStart, fSelEnd);
-		else
+		if (fSelStart != fSelEnd) {
+			if (fSelectable)
+				Highlight(fSelStart, fSelEnd);
+		} else
 			_ShowCaret();
 	}
 }
@@ -2596,9 +2588,10 @@ BTextView::MakeResizable(bool resize, BView *resizeView)
 			fWrap = false;
 
 			if (fActive && Window() != NULL) {
-				if (fSelStart != fSelEnd && fSelectable)
-					Highlight(fSelStart, fSelEnd);
-				else
+				if (fSelStart != fSelEnd) {
+					if (fSelectable)
+						Highlight(fSelStart, fSelEnd);
+				} else
 					_HideCaret();
 			}
 		}
@@ -4476,9 +4469,10 @@ BTextView::_DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 
 	// draw the caret/hilite the selection
 	if (fActive) {
-		if (fSelStart != fSelEnd && fSelectable)
-			Highlight(fSelStart, fSelEnd);
-		else {
+		if (fSelStart != fSelEnd) {
+			if (fSelectable)
+				Highlight(fSelStart, fSelEnd);
+		} else {
 			if (fCaretVisible)
 				_DrawCaret(fSelStart);
 		}
@@ -4537,7 +4531,7 @@ BTextView::_DrawCaret(int32 offset)
 inline void
 BTextView::_ShowCaret()
 {
-	if (!fCaretVisible && fEditable)
+	if (fActive && !fCaretVisible && fEditable && fSelStart == fSelEnd)
 		_InvertCaret();
 }
 
@@ -4545,7 +4539,7 @@ BTextView::_ShowCaret()
 inline void
 BTextView::_HideCaret()
 {
-	if (fCaretVisible)
+	if (fCaretVisible && fSelStart == fSelEnd)
 		_InvertCaret();
 }
 
@@ -5053,10 +5047,8 @@ BTextView::_Activate()
 	if (fSelStart != fSelEnd) {
 		if (fSelectable)
 			Highlight(fSelStart, fSelEnd);
-	} else {
-		if (fEditable)
-			_ShowCaret();
-	}
+	} else
+		_ShowCaret();
 
 	BPoint where;
 	ulong buttons;
@@ -5620,5 +5612,3 @@ BTextView::TextTrackState::SimulateMouseMovement(BTextView *textView)
 	textView->GetMouse(&where, &buttons);
 	textView->_PerformMouseMoved(where, B_INSIDE_VIEW);
 }
-
-
