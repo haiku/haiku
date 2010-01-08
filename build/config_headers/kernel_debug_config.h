@@ -86,7 +86,7 @@
 
 // Enables the vm_page::access_count field, which is used to detect invalid
 // concurrent access to the page.
-#define DEBUG_PAGE_ACCESS				0
+#define DEBUG_PAGE_ACCESS				KDEBUG_LEVEL_2
 
 // Enables a global list of all vm_cache structures.
 #define DEBUG_CACHE_LIST				KDEBUG_LEVEL_1
