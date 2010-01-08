@@ -613,7 +613,7 @@ FUNCTION(i386_return_from_signal):
 	int		$99
 	ret
 FUNCTION_END(i386_return_from_signal)
-FUNCTION(i386_end_return_from_signal):
+SYMBOL(i386_end_return_from_signal):
 
 
 /*!	void i386_restore_frame_from_syscall(struct iframe iframe);

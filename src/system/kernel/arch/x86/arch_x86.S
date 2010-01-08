@@ -157,7 +157,7 @@ FUNCTION(x86_userspace_thread_exit):
 	int		$99
 	.align 4
 FUNCTION_END(x86_userspace_thread_exit)
-FUNCTION(x86_end_userspace_thread_exit):
+SYMBOL(x86_end_userspace_thread_exit):
 
 
 /* void x86_enter_userspace(addr_t entry, addr_t stackTop); */
