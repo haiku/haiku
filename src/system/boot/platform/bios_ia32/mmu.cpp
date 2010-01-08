@@ -361,6 +361,12 @@ init_page_directory(void)
 //	#pragma mark -
 
 
+/*!
+	Neither \a virtualAddress nor \a size need to be aligned, but the function
+	will map all pages the range intersects with.
+	If physicalAddress is not page-aligned, the returned virtual address will
+	have the same "misalignment".
+*/
 extern "C" addr_t
 mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
 {
@@ -368,6 +374,7 @@ mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
 	addr_t pageOffset = physicalAddress & (B_PAGE_SIZE - 1);
 
 	physicalAddress -= pageOffset;
+	size += pageOffset;
 
 	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
 		map_page(get_next_virtual_page(), physicalAddress + offset, flags);
@@ -421,6 +428,8 @@ mmu_allocate(void *virtualAddress, size_t size)
 /*!	This will unmap the allocated chunk of memory from the virtual
 	address space. It might not actually free memory (as its implementation
 	is very simple), but it might.
+	Neither \a virtualAddress nor \a size need to be aligned, but the function
+	will unmap all pages the range intersects with.
 */
 extern "C" void
 mmu_free(void *virtualAddress, size_t size)
@@ -428,23 +437,23 @@ mmu_free(void *virtualAddress, size_t size)
 	TRACE(("mmu_free(virtualAddress = %p, size: %ld)\n", virtualAddress, size));
 
 	addr_t address = (addr_t)virtualAddress;
-	size = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
-		// get number of pages to map
+	addr_t pageOffset = address % B_PAGE_SIZE;
+	address -= pageOffset;
+	size = (size + pageOffset + B_PAGE_SIZE - 1) / B_PAGE_SIZE * B_PAGE_SIZE;
 
 	// is the address within the valid range?
-	if (address < KERNEL_BASE
-		|| address + size >= KERNEL_BASE + kMaxKernelSize) {
+	if (address < KERNEL_BASE || address + size > sNextVirtualAddress) {
 		panic("mmu_free: asked to unmap out of range region (%p, size %lx)\n",
 			(void *)address, size);
 	}
 
 	// unmap all pages within the range
-	for (uint32 i = 0; i < size; i++) {
+	for (size_t i = 0; i < size; i += B_PAGE_SIZE) {
 		unmap_page(address);
 		address += B_PAGE_SIZE;
 	}
 
-	if (address == sNextVirtualAddress) {
+	if (address + size == sNextVirtualAddress) {
 		// we can actually reuse the virtual address space
 		sNextVirtualAddress -= size;
 	}
