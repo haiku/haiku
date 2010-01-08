@@ -43,13 +43,17 @@ All rights reserved.
 #include "Messages.h"
 #include "AutoTextControl.h"
 
-#include <TextView.h>
-#include <Button.h>
 #include <Application.h>
-#include <String.h>
 #include <Box.h>
+#include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
+#include <String.h>
+#include <TextView.h>
 
-#include <MDRLanguage.h>
+
+#define TR_CONTEXT "Mail"
+
 
 enum {
 	M_FIND_STRING_CHANGED = 'fsch'
@@ -134,7 +138,7 @@ FindPanel::FindPanel(BRect rect)
 	AddChild(mBTextControl);
 	
 	mFindButton = new BButton(BRect(0,0,90,20),"FINDBUTTON",
-		MDR_DIALECT_CHOICE ("Find","検索"),
+		TR("Find"),
 		new BMessage(FINDBUTTON),B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	mFindButton->ResizeToPreferred();
 	AddChild(mFindButton);
@@ -229,7 +233,7 @@ void FindPanel::Find()
 
 FindWindow::FindWindow()
 	: BWindow(FindWindow::mLastPosition, 
-		MDR_DIALECT_CHOICE ("Find","検索"),
+		TR("Find"),
 		B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK)
 {

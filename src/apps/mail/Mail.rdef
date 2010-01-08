@@ -19,7 +19,7 @@ resource app_version {
 	internal = 3,
 
 	short_info = "Mail",
-	long_info = "Mail ©2005-2009 Haiku, Inc."
+	long_info = "Mail ©2005-2010 Haiku, Inc."
 };
 
 resource vector_icon {

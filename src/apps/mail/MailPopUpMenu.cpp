@@ -35,16 +35,19 @@ All rights reserved.
 
 #include "MailPopUpMenu.h"
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Message.h>
 
 #include <malloc.h>
 #include <string.h>
 
-#include <MDRLanguage.h>
-
 #include "MailSupport.h"
 #include "Messages.h"
+
+
+#define TR_CONTEXT "Mail"
 
 
 TMenu::TMenu(const char *name, const char *attribute, int32 message, bool popup,
@@ -94,13 +97,10 @@ TMenu::BuildMenu()
 
 		BMessage *msg = new BMessage(M_RANDOM_SIG);
 		if (!fPopup) {
-			AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Random","R) 自動決定"), msg,
-				'0'), 0);
+			AddItem(new BMenuItem(TR("Random"), msg, '0'), 0);
 		} else {
-			AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Random","R) 自動決定"), msg),
-				0);
+			AddItem(new BMenuItem(TR("Random"), msg), 0);
 		}
 	}
 }
-
 

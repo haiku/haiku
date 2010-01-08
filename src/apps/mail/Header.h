@@ -47,32 +47,24 @@ All rights reserved.
 #include <fs_attr.h>
 
 
-#define TO_TEXT				"To:"
-#define FROM_TEXT			"From:"
-#define ENCODING_TEXT		"Encoding:"
-#define DECODING_TEXT		"Decoding:"
 #define TO_FIELD_H			 39
 #define FROM_FIELD_H		 31
 #define TO_FIELD_V			  7
 #define TO_FIELD_WIDTH		270
 #define FROM_FIELD_WIDTH	280
 
-#define ACCOUNT_TEXT		"Account:"
 #define ACCOUNT_FIELD_WIDTH	165
 
-#define SUBJECT_TEXT		"Subject:"
 #define SUBJECT_FIELD_H		 18
 #define SUBJECT_FIELD_V		 33
 #define SUBJECT_FIELD_WIDTH	270
 #define SUBJECT_FIELD_HEIGHT 16
 
-#define CC_TEXT				"CC:"
 #define CC_FIELD_H			 40
 #define CC_FIELD_V			 58
 #define CC_FIELD_WIDTH		192
 #define CC_FIELD_HEIGHT		 16
 
-#define BCC_TEXT			"BCC:"
 #define BCC_FIELD_H			268
 #define BCC_FIELD_V			 58
 #define BCC_FIELD_WIDTH		197
@@ -141,3 +133,4 @@ class TTextControl : public BComboBox {
 };
 
 #endif	/* _HEADER_H */
+

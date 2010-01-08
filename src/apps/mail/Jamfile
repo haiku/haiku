@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps mail ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders mail ;
 }
@@ -11,7 +9,8 @@ UsePrivateHeaders textencoding ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
-AddResources Mail : Mail.rdef pictures.rdef  ;
+AddResources Mail : pictures.rdef  ;
+
 Application Mail : 
 	AutoTextControl.cpp
 	BmapButton.cpp
@@ -32,11 +31,25 @@ Application Mail :
 	Utilities.cpp
 	WIndex.cpp
 	Words.cpp
-	KUndoBuffer.cpp ;
+	KUndoBuffer.cpp
+	: be tracker $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) liblocale.so libmail.so
+		libtextencoding.so
+	: Mail.rdef
+;
 
-LinkAgainst Mail : be tracker $(TARGET_LIBSTDC++) libmail.so libtextencoding.so ;
-
-Package haiku-maildaemon-cvs :
-	Mail : 
-	boot beos apps ;
+DoCatalogs Mail :
+	x-vnd.Be-MAIL
+	:
+	Content.cpp
+	Enclosures.cpp
+	FindWindow.cpp
+	Header.cpp
+	MailApp.cpp
+	MailPopUpMenu.cpp
+	MailWindow.cpp
+	Prefs.cpp
+	Signature.cpp
+	: en.catalog
+	: # ja.catkeys
+	;
 

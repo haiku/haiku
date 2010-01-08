@@ -35,6 +35,7 @@ All rights reserved.
 #define _MAIL_APP_H
 
 #include <Application.h>
+#include <Catalog.h>
 #include <Entry.h>
 #include <Font.h>
 #include <List.h>
@@ -128,7 +129,10 @@ class TMailApp : public BApplication {
 				int32			fUseAccountFrom;
 				uint32			fMailCharacterSet;
 				BFont			fContentFont;
+
+				BCatalog		fCatalog;
 };
 
 
 #endif // #ifndef _MAIL_H
+

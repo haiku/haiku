@@ -40,6 +40,7 @@ All rights reserved.
 
 #include <Clipboard.h>
 #include <InterfaceKit.h>
+#include <Locale.h>
 #include <StorageKit.h>
 
 #include "MailApp.h"
@@ -48,21 +49,18 @@ All rights reserved.
 #include "MailWindow.h"
 #include "Messages.h"
 
-#include <MDRLanguage.h>
+
+#define TR_CONTEXT "Mail"
 
 
 extern BRect		signature_window;
 extern const char	*kUndoStrings[];
 extern const char	*kRedoStrings[];
 
-const char kNameText[] = MDR_DIALECT_CHOICE ("Title:", "署名の名称:");
-const char kSigText[] = MDR_DIALECT_CHOICE ("Signature:", "署名:");
-
-
-//====================================================================
 
 TSignatureWindow::TSignatureWindow(BRect rect)
-	: BWindow (rect, MDR_DIALECT_CHOICE ("Signatures","署名の編集"), B_TITLED_WINDOW, 0),
+	:
+	BWindow (rect, TR("Signatures"), B_TITLED_WINDOW, 0),
 	fFile(NULL)
 {
 	BMenu		*menu;
@@ -72,27 +70,30 @@ TSignatureWindow::TSignatureWindow(BRect rect)
 	BRect r = Bounds();
 	/*** Set up the menus ****/
 	menu_bar = new BMenuBar(r, "MenuBar");
-	menu = new BMenu(MDR_DIALECT_CHOICE ("Signature","S) 署名"));
-	menu->AddItem(fNew = new BMenuItem(MDR_DIALECT_CHOICE ("New","N) 新規"), new BMessage(M_NEW), 'N'));
-	fSignature = new TMenu(MDR_DIALECT_CHOICE ("Open","O) 開く"), INDEX_SIGNATURE, M_SIGNATURE);
+	menu = new BMenu(TR("Signature"));
+	menu->AddItem(fNew = new BMenuItem(TR("New"), new BMessage(M_NEW), 'N'));
+	fSignature = new TMenu(TR("Open"), INDEX_SIGNATURE, M_SIGNATURE);
 	menu->AddItem(new BMenuItem(fSignature));
 	menu->AddSeparatorItem();
-	menu->AddItem(fSave = new BMenuItem(MDR_DIALECT_CHOICE ("Save","S) 保存"), new BMessage(M_SAVE), 'S'));
-	menu->AddItem(fDelete = new BMenuItem(MDR_DIALECT_CHOICE ("Delete","T) 削除"), new BMessage(M_DELETE), 'T'));
+	menu->AddItem(fSave = new BMenuItem(TR("Save"), new BMessage(M_SAVE), 'S'));
+	menu->AddItem(fDelete = new BMenuItem(TR("Delete"), new BMessage(M_DELETE),
+		'T'));
 	menu_bar->AddItem(menu);
 
-	menu = new BMenu(MDR_DIALECT_CHOICE ("Edit","E) 編集"));
-	menu->AddItem(fUndo = new BMenuItem(MDR_DIALECT_CHOICE ("Undo","Z) やり直し"), new BMessage(B_UNDO), 'Z'));
+	menu = new BMenu(TR("Edit"));
+	menu->AddItem(fUndo = new BMenuItem(TR("Undo"), new BMessage(B_UNDO), 'Z'));
 	fUndo->SetTarget(NULL, this);
 	menu->AddSeparatorItem();
-	menu->AddItem(fCut = new BMenuItem(MDR_DIALECT_CHOICE ("Cut","X) 切り取り"), new BMessage(B_CUT), 'X'));
+	menu->AddItem(fCut = new BMenuItem(TR("Cut"), new BMessage(B_CUT), 'X'));
 	fCut->SetTarget(NULL, this);
-	menu->AddItem(fCopy = new BMenuItem(MDR_DIALECT_CHOICE ("Copy","C) コピー"), new BMessage(B_COPY), 'C'));
+	menu->AddItem(fCopy = new BMenuItem(TR("Copy"), new BMessage(B_COPY), 'C'));
 	fCopy->SetTarget(NULL, this);
-	menu->AddItem(fPaste = new BMenuItem(MDR_DIALECT_CHOICE ("Paste","V) 貼り付け"), new BMessage(B_PASTE), 'V'));
+	menu->AddItem(fPaste = new BMenuItem(TR("Paste"), new BMessage(B_PASTE),
+		'V'));
 	fPaste->SetTarget(NULL, this);
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Select All","A) 全文選択"), new BMessage(M_SELECT), 'A'));
+	menu->AddItem(item = new BMenuItem(TR("Select All"), new BMessage(M_SELECT),
+		'A'));
 	item->SetTarget(NULL, this);
 	menu_bar->AddItem(menu);
 
@@ -187,11 +188,9 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case M_DELETE:
-			if (!(new BAlert("",MDR_DIALECT_CHOICE (
-					"Really delete this signature? This cannot be undone.",
-					"この署名を削除しますか？"),
-					MDR_DIALECT_CHOICE ("Cancel","取消l"),
-					MDR_DIALECT_CHOICE ("Delete","削除"), NULL, B_WIDTH_AS_USUAL,
+			if (!(new BAlert("",
+					TR("Really delete this signature? This cannot be undone."),
+					TR("Cancel"), TR("Delete"), NULL, B_WIDTH_AS_USUAL,
 					B_WARNING_ALERT))->Go())
 				break;
 
@@ -225,10 +224,8 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 				else {
 					fFile = NULL;
 					beep();
-					(new BAlert("", MDR_DIALECT_CHOICE (
-						"Couldn't open this signature. Sorry.",
-						"署名を開く時にエラーが発生しました。"),
-						MDR_DIALECT_CHOICE ("OK","了解")))->Go();
+					(new BAlert("", TR("Couldn't open this signature. Sorry."),
+						TR("OK")))->Go();
 				}
 			}
 			break;
@@ -283,14 +280,11 @@ TSignatureWindow::Clear()
 
 	if (IsDirty()) {
 		beep();
-		BAlert *alert = new BAlert("",
-			MDR_DIALECT_CHOICE ("Save changes to this signature?","変更した署名を保存しますか？"),
-			MDR_DIALECT_CHOICE ("Don't Save","保存しない"),
-			MDR_DIALECT_CHOICE ("Cancel","中止"),
-			MDR_DIALECT_CHOICE ("Save","保存する"),
+		BAlert *alert = new BAlert("", TR("Save changes to this signature?"),
+			TR("Don't Save"), TR("Cancel"), TR("Save"),
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0,'d');
-		alert->SetShortcut(1,B_ESCAPE);
+		alert->SetShortcut(0, 'd');
+		alert->SetShortcut(1, B_ESCAPE);
 		result = alert->Go();
 		if (result == 1)
 			return false;
@@ -380,10 +374,8 @@ TSignatureWindow::Save()
 
 err_exit:
 	beep();
-	(new BAlert("", MDR_DIALECT_CHOICE (
-		"An error occurred trying to save this signature.",
-		"署名を保存しようとした時にエラーが発生しました。"),
-		MDR_DIALECT_CHOICE ("Sorry","了解")))->Go();
+	(new BAlert("", TR("An error occurred trying to save this signature."),
+		TR("Sorry")))->Go();
 }
 
 
@@ -401,8 +393,8 @@ void
 TSignatureView::AttachedToWindow()
 {
 	BRect	rect = Bounds();
-	float	name_text_length = StringWidth(kNameText);
-	float	sig_text_length = StringWidth(kSigText);
+	float	name_text_length = StringWidth(TR("Title:"));
+	float	sig_text_length = StringWidth(TR("Signature:"));
 	float	divide_length;
 
 	if (name_text_length > sig_text_length)
@@ -413,7 +405,7 @@ TSignatureView::AttachedToWindow()
 	rect.InsetBy(8,0);
 	rect.top+= 8;
 
-	fName = new TNameControl(rect, kNameText, new BMessage(NAME_FIELD));
+	fName = new TNameControl(rect, TR("Title:"), new BMessage(NAME_FIELD));
 	AddChild(fName);
 
 	fName->SetDivider(divide_length + 10);
@@ -434,7 +426,8 @@ TSignatureView::AttachedToWindow()
 	/* back up a bit to make room for the label */
 
 	rect = scroller->Frame();
-	BStringView *stringView = new BStringView(rect, "SigLabel", kSigText);
+	BStringView *stringView = new BStringView(rect, "SigLabel",
+		TR("Signature:"));
 	AddChild(stringView);
 
 	float tWidth, tHeight;

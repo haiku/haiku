@@ -44,10 +44,12 @@ All rights reserved.
 #include <unistd.h>
 
 #include <Autolock.h>
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <E-mail.h>
 #include <InterfaceKit.h>
+#include <Locale.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <StorageKit.h>
@@ -62,15 +64,10 @@ All rights reserved.
 #include <MailSettings.h>
 #include <MailDaemon.h>
 #include <mail_util.h>
-#include <MDRLanguage.h>
 
 #include <CharacterSetRoster.h>
 
 using namespace BPrivate ;
-
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	#include <netdb.h>
-#endif
 
 #include "ButtonBar.h"
 #include "Content.h"
@@ -88,6 +85,9 @@ using namespace BPrivate ;
 #include "String.h"
 #include "Utilities.h"
 #include "Words.h"
+
+
+#define TR_CONTEXT "Mail"
 
 
 static const char *kDictDirectory = "word_dictionary";
@@ -117,12 +117,14 @@ TMailApp::TMailApp()
 	fMailCharacterSet(B_MS_WINDOWS_CONVERSION),
 	fContentFont(be_fixed_font)
 {
+	be_locale->GetAppCatalog(&fCatalog);
+
 	// set default values
 	fContentFont.SetSize(12.0);
 	fAutoMarkRead = true;
-	fSignature = (char *)malloc(strlen(SIG_NONE) + 1);
-	strcpy(fSignature, SIG_NONE);
-	fReplyPreamble = (char *)malloc(1);
+	fSignature = (char*)malloc(strlen(TR("None")) + 1);
+	strcpy(fSignature, TR("None"));
+	fReplyPreamble = (char*)malloc(1);
 	fReplyPreamble[0] = '\0';
 
 	fMailWindowFrame.Set(0, 0, 0, 0);
@@ -1253,3 +1255,4 @@ main()
 	TMailApp().Run();
 	return B_OK;
 }
+

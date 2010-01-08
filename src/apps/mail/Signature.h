@@ -56,12 +56,12 @@ All rights reserved.
 #include <TextControl.h>
 #include <Window.h>
 
-#include <MDRLanguage.h>
-
 const float kSigHeight = 200;
 const float kSigWidth = 457;
 
+
 #define INDEX_SIGNATURE		"_signature"
+
 
 class TMenu;
 class TNameControl;
@@ -143,3 +143,4 @@ private:
 };
 
 #endif // #ifndef _SIGNATURE_H
+

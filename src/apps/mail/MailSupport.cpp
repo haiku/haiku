@@ -62,7 +62,6 @@ All rights reserved.
 #include <MailSettings.h>
 #include <MailDaemon.h>
 #include <mail_util.h>
-#include <MDRLanguage.h>
 
 #include <CharacterSetRoster.h>
 

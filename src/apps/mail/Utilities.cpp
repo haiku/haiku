@@ -50,8 +50,6 @@ All rights reserved.
 
 #include <MailMessage.h>
 
-#include <MDRLanguage.h>
-
 #include "Utilities.h"
 
 

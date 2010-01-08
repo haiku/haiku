@@ -41,18 +41,17 @@ All rights reserved.
 
 #include "Enclosures.h"
 
-#include <Debug.h>
+#include <Alert.h>
 #include <Beep.h>
 #include <Bitmap.h>
+#include <Debug.h>
+#include <Locale.h>
 #include <MenuItem.h>
-#include <Alert.h>
 #include <NodeMonitor.h>
 #include <PopUpMenu.h>
 
 #include <MailAttachment.h>
 #include <MailMessage.h>
-
-#include <MDRLanguage.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,6 +61,9 @@ All rights reserved.
 #include "MailSupport.h"
 #include "MailWindow.h"
 #include "Messages.h"
+
+
+#define TR_CONTEXT "Mail"
 
 
 static const float kPlainFontSizeScale = 0.9;
@@ -137,7 +139,7 @@ TEnclosuresView::TEnclosuresView(BRect rect, BRect wind_rect)
 
 	BRect r;
 	r.left = ENCLOSE_TEXT_H + font.StringWidth(
-		MDR_DIALECT_CHOICE ("Enclosures: ","添付ファイル")) + 5;
+		TR("Enclosures: ")) + 5;
 	r.top = ENCLOSE_FIELD_V;
 	r.right = wind_rect.right - wind_rect.left - B_V_SCROLL_BAR_WIDTH - 9;
 	r.bottom = Frame().Height() - 8;
@@ -218,16 +220,14 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 
 				if (item->Component())
 				{
-					// remove the component from the mail
 					TMailWindow *window = dynamic_cast<TMailWindow *>(Window());
 					if (window && window->Mail())
 						window->Mail()->RemoveComponent(item->Component());
 
-					(new BAlert("", MDR_DIALECT_CHOICE (
-						"Removing enclosures from a forwarded mail is not yet implemented!\n"
-						"It will not yet work correctly.",
-						"転送メールから添付ファイルを削除する機能はまだ実装されていません。"),
-						MDR_DIALECT_CHOICE ("OK","了解")))->Go();
+					(new BAlert("", TR(
+						"Removing enclosures from a forwarded mail is not yet "
+						"implemented!\nIt will not yet work correctly."),
+						TR("OK")))->Go();
 				}
 				else
 					watch_node(item->NodeRef(), B_STOP_WATCHING, this);
@@ -277,10 +277,9 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 				if (badType)
 				{
 					beep();
-					(new BAlert("", MDR_DIALECT_CHOICE (
-						"Only files can be added as enclosures.",
-						"添付できるのは、ファイルのみです。"),
-						MDR_DIALECT_CHOICE ("Ok","了解")))->Go();
+					(new BAlert("",
+						TR("Only files can be added as enclosures."),
+						TR("Ok")))->Go();
 				}
 			}
 			break;
@@ -424,11 +423,9 @@ TListView::MouseDown(BPoint point)
 
 		BPopUpMenu menu("enclosure", false, false);
 		menu.SetFont(&font);
-		menu.AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE ("Open Enclosure","添付ファイルを開く"),
+		menu.AddItem(new BMenuItem(TR("Open Enclosure"),
 			new BMessage(LIST_INVOKED)));
-		menu.AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE ("Remove Enclosure","添付ファイルを削除"),
+		menu.AddItem(new BMenuItem(TR("Remove Enclosure"),
 			new BMessage(M_REMOVE)));
 
 		BPoint menuStart = ConvertToScreen(point);

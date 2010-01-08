@@ -38,34 +38,28 @@ All rights reserved.
 #include <stdio.h>
 #include <ctype.h>
 
-#include <Debug.h>
 #include <Alert.h>
 #include <Beep.h>
+#include <Clipboard.h>
+#include <Debug.h>
 #include <E-mail.h>
-#include <Beep.h>
+#include <Input.h>
+#include <Locale.h>
 #include <MenuItem.h>
+#include <Mime.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
 #include <Path.h>
-#include <Mime.h>
-#include <Beep.h>
 #include <PopUpMenu.h>
-#include <MenuItem.h>
 #include <Region.h>
 #include <Roster.h>
 #include <ScrollView.h>
 #include <TextView.h>
 #include <UTF8.h>
-#include <MenuItem.h>
-#include <Roster.h>
-#include <Clipboard.h>
-#include <Input.h>
 
 #include <MailMessage.h>
 #include <MailAttachment.h>
 #include <mail_util.h>
-
-#include <MDRLanguage.h>
 
 #include "MailApp.h"
 #include "MailSupport.h"
@@ -83,6 +77,10 @@ All rights reserved.
 #else
 #	define DSPELL(x) ;
 #endif
+
+
+#define TR_CONTEXT "Mail"
+
 
 const rgb_color kNormalTextColor = {0, 0, 0, 255};
 const rgb_color kSpellTextColor = {255, 0, 0, 255};
@@ -744,9 +742,8 @@ TContentView::MessageReceived(BMessage *msg)
 			} else {
 				beep();
 				(new BAlert("",
-					MDR_DIALECT_CHOICE ("An error occurred trying to open this signature.",
-						"この署名を開くときにエラーが発生しました"),
-					MDR_DIALECT_CHOICE ("Sorry", "了解")))->Go();
+					TR("An error occurred trying to open this signature."),
+					TR("Sorry")))->Go();
 			}
 			break;
 		}
@@ -885,19 +882,19 @@ TTextView::TTextView(BRect frame, BRect text, bool incoming,
 	//
 	fEnclosureMenu = new BPopUpMenu("Enclosure", false, false);
 	fEnclosureMenu->SetFont(&menuFont);
-	fEnclosureMenu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Save Enclosure", "添付ファイルを保存") B_UTF8_ELLIPSIS,new BMessage(M_SAVE)));
-	fEnclosureMenu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Open Enclosure", "添付ファイルを開く"), new BMessage(M_OPEN)));
+	fEnclosureMenu->AddItem(new BMenuItem(TR("Save Enclosure" B_UTF8_ELLIPSIS),
+		new BMessage(M_SAVE)));
+	fEnclosureMenu->AddItem(new BMenuItem(TR("Open Enclosure"),
+		new BMessage(M_OPEN)));
 
 	//
 	//	Hyperlink pop up menu
 	//
 	fLinkMenu = new BPopUpMenu("Link", false, false);
 	fLinkMenu->SetFont(&menuFont);
-	fLinkMenu->AddItem(new BMenuItem(
-		MDR_DIALECT_CHOICE ("Open This Link", "リンク先を開く"),
+	fLinkMenu->AddItem(new BMenuItem(TR("Open This Link"),
 		new BMessage(M_OPEN)));
-	fLinkMenu->AddItem(new BMenuItem(
-		MDR_DIALECT_CHOICE ("Copy Link Location", "リンク先をコピー"),
+	fLinkMenu->AddItem(new BMenuItem(TR("Copy Link Location"),
 		new BMessage(M_COPY)));
 
 	SetDoesUndo(true);
@@ -1551,7 +1548,7 @@ TTextView::MouseDown(BPoint where)
 				BMenuItem *addItem = NULL;
 				if (!foundWord && gUserDict >= 0) {
 					menu.AddSeparatorItem();
-					addItem = new BMenuItem(MDR_DIALECT_CHOICE ("Add", "追加"), NULL);
+					addItem = new BMenuItem(TR("Add"), NULL);
 					menu.AddItem(addItem);
 				}
 
@@ -1893,8 +1890,7 @@ TTextView::Open(hyper_text *enclosure)
 			if (result != B_NO_ERROR && result != B_ALREADY_RUNNING) {
 				beep();
 				(new BAlert("",
-					MDR_DIALECT_CHOICE("There is no installed handler for URL links.",
-						"このURLリンクを扱えるアプリケーションが存在しません"),
+					TR("There is no installed handler for URL links."),
 					"Sorry"))->Go();
 			}
 			break;
@@ -2043,10 +2039,8 @@ TTextView::Save(BMessage *msg, bool makeNewFile)
 
 	if (result != B_NO_ERROR) {
 		beep();
-		MDR_DIALECT_CHOICE(
-			(new BAlert("", "An error occurred trying to save the enclosure.", "Sorry"))->Go();,
-			(new BAlert("", "添付ファイルを保存するときにエラーが発生しました", "了解"))->Go();
-		)
+		(new BAlert("", TR("An error occurred trying to save the enclosure."),
+			TR("Sorry")))->Go();
 	}
 
 	return result;
@@ -3285,8 +3279,8 @@ TTextView::Undo(BClipboard */*clipboard*/)
 				} else {
 					::beep();
 					(new BAlert("",
-						MDR_DIALECT_CHOICE("Inconsistency occurred in the Undo/Redo buffer.",
-						"Undo/Redoバッファに矛盾が発生しました！"), "OK"))->Go();
+						TR("Inconsistency occurred in the Undo/Redo buffer."),
+						TR("OK")))->Go();
 				}
 				break;
 		}
@@ -3331,8 +3325,8 @@ TTextView::Redo()
 			case K_REPLACED:
 				::beep();
 				(new BAlert("",
-					MDR_DIALECT_CHOICE("Inconsistency occurred in the Undo/Redo buffer.",
-					"Undo/Redoバッファに矛盾が発生しました！"), "OK"))->Go();
+					TR("Inconsistency occurred in the Undo/Redo buffer."),
+					TR("OK")))->Go();
 				break;
 		}
 		ScrollToSelection();
