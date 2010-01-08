@@ -41,12 +41,9 @@
 ; g = y - (u >> 2 + u >> 4 + u >> 5) - (v >> 1 + v >> 3 + v >> 4 + v >> 5)
 ; b = y + u + u >> 1 + u >> 2 + u >> 6
 ; subtract 16 from y
-	movdqa xmm7, [Const16]			; loads a constant using data cache
+	movdqa xmm7, [Const16]			; loads a constant using data cache (slower on first fetch but then cached)
 	psubsw xmm0,xmm7				; y = y - 16
 ; subtract 128 from u and v
-;	mov eax,128*10001H				; load a constant using instruction cache
-;	movd xmm7,eax					; but requires eax to be saved
-;	pshufd xmm7,xmm7,0				; and uses more instructions
 	movdqa xmm7, [Const128]			; loads a constant using data cache (slower on first fetch but then cached)
 	psubsw xmm1,xmm7				; u = u - 128
 	psubsw xmm2,xmm7				; v = v - 128
@@ -162,7 +159,6 @@ cglobal Convert_YUV422_RGBA32_SSE2
 	test ecx,ecx
 	jng ENDLOOP
 REPEATLOOP:							; loop over width / 8
-;	push ecx						; preserve loop counter
 ; YUV422 packed inputer
 	movdqa xmm0, [esi]				; should have yuyv yuyv yuyv yuyv
 	pshufd xmm1, xmm0, 0xE4			; copy to xmm1
@@ -192,7 +188,6 @@ rgba32output
 ; endloop
 	add edi,32
 	add esi,16
-;	pop ecx
 	sub ecx, 1				; apparently sub is better than dec
 	jnz REPEATLOOP
 ENDLOOP:
@@ -224,7 +219,6 @@ cglobal Convert_YUV420P_RGBA32_SSE2
 	test ecx,ecx
 	jng ENDLOOP1
 REPEATLOOP1:						; loop over width / 8
-;	push ecx						; preserve loop counter
 ; YUV420 Planar inputer
 	movq xmm0, [esi]				; fetch 8 y values (8 bit) yyyyyyyy00000000
 	movd xmm1, [eax]				; fetch 4 u values (8 bit) uuuu000000000000
@@ -253,7 +247,6 @@ rgba32output
 	add esi,8
 	add eax,4
 	add ebx,4
-;	pop ecx
 	sub ecx, 1				; apparently sub is better than dec
 	jnz REPEATLOOP1
 ENDLOOP1:
