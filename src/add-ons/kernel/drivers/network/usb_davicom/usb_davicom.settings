@@ -10,7 +10,7 @@
 trace on 
 
 ## logfile [full path to private log file] 
-## default path value: /var/log/usb_asix.log
+## default path value: /var/log/usb_davicom.log
 ## if disabled - all output goes to syslog
 
 logfile /var/log/usb_davicom.log

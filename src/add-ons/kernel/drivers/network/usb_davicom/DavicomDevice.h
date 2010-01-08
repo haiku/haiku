@@ -1,4 +1,8 @@
 /*
+ *	Davicom DM9601 USB 1.1 Ethernet Driver.
+ *	Copyright (c) 2009 Adrien Destugues <pulkomandy@gmail.com>
+ *	Distributed under the terms of the MIT license.
+ *
  *	ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver.
  *	Copyright (c) 2008 S.Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
@@ -10,18 +14,17 @@
  *
  */
 
-#ifndef _USB_ASIX_DEVICE_H_
-#define _USB_ASIX_DEVICE_H_
+#ifndef _USB_Davicom_DEVICE_H_
+#define _USB_Davicom_DEVICE_H_
 
 #include <net/if_media.h>
 
 #include "Driver.h"
-#include "MIIBus.h"
 
-class ASIXDevice {
+class DavicomDevice {
 public:
-							ASIXDevice(usb_device device, const char *description);
-		virtual				~ASIXDevice();
+							DavicomDevice(usb_device device, const char *description);
+		virtual				~DavicomDevice();
 
 		status_t			InitCheck() { return fStatus; };
 
@@ -51,12 +54,14 @@ static	void				_NotifyCallback(void *cookie, int32 status,
 
 		status_t			_SetupEndpoints();
 
+		status_t				_ReadRegister(uint8 reg, size_t size, uint8* buffer);
+
 protected:
 		/* overrides */
-virtual	status_t			StartDevice() = 0;
+virtual	status_t			StartDevice() ;
 virtual	status_t			StopDevice();
-virtual status_t			OnNotify(uint32 actualLength) = 0;
-virtual	status_t			GetLinkState(ether_link_state *state) = 0;		
+virtual status_t			OnNotify(uint32 actualLength) ;
+virtual	status_t			GetLinkState(ether_link_state *state) ;
 virtual	status_t			SetPromiscuousMode(bool bOn);
 virtual	status_t			ModifyMulticastTable(bool add, uint8 address);
 		status_t			ReadMACAddress(ether_address_t *address);
@@ -93,9 +98,6 @@ const	char *				fDescription;
 		uint8 *				fNotifyBuffer;
 		uint32				fNotifyBufferLength;
 
-		// MII bus handler
-		MIIBus				fMII;
-
 		// connection data
 		sem_id				fLinkStateChangeSem;
 		ether_address_t		fMACAddress;
@@ -108,4 +110,4 @@ const	char *				fDescription;
 		uint16				fPromiscuousBits;
 };
 
-#endif //_USB_ASIX_DEVICE_H_
+#endif //_USB_Davicom_DEVICE_H_
