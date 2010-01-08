@@ -61,6 +61,7 @@ static int16 kCatArchiveVersion = 1;
 void
 escapeQuotedChars(BString& stringToEscape)
 {
+	stringToEscape.ReplaceAll("\\","\\\\");
 	stringToEscape.ReplaceAll("\n","\\n");
 	stringToEscape.ReplaceAll("\t","\\t");
 	stringToEscape.ReplaceAll("\"","\\\"");
