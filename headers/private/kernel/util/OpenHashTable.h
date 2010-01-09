@@ -314,7 +314,30 @@ public:
 		ValueType* fNext;
 	};
 
-	Iterator GetIterator() const { return Iterator(this); }
+	Iterator GetIterator() const
+	{
+		return Iterator(this);
+	}
+
+	Iterator GetIterator(const KeyType& key) const
+	{
+		if (fTableSize == 0)
+			return Iterator(this, fTableSize, NULL);
+
+		size_t index = fDefinition.HashKey(key) & (fTableSize - 1);
+		ValueType* slot = fTable[index];
+
+		while (slot) {
+			if (fDefinition.Compare(key, slot))
+				break;
+			slot = _Link(slot);
+		}
+
+		if (slot == NULL)
+			return Iterator(this, fTableSize, NULL);
+
+		return Iterator(this, index + 1, slot);
+	}
 
 protected:
 	// for g++ 2.95
