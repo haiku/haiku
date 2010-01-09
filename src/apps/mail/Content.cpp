@@ -882,9 +882,9 @@ TTextView::TTextView(BRect frame, BRect text, bool incoming,
 	//
 	fEnclosureMenu = new BPopUpMenu("Enclosure", false, false);
 	fEnclosureMenu->SetFont(&menuFont);
-	fEnclosureMenu->AddItem(new BMenuItem(TR("Save Enclosure" B_UTF8_ELLIPSIS),
+	fEnclosureMenu->AddItem(new BMenuItem(TR("Save attachment" B_UTF8_ELLIPSIS),
 		new BMessage(M_SAVE)));
-	fEnclosureMenu->AddItem(new BMenuItem(TR("Open Enclosure"),
+	fEnclosureMenu->AddItem(new BMenuItem(TR("Open attachment"),
 		new BMessage(M_OPEN)));
 
 	//
@@ -892,9 +892,9 @@ TTextView::TTextView(BRect frame, BRect text, bool incoming,
 	//
 	fLinkMenu = new BPopUpMenu("Link", false, false);
 	fLinkMenu->SetFont(&menuFont);
-	fLinkMenu->AddItem(new BMenuItem(TR("Open This Link"),
+	fLinkMenu->AddItem(new BMenuItem(TR("Open this link"),
 		new BMessage(M_OPEN)));
-	fLinkMenu->AddItem(new BMenuItem(TR("Copy Link Location"),
+	fLinkMenu->AddItem(new BMenuItem(TR("Copy link location"),
 		new BMessage(M_COPY)));
 
 	SetDoesUndo(true);
@@ -1541,7 +1541,7 @@ TTextView::MouseDown(BPoint where)
 						delete string;
 					}
 				} else {
-					(menuItem = new BMenuItem("No Matches", NULL))->SetEnabled(false);
+					(menuItem = new BMenuItem("No matches", NULL))->SetEnabled(false);
 					menu.AddItem(menuItem);
 				}
 
@@ -2039,7 +2039,7 @@ TTextView::Save(BMessage *msg, bool makeNewFile)
 
 	if (result != B_NO_ERROR) {
 		beep();
-		(new BAlert("", TR("An error occurred trying to save the enclosure."),
+		(new BAlert("", TR("An error occurred trying to save the attachment."),
 			TR("Sorry")))->Go();
 	}
 
@@ -2284,7 +2284,7 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 
 			enclosure->type = TYPE_ENCLOSURE;
 
-			const char *name = "\n<Enclosure: could not handle>\n";
+			const char *name = "\n<Attachment: could not handle>\n";
 
 			fView->GetSelection(&enclosure->text_start, &enclosure->text_end);
 			enclosure->text_start++;
@@ -3279,7 +3279,7 @@ TTextView::Undo(BClipboard */*clipboard*/)
 				} else {
 					::beep();
 					(new BAlert("",
-						TR("Inconsistency occurred in the Undo/Redo buffer."),
+						TR("Inconsistency occurred in the undo/redo buffer."),
 						TR("OK")))->Go();
 				}
 				break;
@@ -3325,7 +3325,7 @@ TTextView::Redo()
 			case K_REPLACED:
 				::beep();
 				(new BAlert("",
-					TR("Inconsistency occurred in the Undo/Redo buffer."),
+					TR("Inconsistency occurred in the undo/redo buffer."),
 					TR("OK")))->Go();
 				break;
 		}
@@ -3334,3 +3334,4 @@ TTextView::Redo()
 		fUndoBuffer.On();
 	}
 }
+

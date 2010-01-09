@@ -156,7 +156,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	BMessage* msg;
 
 	float x = StringWidth( /* The longest title string in the header area */
-		TR("Enclosures: ")) + 9;
+		TR("Attachments: ")) + 9;
 	float y = TO_FIELD_V;
 
 	BMenuBar* dummy = new BMenuBar(BRect(0, 0, 100, 15), "Dummy");

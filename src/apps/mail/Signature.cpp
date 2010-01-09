@@ -92,7 +92,7 @@ TSignatureWindow::TSignatureWindow(BRect rect)
 		'V'));
 	fPaste->SetTarget(NULL, this);
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(TR("Select All"), new BMessage(M_SELECT),
+	menu->AddItem(item = new BMenuItem(TR("Select all"), new BMessage(M_SELECT),
 		'A'));
 	item->SetTarget(NULL, this);
 	menu_bar->AddItem(menu);
@@ -281,7 +281,7 @@ TSignatureWindow::Clear()
 	if (IsDirty()) {
 		beep();
 		BAlert *alert = new BAlert("", TR("Save changes to this signature?"),
-			TR("Don't Save"), TR("Cancel"), TR("Save"),
+			TR("Don't save"), TR("Cancel"), TR("Save"),
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, 'd');
 		alert->SetShortcut(1, B_ESCAPE);

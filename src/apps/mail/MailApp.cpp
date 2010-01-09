@@ -149,10 +149,11 @@ TMailApp::~TMailApp()
 void
 TMailApp::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "Mail\n\n"
-		"written by Robert Polic\n"
-		"enhanced by the Dr. Zoidberg crew\n\n"
-		"Copyright 2007, Haiku.\n", "Ok");
+	BAlert *alert = new BAlert("about", TR("Mail\n\n"
+		"Written by Robert Polic.\n"
+		"Enhanced by the Dr. Zoidberg crew.\n\n"
+		"Copyright 1991-2001, Be Incorporated.\n"
+		"Copyright 2005-2010 Haiku, Inc.\n"), "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

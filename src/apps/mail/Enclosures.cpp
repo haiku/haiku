@@ -139,7 +139,7 @@ TEnclosuresView::TEnclosuresView(BRect rect, BRect wind_rect)
 
 	BRect r;
 	r.left = ENCLOSE_TEXT_H + font.StringWidth(
-		TR("Enclosures: ")) + 5;
+		TR("Attachments: ")) + 5;
 	r.top = ENCLOSE_FIELD_V;
 	r.right = wind_rect.right - wind_rect.left - B_V_SCROLL_BAR_WIDTH - 9;
 	r.bottom = Frame().Height() - 8;
@@ -225,7 +225,7 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 						window->Mail()->RemoveComponent(item->Component());
 
 					(new BAlert("", TR(
-						"Removing enclosures from a forwarded mail is not yet "
+						"Removing attachments from a forwarded mail is not yet "
 						"implemented!\nIt will not yet work correctly."),
 						TR("OK")))->Go();
 				}
@@ -278,8 +278,8 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 				{
 					beep();
 					(new BAlert("",
-						TR("Only files can be added as enclosures."),
-						TR("Ok")))->Go();
+						TR("Only files can be added as attachments."),
+						TR("OK")))->Go();
 				}
 			}
 			break;
@@ -305,7 +305,7 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 					{
 						if (opcode == B_ENTRY_REMOVED)
 						{
-							// don't hide the <missing enclosure> item
+							// don't hide the <missing attachment> item
 
 							//fList->RemoveItem(index);
 							//
@@ -423,9 +423,9 @@ TListView::MouseDown(BPoint point)
 
 		BPopUpMenu menu("enclosure", false, false);
 		menu.SetFont(&font);
-		menu.AddItem(new BMenuItem(TR("Open Enclosure"),
+		menu.AddItem(new BMenuItem(TR("Open attachment"),
 			new BMessage(LIST_INVOKED)));
-		menu.AddItem(new BMenuItem(TR("Remove Enclosure"),
+		menu.AddItem(new BMenuItem(TR("Remove attachment"),
 			new BMessage(M_REMOVE)));
 
 		BPoint menuStart = ConvertToScreen(point);
@@ -559,6 +559,6 @@ TListItem::DrawItem(BView *owner, BRect r, bool /* complete */)
 			owner->SetDrawingMode(B_OP_COPY);
 		}
 	} else
-		owner->DrawString("<missing enclosure>");
+		owner->DrawString("<missing attachment>");
 }
 
