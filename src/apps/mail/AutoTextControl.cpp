@@ -56,19 +56,15 @@ AutoTextControlFilter::Filter(BMessage *msg, BHandler **target)
 	if (!text || text != fBox)
 		return B_DISPATCH_MESSAGE;
 	
-	// handle instances where numlock is off and the user tries to punch in numbers.
-	// Instead of simply blocking the resulting keypresses, transform them into legit ones
-	// and turn NumLock on for the user. This doesn't work on R5, so only do it on other
-	// versions of BeOS
-	#ifndef HAIKU_TARGET_PLATFORM_R5
+	// handle instances where numlock is off and the user tries to punch in
+	// numbers. Instead of simply blocking the resulting keypresses, 
+	// transform them into legit ones and turn NumLock on for the user.
 	
 	int32 scancode;
 	if (msg->FindInt32("key",&scancode) != B_OK)
 		scancode = -1;
 	
 	HandleNoNumLock(scancode,rawchar,msg);
-	
-	#endif
 	
 	fCurrentMessage = msg;
 	filter_result result = KeyFilter(rawchar,mod);

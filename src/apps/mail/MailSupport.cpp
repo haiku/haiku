@@ -70,11 +70,6 @@ All rights reserved.
 
 using namespace BPrivate ;
 
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	#include <netdb.h>
-#endif
-
-
 #include "Words.h"
 
 // global variables

@@ -362,10 +362,6 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		AddChild(field, encodingField);
 		field->SetDivider(x - 12 - SEPARATOR_MARGIN + kMenuFieldDividerOffset);
 		field->SetAlignment(B_ALIGN_RIGHT);
-#ifndef __HAIKU__
-		field->MenuBar()->SetResizingMode(B_FOLLOW_LEFT_RIGHT);
-#endif
-
 		y += controlHeight;
 	} else {
 		// To: account

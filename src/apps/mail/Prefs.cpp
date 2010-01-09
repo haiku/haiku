@@ -43,10 +43,8 @@ All rights reserved.
 #include <E-mail.h>
 #include <Application.h>
 
-#ifdef __HAIKU__
 # include <GridView.h>
 # include <GroupLayoutBuilder.h>
-#endif // __HAIKU__
 
 #include <MailSettings.h>
 #include <mail_encoding.h>
@@ -88,14 +86,6 @@ extern BPoint	prefs_window;
 //#pragma mark -
 
 
-#ifdef __HAIKU__
-# define USE_LAYOUT_MANAGEMENT 1
-#else
-# define USE_LAYOUT_MANAGEMENT 0
-#endif
-
-
-#if USE_LAYOUT_MANAGEMENT
 static inline void
 add_menu_to_layout(BMenuField* menu, BGridLayout* layout, int32& row)
 {
@@ -104,7 +94,6 @@ add_menu_to_layout(BMenuField* menu, BGridLayout* layout, int32& row)
 	layout->AddItem(menu->CreateMenuBarLayoutItem(), 1, row, 2);
 	row++;
 }
-#endif
 
 
 TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
@@ -112,14 +101,9 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	char** preamble, char** sig, uint32* encoding, bool* warnUnencodable,
 	bool* spellCheckStartOn, bool* autoMarkRead, uint8* buttonBar)
 	:
-#if USE_LAYOUT_MANAGEMENT
 	BWindow(rect, TR("Mail preferences"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
-#else
-	BWindow(rect, TR("Mail preferences"),
-		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
-#endif
 
 	fNewWrap(wrap),
 	fWrap(*fNewWrap),
@@ -163,7 +147,6 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 
 	BMenuField* menu;
 
-#if USE_LAYOUT_MANAGEMENT
 	// group boxes
 
 	const float kSpacing = 8;
@@ -289,203 +272,6 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	);
 
 	Show();
-
-#else // #if !USE_LAYOUT_MANAGEMENT
-
-	BRect r = Bounds();
-	BView *view = new BView(r, NULL, B_FOLLOW_ALL, B_FRAME_EVENTS);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(view);
-
-	// determine font height
-	font_height fontHeight;
-	view->GetFontHeight(&fontHeight);
-	int32 height = (int32)(fontHeight.ascent + fontHeight.descent
-		+ fontHeight.leading) + 6;
-	int32 labelWidth = (int32)view->StringWidth(TR("Initial spell check mode:"))
-		+ SEPARATOR_MARGIN;
-
-	// group boxes
-
-	r.Set(8, 4, Bounds().right - 8, 4 + 6 * (height + ITEM_SPACE));
-	BBox* interfaceBox = new BBox(r , NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	interfaceBox->SetLabel(TR("User interface"));
-	view->AddChild(interfaceBox);
-
-	r.top = r.bottom + 8;
-	r.bottom = r.top + 9 * (height + ITEM_SPACE);
-	BBox* mailBox = new BBox(r,NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	mailBox->SetLabel(TR("Mailing"));
-	view->AddChild(mailBox);
-
-	// revert, ok & cancel
-
-	r.top = r.bottom + 10;
-	r.bottom = r.top + height;
-	r.left = OK_BUTTON_X1;
-	r.right = OK_BUTTON_X2;
-	BButton* button = new BButton(r, "ok", TR("OK"), new BMessage(P_OK));
-	button->MakeDefault(true);
-	view->AddChild(button);
-
-	r.OffsetBy(-(OK_BUTTON_X2 - OK_BUTTON_X1 + 10), 0);
-	button = new BButton(r, "cancel", TR("Cancel"),
-		new BMessage(P_CANCEL));
-	view->AddChild(button);
-
-	r.left = REVERT_BUTTON_X1;  r.right = REVERT_BUTTON_X2;
-	fRevert = new BButton(r, "revert", TR("Revert"),
-		new BMessage(P_REVERT));
-	fRevert->SetEnabled(false);
-	view->AddChild(fRevert);
-
-	// User Interface
-
-	r = interfaceBox->Bounds();
-	r.left += 8; 
-	r.right -= 8; 
-	r.top = height; 
-	r.bottom = r.top + height - 3;
-	fButtonBarMenu = _BuildButtonBarMenu(*buttonBar);
-	menu = new BMenuField(r, "bar", TR("Button bar:"), fButtonBarMenu,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	interfaceBox->AddChild(menu);	
-
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fFontMenu = _BuildFontMenu(font);
-	menu = new BMenuField(r, "font", TR("Font:"), fFontMenu,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	interfaceBox->AddChild(menu);
-
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fSizeMenu = _BuildSizeMenu(font);
-	menu = new BMenuField(r, "size", TR("Size:"), fSizeMenu,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	interfaceBox->AddChild(menu);
-
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fColoredQuotesMenu = _BuildColoredQuotesMenu(fColoredQuotes);
-	menu = new BMenuField(r, "cquotes", TR("Colored quotes:"),
-		fColoredQuotesMenu,	B_FOLLOW_ALL,
-		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	interfaceBox->AddChild(menu);
-
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fSpellCheckStartOnMenu = _BuildSpellCheckStartOnMenu(fSpellCheckStartOn);
-	menu = new BMenuField(r, "spellCheckStartOn",
-		TR("Initial spell check mode:"), fSpellCheckStartOnMenu, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	interfaceBox->AddChild(menu);
-
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fAutoMarkReadMenu = _BuildAutoMarkReadMenu(fAutoMarkRead);
-	menu = new BMenuField("autoMarkRead", 
-		TR("Automatically mark mail as read:"), fAutoMarkReadMenu, NULL);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	interfaceBox->AddChild(menu);
-	
-	// Mail Accounts
-
-	r = mailBox->Bounds();
-	r.left += 8; 
-	r.right -= 8;
-	r.top = height;
-	r.bottom = r.top + height - 3;
-	fAccountMenu = _BuildAccountMenu(fAccount);
-	menu = new BMenuField(r, "account", TR("Default account:"), fAccountMenu,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	mailBox->AddChild(menu);
-
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fReplyToMenu = _BuildReplyToMenu(fReplyTo);
-	menu = new BMenuField(r, "replyTo", TR("Reply account:"), fReplyToMenu,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	mailBox->AddChild(menu);
-
-	// Mail Contents
-
-	r.OffsetBy(0, height + ITEM_SPACE);
-	r.right -= 25;
-	fReplyPreamble = new BTextControl(r, "replytext", TR("Reply preamble:"),
-		*preamble, new BMessage(P_REPLY_PREAMBLE), B_FOLLOW_ALL,
-		B_WILL_DRAW | B_NAVIGABLE);
-	fReplyPreamble->SetDivider(labelWidth);
-	fReplyPreamble->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	mailBox->AddChild(fReplyPreamble);
-
-	BRect popRect = r;
-	popRect.left = r.right + 6;
-	r.right += 25;
-	popRect.right = r.right;
-	fReplyPreambleMenu = _BuildReplyPreambleMenu();
-	menu = new BMenuField(popRect, "replyPreamble", B_EMPTY_STRING,
-		fReplyPreambleMenu, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(0);
-	mailBox->AddChild(menu);
-	
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fSignatureMenu = _BuildSignatureMenu(*sig);
-	menu = new BMenuField(r, "sig", TR("Auto signature:"), fSignatureMenu,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	mailBox->AddChild(menu);
-
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fEncodingMenu = _BuildEncodingMenu(fEncoding);
-	menu = new BMenuField(r, "enc", TR("Encoding:"), fEncodingMenu,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	mailBox->AddChild(menu);
-
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fWarnUnencodableMenu = _BuildWarnUnencodableMenu(fWarnUnencodable);
-	menu = new BMenuField(r, "warnUnencodable", TR("Warn unencodable:"),
-		fWarnUnencodableMenu, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	mailBox->AddChild(menu);
-
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fWrapMenu = _BuildWrapMenu(*wrap);
-	menu = new BMenuField(r, "wrap", TR("Text wrapping:"), fWrapMenu,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	mailBox->AddChild(menu);
-	
-	r.OffsetBy(0, height + ITEM_SPACE);
-	fAttachAttributesMenu = _BuildAttachAttributesMenu(*attachAttributes);
-	menu = new BMenuField(r, "attachAttributes", TR("Attach attributes:"),
-		fAttachAttributesMenu, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	menu->SetDivider(labelWidth);
-	menu->SetAlignment(B_ALIGN_RIGHT);
-	mailBox->AddChild(menu);
-
-	ResizeTo(Frame().Width(), fRevert->Frame().bottom + 8);
-
-	Show();
-
-#endif // #if !USE_LAYOUT_MANAGEMENT
 }
 
 
@@ -593,8 +379,8 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 					item->SetMarked(true);
 
 				strcpy(label, fAttachAttributes
-					? TR("Include BeOS attributes in attachments")
-					: TR("No BeOS attributes, just plain data"));
+					? TR("Include file attributes in attachments")
+					: TR("No file attributes, just plain data"));
 				if ((item = fAttachAttributesMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
@@ -1022,14 +808,14 @@ TPrefsWindow::_BuildAttachAttributesMenu(bool attachAttributes)
 	msg = new BMessage(P_ATTACH_ATTRIBUTES);
 	msg->AddBool("attachAttributes", true);
 	menu->AddItem(item = new BMenuItem(
-		TR("Include BeOS attributes in attachments"), msg));
+		TR("Include file attributes in attachments"), msg));
 	if (attachAttributes)
 		item->SetMarked(true);
 
 	msg = new BMessage(P_ATTACH_ATTRIBUTES);
 	msg->AddInt32("attachAttributes", false);
 	menu->AddItem(item = new BMenuItem(
-		TR("No BeOS attributes, just plain data"), msg));
+		TR("No file attributes, just plain data"), msg));
 	if (!attachAttributes)
 		item->SetMarked(true);
 

@@ -1547,11 +1547,10 @@ TMailWindow::MessageReceived(BMessage *msg)
 
 			break;
 		}
-#ifdef __HAIKU__
+
 		case B_PATH_MONITOR:
 			_RebuildQueryMenu();
 			break;
-#endif
 
 		default:
 			BWindow::MessageReceived(msg);
@@ -1668,9 +1667,7 @@ TMailWindow::QuitRequested()
 			SetCurrentMessageRead();
 	}
 
-#ifdef __HAIKU__
 	BPrivate::BPathMonitor::StopWatching(BMessenger(this, this));
-#endif
 
 	return true;
 }
@@ -2951,10 +2948,8 @@ TMailWindow::_RebuildQueryMenu(bool firstTime)
 	BDirectory queryDir(queryPath.Path());
 
 	if (firstTime) {
-#ifdef __HAIKU__
 		BPrivate::BPathMonitor::StartWatching(queryPath.Path(),
 			B_WATCH_RECURSIVELY, BMessenger(this, this));
-#endif
 	}
 
 	// If we find the named query, add it to the menu.
