@@ -238,6 +238,7 @@ KPartition::UnpublishDevice()
 	if (error != B_OK) {
 		dprintf("KPartition::UnpublishDevice(): Failed to get path for "
 			"partition %ld: %s\n", ID(), strerror(error));
+		return error;
 	}
 
 	error = devfs_unpublish_partition(path.Path());
