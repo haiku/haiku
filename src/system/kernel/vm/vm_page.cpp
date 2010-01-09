@@ -278,6 +278,7 @@ find_page(int argc, char **argv)
 		{ "clear",		&sClearPageQueue },
 		{ "modified",	&sModifiedPageQueue },
 		{ "active",		&sActivePageQueue },
+		{ "inactive",	&sInactivePageQueue },
 		{ NULL, NULL }
 	};
 
