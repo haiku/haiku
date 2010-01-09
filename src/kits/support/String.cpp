@@ -297,7 +297,9 @@ BString::operator=(const BString& string)
 BString&
 BString::operator=(const char* string)
 {
-	if (string && string != String())
+	if (!string)
+		string = "";
+	if (string != String())
 		SetTo(string, strlen(string));
 	return *this;
 }
