@@ -1813,14 +1813,12 @@ vm_page_schedule_write_page_range(struct VMCache *cache, uint32 firstPage,
 		if (page->cache_offset >= endPage)
 			break;
 
-		DEBUG_PAGE_ACCESS_START(page);
-
 		if (page->state == PAGE_STATE_MODIFIED) {
+			DEBUG_PAGE_ACCESS_START(page);
 			vm_page_requeue(page, false);
 			modified++;
+			DEBUG_PAGE_ACCESS_END(page);
 		}
-
-		DEBUG_PAGE_ACCESS_END(page);
 	}
 
 	if (modified > 0)
