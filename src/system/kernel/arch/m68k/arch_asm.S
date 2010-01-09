@@ -1,10 +1,8 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
- * All rights reserved. Distributed under the terms of the MIT License.
- *
  * Copyright 2003, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 
 #include <arch/m68k/arch_cpu.h>
 
@@ -26,7 +24,7 @@ FUNCTION(arch_int_enable_interrupts):
 FUNCTION_END(arch_int_enable_interrupts)
 
 
-/* int arch_int_disable_interrupts(void) 
+/* int arch_int_disable_interrupts(void)
  */
 FUNCTION(arch_int_disable_interrupts):
 	clr.l	%d0
@@ -41,7 +39,7 @@ FUNCTION(arch_int_disable_interrupts):
 FUNCTION_END(arch_int_disable_interrupts)
 
 
-/* void arch_int_restore_interrupts(int oldState) 
+/* void arch_int_restore_interrupts(int oldState)
  */
 FUNCTION(arch_int_restore_interrupts):
 	move.l	(4,%a7),%d0
@@ -97,7 +95,7 @@ FUNCTION(m68k_context_switch):
 #warning M68K: use fixed size for fsave
 
 	// XXX
-	
+
 	frestore	(%sp)+
 	fmovem		(%sp)+,%fp0-%fp7
 	movem.l		(%sp)+,%d0-%d7/%a0-%a7
@@ -105,21 +103,6 @@ FUNCTION(m68k_context_switch):
 
 	rts
 FUNCTION_END(m68k_context_switch)
-
-
-// void m68k_switch_stack_and_call(addr_t newKstack,
-//		void (*func)(void *), void *arg)
-FUNCTION(m68k_switch_stack_and_call):
-#warning M68K: check
-	move.l		4(%sp),%a0	// new stack
-	move.l		8(%sp),%a1	// func
-	move.l		12(%sp),%d0	// args
-	move.l		%a0,%sp		// switch the stack
-	move.l		%d0,-(%sp)	// push the argument
-	jsr		(%a1)		// call the target function
-_loop:
-	bra		_loop
-FUNCTION_END(m68k_switch_stack_and_call)
 
 
 // m68k_kernel_thread_root(): parameters in r13-r15, the functions to call

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku Inc. All rights reserved.
+ * Copyright 2003-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,7 @@
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 
 #include <arch_thread.h>
 
@@ -29,9 +30,6 @@ static struct arch_thread sInitialState;
 
 // Helper function for thread creation, defined in arch_asm.S.
 extern "C" void ppc_kernel_thread_root();
-
-extern "C" void ppc_switch_stack_and_call(addr_t newKstack, void (*func)(void *),
-	void *arg);
 
 
 void
@@ -166,14 +164,6 @@ arch_thread_init_tls(struct thread *thread)
 {
 	// TODO: Implement!
 	return B_OK;
-}
-
-
-void
-arch_thread_switch_kstack_and_call(struct thread *t, addr_t newKstack,
-	void (*func)(void *), void *arg)
-{
-	ppc_switch_stack_and_call(newKstack, func, arg);
 }
 
 

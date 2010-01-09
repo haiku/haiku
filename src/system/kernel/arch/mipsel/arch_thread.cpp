@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -100,14 +100,6 @@ arch_thread_init_tls(struct thread *thread)
 {
 #warning IMPLEMENT arch_thread_init_tls
 	return B_ERROR;
-}
-
-
-void
-arch_thread_switch_kstack_and_call(struct thread *t, addr_t newKstack,
-	void (*func)(void *), void *arg)
-{
-#warning IMPLEMENT arch_thread_switch_kstack_and_call
 }
 
 

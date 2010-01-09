@@ -26,8 +26,6 @@ status_t arch_thread_init_kthread_stack(struct thread *t,
 void arch_thread_dump_info(void *info);
 status_t arch_thread_enter_userspace(struct thread *t, addr_t entry,
 	void *args1, void *args2);
-void arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack,
-	void (*func)(void *), void *arg);
 
 bool arch_on_signal_stack(struct thread *thread);
 status_t arch_setup_signal_frame(struct thread *t, struct sigaction *sa,

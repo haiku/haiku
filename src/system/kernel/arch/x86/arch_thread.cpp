@@ -6,6 +6,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <arch/thread.h>
 
 #include <string.h>
@@ -348,14 +349,6 @@ arch_thread_init_tls(struct thread *thread)
 	tls[TLS_USER_THREAD_SLOT] = (addr_t)thread->user_thread;
 
 	return user_memcpy((void *)thread->user_local_storage, tls, sizeof(tls));
-}
-
-
-void
-arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack,
-	void (*func)(void *), void *arg)
-{
-	i386_switch_stack_and_call(new_kstack, func, arg);
 }
 
 

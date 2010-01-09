@@ -270,7 +270,6 @@ void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
 void x86_enter_userspace(addr_t entry, addr_t stackTop);
 void i386_set_tss_and_kstack(addr_t kstack);
-void i386_switch_stack_and_call(addr_t stack, void (*func)(void*), void* arg);
 void i386_swap_pgdir(addr_t newPageDir);
 void i386_fnsave(void* fpuState);
 void i386_fxsave(void* fpuState);

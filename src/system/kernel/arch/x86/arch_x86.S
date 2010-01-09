@@ -7,6 +7,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <asm_defs.h>
 
 #include <arch/x86/descriptors.h>
@@ -180,18 +181,6 @@ FUNCTION(x86_enter_userspace):
 	iret
 FUNCTION_END(x86_enter_userspace)
 
-/* void i386_switch_stack_and_call(addr stack, void (*func)(void *), void *arg); */
-FUNCTION(i386_switch_stack_and_call):
-	movl	4(%esp),%eax	// new stack
-	movl	8(%esp),%ecx	// func
-	movl	12(%esp),%edx	// args
-
-	movl	%eax,%esp		// switch the stack
-	pushl	%edx			// push the argument
-	call	*%ecx			// call the target function
-_loop:
-	jmp		_loop
-FUNCTION_END(i386_switch_stack_and_call)
 
 null_idt_descr:
 	.word	0

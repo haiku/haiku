@@ -1,10 +1,11 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2006-2010, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Copyright 2003, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 
 #define FUNCTION(x) .global x; .type x,@function; x
 
@@ -30,7 +31,7 @@ FUNCTION(arch_int_enable_interrupts):
 	blr
 
 
-/* int arch_int_disable_interrupts(void) 
+/* int arch_int_disable_interrupts(void)
  * r3
  */
 FUNCTION(arch_int_disable_interrupts):
@@ -45,7 +46,7 @@ FUNCTION(arch_int_disable_interrupts):
 	blr
 
 
-/* void arch_int_restore_interrupts(int oldState) 
+/* void arch_int_restore_interrupts(int oldState)
  *									r3
  */
 FUNCTION(arch_int_restore_interrupts):
@@ -61,7 +62,7 @@ FUNCTION(arch_int_restore_interrupts):
 /* bool arch_int_are_interrupts_enabled(void) */
 FUNCTION(arch_int_are_interrupts_enabled):
 	mfmsr	%r3							// load msr
-	extrwi	%r3, %r3, 1, 31 - MSR_EXCEPTIONS_ENABLED				
+	extrwi	%r3, %r3, 1, 31 - MSR_EXCEPTIONS_ENABLED
 		// mask out the EE bit
 	blr
 
@@ -195,7 +196,7 @@ FUNCTION(setl2cr):
 	isync
 	blr
 
-	
+
 // void ppc_context_switch(addr_t *old_sp, addr_t new_sp);
 FUNCTION(ppc_context_switch):
 
@@ -306,19 +307,10 @@ FUNCTION(ppc_context_switch):
 	lfdu		%f29, 8(%r1)
 	lfdu		%f30, 8(%r1)
 	lfdu		%f31, 8(%r1)
-	
+
 	addi		%r1, %r1, 8
 
 	blr
-
-
-// void ppc_switch_stack_and_call(addr_t newKstack,
-//		void (*func)(void *), void *arg)
-FUNCTION(ppc_switch_stack_and_call):
-	mr			%r1, %r3	// set the new stack pointer
-	mtctr		%r4			// move the target function into CTR
-	mr			%r3, %r5	// move the arg to this func to the new arg
-	bctr
 
 
 // ppc_kernel_thread_root(): parameters in r13-r15, the functions to call
