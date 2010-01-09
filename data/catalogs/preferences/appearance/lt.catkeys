@@ -4,24 +4,24 @@ Control border	Colors tab		Valdiklių rėmelis
 Antialiasing type:	AntialiasingSettingsView		Glotninimo rūšis:
 Shadow	Colors tab		Šešėlis
 On	AntialiasingSettingsView		Įjungta
-Defaults	APRWindow		Įprastai
+Defaults	APRWindow		Numatytai
 Grayscale	AntialiasingSettingsView		Pilkšvai
-Shine	Colors tab		Šviesa
+Shine	Colors tab		Apšvietimas
 Off	AntialiasingSettingsView		Išjungta
-Success	Colors tab		Sėkmė
-Inactive window tab text	Colors tab		Neveikiančio lango antraštė
-Failure	Colors tab		Nesėkmė
+Success	Colors tab		Sėkmingai
+Inactive window tab text	Colors tab		Neveikiančio lango antraštės tekstas
+Failure	Colors tab		Nesėkmingai
 Hinting menu	AntialiasingSettingsView		Glodinimas
 Document background	Colors tab		Dokumento fonas
 Revert	APRWindow		Grįžti
 Window tab	Colors tab		Lango antraštė
-Tooltip background	Colors tab		Patarimo fonas
+Tooltip background	Colors tab		Patarimų fonas
 Selected menu item background	Colors tab		Išskirtojo meniu dėmens fonas
 Antialiasing	APRWindow		Glotninimas
 Navigation base	Colors tab		Pasirinkimo rėmelis
 Window tab text	Colors tab		Lango antraštės tekstas
 Document text	Colors tab		Dokumento tekstas
-Navigation pulse	Colors tab		Išskirto rėmelio žybsniai
+Navigation pulse	Colors tab		Pasirinkimo rėmelio žybsniai
 Selected menu item text	Colors tab		Išskirtojo meniu dėmens tekstas
 Menu background	Colors tab		Meniu fonas
 Appearance	APRWindow		Išvaizda
@@ -30,7 +30,7 @@ Colors	APRWindow		Spalvos
 Control background	Colors tab		Valdiklių fonas
 Inactive window tab	Colors tab		Neveikiančio lango antraštė
 Reduce colored edges filter strength:	AntialiasingSettingsView		Spalvotų kraštų filtro stiprumo mažinimas:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpikselinis glotninimas kartu su pilkšvuoju glodinimu šioje Haiku versijoje yra neprieinamas dėl patentų nesuderinamumo. Norėdami įjungti šią ypatybę, turite savarankiškai susirinkti Haiku įjungdami atitinkamą sąvybę bibliotekos FreeType antraštinėje derinimo byloje.
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpikselinis glotninimas kartu su pilkšvuoju glodinimu šioje Haiku versijoje yra neprieinamas dėl patentų nesuderinamumo. Norėdami įjungti šią ypatybę, turite savarankiškai susirinkti Haiku įjungdami atitinkamą savybę bibliotekos FreeType antraštinėje derinimo byloje.
 Control text	Colors tab		Valdiklių tekstas
 Tooltip text	Colors tab		Patarimų tekstas
 Menu item text	Colors tab		Meniu dėmens tekstas

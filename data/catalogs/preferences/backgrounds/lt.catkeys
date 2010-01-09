@@ -2,10 +2,10 @@
 X:	Main View		X:
 Resolution: 	Image Filepanel		Raiška:
 pick one	Main View		pasirinkti
-Default	Main View		Įprastai
+Default	Main View		Numatytai
 Center	Main View		Viduryje
 Manual	Main View		Savaip
-Default folder	Main View		Įprastinis aplankas
+Default folder	Main View		Numatytasis aplankas
 Revert	Main View		Grįžti
 None	Main View		Jokio
 All workspaces	Main View		Visi darbastaliai
@@ -15,7 +15,7 @@ Current workspace	Main View		Šis darbastalis
 Folder: 	Main View		Aplankas:
 Apply	Main View		Taikyti
 Other folder…	Main View		Kitas aplankas…
-Backgrounds	Main Window		Darbastalio fonai
+Backgrounds	Main Window		Fonai
 Y:	Main View		Y:
 Tile	Main View		Iškloti
 Select	Main View		Parinkti

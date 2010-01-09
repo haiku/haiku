@@ -20,7 +20,7 @@ Language	Locale Preflet Window		Kalba
 Month number	TimeFormatSettings		mėnesio skaičius
 Year (2 digits)	TimeFormatSettings		Metai (2 skaitmenys)
 Preferred languages	Locale Preflet Window		Pageidautinos kalbos
-Decimal separator: 	TimeFormatSettings		Dešimtainis skirtukas
+Decimal separator: 	TimeFormatSettings		Dešimtainis skirtukas:
 Symbol position	TimeFormatSettings		Ženklo vieta
 Day of week (short name)	TimeFormatSettings		savaitės diena (trumpai)
 Numbers	TimeFormatSettings		Skaičiai
@@ -29,7 +29,7 @@ Numbers	TimeFormatSettings		Skaičiai
 Negative marker:	TimeFormatSettings		Neigiamumo žymuo:
 Day in month	TimeFormatSettings		diena mėnesyje
 OK	Locale Preflet Window		Gerai
-Defaults	Locale Preflet Window		Įprastai
+Defaults	Locale Preflet Window		Numatytai
 Separator	TimeFormatSettings		Skirtukas
 Country	Locale Preflet Window		Šalis
 Month number (2 digits)	TimeFormatSettings		mėnesio skaičius (2 skaitmenys)
