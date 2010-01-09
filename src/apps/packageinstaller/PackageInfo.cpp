@@ -19,6 +19,10 @@
 // Macro reserved for later localization
 #define T(x) x
 
+#define RETURN_AND_SET_STATUS(err) fStatus = err; \
+	fprintf(stderr, "err at %s():%d: %x\n", __FUNCTION__, __LINE__, err); \
+	return fStatus;
+
 const uint32 kSkipOffset = 33;
 
 // Section constants
@@ -91,8 +95,7 @@ PackageInfo::Parse()
 {
 	// TODO: Clean up
 	if (!fPackageFile || fPackageFile->InitCheck() != B_OK) {
-		fStatus = B_ERROR;
-		return fStatus;
+		RETURN_AND_SET_STATUS(B_ERROR);
 	}
 	
 	// Check for the presence of the first AlB tag - as the 'magic number'.
@@ -102,8 +105,7 @@ PackageInfo::Parse()
 	fPackageFile->Read(buffer, 8);
 	if (buffer[0] != 'A' || buffer[1] != 'l' || buffer[2] != 'B' 
 		|| buffer[3] != 0x1a) {
-		fStatus = B_ERROR;
-		return fStatus;
+		RETURN_AND_SET_STATUS(B_ERROR);
 	}
 
 	fHasImage = false;
@@ -128,8 +130,7 @@ PackageInfo::Parse()
 	while (true) {
 		bytesRead = fPackageFile->Read(buffer, 7);
 		if (bytesRead != 7) {
-			fStatus = B_ERROR;
-			return fStatus;
+			RETURN_AND_SET_STATUS(B_ERROR);
 		}
 
 		if (!memcmp(buffer, "PhIn", 5)) {
@@ -165,15 +166,13 @@ PackageInfo::Parse()
 			parser_debug("End!\n");
 			break;
 		} else {
-			fStatus = B_ERROR;
-			return fStatus;
+			RETURN_AND_SET_STATUS(B_ERROR);
 		}
 	}
 
 	fPackageFile->Read(buffer, 7);
 	if (memcmp(buffer, "PkgA", 5) || !groupsOffset || !infoOffset) {
-		fStatus = B_ERROR;
-		return fStatus;
+		RETURN_AND_SET_STATUS(B_ERROR);
 	}
 
 	// Section header identifying constant byte sequences:
@@ -235,8 +234,7 @@ PackageInfo::Parse()
 
 			uint64 original;
 			if (fPackageFile->Read(&original, 8) != 8) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 			swap_data(B_UINT64_TYPE, &original, sizeof(uint64),
 				B_SWAP_BENDIAN_TO_HOST);
@@ -246,9 +244,8 @@ PackageInfo::Parse()
 			uint8 *compressed = new uint8[length];
 			if (fPackageFile->Read(compressed, length)
 					!= static_cast<int64>(length)) {
-				fStatus = B_ERROR;
 				delete compressed;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			uint8 *disclaimer = new uint8[original + 1];
@@ -257,9 +254,8 @@ PackageInfo::Parse()
 			disclaimer[original] = 0;
 			delete compressed;
 			if (ret != B_OK) {
-				fStatus = B_ERROR;
 				delete disclaimer;
-				return ret;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			fDisclaimer = (char *)disclaimer;
@@ -274,8 +270,7 @@ PackageInfo::Parse()
 
 			uint64 original;
 			if (fPackageFile->Read(&original, 8) != 8) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 			swap_data(B_UINT64_TYPE, &original, sizeof(uint64),
 				B_SWAP_BENDIAN_TO_HOST);
@@ -285,9 +280,8 @@ PackageInfo::Parse()
 			uint8 *compressed = new uint8[length];
 			if (fPackageFile->Read(compressed, length)
 					!= static_cast<int64>(length)) {
-				fStatus = B_ERROR;
 				delete compressed;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 			
 			fImage.SetSize(original);
@@ -296,8 +290,7 @@ PackageInfo::Parse()
 				original);
 			delete compressed;
 			if (ret != B_OK) {
-				fStatus = B_ERROR;
-				return ret;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 			fHasImage = true;
 			continue;
@@ -313,16 +306,14 @@ PackageInfo::Parse()
 					parser_debug("FDst - ");
 					directory_which dir;
 					if (fPackageFile->Read(&dir, 4) != 4) {
-						fStatus = B_ERROR;
-						return fStatus;
+						RETURN_AND_SET_STATUS(B_ERROR);
 					}
 					swap_data(B_UINT32_TYPE, &dir, sizeof(uint32),
 						B_SWAP_BENDIAN_TO_HOST);
 					BPath *path = new BPath();
 					status_t ret = find_directory(dir, path);
 					if (ret != B_OK) {
-						fStatus = B_ERROR;
-						return fStatus;
+						RETURN_AND_SET_STATUS(B_ERROR);
 					}
 
 					parser_debug("%s\n", path->Path());
@@ -331,8 +322,7 @@ PackageInfo::Parse()
 				} else if (!memcmp(buffer, "PaNa", 5)) {
 					parser_debug("PaNa\n");
 					if (fPackageFile->Read(&length, 4) != 4) {
-						fStatus = B_ERROR;
-						return fStatus;
+						RETURN_AND_SET_STATUS(B_ERROR);
 					}
 					swap_data(B_UINT32_TYPE, &length, sizeof(uint32),
 						B_SWAP_BENDIAN_TO_HOST);
@@ -343,8 +333,7 @@ PackageInfo::Parse()
 					parser_debug("Padding!\n");
 					continue;
 				} else {
-					fStatus = B_ERROR;
-					return fStatus;
+					RETURN_AND_SET_STATUS(B_ERROR);
 				}
 				break;
 			}
@@ -358,8 +347,7 @@ PackageInfo::Parse()
 					parser_debug("IGrp\n");
 				} else if (!memcmp(buffer, "GrpN", 5)) {
 					if (!groupStarted) {
-						fStatus = B_ERROR;
-						return fStatus;
+						RETURN_AND_SET_STATUS(B_ERROR);
 					}
 
 					parser_debug("GrpN\n");
@@ -374,8 +362,7 @@ PackageInfo::Parse()
 					delete name;
 				} else if (!memcmp(buffer, "GrpD", 5)) {
 					if (!groupStarted) {
-						fStatus = B_ERROR;
-						return fStatus;
+						RETURN_AND_SET_STATUS(B_ERROR);
 					}
 
 					parser_debug("GrpD\n");
@@ -390,8 +377,7 @@ PackageInfo::Parse()
 					delete desc;
 				} else if (!memcmp(buffer, "GrHt", 5)) {
 					if (!groupStarted) {
-						fStatus = B_ERROR;
-						return fStatus;
+						RETURN_AND_SET_STATUS(B_ERROR);
 					}
 
 					parser_debug("GrHt\n");
@@ -428,8 +414,7 @@ PackageInfo::Parse()
 					parser_debug("Marker, jumping!\n");
 					continue;
 				} else {
-					fStatus = B_ERROR;
-					return fStatus;
+					RETURN_AND_SET_STATUS(B_ERROR);
 				}
 				break;
 			}
@@ -484,8 +469,7 @@ PackageInfo::Parse()
 					// the first directory existing in the package
 					fPackageFile->Seek(21, SEEK_CUR);
 					if (fPackageFile->Read(&installDirectoryFlag, 1) != 1) {
-						fStatus = B_ERROR;
-						return fStatus;
+						RETURN_AND_SET_STATUS(B_ERROR);
 					}
 
 					fPackageFile->Seek(11, SEEK_CUR);
@@ -554,6 +538,46 @@ PackageInfo::Parse()
 				if (!memcmp(buffer, "DPat", 5)) {
 					parser_debug("DPat\n");
 					continue;
+				} else if (!memcmp(buffer, "DQue", 5)) {
+					parser_debug("DQue\n");
+					continue;
+				} else if (!memcmp(buffer, "DQTi", 5)) {
+					parser_debug("DQTi\n");
+					uint32 length;
+					if (fPackageFile->Read(&length, 4) != 4) {
+						RETURN_AND_SET_STATUS(B_ERROR);
+					}
+					swap_data(B_UINT32_TYPE, &length, sizeof(uint32),
+						B_SWAP_BENDIAN_TO_HOST);
+					char *ti = new char[length + 1];
+					fPackageFile->Read(ti, length);
+					ti[length] = 0;
+					parser_debug("DQTi - %s\n", ti);
+					delete ti;
+				} else if (!memcmp(buffer, "DQSz", 5)) {
+					parser_debug("DQSz\n");
+					uint64 size;
+					if (fPackageFile->Read(&size, 8) != 8) {
+						RETURN_AND_SET_STATUS(B_ERROR);
+					}
+					swap_data(B_UINT64_TYPE, &size, sizeof(uint64),
+						B_SWAP_BENDIAN_TO_HOST);
+					parser_debug("DQSz - %Ld\n", size);
+				} else if (!memcmp(buffer, "DQMi", 5)) {
+					// TODO actually check if the query finds a file with
+					// size found previously
+					parser_debug("DQMi\n");
+					uint32 length;
+					if (fPackageFile->Read(&length, 4) != 4) {
+						RETURN_AND_SET_STATUS(B_ERROR);
+					}
+					swap_data(B_UINT32_TYPE, &length, sizeof(uint32),
+						B_SWAP_BENDIAN_TO_HOST);
+					char *signature = new char[length + 1];
+					fPackageFile->Read(signature, length);
+					signature[length] = 0;
+					parser_debug("DQMi - %s\n", signature);
+					delete signature;
 				} else if (!memcmp(buffer, "PaNa", 5)) {
 					parser_debug("PaNa\n");
 					fPackageFile->Read(&length, 4);
@@ -572,8 +596,8 @@ PackageInfo::Parse()
 					parser_debug("Padding!\n");
 					continue;
 				} else {
-					fStatus = B_ERROR;
-					return fStatus;
+					parser_debug("Unknown user path section %s\n", buffer);
+					RETURN_AND_SET_STATUS(B_ERROR);
 				}
 				break;
 			}
@@ -597,8 +621,7 @@ PackageInfo::Parse()
 	while (true) {
 		bytesRead = fPackageFile->Read(buffer, 7);
 		if (bytesRead != 7) {
-			fStatus = B_ERROR;
-			return fStatus;
+			RETURN_AND_SET_STATUS(B_ERROR);
 		}
 
 		// TODO: Here's the deal... there seems to be a strange ScrI tag that
@@ -660,8 +683,7 @@ PackageInfo::Parse()
 			originalSize = 0;
 		} else if (!memcmp(buffer, "Name", 5)) {
 			if (element == P_NONE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("Name\n");
@@ -677,8 +699,7 @@ PackageInfo::Parse()
 			delete name;
 		} else if (!memcmp(buffer, "Grps", 5)) {
 			if (element == P_NONE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("Grps\n");
@@ -687,8 +708,7 @@ PackageInfo::Parse()
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "Dest", 5)) {
 			if (element == P_NONE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("Dest\n");
@@ -697,8 +717,7 @@ PackageInfo::Parse()
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "Cust", 5)) {
 			if (element == P_NONE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("Cust\n");
@@ -707,8 +726,7 @@ PackageInfo::Parse()
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "Repl", 5)) {
 			if (element == P_NONE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("Repl\n");
@@ -717,8 +735,7 @@ PackageInfo::Parse()
 			//	I always leave the decision to the user
 		} else if (!memcmp(buffer, "Plat", 5)) {
 			if (element == P_NONE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("Plat\n");
@@ -727,8 +744,7 @@ PackageInfo::Parse()
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "CTim", 5)) {
 			if (element == P_NONE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("CTim\n");
@@ -737,8 +753,7 @@ PackageInfo::Parse()
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "MTim", 5)) {
 			if (element == P_NONE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("MTim\n");
@@ -747,8 +762,7 @@ PackageInfo::Parse()
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "OffT", 5)) {
 			if (element == P_NONE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("OffT\n");
@@ -757,8 +771,7 @@ PackageInfo::Parse()
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "Mime", 5)) {
 			if (element != P_FILE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			fPackageFile->Read(&length, 4);
@@ -774,8 +787,7 @@ PackageInfo::Parse()
 			delete mime;
 		} else if (!memcmp(buffer, "CmpS", 5)) {
 			if (element == P_NONE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("CmpS\n");
@@ -784,8 +796,7 @@ PackageInfo::Parse()
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "OrgS", 5)) {
 			if (element != P_FILE && element != P_LINK) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("OrgS\n");
@@ -794,8 +805,7 @@ PackageInfo::Parse()
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "VrsI", 5)) {
 			if (element != P_FILE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("VrsI\n");
@@ -804,8 +814,7 @@ PackageInfo::Parse()
 			// Also, check what those empty 20 bytes mean
 		} else if (!memcmp(buffer, "Mode", 5)) {
 			if (element != P_FILE && element != P_LINK) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("Mode\n");
@@ -814,15 +823,13 @@ PackageInfo::Parse()
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "FDat", 5)) {
 			if (element != P_DIRECTORY) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			parser_debug("FDat\n");
 		} else if (!memcmp(buffer, "ASig", 5)) {
 			if (element != P_FILE) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			fPackageFile->Read(&length, 4);
@@ -838,8 +845,7 @@ PackageInfo::Parse()
 			delete signature;
 		} else if (!memcmp(buffer, "Link", 5)) {
 			if (element != P_LINK) {
-				fStatus = B_ERROR;
-				return fStatus;
+				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
 			fPackageFile->Read(&length, 4);
@@ -879,8 +885,7 @@ PackageInfo::Parse()
 							BString *def = static_cast<BString *>(
 								userPaths.ItemAt(path));
 							if (!def) {
-								fStatus = B_ERROR;
-								return fStatus;
+								RETURN_AND_SET_STATUS(B_ERROR);
 							}
 							if ((*def)[0] == '/')
 								localType = P_SYSTEM_PATH;
@@ -892,8 +897,7 @@ PackageInfo::Parse()
 							BPath *def = static_cast<BPath *>(
 								systemPaths.ItemAt(path));
 							if (!def) {
-								fStatus = B_ERROR;
-								return fStatus;
+								RETURN_AND_SET_STATUS(B_ERROR);
 							}
 							localType = P_SYSTEM_PATH;
 
@@ -928,8 +932,7 @@ PackageInfo::Parse()
 									BString *def = static_cast<BString *>(
 										userPaths.ItemAt(path));
 									if (!def) {
-										fStatus = B_ERROR;
-										return fStatus;
+										RETURN_AND_SET_STATUS(B_ERROR);
 									}
 									if ((*def)[0] == '/')
 										pathType = P_SYSTEM_PATH;
@@ -941,8 +944,7 @@ PackageInfo::Parse()
 									BPath *def = static_cast<BPath *>(
 										systemPaths.ItemAt(path));
 									if (!def) {
-										fStatus = B_ERROR;
-										return fStatus;
+										RETURN_AND_SET_STATUS(B_ERROR);
 									}
 									pathType = P_SYSTEM_PATH;
 
@@ -955,8 +957,7 @@ PackageInfo::Parse()
 						} else {
 							// Install directory
 							if (path != 0xffffffff) {
-								fStatus = B_ERROR;
-								return fStatus;
+								RETURN_AND_SET_STATUS(B_ERROR);
 							}
 
 							installDirectory = nameString;
@@ -991,8 +992,7 @@ PackageInfo::Parse()
 							BString *def = static_cast<BString *>(
 								userPaths.ItemAt(path));
 							if (!def) {
-								fStatus = B_ERROR;
-								return fStatus;
+								RETURN_AND_SET_STATUS(B_ERROR);
 							}
 							if ((*def)[0] == '/')
 								localType = P_SYSTEM_PATH;
@@ -1003,8 +1003,7 @@ PackageInfo::Parse()
 						} else {
 							BPath *def = static_cast<BPath *>(systemPaths.ItemAt(path));
 							if (!def) {
-								fStatus = B_ERROR;
-								return fStatus;
+								RETURN_AND_SET_STATUS(B_ERROR);
 							}
 							localType = P_SYSTEM_PATH;
 
@@ -1044,10 +1043,12 @@ PackageInfo::Parse()
 		} else if (!memcmp(buffer, "PkgA", 5)) {
 			parser_debug("PkgA\n");
 			break;
+		} else if (!memcmp(buffer, "PtcI", 5)) {
+			parser_debug("PtcI\n");
+			break;
 		} else {
-			fprintf(stderr, "Unknown file tag %s", buffer);
-			fStatus = B_ERROR;
-			return fStatus;
+			fprintf(stderr, "Unknown file tag %s\n", buffer);
+			RETURN_AND_SET_STATUS(B_ERROR);
 		}
 	}
 
@@ -1062,8 +1063,7 @@ PackageInfo::Parse()
 		selection = warning->Go();
 		
 		if (selection == 1) {
-			fStatus = B_ERROR;
-			return fStatus;
+			RETURN_AND_SET_STATUS(B_ERROR);
 		}
 	}
 
