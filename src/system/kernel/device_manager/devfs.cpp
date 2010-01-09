@@ -2043,32 +2043,15 @@ devfs_publish_file_device(const char *path, const char *filePath)
 
 
 extern "C" status_t
-devfs_unpublish_partition(const char *devicePath, const char *name)
+devfs_unpublish_partition(const char* path)
 {
-	// get the device node
-	devfs_vnode* deviceNode;
-	status_t status = get_node_for_path(sDeviceFileSystem, devicePath,
-		&deviceNode);
+	devfs_vnode *node;
+	status_t status = get_node_for_path(sDeviceFileSystem, path, &node);
 	if (status != B_OK)
 		return status;
 
-	// get the partition node and temporarily increment its ref count
-	RecursiveLocker locker(sDeviceFileSystem->lock);
-	devfs_vnode* node = devfs_find_in_dir(deviceNode->parent, name);
-	if (node != NULL)
-		status = get_vnode(sDeviceFileSystem->volume, node->id, (void**)&node);
-	else
-		status = B_ENTRY_NOT_FOUND;
-	locker.Unlock();
-
-	// unpublish the partition node
-	if (status == B_OK) {
-		status = unpublish_node(sDeviceFileSystem, node, S_IFCHR);
-		put_vnode(sDeviceFileSystem->volume, node->id);
-	}
-
-	put_vnode(sDeviceFileSystem->volume, deviceNode->id);
-
+	status = unpublish_node(sDeviceFileSystem, node, S_IFCHR);
+	put_vnode(sDeviceFileSystem->volume, node->id);
 	return status;
 }
 

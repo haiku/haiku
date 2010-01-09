@@ -232,8 +232,15 @@ KPartition::UnpublishDevice()
 	if (!fPublishedName)
 		return B_OK;
 
-	status_t error = devfs_unpublish_partition(Device()->Path(),
-		fPublishedName);
+	// get the path
+	KPath path;
+	status_t error = GetPath(&path);
+	if (error != B_OK) {
+		dprintf("KPartition::UnpublishDevice(): Failed to get path for "
+			"partition %ld: %s\n", ID(), strerror(error));
+	}
+
+	error = devfs_unpublish_partition(path.Path());
 	if (error != B_OK) {
 		dprintf("KPartition::UnpublishDevice(): Failed to unpublish partition "
 			"%ld: %s\n", ID(), strerror(error));

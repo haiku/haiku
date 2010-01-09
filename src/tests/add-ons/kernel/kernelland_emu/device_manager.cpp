@@ -13,9 +13,9 @@
 
 
 extern "C" status_t
-devfs_unpublish_partition(const char *devicePath, const char *name)
+devfs_unpublish_partition(const char *path)
 {
-	printf("unpublish partition: %s/%s\n", devicePath, name);
+	printf("unpublish partition: %s\n", path);
 	return B_OK;
 }
 
