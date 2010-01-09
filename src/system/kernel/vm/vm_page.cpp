@@ -339,50 +339,69 @@ page_state_to_string(int state)
 static int
 dump_page(int argc, char **argv)
 {
-	struct vm_page *page;
-	addr_t address;
+	bool addressIsPointer = true;
 	bool physical = false;
+	bool searchMappings = false;
 	int32 index = 1;
 
-	if (argc > 2) {
-		if (!strcmp(argv[1], "-p")) {
+	while (index < argc) {
+		if (argv[index][0] != '-')
+			break;
+
+		if (!strcmp(argv[index], "-p")) {
+			addressIsPointer = false;
 			physical = true;
-			index++;
-		} else if (!strcmp(argv[1], "-v"))
-			index++;
+		} else if (!strcmp(argv[index], "-v")) {
+			addressIsPointer = false;
+		} else if (!strcmp(argv[index], "-m")) {
+			searchMappings = true;
+		} else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+
+		index++;
 	}
 
-	if (argc < 2
-		|| strlen(argv[index]) <= 2
-		|| argv[index][0] != '0'
-		|| argv[index][1] != 'x') {
-		kprintf("usage: page [-p|-v] <address>\n"
-			"  -v looks up a virtual address for the page, -p a physical address.\n"
-			"  Default is to look for the page structure address directly.\n");
+	if (index + 1 != argc) {
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
-	address = strtoul(argv[index], NULL, 0);
+	uint64 value;
+	if (!evaluate_debug_expression(argv[index], &value, false))
+		return 0;
 
-	if (index == 2) {
+	addr_t pageAddress = (addr_t)value;
+	struct vm_page* page;
+
+	if (addressIsPointer) {
+		page = (struct vm_page *)pageAddress;
+	} else {
 		if (!physical) {
 			VMAddressSpace *addressSpace = VMAddressSpace::Kernel();
-			uint32 flags;
 
-			if (thread_get_current_thread()->team->address_space != NULL)
-				addressSpace = thread_get_current_thread()->team->address_space;
+			if (debug_get_debugged_thread()->team->address_space != NULL)
+				addressSpace = debug_get_debugged_thread()->team->address_space;
 
-			addressSpace->TranslationMap().ops->query_interrupt(
-				&addressSpace->TranslationMap(), address, &address, &flags);
+			uint32 flags = 0;
+			if (addressSpace->TranslationMap().ops->query_interrupt(
+					&addressSpace->TranslationMap(), pageAddress, &pageAddress,
+					&flags) != B_OK
+				|| (flags & PAGE_PRESENT) == 0) {
+				kprintf("Virtual address not mapped to a physical page in this "
+					"address space.\n");
+				return 0;
+			}
 		}
-		page = vm_lookup_page(address / B_PAGE_SIZE);
-	} else
-		page = (struct vm_page *)address;
+
+		page = vm_lookup_page(pageAddress / B_PAGE_SIZE);
+	}
 
 	kprintf("PAGE: %p\n", page);
 	kprintf("queue_next,prev: %p, %p\n", page->queue_link.next,
 		page->queue_link.previous);
-	kprintf("physical_number: %lx\n", page->physical_page_number);
+	kprintf("physical_number: %#lx\n", page->physical_page_number);
 	kprintf("cache:           %p\n", page->cache);
 	kprintf("cache_offset:    %ld\n", page->cache_offset);
 	kprintf("cache_next:      %p\n", page->cache_next);
@@ -402,8 +421,37 @@ dump_page(int argc, char **argv)
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
 	vm_page_mapping *mapping;
 	while ((mapping = iterator.Next()) != NULL) {
-		kprintf("  %p (%#lx)\n", mapping->area, mapping->area->id);
+		kprintf("  %p (%" B_PRId32 ")\n", mapping->area, mapping->area->id);
 		mapping = mapping->page_link.next;
+	}
+
+	if (searchMappings) {
+		kprintf("all mappings:\n");
+		VMAddressSpace* addressSpace = VMAddressSpace::DebugFirst();
+		while (addressSpace != NULL) {
+			size_t pageCount = addressSpace->Size() / B_PAGE_SIZE;
+			for (addr_t address = addressSpace->Base(); pageCount != 0;
+					address += B_PAGE_SIZE, pageCount--) {
+				addr_t physicalAddress;
+				uint32 flags = 0;
+				if (addressSpace->TranslationMap().ops->query_interrupt(
+						&addressSpace->TranslationMap(), address,
+						&physicalAddress, &flags) == B_OK
+					&& (flags & PAGE_PRESENT) != 0
+					&& physicalAddress / B_PAGE_SIZE
+						== page->physical_page_number) {
+					VMArea* area = addressSpace->LookupArea(address);
+					kprintf("  aspace %ld, area %ld: %#" B_PRIxADDR
+						" (%c%c%s%s)\n", addressSpace->ID(),
+						area != NULL ? area->id : -1, address,
+						(flags & B_KERNEL_READ_AREA) != 0 ? 'r' : '-',
+						(flags & B_KERNEL_WRITE_AREA) != 0 ? 'w' : '-',
+						(flags & PAGE_MODIFIED) != 0 ? " modified" : "",
+						(flags & PAGE_ACCESSED) != 0 ? " accessed" : "");
+				}
+			}
+			addressSpace = VMAddressSpace::DebugNext(addressSpace);
+		}
 	}
 
 	return 0;
@@ -1870,8 +1918,20 @@ vm_page_init_post_area(kernel_args *args)
 		PAGE_ALIGN(sNumPages * sizeof(vm_page)), B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	add_debugger_command("page_stats", &dump_page_stats, "Dump statistics about page usage");
-	add_debugger_command("page", &dump_page, "Dump page info");
+	add_debugger_command("page_stats", &dump_page_stats,
+		"Dump statistics about page usage");
+	add_debugger_command_etc("page", &dump_page,
+		"Dump page info",
+		"[ \"-p\" | \"-v\" ] [ \"-m\" ] <address>\n"
+		"Prints information for the physical page. If neither \"-p\" nor\n"
+		"\"-v\" are given, the provided address is interpreted as address of\n"
+		"the vm_page data structure for the page in question. If \"-p\" is\n"
+		"given, the address is the physical address of the page. If \"-v\" is\n"
+		"given, the address is interpreted as virtual address in the current\n"
+		"thread's address space and for the page it is mapped to (if any)\n"
+		"information are printed. If \"-m\" is specified, the command will\n"
+		"search all known address spaces for mappings to that page and print\n"
+		"them.\n", 0);
 	add_debugger_command("page_queue", &dump_page_queue, "Dump page queue");
 	add_debugger_command("find_page", &find_page,
 		"Find out which queue a page is actually in");
