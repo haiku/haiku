@@ -6,7 +6,6 @@ UsePrivateHeaders interface ;
 
 Preference Sounds : 
 	HApp.cpp 
-#	HEventItem.cpp 
 	HWindow.cpp 
 	HEventList.cpp 
 	: be libcolumnlistview.a game tracker libmedia.so $(TARGET_LIBSUPC++)

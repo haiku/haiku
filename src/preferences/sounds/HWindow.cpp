@@ -99,7 +99,7 @@ HWindow::InitGUI()
 	menu->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(M_OTHER_MESSAGE)));
 	BMenuField *menuField = new BMenuField(rect, "filemenu", "Sound file:", menu,
 		B_FOLLOW_TOP | B_FOLLOW_LEFT);
-	menuField->SetDivider(menuField->StringWidth("Sound fwile:") + 10);
+	menuField->SetDivider(menuField->StringWidth("Sound file:") + 10);
 	box->AddChild(menuField);
 	rect.OffsetBy(-2, menuField->Bounds().Height() + 15);
 	BButton *button = new BButton(rect, "stop", "Stop", new BMessage(M_STOP_MESSAGE),
