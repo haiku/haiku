@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-BluetoothPrefs	1684413441
+1	german	x-vnd.Haiku-BluetoothPrefs	348749678
 About Bluetooth…	Window		Über Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Suchdauer:
@@ -41,9 +41,8 @@ Laptop	Settings view		Laptop
 Retrieving name of 	Inquiry panel		Empfangen des Namens von 
 Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Sichtbar
-Service Classes: 	Device View		Service Classes: 
 Service classes: 	Device View		Gerätedienste: 
-Connections & channels list…	Window		Verbindungs- und Kanal-Liste...
+Connections & channels…	Window		Verbindungs- und Kanal-Liste...
 Refresh LocalDevices…	Window		Bluetooth-Geräte erkennen…
 Settings	Window		Einstellungen
 Only from trusted devices	Settings view		Nur vertraute Geräte

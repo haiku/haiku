@@ -1,4 +1,4 @@
-1	Bulgarian	x-vnd.Haiku-BluetoothPrefs	1684413441
+1	Bulgarian	x-vnd.Haiku-BluetoothPrefs	348749678
 About Bluetooth…	Window		 За програмата
 Handheld	Settings view		Преносим
 Default inquiry time:	Settings view		По подразбиране:
@@ -41,9 +41,8 @@ Laptop	Settings view		Лаптоп
 Retrieving name of 	Inquiry panel		Извличане на името на 
 Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Обявено
-Service Classes: 	Device View		Service Classes: 
 Service classes: 	Device View		Клас на услуги: 
-Connections & channels list…	Window		Список на връзки и канали
+Connections & channels…	Window		Список на връзки и канали
 Refresh LocalDevices…	Window		Обновление на локали устройства
 Settings	Window		Параметри
 Only from trusted devices	Settings view		Само от ауторизирани устройства

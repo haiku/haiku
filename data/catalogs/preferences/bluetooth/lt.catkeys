@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-BluetoothPrefs	1684413441
+1	lithuanian	x-vnd.Haiku-BluetoothPrefs	348749678
 About Bluetooth…	Window		Apie…
 Handheld	Settings view		Nešiojamas
 Default inquiry time:	Settings view		Numatytas užklausos laikas:
@@ -41,9 +41,8 @@ Laptop	Settings view		Skreitinis
 Retrieving name of 	Inquiry panel		Gauti pavadinimą 
 Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Aptinkamas
-Service Classes: 	Device View		Tarnybos: 
 Service classes: 	Device View		Tarnybos: 
-Connections & channels list…	Window		Prisijungimų ir kanalų sąrašas…
+Connections & channels…	Window		Prisijungimų ir kanalų sąrašas…
 Refresh LocalDevices…	Window		Vietinių įrenginių atnaujinimas…
 Settings	Window		Nustatymai
 Only from trusted devices	Settings view		Tik iš patikimų įrenginių

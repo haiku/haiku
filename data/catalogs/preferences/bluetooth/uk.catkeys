@@ -1,4 +1,4 @@
-1	Ukrainian	x-vnd.Haiku-BluetoothPrefs	1684413441
+1	Ukrainian	x-vnd.Haiku-BluetoothPrefs	348749678
 About Bluetooth…	Window		Про Bluetooth…
 Handheld	Settings view		Переносний
 Default inquiry time:	Settings view		Час довідки по замовчуванню:
@@ -41,9 +41,8 @@ Laptop	Settings view		Ноутбук
 Retrieving name of 	Inquiry panel		Змінити імя на 
 Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Відкриті	
-Service Classes: 	Device View		Service Classes: 
 Service classes: 	Device View		Класи сервісу: 
-Connections & channels list…	Window		Список під"єднань і каналів…
+Connections & channels…	Window		Список під"єднань і каналів…
 Refresh LocalDevices…	Window		Обновити локальні прилади…
 Settings	Window		Настройки
 Only from trusted devices	Settings view		Тільки для перевірених  приладів

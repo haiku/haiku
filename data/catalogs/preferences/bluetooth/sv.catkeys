@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-BluetoothPrefs	1684413441
+1	swedish	x-vnd.Haiku-BluetoothPrefs	348749678
 About Bluetooth…	Window		Om Bluetooth…
 Handheld	Settings view		Handhållen
 Default inquiry time:	Settings view		Förvald frågotid:
@@ -41,9 +41,8 @@ Laptop	Settings view		Bärbar dator
 Retrieving name of 	Inquiry panel		Hämtar namn från 
 Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Synlig
-Service Classes: 	Device View		Service Classes: 
 Service classes: 	Device View		Tjänsteklasser: 
-Connections & channels list…	Window		Lista över förbindelser och kanaler…
+Connections & channels…	Window		Lista över förbindelser och kanaler…
 Refresh LocalDevices…	Window		Uppdatera LocalDevices…
 Settings	Window		Inställningar
 Only from trusted devices	Settings view		Endast från betrodda källor

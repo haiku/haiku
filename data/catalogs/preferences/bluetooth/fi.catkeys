@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-BluetoothPrefs	1684413441
+1	finnish	x-vnd.Haiku-BluetoothPrefs	348749678
 About Bluetooth…	Window		Tietoja Bluetooth…
 Handheld	Settings view		Kädessäpidettävät
 Default inquiry time:	Settings view		Oletuskyselyn pituus:
@@ -41,9 +41,8 @@ Laptop	Settings view		Kannettava
 Retrieving name of 	Inquiry panel		Noudetaan nimeä 
 Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Löydettävänä
-Service Classes: 	Device View		Service Classes: 
 Service classes: 	Device View		Palveluluokat: 
-Connections & channels list…	Window		Yhteys- ja kanavalista…
+Connections & channels…	Window		Yhteys- ja kanavalista…
 Refresh LocalDevices…	Window		Päivitä LocalDevices…
 Settings	Window		Paramètres
 Only from trusted devices	Settings view		Vain luotetuista laitteista

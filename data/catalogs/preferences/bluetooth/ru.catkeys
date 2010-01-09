@@ -1,4 +1,4 @@
-1	Russian	x-vnd.Haiku-BluetoothPrefs	1684413441
+1	Russian	x-vnd.Haiku-BluetoothPrefs	348749678
 About Bluetooth…	Window		 О программе...
 Handheld	Settings view		Переносной
 Default inquiry time:	Settings view		По умолчанию:
@@ -41,9 +41,8 @@ Laptop	Settings view		Ноутбук
 Retrieving name of 	Inquiry panel		Восстановление названия 
 Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Поддающийся обнаружению
-Service Classes: 	Device View		Service Classes: 
 Service classes: 	Device View		Классы сервиса: 
-Connections & channels list…	Window		Список подключений и каналов
+Connections & channels…	Window		Список подключений и каналов
 Refresh LocalDevices…	Window		Обновление локальных устройств
 Settings	Window		Paramtres
 Only from trusted devices	Settings view		Только от доверенных устройств
