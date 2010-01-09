@@ -103,7 +103,78 @@ public:
 };
 
 
-static mutex sMappingLock = MUTEX_INITIALIZER("page mappings");
+class VMCacheChainLocker {
+public:
+	VMCacheChainLocker()
+		:
+		fTopCache(NULL),
+		fBottomCache(NULL)
+	{
+	}
+
+	VMCacheChainLocker(VMCache* topCache)
+		:
+		fTopCache(topCache),
+		fBottomCache(topCache)
+	{
+	}
+
+	~VMCacheChainLocker()
+	{
+		Unlock();
+	}
+
+	void SetTo(VMCache* topCache)
+	{
+		fTopCache = topCache;
+		fBottomCache = topCache;
+	}
+
+	VMCache* LockSourceCache()
+	{
+		if (fBottomCache == NULL || fBottomCache->source == NULL)
+			return NULL;
+
+		fBottomCache = fBottomCache->source;
+		fBottomCache->Lock();
+		fBottomCache->AcquireRefLocked();
+
+		return fBottomCache;
+	}
+
+	void LockAllSourceCaches()
+	{
+		while (LockSourceCache() != NULL) {
+		}
+	}
+
+	void Unlock(VMCache* exceptCache = NULL)
+	{
+		if (fTopCache == NULL)
+			return;
+
+		VMCache* cache = fTopCache;
+		while (cache != NULL) {
+			VMCache* nextCache = cache->source;
+			if (cache != exceptCache)
+				cache->ReleaseRefAndUnlock();
+
+			if (cache == fBottomCache)
+				break;
+
+			cache = nextCache;
+		}
+
+		fTopCache = NULL;
+		fBottomCache = NULL;
+	}
+
+private:
+	VMCache*	fTopCache;
+	VMCache*	fBottomCache;
+};
+
+
 static rw_lock sAreaCacheLock = RW_LOCK_INITIALIZER("area->cache");
 
 static off_t sAvailableMemory;
@@ -330,8 +401,9 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		return B_OK;
 	}
 
-	AreaCacheLocker cacheLocker(area);
-	VMCache* cache = area->cache;
+	VMCache* cache = vm_area_get_locked_cache(area);
+	VMCacheChainLocker cacheChainLocker(cache);
+	cacheChainLocker.LockAllSourceCaches();
 
 	// Cut the end only?
 	if (areaLast <= lastAddress) {
@@ -351,11 +423,11 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		// If no one else uses the area's cache, we can resize it, too.
 		if (cache->areas == area && area->cache_next == NULL
 			&& list_is_empty(&cache->consumers)) {
-			error = cache->Resize(cache->virtual_base + newSize);
-			if (error != B_OK) {
-				addressSpace->ShrinkAreaTail(area, oldSize);
-				return error;
-			}
+			// Since VMCache::Resize() can temporarily drop the lock, we must
+			// unlock all lower caches to prevent locking order inversion.
+			cacheChainLocker.Unlock(cache);
+			cache->Resize(cache->virtual_base + newSize);
+			cache->ReleaseRefAndUnlock();
 		}
 
 		return B_OK;
@@ -427,29 +499,23 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 }
 
 
+/*!	The page's cache must be locked.
+*/
 static inline void
 increment_page_wired_count(vm_page* page)
 {
-	// TODO: needs to be atomic on all platforms!
-	// ... but at least the check isn't. Consequently we should hold
-	// sMappingLock, which would allows us to even avoid atomic_add() on
-	// gMappedPagesCount.
-	if (page->wired_count++ == 0) {
-		if (page->mappings.IsEmpty())
-			atomic_add(&gMappedPagesCount, 1);
-	}
+	if (page->wired_count++ == 0 && page->mappings.IsEmpty())
+		atomic_add(&gMappedPagesCount, 1);
 }
 
 
+/*!	The page's cache must be locked.
+*/
 static inline void
 decrement_page_wired_count(vm_page* page)
 {
-	if (--page->wired_count == 0) {
-		// TODO: needs to be atomic on all platforms!
-		// See above!
-		if (page->mappings.IsEmpty())
-			atomic_add(&gMappedPagesCount, -1);
-	}
+	if (--page->wired_count == 0 && page->mappings.IsEmpty())
+		atomic_add(&gMappedPagesCount, -1);
 }
 
 
@@ -1595,11 +1661,19 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area)
 	// At this point the area is removed from the global hash table, but
 	// still exists in the area list.
 
-	// Unmap the virtual address space the area occupied
-	vm_unmap_pages(area, area->Base(), area->Size(), !area->cache->temporary);
-		// TODO: Even if the cache is temporary we might need to preserve the
-		// modified flag, since the area could be a clone and backed by swap.
-		// We would lose information in this case.
+	// Unmap the virtual address space the area occupied.
+	{
+		// We need to lock the complete cache chain.
+		VMCache* topCache = vm_area_get_locked_cache(area);
+		VMCacheChainLocker cacheChainLocker(topCache);
+		cacheChainLocker.LockAllSourceCaches();
+
+		vm_unmap_pages(area, area->Base(), area->Size(),
+			!area->cache->temporary);
+			// TODO: Even if the cache is temporary we might need to preserve
+			// the modified flag, since the area could be a clone and backed by
+			// swap. We would lose information in this case.
+	}
 
 	if (!area->cache->temporary)
 		area->cache->WriteModified();
@@ -1895,11 +1969,11 @@ virtual_page_address(VMArea* area, vm_page* page)
 }
 
 
+/*!	The page's cache must be locked.
+*/
 bool
 vm_test_map_modification(vm_page* page)
 {
-	MutexLocker locker(sMappingLock);
-
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
 	vm_page_mapping* mapping;
 	while ((mapping = iterator.Next()) != NULL) {
@@ -1921,13 +1995,13 @@ vm_test_map_modification(vm_page* page)
 }
 
 
+/*!	The page's cache must be locked.
+*/
 int32
 vm_test_map_activation(vm_page* page, bool* _modified)
 {
 	int32 activation = 0;
 	bool modified = false;
-
-	MutexLocker locker(sMappingLock);
 
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
 	vm_page_mapping* mapping;
@@ -1955,11 +2029,11 @@ vm_test_map_activation(vm_page* page, bool* _modified)
 }
 
 
+/*!	The page's cache must be locked.
+*/
 void
 vm_clear_map_flags(vm_page* page, uint32 flags)
 {
-	MutexLocker locker(sMappingLock);
-
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
 	vm_page_mapping* mapping;
 	while ((mapping = iterator.Next()) != NULL) {
@@ -1976,12 +2050,12 @@ vm_clear_map_flags(vm_page* page, uint32 flags)
 /*!	Removes all mappings from a page.
 	After you've called this function, the page is unmapped from memory.
 	The accumulated page flags of all mappings can be found in \a _flags.
+	The page's cache must be locked.
 */
 void
 vm_remove_all_page_mappings(vm_page* page, uint32* _flags)
 {
 	uint32 accumulatedFlags = 0;
-	MutexLocker locker(sMappingLock);
 
 	vm_page_mappings queue;
 	queue.MoveFrom(&page->mappings);
@@ -1999,9 +2073,10 @@ vm_remove_all_page_mappings(vm_page* page, uint32* _flags)
 		map->ops->unmap(map, address, address + (B_PAGE_SIZE - 1));
 		map->ops->flush(map);
 		map->ops->query(map, address, &physicalAddress, &flags);
-		map->ops->unlock(map);
 
 		area->mappings.Remove(mapping);
+
+		map->ops->unlock(map);
 
 		accumulatedFlags |= flags;
 	}
@@ -2009,13 +2084,10 @@ vm_remove_all_page_mappings(vm_page* page, uint32* _flags)
 	if (page->wired_count == 0 && !queue.IsEmpty())
 		atomic_add(&gMappedPagesCount, -1);
 
-	locker.Unlock();
-
 	// free now unused mappings
 
-	while ((mapping = queue.RemoveHead()) != NULL) {
+	while ((mapping = queue.RemoveHead()) != NULL)
 		free(mapping);
-	}
 
 	if (_flags != NULL)
 		*_flags = accumulatedFlags;
@@ -2059,39 +2131,30 @@ vm_unmap_page(VMArea* area, addr_t virtualAddress, bool preserveModified)
 			vm_page_set_state(page, PAGE_STATE_MODIFIED);
 	}
 
-	map->ops->unlock(map);
-
+	vm_page_mapping* mapping = NULL;
 	if (area->wiring == B_NO_LOCK) {
-		vm_page_mapping* mapping;
-
-		mutex_lock(&sMappingLock);
-		map->ops->lock(map);
-
 		vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
-		while (iterator.HasNext()) {
-			mapping = iterator.Next();
-
+		while ((mapping = iterator.Next()) != NULL) {
 			if (mapping->area == area) {
 				area->mappings.Remove(mapping);
 				page->mappings.Remove(mapping);
 
 				if (page->mappings.IsEmpty() && page->wired_count == 0)
 					atomic_add(&gMappedPagesCount, -1);
-
-				map->ops->unlock(map);
-				mutex_unlock(&sMappingLock);
-
-				free(mapping);
-
-				return true;
+				break;
 			}
 		}
+	}
 
-		map->ops->unlock(map);
-		mutex_unlock(&sMappingLock);
+	map->ops->unlock(map);
 
-		dprintf("vm_unmap_page: couldn't find mapping for area %p in page %p\n",
-			area, page);
+	if (area->wiring == B_NO_LOCK) {
+		if (mapping != NULL) {
+			free(mapping);
+		} else {
+			dprintf("vm_unmap_page: couldn't find mapping for area %p in page "
+				"%p\n", area, page);
+		}
 	}
 
 	return true;
@@ -2165,22 +2228,15 @@ vm_unmap_pages(VMArea* area, addr_t base, size_t size, bool preserveModified)
 			DEBUG_PAGE_ACCESS_END(page);
 		}
 	}
-	map->ops->unlock(map);
 
+	VMAreaMappings queue;
 	if (area->wiring == B_NO_LOCK) {
 		uint32 startOffset = (area->cache_offset + base - area->Base())
 			>> PAGE_SHIFT;
 		uint32 endOffset = startOffset + (size >> PAGE_SHIFT);
-		vm_page_mapping* mapping;
-		VMAreaMappings queue;
-
-		mutex_lock(&sMappingLock);
-		map->ops->lock(map);
 
 		VMAreaMappings::Iterator iterator = area->mappings.GetIterator();
-		while (iterator.HasNext()) {
-			mapping = iterator.Next();
-
+		while (vm_page_mapping* mapping = iterator.Next()) {
 			vm_page* page = mapping->page;
 			if (page->cache_offset < startOffset
 				|| page->cache_offset >= endOffset)
@@ -2194,20 +2250,23 @@ vm_unmap_pages(VMArea* area, addr_t base, size_t size, bool preserveModified)
 
 			queue.Add(mapping);
 		}
+	}
 
-		map->ops->unlock(map);
-		mutex_unlock(&sMappingLock);
+	map->ops->unlock(map);
 
-		while ((mapping = queue.RemoveHead()) != NULL) {
+	if (area->wiring == B_NO_LOCK) {
+		while (vm_page_mapping* mapping = queue.RemoveHead())
 			free(mapping);
-		}
 	}
 
 	return B_OK;
 }
 
 
-/*!	When calling this function, you need to have pages reserved! */
+/*!	The caller must have reserved enough pages the translation map
+	implementation might need to map this page.
+	The page's cache must be locked.
+*/
 status_t
 vm_map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection)
 {
@@ -2226,22 +2285,23 @@ vm_map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection)
 	}
 
 	map->ops->lock(map);
+
 	map->ops->map(map, address, page->physical_page_number * B_PAGE_SIZE,
 		protection);
-	map->ops->unlock(map);
 
-	if (area->wiring != B_NO_LOCK) {
-		increment_page_wired_count(page);
-	} else {
+	if (area->wiring == B_NO_LOCK) {
 		// insert mapping into lists
-		MutexLocker locker(sMappingLock);
-
 		if (page->mappings.IsEmpty() && page->wired_count == 0)
 			atomic_add(&gMappedPagesCount, 1);
 
 		page->mappings.Add(mapping);
 		area->mappings.Add(mapping);
 	}
+
+	map->ops->unlock(map);
+
+	if (area->wiring != B_NO_LOCK)
+		increment_page_wired_count(page);
 
 	if (page->usage_count < 0)
 		page->usage_count = 1;
@@ -3573,60 +3633,6 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 }
 
 
-class VMCacheChainLocker {
-public:
-	VMCacheChainLocker()
-		:
-		fTopCache(NULL),
-		fBottomCache(NULL)
-	{
-	}
-
-	void SetTo(VMCache* topCache)
-	{
-		fTopCache = topCache;
-		fBottomCache = topCache;
-	}
-
-	VMCache* LockSourceCache()
-	{
-		if (fBottomCache == NULL || fBottomCache->source == NULL)
-			return NULL;
-
-		fBottomCache = fBottomCache->source;
-		fBottomCache->Lock();
-		fBottomCache->AcquireRefLocked();
-
-		return fBottomCache;
-	}
-
-	void Unlock(VMCache* exceptCache = NULL)
-	{
-		if (fTopCache == NULL)
-			return;
-
-		VMCache* cache = fTopCache;
-		while (cache != NULL) {
-			VMCache* nextCache = cache->source;
-			if (cache != exceptCache)
-				cache->ReleaseRefAndUnlock();
-
-			if (cache == fBottomCache)
-				break;
-
-			cache = nextCache;
-		}
-
-		fTopCache = NULL;
-		fBottomCache = NULL;
-	}
-
-private:
-	VMCache*	fTopCache;
-	VMCache*	fBottomCache;
-};
-
-
 struct PageFaultContext {
 	AddressSpaceReadLocker	addressSpaceLocker;
 	VMCacheChainLocker		cacheChainLocker;
@@ -4256,8 +4262,13 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 		// We also need to unmap all pages beyond the new size, if the area has
 		// shrunk
 		if (newSize < oldSize) {
-			vm_unmap_pages(current, current->Base() + newSize, oldSize - newSize,
-				false);
+			VMCacheChainLocker cacheChainLocker(cache);
+			cacheChainLocker.LockAllSourceCaches();
+
+			vm_unmap_pages(current, current->Base() + newSize,
+				oldSize - newSize, false);
+
+			cacheChainLocker.Unlock(cache);
 		}
 	}
 
@@ -4474,7 +4485,8 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 			panic("couldn't lookup physical page");
 
 		increment_page_wired_count(page);
-			// TODO: needs to be atomic on all platforms!
+			// TODO: We need the cache to be locked at this point! See TODO
+			// above for a possible solution.
 	}
 
 out:
@@ -4539,6 +4551,7 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 			panic("couldn't lookup physical page");
 
 		decrement_page_wired_count(page);
+			// TODO: We need the cache to be locked at this point!
 	}
 
 out:
@@ -5266,6 +5279,12 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 				areaProtection | (areaProtection << 4), bytes);
 		}
 
+		// We need to lock the complete cache chain, since we potentially unmap
+		// pages of lower caches.
+		VMCache* topCache = vm_area_get_locked_cache(area);
+		VMCacheChainLocker cacheChainLocker(topCache);
+		cacheChainLocker.LockAllSourceCaches();
+
 		for (addr_t pageAddress = area->Base() + offset;
 				pageAddress < currentAddress; pageAddress += B_PAGE_SIZE) {
 			map->ops->lock(map);
@@ -5287,13 +5306,13 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 				panic("area %p looking up page failed for pa 0x%lx\n", area,
 					physicalAddress);
 				map->ops->unlock(map);
-				return B_ERROR;;
+				return B_ERROR;
 			}
 
 			// If the page is not in the topmost cache and write access is
 			// requested, we have to unmap it. Otherwise we can re-map it with
 			// the new protection.
-			bool unmapPage = page->cache != area->cache
+			bool unmapPage = page->cache != topCache
 				&& (protection & B_WRITE_AREA) != 0;
 
 			if (!unmapPage) {
@@ -5307,8 +5326,6 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 
 			if (unmapPage)
 				vm_unmap_page(area, pageAddress, true);
-					// TODO: We need to lock the page's cache for that, since
-					// it potentially changes the page's state.
 		}
 	}
 
