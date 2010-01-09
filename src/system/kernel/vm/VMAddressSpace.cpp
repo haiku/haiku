@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -273,6 +273,26 @@ VMAddressSpace::Get(team_id teamID)
 	rw_lock_read_unlock(&sAddressSpaceTableLock);
 
 	return addressSpace;
+}
+
+
+/*static*/ VMAddressSpace*
+VMAddressSpace::DebugFirst()
+{
+	return sAddressSpaceTable.GetIterator().Next();
+}
+
+
+/*static*/ VMAddressSpace*
+VMAddressSpace::DebugNext(VMAddressSpace* addressSpace)
+{
+	if (addressSpace == NULL)
+		return NULL;
+
+	AddressSpaceTable::Iterator it
+		= sAddressSpaceTable.GetIterator(addressSpace->ID());
+	it.Next();
+	return it.Next();
 }
 
 

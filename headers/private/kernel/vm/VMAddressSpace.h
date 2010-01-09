@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -32,6 +32,7 @@ public:
 			team_id				ID() const				{ return fID; }
 			addr_t				Base() const			{ return fBase; }
 			addr_t				EndAddress() const		{ return fEndAddress; }
+			size_t				Size() const { return fEndAddress - fBase + 1; }
 			size_t				FreeSpace() const		{ return fFreeSpace; }
 			bool				IsBeingDeleted() const	{ return fDeleting; }
 
@@ -105,6 +106,9 @@ public:
 	static	VMAddressSpace*		GetCurrent();
 
 	static	VMAddressSpace*		Get(team_id teamID);
+
+	static	VMAddressSpace*		DebugFirst();
+	static	VMAddressSpace*		DebugNext(VMAddressSpace* addressSpace);
 
 protected:
 	static	void				_DeleteIfUnreferenced(team_id id);
