@@ -3120,3 +3120,4 @@ TMailWindow::_UpdateReadButton()
 	}
 	UpdateViews();
 }
+

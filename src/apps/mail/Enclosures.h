@@ -127,3 +127,4 @@ class TListItem : public BListItem
 };
 
 #endif // #ifndef _ENCLOSURES_H
+

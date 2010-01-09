@@ -39,22 +39,23 @@ All rights reserved.
 
 
 class TMenu: public BPopUpMenu {
-	public:
-								TMenu(const char* name, const char* attribute, 
-									int32 message, bool popup = false,
-									bool addRandom = true);
-		virtual					~TMenu();
+public:
+							TMenu(const char* name, const char* attribute, 
+								int32 message, bool popup = false,
+								bool addRandom = true);
+	virtual					~TMenu();
 
-		virtual	BPoint			ScreenLocation(void);
-		virtual	void			AttachedToWindow();
+	virtual	BPoint			ScreenLocation(void);
+	virtual	void			AttachedToWindow();
 
-				void			BuildMenu();
+			void			BuildMenu();
 
-	private:
-				char*			fAttribute;
-				bool			fPopup;
-				bool			fAddRandom;
-				int32			fMessage;
+private:
+			char*			fAttribute;
+			bool			fPopup;
+			bool			fAddRandom;
+			int32			fMessage;
 };
 
 #endif // _MAIL_POPUPMENU_H
+

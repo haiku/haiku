@@ -47,8 +47,6 @@ All rights reserved.
 class FindPanel;
 class AutoTextControl;
 
-// ============================================================================
-//	Floating find window, just one of them.....
 
 class FindWindow : public BWindow {
 friend class FindPanel;
@@ -89,6 +87,5 @@ protected:
 };
 
 
-// ============================================================================
-
 #endif // #ifndef _FINDWINDOW_H
+

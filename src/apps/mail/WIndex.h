@@ -104,3 +104,4 @@ protected:
 };
 
 #endif // #ifndef _WORD_INDEX_H
+

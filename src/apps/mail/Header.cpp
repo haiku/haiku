@@ -76,6 +76,7 @@ All rights reserved.
 using namespace BPrivate;
 using std::map;
 
+
 const char* kDateLabel = "Date:";
 const uint32 kMsgFrom = 'hFrm';
 const uint32 kMsgEncoding = 'encd';
@@ -83,6 +84,7 @@ const uint32 kMsgAddressChosen = 'acsn';
 
 static const float kTextControlDividerOffset = 0;
 static const float kMenuFieldDividerOffset = 6;
+
 
 class QPopupMenu : public QueryMenu {
 	public:
@@ -99,6 +101,7 @@ class QPopupMenu : public QueryMenu {
 
 		int32 fGroups; // Current number of "group" submenus.  Includes All People if present.
 };
+
 
 struct CompareBStrings {
 	bool

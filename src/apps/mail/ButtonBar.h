@@ -80,3 +80,4 @@ protected:
 };
 
 #endif // #ifndef _BUTTON_BAR_H
+

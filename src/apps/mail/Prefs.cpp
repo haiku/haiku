@@ -919,4 +919,4 @@ TPrefsWindow::_BuildButtonBarMenu(uint8 show)
 
 	return menu;
 }
-					
+

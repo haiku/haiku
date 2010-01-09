@@ -48,3 +48,4 @@ enum {
 };
 
 #endif // #ifndef _FIELD_MSG_H
+

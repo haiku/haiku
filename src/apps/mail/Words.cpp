@@ -862,3 +862,4 @@ void sort_word_list( BList *matches, const char *reference )
 		matches->SortItems( (int (*)(const void *, const void *))word_cmp );
 	}
 }
+

@@ -204,3 +204,4 @@ class TMailWindow : public BWindow {
 };
 
 #endif // _MAIL_WINDOW_H
+

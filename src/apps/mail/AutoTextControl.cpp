@@ -245,3 +245,4 @@ AutoTextControl::SetFilter(AutoTextControlFilter *filter)
 	if (Window())
 		Window()->AddCommonFilter(fFilter);
 }
+

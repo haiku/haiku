@@ -67,3 +67,4 @@ int32 linelen(char*, int32, bool);
 #endif
 
 #endif // #ifndef _UTILITIES_H
+

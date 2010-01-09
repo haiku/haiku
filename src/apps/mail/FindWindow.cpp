@@ -59,9 +59,7 @@ enum {
 	M_FIND_STRING_CHANGED = 'fsch'
 };
 
-void TextBevel(BView& view, BRect r);
 
-// ============================================================================
 void TextBevel(BView& view, BRect r)
 {
 	r.InsetBy(-1,-1);
@@ -96,7 +94,8 @@ void FindWindow::DoFind(BWindow *window, const char *text)
 {
 	if (window == NULL) {
 		long i=0;
-		while ((bool)(window = be_app->WindowAt(i++))) {	// Send the text to a waiting window
+		while ((bool)(window = be_app->WindowAt(i++))) {
+			// Send the text to a waiting window
 			if (window != mFindWindow)
 				if (dynamic_cast<TMailWindow *>(window) != NULL)
 					break;	// Found a window
@@ -129,9 +128,10 @@ FindPanel::FindPanel(BRect rect)
 {
 	BRect r = Bounds().InsetByCopy(10,10);
 
-	mBTextControl = new AutoTextControl(r,"BTextControl",NULL,sPreviousFind.String(),
-									new BMessage(M_FIND_STRING_CHANGED),
-									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	mBTextControl = new AutoTextControl(r,"BTextControl",NULL,
+		sPreviousFind.String(), new BMessage(M_FIND_STRING_CHANGED),
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+
 	mBTextControl->SetText(sPreviousFind.String());
 	mBTextControl->MakeFocus();
 	mBTextControl->SetEscapeCancel(true);
@@ -163,7 +163,8 @@ void FindPanel::AttachedToWindow()
 	
 	mBTextControl->SetTarget(this);
 	mBTextControl->ResizeToPreferred();
-	mBTextControl->ResizeTo(Bounds().Width() - 20, mBTextControl->Frame().Height());
+	mBTextControl->ResizeTo(Bounds().Width() - 20,
+		mBTextControl->Frame().Height());
 	
 	mBTextControl->MakeFocus(true);
 	mBTextControl->TextView()->SelectAll();
@@ -211,6 +212,7 @@ void FindPanel::MessageReceived(BMessage *msg)
 	}
 }
 
+
 void FindPanel::Find()
 {
 	mBTextControl->TextView()->SelectAll();
@@ -219,7 +221,8 @@ void FindPanel::Find()
 
 	BWindow *window = NULL;
 	long i=0;
-	while ((bool)(window = be_app->WindowAt(i++))) {	// Send the text to a waiting window
+	while ((bool)(window = be_app->WindowAt(i++))) {
+		// Send the text to a waiting window
 		if (window != FindWindow::mFindWindow)
 			break;	// Found a window
 	}
@@ -227,8 +230,6 @@ void FindPanel::Find()
 	if (window)
 		FindWindow::DoFind(window, text);
 }
-
-// ============================================================================
 
 
 FindWindow::FindWindow()
@@ -243,11 +244,13 @@ FindWindow::FindWindow()
 	Show();
 }
 
+
 FindWindow::~FindWindow()
 {
 	FindWindow::mLastPosition = Frame();
 	mFindWindow = NULL;
 }
+
 
 void FindWindow::Find(BWindow *window)
 {
@@ -259,6 +262,7 @@ void FindWindow::Find(BWindow *window)
 	} else
 		mFindWindow->Activate();
 }
+
 
 void FindWindow::FindAgain(BWindow *window)
 {
@@ -272,12 +276,15 @@ void FindWindow::FindAgain(BWindow *window)
 		Find(window);
 }
 
+
 void FindWindow::SetFindString(const char *string)
 {
 	sPreviousFind = string;
 }
 
+
 const char *FindWindow::GetFindString()
 {
 	return sPreviousFind.String();
 }
+

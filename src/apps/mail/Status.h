@@ -63,3 +63,4 @@ class TStatusWindow : public BWindow {
 };
 
 #endif // #ifndef _STATUS_H
+

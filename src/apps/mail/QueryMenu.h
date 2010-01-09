@@ -86,3 +86,4 @@ class QueryMenu : public BPopUpMenu {
 };
 
 #endif // #ifndef _QUERY_MENU
+

@@ -234,3 +234,4 @@ ButtonBar::ShowLabels(bool show)
 	}
 	fShowLabels = show;
 }
+

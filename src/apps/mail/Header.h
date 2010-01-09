@@ -80,56 +80,58 @@ class TTextControl;
 
 
 class THeaderView : public BBox {
-	public:
-		THeaderView(BRect, BRect, bool incoming, BEmailMessage *mail,
-			bool resending, uint32 defaultCharacterSet, uint32 defaultChain);
+public:
+							THeaderView(BRect, BRect, bool incoming,
+								BEmailMessage *mail, bool resending,
+								uint32 defaultCharacterSet,
+								uint32 defaultChain);
 
-		virtual void	MessageReceived(BMessage *);
-		virtual void	AttachedToWindow(void);
-		status_t		LoadMessage(BEmailMessage *);
+	virtual	void			MessageReceived(BMessage*);
+	virtual	void			AttachedToWindow();
+			status_t		LoadMessage(BEmailMessage*);
 
-		BPopUpMenu		*fAccountMenu;
-		BPopUpMenu		*fEncodingMenu;
-		int32			fChain;
-		TTextControl	*fAccountTo;
-		TTextControl	*fAccount;
-		TTextControl	*fBcc;
-		TTextControl	*fCc;
-		TTextControl	*fSubject;
-		TTextControl	*fTo;
-		BStringView		*fDateLabel;
-		BStringView		*fDate;
-		bool			fIncoming;
-		uint32			fCharacterSetUserSees;
+			BPopUpMenu*		fAccountMenu;
+			BPopUpMenu*		fEncodingMenu;
+			int32			fChain;
+			TTextControl*	fAccountTo;
+			TTextControl*	fAccount;
+			TTextControl*	fBcc;
+			TTextControl*	fCc;
+			TTextControl*	fSubject;
+			TTextControl*	fTo;
+			BStringView*	fDateLabel;
+			BStringView*	fDate;
+			bool			fIncoming;
+			uint32			fCharacterSetUserSees;
 
-	private:		
-		void InitEmailCompletion();
-		void InitGroupCompletion();
+private:		
+			void			InitEmailCompletion();
+			void			InitGroupCompletion();
 
-		bool fResending;
-		QPopupMenu *fBccMenu;
-		QPopupMenu *fCcMenu;
-		QPopupMenu *fToMenu;
-		BDefaultChoiceList fEmailList;
+			bool			fResending;
+			QPopupMenu*		fBccMenu;
+			QPopupMenu*		fCcMenu;
+			QPopupMenu*		fToMenu;
+			BDefaultChoiceList	fEmailList;
 };
 
+
 class TTextControl : public BComboBox {
-	public:
-		TTextControl(BRect, const char*, BMessage*, bool, bool,
-			int32 resizingMode = B_FOLLOW_NONE);
+public:
+							TTextControl(BRect, const char*, BMessage*, bool,
+								bool, int32 resizingMode = B_FOLLOW_NONE);
 
-		virtual void AttachedToWindow();
-		virtual void MessageReceived(BMessage*);
+	virtual	void			AttachedToWindow();
+	virtual	void			MessageReceived(BMessage*);
 
-		// returns focus for the text view
-		bool HasFocus();
+			bool			HasFocus();
 
-	private:
-		bool fIncoming;
-		bool fResending;
-		char fLabel[100];
-		BPopUpMenu *fRefDropMenu;
-		int32 fCommand;
+private:
+			bool			fIncoming;
+			bool			fResending;
+			char			fLabel[100];
+			BPopUpMenu*		fRefDropMenu;
+			int32			fCommand;
 };
 
 #endif	/* _HEADER_H */

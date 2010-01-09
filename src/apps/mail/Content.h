@@ -303,3 +303,4 @@ extern void FillInQuoteTextRuns(BTextView* view, quote_context* context,
 	int32 maxStyles = 5);
 
 #endif	/* #ifndef _CONTENT_H */
+
