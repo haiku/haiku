@@ -996,6 +996,8 @@ VMCache::SetMinimalCommitment(off_t commitment)
 status_t
 VMCache::Resize(off_t newSize)
 {
+// TODO: This method must be virtual as VMAnonymousCache needs to free allocated
+// swap pages!
 	TRACE(("VMCache::Resize(cache %p, newSize %Ld) old size %Ld\n",
 		this, newSize, this->virtual_end));
 	this->AssertLocked();
