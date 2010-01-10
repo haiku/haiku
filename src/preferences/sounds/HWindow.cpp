@@ -35,6 +35,9 @@
 #include <Sound.h>
 
 
+static const char kSettingsFile[] = "Sounds_Settings";
+
+
 HWindow::HWindow(BRect rect, const char *name)
 	: _inherited(rect, name, B_TITLED_WINDOW, 0),
 	fFilePanel(NULL),
@@ -49,6 +52,20 @@ HWindow::HWindow(BRect rect, const char *name)
 
 	fFilePanel = new BFilePanel();
 	fFilePanel->SetTarget(this);
+	
+	BPath path;
+	BMessage msg;
+	
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		path.Append(kSettingsFile);
+		BFile file(path.Path(), B_READ_ONLY);
+
+		if (file.InitCheck() == B_OK && msg.Unflatten(&file) == B_OK
+			&& msg.FindRect("frame", &fFrame) == B_OK) {
+			MoveTo(fFrame.LeftTop());
+			ResizeTo(fFrame.Width(), fFrame.Height());
+		}
+	}
 }
 
 
@@ -56,6 +73,18 @@ HWindow::~HWindow()
 {
 	delete fFilePanel;
 	delete fPlayer;
+	
+	BPath path;
+	BMessage msg;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		path.Append(kSettingsFile);
+		BFile file(path.Path(), B_WRITE_ONLY|B_CREATE_FILE);
+
+		if (file.InitCheck() == B_OK) {
+			msg.AddRect("frame", fFrame);
+			msg.Flatten(&file);
+		}
+	}
 }
 
 
@@ -407,6 +436,8 @@ HWindow::DispatchMessage(BMessage *message, BHandler *handler)
 bool
 HWindow::QuitRequested()
 {
+	fFrame = Frame();
+	
 	fEventList->RemoveAll();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
