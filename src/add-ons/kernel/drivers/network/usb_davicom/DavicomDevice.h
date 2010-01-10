@@ -55,6 +55,8 @@ static	void				_NotifyCallback(void *cookie, int32 status,
 		status_t			_SetupEndpoints();
 
 		status_t				_ReadRegister(uint8 reg, size_t size, uint8* buffer);
+		status_t				_WriteRegister(uint8 reg, size_t size, uint8* buffer);
+		status_t				_Write1Register(uint8 reg, uint8 buffer);
 
 protected:
 		/* overrides */
