@@ -94,7 +94,7 @@ CreateDateMenu(BMenuField** field, bool longFormat = true)
 			*field));
 		//dayMenu->AddItem(new DateMenuItem(TR("julian day"), "g", *field));
 		//dayMenu->AddItem(new BMenuItem("c", msg));
-	BPopUpMenu* monthMenu = new BPopUpMenu("Month");
+	BPopUpMenu* monthMenu = new BPopUpMenu(TR("Month"));
 	menu->AddItem(monthMenu);
 		monthMenu->AddItem(new DateMenuItem(TR("Month number"), "M", *field));
 		monthMenu->AddItem(new DateMenuItem(TR("Month number (2 digits)"), "MM",
