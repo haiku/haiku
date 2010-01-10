@@ -1,20 +1,20 @@
-1	italiano	x-vnd.Haiku-CPUFrequencyPref	2670455659
+1	italiano	x-vnd.Haiku-CPUFrequencyPref	4060072235
 Ok	Status view		Ok
-Integration time [ms]: 	CPU Frequency View		Tempo di intervento	 [ms]: 
-High performance	Status view		Massima potenza
-Defaults	Pref Window		Predefinito
 CPU frequency status view	CPU Frequency View		Frequenza della CPU
+Set state	Status view		Set state
+Defaults	Pref Window		Predefinito
+Install replicant into Deskbar	CPU Frequency View		Installa il replicante con la frequenza della CPU nella Deskbar
+Quit	Status view		Quit
+High performance	Status view		Massima potenza
+Stepping policy	CPU Frequency View		Stepping policy	CPU Frequency
 Dynamic performance	Status view		Potenza dinamica
 Step up by CPU usage	Color Step View		Variazione della potenza in base all'uso della CPU:
-Stepping policy	CPU Frequency View		Stepping policy	CPU Frequency
-Stepping policy: 	CPU Frequency View		Stepping policy	CPU Frequency: 
-Open Speedstep preferences…	Status view		Apri le preferenze di Speestep…
-Set state	Status view		Set state
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Impossibile far partire la preferenza del CPU Frequency.\n\nErreur: 
-Install Replicant into Deskbar	CPU Frequency View		Installa il replicante con la frequenza della CPU nella Deskbar
-Low energy	Status view		Bassi consumi
-Revert	Pref Window		Predefinito
 Dynamic stepping	CPU Frequency View		Accelerazione dinamica
-CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU Frequency\n\tscritto da Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+Stepping policy: 	CPU Frequency View		Stepping policy	CPU Frequency: 
+Integration time [ms]: 	CPU Frequency View		Tempo di intervento	 [ms]: 
+Open Speedstep preferences…	Status view		Apri le preferenze di Speestep…
+Revert	Pref Window		Predefinito
+Low energy	Status view		Bassi consumi
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Impossibile far partire la preferenza del CPU Frequency.\n\nErreur: 
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tscritto da Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 CPU Frequency	Main window		Frequenza della CPU
-Quit	Status view		Quit

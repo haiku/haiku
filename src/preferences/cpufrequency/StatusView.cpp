@@ -32,6 +32,27 @@ extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 #define TR_CONTEXT "Status view"
 #define MAX_FREQ_STRING "9999MHz"
 
+
+/* This file is used both by the preference panel and the deskbar replicant.
+ * This make it needs two different BCatalogs depending on the context.
+ * As this is not really possible with the current way BCatalog are built,
+ * we get the catalog by hand. This makes us unable to use the TR macros,
+ * and then collectcatkeys will not see the strings in the file.
+ * So we mark them explicitly here.
+ */
+void notUsed() {
+	TR_MARK("Dynamic performance");
+	TR_MARK("High performance");
+	TR_MARK("Low energy");
+	TR_MARK("Set state");
+	TR_MARK("CPUFrequency\n"
+			"\twritten by Clemens Zeidler\n"
+			"\tCopyright 2009, Haiku, Inc.\n");
+	TR_MARK("Ok");
+	TR_MARK("Open Speedstep preferences" B_UTF8_ELLIPSIS);
+	TR_MARK("Quit");
+}
+
 // messages FrequencySwitcher
 const uint32 kMsgDynamicPolicyPulse = '&dpp';
 
@@ -383,7 +404,8 @@ StatusView::StatusView(BMessage* archive)
 	: BView(archive),
 	fInDeskbar(false),
 	fCurrentFrequency(NULL),
-	fDragger(NULL)
+	fDragger(NULL),
+	fCatalog("x-vnd.Haiku-CPUFrequencyPref")
 {
 	app_info info;
 	if (be_app->GetAppInfo(&info) == B_OK
