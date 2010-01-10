@@ -9,17 +9,18 @@
 
 class BluetoothWindow;
 
-class BluetoothApplication : public BApplication 
+class BluetoothApplication : public BApplication
 {
-	
+
 public:
 	BluetoothApplication(void);
+	virtual void ReadyToRun();
 	virtual void MessageReceived(BMessage*);
 	virtual void AboutRequested();
-	
+
 private:
-	BluetoothWindow *fWindow;
-	BCatalog fCatalog;
+	BluetoothWindow*	fWindow;
+	BCatalog		fCatalog;
 
 };
 

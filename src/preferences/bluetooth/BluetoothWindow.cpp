@@ -59,14 +59,14 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 	menu->AddItem(new BMenuItem(TR("Refresh LocalDevices" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgRefresh), 0));
 	fMenubar->AddItem(menu);
-	
+
 	menu = new BMenu(TR("View"));
 	menu->AddItem(new BMenuItem(TR("Connections & channels" B_UTF8_ELLIPSIS),
 		NULL, 0));
 	menu->AddItem(new BMenuItem(TR("Remote devices list" B_UTF8_ELLIPSIS),
 		NULL, 0));
 	fMenubar->AddItem(menu);
-	
+
 	menu = new BMenu(TR("Help"));
 	menu->AddItem(new BMenuItem(TR("About Bluetooth" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED), 0));
@@ -122,9 +122,9 @@ BluetoothWindow::MessageReceived(BMessage* message)
 			printf("kMsgStartServices\n");
 			if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
 				status_t error;
-				
+
 				error = be_roster->Launch(BLUETOOTH_SIGNATURE);
-				printf("kMsgStopServices: %s\n", strerror(error));
+				printf("kMsgStartServices: %s\n", strerror(error));
 			}
 			break;
 
@@ -132,12 +132,12 @@ BluetoothWindow::MessageReceived(BMessage* message)
 			printf("kMsgStopServices\n");
 			if (be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
 				status_t error;
-				
+
 				error = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(B_QUIT_REQUESTED);
 				printf("kMsgStopServices: %s\n", strerror(error));
 			}
 			break;
-		
+
 		case kMsgAddToRemoteList:
 			PostMessage(message, fRemoteDevices);
 			break;

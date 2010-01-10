@@ -26,32 +26,23 @@ public:
 
 private:
 			void			_BuildConnectionPolicy();
-			void			_SetCurrentAntialiasing();
-			void			_BuildHintingMenu();
-			void			_SetCurrentHinting();
-			void			_SetCurrentAverageWeight();
+			void			_BuildClassMenu();
 			void			_BuildLocalDevicesMenu();
 
 protected:
 			float			fDivider;
 
-			BMenuField*		fAntialiasingMenuField;
-			BPopUpMenu*		fAntialiasingMenu;
-			BMenuField*		fHintingMenuField;
-			BPopUpMenu*		fHintingMenu;			
+			BMenuField*		fPolicyMenuField;
+			BPopUpMenu*		fPolicyMenu;
+			BMenuField*		fClassMenuField;
+			BPopUpMenu*		fClassMenu;
 			BMenuField*		fLocalDevicesMenuField;
 			BPopUpMenu*		fLocalDevicesMenu;
-			
-			ExtendedLocalDeviceView* fExtDeviceView;
-			
-			BSlider*		fAverageWeightControl;
 
-			bool			fSavedSubpixelAntialiasing;
-			bool			fCurrentSubpixelAntialiasing;
-			bool			fSavedHinting;
-			bool			fCurrentHinting;
-			unsigned char	fSavedAverageWeight;
-			unsigned char	fCurrentAverageWeight;
+			ExtendedLocalDeviceView* fExtDeviceView;
+
+			BSlider*		fInquiryTimeControl;
+
 };
 
 #endif // ANTIALIASING_SETTINGS_VIEW_H
