@@ -315,6 +315,15 @@ UdpDomainSupport::ConnectEndpoint(UdpEndpoint *endpoint,
 		status_t status = endpoint->PeerAddress().SetTo(address);
 		if (status < B_OK)
 			return status;
+		struct net_route *routeToDestination
+			= gDatalinkModule->get_route(fDomain, address);
+		if (routeToDestination) {
+			status = endpoint->LocalAddress().SetTo(
+				routeToDestination->interface->address);
+			gDatalinkModule->put_route(fDomain, routeToDestination);
+			if (status < B_OK)
+				return status;
+		}
 	}
 
 	// we need to activate no matter whether or not we have just disconnected,
