@@ -184,6 +184,9 @@ MediaAddonServer::MonitorHandler::AddOnEnabled(const add_on_entry_info* info)
 	entry_ref ref;
 	make_entry_ref(info->dir_nref.device, info->dir_nref.node,
 		info->name, &ref);
+	BEntry entry(&ref, true);
+	if (!entry.IsFile())
+		return;
 
 	BPath path(&ref);
 	if (path.InitCheck() == B_OK)
