@@ -13,6 +13,9 @@ buildToolsDir=$2/legacy
 haikuOutputDir=$3
 shift 3
 additionalMakeArgs=$*
+	# Note: The gcc 2 build has trouble with -jN N > 1, hence we only use the
+	# additional flags for the binutils build. Should there ever be any other
+	# flags than -jN, we need to handle this differently.
 
 
 if [ ! -d $haikuSourceDir ]; then
@@ -111,13 +114,13 @@ eval "sed $sedExpr Makefile.bak > Makefile" || exit 1
 rm Makefile.bak
 
 # make gcc
-make $additionalMakeArgs cross || {
+make cross || {
 	echo "ERROR: Building gcc failed." >&2
 	exit 1
 }
 
 # install gcc
-make $additionalMakeArgs install-gcc-cross || {
+make install-gcc-cross || {
 	echo "ERROR: Installing the cross compiler failed." >&2
 	exit 1
 }
