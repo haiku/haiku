@@ -272,24 +272,22 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 		BRect rect = frame;
 		rect.right--;
 		rect.bottom--;
-		BBitmap* bitmap = new BBitmap(rect, B_BITMAP_ACCEPTS_VIEWS, B_RGBA32);
+		BBitmap* bitmap = new BBitmap(rect, B_RGBA32, true);
 		bitmap->Lock();
 
-		BView* view = new BView(rect, "drag", 0, 0);
+		BView* view = new BView(rect, "drag", B_FOLLOW_NONE, 0);
 		bitmap->AddChild(view);
-
+		
+		view->SetHighColor(0, 0, 0, 0);
+		view->FillRect(view->Bounds());
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetHighColor(0, 0, 0, 128);
+		// set the level of transparency by value
+		view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 		_DrawKey(view, frame, key, frame, false);
 
 		view->Sync();
-		bitmap->RemoveChild(view);
 		bitmap->Unlock();
-
-		// Make it transparent
-		// TODO: is there a better way to do this?
-		uint8* bits = (uint8*)bitmap->Bits();
-		for (int32 i = 0; i < bitmap->BitsLength(); i += 4) {
-			bits[i + 3] = 144;
-		}
 
 		BMessage drag(B_MIME_DATA);
 		drag.AddInt32("key", key->code);
