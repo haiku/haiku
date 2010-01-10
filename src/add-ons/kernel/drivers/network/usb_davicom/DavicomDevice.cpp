@@ -36,6 +36,7 @@
 #define GPCR 0x1E	// General purpose control
 #define GPR 0x1F	// General purpose
 
+#define NCR_EXT_PHY		0x80	// External PHY
 #define NCR_FDX			0x08	// Full duplex
 #define NCR_LBK			0x06	// Loopback mode
 
@@ -733,6 +734,8 @@ DavicomDevice::StartDevice()
 		TRACE_ALWAYS("Error reading NCR: %#010x.\n", result);
 		return result;
 	}
+	if (tmp_reg & NCR_EXT_PHY)
+		TRACE_ALWAYS("Device uses external PHY\n");
 	tmp_reg &= ~NCR_LBK;
 	result = _Write1Register(NCR, tmp_reg);
 	if (result != B_OK) {
@@ -830,7 +833,7 @@ DavicomDevice::GetLinkState(ether_link_state *linkState)
 	linkState->quality = 1000;
 
 	uint16 mediumStatus = IFM_ETHER | IFM_100_TX;
-	if (tmp_reg & NSR_LINKST) {
+	if (fHasConnection) {
 		mediumStatus |= IFM_ACTIVE;
 		result = _ReadRegister(NCR,1,&tmp_reg);
 		if (result != B_OK)
@@ -844,6 +847,8 @@ DavicomDevice::GetLinkState(ether_link_state *linkState)
 		if (tmp_reg & NCR_LBK)
 			mediumStatus |= IFM_LOOP;
 	}
+
+	linkState->media = mediumStatus;
 
 	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n", 
 						(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
