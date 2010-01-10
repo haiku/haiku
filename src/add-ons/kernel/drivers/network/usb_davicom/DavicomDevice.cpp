@@ -118,7 +118,6 @@ DavicomDevice::DavicomDevice(usb_device device, const char *description)
 		fDevice(device),
 		fDescription(description), 
 		fNonBlocking(false),		
-		fFrameSize(0),
 		fNotifyEndpoint(0), 
 		fReadEndpoint(0), 
 		fWriteEndpoint(0),
@@ -127,11 +126,7 @@ DavicomDevice::DavicomDevice(usb_device device, const char *description)
 		fNotifyBuffer(NULL),
 		fLinkStateChangeSem(-1), 
 		fHasConnection(false),
-		fUseTRXHeader(false), 
-		fReadNodeIDRequest(kInvalidRequest),
-		fReadRXControlRequest(kInvalidRequest),
-		fWriteRXControlRequest(kInvalidRequest),
-		fPromiscuousBits(0)
+		fUseTRXHeader(false) 
 { 
 	const usb_device_descriptor
 			*deviceDescriptor = gUSBModule->get_device_descriptor(device);
@@ -162,7 +157,7 @@ DavicomDevice::DavicomDevice(usb_device device, const char *description)
 		return;
 	}
 
-	fNotifyBuffer = (uint8*)malloc(8);
+	fNotifyBuffer = (uint8*)malloc(kNotifyBufferSize);
 	if (fNotifyBuffer == NULL) {
 		TRACE_ALWAYS("Error allocating notify buffer\n");
 		return;
@@ -208,7 +203,7 @@ DavicomDevice::Open(uint32 flags)
 	
 	// setup state notifications
 	result = gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
-								8, _NotifyCallback, this);
+		kNotifyBufferSize, _NotifyCallback, this);
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of requesting notify interrupt:%#010x\n", result);
 		return result;
@@ -395,7 +390,7 @@ DavicomDevice::Control(uint32 op, void *buffer, size_t length)
 			return B_OK;
 		
 		case ETHER_GETFRAMESIZE:
-			*(uint32 *)buffer = fFrameSize;
+			*(uint32 *)buffer = 1518 /* fFrameSize */;
 			return B_OK;
 
 		case ETHER_NONBLOCK: 
@@ -718,7 +713,7 @@ DavicomDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 
 	// schedule next notification buffer
 	gUSBModule->queue_interrupt(device->fNotifyEndpoint, device->fNotifyBuffer,
-		8, _NotifyCallback, device);
+		kNotifyBufferSize, _NotifyCallback, device);
 	atomic_add(&device->fInsideNotify, -1);
 }
 
@@ -726,58 +721,58 @@ DavicomDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 status_t
 DavicomDevice::StartDevice()
 {
-	uint8 tmp_reg;
+	uint8 registerValue = 0;
 
 	/* disable loopback  */
-	status_t result = _ReadRegister(NCR, 1, &tmp_reg);
+	status_t result = _ReadRegister(NCR, 1, &registerValue);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error reading NCR: %#010x.\n", result);
 		return result;
 	}
-	if (tmp_reg & NCR_EXT_PHY)
+	if (registerValue & NCR_EXT_PHY)
 		TRACE_ALWAYS("Device uses external PHY\n");
-	tmp_reg &= ~NCR_LBK;
-	result = _Write1Register(NCR, tmp_reg);
+	registerValue &= ~NCR_LBK;
+	result = _Write1Register(NCR, registerValue);
 	if (result != B_OK) {
-		TRACE_ALWAYS("Error writing %#02X to NCR: %#010x.\n", tmp_reg, result);
+		TRACE_ALWAYS("Error writing %#02X to NCR: %#010x.\n", registerValue, result);
 		return result;
 	}
 
 	/* Initialize RX control register */
-	result = _ReadRegister(RCR, 1, &tmp_reg);
+	result = _ReadRegister(RCR, 1, &registerValue);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error reading RCR: %#010x.\n", result);
 		return result;
 	}
-	tmp_reg &= RCR_DIS_LONG & RCR_DIS_CRC & RCR_RXEN;
-	result = _Write1Register(RCR, tmp_reg);
+	registerValue &= RCR_DIS_LONG & RCR_DIS_CRC & RCR_RXEN;
+	result = _Write1Register(RCR, registerValue);
 	if (result != B_OK) {
-		TRACE_ALWAYS("Error writing %#02X to RCR: %#010x.\n", tmp_reg, result);
+		TRACE_ALWAYS("Error writing %#02X to RCR: %#010x.\n", registerValue, result);
 		return result;
 	}
 
 	/* clear POWER_DOWN state of internal PHY */
-	result = _ReadRegister(GPCR, 1, &tmp_reg);
+	result = _ReadRegister(GPCR, 1, &registerValue);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error reading GPCR: %#010x.\n", result);
 		return result;
 	}
-	tmp_reg &= GPCR_GEP_CNTL0;
-	result = _Write1Register(GPCR, tmp_reg);
+	registerValue &= GPCR_GEP_CNTL0;
+	result = _Write1Register(GPCR, registerValue);
 	if (result != B_OK) {
-		TRACE_ALWAYS("Error writing %#02X to GPCR: %#010x.\n", tmp_reg, result);
+		TRACE_ALWAYS("Error writing %#02X to GPCR: %#010x.\n", registerValue, result);
 		return result;
 	}
 
-	result = _ReadRegister(GPR, 1, &tmp_reg);
+	result = _ReadRegister(GPR, 1, &registerValue);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error reading GPR: %#010x.\n", result);
 		return result;
 	}
-	tmp_reg &= ~GPR_GEP_GEPIO0;
-	result = _Write1Register(GPR, tmp_reg);
+	registerValue &= ~GPR_GEP_GEPIO0;
+	result = _Write1Register(GPR, registerValue);
 	if (result != B_OK) {
-		TRACE_ALWAYS("Error writing %#02X to GPR: %#010x.\n", tmp_reg, result);
+		TRACE_ALWAYS("Error writing %#02X to GPR: %#010x.\n", registerValue, result);
 		return result;
 	}
 
@@ -788,7 +783,7 @@ DavicomDevice::StartDevice()
 status_t
 DavicomDevice::OnNotify(uint32 actualLength)
 {
-	if (actualLength < 8) {
+	if (actualLength != kNotifyBufferSize) {
 		TRACE_ALWAYS("Data underrun error. %d of 8 bytes received\n",
 			actualLength);
 		return B_BAD_DATA; 
@@ -802,14 +797,14 @@ DavicomDevice::OnNotify(uint32 actualLength)
 	// 6 = Transmit packet counter
 	// 7 = GPR
 	
-	bool linkIsUp = (fNotifyBuffer[0] & 0x40) != 0;
+	bool linkIsUp = (fNotifyBuffer[0] & NSR_LINKST) != 0;
 
 	bool linkStateChange = linkIsUp != fHasConnection;
 	fHasConnection = linkIsUp;
 
 	if(linkStateChange) {
 		TRACE("Link is now %s at %s Mb/s\n", 
-			fHasConnection ? "up" : "down", fNotifyBuffer[0]&0x80?"10":"100");
+			fHasConnection ? "up" : "down", (fNotifyBuffer[0] & NSR_SPEED) ? "10" : "100");
 	}
 
 	if (linkStateChange && fLinkStateChangeSem >= B_OK)
@@ -820,12 +815,14 @@ DavicomDevice::OnNotify(uint32 actualLength)
 status_t
 DavicomDevice::GetLinkState(ether_link_state *linkState)
 {
-	uint8 tmp_reg;
-	status_t result = _ReadRegister(NSR,1,&tmp_reg);
-	if (result != B_OK)
+	uint8 registerValue = 0;
+	status_t result = _ReadRegister(NSR, 1, &registerValue);
+	if (result != B_OK) {
+		TRACE_ALWAYS("Error reading NSR register! %x\n",result);
 		return result;
+	}
 
-	if (tmp_reg & NSR_SPEED)
+	if (registerValue & NSR_SPEED)
 		linkState->speed = 10000;
 	else
 		linkState->speed = 100000;
@@ -835,16 +832,18 @@ DavicomDevice::GetLinkState(ether_link_state *linkState)
 	uint16 mediumStatus = IFM_ETHER | IFM_100_TX;
 	if (fHasConnection) {
 		mediumStatus |= IFM_ACTIVE;
-		result = _ReadRegister(NCR,1,&tmp_reg);
-		if (result != B_OK)
+		result = _ReadRegister(NCR, 1, &registerValue);
+		if (result != B_OK) {
+			TRACE_ALWAYS("Error reading NCR register! %x\n",result);
 			return result;
+		}
 
-		if (tmp_reg & NCR_FDX)
+		if (registerValue & NCR_FDX)
 			mediumStatus |= IFM_FULL_DUPLEX;
 		else
 			mediumStatus |= IFM_HALF_DUPLEX;
 
-		if (tmp_reg & NCR_LBK)
+		if (registerValue & NCR_LBK)
 			mediumStatus |= IFM_LOOP;
 	}
 

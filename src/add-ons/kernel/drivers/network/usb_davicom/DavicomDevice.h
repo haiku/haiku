@@ -54,9 +54,11 @@ static	void				_NotifyCallback(void *cookie, int32 status,
 
 		status_t			_SetupEndpoints();
 
-		status_t				_ReadRegister(uint8 reg, size_t size, uint8* buffer);
-		status_t				_WriteRegister(uint8 reg, size_t size, uint8* buffer);
-		status_t				_Write1Register(uint8 reg, uint8 buffer);
+		status_t			_ReadRegister(uint8 reg, size_t size, uint8* buffer);
+		status_t			_WriteRegister(uint8 reg, size_t size, uint8* buffer);
+		status_t			_Write1Register(uint8 reg, uint8 buffer);
+
+static const int			kFrameSize = 1518;
 
 protected:
 		/* overrides */
@@ -79,9 +81,6 @@ virtual	status_t			ModifyMulticastTable(bool add, uint8 address);
 const	char *				fDescription;
 		bool				fNonBlocking;
 
-		// interface and device infos
-		uint16				fFrameSize;
-
 		// pipes for notifications and data io
 		usb_pipe			fNotifyEndpoint;
 		usb_pipe			fReadEndpoint;
@@ -96,6 +95,7 @@ const	char *				fDescription;
 		sem_id				fNotifyWriteSem;
 
 		uint8 *				fNotifyBuffer;
+static const int			kNotifyBufferSize = 8;
 
 		// connection data
 		sem_id				fLinkStateChangeSem;
@@ -103,10 +103,6 @@ const	char *				fDescription;
 		bool				fHasConnection;
 		bool				fUseTRXHeader;
 		uint8				fIPG[3];
-		uint8				fReadNodeIDRequest;
-		uint8				fReadRXControlRequest;
-		uint8				fWriteRXControlRequest;
-		uint16				fPromiscuousBits;
 };
 
 #endif //_USB_Davicom_DEVICE_H_
