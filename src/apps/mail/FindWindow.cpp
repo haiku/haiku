@@ -41,7 +41,6 @@ All rights reserved.
 #include "MailApp.h"
 #include "MailWindow.h"
 #include "Messages.h"
-#include "AutoTextControl.h"
 
 #include <Application.h>
 #include <Box.h>
@@ -60,29 +59,6 @@ enum {
 };
 
 
-void TextBevel(BView& view, BRect r)
-{
-	r.InsetBy(-1,-1);
-	view.SetHighColor(96,96,96);
-	view.MovePenTo(r.left,r.bottom);
-	view.StrokeLine(BPoint(r.left,r.top));
-	view.StrokeLine(BPoint(r.right,r.top));
-	view.SetHighColor(216,216,216);
-	view.StrokeLine(BPoint(r.right,r.bottom));
-	view.StrokeLine(BPoint(r.left,r.bottom));
-	r.InsetBy(-1,-1);
-	view.SetHighColor(192,192,192);
-	view.MovePenTo(r.left,r.bottom);
-	view.StrokeLine(BPoint(r.left,r.top));
-	view.StrokeLine(BPoint(r.right,r.top));
-	view.SetHighColor(255,255,255);
-	view.StrokeLine(BPoint(r.right,r.bottom));
-	view.StrokeLine(BPoint(r.left,r.bottom));
-	view.SetHighColor(0,0,0);
-}
-
-//	FindWindow is modeless...
-
 #define FINDBUTTON 'find'
 
 static BString sPreviousFind = "";
@@ -94,7 +70,7 @@ void FindWindow::DoFind(BWindow *window, const char *text)
 {
 	if (window == NULL) {
 		long i=0;
-		while ((bool)(window = be_app->WindowAt(i++))) {
+		while ((window = be_app->WindowAt(i++)) != NULL) {
 			// Send the text to a waiting window
 			if (window != mFindWindow)
 				if (dynamic_cast<TMailWindow *>(window) != NULL)
@@ -128,13 +104,12 @@ FindPanel::FindPanel(BRect rect)
 {
 	BRect r = Bounds().InsetByCopy(10,10);
 
-	mBTextControl = new AutoTextControl(r,"BTextControl",NULL,
+	mBTextControl = new BTextControl(r, "BTextControl", NULL,
 		sPreviousFind.String(), new BMessage(M_FIND_STRING_CHANGED),
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 
 	mBTextControl->SetText(sPreviousFind.String());
 	mBTextControl->MakeFocus();
-	mBTextControl->SetEscapeCancel(true);
 	AddChild(mBTextControl);
 	
 	mFindButton = new BButton(BRect(0,0,90,20),"FINDBUTTON",
@@ -233,10 +208,9 @@ void FindPanel::Find()
 
 
 FindWindow::FindWindow()
-	: BWindow(FindWindow::mLastPosition, 
-		TR("Find"),
-		B_FLOATING_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK)
+	: BWindow(FindWindow::mLastPosition, TR("Find"), B_FLOATING_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK
+			| B_CLOSE_ON_ESCAPE)
 {
 	mFindPanel = new FindPanel(Bounds());
 	AddChild(mFindPanel);

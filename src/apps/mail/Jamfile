@@ -12,7 +12,6 @@ UsePrivateHeaders storage ;
 AddResources Mail : pictures.rdef  ;
 
 Application Mail : 
-	AutoTextControl.cpp
 	BmapButton.cpp
 	ButtonBar.cpp
 	ComboBox.cpp

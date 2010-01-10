@@ -42,10 +42,10 @@ All rights reserved.
 
 #include <AppDefs.h>
 #include <Box.h>
+#include <TextControl.h>
 #include <Window.h>
 
 class FindPanel;
-class AutoTextControl;
 
 
 class FindWindow : public BWindow {
@@ -83,7 +83,7 @@ public:
 
 protected:
 		BButton* mFindButton;
-		AutoTextControl* mBTextControl;
+		BTextControl* mBTextControl;
 };
 
 
