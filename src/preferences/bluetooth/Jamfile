@@ -29,6 +29,6 @@ DoCatalogs Bluetooth :
 	RemoteDevicesView.cpp
 	: en.catalog
 	: bg.catkeys de.catkeys fi.catkeys fr.catkeys it.catkeys lt.catkeys
-	ru.catkeys sv.catkeys uk.catkeys
+	pt.catkeys ru.catkeys sv.catkeys uk.catkeys
 	;
 

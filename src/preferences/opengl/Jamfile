@@ -23,6 +23,6 @@ DoCatalogs OpenGL :
 	ExtensionsView.cpp
 	InfoView.cpp
 	: en.catalog
-	: fr.catkeys lt.catkeys
+	: fr.catkeys lt.catkeys pt.catkeys
 	;
 	

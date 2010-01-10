@@ -959,6 +959,12 @@ AboutView::_CreateCreditsView()
 		"Algirdas Buckus\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
+	fCreditsView->Insert("\nPortuguese\n\n");
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(
+		"Marcos Alves (Xeon3D)\n"
+	);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 	fCreditsView->Insert("\nRussian\n\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(

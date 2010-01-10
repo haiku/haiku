@@ -38,6 +38,6 @@ DoCatalogs Appearance :
 	: en.catalog
 	:
 	bg.catkeys de.catkeys eo.catkeys fi.catkeys fr.catkeys it.catkeys ja.catkeys
-	lt.catkeys ru.catkeys sv.catkeys uk.catkeys
+	lt.catkeys pt.catkeys ru.catkeys sv.catkeys uk.catkeys
 	;
 
