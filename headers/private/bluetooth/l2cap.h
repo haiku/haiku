@@ -37,8 +37,8 @@
 #define htole32(x) (x)
 
 #define HZ	1000000 // us per second TODO: move somewhere more generic
-#define bluetooth_l2cap_ertx_timeout (60*HZ)
-#define bluetooth_l2cap_rtx_timeout  (300*HZ)
+#define bluetooth_l2cap_ertx_timeout (60 * HZ)
+#define bluetooth_l2cap_rtx_timeout  (300 * HZ)
 
 /*
  * Channel IDs are assigned relative to the instance of L2CAP node, i.e.
@@ -60,9 +60,9 @@
  * connection. So up to 254 (0xff - 0x01) L2CAP commands can be pending at the
  * same time for the same connection.
  */
-#define L2CAP_NULL_IDENT		0x00        /* DO NOT USE THIS IDENT */
-#define L2CAP_FIRST_IDENT		0x01        /* dynamically alloc. (start) */
-#define L2CAP_LAST_IDENT		0xff        /* dynamically alloc. (end) */
+#define L2CAP_NULL_IDENT		0x00	/* DO NOT USE THIS IDENT */
+#define L2CAP_FIRST_IDENT		0x01	/* dynamically alloc. (start) */
+#define L2CAP_LAST_IDENT		0xff	/* dynamically alloc. (end) */
 
 
 /* L2CAP MTU */
@@ -131,11 +131,11 @@
 #define L2CAP_OPT_QOS_SIZE		sizeof(l2cap_flow_t)
 /* 0x4 - 0xff - reserved for future use */
 
-#define	L2CAP_CFG_IN	(1 << 0)     /* incoming path done */
-#define	L2CAP_CFG_OUT	(1 << 1)     /* outgoing path done */
+#define	L2CAP_CFG_IN	(1 << 0)	/* incoming path done */
+#define	L2CAP_CFG_OUT	(1 << 1)	/* outgoing path done */
 #define	L2CAP_CFG_BOTH  (L2CAP_CFG_IN | L2CAP_CFG_OUT)
-#define	L2CAP_CFG_IN_SENT	(1 << 2)     /* L2CAP ConfigReq sent */
-#define	L2CAP_CFG_OUT_SENT	(1 << 3)     /* ---/--- */
+#define	L2CAP_CFG_IN_SENT	(1 << 2)	/* L2CAP ConfigReq sent */
+#define	L2CAP_CFG_OUT_SENT	(1 << 3)	/* ---/--- */
 
 /* L2CAP Information request type codes */
 #define L2CAP_CONNLESS_MTU		0x0001
@@ -293,6 +293,10 @@ typedef struct {
  * L2CAP_CONNLESS_MTU - 2 bytes connectionless MTU
  */
 } __attribute__ ((packed)) l2cap_info_rsp_cp;
+
+#define IS_SIGNAL_REQ(code) ((code & 1) == 0)
+#define IS_SIGNAL_RSP(code) ((code & 1) == 1)
+
 
 typedef union {
  	/* L2CAP_CONNLESS_MTU */
