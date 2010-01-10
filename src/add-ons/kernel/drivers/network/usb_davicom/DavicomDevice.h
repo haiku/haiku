@@ -67,8 +67,6 @@ virtual	status_t			GetLinkState(ether_link_state *state) ;
 virtual	status_t			SetPromiscuousMode(bool bOn);
 virtual	status_t			ModifyMulticastTable(bool add, uint8 address);
 		status_t			ReadMACAddress(ether_address_t *address);
-		status_t			ReadRXControlRegister(uint16 *rxcontrol);
-		status_t			WriteRXControlRegister(uint16 rxcontrol);
 		
 		// state tracking
 		status_t			fStatus;
@@ -98,7 +96,6 @@ const	char *				fDescription;
 		sem_id				fNotifyWriteSem;
 
 		uint8 *				fNotifyBuffer;
-		uint32				fNotifyBufferLength;
 
 		// connection data
 		sem_id				fLinkStateChangeSem;

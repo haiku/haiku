@@ -30,12 +30,17 @@
 
 // Registers
 #define NCR 0x00	// Network control
+#define NSR	0x01	// Network status
 #define RCR 0x05	// RX Control
 #define PAR 0x10	// 6 bits - Physical address (MAC)
 #define GPCR 0x1E	// General purpose control
 #define GPR 0x1F	// General purpose
 
+#define NCR_FDX			0x08	// Full duplex
 #define NCR_LBK			0x06	// Loopback mode
+
+#define NSR_SPEED		0x80	// 0 = 100MBps, 1 = 10MBps
+#define NSR_LINKST		0x40	// 1 = link up
 
 #define RCR_DIS_LONG	0x20	// Discard long packet
 #define RCR_DIS_CRC		0x10	// Discard CRC error packet
@@ -119,7 +124,6 @@ DavicomDevice::DavicomDevice(usb_device device, const char *description)
 		fNotifyReadSem(-1), 
 		fNotifyWriteSem(-1), 
 		fNotifyBuffer(NULL),
-		fNotifyBufferLength(0), 
 		fLinkStateChangeSem(-1), 
 		fHasConnection(false),
 		fUseTRXHeader(false), 
@@ -154,6 +158,12 @@ DavicomDevice::DavicomDevice(usb_device device, const char *description)
 	if (fNotifyWriteSem < B_OK) {
 		TRACE_ALWAYS("Error of creating write notify semaphore:%#010x\n", 
 															fNotifyWriteSem);
+		return;
+	}
+
+	fNotifyBuffer = (uint8*)malloc(8);
+	if (fNotifyBuffer == NULL) {
+		TRACE_ALWAYS("Error allocating notify buffer\n");
 		return;
 	}
 
@@ -197,7 +207,7 @@ DavicomDevice::Open(uint32 flags)
 	
 	// setup state notifications
 	result = gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
-								fNotifyBufferLength, _NotifyCallback, this);
+								8, _NotifyCallback, this);
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of requesting notify interrupt:%#010x\n", result);
 		return result;
@@ -602,39 +612,9 @@ DavicomDevice::ReadMACAddress(ether_address_t *address)
 
 
 status_t
-DavicomDevice::ReadRXControlRegister(uint16 *rxcontrol)
-{
-	size_t actual_length = 0;
-	*rxcontrol = 0;
-	
-	status_t result = gUSBModule->send_request(fDevice, 
-					USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-					fReadRXControlRequest, 0, 0, 
-					sizeof(*rxcontrol), rxcontrol, &actual_length);
-
-	if(sizeof(*rxcontrol) != actual_length) {
-		TRACE_ALWAYS("Mismatch during reading RX control register."
-											"Read %d bytes instead of %d.\n", 
-											actual_length, sizeof(*rxcontrol));
-	}
-
-	return result; 
-}
-
-
-status_t
-DavicomDevice::WriteRXControlRegister(uint16 rxcontrol)
-{
-	status_t result = gUSBModule->send_request(fDevice, 
-							USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-							fWriteRXControlRequest, rxcontrol, 0, 0, 0, 0);
-	return result;
-}
-
-
-status_t
 DavicomDevice::StopDevice()
 {
+	/*
 	status_t result = WriteRXControlRegister(0);
 	
 	if(result != B_OK) {
@@ -643,6 +623,9 @@ DavicomDevice::StopDevice()
 	
 	TRACE_RET(result);
 	return result; 
+	*/
+	TRACE_ALWAYS("Stop device not implemented\n");
+	return B_ERROR;
 }
 
 
@@ -721,10 +704,12 @@ DavicomDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 
 	if (status != B_OK) {
 		TRACE_ALWAYS("Device status error:%#010x\n", status);
+		/*
 		status_t result = gUSBModule->clear_feature(device->fNotifyEndpoint,
 													USB_FEATURE_ENDPOINT_HALT);
 		if(result != B_OK)
 			TRACE_ALWAYS("Error during clearing of HALT state:%#010x.\n", result);
+		*/
 	}
 	
 	// parse data in overriden class
@@ -732,7 +717,7 @@ DavicomDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 
 	// schedule next notification buffer
 	gUSBModule->queue_interrupt(device->fNotifyEndpoint, device->fNotifyBuffer,
-		device->fNotifyBufferLength, _NotifyCallback, device);
+		8, _NotifyCallback, device);
 	atomic_add(&device->fInsideNotify, -1);
 }
 
@@ -800,89 +785,70 @@ DavicomDevice::StartDevice()
 status_t
 DavicomDevice::OnNotify(uint32 actualLength)
 {
-/*
-	if (actualLength < sizeof(AX88172Notify)) {
-		TRACE_ALWAYS("Data underrun error. %d of %d bytes received\n",
-										actualLength, sizeof(AX88172Notify));
+	if (actualLength < 8) {
+		TRACE_ALWAYS("Data underrun error. %d of 8 bytes received\n",
+			actualLength);
 		return B_BAD_DATA; 
 	}
-		
-	AX88172Notify *notification	= (AX88172Notify *)fNotifyBuffer; 
 
-	if(notification->btA1 != 0xa1) {
-		TRACE_ALWAYS("Notify magic byte is invalid: %#02x\n", 
-														notification->btA1);
-	}
+	// 0 = Network status
+	// 1:2 = TX status
+	// 3 = RX status
+	// 4 = Receive overflow counter
+	// 5 = Received packet counter
+	// 6 = Transmit packet counter
+	// 7 = GPR
 	
-	uint phyIndex = 0;
-	bool linkIsUp = fHasConnection;
-	switch(fMII.ActivePHY()) {
-		case PrimaryPHY:
-			phyIndex = 1;
-			linkIsUp = (notification->btNN & LINK_STATE_PHY1) == LINK_STATE_PHY1; 
-			break;
-		case SecondaryPHY:
-			phyIndex = 2;
-			linkIsUp = (notification->btNN & LINK_STATE_PHY2) == LINK_STATE_PHY2; 
-			break;
-		default:
-		case CurrentPHY:
-			TRACE_ALWAYS("Error: PHY is not initialized.\n");
-			return B_NO_INIT;
-	}
+	bool linkIsUp = (fNotifyBuffer[0] & 0x40) != 0;
 
 	bool linkStateChange = linkIsUp != fHasConnection;
 	fHasConnection = linkIsUp;
 
 	if(linkStateChange) {
-		TRACE("Link state of PHY%d has been changed to '%s'\n", 
-									phyIndex, fHasConnection ? "up" : "down");
+		TRACE("Link is now %s at %s Mb/s\n", 
+			fHasConnection ? "up" : "down", fNotifyBuffer[0]&0x80?"10":"100");
 	}
 
 	if (linkStateChange && fLinkStateChangeSem >= B_OK)
 		release_sem_etc(fLinkStateChangeSem, 1, B_DO_NOT_RESCHEDULE);
-*/
-	TRACE_ALWAYS("OnNotify not implemented\n");
-	return B_ERROR; // shoulb be B_OK when implemented :)
+	return B_OK;
 }
 
 status_t
 DavicomDevice::GetLinkState(ether_link_state *linkState)
 {
-/*
-	uint16 miiANAR = 0;
-	uint16 miiANLPAR = 0;
-
-	status_t result = fMII.Read(MII_ANAR, &miiANAR);
-	if(result != B_OK) {
-		TRACE_ALWAYS("Error reading MII ANAR register:%#010x\n", result);
+	uint8 tmp_reg;
+	status_t result = _ReadRegister(NSR,1,&tmp_reg);
+	if (result != B_OK)
 		return result;
-	}
 
-	result = fMII.Read(MII_ANLPAR, &miiANLPAR);
-	if(result != B_OK) {
-		TRACE_ALWAYS("Error reading MII ANLPAR register:%#010x\n", result);
-		return result;
-	}
+	if (tmp_reg & NSR_SPEED)
+		linkState->speed = 10000;
+	else
+		linkState->speed = 100000;
 
-	TRACE_FLOW("ANAR:%04x ANLPAR:%04x\n", miiANAR, miiANLPAR);
-	
-	uint16 mediumStatus = miiANAR & miiANLPAR;
-		
 	linkState->quality = 1000;
-	
-	linkState->media   = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
-    linkState->media  |= mediumStatus & (ANLPAR_TX_FD | ANLPAR_10_FD) ? 
-											IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
-	
-	linkState->speed   = mediumStatus & (ANLPAR_TX_FD | ANLPAR_TX_HD) ? 100000 : 10000;
-	
+
+	uint16 mediumStatus = IFM_ETHER | IFM_100_TX;
+	if (tmp_reg & NSR_LINKST) {
+		mediumStatus |= IFM_ACTIVE;
+		result = _ReadRegister(NCR,1,&tmp_reg);
+		if (result != B_OK)
+			return result;
+
+		if (tmp_reg & NCR_FDX)
+			mediumStatus |= IFM_FULL_DUPLEX;
+		else
+			mediumStatus |= IFM_HALF_DUPLEX;
+
+		if (tmp_reg & NCR_LBK)
+			mediumStatus |= IFM_LOOP;
+	}
+
 	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n", 
 						(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
 						linkState->speed / 1000,
 						(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
-*/
-	TRACE_ALWAYS("GetLinkState not implemented\n");
-	return B_ERROR; // B_OK
+	return B_OK;
 }
 
