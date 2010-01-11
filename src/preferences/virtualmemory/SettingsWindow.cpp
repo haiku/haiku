@@ -11,7 +11,11 @@
 #include <Alert.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <StringView.h>
 #include <String.h>
 #include <Slider.h>
@@ -27,6 +31,10 @@
 #include <stdio.h>
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "SettingsWindow"
+
+
 static const uint32 kMsgDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
 static const uint32 kMsgSliderUpdate = 'slup';
@@ -35,8 +43,8 @@ static const uint32 kMsgSwapEnabledUpdate = 'swen';
 
 class SizeSlider : public BSlider {
 	public:
-		SizeSlider(BRect rect, const char* name, const char* label,
-			BMessage* message, int32 min, int32 max, uint32 resizingMode);
+		SizeSlider(const char* name, const char* label,
+			BMessage* message, int32 min, int32 max, uint32 flags);
 		virtual ~SizeSlider();
 
 		virtual const char* UpdateText() const;
@@ -53,12 +61,12 @@ const char *
 byte_string(int64 size)
 {
 	double value = 1. * size;
-	static char string[64];
+	static char string[256];
 
 	if (value < 1024)
-		snprintf(string, sizeof(string), "%Ld B", size);
+		snprintf(string, sizeof(string), TR("%Ld B"), size);
 	else {
-		const char *units[] = {"K", "M", "G", NULL};
+		static const char *units[] = {TR_MARK("KB"), TR_MARK("MB"), TR_MARK("GB"), NULL};
 		int32 i = -1;
 
 		do {
@@ -67,7 +75,7 @@ byte_string(int64 size)
 		} while (value >= 1024 && units[i + 1]);
 
 		off_t rounded = off_t(value * 100LL);
-		sprintf(string, "%g %sB", rounded / 100.0, units[i]);
+		sprintf(string, "%g %sB", rounded / 100.0, TR(units[i]));
 	}
 
 	return string;
@@ -77,9 +85,9 @@ byte_string(int64 size)
 //	#pragma mark -
 
 
-SizeSlider::SizeSlider(BRect rect, const char* name, const char* label,
-	BMessage* message, int32 min, int32 max, uint32 resizingMode)
-	: BSlider(rect, name, label, message, min, max, B_BLOCK_THUMB, resizingMode)
+SizeSlider::SizeSlider(const char* name, const char* label,
+	BMessage* message, int32 min, int32 max, uint32 flags)
+	: BSlider(name, label, message, min, max, B_HORIZONTAL, B_BLOCK_THUMB, flags)
 {
 	rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 	UseFillColor(true, &color);
@@ -104,53 +112,36 @@ SizeSlider::UpdateText() const
 
 
 SettingsWindow::SettingsWindow()
-	: BWindow(BRect(0, 0, 269, 172), "VirtualMemory", B_TITLED_WINDOW,
-			B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+	: BWindow(BRect(0, 0, 269, 172), TR("VirtualMemory"), B_TITLED_WINDOW,
+			B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BRect rect = Bounds();
-	BView* view = new BView(rect, "background", B_FOLLOW_ALL, B_WILL_DRAW);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	BView* view = new BGroupView();
 
-	font_height fontHeight;
-	be_plain_font->GetHeight(&fontHeight);
-
-	float lineHeight = ceil(fontHeight.ascent + fontHeight.descent + fontHeight.ascent);
-
-	fSwapEnabledCheckBox = new BCheckBox(rect, "enable swap", "Enable virtual memory",
+	fSwapEnabledCheckBox = new BCheckBox("enable swap",
+		TR("Enable virtual memory"),
 		new BMessage(kMsgSwapEnabledUpdate));
 	fSwapEnabledCheckBox->SetValue(fSettings.SwapEnabled());
-	fSwapEnabledCheckBox->ResizeToPreferred();
 
-	rect.InsetBy(10, 10);
-	BBox* box = new BBox(rect, "box", B_FOLLOW_LEFT_RIGHT);
+	BBox* box = new BBox("box", B_FOLLOW_LEFT_RIGHT);
 	box->SetLabel(fSwapEnabledCheckBox);
-	view->AddChild(box);
 
 	system_info info;
 	get_system_info(&info);
 
-	rect.right -= 20;
-	rect.top = lineHeight;
-	BString string = "Physical memory: ";
+	BString string = TR("Physical memory: ");
 	string << byte_string((off_t)info.max_pages * B_PAGE_SIZE);
-	BStringView* stringView = new BStringView(rect, "physical memory", string.String(),
-		B_FOLLOW_NONE);
-	stringView->ResizeToPreferred();
-	box->AddChild(stringView);
+	BStringView* memoryView = new BStringView("physical memory", string.String());
 
-	rect.OffsetBy(0, lineHeight);
-	string = "Current swap file size: ";
+	string = TR("Current swap file size: ");
 	string << byte_string(fSettings.SwapSize());
-	stringView = new BStringView(rect, "current swap size", string.String(),
-		B_FOLLOW_NONE);
-	stringView->ResizeToPreferred();
-	box->AddChild(stringView);
+	BStringView* swapfileView = new BStringView("current swap size", string.String());
 
 	BPopUpMenu* menu = new BPopUpMenu("volumes");
 
 	// collect volumes
-	// ToDo: listen to volume changes!
-	// ToDo: accept dropped volumes
+	// TODO: listen to volume changes!
+	// TODO: accept dropped volumes
 
 	BVolumeRoster volumeRoster;
 	BVolume volume;
@@ -166,58 +157,60 @@ SettingsWindow::SettingsWindow()
 			item->SetMarked(true);
 	}
 
-	rect.OffsetBy(0, lineHeight);
-	BMenuField* field = new BMenuField(rect, "devices", "Use volume:", menu);
-	field->SetDivider(field->StringWidth(field->Label()) + 8);
-	field->ResizeToPreferred();
+	BMenuField* field = new BMenuField("devices", TR("Use volume:"), menu);
 	field->SetEnabled(false);
-	box->AddChild(field);
 
 	off_t minSize, maxSize;
 	_GetSwapFileLimits(minSize, maxSize);
 
-	rect.OffsetBy(0, lineHeight + 8);
-	fSizeSlider = new SizeSlider(rect, "size slider", "Requested swap file size:",
+	fSizeSlider = new SizeSlider("size slider", TR("Requested swap file size:"),
 		new BMessage(kMsgSliderUpdate), minSize / kMegaByte, maxSize / kMegaByte,
-		B_FOLLOW_LEFT_RIGHT);
-	fSizeSlider->SetLimitLabels("999 MB", "999 MB");
-	fSizeSlider->ResizeToPreferred();
+		B_WILL_DRAW | B_FRAME_EVENTS);
+	fSizeSlider->SetLimitLabels(TR("999 MB"), TR("999 MB"));
 	fSizeSlider->SetViewColor(255, 0, 255);
 	box->AddChild(fSizeSlider);
 
-	rect.OffsetBy(0, fSizeSlider->Frame().Height() + 5);
-	rect.bottom = rect.top + stringView->Frame().Height();
-	fWarningStringView = new BStringView(rect, "", "", B_FOLLOW_ALL);
+	fWarningStringView = new BStringView("", "");
 	fWarningStringView->SetAlignment(B_ALIGN_CENTER);
-	box->AddChild(fWarningStringView);
 
-	box->ResizeTo(box->Frame().Width(), fWarningStringView->Frame().bottom + 10);
+	view->SetLayout(new BGroupLayout(B_HORIZONTAL)); 
+	view->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10) 
+		.AddGroup(B_HORIZONTAL) 
+			.Add(memoryView) 
+			.AddGlue() 
+		.End() 
+		.AddGroup(B_HORIZONTAL) 
+			.Add(swapfileView) 
+			.AddGlue() 
+		.End() 
+		.AddGroup(B_HORIZONTAL) 
+			.Add(field) 
+			.AddGlue() 
+		.End() 
+		.Add(fSizeSlider) 
+		.Add(fWarningStringView) 
+		.SetInsets(10, 10, 10, 10) 
+	); 
+	box->AddChild(view); 
 
 	// Add "Defaults" and "Revert" buttons
 
-	rect.top = box->Frame().bottom + 10;
-	fDefaultsButton = new BButton(rect, "defaults", "Defaults", new BMessage(kMsgDefaults));
-	fDefaultsButton->ResizeToPreferred();
+	fDefaultsButton = new BButton("defaults", TR("Defaults"), new BMessage(kMsgDefaults));
 	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-	view->AddChild(fDefaultsButton);
 
-	rect = fDefaultsButton->Frame();
-	rect.OffsetBy(rect.Width() + 10, 0);
-	fRevertButton = new BButton(rect, "revert", "Revert", new BMessage(kMsgRevert));
-	fRevertButton->ResizeToPreferred();
+	fRevertButton = new BButton("revert", TR("Revert"), new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
-	view->AddChild(fRevertButton);
 
-	view->ResizeTo(view->Frame().Width(), fRevertButton->Frame().bottom + 10);
-	ResizeTo(view->Bounds().Width(), view->Bounds().Height());
-	AddChild(view);
-		// add view after resizing the window, so that the view's resizing
-		// mode is not used (we already layed out the views for the new height)
-
-	// if the strings don't fit on screen, we enlarge the window now - the
-	// views are already added to the window and will resize automatically
-	if (Bounds().Width() < view->StringWidth(fSizeSlider->Label()) * 2)
-		ResizeTo(view->StringWidth(fSizeSlider->Label()) * 2, Bounds().Height());
+	SetLayout(new BGroupLayout(B_HORIZONTAL)); 
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10) 
+		.Add(box) 
+		.AddGroup(B_HORIZONTAL, 10) 
+			.Add(fDefaultsButton) 
+			.Add(fRevertButton) 
+			.AddGlue() 
+		.End() 
+		.SetInsets(10, 10, 10, 10) 
+	); 
 
 	_Update();
 
@@ -226,8 +219,7 @@ SettingsWindow::SettingsWindow()
 
 	if (!screenFrame.Contains(fSettings.WindowPosition())) {
 		// move on screen, centered
-		MoveTo(screenFrame.left + (screenFrame.Width() - Bounds().Width()) / 2,
-			screenFrame.top + (screenFrame.Height() - Bounds().Height()) / 2);
+		CenterOnScreen();
 	} else
 		MoveTo(fSettings.WindowPosition());
 }
@@ -238,7 +230,7 @@ SettingsWindow::~SettingsWindow()
 }
 
 
-void
+	void
 SettingsWindow::_Update()
 {
 	if ((fSwapEnabledCheckBox->Value() != 0) != fSettings.SwapEnabled())
@@ -250,7 +242,7 @@ SettingsWindow::_Update()
 		minLabel << byte_string(minSize);
 		maxLabel << byte_string(maxSize);
 		if (minLabel != fSizeSlider->MinLimitLabel()
-			|| maxLabel != fSizeSlider->MaxLimitLabel()) {
+				|| maxLabel != fSizeSlider->MaxLimitLabel()) {
 			fSizeSlider->SetLimitLabels(minLabel.String(), maxLabel.String());
 #ifdef __HAIKU__
 			fSizeSlider->SetLimits(minSize / kMegaByte, maxSize / kMegaByte);
@@ -274,14 +266,14 @@ SettingsWindow::_Update()
 	if (fRevertButton->IsEnabled() != changed) {
 		fRevertButton->SetEnabled(changed);
 		if (changed)
-			fWarningStringView->SetText("Changes will take effect on restart!");
+			fWarningStringView->SetText(TR("Changes will take effect on restart!"));
 		else
 			fWarningStringView->SetText("");
 	}
 }
 
 
-status_t
+	status_t
 SettingsWindow::_GetSwapFileLimits(off_t& minSize, off_t& maxSize)
 {
 	// minimum size is an arbitrarily chosen MB
@@ -348,12 +340,12 @@ SettingsWindow::MessageReceived(BMessage* message)
 				//	as Be did, but I thought a proper warning could be helpful
 				//	(for those that want to change that anyway)
 				int32 choice = (new BAlert("VirtualMemory",
-					"Disabling virtual memory will have unwanted effects on "
+					TR("Disabling virtual memory will have unwanted effects on "
 					"system stability once the memory is used up.\n"
 					"Virtual memory does not affect system performance "
 					"until this point is reached.\n\n"
-					"Are you really sure you want to turn it off?",
-					"Turn off", "Keep enabled", NULL,
+					"Are you really sure you want to turn it off?"),
+					TR("Turn off"), TR("Keep enabled"), NULL,
 					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 				if (choice == 1) {
 					fSwapEnabledCheckBox->SetValue(1);

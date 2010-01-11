@@ -11,9 +11,14 @@
 #include <TextView.h>
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "VirtualMemoryApp"
+
+
 VirtualMemory::VirtualMemory()
 	: BApplication("application/x-vnd.Haiku-VirtualMemory")
 {
+	be_locale->GetAppCatalog(&fCatalog);
 }
 
 
@@ -33,10 +38,10 @@ VirtualMemory::ReadyToRun()
 void
 VirtualMemory::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "VirtualMemory\n"
+	BAlert* alert = new BAlert("about", TR("VirtualMemory\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2005, Haiku.\n", "OK");
-	BTextView *view = alert->TextView();
+		"\tCopyright 2005, Haiku.\n"), TR("OK"));
+	BTextView* view = alert->TextView();
 	BFont font;
 
 	view->SetStylable(true);

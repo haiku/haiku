@@ -7,6 +7,8 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 class VMSettings;
 
@@ -23,6 +25,7 @@ class VirtualMemory : public BApplication {
 		void GetCurrentSettings(bool& enabled, off_t& size);
 
 		VMSettings *fSettings;	
+		BCatalog fCatalog;
 };
 	
 #endif	/* VIRTUAL_MEMORY_H */
