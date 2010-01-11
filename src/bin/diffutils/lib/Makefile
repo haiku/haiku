@@ -22,7 +22,7 @@ SHELL = /bin/sh
 srcdir = .
 top_srcdir = ..
 
-prefix = /usr/local
+prefix = /boot/common
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -42,10 +42,10 @@ pkglibdir = $(libdir)/diffutils
 pkgincludedir = $(includedir)/diffutils
 top_builddir = ..
 
-ACLOCAL = ${SHELL} /boot/home/Development/current/src/apps/bin/diffutils-2.8.1/config/missing --run aclocal-1.6
-AUTOCONF = ${SHELL} /boot/home/Development/current/src/apps/bin/diffutils-2.8.1/config/missing --run autoconf
-AUTOMAKE = ${SHELL} /boot/home/Development/current/src/apps/bin/diffutils-2.8.1/config/missing --run automake-1.6
-AUTOHEADER = ${SHELL} /boot/home/Development/current/src/apps/bin/diffutils-2.8.1/config/missing --run autoheader
+ACLOCAL = ${SHELL} /boot/home/svnhaiku/haiku/src/bin/diffutils/config/missing --run aclocal-1.6
+AUTOCONF = ${SHELL} /boot/home/svnhaiku/haiku/src/bin/diffutils/config/missing --run autoconf
+AUTOMAKE = ${SHELL} /boot/home/svnhaiku/haiku/src/bin/diffutils/config/missing --run automake-1.6
+AUTOHEADER = ${SHELL} /boot/home/svnhaiku/haiku/src/bin/diffutils/config/missing --run autoheader
 
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = /bin/install -c
@@ -63,12 +63,12 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = 
-host_triplet = i586-pc-beos
+host_triplet = i586-pc-haiku
 
 EXEEXT = 
 OBJEXT = o
 PATH_SEPARATOR = :
-AMTAR = ${SHELL} /boot/home/Development/current/src/apps/bin/diffutils-2.8.1/config/missing --run tar
+AMTAR = ${SHELL} /boot/home/svnhaiku/haiku/src/bin/diffutils/config/missing --run tar
 AWK = gawk
 BUILD_INCLUDED_LIBINTL = @BUILD_INCLUDED_LIBINTL@
 CATOBJEXT = @CATOBJEXT@
@@ -80,7 +80,7 @@ GENCAT = @GENCAT@
 GLIBC21 = @GLIBC21@
 GMSGFMT = :
 HAVE_LIB = @HAVE_LIB@
-HELP2MAN = ${SHELL} /boot/home/Development/current/src/apps/bin/diffutils-2.8.1/config/missing --run help2man
+HELP2MAN = ${SHELL} /boot/home/svnhaiku/haiku/src/bin/diffutils/config/missing --run help2man
 INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
 INSTOBJEXT = @INSTOBJEXT@
 INTLBISON = @INTLBISON@
@@ -88,11 +88,11 @@ INTLLIBS =
 INTLOBJS = @INTLOBJS@
 INTL_LIBTOOL_SUFFIX_PREFIX = @INTL_LIBTOOL_SUFFIX_PREFIX@
 LIB = @LIB@
-LIBICONV = 
+LIBICONV = /boot/common/lib/libiconv.a
 LIBINTL = 
 LIB_CLOCK_GETTIME = 
 LTLIB = @LTLIB@
-LTLIBICONV = 
+LTLIBICONV = -L/boot/common/lib -liconv
 LTLIBINTL = 
 MKINSTALLDIRS = config/mkinstalldirs
 PACKAGE = diffutils
@@ -106,7 +106,7 @@ USE_NLS = no
 VERSION = 2.8.1
 am__include = include
 am__quote = 
-install_sh = /boot/home/Development/current/src/apps/bin/diffutils-2.8.1/config/install-sh
+install_sh = /boot/home/svnhaiku/haiku/src/bin/diffutils/config/install-sh
 
 noinst_LIBRARIES = libdiffutils.a
 
@@ -130,7 +130,7 @@ libdiffutils_a_SOURCES = \
   setmode.c strftime.c umaxtostr.c xmalloc.c xstrtoumax.c
 
 
-libdiffutils_a_LIBADD =   fnmatch.o regex.o
+libdiffutils_a_LIBADD =  
 libdiffutils_a_DEPENDENCIES = $(libdiffutils_a_LIBADD)
 
 DISTCLEANFILES = fnmatch.h fnmatch.hno regex.h regex.hno
@@ -152,7 +152,7 @@ libdiffutils_a_OBJECTS = $(am_libdiffutils_a_OBJECTS)
 
 DEFS = -DHAVE_CONFIG_H
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
-CPPFLAGS = 
+CPPFLAGS = -I/boot/common/include
 LDFLAGS = 
 LIBS = 
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp

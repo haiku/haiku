@@ -35,7 +35,6 @@ StaticLibrary libdiffutils.a :
 	setmode.c
 	strcasecmp.c
 	strftime.c
-	strtoimax.c
 	strtol.c
 	strtoul.c
 	strtoull.c

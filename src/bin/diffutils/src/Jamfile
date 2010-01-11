@@ -38,3 +38,10 @@ BinCommand cmp :
 	version.c 
 	: libdiffutils.a
 	: diffutils.rsrc ;
+
+BinCommand sdiff :
+	sdiff.c
+	version.c
+	: libdiffutils.a
+	: diffutils.rsrc ;
+
