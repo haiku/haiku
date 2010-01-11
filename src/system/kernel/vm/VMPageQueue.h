@@ -18,11 +18,10 @@
 #include <vm/vm_types.h>
 
 
-
 struct VMPageQueue {
 public:
-	typedef DoublyLinkedList<vm_page, DoublyLinkedListMemberGetLink<vm_page,
-		&vm_page::queue_link> > PageList;
+	typedef DoublyLinkedList<vm_page,
+		DoublyLinkedListMemberGetLink<vm_page, &vm_page::queue_link> > PageList;
 	typedef PageList::ConstIterator Iterator;
 
 public:
@@ -39,6 +38,7 @@ public:
 	inline	void				Requeue(vm_page* page, bool tail);
 
 	inline	void				AppendUnlocked(vm_page* page);
+	inline	void				AppendUnlocked(PageList& pages, uint32 count);
 	inline	void				PrependUnlocked(vm_page* page);
 	inline	void				RemoveUnlocked(vm_page* page);
 	inline	vm_page*			RemoveHeadUnlocked();
@@ -183,6 +183,29 @@ VMPageQueue::AppendUnlocked(vm_page* page)
 {
 	InterruptsSpinLocker locker(fLock);
 	Append(page);
+}
+
+
+void
+VMPageQueue::AppendUnlocked(PageList& pages, uint32 count)
+{
+#if DEBUG_PAGE_QUEUE
+	for (PageList::Iterator it = pages.GetIterator();
+			vm_page* page = it.next();) {
+		if (page->queue != NULL) {
+			panic("%p->VMPageQueue::AppendUnlocked(): page %p thinks it is "
+				"already in queue %p", this, page, page->queue);
+		}
+
+		page->queue = this;
+	}
+
+#endif	// DEBUG_PAGE_QUEUE
+
+	InterruptsSpinLocker locker(fLock);
+
+	fPages.MoveFrom(&pages);
+	fCount += count;
 }
 
 
