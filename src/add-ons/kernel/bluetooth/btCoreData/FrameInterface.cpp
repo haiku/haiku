@@ -13,7 +13,8 @@ SignalByIdent(HciConnection* conn, uint8 ident)
 	L2capFrame*	frame;
 
 	mutex_lock(&conn->fLockExpected);
-	DoublyLinkedList<L2capFrame>::Iterator iterator = conn->ExpectedResponses.GetIterator();
+	DoublyLinkedList<L2capFrame>::Iterator iterator
+		= conn->ExpectedResponses.GetIterator();
 
 	while (iterator.HasNext()) {
 
@@ -28,6 +29,7 @@ SignalByIdent(HciConnection* conn, uint8 ident)
 
 	return NULL;
 }
+
 
 status_t
 TimeoutSignal(L2capFrame* frame, uint32 timeo)
@@ -50,7 +52,8 @@ unTimeoutSignal(L2capFrame* frame)
 
 
 L2capFrame*
-SpawmFrame(HciConnection* conn, L2capChannel* channel, net_buffer* buffer, frame_type type)
+SpawmFrame(HciConnection* conn, L2capChannel* channel, net_buffer* buffer,
+	frame_type type)
 {
 	if (buffer == NULL)
 		panic("Null Buffer to outgoing queue");
@@ -74,7 +77,8 @@ SpawmFrame(HciConnection* conn, L2capChannel* channel, net_buffer* buffer, frame
 
 
 L2capFrame*
-SpawmSignal(HciConnection* conn, L2capChannel* channel, net_buffer* buffer, uint8 ident, uint8 code)
+SpawmSignal(HciConnection* conn, L2capChannel* channel, net_buffer* buffer,
+	uint8 ident, uint8 code)
 {
 	if (buffer == NULL)
 		panic("Null Buffer to outgoing queue");
@@ -106,13 +110,16 @@ AcknowledgeSignal(L2capFrame* frame)
 	if (frame != NULL) {
 
 		if (frame->type == L2CAP_C_FRAME) {
+			HciConnection* connection = frame->conn;
+
 			unTimeoutSignal(frame);
-			mutex_lock(&frame->conn->fLockExpected);
-			// frame->conn->ExpectedResponses.Remove(frame);
-			mutex_unlock(&frame->conn->fLockExpected);
+			mutex_lock(&connection->fLockExpected);
+			connection->ExpectedResponses.Remove(frame);
+			mutex_unlock(&connection->fLockExpected);
 		}
 
-		gBufferModule->free(frame->buffer);
+		// NO! This will be deleted by lower layers while being sent!
+		// gBufferModule->free(frame->buffer);
 		delete frame;
 
 		return B_OK;
