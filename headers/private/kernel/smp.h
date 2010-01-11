@@ -62,8 +62,37 @@ int32 smp_get_current_cpu(void);
 
 int smp_intercpu_int_handler(int32 cpu);
 
+void _acquire_spinlock(spinlock* lock);
+
 #ifdef __cplusplus
 }
 #endif
+
+
+// Unless spinlock debug features are enabled, try to inline
+// {acquire,release}_spinlock().
+#if !DEBUG_SPINLOCKS && !B_DEBUG_SPINLOCK_CONTENTION
+
+static inline void
+acquire_spinlock_inline(spinlock* lock)
+{
+	if (atomic_or((int32*)lock, 1) == 0)
+		return;
+	_acquire_spinlock(lock);
+}
+
+
+static inline void
+release_spinlock_inline(spinlock* lock)
+{
+	atomic_and((int32*)lock, 0);
+}
+
+
+#define acquire_spinlock(lock)	acquire_spinlock_inline(lock)
+#define release_spinlock(lock)	release_spinlock_inline(lock)
+
+#endif	// !DEBUG_SPINLOCKS && !B_DEBUG_SPINLOCK_CONTENTION
+
 
 #endif	/* KERNEL_SMP_H */
