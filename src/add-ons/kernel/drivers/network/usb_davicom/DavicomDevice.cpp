@@ -799,12 +799,15 @@ DavicomDevice::OnNotify(uint32 actualLength)
 	
 	bool linkIsUp = (fNotifyBuffer[0] & NSR_LINKST) != 0;
 
-	bool linkStateChange = linkIsUp != fHasConnection;
+	bool linkStateChange = (linkIsUp != fHasConnection);
 	fHasConnection = linkIsUp;
 
-	if(linkStateChange) {
-		TRACE("Link is now %s at %s Mb/s\n", 
-			fHasConnection ? "up" : "down", (fNotifyBuffer[0] & NSR_SPEED) ? "10" : "100");
+	if (linkStateChange) {
+		if (fHasConnection) {
+			TRACE("Link is now up at %s Mb/s\n", 
+				(fNotifyBuffer[0] & NSR_SPEED) ? "10" : "100");
+		} else
+			TRACE("Link is now down");
 	}
 
 	if (linkStateChange && fLinkStateChangeSem >= B_OK)
@@ -829,9 +832,9 @@ DavicomDevice::GetLinkState(ether_link_state *linkState)
 
 	linkState->quality = 1000;
 
-	uint16 mediumStatus = IFM_ETHER | IFM_100_TX;
+	linkState->media = IFM_ETHER | IFM_100_TX;
 	if (fHasConnection) {
-		mediumStatus |= IFM_ACTIVE;
+		linkState->media |= IFM_ACTIVE;
 		result = _ReadRegister(NCR, 1, &registerValue);
 		if (result != B_OK) {
 			TRACE_ALWAYS("Error reading NCR register! %x\n",result);
@@ -839,15 +842,13 @@ DavicomDevice::GetLinkState(ether_link_state *linkState)
 		}
 
 		if (registerValue & NCR_FDX)
-			mediumStatus |= IFM_FULL_DUPLEX;
+			linkState->media |= IFM_FULL_DUPLEX;
 		else
-			mediumStatus |= IFM_HALF_DUPLEX;
+			linkState->media |= IFM_HALF_DUPLEX;
 
 		if (registerValue & NCR_LBK)
-			mediumStatus |= IFM_LOOP;
+			linkState->media |= IFM_LOOP;
 	}
-
-	linkState->media = mediumStatus;
 
 	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n", 
 						(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
