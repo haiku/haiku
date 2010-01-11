@@ -379,7 +379,8 @@ LaunchButton::_UpdateToolTip()
 	if (fRef) {
 		BString helper(fRef->name);
 		if (fDescription.CountChars() > 0) {
-			helper << "\n\n" << fDescription.String();
+			if (fDescription != helper)
+				helper << "\n\n" << fDescription.String();		
 		} else {
 			BFile file(fRef, B_READ_ONLY);
 			BAppFileInfo appFileInfo;
@@ -387,7 +388,8 @@ LaunchButton::_UpdateToolTip()
 			if (appFileInfo.SetTo(&file) == B_OK
 				&& appFileInfo.GetVersionInfo(&info,
 					B_APP_VERSION_KIND) == B_OK
-				&& strlen(info.short_info) > 0) {
+				&& strlen(info.short_info) > 0
+				&& helper.Compare(info.short_info) != 0) {
 				helper << "\n\n" << info.short_info;
 			}
 		}
