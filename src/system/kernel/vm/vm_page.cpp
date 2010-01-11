@@ -2189,38 +2189,36 @@ allocate_page_run(page_num_t start, page_num_t length, int pageState,
 	T(AllocatePageRun(length));
 
 	// pull the pages out of the appropriate queues
+	VMPageQueue::PageList freePages;
+	VMPageQueue::PageList clearPages;
 	for (page_num_t i = 0; i < length; i++) {
 		vm_page& page = sPages[start + i];
 		DEBUG_PAGE_ACCESS_START(&page);
 		if (page.state == PAGE_STATE_CLEAR) {
-			page.is_cleared = true;
 			sClearPageQueue.Remove(&page);
+			clearPages.Add(&page);
 		} else {
-			page.is_cleared = false;
 			sFreePageQueue.Remove(&page);
+			freePages.Add(&page);
 		}
 
 		page.state = PAGE_STATE_BUSY;
+		page.usage_count = 1;
 	}
 
 	freeClearQueueLocker.Unlock();
 
-	// add the pages to the active queue
-	for (page_num_t i = 0; i < length; i++) {
-		vm_page& page = sPages[start + i];
-		sActivePageQueue.AppendUnlocked(&page);
-			// TODO: We could do this more efficiently, if we used a temporary
-			// on-stack queue and added all pages at once.
-		page.usage_count = 1;
-	}
-
 	// clear pages, if requested
 	if (pageState == PAGE_STATE_CLEAR) {
-		for (page_num_t i = 0; i < length; i++) {
-			if (!sPages[start + i].is_cleared)
-	 			clear_page(&sPages[start + i]);
+		for (VMPageQueue::PageList::Iterator it = freePages.GetIterator();
+				vm_page* page = it.Next();) {
+ 			clear_page(page);
 		}
 	}
+
+	// add pages to active queue
+	freePages.MoveFrom(&clearPages);
+	sActivePageQueue.AppendUnlocked(freePages, length);
 
 	// Note: We don't unreserve the pages since we pulled them out of the
 	// free/clear queues without adjusting sUnreservedFreePages.

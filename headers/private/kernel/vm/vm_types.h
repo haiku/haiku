@@ -96,11 +96,8 @@ struct vm_page {
 
 	uint8					type : 2;
 	uint8					state : 3;
-
-	uint8					is_cleared : 1;
-		// is currently only used in vm_page_allocate_page_run()
 	uint8					busy_writing : 1;
-	uint8					unused : 1;
+	uint8					unused : 2;
 		// used in VMAnonymousCache::Merge()
 
 	int8					usage_count;
