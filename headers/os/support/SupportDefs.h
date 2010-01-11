@@ -199,4 +199,30 @@ extern void*	get_stack_frame(void);
 #	define TRUE		1
 #endif
 
+
+/* Use the built-in atomic functions, if requested and available. */
+
+#if defined(B_USE_BUILTIN_ATOMIC_FUNCTIONS) && __GNUC__ >= 4
+
+#define atomic_test_and_set(valuePointer, newValue, testAgainst)	\
+	__sync_val_compare_and_swap(valuePointer, testAgainst, newValue)
+#define atomic_add(valuePointer, addValue)	\
+	__sync_fetch_and_add(valuePointer, addValue)
+#define atomic_and(valuePointer, andValue)	\
+	__sync_fetch_and_and(valuePointer, andValue)
+#define atomic_or(valuePointer, orValue)	\
+	__sync_fetch_and_or(valuePointer, orValue)
+#define atomic_get(valuePointer)	\
+	__sync_fetch_and_or(valuePointer, 0)
+	// No equivalent to atomic_get(). We simulate it via atomic or. On most
+	// (all?) 32+ bit architectures aligned 32 bit reads will be atomic anyway,
+	// though.
+
+// Note: No equivalent for atomic_set(). It could be simulated by a
+// get + atomic test and set loop, but calling the atomic_set() implementation
+// might be faster.
+
+#endif	// B_USE_BUILTIN_ATOMIC_FUNCTIONS && __GNUC__ >= 4
+
+
 #endif	/* _SUPPORT_DEFS_H */

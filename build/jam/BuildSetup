@@ -328,6 +328,11 @@ switch $(HAIKU_ARCH) {
 		HAIKU_C++FLAGS += -march=pentium ;
 		HAIKU_KERNEL_CCFLAGS += -march=pentium ;
 		HAIKU_KERNEL_C++FLAGS += -march=pentium ;
+
+		# Enable use of the gcc built-in atomic functions instead of atomic_*().
+		# The former are inlined and have thus less overhead. They are not
+		# available with gcc 2, but the header will take care of that.
+		HAIKU_DEFINES += B_USE_BUILTIN_ATOMIC_FUNCTIONS ;
 	}
 }
 
