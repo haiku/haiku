@@ -59,6 +59,8 @@ static	void				_NotifyCallback(void *cookie, int32 status,
 		status_t			_Write1Register(uint8 reg, uint8 buffer);
 
 static const int			kFrameSize = 1518;
+static const int			kRXHeaderSize = 3;
+static const int			kTXHeaderSize = 2;
 
 protected:
 		/* overrides */
@@ -101,7 +103,6 @@ static const int			kNotifyBufferSize = 8;
 		sem_id				fLinkStateChangeSem;
 		ether_address_t		fMACAddress;
 		bool				fHasConnection;
-		bool				fUseTRXHeader;
 		uint8				fIPG[3];
 };
 

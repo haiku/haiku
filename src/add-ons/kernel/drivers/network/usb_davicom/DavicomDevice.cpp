@@ -57,22 +57,6 @@
 //TODO: set media state support
 
 
-// frame header used during transfer data 
-struct TRXHeader {
-	uint16	fLength;
-	uint16	fInvertedLength;
-	
-	TRXHeader(uint16 length = 0){ SetLength(length); }
-	bool 	IsValid() { return (fLength ^ fInvertedLength) == 0xffff; }
-	uint16	Length()  { return fLength; }
-	//TODO: low-endian convertion?
-	void	SetLength(uint16 length) {
-				fLength = length;
-				fInvertedLength = ~fLength;
-			}
-};
-
-
 status_t
 DavicomDevice::_ReadRegister(uint8 reg, size_t size, uint8* buffer)
 {
@@ -125,8 +109,7 @@ DavicomDevice::DavicomDevice(usb_device device, const char *description)
 		fNotifyWriteSem(-1), 
 		fNotifyBuffer(NULL),
 		fLinkStateChangeSem(-1), 
-		fHasConnection(false),
-		fUseTRXHeader(false) 
+		fHasConnection(false)
 { 
 	const usb_device_descriptor
 			*deviceDescriptor = gUSBModule->get_device_descriptor(device);
@@ -251,23 +234,20 @@ DavicomDevice::Read(uint8 *buffer, size_t *numBytes)
 		
 	if (fRemoved) {
 		TRACE_ALWAYS("Error of receiving %d bytes from removed device.\n", 
-															numBytesToRead);
+			numBytesToRead);
 		return B_ERROR;
 	}
 
 	TRACE_FLOW("Request %d bytes.\n", numBytesToRead);
 
-	TRXHeader header;
+	uint8 header[kRXHeaderSize];
 	iovec rxData[] = {
-		{ &header, sizeof(TRXHeader) },
+		{ &header, kRXHeaderSize },
 		{ buffer,  numBytesToRead }
 	};
 
-	size_t startIndex = fUseTRXHeader ? 0 : 1 ;
-	size_t chunkCount = fUseTRXHeader ? 2 : 1 ;
-
 	status_t result = gUSBModule->queue_bulk_v(fReadEndpoint, 
-						&rxData[startIndex], chunkCount, _ReadCallback, this);
+		rxData, 1, _ReadCallback, this);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of queue_bulk_v request:%#010x\n", result);
 		return result;
@@ -282,37 +262,29 @@ DavicomDevice::Read(uint8 *buffer, size_t *numBytes)
 	
 	if (fStatusRead != B_OK && fStatusRead != B_CANCELED && !fRemoved) {
 		TRACE_ALWAYS("Device status error:%#010x\n", fStatusRead);
-		result = gUSBModule->clear_feature(fReadEndpoint,
-			USB_FEATURE_ENDPOINT_HALT);
-		if (result != B_OK) {
-			TRACE_ALWAYS("Error during clearing of HALT state:%#010x.\n", result);
-			return result;
-		}
+		return fStatusRead;
 	}
     
-	if(fUseTRXHeader) {
-		if(fActualLengthRead < sizeof(TRXHeader)) {
-			TRACE_ALWAYS("Error: no place for TRXHeader:only %d of %d bytes.\n", 
-										fActualLengthRead, sizeof(TRXHeader));
-			return B_ERROR; //TODO: ???
-		}
+	if(fActualLengthRead < kRXHeaderSize) {
+		TRACE_ALWAYS("Error: no place for TRXHeader:only %d of %d bytes.\n", 
+			fActualLengthRead, kRXHeaderSize);
+		return B_ERROR; //TODO: ???
+	}
+
+	/*
+	 * TODO :see what the first byte holds ?
+	if(!header.IsValid()) {
+		TRACE_ALWAYS("Error:TRX Header is invalid: len:%#04x; ilen:%#04x\n", 
+			header.fLength, header.fInvertedLength);
+		return B_ERROR; //TODO: ???
+	}
+	*/
 		
-		if(!header.IsValid()) {
-			TRACE_ALWAYS("Error:TRX Header is invalid: len:%#04x; ilen:%#04x\n", 
-							header.fLength, header.fInvertedLength);
-			return B_ERROR; //TODO: ???
-		}
-		
-		*numBytes = header.Length();
+	*numBytes = header[1] << 8 | header[2];
 
-		if(fActualLengthRead - sizeof(TRXHeader) > header.Length()) {
-			TRACE_ALWAYS("MISMATCH of the frame length: hdr %d; received:%d\n",
-						header.Length(), fActualLengthRead - sizeof(TRXHeader));
-		}
-
-	} else {
-
-		*numBytes = fActualLengthRead;
+	if(fActualLengthRead - kRXHeaderSize > *numBytes) {
+		TRACE_ALWAYS("MISMATCH of the frame length: hdr %d; received:%d\n",
+			*numBytes, fActualLengthRead - kRXHeaderSize);
 	}
 
 	TRACE_FLOW("Read %d bytes.\n", *numBytes);
@@ -334,17 +306,17 @@ DavicomDevice::Write(const uint8 *buffer, size_t *numBytes)
 
 	TRACE_FLOW("Write %d bytes.\n", numBytesToWrite);
 	
-	TRXHeader header(numBytesToWrite);
+	uint8 header[kTXHeaderSize];
+	header[0] = *numBytes >> 8;
+	header[1] = *numBytes & 0xFF;
+
 	iovec txData[] = {
-		{ &header, sizeof(TRXHeader) },
+		{ &header, kTXHeaderSize },
 		{ (uint8*)buffer, numBytesToWrite }
 	};
 	
-	size_t startIndex = fUseTRXHeader ? 0 : 1 ;
-	size_t chunkCount = fUseTRXHeader ? 2 : 1 ;
-	
 	status_t result = gUSBModule->queue_bulk_v(fWriteEndpoint, 
-						&txData[startIndex], chunkCount, _WriteCallback, this);
+		txData, 1, _WriteCallback, this);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of queue_bulk_v request:%#010x\n", result);
 		return result;
@@ -359,19 +331,10 @@ DavicomDevice::Write(const uint8 *buffer, size_t *numBytes)
 
 	if (fStatusWrite != B_OK && fStatusWrite != B_CANCELED && !fRemoved) {
 		TRACE_ALWAYS("Device status error:%#010x\n", fStatusWrite);
-		result = gUSBModule->clear_feature(fWriteEndpoint,
-			USB_FEATURE_ENDPOINT_HALT);
-		if (result != B_OK) {
-			TRACE_ALWAYS("Error during clearing of HALT state:%#010x\n", result);
-			return result;
-		}
+		return fStatusWrite;
 	}
 
-	if(fUseTRXHeader) {
-		*numBytes = fActualLengthWrite - sizeof(TRXHeader);
-	} else {
-		*numBytes = fActualLengthWrite;
-	}
+	*numBytes = fActualLengthWrite - kTXHeaderSize;;
 
 	TRACE_FLOW("Written %d bytes.\n", *numBytes);
 	return B_OK;
