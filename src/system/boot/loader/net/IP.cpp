@@ -112,7 +112,8 @@ IPService::HandleEthernetPacket(EthernetService *ethernet,
 		if (service->IPProtocol() == header->protocol) {
 			service->HandleIPPacket(this, ntohl(header->source),
 				ntohl(header->destination),
-				(uint8*)data + headerLength, size - headerLength);
+				(uint8*)data + headerLength,
+				ntohs(header->total_length) - headerLength);
 			break;
 		}
 	}
