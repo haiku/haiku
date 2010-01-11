@@ -843,8 +843,8 @@ page_scrubber(void *unused)
 		// and put them into the clear queue
 		for (int32 i = 0; i < scrubCount; i++) {
 			page[i]->state = PAGE_STATE_CLEAR;
-			sClearPageQueue.PrependUnlocked(page[i]);
 			DEBUG_PAGE_ACCESS_END(page[i]);
+			sClearPageQueue.PrependUnlocked(page[i]);
 		}
 
 		locker.Unlock();
@@ -1607,8 +1607,8 @@ steal_pages(vm_page **pages, size_t count)
 			if (steal_page(page)) {
 				ReadLocker locker(sFreePageQueuesLock);
 				page->state = PAGE_STATE_FREE;
-				sFreePageQueue.PrependUnlocked(page);
 				DEBUG_PAGE_ACCESS_END(page);
+				sFreePageQueue.PrependUnlocked(page);
 				locker.Unlock();
 
 				atomic_add(&sUnreservedFreePages, 1);
