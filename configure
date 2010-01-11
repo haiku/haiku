@@ -66,10 +66,10 @@ options:
   -j<n>                       Only relevant for --build-cross-tools and
                               --build-cross-tools-gcc4. Is passed on to the
                               make building the build tools.
-  --target=TARGET             Select build target platform. 
+  --target=TARGET             Select build target platform.
                               [default=${TARGET_PLATFORM}]
                               valid targets=r5,bone,dano,haiku
-  --update                    re-runs last configure invocation [must be given 
+  --update                    re-runs last configure invocation [must be given
                               as first option!]
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
                               process, but uses more memory.
@@ -459,7 +459,7 @@ for sfdiskDir in /sbin /usr/sbin /usr/local/sbin ; do
 	if [ -e ${sfdiskDir}/${SFDISK_BINARY} ]; then
 		HOST_SFDISK=${sfdiskDir}/${SFDISK_BINARY}
 	fi
-done	
+done
 
 # check for case-sensitive filesystem if on darwin
 if [ $HOST_PLATFORM = "darwin" ]; then
