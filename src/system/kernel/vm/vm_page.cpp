@@ -408,7 +408,7 @@ dump_page(int argc, char **argv)
 	kprintf("cache:           %p\n", page->cache);
 	kprintf("cache_offset:    %ld\n", page->cache_offset);
 	kprintf("cache_next:      %p\n", page->cache_next);
-	kprintf("type:            %d\n", page->type);
+	kprintf("is dummy:        %d\n", page->is_dummy);
 	kprintf("state:           %s\n", page_state_to_string(page->state));
 	kprintf("wired_count:     %d\n", page->wired_count);
 	kprintf("usage_count:     %d\n", page->usage_count);
@@ -861,7 +861,7 @@ page_scrubber(void *unused)
 static inline bool
 is_marker_page(struct vm_page *page)
 {
-	return page->type == PAGE_TYPE_DUMMY;
+	return page->is_dummy;
 }
 
 
@@ -1359,7 +1359,7 @@ page_writer(void* /*unused*/)
 	}
 
 	vm_page marker;
-	marker.type = PAGE_TYPE_DUMMY;
+	marker.is_dummy = true;
 	marker.cache = NULL;
 	marker.state = PAGE_STATE_UNUSED;
 #if DEBUG_PAGE_QUEUE
@@ -1586,7 +1586,7 @@ steal_pages(vm_page **pages, size_t count)
 {
 	while (true) {
 		vm_page marker;
-		marker.type = PAGE_TYPE_DUMMY;
+		marker.is_dummy = true;
 		marker.cache = NULL;
 		marker.state = PAGE_STATE_UNUSED;
 #if DEBUG_PAGE_QUEUE
@@ -1884,7 +1884,7 @@ vm_page_init(kernel_args *args)
 	// initialize the free page table
 	for (uint32 i = 0; i < sNumPages; i++) {
 		sPages[i].physical_page_number = sPhysicalPageOffset + i;
-		sPages[i].type = PAGE_TYPE_PHYSICAL;
+		sPages[i].is_dummy = false;
 		sPages[i].state = PAGE_STATE_FREE;
 		new(&sPages[i].mappings) vm_page_mappings();
 		sPages[i].wired_count = 0;

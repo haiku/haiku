@@ -2767,16 +2767,15 @@ dump_cache(int argc, char** argv)
 	if (showPages) {
 		for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 				vm_page* page = it.Next();) {
-			if (page->type == PAGE_TYPE_PHYSICAL) {
-				kprintf("\t%p ppn 0x%lx offset 0x%lx type %u state %u (%s) "
+			if (!page->is_dummy) {
+				kprintf("\t%p ppn 0x%lx offset 0x%lx state %u (%s) "
 					"wired_count %u\n", page, page->physical_page_number,
-					page->cache_offset, page->type, page->state,
+					page->cache_offset, page->state,
 					page_state_to_string(page->state), page->wired_count);
-			} else if(page->type == PAGE_TYPE_DUMMY) {
+			} else {
 				kprintf("\t%p DUMMY PAGE state %u (%s)\n",
 					page, page->state, page_state_to_string(page->state));
-			} else
-				kprintf("\t%p UNKNOWN PAGE type %u\n", page, page->type);
+			}
 		}
 	} else
 		kprintf("\t%ld in cache\n", cache->page_count);

@@ -94,21 +94,16 @@ struct vm_page {
 	vint32					accessing_thread;
 #endif
 
-	uint8					type : 2;
+	uint8					is_dummy : 1;
 	uint8					state : 3;
 	uint8					busy_writing : 1;
-	uint8					unused : 2;
 		// used in VMAnonymousCache::Merge()
+	uint8					unused : 3;
 
 	int8					usage_count;
 	uint16					wired_count;
 };
 
-enum {
-	PAGE_TYPE_PHYSICAL = 0,
-	PAGE_TYPE_DUMMY,
-	PAGE_TYPE_GUARD
-};
 
 enum {
 	PAGE_STATE_ACTIVE = 0,
