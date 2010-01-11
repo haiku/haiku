@@ -322,6 +322,13 @@ switch $(HAIKU_ARCH) {
 		HAIKU_KERNEL_CCFLAGS += -m68020-60 ;
 		HAIKU_KERNEL_C++FLAGS += -m68020-60 ;
 	}
+	case x86 :
+	{
+		HAIKU_CCFLAGS += -march=pentium ;
+		HAIKU_C++FLAGS += -march=pentium ;
+		HAIKU_KERNEL_CCFLAGS += -march=pentium ;
+		HAIKU_KERNEL_C++FLAGS += -march=pentium ;
+	}
 }
 
 # If the environment variable HAIKU_INCLUDE_PATENTED_CODE is defined, we
