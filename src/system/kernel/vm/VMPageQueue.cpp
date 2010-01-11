@@ -7,11 +7,16 @@
 #include "VMPageQueue.h"
 
 
+// #pragma mark - VMPageQueue
+
+
 void
-VMPageQueue::Init(const char* name, int lockingOrder)
+VMPageQueue::Init(const char* name)
 {
+	new(&fPages) PageList;
+
+	B_INITIALIZE_SPINLOCK(&fLock);
+
 	fName = name;
-	fLockingOrder = lockingOrder;
 	fCount = 0;
-	mutex_init(&fLock, fName);
 }

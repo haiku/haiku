@@ -13,6 +13,8 @@
 #include <util/DoublyLinkedList.h>
 
 #include <lock.h>
+#include <int.h>
+#include <util/AutoLock.h>
 #include <vm/vm_types.h>
 
 
@@ -24,15 +26,9 @@ public:
 	typedef PageList::ConstIterator Iterator;
 
 public:
-			void				Init(const char* name, int lockingOrder);
+			void				Init(const char* name);
 
 			const char*			Name() const	{ return fName; }
-			int					LockingOrder() const { return fLockingOrder; }
-
-	inline	bool				Lock();
-	inline	void				Unlock();
-
-	inline	void				LockMultiple(VMPageQueue* other);
 
 	inline	void				Append(vm_page* page);
 	inline	void				Prepend(vm_page* page);
@@ -40,6 +36,13 @@ public:
 									vm_page* page);
 	inline	void				Remove(vm_page* page);
 	inline	vm_page*			RemoveHead();
+	inline	void				Requeue(vm_page* page, bool tail);
+
+	inline	void				AppendUnlocked(vm_page* page);
+	inline	void				PrependUnlocked(vm_page* page);
+	inline	void				RemoveUnlocked(vm_page* page);
+	inline	vm_page*			RemoveHeadUnlocked();
+	inline	void				RequeueUnlocked(vm_page* page, bool tail);
 
 	inline	vm_page*			Head() const;
 	inline	vm_page*			Tail() const;
@@ -50,40 +53,17 @@ public:
 
 	inline	Iterator			GetIterator() const;
 
-private:
+	inline	spinlock&			GetLock()	{ return fLock; }
+
+protected:
 			const char*			fName;
-			int					fLockingOrder;
-			mutex				fLock;
+			spinlock			fLock;
 			uint32				fCount;
 			PageList			fPages;
 };
 
 
-bool
-VMPageQueue::Lock()
-{
-	return mutex_lock(&fLock) == B_OK;
-}
-
-
-void
-VMPageQueue::Unlock()
-{
-	mutex_unlock(&fLock);
-}
-
-
-void
-VMPageQueue::LockMultiple(VMPageQueue* other)
-{
-	if (fLockingOrder < other->fLockingOrder) {
-		Lock();
-		other->Lock();
-	} else {
-		other->Lock();
-		Lock();
-	}
-}
+// #pragma mark - VMPageQueue
 
 
 void
@@ -183,6 +163,61 @@ VMPageQueue::RemoveHead()
 }
 
 
+void
+VMPageQueue::Requeue(vm_page* page, bool tail)
+{
+#if DEBUG_PAGE_QUEUE
+	if (page->queue != this) {
+		panic("%p->VMPageQueue::Requeue(): page %p thinks it is in "
+			"queue %p", this, page, page->queue);
+	}
+#endif
+
+	fPages.Remove(page);
+	fPages.Add(page, tail);
+}
+
+
+void
+VMPageQueue::AppendUnlocked(vm_page* page)
+{
+	InterruptsSpinLocker locker(fLock);
+	Append(page);
+}
+
+
+void
+VMPageQueue::PrependUnlocked(vm_page* page)
+{
+	InterruptsSpinLocker locker(fLock);
+	Prepend(page);
+}
+
+
+void
+VMPageQueue::RemoveUnlocked(vm_page* page)
+{
+	InterruptsSpinLocker locker(fLock);
+	return Remove(page);
+}
+
+
+vm_page*
+VMPageQueue::RemoveHeadUnlocked()
+{
+	InterruptsSpinLocker locker(fLock);
+	return RemoveHead();
+}
+
+
+void
+VMPageQueue::RequeueUnlocked(vm_page* page, bool tail)
+{
+	InterruptsSpinLocker locker(fLock);
+	Requeue(page, tail);
+}
+
+
 vm_page*
 VMPageQueue::Head() const
 {
@@ -216,89 +251,6 @@ VMPageQueue::GetIterator() const
 {
 	return fPages.GetIterator();
 }
-
-
-// #pragma mark - VMPageQueuePairLocker
-
-
-struct VMPageQueuePairLocker {
-	VMPageQueuePairLocker()
-		:
-		fQueue1(NULL),
-		fQueue2(NULL)
-	{
-	}
-
-	VMPageQueuePairLocker(VMPageQueue& queue1, VMPageQueue& queue2)
-		:
-		fQueue1(&queue1),
-		fQueue2(&queue2)
-	{
-		_Lock();
-	}
-
-	~VMPageQueuePairLocker()
-	{
-		_Unlock();
-	}
-
-	void SetTo(VMPageQueue* queue1, VMPageQueue* queue2)
-	{
-		_Unlock();
-		fQueue1 = queue1;
-		fQueue2 = queue2;
-		_Lock();
-	}
-
-	void Unlock()
-	{
-		if (fQueue1 != NULL) {
-			fQueue1->Unlock();
-			fQueue1 = NULL;
-		}
-
-		if (fQueue2 != NULL) {
-			fQueue2->Unlock();
-			fQueue2 = NULL;
-		}
-	}
-
-private:
-	void _Lock()
-	{
-		if (fQueue1 == fQueue2) {
-			if (fQueue1 == NULL)
-				return;
-			fQueue1->Lock();
-			fQueue2 = NULL;
-		} else {
-			if (fQueue1 == NULL) {
-				fQueue2->Lock();
-			} else if (fQueue2 == NULL) {
-				fQueue1->Lock();
-			} else if (fQueue1->LockingOrder() < fQueue2->LockingOrder()) {
-				fQueue1->Lock();
-				fQueue2->Lock();
-			} else {
-				fQueue2->Lock();
-				fQueue1->Lock();
-			}
-		}
-	}
-
-	void _Unlock()
-	{
-		if (fQueue1 != NULL)
-			fQueue1->Unlock();
-
-		if (fQueue2 != NULL)
-			fQueue2->Unlock();
-	}
-
-private:
-	VMPageQueue*	fQueue1;
-	VMPageQueue*	fQueue2;
-};
 
 
 #endif	// VM_PAGE_QUEUE_H
