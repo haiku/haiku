@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -200,8 +200,7 @@ private:
 			bool				fIONotificationsEnabled;
 			bool				fSchedulerNotificationsRequested;
 			bool				fWaitObjectNotificationsRequested;
-			ConditionVariable	fProfilerWaitCondition;
-			bool				fProfilerWaiting;
+			struct thread* volatile fWaitingProfilerThread;
 			bool				fProfilingActive;
 			bool				fReentered[B_MAX_CPU_COUNT];
 			CPUProfileData		fCPUData[B_MAX_CPU_COUNT];
@@ -218,11 +217,11 @@ inline void
 SystemProfiler::_MaybeNotifyProfilerThreadLocked()
 {
 	// If the buffer is full enough, notify the profiler.
-	if (fProfilerWaiting && fBufferSize > fBufferCapacity / 2) {
-		fProfilerWaiting = false;
+	if (fWaitingProfilerThread != NULL && fBufferSize > fBufferCapacity / 2) {
 		int cpu = smp_get_current_cpu();
 		fReentered[cpu] = true;
-		fProfilerWaitCondition.NotifyOne(true);
+		thread_unblock_locked(fWaitingProfilerThread, B_OK);
+		fWaitingProfilerThread = NULL;
 		fReentered[cpu] = false;
 	}
 }
@@ -231,7 +230,7 @@ SystemProfiler::_MaybeNotifyProfilerThreadLocked()
 inline void
 SystemProfiler::_MaybeNotifyProfilerThread()
 {
-	if (!fProfilerWaiting)
+	if (fWaitingProfilerThread == NULL)
 		return;
 
 	InterruptsSpinLocker threadsLocker(gThreadSpinlock);
@@ -267,7 +266,7 @@ SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 	fIONotificationsEnabled(false),
 	fSchedulerNotificationsRequested(false),
 	fWaitObjectNotificationsRequested(false),
-	fProfilerWaiting(false),
+	fWaitingProfilerThread(NULL),
 	fWaitObjectBuffer(NULL),
 	fWaitObjectCount(0),
 	fUsedWaitObjects(),
@@ -275,7 +274,6 @@ SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 	fWaitObjectTable()
 {
 	B_INITIALIZE_SPINLOCK(&fLock);
-	fProfilerWaitCondition.Init(this, "system profiler");
 
 	memset(fReentered, 0, sizeof(fReentered));
 
@@ -296,9 +294,9 @@ SystemProfiler::~SystemProfiler()
 	// Wake up the user thread, if it is waiting, and mark profiling
 	// inactive.
 	InterruptsSpinLocker locker(fLock);
-	if (fProfilerWaiting) {
-		fProfilerWaiting = false;
-		fProfilerWaitCondition.NotifyAll();
+	if (fWaitingProfilerThread != NULL) {
+		thread_unblock_locked(fWaitingProfilerThread, B_OK);
+		fWaitingProfilerThread = NULL;
 	}
 	fProfilingActive = false;
 	locker.Unlock();
@@ -527,8 +525,10 @@ SystemProfiler::NextBuffer(size_t bytesRead, uint64* _droppedEvents)
 {
 	InterruptsSpinLocker locker(fLock);
 
-	if (fProfilerWaiting || !fProfilingActive || bytesRead > fBufferSize)
+	if (fWaitingProfilerThread != NULL || !fProfilingActive
+		|| bytesRead > fBufferSize) {
 		return B_BAD_VALUE;
+	}
 
 	fBufferSize -= bytesRead;
 	fBufferStart += bytesRead;
@@ -543,24 +543,24 @@ SystemProfiler::NextBuffer(size_t bytesRead, uint64* _droppedEvents)
 
 	// Wait until the buffer gets too full or an error or a timeout occurs.
 	while (true) {
-		ConditionVariableEntry waitEntry;
-		fProfilerWaitCondition.Add(&waitEntry);
+		struct thread* thread = thread_get_current_thread();
+		fWaitingProfilerThread = thread;
 
-		fProfilerWaiting = true;
+		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
+			THREAD_BLOCK_TYPE_OTHER, "system profiler buffer");
 
 		locker.Unlock();
 
-		status_t error = waitEntry.Wait(
-			B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, 1000000);
+		status_t error = thread_block_with_timeout(B_RELATIVE_TIMEOUT, 1000000);
 
 		locker.Lock();
 
 		if (error == B_OK) {
-			// the caller has unset fProfilerWaiting for us
+			// the caller has unset fWaitingProfilerThread for us
 			break;
 		}
 
-		fProfilerWaiting = false;
+		fWaitingProfilerThread = NULL;
 
 		if (error != B_TIMED_OUT)
 			return error;
