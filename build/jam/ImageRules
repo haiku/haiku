@@ -1229,7 +1229,11 @@ rule BuildFloppyBootImage image : haikuLoader : archive
 	BuildFloppyBootImage1 $(image) : $(haikuLoader) $(archive) ;
 	if $(HAIKU_BOOT_PLATFORM) = atari_m68k {
 		Depends $(image) : <build>fixup_tos_boot_checksum ;
-		BuildFloppyBootImageAtariM68K $(image) : <build>fixup_tos_boot_checksum ;
+		BuildFloppyBootImageFixupM68K $(image) : <build>fixup_tos_boot_checksum ;
+	}
+	if $(HAIKU_BOOT_PLATFORM) = amiga_m68k {
+		Depends $(image) : <build>fixup_amiga_boot_checksum ;
+		BuildFloppyBootImageFixupM68K $(image) : <build>fixup_amiga_boot_checksum ;
 	}
 }
 
@@ -1244,7 +1248,7 @@ actions BuildFloppyBootImage1
 	dd if=$(>[2]) of=$(<) bs=$(ARCHIVE_IMAGE_OFFSET)k seek=1 conv=notrunc
 }
 
-actions BuildFloppyBootImageAtariM68K
+actions BuildFloppyBootImageFixupM68K
 {
 	# fixup the boot sector checksum
 	$(>[1]) $(<)
