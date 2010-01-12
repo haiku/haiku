@@ -19,7 +19,7 @@ public:
 	
 	const char* GetDriverName() const 
 	{ 
-		return "Canon LIPS4 Compatible"; 
+		return "Canon LIPS4 compatible"; 
 	}
 	
 	const char* GetVersion() const    

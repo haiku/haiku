@@ -20,7 +20,7 @@ public:
 	
 	const char* GetDriverName() const 
 	{ 
-		return "PS Compatible"; 
+		return "PS compatible"; 
 	}
 	
 	const char* GetVersion() const    

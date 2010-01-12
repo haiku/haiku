@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku. All rights reserved.
+ * Copyright 2003-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -90,14 +90,14 @@ static struct
 
 
 PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
-	:	BlockingWindow(BRect(0,0,400,220), "Page Setup", B_TITLED_WINDOW_LOOK,
+	:	BlockingWindow(BRect(0,0,400,220), "Page setup", B_TITLED_WINDOW_LOOK,
  			B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
  			B_NOT_ZOOMABLE),
 	fSetupMsg(msg),
 	fPrinterDirName(printerName)
 {
 	if (printerName)
-		SetTitle(BString(printerName).Append(" Page Setup").String());
+		SetTitle(BString(printerName).Append(" Page setup").String());
 
 	// load orientation
 	if (fSetupMsg->FindInt32("orientation", &fCurrentOrientation) != B_OK)
@@ -147,12 +147,12 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	panel->AddChild(fMarginView);
 	fMarginView->SetResizingMode(B_FOLLOW_NONE);
 
-	BPopUpMenu* m = new BPopUpMenu("Page Size");
+	BPopUpMenu* m = new BPopUpMenu("Page size");
 	m->SetRadioMode(true);
 
 	bounds.OffsetBy(bounds.Width() + 10.0, 5.0);
 	float divider = be_plain_font->StringWidth("Orientation: ");
-	fPageSizeMenu = new BMenuField(bounds, "page_size", "Page Size:", m);
+	fPageSizeMenu = new BMenuField(bounds, "page_size", "Page size:", m);
 	panel->AddChild(fPageSizeMenu);
 	fPageSizeMenu->ResizeToPreferred();
 	fPageSizeMenu->SetDivider(divider);

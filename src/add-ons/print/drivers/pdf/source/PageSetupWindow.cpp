@@ -92,7 +92,7 @@ static const char *pdf_compatibility[] = { "1.3", "1.4", NULL };
 
 
 PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
-	: HWindow(BRect(0,0,400,220), "Page Setup", B_TITLED_WINDOW_LOOK,
+	: HWindow(BRect(0,0,400,220), "Page setup", B_TITLED_WINDOW_LOOK,
  		B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
  		B_NOT_ZOOMABLE),
 	 fResult(B_ERROR),
@@ -103,7 +103,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	fExitSem 	= create_sem(0, "PageSetup");
 
 	if (printerName)
-		SetTitle(BString(printerName).Append(" Page Setup").String());
+		SetTitle(BString(printerName).Append(" Page setup").String());
 
 	if (fSetupMsg->FindInt32("orientation", &fCurrentOrientation) != B_OK)
 		fCurrentOrientation = PrinterDriver::PORTRAIT_ORIENTATION;
@@ -165,12 +165,12 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	panel->AddChild(fMarginView);
 	fMarginView->SetResizingMode(B_FOLLOW_NONE);
 
-	BPopUpMenu* m = new BPopUpMenu("Page Size");
+	BPopUpMenu* m = new BPopUpMenu("Page size");
 	m->SetRadioMode(true);
 
 	bounds.OffsetBy(bounds.Width() + 10.0, 5.0);
-	float divider = be_plain_font->StringWidth("PDF Compatibility: ");
-	fPageSizeMenu = new BMenuField(bounds, "page_size", "Page Size:", m);
+	float divider = be_plain_font->StringWidth("PDF compatibility: ");
+	fPageSizeMenu = new BMenuField(bounds, "page_size", "Page size:", m);
 	panel->AddChild(fPageSizeMenu);
 	fPageSizeMenu->ResizeToPreferred();
 	fPageSizeMenu->SetDivider(divider);
@@ -207,12 +207,12 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 			item->SetMarked(true);
 	}
 
-	m = new BPopUpMenu("PDF Compatibility");
+	m = new BPopUpMenu("PDF compatibility");
 	m->SetRadioMode(true);
 
 	bounds.OffsetBy(0.0, fOrientationMenu->Bounds().Height() + 10.0);
 	fPDFCompatibilityMenu = new BMenuField(bounds, "pdf_compatibility",
-		"PDF Compatibility:", m);
+		"PDF compatibility:", m);
 	panel->AddChild(fPDFCompatibilityMenu);
 	fPDFCompatibilityMenu->ResizeToPreferred();
 	fPDFCompatibilityMenu->SetDivider(divider);

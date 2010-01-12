@@ -20,7 +20,7 @@ public:
 	
 	const char* GetDriverName() const 
 	{ 
-		return "PCL5 Compatible"; 
+		return "PCL5 compatible"; 
 	}
 	
 	const char* GetVersion() const    
