@@ -288,8 +288,6 @@ MediaExtractor::GetNextChunk(int32 stream, const void** _chunkBuffer,
 		return info.status;
 
 #if DISABLE_CHUNK_CACHE
-	static BLocker locker("media extractor next chunk");
-	BAutolock lock(locker);
 	return fReader->GetNextChunk(fStreamInfo[stream].cookie, _chunkBuffer,
 		_chunkSize, mediaHeader);
 #else
