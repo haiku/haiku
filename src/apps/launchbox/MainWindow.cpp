@@ -209,6 +209,7 @@ MainWindow::MessageReceived(BMessage* message)
 					if (ref) {
 						BString helper("Description for '");
 						helper << ref->name << "'";
+						make_sure_frame_is_on_screen(fNamePanelFrame, this);
 						new NamePanel(helper.String(), button->Description(),
 							this, this, new BMessage(*message),
 							fNamePanelFrame);
