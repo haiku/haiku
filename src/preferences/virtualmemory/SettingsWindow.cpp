@@ -75,7 +75,7 @@ byte_string(int64 size)
 		} while (value >= 1024 && units[i + 1]);
 
 		off_t rounded = off_t(value * 100LL);
-		sprintf(string, "%g %sB", rounded / 100.0, TR(units[i]));
+		sprintf(string, "%g %s", rounded / 100.0, TR(units[i]));
 	}
 
 	return string;
@@ -168,30 +168,29 @@ SettingsWindow::SettingsWindow()
 		B_WILL_DRAW | B_FRAME_EVENTS);
 	fSizeSlider->SetLimitLabels(TR("999 MB"), TR("999 MB"));
 	fSizeSlider->SetViewColor(255, 0, 255);
-	box->AddChild(fSizeSlider);
 
 	fWarningStringView = new BStringView("", "");
 	fWarningStringView->SetAlignment(B_ALIGN_CENTER);
 
 	view->SetLayout(new BGroupLayout(B_HORIZONTAL)); 
 	view->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10) 
-		.AddGroup(B_HORIZONTAL) 
-			.Add(memoryView) 
-			.AddGlue() 
-		.End() 
-		.AddGroup(B_HORIZONTAL) 
-			.Add(swapfileView) 
-			.AddGlue() 
-		.End() 
-		.AddGroup(B_HORIZONTAL) 
-			.Add(field) 
-			.AddGlue() 
-		.End() 
-		.Add(fSizeSlider) 
-		.Add(fWarningStringView) 
-		.SetInsets(10, 10, 10, 10) 
-	); 
-	box->AddChild(view); 
+		.AddGroup(B_HORIZONTAL)
+			.Add(memoryView)
+			.AddGlue()
+		.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(swapfileView)
+			.AddGlue()
+		.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(field)
+			.AddGlue()
+		.End()
+		.Add(fSizeSlider)
+		.Add(fWarningStringView)
+		.SetInsets(10, 10, 10, 10)
+	);
+	box->AddChild(view);
 
 	// Add "Defaults" and "Revert" buttons
 
