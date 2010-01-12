@@ -413,6 +413,7 @@ dump_page(int argc, char **argv)
 	kprintf("wired_count:     %d\n", page->wired_count);
 	kprintf("usage_count:     %d\n", page->usage_count);
 	kprintf("busy_writing:    %d\n", page->busy_writing);
+	kprintf("modified:        %d\n", page->modified);
 	#if DEBUG_PAGE_QUEUE
 		kprintf("queue:           %p\n", page->queue);
 	#endif
@@ -2168,6 +2169,7 @@ vm_page_allocate_page(int pageState)
 	int oldPageState = page->state;
 	page->state = PAGE_STATE_BUSY;
 	page->usage_count = 2;
+	page->modified = 0;
 
 	locker.Unlock();
 
@@ -2204,6 +2206,7 @@ allocate_page_run(page_num_t start, page_num_t length, int pageState,
 
 		page.state = PAGE_STATE_BUSY;
 		page.usage_count = 1;
+		page.modified = 0;
 	}
 
 	freeClearQueueLocker.Unlock();
