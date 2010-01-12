@@ -256,6 +256,9 @@ void
 BListView::TargetedByScrollView(BScrollView *view)
 {
 	fScrollView = view;
+	// TODO: We could SetFlags(Flags() | B_FRAME_EVENTS) here, but that
+	// may mess up application code which manages this by some other means
+	// and doesn't want us to be messing with flags.
 }
 
 
