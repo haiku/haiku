@@ -52,6 +52,7 @@ TGAView::TGAView(const BRect& frame, const char* name, uint32 resize,
 	fpchkIgnoreAlpha->SetValue(val);
 	fpchkIgnoreAlpha->SetViewColor(ViewColor());
 	AddChild(fpchkIgnoreAlpha);
+	fpchkIgnoreAlpha->ResizeToPreferred();
 
 	fpchkRLE = new BCheckBox(BRect(10, 67, 180, 84),
 		"Save with RLE Compression", "Save with RLE Compression",
@@ -60,6 +61,7 @@ TGAView::TGAView(const BRect& frame, const char* name, uint32 resize,
 	fpchkRLE->SetValue(val);
 	fpchkRLE->SetViewColor(ViewColor());
 	AddChild(fpchkRLE);
+	fpchkRLE->ResizeToPreferred();
 }
 
 
