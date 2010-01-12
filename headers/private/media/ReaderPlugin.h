@@ -17,9 +17,9 @@ class Reader {
 public:
 								Reader();
 	virtual						~Reader();
-	
+
 	virtual	const char*			Copyright() = 0;
-	
+
 	virtual	status_t			Sniff(int32* streamCount) = 0;
 
 	virtual	void				GetFileFormatInfo(media_file_format* mff) = 0;
@@ -27,7 +27,7 @@ public:
 	virtual	status_t			AllocateCookie(int32 streamNumber,
 									void** cookie) = 0;
 	virtual	status_t			FreeCookie(void* cookie) = 0;
-	
+
 	virtual	status_t			GetStreamInfo(void* cookie, int64* frameCount,
 									bigtime_t *duration, media_format* format,
 									const void** infoBuffer,
@@ -41,7 +41,7 @@ public:
 	virtual	status_t			GetNextChunk(void* cookie,
 									const void** chunkBuffer, size_t* chunkSize,
 									media_header* mediaHeader) = 0;
-	
+
 			BDataIO*			Source() const;
 
 	virtual status_t			Perform(perform_code code, void* data);

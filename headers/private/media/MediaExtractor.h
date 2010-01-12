@@ -1,7 +1,8 @@
 /*
- * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
- * Copyright 2008, Maurice Kalinowski. All rights reserved.
+ * Copyright 2009-2010, Stephan Aßmus <supertippi@gmx.de>. All rights reserved.
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008, Maurice Kalinowski. All rights reserved.
+ * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -51,8 +52,8 @@ public:
 			int64				CountFrames(int32 stream) const;
 			bigtime_t			Duration(int32 stream) const;
 
-			status_t			Seek(int32 stream, uint32 seekTo, int64* _frame,
-									bigtime_t* _time);
+			status_t			Seek(int32 stream, uint32 seekTo,
+									int64* _frame, bigtime_t* _time);
 			status_t			FindKeyFrame(int32 stream, uint32 seekTo,
 									int64* _frame, bigtime_t* _time) const;
 
