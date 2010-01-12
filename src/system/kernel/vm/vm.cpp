@@ -1974,6 +1974,9 @@ virtual_page_address(VMArea* area, vm_page* page)
 bool
 vm_test_map_modification(vm_page* page)
 {
+	if (page->modified)
+		return true;
+
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
 	vm_page_mapping* mapping;
 	while ((mapping = iterator.Next()) != NULL) {
@@ -2001,7 +2004,7 @@ int32
 vm_test_map_activation(vm_page* page, bool* _modified)
 {
 	int32 activation = 0;
-	bool modified = false;
+	bool modified = page->modified;
 
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
 	vm_page_mapping* mapping;
@@ -2034,6 +2037,9 @@ vm_test_map_activation(vm_page* page, bool* _modified)
 void
 vm_clear_map_flags(vm_page* page, uint32 flags)
 {
+	if ((flags & PAGE_MODIFIED) != 0)
+		page->modified = false;
+
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
 	vm_page_mapping* mapping;
 	while ((mapping = iterator.Next()) != NULL) {
@@ -2056,6 +2062,8 @@ void
 vm_remove_all_page_mappings(vm_page* page, uint32* _flags)
 {
 	uint32 accumulatedFlags = 0;
+	if (page->modified)
+		accumulatedFlags |= PAGE_MODIFIED;
 
 	vm_page_mappings queue;
 	queue.MoveFrom(&page->mappings);
@@ -2095,7 +2103,7 @@ vm_remove_all_page_mappings(vm_page* page, uint32* _flags)
 
 
 /*!	If \a preserveModified is \c true, the caller must hold the lock of the
-	page's cache and the page must not be busy.
+	page's cache.
 */
 bool
 vm_unmap_page(VMArea* area, addr_t virtualAddress, bool preserveModified)
@@ -2127,8 +2135,8 @@ vm_unmap_page(VMArea* area, addr_t virtualAddress, bool preserveModified)
 		map->ops->flush(map);
 
 		status = map->ops->query(map, virtualAddress, &physicalAddress, &flags);
-		if ((flags & PAGE_MODIFIED) != 0 && page->state != PAGE_STATE_MODIFIED)
-			vm_page_set_state(page, PAGE_STATE_MODIFIED);
+		if ((flags & PAGE_MODIFIED) != 0)
+			page->modified = true;
 	}
 
 	vm_page_mapping* mapping = NULL;
@@ -2162,9 +2170,7 @@ vm_unmap_page(VMArea* area, addr_t virtualAddress, bool preserveModified)
 
 
 /*!	If \a preserveModified is \c true, the caller must hold the lock of all
-	mapped pages' caches and none of the pages must be busy.
-	TODO: Particularly the latter is very inconvenient. See the TODOs below for
-	reasons for this requirement.
+	mapped pages' caches.
 */
 status_t
 vm_unmap_pages(VMArea* area, addr_t base, size_t size, bool preserveModified)
@@ -2214,18 +2220,8 @@ vm_unmap_pages(VMArea* area, addr_t base, size_t size, bool preserveModified)
 					physicalAddress);
 			}
 
-			DEBUG_PAGE_ACCESS_START(page);
-				// TODO: No guarantee for that. See below.
-
-			if ((flags & PAGE_MODIFIED) != 0
-				&& page->state != PAGE_STATE_MODIFIED) {
-				vm_page_set_state(page, PAGE_STATE_MODIFIED);
-					// TODO: We are only allowed to do this, if (a) we have also
-					// locked the cache and (b) the page is not busy! Not doing
-					// it is problematic, too, since we'd lose information.
-			}
-
-			DEBUG_PAGE_ACCESS_END(page);
+			if ((flags & PAGE_MODIFIED) != 0)
+				page->modified = true;
 		}
 	}
 
