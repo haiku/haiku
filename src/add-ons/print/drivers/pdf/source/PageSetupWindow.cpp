@@ -103,7 +103,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	fExitSem 	= create_sem(0, "PageSetup");
 
 	if (printerName)
-		SetTitle(BString(printerName).Append(" Page setup").String());
+		SetTitle(BString(printerName).Append(" page setup").String());
 
 	if (fSetupMsg->FindInt32("orientation", &fCurrentOrientation) != B_OK)
 		fCurrentOrientation = PrinterDriver::PORTRAIT_ORIENTATION;
