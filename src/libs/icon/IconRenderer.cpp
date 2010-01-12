@@ -123,7 +123,7 @@ IconRenderer::StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 	}
 
 	Style* style = styleItem->style;
-	Gradient* gradient = style->Gradient();		
+	Gradient* gradient = style->Gradient();
 	const agg::rgba8* colors = style->GammaCorrectedColors(fGammaTable);
 
 	switch (gradient->Type()) {
@@ -175,8 +175,8 @@ IconRenderer::StyleHandler::_GenerateGradient(agg::rgba8* span, int x, int y,
 {
 	typedef agg::pod_auto_array<agg::rgba8, 256>	ColorArray;
 	typedef agg::span_interpolator_linear<>			Interpolator;
-	typedef agg::span_gradient<agg::rgba8, 
-							   Interpolator, 
+	typedef agg::span_gradient<agg::rgba8,
+							   Interpolator,
 							   GradientFunction,
 							   ColorArray>			GradientGenerator;
 
@@ -232,8 +232,8 @@ IconRenderer::IconRenderer(BBitmap* bitmap)
 		bitmap->Bounds().IntegerWidth() + 1,
 		bitmap->Bounds().IntegerHeight() + 1, bitmap->BytesPerRow());
 
-	fBaseRendererPre.clip_box(0, 0, fBitmap->Bounds().IntegerWidth(),
-		fBitmap->Bounds().IntegerHeight());
+	fBaseRendererPre.clip_box(0, 0, bitmap->Bounds().IntegerWidth(),
+		bitmap->Bounds().IntegerHeight());
 }
 
 // destructor
