@@ -313,8 +313,12 @@ BMediaTrack::ReadFrames(void* buffer, int64* _frameCount,
 		result = fDecoder->Decode(buffer, _frameCount, _header, info);
 	if (result == B_OK) {
 		fCurrentFrame += *_frameCount;
-		fCurrentTime = _header->start_time
-			+ *_frameCount * 1000000LL / _FrameRate();
+		// TODO: This changes the meaning of fCurrentTime from pointing
+		// to the next chunk start time (i.e. after seeking) to the start time
+		// of the last chunk. Asking the extractor for the current time will
+		// not work so well because of the chunk cache. But providing a
+		// "duration" field in the media_header could be useful.
+		fCurrentTime = fCurrentTime = _header->start_time;
 	} else {
 		ERROR("BMediaTrack::ReadFrames: decoder returned error 0x%08lx (%s)\n",
 			result, strerror(result));
@@ -520,13 +524,14 @@ BMediaTrack::ReadChunk(char** _buffer, int32* _size, media_header* _header)
 		*_buffer = const_cast<char*>(static_cast<const char*>(buffer));
 			// TODO: Change the pointer type when we break the API.
 		*_size = size;
-		// Several chunks may belong to the same frame. If the start time is
-		// different from the previous chunk's time, the next chunk will belong
-		// to the next frame.
-		if (fCurrentTime != _header->start_time) {
-			fCurrentFrame++;
-			fCurrentTime = _header->start_time + 1000000LL / _FrameRate();
-		}
+		// TODO: This changes the meaning of fCurrentTime from pointing
+		// to the next chunk start time (i.e. after seeking) to the start time
+		// of the last chunk. Asking the extractor for the current time will
+		// not work so well because of the chunk cache. But providing a
+		// "duration" field in the media_header could be useful.
+		fCurrentTime = fCurrentTime = _header->start_time;
+		fCurrentFrame = fCurrentTime * _FrameRate() / 1000000LL;
+
 	}
 
 	return result;
