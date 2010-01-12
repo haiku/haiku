@@ -804,8 +804,8 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	if (diskSystemName != "Be File System"
 		&& diskSystemName != "Intel Partition Map"
 		&& diskSystemName != "Intel Extended Partition") {
-		_DisplayPartitionError("Don't know how to construct parameters "
-			"for this file system.");
+		_DisplayPartitionError("Don't know how to gather initialization "
+			"parameters for this file system.");
 		return;
 	}
 
