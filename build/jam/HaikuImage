@@ -54,8 +54,8 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	safemode screen_blanker screenmode sdiff sed setdecor settype setversion
 	setvolume seq sha1sum shar shred shuf shutdown sleep sort spamdbm split
 	stat strace stty su sum sync sysinfo
-	tac tail tar tcpdump tcptester tee telnet telnetd test timeout top touch tput
-	tr traceroute translate trash true truncate tsort tty
+	tac tail tar tcpdump tcptester tee telnet telnetd test timeout top touch
+	tput tr traceroute translate trash true truncate tsort tty
 	uname unchop unexpand unmount uniq unlink unrar unshar unzip unzipsfx
 	<bin>updatedb uptime urlwrapper useradd uudecode uuencode
 	vdir version vim vmstat waitfor watch wc wget whoami xargs xres yes
@@ -122,7 +122,8 @@ SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	TIFFTranslator WonderBrushTranslator
 ;
 SYSTEM_ADD_ONS_LOCALE_CATALOGS = <catalog-addon>zeta <catalog-addon>plaintext ;
-SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon cortex_flanger.media_addon
+SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
+	cortex_flanger.media_addon
 	dvb.media_addon
 	hmulti_audio.media_addon
 	mixer.media_addon
@@ -292,6 +293,8 @@ AddFilesToHaikuImage system demos		: $(SYSTEM_DEMOS) ;
 
 SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToHaikuImage system bin			: which ;
+SEARCH on installoptionalpackage = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToHaikuImage system bin			: installoptionalpackage ;
 
 AddSymlinkToHaikuImage system bin : bash : sh ;
 AddSymlinkToHaikuImage system bin : trash : untrash ;
@@ -356,8 +359,8 @@ AddSymlinkToHaikuImage system bin : vim : view ;
 
 
 # scripts and data files
-local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript InstallerInitScript
-	InstallerFinishScript ;
+local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript
+	InstallerInitScript InstallerFinishScript ;
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToHaikuImage system boot : $(bootScripts) ;
 
@@ -399,7 +402,8 @@ AddFilesToHaikuImage common etc : $(etcFiles) ;
 
 SEARCH on <bash_completion>subversion =
 	[ FDirName $(HAIKU_TOP) data etc bash_completion.d ] ;
-AddFilesToHaikuImage common etc bash_completion.d : <bash_completion>subversion ;
+AddFilesToHaikuImage common etc bash_completion.d :
+	<bash_completion>subversion ;
 
 SEARCH on <etc>vimrc = [ FDirName $(HAIKU_TOP) data etc vim ] ;
 AddFilesToHaikuImage common etc vim : <etc>vimrc ;
@@ -480,7 +484,8 @@ AddBootModuleSymlinksToHaikuImage
 	$(IDE_ONLY)ide scsi usb
 	$(PPC_ONLY)openpic
 	$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph
-	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112 $(X86_ONLY)ide_isa
+	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112
+	$(X86_ONLY)ide_isa
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
 	intel
@@ -507,8 +512,8 @@ AddFilesToHaikuImage system add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToHaikuImage system add-ons media plugins
 	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 AddFilesToHaikuImage system add-ons Tracker
-	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O Open\ Terminal-T
-	ZipOMatic-Z ;
+	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O
+	Open\ Terminal-T ZipOMatic-Z ;
 AddSymlinkToHaikuImage system add-ons Tracker
 	: /boot/system/preferences/Backgrounds : Background-B ;
 AddSymlinkToHaikuImage system add-ons Tracker

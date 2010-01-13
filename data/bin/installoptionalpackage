@@ -1,0 +1,645 @@
+#!/bin/sh
+#
+# Copyright (c) 2009 Haiku Inc. All rights reserved.
+# Distributed under the terms of the MIT License.
+#
+# Authors:
+#		Matt Madia, mattmadia@gmail.com
+#
+# Synopsis: 
+#	Provides a controlled mechanism for end-users to install certain pre-built 
+#	OptionalPackages. The script will determine the host information: the 
+#	default GCC, availability of secondary GCC libs, and revision. Using this 
+#	information, the user will be limited to the appropriate OptionalPackages
+#	that were available for that specific revision.
+#
+# Disclaimer:
+#   This is a temporary solution for installing OptionalPackages.
+#   In time, there will be an official package manager.
+#   See these URL's for info on the in-development package manager.
+#     http://dev.haiku-os.org/wiki/PackageManagerIdeas
+#     http://dev.haiku-os.org/wiki/PackageFormat
+#
+# Usage: ./installoptionalpackage [-l] [-a]
+# -l      List installable packages
+# -a      Add a package and all of its dependencies
+
+
+declare -a packagesToInstall	
+declare -a availablePackages
+# Some Packages cannot be installed,
+# as they require either the source code or compiled binaries
+declare -a packageIgnoreList=( 'Bluetooth' 'Development' 'DevelopmentMin' \
+	'DevelopmentBase' 'P7zip' 'UserlandFS' 'Welcome')
+
+
+function CreateInstallerScript()
+{
+	# This function will create a secondary script, containing all of the
+	# information needed to install the optional package and its dependencies
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	cat << EOF > ${tmpDir}/install-optpkg.sh
+#!/bin/sh
+
+tmpDir=${tmpDir}
+HAIKU_GCC_VERSION[1]=${HAIKU_GCC_VERSION[1]}
+isHybridBuild=${isHybridBuild}
+TARGET_ARCH=${TARGET_ARCH}
+HAIKU_IMAGE_HOST_NAME=`uname -n`
+$urlLine
+$sslPkgLine
+$sslUrlLine
+declare -a functionArgs
+
+
+function ParseFunctionArguments()
+{
+	# ParseFunctionArguments <args>
+	# Parse arguments for Jam wrapper functions into an array.
+	IN="\$@"
+ 	OIFS=\$IFS
+ 	IFS=":"
+ 	
+ 	local count=0
+	functionArgs=( )
+	for x in \$IN
+	do
+		functionArgs[\${count}]="\${x}"
+		((count++))
+	done
+ 	IFS=\$OIFS
+}
+
+
+function TrimLeadingSpace()
+{
+	# TrimLeadingSpace <variable name>
+	eval local text='\$'"\$1"
+	local _outvar="\$1"
+
+ 	local length=\${#text}
+ 	((length--))
+ 	if [ "\${text:0:1}" == ' ' ] ; then
+ 		text=\${text#' '}
+ 	fi
+
+	eval \$_outvar="'\$text'"
+}
+
+
+function TrimEndingSpace()
+{
+	# TrimEndingSpace <variable name>
+	eval local text='\$'"\$1"
+	local _outvar="\$1"
+
+ 	local length=\${#text}
+ 	((length--))
+ 	if [ "\${text:\$length}" == ' ' ] ; then
+ 		text=\${text%' '}
+ 	fi
+
+	eval \$_outvar="'\$text'"
+}
+
+
+function Exit()
+{
+	# Exit <message>
+	# Wrapper for Jam rule
+	echo "\$@"
+	exit 1
+}
+
+
+function InstallOptionalHaikuImagePackage()
+{
+	# InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
+	# Wrapper for Jam rule
+	echo "Installing \$1 ..."
+	cd \$tmpDir
+	
+	zipFile=\`echo \$3 | sed -s "s/http.*\///"\`
+	if ! [ -f \$zipFile ] ; then
+		echo "Downloading \$3 ..."
+		wget -nv \$3
+	fi
+	
+	local dirTokens='/boot'
+	local count=4
+	local i=0
+	for possibleToken in "\$@" ; do
+		if [ \$i -lt \$count ] ; then
+			((i++))
+		else
+			((i++))
+			if [ "\$possibleToken" != ':' ] ; then			
+				dirTokens=\${dirTokens}/\$possibleToken
+			else
+				break
+			fi
+		fi
+	done
+	echo "Unzipping \$zipFile ..."
+	unzipDir="\${dirTokens}"
+	unzip -q -d "\$unzipDir" "\$zipFile"
+	# TODO should .OptionalPackageDescription be added to AboutSystem?
+	if [ -f '/boot/.OptionalPackageDescription' ] ; then
+		rm '/boot/.OptionalPackageDescription'
+	fi
+	rm "\$zipFile"
+}
+
+
+function AddSymlinkToHaikuImage()
+{
+	# AddSymlinkToHaikuImage <dir tokens> : <link target> [ : <link name> ] 
+	# Wrapper for Jam rule
+ 	ParseFunctionArguments "\$@"
+ 	
+ 	local dirTokens="/boot/\${functionArgs[0]}"
+ 	TrimLeadingSpace dirTokens
+	TrimEndingSpace dirTokens
+ 	dirTokens=\${dirTokens//' '/\/}
+ 	
+ 	local linkTarget="\${functionArgs[1]}"
+ 	TrimLeadingSpace linkTarget
+	TrimEndingSpace linkTarget
+ 	
+ 	local linkName="\${functionArgs[2]}"
+ 	TrimLeadingSpace linkName
+	TrimEndingSpace linkName
+			
+	if [ "\${linkName}" == '' ] ; then
+		ln -sf "\${linkTarget}" -t "\${dirTokens}"
+	else
+		ln -sf "\${linkTarget}" "\${dirTokens}/\${linkName}"
+	fi
+}
+
+
+function AddUserToHaikuImage()
+{
+	# AddUserToHaikuImage user : uid : gid : home : shell : realName
+	# Wrapper for Jam rule	
+	ParseFunctionArguments "\$@"
+	
+	local user=\${functionArgs[0]}
+ 	local uid=\${functionArgs[1]}
+ 	local gid=\${functionArgs[2]}
+ 	local home=\${functionArgs[3]}
+ 	local shell=\${functionArgs[4]}
+ 	local realName=\${functionArgs[5]}
+ 	
+ 	passwdLine="\${user}:x:\${uid}:\${gid}:\${realName}:\${home}:\${shell}"
+ 	passwdLine=\${passwdLine//' :'/':'}
+ 	passwdLine=\${passwdLine//': '/':'}
+ 	
+ 	local length=\${#passwdLine}
+ 	((length--))
+ 	if [ "\${passwdLine:\$length}" == ' ' ] ; then
+ 		passwdLine=\${passwdLine%' '}
+ 	fi
+ 	
+ 	passwdFile="\`finddir B_COMMON_ETC_DIRECTORY\`/passwd"
+ 	touch \${passwdFile}
+ 	
+ 	local userExists=1
+ 	while read line ; do
+		if [ "\${passwdLine}" == "\${line}" ] ; then
+			userExists=0
+		fi
+	done < \${passwdFile}
+	
+	if [ \$userExists -ge 1 ] ; then
+		echo "\${passwdLine}" >> \${passwdFile}
+	fi
+}
+
+
+EOF
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	cat ${tmpDir}/optpkg.stage2 >> ${tmpDir}/install-optpkg.sh
+	rm ${tmpDir}/optpkg.stage2
+}
+
+
+function GetBuildFile()
+{
+	# GetBuildFile <file>
+	# Downloads files from Haiku's svn 
+	if ! [ -f ${baseDir}/${1} ] ; then
+		echo "Fetching ${1} ..."
+		cd ${baseDir}
+		local baseURL=http://dev.haiku-os.org/export/
+		local revision=`uname -v | awk '{print $1}' | sed -e 's/r//'`
+		wget ${baseURL}${revision}/haiku/trunk/build/jam/${file} &> /dev/null
+	fi 
+}
+
+
+function GeneratePackageNames()
+{
+	# GeneratePackageNames
+	# Creates a file containing available package names
+	local outfile="${baseDir}/OptionalPackageNames"
+	
+	if ! [ -f ${outfile} ] ; then
+		echo "Generating a list of Package Names ..."
+		
+		touch ${outfile}
+		local regExp='/^if\ \[\ IsOptionalHaikuImagePackageAdded/p'
+		sed -n -e "$regExp" ${baseDir}/OptionalPackages > ${outfile}.temp
+		while read line ; do
+			local pkg=`echo ${line} | awk '{print $4}'`
+			
+			if ! IspackageIgnoreListed ${pkg} ; then
+				echo ${pkg} >> ${outfile}
+			fi
+			
+		done < ${outfile}.temp
+		rm ${outfile}.temp
+	fi 
+	
+	# read list into array
+	local count=0
+	while read line ; do
+		availablePackages[$count]=$line
+		((count++))
+	done < ${outfile}
+}
+
+
+function IspackageIgnoreListed()
+{
+	# IspackageIgnoreListed <pkg>
+	# Check if this package or any of its deps cannot be installed
+	
+	GetPackageDependencies ${1}
+	
+	local mustIgnore=1
+	for ignoreThisPackage in ${packageIgnoreList[*]} ; do
+		if [ ${1} == ${ignoreThisPackage} ] ; then
+			mustIgnore=0
+			break
+		else
+			for dep in ${tempDeps} ; do
+				if [ ${dep} == ${ignoreThisPackage} ] ; then
+					mustIgnore=0
+					break
+				fi
+			done
+		fi
+	done
+	return $mustIgnore
+}
+
+
+function IsPackageNameValid()
+{
+	# IsPackageNameValid <name>
+	if IspackageIgnoreListed "$1" ; then	
+		echo "Due to limitations, the package \"$1\" cannot be installed."
+		exit 1
+	fi
+	
+	local packageExists=1
+	for name in ${availablePackages[*]} ; do
+		if [ "$1" == "$name" ] ; then
+			packageExists=0
+			packagesToInstall[0]=${1}
+			GetPackageDependencies "$1"
+						
+			# move deps into packagesToInstall
+			if [ ${#tempDeps} -gt 0 ] ; then
+				for dep in ${tempDeps} ; do
+					if [ ';' == "$dep" ] ; then
+						break
+					fi
+					gPDi=${#packagesToInstall[@]}
+					((gPDi++))
+					packagesToInstall[$gPDi]=${dep}
+					GetPackageDependencies ${dep}
+				done
+			fi
+			echo "Packages to be installed:"
+			echo "    ${packagesToInstall[*]}"
+			return 0
+		fi
+	done
+	
+	if [ $packageExists -gt 0 ] ; then
+		echo "Package \"$1\" does not exist."
+		echo ''
+		exit 1
+	fi
+	return 1
+}
+
+
+function GetPackageDependencies()
+{
+	# getPackageDependecies <pkg>
+	# parse OptionalPackageDependencies for <pkg>'s dependencies
+	local regExp="^OptionalPackageDependencies\ ${1}"
+	local inputFile="${baseDir}/OptionalPackageDependencies"
+	sed -n -e "/${regExp}\ /p" ${inputFile} > ${tmpDir}/optpkg.temp
+	tempDeps=`sed -e "s/${regExp}\ :\ //" ${tmpDir}/optpkg.temp`
+	rm ${tmpDir}/optpkg.temp
+}
+
+
+function ContainsSubstring()
+{
+	# ContainsSubstring <stringToLookIn> <stringToLookFor>
+	local newString=${1/${2}/''}
+	if [ ${#1} -eq `expr ${#newString} + ${#2}` ] ; then
+		return 0
+	fi
+	return 1
+}
+
+function ReplaceComparators()
+{
+	# ReplaceComparators <line>
+	# One of the Jam-to-Bash conversion functions.
+	
+	# Preserve string comparators for TARGET_ARCH.
+	if ! ContainsSubstring "$line" 'TARGET_ARCH' ; then
+		line=${line//'>='/'-ge'}
+		line=${line//'<='/'-le'}
+		line=${line//'>'/'-gt'}
+		line=${line//'<'/'-lt'}
+		line=${line//'!='/'-ne'}
+	fi
+}
+
+
+function ConvertVariables()
+{
+	# ConvertVariables
+	# One of the Jam-to-Bash conversion functions.
+	# NOTE: jam's variables are normally '$(VARIABLE)'. \n
+	# 		The issue is with '(' and ')', so let's replace them globally.
+	
+	if ContainsSubstring "$line" '$(' ; then
+		line=${line//'('/'{'}
+		line=${line//')'/'}'}
+	fi
+}
+
+
+function ConvertVariableDeclarationLines()
+{
+	# ConvertVariableDeclarationLines <regex> <variable>
+	# One of the Jam-to-Bash conversion functions.
+	# Jam lines that define variables need to be parsed differently.
+	eval local input='$'"$2"
+	local regex="$1"
+	local _outvar="$2"
+	
+	input=${input/\ =\ /=}
+	input=${input/\;/''}
+	input=${input//\(/'{'}
+	input=${input//\)/'}'}
+	
+	eval $_outvar="'$input'"
+}
+
+
+
+function ConvertIfStatements()
+{
+	# ConvertIfStatements <line>	
+	# One of the Jam-to-Bash conversion functions.
+	line=${line//'} else {'/'else '}
+	line=${line//'} else if '/'elif '}
+	if ContainsSubstring "$line" "if " ; then
+		if ! ContainsSubstring "$line" "if [" ; then
+			line=${line/'if '/'if [ '}
+		fi
+		
+		if ContainsSubstring "$line" '] {' ; then
+			line=${line/'{'/' ; then'}
+		elif ContainsSubstring "$line" '{' ; then
+			line=${line/'{'/' ] ; then'}
+		fi
+		
+		for compound in '&&' '||' ; do
+			if ContainsSubstring "$line" "$compound" ; then
+				line=${line/"$compound"/"] $compound ["}
+			fi
+		done
+	fi
+	# Assume all remaining closing braces are part of if statements
+	line=${line/'}'/'fi'}
+}
+
+
+function ConvertJamToBash()
+{
+	# ConvertJamToBash <input file>
+	# The main Jam-to-Bash conversion function.
+	local inputFile=$1
+	declare -a generatedBash
+	countGenBashLine=0
+	
+	# Parse out some variable declarations
+	local regExp='/^HAIKU_OPENSSL_PACKAGE/p'
+	sslPkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	ConvertVariableDeclarationLines "$regExp" 'sslPkgLine'
+		
+	local regExp='/^HAIKU_OPENSSL_URL/p'
+	sslUrlLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	ConvertVariableDeclarationLines "$regExp" 'sslUrlLine'
+	
+	local regExp='/^local\ baseURL/p'
+	urlLine=`sed -n -e "$regExp" ${baseDir}/OptionalPackages`
+	urlLine=${urlLine/local\ /''}
+	ConvertVariableDeclarationLines "$regExp" 'urlLine'
+	
+	# Convert the easy bits.
+	while read line ; do
+		line=${line/'Echo'/'echo'}
+		
+		ConvertIfStatements "$line"
+		ConvertVariables "$line"
+		ReplaceComparators "$line"
+		
+		line=${line/"IsOptionalHaikuImagePackageAdded"/'"SomeText" !='}
+		generatedBash[$countGenBashLine]=${line}
+		((countGenBashLine++))
+	done < ${tmpDir}/optpkg.jam
+	
+	# output stage 1 generated code
+	local i=0
+	while [ $i -lt $countGenBashLine ] ; do
+		echo ${generatedBash[$i]} >> ${tmpDir}/optpkg.stage1
+		((i++))
+	done
+	
+	# This converts multi-line jam statements into a single line.
+	# --- Start awk ---
+	awk '
+		/InstallOptionalHaikuImagePackage/,/\;/{
+			isRule=1;
+			if($0~/\;/) ORS="\n"; 
+			else ORS=" "; print 
+		} 
+		/AddSymlinkToHaikuImage/,/\;/{
+			isRule=1;
+			if($0~/\;/) ORS="\n";
+			else ORS=" "; print 
+		} 
+		/AddUserToHaikuImage/,/\;/{ 
+			isRule=1; 
+			if($0~/\;/) ORS="\n"; 
+			else ORS=" "; print 
+		}
+		/Exit/,/\;/{
+			isRule=1;
+			if($0~/\;/) ORS="\n"; 
+			else ORS=" "; print
+		} 		
+		{
+			if($1!='InstallOptionalHaikuImagePackage' && isRule!=1 && $1!="\;")
+		 	print $0
+		}
+		{ isRule=0; }
+		' ${tmpDir}/optpkg.stage1 > ${tmpDir}/optpkg.stage2 2>/dev/null
+	# --- End awk ---
+	rm ${tmpDir}/optpkg.stage1
+}
+
+
+function ListPackages()
+{
+	# ListPackages
+	echo "Available Optional Packages:"
+	for package in ${availablePackages[*]} ; do
+		echo ${package}
+	done
+}
+
+
+function AddPackage()
+{
+	# AddPackage <name>
+	if IsPackageNameValid $1  ; then
+		for package in ${packagesToInstall[*]} ; do
+			local regExp="if\ \[\ IsOptionalHaikuImagePackageAdded\ ${package}"
+			local inputFile="${baseDir}/OptionalPackages"
+			sed -n "/^$regExp/,/^\}/p" ${inputFile} >> ${tmpDir}/optpkg.jam
+		done
+		ConvertJamToBash "${tmpDir}/optpkg.jam"
+		rm "${tmpDir}/optpkg.jam"
+	CreateInstallerScript
+	sh ${tmpDir}/install-optpkg.sh
+	rm ${tmpDir}/install-optpkg.sh
+	fi
+}
+
+
+function DisplayUsage()
+{
+	echo ''
+	echo 'Disclaimer:'
+	echo '  This is a temporary solution for installing OptionalPackages.'
+	echo '  In time, there will be an official package manager.'
+	echo "  See these URL's for info on the in-development package manager."
+	echo '    http://dev.haiku-os.org/wiki/PackageManagerIdeas'
+	echo '    http://dev.haiku-os.org/wiki/PackageFormat'
+	echo ''
+	echo "Usage: $0 [-l] [-a]"
+	echo "-l	List installable packages"
+	echo "-a	Add a package and all of its dependencies"
+	echo ''
+}
+
+
+function DetectSystemConfiguration()
+{
+	# Determine which GCC we're running and if we're a hybrid
+	if [ -d "$libDir"/gcc4 ] ; then
+		HAIKU_GCC_VERSION[1]=2
+		isHybridBuild=1
+	elif [ -d "$libDir"/gcc2 ] ; then
+		HAIKU_GCC_VERSION[1]=4
+		isHybridBuild=1
+	elif [ -f "$libDir"/libsupc++.so ] ; then
+		HAIKU_GCC_VERSION[1]=4
+		isHybridBuild=0
+	else
+		HAIKU_GCC_VERSION[1]=2
+		isHybridBuild=0
+	fi
+
+	# Determine the Architecture.
+	if [ `uname -m` == "BePC" ] ; then
+		TARGET_ARCH='x86'
+	fi
+}
+
+function Init()
+{
+	
+	# Set up some directory paths
+	baseDir=`finddir B_COMMON_DATA_DIRECTORY`/optional-packages
+	tmpDir=`finddir B_COMMON_TEMP_DIRECTORY`
+	libDir=`finddir B_SYSTEM_LIB_DIRECTORY`
+
+	# Make sure these files are empty.
+	echo "" > ${tmpDir}/optpkg.jam
+	echo "" > ${tmpDir}/optpkg.stage1
+	
+	
+	if ! [ -d ${baseDir} ] ; then
+		mkdir -p ${baseDir}
+	fi
+	
+	# Retreive the necessary jam files from svn.
+	local buildFiles=( 'OptionalPackages' 'OptionalPackageDependencies' \
+		'OptionalBuildFeatures')
+	for file in ${buildFiles[*]} ; do
+		GetBuildFile ${file}
+	done
+
+	DetectSystemConfiguration
+	GeneratePackageNames
+}
+
+
+# If no arguments were passed to the script, display its usage and exit.
+if [ "$#" -lt 1 ] ; then
+	DisplayUsage
+	exit 0
+else
+	Init
+fi
+
+# Parse the arguments given to the script.
+while getopts "a:lh" opt; do
+	case $opt in
+		a)
+			AddPackage $OPTARG
+			exit 0
+			;;
+		h)
+			DisplayUsage
+			exit 0
+			;;
+		l)
+			ListPackages
+			exit 0
+			;;
+		\?)
+			echo "Invalid option: -$OPTARG" >&2
+			exit 1
+			;;
+		:)
+			echo "Option -$OPTARG requires an argument." >&2
+			exit 1
+			;;
+	esac
+done
