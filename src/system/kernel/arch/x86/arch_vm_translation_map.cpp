@@ -131,48 +131,41 @@ vm_translation_map_arch_info::Delete()
 static status_t
 early_query(addr_t va, addr_t *_physicalAddress)
 {
-	page_table_entry *pentry;
-
-	if (sPageHolePageDir[VADDR_TO_PDENT(va)].present == 0) {
+	if ((sPageHolePageDir[VADDR_TO_PDENT(va)] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
 		return B_ERROR;
 	}
 
-	pentry = sPageHole + va / B_PAGE_SIZE;
-	if (pentry->present == 0) {
+	page_table_entry* pentry = sPageHole + va / B_PAGE_SIZE;
+	if ((*pentry & X86_PTE_PRESENT) == 0) {
 		// page mapping not valid
 		return B_ERROR;
 	}
 
-	*_physicalAddress = pentry->addr << 12;
+	*_physicalAddress = *pentry & X86_PTE_ADDRESS_MASK;
 	return B_OK;
 }
 
 
 static void
-put_page_table_entry_in_pgtable(page_table_entry *entry,
+put_page_table_entry_in_pgtable(page_table_entry* entry,
 	addr_t physicalAddress, uint32 attributes, bool globalPage)
 {
-	page_table_entry page;
-	init_page_table_entry(&page);
-
-	page.addr = ADDR_SHIFT(physicalAddress);
+	page_table_entry page = (physicalAddress & X86_PTE_ADDRESS_MASK)
+		| X86_PTE_PRESENT | (globalPage ? X86_PTE_GLOBAL : 0);
 
 	// if the page is user accessible, it's automatically
 	// accessible in kernel space, too (but with the same
 	// protection)
-	page.user = (attributes & B_USER_PROTECTION) != 0;
-	if (page.user)
-		page.rw = (attributes & B_WRITE_AREA) != 0;
-	else
-		page.rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
-	page.present = 1;
-
-	if (globalPage)
-		page.global = 1;
+	if ((attributes & B_USER_PROTECTION) != 0) {
+		page |= X86_PTE_USER;
+		if ((attributes & B_WRITE_AREA) != 0)
+			page |= X86_PTE_WRITABLE;
+	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
+		page |= X86_PTE_WRITABLE;
 
 	// put it in the page table
-	update_page_table_entry(entry, &page);
+	*entry = page;
 }
 
 
@@ -204,24 +197,19 @@ x86_update_all_pgdirs(int index, page_directory_entry e)
 
 void
 x86_put_pgtable_in_pgdir(page_directory_entry *entry,
-	addr_t pgtable_phys, uint32 attributes)
+	addr_t pgtablePhysical, uint32 attributes)
 {
-	page_directory_entry table;
-	// put it in the pgdir
-	init_page_directory_entry(&table);
-	table.addr = ADDR_SHIFT(pgtable_phys);
-
-	// ToDo: we ignore the attributes of the page table - for compatibility
-	//	with BeOS we allow having user accessible areas in the kernel address
-	//	space. This is currently being used by some drivers, mainly for the
-	//	frame buffer. Our current real time data implementation makes use of
-	//	this fact, too.
-	//	We might want to get rid of this possibility one day, especially if
-	//	we intend to port it to a platform that does not support this.
-	table.user = 1;
-	table.rw = 1;
-	table.present = 1;
-	update_page_directory_entry(entry, &table);
+	*entry = (pgtablePhysical & X86_PDE_ADDRESS_MASK)
+		| X86_PDE_PRESENT
+		| X86_PDE_WRITABLE
+		| X86_PDE_USER;
+		// TODO: we ignore the attributes of the page table - for compatibility
+		// with BeOS we allow having user accessible areas in the kernel address
+		// space. This is currently being used by some drivers, mainly for the
+		// frame buffer. Our current real time data implementation makes use of
+		// this fact, too.
+		// We might want to get rid of this possibility one day, especially if
+		// we intend to port it to a platform that does not support this.
 }
 
 
@@ -266,12 +254,10 @@ destroy_tmap(vm_translation_map *map)
 		// cycle through and free all of the user space pgtables
 		for (uint32 i = VADDR_TO_PDENT(USER_BASE);
 				i <= VADDR_TO_PDENT(USER_BASE + (USER_SIZE - 1)); i++) {
-			addr_t pgtable_addr;
-			vm_page *page;
-
-			if (map->arch_data->pgdir_virt[i].present == 1) {
-				pgtable_addr = map->arch_data->pgdir_virt[i].addr;
-				page = vm_lookup_page(pgtable_addr);
+			if ((map->arch_data->pgdir_virt[i] & X86_PDE_PRESENT) != 0) {
+				addr_t address = map->arch_data->pgdir_virt[i]
+					& X86_PDE_ADDRESS_MASK;
+				vm_page* page = vm_lookup_page(address / B_PAGE_SIZE);
 				if (!page)
 					panic("destroy_tmap: didn't find pgtable page\n");
 				DEBUG_PAGE_ACCESS_START(page);
@@ -342,10 +328,6 @@ map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
 static status_t
 map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 {
-	page_directory_entry *pd;
-	page_table_entry *pt;
-	unsigned int index;
-
 	TRACE(("map_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
 
 /*
@@ -356,11 +338,11 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	dprintf("present bit is %d\n", pgdir[va / B_PAGE_SIZE / 1024].present);
 	dprintf("addr is %d\n", pgdir[va / B_PAGE_SIZE / 1024].addr);
 */
-	pd = map->arch_data->pgdir_virt;
+	page_directory_entry* pd = map->arch_data->pgdir_virt;
 
 	// check to see if a page table exists for this range
-	index = VADDR_TO_PDENT(va);
-	if (pd[index].present == 0) {
+	uint32 index = VADDR_TO_PDENT(va);
+	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		addr_t pgtable;
 		vm_page *page;
 
@@ -393,8 +375,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	pt = map->arch_data->page_mapper->GetPageTableAt(
-		ADDR_REVERSE_SHIFT(pd[index].addr));
+	page_table_entry* pt = map->arch_data->page_mapper->GetPageTableAt(
+		pd[index] & X86_PDE_ADDRESS_MASK);
 	index = VADDR_TO_PTENT(va);
 
 	put_page_table_entry_in_pgtable(&pt[index], pa, attributes,
@@ -418,9 +400,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 static status_t
 unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 {
-	page_table_entry *pt;
 	page_directory_entry *pd = map->arch_data->pgdir_virt;
-	int index;
 
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
@@ -431,8 +411,8 @@ restart:
 	if (start >= end)
 		return B_OK;
 
-	index = VADDR_TO_PDENT(start);
-	if (pd[index].present == 0) {
+	int index = VADDR_TO_PDENT(start);
+	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here, move the start up to access the next page table
 		start = ROUNDUP(start + 1, B_PAGE_SIZE);
 		goto restart;
@@ -441,19 +421,19 @@ restart:
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	pt = map->arch_data->page_mapper->GetPageTableAt(
-		ADDR_REVERSE_SHIFT(pd[index].addr));
+	page_table_entry* pt = map->arch_data->page_mapper->GetPageTableAt(
+		pd[index]  & X86_PDE_ADDRESS_MASK);
 
 	for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
 			index++, start += B_PAGE_SIZE) {
-		if (pt[index].present == 0) {
+		if ((pt[index] & X86_PTE_PRESENT) == 0) {
 			// page mapping not valid
 			continue;
 		}
 
 		TRACE(("unmap_tmap: removing page 0x%lx\n", start));
 
-		pt[index].present = 0;
+		clear_page_table_entry_flags(&pt[index], X86_PTE_PRESENT);
 		map->map_count--;
 
 		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE) {
@@ -474,37 +454,37 @@ static status_t
 query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical,
 	uint32 *_flags)
 {
-	page_table_entry *pt;
-	page_directory_entry *pd = map->arch_data->pgdir_virt;
-	int32 index;
-
 	// default the flags to not present
 	*_flags = 0;
 	*_physical = 0;
 
-	index = VADDR_TO_PDENT(va);
-	if (pd[index].present == 0) {
+	int index = VADDR_TO_PDENT(va);
+	page_directory_entry *pd = map->arch_data->pgdir_virt;
+	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
-		return B_NO_ERROR;
+		return B_OK;
 	}
 
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	pt = map->arch_data->page_mapper->GetPageTableAt(
-		ADDR_REVERSE_SHIFT(pd[index].addr));
-	index = VADDR_TO_PTENT(va);
+	page_table_entry* pt = map->arch_data->page_mapper->GetPageTableAt(
+		pd[index] & X86_PDE_ADDRESS_MASK);
+	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
-	*_physical = ADDR_REVERSE_SHIFT(pt[index].addr);
+	*_physical = entry & X86_PDE_ADDRESS_MASK;
 
 	// read in the page state flags
-	if (pt[index].user)
-		*_flags |= (pt[index].rw ? B_WRITE_AREA : 0) | B_READ_AREA;
+	if ((entry & X86_PTE_USER) != 0) {
+		*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
+			| B_READ_AREA;
+	}
 
-	*_flags |= ((pt[index].rw ? B_KERNEL_WRITE_AREA : 0) | B_KERNEL_READ_AREA)
-		| (pt[index].dirty ? PAGE_MODIFIED : 0)
-		| (pt[index].accessed ? PAGE_ACCESSED : 0)
-		| (pt[index].present ? PAGE_PRESENT : 0);
+	*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
+		| B_KERNEL_READ_AREA
+		| ((entry & X86_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
+		| ((entry & X86_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
+		| ((entry & X86_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 
 	pinner.Unlock();
 
@@ -518,30 +498,34 @@ static status_t
 query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
 	uint32 *_flags)
 {
-	page_directory_entry *pd = map->arch_data->pgdir_virt;
-	page_table_entry *pt;
-	addr_t physicalPageTable;
-	int32 index;
-
+	*_flags = 0;
 	*_physical = 0;
 
-	index = VADDR_TO_PDENT(va);
-	if (pd[index].present == 0) {
+	int index = VADDR_TO_PDENT(va);
+	page_directory_entry* pd = map->arch_data->pgdir_virt;
+	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
-		return B_ERROR;
+		return B_OK;
 	}
 
 	// map page table entry
-	physicalPageTable = ADDR_REVERSE_SHIFT(pd[index].addr);
-	pt = gPhysicalPageMapper->InterruptGetPageTableAt(physicalPageTable);
+	page_table_entry* pt = gPhysicalPageMapper->InterruptGetPageTableAt(
+		pd[index] & X86_PDE_ADDRESS_MASK);
+	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
-	index = VADDR_TO_PTENT(va);
-	*_physical = ADDR_REVERSE_SHIFT(pt[index].addr);
+	*_physical = entry & X86_PDE_ADDRESS_MASK;
 
-	*_flags |= ((pt[index].rw ? B_KERNEL_WRITE_AREA : 0) | B_KERNEL_READ_AREA)
-		| (pt[index].dirty ? PAGE_MODIFIED : 0)
-		| (pt[index].accessed ? PAGE_ACCESSED : 0)
-		| (pt[index].present ? PAGE_PRESENT : 0);
+	// read in the page state flags
+	if ((entry & X86_PTE_USER) != 0) {
+		*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
+			| B_READ_AREA;
+	}
+
+	*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
+		| B_KERNEL_READ_AREA
+		| ((entry & X86_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
+		| ((entry & X86_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
+		| ((entry & X86_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 
 	return B_OK;
 }
@@ -558,9 +542,7 @@ static status_t
 protect_tmap(vm_translation_map *map, addr_t start, addr_t end,
 	uint32 attributes)
 {
-	page_table_entry *pt;
 	page_directory_entry *pd = map->arch_data->pgdir_virt;
-	int index;
 
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
@@ -572,8 +554,8 @@ restart:
 	if (start >= end)
 		return B_OK;
 
-	index = VADDR_TO_PDENT(start);
-	if (pd[index].present == 0) {
+	int index = VADDR_TO_PDENT(start);
+	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here, move the start up to access the next page table
 		start = ROUNDUP(start + 1, B_PAGE_SIZE);
 		goto restart;
@@ -582,23 +564,32 @@ restart:
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	pt = map->arch_data->page_mapper->GetPageTableAt(
-		ADDR_REVERSE_SHIFT(pd[index].addr));
+	page_table_entry* pt = map->arch_data->page_mapper->GetPageTableAt(
+		pd[index] & X86_PDE_ADDRESS_MASK);
 
 	for (index = VADDR_TO_PTENT(start); index < 1024 && start < end;
 			index++, start += B_PAGE_SIZE) {
-		if (pt[index].present == 0) {
+		page_table_entry entry = pt[index];
+		if ((entry & X86_PTE_PRESENT) == 0) {
 			// page mapping not valid
 			continue;
 		}
 
 		TRACE(("protect_tmap: protect page 0x%lx\n", start));
 
-		pt[index].user = (attributes & B_USER_PROTECTION) != 0;
-		if ((attributes & B_USER_PROTECTION) != 0)
-			pt[index].rw = (attributes & B_WRITE_AREA) != 0;
-		else
-			pt[index].rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
+		entry &= ~(X86_PTE_WRITABLE | X86_PTE_USER);
+		if ((attributes & B_USER_PROTECTION) != 0) {
+			entry |= X86_PTE_USER;
+			if ((attributes & B_WRITE_AREA) != 0)
+				entry |= X86_PTE_WRITABLE;
+		} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
+			entry |= X86_PTE_WRITABLE;
+
+		set_page_table_entry(&pt[index], entry);
+			// TODO: We might have cleared accessed/modified flags!
+
+		// TODO: Optimize: If the accessed flag was clear, we don't need to
+		// invalidate the TLB for that address.
 
 		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE) {
 			map->arch_data->pages_to_invalidate[
@@ -617,37 +608,30 @@ restart:
 static status_t
 clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 {
-	page_table_entry *pt;
-	page_directory_entry *pd = map->arch_data->pgdir_virt;
-	int index;
-	int tlb_flush = false;
-
-	index = VADDR_TO_PDENT(va);
-	if (pd[index].present == 0) {
+	int index = VADDR_TO_PDENT(va);
+	page_directory_entry* pd = map->arch_data->pgdir_virt;
+	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
 		return B_OK;
 	}
 
+	uint32 flagsToClear = ((flags & PAGE_MODIFIED) ? X86_PTE_DIRTY : 0)
+		| ((flags & PAGE_ACCESSED) ? X86_PTE_ACCESSED : 0);
+
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	pt = map->arch_data->page_mapper->GetPageTableAt(
-		ADDR_REVERSE_SHIFT(pd[index].addr));
+	page_table_entry* pt = map->arch_data->page_mapper->GetPageTableAt(
+		pd[index] & X86_PDE_ADDRESS_MASK);
 	index = VADDR_TO_PTENT(va);
 
 	// clear out the flags we've been requested to clear
-	if (flags & PAGE_MODIFIED) {
-		pt[index].dirty = 0;
-		tlb_flush = true;
-	}
-	if (flags & PAGE_ACCESSED) {
-		pt[index].accessed = 0;
-		tlb_flush = true;
-	}
+	page_table_entry oldEntry
+		= clear_page_table_entry_flags(&pt[index], flagsToClear);
 
 	pinner.Unlock();
 
-	if (tlb_flush) {
+	if ((oldEntry & flagsToClear) != 0) {
 		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE) {
 			map->arch_data->pages_to_invalidate[
 				map->arch_data->num_invalidate_pages] = va;
@@ -889,7 +873,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	TRACE(("vm_translation_map_init_post_area: entry\n"));
 
 	// unmap the page hole hack we were using before
-	sKernelVirtualPageDirectory[1023].present = 0;
+	sKernelVirtualPageDirectory[1023] = 0;
 	sPageHolePageDir = NULL;
 	sPageHole = NULL;
 
@@ -926,7 +910,7 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 
 	// check to see if a page table exists for this range
 	index = VADDR_TO_PDENT(va);
-	if (sPageHolePageDir[index].present == 0) {
+	if ((sPageHolePageDir[index] & X86_PDE_PRESENT) == 0) {
 		addr_t pgtable;
 		page_directory_entry *e;
 		// we need to allocate a pgtable
@@ -995,34 +979,35 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 			gPhysicalPageMapper->PutPageDebug(virtualPageDirectory,
 				handle);
 		} else
-			pageDirectoryEntry.present = 0;
+			pageDirectoryEntry = 0;
 	}
 
 	// map the page table and get the entry
 	page_table_entry pageTableEntry;
 	index = VADDR_TO_PTENT(virtualAddress);
 
-	if (pageDirectoryEntry.present != 0) {
+	if ((pageDirectoryEntry & X86_PDE_PRESENT) != 0) {
 		void* handle;
 		addr_t virtualPageTable;
 		status_t error = gPhysicalPageMapper->GetPageDebug(
-			ADDR_REVERSE_SHIFT(pageDirectoryEntry.addr), &virtualPageTable,
+			pageDirectoryEntry & X86_PDE_ADDRESS_MASK, &virtualPageTable,
 			&handle);
 		if (error == B_OK) {
 			pageTableEntry = ((page_table_entry*)virtualPageTable)[index];
 			gPhysicalPageMapper->PutPageDebug(virtualPageTable, handle);
 		} else
-			pageTableEntry.present = 0;
+			pageTableEntry = 0;
 	} else
-		pageTableEntry.present = 0;
+		pageTableEntry = 0;
 
 	// switch back to the original page directory
 	if (physicalPageDirectory != (addr_t)sKernelPhysicalPageDirectory)
 		write_cr3(physicalPageDirectory);
 
-	if (pageTableEntry.present == 0)
+	if ((pageTableEntry & X86_PTE_PRESENT) == 0)
 		return false;
 
 	// present means kernel-readable, so check for writable
-	return (protection & B_KERNEL_WRITE_AREA) == 0 || pageTableEntry.rw != 0;
+	return (protection & B_KERNEL_WRITE_AREA) == 0
+		|| (pageTableEntry & X86_PTE_WRITABLE) != 0;
 }

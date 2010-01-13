@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -17,9 +18,6 @@
 
 #define PAGE_INVALIDATE_CACHE_SIZE 64
 
-#define ADDR_SHIFT(x) ((x) >> 12)
-#define ADDR_REVERSE_SHIFT(x) ((x) << 12)
-
 #define VADDR_TO_PDENT(va) (((va) / B_PAGE_SIZE) / 1024)
 #define VADDR_TO_PTENT(va) (((va) / B_PAGE_SIZE) % 1024)
 
@@ -27,33 +25,39 @@
 class TranslationMapPhysicalPageMapper;
 
 
-typedef struct page_table_entry {
-	uint32	present:1;
-	uint32	rw:1;
-	uint32	user:1;
-	uint32	write_through:1;
-	uint32	cache_disabled:1;
-	uint32	accessed:1;
-	uint32	dirty:1;
-	uint32	reserved:1;
-	uint32	global:1;
-	uint32	avail:3;
-	uint32	addr:20;
-} page_table_entry;
+// page directory entry bits
+#define X86_PDE_PRESENT				0x00000001
+#define X86_PDE_WRITABLE			0x00000002
+#define X86_PDE_USER				0x00000004
+#define X86_PDE_WRITE_THROUGH		0x00000008
+#define X86_PDE_CACHING_DISABLED	0x00000010
+#define X86_PDE_ACCESSED			0x00000020
+#define X86_PDE_IGNORED1			0x00000040
+#define X86_PDE_RESERVED1			0x00000080
+#define X86_PDE_IGNORED2			0x00000100
+#define X86_PDE_IGNORED3			0x00000200
+#define X86_PDE_IGNORED4			0x00000400
+#define X86_PDE_IGNORED5			0x00000800
+#define X86_PDE_ADDRESS_MASK		0xfffff000
 
-typedef struct page_directory_entry {
-	uint32	present:1;
-	uint32	rw:1;
-	uint32	user:1;
-	uint32	write_through:1;
-	uint32	cache_disabled:1;
-	uint32	accessed:1;
-	uint32	reserved:1;
-	uint32	page_size:1;
-	uint32	global:1;
-	uint32	avail:3;
-	uint32	addr:20;
-} page_directory_entry;
+// page table entry bits
+#define X86_PTE_PRESENT				0x00000001
+#define X86_PTE_WRITABLE			0x00000002
+#define X86_PTE_USER				0x00000004
+#define X86_PTE_WRITE_THROUGH		0x00000008
+#define X86_PTE_CACHING_DISABLED	0x00000010
+#define X86_PTE_ACCESSED			0x00000020
+#define X86_PTE_DIRTY				0x00000040
+#define X86_PTE_PAT					0x00000080
+#define X86_PTE_GLOBAL				0x00000100
+#define X86_PTE_IGNORED1			0x00000200
+#define X86_PTE_IGNORED2			0x00000400
+#define X86_PTE_IGNORED3			0x00000800
+#define X86_PTE_ADDRESS_MASK		0xfffff000
+
+
+typedef uint32 page_table_entry;
+typedef uint32 page_directory_entry;
 
 
 struct vm_translation_map_arch_info : DeferredDeletable {
@@ -83,33 +87,24 @@ void x86_put_pgtable_in_pgdir(page_directory_entry* entry,
 void x86_update_all_pgdirs(int index, page_directory_entry entry);
 
 
-static inline void
-init_page_directory_entry(page_directory_entry *entry)
+static inline page_table_entry
+set_page_table_entry(page_table_entry* entry, page_table_entry newEntry)
 {
-	*(uint32 *)entry = 0;
+	return atomic_set((int32*)entry, newEntry);
 }
 
 
-static inline void
-update_page_directory_entry(page_directory_entry *entry, page_directory_entry *with)
+static inline page_table_entry
+clear_page_table_entry_flags(page_table_entry* entry, uint32 flags)
 {
-	// update page directory entry atomically
-	*(uint32 *)entry = *(uint32 *)with;
+	return atomic_and((int32*)entry, ~flags);
 }
 
 
-static inline void
-init_page_table_entry(page_table_entry *entry)
+static inline page_table_entry
+set_page_table_entry_flags(page_table_entry* entry, uint32 flags)
 {
-	*(uint32 *)entry = 0;
-}
-
-
-static inline void
-update_page_table_entry(page_table_entry *entry, page_table_entry *with)
-{
-	// update page table entry atomically
-	*(uint32 *)entry = *(uint32 *)with;
+	return atomic_or((int32*)entry, flags);
 }
 
 

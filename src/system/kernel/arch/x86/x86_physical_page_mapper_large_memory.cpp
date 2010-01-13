@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -204,12 +204,8 @@ PhysicalPageSlot::Map(addr_t physicalAddress)
 {
 	page_table_entry& pte = pool->pageTable[
 		(address - pool->virtualBase) / B_PAGE_SIZE];
-	init_page_table_entry(&pte);
-	pte.addr = ADDR_SHIFT(physicalAddress);
-	pte.user = 0;
-	pte.rw = 1;
-	pte.present = 1;
-	pte.global = 1;
+	pte = (physicalAddress & X86_PTE_ADDRESS_MASK)
+		| X86_PTE_WRITABLE | X86_PTE_GLOBAL | X86_PTE_PRESENT;
 
 	invalidate_TLB(address);
 }

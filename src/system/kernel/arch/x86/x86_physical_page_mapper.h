@@ -1,15 +1,15 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_ARCH_X86_PHYSICAL_PAGE_MAPPER_H
 #define _KERNEL_ARCH_X86_PHYSICAL_PAGE_MAPPER_H
 
-#include <SupportDefs.h>
+
+#include "x86_paging.h"
 
 
 struct kernel_args;
-struct page_table_entry;
 struct vm_translation_map_ops;
 
 
