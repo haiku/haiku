@@ -1,16 +1,18 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2007, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
-
 #include "FindWindow.h"
+
 
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
+#include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <RadioButton.h>
@@ -19,12 +21,12 @@
 
 
 const uint32 MSG_FIND_HIDE = 'Fhid';
+const uint32 TOGGLE_FIND_CONTROL = 'MTFG';
+const BRect kWindowFrame(10, 30, 250, 200);
 
-const BRect kWindowFrame(0, 0, 240, 170);
 
-FindWindow::FindWindow(BMessenger messenger, BString &str,
-		bool findSelection, bool matchWord, bool matchCase,
-		bool forwardSearch)
+FindWindow::FindWindow(BMessenger messenger, const BString& str,
+		bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
 	:
 	BWindow(kWindowFrame, "Find", B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
@@ -32,41 +34,42 @@ FindWindow::FindWindow(BMessenger messenger, BString &str,
 	fFindDlgMessenger(messenger)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
-	
-	BBox *separator = new BBox("separator");
-	separator->SetExplicitMinSize(BSize(200, B_SIZE_UNSET));
-	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
-	BView *layoutView = BGroupLayoutBuilder(B_VERTICAL, 10)
-		.SetInsets(5, 5, 5, 5)
-		.Add(fTextRadio = new BRadioButton("fTextRadio", "Use text: ",
-			NULL))
-		.Add(fFindLabel = new BTextControl("fFindLabel", "", "", NULL))
-		.Add(fSelectionRadio = new BRadioButton("fSelectionRadio",
-			"Use selection", NULL))
+	BBox *separator = new BBox("separator");
+	separator->SetExplicitMinSize(BSize(250.0, B_SIZE_UNSET));
+	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1.0));
+
+	BRadioButton* useSelection = NULL;
+	const float spacing = be_control_look->DefaultItemSpacing();
+	BView* layoutView = BGroupLayoutBuilder(B_VERTICAL, 5.0)
+		.SetInsets(spacing, spacing, spacing, spacing)
+		.Add(BGridLayoutBuilder()
+			.Add(fTextRadio = new BRadioButton("Use text:",
+				new BMessage(TOGGLE_FIND_CONTROL)), 0, 0)
+			.Add(fFindLabel = new BTextControl(NULL, NULL, NULL), 1, 0)
+			.Add(useSelection = new BRadioButton("Use selection",
+				new BMessage(TOGGLE_FIND_CONTROL)), 0, 1))
 		.Add(separator)
-		.Add(fForwardSearchBox = new BCheckBox("fForwardSearchBox",
-			"Search forward", NULL))
-		.Add(fMatchCaseBox = new BCheckBox("fMatchCaseBox",
-			"Match case", NULL))
-		.Add(fMatchWordBox = new BCheckBox("fMatchWordBox",
-			"Match word", NULL))
-		.Add(fFindButton = new BButton("fFindButton", "Find",
-			new BMessage(MSG_FIND)))
+		.Add(fForwardSearchBox = new BCheckBox("Search forward"))
+		.Add(fMatchCaseBox = new BCheckBox("Match case"))
+		.Add(fMatchWordBox = new BCheckBox("Match word"))
+		.Add(fFindButton = new BButton("Find", new BMessage(MSG_FIND)))
 		.End();
-	
-	AddChild(layoutView);	
-	
+	AddChild(layoutView);
+
 	layoutView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
-	fFindLabel->SetDivider(0);
-	
-	if (!findSelection)
+
+	fFindLabel->SetDivider(0.0);
+
+	if (!findSelection) {
 		fFindLabel->SetText(str.String());
-	fFindLabel->MakeFocus(true);
-	
+		fFindLabel->MakeFocus(true);
+	} else {
+		fFindLabel->SetEnabled(false);
+	}
+
 	if (findSelection)
-		fSelectionRadio->SetValue(B_CONTROL_ON);
+		useSelection->SetValue(B_CONTROL_ON);
 	else
 		fTextRadio->SetValue(B_CONTROL_ON);
 
@@ -75,15 +78,14 @@ FindWindow::FindWindow(BMessenger messenger, BString &str,
 
 	if (matchCase)
 		fMatchCaseBox->SetValue(B_CONTROL_ON);
-	
+
 	if (matchWord)
 		fMatchWordBox->SetValue(B_CONTROL_ON);
 
 	fFindButton->MakeDefault(true);
 
-	AddShortcut((ulong)'W', (ulong)B_COMMAND_KEY,
-		new BMessage(MSG_FIND_HIDE));
-	
+	AddShortcut((uint32)'W', B_COMMAND_KEY, new BMessage(MSG_FIND_HIDE));
+
 	Show();
 }
 
@@ -107,6 +109,10 @@ FindWindow::MessageReceived(BMessage *msg)
 
 		case MSG_FIND_HIDE:
 			Quit();
+			break;
+
+		case TOGGLE_FIND_CONTROL:
+			fFindLabel->SetEnabled(fTextRadio->Value() == B_CONTROL_ON);
 			break;
 
 		default:

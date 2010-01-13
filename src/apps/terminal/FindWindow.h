@@ -16,34 +16,35 @@ const ulong MSG_FIND = 'msgf';
 const ulong MSG_FIND_START = 'msac';
 const ulong MSG_FIND_CLOSED = 'mfcl';
 
+
 class BTextControl;
 class BRadioButton;
 class BCheckBox;
 
+
 class FindWindow : public BWindow {
-	public:
-		FindWindow (BMessenger messenger, BString &str,
-			bool findSelection, bool matchWord, bool matchCase, bool forwardSearch);
-		virtual ~FindWindow();
+public:
+							FindWindow (BMessenger messenger, const BString& str,
+								bool findSelection, bool matchWord,
+								bool matchCase, bool forwardSearch);
+	virtual					~FindWindow();
 
-		virtual void Quit();
-		virtual void MessageReceived(BMessage *msg);
+	virtual	void			Quit();
+	virtual	void			MessageReceived(BMessage* msg);
 
-	private:
-		void _SendFindMessage();
+private:
+			void			_SendFindMessage();
 
-	private:
-		BTextControl 	*fFindLabel;
-		BRadioButton 	*fTextRadio;
-		BRadioButton 	*fSelectionRadio;
-		
-		BCheckBox		*fForwardSearchBox;
-		BCheckBox		*fMatchCaseBox;
-		BCheckBox		*fMatchWordBox;
-		BButton			*fFindButton;
+private:
+			BTextControl*	fFindLabel;
+			BRadioButton*	fTextRadio;
 
-		BString	*fFindString;
-		BMessenger fFindDlgMessenger;
+			BCheckBox*		fForwardSearchBox;
+			BCheckBox*		fMatchCaseBox;
+			BCheckBox*		fMatchWordBox;
+			BButton*		fFindButton;
+
+			BMessenger		fFindDlgMessenger;
 };
 
 #endif	// FINDDLG_H_INCLUDED
