@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -224,13 +224,13 @@ hda_find_multi_custom_string(hda_widget& widget, char* custom, uint32 size)
 	const char* device = NULL;
 	switch (CONF_DEFAULT_DEVICE(widget.d.pin.config)) {
 		case PIN_DEV_LINE_IN:
-			device = "Line In";
+			device = "Line in";
 		case PIN_DEV_LINE_OUT:
 			if (device == NULL)
-				device = "Line Out";
+				device = "Line out";
 		case PIN_DEV_MIC_IN:
 			if (device == NULL)
-				device =  "Mic In";
+				device =  "Mic in";
 			switch (CONF_DEFAULT_COLOR(widget.d.pin.config)) {
 				case 1:
 					device = "Rear";
@@ -239,7 +239,7 @@ hda_find_multi_custom_string(hda_widget& widget, char* custom, uint32 size)
 					device = "Side";
 					break;
 				case 3:
-					device = "Line In";
+					device = "Line in";
 					break;
 				case 4:
 					device = "Front";
@@ -248,15 +248,15 @@ hda_find_multi_custom_string(hda_widget& widget, char* custom, uint32 size)
 					device = "Center/Sub";
 					break;
 				case 9:
-					device = "Mic In";
+					device = "Mic in";
 					break;
 			}
 			break;
 		case PIN_DEV_SPDIF_IN:
-			device = "SPDIF In";
+			device = "SPDIF in";
 			break;
 		case PIN_DEV_SPDIF_OUT:
-			device = "SPDIF Out";
+			device = "SPDIF out";
 			break;
 		case PIN_DEV_CD:
 			device = "CD";

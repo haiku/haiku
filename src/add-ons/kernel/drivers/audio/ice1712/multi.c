@@ -131,7 +131,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 			strncpy(data->friendly_name, "VX 442", 32);
 			break;
 		default:
-			strncpy(data->friendly_name, "Unknow Device", 32);
+			strncpy(data->friendly_name, "Unknow device", 32);
 			break;
 	}
 			

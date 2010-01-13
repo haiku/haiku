@@ -30,7 +30,7 @@ pci_id_table_t ichaudio_id_table[] = {
 	{ 0x1022, 0x7445, -1, -1, -1, -1, -1, "AMD AMD768 AC97 audio" },
 	{ 0x1103, 0x0004, -1, -1, -1, -1, -1, "Highpoint HPT372 RAID" },
 	{ 0x1095, 0x3112, -1, -1, -1, -1, -1, "Silicon Image SATA Si3112" },
-	{ 0x8086, 0x244b, -1, -1, -1, -1, -1, "Intel IDE Controller" },
+	{ 0x8086, 0x244b, -1, -1, -1, -1, -1, "Intel IDE controller" },
 	{ 0x8979, 0x6456, -1, -1, -1, -1, -1, "does not exist" },
 	{ /* empty = end */}
 };

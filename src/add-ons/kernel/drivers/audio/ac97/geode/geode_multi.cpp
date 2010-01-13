@@ -185,12 +185,12 @@ set_global_format(geode_controller* controller, multi_format_info* data)
 }
 
 
-static void	
+static void
 geode_ac97_get_mix(geode_controller *controller, const void *cookie, int32 type, float *values) {
 	ac97_source_info *info = (ac97_source_info *)cookie;
 	uint16 value, mask;
 	float gain;
-	
+
 	switch(type) {
 		case B_MIX_GAIN:
 			value = ac97_reg_cached_read(controller->ac97, info->reg);
@@ -202,7 +202,7 @@ geode_ac97_get_mix(geode_controller *controller, const void *cookie, int32 type,
 					values[0] = info->max_gain - gain;
 				else
 					values[0] = gain - info->min_gain;
-				
+
 				mask = ((1 << (info->bits + 1)) - 1);
 				gain = (value & mask) * info->granularity;
 				if (info->polarity == 1)
@@ -243,25 +243,25 @@ geode_ac97_get_mix(geode_controller *controller, const void *cookie, int32 type,
 }
 
 
-static void	
+static void
 geode_ac97_set_mix(geode_controller *controller, const void *cookie, int32 type, float *values) {
 	ac97_source_info *info = (ac97_source_info *)cookie;
 	uint16 value, mask;
 	float gain;
-	
+
 	switch(type) {
 		case B_MIX_GAIN:
 			value = ac97_reg_cached_read(controller->ac97, info->reg);
 			if (info->type & B_MIX_STEREO) {
 				mask = ((1 << (info->bits + 1)) - 1) << 8;
 				value &= ~mask;
-				
+
 				if (info->polarity == 1)
 					gain = info->max_gain - values[0];
 				else
 					gain =  values[0] - info->min_gain;
 				value |= ((uint16)(gain	/ info->granularity) << 8) & mask;
-				
+
 				mask = ((1 << (info->bits + 1)) - 1);
 				value &= ~mask;
 				if (info->polarity == 1)
@@ -316,7 +316,7 @@ geode_ac97_set_mix(geode_controller *controller, const void *cookie, int32 type,
 
 
 static int32
-create_group_control(geode_multi *multi, uint32 *index, uint32 parent, 
+create_group_control(geode_multi *multi, uint32 *index, uint32 parent,
 	strind_id string, const char* name) {
 	int32 i = *index;
 	(*index)++;
@@ -327,7 +327,7 @@ create_group_control(geode_multi *multi, uint32 *index, uint32 parent,
 	multi->controls[i].mix_control.string = string;
 	if (name)
 		strcpy(multi->controls[i].mix_control.name, name);
-		
+
 	return multi->controls[i].mix_control.id;
 }
 
@@ -339,17 +339,17 @@ create_controls_list(geode_multi *multi)
 	const ac97_source_info *info;
 
 	/* AC97 Mixer */
-	parent = create_group_control(multi, &index, 0, S_null, "AC97 Mixer");
-	
+	parent = create_group_control(multi, &index, 0, S_null, "AC97 mixer");
+
 	count = source_info_size;
 	//Note that we ignore first item in source_info
 	//It's for recording, but do match this with ac97.c's source_info
 	for (i = 1; i < count ; i++) {
 		info = &source_info[i];
 		TRACE("name : %s\n", info->name);
-			
+
 		parent2 = create_group_control(multi, &index, parent, S_null, info->name);
-				
+
 		if (info->type & B_MIX_GAIN) {
 			if (info->type & B_MIX_MUTE) {
 				multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
@@ -363,7 +363,7 @@ create_controls_list(geode_multi *multi)
 				multi->controls[index].set = &geode_ac97_set_mix;
 				index++;
 			}
-		
+
 			multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
 			multi->controls[index].mix_control.master = MULTI_CONTROL_MASTERID;
@@ -378,7 +378,7 @@ create_controls_list(geode_multi *multi)
 			multi->controls[index].set = &geode_ac97_set_mix;
 			id = multi->controls[index].mix_control.id;
 			index++;
-			
+
 			if (info->type & B_MIX_STEREO) {
 				multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 				multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
@@ -394,7 +394,7 @@ create_controls_list(geode_multi *multi)
 				multi->controls[index].set = &geode_ac97_set_mix;
 				index++;
 			}
-			
+
 			if (info->type & B_MIX_MICBOOST) {
 				multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 				multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
@@ -412,12 +412,12 @@ create_controls_list(geode_multi *multi)
 
 	/* AC97 Record */
 	parent = create_group_control(multi, &index, 0, S_null, "Recording");
-		
+
 	info = &source_info[0];
 	TRACE("name : %s\n", info->name);
-	
+
 	parent2 = create_group_control(multi, &index, parent, S_null, info->name);
-		
+
 	if (info->type & B_MIX_GAIN) {
 		if (info->type & B_MIX_MUTE) {
 			multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
@@ -431,7 +431,7 @@ create_controls_list(geode_multi *multi)
 			multi->controls[index].set = &geode_ac97_set_mix;
 			index++;
 		}
-	
+
 		multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 		multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
 		multi->controls[index].mix_control.master = MULTI_CONTROL_MASTERID;
@@ -446,7 +446,7 @@ create_controls_list(geode_multi *multi)
 		multi->controls[index].set = &geode_ac97_set_mix;
 		id = multi->controls[index].mix_control.id;
 		index++;
-		
+
 		if (info->type & B_MIX_STEREO) {
 			multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
@@ -462,19 +462,19 @@ create_controls_list(geode_multi *multi)
 			multi->controls[index].set = &geode_ac97_set_mix;
 			index++;
 		}
-	
+
 		if (info->type & B_MIX_RECORDMUX) {
 			multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_MUX;
 			multi->controls[index].mix_control.parent = parent2;
-			strcpy(multi->controls[index].mix_control.name, "Record Mux");
+			strcpy(multi->controls[index].mix_control.name, "Record mux");
 			multi->controls[index].cookie = info;
 			multi->controls[index].type = B_MIX_MUX;
 			multi->controls[index].get = &geode_ac97_get_mix;
 			multi->controls[index].set = &geode_ac97_set_mix;
 			parent3 = multi->controls[index].mix_control.id;
 			index++;
-			
+
 			multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_MUX_VALUE;
 			multi->controls[index].mix_control.parent = parent3;
@@ -483,22 +483,22 @@ create_controls_list(geode_multi *multi)
 			multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_MUX_VALUE;
 			multi->controls[index].mix_control.parent = parent3;
-			strcpy(multi->controls[index].mix_control.name, "CD In");
+			strcpy(multi->controls[index].mix_control.name, "CD in");
 			index++;
 			multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_MUX_VALUE;
 			multi->controls[index].mix_control.parent = parent3;
-			strcpy(multi->controls[index].mix_control.name, "Video In");
+			strcpy(multi->controls[index].mix_control.name, "Video in");
 			index++;
 			multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_MUX_VALUE;
 			multi->controls[index].mix_control.parent = parent3;
-			strcpy(multi->controls[index].mix_control.name, "Aux In");
+			strcpy(multi->controls[index].mix_control.name, "Aux in");
 			index++;
 			multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_MUX_VALUE;
 			multi->controls[index].mix_control.parent = parent3;
-			strcpy(multi->controls[index].mix_control.name, "Line In");
+			strcpy(multi->controls[index].mix_control.name, "Line in");
 			index++;
 			multi->controls[index].mix_control.id = MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_MUX_VALUE;
@@ -516,8 +516,8 @@ create_controls_list(geode_multi *multi)
 			strcpy(multi->controls[index].mix_control.name, "TAD");
 			index++;
 		}
-	} 	
-		
+	}
+
 	multi->control_count = index;
 	TRACE("multi->control_count %lu\n", multi->control_count);
 	return B_OK;
@@ -530,14 +530,14 @@ list_mix_controls(geode_controller* controller, multi_mix_control_info* mmci)
 	multi_mix_control* mmc = mmci->controls;
 	if (mmci->control_count < 24)
 		return B_ERROR;
-			
+
 	if (create_controls_list(controller->multi) < B_OK)
 		return B_ERROR;
 	for (uint32 i = 0; i < controller->multi->control_count; i++) {
 		mmc[i] = controller->multi->controls[i].mix_control;
 	}
-	
-	mmci->control_count = controller->multi->control_count;	
+
+	mmci->control_count = controller->multi->control_count;
 	return B_OK;
 }
 
@@ -558,7 +558,7 @@ list_mix_channels(geode_controller* controller, multi_mix_channel_info *data)
 }
 
 
-static status_t 
+static status_t
 get_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 {
 	for (int32 i = 0; i < mmvi->item_count; i++) {
@@ -568,7 +568,7 @@ get_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 			continue;
 		}
 		multi_mixer_control *control = &controller->multi->controls[id];
-	
+
 		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			if (control->get) {
 				float values[2];
@@ -577,15 +577,15 @@ get_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 					mmvi->values[i].gain = values[0];
 				else
 					mmvi->values[i].gain = values[1];
-			}			
+			}
 		}
-		
+
 		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
 			float values[1];
 			control->get(controller, control->cookie, control->type, values);
 			mmvi->values[i].enable = (values[0] == 1.0);
 		}
-		
+
 		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
 			float values[1];
 			control->get(controller, control->cookie, control->type, values);
@@ -596,7 +596,7 @@ get_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 }
 
 
-static status_t 
+static status_t
 set_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 {
 	geode_multi *multi = controller->multi;
@@ -607,7 +607,7 @@ set_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 			continue;
 		}
 		multi_mixer_control *control = &multi->controls[id];
-					
+
 		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			multi_mixer_control *control2 = NULL;
 			if (i+1<mmvi->item_count) {
@@ -630,27 +630,27 @@ set_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 					values[0] = mmvi->values[i].gain;
 				else
 					values[1] = mmvi->values[i].gain;
-					
+
 				if (control2 && control2->mix_control.master != MULTI_CONTROL_MASTERID)
 					values[1] = mmvi->values[i+1].gain;
-					
+
 				control->set(controller, control->cookie, control->type, values);
 			}
-			
+
 			if (control2)
-				i++;		
+				i++;
 		}
-	
+
 		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
 			float values[1];
-			
+
 			values[0] = mmvi->values[i].enable ? 1.0 : 0.0;
 			control->set(controller, control->cookie, control->type, values);
 		}
-		
+
 		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
 			float values[1];
-			
+
 			values[0] = (float)mmvi->values[i].mux;
 			control->set(controller, control->cookie, control->type, values);
 		}
@@ -673,7 +673,7 @@ get_buffers(geode_controller* controller, multi_buffer_list* data)
 
 	data->return_playback_buffers = data->request_playback_buffers;
 	data->return_playback_channels = data->request_playback_channels;
-	data->return_playback_buffer_size = data->request_playback_buffer_size;	
+	data->return_playback_buffer_size = data->request_playback_buffer_size;
 	data->return_record_buffers = data->request_record_buffers;
 	data->return_record_channels = data->request_record_channels;
 	data->return_record_buffer_size = data->request_record_buffer_size;
@@ -776,7 +776,7 @@ buffer_exchange(geode_controller* controller, multi_buffer_info* data)
 	cpu_status status;
 	status_t err;
 	multi_buffer_info buffer_info;
-	
+
 	if (controller->playback_stream == NULL)
 		return B_ERROR;
 
@@ -828,7 +828,7 @@ buffer_exchange(geode_controller* controller, multi_buffer_info* data)
 #else
 	memcpy(data, &buffer_info, sizeof(buffer_info));
 #endif
-	
+
 	debug_buffers_exchanged++;
 	if (((debug_buffers_exchanged % 100) == 1) && (debug_buffers_exchanged < 1111)) {
 		dprintf("%s: %d buffers processed\n", __func__, debug_buffers_exchanged);
@@ -846,8 +846,8 @@ buffer_force_stop(geode_controller* controller)
 	}
 	if (controller->record_stream != NULL) {
 		geode_stream_stop(controller->record_stream);
-	}	
-	
+	}
+
 	return B_OK;
 }
 
@@ -910,7 +910,7 @@ multi_audio_control(geode_controller* controller, uint32 op, void* arg, size_t l
 			return get_mix(controller, (multi_mix_value_info *)arg);
 		case B_MULTI_SET_MIX:
 			return set_mix(controller, (multi_mix_value_info *)arg);
-		
+
 		case B_MULTI_GET_BUFFERS:
 			return get_buffers(controller, (multi_buffer_list*)arg);
 

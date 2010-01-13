@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Haiku Inc. All rights reserved.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -51,7 +51,7 @@ get_description(void* cookie, multi_description* data)
 	data->interface_version = B_CURRENT_INTERFACE_VERSION;
 	data->interface_minimum = B_CURRENT_INTERFACE_VERSION;
 
-	strcpy(data->friendly_name,"Virtual Audio (null_audio)");
+	strcpy(data->friendly_name,"Virtual audio (null_audio)");
 	strcpy(data->vendor_info,"Host/Haiku");
 
 	data->output_channel_count = 2;

@@ -2,7 +2,7 @@
  * This file is a part of SiS 7018 BeOS driver project.
  * Copyright (c) 2002-2003 by Siarzuk Zharski <imker@gmx.li>
  * Portional Copyright (c) 1999 Cameron Grant <gandalf@vilnya.demon.co.uk>
- * 
+ *
  * This file may be used under the terms of the BSD License
  * See the file "License" for details.
  */
@@ -69,7 +69,7 @@ static struct ac97_codecid
 };
 
 static char *ac97enhancement[] = {
-  "no 3D Stereo Enhancement",
+  "No 3D Stereo Enhancement",
   "Analog Devices Phat Stereo",
   "Creative Stereo Enhancement",
   "National Semi 3D Stereo Enhancement",
@@ -139,7 +139,7 @@ int ac97read(sis7018_dev *dev, int regno)
   int i, j, reg, rw;
   if(b_trace_ac97)
     TRACE("  ac97read: regno=%x\n", regno);
-  
+
   switch (dev->type->ids.chip_id){
   case SPA_PCI_ID:
     reg=SPA_REG_CODECRD;
@@ -151,7 +151,7 @@ int ac97read(sis7018_dev *dev, int regno)
 		else
 		  reg=TDX_REG_CODECRD;
 		rw=TDX_CDC_RWSTAT;
-		break; 
+		break;
   case TDX_PCI_ID:
   case xDX_PCI_ID:
     reg=TDX_REG_CODECRD;
@@ -165,7 +165,7 @@ int ac97read(sis7018_dev *dev, int regno)
     TRACE("ac97read defaulted !!!\n");
     return ENODEV;
   }
-  
+
   cp = disable_interrupts();
   acquire_spinlock(&dev->hardware);
 
@@ -183,18 +183,18 @@ int ac97read(sis7018_dev *dev, int regno)
 				c2 = hw_read(dev, 0xc8, 4);
       }
 		}
-  } 
+  }
   if(dev->type->ids.chip_id != ALI_PCI_ID || i > 0){
 	  hw_write(dev, reg, regno | rw, 4);
     j=rw;
-    for (i=TR_TIMEOUT_CDC; (i > 0) && (j & rw); i--){  
+    for (i=TR_TIMEOUT_CDC; (i > 0) && (j & rw); i--){
       j=hw_read(dev, reg, 4);
     }
   }
 
   release_spinlock(&dev->hardware);
   restore_interrupts(cp);
-  
+
   if (i == 0)
     TRACE_ALWAYS("ac97 codec timeout during read of register %x\n", regno);
   if(b_trace_ac97)
@@ -206,10 +206,10 @@ status_t ac97write(sis7018_dev *dev, int regno, uint32 data)
 {
   cpu_status cp;
   int i, j, reg, rw;
- 
+
   if(b_trace_ac97)
     TRACE("\nac97write: regno=%x, data=%lx\n", regno, data);
-  
+
   switch (dev->type->ids.chip_id){
   case SPA_PCI_ID:
     reg=SPA_REG_CODECWR;
@@ -229,11 +229,11 @@ status_t ac97write(sis7018_dev *dev, int regno, uint32 data)
     TRACE("ac97write defaulted !!!");
     return ENODEV;
   }
-  
+
   regno &= 0x7f;
   if(b_trace_ac97)
     TRACE("ac97write: reg %x was %x\n", regno, ac97read(dev, regno));
-  
+
   cp = disable_interrupts();
   acquire_spinlock(&dev->hardware);
   j=rw;
@@ -248,7 +248,7 @@ status_t ac97write(sis7018_dev *dev, int regno, uint32 data)
 			for (i = TR_TIMEOUT_CDC; (i > 0) && (c1 == c2);	i--)
 				c2 = hw_read(dev, 0xc8, 4);
 		}
-  } 
+  }
   if(dev->type->ids.chip_id != ALI_PCI_ID || i > 0){
     for(i=TR_TIMEOUT_CDC; (i>0) && (j & rw); i--){
       j=hw_read(dev, reg, 4);
@@ -279,7 +279,7 @@ status_t ac97init(sis7018_dev *card)
 /* old manner
   err |= ac97write(card, AC97_REG_POWER, 0);
   err |= ac97write(card, AC97_REG_RESET, 0);
-  
+
   err |= ac97write(card, AC97_MIX_PCM, 0x707);
   err |= ac97write(card, AC97_MIX_BEEP, 0x06);
   err |= ac97write(card, AC97_MIX_MIC, 0x8000);
@@ -287,7 +287,7 @@ status_t ac97init(sis7018_dev *card)
   err |= ac97write(card, AC97_MIX_PHONES, 0x707);
 */
 
- //BSD init manner 
+ //BSD init manner
   err |= ac97write(card, AC97_REG_POWER, 0x0000);
   err |= ac97write(card, AC97_REG_RESET, 0);
   snooze(100000);
@@ -337,15 +337,15 @@ status_t ac97init(sis7018_dev *card)
          TRACE("ac97 codec initializatin error\n");
     }
   }
-  
+
   TRACE("ac97 codec features:\n");
-  
+
     for (i = 0; i < 10; i++)
       if (caps & (1 << i))
         TRACE("> %s\n", ac97feature[i]);
     TRACE("> %s\n", ac97enhancement[se]);
   TRACE("\n");
-  
+
   extcaps = 0;
   extid = 0;
   extstat = 0;
@@ -364,14 +364,14 @@ status_t ac97init(sis7018_dev *card)
       for (i = 0; i < 14; i++)
         if (extcaps & (1 << i))
           TRACE("> %s\n", ac97extfeature[i]);
-      TRACE("\n"); 
+      TRACE("\n");
     }
 
   if ((ac97read(card, AC97_REG_POWER) & 2) == 0)
     TRACE("ac97 codec reports dac not ready\n");
 
 // some addition
- 
+
   reg = ac97read(card, AC97_MIX_MASTER);
   err |= ac97write(card, AC97_MIX_MASTER, 0x3f3f);
   if(0x3f3f == ac97read(card, AC97_MIX_MASTER)){
@@ -379,7 +379,7 @@ status_t ac97init(sis7018_dev *card)
     card->ac97.wide_main_gain = true;
   }
   err |= ac97write(card, AC97_MIX_MASTER, reg);
- 
+
 // BSD manner
   err |= ac97write(card, AC97_MIX_PCM, 0x707);
 //  err |= ac97write(card, AC97_MIX_BEEP, 0x06);
@@ -398,12 +398,12 @@ status_t ac97get_params(sis7018_dev *dev, sound_setup *sound)
 {
   uint16 reg = 0;
   int main_gain_multiplier = dev->ac97.wide_main_gain ? 1 : 2;
-     
+
   sound->sample_rate = kHz_48_0;
   sound->dither_enable = false;
   sound->output_boost = 0;
   sound->highpass_enable = 0;
-      
+
   reg=ac97read(dev, AC97_MIX_MONO);
   sound->mono_gain = (char)reg;
   sound->mono_mute = (char)(reg & AC97_MUTE) ? 1 : 0;
@@ -415,7 +415,7 @@ status_t ac97get_params(sis7018_dev *dev, sound_setup *sound)
   case 0:  sound->right.adc_source = mic; break;
   default: sound->right.adc_source = loopback; break;
   }
-      
+
   switch ((reg >> 8) & 0x07){
   case 4:  sound->left.adc_source = line; break;
   case 3:  sound->left.adc_source = aux1; break;
@@ -426,38 +426,38 @@ status_t ac97get_params(sis7018_dev *dev, sound_setup *sound)
   reg = ac97read(dev, AC97_MIX_MIC);
   sound->loop_attn = (reg & 0x1f)*2;
   sound->loop_enable = (reg & AC97_MUTE) ? 0 : 1;
-  sound->left.mic_gain_enable = 
+  sound->left.mic_gain_enable =
   sound->right.mic_gain_enable = (reg >> 6) & 0x01;
 
   reg = ac97read(dev, AC97_MIX_RGAIN);
   sound->left.adc_gain = (reg >> 0x8) & 0xf;
   sound->right.adc_gain  = reg & 0xf;
-  
+
   reg = ac97read(dev, AC97_MIX_CD);
   sound->left.aux1_mix_gain = ((reg >> 8) & 0x1f);
   sound->right.aux1_mix_gain = (reg & 0x1f);
-  sound->left.aux1_mix_mute =  
+  sound->left.aux1_mix_mute =
   sound->right.aux1_mix_mute = (reg & AC97_MUTE) ? 1 : 0;
-      
+
   reg = ac97read(dev, AC97_MIX_AUX);
   sound->left.aux2_mix_gain = ((reg >> 8) & 0x1f);
   sound->right.aux2_mix_gain = (reg & 0x1f);
-  sound->left.aux2_mix_mute =  
+  sound->left.aux2_mix_mute =
   sound->right.aux2_mix_mute = (reg & AC97_MUTE) ? 1 : 0;
-      
-        
+
+
   reg = ac97read(dev, AC97_MIX_LINE);
   sound->left.line_mix_gain = ((reg >> 8) & 0x1f);
   sound->right.line_mix_gain = (reg & 0x1f);
-  sound->left.line_mix_mute =  
+  sound->left.line_mix_mute =
   sound->right.line_mix_mute = (reg & AC97_MUTE) ? 1 : 0;
-      
+
   reg = ac97read(dev, AC97_MIX_MASTER);
   sound->left.dac_attn = ((reg >> 8) & 0x1f) * main_gain_multiplier;
   sound->right.dac_attn = (reg & 0x1f) * main_gain_multiplier;
-  sound->left.dac_mute =  
-  sound->right.dac_mute = (reg & AC97_MUTE) ? 1 : 0;  
-      
+  sound->left.dac_mute =
+  sound->right.dac_mute = (reg & AC97_MUTE) ? 1 : 0;
+
   return B_OK;
 }
 
@@ -498,30 +498,30 @@ status_t ac97set_params(sis7018_dev *dev, sound_setup * sound)
   sound->output_boost = 0;
   sound->highpass_enable = 0;
 
-  reg = sound->mono_gain | ((sound->mono_mute) ? AC97_MUTE : 0);  
+  reg = sound->mono_gain | ((sound->mono_mute) ? AC97_MUTE : 0);
   err |= ac97write(dev, AC97_MIX_MONO, reg);
-    
+
   reg = sound->loop_attn / 2;
   reg |= ((sound->left.mic_gain_enable || sound->right.mic_gain_enable) ? 0x01 : 0x00) << 6;
-  reg |= (sound->loop_enable) ? 0 : AC97_MUTE;  
+  reg |= (sound->loop_enable) ? 0 : AC97_MUTE;
   err |= ac97write(dev, AC97_MIX_MIC, reg);
-      
+
   reg = 0;
   switch(sound->left.adc_source){
   case line: reg = 4; break;
   case aux1: reg = 3; break;
   case mic:  reg = 0; break;
-  default:   reg = 0; break; 
+  default:   reg = 0; break;
   }
-      
+
   reg <<= 8;
   switch(sound->right.adc_source){
   case line: reg |= 4; break;
   case aux1: reg |= 3; break;
   case mic:  reg |= 0; break;
-  default:   reg |= 0; break; 
+  default:   reg |= 0; break;
   }
-      
+
   err |= ac97write(dev, AC97_REG_RECSEL, reg);
 
   reg = (sound->left.adc_gain) << 8;
@@ -530,25 +530,25 @@ status_t ac97set_params(sis7018_dev *dev, sound_setup * sound)
 
   reg = (sound->left.aux1_mix_gain) << 0x08;
   reg |= sound->right.aux1_mix_gain;
-  reg |= (sound->left.aux1_mix_mute || sound->right.aux1_mix_mute) ? AC97_MUTE : 0 ; 
+  reg |= (sound->left.aux1_mix_mute || sound->right.aux1_mix_mute) ? AC97_MUTE : 0 ;
   err |= ac97write(dev, AC97_MIX_CD, reg);
 
   reg = (sound->left.aux2_mix_gain) << 0x08;
   reg |= sound->right.aux2_mix_gain;
-  reg |= (sound->left.aux2_mix_mute || sound->right.aux2_mix_mute) ? AC97_MUTE : 0 ; 
+  reg |= (sound->left.aux2_mix_mute || sound->right.aux2_mix_mute) ? AC97_MUTE : 0 ;
   err |= ac97write(dev, AC97_MIX_AUX, reg);
-      
+
   reg = (sound->left.line_mix_gain) << 0x08;
   reg |= sound->right.line_mix_gain;
-  reg |= (sound->left.line_mix_mute || sound->right.line_mix_mute) ? AC97_MUTE : 0 ; 
+  reg |= (sound->left.line_mix_mute || sound->right.line_mix_mute) ? AC97_MUTE : 0 ;
   err |= ac97write(dev, AC97_MIX_LINE, reg);
 
   reg = ((sound->left.dac_attn) / main_gain_divider) << 0x08;
   reg |= (sound->right.dac_attn) / main_gain_divider;
-  reg |= (sound->left.dac_mute || sound->right.dac_mute) ? AC97_MUTE : 0 ; 
+  reg |= (sound->left.dac_mute || sound->right.dac_mute) ? AC97_MUTE : 0 ;
   err |= ac97write(dev, AC97_MIX_MASTER, reg);
 
-  return err;      
+  return err;
 }
 
 status_t ac97init_default(sis7018_dev *dev, bool bOn)
@@ -578,20 +578,20 @@ status_t ac97init_CS4299(sis7018_dev *dev, bool bOn)
 static struct
 {
   int16 reg;
-  char  name[DEVNAME];  
+  char  name[DEVNAME];
 } ac97_regs[]=
 {
-  {AC97_REG_RESET, "Reset"},           {AC97_MIX_MASTER, "Master Volume"}, 
-  {AC97_MIX_PHONES, "AUX Out volume"}, {AC97_MIX_MONO, "Mono Volume"}, 
-  {AC97_MIX_TONE, "Master Tone"},    {AC97_MIX_BEEP, "PC Beep"}, 
-  {AC97_MIX_PHONE, "Phone volume"},  {AC97_MIX_MIC, "Mio Volume"}, 
-  {AC97_MIX_LINE, "Line In Volume"}, {AC97_MIX_CD, "CD Volume"}, 
-  {AC97_MIX_VIDEO, "Video Volume"},  {AC97_MIX_AUX, "AUX In Volume"}, 
-  {AC97_MIX_PCM, "PCM Out Volume"},  {AC97_REG_RECSEL, "Record Select"}, 
-  {AC97_MIX_RGAIN, "Record Gain"},   {AC97_MIX_MGAIN, "Record Gain Mio"}, 
-  {AC97_REG_GEN, "General Purpose"}, {AC97_REG_3D, "3D Control"}, 
-  {0x24, "Audio Int & Paging"}, {AC97_REG_POWER, "Powerdown Ctrl/Stat"}, 
-  {AC97_REG_ID1, "Vendor ID1"}, {AC97_REG_ID2, "VendorID 2"}, 
+  {AC97_REG_RESET, "Reset"},           {AC97_MIX_MASTER, "Master volume"},
+  {AC97_MIX_PHONES, "AUX out volume"}, {AC97_MIX_MONO, "Mono volume"},
+  {AC97_MIX_TONE, "Master tone"},    {AC97_MIX_BEEP, "PC beep"},
+  {AC97_MIX_PHONE, "Phone volume"},  {AC97_MIX_MIC, "Mic volume"},
+  {AC97_MIX_LINE, "Line in volume"}, {AC97_MIX_CD, "CD volume"},
+  {AC97_MIX_VIDEO, "Video volume"},  {AC97_MIX_AUX, "AUX in volume"},
+  {AC97_MIX_PCM, "PCM out volume"},  {AC97_REG_RECSEL, "Record select"},
+  {AC97_MIX_RGAIN, "Record gain"},   {AC97_MIX_MGAIN, "Record gain Mic"},
+  {AC97_REG_GEN, "General purpose"}, {AC97_REG_3D, "3D control"},
+  {0x24, "Audio int & paging"}, {AC97_REG_POWER, "Powerdown ctrl/stat"},
+  {AC97_REG_ID1, "VendorID 1"}, {AC97_REG_ID2, "VendorID 2"},
 };
 
 void ac97dump(int card_id)

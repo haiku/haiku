@@ -55,15 +55,15 @@ static const char* kPortConnector[] = {
 };
 
 static const char* kDefaultDevice[] = {
-	"Line Out", "Speaker", "HP Out", "CD", "SPDIF out", "Digital Other Out",
-	"Modem Line Side", "Modem Hand Side", "Line In", "AUX", "Mic In",
-	"Telephony", "SPDIF In", "Digital Other In", "Reserved", "Other"
+	"Line out", "Speaker", "HP out", "CD", "SPDIF out", "Digital other out",
+	"Modem line side", "Modem hand side", "Line in", "AUX", "Mic in",
+	"Telephony", "SPDIF in", "Digital other in", "Reserved", "Other"
 };
 
 static const char* kConnectionType[] = {
 	"N/A", "1/8\"", "1/4\"", "ATAPI internal", "RCA", "Optical",
-	"Other Digital", "Other Analog", "Multichannel Analog (DIN)",
-	"XLR/Professional", "RJ-11 (Modem)", "Combination", "-", "-", "-", "Other"
+	"Other digital", "Other analog", "Multichannel analog (DIN)",
+	"XLR/Professional", "RJ-11 (modem)", "Combination", "-", "-", "-", "Other"
 };
 
 static const char* kJackColor[] = {
@@ -77,23 +77,23 @@ get_widget_type_name(hda_widget_type type)
 {
 	switch (type) {
 		case WT_AUDIO_OUTPUT:
-			return "Audio Output";
+			return "Audio output";
 		case WT_AUDIO_INPUT:
-			return "Audio Input";
+			return "Audio input";
 		case WT_AUDIO_MIXER:
-			return "Audio Mixer";
+			return "Audio mixer";
 		case WT_AUDIO_SELECTOR:
-			return "Audio Selector";
+			return "Audio selector";
 		case WT_PIN_COMPLEX:
-			return "Pin Complex";
+			return "Pin complex";
 		case WT_POWER:
 			return "Power";
 		case WT_VOLUME_KNOB:
-			return "Volume Knob";
+			return "Volume knob";
 		case WT_BEEP_GENERATOR:
-			return "Beep Generator";
+			return "Beep generator";
 		case WT_VENDOR_DEFINED:
-			return "Vendor Defined";
+			return "Vendor defined";
 		default:
 			return "Unknown";
 	}
@@ -158,17 +158,17 @@ dump_widget_audio_capabilities(uint32 capabilities)
 		uint32		flag;
 		const char*	name;
 	} kFlags[] = {
-		{AUDIO_CAP_LEFT_RIGHT_SWAP, "L-R Swap"},
+		{AUDIO_CAP_LEFT_RIGHT_SWAP, "L-R swap"},
 		{AUDIO_CAP_POWER_CONTROL, "Power"},
 		{AUDIO_CAP_DIGITAL, "Digital"},
-		{AUDIO_CAP_CONNECTION_LIST, "Conn. List"},
-		{AUDIO_CAP_UNSOLICITED_RESPONSES, "Unsol. Responses"},
-		{AUDIO_CAP_PROCESSING_CONTROLS, "Proc Widget"},
+		{AUDIO_CAP_CONNECTION_LIST, "Conn. list"},
+		{AUDIO_CAP_UNSOLICITED_RESPONSES, "Unsol. responses"},
+		{AUDIO_CAP_PROCESSING_CONTROLS, "Proc widget"},
 		{AUDIO_CAP_STRIPE, "Stripe"},
-		{AUDIO_CAP_FORMAT_OVERRIDE, "Format Override"},
-		{AUDIO_CAP_AMPLIFIER_OVERRIDE, "Amplifier Override"},
-		{AUDIO_CAP_OUTPUT_AMPLIFIER, "Out Amplifier"},
-		{AUDIO_CAP_INPUT_AMPLIFIER, "In Amplifier"},
+		{AUDIO_CAP_FORMAT_OVERRIDE, "Format override"},
+		{AUDIO_CAP_AMPLIFIER_OVERRIDE, "Amplifier override"},
+		{AUDIO_CAP_OUTPUT_AMPLIFIER, "Out amplifier"},
+		{AUDIO_CAP_INPUT_AMPLIFIER, "In amplifier"},
 		{AUDIO_CAP_STEREO, "Stereo"},
 	};
 

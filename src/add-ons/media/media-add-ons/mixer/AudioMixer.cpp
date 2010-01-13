@@ -1685,11 +1685,11 @@ AudioMixer::UpdateParameterWeb()
 	MixerOutput *out;
 	char buf[50];
 
-	top = web->MakeGroup("Gain Controls");
+	top = web->MakeGroup("Gain controls");
 
 	out = fCore->Output();
 	group = top->MakeGroup("");
-	group->MakeNullParameter(PARAM_STR1(0), B_MEDIA_RAW_AUDIO, "Master Output", B_WEB_BUFFER_INPUT);
+	group->MakeNullParameter(PARAM_STR1(0), B_MEDIA_RAW_AUDIO, "Master output", B_WEB_BUFFER_INPUT);
 	if (!out) {
 		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
 	} else {
@@ -1704,7 +1704,7 @@ AudioMixer::UpdateParameterWeb()
 			group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", DB_MIN, DB_MAX, 0.1)
 										   ->SetChannelCount(out->GetOutputChannelCount());
 		}
-		group->MakeNullParameter(PARAM_STR3(0), B_MEDIA_RAW_AUDIO, "To Output", B_WEB_BUFFER_OUTPUT);
+		group->MakeNullParameter(PARAM_STR3(0), B_MEDIA_RAW_AUDIO, "To output", B_WEB_BUFFER_OUTPUT);
 	}
 
 	for (int i = 0; (in = fCore->Input(i)); i++) {
@@ -1737,16 +1737,16 @@ AudioMixer::UpdateParameterWeb()
 											   ->SetChannelCount(in->GetMixerChannelCount());
 			}
 		}
-		group->MakeNullParameter(PARAM_STR3(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT);
+		group->MakeNullParameter(PARAM_STR3(in->ID()), B_MEDIA_RAW_AUDIO, "To master", B_WEB_BUFFER_OUTPUT);
 	}
 
 	if (fCore->Settings()->AllowOutputChannelRemapping()) {
-		top = web->MakeGroup("Output Mapping"); // top level group
+		top = web->MakeGroup("Output mapping"); // top level group
 		outputchannels = top->MakeGroup("");
-		outputchannels->MakeNullParameter(PARAM_STR4(0), B_MEDIA_RAW_AUDIO, "Output Channel Sources", B_GENERIC);
+		outputchannels->MakeNullParameter(PARAM_STR4(0), B_MEDIA_RAW_AUDIO, "Output channel sources", B_GENERIC);
 
 		group = outputchannels->MakeGroup("");
-		group->MakeNullParameter(PARAM_STR5(0), B_MEDIA_RAW_AUDIO, "Master Output", B_GENERIC);
+		group->MakeNullParameter(PARAM_STR5(0), B_MEDIA_RAW_AUDIO, "Master output", B_GENERIC);
 		group = group->MakeGroup("");
 		if (!out) {
 			group->MakeNullParameter(PARAM_STR6(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
@@ -1771,9 +1771,9 @@ AudioMixer::UpdateParameterWeb()
 	}
 
 	if (fCore->Settings()->AllowInputChannelRemapping()) {
-		top = web->MakeGroup("Input Mapping"); // top level group
+		top = web->MakeGroup("Input mapping"); // top level group
 		inputchannels = top->MakeGroup("");
-		inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input Channel Destinations", B_GENERIC);
+		inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input channel destinations", B_GENERIC);
 
 		for (int i = 0; (in = fCore->Input(i)); i++) {
 			group = inputchannels->MakeGroup("");

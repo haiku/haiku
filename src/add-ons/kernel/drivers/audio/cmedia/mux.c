@@ -43,11 +43,11 @@ typedef struct {
 } mux_info;
 
 const mux_info the_muxes[] = {
-	{ 0, 1, 1, 7, 5, 0xe0, "Sampling Input" },
-	{ 0, -1, 0, 1, 4, 0x10, "Mic +20dB Selection" },
-	{ 0x2a, -1, 0, 1, 0, 0x01, "MIDI Output To Synth" },
-	{ 0x2a, -1, 0, 1, 1, 0x02, "MIDI Input To Synth" },
-	{ 0x2a, -1, 0, 1, 2, 0x04, "MIDI Output To Port" },
+	{ 0, 1, 1, 7, 5, 0xe0, "Sampling input" },
+	{ 0, -1, 0, 1, 4, 0x10, "Mic +20dB selection" },
+	{ 0x2a, -1, 0, 1, 0, 0x01, "MIDI output to synth" },
+	{ 0x2a, -1, 0, 1, 1, 0x02, "MIDI input to synth" },
+	{ 0x2a, -1, 0, 1, 2, 0x04, "MIDI output to port" },
 };
 
 static const uchar unmap_input[] = {

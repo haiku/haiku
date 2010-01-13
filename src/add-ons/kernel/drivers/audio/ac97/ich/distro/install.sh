@@ -8,7 +8,7 @@ Please read the readme file first!
 It contains recovery instructions, which you will need if your computer crashes, freezes or fails to start.
 
 
-Do you really want to install the ICH AC97  driver now?" "No" "Yes"`
+Do you really want to install the ICH AC97 driver now?" "No" "Yes"`
 
 
 if [ $answer == "No" ]
