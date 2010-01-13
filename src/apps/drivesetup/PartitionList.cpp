@@ -203,8 +203,11 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 	if (partition->ContainsFileSystem()) {
 		SetField(new BStringField(partition->ContentType()), kFilesystemColumn);
 		SetField(new BStringField(partition->ContentName()), kVolumeNameColumn);
-	} else {
+	} else if (partition->CountChildren() > 0) {
 		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
+		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
+	} else {
+		SetField(new BStringField(partition->Type()), kFilesystemColumn);
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	}
 
