@@ -44,6 +44,12 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 		return 0;
 	}
 
+	intr_status &= CSR_READ_4(sc, BWI_MAC_INTR_MASK);
+	if (intr_status == 0) {
+		// nothing interesting
+		return 0;
+	}
+
 	atomic_set((int32*)&sc->sc_intr_status, intr_status);
 
 	CSR_CLRBITS_4(sc, BWI_MAC_INTR_MASK, BWI_ALL_INTRS);

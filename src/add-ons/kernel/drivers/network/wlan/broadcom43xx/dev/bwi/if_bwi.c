@@ -1581,9 +1581,6 @@ bwi_intr(void *xsc)
 		BWI_UNLOCK(sc);
 		return;
 	}
-#else
-	intr_status = atomic_get((int32 *)&sc->sc_intr_status);
-#endif
 
 	DPRINTF(sc, BWI_DBG_INTR, "intr status 0x%08x\n", intr_status);
 
@@ -1592,6 +1589,9 @@ bwi_intr(void *xsc)
 		BWI_UNLOCK(sc);
 		return;
 	}
+#else
+	intr_status = atomic_get((int32 *)&sc->sc_intr_status);
+#endif
 
 	KASSERT(sc->sc_cur_regwin->rw_type == BWI_REGWIN_T_MAC,
 	    ("current regwin type %d", sc->sc_cur_regwin->rw_type));
