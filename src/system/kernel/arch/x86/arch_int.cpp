@@ -568,9 +568,10 @@ ioapic_init(kernel_args *args)
 	// always map the local apic as it can be used for timers even if we
 	// don't end up using the io apic
 	sLocalAPIC = args->arch_args.apic;
-	if (map_physical_memory("local apic", (void *)args->arch_args.apic_phys,
-		B_PAGE_SIZE, B_EXACT_ADDRESS, B_KERNEL_READ_AREA
-		| B_KERNEL_WRITE_AREA, &sLocalAPIC) < B_OK) {
+	if (vm_map_physical_memory(B_SYSTEM_TEAM, "local apic", &sLocalAPIC,
+			B_EXACT_ADDRESS, B_PAGE_SIZE,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			args->arch_args.apic_phys, true) < 0) {
 		panic("mapping the local apic failed");
 		return;
 	}
@@ -597,9 +598,10 @@ ioapic_init(kernel_args *args)
 
 	// map in the ioapic
 	sIOAPIC = (ioapic *)args->arch_args.ioapic;
-	if (map_physical_memory("ioapic", (void *)args->arch_args.ioapic_phys,
-			B_PAGE_SIZE, B_EXACT_ADDRESS,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&sIOAPIC) < 0) {
+	if (vm_map_physical_memory(B_SYSTEM_TEAM, "ioapic", (void**)&sIOAPIC,
+			B_EXACT_ADDRESS, B_PAGE_SIZE,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			args->arch_args.ioapic_phys, true) < 0) {
 		panic("mapping the ioapic failed");
 		return;
 	}

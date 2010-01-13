@@ -1079,7 +1079,8 @@ err0:
 
 area_id
 vm_map_physical_memory(team_id team, const char* name, void** _address,
-	uint32 addressSpec, addr_t size, uint32 protection, addr_t physicalAddress)
+	uint32 addressSpec, addr_t size, uint32 protection, addr_t physicalAddress,
+	bool alreadyWired)
 {
 	VMArea* area;
 	VMCache* cache;
@@ -1132,7 +1133,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 			delete_area(locker.AddressSpace(), area);
 	}
 
-	if (status >= B_OK) {
+	if (status >= B_OK && !alreadyWired) {
 		// make sure our area is mapped in completely
 
 		vm_translation_map* map = &locker.AddressSpace()->TranslationMap();
@@ -4839,7 +4840,7 @@ map_physical_memory(const char* name, void* physicalAddress, size_t numBytes,
 
 	return vm_map_physical_memory(VMAddressSpace::KernelID(), name,
 		_virtualAddress, addressSpec, numBytes, protection,
-		(addr_t)physicalAddress);
+		(addr_t)physicalAddress, false);
 }
 
 

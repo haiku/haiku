@@ -573,8 +573,9 @@ vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 	// map vga/bios area
 	address = (void *)0xa0000;
 	state->bios_area = vm_map_physical_memory(team->id, "bios",
-		&address, B_EXACT_ADDRESS, 0x60000, B_KERNEL_READ_AREA
-		| B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA, (addr_t)0xa0000);
+		&address, B_EXACT_ADDRESS, 0x60000,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
+		(addr_t)0xa0000, false);
 	if (state->bios_area < B_OK) {
 		ret = state->bios_area;
 		TRACE("Could not map VGA BIOS.\n");
