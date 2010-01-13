@@ -1755,7 +1755,7 @@ PreFlightNameCheck(BObjectList<entry_ref> *srcList, const BDirectory *destDir,
 		sprintf(replaceMsg, kReplaceManyStr, verb, verb);
 
 		BAlert *alert = new BAlert("", replaceMsg,
-			"Cancel", "Prompt", "Replace All");
+			"Cancel", "Prompt", "Replace all");
 		alert->SetShortcut(0, B_ESCAPE);
 		switch (alert->Go()) {
 			case 0:
@@ -1891,7 +1891,7 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry, const BDirectory *destDir,
 		// special case single collision (don't need Replace All shortcut)
 		BAlert *alert;
 		if (multipleCollisions || sourceIsDirectory) {
-			alert = new BAlert("", replaceMsg, "Skip", "Replace All");
+			alert = new BAlert("", replaceMsg, "Skip", "Replace all");
 		} else {
 			alert = new BAlert("", replaceMsg, "Cancel", "Replace");
 			alert->SetShortcut(0, B_ESCAPE);
@@ -2605,7 +2605,7 @@ _DeleteTask(BObjectList<entry_ref> *list, bool confirm)
 		}
 
 		if (err != kTrashCanceled && err != kUserCanceled && err != B_OK)
-			(new BAlert("", "Error Deleting items", "OK", NULL, NULL,
+			(new BAlert("", "Error deleting items", "OK", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 	}
 	if (gStatusWindow)
@@ -2796,7 +2796,7 @@ FSCreateNewFolderIn(const node_ref *dirNode, entry_ref *newRef,
 	status_t result = dir.InitCheck();
 	if (result == B_OK) {
 		char name[B_FILE_NAME_LENGTH];
-		strcpy(name, "New Folder");
+		strcpy(name, "New folder");
 
 		int32 fnum = 1;
 		while (dir.Contains(name)) {
@@ -2804,9 +2804,9 @@ FSCreateNewFolderIn(const node_ref *dirNode, entry_ref *newRef,
 			// ToDo:
 			// move this logic ot FSMakeOriginalName
 			if (++fnum > 9)
-				sprintf(name, "New Folder%ld", fnum);
+				sprintf(name, "New folder%ld", fnum);
 			else
-				sprintf(name, "New Folder %ld", fnum);
+				sprintf(name, "New folder %ld", fnum);
 		}
 
 		BDirectory newDir;
@@ -3206,7 +3206,7 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 			alternative = kFindApplicationStr;
 		} else if (error == B_LAUNCH_FAILED_APP_IN_TRASH) {
 			alertString << "Could not open \"" << documentRef.name
-				<< "\" because application \"" << app.name << "\" is in the trash. ";
+				<< "\" because application \"" << app.name << "\" is in the Trash. ";
 			alternative = kFindAlternativeStr;
 		} else if (error == B_LAUNCH_FAILED_APP_NOT_FOUND) {
 			alertString << "Could not open \"" << documentRef.name << "\" "

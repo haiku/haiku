@@ -146,7 +146,7 @@ TCustomButton::Draw(BRect updateRect)
 
 BStatusWindow::BStatusWindow()
 	:
-	BWindow(kStatusRect, "Tracker Status", B_TITLED_WINDOW,
+	BWindow(kStatusRect, "Tracker status", B_TITLED_WINDOW,
 		B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_NOT_ZOOMABLE,
 		B_ALL_WORKSPACES),
 	fRetainDesktopFocus(false)
@@ -529,7 +529,7 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 			break;
 
 		case kCreateLinkState:
-			fStatusBar->Reset("Creating Links: ", buffer.String());
+			fStatusBar->Reset("Creating links: ", buffer.String());
 			break;
 
 		case kMoveState:
