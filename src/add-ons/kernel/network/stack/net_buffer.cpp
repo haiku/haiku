@@ -1653,6 +1653,10 @@ append_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 			}
 
 			node = add_first_data_node(header);
+			if (node == NULL) {
+				release_data_header(header);
+				return B_NO_MEMORY;
+			}
 
 			node->SetTailSpace(node->TailSpace() - sizeUsed);
 			node->used = sizeUsed;
