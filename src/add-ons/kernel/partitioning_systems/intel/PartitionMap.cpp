@@ -83,6 +83,7 @@ static const struct partition_type kPartitionTypes[] = {
 	{ 0xab, "MacOS X boot", true },
 	{ 0xaf, "MacOS X HFS", true },
 	{ 0xbe, "Solaris 8 boot", false },
+	{ 0xbf, "Solaris 10", false },
 	{ 0xeb, /*"BeOS"*/ BFS_NAME, true },
 	{ 0, NULL, false }
 };
@@ -107,8 +108,7 @@ static const char*
 partition_type_string(uint8 type)
 {
 	int32 i;
-	for (i = 0; kPartitionTypes[i].name ; i++)
-	{
+	for (i = 0; kPartitionTypes[i].name ; i++) {
 		if (type == kPartitionTypes[i].type)
 			return kPartitionTypes[i].name;
 	}
