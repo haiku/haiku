@@ -165,7 +165,7 @@ put_page_table_entry_in_pgtable(page_table_entry* entry,
 		page |= X86_PTE_WRITABLE;
 
 	// put it in the page table
-	*entry = page;
+	*(volatile page_table_entry*)entry = page;
 }
 
 
@@ -379,17 +379,15 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	index = VADDR_TO_PTENT(va);
 
+	ASSERT((pt[index] & X86_PTE_PRESENT) == 0);
+
 	put_page_table_entry_in_pgtable(&pt[index], pa, attributes,
 		IS_KERNEL_MAP(map));
 
 	pinner.Unlock();
 
-	if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE) {
-		map->arch_data->pages_to_invalidate[
-			map->arch_data->num_invalidate_pages] = va;
-	}
-
-	map->arch_data->num_invalidate_pages++;
+	// Note: We don't need to invalidate the TLB for this address, as previously
+	// the entry was not present and the TLB doesn't cache those entries.
 
 	map->map_count++;
 
@@ -433,15 +431,22 @@ restart:
 
 		TRACE(("unmap_tmap: removing page 0x%lx\n", start));
 
-		clear_page_table_entry_flags(&pt[index], X86_PTE_PRESENT);
+		page_table_entry oldEntry = clear_page_table_entry_flags(&pt[index],
+			X86_PTE_PRESENT);
 		map->map_count--;
 
-		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE) {
-			map->arch_data->pages_to_invalidate[
-				map->arch_data->num_invalidate_pages] = start;
-		}
+		if ((oldEntry & X86_PTE_ACCESSED) != 0) {
+			// Note, that we only need to invalidate the address, if the
+			// accessed flags was set, since only then the entry could have been
+			// in any TLB.
+			if (map->arch_data->num_invalidate_pages
+					< PAGE_INVALIDATE_CACHE_SIZE) {
+				map->arch_data->pages_to_invalidate[
+					map->arch_data->num_invalidate_pages] = start;
+			}
 
-		map->arch_data->num_invalidate_pages++;
+			map->arch_data->num_invalidate_pages++;
+		}
 	}
 
 	pinner.Unlock();
@@ -585,18 +590,21 @@ restart:
 		} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
 			entry |= X86_PTE_WRITABLE;
 
-		set_page_table_entry(&pt[index], entry);
+		page_table_entry oldEntry = set_page_table_entry(&pt[index], entry);
 			// TODO: We might have cleared accessed/modified flags!
 
-		// TODO: Optimize: If the accessed flag was clear, we don't need to
-		// invalidate the TLB for that address.
+		if ((oldEntry & X86_PTE_ACCESSED) != 0) {
+			// Note, that we only need to invalidate the address, if the
+			// accessed flags was set, since only then the entry could have been
+			// in any TLB.
+			if (map->arch_data->num_invalidate_pages
+					< PAGE_INVALIDATE_CACHE_SIZE) {
+				map->arch_data->pages_to_invalidate[
+					map->arch_data->num_invalidate_pages] = start;
+			}
 
-		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE) {
-			map->arch_data->pages_to_invalidate[
-				map->arch_data->num_invalidate_pages] = start;
+			map->arch_data->num_invalidate_pages++;
 		}
-
-		map->arch_data->num_invalidate_pages++;
 	}
 
 	pinner.Unlock();
@@ -929,11 +937,11 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 			+ (va / B_PAGE_SIZE / 1024) * B_PAGE_SIZE), 0, B_PAGE_SIZE);
 	}
 
+	ASSERT((sPageHole[va / B_PAGE_SIZE] & X86_PTE_PRESENT) == 0);
+
 	// now, fill in the pentry
 	put_page_table_entry_in_pgtable(sPageHole + va / B_PAGE_SIZE, pa,
 		attributes, IS_KERNEL_ADDRESS(va));
-
-	arch_cpu_invalidate_TLB_range(va, va);
 
 	return B_OK;
 }
