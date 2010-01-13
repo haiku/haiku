@@ -2386,8 +2386,14 @@ bool
 FSIsDeskDir(const BEntry *entry, dev_t device)
 {
 	BVolume volume(device);
+	
 	status_t result = volume.InitCheck();
 	if (result != B_OK)
+		return false;
+
+	BVolume bootvolume;
+	BVolumeRoster roster;
+	if (roster.GetBootVolume(&bootvolume) == B_OK && volume != bootvolume)
 		return false;
 
 	BPath path;
