@@ -888,13 +888,13 @@ typedef enum TokenizeModeEnum
 static char * g_TokenizeModeNames [TM_MAX] =
 {
   "All",
-  "Plain Text",
-  "Plain Text and Header",
-  "Any Text",
-  "Any Text and Header",
-  "All Parts",
-  "All Parts and Header",
-  "Just Header"
+  "Plain text",
+  "Plain text and header",
+  "Any text",
+  "Any text and header",
+  "All parts",
+  "All parts and header",
+  "Just header"
 };
 
 
@@ -6369,7 +6369,7 @@ void ControlsView::AttachedToWindow ()
         break;
 
       case TM_ANY_TEXT_HEADER:
-        strcat (TempString, " - Scan entire e-mail text and text attachments (Recommended)");
+       strcat (TempString, " - Scan entire e-mail text and text attachments (recommended)");
         break;
 
       case TM_ALL_PARTS:
@@ -6448,11 +6448,11 @@ void ControlsView::AttachedToWindow ()
     switch (ScoringMode)
     {
       case SM_ROBINSON:
-        strcpy (TempString, "Learning Method 1: Naive Bayesian");
+        strcpy (TempString, "Learning method 1: Naive Bayesian");
         break;
 
       case SM_CHISQUARED:
-        strcpy (TempString, "Learning Method 2: Chi-Squared");
+        strcpy (TempString, "Learning method 2: Chi-Squared");
         break;
 
       default:
@@ -6483,7 +6483,7 @@ void ControlsView::AttachedToWindow ()
   CommandMessage.what = B_EXECUTE_PROPERTY;
   CommandMessage.AddSpecifier (g_PropertyNames[PN_INSTALL_THINGS]);
   m_InstallThingsButtonPntr = new BButton (TempRect, "Install Button",
-    "Install Spam Types",
+    "Install spam types",
     new BMessage (CommandMessage),
     B_FOLLOW_LEFT | B_FOLLOW_TOP);
   if (m_InstallThingsButtonPntr == NULL) goto ErrorExit;
@@ -6502,7 +6502,7 @@ void ControlsView::AttachedToWindow ()
   CommandMessage.what = B_EXECUTE_PROPERTY;
   CommandMessage.AddSpecifier (g_PropertyNames[PN_RESET_TO_DEFAULTS]);
   m_ResetToDefaultsButtonPntr = new BButton (TempRect, "Reset Button",
-    "Default Settings", new BMessage (CommandMessage),
+    "Default settings", new BMessage (CommandMessage),
     B_FOLLOW_RIGHT | B_FOLLOW_TOP);
   if (m_ResetToDefaultsButtonPntr == NULL) goto ErrorExit;
   AddChild (m_ResetToDefaultsButtonPntr);
@@ -6525,7 +6525,7 @@ void ControlsView::AttachedToWindow ()
   TempRect.left = X;
 
   m_EstimateSpamButtonPntr = new BButton (TempRect, "Estimate Button",
-    "Scan a Message",
+    "Scan a message",
     new BMessage (MSG_ESTIMATE_BUTTON),
     B_FOLLOW_LEFT | B_FOLLOW_TOP);
   if (m_EstimateSpamButtonPntr == NULL) goto ErrorExit;
@@ -6543,7 +6543,7 @@ void ControlsView::AttachedToWindow ()
   TempRect.left = X;
 
   m_AddExampleButtonPntr = new BButton (TempRect, "Example Button",
-    "Train Spam Filter on a Message",
+    "Train spam filter on a message",
     new BMessage (MSG_BROWSE_BUTTON),
     B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
     B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
@@ -6577,7 +6577,7 @@ void ControlsView::AttachedToWindow ()
   RowHeight = g_TextBoxHeight;
   RowHeight = ceilf (RowHeight * 1.1);
 
-  StringPntr = "Genuine Messages:";
+  StringPntr = "Genuine messages:";
   m_GenuineCountCachedValue = 87654321;
   sprintf (TempString, "%d", (int) m_GenuineCountCachedValue);
 
@@ -6591,7 +6591,7 @@ void ControlsView::AttachedToWindow ()
     3 * g_MarginBetweenControls;
 
   m_GenuineCountTextboxPntr = new BTextControl (TempRect,
-    "Genuine Count",
+    "Genuine count",
     StringPntr /* label */,
     TempString /* text */,
     NULL /* no message */,
@@ -6605,7 +6605,7 @@ void ControlsView::AttachedToWindow ()
 
   /* The word count in the center. */
 
-  StringPntr = "Word Count:";
+  StringPntr = "Word count:";
   m_WordCountCachedValue = 87654321;
   sprintf (TempString, "%d", (int) m_WordCountCachedValue);
 
@@ -6620,7 +6620,7 @@ void ControlsView::AttachedToWindow ()
   TempRect.right = TempRect.left + Width;
 
   m_WordCountTextboxPntr = new BTextControl (TempRect,
-    "Word Count",
+    "Word count",
     StringPntr /* label */,
     TempString /* text */,
     NULL /* no message */,
@@ -6634,7 +6634,7 @@ void ControlsView::AttachedToWindow ()
 
   /* The spam count on the far right. */
 
-  StringPntr = "Spam Messages:";
+  StringPntr = "Spam messages:";
   m_SpamCountCachedValue = 87654321;
   sprintf (TempString, "%d", (int) m_SpamCountCachedValue);
 
@@ -6648,7 +6648,7 @@ void ControlsView::AttachedToWindow ()
     3 * g_MarginBetweenControls;
 
   m_SpamCountTextboxPntr = new BTextControl (TempRect,
-    "Spam Count",
+    "Spam count",
     StringPntr /* label */,
     TempString /* text */,
     NULL /* no message */,
@@ -7035,7 +7035,7 @@ void ControlsView::Pulse ()
 
 DatabaseWindow::DatabaseWindow ()
 : BWindow (BRect (30, 30, 620, 400),
-    "Haiku Spam Filter Server",
+    "Haiku spam filter server",
     B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
   BRect TempRect;

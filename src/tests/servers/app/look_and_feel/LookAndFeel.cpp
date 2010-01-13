@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc.
+ * Copyright 2005-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -295,7 +295,7 @@ Window::MessageReceived(BMessage* message)
 					char text[512];
 					snprintf(text, sizeof(text),
 						"Window could not be added to subset:\n\n\%s", strerror(status));
-					(new BAlert("Alert", text, "Ok"))->Go(NULL);
+					(new BAlert("Alert", text, "OK"))->Go(NULL);
 
 					delete window;
 					break;

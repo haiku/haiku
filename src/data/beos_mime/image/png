@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "image/png";
 
 resource(2, "META:SNIFF_RULE") "0.70 (\"\\211PNG\\015\\012\\032\\012\")";
 
-resource(3, "META:S:DESC") #'MSDC' "PNG Image";
+resource(3, "META:S:DESC") #'MSDC' "PNG image";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "png",

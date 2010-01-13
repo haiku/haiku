@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "image/gif";
 
 resource(2, "META:SNIFF_RULE") "0.70 (\"GIF8\")";
 
-resource(3, "META:S:DESC") #'MSDC' "GIF Image";
+resource(3, "META:S:DESC") #'MSDC' "GIF image";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "gif",

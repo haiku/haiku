@@ -516,7 +516,7 @@ int main (int argc, char** argv)
   {
     printf ("%s is a utility for converting Pine e-mail\n",
       argv[0]);
-    printf ("files (mbox files) to BeOS e-mail files with attributes.  It\n");
+    printf ("files (mbox files) to Mail e-mail files with attributes.  It\n");
     printf ("could well work with other Unix style mailbox files, and\n");
     printf ("saved Usenet article files.  Each message in the input\n");
     printf ("mailbox is converted into a separate file.  You can\n");

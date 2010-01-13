@@ -42,7 +42,7 @@ AuthenticationPanel::AuthenticationPanel(BRect frame)
 								 NULL, B_FOLLOW_LEFT | B_FOLLOW_RIGHT);
 
 	BRect buttonFrame(0.0, 0.0, 20.0, 15.0);
-	fOkB = new BButton(buttonFrame, "ok", "Ok",
+	fOkB = new BButton(buttonFrame, "ok", "OK",
 					   new BMessage(MSG_PANEL_OK));
 	fCancelB = new BButton(buttonFrame, "cancel", "Cancel",
 						   new BMessage(MSG_PANEL_CANCEL));

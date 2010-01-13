@@ -34,7 +34,7 @@ FileSoundWindow::FileSoundWindow(BRect windowBounds)
 	BBox *box = new BBox(appBounds);
 	//textcontrol to display the chosen file
 	BRect textBounds(appBounds.left + 10, appBounds.top + 10, appBounds.right - 70, appBounds.top + 20);
-	textControl = new BTextControl(textBounds,"filechosen","Play File:","No file chosen yet.", NULL);
+	textControl = new BTextControl(textBounds,"filechosen","Play file:","No file chosen yet.", NULL);
 	textControl -> SetEnabled(false);
 	
 	float x1 = textControl -> Bounds().left;
@@ -110,17 +110,17 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 					fileSound = 0;
 					if (error == B_NO_MEMORY)
 					{
-						BAlert *alert = new BAlert("alert","Not enough memory.","Ok");
+						BAlert *alert = new BAlert("alert","Not enough memory.","OK");
 						alert -> Go();
 					}
 					else if (error == B_ERROR)
 					{
-						BAlert *alert = new BAlert("alert","Unable to create a sound player.","Ok");
+						BAlert *alert = new BAlert("alert","Unable to create a sound player.","OK");
 						alert -> Go();
 					}
 					else
 					{
-						BAlert *alert = new BAlert("alert","Other kind of error!","Ok");
+						BAlert *alert = new BAlert("alert","Other kind of error!","OK");
 						alert -> Go();
 					}				
 					break;
@@ -133,7 +133,7 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 					status_t preloadError = fileSound -> Preload();
 					if (preloadError != B_OK)
 					{
-						BAlert *alert = new BAlert("alert","Port errors. Unable to communicate with the streaming sound port.","Ok");
+						BAlert *alert = new BAlert("alert","Port errors. Unable to communicate with the streaming sound port.","OK");
 						alert -> Go();
 					}
 				}	
@@ -143,12 +143,12 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 				{
 					if (playerror == EALREADY)
 					{
-						BAlert *alert = new BAlert("alert","Sound is already playing","Ok");
+						BAlert *alert = new BAlert("alert","Sound is already playing","OK");
 						alert -> Go();
 					}
 					else
 					{
-						BAlert *alert = new BAlert("alert","Error playing sound","Ok");
+						BAlert *alert = new BAlert("alert","Error playing sound","OK");
 						alert -> Go();
 					}
 				}
@@ -166,12 +166,12 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 				{
 					if (stoperror == EALREADY)
 					{
-						BAlert *alert = new BAlert("alert","Sound is already stopped","Ok");
+						BAlert *alert = new BAlert("alert","Sound is already stopped","OK");
 						alert -> Go();
 					}
 					else
 					{
-						BAlert *alert = new BAlert("alert","Error stopping sound","Ok");
+						BAlert *alert = new BAlert("alert","Error stopping sound","OK");
 						alert -> Go();
 					}
 				}
@@ -213,12 +213,12 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 				{
 					if (error == EALREADY)
 					{
-						BAlert *alert = new BAlert("alert","Already in requested state","Ok");
+						BAlert *alert = new BAlert("alert","Already in requested state","OK");
 						alert -> Go();
 					}
 					else
 					{
-						BAlert *alert = new BAlert("alert","Error!","Ok");
+						BAlert *alert = new BAlert("alert","Error!","OK");
 						alert -> Go();
 					}
 				} 

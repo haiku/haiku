@@ -219,9 +219,9 @@ MediaReplicant::MouseDown(BPoint point)
 		BPopUpMenu* menu = new BPopUpMenu("", false, false);
 		menu->SetFont(be_plain_font);
 
-		menu->AddItem(new BMenuItem("Media Preferences" B_UTF8_ELLIPSIS,
+		menu->AddItem(new BMenuItem("Media preferences" B_UTF8_ELLIPSIS,
 			new BMessage(kMsgOpenMediaSettings)));
-		menu->AddItem(new BMenuItem("Sound Preferences" B_UTF8_ELLIPSIS,
+		menu->AddItem(new BMenuItem("Sound preferences" B_UTF8_ELLIPSIS,
 			new BMessage(kMsgOpenSoundSettings)));
 
 		menu->AddSeparatorItem();
@@ -234,7 +234,7 @@ MediaReplicant::MouseDown(BPoint point)
 		BMenu* subMenu = new BMenu("Options");
 		menu->AddItem(subMenu);
 
-		BMenuItem* item = new BMenuItem("Control Physical Output",
+		BMenuItem* item = new BMenuItem("Control physical output",
 			new BMessage(kMsgVolumeWhich));
 		item->SetMarked(fVolumeWhich == VOLUME_USE_PHYS_OUTPUT);
 		subMenu->AddItem(item);

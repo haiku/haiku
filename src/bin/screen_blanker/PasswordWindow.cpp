@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,7 +20,7 @@
 
 
 PasswordWindow::PasswordWindow()
-	: BWindow(BRect(100, 100, 400, 230), "Enter Password",
+	: BWindow(BRect(100, 100, 400, 230), "Enter password",
 		B_NO_BORDER_WINDOW_LOOK, kPasswordWindowFeel
 			/* TODO: B_MODAL_APP_WINDOW_FEEL should also behave correctly */,
 		B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE

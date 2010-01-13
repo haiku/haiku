@@ -538,7 +538,7 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 			: $(baseURL)/KeymapSwitcher-1.2.3-x86-gcc4-2009-05-31.zip
 			:
 		;
-		AddSymlinkToHaikuImage home config be Desktop\ Applets
+		AddSymlinkToHaikuImage home config be Desktop\ applets
 			: /boot/common/bin/KeymapSwitcher ;
 	} else {
 		InstallOptionalHaikuImagePackage
@@ -546,7 +546,7 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 			: $(baseURL)/KeymapSwitcher-1.2.4-r1a1-x86-gcc2-2009-09-06.zip
 			:
 		;
-		AddSymlinkToHaikuImage home config be Desktop\ Applets
+		AddSymlinkToHaikuImage home config be Desktop\ applets
 			: /boot/common/bin/KeymapSwitcher ;
 	}
 }

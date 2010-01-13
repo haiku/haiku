@@ -34,7 +34,7 @@ static const uint32 kMsgConnect = 'CONN';
 static const uint32 kMsgUpdate = 'MUPD';
 
 // labels
-static const char *kLabelSavePassword = "Save Password";
+static const char *kLabelSavePassword = "Save password";
 static const char *kLabelName = "Username: ";
 static const char *kLabelPassword = "Password: ";
 static const char *kLabelConnect = "Connect";

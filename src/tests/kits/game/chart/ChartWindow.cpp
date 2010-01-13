@@ -679,7 +679,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 
 		/* Fullscreen mode check box */
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+FULL_SCREEN-1);
-		full_screen = new BCheckBox(r, "", "Full Screen", new BMessage(FULL_SCREEN_MSG));
+		full_screen = new BCheckBox(r, "", "Full screen", new BMessage(FULL_SCREEN_MSG));
 		full_screen->SetTarget(this);
 		full_screen->SetFont(&font);
 		full_screen->ResizeToPreferred();
@@ -708,7 +708,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 
 		/* Enabling second thread check box */
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+SECOND_THREAD-1);
-		check_box = new BCheckBox(r, "", "2 Threads", new BMessage(SECOND_THREAD_MSG));
+		check_box = new BCheckBox(r, "", "2 threads", new BMessage(SECOND_THREAD_MSG));
 		check_box->SetTarget(this);
 		check_box->SetFont(&font);
 		check_box->ResizeToPreferred();

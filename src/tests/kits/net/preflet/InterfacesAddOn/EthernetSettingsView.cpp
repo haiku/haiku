@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 Haiku Inc. All rights reserved.
+ * Copyright 2004-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -340,7 +340,7 @@ EthernetSettingsView::_TriggerAutoConfig(const char* device)
 	BMessenger networkServer(kNetServerSignature);
 	if (!networkServer.IsValid()) {
 		(new BAlert("error", "The net_server needs to run for the auto "
-			"configuration!", "Ok"))->Go();
+			"configuration!", "OK"))->Go();
 		return B_ERROR;
 	}
 
@@ -356,13 +356,13 @@ EthernetSettingsView::_TriggerAutoConfig(const char* device)
 	if (status != B_OK) {
 		BString errorMessage("Sending auto-config message failed: ");
 		errorMessage << strerror(status);
-		(new BAlert("error", errorMessage.String(), "Ok"))->Go();
+		(new BAlert("error", errorMessage.String(), "OK"))->Go();
 		return status;
 	} else if (reply.FindInt32("status", &status) == B_OK
 			&& status != B_OK) {
 		BString errorMessage("Auto-configuring failed: ");
 		errorMessage << strerror(status);
-		(new BAlert("error", errorMessage.String(), "Ok"))->Go();
+		(new BAlert("error", errorMessage.String(), "OK"))->Go();
 		return status;
 	}
 

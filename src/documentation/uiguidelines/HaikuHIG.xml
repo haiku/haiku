@@ -459,7 +459,7 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>Capitalization and Spelling</title>
 
-<para>Nothing is more unprofessional than spelling and capitalization errors. If spelling is not your strong suit, consult a spell checker, dictionary, or at least a friend. This is particularly important if you are working with a language which is not your native one. Use title capitalization in all places except where full sentences are used. This means that all "important" words and the last word in a phrase -- regardless of importance -- are capitalized. Prepositions, definite articles, and conjunctions (as, for, to, the, and, etc.) are generally not capitalized except when they are the first or last word in the phrase, such as in "Save As...".</para>
+<para>Nothing is more unprofessional than spelling and capitalization errors. If spelling is not your strong suit, consult a spell checker, dictionary, or at least a friend. This is particularly important if you are working with a language which is not your native one. Use sentence capitalization in all places, that is, follow the normal grammar rules of the language. For English, this means only to capitalize specific names like "Tracker" or "Deskbar".</para>
 
 </sect1>
 <sect1>

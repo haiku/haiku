@@ -93,8 +93,8 @@ add_menu_fields(BGridLayout* layout, int32& row)
 void
 add_text_controls(BGridLayout* layout, int32& row)
 {
-	BTextControl* control1 = new BTextControl("Enabled", "Some Text", NULL);
-	BTextControl* control2 = new BTextControl("Disabled", "More Text", NULL);
+	BTextControl* control1 = new BTextControl("Enabled", "Some text", NULL);
+	BTextControl* control2 = new BTextControl("Disabled", "More text", NULL);
 	control2->SetEnabled(false);
 
 #if USE_LAYOUT_ITEMS
@@ -270,7 +270,7 @@ main(int argc, char** argv)
 	// BListView
 	BListView* listView = new BListView();
 	for (int32 i = 0; i < 20; i++) {
-		BString itemLabel("List Item ");
+		BString itemLabel("List item ");
 		itemLabel << i + 1;
 		listView->AddItem(new BStringItem(itemLabel.String()));
 	}
@@ -327,7 +327,7 @@ main(int argc, char** argv)
 	menu->AddItem(new BMenuItem("Test Save BFilePanel",
 		new BMessage(MSG_TEST_SAVE_FILE_PANEL)));
 	menu->AddItem(new BMenuItem("Click me!", NULL));
-	menu->AddItem(new BMenuItem("Another Option", NULL));
+	menu->AddItem(new BMenuItem("Another option", NULL));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
 	menuBar->AddItem(menu);
@@ -342,14 +342,14 @@ main(int argc, char** argv)
 	menu->AddItem(new BMenuItem("Only", NULL));
 	menuBar->AddItem(menu);
 	menu = new BMenu("Sub Menu");
-	BMenu* subMenu = new BMenu("Click Me");
+	BMenu* subMenu = new BMenu("Click me");
 	subMenu->AddItem(new BMenuItem("Either", NULL));
 	subMenu->AddItem(new BMenuItem("Or", NULL));
 	subMenu->SetRadioMode(true);
 	menu->AddItem(subMenu);
 	menuBar->AddItem(menu);
 
-	BButton* okButton = new BButton("Ok", new BMessage(B_QUIT_REQUESTED));
+	BButton* okButton = new BButton("OK", new BMessage(B_QUIT_REQUESTED));
 
 	window->AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(menuBar)

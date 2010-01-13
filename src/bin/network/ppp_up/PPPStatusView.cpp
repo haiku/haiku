@@ -21,7 +21,7 @@ static const uint32 kMsgDisconnect = 'DISC';
 
 // labels
 static const char *kLabelDisconnect = "Disconnect";
-static const char *kLabelConnectedSince = "Connected Since: ";
+static const char *kLabelConnectedSince = "Connected since: ";
 static const char *kLabelReceived = "Received";
 static const char *kLabelSent = "Sent";
 

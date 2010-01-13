@@ -320,13 +320,13 @@ for linkTarget in $(DESKBAR_APPLICATIONS) {
 		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 
-# Deskbar Desktop Applets links
-AddDirectoryToHaikuImage home config be Desktop\ Applets ;
+# Deskbar Desktop applets links
+AddDirectoryToHaikuImage home config be Desktop\ applets ;
 DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
 	Workspaces
 ;
 for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
-	AddSymlinkToHaikuImage home config be Desktop\ Applets
+	AddSymlinkToHaikuImage home config be Desktop\ applets
 		: /boot/system/apps/$(linkTarget) : $(linkTarget) ;
 }
 

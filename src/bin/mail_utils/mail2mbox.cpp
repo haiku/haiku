@@ -302,7 +302,7 @@ main(int argc, char** argv)
 	BApplication app("application/x-vnd.Haiku-mail2mbox");
 
 	if (argc <= 1 || argc >= 3) {
-		printf("%s is a utility for converting BeMail e-mail\n", argv[0]);
+		printf("%s is a utility for converting Mail e-mail\n", argv[0]);
 		printf("files to Unix Pine style e-mail files.  It could well\n");
 		printf("work with other Unix style mailbox files.  Each message in\n");
 		printf("the input directory is converted and sent to the standard\n");
