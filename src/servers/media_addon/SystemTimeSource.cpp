@@ -27,7 +27,7 @@
 
 
 SystemTimeSource::SystemTimeSource()
- :	BMediaNode("System Clock"),
+ :	BMediaNode("System clock"),
  	BTimeSource(),
  	fControlThread(-1)
 {
@@ -66,7 +66,7 @@ SystemTimeSource::TimeSourceOp(const time_source_op_info & op, void * _reserved)
 SystemTimeSource::NodeRegistered()
 {
 	ASSERT(fControlThread == -1);
-	fControlThread = spawn_thread(_ControlThreadStart, "System Clock control", 12, this);
+	fControlThread = spawn_thread(_ControlThreadStart, "System clock control", 12, this);
 	resume_thread(fControlThread);
 }
 

@@ -257,7 +257,7 @@ void
 NetServer::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "Networking Server\n"
-		"\tCopyright " B_UTF8_COPYRIGHT "2006, Haiku.\n", "Ok");
+		"\tCopyright " B_UTF8_COPYRIGHT "2006, Haiku.\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

@@ -22,7 +22,7 @@ enum {
 
 // constructor
 PartitioningDialog::PartitioningDialog(BRect dialogCenter)
-	: BWindow(BRect(100, 100, 100, 100), "Partitioning Parameters",
+	: BWindow(BRect(100, 100, 100, 100), "Partitioning parameters",
 			  B_TITLED_WINDOW,
 			  B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE),
 	  fEditor(NULL),

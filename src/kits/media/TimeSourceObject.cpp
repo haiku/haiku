@@ -41,7 +41,7 @@ TimeSourceObject::TimeSourceObject(const media_node& node)
 	ASSERT(fKinds == node.kind);
 
 	if (node.node == NODE_SYSTEM_TIMESOURCE_ID) {
-		strcpy(fName, "System Clock");
+		strcpy(fName, "System clock");
 		fIsRealtime = true;
 	} else {
 		live_node_info liveNodeInfo;

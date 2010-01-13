@@ -48,7 +48,7 @@ BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name,
 	frame.InsetBy(90.0 + 5.0, 5.0);
 
 	fCheckNowButton = new BButton(frame, "check_mail",
-		MDR_DIALECT_CHOICE ("Check Mail Now","メールチェック"),
+		MDR_DIALECT_CHOICE ("Check mail now","メールチェック"),
 		new BMessage('mbth'), B_FOLLOW_LEFT_RIGHT,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_NAVIGABLE);
 	fCheckNowButton->ResizeToPreferred();

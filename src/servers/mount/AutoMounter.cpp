@@ -394,8 +394,8 @@ suggest_mount_flags(const BPartition* partition, uint32* _flags)
 		}
 		string << "This will prevent unintentional data loss because of "
 			"errors in Haiku.";
-		BAlert* alert = new BAlert("Mount Warning", string.String(),
-			"Mount Read/Write", "Cancel", "Mount Read-only",
+		BAlert* alert = new BAlert("Mount warning", string.String(),
+			"Mount read/write", "Cancel", "Mount read-only",
 			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 		alert->SetShortcut(1, B_ESCAPE);
 		int32 choice = alert->Go();
@@ -548,7 +548,7 @@ AutoMounter::_MountVolume(const BMessage* message)
 	if (status < B_OK) {
 		BString string;
 		string << "Error mounting volume. (" << strerror(status) << ")";
-			(new BAlert("", string.String(), "Ok"))->Go(NULL);
+			(new BAlert("", string.String(), "OK"))->Go(NULL);
 	}
 }
 
@@ -560,10 +560,10 @@ AutoMounter::_SuggestForceUnmount(const char* name, status_t error)
 	text << "Could not unmount disk \"" << name << "\":\n\t";
 	text << strerror(error);
 	text << "\n\nShould unmounting be forced?\n\n"
-		"Note: if an application is currently writing to the volume, "
+		"Note: If an application is currently writing to the volume, "
 		"unmounting it now might result in loss of data.\n";
 
-	BAlert* alert = new BAlert("", text.String(), "Cancel", "Force Unmount",
+	BAlert* alert = new BAlert("", text.String(), "Cancel", "Force unmount",
 		NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 	alert->SetShortcut(0, B_ESCAPE);
 	int32 choice = alert->Go();

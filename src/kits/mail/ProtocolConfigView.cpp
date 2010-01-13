@@ -116,7 +116,7 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask)
 	rect.bottom = rect.top - 2 + sItemHeight;
 
 	if (options_mask & B_MAIL_PROTOCOL_HAS_HOSTNAME)
-		AddChild(AddTextField(rect,"host",MDR_DIALECT_CHOICE ("Mail Server:","サーバ名　：")));
+		AddChild(AddTextField(rect,"host",MDR_DIALECT_CHOICE ("Mail server:","サーバ名　：")));
 	
 	if (options_mask & B_MAIL_PROTOCOL_HAS_USERNAME)
 		AddChild(AddTextField(rect,"user",MDR_DIALECT_CHOICE ("Username:","ユーザーID：")));
@@ -128,10 +128,10 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask)
 	}
 	
 	if (options_mask & B_MAIL_PROTOCOL_HAS_FLAVORS)
-		AddChild(AddMenuField(rect,"flavor","Connection Type:"));
+		AddChild(AddMenuField(rect,"flavor","Connection type:"));
 	
 	if (options_mask & B_MAIL_PROTOCOL_HAS_AUTH_METHODS)
-		AddChild(AddMenuField(rect,"auth_method",MDR_DIALECT_CHOICE ("Login Type:","認証方法　：")));
+		AddChild(AddMenuField(rect,"auth_method",MDR_DIALECT_CHOICE ("Login type:","認証方法　：")));
 
 	// set divider
 	float width = FindWidestLabel(this);

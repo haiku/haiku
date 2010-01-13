@@ -46,7 +46,7 @@ fi
 # This should be translated
 if [[ `uname -m` == BePC ]] && test ! -e ~/config/lib/libssl.so; then
 
-RETURN=`alert "You don't seem to have OpenSSL installed, which is required for IMAP." "Get OpenSSL" "I Don't Care"`
+RETURN=`alert "You don't seem to have OpenSSL installed, which is required for IMAP." "Get OpenSSL" "I don't care"`
 
 if [[ $RETURN = "Get OpenSSL" ]]
 then

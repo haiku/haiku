@@ -58,7 +58,7 @@ void ConnectionView::Pulse()
 
 //---------------------------------------------------------------
 ConnectionIncoming::ConnectionIncoming(RemoteDevice* rDevice)
-			 : BWindow(BRect(700, 100, 900, 150), "Connection Completed", 
+			 : BWindow(BRect(700, 100, 900, 150), "Connection completed", 
                                    B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
                                    B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {

@@ -177,7 +177,7 @@ DeskbarReplicant::MouseDown(BPoint where)
 
 	BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 
-	menu->AddItem(new BMenuItem("Open Preferences"B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
 		new BMessage(kMsgOpenBluetoothPreferences)));
 
 	// TODO show list of known/paired devices
@@ -187,10 +187,10 @@ DeskbarReplicant::MouseDown(BPoint where)
 	 */
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Show Server Console" B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem("Show server console" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgShowBluetoothServerConsole)));
 
-	menu->AddItem(new BMenuItem("Stop Server",
+	menu->AddItem(new BMenuItem("Stop server",
 		new BMessage(kMsgQuitBluetoothServer)));
 
 	menu->SetTargetForItems(this);
@@ -218,7 +218,7 @@ DeskbarReplicant::_ShowBluetoothServerConsole()
 	status_t status = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(
 		BT_MSG_SERVER_SHOW_CONSOLE);
 	if (status < B_OK) {
-		_ShowErrorAlert("Showing the Bluetooth Server Console failed.", status);
+		_ShowErrorAlert("Showing the Bluetooth server console failed.", status);
 	}
 }
 
@@ -232,7 +232,7 @@ DeskbarReplicant::_QuitBluetoothServer()
 	status_t status = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(
 		B_QUIT_REQUESTED);
 	if (status < B_OK) {
-		_ShowErrorAlert("Stopping the Bluetooth Server failed.", status);
+		_ShowErrorAlert("Stopping the Bluetooth server failed.", status);
 	}
 }
 
@@ -241,7 +241,7 @@ void
 DeskbarReplicant::_ShowErrorAlert(BString msg, status_t status)
 {
 	msg << "\n\nError: " << strerror(status);
-	BAlert* alert = new BAlert("Bluetooth Error", msg.String(), "Ok");
+	BAlert* alert = new BAlert("Bluetooth error", msg.String(), "OK");
 	alert->Go(NULL);
 }
 

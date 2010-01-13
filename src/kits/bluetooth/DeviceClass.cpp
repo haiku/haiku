@@ -11,7 +11,7 @@ void
 DeviceClass::GetServiceClass(BString& serviceClass)
 {
 	static const char *services[] = { "Positioning", "Networking",
-				"Rendering", "Capturing", "Object Transfer",
+				"Rendering", "Capturing", "Object transfer",
 				"Audio", "Telephony", "Information" };
 
 	if (ServiceClass() != 0) {
@@ -39,10 +39,10 @@ void
 DeviceClass::GetMajorDeviceClass(BString& majorClass)
 {
 	static const char *major_devices[] = { "Miscellaneous", "Computer", "Phone",
-				"LAN Access", "Audio/Video", "Peripheral", "Imaging", "Uncategorized" };
+				"LAN access", "Audio/Video", "Peripheral", "Imaging", "Uncategorized" };
 
 	if (MajorDeviceClass() >= sizeof(major_devices) / sizeof(*major_devices))
-		majorClass << "Invalid Device Class!\n";
+		majorClass << "Invalid device class!\n";
 	else
 		majorClass << major_devices[MajorDeviceClass()];
 
@@ -102,10 +102,10 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 					minorClass << "Wired modem or voice gateway";
 					break;
 				case 5:
-					minorClass << "Common ISDN Access";
+					minorClass << "Common ISDN access";
 					break;
 				case 6:
-					minorClass << "Sim Card Reader";
+					minorClass << "SIM card reader";
 					break;
 			}
 			break;
@@ -147,7 +147,7 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 					minorClass << "Uncategorized";
 					break;
 				case 1:
-					minorClass << "Device conforms to the Headset profile";
+					minorClass << "Device conforms to the headset profile";
 					break;
 				case 2:
 					minorClass << "Hands-free";
@@ -163,34 +163,34 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 					minorClass << "Headphones";
 					break;
 				case 7:
-					minorClass << "Portable Audio";
+					minorClass << "Portable audio";
 					break;
 				case 8:
-					minorClass << "Car Audio";
+					minorClass << "Car audio";
 					break;
 				case 9:
 					minorClass << "Set-top box";
 					break;
 				case 10:
-					minorClass << "HiFi Audio Device";
+					minorClass << "HiFi audio device";
 					break;
 				case 11:
 					minorClass << "VCR";
 					break;
 				case 12:
-					minorClass << "Video Camera";
+					minorClass << "Video camera";
 					break;
 				case 13:
 					minorClass << "Camcorder";
 					break;
 				case 14:
-					minorClass << "Video Monitor";
+					minorClass << "Video monitor";
 					break;
 				case 15:
-					minorClass << "Video Display and Loudspeaker";
+					minorClass << "Video display and loudspeaker";
 					break;
 				case 16:
-					minorClass << "Video Conferencing";
+					minorClass << "Video conferencing";
 					break;
 					/* 17 is reserved */
 				case 18:
@@ -258,7 +258,7 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 		case 7: /* wearable */
 			switch(minor) {
 				case 1:
-					minorClass << "Wrist Watch";
+					minorClass << "Wrist watch";
 					break;
 				case 2:
 					minorClass << "Pager";
@@ -283,7 +283,7 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 					minorClass << "Vehicle";
 					break;
 				case 3:
-					minorClass << "Doll / Action Figure";
+					minorClass << "Doll/Action figure";
 					break;
 				case 4:
 					minorClass << "Controller";
@@ -306,13 +306,13 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 void
 DeviceClass::DumpDeviceClass(BString& string)
 {
-	string << "Service Classes: ";
+	string << "Service classes: ";
 	GetServiceClass(string);
 	string << " | ";
-	string << "Major Class: ";
+	string << "Major class: ";
 	GetMajorDeviceClass(string);
 	string << " | ";
-	string << "Minor Class: ";
+	string << "Minor class: ";
 	GetMinorDeviceClass(string);
 	string << ".";
 }

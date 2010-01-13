@@ -47,7 +47,7 @@ namespace Bluetooth {
 #endif
 
 PincodeWindow::PincodeWindow(bdaddr_t address, hci_id hid)
-	: BWindow(BRect(800, 200, 900, 300), "Pincode Request",
+	: BWindow(BRect(800, 200, 900, 300), "Pincode request",
 		B_FLOATING_WINDOW,
 		B_WILL_ACCEPT_FIRST_CLICK | B_NOT_RESIZABLE|  B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS,
@@ -62,7 +62,7 @@ PincodeWindow::PincodeWindow(bdaddr_t address, hci_id hid)
 
 
 PincodeWindow::PincodeWindow(RemoteDevice* rDevice)
-	: BWindow(BRect(800, 200, 900, 300), "Pincode Request",
+	: BWindow(BRect(800, 200, 900, 300), "Pincode request",
 		B_FLOATING_WINDOW,
 		B_WILL_ACCEPT_FIRST_CLICK | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS,

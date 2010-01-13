@@ -92,4 +92,4 @@ else # Need to explicitly restart the daemon.
 	/boot/beos/system/servers/mail_daemon > /dev/null &
 fi
 
-alert "Finished installing" "Thanks"
+alert "Finished installing" "OK"

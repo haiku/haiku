@@ -103,7 +103,7 @@ LeftAlign(BView* view)
 
 ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BMessage* settings, AutoReply* sender)
-	: BWindow(ConfigWindow::GetWindowFrame(), "Page Setup",
+	: BWindow(ConfigWindow::GetWindowFrame(), "Page setup",
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 	, fKind(kind)
 	, fDefaultPrinter(defaultPrinter)
@@ -117,7 +117,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	PrinterForMimeType();
 
 	if (kind == kJobSetup)
-		SetTitle("Print Setup");
+		SetTitle("Print setup");
 
 	BView* panel = new BBox(Bounds(), "temporary", B_FOLLOW_ALL,	B_WILL_DRAW);
 	AddChild(panel);
@@ -125,27 +125,27 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BRect dummyRect(0, 0, 1, 1);
 
 	// print selection pop up menu
-	BPopUpMenu* menu = new BPopUpMenu("Select a Printer");
+	BPopUpMenu* menu = new BPopUpMenu("Select a printer");
 	SetupPrintersMenu(menu);
 
 	fPrinters = new BMenuField("Printer:", menu, NULL);
 
 	// page format button
-	fPageSetup = AddPictureButton(panel, dummyRect, "Page Format", "PAGE_SETUP_ON",
+	fPageSetup = AddPictureButton(panel, dummyRect, "Page format", "PAGE_SETUP_ON",
 		"PAGE_SETUP_OFF", MSG_PAGE_SETUP);
 
 	// add description to button
-	BStringView *pageFormatTitle = new BStringView("pageFormatTitle", "Paper Setup:");
+	BStringView *pageFormatTitle = new BStringView("pageFormatTitle", "Paper setup:");
 	fPageFormatText = new BStringView("pageFormatText", "");
 
 	// page selection button
 	fJobSetup = NULL;
 	BStringView* jobSetupTitle = NULL;
 	if (kind == kJobSetup) {
-		fJobSetup = AddPictureButton(panel, dummyRect, "Page Selection", "JOB_SETUP_ON",
+		fJobSetup = AddPictureButton(panel, dummyRect, "Page selection", "JOB_SETUP_ON",
 			"JOB_SETUP_OFF", MSG_JOB_SETUP);
 		// add description to button
-		jobSetupTitle = new BStringView("jobSetupTitle", "Pages to Print:");
+		jobSetupTitle = new BStringView("jobSetupTitle", "Pages to print:");
 		fJobSetupText = new BStringView("jobSetupText", "");
 	}
 
@@ -269,7 +269,7 @@ void ConfigWindow::MessageReceived(BMessage* m)
 
 static const char*
 kAbout =
-"Printer Server\n"
+"Printer server\n"
 "© 2001-2009 Haiku\n"
 "\n"
 "\tIthamar R. Adema\n"
@@ -280,7 +280,7 @@ kAbout =
 void
 ConfigWindow::AboutRequested()
 {
-	BAlert *about = new BAlert("About Printer Server", kAbout, "OK");
+	BAlert *about = new BAlert("About printer server", kAbout, "OK");
 	about->Go();
 }
 

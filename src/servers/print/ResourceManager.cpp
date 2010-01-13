@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,7 +33,7 @@ bool Resource::NeedsLocking() {
 	// or in case of "Preview" printer it
 	// is set on R5 to "NONE" IIRC and the Haiku
 	// preflet sets an empty string.
-	return !(fTransport == "Print To File" 
+	return !(fTransport == "Print to file" 
 		|| fTransport == "NONE"
 		|| fTransport == ""); 
 }

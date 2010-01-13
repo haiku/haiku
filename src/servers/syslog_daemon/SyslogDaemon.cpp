@@ -58,7 +58,7 @@ SyslogDaemon::AboutRequested()
 		"all system messages and write them to the "
 		"system-wide log at \"%s\".\n\n", path.Path());
 
-	BAlert *alert = new BAlert("Syslog Daemon", message, "Ok");
+	BAlert *alert = new BAlert("Syslog daemon", message, "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

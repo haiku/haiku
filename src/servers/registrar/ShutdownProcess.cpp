@@ -224,7 +224,7 @@ private:
 class ShutdownProcess::ShutdownWindow : public BWindow {
 public:
 	ShutdownWindow()
-		: BWindow(BRect(0, 0, 200, 100), "Shutdown Status",
+		: BWindow(BRect(0, 0, 200, 100), "Shutdown status",
 			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_MINIMIZABLE
 				| B_NOT_ZOOMABLE | B_NOT_CLOSABLE, B_ALL_WORKSPACES),
@@ -272,7 +272,7 @@ public:
 
 		// kill app button
 		fKillAppButton = new(nothrow) BButton(BRect(0, 0, 10, 10), "kill app",
-			"Kill Application", NULL, B_FOLLOW_NONE);
+			"Kill application", NULL, B_FOLLOW_NONE);
 		if (!fKillAppButton)
 			return B_NO_MEMORY;
 		fRootView->AddChild(fKillAppButton);
@@ -287,7 +287,7 @@ public:
 
 		// cancel shutdown button
 		fCancelShutdownButton = new(nothrow) BButton(BRect(0, 0, 10, 10),
-			"cancel shutdown", "Cancel Shutdown", NULL, B_FOLLOW_NONE);
+			"cancel shutdown", "Cancel shutdown", NULL, B_FOLLOW_NONE);
 		if (!fCancelShutdownButton)
 			return B_NO_MEMORY;
 		fRootView->AddChild(fCancelShutdownButton);
@@ -300,7 +300,7 @@ public:
 
 		// reboot system button
 		fRebootSystemButton = new(nothrow) BButton(BRect(0, 0, 10, 10),
-			"reboot", "Restart System", NULL, B_FOLLOW_NONE);
+			"reboot", "Restart system", NULL, B_FOLLOW_NONE);
 		if (!fRebootSystemButton)
 			return B_NO_MEMORY;
 		fRebootSystemButton->Hide();
@@ -479,7 +479,7 @@ public:
 		fRebootSystemButton->MakeDefault(true);
 		fRebootSystemButton->Show();
 
-		SetTitle("System is Shut Down");
+		SetTitle("System is shut down");
 		fTextView->SetText("It's now safe to turn off the computer.");
 	}
 
@@ -492,7 +492,7 @@ public:
 		// TODO: Temporary work-around for a Haiku bug.
 		fAbortedOKButton->Invalidate();
 
-		SetTitle("Shutdown Aborted");
+		SetTitle("Shutdown aborted");
 	}
 
 private:
@@ -1235,12 +1235,12 @@ ShutdownProcess::_WorkerDoShutdown()
 	// ask the user to confirm the shutdown, if desired
 	bool askUser;
 	if (fHasGUI && fRequest->FindBool("confirm", &askUser) == B_OK && askUser) {
-		const char* title = fReboot ? "Restart?" : "Shut Down?";
+		const char* title = fReboot ? "Restart?" : "Shut down?";
 		const char* text = fReboot
 			? "Do you really want to restart the system?"
 			: "Do you really want to shut down the system?";
-		const char* defaultText = fReboot ? "Restart" : "Shut Down";
-		const char* otherText = fReboot ? "Shut Down" : "Restart";
+		const char* defaultText = fReboot ? "Restart" : "Shut down";
+		const char* otherText = fReboot ? "Shut down" : "Restart";
 		BAlert* alert = new BAlert(title, text, "Cancel", otherText, defaultText,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);

@@ -51,7 +51,7 @@ show_error(alert_type type, const char *message, const char *tag)
 
 	if (window == NULL) {
 		window = new ErrorLogWindow(BRect(200, 200, 500, 250),
-			"Mail Daemon Status Log", B_TITLED_WINDOW);
+			"Mail daemon status log", B_TITLED_WINDOW);
 	}
 
 	lock.Unlock();

@@ -727,7 +727,7 @@ BDragger::_BuildDefaultPopUp()
 
 	fPopUp->AddItem(new BMenuItem(about, msg));
 	fPopUp->AddSeparatorItem();
-	fPopUp->AddItem(new BMenuItem("Remove Replicant",
+	fPopUp->AddItem(new BMenuItem("Remove replicant",
 		new BMessage(kDeleteReplicant)));
 }
 

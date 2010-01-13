@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Haiku Inc. All rights reserved.
+ * Copyright 2008-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,7 +32,7 @@ namespace BPrivate {
 
 
 BJobSetupPanel::BJobSetupPanel(BPrinter* printer)
-	: BPrintPanel("Print Document")
+	: BPrintPanel("Print document")
 	, fPrinter(printer)
 	, fPrinterRoster(NULL)
 	, fPrintRange(B_ALL_PAGES)
@@ -44,7 +44,7 @@ BJobSetupPanel::BJobSetupPanel(BPrinter* printer)
 
 
 BJobSetupPanel::BJobSetupPanel(BPrinter* printer, uint32 flags)
-	: BPrintPanel("Print Document")
+	: BPrintPanel("Print document")
 	, fPrinter(printer)
 	, fPrinterRoster(NULL)
 	, fPrintRange(B_ALL_PAGES)
@@ -314,7 +314,7 @@ BJobSetupPanel::_SetupInterface()
 
 	box = new BBox(B_FANCY_BORDER, view);
 	box->SetLabel(BGroupLayoutBuilder()
-		.Add(new BStringView("", "Page Range"))
+		.Add(new BStringView("", "Page range"))
 		.SetInsets(2.0, 0.0, 2.0, 0.0));
 
 	// copies

@@ -774,7 +774,7 @@ DiscreteMessageFilter::Filter(BMessage *message, BHandler **target)
 
 
 DefaultMediaTheme::DefaultMediaTheme()
-	: BMediaTheme("Haiku Theme", "Haiku built-in theme version 0.1")
+	: BMediaTheme("Haiku theme", "Haiku built-in theme version 0.1")
 {
 	CALLED();
 }
