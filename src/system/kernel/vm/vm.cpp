@@ -2135,6 +2135,8 @@ vm_unmap_page(VMArea* area, addr_t virtualAddress, bool preserveModified)
 		map->ops->flush(map);
 
 		status = map->ops->query(map, virtualAddress, &physicalAddress, &flags);
+// TODO: The x86 implementation always returns 0 flags, if the entry is not
+// present. I.e. we've already lost the flag.
 		if ((flags & PAGE_MODIFIED) != 0)
 			page->modified = true;
 	}
@@ -2213,6 +2215,11 @@ vm_unmap_pages(VMArea* area, addr_t base, size_t size, bool preserveModified)
 				&physicalAddress, &flags);
 			if (status < B_OK || (flags & PAGE_PRESENT) == 0)
 				continue;
+// TODO: We just unmapped the pages, so the PAGE_PRESENT flag won't be set for
+// sure. We can't just remove the check, though, since then we might also find
+// pages that we haven't unmapped in the first place. Finally the x86 query()
+// implementation always returns 0 flags, if the entry is not present. I.e.
+// we've already lost the flag.
 
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page == NULL) {
@@ -4532,6 +4539,14 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 		uint32 protection;
 		status = map->ops->query(map, base, &physicalAddress,
 			&protection);
+			// TODO: ATM there's no mechanism that guarantees that the page
+			// we've marked wired in lock_memory_etc() is the one we find here.
+			// If we only locked for reading, the original page might stem from
+			// a lower cache and a page fault in the meantime might have mapped
+			// a page from the top cache.
+			// Moreover fork() can insert a new top cache and re-map pages
+			// read-only at any time. This would even cause a violation of the
+			// lock_memory() guarantee.
 
 		map->ops->unlock(map);
 
