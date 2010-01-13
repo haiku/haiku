@@ -14,18 +14,18 @@
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included 
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
@@ -99,7 +99,7 @@ SGIView::SGIView(const BRect &frame, const char *name,
 	BRect menuFrame = Bounds();
 	menuFrame.bottom = menuFrame.top + menu->Bounds().Height();
 	fCompressionMF = new BMenuField(menuFrame, "compression",
-									"Use Compression:", menu, true/*,
+									"Use compression:", menu, true/*,
 									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP*/);
 	if (fCompressionMF->MenuBar())
 		fCompressionMF->MenuBar()->ResizeToPreferred();
@@ -111,12 +111,12 @@ SGIView::SGIView(const BRect &frame, const char *name,
 	float xbold, ybold;
 	xbold = fh.descent + 1;
 	ybold = fh.ascent + fh.descent * 2 + fh.leading;
-	
+
 	font_height plainh;
 	be_plain_font->GetHeight(&plainh);
 	float yplain;
 	yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-	
+
 	// position the menu field below all the text we draw in Draw()
 	BPoint textOffset(0.0, yplain * 2 + ybold);
 	fCompressionMF->MoveTo(textOffset);
@@ -270,8 +270,8 @@ SGIView::Draw(BRect area)
 	float xbold, ybold;
 	xbold = fh.descent + 1;
 	ybold = fh.ascent + fh.descent * 2 + fh.leading;
-	
-	const char* text = "SGI Image Translator";
+
+	const char* text = "SGI image translator";
 	DrawString(text, BPoint(xbold, ybold));
 
 	SetFont(be_plain_font);
@@ -279,7 +279,7 @@ SGIView::Draw(BRect area)
 	GetFontHeight(&plainh);
 	float yplain;
 	yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-	
+
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(SGI_TRANSLATOR_VERSION)),
@@ -302,7 +302,7 @@ SGIView::Draw(BRect area)
 	text = "based on GIMP SGI plugin v1.5:";
 	DrawString(text, offset);
 	offset.y += ybold;
-	
+
 	DrawString(kSGICopyright, offset);
 }
 

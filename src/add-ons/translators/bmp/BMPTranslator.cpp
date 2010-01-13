@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku.
+ * Copyright 2002-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -116,7 +116,7 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // Returns:
 // ---------------------------------------------------------------
 BMPTranslator::BMPTranslator()
-	: BaseTranslator("BMP Images", "BMP image translator",
+	: BaseTranslator("BMP images", "BMP image translator",
 		BMP_TRANSLATOR_VERSION,
 		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
 		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),

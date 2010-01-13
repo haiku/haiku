@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -34,7 +34,7 @@ IMAPConfig::IMAPConfig(BMessage *archive)
 	 )
 {
 #ifdef USE_SSL
-		AddFlavor("No Encryption");
+		AddFlavor("No encryption");
 		AddFlavor("SSL");
 #endif
 
@@ -53,8 +53,8 @@ IMAPConfig::IMAPConfig(BMessage *archive)
 	/*frame.top += 10;
 	frame.bottom += 10;*/
 
-	BTextControl *folder = new BTextControl(frame,"root","Top Mailbox Folder: ","",NULL);
-	folder->SetDivider(be_plain_font->StringWidth("Top Mailbox Folder: "));
+	BTextControl *folder = new BTextControl(frame,"root","Top mailbox folder: ","",NULL);
+	folder->SetDivider(be_plain_font->StringWidth("Top mailbox folder: "));
 
 	if (archive->HasString("root"))
 		folder->SetText(archive->FindString("root"));

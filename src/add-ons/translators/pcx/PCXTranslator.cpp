@@ -69,7 +69,7 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 
 
 PCXTranslator::PCXTranslator()
-	: BaseTranslator("PCX Images", "PCX Translator",
+	: BaseTranslator("PCX images", "PCX translator",
 		PCX_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,

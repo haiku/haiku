@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -257,7 +257,7 @@ SMTPProtocol::SMTPProtocol(BMessage *message, BMailChainRunner *run)
 		// to the SMTP server first...
 		fStatus = POP3Authentification();
 		if (fStatus < B_OK) {
-			error_msg << MDR_DIALECT_CHOICE ("POP3 authentification failed. The server said:\n","POP3認証に失敗しました\n") << fLog;
+			error_msg << MDR_DIALECT_CHOICE ("POP3 authentication failed. The server said:\n","POP3認証に失敗しました\n") << fLog;
 			runner->ShowError(error_msg.String());
                         runner->Stop(true);
 			return;
@@ -423,7 +423,7 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 			error << "Could not connect to SMTP server " << fSettings->FindString("server");
 			if (port != 465)
 				error << ":" << port;
-			error << ". (SSL Connection Error)";
+			error << ". (SSL connection error)";
 			runner->ShowError(error.String());
 			SSL_CTX_free(ctx);
 			#ifndef HAIKU_TARGET_PLATFORM_BEOS
@@ -1118,7 +1118,7 @@ instantiate_config_panel(BMessage *settings, BMessage *)
 	view->AddAuthMethod(MDR_DIALECT_CHOICE ("POP3 before SMTP","送信前に受信する"), false);
 
 	BTextControl *control = (BTextControl *)(view->FindView("host"));
-	control->SetLabel(MDR_DIALECT_CHOICE ("SMTP Server: ","SMTPサーバ: "));
+	control->SetLabel(MDR_DIALECT_CHOICE ("SMTP server: ","SMTPサーバ: "));
 
 	// Reset the dividers after changing one
 	float widestLabel=0;

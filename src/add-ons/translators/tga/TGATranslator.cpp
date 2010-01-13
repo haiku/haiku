@@ -7,7 +7,7 @@
 // This BTranslator based object is for opening and writing TGA files.
 //
 //
-// Copyright (c) 2002  Haiku, Inc.
+// Copyright (c) 2002-2009, Haiku, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -131,7 +131,7 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // Returns:
 // ---------------------------------------------------------------
 TGATranslator::TGATranslator()
-	: BaseTranslator("TGA Images", "TGA image translator",
+	: BaseTranslator("TGA images", "TGA image translator",
 		TGA_TRANSLATOR_VERSION,
 		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
 		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),

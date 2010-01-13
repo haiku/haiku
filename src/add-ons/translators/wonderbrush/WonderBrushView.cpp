@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -52,12 +52,12 @@ WonderBrushView::WonderBrushView(const BRect &frame, const char *name,
 	float xbold, ybold;
 	xbold = fh.descent + 1;
 	ybold = fh.ascent + fh.descent * 2 + fh.leading;
-	
+
 	font_height plainh;
 	be_plain_font->GetHeight(&plainh);
 	float yplain;
 	yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-	
+
 	ResizeToPreferred();
 }
 
@@ -128,8 +128,8 @@ WonderBrushView::Draw(BRect area)
 	float ybold = fh.ascent + fh.descent * 2 + fh.leading;
 
 	BPoint offset(xbold, ybold);
-	
-	const char* text = "WonderBrush Image Translator";
+
+	const char* text = "WonderBrush image translator";
 	DrawString(text, offset);
 
 	SetFont(be_plain_font);
@@ -138,7 +138,7 @@ WonderBrushView::Draw(BRect area)
 	float yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
 
 	offset.y += yplain;
-	
+
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(WBI_TRANSLATOR_VERSION)),

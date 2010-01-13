@@ -48,7 +48,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define B_TRANSLATOR_BITMAP_DESCRIPTION "Be Bitmap Format (JPEG2000Translator)"
 
 // Translation Kit required globals
-char translatorName[] = "JPEG2000 Images";
+char translatorName[] = "JPEG2000 images";
 char translatorInfo[] = "©2002-2003, Shard\n"
 	"©2005-2006, Haiku\n"
 	"\n"

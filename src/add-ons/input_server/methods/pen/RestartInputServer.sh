@@ -6,7 +6,7 @@ tagfile=/tmp/dokillinputserver
 tmout=$((30))
 
 touch $tagfile
-(alert "All is fine" "Ok"; rm $tagfile) &
+(alert "All is fine." "OK"; rm $tagfile) &
 
 sleep $tmout
 

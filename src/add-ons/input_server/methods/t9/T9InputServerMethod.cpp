@@ -94,16 +94,16 @@ T9InputServerMethod::T9InputServerMethod()
 	BMessage *msg = new BMessage('SetM');
 	msg->AddInt32("t9mode", WordMode);
 	BMenuItem *item;
-	item = new BMenuItem(_T("Word Mode"), msg);
+	item = new BMenuItem(_T("Word mode"), msg);
 	item->SetMarked(true);
 	fDeskbarMenu->AddItem(item);
 	msg = new BMessage('SetM');
 	msg->AddInt32("t9mode", CharMode);
-	item = new BMenuItem(_T("Character Mode"), msg);
+	item = new BMenuItem(_T("Character mode"), msg);
 	fDeskbarMenu->AddItem(item);
 	msg = new BMessage('SetM');
 	msg->AddInt32("t9mode", NumMode);
-	item = new BMenuItem(_T("Numeric Mode"), msg);
+	item = new BMenuItem(_T("Numeric mode"), msg);
 	fDeskbarMenu->AddItem(item);
 	fDeskbarMenu->SetFont(be_plain_font);
 	// doesn't seem to work here
@@ -177,7 +177,7 @@ void T9InputServerMethod::MessageReceived(BMessage *message)
       s << (long) fDeskbarMenu->FindMarked();
       s << " - ";
       s << (long) fDeskbarMenu->ItemAt(v);
-      BAlert *a = new BAlert("Plop", s.String(), "Ok");
+      BAlert *a = new BAlert("Plop", s.String(), "OK");
       a->Go(NULL);
       }*/
     break;

@@ -71,8 +71,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VIEW_LABEL_PROGRESSIVE "Use progressive compression"
 #define VIEW_LABEL_OPTIMIZECOLORS "Prevent colors 'washing out'"
 #define	VIEW_LABEL_SMALLERFILE "Make file smaller (sligthtly worse quality)"
-#define	VIEW_LABEL_GRAY1ASRGB24 "Write Black&White images as RGB24"
-#define	VIEW_LABEL_ALWAYSRGB32 "Read Greyscale images as RGB32"
+#define	VIEW_LABEL_GRAY1ASRGB24 "Write black-and-white images as RGB24"
+#define	VIEW_LABEL_ALWAYSRGB32 "Read greyscale images as RGB32"
 #define	VIEW_LABEL_PHOTOSHOPCMYK "Use CMYK code with 0 for 100% ink coverage"
 #define	VIEW_LABEL_SHOWREADERRORBOX "Show warning messages"
 

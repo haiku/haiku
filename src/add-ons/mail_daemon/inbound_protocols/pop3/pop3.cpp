@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -85,7 +85,7 @@ POP3Protocol::~POP3Protocol()
 status_t
 POP3Protocol::Open(const char *server, int port, int)
 {
-	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Connecting to POP3 Server...",
+	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Connecting to POP3 server...",
 		"POP3サーバに接続しています..."));
 
 	if (port <= 0) {
@@ -169,7 +169,7 @@ POP3Protocol::Open(const char *server, int port, int)
 				<< settings->FindString("server");
 			if (port != 995)
 				error << ":" << port;
-			error << ". (SSL Connection Error)";
+			error << ". (SSL connection error)";
 			runner->ShowError(error.String());
 			SSL_CTX_free(fSSLContext);
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
@@ -765,11 +765,11 @@ instantiate_config_panel(BMessage *settings, BMessage *)
 		| B_MAIL_PROTOCOL_HAS_FLAVORS
 #endif
 		);
-	view->AddAuthMethod("Plain Text");
+	view->AddAuthMethod("Plain text");
 	view->AddAuthMethod("APOP");
 
 #if USE_SSL
-	view->AddFlavor("No Encryption");
+	view->AddFlavor("No encryption");
 	view->AddFlavor("SSL");
 #endif
 

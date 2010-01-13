@@ -13,18 +13,18 @@
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included 
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
@@ -99,7 +99,7 @@ TIFFView::TIFFView(const BRect &frame, const char *name,
 //	add_menu_item(menu, COMPRESSION_JP2000, "JPEG2000", currentCompression);
 
 	fCompressionMF = new BMenuField(BRect(20, 50, 215, 70), "compression",
-									"Use Compression:", menu, true);
+									"Use compression:", menu, true);
 	fCompressionMF->ResizeToPreferred();
 	fCompressionMF->SetDivider(
 		fCompressionMF->StringWidth(fCompressionMF->Label()) + 7);
@@ -200,16 +200,16 @@ TIFFView::Draw(BRect area)
 	float xbold, ybold;
 	xbold = fh.descent + 1;
 	ybold = fh.ascent + fh.descent * 2 + fh.leading;
-	
-	char title[] = "TIFF Image Translator";
+
+	char title[] = "TIFF image translator";
 	DrawString(title, BPoint(xbold, ybold));
-	
+
 	SetFont(be_plain_font);
 	font_height plainh;
 	GetFontHeight(&plainh);
 	float yplain;
 	yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-	
+
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TIFF_TRANSLATOR_VERSION)),
@@ -217,11 +217,11 @@ TIFFView::Draw(BRect area)
 		static_cast<int>(B_TRANSLATION_REVISION_VERSION(TIFF_TRANSLATOR_VERSION)),
 		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
-	
+
 	int32 lineno = 6;
-	DrawString("TIFF Library:", BPoint(xbold, yplain * lineno + ybold));
+	DrawString("TIFF library:", BPoint(xbold, yplain * lineno + ybold));
 	lineno += 2;
-	
+
 	char libtiff[] = TIFFLIB_VERSION_STR;
 	char *tok = strtok(libtiff, "\n");
 	while (tok) {

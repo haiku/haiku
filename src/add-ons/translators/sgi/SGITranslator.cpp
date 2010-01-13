@@ -10,7 +10,7 @@
 // SGI images.
 //
 //
-// Copyright (c) 2003-2006 Haiku Project
+// Copyright (c) 2003-2009 Haiku, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -146,7 +146,7 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // Returns:
 // ---------------------------------------------------------------
 SGITranslator::SGITranslator()
-	: BaseTranslator("SGI Images", "SGI image translator",
+	: BaseTranslator("SGI images", "SGI image translator",
 		SGI_TRANSLATOR_VERSION,
 		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
 		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),

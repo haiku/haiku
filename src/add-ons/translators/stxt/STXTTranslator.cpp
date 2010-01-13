@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1329,7 +1329,7 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 
 
 STXTTranslator::STXTTranslator()
-	: BaseTranslator("StyledEdit Files", "StyledEdit files translator",
+	: BaseTranslator("StyledEdit files", "StyledEdit files translator",
 		STXT_TRANSLATOR_VERSION,
 		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
 		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),

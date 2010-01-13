@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -81,7 +81,7 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 
 
 WonderBrushTranslator::WonderBrushTranslator()
-	: BaseTranslator("WonderBrush Images", "WonderBrush image translator",
+	: BaseTranslator("WonderBrush images", "WonderBrush image translator",
 		WBI_TRANSLATOR_VERSION,
 		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
 		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),

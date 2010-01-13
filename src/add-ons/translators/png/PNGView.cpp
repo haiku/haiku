@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc.
+ * Copyright 2003-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -34,7 +34,7 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", "PNG Image Translator");
+	BStringView *stringView = new BStringView(rect, "title", "PNG image translator");
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -78,7 +78,7 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 
 	rect.OffsetBy(0, stringView->Frame().Height() + 20.0f);
 	BMenuField* menuField = new BMenuField(rect, "PNG Interlace Menu",
-		"Interlacing Type:", fInterlaceMenu);
+		"Interlacing type:", fInterlaceMenu);
 	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 7.0f);
 	menuField->ResizeToPreferred();
 	AddChild(menuField);

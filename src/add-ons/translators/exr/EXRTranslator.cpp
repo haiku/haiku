@@ -56,7 +56,7 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 
 
 EXRTranslator::EXRTranslator()
-	: BaseTranslator("EXR Images", "EXR Image Translator",
+	: BaseTranslator("EXR Images", "EXR image translator",
 		EXR_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,

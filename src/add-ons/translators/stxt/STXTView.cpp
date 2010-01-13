@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc.
+ * Copyright 2002-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -30,7 +30,7 @@ STXTView::STXTView(const BRect &frame, const char *name, uint32 resizeMode,
 	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", "StyledEdit Files Translator");
+	BStringView *stringView = new BStringView(rect, "title", "StyledEdit files translator");
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);

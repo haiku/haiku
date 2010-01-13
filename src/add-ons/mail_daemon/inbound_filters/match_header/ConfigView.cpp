@@ -49,20 +49,20 @@ RuleFilterConfig::RuleFilterConfig(BMessage *settings) : BView(BRect(0,0,260,85)
 	if (settings->HasString("attribute"))
 		attr->SetText(settings->FindString("attribute"));
 	AddChild(attr);
-	
+
 	regex = new BTextControl(BRect(104,5,255,20),"attr",MDR_DIALECT_CHOICE (" has "," が "),MDR_DIALECT_CHOICE ("value (use REGEX: in from of regular expressions like *spam*)","値(正規表現対応)"),NULL);
 	regex->SetDivider(be_plain_font->StringWidth(MDR_DIALECT_CHOICE (" has "," が ")) + 4);
 	if (settings->HasString("regex"))
 		regex->SetText(settings->FindString("regex"));
 	AddChild(regex);
-	
-	arg = new BFileControl(BRect(5,55,255,80),"arg",NULL,MDR_DIALECT_CHOICE ("this field is based on the Action","ここは動作によって意味が変わります"));
+
+	arg = new BFileControl(BRect(5,55,255,80),"arg",NULL,MDR_DIALECT_CHOICE ("this field is based on the action","ここは動作によって意味が変わります"));
 	if (BControl *control = (BControl *)arg->FindView("select_file"))
 		control->SetEnabled(false);
 	if (settings->HasString("argument"))
 		arg->SetText(settings->FindString("argument"));
-	
-	outbound = new BPopUpMenu(MDR_DIALECT_CHOICE ("<Choose Account>","<アカウントを選択>"));
+
+	outbound = new BPopUpMenu(MDR_DIALECT_CHOICE ("<Choose account>","<アカウントを選択>"));
 	BList list;
 	GetOutboundMailChains(&list);
 	if (settings->HasInt32("do_what"))
@@ -81,27 +81,27 @@ RuleFilterConfig::RuleFilterConfig(BMessage *settings) : BView(BRect(0,0,260,85)
 			item->SetMarked(true);
 		delete (BMailChain *)(list.ItemAt(i));
 	}
-		
+
 }
-	
+
 
 void RuleFilterConfig::AttachedToWindow() {
 	if (menu != NULL)
 		return; // We switched back from another tab
-	
-	menu = new BPopUpMenu(MDR_DIALECT_CHOICE ("<Choose Action>","<動作を選択>"));
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Move To","移動する"), new BMessage(kMsgActionMoveTo)));
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Set Flags To","フラグを指定する"), new BMessage(kMsgActionSetTo)));
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Delete Message","削除する"), new BMessage(kMsgActionDelete)));
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Reply With","返事を書く"), new BMessage(kMsgActionReplyWith)));
-	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Set As Read","既読にする"), new BMessage(kMsgActionSetRead)));
+
+	menu = new BPopUpMenu(MDR_DIALECT_CHOICE ("<Choose action>","<動作を選択>"));
+	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Move to","移動する"), new BMessage(kMsgActionMoveTo)));
+	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Set flags to","フラグを指定する"), new BMessage(kMsgActionSetTo)));
+	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Delete message","削除する"), new BMessage(kMsgActionDelete)));
+	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Reply with","返事を書く"), new BMessage(kMsgActionReplyWith)));
+	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Set as read","既読にする"), new BMessage(kMsgActionSetRead)));
 	menu->SetTargetForItems(this);
 
 	BMenuField *field = new BMenuField(BRect(5,30,210,50),"do_what",MDR_DIALECT_CHOICE ("Then","ならば"),menu);
 	field->ResizeToPreferred();
 	field->SetDivider(be_plain_font->StringWidth(MDR_DIALECT_CHOICE ("Then","ならば")) + 8);
 	AddChild(field);
-	
+
 	outbound_field = new BMenuField(BRect(5,55,255,80),"reply","Foo",outbound);
 	outbound_field->ResizeToPreferred();
 	outbound_field->SetDivider(0);
@@ -123,7 +123,7 @@ status_t RuleFilterConfig::Archive(BMessage *into, bool deep) const {
 		into->AddInt32("argument",outbound->FindMarked()->Message()->what);
 	} else
 		into->AddString("argument",arg->Text());
-	
+
 	return B_OK;
 }
 
@@ -132,7 +132,7 @@ void RuleFilterConfig::MessageReceived(BMessage *msg) {
 	{
 		case kMsgActionMoveTo:
 		case kMsgActionSetTo:
-			if (BControl *control = (BControl *)arg->FindView("file_path")) 
+			if (BControl *control = (BControl *)arg->FindView("file_path"))
 				arg->SetEnabled(true);
 			if (BControl *control = (BControl *)arg->FindView("select_file"))
 				control->SetEnabled(msg->what == kMsgActionMoveTo);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -591,7 +591,7 @@ write_tif_stream(TIFF* tif, BPositionIO* inSource, color_space format,
 
 
 TIFFTranslator::TIFFTranslator()
-	: BaseTranslator("TIFF Images", "TIFF image translator",
+	: BaseTranslator("TIFF images", "TIFF image translator",
 		TIFF_TRANSLATOR_VERSION,
 		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
 		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),

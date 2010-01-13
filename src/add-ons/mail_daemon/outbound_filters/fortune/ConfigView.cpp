@@ -27,28 +27,28 @@ ConfigView::ConfigView()
 
 	BRect rect(5,4,250,25);
 	rect.bottom = rect.top - 2 + itemHeight;
-	BMailFileConfigView *fview = new BMailFileConfigView(MDR_DIALECT_CHOICE ("Fortune File:","予言ファイル:"),"fortune_file",false,"",B_FILE_NODE);
+	BMailFileConfigView *fview = new BMailFileConfigView(MDR_DIALECT_CHOICE ("Fortune file:","予言ファイル:"),"fortune_file",false,"",B_FILE_NODE);
 	AddChild(fview);
-	
+
 	rect.top = rect.bottom + 8;
 	rect.bottom = rect.top - 2 + itemHeight;
-	BTextControl * control = new BTextControl(rect,"tag_line",MDR_DIALECT_CHOICE ("Tag Line:","見出し:"),NULL,NULL);
+	BTextControl * control = new BTextControl(rect,"tag_line",MDR_DIALECT_CHOICE ("Tag line:","見出し:"),NULL,NULL);
 	control->SetDivider(control->StringWidth(control->Label()) + 6);
 	AddChild(control);
 
 	ResizeToPreferred();
-}		
+}
 
 
 void ConfigView::SetTo(BMessage *archive)
 {
 	if (BMailFileConfigView *control = (BMailFileConfigView *)FindView("fortune_file"))
 		control->SetTo(archive,NULL);
-		
+
 	BString path = archive->FindString("tag_line");
 	if (!archive->HasString("tag_line"))
-		path = "Fortune Cookie Says:\n\n";
-	
+		path = "Fortune cookie says:\n\n";
+
 	path.Truncate(path.Length() - 2);
 	if (BTextControl *control = (BTextControl *)FindView("tag_line"))
 		control->SetText(path.String());
@@ -61,7 +61,7 @@ status_t ConfigView::Archive(BMessage *into,bool) const
 	{
 		control->Archive(into);
 	}
-	
+
 	if (BTextControl *control = (BTextControl *)FindView("tag_line"))
 	{
 		BString line = control->Text();
@@ -73,7 +73,7 @@ status_t ConfigView::Archive(BMessage *into,bool) const
 	return B_OK;
 }
 
-	
+
 void ConfigView::GetPreferredSize(float *width, float *height)
 {
 	*width = 258;

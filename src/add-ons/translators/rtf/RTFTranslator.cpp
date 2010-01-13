@@ -54,7 +54,7 @@ translation_format sOutputFormats[] = {
 RTFTranslator::RTFTranslator()
 {
 	char info[256];
-	sprintf(info, "Rich Text Format Translator v%d.%d.%d %s",
+	sprintf(info, "Rich Text Format translator v%d.%d.%d %s",
 		int(B_TRANSLATION_MAJOR_VERSION(RTF_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(RTF_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(RTF_TRANSLATOR_VERSION)),
@@ -73,7 +73,7 @@ RTFTranslator::~RTFTranslator()
 const char *
 RTFTranslator::TranslatorName() const
 {
-	return "RTF Text Files";
+	return "RTF text files";
 }
 
 

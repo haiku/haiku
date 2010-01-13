@@ -92,7 +92,7 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 
 
 RAWTranslator::RAWTranslator()
-	: BaseTranslator("RAW Images", "RAW Image Translator",
+	: BaseTranslator("RAW images", "RAW image translator",
 		RAW_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,

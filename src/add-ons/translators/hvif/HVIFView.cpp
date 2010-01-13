@@ -30,7 +30,7 @@ HVIFView::HVIFView(const BRect &frame, const char *name, uint32 resizeMode,
 
 	BRect rect(10, 10, 200, 10 + height);
 	BStringView *stringView = new BStringView(rect, "title",
-		"Native Haiku Icon Format Translator");
+		"Native Haiku icon format translator");
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -57,7 +57,7 @@ HVIFView::HVIFView(const BRect &frame, const char *name, uint32 resizeMode,
 
 	rect.OffsetBy(0, height + 5);
 	int32 renderSize = fSettings->SetGetInt32(HVIF_SETTING_RENDER_SIZE);
-	BString label = "Render Size: ";
+	BString label = "Render size: ";
 	label << renderSize;
 	fRenderSize = new BSlider(rect, "renderSize", label.String(), NULL, 1, 32);
 
@@ -92,7 +92,7 @@ HVIFView::MessageReceived(BMessage *message)
 			fSettings->SetGetInt32(HVIF_SETTING_RENDER_SIZE, &value);
 			fSettings->SaveSettings();
 
-			BString newLabel = "Render Size: ";
+			BString newLabel = "Render size: ";
 			newLabel << value;
 			fRenderSize->SetLabel(newLabel.String());
 			return;

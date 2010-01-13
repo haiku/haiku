@@ -22,7 +22,7 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", "Rich Text Format (RTF) Files");
+	BStringView *stringView = new BStringView(rect, "title", "Rich Text Format (RTF) files");
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);

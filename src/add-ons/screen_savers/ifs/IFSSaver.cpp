@@ -76,7 +76,7 @@ IFSSaver::StartConfig(BView *view)
 
 	// the additive check box
 	fSpeedS = new BSlider(frame, "speed setting",
-						  "Morphing Speed:",
+						  "Morphing speed:",
 						  new BMessage(MSG_SET_SPEED),
 						  1, 12, B_BLOCK_THUMB,
 						  B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);

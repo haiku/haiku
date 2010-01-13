@@ -68,7 +68,7 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 	// Show Caption checkbox
 	pMsg = new BMessage(CHANGE_CAPTION);
 	fShowCaption = new BCheckBox(BRect(10, 45, 180, 62),
-		"Show Caption", "Show Caption", pMsg);
+		"Show caption", "Show caption", pMsg);
 	val = (fSettings->SetGetBool(SAVER_SETTING_CAPTION)) ? 1 : 0;
 	fShowCaption->SetValue(val);
 	fShowCaption->SetViewColor(ViewColor());
@@ -77,7 +77,7 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 	// Change Border checkbox
 	pMsg = new BMessage(CHANGE_BORDER);
 	fShowBorder = new BCheckBox(BRect(10, 70, 180, 87),
-		"Show Border", "Show Border", pMsg);
+		"Show border", "Show border", pMsg);
 	val = (fSettings->SetGetBool(SAVER_SETTING_BORDER)) ? 1 : 0;
 	fShowBorder->SetValue(val);
 	fShowBorder->SetViewColor(ViewColor());
@@ -86,13 +86,13 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 	// Delay Menu
 	// setup PNG interlace options menu
 	int32 currentDelay = fSettings->SetGetInt32(SAVER_SETTING_DELAY) / 1000;
-	fDelayMenu = new BPopUpMenu("Delay Menu");
+	fDelayMenu = new BPopUpMenu("Delay menu");
 	struct DelayItem {
 		const char *name;
 		int32 delay;
 	};
 	DelayItem items[] = {
-		{"No Delay",	0},
+		{"No delay",	0},
 		{"1 second",	1},
 		{"2 seconds",	2},
 		{"3 seconds",	3},
@@ -128,7 +128,7 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 	// Choose Image Folder button
 	pMsg = new BMessage(CHOOSE_DIRECTORY);
 	fChooseFolder = new BButton(BRect(50, 160, 180, 180),
-		"Choose Folder", "Choose Image Folder" B_UTF8_ELLIPSIS, pMsg);
+		"Choose Folder", "Choose image folder" B_UTF8_ELLIPSIS, pMsg);
 	AddChild(fChooseFolder);
 
 	// Setup choose folder file panel
@@ -317,6 +317,6 @@ SlideShowConfigView::Draw(BRect area)
 	// Draw current folder
 	BString strFolder;
 	fSettings->GetString(SAVER_SETTING_DIRECTORY, strFolder);
-	strFolder.Prepend("Image Folder: ");
+	strFolder.Prepend("Image folder: ");
 	DrawString(strFolder.String(), BPoint(10, yplain * 9 + ybold));
 }

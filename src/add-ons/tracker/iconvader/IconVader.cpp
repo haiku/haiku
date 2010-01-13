@@ -17,7 +17,7 @@ static void Error(BView *view, status_t status, bool unlock=false)
 	if (view && unlock)
 		view->UnlockLooper();
 	BString s(strerror(status));
-	alert = new BAlert("Error", s.String(), "Ok");
+	alert = new BAlert("Error", s.String(), "OK");
 	alert->Go();
 }
 
@@ -80,7 +80,7 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 
 
 
-	alert = new BAlert("Error", "IconVader:\nClick on the icons to get points.\nAvoid symlinks!", "Ok");
+	alert = new BAlert("Error", "IconVader:\nClick on the icons to get points.\nAvoid symlinks!", "OK");
 	alert->Go();
 
 

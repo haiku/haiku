@@ -178,7 +178,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fAddSpamToSubjectCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"AddToSubject",
-		"Add spam rating to start of Subject",
+		"Add spam rating to start of subject",
 		new BMessage (kAddSpamToSubjectPressed));
 	AddChild (fAddSpamToSubjectCheckBoxPntr);
 	fAddSpamToSubjectCheckBoxPntr->ResizeToPreferred ();
@@ -194,7 +194,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fNoWordsMeansSpamCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"NoWordsMeansSpam",
-		"or empty E-mail",
+		"or empty e-mail",
 		new BMessage (kNoWordsMeansSpam));
 	AddChild (fNoWordsMeansSpamCheckBoxPntr);
 	fNoWordsMeansSpamCheckBoxPntr->ResizeToPreferred ();
@@ -250,7 +250,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fAutoTrainingCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"autoTraining",
-		"Learn from all incoming E-mail",
+		"Learn from all incoming e-mail",
 		new BMessage (kAutoTrainingPressed));
 	AddChild (fAutoTrainingCheckBoxPntr);
 	fAutoTrainingCheckBoxPntr->ResizeToPreferred ();

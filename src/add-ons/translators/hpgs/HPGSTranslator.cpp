@@ -80,7 +80,7 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 
 
 HPGSTranslator::HPGSTranslator()
-	: BaseTranslator("HPGS Images", "HPGS Image Translator",
+	: BaseTranslator("HPGS images", "HPGS image translator",
 		HPGS_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,

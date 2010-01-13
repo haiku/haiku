@@ -72,7 +72,7 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 
 
 ICOTranslator::ICOTranslator()
-	: BaseTranslator("Windows Icon Images", "Windows Icon Translator",
+	: BaseTranslator("Windows icon images", "Windows icon translator",
 		ICO_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,

@@ -50,14 +50,14 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define B_TRANSLATOR_BITMAP_DESCRIPTION "Be Bitmap Format (JPEGTranslator)"
 
 // Translation Kit required globals
-char translatorName[] = "JPEG Images";
+char translatorName[] = "JPEG images";
 char translatorInfo[] =
 	"©2002-2003, Marcin Konicki\n"
 	"©2005-2007, Haiku\n"
 	"\n"
 	"Based on IJG library © 1991-1998, Thomas G. Lane\n"
 	"          http://www.ijg.org/files/\n"
-	"with \"Lossless\" encoding support patch by Ken Murchison\n"
+	"with \"lossless\" encoding support patch by Ken Murchison\n"
 	"          http://www.oceana.com/ftp/ljpeg/\n"
 	"\n"
 	"With some colorspace conversion routines by Magnus Hellman\n"

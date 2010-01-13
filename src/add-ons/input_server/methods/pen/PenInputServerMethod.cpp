@@ -51,7 +51,7 @@ PenInputServerMethod::PenInputServerMethod()
 	PRINT(("%s\n", __FUNCTION__));
 #if DEBUG
 	//fDebugFile.SetTo("/tmp/PenInputMethodMessages.txt", B_READ_WRITE|B_CREATE_FILE);
-	fDebugAlert = new BAlert("PenInput Debug", "Plip                                   \n\n\n\n\n\n\n\n\n\n\n\n\n", "Ok");
+	fDebugAlert = new BAlert("PenInput Debug", "Plip                                   \n\n\n\n\n\n\n\n\n\n\n\n\n", "OK");
 	fDebugAlert->SetLook(B_TITLED_WINDOW_LOOK);
 	fDebugAlert->TextView()->MakeSelectable();
 	fDebugAlert->TextView()->SelectAll();

@@ -40,19 +40,19 @@ bool DetermineType(BPositionIO *source, bool *is_gif);
 status_t GetBitmap(BPositionIO *in, BBitmap **out);
 
 /* Required data */
-char translatorName[] = "GIF Images"; 
-char translatorInfo[] = "GIF image translator v1.4"; 
+char translatorName[] = "GIF images";
+char translatorInfo[] = "GIF image translator v1.4";
 int32 translatorVersion = 0x140;
 
-translation_format inputFormats[] = { 
-	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" }, 
-	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap Format (GIFTranslator)" }, 
+translation_format inputFormats[] = {
+	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" },
+	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap Format (GIFTranslator)" },
 	{ 0 }
 };
 
-translation_format outputFormats[] = { 
-	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" }, 
-	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap Format (GIFTranslator)" }, 
+translation_format outputFormats[] = {
+	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" },
+	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap Format (GIFTranslator)" },
 	{ 0 }
 };
 
@@ -77,7 +77,7 @@ DetermineType(BPositionIO *source, bool *is_gif)
 	*is_gif = true;
 	if (source->Read(header, 6) != 6) return false;
 	header[6] = 0x00;
-	
+
 	if (strcmp((char *)header, "GIF87a") != 0 && strcmp((char *)header, "GIF89a") != 0) {
 		*is_gif = false;
 		int32 magic = (header[0] << 24) + (header[1] << 16) + (header[2] << 8) + header[3];
@@ -88,7 +88,7 @@ DetermineType(BPositionIO *source, bool *is_gif)
 		cs = (color_space)B_BENDIAN_TO_HOST_INT32(cs);
 		if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG && cs != B_RGBA32_BIG) return false;
 	}
-	
+
 	source->Seek(0, SEEK_SET);
 	return true;
 }
@@ -99,7 +99,7 @@ status_t
 GetBitmap(BPositionIO *in, BBitmap **out)
 {
 	TranslatorBitmap header;
-	
+
 	status_t err = in->Read(&header, sizeof(header));
 	if (err != sizeof(header))
 		return B_IO_ERROR;
@@ -112,7 +112,7 @@ GetBitmap(BPositionIO *in, BBitmap **out)
 	header.rowBytes = B_BENDIAN_TO_HOST_INT32(header.rowBytes);
 	header.colors = (color_space)B_BENDIAN_TO_HOST_INT32(header.colors);
 	header.dataSize = B_BENDIAN_TO_HOST_INT32(header.dataSize);
-	
+
 	BBitmap *bitmap = new BBitmap(header.bounds, header.colors);
 	*out = bitmap;
 	if (bitmap == NULL) return B_NO_MEMORY;
@@ -124,26 +124,26 @@ GetBitmap(BPositionIO *in, BBitmap **out)
 	err = in->Read(bits, header.dataSize);
 	if (err == (status_t)header.dataSize) return B_OK;
 	else return B_IO_ERROR;
-}	
+}
 
 
 /* Required Identify function - may need to read entire header, not sure */
 status_t
-Identify(BPositionIO *inSource, const translation_format *inFormat, 
+Identify(BPositionIO *inSource, const translation_format *inFormat,
 	BMessage *ioExtension, translator_info *outInfo, uint32 outType)
 {
 
 	const char *debug_text = getenv("GIF_TRANSLATOR_DEBUG");
 	if ((debug_text != NULL) && (atoi(debug_text) != 0)) debug = true;
-	
+
 	if (outType == 0) outType = B_TRANSLATOR_BITMAP;
 	if (outType != GIF_TYPE && outType != B_TRANSLATOR_BITMAP) return B_NO_TRANSLATOR;
-	
+
 	bool is_gif;
 	if (!DetermineType(inSource, &is_gif)) return B_NO_TRANSLATOR;
 	if (!is_gif && inFormat != NULL && inFormat->type != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
-	
+
 	outInfo->group = B_TRANSLATOR_BITMAP;
 	if (is_gif) {
 		outInfo->type = GIF_TYPE;
@@ -166,7 +166,7 @@ Identify(BPositionIO *inSource, const translation_format *inFormat,
 /* Main required function - assumes that an incoming GIF must be translated
    to a BBitmap, and vice versa - this could be improved */
 status_t
-Translate(BPositionIO *inSource, const translator_info *inInfo, 
+Translate(BPositionIO *inSource, const translator_info *inInfo,
 	BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
 {
 
@@ -177,11 +177,11 @@ Translate(BPositionIO *inSource, const translator_info *inInfo,
 	if (outType != GIF_TYPE && outType != B_TRANSLATOR_BITMAP) {
 		return B_NO_TRANSLATOR;
 	}
-	
+
 	bool is_gif;
 	if (!DetermineType(inSource, &is_gif)) return B_NO_TRANSLATOR;
 	if (!is_gif && inInfo->type != B_TRANSLATOR_BITMAP) return B_NO_TRANSLATOR;
-	
+
 	status_t err = B_OK;
 	bigtime_t now = system_time();
 	// Going from BBitmap to GIF
@@ -206,7 +206,7 @@ Translate(BPositionIO *inSource, const translator_info *inInfo,
 		}
 		delete gl;
 	}
-	
+
 	if (debug) {
 		now = system_time() - now;
 		printf("Translate() - Translation took %Ld microseconds\n", now);

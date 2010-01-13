@@ -486,7 +486,7 @@ descriptive_name (
 
 	sprintf (buffer, "Spam >= %05.3f", (double) cutoffRatio);
 	if (addMarker)
-		strcat (buffer, ", Mark Subject");
+		strcat (buffer, ", Mark subject");
 	if (autoTraining)
 		strcat (buffer, ", Self-training");
 	strcat (buffer, ".");

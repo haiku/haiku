@@ -62,9 +62,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // View labels
 #define VIEW_LABEL_QUALITY "Output quality"
-#define VIEW_LABEL_GRAY1ASRGB24 "Write Black&White images as RGB24"
+#define VIEW_LABEL_GRAY1ASRGB24 "Write black-and-white images as RGB24"
 #define VIEW_LABEL_JPC "Output only codestream (.jpc)"
-#define	VIEW_LABEL_GRAYASRGB32 "Read Greyscale images as RGB32"
+#define	VIEW_LABEL_GRAYASRGB32 "Read greyscale images as RGB32"
 
 
 //!	Settings storage structure

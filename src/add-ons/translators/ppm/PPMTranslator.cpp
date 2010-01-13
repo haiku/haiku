@@ -47,7 +47,7 @@
 #define PPM_TRANSLATOR_VERSION 0x100
 
 /* These three data items are exported by every translator. */
-char translatorName[] = "PPM Images";
+char translatorName[] = "PPM images";
 char translatorInfo[] = "PPM image translator v1.0.0, " __DATE__;
 int32 translatorVersion = PPM_TRANSLATOR_VERSION;
 	// Revision: lowest 4 bits
@@ -214,13 +214,13 @@ public:
 PrefsLoader g_prefs_loader("PPMTranslator_Settings");
 
 /*	Some prototypes for functions we use.	*/
-status_t read_ppm_header(BDataIO * io, int * width, int * rowbytes, int * height, 
+status_t read_ppm_header(BDataIO * io, int * width, int * rowbytes, int * height,
 	int * max, bool * ascii, color_space * space, bool * is_ppm, char ** comment);
-status_t read_bits_header(BDataIO * io, int skipped, int * width, int * rowbytes, 
+status_t read_bits_header(BDataIO * io, int skipped, int * width, int * rowbytes,
 	int * height, int * max, bool * ascii, color_space * space);
 status_t write_comment(const char * str, BDataIO * io);
-status_t copy_data(BDataIO * in, BDataIO * out, int rowbytes, int out_rowbytes, 
-	int height, int max, bool in_ascii, bool out_ascii, color_space in_space, 
+status_t copy_data(BDataIO * in, BDataIO * out, int rowbytes, int out_rowbytes,
+	int height, int max, bool in_ascii, bool out_ascii, color_space in_space,
 	color_space out_space);
 
 	/*	Return B_NO_TRANSLATOR if not handling this data.	*/
@@ -340,9 +340,9 @@ Translate(	/*	required	*/
 	}
 	else {	/*	When outputting to B_TRANSLATOR_BITMAP, follow user's wishes.	*/
 #if defined(_PR3_COMPATIBLE_)	/* R4 headers? */
-		if (!ioExtension || ioExtension->FindInt32(B_TRANSLATOR_EXT_BITMAP_COLOR_SPACE, (int32*)&out_space) || 
+		if (!ioExtension || ioExtension->FindInt32(B_TRANSLATOR_EXT_BITMAP_COLOR_SPACE, (int32*)&out_space) ||
 #else
-		if (!ioExtension || ioExtension->FindInt32("bits/space", (int32*)&out_space) || 
+		if (!ioExtension || ioExtension->FindInt32("bits/space", (int32*)&out_space) ||
 #endif
 			(out_space == B_NO_COLOR_SPACE)) {
 			if (g_settings.out_space == B_NO_COLOR_SPACE) {
@@ -445,7 +445,7 @@ public:
 				mMenu->AddItem(new BMenuItem("RGB 5:5:5 16 bits", CSMessage(B_RGB15)));
 				mMenu->AddItem(new BMenuItem("RGBA 5:5:5:1 16 bits", CSMessage(B_RGBA15)));
 				mMenu->AddItem(new BMenuItem("RGB 5:6:5 16 bits", CSMessage(B_RGB16)));
-				mMenu->AddItem(new BMenuItem("System Palette 8 bits", CSMessage(B_CMAP8)));
+				mMenu->AddItem(new BMenuItem("System palette 8 bits", CSMessage(B_CMAP8)));
 				mMenu->AddSeparatorItem();
 				mMenu->AddItem(new BMenuItem("Grayscale 8 bits", CSMessage(B_GRAY8)));
 				mMenu->AddItem(new BMenuItem("Bitmap 1 bit", CSMessage(B_GRAY1)));
@@ -458,7 +458,7 @@ public:
 				mMenu->AddItem(new BMenuItem("RGB 5:5:5 16 bits big-endian", CSMessage(B_RGB15_BIG)));
 				mMenu->AddItem(new BMenuItem("RGBA 5:5:5:1 16 bits big-endian", CSMessage(B_RGBA15_BIG)));
 				mMenu->AddItem(new BMenuItem("RGB 5:6:5 16 bits big-endian", CSMessage(B_RGB16)));
-				mField = new BMenuField(BRect(10,110,190,130), "Color Space Field", "Input Color Space", mMenu);
+				mField = new BMenuField(BRect(10,110,190,130), "Color Space Field", "Input color space", mMenu);
 				mField->SetDivider(mField->StringWidth(mField->Label()) + 7);
 				mField->SetViewColor(ViewColor());
 				AddChild(mField);
@@ -490,16 +490,16 @@ virtual	void Draw(
 				float xbold, ybold;
 				xbold = fh.descent + 1;
 				ybold = fh.ascent + fh.descent * 2 + fh.leading;
-	
-				char title[] = "PPM Image Translator";
+
+				char title[] = "PPM image translator";
 				DrawString(title, BPoint(xbold, ybold));
-	
+
 				SetFont(be_plain_font);
 				font_height plainh;
 				GetFontHeight(&plainh);
 				float yplain;
 				yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-	
+
 				char detail[100];
 				int ver = static_cast<int>(translatorVersion);
 				sprintf(detail, "Version %d.%d.%d %s", ver >> 8, ((ver >> 4) & 0xf),
@@ -598,7 +598,7 @@ private:
 	/*	as a local when translation starts.	*/
 	/*	Store your settings wherever you feel like it.	*/
 
-status_t 
+status_t
 MakeConfig(	/*	optional	*/
 	BMessage * ioExtension,	/*	can be NULL	*/
 	BView * * outView,
@@ -644,7 +644,7 @@ read_ppm_header(
 	BDataIO * inSource,
 	int * width,
 	int * rowbytes,
-	int * height, 
+	int * height,
 	int * max,
 	bool * ascii,
 	color_space * space,
@@ -760,7 +760,7 @@ read_bits_header(
 	int skipped,
 	int * width,
 	int * rowbytes,
-	int * height, 
+	int * height,
 	int * max,
 	bool * ascii,
 	color_space * space)
@@ -928,7 +928,7 @@ write_ascii_line(
 }
 
 
-static unsigned char * 
+static unsigned char *
 make_scale_data(
 	int max)
 {
@@ -954,13 +954,13 @@ scale_data(
 
 status_t
 copy_data(
-	BDataIO * in, 
-	BDataIO * out, 
-	int rowbytes, 
+	BDataIO * in,
+	BDataIO * out,
+	int rowbytes,
 	int out_rowbytes,
-	int height, 
+	int height,
 	int max,
-	bool in_ascii, 
+	bool in_ascii,
 	bool out_ascii,
 	color_space in_space,
 	color_space out_space)

@@ -25,7 +25,7 @@ class NotifyCallback : public BMailChainCallback {
 	public:
 		NotifyCallback (int32 notification_method, BMailChainRunner *us,NotifyFilter *ref2);
 		virtual void Callback(status_t result);
-		
+
 		uint32 num_messages;
 	private:
 		BMailChainRunner *chainrunner;
@@ -43,10 +43,10 @@ class NotifyFilter : public BMailFilter
 		BPositionIO** io_message, BEntry* io_entry,
 		BMessage* io_headers, BPath* io_folder, const char* io_uid
 	);
-	
+
   private:
   	friend class NotifyCallback;
-  	
+
   	NotifyCallback *callback;
   	BMailChainRunner *_runner;
   	int32 strategy;
@@ -70,19 +70,19 @@ status_t NotifyFilter::ProcessMailMessage(BPositionIO**, BEntry*, BMessage*heade
 		callback = new NotifyCallback(strategy,_runner,this);
 		_runner->RegisterProcessCallback(callback);
 	}
-	
-	if (!headers->FindBool("ENTIRE_MESSAGE")) {	
+
+	if (!headers->FindBool("ENTIRE_MESSAGE")) {
 		BString status;
 		headers->FindString("STATUS", &status);
 		// do not notify about auto-read messages
 		if (status.Compare("Read") != 0)
 			callback->num_messages ++;
 	}
-	
+
 	return B_OK;
 }
 
-NotifyCallback::NotifyCallback (int32 notification_method, BMailChainRunner *us,NotifyFilter *ref2) : 
+NotifyCallback::NotifyCallback (int32 notification_method, BMailChainRunner *us,NotifyFilter *ref2) :
 	num_messages(0),
 	chainrunner(us),
 	strategy(notification_method),
@@ -92,13 +92,13 @@ NotifyCallback::NotifyCallback (int32 notification_method, BMailChainRunner *us,
 
 void NotifyCallback::Callback(status_t result) {
 	parent->callback = NULL;
-	
+
 	if (num_messages == 0)
 		return;
-	
+
 	if (strategy & do_beep)
 		system_beep("New E-mail");
-		
+
 	if (strategy & alert) {
 		BString text;
 		MDR_DIALECT_CHOICE (
@@ -106,27 +106,27 @@ void NotifyCallback::Callback(status_t result) {
 		<< " for " << chainrunner->Chain()->Name() << ".",
 
 		text << chainrunner->Chain()->Name() << "より\n" << num_messages << " 通のメッセージが届きました");
-		
-		BAlert *alert = new BAlert(MDR_DIALECT_CHOICE ("New Messages","新着メッセージ"), text.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL);
+
+		BAlert *alert = new BAlert(MDR_DIALECT_CHOICE ("New messages","新着メッセージ"), text.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL);
 		alert->SetFeel(B_NORMAL_WINDOW_FEEL);
 		alert->Go(NULL);
 	}
-	
+
 	if (strategy & blink_leds)
 		be_app->PostMessage('mblk');
-	
+
 	if (strategy & one_central_beep)
 		be_app->PostMessage('mcbp');
-	
+
 	if (strategy & big_doozy_alert) {
 		BMessage msg('numg');
 		msg.AddInt32("num_messages",num_messages);
 		msg.AddString("chain_name",chainrunner->Chain()->Name());
 		msg.AddInt32("chain_id",chainrunner->Chain()->ID());
-		
+
 		be_app->PostMessage(&msg);
 	}
-	
+
 	if (strategy & log_window) {
 		BString message;
 		message << num_messages << " new message" << ((num_messages != 1) ? "s" : "");

@@ -60,7 +60,7 @@ make_nth_translator(int32 n, image_id image, uint32 flags, ...)
 
 
 HVIFTranslator::HVIFTranslator()
-	:	BaseTranslator("HVIF Icons", "Native Haiku vector icon translator",
+	:	BaseTranslator("HVIF icons", "Native Haiku vector icon translator",
 			HVIF_TRANSLATOR_VERSION, sInputFormats,
 			sizeof(sInputFormats) / sizeof(sInputFormats[0]), sOutputFormats,
 			sizeof(sOutputFormats) / sizeof(sOutputFormats[0]),

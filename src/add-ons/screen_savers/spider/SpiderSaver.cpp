@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku Inc. All rights reserved.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -353,7 +353,7 @@ SpiderView::SpiderView(BRect frame, SpiderSaver* saver,
 	frame.top = 10.0;
 	frame.bottom = frame.top + viewHeight;
 	frame.OffsetBy(0.0, viewHeight);
-	fQueueNumberS = new BSlider(frame, "queue number", "Max Polygon Count",
+	fQueueNumberS = new BSlider(frame, "queue number", "Max. polygon count",
 								new BMessage(MSG_QUEUE_NUMBER),
 								1, MAX_QUEUE_NUMBER);
 	fQueueNumberS->SetHashMarks(B_HASH_MARKS_BOTTOM);
@@ -361,7 +361,7 @@ SpiderView::SpiderView(BRect frame, SpiderSaver* saver,
 	fQueueNumberS->SetValue(queueNumber);
 	AddChild(fQueueNumberS);
 	frame.OffsetBy(0.0, viewHeight);
-	fPolyNumberS = new BSlider(frame, "poly points", "Max Points per Polygon",
+	fPolyNumberS = new BSlider(frame, "poly points", "Max. points per polygon",
 								new BMessage(MSG_POLY_NUMBER),
 								MIN_POLY_POINTS, MAX_POLY_POINTS);
 	fPolyNumberS->SetHashMarks(B_HASH_MARKS_BOTTOM);
@@ -369,7 +369,7 @@ SpiderView::SpiderView(BRect frame, SpiderSaver* saver,
 	fPolyNumberS->SetValue(maxPolyPoints);
 	AddChild(fPolyNumberS);
 	frame.OffsetBy(0.0, viewHeight);
-	fQueueDepthS = new BSlider(frame, "queue depth", "Trail Depth",
+	fQueueDepthS = new BSlider(frame, "queue depth", "Trail depth",
 								new BMessage(MSG_QUEUE_DEPTH),
 								MIN_QUEUE_DEPTH, MAX_QUEUE_DEPTH);
 	fQueueDepthS->SetHashMarks(B_HASH_MARKS_BOTTOM);

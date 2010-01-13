@@ -55,7 +55,7 @@ TGAView::TGAView(const BRect& frame, const char* name, uint32 resize,
 	fpchkIgnoreAlpha->ResizeToPreferred();
 
 	fpchkRLE = new BCheckBox(BRect(10, 67, 180, 84),
-		"Save with RLE Compression", "Save with RLE Compression",
+		"Save with RLE compression", "Save with RLE compression",
 		new BMessage(CHANGE_RLE));
 	val = (fSettings->SetGetBool(TGA_SETTING_RLE)) ? 1 : 0;
 	fpchkRLE->SetValue(val);
@@ -114,7 +114,7 @@ TGAView::Draw(BRect area)
 	xbold = fh.descent + 1;
 	ybold = fh.ascent + fh.descent * 2 + fh.leading;
 
-	DrawString("TGA Image Translator", BPoint(xbold, ybold));
+	DrawString("TGA image translator", BPoint(xbold, ybold));
 
 	SetFont(be_plain_font);
 	font_height plainh;
@@ -130,6 +130,6 @@ TGAView::Draw(BRect area)
 		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 
-	DrawString("Written by the Haiku Translation Kit Team",
+	DrawString("Written by the Haiku Translation Kit team",
 		BPoint(xbold, yplain * 7 + ybold));
 }

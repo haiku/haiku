@@ -68,7 +68,7 @@ GIFView::GIFView(BRect rect, const char *name)
 
 	// menu fields (Palette & Colors)
 	fWebSafeMI = new BMenuItem("Websafe", new BMessage(GV_WEB_SAFE), 0, 0);
-	fBeOSSystemMI = new BMenuItem("BeOS System", new BMessage(GV_BEOS_SYSTEM), 0, 0);
+	fBeOSSystemMI = new BMenuItem("BeOS system", new BMessage(GV_BEOS_SYSTEM), 0, 0);
 	fGreyScaleMI = new BMenuItem("Greyscale", new BMessage(GV_GREYSCALE), 0, 0);
 	fOptimalMI = new BMenuItem("Optimal", new BMessage(GV_OPTIMAL), 0, 0);
 	fPaletteM = new BPopUpMenu("PalettePopUpMenu", true, true, B_ITEMS_IN_COLUMN);
@@ -92,19 +92,19 @@ GIFView::GIFView(BRect rect, const char *name)
 	
 	r.top = r.bottom + 14;
 	r.bottom = r.top + 24;
-	fPaletteMF = new BMenuField(r, "PaletteMenuField", "Palette",
+	fPaletteMF = new BMenuField(r, "PaletteMenuField", "Palette: ",
 		fPaletteM, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(fPaletteMF);
 
 	r.top = r.bottom + 5;
 	r.bottom = r.top + 24;
-	fColorCountMF = new BMenuField(r, "ColorCountMenuField", "Colors",
+	fColorCountMF = new BMenuField(r, "ColorCountMenuField", "Colors: ",
 		fColorCountM, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(fColorCountMF);
 
 	// align menu fields
-	float maxLabelWidth = ceilf(max_c(be_plain_font->StringWidth("Colors"),
-									  be_plain_font->StringWidth("Palette")));
+	float maxLabelWidth = ceilf(max_c(be_plain_font->StringWidth("Colors: "),
+									  be_plain_font->StringWidth("Palette: ")));
 	fPaletteMF->SetDivider(maxLabelWidth + 7);
 	fColorCountMF->SetDivider(maxLabelWidth + 7);
 

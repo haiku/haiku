@@ -40,7 +40,7 @@ process_refs(entry_ref directoryRef, BMessage *msg, void *)
 			|| targetEntry.GetParent(&targetEntry) != B_OK) {
 			(new BAlert("Open Target Folder",
 				"Cannot open target folder. Maybe this link is broken?",
-				"Ok", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
+				"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 			continue;
 		}
 
@@ -62,7 +62,7 @@ process_refs(entry_ref directoryRef, BMessage *msg, void *)
 		(new BAlert("Open Target Folder",
 			"This add-on can only be used on symbolic links.\n"
 			"It opens the folder of the link target in Tracker.",
-			"Ok"))->Go(NULL);
+			"OK"))->Go(NULL);
 	}
 }
 
