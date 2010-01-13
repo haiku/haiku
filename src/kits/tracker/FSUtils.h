@@ -57,91 +57,100 @@ namespace BPrivate {
 
 class BInfoWindow;
 
+//! Controls the copy engine; may be overriden to specify how conflicts are
+// handled, etc.
 class CopyLoopControl {
-	// controls the copy engine; may be overriden to specify how conflicts are
-	// handled, etc.
-	// Installer has it's own subclass
-	public:
-		virtual ~CopyLoopControl();
-		virtual bool FileError(const char *message, const char *name, status_t error,
-			bool allowContinue) = 0;
-			// inform that a file error occurred while copying <name>
-			// returns true if user decided to continue
+public:
+	virtual						~CopyLoopControl();
 
-		virtual void UpdateStatus(const char *name, entry_ref ref, int32 count,
-			bool optional = false) = 0;
+	//! Inform that a file error occurred while copying <name>.
+	// \return \c True if user decided to continue
+	virtual	bool				FileError(const char *message,
+									const char *name, status_t error,
+									bool allowContinue) = 0;
 
-		virtual bool CheckUserCanceled() = 0;
-			// returns true if canceled
+	virtual	void				UpdateStatus(const char *name,
+									const entry_ref& ref, int32 count,
+									bool optional = false) = 0;
 
-		enum OverwriteMode {
-			kSkip,				// do not replace, go to next entry
-			kReplace,			// remove entry before copying new one
-			kMerge				// for folders: leave existing folder, update contents leaving
-								//  nonconflicting items
+	//! \return \c true if canceled
+	virtual	bool				CheckUserCanceled() = 0;
+
+			enum OverwriteMode {
+				kSkip,			// do not replace, go to next entry
+				kReplace,		// remove entry before copying new one
+				kMerge			// for folders: leave existing folder, update
+								// contents leaving nonconflicting items
 								// for files: save original attributes on file.
-		};
+			};
 
-		virtual OverwriteMode OverwriteOnConflict(const BEntry *srcEntry,
-			const char *destName, const BDirectory *destDir, bool srcIsDir,
-			bool dstIsDir) = 0;
-			// override to always overwrite, never overwrite, let user decide,
-			// compare dates, etc.
+	//! Override to always overwrite, never overwrite, let user decide,
+	// compare dates, etc.
+	virtual	OverwriteMode		OverwriteOnConflict(const BEntry *srcEntry,
+									const char *destName,
+									const BDirectory *destDir,
+									bool srcIsDir, bool dstIsDir) = 0;
 
-		virtual bool SkipEntry(const BEntry *, bool file) = 0;
-			// override to prevent copying of a given file or directory
+	//! Override to prevent copying of a given file or directory
+	virtual	bool				SkipEntry(const BEntry *, bool file) = 0;
 
-		virtual void ChecksumChunk(const char *block, size_t size);
-			// during a file copy, this is called every time a chunk of data
-			// is copied.  Users may override to keep a running checksum.
+	//! During a file copy, this is called every time a chunk of data
+	// is copied.  Users may override to keep a running checksum.
+	virtual	void				ChecksumChunk(const char *block, size_t size);
 
-		virtual bool ChecksumFile(const entry_ref *);
-			// This is called when a file is finished copying.  Users of this
-			// class may override to verify that the checksum they've been
-			// computing in ChecksumChunk matches.  If this returns true,
-			// the copy will continue.  If false, if will abort.
+	//! This is called when a file is finished copying.  Users of this
+	// class may override to verify that the checksum they've been
+	// computing in ChecksumChunk matches.  If this returns true,
+	// the copy will continue.  If false, if will abort.
+	virtual	bool				ChecksumFile(const entry_ref *);
 
-		virtual bool SkipAttribute(const char *attributeName);
-		virtual bool PreserveAttribute(const char *attributeName);
+	virtual	bool				SkipAttribute(const char *attributeName);
+	virtual	bool				PreserveAttribute(const char *attributeName);
 };
 
 
+//! This is the Tracker copy-specific version of CopyLoopControl.
 class TrackerCopyLoopControl : public CopyLoopControl {
-	// this is the Tracker copy - specific version of CopyLoopControl
-	public:
-		TrackerCopyLoopControl(thread_id);
-		virtual ~TrackerCopyLoopControl() {}
+public:
+								TrackerCopyLoopControl(thread_id);
+								TrackerCopyLoopControl(thread_id,
+									int32 totalItems, off_t totalSize);
+	virtual						~TrackerCopyLoopControl();
 
-		virtual bool FileError(const char *message, const char *name, status_t error,
-			bool allowContinue);
-			// inform that a file error occurred while copying <name>
-			// returns true if user decided to continue
+	virtual	bool				FileError(const char *message,
+									const char *name, status_t error,
+									bool allowContinue);
 
-		virtual void UpdateStatus(const char *name, entry_ref ref, int32 count,
-			bool optional = false);
+	virtual	void				UpdateStatus(const char *name,
+									const entry_ref& ref, int32 count,
+									bool optional = false);
 
-		virtual bool CheckUserCanceled();
-			// returns true if canceled
+	virtual	bool				CheckUserCanceled();
 
-		virtual OverwriteMode OverwriteOnConflict(const BEntry *srcEntry,
-			const char *destName, const BDirectory *destDir, bool srcIsDir,
-			bool dstIsDir);
+	virtual	OverwriteMode		OverwriteOnConflict(const BEntry *srcEntry,
+									const char *destName,
+									const BDirectory *destDir,
+									bool srcIsDir, bool dstIsDir);
 
-		virtual bool SkipEntry(const BEntry *, bool file);
-			// override to prevent copying of a given file or directory
+	virtual	bool				SkipEntry(const BEntry *, bool file);
+	virtual	bool				SkipAttribute(const char *attributeName);
 
-		virtual bool SkipAttribute(const char *attributeName);
 
-	private:
-		thread_id fThread;
+	// One can specify an entry_ref list with the source entries. This will
+	// then trigger the feature to pull additional source entries from the
+	// status window, such that the user can drop additional items onto the
+	// progress display of the ongoing copy process to copy these items to
+	// the same target directory.
+			typedef BObjectList<entry_ref> EntryList;
+
+			void				SetSourceList(EntryList* list);
+
+private:
+			thread_id			fThread;
+
+			EntryList*			fSourceList;
 };
 
-
-inline
-TrackerCopyLoopControl::TrackerCopyLoopControl(thread_id thread)
-	: fThread(thread)
-{
-}
 
 #define B_DESKTOP_DIR_NAME "Desktop"
 

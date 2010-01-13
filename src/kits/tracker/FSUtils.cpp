@@ -111,7 +111,8 @@ static status_t _RestoreTask(BObjectList<entry_ref> *);
 status_t CalcItemsAndSize(BObjectList<entry_ref> *refList, size_t blockSize,
 	int32 *totalCount, off_t *totalSize);
 status_t MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc,
-	uint32 moveMode, const char *newName, Undo &undo);
+	uint32 moveMode, const char *newName, Undo &undo,
+	CopyLoopControl* loopControl);
 ConflictCheckResult PreFlightNameCheck(BObjectList<entry_ref> *srcList,
 	const BDirectory *destDir, int32 *collisionCount, uint32 moveMode);
 status_t CheckName(uint32 moveMode, const BEntry *srcEntry,
@@ -171,74 +172,11 @@ const char *kSkipAttributes[] = {
 };
 
 
+// #pragma mark -
+
+
 CopyLoopControl::~CopyLoopControl()
 {
-}
-
-
-bool
-TrackerCopyLoopControl::FileError(const char *message, const char *name,
-	status_t error, bool allowContinue)
-{
-	char buffer[512];
-	sprintf(buffer, message, name, strerror(error));
-
-	if (allowContinue) {
-		BAlert *alert = new BAlert("", buffer, "Cancel", "OK", 0,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
-		return alert->Go() != 0;
-	}
-
-	BAlert *alert = new BAlert("", buffer, "Cancel", 0, 0,
-		B_WIDTH_AS_USUAL, B_STOP_ALERT);
-	alert->SetShortcut(0, B_ESCAPE);
-	alert->Go();
-	return false;
-}
-
-
-void
-TrackerCopyLoopControl::UpdateStatus(const char *name, entry_ref, int32 count,
-	bool optional)
-{
-	if (gStatusWindow)
-		gStatusWindow->UpdateStatus(fThread, name, count, optional);
-}
-
-
-bool
-TrackerCopyLoopControl::CheckUserCanceled()
-{
-	return gStatusWindow && gStatusWindow->CheckCanceledOrPaused(fThread);
-}
-
-
-TrackerCopyLoopControl::OverwriteMode
-TrackerCopyLoopControl::OverwriteOnConflict(const BEntry *, const char *,
-	const BDirectory *, bool, bool)
-{
-	return kReplace;
-}
-
-
-bool
-TrackerCopyLoopControl::SkipEntry(const BEntry *, bool)
-{
-	// tracker makes no exceptions
-	return false;
-}
-
-
-bool
-TrackerCopyLoopControl::SkipAttribute(const char *attributeName)
-{
-	for (const char **skipAttribute = kSkipAttributes; *skipAttribute;
-		skipAttribute++)
-		if (strcmp(*skipAttribute, attributeName) == 0)
-			return true;
-
-	return false;
 }
 
 
@@ -267,6 +205,121 @@ CopyLoopControl::PreserveAttribute(const char*)
 {
 	return false;
 }
+
+
+// #pragma mark -
+
+
+TrackerCopyLoopControl::TrackerCopyLoopControl(thread_id thread)
+	:
+	fThread(thread),
+	fSourceList(NULL)
+{
+}
+
+
+TrackerCopyLoopControl::TrackerCopyLoopControl(thread_id thread,
+		int32 totalItems, off_t totalSize)
+	:
+	fThread(thread),
+	fSourceList(NULL)
+{
+	if (gStatusWindow)
+		gStatusWindow->InitStatusItem(thread, totalItems, totalItems);
+}
+
+
+TrackerCopyLoopControl::~TrackerCopyLoopControl()
+{
+}
+
+
+bool
+TrackerCopyLoopControl::FileError(const char *message, const char *name,
+	status_t error, bool allowContinue)
+{
+	char buffer[512];
+	sprintf(buffer, message, name, strerror(error));
+
+	if (allowContinue) {
+		BAlert *alert = new BAlert("", buffer, "Cancel", "OK", 0,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
+		return alert->Go() != 0;
+	}
+
+	BAlert *alert = new BAlert("", buffer, "Cancel", 0, 0,
+		B_WIDTH_AS_USUAL, B_STOP_ALERT);
+	alert->SetShortcut(0, B_ESCAPE);
+	alert->Go();
+	return false;
+}
+
+
+void
+TrackerCopyLoopControl::UpdateStatus(const char *name, const entry_ref&,
+	int32 count, bool optional)
+{
+	if (gStatusWindow)
+		gStatusWindow->UpdateStatus(fThread, name, count, optional);
+}
+
+
+bool
+TrackerCopyLoopControl::CheckUserCanceled()
+{
+	if (gStatusWindow == NULL)
+		return false;
+
+	if (gStatusWindow->CheckCanceledOrPaused(fThread))
+		return true;
+
+	if (fSourceList != NULL) {
+		// TODO: Check if the user dropped additional files onto this job.
+//		printf("%p->CheckUserCanceled()\n", this);
+	}
+
+	return false;
+}
+
+
+TrackerCopyLoopControl::OverwriteMode
+TrackerCopyLoopControl::OverwriteOnConflict(const BEntry *, const char *,
+	const BDirectory *, bool, bool)
+{
+	return kReplace;
+}
+
+
+bool
+TrackerCopyLoopControl::SkipEntry(const BEntry *, bool)
+{
+	// tracker makes no exceptions
+	return false;
+}
+
+
+bool
+TrackerCopyLoopControl::SkipAttribute(const char *attributeName)
+{
+	for (const char **skipAttribute = kSkipAttributes; *skipAttribute;
+		skipAttribute++) {
+		if (strcmp(*skipAttribute, attributeName) == 0)
+			return true;
+	}
+
+	return false;
+}
+
+
+void
+TrackerCopyLoopControl::SetSourceList(EntryList* list)
+{
+	fSourceList = list;
+}
+
+
+// #pragma mark -
 
 
 static BNode *
@@ -396,8 +449,8 @@ FSMoveToFolder(BObjectList<entry_ref> *srcList, BEntry *destEntry,
 		return;
 	}
 
-	LaunchInNewThread("MoveTask", B_NORMAL_PRIORITY, MoveTask, srcList, destEntry,
-		pointList, moveMode);
+	LaunchInNewThread("MoveTask", B_NORMAL_PRIORITY, MoveTask, srcList,
+		destEntry, pointList, moveMode);
 }
 
 
@@ -552,7 +605,8 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 static status_t
 InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 	BVolume *dstVol, BDirectory *destDir, entry_ref *destRef,
-	bool preflightNameCheck, bool needSizeCalculation, int32 *collisionCount, ConflictCheckResult *preflightResult)
+	bool preflightNameCheck, bool needSizeCalculation, int32 *collisionCount,
+	ConflictCheckResult *preflightResult)
 {
 	if (dstVol->IsReadOnly()) {
 		if (gStatusWindow)
@@ -675,7 +729,8 @@ delete_point(void *point)
 
 
 static status_t
-MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, uint32 moveMode)
+MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
+	uint32 moveMode)
 {
 	ASSERT(!srcList->IsEmpty());
 
@@ -686,7 +741,7 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 	dev_t destVolumeDevice = srcVolumeDevice;
 
 	StatStruct deststat;
-	BVolume volume (srcVolumeDevice);
+	BVolume volume(srcVolumeDevice);
 	entry_ref destRef;
 	const entry_ref *destRefToCheck = NULL;
 
@@ -732,16 +787,19 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 	}
 
 	// change the move mode if needed
-	if (moveMode == kCopySelectionTo && destIsTrash)
+	if (moveMode == kCopySelectionTo && destIsTrash) {
 		// cannot copy to trash
 		moveMode = kMoveSelectionTo;
+	}
 
 	if (moveMode == kMoveSelectionTo && sourceIsReadOnly)
 		moveMode = kCopySelectionTo;
 
 	bool needSizeCalculation = true;
-	if ((moveMode == kMoveSelectionTo && srcVolumeDevice == destVolumeDevice) || destIsTrash)
+	if ((moveMode == kMoveSelectionTo && srcVolumeDevice == destVolumeDevice)
+		|| destIsTrash) {
 		needSizeCalculation = false;
+	}
 
 	// we need the undo object later on, so we create it no matter
 	// if we really need it or not (it's very lightweight)
@@ -755,9 +813,11 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 	status_t result = InitCopy(moveMode, srcList, thread, &volume, destDirToCheck,
 		&destRef, needPreflightNameCheck, needSizeCalculation, &collisionCount, &conflictCheckResult);
 
-	int32 count = srcList->CountItems();
+	TrackerCopyLoopControl loopControl(thread);
+	loopControl.SetSourceList(srcList);
+
 	if (result == B_OK) {
-		for (int32 i = 0; i < count; i++) {
+		for (int32 i = 0; i < srcList->CountItems(); i++) {
 			BPoint *loc = (BPoint *)-1;
 				// a loc of -1 forces autoplacement, rather than copying the
 				// position of the original node
@@ -783,7 +843,7 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 					&& srcRef->directory == deststat.st_ino))
 				continue;
 
-			if (gStatusWindow && gStatusWindow->CheckCanceledOrPaused(thread))
+			if (loopControl.CheckUserCanceled())
 				break;
 
 			BEntry sourceEntry(srcRef);
@@ -824,8 +884,7 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 
 				// update the status because item got skipped and the status
 				// will not get updated by the move call
-				if (gStatusWindow)
-					gStatusWindow->UpdateStatus(thread, srcRef->name, 1);
+				loopControl.UpdateStatus(srcRef->name, *srcRef, 1);
 
 				continue;
 			}
@@ -849,7 +908,8 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 			if (pointList)
  				loc = (BPoint*)pointList->ItemAt(i);
 
-			result = MoveItem(&sourceEntry, &destDir, loc, moveMode, NULL, undo);
+			result = MoveItem(&sourceEntry, &destDir, loc, moveMode, NULL, undo,
+				&loopControl);
 			if (result != B_OK)
 				break;
 		}
@@ -909,7 +969,8 @@ class MoveError {
 
 void
 CopyFile(BEntry *srcFile, StatStruct *srcStat, BDirectory *destDir,
-	CopyLoopControl *loopControl, BPoint *loc, bool makeOriginalName, Undo &undo)
+	CopyLoopControl *loopControl, BPoint *loc, bool makeOriginalName,
+	Undo &undo)
 {
 	if (loopControl->SkipEntry(srcFile, true))
 		return;
@@ -1333,9 +1394,8 @@ CopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
 
 
 status_t
-RecursiveMove(BEntry *entry, BDirectory *destDir)
+RecursiveMove(BEntry *entry, BDirectory *destDir, CopyLoopControl* loopControl)
 {
-	TrackerCopyLoopControl loopControl(find_thread(NULL));
 	char name[B_FILE_NAME_LENGTH];
 	if (entry->GetName(name) == B_OK) {
 		if (destDir->Contains(name)) {
@@ -1349,12 +1409,16 @@ RecursiveMove(BEntry *entry, BDirectory *destDir)
 				BEntry current;
 				while (source.GetNextEntry(&current) == B_OK) {
 					if (current.IsDirectory()) {
-						RecursiveMove(&current, &subDir);
+						RecursiveMove(&current, &subDir, loopControl);
 						current.Remove();
 					} else {
 						current.GetName(name);
-						if (loopControl.OverwriteOnConflict(&current, name, &subDir, true, false) != TrackerCopyLoopControl::kSkip)
-							MoveError::FailOnError(current.MoveTo(&subDir, NULL, true));
+						if (loopControl->OverwriteOnConflict(&current, name,
+							&subDir, true, false)
+								!= TrackerCopyLoopControl::kSkip) {
+							MoveError::FailOnError(current.MoveTo(&subDir,
+								NULL, true));
+						}
 					}
 				}
 			}
@@ -1369,7 +1433,7 @@ RecursiveMove(BEntry *entry, BDirectory *destDir)
 
 status_t
 MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc, uint32 moveMode,
-	const char *newName, Undo &undo)
+	const char *newName, Undo &undo, CopyLoopControl* loopControl)
 {
 	entry_ref ref;
 	try {
@@ -1483,20 +1547,18 @@ MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc, uint32 moveMode,
 
 			// for "Move" the size for status is always 1 - since file
 			// size is irrelevant when simply moving to a new folder
-
-			thread_id thread = find_thread(NULL);
-			if (gStatusWindow)
-				gStatusWindow->UpdateStatus(thread, ref.name, 1);
+			loopControl->UpdateStatus(ref.name, ref, 1);
 			if (entry->IsDirectory())
-				return RecursiveMove(entry, destDir);
+				return RecursiveMove(entry, destDir, loopControl);
 			MoveError::FailOnError(entry->MoveTo(destDir, newName));
 		} else {
-			TrackerCopyLoopControl loopControl(find_thread(NULL));
 			bool makeOriginalName = (moveMode == kDuplicateSelection);
 			if (S_ISDIR(statbuf.st_mode)) {
-				CopyFolder(entry, destDir, &loopControl, loc, makeOriginalName, undo, moveMode == kMoveSelectionTo);
+				CopyFolder(entry, destDir, loopControl, loc, makeOriginalName,
+					undo, moveMode == kMoveSelectionTo);
 			} else {
-				CopyFile(entry, &statbuf, destDir, &loopControl, loc, makeOriginalName, undo);
+				CopyFile(entry, &statbuf, destDir, loopControl, loc,
+					makeOriginalName, undo);
 				if (moveMode == kMoveSelectionTo)
 					entry->Remove();
 			}
@@ -1721,7 +1783,9 @@ MoveEntryToTrash(BEntry *entry, BPoint *loc, Undo &undo)
 		node.WriteAttrString(kAttrOriginalPath, &originalPath);
 	}
 
-	MoveItem(entry, &trash_dir, loc, kMoveSelectionTo, name, undo);
+	TrackerCopyLoopControl loopControl(find_thread(NULL));
+	MoveItem(entry, &trash_dir, loc, kMoveSelectionTo, name, undo,
+		&loopControl);
 	return B_OK;
 }
 
@@ -1911,10 +1975,9 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry, const BDirectory *destDir,
 	}
 
 	// delete destination item
-	if (!destIsDir) {
-		TrackerCopyLoopControl loopControl(find_thread(NULL));
+	if (!destIsDir)
 		err = entry.Remove();
-	} else
+	else
 		return B_OK;
 
 	if (err != B_OK) {
@@ -2509,13 +2572,10 @@ empty_trash(void *)
 	}
 
 	if (err == B_OK) {
-		if (gStatusWindow)
-			gStatusWindow->InitStatusItem(thread, totalCount, totalCount);
+		TrackerCopyLoopControl loopControl(thread, totalCount, totalCount);
 
 		volumeRoster.Rewind();
 		while (volumeRoster.GetNextVolume(&volume) == B_OK) {
-			TrackerCopyLoopControl loopControl(thread);
-
 			if (volume.IsReadOnly() || !volume.IsPersistent())
 				continue;
 
@@ -2589,11 +2649,9 @@ _DeleteTask(BObjectList<entry_ref> *list, bool confirm)
 
 	status_t err = CalcItemsAndSize(list, 0, &totalItems, &totalSize);
 	if (err == B_OK) {
-		if (gStatusWindow)
-			gStatusWindow->InitStatusItem(thread, totalItems, totalItems);
+		TrackerCopyLoopControl loopControl(thread, totalItems, totalItems);
 
 		int32 count = list->CountItems();
-		TrackerCopyLoopControl loopControl(thread);
 		for (int32 index = 0; index < count; index++) {
 			entry_ref ref(*list->ItemAt(index));
 			BEntry entry(&ref);
@@ -2659,11 +2717,9 @@ _RestoreTask(BObjectList<entry_ref> *list)
 
 	status_t err = CalcItemsAndSize(list, 0, &totalItems, &totalSize);
 	if (err == B_OK) {
-		if (gStatusWindow)
-			gStatusWindow->InitStatusItem(thread, totalItems, totalItems);
+		TrackerCopyLoopControl loopControl(thread, totalItems, totalItems);
 
 		int32 count = list->CountItems();
-		TrackerCopyLoopControl loopControl(thread);
 		for (int32 index = 0; index < count; index++) {
 			entry_ref ref(*list->ItemAt(index));
 			BEntry entry(&ref);
