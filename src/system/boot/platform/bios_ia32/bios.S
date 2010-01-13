@@ -22,6 +22,7 @@
 #define SAVED_EAX		0x10008
 #define SAVED_ES		0x1000c
 #define SAVED_FLAGS		0x10010
+#define SAVED_EBP		0x10014
 	// we're overwriting the start of our boot loader to hold some
 	// temporary values - the first 1024 bytes of it are used at
 	// startup only, and we avoid some linking issues this way
@@ -74,7 +75,7 @@ _no_paging:
 	// setup protected stack frame again
 	movl	SAVED_ESP, %eax
 	movl	%eax, %esp
-	movl	%eax, %ebp
+	movl	SAVED_EBP, %ebp
 
 	// copy the return address to the current stack
 	movl	REAL_MODE_STACK, %eax
@@ -95,6 +96,8 @@ FUNCTION(switch_to_real_mode)
 	// save the %esp register
 	movl	%esp, %eax
 	movl	%eax, SAVED_ESP
+
+	movl	%ebp, SAVED_EBP
 
 	// put the return address on the real mode stack
 	movl	(%esp), %eax
@@ -227,6 +230,63 @@ int_number:
 
 	popfl
 	popal
+
+	ret
+
+//--------------------------------------------------------------
+
+/** uint32  search_keyboard_buffer()
+ *  Search in keyboard buffer keycodes for F8, F12 or Space 
+ *  if not found - search ESC keycode.
+ */
+
+FUNCTION(search_keyboard_buffer)
+	pushal
+	pushfl
+
+	// make sure the correct IDT is in place
+	lidt 	idt_descriptor
+
+	call	switch_to_real_mode
+	.code16
+
+	cld
+	push	%ds
+	xorl	%eax, %eax
+	mov	%ax, %ds
+	mov	$0x41E, %si	// BIOS kbd buffer
+search_cycle1:
+	lodsw
+	cmp	$0x4200, %ax	// test F8 key
+	jz	to_ret
+	cmp	$0x8600, %ax	// test F12 key
+	jz	to_ret
+	cmp	$0x3920, %ax	// test Space key
+	jz	to_ret
+	cmp	$0x440, %si
+	jnz	search_cycle1
+
+	movw	$0x41E, %si	// BIOS kbd buffer
+search_cycle2:
+	lodsw
+	cmp	$0x011B, %ax	// test ESC key
+	jz	to_ret
+	cmp	$0x440, %si
+	jnz	search_cycle2
+to_ret:
+	pop	%ds
+
+	// save %eax
+	movl	%eax, (SAVED_EAX - 0x10000)
+
+	call	switch_to_protected_mode
+	.code32
+
+	popfl
+	popal
+
+	// restore %eax
+	movl	SAVED_EAX, %eax
 
 	ret
 

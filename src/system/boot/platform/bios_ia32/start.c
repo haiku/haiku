@@ -129,9 +129,6 @@ _start(void)
 	mmu_init();
 	parse_multiboot_commandline(&args);
 
-	// wait a bit to give the user the opportunity to press a key
-	spin(750000);
-
 	// reading the keyboard doesn't seem to work in graphics mode
 	// (maybe a bochs problem)
 	sBootOptions = check_for_boot_keys();

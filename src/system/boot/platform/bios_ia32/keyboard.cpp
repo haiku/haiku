@@ -58,22 +58,24 @@ wait_for_key(void)
 extern "C" uint32
 check_for_boot_keys(void)
 {
-	union key key;
+	bios_regs regs;
 	uint32 options = 0;
-
-	while ((key.ax = check_for_key()) != 0) {
-		switch (key.code.ascii) {
-			case ' ':
-				options |= BOOT_OPTION_MENU;
-				break;
-			case 0x1b:	// escape
-				options |= BOOT_OPTION_DEBUG_OUTPUT;
-				break;
-			case 0:
-				// evaluate BIOS scan codes
-				// ...
-				break;
-		}
+	uint32 keycode = 0;
+	regs.eax = 0x0200;
+	call_bios(0x16, &regs);
+		// Read Keyboard flags. bit 0 LShift, bit 1 RShift
+	if ((regs.eax & 0x03) != 0) {
+		// LShift or RShift - option menu
+		options |= BOOT_OPTION_MENU;
+	} else {
+		keycode = search_keyboard_buffer();
+		if (keycode == 0x4200 || keycode == 0x8600 || keycode == 0x3920) {
+			// F8 or F12 or Space - option menu
+			options |= BOOT_OPTION_MENU;
+		} else if (keycode == 0x011B) {
+			// ESC - debug output
+			options |= BOOT_OPTION_DEBUG_OUTPUT;
+ 		}
 	}
 
 	dprintf("options = %ld\n", options);

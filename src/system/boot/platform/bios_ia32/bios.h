@@ -41,5 +41,10 @@ extern
 "C"
 #endif
 void call_bios(uint8 num, struct bios_regs *regs);
+extern
+#ifdef __cplusplus
+"C"
+#endif
+uint32 search_keyboard_buffer();
 
 #endif	/* BIOS_H */
