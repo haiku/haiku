@@ -2447,7 +2447,7 @@ BPoseView::RemoveColumn(BColumn *columnToRemove, bool runAlert)
 	if (CountColumns() == 1) {
 		if (runAlert) {
 			BAlert *alert = new BAlert("",
-				"You must have at least one Attribute showing.",
+				"You must have at least one attribute showing.",
 				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->Go();

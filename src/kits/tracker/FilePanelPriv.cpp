@@ -600,9 +600,9 @@ TFilePanel::Init(const BMessage *)
 	FavoritesMenu *favorites = new FavoritesMenu("Favorites",
 		new BMessage(kSwitchDirectory), new BMessage(B_REFS_RECEIVED),
 		BMessenger(this), IsSavePanel(), fPoseView->RefFilter());
-	favorites->AddItem(new BMenuItem("Add Current Folder",
+	favorites->AddItem(new BMenuItem("Add current folder",
 		new BMessage(kAddCurrentDir)));
-	favorites->AddItem(new BMenuItem("Edit Favorites"B_UTF8_ELLIPSIS,
+	favorites->AddItem(new BMenuItem("Edit favorites"B_UTF8_ELLIPSIS,
 		new BMessage(kEditFavorites)));
 
 	fMenuBar->AddItem(favorites);
@@ -847,8 +847,8 @@ TFilePanel::RestoreWindowState(const BMessage &message)
 void
 TFilePanel::AddFileContextMenus(BMenu *menu)
 {
-	menu->AddItem(new BMenuItem("Get Info", new BMessage(kGetInfo), 'I'));
-	menu->AddItem(new BMenuItem("Edit Name", new BMessage(kEditItem), 'E'));
+	menu->AddItem(new BMenuItem("Get info", new BMessage(kGetInfo), 'I'));
+	menu->AddItem(new BMenuItem("Edit name", new BMessage(kEditItem), 'E'));
 	menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash() ?
 			"Delete" : "Move to Trash",
 			new BMessage(kMoveToTrash), 'T'));
@@ -865,8 +865,8 @@ void
 TFilePanel::AddVolumeContextMenus(BMenu *menu)
 {
 	menu->AddItem(new BMenuItem("Open", new BMessage(kOpenSelection), 'O'));
-	menu->AddItem(new BMenuItem("Get Info", new BMessage(kGetInfo), 'I'));
-	menu->AddItem(new BMenuItem("Edit Name", new BMessage(kEditItem), 'E'));
+	menu->AddItem(new BMenuItem("Get info", new BMessage(kGetInfo), 'I'));
+	menu->AddItem(new BMenuItem("Edit name", new BMessage(kEditItem), 'E'));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Cut", new BMessage(B_CUT), 'X'));
 	menu->AddItem(new BMenuItem("Copy", new BMessage(B_COPY), 'C'));
@@ -879,7 +879,7 @@ TFilePanel::AddVolumeContextMenus(BMenu *menu)
 void
 TFilePanel::AddWindowContextMenus(BMenu *menu)
 {
-	BMenuItem *item = new BMenuItem("New Folder", new BMessage(kNewFolder), 'N');
+	BMenuItem *item = new BMenuItem("New folder", new BMessage(kNewFolder), 'N');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
@@ -894,15 +894,15 @@ TFilePanel::AddWindowContextMenus(BMenu *menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A');
+	item = new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Invert Selection", new BMessage(kInvertSelection), 'S');
+	item = new BMenuItem("Invert selection", new BMessage(kInvertSelection), 'S');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Go To Parent", new BMessage(kOpenParentDir), B_UP_ARROW);
+	item = new BMenuItem("Go to parent", new BMessage(kOpenParentDir), B_UP_ARROW);
 	item->SetTarget(this);
 	menu->AddItem(item);
 }
@@ -1051,7 +1051,7 @@ TFilePanel::MessageReceived(BMessage *message)
 
 							// Don't allow saves of multiple files
 							if (count > 1) {
-								ShowCenteredAlert("Sorry, saving of more than one item is not allowed.",
+								ShowCenteredAlert("Sorry, saving more than one item is not allowed.",
 									"Cancel");
 							} else {
 								// if we are a savepanel, set up the filepanel correctly
@@ -1353,7 +1353,7 @@ TFilePanel::HandleSaveButton()
 	// check for some illegal file names
 	if (strcmp(fTextControl->Text(), ".") == 0
 		|| strcmp(fTextControl->Text(), "..") == 0) {
-		ShowCenteredAlert("The name you have specified is illegal. Please type "
+		ShowCenteredAlert("The specified name is illegal. Please choose "
 			"another name.", "Cancel");
 		fTextControl->TextView()->SelectAll();
 		return;
@@ -1367,8 +1367,8 @@ TFilePanel::HandleSaveButton()
 
 	if (dir.Contains(fTextControl->Text())) {
 		if (dir.Contains(fTextControl->Text(), B_DIRECTORY_NODE)) {
-			ShowCenteredAlert("The name you have specified is already the name "
-				"of a folder. Please type another name.", "Cancel");
+			ShowCenteredAlert("The specified name is already used as the name "
+				"of a folder. Please choose another name.", "Cancel");
 			fTextControl->TextView()->SelectAll();
 			return;
 		} else {

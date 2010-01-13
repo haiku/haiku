@@ -103,45 +103,45 @@ AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
 
 	BBox* autoMountBox = new BBox("autoMountBox", B_WILL_DRAW | B_FRAME_EVENTS
 		| B_PULSE_NEEDED | B_NAVIGABLE_JUMP);
-	autoMountBox->SetLabel("Automatic Disk Mounting");
+	autoMountBox->SetLabel("Automatic disk mounting");
 	BGroupLayout* autoMountLayout = new BGroupLayout(B_VERTICAL, spacing);
 	autoMountBox->SetLayout(autoMountLayout);
 	autoMountLayout->SetInsets(spacing,
 		autoMountBox->InnerFrame().top + spacing, spacing, spacing);
 
-	fScanningDisabledCheck = new BRadioButton("scanningOff", "Don't Automount",
+	fScanningDisabledCheck = new BRadioButton("scanningOff", "Don't automount",
 		new BMessage(kAutomountSettingsChanged));
 
-	fAutoMountAllBFSCheck = new BRadioButton("autoBFS", "All BeOS Disks",
+	fAutoMountAllBFSCheck = new BRadioButton("autoBFS", "All BeOS disks",
 		new BMessage(kAutomountSettingsChanged));
 
-	fAutoMountAllCheck = new BRadioButton("autoAll", "All Disks",
+	fAutoMountAllCheck = new BRadioButton("autoAll", "All disks",
 		new BMessage(kAutomountSettingsChanged));
 
 	// "Disk Mounting During Boot" group
 
 	BBox* bootMountBox = new BBox("", B_WILL_DRAW | B_FRAME_EVENTS
 		| B_PULSE_NEEDED | B_NAVIGABLE_JUMP);
-	bootMountBox->SetLabel("Disk Mounting During Boot");
+	bootMountBox->SetLabel("Disk mounting during boot");
 	BGroupLayout* bootMountLayout = new BGroupLayout(B_VERTICAL, spacing);
 	bootMountBox->SetLayout(bootMountLayout);
 	bootMountLayout->SetInsets(spacing,
 		bootMountBox->InnerFrame().top + spacing, spacing, spacing);
 
 	fInitialDontMountCheck = new BRadioButton("initialNone",
-		"Only The Boot Disk", new BMessage(kBootMountSettingsChanged));
+		"Only the boot disk", new BMessage(kBootMountSettingsChanged));
 
 	fInitialMountRestoreCheck = new BRadioButton("initialRestore",
-		"Previously Mounted Disks", new BMessage(kBootMountSettingsChanged));
+		"Previously mounted disks", new BMessage(kBootMountSettingsChanged));
 
 	fInitialMountAllBFSCheck = new BRadioButton("initialBFS",
-		"All BeOS Disks", new BMessage(kBootMountSettingsChanged));
+		"All BeOS disks", new BMessage(kBootMountSettingsChanged));
 
 	fInitialMountAllCheck = new BRadioButton("initialAll",
-		"All Disks", new BMessage(kBootMountSettingsChanged));
+		"All disks", new BMessage(kBootMountSettingsChanged));
 
 	fEjectWhenUnmountingCheckBox = new BCheckBox("ejectWhenUnmounting",
-		"Eject When Unmounting", new BMessage(kEjectWhenUnmountingChanged));
+		"Eject when unmounting", new BMessage(kEjectWhenUnmountingChanged));
 
 	// Buttons
 
@@ -292,7 +292,7 @@ AutomountSettingsPanel::_SendSettings(bool rescan)
 AutomountSettingsDialog::AutomountSettingsDialog(BMessage* settings,
 		const BMessenger& target)
 	:
-	BWindow(BRect(100, 100, 320, 370), "Disk Mount Settings",
+	BWindow(BRect(100, 100, 320, 370), "Disk mount settings",
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -325,8 +325,8 @@ AutomountSettingsDialog::RunAutomountSettings(const BMessenger& target)
 	BMessage reply;
 	status_t ret = target.SendMessage(&message, &reply, 2500000);
 	if (ret != B_OK) {
-		(new BAlert("Mount Server Error", "The mount server could not be "
-			"contacted.", "Ok", NULL, NULL, B_WIDTH_AS_USUAL,
+		(new BAlert("Mount server error", "The mount server could not be "
+			"contacted.", "OK", NULL, NULL, B_WIDTH_AS_USUAL,
 			B_STOP_ALERT))->Go();
 		return;
 	}

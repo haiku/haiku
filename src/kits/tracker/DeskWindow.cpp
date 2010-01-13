@@ -152,7 +152,7 @@ BDeskWindow::Init(const BMessage *)
 	//	Set the size of the screen before calling the container window's
 	//	Init() because it will add volume poses to this window and
 	// 	they will be clipped otherwise
-	//	
+	//
 	BScreen screen(this);
 	fOldFrame = screen.Frame();
 
@@ -169,33 +169,33 @@ BDeskWindow::Init(const BMessage *)
 		if (fDeskShelf)
 			fDeskShelf->SetDisplaysZombies(true);
 	}
-	
+
 	// watch add-on directories so that we can track the addons with
 	// corresponding shortcuts
 	WatchAddOnDir(B_BEOS_ADDONS_DIRECTORY, this);
 	WatchAddOnDir(B_USER_ADDONS_DIRECTORY, this);
 	WatchAddOnDir(B_COMMON_ADDONS_DIRECTORY, this);
-	
+
 	_inherited::Init();
 }
 
 
 void
 BDeskWindow::MenusBeginning()
-{	
+{
 	_inherited::MenusBeginning();
 
 	if (fShouldUpdateAddonShortcuts) {
 		PRINT(("updating addon shortcuts\n"));
 		fShouldUpdateAddonShortcuts = false;
-		
+
 		// remove all current addon shortcuts
 		for (std::set<uint32>::iterator it= fCurrentAddonShortcuts.begin();
 			it != fCurrentAddonShortcuts.end(); it++) {
 			PRINT(("removing shortcut %c\n", *it));
 			RemoveShortcut(*it, B_OPTION_KEY | B_COMMAND_KEY);
 		}
-		
+
 		fCurrentAddonShortcuts.clear();
 
 		AddOneShortcutParams params;
@@ -259,12 +259,12 @@ BDeskWindow::CreatePoseView(Model *model)
 	fPoseView->SetLowColor(desktopColor);
 
 	AddChild(fPoseView);
-	
+
 	PoseView()->StartSettingsWatch();
 }
 
 
-void 
+void
 BDeskWindow::AddWindowContextMenus(BMenu *menu)
 {
 	TemplatesMenu *tempateMenu = new TemplatesMenu(PoseView());
@@ -275,7 +275,7 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 
 	menu->AddSeparatorItem();
 
-	BMenu* iconSizeMenu = new BMenu("Icon View");
+	BMenu* iconSizeMenu = new BMenu("Icon view");
 
 	BMessage* message = new BMessage(kIconMode);
 	message->AddInt32("size", 32);
@@ -309,13 +309,13 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 
 	message = new BMessage(kIconMode);
 	message->AddInt32("scale", 0);
-	item = new BMenuItem("Decrease Size", message, '-');
+	item = new BMenuItem("Decrease size", message, '-');
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kIconMode);
 	message->AddInt32("scale", 1);
-	item = new BMenuItem("Increase Size", message, '+');
+	item = new BMenuItem("Increase size", message, '+');
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
@@ -326,7 +326,7 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 	iconSizeMenu->Superitem()->SetTarget(PoseView());
 	iconSizeMenu->Superitem()->SetMarked(PoseView()->ViewMode() == kIconMode);
 
-	item = new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode), '2');
+	item = new BMenuItem("Mini icon view", new BMessage(kMiniIconMode), '2');
 	item->SetMarked(PoseView()->ViewMode() == kMiniIconMode);
 	menu->AddItem(item);
 
@@ -337,11 +337,11 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 	menu->AddItem(pasteItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V'));
 	menu->AddSeparatorItem();
 #endif
-	menu->AddItem(new BMenuItem("Clean Up", new BMessage(kCleanup), 'K'));
+	menu->AddItem(new BMenuItem("Clean up", new BMessage(kCleanup), 'K'));
 	menu->AddItem(new BMenuItem("Select"B_UTF8_ELLIPSIS,
 		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
-	menu->AddItem(new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A'));
-	
+	menu->AddItem(new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A'));
+
 	menu->AddSeparatorItem();
 	menu->AddItem(new MountMenu("Mount"));
 
@@ -366,7 +366,7 @@ BDeskWindow::AddTrashContextMenu()
 		new BMessage(kEmptyTrash)));
 	fTrashContextMenu->AddItem(new BMenuItem("Open",
 		new BMessage(kOpenSelection), 'O'));
-	fTrashContextMenu->AddItem(new BMenuItem("Get Info",
+	fTrashContextMenu->AddItem(new BMenuItem("Get info",
 		new BMessage(kGetInfo), 'I'));
 	fTrashContextMenu->SetTargetForItems(PoseView());
 }
@@ -376,15 +376,15 @@ void
 BDeskWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *view)
 {
 	BEntry entry;
-	
+
 	// cleanup previous entries
 	DeleteSubmenu(fNavigationItem);
 
 	if (ref && entry.SetTo(ref) == B_OK && FSIsTrashDir(&entry)) {
-		
+
 		if (fTrashContextMenu->Window() || Dragging())
 			return;
-			
+
 		// selected item was trash, show the trash context menu instead
 		BPoint global(loc);
 		PoseView()->ConvertToScreen(&global);
@@ -392,7 +392,7 @@ BDeskWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *view)
 		BRect mouse_rect(global.x, global.y, global.x, global.y);
 		mouse_rect.InsetBy(-5, -5);
 
-		EnableNamedMenuItem(fTrashContextMenu, kEmptyTrash, 
+		EnableNamedMenuItem(fTrashContextMenu, kEmptyTrash,
 			static_cast<TTracker *>(be_app)->TrashFull());
 
 		SetupNavigationMenu(ref, fTrashContextMenu);
@@ -402,7 +402,7 @@ BDeskWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *view)
 }
 
 
-void 
+void
 BDeskWindow::WorkspaceActivated(int32 workspace, bool state)
 {
 	if (fBackgroundImage)
@@ -410,7 +410,7 @@ BDeskWindow::WorkspaceActivated(int32 workspace, bool state)
 }
 
 
-void 
+void
 BDeskWindow::SaveDesktopPoseLocations()
 {
 	PoseView()->SavePoseLocations(&fOldFrame);
@@ -435,7 +435,7 @@ BDeskWindow::ScreenChanged(BRect frame, color_space space)
 }
 
 
-void 
+void
 BDeskWindow::UpdateDesktopBackgroundImages()
 {
 	WindowStateNodeOpener opener(this, false);

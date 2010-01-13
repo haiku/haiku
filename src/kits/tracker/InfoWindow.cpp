@@ -908,7 +908,7 @@ AttributeView::AttributeView(BRect rect, Model *model)
 
 			// Add the default menu item and set it to marked
 			BMenuItem *result;
-			result = new BMenuItem("Default Application", new BMessage(kSetPreferredApp));
+			result = new BMenuItem("Default application", new BMessage(kSetPreferredApp));
 			result->SetTarget(this);
 			fPreferredAppMenu->Menu()->AddItem(result);
 			result->SetMarked(true);
@@ -1767,7 +1767,7 @@ AttributeView::Draw(BRect)
 
 	// Link to/version
 	if (fModel->IsSymLink()) {
-		MovePenTo(BPoint(fDivider - (StringWidth("Link To:")), lineBase));
+		MovePenTo(BPoint(fDivider - (StringWidth("Link to:")), lineBase));
 		SetHighColor(kAttrTitleColor);
 		DrawString("Link To:");
 		MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
@@ -2020,7 +2020,7 @@ AttributeView::BuildContextMenu(BMenu *parent)
 	parent->AddItem(new BMenuItem("Open", new BMessage(kOpenSelection), 'O'));
 
 	if (!FSIsTrashDir(&entry)) {
-		parent->AddItem(new BMenuItem("Edit Name", new BMessage(kEditItem), 'E'));
+		parent->AddItem(new BMenuItem("Edit name", new BMessage(kEditItem), 'E'));
 		parent->AddSeparatorItem();
 		if (fModel->IsVolume()) {
 			BMenuItem *item;
@@ -2039,7 +2039,7 @@ AttributeView::BuildContextMenu(BMenu *parent)
 
 	BMenuItem *sizeItem = NULL;
 	if (model.IsDirectory() && !model.IsVolume() && !model.IsRoot())  {
-		parent->AddItem(sizeItem = new BMenuItem("Recalculate Folder Size",
+		parent->AddItem(sizeItem = new BMenuItem("Recalculate folder size",
 			new BMessage(kRecalculateSize)));
 	}
 

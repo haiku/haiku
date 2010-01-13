@@ -176,7 +176,7 @@ FindWindow::FindWindow(const entry_ref *newRef, bool editIfTemplateOnly)
 			if (BNodeInfo(fFile).GetType(type) == B_OK
 				&& strcasecmp(type, B_QUERY_TEMPLATE_MIMETYPE) == 0) {
 				fEditTemplateOnly = true;
-				SetTitle("Edit Query Template");
+				SetTitle("Edit Query template");
 			}
 		}
 	} else {
@@ -626,7 +626,7 @@ FindWindow::MessageReceived(BMessage *message)
 				BMessenger panel(BackgroundView());
 				fSaveAsTemplatePanel = new BFilePanel(B_SAVE_PANEL, &panel);
 				fSaveAsTemplatePanel->SetSaveText("Query template");
-				fSaveAsTemplatePanel->Window()->SetTitle("Save As Query Template:");
+				fSaveAsTemplatePanel->Window()->SetTitle("Save as Query template:");
 				fSaveAsTemplatePanel->Show();
 			}
 			break;
@@ -685,9 +685,9 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 
 	// add popup for search criteria
 	fSearchModeMenu = new BPopUpMenu("searchMode");
-	fSearchModeMenu->AddItem(new BMenuItem("by Name", new BMessage(kByNameItem)));
-	fSearchModeMenu->AddItem(new BMenuItem("by Attribute", new BMessage(kByAttributeItem)));
-	fSearchModeMenu->AddItem(new BMenuItem("by Formula", new BMessage(kByFormulaItem)));
+	fSearchModeMenu->AddItem(new BMenuItem("by name", new BMessage(kByNameItem)));
+	fSearchModeMenu->AddItem(new BMenuItem("by attribute", new BMessage(kByAttributeItem)));
+	fSearchModeMenu->AddItem(new BMenuItem("by formula", new BMessage(kByFormulaItem)));
 
 	fSearchModeMenu->ItemAt(initialMode == kByNameItem ? 0 :
 		(initialMode == kByAttributeItem ? 1 : 2))->SetMarked(true);

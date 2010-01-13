@@ -214,7 +214,7 @@ MountMenu::AddDynamicItem(add_state)
 
 	AddSeparatorItem();
 
-	BMenuItem *mountAll = new BMenuItem("Mount All",
+	BMenuItem *mountAll = new BMenuItem("Mount all",
 		new BMessage(kMountAllNow));
 	AddItem(mountAll);
 	BMenuItem *mountSettings = new BMenuItem("Settings" B_UTF8_ELLIPSIS,

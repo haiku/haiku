@@ -102,7 +102,7 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 
 	BRect buttonRect = fLaunchButton->Frame();
 	fLaunchAndMakeDefaultButton = new BButton(buttonRect, "make default",
-		"Open and Make Preferred", new BMessage(kOpenAndMakeDefault),
+		"Open and make preferred", new BMessage(kOpenAndMakeDefault),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	// wide button, have to resize to fit text
 	fLaunchAndMakeDefaultButton->ResizeToPreferred();
@@ -143,11 +143,11 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 		entry_ref ref;
 		fEntriesToOpen->FindRef("refs", &ref);
 		BString buffer;
-		buffer << "Open " << ref.name << " With:";
+		buffer << "Open " << ref.name << " with:";
 		SetTitle(buffer.String());
 	} else
 		// use generic title
-		SetTitle("Open Selection With:");
+		SetTitle("Open selection with:");
 
 	AddCommonFilter(new BMessageFilter(B_KEY_DOWN, &OpenWithContainerWindow::KeyDownFilter));
 }

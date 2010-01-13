@@ -55,7 +55,7 @@ namespace BPrivate {
 const char *kTemplatesDirectory = "Tracker/Tracker New Templates";
 const char *kTemplatesMenuName = "New";
 
-static const char *kOpenTemplatesMenuName = "Edit Templates"B_UTF8_ELLIPSIS;
+static const char *kOpenTemplatesMenuName = "Edit templates"B_UTF8_ELLIPSIS;
 
 }
 
@@ -112,7 +112,7 @@ TemplatesMenu::BuildMenu(bool addItems)
 		delete RemoveItem(0L);
 
 	// Add the Folder
-	IconMenuItem *menuItem = new IconMenuItem("New Folder", new BMessage(kNewFolder),
+	IconMenuItem *menuItem = new IconMenuItem("New folder", new BMessage(kNewFolder),
 		B_DIR_MIMETYPE,B_MINI_ICON);
 	AddItem(menuItem);
 	menuItem->SetShortcut('N', 0);

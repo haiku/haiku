@@ -93,14 +93,14 @@ BVolumeWindow::AddFileMenu(BMenu *menu)
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem("Open", new BMessage(kOpenSelection), 'O'));
-	menu->AddItem(new BMenuItem("Get Info", new BMessage(kGetInfo), 'I'));
-	menu->AddItem(new BMenuItem("Edit Name", new BMessage(kEditItem), 'E'));
+	menu->AddItem(new BMenuItem("Get info", new BMessage(kGetInfo), 'I'));
+	menu->AddItem(new BMenuItem("Edit name", new BMessage(kEditItem), 'E'));
 
 	BMenuItem *item = new BMenuItem("Unmount", new BMessage(kUnmountVolume), 'U');
 	item->SetEnabled(false);
 	menu->AddItem(item);
 
-	menu->AddItem(new BMenuItem("Mount Settings" B_UTF8_ELLIPSIS, 
+	menu->AddItem(new BMenuItem("Mount settings" B_UTF8_ELLIPSIS,
 		new BMessage(kRunAutomounterSettings)));
 
 	menu->AddSeparatorItem();
@@ -109,7 +109,7 @@ BVolumeWindow::AddFileMenu(BMenu *menu)
 }
 
 
-void 
+void
 BVolumeWindow::AddWindowContextMenus(BMenu *menu)
 {
 	if (fPoseView != NULL && fPoseView->TargetModel() != NULL
@@ -118,17 +118,17 @@ BVolumeWindow::AddWindowContextMenus(BMenu *menu)
 		return;
 	}
 
-	menu->AddItem(new BMenuItem("Icon View", new BMessage(kIconMode)));
-	menu->AddItem(new BMenuItem("Mini Icon View", new BMessage(kMiniIconMode)));
-	menu->AddItem(new BMenuItem("List View", new BMessage(kListMode)));
+	menu->AddItem(new BMenuItem("Icon view", new BMessage(kIconMode)));
+	menu->AddItem(new BMenuItem("Mini icon view", new BMessage(kMiniIconMode)));
+	menu->AddItem(new BMenuItem("List view", new BMessage(kListMode)));
 	menu->AddSeparatorItem();
 
-	BMenuItem *resizeItem = new BMenuItem("Resize to Fit",new BMessage(kResizeToFit), 'Y');
+	BMenuItem *resizeItem = new BMenuItem("Resize to fit",new BMessage(kResizeToFit), 'Y');
 	menu->AddItem(resizeItem);
-	menu->AddItem(new BMenuItem("Clean Up", new BMessage(kCleanup), 'K'));
+	menu->AddItem(new BMenuItem("Clean up", new BMessage(kCleanup), 'K'));
 	menu->AddItem(new BMenuItem("Select"B_UTF8_ELLIPSIS, new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
-	menu->AddItem(new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A'));
-	menu->AddItem(new BMenuItem("Invert Selection", new BMessage(kInvertSelection), 'S'));
+	menu->AddItem(new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A'));
+	menu->AddItem(new BMenuItem("Invert selection", new BMessage(kInvertSelection), 'S'));
 
 	BMenuItem *closeItem = new BMenuItem("Close",new BMessage(B_QUIT_REQUESTED), 'W');
 	menu->AddItem(closeItem);

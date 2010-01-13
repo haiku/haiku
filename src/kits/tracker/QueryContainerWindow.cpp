@@ -85,7 +85,7 @@ BQueryContainerWindow::AddWindowMenu(BMenu *menu)
 {
 	BMenuItem *item;
 
-	item = new BMenuItem("Resize to Fit", new BMessage(kResizeToFit), 'Y');
+	item = new BMenuItem("Resize to fit", new BMessage(kResizeToFit), 'Y');
 	item->SetTarget(this);
 	menu->AddItem(item);
 
@@ -93,11 +93,11 @@ BQueryContainerWindow::AddWindowMenu(BMenu *menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A');
+	item = new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Invert Selection", new BMessage(kInvertSelection), 'S');
+	item = new BMenuItem("Invert selection", new BMessage(kInvertSelection), 'S');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
@@ -114,7 +114,7 @@ BQueryContainerWindow::AddWindowContextMenus(BMenu *menu)
 		new BMessage(kResizeToFit), 'Y');
 	menu->AddItem(resizeItem);
 	menu->AddItem(new BMenuItem("Select"B_UTF8_ELLIPSIS, new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
-	menu->AddItem(new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A'));
+	menu->AddItem(new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A'));
 	BMenuItem *closeItem = new BMenuItem("Close",
 		new BMessage(B_QUIT_REQUESTED), 'W');
 	menu->AddItem(closeItem);

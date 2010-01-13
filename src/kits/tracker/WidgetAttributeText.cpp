@@ -1626,7 +1626,7 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 				sscanf(textView->Text(), "%c", &ch);
 				//Check if we read the start of a multi-byte glyph:
 				if (!isprint(ch)) {
-					BAlert *alert = new BAlert("", "Sorry, The 'Character' "
+					BAlert *alert = new BAlert("", "Sorry, the 'Character' "
 						"attribute cannot store a multi-byte glyph.",
 						"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);

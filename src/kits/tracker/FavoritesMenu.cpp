@@ -211,7 +211,7 @@ FavoritesMenu::AddNextItem()
 				if (item) {
 					if (!fAddedSeparatorForSection) {
 						fAddedSeparatorForSection = true;
-						AddItem(new TitledSeparatorItem("Recent Documents"));
+						AddItem(new TitledSeparatorItem("Recent documents"));
 					}
 					AddItem(item);
 					fSectionItemCount++;
@@ -259,7 +259,7 @@ FavoritesMenu::AddNextItem()
 			if (item) {
 				if (!fAddedSeparatorForSection) {
 					fAddedSeparatorForSection = true;
-					AddItem(new TitledSeparatorItem("Recent Folders"));
+					AddItem(new TitledSeparatorItem("Recent folders"));
 				}
 				AddItem(item);
 				item->SetEnabled(true);
@@ -436,7 +436,7 @@ RecentsMenu::DoneBuildingItemList()
 	//
 
 	if (CountItems() <= 0) {
-		BMenuItem *item = new BMenuItem("<No Recent Items>", 0);
+		BMenuItem *item = new BMenuItem("<No recent items>", 0);
 		item->SetEnabled(false);
 		AddItem(item);
 	} else

@@ -404,7 +404,7 @@ TTracker::InitMimeTypes()
 		"Folder container for file system items.", kTrackerSignature);
 
 	InstallMimeIfNeeded(B_APP_MIME_TYPE, kResAppIcon, "Be Application",
-		"Generic Be Application executable.", kTrackerSignature);
+		"Generic Be application executable.", kTrackerSignature);
 
 	InstallMimeIfNeeded(B_FILE_MIMETYPE, kResFileIcon,
 		"Generic file", "Generic document file.", kTrackerSignature);
@@ -416,9 +416,9 @@ TTracker::InitMimeTypes()
 		"Be Query", "Query to locate items on disks.", kTrackerSignature);
 
 	InstallMimeIfNeeded(B_QUERY_TEMPLATE_MIMETYPE, kResQueryTemplateIcon,
-		"Be Query Template", "", kTrackerSignature);
+		"Be Query template", "", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_LINK_MIMETYPE, kResBrokenLinkIcon, "Symbolic Link",
+	InstallMimeIfNeeded(B_LINK_MIMETYPE, kResBrokenLinkIcon, "Symbolic link",
 		"Link to another item in the file system.", kTrackerSignature);
 
 	InstallMimeIfNeeded(B_ROOT_MIMETYPE, kResRootIcon,
@@ -444,7 +444,7 @@ TTracker::InitMimeTypes()
 
 	{
 		ExtraAttributeLazyInstaller installer(B_PERSON_MIMETYPE);
-		installer.AddExtraAttribute("Contact Name", kAttrName, B_STRING_TYPE, true, true,
+		installer.AddExtraAttribute("Contact name", kAttrName, B_STRING_TYPE, true, true,
 			120, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Company", kAttrCompany, B_STRING_TYPE, true, true,
 			120, B_ALIGN_LEFT, false);
@@ -460,9 +460,9 @@ TTracker::InitMimeTypes()
 			120, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("E-mail", kAttrEmail, B_STRING_TYPE, true, true,
 			120, B_ALIGN_LEFT, false);
-		installer.AddExtraAttribute("Home Phone", kAttrHomePhone, B_STRING_TYPE, true, true,
+		installer.AddExtraAttribute("Home phone", kAttrHomePhone, B_STRING_TYPE, true, true,
 			90, B_ALIGN_LEFT, false);
-		installer.AddExtraAttribute("Work Phone", kAttrWorkPhone, B_STRING_TYPE, true, true,
+		installer.AddExtraAttribute("Work phone", kAttrWorkPhone, B_STRING_TYPE, true, true,
 			90, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Fax", kAttrFax, B_STRING_TYPE, true, true,
 			90, B_ALIGN_LEFT, false);
@@ -482,21 +482,21 @@ TTracker::InitMimeTypes()
 		ExtraAttributeLazyInstaller installer(B_PRINTER_SPOOL_MIMETYPE);
 		installer.AddExtraAttribute("Status", PSRV_SPOOL_ATTR_STATUS, B_STRING_TYPE, true, false,
 			60, B_ALIGN_LEFT, false);
-		installer.AddExtraAttribute("Page Count", PSRV_SPOOL_ATTR_PAGECOUNT, B_INT32_TYPE, true, false,
+		installer.AddExtraAttribute("Page count", PSRV_SPOOL_ATTR_PAGECOUNT, B_INT32_TYPE, true, false,
 			40, B_ALIGN_RIGHT, false);
 		installer.AddExtraAttribute("Description", PSRV_SPOOL_ATTR_DESCRIPTION, B_STRING_TYPE, true, true,
 			100, B_ALIGN_LEFT, false);
-		installer.AddExtraAttribute("Printer Name", PSRV_SPOOL_ATTR_PRINTER, B_STRING_TYPE, true, false,
+		installer.AddExtraAttribute("Printer name", PSRV_SPOOL_ATTR_PRINTER, B_STRING_TYPE, true, false,
 			80, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Job creator type", PSRV_SPOOL_ATTR_MIMETYPE, B_ASCII_TYPE, true, false,
 			60, B_ALIGN_LEFT, false);
 #else
 		ExtraAttributeLazyInstaller installer(B_PRINTER_SPOOL_MIMETYPE);
-		installer.AddExtraAttribute("Page Count", "_spool/Page Count", B_INT32_TYPE, true, false,
+		installer.AddExtraAttribute("Page count", "_spool/Page Count", B_INT32_TYPE, true, false,
 			40, B_ALIGN_RIGHT, false);
 		installer.AddExtraAttribute("Description", "_spool/Description", B_ASCII_TYPE, true, true,
 			100, B_ALIGN_LEFT, false);
-		installer.AddExtraAttribute("Printer Name", "_spool/Printer", B_ASCII_TYPE, true, false,
+		installer.AddExtraAttribute("Printer name", "_spool/Printer", B_ASCII_TYPE, true, false,
 			80, B_ALIGN_LEFT, false);
 		installer.AddExtraAttribute("Job creator type", "_spool/MimeType", B_ASCII_TYPE, true, false,
 			60, B_ALIGN_LEFT, false);

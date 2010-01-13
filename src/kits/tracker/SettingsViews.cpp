@@ -164,7 +164,7 @@ DesktopSettingsView::DesktopSettingsView(BRect rect)
 	: SettingsView(rect, "DesktopSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fShowDisksIconRadioButton = new BRadioButton(rect, "", "Show Disks Icon",
+	fShowDisksIconRadioButton = new BRadioButton(rect, "", "Show Disks icon",
 		new BMessage(kShowDisksIconChanged));
 	fShowDisksIconRadioButton->ResizeToPreferred();
 	AddChild(fShowDisksIconRadioButton);
@@ -173,14 +173,14 @@ DesktopSettingsView::DesktopSettingsView(BRect rect)
 	rect.OffsetBy(0, itemSpacing);
 
 	fMountVolumesOntoDesktopRadioButton = new BRadioButton(rect, "",
-		"Show Volumes on Desktop", new BMessage(kVolumesOnDesktopChanged));
+		"Show volumes on Desktop", new BMessage(kVolumesOnDesktopChanged));
 	AddChild(fMountVolumesOntoDesktopRadioButton);
 	fMountVolumesOntoDesktopRadioButton->ResizeToPreferred();
 
 	rect.OffsetBy(20, itemSpacing);
 
 	fMountSharedVolumesOntoDesktopCheckBox = new BCheckBox(rect, "",
-		"Show Shared Volumes On Desktop", new BMessage(kVolumesOnDesktopChanged));
+		"Show shared volumes on Desktop", new BMessage(kVolumesOnDesktopChanged));
 	AddChild(fMountSharedVolumesOntoDesktopCheckBox);
 	fMountSharedVolumesOntoDesktopCheckBox->ResizeToPreferred();
 
@@ -188,7 +188,7 @@ DesktopSettingsView::DesktopSettingsView(BRect rect)
 
 	rect = Bounds();
 	rect.top = rect.bottom;
-	fMountButton = new BButton(rect, "", "Mount Settings" B_UTF8_ELLIPSIS,
+	fMountButton = new BButton(rect, "", "Mount settings" B_UTF8_ELLIPSIS,
 		new BMessage(kRunAutomounterSettings), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fMountButton->ResizeToPreferred();
 	fMountButton->MoveBy(0, -fMountButton->Bounds().Height());
@@ -409,7 +409,7 @@ WindowsSettingsView::WindowsSettingsView(BRect rect)
 	: SettingsView(rect, "WindowsSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fShowFullPathInTitleBarCheckBox = new BCheckBox(rect, "", "Show Folder Location in Title Bar",
+	fShowFullPathInTitleBarCheckBox = new BCheckBox(rect, "", "Show folder location in title tab",
 		new BMessage(kWindowsShowFullPathChanged));
 	fShowFullPathInTitleBarCheckBox->ResizeToPreferred();
 	AddChild(fShowFullPathInTitleBarCheckBox);
@@ -417,28 +417,28 @@ WindowsSettingsView::WindowsSettingsView(BRect rect)
 	const float itemSpacing = fShowFullPathInTitleBarCheckBox->Bounds().Height() + kItemExtraSpacing;
 	rect.OffsetBy(0, itemSpacing);
 
-	fSingleWindowBrowseCheckBox = new BCheckBox(rect, "", "Single Window Navigation",
+	fSingleWindowBrowseCheckBox = new BCheckBox(rect, "", "Single window navigation",
 		new BMessage(kSingleWindowBrowseChanged));
 	fSingleWindowBrowseCheckBox->ResizeToPreferred();
 	AddChild(fSingleWindowBrowseCheckBox);
 
 	rect.OffsetBy(20, itemSpacing);
 
-	fShowNavigatorCheckBox = new BCheckBox(rect, "", "Show Navigator",
+	fShowNavigatorCheckBox = new BCheckBox(rect, "", "Show navigator",
 		new BMessage(kShowNavigatorChanged));
 	fShowNavigatorCheckBox->ResizeToPreferred();
 	AddChild(fShowNavigatorCheckBox);
 
 	rect.OffsetBy(-20, itemSpacing);
 
-	fOutlineSelectionCheckBox = new BCheckBox(rect, "", "Outline Selection Rectangle Only",
+	fOutlineSelectionCheckBox = new BCheckBox(rect, "", "Outline selection rectangle only",
 		new BMessage(kTransparentSelectionChanged));
 	fOutlineSelectionCheckBox->ResizeToPreferred();
 	AddChild(fOutlineSelectionCheckBox);
 
 	rect.OffsetBy(0, itemSpacing);
 
-	fSortFolderNamesFirstCheckBox = new BCheckBox(rect, "", "List Folders First",
+	fSortFolderNamesFirstCheckBox = new BCheckBox(rect, "", "List folders first",
 		new BMessage(kSortFolderNamesFirstChanged));
 	fSortFolderNamesFirstCheckBox->ResizeToPreferred();
 	AddChild(fSortFolderNamesFirstCheckBox);
@@ -686,7 +686,7 @@ TimeFormatSettingsView::TimeFormatSettingsView(BRect rect)
 
 	rect.left = 8;
 	rect.top = rect.bottom - 8;
-	f24HrRadioButton = new BRadioButton(rect, "", "24 Hour",
+	f24HrRadioButton = new BRadioButton(rect, "", "24 hour",
 		new BMessage(kSettingsContentsModified));
 	f24HrRadioButton->ResizeToPreferred();
 	clockBox->AddChild(f24HrRadioButton);
@@ -694,7 +694,7 @@ TimeFormatSettingsView::TimeFormatSettingsView(BRect rect)
 	const float itemSpacing = f24HrRadioButton->Bounds().Height() + kItemExtraSpacing;
 	rect.OffsetBy(0, itemSpacing);
 
-	f12HrRadioButton = new BRadioButton(rect, "", "12 Hour",
+	f12HrRadioButton = new BRadioButton(rect, "", "12 hour",
 		new BMessage(kSettingsContentsModified));
 	f12HrRadioButton->ResizeToPreferred();
 	clockBox->AddChild(f12HrRadioButton);
@@ -705,26 +705,26 @@ TimeFormatSettingsView::TimeFormatSettingsView(BRect rect)
 
 	rect = clockBox->Frame();
 	rect.OffsetBy(rect.Width() + 8, 0);
-	BBox *dateFormatBox = new BBox(rect, "Date Order");
-	dateFormatBox->SetLabel("Date Order");
+	BBox *dateFormatBox = new BBox(rect, "Date order");
+	dateFormatBox->SetLabel("Date order");
 	AddChild(dateFormatBox);
 
 	rect = f24HrRadioButton->Frame();
-	fYMDRadioButton = new BRadioButton(rect, "", "Year-Month-Day",
+	fYMDRadioButton = new BRadioButton(rect, "", "Year-month-day",
 		new BMessage(kSettingsContentsModified));
 	fYMDRadioButton->ResizeToPreferred();
 	dateFormatBox->AddChild(fYMDRadioButton);
 
 	rect.OffsetBy(0, itemSpacing);
 
-	fDMYRadioButton = new BRadioButton(rect, "", "Day-Month-Year",
+	fDMYRadioButton = new BRadioButton(rect, "", "Day-month-year",
 		new BMessage(kSettingsContentsModified));
 	fDMYRadioButton->ResizeToPreferred();
 	dateFormatBox->AddChild(fDMYRadioButton);
 
 	rect.OffsetBy(0, itemSpacing);
 
-	fMDYRadioButton = new BRadioButton(rect, "", "Month-Day-Year",
+	fMDYRadioButton = new BRadioButton(rect, "", "Month-day-year",
 		new BMessage(kSettingsContentsModified));
 	fMDYRadioButton->ResizeToPreferred();
 	dateFormatBox->AddChild(fMDYRadioButton);
@@ -1019,7 +1019,7 @@ SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
 	: SettingsView(rect, "SpaceBarSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fSpaceBarShowCheckBox = new BCheckBox(rect, "", "Show Space Bars on Volumes",
+	fSpaceBarShowCheckBox = new BCheckBox(rect, "", "Show space bars on volumes",
 		new BMessage(kUpdateVolumeSpaceBar));
 	fSpaceBarShowCheckBox->ResizeToPreferred();
 	AddChild(fSpaceBarShowCheckBox);
@@ -1031,11 +1031,11 @@ SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
 	menu->SetFont(be_plain_font);
 
 	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("Used Space Color", new BMessage(kSpaceBarSwitchColor)));
+	menu->AddItem(item = new BMenuItem("Used space color", new BMessage(kSpaceBarSwitchColor)));
 	item->SetMarked(true);
 	fCurrentColor = 0;
-	menu->AddItem(new BMenuItem("Free Space Color", new BMessage(kSpaceBarSwitchColor)));
-	menu->AddItem(new BMenuItem("Warning Space Color", new BMessage(kSpaceBarSwitchColor)));
+	menu->AddItem(new BMenuItem("Free space color", new BMessage(kSpaceBarSwitchColor)));
+	menu->AddItem(new BMenuItem("Warning space color", new BMessage(kSpaceBarSwitchColor)));
 
 	BBox *box = new BBox(rect);
 	box->SetLabel(fColorPicker = new BMenuField(rect, NULL, NULL, menu));
@@ -1269,7 +1269,7 @@ TrashSettingsView::TrashSettingsView(BRect rect)
 	: SettingsView(rect, "TrashSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fDontMoveFilesToTrashCheckBox = new BCheckBox(rect, "", "Don't Move Files to Trash",
+	fDontMoveFilesToTrashCheckBox = new BCheckBox(rect, "", "Don't move files to Trash",
 			new BMessage(kDontMoveFilesToTrashChanged));
 	fDontMoveFilesToTrashCheckBox->ResizeToPreferred();
 	AddChild(fDontMoveFilesToTrashCheckBox);
@@ -1277,7 +1277,7 @@ TrashSettingsView::TrashSettingsView(BRect rect)
 	rect = fDontMoveFilesToTrashCheckBox->Frame();
 	rect.OffsetBy(0, fDontMoveFilesToTrashCheckBox->Bounds().Height() + kItemExtraSpacing);
 
-	fAskBeforeDeleteFileCheckBox = new BCheckBox(rect, "", "Ask Before Delete",
+	fAskBeforeDeleteFileCheckBox = new BCheckBox(rect, "", "Ask before delete",
 			new BMessage(kAskBeforeDeleteFileChanged));
 	fAskBeforeDeleteFileCheckBox->ResizeToPreferred();
 	AddChild(fAskBeforeDeleteFileCheckBox);

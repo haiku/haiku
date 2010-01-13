@@ -498,7 +498,7 @@ BSlowContextMenu::DoneBuildingItemList()
 	fItemList->MakeEmpty();
 
 	if (!count) {
-		BMenuItem *item = new BMenuItem("Empty Folder", 0);
+		BMenuItem *item = new BMenuItem("Empty folder", 0);
 		item->SetEnabled(false);
 		AddItem(item);
 	}
