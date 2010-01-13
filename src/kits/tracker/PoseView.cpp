@@ -588,7 +588,7 @@ BPoseView::ViewStateAttributeName() const
 const char *
 BPoseView::ForeignViewStateAttributeName() const
 {
-	return IsDesktopView() ? kAttrDesktopViewStateForeign 
+	return IsDesktopView() ? kAttrDesktopViewStateForeign
 		: kAttrViewStateForeign;
 }
 
@@ -4897,7 +4897,7 @@ BPoseView::FSNotification(const BMessage *message)
 				if (dirNode != *TargetModel()->NodeRef()
 					&& !TargetModel()->IsQuery()
 					&& !TargetModel()->IsRoot()
-					&& !settings.ShowDisksIcon() || !IsDesktopView())
+					&& (!settings.ShowDisksIcon() || !IsDesktopView()))
 					// stray notification
 					break;
 
@@ -5196,7 +5196,7 @@ BPoseView::EntryMoved(const BMessage *message)
 		return DeletePose(&itemNode);
 	else if (dirNode.node == thisDirNode.node)
 		EntryCreated(&dirNode, &itemNode, name);
-	
+
 	return true;
 }
 
