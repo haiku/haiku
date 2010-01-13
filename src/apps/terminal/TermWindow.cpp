@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Haiku, Inc.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
@@ -253,7 +253,7 @@ TermWindow::MenusBeginning()
 BMenu *
 TermWindow::_MakeEncodingMenu()
 {
-	BMenu *menu = new (std::nothrow) BMenu("Text Encoding");
+	BMenu *menu = new (std::nothrow) BMenu("Text encoding");
 	if (menu == NULL)
 		return NULL;
 	
@@ -285,19 +285,19 @@ TermWindow::_SetupMenu()
 	fFilemenu = new BMenu("Terminal");
 	fFilemenu->AddItem(new BMenuItem("Switch Terminals",
 		new BMessage(MENU_SWITCH_TERM), B_TAB));
-	fFilemenu->AddItem(new BMenuItem("New Terminal" B_UTF8_ELLIPSIS,
+	fFilemenu->AddItem(new BMenuItem("New Terminal",
 		new BMessage(MENU_NEW_TERM), 'N'));
-	fFilemenu->AddItem(new BMenuItem("New Tab", new BMessage(kNewTab), 'T'));
+	fFilemenu->AddItem(new BMenuItem("New tab", new BMessage(kNewTab), 'T'));
 
 	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem("Page Setup" B_UTF8_ELLIPSIS,
+	fFilemenu->AddItem(new BMenuItem("Page setup" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_PAGE_SETUP)));
 	fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),'P'));
 	fFilemenu->AddSeparatorItem();
 	fFilemenu->AddItem(new BMenuItem("About Terminal" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem("Close Active Tab",
+	fFilemenu->AddItem(new BMenuItem("Close active tab",
 		new BMessage(kCloseView), 'W', B_SHIFT_KEY));
 	fFilemenu->AddItem(new BMenuItem("Quit",
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
@@ -308,18 +308,18 @@ TermWindow::_SetupMenu()
 	fEditmenu->AddItem(new BMenuItem("Copy", new BMessage(B_COPY),'C'));
 	fEditmenu->AddItem(new BMenuItem("Paste", new BMessage(B_PASTE),'V'));
 	fEditmenu->AddSeparatorItem();
-	fEditmenu->AddItem(new BMenuItem("Select All",
+	fEditmenu->AddItem(new BMenuItem("Select all",
 		new BMessage(B_SELECT_ALL), 'A'));
-	fEditmenu->AddItem(new BMenuItem("Clear All",
+	fEditmenu->AddItem(new BMenuItem("Clear all",
 		new BMessage(MENU_CLEAR_ALL), 'L'));
 	fEditmenu->AddSeparatorItem();
 	fEditmenu->AddItem(new BMenuItem("Find" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_FIND_STRING),'F'));
-	fFindPreviousMenuItem = new BMenuItem("Find Previous",
+	fFindPreviousMenuItem = new BMenuItem("Find previous",
 		new BMessage(MENU_FIND_PREVIOUS), 'G', B_SHIFT_KEY);
 	fEditmenu->AddItem(fFindPreviousMenuItem);
 	fFindPreviousMenuItem->SetEnabled(false);
-	fFindNextMenuItem = new BMenuItem("Find Next",
+	fFindNextMenuItem = new BMenuItem("Find next",
 		new BMessage(MENU_FIND_NEXT), 'G');
 	fEditmenu->AddItem(fFindNextMenuItem);
 	fFindNextMenuItem->SetEnabled(false);
@@ -332,7 +332,7 @@ TermWindow::_SetupMenu()
 
 	fEncodingmenu = _MakeEncodingMenu();
 
-	fSizeMenu = new BMenu("Text Size");
+	fSizeMenu = new BMenu("Text size");
 
 	fIncreaseFontSizeMenuItem = new BMenuItem("Increase",
 		new BMessage(kIncreaseFontSize), '+', B_COMMAND_KEY);
@@ -347,7 +347,7 @@ TermWindow::_SetupMenu()
 	fHelpmenu->AddItem(fEncodingmenu);
 	fHelpmenu->AddItem(fSizeMenu);
 	fHelpmenu->AddSeparatorItem();
-	fHelpmenu->AddItem(new BMenuItem("Preferences" B_UTF8_ELLIPSIS,
+	fHelpmenu->AddItem(new BMenuItem("Settings" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_PREF_OPEN)));
 	fHelpmenu->AddSeparatorItem();
 	fHelpmenu->AddItem(new BMenuItem("Save as default",
@@ -452,7 +452,7 @@ TermWindow::MessageReceived(BMessage *message)
 			if (fFindString.Length() == 0) {
 				const char* errorMsg = !fFindSelection
 					? "No search string was entered." : "Nothing is selected.";
-				BAlert* alert = new BAlert("Find failed", errorMsg, "Ok", NULL,
+				BAlert* alert = new BAlert("Find failed", errorMsg, "OK", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
 				alert->Go();
@@ -467,7 +467,7 @@ TermWindow::MessageReceived(BMessage *message)
 			findresult = _ActiveTermView()->Find(fFindString, fForwardSearch, fMatchCase, fMatchWord);
 
 			if (!findresult) {
-				BAlert *alert = new BAlert("Find failed", "Text not found.", "Ok", NULL,
+				BAlert *alert = new BAlert("Find failed", "Text not found.", "OK", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->SetShortcut(0, B_ESCAPE);
 				alert->Go();
@@ -488,7 +488,7 @@ TermWindow::MessageReceived(BMessage *message)
 				(message->what == MENU_FIND_NEXT) == fForwardSearch,
 				fMatchCase, fMatchWord);
 			if (!findresult) {
-				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay",
+				BAlert *alert = new BAlert("Find failed", "Not found.", "OK",
 					NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->SetShortcut(0, B_ESCAPE);
 				alert->Go();
@@ -976,7 +976,7 @@ TermWindow::_ResizeView(TermView *view)
 BMenu*
 TermWindow::_MakeWindowSizeMenu()
 {
-	BMenu *menu = new (std::nothrow) BMenu("Window Size");
+	BMenu *menu = new (std::nothrow) BMenu("Window size");
 	if (menu == NULL)
 		return NULL;
 	
@@ -1000,7 +1000,7 @@ TermWindow::_MakeWindowSizeMenu()
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Fullscreen", new BMessage(FULLSCREEN),
+	menu->AddItem(new BMenuItem("Full screen", new BMessage(FULLSCREEN),
 		B_ENTER));
 		
 	return menu;

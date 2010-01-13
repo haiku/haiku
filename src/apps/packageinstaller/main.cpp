@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Haiku, Inc.
+ * Copyright (c) 2007-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -139,7 +139,7 @@ PackageInstaller::AboutRequested()
 		"BeOS legacy .pkg file installer for Haiku.\n\n"
 		"Copyright 2007,\nŁukasz 'Sil2100' Zemczak\n\n"
 		"Copyright (c) 2007 Haiku, Inc. \n",
-		"Close");
+		"OK");
 
 	BTextView *view = about->TextView();
 	BFont font;

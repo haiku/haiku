@@ -34,7 +34,7 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	rect.right -= 22;
 	BBox *box = new BBox(rect, "background", B_FOLLOW_NONE,
 		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
-	box->SetLabel("Expander Preferences");
+	box->SetLabel("Expander settings");
 	background->AddChild(box);
 
 	float maxWidth = box->Bounds().right;
@@ -72,7 +72,7 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 
 	frameRect = stringView->Frame();
 	frameRect.top = fCloseWindow->Frame().bottom + 10;
-	stringView = new BStringView(frameRect, "destinationFolder", "Destination Folder:",
+	stringView = new BStringView(frameRect, "destinationFolder", "Destination folder:",
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	stringView->ResizeToPreferred();
 	if (stringView->Frame().right > maxWidth)

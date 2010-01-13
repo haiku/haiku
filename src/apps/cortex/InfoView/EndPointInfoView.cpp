@@ -18,7 +18,7 @@ __USE_CORTEX_NAMESPACE
 
 EndPointInfoView::EndPointInfoView(
 	const media_input &input)
-	: InfoView(input.name, "Media Input", 0),
+	: InfoView(input.name, "Media input", 0),
 	  m_output(false),
 	  m_port(input.destination.port),
 	  m_id(input.destination.id) {
@@ -37,14 +37,14 @@ EndPointInfoView::EndPointInfoView(
 	addField("", "");
 
 	// add "Media Type" field
-	addField("Media Type", MediaString::getStringFor(input.format.type));
+	addField("Media type", MediaString::getStringFor(input.format.type));
 
 	_addFormatFields(input.format);
 }
 
 EndPointInfoView::EndPointInfoView(
 	const media_output &output)
-	: InfoView(output.name, "Media Output", 0),
+	: InfoView(output.name, "Media output", 0),
 	  m_output(true),
 	  m_port(output.source.port),
 	  m_id(output.source.id) {
@@ -63,7 +63,7 @@ EndPointInfoView::EndPointInfoView(
 	addField("", "");
 
 	// add "Media Type" field
-	addField("Media Type", MediaString::getStringFor(output.format.type));
+	addField("Media type", MediaString::getStringFor(output.format.type));
 
 	_addFormatFields(output.format);
 }
@@ -117,22 +117,22 @@ void EndPointInfoView::_addFormatFields(
 			addField("Format", s);
 			// add "Sample Rate" field
 			s = MediaString::forAudioFrameRate(format.u.raw_audio.frame_rate);
-			addField("Sample Rate", s);
+			addField("Sample rate", s);
 			// add "Channels" field
 			s = MediaString::forAudioChannelCount(format.u.raw_audio.channel_count);
 			addField("Channels", s);
 			// add "Channel Mask" field
 			s = MediaString::forAudioChannelMask(format.u.raw_audio.channel_mask);
-			addField("Channel Mask", s);
+			addField("Channel mask", s);
 			// add "Matrix Mask" field
 			s = MediaString::forAudioMatrixMask(format.u.raw_audio.matrix_mask);
-			addField("Matrix Mask", s);
+			addField("Matrix mask", s);
 			// add the "Byte Order" field
 			s = MediaString::forAudioByteOrder(format.u.raw_audio.byte_order);
-			addField("Byte Order", s);
+			addField("Byte order", s);
 			// add the "Buffer Size" field
 			s = MediaString::forAudioBufferSize(format.u.raw_audio.buffer_size);
-			addField("Buffer Size", s);
+			addField("Buffer size", s);
 			break;
 		}
 		case B_MEDIA_RAW_VIDEO: {
@@ -149,18 +149,18 @@ void EndPointInfoView::_addFormatFields(
 			// add the "Field Rate" field
 			s = MediaString::forVideoFieldRate(format.u.raw_video.field_rate,
 											   format.u.raw_video.interlace);
-			addField("Field Rate", s);
+			addField("Field rate", s);
 			// add the "Orientation" field
 			s = MediaString::forVideoOrientation(format.u.raw_video.orientation);
 			addField("Orientation", s);
 			// add the "Aspect Ratio" field
 			s = MediaString::forVideoAspectRatio(format.u.raw_video.pixel_width_aspect,
 												 format.u.raw_video.pixel_height_aspect);
-			addField("Aspect Ratio", s);
+			addField("Aspect ratio", s);
 			// add the "Active Lines" field
 			s = MediaString::forVideoActiveLines(format.u.raw_video.first_active,
 												 format.u.raw_video.last_active);
-			addField("Active Lines", s);
+			addField("Active lines", s);
 			// add the "Offset" field
 			s = MediaString::forVideoOffset(format.u.raw_video.display.pixel_offset,
 											format.u.raw_video.display.line_offset);			
@@ -173,10 +173,10 @@ void EndPointInfoView::_addFormatFields(
 			BString s;
 			// add the "Bit Rate" field
 			s = MediaString::forAudioBitRate(format.u.encoded_audio.bit_rate);
-			addField("Bit Rate", s);
+			addField("Bit rate", s);
 			// add the "Frame Size" field
 			s = MediaString::forAudioFrameSize(format.u.encoded_audio.frame_size);
-			addField("Frame Size", s);
+			addField("Frame size", s);
 			break;
 		}
 		case B_MEDIA_ENCODED_VIDEO: {
@@ -186,10 +186,10 @@ void EndPointInfoView::_addFormatFields(
 			// add the "Bit Rate" field
 			s = MediaString::forVideoBitRate(format.u.encoded_video.avg_bit_rate,
 											 format.u.encoded_video.max_bit_rate);
-			addField("Bit Rate", s);
+			addField("Bit rate", s);
 			// add the "Frame Size" field
 			s = MediaString::forVideoFrameSize(format.u.encoded_video.frame_size);
-			addField("Frame Size", s);
+			addField("Frame size", s);
 			// add the "History" field
 			s = MediaString::forVideoHistory(format.u.encoded_video.forward_history,
 											 format.u.encoded_video.backward_history);
@@ -206,11 +206,11 @@ void EndPointInfoView::_addFormatFields(
 			// add the "Bit Rate" field
 			s = MediaString::forMultistreamBitRate(format.u.multistream.avg_bit_rate,
 												   format.u.multistream.max_bit_rate);
-			addField("Bit Rate", s);
+			addField("Bit rate", s);
 			// add the "Chunk Size" field
 			s = MediaString::forMultistreamChunkSize(format.u.multistream.avg_chunk_size,
 													 format.u.multistream.max_chunk_size);
-			addField("Chunk Size", s);
+			addField("Chunk size", s);
 			// add the "Flags" field
 			s = MediaString::forMultistreamFlags(format.u.multistream.flags);
 			addField("Flags", s);

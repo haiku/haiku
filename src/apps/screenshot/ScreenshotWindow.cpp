@@ -89,7 +89,7 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	bool includeMouse, bool grabActiveWindow, bool showConfigWindow,
 	bool saveScreenshotSilent, int32 imageFileType, int32 translator)
 	:
-	BWindow(BRect(0, 0, 200.0, 100.0), "Take Screenshot", B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, 200.0, 100.0), "Retake screenshot", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_QUIT_ON_WINDOW_CLOSE |
 		B_AVOID_FRONT | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fDelayControl(NULL),
@@ -155,7 +155,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			BCardLayout* layout = dynamic_cast<BCardLayout*> (GetLayout());
 			if (layout)
 				layout->SetVisibleItem(1L);
-			SetTitle("Save Screenshot");
+			SetTitle("Save screenshot");
 			break;
 		}
 
@@ -314,10 +314,10 @@ ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
-	fBackToSave = new BButton("", "Back to save", new BMessage(kBackToSave));
+	fBackToSave = new BButton("", "Back to saving", new BMessage(kBackToSave));
 	fBackToSave->SetEnabled(false);
 
-	fTakeScreenshot = new BButton("", "Take Screenshot",
+	fTakeScreenshot = new BButton("", "Take screenshot",
 		new BMessage(kTakeScreenshot));
 
 	layout->AddView(0, BGroupLayoutBuilder(B_VERTICAL)
@@ -553,7 +553,7 @@ ScreenshotWindow::_UpdatePreviewPanel()
 	if (layout)
 		layout->SetVisibleItem(1L);
 
-	SetTitle("Save Screenshot");
+	SetTitle("Save screenshot");
 }
 
 

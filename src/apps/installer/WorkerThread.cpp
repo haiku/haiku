@@ -392,7 +392,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			"merged, whereas files and links that exist on both the source "
 			"and target volume will be overwritten with the source volume "
 			"version.",
-			"Install Anyway", "Cancel", 0,
+			"Install anyway", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		// TODO: Would be cool to offer the option here to clean additional
 		// folders at the user's choice (like /boot/common and /boot/develop).

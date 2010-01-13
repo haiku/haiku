@@ -80,8 +80,8 @@ MainApp::MainApp()
 
 	if (!fMediaServerRunning || !fMediaAddOnServerRunning) {
 		BAlert* alert = new BAlert("start_media_server",
-			"It appears the Media Server is not running.\n"
-			"Would you like to start it ?", "Quit", "Start Media Server", NULL,
+			"It appears the media server is not running.\n"
+			"Would you like to start it ?", "Quit", "Start media server", NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go() == 0) {
 			PostMessage(B_QUIT_REQUESTED);
@@ -344,7 +344,7 @@ MainApp::MessageReceived(BMessage* message)
 void
 MainApp::AboutRequested()
 {
-	BAlert* alert = new BAlert("about", NAME"\n\n Written by Marcus Overhagen "
+	BAlert* alert = new BAlert("about", NAME"\n\nWritten by Marcus Overhagen "
 		", Stephan Aßmus and Frederik Modéen", "Thanks");
 	alert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 		// Make sure it is on top of any player windows that may have the
@@ -586,7 +586,7 @@ MainApp::_InstallPlaylistMimeType()
 	}
 
 	// set descriptions
-	ret = mime.SetShortDescription("MediaPlayer Playlist");
+	ret = mime.SetShortDescription("MediaPlayer playlist");
 	if (ret != B_OK) {
 		fprintf(stderr, "Could not set short description of mime type: %s\n",
 			strerror(ret));

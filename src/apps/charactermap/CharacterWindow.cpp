@@ -184,7 +184,7 @@ CharacterWindow::CharacterWindow()
 	BScrollView* characterScroller = new BScrollView("characterScroller",
 		fCharacterView, 0, false, true);
 
-	fFontSizeSlider = new FontSizeSlider("fontSizeSlider", "Font Size:",
+	fFontSizeSlider = new FontSizeSlider("fontSizeSlider", "Font size:",
 		new BMessage(kMsgFontSizeChanged), kMinFontSize, kMaxFontSize);
 	fFontSizeSlider->SetValue(fontSize);
 
@@ -223,12 +223,12 @@ CharacterWindow::CharacterWindow()
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("View");
-	menu->AddItem(item = new BMenuItem("Show Private Blocks",
+	menu->AddItem(item = new BMenuItem("Show private blocks",
 		new BMessage(kMsgPrivateBlocks)));
 	item->SetMarked(fCharacterView->IsShowingPrivateBlocks());
 // TODO: this feature is not yet supported by Haiku!
 #if 0
-	menu->AddItem(item = new BMenuItem("Only Show Blocks Contained in Font",
+	menu->AddItem(item = new BMenuItem("Only show blocks contained in font",
 		new BMessage(kMsgContainedBlocks)));
 	item->SetMarked(fCharacterView->IsShowingContainedBlocksOnly());
 #endif

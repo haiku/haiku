@@ -978,7 +978,7 @@ ActivityView::MouseDown(BPoint where)
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	menu->SetFont(be_plain_font);
 
-	BMenu* additionalMenu = new BMenu("Additional Items");
+	BMenu* additionalMenu = new BMenu("Additional items");
 	additionalMenu->SetFont(be_plain_font);
 
 	SystemInfo info;
@@ -1005,7 +1005,7 @@ ActivityView::MouseDown(BPoint where)
 
 	menu->AddItem(new BMenuItem(additionalMenu));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(fShowLegend ? "Hide Legend" : "Show Legend",
+	menu->AddItem(new BMenuItem(fShowLegend ? "Hide legend" : "Show legend",
 		new BMessage(kMsgToggleLegend)));
 
 	menu->SetTargetForItems(this);
@@ -1016,7 +1016,7 @@ ActivityView::MouseDown(BPoint where)
 		menu->AddSeparatorItem();
 		BMessage* message = new BMessage(kMsgRemoveView);
 		message->AddPointer("view", this);
-		menu->AddItem(item = new BMenuItem("Remove View", message));
+		menu->AddItem(item = new BMenuItem("Remove graph", message));
 		item->SetTarget(window);
 	}
 

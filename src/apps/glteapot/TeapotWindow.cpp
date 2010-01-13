@@ -50,7 +50,7 @@ TeapotWindow::TeapotWindow(BRect rect, char* name, window_type wt, ulong somethi
 	menu->AddItem(item = new BMenuItem("Perspective", new BMessage(kMsgPerspective)));
 	item->SetTarget(fObjectView);
 	item->SetMarked(false);
-	menu->AddItem(item = new BMenuItem("FPS Display", new BMessage(kMsgFPS)));
+	menu->AddItem(item = new BMenuItem("FPS display", new BMessage(kMsgFPS)));
 	item->SetTarget(fObjectView);
 	item->SetMarked(true);
 	menu->AddItem(item = new BMenuItem("Filled polygons", new BMessage(kMsgFilled)));

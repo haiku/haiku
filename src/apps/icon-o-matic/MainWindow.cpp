@@ -263,19 +263,19 @@ MainWindow::MessageReceived(BMessage* message)
 					commands[1] = pathCommand;
 					commands[2] = shapeCommand;
 					command = new CompoundCommand(commands, 3,
-										"Add Shape With Path & Style", 0);
+										"Add shape with path & style", 0);
 				} else if (styleCommand) {
 					Command** commands = new Command*[2];
 					commands[0] = styleCommand;
 					commands[1] = shapeCommand;
 					command = new CompoundCommand(commands, 2,
-										"Add Shape With Style", 0);
+										"Add shape with style", 0);
 				} else {
 					Command** commands = new Command*[2];
 					commands[0] = pathCommand;
 					commands[1] = shapeCommand;
 					command = new CompoundCommand(commands, 2,
-										"Add Shape With Path", 0);
+										"Add shape with path", 0);
 				}
 			} else {
 				command = shapeCommand;
@@ -1027,12 +1027,12 @@ MainWindow::_CreateMenuBar(BRect frame)
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Save",
 		new BMessage(MSG_SAVE), 'S'));
-	fileMenu->AddItem(new BMenuItem("Save As"B_UTF8_ELLIPSIS,
+	fileMenu->AddItem(new BMenuItem("Save as"B_UTF8_ELLIPSIS,
 		new BMessage(MSG_SAVE_AS), 'S', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Export",
 		new BMessage(MSG_EXPORT), 'P'));
-	fileMenu->AddItem(new BMenuItem("Export As"B_UTF8_ELLIPSIS,
+	fileMenu->AddItem(new BMenuItem("Export as"B_UTF8_ELLIPSIS,
 		new BMessage(MSG_EXPORT_AS), 'P', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Quit",
@@ -1052,7 +1052,7 @@ MainWindow::_CreateMenuBar(BRect frame)
 	editMenu->AddItem(fRedoMI);
 
 	// Settings
-	BMenu* filterModeMenu = new BMenu("Snap to Grid");
+	BMenu* filterModeMenu = new BMenu("Snap to grid");
 	BMessage* message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_OFF);
 	filterModeMenu->AddItem(new BMenuItem("Off", message, '4'));

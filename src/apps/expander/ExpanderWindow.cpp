@@ -55,12 +55,12 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	menu->AddItem(item = new BMenuItem("About Expander" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED)));
 	item->SetTarget(be_app_messenger);
 	menu->AddSeparatorItem();
-	menu->AddItem(fSourceItem = new BMenuItem("Set Source" B_UTF8_ELLIPSIS, new BMessage(MSG_SOURCE), 'O'));
-	menu->AddItem(fDestItem = new BMenuItem("Set Destination" B_UTF8_ELLIPSIS, new BMessage(MSG_DEST), 'D'));
+	menu->AddItem(fSourceItem = new BMenuItem("Set source" B_UTF8_ELLIPSIS, new BMessage(MSG_SOURCE), 'O'));
+	menu->AddItem(fDestItem = new BMenuItem("Set destination" B_UTF8_ELLIPSIS, new BMessage(MSG_DEST), 'D'));
 	menu->AddSeparatorItem();
 	menu->AddItem(fExpandItem = new BMenuItem("Expand", new BMessage(MSG_EXPAND), 'E'));
 	fExpandItem->SetEnabled(false);
-	menu->AddItem(fShowItem = new BMenuItem("Show Contents", new BMessage(MSG_SHOW), 'L'));
+	menu->AddItem(fShowItem = new BMenuItem("Show contents", new BMessage(MSG_SHOW), 'L'));
 	fShowItem->SetEnabled(false);
 	menu->AddSeparatorItem();
 	menu->AddItem(fStopItem = new BMenuItem("Stop", new BMessage(MSG_STOP), 'K'));
@@ -69,9 +69,9 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W'));
 	fBar->AddItem(menu);
 
-	menu = new BMenu("Edit");
-	menu->AddItem(fPreferencesItem = new BMenuItem("Preferences" B_UTF8_ELLIPSIS,
-		new BMessage(MSG_PREFERENCES), 'P'));
+	menu = new BMenu("Settings");
+	menu->AddItem(fPreferencesItem = new BMenuItem("Settings" B_UTF8_ELLIPSIS,
+		new BMessage(MSG_PREFERENCES), 'S'));
 	fBar->AddItem(menu);
 	AddChild(fBar);
 
@@ -125,7 +125,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	topView->AddChild(fDestText);
 
 	rect.OffsetBy(0, fSourceButton->Bounds().Height() + 4 + offset);
-	fShowContents = new BCheckBox(rect, "showContents", "Show Contents",
+	fShowContents = new BCheckBox(rect, "showContents", "Show contents",
 		new BMessage(MSG_SHOWCONTENTS), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	fShowContents->ResizeToPreferred();
 	fShowContents->MoveTo(Bounds().right - 8 - fShowContents->Bounds().Width(),
@@ -186,13 +186,13 @@ ExpanderWindow::ValidateDest()
 	BVolume volume;
 	if (!entry.Exists()) {
 		BAlert *alert = new BAlert("destAlert", "The destination"
-			" directory does not exist.", "Cancel", NULL, NULL,
+			" folder does not exist.", "Cancel", NULL, NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 		alert->Go();
 		return false;
 	} else if (!entry.IsDirectory()) {
 		(new BAlert("destAlert", "The destination"
-			" is not a directory.", "Cancel", NULL, NULL,
+			" is not a folder.", "Cancel", NULL, NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT))->Go();
 		return false;
 	} else if (entry.GetVolume(&volume) != B_OK || volume.IsReadOnly()) {
@@ -299,7 +299,7 @@ ExpanderWindow::MessageReceived(BMessage *msg)
 		case MSG_SHOWCONTENTS:
 			// change menu item label
 			fShowItem->SetLabel(fShowContents->Value() == B_CONTROL_OFF
-				? "Show Contents" : "Hide Contents");
+				? "Show contents" : "Hide contents");
 
 			if (fShowContents->Value() == B_CONTROL_OFF) {
 				if (fListingStarted)
@@ -508,7 +508,7 @@ ExpanderWindow::StartExpanding()
 
 	BEntry destEntry(fDestText->Text(), true);
 	if (!destEntry.Exists()) {
-		BAlert *alert = new BAlert("destAlert", "The directory was either moved, renamed or not\n"
+		BAlert *alert = new BAlert("destAlert", "The folder was either moved, renamed or not\n"
 			"supported.",
 			"Cancel", NULL, NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
@@ -620,7 +620,7 @@ ExpanderWindow::StartListing()
 	fDestItem->SetEnabled(false);
 	fExpandItem->SetEnabled(false);
 	fShowItem->SetEnabled(true);
-	fShowItem->SetLabel("Hide Contents");
+	fShowItem->SetLabel("Hide contents");
 	fStopItem->SetEnabled(false);
 	fPreferencesItem->SetEnabled(false);
 

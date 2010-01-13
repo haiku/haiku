@@ -182,10 +182,10 @@ SudokuWindow::SudokuWindow()
 	// "File" menu
 	BMenu* menu = new BMenu("File");
 	menu->AddItem(new BMenuItem("New", new BMessage(kMsgNew)));
-	menu->AddItem(new BMenuItem("Start Again", new BMessage(kMsgStartAgain)));
+	menu->AddItem(new BMenuItem("Start again", new BMessage(kMsgStartAgain)));
 	menu->AddSeparatorItem();
 	BMenu* recentsMenu = BRecentFilesList::NewFileListMenu(
-		"Open File" B_UTF8_ELLIPSIS, NULL, NULL, this, 10, false, NULL,
+		"Open file" B_UTF8_ELLIPSIS, NULL, NULL, this, 10, false, NULL,
 		kSignature);
 	BMenuItem *item;
 	menu->AddItem(item = new BMenuItem(recentsMenu,
@@ -202,7 +202,7 @@ SudokuWindow::SudokuWindow()
 
 	menu->AddSeparatorItem();
 
-	subMenu = new BMenu("Export As" B_UTF8_ELLIPSIS);
+	subMenu = new BMenu("Export as" B_UTF8_ELLIPSIS);
 	BMessage *msg;
 	msg = new BMessage(kMsgExportAs);
 	msg->AddInt32("as", kExportAsText);
@@ -233,11 +233,11 @@ SudokuWindow::SudokuWindow()
 
 	// "View" menu
 	menu = new BMenu("View");
-	menu->AddItem(item = new BMenuItem("Mark Invalid Values",
+	menu->AddItem(item = new BMenuItem("Mark invalid values",
 		new BMessage(kMsgMarkInvalid)));
 	if (fSudokuView->HintFlags() & kMarkInvalid)
 		item->SetMarked(true);
-	menu->AddItem(item = new BMenuItem("Mark Valid Hints",
+	menu->AddItem(item = new BMenuItem("Mark valid hints",
 		new BMessage(kMsgMarkValidHints)));
 	if (fSudokuView->HintFlags() & kMarkValidHints)
 		item->SetMarked(true);
@@ -253,14 +253,14 @@ SudokuWindow::SudokuWindow()
 	fRedoItem->SetEnabled(false);
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Snapshot Current", new BMessage(kMsgStoreState)));
-	menu->AddItem(fRestoreStateItem = new BMenuItem("Restore Snapshot",
+	menu->AddItem(new BMenuItem("Snapshot current", new BMessage(kMsgStoreState)));
+	menu->AddItem(fRestoreStateItem = new BMenuItem("Restore snapshot",
 		new BMessage(kMsgRestoreState)));
 	fRestoreStateItem->SetEnabled(fStoredState != NULL);
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem("Solve", new BMessage(kMsgSolveSudoku)));
-	menu->AddItem(new BMenuItem("Solve Single Field",
+	menu->AddItem(new BMenuItem("Solve single field",
 		new BMessage(kMsgSolveSingle)));
 	menu->SetTargetForItems(fSudokuView);
 	menuBar->AddItem(menu);
@@ -386,7 +386,7 @@ SudokuWindow::_MessageDropped(BMessage* message)
 		}
 
 		(new BAlert("Sudoku request",
-			buffer, "Ok", NULL, NULL,
+			buffer, "OK", NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 	}
 }
@@ -528,7 +528,7 @@ SudokuWindow::MessageReceived(BMessage* message)
 
 		case kMsgSudokuSolved:
 			(new BAlert("Sudoku request",
-				"Sudoku solved - congratulations!", "Ok", NULL, NULL,
+				"Sudoku solved - congratulations!", "OK", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_IDEA_ALERT))->Go();
 			break;
 

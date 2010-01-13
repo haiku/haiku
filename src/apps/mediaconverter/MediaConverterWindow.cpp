@@ -602,7 +602,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	format.u.raw_audio = media_raw_audio_format::wildcard;
 	while (get_next_encoder(&cookie, mf_format, &format, &outfmt, &codec_info) == B_OK) {
 		if (separator) {
-			menu->AddItem(new BMenuItem("No Audio",
+			menu->AddItem(new BMenuItem("No audio",
 				new BMessage(AUDIO_CODEC_SELECT_MESSAGE)));
 			menu->AddSeparatorItem();
 			separator = false;
@@ -656,7 +656,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	cookie = 0;
 	while (get_next_encoder(&cookie, mf_format, &format, &outfmt, &codec_info) == B_OK) {
 		if (separator) {
-			menu->AddItem(new BMenuItem("No Video",
+			menu->AddItem(new BMenuItem("No video",
 				new BMessage(VIDEO_CODEC_SELECT_MESSAGE)));
 			menu->AddSeparatorItem();
 			separator = false;

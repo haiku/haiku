@@ -52,7 +52,7 @@ static const char* kInfoText =
 "1)  If you are installing Haiku onto real hardware (not inside an emulator) "
 "it is recommended that you have already prepared a hard disk partition. The "
 "Installer and the DriveSetup tool offer to initialize existing partitions "
-"with the Haiku native filesystem, but the options to change the actual "
+"with the Haiku native file system, but the options to change the actual "
 "partition layout may not have been tested on a sufficiently great variety of "
 "computer installations so we do not recommend using it.\n"
 "If you have not created a partition yet, simply reboot, create the partition "
@@ -130,7 +130,7 @@ InstallerApp::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "Installer\n"
 		"\twritten by Jérôme Duval\n"
-		"\tCopyright 2005, Haiku.\n\n", "Ok");
+		"\tCopyright 2005, Haiku.\n\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

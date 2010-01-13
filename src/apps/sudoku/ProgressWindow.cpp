@@ -20,7 +20,7 @@ static const uint32 kMsgShow = 'show';
 
 ProgressWindow::ProgressWindow(BWindow* referenceWindow,
 		BMessage* abortMessage)
-	: BWindow(BRect(0, 0, 250, 100), "Progress Monitor",
+	: BWindow(BRect(0, 0, 250, 100), "Progress monitor",
 		B_MODAL_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fRunner(NULL)

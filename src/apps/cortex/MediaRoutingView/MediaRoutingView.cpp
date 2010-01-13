@@ -911,14 +911,14 @@ void MediaRoutingView::showContextMenu(
 	BMenuItem *item;
 	BMessage *message = new BMessage(M_LAYOUT_CHANGED);
 	message->AddInt32("layout", M_ICON_VIEW);
-	menu->AddItem(item = new BMenuItem("Icon View", message));
+	menu->AddItem(item = new BMenuItem("Icon view", message));
 	if (m_layout == M_ICON_VIEW)
 	{
 		item->SetMarked(true);
 	}
 	message = new BMessage(M_LAYOUT_CHANGED);
 	message->AddInt32("layout", M_MINI_ICON_VIEW);
-	menu->AddItem(item = new BMenuItem("Mini Icon View", message));
+	menu->AddItem(item = new BMenuItem("Mini icon view", message));
 	if (m_layout == M_MINI_ICON_VIEW)
 	{
 		item->SetMarked(true);
@@ -926,10 +926,10 @@ void MediaRoutingView::showContextMenu(
 	menu->AddSeparatorItem();
 
 	// add 'CleanUp' command
-	menu->AddItem(new BMenuItem("Clean Up", new BMessage(M_CLEANUP_REQUESTED), 'K'));
+	menu->AddItem(new BMenuItem("Clean up", new BMessage(M_CLEANUP_REQUESTED), 'K'));
 
 	// add 'Select All' command
-	menu->AddItem(new BMenuItem("Select All", new BMessage(M_SELECT_ALL), 'A'));
+	menu->AddItem(new BMenuItem("Select all", new BMessage(M_SELECT_ALL), 'A'));
 
 	menu->SetTargetForItems(this);
 	ConvertToScreen(&point);
@@ -955,7 +955,7 @@ void MediaRoutingView::showErrorMessage(
 	BMessenger messenger(0, Window());
 	if (!messenger.IsValid()
 	 || (messenger.SendMessage(&message) != B_OK)) {
-		BAlert *alert = new BAlert("Error", text.String(), "Ok", 0, 0,
+		BAlert *alert = new BAlert("Error", text.String(), "OK", 0, 0,
 								   B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go();
 	}
@@ -1500,21 +1500,21 @@ void MediaRoutingView::_initContent()
 	NodeRef* videoIn = manager->videoInputNode();
 	if (videoIn)
 	{
-		group = manager->createGroup("Video Input");
+		group = manager->createGroup("Video input");
 		group->setRunMode(BMediaNode::B_RECORDING);
 		group->addNode(videoIn);
 	}
 	NodeRef* audioIn = manager->audioInputNode();
 	if (audioIn)
 	{
-		group = manager->createGroup("Audio Input");
+		group = manager->createGroup("Audio input");
 		group->setRunMode(BMediaNode::B_RECORDING);
 		group->addNode(audioIn);
 	}
 	NodeRef* videoOut = manager->videoOutputNode();
 	if (videoOut)
 	{
-		group = manager->createGroup("Video Output");
+		group = manager->createGroup("Video output");
 		group->addNode(videoOut);
 	}
 }

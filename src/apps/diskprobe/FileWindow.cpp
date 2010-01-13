@@ -50,12 +50,12 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 	menu->AddItem(new BMenuItem("New" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgOpenOpenWindow), 'N', B_COMMAND_KEY));
 
-	BMenu *devicesMenu = new BMenu("Open Device");
+	BMenu *devicesMenu = new BMenu("Open device");
 	OpenWindow::CollectDevices(devicesMenu);
 	devicesMenu->SetTargetForItems(be_app);
 	menu->AddItem(new BMenuItem(devicesMenu));
 
-	BMenu *recentsMenu = BRecentFilesList::NewFileListMenu("Open File" B_UTF8_ELLIPSIS,
+	BMenu *recentsMenu = BRecentFilesList::NewFileListMenu("Open file" B_UTF8_ELLIPSIS,
 		NULL, NULL, be_app, 10, false, NULL, kSignature);
 	BMenuItem *item;
 	menu->AddItem(item = new BMenuItem(recentsMenu, new BMessage(kMsgOpenFilePanel)));

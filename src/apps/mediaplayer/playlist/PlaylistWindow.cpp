@@ -228,7 +228,7 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 	menuBar->AddItem(fileMenu);
 	fileMenu->AddItem(new BMenuItem("Open"B_UTF8_ELLIPSIS,
 		new BMessage(M_PLAYLIST_OPEN), 'O'));
-	fileMenu->AddItem(new BMenuItem("Save As"B_UTF8_ELLIPSIS,
+	fileMenu->AddItem(new BMenuItem("Save as"B_UTF8_ELLIPSIS,
 		new BMessage(M_PLAYLIST_SAVE_AS), 'S', B_SHIFT_KEY));
 //	fileMenu->AddItem(new BMenuItem("Save",
 //		new BMessage(M_PLAYLIST_SAVE), 'S'));
@@ -249,9 +249,9 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 	editMenu->AddSeparatorItem();
 	editMenu->AddItem(new BMenuItem("Remove (Del)",
 		new BMessage(M_PLAYLIST_REMOVE)/*, B_DELETE, 0*/));
-	editMenu->AddItem(new BMenuItem("Remove and Put into Trash",
+	editMenu->AddItem(new BMenuItem("Remove and put into Trash",
 		new BMessage(M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH), 'T'));
-	editMenu->AddItem(new BMenuItem("Remove All",
+	editMenu->AddItem(new BMenuItem("Remove all",
 		new BMessage(M_PLAYLIST_EMPTY), 'N'));
 
 	menuBar->AddItem(editMenu);
@@ -292,7 +292,7 @@ PlaylistWindow::_ObjectChanged(const Notifier* object)
 static void
 display_save_alert(const char* message)
 {
-	BAlert* alert = new BAlert("Save Error", message, "Ok", NULL, NULL,
+	BAlert* alert = new BAlert("Save error", message, "OK", NULL, NULL,
 		B_WIDTH_AS_USUAL, B_STOP_ALERT);
 	alert->Go(NULL);
 }
@@ -315,7 +315,7 @@ PlaylistWindow::_SavePlaylist(const BMessage* message)
 	if (message->FindRef("directory", &ref) != B_OK
 		|| message->FindString("name", &name) != B_OK) {
 		display_save_alert("Internal error (malformed message). "
-			"Saving the Playlist failed.");
+			"Saving the playlist failed.");
 		return;
 	}
 
@@ -328,7 +328,7 @@ PlaylistWindow::_SavePlaylist(const BMessage* message)
 		|| origPath.Append(name) != B_OK
 		|| tempPath.Append(tempName.String()) != B_OK) {
 		display_save_alert("Internal error (out of memory). "
-			"Saving the Playlist failed.");
+			"Saving the playlist failed.");
 		return;
 	}
 
@@ -336,7 +336,7 @@ PlaylistWindow::_SavePlaylist(const BMessage* message)
 	BEntry tempEntry(tempPath.Path());
 	if (origEntry.InitCheck() != B_OK || tempEntry.InitCheck() != B_OK) {
 		display_save_alert("Internal error (out of memory). "
-			"Saving the Playlist failed.");
+			"Saving the playlist failed.");
 		return;
 	}
 
@@ -393,7 +393,7 @@ PlaylistWindow::_SavePlaylist(BEntry& origEntry, BEntry& tempEntry,
 	AutoLocker<Playlist> lock(fPlaylist);
 	if (!lock.IsLocked()) {
 		display_save_alert("Internal error (locking failed). "
-			"Saving the Playlist failed.");
+			"Saving the playlist failed.");
 		return;
 	}
 

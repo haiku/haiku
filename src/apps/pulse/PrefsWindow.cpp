@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Copyright 1999, Be Incorporated. All Rights Reserved.
@@ -43,15 +43,15 @@ PrefsWindow::PrefsWindow(BRect frame, const char *name, BMessenger *messenger, P
 	BRect rect = fTabView->ContainerView()->Bounds();
 	rect.InsetBy(5, 5);
 
-	ConfigView *normalView = new ConfigView(rect, "Normal Mode",
+	ConfigView *normalView = new ConfigView(rect, "Normal mode",
 		PRV_NORMAL_CHANGE_COLOR, fTarget, prefs);
 	fTabView->AddTab(normalView);
 
-	ConfigView *miniView = new ConfigView(rect, "Mini Mode", PRV_MINI_CHANGE_COLOR,
+	ConfigView *miniView = new ConfigView(rect, "Mini mode", PRV_MINI_CHANGE_COLOR,
 		fTarget, prefs);
 	fTabView->AddTab(miniView);
-	
-	ConfigView *deskbarView = new ConfigView(rect, "Deskbar Mode", PRV_DESKBAR_CHANGE_COLOR,
+
+	ConfigView *deskbarView = new ConfigView(rect, "Deskbar mode", PRV_DESKBAR_CHANGE_COLOR,
 		fTarget, prefs);
 	fTabView->AddTab(deskbarView);
 
@@ -102,7 +102,7 @@ PrefsWindow::MessageReceived(BMessage *message)
 			Hide();
 
 			fTabView->Select(2);
-			ConfigView *deskbar = (ConfigView *)FindView("Deskbar Mode");
+			ConfigView *deskbar = (ConfigView *)FindView("Deskbar mode");
 			deskbar->UpdateDeskbarIconWidth();
 
 			PostMessage(B_QUIT_REQUESTED);

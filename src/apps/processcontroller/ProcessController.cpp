@@ -1,7 +1,7 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org
-	Copyright (c) 2006 Haiku, Inc. All Rights Reserved.
+	Copyright (c) 2006-2009, Haiku, Inc. All rights reserved.
 
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
@@ -258,7 +258,7 @@ ProcessController::MessageReceived(BMessage *message)
 				if (get_team_info(team, &infos.team_info) == B_OK) {
 					get_team_name_and_icon(infos);
 					sprintf(question, "Do you really want to kill the team \"%s\"?", infos.team_name);
-					alert = new BAlert("", question, "Cancel", "Yes, Kill this Team!", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert = new BAlert("", question, "Cancel", "Yes, kill this team!", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);
 					if (alert->Go())
 						kill_team(team);
@@ -275,7 +275,7 @@ ProcessController::MessageReceived(BMessage *message)
 				if (get_thread_info(thread, &thinfo) == B_OK) {
 					#if DEBUG_THREADS
 					sprintf(question, "What do you want to do with the thread \"%s\"?", thinfo.name);
-					alert = new BAlert("", question, "Cancel", "Debug this Thread!", "Kill this thread!", B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert = new BAlert("", question, "Cancel", "Debug this thread!", "Kill this thread!", B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					#define KILL 2
 					#else
 					sprintf(question, "Are you sure you want to kill the thread \"%s\"?", thinfo.name);
@@ -374,7 +374,7 @@ ProcessController::AboutRequested()
 	BAlert *alert = new BAlert("about", "ProcessController\n\n"
 		"Copyright 1997-2001,\n"
 		"Georges-Edouard Berenger.\n\n"
-		"Copyright " B_UTF8_COPYRIGHT " 2007 Haiku, Inc.\n", "Close");
+		"Copyright " B_UTF8_COPYRIGHT " 2007 Haiku, Inc.\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -636,12 +636,12 @@ thread_popup(void *arg)
 	popup->SetFont(be_plain_font);
 
 	// Quit section
-	BMenu* QuitPopup = new QuitMenu("Quit an Application", infos, systemInfo.used_teams);
+	BMenu* QuitPopup = new QuitMenu("Quit an application", infos, systemInfo.used_teams);
 	QuitPopup->SetFont(be_plain_font);
 	popup->AddItem(QuitPopup);
 
 	// Memory Usage section
-	MemoryBarMenu* MemoryPopup = new MemoryBarMenu("Memory Usage", infos, systemInfo);
+	MemoryBarMenu* MemoryPopup = new MemoryBarMenu("Memory usage", infos, systemInfo);
 	int commitedMemory = int(systemInfo.used_pages * B_PAGE_SIZE / 1024);
 	for (m = 0; m < systemInfo.used_teams; m++) {
 		if (infos[m].team_info.team >= 0) {
@@ -654,7 +654,7 @@ thread_popup(void *arg)
 	addtopbottom(MemoryPopup);
 
 	// CPU Load section
-	TeamBarMenu* CPUPopup = new TeamBarMenu("Threads and CPU Usage", infos, systemInfo.used_teams);
+	TeamBarMenu* CPUPopup = new TeamBarMenu("Threads and CPU usage", infos, systemInfo.used_teams);
 	for (m = 0; m < systemInfo.used_teams; m++) {
 		if (infos[m].team_info.team >= 0) {
 			ThreadBarMenu* TeamPopup = new ThreadBarMenu(infos[m].team_name, infos[m].team_info.team, infos[m].team_info.thread_count);

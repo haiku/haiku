@@ -1071,7 +1071,7 @@ MainWin::_CreateMenu()
 	fPlaylistMenu = new BMenu("Playlist"B_UTF8_ELLIPSIS);
 	fAudioMenu = new BMenu("Audio");
 	fVideoMenu = new BMenu("Video");
-	fVideoAspectMenu = new BMenu("Aspect Ratio");
+	fVideoAspectMenu = new BMenu("Aspect ratio");
 	fSettingsMenu = new BMenu("Settings");
 	fAudioTrackMenu = new BMenu("Track");
 	fVideoTrackMenu = new BMenu("Track");
@@ -1081,7 +1081,7 @@ MainWin::_CreateMenu()
 	fMenuBar->AddItem(fVideoMenu);
 	fMenuBar->AddItem(fSettingsMenu);
 
-	fFileMenu->AddItem(new BMenuItem("New Player"B_UTF8_ELLIPSIS,
+	fFileMenu->AddItem(new BMenuItem("New player"B_UTF8_ELLIPSIS,
 		new BMessage(M_FILE_NEWPLAYER), 'N'));
 	fFileMenu->AddSeparatorItem();
 
@@ -1090,12 +1090,12 @@ MainWin::_CreateMenu()
 	// Add recent files
 	BRecentFilesList recentFiles(10, false, NULL, kAppSig);
 	BMenuItem *item = new BMenuItem(recentFiles.NewFileListMenu(
-		"Open File"B_UTF8_ELLIPSIS, new BMessage(B_REFS_RECEIVED),
+		"Open file"B_UTF8_ELLIPSIS, new BMessage(B_REFS_RECEIVED),
 		NULL, this, 10, false, NULL, 0, kAppSig), new BMessage(M_FILE_OPEN));
 	item->SetShortcut('O', 0);
 	fFileMenu->AddItem(item);
 
-	fFileMenu->AddItem(new BMenuItem("File Info"B_UTF8_ELLIPSIS,
+	fFileMenu->AddItem(new BMenuItem("File info"B_UTF8_ELLIPSIS,
 		new BMessage(M_FILE_INFO), 'I'));
 	fFileMenu->AddItem(fPlaylistMenu);
 	fPlaylistMenu->Superitem()->SetShortcut('P', B_COMMAND_KEY);
@@ -1136,7 +1136,7 @@ MainWin::_CreateMenu()
 
 	fVideoMenu->AddSeparatorItem();
 
-	fVideoMenu->AddItem(new BMenuItem("Full Screen",
+	fVideoMenu->AddItem(new BMenuItem("Full screen",
 		new BMessage(M_TOGGLE_FULLSCREEN), 'F'));
 
 	fVideoMenu->AddSeparatorItem();
@@ -1144,10 +1144,10 @@ MainWin::_CreateMenu()
 	_SetupVideoAspectItems(fVideoAspectMenu);
 	fVideoMenu->AddItem(fVideoAspectMenu);
 
-	fNoInterfaceMenuItem = new BMenuItem("No Interface",
+	fNoInterfaceMenuItem = new BMenuItem("No interface",
 		new BMessage(M_TOGGLE_NO_INTERFACE), 'B');
 	fSettingsMenu->AddItem(fNoInterfaceMenuItem);
-	fSettingsMenu->AddItem(new BMenuItem("Always on Top",
+	fSettingsMenu->AddItem(new BMenuItem("Always on top",
 		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T'));
 	fSettingsMenu->AddSeparatorItem();
 	item = new BMenuItem("Settings"B_UTF8_ELLIPSIS,
@@ -1176,12 +1176,12 @@ MainWin::_SetupVideoAspectItems(BMenu* menu)
 	// "Stream Settings" and "16 : 9" if the stream settings happen to
 	// be "16 : 9".
 
-	menu->AddItem(item = new BMenuItem("Stream Settings",
+	menu->AddItem(item = new BMenuItem("Stream settings",
 		new BMessage(M_ASPECT_SAME_AS_SOURCE)));
 	item->SetMarked(widthAspect == fWidthAspect
 		&& heightAspect == fHeightAspect);
 
-	menu->AddItem(item = new BMenuItem("No Aspect Correction",
+	menu->AddItem(item = new BMenuItem("No aspect correction",
 		new BMessage(M_ASPECT_NO_DISTORTION)));
 	item->SetMarked(width == fWidthAspect && height == fHeightAspect);
 
@@ -1546,18 +1546,18 @@ MainWin::_ShowContextMenu(const BPoint &screen_point)
 	printf("Show context menu\n");
 	BPopUpMenu *menu = new BPopUpMenu("context menu", false, false);
 	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("Full Screen",
+	menu->AddItem(item = new BMenuItem("Full screen",
 		new BMessage(M_TOGGLE_FULLSCREEN), 'F'));
 	item->SetMarked(fIsFullscreen);
 	item->SetEnabled(fHasVideo);
 
-	BMenu* aspectSubMenu = new BMenu("Aspect Ratio");
+	BMenu* aspectSubMenu = new BMenu("Aspect ratio");
 	_SetupVideoAspectItems(aspectSubMenu);
 	aspectSubMenu->SetTargetForItems(this);
 	menu->AddItem(item = new BMenuItem(aspectSubMenu));
 	item->SetEnabled(fHasVideo);
 
-	menu->AddItem(item = new BMenuItem("No Interface",
+	menu->AddItem(item = new BMenuItem("No interface",
 		new BMessage(M_TOGGLE_NO_INTERFACE), 'B'));
 	item->SetMarked(fNoInterface);
 	item->SetEnabled(fHasVideo);
@@ -1565,8 +1565,8 @@ MainWin::_ShowContextMenu(const BPoint &screen_point)
 	menu->AddSeparatorItem();
 
 	// Add track selector menus
-	BMenu* audioTrackMenu = new BMenu("Audio Track");
-	BMenu* videoTrackMenu = new BMenu("Video Track");
+	BMenu* audioTrackMenu = new BMenu("Audio track");
+	BMenu* videoTrackMenu = new BMenu("Video track");
 	_SetupTrackMenus(audioTrackMenu, videoTrackMenu);
 
 	audioTrackMenu->SetTargetForItems(this);

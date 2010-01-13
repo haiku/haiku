@@ -320,7 +320,7 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	// add button
 	BMessage* message = new BMessage(MSG_ADD_SLOT);
 	message->AddPointer("be:source", (void*)nearestButton);
-	BMenuItem* item = new BMenuItem("Add Button Here", message);
+	BMenuItem* item = new BMenuItem("Add button here", message);
 	item->SetTarget(window);
 	menu->AddItem(item);
 	// button options
@@ -328,20 +328,20 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 		// clear button
 		message = new BMessage(MSG_CLEAR_SLOT);
 		message->AddPointer("be:source", (void*)button);
-		item = new BMenuItem("Clear Button", message);
+		item = new BMenuItem("Clear button", message);
 		item->SetTarget(window);
 		menu->AddItem(item);
 		// remove button
 		message = new BMessage(MSG_REMOVE_SLOT);
 		message->AddPointer("be:source", (void*)button);
-		item = new BMenuItem("Remove Button", message);
+		item = new BMenuItem("Remove button", message);
 		item->SetTarget(window);
 		menu->AddItem(item);
 		// set button description
 		if (button->Ref()) {
 			message = new BMessage(MSG_SET_DESCRIPTION);
 			message->AddPointer("be:source", (void*)button);
-			item = new BMenuItem("Set Description"B_UTF8_ELLIPSIS, message);
+			item = new BMenuItem("Set description"B_UTF8_ELLIPSIS, message);
 			item->SetTarget(window);
 			menu->AddItem(item);
 		}
@@ -353,9 +353,9 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 
 	const char* toggleLayoutLabel;
 	if (fButtonLayout->Orientation() == B_HORIZONTAL)
-		toggleLayoutLabel = "Vertical Layout";
+		toggleLayoutLabel = "Vertical layout";
 	else
-		toggleLayoutLabel = "Horizontal Layout";
+		toggleLayoutLabel = "Horizontal layout";
 	item = new BMenuItem(toggleLayoutLabel, new BMessage(MSG_TOGGLE_LAYOUT));
 	item->SetTarget(this);
 	settingsM->AddItem(item);
@@ -374,24 +374,24 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	}
 	settingsM->AddItem(iconSizeM);
 
-	item = new BMenuItem("Ignore Double-click",
+	item = new BMenuItem("Ignore double-click",
 		new BMessage(MSG_SET_IGNORE_DOUBLECLICK));
 	item->SetTarget(this);
 	item->SetMarked(IgnoreDoubleClick());
 	settingsM->AddItem(item);
 
 	uint32 what = window->Look() == B_BORDERED_WINDOW_LOOK ? MSG_SHOW_BORDER : MSG_HIDE_BORDER;
-	item = new BMenuItem("Show Window Border", new BMessage(what));
+	item = new BMenuItem("Show window border", new BMessage(what));
 	item->SetTarget(window);
 	item->SetMarked(what == MSG_HIDE_BORDER);
 	settingsM->AddItem(item);
 
-	item = new BMenuItem("Auto Raise", new BMessage(MSG_TOGGLE_AUTORAISE));
+	item = new BMenuItem("Auto-raise", new BMessage(MSG_TOGGLE_AUTORAISE));
 	item->SetTarget(window);
 	item->SetMarked(window->AutoRaise());
 	settingsM->AddItem(item);
 
-	item = new BMenuItem("Show On All Workspaces", new BMessage(MSG_SHOW_ON_ALL_WORKSPACES));
+	item = new BMenuItem("Show on all workspaces", new BMessage(MSG_SHOW_ON_ALL_WORKSPACES));
 	item->SetTarget(window);
 	item->SetMarked(window->ShowOnAllWorkspaces());
 	settingsM->AddItem(item);

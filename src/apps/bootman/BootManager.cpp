@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  * 
  * Authors:
@@ -46,7 +46,7 @@ BootManager::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "Haiku Boot Manager\n\n"
 		"\twritten by Michael Pfeiffer\n"
-		"\tCopyright 2008, Haiku Inc.\n", "Ok");
+		"\tCopyright 2008, Haiku Inc.\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

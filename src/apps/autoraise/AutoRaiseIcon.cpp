@@ -22,11 +22,11 @@ extern "C" _EXPORT BView *instantiate_deskbar_item(void)
 
 
 long removeFromDeskbar(void *)
-{	
+{
 	BDeskbar db;
 	if (db.RemoveItem(APP_NAME) != B_OK)
 		printf("Unable to remove AutoRaise from BDeskbar\n");
-		
+
 	return 0;
 }
 
@@ -39,9 +39,9 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	BMenuItem *tmpi;
 	BMessage *msg;
 	bigtime_t delay;
-	
+
 	AutoRaiseSettings *s = tv->Settings();
-	
+
 	SetFont(be_plain_font);
 
 
@@ -165,15 +165,16 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	tmpm->SetTargetForItems(tv);
 	BMenuItem *delaym = new BMenuItem(tmpm);
 	delaym->SetEnabled(s->Active());
-	
+
 	AddItem(delaym);
-	
+
 	AddSeparatorItem();
 //	AddItem(new BMenuItem("Settings...", new BMessage(OPEN_SETTINGS)));
-	
-	AddItem(new BMenuItem("About "APP_NAME, new BMessage(B_ABOUT_REQUESTED)));
+
+	AddItem(new BMenuItem("About "APP_NAME B_UTF8_ELLIPSIS,
+		new BMessage(B_ABOUT_REQUESTED)));
 	AddItem(new BMenuItem("Remove from tray", new BMessage(REMOVE_FROM_TRAY)));
-		
+
 	SetTargetForItems(tv);
 	SetAsyncAutoDestruct(true);
 }
@@ -202,19 +203,19 @@ void TrayView::_init()
 {
 	thread_info ti;
 	status_t err;
-	
+
 	watching = false;
 	_settings = new AutoRaiseSettings;
-		
+
 	_appPath = _settings->AppPath();
-	
+
 	raise_delay = _settings->Delay();
 	current_window = 0;
 	polling_delay = 100000;
 	fPollerSem = create_sem(0, "AutoRaise poller sync");
 	last_raiser_thread = 0;
 	fNormalMM = mouse_mode();
-	
+
 	_activeIcon = NULL;
 	_inactiveIcon = NULL;
 
@@ -222,7 +223,8 @@ void TrayView::_init()
 	fDeskbarTeam = ti.team;
 
 #ifndef USE_DANO_HACK
-	resume_thread(poller_thread = spawn_thread(poller, "AutoRaise desktop poller", B_NORMAL_PRIORITY, (void *)this));
+	resume_thread(poller_thread = spawn_thread(poller, "AutoRaise desktop "
+		"poller", B_NORMAL_PRIORITY, (void *)this));
 #endif
 
 	//determine paths to icon files based on app path in settings file
@@ -230,7 +232,7 @@ void TrayView::_init()
 	BResources res;
 	BFile theapp(&_appPath, B_READ_ONLY);
 	if ((err = res.SetTo(&theapp)) != B_OK) {
-	
+
 		printf("Unable to find the app to get the resources !!!\n");
 //		removeFromDeskbar(NULL);
 //		delete _settings;
@@ -241,30 +243,32 @@ void TrayView::_init()
 	char *p;
 
 	p = (char *)res.LoadResource('MICN', ACTIVE_ICON, &bmsz);
-	_activeIcon = new BBitmap(BRect(0, 0, B_MINI_ICON-1, B_MINI_ICON -1), B_CMAP8);
+	_activeIcon = new BBitmap(BRect(0, 0, B_MINI_ICON-1, B_MINI_ICON -1),
+		B_CMAP8);
 	if (!p)
 		puts("ERROR loading active icon");
 	else
 		_activeIcon->SetBits(p, B_MINI_ICON*B_MINI_ICON, 0, B_CMAP8);
-		
+
 	p = (char *)res.LoadResource('MICN', INACTIVE_ICON, &bmsz);
-	_inactiveIcon = new BBitmap(BRect(0, 0, B_MINI_ICON-1, B_MINI_ICON -1), B_CMAP8);
+	_inactiveIcon = new BBitmap(BRect(0, 0, B_MINI_ICON-1, B_MINI_ICON -1),
+		B_CMAP8);
 	if (!p)
 		puts("ERROR loading inactive icon");
 	else
 		_inactiveIcon->SetBits(p, B_MINI_ICON*B_MINI_ICON, 0, B_CMAP8);
-	
-	
+
+
 	SetDrawingMode(B_OP_ALPHA);
 	SetFlags(Flags() | B_WILL_DRAW);
-	
+
 	// begin watching if we want
 	// (doesn't work here, better do it in AttachedToWindow())
 }
 
 TrayView::~TrayView(){
 	status_t ret;
-	
+
 	if (watching) {
 #ifdef USE_DANO_HACK
 		be_roster->StopWatching(this);
@@ -281,7 +285,7 @@ TrayView::~TrayView(){
 	if (_activeIcon) delete _activeIcon;
 	if (_inactiveIcon) delete _inactiveIcon;
 	if (_settings) delete _settings;
-	
+
 	return;
 }
 
@@ -304,7 +308,7 @@ TrayView *TrayView::Instantiate(BMessage *data) {
 	{
 		return NULL;
 	}
-	
+
 	return (new TrayView(data));
 }
 
@@ -325,11 +329,11 @@ void TrayView::AttachedToWindow() {
 
 void TrayView::Draw(BRect updaterect) {
 	BRect bnds(Bounds());
-	
+
 	if (Parent()) SetHighColor(Parent()->ViewColor());
 	else SetHighColor(189, 186, 189, 255);
 	FillRect(bnds);
-	
+
 	if (_settings->Active())
 	{
 		if (_activeIcon) DrawBitmap(_activeIcon);
@@ -344,43 +348,43 @@ void TrayView::MouseDown(BPoint where) {
 	BWindow *window = Window();	/*To handle the MouseDown message*/
 	if (!window)	/*Check for proper instantiation*/
 		return;
-		
+
 	BMessage *mouseMsg = window->CurrentMessage();
 	if (!mouseMsg)	/*Check for existence*/
 		return;
-		
+
 	if (mouseMsg->what == B_MOUSE_DOWN) {
 		/*Variables for storing the button pressed / modifying key*/
 		uint32 	buttons = 0;
 		uint32  modifiers = 0;
-		
+
 		/*Get the button pressed*/
 		mouseMsg->FindInt32("buttons", (int32 *) &buttons);
 		/*Get modifier key (if any)*/
 		mouseMsg->FindInt32("modifiers", (int32 *) &modifiers);
-		
+
 		/*Now perform action*/
 		switch(buttons) {
 			case B_PRIMARY_MOUSE_BUTTON:
 			{
 				SetActive(!_settings->Active());
-			
+
 				break;
 			}
-			case B_SECONDARY_MOUSE_BUTTON: 
+			case B_SECONDARY_MOUSE_BUTTON:
 			{
 				ConvertToScreen(&where);
 
 				//menu will delete itself (see constructor of ConfigMenu),
 				//so all we're concerned about is calling Go() asynchronously
 				ConfigMenu *menu = new ConfigMenu(this, false);
-				menu->Go(where, true, true, ConvertToScreen(Bounds()), true); 
+				menu->Go(where, true, true, ConvertToScreen(Bounds()), true);
 
 				break;
 			}
 		}
 	}
-}	
+}
 
 
 int32 fronter(void *arg)
@@ -449,13 +453,13 @@ int32 poller(void *arg)
 				if ((wi->window_left > wi->window_right) || (wi->window_top > wi->window_bottom))
 					goto zzz; // invalid window ?
 /*
-printf("if (!%s && (%li, %li)isin(%li)(%li, %li, %li, %li) && (%li != %li) ", wi->is_mini?"true":"false", 
+printf("if (!%s && (%li, %li)isin(%li)(%li, %li, %li, %li) && (%li != %li) ", wi->is_mini?"true":"false",
 	(long)mouse.x, (long)mouse.y, i, wi->window_left, wi->window_right, wi->window_top, wi->window_bottom, wi->id, tok);
 */
 
 
-				if ((!wi->is_mini) 
-						&& (((long)mouse.x) > wi->window_left) && (((long)mouse.x) < wi->window_right) 
+				if ((!wi->is_mini)
+						&& (((long)mouse.x) > wi->window_left) && (((long)mouse.x) < wi->window_right)
 						&& (((long)mouse.y) > wi->window_top) && (((long)mouse.y) < wi->window_bottom)) {
 //((tv->_settings->Mode() != Mode_DeskbarOver) || (wi->team == tv->fDeskbarTeam))
 
@@ -502,9 +506,9 @@ void TrayView::MessageReceived(BMessage* message)
 	bool wasactive;
 	BPoint mouse;
 	uint32 buttons;
-	
+
 	switch(message->what)
-	{		
+	{
 		case MSG_TOOGLE_ACTIVE:
 			SetActive(!_settings->Active());
 			break;
@@ -539,17 +543,17 @@ void TrayView::MessageReceived(BMessage* message)
 		{
 			thread_id tid = spawn_thread(removeFromDeskbar, "RemoveFromDeskbar", B_NORMAL_PRIORITY, NULL);
 			if (tid) resume_thread(tid);
-		
+
 			break;
 		}
 		case B_ABOUT_REQUESTED:
-			alert = new BAlert("about box", "AutoRaise, (c) 2002, mmu_man\nEnjoy :-)", "Ok", NULL, NULL,
+			alert = new BAlert("about box", "AutoRaise, (c) 2002, mmu_man\nEnjoy :-)", "OK", NULL, NULL,
                 B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
 	        alert->SetShortcut(0, B_ENTER);
     	    alert->Go(NULL); // use asynchronous version
 			break;
 		case OPEN_SETTINGS:
-				
+
 			break;
 #ifdef USE_DANO_HACK
 		case B_SOME_WINDOW_ACTIVATED:

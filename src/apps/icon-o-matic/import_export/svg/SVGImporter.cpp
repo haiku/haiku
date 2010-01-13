@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -68,10 +68,10 @@ SVGImporter::Import(Icon* icon, const entry_ref* ref)
 	} catch(agg::svg::exception& e) {
 		char error[1024];
 		sprintf(error, "Failed to open the file '%s' as "
-					   "an SVG Document.\n\n"
+					   "an SVG document.\n\n"
 					   "Error: %s", ref->name, e.msg());
 		BAlert* alert = new BAlert("load error",
-								   error, "Ok", NULL, NULL,
+								   error, "OK", NULL, NULL,
 								   B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(NULL);
 		ret = B_ERROR;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku Inc. All rights reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -321,7 +321,7 @@ PropertyListView::SetMenu(BMenu* menu)
 	fSelectM->AddItem(fSelectAllMI);
 	fSelectNoneMI = new BMenuItem("None", new BMessage(MSG_SELECT_NONE));
 	fSelectM->AddItem(fSelectNoneMI);
-	fInvertSelectionMI = new BMenuItem("Invert Selection", new BMessage(MSG_INVERT_SELECTION));
+	fInvertSelectionMI = new BMenuItem("Invert selection", new BMessage(MSG_INVERT_SELECTION));
 	fSelectM->AddItem(fInvertSelectionMI);
 	fSelectM->SetTargetForItems(this);
 
@@ -728,8 +728,8 @@ PropertyListView::_CheckMenuStatus()
 	fPasteMI->SetEnabled(clipboardHasData);
 //	LanguageManager* m = LanguageManager::Default();
 	if (IsEditingMultipleObjects())
-//		fPasteMI->SetLabel(m->GetString(MULTI_PASTE, "Multi Paste"));
-		fPasteMI->SetLabel("Multi Paste");
+//		fPasteMI->SetLabel(m->GetString(MULTI_PASTE, "Multi paste"));
+		fPasteMI->SetLabel("Multi paste");
 	else
 //		fPasteMI->SetLabel(m->GetString(PASTE, "Paste"));
 		fPasteMI->SetLabel("Paste");

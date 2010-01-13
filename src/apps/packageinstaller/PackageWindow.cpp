@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Haiku, Inc.
+ * Copyright (c) 2007-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -18,7 +18,7 @@
 
 
 PackageWindow::PackageWindow(const entry_ref *ref)
-	:	BWindow(BRect(100, 100, 600, 300), T("Package Installer"), B_TITLED_WINDOW,
+	:	BWindow(BRect(100, 100, 600, 300), T("PackageInstaller"), B_TITLED_WINDOW,
 			B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
 	//SetLayout(new BGroupLayout(B_HORIZONTAL));

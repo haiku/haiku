@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -108,7 +108,7 @@ ControlView::AttachedToWindow()
 	AddChild(fOutlineSlider);
 
 	rect.OffsetBy(0.0, offsetX);
-	fAliasingCheckBox = new BCheckBox(rect, "Aliasing", "Anti-aliased text",
+	fAliasingCheckBox = new BCheckBox(rect, "Aliasing", "Antialiased text",
 		new BMessage(ALIASING_MSG));
 	fAliasingCheckBox->SetValue(B_CONTROL_ON);
 	AddChild(fAliasingCheckBox);
@@ -164,7 +164,7 @@ ControlView::AttachedToWindow()
 	AddChild(fBoundingboxesCheckBox);
 
 	rect.OffsetBy(0.0, 22.0);
-	fCyclingFontButton = new BButton(rect, "Cyclefonts", "Cycle Fonts",
+	fCyclingFontButton = new BButton(rect, "Cyclefonts", "Cycle fonts",
 		new BMessage(CYCLING_FONTS_MSG));
 	AddChild(fCyclingFontButton);
 
@@ -302,7 +302,7 @@ ControlView::MessageReceived(BMessage* msg)
 
 		case CYCLING_FONTS_MSG:
 		{
-			fCyclingFontButton->SetLabel(fCycleFonts ? "Cycle Fonts" : "Stop Cycling");
+			fCyclingFontButton->SetLabel(fCycleFonts ? "Cycle fonts" : "Stop cycling");
 			fCycleFonts = !fCycleFonts;
 
 			if (fCycleFonts) {

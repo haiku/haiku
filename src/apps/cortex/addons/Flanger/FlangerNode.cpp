@@ -1228,11 +1228,11 @@ void FlangerNode::initParameterWeb() {
 	BParameterGroup* g;
 
 	// mix ratio
-	g = pTopGroup->MakeGroup("Mix Ratio");
+	g = pTopGroup->MakeGroup("Mix ratio");
 	label = g->MakeNullParameter(
 		P_MIX_RATIO_LABEL,
 		B_MEDIA_NO_TYPE,
-		"Mix Ratio",
+		"Mix ratio",
 		B_GENERIC);
 
 	value = g->MakeContinuousParameter(
@@ -1244,11 +1244,11 @@ void FlangerNode::initParameterWeb() {
 	value->AddInput(label);
 
 	// sweep rate
-	g = pTopGroup->MakeGroup("Sweep Rate");
+	g = pTopGroup->MakeGroup("Sweep rate");
 	label = g->MakeNullParameter(
 		P_SWEEP_RATE_LABEL,
 		B_MEDIA_NO_TYPE,
-		"Sweep Rate",
+		"Sweep rate",
 		B_GENERIC);
 
 	value = g->MakeContinuousParameter(
@@ -1271,7 +1271,7 @@ void FlangerNode::initParameterWeb() {
 		P_DELAY,
 		B_MEDIA_NO_TYPE,
 		"",
-		B_GAIN, "msec", 0.1, s_fMaxDelay/2.0, 0.1);
+		B_GAIN, "ms", 0.1, s_fMaxDelay/2.0, 0.1);
 	label->AddOutput(value);
 	value->AddInput(label);
 
@@ -1287,7 +1287,7 @@ void FlangerNode::initParameterWeb() {
 		P_DEPTH,
 		B_MEDIA_NO_TYPE,
 		"",
-		B_GAIN, "msec", 1.0, s_fMaxDelay/4.0, 0.1);
+		B_GAIN, "ms", 1.0, s_fMaxDelay/4.0, 0.1);
 	label->AddOutput(value);
 	value->AddInput(label);
 

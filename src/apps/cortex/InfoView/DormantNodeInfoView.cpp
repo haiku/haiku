@@ -22,7 +22,7 @@ __USE_CORTEX_NAMESPACE
 
 DormantNodeInfoView::DormantNodeInfoView(
 	const dormant_node_info &info)
-	: InfoView(info.name, "Dormant Media Node",
+	: InfoView(info.name, "Dormant media node",
 			   new MediaIcon(info, B_LARGE_ICON)),
 	  m_addOnID(info.addon),
 	  m_flavorID(info.flavor_id)
@@ -59,9 +59,9 @@ DormantNodeInfoView::DormantNodeInfoView(
 		addField("Kinds", MediaString::getStringFor(static_cast<node_kind>(flavorInfo.kinds)));
 
 		// add "Flavor Flags" field
-		addField("Flavor Flags", "?");
+		addField("Flavor flags", "?");
 
-		// add "Max Instances" field
+		// add "Max. instances" field
 		if (flavorInfo.possible_count > 0)
 		{
 			s = "";
@@ -71,18 +71,18 @@ DormantNodeInfoView::DormantNodeInfoView(
 		{
 			s = "Any number";
 		}
-		addField("Max Instances", s);
+		addField("Max. instances", s);
 
 		// add "Input Formats" field
 		if (flavorInfo.in_format_count > 0)
 		{
 			if (flavorInfo.in_format_count == 1)
 			{
-				addField("Input Format", MediaString::getStringFor(flavorInfo.in_formats[0], false));
+				addField("Input format", MediaString::getStringFor(flavorInfo.in_formats[0], false));
 			}
 			else
 			{
-				addField("Input Formats", "");
+				addField("Input formats", "");
 				for (int32 i = 0; i < flavorInfo.in_format_count; i++)
 				{
 					s = "";
@@ -97,11 +97,11 @@ DormantNodeInfoView::DormantNodeInfoView(
 		{
 			if (flavorInfo.out_format_count == 1)
 			{
-				addField("Output Format", MediaString::getStringFor(flavorInfo.out_formats[0], false));
+				addField("Output format", MediaString::getStringFor(flavorInfo.out_formats[0], false));
 			}
 			else
 			{
-				addField("Output Formats", "");
+				addField("Output formats", "");
 				for (int32 i = 0; i < flavorInfo.out_format_count; i++)
 				{
 					s = "";

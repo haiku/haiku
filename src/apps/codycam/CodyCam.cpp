@@ -67,7 +67,7 @@ ErrorAlert(const char* message, status_t err, BWindow *window = NULL)
 }
 
 
-status_t 
+status_t
 AddTranslationItems(BMenu* intoMenu, uint32 fromType)
 {
 
@@ -89,33 +89,33 @@ AddTranslationItems(BMenu* intoMenu, uint32 fromType)
 		const translation_format* formats = NULL;
 		int32 num_formats = 0;
 		bool ok = false;
-		err = use->GetInputFormats(ids[tix], &formats, &num_formats); 
+		err = use->GetInputFormats(ids[tix], &formats, &num_formats);
 		if (err == B_OK)
-			for (int iix = 0; iix < num_formats; iix++) { 
-				if (formats[iix].type == fromType) { 
-					ok = true; 
-					break; 
+			for (int iix = 0; iix < num_formats; iix++) {
+				if (formats[iix].type == fromType) {
+					ok = true;
+					break;
 				}
 			}
 
 		if (!ok)
 			continue;
 
-		err = use->GetOutputFormats(ids[tix], &formats, &num_formats); 
+		err = use->GetOutputFormats(ids[tix], &formats, &num_formats);
 		if (err == B_OK)
-			for (int oix = 0; oix < num_formats; oix++) { 
- 				if (formats[oix].type != fromType) { 
-					BMessage* itemmsg; 
+			for (int oix = 0; oix < num_formats; oix++) {
+ 				if (formats[oix].type != fromType) {
+					BMessage* itemmsg;
 					itemmsg = new BMessage(msg_translate);
 					itemmsg->AddInt32(translatorIdName, ids[tix]);
-					itemmsg->AddInt32(translatorTypeName, formats[oix].type); 
-					intoMenu->AddItem(new BMenuItem(formats[oix].name, itemmsg)); 
-				} 
-			} 
-	} 
-	delete[] ids; 
-	return B_OK; 
-} 
+					itemmsg->AddInt32(translatorTypeName, formats[oix].type);
+					intoMenu->AddItem(new BMenuItem(formats[oix].name, itemmsg));
+				}
+			}
+	}
+	delete[] ids;
+	return B_OK;
+}
 
 
 //	#pragma mark -
@@ -143,12 +143,12 @@ CodyCam::~CodyCam()
 		fVideoConsumer->Release();
 		fVideoConsumer = NULL;
 	}
-		
+
 	CALL("CodyCam::~CodyCam - EXIT\n");
 }
 
 
-void 
+void
 CodyCam::ReadyToRun()
 {
 	fWindow = new VideoWindow(BRect(28, 28, 28, 28),
@@ -162,12 +162,12 @@ CodyCam::ReadyToRun()
 
 
 
-bool 
+bool
 CodyCam::QuitRequested()
 {
 	_TearDownNodes();
 	snooze(100000);
-	
+
 	return true;
 }
 
@@ -216,10 +216,10 @@ CodyCam::MessageReceived(BMessage *message)
 		}
 
 		case msg_about:
-			(new BAlert("About CodyCam", "CodyCam\n\nThe Original BeOS WebCam",
+			(new BAlert("About CodyCam", "CodyCam\n\nThe Original BeOS webcam",
 				"Close"))->Go();
 			break;
-		
+
 		case msg_control_win:
 			// our control window is being asked to go away
 			// set our pointer to NULL
@@ -233,7 +233,7 @@ CodyCam::MessageReceived(BMessage *message)
 }
 
 
-status_t 
+status_t
 CodyCam::_SetUpNodes()
 {
 	status_t status = B_OK;
@@ -241,14 +241,14 @@ CodyCam::_SetUpNodes()
 	/* find the media roster */
 	fMediaRoster = BMediaRoster::Roster(&status);
 	if (status != B_OK) {
-		ErrorAlert("Can't find the media roster", status, fWindow);
+		ErrorAlert("Cannot find the media roster", status, fWindow);
 		return status;
 	}
 
 	/* find the time source */
 	status = fMediaRoster->GetTimeSource(&fTimeSourceNode);
 	if (status != B_OK) {
-		ErrorAlert("Can't get a time source", status, fWindow);
+		ErrorAlert("Cannot get a time source", status, fWindow);
 		return status;
 	}
 
@@ -256,7 +256,7 @@ CodyCam::_SetUpNodes()
 	INFO("CodyCam acquiring VideoInput node\n");
 	status = fMediaRoster->GetVideoInput(&fProducerNode);
 	if (status != B_OK) {
-		ErrorAlert("Can't find a video source. You need a webcam to use CodyCam.", status, fWindow);
+		ErrorAlert("Cannot find a video source. You need a webcam to use CodyCam.", status, fWindow);
 		return status;
 	}
 
@@ -264,25 +264,25 @@ CodyCam::_SetUpNodes()
 	fVideoConsumer = new VideoConsumer("CodyCam", ((VideoWindow*)fWindow)->VideoView(),
 		((VideoWindow*)fWindow)->StatusLine(), NULL, 0);
 	if (!fVideoConsumer) {
-		ErrorAlert("Can't create a video window", B_ERROR, fWindow);
+		ErrorAlert("Cannot create a video window", B_ERROR, fWindow);
 		return B_ERROR;
 	}
 
 	/* register the node */
 	status = fMediaRoster->RegisterNode(fVideoConsumer);
 	if (status != B_OK) {
-		ErrorAlert("Can't register the video window", status, fWindow);
+		ErrorAlert("Cannot register the video window", status, fWindow);
 		return status;
 	}
 	fPort = fVideoConsumer->ControlPort();
-	
+
 	/* find free producer output */
 	int32 cnt = 0;
 	status = fMediaRoster->GetFreeOutputsFor(fProducerNode, &fProducerOut, 1,  &cnt,
 		B_MEDIA_RAW_VIDEO);
 	if (status != B_OK || cnt < 1) {
 		status = B_RESOURCE_UNAVAILABLE;
-		ErrorAlert("Can't find an available video stream", status, fWindow);
+		ErrorAlert("Cannot find an available video stream", status, fWindow);
 		return status;
 	}
 
@@ -301,13 +301,13 @@ CodyCam::_SetUpNodes()
 	format.type = B_MEDIA_RAW_VIDEO;
 	media_raw_video_format vid_format = {0, 1, 0, 239, B_VIDEO_TOP_LEFT_RIGHT,
 		1, 1, {B_RGB32, VIDEO_SIZE_X, VIDEO_SIZE_Y, VIDEO_SIZE_X * 4, 0, 0}};
-	format.u.raw_video = vid_format; 
+	format.u.raw_video = vid_format;
 
 	/* connect producer to consumer */
 	status = fMediaRoster->Connect(fProducerOut.source, fConsumerIn.destination,
 				&format, &fProducerOut, &fConsumerIn);
 	if (status != B_OK) {
-		ErrorAlert("Can't connect the video source to the video window", status);
+		ErrorAlert("Cannot connect the video source to the video window", status);
 		return status;
 	}
 
@@ -315,13 +315,13 @@ CodyCam::_SetUpNodes()
 	/* set time sources */
 	status = fMediaRoster->SetTimeSourceFor(fProducerNode.node, fTimeSourceNode.node);
 	if (status != B_OK) {
-		ErrorAlert("Can't set the timesource for the video source", status);
+		ErrorAlert("Cannot set the time source for the video source", status);
 		return status;
 	}
 
 	status = fMediaRoster->SetTimeSourceFor(fVideoConsumer->ID(), fTimeSourceNode.node);
 	if (status != B_OK) {
-		ErrorAlert("Can't set the timesource for the video window", status);
+		ErrorAlert("Cannot set the time source for the video window", status);
 		return status;
 	}
 
@@ -334,12 +334,12 @@ CodyCam::_SetUpNodes()
 	bigtime_t initLatency = 0;
 	status = fMediaRoster->GetInitialLatencyFor(fProducerNode, &initLatency);
 	if (status < B_OK) {
-		ErrorAlert("error getting initial latency for fCaptureNode", status);	
+		ErrorAlert("Error getting initial latency for the capture node", status);
 		return status;
 	}
 
 	initLatency += estimate_max_scheduling_latency();
-	
+
 	BTimeSource* timeSource = fMediaRoster->MakeTimeSourceFor(fProducerNode);
 	bool running = timeSource->IsRunning();
 
@@ -350,59 +350,59 @@ CodyCam::_SetUpNodes()
 		status = fMediaRoster->StartTimeSource(fTimeSourceNode, real);
 		if (status != B_OK) {
 			timeSource->Release();
-			ErrorAlert("cannot start time source!", status);
+			ErrorAlert("Cannot start time source!", status);
 			return status;
 		}
 		status = fMediaRoster->SeekTimeSource(fTimeSourceNode, 0, real);
 		if (status != B_OK) {
 			timeSource->Release();
-			ErrorAlert("cannot seek time source!", status);
+			ErrorAlert("Cannot seek time source!", status);
 			return status;
 		}
 	}
 
 	bigtime_t perf = timeSource->PerformanceTimeFor(real + latency + initLatency);
 	timeSource->Release();
-	
+
 	/* start the nodes */
 	status = fMediaRoster->StartNode(fProducerNode, perf);
 	if (status != B_OK) {
-		ErrorAlert("Can't start the video source", status);
+		ErrorAlert("Cannot start the video source", status);
 		return status;
 	}
 	status = fMediaRoster->StartNode(fVideoConsumer->Node(), perf);
 	if (status != B_OK) {
-		ErrorAlert("Can't start the video window", status);
+		ErrorAlert("Cannot start the video window", status);
 		return status;
 	}
-	
+
 	return status;
 }
 
 
-void 
+void
 CodyCam::_TearDownNodes()
 {
 	CALL("CodyCam::_TearDownNodes\n");
 	if (!fMediaRoster)
 		return;
-	
+
 	if (fVideoConsumer) {
-		/* stop */	
+		/* stop */
 		INFO("stopping nodes!\n");
 //		fMediaRoster->StopNode(fProducerNode, 0, true);
 		fMediaRoster->StopNode(fVideoConsumer->Node(), 0, true);
-	
+
 		/* disconnect */
 		fMediaRoster->Disconnect(fProducerOut.node.node, fProducerOut.source,
 			fConsumerIn.node.node, fConsumerIn.destination);
-								
+
 		if (fProducerNode != media_node::null) {
 			INFO("CodyCam releasing fProducerNode\n");
 			fMediaRoster->ReleaseNode(fProducerNode);
 			fProducerNode = media_node::null;
 		}
-		fMediaRoster->ReleaseNode(fVideoConsumer->Node());		
+		fMediaRoster->ReleaseNode(fVideoConsumer->Node());
 		fVideoConsumer = NULL;
 	}
 }
@@ -431,30 +431,31 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 	strcpy(fFtpInfo.passwordText, "password");
 	strcpy(fFtpInfo.directoryText, "directory");
 
-	_SetUpSettings("codycam", "");	
+	_SetUpSettings("codycam", "");
 
 	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), "menu bar");
-	
+
 	BMenuItem* menuItem;
 	BMenu* menu = new BMenu("File");
 
-	menuItem = new BMenuItem("Video Preferences", new BMessage(msg_video), 'P');
+	menuItem = new BMenuItem("Video settings", new BMessage(msg_video), 'P');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("Start Video", new BMessage(msg_start), 'A');
+	menuItem = new BMenuItem("Start video", new BMessage(msg_start), 'A');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
-	menuItem = new BMenuItem("Stop Video", new BMessage(msg_stop), 'O');
+	menuItem = new BMenuItem("Stop video", new BMessage(msg_stop), 'O');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("About Codycam", new BMessage(msg_about), 'B');
+	menuItem = new BMenuItem("About Codycam" B_UTF8_ELLIPSIS,
+		new BMessage(msg_about), 'B');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
@@ -576,9 +577,9 @@ VideoWindow::MessageReceived(BMessage* message)
 			fFtpInfo.rate = (bigtime_t)(B_INFINITE_TIMEOUT);
 			break;
 
-		case msg_translate: 
+		case msg_translate:
 			message->FindInt32("be:type", (int32*)&(fFtpInfo.imageFormat));
-			message->FindInt32("be:translator", &(fFtpInfo.translator)); 
+			message->FindInt32("be:translator", &(fFtpInfo.translator));
 			break;
 
 		case msg_upl_client:
@@ -663,12 +664,12 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	BGridLayout *controlsLayout = new BGridLayout(kXBuffer, 0);
 	controlsLayout->SetInsets(10, 15, 5, 5);
 	fCaptureSetupBox->SetLayout(controlsLayout);
-	
+
 	fFileName = new BTextControl("File Name", "File name:",
 		fFilenameSetting->Value(), new BMessage(msg_filename));
 	fFileName->SetTarget(BMessenger(NULL, this));
 
-	fImageFormatMenu = new BPopUpMenu("Image Format Menu");	
+	fImageFormatMenu = new BPopUpMenu("Image Format Menu");
 	AddTranslationItems(fImageFormatMenu, B_TRANSLATOR_BITMAP);
 	fImageFormatMenu->SetTargetForItems(this);
 
@@ -676,16 +677,14 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 		&& fImageFormatMenu->FindItem(fImageFormatSettings->Value()) != NULL) {
 		fImageFormatMenu->FindItem(
 			fImageFormatSettings->Value())->SetMarked(true);
-	} else if (fImageFormatMenu->FindItem("JPEG Image") != NULL)
-		fImageFormatMenu->FindItem("JPEG Image")->SetMarked(true);
-	else if (fImageFormatMenu->FindItem("JPEG image") != NULL)
+	} else if (fImageFormatMenu->FindItem("JPEG image") != NULL)
 		fImageFormatMenu->FindItem("JPEG image")->SetMarked(true);
 	else
 		fImageFormatMenu->ItemAt(0)->SetMarked(true);
 
 	fImageFormatSelector = new BMenuField("Format", "Format:",
 		fImageFormatMenu, NULL);
-	
+
 	fCaptureRateMenu = new BPopUpMenu("Capture Rate Menu");
 	fCaptureRateMenu->AddItem(new BMenuItem("Every 15 seconds",
 		new BMessage(msg_rate_15s)));
@@ -727,7 +726,7 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	controlsLayout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, 3, 2);
 
 	// FTP setup box
-	fFtpSetupBox = new BBox("Ftp Setup", B_WILL_DRAW);
+	fFtpSetupBox = new BBox("FTP Setup", B_WILL_DRAW);
 
 	fUploadClientMenu = new BPopUpMenu("Send to" B_UTF8_ELLIPSIS);
 	for (int i = 0; kUploadClient[i]; i++) {
@@ -768,7 +767,7 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 		fDirectorySetting->Value(), new BMessage(msg_directory));
 	fDirectory->SetTarget(this);
 
-	fPassiveFtp = new BCheckBox("Passive ftp", "Passive FTP",
+	fPassiveFtp = new BCheckBox("Passive FTP", "Passive FTP",
 		new BMessage(msg_passiveftp));
 	fPassiveFtp->SetTarget(this);
 	fPassiveFtp->SetValue(fPassiveFtpSetting->Value());
@@ -784,14 +783,14 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	ftpLayout->AddItem(fDirectory->CreateLabelLayoutItem(), 0, 4);
 	ftpLayout->AddItem(fDirectory->CreateTextViewLayoutItem(), 1, 4);
 	ftpLayout->AddView(fPassiveFtp, 0, 5, 2);
-	
+
 	fStatusLine = new BStringView("Status Line", "Waiting" B_UTF8_ELLIPSIS);
-	
+
 	BGroupLayout *groupLayout = new BGroupLayout(B_VERTICAL);
 	groupLayout->SetInsets(kXBuffer, kYBuffer, kXBuffer, kYBuffer);
-	
+
 	theView->SetLayout(groupLayout);
-	
+
 	theView->AddChild(BSpaceLayoutItem::CreateVerticalStrut(kYBuffer));
 	theView->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
 		.Add(BSpaceLayoutItem::CreateHorizontalStrut(0.0))
@@ -846,7 +845,7 @@ VideoWindow::_SetUpSettings(const char* filename, const char* dirname)
 	fFilenameSetting = new StringValueSetting("StillImageFilename",
 		"codycam.jpg", "still image filename expected", "");
 	fImageFormatSettings = new StringValueSetting("ImageFileFormat",
-		"JPEG Image", "image file format expected", "");
+		"JPEG image", "image file format expected", "");
 	fCaptureRateSetting = new EnumeratedStringValueSetting("CaptureRate",
 		"Every 5 minutes", kCaptureRate, "capture rate expected",
 		"unrecognized capture rate specified");
@@ -892,7 +891,7 @@ VideoWindow::_QuitSettings()
 	fImageFormatSettings->ValueChanged(fImageFormatMenu->FindMarked()->Label());
 	fCaptureRateSetting->ValueChanged(fCaptureRateMenu->FindMarked()->Label());
 	fUploadClientSetting->ValueChanged(fUploadClientMenu->FindMarked()->Label());
-	
+
 	fSettings->SaveSettings();
 	delete fSettings;
 }
@@ -902,25 +901,25 @@ VideoWindow::_QuitSettings()
 
 
 ControlWindow::ControlWindow(const BRect& frame, BView* controls, media_node node)
-	: BWindow(frame, "Video Preferences", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	: BWindow(frame, "Video settings", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	fView = controls;
 	fNode = node;
-		
+
 	AddChild(fView);
 }
 
 
 void
-ControlWindow::MessageReceived(BMessage* message) 
+ControlWindow::MessageReceived(BMessage* message)
 {
 	BParameterWeb* web = NULL;
 	status_t err;
-	
+
 	switch (message->what) {
 		case B_MEDIA_WEB_CHANGED:
 		{
-			// If this is a tab view, find out which tab 
+			// If this is a tab view, find out which tab
 			// is selected
 			BTabView* tabView = dynamic_cast<BTabView*>(fView);
 			int32 tabNum = -1;
@@ -938,7 +937,7 @@ ControlWindow::MessageReceived(BMessage* message)
 
 				// Another tab view?  Restore previous selection
 				if (tabNum > 0) {
-					BTabView* newTabView = dynamic_cast<BTabView*>(fView);	
+					BTabView* newTabView = dynamic_cast<BTabView*>(fView);
 					if (newTabView)
 						newTabView->Select(tabNum);
 				}
@@ -952,7 +951,7 @@ ControlWindow::MessageReceived(BMessage* message)
 }
 
 
-bool 
+bool
 ControlWindow::QuitRequested()
 {
 	be_app->PostMessage(msg_control_win);
@@ -966,6 +965,6 @@ ControlWindow::QuitRequested()
 int main() {
 	CodyCam app;
 	app.Run();
-	return 0;	
+	return 0;
 }
 

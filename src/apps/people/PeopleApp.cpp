@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 - 2008, Haiku, Inc.
+ * Copyright 2005-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -29,7 +29,7 @@
 
 
 struct people_field gFields[] = {
-	{ "META:name", 120, "Contact Name" },
+	{ "META:name", 120, "Contact name" },
 	{ "META:nickname", 120, "Nickname" },
 	{ "META:company", 120, "Company" },
 	{ "META:address", 120, "Address" },
@@ -37,8 +37,8 @@ struct people_field gFields[] = {
 	{ "META:state", 50, "State" },
 	{ "META:zip", 50, "Zip" },
 	{ "META:country", 120, "Country" },
-	{ "META:hphone", 90, "Home Phone" },
-	{ "META:wphone", 90, "Work Phone" },
+	{ "META:hphone", 90, "Home phone" },
+	{ "META:wphone", 90, "Work phone" },
 	{ "META:fax", 90, "Fax" },
 	{ "META:email", 120, "E-mail" },
 	{ "META:url", 120, "URL" },
@@ -140,7 +140,7 @@ TPeopleApp::~TPeopleApp(void)
 void
 TPeopleApp::AboutRequested(void)
 {
-	(new BAlert("", "...by Robert Polic", "Big Deal"))->Go();
+	(new BAlert("", "...by Robert Polic", "OK"))->Go();
 }
 
 
@@ -230,7 +230,7 @@ TPeopleApp::NewWindow(entry_ref *ref)
 {
 	TPeopleWindow *window;
 
-	window = new TPeopleWindow(fPosition, "New Person", ref);
+	window = new TPeopleWindow(fPosition, "New person", ref);
 	window->Show();
 	fWindowCount++;
 	fPosition.OffsetBy(20, 20);

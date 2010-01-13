@@ -329,7 +329,7 @@ UsedMemoryDataSource::NextValue(SystemInfo& info)
 const char*
 UsedMemoryDataSource::Label() const
 {
-	return "Used Memory";
+	return "Used memory";
 }
 
 
@@ -378,7 +378,7 @@ CachedMemoryDataSource::NextValue(SystemInfo& info)
 const char*
 CachedMemoryDataSource::Label() const
 {
-	return "Cached Memory";
+	return "Cached memory";
 }
 
 
@@ -430,7 +430,7 @@ SwapSpaceDataSource::NextValue(SystemInfo& info)
 const char*
 SwapSpaceDataSource::Label() const
 {
-	return "Swap Space";
+	return "Swap space";
 }
 
 
@@ -485,14 +485,14 @@ BlockCacheDataSource::NextValue(SystemInfo& info)
 const char*
 BlockCacheDataSource::Label() const
 {
-	return "Block Cache Memory";
+	return "Block cache memory";
 }
 
 
 const char*
 BlockCacheDataSource::ShortLabel() const
 {
-	return "Block Cache";
+	return "Block cache";
 }
 
 
@@ -727,7 +727,7 @@ RunningAppsDataSource::NextValue(SystemInfo& info)
 const char*
 RunningAppsDataSource::Label() const
 {
-	return "Running Applications";
+	return "Running applications";
 }
 
 
@@ -839,7 +839,7 @@ CPUUsageDataSource::ShortLabel() const
 const char*
 CPUUsageDataSource::Name() const
 {
-	return "CPU Usage";
+	return "CPU usage";
 }
 
 
@@ -873,7 +873,7 @@ CPUUsageDataSource::_SetCPU(int32 cpu)
 		fLabel << " " << cpu;
 
 	fShortLabel = fLabel;
-	fLabel << " Usage";
+	fLabel << " usage";
 
 	const rgb_color kColors[] = {
 		// TODO: find some better defaults...
@@ -963,7 +963,7 @@ CPUCombinedUsageDataSource::NextValue(SystemInfo& info)
 const char*
 CPUCombinedUsageDataSource::Label() const
 {
-	return "CPU Usage";
+	return "CPU usage";
 }
 
 
@@ -977,7 +977,7 @@ CPUCombinedUsageDataSource::ShortLabel() const
 const char*
 CPUCombinedUsageDataSource::Name() const
 {
-	return "CPU Usage (combined)";
+	return "CPU usage (combined)";
 }
 
 
@@ -1061,21 +1061,21 @@ PageFaultsDataSource::NextValue(SystemInfo& info)
 const char*
 PageFaultsDataSource::Label() const
 {
-	return "Page Faults";
+	return "Page faults";
 }
 
 
 const char*
 PageFaultsDataSource::ShortLabel() const
 {
-	return "P-Faults";
+	return "P-faults";
 }
 
 
 const char*
 PageFaultsDataSource::Name() const
 {
-	return "Page Faults";
+	return "Page faults";
 }
 
 
@@ -1176,7 +1176,7 @@ NetworkUsageDataSource::ShortLabel() const
 const char*
 NetworkUsageDataSource::Name() const
 {
-	return fIn ? "Network Receive" : "Network Send";
+	return fIn ? "Network receive" : "Network send";
 }
 
 
@@ -1246,7 +1246,7 @@ ClipboardSizeDataSource::NextValue(SystemInfo& info)
 const char*
 ClipboardSizeDataSource::Label() const
 {
-	return fText ? "Text Clipboard Size" : "Raw Clipboard Size";
+	return fText ? "Text clipboard size" : "Raw clipboard size";
 }
 
 
@@ -1300,7 +1300,7 @@ MediaNodesDataSource::NextValue(SystemInfo& info)
 const char*
 MediaNodesDataSource::Label() const
 {
-	return "Media Nodes";
+	return "Media nodes";
 }
 
 

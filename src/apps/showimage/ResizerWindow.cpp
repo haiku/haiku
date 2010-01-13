@@ -28,7 +28,7 @@
 
 static const char* kWidthLabel = "Width:";
 static const char* kHeightLabel = "Height:";
-static const char* kKeepAspectRatioLabel = "Keep Original Proportions";
+static const char* kKeepAspectRatioLabel = "Keep original proportions";
 static const char* kApplyLabel = "Apply";
 
 static const float kLineDistance = 5;

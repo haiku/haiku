@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Copyright 1997, 1998 R3 Software Ltd. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -687,7 +687,7 @@ CalcView::AboutRequested()
 		"written by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n"
 		B_UTF8_COPYRIGHT"1997, 1998 R3 Software Ltd.\n"
 		B_UTF8_COPYRIGHT"2006-2009 Haiku, Inc.\n\n"
-		"All Rights Reserved.", "Cool");
+		"All Rights Reserved.", "OK");
 	alert->Go(NULL);
 }
 
@@ -1098,13 +1098,13 @@ void
 CalcView::_CreatePopUpMenu()
 {
 	// construct items
-	fAutoNumlockItem = new BMenuItem("Enable Num Lock on start up",
+	fAutoNumlockItem = new BMenuItem("Enable Num Lock on startup",
 		new BMessage(MSG_OPTIONS_AUTO_NUM_LOCK));
 	fAudioFeedbackItem = new BMenuItem("Audio Feedback",
 		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
-	fShowKeypadItem = new BMenuItem("Show Keypad",
+	fShowKeypadItem = new BMenuItem("Show keypad",
 		new BMessage(MSG_OPTIONS_SHOW_KEYPAD));
-	fAboutItem = new BMenuItem("About DeskCalc",
+	fAboutItem = new BMenuItem("About DeskCalc" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED));
 
 	// apply current settings

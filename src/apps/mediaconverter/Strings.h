@@ -26,14 +26,14 @@
 #define SOURCE_BOX_LABEL			_T("Source files")
 #define INFO_BOX_LABEL				_T("File details")
 #define OUTPUT_BOX_LABEL			_T("Output format")
-#define FORMAT_LABEL 				_T("File format")
-#define VIDEO_LABEL		 			_T("Video encoding")
-#define AUDIO_LABEL 				_T("Audio encoding")
+#define FORMAT_LABEL 				_T("File format:")
+#define VIDEO_LABEL		 			_T("Video encoding:")
+#define AUDIO_LABEL 				_T("Audio encoding:")
 //
-#define OUTPUT_FOLDER_LABEL			_T("Output Folder")
+#define OUTPUT_FOLDER_LABEL			_T("Output folder")
 #define PREVIEW_BUTTON_LABEL		_T("Preview")
-#define START_LABEL 				_T("Start mSec ")
-#define END_LABEL 					_T("End   mSec ")
+#define START_LABEL 				_T("Start [ms]: ")
+#define END_LABEL 					_T("End   [ms]: ")
 //
 #define FORMAT_MENU_LABEL			_T("Format")
 #define VIDEO_MENU_LABEL 			_T("Video")
@@ -43,8 +43,8 @@
 #define AUDIO_INFO_LABEL			_T("Audio:")
 #define CONVERT_LABEL				_T("Convert")
 #define CANCEL_LABEL				_T("Cancel")
-#define VIDEO_QUALITY_LABEL			_T("Video quality %3d%%")
-#define AUDIO_QUALITY_LABEL			_T("Audio quality %3d%%")
+#define VIDEO_QUALITY_LABEL			_T("Video quality: %3d%%")
+#define AUDIO_QUALITY_LABEL			_T("Audio quality: %3d%%")
 #define SLIDER_LOW_LABEL			_T("Low")
 #define SLIDER_HIGH_LABEL			_T("High")
 #define NONE_LABEL					_T("None available")
@@ -54,14 +54,14 @@
 #define OK_LABEL					_T("OK")
 #define CONV_COMPLETE_LABEL			_T("Conversion completed")
 #define CONV_CANCEL_LABEL			_T("Conversion cancelled")
-#define SELECT_DIR_LABEL			_T("Select This Directory")
+#define SELECT_DIR_LABEL			_T("Select this folder")
 #define SELECT_LABEL				_T("Select")
 #define SAVE_DIR_LABEL				_T("MediaConverter+:SaveDirectory")
 #define NO_FILE_LABEL				_T("No file selected")
 //
 #define FILE_MENU_LABEL				_T("File")
 #define OPEN_MENU_LABEL				_T("Open")
-#define ABOUT_MENU_LABEL			_T("About")
+#define ABOUT_MENU_LABEL			_T("About MediaConverter")
 #define QUIT_MENU_LABEL				_T("Quit")
 
 #define WRITE_AUDIO_STRING			_T("Writing audio track:")
@@ -86,7 +86,7 @@
 #define ERROR_READ_AUDIO_STRING		_T("Error read audio frame ")
 #define ERROR_LOAD_STRING			_T("Error loading file")
 
-#define ENCODER_PARAMETERS			_T("Encoder Parameters")
+#define ENCODER_PARAMETERS			_T("Encoder parameters")
 
 
 #endif // STRINGS_H

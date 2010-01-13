@@ -35,13 +35,13 @@ OpenWindow::OpenWindow()
 	if (BMenuItem *item = fDevicesMenu->ItemAt(0))
 		item->SetMarked(true);
 
-	BMenuField *field = new BMenuField("Examine Device:", fDevicesMenu, NULL);
+	BMenuField *field = new BMenuField("Examine device:", fDevicesMenu, NULL);
 
-	BButton *probeDeviceButton = new BButton("device", "Probe Device",
+	BButton *probeDeviceButton = new BButton("device", "Probe device",
 		new BMessage(kMsgProbeDevice));
 	probeDeviceButton->MakeDefault(true);
 
-	BButton *probeFileButton = new BButton("file", "Probe File" B_UTF8_ELLIPSIS,
+	BButton *probeFileButton = new BButton("file", "Probe file" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgProbeFile));
 
 	BButton *cancelButton = new BButton("cancel", "Cancel",

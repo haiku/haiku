@@ -151,11 +151,11 @@ void WatchView::OnAboutRequested()
 	(new BAlert(
 		NULL, 
 		"WebWatch " VERSION
-		"\nAn Internet Time clock for your Deskbar\n\n"
+		"\nAn internet time clock for your Deskbar\n\n"
 		"Created by Matthijs Hollemans\n"
 		"mahlzeit@users.sourceforge.net\n\n"
 		"Thanks to Jason Parks for his help.\n",
-		"Okay"))->Go(NULL);
+		"OK"))->Go(NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

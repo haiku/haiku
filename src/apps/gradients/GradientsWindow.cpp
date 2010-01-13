@@ -18,7 +18,7 @@ GradientsWindow::GradientsWindow()
 	fGradientsMenu = new BPopUpMenu("gradientsType");
 	fLinearItem = new BMenuItem("Linear", new BMessage(MSG_LINEAR));
 	fRadialItem = new BMenuItem("Radial", new BMessage(MSG_RADIAL));
-	fRadialFocusItem = new BMenuItem("Radial Focus",
+	fRadialFocusItem = new BMenuItem("Radial focus",
 		new BMessage(MSG_RADIAL_FOCUS));
 	
 	fDiamondItem = new BMenuItem("Diamond", new BMessage(MSG_DIAMOND));

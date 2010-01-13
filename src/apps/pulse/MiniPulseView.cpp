@@ -15,9 +15,9 @@
 MiniPulseView::MiniPulseView(BRect rect, const char *name, Prefs *prefs) : 
 	PulseView(rect, name) {
 
-	mode1->SetLabel("Normal Mode");
+	mode1->SetLabel("Normal mode");
 	mode1->SetMessage(new BMessage(PV_NORMAL_MODE));
-	mode2->SetLabel("Deskbar Mode");
+	mode2->SetLabel("Deskbar mode");
 	mode2->SetMessage(new BMessage(PV_DESKBAR_MODE));
 	quit = new BMenuItem("Quit", new BMessage(PV_QUIT), 0, 0);
 	popupmenu->AddSeparatorItem();

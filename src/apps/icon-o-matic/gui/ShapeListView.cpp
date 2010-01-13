@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku Inc. All rights reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -423,25 +423,25 @@ ShapeListView::SetMenu(BMenu* menu)
 		return;
 
 	BMessage* message = new BMessage(MSG_ADD_SHAPE);
-	fAddEmptyMI = new BMenuItem("Add Empty", message);
+	fAddEmptyMI = new BMenuItem("Add empty", message);
 
 	message = new BMessage(MSG_ADD_SHAPE);
 	message->AddBool("path", true);
-	fAddWidthPathMI = new BMenuItem("Add With Path", message);
+	fAddWidthPathMI = new BMenuItem("Add with path", message);
 
 	message = new BMessage(MSG_ADD_SHAPE);
 	message->AddBool("style", true);
-	fAddWidthStyleMI = new BMenuItem("Add With Style", message);
+	fAddWidthStyleMI = new BMenuItem("Add with style", message);
 
 	message = new BMessage(MSG_ADD_SHAPE);
 	message->AddBool("path", true);
 	message->AddBool("style", true);
-	fAddWidthPathAndStyleMI = new BMenuItem("Add With Path & Style", message);
+	fAddWidthPathAndStyleMI = new BMenuItem("Add with path & style", message);
 
 	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
-	fResetTransformationMI = new BMenuItem("Reset Transformation",
+	fResetTransformationMI = new BMenuItem("Reset transformation",
 		new BMessage(MSG_RESET_TRANSFORMATION));
-	fFreezeTransformationMI = new BMenuItem("Freeze Transformation",
+	fFreezeTransformationMI = new BMenuItem("Freeze transformation",
 		new BMessage(MSG_FREEZE_TRANSFORMATION));
 
 	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));

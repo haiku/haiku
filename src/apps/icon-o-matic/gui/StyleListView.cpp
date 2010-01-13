@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -600,7 +600,7 @@ StyleListView::SetMenu(BMenu* menu)
 	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
 	fMenu->AddItem(fDuplicateMI);
 
-	fResetTransformationMI = new BMenuItem("Reset Transformation",
+	fResetTransformationMI = new BMenuItem("Reset transformation",
 		new BMessage(MSG_RESET_TRANSFORMATION));
 	fMenu->AddItem(fResetTransformationMI);
 

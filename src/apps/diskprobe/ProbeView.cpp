@@ -519,7 +519,7 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	if (editor.IsAttribute()) {
 		top += 3;
 		stringView = new BStringView(BRect(50, top, frame.right, top + 15),
-			B_EMPTY_STRING, "Attribute Type: ");
+			B_EMPTY_STRING, "Attribute type: ");
 		stringView->SetFont(&boldFont);
 		stringView->ResizeToPreferred();
 		AddChild(stringView);
@@ -590,8 +590,8 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	rect.left = rect.right + 4;
 	rect.right = frame.right;
 	stringView = new BStringView(rect, B_EMPTY_STRING, editor.IsAttribute()
-		? "Attribute Offset: " : editor.IsDevice()
-			? "Device Offset: " : "File Offset: ");
+		? "Attribute offset: " : editor.IsDevice()
+			? "Device offset: " : "File offset: ");
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -1092,7 +1092,7 @@ EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize,
 			// If the user had to wait more than 8 seconds for the result,
 			// we are trying to please him with a requester...
 			(new BAlert("DiskProbe request",
-				"Could not find search string.", "Ok", NULL, NULL,
+				"Could not find search string.", "OK", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 		} else
 			beep();
@@ -1119,7 +1119,7 @@ TypeView::TypeView(BRect rect, const char* name, int32 index,
 
 	fTypeEditorView = GetTypeEditorAt(index, Frame(), editor);
 	if (fTypeEditorView == NULL) {
-		AddChild(new BStringView(Bounds(), "Type Editor",
+		AddChild(new BStringView(Bounds(), "Type editor",
 			"Type editor not supported", B_FOLLOW_NONE));
 	} else
 		AddChild(fTypeEditorView);
@@ -1323,7 +1323,7 @@ void
 ProbeView::AddPrintMenuItems(BMenu* menu, int32 index)
 {
 	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS,
+	menu->AddItem(item = new BMenuItem("Page setup" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgPageSetup)), index++);
 	item->SetTarget(this);
 	menu->AddItem(item = new BMenuItem("Print" B_UTF8_ELLIPSIS,
@@ -1427,14 +1427,14 @@ ProbeView::AttachedToWindow()
 		'V'));
 	fPasteMenuItem->SetTarget(NULL, Window());
 	_CheckClipboard();
-	menu->AddItem(item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL),
+	menu->AddItem(item = new BMenuItem("Select all", new BMessage(B_SELECT_ALL),
 		'A'));
 	item->SetTarget(NULL, Window());
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem("Find" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgOpenFindWindow), 'F'));
 	item->SetTarget(this);
-	menu->AddItem(fFindAgainMenuItem = new BMenuItem("Find Again",
+	menu->AddItem(fFindAgainMenuItem = new BMenuItem("Find again",
 		new BMessage(kMsgFind), 'G'));
 	fFindAgainMenuItem->SetEnabled(false);
 	fFindAgainMenuItem->SetTarget(this);
@@ -1546,7 +1546,7 @@ ProbeView::AttachedToWindow()
 
 	// Font Size
 
-	subMenu = new BMenu("Font Size");
+	subMenu = new BMenu("Font size");
 	subMenu->SetRadioMode(true);
 	const int32 fontSizes[] = {9, 10, 11, 12, 13, 14, 18, 24, 36, 48};
 	int32 fontSize = int32(fDataView->FontSize() + 0.5);
@@ -1841,7 +1841,7 @@ ProbeView::_Save()
 		strerror(status));
 
 	(new BAlert("DiskProbe request",
-		buffer, "Ok", NULL, NULL,
+		buffer, "OK", NULL, NULL,
 		B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 
 	return status;
@@ -1857,7 +1857,7 @@ ProbeView::QuitRequested()
 		return true;
 
 	int32 chosen = (new BAlert("DiskProbe request",
-		"Save changes before closing?", "Don't Save", "Cancel", "Save",
+		"Save changes before closing?", "Don't save", "Cancel", "Save",
 		B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 
 	if (chosen == 0)

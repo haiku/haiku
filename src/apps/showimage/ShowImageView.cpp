@@ -1261,7 +1261,7 @@ ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap,
 		// If loop terminated because of a break, there was an error
 		BString errText;
 		errText << "Sorry, the file '" << name << "' could not be written.";
-		BAlert *palert = new BAlert(NULL, errText.String(), "Ok");
+		BAlert *palert = new BAlert(NULL, errText.String(), "OK");
 		palert->Go();
 	}
 

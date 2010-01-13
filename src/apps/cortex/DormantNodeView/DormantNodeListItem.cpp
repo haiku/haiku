@@ -236,7 +236,7 @@ void DormantNodeListItem::showContextMenu(
 	
 	// Add the "Get Info" item
 	BMessage *message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
-	menu->AddItem(new BMenuItem("Get Info", message));
+	menu->AddItem(new BMenuItem("Get info", message));
 
 	menu->SetTargetForItems(owner);
 	owner->ConvertToScreen(&point);

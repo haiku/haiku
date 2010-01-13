@@ -346,7 +346,7 @@ DiskProbe::RefsReceived(BMessage *message)
 				ref.name, strerror(status));
 
 			(new BAlert("DiskProbe request",
-				buffer, "Ok", NULL, NULL,
+				buffer, "OK", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 		}
 	}
@@ -465,7 +465,7 @@ DiskProbe::AboutRequested()
 	BAlert *alert = new BAlert("about", "DiskProbe\n"
 		"\twritten by Axel Dörfler\n"
 		"\tCopyright 2004-2007, Haiku.\n\n"
-		"original Be version by Robert Polic\n", "Ok");
+		"Original Be version by Robert Polic\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

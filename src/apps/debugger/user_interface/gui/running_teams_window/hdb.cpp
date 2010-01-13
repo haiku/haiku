@@ -129,7 +129,7 @@ Debugger::RefsReceived(BMessage *message)
                 ref.name, strerror(status));
 
             (new BAlert("Debugger request",
-                buffer, "Ok", NULL, NULL,
+                buffer, "OK", NULL, NULL,
                 B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
         }
     }
@@ -219,7 +219,7 @@ Debugger::ShowAbout()
 {
     BAlert *alert = new BAlert("about", "Debugger\n"
         "\twritten by Philippe Houdoin\n"
-        "\tCopyright 2009, Haiku Inc.\n", "Ok");
+        "\tCopyright 2009, Haiku, Inc.\n", "OK");
     BTextView *view = alert->TextView();
     BFont font;
 

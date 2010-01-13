@@ -44,7 +44,7 @@ ImportPLItemsCommand::ImportPLItemsCommand(Playlist* playlist,
 	fNewCount = temp.CountItems();
 	if (fNewCount <= 0) {
 		BAlert* alert = new BAlert("Nothing to Play", "None of the files "
-			"you wanted to play appear to be media files.", "Ok");
+			"you wanted to play appear to be media files.", "OK");
 		alert->Go(NULL);
 		return;
 	}

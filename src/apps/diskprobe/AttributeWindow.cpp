@@ -53,7 +53,7 @@ EditorTabView::EditorTabView(BRect frame, const char *name, button_width width,
 {
 	ContainerView()->MoveBy(-ContainerView()->Frame().left,
 		TabHeight() + 1 - ContainerView()->Frame().top);
-	fNoEditorView = new BStringView(ContainerView()->Bounds(), "Type Editor",
+	fNoEditorView = new BStringView(ContainerView()->Bounds(), "Type editor",
 		"No type editor available", B_FOLLOW_NONE);
 	fNoEditorView->ResizeToPreferred();
 	fNoEditorView->SetAlignment(B_ALIGN_CENTER);
@@ -128,7 +128,7 @@ EditorTabView::AddRawEditorTab(BView *view)
 
 	fRawTab = CountTabs();
 
-	view = new BView(BRect(0, 0, 5, 5), "Raw Editor", B_FOLLOW_NONE, 0);
+	view = new BView(BRect(0, 0, 5, 5), "Raw editor", B_FOLLOW_NONE, 0);
 	view->SetViewColor(ViewColor());
 	AddTab(view);
 }
@@ -208,7 +208,7 @@ AttributeWindow::AttributeWindow(BRect _rect, entry_ref *ref, const char *attrib
 	BMenu *menu = new BMenu("Attribute");
 
 	// the ProbeView save menu items will be inserted here
-	menu->AddItem(new BMenuItem("Remove from File", new BMessage(kMsgRemoveAttribute)));
+	menu->AddItem(new BMenuItem("Remove from file", new BMessage(kMsgRemoveAttribute)));
 	menu->AddSeparatorItem();
 
 	// the ProbeView print menu items will be inserted here

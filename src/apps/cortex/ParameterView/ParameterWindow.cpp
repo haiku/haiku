@@ -40,7 +40,7 @@ ParameterWindow::ParameterWindow(
 	BPoint position,
 	live_node_info &nodeInfo,
 	BMessenger *notifyTarget)
-	: BWindow(BRect(position, position + BPoint(50.0, 50.0)), 
+	: BWindow(BRect(position, position + BPoint(50.0, 50.0)),
 			  "parameters", B_DOCUMENT_WINDOW,
 			  B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS),
 	  m_node(nodeInfo.node),
@@ -61,7 +61,7 @@ ParameterWindow::ParameterWindow(
 	BMenuBar *menuBar = new BMenuBar(Bounds(), "ParameterWindow MenuBar");
 
 	BMenu *menu = new BMenu("Window");
-	menu->AddItem(new BMenuItem("Start Control Panel", 
+	menu->AddItem(new BMenuItem("Start control panel",
 								new BMessage(M_START_CONTROL_PANEL),
 								'P', B_COMMAND_KEY | B_SHIFT_KEY));
 	menu->AddSeparatorItem();
@@ -158,7 +158,7 @@ void ParameterWindow::MessageReceived(
 		default: {
 			BWindow::MessageReceived(message);
 		}
-	}	
+	}
 }
 
 bool ParameterWindow::QuitRequested() {
@@ -276,7 +276,7 @@ void ParameterWindow::_updateParameterView(
 	// adapt the window to the new dimensions
 	ResizeTo(m_idealSize.Width(), m_idealSize.Height());
 	m_zoomed = true;
-	
+
 	if (m_parameters) {
 		BRect paramRect = m_parameters->Bounds();
 		AddChild(new ParameterContainerView(paramRect, m_parameters));
@@ -285,7 +285,7 @@ void ParameterWindow::_updateParameterView(
 
 void ParameterWindow::_constrainToScreen() {
 	D_INTERNAL(("ParameterWindow::_constrainToScreen()\n"));
-	
+
 	BScreen screen(this);
 	BRect screenRect = screen.Frame();
 	BRect windowRect = Frame();

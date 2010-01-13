@@ -78,7 +78,7 @@ RouteWindow::RouteWindow(RouteAppNodeManager* manager)
 	item->SetTarget(be_app);
 	pFileMenu->AddItem(item);
 	pFileMenu->AddItem(new BSeparatorItem());
-	item = new BMenuItem("Save Nodes" B_UTF8_ELLIPSIS,
+	item = new BMenuItem("Save nodes" B_UTF8_ELLIPSIS,
 		new BMessage(RouteApp::M_SHOW_SAVE_PANEL), 'S');
 	item->SetTarget(be_app);
 	pFileMenu->AddItem(item);
@@ -137,19 +137,19 @@ RouteWindow::RouteWindow(RouteAppNodeManager* manager)
 	// construct the Window menu
 	BMenu* windowMenu = new BMenu("Window");
 	m_transportWindowItem = new BMenuItem(
-		"Show Transport",
+		"Show transport",
 		new BMessage(M_TOGGLE_TRANSPORT_WINDOW));
 	windowMenu->AddItem(m_transportWindowItem);
 
 	m_dormantNodeWindowItem = new BMenuItem(
-		"Show Add-Ons",
+		"Show add-ons",
 		new BMessage(M_TOGGLE_DORMANT_NODE_WINDOW));
 	windowMenu->AddItem(m_dormantNodeWindowItem);
 
 	windowMenu->AddItem(new BSeparatorItem());
 
 	m_pullPalettesItem = new BMenuItem(
-		"Pull Palettes",
+		"Pull palettes",
 		new BMessage(M_TOGGLE_PULLING_PALETTES));
 	windowMenu->AddItem(m_pullPalettesItem);
 
@@ -341,7 +341,7 @@ RouteWindow::MessageReceived(BMessage* pMsg)
 //
 	switch (pMsg->what) {
 		case B_ABOUT_REQUESTED:
-			(new BAlert("About", g_aboutText, "Ok"))->Go();
+			(new BAlert("About", g_aboutText, "OK"))->Go();
 			break;
 
 		case MediaRoutingView::M_GROUP_SELECTED:

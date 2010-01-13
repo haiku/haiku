@@ -164,7 +164,7 @@ void RouteAppNodeManager::nodeCreated(
 		if(ts->Node() != systemClock)
 		{
 			g->setTimeSource(ts->Node());
-			logMsg.AddString("line", "Synced to System Clock");
+			logMsg.AddString("line", "Synced to system clock");
 		}
 		ts->Release();
 	}
@@ -249,7 +249,7 @@ void RouteAppNodeManager::connectionMade(
 	logMsg.AddString("line", line);
 
 	NodeGroup *group = 0;
-	BString groupName = "Untitled Group ";
+	BString groupName = "Untitled group ";
 	if(_canGroup(producer) && _canGroup(consumer))
 	{
 		if (producer->group() && consumer->group() &&

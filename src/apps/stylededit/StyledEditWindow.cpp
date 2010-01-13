@@ -139,17 +139,17 @@ StyledEditWindow::InitWindow(uint32 encoding)
 
 	menu->AddItem(fSaveItem = new BMenuItem("Save", new BMessage(MENU_SAVE), 'S'));
 	fSaveItem->SetEnabled(false);
-	menu->AddItem(menuItem = new BMenuItem("Save As" B_UTF8_ELLIPSIS, new BMessage(MENU_SAVEAS)));
+	menu->AddItem(menuItem = new BMenuItem("Save as" B_UTF8_ELLIPSIS, new BMessage(MENU_SAVEAS)));
 	menuItem->SetShortcut('S',B_SHIFT_KEY);
 	menuItem->SetEnabled(true);
 
-	menu->AddItem(fRevertItem = new BMenuItem("Revert to Saved" B_UTF8_ELLIPSIS,
+	menu->AddItem(fRevertItem = new BMenuItem("Revert to saved" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_REVERT)));
 	fRevertItem->SetEnabled(false);
 	menu->AddItem(menuItem = new BMenuItem("Close", new BMessage(MENU_CLOSE), 'W'));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, new BMessage(MENU_PAGESETUP)));
+	menu->AddItem(menuItem = new BMenuItem("Page setup" B_UTF8_ELLIPSIS, new BMessage(MENU_PAGESETUP)));
 	menu->AddItem(menuItem = new BMenuItem("Print" B_UTF8_ELLIPSIS, new BMessage(MENU_PRINT), 'P'));
 
 	menu->AddSeparatorItem();
@@ -159,7 +159,7 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	menu = new BMenu("Edit");
 	fMenuBar->AddItem(menu);
 
-	menu->AddItem(fUndoItem = new BMenuItem("Can't Undo", new BMessage(B_UNDO), 'Z'));
+	menu->AddItem(fUndoItem = new BMenuItem("Can't undo", new BMessage(B_UNDO), 'Z'));
 	fUndoItem->SetEnabled(false);
 
 	menu->AddSeparatorItem();
@@ -178,17 +178,17 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	fClearItem->SetTarget(fTextView);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A'));
+	menu->AddItem(menuItem = new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A'));
 	menuItem->SetTarget(fTextView);
 
 	menu->AddSeparatorItem();
 	menu->AddItem(menuItem = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(MENU_FIND),'F'));
-	menu->AddItem(fFindAgainItem= new BMenuItem("Find Again",new BMessage(MENU_FIND_AGAIN),'G'));
+	menu->AddItem(fFindAgainItem= new BMenuItem("Find again",new BMessage(MENU_FIND_AGAIN),'G'));
 	fFindAgainItem->SetEnabled(false);
 
-	menu->AddItem(menuItem = new BMenuItem("Find Selection", new BMessage(MENU_FIND_SELECTION),'H'));
+	menu->AddItem(menuItem = new BMenuItem("Find selection", new BMessage(MENU_FIND_SELECTION),'H'));
 	menu->AddItem(menuItem = new BMenuItem("Replace" B_UTF8_ELLIPSIS, new BMessage(MENU_REPLACE),'R'));
-	menu->AddItem(fReplaceSameItem = new BMenuItem("Replace Same", new BMessage(MENU_REPLACE_SAME),'T'));
+	menu->AddItem(fReplaceSameItem = new BMenuItem("Replace same", new BMessage(MENU_REPLACE_SAME),'T'));
 	fReplaceSameItem->SetEnabled(false);
 
 	// Add the "Font"-menu:
@@ -269,7 +269,7 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	subMenu->AddItem(fAlignCenter = new BMenuItem("Center", new BMessage(ALIGN_CENTER)));
 	subMenu->AddItem(fAlignRight = new BMenuItem("Right", new BMessage(ALIGN_RIGHT)));
 	menu->AddItem(subMenu);
-	menu->AddItem(fWrapItem = new BMenuItem("Wrap Lines", new BMessage(WRAP_LINES)));
+	menu->AddItem(fWrapItem = new BMenuItem("Wrap lines", new BMessage(WRAP_LINES)));
 	fWrapItem->SetMarked(true);
 
 	fSavePanel = NULL;
@@ -542,7 +542,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 				// set mode
 				fCanUndo = false;
 				fCanRedo = true;
-				fUndoItem->SetLabel("Redo Typing");
+				fUndoItem->SetLabel("Redo typing");
 				fUndoItem->SetEnabled(true);
 				fUndoFlag = false;
 			} else {
@@ -562,7 +562,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 				// set mode
 				fCanUndo = true;
 				fCanRedo = false;
-				fUndoItem->SetLabel("Undo Typing");
+				fUndoItem->SetLabel("Undo typing");
 				fUndoItem->SetEnabled(true);
 				fRedoFlag = false;
 			}
@@ -744,7 +744,7 @@ StyledEditWindow::QuitRequested()
 
 	BString alertText("Save changes to the document \"");
 	alertText<< Title() <<"\"? ";
-	int32 index = _ShowAlert(alertText, "Cancel", "Don't Save", "Save",
+	int32 index = _ShowAlert(alertText, "Cancel", "Don't save", "Save",
 		B_WARNING_ALERT);
 
 	if (index == 0)
@@ -988,7 +988,7 @@ StyledEditWindow::RevertToSaved()
 		return;
 
 	// clear undo modes
-	fUndoItem->SetLabel("Can't Undo");
+	fUndoItem->SetLabel("Can't undo");
 	fUndoItem->SetEnabled(false);
 	fUndoFlag = false;
 	fCanUndo = false;

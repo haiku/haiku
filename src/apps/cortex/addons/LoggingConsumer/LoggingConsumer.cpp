@@ -28,22 +28,22 @@ static BParameterWeb* build_parameter_web()
 	BParameterWeb* web = new BParameterWeb;
 
 	BParameterGroup* mainGroup = web->MakeGroup("LoggingConsumer Parameters");
-	BParameterGroup* group = mainGroup->MakeGroup("Latency Control");
+	BParameterGroup* group = mainGroup->MakeGroup("Latency control");
 	BParameter* nullParam = group->MakeNullParameter(INPUT_NULL_PARAM, B_MEDIA_NO_TYPE, "Latency", B_GENERIC);
 	BParameter* latencyParam = group->MakeContinuousParameter(LATENCY_PARAM, B_MEDIA_NO_TYPE, "",
-		B_GAIN, "msec", 5, 100, 5);
+		B_GAIN, "ms", 5, 100, 5);
 	nullParam->AddOutput(latencyParam);
 	latencyParam->AddInput(nullParam);
 
-	group = mainGroup->MakeGroup("CPU Percentage");
-	nullParam = group->MakeNullParameter(CPU_NULL_PARAM, B_MEDIA_NO_TYPE, "CPU Spin Percentage", B_GENERIC);
+	group = mainGroup->MakeGroup("CPU percentage");
+	nullParam = group->MakeNullParameter(CPU_NULL_PARAM, B_MEDIA_NO_TYPE, "CPU spin percentage", B_GENERIC);
 	BContinuousParameter* cpuParam = group->MakeContinuousParameter(CPU_SPIN_PARAM, B_MEDIA_NO_TYPE, "",
 		B_GAIN, "percent", 5, 80, 5);
 	nullParam->AddOutput(cpuParam);
 	cpuParam->AddInput(nullParam);
 
 	group = mainGroup->MakeGroup("Priority");
-	nullParam = group->MakeNullParameter(PRIO_NULL_PARAM, B_MEDIA_NO_TYPE, "Thread Priority", B_GENERIC);
+	nullParam = group->MakeNullParameter(PRIO_NULL_PARAM, B_MEDIA_NO_TYPE, "Thread priority", B_GENERIC);
 	BDiscreteParameter* prioParam = group->MakeDiscreteParameter(PRIORITY_PARAM, B_MEDIA_NO_TYPE, "", B_GENERIC);
 	prioParam->AddItem(5, "B_LOW_PRIORITY");
 	prioParam->AddItem(10, "B_NORMAL_PRIORITY");

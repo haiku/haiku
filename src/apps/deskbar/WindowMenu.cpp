@@ -173,7 +173,7 @@ TWindowMenu::AttachedToWindow()
 	int32 itemCount = CountItems() + parentMenuItems;
 	if (itemCount < 1) {
 		TWindowMenuItem* noWindowsItem =
- 			new TWindowMenuItem("No Windows", -1, false, false);
+ 			new TWindowMenuItem("No windows", -1, false, false);
 
 		noWindowsItem->SetEnabled(false);
 
@@ -183,7 +183,7 @@ TWindowMenu::AttachedToWindow()
 		// it. (but we only add this option if the application is not Tracker.)
  		if (fApplicationSignature.ICompare(kTrackerSignature) != 0) {
 			AddSeparatorItem();
-			AddItem(new TShowHideMenuItem("Quit Application", fTeam,
+			AddItem(new TShowHideMenuItem("Quit application", fTeam,
 				B_QUIT_REQUESTED));
  		}
 	} else {
@@ -191,11 +191,11 @@ TWindowMenu::AttachedToWindow()
 		//	to the menu
 		if (!dragging) {
 			TShowHideMenuItem* hide =
-				new TShowHideMenuItem("Hide All", fTeam, B_MINIMIZE_WINDOW);
+				new TShowHideMenuItem("Hide all", fTeam, B_MINIMIZE_WINDOW);
 			TShowHideMenuItem* show =
-				new TShowHideMenuItem("Show All", fTeam, B_BRING_TO_FRONT);
+				new TShowHideMenuItem("Show all", fTeam, B_BRING_TO_FRONT);
 			TShowHideMenuItem* close =
-				new TShowHideMenuItem("Close All", fTeam, B_QUIT_REQUESTED);
+				new TShowHideMenuItem("Close all", fTeam, B_QUIT_REQUESTED);
 
 			if (miniCount == itemCount)
 				hide->SetEnabled(false);

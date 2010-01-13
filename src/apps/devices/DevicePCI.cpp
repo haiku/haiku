@@ -74,7 +74,7 @@ DevicePCI::InitFromAttributes()
 	const char *venFull;
 	get_vendor_info(fVendorId, &venShort, &venFull);
 	if (!venShort && !venFull) {
-		ManufacturerName << "Unkown";
+		ManufacturerName << "Unknown";
 	} else if (venShort && venFull) {
 		ManufacturerName << venFull << "(" << venShort << ")";
 	} else {
@@ -98,7 +98,7 @@ DevicePCI::InitFromAttributes()
 	SetAttribute("Manufacturer", ManufacturerName);
 	SetAttribute("Driver used", "Not implemented");
 	SetAttribute("Device paths", "Not implemented");
-	SetAttribute("Class Info", classInfo);
+	SetAttribute("Class info", classInfo);
 	fCategory = (Category)fClassBaseId;
 	BString outlineName;
 	outlineName << ManufacturerName << " " << DeviceName;

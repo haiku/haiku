@@ -249,11 +249,11 @@ PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 {
 	AddColumn(new PartitionColumn("Device", 150, 50, 500,
 		B_TRUNCATE_MIDDLE), kDeviceColumn);
-	AddColumn(new PartitionColumn("Filesystem", 100, 50, 500,
+	AddColumn(new PartitionColumn("File system", 100, 50, 500,
 		B_TRUNCATE_MIDDLE), kFilesystemColumn);
-	AddColumn(new PartitionColumn("Volume Name", 130, 50, 500,
+	AddColumn(new PartitionColumn("Volume name", 130, 50, 500,
 		B_TRUNCATE_MIDDLE), kVolumeNameColumn);
-	AddColumn(new PartitionColumn("Mounted At", 100, 50, 500,
+	AddColumn(new PartitionColumn("Mounted at", 100, 50, 500,
 		B_TRUNCATE_MIDDLE), kMountedAtColumn);
 	AddColumn(new PartitionColumn("Size", 100, 50, 500,
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);

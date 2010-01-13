@@ -42,13 +42,13 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	BRect rect(0, 0, 32767, 15);
 	BMenuBar* menuBar = new BMenuBar(rect, "");
 	menu = new BMenu("File");
-	menu->AddItem(item = new BMenuItem("New Person" B_UTF8_ELLIPSIS, new BMessage(M_NEW), 'N'));
+	menu->AddItem(item = new BMenuItem("New person" B_UTF8_ELLIPSIS, new BMessage(M_NEW), 'N'));
 	item->SetTarget(NULL, be_app);
 	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W'));
 	menu->AddSeparatorItem();
 	menu->AddItem(fSave = new BMenuItem("Save", new BMessage(M_SAVE), 'S'));
 	fSave->SetEnabled(FALSE);
-	menu->AddItem(new BMenuItem("Save As"B_UTF8_ELLIPSIS, new BMessage(M_SAVE_AS)));
+	menu->AddItem(new BMenuItem("Save as"B_UTF8_ELLIPSIS, new BMessage(M_SAVE_AS)));
 	menu->AddItem(fRevert = new BMenuItem("Revert", new BMessage(M_REVERT), 'R'));
 	fRevert->SetEnabled(FALSE);
 	menu->AddSeparatorItem();
@@ -68,7 +68,7 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	fCopy->SetTarget(NULL, this);
 	menu->AddItem(fPaste = new BMenuItem("Paste", new BMessage(B_PASTE), 'V'));
 	fPaste->SetTarget(NULL, this);
-	menu->AddItem(item = new BMenuItem("Select All", new BMessage(M_SELECT), 'A'));
+	menu->AddItem(item = new BMenuItem("Select all", new BMessage(M_SELECT), 'A'));
 	item->SetTarget(NULL, this);
 	menuBar->AddItem(menu);
 	AddChild(menuBar);

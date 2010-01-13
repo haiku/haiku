@@ -1796,11 +1796,11 @@ TermView::_SecondaryMouseButtonDropped(BMessage* msg)
 	cpMessage->what = kSecondaryMouseDropAction;
 	cpMessage->AddInt8("action", kCopyFiles);
 
-	BMenuItem* insertItem = new BMenuItem("Insert Path", insertMessage);
-	BMenuItem* cdItem = new BMenuItem("Change Directory", cdMessage);
-	BMenuItem* lnItem = new BMenuItem("Create Link Here", lnMessage);
-	BMenuItem* mvItem = new BMenuItem("Move Here", mvMessage);
-	BMenuItem* cpItem = new BMenuItem("Copy Here", cpMessage);
+	BMenuItem* insertItem = new BMenuItem("Insert path", insertMessage);
+	BMenuItem* cdItem = new BMenuItem("Change directory", cdMessage);
+	BMenuItem* lnItem = new BMenuItem("Create link here", lnMessage);
+	BMenuItem* mvItem = new BMenuItem("Move here", mvMessage);
+	BMenuItem* cpItem = new BMenuItem("Copy here", cpMessage);
 	BMenuItem* chItem = new BMenuItem("Cancel", NULL);
 
 	// if the refs point to different directorys disable the cd menu item
@@ -2742,7 +2742,7 @@ TermView::AboutRequested()
 		"Terminal\n\n"
 		"written by Kazuho Okui and Takashi Murai\n"
 		"updated by Kian Duffy and others\n\n"
-		"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n", "Ok");
+		"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n", "OK");
 	if (alert != NULL)
 		alert->Go();
 }

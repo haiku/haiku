@@ -24,15 +24,15 @@
 
 PreferencesWindow::PreferencesWindow(BRect frame)
 	:
-	BWindow(frame, "Deskbar Preferences", B_TITLED_WINDOW,
+	BWindow(frame, "Deskbar preferences", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	// Controls
-	fMenuRecentDocuments = new BCheckBox("Recent Documents:",
+	fMenuRecentDocuments = new BCheckBox("Recent documents:",
 		new BMessage(kUpdateRecentCounts));
-	fMenuRecentApplications = new BCheckBox("Recent Applications:",
+	fMenuRecentApplications = new BCheckBox("Recent applications:",
 		new BMessage(kUpdateRecentCounts));
-	fMenuRecentFolders = new BCheckBox("Recent Folders:",
+	fMenuRecentFolders = new BCheckBox("Recent folders:",
 		new BMessage(kUpdateRecentCounts));
 
 	fMenuRecentDocumentCount = new BTextControl(NULL, NULL,
@@ -42,23 +42,23 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fMenuRecentFolderCount = new BTextControl(NULL, NULL,
 		new BMessage(kUpdateRecentCounts));
 
-	fAppsSort = new BCheckBox("Sort Running Applications",
+	fAppsSort = new BCheckBox("Sort running applications",
 		new BMessage(kSortRunningApps));
-	fAppsSortTrackerFirst = new BCheckBox("Tracker Always First",
+	fAppsSortTrackerFirst = new BCheckBox("Tracker always first",
 		new BMessage(kTrackerFirst));
-	fAppsShowExpanders = new BCheckBox("Show Application Expander",
+	fAppsShowExpanders = new BCheckBox("Show application expander",
 		new BMessage(kSuperExpando));
-	fAppsExpandNew = new BCheckBox("Expand New Applications",
+	fAppsExpandNew = new BCheckBox("Expand new applications",
 		new BMessage(kExpandNewTeams));
 
-	fClock24Hours = new BCheckBox("24 Hour Clock", new BMessage(kMilTime));
-	fClockSeconds = new BCheckBox("Show Seconds",
+	fClock24Hours = new BCheckBox("24 hour clock", new BMessage(kMilTime));
+	fClockSeconds = new BCheckBox("Show seconds",
 		new BMessage(kShowSeconds));
-	fClockEuropeanDate = new BCheckBox("European Date",
+	fClockEuropeanDate = new BCheckBox("European date",
 		new BMessage(kEuroDate));
-	fClockFullDate = new BCheckBox("Full Date", new BMessage(kFullDate));
+	fClockFullDate = new BCheckBox("Full date", new BMessage(kFullDate));
 
-	fWindowAlwaysOnTop = new BCheckBox("Always On Top",
+	fWindowAlwaysOnTop = new BCheckBox("Always on top",
 		new BMessage(kAlwaysTop));
 	fWindowAutoRaise = new BCheckBox("Auto-raise", new BMessage(kAutoRaise));
 
@@ -183,7 +183,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 					.Add(fMenuRecentApplicationCount)
 					.End()
 				.End()
-			.Add(new BButton("Edit Menu" B_UTF8_ELLIPSIS,
+			.Add(new BButton("Edit menu" B_UTF8_ELLIPSIS,
 				new BMessage(kEditMenuInTracker)))
 			.SetInsets(10, 10, 10, 10)
 			.End()

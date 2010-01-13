@@ -570,19 +570,19 @@ PowerStatusReplicant::MouseDown(BPoint point)
 	menu->SetFont(be_plain_font);
 
 	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem("Show Text Label",
+	menu->AddItem(item = new BMenuItem("Show text label",
 		new BMessage(kMsgToggleLabel)));
 	if (fShowLabel)
 		item->SetMarked(true);
-	menu->AddItem(item = new BMenuItem("Show Status Icon",
+	menu->AddItem(item = new BMenuItem("Show status icon",
 		new BMessage(kMsgToggleStatusIcon)));
 	if (fShowStatusIcon)
 		item->SetMarked(true);
-	menu->AddItem(new BMenuItem(!fShowTime ? "Show Time" : "Show Percent",
+	menu->AddItem(new BMenuItem(!fShowTime ? "Show time" : "Show percent",
 		new BMessage(kMsgToggleTime)));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Battery Info" B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem("Battery info" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgToggleExtInfo)));
 
 	menu->AddSeparatorItem();
@@ -601,7 +601,7 @@ PowerStatusReplicant::_AboutRequested()
 {
 	BAlert* alert = new BAlert("about", "PowerStatus\n"
 		"written by Axel Dörfler, Clemens Zeidler\n"
-		"Copyright 2006, Haiku, Inc.\n", "Ok");
+		"Copyright 2006, Haiku, Inc.\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

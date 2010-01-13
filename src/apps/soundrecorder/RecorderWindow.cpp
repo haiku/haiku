@@ -379,14 +379,14 @@ RecorderWindow::InitWindow()
 		r.InsetBy(10, 8);
 		r.top -= 1;
 		fFileInfoBox = new BBox(r, "fileinfo", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-		fFileInfoBox->SetLabel("File Info");
+		fFileInfoBox->SetLabel("File info");
 
 		r = fFileInfoBox->Bounds();
 		r.left = 8;
 		r.top = 13;
 		r.bottom = r.top + 15;
 		r.right -= 10;
-		fFilename = new BStringView(r, "filename", "File Name:");
+		fFilename = new BStringView(r, "filename", "File name:");
 		fFileInfoBox->AddChild(fFilename);
 		r.top += 13;
 		r.bottom = r.top + 15;
@@ -402,11 +402,11 @@ RecorderWindow::InitWindow()
 		fFileInfoBox->AddChild(fChannels);
 		r.top += 13;
 		r.bottom = r.top + 15;
-		fSampleSize = new BStringView(r, "samplesize", "Sample Size:");
+		fSampleSize = new BStringView(r, "samplesize", "Sample size:");
 		fFileInfoBox->AddChild(fSampleSize);
 		r.top += 13;
 		r.bottom = r.top + 15;
-		fSampleRate = new BStringView(r, "samplerate", "Sample Rate:");
+		fSampleRate = new BStringView(r, "samplerate", "Sample rate:");
 		fFileInfoBox->AddChild(fSampleRate);
 		r.top += 13;
 		r.bottom = r.top + 15;
@@ -429,7 +429,7 @@ RecorderWindow::InitWindow()
 			WINDOW((stderr, "dropped %ld inputs\n", real_count - max_input_count));
 			real_count = max_input_count;
 		}
-		char selected_name[B_MEDIA_NAME_LENGTH] = "Default Input";
+		char selected_name[B_MEDIA_NAME_LENGTH] = "Default input";
 		BMessage * msg;
 		BMenuItem * item;
 		for (int i = 0; i < real_count; i++) {
@@ -1093,7 +1093,7 @@ RecorderWindow::UpdatePlayFile(SoundListItem* item, bool updateDisplay)
 	if (!updateDisplay)
 		return B_OK;
 
-	BString filename = "File Name: ";
+	BString filename = "File name: ";
 	filename << ref.name;
 	fFilename->SetText(filename.String());
 
@@ -1111,9 +1111,9 @@ RecorderWindow::UpdatePlayFile(SoundListItem* item, bool updateDisplay)
 	}
 	BString channels = "Channels: ";
 	channels << fPlayFormat.u.raw_audio.channel_count;
-	BString samplesize = "Sample Size: ";
+	BString samplesize = "Sample size: ";
 	samplesize << 8 * (fPlayFormat.u.raw_audio.format & 0xf) << " bits";
-	BString samplerate = "Sample Rate: ";
+	BString samplerate = "Sample rate: ";
 	samplerate << (int)fPlayFormat.u.raw_audio.frame_rate;
 	BString durationString = "Duration: ";
 	bigtime_t duration = fPlayTrack->Duration();
@@ -1302,7 +1302,7 @@ RecorderWindow::RefsReceived(BMessage *msg)
 	}
 
 	if (countBad > 0 && countGood == 0)
-		(new BAlert("Nothing to Play", "None of the files appear to be "
+		(new BAlert("Nothing to play", "None of the files appear to be "
 			"audio files", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 	else if (countGood > 0) {
 		if (countBad > 0)

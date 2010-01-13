@@ -54,14 +54,14 @@ typedef struct {
 
 static PriorityRec	priorities[] = {
 	{"Idle", 	0},
-	{"Lowest Active",	1},
+	{"Lowest active",	1},
 	{"Low",	5},
 	{"Normal", 10},
 	{"Display", 15},
-	{"Urgent Display", 20},
-	{"Real Time Display", 100},
+	{"Urgent display", 20},
+	{"Real-time display", 100},
 	{"Urgent", 110},
-	{"Real Time", 120},
+	{"Real-time", 120},
 	{"",	-1}
 };
 
@@ -88,7 +88,7 @@ PriorityMenu::BuildMenu()
 		message = new BMessage('PrTh');
 		message->AddInt32("thread", fThreadID);
 		message->AddInt32("priority", priority->priority);
-		sprintf(name, "%s Priority [%d]", priority->name, (int)priority->priority);
+		sprintf(name, "%s priority [%d]", priority->name, (int)priority->priority);
 		item = new BMenuItem(name, message);
 		item->SetTarget(gPCView);
 		if (fPriority == priority->priority)

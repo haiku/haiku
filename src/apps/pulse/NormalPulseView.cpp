@@ -50,9 +50,9 @@ NormalPulseView::NormalPulseView(BRect rect)
 	SetViewColor(color);
 	SetLowColor(color);
 
-	mode1->SetLabel("Mini Mode");
+	mode1->SetLabel("Mini mode");
 	mode1->SetMessage(new BMessage(PV_MINI_MODE));
-	mode2->SetLabel("Deskbar Mode");
+	mode2->SetLabel("Deskbar mode");
 	mode2->SetMessage(new BMessage(PV_DESKBAR_MODE));
 	
 	DetermineVendorAndProcessor();
@@ -69,7 +69,7 @@ NormalPulseView::NormalPulseView(BRect rect)
 		BRect r(PROGRESS_MLEFT, PROGRESS_MTOP + ITEM_OFFSET * x,
 			PROGRESS_MLEFT + ProgressBar::PROGRESS_WIDTH,
 			PROGRESS_MTOP + ITEM_OFFSET * x + ProgressBar::PROGRESS_HEIGHT);
-		fProgressBars[x] = new ProgressBar(r, "CPU Progress Bar");
+		fProgressBars[x] = new ProgressBar(r, "CPU progress bar");
 		AddChild(fProgressBars[x]);
 
 		r.Set(CPUBUTTON_MLEFT, CPUBUTTON_MTOP + ITEM_OFFSET * x,

@@ -76,7 +76,7 @@ SmartTabView::MouseDown(BPoint point)
 				message->AddInt32("index", tabIndex);
 
 				BPopUpMenu* popUpMenu = new BPopUpMenu("tab menu");
-				popUpMenu->AddItem(new BMenuItem("Close Tab", message));
+				popUpMenu->AddItem(new BMenuItem("Close tab", message));
 				popUpMenu->SetAsyncAutoDestruct(true);
 				popUpMenu->SetTargetForItems(BMessenger(this));
 				popUpMenu->Go(ConvertToScreen(point), true, true, true);

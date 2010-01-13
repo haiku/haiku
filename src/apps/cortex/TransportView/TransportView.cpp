@@ -525,16 +525,16 @@ void TransportView::_releaseGroup() {
 
 const char _run_mode_strings[][20] = {
 	"Offline",
-	"Decrease Precision",
-	"Increase Latency",
-	"Drop Data",
+	"Decrease precision",
+	"Increase latency",
+	"Drop data",
 	"Recording"
 };
 const int _run_modes = 5;
 
 //const char _time_source_strings[][20] = {
-//	"DAC Time Source",
-//	"System Clock"
+//	"DAC time source",
+//	"System clock"
 //};
 //const int _time_sources = 2;
 
@@ -564,7 +564,7 @@ void TransportView::_constructControls() {
 	m_runModeView = new BMenuField(
 		BRect(),
 		"runModeView",
-		"Run Mode:",
+		"Run mode:",
 		new BPopUpMenu("runModeMenu"));
 	_populateRunModeMenu(
 		m_runModeView->Menu());
@@ -573,7 +573,7 @@ void TransportView::_constructControls() {
 	m_timeSourceView = new BMenuField(
 		BRect(),
 		"timeSourceView",
-		"Time Source:",
+		"Time source:",
 		new BPopUpMenu("timeSourceMenu"));
 	_populateTimeSourceMenu(
 		m_timeSourceView->Menu());
@@ -706,7 +706,7 @@ void TransportView::_populateTimeSourceMenu(
 			&dacTimeSource,
 			sizeof(media_node));
 		i = new BMenuItem(
-			"DAC Time Source",
+			"DAC time source",
 			m);
 		menu->AddItem(i);
 		_addGroupTarget(i);
@@ -721,7 +721,7 @@ void TransportView::_populateTimeSourceMenu(
 			&systemTimeSource,
 			sizeof(media_node));
 		i = new BMenuItem(
-			"System Clock",
+			"System clock",
 			m);
 		menu->AddItem(i);
 		_addGroupTarget(i);

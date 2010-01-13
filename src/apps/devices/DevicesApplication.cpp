@@ -56,7 +56,7 @@ DevicesApplication::ShowAbout()
 		"\tBased on listdev by Jérôme Duval\n"
 		"\tand the previous Devices preference\n"
 		"\tby Jérôme Duval and Sikosis\n"
-		"\tCopyright 2009, Haiku Inc.\n", "Ok");
+		"\tCopyright 2009, Haiku, Inc.\n", "OK");
 	BTextView* view = alert->TextView();
 	BFont font;
 

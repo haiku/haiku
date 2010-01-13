@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -729,17 +729,17 @@ PathListView::SetMenu(BMenu* menu)
 		return;
 
 	fAddMI = new BMenuItem("Add", new BMessage(MSG_ADD));
-	fAddRectMI = new BMenuItem("Add Rect", new BMessage(MSG_ADD_RECT));
-	fAddCircleMI = new BMenuItem("Add Circle"/*B_UTF8_ELLIPSIS*/,
+	fAddRectMI = new BMenuItem("Add rect", new BMessage(MSG_ADD_RECT));
+	fAddCircleMI = new BMenuItem("Add circle"/*B_UTF8_ELLIPSIS*/,
 		new BMessage(MSG_ADD_CIRCLE));
-//	fAddArcMI = new BMenuItem("Add Arc"B_UTF8_ELLIPSIS,
+//	fAddArcMI = new BMenuItem("Add arc"B_UTF8_ELLIPSIS,
 //		new BMessage(MSG_ADD_ARC));
 	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
 	fReverseMI = new BMenuItem("Reverse", new BMessage(MSG_REVERSE));
-	fCleanUpMI = new BMenuItem("Clean Up", new BMessage(MSG_CLEAN_UP));
-	fRotateIndicesRightMI = new BMenuItem("Rotate Indices Right",
+	fCleanUpMI = new BMenuItem("Clean up", new BMessage(MSG_CLEAN_UP));
+	fRotateIndicesRightMI = new BMenuItem("Rotate indices right",
 		new BMessage(MSG_ROTATE_INDICES_CCW), 'R');
-	fRotateIndicesLeftMI = new BMenuItem("Rotate Indices Left",
+	fRotateIndicesLeftMI = new BMenuItem("Rotate indices left",
 		new BMessage(MSG_ROTATE_INDICES_CW), 'R', B_SHIFT_KEY);
 	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));
 

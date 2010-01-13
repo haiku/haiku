@@ -229,14 +229,14 @@ PoorManWindow::MessageReceived(BMessage* message)
 		saveConsoleFilePanel->Show();
 		break;
 	case MSG_FILE_PANEL_SAVE_CONSOLE:
-		printf("FilePanel: Save Console\n");
+		printf("FilePanel: Save console\n");
 		SaveConsole(message, false);
 		break;
 	case MSG_MENU_FILE_SAVE_SELECTION:
 		saveConsoleSelectionFilePanel->Show();
 		break;
 	case MSG_FILE_PANEL_SAVE_CONSOLE_SELECTION:
-		printf("FilePanel: Save Console Selection\n");
+		printf("FilePanel: Save console selection\n");
 		SaveConsole(message, true);
 		break;
 	case MSG_FILE_PANEL_SELECT_WEB_DIR:		

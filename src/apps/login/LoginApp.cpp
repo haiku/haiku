@@ -48,18 +48,18 @@ LoginApp::ReadyToRun()
 
 	if (fEditShelfMode) {
 		(new BAlert("Info", "You can customize the desktop shown "
-			"behind the Login app by dropping replicants onto it.\n"
+			"behind the Login application by dropping replicants onto it.\n"
 			"\n"
-			"When you are finished just quit the application (Alt-Q).", 
-			"Ok"))->Go(NULL);
+			"When you are finished just quit the application (Alt-Q).",
+			"OK"))->Go(NULL);
 	} else {
 		BRect frame(0, 0, 400, 150);
-		frame.OffsetBySelf(screen.Frame().Width()/2 - frame.Width()/2, 
+		frame.OffsetBySelf(screen.Frame().Width()/2 - frame.Width()/2,
 			screen.Frame().Height()/2 - frame.Height()/2);
 		fLoginWindow = new LoginWindow(frame);
 		fLoginWindow->Show();
 	}
-	
+
 	fDesktopWindow = new DesktopWindow(screen.Frame(), fEditShelfMode);
 	fDesktopWindow->Show();
 	// TODO: add a shelf with Activity Monitor replicant :)
@@ -89,12 +89,12 @@ LoginApp::MessageReceived(BMessage *message)
 			if (error < B_OK) {
 				BString msg("Error: ");
 				msg << strerror(error);
-				(new BAlert("Error", msg.String(), "Ok"))->Go();
+				(new BAlert("Error", msg.String(), "OK"))->Go();
 			}
 			break;
 		}
 		case kSuspendAction:
-			(new BAlert("Error", "Unimplemented", "Ok"))->Go();
+			(new BAlert("Error", "Unimplemented", "OK"))->Go();
 			break;
 #endif
 	default:
@@ -106,8 +106,7 @@ LoginApp::MessageReceived(BMessage *message)
 void
 LoginApp::ArgvReceived(int32 argc, char **argv)
 {
-	int i;
-	for (i = 1; i < argc; i++) {
+	for (int i = 1; i < argc; i++) {
 		BString arg(argv[i]);
 		//printf("[%d]: %s\n", i, argv[i]);
 		if (arg == "--edit")
@@ -118,7 +117,7 @@ LoginApp::ArgvReceived(int32 argc, char **argv)
 			printf("Login application for Haiku\nUsage:\n");
 			printf("%s [--nonmodal] [--edit]\n", argv[0]);
 			printf("--nonmodal	Do not make the window modal\n");
-			printf("--edit	Launch in Shelf editting mode to "
+			printf("--edit	Launch in shelf editting mode to "
 				"allow customizing the desktop.\n");
 			// just return to the shell
 			exit((arg == "--help") ? 0 : 1);
@@ -143,10 +142,10 @@ LoginApp::TryLogin(BMessage *message)
 		if (err == B_OK) {
 			reply.what = kLoginOk;
 			message->SendReply(&reply);
-			
+
 			if (password == NULL)
 				return;
-			
+
 			// start a session
 			//kSetProgress
 			StartUserSession(login);
@@ -155,7 +154,7 @@ LoginApp::TryLogin(BMessage *message)
 			message->SendReply(&reply);
 			return;
 		}
-		
+
 	} else {
 		reply.AddInt32("error", EINVAL);
 		message->SendReply(&reply);
@@ -168,7 +167,7 @@ status_t
 LoginApp::ValidateLogin(const char *login, const char *password)
 {
 	struct passwd *pwd;
-	
+
 	pwd = getpwnam(login);
 	if (!pwd)
 		return ENOENT;
@@ -207,7 +206,7 @@ LoginApp::getpty(char *pty, char *tty)
 	static const char minor[] = "0123456789abcdef";
 	uint32 i, j;
 	int32 fd = -1;
-	
+
 	for (i = 0; i < sizeof(major); i++)
 	{
 		for (j = 0; j < sizeof(minor); j++)
@@ -221,7 +220,7 @@ LoginApp::getpty(char *pty, char *tty)
 			}
 		}
 	}
-	
+
 	return fd;
 }
 

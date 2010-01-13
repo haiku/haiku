@@ -44,7 +44,7 @@ enum {
 
 
 PackageInfo::PackageInfo()
-	:	
+	:
 	fStatus(B_NO_INIT),
 	fPackageFile(0),
 	fDescription(T("No package available.")),
@@ -55,7 +55,7 @@ PackageInfo::PackageInfo()
 
 
 PackageInfo::PackageInfo(const entry_ref *ref)
-	:	
+	:
 	fStatus(B_NO_INIT),
 	fPackageFile(new BFile(ref, B_READ_ONLY)),
 	fDescription(T("No package selected.")),
@@ -97,13 +97,13 @@ PackageInfo::Parse()
 	if (!fPackageFile || fPackageFile->InitCheck() != B_OK) {
 		RETURN_AND_SET_STATUS(B_ERROR);
 	}
-	
+
 	// Check for the presence of the first AlB tag - as the 'magic number'.
 	// This also ensures that the file header section is present - which
 	// is a crucial pkg section
 	char buffer[16];
 	fPackageFile->Read(buffer, 8);
-	if (buffer[0] != 'A' || buffer[1] != 'l' || buffer[2] != 'B' 
+	if (buffer[0] != 'A' || buffer[1] != 'l' || buffer[2] != 'B'
 		|| buffer[3] != 0x1a) {
 		RETURN_AND_SET_STATUS(B_ERROR);
 	}
@@ -111,7 +111,7 @@ PackageInfo::Parse()
 	fHasImage = false;
 
 	// Parse all known parts of the given .pkg file
-	
+
 	uint32 i;
 	int8 bytesRead;
 	off_t actualSize = 0;
@@ -122,7 +122,7 @@ PackageInfo::Parse()
 
 	system_info sysinfo;
 	get_system_info(&sysinfo);
-	
+
 	uint64 infoOffset = 0, groupsOffset = 0;
 	uint64 length = 0;
 
@@ -261,7 +261,7 @@ PackageInfo::Parse()
 			fDisclaimer = (char *)disclaimer;
 			delete disclaimer;
 
-			continue;		
+			continue;
 		} else if (!memcmp(buffer, splashScreenMarker, 7)) {
 			uint64 length;
 			fPackageFile->Read(&length, 8);
@@ -283,9 +283,9 @@ PackageInfo::Parse()
 				delete compressed;
 				RETURN_AND_SET_STATUS(B_ERROR);
 			}
-			
+
 			fImage.SetSize(original);
-			status_t ret = inflate_data(compressed, length, 
+			status_t ret = inflate_data(compressed, length,
 				static_cast<uint8 *>(const_cast<void *>(fImage.Buffer())),
 				original);
 			delete compressed;
@@ -393,7 +393,7 @@ PackageInfo::Parse()
 					}
 
 					fProfiles.AddItem(new pkg_profile(group));
-					parser_debug("Group added: %s %s\n", group.name.String(), 
+					parser_debug("Group added: %s %s\n", group.name.String(),
 						group.description.String());
 
 					groupStarted = false;
@@ -874,7 +874,7 @@ PackageInfo::Parse()
 					BString dest = "";
 					uint8 localType = pathType;
 
-					if (path == 0xfffffffe) 
+					if (path == 0xfffffffe)
 						dest << itemPath << "/" << nameString.String();
 					else if (path == 0xffffffff) {
 						localType = P_INSTALL_PATH;
@@ -912,7 +912,7 @@ PackageInfo::Parse()
 						signatureString, mode);
 				}
 			} else if (element == P_DIRECTORY) {
-				if (itemGroups) { 
+				if (itemGroups) {
 					if (installDirectoryFlag != 0) {
 						if (installDirectoryFlag < 0) {
 							// Normal directory
@@ -938,7 +938,7 @@ PackageInfo::Parse()
 										pathType = P_SYSTEM_PATH;
 									else
 										pathType = P_USER_PATH;
-		
+
 									itemPath = *def;
 								} else {
 									BPath *def = static_cast<BPath *>(
@@ -981,7 +981,7 @@ PackageInfo::Parse()
 					BString dest = "";
 					uint8 localType = pathType;
 
-					if (path == 0xfffffffe) 
+					if (path == 0xfffffffe)
 						dest << itemPath << "/" << nameString.String();
 					else if (path == 0xffffffff) {
 						localType = P_INSTALL_PATH;
@@ -998,7 +998,7 @@ PackageInfo::Parse()
 								localType = P_SYSTEM_PATH;
 							else
 								localType = P_USER_PATH;
-							
+
 							dest << *def << "/" << nameString;
 						} else {
 							BPath *def = static_cast<BPath *>(systemPaths.ItemAt(path));
@@ -1011,7 +1011,7 @@ PackageInfo::Parse()
 						}
 					}
 
-					parser_debug("Adding link: %s! (type %s)\n", dest.String(), 
+					parser_debug("Adding link: %s! (type %s)\n", dest.String(),
 						pathType == P_SYSTEM_PATH
 							? "System" : localType == P_INSTALL_PATH
 							? "Install" : "User");
@@ -1056,12 +1056,13 @@ PackageInfo::Parse()
 		// Inform the user of a possible error
 		int32 selection;
 		BAlert *warning = new BAlert(T("filesize_wrong"),
-			T("There seems to be a filesize mismatch in the package file. "
+			T("There seems to be a file size mismatch in the package file. "
 				"The package might be corrupted or have been modified after its "
-				"creation. Do you still wish to continue?"), T("Yes"), T("No"), NULL, 
+				"creation. Do you still wish to continue?"), T("Continue"),
+				T("Abort"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		selection = warning->Go();
-		
+
 		if (selection == 1) {
 			RETURN_AND_SET_STATUS(B_ERROR);
 		}
@@ -1097,7 +1098,7 @@ PackageInfo::_AddItem(PackageItem *item, uint64 size, uint32 groups,
 			// the destination volume
 			if (path == 0xffffffff)
 				profile->path_type = P_INSTALL_PATH;
-			else if (path < 0xfffffffe && 
+			else if (path < 0xfffffffe &&
 					profile->path_type != P_INSTALL_PATH) {
 				if (cust) {
 					profile->path_type = P_USER_PATH;

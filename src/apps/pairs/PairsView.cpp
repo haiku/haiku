@@ -158,7 +158,7 @@ PairsView::_ReadRandomIcons()
 		if (fCard[i] == NULL) {
 			BAlert* alert = new BAlert("fatal", "Pairs did not find enough "
 				"vector icons in the system, it needs at least eight.",
-				"Oh!", NULL, NULL, B_WIDTH_FROM_WIDEST, B_STOP_ALERT);
+				"OK", NULL, NULL, B_WIDTH_FROM_WIDEST, B_STOP_ALERT);
 			alert->Go();
 			exit(1);
 		}

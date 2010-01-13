@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku, Inc.
+ * Copyright 2002-2009, Haiku, Inc. All rights reserved.
  * Copyright 2002, François Revol, revol@free.fr.
  * This file is distributed under the terms of the MIT License.
  *
@@ -391,7 +391,7 @@ WorkspacesView::_AboutRequested()
 		"written by François Revol, Axel Dörfler, and Matt Madia.\n\n"
 		"Copyright 2002-2008, Haiku.\n\n"
 		"Send windows behind using the Option key. "
-		"Move windows to front using the Control key.\n", "Ok");
+		"Move windows to front using the Control key.\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -537,7 +537,7 @@ WorkspacesView::MouseDown(BPoint where)
 	menu->SetFont(be_plain_font);
 
 	// TODO: alternatively change the count here directly?
-	BMenuItem* changeItem = new BMenuItem("Change Workspace Count"
+	BMenuItem* changeItem = new BMenuItem("Change workspace count"
 		B_UTF8_ELLIPSIS, new BMessage(kMsgChangeCount));
 	menu->AddItem(changeItem);
 
@@ -546,28 +546,28 @@ WorkspacesView::MouseDown(BPoint where)
 		BMenuItem* item;
 
 		menu->AddSeparatorItem();
-		menu->AddItem(item = new BMenuItem("Show Window Title",
+		menu->AddItem(item = new BMenuItem("Show window title",
 			new BMessage(kMsgToggleTitle)));
 		if (window->Look() == B_TITLED_WINDOW_LOOK)
 			item->SetMarked(true);
-		menu->AddItem(item = new BMenuItem("Show Window Border",
+		menu->AddItem(item = new BMenuItem("Show window border",
 			new BMessage(kMsgToggleBorder)));
 		if (window->Look() == B_TITLED_WINDOW_LOOK
 			|| window->Look() == B_MODAL_WINDOW_LOOK)
 			item->SetMarked(true);
 
 		menu->AddSeparatorItem();
-		menu->AddItem(item = new BMenuItem("Always On Top",
+		menu->AddItem(item = new BMenuItem("Always on top",
 			new BMessage(kMsgToggleAlwaysOnTop)));
 		if (window->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
 			item->SetMarked(true);
-		menu->AddItem(item = new BMenuItem("Auto Raise",
+		menu->AddItem(item = new BMenuItem("Auto-raise",
 			new BMessage(kMsgToggleAutoRaise)));
 		if (window->IsAutoRaising())
 			item->SetMarked(true);
 
 		menu->AddSeparatorItem();
-		menu->AddItem(new BMenuItem("About" B_UTF8_ELLIPSIS,
+		menu->AddItem(new BMenuItem("About Workspaces" B_UTF8_ELLIPSIS,
 			new BMessage(B_ABOUT_REQUESTED)));
 		menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
 		menu->SetTargetForItems(window);

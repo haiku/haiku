@@ -718,7 +718,7 @@ void MediaJack::showContextMenu(
 		BMessage *message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
 		message->AddData("input", B_RAW_TYPE,
 						 reinterpret_cast<const void *>(&input), sizeof(input));
-		menu->AddItem(item = new BMenuItem("Get Info", message));
+		menu->AddItem(item = new BMenuItem("Get info", message));
 	}
 	else if (isOutput())
 	{
@@ -727,7 +727,7 @@ void MediaJack::showContextMenu(
 		BMessage *message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
 		message->AddData("output", B_RAW_TYPE,
 						 reinterpret_cast<const void *>(&output), sizeof(output));
-		menu->AddItem(item = new BMenuItem("Get Info", message));
+		menu->AddItem(item = new BMenuItem("Get info", message));
 	}
 
 	menu->SetTargetForItems(view());

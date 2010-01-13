@@ -30,7 +30,7 @@ NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
 	fTarget(target),
 	fMessage(message)
 {
-	BButton* defaultButton = new BButton("Ok", new BMessage(MSG_PANEL_OK));
+	BButton* defaultButton = new BButton("OK", new BMessage(MSG_PANEL_OK));
 	BButton* cancelButton = new BButton("Cancel",
 		new BMessage(MSG_PANEL_CANCEL));
 	fNameTC = new BTextControl(label, text, NULL);

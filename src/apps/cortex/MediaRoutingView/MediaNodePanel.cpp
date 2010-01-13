@@ -533,7 +533,7 @@ void MediaNodePanel::showContextMenu(
 
 	// add the "Tweak Parameters" item
 	message = new BMessage(MediaRoutingView::M_NODE_TWEAK_PARAMETERS);
-	menu->AddItem(item = new BMenuItem("Tweak Parameters", message, 'P'));
+	menu->AddItem(item = new BMenuItem("Tweak parameters", message, 'P'));
 	if (!(ref->kind() & B_CONTROLLABLE))
 	{
 		item->SetEnabled(false);
@@ -541,7 +541,7 @@ void MediaNodePanel::showContextMenu(
 
 	message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
 	message->AddInt32("nodeID", ref->id());
-	menu->AddItem(new BMenuItem("Get Info", message, 'I'));
+	menu->AddItem(new BMenuItem("Get info", message, 'I'));
 	menu->AddSeparatorItem();
 
 	menu->AddItem(item = new BMenuItem("Release", new BMessage(MediaRoutingView::M_DELETE_SELECTION), 'T'));
@@ -562,7 +562,7 @@ void MediaNodePanel::showContextMenu(
 	}
 
 	// add the "Run Mode" sub menu
-	BMenu *subMenu = new BMenu("Run Mode");
+	BMenu *subMenu = new BMenu("Run mode");
 	subMenu->SetFont(be_plain_font);
 	for (uint32 runMode = 1; runMode <= BMediaNode::B_RECORDING; runMode++)
 	{
@@ -604,12 +604,12 @@ void MediaNodePanel::showContextMenu(
 		message = new BMessage(MediaRoutingView::M_NODE_START_TIME_SOURCE);
 		message->AddInt32("nodeID", ref->id());
 		subMenu->AddItem(new BMenuItem(
-			"Start Time Source",
+			"Start time source",
 			message));
 		message = new BMessage(MediaRoutingView::M_NODE_START_TIME_SOURCE);
 		message->AddInt32("nodeID", ref->id());
 		subMenu->AddItem(new BMenuItem(
-			"Stop Time Source",
+			"Stop time source",
 			message));
 	}
 	// [c.lenz 24dec99] support for BControllable::StartControlPanel()
@@ -631,7 +631,7 @@ void MediaNodePanel::showContextMenu(
 			subMenu->AddSeparatorItem();
 		subMenu->AddItem(
 			new BMenuItem(
-				isLocked ? "Unlock Group" : "Lock Group", message));
+				isLocked ? "Unlock group" : "Lock group", message));
 	}
 	
 	if (subMenu->CountItems() > 0)

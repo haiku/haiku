@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -129,7 +129,7 @@ TransformerListView::Draw(BRect updateRect)
 
 	// display helpful messages
 	const char* message1 = "Click on a shape above";
-	const char* message2 = "to attach Transformers.";
+	const char* message2 = "to attach transformers.";
 
 	SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
 	font_height fh;

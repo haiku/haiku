@@ -6,7 +6,7 @@
  */
 
 #include <Box.h>
- 
+
 #include "constants.h"
 #include "PoorManAdvancedView.h"
 #include "PoorManWindow.h"
@@ -17,9 +17,9 @@ PoorManAdvancedView::PoorManAdvancedView(BRect rect, const char *name)
 {
 	PoorManWindow	*	win;
 	win = ((PoorManApplication *)be_app)->GetPoorManWindow();
-	
+
 	SetViewColor(BACKGROUND_COLOR);
-	
+
 	// Console Logging BBox
 	BRect maxRect;
 	maxRect = rect;
@@ -27,31 +27,31 @@ PoorManAdvancedView::PoorManAdvancedView(BRect rect, const char *name)
 	maxRect.left -= 5.0;
 	maxRect.right -= 7.0;
 	maxRect.bottom -= 118.0;
-	
-	BBox * connectionOptions = new BBox(maxRect, "Connection Options");
+
+	BBox * connectionOptions = new BBox(maxRect, "Connections");
 	connectionOptions->SetLabel(STR_BBX_CONNECTION);
 	AddChild(connectionOptions);
-	
+
 	BRect sliderRect;
 	sliderRect = connectionOptions->Bounds();
 	sliderRect.InsetBy(10.0f, 10.0f);
 	sliderRect.top += 10;
 	sliderRect.bottom = sliderRect.top + 50.0;
-	
-	maxConnections = new StatusSlider(sliderRect, "Max Slider", STR_SLD_LABEL, 
-		STR_SLD_STATUS_LABEL, new BMessage(MSG_PREF_ADV_SLD_MAX_CONNECTION), 1, 200); 
-	
+
+	maxConnections = new StatusSlider(sliderRect, "Max Slider", STR_SLD_LABEL,
+		STR_SLD_STATUS_LABEL, new BMessage(MSG_PREF_ADV_SLD_MAX_CONNECTION), 1, 200);
+
 	// labels below the slider 1 and 200
 	maxConnections->SetLimitLabels("1", "200");
 	SetMaxSimutaneousConnections(win->MaxConnections());
 	connectionOptions->AddChild(maxConnections);
 }
 
-void 
+void
 PoorManAdvancedView::SetMaxSimutaneousConnections(int32 num)
 {
 	if (num <= 0 || num > 200)
 		maxConnections->SetValue(32);
-	else	
+	else
 		maxConnections->SetValue(num);
 }

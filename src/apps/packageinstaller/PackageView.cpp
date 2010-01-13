@@ -266,7 +266,7 @@ PackageView::Install()
 		BAlert *reinstall = new BAlert("reinstall",
 			T("The given package seems to be already installed on your system. "
 				"Would you like to uninstall the existing one and continue the "
-				"installation?"), T("Yes"), T("No"));
+				"installation?"), T("Continue"), T("Abort"));
 
 		if (reinstall->Go() == 0) {
 			// Uninstall the package
@@ -301,7 +301,7 @@ PackageView::Install()
 		return err;
 	}
 
-	fStatusWindow->StageStep(1, "Installing files and directories");
+	fStatusWindow->StageStep(1, "Installing files and folders");
 
 	// Install files and directories
 	PackageItem *iter;
@@ -570,11 +570,11 @@ PackageView::_ItemExists(PackageItem &item, BPath &path)
 			BString alertString = T("The ");
 
 			alertString << item.ItemKind() << T(" named \'") << path.Leaf() << "\' ";
-			alertString << T("already exists in the given path. Should the "
-				"existing file be replaced with the one from this package?");
+			alertString << T("already exists in the given path.\nReplace the file with "
+				"the one from this package or skip it?");
 
 			BAlert *alert = new BAlert(T("file_exists"), alertString.String(),
-				T("Yes"), T("No"), T("Abort"));
+				T("Replace"), T("Skip"), T("Abort"));
 
 			choice = alert->Go();
 			switch (choice) {
@@ -590,8 +590,8 @@ PackageView::_ItemExists(PackageItem &item, BPath &path)
 
 			if (fItemExistsPolicy == P_EXISTS_NONE) {
 				// TODO: Maybe add 'No, but ask again' type of choice as well?
-				alertString = T("Should this decision be remembered and all "
-					"existing files encountered in the future be ");
+				alertString = T("Do you want to remember this decision for the rest of "
+					"this installation?\nAll existing files will be ");
 				alertString << ((choice == P_EXISTS_OVERWRITE)
 					? T("replaced?") : T("skipped?"));
 

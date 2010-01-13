@@ -1,5 +1,5 @@
-/* 
- * Copyright 2004-2007, Haiku Inc. All rights reserved.
+/*
+ * Copyright 2004-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,7 +10,7 @@
 #define _GLMOVSTRINGS_H
 
 #define STR_ABOUT_TEXT "3DMov reloaded.\n\n Demonstrates OpenGL and the Media Kit."
-#define STR_OK "Ok"
+#define STR_OK "OK"
 
 #define STR_MENU "File" //not really related.... "Object" ?
 

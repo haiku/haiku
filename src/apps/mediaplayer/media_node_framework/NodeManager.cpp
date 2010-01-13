@@ -315,7 +315,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 	bool useOverlays)
 {
 	// create the video producer node
-	fVideoProducer = new VideoProducer(NULL, "MediaPlayer Video Out", 0,
+	fVideoProducer = new VideoProducer(NULL, "MediaPlayer video out", 0,
 		this, fVideoSupplier);
 	
 	// register the producer node
@@ -331,7 +331,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 	fVideoConnection.producer = fVideoProducer->Node();
 
 	// create the video consumer node
-	fVideoConsumer = new VideoConsumer("MediaPlayer Video In", NULL, 0, this,
+	fVideoConsumer = new VideoConsumer("MediaPlayer video in", NULL, 0, this,
 		fVideoTarget);
 	
 	// register the consumer node
@@ -448,7 +448,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 status_t
 NodeManager::_SetUpAudioNodes(float audioFrameRate, uint32 audioChannels)
 {
-	fAudioProducer = new AudioProducer("MediaPlayer Audio Out", fAudioSupplier);
+	fAudioProducer = new AudioProducer("MediaPlayer audio out", fAudioSupplier);
 	fAudioProducer->SetPeakListener(fPeakListener);
 	fStatus = fMediaRoster->RegisterNode(fAudioProducer);
 	if (fStatus != B_OK) {

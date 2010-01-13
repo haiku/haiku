@@ -34,7 +34,7 @@ const BRect DormantNodeWindow::s_initFrame(500.0, 350.0, 640.0, 480.0);
 
 DormantNodeWindow::DormantNodeWindow(
 	BWindow* parent)
-	: BWindow(s_initFrame, "Media Add-Ons",
+	: BWindow(s_initFrame, "Media add-ons",
 			  B_FLOATING_WINDOW_LOOK,
 			  B_FLOATING_SUBSET_WINDOW_FEEL,
 			  B_WILL_ACCEPT_FIRST_CLICK|B_AVOID_FOCUS|B_ASYNCHRONOUS_CONTROLS),

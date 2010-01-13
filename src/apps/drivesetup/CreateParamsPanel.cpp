@@ -218,11 +218,11 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 	off_t size)
 {
 	// Setup the controls
-	fSizeSlider = new SizeSlider("Slider", "Partition Size", NULL, offset,
+	fSizeSlider = new SizeSlider("Slider", "Partition size", NULL, offset,
 		offset + size);
 	fSizeSlider->SetPosition(1.0);
 
-	fNameTextControl = new BTextControl("Name Control", "Partition Name",
+	fNameTextControl = new BTextControl("Name Control", "Partition name",
 		"", NULL);
 	if (!parent->SupportsChildName())
 		fNameTextControl->SetEnabled(false);
@@ -242,7 +242,7 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 			item->SetMarked(true);
 	}
 
-	fTypeMenuField = new BMenuField("Partition Type", fTypePopUpMenu, NULL);
+	fTypeMenuField = new BMenuField("Partition type", fTypePopUpMenu, NULL);
 
 	fOKButton = new BButton("Create", new BMessage(MSG_OK));
 	fCancelButton = new BButton("Cancel", new BMessage(MSG_CANCEL));

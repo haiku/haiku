@@ -21,7 +21,7 @@
 
 class PwdItem : public BStringItem {
 public:
-					PwdItem(struct passwd *pwd, uint32 level = 0, 
+					PwdItem(struct passwd *pwd, uint32 level = 0,
 						bool expanded = true)
 						 : BStringItem("", level, expanded)
 						{
@@ -42,58 +42,58 @@ private:
 LoginView::LoginView(BRect frame)
 	: BView(frame, "LoginView", B_FOLLOW_ALL, B_PULSE_NEEDED)
 {
-	// TODO: when I don't need to test in BeOS anymore, 
+	// TODO: when I don't need to test in BeOS anymore,
 	// rewrite to use layout engine.
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 	BRect r;
 	r.Set(CSEP, CSEP, LW, Bounds().Height() - 3 * CSEP - BH);
 	fUserList = new BListView(r, "users");
-	BScrollView *sv = new BScrollView("userssv", fUserList, 
+	BScrollView *sv = new BScrollView("userssv", fUserList,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true);
 	AddChild(sv);
 	fUserList->SetSelectionMessage(new BMessage(kUserSelected));
 	fUserList->SetInvocationMessage(new BMessage(kUserInvoked));
-	
-	r.Set(LW + 30, Bounds().top + CSEP, 
+
+	r.Set(LW + 30, Bounds().top + CSEP,
 		Bounds().right - CSEP, Bounds().top + CSEP + CSEP);
-	fLoginControl = new BTextControl(r, "login", "login:", "", 
+	fLoginControl = new BTextControl(r, "login", "Login:", "",
 		new BMessage(kLoginEdited));
 	AddChild(fLoginControl);
 
 	r.OffsetBySelf(0, CSEP + CSEP);
-	fPasswordControl = new BTextControl(r, "password", "password:", "", 
+	fPasswordControl = new BTextControl(r, "password", "Password:", "",
 		new BMessage(kPasswordEdited));
 	fPasswordControl->TextView()->HideTyping(true);
 	AddChild(fPasswordControl);
 
 	r.OffsetBySelf(0, CSEP + CSEP);
-	fHidePasswordCheckBox = new BCheckBox(r, "hidepw", "Hide Password", 
+	fHidePasswordCheckBox = new BCheckBox(r, "hidepw", "Hide password",
 		new BMessage(kHidePassword));
 	fHidePasswordCheckBox->SetValue(1);
 	AddChild(fHidePasswordCheckBox);
 
 	// buttons
 	float buttonWidth = BW; //(Bounds().Width() - 4 * CSEP) / 3;
-	BRect buttonRect(0, Bounds().bottom - BH, 
+	BRect buttonRect(0, Bounds().bottom - BH,
 		buttonWidth, Bounds().bottom);
 	buttonRect.OffsetBySelf(CSEP, -CSEP);
 
-	fHaltButton = new BButton(buttonRect, "halt", "Halt", 
+	fHaltButton = new BButton(buttonRect, "halt", "Halt",
 		new BMessage(kHaltAction));
 	AddChild(fHaltButton);
 
 	buttonRect.OffsetBySelf(CSEP + buttonWidth, 0);
-	fRebootButton = new BButton(buttonRect, "reboot", "Reboot", 
+	fRebootButton = new BButton(buttonRect, "reboot", "Reboot",
 		new BMessage(kRebootAction));
 	AddChild(fRebootButton);
 
 	BRect infoRect(buttonRect);
 	infoRect.OffsetBySelf(buttonWidth + CSEP, 0);
 
-	buttonRect.OffsetToSelf(Bounds().Width() - CSEP - buttonWidth, 
+	buttonRect.OffsetToSelf(Bounds().Width() - CSEP - buttonWidth,
 		Bounds().Height() - CSEP - BH);
-	fLoginButton = new BButton(buttonRect, "ok", "Ok", 
+	fLoginButton = new BButton(buttonRect, "ok", "OK",
 		new BMessage(kAttemptLogin));
 	AddChild(fLoginButton);
 
@@ -161,7 +161,7 @@ LoginView::MessageReceived(BMessage *message)
 			// if no pass specified and we were selecting the user,
 			// give a chance to enter the password
 			// else we might want to enter an empty password.
-			if (strlen(fPasswordControl->Text()) < 1 
+			if (strlen(fPasswordControl->Text()) < 1
 				&& (fUserList->IsFocus() || fLoginControl->IsFocus())) {
 				fPasswordControl->MakeFocus();
 				break;
@@ -224,10 +224,10 @@ LoginView::AddNextUser()
 
 	pwd = getpwent();
 
-	if (pwd && pwd->pw_shell && 
-		strcmp(pwd->pw_shell, "false") && 
-		strcmp(pwd->pw_shell, "true") && 
-		strcmp(pwd->pw_shell, "/bin/false") && 
+	if (pwd && pwd->pw_shell &&
+		strcmp(pwd->pw_shell, "false") &&
+		strcmp(pwd->pw_shell, "true") &&
+		strcmp(pwd->pw_shell, "/bin/false") &&
 		strcmp(pwd->pw_shell, "/bin/true")) {
 		// not disabled
 		PwdItem *item = new PwdItem(pwd);

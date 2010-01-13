@@ -29,19 +29,19 @@ SoundListView::Draw(BRect updateRect)
 	if (IsEmpty()) {
 		SetHighColor(235,235,235);
 		FillRect(Bounds());
-	
-		SetHighColor(0,0,0);	
+
+		SetHighColor(0,0,0);
 		BFont font(be_bold_font);
 		font.SetSize(12.0);
 		SetFont(&font);
 		font_height height;
 		font.GetHeight(&height);
-		float width = font.StringWidth("Drop Files Here");
-		
+		float width = font.StringWidth("Drop files here");
+
 		BPoint pt;
 		pt.x = (Bounds().Width() - width) / 2;
 		pt.y = (Bounds().Height() + height.ascent + height.descent)/ 2;
-		DrawString("Drop Files Here", pt);
+		DrawString("Drop files here", pt);
 	}
 	BListView::Draw(updateRect);
 }
@@ -57,7 +57,7 @@ SoundListView::AttachedToWindow()
 
 SoundListItem::SoundListItem(
 	const BEntry & entry,
-	bool isTemp) 
+	bool isTemp)
 	: BStringItem(""),
 		fEntry(entry),
 		fIsTemp(isTemp)

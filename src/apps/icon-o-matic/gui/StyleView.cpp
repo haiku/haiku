@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -74,14 +74,14 @@ StyleView::StyleView(BRect frame)
 	BGridLayout* layout = new BGridLayout(5, 5);
 	SetLayout(layout);
 
-	fStyleType = new BMenuField( "Style Type", menu, NULL);
+	fStyleType = new BMenuField( "Style type", menu, NULL);
 
 #else
 	frame.OffsetTo(B_ORIGIN);
 	frame.InsetBy(5, 5);
 	frame.bottom = frame.top + 15;
 
-	fStyleType = new BMenuField(frame, "style type", "Style Type",
+	fStyleType = new BMenuField(frame, "style type", "Style type",
 		menu, true);
 	AddChild(fStyleType);
 
@@ -110,7 +110,7 @@ StyleView::StyleView(BRect frame)
 	menu->AddItem(new BMenuItem("Conic", message));
 
 #if __HAIKU__
-	fGradientType = new BMenuField("Gradient Type", menu, NULL);
+	fGradientType = new BMenuField("Gradient type", menu, NULL);
 	fGradientControl = new GradientControl(new BMessage(MSG_SET_COLOR), this);
 
 	layout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(3), 0, 0, 4);
@@ -129,7 +129,7 @@ StyleView::StyleView(BRect frame)
 
 #else // !__HAIKU__
 	frame.OffsetBy(0, fStyleType->Frame().Height() + 6);
-	fGradientType = new BMenuField(frame, "gradient type", "Gradient Type",
+	fGradientType = new BMenuField(frame, "gradient type", "Gradient type",
 		menu, true);
 	AddChild(fGradientType);
 
@@ -160,7 +160,7 @@ StyleView::StyleView(BRect frame)
 	divider = max_c(divider, fStyleType->StringWidth(fStyleType->Label()));
 	fGradientType->SetDivider(divider + 8);
 	fStyleType->SetDivider(divider + 8);
-	
+
 #endif // __HAIKU__
 
 	fStyleType->SetEnabled(false);

@@ -29,7 +29,7 @@ ExpanderApp::AboutRequested()
 		"\twritten by Jérôme Duval\n"
 		"\tCopyright 2004-2006, Haiku Inc.\n\n"
 		"original Be version by \n"
-		"Dominic, Hiroshi, Peter, Pavel and Robert\n", "Ok");
+		"Dominic, Hiroshi, Peter, Pavel and Robert\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

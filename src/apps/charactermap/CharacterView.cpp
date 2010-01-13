@@ -250,11 +250,11 @@ CharacterView::MouseDown(BPoint where)
 
 	BMessage* message =  new BMessage(B_COPY);
 	message->AddInt32("character", fCurrentCharacter);
-	menu->AddItem(new BMenuItem("Copy Character", message, 'C'));
+	menu->AddItem(new BMenuItem("Copy character", message, 'C'));
 
 	message =  new BMessage(kMsgCopyAsEscapedString);
 	message->AddInt32("character", fCurrentCharacter);
-	menu->AddItem(new BMenuItem("Copy As Escaped Byte String",
+	menu->AddItem(new BMenuItem("Copy as escaped byte string",
 		message, 'C', B_SHIFT_KEY));
 
 	menu->SetTargetForItems(this);

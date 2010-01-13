@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -63,16 +63,16 @@ PrintOptions::SetWidth(float w)
 void
 PrintOptions::SetHeight(float h)
 {
-	fWidth = (fBounds.Width()+1) * h / (fBounds.Height()+1);	
+	fWidth = (fBounds.Width()+1) * h / (fBounds.Height()+1);
 	fHeight = h;
 }
 
 
 PrintOptionsWindow::PrintOptionsWindow(BPoint at, PrintOptions *options,
 	BWindow* listener)
-	: 
-	BWindow(BRect(at.x, at.y, at.x + 300, at.y + 200), "Print Options", 
-		B_TITLED_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL, 
+	:
+	BWindow(BRect(at.x, at.y, at.x + 300, at.y + 200), "Print options",
+		B_TITLED_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fPrintOptions(options),
 	fCurrentOptions(*options),
@@ -123,7 +123,7 @@ PrintOptionsWindow::AddTextControl(BView* view, BPoint& at, const char* name,
 	text->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
 	SetValue(text, value);
 	at.y += text->Bounds().Height() + kLineSkip;
-	return text;	
+	return text;
 }
 
 
@@ -137,16 +137,16 @@ PrintOptionsWindow::Setup()
 	BRadioButton* rb;
 	BBox* line;
 	BButton* button;
-	
-	BBox *panel = new BBox(rect, "top_panel", B_FOLLOW_ALL, 
+
+	BBox *panel = new BBox(rect, "top_panel", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
 		B_PLAIN_BORDER);
 	AddChild(panel);
-	
-	AddRadioButton(panel, at, "fit_to_page", "Fit Image to Page",
+
+	AddRadioButton(panel, at, "fit_to_page", "Fit image to page",
 		kMsgFitToPageSelected, op == PrintOptions::kFitToPage);
 	textAt = at;
-	rb = AddRadioButton(panel, at, "zoom_factor", "Zoom Factor in %: ",
+	rb = AddRadioButton(panel, at, "zoom_factor", "Zoom factor in %: ",
 		kMsgZoomFactorSelected, op == PrintOptions::kZoomFactor);
 	textAt.x = rb->Bounds().right + 5;
 	fZoomFactor = AddTextControl(panel, textAt, "zoom_factor_text", "",
@@ -160,10 +160,10 @@ PrintOptionsWindow::Setup()
 		0, kMsgDPIChanged);
 
 	rb = AddRadioButton(panel, at, "width_and_height",
-		"Resize To (in 1/72 Inches):", kMsgWidthAndHeightSelected,
-		op == PrintOptions::kWidth || op == PrintOptions::kHeight); 
+		"Resize to (in 1/72 inches):", kMsgWidthAndHeightSelected,
+		op == PrintOptions::kWidth || op == PrintOptions::kHeight);
 	at.x += 15;
-	textAt = at;	
+	textAt = at;
 	fWidth = AddTextControl(panel, textAt, "width", "Width: ",
 		fCurrentOptions.Width(), 40, kMsgWidthChanged);
 	textAt = at;
@@ -176,10 +176,10 @@ PrintOptionsWindow::Setup()
 	line = new BBox(BRect(rect.left+3, at.y, rect.right-3, at.y + 1), NULL,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	panel->AddChild(line);
-	
+
 	at.y += 10;
 	rect.OffsetBy(at);
-	button = new BButton(rect, "job setup", "Job Setup",
+	button = new BButton(rect, "job setup", "Job setup",
 		new BMessage(kMsgJobSetup));
 	panel->AddChild(button);
 	button->ResizeToPreferred();
@@ -189,7 +189,7 @@ PrintOptionsWindow::Setup()
 	// resize window
 	ResizeTo(fHeight->Frame().right + kIndent, button->Frame().bottom + kIndent);
 
-	// center button 
+	// center button
 	button->MoveTo((Bounds().Width()-button->Bounds().Width())/2,
 		button->Frame().top);
 }
@@ -241,7 +241,7 @@ PrintOptionsWindow::MessageReceived(BMessage* msg)
 		case kMsgWidthAndHeightSelected:
 			fCurrentOptions.SetOption(MsgToOption(msg->what));
 			break;
-		
+
 		case kMsgZoomFactorChanged:
 			if (GetValue(fZoomFactor, &value)
 				&& fCurrentOptions.ZoomFactor() != value) {
@@ -253,7 +253,7 @@ PrintOptionsWindow::MessageReceived(BMessage* msg)
 			if (GetValue(fDPI, &value) && fCurrentOptions.DPI() != value) {
 				fCurrentOptions.SetDPI(value);
 				SetValue(fZoomFactor, 100*fCurrentOptions.ZoomFactor());
-			}			
+			}
 			break;
 		case kMsgWidthChanged:
 			if (GetValue(fWidth, &value) && fCurrentOptions.Width() != value) {
@@ -267,13 +267,13 @@ PrintOptionsWindow::MessageReceived(BMessage* msg)
 				SetValue(fWidth, fCurrentOptions.Width());
 			}
 			break;
-		
+
 		case kMsgJobSetup:
 			*fPrintOptions = fCurrentOptions;
 			fStatus = B_OK;
 			PostMessage(B_QUIT_REQUESTED);
 			break;
-		
+
 		default:
 			BWindow::MessageReceived(msg);
 	}

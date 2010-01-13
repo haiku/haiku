@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,7 +46,7 @@ enum {
 #define BUTTONHEIGHT 20
 
 SettingsWindow::SettingsWindow(BRect frame)
- 	: BWindow(frame, "MediaPlayer Settings", B_FLOATING_WINDOW_LOOK,
+ 	: BWindow(frame, "MediaPlayer settings", B_FLOATING_WINDOW_LOOK,
  		B_FLOATING_APP_WINDOW_FEEL,
  		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 #ifdef __HAIKU__
@@ -115,7 +115,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 	BButton* cancelButton = new BButton("cancel", "Cancel", 
 		new BMessage(M_SETTINGS_CANCEL));
 
-	BButton* okButton = new BButton("ok", "Ok",
+	BButton* okButton = new BButton("ok", "OK",
 		new BMessage(M_SETTINGS_SAVE));
 	okButton->MakeDefault(true);
 

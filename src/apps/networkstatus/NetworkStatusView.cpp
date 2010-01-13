@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -43,7 +43,7 @@
 
 static const char *kStatusDescriptions[] = {
 	"Unknown",
-	"No Link",
+	"No link",
 	"No stateful configuration",
 	"Configuring",
 	"Ready"
@@ -346,7 +346,7 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 		text += address;
 	}
 
-	BAlert* alert = new BAlert(name, text.String(), "Ok");
+	BAlert* alert = new BAlert(name, text.String(), "OK");
 	BTextView* view = alert->TextView();
 	BFont font;
 
@@ -382,7 +382,7 @@ NetworkStatusView::MouseDown(BPoint point)
 	menu->AddSeparatorItem();
 	//menu->AddItem(new BMenuItem("About NetworkStatus" B_UTF8_ELLIPSIS,
 	//	new BMessage(B_ABOUT_REQUESTED)));
-	menu->AddItem(new BMenuItem("Open Networks Preferences" B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem("Open network preferences" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgOpenNetworkPreferences)));
 
 	if (fInDeskbar)
@@ -399,7 +399,7 @@ NetworkStatusView::_AboutRequested()
 {
 	BAlert* alert = new BAlert("about", "NetworkStatus\n"
 		"\twritten by Axel Dörfler and Hugo Santos\n"
-		"\tCopyright 2007, Haiku, Inc.\n", "Ok");
+		"\tCopyright 2007, Haiku, Inc.\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -512,11 +512,11 @@ NetworkStatusView::_OpenNetworksPreferences()
 {
 	status_t status = be_roster->Launch("application/x-vnd.Haiku-Network");
 	if (status != B_OK && status != B_ALREADY_RUNNING) {
-		BString errorMessage("Launching the Network preflet failed.\n\n"
+		BString errorMessage("Launching the network preflet failed.\n\n"
 			"Error: ");
 		errorMessage << strerror(status);
 		BAlert* alert = new BAlert("launch error", errorMessage.String(),
-			"Ok");
+			"OK");
 
 		// asynchronous alert in order to not block replicant host application
 		alert->Go(NULL);

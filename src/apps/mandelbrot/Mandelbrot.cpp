@@ -56,10 +56,10 @@ TMainWindow::TMainWindow(BRect bound, char* name, window_type type, long flags)
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("Palette");
-	menu->AddItem(new BMenuItem("Palette1", new BMessage(P1)));
-	menu->AddItem(new BMenuItem("Palette2", new BMessage(P2)));
-	menu->AddItem(item = new BMenuItem("Palette3", new BMessage(P3)));
-	menu->AddItem(new BMenuItem("Palette4", new BMessage(P4)));
+	menu->AddItem(new BMenuItem("Palette 1", new BMessage(P1)));
+	menu->AddItem(new BMenuItem("Palette 2", new BMessage(P2)));
+	menu->AddItem(item = new BMenuItem("Palette 3", new BMessage(P3)));
+	menu->AddItem(new BMenuItem("Palette 4", new BMessage(P4)));
 	menuBar->AddItem(menu);
 
 	item->SetMarked(true);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -61,7 +61,7 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchStr
 	fUIchange = false;
 
 	fReplaceView->AddChild(fReplaceAllButton = new BButton(BRect(10, 150, 98, 166),
-		"", "Replace All", new BMessage(MSG_REPLACE_ALL), B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		"", "Replace all", new BMessage(MSG_REPLACE_ALL), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_NAVIGABLE));
 	fReplaceView->AddChild(fCancelButton = new BButton(BRect(141, 150, 211, 166),
 		"", "Cancel", new BMessage(B_QUIT_REQUESTED), B_FOLLOW_LEFT | B_FOLLOW_TOP,

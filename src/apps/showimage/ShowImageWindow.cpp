@@ -247,9 +247,9 @@ ShowImageWindow::BuildContextMenu(BMenu *menu)
 void
 ShowImageWindow::_BuildViewMenu(BMenu *menu, bool popupMenu)
 {
-	_AddItemMenu(menu, "Slide Show", MSG_SLIDE_SHOW, 0, 0, this);
+	_AddItemMenu(menu, "Slide show", MSG_SLIDE_SHOW, 0, 0, this);
 	_MarkMenuItem(menu, MSG_SLIDE_SHOW, fImageView->SlideShowStarted());
-	BMenu* delayMenu = new BMenu("Slide Delay");
+	BMenu* delayMenu = new BMenu("Slide delay");
 	if (fSlideShowDelay == NULL)
 		fSlideShowDelay = delayMenu;
 
@@ -258,38 +258,38 @@ ShowImageWindow::_BuildViewMenu(BMenu *menu, bool popupMenu)
 	//		 if slide show delay is too short! (Especially if loading the image
 	//		 takes as long as or longer than the slide show delay). Should load
 	//		 in background thread!
-	_AddDelayItem(delayMenu, "Three Seconds", 3);
-	_AddDelayItem(delayMenu, "Four Second", 4);
-	_AddDelayItem(delayMenu, "Five Seconds", 5);
-	_AddDelayItem(delayMenu, "Six Seconds", 6);
-	_AddDelayItem(delayMenu, "Seven Seconds", 7);
-	_AddDelayItem(delayMenu, "Eight Seconds", 8);
-	_AddDelayItem(delayMenu, "Nine Seconds", 9);
-	_AddDelayItem(delayMenu, "Ten Seconds", 10);
-	_AddDelayItem(delayMenu, "Twenty Seconds", 20);
+	_AddDelayItem(delayMenu, "3 seconds", 3);
+	_AddDelayItem(delayMenu, "4 seconds", 4);
+	_AddDelayItem(delayMenu, "5 seconds", 5);
+	_AddDelayItem(delayMenu, "6 seconds", 6);
+	_AddDelayItem(delayMenu, "7 seconds", 7);
+	_AddDelayItem(delayMenu, "8 seconds", 8);
+	_AddDelayItem(delayMenu, "9 seconds", 9);
+	_AddDelayItem(delayMenu, "10 seconds", 10);
+	_AddDelayItem(delayMenu, "20 seconds", 20);
 	menu->AddItem(delayMenu);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, "Original Size", MSG_ORIGINAL_SIZE, '1', 0, this);
-	_AddItemMenu(menu, "Zoom In", MSG_ZOOM_IN, '+', 0, this);
-	_AddItemMenu(menu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, this);
+	_AddItemMenu(menu, "Original size", MSG_ORIGINAL_SIZE, '1', 0, this);
+	_AddItemMenu(menu, "Zoom in", MSG_ZOOM_IN, '+', 0, this);
+	_AddItemMenu(menu, "Zoom out", MSG_ZOOM_OUT, '-', 0, this);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, "High-Quality Zooming", MSG_SCALE_BILINEAR, 0, 0, this);
+	_AddItemMenu(menu, "High-quality zooming", MSG_SCALE_BILINEAR, 0, 0, this);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, "Shrink to Window", MSG_SHRINK_TO_WINDOW, 0, 0, this);
-	_AddItemMenu(menu, "Zoom to Window", MSG_ZOOM_TO_WINDOW, 0, 0, this);
+	_AddItemMenu(menu, "Shrink to window", MSG_SHRINK_TO_WINDOW, 0, 0, this);
+	_AddItemMenu(menu, "Zoom to window", MSG_ZOOM_TO_WINDOW, 0, 0, this);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, this);
+	_AddItemMenu(menu, "Full screen", MSG_FULL_SCREEN, B_ENTER, 0, this);
 	_MarkMenuItem(menu, MSG_FULL_SCREEN, fFullScreen);
 
-	_AddItemMenu(menu, "Show Caption in Full Screen Mode", MSG_SHOW_CAPTION, 0,
+	_AddItemMenu(menu, "Show caption in full screen mode", MSG_SHOW_CAPTION, 0,
 		0, this);
 	_MarkMenuItem(menu, MSG_SHOW_CAPTION, fShowCaption);
 
@@ -309,7 +309,7 @@ ShowImageWindow::_BuildViewMenu(BMenu *menu, bool popupMenu)
 
 	if (popupMenu) {
 		menu->AddSeparatorItem();
-		_AddItemMenu(menu, "Use as Background", MSG_DESKTOP_BACKGROUND, 0, 0,
+		_AddItemMenu(menu, "Use as background" B_UTF8_ELLIPSIS, MSG_DESKTOP_BACKGROUND, 0, 0,
 			this);
 	}
 }
@@ -326,14 +326,14 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 	fOpenMenu->Superitem()->SetTarget(be_app);
 	fOpenMenu->Superitem()->SetShortcut('O', 0);
 	menu->AddSeparatorItem();
-	BMenu *pmenuSaveAs = new BMenu("Save As" B_UTF8_ELLIPSIS, B_ITEMS_IN_COLUMN);
+	BMenu *pmenuSaveAs = new BMenu("Save as" B_UTF8_ELLIPSIS, B_ITEMS_IN_COLUMN);
 	BTranslationUtils::AddTranslationItems(pmenuSaveAs, B_TRANSLATOR_BITMAP);
 		// Fill Save As submenu with all types that can be converted
 		// to from the Be bitmap image format
 	menu->AddItem(pmenuSaveAs);
 	_AddItemMenu(menu, "Close", B_QUIT_REQUESTED, 'W', 0, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Page Setup" B_UTF8_ELLIPSIS, MSG_PAGE_SETUP, 0, 0, this);
+	_AddItemMenu(menu, "Page setup" B_UTF8_ELLIPSIS, MSG_PAGE_SETUP, 0, 0, this);
 	_AddItemMenu(menu, "Print" B_UTF8_ELLIPSIS, MSG_PREPARE_PRINT, 'P', 0, this);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, "About ShowImage" B_UTF8_ELLIPSIS, B_ABOUT_REQUESTED, 0, 0,
@@ -350,36 +350,36 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 	_AddItemMenu(menu, "Paste", B_PASTE, 'V', 0, this, false);
 	_AddItemMenu(menu, "Clear", MSG_CLEAR_SELECT, 0, 0, this, false);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Select All", MSG_SELECT_ALL, 'A', 0, this);
+	_AddItemMenu(menu, "Select all", MSG_SELECT_ALL, 'A', 0, this);
 	bar->AddItem(menu);
 
 	menu = fBrowseMenu = new BMenu("Browse");
-	_AddItemMenu(menu, "First Page", MSG_PAGE_FIRST, B_LEFT_ARROW, B_SHIFT_KEY, this);
-	_AddItemMenu(menu, "Last Page", MSG_PAGE_LAST, B_RIGHT_ARROW, B_SHIFT_KEY, this);
-	_AddItemMenu(menu, "Previous Page", MSG_PAGE_PREV, B_LEFT_ARROW, 0, this);
-	_AddItemMenu(menu, "Next Page", MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, this);
-	fGoToPageMenu = new BMenu("Go to Page");
+	_AddItemMenu(menu, "First page", MSG_PAGE_FIRST, B_LEFT_ARROW, B_SHIFT_KEY, this);
+	_AddItemMenu(menu, "Last page", MSG_PAGE_LAST, B_RIGHT_ARROW, B_SHIFT_KEY, this);
+	_AddItemMenu(menu, "Previous page", MSG_PAGE_PREV, B_LEFT_ARROW, 0, this);
+	_AddItemMenu(menu, "Next page", MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, this);
+	fGoToPageMenu = new BMenu("Go to page");
 	fGoToPageMenu->SetRadioMode(true);
 	menu->AddItem(fGoToPageMenu);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Previous File", MSG_FILE_PREV, B_UP_ARROW, 0, this);
-	_AddItemMenu(menu, "Next File", MSG_FILE_NEXT, B_DOWN_ARROW, 0, this);
+	_AddItemMenu(menu, "Previous file", MSG_FILE_PREV, B_UP_ARROW, 0, this);
+	_AddItemMenu(menu, "Next file", MSG_FILE_NEXT, B_DOWN_ARROW, 0, this);
 	bar->AddItem(menu);
 
 	menu = new BMenu("Image");
-	_AddItemMenu(menu, "Rotate Clockwise", MSG_ROTATE_90, 'R', 0, this);
-	_AddItemMenu(menu, "Rotate Counterclockwise", MSG_ROTATE_270, 'R', B_SHIFT_KEY, this);
+	_AddItemMenu(menu, "Rotate clockwise", MSG_ROTATE_90, 'R', 0, this);
+	_AddItemMenu(menu, "Rotate counterclockwise", MSG_ROTATE_270, 'R', B_SHIFT_KEY, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Flip Left to Right", MSG_FLIP_LEFT_TO_RIGHT, 0, 0, this);
-	_AddItemMenu(menu, "Flip Top to Bottom", MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
+	_AddItemMenu(menu, "Flip left to right", MSG_FLIP_LEFT_TO_RIGHT, 0, 0, this);
+	_AddItemMenu(menu, "Flip top to bottom", MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Invert Colors", MSG_INVERT, 0, 0, this);
+	_AddItemMenu(menu, "Invert colors", MSG_INVERT, 0, 0, this);
 	menu->AddSeparatorItem();
 	fResizeItem = _AddItemMenu(menu, "Resize" B_UTF8_ELLIPSIS,
 		MSG_OPEN_RESIZER_WINDOW, 0, 0, this);
 	bar->AddItem(menu);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Use as Background", MSG_DESKTOP_BACKGROUND, 0, 0,
+	_AddItemMenu(menu, "Use as background" B_UTF8_ELLIPSIS, MSG_DESKTOP_BACKGROUND, 0, 0,
 		this);
 }
 

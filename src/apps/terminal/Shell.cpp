@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Haiku, inc.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
@@ -511,7 +511,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		const char *spawnAlertMessage = "alert --stop "
 						"'Cannot execute \"%s\":\n"
 						"\t%s' "
-						"'Use Default Shell' 'Abort'";
+						"'Use default shell' 'Abort'";
 		char errorMessage[256];
 		snprintf(errorMessage, sizeof(errorMessage), spawnAlertMessage, argv[0], strerror(errno));
 

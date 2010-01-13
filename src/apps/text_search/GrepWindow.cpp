@@ -416,21 +416,21 @@ GrepWindow::_CreateMenus()
 
 	fFileMenu = new BMenu(_T("File"));
 	fActionMenu = new BMenu(_T("Actions"));
-	fPreferencesMenu = new BMenu(_T("Preferences"));
+	fPreferencesMenu = new BMenu(_T("Settings"));
 	fHistoryMenu = new BMenu(_T("History"));
 	fEncodingMenu = new BMenu(_T("Encoding"));
 
 	fNew = new BMenuItem(
-		_T("New Window"), new BMessage(MSG_NEW_WINDOW), 'N');
+		_T("New window"), new BMessage(MSG_NEW_WINDOW), 'N');
 
 	fOpen = new BMenuItem(
-		_T("Set Which Files to Search"), new BMessage(MSG_OPEN_PANEL), 'F');
+		_T("Set which files to search"), new BMessage(MSG_OPEN_PANEL), 'F');
 
 	fClose = new BMenuItem(
 		_T("Close"), new BMessage(B_QUIT_REQUESTED), 'W');
 
 	fAbout = new BMenuItem(
-		_T("About"), new BMessage(B_ABOUT_REQUESTED));
+		_T("About TextSearch" B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED));
 
 	fQuit = new BMenuItem(
 		_T("Quit"), new BMessage(MSG_QUIT_NOW), 'Q');
@@ -439,31 +439,31 @@ GrepWindow::_CreateMenus()
 		_T("Search"), new BMessage(MSG_START_CANCEL), 'S');
 
 	fSelectAll = new BMenuItem(
-		_T("Select All"), new BMessage(MSG_SELECT_ALL), 'A');
+		_T("Select all"), new BMessage(MSG_SELECT_ALL), 'A');
 
 	fTrimSelection = new BMenuItem(
-		_T("Trim to Selection"), new BMessage(MSG_TRIM_SELECTION), 'T');
+		_T("Trim to selection"), new BMessage(MSG_TRIM_SELECTION), 'T');
 
 	fOpenSelection = new BMenuItem(
-		_T("Open Selection"), new BMessage(MSG_OPEN_SELECTION), 'O');
+		_T("Open selection"), new BMessage(MSG_OPEN_SELECTION), 'O');
 
 	fSelectInTracker = new BMenuItem(
-		_T("Show Files in Tracker"), new BMessage(MSG_SELECT_IN_TRACKER), 'K');
+		_T("Show files in Tracker"), new BMessage(MSG_SELECT_IN_TRACKER), 'K');
 
 	fCopyText = new BMenuItem(
-		_T("Copy Text to Clipboard"), new BMessage(MSG_COPY_TEXT), 'B');
+		_T("Copy text to clipboard"), new BMessage(MSG_COPY_TEXT), 'B');
 
 	fRecurseLinks = new BMenuItem(
 		_T("Follow symbolic links"), new BMessage(MSG_RECURSE_LINKS));
 
 	fRecurseDirs = new BMenuItem(
-		_T("Look in sub-directories"), new BMessage(MSG_RECURSE_DIRS));
+		_T("Look in sub-folders"), new BMessage(MSG_RECURSE_DIRS));
 
 	fSkipDotDirs = new BMenuItem(
-		_T("Skip sub-directories starting with a dot"), new BMessage(MSG_SKIP_DOT_DIRS));
+		_T("Skip sub-folders starting with a dot"), new BMessage(MSG_SKIP_DOT_DIRS));
 
 	fCaseSensitive = new BMenuItem(
-		_T("Case sensitive"), new BMessage(MSG_CASE_SENSITIVE));
+		_T("Case-sensitive"), new BMessage(MSG_CASE_SENSITIVE));
 
 	fEscapeText = new BMenuItem(
 		_T("Escape search text"), new BMessage(MSG_ESCAPE_TEXT));
@@ -475,7 +475,7 @@ GrepWindow::_CreateMenus()
 		_T("Open files in Pe"), new BMessage(MSG_INVOKE_PE));
 
 	fShowLinesMenuitem = new BMenuItem(
-		_T("Show Lines"), new BMessage(MSG_MENU_SHOW_LINES), 'L');
+		_T("Show lines"), new BMessage(MSG_MENU_SHOW_LINES), 'L');
 	fShowLinesMenuitem->SetMarked(true);
 
 	fUTF8 = new BMenuItem("UTF8", new BMessage('utf8'));
@@ -561,7 +561,7 @@ GrepWindow::_CreateViews()
 	fButton->SetEnabled(false);
 
 	fShowLinesCheckbox = new BCheckBox(
-		BRect(0, 0, 1, 1), "ShowLines", _T("Show Lines"),
+		BRect(0, 0, 1, 1), "ShowLines", _T("Show lines"),
 		new BMessage(MSG_CHECKBOX_SHOW_LINES), B_FOLLOW_LEFT);
 
 	fShowLinesCheckbox->SetValue(B_CONTROL_ON);
@@ -1284,7 +1284,7 @@ GrepWindow::_OnTrimSelection()
 		text << "\n";
 		text << _T("The unselected files will be removed from the list.");
 		text << "\n";
-		BAlert* alert = new BAlert(NULL, text.String(), _T("Okay"), NULL, NULL,
+		BAlert* alert = new BAlert(NULL, text.String(), _T("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(NULL);
 		return;
@@ -1377,7 +1377,7 @@ GrepWindow::_OnSelectInTracker()
 		BAlert* alert = new BAlert("Info",
 			_T("Please select the files you wish to have selected for you in "
 				"Tracker."),
-			_T("Okay"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			_T("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(NULL);
 		return;
 	}
@@ -1438,9 +1438,8 @@ GrepWindow::_OnSelectInTracker()
 
 	if (!_AreAllFoldersOpenInTracker(&folderList)) {
 		BAlert* alert = new BAlert(NULL,
-			_T(APP_NAME " couldn't open one or more folders, and it's very "
-				"sorry about it."),
-			_T("Forgive and forget!"), NULL, NULL, B_WIDTH_AS_USUAL,
+			_T(APP_NAME " couldn't open one or more folders,"),
+			_T("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_STOP_ALERT);
 		alert->Go(NULL);
 		goto out;
@@ -1478,7 +1477,7 @@ GrepWindow::_OnAboutRequested()
 		"Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.");
 	text << "\n";
 
-	BAlert* alert = new BAlert("TextSearch", text.String(), _T("Ok"), NULL,
+	BAlert* alert = new BAlert("TextSearch", text.String(), _T("OK"), NULL,
 		NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
 
 	BTextView* view = alert->TextView();

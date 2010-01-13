@@ -174,7 +174,7 @@ AboutApp::AboutApp()
 
 
 AboutWindow::AboutWindow()
-	: BWindow(BRect(0, 0, 500, 300), "About This System", B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 500, 300), "About this system", B_TITLED_WINDOW,
 			B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -447,7 +447,7 @@ AboutView::AboutView()
 				.Add(_CreateLabel("kernellabel", "Kernel:"))
 				.Add(kernelView)
 				.AddStrut(offset)
-				.Add(_CreateLabel("uptimelabel", "Time Running:"))
+				.Add(_CreateLabel("uptimelabel", "Time running:"))
 				.Add(fUptimeView)
 				.SetInsets(5, 5, 5, 5)
 			.End()
@@ -481,7 +481,7 @@ AboutView::MouseDown(BPoint point)
 {
 	BRect r(92, 26, 105, 31);
 	if (r.Contains(point)) {
-		printf("Easter Egg\n");
+		printf("Easter egg\n");
 		PickRandomHaiku();
 	}
 
@@ -728,7 +728,7 @@ AboutView::_CreateCreditsView()
 	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Current Maintainers:\n");
+	fCreditsView->Insert("Current maintainers:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
@@ -772,7 +772,7 @@ AboutView::_CreateCreditsView()
 		"\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Past Maintainers:\n");
+	fCreditsView->Insert("Past maintainers:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
@@ -799,7 +799,7 @@ AboutView::_CreateCreditsView()
 		"\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Website, Marketing & Documentation:\n");
+	fCreditsView->Insert("Website, marketing & documentation:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
@@ -930,7 +930,7 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert("\nGerman\n\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
-		"Colin Gunther\n"
+		"Colin Günther\n"
 		"svend\n"
 		"leszek\n"
 	);
@@ -984,14 +984,14 @@ AboutView::_CreateCreditsView()
 	);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Special Thanks To:\n");
+	fCreditsView->Insert("Special thanks to:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert("Travis Geiselbrecht (and his NewOS kernel)\n");
 	fCreditsView->Insert("Michael Phipps (project founder)\n\n");
-	fCreditsView->Insert("The Haiku-Ports Team\n");
-	fCreditsView->Insert("The Haikuware Team and their Bounty Program\n");
-	fCreditsView->Insert("The BeGeistert Team\n\n");
+	fCreditsView->Insert("The Haiku-Ports team\n");
+	fCreditsView->Insert("The Haikuware team and their bounty program\n");
+	fCreditsView->Insert("The BeGeistert team\n\n");
 	fCreditsView->Insert("... and the many community members making "
 		"donations!\n\n");
 
@@ -1085,7 +1085,7 @@ AboutView::_CreateCreditsView()
 	// Mesa3D (http://www.mesa3d.org) copyrights
 	_AddPackageCredit(PackageCredit("Mesa")
 		.SetCopyright(COPYRIGHT_STRING "1999-2006 Brian Paul. "
-			"Mesa3D project.  All rights reserved.")
+			"Mesa3D Project.  All rights reserved.")
 		.SetURL("http://www.mesa3d.org"));
 			// TODO: License!
 

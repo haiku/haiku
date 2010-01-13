@@ -149,8 +149,8 @@ TBeMenu::AddNextItem()
 
 	TrackingHookData* data = fBarView->GetTrackingHookData();
 	if (fAddState == kAddingRecents) {
-		const char* recentTitle[] = {"Recent Documents", "Recent Folders",
-			"Recent Applications"};
+		const char* recentTitle[] = {"Recent documents", "Recent folders",
+			"Recent applications"};
 		const int recentType[] = {kRecentDocuments, kRecentFolders,
 			kRecentApplications};
 		const int recentTypes = 3;
@@ -225,7 +225,7 @@ TBeMenu::AddStandardBeMenuItems()
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
 	"About Haiku"
 #else
-	"About This System"
+	"About this system"
 #endif
 		B_UTF8_ELLIPSIS, new BMessage(kShowSplash));
 	item->SetEnabled(!dragging);
@@ -240,7 +240,7 @@ TBeMenu::AddStandardBeMenuItems()
 	item->SetEnabled(!dragging);
 	AddItem(item);
 
-	item = new BMenuItem("Show Replicants", new BMessage(kToggleDraggers));
+	item = new BMenuItem("Show replicants", new BMessage(kToggleDraggers));
 	item->SetEnabled(!dragging);
 	item->SetMarked(BDragger::AreDraggersDrawn());
 	AddItem(item);
@@ -251,7 +251,7 @@ TBeMenu::AddStandardBeMenuItems()
 	AddItem(mountMenu);
 #endif
 
-	item = new BMenuItem("Deskbar Preferences" B_UTF8_ELLIPSIS,
+	item = new BMenuItem("Deskbar preferences" B_UTF8_ELLIPSIS,
 		new BMessage(kConfigShow));
  	item->SetTarget(be_app);
 	AddItem(item);
@@ -260,7 +260,7 @@ TBeMenu::AddStandardBeMenuItems()
 
 	BMenu* shutdownMenu = new BMenu("Shutdown" B_UTF8_ELLIPSIS);
 
-	item = new BMenuItem("Restart System", new BMessage(kRebootSystem));
+	item = new BMenuItem("Restart system", new BMessage(kRebootSystem));
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 
@@ -272,7 +272,7 @@ TBeMenu::AddStandardBeMenuItems()
 	}
 #endif
 
-	item = new BMenuItem("Power Off", new BMessage(kShutdownSystem));
+	item = new BMenuItem("Power off", new BMessage(kShutdownSystem));
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 	shutdownMenu->SetFont(be_plain_font);

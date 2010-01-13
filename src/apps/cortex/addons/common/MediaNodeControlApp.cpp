@@ -53,7 +53,7 @@ MediaNodeControlApp::MediaNodeControlApp(
 		sprintf(buffer,
 			"MediaNodeControlApp: couldn't find node (%ld):\n%s\n",
 			nodeID, strerror(err));
-		(new BAlert("error", buffer, "Ok"))->Go();
+		(new BAlert("error", buffer, "OK"))->Go();
 		return;
 	}
 	
@@ -65,7 +65,7 @@ MediaNodeControlApp::MediaNodeControlApp(
 		sprintf(buffer,
 			"MediaNodeControlApp: couldn't get node info (%ld):\n%s\n",
 			nodeID, strerror(err));
-		(new BAlert("error", buffer, "Ok"))->Go();
+		(new BAlert("error", buffer, "OK"))->Go();
 		return;
 	}
 	
@@ -80,7 +80,7 @@ MediaNodeControlApp::MediaNodeControlApp(
 		sprintf(buffer,
 			"MediaNodeControlApp: no parameters for node (%ld):\n%s\n",
 			nodeID, strerror(err));
-		(new BAlert("error", buffer, "Ok"))->Go();
+		(new BAlert("error", buffer, "OK"))->Go();
 		return;
 	}
 	

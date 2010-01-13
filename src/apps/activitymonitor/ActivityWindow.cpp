@@ -116,7 +116,7 @@ ActivityWindow::ActivityWindow()
 	BMenu* menu = new BMenu("File");
 	BMenuItem* item;
 
-	menu->AddItem(new BMenuItem("Add View", new BMessage(kMsgAddView)));
+	menu->AddItem(new BMenuItem("Add graph", new BMessage(kMsgAddView)));
 	menu->AddSeparatorItem();
 
 	menu->AddItem(item = new BMenuItem("About ActivityMonitor" B_UTF8_ELLIPSIS,

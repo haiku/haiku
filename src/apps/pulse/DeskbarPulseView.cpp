@@ -26,30 +26,30 @@ DeskbarPulseView::DeskbarPulseView(BRect rect) : MiniPulseView(rect, "DeskbarPul
 }
 
 DeskbarPulseView::DeskbarPulseView(BMessage *message) : MiniPulseView(message) {
-	mode1->SetLabel("Normal Mode");
+	mode1->SetLabel("Normal mode");
 	mode1->SetMessage(new BMessage(PV_NORMAL_MODE));
-	mode2->SetLabel("Mini Mode");
+	mode2->SetLabel("Mini mode");
 	mode2->SetMessage(new BMessage(PV_MINI_MODE));
 	quit = new BMenuItem("Quit", new BMessage(PV_QUIT), 0, 0);
 	popupmenu->AddSeparatorItem();
 	popupmenu->AddItem(quit);
-	
+
 	SetViewColor(B_TRANSPARENT_COLOR);
-	
+
 	prefs = new Prefs();
 	active_color.red = (prefs->deskbar_active_color & 0xff000000) >> 24;
 	active_color.green = (prefs->deskbar_active_color & 0x00ff0000) >> 16;
 	active_color.blue = (prefs->deskbar_active_color & 0x0000ff00) >> 8;
-	
+
 	idle_color.red = (prefs->deskbar_idle_color & 0xff000000) >> 24;
 	idle_color.green = (prefs->deskbar_idle_color & 0x00ff0000) >> 16;
 	idle_color.blue = (prefs->deskbar_idle_color & 0x0000ff00) >> 8;
-	
+
 	frame_color.red = (prefs->deskbar_frame_color & 0xff000000) >> 24;
 	frame_color.green = (prefs->deskbar_frame_color & 0x00ff0000) >> 16;
 	frame_color.blue = (prefs->deskbar_frame_color & 0x0000ff00) >> 8;
 	SetViewColor(idle_color);
-	
+
 	messagerunner = NULL;
 	prefswindow = NULL;
 }
@@ -61,7 +61,7 @@ void DeskbarPulseView::AttachedToWindow() {
 	preferences->SetTarget(messenger);
 	about->SetTarget(messenger);
 	quit->SetTarget(messenger);
-	
+
 	system_info sys_info;
 	get_system_info(&sys_info);
 	if (sys_info.cpu_count >= 2) {
@@ -69,7 +69,7 @@ void DeskbarPulseView::AttachedToWindow() {
 			cpu_menu_items[x]->SetTarget(messenger);
 		}
 	}
-	
+
 	// Use a BMessageRunner to deliver periodic messsages instead
 	// of Pulse() events from the Deskbar - this is to avoid changing
 	// the current pulse rate and affecting other replicants
@@ -82,7 +82,7 @@ void DeskbarPulseView::MouseDown(BPoint point) {
 	uint32 buttons;
 	MakeFocus(true);
 	GetMouse(&cursor, &buttons, true);
-	
+
 	if (buttons & B_PRIMARY_MOUSE_BUTTON) {
 		BMessage *message = Window()->CurrentMessage();
 		int32 clicks = message->FindInt32("clicks");
@@ -113,12 +113,13 @@ void DeskbarPulseView::MessageReceived(BMessage *message) {
 				prefswindow->Activate(true);
 				break;
 			}
-			prefswindow = new PrefsWindow(prefs->prefs_window_rect,	"Pulse Preferences",
-				new BMessenger(this), prefs);
+			prefswindow = new PrefsWindow(prefs->prefs_window_rect,
+				"Pulse settings", new BMessenger(this), prefs);
 			prefswindow->Show();
 			break;
 		case PV_ABOUT: {
-			BAlert *alert = new BAlert("Info", "Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin", "OK");
+			BAlert *alert = new BAlert("Info", "Pulse\n\nBy David Ramsey and "
+				"Arve Hjønnevåg\nRevised by Daniel Switkin", "OK");
 			alert->Go(NULL);
 			break;
 		}

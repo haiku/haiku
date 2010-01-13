@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -39,18 +39,18 @@ FindWindow::FindWindow(BMessenger messenger, BString &str,
 
 	BView *layoutView = BGroupLayoutBuilder(B_VERTICAL, 10)
 		.SetInsets(5, 5, 5, 5)
-		.Add(fTextRadio = new BRadioButton("fTextRadio", "Use Text: ",
+		.Add(fTextRadio = new BRadioButton("fTextRadio", "Use text: ",
 			NULL))
 		.Add(fFindLabel = new BTextControl("fFindLabel", "", "", NULL))
 		.Add(fSelectionRadio = new BRadioButton("fSelectionRadio",
-			"Use Selection", NULL))
+			"Use selection", NULL))
 		.Add(separator)
 		.Add(fForwardSearchBox = new BCheckBox("fForwardSearchBox",
-			"Search Forward", NULL))
+			"Search forward", NULL))
 		.Add(fMatchCaseBox = new BCheckBox("fMatchCaseBox",
-			"Match Case", NULL))
+			"Match case", NULL))
 		.Add(fMatchWordBox = new BCheckBox("fMatchWordBox",
-			"Match Word", NULL))
+			"Match word", NULL))
 		.Add(fFindButton = new BButton("fFindButton", "Find",
 			new BMessage(MSG_FIND)))
 		.End();

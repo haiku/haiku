@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -60,7 +60,7 @@ class ShapeIterator : public BShapeIterator {
 	bool fHasLastPoint;
 };
 
-ShapeIterator::ShapeIterator(Icon *icon, Shape *to, BPoint offset, 
+ShapeIterator::ShapeIterator(Icon *icon, Shape *to, BPoint offset,
 	const char *name)
 {
 	CALLED();
@@ -112,7 +112,7 @@ ShapeIterator::IterateBezierTo(int32 bezierCount, BPoint *bezierPts)
 	if (fHasLastPoint)
 		start = fLastPoint;
 	while (bezierCount--) {
-		fPath->AddPoint(fOffset + bezierPts[0], 
+		fPath->AddPoint(fOffset + bezierPts[0],
 			fLastPoint, fOffset + bezierPts[1], true);
 		fLastPoint = fOffset + bezierPts[2];
 		bezierPts += 3;
@@ -184,11 +184,11 @@ StyledTextImporter::Import(Icon* icon, BMessage* clipping)
 
 	if (clipping == NULL)
 		return ENOENT;
-	if (clipping->FindData("text/plain", 
+	if (clipping->FindData("text/plain",
 		B_MIME_TYPE, (const void **)&text, &textLength) == B_OK) {
 		text_run_array *runs = NULL;
 		int32 runsLength;
-		if (clipping->FindData("application/x-vnd.Be-text_run_array", 
+		if (clipping->FindData("application/x-vnd.Be-text_run_array",
 			B_MIME_TYPE, (const void **)&runs, &runsLength) < B_OK)
 			runs = NULL;
 		BString str(text, textLength);
@@ -223,7 +223,7 @@ StyledTextImporter::Import(Icon* icon, const entry_ref* ref)
 		return err;
 	if (size > 1 * 1024 * 1024) // Don't load files that big
 		return E2BIG;
-	
+
 	BMallocIO mio;
 	mio.SetSize((size_t)size + 1);
 	memset((void *)mio.Buffer(), 0, (size_t)size + 1);
@@ -247,8 +247,8 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 
 	BString str(text);
 	if (str.Length() > 50) {
-		BAlert* alert = new BAlert("too big", 
-			"The text you are trying to import is quite long, are you sure ?", 
+		BAlert* alert = new BAlert("too big",
+			"The text you are trying to import is quite long, are you sure?",
 			"Yes", "No", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go())
 			return B_CANCELED;
@@ -274,7 +274,7 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 
 	for (int32 i = 0, c = 0; i < len && c < chars; c++) {
 		// make sure we are still on the (good) run
-		while (run && currentRun < runs->count - 1 && 
+		while (run && currentRun < runs->count - 1 &&
 			i >= runs->runs[currentRun + 1].offset) {
 			run = &runs->runs[++currentRun];
 			//printf("switching to run %d\n", currentRun);

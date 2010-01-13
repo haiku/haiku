@@ -56,7 +56,7 @@ CharacterMap::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "CharacterMap\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2009, Haiku Inc.\n", "Ok");
+		"\tCopyright 2009, Haiku, Inc.\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

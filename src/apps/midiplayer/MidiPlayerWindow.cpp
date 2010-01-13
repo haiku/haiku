@@ -192,7 +192,7 @@ void MidiPlayerWindow::CreateInputMenu()
 
 	inputPopUp->AddItem(inputOff);
 
-	inputMenu = new BMenuField("Live Input:", inputPopUp, NULL);
+	inputMenu = new BMenuField("Live input:", inputPopUp, NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -211,7 +211,7 @@ void MidiPlayerWindow::CreateReverbMenu()
 		"Garage", new BMessage(MSG_REVERB_GARAGE));
 
 	reverbIgor = new BMenuItem(
-		"Igor's Lab", new BMessage(MSG_REVERB_IGOR));
+		"Igor's lab", new BMessage(MSG_REVERB_IGOR));
 
 	reverbCavern = new BMenuItem(
 		"Cavern", new BMessage(MSG_REVERB_CAVERN));
@@ -397,7 +397,7 @@ void MidiPlayerWindow::LoadFile(entry_ref* ref)
 		scopeView->Invalidate();
 
 		(new BAlert(
-			NULL, "Could not load song", "Okay", NULL, NULL,
+			NULL, "Could not load song", "OK", NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 	}
 }

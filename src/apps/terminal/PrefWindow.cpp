@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku, Inc.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -23,7 +23,7 @@
 
 
 PrefWindow::PrefWindow(const BMessenger &messenger)
-	: BWindow(BRect(0, 0, 375, 185), "Terminal Preferences",
+	: BWindow(BRect(0, 0, 375, 185), "Terminal settings",
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_AUTO_UPDATE_SIZE_LIMITS),
 	fPreviousPref(new PrefHandler(PrefHandler::Default())),
@@ -37,7 +37,7 @@ PrefWindow::PrefWindow(const BMessenger &messenger)
 			.Add(new AppearancePrefView("Appearance", fTerminalMessenger))
 			.AddGroup(B_HORIZONTAL)
 				.Add(fSaveAsFileButton = new BButton("savebutton",
-					"Save to File" B_UTF8_ELLIPSIS,
+					"Save to file" B_UTF8_ELLIPSIS,
 					new BMessage(MSG_SAVEAS_PRESSED), B_WILL_DRAW))
 				.AddGlue()
 				.Add(fRevertButton = new BButton("revertbutton",
@@ -79,8 +79,8 @@ PrefWindow::QuitRequested()
 	if (!fDirty)
 		return true;
 
-	BAlert *alert = new BAlert("", "Save changes to this preference panel?",
-		"Cancel", "Don't Save", "Save",
+	BAlert *alert = new BAlert("", "Save changes to this settings panel?",
+		"Cancel", "Don't save", "Save",
 		B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
 		B_WARNING_ALERT); 
 	alert->SetShortcut(0, B_ESCAPE); 

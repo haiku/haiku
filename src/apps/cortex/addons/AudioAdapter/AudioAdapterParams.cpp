@@ -90,7 +90,7 @@ void _AudioAdapterParams::populateGroup(
 	param = inputGroup->MakeDiscreteParameter(
 		P_INPUT_FORMAT,
 		B_MEDIA_NO_TYPE,
-		"Sample Format",
+		"Sample format:",
 		B_GENERIC);
 	param->AddItem(
 		0,
@@ -111,7 +111,7 @@ void _AudioAdapterParams::populateGroup(
 	param = inputGroup->MakeDiscreteParameter(
 		P_INPUT_CHANNEL_COUNT,
 		B_MEDIA_NO_TYPE,
-		"Channels",
+		"Channels:",
 		B_GENERIC);
 	param->AddItem(
 		0,
@@ -137,7 +137,7 @@ void _AudioAdapterParams::populateGroup(
 	param = outputGroup->MakeDiscreteParameter(
 		P_OUTPUT_FORMAT,
 		B_MEDIA_NO_TYPE,
-		"Sample Format",
+		"Sample format:",
 		B_GENERIC);
 	param->AddItem(
 		0,
@@ -158,7 +158,7 @@ void _AudioAdapterParams::populateGroup(
 	param = outputGroup->MakeDiscreteParameter(
 		P_OUTPUT_CHANNEL_COUNT,
 		B_MEDIA_NO_TYPE,
-		"Channels",
+		"Channels:",
 		B_GENERIC);
 	param->AddItem(
 		0,

@@ -173,8 +173,8 @@ InstallerWindow::InstallerWindow()
 	fDestMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fPackagesSwitch = new PaneSwitch("options_button");
-	fPackagesSwitch->SetLabels("Hide Optional Packages",
-		"Show Optional Packages");
+	fPackagesSwitch->SetLabels("Hide optional packages",
+		"Show optional packages");
 	fPackagesSwitch->SetMessage(new BMessage(SHOW_BOTTOM_MESSAGE));
 	fPackagesSwitch->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNSET));
@@ -193,7 +193,7 @@ InstallerWindow::InstallerWindow()
 	fSizeView->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_MIDDLE));
 
-	fProgressBar = new BStatusBar("progress", "Install Progress:  ");
+	fProgressBar = new BStatusBar("progress", "Install progress:  ");
 	fProgressBar->SetMaxValue(100.0);
 
 	fBeginButton = new BButton("begin_button", "Begin",
@@ -205,7 +205,7 @@ InstallerWindow::InstallerWindow()
 		"Set up partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE));
 
 	fMakeBootableButton = new BButton("makebootable_button",
-		"Write Boot Sector", new BMessage(MSG_WRITE_BOOT_SECTOR));
+		"Write boot sector", new BMessage(MSG_WRITE_BOOT_SECTOR));
 	fMakeBootableButton->SetEnabled(false);
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
@@ -305,7 +305,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				snprintf(errorMessage, sizeof(errorMessage), "An error was "
 					"encountered and the installation was not completed:\n\n"
 					"Error:  %s", strerror(error));
-				(new BAlert("error", errorMessage, "Ok"))->Go();
+				(new BAlert("error", errorMessage, "OK"))->Go();
 			}
 
 			_DisableInterface(false);
@@ -383,8 +383,8 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		{
 			(new BAlert("use drive setup", "No partitions have been found that "
 				"are suitable for installation. Please set up partitions and "
-				"initialize at least one partition with the Be File System." ,
-				"Ok"))->Go();
+				"initialize at least one partition with the Be file system." ,
+				"OK"))->Go();
 		}
 		case MSG_STATUS_MESSAGE:
 		{
@@ -482,7 +482,7 @@ InstallerWindow::QuitRequested()
 	if (fDriveSetupLaunched) {
 		(new BAlert("driveSetup",
 			"Please close the DriveSetup window before closing the "
-			"Installer window.", "Ok"))->Go();
+			"Installer window.", "OK"))->Go();
 		return false;
 	}
 	_QuitCopyEngine(false);
@@ -522,7 +522,7 @@ InstallerWindow::_LaunchDriveSetup()
 		if (entry.GetRef(&ref) != B_OK || be_roster->Launch(&ref) != B_OK) {
 			BAlert* alert = new BAlert("error", "DriveSetup, the application "
 				"to configure disk partitions, could not be launched.",
-				"Ok");
+				"OK");
 			alert->Go();
 		}
 	}
@@ -599,7 +599,7 @@ InstallerWindow::_UpdateControls()
 		if (fDestMenu->CountItems() == 0)
 			label = "<none>";
 		else
-			label = "Please Choose Target";
+			label = "Please choose target";
 	}
 	fDestMenuField->MenuItem()->SetLabel(label.String());
 
@@ -624,7 +624,7 @@ InstallerWindow::_UpdateControls()
 	fBeginButton->SetEnabled(srcItem && dstItem);
 
 	// adjust "Write Boot Sector" button
-	label = "Write Boot Sector";
+	label = "Write boot sector";
 	if (dstItem)
 		label << " to \'" <<dstItem->Name() << '\'';
 	fMakeBootableButton->SetEnabled(dstItem);

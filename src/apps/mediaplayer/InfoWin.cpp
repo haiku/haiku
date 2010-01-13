@@ -415,7 +415,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		fContentsView->Insert(s.String());
 		// TODO: demux/video/audio/... perfs (Kb/s)
 
-		fLabelsView->Insert("Display Mode\n");
+		fLabelsView->Insert("Display mode\n");
 		if (fController->IsOverlayActive())
 			fContentsView->Insert("Overlay\n");
 		else

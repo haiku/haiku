@@ -43,12 +43,12 @@ ColorPickerPanel::ColorPickerPanel(BRect frame, rgb_color color,
 	  fMessage(message),
 	  fTarget(target)
 {
-	SetTitle("Pick Color");
+	SetTitle("Pick a color");
 
 	fColorPickerView = new ColorPickerView("color picker", color, mode);
 
 #if LIB_LAYOUT
-	MButton* defaultButton = new MButton("Ok", new BMessage(MSG_DONE), this);
+	MButton* defaultButton = new MButton("OK", new BMessage(MSG_DONE), this);
 
 	// interface layout
 	BView* topView = new VGroup (
@@ -68,7 +68,7 @@ ColorPickerPanel::ColorPickerPanel(BRect frame, rgb_color color,
 	);
 #else // LIB_LAYOUT
 	frame = BRect(0, 0, 40, 15);
-	BButton* defaultButton = new BButton(frame, "ok button", "Ok",
+	BButton* defaultButton = new BButton(frame, "ok button", "OK",
 										 new BMessage(MSG_DONE),
 										 B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	defaultButton->ResizeToPreferred();

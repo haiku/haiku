@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
@@ -127,7 +127,7 @@ TermApp::ReadyToRun()
 	// TODO: This alert does never show up.
 	if (status < B_OK) {
 		(new BAlert("alert", "Terminal couldn't start the shell. Sorry.",
-			"ok", NULL, NULL, B_WIDTH_FROM_LABEL,
+			"OK", NULL, NULL, B_WIDTH_FROM_LABEL,
 			B_INFO_ALERT))->Go(NULL);
 		PostMessage(B_QUIT_REQUESTED);
 		return;

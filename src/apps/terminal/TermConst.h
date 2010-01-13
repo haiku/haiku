@@ -100,34 +100,34 @@ const char* const PREF_HALF_FONT_SIZE = "Half Font Size";
 
 const char* const PREF_TEXT_FORE_COLOR = "Text";
 const char* const PREF_TEXT_BACK_COLOR = "Background";
-const char* const PREF_SELECT_FORE_COLOR = "Selected Text";
-const char* const PREF_SELECT_BACK_COLOR = "Selected Background";
-const char* const PREF_CURSOR_FORE_COLOR = "Cursor Text";
-const char* const PREF_CURSOR_BACK_COLOR = "Cursor Background";
+const char* const PREF_SELECT_FORE_COLOR = "Selected text";
+const char* const PREF_SELECT_BACK_COLOR = "Selected background";
+const char* const PREF_CURSOR_FORE_COLOR = "Cursor text";
+const char* const PREF_CURSOR_BACK_COLOR = "Cursor background";
 
-const char* const PREF_IM_FORE_COLOR = "IM Foreground Color";
-const char* const PREF_IM_BACK_COLOR = "IM Background Color";
-const char* const PREF_IM_SELECT_COLOR = "IM Selection Color";
+const char* const PREF_IM_FORE_COLOR = "IM foreground color";
+const char* const PREF_IM_BACK_COLOR = "IM background color";
+const char* const PREF_IM_SELECT_COLOR = "IM selection color";
 
-const char* const PREF_ANSI_BLACK_COLOR = "ANSI Black Color";
-const char* const PREF_ANSI_RED_COLOR = "ANSI Red Color";
-const char* const PREF_ANSI_GREEN_COLOR = "ANSI Green Color";
-const char* const PREF_ANSI_YELLOW_COLOR = "ANSI Yellow Color";
-const char* const PREF_ANSI_BLUE_COLOR = "ANSI Blue Color";
-const char* const PREF_ANSI_MAGENTA_COLOR = "ANSI Magenta Color";
-const char* const PREF_ANSI_CYAN_COLOR = "ANSI Cyan Color";
-const char* const PREF_ANSI_WHITE_COLOR = "ANSI White Color";
+const char* const PREF_ANSI_BLACK_COLOR = "ANSI black color";
+const char* const PREF_ANSI_RED_COLOR = "ANSI red color";
+const char* const PREF_ANSI_GREEN_COLOR = "ANSI green color";
+const char* const PREF_ANSI_YELLOW_COLOR = "ANSI yellow color";
+const char* const PREF_ANSI_BLUE_COLOR = "ANSI blue color";
+const char* const PREF_ANSI_MAGENTA_COLOR = "ANSI magenta color";
+const char* const PREF_ANSI_CYAN_COLOR = "ANSI cyan color";
+const char* const PREF_ANSI_WHITE_COLOR = "ANSI white color";
 
-const char* const PREF_HISTORY_SIZE = "History Size";
-const char* const PREF_CURSOR_BLINKING = "Cursor Blinking Rate";
+const char* const PREF_HISTORY_SIZE = "History size";
+const char* const PREF_CURSOR_BLINKING = "Cursor blinking rate";
 
-const char* const PREF_IM_AWARE = "Input Method Aware";
+const char* const PREF_IM_AWARE = "Input method aware";
 
 const char* const PREF_COLS = "Cols";
 const char* const PREF_ROWS = "Rows";
 const char* const PREF_SHELL = "Shell";
 
-const char* const PREF_TEXT_ENCODING = "Text Encoding";
+const char* const PREF_TEXT_ENCODING = "Text encoding";
 const char* const PREF_GUI_LANGUAGE = "Language";
 
 // Color type

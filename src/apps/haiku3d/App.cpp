@@ -39,7 +39,7 @@ void
 App::AboutRequested()
 {
 	BAlert* alert;
-	alert = new BAlert("About", "A little 3d demo", "ok");
+	alert = new BAlert("About", "A little 3D demo", "OK");
 	alert->Go(NULL);
 }
 

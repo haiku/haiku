@@ -32,11 +32,11 @@ DevicesView::CreateLayout()
 	BMenuBar* menuBar = new BMenuBar("menu");
 	BMenu* menu = new BMenu("Devices");
 	BMenuItem* item;
-	menu->AddItem(new BMenuItem("Refresh Devices", new BMessage(kMsgRefresh), 'R'));
-	menu->AddItem(item = new BMenuItem("Report Compatibility",
+	menu->AddItem(new BMenuItem("Refresh devices", new BMessage(kMsgRefresh), 'R'));
+	menu->AddItem(item = new BMenuItem("Report compatibility",
 		new BMessage(kMsgReportCompatibility)));
 	item->SetEnabled(false);
-	menu->AddItem(item = new BMenuItem("Generate System Information",
+	menu->AddItem(item = new BMenuItem("Generate system information",
 		new BMessage(kMsgGenerateSysInfo)));
 	item->SetEnabled(false);
 	menu->AddSeparatorItem();
@@ -60,12 +60,12 @@ DevicesView::CreateLayout()
 	// why? Bug? In scrollview or in outlinelistview?
 
 	BPopUpMenu* orderByPopupMenu = new BPopUpMenu("orderByMenu");
-	BMenuItem* byCategory = new BMenuItem("category", 
+	BMenuItem* byCategory = new BMenuItem("Category",
 		new BMessage(kMsgOrderCategory));
-	BMenuItem* byConnection = new BMenuItem("connection",
+	BMenuItem* byConnection = new BMenuItem("Connection",
 		new BMessage(kMsgOrderConnection));
 	byCategory->SetMarked(true);
-	fOrderBy = byCategory->IsMarked() ? ORDER_BY_CATEGORY : 
+	fOrderBy = byCategory->IsMarked() ? ORDER_BY_CATEGORY :
 		ORDER_BY_CONNECTION;
 	orderByPopupMenu->AddItem(byCategory);
 	orderByPopupMenu->AddItem(byConnection);
@@ -76,7 +76,7 @@ DevicesView::CreateLayout()
 	fBasicTab = new BTab();
 	fBasicView = new PropertyListPlain("basicView");
 	fTabView->AddTab(fBasicView, fBasicTab);
-	fBasicTab->SetLabel("Basic Information");
+	fBasicTab->SetLabel("Basic information");
 
 	fDeviceTypeTab = new BTab();
 	fBusView = new PropertyListPlain("busView");
@@ -273,27 +273,27 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 		}
 		attributes.push_back(Attribute(attr.name, attrString));
 	}
-	
+
 	// Determine what type of device it is and create it
 	for (unsigned int i = 0; i < attributes.size(); i++) {
 		// Devices Root
-		if (attributes[i].fName == "device/pretty name" 
+		if (attributes[i].fName == "device/pretty name"
 				&& attributes[i].fValue == "Devices Root") {
 			newDevice = new Device(parent, BUS_NONE, CAT_COMPUTER, "Computer");
 			break;
 		}
-		
+
 		// PCI bus
 		if (attributes[i].fName == "device/pretty name"
 				&& attributes[i].fValue == "PCI") {
-			newDevice = new Device(parent, BUS_PCI, CAT_BUS, "PCI Bus");
+			newDevice = new Device(parent, BUS_PCI, CAT_BUS, "PCI bus");
 			break;
 		}
 
 		// ISA bus
 		if (attributes[i].fName == "device/bus"
 				&& attributes[i].fValue == "isa") {
-			newDevice = new Device(parent, BUS_ISA, CAT_BUS, "ISA Bus");
+			newDevice = new Device(parent, BUS_ISA, CAT_BUS, "ISA bus");
 			break;
 		}
 
@@ -304,11 +304,11 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 			break;
 		}
 	}
-	
+
 	if (newDevice == NULL) {
-		newDevice = new Device(parent, BUS_NONE, CAT_NONE, "Unknown Device");
+		newDevice = new Device(parent, BUS_NONE, CAT_NONE, "Unknown device");
 	}
-	
+
 	// Add its attributes to the device, initialize it and add to the list.
 	for (unsigned int i = 0; i < attributes.size(); i++) {
 		newDevice->SetAttribute(attributes[i].fName, attributes[i].fValue);

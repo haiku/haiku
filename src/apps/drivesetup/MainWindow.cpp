@@ -164,7 +164,7 @@ MainWindow::MainWindow(BRect frame)
 	fFormatMI = new BMenuItem("Format (not implemented)",
 		new BMessage(MSG_FORMAT));
 	fEjectMI = new BMenuItem("Eject", new BMessage(MSG_EJECT), 'E');
-	fSurfaceTestMI = new BMenuItem("Surface Test (not implemented)",
+	fSurfaceTestMI = new BMenuItem("Surface test (not implemented)",
 		new BMessage(MSG_SURFACE_TEST));
 	fRescanMI = new BMenuItem("Rescan", new BMessage(MSG_RESCAN));
 
@@ -174,7 +174,7 @@ MainWindow::MainWindow(BRect frame)
 
 	fMountMI = new BMenuItem("Mount", new BMessage(MSG_MOUNT), 'M');
 	fUnmountMI = new BMenuItem("Unmount", new BMessage(MSG_UNMOUNT), 'U');
-	fMountAllMI = new BMenuItem("Mount All",
+	fMountAllMI = new BMenuItem("Mount all",
 		new BMessage(MSG_MOUNT_ALL), 'M', B_SHIFT_KEY);
 
 	// Disk menu
@@ -622,7 +622,7 @@ MainWindow::_DisplayPartitionError(BString _message,
 		sprintf(message, "%s\n\nError: %s", helper.String(), strerror(error));
 	}
 
-	BAlert* alert = new BAlert("error", message, "Ok", NULL, NULL,
+	BAlert* alert = new BAlert("error", message, "OK", NULL, NULL,
 		B_WIDTH_FROM_WIDEST, error < B_OK ? B_STOP_ALERT : B_INFO_ALERT);
 	alert->Go(NULL);
 }
@@ -642,7 +642,7 @@ MainWindow::_Mount(BDiskDevice* disk, partition_id selectedPartition)
 
 	BPartition* partition = disk->FindDescendant(selectedPartition);
 	if (!partition) {
-		_DisplayPartitionError("Unable to find the selected partition by id.");
+		_DisplayPartitionError("Unable to find the selected partition by ID.");
 		return;
 	}
 
@@ -673,7 +673,7 @@ MainWindow::_Unmount(BDiskDevice* disk, partition_id selectedPartition)
 
 	BPartition* partition = disk->FindDescendant(selectedPartition);
 	if (!partition) {
-		_DisplayPartitionError("Unable to find the selected partition by id.");
+		_DisplayPartitionError("Unable to find the selected partition by ID.");
 		return;
 	}
 
@@ -757,7 +757,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 
 	BPartition* partition = disk->FindDescendant(selectedPartition);
 	if (!partition) {
-		_DisplayPartitionError("Unable to find the selected partition by id.");
+		_DisplayPartitionError("Unable to find the selected partition by ID.");
 		return;
 	}
 
@@ -862,9 +862,9 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		message << "All data on the partition";
 	if (previousName.Length() > 0)
 		message << " \"" << previousName << "\"";
-	message << " will be irrevertably lost if you do so!";
+	message << " will be irretrievably lost if you do so!";
 	alert = new BAlert("final notice", message.String(),
-		"Write Changes", "Cancel", NULL, B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+		"Write changes", "Cancel", NULL, B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 	choice = alert->Go();
 
 	if (choice == 1)
@@ -873,7 +873,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	// commit
 	ret = modificationPreparer.CommitModifications();
 
-	// The partition pointer is toast now! Use the partition id to
+	// The partition pointer is toast now! Use the partition ID to
 	// retrieve it again.
 	partition = disk->FindDescendant(selectedPartition);
 
@@ -969,9 +969,9 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	BString message = "Are you sure you want to write the changes back to "
 		"disk now?\n\n";
 	message << "All data on the partition";
-	message << " will be irrevertably lost if you do so!";
+	message << " will be irretrievably lost if you do so!";
 	BAlert* alert = new BAlert("final notice", message.String(),
-		"Write Changes", "Cancel", NULL, B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+		"Write changes", "Cancel", NULL, B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 	int32 choice = alert->Go();
 
 	if (choice == 1)
@@ -1018,7 +1018,7 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 
 	BPartition* partition = disk->FindDescendant(selectedPartition);
 	if (!partition) {
-		_DisplayPartitionError("Unable to find the selected partition by id.");
+		_DisplayPartitionError("Unable to find the selected partition by ID.");
 		return;
 	}
 
@@ -1045,9 +1045,9 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 	// Warn the user one more time...
 	BString message = "Are you sure you want to delete the selected ";
 	message << "partition?\n\nAll data on the partition";
-	message << " will be irrevertably lost if you do so!";
+	message << " will be irretrievably lost if you do so!";
 	BAlert* alert = new BAlert("final notice", message.String(),
-		"Delete Partition", "Cancel", NULL, B_WIDTH_FROM_WIDEST,
+		"Delete partition", "Cancel", NULL, B_WIDTH_FROM_WIDEST,
 		B_WARNING_ALERT);
 	int32 choice = alert->Go();
 

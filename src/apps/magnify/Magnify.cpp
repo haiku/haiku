@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Updated by Sikosis (beos@gravity24hr.com)
@@ -132,40 +132,40 @@ BuildInfoMenu(BMenu *menu)
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("Save Image", new BMessage(msg_save),'S');
+	menuItem = new BMenuItem("Save image", new BMessage(msg_save),'S');
 	menu->AddItem(menuItem);
-//	menuItem = new BMenuItem("Save Selection", new BMessage(msg_save),'S');
+//	menuItem = new BMenuItem("Save selection", new BMessage(msg_save),'S');
 //	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Copy Image", new BMessage(msg_copy_image),'C');
+	menuItem = new BMenuItem("Copy image", new BMessage(msg_copy_image),'C');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("Hide/Show Info", new BMessage(msg_show_info),'T');
+	menuItem = new BMenuItem("Hide/Show info", new BMessage(msg_show_info),'T');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Add a Crosshair", new BMessage(msg_add_cross_hair),'H');
+	menuItem = new BMenuItem("Add a crosshair", new BMessage(msg_add_cross_hair),'H');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Remove a Crosshair", new BMessage(msg_remove_cross_hair), 'H',
+	menuItem = new BMenuItem("Remove a crosshair", new BMessage(msg_remove_cross_hair), 'H',
 		B_SHIFT_KEY);
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Hide/Show Grid", new BMessage(msg_toggle_grid),'G');
+	menuItem = new BMenuItem("Hide/Show grid", new BMessage(msg_toggle_grid),'G');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
 	menuItem = new BMenuItem("Freeze/Unfreeze image", new BMessage(msg_freeze),'F');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Stick Coordinates", new BMessage(msg_stick), 'I');
+	menuItem = new BMenuItem("Stick coordinates", new BMessage(msg_stick), 'I');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("Make Square", new BMessage(msg_make_square),'/');
+	menuItem = new BMenuItem("Make square", new BMessage(msg_make_square),'/');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Decrease Window Size", new BMessage(msg_shrink),'-');
+	menuItem = new BMenuItem("Decrease window size", new BMessage(msg_shrink),'-');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Increase Window Size", new BMessage(msg_grow),'+');
+	menuItem = new BMenuItem("Increase window size", new BMessage(msg_grow),'+');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Decrease Pixel Size", new BMessage(msg_shrink_pixel),',');
+	menuItem = new BMenuItem("Decrease pixel size", new BMessage(msg_shrink_pixel),',');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Increase Pixel Size", new BMessage(msg_grow_pixel),'.');
+	menuItem = new BMenuItem("Increase pixel size", new BMessage(msg_grow_pixel),'.');
 	menu->AddItem(menuItem);
 }
 
@@ -771,7 +771,7 @@ void
 TWindow::ShowHelp()
 {
 	BRect r(0, 0, 375, 240);
-	BWindow* w = new BWindow(r, "Magnify Help", B_TITLED_WINDOW,
+	BWindow* w = new BWindow(r, "Magnify help", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE);
 
 	r.right -= B_V_SCROLL_BAR_WIDTH;
@@ -810,7 +810,7 @@ TWindow::ShowHelp()
 	text->Insert("  freeze - freezes/unfreezes magnification of whatever the\n");
 	text->Insert("    cursor is currently over\n");
 	text->Insert("\n\n");
-	text->Insert("Sizing & Resizing:\n");
+	text->Insert("Sizing/Resizing:\n");
 	text->Insert("  make square - sets the width and the height to the larger\n");
 	text->Insert("    of the two making a square image\n");
 	text->Insert("  increase/decrease window size - grows or shrinks the window\n");
@@ -1013,31 +1013,31 @@ TMenu::AttachedToWindow()
 	if (fMainWindow)
 		state = fMainWindow->IsActive();
 
-	BMenuItem* menuItem = FindItem("Hide/Show Info");
+	BMenuItem* menuItem = FindItem("Hide/Show info");
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Add a Crosshair");
+	menuItem = FindItem("Add a crosshair");
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Remove a Crosshair");
+	menuItem = FindItem("Remove a crosshair");
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Hide/Show Grid");
+	menuItem = FindItem("Hide/Show grid");
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Make Square");
+	menuItem = FindItem("Make square");
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Decrease Window Size");
+	menuItem = FindItem("Decrease window size");
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Increase Window Size");
+	menuItem = FindItem("Increase window size");
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Decrease Pixel Size");
+	menuItem = FindItem("Decrease pixel size");
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Increase Pixel Size");
+	menuItem = FindItem("Increase pixel size");
 	if (menuItem)
 		menuItem->SetEnabled(state);
 

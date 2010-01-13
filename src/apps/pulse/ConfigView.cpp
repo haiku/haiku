@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Copyright 1999, Be Incorporated. All Rights Reserved.
@@ -61,7 +61,7 @@ ConfigView::ConfigView(BRect rect, const char *name, uint32 mode, BMessenger& ta
 	fActiveButton = fIdleButton = fFrameButton = NULL;
 	fIconWidthControl = NULL;
 
-	SetLabel("Bar Colors");
+	SetLabel("Bar colors");
 
 	font_height fontHeight;
 	be_bold_font->GetHeight(&fontHeight);

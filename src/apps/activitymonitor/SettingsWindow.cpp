@@ -70,9 +70,9 @@ private:
 
 		bigtime_t interval = kUpdateIntervals[level];
 		if ((interval % 1000) == 0)
-			snprintf(fText, sizeof(fText), "%lld secs", interval / 1000);
+			snprintf(fText, sizeof(fText), "%lld sec.", interval / 1000);
 		else
-			snprintf(fText, sizeof(fText), "%lld msecs", interval);
+			snprintf(fText, sizeof(fText), "%lld ms", interval);
 
 		return fText;
 	}

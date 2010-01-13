@@ -89,7 +89,7 @@ PulseWindow::MessageReceived(BMessage *message)
 			// Otherwise launch a new preferences window
 			PulseApp *pulseapp = (PulseApp *)be_app;
 			fPrefsWindow = new PrefsWindow(pulseapp->prefs->prefs_window_rect,
-				"Pulse Preferences", new BMessenger(this), pulseapp->prefs);
+				"Pulse settings", new BMessenger(this), pulseapp->prefs);
 			fPrefsWindow->Show();
 			break;
 		}

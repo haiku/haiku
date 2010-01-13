@@ -26,30 +26,30 @@ BString	MediaString::getStringFor(
 
 	if (kinds & B_BUFFER_PRODUCER) {
 		if (first) {
-			list = "Buffer Producer";
+			list = "Buffer producer";
 			first = false;
 		}
 	}
 	if (kinds & B_BUFFER_CONSUMER) {
 		if (first) {
-			list = "Buffer Consumer";
+			list = "Buffer consumer";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Buffer Consumer";
+			last = "Buffer consumer";
 		}
 	}
 	if (kinds & B_TIME_SOURCE) {
 		if (first) {
-			list = "Time Source";
+			list = "Time source";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Time Source";
+			last = "Time source";
 		}
 	}
 	if (kinds & B_CONTROLLABLE) {
@@ -65,57 +65,57 @@ BString	MediaString::getStringFor(
 	}
 	if (kinds & B_FILE_INTERFACE) {
 		if (first) {
-			list = "File Interface";
+			list = "File interface";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "File Interface";
+			last = "File interface";
 		}
 	}
 	if (kinds & B_ENTITY_INTERFACE) {
 		if (first) {
-			list = "Entity Interface";
+			list = "Entity interface";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Entity Interface";
+			last = "Entity interface";
 		}
 	}
 	if (kinds & B_PHYSICAL_INPUT) {
 		if (first) {
-			list = "Physical Input";
+			list = "Physical input";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Physical Input";
+			last = "Physical input";
 		}
 	}
 	if (kinds & B_PHYSICAL_OUTPUT) {
 		if (first) {
-			list = "Physical Output";
+			list = "Physical output";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Physical Output";
+			last = "Physical output";
 		}
 	}
 	if (kinds & B_SYSTEM_MIXER) {
 		if (first) {
-			list = "System Mixer";
+			list = "System mixer";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "System Mixer";
+			last = "System mixer";
 		}
 	}
 
@@ -133,9 +133,9 @@ BString MediaString::getStringFor(
 	switch (runMode) {
 		case BMediaNode::B_OFFLINE:				return "Offline";
 		case BMediaNode::B_RECORDING:			return "Recording";
-		case BMediaNode::B_DECREASE_PRECISION:	return "Decrease Precision";
-		case BMediaNode::B_INCREASE_LATENCY:	return "Increase Latency";
-		case BMediaNode::B_DROP_DATA:			return "Drop Data";
+		case BMediaNode::B_DECREASE_PRECISION:	return "Decrease precision";
+		case BMediaNode::B_INCREASE_LATENCY:	return "Increase latency";
+		case BMediaNode::B_DROP_DATA:			return "Drop data";
 		default:								return "(unknown run mode)";
 	}
 }
@@ -150,24 +150,24 @@ BString	MediaString::getStringFor(
 	D_METHOD(("MediaString::getStringFor(media_type)\n"));
 
 	switch (type) {
-		case B_MEDIA_NO_TYPE:			return "Typeless Media";
-		case B_MEDIA_UNKNOWN_TYPE:		return "Unknown Media Type";
-		case B_MEDIA_RAW_AUDIO:			return "Raw Audio";
-		case B_MEDIA_RAW_VIDEO:			return "Raw Video";
+		case B_MEDIA_NO_TYPE:			return "Typeless media";
+		case B_MEDIA_UNKNOWN_TYPE:		return "Unknown media type";
+		case B_MEDIA_RAW_AUDIO:			return "Raw audio";
+		case B_MEDIA_RAW_VIDEO:			return "Raw video";
 		case B_MEDIA_VBL:				return "Raw data from VBL area";
 		case B_MEDIA_TIMECODE:			return "Timecode";
 		case B_MEDIA_MIDI:				return "MIDI";
 		case B_MEDIA_TEXT:				return "Text";
 		case B_MEDIA_HTML:				return "HTML";
-		case B_MEDIA_MULTISTREAM:		return "Multistream Media";
+		case B_MEDIA_MULTISTREAM:		return "Multistream media";
 		case B_MEDIA_PARAMETERS:		return "Parameters";
-		case B_MEDIA_ENCODED_AUDIO:		return "Encoded Audio";
-		case B_MEDIA_ENCODED_VIDEO:		return "Encoded Video";
+		case B_MEDIA_ENCODED_AUDIO:		return "Encoded audio";
+		case B_MEDIA_ENCODED_VIDEO:		return "Encoded video";
 		default: {
 			if (type >= B_MEDIA_PRIVATE)
-				return "Private Be Media Type";
+				return "Private Be media type";
 			if (type >= B_MEDIA_FIRST_USER_TYPE)
-				return "User-defined Media Type";
+				return "User-defined media type";
 		}
 	}
 	return "Unknown Media Type";
@@ -179,15 +179,15 @@ BString	MediaString::getStringFor(
 	D_METHOD(("MediaString::getStringFor(media_format_family)\n"));
 
 	switch (family) {
-		case B_ANY_FORMAT_FAMILY:		return "Any Format Family";
-		case B_BEOS_FORMAT_FAMILY:		return "BeOS Format Family";
-		case B_QUICKTIME_FORMAT_FAMILY:	return "QuickTime Format Family";
-		case B_AVI_FORMAT_FAMILY:		return "AVI Format Family";
-		case B_ASF_FORMAT_FAMILY:		return "ASF Format Family";
-		case B_MPEG_FORMAT_FAMILY:		return "MPEG Format Family";
-		case B_WAV_FORMAT_FAMILY:		return "WAV Format Family";
-		case B_AIFF_FORMAT_FAMILY:		return "AIFF Format Family";
-		default:						return "Miscellaneous Format Family";
+		case B_ANY_FORMAT_FAMILY:		return "Any format family";
+		case B_BEOS_FORMAT_FAMILY:		return "BeOS format family";
+		case B_QUICKTIME_FORMAT_FAMILY:	return "QuickTime format family";
+		case B_AVI_FORMAT_FAMILY:		return "AVI format family";
+		case B_ASF_FORMAT_FAMILY:		return "ASF format family";
+		case B_MPEG_FORMAT_FAMILY:		return "MPEG format family";
+		case B_WAV_FORMAT_FAMILY:		return "WAV format family";
+		case B_AIFF_FORMAT_FAMILY:		return "AIFF format family";
+		default:						return "Miscellaneous format family";
 	}
 }
 
@@ -460,7 +460,7 @@ BString MediaString::getStringFor(
 		s << "Port " << source.port << ", ID " << source.id;
 	}
 	else {
-		s = "(None)";
+		s = "(none)";
 	}
 	return s;
 }
@@ -476,7 +476,7 @@ BString MediaString::getStringFor(
 		s << "Port " << destination.port << ", ID " << destination.id;
 	}
 	else {
-		s = "(None)";
+		s = "(none)";
 	}
 	return s;
 }
@@ -497,13 +497,13 @@ BString MediaString::forAudioFormat(
 
 	switch (format) {
 		case media_raw_audio_format::B_AUDIO_UCHAR: {
-			return "8 bit Integer";
+			return "8 bit integer";
 		}
 		case media_raw_audio_format::B_AUDIO_SHORT:	{
-			return "16 bit Integer";
+			return "16 bit integer";
 		}
 		case media_raw_audio_format::B_AUDIO_FLOAT:	{
-			return "32 bit Float";
+			return "32 bit float";
 		}
 		case media_raw_audio_format::B_AUDIO_INT: {
 			BString s = "";
@@ -511,7 +511,7 @@ BString MediaString::forAudioFormat(
 				s << validBits << " bit ";
 			else
 				s << "32 bit ";
-			s << "Integer";
+			s << "integer";
 			return s;
 		}
 		default: {
@@ -569,10 +569,10 @@ BString MediaString::forAudioByteOrder(
 
 	switch (byteOrder) {
 		case B_MEDIA_BIG_ENDIAN: {
-			return "Big Endian";
+			return "Big endian";
 		}
 		case B_MEDIA_LITTLE_ENDIAN: {
-			return "Little Endian";
+			return "Little endian";
 		}
 		default: {
 			return "(unknown byte order)";
@@ -642,156 +642,156 @@ BString MediaString::forAudioChannelMask(
 	}
 	if (channelMask & B_CHANNEL_REARLEFT) {
 		if (first) {
-			list = "Rear-Left";
+			list = "Rear-left";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Rear-Left";
+			last = "Rear-left";
 		}
 	}
 	if (channelMask & B_CHANNEL_REARRIGHT) {
 		if (first) {
-			list = "Rear-Right";
+			list = "Rear-right";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Rear-Right";
+			last = "Rear-right";
 		}
 	}
 	if (channelMask & B_CHANNEL_FRONT_LEFT_CENTER) {
 		if (first) {
-			list = "Front-Left-Center";
+			list = "Front-left-center";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Front-Left-Center";
+			last = "Front-left-center";
 		}
 	}
 	if (channelMask & B_CHANNEL_FRONT_RIGHT_CENTER) {
 		if (first) {
-			list = "Front-Right-Center";
+			list = "Front-right-center";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Front-Right-Center";
+			last = "Front-right-center";
 		}
 	}
 	if (channelMask & B_CHANNEL_BACK_CENTER) {
 		if (first) {
-			list = "Back-Center";
+			list = "Back-center";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Back-Center";
+			last = "Back-center";
 		}
 	}
 	if (channelMask & B_CHANNEL_SIDE_LEFT) {
 		if (first) {
-			list = "Side-Left";
+			list = "Side-left";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Side-Left";
+			last = "Side-left";
 		}
 	}
 	if (channelMask & B_CHANNEL_SIDE_RIGHT) {
 		if (first) {
-			list = "Side-Right";
+			list = "Side-right";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Side-Right";
+			last = "Side-right";
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_CENTER) {
 		if (first) {
-			list = "Top-Center";
+			list = "Top-center";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Center";
+			last = "Top-center";
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_FRONT_LEFT) {
 		if (first) {
-			list = "Top-Front-Left";
+			list = "Top-Front-left";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Front-Left";
+			last = "Top-Front-left";
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_FRONT_CENTER) {
 		if (first) {
-			list = "Top-Front-Center";
+			list = "Top-Front-center";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Front-Center";
+			last = "Top-Front-center";
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_FRONT_RIGHT) {
 		if (first) {
-			list = "Top-Front-Right";
+			list = "Top-Front-right";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Front-Right";
+			last = "Top-Front-right";
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_BACK_LEFT) {
 		if (first) {
-			list = "Top-Back-Left";
+			list = "Top-Back-left";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Back-Left";
+			last = "Top-Back-left";
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_BACK_CENTER) {
 		if (first) {
-			list = "Top-Back-Center";
+			list = "Top-Back-center";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Back-Center";
+			last = "Top-Back-center";
 		}
 	}
 	if (channelMask & B_CHANNEL_TOP_BACK_RIGHT) {
 		if (first) {
-			list = "Top-Back-Right";
+			list = "Top-Back-right";
 			first = false;
 		}
 		else {
 			if (last != "")
 				list << ", " << last;
-			last = "Top-Back-Right";
+			last = "Top-Back-right";
 		}
 	}
 	if (last != "") {
@@ -876,8 +876,8 @@ BString MediaString::forVideoFormat(
 		case B_RGB15_BIG:		return "15 bit RGB";
 		case B_RGBA15:
 		case B_RGBA15_BIG:		return "15 bit RGBA";
-		case B_CMAP8:			return "8 bit Color-Index";
-		case B_GRAY8:			return "8 bit Grayscale-Index";
+		case B_CMAP8:			return "8 bit color-index";
+		case B_GRAY8:			return "8 bit grayscale-index";
 		case B_GRAY1:			return "Monochrome";
 		case B_YUV422:			return "YUV422";
 		case B_YUV411:			return "YUV411";
@@ -942,7 +942,7 @@ BString MediaString::forVideoFieldRate(
 
 	BString s = "";
 	if (interlace == 1) {
-		s << "Non-Interlaced ";
+		s << "Non-interlaced ";
 	}
 	else {
 		s << "Interlaced ";
@@ -970,10 +970,10 @@ BString MediaString::forVideoOrientation(
 
 	switch (orientation) {
 		case B_VIDEO_TOP_LEFT_RIGHT: {
-			return "Top to Bottom, Left to Right";
+			return "Top to bottom, left to right";
 		}
 		case B_VIDEO_BOTTOM_LEFT_RIGHT: {
-			return "Bottom to Top, Left to Right";
+			return "Bottom to top, left to right";
 		}
 		default: {
 			return "(unkown video orientation)";
@@ -1129,7 +1129,7 @@ BString MediaString::forMultistreamFormat(
 	}
 
 	switch (format) {
-		case media_multistream_format::B_VID:		return "BeOS Video";
+		case media_multistream_format::B_VID:		return "BeOS video";
 		case media_multistream_format::B_AVI:		return "AVI";
 		case media_multistream_format::B_MPEG1:		return "MPEG1";
 		case media_multistream_format::B_MPEG2:		return "MPEG2";
