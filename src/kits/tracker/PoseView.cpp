@@ -467,8 +467,8 @@ BPoseView::RestoreState(AttributeStreamNode *node)
 			viewStateAttr = kAttrDisksViewState;
 			viewStateAttrForeign = kAttrDisksViewStateForeign;
 		} else {
-			viewStateAttr = kAttrViewState;
-			viewStateAttrForeign = kAttrViewStateForeign;
+			viewStateAttr = ViewStateAttributeName();
+			viewStateAttrForeign = ForeignViewStateAttributeName();
 		}
 
 		bool wrongEndianness = false;
@@ -578,6 +578,21 @@ BPoseView::SetUpDefaultColumnsIfNeeded()
 }
 
 
+const char *
+BPoseView::ViewStateAttributeName() const
+{
+	return IsDesktopView() ? kAttrDesktopViewState : kAttrViewState;
+}
+
+
+const char *
+BPoseView::ForeignViewStateAttributeName() const
+{
+	return IsDesktopView() ? kAttrDesktopViewStateForeign 
+		: kAttrViewStateForeign;
+}
+
+
 void
 BPoseView::SaveColumnState(AttributeStreamNode *node)
 {
@@ -631,8 +646,8 @@ BPoseView::SaveState(AttributeStreamNode *node)
 		viewStateAttr = kAttrDisksViewState;
 		viewStateAttrForeign = kAttrDisksViewStateForeign;
 	} else {
-		viewStateAttr = kAttrViewState;
-		viewStateAttrForeign = kAttrViewStateForeign;
+		viewStateAttr = ViewStateAttributeName();
+		viewStateAttrForeign = ForeignViewStateAttributeName();
 	}
 
 	node->Write(viewStateAttr, viewStateAttrForeign, B_RAW_TYPE,
@@ -1791,7 +1806,6 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 }
 
 
-
 bool
 BPoseView::PoseVisible(const Model *model, const PoseInfo *poseInfo,
 	bool inFilePanel)
@@ -1804,9 +1818,6 @@ BPoseView::PoseVisible(const Model *model, const PoseInfo *poseInfo,
 bool
 BPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
 {
-	if (!PoseVisible(model, poseInfo, IsFilePanel()))
-		return false;
-
 	// check filter before adding item
 	if (!fRefFilter)
 		return true;
@@ -4733,21 +4744,6 @@ BPoseView::TryUpdatingBrokenLinks()
 
 
 void
-BPoseView::RemoveNonBootDesktopModels(BPose *, Model *model, int32,
-	BPoseView *poseView, dev_t)
-{
-	BPath path;
-
-	model->GetPath(&path);
-
-	TrackerString pathString(path.Path());
-
-	if (pathString.Contains("/home/Desktop") && !pathString.StartsWith("/boot"))
-		poseView->DeletePose(model->NodeRef());
-}
-
-
-void
 BPoseView::PoseHandleDeviceUnmounted(BPose *pose, Model *model, int32 index,
 	BPoseView *poseView, dev_t device)
 {
@@ -4901,8 +4897,7 @@ BPoseView::FSNotification(const BMessage *message)
 				if (dirNode != *TargetModel()->NodeRef()
 					&& !TargetModel()->IsQuery()
 					&& !TargetModel()->IsRoot()
-					&& ((!settings.IntegrateNonBootBeOSDesktops()
-						&& !settings.ShowDisksIcon()) || !IsDesktopView()))
+					&& !settings.ShowDisksIcon() || !IsDesktopView())
 					// stray notification
 					break;
 
@@ -5201,28 +5196,7 @@ BPoseView::EntryMoved(const BMessage *message)
 		return DeletePose(&itemNode);
 	else if (dirNode.node == thisDirNode.node)
 		EntryCreated(&dirNode, &itemNode, name);
-	else if (TrackerSettings().IntegrateNonBootBeOSDesktops() && IsDesktopView()) {
-		// node entered/exited desktop view, we have more work to do
-
-		// if old dir node is a desktop folder, delete pose
-		node_ref oldDirNode;
-		oldDirNode.node = oldDir;
-		oldDirNode.device = dirNode.device;
-		BDirectory oldDirectory(&oldDirNode);
-		BEntry oldDirectoryEntry;
-		oldDirectory.GetEntry(&oldDirectoryEntry);
-		if (oldDirectoryEntry.InitCheck() == B_OK
-			&& FSIsDeskDir(&oldDirectoryEntry)
-			&& !DeletePose(&itemNode))
-			return false;
-
-		// if new dir node is a desktop folder, create pose
-		BDirectory newDirectory(&dirNode);
-		BEntry newDirectoryEntry;
-		newDirectory.GetEntry(&newDirectoryEntry);
-		if (newDirectoryEntry.InitCheck() == B_OK && FSIsDeskDir(&newDirectoryEntry))
-			EntryCreated(&dirNode, &itemNode, name);
-	}
+	
 	return true;
 }
 
@@ -9436,26 +9410,6 @@ void
 BPoseView::SetWidgetTextOutline(bool on)
 {
 	fWidgetTextOutline = on;
-}
-
-
-/* static */
-bool
-BPoseView::ShouldIntegrateDesktop(const BVolume &volume)
-{
-	if (!volume.IsPersistent())
-		return false;
-
-	TrackerSettings settings;
-	if (settings.IntegrateAllNonBootDesktops())
-		return true;
-
-	if (!settings.IntegrateNonBootBeOSDesktops())
-		return false;
-
-	// Only removable read-only volumes should have their desktops integrated
-	return volume.IsRemovable() && volume.IsReadOnly()
-		&& volume.KnowsQuery() && volume.KnowsAttr() && volume.KnowsMime();
 }
 
 

@@ -100,6 +100,8 @@ namespace BPrivate {
 #define	kAttrViewState_le				"_trk/viewstate_le"
 #define	kAttrDisksViewState_be			"_trk/d_viewstate"
 #define	kAttrDisksViewState_le			"_trk/d_viewstate_le"
+#define	kAttrDesktopViewState_be		"_trk/desk_viewstate"
+#define	kAttrDesktopViewState_le		"_trk/desk_viewstate_le"
 #define	kAttrDisksColumns_be			"_trk/d_columns"
 #define	kAttrDisksColumns_le			"_trk/d_columns_le"
 
@@ -130,6 +132,9 @@ namespace BPrivate {
 #define	kAttrDisksColumns				kAttrDisksColumns_le
 #define	kAttrDisksColumnsForeign		kAttrDisksColumns_be
 
+#define	kAttrDesktopViewState			kAttrDesktopViewState_le
+#define	kAttrDesktopViewStateForeign	kAttrDesktopViewState_be
+
 #define kAttrQueryMoreOptions 			kAttrQueryMoreOptions_le
 #define kAttrQueryMoreOptionsForeign 	kAttrQueryMoreOptions_be
 #define	kAttrExtendedPoseInfo			kAttrExtendedPoseInfo_le
@@ -158,6 +163,9 @@ namespace BPrivate {
 
 #define	kAttrDisksColumns				kAttrDisksColumns_be
 #define	kAttrDisksColumnsForeign		kAttrDisksColumns_le
+
+#define	kAttrDesktopViewState			kAttrViewState_be
+#define	kAttrDesktopViewStateForeign	kAttrViewState_le
 
 #define kAttrQueryMoreOptions 			kAttrQueryMoreOptions_be
 #define kAttrQueryMoreOptionsForeign 	kAttrQueryMoreOptions_le

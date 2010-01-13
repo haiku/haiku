@@ -190,8 +190,6 @@ ArgvParser::EachArgvPrivate(const char *name, ArgvHandler argvHandlerFunc, void 
 			}
 			// end of line, flush all argv
 			result = SendArgv(argvHandlerFunc, passThru);
-			if (result != B_OK)
-				break;
 
 			continue;
 		}

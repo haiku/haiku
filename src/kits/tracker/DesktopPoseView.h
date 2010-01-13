@@ -53,9 +53,7 @@ public:
 	static EntryListBase *InitDesktopDirentIterator(BPoseView *, const entry_ref *);
 
 	void ShowVolumes(bool visible, bool showShared);
-	void RemoveNonBootItems();
-	void AddNonBootItems();
-
+	
 	void StartSettingsWatch();
 	void StopSettingsWatch();
 	
@@ -73,8 +71,6 @@ protected:
 
 	void AdaptToVolumeChange(BMessage *);
 	void AdaptToDesktopIntegrationChange(BMessage *);
-
-	void UpdateNonBootDesktopPoses(bool integrateNonBootBeOSDesktops);
 
 private:
 	typedef BPoseView _inherited;

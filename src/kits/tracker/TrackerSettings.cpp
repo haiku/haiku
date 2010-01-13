@@ -59,8 +59,6 @@ class TTrackerState : public Settings {
 
 		BooleanValueSetting *fShowDisksIcon;
 		BooleanValueSetting *fMountVolumesOntoDesktop;
-		BooleanValueSetting *fIntegrateNonBootBeOSDesktops;
-		BooleanValueSetting *fIntegrateAllNonBootDesktops;
 		BooleanValueSetting *fDesktopFilePanelRoot;
 		BooleanValueSetting *fMountSharedVolumesOntoDesktop;
 		BooleanValueSetting *fEjectWhenUnmounting;
@@ -168,10 +166,6 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fMountVolumesOntoDesktop = new BooleanValueSetting("MountVolumesOntoDesktop", true));
 	Add(fMountSharedVolumesOntoDesktop =
 		new BooleanValueSetting("MountSharedVolumesOntoDesktop", true));
-	Add(fIntegrateNonBootBeOSDesktops = new BooleanValueSetting
-		("IntegrateNonBootBeOSDesktops", false));
-	Add(fIntegrateAllNonBootDesktops = new BooleanValueSetting
-		("IntegrateAllNonBootDesktops", false));
 	Add(fEjectWhenUnmounting = new BooleanValueSetting("EjectWhenUnmounting", true));
 
 	Add(fDesktopFilePanelRoot = new BooleanValueSetting("DesktopFilePanelRoot", true));
@@ -279,26 +273,6 @@ TrackerSettings::SetMountSharedVolumesOntoDesktop(bool enabled)
 	gTrackerState.fMountSharedVolumesOntoDesktop->SetValue(enabled);
 }
 
-
-bool
-TrackerSettings::IntegrateNonBootBeOSDesktops()
-{
-	return gTrackerState.fIntegrateNonBootBeOSDesktops->Value();
-}
-
-
-void
-TrackerSettings::SetIntegrateNonBootBeOSDesktops(bool enabled)
-{
-	gTrackerState.fIntegrateNonBootBeOSDesktops->SetValue(enabled);
-}
-
-
-bool
-TrackerSettings::IntegrateAllNonBootDesktops()
-{
-	return gTrackerState.fIntegrateAllNonBootDesktops->Value();
-}
 
 bool
 TrackerSettings::EjectWhenUnmounting()

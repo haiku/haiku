@@ -182,14 +182,6 @@ BRecentItemsList::GetNextMenuItem(const BMessage *fileOpenInvokeMessage,
 	
 			result->CloseNode();
 
-			if (size == sizeof(poseInfo) && !BPoseView::PoseVisible(result,
-				&poseInfo, false)) {
-				// link target sez it doesn't want to be visible,
-				// don't show the link
-				PRINT(("not showing hidden item %s\n", model.Name()));
-				delete newResolvedModel;
-				return NULL;
-			}
 			ref = *result->EntryRef();
 			container = result->IsContainer();
 		}

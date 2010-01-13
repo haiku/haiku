@@ -1523,7 +1523,6 @@ BFilePanelPoseView::StartWatching()
 	// inter-application observing
 	BMessenger tracker(kTrackerSignature);
 	BHandler::StartWatching(tracker, kVolumesOnDesktopChanged);
-	BHandler::StartWatching(tracker, kDesktopIntegrationChanged);
 }
 
 
@@ -1535,7 +1534,6 @@ BFilePanelPoseView::StopWatching()
 	// inter-application observing
 	BMessenger tracker(kTrackerSignature);
 	BHandler::StopWatching(tracker, kVolumesOnDesktopChanged);
-	BHandler::StopWatching(tracker, kDesktopIntegrationChanged);
 }
 
 
@@ -1563,20 +1561,6 @@ BFilePanelPoseView::FSNotification(const BMessage *message)
 					&& (!volume.IsShared() || settings.MountSharedVolumesOntoDesktop())) {
 					// place an icon for the volume onto the desktop
 					CreateVolumePose(&volume, true);
-				}
-
-				if (!ShouldIntegrateDesktop(volume))
-					break;
-
-				BDirectory otherDesktop;
-				BEntry entry;
-
-				if (FSGetDeskDir(&otherDesktop, volume.Device()) == B_OK
-					&& otherDesktop.GetEntry(&entry) == B_OK) {
-					// place desktop items from the mounted volume onto the desktop
-					Model model(&entry);
-					if (model.InitCheck() == B_OK)
-						AddPoses(&model);
 				}
 			}
 			break;

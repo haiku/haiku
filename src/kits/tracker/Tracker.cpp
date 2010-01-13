@@ -169,31 +169,6 @@ GetVolumeFlags(Model *model)
 }
 
 
-static void
-HideVarDir()
-{
-	BPath path;
-	status_t err = find_directory(B_COMMON_VAR_DIRECTORY, &path);
-
-	if (err != B_OK){
-		PRINT(("var err = %s\n", strerror(err)));
-		return;
-	}
-
-	BDirectory varDirectory(path.Path());
-	if (varDirectory.InitCheck() == B_OK) {
-		PoseInfo info;
-		// make var dir invisible
-		info.fInvisible = true;
-		info.fInitedDirectory = -1;
-
-		if (varDirectory.WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &info, sizeof(info))
-			== sizeof(info))
-			varDirectory.RemoveAttr(kAttrPoseInfoForeign);
-	}
-}
-
-
 //	#pragma mark -
 
 
@@ -1293,8 +1268,6 @@ TTracker::ReadyToRun()
 	InstallDefaultTemplates();
 	InstallIndices();
 	InstallTemporaryBackgroundImages();
-
-	HideVarDir();
 
 	fTrashWatcher = new BTrashWatcher();
 	fTrashWatcher->Run();

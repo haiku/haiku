@@ -2244,12 +2244,6 @@ FSGetDeskDir(BDirectory *deskDir, dev_t dev)
 	if (result != B_OK)
 		return result;
 
-	// make desktop invisible
-	PoseInfo poseInfo;
-	poseInfo.fInvisible = true;
-	poseInfo.fInitedDirectory = -1LL;
-	deskDir->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo, sizeof(PoseInfo));
-
 	size_t size;
 	const void* data = GetTrackerResources()->
 		LoadResource('ICON', kResDeskIcon, &size);
@@ -2733,6 +2727,8 @@ FSCreateTrashDirs()
 			continue;
 
 		BPath path;
+		// TODO: relocate Trash directory such that a Desktop dir on
+		// every volume is no longer needed
 		find_directory(B_DESKTOP_DIRECTORY, &path, true, &volume);
 		find_directory(B_TRASH_DIRECTORY, &path, true, &volume);
 

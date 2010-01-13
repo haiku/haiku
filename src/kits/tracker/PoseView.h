@@ -119,6 +119,8 @@ class BPoseView : public BView {
 		virtual bool Represents(const entry_ref *) const;
 
 		BContainerWindow *ContainerWindow() const;
+		const char *ViewStateAttributeName() const;
+		const char *ForeignViewStateAttributeName() const;
 		Model *TargetModel() const;
 
 		virtual bool IsFilePanel() const;
@@ -321,8 +323,7 @@ class BPoseView : public BView {
 		void SetActivePose(BPose *);
 		BPose *ActivePose() const;
 		void CommitActivePose(bool saveChanges = true);
-		static bool PoseVisible(const Model *, const PoseInfo *, bool inFilePanel);
-		bool FrameForPose(BPose *targetpose, bool convert, BRect *poseRect);
+		static bool PoseVisible(const Model *, const PoseInfo *, bool inFilePanel);bool FrameForPose(BPose *targetpose, bool convert, BRect *poseRect);
 		bool CreateSymlinkPoseTarget(Model *symlink);
 			// used to complete a symlink pose; returns true if
 			// target symlink should not be shown	
@@ -613,8 +614,6 @@ class BPoseView : public BView {
 		void Delete(BObjectList<entry_ref> *, bool selectNext, bool askUser);
 		void Delete(const entry_ref &ref, bool selectNext, bool askUser);
 		void RestoreItemsFromTrash(BObjectList<entry_ref> *, bool selectNext);
-
-		static bool ShouldIntegrateDesktop(const BVolume &volume);
 
 	private:
 		void DrawOpenAnimation(BRect);

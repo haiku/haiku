@@ -76,10 +76,6 @@ class TrackerSettings {
 		void SetMountVolumesOntoDesktop(bool);
 		bool MountSharedVolumesOntoDesktop();
 		void SetMountSharedVolumesOntoDesktop(bool);
-		bool IntegrateNonBootBeOSDesktops();
-		void SetIntegrateNonBootBeOSDesktops(bool);
-		bool IntegrateAllNonBootDesktops();
-		void SetIntegrateAllNonBootDesktops(bool);
 		bool EjectWhenUnmounting();
 		void SetEjectWhenUnmounting(bool);
 	

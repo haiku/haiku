@@ -310,7 +310,6 @@ DesktopSettingsView::SetDefaults()
 	settings.SetShowDisksIcon(false);
 	settings.SetMountVolumesOntoDesktop(true);
 	settings.SetMountSharedVolumesOntoDesktop(true);
-	settings.SetIntegrateNonBootBeOSDesktops(false);
 	settings.SetEjectWhenUnmounting(true);
 
 	ShowCurrentSettings();
@@ -326,7 +325,6 @@ DesktopSettingsView::IsDefaultable() const
 	return settings.ShowDisksIcon() != false
 		|| settings.MountVolumesOntoDesktop() != true
 		|| settings.MountSharedVolumesOntoDesktop() != true
-		|| settings.IntegrateNonBootBeOSDesktops() != false
 		|| settings.EjectWhenUnmounting() != true;
 }
 
@@ -339,7 +337,6 @@ DesktopSettingsView::Revert()
 	settings.SetShowDisksIcon(fShowDisksIcon);
 	settings.SetMountVolumesOntoDesktop(fMountVolumesOntoDesktop);
 	settings.SetMountSharedVolumesOntoDesktop(fMountSharedVolumesOntoDesktop);
-	settings.SetIntegrateNonBootBeOSDesktops(fIntegrateNonBootBeOSDesktops);
 	settings.SetEjectWhenUnmounting(fEjectWhenUnmounting);
 
 	ShowCurrentSettings();
@@ -390,7 +387,6 @@ DesktopSettingsView::RecordRevertSettings()
 	fShowDisksIcon = settings.ShowDisksIcon();
 	fMountVolumesOntoDesktop = settings.MountVolumesOntoDesktop();
 	fMountSharedVolumesOntoDesktop = settings.MountSharedVolumesOntoDesktop();
-	fIntegrateNonBootBeOSDesktops = settings.IntegrateNonBootBeOSDesktops();
 	fEjectWhenUnmounting = settings.EjectWhenUnmounting();
 }
 
