@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,6 +46,7 @@
 #	define TRACE(args...)		do { } while (0)
 #	define TRACE_SK(args...)	do { } while (0)
 #endif
+
 
 struct ipv4_header {
 #if B_HOST_IS_LENDIAN == 1
@@ -408,7 +409,7 @@ FragmentPacket::Reassemble(net_buffer* to)
 	}
 
 	if (buffer != to)
-		panic("ipv4 packet reassembly did not work correctly.\n");
+		panic("ipv4 packet reassembly did not work correctly.");
 
 	return B_OK;
 }
@@ -628,9 +629,8 @@ send_fragments(ipv4_protocol* protocol, struct net_route* route,
 	// this way)
 	mtu -= headerLength;
 	mtu &= ~7;
-	TRACE("  adjusted MTU to %ld\n", mtu);
+	TRACE("  adjusted MTU to %ld, bytesLeft %ld", mtu, bytesLeft);
 
-	TRACE("  bytesLeft = %ld\n", bytesLeft);
 	while (bytesLeft > 0) {
 		uint32 fragmentLength = min_c(bytesLeft, mtu);
 		bytesLeft -= fragmentLength;
@@ -644,7 +644,8 @@ send_fragments(ipv4_protocol* protocol, struct net_route* route,
 			headerLength);
 			// TODO: compute the checksum only for those parts that changed?
 
-		TRACE("  send fragment of %ld bytes (%ld bytes left)\n", fragmentLength, bytesLeft);
+		TRACE("  send fragment of %ld bytes (%ld bytes left)", fragmentLength,
+			bytesLeft);
 
 		net_buffer* fragmentBuffer;
 		if (!lastFragment) {
@@ -1422,7 +1423,7 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 		gBufferModule->checksum(buffer, 0, sizeof(ipv4_header), true),
 		gBufferModule->checksum(buffer, 0, buffer->size, true));
 
-	TRACE_SK(protocol, "  SendRoutedData(): destination: %08lx",
+	TRACE_SK(protocol, "  SendRoutedData(): destination: %08x",
 		ntohl(destination.sin_addr.s_addr));
 
 	uint32 mtu = route->mtu ? route->mtu : interface->mtu;
@@ -1580,7 +1581,7 @@ ipv4_receive_data(net_buffer* buffer)
 				&buffer->interface, &matchedAddressType)
 			&& !sDatalinkModule->is_local_link_address(sDomain, true,
 				buffer->destination, &buffer->interface)) {
-			TRACE("  ReceiveData(): packet was not for us %lx -> %lx",
+			TRACE("  ReceiveData(): packet was not for us %x -> %x",
 				ntohl(header.source), ntohl(header.destination));
 			return B_ERROR;
 		}
