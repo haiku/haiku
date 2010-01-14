@@ -1,9 +1,10 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
-//! super block, mounting, etc.
+
+//! Super block, mounting, etc.
 
 
 #include "Volume.h"
@@ -31,37 +32,37 @@
 
 
 class DeviceOpener {
-	public:
-		DeviceOpener(int fd, int mode);
-		DeviceOpener(const char *device, int mode);
-		~DeviceOpener();
+public:
+								DeviceOpener(int fd, int mode);
+								DeviceOpener(const char* device, int mode);
+								~DeviceOpener();
 
-		int Open(const char *device, int mode);
-		int Open(int fd, int mode);
-		void *InitCache(off_t numBlocks, uint32 blockSize);
-		void RemoveCache(bool allowWrites);
+			int					Open(const char* device, int mode);
+			int					Open(int fd, int mode);
+			void*				InitCache(off_t numBlocks, uint32 blockSize);
+			void				RemoveCache(bool allowWrites);
 
-		void Keep();
+			void				Keep();
 
-		int Device() const { return fDevice; }
-		int Mode() const { return fMode; }
-		bool IsReadOnly() const { return _IsReadOnly(fMode); }
+			int					Device() const { return fDevice; }
+			int					Mode() const { return fMode; }
+			bool				IsReadOnly() const { return _IsReadOnly(fMode); }
 
-		status_t GetSize(off_t *_size, uint32 *_blockSize = NULL);
+			status_t			GetSize(off_t* _size, uint32* _blockSize = NULL);
 
-	private:
-		static bool _IsReadOnly(int mode)
-			{ return (mode & O_RWMASK) == O_RDONLY;}
-		static bool _IsReadWrite(int mode)
-			{ return (mode & O_RWMASK) == O_RDWR;}
+private:
+	static	bool				_IsReadOnly(int mode)
+									{ return (mode & O_RWMASK) == O_RDONLY;}
+	static	bool				_IsReadWrite(int mode)
+									{ return (mode & O_RWMASK) == O_RDWR;}
 
-		int		fDevice;
-		int		fMode;
-		void	*fBlockCache;
+			int					fDevice;
+			int					fMode;
+			void*				fBlockCache;
 };
 
 
-DeviceOpener::DeviceOpener(const char *device, int mode)
+DeviceOpener::DeviceOpener(const char* device, int mode)
 	:
 	fBlockCache(NULL)
 {
@@ -87,7 +88,7 @@ DeviceOpener::~DeviceOpener()
 
 
 int
-DeviceOpener::Open(const char *device, int mode)
+DeviceOpener::Open(const char* device, int mode)
 {
 	fDevice = open(device, mode | O_NOCACHE);
 	if (fDevice < 0)
@@ -131,7 +132,7 @@ DeviceOpener::Open(int fd, int mode)
 }
 
 
-void *
+void*
 DeviceOpener::InitCache(off_t numBlocks, uint32 blockSize)
 {
 	return fBlockCache = block_cache_create(fDevice, numBlocks, blockSize,
@@ -161,7 +162,7 @@ DeviceOpener::Keep()
 	to compute the size, or fstat() if that failed.
 */
 status_t
-DeviceOpener::GetSize(off_t *_size, uint32 *_blockSize)
+DeviceOpener::GetSize(off_t* _size, uint32* _blockSize)
 {
 	device_geometry geometry;
 	if (ioctl(fDevice, B_GET_GEOMETRY, &geometry) < 0) {
@@ -304,7 +305,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (diskSize < (NumBlocks() << BlockShift()))
 		return B_BAD_VALUE;
 
-	if ((fBlockCache = opener.InitCache(NumBlocks(), fBlockSize)) == NULL)
+	fBlockCache = opener.InitCache(NumBlocks(), fBlockSize);
+	if (fBlockCache == NULL)
 		return B_ERROR;
 
 	status = get_vnode(fFSVolume, EXT2_ROOT_NODE, (void**)&fRootNode);
@@ -339,8 +341,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 status_t
 Volume::Unmount()
 {
-	//put_vnode(fVolume, ToVnode(Root()));
-	//block_cache_delete(fBlockCache, !IsReadOnly());
+	put_vnode(fFSVolume, RootNode()->ID());
+	block_cache_delete(fBlockCache, !IsReadOnly());
 	close(fDevice);
 
 	return B_OK;
