@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LIBC_LIMITS_H_
@@ -29,13 +29,12 @@
 #define OFF_MAX			LLONG_MAX
 #define OFF_MIN			LLONG_MIN
 
-/* These are various BeOS implementation limits */
-
 #define ARG_MAX			 		(32768)
 #define ATEXIT_MAX			 	(32)
 #define CHILD_MAX				(1024)
 #define IOV_MAX					(1024)
 #define FILESIZEBITS			(64)
+#define HOST_NAME_MAX			(255)
 #define LINE_MAX				(2048)
 #define LINK_MAX				(1)
 #define LOGIN_NAME_MAX			(32)
@@ -58,6 +57,7 @@
 
 #define _POSIX_ARG_MAX	  		(32768)
 #define _POSIX_CHILD_MAX		(1024)
+#define _POSIX_HOST_NAME_MAX	(255)
 #define _POSIX_LINK_MAX	 		(1)
 #define _POSIX_LOGIN_NAME_MAX	(9)
 #define _POSIX_MAX_CANON		(255)
