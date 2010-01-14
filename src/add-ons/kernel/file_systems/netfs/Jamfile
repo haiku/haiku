@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems netfs ;
+
+SubInclude HAIKU_TOP src add-ons kernel file_systems netfs
+	authentication_server ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems netfs client ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems netfs netfs_config ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems netfs netfs_server_prefs ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems netfs server ;

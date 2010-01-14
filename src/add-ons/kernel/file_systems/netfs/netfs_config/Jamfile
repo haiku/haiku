@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems netfs netfs_config ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) headers fs ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) headers shared ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
+
+DEFINES += USER=1 ;
+DEFINES += DEBUG_APP="\\\"server_config\\\"" ;
+
+Application netfs_config
+	: DebugSupport.cpp
+
+	  netfs_config.cpp
+	: be
+;

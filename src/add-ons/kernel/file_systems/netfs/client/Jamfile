@@ -1,0 +1,92 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems netfs client ;
+
+UsePrivateHeaders shared ;
+UsePrivateKernelHeaders ;
+
+local userlandFSIncludes = [ FDirName $(HAIKU_TOP) headers private
+	userlandfs ] ;
+
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) legacy ] ;
+SubDirSysHdrs [ FDirName $(userlandFSIncludes) public ] ;
+SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) headers authentication_server ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) headers fs ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) headers shared ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
+	userlandfs shared ] ;
+
+DEFINES += USER=1 ;
+DEFINES += DEBUG_APP="\\\"netfs\\\"" ;
+
+# If defined this doesn't remove the local machine from the servers accessible
+# via netfs. For debugging purposes only.
+if $(NETFS_ADD_SERVER_LOCALHOST) {
+	DEFINES += ADD_SERVER_LOCALHOST=$(NETFS_ADD_SERVER_LOCALHOST) ;
+}
+
+Addon <test>netfs
+	: DebugSupport.cpp
+#	  Locker.cpp
+	  ObjectTracker.cpp
+#	  Referencable.cpp
+
+	  AbstractConnection.cpp
+	  AttrDirInfo.cpp
+	  AuthenticationServerDefs.cpp
+#	  Blocker.cpp
+#	  BlockerPool.cpp
+	  Channel.cpp
+	  Connection.cpp
+	  ConnectionFactory.cpp
+	  EntryInfo.cpp
+	  FSObject.cpp
+	  InsecureChannel.cpp
+	  InsecureConnection.cpp
+#	  KMessage.cpp
+	  NetAddress.cpp
+	  NetFSDefs.cpp
+	  NodeInfo.cpp
+	  PortChannel.cpp
+	  PortConnection.cpp
+	  Request.cpp
+	  RequestChannel.cpp
+	  RequestConnection.cpp
+	  RequestDumper.cpp
+	  RequestFactory.cpp
+	  RequestFlattener.cpp
+	  RequestHandler.cpp
+	  Requests.cpp
+	  RequestUnflattener.cpp
+	  ServerInfo.cpp
+	  ServerNodeID.cpp
+	  TaskManager.cpp
+	  ThreadLocal.cpp
+
+	  AuthenticationServer.cpp
+	  ExtendedServerInfo.cpp
+	  netfs.cpp
+	  Node.cpp
+	  QueryIterator.cpp
+	  QueryManager.cpp
+	  RootVolume.cpp
+	  ServerConnection.cpp
+	  ServerConnectionProvider.cpp
+	  ServerManager.cpp
+	  ServerQueryIterator.cpp
+	  ServerVolume.cpp
+	  ShareAttrDir.cpp
+	  ShareAttrDirIterator.cpp
+	  ShareNode.cpp
+	  ShareVolume.cpp
+	  VirtualDir.cpp
+	  VirtualVolume.cpp
+	  Volume.cpp
+	  VolumeEvent.cpp
+	  VolumeManager.cpp
+
+	: be libuserlandfs_beos_kernel.so
+	  $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++) libshared.a
+;

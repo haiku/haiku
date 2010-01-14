@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems netfs authentication_server ;
+
+UsePrivateHeaders shared ;
+UsePrivateKernelHeaders ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) headers authentication_server ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) headers shared ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
+
+DEFINES += USER=1 ;
+DEFINES += DEBUG_APP="\\\"AuthenticationServer\\\"" ;
+
+Application AuthenticationServer
+	: DebugSupport.cpp
+
+	  AuthenticationServerDefs.cpp
+	  TaskManager.cpp
+
+	  AuthenticationPanel.cpp
+	  AuthenticationServer.cpp
+	  Panel.cpp
+	: be $(TARGET_LIBSUPC++) libshared.a
+;
