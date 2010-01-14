@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
+ *		Humdinger
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Deskbar</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../de/deskbar.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/deskbar.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/deskbar.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/deskbar.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/deskbar.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/deskbar.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/deskbar.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="tracker-add-ons.html">Extensions du Tracker</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="filetypes.html">Types de fichiers</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#deskbar-menu">Le menu de la Deskbar</a><br />
+	<a href="#tray">Le cartouche</a><br />
+	<a href="#list-of-apps">La liste des programmes en cours</a>
+</td></tr>
+</table>
+
+<h1>Deskbar</h1>
+
+<p>La Deskbar est le petit panneau qui se trouve par défaut dans le coin supérieur droit de l'écran. C'est la version Haiku de la barre des tâches Windows avec le bouton Démarrer. Elle contient menu Deskbar, d'où vous pouvez lancer les applications et les préférences, dessous, un cartouche héberge une horloge ainsi que d'autres outils, et en bas, la liste des programmes en cours.</p>
+<img src="../images/deskbar-images/positions.png" alt="positions" />
+<p>Vous pouvez déplacer la Deskbar dans l'un des coins ou le long d'une bordure de l'écran en la saisissant par la zone d'accroche qui se trouve à coté du cartouche. Vous pouvez aussi la réduire en une présentation plus compacte en faisant glisser zone d'accroche sur le menu de la Deskbar.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="deskbar-menu" name="deskbar-menu">Le menu de la Deskbar</a></h2>
+<p>Un menu s'ouvre lorsque vous cliquez en haut de la Deskbar :</p>
+<img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
+<ul>
+<li><p><b>About This System...</b> - Affiche quelques informations de base du système, les licences et les contributions au projet Haiku.</p></li>
+
+<li><p><b>Find...</b> - Ouvre la boite de dialogue <a href="queries.html">Query</a>.</p></li>
+<li><p><b>Show Replicants</b> - Affiche/cache le petit gadget du <a href="gui.html#replicants">Réplicant</a> que vous utilisez pour le déplacer, le supprimer ou accéder à son menu contextuel.</p></li>
+<li><p><b>Mount</b> - Offre les mêmes options que lorsqu'il est appelé par un clic droit sur le bureau (voir le <a href="tracker.html#mounting-volumes">montage des volumes</a>).</p></li>
+<li><p><b>Deskbar Preferences...</b> - Ouvre le panneau de configuration de la Deskbar (voir ci-dessous).</p></li>
+<li><p><b>Shutdown</b> - Propose les options de redémarrage (<span class="menu">Restart System</span>) et d'extinction (<span class="menu">Power Off</span>).</p></li>
+<li><p><b>Recent Documents, Folders, Applications</b> - Liste des derniers documents, dossiers et applications ouverts récemment (voir <span class="menu">Deskbar Preferences</span> ci-dessous).</p></li>
+<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> -  Liste des applications installées, démos, appliquettes et préférences (voir <span class="menu">Deskbar Preferences</span> ci-desssous).</p></li>
+</ul>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Préférences de la Deskbar</h3>
+<img src="images/deskbar-images/configure.png" alt="configure.png" />
+<ul>
+<li><p><b>Menu</b><br />
+Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
+The button <span class="button">Edit Menu...</span> opens the folder <span class="path">/boot/home/config/be/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar Applets</span>, and <span class="menu">Preferences</span>.<br />
+You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p></li>
+<li><p><b>Window</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Always on Top</span></td><td> </td><td>The Deskbar always stays above all other windows.</td></tr>
+<tr><td><span class="menu">Auto Raise</span></td><td> </td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
+</table></li>
+<li><p><b>Applications</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Sort Running Applications</span></td><td> </td><td>Sorts the list of running programs alphabetically.</td></tr>
+<tr><td><span class="menu">Tracker always First</span></td><td> </td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Show Application Expander</span></td><td> </td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
+<tr><td><span class="menu">Expand New Applications</span></td><td> </td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
+</table></li>
+<li><p><b>Clock</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">24 Hour Clock</span></td><td> </td><td>Toggles between 24 and 12 hour clock.</td></tr>
+<tr><td><span class="menu">Show Seconds</span></td><td> </td><td>Adds the display of seconds to the clock.</td></tr>
+<tr><td><span class="menu">European Date</span></td><td> </td><td>Shows the date in European format: day-month-year</td></tr>
+</table></li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tray" name="tray">Le cartouche</a></h2>
+<img src="images/deskbar-images/calendar.png" alt="calendar.png" />
+<p>Entre autres choses, le cartouche héberge l'horloge. Un clic gauche dessus fait basculer entre la date et l'heure. Un clic droit dessus vous permettra de la cacher, de l'afficher ou de lancer les <a href="preferences/time.html">préférences de l'heure</a> pour en définir les paramètres.<br />
+Ici, vous pouvez également lancer un calendrier qui apparaît aussi, lorsque vous maintenez enfoncé le bouton gauche de la souris sur l'horloge un petit moment.</p>
+<p>Tout programme peut installer une icône dans le cartouche pour fournir une interface à l'utilisateur. Le système de courrier électronique, par exemple, montre un symbole différent quand il ya du courrier non lu et offre un menu contextuel pour, par exemple créer ou vérifier les nouveaux messages. <span class="app">ProcessController</span> est un autre exemple qui installe son icône dans le cartouche pour fournir des informations (utilisation du CPU et de la mémoire) et dispose d'un menu contextuel.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-apps" name="list-of-apps">La liste des programmes en cours</a></h2>
+<img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
+<p>Vous pouvez changer pour une application spécifique en cours d'exécution en cliquant sur son entrée dans la barre de Bureau et de choisir une de ses fenêtres, dans le sous-menu. Par un clic droit vous pouvez réduire ou fermer une fenêtre ou l'application entière.</p>
+<p>Si vous avez activé l'élargissement (Application Expanders) dans les paramètres de la Deskbar, vous pouvez agrandir / réduire les fenêtres directement dans la liste sous l'entrée d'une application.</p>
+<p>En face de chaque fenêtre, on trouve un symbole qui fourni des informations sur son état. Un symbole lumineux signifie qu'une fenêtre est visible, un sombre qu'elle est minimisée. Trois lignes devant le symbole indique que ce n'est pas sur l'espace de travail actuel.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="tracker-add-ons.html">Extensions du Tracker</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="filetypes.html">Types de fichiers</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

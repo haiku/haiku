@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		eforgeot
+ *		Loïc
+ *		Humdinger
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>DriveSetup</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../../de/applications/drivesetup.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/drivesetup.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/drivesetup.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/drivesetup.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/drivesetup.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/drivesetup.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/drivesetup.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="diskusage.html">DiskUsage</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="expander.html">Expander</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />DriveSetup</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
+<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
+</table>
+<p><br /></p>
+<p>DriveSetup est un outils pour créer, supprimer et initialiser des partitions. Pour le moment, il ne peu pas redimensionner ou déplacer une partition existante, de sorte que vous aurez besoin soit d'un volume avec un espace non partitionné (peut-être un disque USB externe ou un autre disque dur) ou modifier la configuration avec un outil comme  <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a>  pour fournir l'espace pour une nouvelle partition.</p>
+<img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
+<p>Au sommet se trouve une représentation graphique de toutes les partitions à l'intérieur du lecteur choisi dans la liste en dessous.
+Vous pouvez avoir jusqu'à 4 partitions primaires au maximum, chacune d'entre elles pouvant contenir un certain nombre de partitions logiques.
+Vous pouvez développer cette liste avec les contrôles +/- qui apparaissent dans ce cas en face de la partition étendue pour voir les détails de toutes les partitions logiques.</p>
+<p>Vous pouvez choisir une partition à partir de la liste afin de la monter ou démonter à l'aide des commandes du menu 
+<span class="menu">Partition</span> ou en appuyant sur <span class="key">ALT</span> <span class="key">M</span> ou <span class="key">ALT</span> <span class="key">U</span>.</p>
+<p>Vous pouvez également supprimer complètement une partition avec <span class="menu">Partition | Delete</span>.<br />
+Ce qui nous amène à ceci :</p>
+<div class="box-stop">Effectuer des créations/suppression/initialisations de partitions est très dangereux.
+Vérifiez toujours deux fois ce que vous faites, et assurer vous d'avoir une sauvegarde de vos données à jour au cas où quelque chose se passe mal !</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="creating" name="creating">Créer une nouvelle partition</a></h2>
+<div class="box-info">Si vous prévoyez d'utiliser le disque entier comme une seule partition, comme par exemple une clé USB ou une carte Compact Flash, vous pouvez sauter la création d'une partition, et procéder directement à <a href="#initializing">l'initialisation</a>.</div>
+<p>Si vous trouvez un espace non formaté sur un lecteur, comme : <tt>&lt;empty&gt;</tt>, vous pouvez créer une nouvelle partition dans cet espace avec <span class="menu">Partition | Create...</span>(<span class="key">ALT</span> <span class="key">C</span>).</p>
+<img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
+<p>Cette boîte de dialogue vous invite à ajuster la taille de la partition et son type. Choisissez <span class="menu">Be File System</span> si vous voulez utiliser la partition pour une installation Haiku ou si vous souhaitez utiliser sur celle-ci toutes les fonctionnalités intéressantes de Haiku, comme les attributs et les requêtes. Notez que les autres systèmes d'exploitations pourraient ne pas être en mesure d'accéder à une telle partition.</p>
+<p>Si vous avez créé une partition primaire plutôt qu'une partition logique, la boîte de dialogue ci-dessus affichera également une case à cocher <span class="menu">Active Partition</span>. Vous devrez la cocher, si vous voulez utiliser cette partition pour démarrer par défaut sur l'installation de Haiku.</p>
+<p>Avant de pouvoir utiliser, ou même monter, la partition nouvellement créée, elle doit être initialisée avec un système de fichiers.</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="initializing" name="initializing">Initialiser une partition</a></h2>
+<p>Seules les partitions non montées peuvent être initialisés en utilisant le menu <span class="menu">Partition | Initialize</span> menu.</p>
+<img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
+<p>Ici, vous définissez le nom de la partition et sa granularité. Une taille de 2048 octets par bloc est recommandée, mais vous pouvez choisir des tailles plus grandes ou plus petites si vous avez des besoins très spécifiques.<br />
+L'initialisation détruira toutes les données sur cette partition !</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="diskusage.html">DiskUsage</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="expander.html">Expander</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

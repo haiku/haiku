@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"../../../../html-dtd/xhtml1-strict.dtd"> 
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -20,30 +19,39 @@
 </head>
 <body>
 
-<div class="logo">
-	<img src="../images/logo.png" alt="logo" class="noprint" id="logo" name="logo" />
+<div id="banner">
+<div><span>User guide</span></div>
 </div>
 
-<div class="topnav">
-	<p>
-		«&#160;&#160;<a href="poorman.html">PoorMan</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="../applications.html#list-of-apps" class="uplink">Applications</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="showimage.html">Showimage</a>&#160;&#160;»
-	</p>
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/gb.png" alt="" /> English</li>
+<li><a href="../../fr/applications/screenshot.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/screenshot.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/screenshot.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/screenshot.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/screenshot.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/screenshot.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/screenshot.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+</ul>
+<span>
+ «  <a href="poorman.html">PoorMan</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="showimage.html">Showimage</a>  »
+</span></div>
 </div>
 
-<div class="content">
+<div id="content">
+<div>
 
-<h1><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png"
-width="64" height="64" />Screenshot</h1>
+<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />Screenshot</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span></td></tr>
 <tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
-<p><br/></p>
+<p><br /></p>
 <p>Besides normal screenshots taken via <span class="key">PRINT</span>, which puts a PNG of the current screen into <span class="path">/boot/home/</span>, this application provides some useful options.</p>
 <p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
 <p>Starting Screenshot will take a screenshot as usual, but offers from its main window controls to set filename, format and folder before saving the image.</p>
@@ -51,38 +59,37 @@ width="64" height="64" />Screenshot</h1>
 <p><img id="sreenshot-options" src="../images/apps-images/screenshot-options.png" alt="screenshot-options.png" /></p>
 <p>Besides the obvious, toggle between taking the whole screen or just the active window, including the window border and the mouse pointer, you can enter a delay before a screenshot is taken. Of course, this delay takes only effect if you take a new shot by pressing <span class="button">Take Screenshot</span>.</p>
 
-<h1>
-<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-Taking a screenshot from Terminal</h1>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Taking a screenshot from Terminal</h2>
 <p>The Screenshot application is also usable from Terminal or a script.<br />
 <span class="cli">Screenshot --help</span> shows the familiar options as parameters:</p>
 
-<pre class="terminal">~> Screenshot --help
+<pre class="terminal">~&gt; Screenshot --help
 
 Screenshot [OPTION]... Creates a bitmap of the current screen
+
 OPTION
   -o, --options         Show options window first
-  -m, --mouse           Have the mouse pointer in the screenshot
-  -b, --border          Include the window border with the screenshot
-  -w, --window          Use active window instead of the entire screen
+  -m, --mouse-pointer   Include the mouse pointer
+  -b, --border          Include the window border
+  -w, --window          Capture the active window instead of the entire screen
   -d, --delay=seconds   Take screenshot after specified delay [in seconds]
-  -s, --silent          Saves the screenshot without the application window
-                        overwrites --options, saves to home directory as png
+  -s, --silent          Saves the screenshot without showing the app window
+                        overrides --options, saves to home folder as png
 
 Note: OPTION -b, --border takes only effect when used with -w, --window
 </pre>
 
-
+</div>
 </div>
 
-<div class="bottomnav">
-	<p>
-		«&#160;&#160;<a href="poorman.html">PoorMan</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="../applications.html#list-of-apps" class="uplink">Applications</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="showimage.html">Showimage</a>&#160;&#160;»
-	</p>
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="poorman.html">PoorMan</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="showimage.html">Showimage</a>  »
+</span></div>
 </div>
 
 </body>

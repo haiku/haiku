@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"../../html-dtd/xhtml1-strict.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
-<!--
+<!-- 
  *
  * Copyright 2008-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
@@ -20,73 +19,57 @@
 </head>
 <body>
 
-<div class="logo">
-	<img src="./images/logo.png" alt="logo" class="noprint" id="logo" name="logo" />
+<div id="banner">
+<div><span>User guide</span></div>
 </div>
 
-<div class="topnav">
-	<p>
-		«&#160;&#160;<a href="gui.html">Haiku's GUI</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="contents.html" class="uplink">Contents</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="twitcher.html">The Twitcher</a>&#160;&#160;»
-	</p>
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/gb.png" alt="" /> English</li>
+<li><a href="../fr/workspaces.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workspaces.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/workspaces.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/workspaces.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/workspaces.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/workspaces.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/workspaces.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+</ul>
+<span>
+ «  <a href="gui.html">Haiku's GUI</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="twitcher.html">The Twitcher</a>  »
+</span></div>
 </div>
 
-<div class="content">
+<div id="content">
+<div>
 
-<div class="title">Workspaces</div>
+<h1>Workspaces</h1>
 
 <p>Workspaces are virtual desktops, complete with their own resolution, color depth and background. Up to 32 of these workspaces can be set from the <a href="preferences/screen.html">Screen</a> preferences.</p>
 
-<h1><img src="../images/desktop-applets-images/workspaces-icon_64.png" alt="workspaces-icon_64.png" width="64" height="64" /><a name="applet">The Workspaces Applet</a></h1>
-<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/Workspaces</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/Workspaces_settings</span> - Stores the panel's window position.</td></tr>
-</table>
-<p><br /></p>
-<img src="images/workspaces-images/workspaces.png" alt="workspaces.png" />
-<p>You find the Workspaces applet with the other <span class="menu">Desktop Applets</span> in the Deskbar. It shows a miniature version of all workspaces. There are several options available from the context menu of the applet's window, which are all pretty self-explaining.<br />
-<span class="menu">Change Workspace Count...</span> will open the <a href="preferences/screen.html">Screen</a> preferences where you set the number of workspaces and their arrangement (how many rows and columns).</p>
-<p>Since the applet is a <a href="gui.html#replicants">Replicant</a>, you can resize the window as desired and then drag&amp;drop it by its handle onto the desktop (make sure "<span class="menu">Show Replicants</span>" is activated in the Deskbar menu).</p>
+<img src="../images/workspaces-images/workspace_overviewpng.png" alt="workspace_overviewpng.png" />
 
 <h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="switching" name="switching">Switching workspaces</a></h2>
-<p>You switch between workspaces by either clicking into the Workspaces applet or by using the keyboard shortcut <span class="key">ALT</span>&#160;<span class="key">Fx</span>, where "x" is the workspace number. It's a good idea to arrange your workspaces in rows of four to mimick the layout of the <span class="key">Fx</span> keys on the keyboard.<br />
+<p>You switch between workspaces by either clicking into the <a href="desktop-applets/workspaces.html">Workspaces applet</a> (which is seen in the above image) or by using the keyboard shortcut <span class="key">ALT</span> <span class="key">Fx</span>, where "x" is the workspace number. It's a good idea to arrange your workspaces in rows of four to mimick the layout of the <span class="key">Fx</span> keys on the keyboard.<br />
 Also, clicking on an application or one of its windows in the Deskbar will send you to the workspace it's in.</p>
-<p>Another very convenient way is to use <span class="key">CTRL</span>&#160;<span class="key">ALT</span>&#160;<span class="key">←</span>/<span class="key">→</span>/<span class="key">↑</span>/<span class="key">↓</span> to navigate spatially the rows/columns of the available workspaces.</p>
-<p>You can switch back and forth between two workspaces with <span class="key">ALT</span>&#160;<span class="key">`</span> (the actual key depends on
-the keymap you're using - it is the key below <span class="key">ESC</span>).</p>
-
-<h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="moving" name="moving">Moving windows between workspaces</a></h2>
-<p>To move a window, you grab it in the Workspaces applet and simply drag it to another workspace. This has the advantage, that you can move it without leaving your current desktop. Of course, that only works well when there aren't too many windows in a workspace and your target isn't obscured by other windows. Another possibility is to grab a window by its tab and just holding on to it while switching workspaces with <span class="key">ALT</span>&#160;<span class="key">Fx</span>.</p>
-
-<h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="special" name="special">Special functionality</a></h2>
-<p>The Workspaces applet provides some additional functionality when clicking on a window while holding certain modifier keys:</p>
-<table summary="functionality-thru-modifiers" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">CTRL</span></td><td style="width:15px;"></td><td>Brings the the window to the foreground.</td></tr>
-<tr><td><span class="key">CTRL</span>&#160;<span class="key">SHIFT</span></td><td></td><td>Minimizes the window.</td></tr>
-<tr><td><span class="key">OPT</span></td><td></td><td>Sends the window to the back.</td></tr>
-</table>
+<p>Another very convenient way is to use <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span>/<span class="key">→</span>/<span class="key">↑</span>/<span class="key">↓</span> to navigate spatially the rows/columns of the available workspaces. If you additionally hold down <span class="key">SHIFT</span>, the active window will move with you to the new workspace.</p>
+<p>You can switch back and forth between two workspaces with <span class="key">ALT</span> <span class="key">`</span> (the actual key depends on the keymap you're using - it is the key below <span class="key">ESC</span>). Again, holding  <span class="key">SHIFT</span> will take the active window with you.</p>
 
 </div>
+</div>
 
-<div class="bottomnav">
-	<p>
-		«&#160;&#160;<a href="gui.html">Haiku's GUI</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="contents.html" class="uplink">Contents</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="twitcher.html">The Twitcher</a>&#160;&#160;»
-	</p>
+<div class="nav">
+<div class="inner"><span>
+<!--
+ «  <a href="gui.html">Haiku's GUI</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="twitcher.html">The Twitcher</a>  »
+-->
+</span></div>
 </div>
 
 </body>

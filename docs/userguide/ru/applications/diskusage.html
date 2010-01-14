@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		michael_s
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>DiskUsage</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../../fr/applications/diskusage.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/diskusage.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/diskusage.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../es/applications/diskusage.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/diskusage.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/diskusage.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/diskusage.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="diskprobe.html">DiskProbe</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
+::  <a href="drivesetup.html">Настройка дисков (DriveSetup)</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Приложения (Applications)</span></td></tr>
+<tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
+<tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
+</table>
+<p><br /></p>
+<p>DiskUsage графически отображает дисковое пространство на ваших разделах.
+Полезный инструмент для ответа на вопрос: "Куда подевалось свободное место на диске"?</p>
+<p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
+<p>Концентрические круги представляют собой различные уровни в иерархии файловой системы. Над центральным кругом изображена <span class="path">/boot/home/</span> папка. Каждый сегмент окружности над ней - файл или папка, находящиеся  в <span class="path">/boot/home/</span>. Каждый дальнейший сегмент отображает на один уровень вглубь файловой иерархии. Возможно, придется изменить размеры окна, чтобы папки с большой степенью вложенности смогли вместиться в него.</p>
+<p>Над окном с графикой имеется выпадающее меню, в котором можно переключаться между всеми доступными разделам. Прежде чем использование диска отобразится, произойдёт сканирование раздела.   Для разделов большого объёма это может занять довольно много времени, в течение которого можно просмотреть другой, менее загруженный раздел, запустив вторую копию приложения.</p>
+<div class="box-info"><ul>
+<li>Если графическое представление файла или папки умещается меньше, чем в 2° круга, то оно не отображается.</li>
+<li>Количество файлов, сообщённое для папки, включает также и файлы в во вложенных папках. Папка подсчитывается также как файл.</li>
+<li>DiskUsage игнорирует симлинки.</li>
+</ul></div>
+<p>Наведя мышь на определённый сегмент, вы получите информацию об этом файле или папке снизу в строке состояния.</p>
+<p>Клик правой кнопкой мыши по сегменту выведет контекстное меню для <span class="menu">получения информации (Get Info)</span>, <span class="menu">открытия (Open)</span> (в Tracker-е), <span class="menu">откытия с (Open With)</span> использованием другого подходящего приложения или <span class="menu">пересканирования (Rescan)</span> папки этого сегмента.<br />
+Клик левой кнопкой мыши по сегменту перенесёт этот файл или папку в центр круга.<br />
+Клик левой кнопкой мыши по центру круга перемещает на один уровень вверх.</p>
+<p>Вы можете перетаскивать файлы и папки из DiskUsage в другие приложения, на рабочий стол или на другое окно Tracker-а для копирования. Если же наоборот  перетащить разделы и папки на окно DiskUsage, то размер окна "подгонится" под новое представление, сделая их новый центральным кругом.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="diskprobe.html">DiskProbe</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
+::  <a href="drivesetup.html">Настройка дисков (DriveSetup)</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

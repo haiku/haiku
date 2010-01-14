@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Finest Bug
+ *		Matthias
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Terminal</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../../fr/applications/terminal.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../it/applications/terminal.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/terminal.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/terminal.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/terminal.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/terminal.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/terminal.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="stylededit.html">StyledEdit</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
+::  <a href="textsearch.html">TextSearch</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/Terminal_settings</span><br />
+<span class="path">~/.profile</span> - hinzufügen/übergehen von Standardwerten in <span class="path">/boot/system/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - hinzufügen/übergehen von Standardwerten in <span class="path">/boot/system/etc/inputrc</span></td></tr>
+</table>
+<p><br /></p>
+<p>Das Terminal ist Haiku's Schnittstelle zur Bash, der "Bourne Again Shell".</p>
+<p>Einige Anleitungen zum arbeiten in der Konsole finden sich in <a href="../bash-scripting.html">Bash und skripten</a>. Hier geht es um die Anwendung Terminal an sich.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="appearance" name="appearance">Erscheinungsbild</a></h3>
+<p>Es können beliebig viele Terminals geöffnet werden. Entweder jedes in seinem eigenen Fenster - durch einfaches Starten, oder mit <span class="key">ALT</span> <span class="key">N</span> von einem bereits laufenden Terminal aus - oder man benutzt die Reiterfunktion von Terminal und öffnet einen neuen Reiter mit <span class="key">ALT</span> <span class="key">T</span>.</p>
+<p>Ein Terminal-Fenster kann, wie jedes andere Programmfenster, in seiner Größe verändert werden. Es sind auch vorgegebene Einstellungen unter <span class="menu">Settings | Window Size</span> vorhanden. Mittels <span class="key">ALT</span> <span class="key">ENTER</span> kann in den Vollbild-Modus (und zurück) geschaltet werden.</p>
+<p>Die vorgenommenen Einstellungen sind jedoch nur bis zum Start eines neuen Terminal aktiv, außer man speichert sie  mit dem Menüpunkt <span class="menu">Settings | Save as default</span> als Voreinstellung.</p>
+<img src="../images/apps-images/terminal.png" alt="terminal.png" />
+<br />
+<p>Über <span class="menu">Settings | Preferences</span> kann man die Schriftart und -größe, sowie die Farbe des Textes und Hintergrunds festlegen. Verschiedene Einstellungen können abgespeichert und später mittels Doppelklick auf diese Einstellungs-Datei wieder gestartet werden.<br />
+Mit <span class="button">OK</span> wird die aktuelle Einstellung übernommen.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="customization" name="customization">Personalisierung der Bash</a></h3>
+<p>Da die Bash aus der Unix-Welt stammt, gibt es unzählige Möglichkeiten, diese anzupassen. Zwei davon sind für den Anwender besonders hervorzuheben: <span class="cli">.profile</span> und <span class="cli">.inputrc</span><br />
+Diese beiden Dateien erweiteren oder ersetzen die Standard-Werte, die in <span class="path">/boot/system/etc/</span> gespeichert sind, wenn sie im <span class="path">home/</span> Verzeichnis angelegt werden.</p>
+
+<h4>.profile</h4>
+<p>Die Datei <span class="cli">.profile</span> wird jedes Mal geladen, wenn ein neues Terminal gestartet wird. Es werden dadurch die verschiedensten Variablen und Verhalten innerhalb der Bash eingerichtet. Da eine detaillierte Beschreibung der Möglichkeiten hier zu umfangreich ist, wird auf die ausführlichen Erklärungen zu dieser Datei im Internet verwiesen. </p>
+<p>Der Haiku/BeOS Tipp-Server enthält einige Beispiele und Tipps, unter anderem:</p>
+<ul>
+<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Customize your Terminal prompt</a> (Den Prompt im Terminal an persönliche Vorlieben anpassen)</li>
+<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">More prompt customizations</a> (Noch mehr Möglichkeiten, den Prompt anzupassen)</li>
+<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Enhancing bash</a> (Die Bash erweitern)</li>
+<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Custom keyboard shortcuts</a> (Personalisierte Tastaturkürzel)</li>
+</ul>
+<p>Noch weitere Tipps gibt es <a href="http://betips.net/index.php?s=.profile">hier</a>.</p>
+
+<h4>.inputrc</h4>
+<p>Die Datei <span class="cli">.inputrc</span> kümmert sich um die Tastaturzuweisungen. Da Haiku aber bereits mit einer sinnvollen Voreinstellung eingerichtet ist, wird man hier wenig ändern müssen - außer man hat spezielle Bedürfnisse. In diesem Fall wird auf die <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a> im Internet verwiesen.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="shortcuts" name="shortcuts">Tastaturkürzel</a></h3>
+<p>Eine Liste mit Tastaturkürzeln ist unter <a href="../keyboard-shortcuts.html#terminal">Shortcuts and key combinations</a> aufgelistet.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="hints" name="hints">Tipps für das Arbeiten mit dem Terminal</a></h3>
+<ul><li><p>Wird eine Datei in das Tracker-Fenster gezogen, so wird der Pfad zu dieser Datei an der aktuellen Cursor-Position eingefügt. Wird sie mittels der rechten Maustaste hineingezogen, gibt es mehrere Möglichkeiten zur Auswahl:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Insert Path</span></td><td> </td><td>Fügt den Pfad zu dieser Datei ein.</td></tr>
+<tr><td><span class="menu">Change Directory</span></td><td> </td><td>Wechselt im Terminal zum Verzeichnis, in dem die Datei gespeichert ist.</td></tr>
+<tr><td><span class="menu">Create Link Here</span></td><td> </td><td>Im aktuellen Verzeichnis des Trackers wird einen Verweis zu dieser Datei erstellt.</td></tr>
+<tr><td><span class="menu">Move Here</span></td><td> </td><td>Verschiebt die Datei in das aktuelle Verzeichnis im Tracker.</td></tr>
+<tr><td><span class="menu">Copy Here</span></td><td> </td><td>Kopiert die Datei in das aktuelle Verzeichnis im Tracker.</td></tr>
+</table></li>
+<li><p>Vom Terminal aus kann auch jede Datei mit ihrem bevorzugten Programm gestartet werden. Der Befehl hierfür ist <span class="cli">open <i>[filename]</i></span>. Dies funktioniert auch mit den Repräsentanten für das aktuelle ("<span class="cli">.</span>") und übergeordnete ("<span class="cli">..</span>") Verzeichnis. Um also ein Tracker-Fenster mit dem aktuellen Verzeichnis zu öffnen wäre dies einzugeben: </p>
+<pre class="terminal">open .</pre>
+</li></ul>
+
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="stylededit.html">StyledEdit</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
+::  <a href="textsearch.html">TextSearch</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

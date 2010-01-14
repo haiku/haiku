@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Matthias
+ *		Humdinger
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Installer</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../../fr/applications/installer.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../it/applications/installer.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/installer.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/installer.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/installer.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/installer.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/installer.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
+::  <a href="magnify.html">Magnify</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><i>keine</i></td></tr>
+</table>
+<p><br /></p>
+<p>Der Installer installiert (genauer: kopiert) Haiku auf einen Datenträger. Eine "Installation" im klassischen Sinn ist bei Haiku nicht notwendig. Das System muss nicht durch Installation an die vorhandene Hardware angepasst werden, sondern läuft mit identischem Dateiumfang auf allen (unterstützten) Systemen.<br />
+Beim Start des Installer werden zunächst wichtige Informationen angezeigt. Es sind aber keine juristischen Formulierungen eines Endbenutzer-Lizenzvertrages (EULA), sondern tatsächlich wichtige Informationen, die lesenswert sind:</p>
+<ul>
+<li><p>Haiku ist noch im "Alpha"-Stadium. Es wird dringend angeraten, Sicherheitskopien von wichtigen Dateien zu machen; ein Datenverlust ist - obwohl nicht wahrscheinlich - nicht auszuschließen!</p></li>
+<li><p>Der Installer kann selbst noch keine neue Partition anlegen. Hierfür wird zusätzliche Software, wie die <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> benötigt. Erst wenn Haikus DriveSetup vollkommen sicher ist, wird es möglich sein, während der Installation die Partitionen zu ändern.</p></li>
+<li><p>Haiku kann zum Boot-Manager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a> hinzugefügt werden. Hierzu ist in der Datei <span class="path">/boot/grub/menu.lst</span> ein weiterer Eintrag hinzuzufügen, der folgendermaßen aussieht (aber natürlich an die eigenen Gegebenheiten angepasst werden muss):</p>
+<pre># Haiku on /dev/sda7
+title		Haiku
+rootnoverify	(hd0,6)
+chainloader	+1</pre></li>
+</ul>
+<p><br /><br /></p>
+<p>Nach Bestätigung der Informationen durch Drücken von <span class="button">Continue</span> erscheint dieses Fenster:</p>
+<img src="../images/apps-images/installer.png" alt="installer.png" />
+<p>Im ersten Auswahlmenü ist die Quelle der Installation zu wählen. Dies kann entweder ein bereits installiertes Haiku sein, oder ein explizites Installationsmedium, wie zum Beispiel die Haiku Alpha1-CD.<br />
+Das zweite Auswahlmenü bezeichnet das Ziel der Installation. Dieses Ziel, das bereits vor der dem Start von Installer existieren muss, wird durch die Installation vollständig überschrieben; eine nachträgliche Rettung von darin gespeicherten Daten ist nicht möglich.</p>
+<p>Durch einen Klick auf das Dreieck neben <i>Show Optional Packages</i> werden, so vorhanden, zusätzliche Programmpakete angeboten, die mitinstalliert werden können.</p>
+<p>Wie bereits erwähnt, wird die Zielpartition vollständig überschrieben. Man muss daher sicher sein, die richtige Partition gewählt zu haben. Über <span class="button">Setup partitions...</span> wird das Programm <a href="drivesetup.html">DriveSetup</a> aufgerufen, in dem man eine Übersicht über die Partitionen erhält.</p>
+<p>Mit Klick auf <span class="button">Begin</span> wird der eigentliche Installations-Prozess gestartet. Wie oben beschrieben, muss lediglich kopiert und nicht installiert werden. Wenn von einer bestehenden Haiku-Installation aus installiert wird, werden bis auf <span class="path">home/</span> and <span class="path">common/</span> alle Ordner übernommen und die Zielpartition startfähig gemacht.</p>
+<p>Durch die Installation anderer Betriebssysteme kann es vorkommen, dass Haiku nicht mehr startfähig ist, weil der "Boot-Sektor" überschrieben wurde. In diesem Fall kann man - wenn unter <span class="menu">Onto: Please Choose Target</span> die nicht mehr startfähige Haiku-Installation auswählt - über einen Klick auf <span class="button">Write Boot Sector</span> den vorherigen Zustand wieder herstellen.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
+::  <a href="magnify.html">Magnify</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

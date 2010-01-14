@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Rustam
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Запросы</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../fr/queries.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/queries.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/queries.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../es/queries.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/queries.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/queries.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/queries.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="index.html">Индексация</a> 
+::  <a href="contents.html" class="uplink">Содержание</a> 
+::  <a href="workshop-filetypes+attributes.html">Семинар</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Индексация</td></tr>
+<tr class="index"><td>
+	<a href="#find-window">Окно поиска</a><br />
+	<a href="#basic-query">Базовые запросы - "по имени"</a><br />
+	<a href="#adv-query">Расширенные запросы - "по атрибуту"</a><br />
+	<a href="#more-adv-query">Более продвинутые запросы - "по формуле"</a><br />
+	<a href="#result-window">Окно результатов поиска</a><br />
+	<a href="#query-template">Шаблоны запросов</a>
+</td></tr>
+</table>
+
+<h1>Запросы</h1>
+
+<p>Запрос - это поиск файлов на основе атрибутов и может быть выполнен как в Tracker, так и в Терминале. Запросы за последние семь дней хранятся по следующему адресу <span class="path">/boot/home/queries/</span> по прошествию семи дней удаляются. Следует отметить, что они не являются статичными списками результатов поиска, при открытии запроса будет запущен новый поиск.<br />
+Ещё более удобный способ заключается в использовании <a href="tracker.html#navigating">ниспадающих подменю</a>, просто щелкните правой кнопкой мыши по файлу запроса.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="find-window" name="find-window">Окно поиска</a></h2>
+<p>Для того. чтобы произвести запрос, можно воспользоваться пуктом меню <span class="menu">Найти (Find...)</span> в Deskbar, либо в любом окне Tracker или на Рабочем столе, при помощи сочетания клавиш <span class="key">ALT</span> <span class="key">F</span>. Окно поиска выглядит следующим образом:</p>
+<img src="images/queries-images/basic-query.png" alt="basic-query.png" />
+<ol>
+<li><p>SВыбрать предыдущие или сохраненные запросы, либо сохранить текущий в виде <a href="#query-template">шаблона запроса</a>.</p></li>
+<li><p>Выбрать какого типа файлы следует искать в выдающем меню <span class="menu">Все файлы и папки (All files and folders)</span>.</p></li>
+<li>Определить тип поиска:<ul>
+    <li><span class="menu">По имени (by Name)</span> - базовый поиск по имени файла</li>
+    <li><span class="menu">По атрибуту (by Attribute)</span> - расширенный поиск, вы можете указать условия поиска по одному или нескольким атрибутам</li>
+    <li><span class="menu">По формуле (by Formula)</span> - более продвинутый поиск, вы можете сформировать более сложный запрос</li></ul></li>
+<li><p>Выбрать на каких разделах произвести поиск..</p></li>
+<li><p>Ввести условия поиска.</p></li>
+<li><p>Показать/спрятать дополнительные опции.</p></li>
+<li><p>Уберите галочку напротив - <span class="menu">Временный (Temporary)</span>, если вы не хотите, чтоб запрос удалился через 7 дней.</p></li>
+<li><p>Отметьте галочкой - <span class="menu">Включая корзину (Include trash)</span>, если хотите, чтоб поиск был произведен и в корзине тоже.</p></li>
+<li><p>Опционально, можете ввести название запроса, если хотите его сохранить.</p></li>
+<li><p>Для того, чтобы сохранить запрос, можете просто перенести иконку в любую папку или рабочий стол.</p></li>
+</ol>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="basic-query" name="basic-query">Базовые запросы - "по имени"</a></h2>
+<p>Если вы хотите просто найти все файлы на ваших смонтированных разделах, то просто выберите тип поиска <span class="menu">По имени (by Name)</span>, введите искомое слово в поле ввода и нажмите клавишу <span class="key">ENTER</span>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="adv-query" name="adv-query">Расширенные запросы - "по атрибуту"</a></h2>
+<p>Вы можете произвести расширенный запрос по указаным атрибутам конкретных типов файлов. Чтобы это работало, атрибуты должны быть <a href="index.html">проиндексированы</a>.</p>
+<img src="images/queries-images/query-window.png" alt="query-window.png" />
+<p>Вам следует выбрать тип файла отличный от <span class="menu">Все файлы и папки (All files and folders)</span>, например, <span class="menu">Текстовый | E-mail (Text | E-mail)</span> и изменить тип поиска на <span class="menu">по атрибуту (by Attribute)</span>.</p>
+<p>Это добавляет всплывающее меню слева от текстового полня и кнопок <span class="button">Добавить (Add)</span> и <span class="button">Удалить (Remove)</span>. Из меню можно выбрать атрибут, по которому будет произведен запрос. При помощи кнопок <span class="button">Добавить (Add)</span> и <span class="button">Удалить (Remove)</span> вы можете добавить дополнительный атрибут или удалить не нужный. Эти атрибуты могут быть логически связаны операторами И/ИЛИ (AND/OR).</p>
+<p>Давайте произведем запрос по письмам для примера:</p>
+<img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
+<p>Так выглядит окно поиска для запроса по всем письмам, которые Clara Botters послала вам за последние два месяца с темой "vibraphone" или "skepticality".<br />
+Как видите, поиск на основе атрибутов времени поддерживает некоторые полезные фразы: кроме  "за последние два месяца (last 2 months)", вы можете выбрать "сегодня (today)", "вчера (yesterday)", "Понедельник (Monday)" или "последний Понедельник (last Monday)" (это будет понедельник на прошлой неделе), или "последние 2 минуты/часа/дня/недели (last 2 minutes/hours/days/weeks").<br />
+Хороший способ сузить круг поиска.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="more-adv-query" name="more-adv-query">Более продвинутые запросы - "по формуле"</a></h2>
+<p>Вводить формулу вручную сложно и непрактично.</p>
+<p>Используйте запросы по атрибутам, который находится выше. Если у вас есть все атрибуты и установлены условия поиска, попробуйте переключиться на тип поиска <span class="menu">по формуле (by Formula)</span> и вы увидите, как запрос превратится в строку:</p>
+<img src="images/queries-images/formula-query.png" alt="formula-query.png" />
+<p>В более понятном виде:</p>
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
+       &amp;&amp;(MAIL:when&gt;=%2 months%))
+       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
+       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
+       &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
+<p>И что?</p>
+<ul>
+<li><p>Вы можете скопировать и вставить строку в письмо, форум или IRC для того чтобы пользовались другие или для отладки.</p></li>
+<li><p>Вы можете использовать метод для построения запросов в режием <span class="menu">Атрибутов (Attribute)</span>, затем переключаться в режим <span class="menu">Формулы (Formula)</span>, чтобы сгенерировать строку поиска для использования запроса в терминале или сценарии.</p></li>
+<li><p>You can fine tune your query by inserting parenthesis where needed, make parts case-sensitive or negate logical combinations by changing. e.g. "<tt>==</tt>" to "<tt>!=</tt>" for a NOT AND. All you need is a basic understanding of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">regular expressions</a> and maybe some scripting basics.</p></li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="result-window" name="result-window">Окно результатов поиска</a></h2>
+<p>После того, как вы запустите поиск, окно поиска заменится окном результатов поиска. Вот пример результатов поиска по слову "server":</p>
+<img src="images/queries-images/result-window.png" alt="result-window.png" />
+<p>Некоторые вещи, которые стоит отметить:</p>
+<ul>
+<li><p>Вы можете открыть месторасположение файла или папки дважды щелкнув по атрибуту адреса.</p></li>
+<li><p>При помощи пункта меню <span class="menu">Файл | Изменить запрос (File | Edit Query)</span> или сочетания клавиш <span class="key">ALT</span> <span class="key">G</span> вы сможете вернуться к окну поиска для того, чтобы изменить критерии запроса.</p></li>
+<li><p>Запрос выполняется в реальном времени т.е. если файл, который соответствует критериям будет создан или удален, то это будет отображено в окне результатов поиска в реальном времени.</p></li>
+</ul>
+<p>You can assign a sensible attribute layout for query results of a specific filetype. Open a folder containing files of the filetype you'd like to create a template for and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy Layout</span>.</p>
+<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder named <i>group/filetype</i>, replacing the slash with an underscore, e.g. "audio_x-mp3". Open the new folder and paste in the previously copied layout with <span class="menu">Attributes | Paste Layout</span>.</p>
+
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="query-template" name="query-template">Шаблоны запросов</a></h2>
+<p>If you double click a saved query, the file search is at once started and the result window opens immediately. However, you may not want to search with these <i>exact</i> search parameters, but use it as starting point to only slightly tweak the formula.<br />
+By using the <span class="menu">Save Query as Template</span> menu item (see <a href="#find-window">(1) in screenshot</a> at the top) or drag&amp;dropping the icon (10) anywhere with the right mouse button, you can create just such a template. Double clicking it won't open a result window, but the Find panel, giving you the opportunity to quickly change search strings or add/remove attributes.</p>
+<p>Wherever you choose to save query templates, they'll be listed in the Find panel's menu of recent queries.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="index.html">Индексация</a> 
+::  <a href="contents.html" class="uplink">Содержание</a> 
+::  <a href="workshop-filetypes+attributes.html">Семинар</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

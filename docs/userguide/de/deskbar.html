@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Matthias
+ *		Humdinger
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Deskbar</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../fr/deskbar.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../it/deskbar.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/deskbar.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/deskbar.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/deskbar.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/deskbar.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/deskbar.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
+::  <a href="contents.html" class="uplink">Inhalt</a> 
+::  <a href="filetypes.html">Dateitypen</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#deskbar-menu">Das Deskbar Menü</a><br />
+	<a href="#tray">Das Tray</a><br />
+	<a href="#list-of-apps">Die Liste der Programme</a>
+</td></tr>
+</table>
+
+<h1>Deskbar</h1>
+
+<p>Die Deskbar wird standardmäßig in der oberen rechten Ecke des Desktops angezeigt. Sie ist praktisch Haikus Version von Windows' "Taskbar" und "Startmenü". Sie besteht aus dem Deskbar Menü, von dem aus Programme und Einstellungen aufgerufen werden können, darunter einen Infobereich (das "Tray") mit Uhr und Hilfsprogrammen, sowie eine Liste der gerade laufenden Programme.</p>
+<img src="../images/deskbar-images/positions.png" alt="positions" />
+<p>Die Deskbar kann in jede der vier Ecken - oder entlang des oberen oder untereren Bildschirmrands - verschoben werden. Hierzu muss die gepunktete Linie seitlich vom Tray mit der Maus zur gewünschten Position gezogen werden. Man kann die Deskbar auch zu einer kompakten Darstellung zusammenschieben, indem man die gepunktete Linie auf das Deskbar Menü zieht.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="deskbar-menu" name="deskbar-menu">Das Deskbar Menü</a></h2>
+<p>Ein Klick auf den oberen Bereich der Deskbar öffnet dieses Menü:</p>
+<img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
+<ul>
+<li><p><b>About This System...</b> - zeigt grundsätzliche Informationen zum installierten System, Lizenzinformationen und Danksagungen.</p></li>
+
+<li><p><b>Find...</b> - öffnet den <a href="queries.html">Query</a> Dialog; ein mächtiges Werkzeug zum Suchen und Finden.</p></li>
+<li><p><b>Show Replicants</b> - zeigt/verbirgt die kleinen Symbole mit dem <a href="gui.html#replicants">Replikanten</a> verschoben, bzw. mittels deren Kontextmenü entfernt werden können.</p></li>
+<li><p><b>Mount</b> - öffnet den gleichen Dialog zum Einbinden von Partitionen, wie bei einem Klick auf den Desktop (siehe <a href="tracker.html#mounting-volumes">Datenträger einbinden</a>).</p></li>
+<li><p><b>Deskbar Preferences...</b> - öffnet ein Dialogfenster um die Deskbar anzupassen (siehe unten).</p></li>
+<li><p><b>Shutdown</b> - bietet die Möglichkeit, das System neu zu starten (<span class="menu">Restart System</span>) oder herunterzufahren (<span class="menu">Power Off</span>).</p></li>
+<li><p><b>Recent Documents, Folders, Applications</b> - eine Liste der kürzlich geöffneten Programme, Dateien und Ordnern (siehe <span class="menu">Deskbar Preferences</span> weiter unten).</p></li>
+<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> - eine Liste aller installierten Programme, der Demo-Programme und der System-Einstellungen (siehe <span class="menu">Deskbar Preferences</span> weiter unten).</p></li>
+</ul>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Deskbar Preferences</h3>
+<img src="images/deskbar-images/configure.png" alt="configure.png" />
+<ul>
+<li><p><b>Menu</b><br />
+Hier lässt sich die Anzahl der kürzlich geöffneten Dokumente, Ordner und Anwendungen einstellen, die in den entsprechenden Menüs der Deskbar erscheinen.<br />
+<span class="button">Edit Menu...</span> öffnet den Ordner <span class="path">/boot/home/config/be/</span>. Hier befinden sich die Dateien und Ordner aus der Deskbar, standardmäßig <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar Applets</span> und <span class="menu">Preferences</span>.<br />
+Einträge wie Verküpfungen zu Anwendungen, Dokumenten oder sogar Query-Suchen können hinzugefügt und wieder gelöscht werden, indem man sie einfach in diesem Ordner ablegt bzw. entfernt.</p>
+<p>Noch einfacher geht das, indem man eine Datei, Ordner oder gespeicherte Query einfach an die gewünschte Position in die Deskbar zieht.</p></li>
+<li><p><b>Window</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Always on Top</span></td><td> </td><td>Die Deskbar bleibt immer im Vordergrund über allen anderen Fenstern.</td></tr>
+<tr><td><span class="menu">Auto Raise</span></td><td> </td><td>Wird die Deskbar vom Mauszeiger berührt, springt sie automatisch in den Vordergrund.</td></tr>
+</table></li>
+<li><p><b>Applications</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Sort Running Applications</span></td><td> </td><td>Ordnet die Liste laufender Programme alphabetisch.</td></tr>
+<tr><td><span class="menu">Tracker always First</span></td><td> </td><td>Selbst wenn alphabetisch sortiert wird, bleibt Tracker immer erster in der Liste.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Show Application Expander</span></td><td> </td><td>Über ein kleines Symbol lassen sich die Fenster eines Programms direkt unter seinem Eintrag in der Deskbar ein- und ausklappen.</td></tr>
+<tr><td><span class="menu">Expand New Applications</span></td><td> </td><td>Fenster neu gestarteter Programme werden automatisch unter deren Eintrag in der Deskbar ausgeklappt.</td></tr>
+</table></li>
+<li><p><b>Clock</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">24 Hour Clock</span></td><td> </td><td>Schaltet zwischen 24 und 12 Stundenanzeige um.</td></tr>
+<tr><td><span class="menu">Show Seconds</span></td><td> </td><td>Blendet die Sekundenanzeige ein.</td></tr>
+<tr><td><span class="menu">European Date</span></td><td> </td><td>Zeigt das Datum im europäischen Tag-Monat-Jahr Format</td></tr>
+</table></li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tray" name="tray">Das Tray</a></h2>
+<img src="images/deskbar-images/calendar.png" alt="calendar.png" />
+<p>Im Tray befindet sich unter anderem die Uhr. Ein Linksklick wechselt zwischen Zeit- und Datumsanzeige. Ein Rechsklick öffnet ein Kontextmenü mit dem die Uhranzeige aus- und eingeschaltet und zur Einstellung das Panel <a href="preferences/time.html">Time</a> geöffnet werden kann.<br />
+Außerdem kann hier ein kleiner Kalender angezeigt werden. Der erscheint übigens auch, wenn man die linke Maustaste etwas länger auf der Uhr gedrückt hält.</p>
+<p>Das Tray steht jedem Programm zur Verfügung, um dort Informationen oder Einstellungsmöglichkeiten für den Benutzer bereit zu stellen. So ändert sich zum Beispiel das Icon des Mailsystems, sobald ungelesene E-Mails vorhanden sind. Der <span class="app">ProcessController</span> ist ein weiteres Beispiel. Er zeigt durch Balken die aktuelle Prozessor-Last und Auslastung des Hauptspeichers und bietet über ein Kontextmenü weitere Informationen und Aktionen.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-apps" name="list-of-apps">Die Liste der laufenden Programme</a></h2>
+<img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
+<p>Hier werden alle Programme angezeigt, die gerade aktiv sind. Durch einen Klick auf ein Programm kann man zu diesem, respektive zu einem seiner Fenster, wechseln. Mit einem Rechtsklick minimiert oder schließt man ein Programmfenster oder das gesamte Programm.</p>
+<p>Bei aktivierter Einstellung "Show Application Expander..." in den Deskbar Einstellungen, kann man über das kleine Dreieck die Liste der einzelnen Fenster eines Programmes direkt unterhalb des jeweiligen Eintrages in der Programmliste anzeigen lassen.</p>
+<p>Das Symbol vor den Einträgen der einzelnen Programmfenster zeigt Informationen zu diesem Fenster. Ein farbiges Icon repräsentiert ein sichtbares Fenster, ein ausgegrautes Icon ein minimiertes Fenster. Linien vor dem Icon deuten darauf hin, dass das Fenster auf einem anderen als dem aktuellen "Workspace" ist.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
+::  <a href="contents.html" class="uplink">Inhalt</a> 
+::  <a href="filetypes.html">Dateitypen</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Oscar Carballal Prego
+ *		Humdinger
+ *		miguel~1.mx
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<meta name="robots" content="all" />
+	<title>Aplicaciones</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../fr/applications.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/applications.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/applications.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/applications.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../sv_SE/applications.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/applications.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/applications.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="desktop-applets.html">Applets de Escritorio</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Aplicaciones</h1>
+
+<p>Before diving into all the applications that come with Haiku, let's have a more detailed look at how to install and uninstall programs you downloaded somewhere, for example from a site mentioned on the <a href="../../welcome/welcome_es.html#software">Welcome</a> page.</p>
+<div class="box-info">Debería únicamente desempaquetar e instalar archivos dentro de Haiku. Si se extrae un paquete dentro de Linux o Windows, por ejemplo, y sólo se copia el folder sobre Haiku posteriormente, todos los atributos vitales se eliminarían, porque esos sistemas operativos no manejan normalmente metainformación.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="install" name="install">Instalar aplicaciones</a></h2>
+<p>El software de Haiku viene siempre empaquetado. La mayor parte de las veces es un fichero ZIP, pero a veces algunos paquetes antiguos de BeOS vienen en formato Software Valet's PKG. Software Valet era capaz de ejecutar automáticamente scripts de instalación, así que tras hacer doble clic, sólo tenía que seleccionar el directorio de destino, y él se encargaba del resto.<br />
+Si es un fichero ZIP, al hacer doble clic se abre <span class="app">Expander</span> donde también se debe poner el directorio de destino y descomprimirlo. Tal como se explica en la sección <a href="filesystem-layout.html">Esquema del sistema de ficheros</a>, ese destino puede ser:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>para aplicaciones disponibles para todos los usuarios.</td></tr>
+<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>para aplicaciones sólamente disponibles para usted.</td></tr>
+</table>
+<p>Esta distinción será relevante sólamente cuando Haiku tenga soporte multiusuario, por supuesto.</p>
+<p>Una vez el fichero está descomprimido, debería echar un vistazo al directorio recién creado. A menudo se encuentran ficheros ReadMe (léame) u otra documentación de interés.</p>
+<p>Algunos programas necesitan mayor configuración. Por ejemplo, los <a href="tracker-add-ons.html">Tracker Add-Ons (extensiones de Tracker)</a>, <a href="preferences/datatranslations.html">Traductores</a> u otros componentes de mejora del sistema tienen que ser colocados en los directorios correctos. En ambos casos encontrará un pequeño fichero script (a menudo con la extensión <span class="cli">.sh</span>) como <span class="cli">install</span> que simplemente tiene abrir mediante doble clic y ellos se harán cargo del resto.<br />
+Algunas veces encontrará directorios enlazados al destino correcto llamados "<span class="cli">arrastre [nombre de fichero] aquí...</span>". Así que tan sólo tiene que seguir esa instrucción y habrá finalizado.</p>
+<p>De todas formas, en la mayor parte de casos, nada de lo explicado es necesario, y sólo será necesario descomprimir.<br />
+Mire la sección <a href="deskbar.html">Deskbar</a> o <a href="desktop-applets/launchbox.html">LaunchBox</a> para ver cómo se añaden accesos directos a su recién instalada aplicación.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="uninstall" name="uninstall">Desinstalar aplicaciones</a></h2>
+<p>Si la instalación se realizó con un script de instalación, es bastante probable que haya un script de desinstalación también. En ese caso, basta con que haga doble clic sobre él.<br />
+En cualquier otro caso, la desinstalación se lleva a cabo simplemente borrando la carpeta de la aplicación.</p>
+<p>Esto, por supuesto, deja atrás posibles ficheros de configuración en el directorio <span class="path">~/config/settings</span>. Esto puede ser a propósito, por si quiere mantener la configuración en caso de que vuelva a instalar el programa en un futuro. De la misma forma, cuando la instalación se ha realizado mediante los directorios "<span class="cli">arrastrar [nombre de fichero] aquí...</span>", esos ficheros son abandonados.</p>
+<p>Una forma de ver rápidamente todos los ficheros relacionados con una aplicación es hacer una búsqueda con una parte significativa del nombre de la aplicación. Esto dará como resultado el binario de la aplicación, su directorio de instalación y sus ficheros de configuración así como posibles enlaces en el Deskbar, etc. Simplemente seleccione todos los ficheros relevantes y bórrelos.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-apps" name="list-of-apps">Aplicaciones de Haiku</a></h2>
+<p>Haiku viene con un conjunto pequeño de aplicaciones esenciales. Podrá encontrarlas en <span class="path">/boot/system/apps/</span> o <span class="path">/boot/common/apps/</span>. Las aplicaciones que no son iniciadas con frecuencia con un doble clic en un fichero de datos (ej.: ShowImage para ficheros de imagen) se pueden encontrar en el menú <span class="menu">Applications (Aplicaciones)</span> del Deskbar.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">ActivityMonitor (Monitor de Actividad)</a></td><td style="width:10px;"> </td>
+		<td valign="top">Herramienta para monitorizar los recursos de sistema como la CPU o el uso de memoria.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CDPlayer (Reproductor de CD)</a></td><td> </td>
+		<td valign="top">Reproductor de CD's de música.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">CharacterMap (Mapa de carácteres)</a></td><td> </td>
+		<td valign="top">Aplicación que muestra el mapa de carácteres Unicode.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam (Visor de cámara web)</a></td><td> </td>
+		<td valign="top">Herramienta para subir imágenes habitualmente de una webcam a un servidor.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">DeskCalc (Calculadora)</a></td><td> </td>
+		<td valign="top">Una calculadora.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskprobe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskprobe.html">DiskProbe</a></td><td> </td>
+		<td valign="top">Editor hexadecimal para ficheros y dispositivos.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/diskusage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/diskusage.html">DiskUsage</a></td><td> </td>
+		<td valign="top">Herramienta para visualizar el uso de memoria de disco.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/drivesetup-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/drivesetup.html">DriveSetup</a></td><td> </td>
+		<td valign="top">Herramienta de particionado de discos.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Expander</a></td><td> </td>
+		<td valign="top">Herramienta para desempaquetar (descomprimir) ficheros comunes.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Matic</a></td><td> </td>
+		<td valign="top">Aplicación para crear iconos vectoriales de Haiku.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Installer</a></td><td> </td>
+		<td valign="top">La herramienta para instalar Haiku en una partición.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Magnify</a></td><td> </td>
+		<td valign="top">Una vista ampliada del área que rodea al puntero del ratón.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Mail</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Un cliente de correo electrónico. [<i>todavía falta</i>]</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">MediaPlayer</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Un reproductor para todos formatos de vídeo y audio soportados. [<i>todavía falta</i>]</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MidiPlayer</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Un reproductor de ficheros MIDI. [<i>todavía falta</i>]</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">PackageInstaller</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Instalador de paquetes BeOS en formato PKG. [<i>todavía falta</i>]</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">People</a></td><td> </td>
+		<td valign="top">Gestor de contactos (Agenda).</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">PoorMan</a></td><td> </td>
+		<td valign="top">Un sencillo servidor web.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Screenshot</a></td><td> </td>
+		<td valign="top">Una herramienta para hacer capturas de pantalla.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Un sencillo visor de imágenes. [<i>todavía falta</i>]</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Una herramienta para grabar sonido desde la entrada de línea o un micrófono. [<i>todavía falta</i>]</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
+		<td valign="top">Un sencillo editor de texto.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Terminal</a></td><td> </td>
+		<td valign="top">Acceso a Bash.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/textsearch-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/textsearch.html">TextSearch</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Una herramienta de búsqueda para ficheros de texto. [<i>todavía falta</i>]</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/tv-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/tv.html">TV</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Un visor de TV analógica. [<i>todavía falta</i>]</span></td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-bundled-apps" name="list-of-bundled-apps">Aplicaciones incluídas</a></h2>
+<p>Aparte de los programas listados más arriba, los cuales están mantenidos por el proyecto Haiku, hay algunas aplicaciones esenciales incluídas en un sistema Haiku estándar. Los errores y solicitudes de mejoras deben enviarse al mantenedor de esa aplicación en particular.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+		<tr><td style="width:24px;"><img src="../images/apps-images/bepdf-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bepdf.html">BePDF</a></td><td> </td>
+		<td valign="top">Visor de documentos <acronym title="Portable Document Format">PDF</acronym>.</td></tr>
+<tr><td style="width:24px;"><img src="../images/apps-images/bezillabrowser-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bezillabrowser.html">BeZillaBrowser</a></td><td> </td>
+		<td valign="top">Navegador web basado en el código fuente de Mozilla.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/pe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/pe.html">Pe</a></td><td> </td>
+		<td valign="top">Editor de texto avanzado con coloreado de sintaxis y mucho más.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/vision-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/vision.html">Vision</a></td><td> </td>
+		<td valign="top">Cliente de <acronym title="Internet Relay Chat">IRC</acronym>.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/vlc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/vlc.html">VLC media player</a></td><td> </td>
+		<td valign="top">Reproductor de medios VideoLAN.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/wonderbrush-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/wonderbrush.html">WonderBrush</a></td><td> </td>
+		<td valign="top">Programa de gráficos hecho por YellowBite.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="desktop-applets.html">Applets de Escritorio</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

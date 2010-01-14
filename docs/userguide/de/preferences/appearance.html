@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Humdinger
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Appearance</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../../fr/preferences/appearance.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../it/preferences/appearance.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/appearance.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/appearance.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/appearance.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/preferences/appearance.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/preferences/appearance.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+    <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="backgrounds.html">Backgrounds</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Appearance</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span></td></tr>
+</table>
+<p>Im Appearance Panel lassen sich einige Details von Haikus Erscheinungsbild anpassen.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="colors" name="colors">Farben</a></h2>
+<img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
+<p>Im ersten Reiter, <span class="menu">Colors</span>, lassen sich die Farben einiger Teile der Oberfläche einstellen. In das Farbfeld können Farben per Drag &amp; Drop aus anderen Programmen, wie z.B. <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> oder dem <span class="app">Backgrounds</span> Panel, reingezogen werden.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="antialiasing" name="antialiasing">Antialiasing</a></h2>
+<img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
+<p>Im zweiten Reiter, <span class="menu">Antialiasing</span>, befinden sich unterschiedliche Einstellungen, die die Ausgabe auf dem Bildschirm beeinflussen.</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Glyph Hinting</h3>
+<p>Aktiviert man <span class="menu">Glyph hinting</span>, werden alle Buchstaben so ausgerichtet, dass ihre horizontalen und vertikalen Ränder genau zwischen zwei Pixel liegen. Dadurch erreicht man einen sehr guten Kontrast, besonders bei Darstellungen von schwarz auf weiß. Text erscheint schärfer. Die Einstellung <span class="menu">Monospaced Fonts Only</span> beschränkt das Hinting auf Schriften fixer Breite und ist gerade bei Geräten mit geringen Auflösungen, wie Netbooks, interessant. Bei kleinen Schriftarten kann das Hinting ziemlich schlimm aussehen. Mit dieser Einstellung hat man die Vorteile aber zumindest noch in Texteditoren und im Terminal.</p>
+<p>Hier sieht man den Unterschied von Hinting anhand vergrößerter Screenshots:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting: aus</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting: an</td></tr>
+</table>
+<p>Es sei angemerkt, dass alle <span class="app">Magnify</span> Fenster auf dieser Seite natürlich auch selbst mit den verschiedenen Optionen dargestellt werden. So bekommt man einen echten Eindruck der Einstellungen, indem man z.B. die fetten Titel der Fensterreiter vergleicht, oder den Text "33 x 15 @ 8 pixels/pixel".</p>
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+Antialiasing Typ</h3>
+<p>Eine weitere Technik, um die Darstellung zu verbessern, ist <i>Antialiasing</i>, welches auf Vektorgrafiken, als auch auf Text angewandt wird. Es glättet Linien, indem die Farbe bestimmter Pixel geändert wird. Dazu gibt es zwei unterschiedliche Methoden:</p>
+<p><span class="menu">Grayscale</span> ändert die Intensität der äußeren Pixel.<br />
+<span class="menu">LCD subpixel</span> macht das noch besser, vor allem bei (hochauflösenden) LCD Monitoren. Anstatt der Intensität eines Pixels, wird die Farbe so geändert, dass eine Kante nur einen Bruchteil eines Pixels bewegt wird, da LCD Schirme jeden Pixel aus einer roten, grünen und blauen Komponente zusammensetzen.</p>
+<p>Hier wieder die beiden Methoden anhand vergrößerter Screenshots:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Grayscale, Hinting: aus</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, Hinting: aus</td></tr>
+</table>
+<p>Subpixel Antialiasing verleiht Objekten einen leicht farbigen Umriss, den nicht jeder mag. In Haiku kann man beide Antialiasing Methoden mischen und die für einen richtige Einstellung mit einem Schieberegler finden.</p>
+<div class="box-info">Die Kombination von Subpixel Antialiasing und Glyph Hinting ist durch ein Softwarepatent geschützt und daher nicht von Hause aus verfügbar. Je nachdem in welchem Land der Erde man sich befindet, existiert u.U. eine dieses Feature enthaltene Version. Das ist sehr schade. Abhilfe könnte ein Gespräch mit seinem Abgeordneten bringen.</div>
+<p>Wenn Glyph Hinting zusammen mit LCD Subpixel Antialiasing aktiviert wird, indem man den Sourcecode entsprechend ändert und neu kompiliert, sieht das so im Vergleich mit Hinting bei Grayscale Antialiasing aus:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Grayscale, Hinting: an</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD subpixel, Hinting: an</td></tr>
+</table>
+<p><br /></p>
+<p>Ganz unten im Fenster befinden sich zwei Buttons:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">Defaults</span></td><td> </td><td>stellt die Standardwerte wieder her.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>setzt wieder die Werte, die aktiv waren als das Appearance Panel gestartet wurde.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+    <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="backgrounds.html">Backgrounds</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

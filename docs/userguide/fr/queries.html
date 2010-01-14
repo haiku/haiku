@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Requêtes</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../de/queries.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/queries.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/queries.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/queries.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/queries.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/queries.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/queries.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="index.html">Index</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="workshop-filetypes+attributes.html">Atelier</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#find-window">La fenêtre de recherche</a><br />
+	<a href="#basic-query">Recherches basiques - "par Nom"</a><br />
+	<a href="#adv-query">Recherches avancées - "par Attribut"</a><br />
+	<a href="#more-adv-query">Requêtes encore plus avancées - "par formule"</a><br />
+	<a href="#result-window">La fenêtre de résultat</a><br />
+	<a href="#query-template">Modèles de requêtes</a>
+</td></tr>
+</table>
+
+<h1>Requêtes</h1>
+
+<p>Une requête est une recherche de fichiers basée sur des attributs de fichiers et peut être réalisée dans le Tracker ou dans le Terminal. Les requêtes sont sauvegardées dans <span class="path">/boot/home/queries/</span> et par défaut, elles sont conservées sept jours avant d'être purgé. Vous remarquez que ce ne sont pas des listes statiques de résultats de vos recherches, mais ce sont des formules de requête qui déclenchent une nouvelle recherche chaque fois que vous les ouvrez.<br />
+Mieux encore, vous n'avez pas à double-cliquer à nouveau pour rafraichir une requête. Vous pouvez <a href="tracker.html#navigating">explorer</a> une requête enregistrée, tout comme n'importe quel dossier en effectuant un clic droit sur elle et en naviguant dans les sous-menus.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="find-window" name="find-window">La fenêtre de recherche</a></h2>
+<p>Vous commencez une requête en invoquant le menu <span class="menu">Find...</span> à partir du menu de la Deskbar, de n'importe quelle fenêtre du Tracker ou directement à partir du bureau (ce dernier est en fait une fenêtre du Tracker en plein écran). Le raccourci est <span class="key">ALT</span> <span class="key">F</span>. Voici une présentation de la fenêtre de recherche :</p>
+<img src="images/queries-images/basic-query.png" alt="basic-query.png" />
+<ol>
+<li><p>Select recent or saved queries or save the current search parameters as <a href="#query-template">Query Template</a>.</p></li>
+<li><p>Réduisez votre recherche de "Tous les fichiers et les dossiers" (<span class="menu">All files and folders</span>) à un type de fichier spécifique.</p></li>
+<li>Define the search method:<ul>
+    <li><span class="menu">by Name</span> - a basic search by file or folder name</li>
+    <li><span class="menu">by Attribute</span> - an advanced search, you specify search terms for one or more attributes</li>
+    <li><span class="menu">by Formula</span> - an even more advanced search, you can fine-tune a complex query term</li></ul></li>
+<li><p>Selection des disques/volumes à interroger.</p></li>
+<li><p>Entrez le terme recherché.</p></li>
+<li><p>Un agrandisseur cache/montre les options supplémentaires.</p></li>
+<li><p>Décochez la case <span class="menu">Temporary</span> (Temporaire) si vous ne voulez pas que cette requête s'efface après 7 jours.</p></li>
+<li><p>Cocher si votre requête est supposé inclure la corbeille (<span class="menu">Include trash</span>).</p></li>
+<li><p>En option, saisissez un nom pour cette requête si vous souhaitez l'enregistrer.</p></li>
+<li><p>Vous pouvez glisser&amp;déposer l'icône pour sauvegarder la requête. En le faisant avec le bouton droit, vous aurez le choix de sauver le modèle de la requête.</p></li>
+</ol>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="basic-query" name="basic-query">Recherches basiques - "par Nom"</a></h2>
+<p>Si vous souhaitez simplement trouver tous les fichiers sur vos disques montés dont le nom correspond à un certain motif, laissez simplement la méthode de recherche "<span class="menu">by name</span>", entrez le terme recherché dans la zone de texte et pressez <span class="key">ENTRÉE</span>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="adv-query" name="adv-query">Recherches avancées - "par Attribut"</a></h2>
+<p>Vous pouvez créer des requêtes plus complexes en faisant une recherche dans les attributs de fichiers d'un type spécifique. Pour que cela fonctionne, ces attributs doivent être <a href="index.html">indexés</a>.</p>
+<img src="images/queries-images/query-window.png" alt="query-window.png" />
+<p>You start by setting the filetype from <span class="menu">All files and folders</span> to, for example, <span class="menu">Text | E-mail</span> and change the search method to <span class="menu">by Attribute</span>.</p>
+<p>This adds a pop-up menu to the left of the textbox and the buttons <span class="button">Add</span> and <span class="button">Remove</span> under that. From the menu you choose which attribute to query. With <span class="button">Add</span> and <span class="button">Remove</span> you can query additional attributes or remove them again. These attributes can be logically linked with AND/OR.</p>
+<p>Faisons par exemple une requête sur un e-mail :</p>
+<img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
+<p>This is your Find window when you're looking for all emails Clara Botters has sent to you in the last two months that had in the subject "vibraphone" or "skepticality".<br />
+As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
+A good way to cut down the number of search results.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="more-adv-query" name="more-adv-query">Requêtes encore plus avancées - "par formule"</a></h2>
+<p>Saisir une formule de requête manuellement est rebutant et assez peu pratique. Elle a néanmoins son utilité.</p>
+<p>Take the above query by attribute of Clara's mails concerning vibraphones etc. If you have all the attributes and their search terms set, try switching to <span class="menu">by Formula</span> mode and be overwhelmed by this one line query string:</p>
+<img src="images/queries-images/formula-query.png" alt="formula-query.png" />
+<p>la même chose, sous forme de texte, édité pour plus de lisibilité :</p>
+<pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
+       &amp;&amp;(MAIL:when&gt;=%2 months%))
+       &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
+       ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
+       &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
+<p>A quoi ça sert ?</p>
+<ul>
+<li><p>Vous pouvez copier et coller la chaîne dans un e-mail, un forum ou sur IRC pour que d'autres puissent l'utiliser ou la déboguer.</p></li>
+<li><p>En construisant une requête en mode <span class="menu">Attribute</span>, puis en passant en mode <span class="menu">Formula</span>, Vous pouvez générer facilement une chaîne de recherche à utiliser pour une requête dans le Terminal ou dans un script.</p></li>
+<li><p>You can fine tune your query by inserting parenthesis where needed, make parts case-sensitive or negate logical combinations by changing. e.g. "<tt>==</tt>" to "<tt>!=</tt>" for a NOT AND. All you need is a basic understanding of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">regular expressions</a> and maybe some scripting basics.</p></li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="result-window" name="result-window">La fenêtre de résultat</a></h2>
+<p>Après avoir lancé une recherche, la fenêtre de recherche va être remplacée par une fenêtre de résultat. Voici un exemple qui a demandé "server" :</p>
+<img src="images/queries-images/result-window.png" alt="result-window.png" />
+<p>Hormis leur fond gris, les fenêtres de résultat fonctionnent exactement comme n'importe quelle autre fenêtre du Tracker. Certaines choses méritent d'être noter :</p>
+<ul>
+<li><p>Vous pouvez ouvrir le dossier dans lequel se trouve le fichier ou le dossier en cliquant deux fois sur l'attribut "Path".</p></li>
+<li><p>With <span class="menu">File | Edit Query</span> or <span class="key">ALT</span> <span class="key">G</span> you get back to your Find window to refine your query.</p></li>
+<li><p>A query is live, i.e. if a file that matches your search criteria appears or disappears from your system, this change is reflected in your results in real-time.</p></li>
+</ul>
+<p>You can assign a sensible attribute layout for query results of a specific filetype. Open a folder containing files of the filetype you'd like to create a template for and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy Layout</span>.</p>
+<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder named <i>group/filetype</i>, replacing the slash with an underscore, e.g. "audio_x-mp3". Open the new folder and paste in the previously copied layout with <span class="menu">Attributes | Paste Layout</span>.</p>
+
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="query-template" name="query-template">Modèles de requêtes</a></h2>
+<p>If you double click a saved query, the file search is at once started and the result window opens immediately. However, you may not want to search with these <i>exact</i> search parameters, but use it as starting point to only slightly tweak the formula.<br />
+By using the <span class="menu">Save Query as Template</span> menu item (see <a href="#find-window">(1) in screenshot</a> at the top) or drag&amp;dropping the icon (10) anywhere with the right mouse button, you can create just such a template. Double clicking it won't open a result window, but the Find panel, giving you the opportunity to quickly change search strings or add/remove attributes.</p>
+<p>Où que vous choisissiez d'enregistrer les modèles de requêtes, ils seront énumérés dans la liste des requêtes récentes de la fenêtre recherche.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="index.html">Index</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="workshop-filetypes+attributes.html">Atelier</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

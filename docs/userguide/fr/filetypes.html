@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Types de fichiers</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../de/filetypes.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/filetypes.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/filetypes.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/filetypes.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/filetypes.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/filetypes.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/filetypes.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="deskbar.html">Deskbar</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="attributes.html">Attributs</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Types de fichiers</h1>
+
+<p>Haiku ne se base pas comme Windows sur les 3 lettres de l'extension du nom du fichier pour déterminer son type (par example .txt, .jpg, .mp3).
+Cette méthode de secours n'est utilisé qu'en dernier ressort.
+Haiku utilise un type <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> comme c'est l'usage sur Internet.</p>
+<div class="box-info">Même si il n'y a aucune raison d'utiliser les extensions de fichier dans Haiku, n'oubliez pas de les ajouter aux fichiers que vous souhaitez partager avec les utilisateurs d'un autres systèmes d'exploitation, par exemple quand vous envoyer un e-mail, quand vous le copiez vers un serveur ou sur une clé USB. Le cas échéant, leur système pourrait ne pas reconnaître le type du fichier.</div>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="specific-file" name="specific-file">Définir le type d'un fichier</a></h2>
+<p>You can change the type of a specific file, its icon and the associated application. Select the file and invoke the <span class="menu">Add-Ons | Filetype add-on</span> from the right-click context menu.</p>
+<img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="filetype" id="filetype">Le type du fichier</a></h3>
+<p>Ce qui précède est un fichier PNG qui a pour chaîne MIME image/png. Disons que vous savez que ce n'est pas un PNG mais un GIF. Vous pouvez modifier le type en entrant
+la chaîne MIME correcte à la main, ou en utilisant l'un des deux boutons sous la zone de texte :</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="button">Select...</span></td><td> </td><td>affiche la liste hiérarchique des types de fichiers dans lesquels vous pouvez naviguez jusqu'à <tt>image | GIF Image</tt>.</td></tr>
+<tr><td><span class="button">Same as...</span></td><td> </td><td>Ouvre une boite de dialogue fichier dans laquelle vous pouvez choisir n'importe quel fichier du type que vous rechercher.</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="preferred-app" name="preferred-app">L'application préférée</a></h3>
+<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked. You could, for example, change a HTML file's preferred application from the browser to a text editor while you're working on it. Every other HTML file still opens in the browser, only this particular one starts in your text editor.</p>
+
+<p>The <span class="menu">Default Application</span> is the one that's set globally for that filetype. If you don't find the program you want to associate with this file in the pop-up menu, you'll again find the buttons <span class="button">Select...</span> and <span class="button">Same As...</span> which do the similar thing described under "The File Type" above.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="icon" name="icon">L'icône</a></h3>
+<p>If you're wondering why the icon well on the top right is empty: Icons are normally inherited from the system default for that filetype. You can open the <span class="app">Filetype Add-On</span> of a file that contains an icon and drag&amp;drop it into your file's icon well. Or you double-click the icon well and create or edit your own icon. For more info on icons and how to create your own, see topic <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="settings-apps" name="settings-apps">Paramètres spécifiques aux applications</a></h2>
+<p>If you invoke the <span class="app">Filetype Add-On</span> on an executable (here: <span class="app">StyledEdit</span>), you'll get a different dialog:</p>
+<img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
+<p>En haut, plutôt qu'une chaîne MIME normalisée, vous verrez la signature unique de l'application. Elle permettra au système de trouver où se trouve le programme.</p>
+<p>En dessous, vous trouverez plusieurs drapeaux qui contrôlent le comportement des applications :</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Single Launch</span></td><td> </td><td>Une seule instance de l'application peut être exécutée par fichier exécutable. 
+Néanmoins, si vous avez deux copies de cette application, elles peuvent fonctionner côte à côte.</td></tr>
+<tr><td><span class="menu">Multiple Launch</span></td><td> </td><td>Plusieurs instances de l'application peuvent s'exécuter simultanément.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Exclusive Launch</span></td><td> </td><td>Il n'est autorisé qu'une seule instance avec cette signature d'application à la fois.</td></tr>
+<tr><td><span class="menu">Args Only</span></td><td> </td><td>Indique que l'application ne répond pas aux messages.</td></tr>
+<tr><td><span class="menu">Background App</span></td><td> </td><td>L'application n'apparaitra pas dans <a href="twitcher.html">Twitcher</a> ou dans la liste des applications en cours de la Deskbar.</td></tr>
+</table>
+<p>Then there's the list of supported filetypes. You can add (and remove) filetypes if you think the application can handle them. As a consequence, the app will appear in the menu for preferred applications or Tracker's <span class="menu">Open with...</span> context menu when you right-click on a file of that type.</p>
+<p>Au bas, vous trouverez la version et le copyright. Comme la signature de l'application, ils sont remplis par l'auteur de l'Application et ne devraient pas être modifiés.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="filetypes-preferences" name="filetypes-preferences">Global settings with the FileTypes Preferences</a></h2>
+<p>The <span class="app">FileTypes</span> preferences don't deal with individual files but with global settings of filetypes. You can change default icons and preferred applications or add, remove, or alter attributes of whole filetypes. You can even create your own filetype from scratch.</p>
+<p>Tous les types de fichiers et leurs configurations sont conservés dans <span class="path">/boot/home/config/settings/beos_mime/</span>. Avant de commencer vos expérimentations, il peut être prudent de faire une sauvegarde de ce dossier...</p>
+<p>To learn more about the <span class="app">FileTypes</span> preferences see the workshop: <a href="workshop-filetypes+attributes.html">Filetypes, Attributes, Index and Queries</a>.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="deskbar.html">Deskbar</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="attributes.html">Attributs</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

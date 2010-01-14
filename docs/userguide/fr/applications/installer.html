@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Installer</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../../de/applications/installer.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/installer.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/installer.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/installer.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/installer.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/installer.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/installer.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="magnify.html">Magnify</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
+<tr><td>Réglages :</td><td></td><td><i>aucun</i></td></tr>
+</table>
+<p><br /></p>
+<p>Installer est utilisé pour répliquer Haiku sur un nouveau volume.<br />
+Au lancement, il affiche une fenêtre de démarrage qui contient des  renseignements importants. Ce n'est pas le stupide CLUF que vous avez l'habitude d'accepter en un clin d'œil, il indique que :</p>
+<ul>
+<li><p>Ce logiciel en version alpha n'étant pas exempt de défaut, faites des sauvegardes ou vous devrez en assumer les conséquences !</p></li>
+<li><p>Vous devez préparer une partition avant d'utiliser Installer. Vous pouvez utiliser <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> ou tout autre outil comparable jusqu'à ce que DriveSetup, l'outil d'Haiku, soit assez mature pour effectuer cette tâche.</p></li>
+<li><p>Haïku peut être ajouté manuellement au gestionnaire d'amorçage <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>.
+En résumé, vous devez ajouter une entrée dans <span class="path">/boot/grub/menu.lst</span> de votre installation Linux, comme ceci :</p>
+<pre># Haiku on /dev/sda7
+title		Haiku
+rootnoverify	(hd0,6)
+chainloader	+1</pre></li>
+</ul>
+<p><br /><br /></p>
+<p>Une fois que vous avez accepté avec <span class="button">Continue</span>, vous arrivez dans la fenêtre principale :</p>
+<img src="../images/apps-images/installer.png" alt="installer.png" />
+<p>Dans la première liste déroulante, vous choisissez la source de l'installation. Ce peut être la version d'Haiku actuellement installée, le CD d'installation, ou une clé USB, etc<br />
+La seconde liste déroulante spécifie la destination de l'installation. Cette partition (ou volume) cible qui devra être préalablement allouée à l'aide d'un outil de partitionnement comme GParted, sera complètement écrasée au début de l'installation.</p>
+<p>En cliquant sur <i>Show Optional Packages</i>, vous développerez, si disponible, les composants complémentaires à installer en plus de la base d'Haiku.</p>
+<p>Vérifiez une dernière fois la destination que vous avez choisi avant de démarrer le processus d'installation. Cliquez sur <span class="button">Setup partitions...</span> afin d'ouvrir <a href="drivesetup.html">DriveSetup</a>. 
+Vous verrez ainsi le nom et l'emplacement des volumes et partitions disponibles.</p>
+<p><span class="button">Begin</span> commence la procédure d'installation, en copiant tout, à l'exception des dossiers <span class="path">home/</span> et <span class="path">common/</span> sur le volume cible, avant de le rendre bootable.</p>
+<p>Bien que la partition soit automatiquement rendu amorçable à la fin de la procédure d'installation, il peut arriver que certains autres systèmes d'exploitation ou outil de partitionnement remplacent (accidentellement) le secteur de démarrage de votre volume Haïku. Dans ce cas, amorcez votre système à partir de votre CD d'installation et démarrez Installater. Sélectionnez votre partition Haiku à démarrer dans la liste déroulante <span class="menu">Onto: Please Choose Target</span> puis cliquez sur <span class="button">Write Boot Sector</span> pour la rendre à nouveau amorçable.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="magnify.html">Magnify</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

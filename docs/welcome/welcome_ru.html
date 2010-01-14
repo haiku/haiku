@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"> 
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *		Stephan Aßmus <superstippi@gmx.de> 
+ * Translators:
+ *		michael_s
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="all" />
+	<title>Добро пожаловать в Haiku!</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="welcome_fr.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="welcome_de.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="welcome_it.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="welcome_es.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="welcome_sv_SE.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="welcome_jp.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="welcome_en.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ 
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2>
+<a id="welcome" name="welcome">Добро пожаловать в Haiku!</a></h2>
+<p>Большое спасибо за проявленный интерес к Haiku! Это наш первый публичный релиз и мы надеемся привлечь новых разработчиков к нашему проекту и дать будущим пользователям шанс увидеть Haiku в деле. Понятно, что этот <i>альфа-релиз</i> далеко не полностью соответствует тем целям, которые мы сами наметили, и не предоставляет все функции, которые мы собирались дать конечному пользователю, запланировав их для финальной версии R1. Однако, мы надеемся, что этот релиз позволит вам заметить большой потенциал Haiku, и вы найдёте немного времени для её изучения.</p>
+
+<h2>
+<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="bugreport" name="bugreport">Остерегайтесь Ошибок!</a></h2>
+<p>Мы провели тяжёлую работу по выявлению и устранению ошибок ("багов"), однако это только  альфа-релиз и в нём обязательно присутствуют немало скрытых ошибок.</p>
+<div class="box-warning">Мы не рекомендуем использовать альфа-версии в качестве основной операционной системы. В ваши данные с большой вероятностью могут быть внесены нежелательные изменения, они могут исказиться или же уничтожиться.</div>
+
+<p>Одной из главных причин для выпуска альфа-версии явилось желание привлечь больше пользователей для тестирования и обнаружения ошибок, а также получения от них предложений по дальнейшему улучшению Haiku. Пожалуйста, оставляйте отчёты о найденных багах и предложения по улучшению в нашей системе отслеживания ошибок (bug tracker), но только после использования поиска, чтобы избежать дубликатов.</p>
+<ul>
+	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Система отслеживания ошибок в Haiku (Bug Tracker)</a></li>
+	<li><a href="ru/bugreports.html">Советы по сообщениям об ошибках</a></li>
+</ul>
+
+<h2>
+<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="system" name="system">Знакомство с системой</a></h2>
+<p>Первые релизы Haiku будут похожи по функционалу и вешнему виду на BeOS R5, которую она и призвана повторить. Если вы никогда не пользовались этой операционной системой, то рекомендуется воспользоваться следующими ссылками:</p>
+<ul>
+	<li><a href="../userguide/en/contents.html">Руководство пользователя Haiku</a></li>
+	<li><a href="http://www.haiku-os.org/community/" class="printurl">Список сайтов о BeOS/Haiku</a></li>
+</ul>
+
+<h2>
+<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="software" name="software">Установка дополнительных программ</a></h2>
+<p>Так как Haiku бинарно и на уровне исходных кодов совместима с BeOS, то многие BeOS-приложения работают и в ней. Загрузив архив с программой, просто распакуйте его (достаточно двойного клика для открытия архива в <span class="app">Expander</span>) в <span class="path">/boot/apps/</span>, и оттуда же запускайте это приложение.</p>
+<div class="box-info">Исключением являются опциональные пакеты (OptionalPackages), которые уже включены в Haiku при её компиляции из исходных кодов, однако их также можно загрузить и добавить в любую установленную копию Haiku. У них одно отличие от обычных архивов с программами: их следует распаковывать в корень загрузочного диска <span class="path">/boot</span>.<br />
+Для отладочных целей на сайте с опциональными пакетами хранятся их устаревшие версии, которые не совместимы с новыми ревизиями Haiku, и они в первую очередь предназначены для разработчиков, но не для конечных пользователей.</div>
+
+<p>Популярные каталоги программ:</p>
+<ul>
+	<li><a href="http://www.haikuware.com" class="printurl">Haikuware</a> сайт с программами, ориентированными на Haiku.</li>
+	<li><a href="http://www.bebits.com" class="printurl">BeBits</a> самый популярный каталог программ для BeOS (в последнее время и для Haiku).</li>
+	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> библиотеки, необходимые для портирования приложений.</li>
+	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> хранилище для разрабатываемых приложений с открытым исходным кодом для BeOS и Haiku.</li>
+	<li><a href="http://haiku-files.org/files/optional-packages/" class="printurl">OptionalPackages</a> в основном используется при компиляции Haiku из исходных кодов.</li>
+</ul>
+
+<h2>
+<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="api" name="api">Знакомство с интерфейсом программирования приложений (API)</a></h2>
+<p>Так как Haiku повторяет BeOS R5, то и всё, что касается API у них схоже (с некоторыми исключениями), потому документация в BeBook всё ещё актуальна. Благодаря компании ACCESS, которой принадлежат права на интеллектуальную собственность Be Inc., нам позволено распространять BeBook.</p>
+
+<p>Существуют и другие ресурсы, которые должны помочь вам начать изучение:</p>
+<ul>
+	<li><a href="http://www.haiku-os.org/development/faq" class="printurl">ЧАВО разработчика</a></li>
+	<li><a href="http://dev.haiku-os.org/browser/" class="printurl">Браузер исходного кода </a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">BeBook</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Архив BeNewsletter</a></li>
+</ul>
+
+<h2>
+<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="contact" name="contact">Желаете пообщаться?</a></h2>
+<p>Вы можете связаться с разработчиками и другими пользователями, присоединившись к обсуждению на IRC каналах, нашем форуме или в списках рассылки. Когда множество людей обсуждают что-то вместе, то необходимо соблюдать некоторые правила для сохранения эффективности общения. Пожалуйста, соблюдайте <a href="http://www.haiku-os.org/node/2517">этикет списков рассылки</a>.</p>
+<ul>
+	<li><a href="http://www.haiku-os.org/community/irc" class="printurl">IRC каналы</a></li>
+	<li><a href="http://www.haiku-os.org/forum" class="printurl">Форумы</a></li>
+	<li><a href="http://www.freelists.org/list/haiku" class="printurl">Основной список рассылки</a></li>
+	<li><a href="http://www.freelists.org/list/haiku-development" class="printurl">Список рассылки непосредственных разработчиков Haiku</a></li>
+	<li><a href="http://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">Список рассылки для разработчиков сторонних приложений</a></li>
+	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">Обзор остальных специализированных списков рассылки</a></li>
+</ul>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ 
+</span></div>
+</div>
+
+</body>
+</html>

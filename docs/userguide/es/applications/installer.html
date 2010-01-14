@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Installer</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../../fr/applications/installer.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/installer.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/installer.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/installer.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../sv_SE/applications/installer.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/installer.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/installer.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicaciones</a> 
+::  <a href="magnify.html">Magnify</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicaciones</span></td></tr>
+<tr><td>Ubicación:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
+<tr><td>Configuración:</td><td></td><td><i>ninguna</i></td></tr>
+</table>
+<p><br /></p>
+<p>The Installer is used to copy Haiku onto another volume.<br />
+Upon launch it displays a start window with important information. It's not a mindless EULA you're used to click away in the blink of an eye, it states:</p>
+<ul>
+<li><p>This is alpha-quality software. Make backups or suffer the consequences!</p></li>
+<li><p>The Installer needs a prepared partition. You may have to use a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> or a similar tool until Haiku's DriveSetup is mature enough to handle this task.</p></li>
+<li><p>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. In short, you have add an entry to <span class="path">/boot/grub/menu.lst</span> of your Linux installation, similar to this:</p>
+<pre># Haiku on /dev/sda7
+title		Haiku
+rootnoverify	(hd0,6)
+chainloader	+1</pre></li>
+</ul>
+<p><br /><br /></p>
+<p>Once you acknowledged with <span class="button">Continue</span>, you're presented with the main window:</p>
+<img src="../images/apps-images/installer.png" alt="installer.png" />
+<p>In the first pop-up menu you choose the source for the installation. It can be a currently installed Haiku or can come from an install CD or USB drive, etc.<br />
+The second pop-up menu specifies the target for the installation. This target partition/volume will be completely overwritten and has to be set aside beforehand by a partitioning tool like GParted.</p>
+<p>Clicking the little expander widget will <i>Show Optional Packages</i>, if available, that you can choose to install in addition to the basic Haiku.</p>
+<p>You should do a last check if you really picked the right target before starting the installation process. Click on <span class="button">Setup partitions...</span> to open <a href="drivesetup.html">DriveSetup</a> and have a look at the naming and layout of the available volumes and partitions.</p>
+<p><span class="button">Begin</span> starts the installation procedure, which basically copies everything but the <span class="path">home/</span> and <span class="path">common/</span> folder onto the target volume and makes it bootable.</p>
+<p>At the end of the installation procedure, the partition is automatically made bootable. However, it can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. In this case, boot your installation CD and start the Installer. Select your Haiku boot partition from the <span class="menu">Onto: Please Choose Target</span> menu  and click <span class="button">Write Boot Sector</span> to make it bootable again.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Aplicaciones</a> 
+::  <a href="magnify.html">Magnify</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

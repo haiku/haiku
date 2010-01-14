@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Vincent Duvert
+ *		Loïc
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Attributs</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../de/attributes.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/attributes.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/attributes.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/attributes.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/attributes.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/attributes.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/attributes.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="filetypes.html">Types de fichiers</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="index.html">Index</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Attributs</h1>
+
+<p>Les attributs sont des champs de données associés à un fichier, mais qui ne font pas partie intégrante de ce fichier, c'est à dire qu'ils ne sont pas comptés dans sa taille et qu'ils peuvent être copiés ou modifier sans modifier le fichier lui-même.
+Le système utilise ces attributs pour enregistrer entre autres la taille des fichiers, leur type et leur date de modification. Ceci est similaire au fonctionnement d'autre systèmes d'exploitation et de leurs systèmes de fichiers.</p>
+<p>En plus de ce mécanisme commun, Haiku vous permet d'ajouter n'importe quel attribut à n'importe quel fichier et de l'afficher ou de l'éditer dans une fenêtre Tracker. Vous devez juste définir le type d'attribut (chaîne de caractères, entier, date...) que vous voulez ajouter à un type de fichier donné et lui donner un nom et une description.</p>
+<p>Les fichiers en eux-même n'ont pas besoin de contenir quoi que ce soit. Par exemple, jetez un œil à ces fichiers People :</p>
+<img src="images/attributes-images/people.png" alt="people.png" />
+<br />
+<p>Comme vous pouvez le voir, ce sont tous des fichiers vides (de taille 0) avec des attributs attachés, comme par exemple l'attribut "E-mail" de "John Nox" qui est en cours d'édition directement depuis le Tracker.</p>
+<p>Si ces attributs sont indexés, ce qui est par défaut le cas des fichiers People, Email et audio, ils pourront être recherchés via le système de requêtes rapide de Haiku.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="attributes-tracker" name="attributes-tracker">Les attributs dans le Tracker</a></h2>
+<p>Les attributs sont affichés de manière similaire à celle d'une base de données ou d'un feuille de calcul. Le Tracker vous permet de choisir quels attributs (colonnes) afficher et comment trier les fichiers (lignes) d'après ceux-ci.</p>
+<p>Pour ce faire, ouvrez une fenêtre Tracker, cliquez sur le menu <span class="menu">Attributes</span> et sélectionnez les attributs que vous voulez afficher. Vous pouvez également effectuer un clic droit sur l'en-tête de la fenêtre et cocher les éléments dans le menu contextuel. Vous pouvez réarranger les colonnes par un simple glisser-déposer, et supprimer celles inutiles en les glissant hors de la fenêtre.</p>
+<p>Double-cliquez sur la ligne entre deux attributs dans l'en-tête pour redimensionner une colonne à sa taille optimale.</p>
+<p>Cliquez l'en-tête d'une colonne pour basculer l'ordre d'affichage entre croissant et décroissant.
+Vous pouvez mettre en place un ordre de tri secondaire en pressant la touche <span class="key">MAJ</span> tout en cliquant sur un en-tête. De cette manière, vous pouvez par exemple trier vos fichiers People par compagnie, puis par nom de contact. Voyez la capture d'écran précédente pour un exemple. L'ordre de recherche secondaire est indiqué par un indicateur grisé à côté du titre de l'en-tête.</p>
+<p>Il est aussi facile d'éditer ces attributs que les noms des fichiers : Cliquez sur un champ, ou bien tapez <span class="key">ALT</span> <span class="key">E</span> et déplacez-vous entre les attributs avec les touches <span class="key">TAB</span> et <span class="key">MAJ</span> <span class="key">TAB</span>.  <span class="key">ESC</span> Permet de quitter le mode édition sans sauvegarder les changements.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="attributes-terminal" name="attributes-terminal">Les attributs dans le Terminal</a></h2>
+<p>Si vous préférez utiliser la ligne de commande ou souhaitez modifier un grand nombre d'attribut à l'aide de scripts shell, vous pouvez utiliser plusieurs commandes de contrôle d'attributs depuis un Terminal.</p>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="listattr" name="listattr">listattr</a></h3>
+<p><span class="cli">listattr</span> liste les attributs d'un fichier, mais n'affiche pas le contenu desdits attributs.</p>
+<pre>usage: listattr 'nom_de_fichier' ['nom_de_fichier2' ...]</pre>
+<p>En l'appelant sur un des fichiers de l'exemple précédent, voici le résultat :</p>
+<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+File: Clara Botters
+   Type         Size                 Name
+-----------  ---------  -------------------------------
+MIME String         21  "BEOS:TYPE"
+        Text         14  "META:name"
+        Text          6  "META:nickname"
+        Text          1  "META:company"
+
+        Text         18  "META:address"
+        Text          8  "META:city"
+        Text          1  "META:state"
+        Text          1  "META:zip"
+        Text          1  "META:country"
+
+        Text          1  "META:hphone"
+        Text         13  "META:wphone"
+        Text          1  "META:fax"
+        Text         19  "META:email"
+        Text          1  "META:url"
+
+        Text          5  "META:group"
+    Raw Data         20  "_trk/pinfo_le"
+ 
+131 bytes total in attributes.</pre>
+<p>Hormis les attributs "<tt>META:*</tt>" qui contiennent les informations sur le contact en question, deux attributs sont directement gérés par le système :</p>
+<ul>
+<li><p><tt>BEOS:TYPE</tt> indique le type du fichier, sous forme de type <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, ici "<tt>application/x-person</tt>". Il permet de déterminer l'icône du fichier et l'application utilisée pour l'ouvrir quand vous double-cliquez dessus.</p></li>
+<li><p>"<tt>_trk/pinfo_le</tt>" est utilisé par le Tracker pour mémoriser la position de l'icône du fichier.</p></li></ul>
+<div class="box-info">Notez l'antislash après "Clara". Dans le Terminal, vous devez "échapper" certains caractères spéciaux comme <tt>'"*\$?!</tt>. L'espace entre  "Clara" et "Botters" est aussi un caractère spécial. On place donc un antislash devant celui-ci pour qu'il se comporte comme un caractère normal.</div>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="catattr" name="catattr">catattr</a></h3>
+<p><span class="cli">catattr</span> affiche le contenu d'un attribut spécifique d'un fichier.</p>
+<pre>usage: catattr [--raw|-r] nom_attribut fichier1 [fichier2...]</pre>
+<p>Encore une fois, avec notre exemple :</p>
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+Clara Botters : string : Whelton</pre>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="addattr" name="addattr">addattr</a></h3>
+<p><span class="cli">addattr</span> ajoute un attribut à un fichier et/ou définit sa valeur.</p>
+<pre>usage: addattr [-t type] attribut valeur fichier1 [fichier2...]
+    or: addattr [-f valeur-depuis-fichier] [-t type] attribut fichier1 [fichier2...]
+ 
+         Le type peut être:
+                 string, mime, int, llong, float, double, bool, raw
+                 ou une valeur numérique (ie. 0x1234, 42, 'ABCD', ...)
+         Le type par défaut est "string"</pre>
+<p>Donc si par exemple Clara vient de commencer à travailler pour la multinationale Barkelbaer Inc., vous pourrez remplir le champ "Company" qui était vide avec cette information (qui est de type "string", chaîne de caractères)  :</p>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="rmattr" name="rmattr">rmattr</a></h3>
+<p><span class="cli">rmattr</span> supprime complètement un attribut d'un fichier.</p>
+
+<pre>usage: rmattr [-p] attribut fichier1 [fichier2...]
+         'attribut' est le nom d'un attribut du fichier.
+         Si '-p' est spécifié, 'attribut' est considéré comme un motif de recherche.</pre>
+<p>Même s'il serait suffiant de ne pas remplir l'attribut "Fax", vous pouvez le supprimer complètement du fichier de Clara en tapant :</p>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="copyattr" name="copyattr">copyattr</a></h3>
+<p><span class="cli">copyattr</span> permet de copier des attributs d'un fichier à un autre. par défaut, les contenus des fichiers eux-mêmes ne sont <b>pas</b> copiés.</p>
+<pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
+
+<p>Si vous voulez également copier les données du fichier, vous pouvez utiliser l'option "<span class="cli">-d</span>" ou "<span class="cli">--data</span>".</p>
+
+<p><br /></p>
+<p>Pour obtenir plus d'information sur ces commandes et leurs options respectives, vous pouvez taper le nom de la commande suivi de "<span class="cli">-h</span>" ou "<span class="cli">--help</span>".</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="filetypes.html">Types de fichiers</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="index.html">Index</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

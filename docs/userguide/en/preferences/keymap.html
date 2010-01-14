@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"../../../../html-dtd/xhtml1-strict.dtd"> 
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -20,23 +19,33 @@
 </head>
 <body>
 
-<div class="logo">
-	<img src="../images/logo.png" alt="logo" class="noprint" id="logo" name="logo" />
+<div id="banner">
+<div><span>User guide</span></div>
 </div>
 
-<div class="topnav">
-	<p>
-		«&#160;&#160;<a href="keyboard.html">Keyboard</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="../preferences.html" class="uplink">Preferences</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="media.html">Media</a>&#160;&#160;»
-	</p>
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/gb.png" alt="" /> English</li>
+<li><a href="../../fr/preferences/keymap.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/keymap.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/keymap.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/keymap.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/keymap.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/keymap.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/preferences/keymap.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+</ul>
+<span>
+ «  <a href="keyboard.html">Keyboard</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="media.html">Media</a>  »
+</span></div>
 </div>
 
-<div class="content">
+<div id="content">
+<div>
 
-<h1><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />Keymap</h1>
+<h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />Keymap</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Keymap</span></td></tr>
@@ -51,8 +60,8 @@ Thus, the Keymap preferences are not only for configuring your local keymap, but
 <p>Then there are the keys that are marked with a blue background. These keys are called <i>Dead Keys</i> that can change the key you press after that. If you click on such a blue key with your mouse, those changeable keys light up yellow. Click again and everything's back to normal. Examples are é, ñ, ó or ë.</p>
 <p>Below the keyboard representation are two more options:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Select Dead Keys</span></td><td>&#160;</td><td>for setting the above mentioned blue keys.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td>&#160;</td><td>for using the shortcut key in Windows/Linux mode, i.e. <span class="key">CONTROL</span> (normally <span class="key">CTRL</span>) or Haiku mode, i.e. <span class="key">COMMAND</span> (normally <span class="key">ALT</span>).</td></tr>
+<tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>for setting the above mentioned blue keys.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td> </td><td>for using the shortcut key in Windows/Linux mode, i.e. <span class="key">CONTROL</span> (normally <span class="key">CTRL</span>) or Haiku mode, i.e. <span class="key">COMMAND</span> (normally <span class="key">ALT</span>).</td></tr>
 </table>
 <p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.<br />
 When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
@@ -60,9 +69,9 @@ When you're done you can save the result from the menu <span class="menu">File |
 <p>The font used in the keyboard representation is set from the <span class="menu">Font</span> menu. Note, that it may or may not contain all symbols for a specific keymap.</p>
 <p>Finally, there's a <span class="button">Revert</span> button to bring back the settings that were active when you started the Keymap preferences.</p>
 
-<h1>
-<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="advanced-keymapping" name="advanced-keymapping">Advanced keymap manipulation</a></h1>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="advanced-keymapping" name="advanced-keymapping">Advanced keymap manipulation</a></h2>
 <p>There's another method to customize your keymap besides the Keymap preference panel. It involves editing a text file containing loads of hex values, which may appear daunting on first sight, but isn't really that impossible to grasp.</p>
 <p>You can dump the current keymap with a command in Terminal:</p>
 <pre class="terminal">keymap -d MyKeymap</pre>
@@ -348,16 +357,14 @@ Tilde ''        = ''
 TildeTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Option CapsLock-Option-Shift </pre>
 
 </div>
+</div>
 
-
-<div class="bottomnav">
-	<p>
-		«&#160;&#160;<a href="keyboard.html">Keyboard</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="../preferences.html" class="uplink">Preferences</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="media.html">Media</a>&#160;&#160;»
-	</p>
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="keyboard.html">Keyboard</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="media.html">Media</a>  »
+</span></div>
 </div>
 
 

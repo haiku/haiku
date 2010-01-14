@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Oscar Carballal Prego
+ *		CapitanPico
+ *		itorres
+ *		miguel~1.mx
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>DataTranslations (Traductores de información)</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../../fr/preferences/datatranslations.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/datatranslations.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/datatranslations.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/datatranslations.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../sv_SE/preferences/datatranslations.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/preferences/datatranslations.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/preferences/datatranslations.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="backgrounds.html">Fondos de pantalla</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="deskbar.html">Deskbar (Barra de Escritorio)</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />DataTranslations</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferencias</span></td></tr>
+<tr><td>Ubicación:</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
+<tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/*</span> - Cada Traductor crea su propio archivo de configuración en esta ubicación  cuando se modifican sus valores por defecto.<br />
+<span class="path">~/config/settings/system/DataTranslations settings</span> - Almacena la posición de la ventana.</td></tr>
+</table>
+<p>Todas las aplicaciones tienen la capacidad de abrir y guardar cualquier formato de archivo para el cual haya un Traductor instalado. Los ajustes de estos traductores se configuran en las preferencias de DataTranslations.</p>
+<p><br /></p>
+<img src="../images/prefs-images/datatranslations.png" alt="datatranslations.png" />
+<p>Dependiendo de sus capacidades, cada Traductor ofrece distintas posibilidades de configuración. El mínimo es un botón de <span class="button">Información...</span> que abrirá una ventana con los créditos y el directorio de instalación.<br />
+La siguiente tabla da una visión general de los traductores por defecto y sus opciones más útiles.</p>
+<table summary="translators" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Imágenes BMP</span></td><td>Color real (24 bits), sin compresión ni transparencia</td></tr>
+<tr><td><span class="menu">Imágenes EXR</span></td><td>Formato de alto rango dinámico (HDR) de la <acronym title="Industrial Light &amp; Magic">ILM</acronym></td></tr>
+<tr><td><span class="menu">Imágenes GIF</span></td><td>Color indexado (8 bits), compresión sin pérdida de información, transparencia<br />
+Puede reducirse el tamaño de archivo limitando el número de colores usados y la paleta.<br />
+Pueden guardarse imágenes con transparencia, bien de forma automática usando el canal alfa o bien ajustando manualmente el valor RGB del color que queremos definir como transparente.</td></tr>
+<tr><td><span class="menu">Imágenes JPEG2000</span></td><td>Color real (24 bits), comprimido, sin transparencia<br />
+Normalmente solo se ajusta la calidad de salida.</td></tr>
+<tr><td><span class="menu">Imágenes JPEG</span></td><td>Color real (24 bits), comprimido, sin transparencia<br />
+Aparte de la calidad de salida también puede ajustarse el suavizado de la imagen, lo que disminuirá los artefactos de compresión aunque puede producir una imagen algo borrosa.</td></tr>
+<tr><td><span class="menu">Imágenes PCX</span></td><td>Color real (24 bits), sin compresión ni transparencia. PC Paintbrush Exchange format</td></tr>
+<tr><td><span class="menu">Imágenes PNG</span></td><td>Color real (32 bits), compresión sin pérdida de información, transparencia</td></tr>
+<tr><td><span class="menu">Imágenes PPM</span></td><td>Color real (24 bits), sin compresión ni transparencia. Portable PixMap format</td></tr>
+<tr><td><span class="menu">Imágenes RAW</span></td><td>Hasta 48 bits, sin compresión ni transparencia</td></tr>
+<tr><td><span class="menu">Archivos de texto RTF</span></td><td>Texto con formato</td></tr>
+<tr><td><span class="menu">Imágenes SGI</span></td><td>Color real (24 bits), compresión opcional sin pérdida de información, transparencia</td></tr>
+<tr><td><span class="menu">Archivos de StyledEdit</span></td><td>Texto con formato</td></tr>
+<tr><td><span class="menu">Imágenes TGA</span></td><td>Color real (32 bits), compresión opcional sin pérdida de información, transparencia</td></tr>
+<tr><td><span class="menu">Imágenes TIFF</span></td><td>Color real (24 bits), compresión opcional sin pérdida de información, capas, transparencia</td></tr>
+<tr><td class="onelinetop"><span class="menu">Imágenes WonderBrush</span></td><td>Color real (32 bits), capas, transparencia, datos vectoriales y rasterizados</td></tr>
+</table>
+<p><br /></p>
+<div class="box-info">Los formatos GIF (hasta 256 colores) o PNG (millones de colores) suelen ser los que dan mejor resultado para guardar capturas de pantalla, dibujos en blanco y negro, gráficas y otras imágenes con pocos colores o de dimensiones reducidas. El formato JPEG, por ejemplo, produce artefactos de compresión sin una reducción apreciable del tamaño de archivo.</div>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="backgrounds.html">Fondos de pantalla</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="deskbar.html">Deskbar (Barra de Escritorio)</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

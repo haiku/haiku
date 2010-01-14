@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		keepeasy
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Boot Loader</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/it.png" alt="" /> Italiano</li>
+<li><a href="../fr/bootloader.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/bootloader.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../ru/bootloader.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bootloader.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bootloader.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/bootloader.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/bootloader.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+<a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Boot Loader</h1>
+
+<p>Il Boot Loader di Haiku può essere di aiuto quando hai problemi con l'hardware o vuoi scegliere quale installazione di Haiku far partire, se ne hai più di una (può essere da un CD di installazione o una penna USB).<br />
+Può tornare anche utile dopo che hai installato un componente software e che ti impedisce di caricare il sistema operativo. L'opzione <i>Disable user add-ons</i> (disabilita i componenti utente) che è discussa più avanti, farà partire Haiku senza caricare i componenti installati dall'utente, per esempio un driver.
+</p>
+<p>Per entrare nelle opzioni del Boot Loader, devi premere la <span class="key">BARRA SPAZIATRICE</span> giusto all'inizio del processo di boot. E' facile sbagliare quidi risulta utile tenerla premuta finche non si vede.</p>
+<p><br /></p>
+<p>Una volta che si è caricato, ti si presenteranno tre menu:</p>
+<table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
+<tr><td><b>Select boot volume</b>  (seleziona il disco di avvio) </td><td> </td><td>Sceglie quale installazione di Haiku caricare.</td></tr>
+<tr><td><b>Select safe mode options</b> (seleziona le opzioni di modalità sicura)<br />
+</td><td> </td><td>Ci sono diverse opzioni da tentare in caso di problemi con l'hardware. Quando sposti la barra di selezione su un'opzione una breve descrizione compare sul margine inferiore dello schermo.
+<p><i>-Safe mode </i>(modalità sicura)<br />
+<i>-Disable user add-ons</i> (disabilita le aggiunte utente)<br />
+<i>-Disable IDE-DMA</i> (disabilita i DMA dell'IDE)<br />
+<i>-Usa fail-safe video mode</i> (Usa le modalità video sicure)<br />
+<i>-Don't call the BIOS</i> (Non chiamare il BIOS)<br />
+<i>-Disable APM</i> (Disabilita l'APM)<br />
+<i>-Disable ACPI</i> (Disabilita l'ACPI)<br />
+<i>-Disabilita IO-APIC</i> (Disabilita l'IO-APIC)<br />
+<i>-Enable serial bebug output</i> (Abilita i messaggi di debug)<br /><i>- Enable on screen debug output</i> (Abilita lo schermo di output del debug)
+</p></td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode (Seleziona modalità video sicure)</b></td><td> </td><td>Se devi attivare l'opzione <i>Use fail-safe video mode</i> (Seleziona modalità video sicure), puoi impostare la profondità di colore e la risoluzione video.</td></tr>
+</table>
+<p><br /></p>
+<p>Dopo aver attivato una o più opzioni, puoi tornare tornare al menu principale e continuare il caricamento, che si presenterà con questa schermata di avvio:
+</p>
+<img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
+
+<p>Se tutto funziona nel modo corretto, si illumineranno una dopo l'altra le icone nella schermata.<br />
+Le diverse icone corrispondono approssimativamente a diverse fasi di caricamento dell'OS e sono:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><b>Atomo</b></td><td style="width:10px;"> </td><td>Inizializza i moduli.</td></tr>
+	<tr><td><b>La lente di  ingrandimento sul disco</b></td><td> </td><td>Crea il rootfs (<span class="path">/</span>) e monta devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Scheda elettronica</b></td><td> </td><td> Inizializza il device manager.</td></tr>
+	<tr><td><b>Disco di avvio</b></td><td> </td><td>Monta il disco di boot.</td></tr>
+	<tr><td><b>Il chip</b></td><td> </td><td>Carica i moduli specifici della CPU.</td></tr>
+	<tr><td><b>La cartella</b></td><td> </td><td>Finisce di inizializzare il sottosistema.</td></tr>
+	<tr><td><b>Il razzo</b></td><td> </td><td>Inizia a caricare i boot scripts che fanno partire il sistema.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+<a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

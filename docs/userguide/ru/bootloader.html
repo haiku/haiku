@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Rustam
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Загрузчик</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../fr/bootloader.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/bootloader.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/bootloader.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../es/bootloader.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bootloader.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/bootloader.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/bootloader.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+<a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filesystem-layout.html">Иерархия файловой системы</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Загрузчик</h1>
+
+<p>Загрузчик Haiku может помочь решить аппаратные проблемы, либо выбрать, какую из систем запустить для установки, если у вас более одной копии Haiku (установочный CD или USB карта).<br />
+Он также полезен после установки программного компонента, который препятствует успешной загрузке системы. Опция <i>Запретить загрузку пользовательских дополнений (Disable user add-ons) </i> запустит систем без компонентов установленных пользователем (например - драйвер).</p>
+<p>Для того чтобы зайти в настройки загрузчика, необходим нажать <span class="key">ПРОБЕЛ</span> сразу же в начале загрузки системы. Этот момент легко пропустить, поэтому лучше удерживать клавишу до загрузки.</p>
+<p><br /></p>
+<p>Вы увидите три пункта меню:</p>
+<table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
+<tr><td><b>Select boot volume</b></td><td> </td><td>Выбрать с какого раздела запустить Haiku.</td></tr>
+<tr><td><b>Select safe mode options</b><br />
+</td><td> </td><td>Здесь находится несколько опций, которые могут решить аппаратные проблемы. При выборе опций, в нижней части экрана отображается краткое описание.
+<p><i>- Safe mode</i><br />
+<i>- Disable user add-ons</i><br />
+<i>- Disable IDE DMA</i><br />
+<i>- Use fail-safe video mode</i><br />
+<i>- Don't call the BIOS</i><br />
+<i>- Disable APM</i><br />
+<i>- Disable ACPI</i><br />
+<i>- Disable IO-APIC</i><br />
+<i>- Enable serial debug output</i><br />
+<i>- Enable on screen debug output</i>
+</p></td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Если вы активировали опцию  <i>Use fail-safe video mode</i>, то сможете выбрать разрешение экрана и глубину цвета.</td></tr>
+</table>
+<p><br /></p>
+<p>После активации одной или более опций, вернитесь в главное меню и продолжите загрузку, далее вы увидите загрузочный экран:</p>
+<img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
+
+<p>Если все в порядке, то иконки будут быстро загораться, одна за другой.<br />
+Каждая иконка соответствует определенному этапу загрузки:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><b>Атом</b></td><td style="width:10px;"> </td><td>Инициализация модулей.</td></tr>
+	<tr><td><b>Диск с лупой</b></td><td> </td><td>Создание корневой файловой системы (<span class="path">/</span>) и монтирование файловой системы устройств (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Карта расширения</b></td><td> </td><td>Инициализация менеджера устройств.</td></tr>
+	<tr><td><b>Загрузочные диск</b></td><td> </td><td>Монтирование загрузочного диска.</td></tr>
+	<tr><td><b>Чип</b></td><td> </td><td>Загрузка модулей процессора.</td></tr>
+	<tr><td><b>Папка</b></td><td> </td><td>Финальная инициализация подсистем.</td></tr>
+	<tr><td><b>Ракета</b></td><td> </td><td>Загрузочный сценарий запускает систему.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+<a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filesystem-layout.html">Иерархия файловой системы</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

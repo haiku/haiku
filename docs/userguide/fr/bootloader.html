@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
+ *		Vincent Duvert
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Chargeur de démarrage</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../de/bootloader.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/bootloader.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/bootloader.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bootloader.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bootloader.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/bootloader.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/bootloader.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+<a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filesystem-layout.html">Structure du système de fichiers</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Chargeur de démarrage</h1>
+
+<p>Le chargeur de démarrage de Haiku peut vous aider à résoudre certains problèmes de support matériel, et à choisir quelle installation de Haiku démarrer si vous en avez plusieurs (par exemple sur un CD d'installation ou sur une clef USB).<br />
+Il peut également s'avérer utile si un composant logiciel que vous avez installé empêche le démarrage de votre ordinateur : l'option <i>Disable user add-ons</i> mentionnée ci-dessous démarrera Haiku sans charger les composants (généralement des pilotes) en question.</p>
+<p>Pour accéder aux options du chargeur de démarrage, vous devez appuyer sur la touche <span class="key">ESPACE</span> juste après le début du démarrage. Le délai étant très court, le plus simple est d'appuyer dessus de manière répétée jusqu'à ce que le menu apparaisse.</p>
+<p><br /></p>
+<p>Ceci fait, vous aurez accès à trois menus :</p>
+<table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
+<tr><td><b>Select boot volume</b></td><td> </td><td>Vous permet de sélectionner l'installation de Haiku à démarrer.</td></tr>
+<tr><td><b>Select safe mode options</b><br />
+</td><td> </td><td>Ces options sont utiles en cas de problème relatif au support matériel. Si vous placez le curseur de sélection sur une option, une courte description de celle-ci s'affichera en bas de l'écran.
+<p><i>- Safe mode</i> (Mode de démarrage minimal)<br />
+<i>- Disable user add-ons</i> (Désactiver les extensions utilisateur)<br />
+<i>- Disable IDE DMA</i> (Désactiver l'optimisation DMA du bus IDE)<br />
+<i>- Use fail-safe video mode</i> (Mode vidéo sans échec)<br />
+<i>- Don't call the BIOS</i> (Eviter les appels au BIOS)<br />
+<i>- Disable APM</i> (Désactiver la gestion d'énergie APM)<br />
+<i>- Disable ACPI</i> (Désactiver la gestion d'énergie avancée ACPI)<br />
+<i>- Disable IO-APIC</i> (Désactiver le gestionnaire d'interruptions IO-APIC)<br />
+<i>- Enable serial debug output</i> (Envoyer les messages de déboguage sur le port série)<br />
+<i>- Enable on screen debug output</i>
+(Afficher les messages de déboguage sur l'écran)</p></td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Si vous avez activé l'option <i>Use fail-safe video mode</i>, vous pouvez utiliser ce menu pour choisir une résolution et une profondeur de couleur.</td></tr>
+</table>
+<p><br /></p>
+<p>Après avoir activé une ou plusieurs options, vous pourrez retourner au menu principal et continuer le démarrage. Pendant celui-ci, un écran de démarrage sera affiché :</p>
+<img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
+
+<p>Si tout fonctionne correctement, chaque symbole devrait s'illuminer, l'un après l'autre.<br />
+Ces symboles correspondent grossièrement aux étapes de démarrage suivantes :</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><b>Atome</b></td><td style="width:10px;"> </td><td>Initialisation du noyau et des modules.</td></tr>
+	<tr><td><b>Disque dur avec loupe</b></td><td> </td><td>Création du système de fichier racine (<span class="path">/</span>) et montage du système de fichiers devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Carte d'extension</b></td><td> </td><td>Initialisation du gestionnaire de périphériques.</td></tr>
+	<tr><td><b>Disque de démarrage</b></td><td> </td><td>Montage du disque de démarrage.</td></tr>
+	<tr><td><b>Puce</b></td><td> </td><td>Activation des fonctionnalités spécifiques au processeur.</td></tr>
+	<tr><td><b>Dossier</b></td><td> </td><td>Initialisation des sous-systèmes.</td></tr>
+	<tr><td><b>Fusée</b></td><td> </td><td>Exécution des scripts de démarrage.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+<a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filesystem-layout.html">Structure du système de fichiers</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

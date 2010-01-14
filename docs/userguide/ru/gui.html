@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Rustam
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Графический интерфейс Haiku</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../fr/gui.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/gui.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/gui.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../es/gui.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/gui.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/gui.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/gui.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="filesystem-layout.html">Иерархия файловой системы</a> 
+::  <a href="contents.html" class="uplink">Содержание</a> 
+::  <a href="workspaces.html">Рабочее пространство</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Графический интерфейс Haiku</h1>
+
+<p>Графический интерфейс Haiku является неотъемлемой частью системы. В отличие от Unix-подобных операционных систем, здесь нет отдельного менеждера окон и невозможно загрузиться только в оболочке командной строки. Haiku нацелена на десктоп-пользователей.</p>
+<p>Т.к. вы, вероятно, уже имели дело с другими графическими средами, давайте опустим обсуждение стандартных вещей вроде меню, контекстного меню, вызываемого правым щелчком мыши, перетаскивания объектов, и т.д. Вместо этого, давайте перейдем к уникальным особенностям графического интерфейса Haiku.</p>
+<img src="images/gui-images/gui.png" alt="gui.png" />
+<p>Есть несколько вещей в графическом интерфейсе Haiku, которые нуждаются в объяснении.</p>
+<ol>
+<li><p>Панель задач именуемая Deskbar, является аналогом меню "Пуск". Для более подробного изучения следует обратиться к теме <a href="deskbar.html">Deskbar - Панель задач</a>.</p></li>
+<li>Желтый ярлычок (заголовок окна) предлагает немного больше, чем просто название программы и название документа: 
+<ul><li>Вы можете передвинуть его, удерживая клавишу <span class="key">SHIFT</span> и перемещая в другую позицию. Если расположить ряд окон, то можно получить удобный доступ к ним по именам на ярлычках.</li>
+<li>Свернуть окно можно при помощи двойного щелчка на этом ярлычке (или при помощи комбинации клавиш <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). Доступ к свернутым окнам можно получить при помощи <a href="deskbar.html">панели задач Deskbar</a> или <a href="twitcher.html">Twitcher</a>.</li>
+<li>Вы можете отправить окно на задний план при помоши правого щелчка мыши по ярлычку (или по краю окна).</li></ul></li>
+<li><p>Кнопка закрытия окна.</p></li>
+<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size. It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
+<li><p>Кнопка измнения размера окна. Потяните в любую сторону и окно поменяет свой размер.</p></li>
+</ol>
+<div class="box-info">Удерживая клавиши <span class="key">CTRL</span> <span class="key">ALT</span>, вы можете переместить окно потащив за любую область левой кнопкой мыши, правой же вы отправите окно на задний план.</div>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="open-save-panel" name="open-save-panel">Диалоги открытия и сохранения</a></h2>
+<p>При сохранении или открытие файла в любом приложение, вы увидите такое диалоговое окно:</p>
+<img src="images/gui-images/open-save.png" alt="open-save.png" />
+<p>Оно содержит все привычные вещи: Список файлов в текушей папке, в случае диалога сохранения также поле для названия файла и выпадающее меню для разных форматов файлов и настроек.<br />
+Вы можете также выбрать папку для сохранения или открытия в выпадающем меню в верхней части диалогового окна.</p>
+<p>Если у вас уже открыто окно файлового менеджера Tracker, вы можете просто перенести любой файл или папку из него (в том числе символ из верхнего правого окна) в диалог сохранения или открытия. Это изменит текущий пусть диалог открытия или сохранения (изображение выше это иллюстрирует).</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Горячие клавиши</a></h3>
+<p>Вы можете использовать большинство горячих клавиш, которые используются в файловом менеджере Tracker. А также команды которые доступы через меню <span class="menu">Файл (File)</span>. Вот некоторые из них:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>Создать новую папку.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Переименовать выбранный файл или папку.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>Открыть папку уровнем выше.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td>Открыть выделенную папку.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td>Перейти в папку содержащую файлы с рабочего стола.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Перейти в домашнюю папку.</td></tr>
+</table>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="favorites-recent" name="favorites-recent">Избранные и недавно открытые папки</a></h3>
+<p>Меню <span class="menu">Избранное (Favorites)</span> обеспечивание доступ к недавно посещенным папкам и избранным местам, которые мы можете установить сами. Вы также можете использовать их для навигации.</p>
+<img src="images/gui-images/favorites.png" alt="favorites.png" />
+<p>Чтобы добавить что-нибудь в избранное, просто перейдите в нужное место и выберите в меню <span class="menu">Избранное (Favorites) | Добавить текущую папку (Add Current Folder)</span>. Отныне эта папка будет доступна в любом диалоге открытия или сохранения. Для удаления чего-либо из избранного, выберите <span class="menu">Избранное (Favorites) | Настроить избранное (Configure Favorites...)</span> и удалите.<br />
+Все избранные папки хранятся по следующему пути <span class="path">/boot/home/config/settings/Tracker/Go/</span>. Таким образом вы можете добавлять или удалять ссылки на файлы или папки непосредственно там.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="replicants" name="replicants">Репликанты</a></h2>
+<p>Репликанты - это небольшие автономные части приложений, которые могут быть интегрированы в другие приложения. Если активировать в Deskbar опцию <span class="menu">Отображать репликанты (Show Replicants)</span>, то вы сможете отличить область репликанта по маленькому значку в правом нижнем углу:</p>
+<img src="../images/gui-images/replicant.png" alt="replicant.png" />
+<p>Наиболее подходящим местом для репликантов является Рабочий стол: Просто перетащите репликант за этот маленький в правом нижем углу на рабочий стол. Теперь репликант является частью рабочего стола и для его работы не требуется запуска оригинального приложения.<br />
+Правым щелчком мыши по маленькой иконке в правом нижнем углу можно вызвать контекстное меню, которое содержит пункты <span class="menu">О репликанте (About)</span> и <span class="menu">Удалить репликант (Remove Replicant)</span>.</p>
+<div class="box-info">Если вы испытываете трудности с репликантом и не можете его удалить, то просто удалите папку <span class="path">~/config/settings/Tracker/tracker_shelf</span>. К сожалению, это приведет к удалению <i>всех</i> репликантов с рабочего стола.</div>
+<p>Примерами репликантов являются  <a href="applications/activitymonitor.html">ActivityMonitor</a>,  <a href="workspaces.html">Workspaces applet</a> и <a href="applications/deskcalc.html">DeskCalc</a>.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="filesystem-layout.html">Иерархия файловой системы</a> 
+::  <a href="contents.html" class="uplink">Содержание</a> 
+::  <a href="workspaces.html">Рабочее пространство</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

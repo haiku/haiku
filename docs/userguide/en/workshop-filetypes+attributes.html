@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"../../html-dtd/xhtml1-strict.dtd"> 
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -20,47 +19,56 @@
 </head>
 <body>
 
-<div class="logo">
-	<img src="./images/logo.png" alt="logo" class="noprint" id="logo" name="logo" />
+<div id="banner">
+<div><span>User guide</span></div>
 </div>
 
-<div class="topnav">
-	<p>
-		«&#160;&#160;<a href="queries.html">Queries</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="contents.html" class="uplink">Contents</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="applications.html">Applications</a>&#160;&#160;»
-	</p>
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/gb.png" alt="" /> English</li>
+<li><a href="../fr/workshop-filetypes+attributes.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workshop-filetypes+attributes.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/workshop-filetypes+attributes.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/workshop-filetypes+attributes.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/workshop-filetypes+attributes.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/workshop-filetypes+attributes.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/workshop-filetypes+attributes.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+</ul>
+<span>
+ «  <a href="queries.html">Queries</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
+</span></div>
 </div>
 
-<div class="content">
+<div id="content">
+<div>
 
 
-<table class="index" id="index" name="index" summary="index" align="right">
+<table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
 	<a href="#preparations">Preparations</a><br />
 	<a href="#custom-filetype">Creating a custom filetype</a><br />
-	&#160;&#160;<a href="#icon">Icon</a><br />
-	&#160;&#160;<a href="#file-recognition">File Recognition</a><br />
-	&#160;&#160;<a href="#indexing">Indexing</a><br />
-	&#160;&#160;<a href="#decription">Description</a><br />
-	&#160;&#160;<a href="#pref_app">Preferred Application</a><br />
-	&#160;&#160;<a href="#extra_attribute">Extra Attributes</a><br />
+	<a href="#icon">Icon</a><br />
+        <a href="#file-recognition">File recognition</a><br />
+	<a href="#description">Description</a><br />
+	<a href="#pref_app">Preferred Application</a><br />
+	<a href="#extra_attribute">Extra Attributes</a><br />
 	<a href="#indexing">Indexing</a><br />
 	<a href="#filling-data">Filling in the data</a><br />
 	<a href="#query-db">Querying the database</a>
 </td></tr>
 </table>
 
-<div class="title">Workshop: Filetypes, Attributes, Index and Queries</div>
+<h1>Workshop: Filetypes, Attributes, Index and Queries</h1>
 
 <p>This is a workshop to show the use of <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, the <a href="index.html">Index</a> and custom <a href="filetypes.html">Filetypes</a>. As an example, we build a database to keep track of our DVD library.</p>
 
-<h1>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="preparations" name="preparations">Preparations</a></h1>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="preparations" name="preparations">Preparations</a></h2>
 <p>Let's first decide what filetype and attributes would serve our needs. Originally, I wanted to use a Bookmark file with a link to the movie's IMdB page, but Haiku doesn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at the moment, so I came up with this: The file itself will be a JPEG image for the movie cover.<br />
 To that we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
 <p>Here are the attributes I'd like to see for my DVDs:</p>
@@ -75,44 +83,44 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 <li>If so, who's borrowed the disk...</li>
 </ul>
 
-<h1>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="custom-filetype" name="custom-filetype">Creating a custom filetype</a></h1>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="custom-filetype" name="custom-filetype">Creating a custom filetype</a></h2>
 <p>Start the <span class="app">Filetypes</span> preferences, and click on the <span class="button">Add...</span> button below the hierarchical list on the left. A small dialog opens and you specify in which MIME Group your new filetype will reside. You can also create a completely new group. Let's put it into "<i>applications</i>" and set the "Internal Name" to <i>DVDdb</i>.</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
 <p>Now, a panel for your new DVDdb filetype opens:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
 
-<h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="icon" name="icon">Icon</a></h2>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="icon" name="icon">Icon</a></h3>
 <p>Double-click the icon well to open  <a href="applications/icon-o-matic.html">Icon-O-Matic</a> to design an icon for your filetype. You can also drag&amp;drop an icon from the icon well of another type, maybe as starting point for a modified version.</p>
 
-<h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="file-recognition" name="file-recognition">File Recognition</a></h2>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="file-recognition" name="file-recognition">File Recognition</a></h3>
 <p>You can add suffixes like .txt, .jpg, .mp3 to recognize files by their extention. Useful when working with files from systems without MIME typing. We don't need that for our example.</p>
 
-<h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="decription" name="decription">Description</a></h2>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="description" name="description">Description</a></h3>
 <ul>
 <li><i>Type Name</i> - Appears e.g. in the Attribute menu of Tracker windows and the "Kind" attribute of a file.</li>
 <li><i>Description</i> - A bit more detailed description.</li>
 </ul>
 
-<h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="pref_app" name="pref_app">Preferred Application</a></h2>
-<p>This drop-down menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="pref_app" name="pref_app">Preferred Application</a></h3>
+<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">Select...</span></td><td>&#160;</td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
-<tr><td class="onelinetop"><span class="button">Same as...</span></td><td>&#160;</td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
+<tr><td><span class="button">Select...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
+<tr><td class="onelinetop"><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
 </table>
 
-<h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="extra_attribute" name="extra_attribute">Extra Attributes</a></h2>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="extra_attribute" name="extra_attribute">Extra Attributes</a></h3>
 <p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel:</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
@@ -156,9 +164,9 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 <tr><td>DVDdb:lent</td>		<td>text</td>		<td>yes</td>	<td>Lent to</td></tr>
 </table>
 
-<h1>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="indexing" name="indexing">Indexing</a></h1>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="indexing" name="indexing">Indexing</a></h2>
 <p>Before we start entering data in our little DVD database, we should add certain attributes to the <a href="index.html">Index</a>. Only indexed attributes can use Haiku's fast <a href="queries.html">Queries</a>.<br />
 So, what will we be searching in the future? We probably won't ask "What's in the B4 coordinate in my shelf?" or "Does the IMdB URL or the plot of the movie contain the word 'pope-shenooda'?".</p>
 <p>This leaves these attributes:</p>
@@ -177,21 +185,21 @@ mkindex -t string DVDdb:cast
 mkindex -t int DVDdb:rating</pre>
 <p>The <span class="cli">-t</span> option defines the type of attribute, which is "string" for all but the rating, which is an integer number.</p>
 
-<h1>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="filling-data" name="filling-data">Filling in the data</a></h1>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="filling-data" name="filling-data">Filling in the data</a></h2>
 <p>Now, everything's set and we can begin putting some data into our base.<br />
 Since our basic file is a cover image, we go to some online resource like IMdB, look for our first movie and save the cover or movie poster in a new folder where we want to keep our DVDdb files.</p>
 <p>Opening that folder we see a typical Tracker window with one JPEG in it. Right-clicking it, we change its filetype to <tt>application/DVDdb</tt> with the <span class="app">Filetype Addon</span>. There's more info on this in the <a href="filetypes.html">Filetypes</a> document.</p>
 <p>Now, we activate all our DVDdb attributes from the <span class="menu">Attributes</span> menu of the Tracker window and rearrange the columns to our taste:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
-<p>By clicking on a yet empty attribute (or pressing <span class="key">ALT</span>&#160;<span class="key">E</span>) we enter editing mode and fill each attribute. With <span class="key">TAB</span> and <span class="key">SHIFT</span>&#160;<span class="key">TAB</span> you can navigate between attributes.</p>
+<p>By clicking on a yet empty attribute (or pressing <span class="key">ALT</span> <span class="key">E</span>) we enter editing mode and fill each attribute. With <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span> you can navigate between attributes.</p>
 <p>In our example, we usually start with a downloaded JPG cover and change its type to applications/DVDdb. There's another elegant way to produce a file to work with. Just copy an empty file of our filetype to <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> and rename it to DVDdb.</p>
 <p>Right-clicking into a Tracker window, you'll find a new entry under <span class="menu">New...</span> besides the default "New folder".</p>
 
-<h1>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-<a id="query-db" name="query-db">Querying the database</a></h1>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="query-db" name="query-db">Querying the database</a></h2>
 <p>Several hours of grunt work later, we have a nice little database that you can query to find all your Christina Ricci movies that have a 7+ rating...  :)</p>
 <p>You can assign a sensible attribute layout for query results of a specific filetype.<br />
 Open the folder containing your DVDdb files and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy Layout</span>.</p>
@@ -200,17 +208,15 @@ Open the folder containing your DVDdb files and arrange the attributes how you'd
 <img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
 
 </div>
+</div>
 
-<div class="bottomnav">
-	<p>
-		«&#160;&#160;<a href="queries.html">Queries</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="contents.html" class="uplink">Contents</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="applications.html">Applications</a>&#160;&#160;»
-	</p>
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="queries.html">Queries</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
+</span></div>
 </div>
 
 </body>
 </html>
-

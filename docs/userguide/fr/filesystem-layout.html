@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Structure du système de fichiers</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../de/filesystem-layout.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/filesystem-layout.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/filesystem-layout.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/filesystem-layout.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/filesystem-layout.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/filesystem-layout.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/filesystem-layout.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="bootloader.html">Chargeur de démarrage</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="gui.html">L'interface graphique de Haiku</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Structure du système de fichiers</h1>
+
+<p>L'organisation des fichiers est assez transparente dans Haiku. En essayant de toujours utiliser des noms explicites pour les fichiers et les dossiers, l'utilisateur n'a pas besoin de faire de suppositions. Les fichiers et dossiers qui sont importants pour le bon fonctionnement du système, sont protégés des atteintes accidentelles par l'affichage d'une de ces alertes :</p>
+<img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
+<img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
+<p>Le second message d'alerte apparaît si vous essayez de renommer ou de supprimer quelque chose à l'intérieur du système. Ici, le bouton "<span class="button">Do it</span>" ne deviendra cliquable qu'en maintenant enfoncée la touche <span class="key">MAJ</span>.</p>
+<p>Généralement, la racine du volume de démarrage se divise en trois dossiers distincts :</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>appartient au système. N'y touchez pas !</td></tr>
+<tr><td><span class="path">/boot/common/</span></td><td> </td><td>contient les fichiers qui sont partagés entre les utilisateurs.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>est votre dossier personnel où vous conservez vos données et paramètres.</td></tr>
+</table>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="system" name="system">Le dossier système - <span class="path">/boot/system/</span></a></h2>
+<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
+Whatever it's named, you should not alter what's inside. Every update of Haiku can add, remove or overwrite anything within it. If you want to add functionality, maybe with other Tracker Add-Ons or Translators or maybe another hardware driver, you install these things under your own <span class="path">/boot/home/</span> hierarchy or, if it's supposed to be for every user, under <span class="path">/boot/common/</span>. As long as Haiku isn't multi-user, this distinction has no apparent effect, as there's only one user with one <i>home</i> folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
+<p>Admettons que vous vouliez installer un nouveau traducteur pour le dernier format d'image. Ne le copiez <b>surtout pas</b> dans le dossier système approprié. Rappelez-vous : vous ne devez pas y toucher !<br />
+Placez le plutôt dans l'une des hiérarchie miroir sous  <span class="path">/boot/common/</span> ou <span class="path">/boot/home/config/</span>.</p>
+<p>Dans notre exemple, l'emplacement des traducteurs dans le système serait le dossier</p>
+<p><span class="path">/boot/system/add-ons/Translators/</span></p>
+<p>Ainsi, le dossier "miroir" de l'utilisateur est soit</p>
+<p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
+soit<br />
+<span class="path">/boot/common/add-ons/Translators/</span></p>
+<p>Cela a un autre avantage: si le composant que vous avez installé sème la pagaille (ce qui est possible comme les pilotes de matériel s'installent aussi de cette manière) vous pouvez choisir "<i>Disable User Add-Ons</i>" dans le menu du <a href="bootloader.html">Chargeur de démarrage</a>, et ainsi, vous êtes toujours en mesure de démarrer sans le composant fautif.</p>
+<p>La plupart du temps, cependant, vous n'aurez pas à vous en préoccuper, car tous les logiciels fiables comprennent une routine d'installation qui gère ces choses.<br />
+<!--
+If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
+</p>
+<p><i>TODO.... Table to be added ....</i>
+<table>
+</table>
+-->
+</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="common" name="common">Le dossier commun - <span class="path">/boot/common/</span></a></h2>
+<p>Pour le moment Haiku n'est pas un système multi-utilisateurs. Néanmoins, quand il le sera, chaque utilisateur aura son propre dossier personnel (<i>home</i>) inaccessible aux autres. Toutes les applications ou composants ajoutés, comme les extensions du Tracker, les traducteurs et les données qui sont censés être partagés entre différents utilisateurs, doivent être placés sous <span class="path">/boot/common/</span>.</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="home" name="home">Le dossier personnel - <span class="path">/boot/home/</span></a></h2>
+<p>This folder belongs to you. Here you can create and delete files and folders as you wish. However, you shouldn't mess too much with the <span class="path">~/config/</span> directory and its subfolders. You <i>could</i> delete e.g. the <span class="path">~/config/settings/</span> folder without damaging the operating system itself, but who wants to lose all his configurations and application settings? In any case, the system warns you with the at the top mentioned alert.</p>
+<p>Besides the <span class="path">~/config/add-ons/</span> folder, which mirrors the system's add-ons folder for additional components as described above, there are a few other folders of interest. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
+<td>Par défaut, c'est là que vos mails sont conservés.</td></tr>
+
+<tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
+<td>Par défaut, les <a href="queries.html">Requêtes</a> sont temporairement stockées dans ce dossier pendant 7 jours.</td></tr>
+
+<tr><td><span class="path">~/config/be/</span></td><td> </td>
+<td>Again from our BeOS legacy, the <span class="path">be</span> folder contains what's shown in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>. You can add and remove items by putting files, folders, links or queries into this folder.</td></tr>
+
+<tr><td><span class="path">~/config/bin/</span></td><td> </td>
+<td>Complète le dossier système <span class="path">/boot/system/bin/</span> et contient tous vos programmes en ligne de commande.</td></tr>
+
+<tr><td><span class="path">~/config/boot/</span></td><td> </td>
+<td>This folder is the place for <a href="bash-scripting.html#user-scripts">User Scripts</a> that are executed before or after the system boots up or shuts down.</td></tr>
+
+<tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
+<td>Les liens vers les programmes ou les documents contenus dans ce dossier sont automatiquement lancés à chaque démarrage.</td></tr>
+
+<tr><td><span class="path">~/config/fonts/</span></td><td> </td>
+<td>Il suffit de copier une police TrueType ou PostScript dans ce dossier pour quelle devienne disponible de partout.</td></tr>
+
+<tr><td><span class="path">~/config/settings/</span></td><td> </td>
+<td>Ce dossier contient les paramètres de toutes les applications et quelques configurations pour le système. Certaines applications gèrent leurs paramètres dans leurs propres sous-dossiers, d'autres mettre simplement leur fichier de configuration ici.</td></tr>
+
+<tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
+<td>Dans cette base de données <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, Haiku conserve tous les différents <a href="filetypes.html">types de fichiers</a> et leurs paramètres.</td></tr>
+
+<tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
+<td>There's one settings file that may be of interest: <span class="cli">kernel</span> offers some low level configurations like disabling <acronym title="Symmetric Multi Processing">SMP</acronym>, activating serial debugging or enabling advanced power management. You activate a configuration line by removing the commentary symbol "<tt>#</tt>". Be careful here!</td></tr>
+
+<tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
+<td>Besides the various settings files for Tracker, there are some interesting subfolders:</td></tr>
+
+<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Affichez et organisez les attributs comme vous aimez, et définissez la taille de fenêtre. Chaque nouveau dossier que vous créez l'utilise comme modèle.</td></tr>
+
+<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Vous pouvez définir la disposition des fenêtres de résultat de requête pour certains types de fichiers. Voir <a href="queries.html#result-window">Requêtes : La fenêtre de résultats</a>.</td></tr>
+
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Put links to your favorite locations in here to make them available e.g. in open and save panels. See topic <a href="gui.html#favorites-recent">Haiku's GUI: Favorites and recent folders</a>.</td></tr>
+
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Ajouter un modèle pour tout type de fichier. il sera laors disponible dans le menu <span class="menu">File | New...</span> du Tracker. voir le sujet <a href="tracker.html#working-with-files">Tracker : gérer vos fichiers</a>.</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="bootloader.html">Chargeur de démarrage</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="gui.html">L'interface graphique de Haiku</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

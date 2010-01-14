@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Finest Bug
+ *		Humdinger
+ *		Matthias
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Bash und Skripten</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../fr/bash-scripting.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../it/bash-scripting.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/bash-scripting.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bash-scripting.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bash-scripting.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/bash-scripting.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/bash-scripting.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="preferences.html">Einstellungen</a> 
+::  <a href="contents.html" class="uplink">Inhalt</a> 
+<!-- ::  <a href="filesystem-layout.html">Dateisystem Layout</a>  » -->
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h1>Bash und Skripten</h1>
+
+<p>"Skripten" bezeichnet die Technik Prozesse zu automatisieren, indem 
+Befehle aneinandergereiht werden und das Ganze als Textdatei, ein 
+sogenanntes "Skript", abgespeichert wird. Jedes mal wenn so ein Skript 
+aufgerufen wird, werden die Befehle nacheinander so ausgeführt, als ob 
+man sie per Hand ins <a href="applications/terminal.html">Terminal</a> eintippt.<br />
+Skripte können zum einfachen Ausführen weniger Befehle in einer 
+bestimmten Reihenfolge dienen, durch ausgefeilte Programmierung aber 
+auch komplexe Aufgaben lösen.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="bash" name="bash">Die Bash</a></h2>
+<p>Da Skripte natürlich stark auf die Konsole für die sie geschrieben wurden aufbauen, sollte man sich zuerst mit der BASH vertraut machen, die von Haiku benutzt wird. Dank ihrer weiten Verbreitung, existieren für diese Konsole viele Ressourcen online. Johan Janssons <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a> ist ein lesenswertes Dokument.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="scripting-bible" name="scripting-bible">Die Skripter Bibel</a></h2>
+<p>Sobald man sich ein gewisses Grundwissen zum Arbeiten in der Shell angeeignet hat, ist es Zeit sich ein wenig tiefer in die Welt des Skripten zu begeben. Nochmals, es gibt massenhaft Beispiele und Referenzmaterial im Internet und im Buchhandel. Eine sehr schöne, für Haiku praktisch maßgeschneiderte, Einführung ist das online verfügbare <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) aus Scot Hackers BeOS Bible.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Skripten in Haiku</a></h2>
+<p>In Haiku macht das System selbst natürlich auch Gebrauch vom Skripten. Hoch- und Runterfahren sind typische Aufgaben für Skripte. Diese definierten Abfolgen können vom Benutzer mit eigenen Benutzerskripten erweitert werden.<br />
+Falls sie noch nicht existieren, muss man die benötigten Dateien selbst anlegen. Ansonsten sollten eigene Befehle einfach an den Stellen eingefügt werden, an denen sie ausgeführt werden sollen.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="userbootscript" name="userbootscript">Das UserBootscript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserBootscript</span> wird ausgeführt nachdem das System komplett hochgefahren wurde. Man kann zum Beispiel einige Programme aufrufen, die dann nach jedem Hochfahren automatisch gestartet werden:</p>
+<pre># Start LaunchBox
+/boot/system/apps/LaunchBox &amp;
+
+# Start Workspaces Applet
+/boot/system/apps/Workspaces &amp;</pre>
+<p>Das "<tt>&amp;</tt>" am Ende jedes Befehls ist wichtig, um ihn im Hintergrund zu starten. Anderenfalls wird das Skript solange anhalten, bis der Befehl beendet ist (in diesem Fall, bis das ausgeführte Programm geschlossen wurde).</p>
+
+<p>Eine einfache Alternative zum oben genannten ist es, die Anwendungen, die nach dem Hochfahren gestartet werden sollen, im Verzeichnis <span class="path">/boot/home/config/boot/launch</span> zu verlinken. Am einfachsten klickt man dazu mit der rechten Maustaste auf die entsprechende Anwendung, geht auf <span class="menu">Create Link</span> und <a href="tracker.html#navigating">navigiert</a> dann zum oben genannten Verzeichnis.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownscript" name="usershutdownscript">Das UserShutdownScript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> wird direkt vor dem Herunterfahren ausgeführt. Das Runterfahren wird abgebrochen, falls das Skript einen anderen Rückgabewert als "0" zurück liefert.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">Das UserShutdownFinishScript</a></h3>
+<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> wird beim Herunterfahren als letztes ausgeführt. Es gilt jedoch zu beachten, das zum Zeitpunkt, an dem dieses Skript ausgeführt wird, viele Systemkomponenten schon nicht mehr laufen.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="preferences.html">Einstellungen</a> 
+::  <a href="contents.html" class="uplink">Inhalt</a> 
+<!-- ::  <a href="filesystem-layout.html">Dateisystem Layout</a>  » -->
+</span></div>
+</div>
+
+</body>
+</html>

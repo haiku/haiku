@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"../../../../html-dtd/xhtml1-strict.dtd"> 
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -20,23 +19,33 @@
 </head>
 <body>
 
-<div class="logo">
-	<img src="../images/logo.png" alt="logo" class="noprint" id="logo" name="logo" />
+<div id="banner">
+<div><span>User guide</span></div>
 </div>
 
-<div class="topnav">
-	<p>
-		«&#160;&#160;<a href="media.html">Media</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="../preferences.html" class="uplink">Preferences</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="network.html">Network</a>&#160;&#160;»
-	</p>
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/gb.png" alt="" /> English</li>
+<li><a href="../../fr/preferences/mouse.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/mouse.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/mouse.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/mouse.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/mouse.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/mouse.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/preferences/mouse.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+</ul>
+<span>
+ «  <a href="media.html">Media</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="network.html">Network</a>  »
+</span></div>
 </div>
 
-<div class="content">
+<div id="content">
+<div>
 
-<h1><img src="../../images/prefs-images/mouse-icon_64.png" alt="mouse-icon_64.png" width="64" height="64" />Mouse</h1>
+<h2><img src="../../images/prefs-images/mouse-icon_64.png" alt="mouse-icon_64.png" width="64" height="64" />Mouse</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Mouse</span></td></tr>
@@ -44,32 +53,30 @@
 </table>
 <p><br /></p>
 <img src="../images/prefs-images/mouse.png" alt="mouse.png" />
-<p>Set your type of mouse: 1, 2 or 3 button mouse. You can simulate the 2nd (=right) mouse button by holding down <span class="key">CTRL</span> while left-clicking. For the 3rd (=middle) mouse button, it's <span class="key">CTRL</span>&#160;<span class="key">ALT</span> and a left-click. A middle-click is also simulated by clicking left and right button together. Useful for notebooks, which mostly don't have a 3rd button.</p>
-<p>You can rearrange the mouse buttons by clicking on them and choose their new meaning from the drop-down menu.</p>
+<p>Set your type of mouse: 1, 2 or 3 button mouse. You can simulate the 2nd (=right) mouse button by holding down <span class="key">CTRL</span> while left-clicking. For the 3rd (=middle) mouse button, it's <span class="key">CTRL</span> <span class="key">ALT</span> and a left-click. A middle-click is also simulated by clicking left and right button together. Useful for notebooks, which mostly don't have a 3rd button.</p>
+<p>You can rearrange the mouse buttons by clicking on them and choosing their new meaning from the pop-up menu.</p>
 <p>With the sliders to the right, you adjust double-click speed, mouse speed and acceleration.</p>
 <p><span class="menu">Focus follows mouse</span> means, that you don't have to click into a window to activate it. There are three modes:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Enabled</span></td><td>&#160;</td><td>The window under the mouse pointer is always activated automatically, but doesn't pop to the front.</td></tr>
-<tr><td><span class="menu">Warping</span></td><td>&#160;</td><td>Choosing a window from Deskbar or the <a href="../twitcher.html">Twitcher</a> will have the mouse pointer glide smoothly toward it.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Instant-Warping</span></td><td>&#160;</td><td>Choosing a window from Deskbar or the Twitcher will have the mouse pointer jump instantly toward it.</td></tr>
+<tr><td><span class="menu">Enabled</span></td><td> </td><td>The window under the mouse pointer is always activated automatically, but doesn't pop to the front.</td></tr>
+<tr><td><span class="menu">Warping</span></td><td> </td><td>Choosing a window from Deskbar or the <a href="../twitcher.html">Twitcher</a> will have the mouse pointer glide smoothly toward it.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Instant-Warping</span></td><td> </td><td>Choosing a window from Deskbar or the Twitcher will have the mouse pointer jump instantly toward it.</td></tr>
 </table>
 <p>All settings are immediately applied.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Defaults</span></td><td>&#160;</td><td>resets everything to default values.</td></tr>
-<tr><td><span class="button">Revert</span></td><td>&#160;</td><td>brings back the settings that were active when you started the Mouse preferences.</td></tr>
+<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Mouse preferences.</td></tr>
 </table>
 
 </div>
+</div>
 
-
-<div class="bottomnav">
-	<p>
-		«&#160;&#160;<a href="media.html">Media</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="../preferences.html" class="uplink">Preferences</a>
-		&#160;&#160;::&#160;&#160;
-		<a href="network.html">Network</a>&#160;&#160;»
-	</p>
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="media.html">Media</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="network.html">Network</a>  »
+</span></div>
 </div>
 
 

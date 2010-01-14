@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!--
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Matthias
+ *
+-->
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta http-equiv="Content-Style-Type" content="text/css" />
+        <meta name="robots" content="all" />
+        <title>Icon-O-Matic</title>
+        <link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/de.png" alt="" /> Deutsch</li>
+<li><a href="../../fr/applications/icon-o-matic.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../it/applications/icon-o-matic.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/icon-o-matic.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/icon-o-matic.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/icon-o-matic.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/icon-o-matic.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/icon-o-matic.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="expander.html">Expander</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
+::  <a href="installer.html">Installer</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td><a href="#bitmap-vector">BeOS Pixel ./. Haiku Vektor Icons</a><br />
+                <a href="#icons-attributes">Icons = Attribute</a><br />
+                <a href="#i-o-m">Icon-Erstellung mit Icon-O-Matic</a><br />
+                  <a href="#i-o-m-path">Path</a><br />
+                  <a href="#i-o-m-shape">Shape</a><br />
+                  <a href="#i-o-m-style">Style</a><br />
+                  <a href="#i-o-m-transformer">Transformer</a><br />
+                  <a href="#i-o-m-save">Über das Abspeichern</a><br />
+                  <a href="#i-o-m-tips">Tipps &amp; Tricks</a></td></tr>
+</table>
+
+<h2><img src="../../images/apps-images/icon-o-matic-icon_64.png" alt="icon-o-matic-icon_64.png" width="64" height="64" />Icon-O-Matic</h2>
+
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/Icon-O-Matic</span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/Icon-O-Matic</span></td></tr>
+</table>
+
+<p><br /></p>
+
+<p>Zuerst ein paar allgemeine Worte zu den Icons in Haiku, bevor es um die Erstellung von Icons geht.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="bitmap-vector" name="bitmap-vector">BeOS Pixelgraphik im Vergleich zu Haiku Vektor-Icons</a></h2>
+<p>Im Gegensatz zum BeOS verwendet Haiku vektor-basierte Icons an Stelle von pixel-basierten Icons. Für diesen Zweck wurde ein eigenes "Haiku Vector Icon Format" (HVIF) entwickelt, das für eine kleine Dateigröße und schnelle Anzeige optimiert ist. Aus diesem Grund sind Haiku Icons normalerweise <i>erheblich</i> kleiner als ein Pixelbild oder das weit verbreiteten SVG-Format. Ebenso sind die Haiku Icons nicht - wie die im BeOS verwendeten - auf 256 Farben (8bit Palette) beschränkt.<br />
+Als Beispiel, das Icon für Terminal:</p>
+<table border="0" cellpadding="10">
+        <tr align="center"><td><b>Pixel</b></td><td><b>SVG</b></td><td><b>HVIF</b></td></tr>
+        <tr align="center"><td><img src="../../images/apps-images/i-o-m-terminal-bitmap32.png" alt="i-o-m-terminal-bitmap32" width="32" height="32" /> <img src="../../images/apps-images/i-o-m-terminal-bitmap16.png" alt="i-o-m-terminal-bitmap16" width="16" height="16" /></td><td style="width:100px"><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td><td><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td></tr>
+        <tr align="center"><td>1,024 byte<br />+ 256 byte</td><td> 7,192 byte </td><td> 768 byte </td></tr>
+</table>
+<p>Anzumerken ist, dass im BeOS immer zwei Versionen eines Icons (16x16 und 32x32 Pixel) verwendet wurden, um sowohl in der Listen- als auch in der Icon-Darstellung gute Ergebnisse zu erzielen.</p>
+<p>Diesen Trick muss man bei Vektor Icons nicht anwenden. Es ist nicht nur lediglich einige hundert Bytes groß, es skaliert auch viel besser als Pixel-Icons. (Anmerkung: da das BeOS nur zwei verschiedene Icon-Einstellungen hatte - 16x16 und 32x32 - war das Problem der Skalierung nicht so ausschlaggebend.)</p>
+<table border="0" cellpadding="10">
+        <tr align="center"><td> </td><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td><td><b>128x128</b></td></tr>
+        <tr align="center"><td><b>Pixel</b></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap16.png" alt="i-o-m-bitmap16" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap32.png" alt="i-o-m-bitmap32" width="32" height="32" /></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap64.png" alt="i-o-m-bitmap64" width="64" height="64" /></td>
+                <td><img src="../../images/apps-images/i-o-m-bitmap128.png" alt="i-o-m-bitmap128" width="128" height="128" /></td></tr>
+        <tr align="center"><td><b>Vektor</b></td>
+                <td><img src="../../images/apps-images/i-o-m-vector16.png" alt="i-o-m-vector16" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-vector32.png" alt="i-o-m-vector32" width="32" height="32" /></td>
+                <td><img src="../../images/apps-images/i-o-m-vector64.png" alt="i-o-m-vector64" width="64" height="64" /></td>
+                <td><img src="../../images/apps-images/i-o-m-vector128.png" alt="i-o-m-vector128" width="128" height="128" /></td></tr>
+
+</table>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="icons-attributes" name="icons-attributes">Icons sind eigentlich Attribute</a></h2>
+<p>Icons werden als Attribut in der jeweiligen Datei gespeichert. Aber es muss nicht jede Datei solch ein Attribut besitzen, um in einem Tracker-Fenster mit einem Icon dargestellt zu werden. Dateien, die kein eigenes Icon besitzen, übernehmen das Icon, das ihren Dateityp repräsentiert; sie erben es sozusagen. Wenn man das Icon für den Dateityp global ändern möchte, verwendet man <span class="app">FileTypes</span> in den Einstellungen. Wenn man das spezielle Icon einer einzelnen Datei ändern möchte, dann macht man dies über das <span class="app">FileType Add-On</span> im Kontext-Menü zu dieser Datei. Unter <a href="../filetypes.html">Filetypes</a> wird hierzu noch mehr ausgeführt.</p>
+<div class="box-info">Da Icons als Attribute einer Datei gespeichert sind, bleiben diese nur in Dateisystemen, die Attribute unterstützen erhalten. Man sollte daher Dateien mittels zip komprimieren, um die in den Attributen gespeicherten Informationen auch außerhalb einer BFS Partition zu erhalten.</div>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m" name="i-o-m">Icon-Erstellung mit Icon-O-Matic</a></h2>
+<p>Icon-O-Matic ist der Icon-Editor unter Haiku. Die hiermit erstellten Icons können im haiku-eigenen Format HVIF, als SVG oder PNG abgespeichert werden. Darüber hinaus ist es auch möglich, das Icon direkt als Attribut an eine bestehende Datei anzuhängen oder es als Ressource, beziehungsweise Quell-Datei für Programmierer bereit zu stellen. Da Icon-O-Matic speziell für das Format HVIF entwickelt wurde, kann man an Hand der Arbeitsabläufe im Programm ein wenig die Struktur des HVIF Formates erkennen.</p>
+<p>Im Gegensatz zu anderen Vektorgraphik-Programmen werden hier keine seperaten Objekte erstellt, die jeweils ihre eigene Sammlung an Eigenschaften, wie Pfad, Strichstärke oder Farbe haben, sondern es werden die einzelnen Objekte ("shapes") aus mehrfach genutzten Pfaden ("paths") und Farben ("styles") zusammengesetzt und mit Eigenschaften ("properties") versehen. Dieses Wiederverwenden von einzelnen Elementen ist eines der Geheimnisse von HVIF. Auch wenn es dem Icon-Designer etwas mehr abverlangt, gibt es doch einige Vorteile, die für diesen Ansatz sprechen.<br />
+So können beispielsweise durch das Wiederverwenden eines Pfades mehrere Objekte gleichzeitig geändert werden, wenn dieser eine Pfad geändert wird. Besonders deutlich wird es bei einem Objekt, das einen Schatten hat. Durch die Änderung des Pfades, den das Objekt und der Schatten nutzen, wird gleichzeitig und gleichartig zum Objekt auch dessen Schatten verändert.</p>
+
+<p>Ein kurzer Überblick über das Programmfenster von Icon-O-Matic:</p>
+<img src="../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" />
+
+<p>Um ein sichtbares Objekt auf der Zeichenfläche zu erstellen, benötigt man einen shape mit einem path und einem style. Der Einfachheit halber kann man eines davon, zwei oder alle drei Teile gleichzeitig aus dem <span class="menu">Shape</span>-Menü heraus erstellen. Bei jedem der vier Elemente eines Objektes (path, shape, transformer oder style) kann durch Anklicken der jeweiligen Kopfzeile ein Kontext-Menü aufgerufen werden. Darüber hinaus hat jedes Element noch Eigenschaften, die im Menü <span class="menu">Properties</span> gesetzt werden können.</p>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-path" name="i-o-m-path">Path</a></h3>
+<p>Ein Pfad besteht aus mehreren Punkten, die mit einer Linie oder einer Bezier-Kurve miteinander verbunden sind. Um einzelne Punkte zu ändern oder hinzuzufügen, muss der entsprechende Pfad in der Pfad-Liste links ausgewählt sein.</p>
+
+<p>Durch Klicken auf die Zeichenfläche wird der erste Punkt eines Pfades gesetzt. Man kann hierbei auch schon festlegen, ob es sich bei dem Pfad um eine Linie oder eine Kurve handelt: ein einfacher Klick erzeugt eine gerade Linie; wird die Taste gehalten und die Maus bewegt, erscheinen die typischen Greifer für Bezier-Kurven. Natürlich kann der Pfad auch noch nachträglich von einer Linie zur Kurve oder anders herum geändert werden.</p>
+
+<img src="../../images/apps-images/i-o-m-path-ab.png" alt="i-o-m-path-ab" />
+
+<p>Um von Bild "A" zu Bild "B" zu kommen, muss man die Eckpunkte der Linie zu Kurvenpunkten umwandeln. Durch gleichzeitiges Drücken der Taste <span class="key">ALT</span> beim Klicken auf einen Punkt werden die Bezier-Greifer (wenn man die Maus bei gedrückter Maustaste bewegt) aus dem Kurvenpunkt sozusagen herausgezogen. Hierdurch ergibt sich eine symmetrische Bezier-Kurve; beide Greifer sind miteinander verknüpft. (Wenn man nur einen der beiden verändern möchte, muss man wiederum die <span class="key">ALT</span>-Taste drücken und den Greifer anklicken.)<br />
+Umgekehrt kann man einen Kurvenpunkt in einen Eckpunkt verwandeln, in dem man ihn bei gedrückter <span class="key">ALT</span>-Taste anklickt.</p>
+
+<p>Durch Klicken und Ziehen kann ein Punkt verschoben werden. Um mehrere Punkte gleichzeitig auszuwählen kann man bei gedrückter <span class="key">SHIFT</span>-Taste ein Auswahl-Rechteck zeichnen und diese damit umfassen. Ausgewählte Punkte sind mit einem roten Rahmen versehen statt einem Schwarzen.<br />
+Um zu einem Pfad einen Punkt hinzuzufügen, muss die Verbindungslinie zwischen zwei Punkten angeklickt werden.<br />
+Ausgewählte Punkte lassen sich durch Drücken von <span class="key">DEL</span> entfernen; alternativ kann auch ein nicht ausgewählter Punkt durch einen <span class="key">CTRL</span>-Klick gelöscht werden.</p>
+
+<p>Am Maus-Zeigers kann der aktuelle Bearbeitungs-Modus abgelesen werden:</p>
+<table summary="Mouse pointer states, Path" border="0" cellpadding="10">
+        <tr align="center">
+                <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-path" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-insert.png" alt="i-o-m-pointer-insert" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-add.png" alt="i-o-m-pointer-add" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-delete.png" alt="i-o-m-pointer-delete" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-bezier.png" alt="i-o-m-pointer-bezier" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-select.png" alt="i-o-m-pointer-select" width="16" height="16" /></td>
+        </tr>
+        <tr align="center">
+                <td>Punkt(e) bewegen</td>
+                <td>Punkt(e) einfügen</td>
+                <td>Punkt hinzufügen</td>
+                <td>Punkt löschen<br /><span class="key">CTRL</span></td>
+                <td>Eck-Punkt ↔ Kurven-Punkt<br /><span class="key">ALT</span></td>
+                <td>Auswahlrechteck<br /><span class="key">SHIFT</span></td>
+        </tr>
+</table>
+<p>Durch Rechtsklick auf einen Punkt (oder einer Auswahl von Punkten) wird ein Kontext-Menü angezeigt:</p>
+<table summary="Path context" border="0" cellspacing="0" cellpadding="2">
+<tr><td class="onelinetop"><span class="menu">Select all</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>Wählt alle Punkte des aktuellen Pfades aus.</td></tr>
+<tr><td><span class="menu">Transform</span></td><td><span class="key">T</span></td><td>Alle ausgewählten Punkte werden gruppiert um sie zusammen bewegen, in der Größe verändern oder drehen zu können. Die Gruppierung ist lediglich temporär.</td></tr>
+<tr><td><span class="menu">Split</span></td><td></td><td>Trennt den ausgewählten Punkt in zwei Punkte auf, die übereinander liegen.</td></tr>
+<tr><td><span class="menu">Flip</span></td><td></td><td>Dreht die ausgewählten Punkte um 180°. (Hat logischerweise nur bei Bezier-Punkten eine sichtbare Auswirkung.)</td></tr>
+<tr><td><span class="menu">Remove</span></td><td><span class="key">DEL</span></td><td>Löscht die ausgewählten Punkte.</td></tr>
+</table>
+
+<h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">Path Menü</a></h4>
+<p>Das <span class="menu">Path</span>-Menü hat einige selbsterklärende Einträge: <span class="menu">Add Rectangle</span>, <span class="menu">Add Circle</span>, <span class="menu">Duplicate</span> oder <span class="menu">Delete</span>. Andere benötigen ein paar Worte der Erklärung:</p>
+
+<table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Reverse</span></td><td style="width:15px;"></td><td>Wenn der Pfad nicht "geschlossen" ist (siehe weiter unten: Pfad Eigenschaften), wird ein neuer Punkt mit dem zuletzt gesetzten Punkt verbunden. Durch "Umkehren" wird der neue Punkt mit dem ursprünglichen Startpunkt des Pfades verbunden.</td></tr>
+<tr><td><span class="menu">Clean Up</span></td><td></td><td>Entfernt überflüssige Punkte (insbesondere beim Import von SVG-Graphiken hilfreich).</td></tr>
+<tr><td class="onelinetop"><span class="menu">Rotate Indices Right</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Hierdurch wird die Öffnung des Pfades gedreht. Am besten wird es bei einem nicht geschlossenen Pfad mit einem zugewiesenen Stil und Form, die als Strich transformiert ist, deutlich: wenn der Pfad diese Gestalt hat ⊂ wird er folgendermaßen gedreht: ⊂ ∩ ⊃ ∪.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Rotate Indices Left</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Wie oben, nur links herum.</td></tr>
+</table>
+
+<h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Path Eigenschaften</a></h4>
+<p>Das Menü <span class="menu">Properties</span> links unten im Programmfenster bietet alle verfügbaren Einstellungen für das ausgewählte Objekt an. Bei einem Pfad sind das: <span class="menu">Name</span> und ob er geschlossen, also <span class="menu">Closed</span> ist, oder nicht.</p>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-shape" name="i-o-m-shape">Shape</a></h3>
+<p>Eine Form ("shape") weist einem oder mehreren Pfaden einen Stil zu. Dadurch wird der Pfad auf der Zeichenfläche auch tatsächlich sichtbar. Die Zuweisung erfolgt, indem man bei ausgewählter Form die entsprechenden Pfade und den Stil ankreuzt.</p>
+<p>Eine Form definiert, wie ein Pfad oder ein Stil angewendet wird, beispielsweise ob ein Objekt gefüllt oder umrandet ist (hier spielt zusätzlich noch die Transformation eine Rolle; hierzu weiter unten mehr). Eine Form kann auch bewegt, gedreht oder in ihrer Größe geändert werden, ohne den verwendeten Pfad verändern zu müssen. Somit ist es möglich, einen einzigen Pfad mehrfach zu verwenden und unterschiedliche, aber ähnliche Formen zu erhalten.</p>
+
+<img src="../../images/apps-images/i-o-m-shape.png" alt="i-o-m-shape" />
+
+<p>Wird eine Form aus der Liste ausgewählt, wird diese Form mit einem Rechteck umschlossen um sie hervorzuheben. Je nach dem, wo dieses Rechteck mit der Maus angefasst wird, kann man die Form verschieben, in der Größe verändern oder um den Mittelpunkt drehen, der selbst auch verschoben werden kann. Mittels der <span class="key">SHIFT</span>-Taste kann man beim Verschieben die Richtung unveränderlich halten, beim Drehen 45°-Schritte festlegen und das Seitenverhältnis bei der Größenänderung beibehalten. Wie bereits bei der Bearbeitung des Pfades kann am Mauszeiger der aktuelle Bearbeitungsmodus abgelesen werden:</p>
+<table summary="Mouse pointer states, Shape" border="0" cellpadding="10">
+        <tr align="center">
+                <td><img src="../../images/apps-images/i-o-m-pointer-move-shape.png" alt="i-o-m- move-shape" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-resize.png" alt="i-o-m-pointer-resize" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-rotate.png" alt="i-o-m-pointer-rotate" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-rotation" width="16" height="16" /></td>
+        </tr>
+        <tr align="center">
+                <td>Bewegen</td>
+                <td>Größe ändern</td>
+                <td>Drehen</td>
+                <td>Mittelpunkt<br />verschieben</td>
+        </tr>
+</table>
+
+<p>Formen liegen - jede für sich in einer seperaten Ebene - übereinander. Die Position in der Z-Achse (also welche Form über oder unter welcher liegt) wird über die Reihenfolge in der Liste aller Formen festgelegt. Hier kann eine Form mit der Maus nach oben oder unten gezogen werden.</p>
+
+<h4><a id="i-o-m-shape-menu" name="i-o-m-path-menu">Shape Menü</a></h4>
+<p>Das Menü <span class="menu">Shape</span> beinhaltet neben der bereits erwähnten Möglichkeit eine "leere" Form, eine Form zusammen mit einem Pfad, einem Stil oder beidem zu erstellen, also <span class="menu">Add Empty, With Path/Style/Path &amp; Style</span>, sowie <span class="menu">Duplicate</span> und <span class="menu">Remove</span>  noch:</p>
+<table summary="Shape menu" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Reset Transformation</span></td><td style="width:15px;"></td><td>Alle Veränderungen an der Form (Größe, Verschieben, Drehen) werden zurückgesetzt.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Freeze Transformation</span></td><td></td><td>Bei der Transformierung einer Form verbleiben die zugewiesenen Pfade an ihrer ursprünglichen Position. Das kann durchaus gewollt sein, so zum Beispiel, wenn mehrere Formen auf einen Pfad zurückgreifen oder man die Option "Am Raster ausrichten", also <span class="menu">Options | Snap to Grid</span>, aktiviert hat.<br />
+Anderenfalls wird durch diesen Menüpunkt die Transformation auf die Pfade angewendet und ein zukünftiges "Transformation zurücksetzen" setzt auf diese neue Transformation zurück.</td></tr>
+</table>
+
+<h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Shape Eigenschaften</a></h4>
+<p>Neben <span class="menu">Name</span> kann eine Form noch diese <span class="menu">Properties</span> haben:</p>
+
+<table summary="Shape properties" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Min LOD</span></td><td></td><td>Minimaler "Level of Detail" - also Detail-Grad.</td></tr>
+<tr><td><span class="menu">Max LOD</span></td><td></td><td>Maximaler Detail-Grad</td></tr>
+</table>
+
+<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Level of Detail (LOD)</a></h5>
+<table summary="LOD example" border="0" cellpadding="10">
+        <tr align="center"><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td></tr>
+        <tr align="center">
+                <td><img src="../../images/apps-images/i-o-m-lod-icon_16.png" alt="i-o-m-lod-icon_16" width="16" height="16" /></td>
+                <td><img src="../../images/apps-images/i-o-m-lod-icon_32.png" alt="i-o-m-lod-icon_32" width="32" height="32" /></td>
+                <td><img src="../../images/apps-images/i-o-m-lod-icon_64.png" alt="i-o-m-lod-icon_64" width="64" height="64" /></td></tr>
+</table>
+<p>Ein gutes Beispiel für den Detail-Grad ist das Icon von BeVexed.<br />
+Je nach dem, welche Icon-Größe im Tracker eingestellt ist, kann für jede Form festgelegt werden ob sie angezeigt wird, oder nicht. In diesem Beispiel wären die Zahlen bei 16x16 nicht mehr erkennbar und würden das Icon als Ganzes "optisch beeinträchtigen". Über den entsprechenden Wert beim Detail-Grad wurden sie ausgeblendet.</p>
+<p>Der Wert für den "LOD" errechnet sich folgendermaßen: ein LOD von 1.00 ist für eine Icon-Größe von 64x64 festgelegt. Für andere Größen ist die Icon-Größe durch 64 zu teilen. So hat ein Icon der Größe 16x16 einen LOD von 16/64 = 0.25. 
+Eine Form wird unterhalb seines <span class="menu">Min LOD</span>, beziehungsweise überhalb seines <span class="menu">Max LOD</span> nicht angezeigt.</p>
+<p>Wenn man also den <span class="menu">Min LOD</span> einer Form auf 0.0 und den <span class="menu">Max LOD</span> auf 0.5 setzt, dann wird diese Form nur angezeigt, wenn die Icon-Größe im Tracker kleiner oder <i>gleich</i> 32x32 ist. Wenn sie bereits ab dieser Größe ausgeschlossen werden soll, muss ein Wert kleiner als 0.5 - beispielsweise 0.49 - eingegeben werden.</p>
+<p>Der "LOD" kann nicht nur dafür verwendet werden, Formen ein- oder auszublenden, sonder unter anderem auch um Linien verschiedener Strichstärken zu verwenden: die Form duplizieren, am Duplikat die gewünschten Änderungen vornehmen und bei beiden den LOD so einstellen, dass entweder die eine oder die andere Form angezeigt wird. Hierbei ist aber darauf zu Achten, dass die Werte der jeweiligen Detail-Grade nicht überlappen! Sonst sind bei einer Icon-Größe beide Formen sichtbar...<br />
+Wenn zum Beispiel "Form 1" unterhalb 48x48 zu sehen sein soll und "Form 2" überhalb (LOD: 48/64 = 0.75):</p>
+
+<table summary="LOD values example" border="0" cellpadding="5">
+<tr align="center"><td></td><td colspan="2"><b>Richtig</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Falsch</b></td></tr>
+<tr style="background-color:#F1F1F1"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Form 1</b></td><td>Min LOD</td><td>0.00</td><td>Min LOD</td><td>0.00</td></tr>
+<tr style="background-color:#F1F1F1"><td>Max LOD</td><td><span style="background-color:#33FF33">0.74</span></td><td>Max LOD</td><td><span style="background-color:#FF9977">0.75</span></td></tr>
+<tr><td colspan="6"></td></tr>
+<tr style="background-color:#F8F8F8"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Form 2</b></td><td>Min LOD</td><td>0.75</td><td>Min LOD</td><td>0.75</td></tr>
+<tr style="background-color:#F8F8F8"><td>Max LOD</td><td>4.00</td><td>Max LOD</td><td>4.00</td></tr>
+</table>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-style" name="i-o-m-style">Style</a></h3>
+<p>Ein Stil ("style") kann entweder eine Vollfarbe oder ein Farbverlauf sein.<br />
+Neben vordefinierten Farben der Farbpalette unter <span class="menu">Swatches</span> kann man auch seine eigene Farbe mischen. Der Regler unterhalb des Farbspektrums legt den Alpha-Kanal einer Farbe, also dessen Transparenz fest.</p>
+<img src="../images/apps-images/i-o-m-gradients.png" alt="i-o-m-gradients" />
+<p>Ein neuer Stil kann auch erstellt werden, in dem man zuerst die gewünschte Farbe wählt oder mischt und diese dann in die Stil-Liste zieht.</p>
+<p>Wenn als Stil anstatt Vollfarbe die Wahl auf Gradient fällt, kann man noch zwischen <span class="menu">Linear</span>, <span class="menu">Radial</span>, <span class="menu">Diamond</span> und <span class="menu">Cone</span> wählen. Die Anfangs- und Endfarbe kann durch Ziehen aus der Farbübersicht auf den dreieckigen Marker gewählt werden.<br />
+Natürlich kann der Marker verschoben werden, um den Farbverlauf anzupassen. Zusätzliche Marker können durch Doppelklick in den Farbverlauf hinzugefügt werden. Mittels <span class="key">DEL</span> wird der ausgewählte (unterstrichene) Marker gelöscht.</p>
+<p>Wie bei einer Form kann das Rechteck, dass den Gradient auf der Zeichenfläche repräsentiert, verschoben, gedreht oder in seiner Größe verändert werden.</p>
+
+<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Style Menü</a></h4>
+<p>Das Menü <span class="menu">Style</span> enthält die Einträge <span class="menu">Add</span>, <span class="menu">Duplicate</span> und <span class="menu">Delete</span>, sowie die Möglichkeit eine Transformation mittels <span class="menu">Reset Transformation</span> zurückzusetzen.</p>
+
+<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">Style Eigenschaften</a></h4>
+<p>Der Eintrag <span class="menu">Name</span> ist der einzige im Menü <span class="menu">Properties</span> eines Stils.</p>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-transformer" name="i-o-m-transformer">Transformer</a></h3>
+<p>Eine Form kann eine zusätzliche Transformation haben, die sein Erscheinungsbild verändert.</p>
+
+<h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Transformer hinzufügen</a></h4>
+<table summary=" Transformer Add menu" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Contour</span></td><td></td><td>Fügt einen Umriss um die ausgewählte Form hinzu.</td></tr>
+<tr><td><span class="menu">Stroke</span></td><td></td><td>Die ausgewählte Form wird mit einem Strich gezeichnet, statt mit dem Stil gefüllt.</td></tr>
+</table>
+
+<p>Abhängig von der Art der Transformation erhält man unterschiedliche Eigenschaften.</p>
+
+<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Transformer Eigenschaften</a></h4>
+<p>Neben dem Namen <span class="menu">Name</span> und der Breite <span class="menu">Width</span> der Transformation können unter den <span class="menu">Properties</span> diese (je nach Art leicht unterschiedliche) Einstellungen vorgenommen werden:</p>
+<table summary="Transformer properties" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Caps</span></td><td style="width:15px;"></td><td>(<i>nur bei "Stroke"</i>) Definiert die Endpunkte einer Linie: <span class="menu">Butt</span> - abgeflacht, <span class="menu">Square</span> - die Linienbreite wird auf die Linie als Abschluss-Quadrat aufgesetzt, oder <span class="menu">Round</span>, die Linie wird abgerundet.</td></tr>
+<tr><td><span class="menu">Detect Orient.</span></td><td></td><td>(<i>nur bei "Contour"</i>) Stellt sicher, dass Icon-O-Matic - insbesondere bei Pfaden, die sich selbst schneiden - die Kontur um einen Pfad immer außen anbringt.</td></tr>
+<tr><td><span class="menu">Joins</span></td><td></td><td>Definiert, wie Linien an einem Punkt miteinander verbunden werden: <span class="menu">Miter</span> (auf Gehrung), <span class="menu">Round</span> (abgerundet) oder <span class="menu">Bevel</span> (abgeschrägt).</td></tr>
+<tr><td><span class="menu">Miter Limit</span></td><td></td><td>nur wenn unter <span class="menu">Joins</span> "Miter" ausgewählt wurde: diese Einstellung beeinflusst das Aussehen des Gehrungsschnittes.</td></tr>
+</table>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-save" name="i-o-m-save">Über das Abspeichern</a></h3>
+<p>Am oberen Rand des Fensters findet man die Menüzeile. <span class="menu">File</span>, <span class="menu">Edit</span> und <span class="menu">Options</span> sind hinreichend selbsterklärend. Detaillierter sind die Möglichkeiten des Abspeicherns zu betrachten.</p>
+<p><span class="menu">File | Save As...</span> speichert die Datei im speziellen Format von Icon-O-Matic, das zusätzliche Informationen, wie den Namen von Pfaden, Formen oder Stilen, mit abspeichert. Diese Informationen gehen, um Speicherplatz zu sparen, verloren, wenn das Icon exportiert wird. Es empfiehlt sich, Entwürfe für eine spätere Verwendung in diesem Format zu speichern, da sonst alle Objekte ihren Namen verlieren und nur noch &lt;path&gt;, &lt;shape&gt;, respektive &lt;style&gt; heißen.</p>
+
+<p><span class="menu">File | Export As...</span> öffnet ein Dialogfenster zum Exportieren der Zeichnung. Das Dateiformat kann über ein Auswahlmenü unten im Dialogfeld ausgewählt werden:</p>
+<table summary="file formats" border="0" cellspacing="0" cellpadding="2">
+<tr><td>HVIF</td><td style="width:15px;"></td><td>Haiku Vektor Icon Format</td></tr>
+<tr><td>HVIF RDef</td><td></td><td>Exportieren als Resource (wird von Programmierern verwendet)</td></tr>
+<tr><td>HVIF Quellcode</td><td></td><td>Exportieren als Quellcode (wird von Programmierern verwendet)</td></tr>
+<tr><td>SVG</td><td></td><td>Exportieren als SVG</td></tr>
+<tr><td>PNG</td><td></td><td>Exportieren als PNG in der Größe 64x64 Pixel</td></tr>
+<tr><td>PNG Set</td><td></td><td>Exportieren als PNG in den Größen 16x16, 32x32 und 64x64 Pixel</td></tr>
+<tr><td>BEOS:ICON Attribute</td><td></td><td>Nach Auswahl einer Datei wird die Zeichnung direkt als Icon-Attribut dieser Datei zugewiesen</td></tr>
+<tr><td>META:ICON Attribute</td><td></td><td>Nach Auswahl einer Datei wird die Zeichnung als Icon (als Meta-Daten) dieser Datei zugewiesen</td></tr>
+</table>
+
+
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-tips" name="i-o-m-tips">Tipps &amp; Tricks</a></h3>
+<p>Ein paar Dinge, die man beherzigen sollte, wenn man Icon-O-Matic verwendet:</p>
+<ul>
+<li><p>Die <a href="http://factory.haiku-os.org/documentation/icon_guidelines/">Icon Guidelines</a> (englisch) enthalten wichtige Informationen zu Haiku Icons wie Perspektive, Farben und Schattenwurf.</p></li>
+<li><p>Mit Pfaden sollte sparsam umgegangen werden, da sie am meisten Speicherplatz benötigen. Man sollte eher Formen bearbeiten und transformieren, um bereits bestehende Pfade wiederverwenden zu können. Ebenso kann die Verwendung von Gradienten Speicherplatz sparen.</p></li>
+<li><p>So oft es möglich ist, sollte die Option "Am Gitter ausrichten" aus den <span class="menu">Options</span> aktiviert werden. Pfade, deren Punkte sich am 64x64 Pixel-Gitter der Zeichenfläche orientieren, benötigen weniger Speicherplatz. Darüber hinaus sind so die Icons optisch ansprechender.</p></li>
+<li><p>Im Programmfenster ist oben links eine Vorschau der Zeichnung in verschiedenen Auflösungen. Hier kann der sinnvolle Einsatz des <a href="#i-o-m-shape-lod">Detail-Grades</a> von Formen direkt überprüft werden.</p></li>
+<li><p>Icon-O-Matic selbst enthält keine Möglichkeit, um Text einzufügen. Text kann nach Einstellung von Schriftart und Schriftschnitt in einem Texteditor - beispielsweise StyledEdit - direkt auf die Zeichenfläche gezogen werden. Icon-O-Matic erstellt automatisch die entsprechenden Pfade und Formen.</p></li>
+<li><p>Sind einer Form mehrere, sich überschneidende Pfade zugewiesen, wird die Schnittfläche ausgeblendet. So ist es möglich, ein Loch in eine Fläche zu "schneiden".</p></li>
+<li><p>Über das Mausrad kann die Zeichenfläche gezoomt werden. Zum Verschieben der Zeichenfläche wird die mittlere Maustaste verwendet, beziehungsweise per normalem Linksklick bei gedrückter <span class="key">LEERTASTE</span>.</p></li>
+</ul>
+
+
+<!--
+<h3>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="i-o-m-workshops" name="i-o-m-workshops">Workshops</a></h3>
+<p>The above is of course quite theoretical. The best way to learn using Icon-O-Matic is by experimenting. To get you started and once more show the basics, have a look at these short clips:</p>
+<ul>
+<li><a href="">Paths</a></li>
+<li><a href="">Shapes</a></li>
+<li><a href="">Styles</a></li>
+<li><a href="">Transformers</a></li>
+<li><a href="">Optimizing icons</a></li>
+<li><a href=""></a></li>
+</ul>
+-->
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="expander.html">Expander</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Anwendungen</a> 
+::  <a href="installer.html">Installer</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

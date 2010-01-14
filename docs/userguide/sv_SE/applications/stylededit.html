@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Victor Widell
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>StyledEdit</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../../images/flags/sv_SE.png" alt="" /> Svensk</li>
+<li><a href="../../fr/applications/stylededit.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/stylededit.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/stylededit.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/stylededit.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/stylededit.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../jp/applications/stylededit.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/stylededit.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="soundrecorder.html">SoundRecorder</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="terminal.html">Terminal</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />StyledEdit</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Plats:</td><td></td><td><span class="path">/boot/system/apps/StyledEdit</span></td></tr>
+<tr><td>Inställningar:</td><td></td><td><i>inga</i></td></tr>
+</table>
+<p><br /></p>
+<p>StyleEdit är Haikus enkla textredigerare. Fastän filer sparas som ren text, sparas även utökade attribut för att möjliggöra enklare formatering när de visas med StyleEdit.</p>
+<img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
+<p>För dig som är intresserad, är det så här de utökade attributen ser ut när de undersöks i Terminal med <span class="cli">listattr</span>:</p>
+<pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
+File: /boot/home/Desktop/test.txt
+  Type         Size                 Name
+-----------  ---------  -------------------------------
+     Int-32          4  "be:encoding"
+MIME String         11  "BEOS:TYPE"
+     Int-32          4  "wrap"
+     Int-32          4  "alignment"
+   Raw Data       1048  "styles"
+
+1071 bytes total in attributes.</pre>
+<p>Som du kan se finns alla formateringsalternativ i StyleEdit med: radbrytning (på/av) och justering (vänster/centrerad/höger), i var sitt attribut. Formatering av enskilda tecken (teckensnitt, storlek, färg) sparas tillsammans i ytterligare ett attribut.</p>
+<div class="box-info">Eftersom attribut är en funktion i filsystemet BFS, betyder det att man på andra plattformar bara ser en ren textfil. Det gör också att formateringen förloras om en textfil sparas på en icke BFS-formaterad partition. Attributen ovan rensas alltså, och det som är kvar är en vanlig ren textfil. </div>
+<p>I vilket fall är det trevligt att kunna använda text i olika storlekar, färger och teckensnitt, och ändå ha en ren textfil. En <span class="cli">ReadMe.txt</span>, till exempel, är därför läsbar via ett terminalfönster på vilken plattform som helst, och har ändå lite stil när den öppnas genom ett dubbelklick i Haiku.</p>
+<p>Det är faktiskt så enkelt att använda StyleEdit att vi hoppar över att förklara varenda liten detalj. Skriv bara ner din text, välj de ord du vill formatera och välj teckensnitt, storlek och färg från menyn <span class="menu">Font</span>. Radbrytning och justering i menyn <span class="menu">Document</span> kan bara väljas för hela filen.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="soundrecorder.html">SoundRecorder</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="terminal.html">Terminal</a>  »
+</span></div>
+</div>
+
+</body>
+</html>
