@@ -22,8 +22,8 @@ struct X86VMTranslationMap : VMTranslationMap {
 
 	virtual	status_t			InitPostSem();
 
-	virtual	status_t 			Lock();
-	virtual	status_t			Unlock();
+	virtual	bool 				Lock();
+	virtual	void				Unlock();
 
 	virtual	addr_t				MappedSize() const;
 	virtual	size_t				MaxPagesNeededToMap(addr_t start,

@@ -129,8 +129,8 @@ struct PPCVMTranslationMap : VMTranslationMap {
 
 	virtual	status_t			InitPostSem();
 
-	virtual	status_t 			Lock();
-	virtual	status_t			Unlock();
+	virtual	bool	 			Lock();
+	virtual	void				Unlock();
 
 	virtual	addr_t				MappedSize() const;
 	virtual	size_t				MaxPagesNeededToMap(addr_t start,
@@ -353,19 +353,18 @@ PPCVMTranslationMap::InitPostSem()
 }
 
 
-status_t
+bool
 PPCVMTranslationMap::Lock()
 {
 	recursive_lock_lock(&fLock);
-	return 0;
+	return true;
 }
 
 
-status_t
+void
 PPCVMTranslationMap::Unlock()
 {
 	recursive_lock_unlock(&fLock);
-	return 0;
 }
 
 

@@ -349,7 +349,7 @@ X86VMTranslationMap::InitPostSem()
 /*!	Acquires the map's recursive lock, and resets the invalidate pages counter
 	in case it's the first locking recursion.
 */
-status_t
+bool
 X86VMTranslationMap::Lock()
 {
 	TRACE(("lock_tmap: map %p\n", map));
@@ -361,7 +361,7 @@ X86VMTranslationMap::Lock()
 		fArchData->num_invalidate_pages = 0;
 	}
 
-	return B_OK;
+	return true;
 }
 
 
@@ -369,7 +369,7 @@ X86VMTranslationMap::Lock()
 	flush all pending changes of this map (ie. flush TLB caches as
 	needed).
 */
-status_t
+void
 X86VMTranslationMap::Unlock()
 {
 	TRACE(("unlock_tmap: map %p\n", map));
@@ -380,7 +380,6 @@ X86VMTranslationMap::Unlock()
 	}
 
 	recursive_lock_unlock(&fLock);
-	return B_OK;
 }
 
 
