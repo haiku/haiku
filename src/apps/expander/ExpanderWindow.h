@@ -9,10 +9,12 @@
 #define EXPANDER_WINDOW_H
 
 
+#include <Window.h>
+
+
 #include "DirectoryFilePanel.h"
 #include "ExpanderRules.h"
 
-#include <Window.h>
 
 class BCheckBox;
 class BMenu;
@@ -26,59 +28,68 @@ class ExpanderPreferences;
 
 
 class ExpanderWindow : public BWindow {
-	public:
-		ExpanderWindow(BRect frameRect, const entry_ref *ref, BMessage *settings);
-		virtual ~ExpanderWindow();
+public:
+								ExpanderWindow(BRect frameRect,
+									const entry_ref* ref, BMessage* settings);
+	virtual						~ExpanderWindow();
 
-		virtual void FrameResized(float width, float height);
-		virtual void MessageReceived(BMessage *msg);
-		virtual bool QuitRequested();
+	virtual	void				FrameResized(float width, float height);
+	virtual	void				MessageReceived(BMessage* msg);
+	virtual	bool				QuitRequested();
 
-		void SetRef(const entry_ref *ref);
-		void RefsReceived(BMessage *msg);
+			void				SetRef(const entry_ref* ref);
+			void				RefsReceived(BMessage* msg);
 
-	private:
-		bool CanQuit();
-		// returns true if the window can be closed safely, false if not
-		void CloseWindowOrKeepOpen();
-		void OpenDestFolder();
-		void AutoListing();
-		void AutoExpand();
-		void StartExpanding();
-		void StopExpanding();
-		void _UpdateWindowSize(bool showContents);
-		void StartListing();
-		void StopListing();
-		bool ValidateDest();
+private:
+			bool				CanQuit();
+				// returns true if the window can be closed safely, false if not
+			void				CloseWindowOrKeepOpen();
+			void				OpenDestFolder();
+			void				AutoListing();
+			void				AutoExpand();
+			void				StartExpanding();
+			void				StopExpanding();
+			void				_UpdateWindowSize(bool showContents);
+			void				StartListing();
+			void				StopListing();
+			bool				ValidateDest();
 
-		BFilePanel *fSourcePanel;
-		DirectoryFilePanel *fDestPanel;
-		BMenuBar *fBar;
-		BMenu *fMenu;
-		entry_ref fSourceRef;
-		entry_ref fDestRef;
-		bool fSourceChanged;
+private:
+			BFilePanel*			fSourcePanel;
+			DirectoryFilePanel*	fDestPanel;
+			BMenuBar*			fBar;
+			BMenu*				fMenu;
+			entry_ref			fSourceRef;
+			entry_ref			fDestRef;
+			bool				fSourceChanged;
 
-		BButton *fSourceButton, *fDestButton, *fExpandButton;
-		BMenuItem *fExpandItem, *fShowItem, *fStopItem,
-			*fSourceItem, *fDestItem, *fPreferencesItem;
-		BCheckBox *fShowContents;
-		BTextControl *fSourceText, *fDestText;
-		BStringView* fStatusView;
-		BTextView *fListingText;
-		BScrollView *fListingScroll;
+			BButton*			fSourceButton;
+			BButton*			fDestButton;
+			BButton*			fExpandButton;
+			BMenuItem*			fExpandItem;
+			BMenuItem*			fShowItem;
+			BMenuItem*			fStopItem;
+			BMenuItem*			fSourceItem;
+			BMenuItem*			fDestItem;
+			BMenuItem*			fPreferencesItem;
+			BCheckBox*			fShowContents;
+			BTextControl*		fSourceText;
+			BTextControl*		fDestText;
+			BStringView*		fStatusView;
+			BTextView*			fListingText;
+			BScrollView*		fListingScroll;
 
-		ExpanderThread *fListingThread;
-		bool fListingStarted;
+			ExpanderThread*		fListingThread;
+			bool				fListingStarted;
 
-		ExpanderThread *fExpandingThread;
-		bool fExpandingStarted;
+			ExpanderThread*		fExpandingThread;
+			bool				fExpandingStarted;
 
-		BMessage fSettings;
-		ExpanderPreferences *fPreferences;
-		ExpanderRules fRules;
+			BMessage			fSettings;
+			ExpanderPreferences*	fPreferences;
+			ExpanderRules		fRules;
 
-		float	fLargestDelta;
+			float				fLargestDelta;
 };
 
 #endif /* EXPANDER_WINDOW_H */
