@@ -32,8 +32,8 @@
 #include <Errors.h>
 
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5
-//#	define B_BAD_DATA -2147483632L
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
+#	define B_BAD_DATA -2147483632L
 #else
 #	ifndef closesocket
 #		define closesocket(fd)	close(fd)
