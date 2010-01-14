@@ -13,8 +13,8 @@
 #include <OS.h>
 
 #include <vm/vm_priv.h>
-#include <vm/vm_translation_map.h>
 #include <vm/VMArea.h>
+#include <vm/VMTranslationMap.h>
 
 
 struct VMAddressSpace {
@@ -36,7 +36,7 @@ public:
 			size_t				FreeSpace() const		{ return fFreeSpace; }
 			bool				IsBeingDeleted() const	{ return fDeleting; }
 
-			vm_translation_map&	TranslationMap()	{ return fTranslationMap; }
+			VMTranslationMap*	TranslationMap()	{ return fTranslationMap; }
 
 			status_t			ReadLock()
 									{ return rw_lock_read_lock(&fLock); }
@@ -129,7 +129,7 @@ protected:
 			int32				fRefCount;
 			int32				fFaultCount;
 			int32				fChangeCount;
-			vm_translation_map	fTranslationMap;
+			VMTranslationMap*	fTranslationMap;
 			bool				fDeleting;
 	static	VMAddressSpace*		sKernelAddressSpace;
 };

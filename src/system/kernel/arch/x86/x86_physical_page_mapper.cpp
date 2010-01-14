@@ -6,15 +6,11 @@
 #include "x86_physical_page_mapper.h"
 
 
-PhysicalPageMapper* gPhysicalPageMapper;
-TranslationMapPhysicalPageMapper* gKernelPhysicalPageMapper;
-
-
 TranslationMapPhysicalPageMapper::~TranslationMapPhysicalPageMapper()
 {
 }
 
 
-PhysicalPageMapper::~PhysicalPageMapper()
+X86PhysicalPageMapper::~X86PhysicalPageMapper()
 {
 }

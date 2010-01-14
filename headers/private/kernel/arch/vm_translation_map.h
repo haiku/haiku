@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Copyright 2002-2010, The Haiku Team. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -9,27 +9,28 @@
 #define KERNEL_ARCH_VM_TRANSLATION_MAP_H
 
 
-#include <vm/vm_translation_map.h>
+#include <vm/VMTranslationMap.h>
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-status_t arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel);
-status_t arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map);
+status_t arch_vm_translation_map_create_map(bool kernel,
+	VMTranslationMap** _map);
 
-status_t arch_vm_translation_map_init(struct kernel_args *args);
+status_t arch_vm_translation_map_init(struct kernel_args *args,
+	VMPhysicalPageMapper** _physicalPageMapper);
 status_t arch_vm_translation_map_init_post_area(struct kernel_args *args);
 status_t arch_vm_translation_map_init_post_sem(struct kernel_args *args);
 
 // Quick function to map a page in regardless of map context. Used in VM
 // initialization before most vm data structures exist.
-status_t arch_vm_translation_map_early_map(struct kernel_args *args, addr_t va, addr_t pa,
-	uint8 attributes, addr_t (*get_free_page)(struct kernel_args *));
+status_t arch_vm_translation_map_early_map(struct kernel_args *args, addr_t va,
+	addr_t pa, uint8 attributes, addr_t (*get_free_page)(struct kernel_args *));
 
 bool arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
-		uint32 protection);
+	uint32 protection);
 
 #ifdef __cplusplus
 }

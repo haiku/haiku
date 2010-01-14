@@ -388,9 +388,8 @@ dump_page(int argc, char **argv)
 				addressSpace = debug_get_debugged_thread()->team->address_space;
 
 			uint32 flags = 0;
-			if (addressSpace->TranslationMap().ops->query_interrupt(
-					&addressSpace->TranslationMap(), pageAddress, &pageAddress,
-					&flags) != B_OK
+			if (addressSpace->TranslationMap()->QueryInterrupt(pageAddress,
+					&pageAddress, &flags) != B_OK
 				|| (flags & PAGE_PRESENT) == 0) {
 				kprintf("Virtual address not mapped to a physical page in this "
 					"address space.\n");
@@ -438,8 +437,7 @@ dump_page(int argc, char **argv)
 					address += B_PAGE_SIZE, pageCount--) {
 				addr_t physicalAddress;
 				uint32 flags = 0;
-				if (addressSpace->TranslationMap().ops->query_interrupt(
-						&addressSpace->TranslationMap(), address,
+				if (addressSpace->TranslationMap()->QueryInterrupt(address,
 						&physicalAddress, &flags) == B_OK
 					&& (flags & PAGE_PRESENT) != 0
 					&& physicalAddress / B_PAGE_SIZE

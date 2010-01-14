@@ -31,6 +31,7 @@
 
 #include "interrupts.h"
 #include "x86_paging.h"
+#include "X86VMTranslationMap.h"
 
 
 #define DUMP_FEATURE_STRING 1
@@ -664,7 +665,8 @@ arch_cpu_init_post_vm(kernel_args *args)
 		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	vm_translation_map_arch_info* kernelArchTranslationMap
-		= VMAddressSpace::Kernel()->TranslationMap().arch_data;
+		= static_cast<X86VMTranslationMap*>(
+			VMAddressSpace::Kernel()->TranslationMap())->ArchData();
 
 	// setup task-state segments
 	for (i = 0; i < args->num_cpus; i++) {

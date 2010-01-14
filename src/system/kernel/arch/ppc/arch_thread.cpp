@@ -181,7 +181,7 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 		if (t_from->team != t_to->team) {
 			// switching to a new address space
 			ppc_translation_map_change_asid(
-				&t_to->team->address_space->TranslationMap());
+				t_to->team->address_space->TranslationMap());
 		}
 	}
 

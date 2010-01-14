@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-void ppc_translation_map_change_asid(vm_translation_map *map);
+void ppc_translation_map_change_asid(VMTranslationMap *map);
 
 status_t ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
 	size_t size);

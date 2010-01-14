@@ -7,6 +7,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <arch/vm_translation_map.h>
 
 #include <stdlib.h>
@@ -27,6 +28,7 @@
 
 #include "x86_paging.h"
 #include "x86_physical_page_mapper.h"
+#include "X86VMTranslationMap.h"
 
 
 //#define TRACE_VM_TMAP
@@ -36,10 +38,14 @@
 #	define TRACE(x) ;
 #endif
 
+
 static page_table_entry *sPageHole = NULL;
 static page_directory_entry *sPageHolePageDir = NULL;
 static page_directory_entry *sKernelPhysicalPageDirectory = NULL;
 static page_directory_entry *sKernelVirtualPageDirectory = NULL;
+
+static X86PhysicalPageMapper* sPhysicalPageMapper;
+static TranslationMapPhysicalPageMapper* sKernelPhysicalPageMapper;
 
 
 // Accessor class to reuse the SinglyLinkedListLink of DeferredDeletable for
@@ -77,12 +83,8 @@ static spinlock sTMapListLock;
 									B_PAGE_SIZE * 1024)))
 #define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
 #define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
-#define IS_KERNEL_MAP(map)		(map->arch_data->pgdir_phys \
+#define IS_KERNEL_MAP(map)		(fArchData->pgdir_phys \
 									== sKernelPhysicalPageDirectory)
-
-static status_t early_query(addr_t va, addr_t *out_physical);
-
-static void flush_tmap(vm_translation_map *map);
 
 
 vm_translation_map_arch_info::vm_translation_map_arch_info()
@@ -173,9 +175,9 @@ put_page_table_entry_in_pgtable(page_table_entry* entry,
 
 
 void *
-i386_translation_map_get_pgdir(vm_translation_map *map)
+i386_translation_map_get_pgdir(VMTranslationMap* map)
 {
-	return map->arch_data->pgdir_phys;
+	return static_cast<X86VMTranslationMap*>(map)->PhysicalPageDir();
 }
 
 
@@ -241,21 +243,22 @@ x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
 // #pragma mark - VM ops
 
 
-static void
-destroy_tmap(vm_translation_map *map)
+X86VMTranslationMap::X86VMTranslationMap()
 {
-	if (map == NULL)
-		return;
+}
 
-	if (map->arch_data->page_mapper != NULL)
-		map->arch_data->page_mapper->Delete();
 
-	if (map->arch_data->pgdir_virt != NULL) {
+X86VMTranslationMap::~X86VMTranslationMap()
+{
+	if (fArchData->page_mapper != NULL)
+		fArchData->page_mapper->Delete();
+
+	if (fArchData->pgdir_virt != NULL) {
 		// cycle through and free all of the user space pgtables
 		for (uint32 i = VADDR_TO_PDENT(USER_BASE);
 				i <= VADDR_TO_PDENT(USER_BASE + (USER_SIZE - 1)); i++) {
-			if ((map->arch_data->pgdir_virt[i] & X86_PDE_PRESENT) != 0) {
-				addr_t address = map->arch_data->pgdir_virt[i]
+			if ((fArchData->pgdir_virt[i] & X86_PDE_PRESENT) != 0) {
+				addr_t address = fArchData->pgdir_virt[i]
 					& X86_PDE_ADDRESS_MASK;
 				vm_page* page = vm_lookup_page(address / B_PAGE_SIZE);
 				if (!page)
@@ -266,25 +269,96 @@ destroy_tmap(vm_translation_map *map)
 		}
 	}
 
-	map->arch_data->RemoveReference();
+	fArchData->RemoveReference();
+}
 
-	recursive_lock_destroy(&map->lock);
+
+status_t
+X86VMTranslationMap::Init(bool kernel)
+{
+	TRACE(("X86VMTranslationMap::Init()\n"));
+
+	fArchData = new(std::nothrow) vm_translation_map_arch_info;
+	if (fArchData == NULL)
+		return B_NO_MEMORY;
+
+	fArchData->active_on_cpus = 0;
+	fArchData->num_invalidate_pages = 0;
+	fArchData->page_mapper = NULL;
+
+	if (!kernel) {
+		// user
+		// allocate a physical page mapper
+		status_t error = sPhysicalPageMapper
+			->CreateTranslationMapPhysicalPageMapper(
+				&fArchData->page_mapper);
+		if (error != B_OK)
+			return error;
+
+		// allocate a pgdir
+		fArchData->pgdir_virt = (page_directory_entry *)memalign(
+			B_PAGE_SIZE, B_PAGE_SIZE);
+		if (fArchData->pgdir_virt == NULL) {
+			fArchData->page_mapper->Delete();
+			return B_NO_MEMORY;
+		}
+		vm_get_page_mapping(VMAddressSpace::KernelID(),
+			(addr_t)fArchData->pgdir_virt,
+			(addr_t*)&fArchData->pgdir_phys);
+	} else {
+		// kernel
+		// get the physical page mapper
+		fArchData->page_mapper = sKernelPhysicalPageMapper;
+
+		// we already know the kernel pgdir mapping
+		fArchData->pgdir_virt = sKernelVirtualPageDirectory;
+		fArchData->pgdir_phys = sKernelPhysicalPageDirectory;
+	}
+
+	// zero out the bottom portion of the new pgdir
+	memset(fArchData->pgdir_virt + FIRST_USER_PGDIR_ENT, 0,
+		NUM_USER_PGDIR_ENTS * sizeof(page_directory_entry));
+
+	// insert this new map into the map list
+	{
+		int state = disable_interrupts();
+		acquire_spinlock(&sTMapListLock);
+
+		// copy the top portion of the pgdir from the current one
+		memcpy(fArchData->pgdir_virt + FIRST_KERNEL_PGDIR_ENT,
+			sKernelVirtualPageDirectory + FIRST_KERNEL_PGDIR_ENT,
+			NUM_KERNEL_PGDIR_ENTS * sizeof(page_directory_entry));
+
+		sTMapList.Add(fArchData);
+
+		release_spinlock(&sTMapListLock);
+		restore_interrupts(state);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+X86VMTranslationMap::InitPostSem()
+{
+	return B_OK;
 }
 
 
 /*!	Acquires the map's recursive lock, and resets the invalidate pages counter
 	in case it's the first locking recursion.
 */
-static status_t
-lock_tmap(vm_translation_map *map)
+status_t
+X86VMTranslationMap::Lock()
 {
 	TRACE(("lock_tmap: map %p\n", map));
 
-	recursive_lock_lock(&map->lock);
-	if (recursive_lock_get_recursion(&map->lock) == 1) {
+	recursive_lock_lock(&fLock);
+	if (recursive_lock_get_recursion(&fLock) == 1) {
 		// we were the first one to grab the lock
 		TRACE(("clearing invalidated page count\n"));
-		map->arch_data->num_invalidate_pages = 0;
+		fArchData->num_invalidate_pages = 0;
 	}
 
 	return B_OK;
@@ -295,23 +369,23 @@ lock_tmap(vm_translation_map *map)
 	flush all pending changes of this map (ie. flush TLB caches as
 	needed).
 */
-static status_t
-unlock_tmap(vm_translation_map *map)
+status_t
+X86VMTranslationMap::Unlock()
 {
 	TRACE(("unlock_tmap: map %p\n", map));
 
-	if (recursive_lock_get_recursion(&map->lock) == 1) {
+	if (recursive_lock_get_recursion(&fLock) == 1) {
 		// we're about to release it for the last time
-		flush_tmap(map);
+		X86VMTranslationMap::Flush();
 	}
 
-	recursive_lock_unlock(&map->lock);
+	recursive_lock_unlock(&fLock);
 	return B_OK;
 }
 
 
-static size_t
-map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
+size_t
+X86VMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 {
 	// If start == 0, the actual base address is not yet known to the caller and
 	// we shall assume the worst case.
@@ -325,8 +399,8 @@ map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
 }
 
 
-static status_t
-map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
+status_t
+X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes)
 {
 	TRACE(("map_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
 
@@ -338,7 +412,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	dprintf("present bit is %d\n", pgdir[va / B_PAGE_SIZE / 1024].present);
 	dprintf("addr is %d\n", pgdir[va / B_PAGE_SIZE / 1024].addr);
 */
-	page_directory_entry* pd = map->arch_data->pgdir_virt;
+	page_directory_entry* pd = fArchData->pgdir_virt;
 
 	// check to see if a page table exists for this range
 	uint32 index = VADDR_TO_PDENT(va);
@@ -368,14 +442,14 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 			&& index < (FIRST_KERNEL_PGDIR_ENT + NUM_KERNEL_PGDIR_ENTS))
 			x86_update_all_pgdirs(index, pd[index]);
 
-		map->map_count++;
+		fMapCount++;
 	}
 
 	// now, fill in the pentry
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = map->arch_data->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	index = VADDR_TO_PTENT(va);
 
@@ -389,16 +463,16 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	// Note: We don't need to invalidate the TLB for this address, as previously
 	// the entry was not present and the TLB doesn't cache those entries.
 
-	map->map_count++;
+	fMapCount++;
 
 	return 0;
 }
 
 
-static status_t
-unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
+status_t
+X86VMTranslationMap::Unmap(addr_t start, addr_t end)
 {
-	page_directory_entry *pd = map->arch_data->pgdir_virt;
+	page_directory_entry *pd = fArchData->pgdir_virt;
 
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
@@ -419,7 +493,7 @@ restart:
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = map->arch_data->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
 		pd[index]  & X86_PDE_ADDRESS_MASK);
 
 	for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
@@ -433,19 +507,19 @@ restart:
 
 		page_table_entry oldEntry = clear_page_table_entry_flags(&pt[index],
 			X86_PTE_PRESENT);
-		map->map_count--;
+		fMapCount--;
 
 		if ((oldEntry & X86_PTE_ACCESSED) != 0) {
 			// Note, that we only need to invalidate the address, if the
 			// accessed flags was set, since only then the entry could have been
 			// in any TLB.
-			if (map->arch_data->num_invalidate_pages
+			if (fArchData->num_invalidate_pages
 					< PAGE_INVALIDATE_CACHE_SIZE) {
-				map->arch_data->pages_to_invalidate[
-					map->arch_data->num_invalidate_pages] = start;
+				fArchData->pages_to_invalidate[
+					fArchData->num_invalidate_pages] = start;
 			}
 
-			map->arch_data->num_invalidate_pages++;
+			fArchData->num_invalidate_pages++;
 		}
 	}
 
@@ -455,16 +529,15 @@ restart:
 }
 
 
-static status_t
-query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical,
-	uint32 *_flags)
+status_t
+X86VMTranslationMap::Query(addr_t va, addr_t *_physical, uint32 *_flags)
 {
 	// default the flags to not present
 	*_flags = 0;
 	*_physical = 0;
 
 	int index = VADDR_TO_PDENT(va);
-	page_directory_entry *pd = map->arch_data->pgdir_virt;
+	page_directory_entry *pd = fArchData->pgdir_virt;
 	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
 		return B_OK;
@@ -473,7 +546,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical,
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = map->arch_data->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
@@ -499,22 +572,22 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical,
 }
 
 
-static status_t
-query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
+status_t
+X86VMTranslationMap::QueryInterrupt(addr_t va, addr_t *_physical,
 	uint32 *_flags)
 {
 	*_flags = 0;
 	*_physical = 0;
 
 	int index = VADDR_TO_PDENT(va);
-	page_directory_entry* pd = map->arch_data->pgdir_virt;
+	page_directory_entry* pd = fArchData->pgdir_virt;
 	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
 		return B_OK;
 	}
 
 	// map page table entry
-	page_table_entry* pt = gPhysicalPageMapper->InterruptGetPageTableAt(
+	page_table_entry* pt = sPhysicalPageMapper->InterruptGetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
@@ -536,18 +609,17 @@ query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
 }
 
 
-static addr_t
-get_mapped_size_tmap(vm_translation_map *map)
+addr_t
+X86VMTranslationMap::MappedSize() const
 {
-	return map->map_count;
+	return fMapCount;
 }
 
 
-static status_t
-protect_tmap(vm_translation_map *map, addr_t start, addr_t end,
-	uint32 attributes)
+status_t
+X86VMTranslationMap::Protect(addr_t start, addr_t end, uint32 attributes)
 {
-	page_directory_entry *pd = map->arch_data->pgdir_virt;
+	page_directory_entry *pd = fArchData->pgdir_virt;
 
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
@@ -569,7 +641,7 @@ restart:
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = map->arch_data->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 
 	for (index = VADDR_TO_PTENT(start); index < 1024 && start < end;
@@ -597,13 +669,13 @@ restart:
 			// Note, that we only need to invalidate the address, if the
 			// accessed flags was set, since only then the entry could have been
 			// in any TLB.
-			if (map->arch_data->num_invalidate_pages
+			if (fArchData->num_invalidate_pages
 					< PAGE_INVALIDATE_CACHE_SIZE) {
-				map->arch_data->pages_to_invalidate[
-					map->arch_data->num_invalidate_pages] = start;
+				fArchData->pages_to_invalidate[
+					fArchData->num_invalidate_pages] = start;
 			}
 
-			map->arch_data->num_invalidate_pages++;
+			fArchData->num_invalidate_pages++;
 		}
 	}
 
@@ -613,11 +685,11 @@ restart:
 }
 
 
-static status_t
-clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
+status_t
+X86VMTranslationMap::ClearFlags(addr_t va, uint32 flags)
 {
 	int index = VADDR_TO_PDENT(va);
-	page_directory_entry* pd = map->arch_data->pgdir_virt;
+	page_directory_entry* pd = fArchData->pgdir_virt;
 	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
 		return B_OK;
@@ -629,7 +701,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = map->arch_data->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	index = VADDR_TO_PTENT(va);
 
@@ -640,31 +712,31 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 	pinner.Unlock();
 
 	if ((oldEntry & flagsToClear) != 0) {
-		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE) {
-			map->arch_data->pages_to_invalidate[
-				map->arch_data->num_invalidate_pages] = va;
+		if (fArchData->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE) {
+			fArchData->pages_to_invalidate[
+				fArchData->num_invalidate_pages] = va;
 		}
 
-		map->arch_data->num_invalidate_pages++;
+		fArchData->num_invalidate_pages++;
 	}
 
 	return B_OK;
 }
 
 
-static void
-flush_tmap(vm_translation_map *map)
+void
+X86VMTranslationMap::Flush()
 {
-	if (map->arch_data->num_invalidate_pages <= 0)
+	if (fArchData->num_invalidate_pages <= 0)
 		return;
 
 	struct thread* thread = thread_get_current_thread();
 	thread_pin_to_current_cpu(thread);
 
-	if (map->arch_data->num_invalidate_pages > PAGE_INVALIDATE_CACHE_SIZE) {
+	if (fArchData->num_invalidate_pages > PAGE_INVALIDATE_CACHE_SIZE) {
 		// invalidate all pages
 		TRACE(("flush_tmap: %d pages to invalidate, invalidate all\n",
-			map->arch_data->num_invalidate_pages));
+			fArchData->num_invalidate_pages));
 
 		if (IS_KERNEL_MAP(map)) {
 			arch_cpu_global_TLB_invalidate();
@@ -676,7 +748,7 @@ flush_tmap(vm_translation_map *map)
 			restore_interrupts(state);
 
 			int cpu = smp_get_current_cpu();
-			uint32 cpuMask = map->arch_data->active_on_cpus
+			uint32 cpuMask = fArchData->active_on_cpus
 				& ~((uint32)1 << cpu);
 			if (cpuMask != 0) {
 				smp_send_multicast_ici(cpuMask, SMP_MSG_USER_INVALIDATE_PAGES,
@@ -685,146 +757,58 @@ flush_tmap(vm_translation_map *map)
 		}
 	} else {
 		TRACE(("flush_tmap: %d pages to invalidate, invalidate list\n",
-			map->arch_data->num_invalidate_pages));
+			fArchData->num_invalidate_pages));
 
-		arch_cpu_invalidate_TLB_list(map->arch_data->pages_to_invalidate,
-			map->arch_data->num_invalidate_pages);
+		arch_cpu_invalidate_TLB_list(fArchData->pages_to_invalidate,
+			fArchData->num_invalidate_pages);
 
 		if (IS_KERNEL_MAP(map)) {
 			smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
-				(uint32)map->arch_data->pages_to_invalidate,
-				map->arch_data->num_invalidate_pages, 0, NULL,
+				(uint32)fArchData->pages_to_invalidate,
+				fArchData->num_invalidate_pages, 0, NULL,
 				SMP_MSG_FLAG_SYNC);
 		} else {
 			int cpu = smp_get_current_cpu();
-			uint32 cpuMask = map->arch_data->active_on_cpus
+			uint32 cpuMask = fArchData->active_on_cpus
 				& ~((uint32)1 << cpu);
 			if (cpuMask != 0) {
 				smp_send_multicast_ici(cpuMask, SMP_MSG_INVALIDATE_PAGE_LIST,
-					(uint32)map->arch_data->pages_to_invalidate,
-					map->arch_data->num_invalidate_pages, 0, NULL,
+					(uint32)fArchData->pages_to_invalidate,
+					fArchData->num_invalidate_pages, 0, NULL,
 					SMP_MSG_FLAG_SYNC);
 			}
 		}
 	}
-	map->arch_data->num_invalidate_pages = 0;
+	fArchData->num_invalidate_pages = 0;
 
 	thread_unpin_from_current_cpu(thread);
 }
-
-
-static vm_translation_map_ops tmap_ops = {
-	destroy_tmap,
-	lock_tmap,
-	unlock_tmap,
-	map_max_pages_need,
-	map_tmap,
-	unmap_tmap,
-	query_tmap,
-	query_tmap_interrupt,
-	get_mapped_size_tmap,
-	protect_tmap,
-	clear_flags_tmap,
-	flush_tmap
-
-	// The physical page ops are initialized by the respective physical page
-	// mapper.
-};
 
 
 // #pragma mark - VM API
 
 
 status_t
-arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
+arch_vm_translation_map_create_map(bool kernel, VMTranslationMap** _map)
 {
+	X86VMTranslationMap* map = new(std::nothrow) X86VMTranslationMap;
 	if (map == NULL)
-		return B_BAD_VALUE;
-
-	TRACE(("vm_translation_map_create\n"));
-
-	// initialize the new object
-	map->ops = &tmap_ops;
-	map->map_count = 0;
-
-	recursive_lock_init(&map->lock, "translation map");
-	CObjectDeleter<recursive_lock> lockDeleter(&map->lock,
-		&recursive_lock_destroy);
-
-	map->arch_data = new(std::nothrow) vm_translation_map_arch_info;
-	if (map->arch_data == NULL)
 		return B_NO_MEMORY;
-	ObjectDeleter<vm_translation_map_arch_info> archInfoDeleter(map->arch_data);
 
-	map->arch_data->active_on_cpus = 0;
-	map->arch_data->num_invalidate_pages = 0;
-	map->arch_data->page_mapper = NULL;
-
-	if (!kernel) {
-		// user
-		// allocate a physical page mapper
-		status_t error = gPhysicalPageMapper
-			->CreateTranslationMapPhysicalPageMapper(
-				&map->arch_data->page_mapper);
-		if (error != B_OK)
-			return error;
-
-		// allocate a pgdir
-		map->arch_data->pgdir_virt = (page_directory_entry *)memalign(
-			B_PAGE_SIZE, B_PAGE_SIZE);
-		if (map->arch_data->pgdir_virt == NULL) {
-			map->arch_data->page_mapper->Delete();
-			return B_NO_MEMORY;
-		}
-		vm_get_page_mapping(VMAddressSpace::KernelID(),
-			(addr_t)map->arch_data->pgdir_virt,
-			(addr_t*)&map->arch_data->pgdir_phys);
-	} else {
-		// kernel
-		// get the physical page mapper
-		map->arch_data->page_mapper = gKernelPhysicalPageMapper;
-
-		// we already know the kernel pgdir mapping
-		map->arch_data->pgdir_virt = sKernelVirtualPageDirectory;
-		map->arch_data->pgdir_phys = sKernelPhysicalPageDirectory;
+	status_t error = map->Init(kernel);
+	if (error != B_OK) {
+		delete map;
+		return error;
 	}
 
-	// zero out the bottom portion of the new pgdir
-	memset(map->arch_data->pgdir_virt + FIRST_USER_PGDIR_ENT, 0,
-		NUM_USER_PGDIR_ENTS * sizeof(page_directory_entry));
-
-	// insert this new map into the map list
-	{
-		int state = disable_interrupts();
-		acquire_spinlock(&sTMapListLock);
-
-		// copy the top portion of the pgdir from the current one
-		memcpy(map->arch_data->pgdir_virt + FIRST_KERNEL_PGDIR_ENT,
-			sKernelVirtualPageDirectory + FIRST_KERNEL_PGDIR_ENT,
-			NUM_KERNEL_PGDIR_ENTS * sizeof(page_directory_entry));
-
-		sTMapList.Add(map->arch_data);
-
-		release_spinlock(&sTMapListLock);
-		restore_interrupts(state);
-	}
-
-	archInfoDeleter.Detach();
-	lockDeleter.Detach();
-
+	*_map = map;
 	return B_OK;
 }
 
 
 status_t
-arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_vm_translation_map_init(kernel_args *args)
+arch_vm_translation_map_init(kernel_args *args,
+	VMPhysicalPageMapper** _physicalPageMapper)
 {
 	TRACE(("vm_translation_map_init: entry\n"));
 
@@ -846,8 +830,9 @@ arch_vm_translation_map_init(kernel_args *args)
 	B_INITIALIZE_SPINLOCK(&sTMapListLock);
 	new (&sTMapList) ArchTMapList;
 
-// TODO: Select the best page mapper!
-	large_memory_physical_page_ops_init(args, &tmap_ops);
+	large_memory_physical_page_ops_init(args, sPhysicalPageMapper,
+		sKernelPhysicalPageMapper);
+		// TODO: Select the best page mapper!
 
 	// enable global page feature if available
 	if (x86_check_feature(IA32_FEATURE_PGE, FEATURE_COMMON)) {
@@ -858,6 +843,7 @@ arch_vm_translation_map_init(kernel_args *args)
 
 	TRACE(("vm_translation_map_init: done\n"));
 
+	*_physicalPageMapper = sPhysicalPageMapper;
 	return B_OK;
 }
 
@@ -891,7 +877,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	if (area < B_OK)
 		return area;
 
-	error = gPhysicalPageMapper->InitPostArea(args);
+	error = sPhysicalPageMapper->InitPostArea(args);
 	if (error != B_OK)
 		return error;
 
@@ -979,12 +965,12 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 		// map the original page directory and get the entry
 		void* handle;
 		addr_t virtualPageDirectory;
-		status_t error = gPhysicalPageMapper->GetPageDebug(
+		status_t error = sPhysicalPageMapper->GetPageDebug(
 			physicalPageDirectory, &virtualPageDirectory, &handle);
 		if (error == B_OK) {
 			pageDirectoryEntry
 				= ((page_directory_entry*)virtualPageDirectory)[index];
-			gPhysicalPageMapper->PutPageDebug(virtualPageDirectory,
+			sPhysicalPageMapper->PutPageDebug(virtualPageDirectory,
 				handle);
 		} else
 			pageDirectoryEntry = 0;
@@ -997,12 +983,12 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 	if ((pageDirectoryEntry & X86_PDE_PRESENT) != 0) {
 		void* handle;
 		addr_t virtualPageTable;
-		status_t error = gPhysicalPageMapper->GetPageDebug(
+		status_t error = sPhysicalPageMapper->GetPageDebug(
 			pageDirectoryEntry & X86_PDE_ADDRESS_MASK, &virtualPageTable,
 			&handle);
 		if (error == B_OK) {
 			pageTableEntry = ((page_table_entry*)virtualPageTable)[index];
-			gPhysicalPageMapper->PutPageDebug(virtualPageTable, handle);
+			sPhysicalPageMapper->PutPageDebug(virtualPageTable, handle);
 		} else
 			pageTableEntry = 0;
 	} else

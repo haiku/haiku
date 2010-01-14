@@ -53,10 +53,10 @@
 	registers (8 - 15) map the kernel addresses, so they remain unchanged.
 
 	The range of the virtual address space a team's effective address space
-	is mapped to is defined by its vm_translation_map_arch_info::vsid_base,
+	is mapped to is defined by its PPCVMTranslationMap::fVSIDBase,
 	which is the first of the 8 successive VSID values used for the team.
 
-	Which vsid_base values are already taken is defined by the set bits in
+	Which fVSIDBase values are already taken is defined by the set bits in
 	the bitmap sVSIDBaseBitmap.
 
 
@@ -85,13 +85,13 @@
 
 #include "generic_vm_physical_page_mapper.h"
 #include "generic_vm_physical_page_ops.h"
+#include "GenericVMPhysicalPageMapper.h"
 
 
 static struct page_table_entry_group *sPageTable;
 static size_t sPageTableSize;
 static uint32 sPageTableHashMask;
 static area_id sPageTableArea;
-
 
 // 64 MB of iospace
 #define IOSPACE_SIZE (64*1024*1024)
@@ -103,6 +103,7 @@ static area_id sPageTableArea;
 
 static addr_t sIOSpaceBase;
 
+static GenericVMPhysicalPageMapper sPhysicalPageMapper;
 
 // The VSID is a 24 bit number. The lower three bits are defined by the
 // (effective) segment number, which leaves us with a 21 bit space of
@@ -112,23 +113,61 @@ static uint32 sVSIDBaseBitmap[MAX_VSID_BASES / (sizeof(uint32) * 8)];
 static spinlock sVSIDBaseBitmapLock;
 
 #define VSID_BASE_SHIFT 3
-#define VADDR_TO_VSID(map, vaddr) \
-	((map)->arch_data->vsid_base + ((vaddr) >> 28))
+#define VADDR_TO_VSID(vsidBase, vaddr) (vsidBase + ((vaddr) >> 28))
 
-// vm_translation object stuff
-typedef struct vm_translation_map_arch_info {
-	int vsid_base;	// used VSIDs are vside_base ... vsid_base + 7
-} vm_translation_map_arch_info;
+
+struct PPCVMTranslationMap : VMTranslationMap {
+								PPCVMTranslationMap();
+	virtual						~PPCVMTranslationMap();
+
+			status_t			Init(bool kernel);
+
+	inline	int					VSIDBase() const	{ return fVSIDBase; }
+
+			page_table_entry*	LookupPageTableEntry(addr_t virtualAddress);
+			bool				RemovePageTableEntry(addr_t virtualAddress);
+
+	virtual	status_t			InitPostSem();
+
+	virtual	status_t 			Lock();
+	virtual	status_t			Unlock();
+
+	virtual	addr_t				MappedSize() const;
+	virtual	size_t				MaxPagesNeededToMap(addr_t start,
+									addr_t end) const;
+
+	virtual	status_t			Map(addr_t virtualAddress,
+									addr_t physicalAddress,
+									uint32 attributes);
+	virtual	status_t			Unmap(addr_t start, addr_t end);
+
+	virtual	status_t			Query(addr_t virtualAddress,
+									addr_t* _physicalAddress,
+									uint32* _flags);
+	virtual	status_t			QueryInterrupt(addr_t virtualAddress,
+									addr_t* _physicalAddress,
+									uint32* _flags);
+
+	virtual	status_t			Protect(addr_t base, addr_t top,
+									uint32 attributes);
+	virtual	status_t			ClearFlags(addr_t virtualAddress,
+									uint32 flags);
+
+	virtual	void				Flush();
+
+protected:
+			int					fVSIDBase;
+};
 
 
 void
-ppc_translation_map_change_asid(vm_translation_map *map)
+ppc_translation_map_change_asid(VMTranslationMap *map)
 {
 // this code depends on the kernel being at 0x80000000, fix if we change that
 #if KERNEL_BASE != 0x80000000
 #error fix me
 #endif
-	int vsidBase = map->arch_data->vsid_base;
+	int vsidBase = static_cast<PPCVMTranslationMap*>(map)->VSIDBase();
 
 	isync();	// synchronize context
 	asm("mtsr	0,%0" : : "g"(vsidBase));
@@ -140,40 +179,6 @@ ppc_translation_map_change_asid(vm_translation_map *map)
 	asm("mtsr	6,%0" : : "g"(vsidBase + 6));
 	asm("mtsr	7,%0" : : "g"(vsidBase + 7));
 	isync();	// synchronize context
-}
-
-
-static status_t
-lock_tmap(vm_translation_map *map)
-{
-	recursive_lock_lock(&map->lock);
-	return 0;
-}
-
-
-static status_t
-unlock_tmap(vm_translation_map *map)
-{
-	recursive_lock_unlock(&map->lock);
-	return 0;
-}
-
-
-static void
-destroy_tmap(vm_translation_map *map)
-{
-	if (map->map_count > 0) {
-		panic("vm_translation_map.destroy_tmap: map %p has positive map count %ld\n",
-			map, map->map_count);
-	}
-
-	// mark the vsid base not in use
-	int baseBit = map->arch_data->vsid_base >> VSID_BASE_SHIFT;
-	atomic_and((vint32 *)&sVSIDBaseBitmap[baseBit / 32],
-			~(1 << (baseBit % 32)));
-
-	free(map->arch_data);
-	recursive_lock_destroy(&map->lock);
 }
 
 
@@ -207,74 +212,13 @@ fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID,
 }
 
 
-static size_t
-map_max_pages_need(vm_translation_map *map, addr_t start, addr_t end)
-{
-	return 0;
-}
-
-
-static status_t
-map_tmap(vm_translation_map *map, addr_t virtualAddress, addr_t physicalAddress, uint32 attributes)
+page_table_entry *
+PPCVMTranslationMap::LookupPageTableEntry(addr_t virtualAddress)
 {
 	// lookup the vsid based off the va
-	uint32 virtualSegmentID = VADDR_TO_VSID(map, virtualAddress);
-	uint32 protection = 0;
-
-	// ToDo: check this
-	// all kernel mappings are R/W to supervisor code
-	if (attributes & (B_READ_AREA | B_WRITE_AREA))
-		protection = (attributes & B_WRITE_AREA) ? PTE_READ_WRITE : PTE_READ_ONLY;
-
-	//dprintf("vm_translation_map.map_tmap: vsid %d, pa 0x%lx, va 0x%lx\n", vsid, pa, va);
-
-	// Search for a free page table slot using the primary hash value
-
-	uint32 hash = page_table_entry::PrimaryHash(virtualSegmentID, virtualAddress);
-	page_table_entry_group *group = &sPageTable[hash & sPageTableHashMask];
-
-	for (int i = 0; i < 8; i++) {
-		page_table_entry *entry = &group->entry[i];
-
-		if (entry->valid)
-			continue;
-
-		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress,
-			protection, false);
-		map->map_count++;
-		return B_OK;
-	}
-
-	// Didn't found one, try the secondary hash value
-
-	hash = page_table_entry::SecondaryHash(hash);
-	group = &sPageTable[hash & sPageTableHashMask];
-
-	for (int i = 0; i < 8; i++) {
-		page_table_entry *entry = &group->entry[i];
-
-		if (entry->valid)
-			continue;
-
-		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress,
-			protection, false);
-		map->map_count++;
-		return B_OK;
-	}
-
-	panic("vm_translation_map.map_tmap: hash table full\n");
-	return B_ERROR;
-}
-
-
-static page_table_entry *
-lookup_page_table_entry(vm_translation_map *map, addr_t virtualAddress)
-{
-	// lookup the vsid based off the va
-	uint32 virtualSegmentID = VADDR_TO_VSID(map, virtualAddress);
+	uint32 virtualSegmentID = VADDR_TO_VSID(fVSIDBase, virtualAddress);
 
 //	dprintf("vm_translation_map.lookup_page_table_entry: vsid %ld, va 0x%lx\n", virtualSegmentID, virtualAddress);
-
 
 	// Search for the page table entry using the primary hash value
 
@@ -308,10 +252,10 @@ lookup_page_table_entry(vm_translation_map *map, addr_t virtualAddress)
 }
 
 
-static bool
-remove_page_table_entry(vm_translation_map *map, addr_t virtualAddress)
+bool
+PPCVMTranslationMap::RemovePageTableEntry(addr_t virtualAddress)
 {
-	page_table_entry *entry = lookup_page_table_entry(map, virtualAddress);
+	page_table_entry *entry = LookupPageTableEntry(virtualAddress);
 	if (entry) {
 		entry->valid = 0;
 		ppc_sync();
@@ -326,7 +270,168 @@ remove_page_table_entry(vm_translation_map *map, addr_t virtualAddress)
 
 
 static status_t
-unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
+map_iospace_chunk(addr_t va, addr_t pa, uint32 flags)
+{
+	pa &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
+	va &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
+	if (va < sIOSpaceBase || va >= (sIOSpaceBase + IOSPACE_SIZE))
+		panic("map_iospace_chunk: passed invalid va 0x%lx\n", va);
+
+	// map the pages
+	return ppc_map_address_range(va, pa, IOSPACE_CHUNK_SIZE);
+}
+
+
+// #pragma mark -
+
+
+PPCVMTranslationMap::PPCVMTranslationMap()
+{
+}
+
+
+PPCVMTranslationMap::~PPCVMTranslationMap()
+{
+	if (fMapCount > 0) {
+		panic("vm_translation_map.destroy_tmap: map %p has positive map count %ld\n",
+			this, fMapCount);
+	}
+
+	// mark the vsid base not in use
+	int baseBit = fVSIDBase >> VSID_BASE_SHIFT;
+	atomic_and((vint32 *)&sVSIDBaseBitmap[baseBit / 32],
+			~(1 << (baseBit % 32)));
+}
+
+
+status_t
+PPCVMTranslationMap::Init(bool kernel)
+{
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&sVSIDBaseBitmapLock);
+
+	// allocate a VSID base for this one
+	if (kernel) {
+		// The boot loader has set up the segment registers for identical
+		// mapping. Two VSID bases are reserved for the kernel: 0 and 8. The
+		// latter one for mapping the kernel address space (0x80000000...), the
+		// former one for the lower addresses required by the Open Firmware
+		// services.
+		fVSIDBase = 0;
+		sVSIDBaseBitmap[0] |= 0x3;
+	} else {
+		int i = 0;
+
+		while (i < MAX_VSID_BASES) {
+			if (sVSIDBaseBitmap[i / 32] == 0xffffffff) {
+				i += 32;
+				continue;
+			}
+			if ((sVSIDBaseBitmap[i / 32] & (1 << (i % 32))) == 0) {
+				// we found it
+				sVSIDBaseBitmap[i / 32] |= 1 << (i % 32);
+				break;
+			}
+			i++;
+		}
+		if (i >= MAX_VSID_BASES)
+			panic("vm_translation_map_create: out of VSID bases\n");
+		fVSIDBase = i << VSID_BASE_SHIFT;
+	}
+
+	release_spinlock(&sVSIDBaseBitmapLock);
+	restore_interrupts(state);
+
+	return B_OK;
+}
+
+
+status_t
+PPCVMTranslationMap::InitPostSem()
+{
+	return B_OK;
+}
+
+
+status_t
+PPCVMTranslationMap::Lock()
+{
+	recursive_lock_lock(&fLock);
+	return 0;
+}
+
+
+status_t
+PPCVMTranslationMap::Unlock()
+{
+	recursive_lock_unlock(&fLock);
+	return 0;
+}
+
+
+size_t
+PPCVMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
+{
+	return 0;
+}
+
+
+status_t
+PPCVMTranslationMap::Map(addr_t virtualAddress, addr_t physicalAddress,
+	uint32 attributes)
+{
+	// lookup the vsid based off the va
+	uint32 virtualSegmentID = VADDR_TO_VSID(fVSIDBase, virtualAddress);
+	uint32 protection = 0;
+
+	// ToDo: check this
+	// all kernel mappings are R/W to supervisor code
+	if (attributes & (B_READ_AREA | B_WRITE_AREA))
+		protection = (attributes & B_WRITE_AREA) ? PTE_READ_WRITE : PTE_READ_ONLY;
+
+	//dprintf("vm_translation_map.map_tmap: vsid %d, pa 0x%lx, va 0x%lx\n", vsid, pa, va);
+
+	// Search for a free page table slot using the primary hash value
+
+	uint32 hash = page_table_entry::PrimaryHash(virtualSegmentID, virtualAddress);
+	page_table_entry_group *group = &sPageTable[hash & sPageTableHashMask];
+
+	for (int i = 0; i < 8; i++) {
+		page_table_entry *entry = &group->entry[i];
+
+		if (entry->valid)
+			continue;
+
+		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress,
+			protection, false);
+		fMapCount++;
+		return B_OK;
+	}
+
+	// Didn't found one, try the secondary hash value
+
+	hash = page_table_entry::SecondaryHash(hash);
+	group = &sPageTable[hash & sPageTableHashMask];
+
+	for (int i = 0; i < 8; i++) {
+		page_table_entry *entry = &group->entry[i];
+
+		if (entry->valid)
+			continue;
+
+		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress,
+			protection, false);
+		fMapCount++;
+		return B_OK;
+	}
+
+	panic("vm_translation_map.map_tmap: hash table full\n");
+	return B_ERROR;
+}
+
+
+status_t
+PPCVMTranslationMap::Unmap(addr_t start, addr_t end)
 {
 	page_table_entry *entry;
 
@@ -336,8 +441,8 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 //	dprintf("vm_translation_map.unmap_tmap: start 0x%lx, end 0x%lx\n", start, end);
 
 	while (start < end) {
-		if (remove_page_table_entry(map, start))
-			map->map_count--;
+		if (RemovePageTableEntry(start))
+			fMapCount--;
 
 		start += B_PAGE_SIZE;
 	}
@@ -346,8 +451,8 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 }
 
 
-static status_t
-query_tmap(vm_translation_map *map, addr_t va, addr_t *_outPhysical, uint32 *_outFlags)
+status_t
+PPCVMTranslationMap::Query(addr_t va, addr_t *_outPhysical, uint32 *_outFlags)
 {
 	page_table_entry *entry;
 
@@ -355,7 +460,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_outPhysical, uint32 *_ou
 	*_outFlags = 0;
 	*_outPhysical = 0;
 
-	entry = lookup_page_table_entry(map, va);
+	entry = LookupPageTableEntry(va);
 	if (entry == NULL)
 		return B_NO_ERROR;
 
@@ -375,38 +480,25 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_outPhysical, uint32 *_ou
 }
 
 
-static status_t
-map_iospace_chunk(addr_t va, addr_t pa, uint32 flags)
+addr_t
+PPCVMTranslationMap::MappedSize() const
 {
-	pa &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
-	va &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
-	if (va < sIOSpaceBase || va >= (sIOSpaceBase + IOSPACE_SIZE))
-		panic("map_iospace_chunk: passed invalid va 0x%lx\n", va);
-
-	// map the pages
-	return ppc_map_address_range(va, pa, IOSPACE_CHUNK_SIZE);
+	return fMapCount;
 }
 
 
-static addr_t
-get_mapped_size_tmap(vm_translation_map *map)
-{
-	return map->map_count;
-}
-
-
-static status_t
-protect_tmap(vm_translation_map *map, addr_t base, addr_t top, uint32 attributes)
+status_t
+PPCVMTranslationMap::Protect(addr_t base, addr_t top, uint32 attributes)
 {
 	// XXX finish
 	return B_ERROR;
 }
 
 
-static status_t
-clear_flags_tmap(vm_translation_map *map, addr_t virtualAddress, uint32 flags)
+status_t
+PPCVMTranslationMap::ClearFlags(addr_t virtualAddress, uint32 flags)
 {
-	page_table_entry *entry = lookup_page_table_entry(map, virtualAddress);
+	page_table_entry *entry = LookupPageTableEntry(virtualAddress);
 	if (entry == NULL)
 		return B_NO_ERROR;
 
@@ -434,8 +526,8 @@ clear_flags_tmap(vm_translation_map *map, addr_t virtualAddress, uint32 flags)
 }
 
 
-static void
-flush_tmap(vm_translation_map *map)
+void
+PPCVMTranslationMap::Flush()
 {
 // TODO: arch_cpu_global_TLB_invalidate() is extremely expensive and doesn't
 // even cut it here. We are supposed to invalidate all TLB entries for this
@@ -460,103 +552,31 @@ put_physical_page_tmap(addr_t virtualAddress, void *handle)
 }
 
 
-static vm_translation_map_ops tmap_ops = {
-	destroy_tmap,
-	lock_tmap,
-	unlock_tmap,
-	map_max_pages_need,
-	map_tmap,
-	unmap_tmap,
-	query_tmap,
-	query_tmap,
-	get_mapped_size_tmap,
-	protect_tmap,
-	clear_flags_tmap,
-	flush_tmap,
-	get_physical_page_tmap,
-	put_physical_page_tmap,
-	get_physical_page_tmap,	// *_current_cpu()
-	put_physical_page_tmap,	// *_current_cpu()
-	get_physical_page_tmap,	// *_debug()
-	put_physical_page_tmap,	// *_debug()
-		// TODO: Replace the *_current_cpu() and *_debug() versions!
-
-	generic_vm_memset_physical,
-	generic_vm_memcpy_from_physical,
-	generic_vm_memcpy_to_physical,
-	generic_vm_memcpy_physical_page
-		// TODO: Verify that this is safe to use!
-};
-
-
 //  #pragma mark -
 //  VM API
 
 
 status_t
-arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
+arch_vm_translation_map_create_map(bool kernel, VMTranslationMap** _map)
 {
-	// initialize the new object
-	map->ops = &tmap_ops;
-	map->map_count = 0;
-
-	recursive_lock_init(&map->lock, "translation map");
-
-	map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
-	if (map->arch_data == NULL) {
-		if (!kernel)
-			recursive_lock_destroy(&map->lock);
+	PPCVMTranslationMap* map = new(std::nothrow) PPCVMTranslationMap;
+	if (map == NULL)
 		return B_NO_MEMORY;
+
+	status_t error = map->Init(kernel);
+	if (error != B_OK) {
+		delete map;
+		return error;
 	}
 
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sVSIDBaseBitmapLock);
-
-	// allocate a VSID base for this one
-	if (kernel) {
-		// The boot loader has set up the segment registers for identical
-		// mapping. Two VSID bases are reserved for the kernel: 0 and 8. The
-		// latter one for mapping the kernel address space (0x80000000...), the
-		// former one for the lower addresses required by the Open Firmware
-		// services.
-		map->arch_data->vsid_base = 0;
-		sVSIDBaseBitmap[0] |= 0x3;
-	} else {
-		int i = 0;
-
-		while (i < MAX_VSID_BASES) {
-			if (sVSIDBaseBitmap[i / 32] == 0xffffffff) {
-				i += 32;
-				continue;
-			}
-			if ((sVSIDBaseBitmap[i / 32] & (1 << (i % 32))) == 0) {
-				// we found it
-				sVSIDBaseBitmap[i / 32] |= 1 << (i % 32);
-				break;
-			}
-			i++;
-		}
-		if (i >= MAX_VSID_BASES)
-			panic("vm_translation_map_create: out of VSID bases\n");
-		map->arch_data->vsid_base = i << VSID_BASE_SHIFT;
-	}
-
-	release_spinlock(&sVSIDBaseBitmapLock);
-	restore_interrupts(state);
-
+	*_map = map;
 	return B_OK;
 }
 
 
 status_t
-arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
-{
-	return B_OK;
-}
-
-
-status_t
-arch_vm_translation_map_init(kernel_args *args)
+arch_vm_translation_map_init(kernel_args *args,
+	VMPhysicalPageMapper** _physicalPageMapper)
 {
 	sPageTable = (page_table_entry_group *)args->arch_args.page_table.start;
 	sPageTableSize = args->arch_args.page_table.size;
@@ -568,6 +588,9 @@ arch_vm_translation_map_init(kernel_args *args)
 	if (error != B_OK)
 		return error;
 
+	new(&sPhysicalPageMapper) GenericVMPhysicalPageMapper;
+
+	*_physicalPageMapper = &sPhysicalPageMapper;
 	return B_OK;
 }
 
@@ -682,12 +705,13 @@ ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
 	physicalAddress = ROUNDDOWN(physicalAddress, B_PAGE_SIZE);
 
 	VMAddressSpace *addressSpace = VMAddressSpace::Kernel();
+	PPCVMTranslationMap* map = static_cast<PPCVMTranslationMap*>(
+		addressSpace->TranslationMap());
 
 	// map the pages
 	for (; virtualAddress < virtualEnd;
 		 virtualAddress += B_PAGE_SIZE, physicalAddress += B_PAGE_SIZE) {
-		status_t error = map_tmap(&addressSpace->TranslationMap(),
-			virtualAddress, physicalAddress,
+		status_t error = map->Map(virtualAddress, physicalAddress,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (error != B_OK)
 			return error;
@@ -705,9 +729,10 @@ ppc_unmap_address_range(addr_t virtualAddress, size_t size)
 
 	VMAddressSpace *addressSpace = VMAddressSpace::Kernel();
 
+	PPCVMTranslationMap* map = static_cast<PPCVMTranslationMap*>(
+		addressSpace->TranslationMap());
 	for (0; virtualAddress < virtualEnd; virtualAddress += B_PAGE_SIZE)
-		remove_page_table_entry(&addressSpace->TranslationMap(),
-			virtualAddress);
+		map->RemovePageTableEntry(virtualAddress);
 }
 
 
@@ -727,8 +752,9 @@ ppc_remap_address_range(addr_t *_virtualAddress, size_t size, bool unmap)
 		return error;
 
 	// get the area's first physical page
-	page_table_entry *entry = lookup_page_table_entry(
-		&addressSpace->TranslationMap(), virtualAddress);
+	PPCVMTranslationMap* map = static_cast<PPCVMTranslationMap*>(
+		addressSpace->TranslationMap());
+	page_table_entry *entry = map->LookupPageTableEntry(virtualAddress);
 	if (!entry)
 		return B_ERROR;
 	addr_t physicalBase = entry->physical_page_number << 12;

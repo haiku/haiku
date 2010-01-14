@@ -29,7 +29,7 @@
 #include <thread.h>
 #include <tracing.h>
 #include <vm/vm.h>
-#include <vm/vm_translation_map.h>
+#include <vm/VMTranslationMap.h>
 
 #include <arch/debug_console.h>
 #include <arch/debug.h>

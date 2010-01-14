@@ -6,6 +6,8 @@
 #define _KERNEL_ARCH_X86_PHYSICAL_PAGE_MAPPER_H
 
 
+#include <vm/VMTranslationMap.h>
+
 #include "x86_paging.h"
 
 
@@ -24,9 +26,9 @@ public:
 };
 
 
-class PhysicalPageMapper {
+class X86PhysicalPageMapper : public VMPhysicalPageMapper {
 public:
-	virtual						~PhysicalPageMapper();
+	virtual						~X86PhysicalPageMapper();
 
 	virtual	status_t			InitPostArea(kernel_args* args) = 0;
 
@@ -36,20 +38,12 @@ public:
 
 	virtual	page_table_entry*	InterruptGetPageTableAt(
 									addr_t physicalAddress) = 0;
-
-	virtual	status_t			GetPageDebug(addr_t physicalAddress,
-									addr_t* _virtualAddress,
-									void** _handle) = 0;
-	virtual	status_t			PutPageDebug(addr_t virtualAddress,
-									void* _handle) = 0;
 };
-
-extern PhysicalPageMapper* gPhysicalPageMapper;
-extern TranslationMapPhysicalPageMapper* gKernelPhysicalPageMapper;
 
 
 status_t large_memory_physical_page_ops_init(kernel_args* args,
-	vm_translation_map_ops* ops);
+	X86PhysicalPageMapper*& _pageMapper,
+	TranslationMapPhysicalPageMapper*& _kernelPageMapper);
 
 
 #endif	// _KERNEL_ARCH_X86_PHYSICAL_PAGE_MAPPER_H

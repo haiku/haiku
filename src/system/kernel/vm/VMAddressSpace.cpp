@@ -102,7 +102,7 @@ VMAddressSpace::~VMAddressSpace()
 
 	WriteLock();
 
-	fTranslationMap.ops->destroy(&fTranslationMap);
+	delete fTranslationMap;
 
 	rw_lock_destroy(&fLock);
 }
@@ -139,8 +139,7 @@ VMAddressSpace::Init()
 /*static*/ status_t
 VMAddressSpace::InitPostSem()
 {
-	status_t status = arch_vm_translation_map_init_kernel_map_post_sem(
-		&sKernelAddressSpace->fTranslationMap);
+	status_t status = sKernelAddressSpace->fTranslationMap->InitPostSem();
 	if (status != B_OK)
 		return status;
 
@@ -181,7 +180,7 @@ VMAddressSpace::Dump() const
 	kprintf("id: %" B_PRId32 "\n", fID);
 	kprintf("ref_count: %" B_PRId32 "\n", fRefCount);
 	kprintf("fault_count: %" B_PRId32 "\n", fFaultCount);
-	kprintf("translation_map: %p\n", &fTranslationMap);
+	kprintf("translation_map: %p\n", fTranslationMap);
 	kprintf("base: %#" B_PRIxADDR "\n", fBase);
 	kprintf("end: %#" B_PRIxADDR "\n", fEndAddress);
 	kprintf("change_count: %" B_PRId32 "\n", fChangeCount);
@@ -207,9 +206,9 @@ VMAddressSpace::Create(team_id teamID, addr_t base, size_t size, bool kernel,
 	TRACE(("vm_create_aspace: team %ld (%skernel): %#lx bytes starting at "
 		"%#lx => %p\n", id, kernel ? "!" : "", size, base, addressSpace));
 
-	// initialize the corresponding translation map
-	status = arch_vm_translation_map_init_map(
-		&addressSpace->fTranslationMap, kernel);
+	// create the corresponding translation map
+	status = arch_vm_translation_map_create_map(kernel,
+		&addressSpace->fTranslationMap);
 	if (status != B_OK) {
 		delete addressSpace;
 		return status;
