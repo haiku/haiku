@@ -17,10 +17,12 @@
 #
 # This script should be sourced by bash, either from /etc/profile
 # (in /etc/profile.d/) or your own .bashrc or .profile
+# after exporting DEVROOT optionally to point to the projects folder.
 # 
 # setup:
 # - edit DRLIST below to include your own possible devroots
 # (ie. where you have subfolders for your own projects)
+# or export DEVROOT before sourcing dev-perso.
 # - optionally edit PWLIST below to where you possibly have a
 # PASSWDS/ folder with passwords stored as plain text.
 # (not really a good idea though :) It's exported
@@ -51,15 +53,19 @@
 
 
 # automagically find them on different machines...
-DRLIST="$HOME/devel /Data /work /Volumes/Data/devel"
+if [ -z "$DEVROOT" ]; then
+	DRLIST="$HOME/devel /Data /work /Volumes/Data/devel"
+	for d in $DRLIST; do
+		test -d $d && DEVROOT=$d && break;
+	done
+fi
+export DEVROOT
+
+# automagically find password files
 PWLIST="/Data /fat32 $HOME"
-for d in $DRLIST; do
-	test -d $d && DEVROOT=$d && break;
-done
 for d in $PWLIST; do
 	test -d $d/PASSWDS && PASSWDS=$d/PASSWDS && break;
 done
-export DEVROOT
 export PASSWDS
 
 # svn sometimes forgets about vi and wants me to use nano...
@@ -73,9 +79,15 @@ function dev() {
 	fi
 	if [ "x$1" = "x--help" ]; then
 		echo "setup project-specific development environment"
-		echo "usage: dev [project]"
+		echo "usage: dev [-n] [project]"
 		echo "running without argument lists available projects"
+		echo "-n projname initializes a new project"
 		return 1
+	fi
+	if [ "x$1" = "x-n" -a -n "$2" ]; then
+		shift
+		mkdir "$DEVROOT/$1" && touch "$DEVROOT/$1/.profile"
+		# fallback
 	fi
 	if [ ! -d "$DEVROOT/$1" ]; then
 		echo "invalid project name '$1'"
