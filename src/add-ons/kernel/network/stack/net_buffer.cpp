@@ -1,11 +1,12 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
+
 
 #include "utility.h"
 
@@ -1028,7 +1029,6 @@ copy_metadata(net_buffer* destination, const net_buffer* source)
 	destination->flags = source->flags;
 	destination->interface = source->interface;
 	destination->offset = source->offset;
-	destination->size = source->size;
 	destination->protocol = source->protocol;
 	destination->type = source->type;
 }
@@ -1151,6 +1151,7 @@ duplicate_buffer(net_buffer* _buffer)
 
 	copy_metadata(duplicate, buffer);
 
+	ASSERT(duplicate->size == buffer->size);
 	CHECK_BUFFER(buffer);
 	CHECK_BUFFER(duplicate);
 	RUN_PARANOIA_CHECKS(duplicate);
@@ -1189,6 +1190,7 @@ clone_buffer(net_buffer* _buffer, bool shareFreeSpace)
 	}
 
 	copy_metadata(clone, buffer);
+	ASSERT(clone->size == buffer->size);
 
 	return clone;
 
@@ -1259,6 +1261,7 @@ clone_buffer(net_buffer* _buffer, bool shareFreeSpace)
 
 	copy_metadata(clone, buffer);
 
+	ASSERT(clone->size == buffer->size);
 	CREATE_PARANOIA_CHECK_SET(clone, "net_buffer");
 	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, clone, &clone->size,
 		sizeof(clone->size));
@@ -1363,6 +1366,7 @@ merge_buffer(net_buffer* _buffer, net_buffer* _with, bool after)
 			// The node is already in the buffer, we can just move it
 			// over to the new owner
 			list_remove_item(&with->buffers, node);
+			with->size -= node->used;
 		} else {
 			// we need a new place for this node
 			data_node* newNode = add_data_node(buffer, node->header);
