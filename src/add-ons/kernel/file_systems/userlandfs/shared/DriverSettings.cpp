@@ -121,7 +121,7 @@ public:
 
 	virtual Delegate* Clone() const
 	{
-		return new(nothrow) Iterator(fParameters, fCount);
+		return new(std::nothrow) Iterator(fParameters, fCount);
 	}
 
 	virtual bool HasNext() const
@@ -166,7 +166,7 @@ public:
 
 	virtual Delegate* Clone() const
 	{
-		return new(nothrow) NameIterator(fParameters, fCount,
+		return new(std::nothrow) NameIterator(fParameters, fCount,
 			fName.GetString());
 	}
 
@@ -276,7 +276,7 @@ DriverParameterContainer::GetParameterIterator() const
 {
 	int32 count;
 	if (const driver_parameter* parameters = GetParametersAndCount(&count)) {
-		if (Iterator* iterator = new(nothrow) Iterator(parameters, count))
+		if (Iterator* iterator = new(std::nothrow) Iterator(parameters, count))
 			return DriverParameterIterator(iterator);
 	}
 	return DriverParameterIterator();
@@ -288,7 +288,7 @@ DriverParameterContainer::GetParameterIterator(const char* name) const
 {
 	int32 count;
 	if (const driver_parameter* parameters = GetParametersAndCount(&count)) {
-		NameIterator* iterator = new(nothrow) NameIterator(parameters, count,
+		NameIterator* iterator = new(std::nothrow) NameIterator(parameters, count,
 			name);
 		if (iterator)
 			return DriverParameterIterator(iterator);
