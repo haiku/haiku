@@ -1,17 +1,17 @@
 // HashMap.h
-// 
+//
 // Copyright (c) 2004-2007, Ingo Weinhold (bonefish@cs.tu-berlin.de)
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation 
+// to deal in the Software without restriction, including without limitation
 // the rights to use, copy, modify, merge, publish, distribute, sublicense,
 // and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
+//
 // Except as contained in this notice, the name of a copyright holder shall
 // not be used in advertising or otherwise to promote the sale, use or other
 // dealings in this Software without prior written authorization of the
@@ -88,18 +88,19 @@ public:
 		typedef HashMapElement<Key, Value>	Element;
 	public:
 		Iterator(const Iterator& other)
-			: fMap(other.fMap),
-			  fIndex(other.fIndex),
-			  fElement(other.fElement),
-			  fLastElement(other.fElement)
+			:
+			fMap(other.fMap),
+			fIndex(other.fIndex),
+			fElement(other.fElement),
+			fLastElement(other.fElement)
 		{
 		}
-	
+
 		bool HasNext() const
 		{
 			return fElement;
 		}
-	
+
 		Entry Next()
 		{
 			if (!fElement)
@@ -113,7 +114,7 @@ public:
 		{
 			if (fElement == NULL)
 				return NULL;
-			
+
 			Value* value = &fElement->fValue;
 			_FindNext();
 			return value;
@@ -128,7 +129,7 @@ public:
 			fLastElement = NULL;
 			return result;
 		}
-	
+
 		Iterator& operator=(const Iterator& other)
 		{
 			fMap = other.fMap;
@@ -137,18 +138,19 @@ public:
 			fLastElement = other.fLastElement;
 			return *this;
 		}
-	
+
 	private:
 		Iterator(const HashMap<Key, Value>* map)
-			: fMap(const_cast<HashMap<Key, Value>*>(map)),
-			  fIndex(0),
-			  fElement(NULL),
-			  fLastElement(NULL)
+			:
+			fMap(const_cast<HashMap<Key, Value>*>(map)),
+			fIndex(0),
+			fElement(NULL),
+			fLastElement(NULL)
 		{
 			// find first
 			_FindNext();
 		}
-	
+
 		void _FindNext()
 		{
 			fLastElement = fElement;
@@ -161,10 +163,10 @@ public:
 			for (; !fElement && fIndex < arraySize; fIndex++)
 				fElement = fMap->fTable.FindFirst(fIndex);
 		}
-	
+
 	private:
 		friend class HashMap<Key, Value>;
-	
+
 		HashMap<Key, Value>*	fMap;
 		int32					fIndex;
 		Element*				fElement;
@@ -345,8 +347,9 @@ struct HashKey64 {
 // constructor
 template<typename Key, typename Value>
 HashMap<Key, Value>::HashMap()
-	: fElementArray(1000),
-	  fTable(1000, &fElementArray)
+	:
+	fElementArray(1000),
+	fTable(1000, &fElementArray)
 {
 }
 
@@ -376,7 +379,7 @@ HashMap<Key, Value>::Put(const Key& key, Value value)
 		element->fValue = value;
 		return B_OK;
 	}
-	// does not contain the key yet: add an element	
+	// does not contain the key yet: add an element
 	element = fTable.Add(key.GetHashCode());
 	if (!element)
 		return B_NO_MEMORY;
@@ -471,5 +474,8 @@ HashMap<Key, Value>::_FindElement(const Key& key) const
 }	// namespace BPrivate
 
 using BPrivate::HashMap;
+using BPrivate::HashKey32;
+using BPrivate::HashKey64;
+using BPrivate::SynchronizedHashMap;
 
 #endif	// HASH_MAP_H
