@@ -237,9 +237,6 @@ TTracker::QuitRequested()
 	gStatusWindow->AttemptToQuit();
 		// try quitting the copy/move/empty trash threads
 
-	BVolume bootVolume;
-	DEBUG_ONLY(status_t err =) BVolumeRoster().GetBootVolume(&bootVolume);
-	ASSERT(err == B_OK);
 	BMessage message;
 	AutoLock<WindowList> lock(&fWindowList);
 	// save open windows in a message inside an attribute of the desktop
@@ -294,7 +291,7 @@ TTracker::QuitRequested()
 
 	// write windows to open on disk
 	BDirectory deskDir;
-	if (!BootedInSafeMode() && FSGetDeskDir(&deskDir, bootVolume.Device()) == B_OK) {
+	if (!BootedInSafeMode() && FSGetDeskDir(&deskDir) == B_OK) {
 		// if message is empty, delete the corresponding attribute
 		if (message.CountNames(B_ANY_TYPE)) {
 			size_t size = (size_t)message.FlattenedSize();
@@ -1189,11 +1186,9 @@ TTracker::_OpenPreviouslyOpenedWindows(const char* pathFilter)
 	if (pathFilter != NULL)
 		filterLength = strlen(pathFilter);
 
-	BVolume	bootVolume;
-	BVolumeRoster().GetBootVolume(&bootVolume);
 	BDirectory deskDir;
 	attr_info attrInfo;
-	if (FSGetDeskDir(&deskDir, bootVolume.Device()) != B_OK
+	if (FSGetDeskDir(&deskDir) != B_OK
 		|| deskDir.GetAttrInfo(kAttrOpenWindows, &attrInfo) != B_OK)
 		return;
 
@@ -1279,10 +1274,8 @@ TTracker::ReadyToRun()
 
 	// open desktop window
 	BContainerWindow *deskWindow = NULL;
-	BVolume	bootVolume;
-	BVolumeRoster().GetBootVolume(&bootVolume);
 	BDirectory deskDir;
-	if (FSGetDeskDir(&deskDir, bootVolume.Device()) == B_OK) {
+	if (FSGetDeskDir(&deskDir) == B_OK) {
 		// create desktop
 		BEntry entry;
 		deskDir.GetEntry(&entry);

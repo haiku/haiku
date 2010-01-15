@@ -1881,7 +1881,8 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry, const BDirectory *destDir,
 		}
 	}
 
-	if (FSIsTrashDir(sourceEntry)) {
+	if (FSIsTrashDir(sourceEntry) && moveMode != kCreateLink 
+		&& moveMode != kCreateRelativeLink) {
 		(new BAlert("", "You can't move or copy the trash.",
 			"OK", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 		return B_ERROR;
@@ -2291,15 +2292,10 @@ FSGetTrashDir(BDirectory *trash_dir, dev_t dev)
 
 
 status_t
-FSGetDeskDir(BDirectory *deskDir, dev_t dev)
+FSGetDeskDir(BDirectory *deskDir)
 {
-	BVolume volume(dev);
-	status_t result = volume.InitCheck();
-	if (result != B_OK)
-		return result;
-
 	BPath path;
-	result = find_directory(B_DESKTOP_DIRECTORY, &path, true, &volume);
+	status_t result = find_directory(B_DESKTOP_DIRECTORY, &path, true);
 	if (result != B_OK)
 		return result;
 
@@ -2383,7 +2379,7 @@ FSIsTrashDir(const BEntry *entry)
 
 
 bool
-FSIsDeskDir(const BEntry *entry, dev_t device)
+FSIsDeskDir(const BEntry *entry)
 {
 	BPath path;
 	status_t result = find_directory(B_DESKTOP_DIRECTORY, &path, true);
@@ -2392,17 +2388,6 @@ FSIsDeskDir(const BEntry *entry, dev_t device)
 
 	BEntry entryToCompare(path.Path());
 	return entryToCompare == *entry;
-}
-
-
-bool
-FSIsDeskDir(const BEntry *entry)
-{
-	entry_ref ref;
-	if (entry->GetRef(&ref) != B_OK)
-		return false;
-
-	return FSIsDeskDir(entry, ref.device);
 }
 
 
@@ -2778,9 +2763,6 @@ FSCreateTrashDirs()
 			continue;
 
 		BPath path;
-		// TODO: relocate Trash directory such that a Desktop dir on
-		// every volume is no longer needed
-		find_directory(B_DESKTOP_DIRECTORY, &path, true, &volume);
 		find_directory(B_TRASH_DIRECTORY, &path, true, &volume);
 
 		BDirectory trashDir;

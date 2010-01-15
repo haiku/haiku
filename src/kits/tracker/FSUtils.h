@@ -190,7 +190,7 @@ _IMPEXP_TRACKER status_t FSCreateNewFolderIn(const node_ref *destDir, entry_ref 
 	node_ref *new_node);
 _IMPEXP_TRACKER void FSCreateTrashDirs();
 _IMPEXP_TRACKER status_t FSGetTrashDir(BDirectory *trashDir, dev_t volume);
-_IMPEXP_TRACKER status_t FSGetDeskDir(BDirectory *deskDir, dev_t volume);
+_IMPEXP_TRACKER status_t FSGetDeskDir(BDirectory *deskDir);
 _IMPEXP_TRACKER status_t FSRecursiveCalcSize(BInfoWindow *, BDirectory *,
 	off_t *runningSize, int32 *fileCount, int32 *dirCount);
 
@@ -233,7 +233,7 @@ status_t LaunchBrokenLink(const char *, const BMessage *);
 
 status_t FSFindTrackerSettingsDir(BPath *, bool autoCreate = true);
 
-bool FSIsDeskDir(const BEntry *, dev_t);
+bool FSIsDeskDir(const BEntry *);
 
 bool ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 	bool dontAsk = false, int32 *confirmedAlready = NULL);

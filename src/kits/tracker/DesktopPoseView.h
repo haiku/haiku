@@ -58,6 +58,7 @@ public:
 	void StopSettingsWatch();
 	
 	virtual bool AddPosesThreadValid(const entry_ref *) const;	
+	virtual void AddPosesCompleted();
 		
 protected:
 	virtual EntryListBase *InitDirentIterator(const entry_ref *);
@@ -77,11 +78,8 @@ private:
 
 	friend bool ShouldShowDesktopPose(dev_t device, const Model *,
 		const PoseInfo *);
-};
-
-class DesktopEntryListCollection : public CachedEntryIteratorList {
-public:
-	DesktopEntryListCollection();
+	
+	void AddTrashPose();
 };
 
 

@@ -1156,7 +1156,7 @@ Model::WriteAttr(const char *attr, type_code type, off_t offset,
 
 
 ssize_t 
-Model::WriteAttrKillForegin(const char *attr, const char *foreignAttr,
+Model::WriteAttrKillForeign(const char *attr, const char *foreignAttr,
 	type_code type, off_t offset, const void *buffer, size_t length)
 {
 	BModelWriteOpener opener(this);

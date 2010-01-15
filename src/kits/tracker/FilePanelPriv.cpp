@@ -1252,7 +1252,7 @@ TFilePanel::CanOpenParent() const
 	if (TrackerSettings().DesktopFilePanelRoot()) {
 		// don't allow opening Desktop folder's parent
 		BEntry entry(TargetModel()->EntryRef());
-		if (FSIsDeskDir(&entry, TargetModel()->NodeRef()->device))
+		if (FSIsDeskDir(&entry))
 			return false;
 	}
 
@@ -1280,11 +1280,8 @@ TFilePanel::SwitchDirToDesktopIfNeeded(entry_ref &ref)
 	BEntry root("/");
 
 	BDirectory desktopDir;
-	BVolume	bootVol;
-	BVolumeRoster().GetBootVolume(&bootVol);
-	FSGetDeskDir(&desktopDir, bootVol.Device());
-
-	if ((bootVol.Device() != ref.device && FSIsDeskDir(&entry, ref.device))
+	FSGetDeskDir(&desktopDir);
+	if (FSIsDeskDir(&entry)
 		// navigated into non-boot desktop, switch to boot desktop
 		|| (entry == root && !settings.ShowDisksIcon())) {
 		// hit "/" level, map to desktop
@@ -1293,7 +1290,7 @@ TFilePanel::SwitchDirToDesktopIfNeeded(entry_ref &ref)
 		entry.GetRef(&ref);
 		return true;
 	}
-	return FSIsDeskDir(&entry, ref.device);
+	return FSIsDeskDir(&entry);
 }
 
 

@@ -804,7 +804,11 @@ BContainerWindow::AddContextMenus()
 	AddDropContextMenus(fDropContextMenu);
 
 	fDragContextMenu = new BSlowContextMenu("DragContext");
-		// will get added and built dynamically in ShowContextMenu
+	// will get added and built dynamically in ShowContextMenu
+
+	fTrashContextMenu = new BPopUpMenu("TrashContext", false, false);
+	fTrashContextMenu->SetFont(be_plain_font);
+	AddTrashContextMenus(fTrashContextMenu);
 }
 
 
@@ -2482,101 +2486,124 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 	if (ref) {
 		// clicked on a pose, show file or volume context menu
 		Model model(ref);
+		
+		BEntry entry;
+		if (entry.SetTo(ref) == B_OK && FSIsTrashDir(&entry)) {
 
-		bool showAsVolume = false;
-		bool filePanel = PoseView()->IsFilePanel();
-
-		if (Dragging()) {
-			fContextMenu = NULL;
-
-			BEntry entry;
-			model.GetEntry(&entry);
-
-			// only show for directories (directory, volume, root)
-			//
-			// don't show a popup for the trash or printers
-			// trash is handled in DeskWindow
-			//
-			// since this menu is opened asynchronously
-			// we need to make sure we don't open it more
-			// than once, the IsShowing flag is set in
-			// SlowContextPopup::AttachedToWindow and
-			// reset in DetachedFromWindow
-			// see the notes in SlowContextPopup::AttachedToWindow
-
-			if (!FSIsPrintersDir(&entry) && !fDragContextMenu->IsShowing()) {
-				// printf("ShowContextMenu - target is %s %i\n", ref->name, IsShowing(ref));
-				fDragContextMenu->ClearMenu();
-
-				// in case the ref is a symlink, resolve it
-				// only pop open for directories
-				BEntry resolvedEntry(ref, true);
-				if (!resolvedEntry.IsDirectory())
-					return;
-
-				entry_ref resolvedRef;
-				resolvedEntry.GetRef(&resolvedRef);
-
-				// use the resolved ref for the menu
-				fDragContextMenu->SetNavDir(&resolvedRef);
-				fDragContextMenu->SetTypesList(fCachedTypesList);
-				fDragContextMenu->SetTarget(BMessenger(this));
-				BPoseView *poseView = PoseView();
-				if (poseView) {
-					BMessenger tmpTarget(poseView);
-					fDragContextMenu->InitTrackingHook(
-						&BPoseView::MenuTrackingHook, &tmpTarget, fDragMessage);
-				}
-
-				// this is now asynchronous so that we don't
-				// deadlock in Window::Quit,
-				fDragContextMenu->Go(global, true, false, true);
-			}
-			return;
-		} else if (TargetModel()->IsRoot() || model.IsVolume()) {
-			fContextMenu = fVolumeContextMenu;
-			showAsVolume = true;
-		} else
-			fContextMenu = fFileContextMenu;
-
-		// clean up items from last context menu
-
-		if (fContextMenu) {
-			if (fContextMenu->Window())
+			if (fTrashContextMenu->Window() || Dragging())
 				return;
-			else
-				MenusEnded();
-
-			if (model.InitCheck() == B_OK) { // ??? Do I need this ???
-				if (showAsVolume) {
-					// non-volume enable/disable copy, move, identify
-					EnableNamedMenuItem(fContextMenu, kDuplicateSelection, false);
-					EnableNamedMenuItem(fContextMenu, kMoveToTrash, false);
-					EnableNamedMenuItem(fContextMenu, kIdentifyEntry, false);
-
-					// volume model, enable/disable the Unmount item
-					bool ejectableVolumeSelected = false;
-
-					BVolume boot;
-					BVolumeRoster().GetBootVolume(&boot);
-					BVolume volume;
-					volume.SetTo(model.NodeRef()->device);
-					if (volume != boot)
-						ejectableVolumeSelected = true;
-
-					EnableNamedMenuItem(fContextMenu, "Unmount", ejectableVolumeSelected);
+			
+			DeleteSubmenu(fNavigationItem);
+	
+			// selected item was trash, show the trash context menu instead
+			BPoint global(loc);
+			PoseView()->ConvertToScreen(&global);
+			PoseView()->CommitActivePose();
+			BRect mouse_rect(global.x, global.y, global.x, global.y);
+			mouse_rect.InsetBy(-5, -5);
+	
+			EnableNamedMenuItem(fTrashContextMenu, kEmptyTrash,
+				static_cast<TTracker *>(be_app)->TrashFull());
+	
+			SetupNavigationMenu(ref, fTrashContextMenu);
+			fTrashContextMenu->Go(global, true, false, mouse_rect, true);
+		} else {
+		
+			bool showAsVolume = false;
+			bool filePanel = PoseView()->IsFilePanel();
+		
+			if (Dragging()) {
+				fContextMenu = NULL;
+		
+				BEntry entry;
+				model.GetEntry(&entry);
+		
+				// only show for directories (directory, volume, root)
+				//
+				// don't show a popup for the trash or printers
+				// trash is handled in DeskWindow
+				//
+				// since this menu is opened asynchronously
+				// we need to make sure we don't open it more
+				// than once, the IsShowing flag is set in
+				// SlowContextPopup::AttachedToWindow and
+				// reset in DetachedFromWindow
+				// see the notes in SlowContextPopup::AttachedToWindow
+		
+				if (!FSIsPrintersDir(&entry) && !fDragContextMenu->IsShowing()) {
+					// printf("ShowContextMenu - target is %s %i\n", ref->name, IsShowing(ref));
+					fDragContextMenu->ClearMenu();
+		
+					// in case the ref is a symlink, resolve it
+					// only pop open for directories
+					BEntry resolvedEntry(ref, true);
+					if (!resolvedEntry.IsDirectory())
+						return;
+		
+					entry_ref resolvedRef;
+					resolvedEntry.GetRef(&resolvedRef);
+		
+					// use the resolved ref for the menu
+					fDragContextMenu->SetNavDir(&resolvedRef);
+					fDragContextMenu->SetTypesList(fCachedTypesList);
+					fDragContextMenu->SetTarget(BMessenger(this));
+					BPoseView *poseView = PoseView();
+					if (poseView) {
+						BMessenger tmpTarget(poseView);
+						fDragContextMenu->InitTrackingHook(
+							&BPoseView::MenuTrackingHook, &tmpTarget, fDragMessage);
+					}
+		
+					// this is now asynchronous so that we don't
+					// deadlock in Window::Quit,
+					fDragContextMenu->Go(global, true, false, true);
 				}
+				return;
+			} else if (TargetModel()->IsRoot() || model.IsVolume()) {
+				fContextMenu = fVolumeContextMenu;
+				showAsVolume = true;
+			} else
+				fContextMenu = fFileContextMenu;
+		
+			// clean up items from last context menu
+		
+			if (fContextMenu) {
+				if (fContextMenu->Window())
+					return;
+				else
+					MenusEnded();
+		
+				if (model.InitCheck() == B_OK) { // ??? Do I need this ???
+					if (showAsVolume) {
+						// non-volume enable/disable copy, move, identify
+						EnableNamedMenuItem(fContextMenu, kDuplicateSelection, false);
+						EnableNamedMenuItem(fContextMenu, kMoveToTrash, false);
+						EnableNamedMenuItem(fContextMenu, kIdentifyEntry, false);
+		
+						// volume model, enable/disable the Unmount item
+						bool ejectableVolumeSelected = false;
+		
+						BVolume boot;
+						BVolumeRoster().GetBootVolume(&boot);
+						BVolume volume;
+						volume.SetTo(model.NodeRef()->device);
+						if (volume != boot)
+							ejectableVolumeSelected = true;
+		
+						EnableNamedMenuItem(fContextMenu, "Unmount", ejectableVolumeSelected);
+					}
+				}
+		
+				SetupNavigationMenu(ref, fContextMenu);
+				if (!showAsVolume && !filePanel) {
+					SetupMoveCopyMenus(ref, fContextMenu);
+					SetupOpenWithMenu(fContextMenu);
+				}
+		
+				UpdateMenu(fContextMenu, kPosePopUpContext);
+		
+				fContextMenu->Go(global, true, false, mouseRect, true);
 			}
-
-			SetupNavigationMenu(ref, fContextMenu);
-			if (!showAsVolume && !filePanel) {
-				SetupMoveCopyMenus(ref, fContextMenu);
-				SetupOpenWithMenu(fContextMenu);
-			}
-
-			UpdateMenu(fContextMenu, kPosePopUpContext);
-
-			fContextMenu->Go(global, true, false, mouseRect, true);
 		}
 	} else if (fWindowContextMenu) {
 		if (fWindowContextMenu->Window())
@@ -2725,6 +2752,20 @@ BContainerWindow::AddDropContextMenus(BMenu *menu)
 	menu->AddItem(new BMenuItem("Copy here", new BMessage(kCopySelectionTo)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Cancel", new BMessage(kCancelButton)));
+}
+
+
+void
+BContainerWindow::AddTrashContextMenus(BMenu *menu)
+{
+	// setup special trash context menu
+	menu->AddItem(new BMenuItem("Empty Trash",
+		new BMessage(kEmptyTrash)));
+	menu->AddItem(new BMenuItem("Open",
+		new BMessage(kOpenSelection), 'O'));
+	menu->AddItem(new BMenuItem("Get info",
+		new BMessage(kGetInfo), 'I'));
+	menu->SetTargetForItems(PoseView());
 }
 
 
@@ -3475,7 +3516,7 @@ BContainerWindow::SetUpDefaultState()
 
 	if (!TargetModel()->IsRoot()) {
 		BDirectory desktop;
-		FSGetDeskDir(&desktop, TargetModel()->EntryRef()->device);
+		FSGetDeskDir(&desktop);
 
 		// try copying state from our parent directory, unless it is the desktop folder
 		BEntry entry(TargetModel()->EntryRef());
@@ -3902,10 +3943,8 @@ WindowStateNodeOpener::WindowStateNodeOpener(BContainerWindow *window, bool forW
 		fStreamNode(NULL)
 {
 	if (window->TargetModel() && window->TargetModel()->IsRoot()) {
-		BVolume bootVol;
-		BVolumeRoster().GetBootVolume(&bootVol);
 		BDirectory dir;
-		if (FSGetDeskDir(&dir, bootVol.Device()) == B_OK) {
+		if (FSGetDeskDir(&dir) == B_OK) {
 			fNode = new BDirectory(dir);
 			fStreamNode = new AttributeStreamFileNode(fNode);
 		}

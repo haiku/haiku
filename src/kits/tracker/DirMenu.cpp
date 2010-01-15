@@ -109,10 +109,8 @@ BDirMenu::Populate(const BEntry *startEntry, BWindow *originatingWindow,
 			parent.GetEntry(&entry);
 		}
 
-		BVolume	bootVol;
-		BVolumeRoster().GetBootVolume(&bootVol);
 		BDirectory desktopDir;
-		FSGetDeskDir(&desktopDir, bootVol.Device());
+		FSGetDeskDir(&desktopDir);
 		BEntry desktopEntry;
 		desktopDir.GetEntry(&desktopEntry);
 	

@@ -201,7 +201,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_TRASH_DIRECTORY:
 			// TODO: eventually put that into the file system API?
 			if (device == bootDevice || !strcmp(fsInfo.fsh_name, "bfs"))
-				template = "$h/Desktop/Trash";
+				template = "Trash"; // TODO: add suffix for current user
 			else if (!strcmp(fsInfo.fsh_name, "dos"))
 				template = "RECYCLED/_BEOS_";
 			break;

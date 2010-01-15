@@ -56,7 +56,6 @@ public:
 	virtual	void Quit();
 	virtual	void ScreenChanged(BRect, color_space);
 
-	virtual	void ShowContextMenu(BPoint, const entry_ref *, BView *);
 	virtual	void CreatePoseView(Model *);
 
 	virtual	bool ShouldAddMenus() const;
@@ -72,7 +71,6 @@ public:
 	
 protected:
 	virtual	void AddWindowContextMenus(BMenu *);
-	void AddTrashContextMenu();
 	virtual BPoseView *NewPoseView(Model *, BRect, uint32);
 
 	virtual void WorkspaceActivated(int32, bool);

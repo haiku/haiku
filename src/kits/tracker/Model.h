@@ -196,7 +196,7 @@ class Model {
 			const void *buffer, size_t );
 			// cover call, creates a writable node and writes out attributes
 			// into it; work around for file nodes not being writeable
-		ssize_t WriteAttrKillForegin(const char *attr, const char *foreignAttr,
+		ssize_t WriteAttrKillForeign(const char *attr, const char *foreignAttr,
 			type_code type, off_t, const void *buffer, size_t);
 
 		bool Mimeset(bool force);

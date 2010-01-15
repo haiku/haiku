@@ -147,7 +147,6 @@ BDeskWindow::~BDeskWindow()
 void
 BDeskWindow::Init(const BMessage *)
 {
-	AddTrashContextMenu();
 	//
 	//	Set the size of the screen before calling the container window's
 	//	Init() because it will add volume poses to this window and
@@ -353,52 +352,6 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 #ifdef CUT_COPY_PASTE_IN_CONTEXT_MENU
 	pasteItem->SetTarget(this);
 #endif
-}
-
-
-void
-BDeskWindow::AddTrashContextMenu()
-{
-	// setup special trash context menu
-	fTrashContextMenu = new BPopUpMenu("TrashContext", false, false);
-	fTrashContextMenu->SetFont(be_plain_font);
-	fTrashContextMenu->AddItem(new BMenuItem("Empty Trash",
-		new BMessage(kEmptyTrash)));
-	fTrashContextMenu->AddItem(new BMenuItem("Open",
-		new BMessage(kOpenSelection), 'O'));
-	fTrashContextMenu->AddItem(new BMenuItem("Get info",
-		new BMessage(kGetInfo), 'I'));
-	fTrashContextMenu->SetTargetForItems(PoseView());
-}
-
-
-void
-BDeskWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *view)
-{
-	BEntry entry;
-
-	// cleanup previous entries
-	DeleteSubmenu(fNavigationItem);
-
-	if (ref && entry.SetTo(ref) == B_OK && FSIsTrashDir(&entry)) {
-
-		if (fTrashContextMenu->Window() || Dragging())
-			return;
-
-		// selected item was trash, show the trash context menu instead
-		BPoint global(loc);
-		PoseView()->ConvertToScreen(&global);
-		PoseView()->CommitActivePose();
-		BRect mouse_rect(global.x, global.y, global.x, global.y);
-		mouse_rect.InsetBy(-5, -5);
-
-		EnableNamedMenuItem(fTrashContextMenu, kEmptyTrash,
-			static_cast<TTracker *>(be_app)->TrashFull());
-
-		SetupNavigationMenu(ref, fTrashContextMenu);
-		fTrashContextMenu->Go(global, true, false, mouse_rect, true);
-	} else
-		_inherited::ShowContextMenu(loc, ref, view);
 }
 
 

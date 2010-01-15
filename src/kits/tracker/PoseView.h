@@ -459,7 +459,8 @@ class BPoseView : public BView {
 
 		virtual void AddPoses(Model *model = NULL);
 			// if <model> is zero, PoseView has other means of iterating through all
-			// the entries that it adds
+			// the entries thaat it adds
+		
 		virtual void AddRootPoses(bool watchIndividually, bool mountShared);
 			// watchIndividually is used when placing a volume pose onto the Desktop
 			// where unlike in the Root window it will not be watched by the folder

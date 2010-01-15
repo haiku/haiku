@@ -94,6 +94,8 @@ namespace BPrivate {
 #define	kAttrPoseInfo_le				"_trk/pinfo_le"
 #define	kAttrDisksPoseInfo_be			"_trk/d_pinfo"
 #define	kAttrDisksPoseInfo_le			"_trk/d_pinfo_le"
+#define kAttrTrashPoseInfo_be			"_trk/t_pinfo"
+#define kAttrTrashPoseInfo_le			"_trk/t_pinfo_le"
 #define	kAttrColumns_be					"_trk/columns"
 #define	kAttrColumns_le					"_trk/columns_le"
 #define	kAttrViewState_be				"_trk/viewstate"
@@ -116,6 +118,9 @@ namespace BPrivate {
 
 #define kAttrDisksPoseInfo 				kAttrDisksPoseInfo_le
 #define kAttrDisksPoseInfoForeign 		kAttrDisksPoseInfo_be
+
+#define kAttrTrashPoseInfo 				kAttrTrashPoseInfo_le
+#define kAttrTrashPoseInfoForeign 		kAttrTrashPoseInfo_be
 
 #define	kAttrPoseInfo					kAttrPoseInfo_le
 #define	kAttrPoseInfoForeign			kAttrPoseInfo_be
@@ -148,6 +153,9 @@ namespace BPrivate {
 
 #define kAttrDisksPoseInfo 				kAttrDisksPoseInfo_be
 #define kAttrDisksPoseInfoForeign	 	kAttrDisksPoseInfo_le
+
+#define kAttrTrashPoseInfo 				kAttrTrashPoseInfo_be
+#define kAttrTrashPoseInfoForeign 		kAttrTrashPoseInfo_le
 
 #define	kAttrPoseInfo					kAttrPoseInfo_be
 #define	kAttrPoseInfoForeign			kAttrPoseInfo_le

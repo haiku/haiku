@@ -73,11 +73,6 @@ ShouldShowDesktopPose(dev_t device, const Model *model, const PoseInfo *)
 }	// namespace BPrivate
 
 
-DesktopEntryListCollection::DesktopEntryListCollection()
-{
-}
-
-
 //	#pragma mark -
 
 
@@ -101,7 +96,7 @@ DesktopPoseView::InitDesktopDirentIterator(BPoseView *nodeMonitoringTarget,
 	if (sourceModel.InitCheck() != B_OK)
 		return NULL;
 
-	CachedEntryIteratorList *result = new DesktopEntryListCollection();
+	CachedEntryIteratorList *result = new CachedEntryIteratorList();
 
 	ASSERT(!sourceModel.IsQuery());
 	ASSERT(sourceModel.Node());
@@ -176,6 +171,13 @@ DesktopPoseView::AddPosesThreadValid(const entry_ref *) const
 }
 
 
+void
+DesktopPoseView::AddPosesCompleted()
+{
+	_inherited::AddPosesCompleted();
+	AddTrashPose();
+}
+
 bool
 DesktopPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
 {
@@ -212,11 +214,31 @@ DesktopPoseView::ShowVolumes(bool visible, bool showShared)
 {
 	if (LockLooper()) {
 		SavePoseLocations();
-		if (!visible)
+		if (!visible) 
 			RemoveRootPoses();
 		else
 			AddRootPoses(true, showShared);
 		UnlockLooper();
+	}
+}
+
+
+void
+DesktopPoseView::AddTrashPose()
+{
+	BVolume volume;
+	if (BVolumeRoster().GetBootVolume(&volume) == B_OK) {
+		BDirectory trash;
+		BEntry entry;
+		node_ref ref;
+		if (FSGetTrashDir(&trash, volume.Device()) == B_OK 
+			&& trash.GetEntry(&entry) == B_OK && entry.GetNodeRef(&ref) == B_OK) {
+			WatchNewNode(&ref);
+			Model *model = new Model(&entry);
+			PoseInfo info;
+			ReadPoseInfo(model, &info);
+			CreatePose(model, &info, false, NULL, NULL, true);
+		}
 	}
 }
 

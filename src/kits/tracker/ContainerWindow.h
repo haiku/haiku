@@ -213,6 +213,7 @@ class BContainerWindow : public BWindow {
 		virtual	void AddWindowContextMenus(BMenu *);
 		virtual	void AddVolumeContextMenus(BMenu *);
 		virtual	void AddDropContextMenus(BMenu *);
+		virtual void AddTrashContextMenus(BMenu *);
 
 		virtual void RepopulateMenus();
 
@@ -253,6 +254,7 @@ class BContainerWindow : public BWindow {
 		BPopUpMenu *fWindowContextMenu;
 		BPopUpMenu *fDropContextMenu;
 		BPopUpMenu *fVolumeContextMenu;
+		BPopUpMenu *fTrashContextMenu;
 		BSlowContextMenu *fDragContextMenu;
 		BMenuItem *fMoveToItem;
 		BMenuItem *fCopyToItem;

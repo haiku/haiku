@@ -757,17 +757,24 @@ BPoseView::SavePoseLocations(BRect *frameIfDesktop)
 			ASSERT(model);
 			ASSERT(model->InitCheck() == B_OK);
 			// special handling for "root" disks icon
-			if (model->IsRoot()) {
-				BVolume bootVol;
+			// and trash pose on desktop dir
+			BEntry entry;
+			model->GetEntry(&entry);
+			bool isTrash = FSIsTrashDir(&entry) && IsDesktopView();
+			if (model->IsRoot() || isTrash) {
 				BDirectory dir;
-				BVolumeRoster().GetBootVolume(&bootVol);
-				if (FSGetDeskDir(&dir, bootVol.Device()) == B_OK) {
-					if (dir.WriteAttr(kAttrDisksPoseInfo, B_RAW_TYPE, 0,
+				if (FSGetDeskDir(&dir) == B_OK) {
+					const char *poseInfoAttr = (isTrash) ? kAttrTrashPoseInfo
+						: kAttrDisksPoseInfo;
+					const char *poseInfoAttrForeign = (isTrash) 
+						? kAttrTrashPoseInfoForeign 
+						: kAttrDisksPoseInfoForeign;
+						if (dir.WriteAttr(poseInfoAttr, B_RAW_TYPE, 0,
 						&poseInfo, sizeof(poseInfo)) == sizeof(poseInfo))
 						// nuke opposite endianness
-						dir.RemoveAttr(kAttrDisksPoseInfoForeign);
+						dir.RemoveAttr(poseInfoAttrForeign);
 
-					if (desktop && dir.WriteAttr(kAttrExtendedDisksPoseInfo,
+					if (!isTrash && desktop && dir.WriteAttr(kAttrExtendedDisksPoseInfo,
 						B_RAW_TYPE, 0,
 						extendedPoseInfo, extendedPoseInfoSize)
 							== (ssize_t)extendedPoseInfoSize)
@@ -775,11 +782,11 @@ BPoseView::SavePoseLocations(BRect *frameIfDesktop)
 						dir.RemoveAttr(kAttrExtendedDisksPoseInfoForegin);
 				}
 			} else {
-				model->WriteAttrKillForegin(kAttrPoseInfo, kAttrPoseInfoForeign,
+				model->WriteAttrKillForeign(kAttrPoseInfo, kAttrPoseInfoForeign,
 					B_RAW_TYPE, 0, &poseInfo, sizeof(poseInfo));
 
 				if (desktop) {
-					model->WriteAttrKillForegin(kAttrExtendedPoseInfo,
+					model->WriteAttrKillForeign(kAttrExtendedPoseInfo,
 						kAttrExtendedPoseInfoForegin,
 						B_RAW_TYPE, 0, extendedPoseInfo, extendedPoseInfoSize);
 				}
@@ -2634,17 +2641,22 @@ BPoseView::ReadPoseInfo(Model *model, PoseInfo *poseInfo)
 	BModelOpener opener(model);
 	if (!model->Node())
 		return;
-
+	
 	ReadAttrResult result = kReadAttrFailed;
+	BEntry entry;
+	model->GetEntry(&entry);
+	bool isTrash = FSIsTrashDir(&entry) && IsDesktopView();
 
 	// special case the "root" disks icon
-	if (model->IsRoot()) {
-		BVolume	bootVol;
+	// as well as the trash on desktop
+	if (model->IsRoot() || isTrash) {
 		BDirectory dir;
-
-		BVolumeRoster().GetBootVolume(&bootVol);
-		if (FSGetDeskDir(&dir, bootVol.Device()) == B_OK) {
-			result = ReadAttr(&dir, kAttrDisksPoseInfo, kAttrDisksPoseInfoForeign,
+		if (FSGetDeskDir(&dir) == B_OK) {
+			const char *poseInfoAttr = (isTrash) ? kAttrTrashPoseInfo 
+				: kAttrDisksPoseInfo;
+			const char *poseInfoAttrForeign = (isTrash) ? kAttrTrashPoseInfoForeign 
+				: kAttrDisksPoseInfoForeign;
+			result = ReadAttr(&dir, poseInfoAttr, poseInfoAttrForeign,
 				B_RAW_TYPE, 0, poseInfo, sizeof(*poseInfo), &PoseInfo::EndianSwap);
 		}
 	} else {
@@ -2710,11 +2722,8 @@ BPoseView::ReadExtendedPoseInfo(Model *model)
 
 	// special case the "root" disks icon
 	if (model->IsRoot()) {
-		BVolume	bootVol;
 		BDirectory dir;
-
-		BVolumeRoster().GetBootVolume(&bootVol);
-		if (FSGetDeskDir(&dir, bootVol.Device()) == B_OK) {
+		if (FSGetDeskDir(&dir) == B_OK) {
 			extendedPoseInfoAttrName = kAttrExtendedDisksPoseInfo;
 			extendedPoseInfoAttrForeignName = kAttrExtendedDisksPoseInfoForegin;
 		} else
