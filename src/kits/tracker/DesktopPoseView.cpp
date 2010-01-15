@@ -178,6 +178,7 @@ DesktopPoseView::AddPosesCompleted()
 	AddTrashPose();
 }
 
+
 bool
 DesktopPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
 {

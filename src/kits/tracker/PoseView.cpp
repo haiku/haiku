@@ -764,9 +764,9 @@ BPoseView::SavePoseLocations(BRect *frameIfDesktop)
 			if (model->IsRoot() || isTrash) {
 				BDirectory dir;
 				if (FSGetDeskDir(&dir) == B_OK) {
-					const char *poseInfoAttr = (isTrash) ? kAttrTrashPoseInfo
+					const char *poseInfoAttr = isTrash ? kAttrTrashPoseInfo
 						: kAttrDisksPoseInfo;
-					const char *poseInfoAttrForeign = (isTrash) 
+					const char *poseInfoAttrForeign = isTrash 
 						? kAttrTrashPoseInfoForeign 
 						: kAttrDisksPoseInfoForeign;
 						if (dir.WriteAttr(poseInfoAttr, B_RAW_TYPE, 0,
@@ -2652,9 +2652,9 @@ BPoseView::ReadPoseInfo(Model *model, PoseInfo *poseInfo)
 	if (model->IsRoot() || isTrash) {
 		BDirectory dir;
 		if (FSGetDeskDir(&dir) == B_OK) {
-			const char *poseInfoAttr = (isTrash) ? kAttrTrashPoseInfo 
+			const char *poseInfoAttr = isTrash ? kAttrTrashPoseInfo 
 				: kAttrDisksPoseInfo;
-			const char *poseInfoAttrForeign = (isTrash) ? kAttrTrashPoseInfoForeign 
+			const char *poseInfoAttrForeign = isTrash ? kAttrTrashPoseInfoForeign 
 				: kAttrDisksPoseInfoForeign;
 			result = ReadAttr(&dir, poseInfoAttr, poseInfoAttrForeign,
 				B_RAW_TYPE, 0, poseInfo, sizeof(*poseInfo), &PoseInfo::EndianSwap);

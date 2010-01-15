@@ -804,7 +804,7 @@ BContainerWindow::AddContextMenus()
 	AddDropContextMenus(fDropContextMenu);
 
 	fDragContextMenu = new BSlowContextMenu("DragContext");
-	// will get added and built dynamically in ShowContextMenu
+		// will get added and built dynamically in ShowContextMenu
 
 	fTrashContextMenu = new BPopUpMenu("TrashContext", false, false);
 	fTrashContextMenu->SetFont(be_plain_font);
@@ -2499,14 +2499,14 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 			BPoint global(loc);
 			PoseView()->ConvertToScreen(&global);
 			PoseView()->CommitActivePose();
-			BRect mouse_rect(global.x, global.y, global.x, global.y);
-			mouse_rect.InsetBy(-5, -5);
+			BRect mouseRect(global.x, global.y, global.x, global.y);
+			mouseRect.InsetBy(-5, -5);
 	
 			EnableNamedMenuItem(fTrashContextMenu, kEmptyTrash,
 				static_cast<TTracker *>(be_app)->TrashFull());
 	
 			SetupNavigationMenu(ref, fTrashContextMenu);
-			fTrashContextMenu->Go(global, true, false, mouse_rect, true);
+			fTrashContextMenu->Go(global, true, false, mouseRect, true);
 		} else {
 		
 			bool showAsVolume = false;
@@ -2549,9 +2549,9 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 					fDragContextMenu->SetTarget(BMessenger(this));
 					BPoseView *poseView = PoseView();
 					if (poseView) {
-						BMessenger tmpTarget(poseView);
+						BMessenger target(poseView);
 						fDragContextMenu->InitTrackingHook(
-							&BPoseView::MenuTrackingHook, &tmpTarget, fDragMessage);
+							&BPoseView::MenuTrackingHook, &target, fDragMessage);
 					}
 		
 					// this is now asynchronous so that we don't
