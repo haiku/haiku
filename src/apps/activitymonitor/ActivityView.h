@@ -9,6 +9,7 @@
 #include <map>
 
 #include <Locker.h>
+#include <Message.h>
 #include <ObjectList.h>
 #include <View.h>
 
@@ -113,6 +114,7 @@ private:
 			void		_DrawHistory(bool drawBackground);
 			void		_UpdateResolution(int32 resolution,
 							bool broadcast = true);
+			void		_LoadBackgroundInfo(bool watch);
 
 private:
 	class HistoryLayoutItem;
@@ -128,6 +130,11 @@ private:
 	BLayoutItem*		fHistoryLayoutItem;
 	BLayoutItem*		fLegendLayoutItem;
 #endif
+
+	BMessage			fBackgroundInfo;
+	bool				fCachedOutline;
+	int32				fCachedWorkspace;
+
 	mutable BLocker		fSourcesLock;
 	BObjectList<DataSource> fSources;
 	BObjectList<DataHistory> fValues;

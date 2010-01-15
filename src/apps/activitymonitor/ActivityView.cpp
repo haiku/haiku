@@ -19,10 +19,12 @@
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Dragger.h>
+#include <fs_attr.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
 #include <PopUpMenu.h>
 #include <Shape.h>
+#include <StorageKit.h>
 #include <String.h>
 
 #include "ActivityMonitor.h"
@@ -174,6 +176,7 @@ const uint32 kMsgUpdateResolution = 'ures';
 
 extern const char* kSignature;
 
+const char* kDesktopAttrName = "be:bgndimginfo";
 
 Scale::Scale(scale_type type)
 	:
@@ -540,6 +543,10 @@ ActivityView::LegendLayoutItem::BaseAlignment()
 //	#pragma mark -
 
 
+const rgb_color kWhite = (rgb_color){255, 255, 255, 255};
+const rgb_color kBlack = (rgb_color){0, 0, 0, 255};
+
+
 ActivityView::ActivityView(BRect frame, const char* name,
 		const BMessage* settings, uint32 resizingMode)
 	: BView(frame, name, resizingMode,
@@ -588,6 +595,7 @@ ActivityView::ActivityView(BMessage* archive)
 
 ActivityView::~ActivityView()
 {
+	stop_watching(this);
 	delete fOffscreen;
 	delete fSystemInfoHandler;
 }
@@ -879,6 +887,9 @@ ActivityView::RemoveAllDataSources()
 void
 ActivityView::AttachedToWindow()
 {
+	if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0)
+		_LoadBackgroundInfo(true);
+
 	Looper()->AddHandler(fSystemInfoHandler);
 	fSystemInfoHandler->StartWatching();
 
@@ -1096,6 +1107,17 @@ ActivityView::MessageReceived(BMessage* message)
 		case B_ABOUT_REQUESTED:
 			ActivityMonitor::ShowAbout();
 			break;
+
+		case B_NODE_MONITOR:
+		{
+			BString attrName;
+			if (message->FindString("attr", &attrName) == B_OK) {
+				if (attrName == kDesktopAttrName) 
+					_LoadBackgroundInfo(false);
+			} else
+				_LoadBackgroundInfo(false);
+			break;
+		}
 
 		case kMsgUpdateResolution:
 		{
@@ -1414,6 +1436,37 @@ ActivityView::_UpdateResolution(int32 resolution, bool broadcast)
 
 
 void
+ActivityView::_LoadBackgroundInfo(bool watch)
+{
+	fCachedOutline = false;
+	fCachedWorkspace = -1;
+	BPath path;
+	if (find_directory(B_DESKTOP_DIRECTORY, &path) == B_OK) {
+		BNode desktopNode = BNode(path.Path());
+
+		attr_info info;
+		if (desktopNode.GetAttrInfo(kDesktopAttrName, &info) != B_OK)
+			return;
+
+		char *buffer = new char[info.size];
+		if (desktopNode.ReadAttr(kDesktopAttrName, B_MESSAGE_TYPE, 0,
+			buffer, (size_t)info.size) == info.size) {
+				BMessage message;
+				if (message.Unflatten(buffer) == B_OK)
+					fBackgroundInfo = message;
+		}
+		delete[] buffer;
+
+		if (watch) {
+			node_ref nref;
+			desktopNode.GetNodeRef(&nref);
+			watch_node(&nref, B_WATCH_ATTR, this);
+		}
+	}
+}
+
+
+void
 ActivityView::Draw(BRect updateRect)
 {
 	bool drawBackground = true;
@@ -1467,12 +1520,83 @@ ActivityView::Draw(BRect updateRect)
 		if (drawBackground)
 			SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
 		else {
+			rgb_color c = Parent()->ViewColor();
+			rgb_color textColor = c.red + c.green * 1.5f + c.blue * 0.50f
+				>= 300 ? kBlack : kWhite;			
+
+			int32 mask;
+			bool tmpOutline = false;
+			bool outline = fCachedOutline;
+			int8 indice = 0;
+
+			if (fCachedWorkspace != current_workspace()) {
+				while (fBackgroundInfo.FindInt32("be:bgndimginfoworkspaces",
+						indice, &mask) == B_OK
+					&& fBackgroundInfo.FindBool("be:bgndimginfoerasetext",
+						indice, &tmpOutline) == B_OK) {
+					if (((1 << current_workspace()) & mask) != 0) {
+						outline = tmpOutline;
+						fCachedWorkspace = current_workspace();
+						fCachedOutline = outline;
+						break;
+					}
+					indice++;
+				}
+			}
+
+			if (outline) {
+				SetDrawingMode(B_OP_ALPHA);
+				SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+
+				BFont font;
+				GetFont(&font);
+				if (textColor == kBlack) {
+					// Black text with white halo/glow
+					rgb_color glowColor = kWhite;
+
+					font.SetFalseBoldWidth(2.0);
+					SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
+					glowColor.alpha = 30;
+					SetHighColor(glowColor);
+					DrawString(label.String(), BPoint(6 + colorBox.right, y));
+					DrawString(text.String(), BPoint(frame.right - width, y));
+
+					font.SetFalseBoldWidth(1.0);
+					SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
+					glowColor.alpha = 65;
+					SetHighColor(glowColor);
+					DrawString(label.String(), BPoint(6 + colorBox.right, y));
+					DrawString(text.String(), BPoint(frame.right - width, y));
+
+					font.SetFalseBoldWidth(0.0);
+					SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+				} else {
+					// white text with black outline
+					rgb_color outlineColor = kBlack;
+				
+					font.SetFalseBoldWidth(1.0);
+					SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
+					outlineColor.alpha = 30;
+					SetHighColor(outlineColor);
+					DrawString(label.String(), BPoint(6 + colorBox.right, y));
+					DrawString(text.String(), BPoint(frame.right - width, y));
+				
+					font.SetFalseBoldWidth(0.0);
+					SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+
+					outlineColor.alpha = 200;
+					SetHighColor(outlineColor);
+					DrawString(label.String(), BPoint(6 + colorBox.right + 1,
+						y + 1));
+					DrawString(text.String(), BPoint(frame.right - width + 1,
+						y + 1));
+				}
+			}
 			SetDrawingMode(B_OP_OVER);
-			rgb_color c = Parent()->LowColor();
-			if (c.red + c.green + c.blue > 128 * 3)
-				SetHighColor(0, 0, 0);
-			else
-				SetHighColor(255, 255, 255);
+			SetHighColor(textColor);
 		}
 		DrawString(label.String(), BPoint(6 + colorBox.right, y));
 		DrawString(text.String(), BPoint(frame.right - width, y));
