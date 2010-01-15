@@ -25,7 +25,7 @@
 #define TRACE dprintf
 
 #define INTERRUPT_TRACING 0
-#if INTERRUPT_TRACING 
+#if INTERRUPT_TRACING
 	#define TRACE_INT(a...) 	ktrace_printf(a)
 #else
 	#define TRACE_INT(a...)
@@ -213,10 +213,17 @@ ata_adapter_inthand(void *arg)
 		statusATA = pci->read_io_8(device, channel->command_block_base + 7);
 		TRACE_INT("ata_adapter_inthand: ATA-status 0x%02x\n", statusATA);
 
-		// clear pending PCI bus master DMA interrupt, for those 
+		// clear pending PCI bus master DMA interrupt, for those
 		// controllers who don't clear it themselves
 		pci->write_io_8(device, channel->bus_master_base + ATA_BM_STATUS_REG,
 			(statusBM & 0xf8) | ATA_BM_STATUS_INTERRUPT);
+
+		if (!channel->dmaing) {
+			// we check this late so that potential spurious interrupts
+			// are acknoledged above
+			TRACE_INT("ata_adapter_inthand: no DMA transfer active\n");
+			return B_UNHANDLED_INTERRUPT;
+		}
 
 		// signal interrupt to ATA stack
 		return sATA->interrupt_handler(channel->ataChannel, statusATA);
@@ -238,7 +245,7 @@ ata_adapter_prepare_dma(ata_adapter_channel_info *channel,
 	prd_entry *prd = channel->prdt;
 	int i;
 
-	TRACE_DMA("ata_adapter: prepare_dma (%s) %u entrys:\n", 
+	TRACE_DMA("ata_adapter: prepare_dma (%s) %u entrys:\n",
 		writeToDevice ? "write" : "read", sgListCount);
 
 	for (i = sgListCount - 1, prd = channel->prdt; i >= 0; --i, ++prd, ++sgList) {
@@ -247,7 +254,7 @@ ata_adapter_prepare_dma(ata_adapter_channel_info *channel,
 		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sgList->size);
 		prd->EOT = i == 0;
 
-		TRACE_DMA("ata_adapter: %p, %ld => 0x%08x, %d, %d\n", 
+		TRACE_DMA("ata_adapter: %p, %ld => 0x%08x, %d, %d\n",
 			sgList->address, sgList->size, prd->address, prd->count, prd->EOT);
 		SHOW_FLOW( 4, "%x, %x, %d", (int)prd->address, prd->count, prd->EOT);
 	}
@@ -564,7 +571,7 @@ ata_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 	}
 	if (pcicmdOld != pcicmdNew) {
 		pci->write_pci_config(pci_device, PCI_command, 2, pcicmdNew);
-		TRACE("PCI-ATA: pcicmd changed from 0x%04x to 0x%04x\n", 
+		TRACE("PCI-ATA: pcicmd changed from 0x%04x to 0x%04x\n",
 			pcicmdOld, pcicmdNew);
 	}
 
@@ -644,7 +651,7 @@ ata_adapter_init_controller(device_node *node,
 	}
 	if (pcicmdOld != pcicmdNew) {
 		pci->write_pci_config(node, PCI_command, 2, pcicmdNew);
-		TRACE("PCI-ATA: adapter init: pcicmd old 0x%04x, new 0x%04x\n", 
+		TRACE("PCI-ATA: adapter init: pcicmd old 0x%04x, new 0x%04x\n",
 			pcicmdOld, pcicmdNew);
 	}
 #endif
