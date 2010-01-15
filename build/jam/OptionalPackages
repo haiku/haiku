@@ -1017,7 +1017,7 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 		: [ FDirName $(HAIKU_TOP) docs Haiku-doc.css ]
 		: Haiku-doc.css ;
 	AddSymlinkToHaikuImage home Desktop
-		: /boot/system/documentation/welcome/welcome.html : Welcome ;
+		: /boot/system/documentation/welcome/welcome_en.html : Welcome ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/userguide/en/contents.html : User\ Guide ;
 }
