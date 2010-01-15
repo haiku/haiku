@@ -892,7 +892,7 @@ NetFSServer::_InitSettings()
 	status_t error = _LoadSettings();
 	if (error != B_OK) {
 		WARN("NetFSServer::_InitSettings(): WARNING: Failed to load settings "
-			"file: %s\n", strerror(error));
+			"file: %s - falling back to driver settings.\n", strerror(error));
 
 		// fall back to the driver settings file
 		error = _LoadSecurityContext(&fSecurityContext);
