@@ -2251,7 +2251,7 @@ CalcItemsAndSize(BObjectList<entry_ref> *refList, size_t blockSize,
 
 
 status_t
-FSGetTrashDir(BDirectory *trash_dir, dev_t dev)
+FSGetTrashDir(BDirectory *trashDir, dev_t dev)
 {
 
 	BVolume volume(dev);
@@ -2264,28 +2264,9 @@ FSGetTrashDir(BDirectory *trash_dir, dev_t dev)
 	if (result != B_OK)
 		return result;
 
-	result = trash_dir->SetTo(path.Path());
+	result = trashDir->SetTo(path.Path());
 	if (result != B_OK)
 		return result;
-
-	// make trash invisible
-	attr_info a_info;
-	if (trash_dir->GetAttrInfo(kAttrPoseInfo, &a_info) != B_OK) {
-
-		StatStruct sbuf;
-		trash_dir->GetStat(&sbuf);
-
-		// move trash to bottom left of main screen initially
-		BScreen screen(B_MAIN_SCREEN_ID);
-		BRect scrn_frame = screen.Frame();
-
-		PoseInfo poseInfo;
-		poseInfo.fInvisible = false;
-		poseInfo.fInitedDirectory = sbuf.st_ino;
-		poseInfo.fLocation = BPoint(scrn_frame.left + 20, scrn_frame.bottom - 60);
-		trash_dir->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
-			sizeof(PoseInfo));
-	}
 
 	return B_OK;
 }
@@ -2767,6 +2748,16 @@ FSCreateTrashDirs()
 
 		BDirectory trashDir;
 		if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
+			// make trash invisible
+			StatStruct sbuf;
+			trashDir.GetStat(&sbuf);
+		
+			PoseInfo poseInfo;
+			poseInfo.fInvisible = true;
+			poseInfo.fInitedDirectory = sbuf.st_ino;
+			trashDir.WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
+				sizeof(PoseInfo));
+
 			size_t size;
 			const void* data = GetTrackerResources()->
 				LoadResource('ICON', kResTrashIcon, &size);

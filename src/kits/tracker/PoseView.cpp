@@ -1825,6 +1825,9 @@ BPoseView::PoseVisible(const Model *model, const PoseInfo *poseInfo,
 bool
 BPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
 {
+	if (!PoseVisible(model, poseInfo, IsFilePanel()))
+		return false;
+		
 	// check filter before adding item
 	if (!fRefFilter)
 		return true;
