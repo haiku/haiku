@@ -1235,8 +1235,12 @@ ActivityView::_LegendHeight() const
 	BAutolock _(fSourcesLock);
 
 	int32 rows = (fSources.CountItems() + 1) / 2;
+	
+	int32 boldMargin = Parent() &&
+		(Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0 ? 2 : 0;
+
 	return rows * (4 + ceilf(fontHeight.ascent)
-		+ ceilf(fontHeight.descent) + ceilf(fontHeight.leading));
+		+ ceilf(fontHeight.descent) + ceilf(fontHeight.leading)) + boldMargin;
 }
 
 
@@ -1448,7 +1452,7 @@ ActivityView::_LoadBackgroundInfo(bool watch)
 		if (desktopNode.GetAttrInfo(kDesktopAttrName, &info) != B_OK)
 			return;
 
-		char *buffer = new char[info.size];
+		char* buffer = new char[info.size];
 		if (desktopNode.ReadAttr(kDesktopAttrName, B_MESSAGE_TYPE, 0,
 			buffer, (size_t)info.size) == info.size) {
 				BMessage message;
