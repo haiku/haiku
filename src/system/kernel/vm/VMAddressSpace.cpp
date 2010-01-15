@@ -161,7 +161,7 @@ VMAddressSpace::RemoveAndPut()
 	fDeleting = true;
 	WriteUnlock();
 
-	vm_delete_areas(this);
+	vm_delete_areas(this, true);
 	Put();
 }
 

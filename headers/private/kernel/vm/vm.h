@@ -94,12 +94,6 @@ bool vm_test_map_modification(struct vm_page *page);
 int32 vm_test_map_activation(struct vm_page *page, bool *_modified);
 void vm_clear_map_flags(struct vm_page *page, uint32 flags);
 void vm_remove_all_page_mappings(struct vm_page *page, uint32 *_flags);
-bool vm_unmap_page(struct VMArea* area, addr_t virtualAddress,
-	bool preserveModified);
-status_t vm_unmap_pages(struct VMArea *area, addr_t base, size_t length,
-			bool preserveModified);
-status_t vm_map_page(struct VMArea *area, struct vm_page *page, addr_t address,
-			uint32 protection);
 
 status_t vm_get_physical_page(addr_t paddr, addr_t* vaddr, void** _handle);
 status_t vm_put_physical_page(addr_t vaddr, void* handle);

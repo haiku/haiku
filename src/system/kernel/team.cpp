@@ -1409,7 +1409,7 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	user_debug_prepare_for_exec();
 
 	delete_team_user_data(team);
-	vm_delete_areas(team->address_space);
+	vm_delete_areas(team->address_space, false);
 	xsi_sem_undo(team);
 	delete_owned_ports(team);
 	sem_delete_owned_sems(team);

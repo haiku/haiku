@@ -25,6 +25,7 @@
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
 #include <vm/VMAddressSpace.h>
+#include <vm/VMCache.h>
 
 #include "x86_paging.h"
 #include "x86_physical_page_mapper.h"
@@ -485,7 +486,9 @@ restart:
 	int index = VADDR_TO_PDENT(start);
 	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here, move the start up to access the next page table
-		start = ROUNDUP(start + 1, B_PAGE_SIZE);
+		start = ROUNDUP(start + 1, B_PAGE_SIZE * 1024);
+		if (start == 0)
+			return B_OK;
 		goto restart;
 	}
 
@@ -525,6 +528,302 @@ restart:
 	pinner.Unlock();
 
 	goto restart;
+}
+
+
+/*!	Caller must have locked the cache of the page to be unmapped.
+	This object shouldn't be locked.
+*/
+status_t
+X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address)
+{
+	ASSERT(address % B_PAGE_SIZE == 0);
+
+	page_directory_entry* pd = fArchData->pgdir_virt;
+
+	TRACE(("X86VMTranslationMap::UnmapPage(%#" B_PRIxADDR ")\n", address));
+
+	RecursiveLocker locker(fLock);
+
+	int index = VADDR_TO_PDENT(address);
+	if ((pd[index] & X86_PDE_PRESENT) == 0)
+		return B_ENTRY_NOT_FOUND;
+
+	ThreadCPUPinner pinner(thread_get_current_thread());
+
+	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+		pd[index] & X86_PDE_ADDRESS_MASK);
+
+	index = VADDR_TO_PTENT(address);
+	page_table_entry oldEntry = clear_page_table_entry(&pt[index]);
+
+	pinner.Unlock();
+
+	if ((oldEntry & X86_PTE_PRESENT) == 0) {
+		// page mapping not valid
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	fMapCount--;
+
+	if ((oldEntry & X86_PTE_ACCESSED) != 0) {
+		// Note, that we only need to invalidate the address, if the
+		// accessed flags was set, since only then the entry could have been
+		// in any TLB.
+		if (fArchData->num_invalidate_pages
+				< PAGE_INVALIDATE_CACHE_SIZE) {
+			fArchData->pages_to_invalidate[fArchData->num_invalidate_pages]
+				= address;
+		}
+
+		fArchData->num_invalidate_pages++;
+
+		Flush();
+
+		// NOTE: Between clearing the page table entry and Flush() other
+		// processors (actually even this processor with another thread of the
+		// same team) could still access the page in question via their cached
+		// entry. We can obviously lose a modified flag in this case, with the
+		// effect that the page looks unmodified (and might thus be recycled),
+		// but is actually modified.
+		// In most cases this is harmless, but for vm_remove_all_page_mappings()
+		// this is actually a problem.
+		// Interestingly FreeBSD seems to ignore this problem as well
+		// (cf. pmap_remove_all()), unless I've missed something.
+	}
+
+	if (area->cache_type == CACHE_TYPE_DEVICE)
+		return B_OK;
+
+	// get the page
+	vm_page* page = vm_lookup_page(
+		(oldEntry & X86_PTE_ADDRESS_MASK) / B_PAGE_SIZE);
+	ASSERT(page != NULL);
+
+	// transfer the accessed/dirty flags to the page
+	if ((oldEntry & X86_PTE_ACCESSED) != 0)
+		page->accessed = true;
+	if ((oldEntry & X86_PTE_DIRTY) != 0)
+		page->modified = true;
+
+	// remove the mapping object/decrement the wired_count of the page
+	vm_page_mapping* mapping = NULL;
+	if (area->wiring == B_NO_LOCK) {
+		vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+		while ((mapping = iterator.Next()) != NULL) {
+			if (mapping->area == area) {
+				area->mappings.Remove(mapping);
+				page->mappings.Remove(mapping);
+				break;
+			}
+		}
+
+		ASSERT(mapping != NULL);
+	} else
+		page->wired_count--;
+
+	if (page->wired_count == 0 && page->mappings.IsEmpty())
+		atomic_add(&gMappedPagesCount, -1);
+
+	locker.Unlock();
+
+	if (mapping != NULL)
+		free(mapping);
+
+	return B_OK;
+}
+
+
+void
+X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size)
+{
+	page_directory_entry* pd = fArchData->pgdir_virt;
+
+	addr_t start = base;
+	addr_t end = base + size;
+
+	TRACE(("X86VMTranslationMap::UnmapPages(%p, %#" B_PRIxADDR ", %#"
+		B_PRIxADDR ")\n", area, start, end));
+
+	VMAreaMappings queue;
+
+	RecursiveLocker locker(fLock);
+
+	while (start < end) {
+		int index = VADDR_TO_PDENT(start);
+		if ((pd[index] & X86_PDE_PRESENT) == 0) {
+			// no page table here, move the start up to access the next page
+			// table
+			start = ROUNDUP(start + 1, B_PAGE_SIZE * 1024);
+			if (start == 0)
+				break;
+			continue;
+		}
+
+		struct thread* thread = thread_get_current_thread();
+		ThreadCPUPinner pinner(thread);
+
+		page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+			pd[index]  & X86_PDE_ADDRESS_MASK);
+
+		for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
+				index++, start += B_PAGE_SIZE) {
+			page_table_entry oldEntry = clear_page_table_entry(&pt[index]);
+			if ((oldEntry & X86_PTE_PRESENT) == 0)
+				continue;
+
+			fMapCount--;
+
+			if ((oldEntry & X86_PTE_ACCESSED) != 0) {
+				// Note, that we only need to invalidate the address, if the
+				// accessed flags was set, since only then the entry could have
+				// been in any TLB.
+				if (fArchData->num_invalidate_pages
+						< PAGE_INVALIDATE_CACHE_SIZE) {
+					fArchData->pages_to_invalidate[
+						fArchData->num_invalidate_pages] = start;
+				}
+
+				fArchData->num_invalidate_pages++;
+			}
+
+			if (area->cache_type != CACHE_TYPE_DEVICE) {
+				// get the page
+				vm_page* page = vm_lookup_page(
+					(oldEntry & X86_PTE_ADDRESS_MASK) / B_PAGE_SIZE);
+				ASSERT(page != NULL);
+
+				// transfer the accessed/dirty flags to the page
+				if ((oldEntry & X86_PTE_ACCESSED) != 0)
+					page->accessed = true;
+				if ((oldEntry & X86_PTE_DIRTY) != 0)
+					page->modified = true;
+
+				// remove the mapping object/decrement the wired_count of the
+				// page
+				if (area->wiring == B_NO_LOCK) {
+					vm_page_mapping* mapping = NULL;
+					vm_page_mappings::Iterator iterator
+						= page->mappings.GetIterator();
+					while ((mapping = iterator.Next()) != NULL) {
+						if (mapping->area == area)
+							break;
+					}
+
+					ASSERT(mapping != NULL);
+
+					area->mappings.Remove(mapping);
+					page->mappings.Remove(mapping);
+					queue.Add(mapping);
+				} else
+					page->wired_count--;
+
+				if (page->wired_count == 0 && page->mappings.IsEmpty())
+					atomic_add(&gMappedPagesCount, -1);
+			}
+		}
+
+		Flush();
+			// flush explicitely, since we directly use the lock
+
+		pinner.Unlock();
+	}
+
+	// TODO: As in UnmapPage() we can lose page dirty flags here. ATM it's not
+	// really critical here, as in all cases this method is used, the unmapped
+	// area range is unmapped for good (resized/cut) and the pages will likely
+	// be freed.
+
+	locker.Unlock();
+
+	// free removed mappings
+	while (vm_page_mapping* mapping = queue.RemoveHead())
+		free(mapping);
+}
+
+
+void
+X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
+	bool ignoreTopCachePageFlags)
+{
+	if (area->cache_type == CACHE_TYPE_DEVICE || area->wiring != B_NO_LOCK) {
+		X86VMTranslationMap::UnmapPages(area, area->Base(), area->Size());
+		return;
+	}
+
+	bool unmapPages = !deletingAddressSpace || !ignoreTopCachePageFlags;
+
+	page_directory_entry* pd = fArchData->pgdir_virt;
+
+	RecursiveLocker locker(fLock);
+
+	VMAreaMappings mappings;
+	mappings.MoveFrom(&area->mappings);
+
+	for (VMAreaMappings::Iterator it = mappings.GetIterator();
+			vm_page_mapping* mapping = it.Next();) {
+		vm_page* page = mapping->page;
+		page->mappings.Remove(mapping);
+
+		if (page->wired_count == 0 && page->mappings.IsEmpty())
+			atomic_add(&gMappedPagesCount, -1);
+
+		if (unmapPages || page->cache != area->cache) {
+			addr_t address = area->Base()
+				+ ((page->cache_offset * B_PAGE_SIZE) - area->cache_offset);
+
+			int index = VADDR_TO_PDENT(address);
+			if ((pd[index] & X86_PDE_PRESENT) == 0) {
+				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
+					"has no page dir entry", page, area, address);
+				continue;
+			}
+
+			ThreadCPUPinner pinner(thread_get_current_thread());
+
+			page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+				pd[index] & X86_PDE_ADDRESS_MASK);
+			page_table_entry oldEntry = clear_page_table_entry(
+				&pt[VADDR_TO_PTENT(address)]);
+
+			pinner.Unlock();
+
+			if ((oldEntry & X86_PTE_PRESENT) == 0) {
+				panic("page %p has mapping for area %p (%#" B_PRIxADDR "), but "
+					"has no page table entry", page, area, address);
+				continue;
+			}
+
+			// transfer the accessed/dirty flags to the page and invalidate
+			// the mapping, if necessary
+			if ((oldEntry & X86_PTE_ACCESSED) != 0) {
+				page->accessed = true;
+
+				if (!deletingAddressSpace) {
+					if (fArchData->num_invalidate_pages
+							< PAGE_INVALIDATE_CACHE_SIZE) {
+						fArchData->pages_to_invalidate[
+							fArchData->num_invalidate_pages] = address;
+					}
+
+					fArchData->num_invalidate_pages++;
+				}
+			}
+
+			if ((oldEntry & X86_PTE_DIRTY) != 0)
+				page->modified = true;
+		}
+
+		fMapCount--;
+	}
+
+	Flush();
+		// flush explicitely, since we directly use the lock
+
+	locker.Unlock();
+
+	while (vm_page_mapping* mapping = mappings.RemoveHead())
+		free(mapping);
 }
 
 
@@ -626,6 +925,15 @@ X86VMTranslationMap::Protect(addr_t start, addr_t end, uint32 attributes)
 	TRACE(("protect_tmap: pages 0x%lx to 0x%lx, attributes %lx\n", start, end,
 		attributes));
 
+	// compute protection flags
+	uint32 newProtectionFlags = 0;
+	if ((attributes & B_USER_PROTECTION) != 0) {
+		newProtectionFlags = X86_PTE_USER;
+		if ((attributes & B_WRITE_AREA) != 0)
+			newProtectionFlags |= X86_PTE_WRITABLE;
+	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
+		newProtectionFlags = X86_PTE_WRITABLE;
+
 restart:
 	if (start >= end)
 		return B_OK;
@@ -633,7 +941,9 @@ restart:
 	int index = VADDR_TO_PDENT(start);
 	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here, move the start up to access the next page table
-		start = ROUNDUP(start + 1, B_PAGE_SIZE);
+		start = ROUNDUP(start + 1, B_PAGE_SIZE * 1024);
+		if (start == 0)
+			return B_OK;
 		goto restart;
 	}
 
@@ -653,20 +963,19 @@ restart:
 
 		TRACE(("protect_tmap: protect page 0x%lx\n", start));
 
-		entry &= ~(X86_PTE_WRITABLE | X86_PTE_USER);
-		if ((attributes & B_USER_PROTECTION) != 0) {
-			entry |= X86_PTE_USER;
-			if ((attributes & B_WRITE_AREA) != 0)
-				entry |= X86_PTE_WRITABLE;
-		} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
-			entry |= X86_PTE_WRITABLE;
-
-		page_table_entry oldEntry = set_page_table_entry(&pt[index], entry);
-			// TODO: We might have cleared accessed/modified flags!
+		// set the new protection flags -- we want to do that atomically,
+		// without changing the accessed or dirty flag
+		page_table_entry oldEntry;
+		do {
+			oldEntry = test_and_set_page_table_entry(&pt[index],
+				(entry & ~(X86_PTE_WRITABLE | X86_PTE_USER))
+					| newProtectionFlags,
+				entry);
+		} while (oldEntry != entry);
 
 		if ((oldEntry & X86_PTE_ACCESSED) != 0) {
 			// Note, that we only need to invalidate the address, if the
-			// accessed flags was set, since only then the entry could have been
+			// accessed flag was set, since only then the entry could have been
 			// in any TLB.
 			if (fArchData->num_invalidate_pages
 					< PAGE_INVALIDATE_CACHE_SIZE) {

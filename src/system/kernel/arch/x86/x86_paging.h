@@ -95,6 +95,21 @@ set_page_table_entry(page_table_entry* entry, page_table_entry newEntry)
 
 
 static inline page_table_entry
+test_and_set_page_table_entry(page_table_entry* entry,
+	page_table_entry newEntry, page_table_entry oldEntry)
+{
+	return atomic_test_and_set((int32*)entry, newEntry, oldEntry);
+}
+
+
+static inline page_table_entry
+clear_page_table_entry(page_table_entry* entry)
+{
+	return set_page_table_entry(entry, 0);
+}
+
+
+static inline page_table_entry
 clear_page_table_entry_flags(page_table_entry* entry, uint32 flags)
 {
 	return atomic_and((int32*)entry, ~flags);

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -71,17 +72,24 @@
 	  spinlock.
  */
 
-#include <KernelExport.h>
-#include <kernel.h>
-#include <vm/vm.h>
-#include <vm/vm_priv.h>
-#include <vm/VMAddressSpace.h>
-#include <int.h>
-#include <boot/kernel_args.h>
 #include <arch/vm_translation_map.h>
+
+#include <stdlib.h>
+
+#include <KernelExport.h>
+
 #include <arch/cpu.h>
 #include <arch_mmu.h>
-#include <stdlib.h>
+#include <boot/kernel_args.h>
+#include <int.h>
+#include <kernel.h>
+#include <vm/vm.h>
+#include <vm/vm_page.h>
+#include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
+#include <vm/VMCache.h>
+
+#include <util/AutoLock.h>
 
 #include "generic_vm_physical_page_mapper.h"
 #include "generic_vm_physical_page_ops.h"
@@ -140,6 +148,8 @@ struct PPCVMTranslationMap : VMTranslationMap {
 									addr_t physicalAddress,
 									uint32 attributes);
 	virtual	status_t			Unmap(addr_t start, addr_t end);
+
+	virtual	status_t			UnmapPage(VMArea* area, addr_t address);
 
 	virtual	status_t			Query(addr_t virtualAddress,
 									addr_t* _physicalAddress,
@@ -234,7 +244,7 @@ PPCVMTranslationMap::LookupPageTableEntry(addr_t virtualAddress)
 			return entry;
 	}
 
-	// Didn't found it, try the secondary hash value
+	// didn't find it, try the secondary hash value
 
 	hash = page_table_entry::SecondaryHash(hash);
 	group = &sPageTable[hash & sPageTableHashMask];
@@ -256,16 +266,17 @@ bool
 PPCVMTranslationMap::RemovePageTableEntry(addr_t virtualAddress)
 {
 	page_table_entry *entry = LookupPageTableEntry(virtualAddress);
-	if (entry) {
-		entry->valid = 0;
-		ppc_sync();
-		tlbie(virtualAddress);
-		eieio();
-		tlbsync();
-		ppc_sync();
-	}
+	if (entry == NULL)
+		return false;
 
-	return entry;
+	entry->valid = 0;
+	ppc_sync();
+	tlbie(virtualAddress);
+	eieio();
+	tlbsync();
+	ppc_sync();
+
+	return true;
 }
 
 
@@ -445,6 +456,69 @@ PPCVMTranslationMap::Unmap(addr_t start, addr_t end)
 
 		start += B_PAGE_SIZE;
 	}
+
+	return B_OK;
+}
+
+
+status_t
+PPCVMTranslationMap::UnmapPage(VMArea* area, addr_t address)
+{
+	ASSERT(address % B_PAGE_SIZE == 0);
+
+	RecursiveLocker locker(fLock);
+
+	if (area->cache_type == CACHE_TYPE_DEVICE) {
+		if (!RemovePageTableEntry(address))
+			return B_ENTRY_NOT_FOUND;
+
+		fMapCount--;
+		return B_OK;
+	}
+
+	page_table_entry* entry = LookupPageTableEntry(address);
+	if (entry == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	page_num_t pageNumber = entry->physical_page_number;
+	bool accessed = entry->referenced;
+	bool modified = entry->changed;
+
+	RemovePageTableEntry(address);
+
+	fMapCount--;
+
+	// get the page
+	vm_page* page = vm_lookup_page(pageNumber);
+	ASSERT(page != NULL);
+
+	// transfer the accessed/dirty flags to the page
+	page->accessed |= accessed;
+	page->modified |= modified;
+
+	// remove the mapping object/decrement the wired_count of the page
+	vm_page_mapping* mapping = NULL;
+	if (area->wiring == B_NO_LOCK) {
+		vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+		while ((mapping = iterator.Next()) != NULL) {
+			if (mapping->area == area) {
+				area->mappings.Remove(mapping);
+				page->mappings.Remove(mapping);
+				break;
+			}
+		}
+
+		ASSERT(mapping != NULL);
+	} else
+		page->wired_count--;
+
+	if (page->wired_count == 0 && page->mappings.IsEmpty())
+		atomic_add(&gMappedPagesCount, -1);
+
+	locker.Unlock();
+
+	if (mapping != NULL)
+		free(mapping);
 
 	return B_OK;
 }

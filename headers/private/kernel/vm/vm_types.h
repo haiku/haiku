@@ -11,7 +11,6 @@
 
 
 #include <arch/vm_types.h>
-#include <arch/vm_translation_map.h>
 #include <condition_variable.h>
 #include <kernel.h>
 #include <lock.h>
@@ -98,8 +97,9 @@ struct vm_page {
 	bool					is_dummy : 1;
 	bool					busy_writing : 1;
 		// used in VMAnonymousCache::Merge()
+	bool					accessed : 1;
 	bool					modified : 1;
-	uint8					unused : 2;
+	uint8					unused : 1;
 
 	int8					usage_count;
 	uint16					wired_count;

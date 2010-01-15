@@ -192,7 +192,8 @@ VMAddressSpace::GetAreaIterator()
 extern "C" {
 #endif
 
-status_t vm_delete_areas(struct VMAddressSpace *aspace);
+status_t vm_delete_areas(struct VMAddressSpace *aspace,
+			bool deletingAddressSpace);
 #define vm_swap_address_space(from, to) arch_vm_aspace_swap(from, to)
 
 #ifdef __cplusplus

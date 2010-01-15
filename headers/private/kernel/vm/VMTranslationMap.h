@@ -14,6 +14,7 @@
 
 
 struct kernel_args;
+struct VMArea;
 
 
 struct VMTranslationMap {
@@ -34,6 +35,14 @@ struct VMTranslationMap {
 									uint32 attributes) = 0;
 	virtual	status_t			Unmap(addr_t start, addr_t end) = 0;
 
+	// map not locked
+	virtual	status_t			UnmapPage(VMArea* area, addr_t address) = 0;
+	virtual	void				UnmapPages(VMArea* area, addr_t base,
+									size_t size);
+	virtual	void				UnmapArea(VMArea* area,
+									bool deletingAddressSpace,
+									bool ignoreTopCachePageFlags);
+
 	virtual	status_t			Query(addr_t virtualAddress,
 									addr_t* _physicalAddress,
 									uint32* _flags) = 0;
@@ -43,6 +52,11 @@ struct VMTranslationMap {
 
 	virtual	status_t			Protect(addr_t base, addr_t top,
 									uint32 attributes) = 0;
+			status_t			ProtectPage(VMArea* area, addr_t address,
+									uint32 attributes);
+			status_t			ProtectArea(VMArea* area,
+									uint32 attributes);
+
 	virtual	status_t			ClearFlags(addr_t virtualAddress,
 									uint32 flags) = 0;
 
@@ -91,6 +105,22 @@ struct VMPhysicalPageMapper {
 									size_t length, bool user) = 0;
 	virtual	void				MemcpyPhysicalPage(addr_t to, addr_t from) = 0;
 };
+
+
+
+inline status_t
+VMTranslationMap::ProtectPage(VMArea* area, addr_t address, uint32 attributes)
+{
+	return Protect(address, address + B_PAGE_SIZE - 1, attributes);
+}
+
+
+#include <vm/VMArea.h>
+inline status_t
+VMTranslationMap::ProtectArea(VMArea* area, uint32 attributes)
+{
+	return Protect(area->Base(), area->Base() + area->Size() - 1, attributes);
+}
 
 
 #include <arch/vm_translation_map.h>
