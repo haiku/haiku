@@ -1092,6 +1092,39 @@ hda_codec_switch_init(hda_audio_group* audioGroup)
 }
 
 
+static status_t
+hda_codec_switch_handler(hda_codec* codec)
+{
+	while (acquire_sem(codec->unsol_response_sem) == B_OK) {
+		uint32 response = codec->unsol_responses[codec->unsol_response_read++];
+		codec->unsol_response_read %= MAX_CODEC_UNSOL_RESPONSES;
+
+		bool disable = response & 1;
+		hda_audio_group* audioGroup = codec->audio_groups[0];
+
+		for (uint32 i = 0; i < audioGroup->widget_count; i++) {
+			hda_widget& widget = audioGroup->widgets[i];
+			
+			if (widget.type != WT_PIN_COMPLEX || !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities))
+				continue;
+
+			int device = CONF_DEFAULT_DEVICE(widget.d.pin.config);
+			if (device != PIN_DEV_SPEAKER
+				&& device != PIN_DEV_LINE_OUT)
+				continue;
+			
+			uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
+					true);
+			corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
+				VID_SET_PIN_WIDGET_CONTROL, disable ? 0 : ctrl);
+			hda_send_verbs(audioGroup->codec, &verb, NULL, 1);	
+		}
+	}
+
+	return B_OK;
+}
+
+
 static void
 hda_codec_delete_audio_group(hda_audio_group* audioGroup)
 {
@@ -1313,6 +1346,10 @@ hda_codec_delete(hda_codec* codec)
 		return;
 
 	delete_sem(codec->response_sem);
+	delete_sem(codec->unsol_response_sem);
+	
+	int32 result;
+	wait_for_thread(codec->unsol_response_thread, &result);
 
 	for (uint32 i = 0; i < codec->num_audio_groups; i++) {
 		hda_codec_delete_audio_group(codec->audio_groups[i]);
@@ -1338,8 +1375,27 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	codec->controller = controller;
 	codec->addr = codecAddress;
 	codec->response_sem = create_sem(0, "hda_codec_response_sem");
-	codec->unsol_response_count = 0;
+	if (codec->response_sem < B_OK) {
+		ERROR("hda: Failed to create semaphore\n");
+		goto err;
+	}
 	controller->codecs[codecAddress] = codec;
+
+	codec->unsol_response_sem = create_sem(0, "hda_codec_unsol_response_sem");
+	if (codec->unsol_response_sem < B_OK) {
+		ERROR("hda: Failed to create semaphore\n");
+		goto err;
+	}
+	codec->unsol_response_read = 0;
+	codec->unsol_response_write = 0;
+	codec->unsol_response_thread = spawn_kernel_thread(
+		(status_t(*)(void*))hda_codec_switch_handler,
+		"hda_codec_unsol_thread", B_LOW_PRIORITY, codec);
+	if (codec->unsol_response_thread < B_OK) {
+		ERROR("hda: Failed to spawn thread\n");
+		goto err;
+	}
+	resume_thread(codec->unsol_response_thread);
 
 	struct {
 		uint32 device : 16;
@@ -1401,7 +1457,6 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	}
 
 	return codec;
-
 err:
 	controller->codecs[codecAddress] = NULL;
 	hda_codec_delete(codec);

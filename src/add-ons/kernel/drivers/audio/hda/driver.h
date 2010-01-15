@@ -286,8 +286,10 @@ struct hda_codec {
 	uint32		responses[MAX_CODEC_RESPONSES];
 	uint32		response_count;
 
+	sem_id		unsol_response_sem;
+	thread_id	unsol_response_thread;
 	uint32		unsol_responses[MAX_CODEC_UNSOL_RESPONSES];
-	uint32		unsol_response_count;
+	uint32		unsol_response_read, unsol_response_write;
 
 	hda_audio_group* audio_groups[HDA_MAX_AUDIO_GROUPS];
 	uint32		num_audio_groups;

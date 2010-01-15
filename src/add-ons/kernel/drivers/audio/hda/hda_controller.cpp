@@ -211,14 +211,12 @@ hda_interrupt_handler(hda_controller* controller)
 					if ((responseFlags & RESPONSE_FLAGS_UNSOLICITED) != 0) {
 						dprintf("hda: Unsolicited response: %08lx/%08lx\n",
 							response, responseFlags);
-						if (codec->unsol_response_count >= MAX_CODEC_UNSOL_RESPONSES) {
-							dprintf("hda: too many unsol responses received"
-								" for codec %ld: %08lx/%08lx!\n",
-								cad, response, responseFlags);
-							continue;
-						}
-						codec->unsol_responses[codec->unsol_response_count++] =
+						codec->unsol_responses[codec->unsol_response_write++] =
 							response;
+						codec->unsol_response_write %= MAX_CODEC_UNSOL_RESPONSES;
+						release_sem_etc(codec->unsol_response_sem, 1, 
+							B_DO_NOT_RESCHEDULE);
+						handled = B_INVOKE_SCHEDULER;
 						continue;
 					}
 					if (codec->response_count >= MAX_CODEC_RESPONSES) {
