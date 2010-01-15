@@ -201,14 +201,6 @@ ata_adapter_inthand(void *arg)
 
 	TRACE_INT("ata_adapter_inthand\n");
 
-	if (!channel->dmaing) {
-		// this could be a spurious interrupt, so read status
-		// register unconditionally to acknowledge those
-		TRACE_INT("ata_adapter_inthand: not DMA\n");
-		pci->read_io_8(device, channel->command_block_base + 7);
-		return B_UNHANDLED_INTERRUPT;
-	}
-
 	// need to read bus master status first, because some controllers
 	// will clear the interrupt status bit once ATA status is read
 	statusBM = pci->read_io_8(device, channel->bus_master_base
