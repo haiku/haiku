@@ -52,6 +52,10 @@ void
 __pthread_destroy_thread(void)
 {
 	pthread_thread* thread = pthread_self();
+	
+	// check if the thread is already dead
+	if ((atomic_get(&thread->flags) & THREAD_DEAD) != 0)
+		return;
 
 	// call cleanup handlers
 	while (true) {
@@ -240,6 +244,34 @@ pthread_setconcurrency(int newLevel)
 
 	sConcurrencyLevel = newLevel;
 	return 0;
+}
+
+
+int
+pthread_getschedparam(pthread_t thread, int *policy, struct sched_param *param)
+{
+	thread_info info;
+	status_t status = _kern_get_thread_info(thread->id, &info);
+	if (status == B_BAD_THREAD_ID)
+		return ESRCH;
+	param->sched_priority = info.priority;
+	if (policy != NULL)
+		*policy = SCHED_RR;
+	return 0;
+}
+
+
+int
+pthread_setschedparam(pthread_t thread, int policy, 
+	const struct sched_param *param)
+{
+	status_t status;
+	if (policy != SCHED_RR)
+		return ENOTSUP;
+	status = _kern_set_thread_priority(thread->id, param->sched_priority);
+	if (status == B_BAD_THREAD_ID)
+		return ESRCH;
+	return status;
 }
 
 
