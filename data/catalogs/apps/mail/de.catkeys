@@ -1,6 +1,6 @@
 1	german	x-vnd.Be-MAIL	2102081210
 %d - Date	Mail		%d - Datum
-Attach attributes:	Mail		Anhang anfügen:
+Attach attributes:	Mail		Dateiattribute anfügen:
 Inconsistency occurred in the undo/redo buffer.	Mail		Es ist eine Inkonsistenz im Rückgängig/Wiederherstellen-System aufgetreten.
 An error occurred trying to save the attachment.	Mail		Beim Speichern des Anhangs ist ein Fehler aufgetreten.
 Copy to new	Mail		Copy to new
