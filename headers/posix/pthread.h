@@ -280,6 +280,11 @@ extern int pthread_setcancelstate(int state, int *_oldState);
 extern int pthread_setcanceltype(int type, int *_oldType);
 extern void pthread_testcancel(void);
 
+extern int pthread_getschedparam(pthread_t thread, int *policy,
+	struct sched_param *param);
+extern int pthread_setschedparam(pthread_t thread, int policy,
+	const struct sched_param *param);
+
 /* thread specific data functions */
 extern int pthread_key_create(pthread_key_t *key,
 	void (*destructorFunc)(void*));
