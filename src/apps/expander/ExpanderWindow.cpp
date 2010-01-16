@@ -1,5 +1,6 @@
 /*
  * Copyright 2004-2006, Jérôme DUVAL. All rights reserved.
+ * Copyright 2010, Karsten Heimrich. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,8 +16,11 @@
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <Entry.h>
 #include <File.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -51,126 +55,60 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	fSettings(*settings),
 	fPreferences(NULL)
 {
-	// create menu bar
-	fBar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
-	BMenu* menu = new BMenu("File");
-	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem("About Expander" B_UTF8_ELLIPSIS,
-		new BMessage(B_ABOUT_REQUESTED)));
-	item->SetTarget(be_app_messenger);
-	menu->AddSeparatorItem();
-	menu->AddItem(fSourceItem = new BMenuItem("Set source" B_UTF8_ELLIPSIS,
-		new BMessage(MSG_SOURCE), 'O'));
-	menu->AddItem(fDestItem = new BMenuItem("Set destination" B_UTF8_ELLIPSIS,
-		new BMessage(MSG_DEST), 'D'));
-	menu->AddSeparatorItem();
-	menu->AddItem(fExpandItem = new BMenuItem("Expand", new BMessage(MSG_EXPAND),
-		'E'));
-	fExpandItem->SetEnabled(false);
-	menu->AddItem(fShowItem = new BMenuItem("Show contents",
-		new BMessage(MSG_SHOW), 'L'));
-	fShowItem->SetEnabled(false);
-	menu->AddSeparatorItem();
-	menu->AddItem(fStopItem = new BMenuItem("Stop", new BMessage(MSG_STOP), 'K'));
-	fStopItem->SetEnabled(false);
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W'));
-	fBar->AddItem(menu);
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
 
-	menu = new BMenu("Settings");
-	menu->AddItem(fPreferencesItem = new BMenuItem("Settings" B_UTF8_ELLIPSIS,
-		new BMessage(MSG_PREFERENCES), 'S'));
-	fBar->AddItem(menu);
-	AddChild(fBar);
+	_AddMenuBar(layout);
 
-	BRect rect = Bounds();
-	rect.top += fBar->Bounds().Height() + 1;
-	BView* topView = new BView(rect, "background", B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
+	fDestButton = new BButton("Destination", new BMessage(MSG_DEST));
+	fSourceButton = new BButton("Source", new BMessage(MSG_SOURCE));
+	fExpandButton = new BButton("Expand", new BMessage(MSG_EXPAND));
 
-	// Buttons
+	BSize size = fDestButton->PreferredSize();
+	size.width = max_c(size.width, fSourceButton->PreferredSize().width);
+	size.width = max_c(size.width, fExpandButton->PreferredSize().width);
 
-	rect = topView->Bounds().InsetByCopy(8, 8);
-	fDestButton = new BButton(rect, "destButton", "Destination",
-		new BMessage(MSG_DEST), B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	fDestButton->ResizeToPreferred();
+	fDestButton->SetExplicitMaxSize(size);
+	fSourceButton->SetExplicitMaxSize(size);
+	fExpandButton->SetExplicitMaxSize(size);
 
-	rect = fDestButton->Frame();
-	fDestButton->MoveBy(0, rect.Height() + 4);
-
-	fSourceButton = new BButton(rect, "sourceButton", "Source",
-		new BMessage(MSG_SOURCE), B_FOLLOW_LEFT | B_FOLLOW_TOP);
-
-	rect = fDestButton->Frame();
-	rect.OffsetBy(0, rect.Height() + 4);
-	fExpandButton = new BButton(rect, "expandButton", "Expand",
-		new BMessage(MSG_EXPAND), B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	fExpandButton->SetEnabled(false);
-
-	// TextControls
-
-	rect = fSourceButton->Frame();
-	rect.left = rect.right + 8;
-	rect.right = frame.Width() - 8;
-	fSourceText = new BTextControl(rect, "sourceText", "", NULL,
-		new BMessage(MSG_SOURCETEXT), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fSourceText->SetDivider(0);
-	float width, height;
-	fSourceText->GetPreferredSize(&width, &height);
-	fSourceText->ResizeTo(rect.Width(), height);
-	float offset = (rect.Height() - fSourceText->Bounds().Height()) / 2;
-	fSourceText->MoveBy(0, offset);
-	topView->AddChild(fSourceButton);
-	topView->AddChild(fSourceText);
-
-	rect = fSourceText->Frame();
-	rect.OffsetBy(0, fSourceButton->Bounds().Height() + 4);
-	fDestText = new BTextControl(rect, "destText", "", NULL,
-		new BMessage(MSG_DESTTEXT), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fDestText->SetDivider(0);
-	topView->AddChild(fDestButton);
-	topView->AddChild(fDestText);
-
-	rect.OffsetBy(0, fSourceButton->Bounds().Height() + 4 + offset);
-	fShowContents = new BCheckBox(rect, "showContents", "Show contents",
-		new BMessage(MSG_SHOWCONTENTS), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	fShowContents->ResizeToPreferred();
-	fShowContents->MoveTo(Bounds().right - 8 - fShowContents->Bounds().Width(),
-		rect.top);
-	topView->AddChild(fExpandButton);
-	topView->AddChild(fShowContents);
-	fShowContents->SetEnabled(false);
-
-	rect.left = fExpandButton->Frame().right + 8;
-	rect.right = fShowContents->Frame().left - 4;
-	fStatusView = new BStringView(rect, "statusView", "",
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS);
-	topView->AddChild(fStatusView);
-
-	ResizeTo(frame.Width(), topView->Frame().top + fExpandButton->Frame().bottom + 8);
-	SetSizeLimits(fExpandButton->Bounds().Width() * 3 + fShowContents->Bounds().Width() + 24,
-		32767.0f, Frame().Height(), Frame().Height());
-
-	rect = topView->Bounds();
-	rect.InsetBy(10, 0);
-	rect.top = rect.bottom + 2;
-	rect.bottom -= 10;
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-
-	BRect textRect = rect;
-	textRect.OffsetTo(B_ORIGIN);
-	textRect.InsetBy(1, 1);
-	fListingText = new BTextView(rect, "listingText", textRect,
-		be_fixed_font, NULL, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
+	fListingText = new BTextView("listingText");
 	fListingText->SetText("");
 	fListingText->MakeEditable(false);
-	fListingScroll = new BScrollView("listingScroll", fListingText,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
-	topView->AddChild(fListingScroll);
-	fListingScroll->Hide();
+	BScrollView* scrollView = new BScrollView("", fListingText,
+		B_INVALIDATE_AFTER_LAYOUT, false, true);
 
-	// finish creating window
+	BView* topView = layout->View();
+	const float spacing = be_control_look->DefaultItemSpacing();
+	topView->AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.AddGroup(B_VERTICAL, 5.0)
+				.Add(fDestButton)
+				.Add(fSourceButton)
+				.Add(fExpandButton)
+			.End()
+			.AddGroup(B_VERTICAL, spacing)
+				.Add(fSourceText = new BTextControl(NULL, NULL,
+					new BMessage(MSG_SOURCETEXT)))
+				.Add(fDestText = new BTextControl(NULL, NULL,
+					new BMessage(MSG_DESTTEXT)))
+				.AddGroup(B_HORIZONTAL, spacing)
+					.Add(fShowContents = new BCheckBox("Show contents",
+						new BMessage(MSG_SHOWCONTENTS)))
+					.Add(fStatusView = new BStringView(NULL, NULL))
+				.End()
+			.End()
+		.End()
+		.Add(scrollView)
+		.SetInsets(spacing, spacing, spacing, spacing)
+	);
+
+	size = topView->PreferredSize();
+	fSizeLimit = size.Height() - scrollView->PreferredSize().height - spacing;
+
+	ResizeTo(Bounds().Width(), fSizeLimit);
+	SetSizeLimits(size.Width(), 32767.0f, fSizeLimit, fSizeLimit);
+
 	Show();
 }
 
@@ -188,7 +126,7 @@ ExpanderWindow::~ExpanderWindow()
 }
 
 
-bool 
+bool
 ExpanderWindow::ValidateDest()
 {
 	BEntry entry(fDestText->Text(), true);
@@ -517,6 +455,41 @@ ExpanderWindow::RefsReceived(BMessage* msg)
 	}
 }
 
+void
+ExpanderWindow::_AddMenuBar(BLayout* layout)
+{
+	fBar = new BMenuBar("menu_bar", B_ITEMS_IN_ROW, B_INVALIDATE_AFTER_LAYOUT);
+	BMenu* menu = new BMenu("File");
+	BMenuItem* item;
+	menu->AddItem(item = new BMenuItem("About Expander" B_UTF8_ELLIPSIS,
+		new BMessage(B_ABOUT_REQUESTED)));
+	item->SetTarget(be_app_messenger);
+	menu->AddSeparatorItem();
+	menu->AddItem(fSourceItem = new BMenuItem("Set source" B_UTF8_ELLIPSIS,
+		new BMessage(MSG_SOURCE), 'O'));
+	menu->AddItem(fDestItem = new BMenuItem("Set destination" B_UTF8_ELLIPSIS,
+		new BMessage(MSG_DEST), 'D'));
+	menu->AddSeparatorItem();
+	menu->AddItem(fExpandItem = new BMenuItem("Expand", new BMessage(MSG_EXPAND),
+		'E'));
+	fExpandItem->SetEnabled(false);
+	menu->AddItem(fShowItem = new BMenuItem("Show contents",
+		new BMessage(MSG_SHOW), 'L'));
+	fShowItem->SetEnabled(false);
+	menu->AddSeparatorItem();
+	menu->AddItem(fStopItem = new BMenuItem("Stop", new BMessage(MSG_STOP), 'K'));
+	fStopItem->SetEnabled(false);
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W'));
+	fBar->AddItem(menu);
+
+	menu = new BMenu("Settings");
+	menu->AddItem(fPreferencesItem = new BMenuItem("Settings" B_UTF8_ELLIPSIS,
+		new BMessage(MSG_PREFERENCES), 'S'));
+	fBar->AddItem(menu);
+	layout->AddView(fBar);
+}
+
 
 void
 ExpanderWindow::StartExpanding()
@@ -592,19 +565,20 @@ ExpanderWindow::_UpdateWindowSize(bool showContents)
 	float minWidth, maxWidth, minHeight, maxHeight;
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 
-	float bottom = fExpandButton->Parent()->Frame().top + fExpandButton->Frame().bottom + 8;
+	float bottom = fSizeLimit;
 
 	if (showContents) {
 		font_height fontHeight;
 		be_plain_font->GetHeight(&fontHeight);
-		float lineHeight = ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading);
+		float lineHeight = ceilf(fontHeight.ascent + fontHeight.descent
+			+ fontHeight.leading);
 
-		minHeight = bottom + 14 + 4 * lineHeight;
+		minHeight = bottom + 5.0 * lineHeight;
 		maxHeight = 32767.0;
-		bottom = minHeight + 10 * lineHeight;
+		bottom = minHeight + 10.0 * lineHeight;
 	} else {
-		minHeight = bottom;
-		maxHeight = bottom;
+		minHeight = fSizeLimit;
+		maxHeight = fSizeLimit;
 	}
 
 	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
@@ -618,9 +592,6 @@ ExpanderWindow::StartListing()
 	_UpdateWindowSize(true);
 
 	fLargestDelta = 0.0f;
-
-	if (fListingScroll->IsHidden())
-		fListingScroll->Show();
 
 	if (!fSourceChanged)
 		return;

@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Jérôme Duval
+ *		Karsten Heimrich <host.haiku@gmx.de>
  */
 #ifndef EXPANDER_WINDOW_H
 #define EXPANDER_WINDOW_H
@@ -18,7 +19,7 @@
 
 class BCheckBox;
 class BMenu;
-class BScrollView;
+class BLayout;
 class BStringView;
 class BTextControl;
 class BTextView;
@@ -37,10 +38,11 @@ public:
 	virtual	void				MessageReceived(BMessage* msg);
 	virtual	bool				QuitRequested();
 
-			void				SetRef(const entry_ref* ref);
+//			void				SetRef(const entry_ref* ref);
 			void				RefsReceived(BMessage* msg);
 
 private:
+			void				_AddMenuBar(BLayout* layout);
 			bool				CanQuit();
 				// returns true if the window can be closed safely, false if not
 			void				CloseWindowOrKeepOpen();
@@ -77,7 +79,6 @@ private:
 			BTextControl*		fDestText;
 			BStringView*		fStatusView;
 			BTextView*			fListingText;
-			BScrollView*		fListingScroll;
 
 			ExpanderThread*		fListingThread;
 			bool				fListingStarted;
@@ -90,6 +91,7 @@ private:
 			ExpanderRules		fRules;
 
 			float				fLargestDelta;
+			float				fSizeLimit;
 };
 
 #endif /* EXPANDER_WINDOW_H */
