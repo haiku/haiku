@@ -11,7 +11,7 @@ UsePrivateHeaders storage ;
 
 AddResources Mail : pictures.rdef  ;
 
-Application Mail : 
+Application Mail :
 	BmapButton.cpp
 	ButtonBar.cpp
 	ComboBox.cpp
@@ -49,6 +49,6 @@ DoCatalogs Mail :
 	Prefs.cpp
 	Signature.cpp
 	: en.catalog
-	: ja.catkeys pt.catkeys
+	: de.catkeys ja.catkeys pt.catkeys
 	;
 

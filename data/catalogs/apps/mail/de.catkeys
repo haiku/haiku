@@ -1,0 +1,141 @@
+1	german	x-vnd.Be-MAIL	2102081210
+%d - Date	Mail		%d - Datum
+Attach attributes:	Mail		Anhang anfügen:
+Inconsistency occurred in the undo/redo buffer.	Mail		Es ist eine Inkonsistenz im Rückgängig/Wiederherstellen-System aufgetreten.
+An error occurred trying to save the attachment.	Mail		Beim Speichern des Anhangs ist ein Fehler aufgetreten.
+Copy to new	Mail		Copy to new
+Edit	Mail		Bearbeiten
+Print	Mail		Drucken
+New mail message	Mail		Neue Nachricht verfassen
+Automatically mark mail as read:	Mail		Nachrichten automatisch als gelesen markieren:
+Colored quotes:	Mail		Farbige Zitate:
+Subject:	Mail		Betreff:
+Reply to all	Mail		Allen antworten
+Show icons & labels	Mail		Icons und Beschriftung anzeigen
+Remove attachment	Mail		Anhang löschen
+Button bar:	Mail		Werkzeugleiste:
+Beginner	Mail		Anfänger
+Don't save	Mail		Nicht speichern
+Expert	Mail		Experte
+Reply account:	Mail		Konto zum Beantworten:
+Discard	Mail		Verwerfen
+Message	Mail		Nachricht
+Reply to sender	Mail		Absender antworten
+There is no installed handler for URL links.	Mail		Es ist keine Handhabung für URL-Verweise eingerichtet.
+Signature	Mail		Signatur
+Find again	Mail		Nächstes finden
+Bcc:	Mail		Blindkopie:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ihr Text enthält %ld nicht kodierbare Zeichen. Eine alternative Zeichenkodierung wäre angebracht. Wählen Sie Senden um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder brechen Sie den Vorgang ab, um das Problem zu lösen.
+Signature:	Mail		Signatur:
+Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nGeschrieben von Robert Polic.\nErweitert vom Dr. Zoidberg Team.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Save changes to this signature?	Mail		Änderungen an der Signatur speichern?
+Cc:	Mail		Kopie:
+Find	Mail		Finden
+Preferences…	Mail		Einstellungen…
+Undo	Mail		Rückgängig
+Leave as New	Mail		Als Neu belassen
+An error occurred trying to open this signature.	Mail		Beim Öffnen dieser Signatur ist ein Fehler aufgetreten.
+No file attributes, just plain data	Mail		Keine Dateiattribute, nur reine Daten
+Edit queries…	Mail		Suchabfragen bearbeiten…
+Paste	Mail		Einfügen
+Save attachment…	Mail		Anhang speichern…
+Include file attributes in attachments	Mail		Dateiattribute in Anhängen speichern
+OK	Mail		OK
+Send	Mail		Senden
+Show icons only	Mail		Nur Icons anzeigen
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Anhänge von weitergeleiteten Nachrichten zu entfernen wird noch nicht unterstützt.\nEs wird nicht richtig funktionieren.
+Hide	Mail		Ausblenden
+Forward without attachments	Mail		Mit Anhängen weiterleiten
+Previous	Mail		Vorheriges
+Redo	Mail		Wiederherstellen
+Add enclosure…	Mail		Anhang anfügen…
+Print…	Mail		Drucken…
+Warn unencodable:	Mail		Warnung nicht-kodierbar:
+Quit	Mail		Beenden
+%n - Full name	Mail		%n - Voller Name
+ Read 	Mail		Gelesen
+Trash	Mail		Löschen
+Default account:	Mail		Standardkonto:
+Size:	Mail		Größe:
+Account from mail	Mail		Konto der Nachricht
+Edit signatures…	Mail		Signaturen bearbeiten…
+New	Mail		Neu
+Attachments: 	Mail		Anhänge:
+Set to %s	Mail		Setzen auf %s
+Forward	Mail		Weiterleiten
+E-mail draft could not be saved!	Mail		Nachrichtenentwurf konnte nicht gespeichert werden!
+To:	Mail		An:
+Only files can be added as attachments.	Mail		Nur Dateien können als Anhang hinzugefügt werden.
+Previous message	Mail		Vorherige Nachricht
+Title:	Mail		Titel:
+Find…	Mail		Finden…
+Accounts…	Mail		Konten…
+Mail preferences	Mail		Mail Einstellungen
+Initial spell check mode:	Mail		Voreingestellter Rechtschreibprüfmodus:
+Leave same	Mail		Beibehalten
+About Mail…	Mail		Über Mail…
+Page setup…	Mail		Seite einrichten…
+Text wrapping:	Mail		Textumbruch:
+Revert	Mail		Änderungen verwerfen
+File	Mail		Datei
+None	Mail		Keine
+Copy link location	Mail		Linkadresse kopieren
+Show header	Mail		Nachrichtenkopf anzeigen
+%e - E-mail address	Mail		%e - Nachrichtenadresse
+Resend	Mail		Nochmals senden
+Show raw message	Mail		Rohnachricht anzeigen
+\\n - Newline	Mail		\\n - Zeilenumbruch
+Start now	Mail		Jetzt starten
+Close	Mail		Schließen
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Der Nachrichtendienst (mail_daemon) läuft nicht. Die Nachricht versendet, sobald der Dienst läuft.
+Really delete this signature? This cannot be undone.	Mail		Diese Signatur tatsächlich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+Open	Mail		Öffnen
+Quote	Mail		Zitat
+Add	Mail		Hinzufügen
+Next message	Mail		Nächste Nachricht
+User interface	Mail		Programmoberfläche
+Cancel	Mail		Abbrechen
+Send message	Mail		Nachricht senden
+Remove enclosure	Mail		Anhang löschen
+Account:	Mail		Konto:
+Decoding:	Mail		Zeichendekodierung:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Es konnte leider keine Anwendung gefunden werden, welche den 'Person' Datentypen unterstützt.
+Do you wish to send this message before closing?	Mail		Möchten Sie diese Nachricht senden, bevor sie geschlossen wird?
+Delete	Mail		Löschen
+Leave as '%s'	Mail		Als '%s' belassen
+Copy	Mail		Kopieren
+Reply preamble:	Mail		Antwort einleiten:
+Signatures	Mail		Signaturen
+Next	Mail		Nächste
+Set to…	Mail		Setzen auf…
+Use default account	Mail		Standardkonto verwenden
+Sorry	Mail		Entschuldigung
+Encoding:	Mail		Kodierung:
+Font:	Mail		Schriftsatz:
+Save address	Mail		Adresse speichern
+Queries	Mail		Suchabfragen
+Do you wish to save this message as a draft before closing?	Mail		Möchten Sie diese Nachricht als Entwurf speichern, bevor sie geschlossen wird?
+Save	Mail		Speichern
+Random	Mail		Zufällig
+Close and 	Mail		Schließen und
+Save as draft	Mail		Als Entwurf speichern
+The mail_daemon could not be started:\n\t	Mail		Der Maildienst (mail_daemon) konnte nicht gestartet werden:\n\t
+Open attachment	Mail		Anhang öffnen
+Reply	Mail		Antworten
+The spell check feature requires the optional \"words\" file on your BeOS CD.	Mail		Die Rechtschreibprüfung erfordert die optionale \"words\" Datei von Ihrer BeOS CD.
+From:	Mail		Von:
+Couldn't open this signature. Sorry.	Mail		Diese Signatur konnte leider nicht geöffnet werden.
+Open draft	Mail		Entwurf öffnen
+Cut	Mail		Ausschneiden
+Check spelling	Mail		Rechtschreibung prüfen
+Set to Saved	Mail		Als gespeichert setzen
+Open this link	Mail		Diesen Link öffnen
+Auto signature:	Mail		Automatische Signatur:
+Add signature	Mail		Signatur hinzufügen
+Need Tracker to move items to trash	Mail		Der Tracker wird benötigt, um Nachrichten in den Müll zu verschieben.
+Mailing	Mail		Nachrichten
+Unread	Mail		Ungelesen
+Remove quote	Mail		Zitat entfernen
+Move to trash	Mail		In den Müll verschieben
+Select all	Mail		Alles auswählen
+An error occurred trying to save this signature.	Mail		Beim Speichern dieser Signatur ist ein Fehler aufgetreten.
