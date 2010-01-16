@@ -7,6 +7,8 @@ use strict;
 
 This simple script traverses the haiku sources and creates (incomplete) *.pro
 files in order to make the haiku sources available within the qt-creator IDE.
+Additionally, it will add those files to svn:ignore of their parent directory
+(unless already contained there).
 
 =cut
 
@@ -81,4 +83,24 @@ sub writeProFile
 			"SOURCES = ".join(" \\\n\t", sort @{$info->{sources}})."\n";
 	}
 	close $proFileFH;
+	
+	updateSvnIgnore($proFile);
+}
+
+sub updateSvnIgnore
+{
+	my $proFile = shift;
+
+	my ($filename, $parentDir) = fileparse($proFile);
+
+	my $svnIgnore = qx{svn propget --strict svn:ignore $parentDir};
+	if (!grep { $_ eq $filename } split "\n", $svnIgnore) {
+		chomp $svnIgnore;
+		$svnIgnore .= "\n" unless !$svnIgnore;
+		$svnIgnore .= "$filename\n";
+		open(my $propsetFH, "|svn propset svn:ignore --file - $parentDir")
+			or die "unable to open pipe to 'svn propset'";
+		print $propsetFH $svnIgnore;
+		close($propsetFH);
+	}
 }
