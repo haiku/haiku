@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <sys/mman.h>
 
 #include <errno.h>
@@ -16,7 +17,7 @@
 #include <vm_defs.h>
 
 
-static const char* kSharedMemoryDir = "/boot/var/shared_memory/";
+static const char* kSharedMemoryDir = "/var/shared_memory/";
 
 
 static bool

@@ -20,6 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+
 #include "Grepper.h"
 
 #include <new>
@@ -176,7 +177,7 @@ Grepper::_GrepperThread()
 	char command[B_PATH_NAME_LENGTH + 32];
 
 	BPath tempFile;
-	sprintf(fileName, "/boot/var/tmp/SearchText%ld", fThreadId);
+	sprintf(fileName, "/tmp/SearchText%ld", fThreadId);
 	tempFile.SetTo(fileName);
 
 	while (!fMustQuit && fIterator->GetNextName(fileName)) {
@@ -249,7 +250,7 @@ Grepper::_GrepperThread()
 
 	// We wait with removing the temporary file until after the
 	// entire search has finished, to prevent a lot of flickering
-	// if the Tracker window for /boot/var/tmp/ might be open.
+	// if the Tracker window for /tmp/ might be open.
 
 	remove(tempFile.Path());
 

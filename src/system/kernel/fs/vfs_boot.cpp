@@ -1,6 +1,6 @@
 /*
  * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -48,8 +48,8 @@ static struct {
 	{"/system", "/boot/system"},
 	{"/bin", "/boot/system/bin"},
 	{"/etc", "/boot/common/etc"},
-	{"/var", "/boot/var"},
-	{"/tmp", "/boot/var/tmp"},
+	{"/var", "/boot/common/var"},
+	{"/tmp", "/boot/common/cache/tmp"},
 	{NULL}
 };
 

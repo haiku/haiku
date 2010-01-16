@@ -58,7 +58,7 @@ SCRIPTS=system/boot
 SERVERS=system/servers
 
 # clean the shared memory dir
-shmDir=/boot/var/shared_memory
+shmDir=/var/shared_memory
 rm -rf $shmDir
 mkdir -p $shmDir
 chmod 777 $shmDir

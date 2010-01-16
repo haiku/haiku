@@ -551,9 +551,9 @@ AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage home config bin ;
 AddDirectoryToHaikuImage home config lib ;
 AddDirectoryToHaikuImage home mail ;
-AddDirectoryToHaikuImage var empty ;
-AddDirectoryToHaikuImage var log ;
-AddDirectoryToHaikuImage var tmp ;
+AddDirectoryToHaikuImage common var empty ;
+AddDirectoryToHaikuImage common var log ;
+AddDirectoryToHaikuImage common cache tmp ;
 
 AddDirectoryToHaikuImage home config add-ons kernel drivers bin ;
 AddDirectoryToHaikuImage home config add-ons kernel drivers dev ;

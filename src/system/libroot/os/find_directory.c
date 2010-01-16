@@ -1,6 +1,6 @@
 /*
  * Copyright 2004, François Revol.
- * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
  *
  * Distributed under the terms of the MIT license.
  */
@@ -72,10 +72,10 @@ static const char *kCommonDirectories[] = {
 	COMMON "/documentation",
 	COMMON "/settings",
 	"develop",								// B_COMMON_DEVELOP_DIRECTORY
-	"var/log",								// B_COMMON_LOG_DIRECTORY
-	"var/spool",							// B_COMMON_SPOOL_DIRECTORY
-	"var/tmp",								// B_COMMON_TEMP_DIRECTORY
-	"var",									// B_COMMON_VAR_DIRECTORY
+	COMMON "/var/log",						// B_COMMON_LOG_DIRECTORY
+	COMMON "/var/spool",					// B_COMMON_SPOOL_DIRECTORY
+	COMMON "/cache/tmp",					// B_COMMON_TEMP_DIRECTORY
+	COMMON "/var",							// B_COMMON_VAR_DIRECTORY
 	COMMON "/add-ons/Translators",
 	COMMON "/add-ons/media",
 	COMMON "/data/sounds",

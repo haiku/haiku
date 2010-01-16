@@ -2243,7 +2243,7 @@ isHarmlessPathname(const char *path)
 {
 	bool result = false;
 	if (path) {
-		const char *harmlessDir = "/boot/var/tmp/";
+		const char *harmlessDir = "/tmp/";
 		result = (string(path).find(harmlessDir) == 0);
 	}
 if (!result)
@@ -2370,14 +2370,13 @@ static const char *tooLongEntryname =
 	"1234567890123456789012345678901234567890123456789012345678901234567890"
 	"12345678901234567890123456789012345678901234567";
 
-// init_entry_test
-static
-void
+
+static void
 init_entry_test()
 {
 	// root dir for testing
 	testDir.initDir(badTestEntry, "testDir");
-	testDir.initPath((string("/boot/var/tmp/") + testDir.name).c_str());
+	testDir.initPath((string("/tmp/") + testDir.name).c_str());
 	allTestEntries.pop_back();
 	// other entries
 	dir1.initDir(testDir, "dir1");
