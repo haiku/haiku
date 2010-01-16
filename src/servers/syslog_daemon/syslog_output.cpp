@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -29,16 +29,15 @@ static const char *kFacilities[] = {
 };
 static const int32 kNumFacilities = 24;
 
-static int		 sLog = -1;
-static char		 sLastMessage[1024];
+static int sLog = -1;
+static char sLastMessage[1024];
 static thread_id sLastThread;
-static int32	 sRepeatCount;
-static size_t	 sLogMaxSize = 524288;	// 512kB
-static bool		 sLogTimeStamps = false;
+static int32 sRepeatCount;
+static size_t sLogMaxSize = 524288;	// 512kB
+static bool sLogTimeStamps = false;
 
 
-/*!
-	Creates the log file if not yet existing, or renames the old
+/*!	Creates the log file if not yet existing, or renames the old
 	log file, if it's too big already.
 */
 static status_t
@@ -133,16 +132,21 @@ syslog_output(syslog_message &message)
 	int facility = SYSLOG_FACILITY_INDEX(message.priority);
 	if (facility >= kNumFacilities)
 		facility = SYSLOG_FACILITY_INDEX(LOG_USER);
-	pos += snprintf(header + pos, sizeof(header) - pos, "%s", kFacilities[facility]);
+	pos += snprintf(header + pos, sizeof(header) - pos, "%s",
+		kFacilities[facility]);
 
 	// add ident/thread ID
 	if (message.ident[0] == '\0') {
 		// ToDo: find out team name?
-	} else
-		pos += snprintf(header + pos, sizeof(header) - pos, " '%s'", message.ident);
+	} else {
+		pos += snprintf(header + pos, sizeof(header) - pos, " '%s'",
+			message.ident);
+	}
 
-	if (message.options & LOG_PID)
-		pos += snprintf(header + pos, sizeof(header) - pos, "[%ld]", message.from);
+	if ((message.options & LOG_PID) != 0) {
+		pos += snprintf(header + pos, sizeof(header) - pos, "[%ld]",
+			message.from);
+	}
 
 	headerLength = pos + strlcpy(header + pos, ": ", sizeof(header) - pos);
 	if (headerLength >= (int32)sizeof(header))
@@ -175,7 +179,8 @@ syslog_output(syslog_message &message)
 			length = sizeof(buffer) - 1;
 
 		if (message.from == sLastThread
-			&& !strncmp(buffer + headerLength, sLastMessage, sizeof(sLastMessage))) {
+			&& !strncmp(buffer + headerLength, sLastMessage,
+					sizeof(sLastMessage))) {
 			// we got this message already
 			sRepeatCount++;
 		} else {
@@ -225,4 +230,3 @@ init_syslog_output(SyslogDaemon *daemon)
 
 	daemon->AddHandler(syslog_output);
 }
-
