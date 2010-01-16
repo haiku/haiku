@@ -1,11 +1,17 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//---------------------------------------------------------------------
-/*!
-	\file SymLink.cpp
+/*
+ * Copyright 2002-2009, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ */
+
+
+/*!	\file SymLink.cpp
 	BSymLink implementation.
 */
+
 
 #include <new>
 #include <string.h>
@@ -21,37 +27,34 @@
 
 using namespace std;
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
 
-// constructor
 //! Creates an uninitialized BSymLink object.
 BSymLink::BSymLink()
-		: BNode()
 {
 }
 
-// copy constructor
+
 //! Creates a copy of the supplied BSymLink.
 /*!	\param link the BSymLink object to be copied
 */
 BSymLink::BSymLink(const BSymLink &link)
-		: BNode(link)
+	:
+	BNode(link)
 {
 }
 
-// constructor
+
 /*! \brief Creates a BSymLink and initializes it to the symbolic link referred
 	to by the supplied entry_ref.
 	\param ref the entry_ref referring to the symbolic link
 */
 BSymLink::BSymLink(const entry_ref *ref)
-		: BNode(ref)
+	:
+	BNode(ref)
 {
 }
 
-// constructor
+
 /*! \brief Creates a BSymLink and initializes it to the symbolic link referred
 	to by the supplied BEntry.
 	\param entry the BEntry referring to the symbolic link
@@ -61,17 +64,18 @@ BSymLink::BSymLink(const BEntry *entry)
 {
 }
 
-// constructor
+
 /*! \brief Creates a BSymLink and initializes it to the symbolic link referred
 	to by the supplied path name.
 	\param path the symbolic link's path name 
 */
 BSymLink::BSymLink(const char *path)
-		: BNode(path)
+	:
+	BNode(path)
 {
 }
 
-// constructor
+
 /*! \brief Creates a BSymLink and initializes it to the symbolic link referred
 	to by the supplied path name relative to the specified BDirectory.
 	\param dir the BDirectory, relative to which the symbolic link's path name
@@ -79,11 +83,12 @@ BSymLink::BSymLink(const char *path)
 	\param path the symbolic link's path name relative to \a dir
 */
 BSymLink::BSymLink(const BDirectory *dir, const char *path)
-		: BNode(dir, path)
+	:
+	BNode(dir, path)
 {
 }
 
-// destructor
+
 //! Frees all allocated resources.
 /*! If the BSymLink is properly initialized, the symbolic link's file
 	descriptor is closed.
@@ -92,7 +97,7 @@ BSymLink::~BSymLink()
 {
 }
 
-// ReadLink
+
 //! Reads the contents of the symbolic link into a buffer.
 /*!	The string written to the buffer will be null-terminated.
 	\param buf the buffer
@@ -125,7 +130,7 @@ BSymLink::ReadLink(char *buffer, size_t size)
 	return linkLen;
 }
 
-// MakeLinkedPath
+
 /*!	\brief Combines a directory path and the contents of this symbolic link to
 	an absolute path.
 	\param dirPath the path name of the directory
@@ -141,9 +146,9 @@ BSymLink::ReadLink(char *buffer, size_t size)
 ssize_t
 BSymLink::MakeLinkedPath(const char *dirPath, BPath *path)
 {
-	// R5 seems to convert the dirPath to a BDirectory, which causes links to
-	// be resolved, i.e. a "/tmp" dirPath expands to "/boot/var/tmp".
-	// That does also mean, that the dirPath must exists!
+	// BeOS seems to convert the dirPath to a BDirectory, which causes links to
+	// be resolved.
+	// This does also mean that the dirPath must exist!
 	if (!dirPath || !path)
 		return B_BAD_VALUE;
 	BDirectory dir(dirPath);
@@ -153,7 +158,7 @@ BSymLink::MakeLinkedPath(const char *dirPath, BPath *path)
 	return result;
 }
 
-// MakeLinkedPath
+
 /*!	\brief Combines a directory path and the contents of this symbolic link to
 	an absolute path.
 	\param dir the BDirectory referring to the directory
@@ -184,7 +189,7 @@ BSymLink::MakeLinkedPath(const BDirectory *dir, BPath *path)
 	return result;
 }
 
-// IsAbsolute
+
 //!	Returns whether this BSymLink refers to an absolute link.
 /*!	/return
 	- \c true, if the object is properly initialized and the symbolic link it
@@ -209,6 +214,7 @@ void BSymLink::_MissingSymLink4() {}
 void BSymLink::_MissingSymLink5() {}
 void BSymLink::_MissingSymLink6() {}
 
+
 //! Returns the BSymLink's file descriptor.
 /*! To be used instead of accessing the BNode's private \c fFd member directly.
 	\return the file descriptor, or -1, if not properly initialized.
@@ -218,9 +224,3 @@ BSymLink::get_fd() const
 {
 	return fFd;
 }
-
-
-#ifdef USE_OPENBEOS_NAMESPACE
-};		// namespace OpenBeOS
-#endif
-
