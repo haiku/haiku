@@ -743,7 +743,7 @@ BContainerWindow::UpdateIfTrash(Model *model)
 	BEntry entry(model->EntryRef());
 
 	if (entry.InitCheck() == B_OK) {
-		fIsTrash = FSIsTrashDir(&entry);
+		fIsTrash = model->IsTrash();
 		fInTrash = FSInTrashDir(model->EntryRef());
 		fIsPrinters = FSIsPrintersDir(&entry);
 	}
@@ -2487,8 +2487,7 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 		// clicked on a pose, show file or volume context menu
 		Model model(ref);
 		
-		BEntry entry;
-		if (entry.SetTo(ref) == B_OK && FSIsTrashDir(&entry)) {
+		if (model.IsTrash()) {
 
 			if (fTrashContextMenu->Window() || Dragging())
 				return;

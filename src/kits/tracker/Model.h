@@ -135,6 +135,7 @@ class Model {
 		bool IsExecutable() const;
 		bool IsSymLink() const;
 		bool IsRoot() const;
+		bool IsTrash() const;
 		bool IsVolume() const;
 
 		IconSource IconFrom() const;
@@ -306,11 +307,13 @@ Model::MimeType() const
 	return fMimeType.String();
 }
 
+
 inline const entry_ref *
 Model::EntryRef() const
 {
 	return &fEntryRef;
 }
+
 
 inline const node_ref *
 Model::NodeRef() const
@@ -319,11 +322,13 @@ Model::NodeRef() const
 	return (node_ref *)&fStatBuf;
 }
 
+
 inline BNode *
 Model::Node() const
 {
 	return fNode;
 }
+
 
 inline const StatStruct *
 Model::StatBuf() const
@@ -331,11 +336,13 @@ Model::StatBuf() const
 	return &fStatBuf;
 }
 
+
 inline IconSource 
 Model::IconFrom() const
 {
 	return (IconSource)fIconFrom;
 }
+
 
 inline void 
 Model::SetIconFrom(IconSource from)
@@ -343,12 +350,14 @@ Model::SetIconFrom(IconSource from)
 	fIconFrom = from;
 }
 
+
 inline Model *
 Model::LinkTo() const
 {
 	ASSERT(IsSymLink());
 	return fLinkTo;
 }
+
 
 inline bool
 Model::IsFile() const
@@ -359,11 +368,13 @@ Model::IsFile() const
 		|| fBaseType == kExecutableNode;
 }
 
+
 inline bool
 Model::IsVolume() const
 {
 	return fBaseType == kVolumeNode;
 }
+
 
 inline bool
 Model::IsDirectory() const
@@ -374,17 +385,20 @@ Model::IsDirectory() const
 		|| fBaseType == kTrashNode;
 }
 
+
 inline bool
 Model::IsQuery() const
 {
 	return fBaseType == kQueryNode;
 }
 
+
 inline bool
 Model::IsQueryTemplate() const
 {
 	return fBaseType == kQueryTemplateNode;
 }
+
 
 inline bool
 Model::IsContainer() const
@@ -394,11 +408,20 @@ Model::IsContainer() const
 	return IsQuery() || IsDirectory();
 }
 
+
 inline bool
 Model::IsRoot() const
 {
 	return fBaseType == kRootNode;
 }
+
+
+inline bool
+Model::IsTrash() const
+{
+	return fBaseType == kTrashNode;
+}
+
 
 inline bool
 Model::IsExecutable() const
@@ -406,11 +429,13 @@ Model::IsExecutable() const
 	return fBaseType == kExecutableNode;
 }
 
+
 inline bool
 Model::IsSymLink() const
 {
 	return fBaseType == kLinkNode;
 }
+
 
 inline
 ModelNodeLazyOpener::ModelNodeLazyOpener(Model *model, bool writable, bool openLater)
@@ -421,6 +446,7 @@ ModelNodeLazyOpener::ModelNodeLazyOpener(Model *model, bool writable, bool openL
 	if (!openLater)
 		OpenNode(writable);
 }
+
 
 inline
 ModelNodeLazyOpener::~ModelNodeLazyOpener()
@@ -433,11 +459,13 @@ ModelNodeLazyOpener::~ModelNodeLazyOpener()
 		fModel->OpenNode();
 }
 
+
 inline bool 
 ModelNodeLazyOpener::IsOpen() const
 {
 	return fModel->IsNodeOpen();
 }
+
 
 inline bool 
 ModelNodeLazyOpener::IsOpenForWriting() const
@@ -445,17 +473,20 @@ ModelNodeLazyOpener::IsOpenForWriting() const
 	return fModel->IsNodeOpenForWriting();
 }
 
+
 inline bool 
 ModelNodeLazyOpener::IsOpen(bool forWriting) const
 {
 	return forWriting ? fModel->IsNodeOpenForWriting() : fModel->IsNodeOpen();
 }
 
+
 inline Model *
 ModelNodeLazyOpener::TargetModel() const
 {
 	return fModel;
 }
+
 
 inline status_t 
 ModelNodeLazyOpener::OpenNode(bool writable)
@@ -468,6 +499,7 @@ ModelNodeLazyOpener::OpenNode(bool writable)
 	
 	return B_OK;
 }
+
 
 } // namespace BPrivate
 

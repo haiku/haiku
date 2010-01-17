@@ -1207,10 +1207,9 @@ AttributeView::ReLinkTargetModel(Model *model)
 void
 AttributeView::MouseDown(BPoint point)
 {
-	// Make sure this isn't the trash directory
 	BEntry entry;
 	fModel->GetEntry(&entry);
-
+	
 	// Assume this isn't part of a double click
 	fDoubleClick = false;
 
@@ -1223,7 +1222,7 @@ AttributeView::MouseDown(BPoint point)
 		fTrackingState = path_track;
 	} else if (fTitleRect.Contains(point)) {
 		// You can't change the name of the trash
-		if (!FSIsTrashDir(&entry)
+		if (!fModel->IsTrash()
 			&& ConfirmChangeIfWellKnownDirectory(&entry, "rename", true)
 			&& fTitleEditView == 0)
 			BeginEditingTitle();

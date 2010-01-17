@@ -413,7 +413,7 @@ BNavMenu::StartBuildingItemList()
 		fContainer = DesktopPoseView::InitDesktopDirentIterator(0, startModel.EntryRef());
 		AddRootItemsIfNeeded();
 		AddTrashItem();
-	} else if (FSIsTrashDir(&entry)) {
+	} else if (startModel.IsTrash()) {
 		// the trash window needs to display a union of all the
 		// trash folders from all the mounted volumes
 		BVolumeRoster volRoster;

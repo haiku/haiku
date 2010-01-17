@@ -318,15 +318,16 @@ BTextWidget::StartEdit(BRect bounds, BPoseView *view, BPose *pose)
 		return;
 
 	// don't allow editing of the trash directory name
-	BEntry entry(pose->TargetModel()->EntryRef());
-	if (entry.InitCheck() == B_OK && FSIsTrashDir(&entry))
+	if (pose->TargetModel()->IsTrash())
 		return;
 
 	// don't allow editing of the "Disks" icon name
 	if (pose->TargetModel()->IsRoot())
 		return;
 
-	if (!ConfirmChangeIfWellKnownDirectory(&entry, "rename"))
+	BEntry entry(pose->TargetModel()->EntryRef());
+	if (entry.InitCheck() == B_OK 
+		&& !ConfirmChangeIfWellKnownDirectory(&entry, "rename"))
 		return;
 
 	// get bounds with full text length

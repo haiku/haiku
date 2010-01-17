@@ -758,9 +758,7 @@ BPoseView::SavePoseLocations(BRect *frameIfDesktop)
 			ASSERT(model->InitCheck() == B_OK);
 			// special handling for "root" disks icon
 			// and trash pose on desktop dir
-			BEntry entry;
-			model->GetEntry(&entry);
-			bool isTrash = FSIsTrashDir(&entry) && IsDesktopView();
+			bool isTrash = model->IsTrash() && IsDesktopView();
 			if (model->IsRoot() || isTrash) {
 				BDirectory dir;
 				if (FSGetDeskDir(&dir) == B_OK) {
@@ -2648,7 +2646,7 @@ BPoseView::ReadPoseInfo(Model *model, PoseInfo *poseInfo)
 	ReadAttrResult result = kReadAttrFailed;
 	BEntry entry;
 	model->GetEntry(&entry);
-	bool isTrash = FSIsTrashDir(&entry) && IsDesktopView();
+	bool isTrash = model->IsTrash() && IsDesktopView();
 
 	// special case the "root" disks icon
 	// as well as the trash on desktop
@@ -3813,8 +3811,7 @@ BPoseView::FindDragNDropAction(const BMessage *dragMessage, bool &canCopy,
 bool
 BPoseView::CanTrashForeignDrag(const Model *targetModel)
 {
-	BEntry entry(targetModel->EntryRef());
-	return FSIsTrashDir(&entry);
+	return targetModel->IsTrash();
 }
 
 
@@ -4635,7 +4632,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 
 
 	BEntry *destEntry = new BEntry(destFolder->EntryRef());
-	bool destIsTrash = FSIsTrashDir(destEntry);
+	bool destIsTrash = destFolder->IsTrash();
 
 	// perform asynchronous copy/move
 	forceCopy = forceCopy || (modifiers() & B_OPTION_KEY);
@@ -5385,8 +5382,7 @@ BPoseView::DuplicateSelection(BPoint *dropStart, BPoint *dropEnd)
 		Model *model = pose->TargetModel();
 
 		// can't duplicate a volume or the trash
-		BEntry entry(model->EntryRef());
-		if (FSIsTrashDir(&entry) || model->IsVolume()) {
+		if (model->IsTrash() || model->IsVolume()) {
 			fSelectionList->RemoveItemAt(index);
 			index--;
 			selectionSize--;
@@ -6017,8 +6013,7 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 		case B_DELETE:
 		{
 			// Make sure user can't trash something already in the trash.
-			BEntry entry(TargetModel()->EntryRef());
-			if (FSIsTrashDir(&entry)) {
+			if (TargetModel()->IsTrash()) {
 				// Delete without asking from the trash
 				DeleteSelection(true, false);
 			} else {

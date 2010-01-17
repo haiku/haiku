@@ -228,7 +228,7 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 			model->GetEntry(&entry);
 			if (model->IsVolume()
 				|| model->IsRoot()
-				|| FSIsTrashDir(&entry)
+				|| model->IsTrash()
 				|| FSIsDeskDir(&entry))
 				continue;
 
@@ -479,7 +479,7 @@ FSClipboardPaste(Model *model, uint32 linksMode)
 	model->GetEntry(&entry);
 
 	// can't copy items into the trash
-	if (copyList->CountItems() > 0 && FSIsTrashDir(&entry)) {
+	if (copyList->CountItems() > 0 && model->IsTrash()) {
 		BAlert *alert = new BAlert("", kNoCopyToTrashStr, "Cancel",
 			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
