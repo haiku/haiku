@@ -1146,9 +1146,10 @@ NodeManager::Dump()
 		registered_node& node = iterator->second;
 
 		printf("  node-id %ld, addon-id %ld, addon-flavor-id %ld, port %ld, "
-			"creator %ld, team %ld, kinds %#08Lx, name \"%s\"\n", node.node_id,
-			node.add_on_id, node.flavor_id, node.port, node.creator,
-			node.containing_team, node.kinds, node.name);
+			"creator %ld, team %ld, kinds %#08Lx, name \"%s\", ref_count %ld\n",
+			node.node_id, node.add_on_id, node.flavor_id, node.port, 
+			node.creator, node.containing_team, node.kinds, node.name,
+			node.ref_count);
 
 		printf("    teams (refcount): ");
 		for (TeamCountMap::iterator refsIterator = node.team_ref_count.begin();
