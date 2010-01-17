@@ -783,16 +783,15 @@ BStatusView::UpdateStatus(const char *curItem, off_t itemSize, bool optional)
 			fLastSpeedReferenceSize = fSizeProcessed;
 			fLastSpeedReferenceTime = currentTime;
 			fBytesPerSecond = 0.0;
+			size_t count = 0;
 			for (size_t i = 0; i < kBytesPerSecondSlots; i++) {
-				if (fBytesPerSecondSlot[i] != 0.0)
+				if (fBytesPerSecondSlot[i] != 0.0) {
 					fBytesPerSecond += fBytesPerSecondSlot[i];
-				else {
-					fBytesPerSecond = 0.0;
-					break;
+					count++;
 				}
 			}
-			if (fBytesPerSecond != 0.0)
-				fBytesPerSecond /= kBytesPerSecondSlots;
+			if (count > 0)
+				fBytesPerSecond /= count;
 			Invalidate();
 		}
 
