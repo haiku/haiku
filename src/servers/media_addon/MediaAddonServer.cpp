@@ -341,13 +341,15 @@ MediaAddonServer::QuitRequested()
 {
 	CALLED();
 
-	InfoMap::reverse_iterator iterator = fInfoMap.rbegin();
-	for (; iterator != fInfoMap.rend(); iterator++) {
-		AddOnInfo& info = iterator->second;
+	InfoMap::iterator iterator = fInfoMap.begin();
+	for (iterator = fInfoMap.begin(); iterator != fInfoMap.end(); iterator++)
+		_DestroyInstantiatedFlavors(iterator->second);
 
-		_DestroyInstantiatedFlavors(info);
-		_PutAddonIfPossible(info);
-	}
+	BMediaRoster::CurrentRoster()->Lock();
+	BMediaRoster::CurrentRoster()->Quit();
+				
+	for (iterator = fInfoMap.begin(); iterator != fInfoMap.end(); iterator++)
+		_PutAddonIfPossible(iterator->second);
 
 	return true;
 }
@@ -605,8 +607,8 @@ MediaAddonServer::_DestroyInstantiatedFlavors(AddOnInfo& info)
 {
 	printf("MediaAddonServer::_DestroyInstantiatedFlavors addon %ld\n", info.id);
 
-	NodeVector::reverse_iterator iterator = info.active_flavors.rbegin();
-	for (; iterator != info.active_flavors.rend(); iterator++) {
+	NodeVector::iterator iterator = info.active_flavors.begin();
+	for (; iterator != info.active_flavors.end(); iterator++) {
 		media_node& node = *iterator;
 		
 		printf("node %ld\n", node.node);
@@ -680,7 +682,7 @@ MediaAddonServer::_DestroyInstantiatedFlavors(AddOnInfo& info)
 			}
 		}
 		
-		fMediaRoster->ReleaseNode(node);
+		MediaRosterEx(fMediaRoster)->ReleaseNodeAll(node);
 	}
 
 	info.active_flavors.clear();

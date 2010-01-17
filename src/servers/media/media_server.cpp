@@ -437,6 +437,17 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
+		
+		case SERVER_RELEASE_NODE_ALL:
+		{
+			const server_release_node_request& request
+				= *static_cast<const server_release_node_request*>(data);
+			server_release_node_reply reply;
+
+			status_t status = gNodeManager->ReleaseNodeAll(request.node.node);
+			request.SendReply(status, &reply, sizeof(reply));
+			break;
+		}
 
 		case SERVER_REGISTER_NODE:
 		{

@@ -79,6 +79,7 @@ public:
 									int32* _flavorID);
 			status_t			ReleaseNodeReference(media_node_id id,
 									team_id team);
+			status_t			ReleaseNodeAll(media_node_id id);
 			status_t			GetCloneForID(media_node_id id, team_id team,
 									media_node* node);
 			status_t			GetClone(node_type type, team_id team,

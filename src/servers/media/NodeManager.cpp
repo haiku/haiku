@@ -281,6 +281,38 @@ NodeManager::ReleaseNodeReference(media_node_id id, team_id team)
 
 
 status_t
+NodeManager::ReleaseNodeAll(media_node_id id)
+{
+	TRACE("NodeManager::ReleaseNodeAll enter: node %ld, team %ld\n", node.node,
+		team);
+
+	BAutolock _(this);
+	
+	NodeMap::iterator found = fNodeMap.find(id);
+	if (found == fNodeMap.end()) {
+		ERROR("NodeManager::ReleaseNodeAll: node %ld not found\n", id);
+		return B_ERROR;
+	}
+	
+	registered_node& node = found->second;
+	node.team_ref_count.clear();
+	node.ref_count = 0;
+	
+	node_final_release_command command;
+	status_t status = SendToPort(node.port, NODE_FINAL_RELEASE, &command,
+		sizeof(command));
+	if (status != B_OK) {
+		ERROR("NodeManager::ReleaseNodeAll: can't send command to "
+			"node %ld\n", id);
+		// ignore error
+	}
+
+	TRACE("NodeManager::ReleaseNodeAll leave: node %ld\n", id);
+	return B_OK;
+}
+
+
+status_t
 NodeManager::SetNodeCreator(media_node_id id, team_id creator)
 {
 	TRACE("NodeManager::SetNodeCreator node %ld, creator %ld\n", id, creator);

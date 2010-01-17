@@ -191,6 +191,40 @@ BMediaRosterEx::DecrementAddonFlavorInstancesCount(media_addon_id addonID,
 
 
 status_t
+BMediaRosterEx::ReleaseNodeAll(const media_node& node)
+{
+		CALLED();
+	if (IS_INVALID_NODE(node))
+		return B_MEDIA_BAD_NODE;
+
+	if (node.kind & NODE_KIND_NO_REFCOUNTING) {
+		printf("BMediaRoster::ReleaseNodeAll, trying to release reference "
+			"counting disabled timesource, node %ld, port %ld, team %ld\n",
+			node.node, node.port, BPrivate::current_team());
+		return B_OK;
+	}
+
+	server_release_node_request request;
+	server_release_node_reply reply;
+	status_t rv;
+
+	request.node = node;
+	request.team = BPrivate::current_team();
+
+	TRACE("BMediaRoster::ReleaseNodeAll, node %ld, port %ld, team %ld\n",
+		node.node, node.port, BPrivate::current_team());
+
+	rv = QueryServer(SERVER_RELEASE_NODE_ALL, &request, sizeof(request), &reply,
+		sizeof(reply));
+	if (rv != B_OK) {
+		ERROR("BMediaRoster::ReleaseNodeAll FAILED, node %ld, port %ld, team "
+			"%ld!\n", node.node, node.port, BPrivate::current_team());
+	}
+	return rv;
+}
+
+
+status_t
 BMediaRosterEx::SetNodeCreator(media_node_id node, team_id creator)
 {
 	server_set_node_creator_request request;
