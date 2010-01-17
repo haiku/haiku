@@ -63,18 +63,23 @@ class CopyLoopControl {
 public:
 	virtual						~CopyLoopControl();
 
+	virtual	void				Init(uint32 jobKind);
+	virtual	void				Init(int32 totalItems, off_t totalSize,
+									const entry_ref* destDir = NULL,
+									bool showCount = true);
+
 	//! Inform that a file error occurred while copying <name>.
 	// \return \c True if user decided to continue
-	virtual	bool				FileError(const char *message,
-									const char *name, status_t error,
-									bool allowContinue) = 0;
+	virtual	bool				FileError(const char* message,
+									const char* name, status_t error,
+									bool allowContinue);
 
-	virtual	void				UpdateStatus(const char *name,
+	virtual	void				UpdateStatus(const char* name,
 									const entry_ref& ref, int32 count,
-									bool optional = false) = 0;
+									bool optional = false);
 
 	//! \return \c true if canceled
-	virtual	bool				CheckUserCanceled() = 0;
+	virtual	bool				CheckUserCanceled();
 
 			enum OverwriteMode {
 				kSkip,			// do not replace, go to next entry
@@ -86,36 +91,42 @@ public:
 
 	//! Override to always overwrite, never overwrite, let user decide,
 	// compare dates, etc.
-	virtual	OverwriteMode		OverwriteOnConflict(const BEntry *srcEntry,
-									const char *destName,
-									const BDirectory *destDir,
-									bool srcIsDir, bool dstIsDir) = 0;
+	virtual	OverwriteMode		OverwriteOnConflict(const BEntry* srcEntry,
+									const char* destName,
+									const BDirectory* destDir,
+									bool srcIsDir, bool dstIsDir);
 
 	//! Override to prevent copying of a given file or directory
-	virtual	bool				SkipEntry(const BEntry *, bool file) = 0;
+	virtual	bool				SkipEntry(const BEntry *, bool file);
 
 	//! During a file copy, this is called every time a chunk of data
 	// is copied.  Users may override to keep a running checksum.
-	virtual	void				ChecksumChunk(const char *block, size_t size);
+	virtual	void				ChecksumChunk(const char* block, size_t size);
 
 	//! This is called when a file is finished copying.  Users of this
 	// class may override to verify that the checksum they've been
 	// computing in ChecksumChunk matches.  If this returns true,
 	// the copy will continue.  If false, if will abort.
-	virtual	bool				ChecksumFile(const entry_ref *);
+	virtual	bool				ChecksumFile(const entry_ref*);
 
-	virtual	bool				SkipAttribute(const char *attributeName);
-	virtual	bool				PreserveAttribute(const char *attributeName);
+	virtual	bool				SkipAttribute(const char* attributeName);
+	virtual	bool				PreserveAttribute(const char* attributeName);
 };
 
 
 //! This is the Tracker copy-specific version of CopyLoopControl.
 class TrackerCopyLoopControl : public CopyLoopControl {
 public:
-								TrackerCopyLoopControl(thread_id);
-								TrackerCopyLoopControl(thread_id,
-									int32 totalItems, off_t totalSize);
+								TrackerCopyLoopControl();
+								TrackerCopyLoopControl(uint32 jobKind);
+								TrackerCopyLoopControl(int32 totalItems,
+									off_t totalSize);
 	virtual						~TrackerCopyLoopControl();
+
+	virtual	void				Init(uint32 state);
+	virtual	void				Init(int32 totalItems, off_t totalSize,
+									const entry_ref* destDir = NULL,
+									bool showCount = true);
 
 	virtual	bool				FileError(const char *message,
 									const char *name, status_t error,
@@ -127,12 +138,6 @@ public:
 
 	virtual	bool				CheckUserCanceled();
 
-	virtual	OverwriteMode		OverwriteOnConflict(const BEntry *srcEntry,
-									const char *destName,
-									const BDirectory *destDir,
-									bool srcIsDir, bool dstIsDir);
-
-	virtual	bool				SkipEntry(const BEntry *, bool file);
 	virtual	bool				SkipAttribute(const char *attributeName);
 
 
@@ -191,8 +196,9 @@ _IMPEXP_TRACKER status_t FSCreateNewFolderIn(const node_ref *destDir, entry_ref 
 _IMPEXP_TRACKER void FSCreateTrashDirs();
 _IMPEXP_TRACKER status_t FSGetTrashDir(BDirectory *trashDir, dev_t volume);
 _IMPEXP_TRACKER status_t FSGetDeskDir(BDirectory *deskDir);
-_IMPEXP_TRACKER status_t FSRecursiveCalcSize(BInfoWindow *, BDirectory *,
-	off_t *runningSize, int32 *fileCount, int32 *dirCount);
+_IMPEXP_TRACKER status_t FSRecursiveCalcSize(BInfoWindow *,
+	CopyLoopControl* loopControl, BDirectory *, off_t *runningSize,
+	int32 *fileCount, int32 *dirCount);
 
 bool FSInTrashDir(const entry_ref *);
 

@@ -727,7 +727,9 @@ BInfoWindow::CalcSize(void *castToWindow)
 		off_t size = 0;
 		int32 fileCount = 0;
 		int32 dirCount = 0;
-		FSRecursiveCalcSize(window, &dir, &size, &fileCount, &dirCount);
+		CopyLoopControl loopControl;
+		FSRecursiveCalcSize(window, &loopControl, &dir, &size, &fileCount,
+			&dirCount);
 
 		// got the size value, update the size string
 		GetSizeString(sizeString, size, fileCount);
@@ -751,8 +753,9 @@ BInfoWindow::CalcSize(void *castToWindow)
 
 			BDirectory trashDir;
 			if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
-				FSRecursiveCalcSize(window, &trashDir, &currentSize,
-					&currentFileCount, &currentDirCount);
+				CopyLoopControl loopControl;
+				FSRecursiveCalcSize(window, &loopControl, &trashDir,
+					&currentSize, &currentFileCount, &currentDirCount);
 				totalSize += currentSize;
 				totalFileCount += currentFileCount;
 				totalDirCount += currentDirCount;
@@ -761,9 +764,10 @@ BInfoWindow::CalcSize(void *castToWindow)
 		GetSizeString(sizeString, totalSize, totalFileCount);
 	}
 
-	if (window->StopCalc())
+	if (window->StopCalc()) {
 		// window closed, bail
 		return B_OK;
+	}
 
 	AutoLock<BWindow> lock(window);
 	if (lock.IsLocked())

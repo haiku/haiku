@@ -108,8 +108,9 @@ status_t DuplicateTask(BObjectList<entry_ref> *srcList);
 static status_t MoveTask(BObjectList<entry_ref> *, BEntry *, BList *, uint32);
 static status_t _DeleteTask(BObjectList<entry_ref> *, bool);
 static status_t _RestoreTask(BObjectList<entry_ref> *);
-status_t CalcItemsAndSize(BObjectList<entry_ref> *refList, size_t blockSize,
-	int32 *totalCount, off_t *totalSize);
+status_t CalcItemsAndSize(CopyLoopControl* loopControl,
+	BObjectList<entry_ref> *refList, size_t blockSize, int32 *totalCount,
+	off_t *totalSize);
 status_t MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc,
 	uint32 moveMode, const char *newName, Undo &undo,
 	CopyLoopControl* loopControl);
@@ -187,13 +188,65 @@ CopyLoopControl::~CopyLoopControl()
 
 
 void
-CopyLoopControl::ChecksumChunk(const char *, size_t)
+CopyLoopControl::Init(uint32 jobKind)
+{
+}
+
+
+void
+CopyLoopControl::Init(int32 totalItems, off_t totalSize,
+	const entry_ref* destDir, bool showCount)
 {
 }
 
 
 bool
-CopyLoopControl::ChecksumFile(const entry_ref *)
+CopyLoopControl::FileError(const char* message, const char* name,
+	status_t error, bool allowContinue)
+{
+	return false;
+}
+
+
+void
+CopyLoopControl::UpdateStatus(const char* name, const entry_ref& ref,
+	int32 count, bool optional)
+{
+}
+
+
+bool
+CopyLoopControl::CheckUserCanceled()
+{
+	return false;
+}
+
+
+CopyLoopControl::OverwriteMode
+CopyLoopControl::OverwriteOnConflict(const BEntry* srcEntry,
+	const char* destName, const BDirectory* destDir, bool srcIsDir,
+	bool dstIsDir)
+{
+	return kReplace;
+}
+
+
+bool
+CopyLoopControl::SkipEntry(const BEntry*, bool)
+{
+	// Tracker makes no exceptions
+	return false;
+}
+
+
+void
+CopyLoopControl::ChecksumChunk(const char*, size_t)
+{
+}
+
+
+bool
+CopyLoopControl::ChecksumFile(const entry_ref*)
 {
 	return true;
 }
@@ -216,32 +269,56 @@ CopyLoopControl::PreserveAttribute(const char*)
 // #pragma mark -
 
 
-TrackerCopyLoopControl::TrackerCopyLoopControl(thread_id thread)
+TrackerCopyLoopControl::TrackerCopyLoopControl()
 	:
-	fThread(thread),
+	fThread(find_thread(NULL)),
 	fSourceList(NULL)
 {
-	// TODO: Move all gStatusWindow handling here (CreateItem()...)
 }
 
 
-TrackerCopyLoopControl::TrackerCopyLoopControl(thread_id thread,
-		int32 totalItems, off_t totalSize)
+TrackerCopyLoopControl::TrackerCopyLoopControl(uint32 jobKind)
 	:
-	fThread(thread),
+	fThread(find_thread(NULL)),
 	fSourceList(NULL)
 {
-	// TODO: Move all gStatusWindow handling here (CreateItem()...)
-	if (gStatusWindow)
-		gStatusWindow->InitStatusItem(thread, totalItems, totalItems);
+	Init(jobKind);
+}
+
+
+TrackerCopyLoopControl::TrackerCopyLoopControl(int32 totalItems,
+		off_t totalSize)
+	:
+	fThread(find_thread(NULL)),
+	fSourceList(NULL)
+{
+	Init(totalItems, totalItems);
 }
 
 
 TrackerCopyLoopControl::~TrackerCopyLoopControl()
 {
-	// TODO: Move all gStatusWindow handling here
-//	if (gStatusWindow)
-//		gStatusWindow->RemoveStatusItem(fThread);
+	if (gStatusWindow != NULL)
+		gStatusWindow->RemoveStatusItem(fThread);
+}
+
+
+void
+TrackerCopyLoopControl::Init(uint32 jobKind)
+{
+	if (gStatusWindow != NULL)
+		gStatusWindow->CreateStatusItem(fThread, (StatusWindowState)jobKind);
+}
+
+
+void
+TrackerCopyLoopControl::Init(int32 totalItems, off_t totalSize,
+	const entry_ref* destDir, bool showCount)
+{
+	if (gStatusWindow != NULL) {
+		gStatusWindow->InitStatusItem(fThread, totalItems, totalItems,
+			destDir, showCount);
+	}
 }
 
 
@@ -271,7 +348,7 @@ void
 TrackerCopyLoopControl::UpdateStatus(const char *name, const entry_ref&,
 	int32 count, bool optional)
 {
-	if (gStatusWindow)
+	if (gStatusWindow != NULL)
 		gStatusWindow->UpdateStatus(fThread, name, count, optional);
 }
 
@@ -290,22 +367,6 @@ TrackerCopyLoopControl::CheckUserCanceled()
 //		printf("%p->CheckUserCanceled()\n", this);
 	}
 
-	return false;
-}
-
-
-TrackerCopyLoopControl::OverwriteMode
-TrackerCopyLoopControl::OverwriteOnConflict(const BEntry *, const char *,
-	const BDirectory *, bool, bool)
-{
-	return kReplace;
-}
-
-
-bool
-TrackerCopyLoopControl::SkipEntry(const BEntry *, bool)
-{
-	// tracker makes no exceptions
 	return false;
 }
 
@@ -620,15 +681,12 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 
 
 static status_t
-InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
-	BVolume *dstVol, BDirectory *destDir, entry_ref *destRef,
-	bool preflightNameCheck, bool needSizeCalculation, int32 *collisionCount,
-	ConflictCheckResult *preflightResult)
+InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
+	BObjectList<entry_ref> *srcList, BVolume *dstVol, BDirectory *destDir,
+	entry_ref *destRef, bool preflightNameCheck, bool needSizeCalculation,
+	int32 *collisionCount, ConflictCheckResult *preflightResult)
 {
 	if (dstVol->IsReadOnly()) {
-		if (gStatusWindow)
-			gStatusWindow->RemoveStatusItem(thread);
-
 		BAlert *alert = new BAlert("",
 			"You can't move or copy items to read-only volumes.",
 			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -644,7 +702,6 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 		// the copy loops, except it takes forever to call CalcItemsAndSize
 		BEntry entry((entry_ref *)srcList->ItemAt(index));
 		if (IsDisksWindowIcon(&entry)) {
-
 			const char *errorStr;
 			if (moveMode == kCreateLink)
 				errorStr = "You cannot create a link to the root directory.";
@@ -683,17 +740,14 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 		case kDuplicateSelection:
 		case kMoveSelectionTo:
 			{
-				if (gStatusWindow) {
-					gStatusWindow->CreateStatusItem(thread,
-						moveMode == kMoveSelectionTo ? kMoveState
-							: kCopyState);
-				}
+				loopControl->Init(moveMode == kMoveSelectionTo ? kMoveState
+					: kCopyState);
 
 				int32 totalItems = 0;
 				off_t totalSize = 0;
 				if (needSizeCalculation) {
-					if (CalcItemsAndSize(srcList, dstVol->BlockSize(),
-						&totalItems, &totalSize) != B_OK) {
+					if (CalcItemsAndSize(loopControl, srcList,
+						dstVol->BlockSize(), &totalItems, &totalSize) != B_OK) {
 						return B_ERROR;
 					}
 
@@ -707,10 +761,7 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 					}
 				}
 
-				if (gStatusWindow) {
-					gStatusWindow->InitStatusItem(thread, totalItems,
-						totalSize, destRef);
-				}
+				loopControl->Init(totalItems, totalSize, destRef);
 				break;
 			}
 
@@ -718,11 +769,8 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 			if (numItems > 10) {
 				// this will be fast, only put up status if lots of items
 				// moved, links created
-				if (gStatusWindow) {
-					gStatusWindow->CreateStatusItem(thread, kCreateLinkState);
-					gStatusWindow->InitStatusItem(thread, numItems, numItems,
-						destRef);
-				}
+				loopControl->Init(kCreateLinkState);
+				loopControl->Init(numItems, numItems, destRef);
 			}
 			break;
 	}
@@ -776,7 +824,7 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
 	moveMode = FSMoveMode(moveMode);
 
 	// if we're not passed a destEntry then we are supposed to move to trash
-	if (destEntry) {
+	if (destEntry != NULL) {
 		destEntry->GetRef(&destRef);
 		destRefToCheck = &destRef;
 
@@ -827,14 +875,16 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
 	if (fromUndo)
 		undo.Remove();
 
-	thread_id thread = find_thread(NULL);
+	TrackerCopyLoopControl loopControl;
+
 	ConflictCheckResult conflictCheckResult = kPrompt;
 	int32 collisionCount = 0;
-	status_t result = InitCopy(moveMode, srcList, thread, &volume,
-		destDirToCheck, &destRef, needPreflightNameCheck, needSizeCalculation,
-		&collisionCount, &conflictCheckResult);
+	// TODO: Status item is created in InitCopy(), but it would be kind of
+	// neat to move all that into TrackerCopyLoopControl
+	status_t result = InitCopy(&loopControl, moveMode, srcList,
+		&volume, destDirToCheck, &destRef, needPreflightNameCheck,
+		needSizeCalculation, &collisionCount, &conflictCheckResult);
 
-	TrackerCopyLoopControl loopControl(thread);
 	loopControl.SetSourceList(srcList);
 
 	if (result == B_OK) {
@@ -842,8 +892,12 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
 			BPoint *loc = (BPoint *)-1;
 				// a loc of -1 forces autoplacement, rather than copying the
 				// position of the original node
-				// ToDo:
-				// clean this mess up
+				// TODO:
+				// Clean this mess up!
+				// What could be a cleaner design is to pass along some kind
+				// "filter" object that post-processes poses, i.e. adds the
+				// location or other stuff. It should not be a job of the
+				// copy-engine.
 
 			entry_ref *srcRef = srcList->ItemAt(i);
 
@@ -945,10 +999,6 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
 		pointList->DoForEach(delete_point);
 		delete pointList;
 	}
-
-// TODO: Move this into TrackerCopyLoopControl destructor
-	if (gStatusWindow)
-		gStatusWindow->RemoveStatusItem(thread);
 
 	return B_OK;
 }
@@ -1830,7 +1880,7 @@ MoveEntryToTrash(BEntry *entry, BPoint *loc, Undo &undo)
 		node.WriteAttrString(kAttrOriginalPath, &originalPath);
 	}
 
-	TrackerCopyLoopControl loopControl(find_thread(NULL));
+	TrackerCopyLoopControl loopControl;
 	MoveItem(entry, &trash_dir, loc, kMoveSelectionTo, name, undo,
 		&loopControl);
 	return B_OK;
@@ -2211,20 +2261,17 @@ FSMakeOriginalName(char *name, BDirectory *destDir, const char *suffix)
 
 
 status_t
-FSRecursiveCalcSize(BInfoWindow *wind, BDirectory *dir, off_t *running_size,
-	int32 *fileCount, int32 *dirCount)
+FSRecursiveCalcSize(BInfoWindow *window, CopyLoopControl* loopControl,
+	BDirectory *dir, off_t *running_size, int32 *fileCount, int32 *dirCount)
 {
-	thread_id tid = find_thread(NULL);
-
 	dir->Rewind();
 	BEntry entry;
 	while (dir->GetNextEntry(&entry) == B_OK) {
-
 		// be sure window hasn't closed
-		if (wind && wind->StopCalc())
+		if (window && window->StopCalc())
 			return B_OK;
 
-		if (gStatusWindow && gStatusWindow->CheckCanceledOrPaused(tid))
+		if (loopControl->CheckUserCanceled())
 			return kUserCanceled;
 
 		StatStruct statbuf;
@@ -2234,14 +2281,14 @@ FSRecursiveCalcSize(BInfoWindow *wind, BDirectory *dir, off_t *running_size,
 			BDirectory subdir(&entry);
 			(*dirCount)++;
 			(*running_size) += 1024;
-			status_t result;
-			if ((result = FSRecursiveCalcSize(wind, &subdir, running_size,
-				fileCount, dirCount)) != B_OK)
+			status_t result = FSRecursiveCalcSize(window, loopControl, &subdir,
+				running_size, fileCount, dirCount);
+			if (result != B_OK)
 				return result;
 		} else {
 			(*fileCount)++;
-			(*running_size) += statbuf.st_size + 1024;	// Add to compensate
-														// for attributes.
+			(*running_size) += statbuf.st_size + 1024;
+				// Add to compensate for attributes.
 		}
 	}
 	return B_OK;
@@ -2249,8 +2296,8 @@ FSRecursiveCalcSize(BInfoWindow *wind, BDirectory *dir, off_t *running_size,
 
 
 status_t
-CalcItemsAndSize(BObjectList<entry_ref> *refList, size_t blockSize,
-	int32 *totalCount, off_t *totalSize)
+CalcItemsAndSize(CopyLoopControl* loopControl, BObjectList<entry_ref> *refList,
+	size_t blockSize, int32 *totalCount, off_t *totalSize)
 {
 	int32 fileCount = 0;
 	int32 dirCount = 0;
@@ -2277,8 +2324,6 @@ CalcItemsAndSize(BObjectList<entry_ref> *refList, size_t blockSize,
 	if (blockSize > 8192)
 		blockSize = 8192;
 
-	thread_id tid = find_thread(NULL);
-
 	int32 num_items = refList->CountItems();
 	for (int32 i = 0; i < num_items; i++) {
 		entry_ref *ref = refList->ItemAt(i);
@@ -2286,18 +2331,17 @@ CalcItemsAndSize(BObjectList<entry_ref> *refList, size_t blockSize,
 		StatStruct statbuf;
 		entry.GetStat(&statbuf);
 
-		if (gStatusWindow && gStatusWindow->CheckCanceledOrPaused(tid))
+		if (loopControl->CheckUserCanceled())
 			return kUserCanceled;
 
 		if (S_ISDIR(statbuf.st_mode)) {
 			BDirectory dir(&entry);
 			dirCount++;
 			(*totalSize) += blockSize;
-			status_t result;
-			if ((result = FSRecursiveCalcSize(NULL, &dir, totalSize,
-				&fileCount, &dirCount)) != B_OK) {
+			status_t result = FSRecursiveCalcSize(NULL, loopControl, &dir,
+				totalSize, &fileCount, &dirCount);
+			if (result != B_OK)
 				return result;
-			}
 		} else {
 			fileCount++;
 			(*totalSize) += statbuf.st_size + blockSize;
@@ -2558,9 +2602,7 @@ empty_trash(void *)
 	// empty trash on all mounted volumes
 	status_t err = B_OK;
 
-	thread_id thread = find_thread(NULL);
-	if (gStatusWindow)
-		gStatusWindow->CreateStatusItem(thread, kTrashState);
+	TrackerCopyLoopControl loopControl(kTrashState);
 
 	// calculate the sum total of all items on all volumes in trash
 	BObjectList<entry_ref> srcList;
@@ -2583,8 +2625,8 @@ empty_trash(void *)
 		entry_ref ref;
 		entry.GetRef(&ref);
 		srcList.AddItem(&ref);
-		err = CalcItemsAndSize(&srcList, volume.BlockSize(), &totalCount,
-			&totalSize);
+		err = CalcItemsAndSize(&loopControl, &srcList, volume.BlockSize(),
+			&totalCount, &totalSize);
 		if (err != B_OK)
 			break;
 
@@ -2595,7 +2637,7 @@ empty_trash(void *)
 	}
 
 	if (err == B_OK) {
-		TrackerCopyLoopControl loopControl(thread, totalCount, totalCount);
+		loopControl.Init(totalCount, totalCount);
 
 		volumeRoster.Rewind();
 		while (volumeRoster.GetNextVolume(&volume) == B_OK) {
@@ -2616,9 +2658,6 @@ empty_trash(void *)
 		(new BAlert("", "Error emptying Trash!", "OK", NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 	}
-
-	if (gStatusWindow)
-		gStatusWindow->RemoveStatusItem(find_thread(NULL));
 
 	return B_OK;
 }
@@ -2662,17 +2701,16 @@ _DeleteTask(BObjectList<entry_ref> *list, bool confirm)
 		}
 	}
 
-	thread_id thread = find_thread(NULL);
-	if (gStatusWindow)
-		gStatusWindow->CreateStatusItem(thread, kDeleteState);
+	TrackerCopyLoopControl loopControl(kDeleteState);
 
 	// calculate the sum total of all items on all volumes in trash
 	int32 totalItems = 0;
 	int64 totalSize = 0;
 
-	status_t err = CalcItemsAndSize(list, 0, &totalItems, &totalSize);
+	status_t err = CalcItemsAndSize(&loopControl, list, 0, &totalItems,
+		&totalSize);
 	if (err == B_OK) {
-		TrackerCopyLoopControl loopControl(thread, totalItems, totalItems);
+		loopControl.Init(totalItems, totalItems);
 
 		int32 count = list->CountItems();
 		for (int32 index = 0; index < count; index++) {
@@ -2689,8 +2727,6 @@ _DeleteTask(BObjectList<entry_ref> *list, bool confirm)
 			(new BAlert("", "Error deleting items", "OK", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 	}
-	if (gStatusWindow)
-		gStatusWindow->RemoveStatusItem(find_thread(NULL));
 
 	delete list;
 
@@ -2730,17 +2766,16 @@ FSRecursiveCreateFolder(BPath path)
 status_t
 _RestoreTask(BObjectList<entry_ref> *list)
 {
-	thread_id thread = find_thread(NULL);
-	if (gStatusWindow)
-		gStatusWindow->CreateStatusItem(thread, kRestoreFromTrashState);
+	TrackerCopyLoopControl loopControl(kRestoreFromTrashState);
 
 	// calculate the sum total of all items that will be restored
 	int32 totalItems = 0;
 	int64 totalSize = 0;
 
-	status_t err = CalcItemsAndSize(list, 0, &totalItems, &totalSize);
+	status_t err = CalcItemsAndSize(&loopControl, list, 0, &totalItems,
+		&totalSize);
 	if (err == B_OK) {
-		TrackerCopyLoopControl loopControl(thread, totalItems, totalItems);
+		loopControl.Init(totalItems, totalItems);
 
 		int32 count = list->CountItems();
 		for (int32 index = 0; index < count; index++) {
@@ -2786,8 +2821,6 @@ _RestoreTask(BObjectList<entry_ref> *list)
 				break;
 		}
 	}
-	if (gStatusWindow)
-		gStatusWindow->RemoveStatusItem(find_thread(NULL));
 
 	delete list;
 
