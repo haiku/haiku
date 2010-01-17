@@ -37,11 +37,13 @@ class CPUButton : public BControl {
 
 	private:
 		void _InitData();
+		void _AddDragger();
 
 		rgb_color fOnColor, fOffColor;
 		bool fReplicant;
 		int32 fCPU;
 		BMessageRunner *fPulseRunner;
+		bool fReplicantInDeskbar;
 };
 
 #endif	// CPUBUTTON_H

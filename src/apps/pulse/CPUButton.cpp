@@ -14,6 +14,10 @@
 #include <stdlib.h>
 
 #include <Alert.h>
+#include <Dragger.h>
+#include <PopUpMenu.h>
+
+#include <ViewPrivate.h>
 
 #include <syscalls.h>
 
@@ -37,6 +41,13 @@ CPUButton::CPUButton(BMessage *message)
 	: BControl(message)
 {
 	fReplicant = true;
+
+	/* We remove the dragger if we are in deskbar */
+	if (CountChildren() > 1)
+		RemoveChild(ChildAt(1));
+
+	ResizeBy(-7, -7);
+
 	_InitData();
 }
 
@@ -56,6 +67,18 @@ CPUButton::_InitData()
 }
 
 
+void
+CPUButton::_AddDragger()
+{
+	BRect rect(Bounds());
+	rect.top = rect.bottom - 7;
+	rect.left = rect.right - 7;
+	BDragger* dragger = new BDragger(rect, this,
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	AddChild(dragger);
+}
+
+
 //! Redraw the button depending on whether it's up or down
 void
 CPUButton::Draw(BRect rect)
@@ -63,7 +86,16 @@ CPUButton::Draw(BRect rect)
 	bool value = (bool)Value();
 	SetHighColor(value ? fOnColor : fOffColor);
 
+	if (!fReplicant) {
+		SetLowColor(Parent()->LowColor());
+		FillRect(Bounds(), B_SOLID_LOW);
+	}
+
 	BRect bounds = Bounds();
+	if (!fReplicantInDeskbar) {
+		bounds.bottom -= 7;
+		bounds.right -= 7;
+	}
 	BRect color_rect(bounds);
 	color_rect.InsetBy(2, 2);
 	if (value) {
@@ -148,19 +180,40 @@ CPUButton::Draw(BRect rect)
 void
 CPUButton::MouseDown(BPoint point)
 {
-	SetValue(!Value());
-	SetTracking(true);
-	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	BPoint mousePosition;
+	uint32 mouseButtons;
+
+	GetMouse(&mousePosition, &mouseButtons);
+
+	if ((B_PRIMARY_MOUSE_BUTTON & mouseButtons) != 0) {
+		SetValue(!Value());
+		SetTracking(true);
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	} else if ((B_SECONDARY_MOUSE_BUTTON & mouseButtons) != 0
+		&& fReplicantInDeskbar) {
+		BPopUpMenu *menu = new BPopUpMenu("Deskbar menu");
+		menu->AddItem(new BMenuItem("About Pulse" B_UTF8_ELLIPSIS,
+			new BMessage(B_ABOUT_REQUESTED)));
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem("Remove replicant",
+			new BMessage(kDeleteReplicant)));
+		menu->SetTargetForItems(this);
+
+		ConvertToScreen(&point);
+		menu->Go(point, true, true, true);
+	}
 }
 
 
 void
 CPUButton::MouseUp(BPoint point)
 {
-	if (Bounds().Contains(point))
-		Invoke();
+	if (IsTracking()) {
+		if (Bounds().Contains(point))
+			Invoke();
 
-	SetTracking(false);
+		SetTracking(false);
+	}
 }
 
 
@@ -225,6 +278,10 @@ CPUButton::MessageReceived(BMessage *message)
 				SetValue(!Value());
 			break;
 		}
+		case kDeleteReplicant: {
+			Window()->PostMessage(kDeleteReplicant, this, NULL);
+			break;
+		}
 		default:
 			BControl::MessageReceived(message);
 			break;
@@ -248,14 +305,24 @@ CPUButton::AttachedToWindow()
 	SetTarget(this);
 	SetFont(be_plain_font);
 	SetFontSize(10);
+	
+	fReplicantInDeskbar = false;
 
 	if (fReplicant) {
+		if (strcmp(Window()->Title(), "Deskbar")) {
+			// return to original size
+			ResizeBy(7, 7);
+			_AddDragger();
+		} else
+			fReplicantInDeskbar = true;
+
 		Prefs *prefs = new Prefs();
 		UpdateColors(prefs->normal_bar_color);
 		delete prefs;
 	} else {
 		PulseApp *pulseapp = (PulseApp *)be_app;
 		UpdateColors(pulseapp->prefs->normal_bar_color);
+		_AddDragger();
 	}
 
 	BMessenger messenger(this);
@@ -269,4 +336,3 @@ CPUButton::DetachedFromWindow()
 {
 	delete fPulseRunner;
 }
-

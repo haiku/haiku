@@ -73,27 +73,12 @@ NormalPulseView::NormalPulseView(BRect rect)
 		AddChild(fProgressBars[x]);
 
 		r.Set(CPUBUTTON_MLEFT, CPUBUTTON_MTOP + ITEM_OFFSET * x,
-			CPUBUTTON_MLEFT + CPUBUTTON_WIDTH,
-			CPUBUTTON_MTOP + ITEM_OFFSET * x + CPUBUTTON_HEIGHT);
+			CPUBUTTON_MLEFT + CPUBUTTON_WIDTH + 7,
+			CPUBUTTON_MTOP + ITEM_OFFSET * x + CPUBUTTON_HEIGHT + 7);
 		char temp[4];
 		sprintf(temp, "%d", x + 1);
 		fCpuButtons[x] = new CPUButton(r, "CPUButton", temp, NULL);
 		AddChild(fCpuButtons[x]);
-
-		//	If there is only 1 cpu it will be hidden below
-		//	thus, no need to add the dragger as it will still
-		//	be visible when replicants are turned on
-		if (fCpuCount > 1) {
-			BRect dragger_rect;
-			dragger_rect = r;
-			dragger_rect.top = dragger_rect.bottom;
-			dragger_rect.left = dragger_rect.right;
-			dragger_rect.bottom += 7;
-			dragger_rect.right += 7;
-			dragger_rect.OffsetBy(-1, -1);
-			BDragger *dragger = new BDragger(dragger_rect, fCpuButtons[x], 0);
-			AddChild(dragger);
-		}
 	}
 
 	if (fCpuCount == 1) {
