@@ -412,6 +412,7 @@ BNavMenu::StartBuildingItemList()
 		fIteratingDesktop = true;
 		fContainer = DesktopPoseView::InitDesktopDirentIterator(0, startModel.EntryRef());
 		AddRootItemsIfNeeded();
+		AddTrashItem();
 	} else if (FSIsTrashDir(&entry)) {
 		// the trash window needs to display a union of all the
 		// trash folders from all the mounted volumes
@@ -464,6 +465,18 @@ BNavMenu::AddRootItemsIfNeeded()
 }
 
 
+void
+BNavMenu::AddTrashItem()
+{
+	BPath path;
+	if (find_directory(B_TRASH_DIRECTORY, &path) == B_OK) {
+		BEntry entry(path.Path());
+		Model model(&entry);
+		AddOneItem(&model);
+	}
+}
+
+
 bool
 BNavMenu::AddNextItem()
 {
@@ -510,7 +523,9 @@ BNavMenu::AddNextItem()
 	// item might be in invisible
 	// ToDo:
 	// use more of PoseView's filtering here
-	if (fIteratingDesktop && !ShouldShowDesktopPose(fNavDir.device,
+	if ((size == sizeof(poseInfo)
+			&& !BPoseView::PoseVisible(&model, &poseInfo, false))
+		|| fIteratingDesktop && !ShouldShowDesktopPose(fNavDir.device,
 			&model, &poseInfo)) {
 //		PRINT(("not showing hidden item %s\n", model.Name()));
 		return true;
@@ -571,6 +586,13 @@ BNavMenu::NewModelItem(Model *model, const BMessage *invokeMessage,
 					&poseInfo, sizeof(poseInfo));
 	
 			result->CloseNode();
+
+			if (size == sizeof(poseInfo) && !BPoseView::PoseVisible(result, 
+				&poseInfo, false)) {
+				// link target does not want to be visible
+				delete newResolvedModel;
+				return NULL;
+			}
 
 			ref = *result->EntryRef();
 			container = result->IsContainer();

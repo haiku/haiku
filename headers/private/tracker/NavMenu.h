@@ -128,6 +128,7 @@ class BNavMenu : public BSlowMenu {
 
 		void AddOneItem(Model *);
 		void AddRootItemsIfNeeded();
+		void AddTrashItem();
 		static void SetTrackingHookDeep(BMenu *, bool (*)(BMenu *, void *), void *);
 
 		entry_ref	fNavDir;
