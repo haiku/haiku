@@ -227,6 +227,7 @@ class Model {
 			kQueryTemplateNode,
 			kVolumeNode,
 			kRootNode,
+			kTrashNode,
 			kUnknownNode
 		};
 
@@ -369,7 +370,8 @@ Model::IsDirectory() const
 {
 	return fBaseType == kDirectoryNode
 		|| fBaseType == kVolumeNode
-		|| fBaseType == kRootNode;
+		|| fBaseType == kRootNode
+		|| fBaseType == kTrashNode;
 }
 
 inline bool
