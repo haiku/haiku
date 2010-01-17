@@ -11,12 +11,12 @@ UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
-Addon New\ Mail\ Notification :
+Addon New\ mail\ notification :
 	filter.cpp ConfigView.cpp ;
 
-LinkAgainst New\ Mail\ Notification :
+LinkAgainst New\ mail\ notification :
 	 be libmail.so $(TARGET_LIBSUPC++) ;
 
 Package haiku-maildaemon-cvs :
-	New\ Mail\ Notification :
+	New\ mail\ notification :
 	boot home config add-ons mail_daemon system_filters ;
