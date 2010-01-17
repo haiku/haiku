@@ -81,6 +81,8 @@ DirectoryFilePanel::Show()
 		fCurrentButton->SetTarget(Messenger());
 
 		SetButtonLabel(B_DEFAULT_BUTTON, "Select");
+		Window()->SetTitle("Expander: Choose destination");
+
 		Window()->Unlock();
 
 		SelectionChanged();
