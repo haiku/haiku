@@ -29,11 +29,13 @@ ExpanderThread::ExpanderThread(BMessage * refs_message, BMessenger * messenger)
 	// (drag&drop messages)
 }
 
+
 ExpanderThread::~ExpanderThread()
 {
 	delete fWindowMessenger;
 	delete [] fExpanderOutputBuffer;
 }
+
 
 status_t
 ExpanderThread::ThreadStartup()
@@ -83,6 +85,7 @@ ExpanderThread::ThreadStartup()
 	return B_OK;
 }
 
+
 status_t
 ExpanderThread::ExecuteUnit(void)
 {
@@ -107,6 +110,7 @@ ExpanderThread::ExecuteUnit(void)
 	return B_OK;
 }
 
+
 status_t
 ExpanderThread::ThreadShutdown(void)
 {
@@ -117,6 +121,7 @@ ExpanderThread::ThreadShutdown(void)
 	return B_OK;
 }
 
+
 void
 ExpanderThread::ThreadStartupFailed(status_t status)
 {
@@ -124,6 +129,7 @@ ExpanderThread::ThreadStartupFailed(status_t status)
 
 	Quit();
 }
+
 
 void
 ExpanderThread::ExecuteUnitFailed(status_t status)
@@ -139,6 +145,7 @@ ExpanderThread::ExecuteUnitFailed(status_t status)
 	Quit();
 }
 
+
 void
 ExpanderThread::ThreadShutdownFailed(status_t status)
 {
@@ -151,6 +158,7 @@ ExpanderThread::ProcessRefs(BMessage *msg)
 {
 	return B_OK;
 }
+
 
 thread_id
 ExpanderThread::PipeCommand(int argc, const char **argv, int &in, int &out, int &err, const char **envp)
@@ -209,6 +217,7 @@ ExpanderThread::SuspendExternalExpander()
 		return status;
 }
 
+
 status_t
 ExpanderThread::ResumeExternalExpander()
 {
@@ -220,6 +229,7 @@ ExpanderThread::ResumeExternalExpander()
 	else
 		return status;
 }
+
 
 status_t
 ExpanderThread::InterruptExternalExpander()
@@ -233,6 +243,7 @@ ExpanderThread::InterruptExternalExpander()
 	}
 	return status;
 }
+
 
 status_t
 ExpanderThread::WaitOnExternalExpander()

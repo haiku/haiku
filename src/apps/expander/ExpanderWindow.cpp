@@ -75,6 +75,9 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	fListingText = new BTextView("listingText");
 	fListingText->SetText("");
 	fListingText->MakeEditable(false);
+	fListingText->SetStylable(false);
+	BFont font = be_fixed_font;
+	fListingText->SetFontAndColor(&font);
 	BScrollView* scrollView = new BScrollView("", fListingText,
 		B_INVALIDATE_AFTER_LAYOUT, false, true);
 
