@@ -47,7 +47,7 @@ CPUButton::CPUButton(BMessage *message)
 	if (CountChildren() > 1)
 		RemoveChild(ChildAt(1));
 
-	ResizeBy(-7, -7);
+	ResizeTo(CPUBUTTON_WIDTH, CPUBUTTON_HEIGHT);
 
 	_InitData();
 }
@@ -93,7 +93,10 @@ CPUButton::Draw(BRect rect)
 	}
 
 	BRect bounds = Bounds();
-	if (!fReplicantInDeskbar) {
+	if (fReplicant && !fReplicantInDeskbar) {
+		bounds.bottom -= 4;
+		bounds.right -= 4;
+	} else if (!fReplicant) {
 		bounds.bottom -= 7;
 		bounds.right -= 7;
 	}
@@ -311,8 +314,9 @@ CPUButton::AttachedToWindow()
 
 	if (fReplicant) {
 		if (strcmp(Window()->Title(), "Deskbar")) {
-			// return to original size
-			ResizeBy(7, 7);
+			// Make room for dragger
+			ResizeBy(4, 4);
+
 			_AddDragger();
 		} else
 			fReplicantInDeskbar = true;
