@@ -1251,8 +1251,7 @@ TFilePanel::CanOpenParent() const
 {
 	if (TrackerSettings().DesktopFilePanelRoot()) {
 		// don't allow opening Desktop folder's parent
-		BEntry entry(TargetModel()->EntryRef());
-		if (FSIsDeskDir(&entry))
+		if (TargetModel()->IsDesktop())
 			return false;
 	}
 
@@ -1504,11 +1503,9 @@ TFilePanel::WindowActivated(bool active)
 
 
 BFilePanelPoseView::BFilePanelPoseView(Model *model, BRect frame, uint32 resizeMask)
-	: BPoseView(model, frame, kListMode, resizeMask)
+	: BPoseView(model, frame, kListMode, resizeMask),
+	fIsDesktop(model->IsDesktop())
 {
-	BEntry entry;
-	model->GetEntry(&entry);
-	fIsDesktop = FSIsDeskDir(&entry);
 }
 
 

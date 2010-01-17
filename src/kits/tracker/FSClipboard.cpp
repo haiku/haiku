@@ -229,7 +229,7 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 			if (model->IsVolume()
 				|| model->IsRoot()
 				|| model->IsTrash()
-				|| FSIsDeskDir(&entry))
+				|| model->IsDesktop())
 				continue;
 
 			MakeRefName(refName, node);

@@ -339,6 +339,9 @@ Model::Name() const
 				
 		case kTrashNode:
 			return "Trash";
+		
+		case kDesktopNode:
+			return "Desktop";
 			
 		default:
 			break;
@@ -411,6 +414,7 @@ Model::OpenNodeCommon(bool writable)
 		case kVolumeNode:
 		case kRootNode:
 		case kTrashNode:
+		case kDesktopNode:
 			if (!IsNodeOpen())
 				fNode = new BDirectory(&fEntryRef);
 
@@ -598,8 +602,12 @@ Model::FinishSettingUpType()
 	switch (fBaseType) {
 		case kDirectoryNode:
 			entry.SetTo(&fEntryRef);
-			if (entry.InitCheck() == B_OK && FSIsTrashDir(&entry)) 
-				fBaseType = kTrashNode;
+			if (entry.InitCheck() == B_OK) {
+				if (FSIsTrashDir(&entry)) 
+					fBaseType = kTrashNode;
+				else if (FSIsDeskDir(&entry))
+					fBaseType = kDesktopNode;
+			}
 			
 			fMimeType = B_DIR_MIMETYPE;	// should use a shared string here
 			if (IsNodeOpen()) {
@@ -687,7 +695,7 @@ Model::ResetIconFrom()
 
 	// mirror the logic from FinishSettingUpType
 	if ((fBaseType == kDirectoryNode || fBaseType == kVolumeNode
-		|| fBaseType == kTrashNode)
+		|| fBaseType == kTrashNode || fBaseType == kDesktopNode)
 		&& !CheckNodeIconHintPrivate(fNode, dynamic_cast<TTracker *>(be_app) == NULL)) {
 		if (WellKnowEntryList::Match(NodeRef()) > (directory_which)-1) {
 			fIconFrom = kTrackerSupplied;
@@ -1265,6 +1273,7 @@ Model::PrintToStream(int32 level, bool deep)
 
 		case kDirectoryNode:
 		case kTrashNode:
+		case kDesktopNode:
 			PRINT(("dir\n"));
 			break;
 

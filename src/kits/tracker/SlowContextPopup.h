@@ -83,6 +83,7 @@ protected:
 	
 	void AddOneItem(Model *);
 	void AddRootItemsIfNeeded();
+	void AddTrashItem();
 	static void SetTrackingHookDeep(BMenu *, bool (*)(BMenu *, void *), void *);
 	
 	bool fMenuBuilt;

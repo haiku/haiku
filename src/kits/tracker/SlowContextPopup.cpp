@@ -259,11 +259,12 @@ BSlowContextMenu::StartBuildingItemList()
 
 		if (startModel.IsQuery()) 
 			fContainer = new QueryEntryListCollection(&startModel);
-		else if (FSIsDeskDir(&entry)) {
+		else if (startModel.IsDesktop()) {
 			fIteratingDesktop = true;
 			fContainer = DesktopPoseView::InitDesktopDirentIterator(0,
 				startModel.EntryRef());
 			AddRootItemsIfNeeded();
+			AddTrashItem();
 		} else
 			fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory *>
 				(startModel.Node()));
@@ -293,6 +294,18 @@ BSlowContextMenu::AddRootItemsIfNeeded()
 			|| root.GetEntry(&entry) != B_OK)
 			continue;
 
+		Model model(&entry);
+		AddOneItem(&model);
+	}
+}
+
+
+void
+BSlowContextMenu::AddTrashItem()
+{
+	BPath path;
+	if (find_directory(B_TRASH_DIRECTORY, &path) == B_OK) {
+		BEntry entry(path.Path());
 		Model model(&entry);
 		AddOneItem(&model);
 	}

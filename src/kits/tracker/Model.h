@@ -136,6 +136,7 @@ class Model {
 		bool IsSymLink() const;
 		bool IsRoot() const;
 		bool IsTrash() const;
+		bool IsDesktop() const;
 		bool IsVolume() const;
 
 		IconSource IconFrom() const;
@@ -229,6 +230,7 @@ class Model {
 			kVolumeNode,
 			kRootNode,
 			kTrashNode,
+			kDesktopNode,
 			kUnknownNode
 		};
 
@@ -382,7 +384,8 @@ Model::IsDirectory() const
 	return fBaseType == kDirectoryNode
 		|| fBaseType == kVolumeNode
 		|| fBaseType == kRootNode
-		|| fBaseType == kTrashNode;
+		|| fBaseType == kTrashNode
+		|| fBaseType == kDesktopNode;
 }
 
 
@@ -420,6 +423,13 @@ inline bool
 Model::IsTrash() const
 {
 	return fBaseType == kTrashNode;
+}
+
+
+inline bool
+Model::IsDesktop() const
+{
+	return fBaseType == kDesktopNode;
 }
 
 

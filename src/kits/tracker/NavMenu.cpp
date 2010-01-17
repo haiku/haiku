@@ -408,7 +408,7 @@ BNavMenu::StartBuildingItemList()
 
 	if (startModel.IsQuery()) 
 		fContainer = new QueryEntryListCollection(&startModel);
-	else if (FSIsDeskDir(&entry)) {
+	else if (startModel.IsDesktop()) {
 		fIteratingDesktop = true;
 		fContainer = DesktopPoseView::InitDesktopDirentIterator(0, startModel.EntryRef());
 		AddRootItemsIfNeeded();

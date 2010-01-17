@@ -217,7 +217,7 @@ BDirMenu::AddItemToDirMenu(const BEntry *entry, BWindow *originatingWindow,
 	}
 
 	if (addShortcuts) {
-		if (FSIsDeskDir(entry))
+		if (model.IsDesktop())
 			item->SetShortcut('D', B_COMMAND_KEY);
 		else if (FSIsHomeDir(entry))
 			item->SetShortcut('H', B_COMMAND_KEY);
