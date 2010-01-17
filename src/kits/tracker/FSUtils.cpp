@@ -292,7 +292,7 @@ TrackerCopyLoopControl::TrackerCopyLoopControl(int32 totalItems,
 	fThread(find_thread(NULL)),
 	fSourceList(NULL)
 {
-	Init(totalItems, totalItems);
+	Init(totalItems, totalSize);
 }
 
 
@@ -316,7 +316,7 @@ TrackerCopyLoopControl::Init(int32 totalItems, off_t totalSize,
 	const entry_ref* destDir, bool showCount)
 {
 	if (gStatusWindow != NULL) {
-		gStatusWindow->InitStatusItem(fThread, totalItems, totalItems,
+		gStatusWindow->InitStatusItem(fThread, totalItems, totalSize,
 			destDir, showCount);
 	}
 }
