@@ -335,6 +335,7 @@ Model::Name() const
 		case kVolumeNode:
 			if (fVolumeName)
 				return fVolumeName;
+			break;
 				
 		case kTrashNode:
 			return "Trash";
