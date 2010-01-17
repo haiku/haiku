@@ -1254,7 +1254,7 @@ AttributeView::MouseDown(BPoint point)
 			offsetPoint.y = point.y - fIconRect.top;
 			if (IconCache::sIconCache->IconHitTest(offsetPoint, fIconModel, kNormalIcon, B_LARGE_ICON)) {
 				// Can't drag the trash anywhere..
-				fTrackingState = FSIsTrashDir(&entry) ? open_only_track : icon_track;
+				fTrackingState = fModel->IsTrash() ? open_only_track : icon_track;
 
 				// Check for possible double click
 				if (abs((int32)(fClickPoint.x - point.x)) < kDragSlop
@@ -2022,7 +2022,7 @@ AttributeView::BuildContextMenu(BMenu *parent)
 
 	parent->AddItem(new BMenuItem("Open", new BMessage(kOpenSelection), 'O'));
 
-	if (!FSIsTrashDir(&entry)) {
+	if (!model.IsTrash()) {
 		parent->AddItem(new BMenuItem("Edit name", new BMessage(kEditItem), 'E'));
 		parent->AddSeparatorItem();
 		if (fModel->IsVolume()) {
@@ -2037,7 +2037,7 @@ AttributeView::BuildContextMenu(BMenu *parent)
 				item->SetEnabled(false);
 		} else
 			parent->AddItem(new BMenuItem("Identify", new BMessage(kIdentifyEntry)));
-	} else if (FSIsTrashDir(&entry))
+	} else
 		parent->AddItem(new BMenuItem("Empty Trash", new BMessage(kEmptyTrash)));
 
 	BMenuItem *sizeItem = NULL;
