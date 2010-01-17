@@ -9,7 +9,6 @@
 #ifndef CREATE_PARAMS_PANEL_H
 #define CREATE_PARAMS_PANEL_H
 
-#include "Support.h"
 
 #include <Window.h>
 #include <InterfaceKit.h>
@@ -38,7 +37,7 @@ public:
 private:
 			void 				_CreateViewControls(BPartition* parent,
 									off_t offset, off_t size);
-			
+
 	class EscapeFilter;
 			EscapeFilter*		fEscapeFilter;
 			sem_id				fExitSemaphore;
@@ -46,13 +45,11 @@ private:
 			int32				fReturnValue;
 
 			BPartitionParameterEditor*	fEditor;
-			
+
 			BPopUpMenu*			fTypePopUpMenu;
 			BMenuField*			fTypeMenuField;
 			BTextControl*		fNameTextControl;
 			SizeSlider*			fSizeSlider;
-			BButton*			fOKButton;
-			BButton*			fCancelButton;
 };
 
 #endif // CREATE_PARAMS_PANEL_H

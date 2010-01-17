@@ -1,20 +1,22 @@
 /*
- * Copyright 2008-2009 Haiku Inc. All rights reserved.
+ * Copyright 2008-20010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Bryce Groff	  <bgroff@hawaii.edu>
+ *		Karsten Heimrich. <host.haiku@gmx.de>
  */
 
 #include "CreateParamsPanel.h"
 #include "Support.h"
 
-#include <Box.h>
 #include <Button.h>
+#include <ControlLook.h>
 #include <DiskDeviceTypes.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
-#include <GroupView.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -22,8 +24,6 @@
 #include <PopUpMenu.h>
 #include <PartitionParameterEditor.h>
 #include <Partition.h>
-#include <Slider.h>
-#include <SpaceLayoutItem.h>
 #include <String.h>
 
 
@@ -63,6 +63,7 @@ public:
 private:
  	CreateParamsPanel*		fPanel;
 };
+
 
 // #pragma mark -
 
@@ -149,10 +150,7 @@ CreateParamsPanel::Go(off_t& offset, off_t& size, BString& name,
 		return GO_CANCELED;
 
 	// center the panel above the parent window
-	BRect frame = Frame();
-	BRect parentFrame = fWindow->Frame();
-	MoveTo((parentFrame.left + parentFrame.right - frame.Width()) / 2.0,
-		(parentFrame.top + parentFrame.bottom - frame.Height()) / 2.0);
+	CenterIn(fWindow->Frame());
 
 	Show();
 	Unlock();
@@ -222,7 +220,7 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 		offset + size);
 	fSizeSlider->SetPosition(1.0);
 
-	fNameTextControl = new BTextControl("Name Control", "Partition name",
+	fNameTextControl = new BTextControl("Name Control", "Partition name:",
 		"", NULL);
 	if (!parent->SupportsChildName())
 		fNameTextControl->SetEnabled(false);
@@ -231,8 +229,7 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 
 	int32 cookie = 0;
 	BString supportedType;
-	while (parent->GetNextSupportedChildType(&cookie, &supportedType)
-		== B_OK) {
+	while (parent->GetNextSupportedChildType(&cookie, &supportedType) == B_OK) {
 		BMessage* message = new BMessage(MSG_PARTITION_TYPE);
 		message->AddString("type", supportedType);
 		BMenuItem* item = new BMenuItem(supportedType, message);
@@ -242,70 +239,36 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 			item->SetMarked(true);
 	}
 
-	fTypeMenuField = new BMenuField("Partition type", fTypePopUpMenu, NULL);
+	fTypeMenuField = new BMenuField("Partition type:", fTypePopUpMenu, NULL);
 
-	fOKButton = new BButton("Create", new BMessage(MSG_OK));
-	fCancelButton = new BButton("Cancel", new BMessage(MSG_CANCEL));
+	const float spacing = be_control_look->DefaultItemSpacing();
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, spacing);
+	layout->SetInsets(spacing, spacing, spacing, spacing);
 
-	BView* infoView = BGroupLayoutBuilder(B_VERTICAL, 3)
+	SetLayout(layout);
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
 		.Add(fSizeSlider)
-		.Add(fNameTextControl)
-		.Add(fTypeMenuField)
-	;
-	BBox* infoBox = new BBox(B_FANCY_BORDER, infoView);
-	BView* rootView;
+		.Add(BGridLayoutBuilder(0.0, 5.0)
+			.Add(fNameTextControl->CreateLabelLayoutItem(), 0, 0)
+			.Add(fNameTextControl->CreateTextViewLayoutItem(), 1, 0)
+			.Add(fTypeMenuField->CreateLabelLayoutItem(), 0, 1)
+			.Add(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1)
+		)
+	);
 
 	parent->GetChildCreationParameterEditor(NULL, &fEditor);
-	if (fEditor != NULL) {
-		BBox* parameterBox = new BBox(B_FANCY_BORDER, fEditor->View());
+	if (fEditor)
+		AddChild(fEditor->View());
 
-		rootView = BGroupLayoutBuilder(B_VERTICAL, 4)
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-
-			// slider and types
-			.Add(infoBox)
-
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(10))
-
-			// editor's view
-			.Add(parameterBox)
-
-			// controls
-			.AddGroup(B_HORIZONTAL, 10)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-				.AddGlue()
-				.Add(fCancelButton)
-				.Add(fOKButton)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-			.End()
-
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-		;
-	} else {
-		rootView = BGroupLayoutBuilder(B_VERTICAL, 4)
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-
-			// slider and types
-			.Add(infoBox)
-
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(10))
-
-			// controls
-			.AddGroup(B_HORIZONTAL, 10)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-				.AddGlue()
-				.Add(fCancelButton)
-				.Add(fOKButton)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-			.End()
-
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-		;
-	}
-
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(rootView);
-	SetDefaultButton(fOKButton);
+	BButton* okButton = new BButton("Create", new BMessage(MSG_OK));
+	AddChild(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
+		.AddGlue()
+		.Add(new BButton("Cancel", new BMessage(MSG_CANCEL)))
+		.Add(okButton)
+	);
+	SetDefaultButton(okButton);
 
 	AddToSubset(fWindow);
+	layout->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }

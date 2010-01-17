@@ -1,9 +1,10 @@
 /*
- * Copyright 2008-2009 Haiku Inc. All rights reserved.
+ * Copyright 2008-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+*		Karsten Heimrich. <host.haiku@gmx.de>
  */
 
 #include "InitParamsPanel.h"
@@ -12,16 +13,11 @@
 #include <stdio.h>
 
 #include <Button.h>
-#include <GridLayoutBuilder.h>
+#include <ControlLook.h>
+#include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
-#include <GroupView.h>
-#include <MenuField.h>
-#include <MenuItem.h>
 #include <Message.h>
 #include <MessageFilter.h>
-#include <PopUpMenu.h>
-#include <TextControl.h>
-#include <SpaceLayoutItem.h>
 #include <String.h>
 
 
@@ -86,31 +82,22 @@ InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
 	AddCommonFilter(fEscapeFilter);
 
 	BButton* okButton = new BButton("Initialize", new BMessage(MSG_OK));
-	BButton* cancelButton = new BButton("Cancel", new BMessage(MSG_CANCEL));
 
 	partition->GetInitializationParameterEditor(diskSystem.String(),
 		&fEditor);
 
-	BView* rootView = BGroupLayoutBuilder(B_VERTICAL, 5)
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(10))
-
-		// test views
-		.Add(fEditor->View())
-
-		// controls
-		.AddGroup(B_HORIZONTAL, 10)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-			.AddGlue()
-			.Add(cancelButton)
-			.Add(okButton)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-		.End()
-
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-	;
-
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(rootView);
+	const float spacing = be_control_look->DefaultItemSpacing();
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
+		.Add(fEditor->View())
+		.AddGroup(B_HORIZONTAL, spacing)
+			.AddGlue()
+			.Add(new BButton("Cancel", new BMessage(MSG_CANCEL)))
+			.Add(okButton)
+		.End()
+		.SetInsets(spacing, spacing, spacing, spacing)
+	);
+
 	SetDefaultButton(okButton);
 
 	// If the partition had a previous name, set to that name.
@@ -168,10 +155,7 @@ InitParamsPanel::Go(BString& name, BString& parameters)
 		return GO_CANCELED;
 
 	// center the panel above the parent window
-	BRect frame = Frame();
-	BRect parentFrame = fWindow->Frame();
-	MoveTo((parentFrame.left + parentFrame.right - frame.Width()) / 2.0,
-		(parentFrame.top + parentFrame.bottom - frame.Height()) / 2.0);
+	CenterIn(fWindow->Frame());
 
 	Show();
 	Unlock();
