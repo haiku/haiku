@@ -55,7 +55,8 @@ All rights reserved.
 
 
 const float	kDefaultStatusViewHeight = 50;
-const float kUpdateGrain = 100000;
+const bigtime_t kMaxUpdateInterval = 100000LL;
+const bigtime_t kSpeedReferenceInterval = 2000000LL;
 const BRect kStatusRect(200, 200, 550, 200);
 
 
@@ -500,7 +501,15 @@ BStatusView::Init()
 	fWasCanceled = false;
 	fIsPaused = false;
 	fLastUpdateTime = 0;
+	fBytesPerSecond = 0.0;
+	for (size_t i = 0; i < kBytesPerSecondSlots; i++)
+		fBytesPerSecondSlot[i] = 0.0;
+	fCurrentBytesPerSecondSlot = 0;
 	fItemSize = 0;
+	fSizeProcessed = 0;
+
+	fProcessStartTime = fLastSpeedReferenceTime = system_time();
+	fLastSpeedReferenceSize = 0;
 }
 
 
@@ -559,6 +568,34 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 }
 
 
+static const char*
+string_for_size(double size, char *string)
+{
+	double kb = size / 1024.0;
+	if (kb < 1.0) {
+		sprintf(string, "%d B", (int)size);
+		return string;
+	}
+	float mb = kb / 1024.0;
+	if (mb < 1.0) {
+		sprintf(string, "%3.1f KB", kb);
+		return string;
+	}
+	float gb = mb / 1024.0;
+	if (gb < 1.0) {
+		sprintf(string, "%3.1f MB", mb);
+		return string;
+	}
+	float tb = gb / 1024.0;
+	if (tb < 1.0) {
+		sprintf(string, "%3.1f GB", gb);
+		return string;
+	}
+	sprintf(string, "%.1f TB", tb);
+	return string;
+}
+
+
 void
 BStatusView::Draw(BRect updateRect)
 {
@@ -604,6 +641,42 @@ BStatusView::Draw(BRect updateRect)
 		buffer << "To: " << fDestDir;
 		SetHighColor(0, 0, 0);
 		DrawString(buffer.String(), tp);
+
+		// Draw speed info
+		float rightDivider = tp.x + StringWidth(buffer.String()) + 5.0f;
+		if (fBytesPerSecond != 0.0) {
+			SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
+
+			BFont font;
+			GetFont(&font);
+			float oldFontSize = font.Size();
+			float fontSize = oldFontSize * 0.8f;
+			font.SetSize(max_c(8.0f, fontSize));
+			SetFont(&font, B_FONT_SIZE);
+
+			char sizeBuffer[128];
+			buffer = "(";
+			buffer << string_for_size((double)fSizeProcessed, sizeBuffer);
+			buffer << " of ";
+			buffer << string_for_size((double)fTotalSize, sizeBuffer);
+			buffer << ", ";
+			buffer << string_for_size(fBytesPerSecond, sizeBuffer);
+			buffer << "/s)";
+			tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
+			if (tp.x > rightDivider)
+				DrawString(buffer.String(), tp);
+			else {
+				// complete string too wide, try with shorter version
+				buffer << string_for_size(fBytesPerSecond, sizeBuffer);
+				buffer << "/s";
+				tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
+				if (tp.x > rightDivider)
+					DrawString(buffer.String(), tp);
+			}
+
+			font.SetSize(oldFontSize);
+			SetFont(&font, B_FONT_SIZE);
+		}
 	}
 }
 
@@ -623,6 +696,12 @@ BStatusView::MessageReceived(BMessage *message)
 		case kPauseButton:
 			fIsPaused = !fIsPaused;
 			fPauseButton->SetValue(fIsPaused ? B_CONTROL_ON : B_CONTROL_OFF);
+			if (fBytesPerSecond != 0.0) {
+				fBytesPerSecond = 0.0;
+				for (size_t i = 0; i < kBytesPerSecondSlots; i++)
+					fBytesPerSecondSlot[i] = 0.0;
+				Invalidate();
+			}
 			if (!fIsPaused) {
 
 				// force window update
@@ -657,48 +736,72 @@ BStatusView::MessageReceived(BMessage *message)
 void
 BStatusView::UpdateStatus(const char *curItem, off_t itemSize, bool optional)
 {
-	float currentTime = system_time();
-
-	if (fShowCount) {
-
-		if (curItem)
-			fCurItem++;
-
-		fItemSize += itemSize;
-
-		if (!optional || ((currentTime - fLastUpdateTime) > kUpdateGrain)) {
-			if (curItem != NULL || fPendingStatusString[0]) {
-				// forced update or past update time
-
-				BString buffer;
-				buffer <<  fCurItem << " ";
-
-				// if we don't have curItem, take the one from the stash
-				const char *statusItem = curItem != NULL
-					? curItem : fPendingStatusString;
-
-				fStatusBar->Update((float)fItemSize / fTotalSize, statusItem,
-					buffer.String());
-
-				// we already displayed this item, clear the stash
-				fPendingStatusString[0] =  '\0';
-
-				fLastUpdateTime = currentTime;
-			}
-			else
-				// don't have a file to show, just update the bar
-				fStatusBar->Update((float)fItemSize / fTotalSize);
-
-			fItemSize = 0;
-		} else if (curItem != NULL) {
-			// stash away the name of the item we are currently processing
-			// so we can show it when the time comes
-			strncpy(fPendingStatusString, curItem, 127);
-			fPendingStatusString[127] = '0';
-		}
-	} else {
+	if (!fShowCount) {
 		fStatusBar->Update((float)fItemSize / fTotalSize);
 		fItemSize = 0;
+		return;
+	}
+
+	if (curItem != NULL)
+		fCurItem++;
+
+	fItemSize += itemSize;
+	fSizeProcessed += itemSize;
+
+	bigtime_t currentTime = system_time();
+	if (!optional || ((currentTime - fLastUpdateTime) > kMaxUpdateInterval)) {
+		if (curItem != NULL || fPendingStatusString[0]) {
+			// forced update or past update time
+
+			BString buffer;
+			buffer <<  fCurItem << " ";
+
+			// if we don't have curItem, take the one from the stash
+			const char *statusItem = curItem != NULL
+				? curItem : fPendingStatusString;
+
+			fStatusBar->Update((float)fItemSize / fTotalSize, statusItem,
+				buffer.String());
+
+			// we already displayed this item, clear the stash
+			fPendingStatusString[0] =  '\0';
+
+			fLastUpdateTime = currentTime;
+		} else {
+			// don't have a file to show, just update the bar
+			fStatusBar->Update((float)fItemSize / fTotalSize);
+		}
+
+		if (currentTime
+				>= fLastSpeedReferenceTime + kSpeedReferenceInterval) {
+			// update current speed every kSpeedReferenceInterval
+			fCurrentBytesPerSecondSlot
+				= (fCurrentBytesPerSecondSlot + 1) % kBytesPerSecondSlots;
+			fBytesPerSecondSlot[fCurrentBytesPerSecondSlot]
+				= (double)(fSizeProcessed - fLastSpeedReferenceSize)
+					* 1000000LL / (currentTime - fLastSpeedReferenceTime);
+			fLastSpeedReferenceSize = fSizeProcessed;
+			fLastSpeedReferenceTime = currentTime;
+			fBytesPerSecond = 0.0;
+			for (size_t i = 0; i < kBytesPerSecondSlots; i++) {
+				if (fBytesPerSecondSlot[i] != 0.0)
+					fBytesPerSecond += fBytesPerSecondSlot[i];
+				else {
+					fBytesPerSecond = 0.0;
+					break;
+				}
+			}
+			if (fBytesPerSecond != 0.0)
+				fBytesPerSecond /= kBytesPerSecondSlots;
+			Invalidate();
+		}
+
+		fItemSize = 0;
+	} else if (curItem != NULL) {
+		// stash away the name of the item we are currently processing
+		// so we can show it when the time comes
+		strncpy(fPendingStatusString, curItem, 127);
+		fPendingStatusString[127] = '0';
 	}
 }
 
