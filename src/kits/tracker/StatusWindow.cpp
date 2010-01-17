@@ -57,8 +57,12 @@ All rights reserved.
 const float	kDefaultStatusViewHeight = 50;
 const bigtime_t kMaxUpdateInterval = 100000LL;
 const bigtime_t kSpeedReferenceInterval = 2000000LL;
+const bigtime_t kShowSpeedInterval = 8000000LL;
+const bigtime_t kShowEstimatedFinishInterval = 4000000LL;
 const BRect kStatusRect(200, 200, 550, 200);
 
+static bigtime_t sLastEstimatedFinishSpeedToggleTime = -1;
+static bool sShowSpeed = true;
 
 class TCustomButton : public BButton {
 public:
@@ -145,6 +149,38 @@ TCustomButton::Draw(BRect updateRect)
 }
 
 
+// #pragma mark -
+
+
+class StatusBackgroundView : public BView {
+public:
+	StatusBackgroundView(BRect frame)
+		: BView(frame, "BackView", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED)
+	{
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	}
+
+	virtual void Pulse()
+	{
+		bigtime_t now = system_time();
+		if (sShowSpeed
+			&& sLastEstimatedFinishSpeedToggleTime + kShowSpeedInterval
+				<= now) {
+			sShowSpeed = false;
+			sLastEstimatedFinishSpeedToggleTime = now;
+		} else if (!sShowSpeed
+			&& sLastEstimatedFinishSpeedToggleTime
+				+ kShowEstimatedFinishInterval <= now) {
+			sShowSpeed = true;
+			sLastEstimatedFinishSpeedToggleTime = now;
+		}
+	}
+};
+
+
+// #pragma mark -
+
+
 BStatusWindow::BStatusWindow()
 	:
 	BWindow(kStatusRect, "Tracker status", B_TITLED_WINDOW,
@@ -156,11 +192,10 @@ BStatusWindow::BStatusWindow()
 	fMouseDownFilter = new BStatusMouseFilter();
 	AddCommonFilter(fMouseDownFilter);
 
-	BRect bounds(Bounds());
-
-	BView* view = new BView(bounds, "BackView", B_FOLLOW_ALL, B_WILL_DRAW);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	BView* view = new StatusBackgroundView(Bounds());
 	AddChild(view);
+
+	SetPulseRate(1000000);
 
 	Hide();
 	Show();
@@ -180,6 +215,11 @@ BStatusWindow::CreateStatusItem(thread_id thread, StatusWindowState type)
 	BRect rect(Bounds());
 	if (BStatusView* lastView = fViewList.LastItem())
 		rect.top = lastView->Frame().bottom + 1;
+	else {
+		// This is the first status item, reset speed/estimated finish toggle.
+		sShowSpeed = true;
+		sLastEstimatedFinishSpeedToggleTime = system_time();
+	}
 	rect.bottom = rect.top + kDefaultStatusViewHeight - 1;
 
 	BStatusView* view = new BStatusView(rect, thread, type);
@@ -507,9 +547,11 @@ BStatusView::Init()
 	fCurrentBytesPerSecondSlot = 0;
 	fItemSize = 0;
 	fSizeProcessed = 0;
-
-	fProcessStartTime = fLastSpeedReferenceTime = system_time();
 	fLastSpeedReferenceSize = 0;
+	fEstimatedFinishReferenceSize = 0;
+
+	fProcessStartTime = fLastSpeedReferenceTime = fEstimatedFinishReferenceTime
+		= system_time();
 }
 
 
@@ -642,41 +684,100 @@ BStatusView::Draw(BRect updateRect)
 		SetHighColor(0, 0, 0);
 		DrawString(buffer.String(), tp);
 
-		// Draw speed info
+		SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
+
+		BFont font;
+		GetFont(&font);
+		float oldFontSize = font.Size();
+		float fontSize = oldFontSize * 0.8f;
+		font.SetSize(max_c(8.0f, fontSize));
+		SetFont(&font, B_FONT_SIZE);
+
 		float rightDivider = tp.x + StringWidth(buffer.String()) + 5.0f;
-		if (fBytesPerSecond != 0.0) {
-			SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
 
-			BFont font;
-			GetFont(&font);
-			float oldFontSize = font.Size();
-			float fontSize = oldFontSize * 0.8f;
-			font.SetSize(max_c(8.0f, fontSize));
-			SetFont(&font, B_FONT_SIZE);
+		if (sShowSpeed) {
+			// Draw speed info
+			if (fBytesPerSecond != 0.0) {
+				char sizeBuffer[128];
+				buffer = "(";
+				buffer << string_for_size((double)fSizeProcessed, sizeBuffer);
+				buffer << " of ";
+				buffer << string_for_size((double)fTotalSize, sizeBuffer);
+				buffer << ", ";
+				buffer << string_for_size(fBytesPerSecond, sizeBuffer);
+				buffer << "/s)";
+				tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
+				if (tp.x > rightDivider)
+					DrawString(buffer.String(), tp);
+				else {
+					// complete string too wide, try with shorter version
+					buffer << string_for_size(fBytesPerSecond, sizeBuffer);
+					buffer << "/s";
+					tp.x = fStatusBar->Frame().right
+						- StringWidth(buffer.String());
+					if (tp.x > rightDivider)
+						DrawString(buffer.String(), tp);
+				}
+			}
+		} else {
+			double totalBytesPerSecond = (double)(fSizeProcessed
+					- fEstimatedFinishReferenceSize)
+				* 1000000LL / (system_time() - fEstimatedFinishReferenceTime);
+			double secondsRemaining = (fTotalSize - fSizeProcessed)
+				/ totalBytesPerSecond;
+			time_t now = (time_t)real_time_clock();
+			time_t finishTime = (time_t)(now + secondsRemaining);
 
-			char sizeBuffer[128];
+			tm _time;
+			tm* time = localtime_r(&finishTime, &_time);
+			int32 year = time->tm_year + 1900;
+
+			char timeText[32];
+			time_t secondsPerDay = 24 * 60 * 60;
+			// TODO: Localization of time string...
+			if (now < finishTime - secondsPerDay) {
+				// process is going to take more than a day!
+				sprintf(timeText, "%0*d:%0*d %0*d/%0*d/%ld",
+					2, time->tm_hour, 2, time->tm_min,
+					2, time->tm_mon + 1, 2, time->tm_mday, year);
+			} else {
+				sprintf(timeText, "%0*d:%0*d",
+					2, time->tm_hour, 2, time->tm_min);
+			}
+
+			BString buffer1("Finish: ");
+			buffer1 << timeText;
+			finishTime -= now;
+			time = gmtime(&finishTime);
+
+			BString buffer2;
+			if (finishTime > secondsPerDay)
+				buffer2 << "Over " << finishTime / secondsPerDay << " days";
+			else if (finishTime > 60 * 60)
+				buffer2 << "Over " << finishTime / (60 * 60) << " hours";
+			else if (finishTime > 60)
+				buffer2 << finishTime / 60 << " minutes";
+			else
+				buffer2 << finishTime << " seconds";
+
+			buffer2 << " left";
+
 			buffer = "(";
-			buffer << string_for_size((double)fSizeProcessed, sizeBuffer);
-			buffer << " of ";
-			buffer << string_for_size((double)fTotalSize, sizeBuffer);
-			buffer << ", ";
-			buffer << string_for_size(fBytesPerSecond, sizeBuffer);
-			buffer << "/s)";
+			buffer << buffer1 << " - " << buffer2 << ")";
 			tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
 			if (tp.x > rightDivider)
 				DrawString(buffer.String(), tp);
 			else {
 				// complete string too wide, try with shorter version
-				buffer << string_for_size(fBytesPerSecond, sizeBuffer);
-				buffer << "/s";
+				buffer = "(";
+				buffer << buffer1 << ")";
 				tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
 				if (tp.x > rightDivider)
 					DrawString(buffer.String(), tp);
 			}
-
-			font.SetSize(oldFontSize);
-			SetFont(&font, B_FONT_SIZE);
 		}
+		font.SetSize(oldFontSize);
+		SetFont(&font, B_FONT_SIZE);
 	}
 }
 
@@ -703,6 +804,8 @@ BStatusView::MessageReceived(BMessage *message)
 				Invalidate();
 			}
 			if (!fIsPaused) {
+				fEstimatedFinishReferenceTime = system_time();
+				fEstimatedFinishReferenceSize = fSizeProcessed;
 
 				// force window update
 				Invalidate();

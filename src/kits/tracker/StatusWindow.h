@@ -134,6 +134,7 @@ private:
 			off_t				fItemSize;
 			off_t				fSizeProcessed;
 			off_t				fLastSpeedReferenceSize;
+			off_t				fEstimatedFinishReferenceSize;
 			int32				fCurItem;
 			int32				fType;
 			BBitmap*			fBitmap;
@@ -144,6 +145,7 @@ private:
 			bigtime_t			fLastSpeedReferenceTime;
 			bigtime_t			fProcessStartTime;
 			bigtime_t			fLastSpeedUpdateTime;
+			bigtime_t			fEstimatedFinishReferenceTime;
 	static	const size_t		kBytesPerSecondSlots = 5;
 			size_t				fCurrentBytesPerSecondSlot;
 			double				fBytesPerSecondSlot[kBytesPerSecondSlots];
