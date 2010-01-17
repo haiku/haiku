@@ -164,15 +164,15 @@ BTrashWatcher::UpdateTrashIcons()
 			size_t largeSize = 0;
 			size_t smallSize = 0;
 			const void *largeData = GetTrackerResources()->LoadResource('ICON',
-				fTrashFull ? kResTrashFullIcon : kResTrashIcon, &largeSize);
+				fTrashFull ? R_TrashFullIcon : R_TrashIcon, &largeSize);
 	
 			const void *smallData = GetTrackerResources()->LoadResource('MICN',
-				fTrashFull ? kResTrashFullIcon : kResTrashIcon,  &smallSize);
+				fTrashFull ? R_TrashFullIcon : R_TrashIcon,  &smallSize);
 	
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			size_t vectorSize = 0;
 			const void *vectorData = GetTrackerResources()->LoadResource(
-				B_VECTOR_ICON_TYPE, fTrashFull ? kResTrashFullIcon : kResTrashIcon,
+				B_VECTOR_ICON_TYPE, fTrashFull ? R_TrashFullIcon : R_TrashIcon,
 				&vectorSize);
 	
 			if (vectorData)

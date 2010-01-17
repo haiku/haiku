@@ -62,7 +62,7 @@ BCountView::BCountView(BRect bounds, BPoseView* view)
 	fTypeAheadString("")
 {
  	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE,
- 		kResBarberPoleBitmap, &fBarberPoleMap);
+ 		R_BarberPoleBitmap, &fBarberPoleMap);
 }
 
 

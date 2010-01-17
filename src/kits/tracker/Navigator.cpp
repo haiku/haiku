@@ -136,20 +136,20 @@ BNavigator::BNavigator(const Model *model, BRect rect, uint32 resizeMask)
 
 	// Set up widgets
 	fBack = new BNavigatorButton(BRect(3, top, 21, top + 17), "Back",
-		new BMessage(kNavigatorCommandBackward), kResBackNavActiveSel,
-		kResBackNavActive, kResBackNavInactive);
+		new BMessage(kNavigatorCommandBackward), R_ResBackNavActiveSel,
+		R_ResBackNavActive, R_ResBackNavInactive);
 	fBack->SetEnabled(false);
 	AddChild(fBack);
 
 	fForw = new BNavigatorButton(BRect(35, top, 53, top + 17), "Forw",
-		new BMessage(kNavigatorCommandForward), kResForwNavActiveSel,
-		kResForwNavActive, kResForwNavInactive);
+		new BMessage(kNavigatorCommandForward), R_ResForwNavActiveSel,
+		R_ResForwNavActive, R_ResForwNavInactive);
 	fForw->SetEnabled(false);
 	AddChild(fForw);
 
 	fUp = new BNavigatorButton(BRect(67, top, 84, top + 17), "Up",
-		new BMessage(kNavigatorCommandUp), kResUpNavActiveSel,
-		kResUpNavActive, kResUpNavInactive);
+		new BMessage(kNavigatorCommandUp), R_ResUpNavActiveSel,
+		R_ResUpNavActive, R_ResUpNavInactive);
 	fUp->SetEnabled(false);
 	AddChild(fUp);
 

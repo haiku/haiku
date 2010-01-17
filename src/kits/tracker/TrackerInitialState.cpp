@@ -400,31 +400,28 @@ TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
 void
 TTracker::InitMimeTypes()
 {
-	InstallMimeIfNeeded(B_DIR_MIMETYPE, kResFolderIcon, "Folder",
-		"Folder container for file system items.", kTrackerSignature);
-
-	InstallMimeIfNeeded(B_APP_MIME_TYPE, kResAppIcon, "Be Application",
+	InstallMimeIfNeeded(B_APP_MIME_TYPE, R_AppIcon, "Be Application",
 		"Generic Be application executable.", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_FILE_MIMETYPE, kResFileIcon,
+	InstallMimeIfNeeded(B_FILE_MIMETYPE, R_FileIcon,
 		"Generic file", "Generic document file.", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_VOLUME_MIMETYPE, kResHardDiskIcon,
+	InstallMimeIfNeeded(B_VOLUME_MIMETYPE, R_HardDiskIcon,
 		"Be Volume", "Disk volume.", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_QUERY_MIMETYPE, kResQueryIcon,
+	InstallMimeIfNeeded(B_QUERY_MIMETYPE, R_QueryDirIcon,
 		"Be Query", "Query to locate items on disks.", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_QUERY_TEMPLATE_MIMETYPE, kResQueryTemplateIcon,
+	InstallMimeIfNeeded(B_QUERY_TEMPLATE_MIMETYPE, R_QueryTemplateIcon,
 		"Be Query template", "", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_LINK_MIMETYPE, kResBrokenLinkIcon, "Symbolic link",
+	InstallMimeIfNeeded(B_LINK_MIMETYPE, R_BrokenLinkIcon, "Symbolic link",
 		"Link to another item in the file system.", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_ROOT_MIMETYPE, kResRootIcon,
+	InstallMimeIfNeeded(B_ROOT_MIMETYPE, R_RootIcon,
 		"Be Root", "File system root.", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_BOOKMARK_MIMETYPE, kResBookmarkIcon,
+	InstallMimeIfNeeded(B_BOOKMARK_MIMETYPE, R_BookmarkIcon,
 		"Bookmark", "Bookmark for a web page.", kNetPositiveSignature);
 
 	{
@@ -439,7 +436,7 @@ TTracker::InitMimeTypes()
 			130, B_ALIGN_LEFT, false);
 	}
 
-	InstallMimeIfNeeded(B_PERSON_MIMETYPE, kResPersonIcon,
+	InstallMimeIfNeeded(B_PERSON_MIMETYPE, R_PersonIcon,
 		"Person", "Contact information for a person.", kPeopleSignature);
 
 	{
@@ -474,7 +471,7 @@ TTracker::InitMimeTypes()
 			120, B_ALIGN_LEFT, false);
 	}
 
-	InstallMimeIfNeeded(B_PRINTER_SPOOL_MIMETYPE, kResSpoolFileIcon,
+	InstallMimeIfNeeded(B_PRINTER_SPOOL_MIMETYPE, R_SpoolFileIcon,
 		"Printer spool", "Printer spool file.", "application/x-vnd.Be-PRNT");
 
 	{
@@ -503,7 +500,7 @@ TTracker::InitMimeTypes()
 #endif
 	}
 
-	InstallMimeIfNeeded(B_PRINTER_MIMETYPE, kResGenericPrinterIcon,
+	InstallMimeIfNeeded(B_PRINTER_MIMETYPE, R_GenericPrinterIcon,
 		"Printer", "Printer queue.", kTrackerSignature /*application/x-vnd.Be-PRNT*/);
 		// for now set tracker as a default handler for the printer because we
 		// just want to open it as a folder

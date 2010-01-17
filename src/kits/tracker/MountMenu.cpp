@@ -198,7 +198,7 @@ MountMenu::AddDynamicItem(add_state)
 			}
 			// Use the shared icon instead of the device icon
 			if (get_device_icon(info.device_name, icon->Bits(), B_MINI_ICON) != B_OK)
-				GetTrackerResources()->GetIconResource(kResShareIcon, B_MINI_ICON, icon);
+				GetTrackerResources()->GetIconResource(R_ShareIcon, B_MINI_ICON, icon);
 
 			BMessage *message = new BMessage(kUnmountVolume);
 			message->AddInt32("device_id", volume.Device());

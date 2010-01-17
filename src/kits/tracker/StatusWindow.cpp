@@ -410,22 +410,22 @@ BStatusView::BStatusView(BRect bounds, thread_id thread,
 	switch (type) {
 		case kCopyState:
 			caption = "Preparing to copy items" B_UTF8_ELLIPSIS;
-			id = kResCopyStatusBitmap;
+			id = R_CopyStatusBitmap;
 			break;
 
 		case kMoveState:
 			caption = "Preparing to move items" B_UTF8_ELLIPSIS;
-			id = kResMoveStatusBitmap;
+			id = R_MoveStatusBitmap;
 			break;
 
 		case kCreateLinkState:
 			caption = "Preparing to create links" B_UTF8_ELLIPSIS;
-			id = kResMoveStatusBitmap;
+			id = R_MoveStatusBitmap;
 			break;
 
 		case kTrashState:
 			caption = "Preparing to empty Trash" B_UTF8_ELLIPSIS;
-			id = kResTrashStatusBitmap;
+			id = R_TrashStatusBitmap;
 			break;
 
 		case kVolumeState:
@@ -434,7 +434,7 @@ BStatusView::BStatusView(BRect bounds, thread_id thread,
 
 		case kDeleteState:
 			caption = "Preparing to delete items" B_UTF8_ELLIPSIS;
-			id = kResTrashStatusBitmap;
+			id = R_TrashStatusBitmap;
 			break;
 
 		case kRestoreFromTrashState:

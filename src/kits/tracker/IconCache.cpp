@@ -561,7 +561,7 @@ IconCache::GetVolumeIcon(AutoLock<SimpleIconCache> *nodeCacheLocker,
 		if (volume.IsShared()) {
 			// Check if it's a network share and give it a special icon
 			BBitmap *bitmap = lazyBitmap->Get();
-			GetTrackerResources()->GetIconResource(kResShareIcon, size, bitmap);
+			GetTrackerResources()->GetIconResource(R_ShareIcon, size, bitmap);
 			if (!entry) {
 				PRINT_ADD_ITEM(("File %s; Line %d # adding entry for model %s\n",
 					__FILE__, __LINE__, model->Name()));
@@ -649,58 +649,58 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache> *,
 		int32 resid = -1;
 		switch (wellKnownEntry->which) {
 			case B_BOOT_DISK:
-				resid = kResBootVolumeIcon;
+				resid = R_BootVolumeIcon;
 				break;
 
 			case B_BEOS_DIRECTORY:
-				resid = kResBeosFolderIcon;
+				resid = R_BeosFolderIcon;
 				break;
 
 			case B_USER_DIRECTORY:
-				resid = kResHomeDirIcon;
+				resid = R_HomeDirIcon;
 				break;
 
 			case B_BEOS_FONTS_DIRECTORY:
 			case B_COMMON_FONTS_DIRECTORY:
 			case B_USER_FONTS_DIRECTORY:
-				resid = kResFontDirIcon;
+				resid = R_FontDirIcon;
 				break;
 
 			case B_BEOS_APPS_DIRECTORY:
 			case B_APPS_DIRECTORY:
 			case B_USER_DESKBAR_APPS_DIRECTORY:
-				resid = kResAppsDirIcon;
+				resid = R_AppsDirIcon;
 				break;
 
 			case B_BEOS_PREFERENCES_DIRECTORY:
 			case B_PREFERENCES_DIRECTORY:
 			case B_USER_DESKBAR_PREFERENCES_DIRECTORY:
-				resid = kResPrefsDirIcon;
+				resid = R_PrefsDirIcon;
 				break;
 
 			case B_USER_MAIL_DIRECTORY:
-				resid = kResMailDirIcon;
+				resid = R_MailDirIcon;
 				break;
 
 			case B_USER_QUERIES_DIRECTORY:
-				resid = kResQueryDirIcon;
+				resid = R_QueryDirIcon;
 				break;
 
 			case B_COMMON_DEVELOP_DIRECTORY:
 			case B_USER_DESKBAR_DEVELOP_DIRECTORY:
-				resid = kResDevelopDirIcon;
+				resid = R_DevelopDirIcon;
 				break;
 
 			case B_USER_CONFIG_DIRECTORY:
-				resid = kResConfigDirIcon;
+				resid = R_ConfigDirIcon;
 				break;
 
 			case B_USER_PEOPLE_DIRECTORY:
-				resid = kResPersonDirIcon;
+				resid = R_PersonDirIcon;
 				break;
 
 			case B_USER_DOWNLOADS_DIRECTORY:
-				resid = kResDownloadDirIcon;
+				resid = R_DownloadDirIcon;
 				break;
 
 			default:
@@ -834,7 +834,7 @@ IconCache::GetFallbackIcon(AutoLock<SimpleIconCache> *sharedCacheLocker,
 		model->PreferredAppSignature());
 
 	BBitmap *bitmap = lazyBitmap->Get();
-	GetTrackerResources()->GetIconResource(kResFileIcon, size, bitmap);
+	GetTrackerResources()->GetIconResource(R_FileIcon, size, bitmap);
 	entry->SetIcon(lazyBitmap->Adopt(), kNormalIcon, size);
 
 	if (mode != kNormalIcon) {

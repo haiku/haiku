@@ -33,6 +33,10 @@ All rights reserved.
 */
 
 enum {
+	R_QueryIcon = 2,
+	R_HardDiskIcon = 3,
+	R_QueryTemplateIcon = 4,
+	R_SymlinkIcon = 6,
 	R_AppIcon = 1000,
 	R_FileIcon = 1001,
 	R_TrashIcon = 1003,

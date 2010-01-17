@@ -2389,18 +2389,18 @@ FSGetDeskDir(BDirectory *deskDir)
 
 	size_t size;
 	const void* data = GetTrackerResources()->
-		LoadResource('ICON', kResDeskIcon, &size);
+		LoadResource('ICON', R_DeskIcon, &size);
 	if (data != NULL)
 		deskDir->WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
 
 	data = GetTrackerResources()->
-		LoadResource('MICN', kResDeskIcon, &size);
+		LoadResource('MICN', R_DeskIcon, &size);
 	if (data != NULL)
 		deskDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
 
 #ifdef __HAIKU__
 	data = GetTrackerResources()->
-		LoadResource(B_VECTOR_ICON_TYPE, kResDeskIcon, &size);
+		LoadResource(B_VECTOR_ICON_TYPE, R_DeskIcon, &size);
 	if (data != NULL)
 		deskDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0, data, size);
 #endif
@@ -2855,20 +2855,20 @@ FSCreateTrashDirs()
 
 			size_t size;
 			const void* data = GetTrackerResources()->
-				LoadResource('ICON', kResTrashIcon, &size);
+				LoadResource('ICON', R_TrashIcon, &size);
 			if (data != NULL) {
 				trashDir.WriteAttr(kAttrLargeIcon, 'ICON', 0,
 					data, size);
 			}
 			data = GetTrackerResources()->
-				LoadResource('MICN', kResTrashIcon, &size);
+				LoadResource('MICN', R_TrashIcon, &size);
 			if (data != NULL) {
 				trashDir.WriteAttr(kAttrMiniIcon, 'MICN', 0,
 					data, size);
 			}
 #ifdef __HAIKU
 			data = GetTrackerResources()->
-				LoadResource(B_VECTOR_ICON_TYPE, kResTrashIcon, &size);
+				LoadResource(B_VECTOR_ICON_TYPE, R_TrashIcon, &size);
 			if (data != NULL) {
 				trashDir.WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0,
 					data, size);
