@@ -12,6 +12,7 @@
 #include "CPUButton.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include <Alert.h>
 #include <Dragger.h>
