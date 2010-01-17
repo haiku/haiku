@@ -17,8 +17,6 @@
 #include "snet_buffer.h"
 
 #include <bluetooth/bluetooth_util.h>
-#include <bluetooth/HCI/btHCI.h>
-#include <bluetooth/HCI/btHCI_module.h>
 
 #define BT_DEBUG_THIS_MODULE
 #define SUBMODULE_NAME BLUETOOTH_DEVICE_DEVFS_NAME
@@ -34,20 +32,20 @@
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-/* Modules */
+// Modules
 static char* usb_name = B_USB_MODULE_NAME;
 static char* hci_name = BT_HCI_MODULE_NAME;
-static char* btDevices_name = NET_BLUETOOTH_DEVICE_NAME;
+static char* btDevices_name = BT_HCI_MODULE_NAME;
 
 
 usb_module_info* usb = NULL;
-bt_hci_module_info* hci = NULL;
-struct net_device_module_info* btDevices = NULL;
+bt_hci_module_info* hci = NULL; // TODO remove / clean
+struct bt_hci_module_info* btDevices = NULL;
 struct net_buffer_module_info* nb = NULL;
 struct bluetooth_core_data_module_info* btCoreData = NULL;
 
 // Driver Global data
-static char	 *publish_names[MAX_BT_GENERIC_USB_DEVICES];
+static char* publish_names[MAX_BT_GENERIC_USB_DEVICES];
 
 int32 dev_count = 0; // number of connected devices
 static bt_usb_dev* bt_usb_devices[MAX_BT_GENERIC_USB_DEVICES];
@@ -55,10 +53,9 @@ sem_id dev_table_sem = -1; // sem to synchronize access to device table
 
 status_t submit_nbuffer(hci_id hid, net_buffer* nbuf);
 
-usb_support_descriptor supported_devices[] =
-{
-    // Generic Bluetooth USB device
-    // Class, SubClass, and Protocol codes that describe a Bluetooth device
+usb_support_descriptor supported_devices[] = {
+	// Generic Bluetooth USB device
+	// Class, SubClass, and Protocol codes that describe a Bluetooth device
 	{ UDCLASS_WIRELESS, UDSUBCLASS_RF, UDPROTO_BLUETOOTH , 0 , 0 },
 
 	// Broadcom BCM2035
@@ -67,14 +64,14 @@ usb_support_descriptor supported_devices[] =
 
 	// Devices taken from the linux Driver
 	// AVM BlueFRITZ! USB v2.0
-	{ 0, 0, 0, 0x057c   , 0x3800 },
+	{ 0, 0, 0, 0x057c, 0x3800 },
 	// Bluetooth Ultraport Module from IBM
-	{ 0, 0, 0, 0x04bf   , 0x030a },
+	{ 0, 0, 0, 0x04bf, 0x030a },
 	// ALPS Modules with non-standard id
-	{ 0, 0, 0, 0x044e   , 0x3001 },
-	{ 0, 0, 0, 0x044e   , 0x3002 },
+	{ 0, 0, 0, 0x044e, 0x3001 },
+	{ 0, 0, 0, 0x044e, 0x3002 },
 	// Ericsson with non-standard id
-	{ 0, 0, 0, 0x0bdb   , 0x1002 }
+	{ 0, 0, 0, 0x0bdb, 0x1002 }
 };
 
 /* add a device to the list of connected devices */
@@ -93,13 +90,13 @@ spawn_device(usb_device* usb_dev)
 
 	flowf("add_device()\n");
 
-	// 16 usb dongles... 
+	// 16 usb dongles...
 	if (dev_count >= MAX_BT_GENERIC_USB_DEVICES) {
 		flowf("device table full\n");
 		goto exit;
 	}
 
-	/* try the allocation */
+	// try the allocation
 	new_bt_dev = (bt_usb_dev*)malloc(sizeof(bt_usb_dev));
 	if (new_bt_dev == NULL) {
 		flowf("no memory\n");
@@ -107,41 +104,43 @@ spawn_device(usb_device* usb_dev)
 	}
 	memset(new_bt_dev, 0, sizeof(bt_usb_dev));
 
-	/* We will need this sem for some flow control */
-	new_bt_dev->cmd_complete = create_sem(1, BLUETOOTH_DEVICE_DEVFS_NAME "cmd_complete");
+	// We will need this sem for some flow control
+	new_bt_dev->cmd_complete = create_sem(1,
+		BLUETOOTH_DEVICE_DEVFS_NAME "cmd_complete");
 	if (new_bt_dev->cmd_complete < 0) {
 		err = new_bt_dev->cmd_complete;
 		goto bail0;
 	}
 
-	/* and this for something else */
+	// and this for something else
 	new_bt_dev->lock = create_sem(1, BLUETOOTH_DEVICE_DEVFS_NAME "lock");
 	if (new_bt_dev->lock < 0) {
 		err = new_bt_dev->lock;
 		goto bail1;
 	}
 
-	/* find a free slot and fill out the name */
+	// find a free slot and fill out the name
 	acquire_sem(dev_table_sem);
 	for (i = 0; i < MAX_BT_GENERIC_USB_DEVICES; i++) {
 		if (bt_usb_devices[i] == NULL) {
 			bt_usb_devices[i] = new_bt_dev;
 			sprintf(new_bt_dev->name, "%s/%ld", BLUETOOTH_DEVICE_PATH, i);
 			new_bt_dev->num = i;
-			debugf("added device %p %ld %s\n", bt_usb_devices[i] ,new_bt_dev->num,new_bt_dev->name);
+			debugf("added device %p %ld %s\n", bt_usb_devices[i],
+				new_bt_dev->num, new_bt_dev->name);
 			break;
 		}
 	}
 	release_sem_etc(dev_table_sem, 1, B_DO_NOT_RESCHEDULE);
 
-	/* In the case we cannot us */
+	// In the case we cannot us
 	if (bt_usb_devices[i] != new_bt_dev) {
-	    flowf("Device could not be added\n");
+		flowf("Device could not be added\n");
 		goto bail2;
 	}
 
 	new_bt_dev->dev = usb_dev;
-	/* TODO am i actually gonna use this? */
+	// TODO: currently only server opens
 	new_bt_dev->open_count = 0;
 
 	dev_count++;
@@ -158,7 +157,7 @@ exit:
 }
 
 
-/* remove a device from the list of connected devices */
+// remove a device from the list of connected devices
 static void
 kill_device(bt_usb_dev* bdev)
 {
@@ -180,40 +179,38 @@ kill_device(bt_usb_dev* bdev)
 bt_usb_dev*
 fetch_device(bt_usb_dev* dev, hci_id hid)
 {
-    int i;
+	int i;
 
 //	debugf("(%p) or %d\n", dev, hid);
 
 	acquire_sem(dev_table_sem);
-    if (dev != NULL)
-	    for (i = 0; i < MAX_BT_GENERIC_USB_DEVICES; i++) {
-	        /* somehow the device is still around */
-		    if (bt_usb_devices[i] == dev) {
-		        release_sem_etc(dev_table_sem, 1, B_DO_NOT_RESCHEDULE);
-		        return bt_usb_devices[i];
-		    }
+	if (dev != NULL)
+		for (i = 0; i < MAX_BT_GENERIC_USB_DEVICES; i++) {
+			if (bt_usb_devices[i] == dev) {
+				release_sem_etc(dev_table_sem, 1, B_DO_NOT_RESCHEDULE);
+				return bt_usb_devices[i];
+			}
 		}
 	else
-	    for (i = 0; i < MAX_BT_GENERIC_USB_DEVICES; i++) {
-	        /* somehow the device is still around */
-		    if (bt_usb_devices[i] != NULL && bt_usb_devices[i]->hdev == hid) {
-		        release_sem_etc(dev_table_sem, 1, B_DO_NOT_RESCHEDULE);
-		        return bt_usb_devices[i];
-		    }
+		for (i = 0; i < MAX_BT_GENERIC_USB_DEVICES; i++) {
+			if (bt_usb_devices[i] != NULL && bt_usb_devices[i]->hdev == hid) {
+				release_sem_etc(dev_table_sem, 1, B_DO_NOT_RESCHEDULE);
+				return bt_usb_devices[i];
+			}
 		}
 
 
 	release_sem_etc(dev_table_sem, 1, B_DO_NOT_RESCHEDULE);
 
-    return NULL;
+	return NULL;
 }
+
 
 #if 0
 #pragma mark -
 #endif
 
-
-/* called by USB Manager when device is added to the USB */
+// called by USB Manager when device is added to the USB
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 static status_t
 device_added(usb_device dev, void** cookie)
@@ -227,9 +224,9 @@ device_added(usb_device* dev, void** cookie)
 	const usb_interface_info*		uif;
 	const usb_endpoint_info*		ep;
 
-    status_t 	err = B_ERROR;
+	status_t 	err = B_ERROR;
 	bt_usb_dev* new_bt_dev = spawn_device(dev);
-    int e;
+	int e;
 
 	debugf("device_added(%ld, %p)\n", dev, new_bt_dev);
 
@@ -239,9 +236,9 @@ device_added(usb_device* dev, void** cookie)
 		goto bail_no_mem;
 	}
 
-	/* we only have 1 configuration number 0 */
+	// we only have 1 configuration number 0
 	config = usb->get_nth_configuration(dev, 0);
-	//dump_usb_configuration_info(config);
+	// dump_usb_configuration_info(config);
 	if (config == NULL) {
 		flowf("couldn't get default config.\n");
 		err = B_ERROR;
@@ -250,7 +247,7 @@ device_added(usb_device* dev, void** cookie)
 
 	debugf("found %ld alt interfaces.\n", config->interface->alt_count);
 
-	/* set first interface */
+	// set first interface
 	interface = &config->interface->alt[0];
 	err = usb->set_alt_interface(new_bt_dev->dev, interface);
 
@@ -259,17 +256,18 @@ device_added(usb_device* dev, void** cookie)
 		goto bail;
 	}
 
-	/* call set_configuration() only after calling set_alt_interface()*/
+	// call set_configuration() only after calling set_alt_interface()
 	err = usb->set_configuration(dev, config);
 	if (err != B_OK) {
 		debugf("set_configuration() returned %ld.\n", err);
 		goto bail;
 	}
 
-	/* Place to find out whats our concrete device and set up  some special info to our driver */
-	/* TODO: if this code increases too much reconsider this implementation*/
+	// Place to find out whats our concrete device and set up some special
+	// info to our driver. If this code increases too much reconsider
+	// this implementation
 	desc = usb->get_device_descriptor(dev);
-	if (desc->vendor_id == 0x0a5c 
+	if (desc->vendor_id == 0x0a5c
 		&& (desc->product_id == 0x200a
 			|| desc->product_id == 0x2009
 			|| desc->product_id == 0x2035)) {
@@ -278,18 +276,19 @@ device_added(usb_device* dev, void** cookie)
 
 	}
 	/*
-	else if ( desc->vendor_id == YOUR_VENDOR_HERE && desc->product_id == YOUR_PRODUCT_HERE ) {
+	else if ( desc->vendor_id == YOUR_VENDOR_HERE
+		&& desc->product_id == YOUR_PRODUCT_HERE ) {
 		 YOUR_SPECIAL_FLAGS_HERE
 	}
 	*/
 
-	if (new_bt_dev->driver_info & BT_IGNORE_THIS_DEVICE){
+	if (new_bt_dev->driver_info & BT_IGNORE_THIS_DEVICE) {
 		err = ENODEV;
 		goto bail;
 	}
 
 	// security check
-	if (config->interface->active->descr->interface_number > 0){
+	if (config->interface->active->descr->interface_number > 0) {
 		debugf("Strange condition happened %d\n",
 			config->interface->active->descr->interface_number);
 		err = B_ERROR;
@@ -297,7 +296,7 @@ device_added(usb_device* dev, void** cookie)
 	}
 
 	debugf("Found %ld interfaces. Expected 3\n", config->interface_count);
-	/* Find endpoints that we need */
+	// Find endpoints that we need
 	uif = config->interface->active;
 	for (e = 0; e < uif->descr->num_endpoints; e++) {
 
@@ -328,21 +327,22 @@ device_added(usb_device* dev, void** cookie)
 		}
 	}
 
-	if (!new_bt_dev->bulk_in_ep || !new_bt_dev->bulk_out_ep || !new_bt_dev->intr_in_ep) {
+	if (!new_bt_dev->bulk_in_ep || !new_bt_dev->bulk_out_ep
+		|| !new_bt_dev->intr_in_ep) {
 		flowf("Minimal # endpoints for BT not found\n");
 		goto bail;
 	}
 
 	// Look into the devices suported to understand this
-    if (new_bt_dev->driver_info & BT_DIGIANSWER)
+	if (new_bt_dev->driver_info & BT_DIGIANSWER)
 		new_bt_dev->ctrl_req = USB_TYPE_VENDOR;
 	else
 		new_bt_dev->ctrl_req = USB_TYPE_CLASS;
 
-    new_bt_dev->connected = true;
+	new_bt_dev->connected = true;
 
-	/* set the cookie that will be passed to other USB
-	   hook functions (currently device_removed() is the only other) */
+	// set the cookie that will be passed to other USB
+	// hook functions (currently device_removed() is the only other)
 	*cookie = new_bt_dev;
 	debugf("Ok %p\n", new_bt_dev);
 	return B_OK;
@@ -356,20 +356,20 @@ bail_no_mem:
 }
 
 
-/* called by USB Manager when device is removed from the USB */
+// Called by USB Manager when device is removed from the USB
 static status_t
 device_removed(void* cookie)
 {
-	bt_usb_dev* bdev = (bt_usb_dev*) fetch_device(cookie, 0);
+	bt_usb_dev* bdev = fetch_device((bt_usb_dev*)cookie, 0);
 
 	debugf("device_removed(%p)\n", bdev);
 
-    if (bdev == NULL) {
-        flowf(" not present in driver?\n");
-        return B_ERROR;
-    }
+	if (bdev == NULL) {
+		flowf(" not present in driver?\n");
+		return B_ERROR;
+	}
 
-	if (!TEST_AND_CLEAR(&bdev->state, RUNNING)) 
+	if (!TEST_AND_CLEAR(&bdev->state, RUNNING))
 		flowf("wasnt running?\n");
 
 	flowf("Cancelling queues...\n");
@@ -394,8 +394,17 @@ device_removed(void* cookie)
 }
 
 
-static usb_notify_hooks notify_hooks =
-{
+static bt_hci_transport_hooks bluetooth_hooks = {
+	NULL,
+	&submit_nbuffer,
+	&submit_nbuffer,
+	NULL,
+	NULL,
+	H2
+};
+
+
+static usb_notify_hooks notify_hooks = {
 	&device_added,
 	&device_removed
 };
@@ -412,21 +421,21 @@ submit_nbuffer(hci_id hid, net_buffer* nbuf)
 	bdev = fetch_device(NULL, hid);
 
 	debugf("index=%lx nbuf=%p bdev=%p\n",hid, nbuf, bdev);
-	
+
 	if (bdev != NULL) {
 		switch (nbuf->protocol) {
 			case BT_COMMAND:
 				// not issued this way
 			break;
-			
+
 			case BT_ACL:
-				return submit_tx_acl(bdev, nbuf);			
+				return submit_tx_acl(bdev, nbuf);
 			break;
 
 			default:
 				panic("submit_nbuffer: no protocol");
 			break;
-		
+
 		}
 	}
 
@@ -435,9 +444,9 @@ submit_nbuffer(hci_id hid, net_buffer* nbuf)
 }
 
 
-/* implements the POSIX open() */
+// implements the POSIX open()
 static status_t
-device_open(const char *name, uint32 flags, void **cookie)
+device_open(const char* name, uint32 flags, void **cookie)
 {
 	status_t err = ENODEV;
 	bt_usb_dev* bdev = NULL;
@@ -463,8 +472,8 @@ device_open(const char *name, uint32 flags, void **cookie)
 
 	// Set RUNNING
 	if (TEST_AND_SET(&bdev->state, RUNNING)) {
-	    flowf("dev already running! - reOpened device!\n");
-	    return B_ERROR;
+		flowf("dev already running! - reOpened device!\n");
+		return B_ERROR;
 	}
 
 	acquire_sem(bdev->lock);
@@ -481,30 +490,28 @@ device_open(const char *name, uint32 flags, void **cookie)
 	}
 
 	// dumping the USB frames
-    init_room(&bdev->eventRoom);
-    init_room(&bdev->aclRoom);
-    //init_room(new_bt_dev->scoRoom);
+	init_room(&bdev->eventRoom);
+	init_room(&bdev->aclRoom);
+	// init_room(new_bt_dev->scoRoom);
 
-   	list_init(&bdev->snetBufferRecycleTrash);
+	list_init(&bdev->snetBufferRecycleTrash);
 
 	// Allocate set and register the HCI device
 	if (btDevices != NULL) {
-		struct net_device* ndev;
-		//	TODO: Fill the transport descriptor
-	    err = btDevices->init_device(bdev->name, &ndev);
-		
-    	if (err == B_OK) {
-    		bdev->hdev = hdev = ndev->index; // get the index
-    		bdev->ndev = ndev;  // get the net_device
+		bluetooth_device* ndev;
+		// TODO: Fill the transport descriptor
+		err = btDevices->RegisterDriver(&bluetooth_hooks, &ndev);
 
-    		ndev->media = (uint32)submit_nbuffer; //XXX: interlayer-Hack
+		if (err == B_OK) {
+			bdev->hdev = hdev = ndev->index; // Get the index
+			bdev->ndev = ndev;  // Get the net_device
 
  		} else {
-			hdev = bdev->num; /* XXX: Lets try to go on*/
+			hdev = bdev->num; // XXX: Lets try to go on
  		}
-    } else {
-		hdev = bdev->num; /* XXX: Lets try to go on*/
-    }
+	} else {
+		hdev = bdev->num; // XXX: Lets try to go on
+	}
 
 	bdev->hdev = hdev;
 
@@ -518,9 +525,10 @@ device_open(const char *name, uint32 flags, void **cookie)
 
 
 /* called when a client calls POSIX close() on the driver, but I/O
- ** requests may still be pending */
+ * requests may still be pending
+ */
 static status_t
-device_close(void *cookie)
+device_close(void* cookie)
 {
 	int32 i;
 	void* item;
@@ -539,57 +547,56 @@ device_close(void *cookie)
 			usb->cancel_queued_transfers(bdev->intr_in_ep->handle);
 			flowf("Cancelling possible EVENTS\n");
 		}
-	
+
 		if (bdev->bulk_in_ep!=NULL) {
 			usb->cancel_queued_transfers(bdev->bulk_in_ep->handle);
 			flowf("Cancelling possible ACL in\n");
 		}
-	
+
 		if (bdev->bulk_out_ep!=NULL) {
 			usb->cancel_queued_transfers(bdev->bulk_out_ep->handle);
 			flowf("Cancelling possible ACL out\n");
 		}
 	}
-	
+
 	// TX
 	for (i = 0; i < BT_DRIVER_TXCOVERAGE; i++) {
 		if (i == BT_COMMAND)
 			while ((item = list_remove_head_item(&bdev->nbuffersTx[i])) != NULL) {
-				snb_free(item);
+				snb_free((snet_buffer*)item);
 			}
 		else
 			while ((item = list_remove_head_item(&bdev->nbuffersTx[i])) != NULL) {
-				nb_destroy(item);
+				nb_destroy((net_buffer*)item);
 			}
 
 	}
 	// RX
 	for (i = 0; i < BT_DRIVER_RXCOVERAGE; i++) {
-	    nb_destroy(bdev->nbufferRx[i]);
+		nb_destroy(bdev->nbufferRx[i]);
 	}
 	snb_free(bdev->eventRx);
 
-    purge_room(&bdev->eventRoom);
-    purge_room(&bdev->aclRoom);
+	purge_room(&bdev->eventRoom);
+	purge_room(&bdev->aclRoom);
 
-    /* Device no longer in our Stack*/
-    if (btDevices != NULL)
-        btDevices->uninit_device(bdev->ndev);
+	// Device no longer in our Stack
+	if (btDevices != NULL)
+		btDevices->UnregisterDriver(bdev->hdev);
 
 	// unSet RUNNING
 	if (TEST_AND_CLEAR(&bdev->state, RUNNING)) {
-	    debugf(" %s not running?\n",bdev->name);
-	    return B_ERROR;
+		debugf(" %s not running?\n",bdev->name);
+		return B_ERROR;
 	}
 
 	return B_OK;
 }
 
 
-/* called after device_close(), when all pending I/O requests have
- * returned */
+// Called after device_close(), when all pending I / O requests have returned
 static status_t
-device_free (void *cookie)
+device_free (void* cookie)
 {
 	status_t err = B_OK;
 	bt_usb_dev* bdev = (bt_usb_dev*)cookie;
@@ -605,9 +612,9 @@ device_free (void *cookie)
 }
 
 
-/* implements the POSIX ioctl() */
+// implements the POSIX ioctl()
 static status_t
-device_control(void *cookie, uint32 msg, void *params, size_t size)
+device_control(void* cookie, uint32 msg, void* params, size_t size)
 {
 	status_t 	err = B_ERROR;
 	bt_usb_dev*	bdev = (bt_usb_dev*)cookie;
@@ -634,7 +641,7 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 	switch (msg) {
 		case ISSUE_BT_COMMAND:
 #ifdef BT_IOCTLS_PASS_SIZE
-		 	if (size == 0) {
+			if (size == 0) {
 				flowf("Invalid size control\n");
 				err = B_BAD_VALUE;
 				break;
@@ -644,10 +651,10 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 			(*(size_t**)&params)++;
 #endif
 
-		   	// TODO: Reuse from some TXcompleted queue
-		    //snbuf = snb_create(size);
-		    snbuf = snb_fetch(&bdev->snetBufferRecycleTrash, size);
-		    snb_put(snbuf, params, size);
+			// TODO: Reuse from some TXcompleted queue
+			// snbuf = snb_create(size);
+			snbuf = snb_fetch(&bdev->snetBufferRecycleTrash, size);
+			snb_put(snbuf, params, size);
 
 			err = submit_tx_command(bdev, snbuf);
 			debugf("command launched %ld\n", err);
@@ -655,10 +662,10 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 
 		case BT_UP:
 
-		    //  EVENTS
+			//  EVENTS
 			err = submit_rx_event(bdev);
 			if (err != B_OK) {
-			    CLEAR_BIT(bdev->state, ANCILLYANT);
+				CLEAR_BIT(bdev->state, ANCILLYANT);
 				flowf("Queuing failed device stops running\n");
 				break;
 			}
@@ -667,10 +674,10 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 			for (i = 0; i < MAX_ACL_IN_WINDOW; i++) {
 				err = submit_rx_acl(bdev);
 				if (err != B_OK && i == 0) {
-	  			    CLEAR_BIT(bdev->state, ANCILLYANT);	// Set the flaq in the HCI world
+				CLEAR_BIT(bdev->state, ANCILLYANT);	// Set the flaq in the HCI world
 					flowf("Queuing failed device stops running\n");
 					break;
-			   	}
+				}
 			}
 			#endif
 
@@ -683,13 +690,13 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 		break;
 
 		case GET_STATS:
-		    memcpy(params, &bdev->stat, sizeof(bt_hci_statistics));
-		    err = B_OK;
+			memcpy(params, &bdev->stat, sizeof(bt_hci_statistics));
+			err = B_OK;
 		break;
 
 		case GET_HCI_ID:
-		    *(hci_id*)params = bdev->hdev;
-		    err = B_OK;
+			*(hci_id*)params = bdev->hdev;
+			err = B_OK;
 		break;
 
 
@@ -704,9 +711,9 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 }
 
 
-/* implements the POSIX read() */
+// implements the POSIX read()
 static status_t
-device_read(void *cookie, off_t pos, void *buf, size_t *count)
+device_read(void* cookie, off_t pos, void* buffer, size_t* count)
 {
 	debugf("Reading... count = %ld\n", *count);
 
@@ -715,14 +722,15 @@ device_read(void *cookie, off_t pos, void *buf, size_t *count)
 }
 
 
-/* implements the POSIX write() */
+// implements the POSIX write()
 static status_t
-device_write(void *cookie, off_t pos, const void *buf, size_t *count)
+device_write(void* cookie, off_t pos, const void* buffer, size_t* count)
 {
 	flowf("device_write()\n");
 
 	return B_ERROR;
 }
+
 
 #if 0
 #pragma mark -
@@ -734,25 +742,27 @@ dump_driver(int argc, char** argv)
 {
 	int i;
 	snet_buffer* item = NULL;
-	
+
 	for (i = 0; i < MAX_BT_GENERIC_USB_DEVICES; i++) {
 
 		if (bt_usb_devices[i] != NULL) {
 			kprintf("%s : \n", bt_usb_devices[i]->name);
-			kprintf("\taclroom = %d\teventroom = %d\tcommand & events =%d\n", snb_packets(&bt_usb_devices[i]->eventRoom)
-																			, snb_packets(&bt_usb_devices[i]->aclRoom)
-																			, snb_packets(&bt_usb_devices[i]->snetBufferRecycleTrash) );
-																			
-			while ((item = list_get_next_item(&bt_usb_devices[i]->snetBufferRecycleTrash, item)) != NULL)
+			kprintf("\taclroom = %d\teventroom = %d\tcommand & events =%d\n",
+				snb_packets(&bt_usb_devices[i]->eventRoom),
+				snb_packets(&bt_usb_devices[i]->aclRoom),
+				snb_packets(&bt_usb_devices[i]->snetBufferRecycleTrash));
+
+			while ((item = (snet_buffer*)list_get_next_item(
+				&bt_usb_devices[i]->snetBufferRecycleTrash, item)) != NULL)
 				snb_dump(item);
-			}
+		}
 	}
 
 	return 0;
 }
 
 
-/* called each time the driver is loaded by the kernel */
+// called each time the driver is loaded by the kernel
 status_t
 init_driver(void)
 {
@@ -806,15 +816,15 @@ init_driver(void)
 	}
 
 	for (j = 0; j < MAX_BT_GENERIC_USB_DEVICES; j++) {
-	    bt_usb_devices[j] = NULL;
+		bt_usb_devices[j] = NULL;
 	}
 
-	/* After here device_added and publish devices hooks are called
-	   be carefull USB devs */
+	// Note: After here device_added and publish devices hooks are called
 	usb->register_driver(BLUETOOTH_DEVICE_DEVFS_NAME, supported_devices, 1, NULL);
 	usb->install_notify(BLUETOOTH_DEVICE_DEVFS_NAME, &notify_hooks);
 
-	add_debugger_command("bth2generic", &dump_driver, "Lists H2 Transport device info");
+	add_debugger_command("bth2generic", &dump_driver,
+		"Lists H2 Transport device info");
 
 	return B_OK;
 
@@ -830,12 +840,12 @@ err_release2:
 	put_module(btDevices_name);
 err_release3:
 	put_module(BT_CORE_DATA_MODULE_NAME);
-	
+
 	return B_ERROR;
 }
 
 
-/* called just before the kernel unloads the driver */
+// called just before the kernel unloads the driver
 void
 uninit_driver(void)
 {
@@ -849,10 +859,10 @@ uninit_driver(void)
 			free(publish_names[j]);
 
 		if (bt_usb_devices[j] != NULL) {
-		    //	if (connected_dev != NULL) {
-            //		debugf("Device %p still exists.\n",	connected_dev);
-            //	}
-            debugf("%s still present?\n",bt_usb_devices[j]->name);
+			//	if (connected_dev != NULL) {
+			//		debugf("Device %p still exists.\n",	connected_dev);
+			//	}
+			debugf("%s still present?\n",bt_usb_devices[j]->name);
 			kill_device(bt_usb_devices[j]);
 		}
 	}
@@ -861,7 +871,7 @@ uninit_driver(void)
 
 	remove_debugger_command("bth2generic", &dump_driver);
 
-	/* Releasing modules */
+	// Releasing modules
 	put_module(usb_name);
 	put_module(hci_name);
 	// TODO: netbuffers
@@ -900,18 +910,18 @@ publish_devices(void)
 	release_sem_etc(dev_table_sem, 1, B_DO_NOT_RESCHEDULE);
 
 	publish_names[i] = NULL;
-    debugf("published %ld devices\n", i);
+	debugf("published %ld devices\n", i);
 
-//  TODO: this method might make better memory use
-//	dev_names = (char**)malloc(sizeof (char*) * (dev_count+1));
-//	if (dev_names) {
-//		for (i = 0; i < MAX_NUM_DEVS; i++) {
-//			if ((dev != NULL) &&
-//					(dev_names[i] = (char*)malloc(strlen(DEVICE_PATH)+2/* num + \n */))) {
-//				sprintf(dev_names[i], "%s%ld", DEVICE_PATH, dev->num);
-//				debugf("publishing \"%s\"\n", dev_names[i]);
-//			}
-//		}
+	// TODO: this method might make better memory use
+	// dev_names = (char**)malloc(sizeof(char*) * (dev_count + 1));
+	// if (dev_names) {
+	// for (i = 0; i < MAX_NUM_DEVS; i++) {
+	//	if ((dev != NULL) // dev + \n
+	//	&& (dev_names[i] = (char*)malloc(strlen(DEVICE_PATH) + 2))) {
+	//	sprintf(dev_names[i], "%s%ld", DEVICE_PATH, dev->num);
+	//	debugf("publishing \"%s\"\n", dev_names[i]);
+	//	}
+	// }
 
 	return (const char**)publish_names;
 }

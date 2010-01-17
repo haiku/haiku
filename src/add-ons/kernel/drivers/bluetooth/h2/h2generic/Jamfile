@@ -18,11 +18,11 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 }
 
 KernelAddon h2generic :
-	h2generic.c
-	h2transactions.c
-	h2upper.c
-	h2util.c
-	snet_buffer.c
+	h2generic.cpp
+	h2transactions.cpp
+	h2upper.cpp
+	h2util.cpp
+	snet_buffer.cpp
 	$(r5_src)
 	;
 	

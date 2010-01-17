@@ -1,8 +1,6 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
 
 #ifndef _H2TRANSACTION_H_

@@ -22,21 +22,20 @@
 void*
 nb_get_whole_buffer(net_buffer* nbuf)
 {
-	void*       conPointer;
-	status_t    err;
+	void* conPointer;
+	status_t err;
 #if 0
-	/* the job could be already done */
+	// the job could be already done
 	// !!! it could be trash from other upper protocols...
 	if (nbuf->COOKIEFIELD != NULL)
 		return (void*)nbuf->COOKIEFIELD;
 #endif
-    err = nb->direct_access(nbuf, 0, nbuf->size, &conPointer);
+	err = nb->direct_access(nbuf, 0, nbuf->size, &conPointer);
 
-    if (err != B_OK) {
-		snooze(3*1000*1000);
+	if (err != B_OK) {
 		panic("expected to be contiguous");
 		#if 0
-		/* pity, we are gonna need a realocation */
+		// We are gonna need a realocation
 		nbuf->COOKIEFIELD = (uint32) malloc(nbuf->size);
 		if (nbuf->COOKIEFIELD == NULL)
 			goto fail;
@@ -65,7 +64,7 @@ nb_destroy(net_buffer* nbuf)
 	if (nbuf == NULL)
 		return;
 #if 0
-	/* Free possible allocated */
+	// Free possible allocated
 	if (nbuf->COOKIEFIELD != NULL)
 		free((void*)nbuf->COOKIEFIELD);
 #endif
@@ -77,10 +76,10 @@ nb_destroy(net_buffer* nbuf)
 
 
 // Extract the expected size of the packet
-// TODO: This might be inefficient as at the moment of the creation of the net_buffer
-// this information is known and it could be stored in any of the net_buffer fields
-// but I still dont know how many of those am i gonna have free....
-size_t
+// TODO: This might be inefficient as at the moment of the creation
+// of the net_buffer this information is known and it could be stored 
+#if 0
+ssize_t
 get_expected_size(net_buffer* nbuf)
 {
 
@@ -114,14 +113,17 @@ get_expected_size(net_buffer* nbuf)
 		break;
 	}
 
-	return B_ERROR;
+	return -1;
 }
+#endif
+
 
 #if 0
 #pragma mark - room util -
 #endif
 
-inline void
+
+void
 init_room(struct list* l)
 {
 	list_init(l);
@@ -142,7 +144,7 @@ alloc_room(struct list* l, size_t size)
 }
 
 
-inline void
+void
 reuse_room(struct list* l, void* room)
 {
 	list_add_item(l, room);

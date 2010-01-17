@@ -21,13 +21,13 @@
 
 #include <util/list.h>
 #include <bluetooth/HCI/btHCI.h>
-#include <bluetooth/HCI/btHCI_module.h>
+#include <bluetooth/HCI/btHCI_transport.h>
 
 #include <btCoreData.h>
 
 #include "snet_buffer.h"
 
-/* USB definitions for the generic device*/
+// USB definitions for the generic device move to h2cfg
 #define UDCLASS_WIRELESS	0xe0
 #define UDSUBCLASS_RF		0x01
 #define UDPROTO_BLUETOOTH	0x01
@@ -45,7 +45,7 @@
 
 extern usb_module_info* usb;
 extern bt_hci_module_info* hci;
-extern struct net_device_module_info* btDevices;
+extern struct bt_hci_module_info* btDevices;
 extern struct net_buffer_module_info* nb;
 extern struct bluetooth_core_data_module_info* btCoreData;
 
@@ -64,9 +64,9 @@ struct bt_usb_dev {
 #else
 	usb_device*		dev;          /* opaque handle */
 #endif
-	hci_id					hdev;		  /* HCI device id*/	
-	struct net_device*		ndev;
-	
+	hci_id					hdev; /* HCI device id*/
+	bluetooth_device*		ndev;
+
 	char			name[B_OS_NAME_LENGTH];
 	bool			connected;    /* is the device plugged into the USB? */
 	int32			open_count;   /* number of clients of the device */
@@ -83,35 +83,36 @@ struct bt_usb_dev {
 	uint32				state;
 
 	bt_hci_statistics	stat;
-	
-	const   usb_endpoint_info	*bulk_in_ep;
-	uint16	max_packet_size_bulk_in;
-	const   usb_endpoint_info	*bulk_out_ep;	
-	uint16	max_packet_size_bulk_out;
-	const   usb_endpoint_info	*intr_in_ep;
-	uint16	max_packet_size_intr_in;
-	
+
+	const	usb_endpoint_info*	bulk_in_ep;
+			uint16				max_packet_size_bulk_in;
+	const	usb_endpoint_info*	bulk_out_ep;
+			uint16				max_packet_size_bulk_out;
+	const	usb_endpoint_info*	intr_in_ep;
+			uint16				max_packet_size_intr_in;
+
 #ifdef BLUETOOTH_SUPPORTS_SCO
 	const usb_endpoint_info	*iso_in_ep;
 	const usb_endpoint_info	*iso_out_ep;
 #endif
-	
+
 	/* This so called rooms, are for dumping the USB RX frames
-	   and try to reuse the allocations. see util submodule */
+	 * and try to reuse the allocations. see util submodule
+	 */
 	struct list eventRoom;
-	struct list aclRoom;	
+	struct list aclRoom;
 
 	// Tx buffers: net_buffers for BT_ACL and snet_buffers for BT_COMMAND
-	// in the same array 
-	struct list nbuffersTx[BT_DRIVER_TXCOVERAGE];
+	// in the same array
+	struct list	nbuffersTx[BT_DRIVER_TXCOVERAGE];
 	uint32		nbuffersPendingTx[BT_DRIVER_TXCOVERAGE];
-	
+
 	// Rx buffer
-	net_buffer*	 nbufferRx[BT_DRIVER_RXCOVERAGE]; /* Wasting 1 pointer for BT_EVENT */
-	snet_buffer* eventRx;		                  /* <- which we hold here */
-	
+	net_buffer*		nbufferRx[BT_DRIVER_RXCOVERAGE];
+	snet_buffer*	eventRx;
+
 	// for who ever needs preallocated buffers
-	struct list snetBufferRecycleTrash;
+	struct list		snetBufferRecycleTrash;
 
 };
 

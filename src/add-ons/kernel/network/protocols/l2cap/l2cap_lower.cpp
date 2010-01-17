@@ -39,11 +39,11 @@
 status_t
 l2cap_receive(HciConnection* conn, net_buffer* buffer)
 {
-	status_t    error = B_OK;
-	uint16		dcid;
-	uint16		length;
+	status_t error = B_OK;
+	uint16 dcid;
+	uint16 length;
 
-	/* Check packet */
+	// Check packet
 	if (buffer->size < sizeof(l2cap_hdr_t)) {
 		debugf("invalid L2CAP packet. Packet too small, len=%ld\n", buffer->size);
 		gBufferModule->free(buffer);
@@ -51,7 +51,7 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 
 	}
 
-	/* Get L2CAP header */
+	// Get L2CAP header
 	NetBufferHeaderReader<l2cap_hdr_t> bufferHeader(buffer);
 	status_t status = bufferHeader.Status();
 	if (status < B_OK) {
@@ -61,28 +61,28 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 	length = bufferHeader->length = le16toh(bufferHeader->length);
 	dcid = bufferHeader->dcid = le16toh(bufferHeader->dcid);
 
-	bufferHeader.Remove(); /* pulling */
+	bufferHeader.Remove(); // pulling
 
-	/* Check payload size */
+	// Check payload size
 	if (length != buffer->size ) {
-		debugf("invalid L2CAP packet. Payload length mismatch, packetlen=%d, nebufferlen=%ld\n",
-			   length, buffer->size);
+		debugf("Payload length mismatch, packetlen=%d, bufferlen=%ld\n",
+			length, buffer->size);
 		gBufferModule->free(buffer);
 		return EMSGSIZE;
 	}
 
-	/* Process packet */
+	// Process packet
 	switch (dcid) {
-		case L2CAP_SIGNAL_CID: /* L2CAP command */
+		case L2CAP_SIGNAL_CID: // L2CAP command
 			error = l2cap_process_signal_cmd(conn, buffer);
 		break;
 
-		case L2CAP_CLT_CID: /* Connectionless packet
-			error = l2cap_cl_receive(buffer);*/
+		case L2CAP_CLT_CID: // Connectionless packet
+			// error = l2cap_cl_receive(buffer);
 			flowf("CL FRAME!!\n");
 		break;
 
-		default: /* Data packet */
+		default: // Data packet
 			error = l2cap_co_receive(conn, buffer, dcid);
 		break;
 	}
@@ -92,7 +92,7 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 }
 
 
-struct net_device_module_info* btDevices = NULL;
+struct bt_hci_module_info* btDevices = NULL;
 
 #if 0
 #pragma mark - thread conn sched -
@@ -105,6 +105,7 @@ void
 purge_connection(HciConnection* conn)
 {
 	L2capFrame* frame;
+	bool containerCanBeDestroyed;
 
 	debugf("handle=%d\n", conn->handle);
 
@@ -118,42 +119,44 @@ purge_connection(HciConnection* conn)
 
 		// Here is the place to decide how many l2cap signals we want to have
 		// per l2cap packet. 1 ATM
-		if (frame->type == L2CAP_C_FRAME) {
+		if (frame->type == L2CAP_C_FRAME && IS_SIGNAL_REQ(frame->code)) {
 			btCoreData->TimeoutSignal(frame, bluetooth_l2cap_rtx_timeout);
 			btCoreData->QueueSignal(frame);
-		}
+			containerCanBeDestroyed = false;
+		} else
+			containerCanBeDestroyed = true;
 
 		// Add the l2cap header
 		if (frame->buffer == NULL)
 			panic("Malformed frame in ongoing queue");
 
-		NetBufferPrepend<l2cap_hdr_t> bufferHeader(frame->buffer);
-		status_t status = bufferHeader.Status();
-		if (status < B_OK) {
-			debugf("l2cap header could not be prepended!! frame code=%d\n", frame->code);
-			return;
+		{
+			NetBufferPrepend<l2cap_hdr_t> bufferHeader(frame->buffer);
+			status_t status = bufferHeader.Status();
+			if (status < B_OK) {
+				debugf("header could not be prepended! code=%d\n", frame->code);
+				return;
 
+			}
+
+			// fill
+			bufferHeader->length = htole16(frame->buffer->size - sizeof(l2cap_hdr_t));
+			switch (frame->type) {
+				case L2CAP_C_FRAME:
+					bufferHeader->dcid = L2CAP_SIGNAL_CID;
+				break;
+				case L2CAP_G_FRAME:
+					bufferHeader->dcid = L2CAP_CLT_CID;
+				break;
+				default:
+					bufferHeader->dcid = frame->channel->dcid;
+				break;
+
+			}
 		}
-
-		// fill
-		bufferHeader->length = htole16(frame->buffer->size - sizeof(l2cap_hdr_t));
-		switch (frame->type) {
-			case L2CAP_C_FRAME:
-				bufferHeader->dcid = L2CAP_SIGNAL_CID;
-			break;
-			case L2CAP_G_FRAME:
-				bufferHeader->dcid = L2CAP_CLT_CID;
-			break;
-			default:
-				bufferHeader->dcid = frame->channel->dcid;
-			break;
-
-		}
-
-		bufferHeader.Sync();
 
 		if (btDevices == NULL)
-		if (get_module(NET_BLUETOOTH_DEVICE_NAME, (module_info**)&btDevices) != B_OK) {
+		if (get_module(BT_HCI_MODULE_NAME, (module_info**)&btDevices) != B_OK) {
 			panic("l2cap: cannot get dev module");
 		} // TODO: someone put it
 
@@ -161,7 +164,13 @@ purge_connection(HciConnection* conn)
 		debugf("dev %p frame %p tolower\n", conn->ndevice, frame->buffer);
 
 		frame->buffer->type = conn->handle;
-		btDevices->send_data(conn->ndevice, frame->buffer);
+		btDevices->PostACL(conn->ndevice->index, frame->buffer);
+
+		// Only in the case that we need a response the frame container needs
+		// to be kept: Request C-Frames
+		if (containerCanBeDestroyed) {
+			delete frame;
+		}
 
 //		frame = conn->OutGoingFrames.RemoveHead();
 //	}
@@ -170,7 +179,7 @@ purge_connection(HciConnection* conn)
 
 
 static status_t
-connection_thread(void *)
+connection_thread(void*)
 {
 	int32 code;
 	ssize_t	ssizePort;
@@ -187,24 +196,24 @@ connection_thread(void *)
 
 	while ((ssizePort = port_buffer_size(fPort)) != B_BAD_PORT_ID) {
 
-		 if (ssizePort <= 0) {
-		 	debugf("Error %s\n", strerror(ssizePort));
-		 	snooze(500*1000);
-		    continue;
-		 }
+		if (ssizePort <= 0) {
+			debugf("Error %s\n", strerror(ssizePort));
+			snooze(500 * 1000);
+			continue;
+		}
 
 		if (ssizePort > (ssize_t) sizeof(conn)) {
-		 	debugf("Message too big %ld\n", ssizePort);
-		 	snooze(500*1000);
+			debugf("Message too big %ld\n", ssizePort);
+			snooze(500 * 1000);
 			continue;
 		}
 
 		ssizeRead = read_port(fPort, &code, &conn, ssizePort);
 
 		if (ssizeRead != ssizePort) {
-		 	debugf("Missmatch size port=%ld read=%ld\n", ssizePort, ssizeRead);
-		 	snooze(500*1000);
-		    continue;
+			debugf("Missmatch size port=%ld read=%ld\n", ssizePort, ssizeRead);
+			snooze(500 * 1000);
+			continue;
 		}
 
 		purge_connection(conn);
@@ -262,8 +271,6 @@ SchedConnectionPurgeThread(HciConnection* conn)
 		panic("BT Connection Port Deleted");
 
 	status_t error = write_port(port, (uint32) conn, &temp, sizeof(conn));
-
-	//debugf("error post %s port=%ld size=%ld\n", strerror(error), port, sizeof(conn));
 
 	if (error != B_OK)
 		panic("BT Connection sched failed");
