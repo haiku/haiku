@@ -341,8 +341,8 @@ MediaAddonServer::QuitRequested()
 {
 	CALLED();
 
-	InfoMap::iterator iterator = fInfoMap.begin();
-	for (; iterator != fInfoMap.end(); iterator++) {
+	InfoMap::reverse_iterator iterator = fInfoMap.rbegin();
+	for (; iterator != fInfoMap.rend(); iterator++) {
 		AddOnInfo& info = iterator->second;
 
 		_DestroyInstantiatedFlavors(info);
@@ -603,11 +603,14 @@ MediaAddonServer::_AddOnAdded(const char* path, ino_t fileNode)
 void
 MediaAddonServer::_DestroyInstantiatedFlavors(AddOnInfo& info)
 {
-	printf("MediaAddonServer::_DestroyInstantiatedFlavors\n");
+	printf("MediaAddonServer::_DestroyInstantiatedFlavors addon %ld\n", info.id);
 
-	NodeVector::iterator iterator = info.active_flavors.begin();
-	for (; iterator != info.active_flavors.end(); iterator++) {
+	NodeVector::reverse_iterator iterator = info.active_flavors.rbegin();
+	for (; iterator != info.active_flavors.rend(); iterator++) {
 		media_node& node = *iterator;
+		
+		printf("node %ld\n", node.node);
+		
 		if ((node.kind & B_TIME_SOURCE) != 0
 			&& (fMediaRoster->StopTimeSource(node, 0, true) != B_OK)) {
 			printf("MediaAddonServer::_DestroyInstantiatedFlavors couldn't stop "
@@ -676,6 +679,8 @@ MediaAddonServer::_DestroyInstantiatedFlavors(AddOnInfo& info)
 				}
 			}
 		}
+		
+		fMediaRoster->ReleaseNode(node);
 	}
 
 	info.active_flavors.clear();
@@ -744,27 +749,26 @@ MediaAddonServer::_InstantiateAutostartFlavors(AddOnInfo& info)
 		bool hasMore;
 		status_t status = info.addon->AutoStart(index, &node, &internalID,
 			&hasMore);
-		if (status == B_OK) {
-			printf("started node %ld\n", index);
-
-			// TODO: IncrementAddonFlavorInstancesCount
-
-			status = MediaRosterEx(fMediaRoster)->RegisterNode(node, info.id,
-				internalID);
-			if (status != B_OK) {
-				ERROR("failed to register node %ld\n", index);
-				// TODO: DecrementAddonFlavorInstancesCount
-			}
-
-			info.active_flavors.push_back(node->Node());
-
-			if (!hasMore)
-				return;
-		} else if (status == B_MEDIA_ADDON_FAILED && hasMore) {
+		if (status == B_MEDIA_ADDON_FAILED && hasMore)
 			continue;
-		} else {
+		else if (status != B_OK)
 			break;
+			
+		printf("started node %ld\n", index);
+						
+		status = MediaRosterEx(fMediaRoster)->RegisterNode(node, info.id,
+			internalID);
+		if (status != B_OK) {
+			ERROR("failed to register node %ld\n", index);
+			node->Release();
+		} else {
+			MediaRosterEx(fMediaRoster)->IncrementAddonFlavorInstancesCount(
+				info.id, internalID);
+			info.active_flavors.push_back(node->Node());
 		}
+
+		if (!hasMore)
+			return;
 	}
 }
 
