@@ -242,7 +242,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 {
 	CALLED();
 
-	BPath targetDirectory, srcDirectory;
+	BPath targetDirectory, srcDirectory, trashPath, testPath;
 	BDirectory targetDir;
 	BDiskDevice device;
 	BPartition* partition;
@@ -342,49 +342,26 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		goto error;
 	}
 
+	// check if target volume's trash dir has anything in it
+	// (target volume w/ only an empty trash dir is considered
+	// an empty volume)
+	if (find_directory(B_TRASH_DIRECTORY, &trashPath, false, 
+		&targetVolume) == B_OK && targetDir.SetTo(trashPath.Path()) == B_OK) {
+			while (targetDir.GetNextRef(&testRef) == B_OK) {
+				// Something in the Trash
+				entries++;
+				break;
+			}
+	}
+
 	targetDir.SetTo(targetDirectory.Path());
 
-	// check target volume not empty
-	// NOTE: It's ok if exactly this path exists: home/Desktop/Trash
-	// and nothing else.
-	while (targetDir.GetNextRef(&testRef) == B_OK) {
-		if (strcmp(testRef.name, "home") == 0) {
-			BDirectory homeDir(&testRef);
-			while (homeDir.GetNextRef(&testRef) == B_OK) {
-				if (strcmp(testRef.name, "Desktop") == 0) {
-					BDirectory desktopDir(&testRef);
-					while (desktopDir.GetNextRef(&testRef) == B_OK) {
-						if (strcmp(testRef.name, "Trash") == 0) {
-							BDirectory trashDir(&testRef);
-							while (trashDir.GetNextRef(&testRef) == B_OK) {
-								// Something in the Trash
-								entries++;
-								break;
-							}
-						} else {
-							// Something besides Trash
-							entries++;
-						}
-
-						if (entries > 0)
-							break;
-					}
-				} else {
-					// Something besides Desktop
-					entries++;
-				}
-
-				if (entries > 0)
-					break;
-			}
-		} else {
-			// Something besides home
+	// check if target volume otherwise has any entries
+	while (entries == 0 && targetDir.GetNextRef(&testRef) == B_OK) {
+		if (testPath.SetTo(&testRef) == B_OK && testPath != trashPath)
 			entries++;
-		}
-
-		if (entries > 0)
-			break;
 	}
+	
 	if (entries != 0
 		&& ((new BAlert("", "The target volume is not empty. Are you sure you "
 			"want to install anyway?\n\nNote: The 'system' folder will be a "
