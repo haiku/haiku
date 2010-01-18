@@ -46,13 +46,11 @@ thread_entry(thread_func entry, void* _thread)
 }
 
 
-#if __GNUC__ < 3
 void
 _thread_do_exit_notification(void)
 {
-	// empty stub for R5 compability
+	// empty stub for R5 compatibility
 }
-#endif
 
 
 void
