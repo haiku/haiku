@@ -142,7 +142,7 @@ set_thread_priority(thread_id thread, int32 priority)
 void
 exit_thread(status_t status)
 {
-	_thread_do_exit_notification();
+	_thread_do_exit_work();
 	_kern_exit_thread(status);
 }
 
