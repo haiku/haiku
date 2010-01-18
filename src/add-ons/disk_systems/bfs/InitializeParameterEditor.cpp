@@ -98,7 +98,7 @@ InitializeBFSEditor::_CreateViewControls()
 	// TODO find out what is the max length for this specific FS partition name
 	fNameTC->TextView()->SetMaxBytes(31);
 
-	BPopUpMenu* blocksizeMenu = new BPopUpMenu("Blocksize:");
+	BPopUpMenu* blocksizeMenu = new BPopUpMenu("blocksize");
 	BMessage* message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "1024");
 	blocksizeMenu->AddItem(new BMenuItem("1024 (Mostly small files)",
@@ -115,7 +115,7 @@ InitializeBFSEditor::_CreateViewControls()
 	blocksizeMenu->AddItem(new BMenuItem("8192 (Mostly large files)",
 		message));
 
-	fBlockSizeMF = new BMenuField("Blocksize", blocksizeMenu, NULL);
+	fBlockSizeMF = new BMenuField("Blocksize:", blocksizeMenu, NULL);
 	defaultItem->SetMarked(true);
 
 	fUseIndicesCB = new BCheckBox("Enable query support", NULL);
@@ -139,7 +139,5 @@ InitializeBFSEditor::_CreateViewControls()
 
 		// row 3
 		.Add(fUseIndicesCB, 0, 2, 2)
-
-		.SetInsets(spacing, spacing, spacing, spacing)
 	;
 }

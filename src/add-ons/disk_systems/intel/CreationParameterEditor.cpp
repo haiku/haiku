@@ -19,8 +19,8 @@ PrimaryPartitionEditor::PrimaryPartitionEditor()
 	fActiveCB(NULL),
 	fParameters(NULL)
 {
-	fActiveCB = new BCheckBox("active", "Active Partition", NULL);
-	fView = BGroupLayoutBuilder(B_VERTICAL, 4)
+	fActiveCB = new BCheckBox("active", "Active partition", NULL);
+	fView = BGroupLayoutBuilder(B_VERTICAL)
 		.Add(fActiveCB)
 	;
 }
