@@ -190,9 +190,9 @@ BeOSKernelVolume::ReadVNode(ino_t vnid, bool reenter, void** node, int* type,
 
 	// stat it -- we need to get the node type
 	struct stat st;
-	error = ReadStat(node, &st);
+	error = ReadStat(*node, &st);
 	if (error != B_OK) {
-		WriteVNode(node, reenter);
+		WriteVNode(*node, reenter);
 		return error;
 	}
 
