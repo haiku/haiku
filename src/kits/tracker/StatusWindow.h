@@ -146,7 +146,7 @@ private:
 			bigtime_t			fProcessStartTime;
 			bigtime_t			fLastSpeedUpdateTime;
 			bigtime_t			fEstimatedFinishReferenceTime;
-	static	const size_t		kBytesPerSecondSlots = 5;
+	static	const size_t		kBytesPerSecondSlots = 10;
 			size_t				fCurrentBytesPerSecondSlot;
 			double				fBytesPerSecondSlot[kBytesPerSecondSlots];
 			double				fBytesPerSecond;
