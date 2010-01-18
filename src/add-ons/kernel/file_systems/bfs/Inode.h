@@ -73,6 +73,8 @@ public:
 
 			bool			IsDeleted() const
 								{ return (Flags() & INODE_DELETED) != 0; }
+			bool			IsLongSymLink() const
+								{ return (Flags() & INODE_LONG_SYMLINK) != 0; }
 
 			mode_t			Mode() const { return fNode.Mode(); }
 			uint32			Type() const { return fNode.Type(); }

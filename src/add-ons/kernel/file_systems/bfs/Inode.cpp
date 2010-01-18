@@ -344,7 +344,7 @@ Inode::Inode(Volume* volume, ino_t id)
 
 	if (IsContainer())
 		fTree = new BPlusTree(this);
-	if (IsFile() || IsAttribute()) {
+	if (IsFile() || IsAttribute() || IsLongSymLink()) {
 		SetFileCache(file_cache_create(fVolume->ID(), ID(), Size()));
 		SetMap(file_map_create(volume->ID(), ID(), Size()));
 	}
