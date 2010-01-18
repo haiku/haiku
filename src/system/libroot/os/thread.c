@@ -27,7 +27,7 @@ typedef struct callback_node {
 } callback_node;
 
 
-void _thread_do_exit_notification(void);
+void _thread_do_exit_work(void);
 
 
 static status_t
@@ -40,14 +40,23 @@ thread_entry(thread_func entry, void* _thread)
 
 	returnCode = entry(thread->entry_argument);
 
-	_thread_do_exit_notification();
+	_thread_do_exit_work();
 
 	return returnCode;
 }
 
 
+#if __GNUC__ < 3
 void
 _thread_do_exit_notification(void)
+{
+	// empty stub for R5 compability
+}
+#endif
+
+
+void
+_thread_do_exit_work(void)
 {
 	callback_node *node = tls_get(TLS_ON_EXIT_THREAD_SLOT);
 	callback_node *next;

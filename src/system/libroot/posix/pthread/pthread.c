@@ -54,10 +54,6 @@ __pthread_destroy_thread(void)
 {
 	pthread_thread* thread = pthread_self();
 	
-	// check if the thread is already dead
-	if ((atomic_get(&thread->flags) & THREAD_DEAD) != 0)
-		return;
-
 	// call cleanup handlers
 	while (true) {
 		struct __pthread_cleanup_handler* handler

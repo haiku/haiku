@@ -22,7 +22,7 @@
 
 
 extern void _IO_cleanup(void);
-extern void _thread_do_exit_notification(void);
+extern void _thread_do_exit_work(void);
 
 struct exit_stack_info {
 	void				(*exit_stack[ATEXIT_MAX])(void);
@@ -127,7 +127,7 @@ void
 exit(int status)
 {
 	// BeOS on exit notification for the main thread
-	_thread_do_exit_notification();
+	_thread_do_exit_work();
 
 	// unwind the exit stack, calling the registered functions
 	_exit_stack_lock();
