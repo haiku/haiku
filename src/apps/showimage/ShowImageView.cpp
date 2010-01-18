@@ -596,6 +596,7 @@ ShowImageView::SetImage(const entry_ref *ref)
 		fDocumentCount = 1;
 
 	fImageType = info.name;
+	fImageMime = info.MIME;
 
 	GetPath(&fCaption);
 	if (fDocumentCount > 1)
@@ -1125,31 +1126,46 @@ ShowImageView::_AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
 	if (roster == NULL)
 		return false;
 
-	BBitmapStream stream(bitmap);
+	// add the current image mime first, will make it the preferred format on
+	// left mouse drag
+	msg->AddString("be:types", fImageMime);
+	msg->AddString("be:filetypes", fImageMime);
+	msg->AddString("be:type_descriptions", fImageType);
 
-	translator_info *outInfo;
-	bool found = false;
-	int32 outNumInfo;
-	if (roster->GetTranslators(&stream, NULL, &outInfo, &outNumInfo) == B_OK) {
-		for (int32 i = 0; i < outNumInfo; i++) {
-			const translation_format *fmts;
-			int32 num_fmts;
-			roster->GetOutputFormats(outInfo[i].translator, &fmts, &num_fmts);
-			for (int32 j = 0; j < num_fmts; j++) {
-				if (strcmp(fmts[j].MIME, "image/x-be-bitmap") != 0) {
+	bool foundOther = false;
+	bool foundCurrent = false;
+
+	int32 infoCount;
+	translator_info* info;
+	BBitmapStream stream(bitmap);
+	if (roster->GetTranslators(&stream, NULL, &info, &infoCount) == B_OK) {
+		for (int32 i = 0; i < infoCount; i++) {
+			const translation_format* formats;
+			int32 count;
+			roster->GetOutputFormats(info[i].translator, &formats, &count);
+			for (int32 j = 0; j < count; j++) {
+				if (fImageMime == formats[j].MIME) {
+					foundCurrent = true;
+				} else if (strcmp(formats[j].MIME, "image/x-be-bitmap") != 0) {
+					foundOther = true;
 					// needed to send data in message
-					msg->AddString("be:types", fmts[j].MIME);
+					msg->AddString("be:types", formats[j].MIME);
 					// needed to pass data via file
-					msg->AddString("be:filetypes", fmts[j].MIME);
-					msg->AddString("be:type_descriptions", fmts[j].name);
+					msg->AddString("be:filetypes", formats[j].MIME);
+					msg->AddString("be:type_descriptions", formats[j].name);
 				}
-				found = true;
 			}
 		}
 	}
 	stream.DetachBitmap(&bitmap);
 
-	return found;
+	if (!foundCurrent) {
+		msg->RemoveData("be:types", 0);
+		msg->RemoveData("be:filetypes", 0);
+		msg->RemoveData("be:type_descriptions", 0);
+	}
+
+	return foundOther || foundCurrent;
 }
 
 
@@ -1174,8 +1190,10 @@ ShowImageView::_BeginDrag(BPoint sourcePoint)
 		drag.AddString("be:types", B_FILE_MIME_TYPE);
 		// avoid flickering of dragged bitmap caused by drawing into the window
 		_AnimateSelection(false);
-		// only use a transparent bitmap on selections less than 400x400 (taking into account zooming)
-		if ((fSelectionRect.Width() * fZoom) < 400.0 && (fSelectionRect.Height() * fZoom) < 400.0) {
+		// only use a transparent bitmap on selections less than 400x400
+		// (taking into account zooming)
+		if ((fSelectionRect.Width() * fZoom) < 400.0
+			&& (fSelectionRect.Height() * fZoom) < 400.0) {
 			sourcePoint -= fSelectionRect.LeftTop();
 			sourcePoint.x *= fZoom;
 			sourcePoint.y *= fZoom;
@@ -1288,20 +1306,16 @@ ShowImageView::_SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format
 void
 ShowImageView::_HandleDrop(BMessage* msg)
 {
-	BMessage data(B_MIME_DATA);
 	entry_ref dirRef;
 	BString name, type;
-	bool saveToFile;
-	bool sendInMessage;
-	BBitmap *bitmap;
-
-	saveToFile = msg->FindString("be:filetypes", &type) == B_OK
+	bool saveToFile = msg->FindString("be:filetypes", &type) == B_OK
 		&& msg->FindRef("directory", &dirRef) == B_OK
 		&& msg->FindString("name", &name) == B_OK;
 
-	sendInMessage = (!saveToFile) && msg->FindString("be:types", &type) == B_OK;
+	bool sendInMessage = !saveToFile
+		&& msg->FindString("be:types", &type) == B_OK;
 
-	bitmap = _CopySelection();
+	BBitmap* bitmap = _CopySelection();
 	if (bitmap == NULL)
 		return;
 

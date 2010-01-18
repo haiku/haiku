@@ -242,6 +242,7 @@ class ShowImageView : public BView {
 		BString fCaption;			// caption text
 
 		BString fImageType; 		// Type of image, for use in status bar and caption
+		BString fImageMime;
 
 		bool fInverted;
 
