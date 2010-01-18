@@ -103,7 +103,7 @@ static const int			kNotifyBufferSize = 8;
 		sem_id				fLinkStateChangeSem;
 		ether_address_t		fMACAddress;
 		bool				fHasConnection;
-		uint8				fIPG[3];
+		bool				fTXBufferFull;
 };
 
 #endif //_USB_Davicom_DEVICE_H_

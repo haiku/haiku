@@ -42,6 +42,8 @@
 
 #define NSR_SPEED		0x80	// 0 = 100MBps, 1 = 10MBps
 #define NSR_LINKST		0x40	// 1 = link up
+#define NSR_TXFULL		0x10	// TX FIFO full
+#define NSR_RXOV		0x08	// RX Overflow
 
 #define RCR_DIS_LONG	0x20	// Discard long packet
 #define RCR_DIS_CRC		0x10	// Discard CRC error packet
@@ -65,7 +67,10 @@ DavicomDevice::_ReadRegister(uint8 reg, size_t size, uint8* buffer)
 	status_t result = gUSBModule->send_request(fDevice, 
 		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
 		READ_REGISTER, 0, reg, size, buffer, &actualLength);
-	if (size != actualLength) TRACE_ALWAYS("Size mismatch reading register ! asked %d got %d",size,actualLength);
+	if (size != actualLength) {
+		TRACE_ALWAYS("Size mismatch reading register ! asked %d got %d",
+			size, actualLength);
+	}
 	return result;
 }
 
@@ -78,7 +83,6 @@ DavicomDevice::_WriteRegister(uint8 reg, size_t size, uint8* buffer)
 	status_t result = gUSBModule->send_request(fDevice, 
 		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 		WRITE_REGISTER, 0, reg, size, buffer, &actualLength);
-	if (size != actualLength) TRACE_ALWAYS("Size mismatch reading register ! asked %d got %d",size,actualLength);
 	return result;
 }
 
@@ -118,10 +122,6 @@ DavicomDevice::DavicomDevice(usb_device device, const char *description)
 		TRACE_ALWAYS("Error of getting USB device descriptor.\n");
 		return;
 	}
-
-	fIPG[0] = 0x15;
-	fIPG[1] = 0x0c;
-	fIPG[2] = 0x12;
 
 	fVendorID = deviceDescriptor->vendor_id;
 	fProductID = deviceDescriptor->product_id;
@@ -280,7 +280,11 @@ DavicomDevice::Read(uint8 *buffer, size_t *numBytes)
 	}
 	*/
 		
-	*numBytes = header[1] << 8 | header[2];
+	*numBytes = header[1] | ( header[2] << 8 );
+
+	if (header[0] & 0xBF ) {
+		TRACE_ALWAYS("RX error %d occured !\n", header[0]);
+	}
 
 	if(fActualLengthRead - kRXHeaderSize > *numBytes) {
 		TRACE_ALWAYS("MISMATCH of the frame length: hdr %d; received:%d\n",
@@ -300,15 +304,27 @@ DavicomDevice::Write(const uint8 *buffer, size_t *numBytes)
 	
 	if (fRemoved) {
 		TRACE_ALWAYS("Error of writing %d bytes to removed device.\n", 
-														numBytesToWrite);
+			numBytesToWrite);
+		return B_ERROR;
+	}
+
+	if (!fHasConnection) {
+		TRACE_ALWAYS("Error of writing %d bytes to device while down.\n",
+			numBytesToWrite);
+		return B_ERROR;
+	}
+
+	if (fTXBufferFull) {
+		TRACE_ALWAYS("Error of writing %d bytes to device while TX buffer full.\n",
+			numBytesToWrite);
 		return B_ERROR;
 	}
 
 	TRACE_FLOW("Write %d bytes.\n", numBytesToWrite);
 	
 	uint8 header[kTXHeaderSize];
-	header[0] = *numBytes >> 8;
-	header[1] = *numBytes & 0xFF;
+	header[0] = *numBytes & 0xFF;
+	header[1] = *numBytes >> 8;
 
 	iovec txData[] = {
 		{ &header, kTXHeaderSize },
@@ -316,7 +332,7 @@ DavicomDevice::Write(const uint8 *buffer, size_t *numBytes)
 	};
 	
 	status_t result = gUSBModule->queue_bulk_v(fWriteEndpoint, 
-		txData, 1, _WriteCallback, this);
+		txData, 2, _WriteCallback, this);
 	if (result != B_OK) {
 		TRACE_ALWAYS("Error of queue_bulk_v request:%#010x\n", result);
 		return result;
@@ -752,15 +768,16 @@ DavicomDevice::OnNotify(uint32 actualLength)
 		return B_BAD_DATA; 
 	}
 
-	// 0 = Network status
-	// 1:2 = TX status
 	// 3 = RX status
 	// 4 = Receive overflow counter
 	// 5 = Received packet counter
 	// 6 = Transmit packet counter
 	// 7 = GPR
 	
+	// 0 = Network status (NSR)
 	bool linkIsUp = (fNotifyBuffer[0] & NSR_LINKST) != 0;
+	fTXBufferFull = (fNotifyBuffer[0] & NSR_TXFULL) != 0;
+	bool rxOverflow = (fNotifyBuffer[0] & NSR_RXOV) != 0;
 
 	bool linkStateChange = (linkIsUp != fHasConnection);
 	fHasConnection = linkIsUp;
@@ -772,6 +789,15 @@ DavicomDevice::OnNotify(uint32 actualLength)
 		} else
 			TRACE("Link is now down");
 	}
+
+	if (rxOverflow)
+		TRACE("RX buffer overflow occured %d times\n", fNotifyBuffer[4]);
+
+	// 1,2 = TX status
+	if (fNotifyBuffer[1])
+		TRACE("Error %x occured on transmitting packet 1\n", fNotifyBuffer[1]);
+	if (fNotifyBuffer[2])
+		TRACE("Error %x occured on transmitting packet 2\n", fNotifyBuffer[2]);
 
 	if (linkStateChange && fLinkStateChangeSem >= B_OK)
 		release_sem_etc(fLinkStateChangeSem, 1, B_DO_NOT_RESCHEDULE);
