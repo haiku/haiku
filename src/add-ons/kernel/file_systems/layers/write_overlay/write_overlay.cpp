@@ -2510,7 +2510,7 @@ overlay_create_sub_vnode(fs_volume *volume, ino_t id, fs_vnode *vnode)
 static status_t
 overlay_delete_sub_vnode(fs_volume *volume, fs_vnode *vnode)
 {
-	delete (OverlayInode *)vnode;
+	delete (OverlayInode *)vnode->private_node;
 	return B_OK;
 }
 
