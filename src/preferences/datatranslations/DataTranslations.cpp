@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -8,10 +8,7 @@
  *		Michael Wilber
  */
 
-
 #include "DataTranslations.h"
-#include "DataTranslationsWindow.h"
-#include "DataTranslationsSettings.h"
 
 #include <Alert.h>
 #include <Directory.h>
@@ -20,9 +17,8 @@
 #include <TranslatorRoster.h>
 #include <TextView.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "DataTranslationsSettings.h"
+#include "DataTranslationsWindow.h"
 
 
 const char* kApplicationSignature = "application/x-vnd.Haiku-DataTranslations";
@@ -31,35 +27,33 @@ const char* kApplicationSignature = "application/x-vnd.Haiku-DataTranslations";
 DataTranslationsApplication::DataTranslationsApplication()
 	: BApplication(kApplicationSignature)
 {
-	fSettings = new DataTranslationsSettings();
 	new DataTranslationsWindow();
 }
 
 
 DataTranslationsApplication::~DataTranslationsApplication()
 {
-	delete fSettings;
 }
 
 
 void
-DataTranslationsApplication::SetWindowCorner(BPoint corner)
+DataTranslationsApplication::SetWindowCorner(const BPoint& leftTop)
 {
-	fSettings->SetWindowCorner(corner);
+	fSettings.SetWindowCorner(leftTop);
 }
 
 
 void
 DataTranslationsApplication::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "DataTranslations\n"
-		"\twritten by Oliver Siebenmarck and others\n"
-		"\tCopyright 2002-2006, Haiku.\n", "OK");
-	BTextView *view = alert->TextView();
-	BFont font;
+	BAlert* alert = new BAlert("about", "DataTranslations\n\twritten by Oliver "
+		"Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights "
+		"reserved.\n", "OK");
 
+	BTextView* view = alert->TextView();
 	view->SetStylable(true);
 
+	BFont font;
 	view->GetFont(&font);
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE);
@@ -72,9 +66,10 @@ DataTranslationsApplication::AboutRequested()
 void
 DataTranslationsApplication::_InstallError(const char* name, status_t status)
 {
-	BString text;
-	text << "Could not install " << name << ":\n" << strerror(status);
-	(new BAlert("DataTranslations - Error", text.String(), "Stop"))->Go();
+	BString text("Could not install ");
+	text << name << ":\n" << strerror(status);
+	BAlert* alert = new BAlert("DataTranslations - Error", text.String(), "Ok");
+	alert->Go();
 }
 
 
@@ -87,7 +82,6 @@ DataTranslationsApplication::_Install(BDirectory& target, BEntry& entry)
 {
 	// Find out wether we need to copy it
 	status_t status = entry.MoveTo(&target, NULL, true);
-
 	if (status == B_OK)
 		return B_OK;
 
@@ -101,10 +95,11 @@ DataTranslationsApplication::_Install(BDirectory& target, BEntry& entry)
 void
 DataTranslationsApplication::_NoTranslatorError(const char* name)
 {
-	BString text;
-	text.SetTo("The item '");
-	text << name << "' does not appear to be a Translator and will not be installed.";
-	(new BAlert("", text.String(), "Stop"))->Go();
+	BString text("The item '");
+	text << name << "' does not appear to be a Translator and will not be "
+		"installed.";
+	BAlert* alert = new BAlert("", text.String(), "Ok");
+	alert->Go();
 }
 
 
@@ -133,28 +128,28 @@ DataTranslationsApplication::RefsReceived(BMessage* message)
 		return;
 	}
 
-	entry_ref ref;
 	int32 i = 0;
+	entry_ref ref;
 	while (message->FindRef("refs", i++, &ref) == B_OK) {
 		if (!roster->IsTranslator(&ref))
 			_NoTranslatorError(ref.name);
 
-    	BEntry entry(&ref, true);
-    	status = entry.InitCheck();
-    	if (status != B_OK) {
+		BEntry entry(&ref, true);
+		status = entry.InitCheck();
+		if (status != B_OK) {
 			_InstallError(ref.name, status);
-    		continue;
-    	}
+			continue;
+		}
 
 		if (target.Contains(ref.name)) {
-			BString string;
-			string << "An item named '" << ref.name
-				<< "' already exists in the Translators folder";
+			BString string("An item named '");
+			string << ref.name << "' already exists in the Translators folder! "
+				"Shall the existing translator be overwritten?";
 
 			BAlert* alert = new BAlert("DataTranslations - Note", string.String(),
-				"Overwrite", "Stop");
-			alert->SetShortcut(1, B_ESCAPE);
-			if (alert->Go() != 0)
+				"Cancel", "Overwrite");
+			alert->SetShortcut(0, B_ESCAPE);
+			if (alert->Go() != 1)
 				continue;
 
 			// the original file will be replaced
@@ -164,9 +159,9 @@ DataTranslationsApplication::RefsReceived(BMessage* message)
 
 		status = _Install(target, entry);
 		if (status == B_OK) {
-			(new BAlert("DataTranslations - Note",
-				"The new translator has been installed successfully",
-				"OK"))->Go(NULL);
+			BAlert* alert = new BAlert("DataTranslations - Note", "The new "
+				"translator has been installed successfully.", "OK");
+			alert->Go(NULL);
 		} else
 			_InstallError(ref.name, status);
 	}
@@ -179,9 +174,8 @@ DataTranslationsApplication::RefsReceived(BMessage* message)
 int
 main(int, char**)
 {
-	DataTranslationsApplication	app;
+	DataTranslationsApplication app;
 	app.Run();
 
 	return 0;
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc.
+ * Copyright 2002-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -11,29 +11,33 @@
 #define DATA_TRANSLATIONS_H
 
 
-#include "DataTranslationsWindow.h"
-#include "DataTranslationsSettings.h"
-
 #include <Application.h>
 
+#include "DataTranslationsSettings.h"
+
+class BDirectory;
+class BEntry;
 
 class DataTranslationsApplication : public BApplication {
-	public:
-		DataTranslationsApplication();
-		virtual ~DataTranslationsApplication();
-	
-		virtual void RefsReceived(BMessage *message);
-		virtual void AboutRequested(void);
+public:
+								DataTranslationsApplication();
+	virtual						~DataTranslationsApplication();
 
-		BPoint WindowCorner() const {return fSettings->WindowCorner(); }
-		void SetWindowCorner(BPoint corner);
+	virtual void				RefsReceived(BMessage* message);
+	virtual void				AboutRequested();
 
-	private:
-		void _InstallError(const char* name, status_t status); 
-		status_t _Install(BDirectory& target, BEntry& entry);
-		void _NoTranslatorError(const char* name); 
+			BPoint				WindowCorner() const {
+									return fSettings.WindowCorner();
+								}
+			void				SetWindowCorner(const BPoint& leftTop);
 
-		DataTranslationsSettings* fSettings;
+private:
+			void				_InstallError(const char* name, status_t status);
+			status_t			_Install(BDirectory& target, BEntry& entry);
+			void				_NoTranslatorError(const char* name);
+
+private:
+			DataTranslationsSettings	fSettings;
 };
 
 #endif	// DATA_TRANSLATIONS_H
