@@ -1808,7 +1808,7 @@ heap_index_for(size_t size, int32 cpu)
 			break;
 	}
 
-	return index + cpu * HEAP_CLASS_COUNT;
+	return (index + cpu * HEAP_CLASS_COUNT) % sHeapCount;
 }
 
 
@@ -2110,6 +2110,10 @@ memalign(size_t alignment, size_t size)
 			shouldGrow = heap_should_grow(heap);
 			break;
 		}
+
+#if PARANOID_HEAP_VALIDATION
+		heap_validate_heap(heap);
+#endif
 	}
 
 	if (result == NULL) {
@@ -2127,10 +2131,6 @@ memalign(size_t alignment, size_t size)
 		// should grow sometime soon, notify the grower
 		release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
 	}
-
-#if PARANOID_HEAP_VALIDATION
-	heap_validate_heap(heap);
-#endif
 
 	if (result == NULL)
 		panic("heap: kernel heap has run out of memory\n");
