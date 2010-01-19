@@ -131,8 +131,10 @@ DataTranslationsApplication::RefsReceived(BMessage* message)
 	int32 i = 0;
 	entry_ref ref;
 	while (message->FindRef("refs", i++, &ref) == B_OK) {
-		if (!roster->IsTranslator(&ref))
+		if (!roster->IsTranslator(&ref)) {
 			_NoTranslatorError(ref.name);
+			continue;
+		}
 
 		BEntry entry(&ref, true);
 		status = entry.InitCheck();
