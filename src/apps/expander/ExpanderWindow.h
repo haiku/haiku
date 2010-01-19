@@ -34,7 +34,6 @@ public:
 									const entry_ref* ref, BMessage* settings);
 	virtual						~ExpanderWindow();
 
-	virtual	void				FrameResized(float width, float height);
 	virtual	void				MessageReceived(BMessage* msg);
 	virtual	bool				QuitRequested();
 
@@ -52,6 +51,7 @@ private:
 			void				StartExpanding();
 			void				StopExpanding();
 			void				_UpdateWindowSize(bool showContents);
+			void				_ExpandListingText();
 			void				StartListing();
 			void				StopListing();
 			bool				ValidateDest();
@@ -90,8 +90,10 @@ private:
 			ExpanderPreferences*	fPreferences;
 			ExpanderRules		fRules;
 
-			float				fLargestDelta;
+			float				fLongestLine;
+			float				fLineHeight;
 			float				fSizeLimit;
+			float				fPreviousHeight;
 };
 
 #endif /* EXPANDER_WINDOW_H */

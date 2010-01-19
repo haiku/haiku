@@ -25,6 +25,7 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Path.h>
+#include <Screen.h>
 #include <ScrollView.h>
 #include <StringView.h>
 #include <TextView.h>
@@ -44,7 +45,7 @@ const uint32 MSG_SHOWCONTENTS	= 'mSCT';
 ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 		BMessage* settings)
 	:
-	BWindow(frame, "Expander", B_TITLED_WINDOW, B_NOT_ZOOMABLE),
+	BWindow(frame, "Expander", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL),
 	fSourcePanel(NULL),
 	fDestPanel(NULL),
 	fSourceChanged(true),
@@ -76,10 +77,11 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	fListingText->SetText("");
 	fListingText->MakeEditable(false);
 	fListingText->SetStylable(false);
+	fListingText->SetWordWrap(false);
 	BFont font = be_fixed_font;
 	fListingText->SetFontAndColor(&font);
 	BScrollView* scrollView = new BScrollView("", fListingText,
-		B_INVALIDATE_AFTER_LAYOUT, false, true);
+		B_INVALIDATE_AFTER_LAYOUT, true, true);
 
 	BView* topView = layout->View();
 	const float spacing = be_control_look->DefaultItemSpacing();
@@ -111,6 +113,8 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 
 	ResizeTo(Bounds().Width(), fSizeLimit);
 	SetSizeLimits(size.Width(), 32767.0f, fSizeLimit, fSizeLimit);
+	SetZoomLimits(Bounds().Width(), fSizeLimit);
+	fPreviousHeight = -1;
 
 	Show();
 }
@@ -153,19 +157,6 @@ ExpanderWindow::ValidateDest()
 	} else {
 		entry.GetRef(&fDestRef);
 		return true;
-	}
-}
-
-
-void
-ExpanderWindow::FrameResized(float width, float height)
-{
-	if (fListingText->DoesWordWrap()) {
-		BRect textRect;
-		textRect = fListingText->Bounds();
-		textRect.OffsetTo(B_ORIGIN);
-		textRect.InsetBy(1, 1);
-		fListingText->SetTextRect(textRect);
 	}
 }
 
@@ -318,12 +309,11 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 				BString string;
 				int32 i = 0;
 				while (msg->FindString("output", i++, &string) == B_OK) {
-					// expand the window if we need...
-					float delta = fListingText->StringWidth(string.String())
-						- fListingText->Frame().Width();
-					if (delta > fLargestDelta) {
-						fLargestDelta = delta;
-					}
+					float length = fListingText->StringWidth(string.String());
+
+					if (length > fLongestLine)
+						fLongestLine = length;
+
 					fListingText->Insert(string.String());
 				}
 				fListingText->ScrollToSelection();
@@ -338,12 +328,10 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 				StopExpanding();
 				OpenDestFolder();
 				CloseWindowOrKeepOpen();
-			} else if (fListingStarted){
+			} else if (fListingStarted) {
 				fSourceChanged = false;
 				StopListing();
-				if (fLargestDelta > 0.0f)
-					ResizeBy(fLargestDelta, 0.0f);
-				fLargestDelta = 0.0f;
+				_ExpandListingText();
 			} else
 				fStatusView->SetText("");
 			break;
@@ -563,6 +551,38 @@ ExpanderWindow::StopExpanding(void)
 
 
 void
+ExpanderWindow::_ExpandListingText()
+{
+	float delta = fLongestLine - fListingText->Frame().Width();
+
+	if (delta > 0) {
+		BScreen screen;
+		BRect screenFrame = screen.Frame();
+
+		if (Frame().right + delta > screenFrame.right)
+			delta = screenFrame.right - Frame().right - 4.0f;
+	
+		ResizeBy(delta, 0.0f);
+	}
+
+	float minWidth, maxWidth, minHeight, maxHeight;
+	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+
+	if (minWidth < Frame().Width() + delta) {
+		// set the Zoom limit as the minimal required size
+		SetZoomLimits(Frame().Width() + delta, 
+			fSizeLimit + fListingText->TextRect().Height()
+			+ fLineHeight + B_H_SCROLL_BAR_HEIGHT + 1.0f);
+	} else {
+		// set the zoom limit based on minimal window size allowed
+		SetZoomLimits(minWidth,
+			fSizeLimit + fListingText->TextRect().Height()
+			+ fLineHeight + B_H_SCROLL_BAR_HEIGHT + 1.0f);
+	}
+}
+
+
+void
 ExpanderWindow::_UpdateWindowSize(bool showContents)
 {
 	float minWidth, maxWidth, minHeight, maxHeight;
@@ -571,17 +591,25 @@ ExpanderWindow::_UpdateWindowSize(bool showContents)
 	float bottom = fSizeLimit;
 
 	if (showContents) {
-		font_height fontHeight;
-		be_plain_font->GetHeight(&fontHeight);
-		float lineHeight = ceilf(fontHeight.ascent + fontHeight.descent
-			+ fontHeight.leading);
+		if (fPreviousHeight < 0.0) {
+			BFont font;
+			font_height fontHeight;
+			fListingText->GetFont(&font);		
+			font.GetHeight(&fontHeight);
+			fLineHeight = ceilf(fontHeight.ascent + fontHeight.descent
+				+ fontHeight.leading);
 
-		minHeight = bottom + 5.0 * lineHeight;
+			minHeight = bottom + 5.0 * fLineHeight;
+			maxHeight = 32767.0;
+			fPreviousHeight = minHeight + 10.0 * fLineHeight;
+		}
+		minHeight = bottom + 5.0 * fLineHeight;
 		maxHeight = 32767.0;
-		bottom = minHeight + 10.0 * lineHeight;
+		bottom = fPreviousHeight;		
 	} else {
 		minHeight = fSizeLimit;
 		maxHeight = fSizeLimit;
+		fPreviousHeight = Frame().Height();
 	}
 
 	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
@@ -594,10 +622,12 @@ ExpanderWindow::StartListing()
 {
 	_UpdateWindowSize(true);
 
-	fLargestDelta = 0.0f;
-
 	if (!fSourceChanged)
 		return;
+
+	fPreviousHeight = -1.0;
+
+	fLongestLine = 0.0f;
 
 	ExpanderRule* rule = fRules.MatchingRule(&fSourceRef);
 	if (!rule)
