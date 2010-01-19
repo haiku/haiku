@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,8 +10,8 @@
 #include <new>
 
 
-struct object_cache {
-	object_cache(const char *name, size_t objectSize,
+struct ObjectCache {
+	ObjectCache(const char *name, size_t objectSize,
 		size_t alignment, size_t maxByteUsage, uint32 flags, void *cookie,
 		object_cache_constructor constructor,
 		object_cache_destructor destructor, object_cache_reclaimer reclaimer)
@@ -35,7 +35,7 @@ create_object_cache(const char *name, size_t objectSize,
 	size_t alignment, void *cookie, object_cache_constructor constructor,
 	object_cache_destructor destructor)
 {
-	return new(std::nothrow) object_cache(name, objectSize, alignment,
+	return new(std::nothrow) ObjectCache(name, objectSize, alignment,
 		0, 0, cookie, constructor, destructor, NULL);
 }
 
@@ -46,7 +46,7 @@ create_object_cache_etc(const char *name, size_t objectSize,
 	object_cache_constructor constructor, object_cache_destructor destructor,
 	object_cache_reclaimer reclaimer)
 {
-	return new(std::nothrow) object_cache(name, objectSize, alignment,
+	return new(std::nothrow) ObjectCache(name, objectSize, alignment,
 		maxByteUsage, flags, cookie, constructor, destructor, reclaimer);
 }
 
