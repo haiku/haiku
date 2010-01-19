@@ -643,12 +643,14 @@ VMCache::Delete()
 
 
 void
-VMCache::Unlock()
+VMCache::Unlock(bool consumerLocked)
 {
 	while (fRefCount == 1 && _IsMergeable()) {
 		VMCache* consumer = (VMCache*)list_get_first_item(&consumers);
-		if (consumer->TryLock()) {
-			_MergeWithOnlyConsumer();
+		if (consumerLocked) {
+			_MergeWithOnlyConsumer(true);
+		} else if (consumer->TryLock()) {
+			_MergeWithOnlyConsumer(false);
 		} else {
 			// Someone else has locked the consumer ATM. Unlock this cache and
 			// wait for the consumer lock. Increment the cache's ref count
@@ -662,7 +664,7 @@ VMCache::Unlock()
 			if (consumerLocked) {
 				if (fRefCount == 1 && _IsMergeable()
 						&& consumer == list_get_first_item(&consumers)) {
-					_MergeWithOnlyConsumer();
+					_MergeWithOnlyConsumer(false);
 				} else {
 					// something changed, get rid of the consumer lock
 					consumer->Unlock();
@@ -1225,7 +1227,7 @@ VMCache::_NotifyPageEvents(vm_page* page, uint32 events)
 	will unlock the consumer lock.
 */
 void
-VMCache::_MergeWithOnlyConsumer()
+VMCache::_MergeWithOnlyConsumer(bool consumerLocked)
 {
 	VMCache* consumer = (VMCache*)list_remove_head_item(&consumers);
 
@@ -1256,7 +1258,8 @@ VMCache::_MergeWithOnlyConsumer()
 	// over the cache's ref to its source (if any) instead.
 	ReleaseRefLocked();
 
-	consumer->Unlock();
+	if (!consumerLocked)
+		consumer->Unlock();
 }
 
 

@@ -74,14 +74,15 @@ public:
 	inline	bool				TryLock();
 	inline	bool				SwitchLock(mutex* from);
 	inline	bool				SwitchFromReadLock(rw_lock* from);
-			void				Unlock();
+			void				Unlock(bool consumerLocked = false);
 	inline	void				AssertLocked();
 
 	inline	void				AcquireRefLocked();
 	inline	void				AcquireRef();
 	inline	void				ReleaseRefLocked();
 	inline	void				ReleaseRef();
-	inline	void				ReleaseRefAndUnlock();
+	inline	void				ReleaseRefAndUnlock(
+									bool consumerLocked = false);
 
 			void				WaitForPageEvents(vm_page* page, uint32 events,
 									bool relock);
@@ -107,6 +108,11 @@ public:
 			status_t			Resize(off_t newSize);
 
 			status_t			FlushAndRemoveAllPages();
+
+			void*				UserData()	{ return fUserData; }
+			void				SetUserData(void* data)	{ fUserData = data; }
+									// Settable by the lock owner and valid as
+									// long as the lock is owned.
 
 			// for debugging only
 			mutex*				GetLock()
@@ -171,13 +177,14 @@ private:
 
 	inline	bool				_IsMergeable() const;
 
-			void				_MergeWithOnlyConsumer();
+			void				_MergeWithOnlyConsumer(bool consumerLocked);
 			void				_RemoveConsumer(VMCache* consumer);
 
 private:
 			int32				fRefCount;
 			mutex				fLock;
 			PageEventWaiter*	fPageEventWaiters;
+			void*				fUserData;
 };
 
 
@@ -272,10 +279,10 @@ VMCache::ReleaseRef()
 
 
 void
-VMCache::ReleaseRefAndUnlock()
+VMCache::ReleaseRefAndUnlock(bool consumerLocked)
 {
 	ReleaseRefLocked();
-	Unlock();
+	Unlock(consumerLocked);
 }
 
 

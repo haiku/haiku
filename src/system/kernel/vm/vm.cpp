@@ -128,6 +128,9 @@ public:
 	{
 		fTopCache = topCache;
 		fBottomCache = topCache;
+
+		if (topCache != NULL)
+			topCache->SetUserData(NULL);
 	}
 
 	VMCache* LockSourceCache()
@@ -135,9 +138,12 @@ public:
 		if (fBottomCache == NULL || fBottomCache->source == NULL)
 			return NULL;
 
+		VMCache* previousCache = fBottomCache;
+
 		fBottomCache = fBottomCache->source;
 		fBottomCache->Lock();
 		fBottomCache->AcquireRefLocked();
+		fBottomCache->SetUserData(previousCache);
 
 		return fBottomCache;
 	}
@@ -153,13 +159,16 @@ public:
 		if (fTopCache == NULL)
 			return;
 
-		VMCache* cache = fTopCache;
+		// Unlock caches in source -> consumer direction. This is important to
+		// avoid double-locking and a reversal of locking order in case a cache
+		// is eligable for merging.
+		VMCache* cache = fBottomCache;
 		while (cache != NULL) {
-			VMCache* nextCache = cache->source;
+			VMCache* nextCache = (VMCache*)cache->UserData();
 			if (cache != exceptCache)
-				cache->ReleaseRefAndUnlock();
+				cache->ReleaseRefAndUnlock(cache != fTopCache);
 
-			if (cache == fBottomCache)
+			if (cache == fTopCache)
 				break;
 
 			cache = nextCache;
@@ -167,6 +176,43 @@ public:
 
 		fTopCache = NULL;
 		fBottomCache = NULL;
+	}
+
+	void UnlockKeepRefs(bool keepTopCacheLocked)
+	{
+		if (fTopCache == NULL)
+			return;
+
+		VMCache* nextCache = fBottomCache;
+		VMCache* cache = NULL;
+
+		while (keepTopCacheLocked
+				? nextCache != fTopCache : cache != fTopCache) {
+			cache = nextCache;
+			nextCache = (VMCache*)cache->UserData();
+			cache->Unlock(cache != fTopCache);
+		}
+	}
+
+	void RelockCaches(bool topCacheLocked)
+	{
+		if (fTopCache == NULL)
+			return;
+
+		VMCache* nextCache = fTopCache;
+		VMCache* cache = NULL;
+		if (topCacheLocked) {
+			cache = nextCache;
+			nextCache = cache->source;
+		}
+
+		while (cache != fBottomCache && nextCache != NULL) {
+			VMCache* consumer = cache;
+			cache = nextCache;
+			nextCache = cache->source;
+			cache->Lock();
+			cache->SetUserData(consumer);
+		}
 	}
 
 private:
@@ -3650,9 +3696,20 @@ fault_get_page(PageFaultContext& context)
 		FTRACE(("get new page, copy it, and put it into the topmost cache\n"));
 		page = vm_page_allocate_page(PAGE_STATE_FREE);
 
+		// To not needlessly kill concurrency we unlock all caches but the top
+		// one while copying the page. Lacking another mechanism to ensure that
+		// the source page doesn't disappear, we mark it busy.
+		int sourcePageState = sourcePage->state;
+		sourcePage->state = PAGE_STATE_BUSY;
+		context.cacheChainLocker.UnlockKeepRefs(true);
+
 		// copy the page
 		vm_memcpy_physical_page(page->physical_page_number * B_PAGE_SIZE,
 			sourcePage->physical_page_number * B_PAGE_SIZE);
+
+		context.cacheChainLocker.RelockCaches(true);
+		sourcePage->state = sourcePageState;
+		sourcePage->cache->NotifyPageEvents(sourcePage, PAGE_EVENT_NOT_BUSY);
 
 		// insert the new page into our cache
 		context.topCache->InsertPage(page, context.cacheOffset);
