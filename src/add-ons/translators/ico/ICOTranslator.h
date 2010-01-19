@@ -44,6 +44,9 @@ class ICOTranslator : public BaseTranslator {
 			const translator_info *inInfo, BMessage *ioExtension,
 			uint32 outType, BPositionIO *outDestination, int32 baseType);
 
+		virtual status_t DerivedCanHandleImageSize(float width,
+			float height) const;
+
 		virtual BView *NewConfigView(TranslatorSettings *settings);	
 
 	protected:

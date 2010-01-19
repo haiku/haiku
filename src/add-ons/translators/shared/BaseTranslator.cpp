@@ -383,8 +383,7 @@ BaseTranslator::BitsCheck(BPositionIO *inSource, BMessage *ioExtension,
 	memcpy(&sourceMagic, ch, sizeof(uint32));
 	if (sourceMagic == kBitsMagic)
 		return B_OK;
-	else
-		return B_OK + 1;
+	return B_OK + 1;
 }
 
 status_t
@@ -392,17 +391,19 @@ BaseTranslator::BitsIdentify(BPositionIO *inSource,
 	const translation_format *inFormat, BMessage *ioExtension,
 	translator_info *outInfo, uint32 outType)
 {
-	status_t result;
-
-	result = BitsCheck(inSource, ioExtension, outType);
-	if (result == B_OK)
-		result = identify_bits_header(inSource, outInfo);
-	else if (result == B_OK + 1)
+	status_t result = BitsCheck(inSource, ioExtension, outType);
+	if (result == B_OK) {
+		TranslatorBitmap bitmap;
+		result = identify_bits_header(inSource, outInfo, &bitmap);
+		if (result == B_OK)
+			result = DerivedCanHandleImageSize(bitmap.bounds.Width() + 1.0,
+				bitmap.bounds.Height() + 1.0);
+	} else if (result >= B_OK) {
 		// if NOT B_TRANSLATOR_BITMAP, it could be an image in the
 		// derived format
 		result = DerivedIdentify(inSource, inFormat, ioExtension,
 			outInfo, outType);
-		
+	}
 	return result;
 }
 
@@ -452,7 +453,7 @@ BaseTranslator::Identify(BPositionIO *inSource,
 		case B_TRANSLATOR_BITMAP:
 			return BitsIdentify(inSource, inFormat, ioExtension,
 				outInfo, outType);
-			
+
 		default:
 			return DerivedIdentify(inSource, inFormat, ioExtension,
 				outInfo, outType);
@@ -595,7 +596,7 @@ BaseTranslator::Translate(BPositionIO *inSource,
 		case B_TRANSLATOR_BITMAP:
 			return BitsTranslate(inSource, inInfo, ioExtension, outType,
 				outDestination);
-				
+
 		default:
 			return DerivedTranslate(inSource, inInfo, ioExtension, outType,
 				outDestination, -1);
@@ -674,6 +675,13 @@ BaseTranslator::DerivedTranslate(BPositionIO *inSource,
 	BPositionIO *outDestination, int32 baseType)
 {
 	return B_NO_TRANSLATOR;
+}
+
+
+status_t
+BaseTranslator::DerivedCanHandleImageSize(float width, float height) const
+{
+	return B_OK;
 }
 
 

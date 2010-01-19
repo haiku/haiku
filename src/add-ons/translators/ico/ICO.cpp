@@ -166,13 +166,6 @@ get_4_bits_per_pixel(uint8 *line, int32 x)
 }
 
 
-static bool
-is_valid_size(int32 size)
-{
-	return size == 16 || size == 32 || size == 48;
-}
-
-
 static uint8
 get_alpha_value(color_space space, uint32 value)
 {
@@ -493,6 +486,13 @@ convert_bits_to_data(TranslatorBitmap &bitsHeader, uint8 *bitsData, ico_dir_entr
 
 
 //	#pragma mark -
+
+
+bool
+ICO::is_valid_size(int32 size)
+{
+	return size == 16 || size == 32 || size == 48;
+}
 
 
 status_t

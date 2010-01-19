@@ -83,7 +83,7 @@ struct rgba32_color {
 	}
 };
 
-
+extern bool is_valid_size(int32 size);
 extern status_t identify(BMessage *settings, BPositionIO &stream, uint8 &type, int32 &bitsPerPixel);
 extern status_t convert_ico_to_bits(BMessage *settings, BPositionIO &source, BPositionIO &target);
 extern status_t convert_bits_to_ico(BMessage *settings, BPositionIO &source,
