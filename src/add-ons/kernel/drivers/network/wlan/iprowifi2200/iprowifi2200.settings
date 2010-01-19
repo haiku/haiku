@@ -1,0 +1,13 @@
+#
+# This is the configuration file for the iprowifi2200 wireless network driver.
+# It should be located at "/boot/home/config/settings/kernel/drivers" and named
+# "iprowifi2200".
+#
+
+#
+# Mapping of the driver internal firmware names to the official Intel® names.
+# -----
+# internal		Intel®
+iwi_bss			ipw2200-bss.fw
+iwi_ibss		ipw2200-ibss.fw
+iwi_monitor		ipw2200-sniffer.fw

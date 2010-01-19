@@ -1,0 +1,13 @@
+#
+# This is the configuration file for the iprowwifi2100 wireless network driver.
+# It should be located at "/boot/home/config/settings/kernel/drivers" and named
+# "iprowwifi2100".
+#
+
+#
+# Mapping of the driver internal firmware names to the official Intel® names.
+# -----
+# internal		Intel®
+ipw-bss			ipw2100-1.3.fw
+ipw-ibss		ipw2100-1.3-i.fw
+ipw-monitor		ipw2100-1.3-p.fw

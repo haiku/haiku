@@ -1,0 +1,12 @@
+#
+# This is the configuration file for the marvell88w8363 wireless network driver.
+# It should be located at "/boot/home/config/settings/kernel/drivers" and named
+# "marvell88w8363".
+#
+
+#
+# Mapping of the driver internal firmware names to FreeBSD provided names.
+# -----
+# internal		FreeBSD
+mw88W8363fw		mw88W8363fw
+mwlboot			mwlboot
