@@ -35,6 +35,10 @@
 #ifndef _FBSD_COMPAT_SYS_CDEFS_H_
 #define _FBSD_COMPAT_SYS_CDEFS_H_
 
+
+#include <posix/sys/cdefs.h>
+
+
 #define __FBSDID(str)	static const char __fbsdid[] = str
 
 /*
@@ -174,7 +178,6 @@
  * a feature that we cannot live without.
  */
 #ifdef lint
-#define	__dead2
 #define	__pure2
 #define	__unused
 #define	__packed
@@ -182,18 +185,15 @@
 #define	__section(x)
 #else
 #if !__GNUC_PREREQ__(2, 5) && !defined(__INTEL_COMPILER)
-#define	__dead2
 #define	__pure2
 #define	__unused
 #endif
 #if __GNUC__ == 2 && __GNUC_MINOR__ >= 5 && __GNUC_MINOR__ < 7 && !defined(__INTEL_COMPILER)
-#define	__dead2		__attribute__((__noreturn__))
 #define	__pure2		__attribute__((__const__))
 #define	__unused
 /* XXX Find out what to do for __packed, __aligned and __section */
 #endif
 #if __GNUC_PREREQ__(2, 7)
-#define	__dead2		__attribute__((__noreturn__))
 #define	__pure2		__attribute__((__const__))
 #define	__unused	__attribute__((__unused__))
 #define	__packed	__attribute__((__packed__))
@@ -210,7 +210,6 @@
 #endif
 
 #if defined(__INTEL_COMPILER)
-#define __dead2		__attribute__((__noreturn__))
 #define __pure2		__attribute__((__const__))
 #define __unused	__attribute__((__unused__))
 #define __used		__attribute__((__used__))
@@ -263,10 +262,6 @@
  * first.  It is only available with ANSI C.
  */
 #if defined(__STDC__) || defined(__cplusplus)
-#define	__P(protos)	protos		/* full-blown ANSI C */
-#define	__CONCAT1(x,y)	x ## y
-#define	__CONCAT(x,y)	__CONCAT1(x,y)
-#define	__STRING(x)	#x		/* stringify without expanding x */
 #define	__XSTRING(x)	__STRING(x)	/* expand x, then stringify */
 
 #define	__const		const		/* define reserved names to standard */
@@ -281,9 +276,6 @@
 #endif /* !__cplusplus */
 
 #else	/* !(__STDC__ || __cplusplus) */
-#define	__P(protos)	()		/* traditional C preprocessor */
-#define	__CONCAT(x,y)	x/**/y
-#define	__STRING(x)	"x"
 
 #if !defined(__CC_SUPPORTS___INLINE)
 #define	__const				/* delete pseudo-ANSI C keywords */

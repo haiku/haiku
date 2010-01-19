@@ -16,6 +16,6 @@ uint32_t arc4random(void);
 
 static __inline int imax(int a, int b) { return (a > b ? a : b); }
 
-static __inline int abs(int a) { return (a < 0 ? -a : a); }
+extern int abs(int a);
 
 #endif /* _FBSD_COMPAT_SYS_LIBKERN_H_ */
