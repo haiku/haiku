@@ -164,14 +164,15 @@ object_depot_init(object_depot* depot, uint32 flags, void* cookie,
 
 	recursive_lock_init(&depot->lock, "depot");
 
+	int cpuCount = smp_get_num_cpus();
 	depot->stores = (depot_cpu_store*)slab_internal_alloc(
-		sizeof(depot_cpu_store) * smp_get_num_cpus(), flags);
+		sizeof(depot_cpu_store) * cpuCount, flags);
 	if (depot->stores == NULL) {
 		recursive_lock_destroy(&depot->lock);
 		return B_NO_MEMORY;
 	}
 
-	for (int i = 0; i < smp_get_num_cpus(); i++) {
+	for (int i = 0; i < cpuCount; i++) {
 		recursive_lock_init(&depot->stores[i].lock, "cpu store");
 		depot->stores[i].loaded = depot->stores[i].previous = NULL;
 	}
@@ -188,9 +189,9 @@ object_depot_destroy(object_depot* depot)
 {
 	object_depot_make_empty(depot);
 
-	for (int i = 0; i < smp_get_num_cpus(); i++) {
+	int cpuCount = smp_get_num_cpus();
+	for (int i = 0; i < cpuCount; i++)
 		recursive_lock_destroy(&depot->stores[i].lock);
-	}
 
 	slab_internal_free(depot->stores);
 
@@ -269,7 +270,8 @@ object_depot_store(object_depot* depot, void* object)
 void
 object_depot_make_empty(object_depot* depot)
 {
-	for (int i = 0; i < smp_get_num_cpus(); i++) {
+	int cpuCount = smp_get_num_cpus();
+	for (int i = 0; i < cpuCount; i++) {
 		depot_cpu_store* store = &depot->stores[i];
 
 		RecursiveLocker _(store->lock);
