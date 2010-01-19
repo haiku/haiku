@@ -81,6 +81,8 @@ private:
 
 			typedef BOpenHashTable<Definition> HashTable;
 
+			friend class Definition;
+
 private:
 	static	Link*				_AllocateLink(uint32 flags);
 	static	void				_FreeLink(HashedObjectCache::Link* link);
