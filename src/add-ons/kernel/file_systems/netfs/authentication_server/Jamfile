@@ -9,9 +9,9 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) headers shared ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 DEFINES += USER=1 ;
-DEFINES += DEBUG_APP="\\\"AuthenticationServer\\\"" ;
+DEFINES += DEBUG_APP="\\\"authentication_server\\\"" ;
 
-Application AuthenticationServer
+Application authentication_server
 	: DebugSupport.cpp
 
 	  AuthenticationServerDefs.cpp
@@ -21,4 +21,5 @@ Application AuthenticationServer
 	  AuthenticationServer.cpp
 	  Panel.cpp
 	: be $(TARGET_LIBSUPC++) libshared.a
+	: authentication_server.rdef
 ;

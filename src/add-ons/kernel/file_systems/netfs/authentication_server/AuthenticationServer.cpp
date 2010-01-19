@@ -256,12 +256,13 @@ private:
 
 // constructor
 AuthenticationServer::AuthenticationServer()
-	: BApplication("application/x-vnd.bonefish.authentification-server"),
-	  fLock(),
-	  fRequestPort(-1),
-	  fRequestThread(-1),
-	  fServerEntries(NULL),
-	  fTerminating(false)
+	:
+	BApplication("application/x-vnd.haiku-authentication_server"),
+	fLock(),
+	fRequestPort(-1),
+	fRequestThread(-1),
+	fServerEntries(NULL),
+	fTerminating(false)
 {
 }
 
