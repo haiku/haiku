@@ -30,7 +30,7 @@ typedef struct object_depot {
 extern "C" {
 #endif
 
-status_t object_depot_init(object_depot* depot, uint32 flags, void *cookie,
+status_t object_depot_init(object_depot* depot, uint32 flags, void* cookie,
 	void (*returnObject)(object_depot* depot, void* cookie, void* object));
 void object_depot_destroy(object_depot* depot);
 
