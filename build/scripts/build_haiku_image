@@ -1,4 +1,5 @@
 #!/bin/sh
+set -o errexit
 
 # The first argument is the shell script that initializes the variables:
 # sourceDir
@@ -122,19 +123,19 @@ if [ $isImage ]; then
 		fi
 
 		if [ $isVMwareImage ]; then
-			$vmdkimage -h 64k $imageFlags "$imagePath" || exit 1
+			$vmdkimage -h 64k $imageFlags "$imagePath"
 		else
-			$createImage $imageFlags "$imagePath" || exit 1
+			$createImage $imageFlags "$imagePath"
 		fi
 
 		$bfsShell --initialize $imageOffsetFlags "$imagePath" \
-			"$imageLabel" "block_size 2048" || exit 1
+			"$imageLabel" "block_size 2048"
 		$makebootable $imageOffsetFlags "$imagePath"
 	fi
 	$bfsShell -n $imageOffsetFlags "$imagePath" > /dev/null &
 	sleep 1
 	# bail out, if mounting fails
-	$cd . || exit 1
+	$cd .
 fi
 
 echo "Populating image ..."
