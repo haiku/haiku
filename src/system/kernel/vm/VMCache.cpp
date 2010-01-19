@@ -491,15 +491,21 @@ vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 	mutex_lock(&sCacheListLock);
 
 	while (dontWait) {
-		VMCache* cache = page->cache;
-		if (cache == NULL || !cache->TryLock()) {
+		VMCacheRef* cacheRef = page->CacheRef();
+		if (cacheRef == NULL) {
 			mutex_unlock(&sCacheListLock);
 			return NULL;
 		}
 
-		if (cache == page->cache) {
-			cache->AcquireRefLocked();
+		VMCache* cache = cacheRef->cache;
+		if (!cache->TryLock()) {
 			mutex_unlock(&sCacheListLock);
+			return NULL;
+		}
+
+		if (cacheRef == page->CacheRef()) {
+			mutex_unlock(&sCacheListLock);
+			cache->AcquireRefLocked();
 			return cache;
 		}
 
@@ -508,27 +514,40 @@ vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 	}
 
 	while (true) {
-		VMCache* cache = page->cache;
-		if (cache == NULL) {
+		VMCacheRef* cacheRef = page->CacheRef();
+		if (cacheRef == NULL) {
 			mutex_unlock(&sCacheListLock);
 			return NULL;
 		}
 
+		VMCache* cache = cacheRef->cache;
 		if (!cache->SwitchLock(&sCacheListLock)) {
 			// cache has been deleted
 			mutex_lock(&sCacheListLock);
 			continue;
 		}
 
-		if (cache == page->cache) {
+		mutex_lock(&sCacheListLock);
+		if (cache == page->Cache()) {
+			mutex_unlock(&sCacheListLock);
 			cache->AcquireRefLocked();
 			return cache;
 		}
 
 		// the cache changed in the meantime
 		cache->Unlock();
-		mutex_lock(&sCacheListLock);
 	}
+}
+
+
+// #pragma mark - VMCache
+
+
+VMCacheRef::VMCacheRef(VMCache* cache)
+	:
+	cache(cache),
+	ref_count(1)
+{
 }
 
 
@@ -545,12 +564,15 @@ VMCache::_IsMergeable() const
 
 
 VMCache::VMCache()
+	:
+	fCacheRef(NULL)
 {
 }
 
 
 VMCache::~VMCache()
 {
+	delete fCacheRef;
 }
 
 
@@ -571,6 +593,10 @@ VMCache::Init(uint32 cacheType)
 	page_count = 0;
 	type = cacheType;
 	fPageEventWaiters = NULL;
+
+	fCacheRef = new(nogrow) VMCacheRef(this);
+	if (fCacheRef == NULL)
+		return B_NO_MEMORY;
 
 #if DEBUG_CACHE_LIST
 	mutex_lock(&sCacheListLock);
@@ -607,8 +633,7 @@ VMCache::Delete()
 
 		// remove it
 		pages.Remove(page);
-		page->cache = NULL;
-		// TODO: we also need to remove all of the page's mappings!
+		page->SetCacheRef(NULL);
 
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
 			oldPage->physical_page_number));
@@ -689,7 +714,7 @@ VMCache::LookupPage(off_t offset)
 	vm_page* page = pages.Lookup((page_num_t)(offset >> PAGE_SHIFT));
 
 #if KDEBUG
-	if (page != NULL && page->cache != this)
+	if (page != NULL && page->Cache() != this)
 		panic("page %p not in cache %p\n", page, this);
 #endif
 
@@ -704,9 +729,9 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 		this, page, offset));
 	AssertLocked();
 
-	if (page->cache != NULL) {
+	if (page->CacheRef() != NULL) {
 		panic("insert page %p into cache %p: page cache is set to %p\n",
-			page, this, page->cache);
+			page, this, page->Cache());
 	}
 
 	T2(InsertPage(this, page, offset));
@@ -714,7 +739,7 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 	page->cache_offset = (page_num_t)(offset >> PAGE_SHIFT);
 	page_count++;
 	page->usage_count = 2;
-	page->cache = this;
+	page->SetCacheRef(fCacheRef);
 
 #if KDEBUG
 	vm_page* otherPage = pages.Lookup(page->cache_offset);
@@ -739,16 +764,16 @@ VMCache::RemovePage(vm_page* page)
 	TRACE(("VMCache::RemovePage(): cache %p, page %p\n", this, page));
 	AssertLocked();
 
-	if (page->cache != this) {
+	if (page->Cache() != this) {
 		panic("remove page %p from cache %p: page cache is set to %p\n", page,
-			this, page->cache);
+			this, page->Cache());
 	}
 
 	T2(RemovePage(this, page));
 
 	pages.Remove(page);
-	page->cache = NULL;
 	page_count--;
+	page->SetCacheRef(NULL);
 }
 
 
@@ -758,7 +783,7 @@ VMCache::RemovePage(vm_page* page)
 void
 VMCache::MovePage(vm_page* page)
 {
-	VMCache* oldCache = page->cache;
+	VMCache* oldCache = page->Cache();
 
 	AssertLocked();
 	oldCache->AssertLocked();
@@ -771,7 +796,7 @@ VMCache::MovePage(vm_page* page)
 	// insert here
 	pages.Insert(page);
 	page_count++;
-	page->cache = this;
+	page->SetCacheRef(fCacheRef);
 	T2(InsertPage(this, page, page->cache_offset << PAGE_SHIFT));
 }
 
@@ -790,12 +815,20 @@ VMCache::MoveAllPages(VMCache* fromCache)
 	page_count = fromCache->page_count;
 	fromCache->page_count = 0;
 
+	// swap the VMCacheRefs
+	mutex_lock(&sCacheListLock);
+	std::swap(fCacheRef, fromCache->fCacheRef);
+	fCacheRef->cache = this;
+	fromCache->fCacheRef->cache = fromCache;
+	mutex_unlock(&sCacheListLock);
+
+#if VM_CACHE_TRACING >= 2
 	for (VMCachePagesTree::Iterator it = pages.GetIterator();
 			vm_page* page = it.Next();) {
-		page->cache = this;
 		T2(RemovePage(fromCache, page));
 		T2(InsertPage(this, page, page->cache_offset << PAGE_SHIFT));
 	}
+#endif
 }
 
 

@@ -1286,7 +1286,7 @@ swap_init_post_modules()
 bool
 swap_free_page_swap_space(vm_page* page)
 {
-	VMAnonymousCache* cache = dynamic_cast<VMAnonymousCache*>(page->cache);
+	VMAnonymousCache* cache = dynamic_cast<VMAnonymousCache*>(page->Cache());
 	if (cache == NULL)
 		return false;
 

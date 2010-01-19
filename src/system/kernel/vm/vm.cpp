@@ -3686,7 +3686,7 @@ fault_get_page(PageFaultContext& context)
 		// insert the new page into our cache
 		cache->InsertPage(page, context.cacheOffset);
 
-	} else if (page->cache != context.topCache && context.isWrite) {
+	} else if (page->Cache() != context.topCache && context.isWrite) {
 		// We have a page that has the data we want, but in the wrong cache
 		// object so we need to copy it and stick it into the top cache.
 		vm_page* sourcePage = page;
@@ -3709,7 +3709,7 @@ fault_get_page(PageFaultContext& context)
 
 		context.cacheChainLocker.RelockCaches(true);
 		sourcePage->state = sourcePageState;
-		sourcePage->cache->NotifyPageEvents(sourcePage, PAGE_EVENT_NOT_BUSY);
+		sourcePage->Cache()->NotifyPageEvents(sourcePage, PAGE_EVENT_NOT_BUSY);
 
 		// insert the new page into our cache
 		context.topCache->InsertPage(page, context.cacheOffset);
@@ -3824,7 +3824,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 		// it's mapped in read-only, so that we cannot overwrite someone else's
 		// data (copy-on-write)
 		uint32 newProtection = protection;
-		if (context.page->cache != context.topCache && !isWrite)
+		if (context.page->Cache() != context.topCache && !isWrite)
 			newProtection &= ~(B_WRITE_AREA | B_KERNEL_WRITE_AREA);
 
 		bool unmapPage = false;
@@ -5210,7 +5210,7 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 			// If the page is not in the topmost cache and write access is
 			// requested, we have to unmap it. Otherwise we can re-map it with
 			// the new protection.
-			bool unmapPage = page->cache != topCache
+			bool unmapPage = page->Cache() != topCache
 				&& (protection & B_WRITE_AREA) != 0;
 
 			if (!unmapPage) {

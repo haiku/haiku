@@ -768,7 +768,7 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 		if (page->wired_count == 0 && page->mappings.IsEmpty())
 			atomic_add(&gMappedPagesCount, -1);
 
-		if (unmapPages || page->cache != area->cache) {
+		if (unmapPages || page->Cache() != area->cache) {
 			addr_t address = area->Base()
 				+ ((page->cache_offset * B_PAGE_SIZE) - area->cache_offset);
 

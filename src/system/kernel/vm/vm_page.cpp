@@ -240,7 +240,7 @@ class WritePage : public AbstractTraceEntry {
 	public:
 		WritePage(vm_page* page)
 			:
-			fCache(page->cache),
+			fCache(page->Cache()),
 			fPage(page)
 		{
 			Initialized();
@@ -404,7 +404,7 @@ dump_page(int argc, char **argv)
 	kprintf("queue_next,prev: %p, %p\n", page->queue_link.next,
 		page->queue_link.previous);
 	kprintf("physical_number: %#lx\n", page->physical_page_number);
-	kprintf("cache:           %p\n", page->cache);
+	kprintf("cache:           %p\n", page->Cache());
 	kprintf("cache_offset:    %ld\n", page->cache_offset);
 	kprintf("cache_next:      %p\n", page->cache_next);
 	kprintf("is dummy:        %d\n", page->is_dummy);
@@ -496,8 +496,8 @@ dump_page_queue(int argc, char **argv)
 		const char *type = "none";
 		int i;
 
-		if (page->cache != NULL) {
-			switch (page->cache->type) {
+		if (page->Cache() != NULL) {
+			switch (page->Cache()->type) {
 				case CACHE_TYPE_RAM:
 					type = "RAM";
 					break;
@@ -518,7 +518,7 @@ dump_page_queue(int argc, char **argv)
 
 		kprintf("page        cache       type       state  wired  usage\n");
 		for (i = 0; page; i++, page = queue->Next(page)) {
-			kprintf("%p  %p  %-7s %8s  %5d  %5d\n", page, page->cache,
+			kprintf("%p  %p  %-7s %8s  %5d  %5d\n", page, page->Cache(),
 				type, page_state_to_string(page->state),
 				page->wired_count, page->usage_count);
 		}
@@ -543,8 +543,8 @@ dump_page_stats(int argc, char **argv)
 
 		counter[sPages[i].state]++;
 
-		if (sPages[i].state == PAGE_STATE_MODIFIED && sPages[i].cache != NULL
-			&& sPages[i].cache->temporary && sPages[i].wired_count == 0) {
+		if (sPages[i].state == PAGE_STATE_MODIFIED && sPages[i].Cache() != NULL
+			&& sPages[i].Cache()->temporary && sPages[i].wired_count == 0) {
 			swappableModified++;
 			if (sPages[i].usage_count < 0)
 				swappableModifiedInactive++;
@@ -610,7 +610,7 @@ free_page(vm_page* page, bool clear)
 			return;
 	}
 
-	if (page->cache != NULL)
+	if (page->CacheRef() != NULL)
 		panic("to be freed page %p has cache", page);
 	if (!page->mappings.IsEmpty() || page->wired_count > 0)
 		panic("to be freed page %p has mappings", page);
@@ -715,7 +715,8 @@ set_page_state(vm_page *page, int pageState)
 			sFreePageCondition.NotifyOne();
 	}
 
-	if (page->cache != NULL && page->cache->temporary) {
+	VMCache* cache = page->Cache();
+	if (cache != NULL && cache->temporary) {
 		if (pageState == PAGE_STATE_MODIFIED)
 			atomic_add(&sModifiedTemporaryPages, 1);
 		else if (page->state == PAGE_STATE_MODIFIED)
@@ -730,8 +731,8 @@ set_page_state(vm_page *page, int pageState)
 		// page states and active pages have a cache that must be locked at
 		// this point. So we rely on the fact that everyone must lock the cache
 		// before trying to change/interpret the page state.
-		ASSERT(page->cache != NULL);
-		page->cache->AssertLocked();
+		ASSERT(cache != NULL);
+		cache->AssertLocked();
 		page->state = pageState;
 	} else {
 		if (fromQueue != NULL)
@@ -767,7 +768,7 @@ move_page_to_active_or_inactive_queue(vm_page *page, bool dequeued)
 		VMPageQueue& queue = state == PAGE_STATE_ACTIVE
 			? sActivePageQueue : sInactivePageQueue;
 		queue.AppendUnlocked(page);
-		if (page->cache->temporary)
+		if (page->Cache()->temporary)
 			atomic_add(&sModifiedTemporaryPages, -1);
 	} else
 		set_page_state(page, state);
@@ -1026,7 +1027,7 @@ PageWriteWrapper::SetTo(vm_page* page, bool dequeuedPage)
 		panic("re-setting page write wrapper that isn't completed");
 
 	fPage = page;
-	fCache = page->cache;
+	fCache = page->Cache();
 	fDequeuedPage = dequeuedPage;
 	fIsActive = true;
 
@@ -1125,7 +1126,7 @@ void
 PageWriteTransfer::SetTo(PageWriterRun* run, vm_page* page, int32 maxPages)
 {
 	fRun = run;
-	fCache = page->cache;
+	fCache = page->Cache();
 	fOffset = page->cache_offset;
 	fPageCount = 1;
 	fMaxPages = maxPages;
@@ -1142,7 +1143,7 @@ PageWriteTransfer::SetTo(PageWriterRun* run, vm_page* page, int32 maxPages)
 bool
 PageWriteTransfer::AddPage(vm_page* page)
 {
-	if (page->cache != fCache
+	if (page->Cache() != fCache
 		|| (fMaxPages >= 0 && fPageCount >= (uint32)fMaxPages))
 		return false;
 
@@ -1271,7 +1272,7 @@ PageWriterRun::AddPage(vm_page* page)
 
 	if (fTransferCount == 0 || !fTransfers[fTransferCount - 1].AddPage(page)) {
 		fTransfers[fTransferCount++].SetTo(this, page,
-			page->cache->MaxPagesPerAsyncWrite());
+			page->Cache()->MaxPagesPerAsyncWrite());
 	}
 }
 
@@ -1360,7 +1361,7 @@ page_writer(void* /*unused*/)
 
 	vm_page marker;
 	marker.is_dummy = true;
-	marker.cache = NULL;
+	marker.SetCacheRef(NULL);
 	marker.state = PAGE_STATE_UNUSED;
 #if DEBUG_PAGE_QUEUE
 	marker.queue = NULL;
@@ -1425,7 +1426,7 @@ page_writer(void* /*unused*/)
 
 			DEBUG_PAGE_ACCESS_START(page);
 
-			VMCache *cache = page->cache;
+			VMCache *cache = page->Cache();
 
 			// Don't write back wired (locked) pages and don't write RAM pages
 			// until we're low on pages. Also avoid writing temporary pages that
@@ -1544,9 +1545,10 @@ steal_page(vm_page *page)
 	// try to lock the page's cache
 	if (vm_cache_acquire_locked_page_cache(page, false) == NULL)
 		return false;
+	VMCache* cache = page->Cache();
 
-	AutoLocker<VMCache> cacheLocker(page->cache, true);
-	MethodDeleter<VMCache> _2(page->cache, &VMCache::ReleaseRefLocked);
+	AutoLocker<VMCache> cacheLocker(cache, true);
+	MethodDeleter<VMCache> _2(cache, &VMCache::ReleaseRefLocked);
 
 	// check again if that page is still a candidate
 	if (page->state != PAGE_STATE_INACTIVE)
@@ -1574,7 +1576,7 @@ steal_page(vm_page *page)
 	//dprintf("  steal page %p from cache %p%s\n", page, page->cache,
 	//	page->state == PAGE_STATE_INACTIVE ? "" : " (ACTIVE)");
 
-	page->cache->RemovePage(page);
+	cache->RemovePage(page);
 
 	sInactivePageQueue.RemoveUnlocked(page);
 	return true;
@@ -1587,7 +1589,7 @@ steal_pages(vm_page **pages, size_t count)
 	while (true) {
 		vm_page marker;
 		marker.is_dummy = true;
-		marker.cache = NULL;
+		marker.SetCacheRef(NULL);
 		marker.state = PAGE_STATE_UNUSED;
 #if DEBUG_PAGE_QUEUE
 		marker.queue = NULL;
@@ -1890,7 +1892,7 @@ vm_page_init(kernel_args *args)
 		sPages[i].wired_count = 0;
 		sPages[i].usage_count = 0;
 		sPages[i].busy_writing = false;
-		sPages[i].cache = NULL;
+		sPages[i].SetCacheRef(NULL);
 		#if DEBUG_PAGE_QUEUE
 			sPages[i].queue = NULL;
 		#endif
@@ -2160,7 +2162,7 @@ vm_page_allocate_page(int pageState)
 		}
 	}
 
-	if (page->cache != NULL)
+	if (page->CacheRef() != NULL)
 		panic("supposed to be free page %p has cache\n", page);
 
 	DEBUG_PAGE_ACCESS_START(page);
@@ -2383,8 +2385,7 @@ vm_page_set_state(vm_page *page, int pageState)
 void
 vm_page_requeue(struct vm_page *page, bool tail)
 {
-	ASSERT(page->cache != NULL);
-	page->cache->AssertLocked();
+	ASSERT(page->Cache() != NULL);
 	DEBUG_PAGE_ACCESS_CHECK(page);
 
 	VMPageQueue *queue = NULL;

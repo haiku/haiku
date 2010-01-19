@@ -26,6 +26,7 @@
 class AsyncIOCallback;
 struct vm_page_mapping;
 struct VMCache;
+struct VMCacheRef;
 typedef DoublyLinkedListLink<vm_page_mapping> vm_page_mapping_link;
 
 
@@ -71,12 +72,23 @@ typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedAreaLink>
 
 typedef uint32 page_num_t;
 
+
+struct VMCacheRef {
+			VMCache*			cache;
+			int32				ref_count;
+
+								VMCacheRef(VMCache* cache);
+};
+
+
 struct vm_page {
 	DoublyLinkedListLink<vm_page> queue_link;
 
 	addr_t					physical_page_number;
 
-	VMCache*				cache;
+private:
+	VMCacheRef*				cache_ref;
+public:
 	page_num_t				cache_offset;
 								// in page size units
 
@@ -103,6 +115,13 @@ struct vm_page {
 
 	int8					usage_count;
 	uint16					wired_count;
+
+
+	VMCacheRef* CacheRef() const			{ return cache_ref; }
+	void SetCacheRef(VMCacheRef* cacheRef)	{ this->cache_ref = cacheRef; }
+
+	VMCache* Cache() const
+		{ return cache_ref != NULL ? cache_ref->cache : NULL; }
 };
 
 

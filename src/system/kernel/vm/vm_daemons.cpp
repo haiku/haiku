@@ -67,8 +67,7 @@ PageCacheLocker::_IgnorePage(vm_page* page)
 {
 	if (page->state == PAGE_STATE_WIRED || page->state == PAGE_STATE_BUSY
 		|| page->state == PAGE_STATE_FREE || page->state == PAGE_STATE_CLEAR
-		|| page->state == PAGE_STATE_UNUSED || page->wired_count > 0
-		|| page->cache == NULL)
+		|| page->state == PAGE_STATE_UNUSED || page->wired_count > 0)
 		return true;
 
 	return false;
@@ -102,7 +101,7 @@ PageCacheLocker::Unlock()
 	if (fPage == NULL)
 		return;
 
-	fPage->cache->ReleaseRefAndUnlock();
+	fPage->Cache()->ReleaseRefAndUnlock();
 
 	fPage = NULL;
 }
@@ -342,8 +341,9 @@ free_page_swap_space(int32 index)
 
 	DEBUG_PAGE_ACCESS_START(page);
 
-	if (page->cache->temporary && page->wired_count == 0
-			&& page->cache->HasPage(page->cache_offset << PAGE_SHIFT)
+	VMCache* cache = page->Cache();
+	if (cache->temporary && page->wired_count == 0
+			&& cache->HasPage(page->cache_offset << PAGE_SHIFT)
 			&& page->usage_count > 0) {
 		// TODO: how to judge a page is highly active?
 		if (swap_free_page_swap_space(page)) {

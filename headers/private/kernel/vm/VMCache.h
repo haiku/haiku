@@ -61,6 +61,7 @@ struct VMCachePagesTreeDefinition {
 
 typedef IteratableSplayTree<VMCachePagesTreeDefinition> VMCachePagesTree;
 
+
 struct VMCache {
 public:
 								VMCache();
@@ -171,6 +172,7 @@ public:
 
 private:
 			struct PageEventWaiter;
+			friend struct VMCacheRef;
 
 private:
 			void				_NotifyPageEvents(vm_page* page, uint32 events);
@@ -185,6 +187,7 @@ private:
 			mutex				fLock;
 			PageEventWaiter*	fPageEventWaiters;
 			void*				fUserData;
+			VMCacheRef*			fCacheRef;
 };
 
 
