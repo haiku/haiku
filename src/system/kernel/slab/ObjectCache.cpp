@@ -10,9 +10,11 @@
 
 #include <string.h>
 
-#include "slab_private.h"
+#include <util/AutoLock.h>
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
+
+#include "slab_private.h"
 
 
 static const size_t kCacheColorPeriod = 8;
@@ -34,7 +36,10 @@ static void
 object_cache_return_object_wrapper(object_depot* depot, void* cookie,
 	void* object)
 {
-	object_cache_free((ObjectCache*)cookie, object);
+	ObjectCache* cache = (ObjectCache*)cookie;
+
+	MutexLocker _(cache->lock);
+	cache->ReturnObjectToSlab(cache->ObjectSlab(object), object);
 }
 
 
@@ -81,9 +86,8 @@ ObjectCache::Init(const char* name, size_t objectSize,
 
 	resize_request = NULL;
 
-	// TODO: depot destruction is obviously broken
 	// no gain in using the depot in single cpu setups
-	//if (smp_get_num_cpus() == 1)
+	if (smp_get_num_cpus() == 1)
 		this->flags |= CACHE_NO_DEPOT;
 
 	if (!(this->flags & CACHE_NO_DEPOT)) {

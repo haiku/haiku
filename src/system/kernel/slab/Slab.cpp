@@ -478,10 +478,10 @@ delete_object_cache(object_cache* cache)
 		sObjectCaches.Remove(cache);
 	}
 
-	mutex_lock(&cache->lock);
-
 	if (!(cache->flags & CACHE_NO_DEPOT))
 		object_depot_destroy(&cache->depot);
+
+	mutex_lock(&cache->lock);
 
 	unregister_low_resource_handler(object_cache_low_memory, cache);
 
