@@ -1,0 +1,21 @@
+/*
+ * userlandfs_server.rdef
+ */
+
+resource app_signature "application/x-vnd.haiku.userlandfs-server";
+
+resource app_flags B_EXCLUSIVE_LAUNCH|B_BACKGROUND_APP;
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_ALPHA,
+	internal = 0,
+
+	short_info = "userlandfs_server",
+	long_info = "userlandfs_server ©2004-2010 Haiku, Inc"
+};
+
+
