@@ -673,8 +673,12 @@ TCPEndpoint::Accept(struct net_socket** _acceptedSocket)
 
 		status = acquire_sem_etc(fAcceptSemaphore, 1, B_ABSOLUTE_TIMEOUT
 			| B_CAN_INTERRUPT, timeout);
-		if (status != B_OK)
+		if (status != B_OK) {
+			if (status == B_TIMED_OUT && socket->receive.timeout == 0)
+				return B_WOULD_BLOCK;
+
 			return status;
+		}
 
 		locker.Lock();
 		status = gSocketModule->dequeue_connected(socket, _acceptedSocket);
