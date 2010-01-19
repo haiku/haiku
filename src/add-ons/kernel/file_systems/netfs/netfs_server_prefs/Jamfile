@@ -6,9 +6,9 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) headers shared ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 DEFINES += USER=1 ;
-DEFINES += DEBUG_APP="\\\"NetFSServerPrefs\\\"" ;
+DEFINES += DEBUG_APP="\\\"netfs_server_prefs\\\"" ;
 
-Application NetFSServerPrefs
+Application netfs_server_prefs
 	: DebugSupport.cpp
 
 	  NetFSServerRosterDefs.cpp

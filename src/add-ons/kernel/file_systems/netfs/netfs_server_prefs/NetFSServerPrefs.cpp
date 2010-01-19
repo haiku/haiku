@@ -20,8 +20,8 @@ static const uint32 kWritePermission
 
 // usage
 static const char* kUsage =
-"Usage: NetFSServerPrefs -h | --help\n"
-"       NetFSServerPrefs <command>\n"
+"Usage: netfs_server_prefs -h | --help\n"
+"       netfs_server_prefs <command>\n"
 "options:\n"
 "  -h, --help        - print this text\n"
 "\n"
@@ -411,7 +411,7 @@ no_more_args(int argc, int argi)
 int
 main(int argc, char** argv)
 {
-	BApplication app("application/x-vnd.yellowbites.NetFSServerPrefs");
+	BApplication app("application/x-vnd.haiku-netfs_server_prefs");
 
 	// parse first argument
 	int argi = 1;

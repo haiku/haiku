@@ -3,4 +3,4 @@
 #include "NetFSServerRosterDefs.h"
 
 const char* kNetFSServerSignature
-	= "application/x-vnd.yellowbites.netfs-server";
+	= "application/x-vnd.haiku-netfs_server";

@@ -41,11 +41,11 @@
 #include "VolumeManager.h"
 
 static const char* kSettingsDirName		= "netfs";
-static const char* kSettingsFileName	= "NetFSServer";
+static const char* kSettingsFileName	= "netfs_server";
 
 // usage
 static const char* kUsage =
-"Usage: NetFSServer <options>\n"
+"Usage: netfs_server <options>\n"
 "options:\n"
 "  --dont-broadcast  - don't use broadcasting to announce the server's\n"
 "                      availability to clients\n"
@@ -186,25 +186,26 @@ private:
 
 // constructor
 NetFSServer::NetFSServer(bool useBroadcasting)
-	: BApplication(kNetFSServerSignature),
-	  fSecurityContext(NULL),
-	  fConnectionListenerFactory(),
-	  fConnectionListener(NULL),
-	  fLock("netfs server"),
-	  fClientConnections(),
-	  fVolumeManager(NULL),
-	  fClosedConnections(),
-	  fClosedConnectionsSemaphore(-1),
-	  fConnectionListenerThread(-1),
-	  fConnectionDeleter(-1),
-	  fBroadcaster(-1),
-	  fBroadcastingSocket(-1),
-	  fBroadcasterSemaphore(-1),
-	  fServerInfoConnectionListener(-1),
-	  fServerInfoConnectionListenerSocket(-1),
-	  fServerInfoUpdated(0),
-	  fUseBroadcasting(useBroadcasting),
-	  fTerminating(false)
+	:
+	BApplication(kNetFSServerSignature),
+	fSecurityContext(NULL),
+	fConnectionListenerFactory(),
+	fConnectionListener(NULL),
+	fLock("netfs server"),
+	fClientConnections(),
+	fVolumeManager(NULL),
+	fClosedConnections(),
+	fClosedConnectionsSemaphore(-1),
+	fConnectionListenerThread(-1),
+	fConnectionDeleter(-1),
+	fBroadcaster(-1),
+	fBroadcastingSocket(-1),
+	fBroadcasterSemaphore(-1),
+	fServerInfoConnectionListener(-1),
+	fServerInfoConnectionListenerSocket(-1),
+	fServerInfoUpdated(0),
+	fUseBroadcasting(useBroadcasting),
+	fTerminating(false)
 {
 }
 

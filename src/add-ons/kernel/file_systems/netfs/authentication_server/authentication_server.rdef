@@ -15,7 +15,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "authentication_server",
-	long_info = "authentication_server ©2004-2009 Haiku, Inc"
+	long_info = "authentication_server ©2004-2010 Haiku, Inc"
 };
 
 resource vector_icon array {
