@@ -109,6 +109,7 @@ private:
 			ProgressReporter*	fProgressReporter;
 
 	// TODO: Should be made into a list of BEntris to be ignored, perhaps.
+	// settable by method...
 			BEntry				fVarDirectory;
 };
 

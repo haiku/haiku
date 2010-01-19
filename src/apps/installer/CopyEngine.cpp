@@ -13,7 +13,6 @@
 #include <sys/resource.h>
 
 #include <Directory.h>
-#include <FindDirectory.h>
 #include <fs_attr.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -63,11 +62,6 @@ CopyEngine::CopyEngine(ProgressReporter* reporter)
 	rl.rlim_cur = 512;
 	rl.rlim_max = RLIM_SAVED_MAX;
 	setrlimit(RLIMIT_NOFILE, &rl);
-
-	// init BEntry pointing to /var
-	BPath path;
-	if (find_directory(B_COMMON_VAR_DIRECTORY, &path) == B_OK)
-		fVarDirectory.SetTo(path.Path());
 }
 
 
@@ -110,6 +104,21 @@ CopyEngine::ResetTargets()
 status_t
 CopyEngine::CollectTargets(const char* source, sem_id cancelSemaphore)
 {
+	// init BEntry pointing to /var
+	{
+		// There is no other way to retrieve the path to the var folder
+		// on the source volume. Using find_directory() with
+		// B_COMMON_VAR_DIRECTORY will only ever get the var folder on the
+		// current /boot volume regardless of the volume of "source", which
+		// makes sense, since passing a volume is meant to folders that are
+		// volume specific, like "trash".
+		BPath path(source);
+		if (path.Append("common/var") == B_OK)
+			fVarDirectory.SetTo(path.Path());
+		else
+			fVarDirectory.Unset();
+	}
+
 	int32 level = 0;
 	status_t ret = _CollectCopyInfo(source, level, cancelSemaphore);
 	if (ret == B_OK && fProgressReporter != NULL)
