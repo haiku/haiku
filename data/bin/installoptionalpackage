@@ -30,7 +30,7 @@ declare -a availablePackages
 # Some Packages cannot be installed,
 # as they require either the source code or compiled binaries
 declare -a packageIgnoreList=( 'Bluetooth' 'Development' 'DevelopmentMin' \
-	'DevelopmentBase' 'P7zip' 'UserlandFS' 'Welcome')
+	'DevelopmentBase' 'NetFS' 'P7zip' 'UserlandFS' 'Welcome')
 
 
 function CreateInstallerScript()
