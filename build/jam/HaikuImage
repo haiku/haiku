@@ -27,6 +27,11 @@ if $(HAIKU_ATA_STACK) = 1 {
 	IDE_ONLY = "" ;
 }
 
+# Make sure that OpenSSL is added to the image.
+if $(HAIKU_OPENSSL_ENABLED) {
+	AddOptionalHaikuImagePackages OpenSSL ;
+}
+
 SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	cal cat catattr checkfs checkitout chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
