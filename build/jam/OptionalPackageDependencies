@@ -16,3 +16,4 @@ OptionalPackageDependencies Python : Bzip ;
 OptionalPackageDependencies Mercurial : Python ;
 OptionalPackageDependencies Git : Expat Curl OpenSSL ;
 OptionalPackageDependencies Curl : OpenSSL ;
+OptionalPackageDependencies NetFS : UserlandFS ;

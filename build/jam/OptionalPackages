@@ -41,6 +41,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Mercurial				- the distributed version control system
 #	Nano					- the command line text editor
 #	Neon					- support libraries used for example by SVN
+#	NetFS					- the native networked file system components
 #	NetSurf					- the web browser
 #	OCaml					- the Objective Caml language
 #	OpenSound				- additional audio driver package
@@ -648,6 +649,35 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 			: true
 		;
 	}
+}
+
+
+# NetFS network file system
+if [ IsOptionalHaikuImagePackageAdded NetFS ] {
+	# userlandfs module
+	AddFilesToHaikuImage home config add-ons userlandfs : netfs ;
+
+	# servers
+	AddFilesToHaikuImage system servers : netfs_server ;
+	AddFilesToHaikuImage system servers : authentication_server ;
+
+	# tools
+	AddFilesToHaikuImage system bin : netfs_config ;
+	AddFilesToHaikuImage system bin : netfs_server_prefs ;
+
+	#example settings for netfs_server
+	local netfsServerSettingsFiles = <driver-settings>netfs-server ;
+	SEARCH on $(netfsServerSettingsFiles)
+		= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems netfs ] ;
+	AddFilesToHaikuImage home config settings kernel drivers
+	: $(netfsServerSettingsFiles) ;
+
+	#userlandfs settings are needed for netfs_config to work (ioctls)
+	local userlandfsServerSettingsFiles = <driver-settings>userlandfs ;
+	SEARCH on $(userlandfsServerSettingsFiles)
+		= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems userlandfs ] ;
+	AddFilesToHaikuImage home config settings kernel drivers
+	: $(userlandfsServerSettingsFiles) ;
 }
 
 
