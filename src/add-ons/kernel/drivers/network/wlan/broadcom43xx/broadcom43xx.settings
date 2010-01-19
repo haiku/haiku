@@ -1,0 +1,28 @@
+#
+# This is the configuration file for the broadcom43xx wireless network driver.
+# It should be located at "/boot/home/config/settings/kernel/drivers" and named
+# "broadcom43xx".
+#
+
+#
+# Mapping of the driver internal firmware names to the b43-fwcutter generated
+# names.
+# -----
+# internal				b43-fwcutter
+bwi_v3_a0g0bsinitvals2	bwi_v3_a0g0bsinitvals2
+bwi_v3_a0g0bsinitvals5	bwi_v3_a0g0bsinitvals5
+bwi_v3_a0g0initvals2	bwi_v3_a0g0initvals2
+bwi_v3_a0g0initvals5	bwi_v3_a0g0initvals5
+bwi_v3_a0g1bsinitvals5	bwi_v3_a0g1bsinitvals5
+bwi_v3_a0g1initvals5	bwi_v3_a0g1initvals5
+bwi_v3_b0g0bsinitvals2	bwi_v3_b0g0bsinitvals2
+bwi_v3_b0g0bsinitvals5	bwi_v3_b0g0bsinitvals5
+bwi_v3_b0g0initvals2	bwi_v3_b0g0initvals2
+bwi_v3_b0g0initvals5	bwi_v3_b0g0initvals5
+bwi_v3_pcm4				bwi_v3_pcm4
+bwi_v3_pcm5				bwi_v3_pcm5
+bwi_v3_ucode			bwi_v3_ucode
+bwi_v3_ucode11			bwi_v3_ucode11
+bwi_v3_ucode2			bwi_v3_ucode2
+bwi_v3_ucode4			bwi_v3_ucode4
+bwi_v3_ucode5			bwi_v3_ucode5
