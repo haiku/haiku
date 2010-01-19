@@ -42,7 +42,8 @@ private:
 									const char* destination,
 									int32& level, sem_id cancelSemaphore);
 
-			bool				_ShouldCopyEntry(const char* name,
+			bool				_ShouldCopyEntry(const BEntry& entry,
+									const char* name,
 									const struct stat& statInfo,
 									int32 level) const;
 
@@ -106,6 +107,9 @@ private:
 			const char*			fCurrentItem;
 
 			ProgressReporter*	fProgressReporter;
+
+	// TODO: Should be made into a list of BEntris to be ignored, perhaps.
+			BEntry				fVarDirectory;
 };
 
 

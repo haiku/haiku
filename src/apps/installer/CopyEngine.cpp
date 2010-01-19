@@ -13,6 +13,7 @@
 #include <sys/resource.h>
 
 #include <Directory.h>
+#include <FindDirectory.h>
 #include <fs_attr.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -62,6 +63,11 @@ CopyEngine::CopyEngine(ProgressReporter* reporter)
 	rl.rlim_cur = 512;
 	rl.rlim_max = RLIM_SAVED_MAX;
 	setrlimit(RLIMIT_NOFILE, &rl);
+
+	// init BEntry pointing to /var
+	BPath path;
+	if (find_directory(B_COMMON_VAR_DIRECTORY, &path) == B_OK)
+		fVarDirectory.SetTo(path.Path());
 }
 
 
@@ -231,7 +237,7 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
 		if (ret < B_OK)
 			return ret;
 
-		if (!_ShouldCopyEntry(name, statInfo, level))
+		if (!_ShouldCopyEntry(entry, name, statInfo, level))
 			continue;
 
 		if (S_ISDIR(statInfo.st_mode)) {
@@ -302,7 +308,7 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 		struct stat statInfo;
 		entry.GetStat(&statInfo);
 
-		if (!_ShouldCopyEntry(name, statInfo, level))
+		if (!_ShouldCopyEntry(entry, name, statInfo, level))
 			continue;
 
 		fItemsCopied++;
@@ -490,11 +496,12 @@ CopyEngine::_UpdateProgress()
 
 
 bool
-CopyEngine::_ShouldCopyEntry(const char* name, const struct stat& statInfo,
-	int32 level) const
+CopyEngine::_ShouldCopyEntry(const BEntry& entry, const char* name,
+	const struct stat& statInfo, int32 level) const
 {
 	if (level == 1 && S_ISDIR(statInfo.st_mode)) {
 		if (strcmp(VAR_DIRECTORY, name) == 0) {
+			// old location of /boot/var
 			printf("ignoring '%s'.\n", name);
 			return false;
 		}
@@ -516,6 +523,11 @@ CopyEngine::_ShouldCopyEntry(const char* name, const struct stat& statInfo,
 			printf("ignoring '%s'.\n", name);
 			return false;
 		}
+	}
+	if (fVarDirectory == entry) {
+		// current location of var
+		printf("ignoring '%s'.\n", name);
+		return false;
 	}
 	return true;
 }
