@@ -12,14 +12,27 @@
 #include <stddef.h>
 
 
-void*	internal_alloc(size_t size, uint32 flags);
-void	internal_free(void *_buffer);
+//#define TRACE_SLAB
+#ifdef TRACE_SLAB
+#define TRACE_CACHE(cache, format, args...) \
+	dprintf("Cache[%p, %s] " format "\n", cache, cache->name , ##args)
+#else
+#define TRACE_CACHE(cache, format, bananas...) do { } while (0)
+#endif
 
 
-void*	block_alloc(size_t size);
-void	block_free(void *block);
-void	block_allocator_init_boot();
-void	block_allocator_init_rest();
+#define COMPONENT_PARANOIA_LEVEL	OBJECT_CACHE_PARANOIA
+#include <debug_paranoia.h>
+
+struct ObjectCache;
+
+void*		slab_internal_alloc(size_t size, uint32 flags);
+void		slab_internal_free(void *_buffer);
+
+void*		block_alloc(size_t size);
+void		block_free(void *block);
+void		block_allocator_init_boot();
+void		block_allocator_init_rest();
 
 
 template<typename Type>

@@ -1,0 +1,29 @@
+/*
+ * Copyright 2008, Axel Dörfler. All Rights Reserved.
+ * Copyright 2007, Hugo Santos. All Rights Reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef SMALL_OBJECT_CACHE_H
+#define SMALL_OBJECT_CACHE_H
+
+
+#include "ObjectCache.h"
+
+
+struct SmallObjectCache : ObjectCache {
+	static	SmallObjectCache*	Create(const char* name, size_t object_size,
+									size_t alignment, size_t maximum,
+									uint32 flags, void* cookie,
+									object_cache_constructor constructor,
+									object_cache_destructor destructor,
+									object_cache_reclaimer reclaimer);
+
+	virtual	slab*				CreateSlab(uint32 flags,
+									bool unlockWhileAllocating);
+	virtual	void				ReturnSlab(slab* slab);
+	virtual slab*				ObjectSlab(void* object) const;
+};
+
+
+#endif	// SMALL_OBJECT_CACHE_H

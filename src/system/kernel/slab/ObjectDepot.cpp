@@ -19,55 +19,65 @@ static const int kMagazineCapacity = 32;
 	// TODO: Should be dynamically tuned per cache.
 
 
-struct depot_magazine {
-	struct depot_magazine *next;
-	uint16 current_round, round_count;
-	void *rounds[0];
+struct DepotMagazine {
+			DepotMagazine*		next;
+			uint16				current_round;
+			uint16				round_count;
+			void*				rounds[0];
+
+public:
+	inline	bool				IsEmpty() const;
+	inline	bool				IsFull() const;
+
+	inline	void*				Pop();
+	inline	bool				Push(void* object);
 };
 
 
 struct depot_cpu_store {
-	recursive_lock lock;
-	struct depot_magazine *loaded, *previous;
+	recursive_lock	lock;
+	DepotMagazine*	loaded;
+	DepotMagazine*	previous;
 };
 
 
-static inline bool
-is_magazine_empty(depot_magazine *magazine)
+bool
+DepotMagazine::IsEmpty() const
 {
-	return magazine->current_round == 0;
+	return current_round == 0;
 }
 
 
-static inline bool
-is_magazine_full(depot_magazine *magazine)
+bool
+DepotMagazine::IsFull() const
 {
-	return magazine->current_round == magazine->round_count;
+	return current_round == round_count;
 }
 
 
-static inline void *
-pop_magazine(depot_magazine *magazine)
+void*
+DepotMagazine::Pop()
 {
-	return magazine->rounds[--magazine->current_round];
+	return rounds[--current_round];
 }
 
 
-static inline bool
-push_magazine(depot_magazine *magazine, void *object)
+bool
+DepotMagazine::Push(void* object)
 {
-	if (is_magazine_full(magazine))
+	if (IsFull())
 		return false;
-	magazine->rounds[magazine->current_round++] = object;
+
+	rounds[current_round++] = object;
 	return true;
 }
 
 
-static depot_magazine *
+static DepotMagazine*
 alloc_magazine()
 {
-	depot_magazine *magazine = (depot_magazine *)internal_alloc(
-		sizeof(depot_magazine) + kMagazineCapacity * sizeof(void *), 0);
+	DepotMagazine* magazine = (DepotMagazine*)slab_internal_alloc(
+		sizeof(DepotMagazine) + kMagazineCapacity * sizeof(void*), 0);
 	if (magazine) {
 		magazine->next = NULL;
 		magazine->current_round = 0;
@@ -79,23 +89,23 @@ alloc_magazine()
 
 
 static void
-free_magazine(depot_magazine *magazine)
+free_magazine(DepotMagazine* magazine)
 {
-	internal_free(magazine);
+	slab_internal_free(magazine);
 }
 
 
 static void
-empty_magazine(object_depot *depot, depot_magazine *magazine)
+empty_magazine(object_depot* depot, DepotMagazine* magazine)
 {
 	for (uint16 i = 0; i < magazine->current_round; i++)
-		depot->return_object(depot, magazine->rounds[i]);
+		depot->return_object(depot, depot->cookie, magazine->rounds[i]);
 	free_magazine(magazine);
 }
 
 
 static bool
-exchange_with_full(object_depot *depot, depot_magazine* &magazine)
+exchange_with_full(object_depot* depot, DepotMagazine*& magazine)
 {
 	RecursiveLocker _(depot->lock);
 
@@ -112,7 +122,7 @@ exchange_with_full(object_depot *depot, depot_magazine* &magazine)
 
 
 static bool
-exchange_with_empty(object_depot *depot, depot_magazine* &magazine)
+exchange_with_empty(object_depot* depot, DepotMagazine*& magazine)
 {
 	RecursiveLocker _(depot->lock);
 
@@ -134,8 +144,8 @@ exchange_with_empty(object_depot *depot, depot_magazine* &magazine)
 }
 
 
-static inline depot_cpu_store *
-object_depot_cpu(object_depot *depot)
+static inline depot_cpu_store*
+object_depot_cpu(object_depot* depot)
 {
 	return &depot->stores[smp_get_current_cpu()];
 }
@@ -145,8 +155,8 @@ object_depot_cpu(object_depot *depot)
 
 
 status_t
-object_depot_init(object_depot *depot, uint32 flags,
-	void (*return_object)(object_depot *depot, void *object))
+object_depot_init(object_depot* depot, uint32 flags, void* cookie,
+	void (*return_object)(object_depot* depot, void* cookie, void* object))
 {
 	depot->full = NULL;
 	depot->empty = NULL;
@@ -154,8 +164,8 @@ object_depot_init(object_depot *depot, uint32 flags,
 
 	recursive_lock_init(&depot->lock, "depot");
 
-	depot->stores = (depot_cpu_store *)internal_alloc(sizeof(depot_cpu_store)
-		* smp_get_num_cpus(), flags);
+	depot->stores = (depot_cpu_store*)slab_internal_alloc(
+		sizeof(depot_cpu_store) * smp_get_num_cpus(), flags);
 	if (depot->stores == NULL) {
 		recursive_lock_destroy(&depot->lock);
 		return B_NO_MEMORY;
@@ -166,6 +176,7 @@ object_depot_init(object_depot *depot, uint32 flags,
 		depot->stores[i].loaded = depot->stores[i].previous = NULL;
 	}
 
+	depot->cookie = cookie;
 	depot->return_object = return_object;
 
 	return B_OK;
@@ -173,7 +184,7 @@ object_depot_init(object_depot *depot, uint32 flags,
 
 
 void
-object_depot_destroy(object_depot *depot)
+object_depot_destroy(object_depot* depot)
 {
 	object_depot_make_empty(depot);
 
@@ -181,14 +192,14 @@ object_depot_destroy(object_depot *depot)
 		recursive_lock_destroy(&depot->stores[i].lock);
 	}
 
-	internal_free(depot->stores);
+	slab_internal_free(depot->stores);
 
 	recursive_lock_destroy(&depot->lock);
 }
 
 
-static void *
-object_depot_obtain_from_store(object_depot *depot, depot_cpu_store *store)
+static void*
+object_depot_obtain_from_store(object_depot* depot, depot_cpu_store* store)
 {
 	RecursiveLocker _(store->lock);
 
@@ -203,21 +214,22 @@ object_depot_obtain_from_store(object_depot *depot, depot_cpu_store *store)
 		return NULL;
 
 	while (true) {
-		if (!is_magazine_empty(store->loaded))
-			return pop_magazine(store->loaded);
+		if (!store->loaded->IsEmpty())
+			return store->loaded->Pop();
 
-		if (store->previous && (is_magazine_full(store->previous)
-			|| exchange_with_full(depot, store->previous)))
+		if (store->previous
+			&& (store->previous->IsFull()
+				|| exchange_with_full(depot, store->previous))) {
 			std::swap(store->previous, store->loaded);
-		else
+		} else
 			return NULL;
 	}
 }
 
 
 static int
-object_depot_return_to_store(object_depot *depot, depot_cpu_store *store,
-	void *object)
+object_depot_return_to_store(object_depot* depot, depot_cpu_store* store,
+	void* object)
 {
 	RecursiveLocker _(store->lock);
 
@@ -227,10 +239,10 @@ object_depot_return_to_store(object_depot *depot, depot_cpu_store *store,
 	// we return the object directly to the slab.
 
 	while (true) {
-		if (store->loaded && push_magazine(store->loaded, object))
+		if (store->loaded && store->loaded->Push(object))
 			return 1;
 
-		if ((store->previous && is_magazine_empty(store->previous))
+		if ((store->previous && store->previous->IsEmpty())
 			|| exchange_with_empty(depot, store->previous))
 			std::swap(store->loaded, store->previous);
 		else
@@ -239,15 +251,15 @@ object_depot_return_to_store(object_depot *depot, depot_cpu_store *store,
 }
 
 
-void *
-object_depot_obtain(object_depot *depot)
+void*
+object_depot_obtain(object_depot* depot)
 {
 	return object_depot_obtain_from_store(depot, object_depot_cpu(depot));
 }
 
 
 int
-object_depot_store(object_depot *depot, void *object)
+object_depot_store(object_depot* depot, void* object)
 {
 	return object_depot_return_to_store(depot, object_depot_cpu(depot),
 		object);
@@ -255,10 +267,10 @@ object_depot_store(object_depot *depot, void *object)
 
 
 void
-object_depot_make_empty(object_depot *depot)
+object_depot_make_empty(object_depot* depot)
 {
 	for (int i = 0; i < smp_get_num_cpus(); i++) {
-		depot_cpu_store *store = &depot->stores[i];
+		depot_cpu_store* store = &depot->stores[i];
 
 		RecursiveLocker _(store->lock);
 

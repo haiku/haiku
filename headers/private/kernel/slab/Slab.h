@@ -26,37 +26,38 @@ enum {
 	CACHE_DURING_BOOT		= 1 << 31
 };
 
-typedef struct object_cache object_cache;
+struct ObjectCache;
+typedef struct ObjectCache object_cache;
 
-typedef status_t (*object_cache_constructor)(void *cookie, void *object);
-typedef void (*object_cache_destructor)(void *cookie, void *object);
-typedef void (*object_cache_reclaimer)(void *cookie, int32 level);
+typedef status_t (*object_cache_constructor)(void* cookie, void* object);
+typedef void (*object_cache_destructor)(void* cookie, void* object);
+typedef void (*object_cache_reclaimer)(void* cookie, int32 level);
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-object_cache *create_object_cache(const char *name, size_t object_size,
-	size_t alignment, void *cookie, object_cache_constructor constructor,
+object_cache* create_object_cache(const char* name, size_t object_size,
+	size_t alignment, void* cookie, object_cache_constructor constructor,
 	object_cache_destructor);
-object_cache *create_object_cache_etc(const char *name, size_t object_size,
-	size_t alignment, size_t max_byte_usage, uint32 flags, void *cookie,
+object_cache* create_object_cache_etc(const char* name, size_t object_size,
+	size_t alignment, size_t max_byte_usage, uint32 flags, void* cookie,
 	object_cache_constructor constructor, object_cache_destructor destructor,
 	object_cache_reclaimer reclaimer);
 
-void delete_object_cache(object_cache *cache);
+void delete_object_cache(object_cache* cache);
 
-status_t object_cache_set_minimum_reserve(object_cache *cache,
+status_t object_cache_set_minimum_reserve(object_cache* cache,
 	size_t objectCount);
 
-void *object_cache_alloc(object_cache *cache, uint32 flags);
-void object_cache_free(object_cache *cache, void *object);
+void* object_cache_alloc(object_cache* cache, uint32 flags);
+void object_cache_free(object_cache* cache, void* object);
 
-status_t object_cache_reserve(object_cache *cache, size_t object_count,
+status_t object_cache_reserve(object_cache* cache, size_t object_count,
 	uint32 flags);
 
-void object_cache_get_usage(object_cache *cache, size_t *_allocatedMemory);
+void object_cache_get_usage(object_cache* cache, size_t* _allocatedMemory);
 
 #ifdef __cplusplus
 }
