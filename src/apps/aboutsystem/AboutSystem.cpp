@@ -874,7 +874,7 @@ AboutView::_CreateCreditsView()
 		"Hartmut Reh\n"
 		"Daniel Reinhold\n"
 		"Chris Roberts\n"
-		"Samuel Rodriguez Perez\n"
+		"Samuel Rodríguez Pérez\n"
 		"Thomas Roell\n"
 		"Rafael Romo\n"
 		"Ralf Schülke\n"
