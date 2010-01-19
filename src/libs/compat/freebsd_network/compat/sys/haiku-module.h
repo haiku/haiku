@@ -173,10 +173,35 @@ enum {
 
 #define HAIKU_DRIVER_REQUIRES(flag) (__haiku_driver_requirements & (flag))
 
+
+/* #pragma mark - firmware loading */
+
+
+/*
+ * Only needed to be specified in the glue code of drivers which actually need
+ * to load firmware. See iprowifi2100 for an example.
+ */
+
 extern const uint __haiku_firmware_version;
 
+/* Use 0 if driver doesn't care about firmware version. */
 #define HAIKU_FIRMWARE_VERSION(version) \
 	const uint __haiku_firmware_version = (version)
+
+extern const uint __haiku_firmware_parts_count;
+extern const char* __haiku_firmware_name_map[][2];
+
+#define HAIKU_FIRMWARE_NAME_MAP(firmwarePartsCount) \
+	const uint __haiku_firmware_parts_count = firmwarePartsCount; \
+	const char* __haiku_firmware_name_map[firmwarePartsCount][2]
+
+#define NO_HAIKU_FIRMWARE_NAME_MAP() \
+	const uint __haiku_firmware_parts_count = 0; \
+	const char* __haiku_firmware_name_map[0][2] = {NULL}
+
+
+/* #pragma mark - synchronization */
+
 
 #define HAIKU_INTR_REGISTER_STATE \
 	cpu_status __haiku_cpu_state = 0

@@ -18,13 +18,7 @@
 #include <StorageDefs.h>
 #include <SupportDefs.h>
 
-#include <driver_settings.h>
-#include <kernel/vm/vm.h>
-#include <syscalls.h>
-#include <vm_defs.h>
-
 #include <device.h>
-
 
 
 #define MAX_FBSD_FIRMWARE_NAME_CHARS 64
@@ -32,32 +26,36 @@
 	// NB: This constant doesn't exist in FreeBSD.
 
 
+static const char*
+getHaikuFirmwareName(const char* fbsdFirmwareName,
+	const char* unknownFirmwareName)
+{
+	int i;
+
+	if (__haiku_firmware_name_map == NULL)
+		return unknownFirmwareName;
+
+	for (i = 0; i < __haiku_firmware_parts_count; i++) {
+		if (strcmp(__haiku_firmware_name_map[i][0], fbsdFirmwareName) == 0)
+			return __haiku_firmware_name_map[i][1];
+	}
+	return unknownFirmwareName;
+}
+
+
 const struct firmware*
 firmware_get(const char* fbsdFirmwareName)
 {
-	area_id				area;
-	void*				driverSettings = NULL;
 	char*				fbsdFirmwareNameCopy = NULL;
 	int					fileDescriptor = 0;
 	struct firmware*	firmware = NULL;
 	int32				firmwareFileSize;
 	char*				firmwarePath = NULL;
 	const char*			haikuFirmwareName = NULL;
+	ssize_t				readCount = 0;
 
-	driverSettings = load_driver_settings(gDriverName);
-	if (driverSettings == NULL) {
-		driver_printf("%s: settings file %s is missing.\n", __func__,
-			gDriverName);
-		return NULL;
-	}
-
-	haikuFirmwareName = get_driver_parameter(driverSettings, fbsdFirmwareName,
-		NULL, NULL);
-	if (haikuFirmwareName == NULL) {
-		driver_printf("%s: settings file %s file contains no mapping for %s.\n", 
-			__func__, gDriverName, fbsdFirmwareName);
-		goto cleanup;
-	}
+	haikuFirmwareName = getHaikuFirmwareName(fbsdFirmwareName,
+		fbsdFirmwareName);
 
 	firmwarePath = (char*)malloc(B_PATH_NAME_LENGTH);
 	if (firmwarePath == NULL)
@@ -88,12 +86,15 @@ firmware_get(const char* fbsdFirmwareName)
 	if (firmware == NULL)
 		goto cleanup;
 
-	firmware->data = NULL;
-	area = _user_map_file("mmap area", (void*)&firmware->data, B_ANY_ADDRESS,
-		firmwareFileSize, B_READ_AREA, REGION_PRIVATE_MAP, true, fileDescriptor,
-		0);
-	if (area < 0)
+	firmware->data = malloc(firmwareFileSize);
+	if (firmware->data == NULL)
 		goto cleanup;
+
+	readCount = read(fileDescriptor, (void*)firmware->data, firmwareFileSize);
+	if (readCount == -1 || readCount < firmwareFileSize) {
+		free((void*)firmware->data);
+		goto cleanup;
+	}
 
 	firmware->datasize = firmwareFileSize;
 	firmware->name = fbsdFirmwareNameCopy;
@@ -101,7 +102,6 @@ firmware_get(const char* fbsdFirmwareName)
 
 	close(fileDescriptor);
 	free(firmwarePath);
-	unload_driver_settings(driverSettings);
 	return firmware;
 
 cleanup:
@@ -113,8 +113,6 @@ cleanup:
 		free(firmwarePath);
 	if (fileDescriptor)
 		close(fileDescriptor);
-	if (driverSettings)
-		unload_driver_settings(driverSettings);
 	return NULL;
 }
 
@@ -125,7 +123,8 @@ firmware_put(const struct firmware* firmware, int flags)
 	if (firmware == NULL)
 		return;
 
-	_user_unmap_memory((void*)firmware->data, firmware->datasize);
+	if (firmware->data)
+		free((void*)firmware->data);
 	if (firmware->name)
 		free((void*)firmware->name);
 	free((void*)firmware);
