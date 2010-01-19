@@ -5,7 +5,7 @@
 // constructor
 FSObject::FSObject()
 	:
-	BReferenceable(),
+	BReferenceable(false),
 	fRemoved(false)
 {
 }
