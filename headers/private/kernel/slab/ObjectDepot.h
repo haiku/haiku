@@ -2,8 +2,8 @@
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _SLAB_DEPOT_H_
-#define _SLAB_DEPOT_H_
+#ifndef _SLAB_OBJECT_DEPOT_H_
+#define _SLAB_OBJECT_DEPOT_H_
 
 
 #include <lock.h>
@@ -37,4 +37,4 @@ void object_depot_make_empty(object_depot *depot);
 }
 #endif
 
-#endif	/* _SLAB_DEPOT_H_ */
+#endif	/* _SLAB_OBJECT_DEPOT_H_ */

@@ -6,14 +6,15 @@
  *      Hugo Santos, hugosantos@gmail.com
  */
 
-#include <Slab.h>
-
-#include "slab_private.h"
+#include <slab/Slab.h>
 
 #include <kernel.h> // for ROUNDUP
 
 #include <stdio.h>
 #include <string.h>
+
+#include "slab_private.h"
+
 
 #define DEBUG_ALLOCATOR
 //#define TEST_ALL_CACHES_DURING_BOOT
