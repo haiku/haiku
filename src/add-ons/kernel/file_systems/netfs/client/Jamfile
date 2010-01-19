@@ -27,7 +27,7 @@ if $(NETFS_ADD_SERVER_LOCALHOST) {
 	DEFINES += ADD_SERVER_LOCALHOST=$(NETFS_ADD_SERVER_LOCALHOST) ;
 }
 
-Addon <test>netfs
+Addon netfs
 	: DebugSupport.cpp
 #	  Locker.cpp
 	  ObjectTracker.cpp
