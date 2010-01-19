@@ -22,6 +22,7 @@ enum {
 	CACHE_DONT_SLEEP		= 1 << 8,
 
 	/* internal */
+	CACHE_ALIGN_ON_SIZE		= 1 << 30,
 	CACHE_DURING_BOOT		= 1 << 31
 };
 

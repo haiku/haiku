@@ -45,8 +45,6 @@
 #include <debug_paranoia.h>
 
 
-#define CACHE_ALIGN_ON_SIZE	(30 << 1)
-
 static const size_t kCacheColorPeriod = 8;
 
 struct object_link {
