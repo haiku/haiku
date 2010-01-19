@@ -3817,7 +3817,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 
 		// All went fine, all there is left to do is to map the page into the
 		// address space.
-		TPF(PageFaultDone(area->id, context.topCache, context.page->cache,
+		TPF(PageFaultDone(area->id, context.topCache, context.page->Cache(),
 			context.page));
 
 		// If the page doesn't reside in the area's cache, we need to make sure
