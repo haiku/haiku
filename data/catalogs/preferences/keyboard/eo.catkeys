@@ -4,9 +4,9 @@ Written by Andrew Edward McCall	KeyboardApplication		Skribita per Andrew Edward 
 Typing test area	KeyboardView		Tajpada provejo
 Defaults	KeyboardWindow		Aprioraj
 Key repeat rate	KeyboardView		Klavripeta rapideco
-Revert	KeyboardWindow		Malfaru
+Revert	KeyboardWindow		Malfari
 Delay until key repeat	KeyboardView		Malfruo antaŭ klavripeto
-OK	KeyboardApplication		Daŭrigu
+OK	KeyboardApplication		Daŭrigi
 Fast	KeyboardView		Rapida
 Slow	KeyboardView		Malrapida
 Something has gone wrong!	KeyboardApplication		Io malbona okazis!

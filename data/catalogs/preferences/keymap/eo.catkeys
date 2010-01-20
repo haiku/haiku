@@ -2,20 +2,20 @@
 Tilde trigger	Keymap window		Tildo
 Grave trigger	Keymap window		Maldekstra korno
 Select dead keys	Keymap window		Elektu senpaŝajn klavojn
-Quit	Keymap window		Finu
+Quit	Keymap window		Aliri
+Switch shortcut keys to Haiku mode	Keymap window		Ŝparvojklavoj laŭ Haiku
 Circumflex trigger	Keymap window		Ĉapelo
 Diaeresis trigger	Keymap window		Dupunkto
-Open…	Keymap window		Malfermu…
+Open…	Keymap window		Malfermi…
 System:	Keymap window		Sistemo:
 Switch shortcut keys	Keymap window		Ŝparvojklavoj
 User:	Keymap window		Uzanto:
-Switch shortcut keys to Haiku mode	Keymap window		Ŝparvojklavoj laŭ Haiku
 Keymap	Keymap window		Klavara aranĝo
 Sample and clipboard:	Keymap window		Ekzemplo kaj poŝo:
 Layout	Keymap window		Aranĝo
 Switch shortcut keys to Windows/Linux mode	Keymap window		Ŝparvojklavoj laŭ Linukso/Vindozo
-Revert	Keymap window		Malfaru
-Save as…	Keymap window		Registru kiel…
+Revert	Keymap window		Malfari
+Save as…	Keymap window		Konservi kiel…
 File	Keymap window		Dosiero
 (Current)	Keymap window		(Ŝaltita)
 Font	Keymap window		Tiparo

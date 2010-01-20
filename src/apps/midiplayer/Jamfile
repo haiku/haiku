@@ -7,7 +7,16 @@ Application MidiPlayer :
 	MidiPlayerWindow.cpp 
 	ScopeView.cpp
 	SynthBridge.cpp
-	: be midi midi2 $(TARGET_LIBSUPC++)
+	: be midi midi2 $(TARGET_LIBSUPC++) liblocale.so
 	: MidiPlayer.rdef
 ;
 
+DoCatalogs MidiPlayer :
+	x-vnd.Haiku-MidiPlayer
+	:
+	MidiPlayerApp.cpp 
+	MidiPlayerWindow.cpp 
+	ScopeView.cpp
+	: en.catalog
+	: eo.catkeys
+	;

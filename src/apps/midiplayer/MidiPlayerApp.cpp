@@ -21,15 +21,20 @@
  */
 
 #include <Alert.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <StorageKit.h>
 
 #include "MidiPlayerApp.h"
 #include "MidiPlayerWindow.h"
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Main Application"
 
 MidiPlayerApp::MidiPlayerApp()
 	: BApplication(MIDI_PLAYER_SIGNATURE)
 {
+	be_locale->GetAppCatalog(&fCatalog);
 	window = new MidiPlayerWindow;
 }
 
@@ -46,10 +51,10 @@ MidiPlayerApp::AboutRequested()
 {
 	(new BAlert(
 		NULL,
-		"Haiku MIDI Player 1.0.0 beta\n\n"
+		TR_CMT("Haiku MIDI Player 1.0.0 beta\n\n"
 		"This tiny program\n"
 		"Knows how to play thousands of\n"
-		"Cheesy sounding songs",
+		"Cheesy sounding songs", "This is a haiku. First line has five syllables, second has seven and last has five again. Create your own."),
 		"Okay", NULL, NULL,
 		B_WIDTH_AS_USUAL, B_INFO_ALERT))->Go();
 }

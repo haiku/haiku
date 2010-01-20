@@ -20,10 +20,16 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <Synth.h>
 #include <Window.h>
 
 #include "ScopeView.h"
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Scope View"
+
 
 //------------------------------------------------------------------------------
 
@@ -180,7 +186,7 @@ void ScopeView::DrawLoading()
 
 void ScopeView::DrawNoFile()
 {
-	DrawText("Drop MIDI file here");
+	DrawText(TR("Drop MIDI file here"));
 }
 
 //------------------------------------------------------------------------------

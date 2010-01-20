@@ -20,9 +20,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <Catalog.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <MidiProducer.h>
 #include <MidiRoster.h>
 #include <StorageKit.h>
@@ -36,10 +38,13 @@
 #define _W(a) (a->Frame().Width())
 #define _H(a) (a->Frame().Height())
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Main Window"
+
 //------------------------------------------------------------------------------
 
 MidiPlayerWindow::MidiPlayerWindow()
-	: BWindow(BRect(0, 0, 1, 1), "MidiPlayer", B_TITLED_WINDOW, 
+	: BWindow(BRect(0, 0, 1, 1), TR("MidiPlayer"), B_TITLED_WINDOW, 
 	          B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	playing = false;
@@ -188,11 +193,11 @@ void MidiPlayerWindow::CreateInputMenu()
 	msg->what = MSG_INPUT_CHANGED;
 	msg->AddInt32("id", -1);
 
-	inputOff = new BMenuItem("Off", msg);
+	inputOff = new BMenuItem(TR("Off"), msg);
 
 	inputPopUp->AddItem(inputOff);
 
-	inputMenu = new BMenuField("Live input:", inputPopUp, NULL);
+	inputMenu = new BMenuField(TR("Live input:"), inputPopUp, NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -202,22 +207,22 @@ void MidiPlayerWindow::CreateReverbMenu()
 	BPopUpMenu* reverbPopUp = new BPopUpMenu("reverbPopUp");
 
 	reverbNone = new BMenuItem(
-		"None", new BMessage(MSG_REVERB_NONE));
+		TR("None"), new BMessage(MSG_REVERB_NONE));
 
 	reverbCloset = new BMenuItem(
-		"Closet", new BMessage(MSG_REVERB_CLOSET));
+		TR("Closet"), new BMessage(MSG_REVERB_CLOSET));
 
 	reverbGarage = new BMenuItem(
-		"Garage", new BMessage(MSG_REVERB_GARAGE));
+		TR("Garage"), new BMessage(MSG_REVERB_GARAGE));
 
 	reverbIgor = new BMenuItem(
-		"Igor's lab", new BMessage(MSG_REVERB_IGOR));
+		TR("Igor's lab"), new BMessage(MSG_REVERB_IGOR));
 
 	reverbCavern = new BMenuItem(
-		"Cavern", new BMessage(MSG_REVERB_CAVERN));
+		TR("Cavern"), new BMessage(MSG_REVERB_CAVERN));
 
 	reverbDungeon = new BMenuItem(
-		"Dungeon", new BMessage(MSG_REVERB_DUNGEON));
+		TR("Dungeon"), new BMessage(MSG_REVERB_DUNGEON));
 
 	reverbPopUp->AddItem(reverbNone);
 	reverbPopUp->AddItem(reverbCloset);
@@ -226,7 +231,7 @@ void MidiPlayerWindow::CreateReverbMenu()
 	reverbPopUp->AddItem(reverbCavern);
 	reverbPopUp->AddItem(reverbDungeon);
 
-	reverbMenu = new BMenuField("Reverb:", reverbPopUp, NULL);
+	reverbMenu = new BMenuField(TR("Reverb:"), reverbPopUp, NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -236,7 +241,7 @@ void MidiPlayerWindow::CreateViews()
 	// Set up needed views
 	scopeView = new ScopeView;
 
-	showScope = new BCheckBox("showScope", "Scope",
+	showScope = new BCheckBox("showScope", TR("Scope"),
 		new BMessage(MSG_SHOW_SCOPE));
 	showScope->SetValue(B_CONTROL_ON);
 
@@ -249,7 +254,7 @@ void MidiPlayerWindow::CreateViews()
 	volumeSlider->UseFillColor(true, &col);
 	volumeSlider->SetModificationMessage(new BMessage(MSG_VOLUME));
 
-	playButton = new BButton("playButton", "Play", new BMessage(MSG_PLAY_STOP));
+	playButton = new BButton("playButton", TR("Play"), new BMessage(MSG_PLAY_STOP));
 	playButton->SetEnabled(false);
 
 	BBox* divider = new BBox(B_EMPTY_STRING, B_WILL_DRAW | B_FRAME_EVENTS,
@@ -257,7 +262,7 @@ void MidiPlayerWindow::CreateViews()
 	divider->SetExplicitMaxSize(
 		BSize(B_SIZE_UNLIMITED, 1));
 
-	BStringView* volumeLabel = new BStringView(NULL, "Volume:");
+	BStringView* volumeLabel = new BStringView(NULL, TR("Volume:"));
 	volumeLabel->SetAlignment(B_ALIGN_LEFT);
 	volumeLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
@@ -381,7 +386,7 @@ void MidiPlayerWindow::LoadFile(entry_ref* ref)
 		synth.SetVolume(volume / 100.0f);
 
 		playButton->SetEnabled(true);
-		playButton->SetLabel("Stop");
+		playButton->SetLabel(TR("Stop"));
 		scopeView->SetHaveFile(true);
 		scopeView->SetPlaying(true);
 		scopeView->Invalidate();
@@ -391,13 +396,13 @@ void MidiPlayerWindow::LoadFile(entry_ref* ref)
 	else
 	{
 		playButton->SetEnabled(false);
-		playButton->SetLabel("Play");
+		playButton->SetLabel(TR("Play"));
 		scopeView->SetHaveFile(false);
 		scopeView->SetPlaying(false);
 		scopeView->Invalidate();
 
 		(new BAlert(
-			NULL, "Could not load song", "OK", NULL, NULL,
+			NULL, TR("Could not load song"), TR("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 	}
 }
@@ -441,7 +446,7 @@ void MidiPlayerWindow::StopHook()
 	scopeView->SetPlaying(false);
 	scopeView->Invalidate();
 	playButton->SetEnabled(true);
-	playButton->SetLabel("Play");
+	playButton->SetLabel(TR("Play"));
 	
 	Unlock();
 }
@@ -461,7 +466,7 @@ void MidiPlayerWindow::OnPlayStop()
 	}
 	else
 	{
-		playButton->SetLabel("Stop");
+		playButton->SetLabel(TR("Stop"));
 		scopeView->SetPlaying(true);
 		scopeView->Invalidate();
 

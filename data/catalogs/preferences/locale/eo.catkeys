@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Locale	1007621035
+1	esperanto	x-vnd.Haiku-Locale	1551394073
 Day in month (2 digits)	TimeFormatSettings		Tago de monato (2 ciferoj)
 Available languages	Locale Preflet Window		Haveblaj lingvoj
 Day of week (name)	TimeFormatSettings		Tago de monato (nomo)
@@ -25,21 +25,22 @@ Symbol position	TimeFormatSettings		Signa pozicio
 Day of week (short name)	TimeFormatSettings		Tago de semajno (mallonga nomo)
 Numbers	TimeFormatSettings		Numeroj
 24 hour	TimeFormatSettings		24 hora
- (unknown format)	TimeFormatSettings		 (nekonita aranĝo)
+ (unknown format)	TimeFormatSettings		 (nekona formato)
 Negative marker:	TimeFormatSettings		Negativa marko:
 Day in month	TimeFormatSettings		Tago de monato
+OK	Locale Preflet Window		Daŭrigi
 Defaults	Locale Preflet Window		Aprioraj
+Month	TimeFormatSettings		Monato
 Separator	TimeFormatSettings		Apartigosigno
 Country	Locale Preflet Window		Lando
 Month number (2 digits)	TimeFormatSettings		Monata numero (2 ciferoj)
-Revert	Locale Preflet Window		Malfaru
+Revert	Locale Preflet Window		Malfari
 Negative marker	TimeFormatSettings		Negativa marko
-OK	Locale Preflet Window		Daŭrigu
 Day of week	TimeFormatSettings		Tago de semajno
 List separator: 	TimeFormatSettings		Lista apartigosigno:
+12 hour	TimeFormatSettings		12 hora
 Time	TimeFormatSettings		Horo
 Date	TimeFormatSettings		Dato
-12 hour	TimeFormatSettings		12 hora
 Locale	Locale Preflet		Lokaĵaro
 None	TimeFormatSettings		Neniu
 Clock	TimeFormatSettings		Horloĝo
