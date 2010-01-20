@@ -453,6 +453,16 @@ BLocaleRoster::GetDefaultCountry(BCountry **country) const
 }
 
 
+status_t
+BLocaleRoster::GetLanguage(BLanguage **language, BString languageCode) const
+{
+	if (!language)
+		return B_BAD_VALUE;
+	*language = new(std::nothrow) BLanguage(languageCode);
+	return B_OK;
+}
+
+
 void
 BLocaleRoster::SetDefaultCountry(BCountry * newDefault) const
 {

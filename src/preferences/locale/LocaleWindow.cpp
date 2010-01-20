@@ -344,22 +344,22 @@ LocaleWindow::LocaleWindow()
 		if (be_locale_roster->GetInstalledLanguages(&installedLanguages)
 				== B_OK) {
 
-			BString currentLanguage;
+			BString currentLanguageCode;
+			BString currentLanguageName;
 			for (int i = 0; installedLanguages.FindString("langs",
-					i, &currentLanguage) == B_OK; i++) {
+					i, &currentLanguageCode) == B_OK; i++) {
 
 				// Now get an human-readable, loacalized name for each language
 				// TODO: sort them using collators.
-				Locale currentLocale
-					= Locale::createFromName(currentLanguage.String());
-				UnicodeString languageFullName;
-				BString str;
-				BStringByteSink bbs(&str);
-				currentLocale.getDisplayName(currentLocale, languageFullName);
-				languageFullName.toUTF8(bbs);
-				LanguageListItem* si
-					= new LanguageListItem(str, currentLanguage.String());
+				BLanguage* currentLanguage;
+				be_locale_roster->GetLanguage(&currentLanguage,
+					currentLanguageCode.String());
+				currentLanguageName.Truncate(0);
+				currentLanguage->GetName(&currentLanguageName);
+				LanguageListItem* si = new LanguageListItem(currentLanguageName,
+					currentLanguageCode.String());
 				fLanguageListView->AddItem(si);
+				delete currentLanguage;
 			}
 
 			fLanguageListView->SortItems(compare_list_items);

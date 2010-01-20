@@ -8,8 +8,16 @@
 #define _LANGUAGE_H_
 
 
+#include <String.h>
 #include <SupportDefs.h>
 #include <LocaleStrings.h>
+
+
+// We must not include the icu headers in there as it could mess up binary
+// compatibility.
+namespace icu_4_2 {
+	class Locale;
+}
 
 
 enum script_direction {
@@ -24,11 +32,9 @@ class BLanguage {
 		~BLanguage();
 
 		// language name, e.g. "english", "deutsch"
-		const char *Name() const { return fName; }
+		status_t GetName(BString* name);
 		// ISO-639 language code, e.g. "en", "de"
-		const char *Code() const { return fCode; }
-		// ISO-639 language family, e.g. "germanic"
-		const char *Family() const { return fFamily; }
+		const char* Code();
 
 		uint8 Direction() const;
 
@@ -41,8 +47,9 @@ class BLanguage {
 		BLanguage(const char *language);
 		void Default();
 
-		char	*fName, *fCode, *fFamily, *fStrings[B_NUM_LANGUAGE_STRINGS];
+		char	*fStrings[B_NUM_LANGUAGE_STRINGS];
 		uint8	fDirection;
+		icu_4_2::Locale* fICULocale;
 };
 
 #endif	/* _LANGUAGE_H_ */

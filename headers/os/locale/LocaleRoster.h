@@ -41,6 +41,8 @@ class BLocaleRoster {
 		status_t GetDefaultCountry(BCountry **) const;
 		void SetDefaultCountry(BCountry *) const;
 
+		status_t GetLanguage(BLanguage** language, BString languageCode) const;
+
 		status_t GetPreferredLanguages(BMessage *) const;
 		status_t SetPreferredLanguages(BMessage *);
 			// the message contains one or more 'language'-string-fields
