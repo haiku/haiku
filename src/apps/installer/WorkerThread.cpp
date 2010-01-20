@@ -10,6 +10,7 @@
 
 #include <Alert.h>
 #include <Autolock.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>
@@ -29,6 +30,9 @@
 #include "PartitionMenuItem.h"
 #include "ProgressReporter.h"
 #include "UnzipEngine.h"
+
+
+#define TR_CONTEXT "InstallProgress"
 
 
 //#define COPY_TRACE
@@ -76,7 +80,8 @@ private:
 
 
 WorkerThread::WorkerThread(InstallerWindow *window)
-	: BLooper("copy_engine"),
+	:
+	BLooper("copy_engine"),
 	fWindow(window),
 	fPackages(NULL),
 	fSpaceRequired(0),
@@ -100,8 +105,8 @@ WorkerThread::MessageReceived(BMessage* message)
 		{
 			int32 id;
 			if (message->FindInt32("id", &id) != B_OK) {
-				_SetStatusMessage("Boot sector not written because of an "
-					" internal error.");
+				_SetStatusMessage(TR("Boot sector not written because of an "
+					" internal error."));
 				break;
 			}
 
@@ -113,32 +118,34 @@ WorkerThread::MessageReceived(BMessage* message)
 			if (fDDRoster.GetPartitionWithID(id, &device, &partition) == B_OK) {
 				if (!partition->IsMounted()) {
 					if (partition->Mount() < B_OK) {
-						_SetStatusMessage("The partition can't be mounted. "
-							"Please choose a different partition.");
+						_SetStatusMessage(TR("The partition can't be mounted. "
+							"Please choose a different partition."));
 						break;
 					}
 				}
 				if (partition->GetMountPoint(&targetDirectory) != B_OK) {
-					_SetStatusMessage("The mount point could not be retrieve.");
+					_SetStatusMessage(TR("The mount point could not be "
+						"retrieve."));
 					break;
 				}
 			} else if (fDDRoster.GetDeviceWithID(id, &device) == B_OK) {
 				if (!device.IsMounted()) {
 					if (device.Mount() < B_OK) {
-						_SetStatusMessage("The disk can't be mounted. Please "
-							"choose a different disk.");
+						_SetStatusMessage(TR("The disk can't be mounted. "
+							"Please choose a different disk."));
 						break;
 					}
 				}
 				if (device.GetMountPoint(&targetDirectory) != B_OK) {
-					_SetStatusMessage("The mount point could not be retrieve.");
+					_SetStatusMessage(TR("The mount point could not be "
+						"retrieve."));
 					break;
 				}
 			}
 
 			_LaunchFinishScript(targetDirectory);
 			// TODO: Get error from executing script!
-			_SetStatusMessage("Boot sector successfully written.");
+			_SetStatusMessage(TR("Boot sector successfully written."));
 		}
 		default:
 			BLooper::MessageReceived(message);
@@ -216,7 +223,7 @@ WorkerThread::_LaunchInitScript(BPath &path)
 	command += "\"";
 	command += path.Path();
 	command += "\"";
-	_SetStatusMessage("Starting Installation.");
+	_SetStatusMessage(TR("Starting Installation."));
 	system(command.String());
 }
 
@@ -232,7 +239,7 @@ WorkerThread::_LaunchFinishScript(BPath &path)
 	command += "\"";
 	command += path.Path();
 	command += "\"";
-	_SetStatusMessage("Finishing Installation.");
+	_SetStatusMessage(TR("Finishing Installation."));
 	system(command.String());
 }
 
@@ -250,6 +257,8 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	status_t err = B_OK;
 	int32 entries = 0;
 	entry_ref testRef;
+	const char* mountError = TR("The disk can't be mounted. Please choose "
+		"a different disk.");
 
 	BMessenger messenger(fWindow);
 	ProgressReporter reporter(messenger, new BMessage(MSG_STATUS_MESSAGE));
@@ -265,12 +274,11 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	// check if target is initialized
 	// ask if init or mount as is
-
-	if (fDDRoster.GetPartitionWithID(targetItem->ID(), &device, &partition) == B_OK) {
+	if (fDDRoster.GetPartitionWithID(targetItem->ID(), &device,
+			&partition) == B_OK) {
 		if (!partition->IsMounted()) {
 			if ((err = partition->Mount()) < B_OK) {
-				_SetStatusMessage("The disk can't be mounted. Please choose a "
-					"different disk.");
+				_SetStatusMessage(mountError);
 				ERR("BPartition::Mount");
 				goto error;
 			}
@@ -286,8 +294,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	} else if (fDDRoster.GetDeviceWithID(targetItem->ID(), &device) == B_OK) {
 		if (!device.IsMounted()) {
 			if ((err = device.Mount()) < B_OK) {
-				_SetStatusMessage("The disk can't be mounted. Please choose a "
-					"different disk.");
+				_SetStatusMessage(mountError);
 				ERR("BDiskDevice::Mount");
 				goto error;
 			}
@@ -305,9 +312,9 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	// check if target has enough space
 	if ((fSpaceRequired > 0 && targetVolume.FreeBytes() < fSpaceRequired)
-		&& ((new BAlert("", "The destination disk may not have enough space. "
-			"Try choosing a different disk or choose to not install optional "
-			"items.", "Try installing anyway", "Cancel", 0,
+		&& ((new BAlert("", TR("The destination disk may not have enough "
+			"space. Try choosing a different disk or choose to not install "
+			"optional items."), TR("Try installing anyway"), TR("Cancel"), 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		goto error;
 	}
@@ -327,16 +334,16 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	// check not installing on itself
 	if (strcmp(srcDirectory.Path(), targetDirectory.Path()) == 0) {
-		_SetStatusMessage("You can't install the contents of a disk onto "
-			"itself. Please choose a different disk.");
+		_SetStatusMessage(TR("You can't install the contents of a disk onto "
+			"itself. Please choose a different disk."));
 		goto error;
 	}
 
 	// check not installing on boot volume
 	if ((strncmp(BOOT_PATH, targetDirectory.Path(), strlen(BOOT_PATH)) == 0)
-		&& ((new BAlert("", "Are you sure you want to install onto the "
+		&& ((new BAlert("", TR("Are you sure you want to install onto the "
 			"current boot disk? The Installer will have to reboot your "
-			"machine if you proceed.", "OK", "Cancel", 0,
+			"machine if you proceed."), TR("OK"), TR("Cancel"), 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		_SetStatusMessage("Installation stopped.");
 		goto error;
@@ -363,13 +370,13 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	}
 	
 	if (entries != 0
-		&& ((new BAlert("", "The target volume is not empty. Are you sure you "
+		&& ((new BAlert("", TR("The target volume is not empty. Are you sure you "
 			"want to install anyway?\n\nNote: The 'system' folder will be a "
 			"clean copy from the source volume, all other folders will be "
 			"merged, whereas files and links that exist on both the source "
 			"and target volume will be overwritten with the source volume "
-			"version.",
-			"Install anyway", "Cancel", 0,
+			"version."),
+			TR("Install anyway"), TR("Cancel"), 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		// TODO: Would be cool to offer the option here to clean additional
 		// folders at the user's choice (like /boot/common and /boot/develop).
@@ -448,7 +455,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 error:
 	BMessage statusMessage(MSG_RESET);
 	if (err == B_CANCELED)
-		_SetStatusMessage("Installation canceled.");
+		_SetStatusMessage(TR("Installation canceled."));
 	else
 		statusMessage.AddInt32("error", err);
 	ERR("_PerformInstall failed");
@@ -520,7 +527,7 @@ make_partition_label(BPartition* partition, char* label, char* menuLabel,
 	if (showContentType) {
 		const char* type = partition->ContentType();
 		if (type == NULL)
-			type = "Unknown Type";
+			type = TR_CMT("Unknown Type", "Partition content type");
 
 		sprintf(label, "%s - %s [%s] (%s)", partition->ContentName(), size,
 			path.Path(), type);
@@ -554,7 +561,8 @@ SourceVisitor::Visit(BPartition *partition, int32 level)
 	BPath path;
 	if (partition->GetPath(&path) == B_OK)
 		printf("SourceVisitor::Visit(BPartition *) : %s\n", path.Path());
-	printf("SourceVisitor::Visit(BPartition *) : %s\n", partition->ContentName());
+	printf("SourceVisitor::Visit(BPartition *) : %s\n",
+		partition->ContentName());
 
 	if (partition->ContentType() == NULL)
 		return false;

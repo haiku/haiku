@@ -1,11 +1,17 @@
 /*
- * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
- *  All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "ProgressReporter.h"
 
 #include <stdio.h>
+
+#include <Catalog.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "InstallProgress"
 
 
 ProgressReporter::ProgressReporter(const BMessenger& messenger,
@@ -42,7 +48,7 @@ ProgressReporter::Reset()
 
 	if (fMessage) {
 		BMessage message(*fMessage);
-		message.AddString("status", "Collecting copy information.");
+		message.AddString("status", TR("Collecting copy information."));
 		fMessenger.SendMessage(&message);
 	}
 }
@@ -66,7 +72,7 @@ ProgressReporter::StartTimer()
 
 	if (fMessage) {
 		BMessage message(*fMessage);
-		message.AddString("status", "Performing installation.");
+		message.AddString("status", TR("Performing installation."));
 		fMessenger.SendMessage(&message);
 	}
 }

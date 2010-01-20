@@ -6,6 +6,8 @@
 #define INSTALLER_APP_H
 
 #include <Application.h>
+#include <Catalog.h>
+
 #include "InstallerWindow.h"
 
 
@@ -19,6 +21,7 @@ public:
 
 private:
 			BWindow*			fEULAWindow;
+			BCatalog			fCatalog;
 };
 
 #endif // INSTALLER_APP_H

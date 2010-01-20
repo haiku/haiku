@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -21,40 +22,41 @@
 #include "InstallerWindow.h"
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "PackagesView"
+
 #define ICON_ATTRIBUTE "INSTALLER PACKAGE: ICON"
-
-void SizeAsString(off_t size, char *string);
-
 
 void
 SizeAsString(off_t size, char *string)
 {
 	double kb = size / 1024.0;
 	if (kb < 1.0) {
-		sprintf(string, "%Ld B", size);
+		sprintf(string, TR("%Ld B"), size);
 		return;
 	}
 	float mb = kb / 1024.0;
 	if (mb < 1.0) {
-		sprintf(string, "%3.1f KB", kb);
+		sprintf(string, TR("%3.1f KB"), kb);
 		return;
 	}
 	float gb = mb / 1024.0;
 	if (gb < 1.0) {
-		sprintf(string, "%3.1f MB", mb);
+		sprintf(string, TR("%3.1f MB"), mb);
 		return;
 	}
 	float tb = gb / 1024.0;
 	if (tb < 1.0) {
-		sprintf(string, "%3.1f GB", gb);
+		sprintf(string, TR("%3.1f GB"), gb);
 		return;
 	}
-	sprintf(string, "%.1f TB", tb);
+	sprintf(string, TR("%.1f TB"), tb);
 }
 
 
 Package::Package(const char *folder)
-	: Group(),
+	:
+	Group(),
 	fSize(0),
 	fIcon(NULL)
 {
@@ -115,7 +117,8 @@ Package::PackageFromEntry(BEntry &entry)
 	if (directory.GetAttrInfo(ICON_ATTRIBUTE, &info) == B_OK) {
 		char buffer[info.size];
 		BMessage msg;
-		if ((directory.ReadAttr(ICON_ATTRIBUTE, info.type, 0, buffer, info.size) == info.size)
+		if ((directory.ReadAttr(ICON_ATTRIBUTE, info.type, 0, buffer,
+				info.size) == info.size)
 			&& (msg.Unflatten(buffer) == B_OK)) {
 			package->SetIcon(new BBitmap(&msg));
 		}
@@ -145,7 +148,8 @@ Group::~Group()
 
 
 PackageCheckBox::PackageCheckBox(BRect rect, Package *item)
-	: BCheckBox(rect.OffsetBySelf(7, 0), "pack_cb", item->Name(), NULL),
+	:
+	BCheckBox(rect.OffsetBySelf(7, 0), "pack_cb", item->Name(), NULL),
 	fPackage(item)
 {
 }
@@ -189,7 +193,8 @@ PackageCheckBox::MouseMoved(BPoint point, uint32 transit,
 
 
 GroupView::GroupView(BRect rect, Group *group)
-	: BStringView(rect, "group", group->GroupName()),
+	:
+	BStringView(rect, "group", group->GroupName()),
 	fGroup(group)
 {
 	SetFont(be_bold_font);
@@ -206,13 +211,15 @@ GroupView::~GroupView()
 
 
 PackagesView::PackagesView(BRect rect, const char* name)
-	: BView(rect, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
+	:
+	BView(rect, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 }
 
 
 PackagesView::PackagesView(const char* name)
-	: BView(name, B_WILL_DRAW | B_FRAME_EVENTS)
+	:
+	BView(name, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 }
 
@@ -226,7 +233,7 @@ PackagesView::~PackagesView()
 void
 PackagesView::Clean()
 {
-	BView *view;
+	BView* view;
 	while ((view = ChildAt(0))) {
 		if (dynamic_cast<GroupView*>(view)
 			|| dynamic_cast<PackageCheckBox*>(view)) {
@@ -239,7 +246,7 @@ PackagesView::Clean()
 
 
 void
-PackagesView::AddPackages(BList &packages, BMessage *msg)
+PackagesView::AddPackages(BList& packages, BMessage* msg)
 {
 	int32 count = packages.CountItems();
 	BRect rect = Bounds();
@@ -249,18 +256,18 @@ PackagesView::AddPackages(BList &packages, BMessage *msg)
 	rect.top = 0;
 	BString lastGroup = "";
 	for (int32 i = 0; i < count; i++) {
-		void *item = packages.ItemAt(i);
-		Package *package = static_cast<Package *>(item);
+		void* item = packages.ItemAt(i);
+		Package* package = static_cast<Package*>(item);
 		if (lastGroup != BString(package->GroupName())) {
 			rect.OffsetBy(0, 1);
 			lastGroup = package->GroupName();
-			Group *group = new Group();
+			Group* group = new Group();
 			group->SetGroupName(package->GroupName());
 			GroupView *view = new GroupView(rect, group);
 			AddChild(view);
 			rect.OffsetBy(0, 17);
 		}
-		PackageCheckBox *checkBox = new PackageCheckBox(rect, package);
+		PackageCheckBox* checkBox = new PackageCheckBox(rect, package);
 		checkBox->SetValue(package->OnByDefault()
 			? B_CONTROL_ON : B_CONTROL_OFF);
 		checkBox->SetEnabled(!package->AlwaysOn());
@@ -274,12 +281,12 @@ PackagesView::AddPackages(BList &packages, BMessage *msg)
 
 
 void
-PackagesView::GetTotalSizeAsString(char *string)
+PackagesView::GetTotalSizeAsString(char* string)
 {
 	int32 count = CountChildren();
 	int32 size = 0;
 	for (int32 i = 0; i < count; i++) {
-		PackageCheckBox *cb = dynamic_cast<PackageCheckBox*>(ChildAt(i));
+		PackageCheckBox* cb = dynamic_cast<PackageCheckBox*>(ChildAt(i));
 		if (cb && cb->Value())
 			size += cb->GetPackage()->Size();
 	}
@@ -288,12 +295,12 @@ PackagesView::GetTotalSizeAsString(char *string)
 
 
 void
-PackagesView::GetPackagesToInstall(BList *list, int32 *size)
+PackagesView::GetPackagesToInstall(BList* list, int32* size)
 {
 	int32 count = CountChildren();
 	*size = 0;
 	for (int32 i = 0; i < count; i++) {
-		PackageCheckBox *cb = dynamic_cast<PackageCheckBox*>(ChildAt(i));
+		PackageCheckBox* cb = dynamic_cast<PackageCheckBox*>(ChildAt(i));
 		if (cb && cb->Value()) {
 			list->AddItem(cb->GetPackage());
 			*size += cb->GetPackage()->Size();
@@ -338,7 +345,7 @@ PackagesView::Draw(BRect updateRect)
 	if (CountChildren() > 0)
 		return;
 
-	be_control_look->DrawLabel(this, "No optional packages available.",
+	be_control_look->DrawLabel(this, TR("No optional packages available."),
 		Bounds(), updateRect, ViewColor(), BControlLook::B_DISABLED,
 		BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 }

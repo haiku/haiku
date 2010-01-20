@@ -12,5 +12,19 @@ Application Installer :
 	ProgressReporter.cpp
 	UnzipEngine.cpp
 	WorkerThread.cpp
-	: be tracker translation libshared.a $(TARGET_LIBSTDC++)
-	: Installer.rdef ;
+	: be tracker translation libshared.a $(TARGET_LIBSTDC++) liblocale.so
+	: Installer.rdef
+;
+
+DoCatalogs Installer :
+	x-vnd.Haiku-Installer
+	:
+	InstallerApp.cpp
+	InstallerWindow.cpp
+	PackageViews.cpp
+	ProgressReporter.cpp
+	WorkerThread.cpp
+	: en.catalog
+	: de.catkeys
+;
+
