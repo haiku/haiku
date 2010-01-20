@@ -2090,9 +2090,12 @@ vm_get_page_mapping(team_id team, addr_t vaddr, addr_t* paddr)
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
+	VMTranslationMap* map = addressSpace->TranslationMap();
+
+	map->Lock();
 	uint32 dummyFlags;
-	status_t status = addressSpace->TranslationMap()->Query(vaddr, paddr,
-		&dummyFlags);
+	status_t status = map->Query(vaddr, paddr, &dummyFlags);
+	map->Unlock();
 
 	addressSpace->Put();
 	return status;
