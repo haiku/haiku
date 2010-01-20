@@ -77,24 +77,22 @@ HashedObjectCache::Create(const char* name, size_t object_size,
 
 
 slab*
-HashedObjectCache::CreateSlab(uint32 flags, bool unlockWhileAllocating)
+HashedObjectCache::CreateSlab(uint32 flags)
 {
 	if (!check_cache_quota(this))
 		return NULL;
 
-	if (unlockWhileAllocating)
-		Unlock();
+	Unlock();
 
 	slab* slab = allocate_slab(flags);
 
-	if (unlockWhileAllocating)
-		Lock();
+	Lock();
 
 	if (slab == NULL)
 		return NULL;
 
 	void* pages;
-	if ((this->*allocate_pages)(&pages, flags, unlockWhileAllocating) == B_OK) {
+	if ((this->*allocate_pages)(&pages, flags) == B_OK) {
 		if (InitSlab(slab, pages, slab_size, flags))
 			return slab;
 

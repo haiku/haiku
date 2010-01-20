@@ -85,6 +85,8 @@ ObjectCache::Init(const char* name, size_t objectSize,
 	this->flags = flags;
 
 	resize_request = NULL;
+	resize_entry_can_wait = NULL;
+	resize_entry_dont_wait = NULL;
 
 	// no gain in using the depot in single cpu setups
 	if (smp_get_num_cpus() == 1)
@@ -295,8 +297,7 @@ ObjectCache::SetKernelArgs(kernel_args* args)
 
 
 status_t
-ObjectCache::AllocatePages(void** pages, uint32 flags,
-	bool unlockWhileAllocating)
+ObjectCache::AllocatePages(void** pages, uint32 flags)
 {
 	TRACE_CACHE(cache, "allocate pages (%lu, 0x0%lx)", slab_size, flags);
 
@@ -309,8 +310,7 @@ ObjectCache::AllocatePages(void** pages, uint32 flags,
 		&& slab_size != B_PAGE_SIZE)
 		addressSpec = B_ANY_KERNEL_BLOCK_ADDRESS;
 
-	if (unlockWhileAllocating)
-		Unlock();
+	Unlock();
 
 	// if we are allocating, it is because we need the pages immediatly
 	// so we lock them. when moving the slab to the empty list we should
@@ -320,8 +320,7 @@ ObjectCache::AllocatePages(void** pages, uint32 flags,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
 		(flags & CACHE_DONT_SLEEP) != 0 ? CREATE_AREA_DONT_WAIT : 0);
 
-	if (unlockWhileAllocating)
-		Lock();
+	Lock();
 
 	if (areaId < 0)
 		return areaId;
@@ -353,20 +352,17 @@ ObjectCache::FreePages(void* pages)
 
 
 status_t
-ObjectCache::EarlyAllocatePages(void** pages, uint32 flags,
-	bool unlockWhileAllocating)
+ObjectCache::EarlyAllocatePages(void** pages, uint32 flags)
 {
 	TRACE_CACHE(this, "early allocate pages (%lu, 0x0%lx)", slab_size,
 		flags);
 
-	if (unlockWhileAllocating)
-		Unlock();
+	Unlock();
 
 	addr_t base = vm_allocate_early(sKernelArgs, slab_size,
 		slab_size, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	if (unlockWhileAllocating)
-		Lock();
+	Lock();
 
 	*pages = (void*)base;
 

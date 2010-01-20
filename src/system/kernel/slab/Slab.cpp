@@ -316,16 +316,54 @@ increase_object_reserve(ObjectCache* cache)
 */
 static status_t
 object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
-	uint32 flags, bool unlockWhileAllocating)
+	uint32 flags)
 {
+	// If someone else is already adding slabs, we wait for that to be finished
+	// first.
+	while (true) {
+		if (objectCount <= cache->total_objects - cache->used_count)
+			return B_OK;
+
+		ObjectCacheResizeEntry* resizeEntry = NULL;
+		if (cache->resize_entry_dont_wait != NULL) {
+			resizeEntry = cache->resize_entry_dont_wait;
+		} else if (cache->resize_entry_can_wait != NULL
+				&& (flags & CACHE_DONT_SLEEP) == 0) {
+			resizeEntry = cache->resize_entry_can_wait;
+		} else
+			break;
+
+		ConditionVariableEntry entry;
+		resizeEntry->condition.Add(&entry);
+
+		cache->Unlock();
+		entry.Wait();
+		cache->Lock();
+	}
+
+	// prepare the resize entry others can wait on
+	ObjectCacheResizeEntry*& resizeEntry = (flags & CACHE_DONT_SLEEP) != 0
+		? cache->resize_entry_dont_wait : cache->resize_entry_can_wait;
+
+	ObjectCacheResizeEntry myResizeEntry;
+	resizeEntry = &myResizeEntry;
+	resizeEntry->condition.Init(cache, "wait for slabs");
+
+	// add new slabs until there are as many free ones as requested
 	while (objectCount > cache->total_objects - cache->used_count) {
-		slab* newSlab = cache->CreateSlab(flags, unlockWhileAllocating);
-		if (newSlab == NULL)
+		slab* newSlab = cache->CreateSlab(flags);
+		if (newSlab == NULL) {
+			resizeEntry->condition.NotifyAll();
+			resizeEntry = NULL;
 			return B_NO_MEMORY;
+		}
 
 		cache->empty.Add(newSlab);
 		cache->empty_count++;
 	}
+
+	resizeEntry->condition.NotifyAll();
+	resizeEntry = NULL;
 
 	return B_OK;
 }
@@ -422,7 +460,7 @@ object_cache_resizer(void*)
 		MutexLocker cacheLocker(cache->lock);
 
 		status_t error = object_cache_reserve_internal(cache,
-			cache->min_object_reserve, 0, true);
+			cache->min_object_reserve, 0);
 		if (error != B_OK) {
 			dprintf("object cache resizer: Failed to resize object cache "
 				"%p!\n", cache);
@@ -557,7 +595,7 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 
 	if (cache->partial.IsEmpty()) {
 		if (cache->empty.IsEmpty()) {
-			if (object_cache_reserve_internal(cache, 1, flags, false) < B_OK) {
+			if (object_cache_reserve_internal(cache, 1, flags) < B_OK) {
 				T(Alloc(cache, flags, NULL));
 				return NULL;
 			}
@@ -625,7 +663,7 @@ object_cache_reserve(object_cache* cache, size_t objectCount, uint32 flags)
 	T(Reserve(cache, objectCount, flags));
 
 	MutexLocker _(cache->lock);
-	return object_cache_reserve_internal(cache, objectCount, flags, false);
+	return object_cache_reserve_internal(cache, objectCount, flags);
 }
 
 

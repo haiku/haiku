@@ -40,13 +40,13 @@ SmallObjectCache::Create(const char* name, size_t object_size,
 
 
 slab*
-SmallObjectCache::CreateSlab(uint32 flags, bool unlockWhileAllocating)
+SmallObjectCache::CreateSlab(uint32 flags)
 {
 	if (!check_cache_quota(this))
 		return NULL;
 
 	void* pages;
-	if ((this->*allocate_pages)(&pages, flags, unlockWhileAllocating) != B_OK)
+	if ((this->*allocate_pages)(&pages, flags) != B_OK)
 		return NULL;
 
 	return InitSlab(slab_in_pages(pages, slab_size), pages,

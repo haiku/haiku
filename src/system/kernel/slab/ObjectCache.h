@@ -8,6 +8,7 @@
 #define OBJECT_CACHE_H
 
 
+#include <condition_variable.h>
 #include <lock.h>
 #include <slab/ObjectDepot.h>
 #include <slab/Slab.h>
@@ -31,6 +32,10 @@ struct slab : DoublyLinkedListLinkImpl<slab> {
 
 typedef DoublyLinkedList<slab> SlabList;
 
+struct ObjectCacheResizeEntry {
+	ConditionVariable	condition;
+};
+
 struct ObjectCache : DoublyLinkedListLinkImpl<ObjectCache> {
 			char				name[32];
 			mutex				lock;
@@ -53,13 +58,16 @@ struct ObjectCache : DoublyLinkedListLinkImpl<ObjectCache> {
 
 			ResizeRequest*		resize_request;
 
+			ObjectCacheResizeEntry* resize_entry_can_wait;
+			ObjectCacheResizeEntry* resize_entry_dont_wait;
+
 			void*				cookie;
 			object_cache_constructor constructor;
 			object_cache_destructor destructor;
 			object_cache_reclaimer reclaimer;
 
 			status_t			(ObjectCache::*allocate_pages)(void** pages,
-									uint32 flags, bool unlockWhileAllocating);
+									uint32 flags);
 			void				(ObjectCache::*free_pages)(void* pages);
 
 			object_depot		depot;
@@ -76,8 +84,7 @@ public:
 			void				InitPostArea();
 			void				Delete();
 
-	virtual	slab*				CreateSlab(uint32 flags,
-									bool unlockWhileAllocating) = 0;
+	virtual	slab*				CreateSlab(uint32 flags) = 0;
 	virtual	void				ReturnSlab(slab* slab) = 0;
 	virtual slab*				ObjectSlab(void* object) const = 0;
 
@@ -95,11 +102,9 @@ public:
 			void				Unlock()	{ mutex_unlock(&lock); }
 
 	static	void				SetKernelArgs(kernel_args* args);
-			status_t			AllocatePages(void** pages, uint32 flags,
-									bool unlockWhileAllocating);
+			status_t			AllocatePages(void** pages, uint32 flags);
 			void				FreePages(void* pages);
-			status_t			EarlyAllocatePages(void** pages, uint32 flags,
-									bool unlockWhileAllocating);
+			status_t			EarlyAllocatePages(void** pages, uint32 flags);
 			void				EarlyFreePages(void* pages);
 
 private:

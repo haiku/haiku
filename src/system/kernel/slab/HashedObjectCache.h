@@ -23,8 +23,7 @@ struct HashedObjectCache : ObjectCache {
 									object_cache_destructor destructor,
 									object_cache_reclaimer reclaimer);
 
-	virtual	slab*				CreateSlab(uint32 flags,
-									bool unlockWhileAllocating);
+	virtual	slab*				CreateSlab(uint32 flags);
 	virtual	void				ReturnSlab(slab* slab);
 	virtual slab*				ObjectSlab(void* object) const;
 
