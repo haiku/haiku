@@ -148,7 +148,7 @@ ObjectCache::Delete()
 
 
 slab*
-ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount)
+ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 {
 	TRACE_CACHE(this, "construct (%p, %p .. %p, %lu)", slab, pages,
 		((uint8*)pages) + byteCount, byteCount);
@@ -176,7 +176,7 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount)
 	for (size_t i = 0; i < slab->size; i++) {
 		bool failedOnFirst = false;
 
-		status_t status = PrepareObject(slab, data);
+		status_t status = PrepareObject(slab, data, flags);
 		if (status < B_OK)
 			failedOnFirst = true;
 		else if (constructor)
@@ -235,7 +235,7 @@ ObjectCache::UninitSlab(slab* slab)
 
 
 status_t
-ObjectCache::PrepareObject(slab* source, void* object)
+ObjectCache::PrepareObject(slab* source, void* object, uint32 flags)
 {
 	return B_OK;
 }

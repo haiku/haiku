@@ -6,14 +6,16 @@
  *      Hugo Santos, hugosantos@gmail.com
  */
 
-#include <slab/Slab.h>
 
-#include <kernel.h> // for ROUNDUP
+#include "slab_private.h"
 
 #include <stdio.h>
 #include <string.h>
 
-#include "slab_private.h"
+#include <kernel.h> // for ROUNDUP
+#include <slab/Slab.h>
+#include <vm/vm.h>
+#include <vm/VMAddressSpace.h>
 
 
 #define DEBUG_ALLOCATOR
@@ -74,7 +76,7 @@ size_to_index(size_t size)
 
 
 void *
-block_alloc(size_t size)
+block_alloc(size_t size, uint32 flags)
 {
 	int index = size_to_index(size + sizeof(boundary_tag));
 
@@ -83,10 +85,12 @@ block_alloc(size_t size)
 
 	if (index < 0) {
 		void *pages;
-		area_id area = create_area("alloc'ed block", &pages,
-			B_ANY_KERNEL_ADDRESS, ROUNDUP(size + sizeof(area_boundary_tag),
-				B_PAGE_SIZE), B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-		if (area < B_OK)
+		area_id area = create_area_etc(VMAddressSpace::KernelID(),
+			"alloc'ed block", &pages, B_ANY_KERNEL_ADDRESS,
+			ROUNDUP(size + sizeof(area_boundary_tag), B_PAGE_SIZE), B_FULL_LOCK,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
+			(flags & CACHE_DONT_SLEEP) != 0 ? CREATE_AREA_DONT_WAIT : 0);
+		if (area < 0)
 			return NULL;
 
 		area_boundary_tag *areaTag = (area_boundary_tag *)pages;
@@ -94,7 +98,7 @@ block_alloc(size_t size)
 		tag = &areaTag->tag;
 		block = areaTag + 1;
 	} else {
-		tag = (boundary_tag *)object_cache_alloc(sBlockCaches[index], 0);
+		tag = (boundary_tag *)object_cache_alloc(sBlockCaches[index], flags);
 		if (tag == NULL)
 			return NULL;
 		atomic_add(&sBlockCacheWaste[index], kBlockSizes[index] - size

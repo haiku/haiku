@@ -279,8 +279,7 @@ slab_internal_alloc(size_t size, uint32 flags)
 		return buffer;
 	}
 
-	// TODO: Support CACHE_DONT_SLEEP!
-	return block_alloc(size);
+	return block_alloc(size, flags);
 }
 
 

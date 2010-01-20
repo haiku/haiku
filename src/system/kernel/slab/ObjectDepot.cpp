@@ -12,6 +12,7 @@
 #include <algorithm>
 
 #include <int.h>
+#include <slab/Slab.h>
 #include <smp.h>
 #include <util/AutoLock.h>
 
@@ -79,7 +80,8 @@ static DepotMagazine*
 alloc_magazine()
 {
 	DepotMagazine* magazine = (DepotMagazine*)slab_internal_alloc(
-		sizeof(DepotMagazine) + kMagazineCapacity * sizeof(void*), 0);
+		sizeof(DepotMagazine) + kMagazineCapacity * sizeof(void*),
+		CACHE_DONT_SLEEP);
 	if (magazine) {
 		magazine->next = NULL;
 		magazine->current_round = 0;

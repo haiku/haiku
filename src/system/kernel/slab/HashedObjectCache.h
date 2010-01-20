@@ -28,7 +28,8 @@ struct HashedObjectCache : ObjectCache {
 	virtual	void				ReturnSlab(slab* slab);
 	virtual slab*				ObjectSlab(void* object) const;
 
-	virtual	status_t			PrepareObject(slab* source, void* object);
+	virtual	status_t			PrepareObject(slab* source, void* object,
+									uint32 flags);
 	virtual	void				UnprepareObject(slab* source, void* object);
 
 private:

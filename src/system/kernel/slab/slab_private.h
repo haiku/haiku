@@ -29,7 +29,7 @@ struct ObjectCache;
 void*		slab_internal_alloc(size_t size, uint32 flags);
 void		slab_internal_free(void *_buffer);
 
-void*		block_alloc(size_t size);
+void*		block_alloc(size_t size, uint32 flags);
 void		block_free(void *block);
 void		block_allocator_init_boot();
 void		block_allocator_init_rest();

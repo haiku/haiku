@@ -82,10 +82,11 @@ public:
 	virtual slab*				ObjectSlab(void* object) const = 0;
 
 			slab*				InitSlab(slab* slab, void* pages,
-									size_t byteCount);
+									size_t byteCount, uint32 flags);
 			void				UninitSlab(slab* slab);
 
-	virtual	status_t			PrepareObject(slab* source, void* object);
+	virtual	status_t			PrepareObject(slab* source, void* object,
+									uint32 flags);
 	virtual	void				UnprepareObject(slab* source, void* object);
 
 			void				ReturnObjectToSlab(slab* source, void* object);

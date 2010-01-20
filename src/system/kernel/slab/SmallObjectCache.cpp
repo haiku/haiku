@@ -50,7 +50,7 @@ SmallObjectCache::CreateSlab(uint32 flags, bool unlockWhileAllocating)
 		return NULL;
 
 	return InitSlab(slab_in_pages(pages, slab_size), pages,
-		slab_size - sizeof(slab));
+		slab_size - sizeof(slab), flags);
 }
 
 

@@ -95,7 +95,7 @@ HashedObjectCache::CreateSlab(uint32 flags, bool unlockWhileAllocating)
 
 	void* pages;
 	if ((this->*allocate_pages)(&pages, flags, unlockWhileAllocating) == B_OK) {
-		if (InitSlab(slab, pages, slab_size))
+		if (InitSlab(slab, pages, slab_size, flags))
 			return slab;
 
 		(this->*free_pages)(pages);
@@ -129,9 +129,9 @@ HashedObjectCache::ObjectSlab(void* object) const
 
 
 status_t
-HashedObjectCache::PrepareObject(slab* source, void* object)
+HashedObjectCache::PrepareObject(slab* source, void* object, uint32 flags)
 {
-	Link* link = _AllocateLink(CACHE_DONT_SLEEP);
+	Link* link = _AllocateLink(flags);
 	if (link == NULL)
 		return B_NO_MEMORY;
 
