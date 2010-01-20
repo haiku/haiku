@@ -273,8 +273,6 @@ slab_internal_alloc(size_t size, uint32 flags)
 {
 	if (flags & CACHE_DURING_BOOT) {
 		if ((sInitialPointer + size) > sInitialLimit) {
-dprintf("sInitialPointer: %p, sInitialLimit: %p, size: %#lx\n",
-sInitialPointer, sInitialLimit, size);
 			panic("slab_internal_alloc: ran out of initial space");
 			return NULL;
 		}
