@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -78,13 +78,11 @@ static int32 sUsedThreads = 0;
 struct UndertakerEntry : DoublyLinkedListLinkImpl<UndertakerEntry> {
 	struct thread*	thread;
 	team_id			teamID;
-	sem_id			deathSem;
 
-	UndertakerEntry(struct thread* thread, team_id teamID, sem_id deathSem)
+	UndertakerEntry(struct thread* thread, team_id teamID)
 		:
 		thread(thread),
-		teamID(teamID),
-		deathSem(deathSem)
+		teamID(teamID)
 	{
 	}
 };
@@ -486,8 +484,10 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 	// look at the team, make sure it's not being deleted
 	team = team_get_team_struct_locked(attributes.team);
 
-	if (team == NULL || team->state == TEAM_STATE_DEATH)
+	if (team == NULL || team->state == TEAM_STATE_DEATH
+		|| team->death_entry != NULL) {
 		abort = true;
+	}
 
 	if (!abort && !kernel) {
 		thread->user_thread = team_allocate_user_thread(team);
@@ -621,9 +621,6 @@ undertaker(void* /*args*/)
 		RELEASE_TEAM_LOCK();
 		enable_interrupts();
 			// needed for the debugger notification below
-
-		if (entry.deathSem >= 0)
-			release_sem_etc(entry.deathSem, 1, B_DO_NOT_RESCHEDULE);
 
 		// free the thread structure
 		locker.Lock();
@@ -1368,8 +1365,6 @@ thread_exit(void)
 	struct thread *thread = thread_get_current_thread();
 	struct team *team = thread->team;
 	thread_id parentID = -1;
-	bool deleteTeam = false;
-	sem_id cachedDeathSem = -1;
 	status_t status;
 	struct thread_debug_info debugInfo;
 	team_id teamID = team->id;
@@ -1396,14 +1391,14 @@ thread_exit(void)
 
 	struct job_control_entry *death = NULL;
 	struct death_entry* threadDeathEntry = NULL;
-	ConditionVariableEntry waitForDebuggerEntry;
-	bool waitForDebugger = false;
+	bool deleteTeam = false;
+	port_id debuggerPort = -1;
 
 	if (team != team_get_kernel_team()) {
 		user_debug_thread_exiting(thread);
 
 		if (team->main_thread == thread) {
-			// this was the main thread in this team, so we will delete that as well
+			// The main thread is exiting. Shut down the whole team.
 			deleteTeam = true;
 		} else {
 			threadDeathEntry = (death_entry*)malloc(sizeof(death_entry));
@@ -1414,6 +1409,10 @@ thread_exit(void)
 		// put the thread into the kernel team until it dies
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
+
+		if (deleteTeam)
+			debuggerPort = team_shutdown_team(team, state);
+
 		GRAB_THREAD_LOCK();
 			// removing the thread and putting its death entry to the parent
 			// team needs to be an atomic operation
@@ -1425,19 +1424,12 @@ thread_exit(void)
 		remove_thread_from_team(team, thread);
 		insert_thread_into_team(team_get_kernel_team(), thread);
 
-		cachedDeathSem = team->death_sem;
+		if (team->death_entry != NULL) {
+			if (--team->death_entry->remaining_threads == 0)
+				team->death_entry->condition.NotifyOne(true, B_OK);
+		}
 
 		if (deleteTeam) {
-			// If a debugger change is in progess for the team, we'll have to
-			// wait until it is done later.
-			GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-			if (team->debug_info.debugger_changed_condition != NULL) {
-				team->debug_info.debugger_changed_condition->Add(
-					&waitForDebuggerEntry);
-				waitForDebugger = true;
-			}
-			RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-
 			struct team *parent = team->parent;
 
 			// remember who our parent was so we can send a signal
@@ -1508,17 +1500,11 @@ thread_exit(void)
 
 	// delete the team if we're its main thread
 	if (deleteTeam) {
-		// wait for a debugger change to be finished first
-		if (waitForDebugger)
-			waitForDebuggerEntry.Wait();
-
-		team_delete_team(team);
+		team_delete_team(team, debuggerPort);
 
 		// we need to delete any death entry that made it to here
 		if (death != NULL)
 			delete death;
-
-		cachedDeathSem = -1;
 	}
 
 	state = disable_interrupts();
@@ -1602,7 +1588,7 @@ thread_exit(void)
 		user_debug_thread_deleted(teamID, thread->id);
 
 	// enqueue in the undertaker list and reschedule for the last time
-	UndertakerEntry undertakerEntry(thread, teamID, cachedDeathSem);
+	UndertakerEntry undertakerEntry(thread, teamID);
 
 	disable_interrupts();
 	GRAB_THREAD_LOCK();

@@ -23,7 +23,8 @@ extern "C" {
 status_t team_init(struct kernel_args *args);
 status_t wait_for_team(team_id id, status_t *returnCode);
 void team_remove_team(struct team *team);
-void team_delete_team(struct team *team);
+port_id team_shutdown_team(struct team *team, cpu_status& state);
+void team_delete_team(struct team *team, port_id debuggerPort);
 struct process_group *team_get_process_group_locked(
 			struct process_session *session, pid_t id);
 void team_delete_process_group(struct process_group *group);

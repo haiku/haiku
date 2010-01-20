@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -759,7 +759,7 @@ create_team_struct(const char* name, bool kernel)
 	team->loading_info = NULL;
 	team->state = TEAM_STATE_BIRTH;
 	team->flags = 0;
-	team->death_sem = -1;
+	team->death_entry = NULL;
 	team->user_data_area = -1;
 	team->user_data = 0;
 	team->used_user_data = 0;
@@ -2382,70 +2382,115 @@ team_remove_team(struct team* team)
 }
 
 
-void
-team_delete_team(struct team* team)
+/*!	Kills all threads but the main thread of the team.
+	To be called on exit of the team's main thread. The teams spinlock must be
+	held. The function may temporarily drop the spinlock, but will reacquire it
+	before it returns.
+	\param team The team in question.
+	\param state The CPU state as returned by disable_interrupts(). Will be
+		adjusted, if the function needs to unlock and relock.
+	\return The port of the debugger for the team, -1 if none. To be passed to
+		team_delete_team().
+*/
+port_id
+team_shutdown_team(struct team* team, cpu_status& state)
 {
-	team_id teamID = team->id;
+	ASSERT(thread_get_current_thread() == team->main_thread);
+
+	// Make sure debugging changes won't happen anymore.
 	port_id debuggerPort = -1;
-	cpu_status state;
+	while (true) {
+		// If a debugger change is in progress for the team, we'll have to
+		// wait until it is done.
+		ConditionVariableEntry waitForDebuggerEntry;
+		bool waitForDebugger = false;
 
-	if (team->num_threads > 0) {
-		// there are other threads still in this team,
-		// cycle through and signal kill on each of the threads
-		// ToDo: this can be optimized. There's got to be a better solution.
-		struct thread* temp_thread;
-		char deathSemName[B_OS_NAME_LENGTH];
-		sem_id deathSem;
-		int32 threadCount;
-
-		sprintf(deathSemName, "team %ld death sem", teamID);
-		deathSem = create_sem(0, deathSemName);
-		if (deathSem < 0) {
-			panic("team_delete_team: cannot init death sem for team %ld\n",
-				teamID);
-		}
-
-		state = disable_interrupts();
-		GRAB_TEAM_LOCK();
-
-		team->death_sem = deathSem;
-		threadCount = team->num_threads;
-
-		// If the team was being debugged, that will stop with the termination
-		// of the nub thread. The team structure has already been removed from
-		// the team hash table at this point, so noone can install a debugger
-		// anymore. We fetch the debugger's port to send it a message at the
-		// bitter end.
 		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
-		if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED)
+		if (team->debug_info.debugger_changed_condition != NULL) {
+			team->debug_info.debugger_changed_condition->Add(
+				&waitForDebuggerEntry);
+			waitForDebugger = true;
+		} else if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+			// The team is being debugged. That will stop with the termination
+			// of the nub thread. Since we won't let go of the team lock, unless
+			// we set team::death_entry or until we have removed the tem from
+			// the team hash, no-one can install a debugger anymore. We fetch
+			// the debugger's port to send it a message at the bitter end.
 			debuggerPort = team->debug_info.debugger_port;
+		}
 
 		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
-		// We can safely walk the list because of the lock. no new threads can
-		// be created because of the TEAM_STATE_DEATH flag on the team
-		temp_thread = team->thread_list;
-		while (temp_thread) {
-			struct thread* next = temp_thread->team_next;
+		if (!waitForDebugger)
+			break;
 
-			send_signal_etc(temp_thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
-			temp_thread = next;
+		// wait for the debugger change to be finished
+		RELEASE_TEAM_LOCK();
+		restore_interrupts(state);
+
+		waitForDebuggerEntry.Wait();
+
+		state = disable_interrupts();
+		GRAB_TEAM_LOCK();
+	}
+
+	// kill all threads but the main thread
+	team_death_entry deathEntry;
+	deathEntry.condition.Init(team, "team death");
+
+	while (true) {
+		team->death_entry = &deathEntry;
+		deathEntry.remaining_threads = 0;
+
+		struct thread* thread = team->thread_list;
+		while (thread != NULL) {
+			if (thread != team->main_thread) {
+				send_signal_etc(thread->id, SIGKILLTHR,
+					B_DO_NOT_RESCHEDULE | SIGNAL_FLAG_TEAMS_LOCKED);
+				deathEntry.remaining_threads++;
+			}
+
+			thread = thread->team_next;
 		}
+
+		if (deathEntry.remaining_threads == 0)
+			break;
+
+		// there are threads to wait for
+		ConditionVariableEntry entry;
+		deathEntry.condition.Add(&entry);
 
 		RELEASE_TEAM_LOCK();
 		restore_interrupts(state);
 
-		// wait until all threads in team are dead.
-		acquire_sem_etc(team->death_sem, threadCount, 0, 0);
-		delete_sem(team->death_sem);
+		entry.Wait();
+
+		state = disable_interrupts();
+		GRAB_TEAM_LOCK();
 	}
+
+	team->death_entry = NULL;
+		// That makes the team "undead" again, but we have the teams spinlock
+		// and our caller won't drop it until after removing the team from the
+		// teams hash table.
+
+	return debuggerPort;
+}
+
+
+void
+team_delete_team(struct team* team, port_id debuggerPort)
+{
+	team_id teamID = team->id;
+
+	ASSERT(team->num_threads == 0);
 
 	// If someone is waiting for this team to be loaded, but it dies
 	// unexpectedly before being done, we need to notify the waiting
 	// thread now.
 
-	state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
 	if (team->loading_info) {

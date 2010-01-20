@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -378,7 +378,7 @@ prepare_debugger_change(team_id teamID, ConditionVariable& condition,
 		InterruptsSpinLocker teamLocker(gTeamSpinlock);
 
 		team = team_get_team_struct_locked(teamID);
-		if (team == NULL)
+		if (team == NULL || team->death_entry != NULL)
 			return B_BAD_TEAM_ID;
 
 		// don't allow messing with the kernel team

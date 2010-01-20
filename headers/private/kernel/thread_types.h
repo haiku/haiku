@@ -10,13 +10,14 @@
 
 #ifndef _ASSEMBLER
 
-#include <smp.h>
+#include <arch/thread_types.h>
+#include <condition_variable.h>
 #include <signal.h>
+#include <smp.h>
 #include <thread_defs.h>
 #include <timer.h>
 #include <user_debugger.h>
 #include <util/list.h>
-#include <arch/thread_types.h>
 
 
 extern spinlock gThreadSpinlock;
@@ -98,6 +99,7 @@ struct team_watcher {
 	void				*data;
 };
 
+
 #define MAX_DEAD_CHILDREN	32
 	// this is a soft limit for the number of child death entries in a team
 #define MAX_DEAD_THREADS	32
@@ -150,6 +152,12 @@ struct team_dead_children : team_job_control_children {
 };
 
 
+struct team_death_entry {
+	int32				remaining_threads;
+	ConditionVariable	condition;
+};
+
+
 #endif	// __cplusplus
 
 
@@ -178,7 +186,7 @@ struct team {
 	struct io_context *io_context;
 	struct realtime_sem_context	*realtime_sem_context;
 	struct xsi_sem_context *xsi_sem_context;
-	sem_id			death_sem;		// semaphore to wait on for dying threads
+	struct team_death_entry *death_entry;
 	struct list		dead_threads;
 	int				dead_threads_count;
 
