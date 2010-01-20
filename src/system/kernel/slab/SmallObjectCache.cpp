@@ -35,6 +35,9 @@ SmallObjectCache::Create(const char* name, size_t object_size,
 	else
 		cache->slab_size = B_PAGE_SIZE;
 
+	cache->objects_per_slab = (cache->slab_size - sizeof(slab))
+		/ cache->object_size;
+
 	return cache;
 }
 

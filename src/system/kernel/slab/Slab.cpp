@@ -316,10 +316,7 @@ static status_t
 object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 	uint32 flags, bool unlockWhileAllocating)
 {
-	size_t numBytes = objectCount * cache->object_size;
-	size_t slabCount = ((numBytes - 1) / cache->slab_size) + 1;
-		// TODO: This also counts the unusable space of each slab, which can
-		// sum up.
+	size_t slabCount = (objectCount - 1) / cache->objects_per_slab + 1;
 
 	while (slabCount > 0) {
 		slab* newSlab = cache->CreateSlab(flags, unlockWhileAllocating);

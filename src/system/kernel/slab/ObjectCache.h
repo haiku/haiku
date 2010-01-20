@@ -47,6 +47,7 @@ struct ObjectCache : DoublyLinkedListLinkImpl<ObjectCache> {
 									// minimum number of free objects
 
 			size_t				slab_size;
+			size_t				objects_per_slab;
 			size_t				usage;
 			size_t				maximum;
 			uint32				flags;
