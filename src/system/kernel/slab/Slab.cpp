@@ -60,9 +60,6 @@ static uint8* sInitialBegin;
 static uint8* sInitialLimit;
 static uint8* sInitialPointer;
 
-static status_t object_cache_reserve_internal(ObjectCache* cache,
-	size_t object_count, uint32 flags, bool unlockWhileAllocating);
-
 static mutex sResizeRequestsLock
 	= MUTEX_INITIALIZER("object cache resize requests");
 static ResizeRequestQueue sResizeRequests;
@@ -299,6 +296,46 @@ slab_internal_free(void* _buffer)
 }
 
 
+// #pragma mark -
+
+
+static void
+increase_object_reserve(ObjectCache* cache)
+{
+	if (cache->resize_request->pending)
+		return;
+
+	cache->resize_request->pending = true;
+
+	MutexLocker locker(sResizeRequestsLock);
+	sResizeRequests.Add(cache->resize_request);
+	sResizeRequestsCondition.NotifyAll();
+}
+
+
+static status_t
+object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
+	uint32 flags, bool unlockWhileAllocating)
+{
+	size_t numBytes = objectCount * cache->object_size;
+	size_t slabCount = ((numBytes - 1) / cache->slab_size) + 1;
+		// TODO: This also counts the unusable space of each slab, which can
+		// sum up.
+
+	while (slabCount > 0) {
+		slab* newSlab = cache->CreateSlab(flags, unlockWhileAllocating);
+		if (newSlab == NULL)
+			return B_NO_MEMORY;
+
+		cache->empty.Add(newSlab);
+		cache->empty_count++;
+		slabCount--;
+	}
+
+	return B_OK;
+}
+
+
 static void
 object_cache_low_memory(void* _self, uint32 resources, int32 level)
 {
@@ -414,18 +451,7 @@ object_cache_resizer(void*)
 }
 
 
-static void
-increase_object_reserve(ObjectCache* cache)
-{
-	if (cache->resize_request->pending)
-		return;
-
-	cache->resize_request->pending = true;
-
-	MutexLocker locker(sResizeRequestsLock);
-	sResizeRequests.Add(cache->resize_request);
-	sResizeRequestsCondition.NotifyAll();
-}
+// #pragma mark - public API
 
 
 object_cache*
@@ -598,29 +624,6 @@ object_cache_free(object_cache* cache, void* object)
 
 	MutexLocker _(cache->lock);
 	cache->ReturnObjectToSlab(cache->ObjectSlab(object), object);
-}
-
-
-static status_t
-object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
-	uint32 flags, bool unlockWhileAllocating)
-{
-	size_t numBytes = objectCount*  cache->object_size;
-	size_t slabCount = ((numBytes - 1) / cache->slab_size) + 1;
-		// TODO: This also counts the unusable space of each slab, which can
-		// sum up.
-
-	while (slabCount > 0) {
-		slab* newSlab = cache->CreateSlab(flags, unlockWhileAllocating);
-		if (newSlab == NULL)
-			return B_NO_MEMORY;
-
-		cache->empty.Add(newSlab);
-		cache->empty_count++;
-		slabCount--;
-	}
-
-	return B_OK;
 }
 
 
