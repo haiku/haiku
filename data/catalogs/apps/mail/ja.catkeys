@@ -1,141 +1,141 @@
-1	japanese	x-vnd.Be-MAIL	518011592
-Show Icons Only	Mail		アイコンのみ
+1	japanese	x-vnd.Be-MAIL	2102081210
 %d - Date	Mail		%d - 日付
-Enclosures: 	Mail		添付ファイル:
-Auto Signature:	Mail		自動署名:
-Removing enclosures from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		転送メールから添付ファイルを削除する機能はまだ実装されていません。
+Attach attributes:	Mail		ファイル属性情報：
+Inconsistency occurred in the undo/redo buffer.	Mail		Undo/Redoバッファに矛盾が発生しました。
+An error occurred trying to save the attachment.	Mail		添付ファイルを保存するときにエラーが発生しました。
+Copy to new	Mail		新規メッセージへコピー
 Edit	Mail		編集
 Print	Mail		印刷
-User Interface	Mail		ユーザーインターフェース
-Remove Enclosure	Mail		添付ファイルを削除
-Automatically mark mail as read:	Mail		メールを自動的に既読にする:
-Subject:	Mail		件名:
-Reply Preamble:	Mail		返信へ追加:
+New mail message	Mail		新規メッセージ作成
+Automatically mark mail as read:	Mail		メールを自動的に既読にする：
+Colored quotes:	Mail		引用部分の着色：
+Subject:	Mail		件名：
+Reply to all	Mail		全員に返信
+Show icons & labels	Mail		アイコンとラベル
+Remove attachment	Mail		添付ファイルを削除
+Button bar:	Mail		ボタンバー：
 Beginner	Mail		初心者
-Start Now	Mail		ただちに開始する
-sorry	Mail		了解
+Don't save	Mail		保存しない
 Expert	Mail		上級者
+Reply account:	Mail		返信用アカウント：
 Discard	Mail		無視
 Message	Mail		メッセージ
+Reply to sender	Mail		送信者に返信
 There is no installed handler for URL links.	Mail		このURLリンクを扱えるアプリケーションが存在しません。
-Reply Account:	Mail		返信用アカウント:
 Signature	Mail		署名
+Find again	Mail		次を検索
 Bcc:	Mail		Bcc:
-Signature:	Mail		署名:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		%ld 個のエンコードできない文字があります。違う文字セットを使うほうがよい可能性があります。このまま送信の場合は「送信」ボタンを押してください。その場合、代用文字がUnicode化可能な文字に代わって使われます。文字セットを変更する場合は「中止」ボタンを押して下さい。
+Signature:	Mail		署名：
+Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\n作者： Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		変更した署名を保存しますか？
-Cc:	Mail		Cc:
-Show Raw Message	Mail		メッセージを生で表示
+Cc:	Mail		Cc：
 Find	Mail		検索
 Preferences…	Mail		Mailの設定…
 Undo	Mail		元に戻す
-Colored Quotes:	Mail		引用部分の着色:
 Leave as New	Mail		新規<New>のままにする
 An error occurred trying to open this signature.	Mail		この署名を開くときにエラーが発生しました。
-Need tracker to move items to trash	Mail		削除するにはTrackerが必要です。
-Add Signature	Mail		署名を追加
- unencodable characters.  Perhaps a different character set would work better?  Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		 個のエンコードできない文字があります。違う文字セットを使うほうがよい可能性があります。このまま送信の場合は「送信」ボタンを押してください。その場合、代用文字がUnicode化可能な文字に代わって使われます。文字セットを変更する場合は「中止」ボタンを押して下さい。
+No file attributes, just plain data	Mail		ファイル属性を付けない（データのみ）
+Edit queries…	Mail		クエリフォルダーを開く…
 Paste	Mail		貼り付け
-Show Icons & Labels	Mail		アイコンとラベル
+Save attachment…	Mail		添付ファイルを保存…
+Include file attributes in attachments	Mail		添付ファイルにファイル属性を服務
 OK	Mail		了解
-An error occurred trying to save the enclosure.	Mail		添付ファイルを保存するときにエラーが発生しました。
 Send	Mail		送信
+Show icons only	Mail		アイコンのみ
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		転送メールから添付ファイルを削除する機能はまだ実装されていません。
 Hide	Mail		隠す
+Forward without attachments	Mail		添付ファイルを含めて転送
 Previous	Mail		前へ
 Redo	Mail		やり直し
+Add enclosure…	Mail		添付ファイルを追加…
 Print…	Mail		印刷…
-Attach Attributes:	Mail		ファイル属性情報:
-Save as Draft	Mail		ドラフトとして保存
+Warn unencodable:	Mail		エンコード不可警告の表示:
 Quit	Mail		終了
-Inconsistency occurred in the Undo/Redo buffer.	Mail		Undo/Redoバッファに矛盾が発生しました。
-Reply to Sender	Mail		送信者に返信
 %n - Full name	Mail		%n - フルネーム
- Read 	Mail		 既読 
-Edit Queries…	Mail		クエリフォルダーを開く…
-Only files can be added as enclosures.	Mail		添付できるのは、ファイルのみです。
+ Read 	Mail		 Read 
 Trash	Mail		削除
+Default account:	Mail		標準アカウント：
 Size:	Mail		サイズ:
-Account From Mail	Mail		メールのアカウントを使う
-Select All	Mail		全文選択
+Account from mail	Mail		メールのアカウントを使う
+Edit signatures…	Mail		署名の編集…
 New	Mail		新規
-New Mail Message	Mail		新規メッセージ作成
+Attachments: 	Mail		添付ファイル：
 Set to %s	Mail		属性を<%s>に設定
 Forward	Mail		転送
 E-mail draft could not be saved!	Mail		ドラフトは保存できませんでした。
-To:	Mail		宛先:
-Open Draft	Mail		ドラフトを開く
-Edit Signatures…	Mail		署名の編集…
-Title:	Mail		署名の名称:
+To:	Mail		宛先：
+Only files can be added as attachments.	Mail		添付できるのは、ファイルのみです。
+Previous message	Mail		前のメッセージ
+Title:	Mail		署名の名称：
 Find…	Mail		検索…
-Copy to New	Mail		新規メッセージへコピー
 Accounts…	Mail		アカウントの設定…
+Mail preferences	Mail		Mailの設定
+Initial spell check mode:	Mail		編集時スペルチェック:
 Leave same	Mail		属性はそのまま
 About Mail…	Mail		Mailについて…
-Your main text contains 	Mail		送信メールの本文には 
-Text wrapping:	Mail		テキストラップ:
+Page setup…	Mail		ページ設定…
+Text wrapping:	Mail		テキストラップ：
 Revert	Mail		復元
-Save Enclosure…	Mail		添付ファイルを保存…
 File	Mail		ファイル
-Remove Quote	Mail		引用符を削除
-Move to Trash	Mail		削除
 None	Mail		無し
-Reply to All	Mail		全員に返信
+Copy link location	Mail		リンク先をコピー
+Show header	Mail		ヘッダーを表示
 %e - E-mail address	Mail		%e - メールアドレス
-Default Account:	Mail		標準アカウント:
 Resend	Mail		再送信
-Open Enclosure	Mail		添付ファイルを開く
+Show raw message	Mail		メッセージを生で表示
 \\n - Newline	Mail		\\n - 改行
-Add Enclosure…	Mail		添付ファイルを追加…
-Button Bar:	Mail		ボタンバー:
+Start now	Mail		ただちに開始する
 Close	Mail		閉じる
-Warn Unencodable:	Mail		エンコード不可警告の表示:
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		メールサービスが起動されていないため、このメッセージは処理待ちとなり、メールサービス起動後に処理されます。
 Really delete this signature? This cannot be undone.	Mail		この署名を削除しますか？
 Open	Mail		開く
 Quote	Mail		引用符をつける
 Add	Mail		追加
-Don't Save	Mail		保存しない
-Copy Link Location	Mail		リンク先をコピー
+Next message	Mail		次のメッセージ
+User interface	Mail		ユーザーインターフェース
 Cancel	Mail		中止
+Send message	Mail		メッセージを送信
+Remove enclosure	Mail		添付ファイルを削除
 Account:	Mail		アカウント:
-Decoding:	Mail		文字コード:
+Decoding:	Mail		文字コード：
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Peopleデータ形式をサポートするアプリケーションが見つかりませんでした。
 Do you wish to send this message before closing?	Mail		閉じる前にこのメッセージを送信しますか？
-Page Setup…	Mail		ページ設定…
 Delete	Mail		削除
 Leave as '%s'	Mail		属性を<%s>にする
 Copy	Mail		コピー
-Previous Message	Mail		前のメッセージ
+Reply preamble:	Mail		返信へ追加：
 Signatures	Mail		署名の編集
 Next	Mail		次へ
 Set to…	Mail		他の属性に変更…
-Show Header	Mail		ヘッダーを表示
+Use default account	Mail		標準アカウントを使う
 Sorry	Mail		了解
-Encoding:	Mail		文字コード:
-Font:	Mail		フォント:
+Encoding:	Mail		文字コード：
+Font:	Mail		フォント：
+Save address	Mail		アドレスを保存
 Queries	Mail		クエリ
-Forward without Attachments	Mail		添付ファイルを含めて転送
 Do you wish to save this message as a draft before closing?	Mail		閉じる前に保存しますか？
-Include BeOS Attributes in Attachments	Mail		BeOSの属性を付ける
 Save	Mail		保存
 Random	Mail		自動決定
-Find Again	Mail		次を検索
 Close and 	Mail		閉じる
-Use Default Account	Mail		標準アカウントを使う
-Initial Spell Check Mode:	Mail		編集時スペルチェック:
+Save as draft	Mail		ドラフトとして保存
+The mail_daemon could not be started:\n\t	Mail		メールサービス（mail_daemon）を起動できませんでした。
+Open attachment	Mail		添付ファイルを開く
 Reply	Mail		返信
-No BeOS Attributes, just Plain Data	Mail		BeOSの属性を付けない（データのみ）
 The spell check feature requires the optional \"words\" file on your BeOS CD.	Mail		スペルチェク機能はBeOS CDの optional \"words\" ファイルが必要です。
-Next Message	Mail		次のメッセージ
-From:	Mail		送信元:
+From:	Mail		送信元：
 Couldn't open this signature. Sorry.	Mail		署名を開く時にエラーが発生しました。orz
-Send Message	Mail		メッセージを送信
+Open draft	Mail		ドラフトを開く
 Cut	Mail		切り取り
+Check spelling	Mail		スペルチェック
 Set to Saved	Mail		属性を<Saved>に設定
-Open This Link	Mail		リンク先を開く
-Check Spelling	Mail		スペルチェック
-Ok	Mail		了解
-Mail Preferences	Mail		Mailの設定
+Open this link	Mail		リンク先を開く
+Auto signature:	Mail		自動署名：
+Add signature	Mail		署名を追加
+Need Tracker to move items to trash	Mail		削除するにはTrackerが必要です。
 Mailing	Mail		メール関係
 Unread	Mail		未読
+Remove quote	Mail		引用符を削除
+Move to trash	Mail		削除
+Select all	Mail		全文選択
 An error occurred trying to save this signature.	Mail		署名を保存しようとした時にエラーが発生しました。
-Save Address	Mail		アドレスを保存
