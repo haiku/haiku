@@ -312,20 +312,19 @@ increase_object_reserve(ObjectCache* cache)
 }
 
 
+/*!	Makes sure that \a objectCount objects can be allocated.
+*/
 static status_t
 object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 	uint32 flags, bool unlockWhileAllocating)
 {
-	size_t slabCount = (objectCount - 1) / cache->objects_per_slab + 1;
-
-	while (slabCount > 0) {
+	while (objectCount > cache->total_objects - cache->used_count) {
 		slab* newSlab = cache->CreateSlab(flags, unlockWhileAllocating);
 		if (newSlab == NULL)
 			return B_NO_MEMORY;
 
 		cache->empty.Add(newSlab);
 		cache->empty_count++;
-		slabCount--;
 	}
 
 	return B_OK;
@@ -422,18 +421,12 @@ object_cache_resizer(void*)
 
 		MutexLocker cacheLocker(cache->lock);
 
-		size_t freeObjects = cache->total_objects - cache->used_count;
-
-		while (freeObjects < cache->min_object_reserve) {
-			status_t error = object_cache_reserve_internal(cache,
-				cache->min_object_reserve - freeObjects, 0, true);
-			if (error != B_OK) {
-				dprintf("object cache resizer: Failed to resize object cache "
-					"%p!\n", cache);
-				break;
-			}
-
-			freeObjects = cache->total_objects - cache->used_count;
+		status_t error = object_cache_reserve_internal(cache,
+			cache->min_object_reserve, 0, true);
+		if (error != B_OK) {
+			dprintf("object cache resizer: Failed to resize object cache "
+				"%p!\n", cache);
+			break;
 		}
 
 		request->pending = false;

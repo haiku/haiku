@@ -72,8 +72,6 @@ HashedObjectCache::Create(const char* name, size_t object_size,
 		cache->slab_size = max_c(16 * B_PAGE_SIZE, 8 * object_size);
 	cache->lower_boundary = __fls0(cache->object_size);
 
-	cache->objects_per_slab = cache->slab_size / cache->object_size;
-
 	return cache;
 }
 
