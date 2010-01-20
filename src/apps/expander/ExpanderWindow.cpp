@@ -570,14 +570,16 @@ ExpanderWindow::_ExpandListingText()
 
 	if (minWidth < Frame().Width() + delta) {
 		// set the Zoom limit as the minimal required size
-		SetZoomLimits(Frame().Width() + delta, 
-			fSizeLimit + fListingText->TextRect().Height()
-			+ fLineHeight + B_H_SCROLL_BAR_HEIGHT + 1.0f);
+		SetZoomLimits(Frame().Width() + delta,
+			min_c(fSizeLimit + fListingText->TextRect().Height()
+				+ fLineHeight + B_H_SCROLL_BAR_HEIGHT + 1.0f,
+				maxHeight));
 	} else {
 		// set the zoom limit based on minimal window size allowed
 		SetZoomLimits(minWidth,
-			fSizeLimit + fListingText->TextRect().Height()
-			+ fLineHeight + B_H_SCROLL_BAR_HEIGHT + 1.0f);
+			min_c(fSizeLimit + fListingText->TextRect().Height()
+				+ fLineHeight + B_H_SCROLL_BAR_HEIGHT + 1.0f,
+				maxHeight));
 	}
 }
 
@@ -591,6 +593,8 @@ ExpanderWindow::_UpdateWindowSize(bool showContents)
 	float bottom = fSizeLimit;
 
 	if (showContents) {
+		minHeight = bottom + 5.0 * fLineHeight;
+		maxHeight = 32767.0;
 		if (fPreviousHeight < 0.0) {
 			BFont font;
 			font_height fontHeight;
@@ -599,13 +603,9 @@ ExpanderWindow::_UpdateWindowSize(bool showContents)
 			fLineHeight = ceilf(fontHeight.ascent + fontHeight.descent
 				+ fontHeight.leading);
 
-			minHeight = bottom + 5.0 * fLineHeight;
-			maxHeight = 32767.0;
 			fPreviousHeight = minHeight + 10.0 * fLineHeight;
 		}
-		minHeight = bottom + 5.0 * fLineHeight;
-		maxHeight = 32767.0;
-		bottom = fPreviousHeight;		
+		bottom = fPreviousHeight;
 	} else {
 		minHeight = fSizeLimit;
 		maxHeight = fSizeLimit;
