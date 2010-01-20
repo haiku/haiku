@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, Axel Dörfler. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  *
@@ -10,6 +11,8 @@
 
 #include <algorithm>
 
+#include <int.h>
+#include <smp.h>
 #include <util/AutoLock.h>
 
 #include "slab_private.h"
@@ -35,7 +38,6 @@ public:
 
 
 struct depot_cpu_store {
-	recursive_lock	lock;
 	DepotMagazine*	loaded;
 	DepotMagazine*	previous;
 };
@@ -107,7 +109,7 @@ empty_magazine(object_depot* depot, DepotMagazine* magazine)
 static bool
 exchange_with_full(object_depot* depot, DepotMagazine*& magazine)
 {
-	RecursiveLocker _(depot->lock);
+	SpinLocker _(depot->inner_lock);
 
 	if (depot->full == NULL)
 		return false;
@@ -124,15 +126,12 @@ exchange_with_full(object_depot* depot, DepotMagazine*& magazine)
 static bool
 exchange_with_empty(object_depot* depot, DepotMagazine*& magazine)
 {
-	RecursiveLocker _(depot->lock);
+	SpinLocker _(depot->inner_lock);
 
-	if (depot->empty == NULL) {
-		depot->empty = alloc_magazine();
-		if (depot->empty == NULL)
-			return false;
-	} else {
-		depot->empty_count--;
-	}
+	if (depot->empty == NULL)
+		return false;
+
+	depot->empty_count--;
 
 	if (magazine) {
 		_push(depot->full, magazine);
@@ -144,6 +143,15 @@ exchange_with_empty(object_depot* depot, DepotMagazine*& magazine)
 }
 
 
+static void
+push_empty_magazine(object_depot* depot, DepotMagazine* magazine)
+{
+	SpinLocker _(depot->inner_lock);
+
+	_push(depot->empty, magazine);
+}
+
+
 static inline depot_cpu_store*
 object_depot_cpu(object_depot* depot)
 {
@@ -151,10 +159,58 @@ object_depot_cpu(object_depot* depot)
 }
 
 
-static void*
-object_depot_obtain_from_store(object_depot* depot, depot_cpu_store* store)
+// #pragma mark - public API
+
+
+status_t
+object_depot_init(object_depot* depot, uint32 flags, void* cookie,
+	void (*return_object)(object_depot* depot, void* cookie, void* object))
 {
-	RecursiveLocker _(store->lock);
+	depot->full = NULL;
+	depot->empty = NULL;
+	depot->full_count = depot->empty_count = 0;
+
+	rw_lock_init(&depot->outer_lock, "object depot");
+	B_INITIALIZE_SPINLOCK(&depot->inner_lock);
+
+	int cpuCount = smp_get_num_cpus();
+	depot->stores = (depot_cpu_store*)slab_internal_alloc(
+		sizeof(depot_cpu_store) * cpuCount, flags);
+	if (depot->stores == NULL) {
+		rw_lock_destroy(&depot->outer_lock);
+		return B_NO_MEMORY;
+	}
+
+	for (int i = 0; i < cpuCount; i++) {
+		depot->stores[i].loaded = NULL;
+		depot->stores[i].previous = NULL;
+	}
+
+	depot->cookie = cookie;
+	depot->return_object = return_object;
+
+	return B_OK;
+}
+
+
+void
+object_depot_destroy(object_depot* depot)
+{
+	object_depot_make_empty(depot);
+
+	slab_internal_free(depot->stores);
+
+	rw_lock_destroy(&depot->outer_lock);
+}
+
+
+void*
+object_depot_obtain(object_depot* depot)
+{
+	ReadLocker readLocker(depot->outer_lock);
+	InterruptsLocker interruptsLocker;
+
+	depot_cpu_store* store = object_depot_cpu(depot);
 
 	// To better understand both the Alloc() and Free() logic refer to
 	// Bonwick's ``Magazines and Vmem'' [in 2001 USENIX proceedings]
@@ -180,11 +236,13 @@ object_depot_obtain_from_store(object_depot* depot, depot_cpu_store* store)
 }
 
 
-static int
-object_depot_return_to_store(object_depot* depot, depot_cpu_store* store,
-	void* object)
+int
+object_depot_store(object_depot* depot, void* object)
 {
-	RecursiveLocker _(store->lock);
+	ReadLocker readLocker(depot->outer_lock);
+	InterruptsLocker interruptsLocker;
+
+	depot_cpu_store* store = object_depot_cpu(depot);
 
 	// We try to add the object to the loaded magazine if we have one
 	// and it's not full, or to the previous one if it is empty. If
@@ -196,98 +254,69 @@ object_depot_return_to_store(object_depot* depot, depot_cpu_store* store,
 			return 1;
 
 		if ((store->previous && store->previous->IsEmpty())
-			|| exchange_with_empty(depot, store->previous))
+			|| exchange_with_empty(depot, store->previous)) {
 			std::swap(store->loaded, store->previous);
-		else
-			return 0;
+		} else {
+			// allocate a new empty magazine
+			interruptsLocker.Unlock();
+			readLocker.Unlock();
+
+			DepotMagazine* magazine = alloc_magazine();
+			if (magazine == NULL)
+				return 0;
+
+			readLocker.Lock();
+			interruptsLocker.Lock();
+
+			push_empty_magazine(depot, magazine);
+			store = object_depot_cpu(depot);
+		}
 	}
-}
-
-
-// #pragma mark - public API
-
-
-status_t
-object_depot_init(object_depot* depot, uint32 flags, void* cookie,
-	void (*return_object)(object_depot* depot, void* cookie, void* object))
-{
-	depot->full = NULL;
-	depot->empty = NULL;
-	depot->full_count = depot->empty_count = 0;
-
-	recursive_lock_init(&depot->lock, "depot");
-
-	int cpuCount = smp_get_num_cpus();
-	depot->stores = (depot_cpu_store*)slab_internal_alloc(
-		sizeof(depot_cpu_store) * cpuCount, flags);
-	if (depot->stores == NULL) {
-		recursive_lock_destroy(&depot->lock);
-		return B_NO_MEMORY;
-	}
-
-	for (int i = 0; i < cpuCount; i++) {
-		recursive_lock_init(&depot->stores[i].lock, "cpu store");
-		depot->stores[i].loaded = depot->stores[i].previous = NULL;
-	}
-
-	depot->cookie = cookie;
-	depot->return_object = return_object;
-
-	return B_OK;
-}
-
-
-void
-object_depot_destroy(object_depot* depot)
-{
-	object_depot_make_empty(depot);
-
-	int cpuCount = smp_get_num_cpus();
-	for (int i = 0; i < cpuCount; i++)
-		recursive_lock_destroy(&depot->stores[i].lock);
-
-	slab_internal_free(depot->stores);
-
-	recursive_lock_destroy(&depot->lock);
-}
-
-
-void*
-object_depot_obtain(object_depot* depot)
-{
-	return object_depot_obtain_from_store(depot, object_depot_cpu(depot));
-}
-
-
-int
-object_depot_store(object_depot* depot, void* object)
-{
-	return object_depot_return_to_store(depot, object_depot_cpu(depot),
-		object);
 }
 
 
 void
 object_depot_make_empty(object_depot* depot)
 {
+	WriteLocker writeLocker(depot->outer_lock);
+
+	// collect the store magazines
+
+	DepotMagazine* storeMagazines = NULL;
+
 	int cpuCount = smp_get_num_cpus();
 	for (int i = 0; i < cpuCount; i++) {
-		depot_cpu_store* store = &depot->stores[i];
+		depot_cpu_store& store = depot->stores[i];
 
-		RecursiveLocker _(store->lock);
+		if (store.loaded) {
+			_push(storeMagazines, store.loaded);
+			store.loaded = NULL;
+		}
 
-		if (depot->stores[i].loaded)
-			empty_magazine(depot, depot->stores[i].loaded);
-		if (depot->stores[i].previous)
-			empty_magazine(depot, depot->stores[i].previous);
-		depot->stores[i].loaded = depot->stores[i].previous = NULL;
+		if (store.previous) {
+			_push(storeMagazines, store.previous);
+			store.previous = NULL;
+		}
 	}
 
-	RecursiveLocker _(depot->lock);
+	// detach the depot's full and empty magazines
 
-	while (depot->full)
-		empty_magazine(depot, _pop(depot->full));
+	DepotMagazine* fullMagazines = depot->full;
+	depot->full = NULL;
 
-	while (depot->empty)
-		empty_magazine(depot, _pop(depot->empty));
+	DepotMagazine* emptyMagazines = depot->empty;
+	depot->empty = NULL;
+
+	writeLocker.Unlock();
+
+	// free all magazines
+
+	while (storeMagazines != NULL)
+		empty_magazine(depot, _pop(storeMagazines));
+
+	while (fullMagazines != NULL)
+		empty_magazine(depot, _pop(fullMagazines));
+
+	while (emptyMagazines)
+		free_magazine(_pop(emptyMagazines));
 }

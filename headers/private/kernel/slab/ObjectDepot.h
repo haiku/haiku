@@ -13,7 +13,8 @@
 struct DepotMagazine;
 
 typedef struct object_depot {
-	recursive_lock			lock;
+	rw_lock					outer_lock;
+	spinlock				inner_lock;
 	DepotMagazine*			full;
 	DepotMagazine*			empty;
 	size_t					full_count;
