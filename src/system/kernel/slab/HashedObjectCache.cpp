@@ -111,6 +111,7 @@ HashedObjectCache::ReturnSlab(slab* slab)
 {
 	UninitSlab(slab);
 	(this->*free_pages)(slab->pages);
+	free_slab(slab);
 }
 
 
