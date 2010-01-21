@@ -10,7 +10,6 @@
 #include <Button.h>
 #include <GroupLayoutBuilder.h>
 #include <Locale.h>
-#include <Screen.h>
 #include <ScrollView.h>
 #include <TextView.h>
 
