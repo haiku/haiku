@@ -7,6 +7,7 @@
 
 	
 #include <Application.h>
+#include <Catalog.h>
 #include <Message.h>
 
 
@@ -31,6 +32,7 @@ private:
 			MainWindow*			fWindow;
 
 			BMessage			fSettings;
+			BCatalog			fCatalog;
 };
 
 

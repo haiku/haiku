@@ -16,6 +16,7 @@
 
 #include <File.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <Path.h>
 
 
@@ -35,6 +36,8 @@ DriveSetup::~DriveSetup()
 void
 DriveSetup::ReadyToRun()
 {
+	be_locale->GetAppCatalog(&fCatalog);
+
 	fWindow = new MainWindow(BRect(50, 50, 600, 450));
 	if (_RestoreSettings() != B_OK)
 		fWindow->ApplyDefaultSettings();

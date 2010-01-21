@@ -13,6 +13,7 @@
 #include <stdio.h>
 
 #include <Button.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
@@ -21,10 +22,14 @@
 #include <String.h>
 
 
+#define TR_CONTEXT "InitParamsPanel"
+
+
 class InitParamsPanel::EscapeFilter : public BMessageFilter {
 public:
 	EscapeFilter(InitParamsPanel* target)
-		: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+		:
+		BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
 		fPanel(target)
 	{
 	}
@@ -70,8 +75,9 @@ enum {
 
 
 InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
-	BPartition* partition)
-	: BWindow(BRect(300.0, 200.0, 600.0, 300.0), 0, B_MODAL_WINDOW_LOOK,
+		BPartition* partition)
+	:
+	BWindow(BRect(300.0, 200.0, 600.0, 300.0), 0, B_MODAL_WINDOW_LOOK,
 		B_MODAL_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fEscapeFilter(new EscapeFilter(this)),
@@ -81,7 +87,7 @@ InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
 {
 	AddCommonFilter(fEscapeFilter);
 
-	BButton* okButton = new BButton("Initialize", new BMessage(MSG_OK));
+	BButton* okButton = new BButton(TR("Initialize"), new BMessage(MSG_OK));
 
 	partition->GetInitializationParameterEditor(diskSystem.String(),
 		&fEditor);
@@ -92,7 +98,7 @@ InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
 		.Add(fEditor->View())
 		.AddGroup(B_HORIZONTAL, spacing)
 			.AddGlue()
-			.Add(new BButton("Cancel", new BMessage(MSG_CANCEL)))
+			.Add(new BButton(TR("Cancel"), new BMessage(MSG_CANCEL)))
 			.Add(okButton)
 		.End()
 		.SetInsets(spacing, spacing, spacing, spacing)

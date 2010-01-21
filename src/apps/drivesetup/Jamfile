@@ -13,6 +13,20 @@ Preference DriveSetup :
 	PartitionList.cpp
 	Support.cpp
 
-	: be libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
+	: be liblocale.so libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
 	: DriveSetup.rdef
 ;
+
+DoCatalogs DriveSetup :
+	x-vnd.Haiku-DriveSetup
+	:
+	CreateParamsPanel.cpp
+	DiskView.cpp
+	InitParamsPanel.cpp
+	MainWindow.cpp
+	PartitionList.cpp
+	Support.cpp
+	: en.catalog
+	: de.catkeys
+;
+

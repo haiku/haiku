@@ -13,8 +13,12 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
 #include <Partition.h>
 #include <String.h>
+
+
+#define TR_CONTEXT "Support"
 
 
 const char*
@@ -22,25 +26,25 @@ string_for_size(off_t size, char *string)
 {
 	double kb = size / 1024.0;
 	if (kb < 1.0) {
-		sprintf(string, "%Ld B", size);
+		sprintf(string, TR("%Ld B"), size);
 		return string;
 	}
 	float mb = kb / 1024.0;
 	if (mb < 1.0) {
-		sprintf(string, "%3.1f KB", kb);
+		sprintf(string, TR("%3.1f KB"), kb);
 		return string;
 	}
 	float gb = mb / 1024.0;
 	if (gb < 1.0) {
-		sprintf(string, "%3.1f MB", mb);
+		sprintf(string, TR("%3.1f MB"), mb);
 		return string;
 	}
 	float tb = gb / 1024.0;
 	if (tb < 1.0) {
-		sprintf(string, "%3.1f GB", gb);
+		sprintf(string, TR("%3.1f GB"), gb);
 		return string;
 	}
-	sprintf(string, "%.1f TB", tb);
+	sprintf(string, TR("%.1f TB"), tb);
 	return string;
 }
 
@@ -86,7 +90,8 @@ is_valid_partitionable_space(size_t size)
 
 
 SpaceIDMap::SpaceIDMap()
-	: HashMap<HashString, partition_id>(),
+	:
+	HashMap<HashString, partition_id>(),
 	fNextSpaceID(-2)
 {
 }
@@ -114,17 +119,21 @@ SpaceIDMap::SpaceIDFor(partition_id parentID, off_t spaceOffset)
 
 
 SizeSlider::SizeSlider(const char* name, const char* label,
-	BMessage* message, int32 minValue, int32 maxValue)
-	: BSlider(name, label, message, minValue, maxValue,
+		BMessage* message, int32 minValue, int32 maxValue)
+	:
+	BSlider(name, label, message, minValue, maxValue,
 	B_HORIZONTAL, B_TRIANGLE_THUMB),
 	fStartOffset(minValue),
 	fEndOffset(maxValue)
 {
 	SetBarColor((rgb_color){ 0, 80, 255, 255 });
-	BString startOffset, endOffset;
-	startOffset << "Offset: " << fStartOffset << " MB";
-	endOffset << "End: " << fEndOffset << " MB";
-	SetLimitLabels(startOffset.String(), endOffset.String());
+	char minString[64];
+	char maxString[64];
+	snprintf(minString, sizeof(minString), TR("Offset: %ld MB"),
+		fStartOffset);
+	snprintf(maxString, sizeof(maxString), TR("End: %ld MB"),
+		fEndOffset);
+	SetLimitLabels(minString, maxString);
 }
 
 
@@ -136,11 +145,10 @@ SizeSlider::~SizeSlider()
 const char*
 SizeSlider::UpdateText() const
 {
-	fStatusLabel.Truncate(0);
-	fStatusLabel << Value() - fStartOffset;
-	fStatusLabel << " MB";
+	snprintf(fStatusLabel, sizeof(fStatusLabel), TR("%ld MB"),
+		Value() - fStartOffset);
 
-	return fStatusLabel.String();
+	return fStatusLabel;
 }
 
 

@@ -56,7 +56,7 @@ public:
 private:
 			off_t				fStartOffset;
 			off_t				fEndOffset;
-	mutable	BString				fStatusLabel;
+	mutable	char				fStatusLabel[64];
 };
 
 #endif // SUPPORT_H

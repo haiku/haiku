@@ -1,35 +1,40 @@
 /*
- * Copyright 2007-2009 Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2007-2010 Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 #include "DiskView.h"
-#include "MainWindow.h"
+
+#include <stdio.h>
 
 #include <DiskDeviceVisitor.h>
+#include <Catalog.h>
 #include <GroupLayout.h>
 #include <HashMap.h>
 #include <LayoutItem.h>
 #include <PartitioningInfo.h>
 #include <String.h>
 
+#include "MainWindow.h"
+
+
+#define TR_CONTEXT "DiskView"
+
 using BPrivate::HashMap;
 using BPrivate::HashKey32;
-
 
 static const pattern	kStripes		= { { 0xc7, 0x8f, 0x1f, 0x3e,
 											  0x7c, 0xf8, 0xf1, 0xe3 } };
 
 static const float		kLayoutInset	= 6;
 
+
 class PartitionView : public BView {
 public:
 	PartitionView(const char* name, float weight, off_t offset,
 			int32 level, partition_id id)
-		: BView(name, B_WILL_DRAW | B_SUPPORTS_LAYOUT | B_FULL_UPDATE_ON_RESIZE),
+		:
+		BView(name, B_WILL_DRAW | B_SUPPORTS_LAYOUT | B_FULL_UPDATE_ON_RESIZE),
 		fID(id),
 		fWeight(weight),
 		fOffset(offset),
@@ -195,7 +200,7 @@ public:
 
 	virtual bool Visit(BDiskDevice* device)
 	{
-		PartitionView* view = new PartitionView("Device", 1.0,
+		PartitionView* view = new PartitionView(TR("Device"), 1.0,
 			device->Offset(), 0, device->ID());
 		fViewMap.Put(device->ID(), view);
 		fView->GetLayout()->AddView(view);
@@ -220,8 +225,11 @@ public:
 		if (name.Length() == 0) {
 			if (partition->CountChildren() > 0)
 				name << partition->Type();
-			else
-				name << "Partition " << partition->ID();
+			else {
+				char buffer[64];
+				snprintf(buffer, 64, TR("Partition %ld"), partition->ID());
+				name << buffer;
+			}
 		}
 		partition_id id = partition->ID();
 		PartitionView* view = new PartitionView(name.String(), scale, offset,
@@ -279,7 +287,7 @@ public:
 				double scale = (double)size / parentSize;
 				partition_id id
 					= fSpaceIDMap.SpaceIDFor(partition->ID(), offset);
-				PartitionView* view = new PartitionView("<empty>", scale,
+				PartitionView* view = new PartitionView(TR("<empty>"), scale,
 					offset, parentView->Level() + 1, id);
 
 				fViewMap.Put(id, view);
@@ -320,7 +328,8 @@ public:
 
 DiskView::DiskView(const BRect& frame, uint32 resizeMode,
 		SpaceIDMap& spaceIDMap)
-	: Inherited(frame, "diskview", resizeMode,
+	:
+	Inherited(frame, "diskview", resizeMode,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fDiskCount(0),
 	fDisk(NULL),
@@ -390,9 +399,9 @@ DiskView::Draw(BRect updateRect)
 
 	const char* helpfulMessage;
 	if (fDiskCount == 0)
-		helpfulMessage = "No disk devices have been recognized.";
+		helpfulMessage = TR("No disk devices have been recognized.");
 	else
-		helpfulMessage = "Select a partition from the list below.";
+		helpfulMessage = TR("Select a partition from the list below.");
 
 	float width = StringWidth(helpfulMessage);
 	font_height fh;

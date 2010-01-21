@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 Haiku Inc. All rights reserved.
+ * Copyright 2006-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -7,18 +7,25 @@
  *		James Urquhart
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-#include "PartitionList.h"
-#include "Support.h"
 
+#include "PartitionList.h"
+
+#include <Catalog.h>
 #include <ColumnTypes.h>
 #include <Path.h>
+
+#include "Support.h"
+
+
+#define TR_CONTEXT "PartitionList"
 
 
 // #pragma mark - BBitmapStringField
 
 
 BBitmapStringField::BBitmapStringField(BBitmap* bitmap, const char* string)
-	: Inherited(string),
+	:
+	Inherited(string),
 	fBitmap(bitmap)
 {
 }
@@ -47,7 +54,8 @@ float PartitionColumn::sTextMargin = 0.0;
 
 PartitionColumn::PartitionColumn(const char* title, float width, float minWidth,
 		float maxWidth, uint32 truncateMode, alignment align)
-	: Inherited(title, width, minWidth, maxWidth, align),
+	:
+	Inherited(title, width, minWidth, maxWidth, align),
 	fTruncateMode(truncateMode)
 {
 	SetWantsEvents(true);
@@ -179,7 +187,8 @@ enum {
 
 
 PartitionListRow::PartitionListRow(BPartition* partition)
-	: Inherited(),
+	:
+	Inherited(),
 	fPartitionID(partition->ID()),
 	fParentID(partition->Parent() ? partition->Parent()->ID() : -1),
 	fOffset(partition->Offset()),
@@ -225,7 +234,8 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 
 PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 		off_t offset, off_t size)
-	: Inherited(),
+	:
+	Inherited(),
 	fPartitionID(id),
 	fParentID(parentID),
 	fOffset(offset),
@@ -234,7 +244,7 @@ PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 	// TODO: design icon for spaces on partitions
 	SetField(new BBitmapStringField(NULL, "-"), kDeviceColumn);
 
-	SetField(new BStringField("<empty>"), kFilesystemColumn);
+	SetField(new BStringField(TR("<empty>")), kFilesystemColumn);
 	SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 
 	SetField(new BStringField(kUnavailableString), kMountedAtColumn);
@@ -250,15 +260,15 @@ PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 	: Inherited(frame, "storagelist", resizeMode, 0, B_NO_BORDER, true)
 {
-	AddColumn(new PartitionColumn("Device", 150, 50, 500,
+	AddColumn(new PartitionColumn(TR("Device"), 150, 50, 500,
 		B_TRUNCATE_MIDDLE), kDeviceColumn);
-	AddColumn(new PartitionColumn("File system", 100, 50, 500,
+	AddColumn(new PartitionColumn(TR("File system"), 100, 50, 500,
 		B_TRUNCATE_MIDDLE), kFilesystemColumn);
-	AddColumn(new PartitionColumn("Volume name", 130, 50, 500,
+	AddColumn(new PartitionColumn(TR("Volume name"), 130, 50, 500,
 		B_TRUNCATE_MIDDLE), kVolumeNameColumn);
-	AddColumn(new PartitionColumn("Mounted at", 100, 50, 500,
+	AddColumn(new PartitionColumn(TR("Mounted at"), 100, 50, 500,
 		B_TRUNCATE_MIDDLE), kMountedAtColumn);
-	AddColumn(new PartitionColumn("Size", 100, 50, 500,
+	AddColumn(new PartitionColumn(TR("Size"), 100, 50, 500,
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
 
 	SetSortingEnabled(false);
