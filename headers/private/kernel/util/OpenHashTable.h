@@ -255,12 +255,14 @@ public:
 	/*!	Resizes the table using the given allocation. The allocation must not
 		be \c NULL. It must be of size \a size, which must a value returned
 		earlier by ResizeNeeded(). If the size requirements have changed in the
-		meantime, the method free()s the given allocation and returns \c false.
+		meantime, the method free()s the given allocation and returns \c false,
+		unless \a force is \c true, in which case the supplied allocation is
+		used in any event.
 		Otherwise \c true is returned.
 	*/
-	bool Resize(void* allocation, size_t size)
+	bool Resize(void* allocation, size_t size, bool force = false)
 	{
-		if (size != ResizeNeeded()) {
+		if (!force && size != ResizeNeeded()) {
 			free(allocation);
 			return false;
 		}
