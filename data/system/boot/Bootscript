@@ -105,7 +105,7 @@ if [ "$isReadOnly" = "yes" ]; then
 	# Create Installer link (using the write overlay)
 	ln -sf /boot/system/apps/Installer /boot/home/Desktop/Installer
 
-	/bin/alert "Do you wish to run the Installer or continue booting to the Desktop?" "Installer" "Desktop"
+	/bin/ReadOnlyBootPrompt
 	if [ $? -eq 0 ]; then
 		launchscript $SCRIPTS/Bootscript.cd
 		exit 0 # and return
