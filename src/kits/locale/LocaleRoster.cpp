@@ -513,6 +513,8 @@ BLocaleRoster::GetInstalledLanguages(BMessage *languages) const
 
 #undef REALLY_ALL_LANGUAGES
 #ifdef REALLY_ALL_LANGUAGES
+	// TODO: Using static variables here looks really weird, and is probably
+	// the reason why calling this method a second time will crash.
 	static const char* const* icuLocaleList = Locale::getISOLanguages();
 
 	// Loop over the strings and add them to an std::set to remove duplicates

@@ -121,6 +121,10 @@ BCatalog::GetAppCatalog(BCatalog* catalog)
 	appNode.ReadAttr(BLocaleRoster::kCatFingerprintAttr, B_UINT32_TYPE, 0,
 		&fingerprint, sizeof(uint32));
 	// try to load catalog (with given fingerprint):
+	// TODO: Not so nice C++ design here, leading to such bugs: The previous
+	// fCatalog is leaked here. (The whole chain, it looks like.) There should
+	// be a SetCatalog() method (it can be private), and that should take care
+	// that internal members are always properly maintained.
 	catalog->fCatalog
 		= be_locale_roster->LoadCatalog(sig.String(), NULL,	fingerprint);
 
