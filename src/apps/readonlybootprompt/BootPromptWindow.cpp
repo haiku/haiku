@@ -64,7 +64,7 @@ BootPromptWindow::BootPromptWindow()
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	// TODO: Remove once BLocalRoster is fixed.
+	// Get the list of all known languages (suffice to do it only once)
 	be_locale_roster->GetInstalledLanguages(&fInstalledLanguages);
 
 	fInfoTextView = new BTextView("info", be_plain_font, NULL, B_WILL_DRAW);
@@ -266,12 +266,6 @@ BootPromptWindow::_PopulateLanguages()
 //	BMessage installedCatalogs;
 //	be_locale_roster->GetInstalledCatalogs(&installedCatalogs);
 //	installedCatalogs.PrintToStream();
-
-// TODO: BLocaleRoster uses static variables!! Fix this! Or else one can only
-// call this once!
-//	// Get the list of all known languages
-//	BMessage installedLanguages;
-//	be_locale_roster->GetInstalledLanguages(&installedLanguages);
 
 	// Try to instantiate a BCatalog for each language, it will only work
 	// for translations of this application. So the list of languages will be

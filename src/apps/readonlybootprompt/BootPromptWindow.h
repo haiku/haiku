@@ -39,7 +39,6 @@ private:
 			BButton*			fDesktopButton;
 			BButton*			fInstallerButton;
 
-	// TODO: Should not be needed, see TODO in _PopulateLanguages()
 			BMessage			fInstalledLanguages;
 };
 
