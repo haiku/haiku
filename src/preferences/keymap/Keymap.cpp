@@ -141,7 +141,7 @@ Keymap::Load(entry_ref &ref)
 		return B_BAD_VALUE;
 	}
 
-	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++)
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
 
 	if ((err = file.Read(&fCharsSize, sizeof(uint32))) < (ssize_t)sizeof(uint32)) {
@@ -154,19 +154,21 @@ Keymap::Load(entry_ref &ref)
 
 	fChars = new char[fCharsSize];
 
-	err = file.Read(fChars, fCharsSize);
-	if (err < B_OK) {
+	ssize_t bytesRead = file.Read(fChars, fCharsSize);
+	if (bytesRead < 0) {
 		fprintf(stderr, "error reading keymap chars: %s\n", strerror(err));
+		return (status_t)bytesRead;
 	}
 
 	// fetch name from attribute and fall back to filename
-	ssize_t bytesRead
-		= file.ReadAttr("keymap:name", B_STRING_TYPE, 0, fName, sizeof(fName));
+	
+	bytesRead = file.ReadAttr("keymap:name", B_STRING_TYPE, 0, fName,
+		sizeof(fName));
 	if (bytesRead > 0)
 		fName[bytesRead] = '\0';
 	else
 		strlcpy(fName, ref.name, sizeof(fName));
-	return err;
+	return B_OK;
 }
 
 
