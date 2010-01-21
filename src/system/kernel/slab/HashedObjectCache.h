@@ -22,14 +22,16 @@ struct HashedObjectCache : ObjectCache {
 									object_cache_constructor constructor,
 									object_cache_destructor destructor,
 									object_cache_reclaimer reclaimer);
+	virtual	void				Delete();
 
 	virtual	slab*				CreateSlab(uint32 flags);
-	virtual	void				ReturnSlab(slab* slab);
+	virtual	void				ReturnSlab(slab* slab, uint32 flags);
 	virtual slab*				ObjectSlab(void* object) const;
 
 	virtual	status_t			PrepareObject(slab* source, void* object,
 									uint32 flags);
-	virtual	void				UnprepareObject(slab* source, void* object);
+	virtual	void				UnprepareObject(slab* source, void* object,
+									uint32 flags);
 
 private:
 			struct Link {
@@ -85,7 +87,8 @@ private:
 
 private:
 	static	Link*				_AllocateLink(uint32 flags);
-	static	void				_FreeLink(HashedObjectCache::Link* link);
+	static	void				_FreeLink(HashedObjectCache::Link* link,
+									uint32 flags);
 
 private:
 			HashTable hash_table;

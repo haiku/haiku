@@ -23,7 +23,7 @@ typedef struct object_depot {
 
 	void*	cookie;
 	void (*return_object)(struct object_depot* depot, void* cookie,
-		void* object);
+		void* object, uint32 flags);
 } object_depot;
 
 
@@ -32,13 +32,14 @@ extern "C" {
 #endif
 
 status_t object_depot_init(object_depot* depot, uint32 flags, void* cookie,
-	void (*returnObject)(object_depot* depot, void* cookie, void* object));
-void object_depot_destroy(object_depot* depot);
+	void (*returnObject)(object_depot* depot, void* cookie, void* object,
+		uint32 flags));
+void object_depot_destroy(object_depot* depot, uint32 flags);
 
 void* object_depot_obtain(object_depot* depot);
-int object_depot_store(object_depot* depot, void* object);
+int object_depot_store(object_depot* depot, void* object, uint32 flags);
 
-void object_depot_make_empty(object_depot* depot);
+void object_depot_make_empty(object_depot* depot, uint32 flags);
 
 #ifdef __cplusplus
 }

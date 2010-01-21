@@ -80,7 +80,7 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 
 
 void
-object_cache_free(object_cache *cache, void *object)
+object_cache_free(object_cache *cache, void *object, uint32 flags)
 {
 	if (object != NULL) {
 		if (cache != NULL && cache->objectDestructor != NULL)

@@ -37,6 +37,7 @@
 #include <int.h>
 #include <lock.h>
 #include <low_resource_manager.h>
+#include <slab/Slab.h>
 #include <smp.h>
 #include <system_info.h>
 #include <thread.h>
@@ -220,6 +221,8 @@ private:
 	VMCache*	fBottomCache;
 };
 
+
+ObjectCache* gPageMappingsObjectCache;
 
 static rw_lock sAreaCacheLock = RW_LOCK_INITIALIZER("area->cache");
 
@@ -468,8 +471,8 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection)
 	if (area->wiring == B_NO_LOCK) {
 		DEBUG_PAGE_ACCESS_CHECK(page);
 
-		vm_page_mapping* mapping
-			= (vm_page_mapping*)malloc_nogrow(sizeof(vm_page_mapping));
+		vm_page_mapping* mapping = (vm_page_mapping*)object_cache_alloc(
+			gPageMappingsObjectCache, CACHE_DONT_SLEEP);
 		if (mapping == NULL)
 			return B_NO_MEMORY;
 
@@ -3067,50 +3070,55 @@ reserve_boot_loader_ranges(kernel_args* args)
 
 
 static addr_t
-allocate_early_virtual(kernel_args* args, size_t size)
+allocate_early_virtual(kernel_args* args, size_t size, bool blockAlign)
 {
-	addr_t spot = 0;
-	uint32 i;
-	int last_valloc_entry = 0;
-
 	size = PAGE_ALIGN(size);
+
 	// find a slot in the virtual allocation addr range
-	for (i = 1; i < args->num_virtual_allocated_ranges; i++) {
+	for (uint32 i = 1; i < args->num_virtual_allocated_ranges; i++) {
+		// check to see if the space between this one and the last is big enough
+		addr_t rangeStart = args->virtual_allocated_range[i].start;
 		addr_t previousRangeEnd = args->virtual_allocated_range[i - 1].start
 			+ args->virtual_allocated_range[i - 1].size;
-		last_valloc_entry = i;
-		// check to see if the space between this one and the last is big enough
-		if (previousRangeEnd >= KERNEL_BASE
-			&& args->virtual_allocated_range[i].start
-				- previousRangeEnd >= size) {
-			spot = previousRangeEnd;
-			args->virtual_allocated_range[i - 1].size += size;
-			goto out;
-		}
-	}
-	if (spot == 0) {
-		// we hadn't found one between allocation ranges. this is ok.
-		// see if there's a gap after the last one
-		addr_t lastRangeEnd
-			= args->virtual_allocated_range[last_valloc_entry].start
-				+ args->virtual_allocated_range[last_valloc_entry].size;
-		if (KERNEL_BASE + (KERNEL_SIZE - 1) - lastRangeEnd >= size) {
-			spot = lastRangeEnd;
-			args->virtual_allocated_range[last_valloc_entry].size += size;
-			goto out;
-		}
-		// see if there's a gap before the first one
-		if (args->virtual_allocated_range[0].start > KERNEL_BASE) {
-			if (args->virtual_allocated_range[0].start - KERNEL_BASE >= size) {
-				args->virtual_allocated_range[0].start -= size;
-				spot = args->virtual_allocated_range[0].start;
-				goto out;
-			}
+
+		addr_t base = blockAlign
+			? ROUNDUP(previousRangeEnd, size) : previousRangeEnd;
+
+		if (base >= KERNEL_BASE && base < rangeStart
+				&& rangeStart - base >= size) {
+			args->virtual_allocated_range[i - 1].size
+				+= base + size - previousRangeEnd;
+			return base;
 		}
 	}
 
-out:
-	return spot;
+	// we hadn't found one between allocation ranges. this is ok.
+	// see if there's a gap after the last one
+	int lastEntryIndex = args->num_virtual_allocated_ranges - 1;
+	addr_t lastRangeEnd = args->virtual_allocated_range[lastEntryIndex].start
+		+ args->virtual_allocated_range[lastEntryIndex].size;
+	addr_t base = blockAlign ? ROUNDUP(lastRangeEnd, size) : lastRangeEnd;
+	if (KERNEL_BASE + (KERNEL_SIZE - 1) - base >= size) {
+		args->virtual_allocated_range[lastEntryIndex].size
+			+= base + size - lastRangeEnd;
+		return base;
+	}
+
+	// see if there's a gap before the first one
+	addr_t rangeStart = args->virtual_allocated_range[0].start;
+	if (rangeStart > KERNEL_BASE && rangeStart - KERNEL_BASE >= size) {
+		base = rangeStart - size;
+		if (blockAlign)
+			base = ROUNDDOWN(base, size);
+
+		if (base >= KERNEL_BASE) {
+			args->virtual_allocated_range[0].start = base;
+			args->virtual_allocated_range[0].size += rangeStart - base;
+			return base;
+		}
+	}
+
+	return 0;
 }
 
 
@@ -3162,13 +3170,13 @@ allocate_early_physical_page(kernel_args* args)
 */
 addr_t
 vm_allocate_early(kernel_args* args, size_t virtualSize, size_t physicalSize,
-	uint32 attributes)
+	uint32 attributes, bool blockAlign)
 {
 	if (physicalSize > virtualSize)
 		physicalSize = virtualSize;
 
 	// find the vaddr to allocate at
-	addr_t virtualBase = allocate_early_virtual(args, virtualSize);
+	addr_t virtualBase = allocate_early_virtual(args, virtualSize, blockAlign);
 	//dprintf("vm_allocate_early: vaddr 0x%lx\n", virtualAddress);
 
 	// map the pages
@@ -3214,13 +3222,13 @@ vm_init(kernel_args* args)
 
 	// map in the new heap and initialize it
 	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
 	TRACE(("heap at 0x%lx\n", heapBase));
 	heap_init(heapBase, heapSize);
 
-	size_t slabInitialSize = args->num_cpus * 3 * B_PAGE_SIZE;
+	size_t slabInitialSize = B_PAGE_SIZE;
 	addr_t slabInitialBase = vm_allocate_early(args, slabInitialSize,
-		slabInitialSize, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		slabInitialSize, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
 	slab_init(args, slabInitialBase, slabInitialSize);
 
 	// initialize the free page list and physical page mapper
@@ -3243,6 +3251,7 @@ vm_init(kernel_args* args)
 	arch_vm_translation_map_init_post_area(args);
 	arch_vm_init_post_area(args);
 	vm_page_init_post_area(args);
+	slab_init_post_area();
 
 	// allocate areas to represent stuff that already exists
 
@@ -3260,9 +3269,8 @@ vm_init(kernel_args* args)
 	create_preloaded_image_areas(&args->kernel_image);
 
 	// allocate areas for preloaded images
-	for (image = args->preloaded_images; image != NULL; image = image->next) {
+	for (image = args->preloaded_images; image != NULL; image = image->next)
 		create_preloaded_image_areas(image);
-	}
 
 	// allocate kernel stacks
 	for (i = 0; i < args->num_cpus; i++) {
@@ -3276,6 +3284,14 @@ vm_init(kernel_args* args)
 
 	void* lastPage = (void*)ROUNDDOWN(~(addr_t)0, B_PAGE_SIZE);
 	vm_block_address_range("overflow protection", lastPage, B_PAGE_SIZE);
+
+	// create the object cache for the page mappings
+	gPageMappingsObjectCache = create_object_cache_etc("page mappings",
+		sizeof(vm_page_mapping), 0, 0, 0, NULL, NULL, NULL, NULL);
+	if (gPageMappingsObjectCache == NULL)
+		panic("failed to create page mappings object cache");
+
+	object_cache_set_minimum_reserve(gPageMappingsObjectCache, 1024);
 
 #if DEBUG_CACHE_LIST
 	create_area("cache info table", (void**)&sCacheInfoTable,

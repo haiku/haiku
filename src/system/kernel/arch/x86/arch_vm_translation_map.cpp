@@ -19,6 +19,7 @@
 #include <heap.h>
 #include <int.h>
 #include <thread.h>
+#include <slab/Slab.h>
 #include <smp.h>
 #include <util/AutoLock.h>
 #include <util/queue.h>
@@ -628,7 +629,7 @@ X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address)
 	locker.Unlock();
 
 	if (mapping != NULL)
-		free(mapping);
+		object_cache_free(gPageMappingsObjectCache, mapping, CACHE_DONT_SLEEP);
 
 	return B_OK;
 }
@@ -738,7 +739,7 @@ X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size)
 
 	// free removed mappings
 	while (vm_page_mapping* mapping = queue.RemoveHead())
-		free(mapping);
+		object_cache_free(gPageMappingsObjectCache, mapping, CACHE_DONT_SLEEP);
 }
 
 
@@ -823,7 +824,7 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	locker.Unlock();
 
 	while (vm_page_mapping* mapping = mappings.RemoveHead())
-		free(mapping);
+		object_cache_free(gPageMappingsObjectCache, mapping, CACHE_DONT_SLEEP);
 }
 
 

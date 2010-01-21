@@ -8,6 +8,7 @@
 
 #include "SmallObjectCache.h"
 
+#include "MemoryManager.h"
 #include "slab_private.h"
 
 
@@ -31,11 +32,21 @@ SmallObjectCache::Create(const char* name, size_t object_size,
 	}
 
 	if ((flags & CACHE_LARGE_SLAB) != 0)
-		cache->slab_size = max_c(16 * B_PAGE_SIZE, 1024 * object_size);
+		cache->slab_size = 1024 * object_size;
 	else
-		cache->slab_size = B_PAGE_SIZE;
+		cache->slab_size = SLAB_CHUNK_SIZE_SMALL;
+
+	cache->slab_size = MemoryManager::AcceptableChunkSize(cache->slab_size);
 
 	return cache;
+}
+
+
+void
+SmallObjectCache::Delete()
+{
+	this->~SmallObjectCache();
+	slab_internal_free(this, 0);
 }
 
 
@@ -46,7 +57,8 @@ SmallObjectCache::CreateSlab(uint32 flags)
 		return NULL;
 
 	void* pages;
-	if ((this->*allocate_pages)(&pages, flags) != B_OK)
+
+	if (MemoryManager::Allocate(this, flags, pages) != B_OK)
 		return NULL;
 
 	return InitSlab(slab_in_pages(pages, slab_size), pages,
@@ -55,10 +67,10 @@ SmallObjectCache::CreateSlab(uint32 flags)
 
 
 void
-SmallObjectCache::ReturnSlab(slab* slab)
+SmallObjectCache::ReturnSlab(slab* slab, uint32 flags)
 {
 	UninitSlab(slab);
-	(this->*free_pages)(slab->pages);
+	MemoryManager::Free(slab->pages, flags);
 }
 
 

@@ -19,27 +19,15 @@
 
 static const size_t kCacheColorPeriod = 8;
 
-kernel_args* ObjectCache::sKernelArgs = NULL;
-
-
-static void
-object_cache_commit_slab(ObjectCache* cache, slab* slab)
-{
-	void* pages = (void*)ROUNDDOWN((addr_t)slab->pages, B_PAGE_SIZE);
-	if (create_area(cache->name, &pages, B_EXACT_ADDRESS, cache->slab_size,
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA) < 0)
-		panic("failed to create_area()");
-}
-
 
 static void
 object_cache_return_object_wrapper(object_depot* depot, void* cookie,
-	void* object)
+	void* object, uint32 flags)
 {
 	ObjectCache* cache = (ObjectCache*)cookie;
 
 	MutexLocker _(cache->lock);
-	cache->ReturnObjectToSlab(cache->ObjectSlab(object), object);
+	cache->ReturnObjectToSlab(cache->ObjectSlab(object), object, flags);
 }
 
 
@@ -106,46 +94,7 @@ ObjectCache::Init(const char* name, size_t objectSize,
 	this->destructor = destructor;
 	this->reclaimer = reclaimer;
 
-	if (this->flags & CACHE_DURING_BOOT) {
-		allocate_pages = &ObjectCache::EarlyAllocatePages;
-		free_pages = &ObjectCache::EarlyFreePages;
-	} else {
-		allocate_pages = &ObjectCache::AllocatePages;
-		free_pages = &ObjectCache::FreePages;
-	}
-
 	return B_OK;
-}
-
-
-void
-ObjectCache::InitPostArea()
-{
-	if (allocate_pages != &ObjectCache::EarlyAllocatePages)
-		return;
-
-	SlabList::Iterator it = full.GetIterator();
-	while (it.HasNext())
-		object_cache_commit_slab(this, it.Next());
-
-	it = partial.GetIterator();
-	while (it.HasNext())
-		object_cache_commit_slab(this, it.Next());
-
-	it = empty.GetIterator();
-	while (it.HasNext())
-		object_cache_commit_slab(this, it.Next());
-
-	allocate_pages = &ObjectCache::AllocatePages;
-	free_pages = &ObjectCache::FreePages;
-}
-
-
-void
-ObjectCache::Delete()
-{
-	this->~ObjectCache();
-	slab_internal_free(this);
 }
 
 
@@ -186,13 +135,13 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 
 		if (status < B_OK) {
 			if (!failedOnFirst)
-				UnprepareObject(slab, data);
+				UnprepareObject(slab, data, flags);
 
 			data = ((uint8*)pages) + slab->offset;
 			for (size_t j = 0; j < i; j++) {
 				if (destructor)
 					destructor(cookie, data);
-				UnprepareObject(slab, data);
+				UnprepareObject(slab, data, flags);
 				data += object_size;
 			}
 
@@ -230,7 +179,7 @@ ObjectCache::UninitSlab(slab* slab)
 	for (size_t i = 0; i < slab->size; i++) {
 		if (destructor)
 			destructor(cookie, data);
-		UnprepareObject(slab, data);
+		UnprepareObject(slab, data, flags);
 		data += object_size;
 	}
 }
@@ -244,13 +193,13 @@ ObjectCache::PrepareObject(slab* source, void* object, uint32 flags)
 
 
 void
-ObjectCache::UnprepareObject(slab* source, void* object)
+ObjectCache::UnprepareObject(slab* source, void* object, uint32 flags)
 {
 }
 
 
 void
-ObjectCache::ReturnObjectToSlab(slab* source, void* object)
+ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 {
 	if (source == NULL) {
 		panic("object_cache: free'd object has no slab");
@@ -280,102 +229,10 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object)
 			empty_count++;
 			empty.Add(source);
 		} else {
-			ReturnSlab(source);
+			ReturnSlab(source, flags);
 		}
 	} else if (source->count == 1) {
 		full.Remove(source);
 		partial.Add(source);
 	}
-}
-
-
-/*static*/ void
-ObjectCache::SetKernelArgs(kernel_args* args)
-{
-	sKernelArgs = args;
-}
-
-
-status_t
-ObjectCache::AllocatePages(void** pages, uint32 flags)
-{
-	TRACE_CACHE(cache, "allocate pages (%lu, 0x0%lx)", slab_size, flags);
-
-	uint32 lock = B_FULL_LOCK;
-	if (this->flags & CACHE_UNLOCKED_PAGES)
-		lock = B_NO_LOCK;
-
-	uint32 addressSpec = B_ANY_KERNEL_ADDRESS;
-	if ((this->flags & CACHE_ALIGN_ON_SIZE) != 0
-		&& slab_size != B_PAGE_SIZE)
-		addressSpec = B_ANY_KERNEL_BLOCK_ADDRESS;
-
-	Unlock();
-
-	// if we are allocating, it is because we need the pages immediatly
-	// so we lock them. when moving the slab to the empty list we should
-	// unlock them, and lock them again when getting one from the empty list.
-	area_id areaId = create_area_etc(VMAddressSpace::KernelID(),
-		name, pages, addressSpec, slab_size, lock,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
-		(flags & CACHE_DONT_SLEEP) != 0 ? CREATE_AREA_DONT_WAIT : 0);
-
-	Lock();
-
-	if (areaId < 0)
-		return areaId;
-
-	usage += slab_size;
-
-	TRACE_CACHE(this, "  ... = { %ld, %p }", areaId, *pages);
-
-	return B_OK;
-}
-
-
-void
-ObjectCache::FreePages(void* pages)
-{
-	area_id id = area_for(pages);
-
-	TRACE_CACHE(this, "delete pages %p (%ld)", pages, id);
-
-	if (id < 0) {
-		panic("object cache: freeing unknown area");
-		return;
-	}
-
-	delete_area(id);
-
-	usage -= slab_size;
-}
-
-
-status_t
-ObjectCache::EarlyAllocatePages(void** pages, uint32 flags)
-{
-	TRACE_CACHE(this, "early allocate pages (%lu, 0x0%lx)", slab_size,
-		flags);
-
-	Unlock();
-
-	addr_t base = vm_allocate_early(sKernelArgs, slab_size,
-		slab_size, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-
-	Lock();
-
-	*pages = (void*)base;
-
-	usage += slab_size;
-
-	TRACE_CACHE(this, "  ... = { %p }", *pages);
-
-	return B_OK;
-}
-
-
-void
-ObjectCache::EarlyFreePages(void* pages)
-{
-	panic("memory pressure on bootup?");
 }

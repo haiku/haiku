@@ -93,18 +93,18 @@ alloc_magazine()
 
 
 static void
-free_magazine(DepotMagazine* magazine)
+free_magazine(DepotMagazine* magazine, uint32 flags)
 {
-	slab_internal_free(magazine);
+	slab_internal_free(magazine, flags);
 }
 
 
 static void
-empty_magazine(object_depot* depot, DepotMagazine* magazine)
+empty_magazine(object_depot* depot, DepotMagazine* magazine, uint32 flags)
 {
 	for (uint16 i = 0; i < magazine->current_round; i++)
-		depot->return_object(depot, depot->cookie, magazine->rounds[i]);
-	free_magazine(magazine);
+		depot->return_object(depot, depot->cookie, magazine->rounds[i], flags);
+	free_magazine(magazine, flags);
 }
 
 
@@ -166,7 +166,8 @@ object_depot_cpu(object_depot* depot)
 
 status_t
 object_depot_init(object_depot* depot, uint32 flags, void* cookie,
-	void (*return_object)(object_depot* depot, void* cookie, void* object))
+	void (*return_object)(object_depot* depot, void* cookie, void* object,
+		uint32 flags))
 {
 	depot->full = NULL;
 	depot->empty = NULL;
@@ -196,11 +197,11 @@ object_depot_init(object_depot* depot, uint32 flags, void* cookie,
 
 
 void
-object_depot_destroy(object_depot* depot)
+object_depot_destroy(object_depot* depot, uint32 flags)
 {
-	object_depot_make_empty(depot);
+	object_depot_make_empty(depot, flags);
 
-	slab_internal_free(depot->stores);
+	slab_internal_free(depot->stores, flags);
 
 	rw_lock_destroy(&depot->outer_lock);
 }
@@ -239,7 +240,7 @@ object_depot_obtain(object_depot* depot)
 
 
 int
-object_depot_store(object_depot* depot, void* object)
+object_depot_store(object_depot* depot, void* object, uint32 flags)
 {
 	ReadLocker readLocker(depot->outer_lock);
 	InterruptsLocker interruptsLocker;
@@ -278,7 +279,7 @@ object_depot_store(object_depot* depot, void* object)
 
 
 void
-object_depot_make_empty(object_depot* depot)
+object_depot_make_empty(object_depot* depot, uint32 flags)
 {
 	WriteLocker writeLocker(depot->outer_lock);
 
@@ -314,11 +315,11 @@ object_depot_make_empty(object_depot* depot)
 	// free all magazines
 
 	while (storeMagazines != NULL)
-		empty_magazine(depot, _pop(storeMagazines));
+		empty_magazine(depot, _pop(storeMagazines), flags);
 
 	while (fullMagazines != NULL)
-		empty_magazine(depot, _pop(fullMagazines));
+		empty_magazine(depot, _pop(fullMagazines), flags);
 
 	while (emptyMagazines)
-		free_magazine(_pop(emptyMagazines));
+		free_magazine(_pop(emptyMagazines), flags);
 }

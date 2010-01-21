@@ -8,6 +8,7 @@
 
 #include "HashedObjectCache.h"
 
+#include "MemoryManager.h"
 #include "slab_private.h"
 
 
@@ -32,9 +33,9 @@ allocate_slab(uint32 flags)
 
 
 static void
-free_slab(slab* slab)
+free_slab(slab* slab, uint32 flags)
 {
-	slab_internal_free(slab);
+	slab_internal_free(slab, flags);
 }
 
 
@@ -67,12 +68,22 @@ HashedObjectCache::Create(const char* name, size_t object_size,
 	}
 
 	if ((flags & CACHE_LARGE_SLAB) != 0)
-		cache->slab_size = max_c(256 * B_PAGE_SIZE, 128 * object_size);
+		cache->slab_size = 128 * object_size;
 	else
-		cache->slab_size = max_c(16 * B_PAGE_SIZE, 8 * object_size);
+		cache->slab_size = 8 * object_size;
+
+	cache->slab_size = MemoryManager::AcceptableChunkSize(cache->slab_size);
 	cache->lower_boundary = __fls0(cache->object_size);
 
 	return cache;
+}
+
+
+void
+HashedObjectCache::Delete()
+{
+	this->~HashedObjectCache();
+	slab_internal_free(this, 0);
 }
 
 
@@ -92,24 +103,24 @@ HashedObjectCache::CreateSlab(uint32 flags)
 		return NULL;
 
 	void* pages;
-	if ((this->*allocate_pages)(&pages, flags) == B_OK) {
+	if (MemoryManager::Allocate(this, flags, pages) == B_OK) {
 		if (InitSlab(slab, pages, slab_size, flags))
 			return slab;
 
-		(this->*free_pages)(pages);
+		MemoryManager::Free(pages, flags);
 	}
 
-	free_slab(slab);
+	free_slab(slab, flags);
 	return NULL;
 }
 
 
 void
-HashedObjectCache::ReturnSlab(slab* slab)
+HashedObjectCache::ReturnSlab(slab* slab, uint32 flags)
 {
 	UninitSlab(slab);
-	(this->*free_pages)(slab->pages);
-	free_slab(slab);
+	MemoryManager::Free(slab->pages, flags);
+	free_slab(slab, flags);
 }
 
 
@@ -137,12 +148,16 @@ HashedObjectCache::PrepareObject(slab* source, void* object, uint32 flags)
 	link->parent = source;
 
 	hash_table.Insert(link);
+		// TODO: This might resize the table! Currently it uses the heap, so
+		// we won't possibly reenter and deadlock on our own cache. We do ignore
+		// the flags, though!
+		// TODO: We don't pre-init the table, so Insert() can fail!
 	return B_OK;
 }
 
 
 void
-HashedObjectCache::UnprepareObject(slab* source, void* object)
+HashedObjectCache::UnprepareObject(slab* source, void* object, uint32 flags)
 {
 	Link* link = hash_table.Lookup(object);
 	if (link == NULL) {
@@ -156,7 +171,7 @@ HashedObjectCache::UnprepareObject(slab* source, void* object)
 	}
 
 	hash_table.Remove(link);
-	_FreeLink(link);
+	_FreeLink(link, flags);
 }
 
 
@@ -169,7 +184,7 @@ HashedObjectCache::_AllocateLink(uint32 flags)
 
 
 /*static*/ inline void
-HashedObjectCache::_FreeLink(HashedObjectCache::Link* link)
+HashedObjectCache::_FreeLink(HashedObjectCache::Link* link, uint32 flags)
 {
-	slab_internal_free(link);
+	slab_internal_free(link, flags);
 }

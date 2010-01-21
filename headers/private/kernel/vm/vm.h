@@ -16,8 +16,9 @@
 
 struct iovec;
 struct kernel_args;
-struct team;
+struct ObjectCache;
 struct system_memory_info;
+struct team;
 struct VMAddressSpace;
 struct VMArea;
 struct VMCache;
@@ -29,6 +30,9 @@ struct vnode;
 #define CREATE_AREA_DONT_WAIT			0x01
 #define CREATE_AREA_UNMAP_ADDRESS_RANGE	0x02
 #define CREATE_AREA_DONT_CLEAR			0x04
+
+
+extern struct ObjectCache* gPageMappingsObjectCache;
 
 
 #ifdef __cplusplus
@@ -43,10 +47,11 @@ status_t vm_init_post_modules(struct kernel_args *args);
 void vm_free_kernel_args(struct kernel_args *args);
 void vm_free_unused_boot_loader_range(addr_t start, addr_t end);
 addr_t vm_allocate_early(struct kernel_args *args, size_t virtualSize,
-			size_t physicalSize, uint32 attributes);
+			size_t physicalSize, uint32 attributes, bool blockAlign);
 
 void slab_init(struct kernel_args *args, addr_t initialBase,
 	size_t initialSize);
+void slab_init_post_area();
 void slab_init_post_sem();
 void slab_init_post_thread();
 

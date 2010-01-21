@@ -66,10 +66,6 @@ struct ObjectCache : DoublyLinkedListLinkImpl<ObjectCache> {
 			object_cache_destructor destructor;
 			object_cache_reclaimer reclaimer;
 
-			status_t			(ObjectCache::*allocate_pages)(void** pages,
-									uint32 flags);
-			void				(ObjectCache::*free_pages)(void* pages);
-
 			object_depot		depot;
 
 public:
@@ -81,11 +77,10 @@ public:
 									object_cache_constructor constructor,
 									object_cache_destructor destructor,
 									object_cache_reclaimer reclaimer);
-			void				InitPostArea();
-			void				Delete();
+	virtual	void				Delete() = 0;
 
 	virtual	slab*				CreateSlab(uint32 flags) = 0;
-	virtual	void				ReturnSlab(slab* slab) = 0;
+	virtual	void				ReturnSlab(slab* slab, uint32 flags) = 0;
 	virtual slab*				ObjectSlab(void* object) const = 0;
 
 			slab*				InitSlab(slab* slab, void* pages,
@@ -94,21 +89,19 @@ public:
 
 	virtual	status_t			PrepareObject(slab* source, void* object,
 									uint32 flags);
-	virtual	void				UnprepareObject(slab* source, void* object);
+	virtual	void				UnprepareObject(slab* source, void* object,
+									uint32 flags);
 
-			void				ReturnObjectToSlab(slab* source, void* object);
+			void				ReturnObjectToSlab(slab* source, void* object,
+									uint32 flags);
 
 			bool				Lock()	{ return mutex_lock(&lock) == B_OK; }
 			void				Unlock()	{ mutex_unlock(&lock); }
 
-	static	void				SetKernelArgs(kernel_args* args);
 			status_t			AllocatePages(void** pages, uint32 flags);
 			void				FreePages(void* pages);
 			status_t			EarlyAllocatePages(void** pages, uint32 flags);
 			void				EarlyFreePages(void* pages);
-
-private:
-	static	kernel_args*		sKernelArgs;
 };
 
 

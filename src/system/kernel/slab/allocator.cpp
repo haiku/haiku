@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -17,6 +18,9 @@
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
 
+#include "ObjectCache.h"
+#include "MemoryManager.h"
+
 
 #define DEBUG_ALLOCATOR
 //#define TEST_ALL_CACHES_DURING_BOOT
@@ -32,23 +36,11 @@ static const size_t kBlockSizes[] = {
 
 static const size_t kNumBlockSizes = sizeof(kBlockSizes) / sizeof(size_t) - 1;
 
-static object_cache *sBlockCaches[kNumBlockSizes];
-static int32 sBlockCacheWaste[kNumBlockSizes];
+static object_cache* sBlockCaches[kNumBlockSizes];
 
-struct boundary_tag {
-	uint32 size;
-#ifdef DEBUG_ALLOCATOR
-	uint32 magic;
-#endif
-};
-
-struct area_boundary_tag {
-	area_id area;
-	boundary_tag tag;
-};
-
-
-static const uint32 kBoundaryMagic = 0x6da78d13;
+static addr_t sBootStrapMemory;
+static size_t sBootStrapMemorySize;
+static size_t sUsedBootStrapMemory;
 
 
 static int
@@ -75,113 +67,90 @@ size_to_index(size_t size)
 }
 
 
-void *
+void*
 block_alloc(size_t size, uint32 flags)
 {
-	int index = size_to_index(size + sizeof(boundary_tag));
+	// allocate from the respective object cache, if any
+	int index = size_to_index(size);
+	if (index >= 0)
+		return object_cache_alloc(sBlockCaches[index], flags);
 
-	void *block;
-	boundary_tag *tag;
+	// the allocation is too large for our object caches -- create an area
+	void* block;
+	area_id area = create_area_etc(VMAddressSpace::KernelID(),
+		"alloc'ed block", &block, B_ANY_KERNEL_ADDRESS,
+		ROUNDUP(size, B_PAGE_SIZE), B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
+		(flags & CACHE_DONT_SLEEP) != 0 ? CREATE_AREA_DONT_WAIT : 0);
+	if (area < 0)
+		return NULL;
 
-	if (index < 0) {
-		void *pages;
-		area_id area = create_area_etc(VMAddressSpace::KernelID(),
-			"alloc'ed block", &pages, B_ANY_KERNEL_ADDRESS,
-			ROUNDUP(size + sizeof(area_boundary_tag), B_PAGE_SIZE), B_FULL_LOCK,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
-			(flags & CACHE_DONT_SLEEP) != 0 ? CREATE_AREA_DONT_WAIT : 0);
-		if (area < 0)
-			return NULL;
+	return block;
+}
 
-		area_boundary_tag *areaTag = (area_boundary_tag *)pages;
-		areaTag->area = area;
-		tag = &areaTag->tag;
-		block = areaTag + 1;
-	} else {
-		tag = (boundary_tag *)object_cache_alloc(sBlockCaches[index], flags);
-		if (tag == NULL)
-			return NULL;
-		atomic_add(&sBlockCacheWaste[index], kBlockSizes[index] - size
-			- sizeof(boundary_tag));
-		block = tag + 1;
-	}
 
-	tag->size = size;
+void*
+block_alloc_early(size_t size)
+{
+	int index = size_to_index(size);
+	if (index < 0)
+		return NULL;
 
-#ifdef DEBUG_ALLOCATOR
-	tag->magic = kBoundaryMagic;
-#endif
+	if (sBlockCaches[index] != NULL)
+		return object_cache_alloc(sBlockCaches[index], CACHE_DURING_BOOT);
+
+	// No object cache yet. Use the bootstrap memory. This allocation must
+	// never be freed!
+	size_t neededSize = ROUNDUP(size, sizeof(double));
+	if (sUsedBootStrapMemory + neededSize > sBootStrapMemorySize)
+		return NULL;
+	void* block = (void*)(sBootStrapMemory + sUsedBootStrapMemory);
+	sUsedBootStrapMemory += neededSize;
 
 	return block;
 }
 
 
 void
-block_free(void *block)
+block_free(void* block, uint32 flags)
 {
-	boundary_tag *tag = (boundary_tag *)(((uint8 *)block)
-		- sizeof(boundary_tag));
-
-#ifdef DEBUG_ALLOCATOR
-	if (tag->magic != kBoundaryMagic)
-		panic("allocator: boundary tag magic doesn't match this universe");
-#endif
-
-	int index = size_to_index(tag->size + sizeof(boundary_tag));
-
-	if (index < 0) {
-		area_boundary_tag *areaTag = (area_boundary_tag *)(((uint8 *)block)
-			- sizeof(area_boundary_tag));
-		delete_area(areaTag->area);
+	if (ObjectCache* cache = MemoryManager::CacheForAddress(block)) {
+		// a regular small allocation
+		ASSERT(cache->object_size >= kBlockSizes[0]);
+		ASSERT(cache->object_size <= kBlockSizes[kNumBlockSizes - 1]);
+		ASSERT(cache == sBlockCaches[size_to_index(cache->object_size)]);
+		object_cache_free(cache, block, flags);
 	} else {
-		atomic_add(&sBlockCacheWaste[index], -(kBlockSizes[index] - tag->size
-			- sizeof(boundary_tag)));
-		object_cache_free(sBlockCaches[index], tag);
+		// a large allocation -- look up the area
+		VMAddressSpace* addressSpace = VMAddressSpace::Kernel();
+		addressSpace->ReadLock();
+		VMArea* area = addressSpace->LookupArea((addr_t)block);
+		addressSpace->ReadUnlock();
+
+		if (area != NULL && (addr_t)block == area->Base())
+			delete_area(area->id);
+		else
+			panic("freeing unknown block %p from area %p", block, area);
 	}
-}
-
-
-static void
-block_create_cache(size_t index, bool boot)
-{
-	char name[32];
-	snprintf(name, sizeof(name), "block cache: %lu", kBlockSizes[index]);
-
-	sBlockCaches[index] = create_object_cache_etc(name, kBlockSizes[index],
-		0, 0, boot ? CACHE_DURING_BOOT : 0, NULL, NULL, NULL, NULL);
-	if (sBlockCaches[index] == NULL)
-		panic("allocator: failed to init block cache");
-
-	sBlockCacheWaste[index] = 0;
-}
-
-
-static int
-show_waste(int argc, char *argv[])
-{
-	size_t total = 0;
-
-	for (size_t index = 0; index < kNumBlockSizes; index++) {
-		if (sBlockCacheWaste[index] > 0) {
-			kprintf("%lu: %lu\n", kBlockSizes[index], sBlockCacheWaste[index]);
-			total += sBlockCacheWaste[index];
-		}
-	}
-
-	kprintf("total waste: %lu\n", total);
-
-	return 0;
 }
 
 
 void
-block_allocator_init_boot()
+block_allocator_init_boot(addr_t bootStrapBase, size_t bootStrapSize)
 {
-	for (int index = 0; kBlockSizes[index] != 0; index++)
-		block_create_cache(index, true);
+	sBootStrapMemory = bootStrapBase;
+	sBootStrapMemorySize = bootStrapSize;
+	sUsedBootStrapMemory = 0;
 
-	add_debugger_command("show_waste", show_waste,
-		"show cache allocator's memory waste");
+	for (int index = 0; kBlockSizes[index] != 0; index++) {
+		char name[32];
+		snprintf(name, sizeof(name), "block cache: %lu", kBlockSizes[index]);
+
+		sBlockCaches[index] = create_object_cache_etc(name, kBlockSizes[index],
+			0, 0, CACHE_DURING_BOOT, NULL, NULL, NULL, NULL);
+		if (sBlockCaches[index] == NULL)
+			panic("allocator: failed to init block cache");
+	}
 }
 
 
@@ -194,4 +163,3 @@ block_allocator_init_rest()
 	}
 #endif
 }
-

@@ -27,11 +27,13 @@
 struct ObjectCache;
 
 void*		slab_internal_alloc(size_t size, uint32 flags);
-void		slab_internal_free(void *_buffer);
+void		slab_internal_free(void *_buffer, uint32 flags);
 
 void*		block_alloc(size_t size, uint32 flags);
-void		block_free(void *block);
-void		block_allocator_init_boot();
+void*		block_alloc_early(size_t size);
+void		block_free(void *block, uint32 flags);
+void		block_allocator_init_boot(addr_t bootStrapBase,
+				size_t bootStrapSize);
 void		block_allocator_init_rest();
 
 

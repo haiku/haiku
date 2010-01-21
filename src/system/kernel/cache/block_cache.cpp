@@ -987,7 +987,7 @@ void
 block_cache::Free(void* buffer)
 {
 	if (buffer != NULL)
-		object_cache_free(buffer_cache, buffer);
+		object_cache_free(buffer_cache, buffer, 0);
 }
 
 
@@ -1025,7 +1025,7 @@ block_cache::FreeBlock(cached_block* block)
 	Free(block->compare);
 #endif
 
-	object_cache_free(sBlockCache, block);
+	object_cache_free(sBlockCache, block, 0);
 }
 
 
@@ -1059,7 +1059,7 @@ block_cache::NewBlock(off_t blockNumber)
 
 	block->current_data = Allocate();
 	if (block->current_data == NULL) {
-		object_cache_free(sBlockCache, block);
+		object_cache_free(sBlockCache, block, 0);
 		return NULL;
 	}
 

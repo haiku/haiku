@@ -29,6 +29,7 @@
 #include <vm/VMAddressSpace.h>
 
 #include "HashedObjectCache.h"
+#include "MemoryManager.h"
 #include "slab_private.h"
 #include "SmallObjectCache.h"
 
@@ -55,10 +56,6 @@ typedef DoublyLinkedList<ResizeRequest> ResizeRequestQueue;
 
 static ObjectCacheList sObjectCaches;
 static mutex sObjectCacheListLock = MUTEX_INITIALIZER("object cache list");
-
-static uint8* sInitialBegin;
-static uint8* sInitialLimit;
-static uint8* sInitialPointer;
 
 static mutex sResizeRequestsLock
 	= MUTEX_INITIALIZER("object cache resize requests");
@@ -268,30 +265,17 @@ dump_cache_info(int argc, char* argv[])
 void*
 slab_internal_alloc(size_t size, uint32 flags)
 {
-	if (flags & CACHE_DURING_BOOT) {
-		if ((sInitialPointer + size) > sInitialLimit) {
-			panic("slab_internal_alloc: ran out of initial space");
-			return NULL;
-		}
-
-		uint8* buffer = sInitialPointer;
-		sInitialPointer += size;
-		return buffer;
-	}
+	if (flags & CACHE_DURING_BOOT)
+		return block_alloc_early(size);
 
 	return block_alloc(size, flags);
 }
 
 
 void
-slab_internal_free(void* _buffer)
+slab_internal_free(void* buffer, uint32 flags)
 {
-	uint8* buffer = (uint8*)_buffer;
-
-	if (buffer >= sInitialBegin && buffer < sInitialLimit)
-		return;
-
-	block_free(buffer);
+	block_free(buffer, flags);
 }
 
 
@@ -428,7 +412,7 @@ object_cache_low_memory(void* _self, uint32 resources, int32 level)
 		minimumAllowed);
 
 	while (cache->empty_count > minimumAllowed) {
-		cache->ReturnSlab(cache->empty.RemoveHead());
+		cache->ReturnSlab(cache->empty.RemoveHead(), 0);
 		cache->empty_count--;
 	}
 }
@@ -530,7 +514,7 @@ delete_object_cache(object_cache* cache)
 	}
 
 	if (!(cache->flags & CACHE_NO_DEPOT))
-		object_depot_destroy(&cache->depot);
+		object_depot_destroy(&cache->depot, 0);
 
 	mutex_lock(&cache->lock);
 
@@ -543,7 +527,7 @@ delete_object_cache(object_cache* cache)
 		panic("cache destroy: still has partial slabs");
 
 	while (!cache->empty.IsEmpty())
-		cache->ReturnSlab(cache->empty.RemoveHead());
+		cache->ReturnSlab(cache->empty.RemoveHead(), 0);
 
 	mutex_destroy(&cache->lock);
 	cache->Delete();
@@ -637,7 +621,7 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 
 
 void
-object_cache_free(object_cache* cache, void* object)
+object_cache_free(object_cache* cache, void* object, uint32 flags)
 {
 	if (object == NULL)
 		return;
@@ -645,12 +629,12 @@ object_cache_free(object_cache* cache, void* object)
 	T(Free(cache, object));
 
 	if (!(cache->flags & CACHE_NO_DEPOT)) {
-		if (object_depot_store(&cache->depot, object))
+		if (object_depot_store(&cache->depot, object, flags))
 			return;
 	}
 
 	MutexLocker _(cache->lock);
-	cache->ReturnObjectToSlab(cache->ObjectSlab(object), object);
+	cache->ReturnObjectToSlab(cache->ObjectSlab(object), object, flags);
 }
 
 
@@ -680,15 +664,11 @@ slab_init(kernel_args* args, addr_t initialBase, size_t initialSize)
 {
 	dprintf("slab: init base %p + 0x%lx\n", (void*)initialBase, initialSize);
 
-	sInitialBegin = (uint8*)initialBase;
-	sInitialLimit = sInitialBegin + initialSize;
-	sInitialPointer = sInitialBegin;
-
-	ObjectCache::SetKernelArgs(args);
+	MemoryManager::Init(args);
 
 	new (&sObjectCaches) ObjectCacheList();
 
-	block_allocator_init_boot();
+	block_allocator_init_boot(initialBase, initialSize);
 
 	add_debugger_command("slabs", dump_slabs, "list all object caches");
 	add_debugger_command("cache_info", dump_cache_info,
@@ -697,13 +677,18 @@ slab_init(kernel_args* args, addr_t initialBase, size_t initialSize)
 
 
 void
+slab_init_post_area()
+{
+	MemoryManager::InitPostArea();
+}
+
+
+void
 slab_init_post_sem()
 {
 	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
-
 	while (it.HasNext()) {
 		ObjectCache* cache = it.Next();
-		cache->InitPostArea();
 		register_low_resource_handler(object_cache_low_memory, cache,
 			B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
 				| B_KERNEL_RESOURCE_ADDRESS_SPACE, 5);

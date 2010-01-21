@@ -831,7 +831,7 @@ VMAnonymousCache::_SwapBlockFree(off_t startPageIndex, uint32 count)
 		swap->used -= j;
 		if (swap->used == 0) {
 			sSwapHashTable.RemoveUnchecked(swap);
-			object_cache_free(sSwapBlockCache, swap);
+			object_cache_free(sSwapBlockCache, swap, CACHE_DONT_SLEEP);
 		}
 	}
 }
@@ -1041,7 +1041,8 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 		if (sourceSwapBlock->used == 0) {
 			// All swap pages have been freed -- we can discard the source swap
 			// block.
-			object_cache_free(sSwapBlockCache, sourceSwapBlock);
+			object_cache_free(sSwapBlockCache, sourceSwapBlock,
+				CACHE_DONT_SLEEP);
 		} else if (swapBlock == NULL) {
 			// We need to take over some of the source's swap pages and there's
 			// no swap block in the consumer cache. Just take over the source
@@ -1059,7 +1060,8 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 					swapBlock->swap_slots[i] = sourceSwapBlock->swap_slots[i];
 			}
 
-			object_cache_free(sSwapBlockCache, sourceSwapBlock);
+			object_cache_free(sSwapBlockCache, sourceSwapBlock,
+				CACHE_DONT_SLEEP);
 		}
 	}
 }

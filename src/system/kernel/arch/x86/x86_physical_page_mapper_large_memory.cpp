@@ -483,7 +483,7 @@ LargeMemoryPhysicalPageMapper::Init(kernel_args* args,
 	// We reserve more, so that we can guarantee to align the base address
 	// to page table ranges.
 	addr_t virtualBase = vm_allocate_early(args,
-		1024 * B_PAGE_SIZE + kPageTableAlignment - B_PAGE_SIZE, 0, 0);
+		1024 * B_PAGE_SIZE + kPageTableAlignment - B_PAGE_SIZE, 0, 0, false);
 	if (virtualBase == 0) {
 		panic("LargeMemoryPhysicalPageMapper::Init(): Failed to reserve "
 			"physical page pool space in virtual address space!");
@@ -495,7 +495,7 @@ LargeMemoryPhysicalPageMapper::Init(kernel_args* args,
 	// allocate memory for the page table and data
 	size_t areaSize = B_PAGE_SIZE + sizeof(PhysicalPageSlot[1024]);
 	page_table_entry* pageTable = (page_table_entry*)vm_allocate_early(args,
-		areaSize, ~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		areaSize, ~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
 
 	// prepare the page table
 	x86_early_prepare_page_tables(pageTable, virtualBase,

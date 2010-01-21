@@ -1878,7 +1878,7 @@ vm_page_init(kernel_args *args)
 
 	// map in the new free page table
 	sPages = (vm_page *)vm_allocate_early(args, sNumPages * sizeof(vm_page),
-		~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
 
 	TRACE(("vm_init: putting free_page_table @ %p, # ents %ld (size 0x%x)\n",
 		sPages, sNumPages, (unsigned int)(sNumPages * sizeof(vm_page))));

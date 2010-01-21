@@ -52,7 +52,7 @@ status_t object_cache_set_minimum_reserve(object_cache* cache,
 	size_t objectCount);
 
 void* object_cache_alloc(object_cache* cache, uint32 flags);
-void object_cache_free(object_cache* cache, void* object);
+void object_cache_free(object_cache* cache, void* object, uint32 flags);
 
 status_t object_cache_reserve(object_cache* cache, size_t object_count,
 	uint32 flags);

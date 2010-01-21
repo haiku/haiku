@@ -83,6 +83,7 @@
 #include <boot/kernel_args.h>
 #include <int.h>
 #include <kernel.h>
+#include <slab/Slab.h>
 #include <vm/vm.h>
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
@@ -518,7 +519,7 @@ PPCVMTranslationMap::UnmapPage(VMArea* area, addr_t address)
 	locker.Unlock();
 
 	if (mapping != NULL)
-		free(mapping);
+		object_cache_free(gPageMappingsObjectCache, mapping, CACHE_DONT_SLEEP);
 
 	return B_OK;
 }

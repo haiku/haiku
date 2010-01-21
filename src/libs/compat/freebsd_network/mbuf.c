@@ -125,7 +125,7 @@ m_getcl(int how, short type, int flags)
 		return NULL;
 
 	if (construct_pkt_mbuf(how, memoryBuffer, type, flags) < 0) {
-		object_cache_free(sMBufCache, memoryBuffer);
+		object_cache_free(sMBufCache, memoryBuffer, 0);
 		return NULL;
 	}
 
@@ -170,7 +170,7 @@ m_getjcl(int how, short type, int flags, int size)
 		return NULL;
 	construct_mbuf(memoryBuffer, type, flags);
 	if (construct_ext_sized_mbuf(memoryBuffer, how, size) < 0) {
-		object_cache_free(sMBufCache, memoryBuffer);
+		object_cache_free(sMBufCache, memoryBuffer, 0);
 		return NULL;
 	}
 	return memoryBuffer;
@@ -225,9 +225,9 @@ mb_free_ext(struct mbuf *memoryBuffer)
 	else
 		panic("unknown type");
 
-	object_cache_free(cache, memoryBuffer->m_ext.ext_buf);
+	object_cache_free(cache, memoryBuffer->m_ext.ext_buf, 0);
 	memoryBuffer->m_ext.ext_buf = NULL;
-	object_cache_free(sMBufCache, memoryBuffer);
+	object_cache_free(sMBufCache, memoryBuffer, 0);
 }
 
 
@@ -239,7 +239,7 @@ m_free(struct mbuf *memoryBuffer)
 	if (memoryBuffer->m_flags & M_EXT)
 		mb_free_ext(memoryBuffer);
 	else
-		object_cache_free(sMBufCache, memoryBuffer);
+		object_cache_free(sMBufCache, memoryBuffer, 0);
 
 	return next;
 }
@@ -278,7 +278,7 @@ init_mbufs()
 		NULL, NULL, NULL);
 	if (sJumbo9ChunkCache == NULL)
 		goto clean;
-	sJumboPageSizeCache = create_object_cache("mbuf jumbo page size chunks", 
+	sJumboPageSizeCache = create_object_cache("mbuf jumbo page size chunks",
 		MJUMPAGESIZE, 0, NULL, NULL, NULL);
 	if (sJumboPageSizeCache == NULL)
 		goto clean;

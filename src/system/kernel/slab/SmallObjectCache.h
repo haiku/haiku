@@ -18,9 +18,10 @@ struct SmallObjectCache : ObjectCache {
 									object_cache_constructor constructor,
 									object_cache_destructor destructor,
 									object_cache_reclaimer reclaimer);
+	virtual	void				Delete();
 
 	virtual	slab*				CreateSlab(uint32 flags);
-	virtual	void				ReturnSlab(slab* slab);
+	virtual	void				ReturnSlab(slab* slab, uint32 flags);
 	virtual slab*				ObjectSlab(void* object) const;
 };
 

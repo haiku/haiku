@@ -732,7 +732,7 @@ free_data_header(data_header* header)
 	if (header != NULL)
 		atomic_add(&sAllocatedDataHeaderCount, -1);
 #endif
-	object_cache_free(sDataNodeCache, header);
+	object_cache_free(sDataNodeCache, header, 0);
 }
 
 
@@ -743,7 +743,7 @@ free_net_buffer(net_buffer_private* buffer)
 	if (buffer != NULL)
 		atomic_add(&sAllocatedNetBufferCount, -1);
 #endif
-	object_cache_free(sNetBufferCache, buffer);
+	object_cache_free(sNetBufferCache, buffer, 0);
 }
 
 
