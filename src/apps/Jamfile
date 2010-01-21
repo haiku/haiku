@@ -43,6 +43,7 @@ HaikuSubInclude poorman ;
 HaikuSubInclude powerstatus ;
 HaikuSubInclude processcontroller ;
 HaikuSubInclude pulse ;
+HaikuSubInclude readonlybootprompt ;
 HaikuSubInclude remotedesktop ;
 HaikuSubInclude resedit ;
 HaikuSubInclude screenshot ;
