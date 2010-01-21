@@ -1,0 +1,7 @@
+1	de	x-vnd.Haiku-ReadOnlyBootPrompt	559279902
+Installer	BootPromptWindow		Installation
+Welcome to Haiku!\n\nDo you wish to want to run the Installer or continue booting to the Desktop?\n\nPlease select your preferred language and keyboard layout from the list below.	BootPromptWindow		Willkommen in Haiku!\n\nMöchten Sie eine Installion durchführen oder weiter in den Desktop booten?\n\nBitte wählen Sie Ihre bevorzugte Sprache und Tastaturbelegung aus den Listen unten.
+Welcome to Haiku	BootPromptWindow		Willkommen in Haiku
+Desktop	BootPromptWindow		Desktop
+Language	BootPromptWindow		Sprache
+Keymap	BootPromptWindow		Tastaturbelegung
