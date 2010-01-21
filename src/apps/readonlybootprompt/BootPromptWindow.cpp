@@ -214,22 +214,23 @@ BootPromptWindow::_InitCatalog(bool saveSettings)
 void
 BootPromptWindow::_UpdateStrings()
 {
-	SetTitle(TR("Welcome to Haiku"));
+	SetTitle(TR("Welcome to Haiku!"));
 
 	const char* infoText = TR(
-		"Welcome to Haiku!\n\n"
+		"Do you wish to run the Installer or continue booting to the "
+		"Desktop? You can also select your preferred language and keyboard "
+		"layout from the list below.\n\n"
 
-		"Do you wish to want to run the Installer or continue booting "
-		"to the Desktop?\n\n"
-
-		"Please select your preferred language and keyboard layout from "
-		"the list below."
+		"Note: Localization of Haiku applications and other components is "
+		"an on-going effort. You will frequently encounter untranslated "
+		"strings, but if you like, you can join in the work at "
+		"<www.haiku-os.org>."
 	);
 
 	fInfoTextView->SetText(infoText);
 
-	fDesktopButton->SetLabel(TR("Desktop"));
-	fInstallerButton->SetLabel(TR("Installer"));
+	fDesktopButton->SetLabel(TR("Desktop (Live-CD)"));
+	fInstallerButton->SetLabel(TR("Run Installer"));
 
 	fLanguagesLabelView->SetText(TR("Language"));
 	fKeymapsLabelView->SetText(TR("Keymap"));
