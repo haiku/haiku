@@ -192,13 +192,15 @@ switch $(HAIKU_GCC_MACHINE) {
 
 # determine the endianness of the host
 switch $(HOST_GCC_MACHINE) {
+	case amd64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
 	case i?86-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case x86_64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
 	case powerpc-*	: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
+	case x86_64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+
 	# the following are rather unlikely as hosts ...
+	case arm-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
 	case m68k-*		: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
 	case mipsel-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case arm-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
 	case *			: Exit "Unsupported gcc host machine:" $(HOST_GCC_MACHINE) ;
 }
 
@@ -490,9 +492,9 @@ if $(HAIKU_HOST_USE_32BIT) = 1 {
 	HOST_GCC_BASE_FLAGS = -m32 ;
 } else {
 	switch $(HOST_GCC_MACHINE) {
-		case x86_64-*	: HOST_PLATFORM_IS_64_BIT = 1 ;
-		case i686-apple-darwin10	:
-			HOST_PLATFORM_IS_64_BIT = 1 ;
+		case amd64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
+		case i686-apple-darwin10 :	HOST_PLATFORM_IS_64_BIT = 1 ;
+		case x86_64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
 	}
 }
 
@@ -717,6 +719,14 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		# part of the C++ runtime lives in libstdc++ on Darwin
 		HOST_LIBSUPC++ = gcc_s.1 stdc++ ;
 		HOST_LIBSTDC++ = ;
+	} else if $(HOST_PLATFORM) = freebsd {
+		if $(HOST_CPU) = x86 && $(HOST_PLATFORM_IS_64_BIT) = 1 {
+			# amd64 FreeBSD 8 doesn't come without a shared libsupc++, and the
+			# static one prevents us from building shared libraries. So we have
+			# to work around by using the shared libstdc++.
+			HOST_LIBSUPC++ = stdc++ ;
+			HOST_LIBSTDC++ = ;
+		}
 	}
 
 	# Unlike glibc FreeBSD's libc doesn't have built-in regex support.
@@ -727,7 +737,6 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HOST_LIBROOT += /opt/local/lib/libgnuregex.dylib ;
 		HOST_STATIC_LIBROOT += /opt/local/lib/libgnuregex.dylib ;
 	}
-
 
 	# The BeOS compilers define __INTEL__ respectively __POWERPC__. On the
 	# build platform we need to make sure, this is also defined.
