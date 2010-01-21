@@ -15,8 +15,9 @@
 #include "KeymapListItem.h"
 
 
-KeymapListItem::KeymapListItem( entry_ref &keymap, const char* name )
-	:	BStringItem( name ? name : keymap.name ),
-		fKeymap(keymap)
+KeymapListItem::KeymapListItem(entry_ref& keymap, const char* name)
+	:
+	BStringItem(name ? name : keymap.name),
+	fKeymap(keymap)
 {
 }
