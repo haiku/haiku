@@ -67,8 +67,8 @@ KernelMergeObject kernel_core.o :
 # Generate the header defining macros for C++ structure sizes.
 local kernelC++StructSizesHeader = [ FGristFiles kernel_c++_struct_sizes.h ] ;
 TARGET_HDRS on $(kernelC++StructSizesHeader)
-    = [ on $(kernelC++StructSizesHeader) return $(TARGET_HDRS) ]
-        $(TARGET_PRIVATE_KERNEL_HEADERS) ;
+	= [ on $(kernelC++StructSizesHeader) return $(TARGET_HDRS) ]
+		$(TARGET_PRIVATE_KERNEL_HEADERS) ;
 CreateAsmStructOffsetsHeader $(kernelC++StructSizesHeader)
 	: kernel_c++_structs.cpp ;
 
