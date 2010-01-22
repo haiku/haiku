@@ -3290,7 +3290,8 @@ vm_init(kernel_args* args)
 
 	// create the object cache for the page mappings
 	gPageMappingsObjectCache = create_object_cache_etc("page mappings",
-		sizeof(vm_page_mapping), 0, 0, 0, NULL, NULL, NULL, NULL);
+		sizeof(vm_page_mapping), 0, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL,
+		NULL);
 	if (gPageMappingsObjectCache == NULL)
 		panic("failed to create page mappings object cache");
 
