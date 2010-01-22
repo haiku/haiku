@@ -1042,6 +1042,9 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 	CopyDirectoryToHaikuImage system documentation
 		: [ FDirName $(HAIKU_TOP) docs userguide ]
 		: userguide : -x .svn ;
+	CopyDirectoryToHaikuImage system documentation
+		: [ FDirName $(HAIKU_TOP) docs images ]
+		: images : -x .svn ;
 	AddFilesToHaikuImage system documentation
 		: [ FDirName $(HAIKU_TOP) docs Haiku-doc.css ]
 		: Haiku-doc.css ;
