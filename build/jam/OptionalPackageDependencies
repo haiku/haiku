@@ -10,7 +10,7 @@ OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
-OptionalPackageDependencies NetSurf : OpenSSL ;
+OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
 OptionalPackageDependencies Python : Bzip ;
 OptionalPackageDependencies Mercurial : Python ;
