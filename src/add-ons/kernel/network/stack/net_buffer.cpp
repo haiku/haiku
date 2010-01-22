@@ -709,7 +709,7 @@ allocate_data_header()
 	atomic_add(&sAllocatedDataHeaderCount, 1);
 	atomic_add(&sEverAllocatedDataHeaderCount, 1);
 #endif
-	return (data_header*)object_cache_alloc(sDataNodeCache, CACHE_DONT_SLEEP);
+	return (data_header*)object_cache_alloc(sDataNodeCache, 0);
 }
 
 
@@ -720,8 +720,7 @@ allocate_net_buffer()
 	atomic_add(&sAllocatedNetBufferCount, 1);
 	atomic_add(&sEverAllocatedNetBufferCount, 1);
 #endif
-	return (net_buffer_private*)object_cache_alloc(sNetBufferCache,
-		CACHE_DONT_SLEEP);
+	return (net_buffer_private*)object_cache_alloc(sNetBufferCache, 0);
 }
 
 
