@@ -779,7 +779,7 @@ VMAnonymousCache::_SwapBlockBuild(off_t startPageIndex,
 		swap_block* swap = sSwapHashTable.Lookup(key);
 		while (swap == NULL) {
 			swap = (swap_block*)object_cache_alloc(sSwapBlockCache,
-				CACHE_DONT_SLEEP);
+				CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
 			if (swap == NULL) {
 				// Wait a short time until memory is available again.
 				locker.Unlock();
@@ -831,7 +831,8 @@ VMAnonymousCache::_SwapBlockFree(off_t startPageIndex, uint32 count)
 		swap->used -= j;
 		if (swap->used == 0) {
 			sSwapHashTable.RemoveUnchecked(swap);
-			object_cache_free(sSwapBlockCache, swap, CACHE_DONT_SLEEP);
+			object_cache_free(sSwapBlockCache, swap,
+				CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
 		}
 	}
 }
@@ -1042,7 +1043,7 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 			// All swap pages have been freed -- we can discard the source swap
 			// block.
 			object_cache_free(sSwapBlockCache, sourceSwapBlock,
-				CACHE_DONT_SLEEP);
+				CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
 		} else if (swapBlock == NULL) {
 			// We need to take over some of the source's swap pages and there's
 			// no swap block in the consumer cache. Just take over the source
@@ -1061,7 +1062,7 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 			}
 
 			object_cache_free(sSwapBlockCache, sourceSwapBlock,
-				CACHE_DONT_SLEEP);
+				CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
 		}
 	}
 }

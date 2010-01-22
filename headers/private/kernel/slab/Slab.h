@@ -14,16 +14,17 @@
 
 enum {
 	/* create_object_cache_etc flags */
-	CACHE_NO_DEPOT			= 1 << 0,
-	CACHE_UNLOCKED_PAGES	= 1 << 1,
-	CACHE_LARGE_SLAB		= 1 << 2,
+	CACHE_NO_DEPOT					= 1 << 0,
+	CACHE_UNLOCKED_PAGES			= 1 << 1,
+	CACHE_LARGE_SLAB				= 1 << 2,
 
-	/* object_cache_alloc flags */
-	CACHE_DONT_SLEEP		= 1 << 8,
+	/* object_cache_{alloc,free}() flags */
+	CACHE_DONT_WAIT_FOR_MEMORY		= 1 << 8,
+	CACHE_DONT_LOCK_KERNEL_SPACE	= 1 << 9,
 
 	/* internal */
-	CACHE_ALIGN_ON_SIZE		= 1 << 30,
-	CACHE_DURING_BOOT		= 1 << 31
+	CACHE_ALIGN_ON_SIZE				= 1 << 30,
+	CACHE_DURING_BOOT				= 1 << 31
 };
 
 struct ObjectCache;

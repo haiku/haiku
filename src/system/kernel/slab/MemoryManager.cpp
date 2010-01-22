@@ -140,7 +140,6 @@ MemoryManager::Allocate(ObjectCache* cache, uint32 flags, void*& _pages)
 	} else
 		chunk = _pop(area->unmappedFreeChunks);
 
-
 	if (++area->usedChunkCount == area->chunkCount) {
 		areaPool->partialAreas.Remove(area);
 		areaPool->fullAreas.Add(area);
@@ -159,7 +158,6 @@ MemoryManager::Allocate(ObjectCache* cache, uint32 flags, void*& _pages)
 			return error;
 		}
 	}
-
 
 	chunk->cache = cache;
 	_pages = (void*)chunkAddress;
@@ -246,6 +244,13 @@ MemoryManager::_AreaPoolFor(size_t chunkSize)
 /*static*/ status_t
 MemoryManager::_GetPartialArea(AreaPool* areaPool, uint32 flags, Area*& _area)
 {
+	if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
+		// We can't create an area with this limitation and we must not wait for
+		// someone else doing that.
+		_area = areaPool->partialAreas.Head();
+		return _area != NULL ? B_OK : B_WOULD_BLOCK;
+	}
+
 	while (true) {
 		Area* area = areaPool->partialAreas.Head();
 		if (area != NULL) {
@@ -259,7 +264,7 @@ MemoryManager::_GetPartialArea(AreaPool* areaPool, uint32 flags, Area*& _area)
 		if (sAllocationEntryDontWait != NULL) {
 			allocationEntry = sAllocationEntryDontWait;
 		} else if (sAllocationEntryCanWait != NULL
-				&& (flags & CACHE_DONT_SLEEP) == 0) {
+				&& (flags & CACHE_DONT_WAIT_FOR_MEMORY) == 0) {
 			allocationEntry = sAllocationEntryCanWait;
 		} else
 			break;
@@ -273,8 +278,9 @@ MemoryManager::_GetPartialArea(AreaPool* areaPool, uint32 flags, Area*& _area)
 	}
 
 	// prepare the allocation entry others can wait on
-	AllocationEntry*& allocationEntry = (flags & CACHE_DONT_SLEEP) != 0
-		? sAllocationEntryDontWait : sAllocationEntryCanWait;
+	AllocationEntry*& allocationEntry
+		= (flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0
+			? sAllocationEntryDontWait : sAllocationEntryCanWait;
 
 	AllocationEntry myResizeEntry;
 	allocationEntry = &myResizeEntry;
@@ -308,10 +314,7 @@ MemoryManager::_AllocateArea(size_t chunkSize, uint32 flags, Area*& _area)
 	TRACE("MemoryManager::_AllocateArea(%" B_PRIuSIZE ", %#" B_PRIx32 ")\n",
 		chunkSize, flags);
 
-	if ((flags & CACHE_DONT_SLEEP) != 0)
-		return B_WOULD_BLOCK;
-		// TODO: Support CACHE_DONT_SLEEP for real! We already consider it in
-		// most cases below, but not for vm_create_null_area().
+	ASSERT((flags & CACHE_DONT_LOCK_KERNEL_SPACE) == 0);
 
 	mutex_unlock(&sLock);
 
@@ -404,13 +407,10 @@ MemoryManager::_FreeArea(Area* area, uint32 flags)
 	sAreaTable.RemoveUnchecked(area);
 	writeLocker.Unlock();
 
-	if (area->vmArea == NULL) {
+	if (area->vmArea == NULL || (flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
 		_push(sFreeAreas, area);
 		return;
 	}
-
-	// TODO: Do we need to handle CACHE_DONT_SLEEP here? Is delete_area()
-	// problematic?
 
 	mutex_unlock(&sLock);
 
@@ -468,14 +468,14 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 	// reserve memory for the chunk
 	size_t reservedMemory = size + reserveAdditionalMemory;
 	status_t error = vm_try_reserve_memory(size,
-		(flags & CACHE_DONT_SLEEP) != 0 ? 0 : 1000000);
+		(flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0 ? 0 : 1000000);
 	if (error != B_OK)
 		return error;
 
 	// reserve the pages we need now
 	size_t reservedPages = size / B_PAGE_SIZE
 		+ translationMap->MaxPagesNeededToMap(address, address + size - 1);
-	if ((flags & CACHE_DONT_SLEEP) != 0) {
+	if ((flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0) {
 		if (!vm_page_try_reserve_pages(reservedPages)) {
 			vm_unreserve_memory(reservedMemory);
 			return B_WOULD_BLOCK;

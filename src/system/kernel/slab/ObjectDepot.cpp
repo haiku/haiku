@@ -77,11 +77,10 @@ DepotMagazine::Push(void* object)
 
 
 static DepotMagazine*
-alloc_magazine()
+alloc_magazine(uint32 flags)
 {
 	DepotMagazine* magazine = (DepotMagazine*)slab_internal_alloc(
-		sizeof(DepotMagazine) + kMagazineCapacity * sizeof(void*),
-		CACHE_DONT_SLEEP);
+		sizeof(DepotMagazine) + kMagazineCapacity * sizeof(void*), flags);
 	if (magazine) {
 		magazine->next = NULL;
 		magazine->current_round = 0;
@@ -264,7 +263,7 @@ object_depot_store(object_depot* depot, void* object, uint32 flags)
 			interruptsLocker.Unlock();
 			readLocker.Unlock();
 
-			DepotMagazine* magazine = alloc_magazine();
+			DepotMagazine* magazine = alloc_magazine(flags);
 			if (magazine == NULL)
 				return 0;
 

@@ -471,8 +471,11 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection)
 	if (area->wiring == B_NO_LOCK) {
 		DEBUG_PAGE_ACCESS_CHECK(page);
 
+		bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
 		vm_page_mapping* mapping = (vm_page_mapping*)object_cache_alloc(
-			gPageMappingsObjectCache, CACHE_DONT_SLEEP);
+			gPageMappingsObjectCache,
+			CACHE_DONT_WAIT_FOR_MEMORY
+				| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0));
 		if (mapping == NULL)
 			return B_NO_MEMORY;
 

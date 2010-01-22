@@ -518,8 +518,12 @@ PPCVMTranslationMap::UnmapPage(VMArea* area, addr_t address)
 
 	locker.Unlock();
 
-	if (mapping != NULL)
-		object_cache_free(gPageMappingsObjectCache, mapping, CACHE_DONT_SLEEP);
+	if (mapping != NULL) {
+		bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
+		object_cache_free(gPageMappingsObjectCache, mapping,
+			CACHE_DONT_WAIT_FOR_MEMORY
+				| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0));
+	}
 
 	return B_OK;
 }

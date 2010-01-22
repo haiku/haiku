@@ -76,12 +76,15 @@ block_alloc(size_t size, uint32 flags)
 		return object_cache_alloc(sBlockCaches[index], flags);
 
 	// the allocation is too large for our object caches -- create an area
+	if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0)
+		return NULL;
+
 	void* block;
 	area_id area = create_area_etc(VMAddressSpace::KernelID(),
 		"alloc'ed block", &block, B_ANY_KERNEL_ADDRESS,
 		ROUNDUP(size, B_PAGE_SIZE), B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
-		(flags & CACHE_DONT_SLEEP) != 0 ? CREATE_AREA_DONT_WAIT : 0);
+		(flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0 ? CREATE_AREA_DONT_WAIT : 0);
 	if (area < 0)
 		return NULL;
 

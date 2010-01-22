@@ -312,7 +312,7 @@ object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 		if (cache->resize_entry_dont_wait != NULL) {
 			resizeEntry = cache->resize_entry_dont_wait;
 		} else if (cache->resize_entry_can_wait != NULL
-				&& (flags & CACHE_DONT_SLEEP) == 0) {
+				&& (flags & CACHE_DONT_WAIT_FOR_MEMORY) == 0) {
 			resizeEntry = cache->resize_entry_can_wait;
 		} else
 			break;
@@ -326,8 +326,9 @@ object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 	}
 
 	// prepare the resize entry others can wait on
-	ObjectCacheResizeEntry*& resizeEntry = (flags & CACHE_DONT_SLEEP) != 0
-		? cache->resize_entry_dont_wait : cache->resize_entry_can_wait;
+	ObjectCacheResizeEntry*& resizeEntry
+		= (flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0
+			? cache->resize_entry_dont_wait : cache->resize_entry_can_wait;
 
 	ObjectCacheResizeEntry myResizeEntry;
 	resizeEntry = &myResizeEntry;

@@ -36,7 +36,7 @@ static int
 m_to_oc_flags(int how)
 {
 	if (how & M_NOWAIT)
-		return CACHE_DONT_SLEEP;
+		return CACHE_DONT_WAIT_FOR_MEMORY;
 
 	return 0;
 }
