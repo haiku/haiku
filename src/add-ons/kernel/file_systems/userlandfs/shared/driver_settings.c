@@ -287,7 +287,7 @@ parse_parameters(struct driver_parameter **_parameters, int *_count, char **_pos
 			newArray = realloc(*_parameters, (*_count + 1) * sizeof(struct driver_parameter));
 			if (newArray == NULL)
 				return B_NO_MEMORY;
-	
+
 			memcpy(&newArray[*_count], &parameter, sizeof(struct driver_parameter));
 			newParameter = &newArray[*_count];
 
@@ -569,7 +569,7 @@ load_driver_settings(const char *driverName)
 {
 	settings_handle *handle;
 	int file;
-	
+
 	if (driverName == NULL)
 		return NULL;
 
