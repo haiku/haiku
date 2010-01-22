@@ -3885,8 +3885,29 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 			DEBUG_PAGE_ACCESS_END(mappedPage);
 		}
 
-		if (mapPage)
-			map_page(area, context.page, address, newProtection);
+		if (mapPage) {
+			if (map_page(area, context.page, address, newProtection) != B_OK) {
+				// Mapping can only fail, when the page mapping object couldn't
+				// be allocated. Save for the missing mapping everything is
+				// fine, though. We'll simply leave and probably fault again.
+				// To make sure we'll have more luck then, we ensure that the
+				// minimum object reserve is available.
+				if (context.page->state == PAGE_STATE_BUSY)
+					vm_page_set_state(context.page, PAGE_STATE_ACTIVE);
+				DEBUG_PAGE_ACCESS_END(context.page);
+
+				context.UnlockAll();
+
+				if (object_cache_reserve(gPageMappingsObjectCache, 1, 0)
+						!= B_OK) {
+					// Apparently the situation is serious. Let's get ourselves
+					// killed.
+					status = B_NO_MEMORY;
+				}
+
+				break;
+			}
+		}
 
 		DEBUG_PAGE_ACCESS_END(context.page);
 
