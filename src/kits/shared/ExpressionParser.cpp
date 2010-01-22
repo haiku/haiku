@@ -138,21 +138,21 @@ class Tokenizer {
 
 			const char* begin = fCurrentChar;
 			bool expectE = true;
-			bool expectPlusOfMinus = false;
+			bool expectPlusOrMinus = false;
 			while (*fCurrentChar != 0) {
 				if (!isdigit(*fCurrentChar)) {
 					if (*fCurrentChar == 'e' || *fCurrentChar == 'E') {
 						if (!expectE)
 							break;
 						expectE = false;
-						expectPlusOfMinus = true;
+						expectPlusOrMinus = true;
 					} else if (*fCurrentChar == '+' || *fCurrentChar == '-') {
-						if (!expectPlusOfMinus)
+						if (!expectPlusOrMinus)
 							break;
 					} else if (!(*fCurrentChar == '.' || *fCurrentChar == ','))
 						break;
 					else
-						expectPlusOfMinus = false;
+						expectPlusOrMinus = false;
 				}
 				if (*fCurrentChar == ',')
 					temp << '.';
