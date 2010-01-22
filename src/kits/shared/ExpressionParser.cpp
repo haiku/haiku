@@ -137,11 +137,22 @@ class Tokenizer {
 			BString temp;
 
 			const char* begin = fCurrentChar;
+			bool expectE = true;
+			bool expectPlusOfMinus = false;
 			while (*fCurrentChar != 0) {
 				if (!isdigit(*fCurrentChar)) {
-					if (!(*fCurrentChar == '.' || *fCurrentChar == ','
-						|| *fCurrentChar == 'e' || *fCurrentChar == 'E'))
+					if (*fCurrentChar == 'e' || *fCurrentChar == 'E') {
+						if (!expectE)
+							break;
+						expectE = false;
+						expectPlusOfMinus = true;
+					} else if (*fCurrentChar == '+' || *fCurrentChar == '-') {
+						if (!expectPlusOfMinus)
+							break;
+					} else if (!(*fCurrentChar == '.' || *fCurrentChar == ','))
 						break;
+					else
+						expectPlusOfMinus = false;
 				}
 				if (*fCurrentChar == ',')
 					temp << '.';
