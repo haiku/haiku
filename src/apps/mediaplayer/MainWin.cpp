@@ -737,26 +737,7 @@ bool
 MainWin::QuitRequested()
 {
 	BMessage message(M_PLAYER_QUIT);
-	message.AddPointer("instance", this);
-	message.AddRect("window frame", Frame());
-	message.AddBool("audio only", !fHasVideo);
-	message.AddInt64("creation time", fCreationTime);
-	if (!fHasVideo && fHasAudio) {
-		// store playlist, current index and position if this is audio
-		BMessage playlistArchive;
-
-		BAutolock controllerLocker(fController);
-		playlistArchive.AddInt64("position", fController->TimePosition());
-		controllerLocker.Unlock();
-
-		BAutolock playlistLocker(fPlaylist);
-		if (fPlaylist->Archive(&playlistArchive) != B_OK
-			|| playlistArchive.AddInt32("index",
-				fPlaylist->CurrentItemIndex()) != B_OK
-			|| message.AddMessage("playlist", &playlistArchive) != B_OK) {
-			fprintf(stderr, "Failed to store current playlist.\n");
-		}
-	}
+	GetQuitMessage(&message);
 	be_app->PostMessage(&message);
 	return true;
 }
@@ -924,6 +905,32 @@ MainWin::VideoFormatChange(int width, int height, int widthAspect,
 	 	FrameResized(Bounds().Width(), Bounds().Height());
 
 	printf("VideoFormatChange leave\n");
+}
+
+
+void
+MainWin::GetQuitMessage(BMessage* message)
+{
+	message->AddPointer("instance", this);
+	message->AddRect("window frame", Frame());
+	message->AddBool("audio only", !fHasVideo);
+	message->AddInt64("creation time", fCreationTime);
+	if (!fHasVideo && fHasAudio) {
+		// store playlist, current index and position if this is audio
+		BMessage playlistArchive;
+
+		BAutolock controllerLocker(fController);
+		playlistArchive.AddInt64("position", fController->TimePosition());
+		controllerLocker.Unlock();
+
+		BAutolock playlistLocker(fPlaylist);
+		if (fPlaylist->Archive(&playlistArchive) != B_OK
+			|| playlistArchive.AddInt32("index",
+				fPlaylist->CurrentItemIndex()) != B_OK
+			|| message->AddMessage("playlist", &playlistArchive) != B_OK) {
+			fprintf(stderr, "Failed to store current playlist.\n");
+		}
+	}
 }
 
 

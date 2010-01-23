@@ -106,6 +106,26 @@ MainApp::~MainApp()
 bool
 MainApp::QuitRequested()
 {
+	// Make sure we store the current playlist, if applicable.
+	for (int32 i = 0; BWindow* window = WindowAt(i); i++) {
+		MainWin* playerWindow = dynamic_cast<MainWin*>(window);
+		if (playerWindow == NULL)
+			continue;
+
+		BAutolock _(playerWindow);
+
+		BMessage quitMessage;
+		playerWindow->GetQuitMessage(&quitMessage);
+		
+		// Store the playlist if there is one. If the user has multiple
+		// instances playing audio at the this time, the first instance wins.
+		BMessage playlistArchive;
+		if (quitMessage.FindMessage("playlist", &playlistArchive) == B_OK) {
+			_StoreCurrentPlaylist(&playlistArchive);
+			break;
+		}
+	}
+
 	// Note: This needs to be done here, SettingsWindow::QuitRequested()
 	// returns "false" always. (Standard BApplication quit procedure will
 	// hang otherwise.)

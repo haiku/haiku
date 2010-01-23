@@ -72,6 +72,8 @@ public:
 			void				VideoFormatChange(int width, int height,
 									int widthAspect, int heightAspect);
 
+			void				GetQuitMessage(BMessage* message);
+
 private:
 			void				_RefsReceived(BMessage* message);
 			void				_PlaylistItemOpened(
