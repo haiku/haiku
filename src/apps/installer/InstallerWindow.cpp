@@ -502,6 +502,18 @@ InstallerWindow::QuitRequested()
 			"Installer window."), TR("OK")))->Go();
 		return false;
 	}
+
+	if ((Flags() & B_NOT_MINIMIZABLE) != 0) {
+		// This means Deskbar is not running, i.e. Installer is the only
+		// thing on the screen and we will reboot the machine once it quits.
+		if ((new BAlert("reallyQuit",
+			TR("Are you sure you want to abort the installation and restart "
+				"the system?"),
+			TR("Cancel"), TR("Restart system")))->Go() == 0) {
+			return false;
+		}
+	}
+
 	_QuitCopyEngine(false);
 	fWorkerThread->PostMessage(B_QUIT_REQUESTED);
 	be_app->PostMessage(B_QUIT_REQUESTED);
