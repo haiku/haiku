@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -899,7 +899,7 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 			else {
 				fDesktop->SetFocusWindow(this);
 				if (desktopSettings.MouseMode() == B_FOCUS_FOLLOWS_MOUSE
-					&& action == DEC_DRAG) {
+					&& (action == DEC_DRAG || action == DEC_RESIZE)) {
 					fActivateOnMouseUp = true;
 					fMouseMoveDistance = 0.0f;
 					fLastMoveTime = system_time();

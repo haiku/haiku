@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Philippe Saint-Pierre, stpere@gmail.com
  */
+
 
 /*!	Default and fallback decorator for the app_server - the yellow tabs */
 
@@ -541,19 +542,19 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(point))
 		return DEC_ZOOM;
 
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
+		return DEC_MOVETOBACK;
+
 	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(point))
 		return DEC_RESIZE;
 
-	bool clicked = false;
-
-	// Clicking in the tab?
 	if (fTabRect.Contains(point)) {
+		// Clicked in the tab
+
 		// tab sliding in any case if either shift key is held down
 		// except sliding up-down by moving mouse left-right would look strange
 		if ((modifiers & B_SHIFT_KEY) && (fLook != kLeftTitledWindowLook))
 			return DEC_SLIDETAB;
-
-		clicked = true;
 	} else if (fLeftBorder.Contains(point) || fRightBorder.Contains(point)
 		|| fTopBorder.Contains(point) || fBottomBorder.Contains(point)) {
 		// Clicked on border
@@ -569,25 +570,15 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 			if (temp.Contains(point))
 				return DEC_RESIZE;
 		}
-
-		clicked = true;
+	} else {
+		// Guess user didn't click anything
+		return DEC_NONE;
 	}
 
-	if (clicked) {
-		// NOTE: On R5, windows are not moved to back if clicked inside the
-		// resize area with the second mouse button. So we check this after
-		// the check above
-		if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
-			return DEC_MOVETOBACK;
+	if (fWasDoubleClick && !(fFlags & B_NOT_MINIMIZABLE))
+		return DEC_MINIMIZE;
 
-		if (fWasDoubleClick && !(fFlags & B_NOT_MINIMIZABLE))
-			return DEC_MINIMIZE;
-
-		return DEC_DRAG;
-	}
-
-	// Guess user didn't click anything
-	return DEC_NONE;
+	return DEC_DRAG;
 }
 
 
