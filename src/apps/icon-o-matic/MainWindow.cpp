@@ -95,9 +95,9 @@ MainWindow::MainWindow(IconEditorApp* app, Document* document,
 	  fDocument(document),
 	  fIcon(NULL)
 {
-	RestoreSettings(settings);
-
 	_Init();
+
+	RestoreSettings(settings);
 }
 
 // destructor
@@ -508,8 +508,13 @@ MainWindow::SetIcon(Icon* icon)
 void
 MainWindow::StoreSettings(BMessage* archive)
 {
-	if (archive->ReplaceRect("main window frame", Frame()) < B_OK)
+	if (archive->ReplaceRect("main window frame", Frame()) != B_OK)
 		archive->AddRect("main window frame", Frame());
+	if (archive->ReplaceUInt32("mouse filter mode",
+			fCanvasView->MouseFilterMode()) != B_OK) {
+		archive->AddUInt32("mouse filter mode",
+			fCanvasView->MouseFilterMode());
+	}
 }
 
 // RestoreSettings
@@ -522,6 +527,9 @@ MainWindow::RestoreSettings(const BMessage* archive)
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	}
+	uint32 mouseFilterMode;
+	if (archive->FindUInt32("mouse filter mode", &mouseFilterMode) == B_OK)
+		fCanvasView->SetMouseFilterMode(mouseFilterMode);
 }
 
 // #pragma mark -

@@ -70,7 +70,7 @@ class CanvasView : public StateView,
 									{ return fZoomLevel; }
 
 			void				SetMouseFilterMode(uint32 mode);
-			bool				MouseFilterMode() const
+			uint32				MouseFilterMode() const
 									{ return fMouseFilterMode; }
 
 			void				ConvertFromCanvas(BPoint* point) const;
