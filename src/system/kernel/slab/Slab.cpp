@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * Copyright 2008, Axel Dörfler. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  *
@@ -36,31 +37,17 @@
 
 typedef DoublyLinkedList<ObjectCache> ObjectCacheList;
 
-
-struct ResizeRequest : DoublyLinkedListLinkImpl<ResizeRequest> {
-	ResizeRequest(ObjectCache* cache)
-		:
-		cache(cache),
-		pending(false),
-		delete_when_done(false)
-	{
-	}
-
-	ObjectCache*	cache;
-	bool			pending;
-	bool			delete_when_done;
-};
-
-typedef DoublyLinkedList<ResizeRequest> ResizeRequestQueue;
-
+typedef DoublyLinkedList<ObjectCache,
+	DoublyLinkedListMemberGetLink<ObjectCache, &ObjectCache::maintenance_link> >
+		MaintenanceQueue;
 
 static ObjectCacheList sObjectCaches;
 static mutex sObjectCacheListLock = MUTEX_INITIALIZER("object cache list");
 
-static mutex sResizeRequestsLock
+static mutex sMaintenanceLock
 	= MUTEX_INITIALIZER("object cache resize requests");
-static ResizeRequestQueue sResizeRequests;
-static ConditionVariable sResizeRequestsCondition;
+static MaintenanceQueue sMaintenanceQueue;
+static ConditionVariable sMaintenanceCondition;
 
 
 #if OBJECT_CACHE_TRACING
@@ -283,16 +270,39 @@ slab_internal_free(void* buffer, uint32 flags)
 
 
 static void
+delete_object_cache_internal(object_cache* cache)
+{
+	if (!(cache->flags & CACHE_NO_DEPOT))
+		object_depot_destroy(&cache->depot, 0);
+
+	mutex_lock(&cache->lock);
+
+	if (!cache->full.IsEmpty())
+		panic("cache destroy: still has full slabs");
+
+	if (!cache->partial.IsEmpty())
+		panic("cache destroy: still has partial slabs");
+
+	while (!cache->empty.IsEmpty())
+		cache->ReturnSlab(cache->empty.RemoveHead(), 0);
+
+	mutex_destroy(&cache->lock);
+	cache->Delete();
+}
+
+
+static void
 increase_object_reserve(ObjectCache* cache)
 {
-	if (cache->resize_request->pending)
-		return;
+	MutexLocker locker(sMaintenanceLock);
 
-	cache->resize_request->pending = true;
+	cache->maintenance_resize = true;
 
-	MutexLocker locker(sResizeRequestsLock);
-	sResizeRequests.Add(cache->resize_request);
-	sResizeRequestsCondition.NotifyAll();
+	if (!cache->maintenance_pending) {
+		cache->maintenance_pending = true;
+		sMaintenanceQueue.Add(cache);
+		sMaintenanceCondition.NotifyAll();
+	}
 }
 
 
@@ -355,107 +365,165 @@ object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 
 
 static void
-object_cache_low_memory(void* _self, uint32 resources, int32 level)
+object_cache_low_memory(void* dummy, uint32 resources, int32 level)
 {
 	if (level == B_NO_LOW_RESOURCE)
 		return;
 
-	ObjectCache* cache = (ObjectCache*)_self;
+	MutexLocker cacheListLocker(sObjectCacheListLock);
 
-	// we are calling the reclaimer without the object cache lock
-	// to give the owner a chance to return objects to the slabs.
-	// As we only register the low memory handler after we complete
-	// the init of the object cache, unless there are some funky
-	// memory re-order business going on, we should be ok.
+	// Append the first cache to the end of the queue. We assume that it is
+	// one of the caches that will never be deleted and thus we use it as a
+	// marker.
+	ObjectCache* firstCache = sObjectCaches.RemoveHead();
+	sObjectCaches.Add(firstCache);
+	cacheListLocker.Unlock();
 
-	if (cache->reclaimer)
-		cache->reclaimer(cache->cookie, level);
+	ObjectCache* cache;
+	do {
+		cacheListLocker.Lock();
 
-	MutexLocker _(cache->lock);
-	size_t minimumAllowed;
+		cache = sObjectCaches.RemoveHead();
+		sObjectCaches.Add(cache);
 
-	switch (level) {
-	case B_LOW_RESOURCE_NOTE:
-		minimumAllowed = cache->pressure / 2 + 1;
-		break;
+		MutexLocker maintenanceLocker(sMaintenanceLock);
+		if (cache->maintenance_pending || cache->maintenance_in_progress) {
+			// We don't want to mess with caches in maintenance.
+			continue;
+		}
 
-	case B_LOW_RESOURCE_WARNING:
-		cache->pressure /= 2;
-		minimumAllowed = 0;
-		break;
+		cache->maintenance_pending = true;
+		cache->maintenance_in_progress = true;
 
-	default:
-		cache->pressure = 0;
-		minimumAllowed = 0;
-		break;
-	}
+		maintenanceLocker.Unlock();
+		cacheListLocker.Unlock();
 
-	// If the object cache has minimum object reserve, make sure that we don't
-	// free too many slabs.
-	if (cache->min_object_reserve > 0 && cache->empty_count > 0) {
-		size_t objectsPerSlab = cache->empty.Head()->size;
-		size_t freeObjects = cache->total_objects - cache->used_count;
+		// We are calling the reclaimer without the object cache lock
+		// to give the owner a chance to return objects to the slabs.
 
-		if (cache->min_object_reserve + objectsPerSlab >= freeObjects)
+		if (cache->reclaimer)
+			cache->reclaimer(cache->cookie, level);
+
+		MutexLocker cacheLocker(cache->lock);
+		size_t minimumAllowed;
+
+		switch (level) {
+			case B_LOW_RESOURCE_NOTE:
+				minimumAllowed = cache->pressure / 2 + 1;
+				break;
+
+			case B_LOW_RESOURCE_WARNING:
+				cache->pressure /= 2;
+				minimumAllowed = 0;
+				break;
+
+			default:
+				cache->pressure = 0;
+				minimumAllowed = 0;
+				break;
+		}
+
+		// If the object cache has minimum object reserve, make sure that we
+		// don't free too many slabs.
+		if (cache->min_object_reserve > 0 && cache->empty_count > 0) {
+			size_t objectsPerSlab = cache->empty.Head()->size;
+			size_t freeObjects = cache->total_objects - cache->used_count;
+
+			if (cache->min_object_reserve + objectsPerSlab >= freeObjects)
+				return;
+
+			size_t slabsToFree = (freeObjects - cache->min_object_reserve)
+				/ objectsPerSlab;
+
+			if (cache->empty_count > minimumAllowed + slabsToFree)
+				minimumAllowed = cache->empty_count - slabsToFree;
+		}
+
+		if (cache->empty_count <= minimumAllowed)
 			return;
 
-		size_t slabsToFree = (freeObjects - cache->min_object_reserve)
-			/ objectsPerSlab;
+		TRACE_CACHE(cache, "cache: memory pressure, will release down to %lu.",
+			minimumAllowed);
 
-		if (cache->empty_count > minimumAllowed + slabsToFree)
-			minimumAllowed = cache->empty_count - slabsToFree;
-	}
+		while (cache->empty_count > minimumAllowed) {
+			cache->ReturnSlab(cache->empty.RemoveHead(), 0);
+			cache->empty_count--;
+		}
 
-	if (cache->empty_count <= minimumAllowed)
-		return;
+		cacheLocker.Unlock();
 
-	TRACE_CACHE(cache, "cache: memory pressure, will release down to %lu.",
-		minimumAllowed);
+		// Check whether in the meantime someone has really requested
+		// maintenance for the cache.
+		maintenanceLocker.Lock();
 
-	while (cache->empty_count > minimumAllowed) {
-		cache->ReturnSlab(cache->empty.RemoveHead(), 0);
-		cache->empty_count--;
-	}
+		if (cache->maintenance_delete) {
+			delete_object_cache_internal(cache);
+			continue;
+		}
+
+		if (cache->maintenance_resize) {
+			sMaintenanceQueue.Add(cache);
+		} else {
+			cache->maintenance_pending = false;
+			cache->maintenance_in_progress = false;
+		}
+	} while (cache != firstCache);
 }
 
 
 static status_t
-object_cache_resizer(void*)
+object_cache_maintainer(void*)
 {
 	while (true) {
-		MutexLocker locker(sResizeRequestsLock);
+		MutexLocker locker(sMaintenanceLock);
 
 		// wait for the next request
-		while (sResizeRequests.IsEmpty()) {
+		while (sMaintenanceQueue.IsEmpty()) {
 			ConditionVariableEntry entry;
-			sResizeRequestsCondition.Add(&entry);
+			sMaintenanceCondition.Add(&entry);
 			locker.Unlock();
 			entry.Wait();
 			locker.Lock();
 		}
 
-		ResizeRequest* request = sResizeRequests.RemoveHead();
+		ObjectCache* cache = sMaintenanceQueue.RemoveHead();
 
-		locker.Unlock();
+		while (true) {
+			bool resizeRequested = cache->maintenance_resize;
+			bool deleteRequested = cache->maintenance_delete;
 
-		// resize the cache, if necessary
+			if (!resizeRequested && !deleteRequested) {
+				cache->maintenance_pending = false;
+				cache->maintenance_in_progress = false;
+				break;
+			}
 
-		ObjectCache* cache = request->cache;
+			cache->maintenance_resize = false;
+			cache->maintenance_in_progress = true;
 
-		MutexLocker cacheLocker(cache->lock);
+			locker.Unlock();
 
-		status_t error = object_cache_reserve_internal(cache,
-			cache->min_object_reserve, 0);
-		if (error != B_OK) {
-			dprintf("object cache resizer: Failed to resize object cache "
-				"%p!\n", cache);
-			break;
+			if (deleteRequested) {
+				delete_object_cache_internal(cache);
+				break;
+			}
+
+			// resize the cache, if necessary
+
+			MutexLocker cacheLocker(cache->lock);
+
+			if (resizeRequested) {
+				status_t error = object_cache_reserve_internal(cache,
+					cache->min_object_reserve, 0);
+				if (error != B_OK) {
+					dprintf("object cache resizer: Failed to resize object "
+						"cache %p!\n", cache);
+					break;
+				}
+			}
+
+			locker.Lock();
 		}
-
-		request->pending = false;
-
-		if (request->delete_when_done)
-			delete request;
 	}
 
 	// never can get here
@@ -514,24 +582,26 @@ delete_object_cache(object_cache* cache)
 		sObjectCaches.Remove(cache);
 	}
 
-	if (!(cache->flags & CACHE_NO_DEPOT))
-		object_depot_destroy(&cache->depot, 0);
+	MutexLocker cacheLocker(cache->lock);
 
-	mutex_lock(&cache->lock);
+	{
+		MutexLocker maintenanceLocker(sMaintenanceLock);
+		if (cache->maintenance_in_progress) {
+			// The maintainer thread is working with the cache. Just mark it
+			// to be deleted.
+			cache->maintenance_delete = true;
+			return;
+		}
 
-	unregister_low_resource_handler(object_cache_low_memory, cache);
+		// unschedule maintenance
+		if (cache->maintenance_pending)
+			sMaintenanceQueue.Remove(cache);
+	}
 
-	if (!cache->full.IsEmpty())
-		panic("cache destroy: still has full slabs");
+	// at this point no-one should have a reference to the cache anymore
+	cacheLocker.Unlock();
 
-	if (!cache->partial.IsEmpty())
-		panic("cache destroy: still has partial slabs");
-
-	while (!cache->empty.IsEmpty())
-		cache->ReturnSlab(cache->empty.RemoveHead(), 0);
-
-	mutex_destroy(&cache->lock);
-	cache->Delete();
+	delete_object_cache_internal(cache);
 }
 
 
@@ -542,19 +612,6 @@ object_cache_set_minimum_reserve(object_cache* cache, size_t objectCount)
 
 	if (cache->min_object_reserve == objectCount)
 		return B_OK;
-
-	if (cache->min_object_reserve == 0) {
-		cache->resize_request = new(std::nothrow) ResizeRequest(cache);
-		if (cache->resize_request == NULL)
-			return B_NO_MEMORY;
-	} else if (cache->min_object_reserve == 0) {
-		if (cache->resize_request->pending)
-			cache->resize_request->delete_when_done = true;
-		else
-			delete cache->resize_request;
-
-		cache->resize_request = NULL;
-	}
 
 	cache->min_object_reserve = objectCount;
 
@@ -687,14 +744,9 @@ slab_init_post_area()
 void
 slab_init_post_sem()
 {
-	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
-	while (it.HasNext()) {
-		ObjectCache* cache = it.Next();
-		register_low_resource_handler(object_cache_low_memory, cache,
-			B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
-				| B_KERNEL_RESOURCE_ADDRESS_SPACE, 5);
-
-	}
+	register_low_resource_handler(object_cache_low_memory, NULL,
+		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
+			| B_KERNEL_RESOURCE_ADDRESS_SPACE, 5);
 
 	block_allocator_init_rest();
 }
@@ -703,10 +755,10 @@ slab_init_post_sem()
 void
 slab_init_post_thread()
 {
-	new(&sResizeRequests) ResizeRequestQueue;
-	sResizeRequestsCondition.Init(&sResizeRequests, "object cache resizer");
+	new(&sMaintenanceQueue) MaintenanceQueue;
+	sMaintenanceCondition.Init(&sMaintenanceQueue, "object cache maintainer");
 
-	thread_id objectCacheResizer = spawn_kernel_thread(object_cache_resizer,
+	thread_id objectCacheResizer = spawn_kernel_thread(object_cache_maintainer,
 		"object cache resizer", B_URGENT_PRIORITY, NULL);
 	if (objectCacheResizer < 0) {
 		panic("slab_init_post_thread(): failed to spawn object cache resizer "

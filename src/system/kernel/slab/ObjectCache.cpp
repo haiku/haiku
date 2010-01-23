@@ -67,6 +67,11 @@ ObjectCache::Init(const char* name, size_t objectSize,
 	pressure = 0;
 	min_object_reserve = 0;
 
+	maintenance_pending = false;
+	maintenance_in_progress = false;
+	maintenance_resize = false;
+	maintenance_delete = false;
+
 	usage = 0;
 	this->maximum = maximum;
 

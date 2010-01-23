@@ -61,6 +61,12 @@ struct ObjectCache : DoublyLinkedListLinkImpl<ObjectCache> {
 			ObjectCacheResizeEntry* resize_entry_can_wait;
 			ObjectCacheResizeEntry* resize_entry_dont_wait;
 
+			DoublyLinkedListLink<ObjectCache> maintenance_link;
+			bool				maintenance_pending;
+			bool				maintenance_in_progress;
+			bool				maintenance_resize;
+			bool				maintenance_delete;
+
 			void*				cookie;
 			object_cache_constructor constructor;
 			object_cache_destructor destructor;
