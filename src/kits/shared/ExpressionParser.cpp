@@ -137,29 +137,49 @@ class Tokenizer {
 			BString temp;
 
 			const char* begin = fCurrentChar;
-			bool expectE = true;
-			bool expectPlusOrMinus = false;
-			while (*fCurrentChar != 0) {
-				if (!isdigit(*fCurrentChar)) {
-					if (*fCurrentChar == 'e' || *fCurrentChar == 'E') {
-						if (!expectE)
-							break;
-						expectE = false;
-						expectPlusOrMinus = true;
-					} else if (*fCurrentChar == '+' || *fCurrentChar == '-') {
-						if (!expectPlusOrMinus)
-							break;
-					} else if (!(*fCurrentChar == '.' || *fCurrentChar == ','))
-						break;
-					else
-						expectPlusOrMinus = false;
-				}
-				if (*fCurrentChar == ',')
-					temp << '.';
-				else
-					temp << *fCurrentChar;
+
+			// optional digits before the comma
+			while (isdigit(*fCurrentChar)) {
+				temp << *fCurrentChar;
 				fCurrentChar++;
 			}
+
+			// optional post comma part
+			// (required if there are no digits before the comma)
+			if (*fCurrentChar == '.' || *fCurrentChar == ',') {
+				temp << '.';
+				fCurrentChar++;
+
+				// optional post comma digits
+				while (isdigit(*fCurrentChar)) {
+					temp << *fCurrentChar;
+					fCurrentChar++;
+				}
+			}
+
+			// optional exponent part
+			if (*fCurrentChar == 'e' || *fCurrentChar == 'E') {
+				temp << *fCurrentChar;
+				fCurrentChar++;
+
+				// optional exponent sign
+				if (*fCurrentChar == '+' || *fCurrentChar == '-') {
+					temp << *fCurrentChar;
+					fCurrentChar++;
+				}
+
+				// required exponent digits
+				if (!isdigit(*fCurrentChar)) {
+					throw ParseException("missing exponent in constant",
+						fCurrentChar - begin);
+				}
+
+				while (isdigit(*fCurrentChar)) {
+					temp << *fCurrentChar;
+					fCurrentChar++;
+				}
+			}
+
 			int32 length = fCurrentChar - begin;
 			BString test = temp;
 			test << "&_";
