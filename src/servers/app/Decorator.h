@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,16 +24,16 @@ class BRegion;
 
 
 enum click_type {
-	DEC_NONE = 0,
-	DEC_ZOOM,
-	DEC_CLOSE,
-	DEC_MINIMIZE,
-	DEC_TAB,
-	DEC_DRAG,
-	DEC_MOVETOBACK,
-	DEC_SLIDETAB,
+	CLICK_NONE = 0,
+	CLICK_ZOOM,
+	CLICK_CLOSE,
+	CLICK_MINIMIZE,
+	CLICK_TAB,
+	CLICK_DRAG,
+	CLICK_MOVE_TO_BACK,
+	CLICK_SLIDE_TAB,
 
-	DEC_RESIZE,
+	CLICK_RESIZE,
 	CLICK_RESIZE_L,
 	CLICK_RESIZE_T,
 	CLICK_RESIZE_R,

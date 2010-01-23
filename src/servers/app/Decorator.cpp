@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -335,7 +335,7 @@ Decorator::GetFootprint(BRegion *region)
 click_type
 Decorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 {
-	return DEC_NONE;
+	return CLICK_NONE;
 }
 
 

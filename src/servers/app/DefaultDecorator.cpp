@@ -537,16 +537,16 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 	// the user might be clicking on and gradually work our way out into larger
 	// rectangles.
 	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(point))
-		return DEC_CLOSE;
+		return CLICK_CLOSE;
 
 	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(point))
-		return DEC_ZOOM;
+		return CLICK_ZOOM;
 
 	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
-		return DEC_MOVETOBACK;
+		return CLICK_MOVE_TO_BACK;
 
 	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(point))
-		return DEC_RESIZE;
+		return CLICK_RESIZE;
 
 	if (fTabRect.Contains(point)) {
 		// Clicked in the tab
@@ -554,7 +554,7 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 		// tab sliding in any case if either shift key is held down
 		// except sliding up-down by moving mouse left-right would look strange
 		if ((modifiers & B_SHIFT_KEY) && (fLook != kLeftTitledWindowLook))
-			return DEC_SLIDETAB;
+			return CLICK_SLIDE_TAB;
 	} else if (fLeftBorder.Contains(point) || fRightBorder.Contains(point)
 		|| fTopBorder.Contains(point) || fBottomBorder.Contains(point)) {
 		// Clicked on border
@@ -568,17 +568,17 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 			BRect temp(BPoint(fBottomBorder.right - 22,
 				fBottomBorder.bottom - 22), fBottomBorder.RightBottom());
 			if (temp.Contains(point))
-				return DEC_RESIZE;
+				return CLICK_RESIZE;
 		}
 	} else {
 		// Guess user didn't click anything
-		return DEC_NONE;
+		return CLICK_NONE;
 	}
 
 	if (fWasDoubleClick && !(fFlags & B_NOT_MINIMIZABLE))
-		return DEC_MINIMIZE;
+		return CLICK_MINIMIZE;
 
-	return DEC_DRAG;
+	return CLICK_DRAG;
 }
 
 
@@ -1015,7 +1015,7 @@ DefaultDecorator::_DrawClose(BRect rect)
 	int32 index = (fButtonFocus ? 0 : 1) + (GetClose() ? 0 : 2);
 	ServerBitmap* bitmap = fCloseBitmaps[index];
 	if (bitmap == NULL) {
-		bitmap = _GetBitmapForButton(DEC_CLOSE, GetClose(), fButtonFocus,
+		bitmap = _GetBitmapForButton(CLICK_CLOSE, GetClose(), fButtonFocus,
 			rect.IntegerWidth(), rect.IntegerHeight(), this);
 		fCloseBitmaps[index] = bitmap;
 	}
@@ -1068,7 +1068,7 @@ DefaultDecorator::_DrawZoom(BRect rect)
 	int32 index = (fButtonFocus ? 0 : 1) + (GetZoom() ? 0 : 2);
 	ServerBitmap* bitmap = fZoomBitmaps[index];
 	if (bitmap == NULL) {
-		bitmap = _GetBitmapForButton(DEC_ZOOM, GetZoom(), fButtonFocus,
+		bitmap = _GetBitmapForButton(CLICK_ZOOM, GetZoom(), fButtonFocus,
 			rect.IntegerWidth(), rect.IntegerHeight(), this);
 		fZoomBitmaps[index] = bitmap;
 	}
@@ -1310,14 +1310,14 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 	BRect rect(0, 0, width - 1, height - 1);
 
 	STRACE(("DefaultDecorator creating bitmap for %s %sfocus %s at size %ldx%ld\n",
-		item == DEC_CLOSE ? "close" : "zoom", focus ? "" : "non-",
+		item == CLICK_CLOSE ? "close" : "zoom", focus ? "" : "non-",
 		down ? "down" : "up", width, height));
 	switch (item) {
-		case DEC_CLOSE:
+		case CLICK_CLOSE:
 			object->_DrawBlendedRect(sBitmapDrawingEngine, rect, down, focus);
 			break;
 
-		case DEC_ZOOM:
+		case CLICK_ZOOM:
 		{
 			// init the background
 			sBitmapDrawingEngine->FillRect(rect, B_TRANSPARENT_COLOR);

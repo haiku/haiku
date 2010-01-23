@@ -791,61 +791,61 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 	if (windowModifier || inBorderRegion) {
 		// clicking Window visible area
 
-		click_type action = DEC_NONE;
+		click_type action = CLICK_NONE;
 		int32 buttons = _ExtractButtons(message);
 
 		if (inBorderRegion && fDecorator != NULL)
 			action = _ActionFor(message, buttons, modifiers);
 		else {
 			if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
-				action = DEC_MOVETOBACK;
+				action = CLICK_MOVE_TO_BACK;
 			else if ((fFlags & B_NOT_MOVABLE) == 0 && fDecorator != NULL)
-				action = DEC_DRAG;
+				action = CLICK_DRAG;
 		}
 
 		if (!desktopSettings.AcceptFirstClick()) {
 			// ignore clicks on decorator buttons if the
 			// non-floating window doesn't have focus
-			if (!IsFocus() && !IsFloating() && action != DEC_MOVETOBACK
-				&& action != DEC_RESIZE && action != DEC_SLIDETAB)
-				action = DEC_DRAG;
+			if (!IsFocus() && !IsFloating() && action != CLICK_MOVE_TO_BACK
+				&& action != CLICK_RESIZE && action != CLICK_SLIDE_TAB)
+				action = CLICK_DRAG;
 		}
 
 		// set decorator internals
 		switch (action) {
-			case DEC_CLOSE:
+			case CLICK_CLOSE:
 				fIsClosing = true;
-				STRACE_CLICK(("===> DEC_CLOSE\n"));
+				STRACE_CLICK(("===> CLICK_CLOSE\n"));
 				break;
 
-			case DEC_ZOOM:
+			case CLICK_ZOOM:
 				fIsZooming = true;
-				STRACE_CLICK(("===> DEC_ZOOM\n"));
+				STRACE_CLICK(("===> CLICK_ZOOM\n"));
 				break;
 
-			case DEC_MINIMIZE:
+			case CLICK_MINIMIZE:
 				if ((Flags() & B_NOT_MINIMIZABLE) == 0) {
 					fIsMinimizing = true;
-					STRACE_CLICK(("===> DEC_MINIMIZE\n"));
+					STRACE_CLICK(("===> CLICK_MINIMIZE\n"));
 				}
 				break;
 
-			case DEC_DRAG:
+			case CLICK_DRAG:
 				fIsDragging = true;
 				fLastMousePosition = where;
-				STRACE_CLICK(("===> DEC_DRAG\n"));
+				STRACE_CLICK(("===> CLICK_DRAG\n"));
 				break;
 
-			case DEC_RESIZE:
+			case CLICK_RESIZE:
 				fIsResizing = true;
 				fLastMousePosition = where;
-				STRACE_CLICK(("===> DEC_RESIZE\n"));
+				STRACE_CLICK(("===> CLICK_RESIZE\n"));
 				break;
 
-			case DEC_SLIDETAB:
+			case CLICK_SLIDE_TAB:
 				fIsSlidingTab = true;
 				fLastMousePosition = where;
-				STRACE_CLICK(("===> DEC_SLIDETAB\n"));
+				STRACE_CLICK(("===> CLICK_SLIDE_TAB\n"));
 				break;
 
 			default:
@@ -875,7 +875,7 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 			fRegionPool.Recycle(visibleBorder);
 		}
 
-		if (action == DEC_MOVETOBACK) {
+		if (action == CLICK_MOVE_TO_BACK) {
 			if (desktopSettings.MouseMode() == B_CLICK_TO_FOCUS_MOUSE) {
 				bool covered = true;
 				BRegion fullRegion;
@@ -899,7 +899,7 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 			else {
 				fDesktop->SetFocusWindow(this);
 				if (desktopSettings.MouseMode() == B_FOCUS_FOLLOWS_MOUSE
-					&& (action == DEC_DRAG || action == DEC_RESIZE)) {
+					&& (action == CLICK_DRAG || action == CLICK_RESIZE)) {
 					fActivateOnMouseUp = true;
 					fMouseMoveDistance = 0.0f;
 					fLastMoveTime = system_time();
@@ -963,7 +963,7 @@ Window::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		if (fIsZooming) {
 			fIsZooming = false;
 			fDecorator->SetZoom(false);
-			if (action == DEC_ZOOM) {
+			if (action == CLICK_ZOOM) {
 				invalidate = true;
 				fWindow->NotifyZoom();
 			}
@@ -971,7 +971,7 @@ Window::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		if (fIsClosing) {
 			fIsClosing = false;
 			fDecorator->SetClose(false);
-			if (action == DEC_CLOSE) {
+			if (action == CLICK_CLOSE) {
 				invalidate = true;
 				fWindow->NotifyQuitRequested();
 			}
@@ -979,7 +979,7 @@ Window::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		if (fIsMinimizing) {
 			fIsMinimizing = false;
 			fDecorator->SetMinimize(false);
-			if (action == DEC_MINIMIZE) {
+			if (action == CLICK_MINIMIZE) {
 				invalidate = true;
 				fWindow->NotifyMinimize(true);
 			}
@@ -1075,11 +1075,11 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 		engine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
-			fDecorator->SetZoom(_ActionFor(message) == DEC_ZOOM);
+			fDecorator->SetZoom(_ActionFor(message) == CLICK_ZOOM);
 		} else if (fIsClosing) {
-			fDecorator->SetClose(_ActionFor(message) == DEC_CLOSE);
+			fDecorator->SetClose(_ActionFor(message) == CLICK_CLOSE);
 		} else if (fIsMinimizing) {
-			fDecorator->SetMinimize(_ActionFor(message) == DEC_MINIMIZE);
+			fDecorator->SetMinimize(_ActionFor(message) == CLICK_MINIMIZE);
 		}
 
 		engine->UnlockParallelAccess();
@@ -2240,7 +2240,7 @@ click_type
 Window::_ActionFor(const BMessage* message) const
 {
 	if (fDecorator == NULL)
-		return DEC_NONE;
+		return CLICK_NONE;
 
 	int32 buttons = _ExtractButtons(message);
 	int32 modifiers = _ExtractModifiers(message);
@@ -2253,11 +2253,11 @@ Window::_ActionFor(const BMessage* message, int32 buttons,
 	int32 modifiers) const
 {
 	if (fDecorator == NULL)
-		return DEC_NONE;
+		return CLICK_NONE;
 
 	BPoint where;
 	if (message->FindPoint("where", &where) != B_OK)
-		return DEC_NONE;
+		return CLICK_NONE;
 
 	return fDecorator->Clicked(where, buttons, modifiers);
 }
