@@ -160,6 +160,7 @@ dosfs_trim_spaces(char *label)
 	}
 }
 
+
 static bool
 dosfs_read_label(bool fat32, uint8 *buffer, char *label)
 {
@@ -177,109 +178,24 @@ dosfs_read_label(bool fat32, uint8 *buffer, char *label)
 }
 
 
-static int
-lock_removable_device(int fd, bool state)
-{
-	return ioctl(fd, B_SCSI_PREVENT_ALLOW, &state, sizeof(state));
-}
-
-
-static status_t
-mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
-	nspace** newVol, int fs_flags, int op_sync_mode)
+static nspace*
+volume_init(int fd, uint8* buf,
+	const int flags, int fs_flags,
+	device_geometry *geo)
 {
 	nspace *vol = NULL;
-	uint8 buf[512];
+	uint8 media_buf[512];
 	int i;
-	device_geometry geo;
 	status_t err;
-
-	*newVol = NULL;
+			
 	if ((vol = (nspace *)calloc(sizeof(nspace), 1)) == NULL) {
 		dprintf("dosfs error: out of memory\n");
-		return B_NO_MEMORY;
+		return NULL;
 	}
 
-	vol->flags = B_FS_IS_PERSISTENT | B_FS_HAS_MIME;
+	vol->flags = flags;
 	vol->fs_flags = fs_flags;
-
-	// open read-only for now
-	if ((err = (vol->fd = open(path, O_RDONLY | O_NOCACHE))) < 0) {
-		dprintf("dosfs error: unable to open %s (%s)\n", path, strerror(err));
-		goto error0;
-	}
-
-	// get device characteristics
-	if (ioctl(vol->fd, B_GET_GEOMETRY, &geo) < 0) {
-		struct stat st;
-		if (fstat(vol->fd, &st) >= 0 && S_ISREG(st.st_mode)) {
-			/* support mounting disk images */
-			geo.bytes_per_sector = 0x200;
-			geo.sectors_per_track = 1;
-			geo.cylinder_count = st.st_size / 0x200;
-			geo.head_count = 1;
-			geo.read_only = !(st.st_mode & S_IWUSR);
-			geo.removable = true;
-		} else {
-			dprintf("dosfs error: error getting device geometry\n");
-			goto error0;
-		}
-	}
-
-	if (geo.bytes_per_sector != 0x200 && geo.bytes_per_sector != 0x400
-		&& geo.bytes_per_sector != 0x800 && geo.bytes_per_sector != 0x1000) {
-		dprintf("dosfs error: unsupported device block size (%lu)\n",
-			geo.bytes_per_sector);
-		goto error0;
-	}
-
-	if (geo.removable) {
-		DPRINTF(0, ("%s is removable\n", path));
-		vol->flags |= B_FS_IS_REMOVABLE;
-	}
-
-	if (geo.read_only || (flags & B_MOUNT_READ_ONLY)) {
-		DPRINTF(0, ("%s is read-only\n", path));
-		vol->flags |= B_FS_IS_READONLY;
-	} else {
-		// reopen it with read/write permissions
-		close(vol->fd);
-		if ((err = (vol->fd = open(path, O_RDWR | O_NOCACHE))) < 0) {
-			dprintf("dosfs error: unable to open %s (%s)\n", path,
-				strerror(err));
-			goto error0;
-		}
-
-		if ((vol->flags & B_FS_IS_REMOVABLE)
-			&& (vol->fs_flags & FS_FLAGS_LOCK_DOOR))
-			lock_removable_device(vol->fd, true);
-	}
-
-	// see if we need to go into op sync mode
-	vol->fs_flags &= ~FS_FLAGS_OP_SYNC;
-	switch (op_sync_mode) {
-		case 1:
-			if ((vol->flags & B_FS_IS_REMOVABLE) == 0) {
-				// we're not removable, so skip op_sync
-				break;
-			}
-			// supposed to fall through
-
-		case 2:
-			dprintf("dosfs: mounted with op_sync enabled\n");
-			vol->fs_flags |= FS_FLAGS_OP_SYNC;
-			break;
-
-		case 0:
-		default:
-			break;
-	}
-
-	// read in the boot sector
-	if ((err = read_pos(vol->fd, 0, (void *)buf, 512)) != 512) {
-		dprintf("dosfs error: error reading boot sector\n");
-		goto error;
-	}
+	vol->fd = fd;
 
 	// only check boot signature on hard disks to account for broken mtools
 	// behavior
@@ -376,22 +292,22 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 		if (vol->total_sectors == 0)
 			vol->total_sectors = read32(buf, 0x20);
 
-		{
+		if (geo != NULL) {
 			/*
-			  Zip disks that were formatted at iomega have an incorrect number
-			  of sectors.  They say that they have 196576 sectors but they
-			  really only have 196192.  This check is a work-around for their
-			  brain-deadness.
+				Zip disks that were formatted at iomega have an incorrect number
+				of sectors.  They say that they have 196576 sectors but they
+				really only have 196192.  This check is a work-around for their
+				brain-deadness.
 			*/
 			unsigned char bogus_zip_data[] = {
 				0x00, 0x02, 0x04, 0x01, 0x00, 0x02, 0x00, 0x02, 0x00, 0x00,
 				0xf8, 0xc0, 0x00, 0x20, 0x00, 0x40, 0x00, 0x20, 0x00, 0x00
 			};
-
+	
 			if (memcmp(buf + 0x0b, bogus_zip_data, sizeof(bogus_zip_data)) == 0
 				&& vol->total_sectors == 196576
-				&& ((off_t)geo.sectors_per_track * (off_t)geo.cylinder_count
-					* (off_t)geo.head_count) == 196192) {
+				&& ((off_t)geo->sectors_per_track * (off_t)geo->cylinder_count
+					* (off_t)geo->head_count) == 196192) {
 				vol->total_sectors = 196192;
 			}
 		}
@@ -422,54 +338,46 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 			vol->vol_entry = -1;
 	}
 
-	/* check that the partition is large enough to contain the file system */
-	if (vol->total_sectors > geo.sectors_per_track * geo.cylinder_count
-			* geo.head_count) {
-		dprintf("dosfs: volume extends past end of partition\n");
-		err = B_PARTITION_TOO_SMALL;
-		goto error;
-	}
-
 	// perform sanity checks on the FAT
 
 	// the media descriptor in active FAT should match the one in the BPB
 	if ((err = read_pos(vol->fd, vol->bytes_per_sector * (vol->reserved_sectors
 			+ vol->active_fat * vol->sectors_per_fat),
-			(void *)buf, 0x200)) != 0x200) {
+			(void *)media_buf, 0x200)) != 0x200) {
 		dprintf("dosfs error: error reading FAT\n");
 		goto error;
 	}
 
-	if (buf[0] != vol->media_descriptor) {
-		dprintf("dosfs error: media descriptor mismatch (%x != %x)\n", buf[0],
+	if (media_buf[0] != vol->media_descriptor) {
+		dprintf("dosfs error: media descriptor mismatch (%x != %x)\n", media_buf[0],
 			vol->media_descriptor);
 		goto error;
 	}
 
 	if (vol->fat_mirrored) {
 		uint32 i;
-		uint8 buf2[512];
+		uint8 mirror_media_buf[512];
 		for (i = 0; i < vol->fat_count; i++) {
 			if (i != vol->active_fat) {
 				DPRINTF(1, ("checking fat #%ld\n", i));
-				buf2[0] = ~buf[0];
+				mirror_media_buf[0] = ~media_buf[0];
 				if ((err = read_pos(vol->fd, vol->bytes_per_sector
 						* (vol->reserved_sectors + vol->sectors_per_fat * i),
-						(void *)buf2, 0x200)) != 0x200) {
+						(void *)mirror_media_buf, 0x200)) != 0x200) {
 					dprintf("dosfs error: error reading FAT %ld\n", i);
 					goto error;
 				}
 
-				if (buf2[0] != vol->media_descriptor) {
+				if (mirror_media_buf[0] != vol->media_descriptor) {
 					dprintf("dosfs error: media descriptor mismatch in fat # "
-						"%ld (%x != %x)\n", i, buf2[0], vol->media_descriptor);
+						"%ld (%x != %x)\n", i, mirror_media_buf[0], vol->media_descriptor);
 					goto error;
 				}
 #if 0
 				// checking for exact matches of fats is too
 				// restrictive; allow these to go through in
 				// case the fat is corrupted for some reason
-				if (memcmp(buf, buf2, 0x200)) {
+				if (memcmp(media_buf, mirror_media_buf, 0x200)) {
 					dprintf("dosfs error: fat %d doesn't match active fat "
 						"(%d)\n", i, vol->active_fat);
 					goto error;
@@ -479,23 +387,12 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 		}
 	}
 
-	// now we are convinced of the drive's validity
 
-	vol->volume = _vol;
-	vol->id = _vol->id;
-	strncpy(vol->device, path, sizeof(vol->device));
+	// now we are convinced of the drive's validity
 
 	// this will be updated later if fsinfo exists
 	vol->last_allocated = 2;
-
 	vol->beos_vnid = INVALID_VNID_BITS_MASK;
-	{
-		void *handle;
-		handle = load_driver_settings("fat");
-		vol->respect_disk_image =
-				get_driver_boolean_parameter(handle, "respect", true, true);
-		unload_driver_settings(handle);
-	}
 
 	// initialize block cache
 	vol->fBlockCache = block_cache_create(vol->fd, vol->total_sectors,
@@ -504,76 +401,6 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 		dprintf("dosfs error: error initializing block cache\n");
 		goto error;
 	}
-
-	// as well as the vnode cache
-	if (init_vcache(vol) != B_OK) {
-		dprintf("dosfs error: error initializing vnode cache\n");
-		goto error1;
-	}
-
-	// and the dlist cache
-	if (dlist_init(vol) != B_OK) {
-		dprintf("dosfs error: error initializing dlist cache\n");
-		goto error2;
-	}
-
-	if (vol->flags & B_FS_IS_READONLY)
-		vol->free_clusters = 0;
-	else {
-		uint32 free_count, last_allocated;
-		err = get_fsinfo(vol, &free_count, &last_allocated);
-		if (err >= 0) {
-			if (free_count < vol->total_clusters)
-				vol->free_clusters = free_count;
-			else {
-				dprintf("dosfs error: free cluster count from fsinfo block "
-					"invalid %lx\n", free_count);
-				err = -1;
-			}
-
-			if (last_allocated < vol->total_clusters)
-				vol->last_allocated = last_allocated; //update to a closer match
-		}
-
-		if (err < 0) {
-			if ((err = count_free_clusters(vol)) < 0) {
-				dprintf("dosfs error: error counting free clusters (%s)\n",
-					strerror(err));
-				goto error3;
-			}
-			vol->free_clusters = err;
-		}
-	}
-
-	DPRINTF(0, ("built at %s on %s\n", build_time, build_date));
-	DPRINTF(0, ("mounting %s (id %lx, device %x, media descriptor %x)\n", vol->device, vol->id, vol->fd, vol->media_descriptor));
-	DPRINTF(0, ("%lx bytes/sector, %lx sectors/cluster\n", vol->bytes_per_sector, vol->sectors_per_cluster));
-	DPRINTF(0, ("%lx reserved sectors, %lx total sectors\n", vol->reserved_sectors, vol->total_sectors));
-	DPRINTF(0, ("%lx %d-bit fats, %lx sectors/fat, %lx root entries\n", vol->fat_count, vol->fat_bits, vol->sectors_per_fat, vol->root_entries_count));
-	DPRINTF(0, ("root directory starts at sector %lx (cluster %lx), data at sector %lx\n", vol->root_start, vol->root_vnode.cluster, vol->data_start));
-	DPRINTF(0, ("%lx total clusters, %lx free\n", vol->total_clusters, vol->free_clusters));
-	DPRINTF(0, ("fat mirroring is %s, fs info sector at sector %x\n", (vol->fat_mirrored) ? "on" : "off", vol->fsinfo_sector));
-	DPRINTF(0, ("last allocated cluster = %lx\n", vol->last_allocated));
-
-	if (vol->fat_bits == 32) {
-		// now that the block cache has been initialised, we can figure
-		// out the length of the root directory with count_clusters()
-		vol->root_vnode.st_size = count_clusters(vol, vol->root_vnode.cluster)
-			* vol->bytes_per_sector * vol->sectors_per_cluster;
-		vol->root_vnode.end_cluster = get_nth_fat_entry(vol,
-			vol->root_vnode.cluster, vol->root_vnode.st_size
-			/ vol->bytes_per_sector / vol->sectors_per_cluster - 1);
-	}
-
-	// initialize root vnode
-	vol->root_vnode.vnid = vol->root_vnode.dir_vnid = GENERATE_DIR_CLUSTER_VNID(
-		vol->root_vnode.cluster, vol->root_vnode.cluster);
-	vol->root_vnode.sindex = vol->root_vnode.eindex = 0xffffffff;
-	vol->root_vnode.mode = FAT_SUBDIR;
-	time(&(vol->root_vnode.st_time));
-	vol->root_vnode.mime = NULL;
-	vol->root_vnode.dirty = false;
-	dlist_add(vol, vol->root_vnode.vnid);
 
 	// find volume label (supercedes any label in the bpb)
 	{
@@ -600,23 +427,251 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	if (!memcmp(vol->vol_label, "__RO__     ", 11))
 		vol->flags |= B_FS_IS_READONLY;
 
+	return vol;
+
+error:
+	free(vol);
+	return NULL;
+}
+
+
+static void
+volume_uninit(nspace *vol)
+{
+	block_cache_delete(vol->fBlockCache, false);
+	free(vol);
+}
+
+
+static void
+volume_count_free_cluster(nspace *vol)
+{
+	status_t err;
+
+	if (vol->flags & B_FS_IS_READONLY)
+		vol->free_clusters = 0;
+	else {
+		uint32 free_count, last_allocated;
+		err = get_fsinfo(vol, &free_count, &last_allocated);
+		if (err >= 0) {
+			if (free_count < vol->total_clusters)
+				vol->free_clusters = free_count;
+			else {
+				dprintf("dosfs error: free cluster count from fsinfo block "
+					"invalid %lx\n", free_count);
+				err = -1;
+			}
+
+			if (last_allocated < vol->total_clusters)
+				vol->last_allocated = last_allocated; //update to a closer match
+		}
+
+		if (err < 0) {
+			if ((err = count_free_clusters(vol)) < 0) {
+				dprintf("dosfs error: error counting free clusters (%s)\n",
+					strerror(err));
+				return;
+			}
+			vol->free_clusters = err;
+		}
+	}
+}
+
+
+static int
+lock_removable_device(int fd, bool state)
+{
+	return ioctl(fd, B_SCSI_PREVENT_ALLOW, &state, sizeof(state));
+}
+
+
+static status_t
+mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
+	nspace** newVol, int fs_flags, int op_sync_mode)
+{
+	nspace *vol = NULL;
+	uint8 buf[512];
+	device_geometry geo;
+	status_t err;
+	int fd;
+	int vol_flags;
+
+	vol_flags = B_FS_IS_PERSISTENT | B_FS_HAS_MIME;
+ 
+	// open read-only for now
+	if ((err = (fd = open(path, O_RDONLY | O_NOCACHE))) < 0) {
+		dprintf("dosfs error: unable to open %s (%s)\n", path, strerror(err));
+		goto error0;
+	}
+
+	// get device characteristics
+	if (ioctl(fd, B_GET_GEOMETRY, &geo) < 0) {
+		struct stat st;
+		if (fstat(fd, &st) >= 0 && S_ISREG(st.st_mode)) {
+			/* support mounting disk images */
+			geo.bytes_per_sector = 0x200;
+			geo.sectors_per_track = 1;
+			geo.cylinder_count = st.st_size / 0x200;
+			geo.head_count = 1;
+			geo.read_only = !(st.st_mode & S_IWUSR);
+			geo.removable = true;
+		} else {
+			dprintf("dosfs error: error getting device geometry\n");
+			goto error1;
+		}
+	}
+
+	if (geo.bytes_per_sector != 0x200 && geo.bytes_per_sector != 0x400
+		&& geo.bytes_per_sector != 0x800 && geo.bytes_per_sector != 0x1000) {
+		dprintf("dosfs error: unsupported device block size (%lu)\n",
+			geo.bytes_per_sector);
+		goto error1;
+	}
+
+	if (geo.removable) {
+		DPRINTF(0, ("%s is removable\n", path));
+		vol_flags |= B_FS_IS_REMOVABLE;
+	}
+
+	if (geo.read_only || (flags & B_MOUNT_READ_ONLY)) {
+		DPRINTF(0, ("%s is read-only\n", path));
+		vol_flags |= B_FS_IS_READONLY;
+	} else {
+		// reopen it with read/write permissions
+		close(fd);
+		if ((err = (fd = open(path, O_RDWR | O_NOCACHE))) < 0) {
+			dprintf("dosfs error: unable to open %s (%s)\n", path,
+				strerror(err));
+			goto error0;
+		}
+
+		if ((vol_flags & B_FS_IS_REMOVABLE)
+			&& (fs_flags & FS_FLAGS_LOCK_DOOR))
+			lock_removable_device(fd, true);
+	}
+
+	// see if we need to go into op sync mode
+	fs_flags &= ~FS_FLAGS_OP_SYNC;
+	switch (op_sync_mode) {
+		case 1:
+			if ((vol_flags & B_FS_IS_REMOVABLE) == 0) {
+				// we're not removable, so skip op_sync
+				break;
+			}
+			// supposed to fall through
+
+		case 2:
+			dprintf("dosfs: mounted with op_sync enabled\n");
+			fs_flags |= FS_FLAGS_OP_SYNC;
+			break;
+
+		case 0:
+		default:
+			break;
+	}
+
+	// read in the boot sector
+	if ((err = read_pos(fd, 0, (void *)buf, 512)) != 512) {
+		dprintf("dosfs error: error reading boot sector\n");
+		goto error1;
+	}
+	
+	vol = volume_init(fd, buf, vol_flags, fs_flags, &geo);
+
+	/* check that the partition is large enough to contain the file system */
+	if (vol->total_sectors > geo.sectors_per_track * geo.cylinder_count
+			* geo.head_count) {
+		dprintf("dosfs: volume extends past end of partition\n");
+		err = B_PARTITION_TOO_SMALL;
+		goto error2;
+	}
+
+	vol->volume = _vol;
+	vol->id = _vol->id;
+	strncpy(vol->device, path, sizeof(vol->device));
+
+	{
+		void *handle;
+		handle = load_driver_settings("fat");
+		vol->respect_disk_image =
+			get_driver_boolean_parameter(handle, "respect", true, true);
+		unload_driver_settings(handle);
+	}
+
+	// Initialize the vnode cache
+	if (init_vcache(vol) != B_OK) {
+		dprintf("dosfs error: error initializing vnode cache\n");
+		goto error2;
+	}
+
+	// and the dlist cache
+	if (dlist_init(vol) != B_OK) {
+		dprintf("dosfs error: error initializing dlist cache\n");
+		goto error3;
+	}
+
+	volume_count_free_cluster(vol);
+
+	DPRINTF(0, ("built at %s on %s\n", build_time, build_date));
+	DPRINTF(0, ("mounting %s (id %lx, device %x, media descriptor %x)\n",
+				vol->device, vol->id, vol->fd, vol->media_descriptor));
+	DPRINTF(0, ("%lx bytes/sector, %lx sectors/cluster\n",
+				vol->bytes_per_sector, vol->sectors_per_cluster));
+	DPRINTF(0, ("%lx reserved sectors, %lx total sectors\n",
+				vol->reserved_sectors, vol->total_sectors));
+	DPRINTF(0, ("%lx %d-bit fats, %lx sectors/fat, %lx root entries\n",
+				vol->fat_count, vol->fat_bits, vol->sectors_per_fat,
+				vol->root_entries_count));
+	DPRINTF(0, ("root directory starts at sector %lx (cluster %lx), data at sector %lx\n",
+				vol->root_start, vol->root_vnode.cluster, vol->data_start));
+	DPRINTF(0, ("%lx total clusters, %lx free\n",
+				vol->total_clusters, vol->free_clusters));
+	DPRINTF(0, ("fat mirroring is %s, fs info sector at sector %x\n",
+				(vol->fat_mirrored) ? "on" : "off", vol->fsinfo_sector));
+	DPRINTF(0, ("last allocated cluster = %lx\n", vol->last_allocated));
+
+	if (vol->fat_bits == 32) {
+		// now that the block cache has been initialised, we can figure
+		// out the length of the root directory with count_clusters()
+		vol->root_vnode.st_size = count_clusters(vol, vol->root_vnode.cluster)
+			* vol->bytes_per_sector * vol->sectors_per_cluster;
+		vol->root_vnode.end_cluster = get_nth_fat_entry(vol,
+			vol->root_vnode.cluster, vol->root_vnode.st_size
+			/ vol->bytes_per_sector / vol->sectors_per_cluster - 1);
+	}
+
+	// initialize root vnode
+	vol->root_vnode.vnid = vol->root_vnode.dir_vnid = GENERATE_DIR_CLUSTER_VNID(
+		vol->root_vnode.cluster, vol->root_vnode.cluster);
+	vol->root_vnode.sindex = vol->root_vnode.eindex = 0xffffffff;
+	vol->root_vnode.mode = FAT_SUBDIR;
+	time(&(vol->root_vnode.st_time));
+	vol->root_vnode.mime = NULL;
+	vol->root_vnode.dirty = false;
+	dlist_add(vol, vol->root_vnode.vnid);
+
+
+	DPRINTF(0, ("root vnode id = %Lx\n", vol->root_vnode.vnid));
+	DPRINTF(0, ("volume label [%s] (%lx)\n", vol->vol_label, vol->vol_entry));
+
+	// steal a trick from bfs
+	if (!memcmp(vol->vol_label, "__RO__     ", 11))
+		vol->flags |= B_FS_IS_READONLY;
+
 	*newVol = vol;
 	return B_NO_ERROR;
 
 error3:
-	dlist_uninit(vol);
-error2:
 	uninit_vcache(vol);
+error2:
+	volume_uninit(vol);
 error1:
-	block_cache_delete(vol->fBlockCache, false);
-error:
 	if (!(vol->flags & B_FS_IS_READONLY) && (vol->flags & B_FS_IS_REMOVABLE)
 		&& (vol->fs_flags & FS_FLAGS_LOCK_DOOR)) {
-		lock_removable_device(vol->fd, false);
+		lock_removable_device(fd, false);
 	}
+	close(fd);
 error0:
-	close(vol->fd);
-	free(vol);
 	return err >= B_NO_ERROR ? EINVAL : err;
 }
 
@@ -691,6 +746,17 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 			total_sectors = read32(buf, 0x20);
 
 		dosfs_read_label(false, buf, name);
+	}
+
+	// find volume label (supercedes any label in the bpb)
+	{
+		nspace *vol;
+		vol = volume_init(fd, buf, 0, 0, NULL);
+		if (vol != NULL)
+		{
+			strlcpy(name, vol->vol_label, 12);
+			volume_uninit(vol);
+		}
 	}
 
 	cookie = (identify_cookie *)malloc(sizeof(identify_cookie));
