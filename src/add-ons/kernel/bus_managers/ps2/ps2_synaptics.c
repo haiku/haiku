@@ -198,7 +198,7 @@ move_to_movement(synaptics_cookie *cookie, touch_event *event,
 	cookie->tap_delta_y += cookie->movement_maker.yDelta;
 
 	if (cookie->tapdrag_started) {
-		movement->buttons = 0x01;	// left button
+		movement->buttons = kLeftButton;
 		movement->clicks = 0;
 
 		cookie->valid_edge_motion = edge_motion(movement, event,
@@ -321,7 +321,7 @@ event_to_movement(synaptics_cookie *cookie, touch_event *event,
 		}
 	}
 
-	if (event->buttons != 0) {
+	if (event->buttons & kLeftButton) {
 		cookie->tap_clicks = 0;
 		cookie->tapdrag_started = false;
 		cookie->tap_started = false;

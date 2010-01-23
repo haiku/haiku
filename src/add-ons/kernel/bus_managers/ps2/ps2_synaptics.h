@@ -70,6 +70,13 @@ typedef struct {
 } touchpad_info;
 
 
+enum button_ids
+{
+	kLeftButton = 0x01,
+	kRightButton = 0x02	
+};
+
+
 typedef struct {
 	uint8		buttons;
 	uint32		xPosition;
