@@ -1743,22 +1743,6 @@ BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
 	if (!rect.Intersects(updateRect))
 		return;
 
-	// setup the text color
-	rgb_color color;
-	if (base.red + base.green + base.blue > 128 * 3)
-		color = tint_color(base, B_DARKEN_MAX_TINT);
-	else
-		color = tint_color(base, B_LIGHTEN_MAX_TINT);
-
-	if (flags & B_DISABLED) {
-		color.red = (uint8)(((int32)base.red + color.red + 1) / 2);
-		color.green = (uint8)(((int32)base.green + color.green + 1) / 2);
-		color.blue = (uint8)(((int32)base.blue + color.blue + 1) / 2);
-	}
-
-	view->SetHighColor(color);
-	view->SetDrawingMode(B_OP_OVER);
-
 	// truncate the label if necessary and get the width and height
 	BString truncatedLabel(label);
 
@@ -1803,7 +1787,36 @@ BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
 			break;
 	}
 
-	view->DrawString(truncatedLabel.String(), location);
+	DrawLabel(view, truncatedLabel.String(), base, flags, location);
+}
+
+
+void
+BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
+	uint32 flags, const BPoint& where)
+{
+	// setup the text color
+	// TODO: Should either use the ui_color(B_CONTROL_TEXT_COLOR) here,
+	// or elliminate that constant alltogether (stippi: +1).
+	rgb_color color;
+	if (base.red + base.green + base.blue > 128 * 3)
+		color = tint_color(base, B_DARKEN_MAX_TINT);
+	else
+		color = tint_color(base, B_LIGHTEN_MAX_TINT);
+
+	if (flags & B_DISABLED) {
+		color.red = (uint8)(((int32)base.red + color.red + 1) / 2);
+		color.green = (uint8)(((int32)base.green + color.green + 1) / 2);
+		color.blue = (uint8)(((int32)base.blue + color.blue + 1) / 2);
+	}
+
+	view->SetHighColor(color);
+	drawing_mode oldMode = view->DrawingMode();
+	view->SetDrawingMode(B_OP_OVER);
+
+	view->DrawString(label, where);
+
+	view->SetDrawingMode(oldMode);
 }
 
 

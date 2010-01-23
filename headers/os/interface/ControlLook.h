@@ -257,6 +257,14 @@ public:
 									const rgb_color& base, uint32 flags,
 									const BAlignment& alignment);
 
+	// TODO: This should also be virtual
+	// TODO: Would be nice to have a (non-virtual) version of this method
+	// which takes an array of labels and locations. That would save some
+	// setup with the view graphics state.
+			void				DrawLabel(BView* view, const char* label,
+									const rgb_color& base, uint32 flags,
+									const BPoint& where);
+
 protected:
 			void				_DrawButtonFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
