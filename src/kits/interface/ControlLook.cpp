@@ -64,6 +64,13 @@ BControlLook::Flags(BControl* control) const
 	if (control->Value() == B_CONTROL_ON)
 		flags |= B_ACTIVATED;
 
+	if (control->Parent() != NULL
+		&& (control->Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
+		// In this constellation, assume we want to render the control
+		// against the already existing view contents of the parent view.
+		flags |= B_BLEND_FRAME;
+	}
+
 	return flags;
 }
 
@@ -933,8 +940,10 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	region.Exclude(barRect);
 	view->ConstrainClippingRegion(&region);
 
-	view->SetHighColor(base);
-	view->FillRect(rect);
+	if ((flags & B_BLEND_FRAME) == 0) {
+		view->SetHighColor(base);
+		view->FillRect(rect);
+	}
 
 	// figure out the tints to be used
 	float edgeLightTint;
@@ -943,6 +952,10 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	float frameShadowTint;
 	float fillLightTint;
 	float fillShadowTint;
+	uint8 edgeLightAlpha;
+	uint8 edgeShadowAlpha;
+	uint8 frameLightAlpha;
+	uint8 frameShadowAlpha;
 
 	if (flags & B_DISABLED) {
 		edgeLightTint = 1.0;
@@ -951,6 +964,10 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		frameShadowTint = 1.25;
 		fillLightTint = 0.9;
 		fillShadowTint = 1.05;
+		edgeLightAlpha = 15;
+		edgeShadowAlpha = 20;
+		frameLightAlpha = 40;
+		frameShadowAlpha = 45;
 
 		fillColor.red = uint8(fillColor.red * 0.4 + base.red * 0.6);
 		fillColor.green = uint8(fillColor.green * 0.4 + base.green * 0.6);
@@ -962,14 +979,34 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		frameShadowTint = 1.50;
 		fillLightTint = 0.8;
 		fillShadowTint = 1.1;
+		edgeLightAlpha = 35;
+		edgeShadowAlpha = 45;
+		frameLightAlpha = 92;
+		frameShadowAlpha = 107;
 	}
 
-	rgb_color edgeLightColor = tint_color(base, edgeLightTint);
-	rgb_color edgeShadowColor = tint_color(base, edgeShadowTint);
-	rgb_color frameLightColor = tint_color(fillColor, frameLightTint);
-	rgb_color frameShadowColor = tint_color(fillColor, frameShadowTint);
+	rgb_color edgeLightColor;
+	rgb_color edgeShadowColor;
+	rgb_color frameLightColor;
+	rgb_color frameShadowColor;
 	rgb_color fillLightColor = tint_color(fillColor, fillLightTint);
 	rgb_color fillShadowColor = tint_color(fillColor, fillShadowTint);
+
+	drawing_mode oldMode = view->DrawingMode();
+
+	if (flags & B_BLEND_FRAME) {
+		edgeLightColor = (rgb_color){ 255, 255, 255, edgeLightAlpha };
+		edgeShadowColor = (rgb_color){ 0, 0, 0, edgeShadowAlpha };
+		frameLightColor = (rgb_color){ 0, 0, 0, frameLightAlpha };
+		frameShadowColor = (rgb_color){ 0, 0, 0, frameShadowAlpha };
+
+		view->SetDrawingMode(B_OP_ALPHA);
+	} else {
+		edgeLightColor = tint_color(base, edgeLightTint);
+		edgeShadowColor = tint_color(base, edgeShadowTint);
+		frameLightColor = tint_color(fillColor, frameLightTint);
+		frameShadowColor = tint_color(fillColor, frameShadowTint);
+	}
 
 	if (orientation == B_HORIZONTAL) {
 		_DrawRoundBarCorner(view, leftCorner, updateRect, edgeLightColor,
@@ -1012,6 +1049,8 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		barRect.InsetBy(1, 0);
 	}
 	view->EndLineArray();
+
+	view->SetDrawingMode(oldMode);
 
 	_FillGradient(view, barRect, fillColor, fillShadowTint, fillLightTint,
 		orientation);
