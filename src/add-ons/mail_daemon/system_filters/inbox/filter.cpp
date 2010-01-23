@@ -88,7 +88,7 @@ FolderFilter::FolderFilter(BMessage* msg,BMailChainRunner *therunner)
 	dest_string = runner->Chain()->MetaData()->FindString("path");
 	create_directory(dest_string.String(),0777);
 	destination = dest_string.String();
-	
+
 	if (msg->FindInt32("size_limit",(long *)&size_limit) != B_OK)
 		size_limit = -1;
 }
@@ -108,7 +108,7 @@ FolderFilter::~FolderFilter ()
 
 status_t FolderFilter::InitCheck(BString* err)
 {
-	
+
 	status_t ret = destination.InitCheck();
 
 	if (ret==B_OK) return B_OK;
@@ -132,7 +132,7 @@ status_t FolderFilter::ProcessMailMessage(BPositionIO**io, BEntry* e, BMessage* 
 	BString			worker;
 
 	BDirectory		dir;
-	
+
 	BPath path = dest_string.String();
 	if (out_headers->HasString("DESTINATION")) {
 		const char *string;
@@ -226,12 +226,12 @@ status_t FolderFilter::ProcessMailMessage(BPositionIO**io, BEntry* e, BMessage* 
 			break;
 		}
 	}
-	
+
 	if (out_headers->HasInt32("SIZE")) {
 		size_t size = out_headers->FindInt32("SIZE");
 		attributes.AddData("MAIL:fullsize",B_SIZE_T_TYPE,&size,sizeof(size_t));
 	}
-		
+
 	// add "New" status, if the status hasn't been set already
 	if (attributes.FindString(B_MAIL_ATTR_STATUS,&buf) < B_OK)
 		attributes.AddString(B_MAIL_ATTR_STATUS,"New");
@@ -324,7 +324,7 @@ status_t FolderFilter::ProcessMailMessage(BPositionIO**io, BEntry* e, BMessage* 
 		e->GetRef(&ref);
 		be_roster->Launch(&ref);
 	}
-		
+
 	return B_OK;
 }
 
@@ -346,17 +346,17 @@ class FolderConfig : public BView {
 												"path",true,"/boot/home/mail/in");
 			fPathView->SetTo(settings,meta_data);
 			fPathView->ResizeToPreferred();
-			
+
 			BRect r(fPathView->Frame());
 			r.OffsetBy(0,r.Height() + 5);
 			fPartialBox = new BCheckBox(r, "size_if", partial_text, new BMessage('SIZF'));
 			fPartialBox->ResizeToPreferred();
-			
+
 			r = fPartialBox->Frame();
 			r.OffsetBy(17,r.Height() + 1);
 			r.right = r.left + be_plain_font->StringWidth("0000") + 10;
 			fSizeBox = new BTextControl(r, "size", "", "", NULL);
-			
+
 			r.OffsetBy(r.Width() + 5,0);
 			fBytesLabel = new BStringView(r,"kb", "KB");
 			AddChild(fBytesLabel);
@@ -396,8 +396,8 @@ class FolderConfig : public BView {
 				into->AddInt32("size_limit",atoi(fSizeBox->Text()) * 1024);
 			return B_OK;
 		}
-			
-			
+
+
 	private:
 		BMailFileConfigView *fPathView;
 		BTextControl *fSizeBox;
