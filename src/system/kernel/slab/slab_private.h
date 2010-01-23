@@ -29,6 +29,8 @@ struct ObjectCache;
 void*		slab_internal_alloc(size_t size, uint32 flags);
 void		slab_internal_free(void *_buffer, uint32 flags);
 
+void		request_memory_manager_maintenance();
+
 void*		block_alloc(size_t size, uint32 flags);
 void*		block_alloc_early(size_t size);
 void		block_free(void *block, uint32 flags);

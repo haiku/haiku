@@ -28,6 +28,8 @@ struct VMArea;
 
 #define SLAB_META_CHUNKS_PER_AREA	(SLAB_AREA_SIZE / SLAB_CHUNK_SIZE_LARGE)
 #define SLAB_SMALL_CHUNKS_PER_AREA	(SLAB_AREA_SIZE / SLAB_CHUNK_SIZE_SMALL)
+#define SLAB_SMALL_CHUNKS_PER_META_CHUNK	\
+	(SLAB_CHUNK_SIZE_LARGE / SLAB_CHUNK_SIZE_SMALL)
 
 
 class MemoryManager {
@@ -41,6 +43,9 @@ public:
 
 	static	size_t				AcceptableChunkSize(size_t size);
 	static	ObjectCache*		CacheForAddress(void* address);
+
+	static	bool				MaintenanceNeeded();
+	static	void				PerformMaintenance();
 
 private:
 			struct Area;
@@ -58,7 +63,7 @@ private:
 				size_t			totalSize;
 				uint16			chunkCount;
 				uint16			usedChunkCount;
-				Chunk*			chunks;
+				Chunk			chunks[SLAB_SMALL_CHUNKS_PER_META_CHUNK];
 				Chunk*			freeChunks;
 
 				Area*			GetArea() const;
@@ -73,7 +78,6 @@ private:
 				uint16			usedMetaChunkCount;
 				bool			fullyMapped;
 				MetaChunk		metaChunks[SLAB_META_CHUNKS_PER_AREA];
-				Chunk			chunks[SLAB_SMALL_CHUNKS_PER_AREA];
 			};
 
 			typedef DoublyLinkedList<Area> AreaList;
@@ -124,8 +128,7 @@ private:
 									size_t chunkSize);
 
 	static	void				_AddArea(Area* area);
-	static	status_t			_AllocateArea(size_t chunkSize, uint32 flags,
-									Area*& _area);
+	static	status_t			_AllocateArea(uint32 flags, Area*& _area);
 	static	void				_FreeArea(Area* area, bool areaRemoved,
 									uint32 flags);
 
@@ -139,11 +142,21 @@ private:
 	static	void				_UnmapFreeChunksEarly(Area* area);
 	static	void				_ConvertEarlyArea(Area* area);
 
+	static	void				_RequestMaintenance();
+
 	static	uint32				_ChunkIndexForAddress(
 									const MetaChunk* metaChunk, addr_t address);
 	static	addr_t				_ChunkAddress(const MetaChunk* metaChunk,
 									const Chunk* chunk);
 
+	static	void				_PrintMetaChunkTableHeader(bool printChunks);
+	static	void				_DumpMetaChunk(MetaChunk* metaChunk,
+									bool printChunks, bool printHeader);
+	static	int					_DumpMetaChunk(int argc, char** argv);
+	static	void				_DumpMetaChunks(const char* name,
+									MetaChunkList& metaChunkList,
+									bool printChunks);
+	static	int					_DumpMetaChunks(int argc, char** argv);
 	static	int					_DumpArea(int argc, char** argv);
 	static	int					_DumpAreas(int argc, char** argv);
 
@@ -156,13 +169,22 @@ private:
 	static	kernel_args*		sKernelArgs;
 	static	AreaTable			sAreaTable;
 	static	Area*				sFreeAreas;
+	static	int					sFreeAreaCount;
 	static	MetaChunkList		sFreeCompleteMetaChunks;
 	static	MetaChunkList		sFreeShortMetaChunks;
 	static	MetaChunkList		sPartialMetaChunksSmall;
 	static	MetaChunkList		sPartialMetaChunksMedium;
 	static	AllocationEntry*	sAllocationEntryCanWait;
 	static	AllocationEntry*	sAllocationEntryDontWait;
+	static	bool				sMaintenanceNeeded;
 };
+
+
+/*static*/ inline bool
+MemoryManager::MaintenanceNeeded()
+{
+	return sMaintenanceNeeded;
+}
 
 
 /*static*/ inline uint32

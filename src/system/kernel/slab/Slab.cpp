@@ -266,6 +266,14 @@ slab_internal_free(void* buffer, uint32 flags)
 }
 
 
+void
+request_memory_manager_maintenance()
+{
+	MutexLocker locker(sMaintenanceLock);
+	sMaintenanceCondition.NotifyAll();
+}
+
+
 // #pragma mark -
 
 
@@ -479,6 +487,14 @@ object_cache_maintainer(void*)
 
 		// wait for the next request
 		while (sMaintenanceQueue.IsEmpty()) {
+			// perform memory manager maintenance, if needed
+			if (MemoryManager::MaintenanceNeeded()) {
+				locker.Unlock();
+				MemoryManager::PerformMaintenance();
+				locker.Lock();
+				continue;
+			}
+
 			ConditionVariableEntry entry;
 			sMaintenanceCondition.Add(&entry);
 			locker.Unlock();

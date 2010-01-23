@@ -40,12 +40,14 @@ rw_lock MemoryManager::sAreaTableLock;
 kernel_args* MemoryManager::sKernelArgs;
 MemoryManager::AreaTable MemoryManager::sAreaTable;
 MemoryManager::Area* MemoryManager::sFreeAreas;
+int MemoryManager::sFreeAreaCount;
 MemoryManager::MetaChunkList MemoryManager::sFreeCompleteMetaChunks;
 MemoryManager::MetaChunkList MemoryManager::sFreeShortMetaChunks;
 MemoryManager::MetaChunkList MemoryManager::sPartialMetaChunksSmall;
 MemoryManager::MetaChunkList MemoryManager::sPartialMetaChunksMedium;
 MemoryManager::AllocationEntry* MemoryManager::sAllocationEntryCanWait;
 MemoryManager::AllocationEntry* MemoryManager::sAllocationEntryDontWait;
+bool MemoryManager::sMaintenanceNeeded;
 
 
 /*static*/ void
@@ -66,6 +68,8 @@ MemoryManager::Init(kernel_args* args)
 		// free it, that's not a problem, though.
 
 	sFreeAreas = NULL;
+	sFreeAreaCount = 0;
+	sMaintenanceNeeded = false;
 }
 
 
@@ -96,6 +100,7 @@ MemoryManager::InitPostArea()
 		// Just "leak" all but the first of the free areas -- the VM will
 		// automatically free all unclaimed memory.
 		sFreeAreas->next = NULL;
+		sFreeAreaCount = 1;
 
 		Area* area = sFreeAreas;
 		_ConvertEarlyArea(area);
@@ -107,15 +112,31 @@ MemoryManager::InitPostArea()
 		_UnmapFreeChunksEarly(area);
 	}
 
+	sMaintenanceNeeded = true;
+		// might not be necessary, but doesn't harm
+
 	add_debugger_command_etc("slab_area", &_DumpArea,
 		"Dump information on a given slab area",
-		"<area>\n"
+		"[ -c ] <area>\n"
 		"Dump information on a given slab area specified by its base "
-			"address.\n", 0);
+			"address.\n"
+		"If \"-c\" is given, the chunks of all meta chunks area printed as "
+			"well.\n", 0);
 	add_debugger_command_etc("slab_areas", &_DumpAreas,
 		"List all slab areas",
 		"\n"
 		"Lists all slab areas.\n", 0);
+	add_debugger_command_etc("slab_meta_chunk", &_DumpMetaChunk,
+		"Dump information on a given slab meta chunk",
+		"<meta chunk>\n"
+		"Dump information on a given slab meta chunk specified by its base "
+			"or object address.\n", 0);
+	add_debugger_command_etc("slab_meta_chunks", &_DumpMetaChunks,
+		"List all non-full slab meta chunks",
+		"[ -c ]\n"
+		"Lists all non-full slab meta chunks.\n"
+		"If \"-c\" is given, the chunks of all meta chunks area printed as "
+			"well.\n", 0);
 }
 
 
@@ -179,8 +200,9 @@ MemoryManager::Free(void* pages, uint32 flags)
 	Chunk* chunk = &metaChunk->chunks[chunkIndex];
 
 	ASSERT(chunk->next != NULL);
-	ASSERT(chunk->next < area->chunks
-		|| chunk->next >= area->chunks + SLAB_SMALL_CHUNKS_PER_AREA);
+	ASSERT(chunk->next < metaChunk->chunks
+		|| chunk->next
+			>= metaChunk->chunks + SLAB_SMALL_CHUNKS_PER_META_CHUNK);
 
 	// and free it
 	MutexLocker locker(sLock);
@@ -223,6 +245,43 @@ MemoryManager::CacheForAddress(void* address)
 }
 
 
+/*static*/ void
+MemoryManager::PerformMaintenance()
+{
+	MutexLocker locker(sLock);
+
+	while (sMaintenanceNeeded) {
+		sMaintenanceNeeded = false;
+
+		// We want to keep one or two areas as a reserve. This way we have at
+		// least one area to use in situations when we aren't allowed to
+		// allocate one and also avoid ping-pong effects.
+		if (sFreeAreaCount > 0 && sFreeAreaCount <= 2)
+			return;
+
+		if (sFreeAreaCount == 0) {
+			// try to allocate one
+			Area* area;
+			if (_AllocateArea(0, area) != B_OK)
+				return;
+
+			_push(sFreeAreas, area);
+			if (++sFreeAreaCount > 2)
+				sMaintenanceNeeded = true;
+		} else {
+			// free until we only have two free ones
+			while (sFreeAreaCount > 2) {
+				Area* area = _pop(sFreeAreas);
+				_FreeArea(area, true, 0);
+			}
+
+			if (sFreeAreaCount == 0)
+				sMaintenanceNeeded = true;
+		}
+	}
+}
+
+
 /*static*/ status_t
 MemoryManager::_AllocateChunk(size_t chunkSize, uint32 flags,
 	MetaChunk*& _metaChunk, Chunk*& _chunk)
@@ -243,8 +302,10 @@ MemoryManager::_AllocateChunk(size_t chunkSize, uint32 flags,
 
 	if (sFreeAreas != NULL) {
 		_AddArea(_pop(sFreeAreas));
+		sFreeAreaCount--;
+		_RequestMaintenance();
+
 		_GetChunk(metaChunkList, chunkSize, _metaChunk, _chunk);
-// TODO: If that was the last area, notify the cleanup/resizer thread!
 		return B_OK;
 	}
 
@@ -288,7 +349,7 @@ MemoryManager::_AllocateChunk(size_t chunkSize, uint32 flags,
 	allocationEntry->thread = find_thread(NULL);
 
 	Area* area;
-	status_t error = _AllocateArea(chunkSize, flags, area);
+	status_t error = _AllocateArea(flags, area);
 
 	allocationEntry->condition.NotifyAll();
 	allocationEntry = NULL;
@@ -363,8 +424,16 @@ MemoryManager::_FreeChunk(Area* area, MetaChunk* metaChunk, Chunk* chunk,
 	// free the meta chunk, if it is unused now
 	ASSERT(metaChunk->usedChunkCount > 0);
 	if (--metaChunk->usedChunkCount == 0) {
+		// remove from partial meta chunk list
+		if (metaChunk->chunkSize == SLAB_CHUNK_SIZE_SMALL)
+			sPartialMetaChunksSmall.Remove(metaChunk);
+		else if (metaChunk->chunkSize == SLAB_CHUNK_SIZE_MEDIUM)
+			sPartialMetaChunksMedium.Remove(metaChunk);
+
+		// mark empty
 		metaChunk->chunkSize = 0;
 
+		// add to free list
 		if (metaChunk == area->metaChunks)
 			sFreeShortMetaChunks.Add(metaChunk, false);
 		else
@@ -416,12 +485,9 @@ MemoryManager::_AddArea(Area* area)
 
 
 /*static*/ status_t
-MemoryManager::_AllocateArea(size_t chunkSize, uint32 flags, Area*& _area)
+MemoryManager::_AllocateArea(uint32 flags, Area*& _area)
 {
-	// TODO: Support reusing free areas!
-
-	TRACE("MemoryManager::_AllocateArea(%" B_PRIuSIZE ", %#" B_PRIx32 ")\n",
-		chunkSize, flags);
+	TRACE("MemoryManager::_AllocateArea(%#" B_PRIx32 ")\n", flags);
 
 	ASSERT((flags & CACHE_DONT_LOCK_KERNEL_SPACE) == 0);
 
@@ -487,8 +553,6 @@ MemoryManager::_AllocateArea(size_t chunkSize, uint32 flags, Area*& _area)
 			// meta chunk. They will be set in _PrepareMetaChunk().
 		metaChunk->chunkCount = 0;
 		metaChunk->usedChunkCount = 0;
-		metaChunk->chunks = area->chunks
-			+ i * (SLAB_CHUNK_SIZE_LARGE / SLAB_CHUNK_SIZE_SMALL);
 		metaChunk->freeChunks = NULL;
 	}
 
@@ -521,17 +585,19 @@ MemoryManager::_FreeArea(Area* area, bool areaRemoved, uint32 flags)
 		writeLocker.Unlock();
 	}
 
-	// We keep one free area as a reserve.
-	if (sFreeAreas == NULL) {
-		sFreeAreas = area;
+	// We want to keep one or two free areas as a reserve.
+	if (sFreeAreaCount <= 1) {
+		_push(sFreeAreas, area);
+		sFreeAreaCount++;
 		return;
 	}
 
 	if (area->vmArea == NULL || (flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
 		// This is either early in the boot process or we aren't allowed to
 		// delete the area now.
-// TODO: Notify the cleanup/resizer thread!
 		_push(sFreeAreas, area);
+		sFreeAreaCount++;
+		_RequestMaintenance();
 		return;
 	}
 
@@ -736,30 +802,35 @@ MemoryManager::_ConvertEarlyArea(Area* area)
 }
 
 
-/*static*/ int
-MemoryManager::_DumpArea(int argc, char** argv)
+/*static*/ void
+MemoryManager::_RequestMaintenance()
 {
-	if (argc != 2) {
-		print_debugger_command_usage(argv[0]);
-		return 0;
-	}
+	if ((sFreeAreaCount > 0 && sFreeAreaCount <= 2) || sMaintenanceNeeded)
+		return;
 
-	uint64 address;
-	if (!evaluate_debug_expression(argv[1], &address, false))
-		return 0;
+	sMaintenanceNeeded = true;
+	request_memory_manager_maintenance();
+}
 
-	address = ROUNDDOWN(address, SLAB_AREA_SIZE);
 
-	Area* area = (Area*)(addr_t)address;
+/*static*/ void
+MemoryManager::_PrintMetaChunkTableHeader(bool printChunks)
+{
+	if (printChunks)
+		kprintf("chunk        base       cache  object size  cache name\n");
+	else
+		kprintf("chunk        base\n");
+}
 
-	kprintf("chunk        base       cache  object size  cache name\n");
+/*static*/ void
+MemoryManager::_DumpMetaChunk(MetaChunk* metaChunk, bool printChunks,
+	bool printHeader)
+{
+	if (printHeader)
+		_PrintMetaChunkTableHeader(printChunks);
 
-	for (uint32 k = 0; k < SLAB_META_CHUNKS_PER_AREA; k++) {
-		MetaChunk* metaChunk = area->metaChunks + k;
-		if (metaChunk->chunkSize == 0)
-			continue;
-
-		const char* type = "???";
+	const char* type = "empty";
+	if (metaChunk->chunkSize != 0) {
 		switch (metaChunk->chunkSize) {
 			case SLAB_CHUNK_SIZE_SMALL:
 				type = "small";
@@ -771,27 +842,132 @@ MemoryManager::_DumpArea(int argc, char** argv)
 				type = "large";
 				break;
 		}
+	}
 
-		kprintf("-- %2" B_PRIu32 " %s ---------------------------------------"
-			"--------------\n", k, type);
+	int metaChunkIndex = metaChunk - metaChunk->GetArea()->metaChunks;
+	kprintf("%5d  %p  --- %6s meta chunk", metaChunkIndex,
+		(void*)metaChunk->chunkBase, type);
+	if (metaChunk->chunkSize != 0) {
+		kprintf(": %4u/%4u used ----------------------------\n",
+			metaChunk->usedChunkCount, metaChunk->chunkCount);
+	} else
+		kprintf(" --------------------------------------------\n");
 
-		for (uint32 i = 0; i < metaChunk->chunkCount; i++) {
-			Chunk* chunk = metaChunk->chunks + i;
+	if (metaChunk->chunkSize == 0 || !printChunks)
+		return;
 
-			// skip free chunks
-			if (chunk->next == NULL)
-				continue;
-			if (chunk->next >= metaChunk->chunks
-				&& chunk->next < metaChunk->chunks + metaChunk->chunkCount) {
-				continue;
-			}
+	for (uint32 i = 0; i < metaChunk->chunkCount; i++) {
+		Chunk* chunk = metaChunk->chunks + i;
 
-			ObjectCache* cache = chunk->cache;
-			kprintf("%5" B_PRIu32 "  %p  %p  %11" B_PRIuSIZE "  %s\n", i,
-				(void*)_ChunkAddress(metaChunk, chunk), cache,
-				cache != NULL ? cache->object_size : 0,
-				cache != NULL ? cache->name : "");
+		// skip free chunks
+		if (chunk->next == NULL)
+			continue;
+		if (chunk->next >= metaChunk->chunks
+			&& chunk->next < metaChunk->chunks + metaChunk->chunkCount) {
+			continue;
 		}
+
+		ObjectCache* cache = chunk->cache;
+		kprintf("%5" B_PRIu32 "  %p  %p  %11" B_PRIuSIZE "  %s\n", i,
+			(void*)_ChunkAddress(metaChunk, chunk), cache,
+			cache != NULL ? cache->object_size : 0,
+			cache != NULL ? cache->name : "");
+	}
+}
+
+
+/*static*/ int
+MemoryManager::_DumpMetaChunk(int argc, char** argv)
+{
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	uint64 address;
+	if (!evaluate_debug_expression(argv[1], &address, false))
+		return 0;
+
+	Area* area = (Area*)(addr_t)ROUNDDOWN(address, SLAB_AREA_SIZE);
+
+	MetaChunk* metaChunk;
+	if ((addr_t)address >= (addr_t)area->metaChunks
+		&& (addr_t)address
+			< (addr_t)(area->metaChunks + SLAB_META_CHUNKS_PER_AREA)) {
+		metaChunk = (MetaChunk*)(addr_t)address;
+	} else {
+		metaChunk = area->metaChunks
+			+ (address % SLAB_AREA_SIZE) / SLAB_CHUNK_SIZE_LARGE;
+	}
+
+	_DumpMetaChunk(metaChunk, true, true);
+
+	return 0;
+}
+
+
+/*static*/ void
+MemoryManager::_DumpMetaChunks(const char* name, MetaChunkList& metaChunkList,
+	bool printChunks)
+{
+	kprintf("%s:\n", name);
+
+	for (MetaChunkList::Iterator it = metaChunkList.GetIterator();
+			MetaChunk* metaChunk = it.Next();) {
+		_DumpMetaChunk(metaChunk, printChunks, false);
+	}
+}
+
+
+/*static*/ int
+MemoryManager::_DumpMetaChunks(int argc, char** argv)
+{
+	bool printChunks = argc > 1 && strcmp(argv[1], "-c") == 0;
+
+	_PrintMetaChunkTableHeader(printChunks);
+	_DumpMetaChunks("free complete", sFreeCompleteMetaChunks, printChunks);
+	_DumpMetaChunks("free short", sFreeShortMetaChunks, printChunks);
+	_DumpMetaChunks("partial small", sPartialMetaChunksSmall, printChunks);
+	_DumpMetaChunks("partial medium", sPartialMetaChunksMedium, printChunks);
+
+	return 0;
+}
+
+
+/*static*/ int
+MemoryManager::_DumpArea(int argc, char** argv)
+{
+	bool printChunks = false;
+
+	int argi = 1;
+	while (argi < argc) {
+		if (argv[argi][0] != '-')
+			break;
+		const char* arg = argv[argi++];
+		if (strcmp(arg, "-c") == 0) {
+			printChunks = true;
+		} else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	if (argi + 1 != argc) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	uint64 address;
+	if (!evaluate_debug_expression(argv[argi], &address, false))
+		return 0;
+
+	address = ROUNDDOWN(address, SLAB_AREA_SIZE);
+
+	Area* area = (Area*)(addr_t)address;
+
+	for (uint32 k = 0; k < SLAB_META_CHUNKS_PER_AREA; k++) {
+		MetaChunk* metaChunk = area->metaChunks + k;
+		_DumpMetaChunk(metaChunk, printChunks, k == 0);
 	}
 
 	return 0;
@@ -839,6 +1015,10 @@ MemoryManager::_DumpAreas(int argc, char** argv)
 			SLAB_META_CHUNKS_PER_AREA, usedSmall, totalSmall, usedMedium,
 			totalMedium, usedLarge, totalLarge);
 	}
+
+	kprintf("%d free areas:\n", sFreeAreaCount);
+	for (Area* area = sFreeAreas; area != NULL; area = area->next)
+		kprintf("%p  %p\n", area, area->vmArea);
 
 	return 0;
 }
