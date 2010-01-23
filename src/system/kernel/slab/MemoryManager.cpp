@@ -443,6 +443,13 @@ MemoryManager::_FreeChunk(Area* area, MetaChunk* metaChunk, Chunk* chunk,
 		ASSERT(area->usedMetaChunkCount > 0);
 		if (--area->usedMetaChunkCount == 0)
 			_FreeArea(area, false, flags);
+	} else if (metaChunk->usedChunkCount == metaChunk->chunkCount - 1) {
+		// the meta chunk was full before -- add it back to its partial chunk
+		// list
+		if (metaChunk->chunkSize == SLAB_CHUNK_SIZE_SMALL)
+			sPartialMetaChunksSmall.Add(metaChunk, false);
+		else if (metaChunk->chunkSize == SLAB_CHUNK_SIZE_MEDIUM)
+			sPartialMetaChunksMedium.Add(metaChunk, false);
 	}
 }
 
