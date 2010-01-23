@@ -9,6 +9,7 @@
 #include <KernelExport.h>
 
 #include <condition_variable.h>
+#include <kernel.h>
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
@@ -20,10 +21,13 @@ struct VMArea;
 
 
 #define SLAB_CHUNK_SIZE_SMALL	B_PAGE_SIZE
-#define SLAB_CHUNK_SIZE_MIDDLE	16 * B_PAGE_SIZE
-#define SLAB_CHUNK_SIZE_LARGE	128 * B_PAGE_SIZE
-#define SLAB_AREA_SIZE			2048 * B_PAGE_SIZE
+#define SLAB_CHUNK_SIZE_MEDIUM	(16 * B_PAGE_SIZE)
+#define SLAB_CHUNK_SIZE_LARGE	(128 * B_PAGE_SIZE)
+#define SLAB_AREA_SIZE			(2048 * B_PAGE_SIZE)
 	// TODO: These sizes have been chosen with 4 KB pages is mind.
+
+#define SLAB_META_CHUNKS_PER_AREA	(SLAB_AREA_SIZE / SLAB_CHUNK_SIZE_LARGE)
+#define SLAB_SMALL_CHUNKS_PER_AREA	(SLAB_AREA_SIZE / SLAB_CHUNK_SIZE_SMALL)
 
 
 class MemoryManager {
@@ -39,6 +43,8 @@ public:
 	static	ObjectCache*		CacheForAddress(void* address);
 
 private:
+			struct Area;
+
 			struct Chunk {
 				union {
 					Chunk*		next;
@@ -46,26 +52,31 @@ private:
 				};
 			};
 
+			struct MetaChunk : DoublyLinkedListLinkImpl<MetaChunk> {
+				size_t			chunkSize;
+				addr_t			chunkBase;
+				size_t			totalSize;
+				uint16			chunkCount;
+				uint16			usedChunkCount;
+				Chunk*			chunks;
+				Chunk*			freeChunks;
+
+				Area*			GetArea() const;
+			};
+
+			typedef DoublyLinkedList<MetaChunk> MetaChunkList;
+
 			struct Area : DoublyLinkedListLinkImpl<Area> {
 				Area*			next;
 				VMArea*			vmArea;
-				size_t			chunkSize;
 				size_t			reserved_memory_for_mapping;
-				addr_t			firstUsableChunk;
-				uint16			chunkCount;
-				uint16			usedChunkCount;
-				Chunk*			mappedFreeChunks;
-				Chunk*			unmappedFreeChunks;
-				Chunk			chunks[0];
+				uint16			usedMetaChunkCount;
+				bool			fullyMapped;
+				MetaChunk		metaChunks[SLAB_META_CHUNKS_PER_AREA];
+				Chunk			chunks[SLAB_SMALL_CHUNKS_PER_AREA];
 			};
 
 			typedef DoublyLinkedList<Area> AreaList;
-
-			struct AreaPool {
-				AreaList		partialAreas;
-				AreaList		fullAreas;
-				size_t			chunkSize;
-			};
 
 			struct AreaHashDefinition {
 				typedef addr_t		KeyType;
@@ -100,59 +111,79 @@ private:
 			};
 
 private:
-	static	AreaPool*			_AreaPoolFor(size_t chunkSize);
-
-	static	status_t			_GetPartialArea(AreaPool* areaPool,
-									uint32 flags, Area*& _area);
-
-	static	status_t			_AllocateArea(size_t chunkSize, uint32 flags,
-									Area*& _area);
-	static	void				_FreeArea(Area* area, uint32 flags);
-
-	static	void				_FreeChunk(AreaPool* areaPool, Area* area,
+	static	status_t			_AllocateChunk(size_t chunkSize, uint32 flags,
+									MetaChunk*& _metaChunk, Chunk*& _chunk);
+	static	bool				_GetChunk(MetaChunkList* metaChunkList,
+									size_t chunkSize, MetaChunk*& _metaChunk,
+									Chunk*& _chunk);
+	static	void				_FreeChunk(Area* area, MetaChunk* metaChunk,
 									Chunk* chunk, addr_t chunkAddress,
 									bool alreadyUnmapped, uint32 flags);
+
+	static	void				_PrepareMetaChunk(MetaChunk* metaChunk,
+									size_t chunkSize);
+
+	static	void				_AddArea(Area* area);
+	static	status_t			_AllocateArea(size_t chunkSize, uint32 flags,
+									Area*& _area);
+	static	void				_FreeArea(Area* area, bool areaRemoved,
+									uint32 flags);
+
 	static	status_t			_MapChunk(VMArea* vmArea, addr_t address,
 									size_t size, size_t reserveAdditionalMemory,
 									uint32 flags);
 	static	status_t			_UnmapChunk(VMArea* vmArea,addr_t address,
 									size_t size, uint32 flags);
 
-	static	bool				_ConvertEarlyAreas(AreaList& areas);
+	static	void				_UnmapChunkEarly(addr_t address, size_t size);
+	static	void				_UnmapFreeChunksEarly(Area* area);
+	static	void				_ConvertEarlyArea(Area* area);
 
-	static	uint32				_ChunkIndexForAddress(const Area* area,
-									addr_t address);
-	static	addr_t				_ChunkAddress(const Area* area,
+	static	uint32				_ChunkIndexForAddress(
+									const MetaChunk* metaChunk, addr_t address);
+	static	addr_t				_ChunkAddress(const MetaChunk* metaChunk,
 									const Chunk* chunk);
 
 	static	int					_DumpArea(int argc, char** argv);
 	static	int					_DumpAreas(int argc, char** argv);
 
 private:
+	static	const size_t		kAreaAdminSize
+									= ROUNDUP(sizeof(Area), B_PAGE_SIZE);
+
 	static	mutex				sLock;
 	static	rw_lock				sAreaTableLock;
 	static	kernel_args*		sKernelArgs;
-	static	AreaPool			sSmallChunkAreas;
-	static	AreaPool			sMiddleChunkAreas;
-	static	AreaPool			sLargeChunkAreas;
 	static	AreaTable			sAreaTable;
 	static	Area*				sFreeAreas;
+	static	MetaChunkList		sFreeCompleteMetaChunks;
+	static	MetaChunkList		sFreeShortMetaChunks;
+	static	MetaChunkList		sPartialMetaChunksSmall;
+	static	MetaChunkList		sPartialMetaChunksMedium;
 	static	AllocationEntry*	sAllocationEntryCanWait;
 	static	AllocationEntry*	sAllocationEntryDontWait;
 };
 
 
 /*static*/ inline uint32
-MemoryManager::_ChunkIndexForAddress(const Area* area, addr_t address)
+MemoryManager::_ChunkIndexForAddress(const MetaChunk* metaChunk, addr_t address)
 {
-	return (address - area->firstUsableChunk) / area->chunkSize;
+	return (address - metaChunk->chunkBase) / metaChunk->chunkSize;
 }
 
 
 /*static*/ inline addr_t
-MemoryManager::_ChunkAddress(const Area* area, const Chunk* chunk)
+MemoryManager::_ChunkAddress(const MetaChunk* metaChunk, const Chunk* chunk)
 {
-	return area->firstUsableChunk + (chunk - area->chunks) * area->chunkSize;
+	return metaChunk->chunkBase
+		+ (chunk - metaChunk->chunks) * metaChunk->chunkSize;
+}
+
+
+inline MemoryManager::Area*
+MemoryManager::MetaChunk::GetArea() const
+{
+	return (Area*)ROUNDDOWN((addr_t)this, SLAB_AREA_SIZE);
 }
 
 

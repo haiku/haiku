@@ -38,11 +38,12 @@ static void* sAreaTableBuffer[1024];
 mutex MemoryManager::sLock;
 rw_lock MemoryManager::sAreaTableLock;
 kernel_args* MemoryManager::sKernelArgs;
-MemoryManager::AreaPool MemoryManager::sSmallChunkAreas;
-MemoryManager::AreaPool MemoryManager::sMiddleChunkAreas;
-MemoryManager::AreaPool MemoryManager::sLargeChunkAreas;
 MemoryManager::AreaTable MemoryManager::sAreaTable;
 MemoryManager::Area* MemoryManager::sFreeAreas;
+MemoryManager::MetaChunkList MemoryManager::sFreeCompleteMetaChunks;
+MemoryManager::MetaChunkList MemoryManager::sFreeShortMetaChunks;
+MemoryManager::MetaChunkList MemoryManager::sPartialMetaChunksSmall;
+MemoryManager::MetaChunkList MemoryManager::sPartialMetaChunksMedium;
 MemoryManager::AllocationEntry* MemoryManager::sAllocationEntryCanWait;
 MemoryManager::AllocationEntry* MemoryManager::sAllocationEntryDontWait;
 
@@ -54,13 +55,10 @@ MemoryManager::Init(kernel_args* args)
 	rw_lock_init(&sAreaTableLock, "slab memory manager area table");
 	sKernelArgs = args;
 
-	new(&sSmallChunkAreas) AreaPool;
-	new(&sMiddleChunkAreas) AreaPool;
-	new(&sLargeChunkAreas) AreaPool;
-
-	sSmallChunkAreas.chunkSize = SLAB_CHUNK_SIZE_SMALL;
-	sMiddleChunkAreas.chunkSize = SLAB_CHUNK_SIZE_MIDDLE;
-	sLargeChunkAreas.chunkSize = SLAB_CHUNK_SIZE_LARGE;
+	new(&sFreeCompleteMetaChunks) MetaChunkList;
+	new(&sFreeShortMetaChunks) MetaChunkList;
+	new(&sPartialMetaChunksSmall) MetaChunkList;
+	new(&sPartialMetaChunksMedium) MetaChunkList;
 
 	new(&sAreaTable) AreaTable;
 	sAreaTable.Resize(sAreaTableBuffer, sizeof(sAreaTableBuffer), true);
@@ -79,20 +77,35 @@ MemoryManager::InitPostArea()
 	// Convert all areas to actual areas. This loop might look a bit weird, but
 	// is necessary since creating the actual area involves memory allocations,
 	// which in turn can change the situation.
-	while (true) {
-		if (!_ConvertEarlyAreas(sSmallChunkAreas.partialAreas)
-			&& !_ConvertEarlyAreas(sSmallChunkAreas.fullAreas)
-			&& !_ConvertEarlyAreas(sMiddleChunkAreas.partialAreas)
-			&& !_ConvertEarlyAreas(sMiddleChunkAreas.fullAreas)
-			&& !_ConvertEarlyAreas(sLargeChunkAreas.partialAreas)
-			&& !_ConvertEarlyAreas(sLargeChunkAreas.fullAreas)) {
-			break;
+	bool done;
+	do {
+		done = true;
+
+		for (AreaTable::Iterator it = sAreaTable.GetIterator();
+				Area* area = it.Next();) {
+			if (area->vmArea == NULL) {
+				_ConvertEarlyArea(area);
+				done = false;
+				break;
+			}
 		}
+	} while (!done);
+
+	// unmap and free unused pages
+	if (sFreeAreas != NULL) {
+		// Just "leak" all but the first of the free areas -- the VM will
+		// automatically free all unclaimed memory.
+		sFreeAreas->next = NULL;
+
+		Area* area = sFreeAreas;
+		_ConvertEarlyArea(area);
+		_UnmapFreeChunksEarly(area);
 	}
 
-	// just "leak" the free areas -- the VM will automatically free all
-	// unclaimed memory
-	sFreeAreas = NULL;
+	for (AreaTable::Iterator it = sAreaTable.GetIterator();
+			Area* area = it.Next();) {
+		_UnmapFreeChunksEarly(area);
+	}
 
 	add_debugger_command_etc("slab_area", &_DumpArea,
 		"Dump information on a given slab area",
@@ -116,53 +129,34 @@ MemoryManager::Allocate(ObjectCache* cache, uint32 flags, void*& _pages)
 	TRACE("MemoryManager::Allocate(%p, %#" B_PRIx32 "): chunkSize: %"
 		B_PRIuSIZE "\n", cache, flags, chunkSize);
 
-	// get the right area pool
-	AreaPool* areaPool = _AreaPoolFor(chunkSize);
-	if (areaPool == NULL) {
-		panic("Invalid slab size: %" B_PRIuSIZE, chunkSize);
-		return B_BAD_VALUE;
-	}
-
 	MutexLocker locker(sLock);
 
-	// get an area
-	Area* area;
-	status_t error = _GetPartialArea(areaPool, flags, area);
+	// allocate a chunk
+	MetaChunk* metaChunk;
+	Chunk* chunk;
+	status_t error = _AllocateChunk(chunkSize, flags, metaChunk, chunk);
 	if (error != B_OK)
 		return error;
 
-	// allocate a chunk
-	bool chunkMapped = false;
-	Chunk* chunk;
-	if (area->mappedFreeChunks != NULL) {
-		chunk = _pop(area->mappedFreeChunks);
-		chunkMapped = true;
-	} else
-		chunk = _pop(area->unmappedFreeChunks);
+	// map the chunk
+	Area* area = metaChunk->GetArea();
+	addr_t chunkAddress = _ChunkAddress(metaChunk, chunk);
 
-	if (++area->usedChunkCount == area->chunkCount) {
-		areaPool->partialAreas.Remove(area);
-		areaPool->fullAreas.Add(area);
-	}
-
-	// If the chunk is not mapped yet, do it now.
-	addr_t chunkAddress = _ChunkAddress(area, chunk);
-
-	if (!chunkMapped) {
-		locker.Unlock();
-		error = _MapChunk(area->vmArea, chunkAddress, chunkSize, 0, flags);
-		locker.Lock();
-		if (error != B_OK) {
-			// something failed -- free the chunk
-			_FreeChunk(areaPool, area, chunk, chunkAddress, true, flags);
-			return error;
-		}
+	locker.Unlock();
+	error = _MapChunk(area->vmArea, chunkAddress, chunkSize, 0, flags);
+	locker.Lock();
+	if (error != B_OK) {
+		// something failed -- free the chunk
+		_FreeChunk(area, metaChunk, chunk, chunkAddress, true, flags);
+		return error;
 	}
 
 	chunk->cache = cache;
 	_pages = (void*)chunkAddress;
 
-	TRACE("MemoryManager::Allocate() done: %p (chunk %p)\n", _pages, chunk);
+	TRACE("MemoryManager::Allocate() done: %p (meta chunk: %d, chunk %d)\n",
+		_pages, int(metaChunk - area->metaChunks),
+		int(chunk - metaChunk->chunks));
 	return B_OK;
 }
 
@@ -172,24 +166,25 @@ MemoryManager::Free(void* pages, uint32 flags)
 {
 	TRACE("MemoryManager::Free(%p, %#" B_PRIx32 ")\n", pages, flags);
 
-	// get the area and the pool
+	// get the area and the meta chunk
 	Area* area = (Area*)ROUNDDOWN((addr_t)pages, SLAB_AREA_SIZE);
+	MetaChunk* metaChunk = &area->metaChunks[
+		((addr_t)pages % SLAB_AREA_SIZE) / SLAB_CHUNK_SIZE_LARGE];
 
-	AreaPool* areaPool = _AreaPoolFor(area->chunkSize);
-	if (areaPool == NULL) {
-		panic("Invalid area: %p", area);
-		return;
-	}
+	ASSERT((addr_t)pages >= metaChunk->chunkBase);
+	ASSERT(((addr_t)pages % metaChunk->chunkSize) == 0);
 
 	// get the chunk
-	uint16 chunkIndex = _ChunkIndexForAddress(area, (addr_t)pages);
-	ASSERT(chunkIndex < area->chunkCount);
-	ASSERT((addr_t)pages % area->chunkSize == 0);
-	Chunk* chunk = &area->chunks[chunkIndex];
+	uint16 chunkIndex = _ChunkIndexForAddress(metaChunk, (addr_t)pages);
+	Chunk* chunk = &metaChunk->chunks[chunkIndex];
+
+	ASSERT(chunk->next != NULL);
+	ASSERT(chunk->next < area->chunks
+		|| chunk->next >= area->chunks + SLAB_SMALL_CHUNKS_PER_AREA);
 
 	// and free it
 	MutexLocker locker(sLock);
-	_FreeChunk(areaPool, area, chunk, (addr_t)pages, false, flags);
+	_FreeChunk(area, metaChunk, chunk, (addr_t)pages, false, flags);
 }
 
 
@@ -198,8 +193,8 @@ MemoryManager::AcceptableChunkSize(size_t size)
 {
 	if (size <= SLAB_CHUNK_SIZE_SMALL)
 		return SLAB_CHUNK_SIZE_SMALL;
-	if (size <= SLAB_CHUNK_SIZE_MIDDLE)
-		return SLAB_CHUNK_SIZE_MIDDLE;
+	if (size <= SLAB_CHUNK_SIZE_MEDIUM)
+		return SLAB_CHUNK_SIZE_MEDIUM;
 	return SLAB_CHUNK_SIZE_LARGE;
 }
 
@@ -217,49 +212,51 @@ MemoryManager::CacheForAddress(void* address)
 	if (area == NULL)
 		return NULL;
 
+	MetaChunk* metaChunk = &area->metaChunks[
+		((addr_t)address % SLAB_AREA_SIZE) / SLAB_CHUNK_SIZE_LARGE];
+
 	// get the chunk
-	uint16 chunkIndex = _ChunkIndexForAddress(area, (addr_t)address);
-	ASSERT(chunkIndex < area->chunkCount);
+	ASSERT((addr_t)address >= metaChunk->chunkBase);
+	uint16 chunkIndex = _ChunkIndexForAddress(metaChunk, (addr_t)address);
 
-	return area->chunks[chunkIndex].cache;
-}
-
-
-/*static*/ MemoryManager::AreaPool*
-MemoryManager::_AreaPoolFor(size_t chunkSize)
-{
-	if (chunkSize == SLAB_CHUNK_SIZE_SMALL)
-		return &sSmallChunkAreas;
-
-	if (chunkSize == SLAB_CHUNK_SIZE_MIDDLE)
-		return &sMiddleChunkAreas;
-
-	if (chunkSize == SLAB_CHUNK_SIZE_LARGE)
-		return &sLargeChunkAreas;
-
-	return NULL;
+	return metaChunk->chunks[chunkIndex].cache;
 }
 
 
 /*static*/ status_t
-MemoryManager::_GetPartialArea(AreaPool* areaPool, uint32 flags, Area*& _area)
+MemoryManager::_AllocateChunk(size_t chunkSize, uint32 flags,
+	MetaChunk*& _metaChunk, Chunk*& _chunk)
 {
+	MetaChunkList* metaChunkList = NULL;
+	if (chunkSize == SLAB_CHUNK_SIZE_SMALL) {
+		metaChunkList = &sPartialMetaChunksSmall;
+	} else if (chunkSize == SLAB_CHUNK_SIZE_MEDIUM) {
+		metaChunkList = &sPartialMetaChunksMedium;
+	} else if (chunkSize != SLAB_CHUNK_SIZE_LARGE) {
+		panic("MemoryManager::_AllocateChunk(): Unsupported chunk size: %"
+			B_PRIuSIZE, chunkSize);
+		return B_BAD_VALUE;
+	}
+
+	if (_GetChunk(metaChunkList, chunkSize, _metaChunk, _chunk))
+		return B_OK;
+
+	if (sFreeAreas != NULL) {
+		_AddArea(_pop(sFreeAreas));
+		_GetChunk(metaChunkList, chunkSize, _metaChunk, _chunk);
+// TODO: If that was the last area, notify the cleanup/resizer thread!
+		return B_OK;
+	}
+
 	if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
 		// We can't create an area with this limitation and we must not wait for
 		// someone else doing that.
-		_area = areaPool->partialAreas.Head();
-		return _area != NULL ? B_OK : B_WOULD_BLOCK;
+		return B_WOULD_BLOCK;
 	}
 
+	// We need to allocate a new area. Wait, if someone else is trying to do
+	// the same.
 	while (true) {
-		Area* area = areaPool->partialAreas.Head();
-		if (area != NULL) {
-			_area = area;
-			return B_OK;
-		}
-
-		// We need to allocate a new area. Wait, if someone else is trying the
-		// same.
 		AllocationEntry* allocationEntry = NULL;
 		if (sAllocationEntryDontWait != NULL) {
 			allocationEntry = sAllocationEntryDontWait;
@@ -275,6 +272,9 @@ MemoryManager::_GetPartialArea(AreaPool* areaPool, uint32 flags, Area*& _area)
 		mutex_unlock(&sLock);
 		entry.Wait();
 		mutex_lock(&sLock);
+
+		if (_GetChunk(metaChunkList, chunkSize, _metaChunk, _chunk))
+			return B_OK;
 	}
 
 	// prepare the allocation entry others can wait on
@@ -284,11 +284,11 @@ MemoryManager::_GetPartialArea(AreaPool* areaPool, uint32 flags, Area*& _area)
 
 	AllocationEntry myResizeEntry;
 	allocationEntry = &myResizeEntry;
-	allocationEntry->condition.Init(areaPool, "wait for slab area");
+	allocationEntry->condition.Init(metaChunkList, "wait for slab area");
 	allocationEntry->thread = find_thread(NULL);
 
 	Area* area;
-	status_t error = _AllocateArea(areaPool->chunkSize, flags, area);
+	status_t error = _AllocateArea(chunkSize, flags, area);
 
 	allocationEntry->condition.NotifyAll();
 	allocationEntry = NULL;
@@ -296,13 +296,122 @@ MemoryManager::_GetPartialArea(AreaPool* areaPool, uint32 flags, Area*& _area)
 	if (error != B_OK)
 		return error;
 
-	areaPool->partialAreas.Add(area);
-		// TODO: If something was freed in the meantime, we might rather
-		// want to delete the area again. Alternatively we could keep
-		// one global free area.
+	// Try again to get a meta chunk. Something might have been freed in the
+	// meantime. We can free the area in this case.
+	if (_GetChunk(metaChunkList, chunkSize, _metaChunk, _chunk)) {
+		_FreeArea(area, true, flags);
+		return B_OK;
+	}
 
-	_area = area;
+	_AddArea(area);
+	_GetChunk(metaChunkList, chunkSize, _metaChunk, _chunk);
 	return B_OK;
+}
+
+
+/*static*/ bool
+MemoryManager::_GetChunk(MetaChunkList* metaChunkList, size_t chunkSize,
+	MetaChunk*& _metaChunk, Chunk*& _chunk)
+{
+	MetaChunk* metaChunk = metaChunkList != NULL
+		? metaChunkList->Head() : NULL;
+	if (metaChunk == NULL) {
+		// no partial meta chunk -- maybe there's a free one
+		if (chunkSize == SLAB_CHUNK_SIZE_LARGE) {
+			metaChunk = sFreeCompleteMetaChunks.RemoveHead();
+		} else {
+			metaChunk = sFreeShortMetaChunks.RemoveHead();
+			if (metaChunk == NULL)
+				metaChunk = sFreeCompleteMetaChunks.RemoveHead();
+			if (metaChunk != NULL)
+				metaChunkList->Add(metaChunk);
+		}
+
+		if (metaChunk == NULL)
+			return false;
+
+		metaChunk->GetArea()->usedMetaChunkCount++;
+		_PrepareMetaChunk(metaChunk, chunkSize);
+	}
+
+	// allocate the chunk
+	if (++metaChunk->usedChunkCount == metaChunk->chunkCount) {
+		// meta chunk is full now -- remove it from its list
+		if (metaChunkList != NULL)
+			metaChunkList->Remove(metaChunk);
+	}
+
+	_chunk = _pop(metaChunk->freeChunks);
+	_metaChunk = metaChunk;
+	return true;
+}
+
+
+/*static*/ void
+MemoryManager::_FreeChunk(Area* area, MetaChunk* metaChunk, Chunk* chunk,
+	addr_t chunkAddress, bool alreadyUnmapped, uint32 flags)
+{
+	// unmap the chunk
+	if (!alreadyUnmapped) {
+		mutex_unlock(&sLock);
+		_UnmapChunk(area->vmArea, chunkAddress, metaChunk->chunkSize, flags);
+		mutex_lock(&sLock);
+	}
+
+	_push(metaChunk->freeChunks, chunk);
+
+	// free the meta chunk, if it is unused now
+	ASSERT(metaChunk->usedChunkCount > 0);
+	if (--metaChunk->usedChunkCount == 0) {
+		metaChunk->chunkSize = 0;
+
+		if (metaChunk == area->metaChunks)
+			sFreeShortMetaChunks.Add(metaChunk, false);
+		else
+			sFreeCompleteMetaChunks.Add(metaChunk, false);
+
+		// free the area, if it is unused now
+		ASSERT(area->usedMetaChunkCount > 0);
+		if (--area->usedMetaChunkCount == 0)
+			_FreeArea(area, false, flags);
+	}
+}
+
+
+/*static*/ void
+MemoryManager::_PrepareMetaChunk(MetaChunk* metaChunk, size_t chunkSize)
+{
+	Area* area = metaChunk->GetArea();
+
+	if (metaChunk == area->metaChunks) {
+		// the first chunk is shorter
+		size_t unusableSize = ROUNDUP(kAreaAdminSize, chunkSize);
+		metaChunk->chunkBase = (addr_t)area + unusableSize;
+		metaChunk->totalSize = SLAB_CHUNK_SIZE_LARGE - unusableSize;
+	}
+
+	metaChunk->chunkSize = chunkSize;
+	metaChunk->chunkCount = metaChunk->totalSize / chunkSize;
+	metaChunk->usedChunkCount = 0;
+
+	metaChunk->freeChunks = NULL;
+	for (uint32 i = 0; i < metaChunk->chunkCount; i++)
+		_push(metaChunk->freeChunks, metaChunk->chunks + i);
+}
+
+
+/*static*/ void
+MemoryManager::_AddArea(Area* area)
+{
+	// add the area to the hash table
+	WriteLocker writeLocker(sAreaTableLock);
+	sAreaTable.InsertUnchecked(area);
+	writeLocker.Unlock();
+
+	// add the area's meta chunks to the free lists
+	sFreeShortMetaChunks.Add(&area->metaChunks[0]);
+	for (int32 i = 1; i < SLAB_META_CHUNKS_PER_AREA; i++)
+		sFreeCompleteMetaChunks.Add(&area->metaChunks[i]);
 }
 
 
@@ -317,11 +426,6 @@ MemoryManager::_AllocateArea(size_t chunkSize, uint32 flags, Area*& _area)
 	ASSERT((flags & CACHE_DONT_LOCK_KERNEL_SPACE) == 0);
 
 	mutex_unlock(&sLock);
-
-	uint32 chunkCount = (SLAB_AREA_SIZE - sizeof(Area))
-		/ (chunkSize + sizeof(Chunk));
-	size_t adminMemory = sizeof(Area) + chunkCount * sizeof(Chunk);
-	adminMemory = ROUNDUP(adminMemory, B_PAGE_SIZE);
 
 	size_t pagesNeededToMap = 0;
 	Area* area;
@@ -344,7 +448,7 @@ MemoryManager::_AllocateArea(size_t chunkSize, uint32 flags, Area*& _area)
 			(addr_t)area + SLAB_AREA_SIZE - 1);
 
 		vmArea = VMAreaHash::Lookup(areaID);
-		status_t error = _MapChunk(vmArea, (addr_t)area, adminMemory,
+		status_t error = _MapChunk(vmArea, (addr_t)area, kAreaAdminSize,
 			pagesNeededToMap, flags);
 		if (error != B_OK) {
 			delete_area(areaID);
@@ -369,25 +473,24 @@ MemoryManager::_AllocateArea(size_t chunkSize, uint32 flags, Area*& _area)
 
 	// init the area structure
 	area->vmArea = vmArea;
-	area->chunkSize = chunkSize;
 	area->reserved_memory_for_mapping = pagesNeededToMap * B_PAGE_SIZE;
-	area->firstUsableChunk = (addr_t)area + ROUNDUP(adminMemory, chunkSize);
-	area->chunkCount = chunkCount;
-	area->usedChunkCount = 0;
-	area->mappedFreeChunks = NULL;
-	area->unmappedFreeChunks = NULL;
+	area->usedMetaChunkCount = 0;
+	area->fullyMapped = vmArea == NULL;
 
-	for (uint32 i = 0; i < chunkCount; i++)
-		_push(area->unmappedFreeChunks, area->chunks + i);
-
-	// in the early boot process everything is mapped already
-	if (sKernelArgs != NULL)
-		std::swap(area->mappedFreeChunks, area->unmappedFreeChunks);
-
-	// add the area to the hash table
-	WriteLocker writeLocker(sAreaTableLock);
-	sAreaTable.InsertUnchecked(area);
-	writeLocker.Unlock();
+	// init the meta chunks
+	for (int32 i = 0; i < SLAB_META_CHUNKS_PER_AREA; i++) {
+		MetaChunk* metaChunk = area->metaChunks + i;
+		metaChunk->chunkSize = 0;
+		metaChunk->chunkBase = (addr_t)area + i * SLAB_CHUNK_SIZE_LARGE;
+		metaChunk->totalSize = SLAB_CHUNK_SIZE_LARGE;
+			// Note: chunkBase and totalSize aren't correct for the first
+			// meta chunk. They will be set in _PrepareMetaChunk().
+		metaChunk->chunkCount = 0;
+		metaChunk->usedChunkCount = 0;
+		metaChunk->chunks = area->chunks
+			+ i * (SLAB_CHUNK_SIZE_LARGE / SLAB_CHUNK_SIZE_SMALL);
+		metaChunk->freeChunks = NULL;
+	}
 
 	mutex_lock(&sLock);
 	_area = area;
@@ -396,62 +499,48 @@ MemoryManager::_AllocateArea(size_t chunkSize, uint32 flags, Area*& _area)
 
 
 /*static*/ void
-MemoryManager::_FreeArea(Area* area, uint32 flags)
+MemoryManager::_FreeArea(Area* area, bool areaRemoved, uint32 flags)
 {
 	TRACE("MemoryManager::_FreeArea(%p, %#" B_PRIx32 ")\n", area, flags);
 
-	ASSERT(area->usedChunkCount == 0);
+	ASSERT(area->usedMetaChunkCount == 0);
 
-	// remove the area from the hash table
-	WriteLocker writeLocker(sAreaTableLock);
-	sAreaTable.RemoveUnchecked(area);
-	writeLocker.Unlock();
+	if (!areaRemoved) {
+		// remove the area's meta chunks from the free lists
+		ASSERT(area->metaChunks[0].usedChunkCount == 0);
+		sFreeShortMetaChunks.Add(&area->metaChunks[0]);
+
+		for (int32 i = 1; i < SLAB_META_CHUNKS_PER_AREA; i++) {
+			ASSERT(area->metaChunks[i].usedChunkCount == 0);
+			sFreeCompleteMetaChunks.Add(&area->metaChunks[i]);
+		}
+
+		// remove the area from the hash table
+		WriteLocker writeLocker(sAreaTableLock);
+		sAreaTable.RemoveUnchecked(area);
+		writeLocker.Unlock();
+	}
+
+	// We keep one free area as a reserve.
+	if (sFreeAreas == NULL) {
+		sFreeAreas = area;
+		return;
+	}
 
 	if (area->vmArea == NULL || (flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
+		// This is either early in the boot process or we aren't allowed to
+		// delete the area now.
+// TODO: Notify the cleanup/resizer thread!
 		_push(sFreeAreas, area);
 		return;
 	}
 
 	mutex_unlock(&sLock);
 
-	size_t reservedMemory = area->reserved_memory_for_mapping;
-
-	// count mapped free chunks
-	for (Chunk* chunk = area->mappedFreeChunks; chunk != NULL;
-			chunk = chunk->next) {
-		reservedMemory += area->chunkSize;
-	}
-
 	delete_area(area->vmArea->id);
-	vm_unreserve_memory(reservedMemory);
+	vm_unreserve_memory(area->reserved_memory_for_mapping);
 
 	mutex_lock(&sLock);
-}
-
-
-/*static*/ void
-MemoryManager::_FreeChunk(AreaPool* areaPool, Area* area, Chunk* chunk,
-	addr_t chunkAddress, bool alreadyUnmapped, uint32 flags)
-{
-	// unmap the chunk
-	if (!alreadyUnmapped) {
-		mutex_unlock(&sLock);
-		alreadyUnmapped = _UnmapChunk(area->vmArea, chunkAddress,
-			area->chunkSize, flags) == B_OK;
-		mutex_lock(&sLock);
-	}
-
-	if (alreadyUnmapped)
-		_push(area->unmappedFreeChunks, chunk);
-	else
-		_push(area->mappedFreeChunks, chunk);
-
-	// free the area, if it is unused now
-	ASSERT(area->usedChunkCount > 0);
-	if (--area->usedChunkCount == 0) {
-		areaPool->partialAreas.Remove(area);
-		_FreeArea(area, flags);
-	}
 }
 
 
@@ -461,6 +550,11 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 {
 	TRACE("MemoryManager::_MapChunk(%p, %#" B_PRIxADDR ", %#" B_PRIxSIZE
 		")\n", vmArea, address, size);
+
+	if (vmArea == NULL) {
+		// everything is mapped anyway
+		return B_OK;
+	}
 
 	VMAddressSpace* addressSpace = VMAddressSpace::Kernel();
 	VMTranslationMap* translationMap = addressSpace->TranslationMap();
@@ -561,34 +655,84 @@ MemoryManager::_UnmapChunk(VMArea* vmArea, addr_t address, size_t size,
 }
 
 
-/*static*/ bool
-MemoryManager::_ConvertEarlyAreas(AreaList& areas)
+/*static*/ void
+MemoryManager::_UnmapChunkEarly(addr_t address, size_t size)
 {
-	for (AreaList::Iterator it = areas.GetIterator();
-			Area* area = it.Next();) {
-		if (area->vmArea != NULL) {
-			// unmap mapped chunks
-			while (area->mappedFreeChunks != NULL) {
-				Chunk* chunk = _pop(area->mappedFreeChunks);
-				_UnmapChunk(area->vmArea, _ChunkAddress(area, chunk),
-					area->chunkSize, 0);
-				_push(area->unmappedFreeChunks, chunk);
-			}
-			continue;
+	VMAddressSpace* addressSpace = VMAddressSpace::Kernel();
+	VMTranslationMap* translationMap = addressSpace->TranslationMap();
+
+	translationMap->Lock();
+
+	for (size_t offset = 0; offset < B_PAGE_SIZE; offset += B_PAGE_SIZE) {
+		addr_t physicalAddress;
+		uint32 flags;
+		if (translationMap->Query(address + offset, &physicalAddress, &flags)
+				== B_OK
+			&& (flags & PAGE_PRESENT) != 0) {
+			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+			DEBUG_PAGE_ACCESS_START(page);
+			vm_page_set_state(page, PAGE_STATE_FREE);
 		}
-
-		void* address = area;
-		area_id areaID = create_area(kSlabAreaName, &address, B_EXACT_ADDRESS,
-			SLAB_AREA_SIZE, B_ALREADY_WIRED,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if (areaID < 0)
-			panic("out of memory");
-
-		area->vmArea = VMAreaHash::Lookup(areaID);
-		return true;
 	}
 
-	return false;
+	translationMap->Unmap(address, address + size - 1);
+
+	translationMap->Unlock();
+}
+
+
+/*static*/ void
+MemoryManager::_UnmapFreeChunksEarly(Area* area)
+{
+	if (!area->fullyMapped)
+		return;
+
+	for (int32 i = 0; i < SLAB_META_CHUNKS_PER_AREA; i++) {
+		MetaChunk* metaChunk = area->metaChunks + i;
+		if (metaChunk->chunkSize == 0) {
+			// meta chunk is free -- unmap it completely
+			if (i == 0) {
+				_UnmapChunk(area->vmArea, (addr_t)area + kAreaAdminSize,
+					SLAB_CHUNK_SIZE_LARGE - kAreaAdminSize, 0);
+			} else {
+				_UnmapChunk(area->vmArea,
+					(addr_t)area + i * SLAB_CHUNK_SIZE_LARGE,
+					SLAB_CHUNK_SIZE_LARGE, 0);
+			}
+		} else {
+			// unmap free chunks
+			for (Chunk* chunk = metaChunk->freeChunks; chunk != NULL;
+					chunk = chunk->next) {
+				_UnmapChunk(area->vmArea, _ChunkAddress(metaChunk, chunk),
+					metaChunk->chunkSize, 0);
+			}
+
+			// The first meta chunk might have space before its first chunk.
+			if (i == 0) {
+				addr_t unusedStart = (addr_t)area + kAreaAdminSize;
+				if (unusedStart < metaChunk->chunkBase) {
+					_UnmapChunk(area->vmArea, unusedStart,
+						metaChunk->chunkBase - unusedStart, 0);
+				}
+			}
+		}
+	}
+
+	area->fullyMapped = false;
+}
+
+
+/*static*/ void
+MemoryManager::_ConvertEarlyArea(Area* area)
+{
+	void* address = area;
+	area_id areaID = create_area(kSlabAreaName, &address, B_EXACT_ADDRESS,
+		SLAB_AREA_SIZE, B_ALREADY_WIRED,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (areaID < 0)
+		panic("out of memory");
+
+	area->vmArea = VMAreaHash::Lookup(areaID);
 }
 
 
@@ -610,35 +754,44 @@ MemoryManager::_DumpArea(int argc, char** argv)
 
 	kprintf("chunk        base       cache  object size  cache name\n");
 
-	// Get the last chunk in each of the free lists. This allows us to easily
-	// identify free chunks, since besides these two all other free chunks
-	// have a Chunk::next pointing to another chunk.
-	Chunk* lastMappedFree = area->mappedFreeChunks;
-	if (lastMappedFree != NULL) {
-		while (lastMappedFree->next != NULL)
-			lastMappedFree = lastMappedFree->next;
-	}
-
-	Chunk* lastUnmappedFree = area->unmappedFreeChunks;
-	if (lastUnmappedFree != NULL) {
-		while (lastUnmappedFree->next != NULL)
-			lastUnmappedFree = lastUnmappedFree->next;
-	}
-
-	for (uint32 i = 0; i < area->chunkCount; i++) {
-		Chunk* chunk = area->chunks + i;
-		if (chunk == lastMappedFree || chunk == lastUnmappedFree)
+	for (uint32 k = 0; k < SLAB_META_CHUNKS_PER_AREA; k++) {
+		MetaChunk* metaChunk = area->metaChunks + k;
+		if (metaChunk->chunkSize == 0)
 			continue;
-		if (chunk->next >= area->chunks
-				&& chunk->next < area->chunks + area->chunkCount) {
-			continue;
+
+		const char* type = "???";
+		switch (metaChunk->chunkSize) {
+			case SLAB_CHUNK_SIZE_SMALL:
+				type = "small";
+				break;
+			case SLAB_CHUNK_SIZE_MEDIUM:
+				type = "medium";
+				break;
+			case SLAB_CHUNK_SIZE_LARGE:
+				type = "large";
+				break;
 		}
 
-		ObjectCache* cache = chunk->cache;
-		kprintf("%5" B_PRIu32 "  %p  %p  %11" B_PRIuSIZE "  %s\n", i,
-			(void*)_ChunkAddress(area, chunk), cache,
-			cache != NULL ? cache->object_size : 0,
-			cache != NULL ? cache->name : "");
+		kprintf("-- %2" B_PRIu32 " %s ---------------------------------------"
+			"--------------\n", k, type);
+
+		for (uint32 i = 0; i < metaChunk->chunkCount; i++) {
+			Chunk* chunk = metaChunk->chunks + i;
+
+			// skip free chunks
+			if (chunk->next == NULL)
+				continue;
+			if (chunk->next >= metaChunk->chunks
+				&& chunk->next < metaChunk->chunks + metaChunk->chunkCount) {
+				continue;
+			}
+
+			ObjectCache* cache = chunk->cache;
+			kprintf("%5" B_PRIu32 "  %p  %p  %11" B_PRIuSIZE "  %s\n", i,
+				(void*)_ChunkAddress(metaChunk, chunk), cache,
+				cache != NULL ? cache->object_size : 0,
+				cache != NULL ? cache->name : "");
+		}
 	}
 
 	return 0;
@@ -648,20 +801,43 @@ MemoryManager::_DumpArea(int argc, char** argv)
 /*static*/ int
 MemoryManager::_DumpAreas(int argc, char** argv)
 {
-	kprintf("      base        area  chunk size  count   used  mapped free\n");
+	kprintf("      base        area   meta      small   medium  large\n");
 
 	for (AreaTable::Iterator it = sAreaTable.GetIterator();
 			Area* area = it.Next();) {
-		// count the mapped free chunks
-		int mappedFreeChunks = 0;
-		for (Chunk* chunk = area->mappedFreeChunks; chunk != NULL;
-				chunk = chunk->next) {
-			mappedFreeChunks++;
+		// sum up the free/used counts for the chunk sizes
+		int totalSmall = 0;
+		int usedSmall = 0;
+		int totalMedium = 0;
+		int usedMedium = 0;
+		int totalLarge = 0;
+		int usedLarge = 0;
+
+		for (int32 i = 0; i < SLAB_META_CHUNKS_PER_AREA; i++) {
+			MetaChunk* metaChunk = area->metaChunks + i;
+			if (metaChunk->chunkSize == 0)
+				continue;
+
+			switch (metaChunk->chunkSize) {
+				case SLAB_CHUNK_SIZE_SMALL:
+					totalSmall += metaChunk->chunkCount;
+					usedSmall += metaChunk->usedChunkCount;
+					break;
+				case SLAB_CHUNK_SIZE_MEDIUM:
+					totalMedium += metaChunk->chunkCount;
+					usedMedium += metaChunk->usedChunkCount;
+					break;
+				case SLAB_CHUNK_SIZE_LARGE:
+					totalLarge += metaChunk->chunkCount;
+					usedLarge += metaChunk->usedChunkCount;
+					break;
+			}
 		}
 
-		kprintf("%p  %p  %10" B_PRIuSIZE "  %5u  %5u  %11d\n",
-			area, area->vmArea, area->chunkSize, area->chunkCount,
-			area->usedChunkCount, mappedFreeChunks);
+		kprintf("%p  %p  %2u/%2u  %4d/%4d  %3d/%3d  %2d/%2d\n",
+			area, area->vmArea, area->usedMetaChunkCount,
+			SLAB_META_CHUNKS_PER_AREA, usedSmall, totalSmall, usedMedium,
+			totalMedium, usedLarge, totalLarge);
 	}
 
 	return 0;
