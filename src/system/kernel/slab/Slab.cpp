@@ -461,12 +461,12 @@ object_cache_low_memory(void* dummy, uint32 resources, int32 level)
 			continue;
 		}
 
-		if (cache->maintenance_resize) {
+		cache->maintenance_in_progress = false;
+
+		if (cache->maintenance_resize)
 			sMaintenanceQueue.Add(cache);
-		} else {
+		else
 			cache->maintenance_pending = false;
-			cache->maintenance_in_progress = false;
-		}
 	} while (cache != firstCache);
 }
 
