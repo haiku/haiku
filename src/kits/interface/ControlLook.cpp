@@ -964,8 +964,8 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		frameShadowTint = 1.25;
 		fillLightTint = 0.9;
 		fillShadowTint = 1.05;
-		edgeLightAlpha = 15;
-		edgeShadowAlpha = 20;
+		edgeLightAlpha = 12;
+		edgeShadowAlpha = 12;
 		frameLightAlpha = 40;
 		frameShadowAlpha = 45;
 
@@ -979,8 +979,8 @@ BControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		frameShadowTint = 1.50;
 		fillLightTint = 0.8;
 		fillShadowTint = 1.1;
-		edgeLightAlpha = 35;
-		edgeShadowAlpha = 45;
+		edgeLightAlpha = 15;
+		edgeShadowAlpha = 15;
 		frameLightAlpha = 92;
 		frameShadowAlpha = 107;
 	}
