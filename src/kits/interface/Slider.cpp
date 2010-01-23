@@ -27,7 +27,7 @@
 #include <binary_compatibility/Interface.h>
 
 
-#define USE_OFF_SCREEN_VIEW 1
+#define USE_OFF_SCREEN_VIEW 0
 
 
 BSlider::BSlider(BRect frame, const char* name, const char* label,
@@ -799,6 +799,12 @@ BSlider::Draw(BRect updateRect)
 	// clear out background
 	BRegion background(updateRect);
 	background.Exclude(BarFrame());
+	bool drawBackground = true;
+	if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
+		// This view is embedded somewhere, most likely the Tracker Desktop
+		// shelf.
+		drawBackground = false;
+	}
 
 	// ToDo: the triangle thumb doesn't delete its background, so we still have
 	// to do it Note, this also creates a different behaviour for subclasses,
@@ -824,7 +830,7 @@ BSlider::Draw(BRect updateRect)
 		fOffScreenView->SetLowColor(ViewColor());
 #endif
 
-		if (background.Frame().IsValid())
+		if (drawBackground && background.Frame().IsValid())
 			OffscreenView()->FillRegion(&background, B_SOLID_LOW);
 
 #if USE_OFF_SCREEN_VIEW
@@ -1133,33 +1139,62 @@ BSlider::DrawText()
 	BRect bounds(Bounds());
 	BView *view = OffscreenView();
 
-	if (IsEnabled()) {
-		view->SetHighColor(0, 0, 0);
-	} else {
-		view->SetHighColor(tint_color(LowColor(), B_DISABLED_LABEL_TINT));
-	}
+	rgb_color base = LowColor();
+	uint32 flags = 0;
+	if (be_control_look == NULL) {
+		if (IsEnabled()) {
+			view->SetHighColor(0, 0, 0);
+		} else {
+			view->SetHighColor(tint_color(LowColor(), B_DISABLED_LABEL_TINT));
+		}
+	} else
+ 		flags = be_control_look->Flags(this);
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	if (Orientation() == B_HORIZONTAL) {
-		if (Label())
-			view->DrawString(Label(), BPoint(0.0, ceilf(fontHeight.ascent)));
+		if (Label()) {
+			if (be_control_look == NULL) {
+				view->DrawString(Label(),
+					BPoint(0.0, ceilf(fontHeight.ascent)));
+			} else {
+				be_control_look->DrawLabel(view, Label(), base, flags,
+					BPoint(0.0, ceilf(fontHeight.ascent)));
+			}
+		}
 
 		// the update text is updated in SetValue() only
 		if (fUpdateText != NULL) {
-			view->DrawString(fUpdateText, BPoint(bounds.right
-				- StringWidth(fUpdateText), ceilf(fontHeight.ascent)));
+			if (be_control_look == NULL) {
+				view->DrawString(fUpdateText, BPoint(bounds.right
+					- StringWidth(fUpdateText), ceilf(fontHeight.ascent)));
+			} else {
+				be_control_look->DrawLabel(view, fUpdateText, base, flags,
+					BPoint(bounds.right - StringWidth(fUpdateText),
+						ceilf(fontHeight.ascent)));
+			}
 		}
 
 		if (fMinLimitLabel) {
-			view->DrawString(fMinLimitLabel, BPoint(0.0, bounds.bottom
-				- fontHeight.descent));
+			if (be_control_look == NULL) {
+				view->DrawString(fMinLimitLabel, BPoint(0.0, bounds.bottom
+					- fontHeight.descent));
+			} else {
+				be_control_look->DrawLabel(view, fMinLimitLabel, base, flags,
+					BPoint(0.0, bounds.bottom - fontHeight.descent));
+			}
 		}
 
 		if (fMaxLimitLabel) {
-			view->DrawString(fMaxLimitLabel, BPoint(bounds.right
-				- StringWidth(fMaxLimitLabel), bounds.bottom
-				- fontHeight.descent));
+			if (be_control_look == NULL) {
+				view->DrawString(fMaxLimitLabel, BPoint(bounds.right
+					- StringWidth(fMaxLimitLabel), bounds.bottom
+					- fontHeight.descent));
+			} else {
+				be_control_look->DrawLabel(view, fMaxLimitLabel, base, flags,
+					BPoint(bounds.right - StringWidth(fMaxLimitLabel),
+						bounds.bottom - fontHeight.descent));
+			}
 		}
 	} else {
 		float lineHeight = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent)
@@ -1167,27 +1202,51 @@ BSlider::DrawText()
 		float baseLine = ceilf(fontHeight.ascent);
 
 		if (Label()) {
-			view->DrawString(Label(), BPoint((bounds.Width()
-				- StringWidth(Label())) / 2.0, baseLine));
+			if (be_control_look == NULL) {
+				view->DrawString(Label(), BPoint((bounds.Width()
+					- StringWidth(Label())) / 2.0, baseLine));
+			} else {
+				be_control_look->DrawLabel(view, Label(), base, flags,
+					BPoint((bounds.Width() - StringWidth(Label())) / 2.0,
+						baseLine));
+			}
 			baseLine += lineHeight;
 		}
 
 		if (fMaxLimitLabel) {
-			view->DrawString(fMaxLimitLabel, BPoint((bounds.Width()
-				- StringWidth(fMaxLimitLabel)) / 2.0, baseLine));
+			if (be_control_look == NULL) {
+				view->DrawString(fMaxLimitLabel, BPoint((bounds.Width()
+					- StringWidth(fMaxLimitLabel)) / 2.0, baseLine));
+			} else {
+				be_control_look->DrawLabel(view, fMaxLimitLabel, base, flags,
+					BPoint((bounds.Width()
+						- StringWidth(fMaxLimitLabel)) / 2.0, baseLine));
+			}
 		}
 
 		baseLine = bounds.bottom - ceilf(fontHeight.descent);
 
 		if (fMinLimitLabel) {
-			view->DrawString(fMinLimitLabel, BPoint((bounds.Width()
-				- StringWidth(fMinLimitLabel)) / 2.0, baseLine));
+			if (be_control_look == NULL) {
+				view->DrawString(fMinLimitLabel, BPoint((bounds.Width()
+					- StringWidth(fMinLimitLabel)) / 2.0, baseLine));
+			} else {
+				be_control_look->DrawLabel(view, fMinLimitLabel, base, flags,
+					BPoint((bounds.Width()
+						- StringWidth(fMinLimitLabel)) / 2.0, baseLine));
+			}
 			baseLine -= lineHeight;
 		}
 
 		if (fUpdateText != NULL) {
-			view->DrawString(fUpdateText, BPoint((bounds.Width()
-				- StringWidth(fUpdateText)) / 2.0, baseLine));
+			if (be_control_look == NULL) {
+				view->DrawString(fUpdateText, BPoint((bounds.Width()
+					- StringWidth(fUpdateText)) / 2.0, baseLine));
+			} else {
+				be_control_look->DrawLabel(view, fUpdateText, base, flags,
+					BPoint((bounds.Width()
+						- StringWidth(fUpdateText)) / 2.0, baseLine));
+			}
 		}
 	}
 }
