@@ -15,15 +15,9 @@ typedef struct acpi_object_type acpi_object_type;
 
 #define B_ACPI_MODULE_NAME "bus_managers/acpi/v1"
 
-#ifdef B_HAIKU_64_BIT
-typedef uint64 acpi_physical_address;
-typedef uint64 acpi_io_address;
-typedef uint64 acpi_size;
-#else
-typedef uint32 acpi_physical_address;
-typedef uint32 acpi_io_address;
-typedef uint32 acpi_size;
-#endif
+typedef addr_t acpi_physical_address;
+typedef addr_t acpi_io_address;
+typedef size_t acpi_size;
 
 /* Actually a ptr to a NS Node */
 typedef void *				acpi_handle;
