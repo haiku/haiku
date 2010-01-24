@@ -642,17 +642,12 @@ get_buffer_route(net_domain* _domain, net_buffer* buffer, net_route** _route)
 	status_t status = B_OK;
 	sockaddr* source = buffer->source;
 
-	// TODO we are quite relaxed in the address checking here
-	//      as we might proceed with srcaddr=INADDR_ANY.
+	// TODO: we are quite relaxed in the address checking here
+	// as we might proceed with source = INADDR_ANY.
 
-	if (route->interface && route->interface->address) {
-		sockaddr* interfaceAddress = route->interface->address;
-		net_address_module_info* addressModule = domain->address_module;
-
-		if (addressModule->is_empty_address(source, true))
-			addressModule->set_to(source, interfaceAddress);
-		else
-			status = addressModule->update_to(source, interfaceAddress);
+	if (route->interface != NULL && route->interface->address != NULL) {
+		status = domain->address_module->update_to(source,
+			route->interface->address);
 	}
 
 	if (status != B_OK)
