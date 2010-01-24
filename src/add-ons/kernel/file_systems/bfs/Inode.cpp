@@ -2679,6 +2679,9 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 			inode->Size()));
 		inode->SetMap(file_map_create(volume->ID(), inode->ID(),
 			inode->Size()));
+
+		if (inode->FileCache() == NULL || inode->Map() == NULL)
+			return B_NO_MEMORY;
 	}
 
 	// Everything worked well until this point, we have a fully
