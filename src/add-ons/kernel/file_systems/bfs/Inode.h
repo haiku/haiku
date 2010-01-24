@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INODE_H
@@ -67,14 +67,18 @@ public:
 								// a regular node in the standard namespace
 								// (i.e. not an index or attribute)
 			bool			IsSymLink() const { return S_ISLNK(Mode()); }
+			bool			IsLongSymLink() const
+								{ return (Flags() & INODE_LONG_SYMLINK) != 0; }
+
 			bool			HasUserAccessableStream() const { return IsFile(); }
 								// currently only files can be accessed with
 								// bfs_read()/bfs_write()
+			bool			NeedsFileCache() const
+								{ return IsFile() || IsAttribute()
+									|| IsLongSymLink(); }
 
 			bool			IsDeleted() const
 								{ return (Flags() & INODE_DELETED) != 0; }
-			bool			IsLongSymLink() const
-								{ return (Flags() & INODE_LONG_SYMLINK) != 0; }
 
 			mode_t			Mode() const { return fNode.Mode(); }
 			uint32			Type() const { return fNode.Type(); }

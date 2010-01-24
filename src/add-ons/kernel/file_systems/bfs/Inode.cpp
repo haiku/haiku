@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -344,7 +344,7 @@ Inode::Inode(Volume* volume, ino_t id)
 
 	if (IsContainer())
 		fTree = new BPlusTree(this);
-	if (IsFile() || IsAttribute() || IsLongSymLink()) {
+	if (NeedsFileCache()) {
 		SetFileCache(file_cache_create(fVolume->ID(), ID(), Size()));
 		SetMap(file_map_create(volume->ID(), ID(), Size()));
 	}
@@ -429,6 +429,9 @@ Inode::InitCheck(bool checkNode)
 			RETURN_ERROR(B_BAD_DATA);
 		}
 	}
+
+	if (NeedsFileCache() && (fCache == NULL || fMap == NULL))
+		return B_NO_MEMORY;
 
 	return B_OK;
 }
@@ -2671,7 +2674,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	if (inode->InLastModifiedIndex())
 		index.InsertLastModified(transaction, inode);
 
-	if (inode->IsFile() || inode->IsAttribute()) {
+	if (inode->NeedsFileCache()) {
 		inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(),
 			inode->Size()));
 		inode->SetMap(file_map_create(volume->ID(), inode->ID(),
