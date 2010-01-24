@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -523,13 +523,13 @@ BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	// the user might be clicking on and gradually work our way out into larger
 	// rectangles.
 	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(pt))
-		return DEC_CLOSE;
+		return CLICK_CLOSE;
 
 	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(pt))
-		return DEC_ZOOM;
+		return CLICK_ZOOM;
 
 	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(pt))
-		return DEC_RESIZE;
+		return CLICK_RESIZE;
 
 	bool clicked = false;
 
@@ -538,7 +538,7 @@ BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 		// tab sliding in any case if either shift key is held down
 		// except sliding up-down by moving mouse left-right would look strange
 		if ((modifiers & B_SHIFT_KEY) && (fLook != kLeftTitledWindowLook))
-			return DEC_SLIDETAB;
+			return CLICK_SLIDE_TAB;
 
 		clicked = true;
 	} else if (fLeftBorder.Contains(pt) || fRightBorder.Contains(pt)
@@ -554,7 +554,7 @@ BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 			BRect temp(BPoint(fBottomBorder.right - 18, fBottomBorder.bottom - 18),
 				fBottomBorder.RightBottom());
 			if (temp.Contains(pt))
-				return DEC_RESIZE;
+				return CLICK_RESIZE;
 		}
 
 		clicked = true;
@@ -565,16 +565,16 @@ BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 		// resize area with the second mouse button. So we check this after
 		// the check above
 		if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
-			return DEC_MOVETOBACK;
+			return CLICK_MOVE_TO_BACK;
 
 		if (fWasDoubleClick && !(fFlags & B_NOT_MINIMIZABLE))
-			return DEC_MINIMIZE;
+			return CLICK_MINIMIZE;
 
-		return DEC_DRAG;
+		return CLICK_DRAG;
 	}
 
 	// Guess user didn't click anything
-	return DEC_NONE;
+	return CLICK_NONE;
 }
 
 

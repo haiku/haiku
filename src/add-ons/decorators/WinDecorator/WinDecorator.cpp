@@ -1,7 +1,8 @@
 /*
- Copyright 2009, Haiku.
- Distributed under the terms of the MIT License.
-*/
+ * Copyright 2009-2010, Haiku.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 /*! Decorator looking like Windows 95 */
 
@@ -28,7 +29,8 @@
 
 WinDecorator::WinDecorator(DesktopSettings& settings, BRect rect,
 		window_look look, uint32 flags)
-	: Decorator(settings, rect, look, flags)
+	:
+	Decorator(settings, rect, look, flags)
 {
 	taboffset=0;
 
@@ -100,15 +102,6 @@ WinDecorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
 }
 
 
-// SetLook
-
-
-// SetFlags
-
-
-
-
-
 void
 WinDecorator::MoveBy(BPoint pt)
 {
@@ -170,34 +163,33 @@ WinDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
 	if (fCloseRect.Contains(pt)) {
 		STRACE(("WinDecorator():Clicked() - Close\n"));
-		return DEC_CLOSE;
+		return CLICK_CLOSE;
 	}
 
 	if (fZoomRect.Contains(pt)) {
 		STRACE(("WinDecorator():Clicked() - Zoom\n"));
-		return DEC_ZOOM;
+		return CLICK_ZOOM;
 	}
 	
 	// Clicking in the tab?
 	if (fTabRect.Contains(pt)) {
 		// Here's part of our window management stuff
-		/* TODO This is missing DEC_MOVETOFRONT
+		/* TODO This is missing CLICK_MOVETOFRONT
 		if(buttons==B_PRIMARY_MOUSE_BUTTON && !IsFocus())
-			return DEC_MOVETOFRONT;
+			return CLICK_MOVETOFRONT;
 		*/
-		return DEC_DRAG;
+		return CLICK_DRAG;
 	}
 
 	// We got this far, so user is clicking on the border?
-	if(fBorderRect.Contains(pt) && !fFrame.Contains(pt))
-	{
+	if (fBorderRect.Contains(pt) && !fFrame.Contains(pt)) {
 		STRACE(("WinDecorator():Clicked() - Resize\n"));
-		return DEC_RESIZE;
+		return CLICK_RESIZE;
 	}
 
 	// Guess user didn't click anything
 	STRACE(("WinDecorator():Clicked()\n"));
-	return DEC_NONE;
+	return CLICK_NONE;
 }
 
 
@@ -328,7 +320,7 @@ WinDecorator::_DrawZoom(BRect r)
 	rect.bottom--;
 	rect.right--;
 	
-	if(GetZoom())
+	if (GetZoom())
 		rect.OffsetBy(1,1);
 
 	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
@@ -351,7 +343,7 @@ WinDecorator::_DrawClose(BRect r)
 	rect.right--;
 	rect.top--;
 	
-	if(GetClose())
+	if (GetClose())
 		rect.OffsetBy(1,1);
 
 	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
@@ -362,7 +354,9 @@ WinDecorator::_DrawClose(BRect r)
 	fDrawingEngine->StrokeLine(rect.RightTop(),rect.LeftBottom());
 }
 
-void WinDecorator::_DrawMinimize(BRect r)
+
+void
+WinDecorator::_DrawMinimize(BRect r)
 {
 	// Just like DrawZoom, but for a Minimize button
 	DrawBeveledRect(r,GetMinimize());
@@ -401,18 +395,19 @@ WinDecorator::_DrawTab(BRect r)
 void
 WinDecorator::DrawBeveledRect(BRect r, bool down)
 {
-	RGBColor higher,high,mid,low,lower;
+	RGBColor higher;
+	RGBColor high;
+	RGBColor mid;
+	RGBColor low;
+	RGBColor lower;
 	
-	if(down)
-	{
+	if (down) {
 		lower.SetColor(255,255,255);
 		low.SetColor(216,216,216);
 		mid.SetColor(192,192,192);
 		high.SetColor(128,128,128);
 		higher.SetColor(0,0,0);
-	}
-	else
-	{
+	} else {
 		higher.SetColor(255,255,255);
 		high.SetColor(216,216,216);
 		mid.SetColor(192,192,192);
@@ -475,9 +470,9 @@ void
 WinDecorator::_UpdateFont(DesktopSettings& settings)
 {
 	ServerFont font;
-	if (fLook == B_FLOATING_WINDOW_LOOK) {
+	if (fLook == B_FLOATING_WINDOW_LOOK)
 		settings.GetDefaultPlainFont(font);
-	} else
+	else
 		settings.GetDefaultBoldFont(font);
 
 	font.SetFlags(B_FORCE_ANTIALIASING);
@@ -489,18 +484,18 @@ WinDecorator::_UpdateFont(DesktopSettings& settings)
 void
 WinDecorator::_DrawFrame(BRect rect)
 {
-	if(fLook==B_NO_BORDER_WINDOW_LOOK)
+	if (fLook == B_NO_BORDER_WINDOW_LOOK)
 		return;
 
 	if (fBorderRect == fFrame)
 		return;
 
-	BRect r=fBorderRect;
+	BRect r = fBorderRect;
 	
 	fDrawingEngine->SetHighColor(frame_lowercol);
 	fDrawingEngine->StrokeRect(r);
 
-	if ( fLook == B_BORDERED_WINDOW_LOOK)
+	if (fLook == B_BORDERED_WINDOW_LOOK)
 		return;
 	
 	BPoint pt;
@@ -533,13 +528,15 @@ WinDecorator::_DrawFrame(BRect rect)
 }
 
 
-extern "C" float get_decorator_version(void)
+extern "C" float
+get_decorator_version(void)
 {
 	return 1.00;
 }
 
 
-extern "C" Decorator *instantiate_decorator(DesktopSettings &desktopSetting, BRect rect,
+extern "C" Decorator *
+instantiate_decorator(DesktopSettings &desktopSetting, BRect rect,
 	window_look wlook, int32 wflags)
 {
 	return new WinDecorator(desktopSetting, rect, wlook, wflags);

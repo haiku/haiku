@@ -1,7 +1,8 @@
 /*
- Copyright 2009, Haiku.
- Distributed under the terms of the MIT License.
-*/
+ * Copyright 2009-2010, Haiku.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 /*! Decorator looking like Mac OS 9 */
 
@@ -29,7 +30,8 @@
 
 MacDecorator::MacDecorator(DesktopSettings& settings, BRect rect,
 		window_look look, uint32 flags)
-	: Decorator(settings, rect, look, flags)
+	:
+	Decorator(settings, rect, look, flags)
 {
 	frame_highcol = (rgb_color){ 255, 255, 255, 255 };
 	frame_midcol = (rgb_color){ 216, 216, 216, 255 };
@@ -184,9 +186,6 @@ MacDecorator::ResizeBy(BPoint offset, BRegion* dirty)
 	_DoLayout();
 }
 
-// settablocation
-// setsettings
-// getsettings
 
 void
 MacDecorator::Draw(BRect update)
@@ -210,8 +209,6 @@ MacDecorator::Draw()
 	_DrawTab(fTabRect);
 }
 
-
-// getsizelimits
 
 void
 MacDecorator::GetFootprint(BRegion* region)
@@ -243,22 +240,22 @@ MacDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 {
 	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(point)) {
 		STRACE(("MacDecorator():Clicked() - Close\n"));
-		return DEC_CLOSE;
+		return CLICK_CLOSE;
 	}
 
 	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(point)) {
 		STRACE(("MacDecorator():Clicked() - Zoom\n"));
-		return DEC_ZOOM;
+		return CLICK_ZOOM;
 	}
 	
 	// Clicking in the tab?
 	if (fTabRect.Contains(point)) {
 		// Here's part of our window management stuff
-		/* TODO This is missing DEC_MOVETOFRONT
+		/* TODO This is missing CLICK_MOVETOFRONT
 		if(buttons==B_PRIMARY_MOUSE_BUTTON && !IsFocus())
-			return DEC_MOVETOFRONT;
+			return CLICK_MOVETOFRONT;
 		*/
-		return DEC_DRAG;
+		return CLICK_DRAG;
 	}
 
 	// We got this far, so user is clicking on the border?
@@ -268,12 +265,12 @@ MacDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 			|| fLook == B_MODAL_WINDOW_LOOK)
 		&& fBorderRect.Contains(point) && !fFrame.Contains(point)) {
 		STRACE(("MacDecorator():Clicked() - Resize\n"));
-		return DEC_RESIZE;
+		return CLICK_RESIZE;
 	}
 
 	// Guess user didn't click anything
 	STRACE(("MacDecorator():Clicked()\n"));
-	return DEC_NONE;
+	return CLICK_NONE;
 }
 
 
@@ -514,7 +511,7 @@ MacDecorator::_DrawFrame(BRect invalid)
 }
 
 
-	void
+void
 MacDecorator::_DrawTab(BRect invalid)
 {
 	// If a window has a tab, this will draw it and any buttons which are
@@ -526,9 +523,7 @@ MacDecorator::_DrawTab(BRect invalid)
 	fDrawingEngine->SetHighColor(RGBColor(frame_midcol));
 	fDrawingEngine->FillRect(rect,frame_midcol);
 
-
-	if(IsFocus())
-	{
+	if (IsFocus()) {
 		fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightTop(),frame_lowercol);
 		fDrawingEngine->StrokeLine(rect.LeftTop(),rect.LeftBottom(),frame_lowercol);
 		fDrawingEngine->StrokeLine(rect.RightBottom(),rect.RightTop(),frame_lowercol);
@@ -541,15 +536,13 @@ MacDecorator::_DrawTab(BRect invalid)
 		fDrawingEngine->StrokeLine(rect.RightBottom(),rect.RightTop(),frame_lowcol);
 
 		// Draw the neat little lines on either side of the title if there's room
-		if((fTabRect.left+textoffset)>(fCloseRect.right+5))
-		{
+		if (fTabRect.left + textoffset > fCloseRect.right + 5) {
 			// Left side
 
 			BPoint offset(fCloseRect.right+5,fCloseRect.top),
-				   pt2(fTabRect.left+textoffset-5,fCloseRect.top);
+				pt2(fTabRect.left+textoffset-5,fCloseRect.top);
 			fDrawState.SetHighColor(RGBColor(frame_highcol));
-			for(int32 i=0;i<6;i++)
-			{
+			for (int32 i = 0; i < 6; i++) {
 				fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
 				offset.y+=2;
 				pt2.y+=2;
@@ -558,43 +551,41 @@ MacDecorator::_DrawTab(BRect invalid)
 			offset.Set(fCloseRect.right+6,fCloseRect.top+1),
 				pt2.Set(fTabRect.left+textoffset-4,fCloseRect.top+1);
 			fDrawState.SetHighColor(RGBColor(frame_lowcol));
-			for(int32 i=0;i<6;i++)
-			{
-				fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
-				offset.y+=2;
-				pt2.y+=2;
+			for (int32 i = 0; i < 6; i++) {
+				fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
+				offset.y += 2;
+				pt2.y += 2;
 			}
 
 			// Right side
 
-			offset.Set(fTabRect.left+textoffset+titlepixelwidth+6,fZoomRect.top),
-				pt2.Set(fZoomRect.left-6,fZoomRect.top);
-			if(offset.x<pt2.x)
-			{
+			offset.Set(fTabRect.left + textoffset + titlepixelwidth + 6,
+				fZoomRect.top), pt2.Set(fZoomRect.left - 6, fZoomRect.top);
+			if (offset.x < pt2.x) {
 				fDrawState.SetHighColor(RGBColor(frame_highcol));
-				for(int32 i=0;i<6;i++)
-				{
-					fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
-					offset.y+=2;
-					pt2.y+=2;
+				for (int32 i = 0; i < 6; i++) {
+					fDrawingEngine->StrokeLine(offset, pt2,
+						fDrawState.HighColor());
+					offset.y += 2;
+					pt2.y += 2;
 				}
-				offset.Set(fTabRect.left+textoffset+titlepixelwidth+7,fZoomRect.top+1),
-					pt2.Set(fZoomRect.left-5,fZoomRect.top+1);
+				offset.Set(fTabRect.left+textoffset + titlepixelwidth + 7,
+					fZoomRect.top + 1), pt2.Set(fZoomRect.left - 5,
+					fZoomRect.top + 1);
 				fDrawState.SetHighColor(frame_lowcol);
-				for(int32 i=0;i<6;i++)
-				{
-					fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
-					offset.y+=2;
-					pt2.y+=2;
+				for(int32 i = 0; i < 6; i++) {
+					fDrawingEngine->StrokeLine(offset, pt2,
+						fDrawState.HighColor());
+					offset.y += 2;
+					pt2.y += 2;
 				}
 			}
 		}
 
-
 		// Draw the buttons if we're supposed to	
-		if(!(fFlags & B_NOT_CLOSABLE))
+		if (!(fFlags & B_NOT_CLOSABLE))
 			_DrawClose(fCloseRect);
-		if(!(fFlags & B_NOT_ZOOMABLE))
+		if (!(fFlags & B_NOT_ZOOMABLE))
 			_DrawZoom(fZoomRect);
 	} else {
 		// Not focused - Just draw a plain light grey area with the title in the middle
@@ -610,42 +601,42 @@ MacDecorator::_DrawTab(BRect invalid)
 void
 MacDecorator::_DrawClose(BRect r)
 {
-	bool down=GetClose();
+	bool down = GetClose();
 
 	// Just like DrawZoom, but for a close button
 	BRect rect(r);
 
-	BPoint offset(r.LeftTop()),pt2(r.RightTop());
+	BPoint offset(r.LeftTop()), pt2(r.RightTop());
 
 	// Topleft dark grey border
 	pt2.x--;
-	fDrawingEngine->SetHighColor(RGBColor(136,136,136));
-	fDrawingEngine->StrokeLine(offset,pt2);
+	fDrawingEngine->SetHighColor(RGBColor(136, 136, 136));
+	fDrawingEngine->StrokeLine(offset, pt2);
 
-	pt2=r.LeftBottom();
+	pt2 = r.LeftBottom();
 	pt2.y--;
-	fDrawingEngine->StrokeLine(offset,pt2);
+	fDrawingEngine->StrokeLine(offset, pt2);
 
 	// Bottomright white border
-	offset=r.RightBottom();
-	pt2=r.RightTop();
+	offset = r.RightBottom();
+	pt2 = r.RightTop();
 	pt2.y++;
-	fDrawingEngine->SetHighColor(RGBColor(255,255,255));
-	fDrawingEngine->StrokeLine(offset,pt2);
+	fDrawingEngine->SetHighColor(RGBColor(255, 255, 255));
+	fDrawingEngine->StrokeLine(offset, pt2);
 
-	pt2=r.LeftBottom();
+	pt2 = r.LeftBottom();
 	pt2.x++;
-	fDrawingEngine->StrokeLine(offset,pt2);
+	fDrawingEngine->StrokeLine(offset, pt2);
 
 	// Black outline
-	rect.InsetBy(1,1);
-	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
+	rect.InsetBy(1, 1);
+	fDrawingEngine->SetHighColor(RGBColor(0, 0, 0));
 	fDrawingEngine->StrokeRect(rect);
 
 	// Double-shaded button
-	rect.InsetBy(1,1);
+	rect.InsetBy(1, 1);
 	_DrawBlendedRect(fDrawingEngine, rect, down);
-	rect.InsetBy(1,1);
+	rect.InsetBy(1, 1);
 	_DrawBlendedRect(fDrawingEngine, rect, !down);
 }
 
@@ -653,7 +644,7 @@ MacDecorator::_DrawClose(BRect r)
 void
 MacDecorator::_DrawTitle(BRect rect)
 {
-	if(IsFocus())
+	if (IsFocus())
 		fDrawingEngine->SetHighColor(fFocusTextColor);
 	else
 		fDrawingEngine->SetHighColor(fNonFocusTextColor);
@@ -662,18 +653,19 @@ MacDecorator::_DrawTitle(BRect rect)
 
 	fTruncatedTitle = Title();
 	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END,
-			(fZoomRect.left - 5) - (fCloseRect.right + 5));
+		(fZoomRect.left - 5) - (fCloseRect.right + 5));
 	fTruncatedTitleLength = fTruncatedTitle.Length();
 	fDrawingEngine->SetFont(fDrawState.Font());
 
 	fDrawingEngine->DrawString(fTruncatedTitle,fTruncatedTitleLength,
-			BPoint(fTabRect.left+textoffset,fCloseRect.bottom-1));
+		BPoint(fTabRect.left+textoffset,fCloseRect.bottom-1));
 }
 
 
-void MacDecorator::_DrawZoom(BRect r)
+void
+MacDecorator::_DrawZoom(BRect r)
 {
-	bool down=GetClose();
+	bool down = GetClose();
 
 	// Just like DrawZoom, but for a close button
 	BRect rect(r);
@@ -681,84 +673,85 @@ void MacDecorator::_DrawZoom(BRect r)
 	BPoint offset(r.LeftTop()),pt2(r.RightTop());
 
 	pt2.x--;
-	fDrawState.SetHighColor(RGBColor(136,136,136));
-	fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
+	fDrawState.SetHighColor(RGBColor(136, 136, 136));
+	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
 
-	pt2=r.LeftBottom();
+	pt2 = r.LeftBottom();
 	pt2.y--;
-	fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
+	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
 
-	offset=r.RightBottom();
-	pt2=r.RightTop();
+	offset = r.RightBottom();
+	pt2 = r.RightTop();
 	pt2.y++;
-	fDrawState.SetHighColor(RGBColor(255,255,255));
-	fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
+	fDrawState.SetHighColor(RGBColor(255, 255, 255));
+	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
 
-	pt2=r.LeftBottom();
+	pt2 = r.LeftBottom();
 	pt2.x++;
-	fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
+	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
 
-	rect.InsetBy(1,1);
-	fDrawState.SetHighColor(RGBColor(0,0,0));
-	fDrawingEngine->StrokeRect(rect,fDrawState.HighColor());
+	rect.InsetBy(1, 1);
+	fDrawState.SetHighColor(RGBColor(0, 0, 0));
+	fDrawingEngine->StrokeRect(rect, fDrawState.HighColor());
 
-	rect.InsetBy(1,1);
+	rect.InsetBy(1, 1);
 	_DrawBlendedRect(fDrawingEngine, rect, down);
 	rect.InsetBy(1,1);
 	_DrawBlendedRect(fDrawingEngine, rect, !down);
 
-	rect.top+=2;
+	rect.top += 2;
 	rect.left--;
 	rect.right++;
 
-	fDrawState.SetHighColor(RGBColor(0,0,0));
-	fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightTop(),fDrawState.HighColor());
+	fDrawState.SetHighColor(RGBColor(0, 0, 0));
+	fDrawingEngine->StrokeLine(rect.LeftTop(), rect.RightTop(),
+		fDrawState.HighColor());
 }
 
 
 void
 MacDecorator::_DrawMinimize(BRect r)
 {
-	bool down=GetClose();
+	bool down = GetClose();
 
 	// Just like DrawZoom, but for a close button
 	BRect rect(r);
 
-	BPoint offset(r.LeftTop()),pt2(r.RightTop());
+	BPoint offset(r.LeftTop()), pt2(r.RightTop());
 
 	pt2.x--;
-	fDrawState.SetHighColor(RGBColor(136,136,136));
-	fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
+	fDrawState.SetHighColor(RGBColor(136, 136, 136));
+	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
 
-	pt2=r.LeftBottom();
+	pt2 = r.LeftBottom();
 	pt2.y--;
-	fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
+	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
 
-	offset=r.RightBottom();
-	pt2=r.RightTop();
+	offset = r.RightBottom();
+	pt2 = r.RightTop();
 	pt2.y++;
-	fDrawState.SetHighColor(RGBColor(255,255,255));
-	fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
+	fDrawState.SetHighColor(RGBColor(255, 255, 255));
+	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
 
-	pt2=r.LeftBottom();
+	pt2 = r.LeftBottom();
 	pt2.x++;
-	fDrawingEngine->StrokeLine(offset,pt2,fDrawState.HighColor());
+	fDrawingEngine->StrokeLine(offset, pt2, fDrawState.HighColor());
 
-	rect.InsetBy(1,1);
-	fDrawState.SetHighColor(RGBColor(0,0,0));
-	fDrawingEngine->StrokeRect(rect,fDrawState.HighColor());
+	rect.InsetBy(1, 1);
+	fDrawState.SetHighColor(RGBColor(0, 0, 0));
+	fDrawingEngine->StrokeRect(rect, fDrawState.HighColor());
 
-	rect.InsetBy(1,1);
+	rect.InsetBy(1, 1);
 	_DrawBlendedRect(fDrawingEngine, rect, down);
-	rect.InsetBy(1,1);
+	rect.InsetBy(1, 1);
 	_DrawBlendedRect(fDrawingEngine, rect, !down);
 
-	rect.top+=4;
-	rect.bottom-=4;
-	rect.InsetBy(-2,0);
+	rect.top += 4;
+	rect.bottom -= 4;
+	rect.InsetBy(-2, 0);
 
-	fDrawState.SetHighColor(RGBColor(0,0,0));
-	fDrawingEngine->StrokeRect(rect,fDrawState.HighColor());
+	fDrawState.SetHighColor(RGBColor(0, 0, 0));
+	fDrawingEngine->StrokeRect(rect, fDrawState.HighColor());
 }
 
 
@@ -812,14 +805,19 @@ MacDecorator::_DrawBlendedRect(DrawingEngine* engine, BRect rect,
 }
 
 
-extern "C" float get_decorator_version(void)
+// #pragma mark -
+
+
+extern "C" float
+get_decorator_version(void)
 {
 	return 1.00;
 }
 
 
-extern "C" Decorator *(instantiate_decorator)(DesktopSettings &desktopSetting, BRect rec,
-		window_look loo, uint32 flag)
+extern "C" Decorator*
+instantiate_decorator(DesktopSettings& desktopSetting, BRect rect,
+	window_look look, uint32 flag)
 {
-	return new MacDecorator(desktopSetting, rec, loo, flag);
+	return new MacDecorator(desktopSetting, rect, look, flag);
 }
