@@ -49,6 +49,9 @@ CPUCapabilities cpu;
 				if (cpu.HasSSE2() && width % 8 == 0 && height % 2 == 0) {
 					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgba32_sse2\n");
 					return gfx_conv_yuv420p_rgba32_sse2;
+				} else if (cpu.HasSSE1() && width % 4 == 0 && height % 2 == 0) {
+					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgba32_sse\n");
+					return gfx_conv_yuv420p_rgba32_sse;
 				} else {
 					TRACE("resolve_colorspace: gfx_conv_YCbCr420p_RGB32_c\n");
 					return gfx_conv_YCbCr420p_RGB32_c;
@@ -58,6 +61,8 @@ CPUCapabilities cpu;
 			if (pixelFormat == PIX_FMT_YUV422P || pixelFormat == PIX_FMT_YUVJ422P) {
 				if (cpu.HasSSE2() && width % 8 == 0) {
 					return gfx_conv_yuv422p_rgba32_sse2;
+				} else if (cpu.HasSSE1() && width % 4 == 0) {
+					return gfx_conv_yuv422p_rgba32_sse;
 				} else {
 					return gfx_conv_YCbCr422_RGB32_c;
 				}
