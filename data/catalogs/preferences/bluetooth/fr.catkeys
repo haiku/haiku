@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BluetoothPrefs	348749678
+1	french	x-vnd.Haiku-BluetoothPrefs	3840151416
 About Bluetooth…	Window		À propos de Bluetooth…
 Handheld	Settings view		Appareil de poche
 Default inquiry time:	Settings view		Temps de requête par défaut:
@@ -7,18 +7,16 @@ Starting scan...	Inquiry panel		Démarrage de la recherche...
 Show bluetooth console…	Window		Montrer le terminal bluetooth…
 Smart phone	Settings view		Téléphone
  seconds	Inquiry panel		 secondes
-Server	Settings view		Serveur
+Server	Window		Serveur
 Stop bluetooth services…	Window		Arrêter les services bluetooth…
 Identify host as:	Settings view		Identifier l'hôte comme :
 View	Window		Vue
 Refresh…	Remote devices		Rafraîchir…
 Pair…	Remote devices		Associer…
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système bluetoothHaiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec le soutien de :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nMerci à toutes les personnes qui ont aidé...\n\nDons de matériel :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinancièrement :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nRustines :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nQui m'ont tout appris :\n\t- l'équipe yellowTAB
 Incoming connections policy:	Settings view		Attitude envers les connexions entrantes :
 From all devices	Settings view		Tous les appareils
 Show name	Extended local device view		Montrer le nom
 Local devices found on system:	Settings view		Appareils locaux trouvés sur le système :
-Server	Window		Serveur
 Scanning completed.	Inquiry panel		Recherche complète.
 OK	main		Ok
 Remote devices list…	Window		Liste des appareils distants…
@@ -27,9 +25,10 @@ Remove	Remote devices		Enlever
 Start bluetooth services…	Window		Démarrer les services bluetooth…
 Policy...	Settings view		Attitude...
 61 secs	Settings view		61 secs
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système Bluetooth Haiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec l'aide de :\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nMerci à tous ceux qui ont apporté leur aide...\n\nDon/envoi de matériel :\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinancièrement :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nAvec du code :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesteurs :\n\t- Petter H. Juliussen\nCeux qui m'ont donné la connaissance :\n\t- l'équipe yellowTAB
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Aucun matériel bluetooth trouvé sur le système
 Identify us as...	Settings view		S'identifier comme...
-Remaining 	Inquiry panel		Restant 
+Remaining 	Inquiry panel		Restant
 As blocked	Remote devices		Comme bloqué
 Pick LocalDevice...	Settings view		Choisir LocalDevice...
 Defaults	Window		Défauts
@@ -38,10 +37,10 @@ Desktop	Settings view		Bureau
 Revert	Window		Défaire
 Remote devices	Window		Appareils distants
 Laptop	Settings view		Portable
-Retrieving name of 	Inquiry panel		Récupérer le nom de 
+Retrieving name of 	Inquiry panel		Récupérer le nom de
 Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Découvrable
-Service classes: 	Device View		Classes de services: 
+Service classes: 	Device View		Classes de services:
 Connections & channels…	Window		Liste des canaux et connexions…
 Refresh LocalDevices…	Window		Rafraîchir les LocalDevices…
 Settings	Window		Paramètres
