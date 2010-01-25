@@ -392,7 +392,7 @@ BSlider::AttachedToWindow()
 	BView* view = OffscreenView();
 	if (view && view->LockLooper()) {
 		view->SetViewColor(B_TRANSPARENT_COLOR);
-		view->SetLowColor(ViewColor());
+		view->SetLowColor(LowColor());
 		view->UnlockLooper();
 	}
 
@@ -827,7 +827,7 @@ BSlider::Draw(BRect updateRect)
 
 	if (fOffScreenBits->Lock()) {
 		fOffScreenView->SetViewColor(ViewColor());
-		fOffScreenView->SetLowColor(ViewColor());
+		fOffScreenView->SetLowColor(LowColor());
 #endif
 
 		if (drawBackground && background.Frame().IsValid())
