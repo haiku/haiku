@@ -12,6 +12,13 @@
 #include "slab_private.h"
 
 
+static inline slab *
+slab_in_pages(const void *pages, size_t slab_size)
+{
+	return (slab *)(((uint8 *)pages) + slab_size - sizeof(slab));
+}
+
+
 /*static*/ SmallObjectCache*
 SmallObjectCache::Create(const char* name, size_t object_size,
 	size_t alignment, size_t maximum, uint32 flags, void* cookie,
@@ -57,7 +64,11 @@ SmallObjectCache::CreateSlab(uint32 flags)
 
 	void* pages;
 
-	if (MemoryManager::Allocate(this, flags, pages) != B_OK)
+	Unlock();
+	status_t error = MemoryManager::Allocate(this, flags, pages);
+	Lock();
+
+	if (error != B_OK)
 		return NULL;
 
 	return InitSlab(slab_in_pages(pages, slab_size), pages,
@@ -69,7 +80,10 @@ void
 SmallObjectCache::ReturnSlab(slab* slab, uint32 flags)
 {
 	UninitSlab(slab);
+
+	Unlock();
 	MemoryManager::Free(slab->pages, flags);
+	Lock();
 }
 
 

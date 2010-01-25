@@ -133,23 +133,15 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 	CREATE_PARANOIA_CHECK_SET(slab, "slab");
 
 	for (size_t i = 0; i < slab->size; i++) {
-		bool failedOnFirst = false;
-
-		status_t status = PrepareObject(slab, data, flags);
-		if (status < B_OK)
-			failedOnFirst = true;
-		else if (constructor)
+		status_t status = B_OK;
+		if (constructor)
 			status = constructor(cookie, data);
 
-		if (status < B_OK) {
-			if (!failedOnFirst)
-				UnprepareObject(slab, data, flags);
-
+		if (status != B_OK) {
 			data = ((uint8*)pages) + slab->offset;
 			for (size_t j = 0; j < i; j++) {
 				if (destructor)
 					destructor(cookie, data);
-				UnprepareObject(slab, data, flags);
 				data += object_size;
 			}
 
@@ -191,22 +183,8 @@ ObjectCache::UninitSlab(slab* slab)
 	for (size_t i = 0; i < slab->size; i++) {
 		if (destructor)
 			destructor(cookie, data);
-		UnprepareObject(slab, data, flags);
 		data += object_size;
 	}
-}
-
-
-status_t
-ObjectCache::PrepareObject(slab* source, void* object, uint32 flags)
-{
-	return B_OK;
-}
-
-
-void
-ObjectCache::UnprepareObject(slab* source, void* object, uint32 flags)
-{
 }
 
 

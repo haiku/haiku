@@ -25,15 +25,15 @@ __fls0(size_t value)
 }
 
 
-static slab*
+static HashedSlab*
 allocate_slab(uint32 flags)
 {
-	return (slab*)slab_internal_alloc(sizeof(slab), flags);
+	return (HashedSlab*)slab_internal_alloc(sizeof(HashedSlab), flags);
 }
 
 
 static void
-free_slab(slab* slab, uint32 flags)
+free_slab(HashedSlab* slab, uint32 flags)
 {
 	slab_internal_free(slab, flags);
 }
@@ -83,7 +83,7 @@ HashedObjectCache::Create(const char* name, size_t object_size,
 		cache->slab_size = 8 * object_size;
 
 	cache->slab_size = MemoryManager::AcceptableChunkSize(cache->slab_size);
-	cache->lower_boundary = __fls0(cache->object_size);
+	cache->lower_boundary = __fls0(cache->slab_size);
 
 	return cache;
 }
@@ -105,13 +105,16 @@ HashedObjectCache::CreateSlab(uint32 flags)
 
 	Unlock();
 
-	slab* slab = allocate_slab(flags);
+	HashedSlab* slab = allocate_slab(flags);
 	if (slab != NULL) {
 		void* pages;
 		if (MemoryManager::Allocate(this, flags, pages) == B_OK) {
 			Lock();
-			if (InitSlab(slab, pages, slab_size, flags))
+			if (InitSlab(slab, pages, slab_size, flags)) {
+				hash_table.InsertUnchecked(slab);
+				_ResizeHashTableIfNeeded(flags);
 				return slab;
+			}
 			Unlock();
 			MemoryManager::Free(pages, flags);
 		}
@@ -125,9 +128,15 @@ HashedObjectCache::CreateSlab(uint32 flags)
 
 
 void
-HashedObjectCache::ReturnSlab(slab* slab, uint32 flags)
+HashedObjectCache::ReturnSlab(slab* _slab, uint32 flags)
 {
+	HashedSlab* slab = static_cast<HashedSlab*>(_slab);
+
+	hash_table.RemoveUnchecked(slab);
+	_ResizeHashTableIfNeeded(flags);
+
 	UninitSlab(slab);
+
 	Unlock();
 	MemoryManager::Free(slab->pages, flags);
 	free_slab(slab, flags);
@@ -138,51 +147,12 @@ HashedObjectCache::ReturnSlab(slab* slab, uint32 flags)
 slab*
 HashedObjectCache::ObjectSlab(void* object) const
 {
-	Link* link = hash_table.Lookup(object);
-	if (link == NULL) {
-		panic("object cache: requested object %p missing from hash table",
-			object);
+	HashedSlab* slab = hash_table.Lookup(::lower_boundary(object, slab_size));
+	if (slab == NULL) {
+		panic("hash object cache %p: unknown object %p", this, object);
 		return NULL;
 	}
-	return link->parent;
-}
-
-
-status_t
-HashedObjectCache::PrepareObject(slab* source, void* object, uint32 flags)
-{
-	Link* link = _AllocateLink(flags);
-	if (link == NULL)
-		return B_NO_MEMORY;
-
-	link->buffer = object;
-	link->parent = source;
-
-	hash_table.InsertUnchecked(link);
-	_ResizeHashTableIfNeeded(flags);
-
-	return B_OK;
-}
-
-
-void
-HashedObjectCache::UnprepareObject(slab* source, void* object, uint32 flags)
-{
-	Link* link = hash_table.Lookup(object);
-	if (link == NULL) {
-		panic("object cache: requested object missing from hash table");
-		return;
-	}
-
-	if (link->parent != source) {
-		panic("object cache: slab mismatch");
-		return;
-	}
-
-	hash_table.RemoveUnchecked(link);
-	_ResizeHashTableIfNeeded(flags);
-
-	_FreeLink(link, flags);
+	return slab;
 }
 
 
@@ -207,19 +177,4 @@ HashedObjectCache::_ResizeHashTableIfNeeded(uint32 flags)
 			}
 		}
 	}
-}
-
-
-/*static*/ inline HashedObjectCache::Link*
-HashedObjectCache::_AllocateLink(uint32 flags)
-{
-	return (HashedObjectCache::Link*)
-		slab_internal_alloc(sizeof(HashedObjectCache::Link), flags);
-}
-
-
-/*static*/ inline void
-HashedObjectCache::_FreeLink(HashedObjectCache::Link* link, uint32 flags)
-{
-	slab_internal_free(link, flags);
 }

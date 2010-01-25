@@ -94,11 +94,6 @@ public:
 									size_t byteCount, uint32 flags);
 			void				UninitSlab(slab* slab);
 
-	virtual	status_t			PrepareObject(slab* source, void* object,
-									uint32 flags);
-	virtual	void				UnprepareObject(slab* source, void* object,
-									uint32 flags);
-
 			void				ReturnObjectToSlab(slab* source, void* object,
 									uint32 flags);
 
@@ -127,23 +122,15 @@ object_to_link(void* object, size_t objectSize)
 }
 
 
-static inline slab *
-slab_in_pages(const void *pages, size_t slab_size)
+static inline void*
+lower_boundary(const void* object, size_t byteCount)
 {
-	return (slab *)(((uint8 *)pages) + slab_size - sizeof(slab));
-}
-
-
-static inline const void *
-lower_boundary(void *object, size_t byteCount)
-{
-	const uint8 *null = (uint8 *)NULL;
-	return null + ((((uint8 *)object) - null) & ~(byteCount - 1));
+	return (void*)((addr_t)object & ~(byteCount - 1));
 }
 
 
 static inline bool
-check_cache_quota(ObjectCache *cache)
+check_cache_quota(ObjectCache* cache)
 {
 	if (cache->maximum == 0)
 		return true;

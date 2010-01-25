@@ -14,6 +14,11 @@
 #include "slab_private.h"
 
 
+struct HashedSlab : slab {
+	HashedSlab*	hash_next;
+};
+
+
 struct HashedObjectCache : ObjectCache {
 								HashedObjectCache();
 
@@ -29,22 +34,11 @@ struct HashedObjectCache : ObjectCache {
 	virtual	void				ReturnSlab(slab* slab, uint32 flags);
 	virtual slab*				ObjectSlab(void* object) const;
 
-	virtual	status_t			PrepareObject(slab* source, void* object,
-									uint32 flags);
-	virtual	void				UnprepareObject(slab* source, void* object,
-									uint32 flags);
-
 private:
-			struct Link {
-				const void*	buffer;
-				slab*		parent;
-				Link*		next;
-			};
-
 			struct Definition {
 				typedef HashedObjectCache	ParentType;
 				typedef const void*			KeyType;
-				typedef Link				ValueType;
+				typedef HashedSlab			ValueType;
 
 				Definition(HashedObjectCache* parent)
 					:
@@ -60,23 +54,23 @@ private:
 
 				size_t HashKey(const void* key) const
 				{
-					return (((const uint8*)key) - ((const uint8*)0))
+					return (addr_t)::lower_boundary(key, parent->slab_size)
 						>> parent->lower_boundary;
 				}
 
-				size_t Hash(Link* value) const
+				size_t Hash(HashedSlab* value) const
 				{
-					return HashKey(value->buffer);
+					return HashKey(value->pages);
 				}
 
-				bool Compare(const void* key, Link* value) const
+				bool Compare(const void* key, HashedSlab* value) const
 				{
-					return value->buffer == key;
+					return value->pages == key;
 				}
 
-				Link*& GetLink(Link* value) const
+				HashedSlab*& GetLink(HashedSlab* value) const
 				{
-					return value->next;
+					return value->hash_next;
 				}
 
 				HashedObjectCache*	parent;
@@ -101,10 +95,6 @@ private:
 
 private:
 			void				_ResizeHashTableIfNeeded(uint32 flags);
-
-	static	Link*				_AllocateLink(uint32 flags);
-	static	void				_FreeLink(HashedObjectCache::Link* link,
-									uint32 flags);
 
 private:
 			HashTable hash_table;
