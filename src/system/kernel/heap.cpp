@@ -1687,6 +1687,9 @@ heap_set_get_caller(heap_allocator* heap, addr_t (*getCaller)())
 #endif
 
 
+#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+
+
 static status_t
 heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	size_t newSize)
@@ -1792,6 +1795,9 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	heap_free(heap, address);
 	return B_OK;
 }
+
+
+#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
 
 
 inline uint32
@@ -2043,6 +2049,9 @@ heap_init_post_thread()
 
 
 //	#pragma mark - Public API
+
+
+#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
 
 
 void *
@@ -2310,6 +2319,9 @@ realloc(void *address, size_t newSize)
 		newSize);
 	return NULL;
 }
+
+
+#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
 
 
 void *

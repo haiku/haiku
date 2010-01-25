@@ -41,19 +41,28 @@ public:
 									void*& _pages);
 	static	void				Free(void* pages, uint32 flags);
 
+	static	status_t			AllocateRaw(size_t size, uint32 flags,
+									void*& _pages);
+	static	ObjectCache*		FreeRawOrReturnCache(void* pages,
+									uint32 flags);
+
 	static	size_t				AcceptableChunkSize(size_t size);
+	static	ObjectCache*		GetAllocationInfo(void* address,
+									size_t& _size);
 	static	ObjectCache*		CacheForAddress(void* address);
 
 	static	bool				MaintenanceNeeded();
 	static	void				PerformMaintenance();
 
 private:
+			struct Tracing;
+
 			struct Area;
 
 			struct Chunk {
 				union {
 					Chunk*		next;
-					ObjectCache* cache;
+					addr_t		reference;
 				};
 			};
 
@@ -63,6 +72,8 @@ private:
 				size_t			totalSize;
 				uint16			chunkCount;
 				uint16			usedChunkCount;
+				uint16			firstFreeChunk;	// *some* free range
+				uint16			lastFreeChunk;	// inclusive
 				Chunk			chunks[SLAB_SMALL_CHUNKS_PER_META_CHUNK];
 				Chunk*			freeChunks;
 
@@ -115,7 +126,11 @@ private:
 			};
 
 private:
-	static	status_t			_AllocateChunk(size_t chunkSize, uint32 flags,
+	static	status_t			_AllocateChunks(size_t chunkSize,
+									uint32 chunkCount, uint32 flags,
+									MetaChunk*& _metaChunk, Chunk*& _chunk);
+	static	bool				_GetChunks(MetaChunkList* metaChunkList,
+									size_t chunkSize, uint32 chunkCount,
 									MetaChunk*& _metaChunk, Chunk*& _chunk);
 	static	bool				_GetChunk(MetaChunkList* metaChunkList,
 									size_t chunkSize, MetaChunk*& _metaChunk,
@@ -135,10 +150,9 @@ private:
 	static	status_t			_MapChunk(VMArea* vmArea, addr_t address,
 									size_t size, size_t reserveAdditionalMemory,
 									uint32 flags);
-	static	status_t			_UnmapChunk(VMArea* vmArea,addr_t address,
+	static	status_t			_UnmapChunk(VMArea* vmArea, addr_t address,
 									size_t size, uint32 flags);
 
-	static	void				_UnmapChunkEarly(addr_t address, size_t size);
 	static	void				_UnmapFreeChunksEarly(Area* area);
 	static	void				_ConvertEarlyArea(Area* area);
 
@@ -148,7 +162,10 @@ private:
 									const MetaChunk* metaChunk, addr_t address);
 	static	addr_t				_ChunkAddress(const MetaChunk* metaChunk,
 									const Chunk* chunk);
+	static	bool				_IsChunkFree(const MetaChunk* metaChunk,
+									const Chunk* chunk);
 
+	static	int					_DumpRawAllocations(int argc, char** argv);
 	static	void				_PrintMetaChunkTableHeader(bool printChunks);
 	static	void				_DumpMetaChunk(MetaChunk* metaChunk,
 									bool printChunks, bool printHeader);
@@ -199,6 +216,15 @@ MemoryManager::_ChunkAddress(const MetaChunk* metaChunk, const Chunk* chunk)
 {
 	return metaChunk->chunkBase
 		+ (chunk - metaChunk->chunks) * metaChunk->chunkSize;
+}
+
+
+/*static*/ inline bool
+MemoryManager::_IsChunkFree(const MetaChunk* metaChunk, const Chunk* chunk)
+{
+	return chunk->next == NULL
+		|| (chunk->next >= metaChunk->chunks
+			&& chunk->next < metaChunk->chunks + metaChunk->chunkCount);
 }
 
 

@@ -3223,16 +3223,13 @@ vm_init(kernel_args* args)
 	if (heapSize < 1024 * 1024)
 		panic("vm_init: go buy some RAM please.");
 
+	slab_init(args);
+
 	// map in the new heap and initialize it
 	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
 	TRACE(("heap at 0x%lx\n", heapBase));
 	heap_init(heapBase, heapSize);
-
-	size_t slabInitialSize = B_PAGE_SIZE;
-	addr_t slabInitialBase = vm_allocate_early(args, slabInitialSize,
-		slabInitialSize, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
-	slab_init(args, slabInitialBase, slabInitialSize);
 
 	// initialize the free page list and physical page mapper
 	vm_page_init(args);
@@ -3261,11 +3258,6 @@ vm_init(kernel_args* args)
 	address = (void*)ROUNDDOWN(heapBase, B_PAGE_SIZE);
 	create_area("kernel heap", &address, B_EXACT_ADDRESS, heapSize,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-
-	address = (void*)ROUNDDOWN(slabInitialBase, B_PAGE_SIZE);
-	create_area("initial slab space", &address, B_EXACT_ADDRESS,
-		slabInitialSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA
-		| B_KERNEL_WRITE_AREA);
 
 	allocate_kernel_args(args);
 

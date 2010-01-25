@@ -112,15 +112,18 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 	slab->pages = pages;
 	slab->count = slab->size = byteCount / object_size;
 	slab->free = NULL;
-	total_objects += slab->size;
 
 	size_t spareBytes = byteCount - (slab->size * object_size);
-	slab->offset = cache_color_cycle;
 
-	if (slab->offset > spareBytes)
-		cache_color_cycle = slab->offset = 0;
-	else
-		cache_color_cycle += kCacheColorPeriod;
+	if ((this->flags & CACHE_ALIGN_ON_SIZE) != 0) {
+		slab->offset = cache_color_cycle;
+
+		if (slab->offset > spareBytes)
+			cache_color_cycle = slab->offset = 0;
+		else
+			cache_color_cycle += kCacheColorPeriod;
+	} else
+		slab->offset = 0;
 
 	TRACE_CACHE(this, "  %lu objects, %lu spare bytes, offset %lu",
 		slab->size, spareBytes, slab->offset);
@@ -163,6 +166,9 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 		data += object_size;
 	}
 
+	usage += slab_size;
+	total_objects += slab->size;
+
 	return slab;
 }
 
@@ -175,6 +181,7 @@ ObjectCache::UninitSlab(slab* slab)
 	if (slab->count != slab->size)
 		panic("cache: destroying a slab which isn't empty.");
 
+	usage -= slab_size;
 	total_objects -= slab->size;
 
 	DELETE_PARANOIA_CHECK_SET(slab);

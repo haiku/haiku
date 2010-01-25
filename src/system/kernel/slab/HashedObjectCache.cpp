@@ -61,6 +61,16 @@ HashedObjectCache::Create(const char* name, size_t object_size,
 
 	HashedObjectCache* cache = new(buffer) HashedObjectCache();
 
+	// init the hash table
+	size_t hashSize = cache->hash_table.ResizeNeeded();
+	buffer = slab_internal_alloc(hashSize, flags);
+	if (buffer == NULL) {
+		cache->Delete();
+		return NULL;
+	}
+
+	cache->hash_table.Resize(buffer, hashSize, true);
+
 	if (cache->Init(name, object_size, alignment, maximum, flags, cookie,
 			constructor, destructor, reclaimer) != B_OK) {
 		cache->Delete();
@@ -96,21 +106,20 @@ HashedObjectCache::CreateSlab(uint32 flags)
 	Unlock();
 
 	slab* slab = allocate_slab(flags);
+	if (slab != NULL) {
+		void* pages;
+		if (MemoryManager::Allocate(this, flags, pages) == B_OK) {
+			Lock();
+			if (InitSlab(slab, pages, slab_size, flags))
+				return slab;
+			Unlock();
+			MemoryManager::Free(pages, flags);
+		}
 
-	Lock();
-
-	if (slab == NULL)
-		return NULL;
-
-	void* pages;
-	if (MemoryManager::Allocate(this, flags, pages) == B_OK) {
-		if (InitSlab(slab, pages, slab_size, flags))
-			return slab;
-
-		MemoryManager::Free(pages, flags);
+		free_slab(slab, flags);
 	}
 
-	free_slab(slab, flags);
+	Lock();
 	return NULL;
 }
 
@@ -119,8 +128,10 @@ void
 HashedObjectCache::ReturnSlab(slab* slab, uint32 flags)
 {
 	UninitSlab(slab);
+	Unlock();
 	MemoryManager::Free(slab->pages, flags);
 	free_slab(slab, flags);
+	Lock();
 }
 
 
@@ -147,11 +158,9 @@ HashedObjectCache::PrepareObject(slab* source, void* object, uint32 flags)
 	link->buffer = object;
 	link->parent = source;
 
-	hash_table.Insert(link);
-		// TODO: This might resize the table! Currently it uses the heap, so
-		// we won't possibly reenter and deadlock on our own cache. We do ignore
-		// the flags, though!
-		// TODO: We don't pre-init the table, so Insert() can fail!
+	hash_table.InsertUnchecked(link);
+	_ResizeHashTableIfNeeded(flags);
+
 	return B_OK;
 }
 
@@ -170,8 +179,34 @@ HashedObjectCache::UnprepareObject(slab* source, void* object, uint32 flags)
 		return;
 	}
 
-	hash_table.Remove(link);
+	hash_table.RemoveUnchecked(link);
+	_ResizeHashTableIfNeeded(flags);
+
 	_FreeLink(link, flags);
+}
+
+
+void
+HashedObjectCache::_ResizeHashTableIfNeeded(uint32 flags)
+{
+	size_t hashSize = hash_table.ResizeNeeded();
+	if (hashSize != 0) {
+		Unlock();
+		void* buffer = slab_internal_alloc(hashSize, flags);
+		Lock();
+
+		if (buffer != NULL) {
+			if (hash_table.ResizeNeeded() == hashSize) {
+				void* oldHash;
+				hash_table.Resize(buffer, hashSize, true, &oldHash);
+				if (oldHash != NULL) {
+					Unlock();
+					slab_internal_free(oldHash, flags);
+					Lock();
+				}
+			}
+		}
+	}
 }
 
 

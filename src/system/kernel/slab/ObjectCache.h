@@ -34,6 +34,7 @@ typedef DoublyLinkedList<slab> SlabList;
 
 struct ObjectCacheResizeEntry {
 	ConditionVariable	condition;
+	thread_id			thread;
 };
 
 struct ObjectCache : DoublyLinkedListLinkImpl<ObjectCache> {

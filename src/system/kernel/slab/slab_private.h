@@ -11,6 +11,8 @@
 
 #include <stddef.h>
 
+#include <slab/Slab.h>
+
 
 //#define TRACE_SLAB
 #ifdef TRACE_SLAB
@@ -26,16 +28,12 @@
 
 struct ObjectCache;
 
-void*		slab_internal_alloc(size_t size, uint32 flags);
-void		slab_internal_free(void *_buffer, uint32 flags);
-
 void		request_memory_manager_maintenance();
 
-void*		block_alloc(size_t size, uint32 flags);
+void*		block_alloc(size_t size, size_t alignment, uint32 flags);
 void*		block_alloc_early(size_t size);
-void		block_free(void *block, uint32 flags);
-void		block_allocator_init_boot(addr_t bootStrapBase,
-				size_t bootStrapSize);
+void		block_free(void* block, uint32 flags);
+void		block_allocator_init_boot();
 void		block_allocator_init_rest();
 
 
@@ -55,6 +53,23 @@ _push(Type*& head, Type* object)
 {
 	object->next = head;
 	head = object;
+}
+
+
+static inline void*
+slab_internal_alloc(size_t size, uint32 flags)
+{
+	if (flags & CACHE_DURING_BOOT)
+		return block_alloc_early(size);
+
+	return block_alloc(size, 0, flags);
+}
+
+
+static inline void
+slab_internal_free(void* buffer, uint32 flags)
+{
+	block_free(buffer, flags);
 }
 
 

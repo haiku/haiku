@@ -11,6 +11,7 @@
 #include <util/OpenHashTable.h>
 
 #include "ObjectCache.h"
+#include "slab_private.h"
 
 
 struct HashedObjectCache : ObjectCache {
@@ -81,11 +82,26 @@ private:
 				HashedObjectCache*	parent;
 			};
 
-			typedef BOpenHashTable<Definition> HashTable;
+			struct InternalAllocator {
+				void* Allocate(size_t size) const
+				{
+					return slab_internal_alloc(size, 0);
+				}
+
+				void Free(void* memory) const
+				{
+					slab_internal_free(memory, 0);
+				}
+			};
+
+			typedef BOpenHashTable<Definition, false, false,
+				InternalAllocator> HashTable;
 
 			friend class Definition;
 
 private:
+			void				_ResizeHashTableIfNeeded(uint32 flags);
+
 	static	Link*				_AllocateLink(uint32 flags);
 	static	void				_FreeLink(HashedObjectCache::Link* link,
 									uint32 flags);

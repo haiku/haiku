@@ -50,10 +50,10 @@ static MaintenanceQueue sMaintenanceQueue;
 static ConditionVariable sMaintenanceCondition;
 
 
-#if OBJECT_CACHE_TRACING
+#if SLAB_OBJECT_CACHE_TRACING
 
 
-namespace ObjectCacheTracing {
+namespace SlabObjectCacheTracing {
 
 class ObjectCacheTraceEntry : public AbstractTraceEntry {
 	public:
@@ -186,13 +186,13 @@ class Reserve : public ObjectCacheTraceEntry {
 };
 
 
-}	// namespace ObjectCacheTracing
+}	// namespace SlabObjectCacheTracing
 
-#	define T(x)	new(std::nothrow) ObjectCacheTracing::x
+#	define T(x)	new(std::nothrow) SlabObjectCacheTracing::x
 
 #else
 #	define T(x)
-#endif	// OBJECT_CACHE_TRACING
+#endif	// SLAB_OBJECT_CACHE_TRACING
 
 
 // #pragma mark -
@@ -211,8 +211,7 @@ dump_slabs(int argc, char* argv[])
 
 		kprintf("%p %22s %8lu %8lu %6lu %8lu %8lu %8lx\n", cache, cache->name,
 			cache->object_size, cache->usage, cache->empty_count,
-			cache->used_count, cache->usage / cache->object_size,
-			cache->flags);
+			cache->used_count, cache->total_objects, cache->flags);
 	}
 
 	return 0;
@@ -241,29 +240,14 @@ dump_cache_info(int argc, char* argv[])
 	kprintf("maximum: %lu\n", cache->maximum);
 	kprintf("flags: 0x%lx\n", cache->flags);
 	kprintf("cookie: %p\n", cache->cookie);
+	kprintf("resize entry don't wait: %p\n", cache->resize_entry_dont_wait);
+	kprintf("resize entry can wait: %p\n", cache->resize_entry_can_wait);
 
 	return 0;
 }
 
 
 // #pragma mark -
-
-
-void*
-slab_internal_alloc(size_t size, uint32 flags)
-{
-	if (flags & CACHE_DURING_BOOT)
-		return block_alloc_early(size);
-
-	return block_alloc(size, flags);
-}
-
-
-void
-slab_internal_free(void* buffer, uint32 flags)
-{
-	block_free(buffer, flags);
-}
 
 
 void
@@ -322,6 +306,7 @@ object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 {
 	// If someone else is already adding slabs, we wait for that to be finished
 	// first.
+	thread_id thread = find_thread(NULL);
 	while (true) {
 		if (objectCount <= cache->total_objects - cache->used_count)
 			return B_OK;
@@ -329,9 +314,19 @@ object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 		ObjectCacheResizeEntry* resizeEntry = NULL;
 		if (cache->resize_entry_dont_wait != NULL) {
 			resizeEntry = cache->resize_entry_dont_wait;
-		} else if (cache->resize_entry_can_wait != NULL
-				&& (flags & CACHE_DONT_WAIT_FOR_MEMORY) == 0) {
+			if (thread == resizeEntry->thread)
+				return B_WOULD_BLOCK;
+			// Note: We could still have reentered the function, i.e.
+			// resize_entry_can_wait would be ours. That doesn't matter much,
+			// though, since after the don't-wait thread has done its job
+			// everyone will be happy.
+		} else if (cache->resize_entry_can_wait != NULL) {
 			resizeEntry = cache->resize_entry_can_wait;
+			if (thread == resizeEntry->thread)
+				return B_WOULD_BLOCK;
+
+			if ((flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0)
+				break;
 		} else
 			break;
 
@@ -351,6 +346,7 @@ object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 	ObjectCacheResizeEntry myResizeEntry;
 	resizeEntry = &myResizeEntry;
 	resizeEntry->condition.Init(cache, "wait for slabs");
+	resizeEntry->thread = thread;
 
 	// add new slabs until there are as many free ones as requested
 	while (objectCount > cache->total_objects - cache->used_count) {
@@ -431,29 +427,13 @@ object_cache_low_memory(void* dummy, uint32 resources, int32 level)
 				break;
 		}
 
-		// If the object cache has minimum object reserve, make sure that we
-		// don't free too many slabs.
-		if (cache->min_object_reserve > 0 && cache->empty_count > 0) {
+		while (cache->empty_count > minimumAllowed) {
+			// make sure we respect the cache's minimum object reserve
 			size_t objectsPerSlab = cache->empty.Head()->size;
 			size_t freeObjects = cache->total_objects - cache->used_count;
+			if (freeObjects < cache->min_object_reserve + objectsPerSlab)
+				break;
 
-			if (cache->min_object_reserve + objectsPerSlab >= freeObjects)
-				return;
-
-			size_t slabsToFree = (freeObjects - cache->min_object_reserve)
-				/ objectsPerSlab;
-
-			if (cache->empty_count > minimumAllowed + slabsToFree)
-				minimumAllowed = cache->empty_count - slabsToFree;
-		}
-
-		if (cache->empty_count <= minimumAllowed)
-			return;
-
-		TRACE_CACHE(cache, "cache: memory pressure, will release down to %lu.",
-			minimumAllowed);
-
-		while (cache->empty_count > minimumAllowed) {
 			cache->ReturnSlab(cache->empty.RemoveHead(), 0);
 			cache->empty_count--;
 		}
@@ -649,23 +629,26 @@ object_cache_alloc(object_cache* cache, uint32 flags)
 	}
 
 	MutexLocker _(cache->lock);
-	slab* source;
+	slab* source = NULL;
 
-	if (cache->partial.IsEmpty()) {
-		if (cache->empty.IsEmpty()) {
-			if (object_cache_reserve_internal(cache, 1, flags) < B_OK) {
-				T(Alloc(cache, flags, NULL));
-				return NULL;
-			}
-
-			cache->pressure++;
-		}
+	while (true) {
+		source = cache->partial.Head();
+		if (source != NULL)
+			break;
 
 		source = cache->empty.RemoveHead();
-		cache->empty_count--;
-		cache->partial.Add(source);
-	} else {
-		source = cache->partial.Head();
+		if (source != NULL) {
+			cache->empty_count--;
+			cache->partial.Add(source);
+			break;
+		}
+
+		if (object_cache_reserve_internal(cache, 1, flags) != B_OK) {
+			T(Alloc(cache, flags, NULL));
+			return NULL;
+		}
+
+		cache->pressure++;
 	}
 
 	ParanoiaChecker _2(source);
@@ -734,19 +717,17 @@ object_cache_get_usage(object_cache* cache, size_t* _allocatedMemory)
 
 
 void
-slab_init(kernel_args* args, addr_t initialBase, size_t initialSize)
+slab_init(kernel_args* args)
 {
-	dprintf("slab: init base %p + 0x%lx\n", (void*)initialBase, initialSize);
-
 	MemoryManager::Init(args);
 
 	new (&sObjectCaches) ObjectCacheList();
 
-	block_allocator_init_boot(initialBase, initialSize);
+	block_allocator_init_boot();
 
 	add_debugger_command("slabs", dump_slabs, "list all object caches");
-	add_debugger_command("cache_info", dump_cache_info,
-		"dump information about a specific cache");
+	add_debugger_command("slab_cache", dump_cache_info,
+		"dump information about a specific object cache");
 }
 
 

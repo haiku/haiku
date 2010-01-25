@@ -94,6 +94,9 @@
 // Enables swap support.
 #define ENABLE_SWAP_SUPPORT				1
 
+// Use the slab allocator as generic memory allocator (malloc()/free()).
+#define USE_SLAB_ALLOCATOR_FOR_MALLOC	0
+
 // When set limits the amount of available RAM (in MB).
 //#define LIMIT_AVAILABLE_MEMORY	256
 

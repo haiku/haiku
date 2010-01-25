@@ -24,9 +24,8 @@ SmallObjectCache::Create(const char* name, size_t object_size,
 
 	SmallObjectCache* cache = new(buffer) SmallObjectCache();
 
-	if (cache->Init(name, object_size, alignment, maximum,
-			flags | CACHE_ALIGN_ON_SIZE, cookie, constructor, destructor,
-			reclaimer) != B_OK) {
+	if (cache->Init(name, object_size, alignment, maximum, flags, cookie,
+			constructor, destructor, reclaimer) != B_OK) {
 		cache->Delete();
 		return NULL;
 	}

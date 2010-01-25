@@ -49,8 +49,7 @@ void vm_free_unused_boot_loader_range(addr_t start, addr_t end);
 addr_t vm_allocate_early(struct kernel_args *args, size_t virtualSize,
 			size_t physicalSize, uint32 attributes, bool blockAlign);
 
-void slab_init(struct kernel_args *args, addr_t initialBase,
-	size_t initialSize);
+void slab_init(struct kernel_args *args);
 void slab_init_post_area();
 void slab_init_post_sem();
 void slab_init_post_thread();
