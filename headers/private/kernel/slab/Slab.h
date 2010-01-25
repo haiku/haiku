@@ -15,7 +15,7 @@
 enum {
 	/* create_object_cache_etc flags */
 	CACHE_NO_DEPOT					= 1 << 0,
-	CACHE_UNLOCKED_PAGES			= 1 << 1,
+	CACHE_UNLOCKED_PAGES			= 1 << 1,	// unsupported
 	CACHE_LARGE_SLAB				= 1 << 2,
 
 	/* object_cache_{alloc,free}() flags */
