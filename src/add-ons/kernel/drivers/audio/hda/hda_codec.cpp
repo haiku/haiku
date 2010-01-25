@@ -1388,14 +1388,6 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	}
 	codec->unsol_response_read = 0;
 	codec->unsol_response_write = 0;
-	codec->unsol_response_thread = spawn_kernel_thread(
-		(status_t(*)(void*))hda_codec_switch_handler,
-		"hda_codec_unsol_thread", B_LOW_PRIORITY, codec);
-	if (codec->unsol_response_thread < B_OK) {
-		ERROR("hda: Failed to spawn thread\n");
-		goto err;
-	}
-	resume_thread(codec->unsol_response_thread);
 
 	struct {
 		uint32 device : 16;
@@ -1455,6 +1447,15 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 			}
 		}
 	}
+	
+	codec->unsol_response_thread = spawn_kernel_thread(
+		(status_t(*)(void*))hda_codec_switch_handler,
+		"hda_codec_unsol_thread", B_LOW_PRIORITY, codec);
+	if (codec->unsol_response_thread < B_OK) {
+		ERROR("hda: Failed to spawn thread\n");
+		goto err;
+	}
+	resume_thread(codec->unsol_response_thread);
 
 	return codec;
 err:
