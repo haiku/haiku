@@ -3016,6 +3016,7 @@ _dump_vnode(struct vnode* vnode)
 	kprintf(" mount:         %p\n", vnode->mount);
 	kprintf(" covered_by:    %p\n", vnode->covered_by);
 	kprintf(" cache:         %p\n", vnode->cache);
+	kprintf(" type:          %#" B_PRIx32 "\n", vnode->Type());
 	kprintf(" flags:         %s%s%s\n", vnode->IsRemoved() ? "r" : "-",
 		vnode->IsBusy() ? "b" : "-", vnode->IsUnpublished() ? "u" : "-");
 	kprintf(" advisory_lock: %p\n", vnode->advisory_locking);
