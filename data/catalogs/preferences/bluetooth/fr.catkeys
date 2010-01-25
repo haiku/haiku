@@ -7,7 +7,7 @@ Starting scan...	Inquiry panel		Démarrage de la recherche...
 Show bluetooth console…	Window		Montrer le terminal bluetooth…
 Smart phone	Settings view		Téléphone
  seconds	Inquiry panel		 secondes
-Server	Window		Serveur
+Server	Settings view		Server
 Stop bluetooth services…	Window		Arrêter les services bluetooth…
 Identify host as:	Settings view		Identifier l'hôte comme :
 View	Window		Vue
@@ -17,6 +17,7 @@ Incoming connections policy:	Settings view		Attitude envers les connexions entra
 From all devices	Settings view		Tous les appareils
 Show name	Extended local device view		Montrer le nom
 Local devices found on system:	Settings view		Appareils locaux trouvés sur le système :
+Server	Window		Serveur
 Scanning completed.	Inquiry panel		Recherche complète.
 OK	main		Ok
 Remote devices list…	Window		Liste des appareils distants…
