@@ -724,10 +724,6 @@ slab_init(kernel_args* args)
 	new (&sObjectCaches) ObjectCacheList();
 
 	block_allocator_init_boot();
-
-	add_debugger_command("slabs", dump_slabs, "list all object caches");
-	add_debugger_command("slab_cache", dump_cache_info,
-		"dump information about a specific object cache");
 }
 
 
@@ -735,6 +731,10 @@ void
 slab_init_post_area()
 {
 	MemoryManager::InitPostArea();
+
+	add_debugger_command("slabs", dump_slabs, "list all object caches");
+	add_debugger_command("slab_cache", dump_cache_info,
+		"dump information about a specific object cache");
 }
 
 
