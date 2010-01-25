@@ -594,6 +594,12 @@ VMCache::Init(uint32 cacheType)
 	type = cacheType;
 	fPageEventWaiters = NULL;
 
+#if DEBUG_CACHE_LIST
+	debug_previous = NULL;
+	debug_next = NULL;
+		// initialize in case the following fails
+#endif
+
 	fCacheRef = new(nogrow) VMCacheRef(this);
 	if (fCacheRef == NULL)
 		return B_NO_MEMORY;
@@ -603,7 +609,6 @@ VMCache::Init(uint32 cacheType)
 
 	if (gDebugCacheList)
 		gDebugCacheList->debug_previous = this;
-	debug_previous = NULL;
 	debug_next = gDebugCacheList;
 	gDebugCacheList = this;
 
