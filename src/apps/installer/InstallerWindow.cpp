@@ -503,7 +503,7 @@ InstallerWindow::QuitRequested()
 		return false;
 	}
 
-	if ((Flags() & B_NOT_MINIMIZABLE) != 0) {
+	if (fInstallStatus != kFinished && (Flags() & B_NOT_MINIMIZABLE) != 0) {
 		// This means Deskbar is not running, i.e. Installer is the only
 		// thing on the screen and we will reboot the machine once it quits.
 		if ((new BAlert("reallyQuit",
