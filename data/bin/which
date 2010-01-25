@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /etc/profile &> /dev/null
+. /etc/profile 2>&1 > /dev/null
 
 whence $*
 

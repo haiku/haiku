@@ -301,7 +301,7 @@ function BuildBroadcomFWCutter()
 
 	# Build b43-fwcutter.
 	echo "Compiling b43-fwcutter for installing Broadcom's firmware ..."
-	make PREFIX=/boot/common CFLAGS="-I. -Wall -D_BSD_SOURCE" &> /dev/null
+	make PREFIX=/boot/common CFLAGS="-I. -Wall -D_BSD_SOURCE" 2>&1 > /dev/null
 	if [ ! -e b43-fwcutter ] ; then
 		return 1
 	fi
@@ -323,7 +323,7 @@ function CutAndInstallBroadcomFirmware()
 
 	# Cut firmware in pieces.
 	cd "$tempDir"
-	b43-fwcutter $file &> /dev/null
+	b43-fwcutter $file 2>&1 > /dev/null
 
 	# Rename the pieces.
 	cd b43legacy
