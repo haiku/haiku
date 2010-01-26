@@ -493,11 +493,6 @@ MainWin::MessageReceived(BMessage* msg)
 						}
 
 						result = reply.AddString("result", item->LocationURI());
-					} else if (msg->what == B_SET_PROPERTY) {
-						float newVolume;
-						result = msg->FindFloat("data", &newVolume);
-						if (result == B_OK)
-							fController->SetVolume(newVolume);
 					}
 
 					break;
