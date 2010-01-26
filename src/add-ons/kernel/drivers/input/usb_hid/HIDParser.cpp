@@ -3,7 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
+#ifndef USERLAND_HID
 #include "Driver.h"
+#else
+#include "UserlandHID.h"
+#endif
+
 #include "HIDCollection.h"
 #include "HIDParser.h"
 #include "HIDReport.h"

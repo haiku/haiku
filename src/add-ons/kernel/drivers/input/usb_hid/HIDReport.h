@@ -7,7 +7,9 @@
 
 #include "HIDParser.h"
 
+#ifndef USERLAND_HID
 #include <condition_variable.h>
+#endif
 
 #define HID_REPORT_TYPE_INPUT		0x01
 #define HID_REPORT_TYPE_OUTPUT		0x02
@@ -39,14 +41,18 @@ public:
 									size_t length);
 		uint8 *					CurrentReport() { return fCurrentReport; };
 
+#ifndef USERLAND_HID
 		status_t				SendReport();
+#endif
 
 		uint32					CountItems() { return fItemsUsed; };
 		HIDReportItem *			ItemAt(uint32 index);
 		HIDReportItem *			FindItem(uint16 usagePage, uint16 usageID);
 
+#ifndef USERLAND_HID
 		status_t				WaitForReport(bigtime_t timeout);
 		void					DoneProcessing();
+#endif
 
 		void					PrintToStream();
 
@@ -66,7 +72,10 @@ private:
 		status_t				fReportStatus;
 		uint8 *					fCurrentReport;
 		int32					fBusyCount;
+
+#ifndef USERLAND_HID
 		ConditionVariable		fConditionVariable;
+#endif
 };
 
 #endif // HID_REPORT_H

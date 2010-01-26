@@ -3,7 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
+#ifndef USERLAND_HID
 #include "Driver.h"
+#else
+#include "UserlandHID.h"
+#endif
+
 #include "HIDCollection.h"
 #include "HIDDevice.h"
 #include "HIDReport.h"
@@ -26,7 +31,9 @@ HIDReport::HIDReport(HIDParser *parser, uint8 type, uint8 id)
 		fCurrentReport(NULL),
 		fBusyCount(0)
 {
+#ifndef USERLAND_HID
 	fConditionVariable.Init(this, "hid report");
+#endif
 }
 
 
@@ -155,10 +162,13 @@ HIDReport::SetReport(status_t status, uint8 *report, size_t length)
 		fReportStatus = B_ERROR;
 	}
 
+#ifndef USERLAND_HID
 	fConditionVariable.NotifyAll();
+#endif
 }
 
 
+#ifndef USERLAND_HID
 status_t
 HIDReport::SendReport()
 {
@@ -184,6 +194,7 @@ HIDReport::SendReport()
 	free(report);
 	return result;
 }
+#endif // !USERLAND_HID
 
 
 HIDReportItem *
@@ -208,6 +219,7 @@ HIDReport::FindItem(uint16 usagePage, uint16 usageID)
 }
 
 
+#ifndef USERLAND_HID
 status_t
 HIDReport::WaitForReport(bigtime_t timeout)
 {
@@ -241,6 +253,7 @@ HIDReport::DoneProcessing()
 {
 	atomic_add(&fBusyCount, -1);
 }
+#endif // !USERLAND_HID
 
 
 void
