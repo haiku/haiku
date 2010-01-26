@@ -38,6 +38,7 @@
 #include <MessageRunner.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
+#include <PropertyInfo.h>
 #include <RecentItems.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -102,6 +103,37 @@ enum {
 
 	M_SHOW_IF_NEEDED
 };
+
+
+static property_info sPropertyInfo[] = {
+	{ "Next", { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, "Skip to the next track.", 0
+	},
+	{ "Prev", { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, "Skip to the previous track.", 0
+	},
+	{ "Play", { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, "Start playing.", 0
+	},
+	{ "Stop", { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, "Stop playing.", 0
+	},
+	{ "Pause", { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, "Pause playback.", 0
+	},
+	{ "TogglePlaying", { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, "Toggle pause/play.", 0
+	},
+	{ "Mute", { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, "Toggle mute.", 0
+	},
+	{ "Volume", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 }, "Gets/sets the volume (0.0-2.0).", 0,
+		{ B_FLOAT_TYPE }
+	},
+	{ 0, { 0 }, { 0 }, 0, 0 }
+};
+
 
 //#define printf(a...)
 
@@ -378,6 +410,89 @@ MainWin::MessageReceived(BMessage* msg)
 {
 //	msg->PrintToStream();
 	switch (msg->what) {
+		case B_EXECUTE_PROPERTY:
+		case B_GET_PROPERTY:
+		case B_SET_PROPERTY:
+		{
+			BMessage reply(B_REPLY);
+			status_t result = B_BAD_SCRIPT_SYNTAX;
+			int32 index;
+			BMessage specifier;
+			int32 what;
+			const char* property;
+
+			if (msg->GetCurrentSpecifier(&index, &specifier, &what,
+					&property) != B_OK) {
+				return BWindow::MessageReceived(msg);
+			}
+
+			BPropertyInfo propertyInfo(sPropertyInfo);
+			switch (propertyInfo.FindMatch(msg, index, &specifier, what,
+					property)) {
+				case 0:
+					fControls->SkipForward();
+					result = B_OK;
+					break;
+
+				case 1:
+					fControls->SkipBackward();
+					result = B_OK;
+					break;
+
+				case 2:
+					fController->Play();
+					result = B_OK;
+					break;
+
+				case 3:
+					fController->Stop();
+					result = B_OK;
+					break;
+
+				case 4:
+					fController->Pause();
+					result = B_OK;
+					break;
+
+				case 5:
+					fController->TogglePlaying();
+					result = B_OK;
+					break;
+
+				case 6:
+					fController->ToggleMute();
+					result = B_OK;
+					break;
+
+				case 7:
+				{
+					if (msg->what == B_GET_PROPERTY) {
+						result = reply.AddFloat("result",
+							fController->Volume());
+					} else if (msg->what == B_SET_PROPERTY) {
+						float newVolume;
+						result = msg->FindFloat("data", &newVolume);
+						if (result == B_OK)
+							fController->SetVolume(newVolume);
+					}
+
+					break;
+				}
+
+				default:
+					return BWindow::MessageReceived(msg);
+			}
+
+			if (result != B_OK) {
+				reply.what = B_MESSAGE_NOT_UNDERSTOOD;
+				reply.AddString("message", strerror(result));
+				reply.AddInt32("error", result);
+			}
+
+			msg->SendReply(&reply);
+			break;
+		}
+
 		case B_REFS_RECEIVED:
 			printf("MainWin::MessageReceived: B_REFS_RECEIVED\n");
 			_RefsReceived(msg);
@@ -931,6 +1046,46 @@ MainWin::GetQuitMessage(BMessage* message)
 			fprintf(stderr, "Failed to store current playlist.\n");
 		}
 	}
+}
+
+
+BHandler*
+MainWin::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
+	int32 what, const char* property)
+{
+	BPropertyInfo propertyInfo(sPropertyInfo);
+	switch (propertyInfo.FindMatch(message, index, specifier, what, property)) {
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+			return this;
+	}
+
+	return BWindow::ResolveSpecifier(message, index, specifier, what, property);
+}
+
+
+status_t
+MainWin::GetSupportedSuites(BMessage* data)
+{
+	if (data == NULL)
+		return B_BAD_VALUE;
+
+	status_t status = data->AddString("suites", "suite/vnd.Haiku-MediaPlayer");
+	if (status != B_OK)
+		return status;
+
+	BPropertyInfo propertyInfo(sPropertyInfo);
+	status = data->AddFlat("messages", &propertyInfo);
+	if (status != B_OK)
+		return status;
+
+	return BWindow::GetSupportedSuites(data);
 }
 
 

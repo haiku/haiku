@@ -74,6 +74,11 @@ public:
 
 			void				GetQuitMessage(BMessage* message);
 
+	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
+									BMessage* specifier, int32 what,
+									const char* property);
+	virtual	status_t			GetSupportedSuites(BMessage* data);
+
 private:
 			void				_RefsReceived(BMessage* message);
 			void				_PlaylistItemOpened(
