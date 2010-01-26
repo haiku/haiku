@@ -736,25 +736,6 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 	if (size == 0)
 		return B_OK;
 
-	cache_func function;
-	if (doWrite) {
-		// in low memory situations, we bypass the cache beyond a
-		// certain I/O size
-		if (size >= BYPASS_IO_SIZE
-			&& low_resource_state(B_KERNEL_RESOURCE_PAGES)
-				!= B_NO_LOW_RESOURCE) {
-			function = write_to_file;
-		} else
-			function = write_to_cache;
-	} else {
-		if (size >= BYPASS_IO_SIZE
-			&& low_resource_state(B_KERNEL_RESOURCE_PAGES)
-				!= B_NO_LOW_RESOURCE) {
-			function = read_from_file;
-		} else
-			function = read_into_cache;
-	}
-
 	// "offset" and "lastOffset" are always aligned to B_PAGE_SIZE,
 	// the "last*" variables always point to the end of the last
 	// satisfied request part
@@ -767,18 +748,33 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 	size_t lastReservedPages = min_c(MAX_IO_VECS, (pageOffset + bytesLeft
 		+ B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 	size_t reservePages = 0;
+	size_t pagesProcessed = 0;
+	cache_func function = NULL;
 
 	reserve_pages(ref, lastReservedPages, doWrite);
 	AutoLocker<VMCache> locker(cache);
 
 	while (bytesLeft > 0) {
+		// Periodically reevaluate the low memory situation and select the
+		// read/write hook accordingly
+		if (pagesProcessed % 32 == 0) {
+			if (size >= BYPASS_IO_SIZE
+				&& low_resource_state(B_KERNEL_RESOURCE_PAGES)
+					!= B_NO_LOW_RESOURCE) {
+				// In low memory situations we bypass the cache beyond a
+				// certain I/O size.
+				function = doWrite ? write_to_file : read_from_file;
+			} else
+				function = doWrite ? write_to_cache : read_into_cache;
+		}
+
 		// check if this page is already in memory
 		vm_page* page = cache->LookupPage(offset);
 		if (page != NULL) {
 			// The page may be busy - since we need to unlock the cache sometime
 			// in the near future, we need to satisfy the request of the pages
 			// we didn't get yet (to make sure no one else interferes in the
-			// mean time).
+			// meantime).
 			status_t status = satisfy_cache_io(ref, cookie, function, offset,
 				buffer, useBuffer, pageOffset, bytesLeft, reservePages,
 				lastOffset, lastBuffer, lastPageOffset, lastLeft,
@@ -863,6 +859,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 		bytesLeft -= bytesInPage;
 		pageOffset = 0;
 		offset += B_PAGE_SIZE;
+		pagesProcessed++;
 
 		if (buffer - lastBuffer + lastPageOffset >= kMaxChunkSize) {
 			status_t status = satisfy_cache_io(ref, cookie, function, offset,
