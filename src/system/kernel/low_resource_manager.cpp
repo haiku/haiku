@@ -47,14 +47,14 @@ static const bigtime_t kLowResourceInterval = 3000000;	// 3 secs
 static const bigtime_t kWarnResourceInterval = 500000;	// 0.5 secs
 
 // page limits
-static const size_t kNotePagesLimit = 2048;
-static const size_t kWarnPagesLimit = 256;
-static const size_t kCriticalPagesLimit = 32;
+static const size_t kNotePagesLimit = VM_PAGE_RESERVE_USER * 4;
+static const size_t kWarnPagesLimit = VM_PAGE_RESERVE_USER;
+static const size_t kCriticalPagesLimit = VM_PAGE_RESERVE_SYSTEM;
 
 // memory limits
-static const off_t kMinNoteMemoryLimit		= 16 * 1024 * 1024;
-static const off_t kMinWarnMemoryLimit		= 4 * 1024 * 1024;
-static const off_t kMinCriticalMemoryLimit	= 1 * 1024 * 1024;
+static const off_t kMinNoteMemoryLimit		= VM_MEMORY_RESERVE_USER * 4;
+static const off_t kMinWarnMemoryLimit		= VM_MEMORY_RESERVE_USER;
+static const off_t kMinCriticalMemoryLimit	= VM_MEMORY_RESERVE_SYSTEM;
 static off_t sNoteMemoryLimit;
 static off_t sWarnMemoryLimit;
 static off_t sCriticalMemoryLimit;

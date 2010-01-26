@@ -222,6 +222,14 @@ private:
 };
 
 
+// The memory reserve an allocation of the certain priority must not touch.
+static const size_t kMemoryReserveForPriority[] = {
+	VM_MEMORY_RESERVE_USER,		// user
+	VM_MEMORY_RESERVE_SYSTEM,	// system
+	0							// VIP
+};
+
+
 ObjectCache* gPageMappingsObjectCache;
 
 static rw_lock sAreaCacheLock = RW_LOCK_INITIALIZER("area->cache");
@@ -255,7 +263,7 @@ static status_t vm_soft_fault(VMAddressSpace* addressSpace, addr_t address,
 static status_t map_backing_store(VMAddressSpace* addressSpace,
 	VMCache* cache, void** _virtualAddress, off_t offset, addr_t size,
 	uint32 addressSpec, int wiring, int protection, int mapping,
-	VMArea** _area, const char* areaName, bool unmapAddressRange, bool kernel);
+	VMArea** _area, const char* areaName, uint32 flags, bool kernel);
 
 
 //	#pragma mark -
@@ -579,7 +587,9 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
-			cache->Resize(cache->virtual_base + newSize);
+			cache->Resize(cache->virtual_base + newSize,
+				addressSpace == VMAddressSpace::Kernel()
+					? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 			cache->ReleaseRefAndUnlock();
 		}
 
@@ -634,7 +644,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	error = map_backing_store(addressSpace, cache, &secondBaseAddress,
 		area->cache_offset + (secondBase - area->Base()), secondSize,
 		B_EXACT_ADDRESS, area->wiring, area->protection, REGION_NO_PRIVATE_MAP,
-		&secondArea, area->name, false, kernel);
+		&secondArea, area->name, 0, kernel);
 	if (error != B_OK) {
 		addressSpace->ShrinkAreaTail(area, oldSize);
 		return error;
@@ -697,7 +707,7 @@ static status_t
 map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 	void** _virtualAddress, off_t offset, addr_t size, uint32 addressSpec,
 	int wiring, int protection, int mapping, VMArea** _area,
-	const char* areaName, bool unmapAddressRange, bool kernel)
+	const char* areaName, uint32 flags, bool kernel)
 {
 	TRACE(("map_backing_store: aspace %p, cache %p, *vaddr %p, offset 0x%Lx, "
 		"size %lu, addressSpec %ld, wiring %d, protection %d, area %p, areaName "
@@ -719,7 +729,8 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 
 		// create an anonymous cache
 		status = VMCacheFactory::CreateAnonymousCache(newCache,
-			(protection & B_STACK_AREA) != 0, 0, USER_STACK_GUARD_PAGES, true);
+			(protection & B_STACK_AREA) != 0, 0, USER_STACK_GUARD_PAGES, true,
+			VM_PRIORITY_USER);
 		if (status != B_OK)
 			goto err1;
 
@@ -734,7 +745,15 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		cache = newCache;
 	}
 
-	status = cache->SetMinimalCommitment(size);
+	int priority;
+	if (addressSpace != VMAddressSpace::Kernel())
+		priority = VM_PRIORITY_USER;
+	else if ((flags & CREATE_AREA_PRIORITY_VIP) != 0)
+		priority = VM_PRIORITY_VIP;
+	else
+		priority = VM_PRIORITY_SYSTEM;
+
+	status = cache->SetMinimalCommitment(size, priority);
 	if (status != B_OK)
 		goto err2;
 
@@ -746,7 +765,8 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		goto err2;
 	}
 
-	if (addressSpec == B_EXACT_ADDRESS && unmapAddressRange) {
+	if (addressSpec == B_EXACT_ADDRESS
+			&& (flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0) {
 		status = unmap_address_range(addressSpace, (addr_t)*_virtualAddress,
 			size, kernel);
 		if (status != B_OK)
@@ -816,7 +836,8 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 
 	// create an anonymous cache
 	VMCache* cache;
-	status = VMCacheFactory::CreateAnonymousCache(cache, false, 0, 0, false);
+	status = VMCacheFactory::CreateAnonymousCache(cache, false, 0, 0, false,
+		VM_PRIORITY_SYSTEM);
 	if (status != B_OK)
 		return status;
 
@@ -829,7 +850,7 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 	void* areaAddress = address;
 	status = map_backing_store(addressSpace, cache, &areaAddress, 0, size,
 		B_EXACT_ADDRESS, B_ALREADY_WIRED, 0, REGION_NO_PRIVATE_MAP, &area, name,
-		false, true);
+		0, true);
 	if (status != B_OK) {
 		cache->ReleaseRefAndUnlock();
 		return status;
@@ -953,6 +974,14 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 		reservedMapPages = map->MaxPagesNeededToMap(0, size - 1);
 	}
 
+	int priority;
+	if (team != VMAddressSpace::KernelID())
+		priority = VM_PRIORITY_USER;
+	else if ((flags & CREATE_AREA_PRIORITY_VIP) != 0)
+		priority = VM_PRIORITY_VIP;
+	else
+		priority = VM_PRIORITY_SYSTEM;
+
 	// Reserve memory before acquiring the address space lock. This reduces the
 	// chances of failure, since while holding the write lock to the address
 	// space (if it is the kernel address space that is), the low memory handler
@@ -960,7 +989,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 	addr_t reservedMemory = 0;
 	if (doReserveMemory) {
 		bigtime_t timeout = (flags & CREATE_AREA_DONT_WAIT) != 0 ? 0 : 1000000;
-		if (vm_try_reserve_memory(size, timeout) != B_OK)
+		if (vm_try_reserve_memory(size, priority, timeout) != B_OK)
 			return B_NO_MEMORY;
 		reservedMemory = size;
 		// TODO: We don't reserve the memory for the pages for the page
@@ -982,13 +1011,13 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 		reservedPages += size / B_PAGE_SIZE;
 	if (reservedPages > 0) {
 		if ((flags & CREATE_AREA_DONT_WAIT) != 0) {
-			if (!vm_page_try_reserve_pages(reservedPages)) {
+			if (!vm_page_try_reserve_pages(reservedPages, priority)) {
 				reservedPages = 0;
 				status = B_WOULD_BLOCK;
 				goto err0;
 			}
 		} else
-			vm_page_reserve_pages(reservedPages);
+			vm_page_reserve_pages(reservedPages, priority);
 	}
 
 	status = locker.SetTo(team);
@@ -1001,7 +1030,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 		// we try to allocate the page run here upfront as this may easily
 		// fail for obvious reasons
 		page = vm_page_allocate_page_run(newPageState, physicalAddress,
-			size / B_PAGE_SIZE);
+			size / B_PAGE_SIZE, priority);
 		if (page == NULL) {
 			status = B_NO_MEMORY;
 			goto err0;
@@ -1014,7 +1043,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 		? USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES) : 0;
 	status = VMCacheFactory::CreateAnonymousCache(cache, canOvercommit,
 		isStack ? (min_c(2, size / B_PAGE_SIZE - guardPages)) : 0, guardPages,
-		wiring == B_NO_LOCK);
+		wiring == B_NO_LOCK, priority);
 	if (status != B_OK)
 		goto err1;
 
@@ -1040,7 +1069,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 
 	status = map_backing_store(addressSpace, cache, address, 0, size,
 		addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name,
-		(flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0, kernel);
+		flags, kernel);
 
 	if (status != B_OK) {
 		cache->ReleaseRefAndUnlock();
@@ -1247,7 +1276,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 
 	status = map_backing_store(locker.AddressSpace(), cache, _address,
 		0, size, addressSpec & ~B_MTR_MASK, B_FULL_LOCK, protection,
-		REGION_NO_PRIVATE_MAP, &area, name, false, true);
+		REGION_NO_PRIVATE_MAP, &area, name, 0, true);
 
 	if (status < B_OK)
 		cache->ReleaseRefLocked();
@@ -1269,7 +1298,9 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 		size_t reservePages = map->MaxPagesNeededToMap(area->Base(),
 			area->Base() + (size - 1));
 
-		vm_page_reserve_pages(reservePages);
+		vm_page_reserve_pages(reservePages,
+			team == VMAddressSpace::KernelID()
+				? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 		map->Lock();
 
 		for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
@@ -1341,7 +1372,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	VMArea* area;
 	result = map_backing_store(locker.AddressSpace(), cache, _address,
 		0, size, addressSpec & ~B_MTR_MASK, B_FULL_LOCK, protection,
-		REGION_NO_PRIVATE_MAP, &area, name, false, true);
+		REGION_NO_PRIVATE_MAP, &area, name, 0, true);
 
 	if (result != B_OK)
 		cache->ReleaseRefLocked();
@@ -1355,7 +1386,9 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	size_t reservePages = map->MaxPagesNeededToMap(area->Base(),
 		area->Base() + (size - 1));
 
-	vm_page_reserve_pages(reservePages);
+	vm_page_reserve_pages(reservePages,
+			team == VMAddressSpace::KernelID()
+				? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 	map->Lock();
 
 	uint32 vecIndex = 0;
@@ -1388,32 +1421,33 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 
 area_id
 vm_create_null_area(team_id team, const char* name, void** address,
-	uint32 addressSpec, addr_t size)
+	uint32 addressSpec, addr_t size, uint32 flags)
 {
-	VMArea* area;
-	VMCache* cache;
-	status_t status;
-
 	AddressSpaceWriteLocker locker(team);
 	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
 
 	size = PAGE_ALIGN(size);
 
-	// create an null cache
-	status = VMCacheFactory::CreateNullCache(cache);
+	// create a null cache
+	int priority = (flags & CREATE_AREA_PRIORITY_VIP) != 0
+		? VM_PRIORITY_VIP : VM_PRIORITY_SYSTEM;
+	VMCache* cache;
+	status_t status = VMCacheFactory::CreateNullCache(priority, cache);
 	if (status != B_OK)
 		return status;
 
-	// tell the page scanner to skip over this area, no pages will be mapped here
+	// tell the page scanner to skip over this area, no pages will be mapped
+	// here
 	cache->scan_skip = 1;
 	cache->virtual_end = size;
 
 	cache->Lock();
 
+	VMArea* area;
 	status = map_backing_store(locker.AddressSpace(), cache, address, 0, size,
 		addressSpec, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name,
-		false, true);
+		flags, true);
 
 	if (status < B_OK) {
 		cache->ReleaseRefAndUnlock();
@@ -1533,7 +1567,9 @@ _vm_map_file(team_id team, const char* name, void** _address,
 
 		locker.Unlock();
 
-		vm_page_reserve_pages(reservedPreMapPages);
+		vm_page_reserve_pages(reservedPreMapPages,
+			team == VMAddressSpace::KernelID()
+				? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 	}
 
 	struct PageUnreserver {
@@ -1566,7 +1602,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	VMArea* area;
 	status = map_backing_store(locker.AddressSpace(), cache, _address,
 		offset, size, addressSpec, 0, protection, mapping, &area, name,
-		unmapAddressRange, kernel);
+		unmapAddressRange ? CREATE_AREA_UNMAP_ADDRESS_RANGE : 0, kernel);
 
 	if (status != B_OK || mapping == REGION_PRIVATE_MAP) {
 		// map_backing_store() cannot know we no longer need the ref
@@ -1707,8 +1743,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 	else {
 		status = map_backing_store(targetAddressSpace, cache, address,
 			sourceArea->cache_offset, sourceArea->Size(), addressSpec,
-			sourceArea->wiring, protection, mapping, &newArea, name, false,
-			kernel);
+			sourceArea->wiring, protection, mapping, &newArea, name, 0, kernel);
 	}
 	if (status == B_OK && mapping != REGION_PRIVATE_MAP) {
 		// If the mapping is REGION_PRIVATE_MAP, map_backing_store() needed
@@ -1735,7 +1770,9 @@ vm_clone_area(team_id team, const char* name, void** address,
 			size_t reservePages = map->MaxPagesNeededToMap(newArea->Base(),
 				newArea->Base() + (newArea->Size() - 1));
 
-			vm_page_reserve_pages(reservePages);
+			vm_page_reserve_pages(reservePages,
+				targetAddressSpace == VMAddressSpace::Kernel()
+					? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 			map->Lock();
 
 			for (addr_t offset = 0; offset < newArea->Size();
@@ -1750,7 +1787,9 @@ vm_clone_area(team_id team, const char* name, void** address,
 			VMTranslationMap* map = targetAddressSpace->TranslationMap();
 			size_t reservePages = map->MaxPagesNeededToMap(
 				newArea->Base(), newArea->Base() + (newArea->Size() - 1));
-			vm_page_reserve_pages(reservePages);
+			vm_page_reserve_pages(reservePages,
+				targetAddressSpace == VMAddressSpace::Kernel()
+					? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 
 			// map in all pages from source
 			for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
@@ -1861,7 +1900,7 @@ vm_copy_on_write_area(VMCache* lowerCache)
 
 	// create an anonymous cache
 	status_t status = VMCacheFactory::CreateAnonymousCache(upperCache, false, 0,
-		0, true);
+		0, true, VM_PRIORITY_USER);
 	if (status != B_OK)
 		return status;
 
@@ -1944,7 +1983,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	status = map_backing_store(targetAddressSpace, cache, _address,
 		source->cache_offset, source->Size(), addressSpec, source->wiring,
 		protection, sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
-		&target, name, false, true);
+		&target, name, 0, true);
 	if (status < B_OK)
 		return status;
 
@@ -2013,7 +2052,9 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 				// we can change the cache's commitment to take only those pages
 				// into account that really are in this cache.
 
-				status = cache->Commit(cache->page_count * B_PAGE_SIZE);
+				status = cache->Commit(cache->page_count * B_PAGE_SIZE,
+					team == VMAddressSpace::KernelID()
+						? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 
 				// TODO: we may be able to join with our source cache, if
 				// count == 0
@@ -2043,8 +2084,9 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 			// No consumers, so we don't need to insert a new one.
 			if (cache->source != NULL && cache->temporary) {
 				// the cache's commitment must contain all possible pages
-				status = cache->Commit(cache->virtual_end
-					- cache->virtual_base);
+				status = cache->Commit(cache->virtual_end - cache->virtual_base,
+					team == VMAddressSpace::KernelID()
+						? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 			}
 
 			if (status == B_OK && cache->source != NULL) {
@@ -3756,7 +3798,9 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 	size_t reservePages = 2 + context.map->MaxPagesNeededToMap(originalAddress,
 		originalAddress);
 	context.addressSpaceLocker.Unlock();
-	vm_page_reserve_pages(reservePages);
+	vm_page_reserve_pages(reservePages,
+		addressSpace == VMAddressSpace::Kernel()
+			? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 
 	while (true) {
 		context.addressSpaceLocker.Lock();
@@ -4011,13 +4055,15 @@ vm_unreserve_memory(size_t amount)
 
 
 status_t
-vm_try_reserve_memory(size_t amount, bigtime_t timeout)
+vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 {
+	size_t reserve = kMemoryReserveForPriority[priority];
+
 	MutexLocker locker(sAvailableMemoryLock);
 
 	//dprintf("try to reserve %lu bytes, %Lu left\n", amount, sAvailableMemory);
 
-	if (sAvailableMemory >= amount) {
+	if (sAvailableMemory >= amount + reserve) {
 		sAvailableMemory -= amount;
 		return B_OK;
 	}
@@ -4040,7 +4086,7 @@ vm_try_reserve_memory(size_t amount, bigtime_t timeout)
 
 		sNeededMemory -= amount;
 
-		if (sAvailableMemory >= amount) {
+		if (sAvailableMemory >= amount + reserve) {
 			sAvailableMemory -= amount;
 			return B_OK;
 		}
@@ -4169,20 +4215,25 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 	if (cache->type != CACHE_TYPE_RAM)
 		return B_NOT_ALLOWED;
 
+	bool anyKernelArea = false;
 	if (oldSize < newSize) {
 		// We need to check if all areas of this cache can be resized
 		for (VMArea* current = cache->areas; current != NULL;
 				current = current->cache_next) {
 			if (!current->address_space->CanResizeArea(current, newSize))
 				return B_ERROR;
+			anyKernelArea |= current->address_space == VMAddressSpace::Kernel();
 		}
 	}
 
 	// Okay, looks good so far, so let's do it
 
+	int priority = kernel && anyKernelArea
+		? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER;
+
 	if (oldSize < newSize) {
 		// Growing the cache can fail, so we do it first.
-		status = cache->Resize(cache->virtual_base + newSize);
+		status = cache->Resize(cache->virtual_base + newSize, priority);
 		if (status != B_OK)
 			return status;
 	}
@@ -4208,7 +4259,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 	// shrinking the cache can't fail, so we do it now
 	if (status == B_OK && newSize < oldSize)
-		status = cache->Resize(cache->virtual_base + newSize);
+		status = cache->Resize(cache->virtual_base + newSize, priority);
 
 	if (status != B_OK) {
 		// Something failed -- resize the areas back to their original size.
@@ -4222,7 +4273,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 			}
 		}
 
-		cache->Resize(cache->virtual_base + oldSize);
+		cache->Resize(cache->virtual_base + oldSize, priority);
 	}
 
 	// TODO: we must honour the lock restrictions of this area

@@ -1369,7 +1369,7 @@ m68k_vm_translation_map_init_post_area(kernel_args *args)
 
 	area = vm_create_null_area(VMAddressSpace::KernelID(),
 		"interrupt query pages", (void **)&queryPage, B_ANY_ADDRESS,
-		B_PAGE_SIZE);
+		B_PAGE_SIZE, CREATE_AREA_PRIORITY_VIP);
 	if (area < B_OK)
 		return area;
 

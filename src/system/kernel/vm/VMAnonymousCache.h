@@ -37,7 +37,7 @@ public:
 									int32 numPrecommittedPages,
 									int32 numGuardPages);
 
-	virtual	status_t			Commit(off_t size);
+	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);
 
 	virtual	status_t			Read(off_t offset, const iovec* vecs,
@@ -66,7 +66,7 @@ private:
 									swap_addr_t slotIndex, uint32 count);
 			void        		_SwapBlockFree(off_t pageIndex, uint32 count);
 			swap_addr_t			_SwapBlockGetAddress(off_t pageIndex);
-			status_t			_Commit(off_t size);
+			status_t			_Commit(off_t size, int priority);
 
 			void				_MergePagesSmallerSource(
 									VMAnonymousCache* source);

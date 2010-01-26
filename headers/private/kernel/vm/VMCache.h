@@ -105,8 +105,9 @@ public:
 			uint32				CountWritableAreas(VMArea* ignoreArea) const;
 
 			status_t			WriteModified();
-			status_t			SetMinimalCommitment(off_t commitment);
-			status_t			Resize(off_t newSize);
+			status_t			SetMinimalCommitment(off_t commitment,
+									int priority);
+			status_t			Resize(off_t newSize, int priority);
 
 			status_t			FlushAndRemoveAllPages();
 
@@ -122,7 +123,7 @@ public:
 									{ return fRefCount; }
 
 	// backing store operations
-	virtual	status_t			Commit(off_t size);
+	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);
 
 	virtual	status_t			Read(off_t offset, const iovec *vecs,
@@ -200,12 +201,13 @@ class VMCacheFactory {
 public:
 	static	status_t		CreateAnonymousCache(VMCache*& cache,
 								bool canOvercommit, int32 numPrecommittedPages,
-								int32 numGuardPages, bool swappable);
+								int32 numGuardPages, bool swappable,
+								int priority);
 	static	status_t		CreateVnodeCache(VMCache*& cache,
 								struct vnode* vnode);
 	static	status_t		CreateDeviceCache(VMCache*& cache,
 								addr_t baseAddress);
-	static	status_t		CreateNullCache(VMCache*& cache);
+	static	status_t		CreateNullCache(int priority, VMCache*& cache);
 };
 
 

@@ -539,7 +539,8 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 	uint32 count = size / B_PAGE_SIZE;
 
 	if ((flags & B_APERTURE_NEED_PHYSICAL) != 0) {
-		memory->page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, 0, count);
+		memory->page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, 0, count,
+			VM_PRIORITY_SYSTEM);
 		if (memory->page == NULL)
 			return B_NO_MEMORY;
 	} else {
@@ -548,7 +549,7 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 		if (memory->pages == NULL)
 			return B_NO_MEMORY;
 
-		vm_page_reserve_pages(count);
+		vm_page_reserve_pages(count, VM_PRIORITY_SYSTEM);
 		for (uint32 i = 0; i < count; i++)
 			memory->pages[i] = vm_page_allocate_page(PAGE_STATE_CLEAR);
 		vm_page_unreserve_pages(count);

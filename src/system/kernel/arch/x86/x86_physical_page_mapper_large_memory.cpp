@@ -546,7 +546,7 @@ LargeMemoryPhysicalPageMapper::InitPostArea(kernel_args* args)
 	temp = (void*)fInitialPool.virtualBase;
 	area = vm_create_null_area(VMAddressSpace::KernelID(),
 		"physical page pool space", &temp, B_EXACT_ADDRESS,
-		1024 * B_PAGE_SIZE);
+		1024 * B_PAGE_SIZE, CREATE_AREA_PRIORITY_VIP);
 	if (area < B_OK) {
 		panic("LargeMemoryPhysicalPageMapper::InitPostArea(): Failed to "
 			"create area for physical page pool space.");
@@ -876,7 +876,8 @@ LargeMemoryPhysicalPageMapper::_AllocatePool(PhysicalPageSlotPool*& _pool)
 	void* virtualBase;
 	area_id virtualArea = vm_create_null_area(
 		VMAddressSpace::KernelID(), "physical page pool space",
-		&virtualBase, B_ANY_KERNEL_BLOCK_ADDRESS, 1024 * B_PAGE_SIZE);
+		&virtualBase, B_ANY_KERNEL_BLOCK_ADDRESS, 1024 * B_PAGE_SIZE,
+		CREATE_AREA_PRIORITY_VIP);
 	if (virtualArea < 0) {
 		delete_area(dataArea);
 		return virtualArea;

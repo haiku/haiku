@@ -1181,8 +1181,11 @@ MemoryManager::_AllocateArea(uint32 flags, Area*& _area)
 
 	if (sKernelArgs == NULL) {
 		// create an area
+		uint32 areaCreationFlags = (flags & CACHE_PRIORITY_VIP) != 0
+			? CREATE_AREA_PRIORITY_VIP : 0;
 		area_id areaID = vm_create_null_area(B_SYSTEM_TEAM, kSlabAreaName,
-			(void**)&area, B_ANY_KERNEL_BLOCK_ADDRESS, SLAB_AREA_SIZE);
+			(void**)&area, B_ANY_KERNEL_BLOCK_ADDRESS, SLAB_AREA_SIZE,
+			areaCreationFlags);
 		if (areaID < 0) {
 			mutex_lock(&sLock);
 			return areaID;
@@ -1315,8 +1318,10 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 	VMTranslationMap* translationMap = addressSpace->TranslationMap();
 
 	// reserve memory for the chunk
+	int priority = (flags & CACHE_PRIORITY_VIP) != 0
+		? VM_PRIORITY_VIP : VM_PRIORITY_SYSTEM;
 	size_t reservedMemory = size + reserveAdditionalMemory;
-	status_t error = vm_try_reserve_memory(size,
+	status_t error = vm_try_reserve_memory(size, priority,
 		(flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0 ? 0 : 1000000);
 	if (error != B_OK)
 		return error;
@@ -1325,12 +1330,12 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 	size_t reservedPages = size / B_PAGE_SIZE
 		+ translationMap->MaxPagesNeededToMap(address, address + size - 1);
 	if ((flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0) {
-		if (!vm_page_try_reserve_pages(reservedPages)) {
+		if (!vm_page_try_reserve_pages(reservedPages, priority)) {
 			vm_unreserve_memory(reservedMemory);
 			return B_WOULD_BLOCK;
 		}
 	} else
-		vm_page_reserve_pages(reservedPages);
+		vm_page_reserve_pages(reservedPages, priority);
 
 	VMCache* cache = vm_area_get_locked_cache(vmArea);
 

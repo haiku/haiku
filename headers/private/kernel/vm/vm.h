@@ -30,6 +30,20 @@ struct vnode;
 #define CREATE_AREA_DONT_WAIT			0x01
 #define CREATE_AREA_UNMAP_ADDRESS_RANGE	0x02
 #define CREATE_AREA_DONT_CLEAR			0x04
+#define CREATE_AREA_PRIORITY_VIP		0x08
+
+// memory/page allocation priorities
+#define VM_PRIORITY_USER	0
+#define VM_PRIORITY_SYSTEM	1
+#define VM_PRIORITY_VIP		2
+
+// page reserves
+#define VM_PAGE_RESERVE_USER	512
+#define VM_PAGE_RESERVE_SYSTEM	128
+
+// memory reserves
+#define VM_MEMORY_RESERVE_USER		(VM_PAGE_RESERVE_USER * B_PAGE_SIZE)
+#define VM_MEMORY_RESERVE_SYSTEM	(VM_PAGE_RESERVE_SYSTEM * B_PAGE_SIZE)
 
 
 extern struct ObjectCache* gPageMappingsObjectCache;
@@ -84,7 +98,7 @@ area_id vm_map_file(team_id aid, const char *name, void **address,
 struct VMCache *vm_area_get_locked_cache(struct VMArea *area);
 void vm_area_put_locked_cache(struct VMCache *cache);
 area_id vm_create_null_area(team_id team, const char *name, void **address,
-			uint32 addressSpec, addr_t size);
+			uint32 addressSpec, addr_t size, uint32 flags);
 area_id vm_copy_area(team_id team, const char *name, void **_address,
 			uint32 addressSpec, uint32 protection, area_id sourceID);
 area_id vm_clone_area(team_id team, const char *name, void **address,

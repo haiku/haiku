@@ -20,7 +20,7 @@ public:
 			status_t	Init(bool canOvercommit, int32 numPrecommittedPages,
 							int32 numGuardPages);
 
-	virtual	status_t	Commit(off_t size);
+	virtual	status_t	Commit(off_t size, int priority);
 	virtual	bool		HasPage(off_t offset);
 
 	virtual	status_t	Read(off_t offset, const iovec *vecs, size_t count,

@@ -12,6 +12,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <algorithm>
+
 #include <KernelExport.h>
 #include <OS.h>
 
@@ -59,6 +61,16 @@
 	// be written
 
 
+// The page reserve an allocation of the certain priority must not touch.
+static const size_t kPageReserveForPriority[] = {
+	VM_PAGE_RESERVE_USER,		// user
+	VM_PAGE_RESERVE_SYSTEM,		// system
+	0							// VIP
+};
+
+static const uint32 kMinimumSystemReserve = VM_PAGE_RESERVE_USER;
+
+
 int32 gMappedPagesCount;
 
 static VMPageQueue sFreePageQueue;
@@ -71,6 +83,7 @@ static vm_page *sPages;
 static addr_t sPhysicalPageOffset;
 static size_t sNumPages;
 static vint32 sUnreservedFreePages;
+static vint32 sSystemReservedPages;
 static vint32 sPageDeficit;
 static vint32 sModifiedTemporaryPages;
 
@@ -560,6 +573,7 @@ dump_page_stats(int argc, char **argv)
 		counter[PAGE_STATE_WIRED], counter[PAGE_STATE_MODIFIED],
 		counter[PAGE_STATE_FREE], counter[PAGE_STATE_CLEAR]);
 	kprintf("unreserved free pages: %" B_PRId32 "\n", sUnreservedFreePages);
+	kprintf("system reserved pages: %" B_PRId32 "\n", sSystemReservedPages);
 	kprintf("page deficit: %lu\n", sPageDeficit);
 	kprintf("mapped pages: %lu\n", gMappedPagesCount);
 
@@ -575,6 +589,32 @@ dump_page_stats(int argc, char **argv)
 	kprintf("inactive queue: %p, count = %ld\n", &sInactivePageQueue,
 		sInactivePageQueue.Count());
 	return 0;
+}
+
+
+// #pragma mark -
+
+
+static void
+unreserve_page()
+{
+	int32 systemReserve = sSystemReservedPages;
+	if (systemReserve >= (int32)kMinimumSystemReserve) {
+		atomic_add(&sUnreservedFreePages, 1);
+	} else {
+		// Note: Due to the race condition, we might increment
+		// sSystemReservedPages beyond its desired count. That doesn't matter
+		// all that much, though, since its only about a single page and
+		// vm_page_reserve_pages() will correct this when the general reserve
+		// is running low.
+		atomic_add(&sSystemReservedPages, 1);
+	}
+
+	if (sPageDeficit > 0) {
+		MutexLocker pageDeficitLocker(sPageDeficitLock);
+		if (sPageDeficit > 0)
+			sFreePageCondition.NotifyAll();
+	}
 }
 
 
@@ -640,7 +680,7 @@ free_page(vm_page* page, bool clear)
 
 	locker.Unlock();
 
-	atomic_add(&sUnreservedFreePages, 1);
+	unreserve_page();
 }
 
 
@@ -807,7 +847,7 @@ page_scrubber(void *unused)
 		// reservation warranty. The following is usually stricter than
 		// necessary, because we don't have information on how many of the
 		// reserved pages have already been allocated.
-		if (!vm_page_try_reserve_pages(SCRUB_SIZE))
+		if (!vm_page_try_reserve_pages(SCRUB_SIZE, VM_PRIORITY_USER))
 			continue;
 
 		// get some pages from the free queue
@@ -1613,7 +1653,7 @@ steal_pages(vm_page **pages, size_t count)
 				sFreePageQueue.PrependUnlocked(page);
 				locker.Unlock();
 
-				atomic_add(&sUnreservedFreePages, 1);
+				unreserve_page();
 
 				T(StolenPage());
 
@@ -1902,7 +1942,7 @@ vm_page_init(kernel_args *args)
 		sFreePageQueue.Append(&sPages[i]);
 	}
 
-	atomic_add(&sUnreservedFreePages, sNumPages);
+	sUnreservedFreePages = sNumPages;
 
 	TRACE(("initialized table\n"));
 
@@ -1913,6 +1953,14 @@ vm_page_init(kernel_args *args)
 	}
 
 	TRACE(("vm_page_init: exit\n"));
+
+	// reserve pages for the system, that user allocations will not touch
+	if (sUnreservedFreePages < (int32)kMinimumSystemReserve) {
+		panic("Less pages than the system reserve!");
+		sSystemReservedPages = sUnreservedFreePages;
+	} else
+		sSystemReservedPages = kMinimumSystemReserve;
+	sUnreservedFreePages -= sSystemReservedPages;
 
 	return B_OK;
 }
@@ -2050,6 +2098,25 @@ vm_page_unreserve_pages(uint32 count)
 
 	T(UnreservePages(count));
 
+	while (true) {
+		int32 systemReserve = sSystemReservedPages;
+		if (systemReserve >= (int32)kMinimumSystemReserve)
+			break;
+
+		int32 toUnreserve = std::min((int32)count,
+			(int32)kMinimumSystemReserve - systemReserve);
+		if (atomic_test_and_set(&sSystemReservedPages,
+					systemReserve + toUnreserve, systemReserve)
+				== systemReserve) {
+			count -= toUnreserve;
+			if (count == 0)
+				return;
+			break;
+		}
+
+		// the count changed in the meantime -- retry
+	}
+
 	atomic_add(&sUnreservedFreePages, count);
 
 	if (sPageDeficit > 0) {
@@ -2067,19 +2134,65 @@ vm_page_unreserve_pages(uint32 count)
 	The caller must not hold any cache lock or the function might deadlock.
 */
 void
-vm_page_reserve_pages(uint32 count)
+vm_page_reserve_pages(uint32 count, int priority)
 {
 	if (count == 0)
 		return;
 
 	T(ReservePages(count));
 
-	int32 oldFreePages = atomic_add(&sUnreservedFreePages, -count);
-	if (oldFreePages >= (int32)count)
-		return;
+	while (true) {
+		// Of the requested count reserve as many pages as possible from the
+		// general reserve.
+		int32 freePages = sUnreservedFreePages;
+		if (freePages <= 0)
+			break;
 
-	if (oldFreePages > 0)
+		uint32 toReserve = std::min((int32)count, freePages);
+		if (atomic_test_and_set(&sUnreservedFreePages,
+					freePages - toReserve, freePages)
+				!= freePages) {
+			// the count changed in the meantime -- retry
+			continue;
+		}
+
+		count -= toReserve;
+		if (count == 0)
+			return;
+
+		break;
+	}
+
+	// Try to get the remaining pages from the system reserve.
+	uint32 systemReserve = kPageReserveForPriority[priority];
+	while (true) {
+		int32 systemFreePages = sSystemReservedPages;
+		uint32 toReserve = 0;
+		if (systemFreePages > (int32)systemReserve) {
+			toReserve = std::min(count, systemFreePages - systemReserve);
+			if (atomic_test_and_set(&sSystemReservedPages,
+						systemFreePages - toReserve, systemFreePages)
+					!= systemFreePages) {
+				// the count changed in the meantime -- retry
+				continue;
+			}
+		}
+
+		count -= toReserve;
+		if (count == 0)
+			return;
+
+		break;
+	}
+
+	// subtract the remaining pages
+	int32 oldFreePages = atomic_add(&sUnreservedFreePages, -(int32)count);
+	if (oldFreePages > 0) {
+		if ((int32)count <= oldFreePages)
+			return;
 		count -= oldFreePages;
+// TODO: Activate low-memory handling/page daemon!
+	}
 
 	steal_pages(NULL, count + 1);
 		// we get one more, just in case we can do something someone
@@ -2088,7 +2201,7 @@ vm_page_reserve_pages(uint32 count)
 
 
 bool
-vm_page_try_reserve_pages(uint32 count)
+vm_page_try_reserve_pages(uint32 count, int priority)
 {
 	if (count == 0)
 		return true;
@@ -2096,16 +2209,43 @@ vm_page_try_reserve_pages(uint32 count)
 	T(ReservePages(count));
 
 	while (true) {
+		// From the requested count reserve as many pages as possible from the
+		// general reserve.
 		int32 freePages = sUnreservedFreePages;
-		if (freePages < (int32)count)
-			return false;
-
-		if (atomic_test_and_set(&sUnreservedFreePages, freePages - count,
-				freePages) == freePages) {
-			return true;
+		uint32 reserved = 0;
+		if (freePages > 0) {
+			reserved = std::min((int32)count, freePages);
+			if (atomic_test_and_set(&sUnreservedFreePages,
+						freePages - reserved, freePages)
+					!= freePages) {
+				// the count changed in the meantime -- retry
+				continue;
+			}
 		}
 
-		// the count changed in the meantime -- retry
+		if (reserved == count)
+			return true;
+
+		// Try to get the remaining pages from the system reserve.
+		uint32 systemReserve = kPageReserveForPriority[priority];
+		uint32 leftToReserve = count - reserved;
+		while (true) {
+			int32 systemFreePages = sSystemReservedPages;
+			if ((uint32)systemFreePages < leftToReserve + systemReserve) {
+				// no dice
+				vm_page_unreserve_pages(reserved);
+				return false;
+			}
+
+			if (atomic_test_and_set(&sSystemReservedPages,
+						systemFreePages - leftToReserve, systemFreePages)
+					== systemFreePages) {
+				return true;
+			}
+
+			// the count changed in the meantime -- retry
+			continue;
+		}
 	}
 }
 
@@ -2234,11 +2374,12 @@ allocate_page_run(page_num_t start, page_num_t length, int pageState,
 
 
 vm_page *
-vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
+vm_page_allocate_page_run(int pageState, addr_t base, addr_t length,
+	int priority)
 {
 	uint32 start = base >> PAGE_SHIFT;
 
-	if (!vm_page_try_reserve_pages(length))
+	if (!vm_page_try_reserve_pages(length, priority))
 		return NULL;
 		// TODO: add more tries, ie. free some inactive, ...
 		// no free space
@@ -2273,7 +2414,7 @@ vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 
 
 vm_page *
-vm_page_allocate_page_run_no_base(int pageState, addr_t count)
+vm_page_allocate_page_run_no_base(int pageState, addr_t count, int priority)
 {
 	VMPageQueue* queue;
 	VMPageQueue* otherQueue;
@@ -2290,7 +2431,7 @@ vm_page_allocate_page_run_no_base(int pageState, addr_t count)
 			return NULL; // invalid
 	}
 
-	if (!vm_page_try_reserve_pages(count))
+	if (!vm_page_try_reserve_pages(count, priority))
 		return NULL;
 		// TODO: add more tries, ie. free some inactive, ...
 		// no free space

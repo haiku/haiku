@@ -21,6 +21,7 @@ enum {
 	/* object_cache_{alloc,free}() flags */
 	CACHE_DONT_WAIT_FOR_MEMORY		= 1 << 8,
 	CACHE_DONT_LOCK_KERNEL_SPACE	= 1 << 9,
+	CACHE_PRIORITY_VIP				= 1 << 10,
 
 	/* internal */
 	CACHE_ALIGN_ON_SIZE				= 1 << 30,

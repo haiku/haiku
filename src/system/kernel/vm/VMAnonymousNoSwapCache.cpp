@@ -15,6 +15,7 @@
 #include <heap.h>
 #include <KernelExport.h>
 #include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
 
 
 //#define TRACE_STORE
@@ -57,7 +58,7 @@ VMAnonymousNoSwapCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 
 
 status_t
-VMAnonymousNoSwapCache::Commit(off_t size)
+VMAnonymousNoSwapCache::Commit(off_t size, int priority)
 {
 	// if we can overcommit, we don't commit here, but in anonymous_fault()
 	if (fCanOvercommit) {
@@ -75,8 +76,10 @@ VMAnonymousNoSwapCache::Commit(off_t size)
 
 	if (size > committed_size) {
 		// try to commit
-		if (vm_try_reserve_memory(size - committed_size, 1000000) != B_OK)
+		if (vm_try_reserve_memory(size - committed_size, priority, 1000000)
+				!= B_OK) {
 			return B_NO_MEMORY;
+		}
 	} else {
 		// we can release some
 		vm_unreserve_memory(committed_size - size);
@@ -136,7 +139,9 @@ VMAnonymousNoSwapCache::Fault(struct VMAddressSpace *aspace, off_t offset)
 
 		if (fPrecommittedPages == 0) {
 			// try to commit additional memory
-			if (vm_try_reserve_memory(B_PAGE_SIZE, 0) != B_OK)
+			int priority = aspace == VMAddressSpace::Kernel()
+				? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER;
+			if (vm_try_reserve_memory(B_PAGE_SIZE, priority, 0) != B_OK)
 				return B_NO_MEMORY;
 
 			committed_size += B_PAGE_SIZE;

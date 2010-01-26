@@ -39,6 +39,7 @@
 #include <vm/vm.h>
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
 
 #include "IORequest.h"
 
@@ -468,7 +469,7 @@ VMAnonymousCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 
 
 status_t
-VMAnonymousCache::Commit(off_t size)
+VMAnonymousCache::Commit(off_t size, int priority)
 {
 	TRACE("%p->VMAnonymousCache::Commit(%lld)\n", this, size);
 
@@ -484,7 +485,7 @@ VMAnonymousCache::Commit(off_t size)
 			size = precommitted;
 	}
 
-	return _Commit(size);
+	return _Commit(size, priority);
 }
 
 
@@ -716,10 +717,14 @@ VMAnonymousCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 
 		if (fPrecommittedPages == 0) {
 			// try to commit additional swap space/memory
-			if (swap_space_reserve(B_PAGE_SIZE) == B_PAGE_SIZE)
+			if (swap_space_reserve(B_PAGE_SIZE) == B_PAGE_SIZE) {
 				fCommittedSwapSize += B_PAGE_SIZE;
-			else if (vm_try_reserve_memory(B_PAGE_SIZE, 0) != B_OK)
-				return B_NO_MEMORY;
+			} else {
+				int priority = aspace == VMAddressSpace::Kernel()
+					? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER;
+				if (vm_try_reserve_memory(B_PAGE_SIZE, priority, 0) != B_OK)
+					return B_NO_MEMORY;
+			}
 
 			committed_size += B_PAGE_SIZE;
 		} else
@@ -749,7 +754,7 @@ VMAnonymousCache::Merge(VMCache* _source)
 
 	off_t actualSize = virtual_end - virtual_base;
 	if (committed_size > actualSize)
-		_Commit(actualSize);
+		_Commit(actualSize, VM_PRIORITY_USER);
 
 	// Move all not shadowed swap pages from the source to the consumer cache.
 	// Also remove all source pages that are shadowed by consumer swap pages.
@@ -857,7 +862,7 @@ VMAnonymousCache::_SwapBlockGetAddress(off_t pageIndex)
 
 
 status_t
-VMAnonymousCache::_Commit(off_t size)
+VMAnonymousCache::_Commit(off_t size, int priority)
 {
 	TRACE("%p->VMAnonymousCache::_Commit(%lld), already committed: %lld "
 		"(%lld swap)\n", this, size, committed_size, fCommittedSwapSize);
@@ -907,7 +912,7 @@ VMAnonymousCache::_Commit(off_t size)
 	// the start of the method, so we try to reserve real memory, now.
 
 	off_t toReserve = size - committed_size;
-	if (vm_try_reserve_memory(toReserve, 1000000) != B_OK) {
+	if (vm_try_reserve_memory(toReserve, priority, 1000000) != B_OK) {
 		dprintf("%p->VMAnonymousCache::_Commit(%lld): Failed to reserve %lld "
 			"bytes of RAM\n", this, size, toReserve);
 		return B_NO_MEMORY;

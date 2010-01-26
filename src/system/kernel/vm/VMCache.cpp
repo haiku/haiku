@@ -1000,7 +1000,7 @@ VMCache::WriteModified()
 	Assumes you have the cache's lock held.
 */
 status_t
-VMCache::SetMinimalCommitment(off_t commitment)
+VMCache::SetMinimalCommitment(off_t commitment, int priority)
 {
 	TRACE(("VMCache::SetMinimalCommitment(cache %p, commitment %Ld)\n",
 		this, commitment));
@@ -1017,7 +1017,7 @@ VMCache::SetMinimalCommitment(off_t commitment)
 		//	enough for a commitment of that size?
 
 		// try to commit more memory
-		status = Commit(commitment);
+		status = Commit(commitment, priority);
 	}
 
 	return status;
@@ -1034,7 +1034,7 @@ VMCache::SetMinimalCommitment(off_t commitment)
 	has to wait for busy pages.
 */
 status_t
-VMCache::Resize(off_t newSize)
+VMCache::Resize(off_t newSize, int priority)
 {
 // TODO: This method must be virtual as VMAnonymousCache needs to free allocated
 // swap pages!
@@ -1044,7 +1044,7 @@ VMCache::Resize(off_t newSize)
 
 	T(Resize(this, newSize));
 
-	status_t status = Commit(newSize - virtual_base);
+	status_t status = Commit(newSize - virtual_base, priority);
 	if (status != B_OK)
 		return status;
 
@@ -1138,7 +1138,7 @@ VMCache::FlushAndRemoveAllPages()
 
 
 status_t
-VMCache::Commit(off_t size)
+VMCache::Commit(off_t size, int priority)
 {
 	committed_size = size;
 	return B_OK;
@@ -1343,10 +1343,12 @@ VMCache::_RemoveConsumer(VMCache* consumer)
 
 /*static*/ status_t
 VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
-	int32 numPrecommittedPages, int32 numGuardPages, bool swappable)
+	int32 numPrecommittedPages, int32 numGuardPages, bool swappable,
+	int priority)
 {
 #if ENABLE_SWAP_SUPPORT
 	if (swappable) {
+// TODO: Respect priority!
 		VMAnonymousCache* cache = new(nogrow) VMAnonymousCache;
 		if (cache == NULL)
 			return B_NO_MEMORY;
@@ -1424,8 +1426,9 @@ VMCacheFactory::CreateDeviceCache(VMCache*& _cache, addr_t baseAddress)
 
 
 /*static*/ status_t
-VMCacheFactory::CreateNullCache(VMCache*& _cache)
+VMCacheFactory::CreateNullCache(int priority, VMCache*& _cache)
 {
+// TODO: Respect priority!
 	VMNullCache* cache = new(nogrow) VMNullCache;
 	if (cache == NULL)
 		return B_NO_MEMORY;

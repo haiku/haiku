@@ -316,7 +316,7 @@ reserve_pages(file_cache_ref* ref, size_t reservePages, bool isWrite)
 		cache->Unlock();
 	}
 
-	vm_page_reserve_pages(reservePages);
+	vm_page_reserve_pages(reservePages, VM_PRIORITY_USER);
 }
 
 
@@ -966,7 +966,7 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 	size_t bytesToRead = 0;
 	off_t lastOffset = offset;
 
-	vm_page_reserve_pages(reservePages);
+	vm_page_reserve_pages(reservePages, VM_PRIORITY_USER);
 
 	cache->Lock();
 
@@ -1229,7 +1229,9 @@ file_cache_set_size(void* _cacheRef, off_t newSize)
 	AutoLocker<VMCache> _(cache);
 
 	off_t oldSize = cache->virtual_end;
-	status_t status = cache->Resize(newSize);
+	status_t status = cache->Resize(newSize, VM_PRIORITY_USER);
+		// Note, the priority doesn't really matter, since this cache doesn't
+		// reserve any memory.
 	if (status == B_OK && newSize < oldSize) {
 		// We may have a new partial page at the end of the cache that must be
 		// cleared.
