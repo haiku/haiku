@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src bin hid_decode ;
+
+local defines = [ FDefines USERLAND_HID ] ;
+local driverDir = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers input
+	usb_hid ] ;
+
+SubDirC++Flags $(defines) ;
+
+UsePrivateHeaders drivers ;
+UseHeaders $(driverDir) ;
+
+BinCommand hid_decode :
+	HIDCollection.cpp
+	HIDParser.cpp
+	HIDReport.cpp
+	HIDReportItem.cpp
+
+	hid_decode.cpp
+	: be
+;
+
+SEARCH on [ FGristFiles HIDCollection.cpp HIDParser.cpp HIDReport.cpp
+	HIDReportItem.cpp ] = $(driverDir) ;
