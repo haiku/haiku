@@ -106,7 +106,12 @@ static void add_to_iovec(iovec* vecs, uint32 &index, uint32 max, addr_t address,
 
 
 static struct cache_module_info* sCacheModule;
-static const uint8 kZeroBuffer[4096] = {};
+
+
+static const uint32 kZeroVecCount = 32;
+static const size_t kZeroVecSize = kZeroVecCount * B_PAGE_SIZE;
+static addr_t sZeroPage;	// physical address
+static iovec sZeroVecs[kZeroVecCount];
 
 
 //	#pragma mark -
@@ -624,22 +629,6 @@ write_to_file(file_cache_ref* ref, void* cookie, off_t offset, int32 pageOffset,
 	addr_t buffer, size_t bufferSize, bool useBuffer, size_t lastReservedPages,
 	size_t reservePages)
 {
-	size_t chunkSize = 0;
-	if (!useBuffer) {
-		// we need to allocate a zero buffer
-		// TODO: use smaller buffers if this fails
-		chunkSize = min_c(bufferSize, B_PAGE_SIZE);
-		buffer = (addr_t)malloc(chunkSize);
-		if (buffer == 0)
-			return B_NO_MEMORY;
-
-		memset((void*)buffer, 0, chunkSize);
-	}
-
-	iovec vec;
-	vec.iov_base = (void*)buffer;
-	vec.iov_len = bufferSize;
-
 	push_access(ref, offset, bufferSize, true);
 	ref->cache->Unlock();
 	vm_page_unreserve_pages(lastReservedPages);
@@ -648,20 +637,21 @@ write_to_file(file_cache_ref* ref, void* cookie, off_t offset, int32 pageOffset,
 
 	if (!useBuffer) {
 		while (bufferSize > 0) {
-			if (bufferSize < chunkSize)
-				chunkSize = bufferSize;
-
+			size_t written = min_c(bufferSize, kZeroVecSize);
 			status = vfs_write_pages(ref->vnode, cookie, offset + pageOffset,
-				&vec, 1, 0, &chunkSize);
-			if (status < B_OK)
-				break;
+				sZeroVecs, kZeroVecCount, B_PHYSICAL_IO_REQUEST, &written);
+			if (status != B_OK)
+				return status;
+			if (written == 0)
+				return B_ERROR;
 
-			bufferSize -= chunkSize;
-			pageOffset += chunkSize;
+			bufferSize -= written;
+			pageOffset += written;
 		}
-
-		free((void*)buffer);
 	} else {
+		iovec vec;
+		vec.iov_base = (void*)buffer;
+		vec.iov_len = bufferSize;
 		status = vfs_write_pages(ref->vnode, cookie, offset + pageOffset,
 			&vec, 1, 0, &bufferSize);
 	}
@@ -1090,6 +1080,18 @@ file_cache_init_post_boot_device(void)
 extern "C" status_t
 file_cache_init(void)
 {
+	// allocate a clean page we can use for writing zeroes
+	vm_page_reserve_pages(1, VM_PRIORITY_SYSTEM);
+	vm_page* page = vm_page_allocate_page(PAGE_STATE_CLEAR);
+	vm_page_unreserve_pages(1);
+
+	sZeroPage = (addr_t)page->physical_page_number * B_PAGE_SIZE;
+
+	for (uint32 i = 0; i < kZeroVecCount; i++) {
+		sZeroVecs[i].iov_base = (void*)sZeroPage;
+		sZeroVecs[i].iov_len = B_PAGE_SIZE;
+	}
+
 	register_generic_syscall(CACHE_SYSCALLS, file_cache_control, 1, 0);
 	return B_OK;
 }
@@ -1296,16 +1298,12 @@ file_cache_write(void* _cacheRef, void* cookie, off_t offset,
 		}
 
 		// NULL buffer -- use a dummy buffer to write zeroes
-		// TODO: This is not particularly efficient!
-		iovec vec;
-		vec.iov_base = (void*)kZeroBuffer;
-		vec.iov_len = sizeof(kZeroBuffer);
 		size_t size = *_size;
 		while (size > 0) {
-			size_t toWrite = min_c(size, vec.iov_len);
+			size_t toWrite = min_c(size, kZeroVecSize);
 			size_t written = toWrite;
-			status_t error = vfs_write_pages(ref->vnode, cookie, offset, &vec,
-				1, 0, &written);
+			status_t error = vfs_write_pages(ref->vnode, cookie, offset,
+				sZeroVecs, kZeroVecCount, B_PHYSICAL_IO_REQUEST, &written);
 			if (error != B_OK)
 				return error;
 			if (written == 0)
