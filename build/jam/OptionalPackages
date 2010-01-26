@@ -33,6 +33,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Expat					- XML parsing libraries
 #	Firefox					- the webbrowser
 #	Git						- the distributed version control system
+#	ICU-devel				- the headers for ICU (for development)
 #	KeymapSwitcher			- Desktop utility
 #	LibIconv				- text encoding conversion library
 #	LibLayout				- GCC2 package needed by some BeOS apps to compile
@@ -525,6 +526,14 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 			: true
 		;
 	}
+}
+
+
+# ICU-devel
+if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
+	InstallOptionalHaikuImagePackage icu-devel-4.2-2010-01-26
+		: $(baseURL)/icu-devel-4.2-2010-01-26.zip
+	;
 }
 
 
@@ -1063,7 +1072,7 @@ if [ IsOptionalHaikuImagePackageAdded Wifi-ipw2100+fw ] {
 		AddDriversToHaikuImage net : ipw2100 ;
 		InstallOptionalHaikuImagePackage ipw2100-firmware-installer-2009-12-26b
 			: $(baseURL)/ipw2100-firmware-installer-2009-12-26b.zip
-			: 
+			:
 		;
 		AddSymlinkToHaikuImage home config boot launch
 			: /boot/common/bin/install_firmware_ipw2100 ;
@@ -1079,7 +1088,7 @@ if [ IsOptionalHaikuImagePackageAdded Wifi-iprowifi2200+fw ] {
 		AddDriversToHaikuImage net : iprowifi2200 ;
 		InstallOptionalHaikuImagePackage iprowifi2200-firmware-installer-2009-12-26
 			: $(baseURL)/iprowifi2200-firmware-installer-2009-12-26.zip
-			: 
+			:
 		;
 		AddSymlinkToHaikuImage home config boot launch
 			: /boot/common/bin/install_firmware_iprowifi2200 ;
