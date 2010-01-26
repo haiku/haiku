@@ -232,14 +232,14 @@ TermView::TermView(BMessage* archive)
 	fReportAnyMouseEvent(false)
 {
 	BRect frame = Bounds();
-	
+
 	if (archive->FindInt32("encoding", (int32*)&fEncoding) < B_OK)
 		fEncoding = M_UTF8;
 	if (archive->FindInt32("columns", (int32*)&fColumns) < B_OK)
 		fColumns = COLUMNS_DEFAULT;
 	if (archive->FindInt32("rows", (int32*)&fRows) < B_OK)
 		fRows = ROWS_DEFAULT;
-		
+
 	int32 argc = 0;
 	if (archive->HasInt32("argc"))
 		archive->FindInt32("argc", &argc);
@@ -257,7 +257,7 @@ TermView::TermView(BMessage* archive)
 	bool useRect = false;
 	if ((archive->FindBool("use_rect", &useRect) == B_OK) && useRect)
 		SetTermSize(frame);
-		
+
 	delete[] argv;
 }
 
@@ -342,7 +342,7 @@ TermView::_InitObject(int32 argc, const char** argv)
 		return B_NO_MEMORY;
 
 	SetTermFont(be_fixed_font);
-	
+
 	error = fShell->Open(fRows, fColumns,
 		EncodingAsShortString(fEncoding), argc, argv);
 
@@ -550,7 +550,7 @@ TermView::SetTermSize(BRect rect)
 {
 	int rows;
 	int columns;
-	
+
 	GetTermSizeFromRect(rect, &rows, &columns);
 	SetTermSize(rows, columns);
 }
@@ -562,7 +562,7 @@ TermView::GetTermSizeFromRect(const BRect &rect, int *_rows,
 {
 	int columns = (rect.IntegerWidth() + 1) / fFontWidth;
 	int rows = (rect.IntegerHeight() + 1) / fFontHeight;
-	
+
 	if (_rows)
 		*_rows = rows;
 	if (_columns)
@@ -621,8 +621,8 @@ TermView::SetMouseClipboard(BClipboard *clipboard)
 {
 	fMouseClipboard = clipboard;
 }
-	
-	
+
+
 void
 TermView::GetTermFont(BFont *font) const
 {
@@ -796,7 +796,7 @@ TermView::_AttachShell(Shell *shell)
 		return B_BAD_VALUE;
 
 	fShell = shell;
-	
+
 	return fShell->AttachBuffer(TextBuffer());
 }
 
@@ -813,7 +813,7 @@ void
 TermView::_Activate()
 {
 	fActive = true;
-	
+
 	if (fCursorBlinkRunner == NULL) {
 		BMessage blinkMessage(kBlinkCursor);
 		fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
@@ -830,7 +830,7 @@ TermView::_Deactivate()
 	_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
 	delete fCursorBlinkRunner;
 	fCursorBlinkRunner = NULL;
-	
+
 	fActive = false;
 }
 
@@ -956,7 +956,7 @@ void
 TermView::_BlinkCursor()
 {
 	bool wasVisible = _IsCursorVisible();
-	
+
 	if (!wasVisible && fInline && fInline->IsActive())
 		return;
 
@@ -1022,7 +1022,7 @@ void
 TermView::AttachedToWindow()
 {
 	fMouseButtons = 0;
-		
+
 	MakeFocus(true);
 	if (fScrollBar) {
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
@@ -1144,7 +1144,7 @@ TermView::Draw(BRect updateRect)
 
 	if (fInline && fInline->IsActive())
 		_DrawInlineMethodString();
-	
+
 	if (fCursor >= TermPos(x1, y1) && fCursor <= TermPos(x2, y2))
 		_DrawCursor();
 }
@@ -1574,7 +1574,7 @@ TermView::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-		
+
 		case B_INPUT_METHOD_EVENT:
 		{
 			int32 opcode;
@@ -1707,8 +1707,8 @@ TermView::ScrollTo(BPoint where)
 //debug_printf("TermView::ScrollTo(): %f -> %f\n", fScrollOffset, where.y);
 	float diff = where.y - fScrollOffset;
 	if (diff == 0)
-		return;	
-	
+		return;
+
 	float bottom = Bounds().bottom;
 	int32 oldFirstLine = _LineAt(0);
 	int32 oldLastLine = _LineAt(bottom);
@@ -1748,7 +1748,7 @@ void
 TermView::TargetedByScrollView(BScrollView *scrollView)
 {
 	BView::TargetedByScrollView(scrollView);
-	
+
 	SetScrollBar(scrollView ? scrollView->ScrollBar(B_VERTICAL) : NULL);
 }
 
@@ -2815,26 +2815,26 @@ TermView::_DrawInlineMethodString()
 {
 	if (!fInline || !fInline->String())
 		return;
-	
+
 	const int32 numChars = BString(fInline->String()).CountChars();
-	
+
 	BPoint startPoint = _ConvertFromTerminal(fCursor);
 	BPoint endPoint = startPoint;
 	endPoint.x += fFontWidth * numChars;
 	endPoint.y += fFontHeight + 1;
-	
+
 	BRect eraseRect(startPoint, endPoint);
-	
+
 	PushState();
 	SetHighColor(kTermColorTable[7]);
 	FillRect(eraseRect);
 	PopState();
-		
+
 	BPoint loc = _ConvertFromTerminal(fCursor);
 	loc.y += fFontHeight;
 	SetFont(&fHalfFont);
 	SetHighColor(kTermColorTable[0]);
-	SetLowColor(kTermColorTable[7]);	
+	SetLowColor(kTermColorTable[7]);
 	DrawString(fInline->String(), loc);
 }
 
@@ -2849,7 +2849,7 @@ TermView::_HandleInputMethodChanged(BMessage *message)
 	_ActivateCursor(false);
 
 	if (IsFocus())
-		be_app->ObscureCursor();	
+		be_app->ObscureCursor();
 
 	// If we find the "be:confirmed" boolean (and the boolean is true),
 	// it means it's over for now, so the current InlineInput object
@@ -2858,13 +2858,13 @@ TermView::_HandleInputMethodChanged(BMessage *message)
 	bool confirmed;
 	if (message->FindBool("be:confirmed", &confirmed) != B_OK)
 		confirmed = false;
-	
+
 	fInline->SetString("");
-	
+
 	Invalidate();
 	// TODO: Debug only
 	snooze(100000);
-	
+
 	fInline->SetString(string);
 	fInline->ResetClauses();
 
@@ -2939,10 +2939,10 @@ TermView::_HandleInputMethodLocationRequest()
 	const int32 &limit = string.CountChars();
 	BPoint where = _ConvertFromTerminal(fCursor);
 	where.y += fFontHeight;
-	
-	for (int32 i = 0; i < limit; i++) { 
+
+	for (int32 i = 0; i < limit; i++) {
 		// Add the location of the UTF8 characters
-	
+
 		where.x += fFontWidth;
 		ConvertToScreen(&where);
 
@@ -2966,7 +2966,7 @@ TermView::_CancelInputMethod()
 
 	if (inlineInput->IsActive() && Window()) {
 		Invalidate();
-		
+
 		BMessage message(B_INPUT_METHOD_EVENT);
 		message.AddInt32("be:opcode", B_INPUT_METHOD_STOPPED);
 		inlineInput->Method()->SendMessage(&message);
