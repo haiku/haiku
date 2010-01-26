@@ -131,6 +131,10 @@ static property_info sPropertyInfo[] = {
 		{ B_DIRECT_SPECIFIER, 0 }, "Gets/sets the volume (0.0-2.0).", 0,
 		{ B_FLOAT_TYPE }
 	},
+	{ "URI", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets the URI of the currently playing item.", 0, { B_STRING_TYPE }
+	},
 	{ 0, { 0 }, { 0 }, 0, 0 }
 };
 
@@ -469,6 +473,26 @@ MainWin::MessageReceived(BMessage* msg)
 					if (msg->what == B_GET_PROPERTY) {
 						result = reply.AddFloat("result",
 							fController->Volume());
+					} else if (msg->what == B_SET_PROPERTY) {
+						float newVolume;
+						result = msg->FindFloat("data", &newVolume);
+						if (result == B_OK)
+							fController->SetVolume(newVolume);
+					}
+
+					break;
+				}
+
+				case 8:
+				{
+					if (msg->what == B_GET_PROPERTY) {
+						const PlaylistItem* item = fController->Item();
+						if (item == NULL) {
+							result = B_NO_INIT;
+							break;
+						}
+
+						result = reply.AddString("result", item->LocationURI());
 					} else if (msg->what == B_SET_PROPERTY) {
 						float newVolume;
 						result = msg->FindFloat("data", &newVolume);
@@ -1063,6 +1087,7 @@ MainWin::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
 		case 5:
 		case 6:
 		case 7:
+		case 8:
 			return this;
 	}
 
