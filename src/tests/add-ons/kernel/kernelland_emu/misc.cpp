@@ -8,10 +8,13 @@
  */
 
 #include <signal.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string>
 
 #include <KernelExport.h>
+
+#include <heap.h>
 
 
 thread_id
@@ -26,4 +29,18 @@ extern "C" int
 send_signal_etc(pid_t thread, uint signal, uint32 flags)
 {
 	return send_signal(thread, signal);
+}
+
+
+void*
+memalign_etc(size_t alignment, size_t size, uint32 flags)
+{
+	return memalign(alignment, size);
+}
+
+
+void
+free_etc(void* address, uint32 flags)
+{
+	free(address);
 }
