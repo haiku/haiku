@@ -65,11 +65,12 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 			continue;
 
 		if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
-			|| item->UsagePage() == HID_USAGE_PAGE_CONSUMER) {
+			|| item->UsagePage() == HID_USAGE_PAGE_CONSUMER
+			|| item->UsagePage() == HID_USAGE_PAGE_BUTTON) {
 			TRACE("keyboard item with usage %lx\n", item->UsageMinimum());
 
 			if (item->Array()) {
-				// normal or "consumer" keys handled as array items
+				// normal or "consumer"/button keys handled as array items
 				if (fKeyCount < MAX_KEYS)
 					fKeys[fKeyCount++] = item;
 			} else {
@@ -80,11 +81,6 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 					if (fModifierCount < MAX_MODIFIERS)
 						fModifiers[fModifierCount++] = item;
 				}
-			}
-		} else if (item->UsagePage() == HID_USAGE_PAGE_CONSUMER) {
-			if (item->Array()) {
-				if (fKeyCount < MAX_KEYS)
-					fKeys[fKeyCount++] = item;
 			}
 		}
 	}
@@ -162,9 +158,11 @@ KeyboardDevice::AddHandler(HIDDevice *device)
 			HIDReportItem *item = input->ItemAt(j);
 			if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
 				|| (item->UsagePage() == HID_USAGE_PAGE_CONSUMER
+					&& item->Array())
+				|| (item->UsagePage() == HID_USAGE_PAGE_BUTTON
 					&& item->Array())) {
 				// found at least one item with a keyboard usage or with
-				// a consumer usage that is handled like a key
+				// a consumer/button usage that is handled like a key
 				foundKeyboardUsage = true;
 				break;
 			}
@@ -611,7 +609,7 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 			}
 
 			if (key == 0) {
-				// unmapped normal key or consumer key
+				// unmapped normal key or consumer/button key
 				key = fKeys[i]->UsageMinimum() + current[i];
 			}
 
