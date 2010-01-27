@@ -19,7 +19,6 @@
 #include "jinclude.h"
 #include "jpeglib.h"
 
-EXTERN(void) jinit_c_codec (j_compress_ptr cinfo);
 
 /*
  * Master selection of compression modules.
@@ -33,16 +32,24 @@ jinit_compress_master (j_compress_ptr cinfo)
   /* Initialize master control (includes parameter checking/processing) */
   jinit_c_master_control(cinfo, FALSE /* full compression */);
 
-  /* Initialize compression codec */
-  jinit_c_codec(cinfo);
-
   /* Preprocessing */
   if (! cinfo->raw_data_in) {
     jinit_color_converter(cinfo);
     jinit_downsampler(cinfo);
     jinit_c_prep_controller(cinfo, FALSE /* never need full buffer here */);
   }
+  /* Forward DCT */
+  jinit_forward_dct(cinfo);
+  /* Entropy encoding: either Huffman or arithmetic coding. */
+  if (cinfo->arith_code)
+    jinit_arith_encoder(cinfo);
+  else {
+    jinit_huff_encoder(cinfo);
+  }
 
+  /* Need a full-image coefficient buffer in any multi-pass mode. */
+  jinit_c_coef_controller(cinfo,
+		(boolean) (cinfo->num_scans > 1 || cinfo->optimize_coding));
   jinit_c_main_controller(cinfo, FALSE /* never need full buffer here */);
 
   jinit_marker_writer(cinfo);

@@ -15,11 +15,6 @@
  * It ain't much, but it beats dropping error messages into the bit bucket,
  * which is what happens to output to stderr under most Windows C compilers.
  *
- * If you define USE_BEOS_ALERT in jconfig.h or in the makefile,
- * you get a BeOS-specific hack to display error messages in a dialog box.
- * It ain't much, but it beats dropping error messages into the bit bucket,
- * which is what happens to output to stderr under most Windows C compilers.
- *
  * These routines are used by both the compression and decompression code.
  */
 
@@ -32,10 +27,6 @@
 #ifdef USE_WINDOWS_MESSAGEBOX
 #include <windows.h>
 #endif
-
-//#ifdef USE_BEOS_ALERT
-//#include <Alert.h>
-//#endif
 
 #ifndef EXIT_FAILURE		/* define exit() codes if not provided */
 #define EXIT_FAILURE  1
@@ -115,13 +106,9 @@ output_message (j_common_ptr cinfo)
   /* Display it in a message dialog box */
   MessageBox(GetActiveWindow(), buffer, "JPEG Library Error",
 	     MB_OK | MB_ICONERROR);
-#else 
-//	#ifdef USE_BEOS_ALERT
-//		(new BAlert("JPEG Library Error", buffer, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
-//	#else
-	  /* Send it to stderr, adding a newline */
-	  fprintf(stderr, "%s\n", buffer);
-//	#endif
+#else
+  /* Send it to stderr, adding a newline */
+  fprintf(stderr, "%s\n", buffer);
 #endif
 }
 

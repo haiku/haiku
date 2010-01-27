@@ -63,8 +63,10 @@ jpeg_CreateCompress (j_compress_ptr cinfo, int version, size_t structsize)
 
   cinfo->comp_info = NULL;
 
-  for (i = 0; i < NUM_QUANT_TBLS; i++)
+  for (i = 0; i < NUM_QUANT_TBLS; i++) {
     cinfo->quant_tbl_ptrs[i] = NULL;
+    cinfo->q_scale_factor[i] = 100;
+  }
 
   for (i = 0; i < NUM_HUFF_TBLS; i++) {
     cinfo->dc_huff_tbl_ptrs[i] = NULL;
@@ -168,7 +170,7 @@ jpeg_finish_compress (j_compress_ptr cinfo)
       /* We bypass the main controller and invoke coef controller directly;
        * all work is being done from the coefficient buffer.
        */
-      if (! (*cinfo->codec->compress_data) (cinfo, (JSAMPIMAGE) NULL))
+      if (! (*cinfo->coef->compress_data) (cinfo, (JSAMPIMAGE) NULL))
 	ERREXIT(cinfo, JERR_CANT_SUSPEND);
     }
     (*cinfo->master->finish_pass) (cinfo);

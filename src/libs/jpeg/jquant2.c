@@ -129,9 +129,9 @@
 /* These will do the right thing for either R,G,B or B,G,R color order,
  * but you may not like the results for other color orders.
  */
-#define HIST_C0_BITS  6		/* bits of precision in R/B histogram */
+#define HIST_C0_BITS  5		/* bits of precision in R/B histogram */
 #define HIST_C1_BITS  6		/* bits of precision in G histogram */
-#define HIST_C2_BITS  6		/* bits of precision in B/R histogram */
+#define HIST_C2_BITS  5		/* bits of precision in B/R histogram */
 
 /* Number of elements along histogram axes. */
 #define HIST_C0_ELEMS  (1<<HIST_C0_BITS)

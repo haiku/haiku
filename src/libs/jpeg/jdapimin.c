@@ -2,6 +2,7 @@
  * jdapimin.c
  *
  * Copyright (C) 1994-1998, Thomas G. Lane.
+ * Modified 2009 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -149,14 +150,8 @@ default_decompress_parms (j_decompress_ptr cinfo)
       else if (cid0 == 82 && cid1 == 71 && cid2 == 66)
 	cinfo->jpeg_color_space = JCS_RGB; /* ASCII 'R', 'G', 'B' */
       else {
-  		if (cinfo->process == JPROC_LOSSLESS) {
-		  TRACEMS3(cinfo, 1, JTRC_UNKNOWN_LOSSLESS_IDS, cid0, cid1, cid2);
-		  cinfo->jpeg_color_space = JCS_RGB; /* assume it's RGB */
-		}
-		else {  /* Lossy processes */
-		  TRACEMS3(cinfo, 1, JTRC_UNKNOWN_LOSSY_IDS, cid0, cid1, cid2);
-		  cinfo->jpeg_color_space = JCS_YCbCr; /* assume it's YCbCr */
-		}
+	TRACEMS3(cinfo, 1, JTRC_UNKNOWN_IDS, cid0, cid1, cid2);
+	cinfo->jpeg_color_space = JCS_YCbCr; /* assume it's YCbCr */
       }
     }
     /* Always guess RGB is proper output colorspace. */
@@ -191,8 +186,8 @@ default_decompress_parms (j_decompress_ptr cinfo)
   }
 
   /* Set defaults for other decompression parameters. */
-  cinfo->scale_num = 1;		/* 1:1 scaling */
-  cinfo->scale_denom = 1;
+  cinfo->scale_num = cinfo->block_size;		/* 1:1 scaling */
+  cinfo->scale_denom = cinfo->block_size;
   cinfo->output_gamma = 1.0;
   cinfo->buffered_image = FALSE;
   cinfo->raw_data_out = FALSE;

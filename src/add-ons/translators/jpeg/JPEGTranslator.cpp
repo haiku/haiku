@@ -55,7 +55,7 @@ char translatorInfo[] =
 	"©2002-2003, Marcin Konicki\n"
 	"©2005-2007, Haiku\n"
 	"\n"
-	"Based on IJG library © 1991-1998, Thomas G. Lane\n"
+	"Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n"
 	"          http://www.ijg.org/files/\n"
 	"with \"lossless\" encoding support patch by Ken Murchison\n"
 	"          http://www.oceana.com/ftp/ljpeg/\n"

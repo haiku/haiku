@@ -1,7 +1,8 @@
 /*
  * jdtrans.c
  *
- * Copyright (C) 1995-1998, Thomas G. Lane.
+ * Copyright (C) 1995-1997, Thomas G. Lane.
+ * Modified 2000-2009 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -13,9 +14,7 @@
 #define JPEG_INTERNALS
 #include "jinclude.h"
 #include "jpeglib.h"
-#include "jlossy.h"
 
-EXTERN(void) jinit_d_codec (j_decompress_ptr cinfo);
 
 /* Forward declarations */
 LOCAL(void) transdecode_master_selection JPP((j_decompress_ptr cinfo));
@@ -46,14 +45,6 @@ LOCAL(void) transdecode_master_selection JPP((j_decompress_ptr cinfo));
 GLOBAL(jvirt_barray_ptr *)
 jpeg_read_coefficients (j_decompress_ptr cinfo)
 {
-  //j_lossy_d_ptr decomp;
-
-  /* Can't read coefficients from lossless streams */
-  if (cinfo->process == JPROC_LOSSLESS) {
-    ERREXIT(cinfo, JERR_CANT_TRANSCODE);
-    return NULL;
-  }
-
   if (cinfo->global_state == DSTATE_READY) {
     /* First call: initialize active modules */
     transdecode_master_selection(cinfo);
@@ -90,7 +81,7 @@ jpeg_read_coefficients (j_decompress_ptr cinfo)
    */
   if ((cinfo->global_state == DSTATE_STOPPING ||
        cinfo->global_state == DSTATE_BUFIMAGE) && cinfo->buffered_image) {
-    return ((j_lossy_d_ptr) cinfo->codec)->coef_arrays;
+    return cinfo->coef->coef_arrays;
   }
   /* Oops, improper usage */
   ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
@@ -109,8 +100,18 @@ transdecode_master_selection (j_decompress_ptr cinfo)
   /* This is effectively a buffered-image operation. */
   cinfo->buffered_image = TRUE;
 
-  /* Initialize decompression codec */
-  jinit_d_codec(cinfo);
+  /* Compute output image dimensions and related values. */
+  jpeg_core_output_dimensions(cinfo);
+
+  /* Entropy decoding: either Huffman or arithmetic coding. */
+  if (cinfo->arith_code)
+    jinit_arith_decoder(cinfo);
+  else {
+    jinit_huff_decoder(cinfo);
+  }
+
+  /* Always get a full-image coefficient buffer. */
+  jinit_d_coef_controller(cinfo, TRUE);
 
   /* We can now tell the memory manager to allocate virtual arrays. */
   (*cinfo->mem->realize_virt_arrays) ((j_common_ptr) cinfo);
@@ -122,7 +123,7 @@ transdecode_master_selection (j_decompress_ptr cinfo)
   if (cinfo->progress != NULL) {
     int nscans;
     /* Estimate number of scans to set pass_limit. */
-    if (cinfo->process == JPROC_PROGRESSIVE) {
+    if (cinfo->progressive_mode) {
       /* Arbitrarily estimate 2 interleaved DC scans + 3 AC scans/component. */
       nscans = 2 + 3 * cinfo->num_components;
     } else if (cinfo->inputctl->has_multiple_scans) {

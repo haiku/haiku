@@ -1212,6 +1212,13 @@ AboutView::_CreateCreditsView()
 			"Randers-Pehrson."));
 			// TODO: License!
 
+	// libjpeg copyrights
+	_AddPackageCredit(PackageCredit("libjpeg")
+		.SetCopyright(COPYRIGHT_STRING " 1994-2009, Thomas G. Lane,"
+			" Guido Vollbeding. This software is based in part on the "
+			"work of the Independent JPEG Group"));
+			// TODO: License!
+			
 	// libprint copyrights
 	_AddPackageCredit(PackageCredit("libprint")
 		.SetCopyright(COPYRIGHT_STRING

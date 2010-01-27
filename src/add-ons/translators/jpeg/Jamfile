@@ -14,7 +14,7 @@ Translator JPEGTranslator :
 	exif_parser.cpp
 	JPEGTranslator.cpp
 
-	: be translation libjpeg.a $(TARGET_LIBSTDC++)
+	: be translation libjpeg.so $(TARGET_LIBSTDC++)
 	: true
 ;
 
