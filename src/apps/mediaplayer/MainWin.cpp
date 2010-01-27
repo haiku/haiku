@@ -290,6 +290,7 @@ MainWin::~MainWin()
 		fPlaylistWindow->Quit();
 
 	delete fPlaylist;
+	fPlaylist = NULL;
 
 	// quit the Controller looper thread
 	thread_id controllerThread = fController->Thread();
@@ -1057,6 +1058,8 @@ MainWin::GetQuitMessage(BMessage* message)
 		playlistArchive.AddInt64("position", fController->TimePosition());
 		controllerLocker.Unlock();
 
+		if (!fPlaylist)
+			return;
 		BAutolock playlistLocker(fPlaylist);
 		if (fPlaylist->Archive(&playlistArchive) != B_OK
 			|| playlistArchive.AddInt32("index",
