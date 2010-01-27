@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the NewOS License.
  */
 #ifndef VM_KERNEL_AREA_H
@@ -115,7 +115,7 @@ struct VMKernelArea : VMArea, AVLTreeNode {
 
 	static	VMKernelArea*		Create(VMAddressSpace* addressSpace,
 									const char* name, uint32 wiring,
-									uint32 protection);
+									uint32 protection, uint32 allocationFlags);
 
 			VMKernelAddressRange* Range() const
 									{ return fRange; }

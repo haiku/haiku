@@ -2257,7 +2257,6 @@ device_manager_init(struct kernel_args* args)
 {
 	TRACE(("device manager init\n"));
 
-	vip_io_request_allocator_init();
 	IOSchedulerRoster::Init();
 
 	dm_init_id_generator();

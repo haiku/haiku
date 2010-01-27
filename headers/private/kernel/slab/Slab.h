@@ -8,24 +8,26 @@
 #define _SLAB_SLAB_H_
 
 
-#include <KernelExport.h>
-#include <OS.h>
+#include <heap.h>
 
 
 enum {
-	/* create_object_cache_etc flags */
-	CACHE_NO_DEPOT					= 1 << 0,
-	CACHE_UNLOCKED_PAGES			= 1 << 1,	// unsupported
-	CACHE_LARGE_SLAB				= 1 << 2,
+	/* object_cache_{alloc,free}() flags  */
+	CACHE_DONT_WAIT_FOR_MEMORY		= HEAP_DONT_WAIT_FOR_MEMORY,
+	CACHE_DONT_LOCK_KERNEL_SPACE	= HEAP_DONT_LOCK_KERNEL_SPACE,
+	CACHE_PRIORITY_VIP				= HEAP_PRIORITY_VIP,
+	CACHE_ALLOC_FLAGS				= CACHE_DONT_WAIT_FOR_MEMORY
+										| CACHE_DONT_LOCK_KERNEL_SPACE
+										| CACHE_PRIORITY_VIP,
 
-	/* object_cache_{alloc,free}() flags */
-	CACHE_DONT_WAIT_FOR_MEMORY		= 1 << 8,
-	CACHE_DONT_LOCK_KERNEL_SPACE	= 1 << 9,
-	CACHE_PRIORITY_VIP				= 1 << 10,
+	/* create_object_cache_etc flags */
+	CACHE_NO_DEPOT					= 0x08000000,
+	CACHE_UNLOCKED_PAGES			= 0x10000000,	// unsupported
+	CACHE_LARGE_SLAB				= 0x20000000,
 
 	/* internal */
-	CACHE_ALIGN_ON_SIZE				= 1 << 30,
-	CACHE_DURING_BOOT				= 1 << 31
+	CACHE_ALIGN_ON_SIZE				= 0x40000000,
+	CACHE_DURING_BOOT				= 0x80000000
 };
 
 struct ObjectCache;

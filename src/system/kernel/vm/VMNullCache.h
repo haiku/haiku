@@ -15,7 +15,7 @@
 
 class VMNullCache : public VMCache {
 public:
-	status_t	Init();
+	status_t	Init(uint32 allocationFlags);
 };
 
 

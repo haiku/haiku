@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -86,11 +86,11 @@ VMKernelAddressSpace::InitObject()
 	// create the free lists
 	size_t size = fEndAddress - fBase + 1;
 	fFreeListCount = ld(size) - PAGE_SHIFT + 1;
-	fFreeLists = new(nogrow) RangeFreeList[fFreeListCount];
+	fFreeLists = new(std::nothrow) RangeFreeList[fFreeListCount];
 	if (fFreeLists == NULL)
 		return B_NO_MEMORY;
 
-	Range* range = new(nogrow) Range(fBase, size, Range::RANGE_FREE);
+	Range* range = new(std::nothrow) Range(fBase, size, Range::RANGE_FREE);
 	if (range == NULL)
 		return B_NO_MEMORY;
 
@@ -127,18 +127,21 @@ VMKernelAddressSpace::NextArea(VMArea* _area) const
 
 VMArea*
 VMKernelAddressSpace::CreateArea(const char* name, uint32 wiring,
-	uint32 protection)
+	uint32 protection, uint32 allocationFlags)
 {
-	return VMKernelArea::Create(this, name, wiring, protection);
+	return VMKernelArea::Create(this, name, wiring, protection,
+		allocationFlags);
 }
 
 
 void
-VMKernelAddressSpace::DeleteArea(VMArea* area)
+VMKernelAddressSpace::DeleteArea(VMArea* _area, uint32 allocationFlags)
 {
 	TRACE("VMKernelAddressSpace::DeleteArea(%p)\n", area);
 
-	delete static_cast<VMKernelArea*>(area);
+	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
+	area->~VMKernelArea();
+	free_etc(area, allocationFlags);
 }
 
 
@@ -162,7 +165,7 @@ VMKernelAddressSpace::LookupArea(addr_t address) const
 */
 status_t
 VMKernelAddressSpace::InsertArea(void** _address, uint32 addressSpec,
-	size_t size, VMArea* _area)
+	size_t size, VMArea* _area, uint32 allocationFlags)
 {
 	TRACE("VMKernelAddressSpace::InsertArea(%p, %" B_PRIu32 ", %#" B_PRIxSIZE
 		", %p \"%s\")\n", *_address, addressSpec, size, _area, _area->name);
@@ -171,7 +174,7 @@ VMKernelAddressSpace::InsertArea(void** _address, uint32 addressSpec,
 
 	Range* range;
 	status_t error = _AllocateRange((addr_t)*_address, addressSpec, size,
-		addressSpec == B_EXACT_ADDRESS, range);
+		addressSpec == B_EXACT_ADDRESS, allocationFlags, range);
 	if (error != B_OK)
 		return error;
 
@@ -192,13 +195,13 @@ VMKernelAddressSpace::InsertArea(void** _address, uint32 addressSpec,
 
 //! You must hold the address space's write lock.
 void
-VMKernelAddressSpace::RemoveArea(VMArea* _area)
+VMKernelAddressSpace::RemoveArea(VMArea* _area, uint32 allocationFlags)
 {
 	TRACE("VMKernelAddressSpace::RemoveArea(%p)\n", _area);
 
 	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
 
-	_FreeRange(area->Range());
+	_FreeRange(area->Range(), allocationFlags);
 
 	fFreeSpace += area->Size();
 
@@ -230,7 +233,8 @@ VMKernelAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 
 
 status_t
-VMKernelAddressSpace::ResizeArea(VMArea* _area, size_t newSize)
+VMKernelAddressSpace::ResizeArea(VMArea* _area, size_t newSize,
+	uint32 allocationFlags)
 {
 	TRACE("VMKernelAddressSpace::ResizeArea(%p, %#" B_PRIxSIZE ")\n", _area,
 		newSize);
@@ -253,8 +257,9 @@ VMKernelAddressSpace::ResizeArea(VMArea* _area, size_t newSize)
 		} else {
 			// no free range following -- we need to allocate a new one and
 			// insert it
-			nextRange = new(nogrow) Range(range->base + newSize,
-				range->size - newSize, Range::RANGE_FREE);
+			nextRange = new(malloc_flags(allocationFlags)) Range(
+				range->base + newSize, range->size - newSize,
+				Range::RANGE_FREE);
 			if (nextRange == NULL)
 				return B_NO_MEMORY;
 			_InsertRange(nextRange);
@@ -274,7 +279,7 @@ VMKernelAddressSpace::ResizeArea(VMArea* _area, size_t newSize)
 		if (sizeDiff == nextRange->size) {
 			// The next range is completely covered -- remove and delete it.
 			_RemoveRange(nextRange);
-			delete nextRange;
+			free_etc(nextRange, allocationFlags);
 		} else {
 			// The next range is only partially covered -- shrink it.
 			if (nextRange->type == Range::RANGE_FREE)
@@ -296,7 +301,8 @@ VMKernelAddressSpace::ResizeArea(VMArea* _area, size_t newSize)
 
 
 status_t
-VMKernelAddressSpace::ShrinkAreaHead(VMArea* _area, size_t newSize)
+VMKernelAddressSpace::ShrinkAreaHead(VMArea* _area, size_t newSize,
+	uint32 allocationFlags)
 {
 	TRACE("VMKernelAddressSpace::ShrinkAreaHead(%p, %#" B_PRIxSIZE ")\n", _area,
 		newSize);
@@ -323,8 +329,8 @@ VMKernelAddressSpace::ShrinkAreaHead(VMArea* _area, size_t newSize)
 	} else {
 		// no free range before -- we need to allocate a new one and
 		// insert it
-		previousRange = new(nogrow) Range(range->base, sizeDiff,
-			Range::RANGE_FREE);
+		previousRange = new(malloc_flags(allocationFlags)) Range(range->base,
+			sizeDiff, Range::RANGE_FREE);
 		if (previousRange == NULL)
 			return B_NO_MEMORY;
 		range->base += sizeDiff;
@@ -342,15 +348,16 @@ VMKernelAddressSpace::ShrinkAreaHead(VMArea* _area, size_t newSize)
 
 
 status_t
-VMKernelAddressSpace::ShrinkAreaTail(VMArea* area, size_t newSize)
+VMKernelAddressSpace::ShrinkAreaTail(VMArea* area, size_t newSize,
+	uint32 allocationFlags)
 {
-	return ResizeArea(area, newSize);
+	return ResizeArea(area, newSize, allocationFlags);
 }
 
 
 status_t
 VMKernelAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
-	size_t size, uint32 flags)
+	size_t size, uint32 flags, uint32 allocationFlags)
 {
 	TRACE("VMKernelAddressSpace::ReserveAddressRange(%p, %" B_PRIu32 ", %#"
 		B_PRIxSIZE ", %#" B_PRIx32 ")\n", *_address, addressSpec, size, flags);
@@ -362,7 +369,7 @@ VMKernelAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 
 	Range* range;
 	status_t error = _AllocateRange((addr_t)*_address, addressSpec, size, false,
-		range);
+		allocationFlags, range);
 	if (error != B_OK)
 		return error;
 
@@ -379,7 +386,8 @@ VMKernelAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 
 
 status_t
-VMKernelAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
+VMKernelAddressSpace::UnreserveAddressRange(addr_t address, size_t size,
+	uint32 allocationFlags)
 {
 	TRACE("VMKernelAddressSpace::UnreserveAddressRange(%#" B_PRIxADDR ", %#"
 		B_PRIxSIZE ")\n", address, size);
@@ -401,7 +409,7 @@ VMKernelAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
 			nextRange = fRangeList.GetNext(nextRange);
 
 		if (range->type == Range::RANGE_RESERVED) {
-			_FreeRange(range);
+			_FreeRange(range, allocationFlags);
 			Put();
 		}
 
@@ -414,7 +422,7 @@ VMKernelAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
 
 
 void
-VMKernelAddressSpace::UnreserveAllAddressRanges()
+VMKernelAddressSpace::UnreserveAllAddressRanges(uint32 allocationFlags)
 {
 	Range* range = fRangeList.Head();
 	while (range != NULL) {
@@ -426,7 +434,7 @@ VMKernelAddressSpace::UnreserveAllAddressRanges()
 			nextRange = fRangeList.GetNext(nextRange);
 
 		if (range->type == Range::RANGE_RESERVED) {
-			_FreeRange(range);
+			_FreeRange(range, allocationFlags);
 			Put();
 		}
 
@@ -522,7 +530,8 @@ VMKernelAddressSpace::_RemoveRange(Range* range)
 
 status_t
 VMKernelAddressSpace::_AllocateRange(addr_t address, uint32 addressSpec,
-	size_t size, bool allowReservedRange, Range*& _range)
+	size_t size, bool allowReservedRange, uint32 allocationFlags,
+	Range*& _range)
 {
 	TRACE("  VMKernelAddressSpace::_AllocateRange(address: %#" B_PRIxADDR
 		", size: %#" B_PRIxSIZE ", addressSpec: %#" B_PRIx32 ", reserved "
@@ -582,8 +591,8 @@ VMKernelAddressSpace::_AllocateRange(addr_t address, uint32 addressSpec,
 		// allocation at the beginning of the range
 		if (range->size > size) {
 			// only partial -- split the range
-			Range* leftOverRange = new(nogrow) Range(address + size,
-				range->size - size, range);
+			Range* leftOverRange = new(malloc_flags(allocationFlags)) Range(
+				address + size, range->size - size, range);
 			if (leftOverRange == NULL)
 				return B_NO_MEMORY;
 
@@ -592,8 +601,8 @@ VMKernelAddressSpace::_AllocateRange(addr_t address, uint32 addressSpec,
 		}
 	} else if (address + size == range->base + range->size) {
 		// allocation at the end of the range -- split the range
-		Range* leftOverRange = new(nogrow) Range(range->base,
-			range->size - size, range);
+		Range* leftOverRange = new(malloc_flags(allocationFlags)) Range(
+			range->base, range->size - size, range);
 		if (leftOverRange == NULL)
 			return B_NO_MEMORY;
 
@@ -602,14 +611,14 @@ VMKernelAddressSpace::_AllocateRange(addr_t address, uint32 addressSpec,
 		_InsertRange(leftOverRange);
 	} else {
 		// allocation in the middle of the range -- split the range in three
-		Range* leftOverRange1 = new(nogrow) Range(range->base,
-			address - range->base, range);
+		Range* leftOverRange1 = new(malloc_flags(allocationFlags)) Range(
+			range->base, address - range->base, range);
 		if (leftOverRange1 == NULL)
 			return B_NO_MEMORY;
-		Range* leftOverRange2 = new(nogrow) Range(address + size,
-			range->size - size - leftOverRange1->size, range);
+		Range* leftOverRange2 = new(malloc_flags(allocationFlags)) Range(
+			address + size, range->size - size - leftOverRange1->size, range);
 		if (leftOverRange2 == NULL) {
-			delete leftOverRange1;
+			free_etc(leftOverRange1, allocationFlags);
 			return B_NO_MEMORY;
 		}
 
@@ -752,7 +761,7 @@ TRACE("    -> reserved range not allowed\n");
 
 
 void
-VMKernelAddressSpace::_FreeRange(Range* range)
+VMKernelAddressSpace::_FreeRange(Range* range, uint32 allocationFlags)
 {
 	TRACE("  VMKernelAddressSpace::_FreeRange(%p (%#" B_PRIxADDR ", %#"
 		B_PRIxSIZE ", %d))\n", range, range->base, range->size, range->type);
@@ -769,15 +778,15 @@ VMKernelAddressSpace::_FreeRange(Range* range)
 			_RemoveRange(range);
 			_RemoveRange(nextRange);
 			previousRange->size += range->size + nextRange->size;
-			delete range;
-			delete nextRange;
+			free_etc(range, allocationFlags);
+			free_etc(nextRange, allocationFlags);
 			_FreeListInsertRange(previousRange, previousRange->size);
 		} else {
 			// join with the previous range only, delete the supplied one
 			_FreeListRemoveRange(previousRange, previousRange->size);
 			_RemoveRange(range);
 			previousRange->size += range->size;
-			delete range;
+			free_etc(range, allocationFlags);
 			_FreeListInsertRange(previousRange, previousRange->size);
 		}
 	} else {
@@ -785,7 +794,7 @@ VMKernelAddressSpace::_FreeRange(Range* range)
 			// join with the next range and delete it
 			_RemoveRange(nextRange);
 			range->size += nextRange->size;
-			delete nextRange;
+			free_etc(nextRange, allocationFlags);
 		}
 
 		// mark the range free and add it to the respective free list

@@ -289,8 +289,6 @@ public:
 									bool partialTransfer,
 									size_t bytesTransferred) = 0;
 
-			void				operator delete(void* address, size_t size);
-
 	static	status_t 			IORequestCallback(void* data,
 									io_request* request, status_t status,
 									bool partialTransfer,

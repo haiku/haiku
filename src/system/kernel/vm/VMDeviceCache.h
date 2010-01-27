@@ -15,7 +15,7 @@
 
 class VMDeviceCache : public VMCache {
 public:
-			status_t	Init(addr_t baseAddress);
+			status_t	Init(addr_t baseAddress, uint32 allocationFlags);
 
 	virtual	bool		HasPage(off_t offset);
 

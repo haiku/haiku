@@ -70,25 +70,31 @@ public:
 
 	virtual	VMArea*				LookupArea(addr_t address) const = 0;
 	virtual	VMArea*				CreateArea(const char* name, uint32 wiring,
-									uint32 protection) = 0;
-	virtual	void				DeleteArea(VMArea* area) = 0;
+									uint32 protection,
+									uint32 allocationFlags) = 0;
+	virtual	void				DeleteArea(VMArea* area,
+									uint32 allocationFlags) = 0;
 	virtual	status_t			InsertArea(void** _address, uint32 addressSpec,
-									size_t size, VMArea* area) = 0;
-	virtual	void				RemoveArea(VMArea* area) = 0;
+									size_t size, VMArea* area,
+									uint32 allocationFlags) = 0;
+	virtual	void				RemoveArea(VMArea* area,
+									uint32 allocationFlags) = 0;
 
 	virtual	bool				CanResizeArea(VMArea* area, size_t newSize) = 0;
-	virtual	status_t			ResizeArea(VMArea* area, size_t newSize) = 0;
-	virtual	status_t			ShrinkAreaHead(VMArea* area, size_t newSize)
-									= 0;
-	virtual	status_t			ShrinkAreaTail(VMArea* area, size_t newSize)
-									= 0;
+	virtual	status_t			ResizeArea(VMArea* area, size_t newSize,
+									uint32 allocationFlags) = 0;
+	virtual	status_t			ShrinkAreaHead(VMArea* area, size_t newSize,
+									uint32 allocationFlags) = 0;
+	virtual	status_t			ShrinkAreaTail(VMArea* area, size_t newSize,
+									uint32 allocationFlags) = 0;
 
 	virtual	status_t			ReserveAddressRange(void** _address,
 									uint32 addressSpec, size_t size,
-									uint32 flags) = 0;
+									uint32 flags, uint32 allocationFlags) = 0;
 	virtual	status_t			UnreserveAddressRange(addr_t address,
-									size_t size) = 0;
-	virtual	void				UnreserveAllAddressRanges() = 0;
+									size_t size, uint32 allocationFlags) = 0;
+	virtual	void				UnreserveAllAddressRanges(
+									uint32 allocationFlags) = 0;
 
 	virtual	void				Dump() const;
 

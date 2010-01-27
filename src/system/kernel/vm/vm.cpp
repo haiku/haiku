@@ -565,6 +565,17 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		return B_OK;
 	}
 
+	int priority;
+	uint32 allocationFlags;
+	if (addressSpace == VMAddressSpace::Kernel()) {
+		priority = VM_PRIORITY_SYSTEM;
+		allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
+			| HEAP_DONT_LOCK_KERNEL_SPACE;
+	} else {
+		priority = VM_PRIORITY_USER;
+		allocationFlags = 0;
+	}
+
 	VMCache* cache = vm_area_get_locked_cache(area);
 	VMCacheChainLocker cacheChainLocker(cache);
 	cacheChainLocker.LockAllSourceCaches();
@@ -574,7 +585,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		size_t oldSize = area->Size();
 		size_t newSize = address - area->Base();
 
-		status_t error = addressSpace->ShrinkAreaTail(area, newSize);
+		status_t error = addressSpace->ShrinkAreaTail(area, newSize,
+			allocationFlags);
 		if (error != B_OK)
 			return error;
 
@@ -587,9 +599,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
-			cache->Resize(cache->virtual_base + newSize,
-				addressSpace == VMAddressSpace::Kernel()
-					? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
+			cache->Resize(cache->virtual_base + newSize, priority);
 			cache->ReleaseRefAndUnlock();
 		}
 
@@ -606,7 +616,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		unmap_pages(area, oldBase, newBase - oldBase);
 
 		// resize the area
-		status_t error = addressSpace->ShrinkAreaHead(area, newSize);
+		status_t error = addressSpace->ShrinkAreaHead(area, newSize,
+			allocationFlags);
 		if (error != B_OK)
 			return error;
 
@@ -630,7 +641,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 	// resize the area
 	addr_t oldSize = area->Size();
-	status_t error = addressSpace->ShrinkAreaTail(area, firstNewSize);
+	status_t error = addressSpace->ShrinkAreaTail(area, firstNewSize,
+		allocationFlags);
 	if (error != B_OK)
 		return error;
 
@@ -646,7 +658,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		B_EXACT_ADDRESS, area->wiring, area->protection, REGION_NO_PRIVATE_MAP,
 		&secondArea, area->name, 0, kernel);
 	if (error != B_OK) {
-		addressSpace->ShrinkAreaTail(area, oldSize);
+		addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
 		return error;
 	}
 
@@ -715,7 +727,19 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		addressSpec, wiring, protection, _area, areaName));
 	cache->AssertLocked();
 
-	VMArea* area = addressSpace->CreateArea(areaName, wiring, protection);
+	uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
+		| HEAP_DONT_LOCK_KERNEL_SPACE;
+	int priority;
+	if (addressSpace != VMAddressSpace::Kernel()) {
+		priority = VM_PRIORITY_USER;
+	} else if ((flags & CREATE_AREA_PRIORITY_VIP) != 0) {
+		priority = VM_PRIORITY_VIP;
+		allocationFlags |= HEAP_PRIORITY_VIP;
+	} else
+		priority = VM_PRIORITY_SYSTEM;
+
+	VMArea* area = addressSpace->CreateArea(areaName, wiring, protection,
+		allocationFlags);
 	if (area == NULL)
 		return B_NO_MEMORY;
 
@@ -745,14 +769,6 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		cache = newCache;
 	}
 
-	int priority;
-	if (addressSpace != VMAddressSpace::Kernel())
-		priority = VM_PRIORITY_USER;
-	else if ((flags & CREATE_AREA_PRIORITY_VIP) != 0)
-		priority = VM_PRIORITY_VIP;
-	else
-		priority = VM_PRIORITY_SYSTEM;
-
 	status = cache->SetMinimalCommitment(size, priority);
 	if (status != B_OK)
 		goto err2;
@@ -773,7 +789,8 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 			goto err2;
 	}
 
-	status = addressSpace->InsertArea(_virtualAddress, addressSpec, size, area);
+	status = addressSpace->InsertArea(_virtualAddress, addressSpec, size, area,
+		allocationFlags);
 	if (status != B_OK) {
 		// TODO: wait and try again once this is working in the backend
 #if 0
@@ -816,7 +833,7 @@ err2:
 		sourceCache->Lock();
 	}
 err1:
-	addressSpace->DeleteArea(area);
+	addressSpace->DeleteArea(area, allocationFlags);
 	return status;
 }
 
@@ -869,7 +886,10 @@ vm_unreserve_address_range(team_id team, void* address, addr_t size)
 	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
 
-	return locker.AddressSpace()->UnreserveAddressRange((addr_t)address, size);
+	VMAddressSpace* addressSpace = locker.AddressSpace();
+	return addressSpace->UnreserveAddressRange((addr_t)address, size,
+		addressSpace == VMAddressSpace::Kernel()
+			? HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE : 0);
 }
 
 
@@ -884,8 +904,11 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
 
-	return locker.AddressSpace()->ReserveAddressRange(_address, addressSpec,
-		size, flags);
+	VMAddressSpace* addressSpace = locker.AddressSpace();
+	return addressSpace->ReserveAddressRange(_address, addressSpec,
+		size, flags,
+		addressSpace == VMAddressSpace::Kernel()
+			? HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE : 0);
 }
 
 
@@ -1852,13 +1875,13 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area,
 		area->cache->WriteModified();
 
 	arch_vm_unset_memory_type(area);
-	addressSpace->RemoveArea(area);
+	addressSpace->RemoveArea(area, 0);
 	addressSpace->Put();
 
 	area->cache->RemoveArea(area);
 	area->cache->ReleaseRef();
 
-	addressSpace->DeleteArea(area);
+	addressSpace->DeleteArea(area, 0);
 }
 
 
@@ -2882,7 +2905,7 @@ vm_delete_areas(struct VMAddressSpace* addressSpace, bool deletingAddressSpace)
 	addressSpace->WriteLock();
 
 	// remove all reserved areas in this address space
-	addressSpace->UnreserveAllAddressRanges();
+	addressSpace->UnreserveAllAddressRanges(0);
 
 	// delete all the areas in this address space
 	while (VMArea* area = addressSpace->FirstArea())
@@ -3267,11 +3290,13 @@ vm_init(kernel_args* args)
 
 	slab_init(args);
 
+#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
 	// map in the new heap and initialize it
 	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
 	TRACE(("heap at 0x%lx\n", heapBase));
 	heap_init(heapBase, heapSize);
+#endif
 
 	// initialize the free page list and physical page mapper
 	vm_page_init(args);
@@ -3297,9 +3322,11 @@ vm_init(kernel_args* args)
 
 	// allocate areas to represent stuff that already exists
 
+#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
 	address = (void*)ROUNDDOWN(heapBase, B_PAGE_SIZE);
 	create_area("kernel heap", &address, B_EXACT_ADDRESS, heapSize,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+#endif
 
 	allocate_kernel_args(args);
 
@@ -3384,7 +3411,12 @@ vm_init_post_sem(kernel_args* args)
 	VMAddressSpace::InitPostSem();
 
 	slab_init_post_sem();
-	return heap_init_post_sem();
+
+#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
+	heap_init_post_sem();
+#endif
+
+	return B_OK;
 }
 
 
@@ -4230,6 +4262,8 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 	int priority = kernel && anyKernelArea
 		? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER;
+	uint32 allocationFlags = kernel && anyKernelArea
+		? HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE : 0;
 
 	if (oldSize < newSize) {
 		// Growing the cache can fail, so we do it first.
@@ -4240,7 +4274,8 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 	for (VMArea* current = cache->areas; current != NULL;
 			current = current->cache_next) {
-		status = current->address_space->ResizeArea(current, newSize);
+		status = current->address_space->ResizeArea(current, newSize,
+			allocationFlags);
 		if (status != B_OK)
 			break;
 
@@ -4266,8 +4301,8 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 		// This can fail, too, in which case we're seriously screwed.
 		for (VMArea* current = cache->areas; current != NULL;
 				current = current->cache_next) {
-			if (current->address_space->ResizeArea(current, oldSize)
-					!= B_OK) {
+			if (current->address_space->ResizeArea(current, oldSize,
+					allocationFlags) != B_OK) {
 				panic("vm_resize_area(): Failed and not being able to restore "
 					"original state.");
 			}

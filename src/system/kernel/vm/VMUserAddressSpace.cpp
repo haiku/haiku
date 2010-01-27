@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -75,16 +75,18 @@ VMUserAddressSpace::NextArea(VMArea* _area) const
 
 VMArea*
 VMUserAddressSpace::CreateArea(const char* name, uint32 wiring,
-	uint32 protection)
+	uint32 protection, uint32 allocationFlags)
 {
-	return VMUserArea::Create(this, name, wiring, protection);
+	return VMUserArea::Create(this, name, wiring, protection, allocationFlags);
 }
 
 
 void
-VMUserAddressSpace::DeleteArea(VMArea* area)
+VMUserAddressSpace::DeleteArea(VMArea* _area, uint32 allocationFlags)
 {
-	delete static_cast<VMUserArea*>(area);
+	VMUserArea* area = static_cast<VMUserArea*>(_area);
+	area->~VMUserArea();
+	free_etc(area, allocationFlags);
 }
 
 
@@ -118,7 +120,7 @@ VMUserAddressSpace::LookupArea(addr_t address) const
 */
 status_t
 VMUserAddressSpace::InsertArea(void** _address, uint32 addressSpec,
-	size_t size, VMArea* _area)
+	size_t size, VMArea* _area, uint32 allocationFlags)
 {
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
 
@@ -151,7 +153,8 @@ VMUserAddressSpace::InsertArea(void** _address, uint32 addressSpec,
 			return B_BAD_VALUE;
 	}
 
-	status = _InsertAreaSlot(searchBase, size, searchEnd, addressSpec, area);
+	status = _InsertAreaSlot(searchBase, size, searchEnd, addressSpec, area,
+		allocationFlags);
 	if (status == B_OK) {
 		*_address = (void*)area->Base();
 		fFreeSpace -= area->Size();
@@ -163,7 +166,7 @@ VMUserAddressSpace::InsertArea(void** _address, uint32 addressSpec,
 
 //! You must hold the address space's write lock.
 void
-VMUserAddressSpace::RemoveArea(VMArea* _area)
+VMUserAddressSpace::RemoveArea(VMArea* _area, uint32 allocationFlags)
 {
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
 
@@ -206,7 +209,8 @@ VMUserAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 
 
 status_t
-VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize)
+VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize,
+	uint32 allocationFlags)
 {
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
 
@@ -224,10 +228,12 @@ VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize)
 		// resize reserved area
 		addr_t offset = area->Base() + newSize - next->Base();
 		if (next->Size() <= offset) {
-			RemoveArea(next);
-			delete next;
+			RemoveArea(next, allocationFlags);
+			next->~VMUserArea();
+			free_etc(next, allocationFlags);
 		} else {
-			status_t error = ShrinkAreaHead(next, next->Size() - offset);
+			status_t error = ShrinkAreaHead(next, next->Size() - offset,
+				allocationFlags);
 			if (error != B_OK)
 				return error;
 		}
@@ -239,7 +245,8 @@ VMUserAddressSpace::ResizeArea(VMArea* _area, size_t newSize)
 
 
 status_t
-VMUserAddressSpace::ShrinkAreaHead(VMArea* area, size_t size)
+VMUserAddressSpace::ShrinkAreaHead(VMArea* area, size_t size,
+	uint32 allocationFlags)
 {
 	size_t oldSize = area->Size();
 	if (size == oldSize)
@@ -253,7 +260,8 @@ VMUserAddressSpace::ShrinkAreaHead(VMArea* area, size_t size)
 
 
 status_t
-VMUserAddressSpace::ShrinkAreaTail(VMArea* area, size_t size)
+VMUserAddressSpace::ShrinkAreaTail(VMArea* area, size_t size,
+	uint32 allocationFlags)
 {
 	size_t oldSize = area->Size();
 	if (size == oldSize)
@@ -267,7 +275,7 @@ VMUserAddressSpace::ShrinkAreaTail(VMArea* area, size_t size)
 
 status_t
 VMUserAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
-	size_t size, uint32 flags)
+	size_t size, uint32 flags, uint32 allocationFlags)
 {
 	// check to see if this address space has entered DELETE state
 	if (fDeleting) {
@@ -276,13 +284,15 @@ VMUserAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 		return B_BAD_TEAM_ID;
 	}
 
-	VMUserArea* area = VMUserArea::CreateReserved(this, flags);
+	VMUserArea* area = VMUserArea::CreateReserved(this, flags, allocationFlags);
 	if (area == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = InsertArea(_address, addressSpec, size, area);
+	status_t status = InsertArea(_address, addressSpec, size, area,
+		allocationFlags);
 	if (status != B_OK) {
-		delete area;
+		area->~VMUserArea();
+		free_etc(area, allocationFlags);
 		return status;
 	}
 
@@ -295,7 +305,8 @@ VMUserAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 
 
 status_t
-VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
+VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size,
+	uint32 allocationFlags)
 {
 	// check to see if this address space has entered DELETE state
 	if (fDeleting) {
@@ -313,9 +324,10 @@ VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
 			break;
 		if (area->id == RESERVED_AREA_ID && area->Base() >= (addr_t)address) {
 			// remove reserved range
-			RemoveArea(area);
+			RemoveArea(area, allocationFlags);
 			Put();
-			delete area;
+			area->~VMUserArea();
+			free_etc(area, allocationFlags);
 		}
 	}
 
@@ -324,14 +336,15 @@ VMUserAddressSpace::UnreserveAddressRange(addr_t address, size_t size)
 
 
 void
-VMUserAddressSpace::UnreserveAllAddressRanges()
+VMUserAddressSpace::UnreserveAllAddressRanges(uint32 allocationFlags)
 {
 	for (VMUserAreaList::Iterator it = fAreas.GetIterator();
 			VMUserArea* area = it.Next();) {
 		if (area->id == RESERVED_AREA_ID) {
-			RemoveArea(area);
+			RemoveArea(area, allocationFlags);
 			Put();
-			delete area;
+			area->~VMUserArea();
+			free_etc(area, allocationFlags);
 		}
 	}
 }
@@ -362,7 +375,7 @@ VMUserAddressSpace::Dump() const
 */
 status_t
 VMUserAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
-	VMUserArea* area)
+	VMUserArea* area, uint32 allocationFlags)
 {
 	VMUserArea* next;
 
@@ -395,7 +408,8 @@ VMUserAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 			// the new area fully covers the reversed range
 			fAreas.Remove(next);
 			Put();
-			delete next;
+			next->~VMUserArea();
+			free_etc(next, allocationFlags);
 		} else {
 			// resize the reserved range behind the area
 			next->SetBase(next->Base() + size);
@@ -411,7 +425,7 @@ VMUserAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 		// the area splits the reserved range into two separate ones
 		// we need a new reserved area to cover this space
 		VMUserArea* reserved = VMUserArea::CreateReserved(this,
-			next->protection);
+			next->protection, allocationFlags);
 		if (reserved == NULL)
 			return B_NO_MEMORY;
 
@@ -437,7 +451,7 @@ VMUserAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 /*!	Must be called with this address space's write lock held */
 status_t
 VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
-	uint32 addressSpec, VMUserArea* area)
+	uint32 addressSpec, VMUserArea* area, uint32 allocationFlags)
 {
 	VMUserArea* last = NULL;
 	VMUserArea* next;
@@ -454,7 +468,8 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 
 	if (addressSpec == B_EXACT_ADDRESS && area->id != RESERVED_AREA_ID) {
 		// search for a reserved area
-		status_t status = _InsertAreaIntoReservedRegion(start, size, area);
+		status_t status = _InsertAreaIntoReservedRegion(start, size, area,
+			allocationFlags);
 		if (status == B_OK || status == B_BAD_VALUE)
 			return status;
 
@@ -555,7 +570,8 @@ second_chance:
 
 						foundSpot = true;
 						area->SetBase(alignedBase);
-						delete next;
+						next->~VMUserArea();
+						free_etc(next, allocationFlags);
 						break;
 					}
 

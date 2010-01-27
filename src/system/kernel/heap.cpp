@@ -142,6 +142,10 @@ typedef SinglyLinkedList<DeferredFreeListEntry> DeferredFreeList;
 typedef SinglyLinkedList<DeferredDeletable> DeferredDeletableList;
 
 
+#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+
+#define VIP_HEAP_SIZE	1024 * 1024
+
 // Heap class configuration
 #define HEAP_CLASS_COUNT 3
 static heap_class sHeapClasses[HEAP_CLASS_COUNT] = {
@@ -183,11 +187,15 @@ static heap_allocator *sHeaps[HEAP_CLASS_COUNT * B_MAX_CPU_COUNT];
 static uint32 *sLastGrowRequest[HEAP_CLASS_COUNT * B_MAX_CPU_COUNT];
 static uint32 *sLastHandledGrowRequest[HEAP_CLASS_COUNT * B_MAX_CPU_COUNT];
 
+static heap_allocator *sVIPHeap;
 static heap_allocator *sGrowHeap = NULL;
 static thread_id sHeapGrowThread = -1;
 static sem_id sHeapGrowSem = -1;
 static sem_id sHeapGrownNotify = -1;
 static bool sAddGrowHeap = false;
+
+#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+
 static DeferredFreeList sDeferredFreeList;
 static DeferredDeletableList sDeferredDeletableList;
 static spinlock sDeferredFreeListLock;
@@ -269,6 +277,9 @@ class Free : public AbstractTraceEntry {
 
 
 // #pragma mark - Debug functions
+
+
+#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
 
 
 #if KERNEL_HEAP_LEAK_CHECK
@@ -808,6 +819,8 @@ dump_allocations_per_caller(int argc, char **argv)
 }
 
 #endif // KERNEL_HEAP_LEAK_CHECK
+
+#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
 
 
 #if PARANOID_HEAP_VALIDATION
@@ -1797,9 +1810,6 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 }
 
 
-#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
-
-
 inline uint32
 heap_index_for(size_t size, int32 cpu)
 {
@@ -1818,33 +1828,45 @@ heap_index_for(size_t size, int32 cpu)
 }
 
 
-static void
-deferred_deleter(void *arg, int iteration)
+static void *
+memalign_nogrow(size_t alignment, size_t size)
 {
-	// move entries and deletables to on-stack lists
-	InterruptsSpinLocker locker(sDeferredFreeListLock);
-	if (sDeferredFreeList.IsEmpty() && sDeferredDeletableList.IsEmpty())
-		return;
+	// use dedicated memory in the grow thread by default
+	if (thread_get_current_thread_id() == sHeapGrowThread) {
+		void *result = heap_memalign(sGrowHeap, alignment, size);
+		if (!sAddGrowHeap && heap_should_grow(sGrowHeap)) {
+			// hopefully the heap grower will manage to create a new heap
+			// before running out of private memory...
+			dprintf("heap: requesting new grow heap\n");
+			sAddGrowHeap = true;
+			release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
+		}
 
-	DeferredFreeList entries;
-	entries.MoveFrom(&sDeferredFreeList);
+		if (result != NULL)
+			return result;
+	}
 
-	DeferredDeletableList deletables;
-	deletables.MoveFrom(&sDeferredDeletableList);
+	// try public memory, there might be something available
+	void *result = NULL;
+	int32 cpuCount = MIN(smp_get_num_cpus(),
+		(int32)sHeapCount / HEAP_CLASS_COUNT);
+	int32 cpuNumber = smp_get_current_cpu();
+	for (int32 i = 0; i < cpuCount; i++) {
+		uint32 heapIndex = heap_index_for(size, cpuNumber++ % cpuCount);
+		heap_allocator *heap = sHeaps[heapIndex];
+		result = heap_memalign(heap, alignment, size);
+		if (result != NULL)
+			return result;
+	}
 
-	locker.Unlock();
+	// no memory available
+	if (thread_get_current_thread_id() == sHeapGrowThread)
+		panic("heap: all heaps have run out of memory while growing\n");
+	else
+		dprintf("heap: all heaps have run out of memory\n");
 
-	// free the entries
-	while (DeferredFreeListEntry* entry = entries.RemoveHead())
-		free(entry);
-
-	// delete the deletables
-	while (DeferredDeletable* deletable = deletables.RemoveHead())
-		delete deletable;
+	return NULL;
 }
-
-
-//	#pragma mark -
 
 
 static status_t
@@ -1905,6 +1927,41 @@ heap_grow_thread(void *)
 
 	return 0;
 }
+
+
+#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+
+
+static void
+deferred_deleter(void *arg, int iteration)
+{
+	// move entries and deletables to on-stack lists
+	InterruptsSpinLocker locker(sDeferredFreeListLock);
+	if (sDeferredFreeList.IsEmpty() && sDeferredDeletableList.IsEmpty())
+		return;
+
+	DeferredFreeList entries;
+	entries.MoveFrom(&sDeferredFreeList);
+
+	DeferredDeletableList deletables;
+	deletables.MoveFrom(&sDeferredDeletableList);
+
+	locker.Unlock();
+
+	// free the entries
+	while (DeferredFreeListEntry* entry = entries.RemoveHead())
+		free(entry);
+
+	// delete the deletables
+	while (DeferredDeletable* deletable = deletables.RemoveHead())
+		delete deletable;
+}
+
+
+//	#pragma mark -
+
+
+#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
 
 
 status_t
@@ -1988,9 +2045,13 @@ heap_init_post_sem()
 }
 
 
+#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+
+
 status_t
 heap_init_post_thread()
 {
+#if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
 	void *address = NULL;
 	area_id growHeapArea = create_area("dedicated grow heap", &address,
 		B_ANY_KERNEL_BLOCK_ADDRESS, HEAP_DEDICATED_GROW_SIZE, B_FULL_LOCK,
@@ -2039,11 +2100,43 @@ heap_init_post_thread()
 		}
 	}
 
+	// create the VIP heap
+	static const heap_class heapClass = {
+		"VIP I/O",					/* name */
+		100,						/* initial percentage */
+		B_PAGE_SIZE / 8,			/* max allocation size */
+		B_PAGE_SIZE,				/* page size */
+		8,							/* min bin size */
+		4,							/* bin alignment */
+		8,							/* min count per page */
+		16							/* max waste per page */
+	};
+
+	area_id vipHeapArea = create_area("VIP heap", &address,
+		B_ANY_KERNEL_ADDRESS, VIP_HEAP_SIZE, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (vipHeapArea < 0) {
+		panic("heap_init_post_thread(): couldn't allocate VIP heap area");
+		return B_ERROR;
+	}
+
+	sVIPHeap = heap_create_allocator("VIP heap", (addr_t)address,
+		VIP_HEAP_SIZE, &heapClass, false);
+	if (sVIPHeap == NULL) {
+		panic("heap_init_post_thread(): failed to create VIP heap\n");
+		return B_ERROR;
+	}
+
+	dprintf("heap_init_post_thread(): created VIP heap: %p\n", sVIPHeap);
+
+	send_signal_etc(sHeapGrowThread, SIGCONT, B_DO_NOT_RESCHEDULE);
+
+#endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
+
 	// run the deferred deleter roughly once a second
 	if (register_kernel_daemon(deferred_deleter, NULL, 10) != B_OK)
 		panic("heap_init_post_thread(): failed to init deferred deleter");
 
-	send_signal_etc(sHeapGrowThread, SIGCONT, B_DO_NOT_RESCHEDULE);
 	return B_OK;
 }
 
@@ -2148,50 +2241,27 @@ memalign(size_t alignment, size_t size)
 
 
 void *
-memalign_nogrow(size_t alignment, size_t size)
+memalign_etc(size_t alignment, size_t size, uint32 flags)
 {
-	// use dedicated memory in the grow thread by default
-	if (thread_get_current_thread_id() == sHeapGrowThread) {
-		void *result = heap_memalign(sGrowHeap, alignment, size);
-		if (!sAddGrowHeap && heap_should_grow(sGrowHeap)) {
-			// hopefully the heap grower will manage to create a new heap
-			// before running out of private memory...
-			dprintf("heap: requesting new grow heap\n");
-			sAddGrowHeap = true;
-			release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
-		}
+	if ((flags & HEAP_PRIORITY_VIP) != 0)
+		return heap_memalign(sVIPHeap, alignment, size);
 
-		if (result != NULL)
-			return result;
+	if ((flags & (HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE))
+			!= 0) {
+		return memalign_nogrow(alignment, size);
 	}
 
-	// try public memory, there might be something available
-	void *result = NULL;
-	int32 cpuCount = MIN(smp_get_num_cpus(),
-		(int32)sHeapCount / HEAP_CLASS_COUNT);
-	int32 cpuNumber = smp_get_current_cpu();
-	for (int32 i = 0; i < cpuCount; i++) {
-		uint32 heapIndex = heap_index_for(size, cpuNumber++ % cpuCount);
-		heap_allocator *heap = sHeaps[heapIndex];
-		result = heap_memalign(heap, alignment, size);
-		if (result != NULL)
-			return result;
-	}
-
-	// no memory available
-	if (thread_get_current_thread_id() == sHeapGrowThread)
-		panic("heap: all heaps have run out of memory while growing\n");
-	else
-		dprintf("heap: all heaps have run out of memory\n");
-
-	return NULL;
+	return memalign(alignment, size);
 }
 
 
-void *
-malloc_nogrow(size_t size)
+void
+free_etc(void *address, uint32 flags)
 {
-	return memalign_nogrow(0, size);
+	if ((flags & HEAP_PRIORITY_VIP) != 0)
+		heap_free(sVIPHeap, address);
+	else
+		free(address);
 }
 
 
@@ -2223,6 +2293,10 @@ free(void *address)
 
 	// maybe it was allocated from the dedicated grow heap
 	if (heap_free(sGrowHeap, address) == B_OK)
+		return;
+
+	// or maybe it was allocated from the VIP heap
+	if (heap_free(sVIPHeap, address) == B_OK)
 		return;
 
 	// or maybe it was a huge allocation using an area

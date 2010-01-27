@@ -23,6 +23,12 @@
 #define HEAP_AREA_USE_THRESHOLD		1 * 1024 * 1024
 
 
+// allocation/deallocation flags for {malloc,free}_etc()
+#define HEAP_DONT_WAIT_FOR_MEMORY		0x01
+#define HEAP_DONT_LOCK_KERNEL_SPACE		0x02
+#define HEAP_PRIORITY_VIP				0x04
+
+
 typedef struct heap_class_s {
 	const char *name;
 	uint32		initial_percentage;
@@ -41,10 +47,9 @@ typedef struct heap_allocator_s heap_allocator;
 extern "C" {
 #endif
 
-// malloc- and memalign_nogrow disallow waiting for a grow to happen - only to
-// be used by vm functions that may deadlock on a triggered area creation.
-void* memalign_nogrow(size_t alignment, size_t size);
-void* malloc_nogrow(size_t size);
+
+void* memalign_etc(size_t alignment, size_t size, uint32 flags);
+void free_etc(void* address, uint32 flags);
 
 void* memalign(size_t alignment, size_t size);
 
@@ -74,6 +79,13 @@ status_t heap_init_post_thread();
 #endif
 
 
+static inline void*
+malloc_etc(size_t size, uint32 flags)
+{
+	return memalign_etc(0, size, flags);
+}
+
+
 #ifdef __cplusplus
 
 #include <new>
@@ -81,21 +93,34 @@ status_t heap_init_post_thread();
 #include <util/SinglyLinkedList.h>
 
 
-static const struct nogrow_t {
-} nogrow = {};
+struct malloc_flags {
+	uint32	flags;
+
+	malloc_flags(uint32 flags)
+		:
+		flags(flags)
+	{
+	}
+
+	malloc_flags(const malloc_flags& other)
+		:
+		flags(other.flags)
+	{
+	}
+};
 
 
 inline void*
-operator new(size_t size, const nogrow_t& nogrow) throw()
+operator new(size_t size, const malloc_flags& flags) throw()
 {
-	return malloc_nogrow(size);
+	return malloc_etc(size, flags.flags);
 }
 
 
 inline void*
-operator new[](size_t size, const nogrow_t& nogrow) throw()
+operator new[](size_t size, const malloc_flags& flags) throw()
 {
-	return malloc_nogrow(size);
+	return malloc_etc(size, flags.flags);
 }
 
 

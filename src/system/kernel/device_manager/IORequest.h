@@ -102,8 +102,6 @@ public:
 			DoublyLinkedListLink<IORequestChunk>*
 									ListLink()	{ return &fListLink; }
 
-			void				operator delete(void* address, size_t size);
-
 protected:
 			void				SetStatus(status_t status)
 									{ fStatus = status; }
@@ -350,35 +348,6 @@ private:
 
 
 typedef DoublyLinkedList<IORequest> IORequestList;
-
-
-// allocator for VIP I/O request memory
-void* vip_io_request_malloc(size_t size);
-void vip_io_request_free(void* address);
-
-void io_request_free(void* address);
-	// frees regardless of whether allocated with vip_io_request_malloc() or
-	// malloc()
-
-void vip_io_request_allocator_init();
-
-
-static const struct vip_io_alloc_t {
-} vip_io_alloc = {};
-
-
-inline void*
-operator new(size_t size, const vip_io_alloc_t& vip_io_alloc) throw ()
-{
-	return vip_io_request_malloc(size);
-}
-
-
-inline void*
-operator new[](size_t size, const vip_io_alloc_t& vip_io_alloc) throw ()
-{
-	return vip_io_request_malloc(size);
-}
 
 
 #endif	// IO_REQUEST_H

@@ -577,7 +577,7 @@ VMCache::~VMCache()
 
 
 status_t
-VMCache::Init(uint32 cacheType)
+VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 {
 	mutex_init(&fLock, "VMCache");
 	VMCache dummyCache;
@@ -600,7 +600,7 @@ VMCache::Init(uint32 cacheType)
 		// initialize in case the following fails
 #endif
 
-	fCacheRef = new(nogrow) VMCacheRef(this);
+	fCacheRef = new(malloc_flags(allocationFlags)) VMCacheRef(this);
 	if (fCacheRef == NULL)
 		return B_NO_MEMORY;
 
@@ -1346,15 +1346,20 @@ VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
 	int32 numPrecommittedPages, int32 numGuardPages, bool swappable,
 	int priority)
 {
+	uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
+		| HEAP_DONT_LOCK_KERNEL_SPACE;
+	if (priority >= VM_PRIORITY_VIP)
+		allocationFlags |= HEAP_PRIORITY_VIP;
+
 #if ENABLE_SWAP_SUPPORT
 	if (swappable) {
-// TODO: Respect priority!
-		VMAnonymousCache* cache = new(nogrow) VMAnonymousCache;
+		VMAnonymousCache* cache
+			= new(malloc_flags(allocationFlags)) VMAnonymousCache;
 		if (cache == NULL)
 			return B_NO_MEMORY;
 
 		status_t error = cache->Init(canOvercommit, numPrecommittedPages,
-			numGuardPages);
+			numGuardPages, allocationFlags);
 		if (error != B_OK) {
 			cache->Delete();
 			return error;
@@ -1367,12 +1372,13 @@ VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
 	}
 #endif
 
-	VMAnonymousNoSwapCache* cache = new(nogrow) VMAnonymousNoSwapCache;
+	VMAnonymousNoSwapCache* cache
+		= new(malloc_flags(allocationFlags)) VMAnonymousNoSwapCache;
 	if (cache == NULL)
 		return B_NO_MEMORY;
 
 	status_t error = cache->Init(canOvercommit, numPrecommittedPages,
-		numGuardPages);
+		numGuardPages, allocationFlags);
 	if (error != B_OK) {
 		cache->Delete();
 		return error;
@@ -1388,11 +1394,15 @@ VMCacheFactory::CreateAnonymousCache(VMCache*& _cache, bool canOvercommit,
 /*static*/ status_t
 VMCacheFactory::CreateVnodeCache(VMCache*& _cache, struct vnode* vnode)
 {
-	VMVnodeCache* cache = new(nogrow) VMVnodeCache;
+	const uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
+		| HEAP_DONT_LOCK_KERNEL_SPACE;
+		// Note: Vnode cache creation is never VIP.
+
+	VMVnodeCache* cache = new(malloc_flags(allocationFlags)) VMVnodeCache;
 	if (cache == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = cache->Init(vnode);
+	status_t error = cache->Init(vnode, allocationFlags);
 	if (error != B_OK) {
 		cache->Delete();
 		return error;
@@ -1408,11 +1418,15 @@ VMCacheFactory::CreateVnodeCache(VMCache*& _cache, struct vnode* vnode)
 /*static*/ status_t
 VMCacheFactory::CreateDeviceCache(VMCache*& _cache, addr_t baseAddress)
 {
-	VMDeviceCache* cache = new(nogrow) VMDeviceCache;
+	const uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
+		| HEAP_DONT_LOCK_KERNEL_SPACE;
+		// Note: Device cache creation is never VIP.
+
+	VMDeviceCache* cache = new(malloc_flags(allocationFlags)) VMDeviceCache;
 	if (cache == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = cache->Init(baseAddress);
+	status_t error = cache->Init(baseAddress, allocationFlags);
 	if (error != B_OK) {
 		cache->Delete();
 		return error;
@@ -1428,12 +1442,16 @@ VMCacheFactory::CreateDeviceCache(VMCache*& _cache, addr_t baseAddress)
 /*static*/ status_t
 VMCacheFactory::CreateNullCache(int priority, VMCache*& _cache)
 {
-// TODO: Respect priority!
-	VMNullCache* cache = new(nogrow) VMNullCache;
+	uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
+		| HEAP_DONT_LOCK_KERNEL_SPACE;
+	if (priority >= VM_PRIORITY_VIP)
+		allocationFlags |= HEAP_PRIORITY_VIP;
+
+	VMNullCache* cache = new(malloc_flags(allocationFlags)) VMNullCache;
 	if (cache == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = cache->Init();
+	status_t error = cache->Init(allocationFlags);
 	if (error != B_OK) {
 		cache->Delete();
 		return error;

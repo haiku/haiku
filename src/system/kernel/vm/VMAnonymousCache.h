@@ -35,7 +35,8 @@ public:
 
 			status_t			Init(bool canOvercommit,
 									int32 numPrecommittedPages,
-									int32 numGuardPages);
+									int32 numGuardPages,
+									uint32 allocationFlags);
 
 	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);

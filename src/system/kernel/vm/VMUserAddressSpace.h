@@ -22,32 +22,40 @@ public:
 
 	virtual	VMArea*				LookupArea(addr_t address) const;
 	virtual	VMArea*				CreateArea(const char* name, uint32 wiring,
-									uint32 protection);
-	virtual	void				DeleteArea(VMArea* area);
+									uint32 protection, uint32 allocationFlags);
+	virtual	void				DeleteArea(VMArea* area,
+									uint32 allocationFlags);
 	virtual	status_t			InsertArea(void** _address, uint32 addressSpec,
-									size_t size, VMArea* area);
-	virtual	void				RemoveArea(VMArea* area);
+									size_t size, VMArea* area,
+									uint32 allocationFlags);
+	virtual	void				RemoveArea(VMArea* area,
+									uint32 allocationFlags);
 
 	virtual	bool				CanResizeArea(VMArea* area, size_t newSize);
-	virtual	status_t			ResizeArea(VMArea* area, size_t newSize);
-	virtual	status_t			ShrinkAreaHead(VMArea* area, size_t newSize);
-	virtual	status_t			ShrinkAreaTail(VMArea* area, size_t newSize);
+	virtual	status_t			ResizeArea(VMArea* area, size_t newSize,
+									uint32 allocationFlags);
+	virtual	status_t			ShrinkAreaHead(VMArea* area, size_t newSize,
+									uint32 allocationFlags);
+	virtual	status_t			ShrinkAreaTail(VMArea* area, size_t newSize,
+									uint32 allocationFlags);
 
 	virtual	status_t			ReserveAddressRange(void** _address,
 									uint32 addressSpec, size_t size,
-									uint32 flags);
+									uint32 flags, uint32 allocationFlags);
 	virtual	status_t			UnreserveAddressRange(addr_t address,
-									size_t size);
-	virtual	void				UnreserveAllAddressRanges();
+									size_t size, uint32 allocationFlags);
+	virtual	void				UnreserveAllAddressRanges(
+									uint32 allocationFlags);
 
 	virtual	void				Dump() const;
 
 private:
 			status_t			_InsertAreaIntoReservedRegion(addr_t start,
-									size_t size, VMUserArea* area);
+									size_t size, VMUserArea* area,
+									uint32 allocationFlags);
 			status_t			_InsertAreaSlot(addr_t start, addr_t size,
 									addr_t end, uint32 addressSpec,
-									VMUserArea* area);
+									VMUserArea* area, uint32 allocationFlags);
 
 private:
 			VMUserAreaList	fAreas;

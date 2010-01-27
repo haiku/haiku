@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,18 +14,14 @@
 #endif
 
 
+#include <heap.h>
+
+
 // #pragma mark - AsyncIOCallback
 
 
 AsyncIOCallback::~AsyncIOCallback()
 {
-}
-
-
-void
-AsyncIOCallback::operator delete(void* address, size_t size)
-{
-	io_request_free(address);
 }
 
 
@@ -61,9 +57,6 @@ struct iterative_io_cookie {
 	off_t							request_offset;
 	io_request_finished_callback	next_finished_callback;
 	void*							next_finished_cookie;
-
-	void operator delete(void* address, size_t size)
-		{ io_request_free(address); }
 };
 
 
@@ -484,7 +477,7 @@ do_iterative_fd_io(int fd, io_request* request, iterative_io_get_vecs getVecs,
 
 	iterative_io_cookie* iterationCookie
 		= (request->Flags() & B_VIP_IO_REQUEST) != 0
-			? new(vip_io_alloc) iterative_io_cookie
+			? new(malloc_flags(HEAP_PRIORITY_VIP)) iterative_io_cookie
 			: new(std::nothrow) iterative_io_cookie;
 	if (iterationCookie == NULL) {
 		// no memory -- fall back to synchronous I/O

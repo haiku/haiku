@@ -47,13 +47,17 @@ VMArea::VMArea(VMAddressSpace* addressSpace, uint32 wiring, uint32 protection)
 
 VMArea::~VMArea()
 {
-	free(page_protections);
-	free(name);
+	const uint32 flags = HEAP_DONT_WAIT_FOR_MEMORY
+		| HEAP_DONT_LOCK_KERNEL_SPACE;
+		// TODO: This might be stricter than necessary.
+
+	free_etc(page_protections, flags);
+	free_etc(name, flags);
 }
 
 
 status_t
-VMArea::Init(const char* name)
+VMArea::Init(const char* name, uint32 allocationFlags)
 {
 	// restrict the area name to B_OS_NAME_LENGTH
 	size_t length = strlen(name) + 1;
@@ -61,7 +65,7 @@ VMArea::Init(const char* name)
 		length = B_OS_NAME_LENGTH;
 
 	// clone the name
-	this->name = (char*)malloc_nogrow(length);
+	this->name = (char*)malloc_etc(length, allocationFlags);
 	if (this->name == NULL)
 		return B_NO_MEMORY;
 	strlcpy(this->name, name, length);

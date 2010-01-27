@@ -213,19 +213,17 @@ memalign(size_t alignment, size_t size)
 }
 
 
-void*
-memalign_nogrow(size_t alignment, size_t size)
+void *
+memalign_etc(size_t alignment, size_t size, uint32 flags)
 {
-	return block_alloc(size, alignment,
-		CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
+	return block_alloc(size, alignment, flags & CACHE_ALLOC_FLAGS);
 }
 
 
-void*
-malloc_nogrow(size_t size)
+void
+free_etc(void *address, uint32 flags)
 {
-	return block_alloc(size, 0,
-		CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
+	block_free(address, flags & CACHE_ALLOC_FLAGS);
 }
 
 

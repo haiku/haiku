@@ -28,16 +28,12 @@
 #endif
 
 
-#define VIP_HEAP_SIZE	1024 * 1024
-
 // partial I/O operation phases
 enum {
 	PHASE_READ_BEGIN	= 0,
 	PHASE_READ_END		= 1,
 	PHASE_DO_ALL		= 2
 };
-
-heap_allocator* sVIPHeap;
 
 
 // #pragma mark -
@@ -53,13 +49,6 @@ IORequestChunk::IORequestChunk()
 
 IORequestChunk::~IORequestChunk()
 {
-}
-
-
-void
-IORequestChunk::operator delete(void* address, size_t size)
-{
-	io_request_free(address);
 }
 
 
@@ -80,7 +69,7 @@ IOBuffer::Create(uint32 count, bool vip)
 {
 	size_t size = sizeof(IOBuffer) + sizeof(iovec) * (count - 1);
 	IOBuffer* buffer
-		= (IOBuffer*)(vip ? vip_io_request_malloc(size) : malloc(size));
+		= (IOBuffer*)(malloc_etc(size, vip ? HEAP_PRIORITY_VIP : 0));
 	if (buffer == NULL)
 		return NULL;
 
@@ -101,10 +90,7 @@ IOBuffer::Delete()
 	if (this == NULL)
 		return;
 
-	if (fVIP)
-		vip_io_request_free(this);
-	else
-		free(this);
+	free_etc(this, fVIP ? HEAP_PRIORITY_VIP : 0);
 }
 
 
@@ -130,7 +116,8 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 {
 	virtual_vec_cookie* cookie = (virtual_vec_cookie*)_cookie;
 	if (cookie == NULL) {
-		cookie = new(std::nothrow) virtual_vec_cookie;
+		cookie = new(malloc_flags(fVIP ? HEAP_PRIORITY_VIP : 0))
+			virtual_vec_cookie;
 		if (cookie == NULL)
 			return B_NO_MEMORY;
 
@@ -207,7 +194,7 @@ IOBuffer::FreeVirtualVecCookie(void* _cookie)
 	if (cookie->mapped_area >= 0)
 		delete_area(cookie->mapped_area);
 
-	delete cookie;
+	free_etc(cookie, fVIP ? HEAP_PRIORITY_VIP : 0);
 }
 
 
@@ -715,7 +702,9 @@ IORequest::~IORequest()
 /* static */ IORequest*
 IORequest::Create(bool vip)
 {
-	return vip ? new(vip_io_alloc) IORequest : new(std::nothrow) IORequest;
+	return vip
+		? new(malloc_flags(HEAP_PRIORITY_VIP)) IORequest
+		: new(std::nothrow) IORequest;
 }
 
 
@@ -1308,107 +1297,4 @@ IORequest::Dump() const
 	set_debug_variable("_mutex", (addr_t)&fLock);
 	set_debug_variable("_buffer", (addr_t)fBuffer);
 	set_debug_variable("_cvar", (addr_t)&fFinishedCondition);
-}
-
-
-// #pragma mark - allocator
-
-
-#if KERNEL_HEAP_LEAK_CHECK
-static addr_t
-get_caller()
-{
-	// Find the first return address outside of the allocator code. Note, that
-	// this makes certain assumptions about how the code for the functions
-	// ends up in the kernel object.
-	addr_t returnAddresses[5];
-	int32 depth = arch_debug_get_stack_trace(returnAddresses, 5, 0, 1,
-		STACK_TRACE_KERNEL | STACK_TRACE_USER);
-
-	// find the first return address inside the VIP allocator
-	int32 i = 0;
-	for (i = 0; i < depth; i++) {
-		if (returnAddresses[i] >= (addr_t)&get_caller
-			&& returnAddresses[i] < (addr_t)&vip_io_request_allocator_init) {
-			break;
-		}
-	}
-
-	// now continue until we have the first one outside
-	for (; i < depth; i++) {
-		if (returnAddresses[i] < (addr_t)&get_caller
-			|| returnAddresses[i] > (addr_t)&vip_io_request_allocator_init) {
-			return returnAddresses[i];
-		}
-	}
-
-	return 0;
-}
-#endif
-
-
-void*
-vip_io_request_malloc(size_t size)
-{
-	void* address = heap_memalign(sVIPHeap, 0, size);
-#if KDEBUG
-	if (address == NULL)
-		panic("vip_io_request_malloc(): VIP heap %p out of memory", sVIPHeap);
-#endif
-	return address;
-}
-
-
-void
-vip_io_request_free(void* address)
-{
-	heap_free(sVIPHeap, address);
-}
-
-
-void
-io_request_free(void* address)
-{
-	if (heap_free(sVIPHeap, address) != B_OK)
-		free(address);
-}
-
-
-void
-vip_io_request_allocator_init()
-{
-	static const heap_class heapClass = {
-		"VIP I/O",					/* name */
-		100,						/* initial percentage */
-		B_PAGE_SIZE / 8,			/* max allocation size */
-		B_PAGE_SIZE,				/* page size */
-		8,							/* min bin size */
-		4,							/* bin alignment */
-		8,							/* min count per page */
-		16							/* max waste per page */
-	};
-
-	void* address = NULL;
-	area_id area = create_area("VIP I/O heap", &address, B_ANY_KERNEL_ADDRESS,
-		VIP_HEAP_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < B_OK) {
-		panic("vip_io_request_allocator_init(): couldn't allocate VIP I/O "
-			"heap area");
-		return;
-	}
-
-	sVIPHeap = heap_create_allocator("VIP I/O heap", (addr_t)address,
-		VIP_HEAP_SIZE, &heapClass, false);
-	if (sVIPHeap == NULL) {
-		panic("vip_io_request_allocator_init(): failed to create VIP I/O "
-			"heap\n");
-		return;
-	}
-
-#if KERNEL_HEAP_LEAK_CHECK
-	heap_set_get_caller(sVIPHeap, &get_caller);
-#endif
-
-	dprintf("vip_io_request_allocator_init(): created VIP I/O heap: %p\n",
-		sVIPHeap);
 }

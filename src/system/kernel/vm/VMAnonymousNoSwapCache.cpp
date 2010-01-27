@@ -39,12 +39,12 @@ VMAnonymousNoSwapCache::~VMAnonymousNoSwapCache()
 
 status_t
 VMAnonymousNoSwapCache::Init(bool canOvercommit, int32 numPrecommittedPages,
-	int32 numGuardPages)
+	int32 numGuardPages, uint32 allocationFlags)
 {
 	TRACE(("VMAnonymousNoSwapCache::Init(canOvercommit = %s, numGuardPages = %ld) "
 		"at %p\n", canOvercommit ? "yes" : "no", numGuardPages, store));
 
-	status_t error = VMCache::Init(CACHE_TYPE_RAM);
+	status_t error = VMCache::Init(CACHE_TYPE_RAM, allocationFlags);
 	if (error != B_OK)
 		return error;
 

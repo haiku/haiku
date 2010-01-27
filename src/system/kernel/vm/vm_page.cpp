@@ -1731,8 +1731,12 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 	if (maxPages < 0 || maxPages > kMaxPages)
 		maxPages = kMaxPages;
 
+	const uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
+		| HEAP_DONT_LOCK_KERNEL_SPACE;
+
 	PageWriteWrapper stackWrappers[2];
-	PageWriteWrapper* wrapperPool = new(nogrow) PageWriteWrapper[maxPages + 1];
+	PageWriteWrapper* wrapperPool
+		= new(malloc_flags(allocationFlags)) PageWriteWrapper[maxPages + 1];
 	if (wrapperPool == NULL) {
 		// don't fail, just limit our capabilities
 		wrapperPool = stackWrappers;

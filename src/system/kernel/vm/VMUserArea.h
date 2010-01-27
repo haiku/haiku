@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the NewOS License.
  */
 #ifndef VM_USER_AREA_H
@@ -19,9 +19,9 @@ struct VMUserArea : VMArea {
 
 	static	VMUserArea*			Create(VMAddressSpace* addressSpace,
 									const char* name, uint32 wiring,
-									uint32 protection);
+									uint32 protection, uint32 allocationFlags);
 	static	VMUserArea*			CreateReserved(VMAddressSpace* addressSpace,
-									uint32 flags);
+									uint32 flags, uint32 allocationFlags);
 
 			DoublyLinkedListLink<VMUserArea>& AddressSpaceLink()
 									{ return fAddressSpaceLink; }

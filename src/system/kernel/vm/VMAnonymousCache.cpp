@@ -409,11 +409,6 @@ public:
 		delete this;
 	}
 
-	void operator delete(void* address, size_t size)
-	{
-		io_request_free(address);
-	}
-
 private:
 	VMAnonymousCache*	fCache;
 	page_num_t			fPageIndex;
@@ -447,13 +442,13 @@ VMAnonymousCache::~VMAnonymousCache()
 
 status_t
 VMAnonymousCache::Init(bool canOvercommit, int32 numPrecommittedPages,
-	int32 numGuardPages)
+	int32 numGuardPages, uint32 allocationFlags)
 {
 	TRACE("%p->VMAnonymousCache::Init(canOvercommit = %s, "
 		"numPrecommittedPages = %ld, numGuardPages = %ld)\n", this,
 		canOvercommit ? "yes" : "no", numPrecommittedPages, numGuardPages);
 
-	status_t error = VMCache::Init(CACHE_TYPE_RAM);
+	status_t error = VMCache::Init(CACHE_TYPE_RAM, allocationFlags);
 	if (error != B_OK)
 		return error;
 
@@ -647,7 +642,7 @@ VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 
 	// create our callback
 	WriteCallback* callback = (flags & B_VIP_IO_REQUEST) != 0
- 		? new(vip_io_alloc) WriteCallback(this, _callback)
+ 		? new(malloc_flags(HEAP_PRIORITY_VIP)) WriteCallback(this, _callback)
 		: new(std::nothrow) WriteCallback(this, _callback);
 	if (callback == NULL) {
 		if (newSlot) {

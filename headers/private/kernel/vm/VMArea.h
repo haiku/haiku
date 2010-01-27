@@ -53,7 +53,7 @@ protected:
 									uint32 wiring, uint32 protection);
 								~VMArea();
 
-			status_t			Init(const char* name);
+			status_t			Init(const char* name, uint32 allocationFlags);
 
 protected:
 			friend class VMAddressSpace;

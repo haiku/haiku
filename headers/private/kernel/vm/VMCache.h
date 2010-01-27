@@ -67,7 +67,7 @@ public:
 								VMCache();
 	virtual						~VMCache();
 
-			status_t			Init(uint32 cacheType);
+			status_t			Init(uint32 cacheType, uint32 allocationFlags);
 
 	virtual	void				Delete();
 

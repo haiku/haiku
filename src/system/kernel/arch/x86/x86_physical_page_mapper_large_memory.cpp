@@ -546,7 +546,7 @@ LargeMemoryPhysicalPageMapper::InitPostArea(kernel_args* args)
 	temp = (void*)fInitialPool.virtualBase;
 	area = vm_create_null_area(VMAddressSpace::KernelID(),
 		"physical page pool space", &temp, B_EXACT_ADDRESS,
-		1024 * B_PAGE_SIZE, CREATE_AREA_PRIORITY_VIP);
+		1024 * B_PAGE_SIZE, 0);
 	if (area < B_OK) {
 		panic("LargeMemoryPhysicalPageMapper::InitPostArea(): Failed to "
 			"create area for physical page pool space.");

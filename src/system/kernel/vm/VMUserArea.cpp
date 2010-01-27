@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the NewOS License.
  */
 
@@ -25,14 +25,14 @@ VMUserArea::~VMUserArea()
 
 /*static*/ VMUserArea*
 VMUserArea::Create(VMAddressSpace* addressSpace, const char* name,
-	uint32 wiring, uint32 protection)
+	uint32 wiring, uint32 protection, uint32 allocationFlags)
 {
-	VMUserArea* area = new(nogrow) VMUserArea(addressSpace, wiring,
-		protection);
+	VMUserArea* area = new(malloc_flags(allocationFlags)) VMUserArea(
+		addressSpace, wiring, protection);
 	if (area == NULL)
 		return NULL;
 
-	if (area->Init(name) != B_OK) {
+	if (area->Init(name, allocationFlags) != B_OK) {
 		delete area;
 		return NULL;
 	}
@@ -42,9 +42,11 @@ VMUserArea::Create(VMAddressSpace* addressSpace, const char* name,
 
 
 /*static*/ VMUserArea*
-VMUserArea::CreateReserved(VMAddressSpace* addressSpace, uint32 flags)
+VMUserArea::CreateReserved(VMAddressSpace* addressSpace, uint32 flags,
+	uint32 allocationFlags)
 {
-	VMUserArea* area = new(nogrow) VMUserArea(addressSpace, 0, 0);
+	VMUserArea* area = new(malloc_flags(allocationFlags)) VMUserArea(
+		addressSpace, 0, 0);
 	if (area != NULL) {
 		area->id = RESERVED_AREA_ID;
 		area->protection = flags;

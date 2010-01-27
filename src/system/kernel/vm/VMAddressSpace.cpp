@@ -192,8 +192,10 @@ VMAddressSpace::Create(team_id teamID, addr_t base, size_t size, bool kernel,
 	VMAddressSpace** _addressSpace)
 {
 	VMAddressSpace* addressSpace = kernel
-		? (VMAddressSpace*)new(nogrow) VMKernelAddressSpace(teamID, base, size)
-		: (VMAddressSpace*)new(nogrow) VMUserAddressSpace(teamID, base, size);
+		? (VMAddressSpace*)new(std::nothrow) VMKernelAddressSpace(teamID, base,
+			size)
+		: (VMAddressSpace*)new(std::nothrow) VMUserAddressSpace(teamID, base,
+			size);
 	if (addressSpace == NULL)
 		return B_NO_MEMORY;
 
