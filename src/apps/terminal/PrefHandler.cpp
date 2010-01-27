@@ -120,16 +120,27 @@ PrefHandler::SetDefault(PrefHandler *prefHandler)
 status_t
 PrefHandler::GetDefaultPath(BPath& path)
 {
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
-		return B_ERROR;
+	status_t status;
+	status = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
+	if (status != B_OK)
+		return status;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	path.Append("Terminal_settings");
+	status = path.Append("Terminal");
+	if (status != B_OK)
+		return status;
+	
+	// Just create the directory. Harmless if already there
+	status = create_directory(path.Path(), 0755);
+	if (status != B_OK)
+		return status;
+		
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU	
+	status = path.Append("Default");
 #else
-	path.Append("HaikuTerminal_settings");
+	status = path.Append("HaikuTerminal_settings");
 #endif
 
-	return B_OK;
+	return status;
 }
 
 
