@@ -6,14 +6,14 @@ Rescan	MainWindow		Opnieuw afzoeken
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Kon geen partitie-informatie verkrijgen.
 There's no space on the partition where a child partition could be created.	MainWindow		De partitie heeft geen ruimte waarin een onderliggende partitie kan worden gemaakt.
-<empty>	DiskView		<leeg>
+<empty>	PartitionList		<leeg>
 Unable to find the selected partition by ID.	MainWindow		Kan de geselecteerde partitie niet vinden op basis van ID.
 Select a partition from the list below.	DiskView		Selecteer een partitie uit onderstaande lijst.
 %.1f TB	Support		%.1f TB
 No disk devices have been recognized.	DiskView		Er zijn geen schijfapparaten herkend.
 The selected disk is read-only.	MainWindow		De geselecteerde schijf is alleen-lezen.
 Partition name:	CreateParamsPanel		Naam partitie:
-Initialize	MainWindow		Initialiseer
+Initialize	InitParamsPanel		Initialiseer
 Could not mount partition %s.	MainWindow		Kon partitie %s niet betrekken.
 The partition %s is already unmounted.	MainWindow		De paritie %s is al onttrokken.
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Kon de partitie niet initialiseren. Er zijn geen veranderingen naar de schijf geschreven.
@@ -21,9 +21,11 @@ Failed to delete the partition. No changes have been written to disk.	MainWindow
 Partition type:	CreateParamsPanel		Soort partitie:
 Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Bent u zeker dat u de partitie \"%s\" wilt initialiseren? Na het invoeren van de initialisatieparameters kunt u deze operatie afbreken tot vlak voor het terugschrijven van de veranderingen naar de schijf. 
 Could not delete the selected partition.	MainWindow		Kon de geselecteerde partitie niet verwijderen.
+Initialize	MainWindow		Initialize
 Error: 	MainWindow	in any error alert	Fout:
 Partition %ld	DiskView		Partitie %ld
 The partition %s has been successfully initialized.\n	MainWindow		De partitie %s werd met succes geïnitialiseerd.\n
+<empty>	DiskView		<empty>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisatie van de partitie %s is mislukt. (Er is niets naar de schijf geschreven.)
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
 Mounted at	PartitionList		Betrokken op
@@ -47,13 +49,14 @@ Disk system \"%s\"\" not found!	MainWindow		Schijf \"%s\"\" systeem niet gevonde
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
 Mount	MainWindow		Betrek
 Create	CreateParamsPanel		Maak
-Device	DiskView		Apparaat
+Device	PartitionList		Apparaat
 Disk	MainWindow		Schijf
+Device	DiskView		Apparaat
 Volume name	PartitionList		Naam gegevensdrager
 Continue	MainWindow		Doorgaan
 Cannot delete the selected partition.	MainWindow		Kan de geselecteerde partitie niet verwijderen.
 Mount all	MainWindow		Betrek alles
-Cancel	CreateParamsPanel		Annuleren
+Cancel	MainWindow		Annuleren
 Delete partition	MainWindow		Verwijder partitie
 End: %ld MB	Support		Einde: %ld MB
 Eject	MainWindow		Uitwerpen
@@ -69,6 +72,8 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 The partition %s is currently mounted.	MainWindow		De partitie %s is op dit moment betrokken.
 Partition size	CreateParamsPanel		Partitiegrootte
 Surface test (not implemented)	MainWindow		Oppervlaktetest (niet geïmplementeerd)
+Cancel	InitParamsPanel		Cancel
+Cancel	CreateParamsPanel		Cancel
 %Ld B	Support		%Ld B
 Creation of the partition has failed.	MainWindow		Creatie van de partitie is mislukt.
 The currently selected partition is not empty.	MainWindow		De huidig geselecteerde partitie is niet leeg.
