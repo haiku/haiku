@@ -12,7 +12,8 @@ SubDirC++Flags
 	-DU_I18N_IMPLEMENTATION -Wno-sign-compare -Wno-parentheses
 	;
 
-SharedLibrary libicu-i18n.so :	
+SharedLibrary libicu-i18n.so
+	:
 	anytrans.cpp
 	astro.cpp
 	basictz.cpp
@@ -153,4 +154,6 @@ SharedLibrary libicu-i18n.so :
 	zstrfmt.cpp
 	:
 	libicu-common.so $(TARGET_LIBSUPC++)
+	:
+	$(HAIKU_ICU_API_VERSION)
 	;

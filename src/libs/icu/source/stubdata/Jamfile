@@ -4,6 +4,5 @@ UseLibraryHeaders icu ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src libs icu source common ] ;
 
-SharedLibrary <stub>libicu-data.so :	
-	stubdata.c
-	;
+SharedLibrary <stub>libicu-data.so
+	: stubdata.c : : $(HAIKU_ICU_API_VERSION) ;

@@ -12,7 +12,8 @@ SubDirC++Flags
 	-DU_COMMON_IMPLEMENTATION -Wno-sign-compare -Wno-parentheses
 	;
 
-SharedLibrary libicu-common.so :	
+SharedLibrary libicu-common.so
+	:
 	bmpset.cpp
 	brkeng.cpp
 	brkiter.cpp
@@ -156,4 +157,6 @@ SharedLibrary libicu-common.so :
 	wintz.c
 	:
 	<stub>libicu-data.so $(TARGET_LIBSUPC++)
+	:
+	$(HAIKU_ICU_API_VERSION)
 	;

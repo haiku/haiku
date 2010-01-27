@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src libs icu ;
 
+HAIKU_ICU_API_VERSION = 4.2 ;
+
 SubInclude HAIKU_TOP src libs icu source common ;
 SubInclude HAIKU_TOP src libs icu source data ;
 SubInclude HAIKU_TOP src libs icu source i18n ;
@@ -14,4 +16,4 @@ Depends ICU_Libs
 	libicu-i18n.so
 	libicu-toolutil.so
 	;
- 
+

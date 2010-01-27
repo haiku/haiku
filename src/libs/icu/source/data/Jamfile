@@ -183,4 +183,5 @@ GeneratePackageInclude icupkg.inc ;
 
 local icuDataAsmSource = [ FGristFiles $(ICU_DATA_VERSION)_dat.s ] ;
 GeneratePackageDataAsm $(icuDataAsmSource) : icudata.lst ;
-SharedLibrary libicu-data.so : $(icuDataAsmSource) ;
+SharedLibrary libicu-data.so
+	: $(icuDataAsmSource) : : $(HAIKU_ICU_API_VERSION) ;
