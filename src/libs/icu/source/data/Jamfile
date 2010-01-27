@@ -13,7 +13,7 @@ if $(HAIKU_HOST_IS_BIG_ENDIAN) = 1 {
 	ICU_ENDIANNESS_INDICATOR = l ;
 }
 ICU_DATA_VERSION = icudt42$(ICU_ENDIANNESS_INDICATOR) ;
-ICU_DATA_DIR 
+ICU_DATA_DIR
 	= [ FDirName $(HOST_COMMON_DEBUG_OBJECT_DIR) $(ICU_DATA_VERSION) ] ;
 
 rule MakeLocateICUData files : subdir
@@ -31,7 +31,7 @@ rule MakeLocateICUData files : subdir
 NotFile ICU_ResourceBundles ;
 Depends ICU_ResourceBundles : ICU_BreakIterators ;
 
-rule GenerateIndexedResourceBundles 
+rule GenerateIndexedResourceBundles
 	indexName : installableSources : otherSources : targetDir : sourceDir
 {
 	local sources = $(installableSources) $(otherSources) ;
@@ -105,12 +105,12 @@ SubDir HAIKU_TOP src libs icu source data ;
 # -----------------------------------------------------------------------------
 
 NotFile ICU_PackageData ;
-Depends ICU_PackageData 
-	: 
-	ICU_BreakIterators 
+Depends ICU_PackageData
+	:
+	ICU_BreakIterators
 	ICU_CharsetConverters
 	ICU_Confusables
-	ICU_ResourceBundles 
+	ICU_ResourceBundles
 	ICU_StringPreps
 	;
 
