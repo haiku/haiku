@@ -2171,20 +2171,19 @@ vm_page_reserve_pages(uint32 count, int priority)
 	uint32 systemReserve = kPageReserveForPriority[priority];
 	while (true) {
 		int32 systemFreePages = sSystemReservedPages;
-		uint32 toReserve = 0;
 		if (systemFreePages > (int32)systemReserve) {
-			toReserve = std::min(count, systemFreePages - systemReserve);
+			uint32 toReserve = std::min(count, systemFreePages - systemReserve);
 			if (atomic_test_and_set(&sSystemReservedPages,
 						systemFreePages - toReserve, systemFreePages)
 					!= systemFreePages) {
 				// the count changed in the meantime -- retry
 				continue;
 			}
-		}
 
-		count -= toReserve;
-		if (count == 0)
-			return;
+			count -= toReserve;
+			if (count == 0)
+				return;
+		}
 
 		break;
 	}
@@ -2210,13 +2209,11 @@ vm_page_try_reserve_pages(uint32 count, int priority)
 	if (count == 0)
 		return true;
 
-	T(ReservePages(count));
-
+	uint32 reserved;
 	while (true) {
 		// From the requested count reserve as many pages as possible from the
 		// general reserve.
 		int32 freePages = sUnreservedFreePages;
-		uint32 reserved = 0;
 		if (freePages > 0) {
 			reserved = std::min((int32)count, freePages);
 			if (atomic_test_and_set(&sUnreservedFreePages,
@@ -2225,31 +2222,36 @@ vm_page_try_reserve_pages(uint32 count, int priority)
 				// the count changed in the meantime -- retry
 				continue;
 			}
-		}
 
-		if (reserved == count)
-			return true;
-
-		// Try to get the remaining pages from the system reserve.
-		uint32 systemReserve = kPageReserveForPriority[priority];
-		uint32 leftToReserve = count - reserved;
-		while (true) {
-			int32 systemFreePages = sSystemReservedPages;
-			if ((uint32)systemFreePages < leftToReserve + systemReserve) {
-				// no dice
-				vm_page_unreserve_pages(reserved);
-				return false;
-			}
-
-			if (atomic_test_and_set(&sSystemReservedPages,
-						systemFreePages - leftToReserve, systemFreePages)
-					== systemFreePages) {
+			if (reserved == count) {
+				T(ReservePages(count));
 				return true;
 			}
+		} else
+			reserved = 0;
 
-			// the count changed in the meantime -- retry
-			continue;
+		break;
+	}
+
+	// Try to get the remaining pages from the system reserve.
+	uint32 systemReserve = kPageReserveForPriority[priority];
+	uint32 leftToReserve = count - reserved;
+	while (true) {
+		int32 systemFreePages = sSystemReservedPages;
+		if ((uint32)systemFreePages < leftToReserve + systemReserve) {
+			// no dice
+			vm_page_unreserve_pages(reserved);
+			return false;
 		}
+
+		if (atomic_test_and_set(&sSystemReservedPages,
+					systemFreePages - leftToReserve, systemFreePages)
+				== systemFreePages) {
+			T(ReservePages(count));
+			return true;
+		}
+
+		// the count changed in the meantime -- retry
 	}
 }
 
