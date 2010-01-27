@@ -1127,6 +1127,28 @@ rule AddSymlinkToHaikuHybridImage directoryTokens : linkTarget : linkName
 		: $(alternativeLinkTarget) : $(linkName) ;
 }
 
+rule AddLibrariesToHaikuHybridImage directory : libs
+{
+	# AddLibraryToHaikuHybridImage <directory> : <libs>
+	#
+	# Installs libraries with the appropriate links onto the image.
+	#
+
+	local lib ;
+	for lib in $(libs) {
+		local apiVersion = [ on $(lib) return $(HAIKU_LIB_API_VERSION) ] ;
+		if $(apiVersion) {
+			local apiLib = $(lib).$(apiVersion) ;
+			AddFilesToHaikuHybridImage $(directory)
+				: $(lib) : $(apiLib) : true ;
+			AddSymlinkToHaikuHybridImage $(directory)
+				: $(apiLib) : $(lib) : : true ;
+		} else {
+			AddFilesToHaikuHybridImage $(directory) : $(lib) : : true ;
+		}
+	}
+}
+
 
 #pragma mark - Floppy Boot Archive rules
 

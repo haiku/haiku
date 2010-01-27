@@ -99,7 +99,10 @@ SYSTEM_LIBS =
 	libscreensaver.so
 	libtextencoding.so libtracker.so libtranslation.so
 	libz.so
-	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++) $(ICU_LIBS)
+	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
+;
+PRIVATE_SYSTEM_LIBS =
+	$(ICU_LIBS)
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server mount_server net_server
@@ -251,7 +254,8 @@ AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 AddFilesToHaikuImage system : <revisioned>kernel_$(TARGET_ARCH) ;
 
 # libs
-AddFilesToHaikuHybridImage system lib : $(SYSTEM_LIBS) : : true ;
+AddLibrariesToHaikuHybridImage system lib
+	: $(SYSTEM_LIBS) $(PRIVATE_SYSTEM_LIBS) ;
 
 # libnetwork.so replaces quite a few libraries
 SYSTEM_LIBS_LIBNETWORK_ALIASES

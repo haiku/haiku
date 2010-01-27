@@ -429,9 +429,15 @@ rule SharedLibrary
 	local sources = [ FGristFiles $(2) ] ;
 	local objects = $(sources:S=$(SUFOBJ)) ;
 	local libs = $(3) ;
+	local apiVersion = $(4) ;
 
 	if ! [ IsPlatformSupportedForTarget $(1) ] {
 		return ;
+	}
+
+	if $(apiVersion) {
+		HAIKU_SONAME on $(lib) = $(lib:BS).$(apiVersion) ;
+		HAIKU_LIB_API_VERSION on $(lib) = $(apiVersion) ;
 	}
 
 	InheritPlatform $(objects) : $(lib) ;
