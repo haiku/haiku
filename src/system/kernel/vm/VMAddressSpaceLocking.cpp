@@ -323,7 +323,8 @@ MultiAddressSpaceLocker::_CompareItems(const void* _a, const void* _b)
 {
 	lock_item* a = (lock_item*)_a;
 	lock_item* b = (lock_item*)_b;
-	return a->space->ID() - b->space->ID();
+	return b->space->ID() - a->space->ID();
+		// descending order, i.e. kernel address space last
 }
 
 
