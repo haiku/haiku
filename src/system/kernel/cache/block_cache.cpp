@@ -74,6 +74,7 @@ struct cached_block {
 	bool			is_dirty : 1;
 	bool			unused : 1;
 	bool			discard : 1;
+	bool			busy_waiters : 1;
 	cache_transaction* transaction;
 	cache_transaction* previous_transaction;
 
@@ -111,6 +112,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 
 	ConditionVariable busy_condition;
 	uint32			busy_count;
+	bool			busy_block_waiters;
 
 	uint32			num_dirty_blocks;
 	bool			read_only;
@@ -933,6 +935,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	transaction_hash(NULL),
 	buffer_cache(NULL),
 	busy_count(0),
+	busy_block_waiters(false),
 	num_dirty_blocks(0),
 	read_only(readOnly)
 {
@@ -1075,6 +1078,7 @@ block_cache::NewBlock(off_t blockNumber)
 	block->is_dirty = false;
 	block->unused = false;
 	block->discard = false;
+	block->busy_waiters = false;
 #if BLOCK_CACHE_DEBUG_CHANGED
 	block->compare = NULL;
 #endif
@@ -1216,6 +1220,70 @@ block_cache::_GetUnusedBlock()
 //	#pragma mark - private block functions
 
 
+/*!	Cache must be locked.
+*/
+static void
+mark_block_busy(block_cache* cache, cached_block* block)
+{
+	block->busy = true;
+	cache->busy_count++;
+}
+
+
+/*!	Cache must be locked.
+*/
+static void
+mark_block_unbusy(block_cache* cache, cached_block* block)
+{
+	block->busy = false;
+	cache->busy_count--;
+
+	if (cache->busy_block_waiters || block->busy_waiters) {
+		cache->busy_block_waiters = false;
+		block->busy_waiters = false;
+		cache->busy_condition.NotifyAll();
+	}
+}
+
+
+/*!	Cache must be locked.
+*/
+static void
+wait_for_busy_block(block_cache* cache, cached_block* block)
+{
+	// wait for all blocks to be read in/written back
+	ConditionVariableEntry entry;
+	cache->busy_condition.Add(&entry);
+	block->busy_waiters = true;
+
+	mutex_unlock(&cache->lock);
+
+	entry.Wait();
+
+	mutex_lock(&cache->lock);
+}
+
+
+/*!	Cache must be locked.
+*/
+static void
+wait_for_busy_blocks(block_cache* cache)
+{
+	while (cache->busy_count != 0) {
+		// wait for all blocks to be read in/written back
+		ConditionVariableEntry entry;
+		cache->busy_condition.Add(&entry);
+		cache->busy_block_waiters = true;
+
+		mutex_unlock(&cache->lock);
+
+		entry.Wait();
+
+		mutex_lock(&cache->lock);
+	}
+}
+
+
 /*!	Removes a reference from the specified \a block. If this was the last
 	reference, the block is moved into the unused list.
 	In low memory situations, it will also free some blocks from that list,
@@ -1337,14 +1405,7 @@ retry:
 		*_allocated = true;
 	} else if (block->busy) {
 		// The block is currently busy - wait and try again later
-		ConditionVariableEntry entry;
-		cache->busy_condition.Add(&entry);
-
-		mutex_unlock(&cache->lock);
-
-		entry.Wait();
-
-		mutex_lock(&cache->lock);
+		wait_for_busy_block(cache, block);
 		goto retry;
 	}
 
@@ -1352,8 +1413,7 @@ retry:
 		// read block into cache
 		int32 blockSize = cache->block_size;
 
-		cache->busy_count++;
-		block->busy = true;
+		mark_block_busy(cache, block);
 		mutex_unlock(&cache->lock);
 
 		ssize_t bytesRead = read_pos(cache->fd, blockNumber * blockSize,
@@ -1369,10 +1429,7 @@ retry:
 		TB(Read(cache, block));
 
 		mutex_lock(&cache->lock);
-		block->busy = false;
-		cache->busy_count--;
-
-		cache->busy_condition.NotifyAll();
+		mark_block_unbusy(cache, block);
 	}
 
 	if (block->unused) {
@@ -1417,8 +1474,15 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 
 	// if there is no transaction support, we just return the current block
 	if (transactionID == -1) {
-		if (cleared)
+		if (cleared) {
+			mark_block_busy(cache, block);
+			mutex_unlock(&cache->lock);
+
 			memset(block->current_data, 0, cache->block_size);
+
+			mutex_lock(&cache->lock);
+			mark_block_unbusy(cache, block);
+		}
 
 		if (!block->is_dirty) {
 			cache->num_dirty_blocks++;
@@ -1477,7 +1541,13 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 			return NULL;
 		}
 
+		mark_block_busy(cache, block);
+		mutex_unlock(&cache->lock);
+
 		memcpy(block->original_data, block->current_data, cache->block_size);
+
+		mutex_lock(&cache->lock);
+		mark_block_unbusy(cache, block);
 	}
 	if (block->parent_data == block->current_data) {
 		// remember any previous contents for the parent transaction
@@ -1490,14 +1560,28 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 			return NULL;
 		}
 
+		mark_block_busy(cache, block);
+		mutex_unlock(&cache->lock);
+
 		memcpy(block->parent_data, block->current_data, cache->block_size);
+
+		mutex_lock(&cache->lock);
+		mark_block_unbusy(cache, block);
+
 		transaction->sub_num_blocks++;
 	} else if (transaction != NULL && transaction->has_sub_transaction
 		&& block->parent_data == NULL && wasUnchanged)
 		transaction->sub_num_blocks++;
 
-	if (cleared)
+	if (cleared) {
+		mark_block_busy(cache, block);
+		mutex_unlock(&cache->lock);
+
 		memset(block->current_data, 0, cache->block_size);
+
+		mutex_lock(&cache->lock);
+		mark_block_unbusy(cache, block);
+	}
 
 	block->is_dirty = true;
 	TB(Get(cache, block));
@@ -2023,7 +2107,7 @@ block_notifier_and_writer(void* /*data*/)
 				while (count < kMaxCount
 					&& (block = (cached_block*)hash_next(cache->hash,
 							&iterator)) != NULL) {
-					if (block->is_dirty && !block->is_writing)
+					if (block->is_dirty && !block->is_writing && !block->busy)
 						blocks[count++] = block;
 				}
 
@@ -2051,8 +2135,10 @@ block_notifier_and_writer(void* /*data*/)
 					block_list::Iterator iterator
 						= transaction->blocks.GetIterator();
 
-					for (; count < kMaxCount && iterator.HasNext(); count++) {
-						blocks[count] = iterator.Next();
+					while (count < kMaxCount && iterator.HasNext()) {
+						cached_block* block = iterator.Next();
+						if (!block->busy)
+							blocks[count++] = block;
 					}
 				}
 
@@ -2779,17 +2865,8 @@ block_cache_delete(void* _cache, bool allowWrites)
 
 	mutex_lock(&cache->lock);
 
-	while (cache->busy_count != 0) {
-		// wait for all blocks to be read in/written back
-		ConditionVariableEntry entry;
-		cache->busy_condition.Add(&entry);
-
-		mutex_unlock(&cache->lock);
-
-		entry.Wait();
-
-		mutex_lock(&cache->lock);
-	}
+	// wait for all blocks to become unbusy
+	wait_for_busy_blocks(cache);
 
 	// free all blocks
 
