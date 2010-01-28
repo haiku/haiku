@@ -52,8 +52,8 @@ const char *isc_strerror(int);
 #endif
 #define HAS_INET6_STRUCTS 1
 #define HAVE_SIN6_SCOPE_ID 1
-#define NEED_IN6ADDR_ANY 1
-#undef HAS_IN_ADDR6
+#undef NEED_IN6ADDR_ANY
+#define HAS_IN_ADDR6
 #define HAVE_SOCKADDR_STORAGE 1
 #undef NEED_GETTIMEOFDAY
 #define HAVE_STRNDUP 1
@@ -84,11 +84,6 @@ const char *isc_strerror(int);
 
 #ifndef PF_INET6
 #define PF_INET6        AF_INET6
-#endif
-
-#ifdef HAS_IN_ADDR6
-/* Map to pre-RFC structure. */
-#define in6_addr in_addr6
 #endif
 
 #ifndef HAS_INET6_STRUCTS
@@ -136,6 +131,11 @@ struct sockaddr_in6 {
 #define IN6ADDR_LOOPBACK_INIT {{{0, 0, 0, 0x01000000}}}
 #endif
 #endif
+#endif
+
+#ifdef __HAIKU__
+#define isc_in6addr_any in6addr_any
+#define isc_in6addr_loopback in6addr_loopback
 #endif
 
 #ifndef IN6ADDR_ANY_INIT
