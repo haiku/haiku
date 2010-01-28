@@ -1469,8 +1469,8 @@ vm_create_null_area(team_id team, const char* name, void** address,
 
 	VMArea* area;
 	status = map_backing_store(locker.AddressSpace(), cache, address, 0, size,
-		addressSpec, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name,
-		flags, true);
+		addressSpec, B_LAZY_LOCK, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP,
+		&area, name, flags, true);
 
 	if (status < B_OK) {
 		cache->ReleaseRefAndUnlock();
