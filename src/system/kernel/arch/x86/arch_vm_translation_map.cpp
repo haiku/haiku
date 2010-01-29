@@ -422,11 +422,7 @@ X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes)
 		vm_page *page;
 
 		// we need to allocate a pgtable
-		page = vm_page_allocate_page(PAGE_STATE_CLEAR);
-
-		// mark the page WIRED
-		vm_page_set_state(page, PAGE_STATE_WIRED);
-		page->busy = false;
+		page = vm_page_allocate_page(PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
 
 		DEBUG_PAGE_ACCESS_END(page);
 

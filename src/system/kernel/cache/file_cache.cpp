@@ -157,7 +157,8 @@ PrecacheIO::Prepare()
 	// allocate pages for the cache and mark them busy
 	uint32 i = 0;
 	for (size_t pos = 0; pos < fSize; pos += B_PAGE_SIZE) {
-		vm_page* page = vm_page_allocate_page(PAGE_STATE_FREE);
+		vm_page* page = vm_page_allocate_page(
+			PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_BUSY);
 
 		fCache->InsertPage(page, fOffset + pos);
 
@@ -385,7 +386,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
-			PAGE_STATE_FREE);
+			PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_BUSY);
 
 		cache->InsertPage(page, offset + pos);
 
@@ -508,7 +509,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		// TODO: the pages we allocate here should have been reserved upfront
 		//	in cache_io()
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
-			PAGE_STATE_FREE);
+			PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_BUSY);
 
 		ref->cache->InsertPage(page, offset + pos);
 
@@ -1074,7 +1075,8 @@ file_cache_init(void)
 {
 	// allocate a clean page we can use for writing zeroes
 	vm_page_reserve_pages(1, VM_PRIORITY_SYSTEM);
-	vm_page* page = vm_page_allocate_page(PAGE_STATE_CLEAR);
+	vm_page* page = vm_page_allocate_page(
+		PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
 	vm_page_unreserve_pages(1);
 
 	sZeroPage = (addr_t)page->physical_page_number * B_PAGE_SIZE;

@@ -920,8 +920,8 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 	bool isStack = (protection & B_STACK_AREA) != 0;
 	page_num_t guardPages;
 	bool canOvercommit = false;
-	uint32 newPageState = (flags & CREATE_AREA_DONT_CLEAR) != 0
-		? PAGE_STATE_FREE : PAGE_STATE_CLEAR;
+	uint32 pageAllocFlags = (flags & CREATE_AREA_DONT_CLEAR) == 0
+		? VM_PAGE_ALLOC_CLEAR : 0;
 
 	TRACE(("create_anonymous_area [%ld] %s: size 0x%lx\n", team, name, size));
 
@@ -1049,8 +1049,8 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 	if (wiring == B_CONTIGUOUS) {
 		// we try to allocate the page run here upfront as this may easily
 		// fail for obvious reasons
-		page = vm_page_allocate_page_run(newPageState, physicalAddress,
-			size / B_PAGE_SIZE, priority);
+		page = vm_page_allocate_page_run(PAGE_STATE_WIRED | pageAllocFlags,
+			physicalAddress, size / B_PAGE_SIZE, priority);
 		if (page == NULL) {
 			status = B_NO_MEMORY;
 			goto err0;
@@ -1122,10 +1122,9 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 #	endif
 					continue;
 #endif
-				vm_page* page = vm_page_allocate_page(newPageState);
-				cache->InsertPage(page, offset);
-				map_page(area, page, address, protection);
-//				vm_page_set_state(page, PAGE_STATE_WIRED);
+				vm_page* page = vm_page_allocate_page(
+					PAGE_STATE_ACTIVE | pageAllocFlags);
+//					PAGE_STATE_WIRED | pageAllocFlags);
 					// TODO: The pages should be PAGE_STATE_WIRED, since there's
 					// no need for the page daemon to play with them (the same
 					// should be considered in vm_soft_fault()). ATM doing that
@@ -1134,7 +1133,8 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 					// will age pages way too fast (since it just skips
 					// PAGE_STATE_WIRED pages, while it processes
 					// PAGE_STATE_ACTIVE with wired_count > 0).
-				page->busy = false;
+				cache->InsertPage(page, offset);
+				map_page(area, page, address, protection);
 
 				DEBUG_PAGE_ACCESS_END(page);
 
@@ -1217,8 +1217,6 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 
 				increment_page_wired_count(page);
 				cache->InsertPage(page, offset);
-				vm_page_set_state(page, PAGE_STATE_WIRED);
-				page->busy = false;
 
 				DEBUG_PAGE_ACCESS_END(page);
 			}
@@ -3720,7 +3718,8 @@ fault_get_page(PageFaultContext& context)
 		// see if the backing store has it
 		if (cache->HasPage(context.cacheOffset)) {
 			// insert a fresh page and mark it busy -- we're going to read it in
-			page = vm_page_allocate_page(PAGE_STATE_FREE);
+			page = vm_page_allocate_page(
+				PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_BUSY);
 			cache->InsertPage(page, context.cacheOffset);
 
 			// We need to unlock all caches and the address space while reading
@@ -3774,8 +3773,7 @@ fault_get_page(PageFaultContext& context)
 		cache = context.isWrite ? context.topCache : lastCache;
 
 		// allocate a clean page
-		page = vm_page_allocate_page(PAGE_STATE_CLEAR);
-		page->busy = false;
+		page = vm_page_allocate_page(PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_CLEAR);
 		FTRACE(("vm_soft_fault: just allocated page 0x%lx\n",
 			page->physical_page_number));
 
@@ -3789,8 +3787,7 @@ fault_get_page(PageFaultContext& context)
 		// TODO: If memory is low, it might be a good idea to steal the page
 		// from our source cache -- if possible, that is.
 		FTRACE(("get new page, copy it, and put it into the topmost cache\n"));
-		page = vm_page_allocate_page(PAGE_STATE_FREE);
-		page->busy = false;
+		page = vm_page_allocate_page(PAGE_STATE_ACTIVE);
 
 		// To not needlessly kill concurrency we unlock all caches but the top
 		// one while copying the page. Lacking another mechanism to ensure that

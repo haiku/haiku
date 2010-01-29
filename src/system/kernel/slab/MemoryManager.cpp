@@ -1349,10 +1349,8 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 	addr_t endAreaOffset = areaOffset + size;
 	for (size_t offset = areaOffset; offset < endAreaOffset;
 			offset += B_PAGE_SIZE) {
-		vm_page* page = vm_page_allocate_page(PAGE_STATE_FREE);
+		vm_page* page = vm_page_allocate_page(PAGE_STATE_WIRED);
 		cache->InsertPage(page, offset);
-		vm_page_set_state(page, PAGE_STATE_WIRED);
-		page->busy = false;
 
 		page->wired_count++;
 		atomic_add(&gMappedPagesCount, 1);
