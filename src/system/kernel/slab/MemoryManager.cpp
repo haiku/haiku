@@ -1207,8 +1207,8 @@ MemoryManager::_AllocateArea(uint32 flags, Area*& _area)
 			return error;
 		}
 
-		TRACE("MemoryManager::_AllocateArea(): allocated area %p (%" B_PRId32
-			")\n", area, areaID);
+		dprintf("slab memory manager: created area %p (%" B_PRId32 ")\n", area,
+			areaID);
 	} else {
 		// no areas yet -- allocate raw memory
 		area = (Area*)vm_allocate_early(sKernelArgs, SLAB_AREA_SIZE,
@@ -1292,6 +1292,9 @@ MemoryManager::_FreeArea(Area* area, bool areaRemoved, uint32 flags)
 	}
 
 	mutex_unlock(&sLock);
+
+	dprintf("slab memory manager: deleting area %p (%" B_PRId32 ")\n", area,
+		area->vmArea->id);
 
 	delete_area(area->vmArea->id);
 	vm_unreserve_memory(area->reserved_memory_for_mapping);
