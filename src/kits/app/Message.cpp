@@ -590,11 +590,9 @@ BMessage::_PrintToStream(const char* indent) const
 					break;
 
 				case B_STRING_TYPE:
-				{
 					printf("string(\"%s\", %ld bytes)\n", (char *)pointer,
 						(long)size);
 					break;
-				}
 
 				case B_INT8_TYPE:
 					print_type<int8>("int8(0x%hx or %d or '%.1s')\n", pointer);
