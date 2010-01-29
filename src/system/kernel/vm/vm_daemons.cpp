@@ -65,7 +65,7 @@ PageCacheLocker::~PageCacheLocker()
 bool
 PageCacheLocker::_IgnorePage(vm_page* page)
 {
-	if (page->state == PAGE_STATE_WIRED || page->state == PAGE_STATE_BUSY
+	if (page->busy || page->state == PAGE_STATE_WIRED
 		|| page->state == PAGE_STATE_FREE || page->state == PAGE_STATE_CLEAR
 		|| page->state == PAGE_STATE_UNUSED || page->wired_count > 0)
 		return true;
@@ -257,7 +257,7 @@ clear_page_activation(int32 index)
 	if (!locker.IsLocked())
 		return;
 
-	if (page->state == PAGE_STATE_ACTIVE)
+	if (!page->busy && page->state == PAGE_STATE_ACTIVE)
 		vm_clear_map_flags(page, PAGE_ACCESSED);
 }
 

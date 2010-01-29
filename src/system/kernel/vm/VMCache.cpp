@@ -1058,7 +1058,7 @@ VMCache::Resize(off_t newSize, int priority)
 		for (VMCachePagesTree::Iterator it
 					= pages.GetIterator(newPageCount, true, true);
 				vm_page* page = it.Next();) {
-			if (page->state == PAGE_STATE_BUSY) {
+			if (page->busy) {
 				if (page->busy_writing) {
 					// We cannot wait for the page to become available
 					// as we might cause a deadlock this way
@@ -1107,7 +1107,7 @@ VMCache::FlushAndRemoveAllPages()
 		// remove pages
 		for (VMCachePagesTree::Iterator it = pages.GetIterator();
 				vm_page* page = it.Next();) {
-			if (page->state == PAGE_STATE_BUSY) {
+			if (page->busy) {
 				// wait for page to become unbusy
 				WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
 

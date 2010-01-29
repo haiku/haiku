@@ -106,7 +106,7 @@ public:
 #endif
 
 	uint8					state : 3;
-	bool					is_dummy : 1;
+	bool					busy : 1;
 	bool					busy_writing : 1;
 		// used in VMAnonymousCache::Merge()
 	bool					accessed : 1;
@@ -115,7 +115,6 @@ public:
 
 	int8					usage_count;
 	uint16					wired_count;
-
 
 	VMCacheRef* CacheRef() const			{ return cache_ref; }
 	void SetCacheRef(VMCacheRef* cacheRef)	{ this->cache_ref = cacheRef; }
@@ -128,7 +127,6 @@ public:
 enum {
 	PAGE_STATE_ACTIVE = 0,
 	PAGE_STATE_INACTIVE,
-	PAGE_STATE_BUSY,
 	PAGE_STATE_MODIFIED,
 	PAGE_STATE_FREE,
 	PAGE_STATE_CLEAR,

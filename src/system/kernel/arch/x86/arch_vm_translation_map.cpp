@@ -426,6 +426,7 @@ X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes)
 
 		// mark the page WIRED
 		vm_page_set_state(page, PAGE_STATE_WIRED);
+		page->busy = false;
 
 		DEBUG_PAGE_ACCESS_END(page);
 

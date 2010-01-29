@@ -90,6 +90,7 @@ public:
 			void				NotifyPageEvents(vm_page* page, uint32 events)
 									{ if (fPageEventWaiters != NULL)
 										_NotifyPageEvents(page, events); }
+	inline	void				MarkPageUnbusy(vm_page* page);
 
 			vm_page*			LookupPage(off_t offset);
 			void				InsertPage(vm_page* page, off_t offset);
@@ -288,6 +289,14 @@ VMCache::ReleaseRefAndUnlock(bool consumerLocked)
 {
 	ReleaseRefLocked();
 	Unlock(consumerLocked);
+}
+
+
+void
+VMCache::MarkPageUnbusy(vm_page* page)
+{
+	page->busy = false;
+	NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 }
 
 

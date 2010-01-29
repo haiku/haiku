@@ -56,6 +56,7 @@ struct vm_page *vm_page_allocate_page_run_no_base(int state, addr_t count,
 	int priority);
 struct vm_page *vm_page_at_index(int32 index);
 struct vm_page *vm_lookup_page(addr_t pageNumber);
+bool vm_page_is_dummy(struct vm_page *page);
 
 #ifdef __cplusplus
 }

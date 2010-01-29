@@ -209,8 +209,7 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 
 		DEBUG_PAGE_ACCESS_TRANSFER(fPages[i], fAllocatingThread);
 
-		fPages[i]->state = PAGE_STATE_ACTIVE;
-		fCache->NotifyPageEvents(fPages[i], PAGE_EVENT_NOT_BUSY);
+		fCache->MarkPageUnbusy(fPages[i]);
 
 		DEBUG_PAGE_ACCESS_END(fPages[i]);
 	}
@@ -308,8 +307,7 @@ reserve_pages(file_cache_ref* ref, size_t reservePages, bool isWrite)
 				vm_page* page;
 				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 						(page = it.Next()) != NULL && left > 0;) {
-					if (page->state != PAGE_STATE_MODIFIED
-						&& page->state != PAGE_STATE_BUSY) {
+					if (page->state != PAGE_STATE_MODIFIED && !page->busy) {
 						DEBUG_PAGE_ACCESS_START(page);
 						cache->RemovePage(page);
 						vm_page_set_state(page, PAGE_STATE_FREE);
@@ -442,9 +440,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	for (int32 i = pageIndex; i-- > 0;) {
 		DEBUG_PAGE_ACCESS_END(pages[i]);
 
-		pages[i]->state = PAGE_STATE_ACTIVE;
-
-		cache->NotifyPageEvents(pages[i], PAGE_EVENT_NOT_BUSY);
+		cache->MarkPageUnbusy(pages[i]);
 	}
 
 	return B_OK;
@@ -610,11 +606,9 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
-		ref->cache->NotifyPageEvents(pages[i], PAGE_EVENT_NOT_BUSY);
+		ref->cache->MarkPageUnbusy(pages[i]);
 
-		if (writeThrough)
-			pages[i]->state = PAGE_STATE_ACTIVE;
-		else
+		if (!writeThrough)
 			vm_page_set_state(pages[i], PAGE_STATE_MODIFIED);
 
 		DEBUG_PAGE_ACCESS_END(pages[i]);
@@ -772,7 +766,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 			if (status != B_OK)
 				return status;
 
-			if (page->state == PAGE_STATE_BUSY) {
+			if (page->busy) {
 				cache->WaitForPageEvents(page, PAGE_EVENT_NOT_BUSY, true);
 				continue;
 			}
@@ -797,8 +791,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 				// need to unlock the cache temporarily to avoid a potential
 				// deadlock. To make sure that our page doesn't go away, we mark
 				// it busy for the time.
-				uint8 oldPageState = page->state;
-				page->state = PAGE_STATE_BUSY;
+				page->busy = true;
 				locker.Unlock();
 
 				// copy the contents of the page already in memory
@@ -818,14 +811,13 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 
 				locker.Lock();
 
-				page->state = oldPageState;
 				if (doWrite && page->state != PAGE_STATE_MODIFIED) {
 					DEBUG_PAGE_ACCESS_START(page);
 					vm_page_set_state(page, PAGE_STATE_MODIFIED);
 					DEBUG_PAGE_ACCESS_END(page);
 				}
 
-				cache->NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
+				cache->MarkPageUnbusy(page);
 			}
 
 			if (bytesLeft <= bytesInPage) {

@@ -515,9 +515,6 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection)
 	if (page->usage_count < 0)
 		page->usage_count = 1;
 
-	if (page->state != PAGE_STATE_MODIFIED)
-		vm_page_set_state(page, PAGE_STATE_ACTIVE);
-
 	return B_OK;
 }
 
@@ -1128,8 +1125,16 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 				vm_page* page = vm_page_allocate_page(newPageState);
 				cache->InsertPage(page, offset);
 				map_page(area, page, address, protection);
-					// TODO: This sets the page state to "active", but it would
-					// make more sense to set it to "wired".
+//				vm_page_set_state(page, PAGE_STATE_WIRED);
+					// TODO: The pages should be PAGE_STATE_WIRED, since there's
+					// no need for the page daemon to play with them (the same
+					// should be considered in vm_soft_fault()). ATM doing that
+					// will result in bad thrashing in systems with little
+					// memory due to the current tuning of the page daemon. It
+					// will age pages way too fast (since it just skips
+					// PAGE_STATE_WIRED pages, while it processes
+					// PAGE_STATE_ACTIVE with wired_count > 0).
+				page->busy = false;
 
 				DEBUG_PAGE_ACCESS_END(page);
 
@@ -1179,6 +1184,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 				increment_page_wired_count(page);
 				cache->InsertPage(page, offset);
 				vm_page_set_state(page, PAGE_STATE_WIRED);
+				page->busy = false;
 
 				DEBUG_PAGE_ACCESS_END(page);
 			}
@@ -1212,6 +1218,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 				increment_page_wired_count(page);
 				cache->InsertPage(page, offset);
 				vm_page_set_state(page, PAGE_STATE_WIRED);
+				page->busy = false;
 
 				DEBUG_PAGE_ACCESS_END(page);
 			}
@@ -1511,7 +1518,7 @@ pre_map_area_pages(VMArea* area, VMCache* cache)
 			break;
 
 		// skip inactive pages
-		if (page->state == PAGE_STATE_BUSY || page->usage_count <= 0)
+		if (page->busy || page->usage_count <= 0)
 			continue;
 
 		DEBUG_PAGE_ACCESS_START(page);
@@ -1817,7 +1824,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 			// map in all pages from source
 			for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 					vm_page* page  = it.Next();) {
-				if (page->state != PAGE_STATE_BUSY) {
+				if (!page->busy) {
 					DEBUG_PAGE_ACCESS_START(page);
 					map_page(newArea, page,
 						newArea->Base() + ((page->cache_offset << PAGE_SHIFT)
@@ -2738,7 +2745,7 @@ dump_cache(int argc, char** argv)
 	if (showPages) {
 		for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 				vm_page* page = it.Next();) {
-			if (!page->is_dummy) {
+			if (!vm_page_is_dummy(page)) {
 				kprintf("\t%p ppn 0x%lx offset 0x%lx state %u (%s) "
 					"wired_count %u\n", page, page->physical_page_number,
 					page->cache_offset, page->state,
@@ -3690,7 +3697,7 @@ fault_get_page(PageFaultContext& context)
 
 		for (;;) {
 			page = cache->LookupPage(context.cacheOffset);
-			if (page == NULL || page->state != PAGE_STATE_BUSY) {
+			if (page == NULL || !page->busy) {
 				// Either there is no page or there is one and it is not busy.
 				break;
 			}
@@ -3745,8 +3752,7 @@ fault_get_page(PageFaultContext& context)
 			}
 
 			// mark the page unbusy again
-			page->state = PAGE_STATE_ACTIVE;
-			cache->NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
+			cache->MarkPageUnbusy(page);
 
 			DEBUG_PAGE_ACCESS_END(page);
 
@@ -3769,12 +3775,12 @@ fault_get_page(PageFaultContext& context)
 
 		// allocate a clean page
 		page = vm_page_allocate_page(PAGE_STATE_CLEAR);
+		page->busy = false;
 		FTRACE(("vm_soft_fault: just allocated page 0x%lx\n",
 			page->physical_page_number));
 
 		// insert the new page into our cache
 		cache->InsertPage(page, context.cacheOffset);
-
 	} else if (page->Cache() != context.topCache && context.isWrite) {
 		// We have a page that has the data we want, but in the wrong cache
 		// object so we need to copy it and stick it into the top cache.
@@ -3784,12 +3790,12 @@ fault_get_page(PageFaultContext& context)
 		// from our source cache -- if possible, that is.
 		FTRACE(("get new page, copy it, and put it into the topmost cache\n"));
 		page = vm_page_allocate_page(PAGE_STATE_FREE);
+		page->busy = false;
 
 		// To not needlessly kill concurrency we unlock all caches but the top
 		// one while copying the page. Lacking another mechanism to ensure that
 		// the source page doesn't disappear, we mark it busy.
-		int sourcePageState = sourcePage->state;
-		sourcePage->state = PAGE_STATE_BUSY;
+		sourcePage->busy = true;
 		context.cacheChainLocker.UnlockKeepRefs(true);
 
 		// copy the page
@@ -3797,8 +3803,7 @@ fault_get_page(PageFaultContext& context)
 			sourcePage->physical_page_number * B_PAGE_SIZE);
 
 		context.cacheChainLocker.RelockCaches(true);
-		sourcePage->state = sourcePageState;
-		sourcePage->Cache()->NotifyPageEvents(sourcePage, PAGE_EVENT_NOT_BUSY);
+		sourcePage->Cache()->MarkPageUnbusy(sourcePage);
 
 		// insert the new page into our cache
 		context.topCache->InsertPage(page, context.cacheOffset);
@@ -3964,8 +3969,6 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 				// fine, though. We'll simply leave and probably fault again.
 				// To make sure we'll have more luck then, we ensure that the
 				// minimum object reserve is available.
-				if (context.page->state == PAGE_STATE_BUSY)
-					vm_page_set_state(context.page, PAGE_STATE_ACTIVE);
 				DEBUG_PAGE_ACCESS_END(context.page);
 
 				context.UnlockAll();
