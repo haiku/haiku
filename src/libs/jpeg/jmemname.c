@@ -67,7 +67,7 @@ extern void free JPP((void *ptr));
  */
 
 #ifndef TEMP_DIRECTORY		/* can override from jconfig.h or Makefile */
-#define TEMP_DIRECTORY  "/usr/tmp/" /* recommended setting for Unix */
+#define TEMP_DIRECTORY  "/tmp/" /* recommended setting for Unix */
 #endif
 
 static int next_file_num;	/* to distinguish among several temp files */
