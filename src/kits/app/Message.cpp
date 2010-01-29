@@ -575,6 +575,11 @@ BMessage::_PrintToStream(const char* indent) const
 					(char *)(fData + field->offset), j);
 			}
 
+			if ((field->flags & FIELD_FLAG_FIXED_SIZE) == 0) {
+				size = *(uint32 *)pointer;
+				pointer += sizeof(uint32);
+			}
+
 			switch (field->type) {
 				case B_RECT_TYPE:
 					print_to_stream_type<BRect>(pointer);
@@ -586,8 +591,6 @@ BMessage::_PrintToStream(const char* indent) const
 
 				case B_STRING_TYPE:
 				{
-					size = *(uint32 *)pointer;
-					pointer += sizeof(uint32);
 					printf("string(\"%s\", %ld bytes)\n", (char *)pointer,
 						(long)size);
 					break;
@@ -641,8 +644,6 @@ BMessage::_PrintToStream(const char* indent) const
 
 				case B_REF_TYPE:
 				{
-					size = *(uint32 *)pointer;
-					pointer += sizeof(uint32);
 					entry_ref ref;
 					BPrivate::entry_ref_unflatten(&ref, (char *)pointer, size);
 
@@ -661,8 +662,6 @@ BMessage::_PrintToStream(const char* indent) const
 					sprintf(buffer, "%s        ", indent);
 
 					BMessage message;
-					size = *(uint32 *)pointer;
-					pointer += sizeof(uint32);
 					status_t result = message.Unflatten((const char *)pointer);
 					if (result != B_OK) {
 						printf("failed unflatten: %s\n", strerror(result));
