@@ -5367,7 +5367,7 @@ BPoseView::AttributeChanged(const BMessage *message)
 		if (!attrName || attrHash == PrimarySort()
 			|| attrHash == SecondarySort()) {
 			_CheckPoseSortOrder(fPoseList, pose, poseListIndex);
-			if (fFiltering)
+			if (fFiltering && visible)
 				_CheckPoseSortOrder(fFilteredPoseList, pose, index);
 		}
 	} else {
