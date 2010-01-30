@@ -615,9 +615,11 @@ class BPoseView : public BView {
 		// filtering
 		void RemoveFilteredPose(BPose *pose, int32 index);
 		void FilterChanged();
+		void UpdateAfterFilterChange();
 		bool FilterPose(BPose *pose);
 		void StartFiltering();
-		void CancelFiltering();
+		void StopFiltering();
+		void ClearFilter();
 
 		// misc
 		BList *GetDropPointList(BPoint dropPoint, BPoint startPoint, const PoseList *,

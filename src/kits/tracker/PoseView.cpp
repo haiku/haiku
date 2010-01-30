@@ -2185,7 +2185,7 @@ BPoseView::MessageReceived(BMessage *message)
 			if (FSClipboardHasRefs())
 				FSClipboardClear();
 			else if (fFiltering)
-				CancelFiltering();
+				StopFiltering();
 			break;
 
 		case kCancelSelectionToClipboard:
@@ -2485,7 +2485,7 @@ BPoseView::MessageReceived(BMessage *message)
 							settings.SetTypeAheadFiltering(typeAheadFiltering);
 
 						if (fFiltering && !typeAheadFiltering)
-							CancelFiltering();
+							StopFiltering();
 						break;
 					}
 				}
@@ -2860,7 +2860,7 @@ BPoseView::SetViewMode(uint32 newMode)
 	BContainerWindow *window = ContainerWindow();
 	if (oldMode == kListMode) {
 		if (fFiltering)
-			CancelFiltering();
+			ClearFilter();
 
 		fTitleView->RemoveSelf();
 
@@ -7693,7 +7693,7 @@ BPoseView::ClearPoses()
 {
 	CommitActivePose();
 	SavePoseLocations();
-	CancelFiltering();
+	ClearFilter();
 
 	// clear all pose lists
 	fPoseList->MakeEmpty();
@@ -9648,7 +9648,7 @@ BPoseView::FilterChanged()
 	if (!fFiltering && length > 0)
 		StartFiltering();
 	else if (fFiltering && stringCount == 1 && length == 0)
-		CancelFiltering();
+		ClearFilter();
 	else {
 		if (fLastFilterStringCount > stringCount
 			|| (fLastFilterStringCount == stringCount
@@ -9669,7 +9669,13 @@ BPoseView::FilterChanged()
 
 	fLastFilterStringCount = stringCount;
 	fLastFilterStringLength = length;
+	UpdateAfterFilterChange();
+}
 
+
+void
+BPoseView::UpdateAfterFilterChange()
+{
 	UpdateCount();
 
 	BPose *pose = fFilteredPoseList->LastItem();
@@ -9745,7 +9751,15 @@ BPoseView::StartFiltering()
 
 
 void
-BPoseView::CancelFiltering()
+BPoseView::StopFiltering()
+{
+	ClearFilter();
+	UpdateAfterFilterChange();
+}
+
+
+void
+BPoseView::ClearFilter()
 {
 	if (!fFiltering)
 		return;
