@@ -59,7 +59,8 @@ BCountView::BCountView(BRect bounds, BPoseView* view)
 	fBarberPoleMap(NULL),
 	fLastBarberPoleOffset(5),
 	fStartSpinningAfter(0),
-	fTypeAheadString("")
+	fTypeAheadString(""),
+	fFilterString("")
 {
  	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE,
  		R_BarberPoleBitmap, &fBarberPoleMap);
@@ -186,6 +187,7 @@ BCountView::CheckCount()
 		fLastCount = fPoseView->CountItems();
 		Invalidate(TextInvalRect());
 	}
+
 	// invalidate barber pole area if necessary
 	TrySpinningBarberPole();
 }
@@ -209,20 +211,26 @@ BCountView::Draw(BRect updateRect)
 	}
 
 	BString itemString;
-	if (!IsTypingAhead()) {
+	if (IsTypingAhead())
+		itemString << TypeAhead();
+	else if (IsFiltering()) {
+		itemString << fLastCount << " " << Filter();
+	} else {
 		if (fLastCount == 0) 
 			itemString << "no items";
 		else if (fLastCount == 1) 
 			itemString << "1 item";
 		else 
 			itemString << fLastCount << " items";
-	} else
-		itemString << TypeAhead();
+	}
+		
 
 	BString string(itemString);
 	BRect textRect(TextInvalRect());
 
-	TruncateString(&string, B_TRUNCATE_END, textRect.Width());
+	TruncateString(&string, IsTypingAhead() ? B_TRUNCATE_BEGINNING
+			: IsFiltering() ? B_TRUNCATE_MIDDLE : B_TRUNCATE_END,
+		textRect.Width());
 
 	if (IsTypingAhead()) {
 		// use a muted gray for the typeahead
@@ -343,6 +351,44 @@ bool
 BCountView::IsTypingAhead() const
 {
 	return fTypeAheadString.Length() != 0;
+}
+
+
+void
+BCountView::AddFilter(const char *string)
+{
+	fFilterString += string;
+	Invalidate();
+}
+
+
+void
+BCountView::RemoveFilter()
+{
+	fFilterString.Truncate(fFilterString.Length() - 1);
+	Invalidate();
+}
+
+
+void
+BCountView::CancelFilter()
+{
+	fFilterString.Truncate(0);
+	Invalidate();
+}
+
+
+const char *
+BCountView::Filter() const
+{
+	return fFilterString.String();
+}
+
+
+bool
+BCountView::IsFiltering() const
+{
+	return fFilterString.Length() > 0;
 }
 
 

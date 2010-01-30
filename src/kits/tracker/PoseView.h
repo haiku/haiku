@@ -438,9 +438,14 @@ class BPoseView : public BView {
 		void ReadPoseInfo(Model *, PoseInfo *);
 		ExtendedPoseInfo *ReadExtendedPoseInfo(Model *);
 
+		void _CheckPoseSortOrder(PoseList *list, BPose *, int32 index);
+
 		// pose creation
 		BPose *EntryCreated(const node_ref *, const node_ref *, const char *, int32 *index = 0);
 
+		void AddPoseToList(PoseList *list, bool visibleList, bool insertionSort,
+			BPose *pose, BRect &viewBounds, float &listViewScrollBy,
+			bool forceDraw);
 		BPose *CreatePose(Model *, PoseInfo *, bool insertionSort = true,
 			int32 *index = 0, BRect *boundsPtr = 0, bool forceDraw = true);
 		virtual void CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
@@ -506,7 +511,7 @@ class BPoseView : public BView {
 		void DrawViewCommon(const BRect &updateRect);
 
 		// pose list handling
-		int32 BSearchList(const BPose *, int32 *index);
+		int32 BSearchList(PoseList *poseList, const BPose *, int32 *index);
 		void InsertPoseAfter(BPose *pose, int32 *index, int32 orientation,
 			BRect *invalidRect);
 			// does a CopyBits to scroll poses making room for a new pose,
@@ -607,6 +612,13 @@ class BPoseView : public BView {
 		virtual void AddPosesCompleted();
 		bool IsValidAddPosesThread(thread_id) const;
 
+		// filtering
+		void RemoveFilteredPose(BPose *pose, int32 index);
+		void FilterChanged();
+		bool FilterPose(BPose *pose);
+		void StartFiltering();
+		void CancelFiltering();
+
 		// misc
 		BList *GetDropPointList(BPoint dropPoint, BPoint startPoint, const PoseList *,
 			bool sourceInListMode, bool dropOnGrid) const;
@@ -629,6 +641,7 @@ class BPoseView : public BView {
 		BRect fExtent;
 		// the following should probably be just member lists, not pointers
 		PoseList *fPoseList;
+		PoseList *fFilteredPoseList;
 		PoseList *fVSPoseList;
 		PoseList *fSelectionList;
 		NodeSet fInsertedNodes;
@@ -682,6 +695,12 @@ class BPoseView : public BView {
 		bool fIsWatchingDateFormatChange : 1;
 		bool fHasPosesInClipboard : 1;
 		bool fCursorCheck : 1;
+		bool fFiltering : 1;
+
+		BObjectList<BString> fFilterStrings;
+		int32 fLastFilterStringCount;
+		int32 fLastFilterStringLength;
+
 		BRect fStartFrame;
 		BRect fSelectionRect;
 
@@ -924,13 +943,13 @@ BPoseView::IndexOfColumn(const BColumn* column) const
 inline int32
 BPoseView::IndexOfPose(const BPose *pose) const
 {
-	return fPoseList->IndexOf(pose);
+	return (fFiltering ? fFilteredPoseList : fPoseList)->IndexOf(pose);
 }
 
 inline BPose *
 BPoseView::PoseAtIndex(int32 index) const
 {
-	return fPoseList->ItemAt(index);
+	return (fFiltering ? fFilteredPoseList : fPoseList)->ItemAt(index);
 }
 
 inline BColumn *
@@ -954,8 +973,9 @@ BPoseView::LastColumn() const
 inline int32
 BPoseView::CountItems() const
 {
-	return fPoseList->CountItems();
+	return (fFiltering ? fFilteredPoseList : fPoseList)->CountItems();
 }
+
 
 inline void
 BPoseView::SetMultipleSelection(bool state)
@@ -1038,19 +1058,19 @@ BHScrollBar::SetTitleView(BView *view)
 inline BPose *
 BPoseView::FindPose(const Model *model, int32 *index) const
 {
-	return fPoseList->FindPose(model, index);
+	return (fFiltering ? fFilteredPoseList : fPoseList)->FindPose(model, index);
 }
 
 inline BPose *
 BPoseView::FindPose(const node_ref *node, int32 *index) const
 {
-	return fPoseList->FindPose(node, index);
+	return (fFiltering ? fFilteredPoseList : fPoseList)->FindPose(node, index);
 }
 
 inline BPose *
 BPoseView::FindPose(const entry_ref *entry, int32 *index) const
 {
-	return fPoseList->FindPose(entry, index);
+	return (fFiltering ? fFilteredPoseList : fPoseList)->FindPose(entry, index);
 }
 
 

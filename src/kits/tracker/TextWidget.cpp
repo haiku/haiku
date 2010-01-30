@@ -449,13 +449,15 @@ BTextWidget::StopEdit(bool saveChanges, BPoint poseLoc, BPoseView *view,
 
 
 void
-BTextWidget::CheckAndUpdate(BPoint loc, const BColumn *column, BPoseView *view)
+BTextWidget::CheckAndUpdate(BPoint loc, const BColumn *column, BPoseView *view,
+	bool visible)
 {
 	BRect oldRect;
 	if (view->ViewMode() != kListMode)
 		oldRect = CalcOldRect(loc, column, view);
 
-	if (fText->CheckAttributeChanged() && fText->CheckViewChanged(view)) {
+	if (fText->CheckAttributeChanged() && fText->CheckViewChanged(view)
+		&& visible) {
 		BRect invalRect(ColumnRect(loc, column, view));
 		if (view->ViewMode() != kListMode)
 			invalRect = invalRect | oldRect;

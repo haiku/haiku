@@ -63,6 +63,12 @@ public:
 	const char *TypeAhead() const;
 	bool IsTypingAhead() const;
 
+	void AddFilter(const char *string);
+	void RemoveFilter();
+	void CancelFilter();
+	const char *Filter() const;
+	bool IsFiltering() const;
+
 	void SetBorderHighlighted(bool highlighted);
 
 private:
@@ -80,6 +86,7 @@ private:
 	float fLastBarberPoleOffset;
 	bigtime_t fStartSpinningAfter;
 	BString fTypeAheadString;
+	BString fFilterString;
 };
 
 } // namespace BPrivate

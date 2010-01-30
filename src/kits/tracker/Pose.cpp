@@ -216,7 +216,7 @@ inline void
 OneCheckAndUpdate(BTextWidget *widget, BPose *, BPoseView *poseView,
 	BColumn *column, BPoint poseLoc)
 {
-	widget->CheckAndUpdate(poseLoc, column, poseView);
+	widget->CheckAndUpdate(poseLoc, column, poseView, true);
 }
 
 
@@ -233,7 +233,7 @@ BPose::UpdateAllWidgets(int32, BPoint poseLoc, BPoseView *poseView)
 
 void
 BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
-	uint32 attrType, int32, BPoint poseLoc, BPoseView *poseView)
+	uint32 attrType, int32, BPoint poseLoc, BPoseView *poseView, bool visible)
 {
 	if (poseView->ViewMode() != kListMode)
 		poseLoc = Location(poseView);
@@ -242,7 +242,7 @@ BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 
 	if (attrName) {
 		// pick up new attributes and find out if icon needs updating
-		if (resolvedModel->AttrChanged(attrName))
+		if (resolvedModel->AttrChanged(attrName) && visible)
 			UpdateIcon(poseLoc, poseView);
 
 		// ToDo: the following code is wrong, because this sort of hashing
@@ -252,7 +252,7 @@ BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 		if (widget) {
 			BColumn *column = poseView->ColumnFor(attrHash);
 			if (column) 
-				widget->CheckAndUpdate(poseLoc, column, poseView);
+				widget->CheckAndUpdate(poseLoc, column, poseView, visible);
 		} else if (attrType == 0) {
 			// attribute got likely removed, so let's search the
 			// column for the matching attribute name
@@ -261,7 +261,7 @@ BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 				BTextWidget *widget = fWidgetList.ItemAt(i);
 				BColumn *column = poseView->ColumnFor(widget->AttrHash());
 				if (column != NULL && !strcmp(column->AttrName(), attrName)) {
-					widget->CheckAndUpdate(poseLoc, column, poseView);
+					widget->CheckAndUpdate(poseLoc, column, poseView, visible);
 					break;
 				}
 			}
@@ -274,7 +274,8 @@ BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 			if (resolvedModel->InitCheck() != B_OK)
 				return;
 
-			UpdateIcon(poseLoc, poseView);
+			if (visible)
+				UpdateIcon(poseLoc, poseView);
 		}
 
 		// distribute stat changes
@@ -286,7 +287,7 @@ BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 			if (column->StatField()) {
 				BTextWidget *widget = WidgetFor(column->AttrHash());
 				if (widget) 
-					widget->CheckAndUpdate(poseLoc, column, poseView);
+					widget->CheckAndUpdate(poseLoc, column, poseView, visible);
 			}
 		}
 	}

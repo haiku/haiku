@@ -442,6 +442,13 @@ WindowsSettingsView::WindowsSettingsView(BRect rect)
 		new BMessage(kSortFolderNamesFirstChanged));
 	fSortFolderNamesFirstCheckBox->ResizeToPreferred();
 	AddChild(fSortFolderNamesFirstCheckBox);
+
+	rect.OffsetBy(0, itemSpacing);
+
+	fTypeAheadFilteringCheckBox = new BCheckBox(rect, "", "Enable type-ahead filtering",
+		new BMessage(kTypeAheadFilteringChanged));
+	fTypeAheadFilteringCheckBox->ResizeToPreferred();
+	AddChild(fTypeAheadFilteringCheckBox);
 }
 
 
@@ -464,6 +471,7 @@ WindowsSettingsView::AttachedToWindow()
 	fShowFullPathInTitleBarCheckBox->SetTarget(this);
 	fOutlineSelectionCheckBox->SetTarget(this);
 	fSortFolderNamesFirstCheckBox->SetTarget(this);
+	fTypeAheadFilteringCheckBox->SetTarget(this);
 }
 
 
@@ -527,6 +535,15 @@ WindowsSettingsView::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kTypeAheadFilteringChanged:
+		{
+			settings.SetTypeAheadFiltering(fTypeAheadFilteringCheckBox->Value() == 1);
+			send_bool_notices(kTypeAheadFilteringChanged, "TypeAheadFiltering",
+				fTypeAheadFilteringCheckBox->Value() == 1);
+			Window()->PostMessage(kSettingsContentsModified);
+			break;
+		}
+
 		default:
 			_inherited::MessageReceived(message);
 			break;
@@ -564,10 +581,16 @@ WindowsSettingsView::SetDefaults()
 			"TransparentSelection", true);
 	}
 
-	if (settings.SortFolderNamesFirst()) {
+	if (!settings.SortFolderNamesFirst()) {
 		settings.SetSortFolderNamesFirst(true);
 		send_bool_notices(kSortFolderNamesFirstChanged,
 			"SortFolderNamesFirst", true);
+	}
+
+	if (settings.TypeAheadFiltering()) {
+		settings.SetTypeAheadFiltering(false);
+		send_bool_notices(kTypeAheadFilteringChanged,
+			"TypeAheadFiltering", true);
 	}
 
 	ShowCurrentSettings();
@@ -583,7 +606,8 @@ WindowsSettingsView::IsDefaultable() const
 		|| settings.SingleWindowBrowse() != false
 		|| settings.ShowNavigator() != false
 		|| settings.TransparentSelection() != true
-		|| settings.SortFolderNamesFirst() != true;
+		|| settings.SortFolderNamesFirst() != true
+		|| settings.TypeAheadFiltering() != false;
 }
 
 
@@ -623,6 +647,12 @@ WindowsSettingsView::Revert()
 			"SortFolderNamesFirst", fSortFolderNamesFirst);
 	}
 
+	if (settings.TypeAheadFiltering() != fTypeAheadFiltering) {
+		settings.SetTypeAheadFiltering(fTypeAheadFiltering);
+		send_bool_notices(kTypeAheadFilteringChanged,
+			"TypeAheadFiltering", fTypeAheadFiltering);
+	}
+
 	ShowCurrentSettings();
 }
 
@@ -639,6 +669,7 @@ WindowsSettingsView::ShowCurrentSettings()
 	fOutlineSelectionCheckBox->SetValue(settings.TransparentSelection()
 		? B_CONTROL_OFF : B_CONTROL_ON);
 	fSortFolderNamesFirstCheckBox->SetValue(settings.SortFolderNamesFirst());
+	fTypeAheadFilteringCheckBox->SetValue(settings.TypeAheadFiltering());
 }
 
 
@@ -652,6 +683,7 @@ WindowsSettingsView::RecordRevertSettings()
 	fShowNavigator = settings.ShowNavigator();
 	fTransparentSelection = settings.TransparentSelection();
 	fSortFolderNamesFirst = settings.SortFolderNamesFirst();
+	fTypeAheadFiltering = settings.TypeAheadFiltering();
 }
 
 
@@ -664,7 +696,8 @@ WindowsSettingsView::IsRevertable() const
 		|| fSingleWindowBrowse != settings.SingleWindowBrowse()
 		|| fShowNavigator != settings.ShowNavigator()
 		|| fTransparentSelection != settings.TransparentSelection()
-		|| fSortFolderNamesFirst != settings.SortFolderNamesFirst();
+		|| fSortFolderNamesFirst != settings.SortFolderNamesFirst()
+		|| fTypeAheadFiltering != settings.TypeAheadFiltering();
 }
 
 

@@ -70,6 +70,7 @@ class TTrackerState : public Settings {
 		BooleanValueSetting *fTransparentSelection;
 		BooleanValueSetting *fSortFolderNamesFirst;
 		BooleanValueSetting *fHideDotFiles;
+		BooleanValueSetting *fTypeAheadFiltering;
 
 		BooleanValueSetting *f24HrClock;
 
@@ -174,6 +175,7 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fTransparentSelection = new BooleanValueSetting("TransparentSelection", true));
 	Add(fSortFolderNamesFirst = new BooleanValueSetting("SortFolderNamesFirst", true));
 	Add(fHideDotFiles = new BooleanValueSetting("HideDotFiles", false));
+	Add(fTypeAheadFiltering = new BooleanValueSetting("TypeAheadFiltering", false));
  	Add(fSingleWindowBrowse = new BooleanValueSetting("SingleWindowBrowse", false));
 	Add(fShowNavigator = new BooleanValueSetting("ShowNavigator", false));
 
@@ -384,6 +386,20 @@ void
 TrackerSettings::SetHideDotFiles(bool hide)
 {
 	gTrackerState.fHideDotFiles->SetValue(hide);
+}
+
+
+bool
+TrackerSettings::TypeAheadFiltering()
+{
+	return gTrackerState.fTypeAheadFiltering->Value();
+}
+
+
+void
+TrackerSettings::SetTypeAheadFiltering(bool enabled)
+{
+	gTrackerState.fTypeAheadFiltering->SetValue(enabled);
 }
 
 

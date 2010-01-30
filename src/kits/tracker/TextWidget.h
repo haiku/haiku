@@ -75,7 +75,7 @@ public:
 	void StopEdit(bool saveChanges, BPoint loc, BPoseView *, BPose *, int32 index);
 
 	void SelectAll(BPoseView *view);
-	void CheckAndUpdate(BPoint, const BColumn *, BPoseView *);
+	void CheckAndUpdate(BPoint, const BColumn *, BPoseView *, bool visible);
 
 	uint32 AttrHash() const;
 	bool IsEditable() const;

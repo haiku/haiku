@@ -94,6 +94,8 @@ class TrackerSettings {
 		void SetSortFolderNamesFirst(bool);
 		bool HideDotFiles();
 		void SetHideDotFiles(bool hide);
+		bool TypeAheadFiltering();
+		void SetTypeAheadFiltering(bool enabled);
 
 		bool ShowSelectionWhenInactive();
 		void SetShowSelectionWhenInactive(bool);

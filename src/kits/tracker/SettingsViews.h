@@ -122,12 +122,14 @@ class WindowsSettingsView : public SettingsView {
 		BCheckBox *fShowSelectionWhenInactiveCheckBox;
 		BCheckBox *fOutlineSelectionCheckBox;
 		BCheckBox *fSortFolderNamesFirstCheckBox;
+		BCheckBox *fTypeAheadFilteringCheckBox;
 
 		bool fShowFullPathInTitleBar;
 		bool fSingleWindowBrowse;
 		bool fShowNavigator;
 		bool fTransparentSelection;
 		bool fSortFolderNamesFirst;
+		bool fTypeAheadFiltering;
 
 		typedef SettingsView _inherited;
 };
