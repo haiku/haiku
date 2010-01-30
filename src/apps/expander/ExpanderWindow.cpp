@@ -593,8 +593,6 @@ ExpanderWindow::_UpdateWindowSize(bool showContents)
 	float bottom = fSizeLimit;
 
 	if (showContents) {
-		minHeight = bottom + 5.0 * fLineHeight;
-		maxHeight = 32767.0;
 		if (fPreviousHeight < 0.0) {
 			BFont font;
 			font_height fontHeight;
@@ -602,10 +600,12 @@ ExpanderWindow::_UpdateWindowSize(bool showContents)
 			font.GetHeight(&fontHeight);
 			fLineHeight = ceilf(fontHeight.ascent + fontHeight.descent
 				+ fontHeight.leading);
-
-			fPreviousHeight = minHeight + 10.0 * fLineHeight;
+			fPreviousHeight = bottom + 10.0 * fLineHeight;
 		}
-		bottom = fPreviousHeight;
+		minHeight = bottom + 5.0 * fLineHeight;
+		maxHeight = 32767.0;
+		
+		bottom = max_c(fPreviousHeight, minHeight);
 	} else {
 		minHeight = fSizeLimit;
 		maxHeight = fSizeLimit;
