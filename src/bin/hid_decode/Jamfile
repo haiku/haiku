@@ -16,7 +16,7 @@ BinCommand hid_decode :
 	HIDReportItem.cpp
 
 	hid_decode.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 ;
 
 SEARCH on [ FGristFiles HIDCollection.cpp HIDParser.cpp HIDReport.cpp
