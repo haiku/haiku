@@ -6008,6 +6008,9 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 				SelectPose(fFilteredPoseList->FirstItem(), 0);
 
 			OpenSelection();
+
+			if (fFiltering && (modifiers() & B_SHIFT_KEY) != 0)
+				StopFiltering();
 			break;
 
 		case B_HOME:
