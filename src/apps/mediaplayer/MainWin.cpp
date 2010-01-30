@@ -487,6 +487,7 @@ MainWin::MessageReceived(BMessage* msg)
 				case 8:
 				{
 					if (msg->what == B_GET_PROPERTY) {
+						BAutolock _(fPlaylist);
 						const PlaylistItem* item = fController->Item();
 						if (item == NULL) {
 							result = B_NO_INIT;
@@ -2024,6 +2025,7 @@ MainWin::_ShowIfNeeded()
 void
 MainWin::_SetFileAttributes()
 {
+	BAutolock locker(fPlaylist);
 	const FilePlaylistItem* item
 		= dynamic_cast<const FilePlaylistItem*>(fController->Item());
 	if (item == NULL)
@@ -2033,6 +2035,8 @@ MainWin::_SetFileAttributes()
 		BNode node(&item->Ref());
 		if (node.InitCheck())
 			return;
+
+		locker.Unlock();
 
 		// write duration
 
