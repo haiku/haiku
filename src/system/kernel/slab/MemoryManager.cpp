@@ -1296,8 +1296,9 @@ MemoryManager::_FreeArea(Area* area, bool areaRemoved, uint32 flags)
 	dprintf("slab memory manager: deleting area %p (%" B_PRId32 ")\n", area,
 		area->vmArea->id);
 
+	size_t memoryToUnreserve = area->reserved_memory_for_mapping;
 	delete_area(area->vmArea->id);
-	vm_unreserve_memory(area->reserved_memory_for_mapping);
+	vm_unreserve_memory(memoryToUnreserve);
 
 	mutex_lock(&sLock);
 }
