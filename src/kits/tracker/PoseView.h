@@ -613,6 +613,7 @@ class BPoseView : public BView {
 		bool IsValidAddPosesThread(thread_id) const;
 
 		// filtering
+		void EnsurePoseUnselected(BPose *pose);
 		void RemoveFilteredPose(BPose *pose, int32 index);
 		void FilterChanged();
 		void UpdateAfterFilterChange();

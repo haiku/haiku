@@ -9607,7 +9607,7 @@ BPoseView::SetWidgetTextOutline(bool on)
 
 
 void
-BPoseView::RemoveFilteredPose(BPose *pose, int32 index)
+BPoseView::EnsurePoseUnselected(BPose *pose)
 {
 	if (pose == fDropTarget)
 		fDropTarget = NULL;
@@ -9626,7 +9626,13 @@ BPoseView::RemoveFilteredPose(BPose *pose, int32 index)
 		if (fSelectionChangedHook)
 			ContainerWindow()->SelectionChanged();
 	}
+}
 
+
+void
+BPoseView::RemoveFilteredPose(BPose *pose, int32 index)
+{
+	EnsurePoseUnselected(pose);
 	fFilteredPoseList->RemoveItemAt(index);
 
 	BRect invalidRect = CalcPoseRectList(pose, index);
@@ -9744,6 +9750,8 @@ BPoseView::StartFiltering()
 		BPose *pose = fPoseList->ItemAt(i);
 		if (FilterPose(pose))
 			fFilteredPoseList->AddItem(pose);
+		else
+			EnsurePoseUnselected(pose);
 	}
 
 	Invalidate();
