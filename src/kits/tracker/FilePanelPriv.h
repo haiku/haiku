@@ -174,7 +174,7 @@ protected:
 	virtual void SavePoseLocations(BRect * = NULL);
 
 	virtual EntryListBase *InitDirentIterator(const entry_ref *);
-	virtual bool ShouldShowPose(const Model *, const PoseInfo *);
+	virtual void AddPosesCompleted();
 	virtual bool IsDesktopView() const;
 
 	void ShowVolumes(bool visible, bool showShared);

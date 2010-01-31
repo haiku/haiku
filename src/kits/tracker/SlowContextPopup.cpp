@@ -344,12 +344,7 @@ BSlowContextMenu::AddNextItem()
 
 	model.CloseNode();
 	
-	// item might be in invisible
-	// ToDo:
-	// use more of PoseView's filtering here
-	if (fIteratingDesktop && !ShouldShowDesktopPose(fNavDir.device,
-			&model, &poseInfo)) {
-//		PRINT(("not showing hidden item %s\n", model.Name()));
+	if (!BPoseView::PoseVisible(&model, &poseInfo)) {
 		return true;
 	}
 

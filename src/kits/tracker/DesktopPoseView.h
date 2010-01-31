@@ -43,8 +43,6 @@ All rights reserved.
 
 namespace BPrivate {
 
-bool ShouldShowDesktopPose(dev_t device, const Model *model, const PoseInfo *);
-
 class DesktopPoseView : public BPoseView {
 	// overrides BPoseView to add desktop-view specific code
 public:
@@ -65,7 +63,6 @@ protected:
 	virtual bool FSNotification(const BMessage *);
 
 	virtual bool IsDesktopView() const;
-	virtual bool ShouldShowPose(const Model *, const PoseInfo *);
 
 	virtual bool Represents(const node_ref *) const;
 	virtual bool Represents(const entry_ref *) const;
@@ -76,10 +73,6 @@ protected:
 private:
 	typedef BPoseView _inherited;
 
-	friend bool ShouldShowDesktopPose(dev_t device, const Model *,
-		const PoseInfo *);
-	
-	void AddTrashPose();
 };
 
 

@@ -1592,6 +1592,26 @@ BPoseView::CreateVolumePose(BVolume *volume, bool watchIndividually)
 }
 
 
+void
+BPoseView::CreateTrashPose()
+{
+	BVolume volume;
+	if (BVolumeRoster().GetBootVolume(&volume) == B_OK) {
+		BDirectory trash;
+		BEntry entry;
+		node_ref ref;
+		if (FSGetTrashDir(&trash, volume.Device()) == B_OK 
+			&& trash.GetEntry(&entry) == B_OK && entry.GetNodeRef(&ref) == B_OK) {
+			WatchNewNode(&ref);
+			Model *model = new Model(&entry);
+			PoseInfo info;
+			ReadPoseInfo(model, &info);
+			CreatePose(model, &info, false, NULL, NULL, true);
+		}
+	}
+}
+
+
 BPose *
 BPoseView::CreatePose(Model *model, PoseInfo *poseInfo, bool insertionSort,
 	int32 *indexPtr, BRect *boundsPtr, bool forceDraw)
@@ -1847,18 +1867,16 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 
 
 bool
-BPoseView::PoseVisible(const Model *model, const PoseInfo *poseInfo,
-	bool inFilePanel)
+BPoseView::PoseVisible(const Model *model, const PoseInfo *poseInfo)
 {
-	return (!poseInfo->fInvisible
-		|| (inFilePanel && strcmp(model->Name(), B_DESKTOP_DIR_NAME)));
+	return !poseInfo->fInvisible;
 }
 
 
 bool
 BPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
 {
-	if (!PoseVisible(model, poseInfo, IsFilePanel()))
+	if (!PoseVisible(model, poseInfo))
 		return false;
 		
 	// check filter before adding item
@@ -6147,7 +6165,7 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 				} else
 					lastString->Truncate(lastString->Length() - 1);
 
-				fCountView->RemoveFilter();
+				fCountView->RemoveFilterString();
 				FilterChanged();
 				break;
 			}
@@ -6185,12 +6203,12 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 						break;
 
 					fFilterStrings.AddItem(new BString());
-					fCountView->AddFilter("|");
+					fCountView->AddFilterString("|");
 					break;
 				}
 
 				fFilterStrings.LastItem()->Append(searchChar);
-				fCountView->AddFilter(searchChar);
+				fCountView->AddFilterString(searchChar);
 				FilterChanged();
 				break;
 			}

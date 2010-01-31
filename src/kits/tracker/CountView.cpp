@@ -355,7 +355,7 @@ BCountView::IsTypingAhead() const
 
 
 void
-BCountView::AddFilter(const char *string)
+BCountView::AddFilterString(const char *string)
 {
 	fFilterString += string;
 	Invalidate();
@@ -363,7 +363,7 @@ BCountView::AddFilter(const char *string)
 
 
 void
-BCountView::RemoveFilter()
+BCountView::RemoveFilterString()
 {
 	fFilterString.Truncate(fFilterString.Length() - 1);
 	Invalidate();

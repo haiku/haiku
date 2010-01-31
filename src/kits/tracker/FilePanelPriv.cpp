@@ -1595,14 +1595,12 @@ BFilePanelPoseView::InitDirentIterator(const entry_ref *ref)
 }
 
 
-bool
-BFilePanelPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
+void
+BFilePanelPoseView::AddPosesCompleted()
 {
-	if (IsDesktopView() && !ShouldShowDesktopPose(TargetModel()->NodeRef()->device,
-		model, poseInfo))
-		return false;
-
-	return _inherited::ShouldShowPose(model, poseInfo);
+	_inherited::AddPosesCompleted();
+	if (IsDesktopView())
+		CreateTrashPose();
 }
 
 

@@ -52,27 +52,6 @@ All rights reserved.
 #include "TrackerString.h"
 
 
-namespace BPrivate {
-
-bool
-ShouldShowDesktopPose(dev_t device, const Model *model, const PoseInfo *)
-{
-	if (model->NodeRef()->device != device) {
-		// avoid having more than one Trash
-		BDirectory remoteTrash;
-		if (FSGetTrashDir(&remoteTrash, model->NodeRef()->device) == B_OK) {
-			node_ref remoteTrashNodeRef;
-			remoteTrash.GetNodeRef(&remoteTrashNodeRef);
-			if (remoteTrashNodeRef == *model->NodeRef())
-				return false;
-		}
-	}
-	return true;
-}
-
-}	// namespace BPrivate
-
-
 //	#pragma mark -
 
 
@@ -175,18 +154,7 @@ void
 DesktopPoseView::AddPosesCompleted()
 {
 	_inherited::AddPosesCompleted();
-	AddTrashPose();
-}
-
-
-bool
-DesktopPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
-{
-	ASSERT(TargetModel());
-	if (!ShouldShowDesktopPose(TargetModel()->NodeRef()->device, model, poseInfo))
-		return false;
-
-	return _inherited::ShouldShowPose(model, poseInfo);
+	CreateTrashPose();
 }
 
 
@@ -220,26 +188,6 @@ DesktopPoseView::ShowVolumes(bool visible, bool showShared)
 		else
 			AddRootPoses(true, showShared);
 		UnlockLooper();
-	}
-}
-
-
-void
-DesktopPoseView::AddTrashPose()
-{
-	BVolume volume;
-	if (BVolumeRoster().GetBootVolume(&volume) == B_OK) {
-		BDirectory trash;
-		BEntry entry;
-		node_ref ref;
-		if (FSGetTrashDir(&trash, volume.Device()) == B_OK 
-			&& trash.GetEntry(&entry) == B_OK && entry.GetNodeRef(&ref) == B_OK) {
-			WatchNewNode(&ref);
-			Model *model = new Model(&entry);
-			PoseInfo info;
-			ReadPoseInfo(model, &info);
-			CreatePose(model, &info, false, NULL, NULL, true);
-		}
 	}
 }
 

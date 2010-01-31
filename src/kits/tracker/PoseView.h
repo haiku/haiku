@@ -323,7 +323,8 @@ class BPoseView : public BView {
 		void SetActivePose(BPose *);
 		BPose *ActivePose() const;
 		void CommitActivePose(bool saveChanges = true);
-		static bool PoseVisible(const Model *, const PoseInfo *, bool inFilePanel);bool FrameForPose(BPose *targetpose, bool convert, BRect *poseRect);
+		static bool PoseVisible(const Model *, const PoseInfo *);
+		bool FrameForPose(BPose *targetpose, bool convert, BRect *poseRect);
 		bool CreateSymlinkPoseTarget(Model *symlink);
 			// used to complete a symlink pose; returns true if
 			// target symlink should not be shown	
@@ -455,6 +456,8 @@ class BPoseView : public BView {
 			// filter, subclasses override to control which poses show up
 			// subclasses should always call inherited
 		void CreateVolumePose(BVolume *, bool watchIndividually);
+
+		void CreateTrashPose();
 
 		virtual bool AddPosesThreadValid(const entry_ref *) const;
 			// verifies whether or not the current set of AddPoses threads

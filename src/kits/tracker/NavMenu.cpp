@@ -521,15 +521,9 @@ BNavMenu::AddNextItem()
 	model.CloseNode();
 	
 	// item might be in invisible
-	// ToDo:
-	// use more of PoseView's filtering here
-	if ((size == sizeof(poseInfo)
-			&& !BPoseView::PoseVisible(&model, &poseInfo, false))
-		|| fIteratingDesktop && !ShouldShowDesktopPose(fNavDir.device,
-			&model, &poseInfo)) {
-//		PRINT(("not showing hidden item %s\n", model.Name()));
+	if (size == sizeof(poseInfo)
+			&& !BPoseView::PoseVisible(&model, &poseInfo))
 		return true;
-	}
 
 	AddOneItem(&model);
 	return true;
@@ -588,7 +582,7 @@ BNavMenu::NewModelItem(Model *model, const BMessage *invokeMessage,
 			result->CloseNode();
 
 			if (size == sizeof(poseInfo) && !BPoseView::PoseVisible(result, 
-				&poseInfo, false)) {
+				&poseInfo)) {
 				// link target does not want to be visible
 				delete newResolvedModel;
 				return NULL;
