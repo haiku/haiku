@@ -822,6 +822,9 @@ is_calling(struct thread *thread, addr_t eip, const char *pattern,
 	if (pattern == NULL)
 		return eip >= start && eip < end;
 
+	if (!IS_KERNEL_ADDRESS(eip))
+		return false;
+
 	const char *symbol;
 	if (lookup_symbol(thread, eip, NULL, &symbol, NULL, NULL) != B_OK)
 		return false;
