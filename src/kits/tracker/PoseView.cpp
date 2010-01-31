@@ -8580,8 +8580,10 @@ BPoseView::_CheckPoseSortOrder(PoseList *poseList, BPose *pose, int32 oldIndex)
 		return;
 	}
 
-	if (fFiltering && poseList != fFilteredPoseList)
+	if (fFiltering && poseList != fFilteredPoseList) {
+		poseList->AddItem(pose, newIndex);
 		return;
+	}
 
 	BRect invalidRect(CalcPoseRectList(pose, oldIndex));
 	CloseGapInList(&invalidRect);
