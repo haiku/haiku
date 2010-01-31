@@ -35,6 +35,7 @@ class BLanguage {
 		status_t GetName(BString* name);
 		// ISO-639 language code, e.g. "en", "de"
 		const char* Code();
+		bool	IsCountry();
 
 		uint8 Direction() const;
 
