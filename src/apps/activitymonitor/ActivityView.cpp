@@ -1239,8 +1239,11 @@ ActivityView::_LegendHeight() const
 	int32 boldMargin = Parent()
 		&& (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0 ? 2 : 0;
 
+	int32 draggerMargin = (fSources.CountItems() % 2) != 0 ? 0 : 7;
+
 	return rows * (4 + ceilf(fontHeight.ascent)
-		+ ceilf(fontHeight.descent) + ceilf(fontHeight.leading)) + boldMargin;
+		+ ceilf(fontHeight.descent) + ceilf(fontHeight.leading)) + boldMargin
+		+ draggerMargin;
 }
 
 
