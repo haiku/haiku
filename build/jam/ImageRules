@@ -1136,24 +1136,13 @@ rule AddLibrariesToHaikuHybridImage directory : libs
 
 	local lib ;
 	for lib in $(libs) {
-		local abiMajor = [ on $(lib) return $(HAIKU_LIB_ABI_MAJOR) ] ;
-		if $(abiMajor) {
-			local abiMajorLib = $(lib).$(abiMajor) ;
-			local abiMinor = [ on $(lib) return $(HAIKU_LIB_ABI_MINOR) ] ;
-			if $(abiMinor) {
-				local abiMinorLib = $(abiMajorLib).$(abiMinor) ;
-				AddFilesToHaikuHybridImage $(directory)
-					: $(lib) : $(abiMinorLib) : true ;
-				AddSymlinkToHaikuHybridImage $(directory)
-					: $(abiMinorLib) : $(abiMajorLib) : : true ;
-				AddSymlinkToHaikuHybridImage $(directory)
-					: $(abiMinorLib) : $(lib) : : true ;
-			} else {
-				AddFilesToHaikuHybridImage $(directory)
-					: $(lib) : $(abiMajorLib) : true ;
-				AddSymlinkToHaikuHybridImage $(directory)
-					: $(abiMajorLib) : $(lib) : : true ;
-			}
+		local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
+		if $(abiVersion) {
+			local abiVersionedLib = $(lib).$(abiVersion) ;
+			AddFilesToHaikuHybridImage $(directory)
+				: $(lib) : $(abiVersionedLib) : true ;
+			AddSymlinkToHaikuHybridImage $(directory)
+				: $(abiVersionedLib) : $(lib) : : true ;
 		} else {
 			AddFilesToHaikuHybridImage $(directory) : $(lib) : : true ;
 		}

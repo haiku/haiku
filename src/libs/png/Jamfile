@@ -27,6 +27,6 @@ local shared_files =
 
 Objects $(shared_files) ;
 
-SharedLibrary libpng.so : [ FGristFiles $(shared_files:S=.o) ] : z : 1.2 : ;
+SharedLibrary libpng.so : [ FGristFiles $(shared_files:S=.o) ] : z : 1.2 ;
 
 StaticLibrary libpng.a : [ FGristFiles $(shared_files:S=.o) ] ;

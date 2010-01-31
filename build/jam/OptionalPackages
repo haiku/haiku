@@ -403,17 +403,11 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	for lib in $(SYSTEM_LIBS) $(SYSTEM_LIBS_LIBGL_ALIASES) $(developmentLibs) {
 		AddSymlinkToHaikuHybridImage $(abiDirTokens) lib
 			: /system/lib $(lib:BS) : : true ;
-		local abiMajor = [ on $(lib) return $(HAIKU_LIB_ABI_MAJOR) ] ;
-		local abiMajorLib = $(lib:BS).$(abiMajor) ;
-		if $(abiMajor) {
-			local abiMinor = [ on $(lib) return $(HAIKU_LIB_ABI_MINOR) ] ;
-			if $(abiMinor) {
-				local abiMinorLib = $(abiMinorLib).$(abiMinor) ;
-				AddSymlinkToHaikuHybridImage $(abiDirTokens) lib
-					: /system/lib $(abiMinorLib) : : true ;
-			}
+		local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
+		if $(abiVersion) {
+			local abiVersionedLib = $(lib:BS).$(abiVersion) ;
 			AddSymlinkToHaikuHybridImage $(abiDirTokens) lib
-				: /system/lib $(abiMajorLib) : : true ;
+				: /system/lib $(abiVersionedLib) : : true ;
 		}
 	}
 
