@@ -725,7 +725,7 @@ BListItem*
 BOutlineListView::ItemUnderAt(BListItem* underItem,
 	bool oneLevelOnly, int32 index) const
 {
-	int32 i = IndexOf(underItem);
+	int32 i = FullListIndexOf(underItem);
 	if (i == -1)
 		return NULL;
 
