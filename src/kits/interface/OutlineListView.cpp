@@ -854,12 +854,16 @@ BOutlineListView::ExpandOrCollapse(BListItem* item, bool expand)
 
 		_RecalcItemTops(startIndex);
 		// fix selection hints
+		// if the selected item was just removed by collapsing, select its
+		// parent
+		if (ListType() == B_SINGLE_SELECTION_LIST && selectionChanged)
+			fFirstSelected = fLastSelected = index;
 		if (index < fFirstSelected && index + count < fFirstSelected) {
-			// all items removed were higher than the selection range,
-			// adjust the indexes to correspond to their new visible positions
-			fFirstSelected -= count;
-			fLastSelected -= count;
-		}
+				// all items removed were higher than the selection range,
+				// adjust the indexes to correspond to their new visible positions
+				fFirstSelected -= count;
+				fLastSelected -= count;
+		}			
 
 		int32 maxIndex = fList.CountItems() - 1;
 		if (fFirstSelected > maxIndex)
@@ -1113,8 +1117,8 @@ BOutlineListView::_RemoveItem(BListItem* item, int32 fullIndex)
 
 	if (item->IsItemVisible()) {
 		// remove children, too
-		while (fullIndex + 1 < CountItems()) {
-			BListItem* subItem = ItemAt(fullIndex + 1);
+		while (fullIndex + 1 < FullListCountItems()) {
+			BListItem* subItem = FullListItemAt(fullIndex + 1);
 
 			if (subItem->OutlineLevel() <= level)
 				break;
