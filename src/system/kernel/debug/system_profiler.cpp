@@ -612,9 +612,10 @@ SystemProfiler::EventOccurred(NotificationService& service,
 					locker.Unlock();
 
 					RemoveReference();
-				} else
-					_TeamRemoved(team);
+					return;
+				}
 
+				_TeamRemoved(team);
 				break;
 
 			case TEAM_EXEC:
