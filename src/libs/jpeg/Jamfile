@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseLibraryHeaders jpeg ;
 
-local jpeg_files = 
+local jpeg_files =
 	jaricom.c
 	jcapimin.c
 	jcapistd.c
@@ -61,6 +61,8 @@ StaticLibrary libjpeg.a :
 
 SharedLibrary libjpeg.so :
 	$(jpeg_files)
+	:
+	: 8.0
 ;
 
 BinCommand jpegtran :

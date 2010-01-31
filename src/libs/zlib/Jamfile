@@ -21,7 +21,7 @@ local shared_files =
 
 Objects $(shared_files) ;
 
-SharedLibrary libz.so : [ FGristFiles $(shared_files:S=.o) ] ;
+SharedLibrary libz.so : [ FGristFiles $(shared_files:S=.o) ] : : 1 : 2 ;
 
 StaticLibrary libz.a : [ FGristFiles $(shared_files:S=.o) ] ;
 

@@ -5,7 +5,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders png zlib ;
 
-local shared_files = 
+local shared_files =
 	png.c
 	pngerror.c
 	pnggccrd.c
@@ -27,6 +27,6 @@ local shared_files =
 
 Objects $(shared_files) ;
 
-SharedLibrary libpng.so : [ FGristFiles $(shared_files:S=.o) ] : z ;
+SharedLibrary libpng.so : [ FGristFiles $(shared_files:S=.o) ] : z : 1.2 : ;
 
 StaticLibrary libpng.a : [ FGristFiles $(shared_files:S=.o) ] ;
