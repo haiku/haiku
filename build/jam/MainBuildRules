@@ -424,20 +424,24 @@ rule SharedLibraryFromObjects
 
 rule SharedLibrary
 {
-	# SharedLibrary <lib> : <sources> : <libraries> ;
+	# SharedLibrary <lib> : <sources> : <libraries> : <abiMajor> : <abiMinor>;
 	local lib = $(1) ;
 	local sources = [ FGristFiles $(2) ] ;
 	local objects = $(sources:S=$(SUFOBJ)) ;
 	local libs = $(3) ;
-	local apiVersion = $(4) ;
+	local abiMajor = $(4) ;	# major ABI (soname) version for lib (if any)
+	local abiMinor = $(5) ;	# additional minor suffix (optional)
 
 	if ! [ IsPlatformSupportedForTarget $(1) ] {
 		return ;
 	}
 
-	if $(apiVersion) {
-		HAIKU_SONAME on $(lib) = $(lib:BS).$(apiVersion) ;
-		HAIKU_LIB_API_VERSION on $(lib) = $(apiVersion) ;
+	if $(abiMajor) {
+		HAIKU_SONAME on $(lib) = $(lib:BS).$(abiMajor) ;
+		HAIKU_LIB_ABI_MAJOR on $(lib) = $(abiMajor) ;
+		if $(abiMinor) {
+			HAIKU_LIB_ABI_MINOR on $(lib) = $(abiMinor) ;
+		}
 	}
 
 	InheritPlatform $(objects) : $(lib) ;

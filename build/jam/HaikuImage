@@ -84,14 +84,12 @@ SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 ICU_LIBS = libicu-common.so libicu-data.so libicu-i18n.so
 ;
 SYSTEM_LIBS =
-	libalm.so
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
-	libfluidsynth.so libfreetype.so
+	libfreetype.so
 	libgame.so libGL.so libgnu.so
-	libilmimf.so
 	libjpeg.so
-	liblinprog.so liblocale.so liblpsolve55.so
+	liblocale.so
 	libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
 	libpng.so
@@ -102,6 +100,10 @@ SYSTEM_LIBS =
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ;
 PRIVATE_SYSTEM_LIBS =
+	libalm.so
+	libfluidsynth.so
+	libilmimf.so
+	liblinprog.so liblpsolve55.so
 	$(ICU_LIBS)
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
