@@ -66,7 +66,7 @@ ImportPLItemsCommand::ImportPLItemsCommand(Playlist* playlist,
 
 	fPlaylingIndex = fPlaylist->CurrentItemIndex();
 
-	if (fToIndex < 0) {
+	if (fToIndex == APPEND_INDEX_REPLACE_PLAYLIST) {
 		fOldCount = fPlaylist->CountItems();
 		if (fOldCount > 0) {
 			fOldItems = new (nothrow) PlaylistItem*[fOldCount];
@@ -112,8 +112,11 @@ ImportPLItemsCommand::Perform()
 
 	fItemsAdded = true;
 
+	if (fToIndex == APPEND_INDEX_APPEND_LAST)
+		fToIndex = fPlaylist->CountItems();
+
 	int32 index = fToIndex;
-	if (fToIndex < 0) {
+	if (fToIndex == APPEND_INDEX_REPLACE_PLAYLIST) {
 		fPlaylist->MakeEmpty(false);
 		index = 0;
 	}
@@ -142,7 +145,7 @@ ImportPLItemsCommand::Undo()
 
 	fItemsAdded = false;
 
-	if (fToIndex < 0) {
+	if (fToIndex == APPEND_INDEX_REPLACE_PLAYLIST) {
 		// remove new items from playlist and restore old refs
 		fPlaylist->MakeEmpty(false);
 		for (int32 i = 0; i < fOldCount; i++) {

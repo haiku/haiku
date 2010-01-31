@@ -1122,9 +1122,13 @@ MainWin::_RefsReceived(BMessage* message)
 	// the playlist is replaced by dropped files
 	// or the dropped files are appended to the end
 	// of the existing playlist if <shift> is pressed
+	bool append = false;
+	if (message->FindBool("append to playlist", &append) != B_OK)
+		append = modifiers() & B_SHIFT_KEY;
+
 	BAutolock _(fPlaylist);
-	int32 appendIndex = modifiers() & B_SHIFT_KEY ?
-		fPlaylist->CountItems() : -1;
+	int32 appendIndex = append ? APPEND_INDEX_APPEND_LAST
+		: APPEND_INDEX_REPLACE_PLAYLIST;
 	message->AddInt32("append_index", appendIndex);
 
 	// forward the message to the playlist window,

@@ -33,6 +33,10 @@ class BString;
 struct entry_ref;
 
 
+// special append index values
+#define APPEND_INDEX_REPLACE_PLAYLIST	-1
+#define APPEND_INDEX_APPEND_LAST		-2
+
 extern const uint32 kPlaylistMagicBytes;
 extern const char* kTextPlaylistMimeString;
 extern const char* kBinaryPlaylistMimeString;
@@ -95,7 +99,8 @@ public:
 
 			// support functions
 			void				AppendRefs(const BMessage* refsReceivedMessage,
-									int32 appendIndex = -1);
+									int32 appendIndex
+										= APPEND_INDEX_REPLACE_PLAYLIST);
 	static	void				AppendToPlaylistRecursive(const entry_ref& ref,
 									Playlist* playlist);
 	static	void				AppendPlaylistToPlaylist(const entry_ref& ref,

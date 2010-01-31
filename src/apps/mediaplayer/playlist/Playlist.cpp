@@ -409,10 +409,13 @@ Playlist::RemoveListener(Listener* listener)
 void
 Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 {
-	// the playlist ist replaced by the refs in the message
+	// the playlist is replaced by the refs in the message
 	// or the refs are appended at the appendIndex
 	// in the existing playlist
-	bool add = appendIndex >= 0;
+	if (appendIndex == APPEND_INDEX_APPEND_LAST)
+		appendIndex = CountItems();
+
+	bool add = appendIndex != APPEND_INDEX_REPLACE_PLAYLIST;
 
 	if (!add)
 		MakeEmpty();

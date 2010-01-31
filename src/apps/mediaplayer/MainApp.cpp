@@ -196,9 +196,40 @@ MainApp::RefsReceived(BMessage* message)
 	// or double clicked a file that's handled by this app.
 	// Command line arguments are also redirected to here by
 	// ArgvReceived() but without MIME type check.
-	// For each file we create a new window and send it a
-	// B_REFS_RECEIVED message with a single file.
-	NewWindow(message);
+
+	// If multiple refs are received in short succession we
+	// combine them into a single window/playlist. Tracker
+	// will send multiple messages when opening a multi-
+	// selection for example and we don't want to spawn large
+	// numbers of windows when someone just tries to open an
+	// album. We use half a second time and prolong it for
+	// each new ref received.
+	static bigtime_t sLastRefsReceived = 0;
+	static MainWin* sLastRefsWindow = NULL;
+
+	if (system_time() - sLastRefsReceived < 500000) {
+		// Find the last opened window
+		for (int32 i = CountWindows() - 1; i >= 0; i--) {
+			MainWin* playerWindow = dynamic_cast<MainWin*>(WindowAt(i));
+			if (playerWindow == NULL)
+				continue;
+
+			if (playerWindow != sLastRefsWindow) {
+				// The window has changed since the last refs
+				sLastRefsReceived = 0;
+				sLastRefsWindow = NULL;
+				break;
+			}
+
+			message->AddBool("append to playlist", true);
+			playerWindow->PostMessage(message);
+			sLastRefsReceived = system_time();
+			return;
+		}
+	}
+
+	sLastRefsWindow = NewWindow(message);
+	sLastRefsReceived = system_time();
 }
 
 
