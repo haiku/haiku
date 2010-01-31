@@ -87,32 +87,18 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsShowExpanders->SetValue(appSettings->superExpando);
 	fAppsExpandNew->SetValue(appSettings->expandNewTeams);
 
-	fMenuRecentDocuments->SetValue(false);
-	fMenuRecentApplications->SetValue(false);
-	fMenuRecentFolders->SetValue(false);
-
-	fMenuRecentDocumentCount->SetEnabled(false);
-	fMenuRecentApplicationCount->SetEnabled(false);
-	fMenuRecentFolderCount->SetEnabled(false);
-
 	int32 docCount = appSettings->recentDocsCount;
 	int32 appCount = appSettings->recentAppsCount;
 	int32 folderCount = appSettings->recentFoldersCount;
 
-	if (docCount > 0) {
-		fMenuRecentDocuments->SetValue(true);
-		fMenuRecentDocumentCount->SetEnabled(true);
-	}
-
-	if (appCount > 0) {
-		fMenuRecentApplications->SetValue(true);
-		fMenuRecentApplicationCount->SetEnabled(true);
-	}
-
-	if (folderCount > 0) {
-		fMenuRecentFolders->SetValue(true);
-		fMenuRecentFolderCount->SetEnabled(true);
-	}
+	fMenuRecentDocuments->SetValue(appSettings->recentDocsEnabled);
+	fMenuRecentDocumentCount->SetEnabled(appSettings->recentDocsEnabled);
+	
+	fMenuRecentApplications->SetValue(appSettings->recentAppsEnabled);
+	fMenuRecentApplicationCount->SetEnabled(appSettings->recentAppsEnabled);
+	
+	fMenuRecentFolders->SetValue(appSettings->recentFoldersEnabled);
+	fMenuRecentFolderCount->SetEnabled(appSettings->recentFoldersEnabled);
 
 	BString docString;
 	BString appString;
@@ -281,20 +267,13 @@ PreferencesWindow::_UpdateRecentCounts()
 	int32 appCount = atoi(fMenuRecentApplicationCount->Text());
 	int32 folderCount = atoi(fMenuRecentFolderCount->Text());
 
-	if (docCount <= 0 || fMenuRecentDocuments->Value() == false)
-		message.AddInt32("documents", 0);
-	else
-		message.AddInt32("documents", docCount);
+	message.AddInt32("documents", max_c(0, docCount));
+	message.AddInt32("applications", max_c(0, appCount));
+	message.AddInt32("folders", max_c(0, folderCount));
 
-	if (appCount <= 0 || fMenuRecentApplications->Value() == false)
-		message.AddInt32("applications", 0);
-	else
-		message.AddInt32("applications", appCount);
-
-	if (folderCount <= 0 || fMenuRecentFolders->Value() == false)
-		message.AddInt32("folders", 0);
-	else
-		message.AddInt32("folders", folderCount);
+	message.AddBool("documentsEnabled", fMenuRecentDocuments->Value());
+	message.AddBool("applicationsEnabled", fMenuRecentApplications->Value());
+	message.AddBool("foldersEnabled", fMenuRecentFolders->Value());
 
 	be_app->PostMessage(&message);
 

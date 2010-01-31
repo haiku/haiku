@@ -112,6 +112,9 @@ struct desk_settings {
 	bool superExpando;			// version 9
 	bool expandNewTeams;
 	bool autoRaise;				// version 10
+	bool recentAppsEnabled;		// version 11
+	bool recentDocsEnabled;
+	bool recentFoldersEnabled;	
 };
 
 // the following structures are defined to compute
@@ -128,6 +131,7 @@ const uint32 kValidSettingsSize7 = sizeof(bool) + kValidSettingsSize6;
 const uint32 kValidSettingsSize8 = 2 * sizeof(bool) + kValidSettingsSize7;
 const uint32 kValidSettingsSize9 = 2 * sizeof(bool) + kValidSettingsSize8;
 const uint32 kValidSettingsSize10 = sizeof(bool) + kValidSettingsSize9;
+const uint32 kValidSettingsSize11 = 3 * sizeof(bool) + kValidSettingsSize10;
 
 class TBarView;
 class BFile;

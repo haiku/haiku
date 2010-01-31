@@ -155,23 +155,24 @@ TBeMenu::AddNextItem()
 			kRecentApplications};
 		const int recentTypes = 3;
 		TRecentsMenu* recentItem[recentTypes];
-		int count = 0;
+
+		bool enabled = false;
 
 		for (int i = 0; i < recentTypes; i++) {
 			recentItem[i] = new TRecentsMenu(recentTitle[i], fBarView,
 				recentType[i]);
 
 			if (recentItem[i])
-				count += recentItem[i]->RecentsCount();
+				enabled |= recentItem[i]->RecentsEnabled();
 		}
-		if (count > 0) {
+		if (enabled) {
 			AddSeparatorItem();
 
-			for (int i = 0;i < recentTypes;i++) {
+			for (int i = 0; i < recentTypes; i++) {
 				if (!recentItem[i])
 					continue;
 
-				if (recentItem[i]->RecentsCount() > 0) {
+				if (recentItem[i]->RecentsEnabled()) {
 					recentItem[i]->SetTypesList(TypesList());
 					recentItem[i]->SetTarget(Target());
 					AddItem(recentItem[i]);
@@ -391,6 +392,7 @@ TRecentsMenu::TRecentsMenu(const char* name, TBarView* bar, int32 which,
 	fAppRef(NULL),
 	fSignature(NULL),
 	fRecentsCount(0),
+	fRecentsEnabled(false),
 	fItemIndex(0),
 	fBarView(bar)
 {
@@ -401,12 +403,15 @@ TRecentsMenu::TRecentsMenu(const char* name, TBarView* bar, int32 which,
 	switch (which) {
 		case kRecentDocuments:
 			fRecentsCount = app->Settings()->recentDocsCount;
+			fRecentsEnabled = app->Settings()->recentDocsEnabled;
 			break;
 		case kRecentApplications:
 			fRecentsCount = app->Settings()->recentAppsCount;
+			fRecentsEnabled = app->Settings()->recentAppsEnabled;
 			break;
 		case kRecentAppDocuments:
 			fRecentsCount = app->Settings()->recentDocsCount;
+			fRecentsEnabled = app->Settings()->recentDocsEnabled;
 			if (signature != NULL)
 				fSignature = strdup(signature);
 			if (appRef != NULL)
@@ -414,6 +419,7 @@ TRecentsMenu::TRecentsMenu(const char* name, TBarView* bar, int32 which,
 			break;
 		case kRecentFolders:
 			fRecentsCount = app->Settings()->recentFoldersCount;
+			fRecentsEnabled = app->Settings()->recentFoldersEnabled;
 			break;
 	}
 }
@@ -454,7 +460,7 @@ TRecentsMenu::StartBuildingItemList()
 bool
 TRecentsMenu::AddNextItem()
 {
-	if (fRecentsCount > 0 && AddRecents(fRecentsCount))
+	if (fRecentsCount > 0 && fRecentsEnabled && AddRecents(fRecentsCount))
 		return true;
 
 	fItemIndex = 0;

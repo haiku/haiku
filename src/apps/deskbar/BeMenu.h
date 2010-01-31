@@ -58,6 +58,7 @@ class TRecentsMenu : public BNavMenu {
 		void			ResetTargets();
 
 		int32			RecentsCount();
+		bool			RecentsEnabled();
 
 	private:
 		virtual	bool	StartBuildingItemList();
@@ -71,6 +72,7 @@ class TRecentsMenu : public BNavMenu {
 		entry_ref		*fAppRef;
 		char			*fSignature;
 		int32			fRecentsCount;
+		bool			fRecentsEnabled;
 
 		int32 			fItemIndex;
 		BMessage		fRecentList;
@@ -83,6 +85,13 @@ inline int32
 TRecentsMenu::RecentsCount()
 {
 	return fRecentsCount;
+}
+
+
+inline bool
+TRecentsMenu::RecentsEnabled()
+{
+	return fRecentsEnabled;
 }
 
 

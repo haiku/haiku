@@ -199,6 +199,9 @@ TBarApp::SaveSettings()
 		fSettingsFile->Write(&fSettings.superExpando, sizeof(bool));
 		fSettingsFile->Write(&fSettings.expandNewTeams, sizeof(bool));
 		fSettingsFile->Write(&fSettings.autoRaise, sizeof(bool));
+		fSettingsFile->Write(&fSettings.recentAppsEnabled, sizeof(bool));
+		fSettingsFile->Write(&fSettings.recentDocsEnabled, sizeof(bool));
+		fSettingsFile->Write(&fSettings.recentFoldersEnabled, sizeof(bool));
 	}
 }
 
@@ -228,6 +231,9 @@ TBarApp::InitSettings()
 	settings.superExpando = false;
 	settings.expandNewTeams = false;
 	settings.autoRaise = false;
+	settings.recentAppsEnabled = true;
+	settings.recentDocsEnabled = true;
+	settings.recentFoldersEnabled = true;
 
 	BPath dirPath;
 	const char* settingsFileName = "Deskbar_settings";
@@ -288,6 +294,16 @@ TBarApp::InitSettings()
 			}
 			if (size >= kValidSettingsSize10)
 				fSettingsFile->Read(&settings.autoRaise, sizeof(bool));
+
+			if (size >= kValidSettingsSize11) {
+				fSettingsFile->Read(&settings.recentAppsEnabled, sizeof(bool));
+				fSettingsFile->Read(&settings.recentDocsEnabled, sizeof(bool));
+				fSettingsFile->Read(&settings.recentFoldersEnabled, sizeof(bool));
+			} else {
+				settings.recentAppsEnabled = settings.recentAppsCount > 0;
+				settings.recentDocsEnabled = settings.recentDocsCount > 0;
+				settings.recentFoldersEnabled = settings.recentFoldersCount > 0;
+			}
 		}
 	}
 
@@ -299,6 +315,7 @@ void
 TBarApp::MessageReceived(BMessage* message)
 {
 	int32 count;
+	bool enabled;
 	switch (message->what) {
 		case 'gloc':
 		case 'sloc':
@@ -335,10 +352,18 @@ TBarApp::MessageReceived(BMessage* message)
 		case kUpdateRecentCounts:
 			if (message->FindInt32("applications", &count) == B_OK)
 				fSettings.recentAppsCount = count;
+			if (message->FindBool("applicationsEnabled", &enabled) == B_OK)
+				fSettings.recentAppsEnabled = enabled && count > 0;
+
 			if (message->FindInt32("folders", &count) == B_OK)
 				fSettings.recentFoldersCount = count;
+			if (message->FindBool("foldersEnabled", &enabled) == B_OK)
+				fSettings.recentFoldersEnabled = enabled && count > 0;
+
 			if (message->FindInt32("documents", &count) == B_OK)
 				fSettings.recentDocsCount = count;
+			if (message->FindBool("documentsEnabled", &enabled) == B_OK)
+				fSettings.recentDocsEnabled = enabled && count > 0;
 			break;
 
 		case kConfigClose:
