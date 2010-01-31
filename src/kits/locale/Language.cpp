@@ -6,6 +6,8 @@
 
 #include <Language.h>
 
+#include <iostream>
+
 #include <Path.h>
 #include <String.h>
 #include <FindDirectory.h>
@@ -135,7 +137,7 @@ BLanguage::GetName(BString* name)
 	// TODO: This will return the language not in the current be_app_catalog,
 	// but in the current system wide language! Don't know the exact reason.
 	UnicodeString s;
-   	fICULocale->getDisplayLanguage(s);
+   	fICULocale->getDisplayName(s);
 	BStringByteSink converter(name);
 	s.toUTF8(converter);
 	return B_OK;
@@ -145,4 +147,11 @@ const char*
 BLanguage::Code()
 {
 	return fICULocale->getLanguage();
+}
+
+
+bool
+BLanguage::IsCountry()
+{
+	return *(fICULocale->getCountry()) != '\0';
 }

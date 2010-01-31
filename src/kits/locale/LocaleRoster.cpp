@@ -509,31 +509,14 @@ BLocaleRoster::GetInstalledLanguages(BMessage *languages) const
 	int32 i;
 	UnicodeString icuLanguageName;
 	BString languageName;
-	std::set<BString> languageSet;
 
-#undef REALLY_ALL_LANGUAGES
-#ifdef REALLY_ALL_LANGUAGES
-	const char* const* icuLocaleList = Locale::getISOLanguages();
-
-	// Loop over the strings and add them to an std::set to remove duplicates
-	for (i = 0; icuLocaleList[i]; i++) {
-		languageSet.insert(BString(icuLocaleList[i]));
-	}
-#else
 	int32_t localeCount;
 	const Locale* icuLocaleList
 		= Locale::getAvailableLocales(localeCount);
 
 	// Loop over the strings and add them to an std::set to remove duplicates
 	for (i = 0; i < localeCount; i++) {
-		languageSet.insert(icuLocaleList[i].getLanguage());
-	}
-#endif
-
-	std::set<BString>::const_iterator lastLang = languageSet.end();
-	for (std::set<BString>::const_iterator setIterator = languageSet.begin();
-		setIterator != lastLang; setIterator++) {
-		languages->AddString("langs", *setIterator);
+		languages->AddString("langs", icuLocaleList[i].getName());
 	}
 
 	return B_OK;
