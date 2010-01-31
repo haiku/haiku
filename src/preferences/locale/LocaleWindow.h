@@ -10,23 +10,24 @@
 
 class BButton;
 class BListView;
+class BOutlineListView;
 class FormatView;
 
 
 class LocaleWindow : public BWindow {
 public:
-							LocaleWindow();
-							~LocaleWindow();
+								LocaleWindow();
+								~LocaleWindow();
 
-	virtual	void			MessageReceived(BMessage* message);
-	virtual	void			FrameMoved(BPoint newPosition);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				FrameMoved(BPoint newPosition);
 
 private:
-			BButton*		fRevertButton;
-			BListView*		fLanguageListView;
-			BListView*		fPreferredListView;
-			FormatView*		fFormatView;
-			BMessage*		fMsgPrefLanguagesChanged;
+			BButton*			fRevertButton;
+			BOutlineListView*	fLanguageListView;
+			BOutlineListView*	fPreferredListView;
+			FormatView*			fFormatView;
+			BMessage*			fMsgPrefLanguagesChanged;
 };
 
 #endif	// LOCALE_WINDOW_H

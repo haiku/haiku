@@ -7,6 +7,8 @@
 #include "Locale.h"
 #include "LocaleWindow.h"
 
+#include <iostream>
+
 #include <Alert.h>
 #include <Application.h>
 #include <Bitmap.h>
@@ -14,9 +16,9 @@
 #include <Catalog.h>
 #include <GroupLayout.h>
 #include <LayoutBuilder.h>
-#include <ListView.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
+#include <OutlineListView.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <StringView.h>
@@ -45,6 +47,12 @@ class LanguageListItem: public BStringItem
 		fLanguageCode(code)
 		{}
 
+		LanguageListItem(const LanguageListItem& other)
+			:
+			BStringItem(other.Text()),
+			fLanguageCode(other.fLanguageCode)
+		{}
+
 		~LanguageListItem() {};
 
 		const inline BString LanguageCode() { return fLanguageCode; }
@@ -63,12 +71,12 @@ compare_list_items(const void* _a, const void* _b)
 }
 
 
-class LanguageListView: public BListView
+class LanguageListView: public BOutlineListView
 {
 	public:
 		LanguageListView(const char* name, list_view_type type)
 			:
-			BListView(name, type),
+			BOutlineListView(name, type),
 			fMsgPrefLanguagesChanged(new BMessage(kMsgPrefLanguagesChanged))
 		{}
 
@@ -77,18 +85,22 @@ class LanguageListView: public BListView
 		bool InitiateDrag(BPoint point, int32 index, bool wasSelected);
 		void MouseMoved(BPoint where, uint32 transit, const BMessage* msg);
 		void MoveItems(BList& items, int32 index);
+		void MoveItemFrom(BOutlineListView* origin, int32 index, int32 dropSpot = 0);
 		void AttachedToWindow()
 		{
-			BListView::AttachedToWindow();
+			BOutlineListView::AttachedToWindow();
 			ScrollToSelection();
 		}
 
 		void MessageReceived (BMessage* message)
 		{
 			if (message->what == 'DRAG') {
+				// Someone just dropped something on us
 				LanguageListView* list = NULL;
 				if (message->FindPointer("list", (void**)&list) == B_OK) {
+					// It comes from a list
 					if (list == this) {
+						// It comes from ourselves : move the item around in the list
 						int32 count = CountItems();
 						if (fDropIndex < 0 || fDropIndex > count)
 							fDropIndex = count;
@@ -97,7 +109,7 @@ class LanguageListView: public BListView
 						int32 index;
 						for (int32 i = 0; message->FindInt32("index", i, &index)
 							 	== B_OK; i++)
-							if (BListItem* item = ItemAt(index))
+							if (BListItem* item = FullListItemAt(index))
 								items.AddItem((void*)item);
 
 						if (items.CountItems() > 0) {
@@ -105,23 +117,23 @@ class LanguageListView: public BListView
 						}
 						fDropIndex = -1;
 					} else {
+						// It comes from another list : move it here
 						int32 count = CountItems();
 						if (fDropIndex < 0 || fDropIndex > count)
 							fDropIndex = count;
 
 						int32 index;
 						for (int32 i = 0; message->FindInt32("index", i, &index)
-								== B_OK; i++)
-							if (BListItem* item = list->RemoveItem(index)) {
-								AddItem(item, fDropIndex);
-								fDropIndex++;
-							}
+								== B_OK; i++) {
+							MoveItemFrom(list,index,fDropIndex);
+							fDropIndex++;
+						}
 
 						fDropIndex = -1;
 					}
+					Invoke(fMsgPrefLanguagesChanged);
 				}
-				Invoke(fMsgPrefLanguagesChanged);
-			} else BListView::MessageReceived(message);
+			} else BOutlineListView::MessageReceived(message);
 		}
 	private:
 		int32		fDropIndex;
@@ -132,6 +144,9 @@ class LanguageListView: public BListView
 void
 LanguageListView::MoveItems(BList& items, int32 index)
 {
+	// TODO : only allow moving top level item around other top level
+	// or sublevels within the same top level
+
 	DeselectAll();
 	// we remove the items while we look at them, the insertion index is
 	// decreaded when the items index is lower, so that we insert at the right
@@ -160,30 +175,51 @@ LanguageListView::MoveItems(BList& items, int32 index)
 }
 
 
+void
+LanguageListView::MoveItemFrom(BOutlineListView* origin, int32 index, int32 dropSpot)
+{
+	int itemCount = origin->CountItemsUnder(origin->FullListItemAt(index), true);
+	LanguageListItem* newItem = new LanguageListItem(*static_cast<LanguageListItem*>
+		(origin->FullListItemAt(index)));
+	this->AddItem(newItem, dropSpot);
+	newItem->SetExpanded(origin->FullListItemAt(index)->IsExpanded());
+
+	for (int i = 0; i < itemCount ; i++) {
+		LanguageListItem* subItem = static_cast<LanguageListItem*>(
+			origin->ItemUnderAt(origin->FullListItemAt(index), true, i));
+		this->AddUnder(new LanguageListItem(*subItem),newItem);
+	}
+	origin->RemoveItem(index);
+		// This will also remove the children
+}
+
+
 bool
 LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 {
 	bool success = false;
-	BListItem* item = ItemAt(CurrentSelection(0));
+	BListItem* item = FullListItemAt(CurrentSelection(0));
 	if (!item) {
 		// workarround a timing problem
 		Select(index);
-		item = ItemAt(index);
+		item = FullListItemAt(index);
 	}
 	if (item) {
 		// create drag message
 		BMessage msg('DRAG');
 		msg.AddPointer("list",(void*)(this));
 		int32 index;
-		for (int32 i = 0; (index = CurrentSelection(i)) >= 0; i++)
+		for (int32 i = 0; (index = FullListCurrentSelection(i)) >= 0; i++) {
+			// TODO : include all childs and parents as needed
 			msg.AddInt32("index", index);
+		}
 		// figure out drag rect
 		float width = Bounds().Width();
 		BRect dragRect(0.0, 0.0, width, -1.0);
 		// figure out, how many items fit into our bitmap
 		int32 numItems;
 		bool fade = false;
-		for (numItems = 0; BListItem* item = ItemAt(CurrentSelection(numItems));
+		for (numItems = 0; BListItem* item = FullListItemAt(CurrentSelection(numItems));
 				numItems++) {
 			dragRect.bottom += ceilf(item->Height()) + 1.0;
 			if (dragRect.Height() > MAX_DRAG_HEIGHT) {
@@ -203,9 +239,9 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 				itemBounds.bottom = 0.0;
 				// let all selected items, that fit into our drag_bitmap, draw
 				for (int32 i = 0; i < numItems; i++) {
-					int32 index = CurrentSelection(i);
+					int32 index = FullListCurrentSelection(i);
 					LanguageListItem* item
-						= static_cast<LanguageListItem*>(ItemAt(index));
+						= static_cast<LanguageListItem*>(FullListItemAt(index));
 					itemBounds.bottom = itemBounds.top + ceilf(item->Height());
 					if (itemBounds.bottom > dragRect.bottom)
 						itemBounds.bottom = dragRect.bottom;
@@ -274,16 +310,16 @@ LanguageListView::MouseMoved(BPoint where, uint32 transit, const BMessage* msg)
 				BRect r = ItemFrame(0);
 				where.y += r.Height() / 2.0;
 	
-				int32 index = IndexOf(where);
+				int32 index = FullListIndexOf(where);
 				if (index < 0)
-					index = CountItems();
+					index = FullListCountItems();
 				if (fDropIndex != index) {
 					fDropIndex = index;
 					if (fDropIndex >= 0) {
-						int32 count = CountItems();
+						int32 count = FullListCountItems();
 						if (fDropIndex == count) {
 							BRect r;
-							if (ItemAt(count - 1)) {
+							if (FullListItemAt(count - 1)) {
 								r = ItemFrame(count - 1);
 								r.top = r.bottom;
 								r.bottom = r.top + 1.0;
@@ -304,7 +340,7 @@ LanguageListView::MouseMoved(BPoint where, uint32 transit, const BMessage* msg)
 			}
 		}
 	} else {
-		BListView::MouseMoved(where, transit, msg);
+		BOutlineListView::MouseMoved(where, transit, msg);
 	}
 }
 
@@ -346,6 +382,7 @@ LocaleWindow::LocaleWindow()
 
 			BString currentLanguageCode;
 			BString currentLanguageName;
+			LanguageListItem* lastAddedLanguage = NULL;
 			for (int i = 0; installedLanguages.FindString("langs",
 					i, &currentLanguageCode) == B_OK; i++) {
 
@@ -354,11 +391,21 @@ LocaleWindow::LocaleWindow()
 				BLanguage* currentLanguage;
 				be_locale_roster->GetLanguage(&currentLanguage,
 					currentLanguageCode.String());
+
 				currentLanguageName.Truncate(0);
 				currentLanguage->GetName(&currentLanguageName);
+
 				LanguageListItem* si = new LanguageListItem(currentLanguageName,
 					currentLanguageCode.String());
-				fLanguageListView->AddItem(si);
+				if (currentLanguage->IsCountry()) {
+					fLanguageListView->AddUnder(si,lastAddedLanguage);
+				} else {
+					// This is a language without country, add it at top-level
+					fLanguageListView->AddItem(si);
+					si->SetExpanded(false);
+					lastAddedLanguage = si;
+				}
+
 				delete currentLanguage;
 			}
 
@@ -393,11 +440,14 @@ LocaleWindow::LocaleWindow()
 				index++) {
 			for (int listPos = 0; LanguageListItem* lli
 					= static_cast<LanguageListItem*>
-						(fLanguageListView->ItemAt(listPos));
+						(fLanguageListView->FullListItemAt(listPos));
 					listPos++) {
 				if (langCode == lli->LanguageCode()) {
-					fPreferredListView->AddItem(lli);
-					fLanguageListView->RemoveItem(lli);
+					// We found the item we were looking for, now move it to
+					// the other list along with all its children
+					static_cast<LanguageListView*>(fPreferredListView)
+						-> MoveItemFrom(fLanguageListView, fLanguageListView
+							-> FullListIndexOf(lli));
 				}
 			}
 		}
