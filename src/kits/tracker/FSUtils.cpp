@@ -3022,12 +3022,20 @@ TrackerOpenWith(const BMessage *refs)
 	return B_OK;
 }
 
+
 static void
 AsynchLaunchBinder(void (*func)(const entry_ref *, const BMessage *, bool on),
-	const entry_ref *entry, const BMessage *message, bool on)
+	const entry_ref *appRef, const BMessage *refs, bool openWithOK)
 {
-	Thread::Launch(NewFunctionObject(func, entry, message, on),
-		B_NORMAL_PRIORITY, "LaunchTask");
+	BMessage *task = new BMessage;
+	task->AddPointer("function", (void *)func);
+	task->AddMessage("refs", refs);
+	task->AddBool("openWithOK", openWithOK);
+	if (appRef != NULL)
+		task->AddRef("appRef", appRef);
+
+	extern BLooper *gLaunchLooper;
+	gLaunchLooper->PostMessage(task);
 }
 
 static bool

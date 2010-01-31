@@ -107,6 +107,40 @@ namespace BPrivate {
 
 NodePreloader *gPreloader = NULL;
 
+class LaunchLooper : public BLooper {
+public:
+	LaunchLooper()
+		:
+		BLooper("launch looper")
+	{
+	}
+
+	virtual void
+	MessageReceived(BMessage *message)
+	{
+		void (*function)(const entry_ref *, const BMessage *, bool);
+		BMessage refs;
+		bool openWithOK;
+		entry_ref appRef;
+
+		if (message->FindPointer("function", (void **)&function) != B_OK
+			|| message->FindMessage("refs", &refs) != B_OK
+			|| message->FindBool("openWithOK", &openWithOK) != B_OK) {
+			printf("incomplete launch message\n");
+			return;
+		}
+
+		if (message->FindRef("appRef", &appRef) == B_OK)
+			function(&appRef, &refs, openWithOK);
+		else
+			function(NULL, &refs, openWithOK);
+	}
+};
+
+BLooper *gLaunchLooper = NULL;
+
+// #pragma mark -
+
 void
 InitIconPreloader()
 {
@@ -204,11 +238,16 @@ TTracker::TTracker()
 
 	//This is how often it should update the free space bar on the volume icons
 	SetPulseRate(1000000);
+
+	gLaunchLooper = new LaunchLooper();
+	gLaunchLooper->Run();
 }
 
 
 TTracker::~TTracker()
 {
+	gLaunchLooper->Lock();
+	gLaunchLooper->Quit();
 }
 
 
