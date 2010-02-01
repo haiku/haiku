@@ -1,7 +1,9 @@
-/* BMailChainRunner - runs the mail inbound and outbound chains
-**
-** Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/*
+ * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
+ */
+
+
+//!	Runs the mail inbound and outbound chains
 
 
 #include <List.h>
@@ -63,36 +65,6 @@ show_error(alert_type type, const char *message, const char *tag)
 //	#pragma mark -
 
 
-#if USE_NASTY_SYNC_THREAD_HACK
-	/* There is a memory leak in gethostbyname() that causes structures it
-	   allocates not to be freed if they were allocated from a BLooper. So
-	   we have this awful hack to ensure that gethostbyname() is not, in
-	   fact, called from a BLooper. It works fairly well, too. Hopefully,
-	   the OpenBeOS net stack will rectify this problem and then I can
-	   turn it off. That will be nice. */
-
-	int32 BMailChainRunner::thread_sync_func(void *arg) {
-		BMailChainRunner *us = ((BMailChainRunner *)(arg));
-		us->Lock();
-		status_t val = us->Init();
-		us->Unlock();
-		return val;
-	}
-	
-	status_t BMailChainRunner::init_addons() {
-		thread_id thread = spawn_thread(&thread_sync_func,
-			"ChainRunnerGetHostByNameHack",10,this);
-		Unlock();
-		resume_thread(thread);
-		status_t result;
-		wait_for_thread(thread,&result);
-		Lock();
-		return result;
-	}
-#else
-	#define init_addons Init
-#endif
-	
 _EXPORT BMailChainRunner *
 GetMailChainRunner(int32 chain_id, BMailStatusWindow *status, bool selfDestruct)
 {
@@ -122,7 +94,7 @@ class DeathFilter : public BMessageFilter {
 		virtual	filter_result Filter(BMessage *, BHandler **)
 		{
 			be_app->MessageReceived(new BMessage('enda')); //---Stop new chains from starting
-			
+
 			list_lock.Lock();
 			for (int32 i = 0; i < running_chain_pointers.CountItems(); i++)
 				((BMailChainRunner *)(running_chain_pointers.ItemAt(i)))->Stop();
@@ -151,7 +123,7 @@ BMailChainRunner::BMailChainRunner(BMailChain *chain, BMailStatusWindow *status,
 
 	if (filter == NULL)
 		be_app->AddFilter(filter = new DeathFilter);
-	
+
 	list_lock.Lock();
 	if (running_chains.HasItem((void *)(_chain->ID())))
 		suicide = true;
@@ -170,10 +142,10 @@ BMailChainRunner::~BMailChainRunner()
 		delete (BMailChainCallback *)process_cb.ItemAt(i);
 	for (int32 i = chain_cb.CountItems();i-- > 0;)
 		delete (BMailChainCallback *)chain_cb.ItemAt(i);
-	
+
 	//--- Delete any filter images
 	for (int32 i = 0; i < addons.CountItems(); i++) {
-		filter_image *image = (filter_image *)(addons.ItemAt(i));			
+		filter_image *image = (filter_image *)(addons.ItemAt(i));
 		delete image->filter;
 		delete image->settings;
 
@@ -191,14 +163,14 @@ BMailChainRunner::~BMailChainRunner()
 		delete _statview;
 		_status->Unlock();
 	}
-	
+
 	//--- Remove ourselves from the lists
 	list_lock.Lock();
 	running_chains.RemoveItem((void *)(_chain->ID()));
 	running_chain_pointers.RemoveItem(this);
 	list_lock.Unlock();
-	
-	//--- And delete our chain			
+
+	//--- And delete our chain
 	if (destroy_chain)
 		delete _chain;
 }
@@ -239,7 +211,7 @@ BMailChainRunner::RunChain(bool asynchronous)
 		Quit();
 		return B_NAME_IN_USE;
 	}
-	
+
 	Run();
 
 	PostMessage('INIT');
@@ -254,7 +226,7 @@ BMailChainRunner::RunChain(bool asynchronous)
 }
 
 
-void 
+void
 BMailChainRunner::CallCallbacksFor(BList &list, status_t code)
 {
 	for (int32 i = 0; i < list.CountItems(); i++) {
@@ -266,7 +238,10 @@ BMailChainRunner::CallCallbacksFor(BList &list, status_t code)
 	list.MakeEmpty();
 }
 
-status_t BMailChainRunner::Init() {
+
+status_t
+BMailChainRunner::Init()
+{
 	status_t big_err = B_OK;
 	BString desc;
 	entry_ref addon;
@@ -334,16 +309,16 @@ BMailChainRunner::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case 'INIT':
-			if (init_addons() == B_OK)
+			if (Init() == B_OK)
 				break;
-		case B_QUIT_REQUESTED: {
-			
+		case B_QUIT_REQUESTED:
+		{
 			CallCallbacksFor(chain_cb, B_OK);
 				// who knows what the code was?
 
 			BMessage settings;
 			entry_ref addon;
-			
+
 			for (int32 i = 0; i < addons.CountItems(); i++) {
 				filter_image *image = (filter_image *)(addons.ItemAt(i));
 				delete image->filter;
@@ -360,20 +335,20 @@ BMailChainRunner::MessageReceived(BMessage *msg)
 
 				delete image;
 			}
-			
+
 			addons.MakeEmpty();
-			
+
 			if ((_status != NULL) && (_statview != NULL)) {
 				_status->Lock();
 				if (_statview->Window())
 					_status->RemoveView(_statview);
 				else
 					delete _statview;
-				
+
 				_statview = NULL;
 				_status->Unlock();
-			}				
-			
+			}
+
 			/*list_lock.Lock();
 			running_chains.RemoveItem((void *)(_chain->ID()));
 			running_chain_pointers.RemoveItem(this);
@@ -386,14 +361,17 @@ BMailChainRunner::MessageReceived(BMessage *msg)
 				Quit();
 			break;
 		}
-		case 'GETM': {
+		case 'GETM':
+		{
 			BStringList list;
 			msg->FindFlat("messages",&list);
 			_statview->SetTotalItems(list.CountItems());
 			_statview->SetMaximum(msg->FindInt32("bytes"));
-			get_messages(&list); }
+			get_messages(&list);
 			break;
-		case 'GTSM': {
+		}
+		case 'GTSM':
+		{
 			const char *uid;
 			status_t err = B_OK;
 			msg->FindString("uid",&uid);
@@ -462,7 +440,7 @@ BMailChainRunner::get_messages(BStringList *list)
 	status_t err = B_OK;
 	const char *glort;
 	bool using_tmp = (_chain->MetaData()->FindString("path",&glort) < B_OK);
-		
+
 	BDirectory tmp(using_tmp ? "/tmp" : glort);
 
 	for (int i = 0; i < list->CountItems(); i++) {
@@ -477,7 +455,7 @@ BMailChainRunner::get_messages(BStringList *list)
 			path = (char *)malloc(B_PATH_NAME_LENGTH);
 			sprintf(path,"%s (%s: %ld)...",pathy.Path(), _chain->Name(), _chain->ID());
 		}
-			
+
 		BEntry *entry = new BEntry(path);
 		free(path);
 		BPositionIO *file = (_chain->ChainDirection() == inbound) ? new BFile(entry, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE) : NULL;
@@ -486,7 +464,7 @@ BMailChainRunner::get_messages(BStringList *list)
 
 		for (int32 j = 0; j < addons.CountItems(); j++) {
 			struct filter_image *current = (struct filter_image *)(addons.ItemAt(j));
-			
+
 			err = current->filter->ProcessMailMessage(&file,entry,headers,folder,uid);
 
 			if (err != B_OK)
@@ -494,13 +472,13 @@ BMailChainRunner::get_messages(BStringList *list)
 		}
 
 		CallCallbacksFor(message_cb, err);
-		
+
 		if (err == B_MAIL_DISCARD)
 			entry->Remove();
-		
+
 		if (file != NULL)
 			delete file;
-			
+
 		delete entry;
 		delete headers;
 		delete folder;
@@ -512,7 +490,7 @@ BMailChainRunner::get_messages(BStringList *list)
 	CallCallbacksFor(process_cb, err);
 
 	if (save_chain) {
-	
+
 		entry_ref addon;
 		BMessage settings;
 		for (int32 i = 0; i < addons.CountItems(); i++) {
@@ -546,7 +524,7 @@ BMailChainRunner::Stop(bool kill)
 		BMessage *msg;
 		while ((msg = looper_queue->NextMessage()))
 			delete msg; //-- Ensure STOP makes the front of the queue
-	 	
+
 		PostMessage(B_QUIT_REQUESTED);
 		looper_queue->Unlock();
 	} else {
@@ -560,7 +538,7 @@ BMailChainRunner::GetMessages(BStringList *list, int32 bytes)
 {
 	if (list->CountItems() < 1)
 		return;
-		
+
 	BMessage msg('GETM');
 	msg.AddFlat("messages",list);
 	msg.AddInt32("bytes",bytes);
@@ -586,7 +564,7 @@ BMailChainRunner::ReportProgress(int bytes, int messages, const char *message)
 		_statview->AddProgress(bytes);
 
 	for (int i = 0; i < messages; i++)
-		_statview->AddItem();	
+		_statview->AddItem();
 
 	if (message != NULL)
 		_statview->SetMessage(message);

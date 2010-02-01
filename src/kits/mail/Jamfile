@@ -12,7 +12,7 @@ if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
 }
 
-SubDirC++Flags -D_BUILDING_mail=1 -DUSE_NASTY_SYNC_THREAD_HACK=1 ;
+SubDirC++Flags -D_BUILDING_mail=1 ;
 
 UsePrivateHeaders textencoding ;
 
@@ -53,5 +53,5 @@ SharedLibrary libmail.so :
 ;
 
 Package haiku-maildaemon-cvs :
-	libmail.so : 
+	libmail.so :
 	boot beos system lib ;
