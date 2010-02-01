@@ -6111,11 +6111,10 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 					break;
 
 				if (fSelectionList->IsEmpty())
-					sMatchString[0] = '\0';
+					sMatchString.Truncate(0);
 				else {
 					BPose *pose = fSelectionList->FirstItem();
-					strncpy(sMatchString, pose->TargetModel()->Name(), B_FILE_NAME_LENGTH - 1);
-					sMatchString[B_FILE_NAME_LENGTH - 1] = '\0';
+					sMatchString.SetTo(pose->TargetModel()->Name());
 				}
 
 				bool reverse = (Window()->CurrentMessage()->FindInt32("modifiers")
@@ -6123,11 +6122,11 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 				int32 index;
 				BPose *pose = FindNextMatch(&index, reverse);
 				if (!pose) {		// wrap around
-					if (reverse) {
-						sMatchString[0] = (char)0xff;
-						sMatchString[1] = '\0';
-					} else
-						sMatchString[0] = '\0';
+					if (reverse)
+						sMatchString.SetTo(0x7f, 1);
+					else
+						sMatchString.Truncate(0);
+
 					pose = FindNextMatch(&index, reverse);
 				}
 
@@ -6170,15 +6169,15 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 				break;
 			}
 
-			if (strlen(sMatchString) == 0)
+			if (sMatchString.Length() == 0)
 				break;
 
 			// remove last char from the typeahead buffer
-			sMatchString[strlen(sMatchString) - 1] = '\0';
+			sMatchString.Truncate(sMatchString.Length() - 1);
 
 			fLastKeyTime = system_time();
 
-			fCountView->SetTypeAhead(sMatchString);
+			fCountView->SetTypeAhead(sMatchString.String());
 
 			// select our new string
 			int32 index;
@@ -6231,17 +6230,14 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 			}
 
 			// add char to existing matchString or start new match string
-			// make sure we don't overfill matchstring
-			if (eventTime - fLastKeyTime < (doubleClickSpeed * 2)) {
-				uint32 nchars = B_FILE_NAME_LENGTH - strlen(sMatchString);
-				strncat(sMatchString, searchChar, nchars);
-			} else {
-				strncpy(sMatchString, searchChar, B_FILE_NAME_LENGTH - 1);
-			}
-			sMatchString[B_FILE_NAME_LENGTH - 1] = '\0';
+			if (eventTime - fLastKeyTime < (doubleClickSpeed * 2))
+				sMatchString.Append(searchChar);
+			else
+				sMatchString.SetTo(searchChar);
+
 			fLastKeyTime = eventTime;
 
-			fCountView->SetTypeAhead(sMatchString);
+			fCountView->SetTypeAhead(sMatchString.String());
 
 			int32 index;
 			BPose *pose = FindBestMatch(&index);
@@ -6267,14 +6263,14 @@ BPoseView::FindNextMatch(int32 *matchingIndex, bool reverse)
 		BPose *pose = fPoseList->ItemAt(index);
 
 		if (reverse) {
-			if (strcasecmp(pose->TargetModel()->Name(), sMatchString) < 0)
+			if (sMatchString.ICompare(pose->TargetModel()->Name()) > 0)
 				if (strcasecmp(pose->TargetModel()->Name(), bestSoFar) >= 0
 					|| !bestSoFar[0]) {
 					strcpy(bestSoFar, pose->TargetModel()->Name());
 					poseToSelect = pose;
 					*matchingIndex = index;
 				}
-		} else if (strcasecmp(pose->TargetModel()->Name(), sMatchString) > 0)
+		} else if (sMatchString.ICompare(pose->TargetModel()->Name()) < 0)
 			if (strcasecmp(pose->TargetModel()->Name(), bestSoFar) <= 0
 				|| !bestSoFar[0]) {
 				strcpy(bestSoFar, pose->TargetModel()->Name());
@@ -6294,7 +6290,7 @@ BPoseView::FindBestMatch(int32 *index)
 	BPose *poseToSelect = NULL;
 	float bestScore = -1;
 	int32 count = fPoseList->CountItems();
-	size_t matchLength = strlen(sMatchString);
+	size_t matchLength = sMatchString.Length();
 
 	// loop through all poses to find match
 	for (int32 j = 0; j < CountColumns(); j++) {
@@ -6312,12 +6308,12 @@ BPoseView::FindBestMatch(int32 *index)
 					text = widget->Text(this);
 
 				if (text != NULL) {
-					score = ComputeTypeAheadScore(text, sMatchString,
+					score = ComputeTypeAheadScore(text, sMatchString.String(),
 						matchLength);
 				}
 			} else {
 				score = ComputeTypeAheadScore(pose->TargetModel()->Name(),
-					sMatchString, matchLength);
+					sMatchString.String(), matchLength);
 			}
 
 			if (score > bestScore) {
@@ -9869,5 +9865,4 @@ float BPoseView::sFontHeight = -1;
 font_height BPoseView::sFontInfo = { 0, 0, 0 };
 BFont BPoseView::sCurrentFont;
 OffscreenBitmap *BPoseView::sOffscreen = new OffscreenBitmap;
-char BPoseView::sMatchString[] = "";
-
+BString BPoseView::sMatchString = "";

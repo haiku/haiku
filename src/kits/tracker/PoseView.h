@@ -713,7 +713,7 @@ class BPoseView : public BView {
 		static float sFontHeight;
 		static font_height sFontInfo;
 		static BFont sCurrentFont;
-		static char sMatchString[B_FILE_NAME_LENGTH];
+		static BString sMatchString;
 			// used for typeahead - should be replaced by a typeahead state
 
 		bigtime_t fLastKeyTime;
