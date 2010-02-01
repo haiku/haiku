@@ -23,14 +23,13 @@ public:
 		const uint32 kTruncateModeCount
 			= sizeof(kTruncateModes) / sizeof(kTruncateModes[0]);
 
-		BString theString("ö-ä-ü");
+		BString theString("ö&ä|ü-é#");
 		BPoint point(10, kTopOffset);
 		BString truncated;
-
-		for (float length = 25; length < 50; length += 5) {
+		for (float length = 5; length < 65; length += 3) {
 			SetHighColor(255, 0, 0);
 			StrokeRect(BRect(point.x, point.y - kSpacing, point.x + length,
-				point.y + kSpacing * (kTruncateModeCount - 1)));
+				point.y + kSpacing * kTruncateModeCount));
 			SetHighColor(0, 0, 0);
 
 			for (uint32 i = 0; i < kTruncateModeCount; i++) {
@@ -52,7 +51,7 @@ main(int argc, char *argv[])
 {
 	BApplication app("application/x-vnd.Haiku-TruncateString");
 
-	BRect frame(200, 200, 600, 400);
+	BRect frame(100, 200, 1200, 300);
 	BWindow *window = new BWindow(frame, "TruncateString", B_TITLED_WINDOW,
 		B_QUIT_ON_WINDOW_CLOSE);
 
