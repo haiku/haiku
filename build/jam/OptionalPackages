@@ -12,6 +12,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 
 
 # Available Optional Packages:
+#	ABI-compliance-checker	- tool for checking ABI compatibility between libs
 #	APR						- support libraries used for example by Subversion
 #	APR-util				- Apache portable runtime utility library
 #	BasicCommandLineTools	- basic commandline tools
@@ -68,6 +69,19 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Yasm					- the assembler utility
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
+
+# ABI-compliance-checker
+if [ IsOptionalHaikuImagePackageAdded ABI-compliance-checker ] {
+	if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
+		Echo "No optional package ABI-compliance-checker for gcc2" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			ABI-compliance-checker-1.12-noarch-gcc4-2010-02-01
+			: $(baseURL)/ABI-compliance-checker-1.12-noarch-gcc4-2010-02-01.zip
+		;
+	}
+}
+
 
 # APR
 if [ IsOptionalHaikuImagePackageAdded APR ] {
