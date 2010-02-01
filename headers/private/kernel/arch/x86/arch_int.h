@@ -25,22 +25,15 @@ arch_int_disable_interrupts_inline(void)
 	asm volatile("pushfl;\n"
 		"popl %0;\n"
 		"cli" : "=g" (flags));
-	return (flags & 0x200) != 0;
+	return flags ;
 }
 
 
 static inline void
 arch_int_restore_interrupts_inline(int oldState)
 {
-	int flags = oldState ? 0x200 : 0;
-
-	asm volatile("pushfl;\n"
-		"popl	%0;\n"
-		"andl	$0xfffffdff,%0;\n"
-		"orl	%1,%0;\n"
-		"pushl	%0;\n"
-		"popfl\n"
-		: "=&r"(flags) : "r"(flags));
+	if (oldState & 0x200)
+			asm("sti");
 }
 
 
