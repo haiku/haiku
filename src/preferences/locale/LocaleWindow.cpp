@@ -100,6 +100,8 @@ class LanguageListView: public BOutlineListView
 				if (message->FindPointer("list", (void**)&list) == B_OK) {
 					// It comes from a list
 					if (list == this) {
+						// TODO : parent item should stay at top level and childs should not
+						// move under another parent.
 						// It comes from ourselves : move the item around in the list
 						int32 count = CountItems();
 						if (fDropIndex < 0 || fDropIndex > count)
@@ -121,6 +123,16 @@ class LanguageListView: public BOutlineListView
 						int32 count = CountItems();
 						if (fDropIndex < 0 || fDropIndex > count)
 							fDropIndex = count;
+
+						// ensure we always drop things at top-level and not
+						// in the middle of another outline
+						if (Superitem(FullListItemAt(fDropIndex))) {
+							// Item has a parent
+							fDropIndex = FullListIndexOf(Superitem(FullListItemAt(fDropIndex)));
+						}
+						
+						// Item is now a top level one - we must insert just below its last child
+						fDropIndex += CountItemsUnder(FullListItemAt(fDropIndex),false);
 
 						int32 index;
 						for (int32 i = 0; message->FindInt32("index", i, &index)
@@ -182,8 +194,8 @@ LanguageListView::MoveItemFrom(BOutlineListView* origin, int32 index,
 	// Check that the node we are going to move is a top-level one.
 	// If not, we want his parent instead
 	
-	LanguageListItem* itemToMove = static_cast<LanguageListItem*>(origin->Superitem(
-		origin->FullListItemAt(index)));
+	LanguageListItem* itemToMove = static_cast<LanguageListItem*>(
+		origin->Superitem(origin->FullListItemAt(index)));
 	if (itemToMove == NULL) {
 		itemToMove = static_cast<LanguageListItem*>(
 			origin->FullListItemAt(index));
@@ -221,7 +233,6 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 		msg.AddPointer("list",(void*)(this));
 		int32 index;
 		for (int32 i = 0; (index = FullListCurrentSelection(i)) >= 0; i++) {
-			// TODO : include all childs and parents as needed
 			msg.AddInt32("index", index);
 		}
 		// figure out drag rect
