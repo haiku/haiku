@@ -971,22 +971,23 @@ void
 BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 	uint32 mode, float width, BString resultArray[]) const
 {
-	if (stringArray && resultArray && numStrings > 0) {
-		// allocate storage, see BeBook for "+ 3" (make space for ellipsis)
-		char** truncatedStrings = new char*[numStrings];
-		for (int32 i = 0; i < numStrings; i++) {
-			truncatedStrings[i] = new char[strlen(stringArray[i]) + 3];
-		}
+	if (stringArray != NULL && numStrings > 0) {
+		// the width of the "…" glyph
+		float ellipsisWidth = StringWidth(B_UTF8_ELLIPSIS);
 
-		GetTruncatedStrings(stringArray, numStrings, mode, width,
-			truncatedStrings);
-
-		// copy the strings into the BString array and free each one
 		for (int32 i = 0; i < numStrings; i++) {
-			resultArray[i].SetTo(truncatedStrings[i]);
-			delete[] truncatedStrings[i];
+			resultArray[i] = stringArray[i];
+			int32 numChars = resultArray[i].CountChars();
+
+			// get the escapement of each glyph in font units
+			float *escapementArray = new float[numChars];
+			GetEscapements(stringArray[i], numChars, NULL, escapementArray);
+
+			truncate_string(resultArray[i], mode, width, escapementArray,
+				fSize, ellipsisWidth, numChars);
+
+			delete[] escapementArray;
 		}
-		delete[] truncatedStrings;
 	}
 }
 
@@ -995,21 +996,15 @@ void
 BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 	uint32 mode, float width, char *resultArray[]) const
 {
-	if (stringArray && numStrings > 0) {
-		// the width of the "…" glyph
-		float ellipsisWidth = StringWidth(B_UTF8_ELLIPSIS);
+	if (stringArray != NULL && numStrings > 0) {
 		for (int32 i = 0; i < numStrings; i++) {
-			int32 length = strlen(stringArray[i]);
-			// count the individual glyphs
-			int32 numChars = UTF8CountChars(stringArray[i], length);
-			// get the escapement of each glyph in font units
-			float* escapementArray = new float[numChars];
-			GetEscapements(stringArray[i], numChars, NULL, escapementArray);
+			BString *strings = new BString[numStrings];
+			GetTruncatedStrings(stringArray, numStrings, mode, width, strings);
 
-			truncate_string(stringArray[i], mode, width, resultArray[i],
-				escapementArray, fSize, ellipsisWidth, length, numChars);
+			for (int32 i = 0; i < numStrings; i++)
+				strcpy(resultArray[i], strings[i].String());
 
-			delete[] escapementArray;
+			delete[] strings;
 		}
 	}
 }

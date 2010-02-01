@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Caz <turok2@currantbun.com>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Michael Lotz <mmlr@mlotz.ch>
  */
 
 
@@ -1361,259 +1362,134 @@ do_minimize_team(BRect zoomRect, team_id team, bool zoom)
 //	#pragma mark - truncate string
 
 
-static char*
-write_ellipsis(char* dst)
-{
-	strcpy(dst, B_UTF8_ELLIPSIS);
-	// The UTF-8 character spans over 3 bytes
-	return dst + 3;
-}
-
-
-static bool
-optional_char_fits(float escapement, float fontSize, float gap)
-{
-	const float size = escapement * fontSize;
-	if (size <= gap || fabs(size - gap) <= 0.0001)
-		return true;
-	return false;
-}
-
-
-bool
-truncate_end(const char* source, char* dest, uint32 numChars,
-	const float* escapementArray, float width, float ellipsisWidth, float size)
-{
-	float currentWidth = 0.0;
-	ellipsisWidth /= size;
-		// test if this is as accurate as escapementArray * size
-	width /= size;
-	uint32 lastFit = 0, c;
-
-	for (c = 0; c < numChars; c++) {
-		currentWidth += escapementArray[c];
-		if (currentWidth + ellipsisWidth <= width)
-			lastFit = c;
-
-		if (currentWidth > width)
-			break;
-	}
-
-	if (c == numChars) {
-		// string fits into width
-		return false;
-	}
-
-	if (c == 0) {
-		// there is no space for the ellipsis
-		strcpy(dest, "");
-		return true;
-	}
-
-	// copy string to destination
-
-	for (uint32 i = 0; i < lastFit + 1; i++) {
-		// copy one glyph
-		do {
-			*dest++ = *source++;
-		} while (IsInsideGlyph(*source));
-	}
-
-	// write ellipsis and terminate
-
-	dest = write_ellipsis(dest);
-	*dest = '\0';
-	return true;
-}
-
-
-static char*
-copy_from_end(const char* src, char* dst, uint32 numChars, uint32 length,
-	const float* escapementArray, float width, float ellipsisWidth, float size)
-{
-	const char* originalStart = src;
-	src += length - 1;
-	float currentWidth = 0.0;
-	for (int32 c = numChars - 1; c > 0; c--) {
-		currentWidth += escapementArray[c] * size;
-		if (currentWidth > width) {
-			// ups, we definitely don't fit. go back until the ellipsis fits
-			currentWidth += ellipsisWidth;
-			// go forward again until ellipsis fits (already beyond the target)
-			for (uint32 c2 = c; c2 < numChars; c2++) {
-//printf(" backward: %c (%ld) (%.1f - %.1f = %.1f)\n", *dst, c2, currentWidth, escapementArray[c2] * size,
-//	currentWidth - escapementArray[c2] * size);
-				currentWidth -= escapementArray[c2] * size;
-				do {
-					src++;
-				} while (IsInsideGlyph(*src));
-				// see if we went back enough
-				if (currentWidth <= width)
-					break;
-			}
-			break;
-		} else {
-			// go back one glyph
-			do {
-				src--;
-			} while (IsInsideGlyph(*src));
-		}
-	}
-	// copy from the end of the string
-	uint32 bytesToCopy = originalStart + length - src;
-	memcpy(dst, src, bytesToCopy);
-	dst += bytesToCopy;
-	return dst;
-}
-
-
-bool
-truncate_middle(const char* source, char* dest, uint32 numChars,
-	const float* escapementArray, float width, float ellipsisWidth, float size)
-{
-	float mid = (width - ellipsisWidth) / 2.0;
-
-	uint32 left = 0;
-	float leftWidth = 0.0;
-	while (left < numChars && (leftWidth + (escapementArray[left] * size))
-			< mid) {
-		leftWidth += (escapementArray[left++] * size);
-	}
-
-	if (left == numChars)
-		return false;
-
-	float rightWidth = 0.0;
-	uint32 right = numChars;
-	while (right > left && (rightWidth + (escapementArray[right - 1] * size))
-			< mid) {
-		rightWidth += (escapementArray[--right] * size);
-	}
-
-	if (left >= right)
-		return false;
-
-	float stringWidth = leftWidth + rightWidth;
-	for (uint32 i = left; i < right; ++i)
-		stringWidth += (escapementArray[i] * size);
-
-	if (stringWidth <= width)
-		return false;
-
-	// if there is no space for the ellipsis
-	if (width < ellipsisWidth) {
-		strcpy(dest, "");
-		return true;
-	}
-
-	// The ellipsis now definitely fits, but let's
-	// see if we can add another character
-	float gap = width - (leftWidth + ellipsisWidth + rightWidth);
-	if (left > numChars - right) {
-		// try right letter first
-		if (optional_char_fits(escapementArray[right - 1], size, gap))
-			right--;
-		else if (optional_char_fits(escapementArray[left], size, gap))
-			left++;
-	} else {
-		// try left letter first
-		if (optional_char_fits(escapementArray[left], size, gap))
-			left++;
-		else if (optional_char_fits(escapementArray[right - 1], size, gap))
-			right--;
-	}
-
-	// copy characters
-
-	for (uint32 i = 0; i < left; i++) {
-		// copy one glyph
-		do {
-			*dest++ = *source++;
-		} while (IsInsideGlyph(*source));
-	}
-
-	dest = write_ellipsis(dest);
-
-	for (uint32 i = left; i < numChars; i++) {
-		// copy one glyph
-		do {
-			if (i >= right)
-				*dest++ = *source++;
-			else
-				source++;
-		} while (IsInsideGlyph(*source));
-	}
-
-	// terminate
-	dest[0] = '\0';
-	return true;
-}
-
-
-// TODO: put into BPrivate namespace
 void
-truncate_string(const char* string, uint32 mode, float width,
-	char* result, const float* escapementArray, float fontSize,
-	float ellipsisWidth, int32 length, int32 numChars)
+truncate_string(BString& string, uint32 mode, float width,
+	const float* escapementArray, float fontSize, float ellipsisWidth,
+	int32 charCount)
 {
-	// TODO: that's actually not correct: the string could be smaller than
-	// ellipsisWidth
-	if (string == NULL /*|| width < ellipsisWidth*/) {
-		// we don't have room for a single glyph
-		strcpy(result, "");
-		return;
-	}
-
-	// iterate over glyphs and copy source into result string
-	// one glyph at a time as long as we have room for the "…" yet
-	char* dest = result;
-	const char* source = string;
-	bool truncated = true;
+	// add a tiny amount to the width to make floating point inaccuracy
+	// not drop chars that would actually fit exactly
+	width += 0.00001;
 
 	switch (mode) {
-		case B_TRUNCATE_BEGINNING: {
-			dest = copy_from_end(source, dest, numChars, length,
-				escapementArray, width, ellipsisWidth, fontSize);
-			// "dst" points to the position behind the last glyph that
-			// was copied.
-			int32 dist = dest - result;
-			// we didn't terminate yet
-			*dest = 0;
-			if (dist < length) {
-				// TODO: Is there a smarter way?
-				char* temp = new char[dist + 4];
-				char* t = temp;
-				// append "…"
-				t = write_ellipsis(t);
-				// shuffle arround strings so that "…" is prepended
-				strcpy(t, result);
-				strcpy(result, temp);
-				delete[] temp;
-/*						char t = result[3];
-				memmove(&result[3], result, dist + 1);
-				write_ellipsis(result);
-				result[3] = t;*/
+		case B_TRUNCATE_BEGINNING:
+		{
+			float totalWidth = 0;
+			for (int32 i = charCount - 1; i >= 0; i--) {
+				float charWidth = escapementArray[i] * fontSize;
+				if (totalWidth + charWidth > width) {
+					// we need to truncate
+					while (totalWidth + ellipsisWidth > width) {
+						// remove chars until there's enough space for the
+						// ellipsis
+						if (++i == charCount) {
+							// we've reached the end of the string and still
+							// no space, so return an empty string
+							string.Truncate(0);
+							return;
+						}
+
+						totalWidth -= escapementArray[i] * fontSize;
+					}
+
+					string.RemoveChars(0, i + 1);
+					string.PrependChars(B_UTF8_ELLIPSIS, 1);
+					return;
+				}
+
+				totalWidth += charWidth;
 			}
+
 			break;
 		}
 
 		case B_TRUNCATE_END:
-			truncated = truncate_end(source, dest, numChars, escapementArray,
-				width, ellipsisWidth, fontSize);
-			break;
+		{
+			float totalWidth = 0;
+			for (int32 i = 0; i < charCount; i++) {
+				float charWidth = escapementArray[i] * fontSize;
+				if (totalWidth + charWidth > width) {
+					// we need to truncate
+					while (totalWidth + ellipsisWidth > width) {
+						// remove chars until there's enough space for the
+						// ellipsis
+						if (i-- == 0) {
+							// we've reached the start of the string and still
+							// no space, so return an empty string
+							string.Truncate(0);
+							return;
+						}
 
-		case B_TRUNCATE_SMART:
-			// TODO: implement, though it was never implemented on R5
-			// FALL THROUGH (at least do something)
+						totalWidth -= escapementArray[i] * fontSize;
+					}
+
+					string.RemoveChars(i, charCount - i);
+					string.AppendChars(B_UTF8_ELLIPSIS, 1);
+					return;
+				}
+
+				totalWidth += charWidth;
+			}
+
+			break;
+		}
+
 		case B_TRUNCATE_MIDDLE:
-		default:
-			truncated = truncate_middle(source, dest, numChars,
-				escapementArray, width, ellipsisWidth, fontSize);
+		case B_TRUNCATE_SMART:
+		{
+			float leftWidth = 0;
+			float rightWidth = 0;
+			int32 leftIndex = 0;
+			int32 rightIndex = charCount - 1;
+			bool left = true;
+
+			for (int32 i = 0; i < charCount; i++) {
+				float charWidth
+					= escapementArray[left ? leftIndex : rightIndex] * fontSize;
+
+				if (leftWidth + rightWidth + charWidth > width) {
+					// we need to truncate
+					while (leftWidth + rightWidth + ellipsisWidth > width) {
+						// remove chars until there's enough space for the
+						// ellipsis
+						if (leftIndex == 0 && rightIndex == charCount - 1) {
+							// we've reached both ends of the string and still
+							// no space, so return an empty string
+							string.Truncate(0);
+							return;
+						}
+
+						if (leftIndex > 0 && (rightIndex == charCount - 1
+								|| leftWidth > rightWidth)) {
+							// remove char on the left
+							leftWidth -= escapementArray[--leftIndex]
+								* fontSize;
+						} else {
+							// remove char on the right
+							rightWidth -= escapementArray[++rightIndex]
+								* fontSize;
+						}
+					}
+
+					string.RemoveChars(leftIndex, rightIndex + 1 - leftIndex);
+					string.InsertChars(B_UTF8_ELLIPSIS, 1, leftIndex);
+					return;
+				}
+
+				if (left) {
+					leftIndex++;
+					leftWidth += charWidth;
+				} else {
+					rightIndex--;
+					rightWidth += charWidth;
+				}
+
+				left = rightWidth > leftWidth;
+			}
+
 			break;
+		}
 	}
 
-	if (!truncated) {
-		// copy string to destination verbatim
-		strlcpy(dest, source, length + 1);
-	}
+	// we've run through without the need to truncate, leave the string as it is
 }

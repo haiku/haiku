@@ -867,28 +867,20 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 
 	// the width of the "…" glyph
 	float ellipsisWidth = StringWidth(B_UTF8_ELLIPSIS, strlen(B_UTF8_ELLIPSIS));
-	const char* string = inOut->String();
-	int32 length = inOut->Length();
-
-	// temporary array to hold result
-	char* result = new char[length + 3];
 
 	// count the individual glyphs
-	int32 numChars = UTF8CountChars(string, -1);
+	int32 numChars = inOut->CountChars();
 
 	// get the escapement of each glyph in font units
 	float* escapementArray = new float[numChars];
 	static escapement_delta delta = (escapement_delta){ 0.0, 0.0 };
-	if (GetEscapements(string, length, numChars, delta, escapementArray)
-			== B_OK) {
-		truncate_string(string, mode, width, result, escapementArray, fSize,
-			ellipsisWidth, length, numChars);
-
-		inOut->SetTo(result);
+	if (GetEscapements(inOut->String(), inOut->Length(), numChars, delta,
+		escapementArray) == B_OK) {
+		truncate_string(*inOut, mode, width, escapementArray, fSize,
+			ellipsisWidth, numChars);
 	}
 
 	delete[] escapementArray;
-	delete[] result;
 }
 
 
