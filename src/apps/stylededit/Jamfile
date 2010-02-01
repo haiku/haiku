@@ -1,13 +1,6 @@
 SubDir HAIKU_TOP src apps stylededit ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders textencoding ;
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers os support ] : true ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-}
-
 
 local styled_edit_rsrc =
 	[ FGristFiles StyledEdit.rsrc ]
@@ -16,26 +9,13 @@ ResComp $(styled_edit_rsrc) :
 	[ FGristFiles StyledEdit.rdef ]
 	;
 
-local styled_edit_files = 
+Application StyledEdit :
 	ColorMenuItem.cpp
 	FindWindow.cpp
 	ReplaceWindow.cpp
 	StyledEditApp.cpp
 	StyledEditView.cpp
 	StyledEditWindow.cpp
-	;
-
-Objects $(styled_edit_files) ;
-
-Application StyledEdit :
-	[ FGristFiles $(styled_edit_files:S=$(SUFOBJ)) ]
-	# Haiku String
-	String.cpp
-	strcasestr.c
-        : be translation tracker libtextencoding.so $(TARGET_LIBSUPC++)
+	: be translation tracker libtextencoding.so $(TARGET_LIBSUPC++)
 	: $(styled_edit_rsrc)
 	;
-
-SEARCH on <src!apps!stylededit>String.cpp += [ FDirName $(HAIKU_TOP) src kits support ] ;
-SEARCH on <src!apps!stylededit>strcasestr.c += [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
-
