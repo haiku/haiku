@@ -89,8 +89,14 @@ int16 read_eeprom(ice1712 *ice, uint8 eeprom[32]);
 //------------------------------------------------------
 
 void codec_write(ice1712 *ice, uint8 reg_addr, uint8 data);
-
 void spdif_write(ice1712 *ice, uint8 reg_addr, uint8 data);
+void codec_write_mult(ice1712 *ice, uint8 reg_addr, uint8 datas[], uint8 size);
+void spdif_write_mult(ice1712 *ice, uint8 reg_addr, uint8 datas[], uint8 size);
+
+uint8 codec_read(ice1712 *ice, uint8 reg_addr);
+uint8 spdif_read(ice1712 *ice, uint8 reg_addr);
+uint8 codec_read_mult(ice1712 *ice, uint8 reg_addr, uint8 datas[], uint8 size);
+uint8 spdif_read_mult(ice1712 *ice, uint8 reg_addr, uint8 datas[], uint8 size);
 
 //------------------------------------------------------
 

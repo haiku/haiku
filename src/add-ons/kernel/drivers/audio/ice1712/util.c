@@ -13,8 +13,6 @@
 #include <OS.h>
 #include <string.h>
 
-//#define DEBUG 2
-
 #include "debug.h"
 #include "util.h"
 
@@ -55,19 +53,19 @@ alloc_mem(void **phy, void **log, size_t size, const char *name)
 	area_id areaid;
 	status_t rv;
 
-	TRACE_ICE(("allocating %#08 bytes for %s\n",size,name));
+	TRACE("allocating %#08X bytes for %s\n", (int)size, name);
 
 	size = round_to_pagesize(size);
 	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS, size,
 		B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (areaid < B_OK) {
-		TRACE_ICE(("couldn't allocate area %s\n",name));
+		TRACE("couldn't allocate area %s\n",name);
 		return B_ERROR;
 	}
 	rv = get_memory_map(logadr,size,&pe,1);
 	if (rv < B_OK) {
 		delete_area(areaid);
-		TRACE_ICE(("couldn't map %s\n",name));
+		TRACE("couldn't map %s\n",name);
 		return B_ERROR;
 	}
 	memset(logadr,0,size);
@@ -75,7 +73,7 @@ alloc_mem(void **phy, void **log, size_t size, const char *name)
 		*log = logadr;
 	if (phy)
 		*phy = pe.address;
-	TRACE_ICE(("area = %d, size = %#08X, log = %#08X, phy = %#08X\n",areaid,size,logadr,pe.address));
+	TRACE("area = %d, size = %#08X, log = %#08X, phy = %#08X\n", (int)areaid, (int)size, (int)logadr, (int)pe.address);
 	return areaid;
 }
 

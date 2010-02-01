@@ -15,9 +15,10 @@
 
 #include "ice1712.h"
 #include "io.h"
-#include "debug.h"
 #include "midi_driver.h"
 #include "util.h"
+
+#include "debug.h"
 
 extern generic_mpu401_module * mpu401;
 
@@ -89,38 +90,35 @@ device_hooks midi_hooks = {
     NULL		/* writev */
 };
 
+
 static status_t midi_open(const char * name, uint32 flags, void ** cookie)
 {
 	int i, ix, used_midi = -1;
 	int ret;
 
-	TRACE_ICE(("midi_open()\n"));
+	TRACE("midi_open()\n");
 
 	*cookie = NULL;
-	for (ix = 0; ix < num_cards; ix++)
-	{
+	for (ix = 0; ix < num_cards; ix++) {
 		for (i = 0; i < cards[ix].nb_MPU401; i++)
-			if (!strcmp(name, cards[ix].midi_interf[i].name))
-			{
+			if (!strcmp(name, cards[ix].midi_interf[i].name)) {
 				used_midi = i;
 				break;
 			}
 	}
 	
-	if (ix >= num_cards)
-	{
-		TRACE_ICE(("bad device\n"));
+	if (ix >= num_cards) {
+		TRACE("bad device\n");
 		return ENODEV;
 	}
 
-	TRACE_ICE(("mpu401: %p  open(): %p  driver: %p\n", mpu401, mpu401->open_hook, cards[ix].midi_interf[used_midi].driver));
+	TRACE("mpu401: %p  open(): %p  driver: %p\n", mpu401, mpu401->open_hook, cards[ix].midi_interf[used_midi].driver);
 	ret = (*mpu401->open_hook)(cards[ix].midi_interf[used_midi].driver, flags, cookie);
-	if (ret >= B_OK)
-	{
+	if (ret >= B_OK) {
 		cards[ix].midi_interf[used_midi].cookie = *cookie;
 		atomic_add(&cards[ix].midi_interf[used_midi].count, 1);
 	}
-	TRACE_ICE(("mpu401: open returns %x / %p\n", ret, *cookie));
+	TRACE("mpu401: open returns %x / %p\n", ret, *cookie);
 	return ret;
 
 }
@@ -128,7 +126,7 @@ static status_t midi_open(const char * name, uint32 flags, void ** cookie)
 
 static status_t midi_close(void * cookie)
 {
-	TRACE_ICE(("midi_close()\n"));
+	TRACE("midi_close()\n");
 	return (*mpu401->close_hook)(cookie);
 }
 
@@ -137,22 +135,19 @@ static status_t midi_free(void * cookie)
 {
 	int i, ix;
 	status_t f;
-	TRACE_ICE(("midi_free()\n"));
+	TRACE("midi_free()\n");
 	f = (*mpu401->free_hook)(cookie);
-	for (ix = 0; ix < num_cards; ix++)
-	{
+	for (ix = 0; ix < num_cards; ix++) {
 		for (i = 0; i < cards[ix].nb_MPU401; i++)
-			if (cards[ix].midi_interf[i].cookie == cookie)
-			{
-				if (atomic_add(&cards[ix].midi_interf[i].count, -1) == 1)
-				{
+			if (cards[ix].midi_interf[i].cookie == cookie) {
+				if (atomic_add(&cards[ix].midi_interf[i].count, -1) == 1) {
 					cards[ix].midi_interf[i].cookie = NULL;
-					TRACE_ICE(("cleared %p card %d\n", cookie, ix));
+					TRACE("cleared %p card %d\n", cookie, ix);
 				}
 				break;
 			}
 	}
-	TRACE_ICE(("midi_free() done\n"));
+	TRACE("midi_free() done\n");
 	return f;
 }
 
@@ -177,9 +172,8 @@ static status_t midi_write(void * cookie, off_t pos, const void * ptr, size_t * 
 
 bool midi_interrupt(ice1712 *card)
 {
-	TRACE_ICE(("midi_interrupt\n"));
-	if (!card->midi_interf[0].driver)
-	{
+	TRACE("midi_interrupt\n");
+	if (!card->midi_interf[0].driver) {
 //		kprintf("aiigh\n");
 		return false;
 	}

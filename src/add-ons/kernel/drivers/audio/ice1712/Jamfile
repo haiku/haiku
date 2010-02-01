@@ -5,7 +5,6 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders media ;
 
 KernelAddon ice1712 :
-	debug.c
 	ice1712.c
 	io.c
 	midi.c

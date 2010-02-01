@@ -13,14 +13,12 @@
 #define _ICE1712_H_
 
 #include <PCI.h>
-#include "hmulti_audio.h"
 
 #define DRIVER_NAME "ice1712"
-#define VERSION "0.3"
+#define VERSION "0.4"
 
 #define ICE1712_VENDOR_ID			0x1412
 #define ICE1712_DEVICE_ID			0x1712
-
 
 typedef enum product_t {
 	ICE1712_SUBDEVICE_DELTA1010			= 0x121430d6,
@@ -38,7 +36,7 @@ typedef enum product_t {
 #define MAX_DAC						10
 #define SWAPPING_BUFFERS			2
 #define SAMPLE_SIZE					4
-#define MIN_BUFFER_FRAMES			64
+#define MIN_BUFFER_FRAMES			256
 #define MAX_BUFFER_FRAMES			2048
 
 #define PLAYBACK_BUFFER_SIZE		(MAX_BUFFER_FRAMES * MAX_DAC * SAMPLE_SIZE)
@@ -52,12 +50,14 @@ typedef enum product_t {
 #define MIXER_OUT_LEFT				10
 #define MIXER_OUT_RIGHT				11
 
+
 typedef enum {
 	NO_IN_NO_OUT = 0,
 	NO_IN_YES_OUT = 1,
 	YES_IN_NO_OUT = 2,
 	YES_IN_YES_OUT = 3,
 } _spdif_config_ ;
+
 
 typedef struct _midi_dev {
 	struct _ice1712_	*card;
@@ -67,15 +67,45 @@ typedef struct _midi_dev {
 	char				name[64];
 } midi_dev;
 
-typedef struct codec_info
+
+typedef struct _codec_commlines
 {
 	uint8	clock;
 	uint8	data_in;
 	uint8	data_out;
-	uint8	reserved[5];
-} codec_info;
+	uint8	cs_mask; //a Mask for removing all Chip select
+	uint8	reserved[4];
+} codec_comm_lines;
 
-typedef struct _ice1712_
+
+typedef struct channel_volume
+{
+	float volume;
+	bool mute;
+} channel_volume;
+
+
+typedef struct ice1712_settings
+{
+	channel_volume playback[10]; //Can't change the volume of the digital mixer
+	channel_volume record[10];
+
+	//General Settings
+	uint8 clock; //an index
+	uint8 sample_rate; //an index
+	uint8 buffer_size; //an index
+	uint8 debug_mode; //an index for debugging
+	
+	//S/PDif Settings
+	uint8 out_format; //an index
+	uint8 emphasis; //an index
+	uint8 copy_mode; //an index
+	
+	uint8 reserved[32];
+} ice1712_settings;
+
+
+typedef struct ice1712
 {
 	uint32 irq;
 	pci_info info;
@@ -96,34 +126,38 @@ typedef struct _ice1712_
 	int8 nb_MPU401;
 
 	product_t product;
-	uint8 gpio_cs_mask; //a Mask for removing all Chip select
 
-	//We hope all manufacturer will not use different codec on the same card
-	codec_info analog_codec;
-	codec_info digital_codec;
+	//We hope all manufacturers will use same communication lines for speaking with codec
+	codec_comm_lines commlines;
 
 	uint32 buffer;
 	bigtime_t played_time;
+	uint32 buffer_size; //in frames
+	uint32 frames_count;
 
 	//Output
 	area_id mem_id_pb;
 	void *phys_addr_pb, *log_addr_pb;
-	uint32 output_buffer_size; //in frames
 	uint8 total_output_channels;
 
 	//Input
 	area_id mem_id_rec;
 	void *phys_addr_rec, *log_addr_rec;
-	uint32 input_buffer_size; //in frames
 	uint8 total_input_channels;
 	
 	sem_id buffer_ready_sem;
 	
 	uint8 sampling_rate; //in the format of the register
 	uint32 lock_source;
-
+	
+	ice1712_settings settings;
 } ice1712;
 
+
+status_t apply_settings(ice1712 *card);
+
+
+//For midi.c
 extern int32 num_cards;
 extern ice1712 cards[NUM_CARDS];
 
@@ -164,27 +198,15 @@ extern ice1712 cards[NUM_CARDS];
 #define VX442_CODEC_CS_0				0x20	// ?? #0
 #define VX442_CODEC_CS_1				0x40	// ?? #1
 
-#define AK45xx_BITS_TO_WRITE			16
-//2 - Chip Address (10b)
-//1 - R/W (Always 1 for Writing)
-//5 - Register Address
-//8 - Data
+#define GPIO_I2C_DELAY					5		//Clock Delay for writing I2C data throw GPIO
 
 //Register definition for the AK45xx codec (xx = 24 or 28)
-#define AK45xx_DELAY					100		//Clock Delay
 #define AK45xx_CHIP_ADDRESS				0x02	//Chip address of the codec
 #define AK45xx_RESET_REGISTER			0x01
 #define AK45xx_CLOCK_FORMAT_REGISTER	0x02
 //Other register are not defined cause they are not used, I'm very lazy...
 
-#define CS84xx_BITS_TO_WRITE			24
-//7 - Chip Address (0010000b)
-//1 - R/W (1 for Reading)
-//8 - Register MAP
-//8 - Data
-
 //Register definition for the CS84xx codec (xx = 27)
-#define CS84xx_DELAY					100		//Clock Delay
 #define CS84xx_CHIP_ADDRESS				0x10	//Chip address of the codec
 #define CS84xx_CONTROL_1_PORT_REG		0x01
 #define CS84xx_CONTROL_2_PORT_REG		0x02
@@ -192,6 +214,8 @@ extern ice1712 cards[NUM_CARDS];
 #define CS84xx_CLOCK_SOURCE_REG			0x04
 #define CS84xx_SERIAL_INPUT_FORMAT_REG	0x05
 #define CS84xx_SERIAL_OUTPUT_FORMAT_REG	0x06
+
+#define CS84xx_VERSION_AND_CHIP_ID		0x7F
 //Other register are not defined cause they are not used, I'm very lazy...
 
 
@@ -217,7 +241,7 @@ extern ice1712 cards[NUM_CARDS];
 	}
 */
 
-//This map come from ALSA sound drivers
+//This map comes from ALSA sound drivers
 #define E2PROM_MAP_SUBVENDOR_LOW	0x00
 #define E2PROM_MAP_SUBVENDOR_HIGH	0x01
 #define E2PROM_MAP_SUBDEVICE_LOW	0x02
