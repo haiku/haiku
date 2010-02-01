@@ -176,17 +176,28 @@ LanguageListView::MoveItems(BList& items, int32 index)
 
 
 void
-LanguageListView::MoveItemFrom(BOutlineListView* origin, int32 index, int32 dropSpot)
+LanguageListView::MoveItemFrom(BOutlineListView* origin, int32 index,
+	int32 dropSpot)
 {
-	int itemCount = origin->CountItemsUnder(origin->FullListItemAt(index), true);
-	LanguageListItem* newItem = new LanguageListItem(*static_cast<LanguageListItem*>
-		(origin->FullListItemAt(index)));
+	// Check that the node we are going to move is a top-level one.
+	// If not, we want his parent instead
+	
+	LanguageListItem* itemToMove = static_cast<LanguageListItem*>(origin->Superitem(
+		origin->FullListItemAt(index)));
+	if (itemToMove == NULL) {
+		itemToMove = static_cast<LanguageListItem*>(
+			origin->FullListItemAt(index));
+	} else
+		index = origin->FullListIndexOf(itemToMove);
+
+	int itemCount = origin->CountItemsUnder(itemToMove, true);
+	LanguageListItem* newItem = new LanguageListItem(*itemToMove);
 	this->AddItem(newItem, dropSpot);
-	newItem->SetExpanded(origin->FullListItemAt(index)->IsExpanded());
+	newItem->SetExpanded(itemToMove->IsExpanded());
 
 	for (int i = 0; i < itemCount ; i++) {
 		LanguageListItem* subItem = static_cast<LanguageListItem*>(
-			origin->ItemUnderAt(origin->FullListItemAt(index), true, i));
+			origin->ItemUnderAt(itemToMove, true, i));
 		this->AddUnder(new LanguageListItem(*subItem),newItem);
 	}
 	origin->RemoveItem(index);
