@@ -100,8 +100,6 @@ class LanguageListView: public BOutlineListView
 				if (message->FindPointer("list", (void**)&list) == B_OK) {
 					// It comes from a list
 					if (list == this) {
-						// TODO : parent item should stay at top level and childs should not
-						// move under another parent.
 						// It comes from ourselves : move the item around in the list
 						int32 count = CountItems();
 						if (fDropIndex < 0 || fDropIndex > count)
@@ -115,7 +113,28 @@ class LanguageListView: public BOutlineListView
 								items.AddItem((void*)item);
 
 						if (items.CountItems() > 0) {
-							MoveItems(items, fDropIndex);
+							// There is something to move
+							LanguageListItem* parent =
+								static_cast<LanguageListItem*>(Superitem(
+									static_cast<LanguageListItem*>(
+										items.FirstItem())));
+							if (parent) {
+								// item has a parent - it should then stay
+								// below it
+								if (Superitem(FullListItemAt(fDropIndex - 1))
+										== parent || FullListItemAt(fDropIndex - 1) == parent)
+									MoveItems(items, fDropIndex);
+							} else {
+								// item is top level and should stay so.
+								if (Superitem(FullListItemAt(fDropIndex - 1)) == NULL)
+									MoveItems(items, fDropIndex);
+								else {
+									int itemCount = CountItemsUnder(
+										FullListItemAt(fDropIndex), true);
+									MoveItems(items, FullListIndexOf(
+										Superitem(FullListItemAt(fDropIndex - 1))+itemCount));
+								}
+							}
 						}
 						fDropIndex = -1;
 					} else {
@@ -132,7 +151,7 @@ class LanguageListView: public BOutlineListView
 						}
 						
 						// Item is now a top level one - we must insert just below its last child
-						fDropIndex += CountItemsUnder(FullListItemAt(fDropIndex),false);
+						fDropIndex += CountItemsUnder(FullListItemAt(fDropIndex),false)  + 1;
 
 						int32 index;
 						for (int32 i = 0; message->FindInt32("index", i, &index)
@@ -165,10 +184,13 @@ LanguageListView::MoveItems(BList& items, int32 index)
 	// spot after removal
 	BList removedItems;
 	int32 count = items.CountItems();
-	for (int32 i = 0; i < count; i++) {
+	// We loop in the reverse way so we can remove childs before their parents
+	for (int32 i = count - 1; i >= 0; i--) {
 		BListItem* item = (BListItem*)items.ItemAt(i);
 		int32 removeIndex = IndexOf(item);
-		if (RemoveItem(item) && removedItems.AddItem((void*)item)) {
+		// TODO : remove all childs before removing the item itself, or else
+		// they will be lost forever
+		if (RemoveItem(item) && removedItems.AddItem((void*)item, 0)) {
 			if (removeIndex < index)
 				index--;
 		}
@@ -193,7 +215,6 @@ LanguageListView::MoveItemFrom(BOutlineListView* origin, int32 index,
 {
 	// Check that the node we are going to move is a top-level one.
 	// If not, we want his parent instead
-	
 	LanguageListItem* itemToMove = static_cast<LanguageListItem*>(
 		origin->Superitem(origin->FullListItemAt(index)));
 	if (itemToMove == NULL) {
