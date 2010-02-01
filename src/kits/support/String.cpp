@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Oliver Tappe (openbeos@hirschkaefer.de)
  *		Axel Dörfler, axeld@pinc-software.de
  *		Julun <host.haiku@gmx.de>
+ *		Michael Lotz <mmlr@mlotz.ch>
  */
 
 
@@ -22,6 +23,8 @@
 #include <stdlib.h>
 
 #include <Debug.h>
+
+#include <utf8_functions.h>
 
 
 // define proper names for case-option of _DoReplace()
@@ -268,19 +271,15 @@ BString::~BString()
 int32
 BString::CountChars() const
 {
-	int32 count = 0;
+	return UTF8CountChars(fPrivateData, Length());
+}
 
-	const char* start = fPrivateData;
-	const char* end = fPrivateData + Length();
 
-	while (start++ != end) {
-		count++;
-
-		// Jump to next UTF8 character
-		for (; (*start & 0xc0) == 0x80; start++);
-	}
-
-	return count;
+int32
+BString::CountBytes(int32 fromCharOffset, int32 charCount) const
+{
+	return UTF8CountBytes(
+		fPrivateData + UTF8CountBytes(fPrivateData, fromCharOffset), charCount);
 }
 
 
@@ -404,6 +403,27 @@ BString::SetTo(char c, int32 count)
 }
 
 
+BString&
+BString::SetToChars(const char* string, int32 charCount)
+{
+	return SetTo(string, UTF8CountBytes(string, charCount));
+}
+
+
+BString&
+BString::SetToChars(const BString& string, int32 charCount)
+{
+	return SetTo(string, UTF8CountBytes(string.String(), charCount));
+}
+
+
+BString&
+BString::AdoptChars(BString& string, int32 charCount)
+{
+	return Adopt(string, UTF8CountBytes(string.String(), charCount));
+}
+
+
 //	#pragma mark - Substring copying
 
 
@@ -423,6 +443,38 @@ BString::CopyInto(char* into, int32 fromOffset, int32 length) const
 		length = min_clamp0(length, Length() - fromOffset);
 		memcpy(into, fPrivateData + fromOffset, length);
 	}
+}
+
+
+BString&
+BString::CopyCharsInto(BString& into, int32 fromCharOffset,
+	int32 charCount) const
+{
+	int32 fromOffset = UTF8CountBytes(fPrivateData, fromCharOffset);
+	int32 length = UTF8CountBytes(fPrivateData + fromOffset, charCount);
+	return CopyInto(into, fromOffset, length);
+}
+
+
+bool
+BString::CopyCharsInto(char* into, int32* intoLength, int32 fromCharOffset,
+	int32 charCount) const
+{
+	if (into == NULL)
+		return false;
+
+	int32 fromOffset = UTF8CountBytes(fPrivateData, fromCharOffset);
+	int32 length = UTF8CountBytes(fPrivateData + fromOffset, charCount);
+	length = min_clamp0(length, Length() - fromOffset);
+
+	if (intoLength != NULL) {
+		if (*intoLength < length)
+			return false;
+		*intoLength = length;
+	}
+
+	memcpy(into, fPrivateData + fromOffset, length);
+	return true;
 }
 
 
@@ -483,6 +535,20 @@ BString::Append(char c, int32 count)
 }
 
 
+BString&
+BString::AppendChars(const BString& string, int32 charCount)
+{
+	return Append(string, UTF8CountBytes(string.String(), charCount));
+}
+
+
+BString&
+BString::AppendChars(const char* string, int32 charCount)
+{
+	return Append(string, UTF8CountBytes(string, charCount));
+}
+
+
 //	#pragma mark - Prepending
 
 
@@ -528,6 +594,20 @@ BString::Prepend(char c, int32 count)
 	if (count > 0 && _DoPrepend("", count))
 		memset(fPrivateData, c, count);
 	return *this;
+}
+
+
+BString&
+BString::PrependChars(const char* string, int32 charCount)
+{
+	return Prepend(string, UTF8CountBytes(string, charCount));
+}
+
+
+BString&
+BString::PrependChars(const BString& string, int32 charCount)
+{
+	return Prepend(string, UTF8CountBytes(string.String(), charCount));
 }
 
 
@@ -626,6 +706,58 @@ BString::Insert(char c, int32 count, int32 position)
 }
 
 
+BString&
+BString::InsertChars(const char* string, int32 charPosition)
+{
+	return Insert(string, UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+BString&
+BString::InsertChars(const char* string, int32 charCount, int32 charPosition)
+{
+	return Insert(string, UTF8CountBytes(string, charCount),
+		UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+BString&
+BString::InsertChars(const char* string, int32 fromCharOffset,
+	int32 charCount, int32 charPosition)
+{
+	int32 fromOffset = UTF8CountBytes(string, fromCharOffset);
+	return Insert(string, fromOffset,
+		UTF8CountBytes(string + fromOffset, charCount),
+		UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+BString&
+BString::InsertChars(const BString& string, int32 charPosition)
+{
+	return Insert(string, UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+BString&
+BString::InsertChars(const BString& string, int32 charCount, int32 charPosition)
+{
+	return Insert(string, UTF8CountBytes(string.String(), charCount),
+		UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+BString&
+BString::InsertChars(const BString& string, int32 fromCharOffset,
+	int32 charCount, int32 charPosition)
+{
+	int32 fromOffset = UTF8CountBytes(string.String(), fromCharOffset);
+	return Insert(string, fromOffset,
+		UTF8CountBytes(string.String() + fromOffset, charCount),
+		UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
 //	#pragma mark - Removing
 
 
@@ -645,11 +777,27 @@ BString::Truncate(int32 newLength, bool lazy)
 
 
 BString&
+BString::TruncateChars(int32 newCharCount, bool lazy)
+{
+	return Truncate(UTF8CountBytes(fPrivateData, newCharCount));
+}
+
+
+BString&
 BString::Remove(int32 from, int32 length)
 {
 	if (length > 0 && from < Length())
 		_ShrinkAtBy(from, min_clamp0(length, (Length() - from)));
 	return *this;
+}
+
+
+BString&
+BString::RemoveChars(int32 fromCharOffset, int32 charCount)
+{
+	int32 fromOffset = UTF8CountBytes(fPrivateData, fromCharOffset);
+	return Remove(fromOffset,
+		UTF8CountBytes(fPrivateData + fromOffset, charCount));
 }
 
 
@@ -729,9 +877,16 @@ BString::RemoveAll(const char* string)
 
 
 BString&
-BString::RemoveSet(const char* setOfCharsToRemove)
+BString::RemoveSet(const char* setOfBytesToRemove)
 {
-	return ReplaceSet(setOfCharsToRemove, "");
+	return ReplaceSet(setOfBytesToRemove, "");
+}
+
+
+BString&
+BString::RemoveCharsSet(const char* setOfCharsToRemove)
+{
+	return ReplaceCharsSet(setOfCharsToRemove, "");
 }
 
 
@@ -753,6 +908,30 @@ BString::MoveInto(char* into, int32 from, int32 length)
 		CopyInto(into, from, length);
 		Remove(from, length);
 	}
+}
+
+
+BString&
+BString::MoveCharsInto(BString& into, int32 fromCharOffset, int32 charCount)
+{
+	if (charCount > 0) {
+		CopyCharsInto(into, fromCharOffset, charCount);
+		RemoveChars(fromCharOffset, charCount);
+	}
+
+	return into;
+}
+
+
+bool
+BString::MoveCharsInto(char* into, int32* intoLength, int32 fromCharOffset,
+	int32 charCount)
+{
+	if (!CopyCharsInto(into, intoLength, fromCharOffset, charCount))
+		return false;
+
+	RemoveChars(fromCharOffset, charCount);
+	return true;
 }
 
 
@@ -822,6 +1001,20 @@ int
 BString::Compare(const char* string, int32 length) const
 {
 	return strncmp(String(), safestr(string), length);
+}
+
+
+int
+BString::CompareChars(const BString& string, int32 charCount) const
+{
+	return Compare(string, UTF8CountBytes(fPrivateData, charCount));
+}
+
+
+int
+BString::CompareChars(const char* string, int32 charCount) const
+{
+	return Compare(string, UTF8CountBytes(fPrivateData, charCount));
 }
 
 
@@ -940,6 +1133,20 @@ BString::FindFirst(char c, int32 fromOffset) const
 
 
 int32
+BString::FindFirstChars(const BString& string, int32 fromCharOffset) const
+{
+	return FindFirst(string, UTF8CountBytes(fPrivateData, fromCharOffset));
+}
+
+
+int32
+BString::FindFirstChars(const char* string, int32 fromCharOffset) const
+{
+	return FindFirst(string, UTF8CountBytes(fPrivateData, fromCharOffset));
+}
+
+
+int32
 BString::FindLast(const BString& string) const
 {
 	return _FindBefore(string.String(), Length(), string.Length());
@@ -1019,6 +1226,20 @@ BString::FindLast(char c, int32 beforeOffset) const
 		return B_ERROR;
 
 	return end - String();
+}
+
+
+int32
+BString::FindLastChars(const BString& string, int32 beforeCharOffset) const
+{
+	return FindLast(string, UTF8CountBytes(fPrivateData, beforeCharOffset));
+}
+
+
+int32
+BString::FindLastChars(const char* string, int32 beforeCharOffset) const
+{
+	return FindLast(string, UTF8CountBytes(fPrivateData, beforeCharOffset));
 }
 
 
@@ -1245,6 +1466,24 @@ BString::Replace(const char* replaceThis, const char* withThis,
 
 
 BString&
+BString::ReplaceAllChars(const char* replaceThis, const char* withThis,
+	int32 fromCharOffset)
+{
+	return ReplaceAll(replaceThis, withThis,
+		UTF8CountBytes(fPrivateData, fromCharOffset));
+}
+
+
+BString&
+BString::ReplaceChars(const char* replaceThis, const char* withThis,
+	int32 maxReplaceCount, int32 fromCharOffset)
+{
+	return Replace(replaceThis, withThis, maxReplaceCount,
+		UTF8CountBytes(fPrivateData, fromCharOffset));
+}
+
+
+BString&
 BString::IReplaceFirst(char replaceThis, char withThis)
 {
 	char tmp[2] = { replaceThis, '\0' };
@@ -1385,9 +1624,9 @@ BString::IReplace(const char* replaceThis, const char* withThis,
 
 
 BString&
-BString::ReplaceSet(const char* setOfChars, char with)
+BString::ReplaceSet(const char* setOfBytes, char with)
 {
-	if (!setOfChars || strcspn(fPrivateData, setOfChars) >= uint32(Length()))
+	if (!setOfBytes || strcspn(fPrivateData, setOfBytes) >= uint32(Length()))
 		return *this;
 
 	if (_MakeWritable() != B_OK)
@@ -1396,7 +1635,7 @@ BString::ReplaceSet(const char* setOfChars, char with)
 	int32 offset = 0;
 	int32 length = Length();
 	for (int32 pos;;) {
-		pos = strcspn(fPrivateData + offset, setOfChars);
+		pos = strcspn(fPrivateData + offset, setOfBytes);
 
 		offset += pos;
 		if (offset >= length)
@@ -1411,16 +1650,16 @@ BString::ReplaceSet(const char* setOfChars, char with)
 
 
 BString&
-BString::ReplaceSet(const char* setOfChars, const char* with)
+BString::ReplaceSet(const char* setOfBytes, const char* with)
 {
-	if (!setOfChars || !with
-		|| strcspn(fPrivateData, setOfChars) >= uint32(Length()))
+	if (!setOfBytes || !with
+		|| strcspn(fPrivateData, setOfBytes) >= uint32(Length()))
 		return *this;
 
 	// delegate simple case
 	int32 withLen = strlen(with);
 	if (withLen == 1)
-		return ReplaceSet(setOfChars, *with);
+		return ReplaceSet(setOfBytes, *with);
 
 	if (_MakeWritable() != B_OK)
 		return *this;
@@ -1431,7 +1670,7 @@ BString::ReplaceSet(const char* setOfChars, const char* with)
 
 	PosVect positions;
 	for (int32 offset = 0; offset < len; offset += (pos + searchLen)) {
-		pos = strcspn(fPrivateData + offset, setOfChars);
+		pos = strcspn(fPrivateData + offset, setOfBytes);
 		if (pos + offset >= len)
 			break;
 		if (!positions.Add(offset + pos))
@@ -1439,6 +1678,49 @@ BString::ReplaceSet(const char* setOfChars, const char* with)
 	}
 
 	_ReplaceAtPositions(&positions, searchLen, with, withLen);
+	return *this;
+}
+
+
+BString&
+BString::ReplaceCharsSet(const char* setOfChars, const char* with)
+{
+	if (!setOfChars || !with)
+		return *this;
+
+	int32 setCharCount = UTF8CountChars(setOfChars, -1);
+	if ((uint32)setCharCount == strlen(setOfChars)) {
+		// no multi-byte chars at all
+		return ReplaceSet(setOfChars, with);
+	}
+
+	BString setString(setOfChars);
+	BString result;
+
+	int32 withLength = withLength;
+	int32 charCount = CountChars();
+	for (int32 i = 0; i < charCount; i++) {
+		int32 charLength;
+		const char* sourceChar = CharAt(i, &charLength);
+		bool match = false;
+
+		for (int32 j = 0; j < setCharCount; j++) {
+			int32 setCharLength;
+			const char* setChar = setString.CharAt(j, &setCharLength);
+			if (charLength == setCharLength
+				&& memcmp(sourceChar, setChar, charLength) == 0) {
+				match = true;
+				break;
+			}
+		}
+
+		if (match)
+			result.Append(with, withLength);
+		else
+			result.Append(sourceChar, charLength);
+	}
+
+	*this = result;
 	return *this;
 }
 
@@ -1467,6 +1749,32 @@ BString::operator[](int32 index)
 	return fPrivateData[index];
 }
 #endif
+
+
+const char*
+BString::CharAt(int32 charIndex, int32* bytes) const
+{
+	int32 offset = UTF8CountBytes(fPrivateData, charIndex);
+	if (bytes != NULL)
+		*bytes = UTF8NextCharLen(fPrivateData + offset);
+	return fPrivateData + offset;
+}
+
+
+bool
+BString::CharAt(int32 charIndex, char* buffer, int32* bytes) const
+{
+	int32 length;
+	const char* charAt = CharAt(charIndex, &length);
+	if (bytes != NULL) {
+		if (*bytes < length)
+			return false;
+		*bytes = length;
+	}
+
+	memcpy(buffer, charAt, length);
+	return true;
+}
 
 
 //	#pragma mark - Fast low-level manipulation
