@@ -216,14 +216,13 @@ BCountView::Draw(BRect updateRect)
 	else if (IsFiltering()) {
 		itemString << fLastCount << " " << Filter();
 	} else {
-		if (fLastCount == 0) 
+		if (fLastCount == 0)
 			itemString << "no items";
-		else if (fLastCount == 1) 
+		else if (fLastCount == 1)
 			itemString << "1 item";
-		else 
+		else
 			itemString << fLastCount << " items";
 	}
-		
 
 	BString string(itemString);
 	BRect textRect(TextInvalRect());
@@ -253,7 +252,7 @@ BCountView::Draw(BRect updateRect)
 		AddLine(bounds.LeftTop(), bounds.RightTop(), light);
 		AddLine(bounds.LeftTop(), bounds.LeftBottom(), light);
 		bounds.top--;
-	
+
 		AddLine(bounds.LeftTop(), bounds.RightTop(), shadow);
 		AddLine(BPoint(bounds.right, bounds.top + 2), bounds.RightBottom(), lightShadow);
 		AddLine(bounds.LeftBottom(), bounds.RightBottom(), lightShadow);
@@ -282,7 +281,7 @@ BCountView::Draw(BRect updateRect)
 
 	BRegion region;
 	region.Set(BarberPoleInnerRect());
-	ConstrainClippingRegion(&region);	
+	ConstrainClippingRegion(&region);
 
 	if (fBarberPoleMap)
 		DrawBitmap(fBarberPoleMap, destRect);
@@ -340,7 +339,7 @@ BCountView::SetTypeAhead(const char *string)
 }
 
 
-const char * 
+const char *
 BCountView::TypeAhead() const
 {
 	return fTypeAheadString.String();

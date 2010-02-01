@@ -58,7 +58,7 @@ public:
 	void CheckCount();
 	void StartBarberPole();
 	void EndBarberPole();
-	
+
 	void SetTypeAhead(const char *);
 	const char *TypeAhead() const;
 	bool IsTypingAhead() const;
