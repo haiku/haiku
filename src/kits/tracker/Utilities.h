@@ -759,7 +759,7 @@ inline uint64 SwapUInt64(uint64 value) { return B_SWAP_INT64(value); }
 
 extern const float kExactMatchScore;
 float ComputeTypeAheadScore(const char *text, const char *match,
-	size_t matchLength, bool wordMode = false);
+	bool wordMode = false);
 
 } // namespace BPrivate
 

@@ -63,8 +63,8 @@ public:
 	const char *TypeAhead() const;
 	bool IsTypingAhead() const;
 
-	void AddFilterString(const char *string);
-	void RemoveFilterString();
+	void AddFilterCharacter(const char *character);
+	void RemoveFilterCharacter();
 	void CancelFilter();
 	const char *Filter() const;
 	bool IsFiltering() const;

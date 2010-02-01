@@ -1585,8 +1585,7 @@ BootedInSafeMode()
 
 
 float
-ComputeTypeAheadScore(const char *text, const char *match, size_t matchLength,
-	bool wordMode)
+ComputeTypeAheadScore(const char *text, const char *match, bool wordMode)
 {
 	// highest score: exact match
 	const char* found = strcasestr(text, match);

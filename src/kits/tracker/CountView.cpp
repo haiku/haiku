@@ -355,17 +355,17 @@ BCountView::IsTypingAhead() const
 
 
 void
-BCountView::AddFilterString(const char *string)
+BCountView::AddFilterCharacter(const char *character)
 {
-	fFilterString += string;
+	fFilterString.AppendChars(character, 1);
 	Invalidate();
 }
 
 
 void
-BCountView::RemoveFilterString()
+BCountView::RemoveFilterCharacter()
 {
-	fFilterString.Truncate(fFilterString.Length() - 1);
+	fFilterString.TruncateChars(fFilterString.CountChars() - 1);
 	Invalidate();
 }
 

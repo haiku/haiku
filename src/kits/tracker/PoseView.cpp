@@ -6162,9 +6162,9 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 					else
 						break;
 				} else
-					lastString->Truncate(lastString->Length() - 1);
+					lastString->TruncateChars(lastString->CountChars() - 1);
 
-				fCountView->RemoveFilterString();
+				fCountView->RemoveFilterCharacter();
 				FilterChanged();
 				break;
 			}
@@ -6173,7 +6173,7 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 				break;
 
 			// remove last char from the typeahead buffer
-			sMatchString.Truncate(sMatchString.Length() - 1);
+			sMatchString.TruncateChars(sMatchString.CountChars() - 1);
 
 			fLastKeyTime = system_time();
 
@@ -6191,10 +6191,7 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 
 		default:
 		{
-			// handle typeahead selection
-
-			// create a null-terminated version of typed char
-			char searchChar[4] = { key, 0 };
+			// handle typeahead selection / filtering
 
 			if (TrackerSettings().TypeAheadFiltering()) {
 				if (key == ' ' && modifiers() & B_SHIFT_KEY) {
@@ -6202,12 +6199,12 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 						break;
 
 					fFilterStrings.AddItem(new BString());
-					fCountView->AddFilterString("|");
+					fCountView->AddFilterCharacter("|");
 					break;
 				}
 
-				fFilterStrings.LastItem()->Append(searchChar);
-				fCountView->AddFilterString(searchChar);
+				fFilterStrings.LastItem()->AppendChars(bytes, 1);
+				fCountView->AddFilterCharacter(bytes);
 				FilterChanged();
 				break;
 			}
@@ -6231,9 +6228,9 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 
 			// add char to existing matchString or start new match string
 			if (eventTime - fLastKeyTime < (doubleClickSpeed * 2))
-				sMatchString.Append(searchChar);
+				sMatchString.AppendChars(bytes, 1);
 			else
-				sMatchString.SetTo(searchChar);
+				sMatchString.SetToChars(bytes, 1);
 
 			fLastKeyTime = eventTime;
 
@@ -6290,7 +6287,6 @@ BPoseView::FindBestMatch(int32 *index)
 	BPose *poseToSelect = NULL;
 	float bestScore = -1;
 	int32 count = fPoseList->CountItems();
-	size_t matchLength = sMatchString.Length();
 
 	// loop through all poses to find match
 	for (int32 j = 0; j < CountColumns(); j++) {
@@ -6308,12 +6304,11 @@ BPoseView::FindBestMatch(int32 *index)
 					text = widget->Text(this);
 
 				if (text != NULL) {
-					score = ComputeTypeAheadScore(text, sMatchString.String(),
-						matchLength);
+					score = ComputeTypeAheadScore(text, sMatchString.String());
 				}
 			} else {
 				score = ComputeTypeAheadScore(pose->TargetModel()->Name(),
-					sMatchString.String(), matchLength);
+					sMatchString.String());
 			}
 
 			if (score > bestScore) {
@@ -9668,7 +9663,7 @@ BPoseView::FilterChanged()
 		return;
 
 	int32 stringCount = fFilterStrings.CountItems();
-	int32 length = fFilterStrings.LastItem()->Length();
+	int32 length = fFilterStrings.LastItem()->CountChars();
 
 	if (!fFiltering && length > 0)
 		StartFiltering();
