@@ -73,7 +73,7 @@ template<>
 struct std::hash<node_ref>
 #endif
 {
-	size_t operator()(node_ref ref) const { 
+	size_t operator()(node_ref ref) const {
 		return ref.node;
 	}
 };
@@ -327,7 +327,7 @@ class BPoseView : public BView {
 		bool FrameForPose(BPose *targetpose, bool convert, BRect *poseRect);
 		bool CreateSymlinkPoseTarget(Model *symlink);
 			// used to complete a symlink pose; returns true if
-			// target symlink should not be shown	
+			// target symlink should not be shown
 		void ResetPosePlacementHint();
 		void PlaceFolder(const entry_ref *, const BMessage *);
 
@@ -423,7 +423,7 @@ class BPoseView : public BView {
 
 		// scripting handlers
 		virtual bool HandleScriptingMessage(BMessage *message);
-		bool SetProperty(BMessage *message, BMessage *specifier, int32 form, 
+		bool SetProperty(BMessage *message, BMessage *specifier, int32 form,
 			const char *property, BMessage *reply);
 		bool GetProperty(BMessage *, int32, const char *, BMessage *);
 		bool CreateProperty(BMessage *message, BMessage *specifier, int32,
@@ -468,7 +468,7 @@ class BPoseView : public BView {
 		virtual void AddPoses(Model *model = NULL);
 			// if <model> is zero, PoseView has other means of iterating through all
 			// the entries thaat it adds
-		
+
 		virtual void AddRootPoses(bool watchIndividually, bool mountShared);
 			// watchIndividually is used when placing a volume pose onto the Desktop
 			// where unlike in the Root window it will not be watched by the folder
@@ -588,7 +588,7 @@ class BPoseView : public BView {
 		void HandleAutoScroll();
 		bool CheckAutoScroll(BPoint mouseLoc, bool shouldScroll, bool selectionScrolling = false);
 
-		// view extent handling	
+		// view extent handling
 		void RecalcExtent();
 		void AddToExtent(const BRect &);
 		void ClearExtent();
@@ -615,7 +615,7 @@ class BPoseView : public BView {
 		virtual void AddPosesCompleted();
 		bool IsValidAddPosesThread(thread_id) const;
 
-		// filtering
+		// typeahead filtering
 		void EnsurePoseUnselected(BPose *pose);
 		void RemoveFilteredPose(BPose *pose, int32 index);
 		void FilterChanged();
@@ -624,6 +624,7 @@ class BPoseView : public BView {
 		void StartFiltering();
 		void StopFiltering();
 		void ClearFilter();
+		PoseList *CurrentPoseList() const;
 
 		// misc
 		BList *GetDropPointList(BPoint dropPoint, BPoint startPoint, const PoseList *,
@@ -829,7 +830,7 @@ BPoseView::CountView() const
 inline bool
 BPoseView::StateNeedsSaving()
 {
-	return fStateNeedsSaving || fViewState->StateNeedsSaving();	
+	return fStateNeedsSaving || fViewState->StateNeedsSaving();
 }
 
 inline uint32
@@ -881,25 +882,25 @@ BPoseView::IsDesktopView() const
 }
 
 inline uint32
-BPoseView::PrimarySort() const 
+BPoseView::PrimarySort() const
 {
 	return fViewState->PrimarySort();
 }
 
 inline uint32
-BPoseView::PrimarySortType() const 
+BPoseView::PrimarySortType() const
 {
 	return fViewState->PrimarySortType();
 }
 
 inline uint32
-BPoseView::SecondarySort() const 
+BPoseView::SecondarySort() const
 {
 	return fViewState->SecondarySort();
 }
 
 inline uint32
-BPoseView::SecondarySortType() const 
+BPoseView::SecondarySortType() const
 {
 	return fViewState->SecondarySortType();
 }
@@ -949,13 +950,13 @@ BPoseView::IndexOfColumn(const BColumn* column) const
 inline int32
 BPoseView::IndexOfPose(const BPose *pose) const
 {
-	return (fFiltering ? fFilteredPoseList : fPoseList)->IndexOf(pose);
+	return CurrentPoseList()->IndexOf(pose);
 }
 
 inline BPose *
 BPoseView::PoseAtIndex(int32 index) const
 {
-	return (fFiltering ? fFilteredPoseList : fPoseList)->ItemAt(index);
+	return CurrentPoseList()->ItemAt(index);
 }
 
 inline BColumn *
@@ -979,7 +980,7 @@ BPoseView::LastColumn() const
 inline int32
 BPoseView::CountItems() const
 {
-	return (fFiltering ? fFilteredPoseList : fPoseList)->CountItems();
+	return CurrentPoseList()->CountItems();
 }
 
 
@@ -1050,7 +1051,7 @@ BPoseView::SetRefFilter(BRefFilter *filter)
 }
 
 inline BRefFilter *
-BPoseView::RefFilter() const	
+BPoseView::RefFilter() const
 {
 	return fRefFilter;
 }
@@ -1064,19 +1065,19 @@ BHScrollBar::SetTitleView(BView *view)
 inline BPose *
 BPoseView::FindPose(const Model *model, int32 *index) const
 {
-	return (fFiltering ? fFilteredPoseList : fPoseList)->FindPose(model, index);
+	return CurrentPoseList()->FindPose(model, index);
 }
 
 inline BPose *
 BPoseView::FindPose(const node_ref *node, int32 *index) const
 {
-	return (fFiltering ? fFilteredPoseList : fPoseList)->FindPose(node, index);
+	return CurrentPoseList()->FindPose(node, index);
 }
 
 inline BPose *
 BPoseView::FindPose(const entry_ref *entry, int32 *index) const
 {
-	return (fFiltering ? fFilteredPoseList : fPoseList)->FindPose(entry, index);
+	return CurrentPoseList()->FindPose(entry, index);
 }
 
 
@@ -1094,8 +1095,15 @@ BPoseView::SetHasPosesInClipboard(bool hasPoses)
 }
 
 
+inline PoseList *
+BPoseView::CurrentPoseList() const
+{
+	return fFiltering ? fFilteredPoseList : fPoseList;
+}
+
+
 template<class Param1>
-void 
+void
 EachTextWidget(BPose *pose, BPoseView *poseView,
 	void (*func)(BTextWidget *, BPose *, BPoseView *, BColumn *, Param1), Param1 p1)
 {
@@ -1112,7 +1120,7 @@ EachTextWidget(BPose *pose, BPoseView *poseView,
 
 
 template<class Param1, class Param2>
-void 
+void
 EachTextWidget(BPose *pose, BPoseView *poseView,
 	void (*func)(BTextWidget *, BPose *, BPoseView *, BColumn *,
 	Param1, Param2), Param1 p1, Param2 p2)
@@ -1130,7 +1138,7 @@ EachTextWidget(BPose *pose, BPoseView *poseView,
 
 
 template<class Result, class Param1, class Param2>
-Result 
+Result
 WhileEachTextWidget(BPose *pose, BPoseView *poseView,
 	Result (*func)(BTextWidget *, BPose *, BPoseView *, BColumn *,
 	Param1, Param2), Param1 p1, Param2 p2)
