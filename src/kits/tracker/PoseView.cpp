@@ -771,8 +771,8 @@ BPoseView::SavePoseLocations(BRect *frameIfDesktop)
 				if (FSGetDeskDir(&dir) == B_OK) {
 					const char *poseInfoAttr = isTrash ? kAttrTrashPoseInfo
 						: kAttrDisksPoseInfo;
-					const char *poseInfoAttrForeign = isTrash 
-						? kAttrTrashPoseInfoForeign 
+					const char *poseInfoAttrForeign = isTrash
+						? kAttrTrashPoseInfoForeign
 						: kAttrDisksPoseInfoForeign;
 						if (dir.WriteAttr(poseInfoAttr, B_RAW_TYPE, 0,
 						&poseInfo, sizeof(poseInfo)) == sizeof(poseInfo))
@@ -1600,7 +1600,7 @@ BPoseView::CreateTrashPose()
 		BDirectory trash;
 		BEntry entry;
 		node_ref ref;
-		if (FSGetTrashDir(&trash, volume.Device()) == B_OK 
+		if (FSGetTrashDir(&trash, volume.Device()) == B_OK
 			&& trash.GetEntry(&entry) == B_OK && entry.GetNodeRef(&ref) == B_OK) {
 			WatchNewNode(&ref);
 			Model *model = new Model(&entry);
@@ -1878,7 +1878,7 @@ BPoseView::ShouldShowPose(const Model *model, const PoseInfo *poseInfo)
 {
 	if (!PoseVisible(model, poseInfo))
 		return false;
-		
+
 	// check filter before adding item
 	if (!fRefFilter)
 		return true;
@@ -2713,7 +2713,7 @@ BPoseView::ReadPoseInfo(Model *model, PoseInfo *poseInfo)
 	BModelOpener opener(model);
 	if (!model->Node())
 		return;
-	
+
 	ReadAttrResult result = kReadAttrFailed;
 	BEntry entry;
 	model->GetEntry(&entry);
@@ -2724,9 +2724,9 @@ BPoseView::ReadPoseInfo(Model *model, PoseInfo *poseInfo)
 	if (model->IsRoot() || isTrash) {
 		BDirectory dir;
 		if (FSGetDeskDir(&dir) == B_OK) {
-			const char *poseInfoAttr = isTrash ? kAttrTrashPoseInfo 
+			const char *poseInfoAttr = isTrash ? kAttrTrashPoseInfo
 				: kAttrDisksPoseInfo;
-			const char *poseInfoAttrForeign = isTrash ? kAttrTrashPoseInfoForeign 
+			const char *poseInfoAttrForeign = isTrash ? kAttrTrashPoseInfoForeign
 				: kAttrDisksPoseInfoForeign;
 			result = ReadAttr(&dir, poseInfoAttr, poseInfoAttrForeign,
 				B_RAW_TYPE, 0, poseInfo, sizeof(*poseInfo), &PoseInfo::EndianSwap);
@@ -6107,8 +6107,10 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 			if (IsFilePanel())
 				_inherited::KeyDown(bytes, count);
 			else {
-				if (TrackerSettings().TypeAheadFiltering())
+				if (ViewMode() == kListMode
+					&& TrackerSettings().TypeAheadFiltering()) {
 					break;
+				}
 
 				if (fSelectionList->IsEmpty())
 					sMatchString.Truncate(0);
@@ -6153,7 +6155,7 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 
 		case B_BACKSPACE:
 		{
-			if (TrackerSettings().TypeAheadFiltering()) {
+			if (fFiltering) {
 				BString *lastString = fFilterStrings.LastItem();
 				if (lastString->Length() == 0) {
 					int32 stringCount = fFilterStrings.CountItems();
@@ -6193,7 +6195,8 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 		{
 			// handle typeahead selection / filtering
 
-			if (TrackerSettings().TypeAheadFiltering()) {
+			if (ViewMode() == kListMode
+				&& TrackerSettings().TypeAheadFiltering()) {
 				if (key == ' ' && modifiers() & B_SHIFT_KEY) {
 					if (fFilterStrings.LastItem()->Length() == 0)
 						break;
