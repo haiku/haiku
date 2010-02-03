@@ -180,7 +180,6 @@ standard_gcc_settings()
 					$headers/$d"
 			done
 
-
 			# when not building the crosscompiler, to use cpp headers from
 			# tree first, but fallback to local C++ system headers (like <new>)
 			# if [ "$buildCrossTools" = "" ]; then
@@ -190,17 +189,15 @@ standard_gcc_settings()
 			if [ $HAIKU_STATIC_LIBSTDCXX = libstdc++.a ]; then
 				HAIKU_STATIC_LIBSTDCXX=
 			fi
-			# we build libstdc++.so ourselves, so we can leave it as is
-			# if [ $HAIKU_SHARED_LIBSTDCXX = libstdc++.so ]; then
-			#	HAIKU_SHARED_LIBSTDCXX=
-			# fi
+			if [ $HAIKU_SHARED_LIBSTDCXX = libstdc++.so ]; then
+				HAIKU_SHARED_LIBSTDCXX=
+			fi
 			if [ $HAIKU_STATIC_LIBSUPCXX = libsupc++.a ]; then
 				HAIKU_STATIC_LIBSUPCXX=
 			fi
-			# we build libsupc++.so ourselves, so we can leave it as is
-			# if [ $HAIKU_SHARED_LIBSUPCXX = libsupc++.so ]; then
-			# 	HAIKU_SHARED_LIBSUPCXX=
-			# fi
+			if [ $HAIKU_SHARED_LIBSUPCXX = libsupc++.so ]; then
+				HAIKU_SHARED_LIBSUPCXX=
+			fi
 		;;
 		2.9*)
 			# check for correct (most up-to-date) legacy compiler and complain
