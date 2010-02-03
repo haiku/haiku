@@ -2183,6 +2183,8 @@ full_scan_inactive_pages(page_stats& pageStats, int32 despairLevel)
 		queue.Remove(&marker);
 	}
 
+	queueLocker.Unlock();
+
 	time = system_time() - time;
 	TRACE_DAEMON("  -> inactive scan (%7lld us): scanned: %7lu, "
 		"moved: %lu -> cached, %lu -> modified, %lu -> active\n", time,
