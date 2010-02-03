@@ -402,23 +402,33 @@ HAIKU_PRIVATE_KERNEL_HEADERS =
 # Add some grist to the libgcc objects
 HAIKU_GCC_LIBGCC_OBJECTS = $(HAIKU_GCC_LIBGCC_OBJECTS:G=libgcc) ;
 
-# the C++ library
+# the C++ standard library
+HAIKU_BUILD_SHARED_LIBSTDC++ = ;
 if $(HAIKU_SHARED_LIBSTDC++) {
 	HAIKU_LIBSTDC++ = $(HAIKU_SHARED_LIBSTDC++) ;
-} else if $(HAIKU_STATIC_LIBSTDC++) {
-	HAIKU_LIBSTDC++ = $(HAIKU_STATIC_LIBSTDC++) ;
 } else {
-	HAIKU_LIBSTDC++ = libstdc++.r4.so ;
+	# no shared library available with the compiler -- build it
+	if $(HAIKU_GCC_VERSION[1]) = 2 {
+		HAIKU_LIBSTDC++ = libstdc++.r4.so ;
+	} else {
+		HAIKU_LIBSTDC++ = libstdc++.so ;
+	}
 	HAIKU_SHARED_LIBSTDC++ = $(HAIKU_LIBSTDC++) ;
+	HAIKU_BUILD_SHARED_LIBSTDC++ = 1 ;
 }
 
-# the C++ support library
+# the C++ support (runtime) library
+HAIKU_BUILD_SHARED_LIBSUPC++ = ;
 if $(HAIKU_SHARED_LIBSUPC++) {
 	HAIKU_LIBSUPC++ = $(HAIKU_SHARED_LIBSUPC++) ;
-} else if $(HAIKU_STATIC_LIBSUPC++) {
-	HAIKU_LIBSUPC++ = $(HAIKU_STATIC_LIBSUPC++) ;
 } else {
-	HAIKU_LIBSUPC++ = ;
+	# no shared library available with the compiler -- build it for gcc 4
+	if $(HAIKU_GCC_VERSION[1]) != 2 {
+		HAIKU_SHARED_LIBSUPC++ = libsupc++.so ;
+		HAIKU_BUILD_SHARED_LIBSUPC++ = 1 ;
+	}
+
+	HAIKU_LIBSUPC++ = $(HAIKU_SHARED_LIBSUPC++) ;
 }
 
 # network libraries
