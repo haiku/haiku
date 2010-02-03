@@ -85,6 +85,8 @@ public:
 	inline	void				ReleaseRefAndUnlock(
 									bool consumerLocked = false);
 
+	inline	VMCacheRef*			CacheRef() const	{ return fCacheRef; }
+
 			void				WaitForPageEvents(vm_page* page, uint32 events,
 									bool relock);
 			void				NotifyPageEvents(vm_page* page, uint32 events)
