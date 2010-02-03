@@ -709,6 +709,8 @@ X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 					(oldEntry & X86_PTE_ADDRESS_MASK) / B_PAGE_SIZE);
 				ASSERT(page != NULL);
 
+				DEBUG_PAGE_ACCESS_START(page);
+
 				// transfer the accessed/dirty flags to the page
 				if ((oldEntry & X86_PTE_ACCESSED) != 0)
 					page->accessed = true;
@@ -746,6 +748,8 @@ X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 							vm_page_set_state(page, PAGE_STATE_CACHED);
 					}
 				}
+
+				DEBUG_PAGE_ACCESS_END(page);
 			}
 		}
 
@@ -796,6 +800,8 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 
 		VMCache* cache = page->Cache();
 
+		DEBUG_PAGE_ACCESS_START(page);
+
 		if (page->wired_count == 0 && page->mappings.IsEmpty()) {
 			atomic_add(&gMappedPagesCount, -1);
 
@@ -808,6 +814,8 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 					vm_page_set_state(page, PAGE_STATE_CACHED);
 			}
 		}
+
+		DEBUG_PAGE_ACCESS_END(page);
 
 		if (unmapPages || cache != area->cache) {
 			addr_t address = area->Base()
