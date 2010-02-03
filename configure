@@ -284,8 +284,8 @@ HAIKU_ENABLE_MULTIUSER=0
 HAIKU_DISTRO_COMPATIBILITY=default
 TARGET_PLATFORM=haiku
 HAIKU_USE_GCC_PIPE=0
-HAIKU_USE_32BIT=0
-HAIKU_USE_XATTR=0
+HAIKU_HOST_USE_32BIT=0
+HAIKU_HOST_USE_XATTR=0
 HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR=
 HAIKU_ADD_ALTERNATIVE_GCC_LIBS=
 HOST_GCC_LD=`gcc -print-prog-name=ld`
@@ -394,8 +394,8 @@ while [ $# -gt 0 ] ; do
         -j*)				buildCrossToolsJobs="$1"; shift 1;;
 		--target=*)     TARGET_PLATFORM=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--use-gcc-pipe)	HAIKU_USE_GCC_PIPE=1; shift 1;;
-		--use-32bit)	HAIKU_USE_32BIT=1; shift 1;;
-		--use-xattr)	HAIKU_USE_XATTR=1; shift 1;;
+		--use-32bit)	HAIKU_HOST_USE_32BIT=1; shift 1;;
+		--use-xattr)	HAIKU_HOST_USE_XATTR=1; shift 1;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
 done
@@ -415,7 +415,7 @@ case "${platform}" in
 	Darwin)	HOST_PLATFORM=darwin ;;
 	FreeBSD)	HOST_PLATFORM=freebsd
 				SFDISK_BINARY=sfdisk-linux
-				if [ "$HAIKU_USE_32BIT" = 1 ] ; then
+				if [ "$HAIKU_HOST_USE_32BIT" = 1 ] ; then
 					echo Unsupported platform: FreeBSD ${platformMachine}
 					exit 1
 				fi	;;
@@ -517,8 +517,8 @@ HAIKU_INCLUDE_3RDPARTY				?= "${HAIKU_INCLUDE_3RDPARTY}" ;
 HAIKU_ENABLE_MULTIUSER				?= "${HAIKU_ENABLE_MULTIUSER}" ;
 HAIKU_DISTRO_COMPATIBILITY			?= "${HAIKU_DISTRO_COMPATIBILITY}" ;
 HAIKU_USE_GCC_PIPE					?= "${HAIKU_USE_GCC_PIPE}" ;
-HAIKU_HOST_USE_32BIT				?= "${HAIKU_USE_32BIT}" ;
-HAIKU_HOST_USE_XATTR				?= "${HAIKU_USE_XATTR}" ;
+HAIKU_HOST_USE_32BIT				?= "${HAIKU_HOST_USE_32BIT}" ;
+HAIKU_HOST_USE_XATTR				?= "${HAIKU_HOST_USE_XATTR}" ;
 HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR	?= ${HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR} ;
 HAIKU_ADD_ALTERNATIVE_GCC_LIBS		?= ${HAIKU_ADD_ALTERNATIVE_GCC_LIBS} ;
 
