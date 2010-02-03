@@ -1,9 +1,13 @@
-/* 
+/*
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 #ifndef KERNEL_ARCH_PPC_THREAD_TYPES_H
 #define KERNEL_ARCH_PPC_THREAD_TYPES_H
+
+
+#include <SupportDefs.h>
+
 
 #define	IFRAME_TRACE_DEPTH 4
 
