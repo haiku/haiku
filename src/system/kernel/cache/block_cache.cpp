@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -71,6 +71,8 @@ struct cached_block {
 	int32			accessed;
 	bool			busy : 1;
 	bool			is_writing : 1;
+		// Block has been checked out for writing without transactions, and
+		// cannot be written back if set
 	bool			is_dirty : 1;
 	bool			unused : 1;
 	bool			discard : 1;
@@ -1316,6 +1318,8 @@ put_cached_block(block_cache* cache, cached_block* block)
 	if (--block->ref_count == 0
 		&& block->transaction == NULL && block->previous_transaction == NULL) {
 		// This block is not used anymore, and not part of any transaction
+		block->is_writing = false;
+
 		if (block->discard) {
 			cache->RemoveBlock(block);
 		} else {
@@ -1483,6 +1487,8 @@ get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
 			mutex_lock(&cache->lock);
 			mark_block_unbusy(cache, block);
 		}
+
+		block->is_writing = true;
 
 		if (!block->is_dirty) {
 			cache->num_dirty_blocks++;
@@ -2915,7 +2921,7 @@ block_cache_sync(void* _cache)
 {
 	block_cache* cache = (block_cache*)_cache;
 
-	// we will sync all dirty blocks to disk that have a completed
+	// We will sync all dirty blocks to disk that have a completed
 	// transaction or no transaction only
 
 	MutexLocker locker(&cache->lock);
@@ -2925,7 +2931,8 @@ block_cache_sync(void* _cache)
 	cached_block* block;
 	while ((block = (cached_block*)hash_next(cache->hash, &iterator)) != NULL) {
 		if (block->previous_transaction != NULL
-			|| (block->transaction == NULL && block->is_dirty)) {
+			|| (block->transaction == NULL && block->is_dirty
+				&& !block->is_writing)) {
 			status_t status = write_cached_block(cache, block);
 			if (status != B_OK)
 				return status;
@@ -2947,7 +2954,7 @@ block_cache_sync_etc(void* _cache, off_t blockNumber, size_t numBlocks)
 {
 	block_cache* cache = (block_cache*)_cache;
 
-	// we will sync all dirty blocks to disk that have a completed
+	// We will sync all dirty blocks to disk that have a completed
 	// transaction or no transaction only
 
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
@@ -2965,7 +2972,8 @@ block_cache_sync_etc(void* _cache, off_t blockNumber, size_t numBlocks)
 			continue;
 
 		if (block->previous_transaction != NULL
-			|| (block->transaction == NULL && block->is_dirty)) {
+			|| (block->transaction == NULL && block->is_dirty
+				&& !block->is_writing)) {
 			status_t status = write_cached_block(cache, block);
 			if (status != B_OK)
 				return status;
