@@ -1990,92 +1990,6 @@ free_cached_pages(uint32 pagesToFree, bool dontWait)
 }
 
 
-// TODO: Not needed when we remove the mappings of pages in the active scan when
-// moved to the inactive queue.
-#if 0
-static void
-idle_scan_inactive_pages(page_stats& pageStats)
-{
-	VMPageQueue& queue = sInactivePageQueue;
-
-	// We want to scan the whole queue in roughly kIdleRunsForFullQueue runs.
-	uint32 maxToScan = queue.Count() / kIdleRunsForFullQueue + 1;
-
-	while (maxToScan > 0) {
-		maxToScan--;
-
-		// Get the next page. Note that we don't bother to lock here. We go with
-		// the assumption that on all architectures reading/writing pointers is
-		// atomic. Beyond that it doesn't really matter. We have to unlock the
-		// queue anyway to lock the page's cache, and we'll recheck afterwards.
-		vm_page* page = queue.Head();
-		if (page == NULL)
-			break;
-
-		// lock the page's cache
-		VMCache* cache = vm_cache_acquire_locked_page_cache(page, true);
-		if (cache == NULL)
-			continue;
-
-		if (page->state != PAGE_STATE_INACTIVE) {
-			// page is no longer in this queue
-			cache->ReleaseRefAndUnlock();
-			continue;
-		}
-
-		if (page->busy) {
-			// page is busy -- requeue at the end
-			vm_page_requeue(page, true);
-			cache->ReleaseRefAndUnlock();
-			continue;
-		}
-
-		DEBUG_PAGE_ACCESS_START(page);
-
-		// Get the accessed count, clear the accessed/modified flags.
-		int32 usageCount = vm_clear_page_mapping_accessed_flags(page);
-
-		// update usage count
-		if (usageCount > 0) {
-			usageCount += page->usage_count + kPageUsageAdvance;
-			if (usageCount > kPageUsageMax)
-				usageCount = kPageUsageMax;
-		} else {
-			usageCount += page->usage_count - (int32)kPageUsageDecline;
-			if (usageCount < 0)
-				usageCount = 0;
-		}
-
-		page->usage_count = usageCount;
-
-		// Move to fitting queue or requeue:
-		// * Active mapped pages go to the active queue.
-		// * Inactive mapped (i.e. wired) pages are requeued.
-		// * Inactive unmapped pages of a temporary cache are requeued. We don't
-		//   want to page out memory until really necessary.
-		// * The remaining pages are cachable. Thus, if unmodified they go to
-		//   the cached queue, otherwise to the modified queue.
-		bool isMapped = page->wired_count > 0 || !page->mappings.IsEmpty();
-		if (usageCount > 0) {
-			if (isMapped)
-				set_page_state(page, PAGE_STATE_ACTIVE);
-			else
-				vm_page_requeue(page, true);
-		} else if (isMapped || cache->temporary) {
-			vm_page_requeue(page, true);
-		} else if (page->modified) {
-			set_page_state(page, PAGE_STATE_MODIFIED);
-		} else
-			set_page_state(page, PAGE_STATE_CACHED);
-
-		DEBUG_PAGE_ACCESS_END(page);
-
-		cache->ReleaseRefAndUnlock();
-	}
-}
-#endif
-
-
 static void
 idle_scan_active_pages(page_stats& pageStats)
 {
@@ -2386,11 +2300,6 @@ page_daemon_idle_scan(page_stats& pageStats)
 			unreserve_pages(freed);
 		get_page_stats(pageStats);
 	}
-
-	// Walk the inactive list and transfer pages to the cached and modified and
-	// active queues.
-//	get_page_stats(pageStats);
-//	idle_scan_inactive_pages(pageStats);
 
 	// Walk the active list and move pages to the inactive queue.
 	get_page_stats(pageStats);
