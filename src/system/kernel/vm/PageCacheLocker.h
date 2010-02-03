@@ -13,18 +13,34 @@ struct vm_page;
 
 class PageCacheLocker {
 public:
-	PageCacheLocker(vm_page* page, bool dontWait = true);
-	~PageCacheLocker();
+	inline						PageCacheLocker(vm_page* page,
+									bool dontWait = true);
+	inline						~PageCacheLocker();
 
-	bool IsLocked() { return fPage != NULL; }
+			bool				IsLocked() { return fPage != NULL; }
 
-	bool Lock(vm_page* page, bool dontWait = true);
-	void Unlock();
+			bool				Lock(vm_page* page, bool dontWait = true);
+			void				Unlock();
 
 private:
-	bool _IgnorePage(vm_page* page);
+			bool				_IgnorePage(vm_page* page);
 
-	vm_page*	fPage;
+			vm_page*			fPage;
 };
+
+
+PageCacheLocker::PageCacheLocker(vm_page* page, bool dontWait)
+	:
+	fPage(NULL)
+{
+	Lock(page, dontWait);
+}
+
+
+PageCacheLocker::~PageCacheLocker()
+{
+	Unlock();
+}
+
 
 #endif	// PAGE_CACHE_LOCKER_H

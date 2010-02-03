@@ -109,9 +109,10 @@ status_t vm_create_vnode_cache(struct vnode *vnode, struct VMCache **_cache);
 status_t vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type);
 status_t vm_get_page_mapping(team_id team, addr_t vaddr, addr_t *paddr);
 bool vm_test_map_modification(struct vm_page *page);
-int32 vm_test_map_activation(struct vm_page *page, bool *_modified);
 void vm_clear_map_flags(struct vm_page *page, uint32 flags);
-void vm_remove_all_page_mappings(struct vm_page *page, uint32 *_flags);
+void vm_remove_all_page_mappings(struct vm_page *page);
+int32 vm_clear_page_mapping_accessed_flags(struct vm_page *page);
+int32 vm_remove_all_page_mappings_if_unaccessed(struct vm_page *page);
 
 status_t vm_get_physical_page(addr_t paddr, addr_t* vaddr, void** _handle);
 status_t vm_put_physical_page(addr_t vaddr, void* handle);

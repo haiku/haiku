@@ -32,7 +32,8 @@ VMTranslationMap::~VMTranslationMap()
 	range and calls UnmapPage(). This is obviously not particularly efficient.
 */
 void
-VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size)
+VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
+	bool updatePageQueue)
 {
 	ASSERT(base % B_PAGE_SIZE == 0);
 	ASSERT(size % B_PAGE_SIZE == 0);
@@ -40,7 +41,7 @@ VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size)
 	addr_t address = base;
 	addr_t end = address + size;
 	for (; address != end; address += B_PAGE_SIZE)
-		UnmapPage(area, address);
+		UnmapPage(area, address, updatePageQueue);
 }
 
 
@@ -64,7 +65,7 @@ VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	addr_t address = area->Base();
 	addr_t end = address + area->Size();
 	for (; address != end; address += B_PAGE_SIZE)
-		UnmapPage(area, address);
+		UnmapPage(area, address, true);
 }
 
 

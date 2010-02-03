@@ -75,7 +75,7 @@ public:
 									size_t size);
 								~PrecacheIO();
 
-			status_t			Prepare();
+			status_t			Prepare(vm_page_reservation* reservation);
 			void				ReadAsync();
 
 	virtual	void				IOFinished(status_t status,
@@ -99,7 +99,7 @@ private:
 
 typedef status_t (*cache_func)(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
-	size_t lastReservedPages, size_t reservePages);
+	vm_page_reservation* reservation, size_t reservePages);
 
 static void add_to_iovec(iovec* vecs, uint32 &index, uint32 max, addr_t address,
 	size_t size);
@@ -141,7 +141,7 @@ PrecacheIO::~PrecacheIO()
 
 
 status_t
-PrecacheIO::Prepare()
+PrecacheIO::Prepare(vm_page_reservation* reservation)
 {
 	if (fPageCount == 0)
 		return B_BAD_VALUE;
@@ -157,8 +157,8 @@ PrecacheIO::Prepare()
 	// allocate pages for the cache and mark them busy
 	uint32 i = 0;
 	for (size_t pos = 0; pos < fSize; pos += B_PAGE_SIZE) {
-		vm_page* page = vm_page_allocate_page(
-			PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_BUSY);
+		vm_page* page = vm_page_allocate_page(reservation,
+			PAGE_STATE_CACHED | VM_PAGE_ALLOC_BUSY);
 
 		fCache->InsertPage(page, fOffset + pos);
 
@@ -281,7 +281,8 @@ push_access(file_cache_ref* ref, off_t offset, size_t bytes, bool isWrite)
 
 
 static void
-reserve_pages(file_cache_ref* ref, size_t reservePages, bool isWrite)
+reserve_pages(file_cache_ref* ref, vm_page_reservation* reservation,
+	size_t reservePages, bool isWrite)
 {
 	if (low_resource_state(B_KERNEL_RESOURCE_PAGES) != B_NO_LOW_RESOURCE) {
 		VMCache* cache = ref->cache;
@@ -320,7 +321,7 @@ reserve_pages(file_cache_ref* ref, size_t reservePages, bool isWrite)
 		cache->Unlock();
 	}
 
-	vm_page_reserve_pages(reservePages, VM_PRIORITY_USER);
+	vm_page_reserve_pages(reservation, reservePages, VM_PRIORITY_USER);
 }
 
 
@@ -367,7 +368,7 @@ read_pages_and_clear_partial(file_cache_ref* ref, void* cookie, off_t offset,
 static status_t
 read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
-	size_t lastReservedPages, size_t reservePages)
+	vm_page_reservation* reservation, size_t reservePages)
 {
 	TRACE(("read_into_cache(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
 		"bufferSize = %lu\n", offset, pageOffset, buffer, bufferSize));
@@ -386,7 +387,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
-			PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_BUSY);
+			reservation, PAGE_STATE_CACHED | VM_PAGE_ALLOC_BUSY);
 
 		cache->InsertPage(page, offset + pos);
 
@@ -397,7 +398,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	push_access(ref, offset, bufferSize, false);
 	cache->Unlock();
-	vm_page_unreserve_pages(lastReservedPages);
+	vm_page_unreserve_pages(reservation);
 
 	// read file into reserved pages
 	status_t status = read_pages_and_clear_partial(ref, cookie, offset, vecs,
@@ -434,7 +435,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		}
 	}
 
-	reserve_pages(ref, reservePages, false);
+	reserve_pages(ref, reservation, reservePages, false);
 	cache->Lock();
 
 	// make the pages accessible in the cache
@@ -451,7 +452,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 static status_t
 read_from_file(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
-	size_t lastReservedPages, size_t reservePages)
+	vm_page_reservation* reservation, size_t reservePages)
 {
 	TRACE(("read_from_file(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
 		"bufferSize = %lu\n", offset, pageOffset, buffer, bufferSize));
@@ -465,13 +466,13 @@ read_from_file(file_cache_ref* ref, void* cookie, off_t offset,
 
 	push_access(ref, offset, bufferSize, false);
 	ref->cache->Unlock();
-	vm_page_unreserve_pages(lastReservedPages);
+	vm_page_unreserve_pages(reservation);
 
 	status_t status = vfs_read_pages(ref->vnode, cookie, offset + pageOffset,
 		&vec, 1, 0, &bufferSize);
 
 	if (status == B_OK)
-		reserve_pages(ref, reservePages, false);
+		reserve_pages(ref, reservation, reservePages, false);
 
 	ref->cache->Lock();
 
@@ -487,7 +488,7 @@ read_from_file(file_cache_ref* ref, void* cookie, off_t offset,
 static status_t
 write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
-	size_t lastReservedPages, size_t reservePages)
+	vm_page_reservation* reservation, size_t reservePages)
 {
 	// TODO: We're using way too much stack! Rather allocate a sufficiently
 	// large chunk on the heap.
@@ -509,7 +510,9 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 		// TODO: the pages we allocate here should have been reserved upfront
 		//	in cache_io()
 		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
-			PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_BUSY);
+			reservation,
+			(writeThrough ? PAGE_STATE_CACHED : PAGE_STATE_MODIFIED)
+				| VM_PAGE_ALLOC_BUSY);
 
 		ref->cache->InsertPage(page, offset + pos);
 
@@ -519,7 +522,7 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 	push_access(ref, offset, bufferSize, true);
 	ref->cache->Unlock();
-	vm_page_unreserve_pages(lastReservedPages);
+	vm_page_unreserve_pages(reservation);
 
 	// copy contents (and read in partially written pages first)
 
@@ -601,16 +604,13 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	}
 
 	if (status == B_OK)
-		reserve_pages(ref, reservePages, true);
+		reserve_pages(ref, reservation, reservePages, true);
 
 	ref->cache->Lock();
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
 		ref->cache->MarkPageUnbusy(pages[i]);
-
-		if (!writeThrough)
-			vm_page_set_state(pages[i], PAGE_STATE_MODIFIED);
 
 		DEBUG_PAGE_ACCESS_END(pages[i]);
 	}
@@ -621,12 +621,12 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 
 static status_t
 write_to_file(file_cache_ref* ref, void* cookie, off_t offset, int32 pageOffset,
-	addr_t buffer, size_t bufferSize, bool useBuffer, size_t lastReservedPages,
-	size_t reservePages)
+	addr_t buffer, size_t bufferSize, bool useBuffer,
+	vm_page_reservation* reservation, size_t reservePages)
 {
 	push_access(ref, offset, bufferSize, true);
 	ref->cache->Unlock();
-	vm_page_unreserve_pages(lastReservedPages);
+	vm_page_unreserve_pages(reservation);
 
 	status_t status = B_OK;
 
@@ -652,7 +652,7 @@ write_to_file(file_cache_ref* ref, void* cookie, off_t offset, int32 pageOffset,
 	}
 
 	if (status == B_OK)
-		reserve_pages(ref, reservePages, true);
+		reserve_pages(ref, reservation, reservePages, true);
 
 	ref->cache->Lock();
 
@@ -665,7 +665,7 @@ satisfy_cache_io(file_cache_ref* ref, void* cookie, cache_func function,
 	off_t offset, addr_t buffer, bool useBuffer, int32 &pageOffset,
 	size_t bytesLeft, size_t &reservePages, off_t &lastOffset,
 	addr_t &lastBuffer, int32 &lastPageOffset, size_t &lastLeft,
-	size_t &lastReservedPages)
+	size_t &lastReservedPages, vm_page_reservation* reservation)
 {
 	if (lastBuffer == buffer)
 		return B_OK;
@@ -675,7 +675,7 @@ satisfy_cache_io(file_cache_ref* ref, void* cookie, cache_func function,
 		+ lastPageOffset + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 
 	status_t status = function(ref, cookie, lastOffset, lastPageOffset,
-		lastBuffer, requestSize, useBuffer, lastReservedPages, reservePages);
+		lastBuffer, requestSize, useBuffer, reservation, reservePages);
 	if (status == B_OK) {
 		lastReservedPages = reservePages;
 		lastBuffer = buffer;
@@ -736,7 +736,9 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 	size_t pagesProcessed = 0;
 	cache_func function = NULL;
 
-	reserve_pages(ref, lastReservedPages, doWrite);
+	vm_page_reservation reservation;
+	reserve_pages(ref, &reservation, lastReservedPages, doWrite);
+
 	AutoLocker<VMCache> locker(cache);
 
 	while (bytesLeft > 0) {
@@ -763,7 +765,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 			status_t status = satisfy_cache_io(ref, cookie, function, offset,
 				buffer, useBuffer, pageOffset, bytesLeft, reservePages,
 				lastOffset, lastBuffer, lastPageOffset, lastLeft,
-				lastReservedPages);
+				lastReservedPages, &reservation);
 			if (status != B_OK)
 				return status;
 
@@ -779,13 +781,6 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 			"= %lu\n", offset, page, bytesLeft, pageOffset));
 
 		if (page != NULL) {
-			// Since we don't actually map pages as part of an area, we have
-			// to manually maintain their usage_count
-			page->usage_count = 2;
-				// TODO: Just because this request comes from the FS API, it
-				// doesn't mean the page is not mapped. We might actually
-				// decrease the usage count of a hot page here.
-
 			if (doWrite || useBuffer) {
 				// Since the following user_mem{cpy,set}() might cause a page
 				// fault, which in turn might cause pages to be reserved, we
@@ -824,8 +819,17 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 			if (bytesLeft <= bytesInPage) {
 				// we've read the last page, so we're done!
 				locker.Unlock();
-				vm_page_unreserve_pages(lastReservedPages);
+				vm_page_unreserve_pages(&reservation);
 				return B_OK;
+			}
+
+			// If it is cached only, requeue the page, so the respective queue
+			// roughly remains LRU first sorted.
+			if (page->state == PAGE_STATE_CACHED
+					|| page->state == PAGE_STATE_MODIFIED) {
+				DEBUG_PAGE_ACCESS_START(page);
+				vm_page_requeue(page, true);
+				DEBUG_PAGE_ACCESS_END(page);
 			}
 
 			// prepare a potential gap request
@@ -848,7 +852,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 			status_t status = satisfy_cache_io(ref, cookie, function, offset,
 				buffer, useBuffer, pageOffset, bytesLeft, reservePages,
 				lastOffset, lastBuffer, lastPageOffset, lastLeft,
-				lastReservedPages);
+				lastReservedPages, &reservation);
 			if (status != B_OK)
 				return status;
 		}
@@ -857,7 +861,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 	// fill the last remaining bytes of the request (either write or read)
 
 	return function(ref, cookie, lastOffset, lastPageOffset, lastBuffer,
-		lastLeft, useBuffer, lastReservedPages, 0);
+		lastLeft, useBuffer, &reservation, 0);
 }
 
 
@@ -929,6 +933,11 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 
 	if (offset + size > fileSize)
 		size = fileSize - offset;
+
+	// "offset" and "size" are always aligned to B_PAGE_SIZE,
+	offset = ROUNDDOWN(offset, B_PAGE_SIZE);
+	size = ROUNDUP(size, B_PAGE_SIZE);
+
 	size_t reservePages = size / B_PAGE_SIZE;
 
 	// Don't do anything if we don't have the resources left, or the cache
@@ -939,14 +948,11 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 		return;
 	}
 
-	// "offset" and "size" are always aligned to B_PAGE_SIZE,
-	offset &= ~(B_PAGE_SIZE - 1);
-	size = ROUNDUP(size, B_PAGE_SIZE);
-
 	size_t bytesToRead = 0;
 	off_t lastOffset = offset;
 
-	vm_page_reserve_pages(reservePages, VM_PRIORITY_USER);
+	vm_page_reservation reservation;
+	vm_page_reserve_pages(&reservation, reservePages, VM_PRIORITY_USER);
 
 	cache->Lock();
 
@@ -965,9 +971,9 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 		}
 		if (bytesToRead != 0) {
 			// read the part before the current page (or the end of the request)
-			PrecacheIO* io
-				= new(std::nothrow) PrecacheIO(ref, lastOffset, bytesToRead);
-			if (io == NULL || io->Prepare() != B_OK) {
+			PrecacheIO* io = new(std::nothrow) PrecacheIO(ref, lastOffset,
+				bytesToRead);
+			if (io == NULL || io->Prepare(&reservation) != B_OK) {
 				delete io;
 				break;
 			}
@@ -989,9 +995,7 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 	}
 
 	cache->ReleaseRefAndUnlock();
-	vm_page_unreserve_pages(reservePages);
-		// TODO: We should periodically unreserve as we go, so we don't
-		// unnecessarily put pressure on the free page pool.
+	vm_page_unreserve_pages(&reservation);
 }
 
 
@@ -1074,10 +1078,11 @@ extern "C" status_t
 file_cache_init(void)
 {
 	// allocate a clean page we can use for writing zeroes
-	vm_page_reserve_pages(1, VM_PRIORITY_SYSTEM);
-	vm_page* page = vm_page_allocate_page(
+	vm_page_reservation reservation;
+	vm_page_reserve_pages(&reservation, 1, VM_PRIORITY_SYSTEM);
+	vm_page* page = vm_page_allocate_page(&reservation,
 		PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
-	vm_page_unreserve_pages(1);
+	vm_page_unreserve_pages(&reservation);
 
 	sZeroPage = (addr_t)page->physical_page_number * B_PAGE_SIZE;
 
@@ -1319,4 +1324,3 @@ file_cache_write(void* _cacheRef, void* cookie, off_t offset,
 
 	return status;
 }
-

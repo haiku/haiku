@@ -1333,13 +1333,14 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 	// reserve the pages we need now
 	size_t reservedPages = size / B_PAGE_SIZE
 		+ translationMap->MaxPagesNeededToMap(address, address + size - 1);
+	vm_page_reservation reservation;
 	if ((flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0) {
-		if (!vm_page_try_reserve_pages(reservedPages, priority)) {
+		if (!vm_page_try_reserve_pages(&reservation, reservedPages, priority)) {
 			vm_unreserve_memory(reservedMemory);
 			return B_WOULD_BLOCK;
 		}
 	} else
-		vm_page_reserve_pages(reservedPages, priority);
+		vm_page_reserve_pages(&reservation, reservedPages, priority);
 
 	VMCache* cache = vm_area_get_locked_cache(vmArea);
 
@@ -1350,7 +1351,7 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 	addr_t endAreaOffset = areaOffset + size;
 	for (size_t offset = areaOffset; offset < endAreaOffset;
 			offset += B_PAGE_SIZE) {
-		vm_page* page = vm_page_allocate_page(PAGE_STATE_WIRED);
+		vm_page* page = vm_page_allocate_page(&reservation, PAGE_STATE_WIRED);
 		cache->InsertPage(page, offset);
 
 		page->wired_count++;
@@ -1359,14 +1360,14 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 
 		translationMap->Map(vmArea->Base() + offset,
 			page->physical_page_number * B_PAGE_SIZE,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &reservation);
 	}
 
 	translationMap->Unlock();
 
 	cache->ReleaseRefAndUnlock();
 
-	vm_page_unreserve_pages(reservedPages);
+	vm_page_unreserve_pages(&reservation);
 
 	return B_OK;
 }

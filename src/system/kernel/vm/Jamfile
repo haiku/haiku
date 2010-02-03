@@ -5,8 +5,8 @@ UsePrivateHeaders shared ;
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) device_manager ] ;
 
 KernelMergeObject kernel_vm.o :
+	PageCacheLocker.cpp
 	vm.cpp
-	vm_daemons.cpp
 	vm_page.cpp
 	VMAddressSpace.cpp
 	VMAddressSpaceLocking.cpp

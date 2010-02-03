@@ -301,9 +301,6 @@ low_resource(uint32 resource, uint64 requirements, uint32 flags, uint32 timeout)
 
 	switch (resource) {
 		case B_KERNEL_RESOURCE_PAGES:
-			vm_schedule_page_scanner(requirements);
-			break;
-
 		case B_KERNEL_RESOURCE_MEMORY:
 		case B_KERNEL_RESOURCE_SEMAPHORES:
 		case B_KERNEL_RESOURCE_ADDRESS_SPACE:

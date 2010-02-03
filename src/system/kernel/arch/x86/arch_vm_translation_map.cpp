@@ -401,7 +401,8 @@ X86VMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 
 
 status_t
-X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes)
+X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes,
+	vm_page_reservation* reservation)
 {
 	TRACE(("map_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
 
@@ -422,7 +423,8 @@ X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes)
 		vm_page *page;
 
 		// we need to allocate a pgtable
-		page = vm_page_allocate_page(PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
+		page = vm_page_allocate_page(reservation,
+			PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
 
 		DEBUG_PAGE_ACCESS_END(page);
 
@@ -533,7 +535,8 @@ restart:
 	This object shouldn't be locked.
 */
 status_t
-X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address)
+X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
+	bool updatePageQueue)
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
 
@@ -620,10 +623,20 @@ X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address)
 	} else
 		page->wired_count--;
 
-	if (page->wired_count == 0 && page->mappings.IsEmpty())
+	locker.Unlock();
+
+	if (page->wired_count == 0 && page->mappings.IsEmpty()) {
 		atomic_add(&gMappedPagesCount, -1);
 
-	locker.Unlock();
+		if (updatePageQueue) {
+			if (page->Cache()->temporary)
+				vm_page_set_state(page, PAGE_STATE_INACTIVE);
+			else if (page->modified)
+				vm_page_set_state(page, PAGE_STATE_MODIFIED);
+			else
+				vm_page_set_state(page, PAGE_STATE_CACHED);
+		}
+	}
 
 	if (mapping != NULL) {
 		bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
@@ -637,7 +650,8 @@ X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address)
 
 
 void
-X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size)
+X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
+	bool updatePageQueue)
 {
 	page_directory_entry* pd = fArchData->pgdir_virt;
 
@@ -720,13 +734,23 @@ X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size)
 				} else
 					page->wired_count--;
 
-				if (page->wired_count == 0 && page->mappings.IsEmpty())
+				if (page->wired_count == 0 && page->mappings.IsEmpty()) {
 					atomic_add(&gMappedPagesCount, -1);
+
+					if (updatePageQueue) {
+						if (page->Cache()->temporary)
+							vm_page_set_state(page, PAGE_STATE_INACTIVE);
+						else if (page->modified)
+							vm_page_set_state(page, PAGE_STATE_MODIFIED);
+						else
+							vm_page_set_state(page, PAGE_STATE_CACHED);
+					}
+				}
 			}
 		}
 
 		Flush();
-			// flush explicitely, since we directly use the lock
+			// flush explicitly, since we directly use the lock
 
 		pinner.Unlock();
 	}
@@ -752,7 +776,7 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	bool ignoreTopCachePageFlags)
 {
 	if (area->cache_type == CACHE_TYPE_DEVICE || area->wiring != B_NO_LOCK) {
-		X86VMTranslationMap::UnmapPages(area, area->Base(), area->Size());
+		X86VMTranslationMap::UnmapPages(area, area->Base(), area->Size(), true);
 		return;
 	}
 
@@ -770,10 +794,22 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 		vm_page* page = mapping->page;
 		page->mappings.Remove(mapping);
 
-		if (page->wired_count == 0 && page->mappings.IsEmpty())
+		VMCache* cache = page->Cache();
+
+		if (page->wired_count == 0 && page->mappings.IsEmpty()) {
 			atomic_add(&gMappedPagesCount, -1);
 
-		if (unmapPages || page->Cache() != area->cache) {
+			if (!ignoreTopCachePageFlags || cache != area->cache) {
+				if (cache->temporary)
+					vm_page_set_state(page, PAGE_STATE_INACTIVE);
+				else if (page->modified)
+					vm_page_set_state(page, PAGE_STATE_MODIFIED);
+				else
+					vm_page_set_state(page, PAGE_STATE_CACHED);
+			}
+		}
+
+		if (unmapPages || cache != area->cache) {
 			addr_t address = area->Base()
 				+ ((page->cache_offset * B_PAGE_SIZE) - area->cache_offset);
 
@@ -1037,6 +1073,129 @@ X86VMTranslationMap::ClearFlags(addr_t va, uint32 flags)
 	}
 
 	return B_OK;
+}
+
+
+bool
+X86VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
+	bool unmapIfUnaccessed, bool& _modified)
+{
+	ASSERT(address % B_PAGE_SIZE == 0);
+
+	page_directory_entry* pd = fArchData->pgdir_virt;
+
+	TRACE(("X86VMTranslationMap::ClearAccessedAndModified(%#" B_PRIxADDR ")\n",
+		address));
+
+	RecursiveLocker locker(fLock);
+
+	int index = VADDR_TO_PDENT(address);
+	if ((pd[index] & X86_PDE_PRESENT) == 0)
+		return false;
+
+	ThreadCPUPinner pinner(thread_get_current_thread());
+
+	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+		pd[index] & X86_PDE_ADDRESS_MASK);
+
+	index = VADDR_TO_PTENT(address);
+
+	// perform the deed
+	page_table_entry oldEntry;
+
+	if (unmapIfUnaccessed) {
+		while (true) {
+			oldEntry = pt[index];
+			if ((oldEntry & X86_PTE_PRESENT) == 0) {
+				// page mapping not valid
+				return false;
+			}
+
+			if (oldEntry & X86_PTE_ACCESSED) {
+				// page was accessed -- just clear the flags
+				oldEntry = clear_page_table_entry_flags(&pt[index],
+					X86_PTE_ACCESSED | X86_PTE_DIRTY);
+				break;
+			}
+
+			// page hasn't been accessed -- unmap it
+			if (test_and_set_page_table_entry(&pt[index], 0, oldEntry)
+					== oldEntry) {
+				break;
+			}
+
+			// something changed -- check again
+		}
+	} else {
+		oldEntry = clear_page_table_entry_flags(&pt[index],
+			X86_PTE_ACCESSED | X86_PTE_DIRTY);
+	}
+
+	pinner.Unlock();
+
+	_modified = (oldEntry & X86_PTE_DIRTY) != 0;
+
+	if ((oldEntry & X86_PTE_ACCESSED) != 0) {
+		// Note, that we only need to invalidate the address, if the
+		// accessed flags was set, since only then the entry could have been
+		// in any TLB.
+		if (fArchData->num_invalidate_pages
+				< PAGE_INVALIDATE_CACHE_SIZE) {
+			fArchData->pages_to_invalidate[fArchData->num_invalidate_pages]
+				= address;
+		}
+
+		fArchData->num_invalidate_pages++;
+
+		Flush();
+
+		return true;
+	}
+
+	if (!unmapIfUnaccessed)
+		return false;
+
+	// We have unmapped the address. Do the "high level" stuff.
+
+	fMapCount--;
+
+	if (area->cache_type == CACHE_TYPE_DEVICE)
+		return false;
+
+	// get the page
+	vm_page* page = vm_lookup_page(
+		(oldEntry & X86_PTE_ADDRESS_MASK) / B_PAGE_SIZE);
+	ASSERT(page != NULL);
+
+	// remove the mapping object/decrement the wired_count of the page
+	vm_page_mapping* mapping = NULL;
+	if (area->wiring == B_NO_LOCK) {
+		vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+		while ((mapping = iterator.Next()) != NULL) {
+			if (mapping->area == area) {
+				area->mappings.Remove(mapping);
+				page->mappings.Remove(mapping);
+				break;
+			}
+		}
+
+		ASSERT(mapping != NULL);
+	} else
+		page->wired_count--;
+
+	locker.Unlock();
+
+	if (page->wired_count == 0 && page->mappings.IsEmpty())
+		atomic_add(&gMappedPagesCount, -1);
+
+	if (mapping != NULL) {
+		object_cache_free(gPageMappingsObjectCache, mapping,
+			CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
+			// Since this is called by the page daemon, we never want to lock
+			// the kernel address space.
+	}
+
+	return false;
 }
 
 

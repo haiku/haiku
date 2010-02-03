@@ -16,6 +16,12 @@ struct kernel_args;
 
 extern int32 gMappedPagesCount;
 
+
+struct vm_page_reservation {
+	uint32	count;
+};
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,11 +51,14 @@ void vm_page_schedule_write_page(struct vm_page *page);
 void vm_page_schedule_write_page_range(struct VMCache *cache,
 	uint32 firstPage, uint32 endPage);
 
-void vm_page_unreserve_pages(uint32 count);
-void vm_page_reserve_pages(uint32 count, int priority);
-bool vm_page_try_reserve_pages(uint32 count, int priority);
+void vm_page_unreserve_pages(vm_page_reservation* reservation);
+void vm_page_reserve_pages(vm_page_reservation* reservation, uint32 count,
+	int priority);
+bool vm_page_try_reserve_pages(vm_page_reservation* reservation, uint32 count,
+	int priority);
 
-struct vm_page *vm_page_allocate_page(uint32 flags);
+struct vm_page *vm_page_allocate_page(vm_page_reservation* reservation,
+	uint32 flags);
 struct vm_page *vm_page_allocate_page_run(uint32 flags, addr_t base,
 	addr_t length, int priority);
 struct vm_page *vm_page_allocate_page_run_no_base(uint32 flags, addr_t count,

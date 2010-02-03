@@ -113,7 +113,7 @@ public:
 	bool					modified : 1;
 	uint8					unused : 1;
 
-	int8					usage_count;
+	uint8					usage_count;
 	uint16					wired_count;
 
 	VMCacheRef* CacheRef() const			{ return cache_ref; }

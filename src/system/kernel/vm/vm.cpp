@@ -472,7 +472,8 @@ get_area_page_protection(VMArea* area, addr_t pageAddress)
 	The page's cache must be locked.
 */
 static status_t
-map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection)
+map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection,
+	vm_page_reservation* reservation, bool activatePage)
 {
 	VMTranslationMap* map = area->address_space->TranslationMap();
 
@@ -492,7 +493,8 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection)
 
 		map->Lock();
 
-		map->Map(address, page->physical_page_number * B_PAGE_SIZE, protection);
+		map->Map(address, page->physical_page_number * B_PAGE_SIZE, protection,
+			reservation);
 
 		// insert mapping into lists
 		if (page->mappings.IsEmpty() && page->wired_count == 0)
@@ -506,14 +508,20 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection)
 		DEBUG_PAGE_ACCESS_CHECK(page);
 
 		map->Lock();
-		map->Map(address, page->physical_page_number * B_PAGE_SIZE, protection);
+		map->Map(address, page->physical_page_number * B_PAGE_SIZE, protection,
+			reservation);
 		map->Unlock();
 
 		increment_page_wired_count(page);
 	}
 
-	if (page->usage_count < 0)
-		page->usage_count = 1;
+	if (page->state == PAGE_STATE_CACHED) {
+		if (page->usage_count == 0 && !activatePage)
+			vm_page_set_state(page, PAGE_STATE_INACTIVE);
+		else
+			vm_page_set_state(page, PAGE_STATE_ACTIVE);
+	} else if (page->state == PAGE_STATE_INACTIVE && activatePage)
+		vm_page_set_state(page, PAGE_STATE_ACTIVE);
 
 	return B_OK;
 }
@@ -526,7 +534,7 @@ static inline bool
 unmap_page(VMArea* area, addr_t virtualAddress)
 {
 	return area->address_space->TranslationMap()->UnmapPage(area,
-		virtualAddress);
+		virtualAddress, true);
 }
 
 
@@ -536,7 +544,7 @@ unmap_page(VMArea* area, addr_t virtualAddress)
 static inline void
 unmap_pages(VMArea* area, addr_t base, size_t size)
 {
-	area->address_space->TranslationMap()->UnmapPages(area, base, size);
+	area->address_space->TranslationMap()->UnmapPages(area, base, size, true);
 }
 
 
@@ -1029,15 +1037,18 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 	page_num_t reservedPages = reservedMapPages;
 	if (wiring == B_FULL_LOCK)
 		reservedPages += size / B_PAGE_SIZE;
+
+	vm_page_reservation reservation;
 	if (reservedPages > 0) {
 		if ((flags & CREATE_AREA_DONT_WAIT) != 0) {
-			if (!vm_page_try_reserve_pages(reservedPages, priority)) {
+			if (!vm_page_try_reserve_pages(&reservation, reservedPages,
+					priority)) {
 				reservedPages = 0;
 				status = B_WOULD_BLOCK;
 				goto err0;
 			}
 		} else
-			vm_page_reserve_pages(reservedPages, priority);
+			vm_page_reserve_pages(&reservation, reservedPages, priority);
 	}
 
 	status = locker.SetTo(team);
@@ -1122,29 +1133,12 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 #	endif
 					continue;
 #endif
-				vm_page* page = vm_page_allocate_page(
-					PAGE_STATE_ACTIVE | pageAllocFlags);
-//					PAGE_STATE_WIRED | pageAllocFlags);
-					// TODO: The pages should be PAGE_STATE_WIRED, since there's
-					// no need for the page daemon to play with them (the same
-					// should be considered in vm_soft_fault()). ATM doing that
-					// will result in bad thrashing in systems with little
-					// memory due to the current tuning of the page daemon. It
-					// will age pages way too fast (since it just skips
-					// PAGE_STATE_WIRED pages, while it processes
-					// PAGE_STATE_ACTIVE with wired_count > 0).
+				vm_page* page = vm_page_allocate_page(&reservation,
+					PAGE_STATE_WIRED | pageAllocFlags);
 				cache->InsertPage(page, offset);
-				map_page(area, page, address, protection);
+				map_page(area, page, address, protection, &reservation, false);
 
 				DEBUG_PAGE_ACCESS_END(page);
-
-				// Periodically unreserve pages we've already allocated, so that
-				// we don't unnecessarily increase the pressure on the VM.
-				if (offset > 0 && offset % (128 * B_PAGE_SIZE) == 0) {
-					page_num_t toUnreserve = 128;
-					vm_page_unreserve_pages(toUnreserve);
-					reservedPages -= toUnreserve;
-				}
 			}
 
 			break;
@@ -1211,7 +1205,8 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 				if (page == NULL)
 					panic("couldn't lookup physical page just allocated\n");
 
-				status = map->Map(virtualAddress, physicalAddress, protection);
+				status = map->Map(virtualAddress, physicalAddress, protection,
+					&reservation);
 				if (status < B_OK)
 					panic("couldn't map physical page in page run\n");
 
@@ -1232,7 +1227,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 	cache->Unlock();
 
 	if (reservedPages > 0)
-		vm_page_unreserve_pages(reservedPages);
+		vm_page_unreserve_pages(&reservation);
 
 	TRACE(("vm_create_anonymous_area: done\n"));
 
@@ -1255,7 +1250,7 @@ err1:
 
 err0:
 	if (reservedPages > 0)
-		vm_page_unreserve_pages(reservedPages);
+		vm_page_unreserve_pages(&reservation);
 	if (reservedMemory > 0)
 		vm_unreserve_memory(reservedMemory);
 
@@ -1326,18 +1321,19 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 		size_t reservePages = map->MaxPagesNeededToMap(area->Base(),
 			area->Base() + (size - 1));
 
-		vm_page_reserve_pages(reservePages,
+		vm_page_reservation reservation;
+		vm_page_reserve_pages(&reservation, reservePages,
 			team == VMAddressSpace::KernelID()
 				? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 		map->Lock();
 
 		for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
 			map->Map(area->Base() + offset, physicalAddress + offset,
-				protection);
+				protection, &reservation);
 		}
 
 		map->Unlock();
-		vm_page_unreserve_pages(reservePages);
+		vm_page_unreserve_pages(&reservation);
 	}
 
 	if (status < B_OK)
@@ -1414,7 +1410,8 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	size_t reservePages = map->MaxPagesNeededToMap(area->Base(),
 		area->Base() + (size - 1));
 
-	vm_page_reserve_pages(reservePages,
+	vm_page_reservation reservation;
+	vm_page_reserve_pages(&reservation, reservePages,
 			team == VMAddressSpace::KernelID()
 				? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 	map->Lock();
@@ -1431,13 +1428,14 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 			break;
 
 		map->Map(area->Base() + offset,
-			(addr_t)vecs[vecIndex].iov_base + vecOffset, protection);
+			(addr_t)vecs[vecIndex].iov_base + vecOffset, protection,
+			&reservation);
 
 		vecOffset += B_PAGE_SIZE;
 	}
 
 	map->Unlock();
-	vm_page_unreserve_pages(reservePages);
+	vm_page_unreserve_pages(&reservation);
 
 	if (_size != NULL)
 		*_size = size;
@@ -1502,7 +1500,8 @@ vm_create_vnode_cache(struct vnode* vnode, struct VMCache** cache)
 /*!	\a cache must be locked. The area's address space must be read-locked.
 */
 static void
-pre_map_area_pages(VMArea* area, VMCache* cache)
+pre_map_area_pages(VMArea* area, VMCache* cache,
+	vm_page_reservation* reservation)
 {
 	addr_t baseAddress = area->Base();
 	addr_t cacheOffset = area->cache_offset;
@@ -1515,14 +1514,14 @@ pre_map_area_pages(VMArea* area, VMCache* cache)
 		if (page->cache_offset >= endPage)
 			break;
 
-		// skip inactive pages
-		if (page->busy || page->usage_count <= 0)
+		// skip busy and inactive pages
+		if (page->busy || page->usage_count == 0)
 			continue;
 
 		DEBUG_PAGE_ACCESS_START(page);
 		map_page(area, page,
 			baseAddress + (page->cache_offset * B_PAGE_SIZE - cacheOffset),
-			B_READ_AREA | B_KERNEL_READ_AREA);
+			B_READ_AREA | B_KERNEL_READ_AREA, reservation, false);
 		DEBUG_PAGE_ACCESS_END(page);
 	}
 }
@@ -1584,6 +1583,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	// If we're going to pre-map pages, we need to reserve the pages needed by
 	// the mapping backend upfront.
 	page_num_t reservedPreMapPages = 0;
+	vm_page_reservation reservation;
 	if ((protection & B_READ_AREA) != 0) {
 		AddressSpaceWriteLocker locker;
 		status = locker.SetTo(team);
@@ -1595,25 +1595,26 @@ _vm_map_file(team_id team, const char* name, void** _address,
 
 		locker.Unlock();
 
-		vm_page_reserve_pages(reservedPreMapPages,
+		vm_page_reserve_pages(&reservation, reservedPreMapPages,
 			team == VMAddressSpace::KernelID()
 				? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 	}
 
 	struct PageUnreserver {
-		PageUnreserver(page_num_t count)
-			: fCount(count)
+		PageUnreserver(vm_page_reservation* reservation)
+			:
+			fReservation(reservation)
 		{
 		}
 
 		~PageUnreserver()
 		{
-			if (fCount > 0)
-				vm_page_unreserve_pages(fCount);
+			if (fReservation != NULL)
+				vm_page_unreserve_pages(fReservation);
 		}
 
-		page_num_t	fCount;
-	} pageUnreserver(reservedPreMapPages);
+		vm_page_reservation* fReservation;
+	} pageUnreserver(reservedPreMapPages > 0 ? &reservation : NULL);
 
 	AddressSpaceWriteLocker locker(team);
 	if (!locker.IsLocked())
@@ -1638,7 +1639,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	}
 
 	if (status == B_OK && (protection & B_READ_AREA) != 0)
-		pre_map_area_pages(area, cache);
+		pre_map_area_pages(area, cache, &reservation);
 
 	cache->Unlock();
 
@@ -1798,7 +1799,8 @@ vm_clone_area(team_id team, const char* name, void** address,
 			size_t reservePages = map->MaxPagesNeededToMap(newArea->Base(),
 				newArea->Base() + (newArea->Size() - 1));
 
-			vm_page_reserve_pages(reservePages,
+			vm_page_reservation reservation;
+			vm_page_reserve_pages(&reservation, reservePages,
 				targetAddressSpace == VMAddressSpace::Kernel()
 					? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 			map->Lock();
@@ -1806,16 +1808,17 @@ vm_clone_area(team_id team, const char* name, void** address,
 			for (addr_t offset = 0; offset < newArea->Size();
 					offset += B_PAGE_SIZE) {
 				map->Map(newArea->Base() + offset, physicalAddress + offset,
-					protection);
+					protection, &reservation);
 			}
 
 			map->Unlock();
-			vm_page_unreserve_pages(reservePages);
+			vm_page_unreserve_pages(&reservation);
 		} else {
 			VMTranslationMap* map = targetAddressSpace->TranslationMap();
 			size_t reservePages = map->MaxPagesNeededToMap(
 				newArea->Base(), newArea->Base() + (newArea->Size() - 1));
-			vm_page_reserve_pages(reservePages,
+			vm_page_reservation reservation;
+			vm_page_reserve_pages(&reservation, reservePages,
 				targetAddressSpace == VMAddressSpace::Kernel()
 					? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 
@@ -1827,14 +1830,14 @@ vm_clone_area(team_id team, const char* name, void** address,
 					map_page(newArea, page,
 						newArea->Base() + ((page->cache_offset << PAGE_SHIFT)
 							- newArea->cache_offset),
-						protection);
+						protection, &reservation, false);
 					DEBUG_PAGE_ACCESS_END(page);
 				}
 			}
 			// TODO: B_FULL_LOCK means that all pages are locked. We are not
 			// ensuring that!
 
-			vm_page_unreserve_pages(reservePages);
+			vm_page_unreserve_pages(&reservation);
 		}
 	}
 	if (status == B_OK)
@@ -2208,42 +2211,6 @@ vm_test_map_modification(vm_page* page)
 
 /*!	The page's cache must be locked.
 */
-int32
-vm_test_map_activation(vm_page* page, bool* _modified)
-{
-	int32 activation = 0;
-	bool modified = false;
-
-	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
-	vm_page_mapping* mapping;
-	while ((mapping = iterator.Next()) != NULL) {
-		VMArea* area = mapping->area;
-		VMTranslationMap* map = area->address_space->TranslationMap();
-
-		addr_t physicalAddress;
-		uint32 flags;
-		map->Lock();
-		map->Query(virtual_page_address(area, page), &physicalAddress, &flags);
-		map->Unlock();
-
-		if ((flags & PAGE_ACCESSED) != 0)
-			activation++;
-		if ((flags & PAGE_MODIFIED) != 0)
-			modified = true;
-	}
-
-	if (_modified != NULL)
-		*_modified = modified || page->modified;
-
-	if (page->accessed)
-		activation++;
-
-	return activation;
-}
-
-
-/*!	The page's cache must be locked.
-*/
 void
 vm_clear_map_flags(vm_page* page, uint32 flags)
 {
@@ -2266,26 +2233,84 @@ vm_clear_map_flags(vm_page* page, uint32 flags)
 
 
 /*!	Removes all mappings from a page.
-	After you've called this function, the page is unmapped from memory.
-	The accumulated page flags of all mappings can be found in \a _flags.
+	After you've called this function, the page is unmapped from memory and
+	the page's \c accessed and \c modified flags have been updated according
+	to the state of the mappings.
 	The page's cache must be locked.
 */
 void
-vm_remove_all_page_mappings(vm_page* page, uint32* _flags)
+vm_remove_all_page_mappings(vm_page* page)
 {
 	while (vm_page_mapping* mapping = page->mappings.Head()) {
 		VMArea* area = mapping->area;
 		VMTranslationMap* map = area->address_space->TranslationMap();
 		addr_t address = virtual_page_address(area, page);
-		map->UnmapPage(area, address);
+		map->UnmapPage(area, address, false);
+	}
+}
+
+
+int32
+vm_clear_page_mapping_accessed_flags(struct vm_page *page)
+{
+	int32 count = 0;
+
+	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+	vm_page_mapping* mapping;
+	while ((mapping = iterator.Next()) != NULL) {
+		VMArea* area = mapping->area;
+		VMTranslationMap* map = area->address_space->TranslationMap();
+
+		bool modified;
+		if (map->ClearAccessedAndModified(area,
+				virtual_page_address(area, page), false, modified)) {
+			count++;
+		}
+
+		page->modified |= modified;
 	}
 
-	if (_flags != NULL) {
-		*_flags = (page->modified ? PAGE_MODIFIED : 0)
-			| (page->accessed ? PAGE_ACCESSED : 0);
-		// TODO: This return value is obviously not particularly useful, as
-		// the caller could simply check the page's flags.
+
+	if (page->accessed) {
+		count++;
+		page->accessed = false;
 	}
+
+	return count;
+}
+
+
+/*!	Removes all mappings of a page and/or clears the accessed bits of the
+	mappings.
+	The function iterates through the page mappings and removes them until
+	encountering one that has been accessed. From then on it will continue to
+	iterate, but only clear the accessed flag of the mapping. The page's
+	\c modified bit will be updated accordingly, the \c accessed bit will be
+	cleared.
+	\return The number of mapping accessed bits encountered, including the
+		\c accessed bit of the page itself. If \c 0 is returned, all mappings
+		of the page have been removed.
+*/
+int32
+vm_remove_all_page_mappings_if_unaccessed(struct vm_page *page)
+{
+	if (page->accessed)
+		return vm_clear_page_mapping_accessed_flags(page);
+
+	while (vm_page_mapping* mapping = page->mappings.Head()) {
+		VMArea* area = mapping->area;
+		VMTranslationMap* map = area->address_space->TranslationMap();
+		addr_t address = virtual_page_address(area, page);
+		bool modified = false;
+		if (map->ClearAccessedAndModified(area, address, true, modified)) {
+			page->accessed = true;
+			page->modified |= modified;
+			return vm_clear_page_mapping_accessed_flags(page);
+		}
+		page->modified |= modified;
+	}
+
+	return 0;
 }
 
 
@@ -3429,7 +3454,6 @@ status_t
 vm_init_post_thread(kernel_args* args)
 {
 	vm_page_init_post_thread(args);
-	vm_daemon_init();
 	slab_init_post_thread();
 	return heap_init_post_thread();
 }
@@ -3630,6 +3654,7 @@ struct PageFaultContext {
 	VMTranslationMap*		map;
 	VMCache*				topCache;
 	off_t					cacheOffset;
+	vm_page_reservation		reservation;
 	bool					isWrite;
 
 	// return values
@@ -3648,6 +3673,7 @@ struct PageFaultContext {
 	~PageFaultContext()
 	{
 		UnlockAll();
+		vm_page_unreserve_pages(&reservation);
 	}
 
 	void Prepare(VMCache* topCache, off_t cacheOffset)
@@ -3718,7 +3744,7 @@ fault_get_page(PageFaultContext& context)
 		// see if the backing store has it
 		if (cache->HasPage(context.cacheOffset)) {
 			// insert a fresh page and mark it busy -- we're going to read it in
-			page = vm_page_allocate_page(
+			page = vm_page_allocate_page(&context.reservation,
 				PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_BUSY);
 			cache->InsertPage(page, context.cacheOffset);
 
@@ -3773,7 +3799,8 @@ fault_get_page(PageFaultContext& context)
 		cache = context.isWrite ? context.topCache : lastCache;
 
 		// allocate a clean page
-		page = vm_page_allocate_page(PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_CLEAR);
+		page = vm_page_allocate_page(&context.reservation,
+			PAGE_STATE_ACTIVE | VM_PAGE_ALLOC_CLEAR);
 		FTRACE(("vm_soft_fault: just allocated page 0x%lx\n",
 			page->physical_page_number));
 
@@ -3787,7 +3814,7 @@ fault_get_page(PageFaultContext& context)
 		// TODO: If memory is low, it might be a good idea to steal the page
 		// from our source cache -- if possible, that is.
 		FTRACE(("get new page, copy it, and put it into the topmost cache\n"));
-		page = vm_page_allocate_page(PAGE_STATE_ACTIVE);
+		page = vm_page_allocate_page(&context.reservation, PAGE_STATE_ACTIVE);
 
 		// To not needlessly kill concurrency we unlock all caches but the top
 		// one while copying the page. Lacking another mechanism to ensure that
@@ -3832,7 +3859,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 	size_t reservePages = 2 + context.map->MaxPagesNeededToMap(originalAddress,
 		originalAddress);
 	context.addressSpaceLocker.Unlock();
-	vm_page_reserve_pages(reservePages,
+	vm_page_reserve_pages(&context.reservation, reservePages,
 		addressSpace == VMAddressSpace::Kernel()
 			? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 
@@ -3960,7 +3987,8 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 		}
 
 		if (mapPage) {
-			if (map_page(area, context.page, address, newProtection) != B_OK) {
+			if (map_page(area, context.page, address, newProtection,
+					&context.reservation, true) != B_OK) {
 				// Mapping can only fail, when the page mapping object couldn't
 				// be allocated. Save for the missing mapping everything is
 				// fine, though. We'll simply leave and probably fault again.
@@ -3979,14 +4007,13 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 
 				break;
 			}
-		}
+		} else if (context.page->state == PAGE_STATE_INACTIVE)
+			vm_page_set_state(context.page, PAGE_STATE_ACTIVE);
 
 		DEBUG_PAGE_ACCESS_END(context.page);
 
 		break;
 	}
-
-	vm_page_unreserve_pages(reservePages);
 
 	return status;
 }
@@ -5335,10 +5362,8 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 			bool unmapPage = page->Cache() != topCache
 				&& (protection & B_WRITE_AREA) != 0;
 
-			if (!unmapPage) {
-				map->Unmap(pageAddress, pageAddress + B_PAGE_SIZE - 1);
-				map->Map(pageAddress, physicalAddress, actualProtection);
-			}
+			if (!unmapPage)
+				map->ProtectPage(area, pageAddress, actualProtection);
 
 			map->Unlock();
 

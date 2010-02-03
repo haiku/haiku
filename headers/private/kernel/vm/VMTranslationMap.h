@@ -14,6 +14,7 @@
 
 
 struct kernel_args;
+struct vm_page_reservation;
 struct VMArea;
 
 
@@ -32,13 +33,15 @@ struct VMTranslationMap {
 
 	virtual	status_t			Map(addr_t virtualAddress,
 									addr_t physicalAddress,
-									uint32 attributes) = 0;
+									uint32 attributes,
+									vm_page_reservation* reservation) = 0;
 	virtual	status_t			Unmap(addr_t start, addr_t end) = 0;
 
 	// map not locked
-	virtual	status_t			UnmapPage(VMArea* area, addr_t address) = 0;
+	virtual	status_t			UnmapPage(VMArea* area, addr_t address,
+									bool updatePageQueue) = 0;
 	virtual	void				UnmapPages(VMArea* area, addr_t base,
-									size_t size);
+									size_t size, bool updatePageQueue);
 	virtual	void				UnmapArea(VMArea* area,
 									bool deletingAddressSpace,
 									bool ignoreTopCachePageFlags);
@@ -59,6 +62,11 @@ struct VMTranslationMap {
 
 	virtual	status_t			ClearFlags(addr_t virtualAddress,
 									uint32 flags) = 0;
+
+	virtual	bool				ClearAccessedAndModified(
+									VMArea* area, addr_t address,
+									bool unmapIfUnaccessed,
+									bool& _modified) = 0;
 
 	virtual	void				Flush() = 0;
 

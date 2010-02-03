@@ -31,12 +31,14 @@ struct X86VMTranslationMap : VMTranslationMap {
 
 	virtual	status_t			Map(addr_t virtualAddress,
 									addr_t physicalAddress,
-									uint32 attributes);
+									uint32 attributes,
+									vm_page_reservation* reservation);
 	virtual	status_t			Unmap(addr_t start, addr_t end);
 
-	virtual	status_t			UnmapPage(VMArea* area, addr_t address);
+	virtual	status_t			UnmapPage(VMArea* area, addr_t address,
+									bool updatePageQueue);
 	virtual	void				UnmapPages(VMArea* area, addr_t base,
-									size_t size);
+									size_t size, bool updatePageQueue);
 	virtual	void				UnmapArea(VMArea* area,
 									bool deletingAddressSpace,
 									bool ignoreTopCachePageFlags);
@@ -53,6 +55,11 @@ struct X86VMTranslationMap : VMTranslationMap {
 
 	virtual	status_t			ClearFlags(addr_t virtualAddress,
 									uint32 flags);
+
+	virtual	bool				ClearAccessedAndModified(
+									VMArea* area, addr_t address,
+									bool unmapIfUnaccessed,
+									bool& _modified);
 
 	virtual	void				Flush();
 

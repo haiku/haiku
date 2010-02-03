@@ -550,12 +550,13 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 		if (memory->pages == NULL)
 			return B_NO_MEMORY;
 
-		vm_page_reserve_pages(count, VM_PRIORITY_SYSTEM);
+		vm_page_reservation reservation;
+		vm_page_reserve_pages(&reservation, count, VM_PRIORITY_SYSTEM);
 		for (uint32 i = 0; i < count; i++) {
-			memory->pages[i] = vm_page_allocate_page(
+			memory->pages[i] = vm_page_allocate_page(&reservation,
 				PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
 		}
-		vm_page_unreserve_pages(count);
+		vm_page_unreserve_pages(&reservation);
 	}
 
 #ifdef DEBUG_PAGE_ACCESS

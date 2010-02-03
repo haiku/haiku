@@ -147,10 +147,12 @@ struct PPCVMTranslationMap : VMTranslationMap {
 
 	virtual	status_t			Map(addr_t virtualAddress,
 									addr_t physicalAddress,
-									uint32 attributes);
+									uint32 attributes,
+									vm_page_reservation* reservation);
 	virtual	status_t			Unmap(addr_t start, addr_t end);
 
-	virtual	status_t			UnmapPage(VMArea* area, addr_t address);
+	virtual	status_t			UnmapPage(VMArea* area, addr_t address,
+									bool updatePageQueue);
 
 	virtual	status_t			Query(addr_t virtualAddress,
 									addr_t* _physicalAddress,
@@ -163,6 +165,11 @@ struct PPCVMTranslationMap : VMTranslationMap {
 									uint32 attributes);
 	virtual	status_t			ClearFlags(addr_t virtualAddress,
 									uint32 flags);
+
+	virtual	bool				ClearAccessedAndModified(
+									VMArea* area, addr_t address,
+									bool unmapIfUnaccessed,
+									bool& _modified);
 
 	virtual	void				Flush();
 
@@ -389,7 +396,7 @@ PPCVMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 
 status_t
 PPCVMTranslationMap::Map(addr_t virtualAddress, addr_t physicalAddress,
-	uint32 attributes)
+	uint32 attributes, vm_page_reservation* reservation)
 {
 	// lookup the vsid based off the va
 	uint32 virtualSegmentID = VADDR_TO_VSID(fVSIDBase, virtualAddress);
@@ -463,7 +470,8 @@ PPCVMTranslationMap::Unmap(addr_t start, addr_t end)
 
 
 status_t
-PPCVMTranslationMap::UnmapPage(VMArea* area, addr_t address)
+PPCVMTranslationMap::UnmapPage(VMArea* area, addr_t address,
+	bool updatePageQueue)
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
 
@@ -513,10 +521,20 @@ PPCVMTranslationMap::UnmapPage(VMArea* area, addr_t address)
 	} else
 		page->wired_count--;
 
-	if (page->wired_count == 0 && page->mappings.IsEmpty())
+	locker.Unlock();
+
+	if (page->wired_count == 0 && page->mappings.IsEmpty()) {
 		atomic_add(&gMappedPagesCount, -1);
 
-	locker.Unlock();
+		if (updatePageQueue) {
+			if (page->Cache()->temporary)
+				vm_page_set_state(page, PAGE_STATE_INACTIVE);
+			else if (page->modified)
+				vm_page_set_state(page, PAGE_STATE_MODIFIED);
+			else
+				vm_page_set_state(page, PAGE_STATE_CACHED);
+		}
+	}
 
 	if (mapping != NULL) {
 		bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
@@ -601,6 +619,52 @@ PPCVMTranslationMap::ClearFlags(addr_t virtualAddress, uint32 flags)
 	}
 
 	return B_OK;
+}
+
+
+bool
+PPCVMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
+	bool unmapIfUnaccessed, bool& _modified)
+{
+	// TODO: Implement for real! ATM this is just an approximation using
+	// Query(), ClearFlags(), and UnmapPage(). See below!
+
+	RecursiveLocker locker(fLock);
+
+	uint32 flags;
+	addr_t physicalAddress;
+	if (Query(address, &physicalAddress, &flags) != B_OK
+		|| (flags & PAGE_PRESENT) == 0) {
+		return false;
+	}
+
+	_modified = (flags & PAGE_MODIFIED) != 0;
+
+	if ((flags & (PAGE_ACCESSED | PAGE_MODIFIED)) != 0)
+		ClearFlags(address, flags & (PAGE_ACCESSED | PAGE_MODIFIED));
+
+	if ((flags & PAGE_ACCESSED) != 0)
+		return true;
+
+	if (!unmapIfUnaccessed)
+		return false;
+
+	locker.Unlock();
+
+	UnmapPage(area, address, false);
+		// TODO: Obvious race condition: Between querying and unmapping the
+		// page could have been accessed. We try to compensate by considering
+		// vm_page::{accessed,modified} (which would have been updated by
+		// UnmapPage()) below, but that doesn't quite match the required
+		// semantics of the method.
+
+	vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+	if (page == NULL)
+		return false;
+
+	_modified |= page->modified;
+
+	return page->accessed;
 }
 
 
@@ -786,11 +850,15 @@ ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
 	PPCVMTranslationMap* map = static_cast<PPCVMTranslationMap*>(
 		addressSpace->TranslationMap());
 
+	vm_page_reservation reservation;
+	vm_page_reserve_pages(&reservation, 0, VM_PRIORITY_USER);
+		// We don't need any pages for mapping.
+
 	// map the pages
 	for (; virtualAddress < virtualEnd;
 		 virtualAddress += B_PAGE_SIZE, physicalAddress += B_PAGE_SIZE) {
 		status_t error = map->Map(virtualAddress, physicalAddress,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &reservation);
 		if (error != B_OK)
 			return error;
 	}

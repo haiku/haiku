@@ -743,7 +743,6 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 
 	page->cache_offset = (page_num_t)(offset >> PAGE_SHIFT);
 	page_count++;
-	page->usage_count = 2;
 	page->SetCacheRef(fCacheRef);
 
 #if KDEBUG
@@ -1076,7 +1075,7 @@ VMCache::Resize(off_t newSize, int priority)
 
 			// remove the page and put it into the free queue
 			DEBUG_PAGE_ACCESS_START(page);
-			vm_remove_all_page_mappings(page, NULL);
+			vm_remove_all_page_mappings(page);
 			ASSERT(page->wired_count == 0);
 				// TODO: Find a real solution! Unmapping is probably fine, but
 				// we have no way of unmapping wired pages here.
