@@ -80,6 +80,10 @@ struct ifconf {
 	};
 };
 
+#define _SIZEOF_ADDR_IFREQ(request) \
+	(sizeof((request).ifr_name) + (request).ifr_addr.sa_len)
+
+
 /* POSIX definitions follow */
 
 struct if_nameindex {
