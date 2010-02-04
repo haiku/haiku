@@ -48,15 +48,18 @@ main(int, char **argv)
 		
 		if (strcmp(argv[i], "--list") == 0) {
 			int32 count = deskbar.CountItems();
-
+			int32 found = 0;
+			int32 j = 0;
 			printf("Deskbar items:\n");
 
-			for (int32 i = 0; i < count; i++) {
+			while (found < count) {
 				const char *name = NULL;
-				if (deskbar.GetItemInfo(i, &name) == B_OK) {
-					printf("Item %ld: '%s'\n", i, name);
+				if (deskbar.GetItemInfo(j, &name) == B_OK) {
+					printf("Item %ld: '%s'\n", j, name);
 					free((void *)name);
+					found++;
 				}
+				j++;
 			}
 			return 0;
 		}
@@ -137,7 +140,7 @@ main(int, char **argv)
 		err = deskbar.AddItem(&ref);
 		if (err != B_OK) {
 			err = deskbar.AddItem(new DeskButton(BRect(0, 0, 15, 15),
-				&ref, "DeskButton", titleList, actionList));
+				&ref, ref.name, titleList, actionList));
 			if (err != B_OK) {
 				printf("desklink: Deskbar refuses link to '%s': %s\n", argv[i], strerror(err));
 				return 1;
