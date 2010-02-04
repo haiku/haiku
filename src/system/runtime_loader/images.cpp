@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
+
 #include <syscalls.h>
 #include <vm_defs.h>
 
@@ -449,11 +451,41 @@ register_image(image_t* image, int fd, const char* path)
 		info.node = -1;
 	}
 
+	// We may have split segments into separate regions. Compute the correct
+	// segments for the image info.
+	addr_t textBase = 0;
+	addr_t textEnd = 0;
+	addr_t dataBase = 0;
+	addr_t dataEnd = 0;
+	for (uint32 i= 0; i < image->num_regions; i++) {
+		addr_t base = image->regions[i].vmstart;
+		addr_t end = base + image->regions[i].vmsize;
+		if (image->regions[i].flags & RFLAG_RW) {
+			// data
+			if (dataBase == 0) {
+				dataBase = base;
+				dataEnd = end;
+			} else {
+				dataBase = std::min(dataBase, base);
+				dataEnd = std::max(dataEnd, end);
+			}
+		} else {
+			// text
+			if (textBase == 0) {
+				textBase = base;
+				textEnd = end;
+			} else {
+				textBase = std::min(textBase, base);
+				textEnd = std::max(textEnd, end);
+			}
+		}
+	}
+
 	strlcpy(info.name, path, sizeof(info.name));
-	info.text = (void *)image->regions[0].vmstart;
-	info.text_size = image->regions[0].vmsize;
-	info.data = (void *)image->regions[1].vmstart;
-	info.data_size = image->regions[1].vmsize;
+	info.text = (void*)textBase;
+	info.text_size = textEnd - textBase;
+	info.data = (void*)dataBase;
+	info.data_size = dataEnd - dataBase;
 	info.api_version = image->api_version;
 	info.abi = image->abi;
 	image->id = _kern_register_image(&info, sizeof(image_info));
