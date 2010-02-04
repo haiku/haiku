@@ -98,8 +98,9 @@ write_attributes(BNode &out, const char *inFileName, BResources &resources,
 		const void *data = resources.LoadResource(type, id, &size);
 		if (!data && size > 0) {
 			// should not happen
-			fprintf(stderr, "Failed to get resource `%s', type: %lx, id: %ld "
-				"from input file `%s'\n", name, type, id, inFileName);
+			fprintf(stderr, "Failed to get resource `%s', type: %" B_PRIx32
+				", id: %" B_PRId32 " from input file `%s'\n", name, type, id,
+				inFileName);
 			exit(1);
 		}
 
@@ -257,7 +258,7 @@ attributes_to_resources(const char *outputFile, const char **inputFiles,
 		}
 
 		// add the resources
-		
+
 		write_resources(resources, inputFiles[i], in, resID);
 	}
 }

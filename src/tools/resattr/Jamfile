@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src tools resattr ;
 
 USES_BE_API on <build>resattr = true ;
 
-BuildPlatformMain <build>resattr : resattr.cpp ;
-LinkAgainst <build>resattr : $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
+BuildPlatformMain <build>resattr : resattr.cpp
+	: $(HOST_LIBBE) $(HOST_LIBSUPC++) ;
 
+SEARCH on [ FGristFiles resattr.cpp ] = [ FDirName $(HAIKU_TOP) src bin ] ;

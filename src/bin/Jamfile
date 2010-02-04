@@ -113,6 +113,7 @@ StdBinCommands
 	dstcheck.cpp
 	hey.cpp
 	reindex.cpp
+	resattr.cpp
 	settype.cpp
 	spybmessage.cpp
 	urlwrapper.cpp
