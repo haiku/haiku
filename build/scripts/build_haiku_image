@@ -34,11 +34,14 @@ fi
 
 # If the haiku image path is a symlink resolve it now (makebootable needs the
 # path of the actual device path under Linux).
+normalizedImagePath=''
 if readlink -f "$imagePath" > /dev/null 2>&1 ; then
 	normalizedImagePath=$(readlink -f "$imagePath")
-	if [ "$normalizedImagePath" ]; then
-		imagePath="$normalizedImagePath"
-	fi
+elif greadlink -f "$imagePath" > /dev/null 2>&1 ; then
+	normalizedImagePath=$(greadlink -f "$imagePath")
+fi
+if [ -n "$normalizedImagePath" ]; then
+	imagePath="$normalizedImagePath"
 fi
 
 # this adds the build library dir to LD_LIBRARY_PATH
