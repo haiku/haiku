@@ -815,7 +815,7 @@ void
 DragSortableListView::_RemoveDropAnticipationRect()
 {
 	_SetDropAnticipationRect(BRect(0.0, 0.0, -1.0, -1.0));
-//	_SetDropIndex(-1);
+	_SetDropIndex(-1);
 }
 
 // _SetDragMessage
