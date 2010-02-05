@@ -686,6 +686,9 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface,
 
 		if (flags != 0) {
 			request.ifr_flags = (currentFlags & ~IFF_CONFIGURING) | flags;
+			if (!autoConfigured)
+				request.ifr_flags = request.ifr_flags & ~IFF_AUTO_CONFIGURED;
+
 			if (ioctl(familySocket, SIOCSIFFLAGS, &request, sizeof(struct ifreq)) < 0)
 				fprintf(stderr, "%s: Setting flags failed: %s\n", Name(), strerror(errno));
 		}
