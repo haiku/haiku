@@ -24,9 +24,8 @@
 #include "generic_vm_physical_page_mapper.h"
 
 
-
 void *
-m68k_translation_map_get_pgdir(vm_translation_map *map)
+m68k_translation_map_get_pgdir(VMTranslationMap *map)
 {
 	return NULL;
 #warning ARM:WRITEME
@@ -38,7 +37,8 @@ m68k_translation_map_get_pgdir(vm_translation_map *map)
 
 
 status_t
-arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
+arch_vm_translation_map_init(kernel_args *args,
+        VMPhysicalPageMapper** _physicalPageMapper)
 {
 	return NULL;
 #warning ARM:WRITEME
@@ -46,9 +46,15 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 //get_vm_ops()->arch_vm_translation_map_init_map(map, kernel);
 }
 
+status_t
+arch_vm_translation_map_create_map(bool kernel, VMTranslationMap** _map)
+{ 
+	return NULL;
+#warning ARM:WRITEME
+}
 
 status_t
-arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
+arch_vm_translation_map_init_kernel_map_post_sem(VMTranslationMap *map)
 {
 	return NULL;
 #warning ARM:WRITEME
