@@ -34,7 +34,7 @@ fi
 
 # If the haiku image path is a symlink resolve it now (makebootable needs the
 # path of the actual device path under Linux).
-if readlink -f "$imagePath" 2>&1 > /dev/null; then
+if readlink -f "$imagePath" > /dev/null 2>&1 ; then
 	normalizedImagePath=$(readlink -f "$imagePath")
 	if [ "$normalizedImagePath" ]; then
 		imagePath="$normalizedImagePath"
