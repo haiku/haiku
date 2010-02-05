@@ -181,6 +181,9 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 		AddSymlinkToHaikuImage beos : ../common/etc ;
 		AddSymlinkToHaikuImage beos : ../system/preferences ;
 		AddSymlinkToHaikuImage beos : ../system ;
+		AddDirectoryToHaikuImage var ;
+		AddSymlinkToHaikuImage var : /boot/common/var/log ;
+		AddSymlinkToHaikuImage var : /boot/common/cache/tmp ;
 	}
 }
 
