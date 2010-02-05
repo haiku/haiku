@@ -2691,7 +2691,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	fLook = look;
 	fFlags = flags | B_ASYNCHRONOUS_CONTROLS;
 
-	fInTransaction = false;
+	fInTransaction = bitmapToken >= 0;
 	fUpdateRequested = false;
 	fActive = false;
 	fShowLevel = 0;
