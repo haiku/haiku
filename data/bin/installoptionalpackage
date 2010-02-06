@@ -171,7 +171,7 @@ function AddSymlinkToHaikuImage()
  	TrimLeadingSpace linkName
 	TrimEndingSpace linkName
 	
-	mkdir -p "${dirTokens}"
+	mkdir -p "\${dirTokens}"
 	
 	if [ "\${linkName}" == '' ] ; then
 		ln -sf "\${linkTarget}" -t "\${dirTokens}"
