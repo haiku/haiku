@@ -112,13 +112,16 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 
 
 # BasicCommandLineTools
-if [ IsOptionalHaikuImagePackageAdded BasicCommandLineTools ]
-		&& $(TARGET_ARCH) = x86 {
-	# sed
-	InstallOptionalHaikuImagePackage sed-4.2.1-r1a1-x86-gcc2-2009-08-30
-		: $(baseURL)/sed-4.2.1-r1a1-x86-gcc2-2009-08-30.zip
-		:
-		: true ;
+if [ IsOptionalHaikuImagePackageAdded BasicCommandLineTools ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package BasicCommandLineTools available for $(TARGET_ARCH)" ;
+	} else {
+		# sed
+		InstallOptionalHaikuImagePackage sed-4.2.1-r1a1-x86-gcc2-2009-08-30
+			: $(baseURL)/sed-4.2.1-r1a1-x86-gcc2-2009-08-30.zip
+			:
+			: true ;
+	}
 }
 
 
