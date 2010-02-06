@@ -98,6 +98,7 @@ private:
 			BRect				_BarFrame(const font_height* fontHeight
 									= NULL) const;
 			float				_BarPosition(const BRect& barFrame) const;
+			bool				_HasText() const;
 
 			BString				fLabel;
 			BString				fTrailingLabel;

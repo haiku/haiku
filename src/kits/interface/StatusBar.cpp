@@ -207,11 +207,14 @@ BStatusBar::GetPreferredSize(float* _width, float* _height)
 	}
 
 	if (_height) {
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
+		float labelHeight = 0;
+		if (_HasText()) {
+			font_height fontHeight;
+			GetFontHeight(&fontHeight);
+			labelHeight = ceilf(fontHeight.ascent + fontHeight.descent) + 6;
+		}
 
-		*_height = ceilf(fontHeight.ascent + fontHeight.descent) + 6
-			+ BarHeight();
+		*_height = labelHeight + BarHeight();
 	}
 }
 
@@ -475,9 +478,13 @@ BStatusBar::SetBarHeight(float barHeight)
 		return;
 
 	// resize so that the height fits
-	float width, height;
-	GetPreferredSize(&width, &height);
-	ResizeTo(Bounds().Width(), height);
+	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
+		InvalidateLayout();
+	} else {
+		float width, height;
+		GetPreferredSize(&width, &height);
+		ResizeTo(Bounds().Width(), height);
+	}
 }
 
 
@@ -813,13 +820,15 @@ BStatusBar::_SetTextData(BString& text, const char* source,
 BRect
 BStatusBar::_BarFrame(const font_height* fontHeight) const
 {
-	float top;
-	if (fontHeight == NULL) {
-		font_height height;
-		GetFontHeight(&height);
-		top = ceilf(height.ascent + height.descent) + 6;
-	} else
-		top = ceilf(fontHeight->ascent + fontHeight->descent) + 6;
+	float top = 2;
+	if (_HasText()) {
+		if (fontHeight == NULL) {
+			font_height height;
+			GetFontHeight(&height);
+			top = ceilf(height.ascent + height.descent) + 6;
+		} else
+			top = ceilf(fontHeight->ascent + fontHeight->descent) + 6;
+	}
 
 	return BRect(2, top, Bounds().right - 2, top + BarHeight() - 4);
 }
@@ -835,3 +844,10 @@ BStatusBar::_BarPosition(const BRect& barFrame) const
 		+ (fCurrent * (barFrame.Width() + 3) / fMax));
 }
 
+
+bool
+BStatusBar::_HasText() const
+{
+	return fLabel.Length() > 0 || fTrailingLabel.Length() > 0
+		|| fTrailingText.Length() > 0 || fText.Length() > 0;
+}
