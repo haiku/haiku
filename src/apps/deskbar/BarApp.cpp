@@ -524,7 +524,7 @@ TBarApp::RefsReceived(BMessage* refs)
 
 		BEntry entry(&ref);
 		if (!entry.IsDirectory())
-			TrackerLaunch(&refsReceived, true);
+			TrackerLaunch(&refsReceived, false);
 	}
 }
 
