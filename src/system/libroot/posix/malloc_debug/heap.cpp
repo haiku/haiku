@@ -947,7 +947,7 @@ heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount,
 			for (uint32 j = 1; j < pageCount; j++) {
 				if (area->page_table[i + j].in_use) {
 					first = -1;
-					i += j;
+					i += j / step * step;
 					break;
 				}
 			}
