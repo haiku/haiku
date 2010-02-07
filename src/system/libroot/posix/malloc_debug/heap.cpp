@@ -23,10 +23,13 @@
 
 //#define TRACE_HEAP
 #ifdef TRACE_HEAP
-#	define INFO(x) printf x
+#	define INFO(x) debug_printf x
 #else
 #	define INFO(x) ;
 #endif
+
+#undef ASSERT
+#define ASSERT(x)	if (!(x)) panic("assert failed: %s", #x);
 
 
 void
@@ -770,6 +773,9 @@ heap_create_allocator(const char *name, addr_t base, size_t size,
 	size_t binSize = 0, lastSize = 0;
 	uint32 count = heap->page_size / heapClass->min_bin_size;
 	for (; count >= heapClass->min_count_per_page; count--, lastSize = binSize) {
+		if (heap->bin_count >= 32)
+			panic("heap configuration invalid - max bin count reached\n");
+
 		binSize = (heap->page_size / count) & ~(heapClass->bin_alignment - 1);
 		if (binSize == lastSize)
 			continue;
@@ -782,9 +788,6 @@ heap_create_allocator(const char *name, addr_t base, size_t size,
 		bin->max_free_count = heap->page_size / binSize;
 		bin->page_list = NULL;
 		heap->bin_count++;
-
-		if (heap->bin_count >= 32)
-			panic("heap configuration invalid - max bin count reached\n");
 	};
 
 	base += heap->bin_count * sizeof(heap_bin);
@@ -913,30 +916,46 @@ heap_unlink_page(heap_page *page, heap_page **list)
 
 
 static heap_page *
-heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount)
+heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount,
+	size_t alignment)
 {
 	heap_area *area = heap->areas;
 	while (area) {
-		bool found = false;
+		if (area->free_page_count < pageCount) {
+			area = area->next;
+			continue;
+		}
+
+		uint32 step = 1;
+		uint32 firstValid = 0;
+		const uint32 lastValid = area->page_count - pageCount + 1;
+
+		if (alignment > heap->page_size) {
+			firstValid = (ROUNDUP(area->base, alignment) - area->base)
+				/ heap->page_size;
+			step = alignment / heap->page_size;
+		}
+
 		int32 first = -1;
-		for (uint32 i = 0; i < area->page_count; i++) {
-			if (area->page_table[i].in_use) {
-				first = -1;
+		for (uint32 i = firstValid; i < lastValid; i += step) {
+			if (area->page_table[i].in_use)
 				continue;
-			}
 
-			if (first < 0)
-				first = i;
+			first = i;
 
-			if (first >= 0) {
-				if ((i + 1 - first) == pageCount) {
-					found = true;
+			for (uint32 j = 1; j < pageCount; j++) {
+				if (area->page_table[i + j].in_use) {
+					first = -1;
+					i += j;
 					break;
 				}
 			}
+
+			if (first >= 0)
+				break;
 		}
 
-		if (!found) {
+		if (first < 0) {
 			area = area->next;
 			continue;
 		}
@@ -961,100 +980,107 @@ heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount)
 }
 
 
-static void *
-heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
+static void
+heap_add_leak_check_info(addr_t address, size_t allocated, size_t size)
 {
-	INFO(("raw_alloc: heap %p; size %lu; bin %lu\n", heap, size, binIndex));
-	if (binIndex < heap->bin_count) {
-		heap_bin *bin = &heap->bins[binIndex];
-		MutexLocker binLocker(bin->lock);
+	size -= sizeof(addr_t) + sizeof(heap_leak_check_info);
+	heap_leak_check_info *info = (heap_leak_check_info *)(address + allocated
+		- sizeof(heap_leak_check_info));
+	info->thread = find_thread(NULL);
+	info->size = size;
 
-		heap_page *page = bin->page_list;
-		if (page == NULL) {
-			MutexLocker pageLocker(heap->page_lock);
-			heap_area *area = heap->areas;
-			if (area == NULL) {
-				INFO(("heap %p: no free pages to allocate %lu bytes\n", heap,
-					size));
-				return NULL;
-			}
+	addr_t wallAddress = address + size;
+	memcpy((void *)wallAddress, &wallAddress, sizeof(addr_t));
+}
 
-			// by design there are only areas in the list that still have
-			// free pages available
-			page = area->free_pages;
-			area->free_pages = page->next;
-			if (page->next)
-				page->next->prev = NULL;
 
-			heap_free_pages_removed(heap, area, 1);
-
-			if (page->in_use)
-				panic("got an in use page from the free pages list\n");
-			page->in_use = 1;
-
-			pageLocker.Unlock();
-
-			page->bin_index = binIndex;
-			page->free_count = bin->max_free_count;
-			page->empty_index = 0;
-			page->free_list = NULL;
-			page->next = page->prev = NULL;
-			bin->page_list = page;
-		}
-
-		// we have a page where we have a free slot
-		void *address = NULL;
-		if (page->free_list) {
-			// there's a previously freed entry we can use
-			address = page->free_list;
-			page->free_list = (addr_t *)*page->free_list;
-		} else {
-			// the page hasn't been fully allocated so use the next empty_index
-			address = (void *)(page->area->base + page->index * heap->page_size
-				+ page->empty_index * bin->element_size);
-			page->empty_index++;
-		}
-
-		page->free_count--;
-		if (page->free_count == 0) {
-			// the page is now full so we remove it from the page_list
-			bin->page_list = page->next;
-			if (page->next)
-				page->next->prev = NULL;
-			page->next = page->prev = NULL;
-		}
-
-		size -= sizeof(addr_t) + sizeof(heap_leak_check_info);
-		heap_leak_check_info *info = (heap_leak_check_info *)((addr_t)address
-			+ bin->element_size - sizeof(heap_leak_check_info));
-		info->thread = find_thread(NULL);
-		info->size = size;
-
-		addr_t wallAddress = (addr_t)address + size;
-		memcpy((void *)wallAddress, &wallAddress, sizeof(addr_t));
-		return address;
-	}
+static void *
+heap_raw_alloc(heap_allocator *heap, size_t size, size_t alignment)
+{
+	INFO(("heap %p: allocate %lu bytes from raw pages with alignment %lu\n",
+		heap, size, alignment));
 
 	MutexLocker pageLocker(heap->page_lock);
 	uint32 pageCount = (size + heap->page_size - 1) / heap->page_size;
-	heap_page *firstPage = heap_allocate_contiguous_pages(heap, pageCount);
+	heap_page *firstPage = heap_allocate_contiguous_pages(heap, pageCount,
+		alignment);
 	if (firstPage == NULL) {
 		INFO(("heap %p: found no contiguous pages to allocate %ld bytes\n",
 			heap, size));
 		return NULL;
 	}
 
-	size -= sizeof(addr_t) + sizeof(heap_leak_check_info);
-	heap_leak_check_info *info = (heap_leak_check_info *)(firstPage->area->base
-		+ (firstPage->index + pageCount) * heap->page_size
-		- sizeof(heap_leak_check_info));
-	info->thread = find_thread(NULL);
-	info->size = size;
-
 	addr_t address = firstPage->area->base + firstPage->index * heap->page_size;
-	addr_t wallAddress = address + size;
-	memcpy((void *)wallAddress, &wallAddress, sizeof(addr_t));
+	heap_add_leak_check_info(address, pageCount * heap->page_size, size);
 	return (void *)address;
+}
+
+
+static void *
+heap_allocate_from_bin(heap_allocator *heap, uint32 binIndex, size_t size)
+{
+	heap_bin *bin = &heap->bins[binIndex];
+	INFO(("heap %p: allocate %lu bytes from bin %lu with element_size %lu\n",
+		heap, size, binIndex, bin->element_size));
+
+	MutexLocker binLocker(bin->lock);
+	heap_page *page = bin->page_list;
+	if (page == NULL) {
+		MutexLocker pageLocker(heap->page_lock);
+		heap_area *area = heap->areas;
+		if (area == NULL) {
+			INFO(("heap %p: no free pages to allocate %lu bytes\n", heap,
+				size));
+			return NULL;
+		}
+
+		// by design there are only areas in the list that still have
+		// free pages available
+		page = area->free_pages;
+		area->free_pages = page->next;
+		if (page->next)
+			page->next->prev = NULL;
+
+		heap_free_pages_removed(heap, area, 1);
+
+		if (page->in_use)
+			panic("got an in use page from the free pages list\n");
+		page->in_use = 1;
+
+		pageLocker.Unlock();
+
+		page->bin_index = binIndex;
+		page->free_count = bin->max_free_count;
+		page->empty_index = 0;
+		page->free_list = NULL;
+		page->next = page->prev = NULL;
+		bin->page_list = page;
+	}
+
+	// we have a page where we have a free slot
+	void *address = NULL;
+	if (page->free_list) {
+		// there's a previously freed entry we can use
+		address = page->free_list;
+		page->free_list = (addr_t *)*page->free_list;
+	} else {
+		// the page hasn't been fully allocated so use the next empty_index
+		address = (void *)(page->area->base + page->index * heap->page_size
+			+ page->empty_index * bin->element_size);
+		page->empty_index++;
+	}
+
+	page->free_count--;
+	if (page->free_count == 0) {
+		// the page is now full so we remove it from the page_list
+		bin->page_list = page->next;
+		if (page->next)
+			page->next->prev = NULL;
+		page->next = page->prev = NULL;
+	}
+
+	heap_add_leak_check_info((addr_t)address, bin->element_size, size);
+	return address;
 }
 
 
@@ -1078,23 +1104,35 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 
 	size += sizeof(addr_t) + sizeof(heap_leak_check_info);
 
-	if (alignment != 0) {
-		// TODO: The alignment is done by ensuring that the element size
-		// of the target bin is aligned with the requested alignment. This
-		// has the problem that it wastes space because a better (smaller) bin
-		// could possibly be selected. We should pick the best bin and check
-		// if there is an aligned block in the free list or if a new (page
-		// aligned) page has to be allocated anyway.
-		size = ROUNDUP(size, alignment);
+	void *address = NULL;
+	if (alignment < B_PAGE_SIZE) {
+		if (alignment != 0) {
+			// TODO: The alignment is done by ensuring that the element size
+			// of the target bin is aligned with the requested alignment. This
+			// has the problem that it wastes space because a better (smaller)
+			// bin could possibly be selected. We should pick the best bin and
+			// check if there is an aligned block in the free list or if a new
+			// (page aligned) page has to be allocated anyway.
+			size = ROUNDUP(size, alignment);
+			for (uint32 i = 0; i < heap->bin_count; i++) {
+				if (size <= heap->bins[i].element_size
+					&& is_valid_alignment(heap->bins[i].element_size)) {
+					address = heap_allocate_from_bin(heap, i, size);
+					break;
+				}
+			}
+		} else {
+			for (uint32 i = 0; i < heap->bin_count; i++) {
+				if (size <= heap->bins[i].element_size) {
+					address = heap_allocate_from_bin(heap, i, size);
+					break;
+				}
+			}
+		}
 	}
 
-	uint32 binIndex;
-	for (binIndex = 0; binIndex < heap->bin_count; binIndex++) {
-		if (size <= heap->bins[binIndex].element_size)
-			break;
-	}
-
-	void *address = heap_raw_alloc(heap, size, binIndex);
+	if (address == NULL)
+		address = heap_raw_alloc(heap, size, alignment);
 
 	size -= sizeof(addr_t) + sizeof(heap_leak_check_info);
 
@@ -1550,7 +1588,11 @@ __init_heap(void)
 void *
 memalign(size_t alignment, size_t size)
 {
-	if (size > HEAP_AREA_USE_THRESHOLD) {
+	size_t alignedSize = size + sizeof(addr_t) + sizeof(heap_leak_check_info);
+	if (alignment != 0 && alignment < B_PAGE_SIZE)
+		alignedSize = ROUNDUP(alignedSize, alignment);
+
+	if (alignedSize >= HEAP_AREA_USE_THRESHOLD) {
 		// don't even attempt such a huge allocation - use areas instead
 		size_t areaSize = ROUNDUP(size + sizeof(area_allocation_info)
 			+ alignment, B_PAGE_SIZE);
@@ -1592,7 +1634,9 @@ memalign(size_t alignment, size_t size)
 		return address;
 	}
 
-	uint32 heapClass = heap_class_for(size);
+	uint32 heapClass = alignment < B_PAGE_SIZE
+		? heap_class_for(alignedSize) : 0;
+
 	heap_allocator *heap = sHeaps[heapClass];
 	void *result = heap_memalign(heap, alignment, size);
 	if (result == NULL) {
@@ -1608,6 +1652,9 @@ memalign(size_t alignment, size_t size)
 		panic("heap: heap has run out of memory trying to allocate %lu bytes\n",
 			size);
 	}
+
+	if (alignment != 0)
+		ASSERT((addr_t)result % alignment == 0);
 
 	return result;
 }
