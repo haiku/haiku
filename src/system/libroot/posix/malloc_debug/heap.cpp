@@ -919,6 +919,7 @@ static heap_page *
 heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount,
 	size_t alignment)
 {
+	MutexLocker pageLocker(heap->page_lock);
 	heap_area *area = heap->areas;
 	while (area) {
 		if (area->free_page_count < pageCount) {
@@ -1000,7 +1001,6 @@ heap_raw_alloc(heap_allocator *heap, size_t size, size_t alignment)
 	INFO(("heap %p: allocate %lu bytes from raw pages with alignment %lu\n",
 		heap, size, alignment));
 
-	MutexLocker pageLocker(heap->page_lock);
 	uint32 pageCount = (size + heap->page_size - 1) / heap->page_size;
 	heap_page *firstPage = heap_allocate_contiguous_pages(heap, pageCount,
 		alignment);
@@ -1079,6 +1079,7 @@ heap_allocate_from_bin(heap_allocator *heap, uint32 binIndex, size_t size)
 		page->next = page->prev = NULL;
 	}
 
+	binLocker.Unlock();
 	heap_add_leak_check_info((addr_t)address, bin->element_size, size);
 	return address;
 }
