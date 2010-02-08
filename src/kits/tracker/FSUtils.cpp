@@ -2375,6 +2375,7 @@ FSGetTrashDir(BDirectory *trashDir, dev_t dev)
 }
 
 
+#if __GNUC__ && __GNUC__ <3
 // obsolete version of FSGetDeskDir retained for bin compat with
 // BeIDE and a few other apps that apparently use it
 status_t
@@ -2384,6 +2385,7 @@ FSGetDeskDir(BDirectory *deskDir, dev_t)
 	// than /boot, redirect to FSGetDeskDir ignoring the volume argument
 	return FSGetDeskDir(deskDir);
 }
+#endif
 
 
 status_t
