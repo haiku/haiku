@@ -2375,6 +2375,17 @@ FSGetTrashDir(BDirectory *trashDir, dev_t dev)
 }
 
 
+// obsolete version of FSGetDeskDir retained for bin compat with
+// BeIDE and a few other apps that apparently use it
+status_t
+FSGetDeskDir(BDirectory *deskDir, dev_t)
+{
+	// since we no longer keep a desktop directory on any volume other
+	// than /boot, redirect to FSGetDeskDir ignoring the volume argument
+	return FSGetDeskDir(deskDir);
+}
+
+
 status_t
 FSGetDeskDir(BDirectory *deskDir)
 {
