@@ -246,15 +246,7 @@ dump_allocator(heap_allocator *heap, bool areas, bool bins)
 }
 
 
-void
-dump_heap_list(int argc, char **argv)
-{
-	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
-		dump_allocator(sHeaps[i], true, true);
-}
-
-
-void
+static void
 dump_allocations(bool statsOnly, thread_id thread)
 {
 	size_t totalSize = 0;
@@ -346,7 +338,7 @@ dump_allocations(bool statsOnly, thread_id thread)
 }
 
 
-void
+static void
 heap_validate_walls()
 {
 	for (uint32 classIndex = 0; classIndex < HEAP_CLASS_COUNT; classIndex++) {
@@ -1503,21 +1495,25 @@ heap_create_new_heap_area(heap_allocator *heap, const char *name, size_t size)
 static int32
 heap_wall_checker(void *data)
 {
+	int msInterval = (int32)data;
 	while (!sStopWallChecking) {
 		heap_validate_walls();
-		snooze(1 * 1000 * 1000);
+		snooze(msInterval * 1000);
 	}
 
 	return 0;
 }
 
 
+//	#pragma mark - Heap Debug API
+
+
 extern "C" status_t
-heap_debug_start_wall_checking()
+heap_debug_start_wall_checking(int msInterval)
 {
 	if (sWallCheckThread < 0) {
 		sWallCheckThread = spawn_thread(heap_wall_checker, "heap wall checker",
-			B_LOW_PRIORITY, NULL);
+			B_LOW_PRIORITY, (void *)msInterval);
 	}
 
 	if (sWallCheckThread < 0)
@@ -1537,21 +1533,44 @@ heap_debug_stop_wall_checking()
 }
 
 
-extern "C" status_t
+extern "C" void
 heap_debug_set_paranoid_validation(bool enabled)
 {
 	sParanoidValidation = enabled;
-	return B_OK;
 }
 
 
-extern "C" void *
-sbrk_hook(long)
+extern "C" void
+heap_debug_validate_heaps()
 {
-	debug_printf("sbrk not supported on malloc debug\n");
-	panic("sbrk not supported on malloc debug\n");
-	return NULL;
+	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
+		heap_validate_heap(sHeaps[i]);
 }
+
+
+extern "C" void
+heap_debug_validate_walls()
+{
+	heap_validate_walls();
+}
+
+
+extern "C" void
+heap_debug_dump_allocations(bool statsOnly, thread_id thread)
+{
+	dump_allocations(statsOnly, thread);
+}
+
+
+extern "C" void
+heap_debug_dump_heaps(bool dumpAreas, bool dumpBins)
+{
+	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
+		dump_allocator(sHeaps[i], dumpAreas, dumpBins);
+}
+
+
+//	#pragma mark - Init
 
 
 extern "C" status_t
@@ -1584,6 +1603,15 @@ __init_heap(void)
 
 
 //	#pragma mark - Public API
+
+
+extern "C" void *
+sbrk_hook(long)
+{
+	debug_printf("sbrk not supported on malloc debug\n");
+	panic("sbrk not supported on malloc debug\n");
+	return NULL;
+}
 
 
 void *
