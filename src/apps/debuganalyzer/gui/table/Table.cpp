@@ -591,6 +591,7 @@ Table::TableRowsAdded(TableModel* model, int32 rowIndex, int32 count)
 			TableField* field = new(std::nothrow) TableField(i);
 			if (field == NULL) {
 				// TODO: Report error!
+				delete row;
 				return;
 			}
 

@@ -182,12 +182,9 @@ PartitioningDialog::_Init(BDiskScannerParameterEditor *editor)
 				delete okMessage;
 			if (!cancelButton && cancelMessage)
 				delete cancelMessage;
-			if (okButton)
-				delete okButton;
-			if (cancelButton)
-				delete cancelButton;
-			if (mainView)
-				delete mainView;
+			delete okButton;
+			delete cancelButton;
+			delete mainView;
 		}
 	}
 	return error;

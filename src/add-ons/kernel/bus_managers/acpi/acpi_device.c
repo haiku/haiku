@@ -92,8 +92,10 @@ acpi_device_init_driver(device_node *node, void **cookie)
 	
 	memset(device, 0, sizeof(*device));
 
-	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK)
+	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK) {
+		free(device);
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	device->handle = handle;
 	device->path = strdup(path);

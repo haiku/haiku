@@ -766,8 +766,7 @@ Model::SetLinkTo(Model *model)
 	ASSERT(IsSymLink());
 	ASSERT(!fLinkTo || (fLinkTo != model));
 
-	if (fLinkTo)
-		delete fLinkTo;
+	delete fLinkTo;
 	fLinkTo = model;
 }
 

@@ -308,8 +308,8 @@ BBufferConsumer::SetOutputBuffersFor(const media_source &source,
 	free(command);
 
 	if (rv == B_OK) {
-		if (fDeleteBufferGroup) // XXX will leak memory if port write failed
-			delete fDeleteBufferGroup;
+		// XXX will leak memory if port write failed
+		delete fDeleteBufferGroup;
 		fDeleteBufferGroup = will_reclaim ? NULL : group;
 	}
 	return rv;

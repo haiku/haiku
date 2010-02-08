@@ -128,8 +128,7 @@ fixed_queue_init(fixed_queue *q, int size)
 void
 fixed_queue_destroy(fixed_queue *q)
 {
-	if (q->table)
-		free(q->table);
+	free(q->table);
 }
 
 

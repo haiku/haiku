@@ -627,8 +627,11 @@ BPositionIO *outDestination, color_space fromspace, MSInfoHeader &msheader)
 	const color_map *pmap = NULL;
 	if (fromspace == B_CMAP8) {
 		pmap = system_colors();
-		if (!pmap)
+		if (!pmap) {
+			delete [] bmpRowData;
+			delete [] bitsRowData;
 			return B_ERROR;
+		}
 	}
 	while (rd == static_cast<ssize_t>(bitsRowBytes)) {
 	

@@ -58,7 +58,7 @@ struct file_cache_ref {
 		last_access[index] = isWrite ? -access : access;
 	}
 
-	inline off_t LastAccess(int32 index, bool isWrite)
+	inline off_t LastAccess(int32 index, bool isWrite) const
 	{
 		return isWrite ? -last_access[index] : last_access[index];
 	}

@@ -635,8 +635,10 @@ driver_settings_init(kernel_args *args)
 
 		if (settings->size != 0) {
 			handle->text = malloc(settings->size + 1);
-			if (handle->text == NULL)
+			if (handle->text == NULL) {
+				free(handle);
 				return B_NO_MEMORY;
+			}
 
 			memcpy(handle->text, settings->buffer, settings->size);
 			handle->text[settings->size] = '\0';
@@ -782,6 +784,7 @@ load_driver_settings(const char *driverName)
 #ifdef _KERNEL_MODE
 		mutex_unlock(&sLock);
 #endif
+		close(file);
 		return NULL;
 	}
 

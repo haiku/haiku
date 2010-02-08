@@ -976,13 +976,17 @@ BPathMonitor::StartWatching(const char* path, uint32 flags, BMessenger target)
 	if (handler == NULL)
 		return B_NO_MEMORY;
 	status = handler->InitCheck();
-	if (status < B_OK)
+	if (status < B_OK) {
+		delete handler;
 		return status;
+	}
 
 	if (watcher == NULL) {
 		watcher = new (nothrow) BPrivate::Watcher;
-		if (watcher == NULL)
+		if (watcher == NULL) {
+			delete handler;
 			return B_NO_MEMORY;
+		}
 		sWatchers[target] = watcher;
 	}
 

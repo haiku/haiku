@@ -796,7 +796,7 @@ PRINT(("VolumeManager::OpenQuery(%p, \"%s\", 0x%lx, %ld, %ld)\n", queryDomain, q
 	// allocate the handle
 	QueryHandle* queryHandle = new(std::nothrow) QueryHandle(remotePort,
 		remoteToken);
-	if (!handle)
+	if (!queryHandle)
 		return B_NO_MEMORY;
 	ObjectDeleter<QueryHandle> handleDeleter(queryHandle);
 

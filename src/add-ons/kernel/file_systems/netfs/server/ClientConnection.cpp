@@ -2748,8 +2748,10 @@ ClientConnection::_CreateVolume(ClientVolume** _volume)
 	if (!volume)
 		return B_NO_MEMORY;
 	status_t error = volume->Init();
-	if (error != B_OK)
+	if (error != B_OK) {
+		delete volume;
 		return error;
+	}
 
 	// add it to the volume map
 	AutoLocker<VolumeMap> locker(fVolumes);

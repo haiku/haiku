@@ -425,8 +425,7 @@ BDiskDevice::_GetData(partition_id id, bool deviceOnly, size_t neededSize,
 			(user_disk_device_data*)buffer, bufferSize, &neededSize);
 		if (error == B_BUFFER_OVERFLOW) {
 			// buffer to small re-allocate it
-			if (buffer)
-				free(buffer);
+			free(buffer);
 
 			buffer = malloc(neededSize);
 
@@ -440,7 +439,7 @@ BDiskDevice::_GetData(partition_id id, bool deviceOnly, size_t neededSize,
 	// set result / cleanup on error
 	if (error == B_OK)
 		*data = (user_disk_device_data*)buffer;
-	else if (buffer)
+	else
 		free(buffer);
 
 	return error;

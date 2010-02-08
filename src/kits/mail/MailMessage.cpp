@@ -96,8 +96,7 @@ BEmailMessage::BEmailMessage(entry_ref *ref, uint32 defaultCharSet)
 
 BEmailMessage::~BEmailMessage()
 {
-	if (_bcc != NULL)
-		free(_bcc);
+	free(_bcc);
 
 	delete _body;
 	delete fData;
@@ -327,8 +326,7 @@ void BEmailMessage::SetCC(const char *cc, uint32 charset, mail_encoding encoding
 }
 
 void BEmailMessage::SetBCC(const char *bcc) {
-	if (_bcc != NULL)
-		free(_bcc);
+	free(_bcc);
 
 	_bcc = strdup(bcc);
 }

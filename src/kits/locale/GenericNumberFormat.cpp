@@ -1016,6 +1016,9 @@ BGenericNumberFormat::BGenericNumberFormat()
 // destructor
 BGenericNumberFormat::~BGenericNumberFormat()
 {
+	delete fSignSymbols;
+	delete fMantissaSignSymbols;
+	delete fExponentSignSymbols;
 }
 
 // FormatInteger

@@ -1933,8 +1933,7 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 	status = B_OK;
 
 error:
-	if (programHeaders)
-		free(programHeaders);
+	free(programHeaders);
 	_kern_close(fd);
 
 	return status;

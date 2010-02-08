@@ -71,7 +71,7 @@ class Autolock {
 		}
 
 		bool
-		IsLocked()
+		IsLocked() const
 		{
 			return fStatus == B_OK;
 		}

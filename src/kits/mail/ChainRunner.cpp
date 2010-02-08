@@ -476,9 +476,7 @@ BMailChainRunner::get_messages(BStringList *list)
 		if (err == B_MAIL_DISCARD)
 			entry->Remove();
 
-		if (file != NULL)
-			delete file;
-
+		delete file;
 		delete entry;
 		delete headers;
 		delete folder;

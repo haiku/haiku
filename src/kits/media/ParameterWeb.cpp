@@ -1990,8 +1990,10 @@ BDiscreteParameter::AddItem(int32 value, const char* name)
 
 	int32* valueCopy = new int32(value);
 	char* nameCopy = strndup(name, 255);
-	if (name != NULL && nameCopy == NULL)
+	if (name != NULL && nameCopy == NULL) {
+		delete valueCopy;
 		return B_NO_MEMORY;
+	}
 
 	if (!fValues->AddItem(valueCopy) || !fSelections->AddItem(nameCopy))
 		return B_NO_MEMORY;

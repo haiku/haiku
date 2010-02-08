@@ -92,7 +92,8 @@ BCollator::BCollator(BCollatorAddOn *collator, int8 strength,
 BCollator::BCollator(BMessage *archive)
 	: BArchivable(archive),
 	fCollator(NULL),
-	fCollatorImage(B_ERROR)
+	fCollatorImage(B_ERROR),
+	fIgnorePunctuation(true)
 {
 #if HAIKU_TARGET_PLATFORM_HAIKU
 	int32 data;

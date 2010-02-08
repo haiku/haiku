@@ -93,8 +93,7 @@ BLanguage::BLanguage(const char *language)
 
 BLanguage::~BLanguage()
 {
-	if (fICULocale != NULL)
-		delete fICULocale;
+	delete fICULocale;
 
 	for (int32 i = B_NUM_LANGUAGE_STRINGS;i-- > 0;)
 		free(fStrings[i]);

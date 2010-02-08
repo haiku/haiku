@@ -447,7 +447,7 @@ class DateMask {
 		bool IsComplete();
 
 	private:
-		inline uint32 Flag(uint8 type) { return 1UL << type; }
+		inline uint32 Flag(uint8 type) const { return 1UL << type; }
 
 		uint32	fMask;
 };

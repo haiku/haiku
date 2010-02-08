@@ -124,8 +124,10 @@ init_words(char *from)
 	if (fd < B_OK)
 		return fd;
 	/* lseek() seems to always return 0 from the kernel ??? */
-	if (fstat(fd, &st))
+	if (fstat(fd, &st)) {
+		close(fd);
 		return B_ERROR;
+	}
 	sz = (size_t)st.st_size;
 //	sz = (size_t)lseek(fd, 0, SEEK_END);
 //	dprintf("khangman: lseek(): %ld\n", sz);

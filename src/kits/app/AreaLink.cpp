@@ -24,18 +24,18 @@ class AreaLinkHeader {
 		AreaLinkHeader() { MakeEmpty(); fLock = B_NAME_NOT_FOUND; }
 
 		void SetAttachmentCount(uint32 size) { fAttachmentCount = size; }
-		uint32 GetAttachmentCount() { return fAttachmentCount; }
+		uint32 GetAttachmentCount() const { return fAttachmentCount; }
 
 		void SetAttachmentSize(uint32 size) { fAttachmentSize = size; }
-		uint32 GetAttachmentSize() { return fAttachmentSize; }
+		uint32 GetAttachmentSize() const { return fAttachmentSize; }
 
 		void AddAttachment(uint32 size) { fAttachmentSize += size; fAttachmentCount++; }
 	
 		void SetLockSem(sem_id sem) { fLock = sem; }
-		sem_id GetLockSem() { return fLock; }
+		sem_id GetLockSem() const { return fLock; }
 
 		void MakeEmpty() { fAttachmentCount = 0; fAttachmentSize = 0; }
-		area_info GetInfo() { return fInfo; }
+		area_info GetInfo() const { return fInfo; }
 		void SetInfo(const area_info &newInfo) { fInfo = newInfo; }
 		
 	private:
@@ -61,8 +61,9 @@ AreaLink::AreaLink()
 	:fAttachList(new BList(0)),
 	fTarget(B_NAME_NOT_FOUND),
 	fAreaIsOk(false),
-	fHaveLock(false)
-	
+	fHaveLock(false),
+	fBaseAddress(0),
+	fHeader(0)
 {	
 }
 

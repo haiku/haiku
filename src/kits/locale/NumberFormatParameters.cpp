@@ -189,6 +189,7 @@ BNumberFormatParameters::operator=(const BNumberFormatParameters &other)
 	fUseBasePrefix = other.fUseBasePrefix;
 	fMinimalIntegerDigits = other.fMinimalIntegerDigits;
 	fFlags = other.fFlags;
+	fUseZeroPadding = other.fUseZeroPadding;
 	return *this;
 }
 

@@ -41,8 +41,7 @@ BMailChain::BMailChain(BMessage* settings)
 
 
 BMailChain::~BMailChain() {
-	if (meta_data != NULL)
-		delete meta_data;
+	delete meta_data;
 		
 	for (int32 i = 0; filter_settings.ItemAt(i); i++)
 		delete (BMessage *)filter_settings.ItemAt(i);
@@ -53,8 +52,7 @@ BMailChain::~BMailChain() {
 
 status_t BMailChain::Load(BMessage* settings)
 {
-	if (meta_data != NULL)
-		delete meta_data;
+	delete meta_data;
 		
 	meta_data = new BMessage;
 	if (settings->HasMessage("meta_data"))

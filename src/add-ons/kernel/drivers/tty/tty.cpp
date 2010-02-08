@@ -104,6 +104,8 @@ public:
 	{
 	}
 
+	virtual ~AbstractLocker() {}
+
 	size_t AvailableBytes() const
 		{ return fBytes; }
 

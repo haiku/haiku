@@ -21,7 +21,7 @@
 class PartitionLocker {
 public:
 	PartitionLocker(partition_id partitionID);
-	~PartitionLocker();
+	virtual ~PartitionLocker();
 
 	bool IsLocked() const;
 	partition_id PartitionId() const;

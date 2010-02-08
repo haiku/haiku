@@ -1495,16 +1495,14 @@ thread_exit(void)
 		TRACE(("thread_exit: thread %ld now a kernel thread!\n", thread->id));
 	}
 
-	if (threadDeathEntry != NULL)
-		free(threadDeathEntry);
+	free(threadDeathEntry);
 
 	// delete the team if we're its main thread
 	if (deleteTeam) {
 		team_delete_team(team, debuggerPort);
 
 		// we need to delete any death entry that made it to here
-		if (death != NULL)
-			delete death;
+		delete death;
 	}
 
 	state = disable_interrupts();

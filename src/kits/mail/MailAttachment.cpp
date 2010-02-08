@@ -419,8 +419,7 @@ BAttributedMailAttachment::~BAttributedMailAttachment() {
 status_t BAttributedMailAttachment::Initialize()
 {
 	// _data & _attributes_attach will be deleted by the container
-	if (fContainer != NULL)
-		delete fContainer;
+	delete fContainer;
 
 	fContainer = new BMIMEMultipartMailContainer("++++++BFile++++++");
 
@@ -639,8 +638,10 @@ status_t BAttributedMailAttachment::RenderToRFC822(BPositionIO *render_to) {
 		io->Write(&swapped,sizeof(int64));
 
 		void *allocd = malloc(dataLen);
-		if (allocd == NULL)
+		if (allocd == NULL) {
+			delete io;
 			return B_NO_MEMORY;
+		}
 		memcpy(allocd,data,dataLen);
 		swap_data(type, allocd, dataLen, B_SWAP_HOST_TO_BENDIAN);
 		io->Write(allocd,dataLen);

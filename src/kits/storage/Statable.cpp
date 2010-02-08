@@ -41,7 +41,7 @@ private:
 };
 
 
-#if __GNUC__ > 2
+#if __GNUC__ > 3
 BStatable::~BStatable()
 {
 }

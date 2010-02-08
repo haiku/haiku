@@ -134,8 +134,10 @@ status_t google_request_process(struct google_request *req)
 		fd = open(FAKE_INPUT, O_RDONLY, 0644);
 		if (fd < 0)
 			return -1;
-		if (fstat(fd, &st) < 0)
+		if (fstat(fd, &st) < 0) {
+			close(fd);
 			return -1;
+		}
 		cnx->datalen = st.st_size;
 		cnx->data = malloc(cnx->datalen);
 		if (!cnx->data)

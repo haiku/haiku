@@ -409,8 +409,8 @@ void
 OffscreenBitmap::NewBitmap(BRect bounds)
 {
 	delete fBitmap;
-	fBitmap = new BBitmap(bounds, B_RGB32, true);
-	if (fBitmap->Lock()) {
+	fBitmap = new(std::nothrow) BBitmap(bounds, B_RGB32, true);
+	if (fBitmap && fBitmap->Lock()) {
 		BView *view = new BView(fBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
 		fBitmap->AddChild(view);
 

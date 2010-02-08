@@ -823,15 +823,20 @@ static BusLogic *create_cardinfo(int num, int iobase, int irq)
         /* can't be sure of getting contig pages -- scale
            stuff down so we can live in just one page */
     bl->box_count = 4;
-    if(!(a = malloc(4096*2))) return NULL;
+    if(!(a = malloc(4096*2))) {
+        free(bl);
+        return NULL;
+    }
     a = (uchar *) ((((uint32) a) & 0xFFFFF000) + 0x1000);
     get_memory_map(a, 4096, entries, 2);
 #else
     bl->box_count = MAX_CCB_COUNT;
     aid = create_area("bl_workspace", (void **)&a, B_ANY_KERNEL_ADDRESS, 4096*5,
                       B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
-    if(aid == B_ERROR || aid == B_BAD_VALUE || aid == B_NO_MEMORY)
+    if(aid == B_ERROR || aid == B_BAD_VALUE || aid == B_NO_MEMORY) {
+        free(bl);
         return NULL;
+    }
     get_memory_map(a, 4096*5, entries, 2);
 #endif 
 

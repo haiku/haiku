@@ -17,6 +17,7 @@
 BListItem::BListItem(uint32 level, bool expanded)
 	:
 	fTop(0.0),
+	fTemporaryList(0),
 	fWidth(0),
 	fHeight(0),
 	fLevel(level),

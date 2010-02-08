@@ -82,12 +82,12 @@ public:
 		return -1;
 	}
 	
-	int CountItems()
+	int CountItems() const
 	{
 		return item_count;
 	}
 	
-	bool IsEmpty()
+	bool IsEmpty() const
 	{
 		return item_count == 0;
 	}

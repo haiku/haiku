@@ -1155,8 +1155,10 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 	audioGroup->codec = codec;
 	audioGroup->multi = (hda_multi*)calloc(1,
 		sizeof(hda_multi));
-	if (audioGroup->multi == NULL)
+	if (audioGroup->multi == NULL) {
+		free(audioGroup);
 		return B_NO_MEMORY;
+	}
 	audioGroup->multi->group = audioGroup;
 
 	/* Parse all widgets in Audio Function Group */

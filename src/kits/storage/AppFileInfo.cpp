@@ -441,8 +441,7 @@ BAppFileInfo::GetSupportedTypes(BMessage *types) const
 	if (error == B_OK)
 		error = types->Unflatten((const char*)buffer);
 	// clean up
-	if (buffer)
-		free(buffer);
+	free(buffer);
 	return error;
 }
 
@@ -517,8 +516,7 @@ BAppFileInfo::SetSupportedTypes(const BMessage *types, bool syncAll)
 								   buffer, size);
 			}
 			// clean up
-			if (buffer)
-				delete[] buffer;
+			delete[] buffer;
 		} else
 			error = _RemoveData(kSupportedTypesAttribute, B_MESSAGE_TYPE);
 		// update the MIME database, if the app signature is installed

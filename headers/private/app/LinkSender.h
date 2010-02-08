@@ -22,7 +22,7 @@ class LinkSender {
 		virtual ~LinkSender(void);
 
 		void SetPort(port_id port);
-		port_id	Port() { return fPort; }
+		port_id	Port() const { return fPort; }
 
 		status_t StartMessage(int32 code, size_t minSize = 0);
 		void CancelMessage(void);

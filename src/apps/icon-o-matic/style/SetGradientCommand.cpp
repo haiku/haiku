@@ -64,8 +64,10 @@ SetGradientCommand::Perform()
 			*fGradient = *fStyle->Gradient();
 		else {
 			fGradient = new (nothrow) Gradient(*fStyle->Gradient());
-			if (!fGradient)
+			if (!fGradient) {
+				delete clone;
 				return B_NO_MEMORY;
+			}
 		}
 	} else {
 		// the style didn't have a gradient set

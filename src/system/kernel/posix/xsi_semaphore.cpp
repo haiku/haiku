@@ -796,6 +796,7 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 		if (semaphoreSet == NULL || !semaphoreSet->InitOK()) {
 			TRACE_ERROR(("xsi_semget: failed to allocate a new xsi "
 				"semaphore set\n"));
+			delete semaphoreSet;
 			return ENOMEM;
 		}
 		atomic_add(&sXsiSemaphoreCount, numberOfSemaphores);

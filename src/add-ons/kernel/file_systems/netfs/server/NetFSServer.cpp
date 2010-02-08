@@ -790,8 +790,10 @@ NetFSServer::_LoadSecurityContext(SecurityContext** _securityContext)
 	if (!securityContext)
 		return B_NO_MEMORY;
 	status_t error = securityContext->InitCheck();
-	if (error != B_OK)
+	if (error != B_OK) {
+		delete securityContext;
 		return error;
+	}
 	ObjectDeleter<SecurityContext> securityContextDeleter(securityContext);
 
 	// load from driver settings for the time being

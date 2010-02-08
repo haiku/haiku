@@ -84,7 +84,7 @@ SET_CURSOR_SHAPE(uint16 width, uint16 height, uint16 hot_x,
 
 	scanlineSize = 4 * ((width + 31) / 32);
 	scanline = calloc(1, scanlineSize);
-	if (calloc == NULL)
+	if (scanline == NULL)
 		return B_ERROR;
 		
 	FifoBeginWrite();

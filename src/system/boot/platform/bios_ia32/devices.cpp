@@ -771,6 +771,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 	BIOSDrive *drive = new(nothrow) BIOSDrive(gBootDriveID);
 	if (drive->InitCheck() != B_OK) {
 		dprintf("no boot drive!\n");
+		delete drive;
 		return B_ERROR;
 	}
 

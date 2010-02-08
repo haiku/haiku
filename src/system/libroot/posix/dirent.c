@@ -335,8 +335,10 @@ scandir(const char* path, struct dirent*** _entryArray,
 				arrayCapacity *= 2;
 
 			newArray = realloc(array, arrayCapacity * sizeof(void*));
-			if (newArray == NULL)
+			if (newArray == NULL) {
+				free(copiedEntry);
 				goto error;
+			}
 
 			array = newArray;
 		}

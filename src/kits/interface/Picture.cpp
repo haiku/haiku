@@ -550,8 +550,10 @@ _BPictureExtent_::Unflatten(BDataIO *stream)
 	for (int32 i = 0; i < count; i++) {
 		BPicture* picture = new BPicture;
 		status_t status = picture->Unflatten(stream);
-		if (status < B_OK)
+		if (status < B_OK) {
+			delete picture;
 			return status;
+		}
 
 		AddPicture(picture);
 	}

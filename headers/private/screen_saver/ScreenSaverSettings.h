@@ -44,16 +44,16 @@ public:
 			BPath&			Path() { return fSettingsPath; }
 
 			// General screen saver settings
-			int32			TimeFlags() { return fTimeFlags; }
-			bigtime_t		BlankTime() { return fBlankTime; }
-			bigtime_t		StandByTime() { return fStandByTime; }
-			bigtime_t		SuspendTime() { return fSuspendTime; }
-			bigtime_t		OffTime() { return fOffTime; }
+			int32			TimeFlags() const { return fTimeFlags; }
+			bigtime_t		BlankTime() const { return fBlankTime; }
+			bigtime_t		StandByTime() const { return fStandByTime; }
+			bigtime_t		SuspendTime() const { return fSuspendTime; }
+			bigtime_t		OffTime() const { return fOffTime; }
 
-			screen_corner	BlankCorner() { return fBlankCorner; }
-			screen_corner	NeverBlankCorner() { return fNeverBlankCorner; }
-			bool			LockEnable() { return fLockEnabled; }
-			bigtime_t		PasswordTime() { return fPasswordTime; }
+			screen_corner		BlankCorner() const { return fBlankCorner; }
+			screen_corner		NeverBlankCorner() const { return fNeverBlankCorner; }
+			bool			LockEnable() const { return fLockEnabled; }
+			bigtime_t		PasswordTime() const { return fPasswordTime; }
 			const char*		Password() { return fPassword.String(); }
 			const char*		LockMethod() { return fLockMethod.String(); }
 			bool			IsNetworkPassword()
@@ -93,8 +93,8 @@ public:
 								BMessage* stateMessage);
 
 			// ScreenSaver preferences settings
-			BRect			WindowFrame() { return fWindowFrame; }
-			int32			WindowTab() { return fWindowTab; }
+			BRect			WindowFrame() const { return fWindowFrame; }
+			int32			WindowTab() const { return fWindowTab; }
 
 			void			SetWindowFrame(const BRect& frame)
 								{ fWindowFrame = frame; }

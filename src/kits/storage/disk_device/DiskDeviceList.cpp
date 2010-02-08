@@ -36,8 +36,7 @@ BDiskDeviceList::BDiskDeviceList(bool useOwnLocker)
 */
 BDiskDeviceList::~BDiskDeviceList()
 {
-	if (fLocker)
-		delete fLocker;
+	delete fLocker;
 }
 
 // MessageReceived
