@@ -237,7 +237,7 @@ int_number:
 
 /** uint32  search_keyboard_buffer()
  *  Search in keyboard buffer keycodes for F8, F12 or Space 
- *  if not found - search ESC keycode.
+ *  if not found - search ESC keycode at the end of this buffer (2 positions)
  */
 
 FUNCTION(search_keyboard_buffer)
@@ -266,13 +266,12 @@ search_cycle1:
 	cmp	$0x440, %si
 	jnz	search_cycle1
 
-	movw	$0x41E, %si	// BIOS kbd buffer
-search_cycle2:
-	lodsw
+	addw	0x41C, %si
+	movw	-0x42(%si), %ax
 	cmp	$0x011B, %ax	// test ESC key
 	jz	to_ret
-	cmp	$0x440, %si
-	jnz	search_cycle2
+	movw	-0x44(%si), %ax
+	cmp	$0x011B, %ax	// test ESC key
 to_ret:
 	pop	%ds
 
