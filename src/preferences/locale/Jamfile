@@ -22,6 +22,6 @@ DoCatalogs Locale		# application name
 	: en.catalog		# default catalog generated from sourcecode
 	:					# translations
 	de.catkeys eo.catkeys fi.catkeys fr.catkeys hu.catkeys lt.catkeys pt.catkeys
-	ru.catkeys sv.catkeys uk.catkeys
+	ru.catkeys sv.catkeys uk.catkeys pl.catkeys
 	;
 

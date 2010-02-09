@@ -1,0 +1,24 @@
+1	polish	x-vnd.Haiku-Mouse	104106491
+Click to activate	SettingsView		Kliknij by aktywować
+Mouse type:	SettingsView		Rodzaj myszy:
+Warp	SettingsView		Warp
+2-Button	SettingsView		Dwuprzyciskowa
+Double-click test area	SettingsView		Strefa testowania podw. kliknięcia
+Revert	MouseWindow		Przywróć
+...by Andrew Edward McCall	MouseApplication		...stworzone przez Andrew Edward McCall
+Mouse acceleration	SettingsView		Przyspieszenie wskaźnika
+Click to focus	SettingsView		Kliknij by zaznaczyć
+3-Button	SettingsView		Trójprzyciskowa
+Mouse speed	SettingsView		Prędkość wskaźnika
+Focus mode:	SettingsView		Tryb zaznaczania:
+Instant warp	SettingsView		Natychmiastowe przeniesienie
+Dig Deal	MouseApplication		Dig Deal
+1-Button	SettingsView		Jednoprzyciskowa
+Double-click speed	SettingsView		Prędkość dwukrotnego kliknięcia
+Defaults	MouseWindow		Domyślne
+Focus follows mouse	SettingsView		Podążaj za wskaźnikiem myszy
+Accept first click	SettingsView		Akceptuj pierwsze klinięcie
+Fast	SettingsView		Szybko
+Normal	SettingsView		Normalna
+Mouse	MouseWindow		Mysz
+Slow	SettingsView		Wolno

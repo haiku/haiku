@@ -1,0 +1,42 @@
+1	polish	x-vnd.Haiku-Appearance	1696107214
+Control highlight	Colors tab		Podkreślenie kontrolki
+Control border	Colors tab		Obramowanie kontrolki
+Antialiasing type:	AntialiasingSettingsView		Typ antyaliasingu:
+Shadow	Colors tab		Cień
+On	AntialiasingSettingsView		Włącz
+Defaults	APRWindow		Domyślne
+Grayscale	AntialiasingSettingsView		Odcienie szarości
+Shine	Colors tab		Połysk
+Off	AntialiasingSettingsView		Wyłącz
+Success	Colors tab		Sukces
+Inactive window tab text	Colors tab		Tekst nieaktywnej zakładki okna
+Failure	Colors tab		Niepowodzenie
+Hinting menu	AntialiasingSettingsView		Menu hintingu
+Document background	Colors tab		Tło dokumentu
+Revert	APRWindow		Przywróć
+Window tab	Colors tab		Zakładka okna
+Tooltip background	Colors tab		Tło podpowiedzi
+Selected menu item background	Colors tab		Tło zaznaczonego elementu menu
+Antialiasing	APRWindow		Antyaliasing
+Navigation base	Colors tab		Nawigacja
+Window tab text	Colors tab		Tekst zakładki okna
+Document text	Colors tab		Tekst dokumentu
+Navigation pulse	Colors tab		Puls nawigacji
+Selected menu item text	Colors tab		Tekst zaznaczonego elementu menu
+Menu background	Colors tab		Tło menu
+Appearance	APRWindow		Wygląd
+Panel background	Colors tab		Tło panelu
+Colors	APRWindow		Kolory
+Control background	Colors tab		Tło kontrolki
+Inactive window tab	Colors tab		Nieaktywna zakładka okna
+Reduce colored edges filter strength:	AntialiasingSettingsView		Zmniejszenie siły kolorowych filtrów krawędzi:
+Control text	Colors tab		Tekst kontrolki
+Tooltip text	Colors tab		Tekst podpowiedzi
+Menu item text	Colors tab		Tekst elementu menu
+LCD subpixel	AntialiasingSettingsView		Podpikselowe LCD
+Selected menu item border	Colors tab		Obramowanie zaznaczonego elementu menu
+Strong	AntialiasingSettingsView		Silny
+Panel text	Colors tab		Tekst panelu
+Monospaced fonts only	AntialiasingSettingsView		Tylko czcionki o stałej szerokości
+Antialiasing menu	AntialiasingSettingsView		Menu antyaliasingu
+Glyph hinting:	AntialiasingSettingsView		Hintowanie czcionek:

@@ -19,6 +19,6 @@ DoCatalogs ReadOnlyBootPrompt :
 	BootPrompt.cpp
 	BootPromptWindow.cpp
 	: en.catalog
-	: de.catkeys nl.catkeys
+	: de.catkeys nl.catkeys pl.catkeys
 ;
 

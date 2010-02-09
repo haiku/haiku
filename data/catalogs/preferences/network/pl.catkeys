@@ -1,0 +1,17 @@
+1	polish	x-vnd.Haiku-Network	2897060402
+Gateway:	EthernetSettingsView		Brama domyślna:
+Netmask:	EthernetSettingsView		Maska sieci:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Zastosuj
+OK	EthernetSettingsView		OK
+DNS #1:	EthernetSettingsView		DNS #1:
+IP address:	EthernetSettingsView		Adres IP:
+Network	NetworkWindow		Sieć
+Adapter:	EthernetSettingsView		Karta sieciowa:
+Revert	EthernetSettingsView		Przywróć
+Sending auto-config message failed: 	EthernetSettingsView		Wysłanie wiadomości automatycznej konfiguracji nie powiodło się: 
+Mode:	EthernetSettingsView		Typ adresu:
+The net_server needs to run for the auto configuration!	EthernetSettingsView		Serwer sieci (net_server) musi być uruchomiony dla automatycznej konfiguracji!
+Auto-configuring failed: 	EthernetSettingsView		Automatyczna konfiguracja nie powiodła się: 
+Static	EthernetSettingsView		Statyczny

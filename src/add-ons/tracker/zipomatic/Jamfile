@@ -21,5 +21,6 @@ DoCatalogs ZipOMatic-Z :
 	ZipperThread.cpp
 	: en.catalog
 	: de.catkeys fr.catkeys ja.catkeys lt.catkeys pt.catkeys sv.catkeys
+	pl.catkeys
 	;
 
