@@ -30,6 +30,17 @@ MergeObject posix_main.o :
  	utime.c
 ;
 
+if $(TARGET_ARCH) = x86 {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot posix fenv i387 ] ;
+} else if $(TARGET_ARCH) = ppc {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot posix fenv powerpc ] ;
+} else if $(TARGET_ARCH) = arm {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot posix fenv arm ] ;
+}
+MergeObject posix_fenv.o :
+	fenv.c
+;
+
 SubInclude HAIKU_TOP src system libroot posix arch $(TARGET_ARCH) ;
 
 SubInclude HAIKU_TOP src system libroot posix crypt ;
