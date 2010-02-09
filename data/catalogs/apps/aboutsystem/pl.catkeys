@@ -4,7 +4,7 @@ Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i j
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundatora projektu)\n\n
 The Haiku-Ports team\n	AboutView		Zespółu Haiku-Ports\n
 Website, marketing & documentation:\n	AboutView		Strona WWW, marketing i dokumentacja:\n
-%s%lld hour	AboutView		%s%lld godzina
+%s%lld hour	AboutView		%s%lld godz.
 ... and the many community members making donations!\n\n	AboutView		… i wielu innych członków społeczności robiących dotację!\n\n
 \nPolish\n\n	AboutView		\nPolski\n\n
 \nJapanese\n\n	AboutView		\nJapoński\n\n
@@ -21,20 +21,20 @@ Contributors:\n	AboutView		Współpracownicy:\n
 Unknown	AboutView		Nieznany
 \nBulgarian\n\n	AboutView		\nBułgarski\n\n
 \nPortuguese\n\n	AboutView		\nPortugalski\n\n
-%s%lld minute	AboutView		%s%lld minuta
+%s%lld minute	AboutView		%s%lld min.
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… i prawdopodobnie paru innych, o których zapomnieliśmy wspomnieć (przepraszamy!)\n\n
 %.2f GHz	AboutView		%.2f GHz
 The BeGeistert team\n\n	AboutView		Zespółu BeGeistert\n\n
-%s%lld minutes	AboutView		%s%lld minuty
+%s%lld minutes	AboutView		%s%lld min.
 Memory:	AboutView		Pamięć:
-%s%lld second	AboutView		%s%lld sekunda
+%s%lld second	AboutView		%s%lld sek.
 Past maintainers:\n	AboutView		Wcześniejsi współpracownicy:\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Kod źródłowy unikalny dla Haiku, szczególnie jądra systemu i aplikacji z nim rozprowadzanych, dystrybuowany jest pod warunkami 
 \n\nSpecial thanks to:\n	AboutView		\n\nSpecjalne podziękowania dla:\n
 Copyright	Utilities		Prawa autorskie
 Licenses: 	AboutView		Licencje: 
 . Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Niektóre  biblioteki systemowe zawieraja oprogramowanie objęte licencją LGPL. Prawa autorskie do nich można znaleźć poniżej.\n\n
-%s%lld seconds	AboutView		%s%lld sekundy
+%s%lld seconds	AboutView		%s%lld sek.
 License	Utilities		Licencja
 \nCopyrights\n\n	AboutView		\nPrawa autorskie\n\n
 \nUkrainian\n\n	AboutView		\nUkraiński\n\n
@@ -42,7 +42,7 @@ License	Utilities		Licencja
 Current maintainers:\n	AboutView		Obecni wspołpracownicy:\n
 Time running:	AboutView		Czas działania:
 MIT license	AboutView		licencji MIT
-%s%lld hours	AboutView		%s%lld godzin
+%s%lld hours	AboutView		%s%lld godz.
 %lld days	AboutView		%lld dni
 The Haikuware team and their bounty program\n	AboutView		Zespółu Haikuware i ich program bounty\n
 About this system	AboutWindow		O systemie
