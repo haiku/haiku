@@ -12,7 +12,13 @@
 #define va_copy		__va_copy
 #endif
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <Message.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Utilities"
 
 
 BString
@@ -231,9 +237,9 @@ PackageCredit::PackageCredit(const BMessage& packageDescription)
 		url = NULL;
 
 	fPackageName = package;
-	fCopyrights.SetTo(packageDescription, "Copyright", COPYRIGHT_STRING);
-	fLicenses.SetTo(packageDescription, "License");
-	fSources.SetTo(packageDescription, "SourceURL");
+	fCopyrights.SetTo(packageDescription, TR("Copyright"), COPYRIGHT_STRING);
+	fLicenses.SetTo(packageDescription, TR("License"));
+	fSources.SetTo(packageDescription, TR("SourceURL"));
 	fURL = url;
 }
 

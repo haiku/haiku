@@ -19,9 +19,18 @@ Application AboutSystem :
 	HyperTextActions.cpp
 	HyperTextView.cpp
 	Utilities.cpp
-	: $(TARGET_LIBSTDC++) be translation
+	: $(TARGET_LIBSTDC++) be translation liblocale.so
 	: AboutSystem.rdef
 ;
+
+DoCatalogs Fonts :
+	x-vnd.Haiku-About
+	:
+	AboutSystem.cpp
+	Utilities.cpp
+	: en.catalog
+	: pl.catkeys
+	;
 
 Includes [ FGristFiles AboutSystem.rdef ] : [ FGristFiles "HAIKU logo - black on white - tiny.png" ] ;
 SEARCH on [ FGristFiles "HAIKU logo - black on white - tiny.png" ]

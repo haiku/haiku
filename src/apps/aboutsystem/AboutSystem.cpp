@@ -45,6 +45,9 @@
 #include <AutoDeleter.h>
 #include <cpu_type.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "HyperTextActions.h"
 #include "HyperTextView.h"
 #include "Utilities.h"
@@ -68,22 +71,27 @@ static const rgb_color kHaikuYellow = { 255, 176, 0, 255 };
 static const rgb_color kLinkBlue = { 80, 80, 200, 255 };
 
 
+
 class AboutApp : public BApplication {
 public:
-								AboutApp();
+					AboutApp();
+private:
+		BCatalog		fCatalog;
 };
+
 
 class AboutWindow : public BWindow {
 public:
-							AboutWindow();
+					AboutWindow();
 
 	virtual	bool			QuitRequested();
 };
 
+
 class LogoView : public BView {
 public:
-							LogoView();
-	virtual					~LogoView();
+					LogoView();
+	virtual				~LogoView();
 
 	virtual	BSize			MinSize();
 	virtual	BSize			MaxSize();
@@ -91,14 +99,16 @@ public:
 	virtual void			Draw(BRect updateRect);
 
 private:
-			BBitmap*		fLogo;
+			BBitmap*	fLogo;
 };
+
 
 class CropView : public BView {
 public:
-							CropView(BView* target, int32 left, int32 top,
-								int32 right, int32 bottom);
-	virtual					~CropView();
+					CropView(BView* target, int32 left,
+						int32 top, int32 right,
+						int32 bottom);
+	virtual				~CropView();
 
 	virtual	BSize			MinSize();
 	virtual	BSize			MaxSize();
@@ -106,17 +116,18 @@ public:
 	virtual void			DoLayout();
 
 private:
-			BView*			fTarget;
-			int32			fCropLeft;
-			int32			fCropTop;
-			int32			fCropRight;
-			int32			fCropBottom;
+			BView*		fTarget;
+			int32		fCropLeft;
+			int32		fCropTop;
+			int32		fCropRight;
+			int32		fCropBottom;
 };
+
 
 class AboutView : public BView {
 public:
-							AboutView();
-							~AboutView();
+					AboutView();
+					~AboutView();
 
 	virtual void			AttachedToWindow();
 	virtual void			Pulse();
@@ -124,36 +135,36 @@ public:
 	virtual void			MessageReceived(BMessage* msg);
 	virtual void			MouseDown(BPoint point);
 
-			void			AddCopyrightEntry(const char* name,
-								const char* text,
-								const StringVector& licenses,
-								const StringVector& sources,
-								const char* url);
-			void			AddCopyrightEntry(const char* name,
-								const char* text, const char* url = NULL);
-			void			PickRandomHaiku();
-
+			void		AddCopyrightEntry(const char* name,
+						const char* text,
+						const StringVector& licenses,
+						const StringVector& sources,
+						const char* url);
+			void		AddCopyrightEntry(const char* name,
+						const char* text,
+						const char* url = NULL);
+			void		PickRandomHaiku();
 
 private:
 	typedef std::map<std::string, PackageCredit*> PackageCreditMap;
 
 private:
-			BView*			_CreateLabel(const char* name, const char* label);
-			BView*			_CreateCreditsView();
-			status_t		_GetLicensePath(const char* license,
-								BPath& path);
-			void			_AddCopyrightsFromAttribute();
-			void			_AddPackageCredit(const PackageCredit& package);
-			void			_AddPackageCreditEntries();
+			BView*		_CreateLabel(const char* name, const char* label);
+			BView*		_CreateCreditsView();
+			status_t	_GetLicensePath(const char* license,
+						BPath& path);
+			void		_AddCopyrightsFromAttribute();
+			void		_AddPackageCredit(const PackageCredit& package);
+			void		_AddPackageCreditEntries();
 
 			BStringView*	fMemView;
-			BTextView*		fUptimeView;
-			BView*			fInfoView;
+			BTextView*	fUptimeView;
+			BView*		fInfoView;
 			HyperTextView*	fCreditsView;
 
-			BBitmap*		fLogo;
+			BBitmap*	fLogo;
 
-			bigtime_t		fLastActionTime;
+			bigtime_t	fLastActionTime;
 			BMessageRunner*	fScrollRunner;
 			PackageCreditMap fPackageCredits;
 };
@@ -165,17 +176,22 @@ private:
 AboutApp::AboutApp()
 	: BApplication("application/x-vnd.Haiku-About")
 {
-	AboutWindow* window = new AboutWindow();
-	window->Show();
+	be_locale->GetAppCatalog(&fCatalog);
+	AboutWindow *window = new(std::nothrow) AboutWindow();
+	if (window)
+		window->Show();
 }
 
 
 //	#pragma mark -
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "AboutWindow"
+
 AboutWindow::AboutWindow()
-	: BWindow(BRect(0, 0, 500, 300), "About this system", B_TITLED_WINDOW,
-			B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
+	: BWindow(BRect(0, 0, 500, 300), TR("About this system"),
+		B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(new AboutView());
@@ -185,8 +201,7 @@ AboutWindow::AboutWindow()
 	ResizeTo(max_c(size.width, Bounds().Width()),
 		max_c(size.height, Bounds().Height()));
 
-	MoveTo((BScreen().Frame().Width() - Bounds().Width()) / 2,
-		(BScreen().Frame().Height() - Bounds().Height()) / 2 );
+	CenterOnScreen();
 }
 
 
@@ -314,6 +329,8 @@ CropView::DoLayout()
 
 //	#pragma mark - AboutView
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "AboutView"
 
 AboutView::AboutView()
 	: BView("aboutview", B_WILL_DRAW | B_PULSE_NEEDED),
@@ -330,7 +347,7 @@ AboutView::AboutView()
 	// OS Version
 
 	char string[1024];
-	strcpy(string, "Unknown");
+	strcpy(string, TR("Unknown"));
 
 	// the version is stored in the BEOS:APP_VERSION attribute of libbe.so
 	BPath path;
@@ -355,7 +372,9 @@ AboutView::AboutView()
 		if (sscanf(unameInfo.version, "r%ld", &revision) == 1) {
 			char version[16];
 			snprintf(version, sizeof(version), "%ld", revision);
-			strlcat(string, " (Revision ", sizeof(string));
+			strlcat(string, " (", sizeof(string));
+			strlcat(string, TR("Revision"), sizeof(string));
+			strlcat(string, " ", sizeof(string));
 			strlcat(string, version, sizeof(string));
 			strlcat(string, ")", sizeof(string));
 		}
@@ -377,10 +396,11 @@ AboutView::AboutView()
 	// CPU count, type and clock speed
 	char processorLabel[256];
 	if (systemInfo.cpu_count > 1) {
-		snprintf(processorLabel, sizeof(processorLabel), "%ld Processors:",
-			systemInfo.cpu_count);
+		snprintf(processorLabel, sizeof(processorLabel),
+			TR("%ld Processors:"), systemInfo.cpu_count);
 	} else
-		strlcpy(processorLabel, "Processor:", sizeof(processorLabel));
+		strlcpy(processorLabel, TR("Processor:"),
+			sizeof(processorLabel));
 
 	BString cpuType;
 	cpuType << get_cpu_vendor_string(systemInfo.cpu_type)
@@ -392,9 +412,9 @@ AboutView::AboutView()
 
 	int32 clockSpeed = get_rounded_cpu_speed();
 	if (clockSpeed < 1000)
-		sprintf(string,"%ld MHz", clockSpeed);
+		sprintf(string, TR("%ld MHz"), clockSpeed);
 	else
-		sprintf(string,"%.2f GHz", clockSpeed / 1000.0f);
+		sprintf(string, TR("%.2f GHz"), clockSpeed / 1000.0f);
 
 	BStringView* frequencyView = new BStringView("frequencytext", string);
 	frequencyView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
@@ -431,7 +451,7 @@ AboutView::AboutView()
 		.AddGroup(B_VERTICAL)
 			.Add(new LogoView())
 			.AddGroup(B_VERTICAL)
-				.Add(_CreateLabel("oslabel", "Version:"))
+				.Add(_CreateLabel("oslabel", TR("Version:")))
 				.Add(versionView)
 #if __GNUC__ != 2
 				.Add(gccView)
@@ -441,13 +461,14 @@ AboutView::AboutView()
 				.Add(cpuView)
 				.Add(frequencyView)
 				.AddStrut(offset)
-				.Add(_CreateLabel("memlabel", "Memory:"))
+				.Add(_CreateLabel("memlabel", TR("Memory:")))
 				.Add(fMemView)
 				.AddStrut(offset)
-				.Add(_CreateLabel("kernellabel", "Kernel:"))
+				.Add(_CreateLabel("kernellabel", TR("Kernel:")))
 				.Add(kernelView)
 				.AddStrut(offset)
-				.Add(_CreateLabel("uptimelabel", "Time running:"))
+				.Add(_CreateLabel("uptimelabel",
+					TR("Time running:")))
 				.Add(fUptimeView)
 				.SetInsets(5, 5, 5, 5)
 			.End()
@@ -502,7 +523,8 @@ AboutView::Pulse()
 	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
 	fMemView->SetText(MemUsageToString(string, sizeof(string), &info));
 
-	if (fScrollRunner == NULL && system_time() > fLastActionTime + 10000000) {
+	if (fScrollRunner == NULL
+		&& system_time() > fLastActionTime + 10000000) {
 		BMessage message(SCROLL_CREDITS_VIEW);
 		//fScrollRunner = new BMessageRunner(this, &message, 25000, -1);
 	}
@@ -515,7 +537,8 @@ AboutView::MessageReceived(BMessage* msg)
 	switch (msg->what) {
 		case SCROLL_CREDITS_VIEW:
 		{
-			BScrollBar* scrollBar = fCreditsView->ScrollBar(B_VERTICAL);
+			BScrollBar* scrollBar =
+				fCreditsView->ScrollBar(B_VERTICAL);
 			if (scrollBar == NULL)
 				break;
 			float max, min;
@@ -543,7 +566,8 @@ AboutView::AddCopyrightEntry(const char* name, const char* text,
 
 void
 AboutView::AddCopyrightEntry(const char* name, const char* text,
-	const StringVector& licenses, const StringVector& sources, const char* url)
+	const StringVector& licenses, const StringVector& sources,
+	const char* url)
 {
 	BFont font(be_bold_font);
 	//font.SetSize(be_bold_font->Size());
@@ -558,9 +582,9 @@ AboutView::AddCopyrightEntry(const char* name, const char* text,
 
 	if (licenses.CountStrings() > 0) {
 		if (licenses.CountStrings() > 1)
-			fCreditsView->Insert("Licenses: ");
+			fCreditsView->Insert(TR("Licenses: "));
 		else
-			fCreditsView->Insert("License: ");
+			fCreditsView->Insert(TR("License: "));
 
 		for (int32 i = 0; i < licenses.CountStrings(); i++) {
 			const char* license = licenses.StringAt(i);
@@ -584,7 +608,7 @@ AboutView::AddCopyrightEntry(const char* name, const char* text,
 	}
 
 	if (sources.CountStrings() > 0) {
-		fCreditsView->Insert("Source Code: ");
+		fCreditsView->Insert(TR("Source Code: "));
 
 		for (int32 i = 0; i < sources.CountStrings(); i++) {
 			const char* source = sources.StringAt(i);
@@ -598,7 +622,8 @@ AboutView::AddCopyrightEntry(const char* name, const char* text,
 
 			fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL,
 				&kLinkBlue);
-			fCreditsView->InsertHyperText(urlName, new URLAction(urlAddress));
+			fCreditsView->InsertHyperText(urlName,
+				new URLAction(urlAddress));
 		}
 
 		fCreditsView->Insert("\n");
@@ -609,8 +634,10 @@ AboutView::AddCopyrightEntry(const char* name, const char* text,
 		BString urlAddress;
 		parse_named_url(url, urlName, urlAddress);
 
-		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
-		fCreditsView->InsertHyperText(urlName, new URLAction(urlAddress));
+		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL,
+			&kLinkBlue);
+		fCreditsView->InsertHyperText(urlName,
+			new URLAction(urlAddress));
 		fCreditsView->Insert("\n");
 	}
 	fCreditsView->Insert("\n");
@@ -714,10 +741,10 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(string);
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert("The copyright to the Haiku code is property of "
+	fCreditsView->Insert(TR("The copyright to the Haiku code is property of "
 		"Haiku, Inc. or of the respective authors where expressly noted "
 		"in the source."
-		"\n\n");
+		"\n\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
 	fCreditsView->InsertHyperText("http://www.haiku-os.org",
@@ -728,7 +755,7 @@ AboutView::_CreateCreditsView()
 	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Current maintainers:\n");
+	fCreditsView->Insert(TR("Current maintainers:\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
@@ -766,13 +793,13 @@ AboutView::_CreateCreditsView()
 		"Oliver Tappe\n"
 		"Gerasim Troeglazov\n"
 		"Ingo Weinhold\n"
-		"Artur Wyszynski\n"
+		"Artur Wyszyński\n"
 		"Clemens Zeidler\n"
 		"Siarzhuk Zharski\n"
 		"\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Past maintainers:\n");
+	fCreditsView->Insert(TR("Past maintainers:\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
@@ -799,7 +826,7 @@ AboutView::_CreateCreditsView()
 		"\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Website, marketing & documentation:\n");
+	fCreditsView->Insert(TR("Website, marketing & documentation:\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
@@ -814,7 +841,7 @@ AboutView::_CreateCreditsView()
 		"\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Contributors:\n");
+	fCreditsView->Insert(TR("Contributors:\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
@@ -894,46 +921,47 @@ AboutView::_CreateCreditsView()
 		"Gerald Zajac\n"
 		"Łukasz Zemczak\n"
 		"JiSheng Zhang\n"
-		"Zhao Shuai\n"
-		"\n" B_UTF8_ELLIPSIS " and probably some more we forgot to mention "
-		"(sorry!)"
-		"\n\n");
+		"Zhao Shuai\n");
+	fCreditsView->Insert(
+		TR("\n" B_UTF8_ELLIPSIS
+			" and probably some more we forgot to mention (sorry!)"
+			"\n\n"));
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Translations:\n");
+	fCreditsView->Insert(TR("Translations:\n"));
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nBulgarian\n\n");
+	fCreditsView->Insert(TR("\nBulgarian\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"cssvb94\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nDutch\n\n");
+	fCreditsView->Insert(TR("\nDutch\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Meanwhile\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nEsperanto\n\n");
+	fCreditsView->Insert(TR("\nEsperanto\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Travis D. Reed (Dancxjo)\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nFinnish\n\n");
+	fCreditsView->Insert(TR("\nFinnish\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Jaakko Leikas (Garjala)\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nFrench\n\n");
+	fCreditsView->Insert(TR("\nFrench\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Adrien Destugues (PulkoMandy)\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nGerman\n\n");
+	fCreditsView->Insert(TR("\nGerman\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Colin Günther\n"
@@ -941,65 +969,72 @@ AboutView::_CreateCreditsView()
 		"leszek\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nHungarian\n\n");
+	fCreditsView->Insert(TR("\nHungarian\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"miqlas\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nItalian\n\n");
+	fCreditsView->Insert(TR("\nItalian\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Andrea Bernardi\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nJapanese\n\n");
+	fCreditsView->Insert(TR("\nJapanese\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"The JPBE.net user group\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nLituanian\n\n");
+	fCreditsView->Insert(TR("\nLituanian\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Algirdas Buckus\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nPortuguese\n\n");
+	fCreditsView->Insert(TR("\nPolish\n\n"));
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(
+		"Artur Wyszyński\n"
+		"Hubert Hareńczyk\n"
+	);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
+	fCreditsView->Insert(TR("\nPortuguese\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Marcos Alves (Xeon3D)\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nRussian\n\n");
+	fCreditsView->Insert(TR("\nRussian\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"StoroZ Gneva\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nSwedish\n\n");
+	fCreditsView->Insert(TR("\nSwedish\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Johan Holmberg\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nUkrainian\n\n");
+	fCreditsView->Insert(TR("\nUkrainian\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Alex Rudyk (totish)\n"
 	);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert("Special thanks to:\n");
+	fCreditsView->Insert(TR("\n\nSpecial thanks to:\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert("Travis Geiselbrecht (and his NewOS kernel)\n");
-	fCreditsView->Insert("Michael Phipps (project founder)\n\n");
-	fCreditsView->Insert("The Haiku-Ports team\n");
-	fCreditsView->Insert("The Haikuware team and their bounty program\n");
-	fCreditsView->Insert("The BeGeistert team\n\n");
-	fCreditsView->Insert("... and the many community members making "
-		"donations!\n\n");
+	fCreditsView->Insert(TR("Travis Geiselbrecht (and his NewOS kernel)\n"));
+	fCreditsView->Insert(TR("Michael Phipps (project founder)\n\n"));
+	fCreditsView->Insert(TR("The Haiku-Ports team\n"));
+	fCreditsView->Insert(TR("The Haikuware team and their bounty program\n"));
+	fCreditsView->Insert(TR("The BeGeistert team\n\n"));
+	fCreditsView->Insert(TR("... and the many community members making "
+		"donations!\n\n"));
 
 	// copyrights for various projects we use
 
@@ -1009,21 +1044,21 @@ AboutView::_CreateCreditsView()
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\nCopyrights\n\n");
+	fCreditsView->Insert(TR("\nCopyrights\n\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert("[Click a license name to read the respective "
-		"license.]\n\n");
+	fCreditsView->Insert(TR("[Click a license name to read the respective "
+		"license.]\n\n"));
 
 	// Haiku license
-	fCreditsView->Insert("The code that is unique to Haiku, especially the "
+	fCreditsView->Insert(TR("The code that is unique to Haiku, especially the "
 		"kernel and all code that applications may link against, is "
-		"distributed under the terms of the ");
-	fCreditsView->InsertHyperText("MIT license",
+		"distributed under the terms of the "));
+	fCreditsView->InsertHyperText(TR("MIT license"),
 		new OpenFileAction(mitPath.Path()));
-	fCreditsView->Insert(". Some system libraries contain third party code "
+	fCreditsView->Insert(TR(". Some system libraries contain third party code "
 		"distributed under the LGPL license. You can find the copyrights "
-		"to third party code below.\n\n");
+		"to third party code below.\n\n"));
 
 	// GNU copyrights
 	AddCopyrightEntry("The GNU Project",
@@ -1105,7 +1140,7 @@ AboutView::_CreateCreditsView()
 	// GLUT implementation copyrights
 	_AddPackageCredit(PackageCredit("GLUT")
 		.SetCopyrights(COPYRIGHT_STRING "1994-1997 Mark Kilgard. "
-				"All rights reserved.",
+			"All rights reserved.",
 			COPYRIGHT_STRING "1997 Be Inc.",
 			COPYRIGHT_STRING "1999 Jake Hamby.",
 			NULL));
@@ -1115,8 +1150,8 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("BRegion backend (XFree86)")
 		.SetCopyrights(COPYRIGHT_STRING "1987, 1988, 1998 The Open Group.",
 			COPYRIGHT_STRING "1987, 1988 Digital Equipment "
-				"Corporation, Maynard, Massachusetts.\n"
-				"All rights reserved.",
+			"Corporation, Maynard, Massachusetts.\n"
+			"All rights reserved.",
 			NULL));
 			// TODO: License!
 
@@ -1135,8 +1170,8 @@ AboutView::_CreateCreditsView()
 	// expat copyrights
 	_AddPackageCredit(PackageCredit("expat")
 		.SetCopyrights(COPYRIGHT_STRING
-				"1998, 1999, 2000 Thai Open Source "
-				"Software Center Ltd and Clark Cooper.",
+			"1998, 1999, 2000 Thai Open Source "
+			"Software Center Ltd and Clark Cooper.",
 			COPYRIGHT_STRING "2001, 2002, 2003 Expat maintainers.",
 			NULL));
 			// TODO: License!
@@ -1256,7 +1291,7 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("Xiph.org Foundation")
 		.SetCopyrights("libvorbis, libogg, libtheora, libspeex",
 			COPYRIGHT_STRING "1994-2008 Xiph.Org. "
-				"All rights reserved.",
+			"All rights reserved.",
 			NULL)
 		.SetURL("http://www.xiph.org"));
 			// TODO: License!
@@ -1483,7 +1518,7 @@ AboutView::_AddPackageCredit(const PackageCredit& package)
 static const char*
 MemUsageToString(char string[], size_t size, system_info* info)
 {
-	snprintf(string, size, "%d MB total, %d MB used (%d%%)",
+	snprintf(string, size, TR("%d MB total, %d MB used (%d%%)"),
 			int(info->max_pages / 256.0f + 0.5f),
 			int(info->used_pages / 256.0f + 0.5f),
 			int(100 * info->used_pages / info->max_pages));
@@ -1511,25 +1546,47 @@ UptimeToString(char string[], size_t size)
 
 	char* str = string;
 	if (days) {
-		str += snprintf(str, size, "%lld day%s",days, days > 1 ? "s" : "");
+		if (days > 1) {
+			str += snprintf(str, size, TR("%lld days"), days);
+		} else {
+			str += snprintf(str, size, TR("%lld day"), days);
+		}
 	}
 	if (hours) {
-		str += snprintf(str, size - strlen(string), "%s%lld hour%s",
-				str != string ? ", " : "",
-				hours, hours > 1 ? "s" : "");
+		if (hours > 1) {
+			str += snprintf(str, size - strlen(string),
+				TR("%s%lld hours"),
+				str != string ? ", " : "", hours);
+		} else {
+			str += snprintf(str, size - strlen(string),
+				TR("%s%lld hour"),
+				str != string ? ", " : "", hours);
+		}
 	}
 	if (minutes) {
-		str += snprintf(str, size - strlen(string), "%s%lld minute%s",
-				str != string ? ", " : "",
-				minutes, minutes > 1 ? "s" : "");
+		if (minutes > 1) {
+			str += snprintf(str, size - strlen(string),
+				TR("%s%lld minutes"),
+				str != string ? ", " : "", minutes);
+		} else {
+			str += snprintf(str, size - strlen(string),
+				TR("%s%lld minute"),
+				str != string ? ", " : "", minutes);
+		}
 	}
 
 	if (seconds || str == string) {
 		// Haiku would be well-known to boot very fast.
 		// Let's be ready to handle below minute uptime, zero second included ;-)
-		str += snprintf(str, size - strlen(string), "%s%lld second%s",
-				str != string ? ", " : "",
-				seconds, seconds > 1 ? "s" : "");
+		if (seconds > 1) {
+			str += snprintf(str, size - strlen(string),
+				TR("%s%lld seconds"),
+				str != string ? ", " : "", seconds);
+		} else {
+			str += snprintf(str, size - strlen(string),
+				TR("%s%lld second"),
+				str != string ? ", " : "", seconds);
+		}
 	}
 
 	return string;
