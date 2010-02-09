@@ -23,7 +23,7 @@ Application AboutSystem :
 	: AboutSystem.rdef
 ;
 
-DoCatalogs Fonts :
+DoCatalogs AboutSystem :
 	x-vnd.Haiku-About
 	:
 	AboutSystem.cpp
