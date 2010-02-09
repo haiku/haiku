@@ -26,6 +26,8 @@
  * $FreeBSD$
  */
 
+#if 0 // disabled for now
 #include <posix/fenv.h>
 
 const fenv_t __fe_dfl_env = 0x00000000;
+#endif

@@ -26,6 +26,7 @@
  * $FreeBSD$
  */
 
+#if 0 // disabled for now
 #include <posix/fenv.h>
 
 /*
@@ -33,3 +34,5 @@
  * this as a default environment.
  */
 const fenv_t __fe_dfl_env = 0;
+#endif
+
