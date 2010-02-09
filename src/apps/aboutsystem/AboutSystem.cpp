@@ -895,6 +895,7 @@ AboutView::_CreateCreditsView()
 		"Pahtz\n"
 		"Michael Paine\n"
 		"Adrian Panasiuk\n"
+		"Romain Picard\n"
 		"Francesco Piccinno\n"
 		"David Powell\n"
 		"Jeremy Rand\n"
