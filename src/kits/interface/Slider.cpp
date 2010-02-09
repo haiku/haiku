@@ -364,8 +364,7 @@ BSlider::AttachedToWindow()
 	ResizeToPreferred();
 
 	fLocation.Set(9.0f, 0.0f);
-	fUpdateText = UpdateText();
-
+	
 #if USE_OFF_SCREEN_VIEW
 	BRect bounds(Bounds());
 
@@ -398,6 +397,7 @@ BSlider::AttachedToWindow()
 
 	SetValue(Value());
 		// makes sure the value is within valid bounds
+	UpdateTextChanged();
 }
 
 
