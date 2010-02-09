@@ -921,7 +921,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 
 	_node->private_node = NULL;
 	_node->ops = &gFATVnodeOps;
-	_flags = 0;
+	*_flags = 0;
 
 	DPRINTF(0, ("dosfs_read_vnode (vnode id %Lx)\n", vnid));
 

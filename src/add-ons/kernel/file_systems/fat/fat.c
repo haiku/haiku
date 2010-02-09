@@ -29,7 +29,6 @@ static status_t
 mirror_fats(nspace *vol, uint32 sector, uint8 *buffer)
 {
 	uint32 i;
-	char *buf = buffer;
 
 	if (!vol->fat_mirrored)
 		return B_OK;
@@ -43,8 +42,7 @@ mirror_fats(nspace *vol, uint32 sector, uint8 *buffer)
 
 		blockData = block_cache_get_writable_etc(vol->fBlockCache, sector
 			+ i * vol->sectors_per_fat, 0, 1, -1);
-		memcpy(blockData, buf, vol->bytes_per_sector);
-		buf += vol->bytes_per_sector;
+		memcpy(blockData, buffer, vol->bytes_per_sector);
 		block_cache_put(vol->fBlockCache, sector + i * vol->sectors_per_fat);
 	}
 
