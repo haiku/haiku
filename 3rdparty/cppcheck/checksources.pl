@@ -32,7 +32,7 @@ foreach my $dir (sort keys %headers) {
 }
 
 print "Running cppcheck tool...\n";
-$cppcheck = "cppcheck -j $jobs --force --auto-dealloc 3rdparty/cppcheck/haiku.lst --enable=exceptRealloc,possibleError,style $headersDirs $dirToCheck 2> $fileToLog";
+$cppcheck = "cppcheck -j $jobs --force --auto-dealloc 3rdparty/cppcheck/haiku.lst --enable=exceptRealloc,possibleError $headersDirs $dirToCheck 2> $fileToLog";
 
 system($cppcheck);
 
