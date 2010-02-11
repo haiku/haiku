@@ -1,0 +1,18 @@
+1	russian	x-vnd.haiku.zip-o-matic	274748138
+1 file added.	file:ZipOMaticWindow.cpp		1 файл добавлен.
+Stop	file:ZipOMaticWindow.cpp		Остановить
+Creating archive: %s	file:ZipOMaticWindow.cpp		Создание архива: %s
+Continue	file:ZipOMaticWindow.cpp		Продолжить
+Preparing to archive	file:ZipperThread.cpp		Подготовка к архивированию
+Filename: %s	file:ZipOMaticWindow.cpp		Имя файла: %s
+Let them continue	file:ZipOMatic.cpp		Позволить им продолжаить
+Do you want to stop them?	file:ZipOMatic.cpp		Вы хотите остановить их?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Вы уверены, что хотите остановить создание этого архива?
+%ld files added.	file:ZipOMaticWindow.cpp		Добавлено %ld файлов.
+Stopped	file:ZipOMaticWindow.cpp		Остановлено
+Archive	file:ZipperThread.cpp		Архив
+Drop files to zip.	file:ZipOMaticWindow.cpp		Киньте файлы для сжатия в zip.
+Error creating archive	file:ZipOMaticWindow.cpp		Ошибка при создании архива
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У Вас запущено %ld Zip-O-Matic.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Архив был успешно создан
+Stop them	file:ZipOMatic.cpp		Остановить их

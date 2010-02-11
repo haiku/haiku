@@ -1,0 +1,18 @@
+1	dutch	x-vnd.haiku.zip-o-matic	274748138
+1 file added.	file:ZipOMaticWindow.cpp		1 bestand toegevoegd.
+Stop	file:ZipOMaticWindow.cpp		Stop
+Creating archive: %s	file:ZipOMaticWindow.cpp		Creëert archief: %s
+Continue	file:ZipOMaticWindow.cpp		Doorgaan
+Preparing to archive	file:ZipperThread.cpp		Archivering voorbereiden
+Filename: %s	file:ZipOMaticWindow.cpp		Bestandsnaam: %s
+Let them continue	file:ZipOMatic.cpp		Laat ze doorgaan
+Do you want to stop them?	file:ZipOMatic.cpp		Wilt u hen stoppen?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Weet u zeker dat u de creatie van dit archief wilt stoppen?
+%ld files added.	file:ZipOMaticWindow.cpp		%ld bestanden toegevoegd.
+Stopped	file:ZipOMaticWindow.cpp		Gestopt
+Archive	file:ZipperThread.cpp		Archief
+Drop files to zip.	file:ZipOMaticWindow.cpp		Sleep bestanden hierheen om te archiveren.
+Error creating archive	file:ZipOMaticWindow.cpp		Fout bij creëren van archief
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Uw %ld Zip-O-Matic zijn actief.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Creatie van archief gelukt
+Stop them	file:ZipOMatic.cpp		Hen stoppen
