@@ -563,13 +563,11 @@ BBox::DoLayout()
 
 		BView::DoLayout();
 
-		if (!fLabelView)
+		if (fLabelView)
+			AddChild(fLabelView, ChildAt(0));
+		else
 			return;
 	}
-
-	// Add it again..
-	if (layouted && fLabelView)
-		AddChild(fLabelView, ChildAt(0));
 
 	_ValidateLayoutData();
 
