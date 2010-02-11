@@ -167,8 +167,8 @@ TUNABLE_INT("hw.re.msi_disable", &msi_disable);
 static struct rl_type re_devs[] = {
 	{ DLINK_VENDORID, DLINK_DEVICEID_528T, 0,
 	    "D-Link DGE-528(T) Gigabit Ethernet Adapter" },
-	/*{ RT_VENDORID, RT_DEVICEID_8139, 0,
-	    "RealTek 8139C+ 10/100BaseTX" },*/
+	{ RT_VENDORID, RT_DEVICEID_8139, 0,
+	    "RealTek 8139C+ 10/100BaseTX" },
 	{ RT_VENDORID, RT_DEVICEID_8101E, 0,
 	    "RealTek 8101E/8102E/8102EL PCIe 10/100baseTX" },
 	/*{ RT_VENDORID, RT_DEVICEID_8168, 0,
