@@ -12,6 +12,8 @@
 #include <arch/int.h>
 #include <arch/cpu.h>
 #include <int.h>
+#include <vm/vm.h>
+
 
 #define TRACE_HPET
 #ifdef TRACE_HPET
@@ -171,9 +173,10 @@ hpet_init(struct kernel_args *args)
 
 	if (sHPETRegs == NULL) {
 		sHPETRegs = (struct hpet_regs *)args->arch_args.hpet;
-		if (map_physical_memory("hpet", (void *)args->arch_args.hpet_phys,
-			B_PAGE_SIZE, B_EXACT_ADDRESS, B_KERNEL_READ_AREA |
-			B_KERNEL_WRITE_AREA, (void **)&sHPETRegs) < B_OK) {
+		if (vm_map_physical_memory(B_SYSTEM_TEAM, "hpet",
+			(void **)&sHPETRegs, B_EXACT_ADDRESS, B_PAGE_SIZE,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			(addr_t)args->arch_args.hpet_phys, true) < B_OK) {
 			// Would it be better to panic here?
 			dprintf("hpet_init: Failed to map memory for the HPET registers.");
 			return B_ERROR;
