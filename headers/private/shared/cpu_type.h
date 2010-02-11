@@ -198,6 +198,7 @@ get_cpu_model_string(system_info *info)
 				return "Core 2 Xeon";
 			return "Core 2 Extreme";
 		case B_CPU_INTEL_PENTIUM_CORE_I7:
+		case B_CPU_INTEL_PENTIUM_CORE_I7_Q720:
 			get_cpuid_model_string(cpuidName);
 			if (strcasestr(cpuidName, "Xeon") != NULL)
 				return "Core i7 Xeon";
