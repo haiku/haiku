@@ -862,8 +862,9 @@ BView::SetFlags(uint32 flags)
 				fOwner->SetPulseRate(fOwner->PulseRate());
 		}
 
-		if (flags & (B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
-					| B_FRAME_EVENTS | B_SUBPIXEL_PRECISE)) {
+		uint32 changesFlags = flags ^ fFlags;
+		if (changesFlags & (B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
+				| B_FRAME_EVENTS | B_SUBPIXEL_PRECISE)) {
 			_CheckLockAndSwitchCurrent();
 
 			fOwner->fLink->StartMessage(AS_VIEW_SET_FLAGS);
