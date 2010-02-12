@@ -21,6 +21,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	BeHappy					- special documentation (i.e. BeBook) browser
 #	BeOSCompatibility		- creates links within the system to support old apps
 #	BePDF					- native PDF reader
+#	BeZillaBrowser			- fork of Mozilla's 1.8 branch.
 #	Bluetooth				- experimental Haiku components for Bluetooth
 #	CDRecord				- the command line CD writing tools
 #	Clockwerk				- native audio/video compositing
@@ -32,7 +33,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	DevelopmentBase			- basic development environment (gcc, headers, libs,...)
 #	DevelopmentMin			- development headers, libs, tools, from sources only
 #	Expat					- XML parsing libraries
-#	Firefox					- the webbrowser
+#	Firefox					- the webbrowser NOTE: will be removed soon.
 #	Git						- the distributed version control system
 #	ICU-devel				- the headers for ICU (for development)
 #	KeymapSwitcher			- Desktop utility
@@ -204,6 +205,31 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BePDF/BePDF ;
+	}
+}
+
+
+# BeZillaBrowser
+if [ IsOptionalHaikuImagePackageAdded BeZillaBrowser ] {
+	
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package BeZillaBrowser available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			BeZillaBrowser-2.0.0.22pre-x86-gcc4-2010-01-27
+			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc4-2010-01-27.zip
+ 			:
+ 		;
+ 		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			BeZillaBrowser-2.0.0.22pre-x86-gcc2-2010-01-27
+			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc2-2010-01-27.zip
+ 			:
+ 		;
+ 		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
 	}
 }
 
@@ -519,25 +545,8 @@ if [ IsOptionalHaikuImagePackageAdded Expat ] {
 
 # Firefox web browser
 if [ IsOptionalHaikuImagePackageAdded Firefox ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage
-			BeZillaBrowser-2.0.0.22pre-x86-gcc4-2010-01-27
-			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc4-2010-01-27.zip
- 			:
- 		;
- 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
-	} else {
-		InstallOptionalHaikuImagePackage
-			BeZillaBrowser-2.0.0.22pre-x86-gcc2-2010-01-27
-			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc2-2010-01-27.zip
- 			:
- 		;
- 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
-	}
+	Echo "Warning: The optional package Firefox is being replaced with"
+	"BeZillaBrowser" ;
 }
 
 
