@@ -278,11 +278,7 @@ BStatusBar::FrameResized(float newWidth, float newHeight)
 void
 BStatusBar::Draw(BRect updateRect)
 {
-	rgb_color backgroundColor;
-	if (Parent())
-		backgroundColor = Parent()->ViewColor();
-	else
-		backgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color backgroundColor = LowColor();
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
