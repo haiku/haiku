@@ -48,6 +48,7 @@ public:
 	virtual void		Pulse();
 
 private:
+	bool				_EntryInTrash(const entry_ref*);
 	void				_RefreshMailQuery();
 	bool				_CreateMenuLinks(BDirectory&, BPath&);
 	void				_CreateNewMailQuery(BEntry&);

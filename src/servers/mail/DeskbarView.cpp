@@ -126,6 +126,22 @@ void DeskbarView::AttachedToWindow()
 }
 
 
+bool DeskbarView::_EntryInTrash(const entry_ref* entry)
+{
+	BPath trashPath;
+	BPath entryPath(entry);
+	BVolume volume(entry->device);
+	if (volume.InitCheck() == B_OK) {
+		find_directory(B_TRASH_DIRECTORY, &trashPath, false, &volume);
+		if (strncmp(entryPath.Path(), trashPath.Path(), 
+			strlen(trashPath.Path())) == 0)
+			return true;
+	}
+	
+	return false;
+}
+
+
 void DeskbarView::_RefreshMailQuery()
 {
 	for (int32 i = 0; i < fNewMailQueries.CountItems(); i++)
@@ -138,7 +154,6 @@ void DeskbarView::_RefreshMailQuery()
 
 	while (volumes.GetNextVolume(&volume) == B_OK) {
 		BQuery *newMailQuery = new BQuery;
-
 		newMailQuery->SetTarget(this);
 		newMailQuery->SetVolume(&volume);
 		newMailQuery->PushAttr(B_MAIL_ATTR_STATUS);
@@ -156,8 +171,12 @@ void DeskbarView::_RefreshMailQuery()
 
 		BEntry entry;
 		while (newMailQuery->GetNextEntry(&entry) == B_OK) {
-			if (entry.InitCheck() == B_OK)
-				fNewMessages++;
+			if (entry.InitCheck() == B_OK) {
+				entry_ref ref;
+				entry.GetRef(&ref);
+				if (!_EntryInTrash(&ref))
+					fNewMessages++;
+			}
 		}
 
 		fNewMailQueries.AddItem(newMailQuery);
@@ -231,13 +250,32 @@ DeskbarView::MessageReceived(BMessage* message)
 		case B_QUERY_UPDATE:
 		{
 			int32 what;
+			dev_t device;
+			ino_t directory;
+			const char *name;			
+			entry_ref ref;
 			message->FindInt32("opcode", &what);
+			message->FindInt32("device", &device);
+			message->FindInt64("directory", &directory);
 			switch (what) {
 				case B_ENTRY_CREATED:
-					fNewMessages++;
+					if (message->FindString("name", &name) == B_OK) {
+						ref.device = device;
+						ref.directory = directory;
+						ref.set_name(name);
+						if (!_EntryInTrash(&ref))
+							fNewMessages++;
+					}
 					break;
 				case B_ENTRY_REMOVED:
-					fNewMessages--;
+					node_ref node;
+					node.device = device;
+					node.node = directory;
+					BDirectory dir(&node);
+					BEntry entry(&dir, NULL);
+					entry.GetRef(&ref);
+					if (!_EntryInTrash(&ref))
+						fNewMessages--;
 					break;
 			}
 			fStatus = (fNewMessages > 0) ? kStatusNewMail : kStatusNoMail;
