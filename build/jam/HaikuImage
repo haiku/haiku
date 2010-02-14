@@ -49,7 +49,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	listport listres listsem listusb ln locate logger login logname ls lsindex
 	mail2mbox makebootable mbox2mail md5sum merge message mimeset mkdos mkdir
 	mkfifo mkfs mkindex modifiers mount mount_nfs mountvolume mv
-	nc netstat nl nohup
+	netcat netstat nl nohup
 	od open
 	passwd paste patch pathchk pc ping play playfile playsound playwav pr prio
 	printenv printf profile ps ptx pwd
@@ -248,7 +248,7 @@ AddDriversToHaikuImage disk virtual	: nbd ;
 AddDriversToHaikuImage dvb			: cx23882 ;
 AddDriversToHaikuImage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage input		: ps2_hid usb_hid wacom ;
-AddDriversToHaikuImage misc			: <driver>poke <driver>test <driver>mem ;
+AddDriversToHaikuImage misc			: <driver>poke <driver>mem ;
 AddDriversToHaikuImage net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 #AddDriversToHaikuImage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 

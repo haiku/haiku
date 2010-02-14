@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src bin network nc ;
+SubDir HAIKU_TOP src bin network netcat ;
 
 SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
@@ -8,17 +8,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
-BinCommand nc :
+BinCommand netcat :
 	netcat.c
 	: $(TARGET_NETWORK_LIBS)
-;
-
-HaikuInstall install-networking
-	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
-	: nc ;
-
-HaikuInstall install-userland-networking
-	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
-	: nc
-	: installed-userland-networking
 ;
