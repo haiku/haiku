@@ -82,7 +82,7 @@ public:
 	void SetTo(Type* object, bool alreadyHasReference = false)
 	{
 		if (object != NULL && !alreadyHasReference)
-			object->AddReference();
+			object->AcquireReference();
 
 		Unset();
 
@@ -92,7 +92,7 @@ public:
 	void Unset()
 	{
 		if (fObject) {
-			fObject->RemoveReference();
+			fObject->ReleaseReference();
 			fObject = NULL;
 		}
 	}
