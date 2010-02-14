@@ -1,11 +1,16 @@
 #include <Application.h>
 #include <Box.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <Path.h>
 #include <Picture.h>
 #include <Shape.h>
 #include <View.h>
 #include <Window.h>
 
+
 #include "SVGViewView.h"
+
 
 class Svg2PictureWindow : public BWindow {
 public:
@@ -16,6 +21,7 @@ public:
         	AddChild(view);
 	}
 };
+
 
 class OriginalView : public BBox {
 public:
@@ -137,6 +143,7 @@ PictureView::AllAttached()
 	message2.PrintToStream();
 }
 
+
 void
 PictureView::Draw(BRect update)
 {
@@ -145,18 +152,18 @@ PictureView::Draw(BRect update)
 }
 
 
-// main
+// #pragma mark -
+
+
 int
 main()
 {		
 	BApplication pictureApp("application/x-vnd.picture");
+
 	BWindow *pictureWindow = new BWindow(BRect(100, 100, 500, 400),
-				"BPicture test", B_TITLED_WINDOW,
-				B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_QUIT_ON_WINDOW_CLOSE);
-	
-	BWindow *svgWindow = new Svg2PictureWindow(BRect(300, 300, 600, 600), "/boot/beos/etc/artwork/lion.svg");
-	
-	
+		"BPicture test", B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_QUIT_ON_WINDOW_CLOSE);
+
 	BRect rect(pictureWindow->Bounds());
 	rect.right -= (rect.Width() + 1) / 2;
 	OriginalView *testView = new OriginalView(rect);
@@ -166,12 +173,20 @@ main()
 	
 	pictureWindow->AddChild(testView);
 	pictureWindow->AddChild(pictureView);
-	
 	pictureWindow->Show();
-	svgWindow->Show();
+
+	BPath path;
+	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &path) == B_OK) {
+		path.Append("artwork/lion.svg");
+		BEntry entry(path.Path());
+		if (entry.Exists()) {
+			BWindow *svgWindow = new Svg2PictureWindow(BRect(300, 300, 600, 600),
+				path.Path());
+			svgWindow->Show();
+		}
+	}
 
 	pictureApp.Run();
-	
 	return 0;
 }
 
