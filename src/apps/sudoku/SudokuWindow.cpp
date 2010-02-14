@@ -1,17 +1,10 @@
 /*
- * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "SudokuWindow.h"
-
-#include "CenteredViewContainer.h"
-#include "ProgressWindow.h"
-#include "Sudoku.h"
-#include "SudokuField.h"
-#include "SudokuGenerator.h"
-#include "SudokuView.h"
 
 #include <stdio.h>
 
@@ -28,40 +21,52 @@
 
 #include <be_apps/Tracker/RecentItems.h>
 
+#include "CenteredViewContainer.h"
+#include "ProgressWindow.h"
+#include "Sudoku.h"
+#include "SudokuField.h"
+#include "SudokuGenerator.h"
+#include "SudokuView.h"
+
 
 const uint32 kMsgOpenFilePanel = 'opfp';
-const uint32 kMsgGenerateVeryEasySudoku = 'gnsv';
-const uint32 kMsgGenerateEasySudoku = 'gnse';
-const uint32 kMsgGenerateHardSudoku = 'gnsh';
+const uint32 kMsgGenerateSudoku = 'gnsu';
 const uint32 kMsgAbortSudokuGenerator = 'asgn';
 const uint32 kMsgSudokuGenerated = 'sugn';
 const uint32 kMsgMarkInvalid = 'minv';
 const uint32 kMsgMarkValidHints = 'mvht';
 const uint32 kMsgStoreState = 'stst';
 const uint32 kMsgRestoreState = 'rest';
-const uint32 kMsgNew = 'new ';
+const uint32 kMsgNewBlank = 'new ';
 const uint32 kMsgStartAgain = 'stag';
 const uint32 kMsgExportAs = 'expt';
 
 
+enum sudoku_level {
+	kEasyLevel		= 0,
+	kAdvancedLevel	= 2,
+	kHardLevel		= 4,
+};
+
+
 class GenerateSudoku {
 public:
-	GenerateSudoku(SudokuField& field, int32 level, BMessenger progress,
-		BMessenger target);
-	~GenerateSudoku();
+								GenerateSudoku(SudokuField& field, int32 level,
+									BMessenger progress, BMessenger target);
+								~GenerateSudoku();
 
-	void Abort();
+			void				Abort();
 
 private:
-	void _Generate();
-	static status_t _GenerateThread(void* self);
+			void				_Generate();
+	static	status_t			_GenerateThread(void* self);
 
-	SudokuField	fField;
-	BMessenger	fTarget;
-	BMessenger	fProgress;
-	thread_id	fThread;
-	int32		fLevel;
-	bool		fQuit;
+			SudokuField			fField;
+			BMessenger			fTarget;
+			BMessenger			fProgress;
+			thread_id			fThread;
+			int32				fLevel;
+			bool				fQuit;
 };
 
 
@@ -158,6 +163,9 @@ SudokuWindow::SudokuWindow()
 		}
 	}
 
+	int32 level = 0;
+	settings.FindInt32("level", &level);
+
 	// create GUI
 
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "menu");
@@ -169,10 +177,11 @@ SudokuWindow::SudokuWindow()
 	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(top);
 
-	fSudokuView = new SudokuView(top->Bounds().InsetByCopy(10, 10).OffsetToSelf(0, 0),
+	fSudokuView = new SudokuView(
+		top->Bounds().InsetByCopy(10, 10).OffsetToSelf(0, 0),
 		"sudoku view", settings, B_FOLLOW_NONE);
-	CenteredViewContainer * container = new CenteredViewContainer(fSudokuView, 
-		top->Bounds().InsetByCopy(10, 10), 
+	CenteredViewContainer* container = new CenteredViewContainer(fSudokuView,
+		top->Bounds().InsetByCopy(10, 10),
 		"center", B_FOLLOW_ALL);
 	container->SetHighColor(top->ViewColor());
 	top->AddChild(container);
@@ -181,7 +190,23 @@ SudokuWindow::SudokuWindow()
 
 	// "File" menu
 	BMenu* menu = new BMenu("File");
-	menu->AddItem(new BMenuItem("New", new BMessage(kMsgNew)));
+	fNewMenu = new BMenu("New");
+	menu->AddItem(new BMenuItem(fNewMenu, new BMessage(kMsgGenerateSudoku)));
+	fNewMenu->Superitem()->SetShortcut('N', B_COMMAND_KEY);
+
+	BMessage* message = new BMessage(kMsgGenerateSudoku);
+	message->AddInt32("level", kEasyLevel);
+	fNewMenu->AddItem(new BMenuItem("Easy", message));
+	message = new BMessage(kMsgGenerateSudoku);
+	message->AddInt32("level", kAdvancedLevel);
+	fNewMenu->AddItem(new BMenuItem("Advanced", message));
+	message = new BMessage(kMsgGenerateSudoku);
+	message->AddInt32("level", kHardLevel);
+	fNewMenu->AddItem(new BMenuItem("Hard", message));
+
+	fNewMenu->AddSeparatorItem();
+	fNewMenu->AddItem(new BMenuItem("Blank", new BMessage(kMsgNewBlank)));
+
 	menu->AddItem(new BMenuItem("Start again", new BMessage(kMsgStartAgain)));
 	menu->AddSeparatorItem();
 	BMenu* recentsMenu = BRecentFilesList::NewFileListMenu(
@@ -191,34 +216,19 @@ SudokuWindow::SudokuWindow()
 	menu->AddItem(item = new BMenuItem(recentsMenu,
 		new BMessage(kMsgOpenFilePanel)));
 	item->SetShortcut('O', B_COMMAND_KEY);
-	BMenu* subMenu = new BMenu("Generate");
-	subMenu->AddItem(new BMenuItem("Easy",
-		new BMessage(kMsgGenerateVeryEasySudoku)));
-	subMenu->AddItem(new BMenuItem("Advanced",
-		new BMessage(kMsgGenerateEasySudoku)));
-	subMenu->AddItem(new BMenuItem("Hard",
-		new BMessage(kMsgGenerateHardSudoku)));
-	menu->AddItem(subMenu);
 
 	menu->AddSeparatorItem();
 
-	subMenu = new BMenu("Export as" B_UTF8_ELLIPSIS);
-	BMessage *msg;
-	msg = new BMessage(kMsgExportAs);
-	msg->AddInt32("as", kExportAsText);
-	subMenu->AddItem(new BMenuItem("Text", msg));
-	msg = new BMessage(kMsgExportAs);
-	msg->AddInt32("as", kExportAsHTML);
-	subMenu->AddItem(new BMenuItem("HTML", msg));
-	/*
-	msg = new BMessage(kMsgExportAs);
-	msg->AddInt32("as", kExportAsBitmap);
-	subMenu->AddItem(new BMenuItem("Bitmap" B_UTF8_ELLIPSIS, msg));
-	*/
+	BMenu* subMenu = new BMenu("Export as" B_UTF8_ELLIPSIS);
+	message = new BMessage(kMsgExportAs);
+	message->AddInt32("as", kExportAsText);
+	subMenu->AddItem(new BMenuItem("Text", message));
+	message= new BMessage(kMsgExportAs);
+	message->AddInt32("as", kExportAsHTML);
+	subMenu->AddItem(new BMenuItem("HTML", message));
 	menu->AddItem(subMenu);
 
-	menu->AddItem(item = new BMenuItem("Copy",
-		new BMessage(B_COPY), 'C'));
+	menu->AddItem(item = new BMenuItem("Copy", new BMessage(B_COPY), 'C'));
 
 	menu->AddSeparatorItem();
 
@@ -235,11 +245,11 @@ SudokuWindow::SudokuWindow()
 	menu = new BMenu("View");
 	menu->AddItem(item = new BMenuItem("Mark invalid values",
 		new BMessage(kMsgMarkInvalid)));
-	if (fSudokuView->HintFlags() & kMarkInvalid)
+	if ((fSudokuView->HintFlags() & kMarkInvalid) != 0)
 		item->SetMarked(true);
 	menu->AddItem(item = new BMenuItem("Mark valid hints",
 		new BMessage(kMsgMarkValidHints)));
-	if (fSudokuView->HintFlags() & kMarkValidHints)
+	if ((fSudokuView->HintFlags() & kMarkValidHints) != 0)
 		item->SetMarked(true);
 	menu->SetTargetForItems(this);
 	menuBar->AddItem(menu);
@@ -253,7 +263,8 @@ SudokuWindow::SudokuWindow()
 	fRedoItem->SetEnabled(false);
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Snapshot current", new BMessage(kMsgStoreState)));
+	menu->AddItem(new BMenuItem("Snapshot current",
+		new BMessage(kMsgStoreState)));
 	menu->AddItem(fRestoreStateItem = new BMenuItem("Restore snapshot",
 		new BMessage(kMsgRestoreState)));
 	fRestoreStateItem->SetEnabled(fStoredState != NULL);
@@ -269,6 +280,8 @@ SudokuWindow::SudokuWindow()
 	fOpenPanel->SetTarget(this);
 	fSavePanel = new BFilePanel(B_SAVE_PANEL);
 	fSavePanel->SetTarget(this);
+
+	_SetLevel(level);
 
 	fSudokuView->StartWatching(this, kUndoRedoChanged);
 		// we like to know whenever the undo/redo state changes
@@ -307,7 +320,7 @@ SudokuWindow::_LoadSettings(BMessage& settings)
 {
 	BFile file;
 	status_t status = _OpenSettings(file, B_READ_ONLY);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	return settings.Unflatten(&file);
@@ -320,7 +333,7 @@ SudokuWindow::_SaveSettings()
 	BFile file;
 	status_t status = _OpenSettings(file, B_WRITE_ONLY | B_CREATE_FILE
 		| B_ERASE_FILE);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	BMessage settings('sudo');
@@ -329,6 +342,8 @@ SudokuWindow::_SaveSettings()
 		status = fSudokuView->SaveState(settings);
 	if (status == B_OK && fStoredState != NULL)
 		status = settings.AddMessage("stored state", fStoredState);
+	if (status == B_OK)
+		status = settings.AddInt32("level", _Level());
 	if (status == B_OK)
 		status = settings.Flatten(&file);
 
@@ -425,15 +440,16 @@ SudokuWindow::MessageReceived(BMessage* message)
 			_MessageDropped(message);
 			break;
 
-		case kMsgGenerateVeryEasySudoku:
-			_Generate(0);
+		case kMsgGenerateSudoku:
+		{
+			int32 level;
+			if (message->FindInt32("level", &level) != B_OK)
+				level = _Level();
+
+			_SetLevel(level);
+			_Generate(level);
 			break;
-		case kMsgGenerateEasySudoku:
-			_Generate(2);
-			break;
-		case kMsgGenerateHardSudoku:
-			_Generate(4);
-			break;
+		}
 		case kMsgAbortSudokuGenerator:
 			if (fGenerator != NULL)
 				fGenerator->Abort();
@@ -475,14 +491,14 @@ SudokuWindow::MessageReceived(BMessage* message)
 
 			BDirectory directory(&directoryRef);
 			BEntry entry(&directory, name);
-			
+
 			entry_ref ref;
 			if (entry.GetRef(&ref) == B_OK)
 				fSudokuView->SaveTo(ref, fExportFormat);
 			break;
 		}
 
-		case kMsgNew:
+		case kMsgNewBlank:
 			_ResetStoredState();
 			fSudokuView->ClearAll();
 			break;
@@ -558,4 +574,35 @@ SudokuWindow::QuitRequested()
 	_SaveSettings();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
+}
+
+
+int32
+SudokuWindow::_Level() const
+{
+	BMenuItem* item = fNewMenu->FindMarked();
+	if (item == NULL)
+		return 0;
+
+	BMessage* message = item->Message();
+	if (message == NULL)
+		return 0;
+
+	return message->FindInt32("level");
+}
+
+
+void
+SudokuWindow::_SetLevel(int32 level)
+{
+	for (int32 i = 0; i < fNewMenu->CountItems(); i++) {
+		BMenuItem* item = fNewMenu->ItemAt(i);
+
+		BMessage* message = item->Message();
+		if (message != NULL && message->HasInt32("level")
+			&& message->FindInt32("level") == level)
+			item->SetMarked(true);
+		else
+			item->SetMarked(false);
+	}
 }
