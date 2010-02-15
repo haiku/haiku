@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2010, Michael Lotz, mmlr@mlotz.ch.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -1438,7 +1438,7 @@ heap_allocate_from_bin(heap_allocator *heap, uint32 binIndex, size_t size)
 		heap_free_pages_removed(heap, area, 1);
 
 		if (page->in_use)
-			panic("got an in use page from the free pages list\n");
+			panic("got an in use page %p from the free pages list\n", page);
 		page->in_use = 1;
 
 		pageLocker.Unlock();
