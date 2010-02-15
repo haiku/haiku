@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -79,14 +79,12 @@ public:
 									{ return fInitialWorkspace; }
 
 			ServerBitmap*		GetBitmap(int32 token) const;
-			bool				BitmapAdded(ServerBitmap* bitmap);
-			void				BitmapRemoved(ServerBitmap* bitmap);
 
 			ServerPicture*		CreatePicture(
 									const ServerPicture* original = NULL);
 			ServerPicture*		GetPicture(int32 token) const;
-			bool				PictureAdded(ServerPicture* picture);
-			void				PictureRemoved(ServerPicture* picture);
+			bool				AddPicture(ServerPicture* picture);
+			void				RemovePicture(ServerPicture* picture);
 
 			Desktop*			GetDesktop() const { return fDesktop; }
 
@@ -105,7 +103,10 @@ private:
 
 			bool				_HasWindowUnderMouse();
 
+			bool				_AddBitmap(ServerBitmap* bitmap);
+			void				_DeleteBitmap(ServerBitmap* bitmap);
 			ServerBitmap*		_FindBitmap(int32 token) const;
+
 			ServerPicture*		_FindPicture(int32 token) const;
 
 private:

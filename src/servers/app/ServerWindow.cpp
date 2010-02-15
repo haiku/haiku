@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -2066,8 +2066,10 @@ fDesktop->LockSingleWindow();
 			DTRACE(("ServerWindow %s: Message AS_VIEW_BEGIN_PICTURE\n",
 				Title()));
 			ServerPicture* picture = App()->CreatePicture();
-			picture->SyncState(fCurrentView);
-			fCurrentView->SetPicture(picture);
+			if (picture != NULL) {
+				picture->SyncState(fCurrentView);
+				fCurrentView->SetPicture(picture);
+			}
 			break;
 		}
 
@@ -2756,9 +2758,9 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 
 bool
-ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
+ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 {
-	ServerPicture *picture = fCurrentView->Picture();
+	ServerPicture* picture = fCurrentView->Picture();
 	if (picture == NULL)
 		return false;
 
@@ -2778,7 +2780,6 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			picture->WriteInvertRect(rect);
-
 			break;
 		}
 
@@ -3092,13 +3093,12 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&opCount);
 			link.Read<int32>(&ptCount);
 
-			uint32 *opList = new(nothrow) uint32[opCount];
-			BPoint *ptList = new(nothrow) BPoint[ptCount];
+			uint32* opList = new(std::nothrow) uint32[opCount];
+			BPoint* ptList = new(std::nothrow) BPoint[ptCount];
 			if (opList != NULL && ptList != NULL
 				&& link.Read(opList, opCount * sizeof(uint32)) >= B_OK
 				&& link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
-
-				// This might seem a bit weird, but under R5, the shapes
+				// This might seem a bit weird, but under BeOS, the shapes
 				// are always offset by the current pen location
 				BPoint penLocation
 					= fCurrentView->CurrentState()->PenLocation();
@@ -3108,9 +3108,9 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 				const bool fill = (code == AS_FILL_SHAPE);
 				picture->WriteDrawShape(opCount, opList, ptCount, ptList, fill);
 			}
+
 			delete[] opList;
 			delete[] ptList;
-
 			break;
 		}
 
@@ -3175,16 +3175,17 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 				// we are supposed to clear the clipping region
 				picture->WriteClearClipping();
 			}
-
 			break;
 		}
+
 		case AS_VIEW_BEGIN_PICTURE:
 		{
-			ServerPicture *newPicture = App()->CreatePicture();
-			newPicture->Usurp(picture);
-			newPicture->SyncState(fCurrentView);
-			fCurrentView->SetPicture(newPicture);
-
+			ServerPicture* newPicture = App()->CreatePicture();
+			if (newPicture != NULL) {
+				newPicture->PushPicture(picture);
+				newPicture->SyncState(fCurrentView);
+				fCurrentView->SetPicture(newPicture);
+			}
 			break;
 		}
 
@@ -3196,7 +3197,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			ServerPicture* appendPicture = App()->GetPicture(token);
 			if (appendPicture != NULL) {
 				//picture->SyncState(fCurrentView);
-				appendPicture->Usurp(picture);
+				appendPicture->AppendPicture(picture);
 			}
 
 			fCurrentView->SetPicture(appendPicture);
@@ -3208,9 +3209,11 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_VIEW_END_PICTURE:
 		{
-			ServerPicture* steppedDown = picture->StepDown();
+			ServerPicture* poppedPicture = picture->PopPicture();
+			fCurrentView->SetPicture(poppedPicture);
+			if (poppedPicture != NULL)
+				poppedPicture->ReleaseReference();
 
-			fCurrentView->SetPicture(steppedDown);
 			fLink.StartMessage(B_OK);
 			fLink.Attach<int32>(picture->Token());
 			fLink.Flush();
@@ -3301,6 +3304,7 @@ ServerWindow::_MessageLooper()
 #endif
 
 		int32 messagesProcessed = 0;
+		bigtime_t processingStart = system_time();
 		bool lockedDesktop = false;
 		bool needsAllWindowsLocked = false;
 
@@ -3384,8 +3388,9 @@ ServerWindow::_MessageLooper()
 				fDesktop->UnlockAllWindows();
 
 			// Only process up to 70 waiting messages at once (we have the
-			// Desktop locked)
-			if (!receiver.HasMessages() || ++messagesProcessed > 70) {
+			// Desktop locked), but don't hold the lock longer than 25 ms
+			if (!receiver.HasMessages() || ++messagesProcessed > 70
+				|| system_time() - processingStart > 25000) {
 				if (lockedDesktop)
 					fDesktop->UnlockSingleWindow();
 				break;

@@ -191,19 +191,11 @@ ServerApp::~ServerApp()
 
 	fMapLocker.Lock();
 
-	while (!fBitmapMap.empty()) {
-		ServerBitmap* bitmap = fBitmapMap.begin()->second;
+	while (!fBitmapMap.empty())
+		_DeleteBitmap(fBitmapMap.begin()->second);
 
-		fBitmapMap.erase(fBitmapMap.begin());
-		bitmap->ReleaseReference();
-	}
-
-	while (!fPictureMap.empty()) {
-		ServerPicture* picture = fPictureMap.begin()->second;
-
-		fPictureMap.erase(fPictureMap.begin());
-		picture->ReleaseReference();
-	}
+	while (!fPictureMap.empty())
+		RemovePicture(fPictureMap.begin()->second);
 
 	fDesktop->GetCursorManager().DeleteCursors(fClientTeam);
 
@@ -298,16 +290,15 @@ ServerApp::SendMessageToClient(BMessage* message) const
 void
 ServerApp::SetCurrentCursor(ServerCursor* cursor)
 {
-	if (fViewCursor == cursor)
-		return;
+	if (fViewCursor != cursor) {
+		if (fViewCursor)
+			fViewCursor->ReleaseReference();
 
-	if (fViewCursor)
-		fViewCursor->ReleaseReference();
+		fViewCursor = cursor;
 
-	fViewCursor = cursor;
-
-	if (fViewCursor)
-		fViewCursor->AcquireReference();
+		if (fViewCursor)
+			fViewCursor->AcquireReference();
+	}
 
 	fDesktop->SetCursor(CurrentCursor());
 }
@@ -419,29 +410,6 @@ ServerApp::GetBitmap(int32 token) const
 }
 
 
-bool
-ServerApp::BitmapAdded(ServerBitmap* bitmap)
-{
-	BAutolock _(fMapLocker);
-
-	try {
-		fBitmapMap.insert(std::make_pair(bitmap->Token(), bitmap));
-	} catch (std::bad_alloc& exception) {
-		return false;
-	}
-
-	return true;
-}
-
-
-void
-ServerApp::BitmapRemoved(ServerBitmap* bitmap)
-{
-	BAutolock _(fMapLocker);
-	fBitmapMap.erase(bitmap->Token());
-}
-
-
 ServerPicture*
 ServerApp::CreatePicture(const ServerPicture* original)
 {
@@ -477,7 +445,7 @@ ServerApp::GetPicture(int32 token) const
 
 
 bool
-ServerApp::PictureAdded(ServerPicture* picture)
+ServerApp::AddPicture(ServerPicture* picture)
 {
 	BAutolock _(fMapLocker);
 
@@ -492,10 +460,12 @@ ServerApp::PictureAdded(ServerPicture* picture)
 
 
 void
-ServerApp::PictureRemoved(ServerPicture* picture)
+ServerApp::RemovePicture(ServerPicture* picture)
 {
 	BAutolock _(fMapLocker);
+
 	fPictureMap.erase(picture->Token());
+	picture->ReleaseReference();
 }
 
 
@@ -743,7 +713,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
 				Signature(), frame.Width() + 1, frame.Height() + 1));
 
-			if (bitmap != NULL && bitmap->SetOwner(this)) {
+			if (bitmap != NULL && _AddBitmap(bitmap)) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(bitmap->Token());
 				fLink.Attach<uint8>(allocationFlags);
@@ -770,8 +740,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: received BBitmap delete request\n",
 				Signature()));
 
-			// Delete a bitmap's allocated memory
-
 			// Attached Data:
 			// 1) int32 token
 			int32 token;
@@ -784,7 +752,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(),
 					token));
 
-				bitmap->ReleaseClientReference();
+				_DeleteBitmap(bitmap);
 			}
 
 			fMapLocker.Unlock();
@@ -833,6 +801,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		// Picture ops
+
 		case AS_CREATE_PICTURE:
 		{
 			// TODO: Maybe rename this to AS_UPLOAD_PICTURE ?
@@ -872,7 +842,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 				ServerPicture* picture = _FindPicture(token);
 				if (picture != NULL)
-					picture->ReleaseClientReference();
+					RemovePicture(picture);
 			}
 			break;
 		}
@@ -3196,6 +3166,34 @@ ServerApp::_HasWindowUnderMouse()
 	}
 
 	return false;
+}
+
+
+bool
+ServerApp::_AddBitmap(ServerBitmap* bitmap)
+{
+	BAutolock _(fMapLocker);
+
+	try {
+		fBitmapMap.insert(std::make_pair(bitmap->Token(), bitmap));
+	} catch (std::bad_alloc& exception) {
+		return false;
+	}
+
+	bitmap->SetOwner(this);
+	return true;
+}
+
+
+void
+ServerApp::_DeleteBitmap(ServerBitmap* bitmap)
+{
+	ASSERT(fMapLock.IsLocked());
+
+	gBitmapManager->BitmapRemoved(bitmap);
+	fBitmapMap.erase(bitmap->Token());
+
+	bitmap->ReleaseReference();
 }
 
 

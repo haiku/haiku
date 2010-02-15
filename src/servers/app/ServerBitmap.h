@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -69,10 +69,8 @@ public:
 			void			SetOverlay(::Overlay* overlay);
 			::Overlay*		Overlay() const;
 
-			bool			SetOwner(ServerApp* owner);
+			void			SetOwner(ServerApp* owner);
 			ServerApp*		Owner() const;
-
-			bool			ReleaseClientReference();
 
 	//! Does a shallow copy of the bitmap passed to it
 	inline	void			ShallowCopy(const ServerBitmap *from);
@@ -95,8 +93,6 @@ protected:
 							ServerBitmap(const ServerBitmap* bmp);
 	virtual					~ServerBitmap();
 
-	virtual	void			LastReferenceReleased();
-
 			void			AllocateBuffer();
 
 protected:
@@ -104,7 +100,6 @@ protected:
 			void*			fAllocationCookie;
 			::Overlay*		fOverlay;
 			uint8*			fBuffer;
-			int32			fReferenceCount;
 
 			int32			fWidth;
 			int32			fHeight;
@@ -114,7 +109,6 @@ protected:
 
 			ServerApp*		fOwner;
 			int32			fToken;
-			bool			fHasClientReference;
 };
 
 class UtilityBitmap : public ServerBitmap {

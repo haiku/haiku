@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,8 +28,7 @@ using std::nothrow;
 using namespace BPrivate;
 
 
-/*!
-	A word about memory housekeeping and why it's implemented this way:
+/*!	A word about memory housekeeping and why it's implemented this way:
 
 	The reason why this looks so complicated is to optimize the most common
 	path (bitmap creation from the application), and don't cause any further
@@ -47,8 +46,7 @@ using namespace BPrivate;
 */
 
 
-/*!
-	\brief Constructor called by the BitmapManager (only).
+/*!	\brief Constructor called by the BitmapManager (only).
 	\param rect Size of the bitmap.
 	\param space Color space of the bitmap
 	\param flags Various bitmap flags to tweak the bitmap as defined in Bitmap.h
@@ -65,7 +63,6 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space, uint32 flags,
 	fAllocationCookie(NULL),
 	fOverlay(NULL),
 	fBuffer(NULL),
-	fReferenceCount(1),
 	// WARNING: '1' is added to the width and height.
 	// Same is done in FBBitmap subclass, so if you
 	// modify here make sure to do the same under
@@ -75,8 +72,7 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space, uint32 flags,
 	fBytesPerRow(0),
 	fSpace(space),
 	fFlags(flags),
-	fOwner(NULL),
-	fHasClientReference(true)
+	fOwner(NULL)
 	// fToken is initialized (if used) by the BitmapManager
 {
 	int32 minBytesPerRow = get_bytes_per_row(space, fWidth);
@@ -92,8 +88,7 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bitmap)
 	fAllocationCookie(NULL),
 	fOverlay(NULL),
 	fBuffer(NULL),
-	fReferenceCount(1),
-	fHasClientReference(false)
+	fOwner(NULL)
 {
 	if (bitmap) {
 		fWidth = bitmap->fWidth;
@@ -101,14 +96,12 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bitmap)
 		fBytesPerRow = bitmap->fBytesPerRow;
 		fSpace = bitmap->fSpace;
 		fFlags = bitmap->fFlags;
-		fOwner = bitmap->fOwner;
 	} else {
 		fWidth = 0;
 		fHeight = 0;
 		fBytesPerRow = 0;
 		fSpace = B_NO_COLOR_SPACE;
 		fFlags = 0;
-		fOwner = NULL;
 	}
 }
 
@@ -200,18 +193,10 @@ ServerBitmap::Overlay() const
 }
 
 
-bool
+void
 ServerBitmap::SetOwner(ServerApp* owner)
 {
-	if (fOwner != NULL)
-		fOwner->BitmapRemoved(this);
-
-	if (owner != NULL && owner->BitmapAdded(this)) {
-		fOwner = owner;
-		return true;
-	}
-
-	return false;
+	fOwner = owner;
 }
 
 
@@ -219,18 +204,6 @@ ServerApp*
 ServerBitmap::Owner() const
 {
 	return fOwner;
-}
-
-
-bool
-ServerBitmap::ReleaseClientReference()
-{
-	if (!fHasClientReference)
-		return false;
-
-	fHasClientReference = false;
-	ReleaseReference();
-	return true;
 }
 
 
@@ -242,30 +215,21 @@ ServerBitmap::PrintToStream()
 }
 
 
-void
-ServerBitmap::LastReferenceReleased()
-{
-	if (fOwner != NULL)
-		fOwner->BitmapRemoved(this);
-
-	gBitmapManager->BitmapRemoved(this);
-	delete this;
-}
-
-
 //	#pragma mark -
 
 
 UtilityBitmap::UtilityBitmap(BRect rect, color_space space, uint32 flags,
-		int32 bytesperline, screen_id screen)
-	: ServerBitmap(rect, space, flags, bytesperline, screen)
+		int32 bytesPerRow, screen_id screen)
+	:
+	ServerBitmap(rect, space, flags, bytesPerRow, screen)
 {
 	AllocateBuffer();
 }
 
 
 UtilityBitmap::UtilityBitmap(const ServerBitmap* bitmap)
-	: ServerBitmap(bitmap)
+	:
+	ServerBitmap(bitmap)
 {
 	AllocateBuffer();
 
@@ -276,7 +240,8 @@ UtilityBitmap::UtilityBitmap(const ServerBitmap* bitmap)
 
 UtilityBitmap::UtilityBitmap(const uint8* alreadyPaddedData, uint32 width,
 		uint32 height, color_space format)
-	: ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0)
+	:
+	ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0)
 {
 	AllocateBuffer();
 	if (Bits())

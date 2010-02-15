@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -783,9 +783,8 @@ ServerPicture::ServerPicture()
 	:
 	fFile(NULL),
 	fPictures(NULL),
-	fUsurped(NULL),
-	fOwner(NULL),
-	fHasClientReference(true)
+	fPushed(NULL),
+	fOwner(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 	fData = new(std::nothrow) BMallocIO();
@@ -799,9 +798,8 @@ ServerPicture::ServerPicture(const ServerPicture& picture)
 	fFile(NULL),
 	fData(NULL),
 	fPictures(NULL),
-	fUsurped(NULL),
-	fOwner(NULL),
-	fHasClientReference(false)
+	fPushed(NULL),
+	fOwner(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
@@ -827,9 +825,8 @@ ServerPicture::ServerPicture(const char* fileName, int32 offset)
 	fFile(NULL),
 	fData(NULL),
 	fPictures(NULL),
-	fUsurped(NULL),
-	fOwner(NULL),
-	fHasClientReference(true)
+	fPushed(NULL),
+	fOwner(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
@@ -852,15 +849,25 @@ ServerPicture::ServerPicture(const char* fileName, int32 offset)
 
 ServerPicture::~ServerPicture()
 {
+	ASSERT(fOwner == NULL);
+
 	delete fData;
 	delete fFile;
 	gTokenSpace.RemoveToken(fToken);
 
 	if (fPictures != NULL) {
-		for (int32 i = fPictures->CountItems(); i-- > 0;)
-			fPictures->ItemAt(i)->ReleaseReference();
+		for (int32 i = fPictures->CountItems(); i-- > 0;) {
+			ServerPicture* picture = fPictures->ItemAt(i);
+			picture->SetOwner(NULL);
+			picture->ReleaseReference();
+		}
 
 		delete fPictures;
+	}
+	
+	if (fPushed != NULL) {
+		fPushed->SetOwner(NULL);
+		fPushed->ReleaseReference();
 	}
 }
 
@@ -869,26 +876,15 @@ bool
 ServerPicture::SetOwner(ServerApp* owner)
 {
 	if (fOwner != NULL)
-		fOwner->PictureRemoved(this);
+		fOwner->RemovePicture(this);
 
-	if (owner != NULL && owner->PictureAdded(this)) {
+	if (owner != NULL && owner->AddPicture(this)) {
 		fOwner = owner;
 		return true;
 	}
 
+	fOwner = NULL;
 	return false;
-}
-
-
-bool
-ServerPicture::ReleaseClientReference()
-{
-	if (!fHasClientReference)
-		return false;
-
-	fHasClientReference = false;
-	ReleaseReference();
-	return true;
 }
 
 
@@ -1014,19 +1010,35 @@ ServerPicture::Play(View* view)
 }
 
 
+/*!	Acquires a reference to the pushed picture.
+*/
 void
-ServerPicture::Usurp(ServerPicture* picture)
+ServerPicture::PushPicture(ServerPicture* picture)
 {
-	fUsurped = picture;
+	if (fPushed != NULL)
+		debugger("already pushed a picture");
+
+	fPushed = picture;
+	fPushed->AcquireReference();
 }
 
 
+/*!	Returns a reference with the popped picture.
+*/
 ServerPicture*
-ServerPicture::StepDown()
+ServerPicture::PopPicture()
 {
-	ServerPicture* old = fUsurped;
-	fUsurped = NULL;
+	ServerPicture* old = fPushed;
+	fPushed = NULL;
 	return old;
+}
+
+
+void
+ServerPicture::AppendPicture(ServerPicture* picture)
+{
+	// A pushed picture is the same as an appended one
+	PushPicture(picture);
 }
 
 
@@ -1118,14 +1130,4 @@ ServerPicture::ExportData(BPrivate::PortLink& link)
 
 	fData->Seek(oldPosition, SEEK_SET);
 	return status;
-}
-
-
-void
-ServerPicture::LastReferenceReleased()
-{
-	if (fOwner != NULL)
-		fOwner->PictureRemoved(this);
-
-	delete this;
 }

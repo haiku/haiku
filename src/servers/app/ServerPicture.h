@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -49,9 +49,10 @@ public:
 
 			void				Play(View* view);
 
-			void 				Usurp(ServerPicture* newPicture);
-			ServerPicture*		StepDown();
+			void 				PushPicture(ServerPicture* picture);
+			ServerPicture*		PopPicture();
 
+			void				AppendPicture(ServerPicture* picture);
 			bool				NestPicture(ServerPicture* picture);
 
 			off_t				DataLength() const;
@@ -59,19 +60,16 @@ public:
 			status_t			ImportData(BPrivate::LinkReceiver& link);
 			status_t			ExportData(BPrivate::PortLink& link);
 
-protected:
-	virtual	void				LastReferenceReleased();
-
 private:
-	typedef BObjectList<ServerPicture> PictureList;
+			typedef BObjectList<ServerPicture> PictureList;
 
 			int32				fToken;
 			BFile*				fFile;
 			BPositionIO*		fData;
 			PictureList*		fPictures;
-			ServerPicture*		fUsurped;
+			ServerPicture*		fPushed;
 			ServerApp*			fOwner;
-			bool				fHasClientReference;
 };
+
 
 #endif	// SERVER_PICTURE_H
