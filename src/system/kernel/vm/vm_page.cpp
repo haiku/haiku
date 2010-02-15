@@ -1792,6 +1792,7 @@ page_writer(void* /*unused*/)
 					set_page_state(page, PAGE_STATE_ACTIVE);
 
 				DEBUG_PAGE_ACCESS_END(page);
+				continue;
 			}
 
 			// We need our own reference to the store, as it might currently be
@@ -2504,17 +2505,19 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 
 			wrapper->SetTo(page);
 
-			DEBUG_PAGE_ACCESS_END(page);
-
 			if (transferEmpty || transfer.AddPage(page)) {
 				if (transferEmpty) {
 					transfer.SetTo(NULL, page, maxPages);
 					transferEmpty = false;
 				}
 
+				DEBUG_PAGE_ACCESS_END(page);
+
 				wrappers[usedWrappers++] = wrapper;
 				continue;
 			}
+
+			DEBUG_PAGE_ACCESS_END(page);
 		}
 
 		if (transferEmpty)
