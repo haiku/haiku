@@ -40,8 +40,25 @@ VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 
 	addr_t address = base;
 	addr_t end = address + size;
+#if DEBUG_PAGE_ACCESS
+	for (; address != end; address += B_PAGE_SIZE) {
+		addr_t physicalAddress;
+		uint32 flags;
+		if (map->Query(address, &physicalAddress, &flags) == B_OK
+			&& (flags & PAGE_PRESENT) == 0) {
+			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+			if (page != NULL) {
+				DEBUG_PAGE_ACCESS_START(page);
+				UnmapPage(area, address, updatePageQueue);
+				DEBUG_PAGE_ACCESS_END(page);
+			} else
+				UnmapPage(area, address, updatePageQueue);
+		}
+	}
+#else
 	for (; address != end; address += B_PAGE_SIZE)
 		UnmapPage(area, address, updatePageQueue);
+#endif
 }
 
 
@@ -64,8 +81,25 @@ VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 {
 	addr_t address = area->Base();
 	addr_t end = address + area->Size();
+#if DEBUG_PAGE_ACCESS
+	for (; address != end; address += B_PAGE_SIZE) {
+		addr_t physicalAddress;
+		uint32 flags;
+		if (map->Query(address, &physicalAddress, &flags) == B_OK
+			&& (flags & PAGE_PRESENT) == 0) {
+			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+			if (page != NULL) {
+				DEBUG_PAGE_ACCESS_START(page);
+				UnmapPage(area, address, true);
+				DEBUG_PAGE_ACCESS_END(page);
+			} else
+				UnmapPage(area, address, true);
+		}
+	}
+#else
 	for (; address != end; address += B_PAGE_SIZE)
 		UnmapPage(area, address, true);
+#endif
 }
 
 
