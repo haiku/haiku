@@ -1,6 +1,6 @@
 /*
  * Copyright 2010, Ingo Weinhold <ingo_weinhold@gmx.de>.
- * Copyright 2008, Axel Dörfler. All Rights Reserved.
+ * Copyright 2008-2010, Axel Dörfler. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -226,22 +226,27 @@ dump_cache_info(int argc, char* argv[])
 		return 0;
 	}
 
-	ObjectCache* cache = (ObjectCache*)strtoul(argv[1], NULL, 16);
+	ObjectCache* cache = (ObjectCache*)parse_expression(argv[1]);
 
-	kprintf("name: %s\n", cache->name);
-	kprintf("lock: %p\n", &cache->lock);
-	kprintf("object_size: %lu\n", cache->object_size);
+	kprintf("name:              %s\n", cache->name);
+	kprintf("lock:              %p\n", &cache->lock);
+	kprintf("object_size:       %lu\n", cache->object_size);
 	kprintf("cache_color_cycle: %lu\n", cache->cache_color_cycle);
-	kprintf("used_count: %lu\n", cache->used_count);
-	kprintf("empty_count: %lu\n", cache->empty_count);
-	kprintf("pressure: %lu\n", cache->pressure);
-	kprintf("slab_size: %lu\n", cache->slab_size);
-	kprintf("usage: %lu\n", cache->usage);
-	kprintf("maximum: %lu\n", cache->maximum);
-	kprintf("flags: 0x%lx\n", cache->flags);
-	kprintf("cookie: %p\n", cache->cookie);
+	kprintf("used_count:        %lu\n", cache->used_count);
+	kprintf("empty_count:       %lu\n", cache->empty_count);
+	kprintf("pressure:          %lu\n", cache->pressure);
+	kprintf("slab_size:         %lu\n", cache->slab_size);
+	kprintf("usage:             %lu\n", cache->usage);
+	kprintf("maximum:           %lu\n", cache->maximum);
+	kprintf("flags:             0x%lx\n", cache->flags);
+	kprintf("cookie:            %p\n", cache->cookie);
 	kprintf("resize entry don't wait: %p\n", cache->resize_entry_dont_wait);
-	kprintf("resize entry can wait: %p\n", cache->resize_entry_can_wait);
+	kprintf("resize entry can wait:   %p\n", cache->resize_entry_can_wait);
+
+	if ((cache->flags & CACHE_NO_DEPOT) == 0) {
+		kprintf("depot:\n");
+		dump_object_depot(&cache->depot);
+	}
 
 	return 0;
 }
@@ -735,6 +740,10 @@ slab_init_post_area()
 	add_debugger_command("slabs", dump_slabs, "list all object caches");
 	add_debugger_command("slab_cache", dump_cache_info,
 		"dump information about a specific object cache");
+	add_debugger_command("slab_depot", dump_object_depot,
+		"dump contents of an object depot");
+	add_debugger_command("slab_magazine", dump_depot_magazine,
+		"dump contents of a depot magazine");
 }
 
 

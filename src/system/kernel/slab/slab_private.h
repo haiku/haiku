@@ -27,6 +27,8 @@
 #include <debug_paranoia.h>
 
 struct ObjectCache;
+struct object_depot;
+
 
 void		request_memory_manager_maintenance();
 
@@ -35,6 +37,10 @@ void*		block_alloc_early(size_t size);
 void		block_free(void* block, uint32 flags);
 void		block_allocator_init_boot();
 void		block_allocator_init_rest();
+
+void		dump_object_depot(object_depot* depot);
+int			dump_object_depot(int argCount, char** args);
+int			dump_depot_magazine(int argCount, char** args);
 
 
 template<typename Type>

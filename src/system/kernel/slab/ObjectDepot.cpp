@@ -1,6 +1,6 @@
 /*
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2008, Axel Dörfler. All Rights Reserved.
+ * Copyright 2008-2010, Axel Dörfler. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -74,6 +74,9 @@ DepotMagazine::Push(void* object)
 	rounds[current_round++] = object;
 	return true;
 }
+
+
+// #pragma mark -
 
 
 static DepotMagazine*
@@ -150,6 +153,7 @@ push_empty_magazine(object_depot* depot, DepotMagazine* magazine)
 	SpinLocker _(depot->inner_lock);
 
 	_push(depot->empty, magazine);
+	depot->empty_count++;
 }
 
 
@@ -321,4 +325,56 @@ object_depot_make_empty(object_depot* depot, uint32 flags)
 
 	while (emptyMagazines)
 		free_magazine(_pop(emptyMagazines), flags);
+}
+
+
+// #pragma mark - private kernel API
+
+
+void
+dump_object_depot(object_depot* depot)
+{
+	kprintf("  full:  %p, count %lu\n", depot->full, depot->full_count);
+	kprintf("  empty: %p, count %lu\n", depot->empty, depot->empty_count);
+	kprintf("  stores:\n");
+
+	int cpuCount = smp_get_num_cpus();
+
+	for (int i = 0; i < cpuCount; i++) {
+		kprintf("  [%d] loaded:   %p\n", i, depot->stores[i].loaded);
+		kprintf("      previous: %p\n", depot->stores[i].previous);
+	}
+}
+
+
+int
+dump_object_depot(int argCount, char** args)
+{
+	if (argCount != 2)
+		kprintf("usage: %s [address]\n", args[0]);
+	else
+		dump_object_depot((object_depot*)parse_expression(args[1]));
+
+	return 0;
+}
+
+
+int
+dump_depot_magazine(int argCount, char** args)
+{
+	if (argCount != 2) {
+		kprintf("usage: %s [address]\n", args[0]);
+		return 0;
+	}
+
+	DepotMagazine* magazine = (DepotMagazine*)parse_expression(args[1]);
+
+	kprintf("next:          %p\n", magazine->next);
+	kprintf("current_round: %u\n", magazine->current_round);
+	kprintf("round_count:   %u\n", magazine->round_count);
+
+	for (uint16 i = 0; i < magazine->current_round; i++)
+		kprintf("  [%i] %p\n", i, magazine->rounds[i]);
+
+	return 0;
 }
