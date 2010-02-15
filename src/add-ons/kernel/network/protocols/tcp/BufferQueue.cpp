@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,7 +59,8 @@ BufferQueue::SetMaxBytes(size_t maxBytes)
 void
 BufferQueue::SetInitialSequence(tcp_sequence sequence)
 {
-	TRACE(("BufferQueue@%p::SetInitialSequence(%lu)\n", this, (uint32)sequence));
+	TRACE(("BufferQueue@%p::SetInitialSequence(%lu)\n", this,
+		sequence.Number()));
 
 	fFirstSequence = fLastSequence = sequence;
 }
@@ -77,9 +78,9 @@ void
 BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 {
 	TRACE(("BufferQueue@%p::Add(buffer %p, size %lu, sequence %lu)\n",
-		this, buffer, buffer->size, (uint32)sequence));
+		this, buffer, buffer->size, sequence.Number()));
 	TRACE(("  in: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-		(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes,
+		fFirstSequence.Number(), fLastSequence.Number(), fNumBytes,
 		fContiguousBytes));
 	VERIFY();
 
@@ -112,7 +113,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		fNumBytes += buffer->size;
 
 		TRACE(("  out0: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-			(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes,
+			fFirstSequence.Number(), fLastSequence.Number(), fNumBytes,
 			fContiguousBytes));
 		VERIFY();
 		return;
@@ -190,7 +191,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 
 	if (buffer == NULL) {
 		TRACE(("  out1: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-			(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes,
+			fFirstSequence.Number(), fLastSequence.Number(), fNumBytes,
 			fContiguousBytes));
 		VERIFY();
 		return;
@@ -217,7 +218,8 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 	}
 
 	TRACE(("  out2: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-		(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
+		fFirstSequence.Number(), fLastSequence.Number(), fNumBytes,
+		fContiguousBytes));
 	VERIFY();
 }
 
@@ -230,7 +232,8 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 status_t
 BufferQueue::RemoveUntil(tcp_sequence sequence)
 {
-	TRACE(("BufferQueue@%p::RemoveUntil(sequence %lu)\n", this, (uint32)sequence));
+	TRACE(("BufferQueue@%p::RemoveUntil(sequence %lu)\n", this,
+		sequence.Number()));
 	VERIFY();
 
 	if (sequence < fFirstSequence)
@@ -280,7 +283,7 @@ status_t
 BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 {
 	TRACE(("BufferQueue@%p::Get(sequence %lu, bytes %lu)\n", this,
-		(uint32)sequence, bytes));
+		sequence.Number(), bytes));
 	VERIFY();
 
 	if (bytes == 0)

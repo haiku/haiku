@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -411,7 +411,8 @@ WaitList::Signal()
 
 
 TCPEndpoint::TCPEndpoint(net_socket* socket)
-	: ProtocolSocket(socket),
+	:
+	ProtocolSocket(socket),
 	fManager(NULL),
 	fReceiveList("tcp receive"),
 	fSendList("tcp send"),
@@ -1301,7 +1302,7 @@ TCPEndpoint::_AddData(tcp_segment_header& segment, net_buffer* buffer)
 	fReceiveNext = fReceiveQueue.NextSequence();
 
 	TRACE("  _AddData(): adding data, receive next = %lu. Now have %lu bytes.",
-		(uint32)fReceiveNext, fReceiveQueue.Available());
+		fReceiveNext.Number(), fReceiveQueue.Available());
 
 	if (segment.flags & TCP_FLAG_PUSH)
 		fReceiveQueue.SetPushPointer();
@@ -1515,8 +1516,8 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		if (!segment_in_sequence(segment, segmentLength, fReceiveNext,
 				fReceiveWindow)) {
 			TRACE("  Receive(): segment out of window, next: %lu wnd: %lu",
-				(uint32)fReceiveNext, fReceiveWindow);
-			if (segment.flags & TCP_FLAG_RESET) {
+				fReceiveNext.Number(), fReceiveWindow);
+			if ((segment.flags & TCP_FLAG_RESET) != 0) {
 				// TODO: this doesn't look right - review!
 				return DROP;
 			}
@@ -1524,7 +1525,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		}
 	}
 
-	if (segment.flags & TCP_FLAG_RESET) {
+	if ((segment.flags & TCP_FLAG_RESET) != 0) {
 		// Is this a valid reset?
 		// We generally ignore resets in time wait state (see RFC 1337)
 		if (fLastAcknowledgeSent <= segment.sequence
@@ -1556,9 +1557,11 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		return DROP | RESET;
 	}
 
+	// TODO: Check this! Why do we advertize a window outside of what we should
+	// buffer?
 	fReceiveWindow = max_c(fReceiveQueue.Free(), fReceiveWindow);
 		// the window must not shrink
-
+	
 	// trim buffer to be within the receive window
 	int32 drop = (int32)(fReceiveNext - segment.sequence).Number();
 	if (drop > 0) {
@@ -1959,7 +1962,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 
 	if (consumedWindow > sendWindow) {
 		sendWindow = 0;
-		// TODO enter persist state? try to get a window update.
+		// TODO: enter persist state? try to get a window update.
 	} else
 		sendWindow -= consumedWindow;
 
@@ -2019,8 +2022,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			PrintAddress(buffer->destination), segment.flags, segment.sequence,
 			segment.acknowledge, segment.advertised_window,
 			fCongestionWindow, fSlowStartThreshold, segmentLength,
-			(uint32)fSendQueue.FirstSequence(),
-			(uint32)fSendQueue.LastSequence());
+			fSendQueue.FirstSequence().Number(),
+			fSendQueue.LastSequence().Number());
 		T(Send(this, segment, buffer, fSendQueue.FirstSequence(),
 			fSendQueue.LastSequence()));
 

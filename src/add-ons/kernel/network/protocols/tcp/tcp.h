@@ -108,8 +108,7 @@ public:
 		return fNumber - 1;
 	}
 
-// Conceptually private, but used in global operators.
-//private:
+private:
 	uint32	fNumber;
 };
 
@@ -120,56 +119,56 @@ public:
 inline bool
 operator>(tcp_sequence a, tcp_sequence b)
 {
-	return (int32)(a.fNumber - b.fNumber) > 0;
+	return (int32)(a.Number() - b.Number()) > 0;
 }
 
 
 inline bool
 operator>=(tcp_sequence a, tcp_sequence b)
 {
-	return (int32)(a.fNumber - b.fNumber) >= 0;
+	return (int32)(a.Number() - b.Number()) >= 0;
 }
 
 
 inline bool
 operator<(tcp_sequence a, tcp_sequence b)
 {
-	return (int32)(a.fNumber - b.fNumber) < 0;
+	return (int32)(a.Number() - b.Number()) < 0;
 }
 
 
 inline bool
 operator<=(tcp_sequence a, tcp_sequence b)
 {
-	return (int32)(a.fNumber - b.fNumber) <= 0;
+	return (int32)(a.Number() - b.Number()) <= 0;
 }
 
 
 inline tcp_sequence
 operator+(tcp_sequence a, tcp_sequence b)
 {
-	return a.fNumber + b.fNumber;
+	return a.Number() + b.Number();
 }
 
 
 inline tcp_sequence
 operator-(tcp_sequence a, tcp_sequence b)
 {
-	return a.fNumber - b.fNumber;
+	return a.Number() - b.Number();
 }
 
 
 inline bool
 operator!=(tcp_sequence a, tcp_sequence b)
 {
-	return a.fNumber != b.fNumber;
+	return a.Number() != b.Number();
 }
 
 
 inline bool
 operator==(tcp_sequence a, tcp_sequence b)
 {
-	return a.fNumber == b.fNumber;
+	return a.Number() == b.Number();
 }
 
 
