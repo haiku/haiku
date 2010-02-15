@@ -126,6 +126,7 @@ typedef struct area_allocation_info_s {
 	void *		base;
 	uint32		magic;
 	size_t		size;
+	thread_id	thread;
 	size_t		allocation_size;
 	size_t		allocation_alignment;
 	void *		allocation_base;
@@ -1477,6 +1478,107 @@ heap_class_for(size_t size)
 }
 
 
+static status_t
+heap_get_allocation_info(heap_allocator *heap, void *address, size_t *size,
+	thread_id *thread)
+{
+	ReadLocker areaReadLocker(heap->area_lock);
+	heap_area *area = heap->all_areas;
+	while (area) {
+		// since the all_areas list is ordered by base with the biggest
+		// base at the top, we need only find the first area with a base
+		// smaller than our address to become our only candidate for freeing
+		if (area->base <= (addr_t)address) {
+			if ((addr_t)address >= area->base + area->size) {
+				// none of the other areas can contain the address as the list
+				// is ordered
+				return B_ENTRY_NOT_FOUND;
+			}
+
+			// this area contains the allocation, we're done searching
+			break;
+		}
+
+		area = area->all_next;
+	}
+
+	if (area == NULL) {
+		// this address does not belong to us
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	heap_page *page = &area->page_table[((addr_t)address - area->base)
+		/ heap->page_size];
+
+	if (page->bin_index > heap->bin_count) {
+		panic("get_allocation_info(): page %p: invalid bin_index %d\n", page,
+			page->bin_index);
+		return B_ERROR;
+	}
+
+	heap_leak_check_info *info = NULL;
+	addr_t pageBase = area->base + page->index * heap->page_size;
+	if (page->bin_index < heap->bin_count) {
+		// small allocation
+		heap_bin *bin = &heap->bins[page->bin_index];
+		if (((addr_t)address - pageBase) % bin->element_size != 0) {
+			panic("get_allocation_info(): address %p does not fall on"
+				" allocation boundary for page base %p and element size %lu\n",
+				address, (void *)pageBase, bin->element_size);
+			return B_ERROR;
+		}
+
+		MutexLocker binLocker(bin->lock);
+
+		info = (heap_leak_check_info *)((addr_t)address + bin->element_size
+			- sizeof(heap_leak_check_info));
+		if (info->size > bin->element_size - sizeof(addr_t)
+				- sizeof(heap_leak_check_info)) {
+			panic("leak check info has invalid size %lu for element size %lu,"
+				" probably memory has been overwritten past allocation size\n",
+				info->size, bin->element_size);
+		}
+	} else {
+		if ((addr_t)address != pageBase) {
+			panic("get_allocation_info(): large allocation address %p not on"
+				" page base %p\n", address, (void *)pageBase);
+			return B_ERROR;
+		}
+
+		uint32 allocationID = page->allocation_id;
+		uint32 maxPages = area->page_count - page->index;
+		uint32 pageCount = 0;
+
+		MutexLocker pageLocker(heap->page_lock);
+		for (uint32 i = 0; i < maxPages; i++) {
+			// loop until we find the end of this allocation
+			if (!page[i].in_use || page[i].bin_index != heap->bin_count
+				|| page[i].allocation_id != allocationID)
+				break;
+
+			pageCount++;
+		}
+
+		size_t allocationSize = pageCount * heap->page_size;
+		info = (heap_leak_check_info *)((addr_t)address + allocationSize
+			- sizeof(heap_leak_check_info));
+		if (info->size > allocationSize - sizeof(addr_t)
+				- sizeof(heap_leak_check_info)) {
+			panic("leak check info has invalid size %lu for allocation of %lu,"
+				" probably memory has been overwritten past allocation size\n",
+				info->size, allocationSize);
+		}
+	}
+
+	if (size != NULL)
+		*size = info->size;
+	if (thread != NULL)
+		*thread = info->thread;
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 
 
@@ -1609,6 +1711,7 @@ heap_debug_malloc_with_guard_page(size_t size)
 	info->area = allocationArea;
 	info->base = address;
 	info->size = areaSize;
+	info->thread = find_thread(NULL);
 	info->allocation_size = size;
 	info->allocation_alignment = 0;
 
@@ -1623,6 +1726,38 @@ heap_debug_malloc_with_guard_page(size_t size)
 
 	memset(address, 0xcc, size);
 	return address;
+}
+
+
+extern "C" status_t
+heap_debug_get_allocation_info(void *address, size_t *size,
+	thread_id *thread)
+{
+	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
+		heap_allocator *heap = sHeaps[i];
+		if (heap_get_allocation_info(heap, address, size, thread) == B_OK)
+			return B_OK;
+	}
+
+	// or maybe it was a huge allocation using an area
+	area_info areaInfo;
+	area_id area = area_for(address);
+	if (area >= B_OK && get_area_info(area, &areaInfo) == B_OK) {
+		area_allocation_info *info = (area_allocation_info *)areaInfo.address;
+
+		// just make extra sure it was allocated by us
+		if (info->magic == kAreaAllocationMagic && info->area == area
+			&& info->size == areaInfo.size && info->base == areaInfo.address
+			&& info->allocation_size < areaInfo.size) {
+			if (size)
+				*size = info->allocation_size;
+			if (thread)
+				*thread = info->thread;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -1700,6 +1835,7 @@ memalign(size_t alignment, size_t size)
 		info->area = allocationArea;
 		info->base = address;
 		info->size = areaSize;
+		info->thread = find_thread(NULL);
 		info->allocation_size = size;
 		info->allocation_alignment = alignment;
 

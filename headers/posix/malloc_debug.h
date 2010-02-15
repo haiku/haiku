@@ -24,6 +24,9 @@ void heap_debug_dump_heaps(bool dumpAreas, bool dumpBins);
 
 void *heap_debug_malloc_with_guard_page(size_t size);
 
+status_t heap_debug_get_allocation_info(void *address, size_t *size,
+	thread_id *thread);
+
 #ifdef __cplusplus
 }
 #endif
