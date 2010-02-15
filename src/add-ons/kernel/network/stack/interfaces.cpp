@@ -33,6 +33,8 @@
 #	define TRACE(x) ;
 #endif
 
+#define ENABLE_DEBUGGER_COMMANDS	1
+
 
 static mutex sInterfaceLock;
 static DeviceInterfaceList sInterfaces;
@@ -178,6 +180,93 @@ notify_device_monitors(net_device_interface* interface, int32 event)
 		monitor->event(monitor, event);
 	}
 }
+
+
+#if ENABLE_DEBUGGER_COMMANDS
+
+
+static int
+dump_interface(int argc, char** argv)
+{
+	if (argc != 2) {
+		kprintf("usage: %s [address]\n", argv[0]);
+		return 0;
+	}
+
+	net_interface_private* interface
+		= (net_interface_private*)parse_expression(argv[1]);
+
+	kprintf("name:             %s\n", interface->name);
+	kprintf("base_name:        %s\n", interface->name);
+	kprintf("domain:           %p\n", interface->domain);
+	kprintf("device:           %p\n", interface->device);
+	kprintf("device_interface: %p\n", interface->device_interface);
+	kprintf("direct_route:     %p\n", &interface->direct_route);
+	kprintf("first_protocol:   %p\n", interface->first_protocol);
+	kprintf("first_info:       %p\n", interface->first_info);
+	kprintf("address:          %p\n", interface->address);
+	kprintf("destination:      %p\n", interface->destination);
+	kprintf("mask:             %p\n", interface->mask);
+	kprintf("index:            %" B_PRIu32 "\n", interface->index);
+	kprintf("flags:            %#" B_PRIx32 "\n", interface->flags);
+	kprintf("type:             %u\n", interface->type);
+	kprintf("mtu:              %" B_PRIu32 "\n", interface->mtu);
+	kprintf("metric:           %" B_PRIu32 "\n", interface->metric);
+
+	return 0;
+}
+
+
+static int
+dump_device_interface(int argc, char** argv)
+{
+	if (argc != 2) {
+		kprintf("usage: %s [address]\n", argv[0]);
+		return 0;
+	}
+
+	net_device_interface* interface
+		= (net_device_interface*)parse_expression(argv[1]);
+
+	kprintf("device:            %p\n", interface->device);
+	kprintf("reader_thread:     %ld\n", interface->reader_thread);
+	kprintf("up_count:          %" B_PRIu32 "\n", interface->up_count);
+	kprintf("ref_count:         %" B_PRId32 "\n", interface->ref_count);
+	kprintf("deframe_func:      %p\n", interface->deframe_func);
+	kprintf("deframe_ref_count: %" B_PRId32 "\n", interface->ref_count);
+	kprintf("monitor_funcs:\n");
+	kprintf("receive_funcs:\n");
+	kprintf("consumer_thread:   %ld\n", interface->consumer_thread);
+	kprintf("receive_lock:      %p\n", &interface->receive_lock);
+	kprintf("receive_queue:     %p\n", &interface->receive_queue);
+
+	DeviceMonitorList::Iterator monitorIterator
+		= interface->monitor_funcs.GetIterator();
+	while (monitorIterator.HasNext())
+		kprintf("  %p\n", monitorIterator.Next());
+
+	DeviceHandlerList::Iterator handlerIterator
+		= interface->receive_funcs.GetIterator();
+	while (handlerIterator.HasNext())
+		kprintf("  %p\n", handlerIterator.Next());
+
+	return 0;
+}
+
+
+static int
+dump_device_interfaces(int argc, char** argv)
+{
+	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while (net_device_interface* interface = iterator.Next()) {
+		kprintf("  %p\n", interface);
+	}
+
+	return 0;
+}
+
+
+#endif	// ENABLE_DEBUGGER_COMMANDS
 
 
 //	#pragma mark - interfaces
@@ -806,6 +895,15 @@ init_interfaces()
 
 	new (&sInterfaces) DeviceInterfaceList;
 		// static C++ objects are not initialized in the module startup
+
+#if ENABLE_DEBUGGER_COMMANDS
+	add_debugger_command("net_interface", &dump_interface,
+		"Dump the given network interface");
+	add_debugger_command("net_device_interface", &dump_device_interface,
+		"Dump the given network device interface");
+	add_debugger_command("net_device_interfaces", &dump_device_interfaces,
+		"Dump network device interfaces");
+#endif
 	return B_OK;
 }
 
@@ -813,6 +911,12 @@ init_interfaces()
 status_t
 uninit_interfaces()
 {
+#if ENABLE_DEBUGGER_COMMANDS
+	remove_debugger_command("net_interface", &dump_interface);
+	remove_debugger_command("net_device_interface", &dump_device_interface);
+	remove_debugger_command("net_device_interfaces", &dump_device_interfaces);
+#endif
+
 	mutex_destroy(&sInterfaceLock);
 	return B_OK;
 }

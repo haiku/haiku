@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,8 +32,13 @@
 #	define TRACE(x) ;
 #endif
 
+#define ENABLE_DEBUGGER_COMMANDS	1
+
+
+typedef DoublyLinkedList<net_domain_private> DomainList;
+
 static mutex sDomainLock;
-static list sDomains;
+static DomainList sDomains;
 
 
 /*!	Scans the domain list for the specified family.
@@ -42,18 +47,63 @@ static list sDomains;
 static net_domain_private*
 lookup_domain(int family)
 {
-	net_domain_private* domain = NULL;
-	while (true) {
-		domain = (net_domain_private*)list_get_next_item(&sDomains, domain);
-		if (domain == NULL)
-			break;
-
+	DomainList::Iterator iterator = sDomains.GetIterator();
+	while (net_domain_private* domain = iterator.Next()) {
 		if (domain->family == family)
 			return domain;
 	}
 
 	return NULL;
 }
+
+
+#if	ENABLE_DEBUGGER_COMMANDS
+
+
+static int
+dump_domains(int argc, char** argv)
+{
+	DomainList::Iterator iterator = sDomains.GetIterator();
+	while (net_domain_private* domain = iterator.Next()) {
+		kprintf("domain: %p, %s, %d\n", domain, domain->name, domain->family);
+		kprintf("  module:         %p\n", domain->module);
+		kprintf("  address_module: %p\n", domain->address_module);
+		
+		if (!list_is_empty(&domain->interfaces))
+			kprintf("  interfaces:\n");
+
+		net_interface* interface = NULL;
+		while (true) {
+			interface = (net_interface*)list_get_next_item(&domain->interfaces,
+				interface);
+			if (interface == NULL)
+				break;
+
+			kprintf("    %p\n", interface);
+		}
+
+		if (!domain->routes.IsEmpty())
+			kprintf("  routes:\n");
+	
+		RouteList::Iterator routeIterator = domain->routes.GetIterator();
+		while (net_route* route = routeIterator.Next()) {
+			kprintf("    %p\n", route);
+		}
+
+		if (!domain->route_infos.IsEmpty())
+			kprintf("  route infos:\n");
+	
+		RouteInfoList::Iterator infoIterator = domain->route_infos.GetIterator();
+		while (net_route_info* info = infoIterator.Next()) {
+			kprintf("    %p\n", info);
+		}
+	}
+
+	return 0;
+}
+
+
+#endif	// ENABLE_DEBUGGER_COMMANDS
 
 
 //	#pragma mark -
@@ -74,14 +124,10 @@ count_domain_interfaces()
 {
 	MutexLocker locker(sDomainLock);
 
-	net_domain_private* domain = NULL;
 	uint32 count = 0;
 
-	while (true) {
-		domain = (net_domain_private*)list_get_next_item(&sDomains, domain);
-		if (domain == NULL)
-			break;
-
+	DomainList::Iterator iterator = sDomains.GetIterator();
+	while (net_domain_private* domain = iterator.Next()) {
 		net_interface* interface = NULL;
 		while (true) {
 			interface = (net_interface*)list_get_next_item(&domain->interfaces,
@@ -97,8 +143,7 @@ count_domain_interfaces()
 }
 
 
-/*!
-	Dumps a list of all interfaces into the supplied userland buffer.
+/*!	Dumps a list of all interfaces into the supplied userland buffer.
 	If the interfaces don't fit into the buffer, an error (\c ENOBUFS) is
 	returned.
 */
@@ -108,13 +153,9 @@ list_domain_interfaces(void* _buffer, size_t* bufferSize)
 	MutexLocker locker(sDomainLock);
 
 	UserBuffer buffer(_buffer, *bufferSize);
-	net_domain_private* domain = NULL;
 
-	while (true) {
-		domain = (net_domain_private*)list_get_next_item(&sDomains, domain);
-		if (domain == NULL)
-			break;
-
+	DomainList::Iterator iterator = sDomains.GetIterator();
+	while (net_domain_private* domain = iterator.Next()) {
 		RecursiveLocker locker(domain->lock);
 
 		net_interface* interface = NULL;
@@ -193,8 +234,7 @@ add_interface_to_domain(net_domain* _domain,
 }
 
 
-/*!
-	Removes the interface from its domain, and deletes it.
+/*!	Removes the interface from its domain, and deletes it.
 	You need to hold the domain's lock when calling this function.
 */
 status_t
@@ -281,12 +321,8 @@ domain_removed_device_interface(net_device_interface* deviceInterface)
 {
 	MutexLocker locker(sDomainLock);
 
-	net_domain_private* domain = NULL;
-	while (true) {
-		domain = (net_domain_private*)list_get_next_item(&sDomains, domain);
-		if (domain == NULL)
-			break;
-
+	DomainList::Iterator iterator = sDomains.GetIterator();
+	while (net_domain_private* domain = iterator.Next()) {
 		RecursiveLocker locker(domain->lock);
 
 		net_interface_private* interface = find_interface(domain,
@@ -325,7 +361,7 @@ register_domain(int family, const char* name,
 
 	list_init(&domain->interfaces);
 
-	list_add_item(&sDomains, domain);
+	sDomains.Add(domain);
 
 	*_domain = domain;
 	return B_OK;
@@ -341,7 +377,7 @@ unregister_domain(net_domain* _domain)
 	net_domain_private* domain = (net_domain_private*)_domain;
 	MutexLocker locker(sDomainLock);
 
-	list_remove_item(&sDomains, domain);
+	sDomains.Remove(domain);
 
 	net_interface_private* interface = NULL;
 	while (true) {
@@ -364,7 +400,13 @@ init_domains()
 {
 	mutex_init(&sDomainLock, "net domains");
 
-	list_init_etc(&sDomains, offsetof(struct net_domain_private, link));
+	new (&sDomains) DomainList;
+		// static C++ objects are not initialized in the module startup
+
+#if ENABLE_DEBUGGER_COMMANDS
+	add_debugger_command("net_domains", &dump_domains,
+		"Dump network domains");
+#endif
 	return B_OK;
 }
 
@@ -372,6 +414,10 @@ init_domains()
 status_t
 uninit_domains()
 {
+#if ENABLE_DEBUGGER_COMMANDS
+	remove_debugger_command("net_domains", &dump_domains);
+#endif
+
 	mutex_destroy(&sDomainLock);
 	return B_OK;
 }

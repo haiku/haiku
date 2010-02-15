@@ -43,7 +43,7 @@
 	// maximum implementation derived buffer size is 65536
 
 #define ENABLE_DEBUGGER_COMMANDS	1
-//#define ENABLE_STATS				1
+#define ENABLE_STATS				1
 #define PARANOID_BUFFER_CHECK		NET_BUFFER_PARANOIA
 
 #define COMPONENT_PARANOIA_LEVEL	NET_BUFFER_PARANOIA

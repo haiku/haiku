@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,19 +9,18 @@
 #define DOMAINS_H
 
 
-#include "routes.h"
-
 #include <lock.h>
 #include <util/list.h>
 #include <util/DoublyLinkedList.h>
+
+#include "routes.h"
 
 
 struct net_device_interface;
 
 
-struct net_domain_private : net_domain {
-	struct list_link	link;
-
+struct net_domain_private : net_domain,
+		DoublyLinkedListLinkImpl<net_domain_private> {
 	recursive_lock		lock;
 
 	RouteList			routes;
@@ -46,5 +45,6 @@ status_t register_domain(int family, const char* name,
 	struct net_protocol_module_info* module,
 	struct net_address_module_info* addressModule, net_domain* *_domain);
 status_t unregister_domain(net_domain* domain);
+
 
 #endif	// DOMAINS_H

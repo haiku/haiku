@@ -15,7 +15,7 @@
 #include <util/DoublyLinkedList.h>
 
 
-struct net_device_handler : public DoublyLinkedListLinkImpl<net_device_handler> {
+struct net_device_handler : DoublyLinkedListLinkImpl<net_device_handler> {
 	net_receive_func	func;
 	int32				type;
 	void*				cookie;
