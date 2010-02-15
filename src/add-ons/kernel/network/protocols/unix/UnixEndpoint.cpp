@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "UnixEndpoint.h"
 
 #include <stdio.h>
@@ -431,6 +432,8 @@ UnixEndpoint::Send(const iovec *vecs, size_t vecCount,
 		gStackModule->store_syscall_restart_timeout(timeout);
 
 	UnixEndpointLocker locker(this);
+
+	Reference<UnixEndpoint> peerReference;
 	UnixEndpointLocker peerLocker;
 
 	status_t error = _LockConnectedEndpoints(locker, peerLocker);
@@ -438,7 +441,7 @@ UnixEndpoint::Send(const iovec *vecs, size_t vecCount,
 		RETURN_ERROR(error);
 
 	UnixEndpoint* peerEndpoint = fPeerEndpoint;
-	Reference<UnixEndpoint> peerReference(peerEndpoint);
+	peerReference.SetTo(peerEndpoint);
 
 	// lock the peer's FIFO
 	UnixFifo* peerFifo = peerEndpoint->fReceiveFifo;
