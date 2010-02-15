@@ -1542,6 +1542,7 @@ heap_get_allocation_info(heap_allocator *heap, void *address, size_t *size,
 			panic("leak check info has invalid size %lu for element size %lu,"
 				" probably memory has been overwritten past allocation size\n",
 				info->size, bin->element_size);
+			return B_ERROR;
 		}
 	} else {
 		if ((addr_t)address != pageBase) {
@@ -1572,6 +1573,7 @@ heap_get_allocation_info(heap_allocator *heap, void *address, size_t *size,
 			panic("leak check info has invalid size %lu for allocation of %lu,"
 				" probably memory has been overwritten past allocation size\n",
 				info->size, allocationSize);
+			return B_ERROR;
 		}
 	}
 
