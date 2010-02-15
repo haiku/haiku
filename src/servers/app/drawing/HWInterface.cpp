@@ -131,18 +131,6 @@ HWInterface::SetCursor(ServerCursor* cursor)
 	if (!fFloatingOverlaysLock.Lock())
 		return;
 
-	// TODO: if a bitmap is being dragged, it could
-	// be considered iritating to the user to change
-	// cursor shapes while something is dragged.
-	// The disabled code below would prevent this (except
-	// for the minor annoyance that the cursor is not
-	// updated when the drag is over)
-//	if (fDragBitmap) {
-//		// TODO: like a "+" or "-" sign when dragging some files to indicate
-//		//		the current drag mode?
-//		UnlockExclusiveAccess();
-//		return;
-//	}
 	if (fCursor != cursor) {
 		BRect oldFrame = _CursorFrame();
 
