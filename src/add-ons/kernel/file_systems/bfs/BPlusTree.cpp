@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  *
  * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
  * no code but achieves binary compatibility with the on disk format.
  */
+
 
 //! B+Tree implementation
 
@@ -82,6 +83,12 @@ CachedNode::Unset()
 		return;
 
 	if (fNode != NULL) {
+		if (fWritable && fOffset == 0) {
+			// The B+tree header has been updated - we need to update the
+			// BPlusTrees copy of it, as well.
+			memcpy(&fTree->fHeader, fNode, sizeof(bplustree_header));
+		}
+
 		block_cache_put(fTree->fStream->GetVolume()->BlockCache(),
 			fBlockNumber);
 		fNode = NULL;
@@ -102,14 +109,14 @@ CachedNode::SetTo(off_t offset, bool check)
 	// You can only ask for nodes at valid positions - you can't
 	// even access the b+tree header with this method (use SetToHeader()
 	// instead)
-	if (offset > fTree->fHeader->MaximumSize() - fTree->fNodeSize
+	if (offset > fTree->fHeader.MaximumSize() - fTree->fNodeSize
 		|| offset <= 0
 		|| (offset % fTree->fNodeSize) != 0)
 		return NULL;
 
 	if (InternalSetTo(NULL, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
-		if (!fTree->fHeader->CheckNode(fNode)) {
+		if (!fTree->fHeader.CheckNode(fNode)) {
 			FATAL(("invalid node [%p] read from offset %" B_PRIdOFF " (block %"
 				B_PRIdOFF "), inode at %" B_PRIdINO "\n", fNode, offset,
 				fBlockNumber, fTree->fStream->ID()));
@@ -133,14 +140,14 @@ CachedNode::SetToWritable(Transaction& transaction, off_t offset, bool check)
 	// You can only ask for nodes at valid positions - you can't
 	// even access the b+tree header with this method (use SetToHeader()
 	// instead)
-	if (offset > fTree->fHeader->MaximumSize() - fTree->fNodeSize
+	if (offset > fTree->fHeader.MaximumSize() - fTree->fNodeSize
 		|| offset <= 0
 		|| (offset % fTree->fNodeSize) != 0)
 		return NULL;
 
 	if (InternalSetTo(&transaction, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
-		if (!fTree->fHeader->CheckNode(fNode)) {
+		if (!fTree->fHeader.CheckNode(fNode)) {
 			FATAL(("invalid node [%p] read from offset %" B_PRIdOFF " (block %"
 				B_PRIdOFF "), inode at %" B_PRIdINO "\n", fNode, offset,
 				fBlockNumber, fTree->fStream->ID()));
@@ -162,13 +169,6 @@ CachedNode::MakeWritable(Transaction& transaction)
 		return fNode;
 
 	return NULL;
-}
-
-
-bplustree_header*
-CachedNode::MakeWritableHeader(Transaction& transaction)
-{
-	return (bplustree_header*)MakeWritable(transaction);
 }
 
 
@@ -250,8 +250,8 @@ CachedNode::Free(Transaction& transaction, off_t offset)
 	// function is called, perhaps it should be done when the directory
 	// inode is closed or based on some calculation or whatever...
 
-	bplustree_header* header
-		= fTree->fCachedHeader.MakeWritableHeader(transaction);
+	CachedNode cached(fTree);
+	bplustree_header* header = cached.SetToWritableHeader(transaction);
 	if (header == NULL)
 		return B_IO_ERROR;
 
@@ -284,7 +284,7 @@ status_t
 CachedNode::Allocate(Transaction& transaction, bplustree_node** _node,
 	off_t* _offset)
 {
-	if (fTree == NULL || fTree->fHeader == NULL || fTree->fStream == NULL)
+	if (fTree == NULL || fTree->fStream == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	Unset();
@@ -293,8 +293,9 @@ CachedNode::Allocate(Transaction& transaction, bplustree_node** _node,
 	status_t status;
 
 	// if there are any free nodes, recycle them
-	if (SetToWritable(transaction, fTree->fHeader->FreeNode(), false) != NULL) {
-		header = fTree->fCachedHeader.MakeWritableHeader(transaction);
+	if (SetToWritable(transaction, fTree->fHeader.FreeNode(), false) != NULL) {
+		CachedNode cached(fTree);
+		header = cached.SetToWritableHeader(transaction);
 		if (header == NULL)
 			return B_IO_ERROR;
 
@@ -312,7 +313,8 @@ CachedNode::Allocate(Transaction& transaction, bplustree_node** _node,
 	if ((status = stream->Append(transaction, fTree->fNodeSize)) < B_OK)
 		return status;
 
-	header = fTree->fCachedHeader.MakeWritableHeader(transaction);
+	CachedNode cached(fTree);
+	header = cached.SetToWritableHeader(transaction);
 	if (header == NULL)
 		return B_IO_ERROR;
 
@@ -342,9 +344,7 @@ CachedNode::Allocate(Transaction& transaction, bplustree_node** _node,
 
 BPlusTree::BPlusTree(Transaction& transaction, Inode* stream, int32 nodeSize)
 	:
-	fStream(NULL),
-	fHeader(NULL),
-	fCachedHeader(this)
+	fStream(NULL)
 {
 	mutex_init(&fIteratorLock, "bfs b+tree iterator");
 	SetTo(transaction, stream);
@@ -353,9 +353,7 @@ BPlusTree::BPlusTree(Transaction& transaction, Inode* stream, int32 nodeSize)
 
 BPlusTree::BPlusTree(Inode* stream)
 	:
-	fStream(NULL),
-	fHeader(NULL),
-	fCachedHeader(this)
+	fStream(NULL)
 {
 	mutex_init(&fIteratorLock, "bfs b+tree iterator");
 	SetTo(stream);
@@ -365,8 +363,6 @@ BPlusTree::BPlusTree(Inode* stream)
 BPlusTree::BPlusTree()
 	:
 	fStream(NULL),
-	fHeader(NULL),
-	fCachedHeader(this),
 	fNodeSize(BPLUSTREE_NODE_SIZE),
 	fAllowDuplicates(true),
 	fStatus(B_NO_INIT)
@@ -399,19 +395,19 @@ BPlusTree::SetTo(Transaction& transaction, Inode* stream, int32 nodeSize)
 
 	fStream = stream;
 
-	bplustree_header* header = fCachedHeader.SetToWritableHeader(transaction);
+	CachedNode cached(this);
+	bplustree_header* header = cached.SetToWritableHeader(transaction);
 	if (header == NULL) {
 		// allocate space for new header + node!
 		fStatus = stream->SetFileSize(transaction, nodeSize * 2);
 		if (fStatus < B_OK)
 			RETURN_ERROR(fStatus);
 
-		header = fCachedHeader.SetToWritableHeader(transaction);
+		header = cached.SetToWritableHeader(transaction);
 		if (header == NULL)
 			RETURN_ERROR(fStatus = B_ERROR);
 	}
 
-	fHeader = header;
 	fAllowDuplicates = stream->IsIndex()
 		|| (stream->Mode() & S_ALLOW_DUPS) != 0;
 
@@ -427,9 +423,10 @@ BPlusTree::SetTo(Transaction& transaction, Inode* stream, int32 nodeSize)
  		= HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
  	header->maximum_size = HOST_ENDIAN_TO_BFS_INT64(nodeSize * 2);
 
+	memcpy(&fHeader, header, sizeof(bplustree_header));
+
 	// initialize b+tree root node
-	CachedNode cached(this);
-	cached.SetToWritable(transaction, header->RootNode(), false);
+	cached.SetToWritable(transaction, fHeader.RootNode(), false);
 	if (cached.Node() == NULL)
 		RETURN_ERROR(B_IO_ERROR);
 
@@ -445,35 +442,37 @@ BPlusTree::SetTo(Inode* stream)
 	if (stream == NULL)
 		RETURN_ERROR(fStatus = B_BAD_VALUE);
 
-	// get on-disk B+Tree header
-
-	fCachedHeader.Unset();
 	fStream = stream;
 
-	fHeader = fCachedHeader.SetToHeader();
-	if (fHeader == NULL)
-		RETURN_ERROR(fStatus = B_NO_INIT);
+	// get on-disk B+Tree header
+
+	CachedNode cached(this);
+	const bplustree_header* header = cached.SetToHeader();
+	if (header != NULL)
+		memcpy(&fHeader, header, sizeof(bplustree_header));
+	else
+		RETURN_ERROR(fStatus = B_IO_ERROR);
 
 	// is header valid?
 
-	if (fHeader->MaximumSize() != stream->Size()) {
+	if (fHeader.MaximumSize() != stream->Size()) {
 		dprintf("B+tree header size %" B_PRIdOFF " doesn't fit file size %"
-			B_PRIdOFF "!\n", fHeader->MaximumSize(), stream->Size());
+			B_PRIdOFF "!\n", fHeader.MaximumSize(), stream->Size());
 		// we can't change the header since we don't have a transaction
-		//fHeader->maximum_size = HOST_ENDIAN_TO_BFS_INT64(stream->Size());
+		//fHeader.maximum_size = HOST_ENDIAN_TO_BFS_INT64(stream->Size());
 	}
-	if (fHeader->Magic() != BPLUSTREE_MAGIC
-		|| (fHeader->RootNode() % fHeader->NodeSize()) != 0
-		|| !fHeader->IsValidLink(fHeader->RootNode())
-		|| !fHeader->IsValidLink(fHeader->FreeNode())) {
+	if (fHeader.Magic() != BPLUSTREE_MAGIC
+		|| (fHeader.RootNode() % fHeader.NodeSize()) != 0
+		|| !fHeader.IsValidLink(fHeader.RootNode())
+		|| !fHeader.IsValidLink(fHeader.FreeNode())) {
 #ifdef DEBUG
-		dump_bplustree_header(fHeader);
-		dump_block((const char*)fHeader, 128);
+		dump_bplustree_header(&fHeader);
+		dump_block((const char*)&fHeader, 128);
 #endif
 		RETURN_ERROR(fStatus = B_BAD_DATA);
 	}
 
-	fNodeSize = fHeader->NodeSize();
+	fNodeSize = fHeader.NodeSize();
 
 	// validity check
 	static const uint32 kToMode[] = {S_STR_INDEX, S_INT_INDEX, S_UINT_INDEX,
@@ -483,11 +482,11 @@ BPlusTree::SetTo(Inode* stream)
 		| S_UINT_INDEX | S_LONG_LONG_INDEX | S_ULONG_LONG_INDEX
 		| S_FLOAT_INDEX | S_DOUBLE_INDEX);
 
-	if (fHeader->DataType() > BPLUSTREE_DOUBLE_TYPE
+	if (fHeader.DataType() > BPLUSTREE_DOUBLE_TYPE
 		|| ((stream->Mode() & S_INDEX_DIR) != 0
-			&& kToMode[fHeader->DataType()] != mode)
+			&& kToMode[fHeader.DataType()] != mode)
 		|| !stream->IsContainer()) {
-		D(	dump_bplustree_header(fHeader);
+		D(	dump_bplustree_header(&fHeader);
 			dump_inode(&stream->Node());
 		);
 		RETURN_ERROR(fStatus = B_BAD_TYPE);
@@ -498,7 +497,7 @@ BPlusTree::SetTo(Inode* stream)
 	fAllowDuplicates = stream->IsIndex()
 		|| (stream->Mode() & S_ALLOW_DUPS) != 0;
 
-	CachedNode cached(this, fHeader->RootNode());
+	cached.SetTo(fHeader.RootNode());
 	RETURN_ERROR(fStatus = cached.Node() ? B_OK : B_BAD_DATA);
 }
 
@@ -601,7 +600,7 @@ BPlusTree::_CompareKeys(const void* key1, int keyLength1, const void* key2,
 	int keyLength2)
 {
 	type_code type = 0;
-	switch (fHeader->data_type) {
+	switch (fHeader.DataType()) {
 	    case BPLUSTREE_STRING_TYPE:
 	    	type = B_STRING_TYPE;
 	    	break;
@@ -697,7 +696,7 @@ BPlusTree::_SeekDown(Stack<node_and_key>& stack, const uint8* key,
 {
 	// set the root node to begin with
 	node_and_key nodeAndKey;
-	nodeAndKey.nodeOffset = fHeader->RootNode();
+	nodeAndKey.nodeOffset = fHeader.RootNode();
 
 	CachedNode cached(this);
 	const bplustree_node* node;
@@ -718,7 +717,7 @@ BPlusTree::_SeekDown(Stack<node_and_key>& stack, const uint8* key,
 		if (status == B_ENTRY_NOT_FOUND && nextOffset == nodeAndKey.nodeOffset)
 			RETURN_ERROR(B_ERROR);
 
-		if ((uint32)stack.CountItems() > fHeader->MaxNumberOfLevels()) {
+		if ((uint32)stack.CountItems() > fHeader.MaxNumberOfLevels()) {
 			dprintf("BPlusTree::_SeekDown() node walked too deep.\n");
 			break;
 		}
@@ -1331,7 +1330,7 @@ BPlusTree::Insert(Transaction& transaction, const uint8* key, uint16 keyLength,
 			// do we need to allocate a new root node? if so, then do
 			// it now
 			off_t newRoot = BPLUSTREE_NULL;
-			if (nodeAndKey.nodeOffset == fHeader->RootNode()) {
+			if (nodeAndKey.nodeOffset == fHeader.RootNode()) {
 				bplustree_node* root;
 				status_t status = cachedNewRoot.Allocate(transaction, &root,
 					&newRoot);
@@ -1388,8 +1387,9 @@ BPlusTree::Insert(Transaction& transaction, const uint8* key, uint16 keyLength,
 				root->overflow_link = HOST_ENDIAN_TO_BFS_INT64(
 					nodeAndKey.nodeOffset);
 
+				CachedNode cached(this);
 				bplustree_header* header
-					= fCachedHeader.MakeWritableHeader(transaction);
+					= cached.SetToWritableHeader(transaction);
 				if (header == NULL)
 					return B_IO_ERROR;
 
@@ -1734,7 +1734,7 @@ BPlusTree::Remove(Transaction& transaction, const uint8* key, uint16 keyLength,
 		// if it's an empty root node, we have to convert it
 		// to a leaf node by dropping the overflow link, or,
 		// if it's already a leaf node, just empty it
-		if (nodeAndKey.nodeOffset == fHeader->RootNode()
+		if (nodeAndKey.nodeOffset == fHeader.RootNode()
 			&& (node->NumKeys() == 0
 				|| (node->NumKeys() == 1 && node->IsLeaf()))) {
 			writableNode->overflow_link
@@ -1744,9 +1744,10 @@ BPlusTree::Remove(Transaction& transaction, const uint8* key, uint16 keyLength,
 
 			// if we've made a leaf node out of the root node, we need
 			// to reset the maximum number of levels in the header
-			if (fHeader->MaxNumberOfLevels() != 1) {
+			if (fHeader.MaxNumberOfLevels() != 1) {
+				CachedNode cached(this);
 				bplustree_header* header
-					= fCachedHeader.MakeWritableHeader(transaction);
+					= cached.SetToWritableHeader(transaction);
 				if (header == NULL)
 					return B_IO_ERROR;
 
@@ -1807,7 +1808,7 @@ BPlusTree::Replace(Transaction& transaction, const uint8* key, uint16 keyLength,
 
 	ASSERT_WRITE_LOCKED_INODE(fStream);
 
-	off_t nodeOffset = fHeader->RootNode();
+	off_t nodeOffset = fHeader.RootNode();
 	CachedNode cached(this);
 	const bplustree_node* node;
 
@@ -1861,7 +1862,7 @@ BPlusTree::Find(const uint8* key, uint16 keyLength, off_t* _value)
 
 	ASSERT_READ_LOCKED_INODE(fStream);
 
-	off_t nodeOffset = fHeader->RootNode();
+	off_t nodeOffset = fHeader.RootNode();
 	CachedNode cached(this);
 	const bplustree_node* node;
 
@@ -1883,7 +1884,7 @@ BPlusTree::Find(const uint8* key, uint16 keyLength, off_t* _value)
 				*_value = BFS_ENDIAN_TO_HOST_INT64(node->Values()[keyIndex]);
 
 #ifdef DEBUG
-			if (levels != (int32)fHeader->MaxNumberOfLevels())
+			if (levels != (int32)fHeader.MaxNumberOfLevels())
 				DEBUGGER(("levels don't match"));
 #endif
 			return status;
@@ -1919,13 +1920,13 @@ TreeIterator::~TreeIterator()
 status_t
 TreeIterator::Goto(int8 to)
 {
-	if (fTree == NULL || fTree->fHeader == NULL)
+	if (fTree == NULL || fTree->fStream == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	// lock access to stream
 	InodeReadLocker locker(fTree->fStream);
 
-	off_t nodeOffset = fTree->fHeader->RootNode();
+	off_t nodeOffset = fTree->fHeader.RootNode();
 	CachedNode cached(fTree);
 	const bplustree_node* node;
 
@@ -2079,7 +2080,7 @@ TreeIterator::Traverse(int8 direction, void* key, uint16* keyLength,
 	length = min_c(length, maxLength);
 	memcpy(key, keyStart, length);
 
-	if (fTree->fHeader->data_type == BPLUSTREE_STRING_TYPE)	{
+	if (fTree->fHeader.DataType() == BPLUSTREE_STRING_TYPE)	{
 		// terminate string type
 		if (length == maxLength)
 			length--;
@@ -2138,7 +2139,7 @@ TreeIterator::Find(const uint8* key, uint16 keyLength)
 	// lock access to stream
 	InodeReadLocker locker(fTree->fStream);
 
-	off_t nodeOffset = fTree->fHeader->RootNode();
+	off_t nodeOffset = fTree->fHeader.RootNode();
 
 	CachedNode cached(fTree);
 	const bplustree_node* node;
