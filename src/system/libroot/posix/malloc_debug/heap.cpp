@@ -10,9 +10,13 @@
  */
 
 #include <malloc.h>
+#include <malloc_debug.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include <errno.h>
+#include <sys/mman.h>
 
 #include <locks.h>
 #include <syscalls.h>
@@ -1703,20 +1707,26 @@ heap_debug_dump_heaps(bool dumpAreas, bool dumpBins)
 extern "C" void *
 heap_debug_malloc_with_guard_page(size_t size)
 {
-	size_t areaSize = ROUNDUP(size + sizeof(area_allocation_info), B_PAGE_SIZE);
+	size_t areaSize = ROUNDUP(size + sizeof(area_allocation_info) + B_PAGE_SIZE,
+		B_PAGE_SIZE);
 	if (areaSize < size) {
 		// the size overflowed
 		return NULL;
 	}
 
 	void *address = NULL;
-	// TODO: this needs a kernel backend (flag) to enforce adding an unmapped
-	// page past the required pages so it will reliably crash
 	area_id allocationArea = create_area("guarded area", &address,
 		B_ANY_ADDRESS, areaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (allocationArea < B_OK) {
 		panic("heap: failed to create area for guarded allocation of %lu"
 			" bytes\n", size);
+		return NULL;
+	}
+
+	if (mprotect((void *)((addr_t)address + areaSize - B_PAGE_SIZE),
+			B_PAGE_SIZE, PROT_NONE) != 0) {
+		panic("heap: failed to protect guard page: %s\n", strerror(errno));
+		delete_area(allocationArea);
 		return NULL;
 	}
 
@@ -1731,7 +1741,7 @@ heap_debug_malloc_with_guard_page(size_t size)
 
 	// the address is calculated so that the end of the allocation
 	// is at the end of the usable space of the requested area
-	address = (void *)((addr_t)address + areaSize - size);
+	address = (void *)((addr_t)address + areaSize - B_PAGE_SIZE - size);
 
 	INFO(("heap: allocated area %ld for guarded allocation of %lu bytes\n",
 		allocationArea, size));
