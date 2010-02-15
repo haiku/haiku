@@ -32,6 +32,13 @@
 #define ASSERT(x)	if (!(x)) panic("assert failed: %s", #x);
 
 
+static bool sDebuggerCalls = true;
+static bool sReuseMemory = true;
+static bool sParanoidValidation = false;
+static thread_id sWallCheckThread = -1;
+static bool sStopWallChecking = false;
+
+
 void
 panic(const char *format, ...)
 {
@@ -42,7 +49,10 @@ panic(const char *format, ...)
 	vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
-	debugger(buffer);
+	if (sDebuggerCalls)
+		debugger(buffer);
+	else
+		debug_printf(buffer);
 }
 
 
@@ -51,11 +61,6 @@ panic(const char *format, ...)
 #define HEAP_INITIAL_SIZE			1 * 1024 * 1024
 #define HEAP_GROW_SIZE				2 * 1024 * 1024
 #define HEAP_AREA_USE_THRESHOLD		1 * 1024 * 1024
-
-static bool sReuseMemory = true;
-static bool sParanoidValidation = false;
-static thread_id sWallCheckThread = -1;
-static bool sStopWallChecking = false;
 
 typedef struct heap_leak_check_info_s {
 	size_t		size;
@@ -1653,6 +1658,13 @@ extern "C" void
 heap_debug_set_memory_reuse(bool enabled)
 {
 	sReuseMemory = enabled;
+}
+
+
+extern "C" void
+heap_debug_set_debugger_calls(bool enabled)
+{
+	sDebuggerCalls = enabled;
 }
 
 
