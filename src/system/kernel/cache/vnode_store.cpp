@@ -132,7 +132,7 @@ VMVnodeCache::AcquireUnreferencedStoreRef()
 	// If successful, update the store's vnode pointer, so that release_ref()
 	// won't use a stale pointer.
 	if (status == B_OK && fVnodeDeleted) {
-		vfs_put_vnode(fVnode);
+		vfs_put_vnode(vnode);
 		status = B_BUSY;
 	}
 
