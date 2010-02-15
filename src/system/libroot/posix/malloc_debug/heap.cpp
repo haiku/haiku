@@ -52,6 +52,7 @@ panic(const char *format, ...)
 #define HEAP_GROW_SIZE				2 * 1024 * 1024
 #define HEAP_AREA_USE_THRESHOLD		1 * 1024 * 1024
 
+static bool sReuseMemory = true;
 static bool sParanoidValidation = false;
 static thread_id sWallCheckThread = -1;
 static bool sStopWallChecking = false;
@@ -911,7 +912,6 @@ static heap_page *
 heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount,
 	size_t alignment)
 {
-	MutexLocker pageLocker(heap->page_lock);
 	heap_area *area = heap->areas;
 	while (area) {
 		if (area->free_page_count < pageCount) {
@@ -994,6 +994,8 @@ heap_raw_alloc(heap_allocator *heap, size_t size, size_t alignment)
 		heap, size, alignment));
 
 	uint32 pageCount = (size + heap->page_size - 1) / heap->page_size;
+
+	MutexLocker pageLocker(heap->page_lock);
 	heap_page *firstPage = heap_allocate_contiguous_pages(heap, pageCount,
 		alignment);
 	if (firstPage == NULL) {
@@ -1071,7 +1073,6 @@ heap_allocate_from_bin(heap_allocator *heap, uint32 binIndex, size_t size)
 		page->next = page->prev = NULL;
 	}
 
-	binLocker.Unlock();
 	heap_add_leak_check_info((addr_t)address, bin->element_size, size);
 	return address;
 }
@@ -1238,40 +1239,42 @@ heap_free(heap_allocator *heap, void *address)
 		// the first 4 bytes are overwritten with the next free list pointer
 		// later
 		uint32 *dead = (uint32 *)address;
-		for (uint32 i = 1; i < bin->element_size / sizeof(uint32); i++)
+		for (uint32 i = 0; i < bin->element_size / sizeof(uint32); i++)
 			dead[i] = 0xdeadbeef;
 
-		// add the address to the page free list
-		*(addr_t *)address = (addr_t)page->free_list;
-		page->free_list = (addr_t *)address;
-		page->free_count++;
+		if (sReuseMemory) {
+			// add the address to the page free list
+			*(addr_t *)address = (addr_t)page->free_list;
+			page->free_list = (addr_t *)address;
+			page->free_count++;
 
-		if (page->free_count == bin->max_free_count) {
-			// we are now empty, remove the page from the bin list
-			MutexLocker pageLocker(heap->page_lock);
-			heap_unlink_page(page, &bin->page_list);
-			page->in_use = 0;
-			heap_link_page(page, &area->free_pages);
-			heap_free_pages_added(heap, area, 1);
-		} else if (page->free_count == 1) {
-			// we need to add ourselfs to the page list of the bin
-			heap_link_page(page, &bin->page_list);
-		} else {
-			// we might need to move back in the free pages list
-			if (page->next && page->next->free_count < page->free_count) {
-				// move ourselfs so the list stays ordered
-				heap_page *insert = page->next;
-				while (insert->next
-					&& insert->next->free_count < page->free_count)
-					insert = insert->next;
-
+			if (page->free_count == bin->max_free_count) {
+				// we are now empty, remove the page from the bin list
+				MutexLocker pageLocker(heap->page_lock);
 				heap_unlink_page(page, &bin->page_list);
+				page->in_use = 0;
+				heap_link_page(page, &area->free_pages);
+				heap_free_pages_added(heap, area, 1);
+			} else if (page->free_count == 1) {
+				// we need to add ourselfs to the page list of the bin
+				heap_link_page(page, &bin->page_list);
+			} else {
+				// we might need to move back in the free pages list
+				if (page->next && page->next->free_count < page->free_count) {
+					// move ourselfs so the list stays ordered
+					heap_page *insert = page->next;
+					while (insert->next
+						&& insert->next->free_count < page->free_count)
+						insert = insert->next;
 
-				page->prev = insert;
-				page->next = insert->next;
-				if (page->next)
-					page->next->prev = page;
-				insert->next = page;
+					heap_unlink_page(page, &bin->page_list);
+
+					page->prev = insert;
+					page->next = insert->next;
+					if (page->next)
+						page->next->prev = page;
+					insert->next = page;
+				}
 			}
 		}
 	} else {
@@ -1294,11 +1297,14 @@ heap_free(heap_allocator *heap, void *address)
 				break;
 
 			// this page still belongs to the same allocation
-			page[i].in_use = 0;
-			page[i].allocation_id = 0;
+			if (sReuseMemory) {
+				page[i].in_use = 0;
+				page[i].allocation_id = 0;
 
-			// return it to the free list
-			heap_link_page(&page[i], &area->free_pages);
+				// return it to the free list
+				heap_link_page(&page[i], &area->free_pages);
+			}
+
 			pageCount++;
 		}
 
@@ -1325,7 +1331,8 @@ heap_free(heap_allocator *heap, void *address)
 		for (uint32 i = 0; i < allocationSize / sizeof(uint32); i++)
 			dead[i] = 0xdeadbeef;
 
-		heap_free_pages_added(heap, area, pageCount);
+		if (sReuseMemory)
+			heap_free_pages_added(heap, area, pageCount);
 	}
 
 	areaReadLocker.Unlock();
@@ -1541,6 +1548,13 @@ heap_debug_set_paranoid_validation(bool enabled)
 
 
 extern "C" void
+heap_debug_set_memory_reuse(bool enabled)
+{
+	sReuseMemory = enabled;
+}
+
+
+extern "C" void
 heap_debug_validate_heaps()
 {
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
@@ -1567,6 +1581,48 @@ heap_debug_dump_heaps(bool dumpAreas, bool dumpBins)
 {
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
 		dump_allocator(sHeaps[i], dumpAreas, dumpBins);
+}
+
+
+extern "C" void *
+heap_debug_malloc_with_guard_page(size_t size)
+{
+	size_t areaSize = ROUNDUP(size + sizeof(area_allocation_info), B_PAGE_SIZE);
+	if (areaSize < size) {
+		// the size overflowed
+		return NULL;
+	}
+
+	void *address = NULL;
+	// TODO: this needs a kernel backend (flag) to enforce adding an unmapped
+	// page past the required pages so it will reliably crash
+	area_id allocationArea = create_area("guarded area", &address,
+		B_ANY_ADDRESS, areaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+	if (allocationArea < B_OK) {
+		panic("heap: failed to create area for guarded allocation of %lu"
+			" bytes\n", size);
+		return NULL;
+	}
+
+	area_allocation_info *info = (area_allocation_info *)address;
+	info->magic = kAreaAllocationMagic;
+	info->area = allocationArea;
+	info->base = address;
+	info->size = areaSize;
+	info->allocation_size = size;
+	info->allocation_alignment = 0;
+
+	// the address is calculated so that the end of the allocation
+	// is at the end of the usable space of the requested area
+	address = (void *)((addr_t)address + areaSize - size);
+
+	INFO(("heap: allocated area %ld for guarded allocation of %lu bytes\n",
+		allocationArea, size));
+
+	info->allocation_base = address;
+
+	memset(address, 0xcc, size);
+	return address;
 }
 
 

@@ -5,19 +5,24 @@
 #ifndef MALLOC_DEBUG_H
 #define MALLOC_DEBUG_H
 
+#include <OS.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern status_t heap_debug_start_wall_checking(int msInterval);
-extern status_t heap_debug_stop_wall_checking();
+status_t heap_debug_start_wall_checking(int msInterval);
+status_t heap_debug_stop_wall_checking();
 
-extern void heap_debug_set_paranoid_validation(bool enabled);
-extern void heap_debug_validate_heaps();
-extern void heap_debug_validate_walls();
+void heap_debug_set_memory_reuse(bool enabled);
+void heap_debug_set_paranoid_validation(bool enabled);
+void heap_debug_validate_heaps();
+void heap_debug_validate_walls();
 
-extern void heap_debug_dump_allocations(bool statsOnly, thread_id thread);
-extern void heap_debug_dump_heaps(bool dumpAreas, bool dumpBins);
+void heap_debug_dump_allocations(bool statsOnly, thread_id thread);
+void heap_debug_dump_heaps(bool dumpAreas, bool dumpBins);
+
+void *heap_debug_malloc_with_guard_page(size_t size);
 
 #ifdef __cplusplus
 }
