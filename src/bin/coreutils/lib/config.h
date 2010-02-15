@@ -1714,7 +1714,7 @@
 #define HAVE___FSETLOCKING 1
 
 /* Define HOST_NAME_MAX when <limits.h> does not define it. */
-#define HOST_NAME_MAX 256
+/* #undef HOST_NAME_MAX */
 
 /* The host operating system. */
 #define HOST_OPERATING_SYSTEM "Haiku"
