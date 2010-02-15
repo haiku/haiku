@@ -488,7 +488,7 @@ RemoteHWInterface::SetCursor(ServerCursor* cursor)
 	HWInterface::SetCursor(cursor);
 	RemoteMessage message(NULL, fSendBuffer);
 	message.Start(RP_SET_CURSOR);
-	message.AddCursor(Cursor().Cursor());
+	message.AddCursor(Cursor().Get());
 }
 
 
@@ -520,7 +520,7 @@ RemoteHWInterface::SetDragBitmap(const ServerBitmap* bitmap,
 	HWInterface::SetDragBitmap(bitmap, offsetFromCursor);
 	RemoteMessage message(NULL, fSendBuffer);
 	message.Start(RP_SET_CURSOR);
-	message.AddCursor(CursorAndDragBitmap().Cursor());
+	message.AddCursor(CursorAndDragBitmap().Get());
 }
 
 

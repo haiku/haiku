@@ -65,66 +65,7 @@ private:
 };
 
 
-class ServerCursorReference {
-public:
-	ServerCursorReference()
-		:
-		fCursor(NULL)
-	{
-	}
-
-	ServerCursorReference(ServerCursor* cursor)
-		:
-		fCursor(cursor)
-	{
-		if (fCursor)
-			fCursor->AcquireReference();
-	}
-
-	ServerCursorReference(const ServerCursorReference& other)
-		:
-		fCursor(other.fCursor)
-	{
-		if (fCursor)
-			fCursor->AcquireReference();
-	}
-
-	virtual ~ServerCursorReference()
-	{
-		if (fCursor)
-			fCursor->ReleaseReference();
-	}
-
-	ServerCursorReference& operator=(const ServerCursorReference& other)
-	{
-		SetCursor(other.fCursor);
-		return *this;
-	}
-
-	void SetCursor(ServerCursor* cursor)
-	{
-		if (fCursor == cursor)
-			return;
-
-		if (cursor)
-			cursor->AcquireReference();
-
-		ServerCursor* oldCursor = fCursor;
-
-		fCursor = cursor;
-
-		if (oldCursor)
-			oldCursor->ReleaseReference();
-	}
-
-	ServerCursor* Cursor() const
-	{
-		return fCursor;
-	}
-
-private:
-	ServerCursor*			fCursor;
-};
+typedef BReference<ServerCursor> ServerCursorReference;
 
 
 #endif	// SERVER_CURSOR_H

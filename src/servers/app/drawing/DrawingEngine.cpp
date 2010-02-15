@@ -1380,7 +1380,7 @@ DrawingEngine::ReadBitmap(ServerBitmap* bitmap, bool drawCursor, BRect bounds)
 
 	if (drawCursor) {
 		ServerCursorReference cursorRef = fGraphicsCard->Cursor();
-		ServerCursor* cursor = cursorRef.Cursor();
+		ServerCursor* cursor = cursorRef.Get();
 		if (!cursor)
 			return result;
 		int32 cursorWidth = cursor->Width();
