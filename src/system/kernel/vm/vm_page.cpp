@@ -130,6 +130,13 @@ static page_num_t sNextPageUsagePageCount;
 #endif
 
 
+struct page_stats {
+	int32	totalFreePages;
+	int32	unsatisfiedReservations;
+	int32	cachedPages;
+};
+
+
 struct PageReservationWaiter
 		: public DoublyLinkedListLinkImpl<PageReservationWaiter> {
 	struct thread*	thread;
@@ -875,19 +882,22 @@ dump_page_usage_stats(int argc, char** argv)
 // #pragma mark -
 
 
-struct page_stats {
-	int32	totalFreePages;
-	int32	unsatisfiedReservations;
-	int32	cachedPages;
-};
-
 static void
-get_page_stats(page_stats& pageStats)
+get_page_stats(page_stats& _pageStats)
 {
-	pageStats.totalFreePages = sUnreservedFreePages;
-	pageStats.cachedPages = sCachedPageQueue.Count();
-	pageStats.unsatisfiedReservations = sUnsatisfiedPageReservations;
+	_pageStats.totalFreePages = sUnreservedFreePages;
+	_pageStats.cachedPages = sCachedPageQueue.Count();
+	_pageStats.unsatisfiedReservations = sUnsatisfiedPageReservations;
 	// TODO: We don't get an actual snapshot here!
+}
+
+
+static bool
+do_active_paging(const page_stats& pageStats)
+{
+	return pageStats.totalFreePages + pageStats.cachedPages
+		< pageStats.unsatisfiedReservations
+			+ (int32)sFreeOrCachedPagesTarget;
 }
 
 
@@ -1123,7 +1133,7 @@ set_page_state(vm_page *page, int pageState)
 	The page queues must not be locked.
 */
 static void
-move_page_to_active_or_inactive_queue(vm_page *page, bool dequeued)
+move_page_to_active_or_inactive_queue(vm_page *page)
 {
 	DEBUG_PAGE_ACCESS_CHECK(page);
 
@@ -1138,13 +1148,7 @@ move_page_to_active_or_inactive_queue(vm_page *page, bool dequeued)
 
 // TODO: If free + cached pages are low, we might directly want to free the
 // page.
-	if (dequeued) {
-		page->state = state;
-		sPageQueues[state].AppendUnlocked(page);
-		if (page->Cache()->temporary)
-			atomic_add(&sModifiedTemporaryPages, -1);
-	} else
-		set_page_state(page, state);
+	set_page_state(page, state);
 }
 
 
@@ -1353,14 +1357,12 @@ class PageWriteWrapper {
 public:
 	PageWriteWrapper();
 	~PageWriteWrapper();
-	void SetTo(vm_page* page, bool dequeuedPage);
-	void ClearModifiedFlag();
+	void SetTo(vm_page* page);
 	void Done(status_t result);
 
 private:
 	vm_page*			fPage;
 	struct VMCache*		fCache;
-	bool				fDequeuedPage;
 	bool				fIsActive;
 };
 
@@ -1382,7 +1384,7 @@ PageWriteWrapper::~PageWriteWrapper()
 /*!	The page's cache must be locked.
 */
 void
-PageWriteWrapper::SetTo(vm_page* page, bool dequeuedPage)
+PageWriteWrapper::SetTo(vm_page* page)
 {
 	DEBUG_PAGE_ACCESS_CHECK(page);
 
@@ -1394,28 +1396,20 @@ PageWriteWrapper::SetTo(vm_page* page, bool dequeuedPage)
 
 	fPage = page;
 	fCache = page->Cache();
-	fDequeuedPage = dequeuedPage;
 	fIsActive = true;
 
 	fPage->busy = true;
 	fPage->busy_writing = true;
-}
 
-
-/*!	The page's cache must be locked.
-*/
-void
-PageWriteWrapper::ClearModifiedFlag()
-{
-	// We have a modified page - however, while we're writing it back,
-	// the page is still mapped. In order not to lose any changes to the
+	// We have a modified page -- however, while we're writing it back,
+	// the page might still be mapped. In order not to lose any changes to the
 	// page, we mark it clean before actually writing it back; if
-	// writing the page fails for some reason, we just keep it in the
+	// writing the page fails for some reason, we'll just keep it in the
 	// modified page list, but that should happen only rarely.
 
-	// If the page is changed after we cleared the dirty flag, but
-	// before we had the chance to write it back, then we'll write it
-	// again later - that will probably not happen that often, though.
+	// If the page is changed after we cleared the dirty flag, but before we
+	// had the chance to write it back, then we'll write it again later -- that
+	// will probably not happen that often, though.
 
 	vm_clear_map_flags(fPage, PAGE_MODIFIED);
 }
@@ -1430,25 +1424,20 @@ PageWriteWrapper::Done(status_t result)
 	if (!fIsActive)
 		panic("completing page write wrapper that is not active");
 
-	DEBUG_PAGE_ACCESS_CHECK(fPage);
+	DEBUG_PAGE_ACCESS_START(fPage);
 
 	fPage->busy = false;
 		// Set unbusy and notify later by hand, since we might free the page.
 
 	if (result == B_OK) {
 		// put it into the active/inactive queue
-		move_page_to_active_or_inactive_queue(fPage, fDequeuedPage);
+		move_page_to_active_or_inactive_queue(fPage);
 		fPage->busy_writing = false;
 		DEBUG_PAGE_ACCESS_END(fPage);
 	} else {
-		// Writing the page failed -- move to the modified queue. If we dequeued
-		// it from there, just enqueue it again, otherwise set the page state
-		// explicitly, which will take care of moving between the queues.
-		if (fDequeuedPage) {
-			fPage->state = PAGE_STATE_MODIFIED;
-			sModifiedPageQueue.AppendUnlocked(fPage);
-		} else
-			set_page_state(fPage, PAGE_STATE_MODIFIED);
+		// Writing the page failed. One reason would be that the cache has been
+		// shrunk and the page does no longer belong to the file. Otherwise the
+		// actual I/O failed, in which case we'll simply keep the page modified.
 
 		if (!fPage->busy_writing) {
 			// The busy_writing flag was cleared. That means the cache has been
@@ -1458,11 +1447,23 @@ PageWriteWrapper::Done(status_t result)
 // TODO: Unmapping should already happen when resizing the cache!
 			fCache->RemovePage(fPage);
 			free_page(fPage, false);
-
-			// Adjust temporary modified pages count, if necessary.
-			if (fDequeuedPage && fCache->temporary)
-				atomic_add(&sModifiedTemporaryPages, -1);
 		} else {
+			// Writing the page failed -- mark the page modified and move it to
+			// an appropriate queue other than the modified queue, so we don't
+			// keep trying to write it over and over again. We keep
+			// non-temporary pages in the modified queue, though, so they don't
+			// get lost in the inactive queue.
+			dprintf("PageWriteWrapper: Failed to write page %p: %s\n", fPage,
+				strerror(result));
+
+			fPage->modified = true;
+			if (!fCache->temporary)
+				set_page_state(fPage, PAGE_STATE_MODIFIED);
+			else if (fPage->wired_count > 0 || !fPage->mappings.IsEmpty())
+				set_page_state(fPage, PAGE_STATE_ACTIVE);
+			else
+				set_page_state(fPage, PAGE_STATE_INACTIVE);
+
 			fPage->busy_writing = false;
 			DEBUG_PAGE_ACCESS_END(fPage);
 		}
@@ -1621,7 +1622,7 @@ PageWriterRun::PrepareNextRun()
 void
 PageWriterRun::AddPage(vm_page* page)
 {
-	fWrappers[fWrapperCount++].SetTo(page, true);
+	fWrappers[fWrapperCount++].SetTo(page);
 
 	if (fTransferCount == 0 || !fTransfers[fTransferCount - 1].AddPage(page)) {
 		fTransfers[fTransferCount++].SetTo(this, page,
@@ -1720,6 +1721,12 @@ page_writer(void* /*unused*/)
 		if (modifiedPages == 0)
 			continue;
 
+#if ENABLE_SWAP_SUPPORT
+		page_stats pageStats;
+		get_page_stats(pageStats);
+		bool activePaging = do_active_paging(pageStats);
+#endif
+
 		// depending on how urgent it becomes to get pages to disk, we adjust
 		// our I/O priority
 		uint32 lowPagesState = low_resource_state(B_KERNEL_RESOURCE_PAGES);
@@ -1742,10 +1749,6 @@ page_writer(void* /*unused*/)
 		// enough to do).
 
 		// collect pages to be written
-#if ENABLE_SWAP_SUPPORT
-		bool lowOnPages = lowPagesState != B_NO_LOW_RESOURCE;
-#endif
-
 		pageCollectionTime -= system_time();
 
 		while (numPages < kNumPages) {
@@ -1757,27 +1760,42 @@ page_writer(void* /*unused*/)
 			if (!cacheLocker.IsLocked())
 				continue;
 
-			DEBUG_PAGE_ACCESS_START(page);
-
 			VMCache *cache = page->Cache();
 
-			// Don't write back wired (locked) pages and don't write RAM pages
-			// until we're low on pages. Also avoid writing temporary pages that
-			// are active.
-			if (page->wired_count > 0
-				|| (cache->temporary
-#if ENABLE_SWAP_SUPPORT
-					&& (!lowOnPages /*|| page->usage_count > 0*/
-						|| !cache->CanWritePage(
-								(off_t)page->cache_offset << PAGE_SHIFT))
-#endif
-				)) {
+			// If the page is busy or its state has changed while we were
+			// locking the cache, just ignore it.
+			if (page->busy || page->state != PAGE_STATE_MODIFIED)
+				continue;
+
+			DEBUG_PAGE_ACCESS_START(page);
+
+			// Don't write back wired (locked) pages.
+			if (page->wired_count > 0) {
+				set_page_state(page, PAGE_STATE_ACTIVE);
 				DEBUG_PAGE_ACCESS_END(page);
 				continue;
 			}
 
-			// we need our own reference to the store, as it might
-			// currently be destructed
+			// Write back temporary pages only when we're actively paging.
+			if (cache->temporary
+#if ENABLE_SWAP_SUPPORT
+				&& (!activePaging
+					|| !cache->CanWritePage(
+							(off_t)page->cache_offset << PAGE_SHIFT))
+#endif
+				) {
+				// We can't/don't want to do anything with this page, so move it
+				// to one of the other queues.
+				if (page->mappings.IsEmpty())
+					set_page_state(page, PAGE_STATE_INACTIVE);
+				else
+					set_page_state(page, PAGE_STATE_ACTIVE);
+
+				DEBUG_PAGE_ACCESS_END(page);
+			}
+
+			// We need our own reference to the store, as it might currently be
+			// destroyed.
 			if (cache->AcquireUnreferencedStoreRef() != B_OK) {
 				DEBUG_PAGE_ACCESS_END(page);
 				cacheLocker.Unlock();
@@ -1785,21 +1803,13 @@ page_writer(void* /*unused*/)
 				continue;
 			}
 
-			// state might have changed while we were locking the cache
-			if (page->busy || page->state != PAGE_STATE_MODIFIED) {
-				// release the cache reference
-				DEBUG_PAGE_ACCESS_END(page);
-				cache->ReleaseStoreRef();
-				continue;
-			}
-
-			sModifiedPageQueue.RemoveUnlocked(page);
 			run.AddPage(page);
+
+			DEBUG_PAGE_ACCESS_END(page);
 
 			//dprintf("write page %p, cache %p (%ld)\n", page, page->cache, page->cache->ref_count);
 			TPW(WritePage(page));
 
-			vm_clear_map_flags(page, PAGE_MODIFIED);
 			cache->AcquireRefLocked();
 			numPages++;
 		}
@@ -2329,9 +2339,7 @@ page_daemon(void* /*unused*/)
 		page_stats pageStats;
 		get_page_stats(pageStats);
 
-		if (pageStats.totalFreePages + pageStats.cachedPages
-				>= pageStats.unsatisfiedReservations
-					+ (int32)sFreeOrCachedPagesTarget) {
+		if (!do_active_paging(pageStats)) {
 			// Things look good -- just maintain statistics and keep the pool
 			// of actually free pages full enough.
 			despairLevel = 0;
@@ -2478,18 +2486,12 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 			page = NULL;
 		}
 
-		bool dequeuedPage = false;
 		if (page != NULL) {
-			if (page->busy) {
+			if (page->busy
+				|| (page->state != PAGE_STATE_MODIFIED
+					&& !vm_test_map_modification(page))) {
 				page = NULL;
-			} else if (page->state == PAGE_STATE_MODIFIED) {
-				DEBUG_PAGE_ACCESS_START(page);
-				sModifiedPageQueue.RemoveUnlocked(page);
-				dequeuedPage = true;
-			} else if (!vm_test_map_modification(page)) {
-				page = NULL;
-			} else
-				DEBUG_PAGE_ACCESS_START(page);
+			}
 		}
 
 		PageWriteWrapper* wrapper = NULL;
@@ -2498,8 +2500,11 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 			if (nextWrapper > maxPages)
 				nextWrapper = 0;
 
-			wrapper->SetTo(page, dequeuedPage);
-			wrapper->ClearModifiedFlag();
+			DEBUG_PAGE_ACCESS_START(page);
+
+			wrapper->SetTo(page);
+
+			DEBUG_PAGE_ACCESS_END(page);
 
 			if (transferEmpty || transfer.AddPage(page)) {
 				if (transferEmpty) {
