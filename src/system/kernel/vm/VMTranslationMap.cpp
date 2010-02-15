@@ -6,6 +6,8 @@
 
 #include <vm/VMTranslationMap.h>
 
+#include <vm/vm_page.h>
+#include <vm/vm_priv.h>
 #include <vm/VMArea.h>
 
 
@@ -44,7 +46,7 @@ VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 	for (; address != end; address += B_PAGE_SIZE) {
 		addr_t physicalAddress;
 		uint32 flags;
-		if (map->Query(address, &physicalAddress, &flags) == B_OK
+		if (Query(address, &physicalAddress, &flags) == B_OK
 			&& (flags & PAGE_PRESENT) == 0) {
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page != NULL) {
@@ -85,7 +87,7 @@ VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	for (; address != end; address += B_PAGE_SIZE) {
 		addr_t physicalAddress;
 		uint32 flags;
-		if (map->Query(address, &physicalAddress, &flags) == B_OK
+		if (Query(address, &physicalAddress, &flags) == B_OK
 			&& (flags & PAGE_PRESENT) == 0) {
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page != NULL) {
