@@ -664,6 +664,10 @@ port_init(kernel_args *args)
 	if (create_area("port heap", (void**)&base, B_ANY_KERNEL_ADDRESS,
 			kInitialPortBufferSize, B_NO_LOCK,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA) < 0) {
+			// TODO: Since port_init() is invoked before the boot partition is
+			// mounted, the underlying VMAnonymousCache cannot commit swap space
+			// upon creation and thus the pages aren't swappable after all. This
+			// makes the area essentially B_LAZY_LOCK with additional overhead.
 		panic("unable to allocate port area!\n");
 		return B_ERROR;
 	}
