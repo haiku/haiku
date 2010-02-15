@@ -5367,8 +5367,11 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 
 			map->Unlock();
 
-			if (unmapPage)
+			if (unmapPage) {
+				DEBUG_PAGE_ACCESS_START(page);
 				unmap_page(area, pageAddress);
+				DEBUG_PAGE_ACCESS_END(page);
+			}
 		}
 	}
 
