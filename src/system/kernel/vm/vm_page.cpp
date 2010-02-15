@@ -1355,7 +1355,6 @@ public:
 	~PageWriteWrapper();
 	void SetTo(vm_page* page, bool dequeuedPage);
 	void ClearModifiedFlag();
-	void CheckRemoveFromShrunkenCache();
 	void Done(status_t result);
 
 private:
@@ -1423,19 +1422,6 @@ PageWriteWrapper::ClearModifiedFlag()
 
 
 /*!	The page's cache must be locked.
-*/
-void
-PageWriteWrapper::CheckRemoveFromShrunkenCache()
-{
-	if (fPage->busy_writing)
-		return;
-
-	vm_remove_all_page_mappings(fPage);
-	fCache->RemovePage(fPage);
-}
-
-
-/*!	The page's cache must be locked.
 	The page queues must not be locked.
 */
 void
@@ -1468,19 +1454,19 @@ PageWriteWrapper::Done(status_t result)
 			// The busy_writing flag was cleared. That means the cache has been
 			// shrunk while we were trying to write the page and we have to free
 			// it now.
+			vm_remove_all_page_mappings(fPage);
+// TODO: Unmapping should already happen when resizing the cache!
+			fCache->RemovePage(fPage);
+			free_page(fPage, false);
 
 			// Adjust temporary modified pages count, if necessary.
 			if (fDequeuedPage && fCache->temporary)
 				atomic_add(&sModifiedTemporaryPages, -1);
-
-			// free the page
-			free_page(fPage, false);
 		} else {
 			fPage->busy_writing = false;
 			DEBUG_PAGE_ACCESS_END(fPage);
 		}
 	}
-
 
 	fCache->NotifyPageEvents(fPage, PAGE_EVENT_NOT_BUSY);
 	fIsActive = false;
@@ -1666,12 +1652,6 @@ PageWriterRun::Go()
 	for (uint32 i = 0; i < fTransferCount; i++) {
 		PageWriteTransfer& transfer = fTransfers[i];
 		transfer.Cache()->Lock();
-
-		if (transfer.Status() != B_OK) {
-			uint32 checkIndex = wrapperIndex;
-			for (uint32 j = 0; j < transfer.PageCount(); j++)
-				fWrappers[checkIndex++].CheckRemoveFromShrunkenCache();
-		}
 
 		for (uint32 j = 0; j < transfer.PageCount(); j++)
 			fWrappers[wrapperIndex++].Done(transfer.Status());
@@ -2538,14 +2518,6 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 		cache->Unlock();
 		status_t status = transfer.Schedule(0);
 		cache->Lock();
-
-		// Before disabling interrupts handle part of the special case that
-		// writing the page failed due the cache having been shrunk. We need to
-		// remove the page from the cache and free it.
-		if (status != B_OK) {
-			for (int32 i = 0; i < usedWrappers; i++)
-				wrappers[i]->CheckRemoveFromShrunkenCache();
-		}
 
 		for (int32 i = 0; i < usedWrappers; i++)
 			wrappers[i]->Done(status);
