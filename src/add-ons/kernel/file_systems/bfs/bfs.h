@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * Parts of this code is based on work previously done by Marcus Overhagen.
  *
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BFS_H
 #define BFS_H
+
 
 //!	BFS definitions and helper functions
 
@@ -144,20 +145,25 @@ struct data_stream {
 struct bfs_inode;
 
 struct small_data {
-	uint32		type;
-	uint16		name_size;
-	uint16		data_size;
-	char		name[0];	// name_size long, followed by data
+			uint32				type;
+			uint16				name_size;
+			uint16				data_size;
+			char				name[0];	// name_size long, followed by data
 
-	uint32 Type() const { return BFS_ENDIAN_TO_HOST_INT32(type); }
-	uint16 NameSize() const { return BFS_ENDIAN_TO_HOST_INT16(name_size); }
-	uint16 DataSize() const { return BFS_ENDIAN_TO_HOST_INT16(data_size); }
+			uint32				Type() const
+									{ return BFS_ENDIAN_TO_HOST_INT32(type); }
+			uint16				NameSize() const
+									{ return BFS_ENDIAN_TO_HOST_INT16(
+										name_size); }
+			uint16				DataSize() const
+									{ return BFS_ENDIAN_TO_HOST_INT16(
+										data_size); }
 
-	inline char		*Name() const;
-	inline uint8	*Data() const;
-	inline uint32	Size() const;
-	inline small_data *Next() const;
-	inline bool		IsLast(const bfs_inode *inode) const;
+	inline	char*				Name() const;
+	inline	uint8*				Data() const;
+	inline	uint32				Size() const;
+	inline	small_data*			Next() const;
+	inline	bool				IsLast(const bfs_inode* inode) const;
 } _PACKED;
 
 // the file name is part of the small_data structure
@@ -222,7 +228,7 @@ struct bfs_inode {
 		{ return BFS_ENDIAN_TO_HOST_INT64(status_change_time); }
 	small_data* SmallDataStart() { return small_data_start; }
 
-	status_t InitCheck(Volume *volume);
+	status_t InitCheck(Volume* volume) const;
 		// defined in Inode.cpp
 
 	static int64 ToInode(bigtime_t time)

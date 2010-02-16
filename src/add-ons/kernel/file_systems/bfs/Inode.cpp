@@ -3,7 +3,8 @@
  * This file may be used under the terms of the MIT License.
  */
 
-//! inode access functions
+
+//! Inode access functions
 
 
 #include "Debug.h"
@@ -175,7 +176,7 @@ InodeAllocator::~InodeAllocator()
 			fInode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
 				// this unblocks any pending bfs_read_vnode() calls
 			fInode->Free(*fTransaction);
-			fTransaction->RemoveInode(fInode);
+			fTransaction->RemoveListener(fInode);
 
 			remove_vnode(volume->FSVolume(), fInode->ID());
 		} else
@@ -291,7 +292,7 @@ InodeAllocator::_TransactionListener(int32 id, int32 event, void* _inode)
 
 
 status_t
-bfs_inode::InitCheck(Volume* volume)
+bfs_inode::InitCheck(Volume* volume) const
 {
 	if (Magic1() != INODE_MAGIC1
 		|| !(Flags() & INODE_IN_USE)
@@ -403,7 +404,7 @@ Inode::~Inode()
 
 
 status_t
-Inode::InitCheck(bool checkNode)
+Inode::InitCheck(bool checkNode) const
 {
 	// test inode magic and flags
 	if (checkNode) {
@@ -434,6 +435,33 @@ Inode::InitCheck(bool checkNode)
 		return B_NO_MEMORY;
 
 	return B_OK;
+}
+
+
+/*!	Adds this inode to the specified transaction. This means that the inode will
+	be write locked until the transaction ended.
+	To ensure that the inode will stay valid until that point, an extra reference
+	is acquired to it as long as this transaction stays active.
+*/
+void
+Inode::WriteLockInTransaction(Transaction& transaction)
+{
+	// These flags can only change while holding the transaction lock
+	if ((Flags() & INODE_IN_TRANSACTION) != 0)
+		return;
+
+	// We share the same list link with the removed list, so we have to remove
+	// the inode from that list here (and add it back when we no longer need it)
+	if ((Flags() & INODE_DELETED) != 0)
+		fVolume->RemovedInodes().Remove(this);
+
+	if (!fVolume->IsInitializing())
+		acquire_vnode(fVolume->FSVolume(), ID());
+
+	rw_lock_write_lock(&Lock());
+	Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
+
+	transaction.AddListener(this);
 }
 
 
@@ -2376,6 +2404,35 @@ Inode::Sync()
 		}
 	}
 	return B_OK;
+}
+
+
+//	#pragma mark - TransactionListener implementation
+
+
+void
+Inode::TransactionDone(bool success)
+{
+	if (!success) {
+		// revert any changes made to the cached bfs_inode
+		UpdateNodeFromDisk();
+	}
+}
+
+
+void
+Inode::RemovedFromTransaction()
+{
+	Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
+
+	// See AddInode() why we do this here
+	if ((Flags() & INODE_DELETED) != 0)
+		fVolume->RemovedInodes().Add(this);
+
+	rw_lock_write_unlock(&Lock());
+
+	if (!fVolume->IsInitializing())
+		put_vnode(fVolume->FSVolume(), ID());
 }
 
 

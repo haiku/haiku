@@ -1,7 +1,8 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
+
 
 //! Transaction and logging
 
@@ -1005,7 +1006,7 @@ Journal::Unlock(Transaction* owner, bool success)
 			// closed.
 			bool separateSubTransactions = fSeparateSubTransactions;
 			fSeparateSubTransactions = true;
-			owner->UnlockInodes(success);
+			owner->NotifyListeners(success);
 			fSeparateSubTransactions = separateSubTransactions;
 
 			fOwner = owner->Parent();
@@ -1018,7 +1019,7 @@ Journal::Unlock(Transaction* owner, bool success)
 			&& recursive_lock_get_recursion(&fLock) == 1)
 			fSeparateSubTransactions = false;
 	} else
-		owner->MoveInodesTo(fOwner);
+		owner->MoveListenersTo(fOwner);
 
 	recursive_lock_unlock(&fLock);
 	return B_OK;
@@ -1077,6 +1078,7 @@ Journal::_TransactionDone(bool success)
 
 #ifdef BFS_DEBUGGER_COMMANDS
 
+
 void
 Journal::Dump()
 {
@@ -1121,7 +1123,21 @@ dump_journal(int argc, char** argv)
 	return 0;
 }
 
+
 #endif	// BFS_DEBUGGER_COMMANDS
+
+
+//	#pragma mark - TransactionListener
+
+
+TransactionListener::TransactionListener()
+{
+}
+
+
+TransactionListener::~TransactionListener()
+{
+}
 
 
 //	#pragma mark - Transaction
@@ -1143,74 +1159,33 @@ Transaction::Start(Volume* volume, off_t refBlock)
 }
 
 
-/*!	Adds an inode to this transaction. This means that the inode will be write
-	locked until the transaction ended.
-	To ensure that the inode will stay valid until that point, an extra reference
-	is acquired to it as long as this transaction stays active.
-*/
 void
-Transaction::AddInode(Inode* inode)
+Transaction::AddListener(TransactionListener* listener)
 {
 	if (fJournal == NULL)
 		panic("Transaction is not running!");
 
-	// These flags can only change while holding the transaction lock
-	if ((inode->Flags() & INODE_IN_TRANSACTION) != 0)
-		return;
-
-	// We share the same list link with the removed list, so we have to remove
-	// the inode from that list here (and add it back when we no longer need it)
-	if ((inode->Flags() & INODE_DELETED) != 0)
-		GetVolume()->RemovedInodes().Remove(inode);
-
-	if (!GetVolume()->IsInitializing())
-		acquire_vnode(GetVolume()->FSVolume(), inode->ID());
-
-	rw_lock_write_lock(&inode->Lock());
-	fLockedInodes.Add(inode);
-	inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
+	fListeners.Add(listener);
 }
 
 
 void
-Transaction::RemoveInode(Inode* inode)
+Transaction::RemoveListener(TransactionListener* listener)
 {
 	if (fJournal == NULL)
 		panic("Transaction is not running!");
 
-	inode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
-	fLockedInodes.Remove(inode);
-	rw_lock_write_unlock(&inode->Lock());
-
-	// See AddInode() why we do this here
-	if ((inode->Flags() & INODE_DELETED) != 0)
-		GetVolume()->RemovedInodes().Add(inode);
-
-	if (!GetVolume()->IsInitializing())
-		put_vnode(GetVolume()->FSVolume(), inode->ID());
+	fListeners.Remove(listener);
+	listener->RemovedFromTransaction();
 }
 
 
 void
-Transaction::UnlockInodes(bool success)
+Transaction::NotifyListeners(bool success)
 {
-	while (Inode* inode = fLockedInodes.RemoveHead()) {
-		if (success) {
-			inode->Node().flags
-				&= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
-		} else {
-			// revert any changes made to the cached bfs_inode
-			inode->UpdateNodeFromDisk();
-		}
-
-		rw_lock_write_unlock(&inode->Lock());
-
-		// See AddInode() why we do this here
-		if ((inode->Flags() & INODE_DELETED) != 0)
-			GetVolume()->RemovedInodes().Add(inode);
-
-		if (!GetVolume()->IsInitializing())
-			put_vnode(GetVolume()->FSVolume(), inode->ID());
+	while (TransactionListener* listener = fListeners.RemoveHead()) {
+		listener->TransactionDone(success);
+		listener->RemovedFromTransaction();
 	}
 }
 
@@ -1219,9 +1194,9 @@ Transaction::UnlockInodes(bool success)
 	sure they will still be reverted in case the transaction is aborted.
 */
 void
-Transaction::MoveInodesTo(Transaction* transaction)
+Transaction::MoveListenersTo(Transaction* transaction)
 {
-	while (Inode* inode = fLockedInodes.RemoveHead()) {
-		transaction->fLockedInodes.Add(inode);
+	while (TransactionListener* listener = fListeners.RemoveHead()) {
+		transaction->fListeners.Add(listener);
 	}
 }

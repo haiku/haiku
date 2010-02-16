@@ -23,240 +23,244 @@ class NodeGetter;
 class Transaction;
 
 
-class Inode {
+class Inode : public TransactionListener {
 	typedef DoublyLinkedListLink<Inode> Link;
 
 public:
-							Inode(Volume* volume, ino_t id);
-							Inode(Volume* volume, Transaction& transaction,
-								ino_t id, mode_t mode, block_run& run);
-							~Inode();
+								Inode(Volume* volume, ino_t id);
+								Inode(Volume* volume, Transaction& transaction,
+									ino_t id, mode_t mode, block_run& run);
+								~Inode();
 
-			ino_t			ID() const { return fID; }
-			off_t			BlockNumber() const
-								{ return fVolume->VnodeToBlock(fID); }
+			status_t			InitCheck(bool checkNode = true) const;
 
-			rw_lock&		Lock() { return fLock; }
-			ReadLocker		ReadLock() { return ReadLocker(fLock); }
-			void			WriteLockInTransaction(Transaction& transaction)
-								{ transaction.AddInode(this); }
+			ino_t				ID() const { return fID; }
+			off_t				BlockNumber() const
+									{ return fVolume->VnodeToBlock(fID); }
 
-			recursive_lock&	SmallDataLock() { return fSmallDataLock; }
+			rw_lock&			Lock() { return fLock; }
+			ReadLocker			ReadLock() { return ReadLocker(fLock); }
+			void				WriteLockInTransaction(Transaction& transaction);
 
-			status_t		WriteBack(Transaction& transaction);
-			void			UpdateNodeFromDisk();
+			recursive_lock&		SmallDataLock() { return fSmallDataLock; }
 
-			bool			IsContainer() const
-								{ return S_ISDIR(Mode()); }
-			bool			IsDirectory() const
-								{ return is_directory(Mode()); }
-			bool			IsIndex() const
-								{ return is_index(Mode()); }
+			status_t			WriteBack(Transaction& transaction);
+			void				UpdateNodeFromDisk();
 
-			bool			IsAttributeDirectory() const
-								{ return (Mode() & S_EXTENDED_TYPES)
-									== S_ATTR_DIR; }
-			bool			IsAttribute() const
-								{ return (Mode() & S_EXTENDED_TYPES)
-									== S_ATTR; }
-			bool			IsFile() const
-								{ return (Mode()
-									& (S_IFMT | S_EXTENDED_TYPES)) == S_FILE; }
-			bool			IsRegularNode() const
-								{ return (Mode() & S_EXTENDED_TYPES) == 0; }
-								// a regular node in the standard namespace
-								// (i.e. not an index or attribute)
-			bool			IsSymLink() const { return S_ISLNK(Mode()); }
-			bool			IsLongSymLink() const
-								{ return (Flags() & INODE_LONG_SYMLINK) != 0; }
+			bool				IsContainer() const
+									{ return S_ISDIR(Mode()); }
+			bool				IsDirectory() const
+									{ return is_directory(Mode()); }
+			bool				IsIndex() const
+									{ return is_index(Mode()); }
 
-			bool			HasUserAccessableStream() const { return IsFile(); }
-								// currently only files can be accessed with
-								// bfs_read()/bfs_write()
-			bool			NeedsFileCache() const
-								{ return IsFile() || IsAttribute()
-									|| IsLongSymLink(); }
+			bool				IsAttributeDirectory() const
+									{ return (Mode() & S_EXTENDED_TYPES)
+										== S_ATTR_DIR; }
+			bool				IsAttribute() const
+									{ return (Mode() & S_EXTENDED_TYPES)
+										== S_ATTR; }
+			bool				IsFile() const
+									{ return (Mode() & (S_IFMT
+											| S_EXTENDED_TYPES)) == S_FILE; }
+			bool				IsRegularNode() const
+									{ return (Mode() & S_EXTENDED_TYPES) == 0; }
+									// a regular node in the standard namespace
+									// (i.e. not an index or attribute)
+			bool				IsSymLink() const { return S_ISLNK(Mode()); }
+			bool				IsLongSymLink() const
+									{ return (Flags() & INODE_LONG_SYMLINK)
+										!= 0; }
 
-			bool			IsDeleted() const
-								{ return (Flags() & INODE_DELETED) != 0; }
+			bool				HasUserAccessableStream() const
+									{ return IsFile(); }
+									// currently only files can be accessed with
+									// bfs_read()/bfs_write()
+			bool				NeedsFileCache() const
+									{ return IsFile() || IsAttribute()
+										|| IsLongSymLink(); }
 
-			mode_t			Mode() const { return fNode.Mode(); }
-			uint32			Type() const { return fNode.Type(); }
-			int32			Flags() const { return fNode.Flags(); }
+			bool				IsDeleted() const
+									{ return (Flags() & INODE_DELETED) != 0; }
 
-			off_t			Size() const { return fNode.data.Size(); }
-			off_t			AllocatedSize() const;
-			off_t			LastModified() const
-								{ return fNode.LastModifiedTime(); }
+			mode_t				Mode() const { return fNode.Mode(); }
+			uint32				Type() const { return fNode.Type(); }
+			int32				Flags() const { return fNode.Flags(); }
 
-			const block_run& BlockRun() const
-								{ return fNode.inode_num; }
-			block_run&		Parent() { return fNode.parent; }
-			block_run&		Attributes() { return fNode.attributes; }
+			off_t				Size() const { return fNode.data.Size(); }
+			off_t				AllocatedSize() const;
+			off_t				LastModified() const
+									{ return fNode.LastModifiedTime(); }
 
-			Volume*			GetVolume() const { return fVolume; }
+			const block_run&	BlockRun() const
+									{ return fNode.inode_num; }
+			block_run&			Parent() { return fNode.parent; }
+			block_run&			Attributes() { return fNode.attributes; }
 
-			status_t		InitCheck(bool checkNode = true);
+			Volume*				GetVolume() const { return fVolume; }
 
-			status_t		CheckPermissions(int accessMode) const;
+			status_t			CheckPermissions(int accessMode) const;
 
 			// small_data access methods
-			small_data*		FindSmallData(const bfs_inode* node,
-								const char* name) const;
-			const char*		Name(const bfs_inode* node) const;
-			status_t		GetName(char* buffer,
-								size_t bufferSize = B_FILE_NAME_LENGTH) const;
-			status_t		SetName(Transaction& transaction, const char* name);
+			small_data*			FindSmallData(const bfs_inode* node,
+									const char* name) const;
+			const char*			Name(const bfs_inode* node) const;
+			status_t			GetName(char* buffer, size_t bufferSize
+										= B_FILE_NAME_LENGTH) const;
+			status_t			SetName(Transaction& transaction,
+									const char* name);
 
 			// high-level attribute methods
-			status_t		ReadAttribute(const char* name, int32 type,
-								off_t pos, uint8* buffer, size_t* _length);
-			status_t		WriteAttribute(Transaction& transaction,
-								const char* name, int32 type, off_t pos,
-								const uint8* buffer, size_t* _length,
-								bool* _created);
-			status_t		RemoveAttribute(Transaction& transaction,
-								const char* name);
+			status_t			ReadAttribute(const char* name, int32 type,
+									off_t pos, uint8* buffer, size_t* _length);
+			status_t			WriteAttribute(Transaction& transaction,
+									const char* name, int32 type, off_t pos,
+									const uint8* buffer, size_t* _length,
+									bool* _created);
+			status_t			RemoveAttribute(Transaction& transaction,
+									const char* name);
 
 			// attribute methods
-			status_t		GetAttribute(const char* name, Inode** attribute);
-			void			ReleaseAttribute(Inode* attribute);
-			status_t		CreateAttribute(Transaction& transaction,
-								const char* name, uint32 type,
-								Inode** attribute);
+			status_t			GetAttribute(const char* name,
+									Inode** _attribute);
+			void				ReleaseAttribute(Inode* attribute);
+			status_t			CreateAttribute(Transaction& transaction,
+									const char* name, uint32 type,
+									Inode** attribute);
 
 			// for directories only:
-			BPlusTree*		Tree() const { return fTree; }
-			bool			IsEmpty();
-			status_t		ContainerContentsChanged(Transaction& transaction);
+			BPlusTree*			Tree() const { return fTree; }
+			bool				IsEmpty();
+			status_t			ContainerContentsChanged(
+									Transaction& transaction);
 
 			// manipulating the data stream
-			status_t		FindBlockRun(off_t pos, block_run& run,
-								off_t& offset);
+			status_t			FindBlockRun(off_t pos, block_run& run,
+									off_t& offset);
 
-			status_t		ReadAt(off_t pos, uint8* buffer, size_t* length);
-			status_t		WriteAt(Transaction& transaction, off_t pos,
-								const uint8* buffer, size_t* length);
-			status_t		FillGapWithZeros(off_t oldSize, off_t newSize);
+			status_t			ReadAt(off_t pos, uint8* buffer, size_t* length);
+			status_t			WriteAt(Transaction& transaction, off_t pos,
+									const uint8* buffer, size_t* length);
+			status_t			FillGapWithZeros(off_t oldSize, off_t newSize);
 
-			status_t		SetFileSize(Transaction& transaction, off_t size);
-			status_t		Append(Transaction& transaction, off_t bytes);
-			status_t		TrimPreallocation(Transaction& transaction);
-			bool			NeedsTrimming() const;
+			status_t			SetFileSize(Transaction& transaction,
+									off_t size);
+			status_t			Append(Transaction& transaction, off_t bytes);
+			status_t			TrimPreallocation(Transaction& transaction);
+			bool				NeedsTrimming() const;
 
-			status_t		Free(Transaction& transaction);
-			status_t		Sync();
+			status_t			Free(Transaction& transaction);
+			status_t			Sync();
 
-			bfs_inode&		Node() { return fNode; }
-			const bfs_inode& Node() const { return fNode; }
+			bfs_inode&			Node() { return fNode; }
+			const bfs_inode&	Node() const { return fNode; }
 
 			// create/remove inodes
-			status_t		Remove(Transaction& transaction, const char* name,
-								ino_t* _id = NULL, bool isDirectory = false,
-								bool force = false);
-	static	status_t		Create(Transaction& transaction, Inode* parent,
-								const char* name, int32 mode, int openMode,
-								uint32 type, bool* _created = NULL,
-								ino_t* _id = NULL, Inode** _inode = NULL,
-								fs_vnode_ops* vnodeOps = NULL,
-								uint32 publishFlags = 0);
+			status_t			Remove(Transaction& transaction,
+									const char* name, ino_t* _id = NULL,
+									bool isDirectory = false,
+									bool force = false);
+	static	status_t			Create(Transaction& transaction, Inode* parent,
+									const char* name, int32 mode, int openMode,
+									uint32 type, bool* _created = NULL,
+									ino_t* _id = NULL, Inode** _inode = NULL,
+									fs_vnode_ops* vnodeOps = NULL,
+									uint32 publishFlags = 0);
 
 			// index maintaining helper
-			void			UpdateOldSize() { fOldSize = Size(); }
-			void			UpdateOldLastModified()
-								{ fOldLastModified
-									= Node().LastModifiedTime(); }
-			off_t			OldSize() { return fOldSize; }
-			off_t			OldLastModified() { return fOldLastModified; }
+			void				UpdateOldSize() { fOldSize = Size(); }
+			void				UpdateOldLastModified()
+									{ fOldLastModified
+										= Node().LastModifiedTime(); }
+			off_t				OldSize() { return fOldSize; }
+			off_t				OldLastModified() { return fOldLastModified; }
 
-			bool			InNameIndex() const;
-			bool			InSizeIndex() const;
-			bool			InLastModifiedIndex() const;
+			bool				InNameIndex() const;
+			bool				InSizeIndex() const;
+			bool				InLastModifiedIndex() const;
 
 			// file cache
-			void*			FileCache() const { return fCache; }
-			void			SetFileCache(void* cache) { fCache = cache; }
-			void*			Map() const { return fMap; }
-			void			SetMap(void* map) { fMap = map; }
+			void*				FileCache() const { return fCache; }
+			void				SetFileCache(void* cache) { fCache = cache; }
+			void*				Map() const { return fMap; }
+			void				SetMap(void* map) { fMap = map; }
 
 #if _KERNEL_MODE && KDEBUG
-			void			AssertReadLocked()
-								{ ASSERT_READ_LOCKED_RW_LOCK(&fLock); }
-			void			AssertWriteLocked()
-								{ ASSERT_WRITE_LOCKED_RW_LOCK(&fLock); }
+			void				AssertReadLocked()
+									{ ASSERT_READ_LOCKED_RW_LOCK(&fLock); }
+			void				AssertWriteLocked()
+									{ ASSERT_WRITE_LOCKED_RW_LOCK(&fLock); }
 #endif
 
-#ifdef B_HAIKU_64_BIT
-			Link*			GetDoublyLinkedListLink()
-								{ return &fListLink; }
-			const Link*		GetDoublyLinkedListLink() const
-								{ return &fListLink; }
-#else
-			Link*			GetDoublyLinkedListLink()
-								{ return (Link*)&fNode.pad[0]; }
-			const Link*		GetDoublyLinkedListLink() const
-								{ return (Link*)&fNode.pad[0]; }
-#endif
+			Link*				GetDoublyLinkedListLink()
+									{ return (Link*)TransactionListener
+										::GetDoublyLinkedListLink(); }
+			const Link*			GetDoublyLinkedListLink() const
+									{ return (Link*)TransactionListener
+										::GetDoublyLinkedListLink(); }
+
+protected:
+	virtual void				TransactionDone(bool success);
+	virtual void				RemovedFromTransaction();
 
 private:
-							Inode(const Inode& other);
-							Inode& operator=(const Inode& other);
-								// no implementation
+								Inode(const Inode& other);
+								Inode& operator=(const Inode& other);
+									// no implementation
 
 	friend class AttributeIterator;
 	friend class InodeAllocator;
 
 			// small_data access methods
-			status_t		_MakeSpaceForSmallData(Transaction& transaction,
-								bfs_inode* node, const char* name,
-								int32 length);
-			status_t		_RemoveSmallData(Transaction& transaction,
-								NodeGetter& node, const char* name);
-			status_t		_AddSmallData(Transaction& transaction,
-								NodeGetter& node, const char* name, uint32 type,
-								off_t pos, const uint8* data, size_t length,
-								bool force = false);
-			status_t		_GetNextSmallData(bfs_inode* node,
-								small_data** _smallData) const;
-			status_t		_RemoveSmallData(bfs_inode* node, small_data* item,
-								int32 index);
-			status_t		_RemoveAttribute(Transaction& transaction,
-								const char* name, bool hasIndex, Index* index);
+			status_t			_MakeSpaceForSmallData(Transaction& transaction,
+									bfs_inode* node, const char* name,
+									int32 length);
+			status_t			_RemoveSmallData(Transaction& transaction,
+									NodeGetter& node, const char* name);
+			status_t			_AddSmallData(Transaction& transaction,
+									NodeGetter& node, const char* name,
+									uint32 type, off_t pos, const uint8* data,
+									size_t length, bool force = false);
+			status_t			_GetNextSmallData(bfs_inode* node,
+									small_data** _smallData) const;
+			status_t			_RemoveSmallData(bfs_inode* node,
+									small_data* item, int32 index);
+			status_t			_RemoveAttribute(Transaction& transaction,
+									const char* name, bool hasIndex,
+									Index* index);
 
-			void			_AddIterator(AttributeIterator* iterator);
-			void			_RemoveIterator(AttributeIterator* iterator);
+			void				_AddIterator(AttributeIterator* iterator);
+			void				_RemoveIterator(AttributeIterator* iterator);
 
-			size_t			_DoubleIndirectBlockLength() const;
-			status_t		_FreeStaticStreamArray(Transaction& transaction,
-								int32 level, block_run run, off_t size,
-								off_t offset, off_t& max);
-			status_t		_FreeStreamArray(Transaction& transaction,
-								block_run* array, uint32 arrayLength,
-								off_t size, off_t& offset, off_t& max);
-			status_t		_AllocateBlockArray(Transaction& transaction,
-								block_run& run, size_t length,
-								bool variableSize = false);
-			status_t		_GrowStream(Transaction& transaction, off_t size);
-			status_t		_ShrinkStream(Transaction& transaction, off_t size);
+			size_t				_DoubleIndirectBlockLength() const;
+			status_t			_FreeStaticStreamArray(Transaction& transaction,
+									int32 level, block_run run, off_t size,
+									off_t offset, off_t& max);
+			status_t			_FreeStreamArray(Transaction& transaction,
+									block_run* array, uint32 arrayLength,
+									off_t size, off_t& offset, off_t& max);
+			status_t			_AllocateBlockArray(Transaction& transaction,
+									block_run& run, size_t length,
+									bool variableSize = false);
+			status_t			_GrowStream(Transaction& transaction,
+									off_t size);
+			status_t			_ShrinkStream(Transaction& transaction,
+									off_t size);
 
 private:
-			rw_lock			fLock;
-			Volume*			fVolume;
-			ino_t			fID;
-			BPlusTree*		fTree;
-			Inode*			fAttributes;
-			void*			fCache;
-			void*			fMap;
-			bfs_inode		fNode;
+			rw_lock				fLock;
+			Volume*				fVolume;
+			ino_t				fID;
+			BPlusTree*			fTree;
+			Inode*				fAttributes;
+			void*				fCache;
+			void*				fMap;
+			bfs_inode			fNode;
 
-			off_t			fOldSize;
-			off_t			fOldLastModified;
+			off_t				fOldSize;
+			off_t				fOldLastModified;
 				// we need those values to ensure we will remove
 				// the correct keys from the indices
-
-#ifdef B_HAIKU_64_BIT
-			Link			fListLink;
-#endif
 
 			mutable recursive_lock fSmallDataLock;
 			SinglyLinkedList<AttributeIterator> fIterators;

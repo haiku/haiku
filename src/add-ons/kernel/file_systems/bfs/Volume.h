@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -11,9 +11,11 @@
 #include "bfs.h"
 #include "BlockAllocator.h"
 
+
 class Journal;
 class Inode;
 class Query;
+
 
 enum volume_flags {
 	VOLUME_READ_ONLY	= 0x0001
@@ -24,6 +26,7 @@ enum volume_initialize_flags {
 };
 
 typedef DoublyLinkedList<Inode> InodeList;
+
 
 class Volume {
 public:

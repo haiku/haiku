@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef JOURNAL_H
@@ -84,6 +84,19 @@ Journal::FreeLogBlocks() const
 		? fLogSize - fVolume->LogEnd() + fVolume->LogStart()
 		: fVolume->LogStart() - fVolume->LogEnd();
 }
+
+
+class TransactionListener
+	: public DoublyLinkedListLinkImpl<TransactionListener> {
+public:
+								TransactionListener();
+	virtual						~TransactionListener();
+
+	virtual void				TransactionDone(bool success) = 0;
+	virtual void				RemovedFromTransaction() = 0;
+};
+
+typedef DoublyLinkedList<TransactionListener> TransactionListeners;
 
 
 class Transaction {
@@ -176,11 +189,11 @@ public:
 	int32 ID() const
 		{ return fJournal->TransactionID(); }
 
-	void AddInode(Inode* inode);
-	void RemoveInode(Inode* inode);
+	void AddListener(TransactionListener* listener);
+	void RemoveListener(TransactionListener* listener);
 
-	void UnlockInodes(bool success);
-	void MoveInodesTo(Transaction* transaction);
+	void NotifyListeners(bool success);
+	void MoveListenersTo(Transaction* transaction);
 
 	void SetParent(Transaction* parent)
 		{ fParent = parent; }
@@ -192,13 +205,15 @@ private:
 	Transaction& operator=(const Transaction& other);
 		// no implementation
 
-	Journal*		fJournal;
-	InodeList		fLockedInodes;
-	Transaction*	fParent;
+	Journal*				fJournal;
+	TransactionListeners	fListeners;
+	Transaction*			fParent;
 };
+
 
 #ifdef BFS_DEBUGGER_COMMANDS
 int dump_journal(int argc, char** argv);
 #endif
+
 
 #endif	// JOURNAL_H
