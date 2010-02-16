@@ -1101,7 +1101,7 @@ BlockWriter::_WriteBlock(cached_block* block)
 {
 	ASSERT(block->busy_writing);
 
-	TRACE(("write_cached_block(block %Ld)\n", block->block_number));
+	TRACE(("BlockWriter::_WriteBlock(block %Ld)\n", block->block_number));
 	TB(Write(fCache, block));
 	TB2(BlockData(fCache, block, "before write"));
 
@@ -2673,14 +2673,20 @@ cache_end_transaction(void* _cache, int32 id,
 
 	BlockWriter writer(cache);
 	cached_block* block = transaction->first_block;
-	cached_block* next;
-	for (; block != NULL; block = next) {
-		next = block->transaction_next;
-
+	for (; block != NULL; block = block->transaction_next) {
 		if (block->previous_transaction != NULL) {
 			// need to write back pending changes
-			write_cached_block(cache, block);
+			writer.Add(block);
 		}
+	}
+
+	writer.Write();
+
+	cached_block* next;
+	for (block = transaction->first_block; block != NULL; block = next) {
+		next = block->transaction_next;
+		ASSERT(block->previous_transaction == NULL);
+
 		if (block->discard) {
 			// This block has been discarded in the transaction
 			cache->DiscardBlock(block);
@@ -2798,16 +2804,23 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 
 	// iterate through all blocks and free the unchanged original contents
 
+	BlockWriter writer(cache);
 	cached_block* block = transaction->first_block;
-	cached_block* last = NULL;
-	cached_block* next;
-	for (; block != NULL; block = next) {
-		next = block->transaction_next;
-
+	for (; block != NULL; block = block->transaction_next) {
 		if (block->previous_transaction != NULL) {
 			// need to write back pending changes
-			write_cached_block(cache, block);
+			writer.Add(block);
 		}
+	}
+
+	writer.Write();
+
+	cached_block* last = NULL;
+	cached_block* next;
+	for (block = transaction->first_block; block != NULL; block = next) {
+		next = block->transaction_next;
+		ASSERT(block->previous_transaction == NULL);
+
 		if (block->discard) {
 			cache->DiscardBlock(block);
 			transaction->main_num_blocks--;
@@ -3251,7 +3264,18 @@ void
 block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 {
 	block_cache* cache = (block_cache*)_cache;
-	MutexLocker locker(&cache->lock);
+	TransactionLocker locker(cache);
+
+	BlockWriter writer(cache);
+
+	for (; numBlocks > 0; numBlocks--, blockNumber++) {
+		cached_block* block = (cached_block*)hash_lookup(cache->hash,
+			&blockNumber);
+		if (block != NULL && block->previous_transaction != NULL)
+			writer.Add(block);
+	}
+
+	writer.Write();
 
 	for (; numBlocks > 0; numBlocks--, blockNumber++) {
 		cached_block* block = (cached_block*)hash_lookup(cache->hash,
@@ -3259,8 +3283,7 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 		if (block == NULL)
 			continue;
 
-		if (block->previous_transaction != NULL)
-			write_cached_block(cache, block);
+		ASSERT(block->previous_transaction == NULL);
 
 		if (block->unused) {
 			cache->unused_blocks.Remove(block);
