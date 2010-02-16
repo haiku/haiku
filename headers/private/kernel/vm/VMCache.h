@@ -297,6 +297,7 @@ VMCache::ReleaseRefAndUnlock(bool consumerLocked)
 void
 VMCache::MarkPageUnbusy(vm_page* page)
 {
+	ASSERT(page->busy);
 	page->busy = false;
 	NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
 }
