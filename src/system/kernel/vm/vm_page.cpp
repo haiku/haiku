@@ -1082,6 +1082,7 @@ set_page_state(vm_page *page, int pageState)
 			break;
 		case PAGE_STATE_CACHED:
 			ASSERT(page->wired_count == 0 && page->mappings.IsEmpty());
+			ASSERT(!page->modified);
 			toQueue = &sCachedPageQueue;
 			break;
 		case PAGE_STATE_FREE:
@@ -1128,23 +1129,22 @@ set_page_state(vm_page *page, int pageState)
 }
 
 
-/*! Moves a modified page into either the active or inactive page queue
-	depending on its usage count and wiring.
+/*! Moves a previously modified page into a now appropriate queue.
 	The page queues must not be locked.
 */
 static void
-move_page_to_active_or_inactive_queue(vm_page *page)
+move_page_to_appropriate_queue(vm_page *page)
 {
 	DEBUG_PAGE_ACCESS_CHECK(page);
 
-	// Note, this logic must be in sync with what the page daemon does
+	// Note, this logic must be in sync with what the page daemon does.
 	int32 state;
-	if (page->mappings.IsEmpty() && page->wired_count == 0)
-		state = PAGE_STATE_CACHED;
-	else if (page->usage_count > 0)
+	if (!page->mappings.IsEmpty() || page->wired_count > 0)
 		state = PAGE_STATE_ACTIVE;
+	else if (page->modified)
+		state = PAGE_STATE_MODIFIED;
 	else
-		state = PAGE_STATE_INACTIVE;
+		state = PAGE_STATE_CACHED;
 
 // TODO: If free + cached pages are low, we might directly want to free the
 // page.
@@ -1431,7 +1431,7 @@ PageWriteWrapper::Done(status_t result)
 
 	if (result == B_OK) {
 		// put it into the active/inactive queue
-		move_page_to_active_or_inactive_queue(fPage);
+		move_page_to_appropriate_queue(fPage);
 		fPage->busy_writing = false;
 		DEBUG_PAGE_ACCESS_END(fPage);
 	} else {
@@ -1923,6 +1923,10 @@ find_cached_page_candidate(struct vm_page &marker)
 static bool
 free_cached_page(vm_page *page, bool dontWait)
 {
+	ASSERT(!page->busy);
+	ASSERT(!page->modified);
+	ASSERT(page->wired_count == 0 && page->mappings.IsEmpty());
+
 	// try to lock the page's cache
 	if (vm_cache_acquire_locked_page_cache(page, dontWait) == NULL)
 		return false;
@@ -2151,7 +2155,7 @@ full_scan_inactive_pages(page_stats& pageStats, int32 despairLevel)
 				pagesToActive++;
 			} else
 				vm_page_requeue(page, true);
-		} if (isMapped) {
+		} else if (isMapped) {
 			vm_page_requeue(page, true);
 		} else if (!page->modified) {
 			set_page_state(page, PAGE_STATE_CACHED);
