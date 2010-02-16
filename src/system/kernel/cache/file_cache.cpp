@@ -309,7 +309,8 @@ reserve_pages(file_cache_ref* ref, vm_page_reservation* reservation,
 				vm_page* page;
 				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 						(page = it.Next()) != NULL && left > 0;) {
-					if (page->state != PAGE_STATE_MODIFIED && !page->busy) {
+					if (page->state != PAGE_STATE_MODIFIED && !page->modified
+							&& !page->busy) {
 						DEBUG_PAGE_ACCESS_START(page);
 						cache->RemovePage(page);
 						vm_page_set_state(page, PAGE_STATE_FREE);
@@ -513,6 +514,8 @@ write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 			reservation,
 			(writeThrough ? PAGE_STATE_CACHED : PAGE_STATE_MODIFIED)
 				| VM_PAGE_ALLOC_BUSY);
+
+		page->modified = !writeThrough;
 
 		ref->cache->InsertPage(page, offset + pos);
 
@@ -807,9 +810,14 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 
 				locker.Lock();
 
-				if (doWrite && page->state != PAGE_STATE_MODIFIED) {
+				if (doWrite) {
 					DEBUG_PAGE_ACCESS_START(page);
-					vm_page_set_state(page, PAGE_STATE_MODIFIED);
+
+					page->modified = true;
+
+					if (page->state != PAGE_STATE_MODIFIED)
+						vm_page_set_state(page, PAGE_STATE_MODIFIED);
+
 					DEBUG_PAGE_ACCESS_END(page);
 				}
 
