@@ -473,9 +473,11 @@ get_area_page_protection(VMArea* area, addr_t pageAddress)
 */
 static status_t
 map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection,
-	vm_page_reservation* reservation, bool activatePage)
+	vm_page_reservation* reservation)
 {
 	VMTranslationMap* map = area->address_space->TranslationMap();
+
+	bool wasMapped = page->wired_count > 0 || !page->mappings.IsEmpty();
 
 	if (area->wiring == B_NO_LOCK) {
 		DEBUG_PAGE_ACCESS_CHECK(page);
@@ -515,13 +517,17 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection,
 		increment_page_wired_count(page);
 	}
 
-	if (page->state == PAGE_STATE_CACHED) {
-		if (page->usage_count == 0 && !activatePage)
-			vm_page_set_state(page, PAGE_STATE_INACTIVE);
-		else
+	if (!wasMapped) {
+		// The page is mapped now, so we must not remain in the cached queue.
+		// It also makes sense to move it from the inactive to the active, since
+		// otherwise the page daemon wouldn't come to keep track of it (in idle
+		// mode) -- if the page isn't touched, it will be deactivated after a
+		// full iteration through the queue at the latest.
+		if (page->state == PAGE_STATE_CACHED
+				|| page->state == PAGE_STATE_INACTIVE) {
 			vm_page_set_state(page, PAGE_STATE_ACTIVE);
-	} else if (page->state == PAGE_STATE_INACTIVE && activatePage)
-		vm_page_set_state(page, PAGE_STATE_ACTIVE);
+		}
+	}
 
 	return B_OK;
 }
@@ -1136,7 +1142,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 				vm_page* page = vm_page_allocate_page(&reservation,
 					PAGE_STATE_WIRED | pageAllocFlags);
 				cache->InsertPage(page, offset);
-				map_page(area, page, address, protection, &reservation, false);
+				map_page(area, page, address, protection, &reservation);
 
 				DEBUG_PAGE_ACCESS_END(page);
 			}
@@ -1521,7 +1527,7 @@ pre_map_area_pages(VMArea* area, VMCache* cache,
 		DEBUG_PAGE_ACCESS_START(page);
 		map_page(area, page,
 			baseAddress + (page->cache_offset * B_PAGE_SIZE - cacheOffset),
-			B_READ_AREA | B_KERNEL_READ_AREA, reservation, false);
+			B_READ_AREA | B_KERNEL_READ_AREA, reservation);
 		DEBUG_PAGE_ACCESS_END(page);
 	}
 }
@@ -1830,7 +1836,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 					map_page(newArea, page,
 						newArea->Base() + ((page->cache_offset << PAGE_SHIFT)
 							- newArea->cache_offset),
-						protection, &reservation, false);
+						protection, &reservation);
 					DEBUG_PAGE_ACCESS_END(page);
 				}
 			}
@@ -3988,7 +3994,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 
 		if (mapPage) {
 			if (map_page(area, context.page, address, newProtection,
-					&context.reservation, true) != B_OK) {
+					&context.reservation) != B_OK) {
 				// Mapping can only fail, when the page mapping object couldn't
 				// be allocated. Save for the missing mapping everything is
 				// fine, though. We'll simply leave and probably fault again.
