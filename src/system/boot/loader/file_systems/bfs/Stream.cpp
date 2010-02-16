@@ -258,8 +258,8 @@ Stream::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 						+= indirect[current].Length() << cached.BlockShift();
 					if (runBlockEnd > pos) {
 						run = indirect[current];
-						offset = runBlockEnd -
-							(run.Length() << cached.BlockShift());
+						offset = runBlockEnd
+							- (run.Length() << cached.BlockShift());
 						//printf("reading from indirect block: %ld,%d\n",fRun.allocation_group,fRun.start);
 						//printf("### indirect-run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
 						return fVolume.ValidateBlockRun(run);
