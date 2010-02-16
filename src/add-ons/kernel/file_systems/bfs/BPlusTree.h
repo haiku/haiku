@@ -196,7 +196,7 @@ protected:
 };
 
 
-class BPlusTree {
+class BPlusTree : public TransactionListener {
 public:
 								BPlusTree(Transaction& transaction,
 									Inode* stream,
@@ -245,6 +245,10 @@ public:
 
 	static	int32				TypeCodeToKeyType(type_code code);
 	static	int32				ModeToKeyType(mode_t mode);
+
+protected:
+	virtual void				TransactionDone(bool success);
+	virtual void				RemovedFromTransaction();
 
 private:
 								BPlusTree(const BPlusTree& other);
@@ -296,6 +300,7 @@ private:
 			bplustree_header	fHeader;
 			int32				fNodeSize;
 			bool				fAllowDuplicates;
+			bool				fInTransaction;
 			status_t			fStatus;
 			mutex				fIteratorLock;
 			SinglyLinkedList<TreeIterator> fIterators;

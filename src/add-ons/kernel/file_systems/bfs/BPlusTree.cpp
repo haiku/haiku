@@ -198,6 +198,17 @@ CachedNode::SetToWritableHeader(Transaction& transaction)
 	Unset();
 
 	InternalSetTo(&transaction, 0LL);
+
+	if (fNode != NULL && !fTree->fInTransaction) {
+		transaction.AddListener(fTree);
+		fTree->fInTransaction = true;
+
+		if (!transaction.GetVolume()->IsInitializing()) {
+			acquire_vnode(transaction.GetVolume()->FSVolume(),
+				fTree->fStream->ID());
+		}
+	}
+
 	return (bplustree_header*)fNode;
 }
 
@@ -343,7 +354,8 @@ CachedNode::Allocate(Transaction& transaction, bplustree_node** _node,
 
 BPlusTree::BPlusTree(Transaction& transaction, Inode* stream, int32 nodeSize)
 	:
-	fStream(NULL)
+	fStream(NULL),
+	fInTransaction(false)
 {
 	mutex_init(&fIteratorLock, "bfs b+tree iterator");
 	SetTo(transaction, stream);
@@ -352,7 +364,8 @@ BPlusTree::BPlusTree(Transaction& transaction, Inode* stream, int32 nodeSize)
 
 BPlusTree::BPlusTree(Inode* stream)
 	:
-	fStream(NULL)
+	fStream(NULL),
+	fInTransaction(false)
 {
 	mutex_init(&fIteratorLock, "bfs b+tree iterator");
 	SetTo(stream);
@@ -364,6 +377,7 @@ BPlusTree::BPlusTree()
 	fStream(NULL),
 	fNodeSize(BPLUSTREE_NODE_SIZE),
 	fAllowDuplicates(true),
+	fInTransaction(false),
 	fStatus(B_NO_INIT)
 {
 	mutex_init(&fIteratorLock, "bfs b+tree iterator");
@@ -556,6 +570,32 @@ BPlusTree::ModeToKeyType(mode_t mode)
 			// default is for standard directories
 			return BPLUSTREE_STRING_TYPE;
 	}
+}
+
+
+//	#pragma mark - TransactionListener implementation
+
+
+void
+BPlusTree::TransactionDone(bool success)
+{
+	if (!success) {
+		// update header from disk
+		CachedNode cached(this);
+		const bplustree_header* header = cached.SetToHeader();
+		if (header != NULL)
+			memcpy(&fHeader, header, sizeof(bplustree_header));
+	}
+}
+
+
+void
+BPlusTree::RemovedFromTransaction()
+{
+	fInTransaction = false;
+
+	if (!fStream->GetVolume()->IsInitializing())
+		put_vnode(fStream->GetVolume()->FSVolume(), fStream->ID());
 }
 
 
