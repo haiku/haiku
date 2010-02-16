@@ -1932,18 +1932,75 @@ write_cached_block(block_cache* cache, cached_block* block,
 
 #if DEBUG_BLOCK_CACHE
 
+
 static void
 dump_block(cached_block* block)
 {
-	kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c%c %08lx %08lx\n",
+	kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c%c%c %08lx %08lx\n",
 		(addr_t)block, block->block_number,
 		(addr_t)block->current_data, (addr_t)block->original_data,
 		(addr_t)block->parent_data, block->ref_count, block->accessed,
-		block->busy_reading ? 'B' : '-', block->is_writing ? 'W' : '-',
-		block->is_dirty ? 'D' : '-', block->unused ? 'U' : '-',
-		block->discard ? 'D' : '-',
+		block->busy_reading ? 'r' : '-', block->busy_writing ? 'w' : '-', 
+		block->is_writing ? 'W' : '-', block->is_dirty ? 'D' : '-',
+		block->unused ? 'U' : '-', block->discard ? 'D' : '-',
 		(addr_t)block->transaction,
 		(addr_t)block->previous_transaction);
+}
+
+
+static void
+dump_block_long(cached_block* block)
+{
+	kprintf("BLOCK %p\n", block);
+	kprintf(" current data:  %p\n", block->current_data);
+	kprintf(" original data: %p\n", block->original_data);
+	kprintf(" parent data:   %p\n", block->parent_data);
+	kprintf(" ref_count:     %ld\n", block->ref_count);
+	kprintf(" accessed:      %ld\n", block->accessed);
+	kprintf(" flags:        ");
+	if (block->busy_reading)
+		kprintf(" busy_reading");
+	if (block->busy_writing)
+		kprintf(" busy_writing");
+	if (block->is_writing)
+		kprintf(" is-writing");
+	if (block->is_dirty)
+		kprintf(" is-dirty");
+	if (block->unused)
+		kprintf(" unused");
+	if (block->discard)
+		kprintf(" discard");
+	kprintf("\n");
+	if (block->transaction != NULL) {
+		kprintf(" transaction:   %p (%ld)\n", block->transaction,
+			block->transaction->id);
+		if (block->transaction_next != NULL) {
+			kprintf(" next in transaction: %Ld\n",
+				block->transaction_next->block_number);
+		}
+	}
+	if (block->previous_transaction != NULL) {
+		kprintf(" previous transaction: %p (%ld)\n",
+			block->previous_transaction,
+			block->previous_transaction->id);
+	}
+
+	set_debug_variable("_current", (addr_t)block->current_data);
+	set_debug_variable("_original", (addr_t)block->original_data);
+	set_debug_variable("_parent", (addr_t)block->parent_data);
+}
+
+
+static int
+dump_cached_block(int argc, char** argv)
+{
+	if (argc != 2) {
+		kprintf("usage: %s <block-address>\n", argv[0]);
+		return 0;
+	}
+
+	dump_block_long((struct cached_block*)parse_expression(argv[1]));
+	return 0;
 }
 
 
@@ -1986,43 +2043,9 @@ dump_cache(int argc, char** argv)
 		blockNumber = parse_expression(argv[i + 1]);
 		cached_block* block = (cached_block*)hash_lookup(cache->hash,
 			&blockNumber);
-		if (block != NULL) {
-			kprintf("BLOCK %p\n", block);
-			kprintf(" current data:  %p\n", block->current_data);
-			kprintf(" original data: %p\n", block->original_data);
-			kprintf(" parent data:   %p\n", block->parent_data);
-			kprintf(" ref_count:     %ld\n", block->ref_count);
-			kprintf(" accessed:      %ld\n", block->accessed);
-			kprintf(" flags:        ");
-			if (block->busy_reading)
-				kprintf(" busy_reading");
-			if (block->is_writing)
-				kprintf(" is-writing");
-			if (block->is_dirty)
-				kprintf(" is-dirty");
-			if (block->unused)
-				kprintf(" unused");
-			if (block->discard)
-				kprintf(" discard");
-			kprintf("\n");
-			if (block->transaction != NULL) {
-				kprintf(" transaction:   %p (%ld)\n", block->transaction,
-					block->transaction->id);
-				if (block->transaction_next != NULL) {
-					kprintf(" next in transaction: %Ld\n",
-						block->transaction_next->block_number);
-				}
-			}
-			if (block->previous_transaction != NULL) {
-				kprintf(" previous transaction: %p (%ld)\n",
-					block->previous_transaction,
-					block->previous_transaction->id);
-			}
-
-			set_debug_variable("_current", (addr_t)block->current_data);
-			set_debug_variable("_original", (addr_t)block->original_data);
-			set_debug_variable("_parent", (addr_t)block->parent_data);
-		} else
+		if (block != NULL)
+			dump_block_long(block);
+		else
 			kprintf("block %Ld not found\n", blockNumber);
 		return 0;
 	}
@@ -2296,6 +2319,7 @@ dump_block_data(int argc, char** argv)
 }
 #endif	// BLOCK_CACHE_BLOCK_TRACING >= 2
 
+
 #endif	// DEBUG_BLOCK_CACHE
 
 
@@ -2508,6 +2532,8 @@ block_cache_init(void)
 		"[-bt] <cache-address> [block-number]\n"
 		"  -t lists the transactions\n"
 		"  -b lists all blocks\n", 0);
+	add_debugger_command("cached_block", &dump_cached_block,
+		"dumps the specified cached block");
 	add_debugger_command_etc("transaction", &dump_transaction,
 		"dumps a specific transaction", "[-b] ((<cache> <id>) | <transaction>)\n"
 		"Either use a block cache pointer and an ID or a pointer to the transaction.\n"
