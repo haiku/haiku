@@ -594,9 +594,17 @@ LocaleWindow::MessageReceived(BMessage* message)
 		{
 				BMessage update(kMsgSettingsChanged);
 				int index = 0;
-				while (index < fPreferredListView->CountItems()) {
-					update.AddString("language", static_cast<LanguageListItem*>
-						(fPreferredListView->ItemAt(index))->LanguageCode());
+				while (index < fPreferredListView->FullListCountItems()) {
+					// only include subitems : we can guess the superitem
+					// from them anyway
+					if (fPreferredListView->Superitem(fPreferredListView->
+								FullListItemAt(index))
+							!= NULL) {
+						update.AddString("language",
+							static_cast<LanguageListItem*>
+								(fPreferredListView->FullListItemAt(index))
+							-> LanguageCode());
+					}
 					index++;
 				}
 				be_app_messenger.SendMessage(&update);

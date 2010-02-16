@@ -1,0 +1,7 @@
+1	ukrainian	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
+Desktop (Live-CD)	BootPromptWindow		Десктоп (Live-CD)
+Language	BootPromptWindow		Мова
+Welcome to Haiku!	BootPromptWindow		Вітаємо в Haiku!
+Run Installer	BootPromptWindow		Запусти Встановлювач
+Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Бажаєш запустити Встановлювач чи хочеш далі працювати у версїi Live? Можеш вибрати мову , якій надаєш перевагу і розкладку клавіатури з списку ,що бачиш нижче.\n\nУвага:Локалізація Haiku i  ЇЇjдодатків триває. Часто зустрінете непереведені фрагменти тексту,Бажаєте допомогти щиро запрошуємо на <www.haiku-os.org>
+Keymap	BootPromptWindow		Розкладка

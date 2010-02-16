@@ -1,18 +1,18 @@
 1	ukrainian	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		1 file added.
-Stop	file:ZipOMaticWindow.cpp		Stop
-Creating archive: %s	file:ZipOMaticWindow.cpp		Creating archive: %s
-Continue	file:ZipOMaticWindow.cpp		Continue
-Preparing to archive	file:ZipperThread.cpp		Preparing to archive
-Filename: %s	file:ZipOMaticWindow.cpp		Filename: %s
-Let them continue	file:ZipOMatic.cpp		Let them continue
-Do you want to stop them?	file:ZipOMatic.cpp		Do you want to stop them?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Are you sure you want to stop creating this archive?
-%ld files added.	file:ZipOMaticWindow.cpp		%ld files added.
-Stopped	file:ZipOMaticWindow.cpp		Stopped
-Archive	file:ZipperThread.cpp		Archive
-Drop files to zip.	file:ZipOMaticWindow.cpp		Drop files to zip.
-Error creating archive	file:ZipOMaticWindow.cpp		Error creating archive
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		You have %ld Zip-O-Matic running.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Archive created OK
-Stop them	file:ZipOMatic.cpp		Stop them
+1 file added.	file:ZipOMaticWindow.cpp		Додано 1файл.
+Stop	file:ZipOMaticWindow.cpp		Зупининити
+Creating archive: %s	file:ZipOMaticWindow.cpp		Створення архіва: %s
+Continue	file:ZipOMaticWindow.cpp		Продовжити
+Preparing to archive	file:ZipperThread.cpp		Підготовка до архівування
+Filename: %s	file:ZipOMaticWindow.cpp		Ім"я файла: %s
+Let them continue	file:ZipOMatic.cpp		Дозволити продовження
+Do you want to stop them?	file:ZipOMatic.cpp		Ви хочете зупинити їх?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ви впевнені, що хочете зупинити створення цього  архіва?
+%ld files added.	file:ZipOMaticWindow.cpp		%ld файлів додано.
+Stopped	file:ZipOMaticWindow.cpp		Зупинено
+Archive	file:ZipperThread.cpp		Архів
+Drop files to zip.	file:ZipOMaticWindow.cpp		Додати файли для стиску в архів.
+Error creating archive	file:ZipOMaticWindow.cpp		Помилка створення архіва
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Ви маєте %ld Zip-O-Matic запущено.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створено
+Stop them	file:ZipOMatic.cpp		Зупинити їх

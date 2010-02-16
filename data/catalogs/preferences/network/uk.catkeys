@@ -1,0 +1,17 @@
+1	ukrainian	x-vnd.Haiku-Network	2897060402
+Gateway:	EthernetSettingsView		Шлюз:
+Netmask:	EthernetSettingsView		Маска мережі:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Застосувати
+OK	EthernetSettingsView		OK
+DNS #1:	EthernetSettingsView		DNS #1:
+IP address:	EthernetSettingsView		Адреса IP:
+Network	NetworkWindow		Мережа
+Adapter:	EthernetSettingsView		Мережева карта:
+Revert	EthernetSettingsView		Повернути
+Sending auto-config message failed: 	EthernetSettingsView		Відправка повідомлення автоконфігурації не відбулася: 
+Mode:	EthernetSettingsView		Тип адреси:
+The net_server needs to run for the auto configuration!	EthernetSettingsView		Сервер мережі (net_server)  повинен бути запущеним для автоматичної конфігурації!
+Auto-configuring failed: 	EthernetSettingsView		Автоматична конфігурація не відбулася: 
+Static	EthernetSettingsView		Статичний

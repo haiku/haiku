@@ -29,6 +29,6 @@ Real-time	Media views		Реальний час
 Restart media services	Media views		Перезапустити медіа сервіси
 Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального часу дозволяє виконувати запис і відтворення максимально швидко. Це досягається за рахунок збільшення загрузки процесора і використання пам"яті\n\nВикористовуйте його тільки у випадку гострої необхідності.
 Couldn't remove volume control in Deskbar: %s\n	Media Window		Неможливо видалити регулятор гучності з Deskbar : %s\n
-Couldn't add volume control in Deskbar: %s\n	Media Window		Неможливо додати регулятор гучності вDeskbar: %s\n
+Couldn't add volume control in Deskbar: %s\n	Media Window		Неможливо додати регулятор гучності в Deskbar: %s\n
 Media	Media Window		Media
 Channel:	Media views		Канал:

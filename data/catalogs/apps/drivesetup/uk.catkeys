@@ -1,0 +1,80 @@
+1	ukrainian	x-vnd.Haiku-DriveSetup	3321530449
+Delete	MainWindow		Видалити
+Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Ви дійсно бажаєте зініціалізувати цей розділю Після вибору параметрів ініціалізації у вас залишається можливість перервати операцію безпосередньо перед самим записом нав диск.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що хочете записати зміни на диск?\n\nВсі дані на вибраному розділі будуть безповоротно втрачені!
+Rescan	MainWindow		Просканувати
+OK	MainWindow		OK
+Could not aquire partitioning information.	MainWindow		Неможливо добути інформацію про розділ.
+There's no space on the partition where a child partition could be created.	MainWindow		Відсутнє місце для створення дитячого розділу.
+<empty>	PartitionList		<пусто>
+Unable to find the selected partition by ID.	MainWindow		Неможливо знайти даний розділ по ID.
+Select a partition from the list below.	DiskView		Виберіть розділ зі списку.
+%.1f TB	Support		%.1f TB
+No disk devices have been recognized.	DiskView		Не знайдено жодного вінчестера .
+The selected disk is read-only.	MainWindow		Вибраний диск доступний тільки в режимі читання.
+Partition name:	CreateParamsPanel		Назва розділу:
+Initialize	InitParamsPanel		Ініціалізувати
+Could not mount partition %s.	MainWindow		Неможливо підмонтувати розділ  %s.
+The partition %s is already unmounted.	MainWindow		Розділ %s вже відмонтований.
+Failed to initialize the partition. No changes have been written to disk.	MainWindow		Помилка в ініціалізації розділу. Жодні  зміни не були записані на диск .
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Помилка при видаленні розділу. .Жодні  зміни не були записані на диск.
+Partition type:	CreateParamsPanel		Тип розділу:
+Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Ініціалізувати розділ \"%s\"? Після вибору параметрів можна перервати операцію перед записом змін на диск.
+Could not delete the selected partition.	MainWindow		Неможливо видалит вибраний розділ.
+Initialize	MainWindow		Ініціалізувати
+Error: 	MainWindow	in any error alert	Помилка: 
+Partition %ld	DiskView		Розділ %ld
+The partition %s has been successfully initialized.\n	MainWindow		Розділ %s успішно ініціалізований.\n
+<empty>	DiskView		<пусто>
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Ініціалізація розділу %s не відбулась. Жодні зміни не були записані на диск.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Впевнений що хочеш записати зміни на диск?\n\nВсі дані на розділі будуть безповоротно втрачені!
+Mounted at	PartitionList		Пункт монтування
+Failed to initialize the partition %s!\n	MainWindow		Помилка при ініціалізаціі розділу %s!\n
+There was an error acquiring the partition row.	MainWindow		Виникла помилка при отриманні інформації про розділ.
+You need to select a partition entry from the list.	MainWindow		Необхідно вибрати розділ зі списку.
+Format (not implemented)	MainWindow		Форматувати (не реалізовано)
+The currently selected partition does not have a parent partition.	MainWindow		Вибраний розділ не містить батьківського розділу.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що хочете записати зміни на диск?\n\nВсі дані на вибраному диску будуть втрачені безповоротно!
+Offset: %ld MB	Support		Przesunięcie: %ld MB
+Write changes	MainWindow		Записати зміни
+There was an error preparing the disk for modifications.	MainWindow		Виникла помилка при підготовці диску до змін.
+%3.1f MB	Support		%3.1f MB
+The partition %s is already mounted.	MainWindow		Розділ %s підмонтовано.
+%3.1f GB	Support		%3.1f GB
+%ld MB	Support		%ld MB
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що хочете записати зміни на диск?\n\nВсі дані на диску %s будуть втрачені безповоротно!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви дійсно хочете видалити вибраний розділ? Всі дані на ньому будуть втрачені! 
+Create…	MainWindow		Створити…
+Disk system \"%s\"\" not found!	MainWindow		Файлова система диску \"%s\"\" не визначена!
+Could not unmount partition %s.	MainWindow		Неможливо відмонтувати розділ %s.
+Mount	MainWindow		Підмонтувати
+Create	CreateParamsPanel		Створити
+Device	PartitionList		Пристрій
+Disk	MainWindow		Диск
+Device	DiskView		Пристрій
+Volume name	PartitionList		Назва
+Continue	MainWindow		Продовжити
+Cannot delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
+Mount all	MainWindow		Змонтувати все
+Cancel	MainWindow		Відмінити
+Delete partition	MainWindow		Видалити розділ
+End: %ld MB	Support		Кінець: %ld MB
+Eject	MainWindow		Вийняти
+%3.1f KB	Support		%3.1f KB
+Partition	MainWindow		Розділ
+File system	PartitionList		Файлова система
+Validation of the given creation parameters failed.	MainWindow		Правильність створення розділуне підтверджено.
+Size	PartitionList		Розмір
+Don't know how to gather initialization parameters for this disk system.	MainWindow		Неможливо знайти правильні параметри для ініціалізації такого типу укладу диску.
+Validation of the given initialization parameters failed.	MainWindow		Підтвердження правильності параметрів ініціалізації не відбулось .
+The selected partition does not contain a partitioning system.	MainWindow		вибраний розділ не містить системи розділення.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що хочете записати зміни на диск?\n\nВсі дані на розділі %s будуть втрачені!
+The partition %s is currently mounted.	MainWindow		Розділ %s вже підмонтований.
+Partition size	CreateParamsPanel		Розмір розділу
+Surface test (not implemented)	MainWindow		Перевірка поверхні (не реалізовано)
+Cancel	InitParamsPanel		Відмінити
+Cancel	CreateParamsPanel		Відмінити
+%Ld B	Support		%Ld B
+Creation of the partition has failed.	MainWindow		Спроба створення розділу невдала.
+The currently selected partition is not empty.	MainWindow		Визначений розділ не є пустий.
+Unmount	MainWindow		Відмонтувати

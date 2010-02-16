@@ -1,0 +1,24 @@
+1	ukrainian	x-vnd.Haiku-Mouse	104106491
+Click to activate	SettingsView		Клікніть, щоб активувати
+Mouse type:	SettingsView		Тип мишки:
+Warp	SettingsView		Перенести
+2-Button	SettingsView		Двохкнопкова
+Double-click test area	SettingsView		Зона перевірки подвійного кліка
+Revert	MouseWindow		Повернути
+...by Andrew Edward McCall	MouseApplication		...автор Andrew Edward McCall
+Mouse acceleration	SettingsView		Прискорення курсора
+Click to focus	SettingsView		Клікни, щоб відзначити
+3-Button	SettingsView		Трьохкнопкова
+Mouse speed	SettingsView		Швидкість курсора
+Focus mode:	SettingsView		Режим відзначення:
+Instant warp	SettingsView		Миттєве перенесення
+Dig Deal	MouseApplication		Dig Deal
+1-Button	SettingsView		Однокнопкова
+Double-click speed	SettingsView		Швидкість подвійного кліку
+Defaults	MouseWindow		По замовчуванню
+Focus follows mouse	SettingsView		Прагнути до курсора
+Accept first click	SettingsView		Визнавати перший клік
+Fast	SettingsView		Швидко
+Normal	SettingsView		Нормальна
+Mouse	MouseWindow		Мишка
+Slow	SettingsView		Повільно

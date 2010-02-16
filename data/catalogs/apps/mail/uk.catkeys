@@ -1,0 +1,141 @@
+1	ukrainian	x-vnd.Be-MAIL	2102081210
+%d - Date	Mail		%d - Дата
+Attach attributes:	Mail		Додати атрибути:
+Inconsistency occurred in the undo/redo buffer.	Mail		Es ist eine Inkonsistenz im Rückgängig/Wiederherstellen-System aufgetreten.
+An error occurred trying to save the attachment.	Mail		Сталася помилка при збереженні вкладення.
+Copy to new	Mail		Копіювати до нового
+Edit	Mail		Редагувати
+Print	Mail		Друкувати
+New mail message	Mail		Нове почтове відправлення
+Automatically mark mail as read:	Mail		Автоматично відмічати почту як прочитану:
+Colored quotes:	Mail		Кольорова помітка:
+Subject:	Mail		Тема:
+Reply to all	Mail		Відповісти всім
+Show icons & labels	Mail		Показати іконки і мітки
+Remove attachment	Mail		Видалити вкладення
+Button bar:	Mail		Панель кнопок:
+Beginner	Mail		Початковий
+Don't save	Mail		Не зберігати
+Expert	Mail		Експерт
+Reply account:	Mail		Відповісти
+Discard	Mail		Витягнути
+Message	Mail		Масив
+Reply to sender	Mail		Відповісти відправникові
+There is no installed handler for URL links.	Mail		Не встановлено оброблювач лінків URL.
+Signature	Mail		Підпис
+Find again	Mail		Шукати знову
+Bcc:	Mail		Bcc:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш лист містить %ld нерозкодованих символів. Можливо інші символи спрацюють краще?Натисніть Відправити для беззастережної відправки ,або Відміна для повернення і виправлення ситуації.
+Signature:	Mail		Signatur:
+Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nGeschrieben von Robert Polic.\nErweitert vom Dr. Zoidberg Team.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Save changes to this signature?	Mail		Änderungen an der Signatur speichern?
+Cc:	Mail		Сс:
+Find	Mail		Знайти
+Preferences…	Mail		Налаштування…
+Undo	Mail		Відмінити
+Leave as New	Mail		Зберегти як нове
+An error occurred trying to open this signature.	Mail		Відбулася помилка при відкритті цього підпису.
+No file attributes, just plain data	Mail		Жодних атрибутів тільки звичайні дані
+Edit queries…	Mail		Редагувати пошук…
+Paste	Mail		Вставити
+Save attachment…	Mail		Зберегти вкладення…
+Include file attributes in attachments	Mail		Включити файлові атрибути до вкладення
+OK	Mail		OK
+Send	Mail		Відіслати
+Show icons only	Mail		Показати тільки іконки
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Видалити вкладення з листа , що пересилається неможливо.\nЦе не спрацює правильно.
+Hide	Mail		Сховати
+Forward without attachments	Mail		Переслати без вкладення
+Previous	Mail		Попереднє
+Redo	Mail		Відмінити  відміну
+Add enclosure…	Mail		Додати  вкладення…
+Print…	Mail		Друкувати…
+Warn unencodable:	Mail		Увага не розкодовується:
+Quit	Mail		Вийти
+%n - Full name	Mail		%n - повне ім"я
+ Read 	Mail		Читати
+Trash	Mail		Кошик
+Default account:	Mail		Акакунт по замовчуванню:
+Size:	Mail		Розмір:
+Account from mail	Mail		Почтовий аакунт
+Edit signatures…	Mail		Редагувати підпис…
+New	Mail		Нове
+Attachments: 	Mail		Вкладення:
+Set to %s	Mail		Встановити  на %s
+Forward	Mail		Переслати
+E-mail draft could not be saved!	Mail		Чорновик не може бути збереженим!
+To:	Mail		До:
+Only files can be added as attachments.	Mail		Як вкладення можуть бути доданими тільки файли.
+Previous message	Mail		Попередній масив
+Title:	Mail		Назва:
+Find…	Mail		Знайти …
+Accounts…	Mail		Фккаунти…
+Mail preferences	Mail		Налаштування пошти
+Initial spell check mode:	Mail		 Перевірка правопису:
+Leave same	Mail		Зберегти таке саме
+About Mail…	Mail		Про пошту…
+Page setup…	Mail		Налаштування сторінки…
+Text wrapping:	Mail		Обтікання тексту:
+Revert	Mail		Повернути
+File	Mail		Файл
+None	Mail		Жоден
+Copy link location	Mail		Копіювати посилання
+Show header	Mail		Показати заголовок
+%e - E-mail address	Mail		%e - поштова адреса
+Resend	Mail		Повторити відправку
+Show raw message	Mail		Показати лист
+\\n - Newline	Mail		\\n - Нова лінія
+Start now	Mail		Запустити зараз
+Close	Mail		Закрити
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Поштовий демон не запущено.Лист збережено і буде відправлено коли він стартує.
+Really delete this signature? This cannot be undone.	Mail		Дійсно видалити цей підпис. Його неможливо буде поновити.
+Open	Mail		Відкрити
+Quote	Mail		Цитата
+Add	Mail		Додати
+Next message	Mail		Наступний лист
+User interface	Mail		Інтерфейс користувача
+Cancel	Mail		Відмінити
+Send message	Mail		Відіслати лист
+Remove enclosure	Mail		Видалити вкладення
+Account:	Mail		Аккаунт:
+Decoding:	Mail		Розшифровка:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Неможливо знайти додаток, який підтримує дані типу 'Person'.
+Do you wish to send this message before closing?	Mail		Ви бажаєте відправити лист до закриття?
+Delete	Mail		Видалити
+Leave as '%s'	Mail		Зберегти як '%s' 
+Copy	Mail		Копіювати
+Reply preamble:	Mail		Antwort einleiten:
+Signatures	Mail		Підпис
+Next	Mail		Наступний
+Set to…	Mail		Встановити на…
+Use default account	Mail		Використати аккаунт по за мовчуванню
+Sorry	Mail		Прикро
+Encoding:	Mail		Кодування:
+Font:	Mail		Шрифт:
+Save address	Mail		Зберегти адресу
+Queries	Mail		Запити
+Do you wish to save this message as a draft before closing?	Mail		Ви хочете зберегти цей лист як чорновик до закриття?
+Save	Mail		Зберегти
+Random	Mail		випадковий
+Close and 	Mail		Закрити і
+Save as draft	Mail		Зберегти як чорновик
+The mail_daemon could not be started:\n\t	Mail		Поштовий демон не запущений:\n\t
+Open attachment	Mail		Відкрити вкладення
+Reply	Mail		Відповісти
+The spell check feature requires the optional \"words\" file on your BeOS CD.	Mail		Функція перевірки правопису вимагає  присутності додаткового файла \"words\"  на вашому Haiku CD.
+From:	Mail		Від:
+Couldn't open this signature. Sorry.	Mail		Неможливо  відкрити цей підпис.
+Open draft	Mail		Відкрити чорновик
+Cut	Mail		Вирізати
+Check spelling	Mail		Перевірити правопис
+Set to Saved	Mail		Встановити для збереження
+Open this link	Mail		Відкрити це посилання
+Auto signature:	Mail		Автопідпис:
+Add signature	Mail		Додати підпис
+Need Tracker to move items to trash	Mail		Потрібен Tracker для видалення.
+Mailing	Mail		Новини
+Unread	Mail		не прочитані
+Remove quote	Mail		Видалити цитату
+Move to trash	Mail		Видалити
+Select all	Mail		Виділити все
+An error occurred trying to save this signature.	Mail		Сталася помилка при збереженні цього підпису.
