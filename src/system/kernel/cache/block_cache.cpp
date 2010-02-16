@@ -2590,7 +2590,7 @@ cache_sync_transaction(void* _cache, int32 id)
 			// write back all of their remaining dirty blocks
 			T(Action("sync", cache, transaction));
 			while (transaction->num_blocks > 0) {
-				BlockWriter writer(cache, transaction->num_blocks);
+				BlockWriter writer(cache, false);
 				block_list::Iterator iterator
 					= transaction->blocks.GetIterator();
 
