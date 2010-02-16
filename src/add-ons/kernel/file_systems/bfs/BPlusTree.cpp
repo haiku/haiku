@@ -227,7 +227,7 @@ CachedNode::InternalSetTo(Transaction* transaction, off_t offset)
 			fWritable = false;
 		}
 
-		if (block) {
+		if (block != NULL) {
 			// The node is somewhere in that block...
 			// (confusing offset calculation)
 			fNode = (bplustree_node*)(block + offset
@@ -324,18 +324,17 @@ CachedNode::Allocate(Transaction& transaction, bplustree_node** _node,
 	header->maximum_size = HOST_ENDIAN_TO_BFS_INT64(header->MaximumSize()
 		+ fTree->fNodeSize);
 
-	if (SetToWritable(transaction, offset, false) != NULL) {
-		fNode->Initialize();
+	cached.Unset();
+		// SetToWritable() below needs the new values in the tree's header
 
-		*_offset = offset;
-		*_node = fNode;
-		return B_OK;
-	}
+	if (SetToWritable(transaction, offset, false) == NULL)
+		RETURN_ERROR(B_ERROR);
 
-	// revert header size to old value
-	header->maximum_size = HOST_ENDIAN_TO_BFS_INT64(header->MaximumSize()
-		- fTree->fNodeSize);
-	RETURN_ERROR(B_ERROR);
+	fNode->Initialize();
+
+	*_offset = offset;
+	*_node = fNode;
+	return B_OK;
 }
 
 
@@ -423,7 +422,7 @@ BPlusTree::SetTo(Transaction& transaction, Inode* stream, int32 nodeSize)
  		= HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
  	header->maximum_size = HOST_ENDIAN_TO_BFS_INT64(nodeSize * 2);
 
-	memcpy(&fHeader, header, sizeof(bplustree_header));
+	cached.Unset();
 
 	// initialize b+tree root node
 	cached.SetToWritable(transaction, fHeader.RootNode(), false);
