@@ -13,6 +13,7 @@
 #include <String.h>
 
 #include <unicode/bytestream.h>
+#include <String.h>
 
 
 /* Convert UnicodeString to BString needs an ICU ByteSink to do the work */

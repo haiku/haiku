@@ -47,9 +47,6 @@ class BFloatFormat : public BNumberFormat, public BFloatFormatParameters {
 		BFloatFormat &operator=(const BFloatFormat &other);
 
 		BFloatFormat(BFloatFormatImpl *impl);		// conceptually private
-
-	private:
-		inline BFloatFormatImpl *FloatFormatImpl() const;
 };
 
 

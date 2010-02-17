@@ -40,9 +40,6 @@ class BFormat {
 		BFormat &operator=(const BFormat &other);
 
 		BFormat();
-
-	protected:
-		BFormatImpl	*fImpl;
 };
 
 #endif	// _B_FORMAT_H_

@@ -34,6 +34,7 @@
 #include <ScrollView.h>
 #include <String.h>
 #include <StringView.h>
+#include <TimeFormat.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
 #include <View.h>
@@ -1530,64 +1531,12 @@ MemUsageToString(char string[], size_t size, system_info* info)
 static const char*
 UptimeToString(char string[], size_t size)
 {
-	int64 days, hours, minutes, seconds, remainder;
-	int64 systime = system_time();
+	BTimeFormat formatter;
+	BString str;
 
-	days = systime / 86400000000LL;
-	remainder = systime % 86400000000LL;
-
-	hours = remainder / 3600000000LL;
-	remainder = remainder % 3600000000LL;
-
-	minutes = remainder / 60000000;
-	remainder = remainder % 60000000;
-
-	seconds = remainder / 1000000;
-
-	char* str = string;
-	if (days) {
-		if (days > 1) {
-			str += snprintf(str, size, TR("%lld days"), days);
-		} else {
-			str += snprintf(str, size, TR("%lld day"), days);
-		}
-	}
-	if (hours) {
-		if (hours > 1) {
-			str += snprintf(str, size - strlen(string),
-				TR("%s%lld hours"),
-				str != string ? ", " : "", hours);
-		} else {
-			str += snprintf(str, size - strlen(string),
-				TR("%s%lld hour"),
-				str != string ? ", " : "", hours);
-		}
-	}
-	if (minutes) {
-		if (minutes > 1) {
-			str += snprintf(str, size - strlen(string),
-				TR("%s%lld minutes"),
-				str != string ? ", " : "", minutes);
-		} else {
-			str += snprintf(str, size - strlen(string),
-				TR("%s%lld minute"),
-				str != string ? ", " : "", minutes);
-		}
-	}
-
-	if (seconds || str == string) {
-		// Haiku would be well-known to boot very fast.
-		// Let's be ready to handle below minute uptime, zero second included ;-)
-		if (seconds > 1) {
-			str += snprintf(str, size - strlen(string),
-				TR("%s%lld seconds"),
-				str != string ? ", " : "", seconds);
-		} else {
-			str += snprintf(str, size - strlen(string),
-				TR("%s%lld second"),
-				str != string ? ", " : "", seconds);
-		}
-	}
+	formatter.Format(system_time() / 1000000, &str);
+	str.CopyInto(string,0,size);
+	string[str.Length()] = '\0';
 
 	return string;
 }

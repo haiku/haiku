@@ -3,7 +3,6 @@
 
 // copy constructor
 BFormat::BFormat(const BFormat &other)
-	: fImpl(other.fImpl)
 {
 }
 
@@ -16,7 +15,6 @@ BFormat::~BFormat()
 BFormat &
 BFormat::operator=(const BFormat &other)
 {
-	fImpl = other.fImpl;
 	return *this;
 }
 

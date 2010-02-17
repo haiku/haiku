@@ -26,11 +26,3 @@ BNumberFormat::BNumberFormat()
 {
 }
 
-// NumberFormatImpl
-inline
-BNumberFormatImpl *
-BNumberFormat::NumberFormatImpl() const
-{
-	return static_cast<BNumberFormatImpl*>(fImpl);
-}
-

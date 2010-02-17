@@ -17,9 +17,7 @@ BFloatFormat::~BFloatFormat()
 status_t
 BFloatFormat::Format(double number, BString *buffer) const
 {
-	if (!fImpl)
-		return B_NO_INIT;
-	return FloatFormatImpl()->Format(this, number, buffer);
+	return B_ERROR;
 }
 
 // Format
@@ -28,10 +26,7 @@ BFloatFormat::Format(double number, BString *buffer,
 					 format_field_position *positions, int32 positionCount,
 					 int32 *fieldCount, bool allFieldPositions) const
 {
-	if (!fImpl)
-		return B_NO_INIT;
-	return FloatFormatImpl()->Format(this,number, buffer, positions,
-		positionCount, fieldCount, allFieldPositions);
+	return B_ERROR;
 }
 
 // =
@@ -49,13 +44,5 @@ BFloatFormat::BFloatFormat(BFloatFormatImpl *impl)
 	  BFloatFormatParameters(impl ? impl->DefaultFloatFormatParameters()
 	  							    : NULL)
 {
-}
-
-// FloatFormatImpl
-inline
-BFloatFormatImpl *
-BFloatFormat::FloatFormatImpl() const
-{
-	return static_cast<BFloatFormatImpl*>(fImpl);
 }
 

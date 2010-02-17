@@ -17,9 +17,7 @@ BIntegerFormat::~BIntegerFormat()
 status_t
 BIntegerFormat::Format(int64 number, BString *buffer) const
 {
-	if (!fImpl)
-		return B_NO_INIT;
-	return IntegerFormatImpl()->Format(this, number, buffer);
+	return B_ERROR;
 }
 
 // Format
@@ -28,10 +26,7 @@ BIntegerFormat::Format(int64 number, BString *buffer,
 					   format_field_position *positions, int32 positionCount,
 					   int32 *fieldCount, bool allFieldPositions) const
 {
-	if (!fImpl)
-		return B_NO_INIT;
-	return IntegerFormatImpl()->Format(this,number, buffer, positions,
-		positionCount, fieldCount, allFieldPositions);
+	return B_ERROR;
 }
 
 // =
@@ -49,13 +44,5 @@ BIntegerFormat::BIntegerFormat(BIntegerFormatImpl *impl)
 	  BIntegerFormatParameters(impl ? impl->DefaultIntegerFormatParameters()
 	  							    : NULL)
 {
-}
-
-// IntegerFormatImpl
-inline
-BIntegerFormatImpl *
-BIntegerFormat::IntegerFormatImpl() const
-{
-	return static_cast<BIntegerFormatImpl*>(fImpl);
 }
 

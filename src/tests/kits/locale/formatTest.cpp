@@ -5,11 +5,17 @@
 #include <String.h>
 #include <TimeFormat.h>
 
-int main() {
+int
+main()
+{
 	BTimeFormat timeFormatter;
 	BString str;
 
-	timeFormatter.Format(123456, &str);
+	if (timeFormatter.Format(123456, &str) != B_OK) {
+		std::cout << "Conversion error\n";
+		return -1;
+	}
 
-	std::cout << str.String();
+	std::cout << str.String() << std::endl;
+	return 0;
 }

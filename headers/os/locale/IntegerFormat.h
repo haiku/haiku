@@ -52,9 +52,6 @@ class BIntegerFormat : public BNumberFormat, public BIntegerFormatParameters {
 		BIntegerFormat &operator=(const BIntegerFormat &other);
 
 		BIntegerFormat(BIntegerFormatImpl *impl);		// conceptually private
-
-	private:
-		inline BIntegerFormatImpl *IntegerFormatImpl() const;
 };
 
 

@@ -14,9 +14,6 @@ class BNumberFormat : public BFormat {
 		BNumberFormat &operator=(const BNumberFormat &other);
 
 		BNumberFormat();
-
-	private:
-		inline BNumberFormatImpl *NumberFormatImpl() const;
 };
 
 

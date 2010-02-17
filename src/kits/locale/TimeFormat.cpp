@@ -14,24 +14,75 @@ status_t BTimeFormat::Format(int64 number, BString* buffer) const
 {
 	// create time unit amount instance - a combination of Number and time unit
 	UErrorCode status = U_ZERO_ERROR;
-	TimeUnitAmount* source = new TimeUnitAmount(number/1000000, TimeUnit::UTIMEUNIT_SECOND, status);
-	// create time unit format instance
+
+	int64 days, hours, minutes, seconds, remainder;
+
+	days = number / (24 * 3600);
+	remainder = number % (24 * 3600);
+
+	hours = remainder / 3600;
+	remainder %= 3600;
+
+	minutes = remainder / 60;
+	remainder %= 60;
+
+	seconds = remainder;
+	
 	TimeUnitFormat* format = new TimeUnitFormat(status);
-	// format a time unit amount
 	UnicodeString formatted;
-	Formattable formattable(source);
+	Formattable formattable;
+	BStringByteSink bbs(buffer);
+
 	if (!U_SUCCESS(status)) {
-		delete source;
 		delete format;
 		return B_ERROR;
 	}
 
-	formatted = ((icu_4_2::Format*)format)->format(formattable, formatted, status);
+	if (days) {
+		TimeUnitAmount* daysAmount = new TimeUnitAmount(days,
+			TimeUnit::UTIMEUNIT_DAY, status);
 
-	BStringByteSink bbs(buffer);
+		formattable.adoptObject(daysAmount);
+		formatted = ((icu_4_2::Format*)format)->format(formattable, formatted,
+			status);
+	}
+
+	if (hours) {
+		TimeUnitAmount* hoursAmount = new TimeUnitAmount(hours,
+			TimeUnit::UTIMEUNIT_HOUR, status);
+
+		formattable.adoptObject(hoursAmount);
+		if (days)
+			formatted.append(", ");
+		formatted = ((icu_4_2::Format*)format)->format(formattable, formatted,
+			status);
+	}
+
+	if (minutes) {
+		TimeUnitAmount* minutesAmount = new TimeUnitAmount(minutes,
+			TimeUnit::UTIMEUNIT_MINUTE, status);
+
+		formattable.adoptObject(minutesAmount);
+		if (days || hours)
+			formatted.append(", ");
+		formatted = ((icu_4_2::Format*)format)->format(formattable, formatted,
+			status);
+	}
+
+
+	if (seconds || (minutes == 0 && hours == 0 && days == 0)) {
+		TimeUnitAmount* secondsAmount = new TimeUnitAmount(seconds,
+			TimeUnit::UTIMEUNIT_SECOND, status);
+
+		formattable.adoptObject(secondsAmount);
+		if (days || hours || minutes)
+			formatted.append(", ");
+		formatted = ((icu_4_2::Format*)format)->format(formattable, formatted,
+			status);
+	}
 	formatted.toUTF8(bbs);
 
-	delete source;
+
 	delete format;
 	return B_OK;
 }
