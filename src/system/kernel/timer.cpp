@@ -147,8 +147,11 @@ timer_interrupt()
 
 	// setup the next hardware timer
 	if (cpuData.events != NULL) {
-		arch_timer_set_hardware_timer(
-			(bigtime_t)cpuData.events->schedule_time - system_time());
+		bigtime_t timeout = (bigtime_t)cpuData.events->schedule_time
+			- system_time();
+		if (timeout <= 0)
+			timeout = 1;
+		arch_timer_set_hardware_timer(timeout);
 	}
 
 	release_spinlock(spinlock);
