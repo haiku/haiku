@@ -10,6 +10,7 @@
 #ifndef __ICU_WRAPPER_H__
 #define __ICU_WRAPPER_H__
 
+#include <String.h>
 
 #include <unicode/bytestream.h>
 
