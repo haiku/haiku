@@ -32,3 +32,14 @@ resource(6, "META:ICON") #'VICN' array {
 	$"0107201C200A070108201C200A080109201C200A000100201E240A0C0100201C"
 	$"20"
 };
+
+resource(7, "META:ATTR_INFO") message(233) {
+	"attr:name" = "_trk/qrystr",
+	"attr:public_name" = "Formula",
+	"attr:type" = 'CSTR',
+	"attr:viewable" = true,
+	"attr:editable" = true,
+	"attr:width" = 200,
+	"attr:alignment" = 0,
+	"type" = "application/x-vnd.Be-query"
+};
