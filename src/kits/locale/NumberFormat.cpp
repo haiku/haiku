@@ -21,8 +21,8 @@ BNumberFormat::operator=(const BNumberFormat &other)
 }
 
 // constructor
-BNumberFormat::BNumberFormat(BNumberFormatImpl *impl)
-	: BFormat(impl)
+BNumberFormat::BNumberFormat()
+	: BFormat()
 {
 }
 

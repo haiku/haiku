@@ -45,7 +45,7 @@ BFloatFormat::operator=(const BFloatFormat &other)
 
 // constructor
 BFloatFormat::BFloatFormat(BFloatFormatImpl *impl)
-	: BNumberFormat(impl),
+	: BNumberFormat(),
 	  BFloatFormatParameters(impl ? impl->DefaultFloatFormatParameters()
 	  							    : NULL)
 {

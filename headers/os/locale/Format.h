@@ -39,7 +39,7 @@ class BFormat {
 
 		BFormat &operator=(const BFormat &other);
 
-		BFormat(BFormatImpl *impl);
+		BFormat();
 
 	protected:
 		BFormatImpl	*fImpl;

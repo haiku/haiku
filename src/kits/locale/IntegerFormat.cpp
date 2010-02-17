@@ -45,7 +45,7 @@ BIntegerFormat::operator=(const BIntegerFormat &other)
 
 // constructor
 BIntegerFormat::BIntegerFormat(BIntegerFormatImpl *impl)
-	: BNumberFormat(impl),
+	: BNumberFormat(),
 	  BIntegerFormatParameters(impl ? impl->DefaultIntegerFormatParameters()
 	  							    : NULL)
 {

@@ -23,7 +23,7 @@ rule LocaleTest
 	# LocaleTest <sources> ;
 	local sources = $(1) ;
 	local name = $(sources[1]:B) ;
-	Application $(name) : $(sources) : be liblocale.so $(TARGET_LIBSUPC++) ;
+	Application $(name) : $(sources) : be liblocale.so $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) ;
 }
 
 LocaleTest catalogSpeed.cpp ;
@@ -32,6 +32,7 @@ LocaleTest collatorSpeed.cpp ;
 LocaleTest collatorTest.cpp ;
 LocaleTest genericNumberFormatTest.cpp ;
 LocaleTest localeTest.cpp ;
+LocaleTest formatTest.cpp ;
 
 Application ICUTest : 
 	ICUTest.cpp :

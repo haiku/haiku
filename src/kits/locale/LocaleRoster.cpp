@@ -602,18 +602,15 @@ BLocaleRoster::LoadCatalog(const char *signature, const char *language,
 			catalog = info->fInstantiateFunc(signature, lang, fingerprint);
 			if (catalog) {
 				info->fLoadedCatalogs.AddItem(catalog);
-#if 0
-				// Chain-loading of catalogs has been disabled, as with the
-				// current way of handling languages (there are no general
-				// languages like 'English', but only specialized ones, like
-				// 'English-american') it does not make sense...
-				//
 				// Chain-load catalogs for languages that depend on
 				// other languages.
 				// The current implementation uses the filename in order to
 				// detect dependencies (parenthood) between languages (it
 				// traverses from "english-british-oxford" to "english-british"
 				// to "english"):
+				// TODO :use ICU facilities instead, so we can handle more
+				// complex things such as fr_FR@euro, or whatever, encodings
+				// and so on.
 				int32 pos;
 				BString langName(lang);
 				BCatalogAddOn *currCatalog=catalog, *nextCatalog;
@@ -628,7 +625,6 @@ BLocaleRoster::LoadCatalog(const char *signature, const char *language,
 						currCatalog = nextCatalog;
 					}
 				}
-#endif
 				return catalog;
 			}
 		}

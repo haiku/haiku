@@ -21,8 +21,7 @@ BFormat::operator=(const BFormat &other)
 }
 
 // constructor
-BFormat::BFormat(BFormatImpl *impl)
-	: fImpl(impl)
+BFormat::BFormat()
 {
 }
 
