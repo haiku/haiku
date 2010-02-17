@@ -1375,7 +1375,8 @@ heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount,
 
 #if KERNEL_HEAP_LEAK_CHECK
 static void
-heap_add_leak_check_info(addr_t address, size_t allocated, size_t size)
+heap_add_leak_check_info(heap_allocator *heap, addr_t address, size_t allocated,
+	size_t size)
 {
 	heap_leak_check_info *info = (heap_leak_check_info *)(address + allocated
 		- sizeof(heap_leak_check_info));
@@ -1404,7 +1405,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, size_t alignment)
 
 	addr_t address = firstPage->area->base + firstPage->index * heap->page_size;
 #if KERNEL_HEAP_LEAK_CHECK
-	heap_add_leak_check_info(address, pageCount * heap->page_size, size);
+	heap_add_leak_check_info(heap, address, pageCount * heap->page_size, size);
 #endif
 	return (void *)address;
 }
@@ -1475,7 +1476,7 @@ heap_allocate_from_bin(heap_allocator *heap, uint32 binIndex, size_t size)
 
 #if KERNEL_HEAP_LEAK_CHECK
 	binLocker.Unlock();
-	heap_add_leak_check_info((addr_t)address, bin->element_size, size);
+	heap_add_leak_check_info(heap, (addr_t)address, bin->element_size, size);
 #endif
 	return address;
 }
