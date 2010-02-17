@@ -131,6 +131,8 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 
 	// recycle a potential previously mapped page
 	if (cookie->physical_page_handle != NULL) {
+// TODO: This check is invalid! The physical page mapper is not required to
+// return a non-NULL handle (the generic implementation does not)!
 		vm_put_physical_page(cookie->virtual_address,
 			cookie->physical_page_handle);
 	}
@@ -148,6 +150,8 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 		void* mappedAddress;
 		addr_t mappedSize;
 
+// TODO: This is a potential violation of the VIP requirement, since
+// vm_map_physical_memory_vecs() allocates memory without special flags!
 		cookie->mapped_area = vm_map_physical_memory_vecs(
 			VMAddressSpace::KernelID(), "io buffer mapped physical vecs",
 			&mappedAddress, B_ANY_KERNEL_ADDRESS, &mappedSize,
@@ -166,6 +170,8 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 	addr_t address = (addr_t)currentVec.iov_base + cookie->vec_offset;
 	addr_t pageOffset = address % B_PAGE_SIZE;
 
+// TODO: This is a potential violation of the VIP requirement, since
+// vm_get_physical_page() may allocate memory without special flags!
 	status_t result = vm_get_physical_page(address - pageOffset,
 		&cookie->virtual_address, &cookie->physical_page_handle);
 	if (result != B_OK)
@@ -193,6 +199,7 @@ IOBuffer::FreeVirtualVecCookie(void* _cookie)
 	virtual_vec_cookie* cookie = (virtual_vec_cookie*)_cookie;
 	if (cookie->mapped_area >= 0)
 		delete_area(cookie->mapped_area);
+// TODO: A vm_get_physical_page() may still be unmatched!
 
 	free_etc(cookie, fVIP ? HEAP_PRIORITY_VIP : 0);
 }
