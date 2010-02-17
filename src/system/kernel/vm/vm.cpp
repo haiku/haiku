@@ -1354,6 +1354,11 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 }
 
 
+/*!	Don't use!
+	TODO: This function was introduced to map physical page vecs to
+	contiguous virtual memory in IOBuffer::GetNextVirtualVec(). It does
+	use a device cache and does not track vm_page::wired_count!
+*/
 area_id
 vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	uint32 addressSpec, addr_t* _size, uint32 protection, struct iovec* vecs,
