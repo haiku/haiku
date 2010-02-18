@@ -576,6 +576,14 @@ PPCVMTranslationMap::Query(addr_t va, addr_t *_outPhysical, uint32 *_outFlags)
 }
 
 
+status_t
+PPCVMTranslationMap::QueryInterrupt(addr_t virtualAddress,
+	addr_t* _physicalAddress, uint32* _flags)
+{
+	return PPCVMTranslationMap::Query(virtualAddress, _physicalAddress, _flags);
+}
+
+
 addr_t
 PPCVMTranslationMap::MappedSize() const
 {
