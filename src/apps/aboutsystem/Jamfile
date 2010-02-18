@@ -29,7 +29,8 @@ DoCatalogs AboutSystem :
 	AboutSystem.cpp
 	Utilities.cpp
 	: en.catalog
-	: pl.catkeys uk.catkeys
+	:
+	hu.catkeys pl.catkeys uk.catkeys
 	;
 
 Includes [ FGristFiles AboutSystem.rdef ] : [ FGristFiles "HAIKU logo - black on white - tiny.png" ] ;
