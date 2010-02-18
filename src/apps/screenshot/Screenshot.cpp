@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 
 #include <TranslatorFormats.h>
@@ -30,6 +32,7 @@ Screenshot::Screenshot()
 	fImageFileType(B_PNG_FORMAT),
 	fTranslator(8)
 {
+	be_locale->GetAppCatalog(&fCatalog);
 }
 
 

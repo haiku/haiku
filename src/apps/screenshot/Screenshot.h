@@ -11,6 +11,7 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
 
 
 class Screenshot : public BApplication {
@@ -30,6 +31,7 @@ private:
 	bool				fRefsReceived;
 	int32				fImageFileType;
 	int32				fTranslator;
+	BCatalog				fCatalog;
 };
 
 #endif	/* SCREENSHOT_H */

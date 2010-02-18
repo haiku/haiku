@@ -21,6 +21,7 @@
 #include <BitmapStream.h>
 #include <Button.h>
 #include <CardLayout.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -30,6 +31,7 @@
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutItem.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -83,13 +85,15 @@ public:
 
 
 // #pragma mark - ScreenshotWindow
+#undef TR_CONTEXT
+#define TR_CONTEXT "ScreenshotWindow"
 
 
 ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	bool includeMouse, bool grabActiveWindow, bool showConfigWindow,
 	bool saveScreenshotSilent, int32 imageFileType, int32 translator)
 	:
-	BWindow(BRect(0, 0, 200.0, 100.0), "Retake screenshot", B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, 200.0, 100.0), TR("Retake screenshot"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_QUIT_ON_WINDOW_CLOSE |
 		B_AVOID_FRONT | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fDelayControl(NULL),
@@ -155,7 +159,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			BCardLayout* layout = dynamic_cast<BCardLayout*> (GetLayout());
 			if (layout)
 				layout->SetVisibleItem(1L);
-			SetTitle("Save screenshot");
+			SetTitle(TR("Save screenshot"));
 			break;
 		}
 
@@ -188,8 +192,9 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 				BMessenger target(this);
 				fOutputPathPanel = new BFilePanel(B_OPEN_PANEL, &target,
 					NULL, B_DIRECTORY_NODE, false, NULL, new DirectoryRefFilter());
-				fOutputPathPanel->Window()->SetTitle("Choose folder");
-				fOutputPathPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
+				fOutputPathPanel->Window()->SetTitle(TR("Choose folder"));
+				fOutputPathPanel->SetButtonLabel(B_DEFAULT_BUTTON, TR("Select"));
+				fOutputPathPanel->SetButtonLabel(B_CANCEL_BUTTON, TR("Cancel"));
 			}
 			fOutputPathPanel->Show();
 			break;
@@ -231,7 +236,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			if (layout)
 				layout->SetVisibleItem(0L);
 			
-			SetTitle("Take Screenshot");
+			SetTitle(TR("Take Screenshot"));
 			fBackToSave->SetEnabled(true);
 			break;
 		}
@@ -283,41 +288,41 @@ ScreenshotWindow::_InitWindow()
 void
 ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 {
-	BStringView* stringView = new BStringView("", "Options");
+	BStringView* stringView = new BStringView("", TR("Options"));
 	stringView->SetFont(be_bold_font);
 	stringView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	fActiveWindow = new BRadioButton("Capture active window",
+	fActiveWindow = new BRadioButton(TR("Capture active window"),
 		new BMessage(kScreenshotType));
-	fWholeDesktop = new BRadioButton("Capture entire screen",
+	fWholeDesktop = new BRadioButton(TR("Capture entire screen"),
 		new BMessage(kScreenshotType));
 	fWholeDesktop->SetValue(B_CONTROL_ON);
 
 	BString delay;
 	delay << fDelay / 1000000;
-	fDelayControl = new BTextControl("", "Take screenshot after a delay of",
+	fDelayControl = new BTextControl("", TR("Take screenshot after a delay of"),
 		delay.String(), NULL);
 	_DisallowChar(fDelayControl->TextView());
 	fDelayControl->TextView()->SetAlignment(B_ALIGN_RIGHT);
 
-	BStringView* stringView2 = new BStringView("", "seconds");
+	BStringView* stringView2 = new BStringView("", TR("seconds"));
 	stringView2->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	fWindowBorder = new BCheckBox("Include window border",
+	fWindowBorder = new BCheckBox(TR("Include window border"),
 		new BMessage(kIncludeBorder));
 	fWindowBorder->SetEnabled(false);
 
-	fShowMouse = new BCheckBox("Include mouse pointer",
+	fShowMouse = new BCheckBox(TR("Include mouse pointer"),
 		new BMessage(kShowMouse));
 	fShowMouse->SetValue(fIncludeMouse);
 
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
-	fBackToSave = new BButton("", "Back to saving", new BMessage(kBackToSave));
+	fBackToSave = new BButton("", TR("Back to saving"), new BMessage(kBackToSave));
 	fBackToSave->SetEnabled(false);
 
-	fTakeScreenshot = new BButton("", "Take screenshot",
+	fTakeScreenshot = new BButton("", TR("Take screenshot"),
 		new BMessage(kTakeScreenshot));
 
 	layout->AddView(0, BGroupLayoutBuilder(B_VERTICAL)
@@ -351,7 +356,7 @@ ScreenshotWindow::_SetupFirstLayoutItem(BCardLayout* layout)
 		.AddGroup(B_HORIZONTAL, 10.0)
 			.Add(fBackToSave)
 			.AddGlue()
-			.Add(new BButton("", "Cancel", new BMessage(B_QUIT_REQUESTED)))
+			.Add(new BButton("", TR("Cancel"), new BMessage(B_QUIT_REQUESTED)))
 			.Add(fTakeScreenshot)
 			.End()
 		.SetInsets(10.0, 10.0, 10.0, 10.0)
@@ -370,17 +375,19 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 {
 	fPreview = new PreviewView();
 
-	fNameControl = new BTextControl("", "Name:", "screenshot1", NULL);
+	fNameControl = new BTextControl("", TR("Name:"), 
+		TR_CMT("screenshot1", "!! Filename of first screenshot !!"), NULL);
 
 	BMessage settings(_ReadSettings());
 
-	_SetupOutputPathMenu(new BMenu("Please select"), settings);
-	BMenuField* menuField2 = new BMenuField("Save in:", fOutputPathMenu);
+	_SetupOutputPathMenu(new BMenu(TR("Please select")), settings);
+	BMenuField* menuField2 = new BMenuField(TR("Save in:"), fOutputPathMenu);
 	
-	fNameControl->SetText(_FindValidFileName("screenshot1").String());
+	fNameControl->SetText(_FindValidFileName(
+		TR_CMT("screenshot1", "!! Filename of first screenshot !!")).String());
 
-	_SetupTranslatorMenu(new BMenu("Please select"), settings);
-	BMenuField* menuField = new BMenuField("Save as:", fTranslatorMenu);
+	_SetupTranslatorMenu(new BMenu(TR("Please select")), settings);
+	BMenuField* menuField = new BMenuField(TR("Save as:"), fTranslatorMenu);
 
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
@@ -392,7 +399,9 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 		.Add(menuField->CreateMenuBarLayoutItem(), 1, 1)
 		.Add(menuField2->CreateLabelLayoutItem(), 0, 2)
 		.Add(menuField2->CreateMenuBarLayoutItem(), 1, 2);
-	gridLayout->SetMinColumnWidth(1, menuField->StringWidth("SomethingLongHere"));
+	gridLayout->SetMinColumnWidth(1, 
+		menuField->StringWidth(
+			TR_CMT("SomethingLongHere", "!! length >= screenshot file name? !!")));
 
 	layout->AddView(1, BGroupLayoutBuilder(B_VERTICAL)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10.0)
@@ -405,10 +414,10 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 		.Add(divider)
 		.AddStrut(10)
 		.AddGroup(B_HORIZONTAL, 10.0)
-			.Add(new BButton("", "Options", new BMessage(kShowOptions)))
+			.Add(new BButton("", TR("Options"), new BMessage(kShowOptions)))
 			.AddGlue()
-			.Add(new BButton("", "Cancel", new BMessage(B_QUIT_REQUESTED)))
-			.Add(new BButton("", "Save", new BMessage(kFinishScreenshot)))
+			.Add(new BButton("", TR("Cancel"), new BMessage(B_QUIT_REQUESTED)))
+			.Add(new BButton("", TR("Save"), new BMessage(kFinishScreenshot)))
 			.End()
 		.SetInsets(10.0, 10.0, 10.0, 10.0)
 	);
@@ -473,17 +482,17 @@ ScreenshotWindow::_SetupOutputPathMenu(BMenu* outputPathMenu,
 	BPath path;
 	find_directory(B_USER_DIRECTORY, &path);
 
-	BString label("Home folder");
+	BString label(TR("Home folder"));
 	_AddItemToPathMenu(path.Path(), label, 0, (path.Path() == lastSelectedPath));
 
 	path.Append("Desktop");
-	label.SetTo("Desktop");
+	label.SetTo(TR("Desktop"));
 	_AddItemToPathMenu(path.Path(), label, 0, (path.Path() == lastSelectedPath));
 
 	find_directory(B_BEOS_ETC_DIRECTORY, &path);
 	path.Append("artwork");
 
-	label.SetTo("Artwork folder");
+	label.SetTo(TR("Artwork folder"));
 	_AddItemToPathMenu(path.Path(), label, 2, (path.Path() == lastSelectedPath));
 
 	int32 i = 0;
@@ -503,7 +512,7 @@ ScreenshotWindow::_SetupOutputPathMenu(BMenu* outputPathMenu,
 	}
 
 	fOutputPathMenu->AddItem(new BSeparatorItem());
-	fOutputPathMenu->AddItem(new BMenuItem("Choose folder...",
+	fOutputPathMenu->AddItem(new BMenuItem(TR("Choose folder..."),
 		new BMessage(kChooseLocation)));
 }
 
@@ -516,7 +525,8 @@ ScreenshotWindow::_AddItemToPathMenu(const char* path, BString& label,
 	message->AddString("path", path);
 
 	fOutputPathMenu->TruncateString(&label, B_TRUNCATE_MIDDLE,
-		fOutputPathMenu->StringWidth("SomethingLongHere"));
+		fOutputPathMenu->StringWidth(
+			TR_CMT("SomethingLongHere", "!! length >= screenshot file name? !!")));
 
 	fOutputPathMenu->AddItem(new BMenuItem(label.String(), message), index);
 
@@ -553,7 +563,7 @@ ScreenshotWindow::_UpdatePreviewPanel()
 	if (layout)
 		layout->SetVisibleItem(1L);
 
-	SetTitle("Save screenshot");
+	SetTitle(TR("Save screenshot"));
 }
 
 
@@ -602,8 +612,8 @@ ScreenshotWindow::_FindValidFileName(const char* name)
 	if (!BEntry(outputPath.Path()).Exists())
 		return fileName;
 
-	if (baseName.FindFirst("screenshot") == 0)
-		baseName.SetTo("screenshot");
+	if (baseName.FindFirst(TR_CMT("screenshot", "!! Basename of screenshot files. !!")) == 0)
+		baseName.SetTo(TR_CMT("screenshot", "!! Basename of screenshot files. !!" ));
 
 	BEntry entry;
 	int32 index = 1;
@@ -772,7 +782,8 @@ ScreenshotWindow::_SaveScreenshot()
 		return B_ERROR;
 
 	if (fSaveScreenshotSilent)	
-		path.Append(_FindValidFileName("screenshot1").String());
+		path.Append(_FindValidFileName(
+			TR_CMT("screenshot1", "!! Filename of first screenshot !!")).String());
 	else
 		path.Append(fNameControl->Text());
 	
@@ -781,9 +792,9 @@ ScreenshotWindow::_SaveScreenshot()
 	
 	if (!fSaveScreenshotSilent) {
 		if (entry.Exists()) {
-			BAlert *overwriteAlert = new BAlert("overwrite", "This file "
-				"already exists.\n Are you sure would you like to overwrite "
-				"it?", "Cancel", "Overwrite", NULL, B_WIDTH_AS_USUAL, 
+			BAlert* overwriteAlert = new BAlert(TR("overwrite"), 
+				TR("This file already exists.\n Are you sure would you like to overwrite it?"),
+				TR("Cancel"), TR("Overwrite"), NULL, B_WIDTH_AS_USUAL, 
 				B_EVEN_SPACING, B_WARNING_ALERT);
 
 				overwriteAlert->SetShortcut(0, B_ESCAPE);

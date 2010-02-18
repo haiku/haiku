@@ -8,7 +8,14 @@ Application Screenshot :
 	PreviewView.cpp
 	Screenshot.cpp
 	ScreenshotWindow.cpp
-	: be tracker translation libz.so $(TARGET_LIBSUPC++)
+	: be tracker translation libz.so liblocale.so $(TARGET_LIBSUPC++)
 	: Screenshot.rdef
 ;
 
+DoCatalogs Screenshot :
+	x-vnd.Haiku-Screenshot
+	:
+	ScreenshotWindow.cpp
+	: en.catalog
+	:
+;
