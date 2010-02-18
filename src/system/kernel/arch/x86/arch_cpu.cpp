@@ -73,6 +73,7 @@ struct set_mtrr_parameter {
 struct set_mtrrs_parameter {
 	const x86_mtrr_info*	infos;
 	uint32					count;
+	uint8					defaultType;
 };
 
 
@@ -188,7 +189,8 @@ set_mtrrs(void* _parameter, int cpu)
 
 	disable_caches();
 
-	sCpuModule->set_mtrrs(parameter->infos, parameter->count);
+	sCpuModule->set_mtrrs(parameter->defaultType, parameter->infos,
+		parameter->count);
 
 	enable_caches();
 
@@ -248,9 +250,13 @@ x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
 
 
 void
-x86_set_mtrrs(const x86_mtrr_info* infos, uint32 count)
+x86_set_mtrrs(uint8 defaultType, const x86_mtrr_info* infos, uint32 count)
 {
+	if (sCpuModule == NULL)
+		return;
+
 	struct set_mtrrs_parameter parameter;
+	parameter.defaultType = defaultType;
 	parameter.infos = infos;
 	parameter.count = count;
 

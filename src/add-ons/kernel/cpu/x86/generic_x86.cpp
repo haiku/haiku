@@ -173,7 +173,8 @@ generic_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
 
 
 void
-generic_set_mtrrs(const x86_mtrr_info* infos, uint32 count, uint32 maxCount)
+generic_set_mtrrs(uint8 newDefaultType, const x86_mtrr_info* infos,
+	uint32 count, uint32 maxCount)
 {
 	// check count
 	if (maxCount == 0)
@@ -195,7 +196,8 @@ generic_set_mtrrs(const x86_mtrr_info* infos, uint32 count, uint32 maxCount)
 	for (uint32 i = count; i < maxCount; i++)
 		set_mtrr(i, 0, 0, 0);
 
-	// re-enable MTTRs
+	// re-enable MTTRs and set the new default type
+	defaultType = (defaultType & ~(uint64)0xff) | newDefaultType;
 	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE, defaultType | IA32_MTRR_ENABLE);
 }
 

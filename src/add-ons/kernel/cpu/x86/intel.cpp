@@ -38,9 +38,9 @@ intel_init(void)
 
 
 static void
-intel_set_mtrrs(const x86_mtrr_info* infos, uint32 count)
+intel_set_mtrrs(uint8 defaultType, const x86_mtrr_info* infos, uint32 count)
 {
-	generic_set_mtrrs(infos, count, generic_count_mtrrs());
+	generic_set_mtrrs(defaultType, infos, count, generic_count_mtrrs());
 }
 
 

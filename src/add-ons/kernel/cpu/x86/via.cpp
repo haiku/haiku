@@ -32,9 +32,9 @@ via_init_mtrrs(void)
 
 
 static void
-via_set_mtrrs(const x86_mtrr_info* infos, uint32 count)
+via_set_mtrrs(uint8 defaultType, const x86_mtrr_info* infos, uint32 count)
 {
-	generic_set_mtrrs(infos, count, via_count_mtrrs());
+	generic_set_mtrrs(defaultType, infos, count, via_count_mtrrs());
 }
 
 

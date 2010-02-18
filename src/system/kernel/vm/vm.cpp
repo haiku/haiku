@@ -1312,11 +1312,14 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 
 	cache->Unlock();
 
-	if (status >= B_OK && (addressSpec & B_MTR_MASK) != 0) {
-		// set requested memory type
-		status = arch_vm_set_memory_type(area, physicalAddress,
-			addressSpec & B_MTR_MASK);
-		if (status < B_OK)
+	if (status == B_OK) {
+		// set requested memory type -- use uncached, if not given
+		uint32 memoryType = addressSpec & B_MTR_MASK;
+		if (memoryType == 0)
+			memoryType = B_MTR_UC;
+
+		status = arch_vm_set_memory_type(area, physicalAddress, memoryType);
+		if (status != B_OK)
 			delete_area(locker.AddressSpace(), area, false);
 	}
 
