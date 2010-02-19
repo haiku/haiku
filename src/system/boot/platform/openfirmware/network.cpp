@@ -15,6 +15,7 @@
 
 #include <boot/platform.h>
 #include <boot/net/Ethernet.h>
+#include <boot/net/IP.h>
 #include <boot/net/NetStack.h>
 #include <platform/openfirmware/openfirmware.h>
 
@@ -74,28 +75,6 @@ hex_dump(const void *_data, int length)
 #define hex_dump(data, length)
 
 #endif	// !TRACE_NETWORK
-
-
-static ip_addr_t
-parse_ip_address(const char *string)
-{
-	ip_addr_t address = 0;
-	int components = 0;
-
-	// TODO: Handles only IPv4 addresses for now.
-	while (components < 4) {
-		address |= strtol(string, NULL, 0) << ((4 - components - 1) * 8);
-
-		const char *dot = strchr(string, '.');
-		if (dot == NULL)
-			break;
-
-		string = dot + 1;
-		components++;
-	}
-
-	return address;
-}
 
 
 // #pragma mark -
@@ -165,7 +144,7 @@ OFEthernetInterface::Init(const char *device, const char *parameters)
 		if (parameters != NULL) {
 			char *comma = strrchr(parameters, ',');
 			if (comma != NULL && comma != strchr(parameters, ',')) {
-				SetIPAddress(parse_ip_address(comma + 1));
+				SetIPAddress(ip_parse_address(comma + 1));
 			}
 		}
 		if (fIPAddress == 0) {
@@ -176,7 +155,7 @@ OFEthernetInterface::Init(const char *device, const char *parameters)
 				defaultClientIP, sizeof(defaultClientIP) - 1);
 			if (bytesRead != OF_FAILED && bytesRead > 1) {
 				defaultClientIP[bytesRead] = '\0';
-				ip_addr_t address = parse_ip_address(defaultClientIP);
+				ip_addr_t address = ip_parse_address(defaultClientIP);
 				SetIPAddress(address);
 			}
 		}

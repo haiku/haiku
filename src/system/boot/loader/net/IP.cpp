@@ -266,3 +266,25 @@ ip_checksum(ChainBuffer *buffer)
 
 	return ~checksum;
 }
+
+
+ip_addr_t
+ip_parse_address(const char *string)
+{
+	ip_addr_t address = 0;
+	int components = 0;
+
+	// TODO: Handles only IPv4 addresses for now.
+	while (components < 4) {
+		address |= strtol(string, NULL, 0) << ((4 - components - 1) * 8);
+
+		const char *dot = strchr(string, '.');
+		if (dot == NULL)
+			break;
+
+		string = dot + 1;
+		components++;
+	}
+
+	return address;
+}

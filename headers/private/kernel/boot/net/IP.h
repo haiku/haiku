@@ -59,6 +59,7 @@ private:
 };
 
 uint16 ip_checksum(ChainBuffer *buffer);
+ip_addr_t ip_parse_address(const char* address);
 
 
 #endif	// _BOOT_IP_H
