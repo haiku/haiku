@@ -21,6 +21,11 @@ SimpleTest lock_node_test :
 	: be
 ;
 
+SimpleTest node_monitor_test :
+	node_monitor_test.cpp
+	: be
+;
+
 SimpleTest page_fault_cache_merge_test : page_fault_cache_merge_test.cpp ;
 
 SimpleTest path_resolution_test : path_resolution_test.cpp ;
