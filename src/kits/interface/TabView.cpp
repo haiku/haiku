@@ -739,9 +739,7 @@ BTabView::Select(int32 index)
 		Invalidate();
 	}
 
-	/*MakeFocus();
 	SetFocusTab(index, true);
-	FocusTab();*/
 }
 
 
