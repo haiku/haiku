@@ -36,8 +36,9 @@ DoCatalogs Appearance :
 	ColorWell.cpp
 	ColorWhichItem.cpp
 	: en.catalog
-	: bg.catkeys de.catkeys eo.catkeys fi.catkeys fr.catkeys
-	ja.catkeys lt.catkeys pt.catkeys ru.catkeys sv.catkeys uk.catkeys
-	pl.catkeys
+	:
+	bg.catkeys de.catkeys eo.catkeys fi.catkeys fr.catkeys hu.catkeys
+	ja.catkeys lt.catkeys pl.catkeys pt.catkeys ru.catkeys sv.catkeys
+	uk.catkeys
 	;
 

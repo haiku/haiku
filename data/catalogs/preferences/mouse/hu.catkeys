@@ -1,0 +1,24 @@
+1	hungarian	x-vnd.Haiku-Mouse	104106491
+Click to activate	SettingsView		Kattintásra aktiválódik
+Mouse type:	SettingsView		Egér típusa:
+Warp	SettingsView		Áthajlás
+2-Button	SettingsView		Kétgombos
+Double-click test area	SettingsView		Duplakattintásos próbaterület
+Revert	MouseWindow		Visszaállít
+...by Andrew Edward McCall	MouseApplication		Írta: Andrew Edward McCall
+Mouse acceleration	SettingsView		Egérgyorsítás
+Click to focus	SettingsView		A fókuszhoz kattintani kell
+3-Button	SettingsView		Háromgombos
+Mouse speed	SettingsView		Egér sebessége
+Focus mode:	SettingsView		Fókuszmód:
+Instant warp	SettingsView		Szünetmentes áthajlás
+Dig Deal	MouseApplication		Dig Deal
+1-Button	SettingsView		Egygombos
+Double-click speed	SettingsView		Duplakattintás sebessége
+Defaults	MouseWindow		Alapértelmezett
+Focus follows mouse	SettingsView		A fókusz az egér helyzetétől függ
+Accept first click	SettingsView		Első kattintás elfogadása
+Fast	SettingsView		Gyors
+Normal	SettingsView		Megszokott
+Mouse	MouseWindow		Egér
+Slow	SettingsView		Lassú

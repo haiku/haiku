@@ -19,6 +19,7 @@ DoCatalogs Mouse :
 	MouseWindow.cpp
 	SettingsView.cpp
 	: en.catalog
-	: bg.catkeys eo.catkeys fr.catkeys lt.catkeys pt.catkeys sv.catkeys
-	pl.catkeys uk.catkeys
+	:
+	bg.catkeys eo.catkeys fr.catkeys hu.catkeys lt.catkeys pl.catkeys
+	pt.catkeys sv.catkeys uk.catkeys
 	;

@@ -16,5 +16,6 @@ DoCatalogs Touchpad :
 	TouchpadPrefView.cpp
 	main.cpp
 	: en.catalog
-	: fr.catkeys lt.catkeys pt.catkeys pl.catkeys uk.catkeys
+	:
+	fr.catkeys hu.catkeys lt.catkeys pl.catkeys pt.catkeys uk.catkeys
 	;

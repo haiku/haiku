@@ -1,18 +1,18 @@
 1	hungarian	x-vnd.haiku.zip-o-matic	274748138
 1 file added.	file:ZipOMaticWindow.cpp		1 fájl hozzáadva.
-Stop	file:ZipOMaticWindow.cpp		Stop
-Creating archive: %s	file:ZipOMaticWindow.cpp		Archívum létrehozása: %s
+Stop	file:ZipOMaticWindow.cpp		Leállítás
+Creating archive: %s	file:ZipOMaticWindow.cpp		Archívum létrehozása: „%s”
 Continue	file:ZipOMaticWindow.cpp		Folytatás
 Preparing to archive	file:ZipperThread.cpp		Archíválás előkészítése
-Filename: %s	file:ZipOMaticWindow.cpp		Fájlnév: %s
-Let them continue	file:ZipOMatic.cpp		Folytassuk
-Do you want to stop them?	file:ZipOMatic.cpp		Meg szeretné szakítani?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Biztosan meg szeretné szakítani az archívum létrehozását?
+Filename: %s	file:ZipOMaticWindow.cpp		Fájlnév: „%s”
+Let them continue	file:ZipOMatic.cpp		Hadd legyen folytatva
+Do you want to stop them?	file:ZipOMatic.cpp		Le szeretné állítani?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Biztosan le szeretné állítani az archívum létrehozását?
 %ld files added.	file:ZipOMaticWindow.cpp		%ld fájl hozzáadva.
 Stopped	file:ZipOMaticWindow.cpp		Megállítva
 Archive	file:ZipperThread.cpp		Archívum
-Drop files to zip.	file:ZipOMaticWindow.cpp		Dobjon ide fájlokat a bezippeléshez.
-Error creating archive	file:ZipOMaticWindow.cpp		Hiba az archívum létrehozása közben
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Már %ld Zip-O-Matic fut.\n\n
+Drop files to zip.	file:ZipOMaticWindow.cpp		Dobjon ide fájlokat a becsomagoláshoz.
+Error creating archive	file:ZipOMaticWindow.cpp		Hiba az archívum létrehozása közben.
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Már fut %ld tömörítő!\n\n
 Archive created OK	file:ZipOMaticWindow.cpp		Az archívum elkészült.
-Stop them	file:ZipOMatic.cpp		Megszakít
+Stop them	file:ZipOMatic.cpp		Legyen megállítva
