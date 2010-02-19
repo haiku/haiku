@@ -15,7 +15,6 @@ local librootObjects =
 	posix_crypt.o
 	posix_locale.o
 	posix_main.o
-	posix_fenv.o
 	posix_pthread.o
 	posix_signal.o
 	posix_stdio.o
