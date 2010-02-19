@@ -288,6 +288,9 @@ SudokuWindow::SudokuWindow()
 
 	fProgressWindow = new ProgressWindow(this,
 		new BMessage(kMsgAbortSudokuGenerator));
+
+	if (fSudokuView->Field()->IsEmpty())
+		PostMessage(kMsgGenerateSudoku);
 }
 
 

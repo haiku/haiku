@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -224,11 +224,25 @@ SudokuField::Dump()
 
 
 bool
-SudokuField::IsSolved()
+SudokuField::IsSolved() const
 {
 	for (uint32 y = 0; y < fSize; y++) {
 		for (uint32 x = 0; x < fSize; x++) {
 			if (!_ValidValueAt(x, y))
+				return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool
+SudokuField::IsEmpty() const
+{
+	for (uint32 y = 0; y < fSize; y++) {
+		for (uint32 x = 0; x < fSize; x++) {
+			if (ValueAt(x, y) != 0)
 				return false;
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SUDOKU_FIELD_H
@@ -13,6 +13,7 @@
 enum {
 	kInitialValue	= 0x01,
 };
+
 
 class SudokuField : public BArchivable {
 public:
@@ -30,7 +31,8 @@ public:
 	void SetTo(const SudokuField* other);
 	void Reset();
 
-	bool IsSolved();
+	bool IsSolved() const;
+	bool IsEmpty() const;
 
 	uint32 Size() const { return fSize; }
 	uint32 BlockSize() const { return fBlockSize; }
@@ -70,5 +72,6 @@ private:
 	uint32	fMaxMask;
 	field*	fFields;
 };
+
 
 #endif	// SUDOKU_FIELD_H
