@@ -5,7 +5,9 @@
 #ifndef _DOSFS_UTIL_H_
 #define _DOSFS_UTIL_H_
 
+
 #include <ByteOrder.h>
+
 
 // debugging functions
 #ifndef ASSERT
@@ -25,6 +27,7 @@ time_t	dos2time_t(uint32 t);
 uint32	time_t2dos(time_t s);
 
 uint8	hash_msdos_name(const char *name);
+void	sanitize_name(char *name, int length);
 
 #if 0
 #define read32(buffer,off) \
@@ -41,4 +44,4 @@ uint8	hash_msdos_name(const char *name);
 #define read16(buffer,off) \
 	B_LENDIAN_TO_HOST_INT16(*(uint16 *)&buffer[off])
 
-#endif
+#endif	/* _DOSFS_UTIL_H_ */

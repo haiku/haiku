@@ -2,6 +2,8 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
+
+
 #include <SupportDefs.h>
 #include <KernelExport.h>
 
@@ -163,4 +165,21 @@ hash_msdos_name(const char *name)
 	for (i=0;i<11;i++)
 		c = (c << 7) + (c >> 1) + *(p++);
 	return c;
+}
+
+
+void
+sanitize_name(char *name, int length)
+{
+	int i;
+
+	for (i = length - 1; i > 0; i--) {
+		if (name[i] != ' ')
+			break;
+	}
+	name[i + 1] = 0;
+	for (; i >= 0; i--) {
+		if (name[i] >= 'A' && name[i] <= 'Z')
+			name[i] += 'a' - 'A';
+	}
 }

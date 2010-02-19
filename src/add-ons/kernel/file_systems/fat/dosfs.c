@@ -187,7 +187,7 @@ volume_init(int fd, uint8* buf,
 	uint8 media_buf[512];
 	int i;
 	status_t err;
-			
+
 	if ((vol = (nspace *)calloc(sizeof(nspace), 1)) == NULL) {
 		dprintf("dosfs error: out of memory\n");
 		return NULL;
@@ -303,7 +303,7 @@ volume_init(int fd, uint8* buf,
 				0x00, 0x02, 0x04, 0x01, 0x00, 0x02, 0x00, 0x02, 0x00, 0x00,
 				0xf8, 0xc0, 0x00, 0x20, 0x00, 0x40, 0x00, 0x20, 0x00, 0x00
 			};
-	
+
 			if (memcmp(buf + 0x0b, bogus_zip_data, sizeof(bogus_zip_data)) == 0
 				&& vol->total_sectors == 196576
 				&& ((off_t)geo->sectors_per_track * (off_t)geo->cylinder_count
@@ -497,7 +497,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	int vol_flags;
 
 	vol_flags = B_FS_IS_PERSISTENT | B_FS_HAS_MIME;
- 
+
 	// open read-only for now
 	if ((err = (fd = open(path, O_RDONLY | O_NOCACHE))) < 0) {
 		dprintf("dosfs error: unable to open %s (%s)\n", path, strerror(err));
@@ -575,7 +575,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 		dprintf("dosfs error: error reading boot sector\n");
 		goto error1;
 	}
-	
+
 	vol = volume_init(fd, buf, vol_flags, fs_flags, &geo);
 
 	/* check that the partition is large enough to contain the file system */
@@ -765,6 +765,7 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 	cookie->bytes_per_sector = bytes_per_sector;
 	cookie->total_sectors = total_sectors;
+	sanitize_name(name, 12);
 	strlcpy(cookie->name, name, 12);
 	*_cookie = cookie;
 
@@ -994,7 +995,6 @@ static status_t
 dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 {
 	nspace* vol = (nspace*)_vol->private_volume;
-	int i;
 
 	LOCK_VOL(vol);
 
@@ -1021,19 +1021,11 @@ dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 	strncpy(fss->device_name, vol->device, sizeof(fss->device_name));
 
 	if (vol->vol_entry > -2)
-		strncpy(fss->volume_name, vol->vol_label, sizeof(fss->volume_name));
+		strlcpy(fss->volume_name, vol->vol_label, sizeof(fss->volume_name));
 	else
 		strcpy(fss->volume_name, "no name");
 
-	// XXX: should sanitize name as well
-	for (i=10;i>0;i--)
-		if (fss->volume_name[i] != ' ')
-			break;
-	fss->volume_name[i+1] = 0;
-	for (;i>=0;i--) {
-		if ((fss->volume_name[i] >= 'A') && (fss->volume_name[i] <= 'Z'))
-			fss->volume_name[i] += 'a' - 'A';
-	}
+	sanitize_name(fss->volume_name, 12);
 
 	// File system name
 	strcpy(fss->fsh_name, "fat");
