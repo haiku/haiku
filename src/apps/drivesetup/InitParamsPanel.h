@@ -36,6 +36,7 @@ private:
 			EscapeFilter*		fEscapeFilter;
 			sem_id				fExitSemaphore;
 			BWindow*			fWindow;
+			BButton*			fOkButton;
 			int32				fReturnValue;
 
 			BPartitionParameterEditor*	fEditor;

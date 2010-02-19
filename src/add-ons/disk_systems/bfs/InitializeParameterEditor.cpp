@@ -24,6 +24,7 @@
 
 
 static uint32 MSG_BLOCK_SIZE = 'blsz';
+static uint32 MSG_NAME_CHANGED = 'nmch';
 
 
 InitializeBFSEditor::InitializeBFSEditor()
@@ -95,6 +96,7 @@ void
 InitializeBFSEditor::_CreateViewControls()
 {
 	fNameTC = new BTextControl("Name:", "Haiku", NULL);
+	fNameTC->SetModificationMessage(new BMessage(MSG_NAME_CHANGED));
 	// TODO find out what is the max length for this specific FS partition name
 	fNameTC->TextView()->SetMaxBytes(31);
 

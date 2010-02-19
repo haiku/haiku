@@ -4,8 +4,9 @@
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
-*		Karsten Heimrich. <host.haiku@gmx.de>
+ *		Karsten Heimrich. <host.haiku@gmx.de>
  */
+
 
 #include "InitParamsPanel.h"
 
@@ -20,6 +21,7 @@
 #include <Message.h>
 #include <MessageFilter.h>
 #include <String.h>
+#include <TextControl.h>
 
 
 #define TR_CONTEXT "InitParamsPanel"
@@ -67,10 +69,13 @@ private:
 // #pragma mark -
 
 
+// TODO: MSG_NAME_CHANGED is shared with the disk system add-ons, so it should
+// be in some private shared header.
+// TODO: there is already B_CANCEL, why not use that one?
 enum {
 	MSG_OK						= 'okok',
 	MSG_CANCEL					= 'cncl',
-	MSG_BLOCK_SIZE				= 'blsz'
+	MSG_NAME_CHANGED			= 'nmch'
 };
 
 
@@ -87,7 +92,7 @@ InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
 {
 	AddCommonFilter(fEscapeFilter);
 
-	BButton* okButton = new BButton(TR("Initialize"), new BMessage(MSG_OK));
+	fOkButton = new BButton(TR("Initialize"), new BMessage(MSG_OK));
 
 	partition->GetInitializationParameterEditor(diskSystem.String(),
 		&fEditor);
@@ -99,12 +104,12 @@ InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
 		.AddGroup(B_HORIZONTAL, spacing)
 			.AddGlue()
 			.Add(new BButton(TR("Cancel"), new BMessage(MSG_CANCEL)))
-			.Add(okButton)
+			.Add(fOkButton)
 		.End()
 		.SetInsets(spacing, spacing, spacing, spacing)
 	);
 
-	SetDefaultButton(okButton);
+	SetDefaultButton(fOkButton);
 
 	// If the partition had a previous name, set to that name.
 	BString name = partition->ContentName();
@@ -143,6 +148,19 @@ InitParamsPanel::MessageReceived(BMessage* message)
 		case MSG_OK:
 			fReturnValue = GO_SUCCESS;
 			release_sem(fExitSemaphore);
+			break;
+
+		case MSG_NAME_CHANGED:
+			// message comes from fEditor's BTextControl
+			BTextControl* control;
+			if (message->FindPointer("source", (void**)&control) != B_OK)
+				break;
+			if (control->TextView()->TextLength() == 0
+				&& fOkButton->IsEnabled())
+				fOkButton->SetEnabled(false);
+			else if (control->TextView()->TextLength() > 0
+				&& !fOkButton->IsEnabled())
+				fOkButton->SetEnabled(true);
 			break;
 
 		default:
