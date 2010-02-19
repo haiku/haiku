@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ENTRY_H
@@ -59,21 +59,21 @@ public:
 			status_t			SetTo(const char* path, bool traverse = false);
 			void				Unset();
 
-			status_t GetRef(entry_ref *ref) const;
-			status_t GetPath(BPath *path) const;
-			status_t GetParent(BEntry *entry) const;
-			status_t GetParent(BDirectory *dir) const;
-			status_t GetName(char *buffer) const;
+			status_t			GetRef(entry_ref* ref) const;
+			status_t			GetPath(BPath* path) const;
+			status_t			GetParent(BEntry* entry) const;
+			status_t			GetParent(BDirectory* dir) const;
+			status_t			GetName(char* buffer) const;
 
-			status_t Rename(const char *path, bool clobber = false);
-			status_t MoveTo(BDirectory *dir, const char *path = NULL,
-					bool clobber = false);
-			status_t Remove();
+			status_t			Rename(const char* path, bool clobber = false);
+			status_t			MoveTo(BDirectory* dir, const char* path = NULL,
+									bool clobber = false);
+			status_t			Remove();
 
-			bool operator==(const BEntry &item) const;
-			bool operator!=(const BEntry &item) const;
+			bool				operator==(const BEntry& item) const;
+			bool				operator!=(const BEntry& item) const;
 
-			BEntry &operator=(const BEntry &item);
+			BEntry&				operator=(const BEntry& item);
 
 private:
 			friend class BDirectory;
