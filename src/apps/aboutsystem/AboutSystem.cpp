@@ -973,7 +973,8 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(TR("\nHungarian\n\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
-		"miqlas\n"
+		"Zoltán Mizsei (miqlas)\n"
+		"Zoltán Szabó (Bird)\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 	fCreditsView->Insert(TR("\nItalian\n\n"));
