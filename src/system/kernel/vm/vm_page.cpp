@@ -60,6 +60,9 @@
 
 //#define TRACK_PAGE_USAGE_STATS	1
 
+#define PAGE_ASSERT(page, condition)	\
+	ASSERT_PRINT((condition), "page: %p", (page))
+
 #define SCRUB_SIZE 16
 	// this many pages will be cleared at once in the page scrubber thread
 
@@ -1058,7 +1061,7 @@ free_page(vm_page* page, bool clear)
 {
 	DEBUG_PAGE_ACCESS_CHECK(page);
 
-	ASSERT(!page->IsMapped());
+	PAGE_ASSERT(page, !page->IsMapped());
 
 	VMPageQueue* fromQueue;
 
@@ -1091,7 +1094,7 @@ free_page(vm_page* page, bool clear)
 
 	if (page->CacheRef() != NULL)
 		panic("to be freed page %p has cache", page);
-	if (!page->mappings.IsEmpty() || page->wired_count > 0)
+	if (page->IsMapped())
 		panic("to be freed page %p has mappings", page);
 
 	if (fromQueue != NULL)
@@ -1171,8 +1174,8 @@ set_page_state(vm_page *page, int pageState)
 			toQueue = &sModifiedPageQueue;
 			break;
 		case PAGE_STATE_CACHED:
-			ASSERT(page->wired_count == 0 && page->mappings.IsEmpty());
-			ASSERT(!page->modified);
+			PAGE_ASSERT(page, !page->IsMapped());
+			PAGE_ASSERT(page, !page->modified);
 			toQueue = &sCachedPageQueue;
 			break;
 		case PAGE_STATE_FREE:
@@ -1204,7 +1207,7 @@ set_page_state(vm_page *page, int pageState)
 		// page states and active pages have a cache that must be locked at
 		// this point. So we rely on the fact that everyone must lock the cache
 		// before trying to change/interpret the page state.
-		ASSERT(cache != NULL);
+		PAGE_ASSERT(page, cache != NULL);
 		cache->AssertLocked();
 		page->SetState(pageState);
 	} else {
@@ -1229,7 +1232,7 @@ move_page_to_appropriate_queue(vm_page *page)
 
 	// Note, this logic must be in sync with what the page daemon does.
 	int32 state;
-	if (!page->mappings.IsEmpty() || page->wired_count > 0)
+	if (page->IsMapped())
 		state = PAGE_STATE_ACTIVE;
 	else if (page->modified)
 		state = PAGE_STATE_MODIFIED;
@@ -1549,7 +1552,7 @@ PageWriteWrapper::Done(status_t result)
 			fPage->modified = true;
 			if (!fCache->temporary)
 				set_page_state(fPage, PAGE_STATE_MODIFIED);
-			else if (fPage->wired_count > 0 || !fPage->mappings.IsEmpty())
+			else if (fPage->IsMapped())
 				set_page_state(fPage, PAGE_STATE_ACTIVE);
 			else
 				set_page_state(fPage, PAGE_STATE_INACTIVE);
@@ -2027,8 +2030,8 @@ free_cached_page(vm_page *page, bool dontWait)
 
 	DEBUG_PAGE_ACCESS_START(page);
 
-	ASSERT(page->wired_count == 0 && page->mappings.IsEmpty());
-	ASSERT(!page->modified);
+	PAGE_ASSERT(page, !page->IsMapped());
+	PAGE_ASSERT(page, !page->modified);
 
 	// we can now steal this page
 
@@ -2235,7 +2238,7 @@ full_scan_inactive_pages(page_stats& pageStats, int32 despairLevel)
 		//   Note that until in the idle scanning we don't exempt pages of
 		//   temporary caches. Apparently we really need memory, so we better
 		//   page out memory as well.
-		bool isMapped = page->wired_count > 0 || !page->mappings.IsEmpty();
+		bool isMapped = page->IsMapped();
 		if (usageCount > 0) {
 			if (isMapped) {
 				set_page_state(page, PAGE_STATE_ACTIVE);
@@ -2655,7 +2658,7 @@ vm_page_write_modified_pages(VMCache *cache)
 void
 vm_page_schedule_write_page(vm_page *page)
 {
-	ASSERT(page->State() == PAGE_STATE_MODIFIED);
+	PAGE_ASSERT(page, page->State() == PAGE_STATE_MODIFIED);
 
 	vm_page_requeue(page, false);
 
@@ -3244,7 +3247,7 @@ vm_page_is_dummy(struct vm_page *page)
 void
 vm_page_free(VMCache *cache, vm_page *page)
 {
-	ASSERT(page->State() != PAGE_STATE_FREE
+	PAGE_ASSERT(page, page->State() != PAGE_STATE_FREE
 		&& page->State() != PAGE_STATE_CLEAR);
 
 	if (page->State() == PAGE_STATE_MODIFIED && cache->temporary)
@@ -3257,7 +3260,7 @@ vm_page_free(VMCache *cache, vm_page *page)
 void
 vm_page_set_state(vm_page *page, int pageState)
 {
-	ASSERT(page->State() != PAGE_STATE_FREE
+	PAGE_ASSERT(page, page->State() != PAGE_STATE_FREE
 		&& page->State() != PAGE_STATE_CLEAR);
 
 	if (pageState == PAGE_STATE_FREE || pageState == PAGE_STATE_CLEAR)
@@ -3274,7 +3277,7 @@ vm_page_set_state(vm_page *page, int pageState)
 void
 vm_page_requeue(struct vm_page *page, bool tail)
 {
-	ASSERT(page->Cache() != NULL);
+	PAGE_ASSERT(page, page->Cache() != NULL);
 	DEBUG_PAGE_ACCESS_CHECK(page);
 
 	VMPageQueue *queue = NULL;
