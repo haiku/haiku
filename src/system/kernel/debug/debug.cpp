@@ -67,8 +67,6 @@ struct debug_strlcpy_parameters {
 
 static const char* const kKDLPrompt = "kdebug> ";
 
-static va_list kDummyVaList;
-
 extern "C" int kgets(char* buffer, int length);
 
 void call_modules_hook(bool enter);
@@ -94,7 +92,9 @@ static struct syslog_message* sSyslogMessage;
 static struct ring_buffer* sSyslogBuffer;
 static bool sSyslogDropped = false;
 
+static const char* sCurrentKernelDebuggerMessagePrefix;
 static const char* sCurrentKernelDebuggerMessage;
+static va_list sCurrentKernelDebuggerMessageArgs;
 
 #define DEFAULT_SYSLOG_BUFFER_SIZE 65536
 #define OUTPUT_BUFFER_SIZE 1024
@@ -694,6 +694,23 @@ kprintf_args(const char* format, va_list args)
 
 
 static void
+print_kernel_debugger_message()
+{
+	if (sCurrentKernelDebuggerMessagePrefix != NULL
+			|| sCurrentKernelDebuggerMessage != NULL) {
+		if (sCurrentKernelDebuggerMessagePrefix != NULL)
+			kprintf("%s", sCurrentKernelDebuggerMessagePrefix);
+		if (sCurrentKernelDebuggerMessage != NULL) {
+			kprintf_args(sCurrentKernelDebuggerMessage,
+				sCurrentKernelDebuggerMessageArgs);
+		}
+
+		kprintf("\n");
+	}
+}
+
+
+static void
 kernel_debugger_loop(const char* messagePrefix, const char* message,
 	va_list args, int32 cpu)
 {
@@ -702,16 +719,11 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 
 	DebugAllocPool* allocPool = create_debug_alloc_pool();
 
+	sCurrentKernelDebuggerMessagePrefix = messagePrefix;
 	sCurrentKernelDebuggerMessage = message;
+	sCurrentKernelDebuggerMessageArgs = args;
 
-	if (messagePrefix != NULL || message != NULL) {
-		if (messagePrefix != NULL)
-			kprintf("%s", messagePrefix);
-		if (message)
-			kprintf_args(message, args);
-
-		kprintf("\n");
-	}
+	print_kernel_debugger_message();
 
 	kprintf("Welcome to Kernel Debugging Land...\n");
 
@@ -916,11 +928,7 @@ kernel_debugger_internal(const char* messagePrefix, const char* message,
 static int
 cmd_dump_kdl_message(int argc, char** argv)
 {
-	if (sCurrentKernelDebuggerMessage) {
-		kputs(sCurrentKernelDebuggerMessage);
-		kputs("\n");
-	}
-
+	print_kernel_debugger_message();
 	return 0;
 }
 
@@ -1534,7 +1542,8 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 			if (returnIfHandedOver)
 				break;
 
-			kernel_debugger_internal(NULL, NULL, kDummyVaList, cpu);
+			kernel_debugger_internal(NULL, NULL,
+				sCurrentKernelDebuggerMessageArgs, cpu);
 		} else
 			smp_intercpu_int_handler(cpu);
 	}
@@ -1546,7 +1555,8 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 void
 debug_double_fault(int32 cpu)
 {
-	kernel_debugger_internal("Double Fault!", NULL, kDummyVaList, cpu);
+	kernel_debugger_internal("Double Fault!", NULL,
+		sCurrentKernelDebuggerMessageArgs, cpu);
 }
 
 
@@ -1726,7 +1736,7 @@ kernel_debugger(const char* message)
 {
 	cpu_status state = disable_interrupts();
 
-	kernel_debugger_internal(message, NULL, kDummyVaList,
+	kernel_debugger_internal(message, NULL, sCurrentKernelDebuggerMessageArgs,
 		smp_get_current_cpu());
 
 	restore_interrupts(state);
