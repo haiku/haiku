@@ -1,9 +1,10 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
-#include "CallgrindThreadProfileResult.h"
+
+#include "CallgrindProfileResult.h"
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -12,21 +13,22 @@
 #include <new>
 
 #include "Options.h"
+#include "ProfiledEntity.h"
 
 
-// #pragma mark - CallgrindThreadImage
+// #pragma mark - CallgrindProfileResultImage
 
 
-CallgrindThreadImage::CallgrindThreadImage(Image* image)
+CallgrindProfileResultImage::CallgrindProfileResultImage(Image* image)
 	:
-	ThreadImage(image),
+	ProfileResultImage(image),
 	fFunctions(NULL),
 	fOutputIndex(0)
 {
 }
 
 
-CallgrindThreadImage::~CallgrindThreadImage()
+CallgrindProfileResultImage::~CallgrindProfileResultImage()
 {
 	int32 symbolCount = fImage->SymbolCount();
 	for (int32 i = 0; i < symbolCount; i++) {
@@ -42,7 +44,7 @@ CallgrindThreadImage::~CallgrindThreadImage()
 
 
 status_t
-CallgrindThreadImage::Init()
+CallgrindProfileResultImage::Init()
 {
 	int32 symbolCount = fImage->SymbolCount();
 	fFunctions = new(std::nothrow) CallgrindFunction[symbolCount];
@@ -56,8 +58,8 @@ CallgrindThreadImage::Init()
 
 
 void
-CallgrindThreadImage::AddSymbolHit(int32 symbolIndex,
-	CallgrindThreadImage* calledImage, int32 calledSymbol)
+CallgrindProfileResultImage::AddSymbolHit(int32 symbolIndex,
+	CallgrindProfileResultImage* calledImage, int32 calledSymbol)
 
 {
 	fTotalHits++;
@@ -92,30 +94,30 @@ CallgrindThreadImage::AddSymbolHit(int32 symbolIndex,
 
 
 CallgrindFunction*
-CallgrindThreadImage::Functions() const
+CallgrindProfileResultImage::Functions() const
 {
 	return fFunctions;
 }
 
 
 int32
-CallgrindThreadImage::OutputIndex() const
+CallgrindProfileResultImage::OutputIndex() const
 {
 	return fOutputIndex;
 }
 
 
 void
-CallgrindThreadImage::SetOutputIndex(int32 index)
+CallgrindProfileResultImage::SetOutputIndex(int32 index)
 {
 	fOutputIndex = index;
 }
 
 
-// #pragma mark - CallgrindThreadProfileResult
+// #pragma mark - CallgrindProfileResult
 
 
-CallgrindThreadProfileResult::CallgrindThreadProfileResult()
+CallgrindProfileResult::CallgrindProfileResult()
 	:
 	fTotalTicks(0),
 	fUnkownTicks(0),
@@ -127,16 +129,16 @@ CallgrindThreadProfileResult::CallgrindThreadProfileResult()
 
 
 void
-CallgrindThreadProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
+CallgrindProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
 {
 	int32 unknownSamples = 0;
-	CallgrindThreadImage* previousImage = NULL;
+	CallgrindProfileResultImage* previousImage = NULL;
 	int32 previousSymbol = -1;
 
 	// TODO: That probably doesn't work with recursive functions.
 	for (int32 i = 0; i < sampleCount; i++) {
 		addr_t address = samples[i];
-		CallgrindThreadImage* image = FindImage(address);
+		CallgrindProfileResultImage* image = FindImage(address);
 		int32 symbol = -1;
 		if (image != NULL) {
 			symbol = image->GetImage()->FindSymbol(address);
@@ -157,31 +159,31 @@ CallgrindThreadProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
 
 
 void
-CallgrindThreadProfileResult::AddDroppedTicks(int32 dropped)
+CallgrindProfileResult::AddDroppedTicks(int32 dropped)
 {
 	fDroppedTicks += dropped;
 }
 
 
 void
-CallgrindThreadProfileResult::PrintResults()
+CallgrindProfileResult::PrintResults()
 {
 	// create output file
 
 	// create output dir
 	mkdir(gOptions.callgrind_directory, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
-	// get the thread name and replace slashes by hyphens
-	char threadName[B_OS_NAME_LENGTH];
-	strlcpy(threadName, fThread->Name(), sizeof(threadName));
-	char* slash = threadName;
+	// get the entity name and replace slashes by hyphens
+	char entityName[B_OS_NAME_LENGTH];
+	strlcpy(entityName, fEntity->EntityName(), sizeof(entityName));
+	char* slash = entityName;
 	while ((slash = strchr(slash, '/')) != NULL)
 		*slash = '-';
 
 	// create the file name
 	char fileName[B_PATH_NAME_LENGTH];
 	snprintf(fileName, sizeof(fileName), "%s/callgrind.out.%ld.%s.%lldms",
-		gOptions.callgrind_directory, fThread->ID(), threadName,
+		gOptions.callgrind_directory, fEntity->EntityID(), entityName,
 		fTotalTicks * fInterval);
 
 	// create the file
@@ -195,8 +197,8 @@ CallgrindThreadProfileResult::PrintResults()
 	// write the header
 	fprintf(out, "version: 1\n");
 	fprintf(out, "creator: Haiku profile\n");
-	fprintf(out, "pid: %ld\n", fThread->ID());
-	fprintf(out, "cmd: %s\n", fThread->Name());
+	fprintf(out, "pid: %ld\n", fEntity->EntityID());
+	fprintf(out, "cmd: %s\n", fEntity->EntityName());
 	fprintf(out, "part: 1\n\n");
 
 	fprintf(out, "positions: line\n");
@@ -204,11 +206,11 @@ CallgrindThreadProfileResult::PrintResults()
 	fprintf(out, "summary: %lld %lld\n", fTotalTicks, fTotalTicks * fInterval);
 
 	// get hit images
-	CallgrindThreadImage* images[fOldImages.Count() + fImages.Count()];
+	CallgrindProfileResultImage* images[fOldImages.Count() + fImages.Count()];
 	int32 imageCount = GetHitImages(images);
 
 	for (int32 i = 0; i < imageCount; i++) {
-		CallgrindThreadImage* image = images[i];
+		CallgrindProfileResultImage* image = images[i];
 
 		CallgrindFunction* functions = image->Functions();
 		int32 imageSymbolCount = image->GetImage()->SymbolCount();
@@ -255,16 +257,16 @@ CallgrindThreadProfileResult::PrintResults()
 }
 
 
-CallgrindThreadImage*
-CallgrindThreadProfileResult::CreateThreadImage(Image* image)
+CallgrindProfileResultImage*
+CallgrindProfileResult::CreateProfileResultImage(Image* image)
 {
-	return new(std::nothrow) CallgrindThreadImage(image);
+	return new(std::nothrow) CallgrindProfileResultImage(image);
 }
 
 
 void
-CallgrindThreadProfileResult::_PrintFunction(FILE* out,
-	CallgrindThreadImage* image, int32 functionIndex, bool called)
+CallgrindProfileResult::_PrintFunction(FILE* out,
+	CallgrindProfileResultImage* image, int32 functionIndex, bool called)
 {
 	if (image->OutputIndex() == 0) {
 		// need to print the image name

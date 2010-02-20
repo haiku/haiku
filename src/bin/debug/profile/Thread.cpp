@@ -1,7 +1,8 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "Thread.h"
 
@@ -15,33 +16,6 @@
 #include "Options.h"
 #include "Team.h"
 
-
-// #pragma mark - ThreadImage
-
-
-ThreadImage::ThreadImage(Image* image)
-	:
-	fImage(image),
-	fTotalHits(0)
-{
-	fImage->AddReference();
-}
-
-
-ThreadImage::~ThreadImage()
-{
-	fImage->RemoveReference();
-}
-
-
-status_t
-ThreadImage::Init()
-{
-	return B_OK;
-}
-
-
-// #pragma mark - Thread
 
 
 Thread::Thread(thread_id threadID, const char* name, Team* team)
@@ -65,8 +39,29 @@ Thread::~Thread()
 }
 
 
+int32
+Thread::EntityID() const
+{
+	return ID();
+}
+
+
+const char*
+Thread::EntityName() const
+{
+	return Name();
+}
+
+
+const char*
+Thread::EntityType() const
+{
+	return "thread";
+}
+
+
 void
-Thread::SetProfileResult(ThreadProfileResult* result)
+Thread::SetProfileResult(ProfileResult* result)
 {
 	delete fProfileResult;
 	fProfileResult = result;
@@ -149,35 +144,4 @@ void
 Thread::PrintResults() const
 {
 	fProfileResult->PrintResults();
-}
-
-
-// #pragma mark - ThreadProfileResult
-
-
-ThreadProfileResult::ThreadProfileResult()
-	:
-	fThread(NULL),
-	fInterval(1)
-{
-}
-
-
-ThreadProfileResult::~ThreadProfileResult()
-{
-}
-
-
-status_t
-ThreadProfileResult::Init(Thread* thread)
-{
-	fThread = thread;
-	return B_OK;
-}
-
-
-void
-ThreadProfileResult::SetInterval(bigtime_t interval)
-{
-	fInterval = interval;
 }

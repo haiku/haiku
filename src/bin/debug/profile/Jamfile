@@ -10,9 +10,11 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 BinCommand profile
 	:
-	BasicThreadProfileResult.cpp
-	CallgrindThreadProfileResult.cpp
+	BasicProfileResult.cpp
+	CallgrindProfileResult.cpp
 	Image.cpp
+	ProfiledEntity.cpp
+	ProfileResult.cpp
 	SharedImage.cpp
 	Team.cpp
 	Thread.cpp

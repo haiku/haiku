@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -30,8 +30,8 @@
 
 #include <util/DoublyLinkedList.h>
 
-#include "BasicThreadProfileResult.h"
-#include "CallgrindThreadProfileResult.h"
+#include "BasicProfileResult.h"
+#include "CallgrindProfileResult.h"
 #include "debug_utils.h"
 #include "Image.h"
 #include "Options.h"
@@ -145,7 +145,7 @@ public:
 		if (thread == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = _CreateThreadProfileResult(thread);
+		status_t error = _CreateProfileResult(thread);
 		if (error != B_OK) {
 			delete thread;
 			return error;
@@ -333,15 +333,15 @@ private:
 		return B_OK;
 	}
 
-	status_t _CreateThreadProfileResult(Thread* thread)
+	status_t _CreateProfileResult(Thread* thread)
 	{
-		ThreadProfileResult* profileResult;
+		ProfileResult* profileResult;
 		if (gOptions.callgrind_directory != NULL)
-			profileResult = new(std::nothrow) CallgrindThreadProfileResult;
+			profileResult = new(std::nothrow) CallgrindProfileResult;
 		else if (gOptions.analyze_full_stack)
-			profileResult = new(std::nothrow) InclusiveThreadProfileResult;
+			profileResult = new(std::nothrow) InclusiveProfileResult;
 		else
-			profileResult = new(std::nothrow) ExclusiveThreadProfileResult;
+			profileResult = new(std::nothrow) ExclusiveProfileResult;
 
 		if (profileResult == NULL)
 			return B_NO_MEMORY;

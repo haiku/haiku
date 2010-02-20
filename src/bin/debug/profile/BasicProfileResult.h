@@ -1,18 +1,19 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef BASIC_THREAD_PROFILE_RESULT_H
-#define BASIC_THREAD_PROFILE_RESULT_H
-
-#include "Thread.h"
+#ifndef BASIC_PROFILE_RESULT_H
+#define BASIC_PROFILE_RESULT_H
 
 
-class BasicThreadImage : public ThreadImage,
-	public DoublyLinkedListLinkImpl<BasicThreadImage> {
+#include "ProfileResult.h"
+
+
+class BasicProfileResultImage : public ProfileResultImage,
+	public DoublyLinkedListLinkImpl<BasicProfileResultImage> {
 public:
-								BasicThreadImage(Image* image);
-	virtual						~BasicThreadImage();
+								BasicProfileResultImage(Image* image);
+	virtual						~BasicProfileResultImage();
 
 	virtual	status_t			Init();
 
@@ -30,15 +31,15 @@ private:
 };
 
 
-class BasicThreadProfileResult
-	: public AbstractThreadProfileResult<BasicThreadImage> {
+class BasicProfileResult
+	: public AbstractProfileResult<BasicProfileResultImage> {
 public:
-								BasicThreadProfileResult();
+								BasicProfileResult();
 
 	virtual	void				AddDroppedTicks(int32 dropped);
 	virtual	void				PrintResults();
 
-	virtual BasicThreadImage*	CreateThreadImage(Image* image);
+	virtual BasicProfileResultImage* CreateProfileResultImage(Image* image);
 
 protected:
 			int64				fTotalTicks;
@@ -48,18 +49,18 @@ protected:
 };
 
 
-class InclusiveThreadProfileResult : public BasicThreadProfileResult {
+class InclusiveProfileResult : public BasicProfileResult {
 public:
 	virtual	void				AddSamples(addr_t* samples,
 									int32 sampleCount);
 };
 
 
-class ExclusiveThreadProfileResult : public BasicThreadProfileResult {
+class ExclusiveProfileResult : public BasicProfileResult {
 public:
 	virtual	void				AddSamples(addr_t* samples,
 									int32 sampleCount);
 };
 
 
-#endif	// BASIC_THREAD_PROFILE_RESULT_H
+#endif	// BASIC_PROFILE_RESULT_H

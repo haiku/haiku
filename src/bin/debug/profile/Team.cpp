@@ -104,7 +104,7 @@ status_t
 Team::InitThread(Thread* thread)
 {
 	// The thread
-	thread->ProfileResult()->SetLazyImages(!_SynchronousProfiling());
+	thread->GetProfileResult()->SetLazyImages(!_SynchronousProfiling());
 
 	// create the sample area
 	char areaName[B_OS_NAME_LENGTH];
@@ -267,7 +267,7 @@ Team::_RemoveImage(int32 index, int32 event)
 	if (_SynchronousProfiling()) {
 		ThreadList::Iterator it = fThreads.GetIterator();
 		while (Thread* thread = it.Next())
-			thread->ProfileResult()->RemoveImage(image);
+			thread->GetProfileResult()->RemoveImage(image);
 	} else {
 		// Note: We don't tell the threads that the image has been removed. They
 		// will be updated lazily when their next profiler update arrives. This

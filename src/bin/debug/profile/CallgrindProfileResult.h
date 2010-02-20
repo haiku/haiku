@@ -1,25 +1,26 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef CALLGRIND_THREAD_PROFILE_RESULT_H
-#define CALLGRIND_THREAD_PROFILE_RESULT_H
+#ifndef CALLGRIND_PROFILE_RESULT_H
+#define CALLGRIND_PROFILE_RESULT_H
+
 
 #include <stdio.h>
 
-#include "Thread.h"
+#include "ProfileResult.h"
 
 
-class CallgrindThreadImage;
+class CallgrindProfileResultImage;
 
 
 struct CallgrindCalledFunction {
-	CallgrindCalledFunction*	next;
-	CallgrindThreadImage*		image;
-	int32						function;
-	int64						hits;
+	CallgrindCalledFunction*		next;
+	CallgrindProfileResultImage*	image;
+	int32							function;
+	int64							hits;
 
-	CallgrindCalledFunction(CallgrindThreadImage* image, int32 function)
+	CallgrindCalledFunction(CallgrindProfileResultImage* image, int32 function)
 		:
 		next(NULL),
 		image(image),
@@ -38,16 +39,16 @@ struct CallgrindFunction {
 };
 
 
-class CallgrindThreadImage : public ThreadImage,
-	public DoublyLinkedListLinkImpl<CallgrindThreadImage> {
+class CallgrindProfileResultImage : public ProfileResultImage,
+	public DoublyLinkedListLinkImpl<CallgrindProfileResultImage> {
 public:
-								CallgrindThreadImage(Image* image);
-	virtual						~CallgrindThreadImage();
+								CallgrindProfileResultImage(Image* image);
+	virtual						~CallgrindProfileResultImage();
 
 	virtual	status_t			Init();
 
 	inline	void				AddSymbolHit(int32 symbolIndex,
-									CallgrindThreadImage* calledImage,
+									CallgrindProfileResultImage* calledImage,
 									int32 calledSymbol);
 
 	inline	CallgrindFunction*	Functions() const;
@@ -61,21 +62,21 @@ private:
 };
 
 
-class CallgrindThreadProfileResult
-	: public AbstractThreadProfileResult<CallgrindThreadImage> {
+class CallgrindProfileResult
+	: public AbstractProfileResult<CallgrindProfileResultImage> {
 public:
-								CallgrindThreadProfileResult();
+								CallgrindProfileResult();
 
 	virtual	void				AddSamples(addr_t* samples,
 									int32 sampleCount);
 	virtual	void				AddDroppedTicks(int32 dropped);
 	virtual	void				PrintResults();
 
-	virtual CallgrindThreadImage* CreateThreadImage(Image* image);
+	virtual CallgrindProfileResultImage* CreateProfileResultImage(Image* image);
 
 private:
 			void				_PrintFunction(FILE* out,
-									CallgrindThreadImage* image,
+									CallgrindProfileResultImage* image,
 									int32 functionIndex, bool called);
 private:
 			int64				fTotalTicks;
@@ -86,4 +87,4 @@ private:
 };
 
 
-#endif	// CALLGRIND_THREAD_PROFILE_RESULT_H
+#endif	// CALLGRIND_PROFILE_RESULT_H
