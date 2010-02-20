@@ -1,0 +1,17 @@
+1	russian	x-vnd.Haiku-Network	2897060402
+Gateway:	EthernetSettingsView		Шлюз:
+Netmask:	EthernetSettingsView		Маска:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Применить
+OK	EthernetSettingsView		Ok
+DNS #1:	EthernetSettingsView		DNS #1:
+IP address:	EthernetSettingsView		IP адрес:
+Network	NetworkWindow		Сеть
+Adapter:	EthernetSettingsView		Адаптер:
+Revert	EthernetSettingsView		Вернуть
+Sending auto-config message failed: 	EthernetSettingsView		Не удалось отправить запрос автонастройки:
+Mode:	EthernetSettingsView		Режим:
+The net_server needs to run for the auto configuration!	EthernetSettingsView		net_server должен быть запущен для автонастройки!
+Auto-configuring failed: 	EthernetSettingsView		Не удалось выполнить автонастройку:
+Static	EthernetSettingsView		Статический

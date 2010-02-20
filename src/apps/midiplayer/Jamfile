@@ -19,5 +19,6 @@ DoCatalogs MidiPlayer :
 	ScopeView.cpp
 	: en.catalog
 	:
-	eo.catkeys fr.catkeys hu.catkeys nl.catkeys pl.catkeys uk.catkeys
+	eo.catkeys fr.catkeys hu.catkeys nl.catkeys pl.catkeys ru.catkeys
+	uk.catkeys
 	;

@@ -27,5 +27,5 @@ DoCatalogs Keyboard :
 	: en.catalog
 	:
 	bg.catkeys eo.catkeys fr.catkeys hu.catkeys ja.catkeys lt.catkeys
-	pl.catkeys pt.catkeys sv.catkeys uk.catkeys
+	pl.catkeys pt.catkeys ru.catkeys sv.catkeys uk.catkeys
 	;

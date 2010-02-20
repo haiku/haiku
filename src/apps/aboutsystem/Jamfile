@@ -30,9 +30,5 @@ DoCatalogs AboutSystem :
 	Utilities.cpp
 	: en.catalog
 	:
-	hu.catkeys pl.catkeys uk.catkeys
+	hu.catkeys pl.catkeys ru.catkeys uk.catkeys
 	;
-
-Includes [ FGristFiles AboutSystem.rdef ] : [ FGristFiles "HAIKU logo - black on white - tiny.png" ] ;
-SEARCH on [ FGristFiles "HAIKU logo - black on white - tiny.png" ]
-	= [ FDirName $(HAIKU_TOP) data artwork ] ;

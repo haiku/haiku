@@ -5,13 +5,13 @@ Creating archive: %s	file:ZipOMaticWindow.cpp		Создание архива: %s
 Continue	file:ZipOMaticWindow.cpp		Продолжить
 Preparing to archive	file:ZipperThread.cpp		Подготовка к архивированию
 Filename: %s	file:ZipOMaticWindow.cpp		Имя файла: %s
-Let them continue	file:ZipOMatic.cpp		Позволить им продолжаить
+Let them continue	file:ZipOMatic.cpp		Позволить им продолжить
 Do you want to stop them?	file:ZipOMatic.cpp		Вы хотите остановить их?
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Вы уверены, что хотите остановить создание этого архива?
-%ld files added.	file:ZipOMaticWindow.cpp		Добавлено %ld файлов.
+%ld files added.	file:ZipOMaticWindow.cpp		Добавлено файлов :%ld
 Stopped	file:ZipOMaticWindow.cpp		Остановлено
 Archive	file:ZipperThread.cpp		Архив
-Drop files to zip.	file:ZipOMaticWindow.cpp		Киньте файлы для сжатия в zip.
+Drop files to zip.	file:ZipOMaticWindow.cpp		Перетащите файлы для сжатия в zip
 Error creating archive	file:ZipOMaticWindow.cpp		Ошибка при создании архива
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У Вас запущено %ld Zip-O-Matic.\n\n
 Archive created OK	file:ZipOMaticWindow.cpp		Архив был успешно создан
