@@ -121,6 +121,9 @@ public:
 
 	VMCache* Cache() const
 		{ return cache_ref != NULL ? cache_ref->cache : NULL; }
+
+	bool IsMapped() const
+		{ return wired_count > 0 || !mappings.IsEmpty(); }
 };
 
 
