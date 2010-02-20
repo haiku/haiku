@@ -1105,11 +1105,31 @@ hda_codec_switch_handler(hda_codec* codec)
 		for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 			hda_widget& widget = audioGroup->widgets[i];
 			
-			if (widget.type != WT_PIN_COMPLEX || !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities))
+			if (widget.type != WT_PIN_COMPLEX 
+				|| !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities)
+				|| CONF_DEFAULT_DEVICE(widget.d.pin.config) 
+					!= PIN_DEV_HEAD_PHONE_OUT)
+				continue;
+
+			corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
+				VID_GET_PINSENSE, 0);
+			uint32 response;
+			hda_send_verbs(audioGroup->codec, &verb, &response, 1);
+			disable = response & PIN_SENSE_PRESENCE_DETECT;
+			TRACE("hda: sensed pin widget %ld, %d\n", widget.node_id, disable);
+			break;
+		}
+
+		for (uint32 i = 0; i < audioGroup->widget_count; i++) {
+			hda_widget& widget = audioGroup->widgets[i];
+			
+			if (widget.type != WT_PIN_COMPLEX 
+				|| !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities))
 				continue;
 
 			int device = CONF_DEFAULT_DEVICE(widget.d.pin.config);
-			if (device != PIN_DEV_SPEAKER
+			if (device != PIN_DEV_AUX
+				&& device != PIN_DEV_SPEAKER
 				&& device != PIN_DEV_LINE_OUT)
 				continue;
 			

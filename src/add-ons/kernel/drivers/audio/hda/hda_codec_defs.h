@@ -281,6 +281,9 @@ enum pin_dev_type {
 /* Unsolicited Response */
 #define UNSOLRESP_ENABLE				(1L << 7)
 
+/* Pin sense */
+#define PIN_SENSE_PRESENCE_DETECT		(1L << 31)
+
 /* Supported power states */
 #define POWER_STATE_D0					(1L << 0)
 #define POWER_STATE_D1					(1L << 1)
