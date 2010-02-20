@@ -2013,10 +2013,6 @@ find_cached_page_candidate(struct vm_page &marker)
 static bool
 free_cached_page(vm_page *page, bool dontWait)
 {
-	ASSERT(!page->busy);
-	ASSERT(!page->modified);
-	ASSERT(page->wired_count == 0 && page->mappings.IsEmpty());
-
 	// try to lock the page's cache
 	if (vm_cache_acquire_locked_page_cache(page, dontWait) == NULL)
 		return false;
