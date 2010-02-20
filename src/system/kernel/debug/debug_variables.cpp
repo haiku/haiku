@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de
  * Distributed under the terms of the MIT License.
  */
 
@@ -51,6 +51,7 @@ struct Variable {
 
 struct TemporaryVariable : Variable,
 		DoublyLinkedListLinkImpl<TemporaryVariable> {
+	bool queued;
 };
 
 static Variable sVariables[kVariableCount];
@@ -84,9 +85,9 @@ static void
 dequeue_temporary_variable(TemporaryVariable* variable)
 {
 	// dequeue if queued
-	if (variable->GetDoublyLinkedListLink()->previous != NULL
-		|| sTemporaryVariablesLRUQueue.Head() == variable) {
+	if (variable->queued) {
 		sTemporaryVariablesLRUQueue.Remove(variable);
+		variable->queued = false;
 	}
 }
 
@@ -112,6 +113,7 @@ touch_variable(Variable* _variable)
 	// move to the end of the queue
 	dequeue_temporary_variable(variable);
 	sTemporaryVariablesLRUQueue.Add(variable);
+	variable->queued = true;
 }
 
 
@@ -119,8 +121,10 @@ static Variable*
 free_temporary_variable_slot()
 {
 	TemporaryVariable* variable = sTemporaryVariablesLRUQueue.RemoveHead();
-	if (variable)
+	if (variable) {
+		variable->queued = false;
 		variable->Uninit();
+	}
 
 	return variable;
 }
@@ -260,6 +264,9 @@ is_debug_variable_defined(const char* variableName)
 bool
 set_debug_variable(const char* variableName, uint64 value)
 {
+	if (is_symbol_variable(variableName))
+		return false;
+
 	if (is_arch_specific_variable(variableName))
 		return arch_set_debug_variable(variableName + 1, value) == B_OK;
 
