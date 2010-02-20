@@ -683,8 +683,17 @@ kgets(char* buffer, int length)
 }
 
 
+static inline void
+kprintf_args(const char* format, va_list args)
+{
+	if (sDebugOutputFilter != NULL)
+		sDebugOutputFilter->Print(format, args);
+}
+
+
 static void
-kernel_debugger_loop(const char* message, int32 cpu)
+kernel_debugger_loop(const char* messagePrefix, const char* message,
+	va_list args, int32 cpu)
 {
 	int32 previousCPU = sDebuggerOnCPU;
 	sDebuggerOnCPU = cpu;
@@ -693,8 +702,14 @@ kernel_debugger_loop(const char* message, int32 cpu)
 
 	sCurrentKernelDebuggerMessage = message;
 
-	if (message)
-		kprintf("PANIC: %s\n", message);
+	if (messagePrefix != NULL || message != NULL) {
+		if (messagePrefix != NULL)
+			kprintf("%s", messagePrefix);
+		if (message)
+			kprintf_args(message, args);
+
+		kprintf("\n");
+	}
 
 	kprintf("Welcome to Kernel Debugging Land...\n");
 
@@ -869,7 +884,8 @@ hand_over_kernel_debugger()
 
 
 static void
-kernel_debugger_internal(const char* message, int32 cpu)
+kernel_debugger_internal(const char* messagePrefix, const char* message,
+	va_list args, int32 cpu)
 {
 	while (true) {
 		if (sHandOverKDLToCPU == cpu) {
@@ -878,7 +894,7 @@ kernel_debugger_internal(const char* message, int32 cpu)
 		} else
 			enter_kernel_debugger(cpu);
 
-		kernel_debugger_loop(message, cpu);
+		kernel_debugger_loop(messagePrefix, message, args, cpu);
 
 		if (sHandOverKDLToCPU < 0) {
 			exit_kernel_debugger();
@@ -1516,7 +1532,8 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 			if (returnIfHandedOver)
 				break;
 
-			kernel_debugger_internal(NULL, cpu);
+			va_list dummy;
+			kernel_debugger_internal(NULL, NULL, dummy, cpu);
 		} else
 			smp_intercpu_int_handler(cpu);
 	}
@@ -1528,7 +1545,8 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 void
 debug_double_fault(int32 cpu)
 {
-	kernel_debugger_internal("Double Fault!\n", cpu);
+	va_list dummy;
+	kernel_debugger_internal("Double Fault!", NULL, dummy, cpu);
 }
 
 
@@ -1691,13 +1709,15 @@ void
 panic(const char* format, ...)
 {
 	va_list args;
-	char temp[128];
-
 	va_start(args, format);
-	vsnprintf(temp, sizeof(temp), format, args);
-	va_end(args);
 
-	kernel_debugger(temp);
+	cpu_status state = disable_interrupts();
+
+	kernel_debugger_internal("PANIC: ", format, args, smp_get_current_cpu());
+
+	restore_interrupts(state);
+
+	va_end(args);
 }
 
 
@@ -1706,7 +1726,8 @@ kernel_debugger(const char* message)
 {
 	cpu_status state = disable_interrupts();
 
-	kernel_debugger_internal(message, smp_get_current_cpu());
+	va_list dummy;
+	kernel_debugger_internal(message, NULL, dummy, smp_get_current_cpu());
 
 	restore_interrupts(state);
 }
@@ -1759,7 +1780,7 @@ kprintf(const char* format, ...)
 	if (sDebugOutputFilter != NULL) {
 		va_list args;
 		va_start(args, format);
-		sDebugOutputFilter->Print(format, args);
+		kprintf_args(format, args);
 		va_end(args);
 	}
 }
