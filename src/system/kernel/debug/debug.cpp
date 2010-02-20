@@ -721,7 +721,11 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 
 	sCurrentKernelDebuggerMessagePrefix = messagePrefix;
 	sCurrentKernelDebuggerMessage = message;
-	sCurrentKernelDebuggerMessageArgs = args;
+#if __GNUC__ == 2
+	__va_copy(sCurrentKernelDebuggerMessageArgs, args);
+#else
+	va_copy(sCurrentKernelDebuggerMessageArgs, args);
+#endif
 
 	print_kernel_debugger_message();
 
@@ -815,6 +819,8 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 				sCurrentLine = 0;
 		}
 	}
+
+	va_end(sCurrentKernelDebuggerMessageArgs);
 
 	delete_debug_alloc_pool(allocPool);
 
