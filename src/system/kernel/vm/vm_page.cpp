@@ -970,6 +970,8 @@ free_page(vm_page* page, bool clear)
 {
 	DEBUG_PAGE_ACCESS_CHECK(page);
 
+	ASSERT(!page->IsMapped());
+
 	VMPageQueue* fromQueue;
 
 	switch (page->state) {
