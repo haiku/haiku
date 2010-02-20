@@ -824,13 +824,6 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 				cache->MarkPageUnbusy(page);
 			}
 
-			if (bytesLeft <= bytesInPage) {
-				// we've read the last page, so we're done!
-				locker.Unlock();
-				vm_page_unreserve_pages(&reservation);
-				return B_OK;
-			}
-
 			// If it is cached only, requeue the page, so the respective queue
 			// roughly remains LRU first sorted.
 			if (page->state == PAGE_STATE_CACHED
@@ -838,6 +831,13 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 				DEBUG_PAGE_ACCESS_START(page);
 				vm_page_requeue(page, true);
 				DEBUG_PAGE_ACCESS_END(page);
+			}
+
+			if (bytesLeft <= bytesInPage) {
+				// we've read the last page, so we're done!
+				locker.Unlock();
+				vm_page_unreserve_pages(&reservation);
+				return B_OK;
 			}
 
 			// prepare a potential gap request
