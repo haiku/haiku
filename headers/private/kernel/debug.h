@@ -33,24 +33,24 @@
 #define ASSERT_ALWAYS(x) \
 	do {																	\
 		if (!(x)) {															\
-			panic("ASSERT FAILED (%s:%d): %s\n", __FILE__, __LINE__, #x);	\
+			panic("ASSERT FAILED (%s:%d): %s", __FILE__, __LINE__, #x);		\
 		}																	\
 	} while (0)
 
-#define ASSERT_ALWAYS_PRINT(x, format...) \
+#define ASSERT_ALWAYS_PRINT(x, format, args...) \
 	do {																	\
 		if (!(x)) {															\
-			dprintf_no_syslog(format);										\
-			panic("ASSERT FAILED (%s:%d): %s\n", __FILE__, __LINE__, #x);	\
+			panic("ASSERT FAILED (%s:%d): %s; " format, __FILE__, __LINE__,	\
+				#x, args);													\
 		}																	\
 	} while (0)
 
 #if KDEBUG
-#	define ASSERT(x)					ASSERT_ALWAYS(x)
-#	define ASSERT_PRINT(x, format...)	ASSERT_ALWAYS_PRINT(x, format)
+#	define ASSERT(x)						ASSERT_ALWAYS(x)
+#	define ASSERT_PRINT(x, format, args...)	ASSERT_ALWAYS_PRINT(x, format, args)
 #else
-#	define ASSERT(x)					do { } while(0)
-#	define ASSERT_PRINT(x, format...)	do { } while(0)
+#	define ASSERT(x)						do { } while(0)
+#	define ASSERT_PRINT(x, format, args...)	do { } while(0)
 #endif
 
 #if KDEBUG
