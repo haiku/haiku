@@ -67,6 +67,8 @@ struct debug_strlcpy_parameters {
 
 static const char* const kKDLPrompt = "kdebug> ";
 
+static va_list kDummyVaList;
+
 extern "C" int kgets(char* buffer, int length);
 
 void call_modules_hook(bool enter);
@@ -1532,8 +1534,7 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 			if (returnIfHandedOver)
 				break;
 
-			va_list dummy;
-			kernel_debugger_internal(NULL, NULL, dummy, cpu);
+			kernel_debugger_internal(NULL, NULL, kDummyVaList, cpu);
 		} else
 			smp_intercpu_int_handler(cpu);
 	}
@@ -1545,8 +1546,7 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 void
 debug_double_fault(int32 cpu)
 {
-	va_list dummy;
-	kernel_debugger_internal("Double Fault!", NULL, dummy, cpu);
+	kernel_debugger_internal("Double Fault!", NULL, kDummyVaList, cpu);
 }
 
 
@@ -1726,8 +1726,8 @@ kernel_debugger(const char* message)
 {
 	cpu_status state = disable_interrupts();
 
-	va_list dummy;
-	kernel_debugger_internal(message, NULL, dummy, smp_get_current_cpu());
+	kernel_debugger_internal(message, NULL, kDummyVaList,
+		smp_get_current_cpu());
 
 	restore_interrupts(state);
 }
