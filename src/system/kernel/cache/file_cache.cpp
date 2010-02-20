@@ -309,9 +309,10 @@ reserve_pages(file_cache_ref* ref, vm_page_reservation* reservation,
 				vm_page* page;
 				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 						(page = it.Next()) != NULL && left > 0;) {
-					if (page->state != PAGE_STATE_MODIFIED && !page->modified
-							&& !page->busy) {
+					if (page->state == PAGE_STATE_CACHED && !page->busy) {
 						DEBUG_PAGE_ACCESS_START(page);
+						ASSERT(!page->IsMapped());
+						ASSERT(!page->modified);
 						cache->RemovePage(page);
 						vm_page_set_state(page, PAGE_STATE_FREE);
 						left--;
