@@ -5,6 +5,7 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+
 #include <String.h>
 
 #include <util/DoublyLinkedList.h>
@@ -64,9 +65,6 @@ public:
 									int32 event);
 			void				AddSamples(addr_t* samples, int32 sampleCount);
 			void				PrintResults() const;
-
-private:
-	typedef DoublyLinkedList<ThreadImage>	ImageList;
 
 private:
 			thread_id			fID;
