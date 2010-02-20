@@ -117,11 +117,6 @@ public:
 			ThreadImageType*	FindImage(addr_t address) const;
 			int32				GetHitImages(ThreadImageType** images) const;
 
-	virtual	void				AddSamples(addr_t* samples,
-									int32 sampleCount) = 0;
-	virtual	void				AddDroppedTicks(int32 dropped) = 0;
-	virtual	void				PrintResults() = 0;
-
 	virtual ThreadImageType*	CreateThreadImage(Image* image) = 0;
 
 protected:
