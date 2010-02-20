@@ -32,6 +32,8 @@
 #define NET_BUFFER_TRACING_STACK_TRACE			0	/* stack trace depth */
 #define PAGE_ALLOCATION_TRACING					0
 #define PAGE_DAEMON_TRACING						0
+#define PAGE_STATE_TRACING						0
+#define PAGE_STATE_TRACING_STACK_TRACE			0	/* stack trace depth */
 #define PAGE_WRITER_TRACING						0
 #define PARANOIA_TRACING						0
 #define PARANOIA_TRACING_STACK_TRACE			0	/* stack trace depth */
@@ -50,7 +52,7 @@
 #define USER_MALLOC_TRACING						0
 #define VFS_PAGES_IO_TRACING					0
 #define VM_CACHE_TRACING						0
-#define VM_CACHE_TRACING_STACK_TRACE			0
+#define VM_CACHE_TRACING_STACK_TRACE			0	/* stack trace depth */
 #define VM_PAGE_FAULT_TRACING					0
 #define WAIT_FOR_OBJECTS_TRACING				0
 

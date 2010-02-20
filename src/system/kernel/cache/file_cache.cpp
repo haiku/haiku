@@ -309,7 +309,7 @@ reserve_pages(file_cache_ref* ref, vm_page_reservation* reservation,
 				vm_page* page;
 				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 						(page = it.Next()) != NULL && left > 0;) {
-					if (page->state == PAGE_STATE_CACHED && !page->busy) {
+					if (page->State() == PAGE_STATE_CACHED && !page->busy) {
 						DEBUG_PAGE_ACCESS_START(page);
 						ASSERT(!page->IsMapped());
 						ASSERT(!page->modified);
@@ -816,7 +816,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 
 					page->modified = true;
 
-					if (page->state != PAGE_STATE_MODIFIED)
+					if (page->State() != PAGE_STATE_MODIFIED)
 						vm_page_set_state(page, PAGE_STATE_MODIFIED);
 
 					DEBUG_PAGE_ACCESS_END(page);
@@ -827,8 +827,8 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 
 			// If it is cached only, requeue the page, so the respective queue
 			// roughly remains LRU first sorted.
-			if (page->state == PAGE_STATE_CACHED
-					|| page->state == PAGE_STATE_MODIFIED) {
+			if (page->State() == PAGE_STATE_CACHED
+					|| page->State() == PAGE_STATE_MODIFIED) {
 				DEBUG_PAGE_ACCESS_START(page);
 				vm_page_requeue(page, true);
 				DEBUG_PAGE_ACCESS_END(page);

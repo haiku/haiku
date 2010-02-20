@@ -105,7 +105,9 @@ public:
 	vint32					accessing_thread;
 #endif
 
+private:
 	uint8					state : 3;
+public:
 	bool					busy : 1;
 	bool					busy_writing : 1;
 		// used in VMAnonymousCache::Merge()
@@ -124,6 +126,10 @@ public:
 
 	bool IsMapped() const
 		{ return wired_count > 0 || !mappings.IsEmpty(); }
+
+	uint8 State() const				{ return state; }
+	void InitState(uint8 newState);
+	void SetState(uint8 newState);
 };
 
 

@@ -12,9 +12,9 @@
 bool
 PageCacheLocker::_IgnorePage(vm_page* page)
 {
-	if (page->busy || page->state == PAGE_STATE_WIRED
-		|| page->state == PAGE_STATE_FREE || page->state == PAGE_STATE_CLEAR
-		|| page->state == PAGE_STATE_UNUSED || page->wired_count > 0)
+	if (page->busy || page->State() == PAGE_STATE_WIRED
+		|| page->State() == PAGE_STATE_FREE || page->State() == PAGE_STATE_CLEAR
+		|| page->State() == PAGE_STATE_UNUSED || page->wired_count > 0)
 		return true;
 
 	return false;

@@ -476,6 +476,74 @@ class WritePage : public AbstractTraceEntry {
 #endif	// PAGE_WRITER_TRACING
 
 
+#if PAGE_STATE_TRACING
+
+namespace PageStateTracing {
+
+class SetPageState : public AbstractTraceEntry {
+	public:
+		SetPageState(vm_page* page, uint8 newState)
+			:
+			fPage(page),
+			fOldState(page->State()),
+			fNewState(newState),
+			fBusy(page->busy),
+			fWired(page->wired_count > 0),
+			fMapped(!page->mappings.IsEmpty()),
+			fAccessed(page->accessed),
+			fModified(page->modified)
+		{
+#if PAGE_STATE_TRACING_STACK_TRACE
+			fStackTrace = capture_tracing_stack_trace(
+				PAGE_STATE_TRACING_STACK_TRACE, 0, true);
+				// Don't capture userland stack trace to avoid potential
+				// deadlocks.
+#endif
+			Initialized();
+		}
+
+#if PAGE_STATE_TRACING_STACK_TRACE
+		virtual void DumpStackTrace(TraceOutput& out)
+		{
+			out.PrintStackTrace(fStackTrace);
+		}
+#endif
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page set state: %p (%c%c%c%c%c): %s -> %s", fPage,
+				fBusy ? 'b' : '-',
+				fWired ? 'w' : '-',
+				fMapped ? 'm' : '-',
+				fAccessed ? 'a' : '-',
+				fModified ? 'm' : '-',
+				page_state_to_string(fOldState),
+				page_state_to_string(fNewState));
+		}
+
+	private:
+		vm_page*	fPage;
+#if PAGE_STATE_TRACING_STACK_TRACE
+		tracing_stack_trace* fStackTrace;
+#endif
+		uint8		fOldState;
+		uint8		fNewState;
+		bool		fBusy : 1;
+		bool		fWired : 1;
+		bool		fMapped : 1;
+		bool		fAccessed : 1;
+		bool		fModified : 1;
+};
+
+}	// namespace PageStateTracing
+
+#	define TPS(x)	new(std::nothrow) PageStateTracing::x
+
+#else
+#	define TPS(x)
+#endif	// PAGE_STATE_TRACING
+
+
 static int
 find_page(int argc, char **argv)
 {
@@ -619,7 +687,7 @@ dump_page(int argc, char **argv)
 	kprintf("cache:           %p\n", page->Cache());
 	kprintf("cache_offset:    %ld\n", page->cache_offset);
 	kprintf("cache_next:      %p\n", page->cache_next);
-	kprintf("state:           %s\n", page_state_to_string(page->state));
+	kprintf("state:           %s\n", page_state_to_string(page->State()));
 	kprintf("wired_count:     %d\n", page->wired_count);
 	kprintf("usage_count:     %d\n", page->usage_count);
 	kprintf("busy:            %d\n", page->busy);
@@ -733,7 +801,7 @@ dump_page_queue(int argc, char **argv)
 		kprintf("page        cache       type       state  wired  usage\n");
 		for (i = 0; page; i++, page = queue->Next(page)) {
 			kprintf("%p  %p  %-7s %8s  %5d  %5d\n", page, page->Cache(),
-				type, page_state_to_string(page->state),
+				type, page_state_to_string(page->State()),
 				page->wired_count, page->usage_count);
 		}
 	}
@@ -754,14 +822,15 @@ dump_page_stats(int argc, char **argv)
 	memset(busyCounter, 0, sizeof(busyCounter));
 
 	for (i = 0; i < sNumPages; i++) {
-		if (sPages[i].state > 7)
+		if (sPages[i].State() > 7)
 			panic("page %li at %p has invalid state!\n", i, &sPages[i]);
 
-		counter[sPages[i].state]++;
+		counter[sPages[i].State()]++;
 		if (sPages[i].busy)
-			busyCounter[sPages[i].state]++;
+			busyCounter[sPages[i].State()]++;
 
-		if (sPages[i].state == PAGE_STATE_MODIFIED && sPages[i].Cache() != NULL
+		if (sPages[i].State() == PAGE_STATE_MODIFIED
+			&& sPages[i].Cache() != NULL
 			&& sPages[i].Cache()->temporary && sPages[i].wired_count == 0) {
 			swappableModified++;
 			if (sPages[i].usage_count == 0)
@@ -879,6 +948,25 @@ dump_page_usage_stats(int argc, char** argv)
 #endif	// TRACK_PAGE_USAGE_STATS
 
 
+// #pragma mark - vm_page
+
+
+inline void
+vm_page::InitState(uint8 newState)
+{
+	state = newState;
+}
+
+
+inline void
+vm_page::SetState(uint8 newState)
+{
+	TPS(SetPageState(this, newState));
+
+	state = newState;
+}
+
+
 // #pragma mark -
 
 
@@ -974,7 +1062,7 @@ free_page(vm_page* page, bool clear)
 
 	VMPageQueue* fromQueue;
 
-	switch (page->state) {
+	switch (page->State()) {
 		case PAGE_STATE_ACTIVE:
 			fromQueue = &sActivePageQueue;
 			break;
@@ -997,7 +1085,7 @@ free_page(vm_page* page, bool clear)
 			break;
 		default:
 			panic("free_page(): page %p in invalid state %d",
-				page, page->state);
+				page, page->State());
 			return;
 	}
 
@@ -1016,10 +1104,10 @@ free_page(vm_page* page, bool clear)
 	DEBUG_PAGE_ACCESS_END(page);
 
 	if (clear) {
-		page->state = PAGE_STATE_CLEAR;
+		page->SetState(PAGE_STATE_CLEAR);
 		sClearPageQueue.PrependUnlocked(page);
 	} else {
-		page->state = PAGE_STATE_FREE;
+		page->SetState(PAGE_STATE_FREE);
 		sFreePageQueue.PrependUnlocked(page);
 	}
 
@@ -1038,12 +1126,12 @@ set_page_state(vm_page *page, int pageState)
 {
 	DEBUG_PAGE_ACCESS_CHECK(page);
 
-	if (pageState == page->state)
+	if (pageState == page->State())
 		return;
 
 	VMPageQueue* fromQueue;
 
-	switch (page->state) {
+	switch (page->State()) {
 		case PAGE_STATE_ACTIVE:
 			fromQueue = &sActivePageQueue;
 			break;
@@ -1066,7 +1154,7 @@ set_page_state(vm_page *page, int pageState)
 			break;
 		default:
 			panic("set_page_state(): page %p in invalid state %d",
-				page, page->state);
+				page, page->State());
 			return;
 	}
 
@@ -1104,7 +1192,7 @@ set_page_state(vm_page *page, int pageState)
 	if (cache != NULL && cache->temporary) {
 		if (pageState == PAGE_STATE_MODIFIED)
 			atomic_add(&sModifiedTemporaryPages, 1);
-		else if (page->state == PAGE_STATE_MODIFIED)
+		else if (page->State() == PAGE_STATE_MODIFIED)
 			atomic_add(&sModifiedTemporaryPages, -1);
 	}
 
@@ -1118,12 +1206,12 @@ set_page_state(vm_page *page, int pageState)
 		// before trying to change/interpret the page state.
 		ASSERT(cache != NULL);
 		cache->AssertLocked();
-		page->state = pageState;
+		page->SetState(pageState);
 	} else {
 		if (fromQueue != NULL)
 			fromQueue->RemoveUnlocked(page);
 
-		page->state = pageState;
+		page->SetState(pageState);
 
 		if (toQueue != NULL)
 			toQueue->AppendUnlocked(page);
@@ -1205,7 +1293,7 @@ page_scrubber(void *unused)
 
 			DEBUG_PAGE_ACCESS_START(page[i]);
 
-			page[i]->state = PAGE_STATE_ACTIVE;
+			page[i]->SetState(PAGE_STATE_ACTIVE);
 			page[i]->busy = true;
 			scrubCount++;
 		}
@@ -1227,7 +1315,7 @@ page_scrubber(void *unused)
 
 		// and put them into the clear queue
 		for (int32 i = 0; i < scrubCount; i++) {
-			page[i]->state = PAGE_STATE_CLEAR;
+			page[i]->SetState(PAGE_STATE_CLEAR);
 			page[i]->busy = false;
 			DEBUG_PAGE_ACCESS_END(page[i]);
 			sClearPageQueue.PrependUnlocked(page[i]);
@@ -1248,7 +1336,7 @@ static void
 init_page_marker(vm_page &marker)
 {
 	marker.SetCacheRef(NULL);
-	marker.state = PAGE_STATE_UNUSED;
+	marker.InitState(PAGE_STATE_UNUSED);
 	marker.busy = true;
 #if DEBUG_PAGE_QUEUE
 	marker.queue = NULL;
@@ -1264,10 +1352,10 @@ remove_page_marker(struct vm_page &marker)
 {
 	DEBUG_PAGE_ACCESS_CHECK(&marker);
 
-	if (marker.state < PAGE_STATE_FIRST_UNQUEUED)
-		sPageQueues[marker.state].RemoveUnlocked(&marker);
+	if (marker.State() < PAGE_STATE_FIRST_UNQUEUED)
+		sPageQueues[marker.State()].RemoveUnlocked(&marker);
 
-	marker.state = PAGE_STATE_UNUSED;
+	marker.SetState(PAGE_STATE_UNUSED);
 }
 
 
@@ -1279,17 +1367,17 @@ next_modified_page(struct vm_page &marker)
 
 	DEBUG_PAGE_ACCESS_CHECK(&marker);
 
-	if (marker.state == PAGE_STATE_MODIFIED) {
+	if (marker.State() == PAGE_STATE_MODIFIED) {
 		page = sModifiedPageQueue.Next(&marker);
 		sModifiedPageQueue.Remove(&marker);
-		marker.state = PAGE_STATE_UNUSED;
+		marker.SetState(PAGE_STATE_UNUSED);
 	} else
 		page = sModifiedPageQueue.Head();
 
 	for (; page != NULL; page = sModifiedPageQueue.Next(page)) {
 		if (!page->busy) {
 			// insert marker
-			marker.state = PAGE_STATE_MODIFIED;
+			marker.SetState(PAGE_STATE_MODIFIED);
 			sModifiedPageQueue.InsertAfter(page, &marker);
 			return page;
 		}
@@ -1766,7 +1854,7 @@ page_writer(void* /*unused*/)
 
 			// If the page is busy or its state has changed while we were
 			// locking the cache, just ignore it.
-			if (page->busy || page->state != PAGE_STATE_MODIFIED)
+			if (page->busy || page->State() != PAGE_STATE_MODIFIED)
 				continue;
 
 			DEBUG_PAGE_ACCESS_START(page);
@@ -1892,25 +1980,25 @@ find_cached_page_candidate(struct vm_page &marker)
 	InterruptsSpinLocker locker(sCachedPageQueue.GetLock());
 	vm_page *page;
 
-	if (marker.state == PAGE_STATE_UNUSED) {
+	if (marker.State() == PAGE_STATE_UNUSED) {
 		// Get the first free pages of the (in)active queue
 		page = sCachedPageQueue.Head();
 	} else {
 		// Get the next page of the current queue
-		if (marker.state != PAGE_STATE_CACHED) {
+		if (marker.State() != PAGE_STATE_CACHED) {
 			panic("invalid marker %p state", &marker);
 			return NULL;
 		}
 
 		page = sCachedPageQueue.Next(&marker);
 		sCachedPageQueue.Remove(&marker);
-		marker.state = PAGE_STATE_UNUSED;
+		marker.SetState(PAGE_STATE_UNUSED);
 	}
 
 	while (page != NULL) {
 		if (!page->busy) {
 			// we found a candidate, insert marker
-			marker.state = PAGE_STATE_CACHED;
+			marker.SetState(PAGE_STATE_CACHED);
 			sCachedPageQueue.InsertAfter(page, &marker);
 			return page;
 		}
@@ -1938,7 +2026,7 @@ free_cached_page(vm_page *page, bool dontWait)
 	MethodDeleter<VMCache> _2(cache, &VMCache::ReleaseRefLocked);
 
 	// check again if that page is still a candidate
-	if (page->busy || page->state != PAGE_STATE_CACHED)
+	if (page->busy || page->State() != PAGE_STATE_CACHED)
 		return false;
 
 	DEBUG_PAGE_ACCESS_START(page);
@@ -1970,7 +2058,7 @@ free_cached_pages(uint32 pagesToFree, bool dontWait)
 
 		if (free_cached_page(page, dontWait)) {
 			ReadLocker locker(sFreePageQueuesLock);
-			page->state = PAGE_STATE_FREE;
+			page->SetState(PAGE_STATE_FREE);
 			DEBUG_PAGE_ACCESS_END(page);
 			sFreePageQueue.PrependUnlocked(page);
 			locker.Unlock();
@@ -2011,7 +2099,7 @@ idle_scan_active_pages(page_stats& pageStats)
 		if (cache == NULL)
 			continue;
 
-		if (cache == NULL || page->state != PAGE_STATE_ACTIVE) {
+		if (cache == NULL || page->State() != PAGE_STATE_ACTIVE) {
 			// page is no longer in the cache or in this queue
 			cache->ReleaseRefAndUnlock();
 			continue;
@@ -2108,7 +2196,8 @@ full_scan_inactive_pages(page_stats& pageStats, int32 despairLevel)
 
 		// lock the page's cache
 		VMCache* cache = vm_cache_acquire_locked_page_cache(page, true);
-		if (cache == NULL || page->busy || page->state != PAGE_STATE_INACTIVE) {
+		if (cache == NULL || page->busy
+				|| page->State() != PAGE_STATE_INACTIVE) {
 			if (cache != NULL)
 				cache->ReleaseRefAndUnlock();
 			queueLocker.Lock();
@@ -2235,7 +2324,7 @@ full_scan_active_pages(page_stats& pageStats, int32 despairLevel)
 
 		// lock the page's cache
 		VMCache* cache = vm_cache_acquire_locked_page_cache(page, true);
-		if (cache == NULL || page->busy || page->state != PAGE_STATE_ACTIVE) {
+		if (cache == NULL || page->busy || page->State() != PAGE_STATE_ACTIVE) {
 			if (cache != NULL)
 				cache->ReleaseRefAndUnlock();
 			queueLocker.Lock();
@@ -2495,7 +2584,7 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 
 		if (page != NULL) {
 			if (page->busy
-				|| (page->state != PAGE_STATE_MODIFIED
+				|| (page->State() != PAGE_STATE_MODIFIED
 					&& !vm_test_map_modification(page))) {
 				page = NULL;
 			}
@@ -2570,7 +2659,7 @@ vm_page_write_modified_pages(VMCache *cache)
 void
 vm_page_schedule_write_page(vm_page *page)
 {
-	ASSERT(page->state == PAGE_STATE_MODIFIED);
+	ASSERT(page->State() == PAGE_STATE_MODIFIED);
 
 	vm_page_requeue(page, false);
 
@@ -2591,7 +2680,7 @@ vm_page_schedule_write_page_range(struct VMCache *cache, uint32 firstPage,
 		if (page->cache_offset >= endPage)
 			break;
 
-		if (!page->busy && page->state == PAGE_STATE_MODIFIED) {
+		if (!page->busy && page->State() == PAGE_STATE_MODIFIED) {
 			DEBUG_PAGE_ACCESS_START(page);
 			vm_page_requeue(page, false);
 			modified++;
@@ -2653,7 +2742,7 @@ vm_page_init(kernel_args *args)
 	// initialize the free page table
 	for (uint32 i = 0; i < sNumPages; i++) {
 		sPages[i].physical_page_number = sPhysicalPageOffset + i;
-		sPages[i].state = PAGE_STATE_FREE;
+		sPages[i].InitState(PAGE_STATE_FREE);
 		new(&sPages[i].mappings) vm_page_mappings();
 		sPages[i].wired_count = 0;
 		sPages[i].usage_count = 0;
@@ -2802,7 +2891,7 @@ vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 
 	for (addr_t i = 0; i < length; i++) {
 		vm_page *page = &sPages[startPage + i];
-		switch (page->state) {
+		switch (page->State()) {
 			case PAGE_STATE_FREE:
 			case PAGE_STATE_CLEAR:
 			{
@@ -2810,10 +2899,10 @@ vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 // the free/clear queues without having reserved them before. This should happen
 // in the early boot process only, though.
 				DEBUG_PAGE_ACCESS_START(page);
-				VMPageQueue& queue = page->state == PAGE_STATE_FREE
+				VMPageQueue& queue = page->State() == PAGE_STATE_FREE
 					? sFreePageQueue : sClearPageQueue;
 				queue.Remove(page);
-				page->state = PAGE_STATE_UNUSED;
+				page->SetState(PAGE_STATE_UNUSED);
 				page->busy = false;
 				atomic_add(&sUnreservedFreePages, -1);
 				DEBUG_PAGE_ACCESS_END(page);
@@ -2829,7 +2918,7 @@ vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 			default:
 				// uh
 				dprintf("vm_mark_page_range_inuse: page 0x%lx in non-free state %d!\n",
-					startPage + i, page->state);
+					startPage + i, page->State());
 				break;
 		}
 	}
@@ -2955,8 +3044,8 @@ vm_page_allocate_page(vm_page_reservation* reservation, uint32 flags)
 
 	DEBUG_PAGE_ACCESS_START(page);
 
-	int oldPageState = page->state;
-	page->state = pageState;
+	int oldPageState = page->State();
+	page->SetState(pageState);
 	page->busy = (flags & VM_PAGE_ALLOC_BUSY) != 0;
 	page->usage_count = 0;
 	page->accessed = false;
@@ -2992,7 +3081,7 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 	for (page_num_t i = 0; i < length; i++) {
 		vm_page& page = sPages[start + i];
 		DEBUG_PAGE_ACCESS_START(&page);
-		if (page.state == PAGE_STATE_CLEAR) {
+		if (page.State() == PAGE_STATE_CLEAR) {
 			sClearPageQueue.Remove(&page);
 			clearPages.Add(&page);
 		} else {
@@ -3000,7 +3089,7 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 			freePages.Add(&page);
 		}
 
-		page.state = flags & VM_PAGE_ALLOC_STATE;
+		page.SetState(flags & VM_PAGE_ALLOC_STATE);
 		page.busy = flags & VM_PAGE_ALLOC_BUSY;
 		page.usage_count = 0;
 		page.accessed = false;
@@ -3054,8 +3143,8 @@ vm_page_allocate_page_run(uint32 flags, addr_t base, addr_t length,
 
 		uint32 i;
 		for (i = 0; i < length; i++) {
-			if (sPages[start + i].state != PAGE_STATE_FREE
-				&& sPages[start + i].state != PAGE_STATE_CLEAR) {
+			if (sPages[start + i].State() != PAGE_STATE_FREE
+				&& sPages[start + i].State() != PAGE_STATE_CLEAR) {
 				foundRun = false;
 				i++;
 				break;
@@ -3101,8 +3190,8 @@ vm_page_allocate_page_run_no_base(uint32 flags, addr_t count, int priority)
 
 			bool foundRun = true;
 			for (uint32 i = 0; i < count; i++, current++) {
-				if (current->state != PAGE_STATE_FREE
-					&& current->state != PAGE_STATE_CLEAR) {
+				if (current->State() != PAGE_STATE_FREE
+					&& current->State() != PAGE_STATE_CLEAR) {
 					foundRun = false;
 					break;
 				}
@@ -3159,9 +3248,10 @@ vm_page_is_dummy(struct vm_page *page)
 void
 vm_page_free(VMCache *cache, vm_page *page)
 {
-	ASSERT(page->state != PAGE_STATE_FREE && page->state != PAGE_STATE_CLEAR);
+	ASSERT(page->State() != PAGE_STATE_FREE
+		&& page->State() != PAGE_STATE_CLEAR);
 
-	if (page->state == PAGE_STATE_MODIFIED && cache->temporary)
+	if (page->State() == PAGE_STATE_MODIFIED && cache->temporary)
 		atomic_add(&sModifiedTemporaryPages, -1);
 
 	free_page(page, false);
@@ -3171,7 +3261,8 @@ vm_page_free(VMCache *cache, vm_page *page)
 void
 vm_page_set_state(vm_page *page, int pageState)
 {
-	ASSERT(page->state != PAGE_STATE_FREE && page->state != PAGE_STATE_CLEAR);
+	ASSERT(page->State() != PAGE_STATE_FREE
+		&& page->State() != PAGE_STATE_CLEAR);
 
 	if (pageState == PAGE_STATE_FREE || pageState == PAGE_STATE_CLEAR)
 		free_page(page, pageState == PAGE_STATE_CLEAR);
@@ -3192,7 +3283,7 @@ vm_page_requeue(struct vm_page *page, bool tail)
 
 	VMPageQueue *queue = NULL;
 
-	switch (page->state) {
+	switch (page->State()) {
 		case PAGE_STATE_ACTIVE:
 			queue = &sActivePageQueue;
 			break;
@@ -3214,7 +3305,7 @@ vm_page_requeue(struct vm_page *page, bool tail)
 			return;
 		default:
 			panic("vm_page_touch: vm_page %p in invalid state %d\n",
-				page, page->state);
+				page, page->State());
 			break;
 	}
 

@@ -523,8 +523,8 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection,
 		// otherwise the page daemon wouldn't come to keep track of it (in idle
 		// mode) -- if the page isn't touched, it will be deactivated after a
 		// full iteration through the queue at the latest.
-		if (page->state == PAGE_STATE_CACHED
-				|| page->state == PAGE_STATE_INACTIVE) {
+		if (page->State() == PAGE_STATE_CACHED
+				|| page->State() == PAGE_STATE_INACTIVE) {
 			vm_page_set_state(page, PAGE_STATE_ACTIVE);
 		}
 	}
@@ -2785,11 +2785,11 @@ dump_cache(int argc, char** argv)
 			if (!vm_page_is_dummy(page)) {
 				kprintf("\t%p ppn 0x%lx offset 0x%lx state %u (%s) "
 					"wired_count %u\n", page, page->physical_page_number,
-					page->cache_offset, page->state,
-					page_state_to_string(page->state), page->wired_count);
+					page->cache_offset, page->State(),
+					page_state_to_string(page->State()), page->wired_count);
 			} else {
 				kprintf("\t%p DUMMY PAGE state %u (%s)\n",
-					page, page->state, page_state_to_string(page->state));
+					page, page->State(), page_state_to_string(page->State()));
 			}
 		}
 	} else
@@ -3003,8 +3003,8 @@ unmap_and_free_physical_pages(VMTranslationMap* map, addr_t start, addr_t end)
 		if (map->Query(current, &physicalAddress, &flags) == B_OK
 			&& (flags & PAGE_PRESENT) != 0) {
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
-			if (page != NULL && page->state != PAGE_STATE_FREE
-					 && page->state != PAGE_STATE_CLEAR) {
+			if (page != NULL && page->State() != PAGE_STATE_FREE
+					 && page->State() != PAGE_STATE_CLEAR) {
 				DEBUG_PAGE_ACCESS_START(page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
 			}
@@ -4021,7 +4021,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 
 				break;
 			}
-		} else if (context.page->state == PAGE_STATE_INACTIVE)
+		} else if (context.page->State() == PAGE_STATE_INACTIVE)
 			vm_page_set_state(context.page, PAGE_STATE_ACTIVE);
 
 		DEBUG_PAGE_ACCESS_END(context.page);

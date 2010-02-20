@@ -1117,7 +1117,7 @@ VMCache::FlushAndRemoveAllPages()
 
 			// skip modified pages -- they will be written back in the next
 			// iteration
-			if (page->state == PAGE_STATE_MODIFIED)
+			if (page->State() == PAGE_STATE_MODIFIED)
 				continue;
 
 			// We can't remove mapped pages.
