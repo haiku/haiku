@@ -3641,6 +3641,10 @@ BWindow::_HandleKeyDown(BMessage* event)
 			return true;
 		}
 
+		// Pretend that the user opened a menu, to give the subclass a
+		// chance to update it's menus. This may install new shortcuts,
+		// which is why we have to call it here, before trying to find
+		// a shortcut for the given key.
 		MenusBeginning();
 
 		Shortcut* shortcut = _FindShortcut(key, modifiers);
