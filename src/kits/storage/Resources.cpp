@@ -79,6 +79,10 @@ BResources::BResources(const BFile *file, bool clobber)
 	\param clobber if \c true, the file's resources are truncated to size 0
 */
 BResources::BResources(const char *path, bool clobber)
+			: fFile(),
+			  fContainer(NULL),
+			  fResourceFile(NULL),
+			  fReadOnly(false)
 {
 	fContainer = new(nothrow) ResourcesContainer;
 	SetTo(path, clobber);
@@ -95,6 +99,10 @@ BResources::BResources(const char *path, bool clobber)
 	\param clobber if \c true, the file's resources are truncated to size 0
 */
 BResources::BResources(const entry_ref *ref, bool clobber)
+			: fFile(),
+			  fContainer(NULL),
+			  fResourceFile(NULL),
+			  fReadOnly(false)
 {
 	fContainer = new(nothrow) ResourcesContainer;
 	SetTo(ref, clobber);
