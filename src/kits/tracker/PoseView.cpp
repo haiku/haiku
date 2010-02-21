@@ -1354,8 +1354,8 @@ BPoseView::AddPosesTask(void *castToParams)
 				if (!view->ShouldShowPose(model,
 						&(posesResult->fPoseInfos[modelChunkIndex]))
 					// filter out models we do not want to show
-					|| model->IsSymLink()
-						&& !view->CreateSymlinkPoseTarget(model)) {
+					|| (model->IsSymLink()
+						&& !view->CreateSymlinkPoseTarget(model))) {
 					// filter out symlinks whose target models we do not
 					// want to show
 
@@ -9026,7 +9026,7 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 	int32 index;
 	BPose *targetPose = FindPose(mouseLoc, &index);
 
-	if (fCursorCheck && targetPose == fDropTarget
+	if ((fCursorCheck && targetPose == fDropTarget)
 		|| (trackingContextMenu && !targetPose))
 		// no change
 		return false;
@@ -9286,8 +9286,8 @@ BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll,
 		return false;
 
 	// make sure window is in front before attempting scrolling
-	BContainerWindow *window = ContainerWindow();
-	if (!window)
+	BContainerWindow* window = ContainerWindow();
+	if (window == NULL)
 		return false;
 
 	// selection scrolling will also work if the window is inactive
@@ -9321,11 +9321,13 @@ BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll,
 
 		if (keepGoing) {
 			wouldScroll = true;
-			if (shouldScroll)
-				if (fVScrollBar)
-					fVScrollBar->SetValue(fVScrollBar->Value() - scrollIncrement);
-				else
+			if (shouldScroll) {
+				if (fVScrollBar != NULL) {
+					fVScrollBar->SetValue(
+						fVScrollBar->Value() - scrollIncrement);
+				} else
 					ScrollBy(0, -scrollIncrement);
+			}
 		}
 	}
 
@@ -9346,11 +9348,13 @@ BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll,
 
 		if (keepGoing) {
 			wouldScroll = true;
-			if (shouldScroll)
-				if (fVScrollBar)
-					fVScrollBar->SetValue(fVScrollBar->Value() + scrollIncrement);
-				else
+			if (shouldScroll) {
+				if (fVScrollBar != NULL) {
+					fVScrollBar->SetValue(
+						fVScrollBar->Value() + scrollIncrement);
+				} else
 					ScrollBy(0, scrollIncrement);
+			}
 		}
 	}
 
@@ -9371,11 +9375,13 @@ BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll,
 
 		if (keepGoing) {
 			wouldScroll = true;
-			if (shouldScroll)
-				if (fHScrollBar)
-					fHScrollBar->SetValue(fHScrollBar->Value() - scrollIncrement);
-				else
+			if (shouldScroll) {
+				if (fHScrollBar != NULL) {
+					fHScrollBar->SetValue(
+						fHScrollBar->Value() - scrollIncrement);
+				} else
 					ScrollBy(-scrollIncrement, 0);
+			}
 		}
 	}
 
@@ -9396,11 +9402,13 @@ BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll,
 
 		if (keepGoing) {
 			wouldScroll = true;
-			if (shouldScroll)
-				if (fHScrollBar)
-					fHScrollBar->SetValue(fHScrollBar->Value() + scrollIncrement);
- 				else
+			if (shouldScroll) {
+				if (fHScrollBar != NULL) {
+					fHScrollBar->SetValue(
+						fHScrollBar->Value() + scrollIncrement);
+ 				} else
  					ScrollBy(scrollIncrement, 0);
+			}
 		}
 	}
 
