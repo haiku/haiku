@@ -1159,6 +1159,9 @@ BTabView::RemoveTab(int32 index)
 
 	tab->Deselect();
 
+	if (fContainerView->GetLayout())
+		fContainerView->GetLayout()->RemoveItem(index);
+
 	if (index <= fSelection && fSelection != 0)
 		fSelection--;
 
@@ -1171,9 +1174,6 @@ BTabView::RemoveTab(int32 index)
 		SetFocusTab(fFocus, false);
 	else
 		SetFocusTab(fFocus, true);
-
-	if (fContainerView->GetLayout())
-		fContainerView->GetLayout()->RemoveItem(index);
 
 	return tab;
 }
