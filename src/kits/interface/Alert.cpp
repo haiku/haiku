@@ -464,7 +464,7 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 
 	// Must have at least one button
 	if (button0 == NULL) {
-		debugger("BAlert's must have at least one button.");
+		debugger("BAlerts must have at least one button.");
 		button0 = "";
 	}
 
