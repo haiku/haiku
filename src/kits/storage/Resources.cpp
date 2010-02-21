@@ -37,10 +37,11 @@ using namespace std;
 /*!	\brief Creates an unitialized BResources object.
 */
 BResources::BResources()
-		  : fFile(),
-			fContainer(NULL),
-			fResourceFile(NULL),
-			fReadOnly(false)
+	:
+	fFile(),
+	fContainer(NULL),
+	fResourceFile(NULL),
+	fReadOnly(false)
 {
 	fContainer = new(nothrow) ResourcesContainer;
 }
@@ -58,11 +59,12 @@ BResources::BResources()
 	\param file the file
 	\param clobber if \c true, the file's resources are truncated to size 0
 */
-BResources::BResources(const BFile *file, bool clobber)
-		  : fFile(),
-			fContainer(NULL),
-			fResourceFile(NULL),
-			fReadOnly(false)
+BResources::BResources(const BFile* file, bool clobber)
+	: 
+	fFile(),
+	fContainer(NULL),
+	fResourceFile(NULL),
+	fReadOnly(false)
 {
 	fContainer = new(nothrow) ResourcesContainer;
 	SetTo(file, clobber);
@@ -78,11 +80,12 @@ BResources::BResources(const BFile *file, bool clobber)
 	\param path a path referring to the file
 	\param clobber if \c true, the file's resources are truncated to size 0
 */
-BResources::BResources(const char *path, bool clobber)
-			: fFile(),
-			  fContainer(NULL),
-			  fResourceFile(NULL),
-			  fReadOnly(false)
+BResources::BResources(const char* path, bool clobber)
+	:
+	fFile(),
+	fContainer(NULL),
+	fResourceFile(NULL),
+	fReadOnly(false)
 {
 	fContainer = new(nothrow) ResourcesContainer;
 	SetTo(path, clobber);
@@ -98,11 +101,12 @@ BResources::BResources(const char *path, bool clobber)
 	\param ref an entry_ref referring to the file
 	\param clobber if \c true, the file's resources are truncated to size 0
 */
-BResources::BResources(const entry_ref *ref, bool clobber)
-			: fFile(),
-			  fContainer(NULL),
-			  fResourceFile(NULL),
-			  fReadOnly(false)
+BResources::BResources(const entry_ref* ref, bool clobber)
+	:
+	fFile(),
+	fContainer(NULL),
+	fResourceFile(NULL),
+	fReadOnly(false)
 {
 	fContainer = new(nothrow) ResourcesContainer;
 	SetTo(ref, clobber);
@@ -140,7 +144,7 @@ BResources::~BResources()
 	- \c B_ERROR: Failed to initialize the object (for whatever reason).
 */
 status_t
-BResources::SetTo(const BFile *file, bool clobber)
+BResources::SetTo(const BFile* file, bool clobber)
 {
 	Unset();
 	status_t error = B_OK;
@@ -192,7 +196,7 @@ BResources::SetTo(const BFile *file, bool clobber)
 	- \c B_ERROR: Failed to initialize the object (for whatever reason).
 */
 status_t
-BResources::SetTo(const char *path, bool clobber)
+BResources::SetTo(const char* path, bool clobber)
 {
 	if (!path)
 		return B_BAD_VALUE;
@@ -227,7 +231,7 @@ BResources::SetTo(const char *path, bool clobber)
 	- \c B_ERROR: Failed to initialize the object (for whatever reason).
 */
 status_t
-BResources::SetTo(const entry_ref *ref, bool clobber)
+BResources::SetTo(const entry_ref* ref, bool clobber)
 {
 	if (!ref)
 		return B_BAD_VALUE;
@@ -285,7 +289,7 @@ BResources::SetToImage(image_id image, bool clobber)
 	- \c B_ERROR: Failed to initialize the object (for whatever reason).
 */
 status_t
-BResources::SetToImage(const void *codeOrDataPointer, bool clobber)
+BResources::SetToImage(const void* codeOrDataPointer, bool clobber)
 {
 	if (!codeOrDataPointer)
 		return B_BAD_VALUE;
@@ -349,7 +353,7 @@ BResources::InitCheck() const
 /*!	\brief Returns a reference to the BResources' BFile object.
 	\return a reference to the object's BFile.
 */
-const BFile &
+const BFile&
 BResources::File() const
 {
 	return fFile;
@@ -369,12 +373,12 @@ BResources::File() const
 			\c NULL, if the file does not have a resource that matchs the
 			parameters or an error occured.
 */
-const void *
-BResources::LoadResource(type_code type, int32 id, size_t *outSize)
+const void*
+BResources::LoadResource(type_code type, int32 id, size_t* outSize)
 {
 	// find the resource
 	status_t error = InitCheck();
-	ResourceItem *resource = NULL;
+	ResourceItem* resource = NULL;
 	if (error == B_OK) {
 		resource = fContainer->ResourceAt(fContainer->IndexOf(type, id));
 		if (!resource)
@@ -411,11 +415,11 @@ BResources::LoadResource(type_code type, int32 id, size_t *outSize)
 		  parameters, that is the one with the least index.
 */
 const void *
-BResources::LoadResource(type_code type, const char *name, size_t *outSize)
+BResources::LoadResource(type_code type, const char* name, size_t* outSize)
 {
 	// find the resource
 	status_t error = InitCheck();
-	ResourceItem *resource = NULL;
+	ResourceItem* resource = NULL;
 	if (error == B_OK) {
 		resource = fContainer->ResourceAt(fContainer->IndexOf(type, name));
 		if (!resource)
@@ -425,7 +429,7 @@ BResources::LoadResource(type_code type, const char *name, size_t *outSize)
 	if (error == B_OK && !resource->IsLoaded() && fResourceFile)
 		error = fResourceFile->ReadResource(*resource);
 	// return the result
-	const void *result = NULL;
+	const void* result = NULL;
 	if (error == B_OK) {
 		result = resource->Data();
 		if (outSize)
@@ -515,7 +519,7 @@ BResources::Sync()
 	- \c B_IO_ERROR: An error occured while writing the resources.
 */
 status_t
-BResources::MergeFrom(BFile *fromFile)
+BResources::MergeFrom(BFile* fromFile)
 {
 	status_t error = (fromFile ? B_OK : B_BAD_VALUE);
 	if (error == B_OK)
@@ -546,7 +550,7 @@ BResources::MergeFrom(BFile *fromFile)
 		  remains unmodified.
 */
 status_t
-BResources::WriteTo(BFile *file)
+BResources::WriteTo(BFile* file)
 {
 	status_t error = (file ? B_OK : B_BAD_VALUE);
 	if (error == B_OK)
@@ -592,8 +596,8 @@ BResources::WriteTo(BFile *file)
 	- \c B_NO_MEMORY: Not enough memory for that operation.
 */
 status_t
-BResources::AddResource(type_code type, int32 id, const void *data,
-						size_t length, const char *name)
+BResources::AddResource(type_code type, int32 id, const void* data,
+						size_t length, const char* name)
 {
 	status_t error = (data ? B_OK : B_BAD_VALUE);
 	if (error == B_OK)
@@ -601,7 +605,7 @@ BResources::AddResource(type_code type, int32 id, const void *data,
 	if (error == B_OK)
 		error = (fReadOnly ? B_NOT_ALLOWED : B_OK);
 	if (error == B_OK) {
-		ResourceItem *item = new(nothrow) ResourceItem;
+		ResourceItem* item = new(nothrow) ResourceItem;
 		if (!item)
 			error = B_NO_MEMORY;
 		if (error == B_OK) {
@@ -643,7 +647,7 @@ BResources::HasResource(type_code type, int32 id)
 	\return \c true, if the file contains a matching resource, \false otherwise
 */
 bool
-BResources::HasResource(type_code type, const char *name)
+BResources::HasResource(type_code type, const char* name)
 {
 	return (InitCheck() == B_OK && fContainer->IndexOf(type, name) >= 0);
 }
@@ -662,11 +666,11 @@ BResources::HasResource(type_code type, const char *name)
 	\return \c true, if a matching resource could be found, false otherwise
 */
 bool
-BResources::GetResourceInfo(int32 byIndex, type_code *typeFound,
-							int32 *idFound, const char **nameFound,
-							size_t *lengthFound)
+BResources::GetResourceInfo(int32 byIndex, type_code* typeFound,
+							int32* idFound, const char** nameFound,
+							size_t* lengthFound)
 {
-	ResourceItem *item = NULL;
+	ResourceItem* item = NULL;
 	if (InitCheck() == B_OK)
 		item = fContainer->ResourceAt(byIndex);
 	if (item) {
@@ -696,10 +700,10 @@ BResources::GetResourceInfo(int32 byIndex, type_code *typeFound,
 	\return \c true, if a matching resource could be found, false otherwise
 */
 bool
-BResources::GetResourceInfo(type_code byType, int32 andIndex, int32 *idFound,
-							const char **nameFound, size_t *lengthFound)
+BResources::GetResourceInfo(type_code byType, int32 andIndex, int32* idFound,
+							const char** nameFound, size_t* lengthFound)
 {
-	ResourceItem *item = NULL;
+	ResourceItem* item = NULL;
 	if (InitCheck() == B_OK) {
 		item = fContainer->ResourceAt(fContainer->IndexOfType(byType,
 															  andIndex));
@@ -727,9 +731,9 @@ BResources::GetResourceInfo(type_code byType, int32 andIndex, int32 *idFound,
 */
 bool
 BResources::GetResourceInfo(type_code byType, int32 andID,
-							const char **nameFound, size_t *lengthFound)
+							const char** nameFound, size_t* lengthFound)
 {
-	ResourceItem *item = NULL;
+	ResourceItem* item = NULL;
 	if (InitCheck() == B_OK)
 		item = fContainer->ResourceAt(fContainer->IndexOf(byType, andID));
 	if (item) {
@@ -753,10 +757,10 @@ BResources::GetResourceInfo(type_code byType, int32 andID,
 	\return \c true, if a matching resource could be found, false otherwise
 */
 bool
-BResources::GetResourceInfo(type_code byType, const char *andName,
-							int32 *idFound, size_t *lengthFound)
+BResources::GetResourceInfo(type_code byType, const char* andName,
+							int32* idFound, size_t* lengthFound)
 {
-	ResourceItem *item = NULL;
+	ResourceItem* item = NULL;
 	if (InitCheck() == B_OK)
 		item = fContainer->ResourceAt(fContainer->IndexOf(byType, andName));
 	if (item) {
@@ -783,11 +787,11 @@ BResources::GetResourceInfo(type_code byType, const char *andName,
 	\return \c true, if a matching resource could be found, false otherwise
 */
 bool
-BResources::GetResourceInfo(const void *byPointer, type_code *typeFound,
-							int32 *idFound, size_t *lengthFound,
-							const char **nameFound)
+BResources::GetResourceInfo(const void* byPointer, type_code* typeFound,
+							int32* idFound, size_t* lengthFound,
+							const char** nameFound)
 {
-	ResourceItem *item = NULL;
+	ResourceItem* item = NULL;
 	if (InitCheck() == B_OK)
 		item = fContainer->ResourceAt(fContainer->IndexOf(byPointer));
 	if (item) {
@@ -816,7 +820,7 @@ BResources::GetResourceInfo(const void *byPointer, type_code *typeFound,
 	- \c B_ERROR: An error occured while removing the resource.
 */
 status_t
-BResources::RemoveResource(const void *resource)
+BResources::RemoveResource(const void* resource)
 {
 	status_t error = (resource ? B_OK : B_BAD_VALUE);
 	if (error == B_OK)
@@ -824,7 +828,7 @@ BResources::RemoveResource(const void *resource)
 	if (error == B_OK)
 		error = (fReadOnly ? B_NOT_ALLOWED : B_OK);
 	if (error == B_OK) {
-		ResourceItem *item
+		ResourceItem* item
 			= fContainer->RemoveResource(fContainer->IndexOf(resource));
 		if (item)
 			delete item;
@@ -852,7 +856,7 @@ BResources::RemoveResource(type_code type, int32 id)
 	if (error == B_OK)
 		error = (fReadOnly ? B_NOT_ALLOWED : B_OK);
 	if (error == B_OK) {
-		ResourceItem *item
+		ResourceItem* item
 			= fContainer->RemoveResource(fContainer->IndexOf(type, id));
 		if (item)
 			delete item;
@@ -885,7 +889,7 @@ BResources::RemoveResource(type_code type, int32 id)
 	\deprecated Always use AddResource().
 */
 status_t
-BResources::WriteResource(type_code type, int32 id, const void *data,
+BResources::WriteResource(type_code type, int32 id, const void* data,
 						  off_t offset, size_t length)
 {
 	status_t error = (data && offset >= 0 ? B_OK : B_BAD_VALUE);
@@ -934,13 +938,13 @@ BResources::WriteResource(type_code type, int32 id, const void *data,
 	\deprecated Use LoadResource() only.
 */
 status_t
-BResources::ReadResource(type_code type, int32 id, void *data, off_t offset,
+BResources::ReadResource(type_code type, int32 id, void* data, off_t offset,
 						 size_t length)
 {
 	status_t error = (data && offset >= 0 ? B_OK : B_BAD_VALUE);
 	if (error == B_OK)
 		error = InitCheck();
-	ResourceItem *item = NULL;
+	ResourceItem* item = NULL;
 	if (error == B_OK) {
 		item = fContainer->ResourceAt(fContainer->IndexOf(type, id));
 		if (!item)
@@ -971,12 +975,13 @@ BResources::ReadResource(type_code type, int32 id, void *data, off_t offset,
 	- \c NULL, if an error occured.
 	\deprecated Use LoadResource().
 */
-void *
-BResources::FindResource(type_code type, int32 id, size_t *lengthFound)
+void*
+BResources::FindResource(type_code type, int32 id, size_t* lengthFound)
 {
-	void *result = NULL;
+	void* result = NULL;
 	size_t size = 0;
-	if (const void *data = LoadResource(type, id, &size)) {
+	const void* data = LoadResource(type, id, &size);
+	if (data != NULL) {
 		if ((result = malloc(size)))
 			memcpy(result, data, size);
 	}
@@ -997,12 +1002,13 @@ BResources::FindResource(type_code type, int32 id, size_t *lengthFound)
 	- \c NULL, if an error occured.
 	\deprecated Use LoadResource().
 */
-void *
-BResources::FindResource(type_code type, const char *name, size_t *lengthFound)
+void*
+BResources::FindResource(type_code type, const char* name, size_t* lengthFound)
 {
-	void *result = NULL;
+	void* result = NULL;
 	size_t size = 0;
-	if (const void *data = LoadResource(type, name, &size)) {
+	const void *data = LoadResource(type, name, &size);
+	if (data != NULL) {
 		if ((result = malloc(size)))
 			memcpy(result, data, size);
 	}
