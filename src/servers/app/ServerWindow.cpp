@@ -3388,9 +3388,9 @@ ServerWindow::_MessageLooper()
 				fDesktop->UnlockAllWindows();
 
 			// Only process up to 70 waiting messages at once (we have the
-			// Desktop locked), but don't hold the lock longer than 25 ms
+			// Desktop locked), but don't hold the lock longer than 10 ms
 			if (!receiver.HasMessages() || ++messagesProcessed > 70
-				|| system_time() - processingStart > 25000) {
+				|| system_time() - processingStart > 10000) {
 				if (lockedDesktop)
 					fDesktop->UnlockSingleWindow();
 				break;
