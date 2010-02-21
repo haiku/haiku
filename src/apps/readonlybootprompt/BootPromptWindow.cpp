@@ -130,6 +130,10 @@ BootPromptWindow::BootPromptWindow()
 		)
 	);
 
+	// This call in the first _PopulateKeymaps had no effect yet, since the
+	// list wasn't attatched to the window yet.
+	fKeymapsListView->ScrollToSelection();
+
 	CenterOnScreen();
 	Show();
 }
