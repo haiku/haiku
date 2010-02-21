@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,19 +16,20 @@
 #include "ProfiledEntity.h"
 
 
-// #pragma mark - CallgrindProfileResultImage
+// #pragma mark - CallgrindImageProfileResult
 
 
-CallgrindProfileResultImage::CallgrindProfileResultImage(Image* image)
+CallgrindImageProfileResult::CallgrindImageProfileResult(SharedImage* image,
+	image_id id)
 	:
-	ProfileResultImage(image),
+	ImageProfileResult(image, id),
 	fFunctions(NULL),
 	fOutputIndex(0)
 {
 }
 
 
-CallgrindProfileResultImage::~CallgrindProfileResultImage()
+CallgrindImageProfileResult::~CallgrindImageProfileResult()
 {
 	int32 symbolCount = fImage->SymbolCount();
 	for (int32 i = 0; i < symbolCount; i++) {
@@ -44,7 +45,7 @@ CallgrindProfileResultImage::~CallgrindProfileResultImage()
 
 
 status_t
-CallgrindProfileResultImage::Init()
+CallgrindImageProfileResult::Init()
 {
 	int32 symbolCount = fImage->SymbolCount();
 	fFunctions = new(std::nothrow) CallgrindFunction[symbolCount];
@@ -58,8 +59,8 @@ CallgrindProfileResultImage::Init()
 
 
 void
-CallgrindProfileResultImage::AddSymbolHit(int32 symbolIndex,
-	CallgrindProfileResultImage* calledImage, int32 calledSymbol)
+CallgrindImageProfileResult::AddSymbolHit(int32 symbolIndex,
+	CallgrindImageProfileResult* calledImage, int32 calledSymbol)
 
 {
 	fTotalHits++;
@@ -94,21 +95,21 @@ CallgrindProfileResultImage::AddSymbolHit(int32 symbolIndex,
 
 
 CallgrindFunction*
-CallgrindProfileResultImage::Functions() const
+CallgrindImageProfileResult::Functions() const
 {
 	return fFunctions;
 }
 
 
 int32
-CallgrindProfileResultImage::OutputIndex() const
+CallgrindImageProfileResult::OutputIndex() const
 {
 	return fOutputIndex;
 }
 
 
 void
-CallgrindProfileResultImage::SetOutputIndex(int32 index)
+CallgrindImageProfileResult::SetOutputIndex(int32 index)
 {
 	fOutputIndex = index;
 }
@@ -129,19 +130,23 @@ CallgrindProfileResult::CallgrindProfileResult()
 
 
 void
-CallgrindProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
+CallgrindProfileResult::AddSamples(ImageProfileResultContainer* container,
+	addr_t* samples, int32 sampleCount)
 {
 	int32 unknownSamples = 0;
-	CallgrindProfileResultImage* previousImage = NULL;
+	CallgrindImageProfileResult* previousImage = NULL;
 	int32 previousSymbol = -1;
 
 	// TODO: That probably doesn't work with recursive functions.
 	for (int32 i = 0; i < sampleCount; i++) {
 		addr_t address = samples[i];
-		CallgrindProfileResultImage* image = FindImage(address);
+		addr_t loadDelta;
+		CallgrindImageProfileResult* image
+			= static_cast<CallgrindImageProfileResult*>(
+				container->FindImage(address, loadDelta));
 		int32 symbol = -1;
 		if (image != NULL) {
-			symbol = image->GetImage()->FindSymbol(address);
+			symbol = image->GetImage()->FindSymbol(address - loadDelta);
 			if (symbol >= 0) {
 				image->AddSymbolHit(symbol, previousImage, previousSymbol);
 				previousImage = image;
@@ -166,7 +171,7 @@ CallgrindProfileResult::AddDroppedTicks(int32 dropped)
 
 
 void
-CallgrindProfileResult::PrintResults()
+CallgrindProfileResult::PrintResults(ImageProfileResultContainer* container)
 {
 	// create output file
 
@@ -206,11 +211,11 @@ CallgrindProfileResult::PrintResults()
 	fprintf(out, "summary: %lld %lld\n", fTotalTicks, fTotalTicks * fInterval);
 
 	// get hit images
-	CallgrindProfileResultImage* images[fOldImages.Count() + fImages.Count()];
-	int32 imageCount = GetHitImages(images);
+	CallgrindImageProfileResult* images[container->CountImages()];
+	int32 imageCount = GetHitImages(container, images);
 
 	for (int32 i = 0; i < imageCount; i++) {
-		CallgrindProfileResultImage* image = images[i];
+		CallgrindImageProfileResult* image = images[i];
 
 		CallgrindFunction* functions = image->Functions();
 		int32 imageSymbolCount = image->GetImage()->SymbolCount();
@@ -257,16 +262,17 @@ CallgrindProfileResult::PrintResults()
 }
 
 
-CallgrindProfileResultImage*
-CallgrindProfileResult::CreateProfileResultImage(Image* image)
+ImageProfileResult*
+CallgrindProfileResult::CreateImageProfileResult(SharedImage* image,
+	image_id id)
 {
-	return new(std::nothrow) CallgrindProfileResultImage(image);
+	return new(std::nothrow) CallgrindImageProfileResult(image, id);
 }
 
 
 void
 CallgrindProfileResult::_PrintFunction(FILE* out,
-	CallgrindProfileResultImage* image, int32 functionIndex, bool called)
+	CallgrindImageProfileResult* image, int32 functionIndex, bool called)
 {
 	if (image->OutputIndex() == 0) {
 		// need to print the image name

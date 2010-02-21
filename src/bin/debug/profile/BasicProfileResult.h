@@ -9,11 +9,12 @@
 #include "ProfileResult.h"
 
 
-class BasicProfileResultImage : public ProfileResultImage,
-	public DoublyLinkedListLinkImpl<BasicProfileResultImage> {
+class BasicImageProfileResult : public ImageProfileResult,
+	public DoublyLinkedListLinkImpl<BasicImageProfileResult> {
 public:
-								BasicProfileResultImage(Image* image);
-	virtual						~BasicProfileResultImage();
+								BasicImageProfileResult(SharedImage* image,
+									image_id id);
+	virtual						~BasicImageProfileResult();
 
 	virtual	status_t			Init();
 
@@ -31,15 +32,16 @@ private:
 };
 
 
-class BasicProfileResult
-	: public AbstractProfileResult<BasicProfileResultImage> {
+class BasicProfileResult : public ProfileResult {
 public:
 								BasicProfileResult();
 
 	virtual	void				AddDroppedTicks(int32 dropped);
-	virtual	void				PrintResults();
+	virtual	void				PrintResults(
+									ImageProfileResultContainer* container);
 
-	virtual BasicProfileResultImage* CreateProfileResultImage(Image* image);
+	virtual ImageProfileResult*	CreateImageProfileResult(SharedImage* image,
+									image_id id);
 
 protected:
 			int64				fTotalTicks;
@@ -51,15 +53,17 @@ protected:
 
 class InclusiveProfileResult : public BasicProfileResult {
 public:
-	virtual	void				AddSamples(addr_t* samples,
-									int32 sampleCount);
+	virtual	void				AddSamples(
+									ImageProfileResultContainer* container,
+									addr_t* samples, int32 sampleCount);
 };
 
 
 class ExclusiveProfileResult : public BasicProfileResult {
 public:
-	virtual	void				AddSamples(addr_t* samples,
-									int32 sampleCount);
+	virtual	void				AddSamples(
+									ImageProfileResultContainer* container,
+									addr_t* samples, int32 sampleCount);
 };
 
 

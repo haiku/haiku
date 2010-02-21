@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_H
@@ -14,6 +14,8 @@
 #include "Thread.h"
 
 
+class Image;
+class SharedImage;
 struct system_profiler_team_added;
 
 

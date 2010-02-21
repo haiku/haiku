@@ -14,10 +14,27 @@
 #include "ProfileResult.h"
 
 
+class Image;
 class Team;
 
 
-class Thread : public ProfiledEntity, public DoublyLinkedListLinkImpl<Thread> {
+class ThreadImage : public DoublyLinkedListLinkImpl<ThreadImage> {
+public:
+								ThreadImage(Image* image,
+									ImageProfileResult* result);
+								~ThreadImage();
+
+			Image*				GetImage() const	{ return fImage; }
+			ImageProfileResult*	Result() const		{ return fResult; }
+
+private:
+			Image*				fImage;
+			ImageProfileResult*	fResult;
+};
+
+
+class Thread : public ProfiledEntity, public DoublyLinkedListLinkImpl<Thread>,
+	private ImageProfileResultContainer {
 public:
 								Thread(thread_id threadID, const char* name,
 									Team* team);
@@ -40,14 +57,29 @@ public:
 			void				SetSampleArea(area_id area, addr_t* samples);
 			void				SetInterval(bigtime_t interval);
 
-	inline	status_t			AddImage(Image* image);
-	inline	void				RemoveImage(Image* image);
+			void				SetLazyImages(bool lazy);
+
+			status_t			AddImage(Image* image);
+			void				RemoveImage(Image* image);
 
 			void				AddSamples(int32 count, int32 dropped,
 									int32 stackDepth, bool variableStackDepth,
 									int32 event);
 			void				AddSamples(addr_t* samples, int32 sampleCount);
-			void				PrintResults() const;
+			void				PrintResults();
+
+private:
+	typedef DoublyLinkedList<ThreadImage>	ImageList;
+
+private:
+	// ImageProfileResultContainer
+	virtual	int32				CountImages() const;
+	virtual	ImageProfileResult*	VisitImages(Visitor& visitor) const;
+	virtual	ImageProfileResult*	FindImage(addr_t address,
+									addr_t& _loadDelta) const;
+
+private:
+			void				_SynchronizeImages(int32 event);
 
 private:
 			thread_id			fID;
@@ -56,6 +88,10 @@ private:
 			area_id				fSampleArea;
 			addr_t*				fSamples;
 			ProfileResult*		fProfileResult;
+			ImageList			fImages;
+			ImageList			fNewImages;
+			ImageList			fOldImages;
+			bool				fLazyImages;
 };
 
 
@@ -91,20 +127,6 @@ ProfileResult*
 Thread::GetProfileResult() const
 {
 	return fProfileResult;
-}
-
-
-status_t
-Thread::AddImage(Image* image)
-{
-	return fProfileResult->AddImage(image);
-}
-
-
-void
-Thread::RemoveImage(Image* image)
-{
-	fProfileResult->RemoveImage(image);
 }
 
 

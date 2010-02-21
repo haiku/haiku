@@ -11,16 +11,16 @@
 #include "ProfileResult.h"
 
 
-class CallgrindProfileResultImage;
+class CallgrindImageProfileResult;
 
 
 struct CallgrindCalledFunction {
 	CallgrindCalledFunction*		next;
-	CallgrindProfileResultImage*	image;
+	CallgrindImageProfileResult*	image;
 	int32							function;
 	int64							hits;
 
-	CallgrindCalledFunction(CallgrindProfileResultImage* image, int32 function)
+	CallgrindCalledFunction(CallgrindImageProfileResult* image, int32 function)
 		:
 		next(NULL),
 		image(image),
@@ -39,16 +39,17 @@ struct CallgrindFunction {
 };
 
 
-class CallgrindProfileResultImage : public ProfileResultImage,
-	public DoublyLinkedListLinkImpl<CallgrindProfileResultImage> {
+class CallgrindImageProfileResult : public ImageProfileResult,
+	public DoublyLinkedListLinkImpl<CallgrindImageProfileResult> {
 public:
-								CallgrindProfileResultImage(Image* image);
-	virtual						~CallgrindProfileResultImage();
+								CallgrindImageProfileResult(SharedImage* image,
+									image_id id);
+	virtual						~CallgrindImageProfileResult();
 
 	virtual	status_t			Init();
 
 	inline	void				AddSymbolHit(int32 symbolIndex,
-									CallgrindProfileResultImage* calledImage,
+									CallgrindImageProfileResult* calledImage,
 									int32 calledSymbol);
 
 	inline	CallgrindFunction*	Functions() const;
@@ -62,21 +63,23 @@ private:
 };
 
 
-class CallgrindProfileResult
-	: public AbstractProfileResult<CallgrindProfileResultImage> {
+class CallgrindProfileResult : public ProfileResult {
 public:
 								CallgrindProfileResult();
 
-	virtual	void				AddSamples(addr_t* samples,
-									int32 sampleCount);
+	virtual	void				AddSamples(
+									ImageProfileResultContainer* container,
+									addr_t* samples, int32 sampleCount);
 	virtual	void				AddDroppedTicks(int32 dropped);
-	virtual	void				PrintResults();
+	virtual	void				PrintResults(
+									ImageProfileResultContainer* container);
 
-	virtual CallgrindProfileResultImage* CreateProfileResultImage(Image* image);
+	virtual ImageProfileResult*	CreateImageProfileResult(SharedImage* image,
+									image_id id);
 
 private:
 			void				_PrintFunction(FILE* out,
-									CallgrindProfileResultImage* image,
+									CallgrindImageProfileResult* image,
 									int32 functionIndex, bool called);
 private:
 			int64				fTotalTicks;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,6 +14,7 @@
 
 #include "debug_utils.h"
 
+#include "Image.h"
 #include "Options.h"
 
 
@@ -104,7 +105,7 @@ status_t
 Team::InitThread(Thread* thread)
 {
 	// The thread
-	thread->GetProfileResult()->SetLazyImages(!_SynchronousProfiling());
+	thread->SetLazyImages(!_SynchronousProfiling());
 
 	// create the sample area
 	char areaName[B_OS_NAME_LENGTH];
@@ -267,7 +268,7 @@ Team::_RemoveImage(int32 index, int32 event)
 	if (_SynchronousProfiling()) {
 		ThreadList::Iterator it = fThreads.GetIterator();
 		while (Thread* thread = it.Next())
-			thread->GetProfileResult()->RemoveImage(image);
+			thread->RemoveImage(image);
 	} else {
 		// Note: We don't tell the threads that the image has been removed. They
 		// will be updated lazily when their next profiler update arrives. This

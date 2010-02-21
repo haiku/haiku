@@ -7,26 +7,43 @@
 #include "ProfileResult.h"
 
 
-// #pragma mark - ProfileResultImage
+// #pragma mark - ImageProfileResultContainer
 
 
-ProfileResultImage::ProfileResultImage(Image* image)
+ImageProfileResultContainer::~ImageProfileResultContainer()
+{
+}
+
+
+// #pragma mark - ImageProfileResultContainer::Visitor
+
+
+ImageProfileResultContainer::Visitor::~Visitor()
+{
+}
+
+
+// #pragma mark - ImageProfileResult
+
+
+ImageProfileResult::ImageProfileResult(SharedImage* image, image_id id)
 	:
 	fImage(image),
-	fTotalHits(0)
+	fTotalHits(0),
+	fImageID(id)
 {
 	fImage->AddReference();
 }
 
 
-ProfileResultImage::~ProfileResultImage()
+ImageProfileResult::~ImageProfileResult()
 {
 	fImage->RemoveReference();
 }
 
 
 status_t
-ProfileResultImage::Init()
+ImageProfileResult::Init()
 {
 	return B_OK;
 }

@@ -27,25 +27,26 @@ struct HitSymbol {
 };
 
 
-// #pragma mark - BasicProfileResultImage
+// #pragma mark - BasicImageProfileResult
 
 
-BasicProfileResultImage::BasicProfileResultImage(Image* image)
+BasicImageProfileResult::BasicImageProfileResult(SharedImage* image,
+	image_id id)
 	:
-	ProfileResultImage(image),
+	ImageProfileResult(image, id),
 	fSymbolHits(NULL),
 	fUnknownHits(0)
 {
 }
 
 
-BasicProfileResultImage::~BasicProfileResultImage()
+BasicImageProfileResult::~BasicImageProfileResult()
 {
 }
 
 
 status_t
-BasicProfileResultImage::Init()
+BasicImageProfileResult::Init()
 {
 	int32 symbolCount = fImage->SymbolCount();
 	fSymbolHits = new(std::nothrow) int64[symbolCount];
@@ -59,7 +60,7 @@ BasicProfileResultImage::Init()
 
 
 bool
-BasicProfileResultImage::AddHit(addr_t address)
+BasicImageProfileResult::AddHit(addr_t address)
 {
 	int32 symbolIndex = fImage->FindSymbol(address);
 	if (symbolIndex < 0)
@@ -73,7 +74,7 @@ BasicProfileResultImage::AddHit(addr_t address)
 
 
 void
-BasicProfileResultImage::AddUnknownHit()
+BasicImageProfileResult::AddUnknownHit()
 {
 	fUnknownHits++;
 	fTotalHits++;
@@ -81,28 +82,28 @@ BasicProfileResultImage::AddUnknownHit()
 
 
 void
-BasicProfileResultImage::AddSymbolHit(int32 symbolIndex)
+BasicImageProfileResult::AddSymbolHit(int32 symbolIndex)
 {
 	fSymbolHits[symbolIndex]++;
 }
 
 
 void
-BasicProfileResultImage::AddImageHit()
+BasicImageProfileResult::AddImageHit()
 {
 	fTotalHits++;
 }
 
 
 const int64*
-BasicProfileResultImage::SymbolHits() const
+BasicImageProfileResult::SymbolHits() const
 {
 	return fSymbolHits;
 }
 
 
 int64
-BasicProfileResultImage::UnknownHits() const
+BasicImageProfileResult::UnknownHits() const
 {
 	return fUnknownHits;
 }
@@ -129,16 +130,16 @@ BasicProfileResult::AddDroppedTicks(int32 dropped)
 
 
 void
-BasicProfileResult::PrintResults()
+BasicProfileResult::PrintResults(ImageProfileResultContainer* container)
 {
 	// get hit images
-	BasicProfileResultImage* images[fOldImages.Count() + fImages.Count()];
-	int32 imageCount = GetHitImages(images);
+	BasicImageProfileResult* images[container->CountImages()];
+	int32 imageCount = GetHitImages(container, images);
 
 	// count symbols
 	int32 symbolCount = 0;
 	for (int32 k = 0; k < imageCount; k++) {
-		BasicProfileResultImage* image = images[k];
+		BasicImageProfileResult* image = images[k];
 		if (image->TotalHits() > image->UnknownHits())
 			symbolCount += image->GetImage()->SymbolCount();
 	}
@@ -148,7 +149,7 @@ BasicProfileResult::PrintResults()
 	int32 hitSymbolCount = 0;
 
 	for (int32 k = 0; k < imageCount; k++) {
-		BasicProfileResultImage* image = images[k];
+		BasicImageProfileResult* image = images[k];
 		if (image->TotalHits() > image->UnknownHits()) {
 			Symbol** symbols = image->GetImage()->Symbols();
 			const int64* symbolHits = image->SymbolHits();
@@ -193,10 +194,10 @@ BasicProfileResult::PrintResults()
 		fprintf(gOptions.output, "  ---------------------------------------"
 			"---------------------------------------\n");
 		for (int32 k = 0; k < imageCount; k++) {
-			BasicProfileResultImage* image = images[k];
+			BasicImageProfileResult* image = images[k];
 			fprintf(gOptions.output, "  %10lld  %10lld  %7ld %s\n",
 				image->TotalHits(), image->UnknownHits(),
-				image->GetImage()->ID(), image->GetImage()->Name());
+				image->ID(), image->GetImage()->Name());
 		}
 	}
 
@@ -219,10 +220,10 @@ BasicProfileResult::PrintResults()
 }
 
 
-BasicProfileResultImage*
-BasicProfileResult::CreateProfileResultImage(Image* image)
+ImageProfileResult*
+BasicProfileResult::CreateImageProfileResult(SharedImage* image, image_id id)
 {
-	return new(std::nothrow) BasicProfileResultImage(image);
+	return new(std::nothrow) BasicImageProfileResult(image, id);
 }
 
 
@@ -230,7 +231,8 @@ BasicProfileResult::CreateProfileResultImage(Image* image)
 
 
 void
-InclusiveProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
+InclusiveProfileResult::AddSamples(ImageProfileResultContainer* container,
+	addr_t* samples, int32 sampleCount)
 {
 	// Sort the samples. This way hits of the same symbol are
 	// successive and we can avoid incrementing the hit count of the
@@ -238,15 +240,17 @@ InclusiveProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
 	std::sort(samples, samples + sampleCount);
 
 	int32 unknownSamples = 0;
-	BasicProfileResultImage* previousImage = NULL;
+	BasicImageProfileResult* previousImage = NULL;
 	int32 previousSymbol = -1;
 
 	for (int32 i = 0; i < sampleCount; i++) {
 		addr_t address = samples[i];
-		BasicProfileResultImage* image = FindImage(address);
+		addr_t loadDelta;
+		BasicImageProfileResult* image = static_cast<BasicImageProfileResult*>(
+			container->FindImage(address, loadDelta));
 		int32 symbol = -1;
 		if (image != NULL) {
-			symbol = image->GetImage()->FindSymbol(address);
+			symbol = image->GetImage()->FindSymbol(address - loadDelta);
 			if (symbol < 0) {
 				// TODO: Count unknown image hits?
 			} else if (image != previousImage || symbol != previousSymbol)
@@ -273,18 +277,21 @@ InclusiveProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
 
 
 void
-ExclusiveProfileResult::AddSamples(addr_t* samples, int32 sampleCount)
+ExclusiveProfileResult::AddSamples(ImageProfileResultContainer* container,
+	addr_t* samples, int32 sampleCount)
 {
-	BasicProfileResultImage* image = NULL;
+	BasicImageProfileResult* image = NULL;
 		// the image in which we hit a symbol
-	BasicProfileResultImage* firstImage = NULL;
+	BasicImageProfileResult* firstImage = NULL;
 		// the first image we hit, != image if no symbol was hit
 
 	for (int32 k = 0; k < sampleCount; k++) {
 		addr_t address = samples[k];
-		image = FindImage(address);
+		addr_t loadDelta;
+		image = static_cast<BasicImageProfileResult*>(
+			container->FindImage(address, loadDelta));
 		if (image != NULL) {
-			if (image->AddHit(address))
+			if (image->AddHit(address - loadDelta))
 				break;
 			if (firstImage == NULL)
 				firstImage = image;
