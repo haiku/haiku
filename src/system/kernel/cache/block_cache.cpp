@@ -189,7 +189,8 @@ public:
 			bool				Add(cached_block* block,
 									hash_iterator* iterator = NULL);
 			bool				Add(cache_transaction* transaction,
-									hash_iterator* iterator);
+									hash_iterator* iterator,
+									bool& hasLeftOvers);
 
 			status_t			Write(hash_iterator* iterator = NULL,
 									bool canUnlock = true);
@@ -1083,16 +1084,27 @@ BlockWriter::Add(cached_block* block, hash_iterator* iterator)
 	If no more blocks can be added, false is returned, otherwise true.
 */
 bool
-BlockWriter::Add(cache_transaction* transaction, hash_iterator* iterator)
+BlockWriter::Add(cache_transaction* transaction, hash_iterator* iterator,
+	bool& hasLeftOvers)
 {
 	ASSERT(!transaction->open);
 
-	if (transaction->busy_writing_count != 0)
+	if (transaction->busy_writing_count != 0) {
+		hasLeftOvers = true;
 		return true;
+	}
+
+	hasLeftOvers = false;
 
 	block_list::Iterator blockIterator = transaction->blocks.GetIterator();
 	while (cached_block* block = blockIterator.Next()) {
-		if (!Add(block))
+		if (!block->CanBeWritten()) {
+			// This block was already part of a previous transaction within this
+			// writer
+			hasLeftOvers = true;
+			continue;
+		}
+		if (!Add(block, iterator))
 			return false;
 
 		if (DeletedTransaction())
@@ -2491,7 +2503,9 @@ block_notifier_and_writer(void* /*data*/)
 						continue;
 					}
 
-					if (!writer.Add(transaction, &iterator))
+					bool hasLeftOvers;
+						// we ignore this one
+					if (!writer.Add(transaction, &iterator, hasLeftOvers))
 						break;
 				}
 
@@ -2689,7 +2703,14 @@ cache_sync_transaction(void* _cache, int32 id)
 				// write back all of their remaining dirty blocks
 				T(Action("sync", cache, transaction));
 
-				writer.Add(transaction, &iterator);
+				bool hasLeftOvers;
+				writer.Add(transaction, &iterator, hasLeftOvers);
+
+				if (hasLeftOvers) {
+					// This transaction contains blocks that a previous
+					// transaction is trying to write back in this write run
+					hadBusy = true;
+				}
 			}
 		}
 
