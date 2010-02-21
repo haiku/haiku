@@ -103,6 +103,7 @@ local namespace_src =
 	nsparse.c
 	nspredef.c
 	nsrepair.c
+	nsrepair2.c
 	nssearch.c
 	nsutils.c
 	nswalk.c
