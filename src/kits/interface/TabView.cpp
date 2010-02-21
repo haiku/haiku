@@ -270,16 +270,6 @@ BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 	if (be_control_look != NULL) {
-//		uint32 borders = BControlLook::B_RIGHT_BORDER
-//			| BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
-//		if (frame.left == owner->Bounds().left)
-//			borders |= BControlLook::B_LEFT_BORDER;
-//		be_control_look->DrawButtonFrame(owner, frame, frame,
-//			no_tint, 0, borders);
-//		if (position == B_TAB_FRONT)
-//			no_tint = tint_color(no_tint, B_DARKEN_2_TINT);
-//		be_control_look->DrawButtonBackground(owner, frame, frame, no_tint);
-
 		uint32 borders = BControlLook::B_TOP_BORDER
 			| BControlLook::B_BOTTOM_BORDER;
 		if (frame.left == owner->Bounds().left)
@@ -402,9 +392,8 @@ BTabView::BTabView(BRect frame, const char *name, button_width width,
 
 BTabView::~BTabView()
 {
-	for (int32 i = 0; i < CountTabs(); i++) {
+	for (int32 i = 0; i < CountTabs(); i++)
 		delete TabAt(i);
-	}
 
 	delete fTabList;
 }
@@ -824,14 +813,6 @@ BTabView::Draw(BRect updateRect)
 BRect
 BTabView::DrawTabs()
 {
-	if (be_control_look != NULL) {
-//		BRect rect(Bounds());
-//		rect.bottom = rect.top + fTabHeight;
-//		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-//		be_control_look->DrawButtonFrame(this, rect, rect, base);
-//		be_control_look->DrawButtonBackground(this, rect, rect, base);
-	}
-
 	float left = 0;
 
 	for (int32 i = 0; i < CountTabs(); i++) {
@@ -844,6 +825,10 @@ BTabView::DrawTabs()
 
 	if (be_control_look != NULL) {
 		BRect frame(Bounds());
+		if (fBorderStyle == B_PLAIN_BORDER)
+			frame.right += 1;
+		else if (fBorderStyle == B_NO_BORDER)
+			frame.right += 2;
 		if (left < frame.right) {
 			frame.left = left;
 			frame.bottom = fTabHeight;
@@ -852,6 +837,18 @@ BTabView::DrawTabs()
 				| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
 			if (left == 0)
 				borders |= BControlLook::B_LEFT_BORDER;
+			be_control_look->DrawInactiveTab(this, frame, frame, base, 0,
+				borders);
+		}
+		if (fBorderStyle == B_NO_BORDER) {
+			// Draw a small inactive area before first tab.
+			frame = Bounds();
+			frame.right = 0.0f;
+				// one pixel wide
+			frame.bottom = fTabHeight;
+			rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+			uint32 borders = BControlLook::B_TOP_BORDER
+				| BControlLook::B_BOTTOM_BORDER;
 			be_control_look->DrawInactiveTab(this, frame, frame, base, 0,
 				borders);
 		}
@@ -870,18 +867,19 @@ BTabView::DrawBox(BRect selTabRect)
 	if (be_control_look != NULL) {
 		BRect rect(Bounds());
 		rect.top = selTabRect.bottom;
-
-//		BRegion clipping(Bounds());
-//		selTabRect.left += 2;
-//		selTabRect.right -= 2;
-//		clipping.Exclude(selTabRect);
-//		ConstrainClippingRegion(&clipping);
+		if (fBorderStyle != B_FANCY_BORDER)
+			rect.top += 1.0f;
 
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		be_control_look->DrawGroupFrame(this, rect, rect, base);
-
-//		ConstrainClippingRegion(NULL);
-
+		if (fBorderStyle == B_FANCY_BORDER)
+			be_control_look->DrawGroupFrame(this, rect, rect, base);
+		else {
+			uint32 borders = BControlLook::B_TOP_BORDER;
+			if (fBorderStyle == B_PLAIN_BORDER)
+				borders = BControlLook::B_ALL_BORDERS;
+			be_control_look->DrawBorder(this, rect, rect, base, B_PLAIN_BORDER,
+				0, borders);
+		}
 		return;
 	}
 
@@ -949,25 +947,31 @@ BTabView::TabFrame(int32 index) const
 		return BRect();
 
 	if (be_control_look != NULL) {
-		float width = 100.0;
-		float height = fTabHeight;;
+		float width = 100.0f;
+		float height = fTabHeight;
+		float borderOffset = 0.0f;
+		// Do not use 2.0f for B_NO_BORDER, that will look yet different
+		// again (handled in DrawTabs()).
+		if (fBorderStyle == B_PLAIN_BORDER)
+			borderOffset = 1.0f;
 		switch (fTabWidthSetting) {
 			case B_WIDTH_FROM_LABEL:
 			{
-				float x = 0.0;
+				float x = 0.0f;
 				for (int32 i = 0; i < index; i++){
-					x += StringWidth(TabAt(i)->Label()) + 20.0;
+					x += StringWidth(TabAt(i)->Label()) + 20.0f;
 				}
 
-				return BRect(x, 0.0,
-					x + StringWidth(TabAt(index)->Label()) + 20.0,
+				return BRect(x - borderOffset, 0.0f,
+					x + StringWidth(TabAt(index)->Label()) + 20.0f
+						- borderOffset,
 					height);
 			}
 
 			case B_WIDTH_FROM_WIDEST:
 				width = 0.0;
 				for (int32 i = 0; i < CountTabs(); i++) {
-					float tabWidth = StringWidth(TabAt(i)->Label()) + 20.0;
+					float tabWidth = StringWidth(TabAt(i)->Label()) + 20.0f;
 					if (tabWidth > width)
 						width = tabWidth;
 				}
@@ -975,7 +979,8 @@ BTabView::TabFrame(int32 index) const
 
 			case B_WIDTH_AS_USUAL:
 			default:
-				return BRect(index * width, 0.0, index * width + width, height);
+				return BRect(index * width - borderOffset, 0.0f,
+					index * width + width - borderOffset, height);
 		}
 	}
 
@@ -1224,6 +1229,25 @@ BTabView::TabHeight() const
 }
 
 
+void
+BTabView::SetBorder(border_style border)
+{
+	if (fBorderStyle == border)
+		return;
+
+	fBorderStyle = border;
+
+	_LayoutContainerView((Flags() & B_SUPPORTS_LAYOUT) != 0);
+}
+
+
+border_style
+BTabView::Border() const
+{
+	return fBorderStyle;
+}
+
+
 BView *
 BTabView::ContainerView() const
 {
@@ -1261,6 +1285,7 @@ BTabView::_InitObject(bool layouted, button_width width)
 	fSelection = 0;
 	fFocus = -1;
 	fTabOffset = 0.0f;
+	fBorderStyle = B_FANCY_BORDER;
 
 	rgb_color color = ui_color(B_PANEL_BACKGROUND_COLOR);
 
@@ -1272,23 +1297,15 @@ BTabView::_InitObject(bool layouted, button_width width)
 	fTabHeight = fh.ascent + fh.descent + fh.leading + 8.0f;
 
 	if (layouted) {
-		BGroupLayout* layout = new(std::nothrow) BGroupLayout(B_HORIZONTAL);
-		if (layout) {
-			layout->SetInsets(3.0, 3.0 + TabHeight() - 1, 3.0, 3.0);
-			SetLayout(layout);
-		}
+		SetLayout(new(std::nothrow) BGroupLayout(B_HORIZONTAL));
 
 		fContainerView = new BView("view container", B_WILL_DRAW);
 		fContainerView->SetLayout(new(std::nothrow) BCardLayout());
 	} else {
-		BRect bounds = Bounds();
-
-		bounds.top += TabHeight();
-		bounds.InsetBy(3.0f, 3.0f);
-
-		fContainerView = new BView(bounds, "view container", B_FOLLOW_ALL,
+		fContainerView = new BView(Bounds(), "view container", B_FOLLOW_ALL,
 			B_WILL_DRAW);
 	}
+	_LayoutContainerView(layouted);
 
 	fContainerView->SetViewColor(color);
 	fContainerView->SetLowColor(color);
@@ -1316,10 +1333,59 @@ BTabView::_TabsMinSize() const
 }
 
 
+float
+BTabView::_BorderWidth() const
+{
+	switch (fBorderStyle) {
+		default:
+		case B_FANCY_BORDER:
+			return 3.0f;
+		case B_PLAIN_BORDER:
+			return 1.0f;
+		case B_NO_BORDER:
+			return 0.0f;
+	}
+}
+
+
+void
+BTabView::_LayoutContainerView(bool layouted)
+{
+	float borderWidth = _BorderWidth();
+	if (layouted) {
+		float topBorderOffset;
+		switch (fBorderStyle) {
+			default:
+			case B_FANCY_BORDER:
+				topBorderOffset = 1.0f;
+				break;
+			case B_PLAIN_BORDER:
+				topBorderOffset = 0.0f;
+				break;
+			case B_NO_BORDER:
+				topBorderOffset = -1.0f;
+				break;
+		}
+		BGroupLayout* layout = dynamic_cast<BGroupLayout*>(GetLayout());
+		if (layout) {
+			layout->SetInsets(borderWidth, borderWidth + TabHeight()
+				- topBorderOffset, borderWidth, borderWidth);
+		}
+	} else {
+		BRect bounds = Bounds();
+
+		bounds.top += TabHeight();
+		bounds.InsetBy(borderWidth, borderWidth);
+
+		fContainerView->MoveTo(bounds.left, bounds.top);
+		fContainerView->ResizeTo(bounds.Width(), bounds.Height());
+	}
+}
+
+
 // #pragma mark - FBC and forbidden
 
 
-void BTabView::_ReservedTabView1() {}
 void BTabView::_ReservedTabView2() {}
 void BTabView::_ReservedTabView3() {}
 void BTabView::_ReservedTabView4() {}
@@ -1346,3 +1412,24 @@ BTabView::operator=(const BTabView&)
 	// this is private and not functional, but exported
 	return *this;
 }
+
+//	#pragma mark - binary compatibility
+
+#if __GNUC__ < 3
+
+extern "C" void
+_ReservedTabView1__8BTabView(BTabView* tabView, border_style border)
+{
+	tabView->BTabView::SetBorder(border);
+}
+
+#else // __GNUC__ >= 3
+
+extern "C" void
+_ZN8BTabView17_ReservedTabView1Ev(BTabView* tabView, border_style border)
+{
+	tabView->BTabView::SetBorder(border);
+}
+
+#endif // __GNUC__ >= 3
+

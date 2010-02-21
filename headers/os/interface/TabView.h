@@ -155,6 +155,9 @@ public:
 	virtual	void				SetTabHeight(float height);
 			float				TabHeight() const;
 
+	virtual	void				SetBorder(border_style border);
+			border_style		Border() const;
+
 			BView*				ContainerView() const;
 
 			int32				CountTabs() const;
@@ -162,7 +165,6 @@ public:
 
 private:
 	// FBC padding and forbidden methods
-	virtual	void				_ReservedTabView1();
 	virtual	void				_ReservedTabView2();
 	virtual	void				_ReservedTabView3();
 	virtual	void				_ReservedTabView4();
@@ -181,6 +183,8 @@ private:
 private:
 			void				_InitObject(bool layouted, button_width width);
 			BSize				_TabsMinSize() const;
+			float				_BorderWidth() const;
+			void				_LayoutContainerView(bool layouted);
 
 private:
 			BList*				fTabList;
@@ -192,8 +196,9 @@ private:
 			int32				fInitialSelection;
 			int32				fFocus;
 			float				fTabOffset;
+			border_style		fBorderStyle;
 
-			uint32				_reserved[11];
+			uint32				_reserved[10];
 };
 
 #endif // _TAB_VIEW_H
