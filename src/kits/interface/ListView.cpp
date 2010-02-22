@@ -1685,14 +1685,14 @@ BListView::_SwapItems(int32 a, int32 b)
 	int32 last = max_c(a, b);
 	if (ItemAt(a)->IsSelected() != ItemAt(b)->IsSelected()) {
 		if (first < fFirstSelected || last > fLastSelected)
-			_RescanSelection(min_c(first, fFirstSelected), min_c(last, fLastSelected));
+			_RescanSelection(min_c(first, fFirstSelected), max_c(last, fLastSelected));
 		// though the actually selected items stayed the
 		// same, the selection has still changed
 		SelectionChanged();
 	}
 
-	ItemAt(a)->SetTop(bFrame.top);
-	ItemAt(b)->SetTop(aFrame.top);
+	ItemAt(a)->SetTop(aFrame.top);
+	ItemAt(b)->SetTop(bFrame.top);
 
 	// take care of invalidation
 	if (Window()) {
@@ -1801,7 +1801,7 @@ BListView::_RescanSelection(int32 from, int32 to)
 
 	from = max_c(0, from);
 	to = min_c(to, CountItems() - 1);
-
+	
 	if (fAnchorIndex != -1) {
 		if (fAnchorIndex == from)
 			fAnchorIndex = to;
@@ -1818,6 +1818,8 @@ BListView::_RescanSelection(int32 from, int32 to)
 
 	if (fFirstSelected > from)
 		from = fFirstSelected;
+		
+	fLastSelected = fFirstSelected;
 	for (int32 i = from; i <= to; i++) {
 		if (ItemAt(i)->IsSelected())
 			fLastSelected = i;
