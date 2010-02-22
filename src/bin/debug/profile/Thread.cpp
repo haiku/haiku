@@ -27,13 +27,14 @@ ThreadImage::ThreadImage(Image* image, ImageProfileResult* result)
 	fResult(result)
 {
 	fImage->AcquireReference();
+	fResult->AcquireReference();
 }
 
 
 ThreadImage::~ThreadImage()
 {
 	fImage->ReleaseReference();
-	delete fResult;
+	fResult->ReleaseReference();
 }
 
 
@@ -58,7 +59,8 @@ Thread::~Thread()
 	if (fSampleArea >= 0)
 		delete_area(fSampleArea);
 
-	delete fProfileResult;
+	if (fProfileResult != NULL)
+		fProfileResult->ReleaseReference();
 
 	while (ThreadImage* image = fImages.RemoveHead())
 		delete image;
@@ -91,8 +93,14 @@ Thread::EntityType() const
 void
 Thread::SetProfileResult(ProfileResult* result)
 {
-	delete fProfileResult;
+	ProfileResult* oldResult = fProfileResult;
+
 	fProfileResult = result;
+	if (fProfileResult != NULL)
+		fProfileResult->AcquireReference();
+
+	if (oldResult)
+		oldResult->ReleaseReference();
 }
 
 
@@ -128,22 +136,17 @@ Thread::SetLazyImages(bool lazy)
 status_t
 Thread::AddImage(Image* image)
 {
-	ImageProfileResult* result = fProfileResult->CreateImageProfileResult(
-		image->GetSharedImage(), image->ID());
-	if (result == NULL)
-		return B_NO_MEMORY;
-
-	status_t error = result->Init();
-	if (error != B_OK) {
-		delete result;
+	ImageProfileResult* result;
+	status_t error = fProfileResult->GetImageProfileResult(
+		image->GetSharedImage(), image->ID(), result);
+	if (error != B_OK)
 		return error;
-	}
+
+	BReference<ImageProfileResult> resultReference(result, true);
 
 	ThreadImage* threadImage = new(std::nothrow) ThreadImage(image, result);
-	if (threadImage == NULL) {
-		delete result;
+	if (threadImage == NULL)
 		return B_NO_MEMORY;
-	}
 
 	if (fLazyImages)
 		fNewImages.Add(threadImage);

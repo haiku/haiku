@@ -35,6 +35,7 @@
 #include "debug_utils.h"
 #include "Image.h"
 #include "Options.h"
+#include "SummaryProfileResult.h"
 #include "Team.h"
 
 
@@ -84,6 +85,8 @@ static const char* kUsage =
 	"                   caller stack per tick. If the topmost address doesn't\n"
 	"                   hit a known image, the next address will be matched\n"
 	"                   (and so on).\n"
+	"  -S             - Don't output results for individual threads, but\n"
+	"                   produce a combined output at the end.\n"
 	"  -v <directory> - Create valgrind/callgrind output. <directory> is the\n"
 	"                   directory where to put the output files.\n"
 ;
@@ -94,22 +97,46 @@ Options gOptions;
 static bool sCaughtDeadlySignal = false;
 
 
-class ThreadManager {
+class ThreadManager : private ProfiledEntity {
 public:
 	ThreadManager(port_id debuggerPort)
 		:
 		fTeams(20, true),
 		fThreads(20, true),
 		fKernelTeam(NULL),
-		fDebuggerPort(debuggerPort)
+		fDebuggerPort(debuggerPort),
+		fSummaryProfileResult(NULL)
 	{
 	}
 
-	~ThreadManager()
+	virtual ~ThreadManager()
 	{
 		// release image references
 		for (ImageMap::iterator it = fImages.begin(); it != fImages.end(); ++it)
 			it->second->RemoveReference();
+
+		if (fSummaryProfileResult != NULL)
+			fSummaryProfileResult->ReleaseReference();
+	}
+
+	status_t Init()
+	{
+		if (!gOptions.summary_result)
+			return B_OK;
+
+		ProfileResult* profileResult;
+		status_t error = _CreateProfileResult(this, profileResult);
+		if (error != B_OK)
+			return error;
+
+		BReference<ProfileResult> profileResultReference(profileResult, true);
+
+		fSummaryProfileResult = new(std::nothrow) SummaryProfileResult(
+			profileResult);
+		if (fSummaryProfileResult == NULL)
+			return B_NO_MEMORY;
+
+		return fSummaryProfileResult->Init(profileResult->Entity());
 	}
 
 	status_t AddTeam(team_id teamID, Team** _team = NULL)
@@ -145,7 +172,7 @@ public:
 		if (thread == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = _CreateProfileResult(thread);
+		status_t error = _CreateThreadProfileResult(thread);
 		if (error != B_OK) {
 			delete thread;
 			return error;
@@ -244,6 +271,28 @@ public:
 		}
 	}
 
+	void PrintSummaryResults()
+	{
+		if (fSummaryProfileResult != NULL)
+			fSummaryProfileResult->PrintSummaryResults();
+	}
+
+private:
+	virtual int32 EntityID() const
+	{
+		return 1;
+	}
+
+	virtual const char* EntityName() const
+	{
+		return "all";
+	}
+
+	virtual const char* EntityType() const
+	{
+		return "summary";
+	}
+
 private:
 	status_t _AddTeam(team_id teamID, system_profiler_team_added* addedInfo,
 		Team** _team = NULL)
@@ -333,9 +382,28 @@ private:
 		return B_OK;
 	}
 
-	status_t _CreateProfileResult(Thread* thread)
+	status_t _CreateThreadProfileResult(Thread* thread)
+	{
+		if (fSummaryProfileResult != NULL) {
+			thread->SetProfileResult(fSummaryProfileResult);
+			return B_OK;
+		}
+
+		ProfileResult* profileResult;
+		status_t error = _CreateProfileResult(thread, profileResult);
+		if (error != B_OK)
+			return error;
+
+		thread->SetProfileResult(profileResult);
+
+		return B_OK;
+	}
+
+	status_t _CreateProfileResult(ProfiledEntity* profiledEntity,
+		ProfileResult*& _profileResult)
 	{
 		ProfileResult* profileResult;
+
 		if (gOptions.callgrind_directory != NULL)
 			profileResult = new(std::nothrow) CallgrindProfileResult;
 		else if (gOptions.analyze_full_stack)
@@ -346,13 +414,13 @@ private:
 		if (profileResult == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = profileResult->Init(thread);
-		if (error != B_OK) {
-			delete profileResult;
-			return error;
-		}
+		BReference<ProfileResult> profileResultReference(profileResult, true);
 
-		thread->SetProfileResult(profileResult);
+		status_t error = profileResult->Init(profiledEntity);
+		if (error != B_OK)
+			return error;
+
+		_profileResult = profileResultReference.Detach();
 		return B_OK;
 	}
 
@@ -412,6 +480,7 @@ private:
 	ImageMap						fImages;
 	Team*							fKernelTeam;
 	port_id							fDebuggerPort;
+	SummaryProfileResult*			fSummaryProfileResult;
 };
 
 
@@ -608,6 +677,12 @@ profile_all(const char* const* programArgs, int programArgCount)
 
 	// create a thread manager
 	ThreadManager threadManager(-1);	// TODO: We don't need a debugger port!
+	status_t error = threadManager.Init();
+	if (error != B_OK) {
+		fprintf(stderr, "%s: Failed to init thread manager: %s\n", kCommandName,
+			strerror(error));
+		exit(1);
+	}
 
 	// start profiling
 	system_profiler_parameters profilerParameters;
@@ -618,7 +693,7 @@ profile_all(const char* const* programArgs, int programArgCount)
 	profilerParameters.interval = gOptions.interval;
 	profilerParameters.stack_depth = gOptions.stack_depth;
 
-	status_t error = _kern_system_profiler_start(&profilerParameters);
+	error = _kern_system_profiler_start(&profilerParameters);
 	if (error != B_OK) {
 		fprintf(stderr, "%s: Failed to start profiling: %s\n", kCommandName,
 			strerror(error));
@@ -678,6 +753,8 @@ profile_all(const char* const* programArgs, int programArgCount)
 		Thread* thread = threadManager.ThreadAt(i);
 		thread->PrintResults();
 	}
+
+	threadManager.PrintSummaryResults();
 }
 
 
@@ -686,10 +763,10 @@ dump_recorded()
 {
 	// retrieve recorded samples and parameters
 	system_profiler_parameters profilerParameters;
-	status_t status = _kern_system_profiler_recorded(&profilerParameters);
-	if (status != B_OK) {
+	status_t error = _kern_system_profiler_recorded(&profilerParameters);
+	if (error != B_OK) {
 		fprintf(stderr, "%s: Failed to get recorded profiling buffer: %s\n",
-			kCommandName, strerror(status));
+			kCommandName, strerror(error));
 		exit(1);
 	}
 
@@ -699,10 +776,10 @@ dump_recorded()
 
 	// create an area for the sample buffer
 	area_info info;
-	status = get_area_info(profilerParameters.buffer_area, &info);
-	if (status != B_OK) {
+	error = get_area_info(profilerParameters.buffer_area, &info);
+	if (error != B_OK) {
 		fprintf(stderr, "%s: Recorded profiling buffer invalid: %s\n",
-			kCommandName, strerror(status));
+			kCommandName, strerror(error));
 		exit(1);
 	}
 
@@ -714,6 +791,12 @@ dump_recorded()
 
 	// create a thread manager
 	ThreadManager threadManager(-1);	// TODO: We don't need a debugger port!
+	error = threadManager.Init();
+	if (error != B_OK) {
+		fprintf(stderr, "%s: Failed to init thread manager: %s\n", kCommandName,
+			strerror(error));
+		exit(1);
+	}
 
 	// get the current buffer
 	size_t bufferStart = bufferHeader->start;
@@ -736,6 +819,8 @@ dump_recorded()
 		Thread* thread = threadManager.ThreadAt(i);
 		thread->PrintResults();
 	}
+
+	threadManager.PrintSummaryResults();
 }
 
 
@@ -771,6 +856,13 @@ profile_single(const char* const* programArgs, int programArgCount)
 
 	// add team and thread to the thread manager
 	ThreadManager threadManager(debuggerPort);
+	error = threadManager.Init();
+	if (error != B_OK) {
+		fprintf(stderr, "%s: Failed to init thread manager: %s\n", kCommandName,
+			strerror(error));
+		exit(1);
+	}
+
 	if (threadManager.AddTeam(teamID) != B_OK
 		|| threadManager.AddThread(threadID) != B_OK) {
 		exit(1);
@@ -882,6 +974,9 @@ profile_single(const char* const* programArgs, int programArgCount)
 		if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
 			continue_thread(message.origin.nub_port, message.origin.thread);
 	}
+
+	// prints summary results
+	threadManager.PrintSummaryResults();
 }
 
 
@@ -901,7 +996,7 @@ main(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+acCfhi:klo:rs:v:",
+		int c = getopt_long(argc, (char**)argv, "+acCfhi:klo:rsS:v:",
 			sLongOptions, NULL);
 		if (c == -1)
 			break;
@@ -940,6 +1035,9 @@ main(int argc, const char* const* argv)
 				break;
 			case 's':
 				stackDepth = atol(optarg);
+				break;
+			case 'S':
+				gOptions.summary_result = true;
 				break;
 			case 'v':
 				gOptions.callgrind_directory = optarg;

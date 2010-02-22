@@ -6,6 +6,8 @@
 #define PROFILE_RESULT_H
 
 
+#include <Referenceable.h>
+
 #include <util/DoublyLinkedList.h>
 
 #include "SharedImage.h"
@@ -15,7 +17,7 @@ class ProfiledEntity;
 class Team;
 
 
-class ImageProfileResult {
+class ImageProfileResult : public BReferenceable {
 public:
 								ImageProfileResult(SharedImage* image,
 									image_id id);
@@ -58,12 +60,14 @@ public:
 };
 
 
-class ProfileResult {
+class ProfileResult : public BReferenceable {
 public:
 								ProfileResult();
 	virtual						~ProfileResult();
 
 	virtual	status_t			Init(ProfiledEntity* entity);
+
+			ProfiledEntity*		Entity() const	{ return fEntity; }
 
 			void				SetInterval(bigtime_t interval);
 
@@ -75,8 +79,9 @@ public:
 	virtual	void				PrintResults(
 									ImageProfileResultContainer* container) = 0;
 
-	virtual ImageProfileResult*	CreateImageProfileResult(SharedImage* image,
-									image_id id) = 0;
+	virtual status_t			GetImageProfileResult(SharedImage* image,
+									image_id id,
+									ImageProfileResult*& _imageResult) = 0;
 
 protected:
 			template<typename ImageProfileResultType>

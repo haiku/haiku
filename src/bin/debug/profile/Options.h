@@ -23,7 +23,8 @@ struct Options {
 		profile_loading(false),
 		profile_teams(true),
 		profile_threads(true),
-		analyze_full_stack(false)
+		analyze_full_stack(false),
+		summary_result(false)
 	{
 	}
 
@@ -37,6 +38,7 @@ struct Options {
 	bool		profile_teams;
 	bool		profile_threads;
 	bool		analyze_full_stack;
+	bool		summary_result;
 };
 
 

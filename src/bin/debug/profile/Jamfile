@@ -16,6 +16,7 @@ BinCommand profile
 	ProfiledEntity.cpp
 	ProfileResult.cpp
 	SharedImage.cpp
+	SummaryProfileResult.cpp
 	Team.cpp
 	Thread.cpp
 	profile.cpp

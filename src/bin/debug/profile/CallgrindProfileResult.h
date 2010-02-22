@@ -46,7 +46,7 @@ public:
 									image_id id);
 	virtual						~CallgrindImageProfileResult();
 
-	virtual	status_t			Init();
+			status_t			Init();
 
 	inline	void				AddSymbolHit(int32 symbolIndex,
 									CallgrindImageProfileResult* calledImage,
@@ -74,8 +74,9 @@ public:
 	virtual	void				PrintResults(
 									ImageProfileResultContainer* container);
 
-	virtual ImageProfileResult*	CreateImageProfileResult(SharedImage* image,
-									image_id id);
+	virtual status_t			GetImageProfileResult(SharedImage* image,
+									image_id id,
+									ImageProfileResult*& _imageResult);
 
 private:
 			void				_PrintFunction(FILE* out,

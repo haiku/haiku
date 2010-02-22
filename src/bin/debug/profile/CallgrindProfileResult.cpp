@@ -262,11 +262,23 @@ CallgrindProfileResult::PrintResults(ImageProfileResultContainer* container)
 }
 
 
-ImageProfileResult*
-CallgrindProfileResult::CreateImageProfileResult(SharedImage* image,
-	image_id id)
+status_t
+CallgrindProfileResult::GetImageProfileResult(SharedImage* image, image_id id,
+	ImageProfileResult*& _imageResult)
 {
-	return new(std::nothrow) CallgrindImageProfileResult(image, id);
+	CallgrindImageProfileResult* result
+		= new(std::nothrow) CallgrindImageProfileResult(image, id);
+	if (result == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = result->Init();
+	if (error != B_OK) {
+		delete result;
+		return error;
+	}
+
+	_imageResult = result;
+	return B_OK;
 }
 
 

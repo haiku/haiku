@@ -16,7 +16,7 @@ public:
 									image_id id);
 	virtual						~BasicImageProfileResult();
 
-	virtual	status_t			Init();
+			status_t			Init();
 
 	inline	bool				AddHit(addr_t address);
 	inline	void				AddUnknownHit();
@@ -40,8 +40,9 @@ public:
 	virtual	void				PrintResults(
 									ImageProfileResultContainer* container);
 
-	virtual ImageProfileResult*	CreateImageProfileResult(SharedImage* image,
-									image_id id);
+	virtual status_t			GetImageProfileResult(SharedImage* image,
+									image_id id,
+									ImageProfileResult*& _imageResult);
 
 protected:
 			int64				fTotalTicks;
