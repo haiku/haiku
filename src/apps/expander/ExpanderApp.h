@@ -30,6 +30,7 @@
 #define _ExpanderApp_h
 
 #include <Application.h>
+#include <Catalog.h>
 #include "ExpanderSettings.h"
 #include "ExpanderWindow.h"
 
@@ -47,6 +48,7 @@ class ExpanderApp : public BApplication {
 		void UpdateSettingsFrom(BMessage *message);
 	private:
 		ExpanderWindow *fWindow;
+		BCatalog				fCatalog;
 };
 
 #endif /* _ExpanderApp_h */

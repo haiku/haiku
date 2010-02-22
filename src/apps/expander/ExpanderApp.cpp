@@ -8,12 +8,15 @@
 #include "ExpanderWindow.h"
 
 #include <Alert.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <TextView.h>
-
 
 ExpanderApp::ExpanderApp()
 	: BApplication("application/x-vnd.Haiku-Expander")
 {
+	be_locale->GetAppCatalog(&fCatalog);
+
 	BPoint windowPosition = fSettings.Message().FindPoint("window_position");
 	BRect windowFrame(0, 0, 450, 120);
 	windowFrame.OffsetBy(windowPosition);
@@ -22,15 +25,16 @@ ExpanderApp::ExpanderApp()
 }
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "About"
+
 void
 ExpanderApp::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "Expander\n"
-		"\twritten by Jérôme Duval\n"
-		"\tCopyright 2004-2006, Haiku Inc.\n\n"
-		"original Be version by \n"
-		"Dominic, Hiroshi, Peter, Pavel and Robert\n", "OK");
-	BTextView *view = alert->TextView();
+	BAlert* alert = new BAlert("about", 
+		TR("Expander\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n"),
+		TR("OK"));
+	BTextView* view = alert->TextView();
 	BFont font;
 
 	view->SetStylable(true);
@@ -53,7 +57,7 @@ ExpanderApp::ReadyToRun()
 void
 ExpanderApp::ArgvReceived(int32 argc, char **argv)
 {
-	BMessage *msg = NULL;
+	BMessage* msg = NULL;
 	for (int32 i = 1; i < argc; i++) {
 		entry_ref ref;
 		status_t err = get_ref_for_path(argv[i], &ref);
@@ -71,7 +75,7 @@ ExpanderApp::ArgvReceived(int32 argc, char **argv)
 
 
 void
-ExpanderApp::RefsReceived(BMessage *msg)
+ExpanderApp::RefsReceived(BMessage* msg)
 {
 	BMessenger messenger(fWindow);
 	msg->AddBool("fromApp", true);
@@ -80,7 +84,7 @@ ExpanderApp::RefsReceived(BMessage *msg)
 
 
 void
-ExpanderApp::UpdateSettingsFrom(BMessage *message)
+ExpanderApp::UpdateSettingsFrom(BMessage* message)
 {
 	fSettings.UpdateFrom(message);
 }

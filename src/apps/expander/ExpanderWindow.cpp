@@ -15,12 +15,14 @@
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
 #include <Entry.h>
 #include <File.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -42,10 +44,13 @@ const uint32 MSG_DESTTEXT		= 'mDTX';
 const uint32 MSG_SHOWCONTENTS	= 'mSCT';
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "ExpanderWindow"
+
 ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 		BMessage* settings)
 	:
-	BWindow(frame, "Expander", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL),
+	BWindow(frame, TR_CMT("Expander", "!! Window Title !!"), B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL),
 	fSourcePanel(NULL),
 	fDestPanel(NULL),
 	fSourceChanged(true),
@@ -61,9 +66,9 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 
 	_AddMenuBar(layout);
 
-	fDestButton = new BButton("Destination", new BMessage(MSG_DEST));
-	fSourceButton = new BButton("Source", new BMessage(MSG_SOURCE));
-	fExpandButton = new BButton("Expand", new BMessage(MSG_EXPAND));
+	fDestButton = new BButton(TR("Destination"), new BMessage(MSG_DEST));
+	fSourceButton = new BButton(TR("Source"), new BMessage(MSG_SOURCE));
+	fExpandButton = new BButton(TR("Expand"), new BMessage(MSG_EXPAND));
 
 	BSize size = fDestButton->PreferredSize();
 	size.width = max_c(size.width, fSourceButton->PreferredSize().width);
@@ -98,7 +103,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 				.Add(fDestText = new BTextControl(NULL, NULL,
 					new BMessage(MSG_DESTTEXT)))
 				.AddGroup(B_HORIZONTAL, spacing)
-					.Add(fShowContents = new BCheckBox("Show contents",
+					.Add(fShowContents = new BCheckBox(TR("Show contents"),
 						new BMessage(MSG_SHOWCONTENTS)))
 					.Add(fStatusView = new BStringView(NULL, NULL))
 				.End()
@@ -139,19 +144,22 @@ ExpanderWindow::ValidateDest()
 	BEntry entry(fDestText->Text(), true);
 	BVolume volume;
 	if (!entry.Exists()) {
-		BAlert* alert = new BAlert("destAlert", "The destination"
-			" folder does not exist.", "Cancel", NULL, NULL,
+		BAlert* alert = new BAlert("destAlert", 
+			TR("The destination folder does not exist."),
+			TR("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 		alert->Go();
 		return false;
 	} else if (!entry.IsDirectory()) {
-		(new BAlert("destAlert", "The destination"
-			" is not a folder.", "Cancel", NULL, NULL,
+		(new BAlert("destAlert",
+			TR("The destination is not a folder."),
+			TR("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT))->Go();
 		return false;
 	} else if (entry.GetVolume(&volume) != B_OK || volume.IsReadOnly()) {
-		(new BAlert("destAlert", "The destination is read only.",
-			"Cancel", NULL, NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING,
+		(new BAlert("destAlert",
+			TR("The destination is read only."),
+			TR("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING,
 			B_WARNING_ALERT))->Go();
 		return false;
 	} else {
@@ -175,6 +183,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 				BMessenger messenger(this);
 				fSourcePanel = new BFilePanel(B_OPEN_PANEL, &messenger, &srcRef,
 					B_FILE_NODE, false, NULL, new RuleRefFilter(fRules), true);
+				(fSourcePanel->Window())->SetTitle(TR("Expander: Open"));
 			} else
 				fSourcePanel->SetPanelDirectory(&srcRef);
 			fSourcePanel->Show();
@@ -226,9 +235,9 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 		case MSG_STOP:
 			if (fExpandingStarted) {
 				fExpandingThread->SuspendExternalExpander();
-				BAlert* alert = new BAlert("stopAlert", "Are you sure you want "
-					"to stop expanding this\narchive? The expanded items may "
-					"not be complete.", "Stop", "Continue", NULL,
+				BAlert* alert = new BAlert("stopAlert",
+					TR("Are you sure you want to stop expanding this\narchive? The expanded items may not be complete."),
+					TR("Stop"), TR("Continue"), NULL,
 					B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 				if (alert->Go() == 0) {
 					fExpandingThread->ResumeExternalExpander();
@@ -245,7 +254,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 		case MSG_SHOWCONTENTS:
 			// change menu item label
 			fShowItem->SetLabel(fShowContents->Value() == B_CONTROL_OFF
-				? "Show contents" : "Hide contents");
+				? TR("Show contents") : TR("Hide contents"));
 
 			if (fShowContents->Value() == B_CONTROL_OFF) {
 				if (fListingStarted)
@@ -260,8 +269,8 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 		{
 			BEntry entry(fSourceText->Text(), true);
 			if (!entry.Exists()) {
-				BAlert* alert = new BAlert("srcAlert", "The file doesn't exist",
-					"Cancel", NULL, NULL,
+				BAlert* alert = new BAlert("srcAlert", TR("The file doesn't exist"),
+					TR("Cancel"), NULL, NULL,
 					B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 				alert->Go();
 				break;
@@ -282,8 +291,8 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 
 			BString string = "The file : ";
 			string += fSourceText->Text();
-			string += " is not supported";
-			BAlert* alert = new BAlert("srcAlert", string.String(), "Cancel",
+			string += TR_MARK(" is not supported");
+			BAlert* alert = new BAlert("srcAlert", string.String(), TR("Cancel"),
 				NULL, NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_INFO_ALERT);
 			alert->Go();
 
@@ -324,7 +333,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 			// thread has finished		(finished, quit, killed, we don't know)
 			// reset window state
 			if (fExpandingStarted) {
-				fStatusView->SetText("File expanded");
+				fStatusView->SetText(TR("File expanded"));
 				StopExpanding();
 				OpenDestFolder();
 				CloseWindowOrKeepOpen();
@@ -339,7 +348,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 		case 'exrr':	// thread has finished
 			// reset window state
 
-			fStatusView->SetText("Error when expanding archive");
+			fStatusView->SetText(TR("Error when expanding archive"));
 			CloseWindowOrKeepOpen();
 			break;
 
@@ -359,9 +368,9 @@ ExpanderWindow::CanQuit()
 
 	if (fExpandingStarted) {
 		fExpandingThread->SuspendExternalExpander();
-		BAlert* alert = new BAlert("stopAlert", "Are you sure you want to stop "
-			"expanding this\narchive? The expanded items may not be complete.",
-			"Stop", "Continue", NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING,
+		BAlert* alert = new BAlert("stopAlert",
+			TR("Are you sure you want to stop expanding this\narchive? The expanded items may not be complete."),
+			TR("Stop"), TR("Continue"), NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING,
 			B_WARNING_ALERT);
 		if (alert->Go() == 0) {
 			fExpandingThread->ResumeExternalExpander();
@@ -446,41 +455,49 @@ ExpanderWindow::RefsReceived(BMessage* msg)
 	}
 }
 
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "ExpanderMenu"
+
 void
 ExpanderWindow::_AddMenuBar(BLayout* layout)
 {
 	fBar = new BMenuBar("menu_bar", B_ITEMS_IN_ROW, B_INVALIDATE_AFTER_LAYOUT);
-	BMenu* menu = new BMenu("File");
+	BMenu* menu = new BMenu(TR("File"));
 	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem("About Expander" B_UTF8_ELLIPSIS,
+	menu->AddItem(item = new BMenuItem(TR("About Expander…"),
 		new BMessage(B_ABOUT_REQUESTED)));
 	item->SetTarget(be_app_messenger);
 	menu->AddSeparatorItem();
-	menu->AddItem(fSourceItem = new BMenuItem("Set source" B_UTF8_ELLIPSIS,
+	menu->AddItem(fSourceItem = new BMenuItem(TR("Set source…"),
 		new BMessage(MSG_SOURCE), 'O'));
-	menu->AddItem(fDestItem = new BMenuItem("Set destination" B_UTF8_ELLIPSIS,
+	menu->AddItem(fDestItem = new BMenuItem(TR("Set destination…"),
 		new BMessage(MSG_DEST), 'D'));
 	menu->AddSeparatorItem();
-	menu->AddItem(fExpandItem = new BMenuItem("Expand", new BMessage(MSG_EXPAND),
-		'E'));
+	menu->AddItem(fExpandItem = new BMenuItem(TR("Expand"),
+		new BMessage(MSG_EXPAND), 'E'));
 	fExpandItem->SetEnabled(false);
-	menu->AddItem(fShowItem = new BMenuItem("Show contents",
+	menu->AddItem(fShowItem = new BMenuItem(TR("Show contents"),
 		new BMessage(MSG_SHOW), 'L'));
 	fShowItem->SetEnabled(false);
 	menu->AddSeparatorItem();
-	menu->AddItem(fStopItem = new BMenuItem("Stop", new BMessage(MSG_STOP), 'K'));
+	menu->AddItem(fStopItem = new BMenuItem(TR("Stop"),
+		new BMessage(MSG_STOP), 'K'));
 	fStopItem->SetEnabled(false);
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W'));
+	menu->AddItem(new BMenuItem(TR("Close"), new BMessage(B_QUIT_REQUESTED), 'W'));
 	fBar->AddItem(menu);
 
-	menu = new BMenu("Settings");
-	menu->AddItem(fPreferencesItem = new BMenuItem("Settings" B_UTF8_ELLIPSIS,
+	menu = new BMenu(TR("Settings"));
+	menu->AddItem(fPreferencesItem = new BMenuItem(TR("Settings…"),
 		new BMessage(MSG_PREFERENCES), 'S'));
 	fBar->AddItem(menu);
 	layout->AddView(fBar);
 }
 
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "ExpanderWindow"
 
 void
 ExpanderWindow::StartExpanding()
@@ -491,8 +508,9 @@ ExpanderWindow::StartExpanding()
 
 	BEntry destEntry(fDestText->Text(), true);
 	if (!destEntry.Exists()) {
-		BAlert* alert = new BAlert("destAlert", "The folder was either moved, "
-			"renamed or not\nsupported.", "Cancel", NULL, NULL,
+		BAlert* alert = new BAlert("destAlert",
+		TR("The folder was either moved, renamed or not\nsupported."),
+		TR("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 		alert->Go();
 		return;
@@ -503,7 +521,7 @@ ExpanderWindow::StartExpanding()
 	message.AddRef("srcRef", &fSourceRef);
 	message.AddRef("destRef", &fDestRef);
 
-	fExpandButton->SetLabel("Stop");
+	fExpandButton->SetLabel(TR("Stop"));
 	fSourceButton->SetEnabled(false);
 	fDestButton->SetEnabled(false);
 	fShowContents->SetEnabled(false);
@@ -516,7 +534,7 @@ ExpanderWindow::StartExpanding()
 
 	BEntry entry(&fSourceRef);
 	BPath path(&entry);
-	BString text("Expanding file ");
+	BString text(TR("Expanding file "));
 	text.Append(path.Leaf());
 	fStatusView->SetText(text.String());
 
@@ -537,7 +555,7 @@ ExpanderWindow::StopExpanding(void)
 
 	fExpandingStarted = false;
 
-	fExpandButton->SetLabel("Expand");
+	fExpandButton->SetLabel(TR("Expand"));
 	fSourceButton->SetEnabled(true);
 	fDestButton->SetEnabled(true);
 	fShowContents->SetEnabled(true);
@@ -642,7 +660,7 @@ ExpanderWindow::StartListing()
 	fDestItem->SetEnabled(false);
 	fExpandItem->SetEnabled(false);
 	fShowItem->SetEnabled(true);
-	fShowItem->SetLabel("Hide contents");
+	fShowItem->SetLabel(TR("Hide contents"));
 	fStopItem->SetEnabled(false);
 	fPreferencesItem->SetEnabled(false);
 
@@ -652,7 +670,7 @@ ExpanderWindow::StartListing()
 
 	BEntry entry(&fSourceRef);
 	BPath path(&entry);
-	BString text("Creating listing for ");
+	BString text(TR("Creating listing for "));
 	text.Append(path.Leaf());
 	fStatusView->SetText(text.String());
 	fListingText->SetText("");

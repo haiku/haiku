@@ -5,6 +5,10 @@
 
 #include "ExpanderPreferences.h"
 #include <Box.h>
+#include <Catalog.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <Path.h>
 #include <Screen.h>
 #include <StringView.h>
@@ -17,169 +21,101 @@ const uint32 MSG_DESTUSE = 'mDeu';
 const uint32 MSG_DESTTEXT = 'mDet';
 const uint32 MSG_DESTSELECT = 'mDes';
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "ExpanderPreferences"
+
 ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	: BWindow(BRect(0, 0, 325, 305), "Expander", B_MODAL_WINDOW,
-		B_NOT_CLOSABLE | B_NOT_RESIZABLE),
+		B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fSettings(settings),
 	fUsePanel(NULL)
 {
+	BBox* box = new BBox("background");
+	box->SetLabel(TR("Expander settings"));
 
-	BRect rect = Bounds();
-	BBox *background = new BBox(rect, "background", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
-	AddChild(background);
+	fAutoExpand = new BCheckBox("autoExpand",
+		TR("Automatically expand files"), NULL);
+	fCloseWindow = new BCheckBox("closeWindowWhenDone", 
+		TR("Close window when done expanding"), NULL);
 
-	rect.OffsetBy(11, 9);
-	rect.bottom -= 64;
-	rect.right -= 22;
-	BBox *box = new BBox(rect, "background", B_FOLLOW_NONE,
-		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
-	box->SetLabel("Expander settings");
-	background->AddChild(box);
-
-	float maxWidth = box->Bounds().right;
-
-	BRect frameRect = box->Bounds();
-	frameRect.OffsetBy(15, 23);
-	frameRect.right = frameRect.left + 200;
-	frameRect.bottom = frameRect.top + 20;
-	BRect textRect(frameRect);
-	textRect.OffsetTo(B_ORIGIN);
-	textRect.InsetBy(1, 1);
-	BStringView *stringView = new BStringView(frameRect, "expansion", "Expansion:",
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	stringView->ResizeToPreferred();
-	if (stringView->Frame().right > maxWidth)
-		maxWidth = stringView->Frame().right;
-	box->AddChild(stringView);
-
-	frameRect.top = stringView->Frame().bottom + 5;
-	frameRect.left += 10;
-
-	fAutoExpand = new BCheckBox(frameRect, "autoExpand", "Automatically expand files", NULL);
-	fAutoExpand->ResizeToPreferred();
-	if (fAutoExpand->Frame().right > maxWidth)
-		maxWidth = fAutoExpand->Frame().right;
-	box->AddChild(fAutoExpand);
-
-	frameRect = fAutoExpand->Frame();
-	frameRect.top = fAutoExpand->Frame().bottom + 1;
-	fCloseWindow = new BCheckBox(frameRect, "closeWindowWhenDone", "Close window when done expanding", NULL);
-	fCloseWindow->ResizeToPreferred();
-	if (fCloseWindow->Frame().right > maxWidth)
-		maxWidth = fCloseWindow->Frame().right;
-	box->AddChild(fCloseWindow);
-
-	frameRect = stringView->Frame();
-	frameRect.top = fCloseWindow->Frame().bottom + 10;
-	stringView = new BStringView(frameRect, "destinationFolder", "Destination folder:",
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	stringView->ResizeToPreferred();
-	if (stringView->Frame().right > maxWidth)
-		maxWidth = stringView->Frame().right;
-	box->AddChild(stringView);
-
-	frameRect.top = stringView->Frame().bottom + 5;
-	frameRect.left += 10;
-
-	fLeaveDest = new BRadioButton(frameRect, "leaveDest", "Leave destination folder path empty",
+	fLeaveDest = new BRadioButton("leaveDest",
+		TR("Leave destination folder path empty"),
 		new BMessage(MSG_LEAVEDEST));
-	fLeaveDest->ResizeToPreferred();
-	if (fLeaveDest->Frame().right > maxWidth)
-		maxWidth = fLeaveDest->Frame().right;
-	box->AddChild(fLeaveDest);
-
-	frameRect = fLeaveDest->Frame();
-	frameRect.top = fLeaveDest->Frame().bottom + 1;
-	fSameDest = new BRadioButton(frameRect, "sameDir", "Same directory as source (archive) file",
+	fSameDest = new BRadioButton("sameDir",
+		TR("Same directory as source (archive) file"),
 		new BMessage(MSG_SAMEDIR));
-	fSameDest->ResizeToPreferred();
-	if (fSameDest->Frame().right > maxWidth)
-		maxWidth = fSameDest->Frame().right;
-	box->AddChild(fSameDest);
-
-	frameRect = fSameDest->Frame();
-	frameRect.top = frameRect.bottom + 1;
-	fDestUse = new BRadioButton(frameRect, "destUse", "Use:", new BMessage(MSG_DESTUSE));
-	fDestUse->ResizeToPreferred();
-	if (fDestUse->Frame().right > maxWidth)
-		maxWidth = fDestUse->Frame().right;
-	box->AddChild(fDestUse);
-
-	frameRect = fDestUse->Frame();
-	frameRect.left  = fDestUse->Frame().right + 1;
-	frameRect.right  = frameRect.left + 58;
-	frameRect.bottom  = frameRect.top + 38;
-
-	fDestText = new BTextControl(frameRect, "destText", "", "", new BMessage(MSG_DESTTEXT));
-	box->AddChild(fDestText);
-	fDestText->ResizeToPreferred();
+	fDestUse = new BRadioButton("destUse",
+		TR("Use:"), new BMessage(MSG_DESTUSE));
+	fDestText = new BTextControl("destText", "", "", new BMessage(MSG_DESTTEXT));
 	fDestText->SetDivider(0);
 	fDestText->TextView()->MakeEditable(false);
-	fDestText->ResizeTo(158, fDestText->Frame().Height());
-
 	fDestText->SetEnabled(false);
-
-	frameRect = fDestText->Frame();
-	frameRect.left = frameRect.right + 5;
-	fSelect = new BButton(frameRect, "selectButton", "Select", new BMessage(MSG_DESTSELECT));
-	fSelect->ResizeToPreferred();
-	if (fSelect->Frame().right > maxWidth)
-		maxWidth = fSelect->Frame().right;
-	box->AddChild(fSelect);
+	fSelect = new BButton("selectButton", TR("Select"),
+		new BMessage(MSG_DESTSELECT));
 	fSelect->SetEnabled(false);
 
-	fDestText->MoveBy(0, (fSelect->Frame().Height() - fDestText->Frame().Height()) / 2.0);
-	fDestText->ResizeTo(158, fDestText->Frame().Height());
+	fOpenDest = new BCheckBox("openDestination",
+		TR("Open destination folder after extraction"), NULL);
+	fAutoShow = new BCheckBox("autoShow",
+		TR("Automatically show contents listing"), NULL);
 
-	frameRect = stringView->Frame();
-	frameRect.top = fDestUse->Frame().bottom + 10;
+	BView* view = new BGroupView();
+	view->SetLayout(new BGroupLayout(B_HORIZONTAL)); 
+	view->AddChild(BGroupLayoutBuilder(B_VERTICAL) 
+		.AddGroup(B_HORIZONTAL)
+			.Add(new BStringView("expansion", TR("Expansion:")))
+			.AddGlue()
+		.End()
+		.AddGroup(B_VERTICAL, 1)
+			.Add(fAutoExpand)
+			.Add(fCloseWindow)
+			.SetInsets(10, 0, 0, 10)
+		.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(new BStringView("destinationFolder", TR("Destination folder:")))
+			.AddGlue()
+		.End()
+		.AddGroup(B_VERTICAL, 1)
+			.Add(fLeaveDest)
+			.Add(fSameDest)
+			.Add(fDestUse)
+			.AddGroup(B_HORIZONTAL, 5)
+				.Add(fDestText, 0.8)
+				.Add(fSelect, 0.2)
+				.SetInsets(20, 0, 0, 0)
+			.End()
+			.SetInsets(10, 0, 0, 10)
+		.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(new BStringView("other", TR("Other:")))
+			.AddGlue()
+		.End()
+		.AddGroup(B_VERTICAL, 1)
+			.Add(fOpenDest)
+			.Add(fAutoShow)
+			.SetInsets(10, 0, 0, 0)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
+	box->AddChild(view);
 
-	stringView = new BStringView(frameRect, "other", "Other:", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	stringView->ResizeToPreferred();
-	if (stringView->Frame().right > maxWidth)
-		maxWidth = stringView->Frame().right;
-	box->AddChild(stringView);
-
-	frameRect.top = stringView->Frame().bottom + 5;
-	frameRect.left += 10;
-
-	fOpenDest = new BCheckBox(frameRect, "openDestination", "Open destination folder after extraction", NULL);
-	fOpenDest->ResizeToPreferred();
-	if (fOpenDest->Frame().right > maxWidth)
-		maxWidth = fOpenDest->Frame().right;
-	box->AddChild(fOpenDest);
-
-	frameRect = fOpenDest->Frame();
-	frameRect.top = frameRect.bottom + 1;
-	fAutoShow = new BCheckBox(frameRect, "autoShow", "Automatically show contents listing", NULL);
-	fAutoShow->ResizeToPreferred();
-	if (fAutoShow->Frame().right > maxWidth)
-		maxWidth = fAutoShow->Frame().right;
-	box->AddChild(fAutoShow);
-
-	box->ResizeTo(maxWidth + 15, fAutoShow->Frame().bottom + 10);
-
-	rect = BRect(Bounds().right - 89, Bounds().bottom - 40, Bounds().right - 14, Bounds().bottom - 16);
-
-	rect = Bounds();
-	BButton *button = new BButton(rect, "OKButton", "OK", new BMessage(MSG_OK));
+	BButton* button = new BButton("OKButton", TR("OK"), new BMessage(MSG_OK));
 	button->MakeDefault(true);
-	button->ResizeToPreferred();
-	button->MoveTo(box->Frame().right - button->Frame().Width(), box->Frame().bottom + 10);
-	background->AddChild(button);
+	BButton* cancel = new BButton("CancelButton", TR("Cancel"),
+		new BMessage(MSG_CANCEL));
 
-	rect = button->Frame();
-	BButton *cancel = new BButton(rect, "CancelButton", "Cancel", new BMessage(MSG_CANCEL));
-	cancel->ResizeToPreferred();
-	cancel->MoveBy(-cancel->Frame().Width() - 10, (button->Frame().Height() - cancel->Frame().Height()) / 2.0);
-	background->AddChild(cancel);
+	SetLayout(new BGroupLayout(B_HORIZONTAL)); 
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 11) 
+		.Add(box) 
+		.AddGroup(B_HORIZONTAL, 10) 
+			.AddGlue() 
+			.Add(cancel) 
+			.Add(button) 
+		.End() 
+		.SetInsets(10, 10, 10, 10) 
+	); 
 
-	ResizeTo(box->Frame().right + 11 , button->Frame().bottom + 11);
-
-	BScreen screen(this);
-	MoveBy((screen.Frame().Width() - Bounds().Width()) / 2,
-		(screen.Frame().Height() - Bounds().Height()) / 2);
+	CenterOnScreen();
 
 	bool automatically_expand_files;
 	bool close_when_done;
@@ -239,7 +175,7 @@ ExpanderPreferences::~ExpanderPreferences()
 
 
 void
-ExpanderPreferences::MessageReceived(BMessage *msg)
+ExpanderPreferences::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case MSG_DESTSELECT:

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps expander ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 Application Expander : 
 	ExpanderApp.cpp
 	ExpanderWindow.cpp
@@ -11,7 +9,17 @@ Application Expander :
 	ExpanderPreferences.cpp
 	DirectoryFilePanel.cpp
 	ExpanderRules.cpp
-	: be tracker $(TARGET_LIBSUPC++)
+	: be tracker liblocale.so $(TARGET_LIBSUPC++)
 	: Expander.rdef
 ;
 
+DoCatalogs Expander :
+	x-vnd.Haiku-Expander
+	:
+	ExpanderApp.cpp
+	ExpanderWindow.cpp
+	ExpanderSettings.cpp
+	DirectoryFilePanel.cpp
+	: en.catalog
+	:
+;

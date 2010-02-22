@@ -9,6 +9,8 @@
 
 #include "DirectoryFilePanel.h"
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <Window.h>
 
 #include <stdio.h>
@@ -41,10 +43,13 @@ DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node,
 
 //	#pragma mark -
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "DirectoryFilePanel"
 
-DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode, BMessenger *target,
-		const entry_ref *startDirectory, uint32 nodeFlavors,
-		bool allowMultipleSelection, BMessage *message, BRefFilter *filter,
+
+DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode, BMessenger* target,
+		const entry_ref* startDirectory, uint32 nodeFlavors,
+		bool allowMultipleSelection, BMessage* message, BRefFilter* filter,
 		bool modal,	bool hideWhenDone)
 	: BFilePanel(mode, target, startDirectory, nodeFlavors,
 		allowMultipleSelection, message, filter, modal, hideWhenDone),
@@ -72,16 +77,16 @@ DirectoryFilePanel::Show()
 		}
 
 		rect.right = rect.left -= 30;
-		float width = be_plain_font->StringWidth("Select current") + 20;
+		float width = be_plain_font->StringWidth(TR("Select current")) + 20;
 		rect.left = width > 75 ? rect.right - width : rect.right - 75;
-		fCurrentButton = new BButton(rect, "directoryButton", "Select current",
+		fCurrentButton = new BButton(rect, "directoryButton", TR("Select current"),
 			new BMessage(MSG_DIRECTORY), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 
 		background->AddChild(fCurrentButton);
 		fCurrentButton->SetTarget(Messenger());
 
-		SetButtonLabel(B_DEFAULT_BUTTON, "Select");
-		Window()->SetTitle("Expander: Choose destination");
+		SetButtonLabel(B_DEFAULT_BUTTON, TR("Select"));
+		Window()->SetTitle(TR("Expander: Choose destination"));
 
 		Window()->Unlock();
 
@@ -100,8 +105,9 @@ DirectoryFilePanel::SelectionChanged()
 	char label[64];
 	entry_ref ref;
 	GetPanelDirectory(&ref);
-	if (snprintf(label, sizeof(label), "Select '%s'", ref.name) >= (int)sizeof(label))
-		strcpy(label + sizeof(label) - 5, B_UTF8_ELLIPSIS "'");
+	if (snprintf(label, sizeof(label),
+		TR("Select '%s'"), ref.name) >= (int)sizeof(label))
+			strcpy(label + sizeof(label) - 5, B_UTF8_ELLIPSIS "'");
 
 	// Resize button so that the label fits
 	// maximum width is dictated by the window's size limits
