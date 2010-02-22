@@ -386,6 +386,6 @@ SeekSlider::_SetKnobPosition(int32 knobPos)
 
 	newKnob.left = fKnobPos - knobWidth2;
 	newKnob.right = fKnobPos + knobWidth2;
-	Invalidate(oldKnob | newKnob);
+	Invalidate((oldKnob | newKnob).InsetBySelf(-1, 0));
 }
 
