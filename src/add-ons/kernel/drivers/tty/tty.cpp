@@ -416,12 +416,12 @@ RequestOwner::Wait(bool interruptable, bigtime_t timeout)
 
 		// publish the condition variable
 		ConditionVariable conditionVariable;
-		conditionVariable.Publish(this, "tty request");
+		conditionVariable.Init(this, "tty request");
 		fConditionVariable = &conditionVariable;
 
 		// add an entry to wait on
 		ConditionVariableEntry entry;
-		entry.Add(this);
+		conditionVariable.Add(&entry);
 
 		locker.Unlock();
 
@@ -438,7 +438,6 @@ RequestOwner::Wait(bool interruptable, bigtime_t timeout)
 		// remove the condition variable
 		locker.Lock();
 		fConditionVariable = NULL;
-		conditionVariable.Unpublish();
 	}
 
 	// get the result
