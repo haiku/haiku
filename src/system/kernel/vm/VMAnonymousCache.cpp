@@ -933,6 +933,7 @@ VMAnonymousCache::_MergePagesSmallerSource(VMAnonymousCache* source)
 			(off_t)page->cache_offset << PAGE_SHIFT);
 		if (consumerPage == NULL) {
 			// the page is not yet in the consumer cache - move it upwards
+			ASSERT_PRINT(!page->busy, "page: %p", page);
 			source->RemovePage(page);
 			InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
 		}
@@ -954,6 +955,7 @@ VMAnonymousCache::_MergePagesSmallerConsumer(VMAnonymousCache* source)
 			(off_t)page->cache_offset << PAGE_SHIFT);
 		if (sourcePage != NULL) {
 			DEBUG_PAGE_ACCESS_START(sourcePage);
+			ASSERT_PRINT(!sourcePage->busy, "page: %p", sourcePage);
 			source->RemovePage(sourcePage);
 			vm_page_free(source, sourcePage);
 		}
@@ -1002,9 +1004,12 @@ VMAnonymousCache::_MergeSwapPages(VMAnonymousCache* source)
 				if (swapBlock->swap_slots[i] != SWAP_SLOT_NONE) {
 					vm_page* page = source->LookupPage(
 						(off_t)(swapBlockPageIndex + i) << PAGE_SHIFT);
-					DEBUG_PAGE_ACCESS_START(page);
-					source->RemovePage(page);
-					vm_page_free(source, page);
+					if (page != NULL) {
+						DEBUG_PAGE_ACCESS_START(page);
+						ASSERT_PRINT(!page->busy, "page: %p", page);
+						source->RemovePage(page);
+						vm_page_free(source, page);
+					}
 				}
 			}
 		}
