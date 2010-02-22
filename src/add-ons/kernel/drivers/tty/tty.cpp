@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2007-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -145,8 +145,7 @@ public:
 								~ReaderLocker();
 
 			status_t			AcquireReader(bigtime_t timeout,
-									size_t minBytes);
-			status_t			AcquireReader(bool dontBlock);
+									size_t bytesNeeded);
 
 private:
 			size_t				_CheckAvailableBytes() const;
@@ -595,13 +594,11 @@ WriterLocker::AcquireWriter(bool dontBlock, size_t bytesNeeded)
 	// set the number of bytes we need and notify, just in case we're first in
 	// one of the queues (RequestOwner::SetBytesNeeded() resets the notification
 	// state)
-	if (bytesNeeded != fRequestOwner.BytesNeeded()) {
-		fRequestOwner.SetBytesNeeded(bytesNeeded);
-		if (fTarget)
-			tty_notify_if_available(fTarget, fSource, false);
-		if (fEcho)
-			tty_notify_if_available(fSource, fTarget, false);
-	}
+	fRequestOwner.SetBytesNeeded(bytesNeeded);
+	if (fTarget)
+		tty_notify_if_available(fTarget, fSource, false);
+	if (fEcho)
+		tty_notify_if_available(fSource, fTarget, false);
 
 	requestLocker.Unlock();
 
@@ -688,7 +685,7 @@ ReaderLocker::~ReaderLocker()
 
 
 status_t
-ReaderLocker::AcquireReader(bigtime_t timeout, size_t minBytes)
+ReaderLocker::AcquireReader(bigtime_t timeout, size_t bytesNeeded)
 {
 	if (fCookie->closed)
 		return B_FILE_ERROR;
@@ -700,7 +697,7 @@ ReaderLocker::AcquireReader(bigtime_t timeout, size_t minBytes)
 	// check, if we're first in queue, and if there is something to read
 	if (fRequestOwner.IsFirstInQueues()) {
 		fBytes = _CheckAvailableBytes();
-		if (fBytes > minBytes)
+		if (fBytes >= bytesNeeded)
 			return B_OK;
 	}
 
@@ -708,6 +705,9 @@ ReaderLocker::AcquireReader(bigtime_t timeout, size_t minBytes)
 	// bail out, if we shall not block.
 	if (timeout <= 0)
 		return B_WOULD_BLOCK;
+
+	// reset the number of bytes we need
+	fRequestOwner.SetBytesNeeded(bytesNeeded);
 
 	// block until something happens
 	Unlock();
@@ -721,13 +721,6 @@ ReaderLocker::AcquireReader(bigtime_t timeout, size_t minBytes)
 		fBytes = _CheckAvailableBytes();
 
 	return status;
-}
-
-
-status_t
-ReaderLocker::AcquireReader(bool dontBlock)
-{
-	return AcquireReader(dontBlock ? 0 : B_INFINITE_TIMEOUT, 0);
 }
 
 
@@ -1730,8 +1723,12 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			locker.Unlock();
 			ReaderLocker readLocker(cookie);
 
+			bigtime_t timeout = wanted == 0 ? 0 : B_INFINITE_TIMEOUT;
+
+			// TODO: If wanted is > the TTY buffer size, this loop cannot work
+			// correctly. Refactor the read code!
 			do {
-				status_t status = readLocker.AcquireReader(wanted == 0);
+				status_t status = readLocker.AcquireReader(timeout, wanted);
 				if (status != B_OK)
 					return status;
 
@@ -1776,18 +1773,17 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 
 
 status_t
-tty_input_read(tty_cookie* cookie, void* buffer, size_t* _length)
+tty_input_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 {
+	char* buffer = (char*)_buffer;
 	struct tty* tty = cookie->tty;
 	uint32 mode = cookie->open_mode;
 	bool dontBlock = (mode & O_NONBLOCK) != 0;
 	size_t length = *_length;
-	ssize_t bytesRead = 0;
 	bool canon = true;
 	bigtime_t timeout = dontBlock ? 0 : B_INFINITE_TIMEOUT;
-	bigtime_t vtime = timeout;
-	size_t vmin = 0;
-	size_t minRead = 0;
+	bigtime_t interCharTimeout = 0;
+	size_t bytesNeeded = 1;
 
 	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %lu)\n", tty, length, mode));
 
@@ -1804,69 +1800,79 @@ tty_input_read(tty_cookie* cookie, void* buffer, size_t* _length)
 	// handle raw mode
 	if ((!tty->is_master) && ((tty->settings->termios.c_lflag & ICANON) == 0)) {
 		canon = false;
-		vmin = tty->settings->termios.c_cc[VMIN];
-		// for now behaviour is undefined when nonblocking is enabled
-		//if (!dontBlock) // XXX does it take precedence or not ?
-		vtime = tty->settings->termios.c_cc[VTIME] * 100000LL;
-		TRACE(("tty_input_read: -icanon vmin %lu, vtime %Ldus\n", vmin, vtime));
+		if (!dontBlock) {
+			// Non-blocking mode. Handle VMIN and VTIME.
+			bytesNeeded = tty->settings->termios.c_cc[VMIN];
+			bigtime_t vtime = tty->settings->termios.c_cc[VTIME] * 100000;
+			TRACE(("tty_input_read: icanon vmin %lu, vtime %Ldus\n", vmin,
+				vtime));
 
-		// yes it's weird but termios is!
-		if (vmin && vtime == 0LL)
-			vtime = B_INFINITE_TIMEOUT;
-		if (!vmin)
-			timeout = vtime;
-		// timeout starts at 1st char when vmin > 0
-		// so we first wait for 1 char only
-		minRead = 0;
+			if (bytesNeeded == 0) {
+				// In this case VTIME specifies a relative total timeout. We
+				// have no inter-char timeout, though.
+				timeout = vtime;
+			} else {
+				// VTIME specifies the inter-char timeout. 0 is indefinitely.
+				if (vtime == 0)
+					interCharTimeout = B_INFINITE_TIMEOUT;
+				else
+					interCharTimeout = vtime;
+
+				if (bytesNeeded > length)
+					bytesNeeded = length;
+			}
+		}
 	}
 
-	while (bytesRead == 0) {
-		TRACE(("tty_input_read: AcquireReader(%Ldus, %ld)\n", timeout, minRead));
-		status_t status = locker.AcquireReader(timeout, minRead);
-		if (status == B_WOULD_BLOCK) {
-			*_length = 0;
-			return 0;
-		}
-		if (status != B_OK) {
-			*_length = 0;
-			return status;
-		}
+	status_t status;
+	*_length = 0;
+
+	do {
+		TRACE(("tty_input_read: AcquireReader(%Ldus, %ld)\n", timeout,
+			bytesNeeded));
+		status = locker.AcquireReader(timeout, bytesNeeded);
+		if (status != B_OK)
+			break;
 
 		size_t toRead = locker.AvailableBytes();
-
-		if (toRead) {
-			// raw mode: we have something, now retry with vmin and vtime
-			minRead = MAX(vmin-1, 0);
-			timeout = vtime;
-		}
-
-		if (toRead < vmin && timeout == B_INFINITE_TIMEOUT)
-			continue;
 		if (toRead > length)
 			toRead = length;
 
 		bool _hitEOF = false;
-		bool* hitEOF = NULL;
+		bool* hitEOF = canon && tty->pending_eof > 0 ? &_hitEOF : NULL;
 
-		if (canon && tty->pending_eof > 0)
-			hitEOF = &_hitEOF;
-
-		bytesRead = line_buffer_user_read(tty->input_buffer, (char*)buffer,
+		ssize_t bytesRead = line_buffer_user_read(tty->input_buffer, buffer,
 			toRead, tty->settings->termios.c_cc[VEOF], hitEOF);
-		if (bytesRead < B_OK) {
-			*_length = 0;
-			return bytesRead;
+		if (bytesRead < 0) {
+			status = bytesRead;
+			break;
 		}
+
+		buffer += bytesRead;
+		length -= bytesRead;
+		*_length += bytesRead;
+		bytesNeeded = bytesRead > bytesNeeded ? 0 : bytesNeeded - bytesRead;
 
 		// we hit an EOF char -- bail out, whatever amount of data we have
 		if (hitEOF && *hitEOF) {
 			tty->pending_eof--;
 			break;
 		}
+
+		// Once we have read something reset the timeout to the inter-char
+		// timeout, if applicable.
+		if (!dontBlock && !canon && *_length > 0)
+			timeout = interCharTimeout;
+	} while (bytesNeeded > 0);
+
+	if (status == B_WOULD_BLOCK || status == B_TIMED_OUT) {
+		// In non-blocking non-canonical-input-processing mode never return
+		// timeout errors. Just return 0, if nothing has been read.
+		if (!dontBlock && !canon)
+			status = B_OK;
 	}
 
-	*_length = bytesRead;
-	return B_OK;
+	return *_length == 0 ? status : B_OK;
 }
 
 
