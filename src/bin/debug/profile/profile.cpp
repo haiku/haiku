@@ -996,7 +996,7 @@ main(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+acCfhi:klo:rsS:v:",
+		int c = getopt_long(argc, (char**)argv, "+acCfhi:klo:rs:Sv:",
 			sLongOptions, NULL);
 		if (c == -1)
 			break;
