@@ -44,6 +44,14 @@ SummaryProfileResult::~SummaryProfileResult()
 }
 
 
+void
+SummaryProfileResult::SetInterval(bigtime_t interval)
+{
+	ProfileResult::SetInterval(interval);
+	fResult->SetInterval(interval);
+}
+
+
 status_t
 SummaryProfileResult::Init(ProfiledEntity* entity)
 {

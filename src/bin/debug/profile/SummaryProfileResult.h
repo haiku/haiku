@@ -61,6 +61,8 @@ public:
 
 	virtual	status_t			Init(ProfiledEntity* entity);
 
+	virtual	void				SetInterval(bigtime_t interval);
+
 	virtual	void				AddSamples(
 									ImageProfileResultContainer* container,
 									addr_t* samples, int32 sampleCount);

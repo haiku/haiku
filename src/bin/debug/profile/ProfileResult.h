@@ -69,7 +69,7 @@ public:
 
 			ProfiledEntity*		Entity() const	{ return fEntity; }
 
-			void				SetInterval(bigtime_t interval);
+	virtual	void				SetInterval(bigtime_t interval);
 
 	virtual	void				AddSamples(
 									ImageProfileResultContainer* container,
