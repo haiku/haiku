@@ -2,7 +2,7 @@
  * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed under the terms of the MIT license.
  *
@@ -31,7 +31,7 @@
 #include "TermConst.h"
 #include "TermParse.h"
 #include "TerminalBuffer.h"
-	
+
 
 #ifndef CEOF
 #define CEOF ('D'&037)
@@ -95,7 +95,7 @@ setenv(const char *var, const char *value, bool overwrite)
 
 
 /* handshake interface */
-typedef struct 
+typedef struct
 {
 	int status;		/* status of child */
 	char msg[128];	/* error message */
@@ -138,9 +138,9 @@ Shell::Open(int row, int col, const char *encoding, int argc, const char **argv)
 	fTermParse = new (std::nothrow) TermParse(fFd);
 	if (fTermParse == NULL) {
 		Close();
-		return B_NO_MEMORY;	
+		return B_NO_MEMORY;
 	}
-	
+
 	return B_OK;
 }
 
@@ -150,14 +150,14 @@ Shell::Close()
 {
 	delete fTermParse;
 	fTermParse = NULL;
-	
+
 	if (fFd >= 0) {
 		close(fFd);
 		kill(-fProcessID, SIGHUP);
 		fProcessID = -1;
 		int status;
-		wait(&status);	
-		fFd = -1;	
+		wait(&status);
+		fFd = -1;
 	}
 }
 
@@ -174,7 +174,7 @@ Shell::Read(void *buffer, size_t numBytes) const
 {
 	if (fFd < 0)
 		return B_NO_INIT;
-	
+
 	return read(fFd, buffer, numBytes);
 }
 
@@ -184,7 +184,7 @@ Shell::Write(const void *buffer, size_t numBytes)
 {
 	if (fFd < 0)
 		return B_NO_INIT;
-	
+
 	return write(fFd, buffer, numBytes);
 }
 
@@ -233,7 +233,7 @@ Shell::AttachBuffer(TerminalBuffer *buffer)
 		return B_ERROR;
 
 	fAttached = true;
-	
+
 	return fTermParse->StartThreads(buffer);
 }
 
@@ -270,7 +270,7 @@ initialize_termios(struct termios &tio)
 	 */
 
 	tio.c_line = 0;
-	tio.c_lflag |= ECHOE; 
+	tio.c_lflag |= ECHOE;
 
 	/* input: nl->nl, cr->nl */
 	tio.c_iflag &= ~(INLCR|IGNCR);
@@ -320,14 +320,14 @@ status_t
 Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **argv)
 {
 	const char *kDefaultShellCommand[] = { "/bin/sh", "--login", NULL };
-	
+
 	if (argv == NULL || argc == 0) {
 		argv = kDefaultShellCommand;
-		argc = 2;	
+		argc = 2;
 	}
 
 	signal(SIGTTOU, SIG_IGN);
-	
+
 #ifdef __HAIKU__
 	// get a pseudo-tty
 	int master = posix_openpt(O_RDWR | O_NOCTTY);
@@ -339,11 +339,11 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 	 * which is already in use, so we simply go until the open succeeds.
 	 */
 	char ttyName[B_PATH_NAME_LENGTH];
-	int master = -1;	
+	int master = -1;
 	DIR *dir = opendir("/dev/pt/");
 	if (dir != NULL) {
 		struct dirent *dirEntry;
-		while ((dirEntry = readdir(dir)) != NULL) { 
+		while ((dirEntry = readdir(dir)) != NULL) {
 			// skip '.' and '..'
 			if (dirEntry->d_name[0] == '.')
 				continue;
@@ -358,7 +358,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 				break;
 			} else {
 				// B_BUSY is a normal case
-				if (errno != B_BUSY) 
+				if (errno != B_BUSY)
 					fprintf(stderr, "could not open %s: %s\n", ptyName, strerror(errno));
 			}
 		}
@@ -435,11 +435,11 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		 * TODO: so why are we doing it ?
 		 */
 		tcgetattr(slave, &tio);
-		
+
 		initialize_termios(tio);
 
 		/*
-		 * change control tty. 
+		 * change control tty.
 		 */
 
 		dup2(slave, 0);
@@ -506,7 +506,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		 * Exec failed.
 		 * TODO: This doesn't belong here.
 		 */
-		
+
 		sleep(1);
 		const char *spawnAlertMessage = "alert --stop "
 						"'Cannot execute \"%s\":\n"
@@ -524,7 +524,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 	}
 
 	/*
-	 * In parent Process, Set up the input and output file pointers so 
+	 * In parent Process, Set up the input and output file pointers so
 	 * that they can write and read the pseudo terminal.
 	 */
 
@@ -554,7 +554,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 				break;
 		}
 	}
-  
+
 	if (done <= 0)
 		return B_ERROR;
 
