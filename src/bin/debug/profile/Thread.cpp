@@ -51,6 +51,7 @@ Thread::Thread(thread_id threadID, const char* name, Team* team)
 	fProfileResult(NULL),
 	fLazyImages(true)
 {
+	fTeam->AcquireReference();
 }
 
 
@@ -66,6 +67,8 @@ Thread::~Thread()
 		delete image;
 	while (ThreadImage* image = fOldImages.RemoveHead())
 		delete image;
+
+	fTeam->ReleaseReference();
 }
 
 

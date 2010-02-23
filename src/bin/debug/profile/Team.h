@@ -9,6 +9,7 @@
 
 #include <debug_support.h>
 #include <ObjectList.h>
+#include <Referenceable.h>
 #include <util/DoublyLinkedList.h>
 
 #include "Thread.h"
@@ -19,7 +20,7 @@ class SharedImage;
 struct system_profiler_team_added;
 
 
-class Team {
+class Team : public BReferenceable {
 public:
 								Team();
 								~Team();

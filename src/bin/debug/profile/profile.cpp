@@ -101,7 +101,7 @@ class ThreadManager : private ProfiledEntity {
 public:
 	ThreadManager(port_id debuggerPort)
 		:
-		fTeams(20, true),
+		fTeams(20),
 		fThreads(20, true),
 		fKernelTeam(NULL),
 		fDebuggerPort(debuggerPort),
@@ -117,6 +117,9 @@ public:
 
 		if (fSummaryProfileResult != NULL)
 			fSummaryProfileResult->ReleaseReference();
+
+		for (int32 i = 0; Team* team = fTeams.ItemAt(i); i++)
+			team->ReleaseReference();
 	}
 
 	status_t Init()
@@ -193,7 +196,8 @@ public:
 		if (Team* team = FindTeam(teamID)) {
 			if (team == fKernelTeam)
 				fKernelTeam = NULL;
-			fTeams.RemoveItem(team, true);
+			fTeams.RemoveItem(team);
+			team->ReleaseReference();
 		}
 	}
 
@@ -308,7 +312,7 @@ private:
 			? _InitUndebuggedTeam(team, addedInfo)
 			: _InitDebuggedTeam(team, teamID);
 		if (error != B_OK) {
-			delete team;
+			team->ReleaseReference();
 			return error;
 		}
 
