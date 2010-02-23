@@ -790,8 +790,8 @@ device_write(void* _cookie, off_t offset, void* buffer, size_t* length)
 static int
 dump_node(int argc, char **argv)
 {
-	if (argc < 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: %s <address>\n", argv[0]);
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
@@ -836,6 +836,27 @@ dump_node(int argc, char **argv)
 				(addr_t)vnode->stream.u.dev.partition->raw_device);
 		}
 	}
+
+	return 0;
+}
+
+
+static int
+dump_cookie(int argc, char** argv)
+{
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	uint64 address;
+	if (!evaluate_debug_expression(argv[1], &address, false))
+		return 0;
+
+	struct devfs_cookie* cookie = (devfs_cookie*)(addr_t)address;
+
+	kprintf("DEVFS COOKIE: %p\n", cookie);
+	kprintf(" device_cookie: %p\n", cookie->device_cookie);
 
 	return 0;
 }
@@ -1883,14 +1904,23 @@ devfs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			add_debugger_command("devfs_node", &dump_node,
-				"info about a private devfs node");
+			add_debugger_command_etc("devfs_node", &dump_node,
+				"Print info on a private devfs node",
+				"<address>\n"
+				"Prints information on a devfs node given by <address>.\n",
+				0);
+			add_debugger_command_etc("devfs_cookie", &dump_cookie,
+				"Print info on a private devfs cookie",
+				"<address>\n"
+				"Prints information on a devfs cookie given by <address>.\n",
+				0);
 
 			legacy_driver_init();
 			return B_OK;
 
 		case B_MODULE_UNINIT:
 			remove_debugger_command("devfs_node", &dump_node);
+			remove_debugger_command("devfs_cookie", &dump_cookie);
 			return B_OK;
 
 		default:
