@@ -1851,7 +1851,8 @@ tty_input_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 		buffer += bytesRead;
 		length -= bytesRead;
 		*_length += bytesRead;
-		bytesNeeded = bytesRead > bytesNeeded ? 0 : bytesNeeded - bytesRead;
+		bytesNeeded = (size_t)bytesRead > bytesNeeded
+			? 0 : bytesNeeded - bytesRead;
 
 		// we hit an EOF char -- bail out, whatever amount of data we have
 		if (hitEOF && *hitEOF) {
