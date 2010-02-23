@@ -1102,7 +1102,7 @@ TermView::Draw(BRect updateRect)
 	// clear the area to the right of the line ends
 	if (y1 <= y2) {
 		float clearLeft = fColumns * fFontWidth;
-		if (clearLeft < updateRect.right) {
+		if (clearLeft <= updateRect.right) {
 			BRect rect(clearLeft, updateRect.top, updateRect.right,
 				updateRect.bottom);
 			SetHighColor(fTextBackColor);
@@ -1113,7 +1113,7 @@ TermView::Draw(BRect updateRect)
 	// clear the area below the last line
 	if (y2 == fRows - 1) {
 		float clearTop = _LineOffset(fRows);
-		if (clearTop < updateRect.bottom) {
+		if (clearTop <= updateRect.bottom) {
 			BRect rect(updateRect.left, clearTop, updateRect.right,
 				updateRect.bottom);
 			SetHighColor(fTextBackColor);
