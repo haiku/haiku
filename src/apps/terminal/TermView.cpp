@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2010, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -11,7 +11,6 @@
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
  *		Clemens Zeidler <haiku@Clemens-Zeidler.de>
  */
-
 
 
 #include "TermView.h"
@@ -1090,55 +1089,80 @@ TermView::Draw(BRect updateRect)
 // }
 // }
 
-	int32 x1 = (int32)(updateRect.left) / fFontWidth;
-	int32 x2 = (int32)(updateRect.right) / fFontWidth;
+	int32 x1 = (int32)updateRect.left / fFontWidth;
+	int32 x2 = std::min((int)updateRect.right / fFontWidth, fColumns - 1);
 
 	int32 firstVisible = _LineAt(0);
 	int32 y1 = _LineAt(updateRect.top);
-	int32 y2 = _LineAt(updateRect.bottom);
+	int32 y2 = std::min(_LineAt(updateRect.bottom), (int32)fRows - 1);
 
 //debug_printf("TermView::Draw(): (%ld, %ld) - (%ld, %ld), top: %f, fontHeight: %d, scrollOffset: %f\n",
 //x1, y1, x2, y2, updateRect.top, fFontHeight, fScrollOffset);
 
-	for (int32 j = y1; j <= y2; j++) {
-		int32 k = x1;
-		char buf[fColumns * 4 + 1];
+	// clear the area to the right of the line ends
+	if (y1 <= y2) {
+		float clearLeft = fColumns * fFontWidth;
+		if (clearLeft < updateRect.right) {
+			BRect rect(clearLeft, updateRect.top, updateRect.right,
+				updateRect.bottom);
+			SetHighColor(fTextBackColor);
+			FillRect(rect);
+		}
+	}
 
-		if (fVisibleTextBuffer->IsFullWidthChar(j - firstVisible, k))
-			k--;
+	// clear the area below the last line
+	if (y2 == fRows - 1) {
+		float clearTop = _LineOffset(fRows);
+		if (clearTop < updateRect.bottom) {
+			BRect rect(updateRect.left, clearTop, updateRect.right,
+				updateRect.bottom);
+			SetHighColor(fTextBackColor);
+			FillRect(rect);
+		}
+	}
 
-		if (k < 0)
-			k = 0;
+	// draw the affected line parts
+	if (x1 <= x2) {
+		for (int32 j = y1; j <= y2; j++) {
+			int32 k = x1;
+			char buf[fColumns * 4 + 1];
 
-		for (int32 i = k; i <= x2;) {
-			int32 lastColumn = x2;
-			bool insideSelection = _CheckSelectedRegion(j, i, lastColumn);
-			uint16 attr;
-			int32 count = fVisibleTextBuffer->GetString(j - firstVisible, i,
-				lastColumn, buf, attr);
+			if (fVisibleTextBuffer->IsFullWidthChar(j - firstVisible, k))
+				k--;
+
+			if (k < 0)
+				k = 0;
+
+			for (int32 i = k; i <= x2;) {
+				int32 lastColumn = x2;
+				bool insideSelection = _CheckSelectedRegion(j, i, lastColumn);
+				uint16 attr;
+				int32 count = fVisibleTextBuffer->GetString(j - firstVisible, i,
+					lastColumn, buf, attr);
 
 //debug_printf("  fVisibleTextBuffer->GetString(%ld, %ld, %ld) -> (%ld, \"%.*s\"), selected: %d\n",
 //j - firstVisible, i, lastColumn, count, (int)count, buf, insideSelection);
 
-			if (count == 0) {
-				BRect rect(fFontWidth * i, _LineOffset(j),
-					fFontWidth * (lastColumn + 1) - 1, 0);
-				rect.bottom = rect.top + fFontHeight - 1;
+				if (count == 0) {
+					BRect rect(fFontWidth * i, _LineOffset(j),
+						fFontWidth * (lastColumn + 1) - 1, 0);
+					rect.bottom = rect.top + fFontHeight - 1;
 
-				SetHighColor(insideSelection ? fSelectBackColor
-					: fTextBackColor);
-				FillRect(rect);
+					SetHighColor(insideSelection ? fSelectBackColor
+						: fTextBackColor);
+					FillRect(rect);
 
-				i = lastColumn + 1;
-				continue;
+					i = lastColumn + 1;
+					continue;
+				}
+
+				if (IS_WIDTH(attr))
+					count = 2;
+
+				_DrawLinePart(fFontWidth * i, (int32)_LineOffset(j),
+					attr, buf, count, insideSelection, false, this);
+				i += count;
 			}
-
-			if (IS_WIDTH(attr))
-				count = 2;
-
-			_DrawLinePart(fFontWidth * i, (int32)_LineOffset(j),
-				attr, buf, count, insideSelection, false, this);
-			i += count;
 		}
 	}
 
