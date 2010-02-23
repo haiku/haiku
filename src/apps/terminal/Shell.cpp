@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2010, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
@@ -7,6 +7,7 @@
  * Distributed under the terms of the MIT license.
  *
  */
+
 
 #include "Shell.h"
 
@@ -397,6 +398,9 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 
 	if (fProcessID == 0) {
 		// Now in child process.
+
+		// close the PTY master side
+		close(master);
 
 		/*
 		 * Make our controlling tty the pseudo tty. This hapens because
