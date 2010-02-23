@@ -3226,16 +3226,19 @@ dump_io_context(int argc, char** argv)
 	kprintf(" max fds:\t%lu\n", context->table_size);
 
 	if (context->num_used_fds)
-		kprintf("   no. type     ops ref open mode        pos cookie\n");
+		kprintf("   no.  type         ops  ref  open  mode         pos"
+			"      cookie\n");
 
 	for (uint32 i = 0; i < context->table_size; i++) {
 		struct file_descriptor* fd = context->fds[i];
 		if (fd == NULL)
 			continue;
 
-		kprintf("  %3lu: %ld %p %3ld %4ld %4lx %10Ld %p %s %p\n", i, fd->type,
-			fd->ops, fd->ref_count, fd->open_count, fd->open_mode, fd->pos,
-			fd->cookie, fd->type >= FDTYPE_INDEX && fd->type <= FDTYPE_QUERY
+		kprintf("  %3" B_PRIu32 ":  %4" B_PRId32 "  %p  %3" B_PRId32 "  %4"
+			B_PRIu32 "  %4" B_PRIx32 "  %10" B_PRIdOFF "  %p  %s %p\n", i,
+			fd->type, fd->ops, fd->ref_count, fd->open_count, fd->open_mode,
+			fd->pos, fd->cookie,
+			fd->type >= FDTYPE_INDEX && fd->type <= FDTYPE_QUERY
 				? "mount" : "vnode",
 			fd->u.vnode);
 	}
