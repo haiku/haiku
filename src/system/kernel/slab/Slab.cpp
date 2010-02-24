@@ -413,10 +413,8 @@ object_cache_low_memory(void* dummy, uint32 resources, int32 level)
 		if (cache->reclaimer)
 			cache->reclaimer(cache->cookie, level);
 
-		if ((cache->flags & CACHE_NO_DEPOT) == 0) {
+		if ((cache->flags & CACHE_NO_DEPOT) == 0)
 			object_depot_make_empty(&cache->depot, 0);
-				// TODO: what flags?
-		}
 
 		MutexLocker cacheLocker(cache->lock);
 		size_t minimumAllowed;
