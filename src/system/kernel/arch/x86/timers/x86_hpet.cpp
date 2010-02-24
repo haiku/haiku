@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <debug.h>
 #include <timer.h>
 #include <arch/x86/timer.h>
 #include <arch/x86/arch_hpet.h>
@@ -22,10 +23,13 @@
 	#define TRACE(x) ;
 #endif
 
+#define TEST_HPET
+
 static struct hpet_regs *sHPETRegs;
 static volatile struct hpet_timer *sTimer;
+static uint64 sHPETPeriod;
 
-static int hpet_get_prio();
+static int hpet_get_priority();
 static status_t hpet_set_hardware_timer(bigtime_t relativeTimeout);
 static status_t hpet_clear_hardware_timer();
 static status_t hpet_init(struct kernel_args *args);
@@ -33,7 +37,7 @@ static status_t hpet_init(struct kernel_args *args);
 
 struct timer_info gHPETTimer = {
 	"HPET",
-	&hpet_get_prio,
+	&hpet_get_priority,
 	&hpet_set_hardware_timer,
 	&hpet_clear_hardware_timer,
 	&hpet_init
@@ -41,15 +45,16 @@ struct timer_info gHPETTimer = {
 
 
 static int
-hpet_get_prio()
+hpet_get_priority()
 {
-	return 0; //TODO: Should be 3, so it gets picked first
+	return 0; // TODO: Should have the highest priority
 }
 
 
 static int32
 hpet_timer_interrupt(void *arg)
 {
+	//dprintf_no_syslog("HPET timer_interrupt!!!!\n");
 	return timer_interrupt();
 }
 
@@ -57,8 +62,8 @@ hpet_timer_interrupt(void *arg)
 static inline bigtime_t
 hpet_convert_timeout(const bigtime_t &relativeTimeout)
 {
-	return ((relativeTimeout * 1000000000LL)
-		/ HPET_GET_PERIOD(sHPETRegs)) + sHPETRegs->u0.counter64;
+	return ((relativeTimeout * 1000000000ULL)
+		/ sHPETPeriod) + sHPETRegs->u0.counter64;
 }
 
 
@@ -67,9 +72,14 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout)
 {
 	cpu_status state = disable_interrupts();
 
-	bigtime_t timerValue = hpet_convert_timeout(relativeTimeout);
+	// enable timer interrupt
+	sTimer->config |= HPET_CONF_TIMER_INT_ENABLE;
 	
-	//dprintf("setting value %lld, cur is %lld\n", timerValue, sHPETRegs->counter64);
+	// TODO:
+	if (relativeTimeout < 3000)
+		relativeTimeout = 3000;
+		
+	bigtime_t timerValue = hpet_convert_timeout(relativeTimeout);
 	
 	sTimer->u0.comparator64 = timerValue;
 
@@ -82,7 +92,7 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout)
 static status_t
 hpet_clear_hardware_timer()
 {
-	// Disable timer
+	// Disable timer interrupt
 	sTimer->config &= ~HPET_CONF_TIMER_INT_ENABLE;
 	return B_OK;
 }
@@ -120,20 +130,32 @@ hpet_set_legacy(bool enabled)
 static void
 hpet_dump_timer(volatile struct hpet_timer *timer)
 {
-	dprintf(" routable interrupts:\n");
+	dprintf("HPET Timer %ld:\n", (timer - sHPETRegs->timer));
+		
+	dprintf("\troutable IRQs: ");
 	uint32 interrupts = (uint32)HPET_GET_CAP_TIMER_ROUTE(timer);
 	for (int i = 0; i < 32; i++) {
 		if (interrupts & (1 << i))
 			dprintf("%d ", i);
 	}
-		
 	dprintf("\n");
-	dprintf(" config: 0x%llx\n", timer->config);
-	dprintf(" configured interrupt: %lld\n",
-		HPET_GET_CONF_TIMER_INT_ROUTE(timer));
+	dprintf("\tconfiguration: 0x%llx\n", timer->config);
+	dprintf("\tFSB Enabled: %s\n",
+		timer->config & HPET_CONF_TIMER_FSB_ENABLE ? "Yes" : "No");
+	dprintf("\tInterrupt Enabled: %s\n",
+		timer->config & HPET_CONF_TIMER_INT_ENABLE ? "Yes" : "No");
+	dprintf("\tTimer type: %s\n",
+		timer->config & HPET_CONF_TIMER_TYPE ? "Periodic" : "OneShot");
+	dprintf("\tInterrupt Type: %s\n",
+		timer->config & HPET_CONF_TIMER_INT_TYPE ? "Level" : "Edge");	
 	
-	dprintf(" fsb_route[0]: 0x%llx\n", timer->fsb_route[0]);
-	dprintf(" fsb_route[1]: 0x%llx\n", timer->fsb_route[1]);
+	dprintf("\tconfigured IRQ: %lld\n",
+		HPET_GET_CONF_TIMER_INT_ROUTE(timer));
+		
+	if (timer->config & HPET_CONF_TIMER_FSB_ENABLE) {
+		dprintf("\tfsb_route[0]: 0x%llx\n", timer->fsb_route[0]);
+		dprintf("\tfsb_route[1]: 0x%llx\n", timer->fsb_route[1]);
+	}
 }
 #endif
 
@@ -143,22 +165,39 @@ hpet_init_timer(volatile struct hpet_timer *timer)
 {
 	sTimer = timer;
 	
-	// Configure timer for interrupt 0
-	sTimer->config &= (~HPET_CONF_TIMER_INT_ROUTE_MASK
-		<< HPET_CONF_TIMER_INT_ROUTE_SHIFT);
+	uint32 interrupt = 0;
 	
+	sTimer->config |= (interrupt << HPET_CONF_TIMER_INT_ROUTE_SHIFT)
+		& HPET_CONF_TIMER_INT_ROUTE_MASK;
+
 	// Non-periodic mode, edge triggered
 	sTimer->config &= ~(HPET_CONF_TIMER_TYPE | HPET_CONF_TIMER_INT_TYPE);
 
 	sTimer->config &= ~HPET_CONF_TIMER_FSB_ENABLE;
+	sTimer->config &= ~HPET_CONF_TIMER_32MODE;
 
 	// Enable timer
 	sTimer->config |= HPET_CONF_TIMER_INT_ENABLE;
 	
 #ifdef TRACE_HPET
-	dprintf("hpet_init_timer: timer %p, final configuration:\n", timer);
 	hpet_dump_timer(sTimer);
 #endif
+}
+
+
+static status_t
+hpet_test()
+{
+	uint64 initialValue = sHPETRegs->u0.counter64;
+	spin(10);
+	uint64 finalValue = sHPETRegs->u0.counter64;
+	
+	if (initialValue == finalValue) {
+		dprintf("hpet_test: counter does not increment\n");
+		return B_ERROR;
+	}
+	
+	return B_OK;
 }
 
 
@@ -183,8 +222,11 @@ hpet_init(struct kernel_args *args)
 		}
 	}
 
-	TRACE(("hpet_init: HPET is at %p. Vendor ID: %llx. Period: %lld\n",
-		sHPETRegs, HPET_GET_VENDOR_ID(sHPETRegs), HPET_GET_PERIOD(sHPETRegs)));
+	sHPETPeriod = HPET_GET_PERIOD(sHPETRegs);
+
+	TRACE(("hpet_init: HPET is at %p.\n\tVendor ID: %llx, rev: %llx, period: %lld\n",
+		sHPETRegs, HPET_GET_VENDOR_ID(sHPETRegs), HPET_GET_REVID(sHPETRegs),
+		sHPETPeriod));
 
 	status_t status = hpet_set_enabled(false);
 	if (status != B_OK)
@@ -206,23 +248,31 @@ hpet_init(struct kernel_args *args)
 		dprintf("hpet_init: HPET does not have at least 3 timers. Skipping.\n");
 		return B_ERROR;
 	}
-
+		
 #ifdef TRACE_HPET
-	for (uint32 c = 0; c < numTimers; c++) {
-		TRACE(("hpet_init: timer %lu:\n", c));	
+	for (uint32 c = 0; c < numTimers; c++)
 		hpet_dump_timer(&sHPETRegs->timer[c]);
-	}
 #endif
 
-	install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE,
-		&hpet_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
-	install_io_interrupt_handler(0, &hpet_timer_interrupt, NULL,
-		B_NO_LOCK_VECTOR);
-
-	hpet_init_timer(&sHPETRegs->timer[2]);
-	
+	hpet_init_timer(&sHPETRegs->timer[0]);
+			
 	status = hpet_set_enabled(true);
+	if (status != B_OK)
+		return status;
 
+#ifdef TEST_HPET		
+	status = hpet_test();
+	if (status != B_OK)
+		return status;
+#endif
+	
+	int32 configuredIRQ = HPET_GET_CONF_TIMER_INT_ROUTE(sTimer);
+		
+	//install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE,
+		//&hpet_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
+	install_io_interrupt_handler(configuredIRQ, &hpet_timer_interrupt,
+		NULL, B_NO_LOCK_VECTOR);
+	
 	return status;
 }
 
