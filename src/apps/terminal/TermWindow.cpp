@@ -818,6 +818,8 @@ TermWindow::_AddTab(Arguments *args)
 		SetSizeLimits(MIN_COLS * width - 1, MAX_COLS * width - 1,
 			minimumHeight + MIN_ROWS * height - 1,
 			minimumHeight + MAX_ROWS * height - 1);
+			// TODO: The size limit computation is apparently broken, since
+			// the terminal can be resized smaller than MIN_ROWS/MIN_COLS!
 
 		// If it's the first time we're called, setup the window
 		if (fTabView->CountTabs() == 1) {
