@@ -290,8 +290,10 @@ object_depot_store(object_depot* depot, void* object, uint32 flags)
 			readLocker.Unlock();
 
 			DepotMagazine* magazine = alloc_magazine(depot, flags);
-			if (magazine == NULL)
+			if (magazine == NULL) {
+				depot->return_object(depot, depot->cookie, object, flags);
 				return 0;
+			}
 
 			readLocker.Lock();
 			interruptsLocker.Lock();
