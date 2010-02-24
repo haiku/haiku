@@ -26,6 +26,7 @@
 #include <vm/VMAddressSpace.h>
 
 #include "x86_paging.h"
+#include "x86_syscalls.h"
 #include "X86VMTranslationMap.h"
 
 
@@ -357,6 +358,7 @@ void
 arch_thread_context_switch(struct thread *from, struct thread *to)
 {
 	i386_set_tss_and_kstack(to->kernel_stack_top);
+	x86_set_syscall_stack(to->kernel_stack_top);
 
 	// set TLS GDT entry to the current thread - since this action is
 	// dependent on the current CPU, we have to do it here
@@ -451,6 +453,7 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1,
 	// set the CPU dependent GDT entry for TLS
 	set_tls_context(t);
 
+	x86_set_syscall_stack(t->kernel_stack_top);
 	x86_enter_userspace(entry, stackTop);
 
 	return B_OK;

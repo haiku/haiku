@@ -555,9 +555,8 @@ FUNCTION_END(handle_syscall)
 	ecx - user esp
 */
 FUNCTION(x86_sysenter):
-	// switch the stack
+	// get the thread
 	movl	%dr3, %edx
-	movl	THREAD_kernel_stack_top(%edx), %esp
 
 	// push the iframe
 	pushl	$USER_DATA_SEG			// user_ss
