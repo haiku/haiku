@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,6 +19,13 @@
 
 
 static const UTF8Char kSpaceChar(' ');
+
+// Soft size limits for the terminal buffer. The constants defined in
+// TermConst.h are rather for the Terminal in general (i.e. the GUI).
+static const int32 kMinRowCount = 2;
+static const int32 kMaxRowCount = 1024;
+static const int32 kMinColumnCount = 4;
+static const int32 kMaxColumnCount = 1024;
 
 
 #define ALLOC_LINE_ON_STACK(width)	\
@@ -164,8 +171,8 @@ BasicTerminalBuffer::ResizeTo(int32 width, int32 height)
 status_t
 BasicTerminalBuffer::ResizeTo(int32 width, int32 height, int32 historyCapacity)
 {
-	if (height < MIN_ROWS || height > MAX_ROWS || width < MIN_COLS
-			|| width > MAX_COLS) {
+	if (height < kMinRowCount || height > kMaxRowCount
+			|| width < kMinColumnCount || width > kMaxColumnCount) {
 		return B_BAD_VALUE;
 	}
 
