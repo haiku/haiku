@@ -64,7 +64,6 @@ All rights reserved.
 */
 
 #include <Button.h>
-#include <ClassInfo.h>
 #include <Debug.h>
 #include <InterfaceDefs.h>
 #include <ListItem.h>
@@ -613,8 +612,7 @@ BComboBox::TextInput::KeyDown(const char *bytes, int32 numBytes)
 
 	switch (aKey) {
 		case B_RETURN:
-			cb = cast_as(Parent(), BComboBox);
-
+			cb = dynamic_cast<BComboBox*>(Parent());
 			ASSERT(cb);
 
 			if (!cb->IsEnabled())
@@ -639,7 +637,7 @@ BComboBox::TextInput::KeyDown(const char *bytes, int32 numBytes)
 			}
 			break;
 		case B_TAB:
-//			cb = cast_as(Parent(), BComboBox);
+//			cb = dynamic_cast<BComboBox*>Parent());
 //			ASSERT(cb);
 //			if (cb->fAutoComplete && cb->fCompletionIndex >= 0) {	
 //				int32 from, to;
@@ -678,10 +676,10 @@ BComboBox::TextInput::KeyDown(const char *bytes, int32 numBytes)
 #if 0
 		case B_UP_ARROW:		// fall through
 		case B_DOWN_ARROW:
-			cb = cast_as(Parent(), BComboBox);
+			cb = dynamic_cast<BComboBox*>(Parent());
 			ASSERT(cb);
 			if (cb->fChoiceList) {
-				cb = cast_as(Parent(), BComboBox);
+				cb = dynamic_cast<BComboBox*>(Parent());
 				ASSERT(cb);
 				if (!(cb->fPopupWindow)) {
 					cb->fPopupWindow = cb->CreatePopupWindow();
@@ -709,11 +707,11 @@ BComboBox::TextInput::KeyDown(const char *bytes, int32 numBytes)
 			break;
 #endif
 		case B_ESCAPE:
-			cb = cast_as(Parent(), BComboBox);
+			cb = dynamic_cast<BComboBox*>(Parent());
 			ASSERT(cb);
 			if (cb->fChoiceList)
 			{
-				cb = cast_as(Parent(), BComboBox);
+				cb = dynamic_cast<BComboBox*>(Parent());
 				ASSERT(cb);
 				if (cb->fPopupWindow && cb->fPopupWindow->Lock())
 				{
@@ -749,7 +747,7 @@ BComboBox::TextInput::MakeFocus(bool state)
 	if (state == IsFocus())
 		return;
 
-	BComboBox* parent = cast_as(Parent(), BComboBox);
+	BComboBox* parent = dynamic_cast<BComboBox*>(Parent());
 	ASSERT(parent);
 
 	BTextView::MakeFocus(state);

@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <ClassInfo.h>
 #include <Clipboard.h>
 #ifdef __HAIKU__
 #  include <LayoutUtils.h>
@@ -191,8 +190,8 @@ PropertyListView::MessageReceived(BMessage* message)
 				if (!archivable)
 					continue;
 				// see if this is actually a property
-				Property* property = cast_as(archivable, Property);
-				if (!property || !propertyObject.AddProperty(property))
+				Property* property = dynamic_cast<Property*>(archivable);
+				if (property == NULL || !propertyObject.AddProperty(property))
 					delete archivable;
 			}
 			if (propertyObject.CountProperties() > 0)

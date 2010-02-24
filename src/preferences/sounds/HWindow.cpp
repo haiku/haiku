@@ -19,7 +19,6 @@
 #include <Beep.h>
 #include <Box.h>
 #include <Button.h>
-#include <ClassInfo.h>
 #include <FindDirectory.h>
 #include <fs_attr.h>
 #include <MediaFiles.h>
@@ -173,7 +172,10 @@ HWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case M_OTHER_MESSAGE:
 		{
-			BMenuField* menufield = cast_as(FindView("filemenu"), BMenuField);
+			BMenuField* menufield
+				= dynamic_cast<BMenuField*>(FindView("filemenu"));
+			if (menufield == NULL)
+				return;
 			BMenu* menu = menufield->Menu();
 
 			HEventRow* row = (HEventRow*)fEventList->CurrentSelection();
@@ -199,8 +201,10 @@ HWindow::MessageReceived(BMessage* message)
 			entry_ref ref;
 			HEventRow* row = (HEventRow*)fEventList->CurrentSelection();
 			if (message->FindRef("refs", &ref) == B_OK && row != NULL) {
-				BMenuField* menufield = cast_as(FindView("filemenu"),
-					BMenuField);
+				BMenuField* menufield
+					= dynamic_cast<BMenuField*>(FindView("filemenu"));
+				if (menufield == NULL)
+					return;	
 				BMenu* menu = menufield->Menu();
 
 				// check audio file
@@ -267,7 +271,10 @@ HWindow::MessageReceived(BMessage* message)
 		case M_EVENT_CHANGED:
 		{
 			const char* path;
-			BMenuField* menufield = cast_as(FindView("filemenu"), BMenuField);
+			BMenuField* menufield
+				= dynamic_cast<BMenuField*>(FindView("filemenu"));
+			if (menufield == NULL)
+				return;
 			BMenu* menu = menufield->Menu();
 
 			if (message->FindString("path", &path) == B_OK) {
@@ -308,7 +315,9 @@ HWindow::MessageReceived(BMessage* message)
 void
 HWindow::SetupMenuField()
 {
-	BMenuField* menufield = cast_as(FindView("filemenu"), BMenuField);
+	BMenuField* menufield = dynamic_cast<BMenuField*>(FindView("filemenu"));
+	if (menufield == NULL)
+		return;
 	BMenu* menu = menufield->Menu();
 	int32 count = fEventList->CountRows();
 	for (int32 i = 0; i < count; i++) {
@@ -403,11 +412,11 @@ void
 HWindow::Pulse()
 {
 	HEventRow* row = (HEventRow*)fEventList->CurrentSelection();
-	BMenuField* menufield = cast_as(FindView("filemenu"), BMenuField);
-	BButton* button = cast_as(FindView("play"), BButton);
-	BButton* stop = cast_as(FindView("stop"), BButton);
+	BMenuField* menufield = dynamic_cast<BMenuField*>(FindView("filemenu"));
+	BButton* button = dynamic_cast<BButton*>(FindView("play"));
+	BButton* stop = dynamic_cast<BButton*>(FindView("stop"));
 
-	if (menufield == NULL)
+	if (menufield == NULL || button == NULL || stop == NULL)
 		return;
 
 	if (row != NULL) {
