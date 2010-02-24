@@ -164,8 +164,8 @@ TermWindow::TermWindow(BRect frame, const char* title, Arguments *args)
 TermWindow::~TermWindow()
 {
 	if (fPrefWindow)
-		fPrefWindow->PostMessage(B_QUIT_REQUESTED);	
-		
+		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
+
 	if (fFindPanel && fFindPanel->Lock()) {
 		fFindPanel->Quit();
 		fFindPanel = NULL;
@@ -230,7 +230,7 @@ void
 TermWindow::MenusBeginning()
 {
 	TermView *view = _ActiveTermView();
-	
+
 	// Syncronize Encode Menu Pop-up menu and Preference.
 	BMenuItem *item = fEncodingmenu->FindItem(
 		EncodingAsString(view->Encoding()));
@@ -256,7 +256,7 @@ TermWindow::_MakeEncodingMenu()
 	BMenu *menu = new (std::nothrow) BMenu("Text encoding");
 	if (menu == NULL)
 		return NULL;
-	
+
 	int encoding;
 	int i = 0;
 	while (get_next_encoding(i, &encoding) == B_OK) {
@@ -268,9 +268,9 @@ TermWindow::_MakeEncodingMenu()
 		}
 		i++;
 	}
-	
+
 	menu->SetRadioMode(true);
-	
+
 	return menu;
 }
 
@@ -363,12 +363,12 @@ TermWindow::_GetPreferredFont(BFont &font)
 {
 	// Default to be_fixed_font
 	font = be_fixed_font;
-	
+
 	const char *family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
 	const char *style = PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE);
-	
+
 	font.SetFamilyAndStyle(family, style);
-			
+
 	float size = PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE);
 	if (size < 6.0f)
 		size = 6.0f;
@@ -633,10 +633,10 @@ TermWindow::MessageReceived(BMessage *message)
 				index = _IndexOfTermView(termView);
 			else
 				index = _IndexOfTermView(_ActiveTermView());
-				
+
 			if (index >= 0)
 				_RemoveTab(index);
-							
+
 			break;
 		}
 
@@ -835,7 +835,7 @@ TermWindow::_AddTab(Arguments *args)
 	} catch (...) {
 		// most probably out of memory. That's bad.
 		// TODO: Should cleanup, I guess
-		
+
 		// Quit the application if we don't have a shell already
 		if (fTabView->CountTabs() == 0) {
 			fprintf(stderr, "Terminal couldn't open a shell\n");
@@ -936,7 +936,7 @@ void
 TermWindow::FrameResized(float newWidth, float newHeight)
 {
 	BWindow::FrameResized(newWidth, newHeight);
-	
+
 	TermView *view = _ActiveTermView();
 	PrefHandler::Default()->setInt32(PREF_COLS, view->Columns());
 	PrefHandler::Default()->setInt32(PREF_ROWS, view->Rows());
@@ -979,14 +979,14 @@ TermWindow::_MakeWindowSizeMenu()
 	BMenu *menu = new (std::nothrow) BMenu("Window size");
 	if (menu == NULL)
 		return NULL;
-	
+
 	const int32 windowSizes[4][2] = {
 		{ 80, 25 },
 		{ 80, 40 },
 		{ 132, 25 },
 		{ 132, 40 }
-	};	
-	
+	};
+
 	const int32 sizeNum = sizeof(windowSizes) / sizeof(windowSizes[0]);
 	for (int32 i = 0; i < sizeNum; i++) {
 		char label[32];
@@ -1002,7 +1002,7 @@ TermWindow::_MakeWindowSizeMenu()
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Full screen", new BMessage(FULLSCREEN),
 		B_ENTER));
-		
+
 	return menu;
 }
 
