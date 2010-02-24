@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler. All Rights Reserved.
+ * Copyright 2008-2010, Axel Dörfler. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -42,11 +42,12 @@ typedef void (*object_cache_reclaimer)(void* cookie, int32 level);
 extern "C" {
 #endif
 
-object_cache* create_object_cache(const char* name, size_t object_size,
+object_cache* create_object_cache(const char* name, size_t objectSize,
 	size_t alignment, void* cookie, object_cache_constructor constructor,
-	object_cache_destructor);
-object_cache* create_object_cache_etc(const char* name, size_t object_size,
-	size_t alignment, size_t max_byte_usage, uint32 flags, void* cookie,
+	object_cache_destructor destructor);
+object_cache* create_object_cache_etc(const char* name, size_t objectSize,
+	size_t alignment, size_t maxByteUsage, size_t magazineCapacity,
+	size_t maxMagazineCount, uint32 flags, void* cookie,
 	object_cache_constructor constructor, object_cache_destructor destructor,
 	object_cache_reclaimer reclaimer);
 

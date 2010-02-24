@@ -180,8 +180,8 @@ block_allocator_init_boot()
 		if (size > 2048)
 			flags |= CACHE_NO_DEPOT;
 
-		sBlockCaches[index] = create_object_cache_etc(name, size, 0, 0, flags,
-			NULL, NULL, NULL, NULL);
+		sBlockCaches[index] = create_object_cache_etc(name, size, 0, 0, 0, 0,
+			flags, NULL, NULL, NULL, NULL);
 		if (sBlockCaches[index] == NULL)
 			panic("allocator: failed to init block cache");
 	}

@@ -24,6 +24,8 @@ struct HashedObjectCache : ObjectCache {
 
 	static	HashedObjectCache*	Create(const char* name, size_t object_size,
 									size_t alignment, size_t maximum,
+									size_t magazineCapacity,
+									size_t maxMagazineCount,
 									uint32 flags, void* cookie,
 									object_cache_constructor constructor,
 									object_cache_destructor destructor,

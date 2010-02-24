@@ -413,6 +413,11 @@ object_cache_low_memory(void* dummy, uint32 resources, int32 level)
 		if (cache->reclaimer)
 			cache->reclaimer(cache->cookie, level);
 
+		if ((cache->flags & CACHE_NO_DEPOT) == 0) {
+			object_depot_make_empty(&cache->depot, 0);
+				// TODO: what flags?
+		}
+
 		MutexLocker cacheLocker(cache->lock);
 		size_t minimumAllowed;
 
@@ -540,16 +545,16 @@ create_object_cache(const char* name, size_t object_size, size_t alignment,
 	void* cookie, object_cache_constructor constructor,
 	object_cache_destructor destructor)
 {
-	return create_object_cache_etc(name, object_size, alignment, 0, 0, cookie,
-		constructor, destructor, NULL);
+	return create_object_cache_etc(name, object_size, alignment, 0, 0, 0, 0,
+		cookie, constructor, destructor, NULL);
 }
 
 
 object_cache*
 create_object_cache_etc(const char* name, size_t objectSize, size_t alignment,
-	size_t maximum, uint32 flags, void* cookie,
-	object_cache_constructor constructor, object_cache_destructor destructor,
-	object_cache_reclaimer reclaimer)
+	size_t maximum, size_t magazineCapacity, size_t maxMagazineCount,
+	uint32 flags, void* cookie, object_cache_constructor constructor,
+	object_cache_destructor destructor, object_cache_reclaimer reclaimer)
 {
 	ObjectCache* cache;
 
@@ -557,10 +562,12 @@ create_object_cache_etc(const char* name, size_t objectSize, size_t alignment,
 		cache = NULL;
 	} else if (objectSize <= 256) {
 		cache = SmallObjectCache::Create(name, objectSize, alignment, maximum,
-			flags, cookie, constructor, destructor, reclaimer);
+			magazineCapacity, maxMagazineCount, flags, cookie, constructor,
+			destructor, reclaimer);
 	} else {
-		cache = HashedObjectCache::Create(name, objectSize, alignment,
-			maximum, flags, cookie, constructor, destructor, reclaimer);
+		cache = HashedObjectCache::Create(name, objectSize, alignment, maximum,
+			magazineCapacity, maxMagazineCount, flags, cookie, constructor,
+			destructor, reclaimer);
 	}
 
 	if (cache != NULL) {

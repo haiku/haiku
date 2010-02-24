@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Axel Dörfler. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -19,9 +20,11 @@ typedef struct object_depot {
 	DepotMagazine*			empty;
 	size_t					full_count;
 	size_t					empty_count;
+	size_t					max_count;
+	size_t					magazine_capacity;
 	struct depot_cpu_store*	stores;
+	void*					cookie;
 
-	void*	cookie;
 	void (*return_object)(struct object_depot* depot, void* cookie,
 		void* object, uint32 flags);
 } object_depot;
@@ -31,7 +34,8 @@ typedef struct object_depot {
 extern "C" {
 #endif
 
-status_t object_depot_init(object_depot* depot, uint32 flags, void* cookie,
+status_t object_depot_init(object_depot* depot, size_t capacity,
+	size_t maxCount, uint32 flags, void* cookie,
 	void (*returnObject)(object_depot* depot, void* cookie, void* object,
 		uint32 flags));
 void object_depot_destroy(object_depot* depot, uint32 flags);
@@ -44,5 +48,6 @@ void object_depot_make_empty(object_depot* depot, uint32 flags);
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif	/* _SLAB_OBJECT_DEPOT_H_ */

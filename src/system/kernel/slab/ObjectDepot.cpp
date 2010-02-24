@@ -19,10 +19,6 @@
 #include "slab_private.h"
 
 
-static const int kMagazineCapacity = 32;
-	// TODO: Should be dynamically tuned per cache.
-
-
 struct DepotMagazine {
 			DepotMagazine*		next;
 			uint16				current_round;
@@ -80,14 +76,15 @@ DepotMagazine::Push(void* object)
 
 
 static DepotMagazine*
-alloc_magazine(uint32 flags)
+alloc_magazine(object_depot* depot, uint32 flags)
 {
 	DepotMagazine* magazine = (DepotMagazine*)slab_internal_alloc(
-		sizeof(DepotMagazine) + kMagazineCapacity * sizeof(void*), flags);
+		sizeof(DepotMagazine) + depot->magazine_capacity * sizeof(void*),
+		flags);
 	if (magazine) {
 		magazine->next = NULL;
 		magazine->current_round = 0;
-		magazine->round_count = kMagazineCapacity;
+		magazine->round_count = depot->magazine_capacity;
 	}
 
 	return magazine;
@@ -113,6 +110,8 @@ empty_magazine(object_depot* depot, DepotMagazine* magazine, uint32 flags)
 static bool
 exchange_with_full(object_depot* depot, DepotMagazine*& magazine)
 {
+	ASSERT(magazine->IsEmpty());
+
 	SpinLocker _(depot->inner_lock);
 
 	if (depot->full == NULL)
@@ -128,8 +127,11 @@ exchange_with_full(object_depot* depot, DepotMagazine*& magazine)
 
 
 static bool
-exchange_with_empty(object_depot* depot, DepotMagazine*& magazine)
+exchange_with_empty(object_depot* depot, DepotMagazine*& magazine,
+	DepotMagazine*& freeMagazine)
 {
+	ASSERT(magazine == NULL || magazine->IsFull());
+
 	SpinLocker _(depot->inner_lock);
 
 	if (depot->empty == NULL)
@@ -137,9 +139,12 @@ exchange_with_empty(object_depot* depot, DepotMagazine*& magazine)
 
 	depot->empty_count--;
 
-	if (magazine) {
-		_push(depot->full, magazine);
-		depot->full_count++;
+	if (magazine != NULL) {
+		if (depot->full_count < depot->max_count) {
+			_push(depot->full, magazine);
+			depot->full_count++;
+		} else
+			freeMagazine = magazine;
 	}
 
 	magazine = _pop(depot->empty);
@@ -168,13 +173,15 @@ object_depot_cpu(object_depot* depot)
 
 
 status_t
-object_depot_init(object_depot* depot, uint32 flags, void* cookie,
-	void (*return_object)(object_depot* depot, void* cookie, void* object,
-		uint32 flags))
+object_depot_init(object_depot* depot, size_t capacity, size_t maxCount,
+	uint32 flags, void* cookie, void (*return_object)(object_depot* depot,
+		void* cookie, void* object, uint32 flags))
 {
 	depot->full = NULL;
 	depot->empty = NULL;
 	depot->full_count = depot->empty_count = 0;
+	depot->max_count = maxCount;
+	depot->magazine_capacity = capacity;
 
 	rw_lock_init(&depot->outer_lock, "object depot");
 	B_INITIALIZE_SPINLOCK(&depot->inner_lock);
@@ -245,6 +252,8 @@ object_depot_obtain(object_depot* depot)
 int
 object_depot_store(object_depot* depot, void* object, uint32 flags)
 {
+	DepotMagazine* freeMagazine = NULL;
+
 	ReadLocker readLocker(depot->outer_lock);
 	InterruptsLocker interruptsLocker;
 
@@ -256,18 +265,31 @@ object_depot_store(object_depot* depot, void* object, uint32 flags)
 	// we return the object directly to the slab.
 
 	while (true) {
-		if (store->loaded && store->loaded->Push(object))
+		if (store->loaded != NULL && store->loaded->Push(object))
 			return 1;
 
-		if ((store->previous && store->previous->IsEmpty())
-			|| exchange_with_empty(depot, store->previous)) {
+		if ((store->previous != NULL && store->previous->IsEmpty())
+			|| exchange_with_empty(depot, store->previous, freeMagazine)) {
 			std::swap(store->loaded, store->previous);
+
+			if (freeMagazine != NULL) {
+				// Free the magazine that didn't have space in the list
+				interruptsLocker.Unlock();
+				readLocker.Unlock();
+
+				empty_magazine(depot, freeMagazine, flags);
+
+				readLocker.Lock();
+				interruptsLocker.Lock();
+
+				store = object_depot_cpu(depot);
+			}
 		} else {
 			// allocate a new empty magazine
 			interruptsLocker.Unlock();
 			readLocker.Unlock();
 
-			DepotMagazine* magazine = alloc_magazine(flags);
+			DepotMagazine* magazine = alloc_magazine(depot, flags);
 			if (magazine == NULL)
 				return 0;
 

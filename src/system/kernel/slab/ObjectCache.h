@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler. All Rights Reserved.
+ * Copyright 2008-2010, Axel Dörfler. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -80,7 +80,9 @@ public:
 
 			status_t			Init(const char* name, size_t objectSize,
 									size_t alignment, size_t maximum,
-									uint32 flags, void* cookie,
+									size_t magazineCapacity,
+									size_t maxMagazineCount, uint32 flags,
+									void* cookie,
 									object_cache_constructor constructor,
 									object_cache_destructor destructor,
 									object_cache_reclaimer reclaimer);

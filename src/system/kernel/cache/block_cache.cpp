@@ -1329,7 +1329,7 @@ block_cache::Init()
 	mutex_init(&lock, "block cache");
 
 	buffer_cache = create_object_cache_etc("block cache buffers", block_size,
-		8, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
+		8, 0, 0, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
 	if (buffer_cache == NULL)
 		return B_NO_MEMORY;
 
@@ -1472,7 +1472,7 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 		if (block->is_dirty && !block->discard) {
 			if (block->busy_writing)
 				continue;
-			
+
 			BlockWriter::WriteBlock(this, block);
 		}
 
@@ -2022,7 +2022,7 @@ dump_block(cached_block* block)
 		(addr_t)block, block->block_number,
 		(addr_t)block->current_data, (addr_t)block->original_data,
 		(addr_t)block->parent_data, block->ref_count, block->accessed,
-		block->busy_reading ? 'r' : '-', block->busy_writing ? 'w' : '-', 
+		block->busy_reading ? 'r' : '-', block->busy_writing ? 'w' : '-',
 		block->is_writing ? 'W' : '-', block->is_dirty ? 'D' : '-',
 		block->unused ? 'U' : '-', block->discard ? 'D' : '-',
 		(addr_t)block->transaction,
@@ -2587,7 +2587,7 @@ status_t
 block_cache_init(void)
 {
 	sBlockCache = create_object_cache_etc("cached blocks", sizeof(cached_block),
-		8, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
+		8, 0, 0, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
 	if (sBlockCache == NULL)
 		return B_NO_MEMORY;
 
@@ -3299,7 +3299,7 @@ block_cache_sync(void* _cache)
 	}
 
 	hash_close(cache->hash, &iterator, false);
-	
+
 	status_t status = writer.Write();
 
 	locker.Unlock();

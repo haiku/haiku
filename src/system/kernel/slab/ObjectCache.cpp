@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler. All Rights Reserved.
+ * Copyright 2008-2010, Axel Dörfler. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -40,10 +40,10 @@ ObjectCache::~ObjectCache()
 
 
 status_t
-ObjectCache::Init(const char* name, size_t objectSize,
-	size_t alignment, size_t maximum, uint32 flags, void* cookie,
-	object_cache_constructor constructor, object_cache_destructor destructor,
-	object_cache_reclaimer reclaimer)
+ObjectCache::Init(const char* name, size_t objectSize, size_t alignment,
+	size_t maximum, size_t magazineCapacity, size_t maxMagazineCount,
+	uint32 flags, void* cookie, object_cache_constructor constructor,
+	object_cache_destructor destructor, object_cache_reclaimer reclaimer)
 {
 	strlcpy(this->name, name, sizeof(this->name));
 
@@ -86,9 +86,17 @@ ObjectCache::Init(const char* name, size_t objectSize,
 		this->flags |= CACHE_NO_DEPOT;
 
 	if (!(this->flags & CACHE_NO_DEPOT)) {
-		status_t status = object_depot_init(&depot, flags, this,
-			object_cache_return_object_wrapper);
-		if (status < B_OK) {
+		// Determine usable magazine configuration values if none had been given
+		if (magazineCapacity == 0) {
+			magazineCapacity = objectSize < 256
+				? 32 : (objectSize < 512 ? 16 : 8);
+		}
+		if (maxMagazineCount == 0)
+			maxMagazineCount = magazineCapacity / 2;
+
+		status_t status = object_depot_init(&depot, magazineCapacity,
+			maxMagazineCount, flags, this, object_cache_return_object_wrapper);
+		if (status != B_OK) {
 			mutex_destroy(&lock);
 			return status;
 		}

@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -3395,8 +3395,8 @@ vm_init(kernel_args* args)
 
 	// create the object cache for the page mappings
 	gPageMappingsObjectCache = create_object_cache_etc("page mappings",
-		sizeof(vm_page_mapping), 0, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL,
-		NULL);
+		sizeof(vm_page_mapping), 0, 0, 64, 128, CACHE_LARGE_SLAB, NULL, NULL,
+		NULL, NULL);
 	if (gPageMappingsObjectCache == NULL)
 		panic("failed to create page mappings object cache");
 
