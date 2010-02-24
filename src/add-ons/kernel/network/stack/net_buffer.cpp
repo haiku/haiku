@@ -163,6 +163,8 @@ static vint32 sAllocatedDataHeaderCount = 0;
 static vint32 sAllocatedNetBufferCount = 0;
 static vint32 sEverAllocatedDataHeaderCount = 0;
 static vint32 sEverAllocatedNetBufferCount = 0;
+static vint32 sMaxAllocatedDataHeaderCount = 0;
+static vint32 sMaxAllocatedNetBufferCount = 0;
 #endif
 
 
@@ -611,10 +613,12 @@ dump_net_buffer(int argc, char** argv)
 static int
 dump_net_buffer_stats(int argc, char** argv)
 {
-	kprintf("allocated data headers: %7ld / %7ld\n", sAllocatedDataHeaderCount,
-		sEverAllocatedDataHeaderCount);
-	kprintf("allocated net buffers:  %7ld / %7ld\n", sAllocatedNetBufferCount,
-		sEverAllocatedNetBufferCount);
+	kprintf("allocated data headers: %7ld / %7ld, peak %7ld\n",
+		sAllocatedDataHeaderCount, sEverAllocatedDataHeaderCount,
+		sMaxAllocatedDataHeaderCount);
+	kprintf("allocated net buffers:  %7ld / %7ld, peak %7ld\n",
+		sAllocatedNetBufferCount, sEverAllocatedNetBufferCount,
+		sMaxAllocatedNetBufferCount);
 	return 0;
 }
 
@@ -706,7 +710,11 @@ static inline data_header*
 allocate_data_header()
 {
 #if ENABLE_STATS
-	atomic_add(&sAllocatedDataHeaderCount, 1);
+	int32 current = atomic_add(&sAllocatedDataHeaderCount, 1) + 1;
+	int32 max = atomic_get(&sMaxAllocatedDataHeaderCount);
+	if (current > max)
+		atomic_test_and_set(&sMaxAllocatedDataHeaderCount, current, max);
+
 	atomic_add(&sEverAllocatedDataHeaderCount, 1);
 #endif
 	return (data_header*)object_cache_alloc(sDataNodeCache, 0);
@@ -717,7 +725,11 @@ static inline net_buffer_private*
 allocate_net_buffer()
 {
 #if ENABLE_STATS
-	atomic_add(&sAllocatedNetBufferCount, 1);
+	int32 current = atomic_add(&sAllocatedNetBufferCount, 1) + 1;
+	int32 max = atomic_get(&sMaxAllocatedNetBufferCount);
+	if (current > max)
+		atomic_test_and_set(&sMaxAllocatedNetBufferCount, current, max);
+
 	atomic_add(&sEverAllocatedNetBufferCount, 1);
 #endif
 	return (net_buffer_private*)object_cache_alloc(sNetBufferCache, 0);
