@@ -41,7 +41,7 @@ status_t object_depot_init(object_depot* depot, size_t capacity,
 void object_depot_destroy(object_depot* depot, uint32 flags);
 
 void* object_depot_obtain(object_depot* depot);
-int object_depot_store(object_depot* depot, void* object, uint32 flags);
+void object_depot_store(object_depot* depot, void* object, uint32 flags);
 
 void object_depot_make_empty(object_depot* depot, uint32 flags);
 

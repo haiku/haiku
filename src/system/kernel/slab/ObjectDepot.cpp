@@ -249,7 +249,7 @@ object_depot_obtain(object_depot* depot)
 }
 
 
-int
+void
 object_depot_store(object_depot* depot, void* object, uint32 flags)
 {
 	DepotMagazine* freeMagazine = NULL;
@@ -266,7 +266,7 @@ object_depot_store(object_depot* depot, void* object, uint32 flags)
 
 	while (true) {
 		if (store->loaded != NULL && store->loaded->Push(object))
-			return 1;
+			return;
 
 		if ((store->previous != NULL && store->previous->IsEmpty())
 			|| exchange_with_empty(depot, store->previous, freeMagazine)) {
@@ -292,7 +292,7 @@ object_depot_store(object_depot* depot, void* object, uint32 flags)
 			DepotMagazine* magazine = alloc_magazine(depot, flags);
 			if (magazine == NULL) {
 				depot->return_object(depot, depot->cookie, object, flags);
-				return 0;
+				return;
 			}
 
 			readLocker.Lock();

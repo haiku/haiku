@@ -696,8 +696,8 @@ object_cache_free(object_cache* cache, void* object, uint32 flags)
 	T(Free(cache, object));
 
 	if (!(cache->flags & CACHE_NO_DEPOT)) {
-		if (object_depot_store(&cache->depot, object, flags))
-			return;
+		object_depot_store(&cache->depot, object, flags);
+		return;
 	}
 
 	MutexLocker _(cache->lock);
