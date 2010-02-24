@@ -279,7 +279,7 @@ function GetBuildFile()
 		local baseURL=http://dev.haiku-os.org/export/
 		local revision=`uname -v | awk '{print $1}' | sed -e 's/r//'`
 		local url="${baseURL}${revision}/haiku/trunk/build/jam/${buildfile}"
-		wget -nv ${url} 2>&1 > /dev/null
+		wget -nv ${url} > /dev/null 2>&1
 	fi 
 }
 
