@@ -14,7 +14,6 @@
 #include <string>
 
 #include <Bitmap.h>
-#include <ClassInfo.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <Path.h>

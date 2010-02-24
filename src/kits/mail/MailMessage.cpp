@@ -16,7 +16,6 @@
 #include <Entry.h>
 #include <netdb.h>
 #include <NodeInfo.h>
-#include <ClassInfo.h>
 #include <Messenger.h>
 #include <Path.h>
 

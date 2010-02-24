@@ -9,8 +9,6 @@
 #define _AUDIO_STREAM_H
 
 
-#include <ClassInfo.h>
-
 #include "OldBufferStream.h"
 
 

@@ -12,7 +12,6 @@
 #define _SUBSCRIBER_H
 
 #include <MediaDefs.h>
-#include <ClassInfo.h>
 
 #include "OldBufferStream.h"
 

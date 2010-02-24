@@ -15,7 +15,6 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
-#include <ClassInfo.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <GridLayoutBuilder.h>

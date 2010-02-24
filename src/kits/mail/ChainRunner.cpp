@@ -13,7 +13,6 @@
 #include <Entry.h>
 #include <File.h>
 #include <String.h>
-#include <ClassInfo.h>
 #include <Alert.h>
 #include <Directory.h>
 #include <Application.h>

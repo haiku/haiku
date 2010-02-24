@@ -3,7 +3,6 @@
 
 #include <Application.h>
 #include <Archivable.h>
-#include <ClassInfo.h>
 
 #include "common.h"
 #include "settings.h"

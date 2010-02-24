@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <OS.h>
 #include <SupportDefs.h>
-#include <ClassInfo.h>
 #include <Locker.h>
 #include <Messenger.h>
 
