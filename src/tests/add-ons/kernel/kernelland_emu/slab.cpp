@@ -42,7 +42,8 @@ create_object_cache(const char *name, size_t objectSize,
 
 object_cache *
 create_object_cache_etc(const char *name, size_t objectSize,
-	size_t alignment, size_t maxByteUsage, uint32 flags, void *cookie,
+	size_t alignment, size_t maxByteUsage, size_t magazineCapacity,
+	size_t maxMagazineCount, uint32 flags, void *cookie,
 	object_cache_constructor constructor, object_cache_destructor destructor,
 	object_cache_reclaimer reclaimer)
 {
