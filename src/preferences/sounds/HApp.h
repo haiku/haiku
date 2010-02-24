@@ -14,13 +14,12 @@
 #include <Application.h>
 
 
-class HApp :public BApplication {
-	public:
-		HApp();
-		virtual ~HApp();
-
-	protected:
-		virtual void AboutRequested();
+class HApp : public BApplication {
+public:
+								HApp();
+	virtual						~HApp();
+	virtual	void				AboutRequested();
 };
+
 
 #endif	// HAPP_H

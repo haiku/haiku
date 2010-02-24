@@ -16,13 +16,14 @@
 
 
 HApp::HApp()
-	: BApplication("application/x-vnd.Haiku-Sounds")
+	:
+	BApplication("application/x-vnd.Haiku-Sounds")
 {
 	BRect rect;
 	rect.Set(200, 150, 590, 570);
 
-	HWindow *win = new HWindow(rect, "Sounds");
-	win->Show();
+	HWindow* window = new HWindow(rect, "Sounds");
+	window->Show();
 }
 
 
@@ -34,12 +35,14 @@ HApp::~HApp()
 void
 HApp::AboutRequested()
 {
-	(new BAlert("About Sounds", "Sounds\n"
-			    "  Brought to you by :\n"
-			    "	Oliver Ruiz Dorantes\n"
-			    "	Jérôme DUVAL.\n"
-			    "  Original work from Atsushi Takamatsu.\n"
-			    "Copyright " B_UTF8_COPYRIGHT "2003-2006 Haiku", "OK"))->Go();
+	BAlert* alert = new BAlert("About Sounds",
+		"Sounds\n"
+		"  Brought to you by :\n"
+		"	Oliver Ruiz Dorantes\n"
+		"	Jérôme DUVAL.\n"
+		"  Original work from Atsushi Takamatsu.\n"
+		"Copyright " B_UTF8_COPYRIGHT "2003-2006 Haiku", "OK");
+	alert->Go();
 }
 
 

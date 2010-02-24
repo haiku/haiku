@@ -35,22 +35,23 @@ enum{
 
 class HWindow : public BWindow {
 public:
-							HWindow(BRect rect, const char* name);
-protected:
-	virtual					~HWindow();
-	virtual	void			MessageReceived(BMessage *message);
-	virtual	bool			QuitRequested();
-	virtual	void			DispatchMessage(BMessage *message,
-								BHandler *handler);
-			void			InitGUI();
-			void			SetupMenuField();
-			void			Pulse();
+								HWindow(BRect rect, const char* name);
+	virtual						~HWindow();
+
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
+	virtual	void				DispatchMessage(BMessage* message,
+									BHandler* handler);
+			void				InitGUI();
+			void				SetupMenuField();
+			void				Pulse();
+
 private:
-	typedef	BWindow			_inherited;
-			HEventList*		fEventList;
-			BFilePanel*		fFilePanel;
-			BFileGameSound*	fPlayer;
-			BRect			fFrame;
+			HEventList*			fEventList;
+			BFilePanel*			fFilePanel;
+			BFileGameSound*		fPlayer;
+			BRect				fFrame;
 };
+
 
 #endif	// __HWINDOW_H__

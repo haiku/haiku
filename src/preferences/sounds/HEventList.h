@@ -10,8 +10,10 @@
 #ifndef __HEVENTLIST_H__
 #define __HEVENTLIST_H__
 
+
 #include <ColumnListView.h>
 #include <String.h>
+
 
 enum {
 	kEventColumn,
@@ -21,19 +23,18 @@ enum {
 
 class HEventRow : public BRow {
 public:
-					HEventRow(const char* event_name,
-						const char* path);
-		virtual			~HEventRow();
+								HEventRow(const char* event_name,
+									const char* path);
+	virtual						~HEventRow();
 		
-		const char*		Name() const { return fName.String();}
-		const char*		Path() const { return fPath.String();}
-			void		Remove(const char *type);
-			void		SetPath(const char* path);
-protected:
+			const char*			Name() const { return fName.String(); }
+			const char*			Path() const { return fPath.String(); }
+			void				Remove(const char* type);
+			void				SetPath(const char* path);
 
 private:
-			BString		fName;
-			BString		fPath;
+			BString				fName;
+			BString				fPath;
 };
 
 
@@ -44,15 +45,19 @@ enum {
 
 class HEventList : public BColumnListView {
 public:
-					HEventList(BRect rect, 
-						const char* name = "EventList");
-		virtual			~HEventList();
-				void	RemoveAll();
-				void	SetType(const char* type);
-				void	SetPath(const char* path);
+								HEventList(BRect rect, 
+									const char* name = "EventList");
+	virtual						~HEventList();
+			void				RemoveAll();
+			void				SetType(const char* type);
+			void				SetPath(const char* path);
+
 protected:
-		virtual 	void	SelectionChanged();
+	virtual	void				SelectionChanged();
+
 private:
-		char			*fType;	
+			char*				fType;	
 };
-#endif
+
+
+#endif	// __HEVENTLIST_H__
