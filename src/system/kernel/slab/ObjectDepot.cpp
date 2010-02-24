@@ -356,8 +356,10 @@ object_depot_make_empty(object_depot* depot, uint32 flags)
 void
 dump_object_depot(object_depot* depot)
 {
-	kprintf("  full:  %p, count %lu\n", depot->full, depot->full_count);
-	kprintf("  empty: %p, count %lu\n", depot->empty, depot->empty_count);
+	kprintf("  full:     %p, count %lu\n", depot->full, depot->full_count);
+	kprintf("  empty:    %p, count %lu\n", depot->empty, depot->empty_count);
+	kprintf("  max full: %lu\n", depot->max_count);
+	kprintf("  capacity: %lu\n", depot->magazine_capacity);
 	kprintf("  stores:\n");
 
 	int cpuCount = smp_get_num_cpus();
