@@ -778,6 +778,8 @@ BStatusBar::_SetTextData(BString& text, const char* source,
 	else
 		oldWidth = fTextDivider;
 
+	bool oldHasText = _HasText();
+
 	text = source;
 
 	BString newString;
@@ -796,6 +798,9 @@ BStatusBar::_SetTextData(BString& text, const char* source,
 	float position = 0.0;
 	if (rightAligned)
 		position = Bounds().right - invalidateWidth;
+
+	if (oldHasText != _HasText())
+		InvalidateLayout();
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
@@ -844,6 +849,10 @@ BStatusBar::_BarPosition(const BRect& barFrame) const
 bool
 BStatusBar::_HasText() const
 {
+	// Force BeOS behavior where the size of the BStatusBar always included
+	// room for labels, even when there weren't any.
+	if ((Flags() & B_SUPPORTS_LAYOUT) == 0)
+		return true;
 	return fLabel.Length() > 0 || fTrailingLabel.Length() > 0
 		|| fTrailingText.Length() > 0 || fText.Length() > 0;
 }
