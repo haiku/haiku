@@ -198,16 +198,17 @@ if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
 
 if $(HAIKU_BOARD_UBOOT_IMAGE) && $(HAIKU_BOARD_UBOOT_IMAGE_URL) {
 	# Download the u-boot binary file.
-	DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE) $(HAIKU_BOARD_UBOOT_IMAGE_URL) ;
+	ubootFile = [ DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE) 
+		: $(HAIKU_BOARD_UBOOT_IMAGE_URL) ] ;
 }
 
 # flash image targets
 BuildUBootFlashImage haiku_flash_image_raw.img : haiku_loader : 
-	$(HAIKU_BOARD_UBOOT_IMAGE) ;
+	$(ubootFile) ;
 #BuildUBootFlashImage haiku_flash_image_elf.img : boot_loader_u-boot : 
-#	$(HAIKU_BOARD_UBOOT_IMAGE) ;
+#	$(ubootFile) ;
 BuildUBootFlashImage haiku_flash_image_uimage.img : haiku_loader.ub : 
-	$(HAIKU_BOARD_UBOOT_IMAGE) ;
+	$(ubootFile) ;
 
 # SD/mmc image targets
 BuildUBootSDImage haiku.mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
