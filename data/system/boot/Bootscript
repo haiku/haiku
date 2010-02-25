@@ -80,6 +80,16 @@ else
 	runprog system/bin/clockconfig
 fi
 
+# Create /tmp dir, and make sure it's empty
+
+TMPDIR=/boot/common/cache/tmp
+if [ ! -d $TMPDIR ]; then
+	mkdir -f $TMPDIR
+	chmod a+rwx $TMPDIR
+else
+	rm -rf $TMPDIR/*
+fi
+
 
 # Launch servers
 
