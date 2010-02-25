@@ -839,7 +839,7 @@ fs_read_vnode(fs_volume *_volume, ino_t vnid, fs_vnode *_node, int *_type,
 	current->vnid = vnid;
 	_node->private_node = current;
 	_node->ops = &sNFSVnodeOps;
-	*_type = 0;
+	*_type = current->mode;
 	*_flags = 0;
 
 	if (!r)
@@ -891,6 +891,7 @@ fs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *vnid)
 		}
 
 		newNode->vnid=st.st_ino;
+		newNode->mode=st.st_mode;
 		*vnid=newNode->vnid;
 
 		insert_node (ns,newNode);
@@ -1043,6 +1044,7 @@ fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 					return result;
 				}
 
+				newNode->mode = st.st_mode;
 				insert_node (ns,newNode);
 
 				if (bufsize<2*(sizeof(dev_t)+sizeof(ino_t))+sizeof(unsigned short)+strlen(filename)+1)
@@ -1751,6 +1753,7 @@ fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode, int p
 		fs_node *newNode=(fs_node *)malloc(sizeof(fs_node));
 		newNode->fhandle=fhandle;
 		newNode->vnid=st.st_ino;
+		newNode->mode=st.st_mode;
 		insert_node (ns,newNode);
 
 		*vnid=st.st_ino;
@@ -1840,6 +1843,7 @@ fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode, int p
 		newNode=(fs_node *)malloc(sizeof(fs_node));
 		newNode->fhandle=fhandle;
 		newNode->vnid=st.st_ino;
+		newNode->mode=st.st_mode;
 
 		insert_node (ns,newNode);
 
@@ -1898,6 +1902,7 @@ fs_unlink(fs_volume *_volume, fs_vnode *_dir, const char *name)
 	newNode=(fs_node *)malloc(sizeof(fs_node));
 	newNode->fhandle=fhandle;
 	newNode->vnid=st.st_ino;
+	newNode->mode=st.st_mode;
 
 	insert_node (ns,newNode);
 
@@ -2065,6 +2070,7 @@ fs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms)
 	newNode=(fs_node *)malloc(sizeof(fs_node));
 	newNode->fhandle=fhandle;
 	newNode->vnid=st.st_ino;
+	newNode->mode=st.st_mode;
 
 	insert_node (ns,newNode);
 
@@ -2190,6 +2196,7 @@ fs_rmdir(fs_volume *_volume, fs_vnode *_dir, const char *name)
 	newNode=(fs_node *)malloc(sizeof(fs_node));
 	newNode->fhandle=fhandle;
 	newNode->vnid=st.st_ino;
+	newNode->mode=st.st_mode;
 
 	insert_node (ns,newNode);
 

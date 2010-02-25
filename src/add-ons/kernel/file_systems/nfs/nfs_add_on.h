@@ -41,6 +41,7 @@ struct mount_nfs_params {
 };
 
 struct fs_node {
+	int mode;
 	ino_t vnid;
 	struct nfs_fhandle fhandle;
 	struct fs_node *next;
