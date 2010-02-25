@@ -974,11 +974,8 @@ static inline data_node*
 get_node_at_offset(net_buffer_private* buffer, size_t offset)
 {
 	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
-	while (node->offset + node->used <= offset) {
+	while (node != NULL && node->offset + node->used <= offset)
 		node = (data_node*)list_get_next_item(&buffer->buffers, node);
-		if (node == NULL)
-			return NULL;
-	}
 
 	return node;
 }
