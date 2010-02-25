@@ -29,11 +29,11 @@ if $(HAIKU_BUILD_FEATURE_SSL) {
 			$(HAIKU_OPENSSL_PACKAGE) ] ;
 
 		# unzip headers and libraries
-		HAIKU_OPENSSL_HEADERS_DEPENDENCY = [ UnzipArchive $(HAIKU_OPENSSL_DIR)
+		HAIKU_OPENSSL_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_OPENSSL_DIR)
 			: common/include/ : $(zipFile)
 		] ;
 
-		HAIKU_OPENSSL_LIBS = [ UnzipArchive $(HAIKU_OPENSSL_DIR)
+		HAIKU_OPENSSL_LIBS = [ ExtractArchive $(HAIKU_OPENSSL_DIR)
 			:
 			common/lib/libcrypto.so
 			common/lib/libssl.so

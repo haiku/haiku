@@ -190,26 +190,26 @@ actions UnarchiveObjects
 }
 
 
-rule UnzipArchive directory : entries : zipFile : grist
+rule ExtractArchive directory : entries : archiveFile : grist
 {
-	# UnzipArchive <directory> : <entries> : <zipFile> [ : <grist> ]
+	# ExtractArchive <directory> : <entries> : <archiveFile> [ : <grist> ]
 	#
-	# Unzips the zip file target <zipFile> to directory <directory>. The rule
-	# can be called multiple times for different <entries> for the same
-	# <directory> and <zipFile> combo.
+	# Extract the archive file target <archiveFile> to directory <directory>.
+	# The rule can be called multiple times for different <entries> for the same
+	# <directory> and <archiveFile> combo.
 	#
-	# <directory> - The directory into which to unzip the zip file. The
+	# <directory> - The directory into which to extract the archive file. The
 	#               directory is created is by this rule and it is the target
-	#               that the unzip action is associated with.
+	#               that the extract action is associated with.
 	# <entries>   - The entries of the zip file one is interested in. The rule
 	#               always unzips the complete zip file, from the given entries
 	#               the rule creates targets (using <grist>) representing the
 	#               unzipped entries. Those targets are returned by the rule.
-	# <zipFile>   - The zip file target to unzip.
+	# <archiveFile> - The archive file target to extract.
 	# <grist>     - The grist used to create targets from <entries>. Defaults to
-	#               "unzipped".
+	#               "extracted".
 
-	grist ?= unzipped ;
+	grist ?= extracted ;
 
 	# Turn the entries into targets to build.
 	local targets ;
@@ -231,28 +231,39 @@ rule UnzipArchive directory : entries : zipFile : grist
 		MkDir $(parentDir) ;
 
 		NoUpdate $(directory) ;
-		Depends $(directory) : $(zipFile) ;
-		UnzipArchive1 $(directory) : $(zipFile) ;
+		Depends $(directory) : $(archiveFile) ;
+		switch $(archiveFile:S)
+		{
+			case .zip 	: ExtractZipArchive1 $(directory) : $(archiveFile) ;
+			case .tgz 	: ExtractTarArchive1 $(directory) : $(archiveFile) ;
+			case * 		: Exit "ExtractArchive: Unhandled archive extension:
+							$(archiveFile:S)" ;
+		}
 		INITIALIZED on $(directory) = 1 ;
 	}
 
 	# Use a dummy rule so that it looks to jam like the targets are actually
 	# built from the directory target.
-	UnzipArchiveDummy $(targets) : $(directory) ;
+	ExtractArchiveDummy $(targets) : $(directory) ;
 
 	return $(targets) ;
 }
 
-actions UnzipArchive1
+actions ExtractZipArchive1
 {
 	mkdir -p $(1[1])
 	unzip -q -u -o -d $(1[1]) $(2)
 }
 
-actions UnzipArchiveDummy
+actions ExtractTarArchive1
 {
+	mkdir -p $(1[1])
+	tar -C $(1[1]) -xf $(2)
 }
 
+actions ExtractArchiveDummy
+{
+}
 
 rule ObjectReference
 {
