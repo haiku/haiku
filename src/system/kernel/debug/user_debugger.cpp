@@ -954,11 +954,25 @@ user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 void
 user_debug_stop_thread()
 {
-	// prepare the message
-	debug_thread_debugged message;
+	// check whether this is actually an emulated single-step notification
+	InterruptsSpinLocker threadsLocker(gThreadSpinlock);
+	struct thread* thread = thread_get_current_thread();
+	bool singleStepped = false;
+	if ((atomic_and(&thread->debug_info.flags,
+				~B_THREAD_DEBUG_NOTIFY_SINGLE_STEP)
+			& B_THREAD_DEBUG_NOTIFY_SINGLE_STEP) != 0) {
+		singleStepped = true;
+	}
 
-	thread_hit_serious_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED, &message,
-		sizeof(message));
+	threadsLocker.Unlock();
+
+	if (singleStepped) {
+		user_debug_single_stepped();
+	} else {
+		debug_thread_debugged message;
+		thread_hit_serious_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED,
+			&message, sizeof(message));
+	}
 }
 
 

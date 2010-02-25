@@ -154,17 +154,18 @@ enum {
 
 // thread debugging flags (user-specifiable flags are in <debugger.h>)
 enum {
-	B_THREAD_DEBUG_INITIALIZED		= 0x0001,
-	B_THREAD_DEBUG_DYING			= 0x0002,
-	B_THREAD_DEBUG_STOP				= 0x0004,
-	B_THREAD_DEBUG_STOPPED			= 0x0008,
-	B_THREAD_DEBUG_SINGLE_STEP		= 0x0010,
+	B_THREAD_DEBUG_INITIALIZED			= 0x0001,
+	B_THREAD_DEBUG_DYING				= 0x0002,
+	B_THREAD_DEBUG_STOP					= 0x0004,
+	B_THREAD_DEBUG_STOPPED				= 0x0008,
+	B_THREAD_DEBUG_SINGLE_STEP			= 0x0010,
+	B_THREAD_DEBUG_NOTIFY_SINGLE_STEP	= 0x0020,
 
-	B_THREAD_DEBUG_NUB_THREAD		= 0x0020,	// marks the nub thread
+	B_THREAD_DEBUG_NUB_THREAD			= 0x0040,	// marks the nub thread
 
-	B_THREAD_DEBUG_KERNEL_FLAG_MASK	= 0xffff,
+	B_THREAD_DEBUG_KERNEL_FLAG_MASK		= 0xffff,
 
-	B_THREAD_DEBUG_DEFAULT_FLAGS	= 0,
+	B_THREAD_DEBUG_DEFAULT_FLAGS		= 0,
 };
 
 // messages sent from the debug nub thread to a debugged thread

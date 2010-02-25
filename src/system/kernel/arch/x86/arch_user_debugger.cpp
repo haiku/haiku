@@ -886,7 +886,42 @@ x86_handle_debug_exception(struct iframe *frame)
 			// it, but we don't want it when continuing otherwise.
 			frame->flags &= ~(1 << X86_EFLAGS_TF);
 
-			panic("kernel single step");
+			// Determine whether the exception occurred at a syscall/trap
+			// kernel entry or whether this is genuine kernel single-stepping.
+			bool inKernel = true;
+			struct thread* thread = thread_get_current_thread();
+			if (thread->team != team_get_kernel_team()
+				&& i386_get_user_iframe() == NULL) {
+				// TODO: This is not yet fully correct, since a newly created
+				// thread that doesn't have entered userland yet also has this
+				// property.
+				inKernel = false;
+			}
+
+			if (inKernel) {
+				panic("kernel single step");
+			} else {
+				// The thread is a userland thread and it just entered the
+				// kernel when the single-step exception occurred. This happens
+				// e.g. when sysenter is called with single-stepping enabled.
+				// We need to ignore the exception now and send a single-step
+				// notification later, when the thread wants to return from the
+				// kernel.
+				InterruptsSpinLocker threadLocker(gThreadSpinlock);
+
+				// Check whether the team is still being debugged and set
+				// the B_THREAD_DEBUG_NOTIFY_SINGLE_STEP and
+				// B_THREAD_DEBUG_STOP flags, so that the thread will be
+				// stopped when it is going to leave the kernel and notify the
+				// debugger about the single-step event.
+				int32 teamDebugFlags
+					= atomic_get(&thread->team->debug_info.flags);
+				if (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+					atomic_or(&thread->debug_info.flags,
+						B_THREAD_DEBUG_NOTIFY_SINGLE_STEP
+							| B_THREAD_DEBUG_STOP);
+				}
+			}
 		}
 	} else if (dr6 & (1 << X86_DR6_BT)) {
 		// task switch
