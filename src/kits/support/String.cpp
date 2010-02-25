@@ -1697,7 +1697,7 @@ BString::ReplaceCharsSet(const char* setOfChars, const char* with)
 	BString setString(setOfChars);
 	BString result;
 
-	int32 withLength = withLength;
+	int32 withLength = strlen(with);
 	int32 charCount = CountChars();
 	for (int32 i = 0; i < charCount; i++) {
 		int32 charLength;
