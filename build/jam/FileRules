@@ -369,32 +369,36 @@ actions DataFileToSourceFile1
 	$(2[1]) $(DATA_VARIABLE) $(SIZE_VARIABLE) $(2[2]) $(1)
 }
 
-rule DownloadFile target : url
+rule DownloadLocatedFile target : url
 {
 	URL on $(target) = $(url) ;
 
-	DownloadFile1 $(target) ;
+	DownloadLocatedFile1 $(target) ;
 }
 
-actions DownloadFile1
+actions DownloadLocatedFile1
 {
 	wget -O $(1) $(URL)
 }
 
-rule DownloadOptionalPackage package : url
+rule DownloadFile file : url
 {
-	# download zip file
-	local zipFile = $(package:G=download).zip ;
+	file = $(file:G=download) ;
 
 	# Request the download only once.
-	if [ on $(zipFile) return $(HAIKU_OPTIONAL_PACKAGE_DOWNLOAD) ] {
-		return $(zipFile) ;
+	if [ on $(file) return $(HAIKU_FILE_DOWNLOAD) ] {
+		return $(file) ;
 	}
 
-	HAIKU_OPTIONAL_PACKAGE_DOWNLOAD on $(zipFile) = 1 ;
+	HAIKU_FILE_DOWNLOAD on $(file) = 1 ;
 
-	MakeLocate $(zipFile) : $(HAIKU_DOWNLOAD_DIR) ;
-	DownloadFile $(zipFile) : $(url) ;
+	MakeLocate $(file) : $(HAIKU_DOWNLOAD_DIR) ;
+	DownloadLocatedFile $(file) : $(url) ;
 
-	return $(zipFile) ;
+	return $(file) ;
+}
+
+rule DownloadOptionalPackage package : url
+{
+	return [ DownloadFile $(package).zip : $(url) ] ;
 }

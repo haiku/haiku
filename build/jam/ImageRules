@@ -758,6 +758,17 @@ rule OptionalPackageDependencies package : dependencies
 	}
 }
 
+rule InstallSourceArchive file : url
+{
+	if $(HAIKU_INCLUDE_SOURCES) = 1 {
+		# download archive file
+		local archiveFile = [ DownloadFile $(file) : $(url) ] ;
+
+		# copy directly into image
+		AddFilesToHaikuImage develop sources : $(archiveFile) ;
+	}
+}
+
 rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
 {
 	# download zip file

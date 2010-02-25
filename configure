@@ -62,6 +62,10 @@ options:
                               implement patented ideas and techniques. This
                               option only disables code that is currently known
                               to be problematic.
+  --include-sources           Includes the source code of projects that require
+                              either an offer of source code or a copy of the
+                              patched sources. This is preferable when
+                              distributing on physical mediums.
   --include-3rdparty          Include 3rdparty/ in the build system.
   -j<n>                       Only relevant for --build-cross-tools and
                               --build-cross-tools-gcc4. Is passed on to the
@@ -279,6 +283,7 @@ HOST_GCC_RAW_VERSION=`gcc -dumpversion`
 HOST_GCC_MACHINE=`gcc -dumpmachine`
 HAIKU_INCLUDE_GPL_ADDONS=0
 HAIKU_INCLUDE_PATENTED_CODE=0
+HAIKU_INCLUDE_SOURCES=0
 HAIKU_INCLUDE_3RDPARTY=0
 HAIKU_ENABLE_MULTIUSER=0
 HAIKU_DISTRO_COMPATIBILITY=default
@@ -390,6 +395,7 @@ while [ $# -gt 0 ] ; do
 		--help | -h)	usage; exit 0;;
 		--include-gpl-addons)	HAIKU_INCLUDE_GPL_ADDONS=1; shift 1;;
 		--include-patented-code)	HAIKU_INCLUDE_PATENTED_CODE=1; shift 1;;
+		--include-sources)	HAIKU_INCLUDE_SOURCES=1; shift 1;;
 		--include-3rdparty)	HAIKU_INCLUDE_3RDPARTY=1; shift 1;;
         -j*)				buildCrossToolsJobs="$1"; shift 1;;
 		--target=*)     TARGET_PLATFORM=`echo $1 | cut -d'=' -f2-`; shift 1;;
@@ -514,6 +520,7 @@ HOST_PLATFORM				?= "${HOST_PLATFORM}" ;
 
 HAIKU_INCLUDE_GPL_ADDONS			?= "${HAIKU_INCLUDE_GPL_ADDONS}" ;
 HAIKU_INCLUDE_PATENTED_CODE			?= "${HAIKU_INCLUDE_PATENTED_CODE}" ;
+HAIKU_INCLUDE_SOURCES				?= "${HAIKU_INCLUDE_SOURCES}" ;
 HAIKU_INCLUDE_3RDPARTY				?= "${HAIKU_INCLUDE_3RDPARTY}" ;
 HAIKU_ENABLE_MULTIUSER				?= "${HAIKU_ENABLE_MULTIUSER}" ;
 HAIKU_DISTRO_COMPATIBILITY			?= "${HAIKU_DISTRO_COMPATIBILITY}" ;
