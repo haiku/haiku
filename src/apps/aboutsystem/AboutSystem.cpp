@@ -14,6 +14,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <map>
 #include <string>
 
@@ -1255,7 +1256,7 @@ AboutView::_CreateCreditsView()
 			" Guido Vollbeding. This software is based in part on the "
 			"work of the Independent JPEG Group"));
 			// TODO: License!
-			
+
 	// libprint copyrights
 	_AddPackageCredit(PackageCredit("libprint")
 		.SetCopyright(COPYRIGHT_STRING
@@ -1477,9 +1478,22 @@ AboutView::_AddCopyrightsFromAttribute()
 void
 AboutView::_AddPackageCreditEntries()
 {
+	// sort the packages case-insensitively
+	PackageCredit* packages[fPackageCredits.size()];
+	int32 count = 0;
 	for (PackageCreditMap::iterator it = fPackageCredits.begin();
-		it != fPackageCredits.end(); ++it) {
-		PackageCredit* package = it->second;
+			it != fPackageCredits.end(); ++it) {
+		packages[count++] = it->second;
+	}
+
+	if (count > 1) {
+		std::sort(packages, packages + count,
+			&PackageCredit::NameLessInsensitive);
+	}
+
+	// add the credits
+	for (int32 i = 0; i < count; i++) {
+		PackageCredit* package = packages[i];
 
 		BString text(package->CopyrightAt(0));
 		int32 count = package->CountCopyrights();
