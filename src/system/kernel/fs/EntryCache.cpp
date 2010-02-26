@@ -204,6 +204,22 @@ EntryCache::Lookup(ino_t dirID, const char* name, ino_t& _nodeID)
 }
 
 
+const char*
+EntryCache::DebugReverseLookup(ino_t nodeID, ino_t& _dirID)
+{
+	for (EntryTable::Iterator it = fEntries.GetIterator();
+			EntryCacheEntry* entry = it.Next();) {
+		if (nodeID == entry->node_id && strcmp(entry->name, ".") != 0
+				&& strcmp(entry->name, "..") != 0) {
+			_dirID = entry->dir_id;
+			return entry->name;
+		}
+	}
+
+	return NULL;
+}
+
+
 void
 EntryCache::_AddEntryToCurrentGeneration(EntryCacheEntry* entry)
 {

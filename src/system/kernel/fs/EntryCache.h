@@ -94,6 +94,8 @@ public:
 			bool				Lookup(ino_t dirID, const char* name,
 									ino_t& nodeID);
 
+			const char*			DebugReverseLookup(ino_t nodeID, ino_t& _dirID);
+
 private:
 	static	const int32			kGenerationCount = 8;
 
