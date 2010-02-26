@@ -423,6 +423,14 @@ PackageCredit::URL() const
 }
 
 
+/*static*/ bool
+PackageCredit::NameLessInsensitive(const PackageCredit* a,
+	const PackageCredit* b)
+{
+	return a->fPackageName.ICompare(b->fPackageName) < 0;
+}
+
+
 int
 PackageCredit::_MaxCopyrightYear() const
 {

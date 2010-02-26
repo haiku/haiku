@@ -89,6 +89,9 @@ public:
 
 			const char*			URL() const;
 
+	static	bool				NameLessInsensitive(const PackageCredit* a,
+									const PackageCredit* b);
+
 private:
 			int					_MaxCopyrightYear() const;
 
