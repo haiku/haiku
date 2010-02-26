@@ -32,6 +32,7 @@
 #include <AutoDeleter.h>
 #include <block_cache.h>
 #include <boot/kernel_args.h>
+#include <debug_heap.h>
 #include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
 #include <disk_device_manager/KDiskDeviceUtils.h>
@@ -3005,8 +3006,104 @@ _dump_mount(struct fs_mount* mount)
 }
 
 
+static bool
+debug_prepend_vnode_name_to_path(char* buffer, size_t& bufferSize,
+	const char* name)
+{
+	bool insertSlash = buffer[bufferSize] != '\0';
+	size_t nameLength = strlen(name);
+
+	if (bufferSize < nameLength + (insertSlash ? 1 : 0))
+		return false;
+
+	if (insertSlash)
+		buffer[--bufferSize] = '/';
+
+	bufferSize -= nameLength;
+	memcpy(buffer + bufferSize, name, nameLength);
+
+	return true;
+}
+
+
+static bool
+debug_prepend_vnode_id_to_path(char* buffer, size_t& bufferSize, dev_t devID,
+	ino_t nodeID)
+{
+	if (bufferSize == 0)
+		return false;
+
+	bool insertSlash = buffer[bufferSize] != '\0';
+	if (insertSlash)
+		buffer[--bufferSize] = '/';
+
+	size_t size = snprintf(buffer, bufferSize,
+		"<%" B_PRIdDEV ",%" B_PRIdINO ">", devID, nodeID);
+	if (size > bufferSize) {
+		if (insertSlash)
+			bufferSize++;
+		return false;
+	}
+
+	if (size < bufferSize)
+		memmove(buffer + bufferSize - size, buffer, size);
+
+	bufferSize -= size;
+	return true;
+}
+
+
+static char*
+debug_resolve_vnode_path(struct vnode* vnode, char* buffer, size_t bufferSize,
+	bool& _truncated)
+{
+	// null-terminate the path
+	buffer[--bufferSize] = '\0';
+
+	while (true) {
+		while (vnode->mount->root_vnode == vnode
+				&& vnode->mount->covers_vnode != NULL) {
+			vnode = vnode->mount->covers_vnode;
+		}
+
+		if (vnode == sRoot) {
+			_truncated = !debug_prepend_vnode_name_to_path(buffer, bufferSize,
+				"/");
+			return buffer + bufferSize;
+		}
+
+		// resolve the name
+		ino_t dirID;
+		const char* name = vnode->mount->entry_cache.DebugReverseLookup(
+			vnode->id, dirID);
+		if (name == NULL) {
+			// Failed to resolve the name -- prepend "<dev,node>/".
+			_truncated = !debug_prepend_vnode_id_to_path(buffer, bufferSize,
+				vnode->mount->id, vnode->id);
+			return buffer + bufferSize;
+		}
+
+		// prepend the name
+		if (!debug_prepend_vnode_name_to_path(buffer, bufferSize, name)) {
+			_truncated = true;
+			return buffer + bufferSize;
+		}
+
+		// resolve the directory node
+		struct vnode* nextVnode = lookup_vnode(vnode->mount->id, dirID);
+		if (nextVnode == NULL) {
+			_truncated = !debug_prepend_vnode_id_to_path(buffer, bufferSize,
+				vnode->mount->id, dirID);
+			return buffer + bufferSize;
+		}
+
+		vnode = nextVnode;
+	}
+}
+
+
 static void
-_dump_vnode(struct vnode* vnode)
+_dump_vnode(struct vnode* vnode, bool printPath)
 {
 	kprintf("VNODE: %p\n", vnode);
 	kprintf(" device:        %ld\n", vnode->device);
@@ -3022,6 +3119,26 @@ _dump_vnode(struct vnode* vnode)
 	kprintf(" advisory_lock: %p\n", vnode->advisory_locking);
 
 	_dump_advisory_locking(vnode->advisory_locking);
+
+	if (printPath) {
+		void* buffer = debug_malloc(B_PATH_NAME_LENGTH);
+		if (buffer != NULL) {
+			bool truncated;
+			char* path = debug_resolve_vnode_path(vnode, (char*)buffer,
+				B_PATH_NAME_LENGTH, truncated);
+			if (path != NULL) {
+				kprintf(" path:          ");
+				if (truncated)
+					kputs("<truncated>/");
+				kputs(path);
+				kputs("\n");
+			} else
+				kprintf("Failed to resolve vnode path.\n");
+
+			debug_free(buffer);
+		} else
+			kprintf("Failed to allocate memory for constructing the path.\n");
+	}
 
 	set_debug_variable("_node", (addr_t)vnode->private_node);
 	set_debug_variable("_mount", (addr_t)vnode->mount);
@@ -3091,34 +3208,40 @@ dump_mounts(int argc, char** argv)
 static int
 dump_vnode(int argc, char** argv)
 {
-	if (argc < 2 || argc > 3 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: %s <device> <id>\n"
-			"   or: %s <address>\n", argv[0], argv[0]);
+	bool printPath = false;
+	int argi = 1;
+	if (argc >= 2 && strcmp(argv[argi], "-p") == 0) {
+		printPath = true;
+		argi++;
+	}
+
+	if (argi >= argc || argi + 2 < argc) {
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
 	struct vnode* vnode = NULL;
 
-	if (argc == 2) {
-		vnode = (struct vnode*)parse_expression(argv[1]);
+	if (argi + 1 == argc) {
+		vnode = (struct vnode*)parse_expression(argv[argi]);
 		if (IS_USER_ADDRESS(vnode)) {
 			kprintf("invalid vnode address\n");
 			return 0;
 		}
-		_dump_vnode(vnode);
+		_dump_vnode(vnode, printPath);
 		return 0;
 	}
 
 	struct hash_iterator iterator;
-	dev_t device = parse_expression(argv[1]);
-	ino_t id = parse_expression(argv[2]);
+	dev_t device = parse_expression(argv[argi]);
+	ino_t id = parse_expression(argv[argi + 1]);
 
 	hash_open(sVnodeTable, &iterator);
 	while ((vnode = (struct vnode*)hash_next(sVnodeTable, &iterator)) != NULL) {
 		if (vnode->id != id || vnode->device != device)
 			continue;
 
-		_dump_vnode(vnode);
+		_dump_vnode(vnode, printPath);
 	}
 
 	hash_close(sVnodeTable, &iterator, false);
@@ -4928,8 +5051,14 @@ vfs_init(kernel_args* args)
 
 #ifdef ADD_DEBUGGER_COMMANDS
 	// add some debugger commands
-	add_debugger_command("vnode", &dump_vnode,
-		"info about the specified vnode");
+	add_debugger_command_etc("vnode", &dump_vnode,
+		"Print info about the specified vnode",
+		"[ \"-p\" ] ( <vnode> | <devID> <nodeID> )\n"
+		"Prints information about the vnode specified by address <vnode> or\n"
+		"<devID>, <vnodeID> pair. If \"-p\" is given, a path of the vnode is\n"
+		"constructed and printed. It might not be possible to construct a\n"
+		"complete path, though.\n",
+		0);
 	add_debugger_command("vnodes", &dump_vnodes,
 		"list all vnodes (from the specified device)");
 	add_debugger_command("vnode_caches", &dump_vnode_caches,
