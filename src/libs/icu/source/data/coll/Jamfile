@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src libs icu source data coll ;
 
 # this file has been converted to Jamfile format from colfiles.mk
 
-ICU_COLLATION_SYNTHETIC_ALIAS = de_.txt de__PHONEBOOK.txt es_.txt 
+ICU_COLLATION_SYNTHETIC_ALIAS = de_.txt de__PHONEBOOK.txt es_.txt
 	es__TRADITIONAL.txt
 	hi_.txt hi__DIRECT.txt in.txt in_ID.txt iw.txt
 	iw_IL.txt no.txt no_NO.txt pa_IN.txt sh.txt
@@ -67,12 +67,11 @@ ICU_COLLATION_SOURCE = $(ICU_COLLATION_EMPTY_SOURCE) af.txt ar.txt as.txt az.txt
 # -----------------------------------------------------------------------------
 
 local installableCollSources = [ FGristFiles $(ICU_COLLATION_SOURCE) ] ;
-local otherCollSources 
+local otherCollSources
 	= [ FGristFiles root.txt $(ICU_COLLATION_ALIAS_SOURCE) ] ;
 
-MakeLocate $(installableCollSources) : $(SUBDIR) ;
-MakeLocate $(otherCollSources) : $(SUBDIR) ;
+SEARCH on $(installableCollSources) = $(SUBDIR) ;
+SEARCH on $(otherCollSources) = $(SUBDIR) ;
 
-GenerateIndexedResourceBundles res_index.txt 
+GenerateIndexedResourceBundles res_index.txt
 	: $(installableCollSources) : $(otherCollSources) : coll : coll ;
-

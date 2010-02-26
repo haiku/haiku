@@ -9,6 +9,6 @@ ICU_TRANSLIT_SOURCE = root.txt en.txt el.txt ;
 # -----------------------------------------------------------------------------
 
 local translitSources = [ FGristFiles $(ICU_TRANSLIT_SOURCE) ] ;
-MakeLocate $(translitSources) : $(SUBDIR) ;
+SEARCH on $(translitSources) = $(SUBDIR) ;
 GenerateResourceBundles $(translitSources) : translit : translit ;
 

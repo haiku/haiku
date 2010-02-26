@@ -133,7 +133,6 @@ NotFile ICU_CharsetConverters ;
 
 rule GenerateConvAliases target : source
 {
-	MakeLocate $(source) : $(SUBDIR) ;
 	MakeLocateICUData $(target) ;
 	Depends $(target) : <build>gencnval $(source) ;
 	LocalClean clean : $(target) ;
@@ -147,6 +146,7 @@ actions GenerateConvAliases1
 }
 
 local converters = [ FGristFiles convrtrs.txt ] ;
+SEARCH on $(converters) = $(SUBDIR) ;
 GenerateConvAliases cnvalias.icu : $(converters) ;
 
 # -----------------------------------------------------------------------------
@@ -155,7 +155,6 @@ GenerateConvAliases cnvalias.icu : $(converters) ;
 
 rule GenerateCharsetConverter target : source
 {
-	MakeLocate $(source) : $(SUBDIR) ;
 	MakeLocateICUData $(target) ;
 	Depends $(target) : <build>makeconv $(source) ;
 	LocalClean clean : $(target) ;
@@ -171,6 +170,7 @@ actions GenerateCharsetConverter1
 # local mappingSources = [ FGristFiles $(ICU_UCM_ALL) ] ;
 	# use the above for running the ICU tests
 local mappingSources = [ FGristFiles $(ICU_UCM_SOURCE_CORE) ] ;
+SEARCH on $(mappingSources) = $(SUBDIR) ;
 
 local source ;
 for source in $(mappingSources) {

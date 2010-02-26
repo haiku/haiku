@@ -30,8 +30,8 @@ ICU_RBNF_SOURCE = af.txt am.txt ar.txt az.txt
 local installableRbnfSources = [ FGristFiles $(ICU_RBNF_SOURCE) ] ;
 local otherRbnfSources = [ FGristFiles root.txt $(ICU_RBNF_ALIAS_SOURCE) ] ;
 
-MakeLocate $(installableRbnfSources) : $(SUBDIR) ;
-MakeLocate $(otherRbnfSources) : $(SUBDIR) ;
+SEARCH on $(installableRbnfSources) = $(SUBDIR) ;
+SEARCH on $(otherRbnfSources) = $(SUBDIR) ;
 
-GenerateIndexedResourceBundles res_index.txt 
+GenerateIndexedResourceBundles res_index.txt
 	: $(installableRbnfSources) : $(otherRbnfSources) : rbnf : rbnf ;

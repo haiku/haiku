@@ -33,23 +33,32 @@ Depends ICU_ResourceBundles : ICU_BreakIterators ;
 
 rule GenerateIndexedResourceBundles
 	indexName : installableSources : otherSources : targetDir : sourceDir
+	: additionalDependencies
 {
 	local sources = $(installableSources) $(otherSources) ;
-	GenerateResourceBundles $(sources) : $(targetDir) : $(sourceDir) ;
+	GenerateResourceBundles $(installableSources) : $(targetDir)
+		: $(sourceDir) ;
+	GenerateResourceBundles $(otherSources) : $(targetDir) : $(sourceDir)
+		: $(additionalDependencies) ;
+
 	local indexSource = $(indexName:G=$(sourceDir)) ;
 	MakeLocateICUData $(indexSource) : $(targetDir) ;
+	GenerateResourceIndex $(indexSource) : $(installableSources)
+		: $(ICU_CLDR_VERSION) ;
+
 	local indexTarget = $(indexSource:S=.res) ;
-	GenerateResourceIndex $(indexSource)
-		: $(installableSources) : $(ICU_CLDR_VERSION) ;
+	Depends $(indexTarget) : $(additionalDependencies) ;
 	Depends ICU_ResourceBundles : $(indexTarget) ;
 	GenerateResourceBundle $(indexTarget) : $(indexSource) : $(targetDir) ;
 }
 
-rule GenerateResourceBundles sources : targetDir : sourceDir
+rule GenerateResourceBundles
+	sources : targetDir : sourceDir : additionalDependencies
 {
 	for source in $(sources) {
 		local target = $(source:D=:S=.res:G=$(sourceDir)) ;
 		Depends ICU_ResourceBundles : $(target) ;
+		Depends $(target) : $(additionalDependencies) ;
 		GenerateResourceBundle $(target) : $(source) : $(targetDir) ;
 	}
 }

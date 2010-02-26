@@ -8,7 +8,7 @@ ICU_GENRB_SYNTHETIC_ALIAS =	en_RH.txt in_ID.txt iw_IL.txt ja_JP_TRADITIONAL.txt
 	no_NO.txt no_NO_NY.txt th_TH_TRADITIONAL.txt
 	;
 
-ICU_GENRB_ALIAS_SOURCE = $(ICU_GENRB_SYNTHETIC_ALIAS) 
+ICU_GENRB_ALIAS_SOURCE = $(ICU_GENRB_SYNTHETIC_ALIAS)
 	az_AZ.txt ha_GH.txt ha_NE.txt ha_NG.txt
 	in.txt iw.txt kk_KZ.txt no.txt pa_IN.txt
 	pa_PK.txt sh.txt sh_BA.txt sh_CS.txt sh_YU.txt
@@ -77,7 +77,7 @@ ICU_GENRB_SOURCE = af.txt af_NA.txt af_ZA.txt am.txt
 	vi_VN.txt zh.txt zh_Hans.txt zh_Hans_CN.txt zh_Hans_HK.txt
 	zh_Hans_MO.txt zh_Hans_SG.txt zh_Hant.txt zh_Hant_HK.txt zh_Hant_MO.txt
 	zh_Hant_TW.txt zu.txt zu_ZA.txt
-	; 
+	;
 
 # -----------------------------------------------------------------------------
 # general resource bundles (*.res)
@@ -86,8 +86,8 @@ ICU_GENRB_SOURCE = af.txt af_NA.txt af_ZA.txt am.txt
 local installableLocalesSources = [ FGristFiles $(ICU_GENRB_SOURCE) ] ;
 local otherLocalesSources = [ FGristFiles root.txt $(ICU_GENRB_ALIAS_SOURCE) ] ;
 
-MakeLocate $(installableLocalesSources) : $(SUBDIR) ;
-MakeLocate $(otherLocalesSources) : $(SUBDIR) ;
+SEARCH on $(installableLocalesSources) = $(SUBDIR) ;
+SEARCH on $(otherLocalesSources) = $(SUBDIR) ;
 
-GenerateIndexedResourceBundles res_index.txt 
+GenerateIndexedResourceBundles res_index.txt
 	: $(installableLocalesSources) : $(otherLocalesSources) : : locales ;

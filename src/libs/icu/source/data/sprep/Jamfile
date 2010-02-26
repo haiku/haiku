@@ -2,8 +2,8 @@ SubDir HAIKU_TOP src libs icu source data sprep ;
 
 # this file has been converted to Jamfile format from sprepbrkfiles.mk
 
-ICU_SPREP_SOURCE = rfc3491.txt rfc3530cs.txt rfc3530csci.txt rfc3530mixp.txt 
-	rfc3722.txt rfc3920node.txt rfc3920res.txt rfc4011.txt rfc4013.txt 
+ICU_SPREP_SOURCE = rfc3491.txt rfc3530cs.txt rfc3530csci.txt rfc3530mixp.txt
+	rfc3722.txt rfc3920node.txt rfc3920res.txt rfc4011.txt rfc4013.txt
 	rfc4505.txt rfc4518.txt rfc4518ci.txt
 	;
 
@@ -18,7 +18,7 @@ rule GenerateStringPrep target : source
 	MakeLocateICUData $(target) ;
 	Depends $(target) : <build>gensprep $(source) ;
 	LocalClean clean : $(target) ;
-	local unidataDir 
+	local unidataDir
 		= [ FDirName $(HAIKU_TOP) src libs icu source data unidata ] ;
 	NotFile $(unidataDir) ;
 	GenerateStringPrep1 $(target) : <build>gensprep $(source) $(unidataDir) ;
@@ -32,7 +32,7 @@ actions GenerateStringPrep1
 
 local sprepSources = [ FGristFiles $(ICU_SPREP_SOURCE) ] ;
 for source in $(sprepSources) {
-	MakeLocate $(source) : $(SUBDIR) ;
+	SEARCH on $(source) = $(SUBDIR) ;
 	local target = $(source:D=:S=.spp) ;
 	Depends ICU_StringPreps : $(target) ;
 	GenerateStringPrep $(target) : $(source) ;

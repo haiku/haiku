@@ -20,13 +20,13 @@ actions GeneratePNames1
 	$(2) -d $(1:D)
 }
 
-local propertyFiles 
+local propertyFiles
 	= [ FGristFiles Blocks.txt PropertyAliases.txt PropertyValueAliases.txt ] ;
-MakeLocate $(propertyFiles) : $(SUBDIR) ;
+SEARCH on $(propertyFiles) = $(SUBDIR) ;
 
 local propertyHeaders = [ FGristFiles uscript.h uchar.h ] ;
-MakeLocate $(propertyHeaders) 
-	: [ FDirName $(HAIKU_TOP) headers libs icu unicode ] ;
+SEARCH on $(propertyHeaders)
+	= [ FDirName $(HAIKU_TOP) headers libs icu unicode ] ;
 
 GeneratePNames pnames.icu : $(propertyFiles) $(propertyHeaders) ;
 
@@ -49,7 +49,7 @@ actions GenerateUNames1
 }
 
 local unicodeData = [ FGristFiles UnicodeData.txt ] ;
-MakeLocate $(unicodeData) : $(SUBDIR) ;
+SEARCH on $(unicodeData) = $(SUBDIR) ;
 GenerateUNames unames.icu : $(unicodeData) ;
 
 # -----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ actions GenerateUcaData1
 }
 
 local fractionalUCA = [ FGristFiles FractionalUCA.txt ] ;
-MakeLocate $(fractionalUCA) : $(SUBDIR) ;
+SEARCH on $(fractionalUCA) = $(SUBDIR) ;
 GenerateUcaData ucadata.icu invuca.icu : $(fractionalUCA) ;
 
 # -----------------------------------------------------------------------------
@@ -92,9 +92,9 @@ actions GenerateConfusables1
 	$(2[1]) -c -i $(ICU_DATA_DIR) -r $(2[2]) -w $(2[3]) -o $(1) >/dev/null
 }
 
-local confusableSources 
+local confusableSources
 	= [ FGristFiles confusables.txt confusablesWholeScript.txt ] ;
-MakeLocate $(confusableSources) : $(SUBDIR) ;
+SEARCH on $(confusableSources) = $(SUBDIR) ;
 local target = $(confusableSources[1]:D=:S=.cfu) ;
 Depends ICU_Confusables : $(target) ;
 GenerateConfusables $(target) : $(confusableSources) ;

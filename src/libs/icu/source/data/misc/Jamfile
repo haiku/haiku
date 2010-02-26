@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src libs icu source data misc ;
 
 # this file has been converted to Jamfile format from miscfiles.mk
 
-ICU_MISC_SOURCE = zoneinfo.txt supplementalData.txt metazoneInfo.txt 
+ICU_MISC_SOURCE = zoneinfo.txt supplementalData.txt metazoneInfo.txt
 	likelySubtags.txt plurals.txt numberingSystems.txt
 	;
 
@@ -11,5 +11,5 @@ ICU_MISC_SOURCE = zoneinfo.txt supplementalData.txt metazoneInfo.txt
 # -----------------------------------------------------------------------------
 
 local miscSources = [ FGristFiles $(ICU_MISC_SOURCE) ] ;
-MakeLocate $(miscSources) : $(SUBDIR) ;
+SEARCH on $(miscSources) = $(SUBDIR) ;
 GenerateResourceBundles $(miscSources) : : misc ;

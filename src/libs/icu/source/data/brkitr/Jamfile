@@ -10,10 +10,10 @@ ICU_BRK_RES_ALIAS_SOURCE = $(BRK_RES_SYNTHETIC_ALIAS) ;
 
 ICU_BRK_CTD_SOURCE = thaidict.txt ;
 
-ICU_BRK_SOURCE = word_POSIX.txt word_ja.txt sent_el.txt char_th.txt char.txt 
-	word.txt line.txt sent.txt title.txt 
+ICU_BRK_SOURCE = word_POSIX.txt word_ja.txt sent_el.txt char_th.txt char.txt
+	word.txt line.txt sent.txt title.txt
 	;
-	
+
 ICU_BRK_RES_SOURCE = el.txt en.txt en_US.txt en_US_POSIX.txt ja.txt th.txt ;
 
 NotFile ICU_BreakIterators ;
@@ -36,10 +36,11 @@ actions GenerateBreakIterator1
 	$(2[1]) -c -i $(ICU_DATA_DIR) -r $(2[2]) -o $(1) >/dev/null
 }
 
-local brkSources = [ FGristFiles $(ICU_BRK_SOURCE) ] ;
-for source in $(brkSources) {
-	MakeLocate $(source) : $(SUBDIR) ;
+local brkitrSources = [ FGristFiles $(ICU_BRK_SOURCE) ] ;
+local brkitrTargets ;
+for source in $(brkitrSources) {
 	local target = $(source:D=:S=.brk) ;
+	brkitrTargets += $(target) ;
 	Depends ICU_BreakIterators : $(target) ;
 	GenerateBreakIterator $(target) : $(source) ;
 }
@@ -64,7 +65,6 @@ actions GenerateCtdBreakIterator1
 
 local ctdSources = [ FGristFiles $(ICU_BRK_CTD_SOURCE) ] ;
 for source in $(ctdSources) {
-	MakeLocate $(source) : $(SUBDIR) ;
 	local target = $(source:D=:S=.ctd) ;
 	Depends ICU_BreakIterators : $(target) ;
 	GenerateCtdBreakIterator $(target) : $(source) ;
@@ -75,13 +75,14 @@ for source in $(ctdSources) {
 # -----------------------------------------------------------------------------
 
 local installableBrkitrSources = [ FGristFiles $(ICU_BRK_RES_SOURCE) ] ;
-local otherBrkitrSources 
+local otherBrkitrSources
 	= [ FGristFiles root.txt $(ICU_BRK_RES_ALIAS_SOURCE) ] ;
 
-MakeLocate $(installableBrkitrSources) : $(SUBDIR) ;
-MakeLocate $(otherBrkitrSources) : $(SUBDIR) ;
+SEARCH on $(brkitrSources) = $(SUBDIR) ;
+SEARCH on $(ctdSources) = $(SUBDIR) ;
+SEARCH on $(installableBrkitrSources) = $(SUBDIR) ;
+SEARCH on $(otherBrkitrSources) = $(SUBDIR) ;
 
-GenerateIndexedResourceBundles res_index.txt 
+GenerateIndexedResourceBundles res_index.txt
 	: $(installableBrkitrSources) : $(otherBrkitrSources)
-	: brkitr : brkitr ;
-
+	: brkitr : brkitr : $(brkitrTargets) ;
