@@ -85,7 +85,8 @@ status_t PrintServerApp::async_thread(void* data)
 					int32 count = Printer::CountPrinters();
 					BString alertText(TR("There are no printers set up."));
 					if (count > 0)
-						alertText.SetTo(TR("There is no default printer set up."));
+						alertText.SetTo(
+							TR("There is no default printer set up."));
 
 					alertText.Append(" ");
 					alertText.Append(TR("Would you like to set one up now?"));
@@ -128,9 +129,12 @@ status_t PrintServerApp::async_thread(void* data)
 					// then create the actual printer
 					if (p->app->CreatePrinter(printerName.String(),
 						driverName.String(), connection.String(),
-						transportName.String(), transportPath.String()) == B_OK) {
-						// If printer was created ok, ask if it needs to be the default
-						BString text(TR("Would you like to make @ the default printer?"));
+						transportName.String(),
+						transportPath.String()) == B_OK) {
+						// If printer was created ok,
+						// ask if it needs to be the default
+						BString text(TR("Would you like to make @ "
+							"the default printer?"));
 						text.ReplaceFirst("@", printerName.String());
 						BAlert* alert = new BAlert("", text.String(), TR("No"),
 							TR("Yes"));
@@ -151,7 +155,8 @@ void PrintServerApp::AsyncHandleMessage(BMessage* msg)
 {
 	AsyncThreadParams* data = new AsyncThreadParams(this, fDefaultPrinter, msg);
 
-	thread_id tid = spawn_thread(async_thread, "async", B_NORMAL_PRIORITY, (void*)data);
+	thread_id tid = spawn_thread(async_thread, "async", B_NORMAL_PRIORITY,
+		(void*)data);
 
 	if (tid > 0) {
 		resume_thread(tid);
@@ -166,14 +171,18 @@ void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 			// Get currently selected printer
 		case PSRV_GET_ACTIVE_PRINTER: {
 				BMessage reply('okok');
-				BString printerName = fDefaultPrinter ? fDefaultPrinter->Name() : "";
+				BString printerName;
+				if (fDefaultPrinter)
+					printerName = fDefaultPrinter->Name();
 				BString mime;
 				if (fUseConfigWindow && MimeTypeForSender(msg, mime)) {
 					BAutolock lock(gLock);
 					if (lock.IsLocked()) {
 							// override with printer for application
-						PrinterSettings* p = fSettings->FindPrinterSettings(mime.String());
-						if (p) printerName = p->GetPrinter();
+						PrinterSettings* p = fSettings->FindPrinterSettings(
+							mime.String());
+						if (p)
+							printerName = p->GetPrinter();
 					}
 				}
 				reply.AddString("printer_name", printerName);

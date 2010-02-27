@@ -200,7 +200,8 @@ PrintServerApp::RegisterPrinter(BDirectory* printer)
 	BString transport, address, connection, state;
 
 	if (printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT, &transport) == B_OK
-		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, &address) == B_OK
+		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, &address)
+			== B_OK
 		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_CNX, &connection) == B_OK
 		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_STATE, &state) == B_OK
 		&& state == "free") {
@@ -216,7 +217,8 @@ PrintServerApp::RegisterPrinter(BDirectory* printer)
 				return;
 
 			// register new printer
-			Resource* r = fResourceManager.Allocate(transport.String(), address.String(), connection.String());
+			Resource* r = fResourceManager.Allocate(transport.String(),
+				address.String(), connection.String());
 		 	AddHandler(new Printer(printer, r));
 		 	Acquire();
 		}
@@ -318,7 +320,8 @@ PrintServerApp::SetupPrinterList()
 		BDirectory node(&entry);
 		BNodeInfo info(&node);
 		char buffer[256];
-		if (info.GetType(buffer) == B_OK && strcmp(buffer, PSRV_PRINTER_FILETYPE) == 0) {
+		if (info.GetType(buffer) == B_OK
+			&& strcmp(buffer, PSRV_PRINTER_FILETYPE) == 0) {
 			RegisterPrinter(&node);
 		}
 	}
@@ -391,7 +394,8 @@ PrintServerApp::MessageReceived(BMessage* msg)
 // ---------------------------------------------------------------
 status_t
 PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
-	const char* connection, const char* transportName, const char* transportPath)
+	const char* connection, const char* transportName,
+	const char* transportPath)
 {
 	status_t rc;
 
@@ -424,14 +428,17 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 				// the printer exists, but no default at all
 				return B_OK;
 			} else {
-				info.SetTo(TR("There already exists a printer you are going to create, but it's driver could not be found! Replace?"));
+				info.SetTo(TR("There already exists a printer you are going to "
+					"create, but it's driver could not be found! Replace?"));
 			}
 		} else {
-			info.SetTo(TR("There already exists a printer you are going to create, but it's not usable at all! Replace?"));
+			info.SetTo(TR("There already exists a printer you are going to "
+				"create, but it's not usable at all! Replace?"));
 		}
 
 		if (info.Length() != 0) {
-			BAlert *alert = new BAlert("Info", info.String(), TR("Cancel"), TR("OK"));
+			BAlert *alert = new BAlert("Info", info.String(), TR("Cancel"),
+				TR("OK"));
 			alert->SetShortcut(0, B_ESCAPE);
 			if (alert->Go() == 0)
 				return rc;
@@ -449,8 +456,8 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 		::strlen(printerName) + 1);
 	printer.WriteAttr(PSRV_PRINTER_ATTR_DRV_NAME, B_STRING_TYPE, 0, driverName,
 		::strlen(driverName) + 1);
-	printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT, B_STRING_TYPE, 0, transportName,
-		::strlen(transportName) + 1);
+	printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT, B_STRING_TYPE, 0,
+		transportName, ::strlen(transportName) + 1);
 	printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, B_STRING_TYPE, 0,
 		transportPath, ::strlen(transportPath) + 1);
 	printer.WriteAttr(PSRV_PRINTER_ATTR_CNX, B_STRING_TYPE, 0, connection,
@@ -479,7 +486,8 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 	if ((*func)(printerName) == NULL)
 		rc = B_ERROR;
 	else
-		printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free", ::strlen("free")+1);
+		printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free",
+			::strlen("free")+1);
 
 error:
 	if (rc != B_OK) {
@@ -646,17 +654,23 @@ PrintServerApp::FindPrinterNode(const char* name, BNode& node)
 status_t
 PrintServerApp::FindPrinterDriver(const char* name, BPath& outPath)
 {
-	if (::TestForAddonExistence(name, B_USER_ADDONS_DIRECTORY, "Print", outPath) != B_OK
-		&& TestForAddonExistence(name, B_COMMON_ADDONS_DIRECTORY, "Print", outPath) != B_OK)
-		return ::TestForAddonExistence(name, B_BEOS_ADDONS_DIRECTORY, "Print", outPath);
+	if (::TestForAddonExistence(name, B_USER_ADDONS_DIRECTORY, "Print", outPath)
+		!= B_OK
+		&& TestForAddonExistence(name, B_COMMON_ADDONS_DIRECTORY, "Print",
+			outPath) != B_OK)
+		return ::TestForAddonExistence(name, B_BEOS_ADDONS_DIRECTORY, "Print",
+			outPath);
 
 	return B_OK;
 }
 
 
-bool PrintServerApp::OpenSettings(BFile& file, const char* name, bool forReading) {
+bool PrintServerApp::OpenSettings(BFile& file, const char* name,
+	bool forReading)
+{
 	BPath path;
-	uint32 openMode = forReading ? B_READ_ONLY : B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY;
+	uint32 openMode = forReading ? B_READ_ONLY : B_CREATE_FILE | B_ERASE_FILE
+		| B_WRITE_ONLY;
 	return find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK
 		&& path.Append(name) == B_OK
 		&& file.SetTo(path.Path(), openMode) == B_OK;

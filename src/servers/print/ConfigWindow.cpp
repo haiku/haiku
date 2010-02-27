@@ -88,8 +88,10 @@ static void GetPageFormat(float w, float h, BString& label)
 	w = floor(w + 0.5); h = floor(h + 0.5);
 	for (uint i = 0; i < sizeof(pageFormat) / sizeof(struct PageFormat); i ++) {
 		struct PageFormat& pf = pageFormat[i];
-		if (pf.width == w && pf.height == h || pf.width == h && pf.height == w) {
-			label = TR(pf.label); return;
+		if (pf.width == w && pf.height == h || pf.width == h
+			&& pf.height == w) {
+			label = be_catalog->GetString(pf.label, TR_CONTEXT);
+			return;
 		}
 	}
 
@@ -110,7 +112,8 @@ LeftAlign(BView* view)
 ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BMessage* settings, AutoReply* sender)
 	: BWindow(ConfigWindow::GetWindowFrame(), TR("Page setup"),
-		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+		B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 	, fKind(kind)
 	, fDefaultPrinter(defaultPrinter)
 	, fSettings(settings)
@@ -125,7 +128,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	if (kind == kJobSetup)
 		SetTitle(TR("Print setup"));
 
-	BView* panel = new BBox(Bounds(), "temporary", B_FOLLOW_ALL,	B_WILL_DRAW);
+	BView* panel = new BBox(Bounds(), "temporary", B_FOLLOW_ALL, B_WILL_DRAW);
 	AddChild(panel);
 
 	BRect dummyRect(0, 0, 1, 1);
@@ -137,26 +140,28 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	fPrinters = new BMenuField(TR("Printer:"), menu, NULL);
 
 	// page format button
-	fPageSetup = AddPictureButton(panel, dummyRect, "Paper setup", "PAGE_SETUP_ON",
-		"PAGE_SETUP_OFF", MSG_PAGE_SETUP);
+	fPageSetup = AddPictureButton(panel, dummyRect, "Paper setup",
+		"PAGE_SETUP_ON", "PAGE_SETUP_OFF", MSG_PAGE_SETUP);
 
 	// add description to button
-	BStringView *pageFormatTitle = new BStringView("paperSetupTitle", TR("Paper setup:"));
+	BStringView *pageFormatTitle = new BStringView("paperSetupTitle",
+		TR("Paper setup:"));
 	fPageFormatText = new BStringView("paperSetupText", "");
 
 	// page selection button
 	fJobSetup = NULL;
 	BStringView* jobSetupTitle = NULL;
 	if (kind == kJobSetup) {
-		fJobSetup = AddPictureButton(panel, dummyRect, "Page setup", "JOB_SETUP_ON",
-			"JOB_SETUP_OFF", MSG_JOB_SETUP);
+		fJobSetup = AddPictureButton(panel, dummyRect, "Page setup",
+			"JOB_SETUP_ON", "JOB_SETUP_OFF", MSG_JOB_SETUP);
 		// add description to button
 		jobSetupTitle = new BStringView("jobSetupTitle", TR("Page setup:"));
 		fJobSetupText = new BStringView("jobSetupText", "");
 	}
 
 	// separator line
-	BBox* separator = new BBox(dummyRect, "line", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	BBox* separator = new BBox(dummyRect, "line",
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
 	// Cancel & OK button
@@ -254,7 +259,8 @@ void ConfigWindow::MessageReceived(BMessage* m)
 		case MSG_PRINTER_SELECTED: {
 				BString printer;
 				if (m->FindString("name", &printer) == B_OK) {
-					UpdateAppSettings(fSenderMimeType.String(), printer.String());
+					UpdateAppSettings(fSenderMimeType.String(),
+						printer.String());
 					PrinterForMimeType();
 					UpdateSettings(true);
 				}
@@ -262,7 +268,10 @@ void ConfigWindow::MessageReceived(BMessage* m)
 			break;
 		case MSG_OK:
 			UpdateSettings(false);
-			fSender->SetReply(fKind == kPageSetup ? &fPageSettings : &fJobSettings);
+			if (fKind == kPageSetup)
+				fSender->SetReply(&fPageSettings);
+			else
+				fSender->SetReply(&fJobSettings);
 			Quit();
 			break;
 		case B_ABOUT_REQUESTED: AboutRequested();
@@ -329,12 +338,13 @@ BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame,
 	BPictureButton* button = NULL;
 
 	if (onPict != NULL && offPict != NULL) {
-		button = new BPictureButton(frame, name, onPict, offPict, new BMessage(what));
+		button = new BPictureButton(frame, name, onPict, offPict,
+			new BMessage(what));
 		button->SetViewColor(B_TRANSPARENT_COLOR);
 		panel->AddChild(button);
 		onBM->Lock();
-		int32 width = onBM->Bounds().Width();
-		int32 height = onBM->Bounds().Height();
+		int32 width = (int32)onBM->Bounds().Width();
+		int32 height = (int32)onBM->Bounds().Height();
 		button->ResizeTo(width, height);
 		button->SetExplicitMaxSize(BSize(width, height));
 		onBM->Unlock();
@@ -454,7 +464,8 @@ void ConfigWindow::UpdateUI()
 		fPageSetup->SetEnabled(true);
 
 		if (fJobSetup)
-			fJobSetup->SetEnabled(fKind == kJobSetup && !fPageSettings.IsEmpty());
+			fJobSetup->SetEnabled(fKind == kJobSetup
+				&& !fPageSettings.IsEmpty());
 
 		fOk->SetEnabled(fKind == kJobSetup && !fJobSettings.IsEmpty() ||
 			fKind == kPageSetup && !fPageSettings.IsEmpty());
@@ -483,7 +494,8 @@ void ConfigWindow::UpdateUI()
 			if (fJobSettings.FindInt32(PSRV_FIELD_FIRST_PAGE, &first) == B_OK &&
 				fJobSettings.FindInt32(PSRV_FIELD_LAST_PAGE, &last) == B_OK) {
 				if (first >= 1 && first <= last && last != INT_MAX) {
-					job << TR("Page") << " " << first << " " << TR("to") << " " << last;
+					job << TR("Page") << " " << first << " " << TR("to") << " "
+						<< last;
 				} else {
 					job << TR("All pages");
 				}
