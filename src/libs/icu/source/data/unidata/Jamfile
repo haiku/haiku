@@ -81,7 +81,7 @@ GenerateUcaData ucadata.icu invuca.icu : $(fractionalUCA) ;
 rule GenerateConfusables target : sources
 {
 	MakeLocateICUData $(target) ;
-	Depends $(target) : <build>gencfu $(sources) ;
+	Depends $(target) : <build>gencfu $(ICU_DAT_FILES) $(sources) ;
 	LocalClean clean : $(target) ;
 	GenerateConfusables1 $(target) : <build>gencfu $(sources) ;
 }
