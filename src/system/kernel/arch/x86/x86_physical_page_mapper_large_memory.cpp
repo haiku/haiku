@@ -918,8 +918,9 @@ large_memory_physical_page_ops_init(kernel_args* args,
 	X86PhysicalPageMapper*& _pageMapper,
 	TranslationMapPhysicalPageMapper*& _kernelPageMapper)
 {
-	_pageMapper = new(&sPhysicalPageMapper) LargeMemoryPhysicalPageMapper;
+	new(&sPhysicalPageMapper) LargeMemoryPhysicalPageMapper;
 	sPhysicalPageMapper.Init(args, _kernelPageMapper);
 
+	_pageMapper = &sPhysicalPageMapper;
 	return B_OK;
 }

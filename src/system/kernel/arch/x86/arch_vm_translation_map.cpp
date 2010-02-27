@@ -1446,7 +1446,7 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 
 	if (physicalPageDirectory == (addr_t)sKernelPhysicalPageDirectory) {
 		pageDirectoryEntry = sKernelVirtualPageDirectory[index];
-	} else {
+	} else if (sPhysicalPageMapper != NULL) {
 		// map the original page directory and get the entry
 		void* handle;
 		addr_t virtualPageDirectory;
@@ -1459,13 +1459,15 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 				handle);
 		} else
 			pageDirectoryEntry = 0;
-	}
+	} else
+		pageDirectoryEntry = 0;
 
 	// map the page table and get the entry
 	page_table_entry pageTableEntry;
 	index = VADDR_TO_PTENT(virtualAddress);
 
-	if ((pageDirectoryEntry & X86_PDE_PRESENT) != 0) {
+	if ((pageDirectoryEntry & X86_PDE_PRESENT) != 0
+			&& sPhysicalPageMapper != NULL) {
 		void* handle;
 		addr_t virtualPageTable;
 		status_t error = sPhysicalPageMapper->GetPageDebug(
