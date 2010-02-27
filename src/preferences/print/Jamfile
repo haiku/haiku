@@ -21,15 +21,15 @@ Preference Printers :
 	;
 
 DoCatalogs Printers :
-		x-vnd.Be-PRNT
-		:
-		AddPrinterDialog.cpp
-		JobListView.cpp
-		PrinterListView.cpp
-		PrintersWindow.cpp
-		: 
-		en.catalog
-		: 
-		de.catkeys
-		;
+	x-vnd.Be-PRNT
+	:
+	AddPrinterDialog.cpp
+	JobListView.cpp
+	PrinterListView.cpp
+	PrintersWindow.cpp
+	: 
+	en.catalog
+	: 
+	de.catkeys
+	;
 	
