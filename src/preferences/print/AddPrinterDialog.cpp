@@ -16,6 +16,7 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <TextControl.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -33,9 +34,14 @@
 
 #include <stdio.h>
 
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "AddPrinterDialog"
+
+
 AddPrinterDialog::AddPrinterDialog(BWindow *parent)
 	:
-	Inherited(BRect(78.0, 71.0, 400, 300), "Add printer",
+	Inherited(BRect(78.0, 71.0, 400, 300), TR("Add printer"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fPrintersPrefletMessenger(parent)
@@ -171,32 +177,32 @@ void
 AddPrinterDialog::BuildGUI(int stage)
 {
 	// add a "printer name" input field
-	fName = new BTextControl("printer_name", "Printer name:", B_EMPTY_STRING,
+	fName = new BTextControl("printer_name", TR("Printer name:"), B_EMPTY_STRING,
 		NULL);
 	fName->SetFont(be_bold_font);
 	fName->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fName->SetModificationMessage(new BMessage(kNameChangedMsg));
 
 	// add a "driver" popup menu field
-	fPrinter = new BPopUpMenu("<pick one>");
+	fPrinter = new BPopUpMenu(TR("<pick one>"));
 	BMenuField *printerMenuField = new BMenuField("drivers_list",
-		"Printer type:", fPrinter);
+		TR("Printer type:"), fPrinter);
 	printerMenuField->SetAlignment(B_ALIGN_RIGHT);
 	FillMenu(fPrinter, "Print", kPrinterSelectedMsg);
 
 	// add a "connected to" (aka transports list) menu field
-	fTransport = new BPopUpMenu("<pick one>");
+	fTransport = new BPopUpMenu(TR("<pick one>"));
 	BMenuField *transportMenuField = new BMenuField("transports_list",
-		"Connected to:", fTransport);
+		TR("Connected to:"), fTransport);
 	transportMenuField->SetAlignment(B_ALIGN_RIGHT);
 	FillTransportMenu(fTransport);
 	
 	// add a "OK" button
-	fOk = new BButton(NULL, "Add", new BMessage((uint32)B_OK),
+	fOk = new BButton(NULL, TR("Add"), new BMessage((uint32)B_OK),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 
 	// add a "Cancel button	
-	BButton *cancel = new BButton(NULL, "Cancel", new BMessage(B_CANCEL));
+	BButton *cancel = new BButton(NULL, TR("Cancel"), new BMessage(B_CANCEL));
 
 	SetLayout(new BGridLayout());
 

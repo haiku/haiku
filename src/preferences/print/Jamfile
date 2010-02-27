@@ -15,6 +15,21 @@ Preference Printers :
 	translation 
 	libprintutils.a
 	$(TARGET_LIBSUPC++)
+	liblocale.so
 	: 
 	Printers.rdef
 	;
+
+DoCatalogs Printers :
+		x-vnd.Be-PRNT
+		:
+		AddPrinterDialog.cpp
+		JobListView.cpp
+		PrinterListView.cpp
+		PrintersWindow.cpp
+		: 
+		en.catalog
+		: 
+		de.catkeys
+		;
+	

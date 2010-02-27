@@ -15,7 +15,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Printers",
-	long_info = "Printers ©2001-2009 Haiku"
+	long_info = "Printers ©2001-2010 Haiku"
 };
 
 resource vector_icon {

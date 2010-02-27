@@ -39,15 +39,20 @@
 // BeOS API
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <ListView.h>
 #include <ScrollView.h>
 #include <Application.h>
 #include <FindDirectory.h>
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "PrintersWindow"
+
+
 PrintersWindow::PrintersWindow(BRect frame)
 	:
-	Inherited(BRect(78.0, 71.0, 561.0, 409.0), "Printers", B_TITLED_WINDOW, 0),
+	Inherited(BRect(78.0, 71.0, 561.0, 409.0), TR("Printers"), B_TITLED_WINDOW, 0),
 	fSelectedPrinter(NULL),
 	fAddingPrinter(false)
 {
@@ -77,14 +82,14 @@ PrintersWindow::MessageReceived(BMessage* msg)
 				fSelectedPrinter = fPrinterListView->SelectedItem();
 				if (fSelectedPrinter)
 				{
-					fJobsBox->SetLabel((BString("Print jobs for ") << fSelectedPrinter->Name()).String());
+					fJobsBox->SetLabel((BString(TR("Print jobs for ")) << fSelectedPrinter->Name()).String());
 					fMakeDefault->SetEnabled(true);
 					fRemove->SetEnabled(true);
 					fJobListView->SetSpoolFolder(fSelectedPrinter->Folder());
 				}
 				else
 				{
-					fJobsBox->SetLabel("Print jobs: No printer selected");
+					fJobsBox->SetLabel(TR("Print jobs: No printer selected"));
 					fMakeDefault->SetEnabled(false);
 					fRemove->SetEnabled(false);
 					fSelectedPrinter = NULL;
@@ -178,21 +183,21 @@ PrintersWindow::BuildGUI()
 	BBox* printersBox = new BBox(BRect(boxInset, boxInset, r.Width()-boxInset, (r.Height()/2) - (boxInset/2)),
 		"printersBox", B_FOLLOW_ALL);
 	printersBox->SetFont(be_bold_font);
-	printersBox->SetLabel("Printers:");
+	printersBox->SetLabel(TR("Printers"));
 	backdrop->AddChild(printersBox);
 
 		// Width of largest button
 	float maxWidth = 0;
 
 		// Add Button
-	BButton* addButton = new BButton(BRect(5,5,5,5), "add", "Add " B_UTF8_ELLIPSIS, new BMessage(kMsgAddPrinter), B_FOLLOW_RIGHT);
+	BButton* addButton = new BButton(BRect(5,5,5,5), "add", TR("Add …"), new BMessage(kMsgAddPrinter), B_FOLLOW_RIGHT);
 	printersBox->AddChild(addButton);
 	addButton->ResizeToPreferred();
 
 	maxWidth = addButton->Bounds().Width();
 
 		// Remove button
-	fRemove = new BButton(BRect(5,30,5,30), "remove", "Remove", new BMessage(kMsgRemovePrinter), B_FOLLOW_RIGHT);
+	fRemove = new BButton(BRect(5,30,5,30), "remove", TR("Remove"), new BMessage(kMsgRemovePrinter), B_FOLLOW_RIGHT);
 	printersBox->AddChild(fRemove);
 	fRemove->ResizeToPreferred();
 
@@ -200,7 +205,7 @@ PrintersWindow::BuildGUI()
 		maxWidth = fRemove->Bounds().Width();
 
 		// Make Default button
-	fMakeDefault = new BButton(BRect(5,60,5,60), "default", "Make default", new BMessage(kMsgMakeDefaultPrinter), B_FOLLOW_RIGHT);
+	fMakeDefault = new BButton(BRect(5,60,5,60), "default", TR("Make default"), new BMessage(kMsgMakeDefaultPrinter), B_FOLLOW_RIGHT);
 	printersBox->AddChild(fMakeDefault);
 	fMakeDefault->ResizeToPreferred();
 
@@ -236,11 +241,11 @@ PrintersWindow::BuildGUI()
 	fJobsBox = new BBox(BRect(boxInset, (r.Height()/2)+(boxInset/2), Bounds().Width()-10, Bounds().Height() - boxInset),
 		"jobsBox", B_FOLLOW_LEFT_RIGHT+B_FOLLOW_BOTTOM);
 	fJobsBox->SetFont(be_bold_font);
-	fJobsBox->SetLabel("Print Jobs: No printer selected");
+	fJobsBox->SetLabel(TR("Print jobs: No printer selected"));
 	backdrop->AddChild(fJobsBox);
 
 		// Cancel Job Button
-	BButton* cancelButton = new BButton(BRect(5,5,5,5), "cancel", "Cancel job", new BMessage(kMsgCancelJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
+	BButton* cancelButton = new BButton(BRect(5,5,5,5), "cancel", TR("Cancel job"), new BMessage(kMsgCancelJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
 	fJobsBox->AddChild(cancelButton);
 	cancelButton->ResizeToPreferred();
 	fCancel = cancelButton;
@@ -248,7 +253,7 @@ PrintersWindow::BuildGUI()
 	maxWidth = cancelButton->Bounds().Width();
 
 		// Restart Job button
-	BButton* restartButton = new BButton(BRect(5,30,5,30), "restart", "Restart job", new BMessage(kMsgRestartJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
+	BButton* restartButton = new BButton(BRect(5,30,5,30), "restart", TR("Restart job"), new BMessage(kMsgRestartJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
 	fJobsBox->AddChild(restartButton);
 	restartButton->ResizeToPreferred();
 	fRestart = restartButton;

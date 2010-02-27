@@ -36,10 +36,15 @@
 
 #include <Messenger.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <String.h>
 #include <Alert.h>
 #include <Mime.h>
 #include <StorageKit.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "PrinterListView"
 
 
 // #pragma mark -- PrinterListView
@@ -372,7 +377,7 @@ void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	BPoint driverPt(iconPt + BPoint(x, fntheight * 2.0));
 	BPoint defaultPt(iconPt + BPoint(x, fntheight * 3.0));
 
-	float width = owner->StringWidth("No pending jobs.");
+	float width = owner->StringWidth(TR("No pending jobs."));
 	BPoint pendingPt(bounds.right - width - 8.0, namePt.y);
 	BPoint transportPt(bounds.right - width - 8.0, driverPt.y);
 	BPoint commentPt(bounds.right - width - 8.0, defaultPt.y);
@@ -388,7 +393,7 @@ void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 		if (sSelectedIcon && sSelectedIcon->IsValid())
 			owner->DrawBitmap(sSelectedIcon, iconPt);
 		else
-			owner->DrawString("Default Printer", defaultPt);
+			owner->DrawString(TR("Default Printer"), defaultPt);
 	} else {
 		if (sIcon && sIcon->IsValid())
 			owner->DrawBitmap(sIcon, iconPt);
@@ -401,7 +406,7 @@ void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	owner->DrawString(fDriverName.String(), fDriverName.Length(), driverPt);
 
 	// right of item
-	owner->DrawString(fPendingJobs.String(), 16, pendingPt);
+	owner->DrawString(fPendingJobs.String(), fPendingJobs.Length(), pendingPt);
 	owner->DrawString(fTransport.String(), fTransport.Length(), transportPt);
 	owner->DrawString(fComments.String(), fComments.Length(), commentPt);
 
@@ -444,12 +449,12 @@ PrinterItem::UpdatePendingJobs()
 	if (fFolder) {
 		uint32 pendingJobs = fFolder->CountJobs();
 		if (pendingJobs == 1) {
-			fPendingJobs = "1 pending job.";
+			fPendingJobs = TR("1 pending job.");
 			return;
 		} else if (pendingJobs > 1) {
-			fPendingJobs << pendingJobs << " pending jobs.";
+			fPendingJobs << pendingJobs << TR(" pending jobs.");
 			return;
 		}
 	}
-	fPendingJobs = "No pending jobs.";
+	fPendingJobs = TR("No pending jobs.");
 }

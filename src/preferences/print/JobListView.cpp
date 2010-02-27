@@ -38,9 +38,14 @@
 
 #include <Alert.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Messenger.h>
 #include <Mime.h>
 #include <Roster.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "JobListView"
 
 
 // #pragma mark -- JobListView
@@ -218,41 +223,41 @@ JobItem::Update()
 		B_INT32_TYPE, 0, &pages, sizeof(pages)) == sizeof(pages)) {
 		fPages << pages;
 		if (pages > 1)
-				fPages << " pages.";
+			fPages << " " << TR("pages") << ".";
 		else
-			fPages << " page.";
+			fPages << " " << TR("page") << ".";
 	} else {
-		fPages = "??? pages.";
+		fPages << "??? " << TR("pages") << ".";
 	}
 
 	fSize = "";
 	off_t size;
 	if (node.GetSize(&size) == B_OK) {
 		char buffer[80];
-		sprintf(buffer, "%.2f KB", size / 1024.0);
+		sprintf(buffer, TR("%.2f KB"), size / 1024.0);
 		fSize = buffer;
 	}
 
 	fStatus = "";
 	switch (fJob->Status()) {
 		case kWaiting:
-			fStatus = "Waiting";
+			fStatus = TR("Waiting");
 			break;
 
 		case kProcessing:
-			fStatus = "Processing";
+			fStatus = TR("Processing");
 			break;
 
 		case kFailed:
-			fStatus = "Failed";
+			fStatus = TR("Failed");
 			break;
 
 		case kCompleted:
-			fStatus = "Completed";
+			fStatus = TR("Completed");
 			break;
 
 		default:
-			fStatus = "Unkown status";
+			fStatus = TR("Unknown status");
 	}
 }
 

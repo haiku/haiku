@@ -32,6 +32,8 @@
 #include "Messages.h"
 #include "PrintersWindow.h"
 
+#include <Locale.h>
+
 int main()
 {
 	PrintersApp app;
@@ -42,6 +44,7 @@ int main()
 PrintersApp::PrintersApp()
 	: Inherited(PRINTERS_SIGNATURE)
 {
+	be_locale->GetAppCatalog(&fCatalog);
 }
 
 void PrintersApp::ReadyToRun()
