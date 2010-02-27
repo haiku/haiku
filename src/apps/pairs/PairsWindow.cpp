@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ralf Schülke, teammaui@web.de. All rights reserved.
+ * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,17 +8,22 @@
 #include <stdio.h>
 
 #include <Application.h>
-#include <MessageRunner.h>
-#include <Button.h>
 #include <Alert.h>
-#include <TextView.h>
+#include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
+#include <MessageRunner.h>
 #include <String.h>
+#include <TextView.h>
 
 #include "Pairs.h"
 #include "PairsGlobal.h"
 #include "PairsView.h"
 #include "PairsTopButton.h"
 
+// #pragma mark - PairsWindow
+#undef TR_CONTEXT
+#define TR_CONTEXT "PairsWindow"
 
 PairsWindow::PairsWindow()
 	: BWindow(BRect(100, 100, 405, 405), "Pairs", B_TITLED_WINDOW,
@@ -115,8 +120,8 @@ PairsWindow::MessageReceived(BMessage* message)
 						<< "You completed the game in " << fButtonClicks
 						<< " clicks.\n";
 
-					BAlert* alert = new BAlert("about", strAbout.String(),
-						"New game", "Quit game");
+					BAlert* alert = new BAlert("about", TR(strAbout.String()),
+						TR("New game"), TR("Quit game"));
 
 					BTextView* view = alert->TextView();
 					BFont font;

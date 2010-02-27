@@ -1,11 +1,13 @@
 /*
- * Copyright 2008, Ralf Schülke, teammaui@web.de. All rights reserved.
+ * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 #include <stdlib.h>
 
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #include "Pairs.h"
 #include "PairsWindow.h"
@@ -17,6 +19,7 @@ Pairs::Pairs()
 	: BApplication(kSignature),
 	  fWindow(NULL)
 {
+	be_locale->GetAppCatalog(&fCatalog);
 }
 
 

@@ -8,6 +8,13 @@ Application Pairs :
 	PairsView.cpp
 	PairsTopButton.cpp
 
-	: be $(TARGET_LIBSTDC++)
+	: be liblocale.so $(TARGET_LIBSTDC++)
 	: Pairs.rdef
-	;
+;
+
+DoCatalogs Pairs :
+	x-vnd.Haiku-Pairs
+	:
+	PairsWindow.cpp
+	: en.catalog
+;

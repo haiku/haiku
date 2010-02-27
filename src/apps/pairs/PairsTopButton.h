@@ -1,7 +1,8 @@
 /*
- * Copyright 2008, Ralf Schülke, teammaui@web.de. All rights reserved.
+ * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 #ifndef PAIRS_TOP_BUTTON_H
 #define PAIRS_TOP_BUTTON_H
 
