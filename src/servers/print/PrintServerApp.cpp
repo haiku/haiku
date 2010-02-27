@@ -16,10 +16,12 @@
 // BeOS API
 #include <Alert.h>
 #include <Autolock.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <File.h>
-#include <image.h>
 #include <FindDirectory.h>
+#include <image.h>
+#include <Locale.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
@@ -33,6 +35,11 @@
 	// for printf
 #include <unistd.h>
 	// for unlink
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "PrintServerApp"
+
 
 BLocker *gLock = NULL;
 
@@ -87,6 +94,7 @@ PrintServerApp::PrintServerApp(status_t* err)
 	fUseConfigWindow(true),
 	fFolder(NULL)
 {
+	be_locale->GetAppCatalog(&fCatalog);
 	fSettings = Settings::GetSettings();
 	LoadSettings();
 
@@ -416,16 +424,14 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 				// the printer exists, but no default at all
 				return B_OK;
 			} else {
-				info.SetTo("There already exists an printer you are going to"
-					" create, but it's driver could not be found! Replace?");
+				info.SetTo(TR("There already exists a printer you are going to create, but it's driver could not be found! Replace?"));
 			}
 		} else {
-			info.SetTo("There already exists an printer you are going to"
-				" create, but it's not usable at all! Replace?");
+			info.SetTo(TR("There already exists a printer you are going to create, but it's not usable at all! Replace?"));
 		}
 
 		if (info.Length() != 0) {
-			BAlert *alert = new BAlert("Info", info.String(), "Cancel", "OK");
+			BAlert *alert = new BAlert("Info", info.String(), TR("Cancel"), TR("OK"));
 			alert->SetShortcut(0, B_ESCAPE);
 			if (alert->Go() == 0)
 				return rc;

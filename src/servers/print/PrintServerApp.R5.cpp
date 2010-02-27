@@ -15,7 +15,13 @@
 	// BeOS API
 #include <Alert.h>
 #include <Autolock.h>
+#include <Catalog.h>
 #include <PrintJob.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "PrintServerApp"
+
 
 struct AsyncThreadParams {
 	PrintServerApp* app;
@@ -77,12 +83,14 @@ status_t PrintServerApp::async_thread(void* data)
 					// If no default printer is set, give user
 					// choice of aborting or setting up a printer
 					int32 count = Printer::CountPrinters();
-					BString alertText("There are no printers set up. ");
+					BString alertText(TR("There are no printers set up."));
 					if (count > 0)
-						alertText.SetTo("There is no default printer set up. ");
+						alertText.SetTo(TR("There is no default printer set up."));
 
-					BAlert* alert = new BAlert("Info", alertText.Append("Would "
-						"you like to set one up now?").String(), "No", "Yes");
+					alertText.Append(" ");
+					alertText.Append(TR("Would you like to set one up now?"));
+					BAlert* alert = new BAlert("Info", alertText.String(),
+						TR("No"), TR("Yes"));
 					if (alert->Go() == 1) {
 						if (count == 0)
 							run_add_printer_panel();
@@ -122,9 +130,10 @@ status_t PrintServerApp::async_thread(void* data)
 						driverName.String(), connection.String(),
 						transportName.String(), transportPath.String()) == B_OK) {
 						// If printer was created ok, ask if it needs to be the default
-						BString text("Would you like to make @ the default printer?");
+						BString text(TR("Would you like to make @ the default printer?"));
 						text.ReplaceFirst("@", printerName.String());
-						BAlert* alert = new BAlert("", text.String(), "No", "Yes");
+						BAlert* alert = new BAlert("", text.String(), TR("No"),
+							TR("Yes"));
 						if (alert->Go() == 1)
 							p->app->SelectPrinter(printerName.String());
 					}

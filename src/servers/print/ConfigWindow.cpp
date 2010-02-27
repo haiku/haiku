@@ -25,9 +25,15 @@
 #include <Window.h>
 
 // Haiku
+#include <Catalog.h>
 #include <Layout.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "ConfigWindow"
+
 
 static const float a0_width = 2380.0;
 static const float a0_height = 3368.0;
@@ -51,29 +57,29 @@ static const float legal_width  = 612.0;
 static const float legal_height  = 1008.0;
 static const float ledger_width = 1224.0;
 static const float ledger_height = 792.0;
-static const float p11x17_width = 792.0;
-static const float p11x17_height = 1224.0;
+static const float tabloid_width = 792.0;
+static const float tabloid_height = 1224.0;
 
 
 static struct PageFormat
 {
-	char  *label;
+	const char  *label;
 	float width;
 	float height;
 } pageFormat[] =
 {
-	{"Letter", letter_width, letter_height },
-	{"Legal",  legal_width,  legal_height  },
-	{"Ledger", ledger_width, ledger_height  },
-	{"p11x17", p11x17_width, p11x17_height  },
-	{"A0",     a0_width,     a0_height     },
-	{"A1",     a1_width,     a1_height     },
-	{"A2",     a2_width,     a2_height     },
-	{"A3",     a3_width,     a3_height     },
-	{"A4",     a4_width,     a4_height     },
-	{"A5",     a5_width,     a5_height     },
-	{"A6",     a6_width,     a6_height     },
-	{"B5",     b5_width,     b5_height     },
+	{TR_MARK("Letter"), letter_width, letter_height },
+	{TR_MARK("Legal"),  legal_width,  legal_height  },
+	{TR_MARK("Ledger"), ledger_width, ledger_height  },
+	{TR_MARK("Tabloid"), tabloid_width, tabloid_height  },
+	{TR_MARK("A0"),     a0_width,     a0_height     },
+	{TR_MARK("A1"),     a1_width,     a1_height     },
+	{TR_MARK("A2"),     a2_width,     a2_height     },
+	{TR_MARK("A3"),     a3_width,     a3_height     },
+	{TR_MARK("A4"),     a4_width,     a4_height     },
+	{TR_MARK("A5"),     a5_width,     a5_height     },
+	{TR_MARK("A6"),     a6_width,     a6_height     },
+	{TR_MARK("B5"),     b5_width,     b5_height     },
 };
 
 
@@ -83,11 +89,11 @@ static void GetPageFormat(float w, float h, BString& label)
 	for (uint i = 0; i < sizeof(pageFormat) / sizeof(struct PageFormat); i ++) {
 		struct PageFormat& pf = pageFormat[i];
 		if (pf.width == w && pf.height == h || pf.width == h && pf.height == w) {
-			label = pf.label; return;
+			label = TR(pf.label); return;
 		}
 	}
 
-	float unit = 72.0; // currently inc[h]es only
+	float unit = 72.0; // currently inches only
 	label << (w / unit) << "x" << (h / unit) << " in.";
 }
 
@@ -103,7 +109,7 @@ LeftAlign(BView* view)
 
 ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BMessage* settings, AutoReply* sender)
-	: BWindow(ConfigWindow::GetWindowFrame(), "Page setup",
+	: BWindow(ConfigWindow::GetWindowFrame(), TR("Page setup"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 	, fKind(kind)
 	, fDefaultPrinter(defaultPrinter)
@@ -117,7 +123,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	PrinterForMimeType();
 
 	if (kind == kJobSetup)
-		SetTitle("Print setup");
+		SetTitle(TR("Print setup"));
 
 	BView* panel = new BBox(Bounds(), "temporary", B_FOLLOW_ALL,	B_WILL_DRAW);
 	AddChild(panel);
@@ -125,27 +131,27 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BRect dummyRect(0, 0, 1, 1);
 
 	// print selection pop up menu
-	BPopUpMenu* menu = new BPopUpMenu("Select a printer");
+	BPopUpMenu* menu = new BPopUpMenu(TR("Select a printer"));
 	SetupPrintersMenu(menu);
 
-	fPrinters = new BMenuField("Printer:", menu, NULL);
+	fPrinters = new BMenuField(TR("Printer:"), menu, NULL);
 
 	// page format button
-	fPageSetup = AddPictureButton(panel, dummyRect, "Page format", "PAGE_SETUP_ON",
+	fPageSetup = AddPictureButton(panel, dummyRect, "Paper setup", "PAGE_SETUP_ON",
 		"PAGE_SETUP_OFF", MSG_PAGE_SETUP);
 
 	// add description to button
-	BStringView *pageFormatTitle = new BStringView("pageFormatTitle", "Paper setup:");
-	fPageFormatText = new BStringView("pageFormatText", "");
+	BStringView *pageFormatTitle = new BStringView("paperSetupTitle", TR("Paper setup:"));
+	fPageFormatText = new BStringView("paperSetupText", "");
 
 	// page selection button
 	fJobSetup = NULL;
 	BStringView* jobSetupTitle = NULL;
 	if (kind == kJobSetup) {
-		fJobSetup = AddPictureButton(panel, dummyRect, "Page selection", "JOB_SETUP_ON",
+		fJobSetup = AddPictureButton(panel, dummyRect, "Page setup", "JOB_SETUP_ON",
 			"JOB_SETUP_OFF", MSG_JOB_SETUP);
 		// add description to button
-		jobSetupTitle = new BStringView("jobSetupTitle", "Pages to print:");
+		jobSetupTitle = new BStringView("jobSetupTitle", TR("Page setup:"));
 		fJobSetupText = new BStringView("jobSetupText", "");
 	}
 
@@ -154,9 +160,9 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
 	// Cancel & OK button
-	BButton* cancel = new BButton(dummyRect, "Cancel", "Cancel",
+	BButton* cancel = new BButton(dummyRect, "Cancel", TR("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
-	fOk = new BButton(dummyRect, "OK", "OK", new BMessage(MSG_OK));
+	fOk = new BButton(dummyRect, "OK", TR("OK"), new BMessage(MSG_OK));
 
 	RemoveChild(panel);
 
@@ -270,7 +276,7 @@ void ConfigWindow::MessageReceived(BMessage* m)
 static const char*
 kAbout =
 "Printer server\n"
-"© 2001-2009 Haiku\n"
+"© 2001-2010 Haiku, Inc.\n"
 "\n"
 "\tIthamar R. Adema\n"
 "\tMichael Pfeiffer\n"
@@ -280,7 +286,7 @@ kAbout =
 void
 ConfigWindow::AboutRequested()
 {
-	BAlert *about = new BAlert("About printer server", kAbout, "OK");
+	BAlert *about = new BAlert("About printer server", kAbout, TR("OK"));
 	about->Go();
 }
 
@@ -440,10 +446,10 @@ void ConfigWindow::UpdateUI()
 		fPageSetup->SetEnabled(false);
 		if (fJobSetup) {
 			fJobSetup->SetEnabled(false);
-			fJobSetupText->SetText("Undefined job settings");
+			fJobSetupText->SetText(TR("Undefined"));
 		}
 		fOk->SetEnabled(false);
-		fPageFormatText->SetText("Undefined paper format");
+		fPageFormatText->SetText(TR("Undefined"));
 	} else {
 		fPageSetup->SetEnabled(true);
 
@@ -462,11 +468,11 @@ void ConfigWindow::UpdateUI()
 			int32 orientation = 0;
 			fPageSettings.FindInt32(PSRV_FIELD_ORIENTATION, &orientation);
 			if (orientation == 0)
-				pageFormat << ", Portrait";
+				pageFormat << ", " << TR("Portrait");
 			else
-				pageFormat << ", Landscape";
+				pageFormat << ", " << TR("Landscape");
 		} else {
-			pageFormat << "Undefined paper format";
+			pageFormat << TR("Undefined");
 		}
 		fPageFormatText->SetText(pageFormat.String());
 
@@ -477,17 +483,17 @@ void ConfigWindow::UpdateUI()
 			if (fJobSettings.FindInt32(PSRV_FIELD_FIRST_PAGE, &first) == B_OK &&
 				fJobSettings.FindInt32(PSRV_FIELD_LAST_PAGE, &last) == B_OK) {
 				if (first >= 1 && first <= last && last != INT_MAX) {
-					job << "From page " << first << " to " << last;
+					job << TR("Page") << " " << first << " " << TR("to") << " " << last;
 				} else {
-					job << "All pages";
+					job << TR("All pages");
 				}
 				int32 copies;
 				if (fJobSettings.FindInt32(PSRV_FIELD_COPIES, &copies)
 					== B_OK && copies > 1) {
-					job << ", " << copies << " copies";
+					job << ", " << copies << " " << TR("copies");
 				}
 			} else {
-				job << "Undefined job settings";
+				job << TR("Undefined");
 			}
 			fJobSetupText->SetText(job.String());
 		}

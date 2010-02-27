@@ -24,7 +24,20 @@ LinkAgainst print_server :
 	be 
 	root
 	translation
+	liblocale.so
 	libprint.a
 	libprintutils.a
 	$(TARGET_LIBSUPC++)
 ;
+
+DoCatalogs print_server :
+	x-vnd.Be-PSRV
+	:
+	ConfigWindow.cpp
+	PrintServerApp.cpp
+	PrintServerApp.R5.cpp
+	: 
+	en.catalog
+	:
+	de.catkeys
+	;
