@@ -1,6 +1,6 @@
 // kernel_interface.cpp
 //
-// Copyright (c) 2003-2008, Ingo Weinhold (bonefish@cs.tu-berlin.de)
+// Copyright (c) 2003-2010, Ingo Weinhold (bonefish@cs.tu-berlin.de)
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 // You can alternatively use *this file* under the terms of the the MIT
 // license included in this package.
 
+
 #include <new>
 
 #include <ctype.h>
@@ -32,6 +33,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
+#include <fs_cache.h>
 #include <fs_info.h>
 #include <fs_interface.h>
 #include <KernelExport.h>
@@ -219,6 +221,12 @@ FUNCTION(("dir: (%Ld: %lu, %lu), entry: `%s'\n", dir->GetID(), dir->GetDirID(),
 			*vnid = foundNode.GetID();
 			error = volume->GetVNode(*vnid, &entryNode);
 		}
+	}
+
+	// add to the entry cache
+	if (error == B_OK) {
+		entry_cache_add(volume->GetID(), dir->GetID(), entryName,
+			*vnid);
 	}
 
 	RETURN_ERROR(error);
