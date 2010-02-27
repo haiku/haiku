@@ -211,7 +211,6 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 
 # BeZillaBrowser
 if [ IsOptionalHaikuImagePackageAdded BeZillaBrowser ] {
-	
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BeZillaBrowser available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
@@ -1127,6 +1126,69 @@ if [ IsOptionalHaikuImagePackageAdded Wifi-iprowifi2200+fw ] {
 		;
 		AddSymlinkToHaikuImage home config boot launch
 			: /boot/common/bin/install_firmware_iprowifi2200 ;
+	}
+}
+
+
+# WifiFirmwareScriptData
+# This optional package is for people who build their own images & have wifi
+# hardware that requires install-wifi-firmwares.sh & have no active network
+# connection. This is not to be added to default images.
+if [ IsOptionalHaikuImagePackageAdded WifiFirmwareScriptData ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package WifiFirmwareScriptData available for"
+			$(TARGET_ARCH) ;
+	} else {
+		# broadcom43xx
+		# firmware cutter
+		local broadcomFWCutterArchive = b43-fwcutter-012.tar.bz2 ;
+		local broadcomFWCutterURL =
+			http://bu3sch.de/b43/fwcutter/$(broadcomFWCutterArchive) ;
+		local broadcomFWCutterFile = [ DownloadFile $(broadcomFWCutterArchive)
+			: $(broadcomFWCutterURL) ] ;
+		AddFilesToHaikuImage system data firmware broadcom43xx b43-fwcutter
+			: $(broadcomFWCutterFile) ;
+
+		# headers needed to compile firmware cutter
+		local glibcDir = [ FDirName
+			$(HAIKU_TOP) src system libroot posix glibc ] ;
+		local byteswapHeader = [ FDirName $(glibcDir) string byteswap.h ] ;
+		AddFilesToHaikuImage system data firmware broadcom43xx b43-fwcutter
+			: $(byteswapHeader) ;
+		local bitByteswapHeader = [ FDirName
+			$(glibcDir) include arch x86 bits byteswap.h ] ;
+		AddFilesToHaikuImage system data firmware broadcom43xx b43-fwcutter bits
+			: $(bitByteswapHeader) ;
+
+		# file containing firmware
+		local broadcom43xxFile ;
+		broadcom43xxFile = [ DownloadFile wl_apsta-3.130.20.0.o
+			: http://downloads.openwrt.org/sources/wl_apsta-3.130.20.0.o ] ;
+		AddFilesToHaikuImage system data firmware broadcom43xx
+			: $(broadcom43xxFile) ;
+
+		# ipw2100
+		local FirmwareTopDirectory = [ FDirName
+			$(HAIKU_TOP) data system data firmware ] ;
+		local ipw2100FWArchive = [ FDirName
+			$(FirmwareTopDirectory) ipw2100 ipw2100-fw-1.3.tgz ] ;
+		AddFilesToHaikuImage system data firmware ipw2100
+			: $(ipw2100FWArchive) ;
+
+		# iprowifi2200
+		local FirmwareTopDirectory = [ FDirName
+			$(HAIKU_TOP) data system data firmware ] ;
+		local iprowifi2200FWArchive = [ FDirName
+			$(FirmwareTopDirectory) iprowifi2200 ipw2200-fw-3.1.tgz ] ;
+		AddFilesToHaikuImage system data firmware iprowifi2200
+			: $(iprowifi2200FWArchive) ;
+
+		# marvell88w8335
+		local marvelArchive = malo-firmware-1.4.tgz ;
+		local marvelURL = http://www.nazgul.ch/malo/$(marvelArchive) ;
+		local marvelFile = [ DownloadFile $(marvelArchive) : $(marvelURL) ] ;
+		AddFilesToHaikuImage system data firmware marvell88w8335
+			: $(marvelFile) ;
 	}
 }
 
