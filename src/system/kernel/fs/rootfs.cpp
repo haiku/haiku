@@ -13,20 +13,21 @@
 #	include "hash.h"
 #	include "list.h"
 #else
+#	include <stdio.h>
+#	include <stdlib.h>
+#	include <string.h>
+#	include <sys/stat.h>
+
+#	include <fs_cache.h>
 #	include <KernelExport.h>
-#	include <vfs.h>
+#	include <NodeMonitor.h>
+
 #	include <debug.h>
 #	include <khash.h>
 #	include <lock.h>
 #	include <util/AutoLock.h>
+#	include <vfs.h>
 #	include <vm/vm.h>
-
-#	include <NodeMonitor.h>
-
-#	include <sys/stat.h>
-#	include <malloc.h>
-#	include <string.h>
-#	include <stdio.h>
 #endif
 
 
@@ -344,6 +345,8 @@ rootfs_remove(struct rootfs* fs, struct rootfs_vnode* dir, const char* name,
 	if (status != B_OK)
 		return status;
 
+	entry_cache_remove(fs->volume->id, dir->id, name);
+
 	return remove_node(fs, dir, vnode);
 }
 
@@ -466,6 +469,8 @@ rootfs_lookup(fs_volume* _volume, fs_vnode* _dir, const char* name, ino_t* _id)
 	status_t status = get_vnode(fs->volume, vnode->id, NULL);
 	if (status != B_OK)
 		return status;
+
+	entry_cache_add(fs->volume->id, dir->id, name, vnode->id);
 
 	*_id = vnode->id;
 	return B_OK;
@@ -641,6 +646,7 @@ rootfs_create_dir(fs_volume* _volume, fs_vnode* _dir, const char* name,
 	rootfs_insert_in_dir(fs, dir, vnode);
 	hash_insert(fs->vnode_list_hash, vnode);
 
+	entry_cache_add(fs->volume->id, dir->id, name, vnode->id);
 	notify_entry_created(fs->id, dir->id, name, vnode->id);
 
 	return B_OK;
@@ -880,6 +886,8 @@ rootfs_symlink(fs_volume* _volume, fs_vnode* _dir, const char* name,
 	}
 	vnode->stream.symlink.length = strlen(path);
 
+	entry_cache_add(fs->volume->id, dir->id, name, vnode->id);
+
 	notify_entry_created(fs->id, dir->id, name, vnode->id);
 
 	return B_OK;
@@ -944,6 +952,7 @@ rootfs_rename(fs_volume* _volume, fs_vnode* _fromDir, const char* fromName,
 			return B_NAME_IN_USE;
 
 		// so we can cleanly remove it
+		entry_cache_remove(fs->volume->id, toDirectory->id, toName);
 		remove_node(fs, toDirectory, targetVnode);
 	}
 
@@ -961,12 +970,15 @@ rootfs_rename(fs_volume* _volume, fs_vnode* _fromDir, const char* fromName,
 	}
 
 	// remove it from the dir
+	entry_cache_remove(fs->volume->id, fromDirectory->id, fromName);
 	rootfs_remove_from_dir(fs, fromDirectory, vnode);
 
 	// Add it back to the dir with the new name.
 	// We need to do this even in the same directory,
 	// so that it keeps sorted correctly.
 	rootfs_insert_in_dir(fs, toDirectory, vnode);
+
+	entry_cache_add(fs->volume->id, toDirectory->id, toName, vnode->id);
 
 	notify_entry_moved(fs->id, fromDirectory->id, fromName, toDirectory->id,
 		toName, vnode->id);
@@ -1092,8 +1104,10 @@ rootfs_create_special_node(fs_volume* _volume, fs_vnode* _dir, const char* name,
 		return status;
 	}
 
-	if (name != NULL)
+	if (name != NULL) {
+		entry_cache_add(fs->volume->id, dir->id, name, vnode->id);
 		notify_entry_created(fs->id, dir->id, name, vnode->id);
+	}
 
 	return B_OK;
 }
@@ -1223,4 +1237,3 @@ file_system_module_info gRootFileSystem = {
 
 	&rootfs_mount,
 };
-
