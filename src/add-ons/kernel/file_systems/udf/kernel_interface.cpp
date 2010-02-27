@@ -131,7 +131,8 @@ udf_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 			if (_node)
 				_node->private_node = icb;
 				_node->ops = &gUDFVnodeOps;
-				_flags = 0;
+				*_type = icb->Mode();
+				*_flags = 0;
 		} else {
 			TRACE_ERROR(("udf_get_vnode: InitCheck failed\n"));
 			delete icb;
@@ -366,8 +367,8 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 	uint32 nameLength = bufferSize - sizeof(struct dirent) + 1;
 	ino_t id;
 	status_t status = iterator->GetNextEntry(dirent->d_name, &nameLength, &id);
-	TRACE(("udf_read_dir: dirent->d_name = %s, length = %ld\n", dirent->d_name, nameLength));
 	if (!status) {
+		TRACE(("udf_read_dir: dirent->d_name = %s, length = %ld\n", dirent->d_name, nameLength));
 		*_num = 1;
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;

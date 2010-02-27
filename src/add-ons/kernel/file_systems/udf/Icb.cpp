@@ -19,7 +19,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 	if (!id || !name || !length)
 		return B_BAD_VALUE;
 
-	TRACE(("DirectoryIterator::GetNextEntry: name = %s, length = %ld, "
+	TRACE(("DirectoryIterator::GetNextEntry: name = %p, length = %ld, "
 		"id = %p, position = %Ld, parent length = %Ld\n", name, *length, id,
 		fPosition, Parent()->Length()));
 
@@ -31,8 +31,10 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 		*id = Parent()->Id();
 		fAtBeginning = false;
 	} else {
-		if (uint64(fPosition) >= Parent()->Length()) 
+		if (uint64(fPosition) >= Parent()->Length()) {
+			TRACE(("DirectoryIterator::GetNextEntry: end of dir\n"));
 			return B_ENTRY_NOT_FOUND;
+		}
 
 		uint8 data[kMaxFileIdSize];
 		file_id_descriptor *entry = (file_id_descriptor *)data;
@@ -82,7 +84,7 @@ DirectoryIterator::Rewind()
 }
 
 
-//	#pragma - Private methods
+//	#pragma mark - Private methods
 
 
 DirectoryIterator::DirectoryIterator(Icb *parent)
@@ -92,6 +94,7 @@ DirectoryIterator::DirectoryIterator(Icb *parent)
 	fPosition(0)
 {
 }
+
 
 Icb::Icb(Volume *volume, long_address address)
 	:
@@ -241,10 +244,13 @@ Icb::Find(const char *filename, ino_t *id)
 
 	bool foundIt = false;
 	while (i->GetNextEntry(name, &length, &entryId) == B_OK) {
-    	if (strcmp(filename, name) == 0) {
-    		foundIt = true;
-    		break;
-    	}
+		if (strcmp(filename, name) == 0) {
+			foundIt = true;
+			break;
+		}
+
+		// reset overwritten length
+		length = B_FILE_NAME_LENGTH;
 	}
 
 	if (foundIt)
