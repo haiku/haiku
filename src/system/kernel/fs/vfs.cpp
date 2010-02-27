@@ -3067,8 +3067,9 @@ debug_resolve_vnode_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 		}
 
 		if (vnode == sRoot) {
-			_truncated = !debug_prepend_vnode_name_to_path(buffer, bufferSize,
-				"/");
+			_truncated = bufferSize == 0;
+			if (!_truncated)
+				buffer[--bufferSize] = '/';
 			return buffer + bufferSize;
 		}
 
