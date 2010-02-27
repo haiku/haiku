@@ -273,15 +273,16 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 	DIRECTORIES_TO_INSTALL on $(directory) += $(targetDir) ;
 }
 
-rule ExtractArchiveToContainer container : directoryTokens : archiveFile
+rule ExtractArchiveToContainer container : directoryTokens : archiveFile : extractedSubDir
 {
-	# ExtractArchiveToContainer <container> : <directory> : <archiveFile> ] ;
+	# ExtractArchiveToContainer <container> : <directory> : <archiveFile> : <extractedSubDir> ;
 	#
 
 	local directory = [ AddDirectoryToContainer $(container)
 		: $(directoryTokens) ] ;
 
 	ARCHIVE_FILES_TO_INSTALL on $(directory) += $(archiveFile) ;
+	ARCHIVE_SUBDIR_TO_INSTALL_FROM on $(archiveFile) = $(extractedSubDir) ;
 }
 
 rule AddDriversToContainer container : relativeDirectoryTokens : targets
@@ -590,13 +591,17 @@ rule CreateContainerExtractFilesScript container : script
 			NotFile $(dummyTarget) ;
 			TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
 
+			local extractedSubDir = [ on $(archiveFile)
+				return $(ARCHIVE_SUBDIR_TO_INSTALL_FROM) ] ;
+			NotFile $(extractedSubDir) ;
+
 			Depends $(dummyTarget) : $(initScript) $(archiveFile)
 				$(serializationDependency) ;
 			Depends $(script) : $(dummyTarget) ;
 			serializationDependency = $(dummyTarget) ;
 
-			AddExtractFileToContainerExtractFilesScript $(dummyTarget) 
-				: $(initScript) $(archiveFile) ;
+			AddExtractFileToContainerExtractFilesScript $(dummyTarget)
+				: $(initScript) $(archiveFile) $(extractedSubDir) ;
 		}
 	}
 }
@@ -604,7 +609,7 @@ rule CreateContainerExtractFilesScript container : script
 
 actions AddExtractFileToContainerExtractFilesScript
 {
-	echo extractFile "\"$(2[2])\"" "\"$(TARGET_DIR)\"" >> $(2[1])
+	echo extractFile "\"$(2[2])\"" "\"$(TARGET_DIR)\"" "\"$(2[3])\"" >> $(2[1])
 }
 
 
@@ -691,15 +696,28 @@ rule AddHeaderDirectoryToHaikuImage dirTokens : dirName : alwaysUpdate
 		: $(dirName) : -x .svn : $(alwaysUpdate) ;
 }
 
-rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate
+rule AddWifiFirmwareToHaikuImage driver : package : archive
 {
-	# ExtractArchiveToHaikuImage <dirTokens> : <archiveFile> : <alwaysUpdate> ;
+	#AddWifiFirmwareToHaikuImage <driver> : <package> : <archive>
+
+	# complete location to wifi firmware archive
+	local firmwareArchive = [ FDirName
+		$(HAIKU_TOP) data system data firmware $(driver) $(archive) ] ;
+
+	local dirTokens = system data firmware $(driver) ;
+
+	ExtractArchiveToHaikuImage $(dirTokens) : $(firmwareArchive) : : $(package) ;
+}
+
+rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate : extractedSubDir
+{
+	# ExtractArchiveToHaikuImage <dirTokens> : <archiveFile> : <alwaysUpdate>  : <extractedSubDir> ;
 
 	# If the image shall only be updated, we extract only, if explicitely
 	# requested.
 	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
 		ExtractArchiveToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
-			: $(archiveFile) ;
+			: $(archiveFile) : $(extractedSubDir) ;
 	}
 }
 

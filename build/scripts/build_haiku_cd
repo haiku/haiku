@@ -40,6 +40,7 @@ extractFile()
 	# extractFile <archive> <directory>
 	archiveFile=$1
 	targetExtractDir=$2
+	extractedSubDir=$3
 
 	echo "Extracting $archiveFile ..."
 
@@ -66,7 +67,7 @@ extractFile()
 		rm $extractDir/.OptionalPackageDescription
 	fi
 
-	$cp -r "$extractDir/." "${tPrefix}$targetExtractDir"
+	$cp -r "$extractDir/$extractedSubDir/." "${tPrefix}$targetExtractDir"
 
 	$rmAttrs -rf "$extractDir"
 }
