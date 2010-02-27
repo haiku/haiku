@@ -45,8 +45,11 @@ void
 BootManager::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "Haiku Boot Manager\n\n"
-		"\twritten by Michael Pfeiffer\n"
-		"\tCopyright 2008, Haiku Inc.\n", "OK");
+		"written by\n"
+		"\tDavid Dengg\n"
+		"\tMichael Pfeiffer\n"
+		"\n"
+		"Copyright 2008-10, Haiku Inc.\n", "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 
