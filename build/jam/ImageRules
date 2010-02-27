@@ -273,15 +273,15 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 	DIRECTORIES_TO_INSTALL on $(directory) += $(targetDir) ;
 }
 
-rule UnzipArchiveToContainer container : directoryTokens : zipFile
+rule ExtractArchiveToContainer container : directoryTokens : archiveFile
 {
-	# UnzipArchiveToContainer <container> : <directory> : <zipFile> ] ;
+	# ExtractArchiveToContainer <container> : <directory> : <archiveFile> ] ;
 	#
 
 	local directory = [ AddDirectoryToContainer $(container)
 		: $(directoryTokens) ] ;
 
-	ZIP_FILES_TO_INSTALL on $(directory) += $(zipFile) ;
+	ARCHIVE_FILES_TO_INSTALL on $(directory) += $(archiveFile) ;
 }
 
 rule AddDriversToContainer container : relativeDirectoryTokens : targets
@@ -560,7 +560,7 @@ actions AddDirectoryToContainerCopyFilesScript
 }
 
 
-rule CreateContainerUnzipFilesScript container : script
+rule CreateContainerExtractFilesScript container : script
 {
 	MakeLocate $(script) : $(HAIKU_OUTPUT_DIR) ;
 	Always $(script) ;
@@ -581,29 +581,30 @@ rule CreateContainerUnzipFilesScript container : script
 
 	local dir ;
 	for dir in [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] {
-		local zipFiles = [ on $(dir) return $(ZIP_FILES_TO_INSTALL) ] ;
-		local zipFile ;
-		for zipFile in $(zipFiles) {
+		local archiveFiles = [ on $(dir) return $(ARCHIVE_FILES_TO_INSTALL) ] ;
+		local archiveFile ;
+		for archiveFile in $(archiveFiles) {
 			# use a unique dummy target for this file, on which we
 			# can define the TARGET_DIR variable
-			local dummyTarget = $(script)-dummy-$(dir:G=)-$(zipFile) ;
+			local dummyTarget = $(script)-dummy-$(dir:G=)-$(archiveFile) ;
 			NotFile $(dummyTarget) ;
 			TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
 
-			Depends $(dummyTarget) : $(initScript) $(zipFile)
+			Depends $(dummyTarget) : $(initScript) $(archiveFile)
 				$(serializationDependency) ;
 			Depends $(script) : $(dummyTarget) ;
 			serializationDependency = $(dummyTarget) ;
 
-			AddUnzipFileToContainerUnzipFilesScript $(dummyTarget)
-				: $(initScript) $(zipFile) ;
+			AddExtractFileToContainerExtractFilesScript $(dummyTarget) 
+				: $(initScript) $(archiveFile) ;
 		}
 	}
 }
 
-actions AddUnzipFileToContainerUnzipFilesScript
+
+actions AddExtractFileToContainerExtractFilesScript
 {
-	echo unzipFile "\"$(2[2])\"" "\"$(TARGET_DIR)\"" >> $(2[1])
+	echo extractFile "\"$(2[2])\"" "\"$(TARGET_DIR)\"" >> $(2[1])
 }
 
 
@@ -690,15 +691,15 @@ rule AddHeaderDirectoryToHaikuImage dirTokens : dirName : alwaysUpdate
 		: $(dirName) : -x .svn : $(alwaysUpdate) ;
 }
 
-rule UnzipArchiveToHaikuImage dirTokens : zipFile : alwaysUpdate
+rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate
 {
-	# UnzipArchiveToHaikuImage <dirTokens> : <zipFile> : <alwaysUpdate> ;
+	# ExtractArchiveToHaikuImage <dirTokens> : <archiveFile> : <alwaysUpdate> ;
 
-	# If the image shall only be updated, we unzip only, if explicitely
+	# If the image shall only be updated, we extract only, if explicitely
 	# requested.
 	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
-		UnzipArchiveToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
-			: $(zipFile) ;
+		ExtractArchiveToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
+			: $(archiveFile) ;
 	}
 }
 
@@ -771,17 +772,17 @@ rule InstallSourceArchive file : url
 
 rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
 {
-	# download zip file
-	local zipFile = [ DownloadOptionalPackage $(package) : $(url) ] ;
+	# download archive file
+	local archiveFile = [ DownloadFile $(package) : $(url) ] ;
 
 	if ( $(isCDPackage) = true || $(isCDPackage) = 1 ) && $(HAIKU_CD_NAME) {
 		# TODO: If HAIKU_CD_NAME is set, that doesn't mean we're building a CD
 		# image!
 		# copy onto image
-		AddFilesToHaikuImage _packages_ : $(zipFile) ;
+		AddFilesToHaikuImage _packages_ : $(archiveFile) ;
 	} else {
-		# unzip onto image
-		UnzipArchiveToHaikuImage $(dirTokens) : $(zipFile) ;
+		# extract onto image
+		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile) ;
 	}
 }
 
@@ -866,9 +867,9 @@ rule CreateHaikuImageCopyFilesScript script
 	CreateContainerCopyFilesScript $(HAIKU_IMAGE_CONTAINER_NAME) : $(script) ;
 }
 
-rule CreateHaikuImageUnzipFilesScript script
+rule CreateHaikuImageExtractFilesScript script
 {
-	CreateContainerUnzipFilesScript $(HAIKU_IMAGE_CONTAINER_NAME) : $(script) ;
+	CreateContainerExtractFilesScript $(HAIKU_IMAGE_CONTAINER_NAME) : $(script) ;
 }
 
 rule BuildHaikuImage haikuImage : scripts : isImage : isVMwareImage

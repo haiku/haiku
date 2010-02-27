@@ -399,7 +399,3 @@ rule DownloadFile file : url
 	return $(file) ;
 }
 
-rule DownloadOptionalPackage package : url
-{
-	return [ DownloadFile $(package).zip : $(url) ] ;
-}

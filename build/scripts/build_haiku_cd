@@ -35,29 +35,40 @@ mkdir=mkdir
 rm=rm
 
 
-unzipFile()
+extractFile()
 {
-	# unzipFile <archive> <directory>
-	zipFile=$1
-	targetUnzipDir=$2
+	# extractFile <archive> <directory>
+	archiveFile=$1
+	targetExtractDir=$2
 
-	echo "Unzipping $zipFile ..."
+	echo "Extracting $archiveFile ..."
 
-	unzipDir=$tmpDir/unzip
-	$rmAttrs -rf "$unzipDir"
-	mkdir -p "$unzipDir"
+	extractDir=$tmpDir/extract
+	$rmAttrs -rf "$extractDir"
+	mkdir -p "$extractDir"
+	
+	case "$archiveFile" in
+		*.zip)
+			$unzip -q -d "$extractDir" "$archiveFile"
+			;;
+		*.tgz|*.tar.gz)
+			tar -C "$extractDir" -xf "$archiveFile"
+			;;
+		*)
+			echo "Unhandled archive extension in build_haiku_image extractFile()"
+			exit 1
+			;;
+	esac
 
-	$unzip -q -d "$unzipDir" "$zipFile"
-
-	if [ -f $unzipDir/.OptionalPackageDescription ]; then
-		cat $unzipDir/.OptionalPackageDescription >> $copyrightsFile
+	if [ -f $extractDir/.OptionalPackageDescription ]; then
+		cat $extractDir/.OptionalPackageDescription >> $copyrightsFile
 		echo >> $copyrightsFile
-		rm $unzipDir/.OptionalPackageDescription
+		rm $extractDir/.OptionalPackageDescription
 	fi
 
-	$cp -r "$unzipDir/." "${tPrefix}$targetUnzipDir"
+	$cp -r "$extractDir/." "${tPrefix}$targetExtractDir"
 
-	$rmAttrs -rf "$unzipDir"
+	$rmAttrs -rf "$extractDir"
 }
 
 

@@ -657,7 +657,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 		: "haiku-alternative-gcc-archive" ;
 
 	# install the alternative libs in the right directory
-	UnzipArchiveToHaikuImage : $(otherAlternativeSystemLibsZip) ;
+	ExtractArchiveToHaikuImage : $(otherAlternativeSystemLibsZip) ;
 }
 
 
@@ -749,13 +749,13 @@ if $(optionalPackageDescriptions) {
 # create the other scripts
 HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;
 HAIKU_IMAGE_COPY_FILES_SCRIPT = <HaikuImage>haiku.image-copy-files ;
-HAIKU_IMAGE_UNZIP_FILES_SCRIPT = <HaikuImage>haiku.image-unzip-files ;
+HAIKU_IMAGE_EXTRACT_FILES_SCRIPT = <HaikuImage>haiku.image-extract-files ;
 MakeLocate $(HAIKU_IMAGE_MAKE_DIRS_SCRIPT) $(HAIKU_IMAGE_COPY_FILES_SCRIPT)
-	$(HAIKU_IMAGE_UNZIP_FILES_SCRIPT) : $(HAIKU_OUTPUT_DIR) ;
+	$(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT) : $(HAIKU_OUTPUT_DIR) ;
 
 CreateHaikuImageMakeDirectoriesScript $(HAIKU_IMAGE_MAKE_DIRS_SCRIPT) ;
 CreateHaikuImageCopyFilesScript $(HAIKU_IMAGE_COPY_FILES_SCRIPT) ;
-CreateHaikuImageUnzipFilesScript $(HAIKU_IMAGE_UNZIP_FILES_SCRIPT) ;
+CreateHaikuImageExtractFilesScript $(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT) ;
 
 # Convenience wrapper rule around BuildHaikuImage.
 rule _BuildHaikuImage image : isImage : isVMwareImage
@@ -771,7 +771,7 @@ rule _BuildHaikuImage image : isImage : isVMwareImage
 		$(HAIKU_IMAGE_EARLY_USER_SCRIPTS)
 		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
 		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
-		$(HAIKU_IMAGE_UNZIP_FILES_SCRIPT)
+		$(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT)
 		$(HAIKU_IMAGE_LATE_USER_SCRIPTS)
 		: $(isImage)
 		: $(isVMwareImage)
@@ -782,7 +782,7 @@ rule _BuildHaikuImage image : isImage : isVMwareImage
 		$(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT)
 		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
 		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
-		$(HAIKU_IMAGE_UNZIP_FILES_SCRIPT)
+		$(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT)
 	;
 }
 

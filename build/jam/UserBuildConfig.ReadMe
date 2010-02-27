@@ -122,8 +122,8 @@ CopyDirectoryToHaikuImage home Desktop
 	: $(HAIKU_TOP)/../buildtools/jam
 	: "jam-src" : -x .svn -X \\*/jam/./bin.\\* ;
 
-# Unzips the given zip archive onto the image under /boot/develop/tools.
-UnzipArchiveToHaikuImage develop tools
+# Extracts the given archive onto the image under /boot/develop/tools.
+ExtractArchiveToHaikuImage develop tools
 	: /home/bonefish/develop/haiku/misc/gcc-2.95.3-beos-070218/gcc-2.95.3_binutils-2.17_rel-070218.zip ;
 
 # Add the optional package WonderBrush to the image. The package is downloaded

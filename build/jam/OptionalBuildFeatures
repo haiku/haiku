@@ -12,23 +12,23 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 }
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
-HAIKU_OPENSSL_PACKAGE = openssl-0.9.8l-x86-gcc2-2009-11-08 ;
-HAIKU_OPENSSL_URL = $(baseURL)/$(HAIKU_OPENSSL_PACKAGE).zip ;
+HAIKU_OPENSSL_PACKAGE = openssl-0.9.8l-x86-gcc2-2009-11-08.zip ;
+HAIKU_OPENSSL_URL = $(baseURL)/$(HAIKU_OPENSSL_PACKAGE) ;
 
 if $(HAIKU_BUILD_FEATURE_SSL) {
 	if $(TARGET_ARCH) != x86 {
 		Echo "SSL build feature not available for $(TARGET_ARCH)" ;
 	} else {
 		# Download the zip archive.
-		local zipFile = [ DownloadOptionalPackage $(HAIKU_OPENSSL_PACKAGE)
+		local zipFile = [ DownloadFile $(HAIKU_OPENSSL_PACKAGE)
 			: $(HAIKU_OPENSSL_URL) ] ;
 
 		# zip file and output directory
 		HAIKU_OPENSSL_ZIP_FILE = $(zipFile) ;
 		HAIKU_OPENSSL_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-			$(HAIKU_OPENSSL_PACKAGE) ] ;
+			$(HAIKU_OPENSSL_PACKAGE:B) ] ;
 
-		# unzip headers and libraries
+		# extract headers and libraries
 		HAIKU_OPENSSL_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_OPENSSL_DIR)
 			: common/include/ : $(zipFile)
 		] ;
