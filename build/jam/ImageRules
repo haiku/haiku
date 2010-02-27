@@ -273,10 +273,11 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 	DIRECTORIES_TO_INSTALL on $(directory) += $(targetDir) ;
 }
 
-rule ExtractArchiveToContainer container : directoryTokens : archiveFile : extractedSubDir
+rule ExtractArchiveToContainer container : directoryTokens : archiveFile
+	: extractedSubDir
 {
-	# ExtractArchiveToContainer <container> : <directory> : <archiveFile> : <extractedSubDir> ;
-	#
+	# ExtractArchiveToContainer <container> : <directory> : <archiveFile>
+	#	: <extractedSubDir> ;
 
 	local directory = [ AddDirectoryToContainer $(container)
 		: $(directoryTokens) ] ;
@@ -378,7 +379,8 @@ rule CreateContainerMakeDirectoriesScript container : script
 
 	# collect the directories to create
 	local dirsToCreate ;
-	local directories = [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] ;
+	local directories
+		= [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] ;
 	local dir ;
 	for dir in $(directories) {
 		if ! [ on $(dir) return $(DONT_CREATE) ] {
@@ -706,12 +708,15 @@ rule AddWifiFirmwareToHaikuImage driver : package : archive
 
 	local dirTokens = system data firmware $(driver) ;
 
-	ExtractArchiveToHaikuImage $(dirTokens) : $(firmwareArchive) : : $(package) ;
+	ExtractArchiveToHaikuImage $(dirTokens) : $(firmwareArchive) :
+		: $(package) ;
 }
 
-rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate : extractedSubDir
+rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate
+	: extractedSubDir
 {
-	# ExtractArchiveToHaikuImage <dirTokens> : <archiveFile> : <alwaysUpdate>  : <extractedSubDir> ;
+	# ExtractArchiveToHaikuImage <dirTokens> : <archiveFile> : <alwaysUpdate>
+	#	: <extractedSubDir> ;
 
 	# If the image shall only be updated, we extract only, if explicitely
 	# requested.
@@ -887,7 +892,8 @@ rule CreateHaikuImageCopyFilesScript script
 
 rule CreateHaikuImageExtractFilesScript script
 {
-	CreateContainerExtractFilesScript $(HAIKU_IMAGE_CONTAINER_NAME) : $(script) ;
+	CreateContainerExtractFilesScript $(HAIKU_IMAGE_CONTAINER_NAME)
+		: $(script) ;
 }
 
 rule BuildHaikuImage haikuImage : scripts : isImage : isVMwareImage
@@ -1201,7 +1207,8 @@ rule AddFilesToFloppyBootArchive directory : targets : destName
 
 rule AddSymlinkToFloppyBootArchive directoryTokens : linkTarget : linkName
 {
-	# AddSymlinkToFloppyBootArchive <directory> : <link target> [ : <link name> ] ;
+	# AddSymlinkToFloppyBootArchive <directory> : <link target>
+	#	[ : <link name> ] ;
 
 	AddSymlinkToContainer $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
 		: $(directoryTokens) : $(linkTarget) : $(linkName) ;
@@ -1281,11 +1288,13 @@ rule BuildFloppyBootImage image : haikuLoader : archive
 	BuildFloppyBootImage1 $(image) : $(haikuLoader) $(archive) ;
 	if $(HAIKU_BOOT_PLATFORM) = atari_m68k {
 		Depends $(image) : <build>fixup_tos_boot_checksum ;
-		BuildFloppyBootImageFixupM68K $(image) : <build>fixup_tos_boot_checksum ;
+		BuildFloppyBootImageFixupM68K $(image)
+			: <build>fixup_tos_boot_checksum ;
 	}
 	if $(HAIKU_BOOT_PLATFORM) = amiga_m68k {
 		Depends $(image) : <build>fixup_amiga_boot_checksum ;
-		BuildFloppyBootImageFixupM68K $(image) : <build>fixup_amiga_boot_checksum ;
+		BuildFloppyBootImageFixupM68K $(image)
+			: <build>fixup_amiga_boot_checksum ;
 	}
 }
 
@@ -1326,7 +1335,8 @@ actions BuildCDBootImage1
 
 #pragma mark - CD Boot PPC Image rules
 
-rule BuildCDBootPPCImage image : hfsmaps : elfloader : coffloader : chrpscript : extrafiles
+rule BuildCDBootPPCImage image : hfsmaps : elfloader : coffloader : chrpscript
+	: extrafiles
 {
 	Depends $(image) : $(elfloader) ;
 	Depends $(image) : $(coffloader) ;
@@ -1335,7 +1345,8 @@ rule BuildCDBootPPCImage image : hfsmaps : elfloader : coffloader : chrpscript :
 	Depends $(image) : $(hfsmaps) ;
 	MAPS on $(image) = $(hfsmaps) ;
 
-	BuildCDBootPPCImage1 $(image) : $(elfloader) $(coffloader) $(chrpscript) $(extrafiles) ;
+	BuildCDBootPPCImage1 $(image) : $(elfloader) $(coffloader) $(chrpscript)
+		$(extrafiles) ;
 }
 
 actions BuildCDBootPPCImage1 bind MAPS
@@ -1347,13 +1358,20 @@ actions BuildCDBootPPCImage1 bind MAPS
 	cp $(>[1]) $(HAIKU_OUTPUT_DIR)/cd/ofwboot.elf
 	cp $(>[2]) $(HAIKU_OUTPUT_DIR)/cd/ofwboot.xcf
 	#mkisofs -r -U -chrp-boot -V bootimg -o $(<) $(>[1]) $(>[2-])
-	#mkisofs -hfs -r -U -chrp-boot -part -map $(MAPS) -no-desktop -hfs-volid bootimg -V bootimg -prep-boot $(>[1]:D=) -o $(<) $(>[1]) $(>[2-])
-	#mkisofs -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg -V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/ppc -r -o $(<) $(>[1]) $(>[2-]) $(HAIKU_OUTPUT_DIR)/cd
-	#mkisofs -r -U -chrp-boot -V bootimg -prep-boot $(>[1]:D=) -o $(<) $(>[1]) $(>[2-])
+	#mkisofs -hfs -r -U -chrp-boot -part -map $(MAPS) -no-desktop \
+	#	-hfs-volid bootimg -V bootimg -prep-boot $(>[1]:D=) -o $(<) $(>[1])
+	#	- $(>[2-])
+	#mkisofs -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg \
+	#	-V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/ppc -r -o $(<) $(>[1]) \
+	#	$(>[2-]) $(HAIKU_OUTPUT_DIR)/cd
+	#mkisofs -r -U -chrp-boot -V bootimg -prep-boot $(>[1]:D=) -o $(<) $(>[1]) \
+	#	$(>[2-])
 	#mkisofs -r -U -V bootimg -prep-boot $(>[1]:D=) -o $(<) $(>[1]) $(>[2-])
 	# $(HAIKU_OUTPUT_DIR)/cd
 	# -hfs -hfs-bless .
-	mkisofs -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg -V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/ppc -prep-boot ppc/$(>[2]:D=) -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
+	mkisofs -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg \
+		-V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/ppc -prep-boot \
+		ppc/$(>[2]:D=) -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
 	#$(RM) -R $(HAIKU_OUTPUT_DIR)/cd
 }
 
