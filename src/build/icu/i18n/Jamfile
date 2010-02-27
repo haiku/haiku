@@ -16,7 +16,7 @@ SubDirC++Flags
 
 MakeLocate <build>libicu-i18n.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
 
-BuildPlatformSharedLibrary <build>libicu-i18n.so :	
+BuildPlatformSharedLibrary <build>libicu-i18n.so :
 	anytrans.cpp
 	astro.cpp
 	basictz.cpp
@@ -156,7 +156,7 @@ BuildPlatformSharedLibrary <build>libicu-i18n.so :
 	zonemeta.cpp
 	zstrfmt.cpp
 	:
-	<build>libicu-common.so 
+	<build>libicu-common.so
 	$(HOST_LIBSUPC++)
-	$(HOST_LIBBE)
+	$(HOST_LIBROOT)
 	;
