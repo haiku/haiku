@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
+//  This software is part of the Haiku distribution and is covered
 //  by the MIT license.
 //
 //  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
@@ -12,10 +12,12 @@
 #include "Utils.h"
 #include "Volume.h"
 
+#include <file_cache.h>
+
 
 status_t
 DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
-{	
+{
 	if (!id || !name || !length)
 		return B_BAD_VALUE;
 
@@ -103,7 +105,9 @@ Icb::Icb(Volume *volume, long_address address)
 	fInitStatus(B_NO_INIT),
 	fId(to_vnode_id(address)),
 	fFileEntry(&fData),
-	fExtendedEntry(&fData)
+	fExtendedEntry(&fData),
+	fFileCache(NULL),
+	fFileMap(NULL)
 {
 	TRACE(("Icb::Icb: volume = %p, address(block = %ld, partition = %d, "
 		"length = %ld)\n", volume, address.block(), address.partition(),
@@ -130,8 +134,22 @@ Icb::Icb(Volume *volume, long_address address)
 		status = header->tag().init_check(address.block());
 	}
 
+	if (IsFile()) {
+		fFileCache = file_cache_create(fVolume->ID(), fId, Length());
+		fFileMap = file_map_create(fVolume->ID(), fId, Length());
+	}
+
 	fInitStatus = status;
 	TRACE(("Icb::Icb: status = 0x%lx, `%s'\n", status, strerror(status)));
+}
+
+
+Icb::~Icb()
+{
+	if (fFileCache != NULL) {
+		file_cache_delete(fFileCache);
+		file_map_delete(fFileMap);
+	}
 }
 
 
@@ -187,6 +205,9 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 		return B_OK;
 	}
 
+	if (fFileCache != NULL)
+		return file_cache_read(fFileCache, NULL, pos, buffer, length);
+
 	switch (_IcbTag().descriptor_flags()) {
 		case ICB_DESCRIPTOR_TYPE_SHORT: {
 			TRACE(("Icb::Read: descriptor type -> short\n"));
@@ -194,7 +215,7 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 			RETURN(_Read(list, pos, buffer, length, block));
 			break;
 		}
-	
+
 		case ICB_DESCRIPTOR_TYPE_LONG: {
 			TRACE(("Icb::Read: descriptor type -> long\n"));
 			AllocationDescriptorList<LongDescriptorAccessor> list(this);
@@ -220,8 +241,201 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 			TRACE(("Icb::Read: invalid icb descriptor flags! (flags = %d)\n",
 				_IcbTag().descriptor_flags()));
 			RETURN(B_BAD_VALUE);
-			break;		
+			break;
 	}
+}
+
+
+/*! \brief Does the dirty work of reading using the given DescriptorList object
+	to access the allocation descriptors properly.
+*/
+template <class DescriptorList>
+status_t
+Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint32 *block)
+{
+	TRACE(("Icb::_Read(): list = %p, pos = %Ld, buffer = %p, length = %ld\n",
+		&list, pos, _buffer, (length ? *length : 0)));
+
+	uint64 bytesLeftInFile = uint64(pos) > Length() ? 0 : Length() - pos;
+	size_t bytesLeft = (*length >= bytesLeftInFile) ? bytesLeftInFile : *length;
+	size_t bytesRead = 0;
+
+	Volume *volume = GetVolume();
+	status_t status = B_OK;
+	uint8 *buffer = (uint8 *)_buffer;
+	bool isFirstBlock = true;
+
+	while (bytesLeft > 0) {
+
+		TRACE(("Icb::_Read(): pos: %Ld, bytesLeft: %ld\n", pos, bytesLeft));
+		long_address extent;
+		bool isEmpty = false;
+		status = list.FindExtent(pos, &extent, &isEmpty);
+		if (status != B_OK) {
+			TRACE_ERROR(("Icb::_Read: error finding extent for offset %Ld. "
+				"status = 0x%lx `%s'\n", pos, status, strerror(status)));
+			break;
+		}
+
+		TRACE(("Icb::_Read(): found extent for offset %Ld: (block: %ld, "
+			"partition: %d, length: %ld, type: %d)\n", pos, extent.block(),
+			extent.partition(), extent.length(), extent.type()));
+
+		switch (extent.type()) {
+			case EXTENT_TYPE_RECORDED:
+				isEmpty = false;
+				break;
+
+			case EXTENT_TYPE_ALLOCATED:
+			case EXTENT_TYPE_UNALLOCATED:
+				isEmpty = true;
+				break;
+
+			default:
+				TRACE_ERROR(("Icb::_Read(): Invalid extent type found: %d\n",
+					extent.type()));
+				status = B_ERROR;
+				break;
+		}
+
+		if (status != B_OK)
+			break;
+
+		// Note the unmapped first block of the total read in
+		// the block output parameter if provided
+		if (isFirstBlock) {
+			isFirstBlock = false;
+			if (block)
+				*block = extent.block();
+		}
+
+		off_t blockOffset
+			= pos - off_t((pos >> volume->BlockShift()) << volume->BlockShift());
+
+		size_t readLength = volume->BlockSize() - blockOffset;
+		if (bytesLeft < readLength)
+			readLength = bytesLeft;
+		if (extent.length() < readLength)
+			readLength = extent.length();
+
+		TRACE(("Icb::_Read: reading block. offset = %Ld, length: %ld\n",
+			blockOffset, readLength));
+
+		if (isEmpty) {
+			TRACE(("Icb::_Read: reading %ld empty bytes as zeros\n",
+				readLength));
+			memset(buffer, 0, readLength);
+		} else {
+			off_t diskBlock;
+			status = volume->MapBlock(extent, &diskBlock);
+			if (status != B_OK) {
+				TRACE_ERROR(("Icb::_Read: could not map extent\n"));
+				break;
+			}
+
+			TRACE(("Icb::_Read: %ld bytes from disk block %Ld using "
+				"block_cache_get_etc()\n", readLength, diskBlock));
+			uint8 *data = (uint8*)block_cache_get_etc(volume->BlockCache(),
+				diskBlock, 0, readLength);
+			if (data == NULL)
+				break;
+			memcpy(buffer, data + blockOffset, readLength);
+			block_cache_put(volume->BlockCache(), diskBlock);
+		}
+
+		bytesLeft -= readLength;
+		bytesRead += readLength;
+		pos += readLength;
+		buffer += readLength;
+	}
+
+	*length = bytesRead;
+
+	return status;
+}
+
+
+status_t
+Icb::GetFileMap(off_t offset, size_t size, file_io_vec *vecs, size_t *count)
+{
+	switch (_IcbTag().descriptor_flags()) {
+		case ICB_DESCRIPTOR_TYPE_SHORT:
+		{
+			AllocationDescriptorList<ShortDescriptorAccessor> list(this,
+				ShortDescriptorAccessor(0));
+			return _GetFileMap(list, offset, size, vecs, count);
+		}
+
+		case ICB_DESCRIPTOR_TYPE_LONG:
+		{
+			AllocationDescriptorList<LongDescriptorAccessor> list(this);
+			return _GetFileMap(list, offset, size, vecs, count);
+		}
+
+		case ICB_DESCRIPTOR_TYPE_EXTENDED:
+		case ICB_DESCRIPTOR_TYPE_EMBEDDED:
+		default:
+		{
+			// TODO: implement?
+			return B_UNSUPPORTED;
+		}
+	}
+}
+
+
+template<class DescriptorList>
+status_t
+Icb::_GetFileMap(DescriptorList &list, off_t offset, size_t size,
+	struct file_io_vec *vecs, size_t *count)
+{
+	size_t index = 0;
+	size_t max = *count;
+
+	while (true) {
+		long_address extent;
+		bool isEmpty = false;
+		status_t status = list.FindExtent(offset, &extent, &isEmpty);
+		if (status != B_OK)
+			return status;
+
+		switch (extent.type()) {
+			case EXTENT_TYPE_RECORDED:
+				isEmpty = false;
+				break;
+
+			case EXTENT_TYPE_ALLOCATED:
+			case EXTENT_TYPE_UNALLOCATED:
+				isEmpty = true;
+				break;
+
+			default:
+				return B_ERROR;
+		}
+
+		if (isEmpty)
+			vecs[index].offset = -1;
+		else {
+			off_t diskBlock;
+			fVolume->MapBlock(extent, &diskBlock);
+			vecs[index].offset = diskBlock << fVolume->BlockShift();
+		}
+
+		off_t length = extent.length();
+		vecs[index].length = length;
+
+		offset += length;
+		size -= length;
+		index++;
+
+		if (index >= max || size <= vecs[index - 1].length
+			|| offset >= (off_t)Length()) {
+			*count = index;
+			return index >= max ? B_BUFFER_OVERFLOW : B_OK;
+		}
+	}
+
+	// can never get here
+	return B_ERROR;
 }
 
 

@@ -16,6 +16,8 @@
 #include <KernelExport.h>
 #include <util/kernel_cpp.h>
 
+#include <io_requests.h>
+
 #include "Icb.h"
 #include "Recognition.h"
 #include "Utils.h"
@@ -35,6 +37,28 @@
 
 extern fs_volume_ops gUDFVolumeOps;
 extern fs_vnode_ops gUDFVnodeOps;
+
+
+//	#pragma mark - io callbacks
+
+
+static status_t
+iterative_io_get_vecs_hook(void *cookie, io_request *request, off_t offset,
+	size_t size, struct file_io_vec *vecs, size_t *count)
+{
+	Icb *icb = (Icb *)cookie;
+	return file_map_translate(icb->FileMap(), offset, size, vecs, count,
+		icb->GetVolume()->BlockSize());
+}
+
+
+static status_t
+iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
+	bool partialTransfer, size_t bytesTransferred)
+{
+	// nothing to do
+	return B_OK;
+}
 
 
 //	#pragma mark - fs_volume_ops fuctions
@@ -266,7 +290,7 @@ udf_close(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 
 static status_t
 udf_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
-{	
+{
 	TRACE(("udf_free_cookie: _volume = %p, _node = %p\n", _volume, _node));
 	return B_OK;
 }
@@ -274,7 +298,7 @@ udf_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 
 static status_t
 udf_access(fs_volume* _volume, fs_vnode* _node, int accessMode)
-{	
+{
 	TRACE(("udf_access: _volume = %p, _node = %p\n", _volume, _node));
 	return B_OK;
 }
@@ -295,6 +319,34 @@ udf_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 //	}
 
 	RETURN(icb->Read(pos, buffer, length));
+}
+
+
+static status_t
+udf_io(fs_volume *volume, fs_vnode *vnode, void *cookie, io_request *request)
+{
+	if (io_request_is_write(request)) {
+		notify_io_request(request, B_READ_ONLY_DEVICE);
+		return B_READ_ONLY_DEVICE;
+	}
+
+	Icb *icb = (Icb *)vnode->private_node;
+	if (icb->FileCache() == NULL) {
+		notify_io_request(request, B_BAD_VALUE);
+		return B_BAD_VALUE;
+	}
+
+	return do_iterative_fd_io(((Volume *)volume->private_volume)->Device(),
+		request, iterative_io_get_vecs_hook, iterative_io_finished_hook, icb);
+}
+
+
+static status_t
+udf_get_file_map(fs_volume *_volume, fs_vnode *vnode, off_t offset, size_t size,
+	struct file_io_vec *vecs, size_t *count)
+{
+	Icb *icb = (Icb *)vnode->private_node;
+	return icb->GetFileMap(offset, size, vecs, count);
 }
 
 
@@ -568,11 +620,11 @@ fs_vnode_ops gUDFVnodeOps = {
 	NULL,	// write_pages
 
 	/* asynchronous I/O */
-	NULL,	// io()
+	&udf_io,
 	NULL,	// cancel_io()
 
 	/* cache file access */
-	NULL,	// &udf_get_file_map,
+	&udf_get_file_map,
 
 	/* common operations */
 	NULL,	// ioctl

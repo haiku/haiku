@@ -39,7 +39,7 @@ public:
 								Accessor accessor = Accessor());
 
 	status_t				FindExtent(off_t start, long_address *extent,
-								bool *isEmpty); 
+								bool *isEmpty);
 
 private:
 
@@ -172,7 +172,7 @@ AllocationDescriptorList<Accessor>::_MoveToNextDescriptor()
 		return B_ENTRY_NOT_FOUND;
 
 	// Increment our indices and get the next descriptor
-	// from this extent. 
+	// from this extent.
 	fBlockIndex += fAccessor.GetLength(*descriptor);
 	fDescriptorIndex++;
 	fDescriptorNumber++;

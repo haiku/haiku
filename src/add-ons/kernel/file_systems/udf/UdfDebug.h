@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the OpenBeOS license.
 //
 //  This version copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
@@ -31,15 +31,15 @@
 #	include <stdarg.h>
 extern "C" int 	vsprintf(char *s, const char *format, va_list arg);
 #	include <fcntl.h>
-#	define __out dbg_printf		
+#	define __out dbg_printf
 	void dbg_printf(const char *format,...);
 	void initialize_debugger(const char *filename);
 #else
-#	if !_KERNEL_MODE 
-//#		include <stdio.h> 
-#		define __out printf 
-#	else 
-//#		include <null.h> 
+#	if !_KERNEL_MODE
+//#		include <stdio.h>
+#		define __out printf
+#	else
+//#		include <null.h>
 #		define __out dprintf
 #	endif
 #	include <stdio.h>
@@ -64,10 +64,10 @@ class DebugHelper
 public:
 	DebugHelper(const char *className = NULL, uint8 tabCount = 1);
 	~DebugHelper();
-	
+
 	uint8 TabCount() const { return fTabCount; }
 	const char* ClassName() const { return fClassName; }
-	
+
 private:
 	uint8 fTabCount;
 	char *fClassName;
@@ -98,14 +98,14 @@ private:
 	#else
 		#define INITIALIZE_DEBUGGING_OUTPUT_FILE(filename) ;
 	#endif
-	
+
 	#define DEBUG_INIT_SILENT(className)			\
-		DebugHelper _debugHelper(className, 2);			
+		DebugHelper _debugHelper(className, 2);
 
 	#define DEBUG_INIT(className)		\
 		DEBUG_INIT_SILENT(className);	\
 		PRINT(("\n"));
-		
+
 	#define DEBUG_INIT_ETC(className, arguments)							\
 		DEBUG_INIT_SILENT(className)										\
 		{																	\
@@ -119,10 +119,10 @@ private:
 			__out arguments;												\
 			__out("):\n");													\
 		}
-		
+
 	#define DUMP_INIT(className)	\
-		DEBUG_INIT_SILENT(className);	
-				
+		DEBUG_INIT_SILENT(className);
+
 	#define PRINT(x) { 														\
 		{																	\
 			PRINT_INDENT();													\
@@ -164,21 +164,21 @@ private:
 			}													\
 		}														\
 	}
-	
+
 	#define PRINT_DIVIDER()	\
 		PRINT_INDENT(); 	\
 		SIMPLE_PRINT(("------------------------------------------------------------\n"));
-		
+
 	#define DUMP(object)				\
 		{								\
 			(object).dump();			\
-		}		
-	
+		}
+
 	#define PDUMP(objectPointer)		\
 		{								\
 			(objectPointer)->dump();	\
-		}		
-	
+		}
+
 	#define REPORT_ERROR(error) {											\
 		LPRINT(("returning error 0x%lx, `%s'\n", error, strerror(error)));	\
 	}
@@ -205,9 +205,9 @@ private:
 	#define FATAL(x) { 								\
 		PRINT(("fatal error: ")); SIMPLE_PRINT(x);	\
 	}
-	
+
 	#define DBG(x) x ;
-	
+
 #else	// ifdef DEBUG
 	#define INITIALIZE_DEBUGGING_OUTPUT_FILE(filename) ;
 	#define DEBUG_INIT_SILENT(className)	;
@@ -228,7 +228,7 @@ private:
 	#define DBG(x) ;
 #endif	// ifdef DEBUG else
 
-#define TRACE(x) dprintf x
+#define TRACE(x) /*dprintf x*/
 #define TRACE_ERROR(x) dprintf x
 
 // These macros turn on or off extensive and generally unnecessary

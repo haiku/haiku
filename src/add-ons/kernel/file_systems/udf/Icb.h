@@ -79,6 +79,8 @@ friend class 						Icb;
 class Icb {
 public:
 								Icb(Volume *volume, long_address address);
+								~Icb();
+
 	status_t					InitCheck();
 	ino_t						Id() { return fId; }
 
@@ -105,6 +107,12 @@ public:
 	status_t					Read(off_t pos, void *buffer, size_t *length,
 									uint32 *block = NULL);
 
+	void *						FileCache() { return fFileCache; }
+	void *						FileMap() { return fFileMap; }
+
+	status_t					GetFileMap(off_t offset, size_t size,
+									struct file_io_vec *vecs, size_t *count);
+
 	// for directories only
 	status_t					GetDirectoryIterator(DirectoryIterator **iterator);
 	status_t					Find(const char *filename, ino_t *id);
@@ -114,7 +122,7 @@ public:
 private:
 	AbstractFileEntry			*_AbstractEntry() { return (_Tag().id()
 									== TAGID_EXTENDED_FILE_ENTRY)
-									? (AbstractFileEntry *)&fExtendedEntry 
+									? (AbstractFileEntry *)&fExtendedEntry
 									: (AbstractFileEntry *)&fFileEntry; }
 
 	descriptor_tag				&_Tag() { return ((icb_header *)fData.Block())->tag(); }
@@ -122,128 +130,24 @@ private:
 	file_icb_entry				*_FileEntry() { return (file_icb_entry *)fData.Block(); }
 	extended_file_icb_entry		&_ExtendedEntry() { return *(extended_file_icb_entry *)fData.Block(); }
 
-	template <class DescriptorList>
+	template<class DescriptorList>
+	status_t					_GetFileMap(DescriptorList &list, off_t offset,
+									size_t size, struct file_io_vec *vecs,
+									size_t *count);
+	template<class DescriptorList>
 	status_t					_Read(DescriptorList &list, off_t pos,
 									void *buffer, size_t *length, uint32 *block);
 
-private:
 	Volume						*fVolume;
 	CachedBlock					fData;
 	status_t					fInitStatus;
 	ino_t						fId;
 	SinglyLinkedList<DirectoryIterator>		fIteratorList;
 	FileEntry<file_icb_entry> 				fFileEntry;
-	FileEntry<extended_file_icb_entry>		fExtendedEntry;	
+	FileEntry<extended_file_icb_entry>		fExtendedEntry;
+	void *						fFileCache;
+	void *						fFileMap;
 };
-
-
-/*! \brief Does the dirty work of reading using the given DescriptorList object
-	to access the allocation descriptors properly.
-*/
-template <class DescriptorList>
-status_t
-Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint32 *block)
-{
-	TRACE(("Icb::_Read(): list = %p, pos = %Ld, buffer = %p, length = %ld\n",
-		&list, pos, _buffer, (length ? *length : 0)));
-
-	uint64 bytesLeftInFile = uint64(pos) > Length() ? 0 : Length() - pos;
-	size_t bytesLeft = (*length >= bytesLeftInFile) ? bytesLeftInFile : *length;
-	size_t bytesRead = 0;
-
-	Volume *volume = GetVolume();
-	status_t status = B_OK;
-	uint8 *buffer = (uint8 *)_buffer;
-	bool isFirstBlock = true;
-
-	while (bytesLeft > 0) {
-
-		TRACE(("Icb::_Read(): pos: %Ld, bytesLeft: %ld\n", pos, bytesLeft));
-		long_address extent;
-		bool isEmpty = false;
-		status = list.FindExtent(pos, &extent, &isEmpty);
-		if (status != B_OK) {
-			TRACE_ERROR(("Icb::_Read: error finding extent for offset %Ld. "
-				"status = 0x%lx `%s'\n", pos, status, strerror(status)));
-			break;
-		}
-
-		TRACE(("Icb::_Read(): found extent for offset %Ld: (block: %ld, "
-			"partition: %d, length: %ld, type: %d)\n", pos, extent.block(),
-			extent.partition(), extent.length(), extent.type()));
-
-		switch (extent.type()) {
-			case EXTENT_TYPE_RECORDED:
-				isEmpty = false;
-				break;
-
-			case EXTENT_TYPE_ALLOCATED:
-			case EXTENT_TYPE_UNALLOCATED:
-				isEmpty = true;
-				break;
-
-			default:
-				TRACE_ERROR(("Icb::_Read(): Invalid extent type found: %d\n",
-					extent.type()));
-				status = B_ERROR;
-				break;
-		}
-
-		if (status != B_OK)
-			break;
-
-		// Note the unmapped first block of the total read in
-		// the block output parameter if provided
-		if (isFirstBlock) {
-			isFirstBlock = false;
-			if (block)
-				*block = extent.block();
-		}
-
-		off_t blockOffset
-			= pos - off_t((pos >> volume->BlockShift()) << volume->BlockShift());
-
-		size_t readLength = volume->BlockSize() - blockOffset;
-		if (bytesLeft < readLength)
-			readLength = bytesLeft;
-		if (extent.length() < readLength)
-			readLength = extent.length();
-
-		TRACE(("Icb::_Read: reading block. offset = %Ld, length: %ld\n",
-			blockOffset, readLength));
-
-		if (isEmpty) {
-			TRACE(("Icb::_Read: reading %ld empty bytes as zeros\n",
-				readLength));
-			memset(buffer, 0, readLength);
-		} else {
-			off_t diskBlock;
-			status = volume->MapBlock(extent, &diskBlock);
-			if (status != B_OK) {
-				TRACE_ERROR(("Icb::_Read: could not map extent\n"));
-				break;
-			}
-
-			TRACE(("Icb::_Read: %ld bytes from disk block %Ld using "
-				"block_cache_get_etc()\n", readLength, diskBlock));
-			uint8 *data = (uint8*)block_cache_get_etc(volume->BlockCache(),
-				diskBlock, 0, readLength);
-			if (data == NULL)
-				break;
-			memcpy(buffer, data + blockOffset, readLength);
-			block_cache_put(volume->BlockCache(), diskBlock);
-		}
-
-		bytesLeft -= readLength;
-		bytesRead += readLength;
-		pos += readLength;
-		buffer += readLength;
-	}				 
-	
-	*length = bytesRead;
-	
-	return status;
-}
 
 
 template <class Descriptor>
