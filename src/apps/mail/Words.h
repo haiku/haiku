@@ -34,36 +34,40 @@ All rights reserved.
 #ifndef _WORDS_H
 #define _WORDS_H
 
+
+#include <List.h>
 #include <String.h>
 
 #include "WIndex.h"
 
+
 typedef enum {
 	COMPARE,
 	GENERATE
-} metaphlag; 
+} metaphlag;
 
-class Words;
 
-bool metaphone(const char *Word, char *Metaph, metaphlag Flag);
-int word_match(const char *reference, const char *test);
-int32 suffix_word(char *dst, const char *src, char flag);
-void sort_word_list(BList *matches, const char *reference);
+bool metaphone(const char* Word, char* Metaph, metaphlag Flag);
+int word_match(const char* reference, const char* test);
+int32 suffix_word(char* dst, const char* src, char flag);
+void sort_word_list(BList* matches, const char* reference);
+
 
 class Words : public WIndex {
 public:
-	Words(bool useMetaphone = true);
-	Words(BPositionIO *thes, bool useMetaphone = true);
-	Words(const char *dataPath, const char *indexPath, bool useMetaphone);
-	virtual ~Words(void);
-		
-	virtual status_t BuildIndex(void);
-	virtual int32 GetKey(const char *s);
-		
-	int32 FindBestMatches(BList *matches, const char *word);
-	
+							Words(bool useMetaphone = true);
+							Words(BPositionIO* thes, bool useMetaphone = true);
+							Words(const char* dataPath, const char* indexPath,
+								bool useMetaphone);
+	virtual					~Words(void);
+
+	virtual	status_t		BuildIndex(void);
+	virtual	int32			GetKey(const char* s);
+
+			int32			FindBestMatches(BList* matches, const char* word);
+
 protected:
-	bool fUseMetaphone;
+			bool			fUseMetaphone;
 };
 
 #endif // #ifndef _WORDS_H
