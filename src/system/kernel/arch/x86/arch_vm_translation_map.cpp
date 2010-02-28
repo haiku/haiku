@@ -35,9 +35,9 @@
 
 //#define TRACE_VM_TMAP
 #ifdef TRACE_VM_TMAP
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 
@@ -278,7 +278,7 @@ X86VMTranslationMap::~X86VMTranslationMap()
 status_t
 X86VMTranslationMap::Init(bool kernel)
 {
-	TRACE(("X86VMTranslationMap::Init()\n"));
+	TRACE("X86VMTranslationMap::Init()\n");
 
 	fArchData = new(std::nothrow) vm_translation_map_arch_info;
 	if (fArchData == NULL)
@@ -354,12 +354,12 @@ X86VMTranslationMap::InitPostSem()
 bool
 X86VMTranslationMap::Lock()
 {
-	TRACE(("lock_tmap: map %p\n", map));
+	TRACE("%p->X86VMTranslationMap::Lock()\n", this);
 
 	recursive_lock_lock(&fLock);
 	if (recursive_lock_get_recursion(&fLock) == 1) {
 		// we were the first one to grab the lock
-		TRACE(("clearing invalidated page count\n"));
+		TRACE("clearing invalidated page count\n");
 		fArchData->num_invalidate_pages = 0;
 	}
 
@@ -374,7 +374,7 @@ X86VMTranslationMap::Lock()
 void
 X86VMTranslationMap::Unlock()
 {
-	TRACE(("unlock_tmap: map %p\n", map));
+	TRACE("%p->X86VMTranslationMap::Unlock()\n", this);
 
 	if (recursive_lock_get_recursion(&fLock) == 1) {
 		// we're about to release it for the last time
@@ -404,7 +404,7 @@ status_t
 X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes,
 	vm_page_reservation* reservation)
 {
-	TRACE(("map_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
+	TRACE("map_tmap: entry pa 0x%lx va 0x%lx\n", pa, va);
 
 /*
 	dprintf("pgdir at 0x%x\n", pgdir);
@@ -430,7 +430,7 @@ X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes,
 
 		pgtable = page->physical_page_number * B_PAGE_SIZE;
 
-		TRACE(("map_tmap: asked for free page for pgtable. 0x%lx\n", pgtable));
+		TRACE("map_tmap: asked for free page for pgtable. 0x%lx\n", pgtable);
 
 		// put it in the pgdir
 		x86_put_pgtable_in_pgdir(&pd[index], pgtable, attributes
@@ -477,7 +477,7 @@ X86VMTranslationMap::Unmap(addr_t start, addr_t end)
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
 
-	TRACE(("unmap_tmap: asked to free pages 0x%lx to 0x%lx\n", start, end));
+	TRACE("unmap_tmap: asked to free pages 0x%lx to 0x%lx\n", start, end);
 
 restart:
 	if (start >= end)
@@ -505,7 +505,7 @@ restart:
 			continue;
 		}
 
-		TRACE(("unmap_tmap: removing page 0x%lx\n", start));
+		TRACE("unmap_tmap: removing page 0x%lx\n", start);
 
 		page_table_entry oldEntry = clear_page_table_entry_flags(&pt[index],
 			X86_PTE_PRESENT);
@@ -542,7 +542,7 @@ X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 
 	page_directory_entry* pd = fArchData->pgdir_virt;
 
-	TRACE(("X86VMTranslationMap::UnmapPage(%#" B_PRIxADDR ")\n", address));
+	TRACE("X86VMTranslationMap::UnmapPage(%#" B_PRIxADDR ")\n", address);
 
 	RecursiveLocker locker(fLock);
 
@@ -658,8 +658,8 @@ X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 	addr_t start = base;
 	addr_t end = base + size;
 
-	TRACE(("X86VMTranslationMap::UnmapPages(%p, %#" B_PRIxADDR ", %#"
-		B_PRIxADDR ")\n", area, start, end));
+	TRACE("X86VMTranslationMap::UnmapPages(%p, %#" B_PRIxADDR ", %#"
+		B_PRIxADDR ")\n", area, start, end);
 
 	VMAreaMappings queue;
 
@@ -918,7 +918,7 @@ X86VMTranslationMap::Query(addr_t va, addr_t *_physical, uint32 *_flags)
 
 	pinner.Unlock();
 
-	TRACE(("query_tmap: returning pa 0x%lx for va 0x%lx\n", *_physical, va));
+	TRACE("query_tmap: returning pa 0x%lx for va 0x%lx\n", *_physical, va);
 
 	return B_OK;
 }
@@ -976,8 +976,8 @@ X86VMTranslationMap::Protect(addr_t start, addr_t end, uint32 attributes)
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
 
-	TRACE(("protect_tmap: pages 0x%lx to 0x%lx, attributes %lx\n", start, end,
-		attributes));
+	TRACE("protect_tmap: pages 0x%lx to 0x%lx, attributes %lx\n", start, end,
+		attributes);
 
 	// compute protection flags
 	uint32 newProtectionFlags = 0;
@@ -1015,7 +1015,7 @@ restart:
 			continue;
 		}
 
-		TRACE(("protect_tmap: protect page 0x%lx\n", start));
+		TRACE("protect_tmap: protect page 0x%lx\n", start);
 
 		// set the new protection flags -- we want to do that atomically,
 		// without changing the accessed or dirty flag
@@ -1094,8 +1094,8 @@ X86VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 
 	page_directory_entry* pd = fArchData->pgdir_virt;
 
-	TRACE(("X86VMTranslationMap::ClearAccessedAndModified(%#" B_PRIxADDR ")\n",
-		address));
+	TRACE("X86VMTranslationMap::ClearAccessedAndModified(%#" B_PRIxADDR ")\n",
+		address);
 
 	RecursiveLocker locker(fLock);
 
@@ -1220,8 +1220,8 @@ X86VMTranslationMap::Flush()
 
 	if (fArchData->num_invalidate_pages > PAGE_INVALIDATE_CACHE_SIZE) {
 		// invalidate all pages
-		TRACE(("flush_tmap: %d pages to invalidate, invalidate all\n",
-			fArchData->num_invalidate_pages));
+		TRACE("flush_tmap: %d pages to invalidate, invalidate all\n",
+			fArchData->num_invalidate_pages);
 
 		if (IS_KERNEL_MAP(map)) {
 			arch_cpu_global_TLB_invalidate();
@@ -1241,8 +1241,8 @@ X86VMTranslationMap::Flush()
 			}
 		}
 	} else {
-		TRACE(("flush_tmap: %d pages to invalidate, invalidate list\n",
-			fArchData->num_invalidate_pages));
+		TRACE("flush_tmap: %d pages to invalidate, invalidate list\n",
+			fArchData->num_invalidate_pages);
 
 		arch_cpu_invalidate_TLB_list(fArchData->pages_to_invalidate,
 			fArchData->num_invalidate_pages);
@@ -1295,7 +1295,7 @@ status_t
 arch_vm_translation_map_init(kernel_args *args,
 	VMPhysicalPageMapper** _physicalPageMapper)
 {
-	TRACE(("vm_translation_map_init: entry\n"));
+	TRACE("vm_translation_map_init: entry\n");
 
 	// page hole set up in stage2
 	sPageHole = (page_table_entry *)args->arch_args.page_hole;
@@ -1312,6 +1312,33 @@ arch_vm_translation_map_init(kernel_args *args,
 	sKernelVirtualPageDirectory = (page_directory_entry*)
 		args->arch_args.vir_pgdir;
 
+#ifdef TRACE_VM_TMAP
+	TRACE("page hole: %p, page dir: %p\n", sPageHole, sPageHolePageDir);
+	TRACE("page dir: %p (physical: %p)\n", sKernelVirtualPageDirectory,
+		sKernelVirtualPageDirectory);
+
+	TRACE("physical memory ranges:\n");
+	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+		addr_t start = args->physical_memory_range[i].start;
+		addr_t end = start + args->physical_memory_range[i].size;
+		TRACE("  %#10" B_PRIxADDR " - %#10" B_PRIxADDR "\n", start, end);
+	}
+
+	TRACE("allocated physical ranges:\n");
+	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
+		addr_t start = args->physical_allocated_range[i].start;
+		addr_t end = start + args->physical_allocated_range[i].size;
+		TRACE("  %#10" B_PRIxADDR " - %#10" B_PRIxADDR "\n", start, end);
+	}
+
+	TRACE("allocated virtual ranges:\n");
+	for (uint32 i = 0; i < args->num_virtual_allocated_ranges; i++) {
+		addr_t start = args->virtual_allocated_range[i].start;
+		addr_t end = start + args->virtual_allocated_range[i].size;
+		TRACE("  %#10" B_PRIxADDR " - %#10" B_PRIxADDR "\n", start, end);
+	}
+#endif
+
 	B_INITIALIZE_SPINLOCK(&sTMapListLock);
 	new (&sTMapList) ArchTMapList;
 
@@ -1326,7 +1353,7 @@ arch_vm_translation_map_init(kernel_args *args,
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_GLOBAL_PAGES);
 	}
 
-	TRACE(("vm_translation_map_init: done\n"));
+	TRACE("vm_translation_map_init: done\n");
 
 	*_physicalPageMapper = sPhysicalPageMapper;
 	return B_OK;
@@ -1349,7 +1376,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	status_t error;
 	area_id area;
 
-	TRACE(("vm_translation_map_init_post_area: entry\n"));
+	TRACE("vm_translation_map_init_post_area: entry\n");
 
 	// unmap the page hole hack we were using before
 	sKernelVirtualPageDirectory[1023] = 0;
@@ -1366,7 +1393,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	if (error != B_OK)
 		return error;
 
-	TRACE(("vm_translation_map_init_post_area: done\n"));
+	TRACE("vm_translation_map_init_post_area: done\n");
 	return B_OK;
 }
 
@@ -1385,7 +1412,7 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 {
 	int index;
 
-	TRACE(("early_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
+	TRACE("early_tmap: entry pa 0x%lx va 0x%lx\n", pa, va);
 
 	// check to see if a page table exists for this range
 	index = VADDR_TO_PDENT(va);
@@ -1397,7 +1424,7 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 		// pgtable is in pages, convert to physical address
 		pgtable *= B_PAGE_SIZE;
 
-		TRACE(("early_map: asked for free page for pgtable. 0x%lx\n", pgtable));
+		TRACE("early_map: asked for free page for pgtable. 0x%lx\n", pgtable);
 
 		// put it in the pgdir
 		e = &sPageHolePageDir[index];
@@ -1408,7 +1435,8 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 			+ (va / B_PAGE_SIZE / 1024) * B_PAGE_SIZE), 0, B_PAGE_SIZE);
 	}
 
-	ASSERT((sPageHole[va / B_PAGE_SIZE] & X86_PTE_PRESENT) == 0);
+	ASSERT_PRINT((sPageHole[va / B_PAGE_SIZE] & X86_PTE_PRESENT) == 0,
+		"existing pte: %#" B_PRIx32, sPageHole[va / B_PAGE_SIZE]);
 
 	// now, fill in the pentry
 	put_page_table_entry_in_pgtable(sPageHole + va / B_PAGE_SIZE, pa,
