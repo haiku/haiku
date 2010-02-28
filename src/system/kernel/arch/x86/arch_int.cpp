@@ -261,8 +261,6 @@ x86_get_idt(int32 cpu)
 static bool
 pic_is_spurious_interrupt(int32 num)
 {
-	int32 isr;
-
 	if (num != 7)
 		return false;
 
@@ -271,7 +269,7 @@ pic_is_spurious_interrupt(int32 num)
 	// just ignore them
 
 	out8(PIC_CONTROL3 | PIC_CONTROL3_READ_ISR, PIC_MASTER_CONTROL);
-	isr = in8(PIC_MASTER_CONTROL);
+	int32 isr = in8(PIC_MASTER_CONTROL);
 	out8(PIC_CONTROL3 | PIC_CONTROL3_READ_IRR, PIC_MASTER_CONTROL);
 
 	return (isr & 0x80) == 0;
@@ -439,9 +437,8 @@ ioapic_write_32(uint8 registerSelect, uint32 value)
 static inline uint64
 ioapic_read_64(uint8 registerSelect)
 {
-	uint64 result;
 	sIOAPIC->io_register_select = registerSelect + 1;
-	result = sIOAPIC->io_window_register;
+	uint64 result = sIOAPIC->io_window_register;
 	result <<= 32;
 	sIOAPIC->io_register_select = registerSelect;
 	result |= sIOAPIC->io_window_register;
@@ -477,14 +474,13 @@ ioapic_end_of_interrupt(int32 num)
 static void
 ioapic_enable_io_interrupt(int32 num)
 {
-	uint64 entry;
 	int32 pin = sIRQToIOAPICPin[num];
 	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
 	TRACE(("ioapic_enable_io_interrupt: IRQ %ld -> pin %ld\n", num, pin));
 
-	entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
+	uint64 entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
 	entry |= IO_APIC_INTERRUPT_UNMASKED << IO_APIC_INTERRUPT_MASK_SHIFT;
 	ioapic_write_64(IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
@@ -494,14 +490,13 @@ ioapic_enable_io_interrupt(int32 num)
 static void
 ioapic_disable_io_interrupt(int32 num)
 {
-	uint64 entry;
 	int32 pin = sIRQToIOAPICPin[num];
 	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
 	TRACE(("ioapic_disable_io_interrupt: IRQ %ld -> pin %ld\n", num, pin));
 
-	entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
+	uint64 entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~(1 << IO_APIC_INTERRUPT_MASK_SHIFT);
 	entry |= IO_APIC_INTERRUPT_MASKED << IO_APIC_INTERRUPT_MASK_SHIFT;
 	ioapic_write_64(IO_APIC_REDIRECTION_TABLE + pin * 2, entry);
@@ -511,7 +506,6 @@ ioapic_disable_io_interrupt(int32 num)
 static void
 ioapic_configure_io_interrupt(int32 num, uint32 config)
 {
-	uint64 entry;
 	int32 pin = sIRQToIOAPICPin[num];
 	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
@@ -519,7 +513,7 @@ ioapic_configure_io_interrupt(int32 num, uint32 config)
 	TRACE(("ioapic_configure_io_interrupt: IRQ %ld -> pin %ld; config 0x%08lx\n",
 		num, pin, config));
 
-	entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
+	uint64 entry = ioapic_read_64(IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~((1 << IO_APIC_TRIGGER_MODE_SHIFT)
 		| (1 << IO_APIC_PIN_POLARITY_SHIFT)
 		| (IO_APIC_INTERRUPT_VECTOR_MASK << IO_APIC_INTERRUPT_VECTOR_SHIFT));
