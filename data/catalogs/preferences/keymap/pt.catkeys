@@ -1,4 +1,4 @@
-1	Portuguese	x-vnd.Haiku-Keymap	4175672673
+1	portuguese	x-vnd.Haiku-Keymap	4175672673
 Tilde trigger	Keymap window		Til
 Grave trigger	Keymap window		Acento grave
 Select dead keys	Keymap window		Teclas Mortas
@@ -10,7 +10,7 @@ Open…	Keymap window		Abrir...
 System:	Keymap window		Sistema:
 Switch shortcut keys	Keymap window		Teclas de atalho
 User:	Keymap window		Utilizador:
-Keymap	Keymap window		Keymap
+Keymap	Keymap window		Mapa de teclado
 Sample and clipboard:	Keymap window		Exemplo e Área de Transferência:
 Layout	Keymap window		Esquema
 Switch shortcut keys to Windows/Linux mode	Keymap window		Teclas de atalho em modo Windows/Linux

@@ -1,4 +1,4 @@
-1	Portuguese	x-vnd.Haiku-Mouse	104106491
+1	portuguese	x-vnd.Haiku-Mouse	104106491
 Click to activate	SettingsView		Clique para activar
 Mouse type:	SettingsView		Tipo de rato:
 Warp	SettingsView		Teleportar
@@ -12,7 +12,7 @@ Click to focus	SettingsView		Clique para focar
 Mouse speed	SettingsView		Velocidade do rato
 Focus mode:	SettingsView		Modo de foco:
 Instant warp	SettingsView		Teleporte instantâneo
-Dig Deal	MouseApplication		Dig Deal
+Dig Deal	MouseApplication		Grande coisa...
 1-Button	SettingsView		1 botão
 Double-click speed	SettingsView		Velocidade do duplo clique
 Defaults	MouseWindow		Predefenições

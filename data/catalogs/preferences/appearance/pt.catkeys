@@ -1,5 +1,5 @@
-1	Portuguese	x-vnd.Haiku-Appearance	3612090060
-Control highlight	Colors tab		Realçe do controlo
+1	portuguese	x-vnd.Haiku-Appearance	3612090060
+Control highlight	Colors tab		Realce do controlo
 Control border	Colors tab		Limite do controlo
 Antialiasing type:	AntialiasingSettingsView		Tipo de Antiserrilhamento:
 Shadow	Colors tab		Sombreado
@@ -11,7 +11,7 @@ Off	AntialiasingSettingsView		Desligado
 Success	Colors tab		Sucesso
 Inactive window tab text	Colors tab		Texto do separador de janela inactiva
 Failure	Colors tab		Falha
-Hinting menu	AntialiasingSettingsView		Menu Hinting
+Hinting menu	AntialiasingSettingsView		Menu melhoramento de tipos de letra
 Document background	Colors tab		Fundo do documento
 Revert	APRWindow		Reverter
 Window tab	Colors tab		Separador de janela
