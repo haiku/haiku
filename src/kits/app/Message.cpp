@@ -1082,23 +1082,7 @@ BMessage::_Reference()
 	if (result < B_OK)
 		return result;
 
-	uint8 *address = NULL;
-	thread_info threadInfo;
-	get_thread_info(find_thread(NULL), &threadInfo);
-	if (areaInfo.team != threadInfo.team) {
-#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-		// we are accessing a message from a port not owned by us
-		area_id transfered = _kern_transfer_area(fHeader->message_area,
-			(void **)&address, B_ANY_ADDRESS, threadInfo.team);
-		if (transfered < 0) {
-			debug_printf("BMessage: failed to transfer area into current team\n");
-			return transfered;
-		}
-
-		fHeader->message_area = transfered;
-#endif
-	} else
-		address = (uint8 *)areaInfo.address;
+	uint8 *address = (uint8 *)areaInfo.address;
 
 	fFields = (field_header *)address;
 	fData = address + fHeader->field_count * sizeof(field_header);
