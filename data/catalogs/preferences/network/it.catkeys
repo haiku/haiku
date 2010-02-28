@@ -1,0 +1,16 @@
+1	italian	x-vnd.Haiku-Network	3333205752
+Gateway:	EthernetSettingsView		Gateway:
+Netmask:	EthernetSettingsView		Maschera di rete:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Applica
+OK	EthernetSettingsView		OK
+DNS #1:	EthernetSettingsView		DNS #1:
+IP address:	EthernetSettingsView		Indirizzo IP:
+Network	NetworkWindow		Rete
+Adapter:	EthernetSettingsView		Adattatore:
+Sending auto-config message failed: 	EthernetSettingsView		Invio del messaggio di auto configurazione fallito: 
+Mode:	EthernetSettingsView		Modalità:
+The net_server needs to run for the auto configuration!	EthernetSettingsView		E' necessario che il net_server sia avviato per l'auto-configurazione!
+Auto-configuring failed: 	EthernetSettingsView		Auto-configurazione fallita: 
+Static	EthernetSettingsView		Statico
