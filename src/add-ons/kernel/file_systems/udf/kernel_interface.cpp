@@ -26,7 +26,7 @@
 
 #undef TRACE
 #undef TRACE_ERROR
-#define UDF_KERNEL_INTERFACE_DEBUG
+//#define UDF_KERNEL_INTERFACE_DEBUG
 #ifdef UDF_KERNEL_INTERFACE_DEBUG
 #	define TRACE(x)			dprintf x
 #	define TRACE_ERROR(x)	dprintf x

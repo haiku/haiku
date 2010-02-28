@@ -1,21 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems udf ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirC++Flags -fno-rtti ;
-
-# save original optimization level
-oldOPTIM = $(OPTIM) ;
-
-# set some additional defines
-{
-	local defines =
-		KEEP_WRONG_DIRENT_RECLEN
-		;
-
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
-}
 
 UsePrivateKernelHeaders ;
 
@@ -32,29 +17,6 @@ KernelAddon udf :
 	Utils.cpp
 	VirtualPartition.cpp
 	Volume.cpp
-	
-	kernel_cpp.cpp 
+
 	kernel_interface.cpp
-	;
-
-SEARCH on [ FGristFiles
-		kernel_cpp.cpp 
-	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-
-
-rule InstallUDF
-{
-	Depends $(<) : $(>) ;
-}
-
-actions ignore InstallUDF
-{
-	cp $(>) /boot/home/config/add-ons/kernel/file_systems/
-}
-
-InstallUDF install : udf ;
-
-# restore original optimization level
-OPTIM = $(oldOPTIM) ;
-
-#SubInclude HAIKU_TOP src add-ons kernel file_systems udf drive_setup_addon ;
+;
