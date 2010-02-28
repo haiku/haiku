@@ -35,53 +35,35 @@ All rights reserved.
 
 #include "BmapButton.h"
 
-#include <BeBuild.h>
-#include <Bitmap.h>
-#include <Autolock.h>
 #include <Application.h>
+#include <Autolock.h>
+#include <Bitmap.h>
+#include <ColorTools.h>
 #include <Resources.h>
 
 #include <stdlib.h>
 
 
-#if !defined(HAIKU_TARGET_PLATFORM_DANO)
-static rgb_color
-mix_color(rgb_color color1, rgb_color color2, float portion)
-{
-	rgb_color ret;
-	ret.red = uint8(color1.red*portion + color2.red*(1-portion) + .5);
-	ret.green = uint8(color1.green*portion + color2.green*(1-portion) + .5);
-	ret.blue = uint8(color1.blue*portion + color2.blue*(1-portion) + .5);
-	ret.alpha = uint8(color1.alpha*portion + color2.alpha*(1-portion) + .5);
-	return ret;
-}
-
-static inline rgb_color
-disable_color(rgb_color color, rgb_color background)
-{
-	return mix_color(color, background, .5);
-}
-#endif // #if older versions of BeOS, like R5.
-
 BList BmapButton::fBitmapCache;
 BLocker BmapButton::fBmCacheLock;
+
 		
 struct BitmapItem {
-	BBitmap *bm;
+	BBitmap* bm;
 	int32 id;
 	int32 openCount;
 };
 
 
 BmapButton::BmapButton(BRect frame, 
-	const char *name, 
-	const char *label,
+	const char* name, 
+	const char* label,
 	int32 enabledID,
 	int32 disabledID,
 	int32 rollID,
 	int32 pressedID,
 	bool showLabel,
-	BMessage *message,
+	BMessage* message,
 	uint32 resizeMask,
 	uint32 flags) :
 	BControl(frame, name, label, message, resizeMask, flags),
@@ -107,7 +89,7 @@ BmapButton::~BmapButton(void)
 }
 
 
-const BBitmap *
+const BBitmap*
 BmapButton::RetrieveBitmap(int32 id)
 {
 	// Lock access to the list
@@ -116,8 +98,8 @@ BmapButton::RetrieveBitmap(int32 id)
 		return NULL;
 	
 	// Check for the bitmap in the cache first
-	BitmapItem *item;
-	for (int32 i=0; (item=(BitmapItem *)fBitmapCache.ItemAt(i)) != NULL; i++) {
+	BitmapItem* item;
+	for (int32 i=0; (item=(BitmapItem*)fBitmapCache.ItemAt(i)) != NULL; i++) {
 		if (item->id == id) {
 			item->openCount++;
 			return item->bm;
@@ -129,7 +111,7 @@ BmapButton::RetrieveBitmap(int32 id)
 	if (!res) return NULL;
 	
 	size_t size = 0;
-	const void * data = res->LoadResource('BMAP', id, &size);
+	const void*  data = res->LoadResource('BMAP', id, &size);
 	if (!data) return NULL;
 	BMemoryIO mio(data, size);
 	BMessage arch;
@@ -142,7 +124,7 @@ BmapButton::RetrieveBitmap(int32 id)
 		return NULL;
 	}
 	
-	item = (BitmapItem *)malloc(sizeof(BitmapItem));
+	item = (BitmapItem*)malloc(sizeof(BitmapItem));
 	item->bm = bm;
 	item->id = id;
 	item->openCount = 1;
@@ -152,18 +134,20 @@ BmapButton::RetrieveBitmap(int32 id)
 
 
 status_t
-BmapButton::ReleaseBitmap(const BBitmap *bm)
+BmapButton::ReleaseBitmap(const BBitmap* bm)
 {
-	// Lock access to the list
 	BAutolock lock(fBmCacheLock);
 	if (!lock.IsLocked())
 		return B_ERROR;
 		
-	// Find the bitmap
-	BitmapItem *item;
-	for (int32 i=0; (item=(BitmapItem *)fBitmapCache.ItemAt(i)) != NULL; i++) {
+	BitmapItem* item;
+	for (int32 i = 0;; i++)
+	{
+		item = static_cast<BitmapItem*>(fBitmapCache.ItemAt(i));
+		if (item == NULL)
+			break;
+
 		if (item->bm == bm) {
-			// If it's no longer in use by any objects, free the resources
 			if (--item->openCount <= 0) {
 				fBitmapCache.RemoveItem(i);
 				delete item->bm;
@@ -200,14 +184,14 @@ BmapButton::Draw(BRect updateRect)
 		labelWidth = renderFont.StringWidth(Label());
 
 		BRect textRect;
-		textRect.left = (bounds.right-bounds.left-labelWidth+1)/2;
-		textRect.right = textRect.left+labelWidth;
+		textRect.left = (bounds.right - bounds.left - labelWidth + 1) / 2;
+		textRect.right = textRect.left + labelWidth;
 		textRect.bottom = bounds.bottom;
-		textRect.top = textRect.bottom-fheight.descent-fheight.ascent-1;
+		textRect.top = textRect.bottom - fheight.descent - fheight.ascent - 1;
 
 		// Only draw if it's within the update rect
 		if (updateRect.Intersects(textRect)) {
-			float baseLine = textRect.bottom-fheight.descent;
+			float baseLine = textRect.bottom - fheight.descent;
 
 			if (IsFocus() && fActive)
 				SetHighColor(0, 0, 255);
@@ -219,7 +203,7 @@ BmapButton::Draw(BRect updateRect)
 			if (IsEnabled())
 				SetHighColor(0, 0, 0);
 			else {
-				const rgb_color black = { 0, 0, 0, 255 };
+				const rgb_color black = {0, 0, 0, 255};
 				SetHighColor(disable_color(black, ViewColor()));
 			}
 			MovePenTo(textRect.left, baseLine);
@@ -237,7 +221,7 @@ BmapButton::Draw(BRect updateRect)
 	// Draw Bitmap
 
 	// Select the bitmap to use
-	const BBitmap *bm;
+	const BBitmap* bm;
 
 	if (!IsEnabled())
 		bm = fDisabledBM;
@@ -257,8 +241,10 @@ BmapButton::Draw(BRect updateRect)
 	if (bm) {
 		fBitmapRect = bm->Bounds();
 		fBitmapRect.OffsetTo(0, 0);
-		fBitmapRect.OffsetBy((bounds.right-bounds.left-fBitmapRect.right-fBitmapRect.left)/2,
-			(bounds.bottom-bounds.top-labelHeight-fBitmapRect.bottom-fBitmapRect.top)/2);
+		fBitmapRect.OffsetBy((bounds.right - bounds.left - fBitmapRect.right
+				- fBitmapRect.left) / 2,
+			(bounds.bottom - bounds.top - labelHeight - fBitmapRect.bottom
+				- fBitmapRect.top) / 2);
 		// Update if within update rect
 
 		SetDrawingMode(B_OP_OVER);
@@ -276,7 +262,7 @@ BmapButton::Draw(BRect updateRect)
 
 
 void
-BmapButton::GetPreferredSize(float *width, float *height)
+BmapButton::GetPreferredSize(float* width, float* height)
 {
 	BRect prefBounds;
 	
@@ -294,9 +280,9 @@ BmapButton::GetPreferredSize(float *width, float *height)
 			labelWidth = renderFont.StringWidth(Label());
 			prefBounds.left = 0;
 			prefBounds.top = 0;
-			prefBounds.right = labelWidth > (bmBounds.right-bmBounds.left) ? labelWidth : 
-				(bmBounds.right-bmBounds.left);
-			prefBounds.bottom = labelHeight + (bmBounds.bottom-bmBounds.top);
+			prefBounds.right = labelWidth > (bmBounds.right - bmBounds.left)
+				? labelWidth : (bmBounds.right - bmBounds.left);
+			prefBounds.bottom = labelHeight + (bmBounds.bottom - bmBounds.top);
 		} else
 			prefBounds = fEnabledBM->Bounds();
 	} else
@@ -308,7 +294,7 @@ BmapButton::GetPreferredSize(float *width, float *height)
 
 
 void
-BmapButton::MouseMoved(BPoint where, uint32 code, const BMessage *msg)
+BmapButton::MouseMoved(BPoint where, uint32 code, const BMessage* msg)
 {
 	// eliminate unused parameter warnings
 	(void)where;

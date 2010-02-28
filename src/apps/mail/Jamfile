@@ -4,6 +4,7 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders mail ;
 }
 
+UsePrivateHeaders interface ;
 UsePrivateHeaders mail ;
 UsePrivateHeaders textencoding ;
 UsePrivateHeaders shared ;

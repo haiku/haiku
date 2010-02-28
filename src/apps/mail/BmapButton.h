@@ -31,58 +31,64 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef _BMAP_BUTTON_H
 #define _BMAP_BUTTON_H
+
 
 #include <Control.h>
 #include <List.h>
 #include <Locker.h>
 #include <View.h>
 
+
 class BBitmap;
 class BResources;
 
+
 class BmapButton : public BControl {
 public:
-	BmapButton(BRect frame, const char *name, const char *label,
-		int32 enabledID, int32 disabledID, int32 rollID, int32 pressedID,
-		bool showLabel, BMessage *message, uint32 resizeMask,
-		uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
-	virtual ~BmapButton(void);
+							BmapButton(BRect frame, const char* name,
+								const char* label, int32 enabledID,
+								int32 disabledID, int32 rollID, int32 pressedID,
+								bool showLabel, BMessage* message,
+								uint32 resizeMask,
+								uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+	virtual					~BmapButton(void);
 		
 	// Hooks
-	virtual void Draw(BRect updateRect);
-	virtual void GetPreferredSize(float *width, float *height);
-	virtual void MouseMoved(BPoint where, uint32 code, const BMessage *msg);
-	virtual void MouseDown(BPoint point);
-	virtual void MouseUp(BPoint where);
-	virtual void WindowActivated(bool active);
+	virtual	void			Draw(BRect updateRect);
+	virtual	void			GetPreferredSize(float* width, float* height);
+	virtual	void			MouseMoved(BPoint where, uint32 code,
+								const BMessage* msg);
+	virtual	void			MouseDown(BPoint point);
+	virtual	void			MouseUp(BPoint where);
+	virtual	void			WindowActivated(bool active);
 		
-	void InvokeOnButton(uint32 button);
-	void ShowLabel(bool show);
+			void			InvokeOnButton(uint32 button);
+			void			ShowLabel(bool show);
 	
 protected:
-	const BBitmap *RetrieveBitmap(int32 id);
-	status_t ReleaseBitmap(const BBitmap *bm);
-		
-	const BBitmap *fEnabledBM;
-	const BBitmap *fDisabledBM;
-	const BBitmap *fRollBM;
-	const BBitmap *fPressedBM;
-	int32 fPressing;
-	int32 fIsInBounds;
-	uint32 fButtons;
-	bool fShowLabel;
-	bool fActive;
-	BRect fBitmapRect;
-	BPoint fWhere;
-	uint32 fIButtons;
-	
+	const	BBitmap*		RetrieveBitmap(int32 id);
+			status_t		ReleaseBitmap(const BBitmap* bm);
+
+	const	BBitmap*		fEnabledBM;
+	const	BBitmap*		fDisabledBM;
+	const	BBitmap*		fRollBM;
+	const	BBitmap*		fPressedBM;
+			int32			fPressing;
+			int32			fIsInBounds;
+			uint32			fButtons;
+			bool			fShowLabel;
+			bool			fActive;
+			BRect			fBitmapRect;
+			BPoint			fWhere;
+			uint32			fIButtons;
+
 private:
-	static BList fBitmapCache;
-	static BLocker fBmCacheLock;
+	static	BList			fBitmapCache;
+	static	BLocker			fBmCacheLock;
 };
+
 
 #endif // #ifndef _BMAP_BUTTON_H
 
