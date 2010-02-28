@@ -19,7 +19,6 @@ DoCatalogs Network :
 	EthernetSettingsView.cpp
 	NetworkWindow.cpp
 	: en.catalog
-	:
-	bg.catkeys de.catkeys fr.catkeys hu.catkeys lt.catkeys pl.catkeys
-	pt.catkeys ru.catkeys sv.catkeys uk.catkeys
+	: bg.catkeys de.catkeys fr.catkeys hu.catkeys lt.catkeys pl.catkeys
+	  pt.catkeys pt_br.catkeys ru.catkeys sv.catkeys uk.catkeys
 	;

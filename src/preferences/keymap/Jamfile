@@ -20,7 +20,6 @@ DoCatalogs Keymap :
 	x-vnd.Haiku-Keymap
 	: KeymapWindow.cpp
 	: en.catalog
-	:
-	eo.catkeys fr.catkeys hu.catkeys lt.catkeys pl.catkeys pt.catkeys
-	ru.catkeys uk.catkeys
+	: eo.catkeys fr.catkeys hu.catkeys lt.catkeys pl.catkeys pt.catkeys
+	  pt_br.catkeys ru.catkeys uk.catkeys
 	;
