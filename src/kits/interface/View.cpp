@@ -1339,8 +1339,6 @@ BView::DragMessage(BMessage* message, BBitmap* image,
 	BMessage::Private privateMessage(message);
 	privateMessage.SetReply(BMessenger(replyTo, replyTo->Looper()));
 
-	// TODO: create area and flatten message into that area!
-	// send area info over port, not the actual message!
 	int32 bufferSize = message->FlattenedSize();
 	char* buffer = new(std::nothrow) char[bufferSize];
 	if (buffer != NULL) {
