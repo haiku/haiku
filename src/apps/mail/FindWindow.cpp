@@ -63,23 +63,23 @@ enum {
 
 static BString sPreviousFind = "";
 
-FindWindow* FindWindow::mFindWindow = NULL;
-BRect FindWindow::mLastPosition(BRect(100,300,300,374));
+FindWindow* FindWindow::fFindWindow = NULL;
+BRect FindWindow::fLastPosition(BRect(100, 300, 300, 374));
 
-void FindWindow::DoFind(BWindow *window, const char *text)
+void FindWindow::DoFind(BWindow* window, const char* text)
 {
 	if (window == NULL) {
-		long i=0;
+		long i = 0;
 		while ((window = be_app->WindowAt(i++)) != NULL) {
 			// Send the text to a waiting window
-			if (window != mFindWindow)
-				if (dynamic_cast<TMailWindow *>(window) != NULL)
+			if (window != fFindWindow)
+				if (dynamic_cast<TMailWindow*>(window) != NULL)
 					break;	// Found a window
 		}
 	}
 	
 	/* ask that window who is in the front */
-	window = dynamic_cast<TMailWindow *>(window)->FrontmostWindow();
+	window = dynamic_cast<TMailWindow*>(window)->FrontmostWindow();
 	if (window == NULL)
 		return;
 		
@@ -87,7 +87,7 @@ void FindWindow::DoFind(BWindow *window, const char *text)
 	
 	if (!window->Lock())
 		return;
-	BView *focus = window->FindView("m_content");
+	BView* focus = window->FindView("m_content");
 	window->Unlock();
 
 	if (focus)
@@ -98,52 +98,55 @@ void FindWindow::DoFind(BWindow *window, const char *text)
 	}
 }
 
-FindPanel::FindPanel(BRect rect)
-	: BBox(rect, "FindPanel", B_FOLLOW_LEFT_RIGHT,
-		B_WILL_DRAW)
-{
-	BRect r = Bounds().InsetByCopy(10,10);
 
-	mBTextControl = new BTextControl(r, "BTextControl", NULL,
+FindPanel::FindPanel(BRect rect)
+	:
+	BBox(rect, "FindPanel", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW)
+{
+	BRect r = Bounds().InsetByCopy(10, 10);
+
+	fTextControl = new BTextControl(r, "BTextControl", NULL,
 		sPreviousFind.String(), new BMessage(M_FIND_STRING_CHANGED),
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 
-	mBTextControl->SetText(sPreviousFind.String());
-	mBTextControl->MakeFocus();
-	AddChild(mBTextControl);
+	fTextControl->SetText(sPreviousFind.String());
+	fTextControl->MakeFocus();
+	AddChild(fTextControl);
 	
-	mFindButton = new BButton(BRect(0,0,90,20),"FINDBUTTON",
-		TR("Find"),
+	fFindButton = new BButton(BRect(0, 0, 90, 20),"FINDBUTTON", TR("Find"),
 		new BMessage(FINDBUTTON),B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	mFindButton->ResizeToPreferred();
-	AddChild(mFindButton);
-	r = mFindButton->Bounds();
+	fFindButton->ResizeToPreferred();
+	AddChild(fFindButton);
+	r = fFindButton->Bounds();
 	
-	mFindButton->MoveTo(Bounds().right - r.Width() - 8,
+	fFindButton->MoveTo(Bounds().right - r.Width() - 8,
 		Bounds().bottom - r.Height() - 8);
-	mFindButton->SetEnabled(sPreviousFind.Length());
+	fFindButton->SetEnabled(sPreviousFind.Length());
 }
+
 
 FindPanel::~FindPanel()
 {
-	sPreviousFind = mBTextControl->Text();
+	sPreviousFind = fTextControl->Text();
 }
+
 
 void FindPanel::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	SetViewColor(216,216,216);
-	Window()->SetDefaultButton(mFindButton);
-	mFindButton->SetTarget(this);
+	SetViewColor(216, 216, 216);
+	Window()->SetDefaultButton(fFindButton);
+	fFindButton->SetTarget(this);
 	
-	mBTextControl->SetTarget(this);
-	mBTextControl->ResizeToPreferred();
-	mBTextControl->ResizeTo(Bounds().Width() - 20,
-		mBTextControl->Frame().Height());
+	fTextControl->SetTarget(this);
+	fTextControl->ResizeToPreferred();
+	fTextControl->ResizeTo(Bounds().Width() - 20,
+		fTextControl->Frame().Height());
 	
-	mBTextControl->MakeFocus(true);
-	mBTextControl->TextView()->SelectAll();
+	fTextControl->MakeFocus(true);
+	fTextControl->TextView()->SelectAll();
 }
+
 
 void FindPanel::MouseDown(BPoint point)
 {
@@ -151,30 +154,33 @@ void FindPanel::MouseDown(BPoint point)
 	BView::MouseDown(point);
 }
 
+
 void FindPanel::Draw(BRect)
 {
-//	TextBevel(*this,mBTextView->Frame());
+//	TextBevel(*this, mBTextView->Frame());
 }
 
-void FindPanel::KeyDown(const char *, int32)
+
+void FindPanel::KeyDown(const char*, int32)
 {
-	int32 length = mBTextControl->TextView()->TextLength();
-	bool enabled = mFindButton->IsEnabled();
+	int32 length = fTextControl->TextView()->TextLength();
+	bool enabled = fFindButton->IsEnabled();
 
 	if (length > 0 && !enabled)
-		mFindButton->SetEnabled(true);
+		fFindButton->SetEnabled(true);
 	else if (length == 0 && enabled)
-		mFindButton->SetEnabled(false);
+		fFindButton->SetEnabled(false);
 }
 
-void FindPanel::MessageReceived(BMessage *msg)
+
+void FindPanel::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case M_FIND_STRING_CHANGED: {
-			if (strlen(mBTextControl->Text()) == 0)
-				mFindButton->SetEnabled(false);
+			if (strlen(fTextControl->Text()) == 0)
+				fFindButton->SetEnabled(false);
 			else
-				mFindButton->SetEnabled(true);
+				fFindButton->SetEnabled(true);
 			break;
 		}
 		case FINDBUTTON: {
@@ -190,15 +196,15 @@ void FindPanel::MessageReceived(BMessage *msg)
 
 void FindPanel::Find()
 {
-	mBTextControl->TextView()->SelectAll();
-	const char *text = mBTextControl->Text();
+	fTextControl->TextView()->SelectAll();
+	const char* text = fTextControl->Text();
 	if (text == NULL || text[0] == 0) return;
 
-	BWindow *window = NULL;
-	long i=0;
+	BWindow* window = NULL;
+	long i = 0;
 	while ((bool)(window = be_app->WindowAt(i++))) {
 		// Send the text to a waiting window
-		if (window != FindWindow::mFindWindow)
+		if (window != FindWindow::fFindWindow)
 			break;	// Found a window
 	}
 
@@ -208,42 +214,42 @@ void FindPanel::Find()
 
 
 FindWindow::FindWindow()
-	: BWindow(FindWindow::mLastPosition, TR("Find"), B_FLOATING_WINDOW,
+	: BWindow(FindWindow::fLastPosition, TR("Find"), B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK
 			| B_CLOSE_ON_ESCAPE)
 {
-	mFindPanel = new FindPanel(Bounds());
-	AddChild(mFindPanel);
-	mFindWindow = this;
+	fFindPanel = new FindPanel(Bounds());
+	AddChild(fFindPanel);
+	fFindWindow = this;
 	Show();
 }
 
 
 FindWindow::~FindWindow()
 {
-	FindWindow::mLastPosition = Frame();
-	mFindWindow = NULL;
+	FindWindow::fLastPosition = Frame();
+	fFindWindow = NULL;
 }
 
 
-void FindWindow::Find(BWindow *window)
+void FindWindow::Find(BWindow* window)
 {
 	// eliminate unused parameter warning
 	(void)window;
 
-	if (mFindWindow == NULL) {
-		mFindWindow = new FindWindow();
+	if (fFindWindow == NULL) {
+		fFindWindow = new FindWindow();
 	} else
-		mFindWindow->Activate();
+		fFindWindow->Activate();
 }
 
 
-void FindWindow::FindAgain(BWindow *window)
+void FindWindow::FindAgain(BWindow* window)
 {
-	if (mFindWindow) {
-		mFindWindow->Lock();
-		mFindWindow->mFindPanel->Find();
-		mFindWindow->Unlock();
+	if (fFindWindow) {
+		fFindWindow->Lock();
+		fFindWindow->fFindPanel->Find();
+		fFindWindow->Unlock();
 	} else if (sPreviousFind.Length() != 0)
 		DoFind(window, sPreviousFind.String());
 	else
@@ -251,13 +257,13 @@ void FindWindow::FindAgain(BWindow *window)
 }
 
 
-void FindWindow::SetFindString(const char *string)
+void FindWindow::SetFindString(const char* string)
 {
 	sPreviousFind = string;
 }
 
 
-const char *FindWindow::GetFindString()
+const char* FindWindow::GetFindString()
 {
 	return sPreviousFind.String();
 }

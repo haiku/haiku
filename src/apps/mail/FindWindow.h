@@ -36,7 +36,6 @@ All rights reserved.
 //	FindWindow.h
 // 	Copyright 1996 by Peter Barrett, All rights reserved.
 // ===========================================================================
-
 #ifndef _FINDWINDOW_H
 #define _FINDWINDOW_H
 
@@ -45,45 +44,49 @@ All rights reserved.
 #include <TextControl.h>
 #include <Window.h>
 
+
 class FindPanel;
 
 
 class FindWindow : public BWindow {
 friend class FindPanel;
 public:
-	FindWindow();
-	virtual ~FindWindow();
+							FindWindow();
+	virtual					~FindWindow();
 
-	static void FindAgain(BWindow *window);
-	static void Find(BWindow *window);
-	static bool IsFindWindowOpen() {return mFindWindow;}
-	static void Close()
-		{ if (mFindWindow) mFindWindow->PostMessage(B_QUIT_REQUESTED); }
-	static void SetFindString(const char *string);
-	static const char* GetFindString();
-	
+	static	void			FindAgain(BWindow* window);
+	static	void			Find(BWindow* window);
+	static	bool			IsFindWindowOpen() { return fFindWindow; }
+	static	void			Close() {
+								if (fFindWindow)
+									fFindWindow->PostMessage(B_QUIT_REQUESTED);
+							}
+	static	void			SetFindString(const char* string);
+	static const char*		GetFindString();
+
 protected:
-	static void DoFind(BWindow *window, const char *text);
-	
-	static FindWindow* mFindWindow;
-	FindPanel* mFindPanel;
-	static BRect mLastPosition;
+	static	void			DoFind(BWindow* window, const char* text);
+
+	static	FindWindow*		fFindWindow;
+			FindPanel*		fFindPanel;
+	static	BRect			fLastPosition;
 };
+
 
 class FindPanel : public BBox {
 public:
-	FindPanel(BRect rect);
-	virtual ~FindPanel();
-	virtual	void AttachedToWindow();
-	virtual	void MessageReceived(BMessage *msg);
-	virtual	void Draw(BRect updateRect);
-	virtual void KeyDown(const char *bytes, int32 numBytes);
-	void Find();
-	virtual void MouseDown(BPoint point);
+							FindPanel(BRect rect);
+	virtual					~FindPanel();
+	virtual	void			AttachedToWindow();
+	virtual	void			MessageReceived(BMessage* msg);
+	virtual	void			Draw(BRect updateRect);
+	virtual	void			KeyDown(const char* bytes, int32 numBytes);
+			void			Find();
+	virtual	void			MouseDown(BPoint point);
 
 protected:
-		BButton* mFindButton;
-		BTextControl* mBTextControl;
+			BButton*		fFindButton;
+			BTextControl*	fTextControl;
 };
 
 
