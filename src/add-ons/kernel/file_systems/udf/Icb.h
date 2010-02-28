@@ -203,12 +203,20 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 		off_t blockOffset
 			= pos - off_t((pos >> volume->BlockShift()) << volume->BlockShift());
 
-		size_t fullBlocksLeft = bytesLeft >> volume->BlockShift();
+		size_t readLength = volume->BlockSize() - blockOffset;
+		if (bytesLeft < readLength)
+			readLength = bytesLeft;
+		if (extent.length() < readLength)
+			readLength = extent.length();
 
-		if (fullBlocksLeft > 0 && blockOffset == 0) {
-			TRACE(("Icb::_Read(): reading full block (or more)\n"));
-			// Block aligned and at least one full block left. Read
-			// in using block_cache_get_etc() calls.
+		TRACE(("Icb::_Read: reading block. offset = %Ld, length: %ld\n",
+			blockOffset, readLength));
+
+		if (isEmpty) {
+			TRACE(("Icb::_Read: reading %ld empty bytes as zeros\n",
+				readLength));
+			memset(buffer, 0, readLength);
+		} else {
 			off_t diskBlock;
 			status = volume->MapBlock(extent, &diskBlock);
 			if (status != B_OK) {
@@ -216,83 +224,20 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 				break;
 			}
 
-			size_t fullBlockBytesLeft = fullBlocksLeft << volume->BlockShift();
-			size_t readLength = fullBlockBytesLeft < extent.length()
-				? fullBlockBytesLeft : extent.length();
+			TRACE(("Icb::_Read: %ld bytes from disk block %Ld using "
+				"block_cache_get_etc()\n", readLength, diskBlock));
+			uint8 *data = (uint8*)block_cache_get_etc(volume->BlockCache(),
+				diskBlock, 0, readLength);
+			if (data == NULL)
+				break;
+			memcpy(buffer, data + blockOffset, readLength);
+			block_cache_put(volume->BlockCache(), diskBlock);
+		}
 
-			if (isEmpty) {
-				TRACE(("Icb::_Read(): reading %ld empty bytes as zeros\n",
-					readLength));
-				memset(buffer, 0, readLength);
-			} else {
-				off_t diskBlock;
-				status = volume->MapBlock(extent, &diskBlock);
-				if (status != B_OK) {
-					TRACE_ERROR(("Icb::_Read: could not map extent\n"));
-					break;
-				}
-				TRACE(("Icb::_Read(): reading %ld bytes from disk block %Ld "
-					"using block_cache_get_etc()\n", readLength, diskBlock));
-				size_t length = readLength >> volume->BlockShift();
-				uint8 *data = (uint8*)block_cache_get_etc(volume->BlockCache(),
-					diskBlock, pos, length);
-				if (data == NULL) {
-					status = B_BAD_DATA;
-					break;
-				}
-				memcpy(buffer, data, length);
-				block_cache_put(volume->BlockCache(), diskBlock);
-			}
-
-			bytesLeft -= readLength;
-			bytesRead += readLength;
-			pos += readLength;
-			buffer += readLength;
-		} else {
-			off_t partialOffset;
-			size_t partialLength;
-			if (blockOffset == 0) {
-				// Block aligned, but only a partial block's worth remaining.
-				// Read in remaining bytes of file
-				partialOffset = 0;
-				partialLength = bytesLeft;
-			} else {
-				// Not block aligned, so just read up to the next block boundary.
-				partialOffset = blockOffset;
-				partialLength = volume->BlockSize() - blockOffset;
-				if (bytesLeft < partialLength)
-					partialLength = bytesLeft;
-			}
-			TRACE(("Icb::_Read: reading partial block. partialOffset = %Ld, "
-				"partialLength: %ld\n",partialOffset, partialLength));
-
-			if (isEmpty) {
-				TRACE(("Icb::_Read: reading %ld empty bytes as zeros\n",
-					partialLength));
-				memset(buffer, 0, partialLength);
-			} else {
-				off_t diskBlock;
-				status = volume->MapBlock(extent, &diskBlock);
-				if (status != B_OK) {
-					TRACE_ERROR(("Icb::_Read: could not map extent\n"));
-					break;
-				}
-
-				TRACE(("Icb::_Read: %ld bytes from disk block %Ld using "
-					"block_cache_get_etc()\n", partialLength, diskBlock));
-				uint8 *data = (uint8*)block_cache_get_etc(volume->BlockCache(),
-					diskBlock, 0, partialLength);
-				if (data == NULL)
-					break;
-				memcpy(buffer, data + partialOffset, partialLength);
-				block_cache_put(volume->BlockCache(), diskBlock);
-			}
-
-			bytesLeft -= partialLength;
-			bytesRead += partialLength;
-			pos += partialLength;
-			buffer += partialLength;
-		}					
+		bytesLeft -= readLength;
+		bytesRead += readLength;
+		pos += readLength;
+		buffer += readLength;
 	}				 
 	
 	*length = bytesRead;
