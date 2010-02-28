@@ -21,6 +21,6 @@ DoCatalogs Keymap :
 	: KeymapWindow.cpp
 	: en.catalog
 	:
-	br.catkeys eo.catkeys fr.catkeys hu.catkeys lt.catkeys pl.catkeys
+	pt_br.catkeys eo.catkeys fr.catkeys hu.catkeys lt.catkeys pl.catkeys
 	pt.catkeys ru.catkeys uk.catkeys
 	;
