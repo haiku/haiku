@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,7 +58,8 @@ main(int argc, char *argv[])
 
 	static const size_t kBlockSize = 512;
 
-	int outputFile = open(argv[1], O_WRONLY | O_TRUNC | O_CREAT);
+	int outputFile = open(argv[1], O_WRONLY | O_TRUNC | O_CREAT,
+		S_IRUSR | S_IWUSR);
 	checkError(outputFile < 0, "failed to open output file");
 
 	int isoFile = open(argv[2], O_RDONLY);
