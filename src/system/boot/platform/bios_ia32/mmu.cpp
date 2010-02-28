@@ -46,9 +46,9 @@
 
 //#define TRACE_MMU
 #ifdef TRACE_MMU
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 
@@ -137,8 +137,9 @@ get_next_physical_page()
 static uint32 *
 get_next_page_table()
 {
-	TRACE(("get_next_page_table, sNextPageTableAddress %p, kPageTableRegionEnd "
-		"%p\n", sNextPageTableAddress, kPageTableRegionEnd));
+	TRACE("get_next_page_table, sNextPageTableAddress %#" B_PRIxADDR
+		", kPageTableRegionEnd %#" B_PRIxADDR "\n", sNextPageTableAddress,
+		kPageTableRegionEnd);
 
 	addr_t address = sNextPageTableAddress;
 	if (address >= kPageTableRegionEnd)
@@ -153,14 +154,14 @@ get_next_page_table()
 static void
 add_page_table(addr_t base)
 {
-	TRACE(("add_page_table(base = %p)\n", (void *)base));
-
 	// Get new page table and clear it out
 	uint32 *pageTable = get_next_page_table();
 	if (pageTable > (uint32 *)(8 * 1024 * 1024)) {
 		panic("tried to add page table beyond the identity mapped 8 MB "
 			"region\n");
 	}
+
+	TRACE("add_page_table(base = %p), got page: %p\n", (void*)base, pageTable);
 
 	gKernelArgs.arch_args.pgtables[gKernelArgs.arch_args.num_pgtables++]
 		= (uint32)pageTable;
@@ -177,7 +178,7 @@ add_page_table(addr_t base)
 static void
 unmap_page(addr_t virtualAddress)
 {
-	TRACE(("unmap_page(virtualAddress = %p)\n", (void *)virtualAddress));
+	TRACE("unmap_page(virtualAddress = %p)\n", (void *)virtualAddress);
 
 	if (virtualAddress < KERNEL_BASE) {
 		panic("unmap_page: asked to unmap invalid page %p!\n",
@@ -201,7 +202,8 @@ unmap_page(addr_t virtualAddress)
 static void
 map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 {
-	TRACE(("map_page: vaddr 0x%lx, paddr 0x%lx\n", virtualAddress, physicalAddress));
+	TRACE("map_page: vaddr 0x%lx, paddr 0x%lx\n", virtualAddress,
+		physicalAddress);
 
 	if (virtualAddress < KERNEL_BASE) {
 		panic("map_page: asked to map invalid page %p!\n",
@@ -210,7 +212,6 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 
 	if (virtualAddress >= sMaxVirtualAddress) {
 		// we need to add a new page table
-
 		add_page_table(sMaxVirtualAddress);
 		sMaxVirtualAddress += B_PAGE_SIZE * 1024;
 
@@ -227,14 +228,15 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
 	uint32 tableEntry = (virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE;
 
-	TRACE(("map_page: inserting pageTable %p, tableEntry %ld, physicalAddress "
-		"%p\n", pageTable, tableEntry, physicalAddress));
+	TRACE("map_page: inserting pageTable %p, tableEntry %" B_PRIu32
+		", physicalAddress %#" B_PRIxADDR "\n", pageTable, tableEntry,
+		physicalAddress);
 
 	pageTable[tableEntry] = physicalAddress | flags;
 
 	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
 
-	TRACE(("map_page: done\n"));
+	TRACE("map_page: done\n");
 }
 
 
@@ -282,7 +284,7 @@ get_memory_map(extended_memory **_extendedMemory)
 	bios_regs regs = {0, 0, sizeof(extended_memory), 0, 0, (uint32)block, 0, 0};
 	uint32 count = 0;
 
-	TRACE(("get_memory_map()\n"));
+	TRACE("get_memory_map()\n");
 
 	do {
 		regs.eax = 0xe820;
@@ -314,7 +316,7 @@ get_memory_map(extended_memory **_extendedMemory)
 static void
 init_page_directory(void)
 {
-	TRACE(("init_page_directory\n"));
+	TRACE("init_page_directory\n");
 
 	// allocate a new pgdir
 	sPageDirectory = (uint32 *)get_next_physical_page();
@@ -387,8 +389,8 @@ mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
 extern "C" void *
 mmu_allocate(void *virtualAddress, size_t size)
 {
-	TRACE(("mmu_allocate: requested vaddr: %p, next free vaddr: 0x%lx, size: "
-		"%ld\n", virtualAddress, sNextVirtualAddress, size));
+	TRACE("mmu_allocate: requested vaddr: %p, next free vaddr: 0x%lx, size: "
+		"%ld\n", virtualAddress, sNextVirtualAddress, size);
 
 	size = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
 		// get number of pages to map
@@ -434,7 +436,7 @@ mmu_allocate(void *virtualAddress, size_t size)
 extern "C" void
 mmu_free(void *virtualAddress, size_t size)
 {
-	TRACE(("mmu_free(virtualAddress = %p, size: %ld)\n", virtualAddress, size));
+	TRACE("mmu_free(virtualAddress = %p, size: %ld)\n", virtualAddress, size);
 
 	addr_t address = (addr_t)virtualAddress;
 	addr_t pageOffset = address % B_PAGE_SIZE;
@@ -467,7 +469,7 @@ mmu_free(void *virtualAddress, size_t size)
 extern "C" void
 mmu_init_for_kernel(void)
 {
-	TRACE(("mmu_init_for_kernel\n"));
+	TRACE("mmu_init_for_kernel\n");
 	// set up a new idt
 	{
 		struct gdt_idt_descr idtDescriptor;
@@ -477,7 +479,7 @@ mmu_init_for_kernel(void)
 		idt = (uint32 *)get_next_physical_page();
 		gKernelArgs.arch_args.phys_idt = (uint32)idt;
 
-		TRACE(("idt at %p\n", idt));
+		TRACE("idt at %p\n", idt);
 
 		// map the idt into virtual space
 		gKernelArgs.arch_args.vir_idt = (uint32)get_next_virtual_page();
@@ -496,7 +498,7 @@ mmu_init_for_kernel(void)
 		asm("lidt	%0;"
 			: : "m" (idtDescriptor));
 
-		TRACE(("idt at virtual address 0x%lx\n", gKernelArgs.arch_args.vir_idt));
+		TRACE("idt at virtual address 0x%lx\n", gKernelArgs.arch_args.vir_idt);
 	}
 
 	// set up a new gdt
@@ -508,7 +510,7 @@ mmu_init_for_kernel(void)
 		gdt = (segment_descriptor *)get_next_physical_page();
 		gKernelArgs.arch_args.phys_gdt = (uint32)gdt;
 
-		TRACE(("gdt at %p\n", gdt));
+		TRACE("gdt at %p\n", gdt);
 
 		// map the gdt into virtual space
 		gKernelArgs.arch_args.vir_gdt = (uint32)get_next_virtual_page();
@@ -545,7 +547,8 @@ mmu_init_for_kernel(void)
 		asm("lgdt	%0;"
 			: : "m" (gdtDescriptor));
 
-		TRACE(("gdt at virtual address %p\n", (void *)gKernelArgs.arch_args.vir_gdt));
+		TRACE("gdt at virtual address %p\n",
+			(void*)gKernelArgs.arch_args.vir_gdt);
 	}
 
 	// save the memory we've physically allocated
@@ -593,7 +596,7 @@ mmu_init_for_kernel(void)
 extern "C" void
 mmu_init(void)
 {
-	TRACE(("mmu_init\n"));
+	TRACE("mmu_init\n");
 
 	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
 	gKernelArgs.physical_allocated_range[0].size = 0;
@@ -619,8 +622,8 @@ mmu_init(void)
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE
 		+ KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE;
 
-	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
-		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
+	TRACE("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
+		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
 
 	extended_memory *extMemoryBlock;
 	uint32 extMemoryCount = get_memory_map(&extMemoryBlock);
