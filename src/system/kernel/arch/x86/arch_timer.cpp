@@ -93,16 +93,13 @@ sort_timers(timer_info *timers[], int numTimers)
 int
 arch_init_timer(kernel_args *args)
 {
-	int i = 0;
-	timer_info *timer = NULL;
-	cpu_status state;
-
 	// Sort timers by priority
 	sort_timers(sTimers, (sizeof(sTimers) / sizeof(sTimers[0])) - 1);
 
-	state = disable_interrupts();
-
-	for (i = 0; (timer = sTimers[i]) != NULL; i++) {
+	timer_info *timer = NULL;
+	cpu_status state = disable_interrupts();
+	
+	for (int i = 0; (timer = sTimers[i]) != NULL; i++) {
 		if (timer->init(args) == B_OK)
 			break;
 	}
