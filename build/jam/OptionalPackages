@@ -406,8 +406,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	# other commonly used tools
 	InstallOptionalHaikuImagePackage bison-2.4.1-r1a1-x86-gcc2-2009-08-31.zip
 		: $(baseURL)/bison-2.4.1-r1a1-x86-gcc2-2009-08-31.zip ;
-	InstallOptionalHaikuImagePackage m4-1.4.13-r1a1-x86-gcc2-2009-08-28.zip
-		: $(baseURL)/m4-1.4.13-r1a1-x86-gcc2-2009-08-28.zip ;
+	InstallOptionalHaikuImagePackage m4-1.4.14-x86-gcc2-2010-02-27.zip
+		: $(baseURL)/m4-1.4.14-x86-gcc2-2010-02-27.zip ;
 	InstallOptionalHaikuImagePackage flex-2.5.35-r1a1-x86-gcc2-2009-08-31.zip
 		: $(baseURL)/flex-2.5.35-r1a1-x86-gcc2-2009-08-31.zip ;
 	InstallOptionalHaikuImagePackage jam-2.5-r1a1-x86-gcc2-2009-08-31.zip
