@@ -1834,6 +1834,8 @@ retry:
 
 		ssize_t bytesRead = read_pos(cache->fd, blockNumber * blockSize,
 			block->current_data, blockSize);
+
+		mutex_lock(&cache->lock);
 		if (bytesRead < blockSize) {
 			cache->RemoveBlock(block);
 			TB(Error(cache, blockNumber, "read failed", bytesRead));
@@ -1844,7 +1846,6 @@ retry:
 		}
 		TB(Read(cache, block));
 
-		mutex_lock(&cache->lock);
 		mark_block_unbusy_reading(cache, block);
 	}
 
