@@ -565,8 +565,8 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 
 # ICU-devel
 if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
-	InstallOptionalHaikuImagePackage icu-devel-4.2-2010-01-26.zip
-		: $(baseURL)/icu-devel-4.2-2010-01-26.zip
+	InstallOptionalHaikuImagePackage icu-devel-4.2-2010-02-28.zip
+		: $(baseURL)/icu-devel-4.2-2010-02-28.zip
 	;
 }
 
