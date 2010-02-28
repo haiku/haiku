@@ -38,7 +38,8 @@ public:
 			const Partition*	PartitionAt(int32 index) const;
 
 private:
-			status_t			_ParsePrimary(const partition_table* table);
+			status_t			_ParsePrimary(const partition_table* table,
+									bool& hadToReFitSize);
 			status_t			_ParseExtended(PrimaryPartition* primary,
 									off_t offset);
 			status_t			_ReadPartitionTable(off_t offset,

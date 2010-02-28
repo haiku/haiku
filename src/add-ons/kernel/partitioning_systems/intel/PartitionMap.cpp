@@ -399,7 +399,7 @@ Partition::CheckLocation(off_t sessionSize) const
 }
 
 
-void
+bool
 Partition::FitSizeToSession(off_t sessionSize)
 {
 	// To work around buggy (or older) BIOS, we shrink the partition size to
@@ -408,8 +408,12 @@ Partition::FitSizeToSession(off_t sessionSize)
 	// Also, the drive size is obviously reported differently sometimes; this
 	// should let us read problematic drives - let the file system figure out
 	// if something is wrong.
-	if (sessionSize < fOffset + fSize && sessionSize > fOffset)
+	if (sessionSize < fOffset + fSize && sessionSize > fOffset) {
 		fSize = sessionSize - fOffset;
+		return true;
+	}
+
+	return false;
 }
 
 

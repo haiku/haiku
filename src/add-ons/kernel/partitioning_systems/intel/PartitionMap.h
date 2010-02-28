@@ -182,7 +182,7 @@ public:
 									{ fBlockSize = blockSize; }
 
 			bool				CheckLocation(off_t sessionSize) const;
-			void				FitSizeToSession(off_t sessionSize);
+			bool				FitSizeToSession(off_t sessionSize);
 
 private:
 			off_t				fPartitionTableOffset;

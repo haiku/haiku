@@ -67,18 +67,45 @@ PartitionMapParser::Parse(const uint8* block, PartitionMap* map)
 		return B_BAD_VALUE;
 
 	status_t error;
+	bool hadToReFitSize = false;
 
 	fMap = map;
 	fMap->Unset();
 
 	if (block) {
 		const partition_table* table = (const partition_table*)block;
-		error = _ParsePrimary(table);
+		error = _ParsePrimary(table, hadToReFitSize);
 	} else {
 		partition_table table;
 		error = _ReadPartitionTable(0, &table);
-		if (error == B_OK)
-			error = _ParsePrimary(&table);
+		if (error == B_OK) {
+			error = _ParsePrimary(&table, hadToReFitSize);
+
+			if (fBlockSize != 512 && (hadToReFitSize
+					|| !fMap->Check(fSessionSize))) {
+				// This might be a fixed 512 byte MBR on a non-512 medium.
+				// We do that for the anyboot images for example. so retry
+				// with a fixed 512 block size and see if we get better
+				// results
+				int32 previousPartitionCount = fMap->CountNonEmptyPartitions();
+				uint32 previousBlockSize = fBlockSize;
+				TRACE(("intel: Parse(): trying with a fixed 512 block size\n"));
+
+				fBlockSize = 512;
+				fMap->Unset();
+				error = _ParsePrimary(&table, hadToReFitSize);
+
+				if (fMap->CountNonEmptyPartitions() < previousPartitionCount
+					|| error != B_OK || hadToReFitSize
+					|| !fMap->Check(fSessionSize)) {
+					// That didn't improve anything, let's revert.
+					TRACE(("intel: Parse(): try failed, reverting\n"));
+					fBlockSize = previousBlockSize;
+					fMap->Unset();
+					error = _ParsePrimary(&table, hadToReFitSize);
+				}
+			}
+		}
 	}
 
 	if (error == B_OK && !fMap->Check(fSessionSize))
@@ -92,7 +119,8 @@ PartitionMapParser::Parse(const uint8* block, PartitionMap* map)
 
 // _ParsePrimary
 status_t
-PartitionMapParser::_ParsePrimary(const partition_table* table)
+PartitionMapParser::_ParsePrimary(const partition_table* table,
+	bool& hadToReFitSize)
 {
 	if (table == NULL)
 		return B_BAD_VALUE;
@@ -104,6 +132,8 @@ PartitionMapParser::_ParsePrimary(const partition_table* table)
 		return B_BAD_DATA;
 	}
 
+	hadToReFitSize = false;
+
 	// examine the table
 	for (int32 i = 0; i < 4; i++) {
 		const partition_descriptor* descriptor = &table->table[i];
@@ -111,7 +141,7 @@ PartitionMapParser::_ParsePrimary(const partition_table* table)
 		partition->SetTo(descriptor, 0, fBlockSize);
 
 		// work-around potential BIOS/OS problems
-		partition->FitSizeToSession(fSessionSize);
+		hadToReFitSize |= partition->FitSizeToSession(fSessionSize);
 
 		// ignore, if location is bad
 		if (!partition->CheckLocation(fSessionSize)) {
