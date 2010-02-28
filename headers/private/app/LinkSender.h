@@ -45,6 +45,7 @@ class LinkSender {
 		status_t FlushCompleted(size_t newBufferSize);
 
 		port_id	fPort;
+		port_id fAppServerPort;
 
 		char	*fBuffer;
 		size_t	fBufferSize;

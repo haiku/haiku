@@ -39,6 +39,7 @@ namespace BPrivate {
 LinkSender::LinkSender(port_id port)
 	:
 	fPort(port),
+	fAppServerPort(-1),
 	fBuffer(NULL),
 	fBufferSize(0),
 
@@ -167,9 +168,11 @@ LinkSender::Attach(const void *passedData, size_t passedSize)
 		port_id port = -1;
 		if (be_app == NULL)
 			port = fPort;
-		else
-			port = get_app_server_port();
-
+		else {
+			if (fAppServerPort < 0)
+				fAppServerPort = get_app_server_port();
+			port = fAppServerPort;
+		}
 		port_info info;
 		status_t result = get_port_info(port, &info);
 		if (result != B_OK)
