@@ -27,7 +27,7 @@ DoCatalogs DriveSetup :
 	PartitionList.cpp
 	Support.cpp
 	: en.catalog
-	:
-	de.catkeys hu.catkeys nl.catkeys pl.catkeys uk.catkeys ru.catkeys
+	: de.catkeys hu.catkeys nl.catkeys pl.catkeys pt.catkeys ru.catkeys
+	  uk.catkeys
 	;
 
