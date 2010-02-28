@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan ralinkwifi ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
@@ -23,3 +24,7 @@ KernelAddon ralinkwifi :
 	libfreebsd_wlan.a
 	libfreebsd_network.a
 	;
+
+HAIKU_WIFI_FIRMWARE_PACKAGE on ralinkwifi = RT61_Firmware_V1.2 ;
+HAIKU_WIFI_FIRMWARE_ARCHIVE on ralinkwifi = RT61_Firmware_V1.2.zip ;
+

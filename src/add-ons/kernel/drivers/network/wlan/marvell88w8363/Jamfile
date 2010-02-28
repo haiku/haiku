@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan marvell88w8363 ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] 
+	: true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
@@ -25,3 +26,7 @@ KernelAddon marvell88w8363 :
 	libfreebsd_wlan.a
 	libfreebsd_network.a
 	;
+
+HAIKU_WIFI_FIRMWARE_PACKAGE on marvell88w8363 = "" ;
+HAIKU_WIFI_FIRMWARE_ARCHIVE on marvell88w8363 = 88w8363-fw-3.6.2.2.zip ;
+
