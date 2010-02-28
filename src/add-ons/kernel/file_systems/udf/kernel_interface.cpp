@@ -1,6 +1,7 @@
 /*
- * Copyright 2008, Salvatore Benedetto, salvatore.benedetto@gmail.com.
  * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
+ * Copyright 2008, Salvatore Benedetto, salvatore.benedetto@gmail.com.
+ * Copyright 2010, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
 
@@ -37,6 +38,11 @@
 
 extern fs_volume_ops gUDFVolumeOps;
 extern fs_vnode_ops gUDFVnodeOps;
+
+
+struct identify_cookie {
+	struct logical_volume_descriptor logical_volume_descriptor;
+};
 
 
 //	#pragma mark - io callbacks
@@ -82,6 +88,12 @@ udf_identify_partition(int fd, partition_data *partition, void **_cookie)
 	if (error != B_OK)
 		return -1;
 
+	identify_cookie *cookie = new(std::nothrow) identify_cookie;
+	if (cookie == NULL)
+		return -1;
+
+	cookie->logical_volume_descriptor = logicalVolumeDescriptor;
+	*_cookie = cookie;
 	return 0.8f;
 }
 
@@ -90,12 +102,29 @@ static status_t
 udf_scan_partition(int fd, partition_data *partition, void *_cookie)
 {
 	TRACE(("udf_scan_partition: fd = %d\n", fd));
+	identify_cookie *cookie = (identify_cookie *)_cookie;
+	logical_volume_descriptor &volumeDescriptor
+		= cookie->logical_volume_descriptor;
 
-#if 0
-	UdfString name(logicalVolumeDescriptor.logical_volume_identifier());
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_FILE_SYSTEM;
+	partition->content_size = partition->size;
+		// TODO: not actually correct
+	partition->block_size = volumeDescriptor.logical_block_size();
+
+	UdfString name(volumeDescriptor.logical_volume_identifier());
 	partition->content_name = strdup(name.Utf8());
-#endif
-	return B_ERROR;
+	if (partition->content_name == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+static void
+udf_free_identify_partition_cookie(partition_data *partition, void *cookie)
+{
+	delete (identify_cookie *)cookie;
 }
 
 
@@ -696,7 +725,7 @@ static file_system_module_info sUDFFileSystem = {
 
 	&udf_identify_partition,
 	&udf_scan_partition,
-	NULL, // &udf_free_identify_patition_cookie,
+	&udf_free_identify_partition_cookie,
 	NULL,	// free_partition_content_cookie()
 
 	&udf_mount,

@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered
-//  by the MIT license.
-//
-//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003, Tyler Dauwalder, tyler@dauwalder.net.
+ * Copyright 2010, Michael Lotz, mmlr@mlotz.ch.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "Icb.h"
 
 #include "time.h"
