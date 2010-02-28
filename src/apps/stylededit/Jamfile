@@ -16,6 +16,17 @@ Application StyledEdit :
 	StyledEditApp.cpp
 	StyledEditView.cpp
 	StyledEditWindow.cpp
-	: be translation tracker libtextencoding.so $(TARGET_LIBSUPC++)
+	: be translation tracker libtextencoding.so liblocale.so $(TARGET_LIBSUPC++)
 	: $(styled_edit_rsrc)
 	;
+
+DoCatalogs StyledEdit :
+	x-vnd.Haiku-StyledEdit
+	:
+	FindWindow.cpp
+	ReplaceWindow.cpp
+	StyledEditApp.cpp
+	StyledEditWindow.cpp
+	: en.catalog
+	:
+;

@@ -15,6 +15,8 @@
 
 #include <Alert.h>
 #include <Autolock.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
@@ -49,7 +51,7 @@ namespace
 		if (top + gWindowRect.Height() > screenBorder.bottom)
 			top = 26;
 
-		gWindowRect.OffsetTo(BPoint(left,top));	
+		gWindowRect.OffsetTo(BPoint(left, top));	
 	}
 
 
@@ -71,24 +73,28 @@ namespace
 			top = top - ((int)left % 15) + 26;
 		}
 
-		gWindowRect.OffsetTo(BPoint(left,top));	
+		gWindowRect.OffsetTo(BPoint(left, top));	
 	}
 }
 
 
 //	#pragma mark -
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Open_and_SaveAsPanel"
 
 StyledEditApp::StyledEditApp()
 	: BApplication(APP_SIGNATURE),
 	fOpenPanel(NULL)
 {
+	be_locale->GetAppCatalog(&fCatalog);
+
 	fOpenPanel = new BFilePanel();
-	BMenuBar *menuBar =
+	BMenuBar* menuBar =
 		dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));
 
 	fOpenAsEncoding = 0;
-	fOpenPanelEncodingMenu= new BMenu("Encoding");
+	fOpenPanelEncodingMenu= new BMenu(TR("Encoding"));
 	menuBar->AddItem(fOpenPanelEncodingMenu);
 	fOpenPanelEncodingMenu->SetRadioMode(true);
 
@@ -97,7 +103,7 @@ StyledEditApp::StyledEditApp()
 	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
 		BString name;
 		if (charset.GetFontID() == B_UNICODE_UTF8)
-			name = "Default";
+			name = TR("Default");
 		else
 			name = charset.GetPrintName();
 
@@ -107,7 +113,8 @@ StyledEditApp::StyledEditApp()
 			name.Append(mime);
 			name.Append(")");
 		}
-		BMenuItem* item = new BMenuItem(name.String(), new BMessage(OPEN_AS_ENCODING));
+		BMenuItem* item =
+			new BMenuItem(name.String(), new BMessage(OPEN_AS_ENCODING));
 		item->SetTarget(this);
 		fOpenPanelEncodingMenu->AddItem(item);
 		if (charset.GetFontID() == fOpenAsEncoding)
@@ -129,7 +136,7 @@ StyledEditApp::~StyledEditApp()
 
 
 void
-StyledEditApp::MessageReceived(BMessage *message)
+StyledEditApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MENU_NEW:
@@ -231,7 +238,7 @@ StyledEditApp::CloseDocument()
 
 
 void
-StyledEditApp::RefsReceived(BMessage *message)
+StyledEditApp::RefsReceived(BMessage* message)
 {
 	int32 index = 0;
 	entry_ref ref;

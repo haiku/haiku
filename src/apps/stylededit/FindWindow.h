@@ -16,7 +16,6 @@
 class BButton;
 class BCheckBox;
 class BTextControl;
-class BView;
 
 
 class FindWindow : public BWindow {
@@ -30,7 +29,6 @@ class FindWindow : public BWindow {
 	private:
 		void			_SendMessage();
 
-		BView 			*fFindView;
 		BTextControl	*fSearchString;
 		BCheckBox		*fCaseSensBox;
 		BCheckBox		*fWrapBox;

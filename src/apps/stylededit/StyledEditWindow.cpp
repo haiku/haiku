@@ -19,12 +19,14 @@
 
 #include <Alert.h>
 #include <Autolock.h>
+#include <Catalog.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <File.h>
 #include <FilePanel.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -42,12 +44,14 @@ using namespace BPrivate;
 
 const float kLineViewWidth = 30.0;
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "StyledEditWindow"
 
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	InitWindow(encoding);
-	BString unTitled("Untitled ");
+	BString unTitled(TR("Untitled "));
 	unTitled << id;
 	SetTitle(unTitled.String());
 	fSaveItem->SetEnabled(true);
@@ -56,7 +60,7 @@ StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 }
 
 
-StyledEditWindow::StyledEditWindow(BRect frame, entry_ref *ref, uint32 encoding)
+StyledEditWindow::StyledEditWindow(BRect frame, entry_ref* ref, uint32 encoding)
 	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	InitWindow(encoding);
@@ -72,6 +76,9 @@ StyledEditWindow::~StyledEditWindow()
 	delete fSavePanel;
 }
 
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Menus"
 
 void
 StyledEditWindow::InitWindow(uint32 encoding)
@@ -124,79 +131,97 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	fTextView->MakeFocus(true);
 	
 	// Add "File"-menu:
-	BMenu* menu = new BMenu("File");
+	BMenu* menu = new BMenu(TR("File"));
 	fMenuBar->AddItem(menu);
 
 	BMenuItem* menuItem;
-	menu->AddItem(menuItem = new BMenuItem("New", new BMessage(MENU_NEW), 'N'));
+	menu->AddItem(menuItem = new BMenuItem(TR("New"),
+		new BMessage(MENU_NEW), 'N'));
 	menuItem->SetTarget(be_app);
 
-	menu->AddItem(menuItem = new BMenuItem(fRecentMenu = new BMenu("Open" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_OPEN)));
+	menu->AddItem(menuItem = new BMenuItem(fRecentMenu =
+		new BMenu(TR("Open" B_UTF8_ELLIPSIS)), new BMessage(MENU_OPEN)));
 	menuItem->SetShortcut('O', 0);
 	menuItem->SetTarget(be_app);
 	menu->AddSeparatorItem();
 
-	menu->AddItem(fSaveItem = new BMenuItem("Save", new BMessage(MENU_SAVE), 'S'));
+	menu->AddItem(fSaveItem = new BMenuItem(TR("Save"),
+		new BMessage(MENU_SAVE), 'S'));
 	fSaveItem->SetEnabled(false);
-	menu->AddItem(menuItem = new BMenuItem("Save as" B_UTF8_ELLIPSIS, new BMessage(MENU_SAVEAS)));
-	menuItem->SetShortcut('S',B_SHIFT_KEY);
+	menu->AddItem(menuItem = new BMenuItem(TR("Save as" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_SAVEAS)));
+	menuItem->SetShortcut('S', B_SHIFT_KEY);
 	menuItem->SetEnabled(true);
 
-	menu->AddItem(fRevertItem = new BMenuItem("Revert to saved" B_UTF8_ELLIPSIS,
+	menu->AddItem(fRevertItem =
+		new BMenuItem(TR("Revert to saved" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_REVERT)));
 	fRevertItem->SetEnabled(false);
-	menu->AddItem(menuItem = new BMenuItem("Close", new BMessage(MENU_CLOSE), 'W'));
+	menu->AddItem(menuItem = new BMenuItem(TR("Close"),
+		new BMessage(MENU_CLOSE), 'W'));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem("Page setup" B_UTF8_ELLIPSIS, new BMessage(MENU_PAGESETUP)));
-	menu->AddItem(menuItem = new BMenuItem("Print" B_UTF8_ELLIPSIS, new BMessage(MENU_PRINT), 'P'));
+	menu->AddItem(menuItem = new BMenuItem(TR("Page setup" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_PAGESETUP)));
+	menu->AddItem(menuItem = new BMenuItem(TR("Print" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_PRINT), 'P'));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem("Quit", new BMessage(MENU_QUIT), 'Q'));
+	menu->AddItem(menuItem = new BMenuItem(TR("Quit"),
+		new BMessage(MENU_QUIT), 'Q'));
 
 	// Add the "Edit"-menu:
-	menu = new BMenu("Edit");
+	menu = new BMenu(TR("Edit"));
 	fMenuBar->AddItem(menu);
 
-	menu->AddItem(fUndoItem = new BMenuItem("Can't undo", new BMessage(B_UNDO), 'Z'));
+	menu->AddItem(fUndoItem = new BMenuItem(TR("Can't undo"),
+		new BMessage(B_UNDO), 'Z'));
 	fUndoItem->SetEnabled(false);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(fCutItem = new BMenuItem("Cut", new BMessage(B_CUT), 'X'));
+	menu->AddItem(fCutItem = new BMenuItem(TR("Cut"), new BMessage(B_CUT), 'X'));
 	fCutItem->SetEnabled(false);
 	fCutItem->SetTarget(fTextView);
 
-	menu->AddItem(fCopyItem = new BMenuItem("Copy", new BMessage(B_COPY), 'C'));
+	menu->AddItem(fCopyItem = new BMenuItem(TR("Copy"),
+		new BMessage(B_COPY), 'C'));
 	fCopyItem->SetEnabled(false);
 	fCopyItem->SetTarget(fTextView);
 
-	menu->AddItem(menuItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V'));
+	menu->AddItem(menuItem = new BMenuItem(TR("Paste"),
+		new BMessage(B_PASTE), 'V'));
 	menuItem->SetTarget(fTextView);
-	menu->AddItem(fClearItem = new BMenuItem("Clear", new BMessage(MENU_CLEAR)));
+	menu->AddItem(fClearItem = new BMenuItem(TR("Clear"),
+		new BMessage(MENU_CLEAR)));
 	fClearItem->SetEnabled(false);
 	fClearItem->SetTarget(fTextView);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A'));
+	menu->AddItem(menuItem = new BMenuItem(TR("Select all"),
+		new BMessage(B_SELECT_ALL), 'A'));
 	menuItem->SetTarget(fTextView);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(MENU_FIND),'F'));
-	menu->AddItem(fFindAgainItem= new BMenuItem("Find again",new BMessage(MENU_FIND_AGAIN),'G'));
+	menu->AddItem(menuItem = new BMenuItem(TR("Find" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_FIND), 'F'));
+	menu->AddItem(fFindAgainItem= new BMenuItem(TR("Find again"),
+		new BMessage(MENU_FIND_AGAIN), 'G'));
 	fFindAgainItem->SetEnabled(false);
 
-	menu->AddItem(menuItem = new BMenuItem("Find selection", new BMessage(MENU_FIND_SELECTION),'H'));
-	menu->AddItem(menuItem = new BMenuItem("Replace" B_UTF8_ELLIPSIS, new BMessage(MENU_REPLACE),'R'));
-	menu->AddItem(fReplaceSameItem = new BMenuItem("Replace same", new BMessage(MENU_REPLACE_SAME),'T'));
+	menu->AddItem(menuItem = new BMenuItem(TR("Find selection"),
+		new BMessage(MENU_FIND_SELECTION), 'H'));
+	menu->AddItem(menuItem = new BMenuItem(TR("Replace" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_REPLACE), 'R'));
+	menu->AddItem(fReplaceSameItem = new BMenuItem(TR("Replace same"),
+		new BMessage(MENU_REPLACE_SAME), 'T'));
 	fReplaceSameItem->SetEnabled(false);
 
 	// Add the "Font"-menu:
-	fFontMenu = new BMenu("Font");
+	fFontMenu = new BMenu(TR("Font"));
 	fMenuBar->AddItem(fFontMenu);
 
 	//"Size"-subMenu
-	fFontSizeMenu = new BMenu("Size");
+	fFontSizeMenu = new BMenu(TR("Size"));
 	fFontSizeMenu->SetRadioMode(true);
 	fFontMenu->AddItem(fFontSizeMenu);
 
@@ -214,18 +239,25 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	}
 
 	// "Color"-subMenu
-	fFontColorMenu = new BMenu("Color");
+	fFontColorMenu = new BMenu(TR("Color"));
 	fFontColorMenu->SetRadioMode(true);
 	fFontMenu->AddItem(fFontColorMenu);
 
-	fFontColorMenu->AddItem(fBlackItem = new BMenuItem("Black", new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fBlackItem = new BMenuItem(TR("Black"),
+		new BMessage(FONT_COLOR)));
 	fBlackItem->SetMarked(true);
-	fFontColorMenu->AddItem(fRedItem = new ColorMenuItem("Red", RED, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fGreenItem = new ColorMenuItem("Green", GREEN, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fBlueItem = new ColorMenuItem("Blue", BLUE, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fCyanItem = new ColorMenuItem("Cyan", CYAN, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fMagentaItem = new ColorMenuItem("Magenta", MAGENTA, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fYellowItem = new ColorMenuItem("Yellow", YELLOW, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fRedItem = new ColorMenuItem(TR("Red"), RED,
+		new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fGreenItem = new ColorMenuItem(TR("Green"), GREEN,
+		new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fBlueItem = new ColorMenuItem(TR("Blue"), BLUE,
+		new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fCyanItem = new ColorMenuItem(TR("Cyan"), CYAN,
+		new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fMagentaItem = new ColorMenuItem(TR("Magenta"), MAGENTA,
+		new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fYellowItem = new ColorMenuItem(TR("Yellow"), YELLOW,
+		new BMessage(FONT_COLOR)));
 	fFontMenu->AddSeparatorItem();
 
 	// Available fonts
@@ -256,20 +288,24 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	}
 
 	// Add the "Document"-menu:
-	menu = new BMenu("Document");
+	menu = new BMenu(TR("Document"));
 	fMenuBar->AddItem(menu);
 
 	// "Align"-subMenu:
-	subMenu = new BMenu("Align");
+	subMenu = new BMenu(TR("Align"));
 	subMenu->SetRadioMode(true);
 
-	subMenu->AddItem(fAlignLeft = new BMenuItem("Left", new BMessage(ALIGN_LEFT)));
+	subMenu->AddItem(fAlignLeft = new BMenuItem(TR("Left"),
+		new BMessage(ALIGN_LEFT)));
 	fAlignLeft->SetMarked(true);
 
-	subMenu->AddItem(fAlignCenter = new BMenuItem("Center", new BMessage(ALIGN_CENTER)));
-	subMenu->AddItem(fAlignRight = new BMenuItem("Right", new BMessage(ALIGN_RIGHT)));
+	subMenu->AddItem(fAlignCenter = new BMenuItem(TR("Center"),
+		new BMessage(ALIGN_CENTER)));
+	subMenu->AddItem(fAlignRight = new BMenuItem(TR("Right"),
+		new BMessage(ALIGN_RIGHT)));
 	menu->AddItem(subMenu);
-	menu->AddItem(fWrapItem = new BMenuItem("Wrap lines", new BMessage(WRAP_LINES)));
+	menu->AddItem(fWrapItem = new BMenuItem(TR("Wrap lines"),
+		new BMessage(WRAP_LINES)));
 	fWrapItem->SetMarked(true);
 
 	fSavePanel = NULL;
@@ -279,7 +315,7 @@ StyledEditWindow::InitWindow(uint32 encoding)
 
 
 void
-StyledEditWindow::MessageReceived(BMessage *message)
+StyledEditWindow::MessageReceived(BMessage* message)
 {
 	if (message->WasDropped()) {
 		entry_ref ref;
@@ -502,7 +538,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		{
 			BRect textRect(fTextView->Bounds());
 			textRect.OffsetTo(B_ORIGIN);
-			textRect.InsetBy(TEXT_INSET,TEXT_INSET);
+			textRect.InsetBy(TEXT_INSET, TEXT_INSET);
 			if (fTextView->DoesWordWrap()) {
 				fTextView->SetWordWrap(false);
 				fWrapItem->SetMarked(false);
@@ -534,15 +570,15 @@ StyledEditWindow::MessageReceived(BMessage *message)
 					fClean = true;
 					fUndoCleans = false;
 				} else if (fClean) {
-				   // if we were clean
-				   // then a redo will make us clean again
-				   fRedoCleans = true;
-				   fClean = false;
+					// if we were clean
+					// then a redo will make us clean again
+					fRedoCleans = true;
+					fClean = false;
 				}
 				// set mode
 				fCanUndo = false;
 				fCanRedo = true;
-				fUndoItem->SetLabel("Redo typing");
+				fUndoItem->SetLabel(TR("Redo typing"));
 				fUndoItem->SetEnabled(true);
 				fUndoFlag = false;
 			} else {
@@ -562,7 +598,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 				// set mode
 				fCanUndo = true;
 				fCanRedo = false;
-				fUndoItem->SetLabel("Undo typing");
+				fUndoItem->SetLabel(TR("Undo typing"));
 				fUndoItem->SetEnabled(true);
 				fRedoFlag = false;
 			}
@@ -579,7 +615,8 @@ StyledEditWindow::MessageReceived(BMessage *message)
 			void* ptr;
 			if (message->FindPointer("source", &ptr) == B_OK
 				&& fSavePanelEncodingMenu != NULL) {
-				fTextView->SetEncoding((uint32)fSavePanelEncodingMenu->IndexOf((BMenuItem*)ptr));
+				fTextView->SetEncoding(
+					(uint32)fSavePanelEncodingMenu->IndexOf((BMenuItem*)ptr));
 			}
 			break;
 
@@ -736,15 +773,34 @@ StyledEditWindow::Quit()
 }
 
 
+// This is temporary solution for building BString with printf like format.
+// will be removed in the future.
+static void
+bs_printf(BString* string, const char* format, ...)
+{
+	va_list 	ap;
+	va_start(ap, format);
+	char*	buf;
+	vasprintf(&buf, format, ap);
+	string->SetTo(buf);
+	free(buf);
+	va_end(ap);
+}
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "QuitAlert"
+
 bool
 StyledEditWindow::QuitRequested()
 {
 	if (fClean)
 		return true;
 
-	BString alertText("Save changes to the document \"");
-	alertText<< Title() <<"\"? ";
-	int32 index = _ShowAlert(alertText, "Cancel", "Don't save", "Save",
+	BString alertText;
+	bs_printf(&alertText, TR("Save changes to the document \"%s\"? "), Title());
+	
+	int32 index = _ShowAlert(alertText, TR("Cancel"), TR("Don't save"), TR("Save"),
 		B_WARNING_ALERT);
 
 	if (index == 0)
@@ -762,8 +818,11 @@ StyledEditWindow::QuitRequested()
 }
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "SaveAlert"
+
 status_t
-StyledEditWindow::Save(BMessage *message)
+StyledEditWindow::Save(BMessage* message)
 {
 	if (!message)
 		message = fSaveMessage;
@@ -788,10 +847,10 @@ StyledEditWindow::Save(BMessage *message)
 	}
 
 	if (status != B_OK) {
-		BString alertText("Error saving \"");
-		alertText << name << "\":\n" << strerror(status);
+		BString alertText;
+		bs_printf(&alertText, TR("Error saving \"%s\":\n%s"), name, strerror(status));
 
-		_ShowAlert(alertText, "OK", "", "", B_STOP_ALERT);
+		_ShowAlert(alertText, TR("OK"), "", "", B_STOP_ALERT);
 		return status;
 	}
 
@@ -816,8 +875,11 @@ StyledEditWindow::Save(BMessage *message)
 }
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Open_and_SaveAsPanel"
+
 status_t
-StyledEditWindow::SaveAs(BMessage *message)
+StyledEditWindow::SaveAs(BMessage* message)
 {
 	if (fSavePanel == NULL) {
 		entry_ref* directory = NULL;
@@ -834,7 +896,7 @@ StyledEditWindow::SaveAs(BMessage *message)
 		BMenuBar* menuBar = dynamic_cast<BMenuBar*>(
 			fSavePanel->Window()->FindView("MenuBar"));
 
-		fSavePanelEncodingMenu= new BMenu("Encoding");
+		fSavePanelEncodingMenu= new BMenu(TR("Encoding"));
 		menuBar->AddItem(fSavePanelEncodingMenu);
 		fSavePanelEncodingMenu->SetRadioMode(true);
 
@@ -848,7 +910,8 @@ StyledEditWindow::SaveAs(BMessage *message)
 				name.Append(mime);
 				name.Append(")");
 			}
-			BMenuItem * item = new BMenuItem(name.String(), new BMessage(SAVE_AS_ENCODING));
+			BMenuItem * item = new BMenuItem(name.String(),
+				new BMessage(SAVE_AS_ENCODING));
 			item->SetTarget(this);
 			fSavePanelEncodingMenu->AddItem(item);
 			if (charset.GetFontID() == fTextView->GetEncoding())
@@ -864,6 +927,9 @@ StyledEditWindow::SaveAs(BMessage *message)
 	return B_OK;
 }
 
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "LoadAlert"
 
 status_t
 StyledEditWindow::_LoadFile(entry_ref* ref)
@@ -892,16 +958,15 @@ StyledEditWindow::_LoadFile(entry_ref* ref)
 		BEntry entry(ref, true);
 		char name[B_FILE_NAME_LENGTH];
 		if (entry.GetName(name) != B_OK)
-			strcpy(name, "???");
+			strcpy(name, TR("???"));
 
-		BString text("Error loading \"");
-		text << name << "\":\n\t";
+		BString text;
 		if (status == B_BAD_TYPE)
-			text << "Unsupported format";
+			bs_printf(&text, TR("Error loading \"%s\":\n\tUnsupported format"), name);
 		else
-			text << strerror(status);
+			bs_printf(&text, TR("Error loading \"%s\":\n\t%s"), name, strerror(status));
 
-		_ShowAlert(text, "OK", "", "", B_STOP_ALERT);
+		_ShowAlert(text, TR("OK"), "", "", B_STOP_ALERT);
 		return status;
 	}
 
@@ -953,11 +1018,14 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 }
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "RevertToSavedAlert"
+
 void
 StyledEditWindow::RevertToSaved()
 {
 	entry_ref ref;
-	const char *name;
+	const char* name;
 
 	fSaveMessage->FindRef("directory", &ref);
 	fSaveMessage->FindString("name", &name);
@@ -972,23 +1040,26 @@ StyledEditWindow::RevertToSaved()
 		status = entry.GetRef(&ref);
 
 	if (status != B_OK || !entry.Exists()) {
-		BString alertText("Cannot revert, file not found: \"");
-		alertText << name << "\".";
-		_ShowAlert(alertText, "OK", "", "", B_STOP_ALERT);
+		BString alertText;
+		bs_printf(&alertText, TR("Cannot revert, file not found: \"%s\"."), name);
+		_ShowAlert(alertText, TR("OK"), "", "", B_STOP_ALERT);
 		return;
 	}
 
-	BString alertText("Revert to the last version of \"");
-	alertText << Title() << "\"? ";
-	if (_ShowAlert(alertText, "Cancel", "OK", "", B_WARNING_ALERT) != 1)
+	BString alertText;
+	bs_printf(&alertText, TR("Revert to the last version of \"%s\"? "), Title());
+	if (_ShowAlert(alertText, TR("Cancel"), TR("OK"), "", B_WARNING_ALERT) != 1)
 		return;
 
 	fTextView->Reset();
 	if (_LoadFile(&ref) != B_OK)
 		return;
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Menus"
+
 	// clear undo modes
-	fUndoItem->SetLabel("Can't undo");
+	fUndoItem->SetLabel(TR("Can't undo"));
 	fUndoItem->SetEnabled(false);
 	fUndoFlag = false;
 	fCanUndo = false;
@@ -1089,7 +1160,8 @@ StyledEditWindow::Print(const char* documentName)
 				top = fTextView->TextHeight(0, firstLineOnPage - 1);
 
 			float bottom = fTextView->TextHeight(0, printLine - 1);
-			BRect textRect(0.0, top + TEXT_INSET, printableRect.Width(), bottom + TEXT_INSET);
+			BRect textRect(0.0, top + TEXT_INSET,
+				printableRect.Width(), bottom + TEXT_INSET);
 			printJob.DrawView(fTextView, textRect, B_ORIGIN);
 			printJob.SpoolPage();
 		}
@@ -1213,7 +1285,7 @@ StyledEditWindow::ReplaceAll(BString findIt, BString replaceWith, bool caseSensi
 	if (viewText.Length() < textFinish)
 		textFinish = viewText.Length();
 
-	fTextView->Select(textStart,textFinish);
+	fTextView->Select(textStart, textFinish);
 	fTextView->ScrollToSelection();
 
 	_UpdateCleanUndoRedoSaveRevert();
@@ -1226,14 +1298,14 @@ StyledEditWindow::SearchAllWindows(BString find, BString replace, bool caseSensi
 	int32 numWindows;
 	numWindows = be_app->CountWindows();
 
-	BMessage *message;
+	BMessage* message;
 	message= new BMessage(MSG_REPLACE_ALL);
 	message->AddString("FindText", find);
 	message->AddString("ReplaceText", replace);
 	message->AddBool("casesens", caseSensitive);
 
 	while (numWindows >= 0) {
-		StyledEditWindow *window = dynamic_cast<StyledEditWindow *>(
+		StyledEditWindow* window = dynamic_cast<StyledEditWindow *>(
 			be_app->WindowAt(numWindows));
 
 		BMessenger messenger(window);
@@ -1259,7 +1331,7 @@ StyledEditWindow::SetFontSize(float fontSize)
 
 
 void
-StyledEditWindow::SetFontColor(const rgb_color *color)
+StyledEditWindow::SetFontColor(const rgb_color* color)
 {
 	uint32 sameProperties;
 	BFont font;
@@ -1272,7 +1344,7 @@ StyledEditWindow::SetFontColor(const rgb_color *color)
 
 
 void
-StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
+StyledEditWindow::SetFontStyle(const char* fontFamily, const char* fontStyle)
 {
 	BFont font;
 	uint32 sameProperties;
@@ -1311,6 +1383,8 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 }
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Menus"
 void
 StyledEditWindow::_UpdateCleanUndoRedoSaveRevert()
 {
@@ -1319,7 +1393,7 @@ StyledEditWindow::_UpdateCleanUndoRedoSaveRevert()
 	fRedoCleans = false;
 	fRevertItem->SetEnabled(fSaveMessage != NULL);
 	fSaveItem->SetEnabled(true);
-	fUndoItem->SetLabel("Can't Undo");
+	fUndoItem->SetLabel(TR("Can't Undo"));
 	fUndoItem->SetEnabled(false);
 	fCanUndo = false;
 	fCanRedo = false;

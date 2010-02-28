@@ -13,7 +13,6 @@
 #include <Window.h>
 
 
-class BView;
 class BString;
 class BButton;
 class BHandler;
@@ -35,7 +34,6 @@ class ReplaceWindow : public BWindow {
 		void 			_SendMessage(uint32 what);
 		void 			_ChangeUI();		
 
-		BView 			*fReplaceView;
 		BTextControl	*fSearchString;
 		BTextControl	*fReplaceString;
 		BCheckBox		*fCaseSensBox;

@@ -12,69 +12,72 @@
 #include "ReplaceWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
+#include <GroupLayoutBuilder.h>
+#include <GridLayoutBuilder.h>
 #include <Handler.h>
+#include <Locale.h>
+#include <LayoutBuilder.h>
 #include <Message.h>
 #include <Messenger.h>
-#include <Rect.h>
 #include <String.h>
 #include <TextControl.h>
-#include <View.h>
 
 
-ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchString,
-	BString *replaceString, bool caseState, bool wrapState, bool backState)
+#undef TR_CONTEXT
+#define TR_CONTEXT "FindandReplaceWindow"
+
+ReplaceWindow::ReplaceWindow(BRect frame, BHandler* _handler,
+	BString* searchString, 	BString *replaceString,
+	bool caseState, bool wrapState, bool backState)
 	: BWindow(frame, "ReplaceWindow", B_MODAL_WINDOW,
-		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_CURRENT_WORKSPACE) 
+		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS,
+		B_CURRENT_WORKSPACE) 
 {
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 	
-	fReplaceView = new BView(Bounds(), "ReplaceView", B_FOLLOW_ALL, B_WILL_DRAW);
-	fReplaceView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(fReplaceView);
-
-	char* findLabel = "Find:";
-	float findWidth = fReplaceView->StringWidth(findLabel);
-	fReplaceView->AddChild(fSearchString = new BTextControl(BRect(5, 10, 290, 50), "",
-		findLabel, NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE));
-	
-	char* replaceWithLabel = "Replace with:";
-	float replaceWithWidth = fReplaceView->StringWidth(replaceWithLabel);
-	fReplaceView->AddChild(fReplaceString = new BTextControl(BRect(5, 35, 290, 50), "",
-		replaceWithLabel, NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE));
-	float maxWidth = (replaceWithWidth > findWidth ? replaceWithWidth : findWidth) + TEXT_INSET;
-	fSearchString->SetDivider(maxWidth);
-	fReplaceString->SetDivider(maxWidth);
-
-	fReplaceView->AddChild(fCaseSensBox = new BCheckBox(BRect(maxWidth + 8, 60, 290, 52),
-		"", "Case-sensitive", NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE));
-	fReplaceView->AddChild(fWrapBox = new BCheckBox(BRect(maxWidth + 8, 80, 290, 70),
-		"", "Wrap-around search", NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE));
-	fReplaceView->AddChild(fBackSearchBox = new BCheckBox(BRect(maxWidth + 8, 100, 290, 95),
-		"", "Search backwards", NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE)); 
-	fReplaceView->AddChild(fAllWindowsBox = new BCheckBox(BRect(maxWidth + 8, 120, 290, 95),
-		"", "Replace in all windows", new BMessage(CHANGE_WINDOW),
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE));
+	fSearchString = new BTextControl("", TR("Find:"), NULL, NULL);
+	fReplaceString = new BTextControl("", TR("Replace with:"), NULL, NULL);
+	fCaseSensBox = new BCheckBox("", TR("Case-sensitive"), NULL);
+	fWrapBox = new BCheckBox("", TR("Wrap-around search"), NULL);
+	fBackSearchBox = new BCheckBox("", TR("Search backwards"), NULL); 
+	fAllWindowsBox = new BCheckBox("", TR("Replace in all windows"),
+		new BMessage(CHANGE_WINDOW));
 	fUIchange = false;
 
-	fReplaceView->AddChild(fReplaceAllButton = new BButton(BRect(10, 150, 98, 166),
-		"", "Replace all", new BMessage(MSG_REPLACE_ALL), B_FOLLOW_LEFT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE));
-	fReplaceView->AddChild(fCancelButton = new BButton(BRect(141, 150, 211, 166),
-		"", "Cancel", new BMessage(B_QUIT_REQUESTED), B_FOLLOW_LEFT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE));
-	fReplaceView->AddChild(fReplaceButton = new BButton(BRect(221, 150, 291, 166),
-		"", "Replace", new BMessage(MSG_REPLACE), B_FOLLOW_LEFT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE));
+	fReplaceAllButton = new BButton("", TR("Replace all"),
+		new BMessage(MSG_REPLACE_ALL));
+	fCancelButton = new BButton("", TR("Cancel"), new BMessage(B_QUIT_REQUESTED));
+	fReplaceButton = new BButton("", TR("Replace"), new BMessage(MSG_REPLACE));
+
+	SetLayout(new BGroupLayout(B_HORIZONTAL)); 
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 4)
+		.Add(BGridLayoutBuilder(6, 2)
+				.Add(fSearchString->CreateLabelLayoutItem(), 0, 0)
+				.Add(fSearchString->CreateTextViewLayoutItem(), 1, 0)
+				.Add(fReplaceString->CreateLabelLayoutItem(), 0, 1)
+				.Add(fReplaceString->CreateTextViewLayoutItem(), 1, 1)
+				.Add(fCaseSensBox, 1, 2)
+				.Add(fWrapBox, 1, 3)
+				.Add(fBackSearchBox, 1, 4)
+				.Add(fAllWindowsBox, 1, 5)
+				)
+		.AddGroup(B_HORIZONTAL, 10) 
+			.Add(fReplaceAllButton) 
+			.AddGlue() 
+			.Add(fCancelButton) 
+			.Add(fReplaceButton) 
+		.End() 
+		.SetInsets(10, 10, 10, 10) 
+	); 
+
 	fReplaceButton->MakeDefault(true);
 
 	fHandler = _handler;
 
-	const char *searchtext = searchString->String();
-	const char *replacetext = replaceString->String(); 
+	const char* searchtext = searchString->String();
+	const char* replacetext = replaceString->String(); 
 
 	fSearchString->SetText(searchtext);
 	fReplaceString->SetText(replacetext);
@@ -87,7 +90,7 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchStr
 
 
 void
-ReplaceWindow::MessageReceived(BMessage *msg)
+ReplaceWindow::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case MSG_REPLACE:
@@ -126,7 +129,7 @@ ReplaceWindow::_ChangeUI()
 
 
 void
-ReplaceWindow::DispatchMessage(BMessage *message, BHandler *handler)
+ReplaceWindow::DispatchMessage(BMessage* message, BHandler* handler)
 {
 	if (message->what == B_KEY_DOWN) {
 		int8 key;

@@ -12,57 +12,55 @@
 #include "FindWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
+#include <GroupLayoutBuilder.h>
+#include <GridLayoutBuilder.h>
+#include <Locale.h>
+#include <LayoutBuilder.h>
 #include <String.h>
 #include <TextControl.h>
 
 
-FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString,
+#undef TR_CONTEXT
+#define TR_CONTEXT "FindandReplaceWindow"
+
+FindWindow::FindWindow(BRect frame, BHandler* _handler, BString* searchString,
 	bool caseState, bool wrapState, bool backState)
 	: BWindow(frame, "FindWindow", B_MODAL_WINDOW,
-		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_CURRENT_WORKSPACE)
+		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS,
+		B_CURRENT_WORKSPACE)
 {
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
-	
-	fFindView = new BView(Bounds(), "FindView", B_FOLLOW_ALL, B_WILL_DRAW);
-	fFindView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(fFindView);
 
-	font_height height;
-	fFindView->GetFontHeight(&height);
-	float lineHeight = height.ascent + height.descent + height.leading;
+	fSearchString = new BTextControl("", TR("Find:"), NULL, NULL);
+	fCaseSensBox = new BCheckBox("", TR("Case-sensitive"), NULL);
+	fWrapBox = new BCheckBox("", TR("Wrap-around search"), NULL);
+	fBackSearchBox = new BCheckBox("", TR("Search backwards"), NULL);
+	fCancelButton = new BButton("", TR("Cancel"), new BMessage(B_QUIT_REQUESTED));
+	fSearchButton = new BButton("", TR("Find"), new BMessage(MSG_SEARCH));
 
-	float findWidth = fFindView->StringWidth("Find:") + 6;
-
-	float searchBottom = 12 + 2 + lineHeight + 2 + 1;
-	float buttonTop = frame.Height() - 19 - lineHeight;
-	float wrapBoxTop = (buttonTop + searchBottom - lineHeight) / 2;
-	float wrapBoxBottom = (buttonTop + searchBottom + lineHeight) / 2;
-	float caseBoxTop = (searchBottom + wrapBoxTop - lineHeight) / 2;
-	float caseBoxBottom = (searchBottom + wrapBoxTop + lineHeight) / 2;
-	float backBoxTop = (buttonTop + wrapBoxBottom - lineHeight) / 2;
-	float backBoxBottom = (buttonTop + wrapBoxBottom + lineHeight) / 2;
-
-	fFindView->AddChild(fSearchString = new BTextControl(BRect(14, 12,
-		frame.Width() - 10, searchBottom), "", "Find:", NULL, NULL));
-	fSearchString->SetDivider(findWidth);
-
-	fFindView->AddChild(fCaseSensBox = new BCheckBox(BRect(16 + findWidth, caseBoxTop,
-		frame.Width() - 12, caseBoxBottom), "", "Case-sensitive", NULL));
-	fFindView->AddChild(fWrapBox = new BCheckBox(BRect(16 + findWidth, wrapBoxTop,
-		frame.Width() - 12, wrapBoxBottom), "", "Wrap-around search", NULL));
-	fFindView->AddChild(fBackSearchBox = new BCheckBox(BRect(16 + findWidth,
-		backBoxTop, frame.Width() - 12, backBoxBottom), "", "Search backwards", NULL));
-	
-	fFindView->AddChild(fCancelButton = new BButton(BRect(142, buttonTop, 212,
-		frame.Height() - 7), "", "Cancel", new BMessage(B_QUIT_REQUESTED)));
-	fFindView->AddChild(fSearchButton = new BButton(BRect(221, buttonTop, 291,
-		frame.Height() - 7), "", "Find", new BMessage(MSG_SEARCH)));
+	SetLayout(new BGroupLayout(B_HORIZONTAL)); 
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 4)
+		.Add(BGridLayoutBuilder(6, 2)
+				.Add(fSearchString->CreateLabelLayoutItem(), 0, 0)
+				.Add(fSearchString->CreateTextViewLayoutItem(), 1, 0)
+				.Add(fCaseSensBox, 1, 1)
+				.Add(fWrapBox, 1, 2)
+				.Add(fBackSearchBox, 1, 3)
+				)
+		.AddGroup(B_HORIZONTAL, 10) 
+			.AddGlue() 
+			.Add(fCancelButton) 
+			.Add(fSearchButton) 
+		.End() 
+		.SetInsets(10, 10, 10, 10) 
+	); 
 
 	fSearchButton->MakeDefault(true);
 	fHandler = _handler;
 
-	const char *text = searchString->String();
+	const char* text = searchString->String();
 
 	fSearchString->SetText(text);
 	fSearchString->MakeFocus(true);
@@ -74,7 +72,7 @@ FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString,
 
 
 void
-FindWindow::MessageReceived(BMessage *msg)
+FindWindow::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case B_QUIT_REQUESTED:
@@ -92,7 +90,7 @@ FindWindow::MessageReceived(BMessage *msg)
 
 
 void
-FindWindow::DispatchMessage(BMessage *message, BHandler *handler)
+FindWindow::DispatchMessage(BMessage* message, BHandler* handler)
 {
 	if (message->what == B_KEY_DOWN) {
 		int8 key;
