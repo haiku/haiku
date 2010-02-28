@@ -1,22 +1,24 @@
 /*
+ * Copyright 2009-2010, Stefano Ceccherini (stefano.ceccherini@gmail.com)
  * Copyright 2008, Dustin Howett, dustin.howett@gmail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 #include <debug.h>
+#include <int.h>
+#include <smp.h>
 #include <timer.h>
+
+#include <arch/int.h>
+#include <arch/cpu.h>
 #include <arch/x86/timer.h>
 #include <arch/x86/arch_hpet.h>
 
 #include <boot/kernel_args.h>
-
-#include <arch/int.h>
-#include <arch/cpu.h>
-#include <int.h>
 #include <vm/vm.h>
 
 
-#define TRACE_HPET
+//#define TRACE_HPET
 #ifdef TRACE_HPET
 	#define TRACE(x) dprintf x
 #else
@@ -47,7 +49,13 @@ struct timer_info gHPETTimer = {
 static int
 hpet_get_priority()
 {
-	return 0; // TODO: Should have the highest priority
+	// TODO: Fix HPET in SMP mode.
+	if (smp_get_num_cpus() > 1)
+		return 0;
+	
+	// HPET timers, being off-chip, are more expensive to setup
+	// than the LAPIC.
+	return 0;
 }
 
 
@@ -67,6 +75,8 @@ hpet_convert_timeout(const bigtime_t &relativeTimeout)
 }
 
 
+#define MIN_TIMEOUT 3000
+
 static status_t
 hpet_set_hardware_timer(bigtime_t relativeTimeout)
 {
@@ -76,8 +86,8 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout)
 	sTimer->config |= HPET_CONF_TIMER_INT_ENABLE;
 	
 	// TODO:
-	if (relativeTimeout < 3000)
-		relativeTimeout = 3000;
+	if (relativeTimeout < MIN_TIMEOUT)
+		relativeTimeout = MIN_TIMEOUT;
 		
 	bigtime_t timerValue = hpet_convert_timeout(relativeTimeout);
 	
@@ -268,8 +278,6 @@ hpet_init(struct kernel_args *args)
 	
 	int32 configuredIRQ = HPET_GET_CONF_TIMER_INT_ROUTE(sTimer);
 		
-	//install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE,
-		//&hpet_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
 	install_io_interrupt_handler(configuredIRQ, &hpet_timer_interrupt,
 		NULL, B_NO_LOCK_VECTOR);
 	
