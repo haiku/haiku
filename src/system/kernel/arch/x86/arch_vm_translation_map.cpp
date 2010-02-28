@@ -1315,7 +1315,7 @@ arch_vm_translation_map_init(kernel_args *args,
 #ifdef TRACE_VM_TMAP
 	TRACE("page hole: %p, page dir: %p\n", sPageHole, sPageHolePageDir);
 	TRACE("page dir: %p (physical: %p)\n", sKernelVirtualPageDirectory,
-		sKernelVirtualPageDirectory);
+		sKernelPhysicalPageDirectory);
 
 	TRACE("physical memory ranges:\n");
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
