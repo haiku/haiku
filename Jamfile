@@ -191,6 +191,7 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) FloppyBootImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootPPCImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuCD ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) AnybootImage ] ;
 
 # Check whether all requested optional packages do actually exist.
 local package ;

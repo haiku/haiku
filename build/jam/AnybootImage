@@ -1,0 +1,45 @@
+rule BuildAnybootMBR binary : source {
+	MBR_SOURCE on $(binary) = $(source) ;
+
+	BuildAnybootMBR1 $(binary) ;
+}
+
+actions BuildAnybootMBR1 {
+	$(RM) $(1)
+	$(TARGET_CC) $(MBR_SOURCE) -o $(1) -nostdlib -Xlinker --oformat=binary -Xlinker -S -Xlinker -N -Xlinker "-e start" -Xlinker "-Ttext=0x600"
+}
+
+local baseMBR = base_mbr.bin ;
+local mbrSource = [ FDirName $(HAIKU_TOP) src bin writembr mbr.S ] ;
+
+BuildAnybootMBR $(baseMBR) : $(mbrSource) ;
+
+MakeLocate $(baseMBR) : $(HAIKU_OUTPUT_DIR) ;
+
+
+rule BuildAnybootImage anybootImage : mbrPart : isoPart : imageFile {
+	local anyboot = <build>anyboot ;
+
+	Depends $(anybootImage) : $(anyboot) ;
+	Depends $(anybootImage) : $(isoPart) ;
+	Depends $(anybootImage) : $(mbrPart) ;
+	Depends $(anybootImage) : $(imageFile) ;
+
+	BuildAnybootImage1 $(anybootImage) : $(anyboot) $(isoPart) $(mbrPart) $(imageFile) ;
+}
+
+actions BuildAnybootImage1 {
+	$(2[1]) $(1) $(2[2]) $(2[3]) $(2[4])
+}
+
+HAIKU_ANYBOOT_IMAGE = haiku-anyboot.image ;
+MakeLocate $(HAIKU_ANYBOOT_IMAGE) : $(HAIKU_OUTPUT_DIR) ;
+
+BuildAnybootImage $(HAIKU_ANYBOOT_IMAGE) : $(baseMBR) : $(HAIKU_CD_BOOT_IMAGE)
+	: $(HAIKU_IMAGE_NAME) ;
+
+# TODO: this one seems to cause the build to fail each other run (caching?)
+#RmTemps $(HAIKU_ANYBOOT_IMAGE) : $(baseMBR) ;
+
+NotFile haiku-anyboot-image ;
+Depends haiku-anyboot-image : $(HAIKU_ANYBOOT_IMAGE) ;
