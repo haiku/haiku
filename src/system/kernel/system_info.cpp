@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2008, Haiku, Inc.
+ * Copyright (c) 2004-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -49,15 +49,16 @@ dump_info(int argc, char **argv)
 	kprintf("cpu count: %ld, active times:\n", smp_get_num_cpus());
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++)
-		kprintf("  [%ld] %Ld\n", i + 1, cpu_get_active_time(i));
+		kprintf("  [%ld] %Ld\n", i + 1, gCPU[i].active_time);
 
 	// ToDo: Add page_faults
-	kprintf("pages:\t\t%ld (%ld max)\n", vm_page_num_pages() - vm_page_num_free_pages(),
-		vm_page_num_pages());
+	kprintf("pages:\t\t%ld (%ld max)\n",
+		vm_page_num_pages() - vm_page_num_free_pages(), vm_page_num_pages());
 
 	kprintf("sems:\t\t%ld (%ld max)\n", sem_used_sems(), sem_max_sems());
 	kprintf("ports:\t\t%ld (%ld max)\n", port_used_ports(), port_max_ports());
-	kprintf("threads:\t%ld (%ld max)\n", thread_used_threads(), thread_max_threads());
+	kprintf("threads:\t%ld (%ld max)\n", thread_used_threads(),
+		thread_max_threads());
 	kprintf("teams:\t\t%ld (%ld max)\n", team_used_teams(), team_max_teams());
 
 	return 0;
