@@ -18,7 +18,7 @@ copyLoop(int from, int to, off_t position)
 		if (copyLength <= 0)
 			return copyLength;
 
-		ssize_t written = write_pos(to, position, sCopyBuffer, copyLength);
+		ssize_t written = pwrite(to, sCopyBuffer, copyLength, position);
 		if (written != copyLength) {
 			if (written < 0)
 				return written;
@@ -110,12 +110,12 @@ main(int argc, char *argv[])
 	uint32_t partitionOffset = (uint32_t)(imageOffset / kBlockSize);
 	((uint32_t *)partition)[2] = partitionOffset;
 	((uint32_t *)partition)[3] = (uint32_t)(imageSize / kBlockSize);
-	ssize_t written = write_pos(outputFile, 512 - 2 - 16 * 4, partition, 16);
+	ssize_t written = pwrite(outputFile, partition, 16, 512 - 2 - 16 * 4);
 	checkError(written != 16, "failed to write partition entry");
 
 	// and make the image bootable
-	written = write_pos(outputFile, imageOffset + 512 - 2 - 4,
-		&partitionOffset, 4);
+	written = pwrite(outputFile, &partitionOffset, 4,
+		imageOffset + 512 - 2 - 4);
 	checkError(written != 4, "failed to make image bootable");
 
 	free(sCopyBuffer);
