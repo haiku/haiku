@@ -27,7 +27,6 @@
 #include <GradientConic.h>
 
 #include "link_message.h"
-#include "syscalls.h"
 
 //#define DEBUG_BPORTLINK
 #ifdef DEBUG_BPORTLINK
@@ -297,19 +296,7 @@ LinkReceiver::Read(void *data, ssize_t passedSize)
 			fReadError = B_BAD_VALUE;
 
 		if (fReadError >= B_OK) {
-			thread_info threadInfo;
-			get_thread_info(find_thread(NULL), &threadInfo);
-
-			void* areaAddress = NULL;
-			if (areaInfo.team != threadInfo.team) {
-				sourceArea = _kern_transfer_area(sourceArea, &areaAddress,
-					B_ANY_ADDRESS, threadInfo.team);
-		
-				if (sourceArea < B_OK)
-					fReadError = sourceArea;
-			} else {
-				areaAddress = areaInfo.address;
-			}
+			void* areaAddress = areaInfo.address;
 			
 			if (areaAddress && sourceArea >= B_OK) {
 				memcpy(data, areaAddress, passedSize);

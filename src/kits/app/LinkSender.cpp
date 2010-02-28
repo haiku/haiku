@@ -14,11 +14,13 @@
 #include <string.h>
 #include <new>
 
+#include <Application.h>
+#include <AppMisc.h>
 #include <ServerProtocol.h>
 #include <LinkSender.h>
 
 #include "link_message.h"
-
+#include "syscalls.h"
 
 //#define DEBUG_BPORTLINK
 #ifdef DEBUG_BPORTLINK
@@ -161,6 +163,19 @@ LinkSender::Attach(const void *passedData, size_t passedSize)
 
 	area_id senderArea = -1;
 	if (useArea) {
+		team_id target = -1;
+		port_id port = -1;
+		if (be_app == NULL)
+			port = fPort;
+		else
+			port = get_app_server_port();
+
+		port_info info;
+		status_t result = get_port_info(port, &info);
+		if (result != B_OK)
+			return result;
+
+		target = info.team;
 		void* address = NULL;
 		off_t alignedSize = (passedSize + B_PAGE_SIZE) & ~(B_PAGE_SIZE - 1);
 		senderArea = create_area("LinkSenderArea", &address, B_ANY_ADDRESS,
@@ -168,9 +183,18 @@ LinkSender::Attach(const void *passedData, size_t passedSize)
 
 		if (senderArea < B_OK)
 			return senderArea;
-
+			
 		data = &senderArea;
 		memcpy(address, passedData, passedSize);
+
+		area_id areaID = senderArea;
+		senderArea = _kern_transfer_area(senderArea, &address,
+			B_ANY_ADDRESS, target);
+		
+		if (senderArea < B_OK) {
+			delete_area(areaID);
+			return senderArea;
+		}
 	}
 
 	memcpy(fBuffer + fCurrentEnd, data, size);
