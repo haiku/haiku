@@ -30,6 +30,6 @@ DoCatalogs Printers :
 	: 
 	en.catalog
 	: 
-	de.catkeys
+	de.catkeys ja.catkeys
 	;
 	
