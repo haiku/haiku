@@ -1,9 +1,0 @@
-@dircategory Text creation and manipulation
-@direntry
-* sed: (sed).                   Stream EDitor.
-
-@end direntry
-
-@clear PERL
-@set SSEDEXT @acronym{GNU} extensions
-@set SSED @acronym{GNU} @command{sed}

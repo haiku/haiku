@@ -1,1 +1,0 @@
-s/foo/bar/g

@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src bin sed ;
-
-SubInclude HAIKU_TOP src bin sed lib ;
-SubInclude HAIKU_TOP src bin sed sed ; 
