@@ -121,8 +121,8 @@ function InstallOptionalHaikuImagePackage()
 	echo "Installing \$1 ..."
 	cd \$tmpDir
 	
-	zipFile=\`echo \$3 | sed -s "s/http.*\///"\`
-	if ! [ -f \$zipFile ] ; then
+	archiveFile=\`echo \$3 | sed -s "s/http.*\///"\`
+	if ! [ -f \$archiveFile ] ; then
 		echo "Downloading \$3 ..."
 		wget -nv \$3
 	fi
@@ -142,14 +142,26 @@ function InstallOptionalHaikuImagePackage()
 			fi
 		fi
 	done
-	echo "Unzipping \$zipFile ..."
-	unzipDir="\${dirTokens}"
-	unzip -q -o  -d "\$unzipDir" "\$zipFile"
+	echo "Extracting \$archiveFile ..."
+	extractDir="\${dirTokens}"
+	
+	case "\$archiveFile" in
+		*.zip)
+			unzip -q -o -d "\$extractDir" "\$archiveFile"
+			;;
+		*.tgz|*.tar.gz)
+			tar -C "\$extractDir" -xf "\$archiveFile"
+			;;
+		*)
+			echo "Unhandled archive extension in InstallOptionalHaikuImagePackage()"
+			exit 1
+			;;
+	esac
 	
 	if [ -f '/boot/.OptionalPackageDescription' ] ; then
 		rm '/boot/.OptionalPackageDescription'
 	fi
-	rm "\$zipFile"
+	rm "\$archiveFile"
 }
 
 
