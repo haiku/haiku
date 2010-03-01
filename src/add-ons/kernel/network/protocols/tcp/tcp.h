@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -34,12 +34,12 @@ enum tcp_state {
 	ESTABLISHED,
 
 	// peer closes the connection
-	FINISH_RECEIVED,
-	WAIT_FOR_FINISH_ACKNOWLEDGE,
+	FINISH_RECEIVED,				// close-wait
+	WAIT_FOR_FINISH_ACKNOWLEDGE,	// last-ack
 
 	// we close the connection
-	FINISH_SENT,
-	FINISH_ACKNOWLEDGED,
+	FINISH_SENT,					// fin-wait-1
+	FINISH_ACKNOWLEDGED,			// fin-wait-2
 	CLOSING,
 	TIME_WAIT
 };
