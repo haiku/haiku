@@ -223,15 +223,17 @@ function InstallBroadcom43xx()
 	PreFirmwareInstallation
 
 	BuildBroadcomFWCutter
-	if [ $? -gt 0 ] ; then
+	returnCode=$?
+	if [ $returnCode -gt 0 ] ; then
 		echo "...failed. ${driver}'s firmware will not be installed."
-		return $?
+		return $returnCode
 	fi
 
 	CutAndInstallBroadcomFirmware
-	if [ $? -gt 0 ] ; then
+	returnCode=$?
+	if [ $returnCode -gt 0 ] ; then
 		echo "...failed. ${driver}'s firmware will not be installed."
-		return $?
+		return $returnCode
 	fi
 
 	PostFirmwareInstallation
