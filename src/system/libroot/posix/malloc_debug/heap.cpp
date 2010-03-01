@@ -154,7 +154,7 @@ typedef struct heap_class_s {
 
 // Heap class configuration
 #define HEAP_CLASS_COUNT 3
-static heap_class sHeapClasses[HEAP_CLASS_COUNT] = {
+static const heap_class sHeapClasses[HEAP_CLASS_COUNT] = {
 	{
 		"small",					/* name */
 		50,							/* initial percentage */
