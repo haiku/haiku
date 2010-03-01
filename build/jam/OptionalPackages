@@ -953,8 +953,8 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Tar available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage tar-1.21-gcc2-2009-02-08.zip
-			: $(baseURL)/tar-1.21-gcc2-2009-02-08.zip
+		InstallOptionalHaikuImagePackage tar-1.22-x86-gcc4-2010-02-25.zip
+			: $(baseURL)/tar-1.22-x86-gcc4-2010-02-25.zip
 			:
 		;
 	}
