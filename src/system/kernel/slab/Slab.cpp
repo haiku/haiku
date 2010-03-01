@@ -232,6 +232,7 @@ dump_cache_info(int argc, char* argv[])
 	kprintf("lock:              %p\n", &cache->lock);
 	kprintf("object_size:       %lu\n", cache->object_size);
 	kprintf("cache_color_cycle: %lu\n", cache->cache_color_cycle);
+	kprintf("total_objects:     %lu\n", cache->total_objects);
 	kprintf("used_count:        %lu\n", cache->used_count);
 	kprintf("empty_count:       %lu\n", cache->empty_count);
 	kprintf("pressure:          %lu\n", cache->pressure);
@@ -361,6 +362,9 @@ object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 			resizeEntry = NULL;
 			return B_NO_MEMORY;
 		}
+
+		cache->usage += cache->slab_size;
+		cache->total_objects += newSlab->size;
 
 		cache->empty.Add(newSlab);
 		cache->empty_count++;

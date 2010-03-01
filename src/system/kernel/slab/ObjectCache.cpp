@@ -166,9 +166,6 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 		data += object_size;
 	}
 
-	usage += slab_size;
-	total_objects += slab->size;
-
 	return slab;
 }
 
