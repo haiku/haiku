@@ -1356,8 +1356,8 @@ AboutView::_CreateCreditsView()
 			"Intel Corporation. All rights reserved.")
 		.SetLicense("Intel (2xxx firmware)")
 		.SetURL("http://ipw2100.sourceforge.net/"));
-// Copyright years taken from:
-// http://ipw2100.sourceforge.net/README.ipw2100
+	// Copyright years taken from:
+	// http://ipw2100.sourceforge.net/README.ipw2100
 #endif
 
 #ifdef __INTEL__
@@ -1368,8 +1368,8 @@ AboutView::_CreateCreditsView()
 			"Intel Corporation. All rights reserved.")
 		.SetLicense("Intel (2xxx firmware)")
 		.SetURL("http://ipw2200.sourceforge.net/"));
-// Copyright years taken from:
-// http://ipw2200.sourceforge.net/README.ipw2200
+	// Copyright years taken from:
+	// http://ipw2200.sourceforge.net/README.ipw2200
 #endif
 
 #ifdef __INTEL__
@@ -1382,9 +1382,9 @@ AboutView::_CreateCreditsView()
 			"Intel Corporation. All rights reserved.")
 		.SetLicense("Intel (firmware)")
 		.SetURL("http://www.intellinuxwireless.org/"));
-// Copyright years taken from:
-// iwlwifi-3945-ucode-2.14.1.5.tgz/iwlwifi-3945-ucode-2.14.1.5/
-// README.iwlwifi-3945-ucode
+	// Copyright years taken from:
+	// iwlwifi-3945-ucode-2.14.1.5.tgz/iwlwifi-3945-ucode-2.14.1.5/
+	// README.iwlwifi-3945-ucode
 #endif
 #ifdef __INTEL__
 	// Intel Wireless WiFi Link 4965AGN Adapter Firmware
@@ -1395,9 +1395,9 @@ AboutView::_CreateCreditsView()
 			"Intel Corporation. All rights reserved.")
 		.SetLicense("Intel (firmware)")
 		.SetURL("http://www.intellinuxwireless.org/"));
-// Copyright years taken from:
-// iwlwifi-4965-ucode-4.44.1.20.tgz/iwlwifi-4965-ucode-4.44.1.20/
-// README.iwlwifi-4965-ucode
+	// Copyright years taken from:
+	// iwlwifi-4965-ucode-4.44.1.20.tgz/iwlwifi-4965-ucode-4.44.1.20/
+	// README.iwlwifi-4965-ucode
 #endif
 
 #ifdef __INTEL__
@@ -1408,9 +1408,9 @@ AboutView::_CreateCreditsView()
 			"Marvell Semiconductor, Inc. All rights reserved.")
 		.SetLicense("Marvell (firmware)")
 		.SetURL("http://www.marvell.com/"));
-// Copyright years taken from:
-// http://people.freebsd.org/~hmp/dragonfly/sys/modules/nfsclient/@/dev/mwl/
-// if_mwl_pci.c
+	// Copyright years taken from:
+	// http://people.freebsd.org/~hmp/dragonfly/sys/modules/nfsclient/@/dev/mwl/
+	// if_mwl_pci.c
 #endif
 
 #ifdef __INTEL__
@@ -1421,8 +1421,8 @@ AboutView::_CreateCreditsView()
 			"Ralink Technology Corporation. All rights reserved.")
 		.SetLicense("Ralink (firmware)")
 		.SetURL("http://www.ralinktech.com/"));
-// Copyright year taken from:
-// RT61_Firmware_V1.2.zip/RT61_Firmware_V1.2/LICENSE.ralink-firmware.txt
+	// Copyright year taken from:
+	// RT61_Firmware_V1.2.zip/RT61_Firmware_V1.2/LICENSE.ralink-firmware.txt
 #endif
 
 	// ICU copyrights
