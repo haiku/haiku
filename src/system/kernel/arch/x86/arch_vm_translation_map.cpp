@@ -1436,7 +1436,9 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	}
 
 	ASSERT_PRINT((sPageHole[va / B_PAGE_SIZE] & X86_PTE_PRESENT) == 0,
-		"existing pte: %#" B_PRIx32, sPageHole[va / B_PAGE_SIZE]);
+		"virtual address: %#" B_PRIxADDR ", pde: %#" B_PRIx32
+		", existing pte: %#" B_PRIx32, va, sPageHolePageDir[index],
+		sPageHole[va / B_PAGE_SIZE]);
 
 	// now, fill in the pentry
 	put_page_table_entry_in_pgtable(sPageHole + va / B_PAGE_SIZE, pa,
