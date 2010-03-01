@@ -30,7 +30,8 @@ declare availablePackagesKeys=""
 # Some Packages cannot be installed,
 # as they require either the source code or compiled binaries
 declare packageIgnoreList='Bluetooth Development DevelopmentMin \
-DevelopmentBase P7zip UserlandFS Welcome Wifi-ipw2100+fw Wifi-iprowifi2200+fw'
+DevelopmentBase P7zip UserlandFS Welcome Wifi-ipw2100+fw Wifi-iprowifi2200+fw \
+WifiFirmwareScriptData'
 
 
 function CreateInstallerScript()
@@ -295,10 +296,10 @@ function DetectSystemConfiguration()
 		isHybridBuild=1
 	elif [ -f "$libDir"/libsupc++.so ] ; then
 		HAIKU_GCC_VERSION[1]=4
-		isHybridBuild=0
+		isHybridBuild=""
 	else
 		HAIKU_GCC_VERSION[1]=2
-		isHybridBuild=0
+		isHybridBuild=""
 	fi
 
 	# Determine the Architecture.
