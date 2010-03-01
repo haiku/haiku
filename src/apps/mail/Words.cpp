@@ -40,8 +40,7 @@ All rights reserved.
 #include <string.h>
 
 
-enum
-{
+enum {
 	FIND_WORD,
 	GET_WORD,
 	GET_FLAGS
@@ -69,7 +68,8 @@ static char vsvfn[26] = { 1, 16, 4, 16, 9, 2, 4, 16, 9, 2, 0, 2, 2, 2, 1, 4, 0,
 static const char* gCmpKey;
 
 
-static int word_cmp(BString** firstArg, BString** secondArg)
+static int
+word_cmp(BString** firstArg, BString** secondArg)
 {
 	return word_match(gCmpKey, (*firstArg)->String()) - word_match(gCmpKey,
 		(*secondArg)->String());
@@ -804,7 +804,8 @@ Words::FindBestMatches(BList* matches, const char* s)
 }
 
 
-void sort_word_list(BList* matches, const char* reference)
+void
+sort_word_list(BList* matches, const char* reference)
 {
 	if (matches->CountItems() > 0) {
 		BString srcWord(reference);
