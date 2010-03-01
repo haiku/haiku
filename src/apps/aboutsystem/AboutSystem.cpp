@@ -1348,6 +1348,83 @@ AboutView::_CreateCreditsView()
 			// TODO: License!
 #endif
 
+#ifdef __INTEL__
+	// Intel PRO/Wireless 2100 Firmware
+	_AddPackageCredit(PackageCredit("Intel PRO/Wireless 2100 Firmware")
+		.SetCopyright(COPYRIGHT_STRING
+			"2003-2006 by "
+			"Intel Corporation. All rights reserved.")
+		.SetLicense("Intel (2xxx firmware)")
+		.SetURL("http://ipw2100.sourceforge.net/"));
+// Copyright years taken from:
+// http://ipw2100.sourceforge.net/README.ipw2100
+#endif
+
+#ifdef __INTEL__
+	// Intel PRO/Wireless 2200BG Firmware
+	_AddPackageCredit(PackageCredit("Intel PRO/Wireless 2200BG Firmware")
+		.SetCopyright(COPYRIGHT_STRING
+			"2004-2005 by "
+			"Intel Corporation. All rights reserved.")
+		.SetLicense("Intel (2xxx firmware)")
+		.SetURL("http://ipw2200.sourceforge.net/"));
+// Copyright years taken from:
+// http://ipw2200.sourceforge.net/README.ipw2200
+#endif
+
+#ifdef __INTEL__
+	// Intel PRO/Wireless 3945ABG/BG Network Connection Adapter Firmware
+	_AddPackageCredit(
+		PackageCredit(
+			"Intel PRO/Wireless 3945ABG/BG Network Connection Adapter Firmware")
+		.SetCopyright(COPYRIGHT_STRING
+			"2006 - 2007 by "
+			"Intel Corporation. All rights reserved.")
+		.SetLicense("Intel (firmware)")
+		.SetURL("http://www.intellinuxwireless.org/"));
+// Copyright years taken from:
+// iwlwifi-3945-ucode-2.14.1.5.tgz/iwlwifi-3945-ucode-2.14.1.5/
+// README.iwlwifi-3945-ucode
+#endif
+#ifdef __INTEL__
+	// Intel Wireless WiFi Link 4965AGN Adapter Firmware
+	_AddPackageCredit(
+		PackageCredit("Intel Wireless WiFi Link 4965AGN Adapter Firmware")
+		.SetCopyright(COPYRIGHT_STRING
+			"2006 - 2007 by "
+			"Intel Corporation. All rights reserved.")
+		.SetLicense("Intel (firmware)")
+		.SetURL("http://www.intellinuxwireless.org/"));
+// Copyright years taken from:
+// iwlwifi-4965-ucode-4.44.1.20.tgz/iwlwifi-4965-ucode-4.44.1.20/
+// README.iwlwifi-4965-ucode
+#endif
+
+#ifdef __INTEL__
+	// Marvell 88w8363
+	_AddPackageCredit(PackageCredit("Marvell 88w8363")
+		.SetCopyright(COPYRIGHT_STRING
+			"2007-2009 by "
+			"Marvell Semiconductor, Inc. All rights reserved.")
+		.SetLicense("Marvell (firmware)")
+		.SetURL("http://www.marvell.com/"));
+// Copyright years taken from:
+// http://people.freebsd.org/~hmp/dragonfly/sys/modules/nfsclient/@/dev/mwl/
+// if_mwl_pci.c
+#endif
+
+#ifdef __INTEL__
+	// Ralink Firmware RT2501/RT2561/RT2661
+	_AddPackageCredit(PackageCredit("Ralink Firmware RT2501/RT2561/RT2661")
+		.SetCopyright(COPYRIGHT_STRING
+			"2007 by "
+			"Ralink Technology Corporation. All rights reserved.")
+		.SetLicense("Ralink (firmware)")
+		.SetURL("http://www.ralinktech.com/"));
+// Copyright year taken from:
+// RT61_Firmware_V1.2.zip/RT61_Firmware_V1.2/LICENSE.ralink-firmware.txt
+#endif
+
 	// ICU copyrights
 	_AddPackageCredit(PackageCredit(
 			"ICU - International Components for Unicode")
