@@ -32,41 +32,34 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-//--------------------------------------------------------------------
-//	
-//	Utilities.cpp
-//	
-//--------------------------------------------------------------------
+
+#include "Utilities.h"
+
+#include <fs_attr.h>
+#include <Node.h>
+#include <String.h>
+#include <TypeConstants.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <Alert.h>
-#include <String.h>
-#include <Node.h>
-#include <TypeConstants.h>
-#include <fs_attr.h>
-
-#include <MailMessage.h>
-
-#include "Utilities.h"
-
 
 status_t
-WriteAttrString(BNode *node, const char *attr, const char *value)
+WriteAttrString(BNode* node, const char* attr, const char* value)
 {
 	if (!value)
 		value = B_EMPTY_STRING;
 
-	ssize_t size = node->WriteAttr(attr, B_STRING_TYPE, 0, value, strlen(value) + 1);
+	ssize_t size = node->WriteAttr(attr, B_STRING_TYPE, 0, value,
+		strlen(value) + 1);
 
 	return size >= 0 ? B_OK : size;
 }
 
 
 status_t
-ReadAttrString(BNode *node, const char *attr, BString *value)
+ReadAttrString(BNode* node, const char* attr, BString* value)
 {
 	attr_info attrInfo;
 	
@@ -75,7 +68,9 @@ ReadAttrString(BNode *node, const char *attr, BString *value)
 	if (status < B_OK)
 		return status;
 
-	ssize_t size = node->ReadAttr(attr, B_STRING_TYPE, 0, value->LockBuffer(attrInfo.size + 1), attrInfo.size);
+	ssize_t size = node->ReadAttr(attr, B_STRING_TYPE, 0,
+		value->LockBuffer(attrInfo.size + 1), attrInfo.size);
+
 	value->UnlockBuffer();	
 
 	return size >= 0 ? B_OK : size;
@@ -87,7 +82,7 @@ ReadAttrString(BNode *node, const char *attr, BString *value)
 //
 
 int32
-cistrcmp(const char *str1, const char *str2)
+cistrcmp(const char* str1, const char* str2)
 {
 	char	c1;
 	char	c2;
@@ -95,21 +90,19 @@ cistrcmp(const char *str1, const char *str2)
 	int32	loop;
 
 	len = strlen(str1) + 1;
-	for (loop = 0; loop < len; loop++)
-	{
+	for (loop = 0; loop < len; loop++) {
 		c1 = str1[loop];
 		if (c1 >= 'A' && c1 <= 'Z')
 			c1 += 'a' - 'A';
 		c2 = str2[loop];
 		if (c2 >= 'A' && c2 <= 'Z')
 			c2 += 'a' - 'A';
-		if (c1 == c2)
-		{
-		}
-		else if (c1 < c2)
+		if (c1 == c2) {
+		} else if (c1 < c2) {
 			return -1;
-		else if (c1 > c2 || !c2)
+		} else if (c1 > c2 || !c2) {
 			return 1;
+		}
 	}
 	return 0;
 }
@@ -120,27 +113,25 @@ cistrcmp(const char *str1, const char *str2)
 //
 
 int32
-cistrncmp(const char *str1, const char *str2, int32 max)
+cistrncmp(const char* str1, const char* str2, int32 max)
 {
 	char		c1;
 	char		c2;
 	int32		loop;
 
-	for (loop = 0; loop < max; loop++)
-	{
+	for (loop = 0; loop < max; loop++) {
 		c1 = *str1++;
 		if (c1 >= 'A' && c1 <= 'Z')
 			c1 += 'a' - 'A';
 		c2 = *str2++;
 		if (c2 >= 'A' && c2 <= 'Z')
 			c2 += 'a' - 'A';
-		if (c1 == c2)
-		{
-		}
-		else if (c1 < c2)
+		if (c1 == c2) {
+		} else if (c1 < c2) {
 			return -1;
-		else if (c1 > c2 || !c2)
+		} else if (c1 > c2 || !c2) {
 			return 1;
+		}
 	}
 	return 0;
 }
@@ -150,8 +141,8 @@ cistrncmp(const char *str1, const char *str2, int32 max)
 // case-insensitive version of strstr
 //
 
-char *
-cistrstr(const char *cs, const char *ct)
+char*
+cistrstr(const char* cs, const char* ct)
 {
 	char		c1;
 	char		c2;
@@ -162,13 +153,11 @@ cistrstr(const char *cs, const char *ct)
 
 	cs_len = strlen(cs);
 	ct_len = strlen(ct);
-	for (loop1 = 0; loop1 < cs_len; loop1++)
-	{
+	for (loop1 = 0; loop1 < cs_len; loop1++) {
 		if (cs_len - loop1 < ct_len)
 			return NULL;
 
-		for (loop2 = 0; loop2 < ct_len; loop2++)
-		{
+		for (loop2 = 0; loop2 < ct_len; loop2++) {
 			c1 = cs[loop1 + loop2];
 			if ((c1 >= 'A') && (c1 <= 'Z'))
 				c1 += ('a' - 'A');
@@ -178,7 +167,7 @@ cistrstr(const char *cs, const char *ct)
 			if (c1 != c2)
 				goto next;
 		}
-		return const_cast<char *>(&cs[loop1]);
+		return const_cast<char*>(&cs[loop1]);
 next:
 		// label must be followed by a statement
 		;
@@ -192,14 +181,12 @@ next:
 //
 
 int32
-linelen(char *str, int32 len, bool header)
+linelen(char* str, int32 len, bool header)
 {
 	int32		loop;
 
-	for (loop = 0; loop < len; loop++)
-	{
-		if (str[loop] == '\n')
-		{
+	for (loop = 0; loop < len; loop++) {
+		if (str[loop] == '\n') {
 			if (!header || loop < 2
 				|| (header && str[loop + 1] != ' ' && str[loop + 1] != '\t'))
 				return loop + 1;

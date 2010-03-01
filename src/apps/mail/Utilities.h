@@ -31,40 +31,27 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-
-//--------------------------------------------------------------------
-//	
-//	Utilities.h
-//
-//--------------------------------------------------------------------
-
 #ifndef _UTILITIES_H
 #define _UTILITIES_H
 
+
 #include <SupportDefs.h>
 
-class BEmailMessage;
-
-//====================================================================
-
-#ifdef __cplusplus
 
 class BNode;
-extern status_t WriteAttrString(BNode *node, const char *attr, const char *value);
-extern status_t ReadAttrString(BNode *node, const char *attr, BString *value);
+class BString;
 
-extern "C" {
-#endif
 
-int32 cistrcmp(const char *, const char *);
-int32 cistrncmp(const char *, const char *, int32);
-char *cistrstr(const char *, const char *);
+extern status_t WriteAttrString(BNode* node, const char* attr,
+	const char* value);
+extern status_t ReadAttrString(BNode* node, const char* attr, BString* value);
+
+
+int32 cistrcmp(const char*, const char*);
+int32 cistrncmp(const char*, const char*, int32);
+char* cistrstr(const char*, const char*);
 int32 linelen(char*, int32, bool);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif // #ifndef _UTILITIES_H
 
