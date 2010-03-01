@@ -6,6 +6,7 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Philippe Saint-Pierre, stpere@gmail.com
+ *		Ryan Leavengood <leavengood@gmail.com>
  */
 
 
@@ -40,6 +41,9 @@
 #	define STRACE(x) ;
 #endif
 
+
+static const float kBorderResizeLength = 22.0;
+static const float kResizeKnobSize = 18.0;
 
 static inline uint8
 blend_color_value(uint8 a, uint8 b, float position)
@@ -238,36 +242,38 @@ DefaultDecorator::ResizeBy(BPoint offset, BRegion* dirty)
 	fFrame.right += offset.x;
 	fFrame.bottom += offset.y;
 
-	// handle invalidation of resize rect
+	// Handle invalidation of resize rect
 	if (dirty && !(fFlags & B_NOT_RESIZABLE)) {
 		BRect realResizeRect;
 		switch (fLook) {
 			case B_DOCUMENT_WINDOW_LOOK:
 				realResizeRect = fResizeRect;
-				// resize rect at old location
+				// Resize rect at old location
 				dirty->Include(realResizeRect);
 				realResizeRect.OffsetBy(offset);
-				// resize rect at new location
+				// Resize rect at new location
 				dirty->Include(realResizeRect);
 				break;
 			case B_TITLED_WINDOW_LOOK:
 			case B_FLOATING_WINDOW_LOOK:
 			case B_MODAL_WINDOW_LOOK:
 			case kLeftTitledWindowLook:
-				realResizeRect.Set(fRightBorder.right - 22, fBottomBorder.top,
-					fRightBorder.right - 22, fBottomBorder.bottom - 1);
-				// resize rect at old location
+				// The bottom border resize line
+				realResizeRect.Set(fRightBorder.right - kBorderResizeLength, fBottomBorder.top,
+					fRightBorder.right - kBorderResizeLength, fBottomBorder.bottom - 1);
+				// Old location
 				dirty->Include(realResizeRect);
 				realResizeRect.OffsetBy(offset);
-				// resize rect at new location
+				// New location
 				dirty->Include(realResizeRect);
 
-				realResizeRect.Set(fRightBorder.left, fBottomBorder.bottom - 22,
-					fRightBorder.right - 1, fBottomBorder.bottom - 22);
-				// resize rect at old location
+				// The right border resize line
+				realResizeRect.Set(fRightBorder.left, fBottomBorder.bottom - kBorderResizeLength,
+					fRightBorder.right - 1, fBottomBorder.bottom - kBorderResizeLength);
+				// Old location
 				dirty->Include(realResizeRect);
 				realResizeRect.OffsetBy(offset);
-				// resize rect at new location
+				// New location
 				dirty->Include(realResizeRect);
 				break;
 			default:
@@ -447,7 +453,7 @@ DefaultDecorator::Draw(BRect update)
 	STRACE(("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",
 		update.left, update.top, update.right, update.bottom));
 
-	// We need to draw a few things: the tab, the resize thumb, the borders,
+	// We need to draw a few things: the tab, the resize knob, the borders,
 	// and the buttons
 	fDrawingEngine->SetDrawState(&fDrawState);
 
@@ -510,7 +516,8 @@ DefaultDecorator::GetFootprint(BRegion* region)
 
 	if (fLook == B_DOCUMENT_WINDOW_LOOK) {
 		// include the rectangular resize knob on the bottom right
-		region->Include(BRect(fFrame.right - 13.0f, fFrame.bottom - 13.0f,
+		float knobSize = kResizeKnobSize - fBorderWidth - 1.0;
+		region->Include(BRect(fFrame.right - knobSize, fFrame.bottom - knobSize,
 			fFrame.right, fFrame.bottom));
 	}
 }
@@ -565,8 +572,8 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 				|| fLook == B_FLOATING_WINDOW_LOOK
 				|| fLook == B_MODAL_WINDOW_LOOK
 				|| fLook == kLeftTitledWindowLook)) {
-			BRect temp(BPoint(fBottomBorder.right - 22,
-				fBottomBorder.bottom - 22), fBottomBorder.RightBottom());
+			BRect temp(BPoint(fBottomBorder.right - kBorderResizeLength,
+				fBottomBorder.bottom - kBorderResizeLength), fBottomBorder.RightBottom());
 			if (temp.Contains(point))
 				return CLICK_RESIZE;
 		}
@@ -711,8 +718,8 @@ DefaultDecorator::_DoLayout()
 
 	// calculate resize rect
 	if (fBorderWidth > 1) {
-		fResizeRect.Set(fBottomBorder.right - 18.0,
-			fBottomBorder.bottom - 18.0, fBottomBorder.right,
+		fResizeRect.Set(fBottomBorder.right - kResizeKnobSize,
+			fBottomBorder.bottom - kResizeKnobSize, fBottomBorder.right,
 			fBottomBorder.bottom);
 	} else {
 		// no border or one pixel border (menus and such)
@@ -861,7 +868,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			break;
 	}
 
-	// Draw the resize thumb if we're supposed to
+	// Draw the resize knob if we're supposed to
 	if (!(fFlags & B_NOT_RESIZABLE)) {
 		r = fResizeRect;
 
@@ -914,18 +921,18 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			case B_MODAL_WINDOW_LOOK:
 			case kLeftTitledWindowLook:
 			{
-				if (!invalid.Intersects(BRect(fRightBorder.right - 22,
-					fBottomBorder.bottom - 22, fRightBorder.right - 1,
+				if (!invalid.Intersects(BRect(fRightBorder.right - kBorderResizeLength,
+					fBottomBorder.bottom - kBorderResizeLength, fRightBorder.right - 1,
 					fBottomBorder.bottom - 1)))
 					break;
 
 				fDrawingEngine->StrokeLine(
-					BPoint(fRightBorder.left, fBottomBorder.bottom - 22),
-					BPoint(fRightBorder.right - 1, fBottomBorder.bottom - 22),
+					BPoint(fRightBorder.left, fBottomBorder.bottom - kBorderResizeLength),
+					BPoint(fRightBorder.right - 1, fBottomBorder.bottom - kBorderResizeLength),
 					fFrameColors[0]);
 				fDrawingEngine->StrokeLine(
-					BPoint(fRightBorder.right - 22, fBottomBorder.top),
-					BPoint(fRightBorder.right - 22, fBottomBorder.bottom - 1),
+					BPoint(fRightBorder.right - kBorderResizeLength, fBottomBorder.top),
+					BPoint(fRightBorder.right - kBorderResizeLength, fBottomBorder.bottom - 1),
 					fFrameColors[0]);
 				break;
 			}
