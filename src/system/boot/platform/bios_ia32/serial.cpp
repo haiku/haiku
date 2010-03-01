@@ -74,7 +74,7 @@ serial_puts(const char* string, size_t size)
 }
 
 
-extern "C" void 
+extern "C" void
 serial_disable(void)
 {
 #ifdef ENABLE_SERIAL
@@ -85,7 +85,7 @@ serial_disable(void)
 }
 
 
-extern "C" void 
+extern "C" void
 serial_enable(void)
 {
 	sSerialEnabled++;
