@@ -73,8 +73,6 @@ EOF
 
 function InstallAllFirmwares()
 {
-	mkdir -p ${tempDir}
-
 	InstallIpw2100
 	InstallIprowifi2200
 	InstallBroadcom43xx
@@ -340,4 +338,5 @@ function CutAndInstallBroadcomFirmware()
 }
 
 
+mkdir -p "$tempDir"
 DisplayAlert
