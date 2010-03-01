@@ -64,8 +64,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Vision					- powerful native IRC client
 #	VLC						- the multi media player with native interface
 #	Welcome					- introductory documentation to Haiku
-#	Wifi-ipw2100+fw			- driver, firmware, and installer script for Intel PRO/Wireless 2100
-#	Wifi-iprowifi2200+fw	- driver, firmware, and installer script for Intel PRO/Wireless 2200
+#	WifiFirmwareScriptData	- data files needed by install-wifi-firmwares.sh
 #	WonderBrush				- native graphics application
 #	Yasm					- the assembler utility
 
@@ -1095,38 +1094,6 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 		: /boot/system/documentation/welcome/welcome_en.html : Welcome ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/userguide/en/contents.html : User\ Guide ;
-}
-
-
-# Wifi-ipw2100+fw
-if [ IsOptionalHaikuImagePackageAdded Wifi-ipw2100+fw ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Wifi-ipw2100+fw available for $(TARGET_ARCH)" ;
-	} else {
-		AddDriversToHaikuImage net : ipw2100 ;
-		InstallOptionalHaikuImagePackage ipw2100-firmware-installer-2009-12-26b.zip
-			: $(baseURL)/ipw2100-firmware-installer-2009-12-26b.zip
-			:
-		;
-		AddSymlinkToHaikuImage home config boot launch
-			: /boot/common/bin/install_firmware_ipw2100 ;
-	}
-}
-
-
-# Wifi-iprowifi2200+fw
-if [ IsOptionalHaikuImagePackageAdded Wifi-iprowifi2200+fw ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Wifi-iprowifi2200+fw available for $(TARGET_ARCH)" ;
-	} else {
-		AddDriversToHaikuImage net : iprowifi2200 ;
-		InstallOptionalHaikuImagePackage iprowifi2200-firmware-installer-2009-12-26.zip
-			: $(baseURL)/iprowifi2200-firmware-installer-2009-12-26.zip
-			:
-		;
-		AddSymlinkToHaikuImage home config boot launch
-			: /boot/common/bin/install_firmware_iprowifi2200 ;
-	}
 }
 
 
