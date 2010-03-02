@@ -620,19 +620,6 @@ AcpiTbParseRootTable (
          */
         Address = (ACPI_PHYSICAL_ADDRESS) Rsdp->XsdtPhysicalAddress;
         TableEntrySize = sizeof (UINT64);
-
-#if ACPI_MACHINE_WIDTH == 32
-        if (Rsdp->XsdtPhysicalAddress > ACPI_UINT32_MAX)
-        {
-            /* Will truncate 64-bit address to 32 bits, issue warning */
-
-            ACPI_WARNING ((AE_INFO,
-                "64-bit Physical Address in XSDT is too large (%8.8X%8.8X),"
-                " truncating",
-                ACPI_FORMAT_UINT64 (Rsdp->XsdtPhysicalAddress)));
-        }
-#endif
-
     }
     else
     {
