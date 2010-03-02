@@ -869,7 +869,7 @@ rule AddEntryToHaikuImageExpanderRuleFile file : entry
 		Always $(file) ;
 		MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
 		BuildHaikuImageExpanderRules $(file) ;
-		AddFilesToHaikuImage common etc : $(file) ;
+		AddFilesToHaikuImage common data : $(file) ;
 	}
 
 	HAIKU_IMAGE_EXPANDER_RULES_ENTRIES on $(file) = $(allEntries) ;
