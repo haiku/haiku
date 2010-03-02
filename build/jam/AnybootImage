@@ -1,4 +1,6 @@
 rule BuildAnybootMBR binary : source {
+	Depends $(binary) : $(source) ;
+
 	MBR_SOURCE on $(binary) = $(source) ;
 
 	BuildAnybootMBR1 $(binary) ;
