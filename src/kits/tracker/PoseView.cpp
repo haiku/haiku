@@ -103,6 +103,7 @@ const float kCountViewWidth = 76;
 const uint32 kAddNewPoses = 'Tanp';
 const uint32 kAddPosesCompleted = 'Tapc';
 const int32 kMaxAddPosesChunk = 50;
+const uint32 kMaxTextClippingSize = 64 * 1024;
 
 namespace BPrivate {
 extern bool delete_point(void *);
@@ -6736,6 +6737,9 @@ BPoseView::DragSelectedPoses(const BPose *pose, BPoint clickPoint)
 				off_t size = 0;
 				file.GetSize(&size);
 				if (size) {
+					// clamp the amount of text we extract in order to avoid very unpleasant surprises if, say, the user
+					// happens to have a 100MB plain text file they want to drag around.
+					size = min(size, (off_t)kMaxTextClippingSize);
 					char *buffer = new char[size];
 					if (file.Read(buffer, (size_t)size) == size) {
 						message.AddData(kPlainTextMimeType, B_MIME_TYPE, buffer, (ssize_t)size);
@@ -6758,7 +6762,7 @@ BPoseView::DragSelectedPoses(const BPose *pose, BPoint clickPoint)
 					delete [] buffer;
 				}
 			} else if (strcasecmp(type, kBitmapMimeType) == 0
-				// got a text file
+				// got a raw bitmap clipping file
 				&& file.ReadAttr(kAttrClippingFile, B_RAW_TYPE, 0,
 					&tmp, sizeof(int32)) == sizeof(int32)) {
 				file.Seek(0, SEEK_SET);
