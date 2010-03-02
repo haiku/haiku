@@ -1427,6 +1427,8 @@ MemoryManager::_UnmapFreeChunksEarly(Area* area)
 	if (!area->fullyMapped)
 		return;
 
+	TRACE("MemoryManager::_UnmapFreeChunksEarly(%p)\n", area);
+
 	for (int32 i = 0; i < SLAB_META_CHUNKS_PER_AREA; i++) {
 		MetaChunk* metaChunk = area->metaChunks + i;
 		if (metaChunk->chunkSize == 0) {
