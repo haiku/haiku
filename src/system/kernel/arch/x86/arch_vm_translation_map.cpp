@@ -453,7 +453,9 @@ X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes,
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	index = VADDR_TO_PTENT(va);
 
-	ASSERT((pt[index] & X86_PTE_PRESENT) == 0);
+	ASSERT_PRINT((pt[index] & X86_PTE_PRESENT) == 0,
+		"virtual address: %#" B_PRIxADDR ", existing pte: %#" B_PRIx32, va,
+		pt[index]);
 
 	put_page_table_entry_in_pgtable(&pt[index], pa, attributes,
 		IS_KERNEL_MAP(map));
