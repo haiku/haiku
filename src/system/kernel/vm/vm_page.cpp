@@ -1253,6 +1253,63 @@ clear_page(struct vm_page *page)
 }
 
 
+static status_t
+mark_page_range_in_use(addr_t startPage, addr_t length, bool wired)
+{
+	TRACE(("mark_page_range_in_use: start 0x%lx, len 0x%lx\n",
+		startPage, length));
+
+	if (sPhysicalPageOffset > startPage) {
+		TRACE(("mark_page_range_in_use: start page %ld is before free list\n",
+			startPage));
+		return B_BAD_VALUE;
+	}
+	startPage -= sPhysicalPageOffset;
+	if (startPage + length > sNumPages) {
+		TRACE(("mark_page_range_in_use: range would extend past free list\n"));
+		return B_BAD_VALUE;
+	}
+
+	WriteLocker locker(sFreePageQueuesLock);
+
+	for (addr_t i = 0; i < length; i++) {
+		vm_page *page = &sPages[startPage + i];
+		switch (page->State()) {
+			case PAGE_STATE_FREE:
+			case PAGE_STATE_CLEAR:
+			{
+// TODO: This violates the page reservation policy, since we remove pages from
+// the free/clear queues without having reserved them before. This should happen
+// in the early boot process only, though.
+				DEBUG_PAGE_ACCESS_START(page);
+				VMPageQueue& queue = page->State() == PAGE_STATE_FREE
+					? sFreePageQueue : sClearPageQueue;
+				queue.Remove(page);
+				page->SetState(wired ? PAGE_STATE_UNUSED : PAGE_STATE_UNUSED);
+				page->busy = false;
+				atomic_add(&sUnreservedFreePages, -1);
+				DEBUG_PAGE_ACCESS_END(page);
+				break;
+			}
+			case PAGE_STATE_WIRED:
+			case PAGE_STATE_UNUSED:
+				break;
+			case PAGE_STATE_ACTIVE:
+			case PAGE_STATE_INACTIVE:
+			case PAGE_STATE_MODIFIED:
+			case PAGE_STATE_CACHED:
+			default:
+				// uh
+				dprintf("mark_page_range_in_use: page 0x%lx in non-free state %d!\n",
+					startPage + i, page->State());
+				break;
+		}
+	}
+
+	return B_OK;
+}
+
+
 /*!
 	This is a background thread that wakes up every now and then (every 100ms)
 	and moves some pages from the free queue over to the clear queue.
@@ -2761,10 +2818,23 @@ vm_page_init(kernel_args *args)
 
 	TRACE(("initialized table\n"));
 
-	// mark some of the page ranges in use
+	// mark the ranges between usable physical memory unused
+	addr_t previousEnd = 0;
+	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+		addr_t base = args->physical_memory_range[i].start;
+		addr_t size = args->physical_memory_range[i].size;
+		if (base > previousEnd) {
+			mark_page_range_in_use(previousEnd / B_PAGE_SIZE,
+				(base - previousEnd) / B_PAGE_SIZE, false);
+		}
+		previousEnd = base + size;
+	}
+
+	// mark the allocated physical page ranges wired
 	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
-		vm_mark_page_range_inuse(args->physical_allocated_range[i].start / B_PAGE_SIZE,
-			args->physical_allocated_range[i].size / B_PAGE_SIZE);
+		mark_page_range_in_use(
+			args->physical_allocated_range[i].start / B_PAGE_SIZE,
+			args->physical_allocated_range[i].size / B_PAGE_SIZE, true);
 	}
 
 	// The target of actually free pages. This must be at least the system
@@ -2873,57 +2943,7 @@ vm_mark_page_inuse(addr_t page)
 status_t
 vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 {
-	TRACE(("vm_mark_page_range_inuse: start 0x%lx, len 0x%lx\n",
-		startPage, length));
-
-	if (sPhysicalPageOffset > startPage) {
-		TRACE(("vm_mark_page_range_inuse: start page %ld is before free list\n",
-			startPage));
-		return B_BAD_VALUE;
-	}
-	startPage -= sPhysicalPageOffset;
-	if (startPage + length > sNumPages) {
-		TRACE(("vm_mark_page_range_inuse: range would extend past free list\n"));
-		return B_BAD_VALUE;
-	}
-
-	WriteLocker locker(sFreePageQueuesLock);
-
-	for (addr_t i = 0; i < length; i++) {
-		vm_page *page = &sPages[startPage + i];
-		switch (page->State()) {
-			case PAGE_STATE_FREE:
-			case PAGE_STATE_CLEAR:
-			{
-// TODO: This violates the page reservation policy, since we remove pages from
-// the free/clear queues without having reserved them before. This should happen
-// in the early boot process only, though.
-				DEBUG_PAGE_ACCESS_START(page);
-				VMPageQueue& queue = page->State() == PAGE_STATE_FREE
-					? sFreePageQueue : sClearPageQueue;
-				queue.Remove(page);
-				page->SetState(PAGE_STATE_UNUSED);
-				page->busy = false;
-				atomic_add(&sUnreservedFreePages, -1);
-				DEBUG_PAGE_ACCESS_END(page);
-				break;
-			}
-			case PAGE_STATE_WIRED:
-				break;
-			case PAGE_STATE_ACTIVE:
-			case PAGE_STATE_INACTIVE:
-			case PAGE_STATE_MODIFIED:
-			case PAGE_STATE_CACHED:
-			case PAGE_STATE_UNUSED:
-			default:
-				// uh
-				dprintf("vm_mark_page_range_inuse: page 0x%lx in non-free state %d!\n",
-					startPage + i, page->State());
-				break;
-		}
-	}
-
-	return B_OK;
+	return mark_page_range_in_use(startPage, length, false);
 }
 
 

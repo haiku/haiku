@@ -25,6 +25,7 @@ typedef struct {
 	uint32	vir_pgdir;
 	uint32	num_pgtables;
 	uint32	pgtables[MAX_BOOT_PTABLES];
+	uint32	virtual_end;
 	uint32	phys_idt;
 	uint32	vir_idt;
 	uint32	phys_gdt;

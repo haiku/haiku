@@ -615,7 +615,7 @@ arch_vm_init_end(kernel_args *args)
 
 	// throw away anything in the kernel_args.pgtable[] that's not yet mapped
 	vm_free_unused_boot_loader_range(KERNEL_BASE,
-		0x400000 * args->arch_args.num_pgtables);
+		args->arch_args.virtual_end - KERNEL_BASE);
 
 	return B_OK;
 }
