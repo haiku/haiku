@@ -19,3 +19,5 @@ OptionalPackageDependencies Git : Expat Curl OpenSSL ;
 OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies NetFS : UserlandFS ;
 OptionalPackageDependencies Vim : LibIconv ;
+OptionalPackageDependencies XZ-Utils : Tar ;
+

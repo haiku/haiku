@@ -1172,6 +1172,27 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 }
 
 
+# XZ-Utils
+if [ IsOptionalHaikuImagePackageAdded XZ-Utils ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package XZ-Utils available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage xz-utils-4.999.9-x86-gcc4-2010-02-25.zip
+			: $(baseURL)/xz-utils-4.999.9-x86-gcc4-2010-02-25.zip
+			:
+		;
+		AddExpanderRuleToHaikuImage "application/x-xz" : .tar.xz
+			: "xz -dc \\0045s | tar tvf -"
+			: "xz -dc \\0045s | tar xvf -"
+		;
+		AddExpanderRuleToHaikuImage "application/x-xz" : .txz
+			: "echo \\0045s | sed 's/.xz\\\$//g'"
+			: "xz -df \\0045s"
+		;
+	}
+}
+
+
 # Yasm
 if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 	if $(TARGET_ARCH) != x86 {
