@@ -567,6 +567,20 @@ if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
 	InstallOptionalHaikuImagePackage icu-devel-4.2-2010-01-26.zip
 		: $(baseURL)/icu-devel-4.2-2010-01-26.zip
 	;
+	local arch = $(TARGET_ARCH) ;
+	local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
+	local libs = common data i18n ;
+	for lib in $(libs) {
+		lib = libicu-$(lib).so ;
+		local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
+		if $(abiVersion) {
+			local abiVersionedLib = $(lib).$(abiVersion) ;
+			AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
+				: /system/lib $(abiVersionedLib) : : true ;
+		}
+		AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
+			: /system/lib $(lib) : : true ;
+	}
 }
 
 
@@ -823,9 +837,9 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 				:
 			;
 		}
-		AddExpanderRuleToHaikuImage "application/x-7z-compressed" : .7z 
-			: "7za l \\0045s" 
-			: "7za x -y \\0045s" 
+		AddExpanderRuleToHaikuImage "application/x-7z-compressed" : .7z
+			: "7za l \\0045s"
+			: "7za x -y \\0045s"
 		;
 
 	}

@@ -9,6 +9,7 @@ OptionalPackageDependencies Beam : LibIconv LibLayout OpenSSL PCRE ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
+OptionalPackageDependencies ICU-devel : Development ;
 OptionalPackageDependencies Firefox : BeZillaBrowser ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv ;
