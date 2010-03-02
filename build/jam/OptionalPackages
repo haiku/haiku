@@ -823,16 +823,11 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 				:
 			;
 		}
+		AddExpanderRuleToHaikuImage "application/x-7z-compressed" : .7z 
+			: "7za l \\0045s" 
+			: "7za x -y \\0045s" 
+		;
 
-		actions BuildHaikuImageExpanderRules
-		{
-			echo -e "\"application/x-7z-compressed\"\t.7z\t\"7za l \0045s\"\t\"7za x -y \0045s\"" > $(1)
-		}
-
-		Always expander.rules ;
-		MakeLocate expander.rules : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
-		BuildHaikuImageExpanderRules expander.rules ;
-		AddFilesToHaikuImage home config etc : expander.rules ;
 	}
 }
 
