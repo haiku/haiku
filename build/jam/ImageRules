@@ -858,7 +858,7 @@ rule AddGroupToHaikuImage group : gid : members
 
 rule AddEntryToHaikuImageExpanderRuleFile file : entry
 {
-	local allEntries 
+	local allEntries
 		= [ on $(file) return $(HAIKU_IMAGE_EXPANDER_RULES_ENTRIES) ] ;
 
 	if $(allEntries) {
@@ -1165,7 +1165,7 @@ rule AddFilesToHaikuHybridImage directory : targets : destName
 rule AddSymlinkToHaikuHybridImage directoryTokens : linkTarget : linkName
 	: useSymlinkTargetABISubDir : useABISubDir
 {
-	# AddFilesToHaikuHybridImage <directoryTokens> : <linkTarget> : <linkName>
+	# AddSymlinkToHaikuHybridImage <directoryTokens> : <linkTarget> : <linkName>
 	#	[ : <useSymlinkTargetABISubDir> [ :  <useABISubDir> ] ]
 	#
 	# Convenience rule calling both AddSymlinkToHaikuImage and
