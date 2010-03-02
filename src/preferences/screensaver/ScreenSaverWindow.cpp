@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku.
+ * Copyright 2003-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -308,6 +308,7 @@ ModulesView::~ModulesView()
 void
 ModulesView::DetachedFromWindow()
 {
+	SaveState();
 	_CloseSaver();
 }
 
@@ -441,10 +442,10 @@ ModulesView::PopulateScreenSaverList()
 			path.Append(name);
 
 			ScreenSaverItem* item = new ScreenSaverItem(name, path.Path());
-			fListView->AddItem(item); 
-			
+			fListView->AddItem(item);
+
 			if (!strcmp(fSettings.ModuleName(), item->Text())
-				|| (!strcmp(fSettings.ModuleName(), "") 
+				|| (!strcmp(fSettings.ModuleName(), "")
 					&& !strcmp(item->Text(), "Blackness")))
 				selectItem = item;
 		}
@@ -459,7 +460,7 @@ ModulesView::PopulateScreenSaverList()
 
 //! sorting function for ScreenSaverItems
 int
-ModulesView::_CompareScreenSaverItems(const void* left, const void* right) 
+ModulesView::_CompareScreenSaverItems(const void* left, const void* right)
 {
 	ScreenSaverItem* leftItem  = *(ScreenSaverItem **)left;
 	ScreenSaverItem* rightItem = *(ScreenSaverItem **)right;
@@ -492,7 +493,7 @@ ModulesView::_CloseSaver()
 		fSaverRunner->Quit();
 	if (saver != NULL)
 		saver->StopConfig();
-	
+
 	delete view;
 	delete fSettingsView;
 	delete fSaverRunner;
@@ -586,7 +587,7 @@ ModulesView::_OpenSaver()
 //	#pragma mark -
 
 
-ScreenSaverWindow::ScreenSaverWindow() 
+ScreenSaverWindow::ScreenSaverWindow()
 	: BWindow(BRect(50, 50, 496, 375), "ScreenSaver",
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /*| B_NOT_ZOOMABLE | B_NOT_RESIZABLE*/)
 {
@@ -639,6 +640,14 @@ ScreenSaverWindow::ScreenSaverWindow()
 
 ScreenSaverWindow::~ScreenSaverWindow()
 {
+	Hide();
+	_UpdateStatus();
+
+	delete fTabView->RemoveTab(1);
+		// We delete this here in order to make sure the module view saves its
+		// state while the window is still intact.
+
+	fSettings.Save();
 }
 
 
@@ -814,7 +823,7 @@ ScreenSaverWindow::_UpdateStatus()
 	EnableUpdates();
 
 	// Update the saved preferences
-	fSettings.SetWindowFrame(Frame());	
+	fSettings.SetWindowFrame(Frame());
 	fSettings.SetWindowTab(fTabView->Selection());
 	fSettings.SetTimeFlags((enabled ? ENABLE_SAVER : 0)
 		| (fTurnOffCheckBox->Value() ? fTurnOffScreenFlags : 0));
@@ -917,11 +926,7 @@ ScreenSaverWindow::ScreenChanged(BRect frame, color_space colorSpace)
 bool
 ScreenSaverWindow::QuitRequested()
 {
-	_UpdateStatus();
-	fModulesView->SaveState();
-	fSettings.Save();
-
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
-}       
+}
 
