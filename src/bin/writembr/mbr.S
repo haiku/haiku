@@ -37,7 +37,7 @@ start:	cld								// String ops inc
 /*
  * Relocate ourself to a lower address so that we are out of the way when
  * we load in the bootstrap from the partition to boot.
- */ 
+ */
 		movw $main-EXEC+LOAD, %si		// Source
 		movw $main, %di					// Destination
 		movw $0x200-(main-start), %cx	// Byte count
@@ -94,7 +94,7 @@ main.5:	movw %sp, %di					// Save stack pointer
 		jnz main.7						// No.
 		pushw %cx						// Save %cx
 		pushw %bx						// Save %bx
-		movw $MAGIC, %bx				// Magic
+		movw $0x55aa, %bx				// Reversed Magic
 		movb $0x41, %ah					// BIOS:	EDD extensions present?
 		int $0x13						//
 		jc main.6						// No.
@@ -109,7 +109,7 @@ main.5:	movw %sp, %di					// Save stack pointer
 		pushw %bx						//  the transfer buffer
 		pushw $0x1						// Read 1 sector
 		pushw $0x10						// Packet length
-		movw %sp, %si					// Packer pointer
+		movw %sp, %si					// Packet pointer
 		movw $0x4200, %ax				// BIOS:	LBA Read from disk
 		jmp main.8						// Skip the CHS setup
 main.6:	popw %bx						// Restore %bx
@@ -119,8 +119,8 @@ main.8:	int $0x13						// Call the BIOS
 		movw %di,%sp					// Restore stack
 		jc err_loading_os				// If error
 /*
- * Now that we've loaded the bootstrap, check for the magic 0xaa55 signature.  If it
- * is present, execute the bootstrap we just loaded.
+ * Now that we've loaded the bootstrap, check for the magic 0xaa55 signature.
+ * If it is present, execute the bootstrap we just loaded.
  */
 		cmpw $MAGIC, 0x1fe(%bx)			// Bootable?
 		jne err_missing_os				// No
@@ -141,7 +141,7 @@ err_missing_os:
 		jmp putString					//
 /*
  * Output an ASCIZ string to the console via the BIOS.
- */ 
+ */
 putString.0:
 		movw $0x7, %bx			 		// Page:attribute
 		movb $0xe, %ah					// BIOS: Display character
