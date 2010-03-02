@@ -44,6 +44,41 @@ checkError(bool failed, const char *message)
 }
 
 
+void
+chsAddressFor(uint32_t offset, uint8_t *address, uint32_t sectorsPerTrack,
+	uint32_t headsPerCylinder)
+{
+	if (offset >= 1024 * sectorsPerTrack * headsPerCylinder) {
+		// not encodable, force LBA
+		address[0] = 0xff;
+		address[1] = 0xff;
+		address[2] = 0xff;
+		return;
+	}
+
+	uint32_t cylinders = 0;
+	uint32_t heads = 0;
+	uint32_t sectors = 0;
+
+	uint32_t temp = 0;
+	while (temp * sectorsPerTrack * headsPerCylinder <= offset)
+		cylinders = temp++;
+
+	offset -= (sectorsPerTrack * headsPerCylinder * cylinders);
+
+	temp = 0;
+	while (temp * sectorsPerTrack <= offset)
+		heads = temp++;
+
+	sectors = offset - (sectorsPerTrack * heads) + 1;
+
+	address[0] = heads;
+	address[1] = sectors;
+	address[1] |= (cylinders >> 2) & 0xc0;
+	address[2] = cylinders;
+}
+
+
 int
 main(int argc, char *argv[])
 {
@@ -97,11 +132,9 @@ main(int argc, char *argv[])
 	// construct the partition table
 	uint8_t partition[16] = {
 		0x80,					// active
-		0xff, 0xff, 0xff,		// CHS start offset
-			// TODO: we enforce LBA here, maybe not a good idea?
+		0xff, 0xff, 0xff,		// CHS first block (default to LBA)
 		0xeb,					// partition type (BFS)
-		0xff, 0xff, 0xff,		// CHS end offset
-			// TODO: see above
+		0xff, 0xff, 0xff,		// CHS last block (default to LBA)
 		0x00, 0x00, 0x00, 0x00,	// imageOffset in blocks (written below)
 		0x00, 0x00, 0x00, 0x00	// imageSize in blocks (written below)
 	};
@@ -109,9 +142,26 @@ main(int argc, char *argv[])
 	alignment = kBlockSize - 1;
 	imageSize = (imageSize + alignment) & ~alignment;
 
+	// fill in LBA values
 	uint32_t partitionOffset = (uint32_t)(imageOffset / kBlockSize);
 	((uint32_t *)partition)[2] = partitionOffset;
 	((uint32_t *)partition)[3] = (uint32_t)(imageSize / kBlockSize);
+
+#if 0
+	// while this should basically work, it makes the boot code needlessly
+	// use chs which has a high potential of failure due to the geometry
+	// being unknown beforehand (a fixed geometry would be used here).
+
+	uint32_t sectorsPerTrack = 63;
+	uint32_t headsPerCylinder = 255;
+
+	// fill in CHS values
+	chsAddressFor(partitionOffset, &partition[1], sectorsPerTrack,
+		headsPerCylinder);
+	chsAddressFor(partitionOffset + (uint32_t)(imageSize / kBlockSize),
+		&partition[5], sectorsPerTrack, headsPerCylinder);
+#endif
+
 	ssize_t written = pwrite(outputFile, partition, 16, 512 - 2 - 16 * 4);
 	checkError(written != 16, "failed to write partition entry");
 
