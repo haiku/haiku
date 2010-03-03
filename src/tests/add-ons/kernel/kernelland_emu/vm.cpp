@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -10,6 +10,8 @@
 #include <string.h>
 
 #include <KernelExport.h>
+
+#include <vm/vm_page.h>
 
 
 extern "C" status_t
@@ -24,4 +26,12 @@ extern "C" ssize_t
 user_strlcpy(char *to, const char *from, size_t size)
 {
 	return strlcpy(to, from, size);
+}
+
+
+size_t
+vm_page_num_pages(void)
+{
+	return 65536;
+		// TODO: 256 MB. Return real value?
 }
