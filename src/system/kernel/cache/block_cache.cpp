@@ -24,6 +24,7 @@
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
 #include <util/khash.h>
+#include <vm/vm_page.h>
 
 #include "kernel_debug_config.h"
 
@@ -66,7 +67,7 @@ struct cached_block {
 	void*			compare;
 #endif
 	int32			ref_count;
-	int32			accessed;
+	int32			last_accessed;
 	bool			busy_reading : 1;
 	bool			busy_writing : 1;
 	bool			is_writing : 1;
@@ -81,6 +82,8 @@ struct cached_block {
 	cache_transaction* previous_transaction;
 
 	bool CanBeWritten() const;
+	int32 LastAccess() const
+		{ return system_time() / 1000000L - last_accessed; }
 
 	static int Compare(void* _cacheEntry, const void* _block);
 	static uint32 Hash(void* _cacheEntry, const void* _block, uint32 range);
@@ -136,8 +139,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 
 	void			Free(void* buffer);
 	void*			Allocate();
-	void			RemoveUnusedBlocks(int32 maxAccessed = LONG_MAX,
-						int32 count = LONG_MAX);
+	void			RemoveUnusedBlocks(int32 count, int32 minSecondsOld = 0);
 	void			RemoveBlock(cached_block* block);
 	void			DiscardBlock(cached_block* block);
 	void			FreeBlock(cached_block* block);
@@ -1365,7 +1367,7 @@ block_cache::Allocate()
 	if (low_resource_state(B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
 			| B_KERNEL_RESOURCE_ADDRESS_SPACE) != B_NO_LOW_RESOURCE) {
 		// recycle existing before allocating a new one
-		RemoveUnusedBlocks(1, 2);
+		RemoveUnusedBlocks(2);
 	}
 
 	void* block = object_cache_alloc(buffer_cache, 0);
@@ -1373,7 +1375,7 @@ block_cache::Allocate()
 		return block;
 
 	// recycle existing before allocating a new one
-	RemoveUnusedBlocks(1, 2);
+	RemoveUnusedBlocks(100);
 
 	return object_cache_alloc(buffer_cache, 0);
 }
@@ -1433,7 +1435,7 @@ block_cache::NewBlock(off_t blockNumber)
 
 	block->block_number = blockNumber;
 	block->ref_count = 0;
-	block->accessed = 0;
+	block->last_accessed = 0;
 	block->transaction_next = NULL;
 	block->transaction = block->previous_transaction = NULL;
 	block->original_data = NULL;
@@ -1455,18 +1457,22 @@ block_cache::NewBlock(off_t blockNumber)
 
 
 void
-block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
+block_cache::RemoveUnusedBlocks(int32 count, int32 minSecondsOld)
 {
-	TRACE(("block_cache: remove up to %ld unused blocks\n", count));
+	TRACE(("block_cache: remove up to %" B_PRId32 " unused blocks\n", count));
 
 	for (block_list::Iterator iterator = unused_blocks.GetIterator();
 			cached_block* block = iterator.Next();) {
-		if (maxAccessed < block->accessed || block->busy_reading)
+		if (minSecondsOld >= block->LastAccess()) {
+			// The list is sorted by last access
+			break;
+		}
+		if (block->busy_reading || block->busy_writing)
 			continue;
 
 		TB(Flush(this, block));
-		TRACE(("  remove block %Ld, accessed %ld times\n",
-			block->block_number, block->accessed));
+		TRACE(("  remove block %Ld, last accessed %" B_PRId32 "\n",
+			block->block_number, block->last_accessed));
 
 		// this can only happen if no transactions are used
 		if (block->is_dirty && !block->discard) {
@@ -1519,6 +1525,30 @@ block_cache::DiscardBlock(cached_block* block)
 void
 block_cache::_LowMemoryHandler(void* data, uint32 resources, int32 level)
 {
+	TRACE(("block_cache: low memory handler called with level %ld\n", level));
+
+	// free some blocks according to the low memory state
+	// (if there is enough memory left, we don't free any)
+
+	int32 free = 0;
+	int32 secondsOld = 0;
+	switch (level) {
+		case B_NO_LOW_RESOURCE:
+			return;
+		case B_LOW_RESOURCE_NOTE:
+			free = 50;
+			secondsOld = 120;
+			break;
+		case B_LOW_RESOURCE_WARNING:
+			free = 200;
+			secondsOld = 10;
+			break;
+		case B_LOW_RESOURCE_CRITICAL:
+			free = 10000;
+			secondsOld = 0;
+			break;
+	}
+
 	block_cache* cache = (block_cache*)data;
 	MutexLocker locker(&cache->lock);
 
@@ -1529,32 +1559,7 @@ block_cache::_LowMemoryHandler(void* data, uint32 resources, int32 level)
 		return;
 	}
 
-	TRACE(("block_cache: low memory handler called with level %ld\n", level));
-
-	// free some blocks according to the low memory state
-	// (if there is enough memory left, we don't free any)
-
-	int32 free = 1;
-	int32 accessed = 1;
-	switch (low_resource_state(
-			B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)) {
-		case B_NO_LOW_RESOURCE:
-			return;
-		case B_LOW_RESOURCE_NOTE:
-			free = 50;
-			accessed = 2;
-			break;
-		case B_LOW_RESOURCE_WARNING:
-			free = 200;
-			accessed = 10;
-			break;
-		case B_LOW_RESOURCE_CRITICAL:
-			free = LONG_MAX;
-			accessed = LONG_MAX;
-			break;
-	}
-
-	cache->RemoveUnusedBlocks(accessed, free);
+	cache->RemoveUnusedBlocks(free, secondsOld);
 }
 
 
@@ -1742,27 +1747,6 @@ put_cached_block(block_cache* cache, cached_block* block)
 			cache->unused_blocks.Add(block);
 		}
 	}
-
-	// Free some blocks according to the low memory state
-	// (if there is enough memory left, we don't free any)
-
-	int32 free = 1;
-	switch (low_resource_state(
-			B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)) {
-		case B_NO_LOW_RESOURCE:
-			return;
-		case B_LOW_RESOURCE_NOTE:
-			free = 1;
-			break;
-		case B_LOW_RESOURCE_WARNING:
-			free = 5;
-			break;
-		case B_LOW_RESOURCE_CRITICAL:
-			free = 20;
-			break;
-	}
-
-	cache->RemoveUnusedBlocks(LONG_MAX, free);
 }
 
 
@@ -1856,7 +1840,7 @@ retry:
 	}
 
 	block->ref_count++;
-	block->accessed++;
+	block->last_accessed = system_time() / 1000000L;
 
 	return block;
 }
@@ -2022,7 +2006,7 @@ dump_block(cached_block* block)
 	kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c%c%c %08lx %08lx\n",
 		(addr_t)block, block->block_number,
 		(addr_t)block->current_data, (addr_t)block->original_data,
-		(addr_t)block->parent_data, block->ref_count, block->accessed,
+		(addr_t)block->parent_data, block->ref_count, block->LastAccess(),
 		block->busy_reading ? 'r' : '-', block->busy_writing ? 'w' : '-',
 		block->is_writing ? 'W' : '-', block->is_dirty ? 'D' : '-',
 		block->unused ? 'U' : '-', block->discard ? 'D' : '-',
@@ -2039,7 +2023,7 @@ dump_block_long(cached_block* block)
 	kprintf(" original data: %p\n", block->original_data);
 	kprintf(" parent data:   %p\n", block->parent_data);
 	kprintf(" ref_count:     %ld\n", block->ref_count);
-	kprintf(" accessed:      %ld\n", block->accessed);
+	kprintf(" accessed:      %ld\n", block->LastAccess());
 	kprintf(" flags:        ");
 	if (block->busy_reading)
 		kprintf(" busy_reading");
@@ -2514,6 +2498,13 @@ block_notifier_and_writer(void* /*data*/)
 			}
 
 			writer.Write();
+
+			if ((block_cache_used_memory() / B_PAGE_SIZE)
+					> vm_page_num_pages() / 2) {
+				// Try to reduce memory usage to half of the available
+				// RAM at maximum
+				cache->RemoveUnusedBlocks(500, 10);
+			}
 		}
 
 		MutexLocker _(sCachesMemoryUseLock);
