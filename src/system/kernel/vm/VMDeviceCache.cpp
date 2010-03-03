@@ -41,3 +41,10 @@ VMDeviceCache::Write(off_t offset, const iovec *vecs, size_t count,
 	// no place to write, this will cause the page daemon to skip this store
 	return B_OK;
 }
+
+
+status_t
+VMDeviceCache::Fault(struct VMAddressSpace* addressSpace, off_t offset)
+{
+	return B_BAD_ADDRESS;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -15,7 +15,10 @@
 
 class VMNullCache : public VMCache {
 public:
-	status_t	Init(uint32 allocationFlags);
+			status_t			Init(uint32 allocationFlags);
+
+	virtual	status_t			Fault(struct VMAddressSpace* addressSpace,
+									off_t offset);
 };
 
 
