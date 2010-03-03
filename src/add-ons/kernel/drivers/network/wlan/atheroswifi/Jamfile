@@ -93,6 +93,7 @@ KernelMergeObject atheroswifi_hal.o :
 
 	# AR5416 support
 	ah_eeprom_v14.c
+	ah_eeprom_v4k.c
 	ar5416_ani.c
 	ar5416_attach.c
 	ar5416_beacon.c
@@ -111,9 +112,14 @@ KernelMergeObject atheroswifi_hal.o :
 	ar5416_reset.c
 	ar5416_xmit.c
 
-	# AR9160 support
+	# AR9k support
 	ar9160_attach.c
-	
+	ar9280.c
+	ar9280_attach.c
+	ar9285.c
+	ar9285_attach.c
+	ar9285_reset.c
+
 	# RF backend for 5416 and 9160
 	ar2133.c
 	;
