@@ -196,10 +196,13 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 nfs attribute_overlay
 for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
 	local package = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGE) ] ;
 	local archive = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVE) ] ;
+	local extract = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_DO_EXTRACT) ] ;
 	if $(archive) {
-		AddWifiFirmwareToHaikuImage $(driver) : $(package) : $(archive) ;
+		AddWifiFirmwareToHaikuImage $(driver) : $(package) : $(archive) 
+			: $(extract) ;
 	}
 }
+
 
 # modules
 AddFilesToHaikuImage system add-ons kernel bus_managers

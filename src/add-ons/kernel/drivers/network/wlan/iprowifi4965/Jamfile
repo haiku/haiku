@@ -26,4 +26,5 @@ KernelAddon iprowifi4965 :
 
 HAIKU_WIFI_FIRMWARE_PACKAGE on iprowifi4965 = iwlwifi-4965-ucode-4.44.1.20 ;
 HAIKU_WIFI_FIRMWARE_ARCHIVE on iprowifi4965 = iwlwifi-4965-ucode-4.44.1.20.tgz ;
+HAIKU_WIFI_FIRMWARE_DO_EXTRACT on iprowifi4965 = true ;
 

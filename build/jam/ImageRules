@@ -698,18 +698,21 @@ rule AddHeaderDirectoryToHaikuImage dirTokens : dirName : alwaysUpdate
 		: $(dirName) : -x .svn : $(alwaysUpdate) ;
 }
 
-rule AddWifiFirmwareToHaikuImage driver : package : archive
+rule AddWifiFirmwareToHaikuImage driver : package : archive : extract
 {
-	#AddWifiFirmwareToHaikuImage <driver> : <package> : <archive>
+	#AddWifiFirmwareToHaikuImage <driver> : <package> : <archive> : <extract>
 
 	# complete location to wifi firmware archive
 	local firmwareArchive = [ FDirName
 		$(HAIKU_TOP) data system data firmware $(driver) $(archive) ] ;
 
 	local dirTokens = system data firmware $(driver) ;
-
-	ExtractArchiveToHaikuImage $(dirTokens) : $(firmwareArchive) :
-		: $(package) ;
+	if $(extract) = true || $(extract) = 1 {
+		ExtractArchiveToHaikuImage $(dirTokens) : $(firmwareArchive) :
+			: $(package) ;
+	} else {
+		AddFilesToHaikuImage $(dirTokens) : $(firmwareArchive)  ;
+	}
 }
 
 rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate
