@@ -495,9 +495,11 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 
 	innerRect = fPreferredBox->Bounds().InsetByCopy(8.0f, 6.0f);
 	innerRect.top += ceilf(boldHeight.ascent);
-	innerRect.left = innerRect.right - button->StringWidth("Same as" B_UTF8_ELLIPSIS) - 24.0f;
+	innerRect.left = innerRect.right - button->StringWidth(
+		"Same as" B_UTF8_ELLIPSIS) - 24.0f;
 	innerRect.bottom = innerRect.top + button->Bounds().Height();
-	fSameAsButton = new BButton(innerRect, "same as", "Same as" B_UTF8_ELLIPSIS,
+	fSameAsButton = new BButton(innerRect, "same as",
+		"Same as" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgSamePreferredAppAs), B_FOLLOW_RIGHT);
 	fPreferredBox->AddChild(fSameAsButton);
 
@@ -507,32 +509,28 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	fPreferredBox->AddChild(fSelectButton);
 
 	menu = new BPopUpMenu("preferred");
-	menu->AddItem(item = new BMenuItem("None", new BMessage(kMsgPreferredAppChosen)));
+	menu->AddItem(item = new BMenuItem("None",
+		new BMessage(kMsgPreferredAppChosen)));
 	item->SetMarked(true);
 
 	innerRect.right = innerRect.left - 6.0f;
 	innerRect.left = 8.0f;
-	BView* constrainingView = new BView(innerRect, NULL, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW);
-	constrainingView->SetViewColor(topView->ViewColor());
 
-	fPreferredField = new BMenuField(innerRect.OffsetToCopy(B_ORIGIN), "preferred",
-		NULL, menu);
+	fPreferredField = new BMenuField(innerRect, "preferred", NULL, menu, true,
+		B_FOLLOW_LEFT_RIGHT);
 	float width;
 	fPreferredField->GetPreferredSize(&width, &height);
 	fPreferredField->ResizeTo(innerRect.Width(), height);
 	fPreferredField->MoveBy(0.0f, (innerRect.Height() - height) / 2.0f);
-	constrainingView->AddChild(fPreferredField);
-		// we embed the menu field in another view to make it behave like
-		// we want so that it can't obscure other elements with larger
-		// labels
 
-	fPreferredBox->AddChild(constrainingView);
+	fPreferredBox->AddChild(fPreferredField);
 
 	// "Extra Attributes" group
 
 	rect.top = rect.bottom + 8.0f;
 	rect.bottom = topView->Bounds().Height() - 8.0f;
-	fAttributeBox = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM);
+	fAttributeBox = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT
+		| B_FOLLOW_TOP_BOTTOM);
 	fAttributeBox->SetLabel("Extra attributes");
 	topView->AddChild(fAttributeBox);
 
@@ -540,8 +538,8 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	innerRect.top += ceilf(boldHeight.ascent);
 	innerRect.left = innerRect.right - button->StringWidth("Remove") - 16.0f;
 	innerRect.bottom = innerRect.top + button->Bounds().Height();
-	fAddAttributeButton = new BButton(innerRect, "add attr", "Add" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgAddAttribute), B_FOLLOW_RIGHT);
+	fAddAttributeButton = new BButton(innerRect, "add attr",
+		"Add" B_UTF8_ELLIPSIS, new BMessage(kMsgAddAttribute), B_FOLLOW_RIGHT);
 	fAttributeBox->AddChild(fAddAttributeButton);
 
 	innerRect.OffsetBy(0, innerRect.Height() + 4.0f);
