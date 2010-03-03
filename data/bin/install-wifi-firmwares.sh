@@ -105,7 +105,7 @@ function DownloadFileIfNotCached()
 	mkdir -p "$dir"
 	if [ ! -e $dir/$file ] ; then
 		echo "Downloading $url ..."
-		wget -nv -O $dir/$file $urlarst
+		wget -nv -O $dir/$file $url
 	fi
 	result=$?
 	if [ $result -gt 0 ]; then
