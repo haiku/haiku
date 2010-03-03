@@ -2022,6 +2022,9 @@ dump_block_long(cached_block* block)
 	kprintf(" current data:  %p\n", block->current_data);
 	kprintf(" original data: %p\n", block->original_data);
 	kprintf(" parent data:   %p\n", block->parent_data);
+#if BLOCK_CACHE_DEBUG_CHANGED
+	kprintf(" compare data:  %p\n", block->compare);
+#endif
 	kprintf(" ref_count:     %ld\n", block->ref_count);
 	kprintf(" accessed:      %ld\n", block->LastAccess());
 	kprintf(" flags:        ");
@@ -2123,6 +2126,7 @@ dump_cache(int argc, char** argv)
 	kprintf(" max_blocks:   %Ld\n", cache->max_blocks);
 	kprintf(" block_size:   %lu\n", cache->block_size);
 	kprintf(" next_transaction_id: %ld\n", cache->next_transaction_id);
+	kprintf(" buffer_cache: %p\n", cache->buffer_cache);
 	kprintf(" busy_reading: %lu, %s waiters\n", cache->busy_reading_count,
 		cache->busy_reading_waiters ? "has" : "no");
 	kprintf(" busy_writing: %lu, %s waiters\n", cache->busy_writing_count,
@@ -2447,7 +2451,8 @@ block_notifier_and_writer(void* /*data*/)
 		// write 64 blocks of each block_cache every two seconds
 		// TODO: change this once we have an I/O scheduler
 		timeout = kTimeout;
-		size_t usedMemory = 0;
+		size_t usedMemory;
+		object_cache_get_usage(sBlockCache, &usedMemory);
 
 		block_cache* cache = NULL;
 		while ((cache = get_next_locked_block_cache(cache)) != NULL) {
@@ -2503,7 +2508,7 @@ block_notifier_and_writer(void* /*data*/)
 					> vm_page_num_pages() / 2) {
 				// Try to reduce memory usage to half of the available
 				// RAM at maximum
-				cache->RemoveUnusedBlocks(500, 10);
+				cache->RemoveUnusedBlocks(1000, 10);
 			}
 		}
 
