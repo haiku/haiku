@@ -46,7 +46,7 @@ public:
 								int32 group, uint16 start, uint16 numBlocks,
 								uint16 minimum, block_run& run);
 
-			status_t		StartChecking(check_control* control);
+			status_t		StartChecking(const check_control* control);
 			status_t		StopChecking(check_control* control);
 			status_t		CheckNextNode(check_control* control);
 
@@ -74,7 +74,7 @@ private:
 #ifdef DEBUG_ALLOCATION_GROUPS
 			void			_CheckGroup(int32 group) const;
 #endif
-			bool			_IsValidCheckControl(check_control* control);
+			bool			_IsValidCheckControl(const check_control* control);
 			bool			_CheckBitmapIsUsedAt(off_t block) const;
 			void			_SetCheckBitmapAt(off_t block);
 

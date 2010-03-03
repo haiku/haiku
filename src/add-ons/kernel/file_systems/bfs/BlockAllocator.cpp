@@ -1177,7 +1177,7 @@ BlockAllocator::_CheckGroup(int32 groupIndex) const
 
 
 bool
-BlockAllocator::_IsValidCheckControl(check_control* control)
+BlockAllocator::_IsValidCheckControl(const check_control* control)
 {
 	if (control == NULL
 		|| control->magic != BFS_IOCTL_CHECK_MAGIC) {
@@ -1190,7 +1190,7 @@ BlockAllocator::_IsValidCheckControl(check_control* control)
 
 
 status_t
-BlockAllocator::StartChecking(check_control* control)
+BlockAllocator::StartChecking(const check_control* control)
 {
 	if (!_IsValidCheckControl(control))
 		return B_BAD_VALUE;
@@ -1212,8 +1212,8 @@ BlockAllocator::StartChecking(check_control* control)
 		return B_NO_MEMORY;
 	}
 
-	check_cookie* cookie = new check_cookie();
-	if (cookie == NULL) {
+	fCheckCookie = new check_cookie();
+	if (fCheckCookie == NULL) {
 		free(fCheckBitmap);
 		fCheckBitmap = NULL;
 		mutex_unlock(&fLock);
@@ -1229,19 +1229,15 @@ BlockAllocator::StartChecking(check_control* control)
 		_SetCheckBitmapAt(block);
 	}
 
-	cookie->stack.Push(fVolume->Root());
-	cookie->stack.Push(fVolume->Indices());
-	cookie->iterator = NULL;
-	control->cookie = cookie;
-
-	fCheckCookie = cookie;
-		// to be able to restore nicely if "chkbfs" exited abnormally
+	fCheckCookie->stack.Push(fVolume->Root());
+	fCheckCookie->stack.Push(fVolume->Indices());
+	fCheckCookie->iterator = NULL;
 
 	// Put removed vnodes to the stack -- they are not reachable by traversing
 	// the file system anymore.
 	InodeList::Iterator iterator = fVolume->RemovedInodes().GetIterator();
 	while (Inode* inode = iterator.Next()) {
-		cookie->stack.Push(inode->BlockRun());
+		fCheckCookie->stack.Push(inode->BlockRun());
 	}
 
 	// TODO: check reserved area in bitmap!
@@ -1253,21 +1249,15 @@ BlockAllocator::StartChecking(check_control* control)
 status_t
 BlockAllocator::StopChecking(check_control* control)
 {
-	check_cookie* cookie;
-	if (control == NULL)
-		cookie = fCheckCookie;
-	else
-		cookie = (check_cookie*)control->cookie;
-
-	if (cookie == NULL)
+	if (fCheckCookie == NULL)
 		return B_ERROR;
 
-	if (cookie->iterator != NULL) {
-		delete cookie->iterator;
-		cookie->iterator = NULL;
+	if (fCheckCookie->iterator != NULL) {
+		delete fCheckCookie->iterator;
+		fCheckCookie->iterator = NULL;
 
 		// the current directory inode is still locked in memory
-		put_vnode(fVolume->FSVolume(), fVolume->ToVnode(cookie->current));
+		put_vnode(fVolume->FSVolume(), fVolume->ToVnode(fCheckCookie->current));
 	}
 
 	if (fVolume->IsReadOnly()) {
@@ -1351,8 +1341,8 @@ BlockAllocator::StopChecking(check_control* control)
 
 	free(fCheckBitmap);
 	fCheckBitmap = NULL;
+	delete fCheckCookie;
 	fCheckCookie = NULL;
-	delete cookie;
 	mutex_unlock(&fLock);
 	fVolume->GetJournal(0)->Unlock(NULL, true);
 
@@ -1366,22 +1356,21 @@ BlockAllocator::CheckNextNode(check_control* control)
 	if (!_IsValidCheckControl(control))
 		return B_BAD_VALUE;
 
-	check_cookie* cookie = (check_cookie*)control->cookie;
 	fVolume->SetCheckingThread(find_thread(NULL));
 
 	while (true) {
-		if (cookie->iterator == NULL) {
-			if (!cookie->stack.Pop(&cookie->current)) {
+		if (fCheckCookie->iterator == NULL) {
+			if (!fCheckCookie->stack.Pop(&fCheckCookie->current)) {
 				// no more runs on the stack, we are obviously finished!
 				control->status = B_ENTRY_NOT_FOUND;
 				return B_ENTRY_NOT_FOUND;
 			}
 
-			Vnode vnode(fVolume, cookie->current);
+			Vnode vnode(fVolume, fCheckCookie->current);
 			Inode* inode;
 			if (vnode.Get(&inode) != B_OK) {
 				FATAL(("check: Could not open inode at %" B_PRIdOFF "\n",
-					fVolume->ToBlock(cookie->current)));
+					fVolume->ToBlock(fCheckCookie->current)));
 				continue;
 			}
 
@@ -1404,15 +1393,15 @@ BlockAllocator::CheckNextNode(check_control* control)
 			BPlusTree* tree = inode->Tree();
 			if (tree == NULL) {
 				FATAL(("check: could not open b+tree from inode at %" B_PRIdOFF
-					"\n", fVolume->ToBlock(cookie->current)));
+					"\n", fVolume->ToBlock(fCheckCookie->current)));
 				continue;
 			}
 
-			cookie->parent = inode;
-			cookie->parent_mode = inode->Mode();
+			fCheckCookie->parent = inode;
+			fCheckCookie->parent_mode = inode->Mode();
 
-			cookie->iterator = new TreeIterator(tree);
-			if (cookie->iterator == NULL)
+			fCheckCookie->iterator = new TreeIterator(tree);
+			if (fCheckCookie->iterator == NULL)
 				RETURN_ERROR(B_NO_MEMORY);
 
 			// the inode must stay locked in memory until the iterator is freed
@@ -1432,15 +1421,16 @@ BlockAllocator::CheckNextNode(check_control* control)
 		uint16 length;
 		ino_t id;
 
-		status_t status = cookie->iterator->GetNextEntry(name, &length,
+		status_t status = fCheckCookie->iterator->GetNextEntry(name, &length,
 			B_FILE_NAME_LENGTH, &id);
 		if (status == B_ENTRY_NOT_FOUND) {
 			// there are no more entries in this iterator, free it and go on
-			delete cookie->iterator;
-			cookie->iterator = NULL;
+			delete fCheckCookie->iterator;
+			fCheckCookie->iterator = NULL;
 
 			// unlock the directory's inode from memory
-			put_vnode(fVolume->FSVolume(), fVolume->ToVnode(cookie->current));
+			put_vnode(fVolume->FSVolume(),
+				fVolume->ToVnode(fCheckCookie->current));
 
 			continue;
 		} else if (status == B_OK) {
@@ -1460,8 +1450,8 @@ BlockAllocator::CheckNextNode(check_control* control)
 				control->errors |= BFS_COULD_NOT_OPEN;
 
 				if ((control->flags & BFS_REMOVE_INVALID) != 0) {
-					status = _RemoveInvalidNode(cookie->parent,
-						cookie->iterator->Tree(), NULL, name);
+					status = _RemoveInvalidNode(fCheckCookie->parent,
+						fCheckCookie->iterator->Tree(), NULL, name);
 				} else
 					status = B_ERROR;
 
@@ -1501,22 +1491,22 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 			// Check for the correct mode of the node (if the mode of the
 			// file don't fit to its parent, there is a serious problem)
-			if (((cookie->parent_mode & S_ATTR_DIR) != 0
+			if (((fCheckCookie->parent_mode & S_ATTR_DIR) != 0
 					&& !inode->IsAttribute())
-				|| ((cookie->parent_mode & S_INDEX_DIR) != 0
+				|| ((fCheckCookie->parent_mode & S_INDEX_DIR) != 0
 					&& !inode->IsIndex())
-				|| (is_directory(cookie->parent_mode)
+				|| (is_directory(fCheckCookie->parent_mode)
 					&& !inode->IsRegularNode())) {
 				FATAL(("inode at %" B_PRIdOFF " is of wrong type: %o (parent "
 					"%o at %" B_PRIdOFF ")!\n", inode->BlockNumber(),
-					inode->Mode(), cookie->parent_mode,
-					cookie->parent->BlockNumber()));
+					inode->Mode(), fCheckCookie->parent_mode,
+					fCheckCookie->parent->BlockNumber()));
 
 				// if we are allowed to fix errors, we should remove the file
 				if ((control->flags & BFS_REMOVE_WRONG_TYPES) != 0
 					&& (control->flags & BFS_FIX_BITMAP_ERRORS) != 0) {
-					status = _RemoveInvalidNode(cookie->parent, NULL, inode,
-						name);
+					status = _RemoveInvalidNode(fCheckCookie->parent, NULL,
+						inode, name);
 				} else
 					status = B_ERROR;
 
@@ -1527,7 +1517,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 			// push the directory on the stack so that it will be scanned later
 			if (inode->IsContainer() && !inode->IsIndex())
-				cookie->stack.Push(inode->BlockRun());
+				fCheckCookie->stack.Push(inode->BlockRun());
 			else {
 				// check it now
 				control->status = CheckInode(inode, control);
@@ -1757,10 +1747,8 @@ BlockAllocator::CheckInode(Inode* inode, check_control* control)
 		return status;
 
 	// If the inode has an attribute directory, push it on the stack
-	if (!inode->Attributes().IsZero()) {
-		check_cookie* cookie = (check_cookie*)control->cookie;
-		cookie->stack.Push(inode->Attributes());
-	}
+	if (!inode->Attributes().IsZero())
+		fCheckCookie->stack.Push(inode->Attributes());
 
 	if (inode->IsSymLink() && (inode->Flags() & INODE_LONG_SYMLINK) == 0) {
 		// symlinks may not have a valid data stream

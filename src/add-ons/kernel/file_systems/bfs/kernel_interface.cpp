@@ -618,23 +618,21 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
 
 	Volume* volume = (Volume*)_volume->private_volume;
 
-	// TODO: Access user buffers safely!
-
 	switch (cmd) {
 		case BFS_IOCTL_VERSION:
 		{
-			uint32 *version = (uint32*)buffer;
-
-			*version = 0x10000;
-			return B_OK;
+			uint32 version = 0x10000;
+			return user_memcpy(buffer, &version, sizeof(uint32));
 		}
 		case BFS_IOCTL_START_CHECKING:
 		{
 			// start checking
 			BlockAllocator& allocator = volume->Allocator();
-			check_control* control = (check_control*)buffer;
+			check_control control;
+			if (user_memcpy(&control, buffer, sizeof(check_control)) != B_OK)
+				return B_BAD_ADDRESS;
 
-			status_t status = allocator.StartChecking(control);
+			status_t status = allocator.StartChecking(&control);
 			if (status == B_OK) {
 				file_cookie* cookie = (file_cookie*)_cookie;
 				cookie->open_mode |= BFS_OPEN_MODE_CHECKING;
@@ -646,13 +644,15 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
 		{
 			// stop checking
 			BlockAllocator& allocator = volume->Allocator();
-			check_control* control = (check_control*)buffer;
+			check_control control;
 
-			status_t status = allocator.StopChecking(control);
+			status_t status = allocator.StopChecking(&control);
 			if (status == B_OK) {
 				file_cookie* cookie = (file_cookie*)_cookie;
 				cookie->open_mode &= ~BFS_OPEN_MODE_CHECKING;
 			}
+			if (status == B_OK)
+				status = user_memcpy(buffer, &control, sizeof(check_control));
 
 			return status;
 		}
@@ -660,9 +660,13 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
 		{
 			// check next
 			BlockAllocator& allocator = volume->Allocator();
-			check_control* control = (check_control*)buffer;
+			check_control control;
 
-			return allocator.CheckNextNode(control);
+			status_t status = allocator.CheckNextNode(&control);
+			if (status == B_OK)
+				status = user_memcpy(buffer, &control, sizeof(check_control));
+
+			return status;
 		}
 		case BFS_IOCTL_UPDATE_BOOT_BLOCK:
 		{

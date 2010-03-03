@@ -51,7 +51,6 @@ struct check_control {
 		uint64	freed;
 	} stats;
 	status_t	status;
-	void*		cookie;
 };
 
 /* values for the flags field */
