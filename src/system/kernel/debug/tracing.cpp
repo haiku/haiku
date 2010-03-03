@@ -474,6 +474,9 @@ TracingMetaData::_InitPreviousTracingData()
 		return false;
 	}
 
+	dprintf("ktrace: Remapped tracing buffer at %p, size: %" B_PRIuSIZE "\n",
+		buffer, kTraceOutputBufferSize + MAX_TRACE_SIZE);
+
 	// verify/repair the tracing entry list
 	uint32 errorCount = 0;
 	uint32 entryCount = 0;
@@ -487,6 +490,7 @@ TracingMetaData::_InitPreviousTracingData()
 				dprintf("ktrace recovering: entry %p: fixing previous_size "
 					"size: %lu (should be %lu)\n", entry, entry->previous_size,
 					previousEntrySize);
+				errorCount++;
 			}
 			entry->previous_size = previousEntrySize;
 		}
@@ -498,6 +502,7 @@ TracingMetaData::_InitPreviousTracingData()
 		if ((entry->flags & WRAP_ENTRY) == 0 && entry->size == 0) {
 			dprintf("ktrace recovering: entry %p: non-wrap entry size is 0\n",
 				entry);
+			errorCount++;
 			fAfterLastEntry = entry;
 			break;
 		}
@@ -505,6 +510,7 @@ TracingMetaData::_InitPreviousTracingData()
 		if (entry->size > uint32(fBuffer + kBufferSize - entry)) {
 			dprintf("ktrace recovering: entry %p: size too big: %lu\n", entry,
 				entry->size);
+			errorCount++;
 			fAfterLastEntry = entry;
 			break;
 		}
@@ -512,6 +518,7 @@ TracingMetaData::_InitPreviousTracingData()
 		if (entry < fAfterLastEntry && entry + entry->size > fAfterLastEntry) {
 			dprintf("ktrace recovering: entry %p: entry crosses "
 				"fAfterLastEntry (%p)\n", entry, fAfterLastEntry);
+			errorCount++;
 			fAfterLastEntry = entry;
 			break;
 		}
@@ -522,11 +529,13 @@ TracingMetaData::_InitPreviousTracingData()
 					> kMaxTracingEntryByteSize / sizeof(trace_entry)) {
 				dprintf("ktrace recovering: entry %p: wrap entry at invalid "
 					"buffer location\n", entry);
+				errorCount++;
 			}
 
 			if (entry->size != 0) {
 				dprintf("ktrace recovering: entry %p: invalid wrap entry "
 					"size: %lu\n", entry, entry->size);
+				errorCount++;
 				entry->size = 0;
 			}
 
