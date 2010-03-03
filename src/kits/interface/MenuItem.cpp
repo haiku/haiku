@@ -388,9 +388,10 @@ BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
 void
 BMenuItem::DrawContent()
 {
-	MenuPrivate(fSuper).CacheFontInfo();
+	MenuPrivate menuPrivate(fSuper);
+	menuPrivate.CacheFontInfo();
 
-	fSuper->MovePenBy(0, MenuPrivate(fSuper).Ascent());
+	fSuper->MovePenBy(0, menuPrivate.Ascent());
 	BPoint lineStart = fSuper->PenLocation();
 
 	float labelWidth, labelHeight;
@@ -398,13 +399,19 @@ BMenuItem::DrawContent()
 
 	fSuper->SetDrawingMode(B_OP_OVER);
 
+	float frameWidth = fBounds.Width();
+	if (menuPrivate.State() == MENU_STATE_CLOSED) {
+		float rightMargin, leftMargin;
+		menuPrivate.GetItemMargins(&leftMargin, NULL, &rightMargin, NULL);
+		frameWidth = fSuper->Frame().Width() - (rightMargin + leftMargin);
+	}
+
 	// truncate if needed
-	// TODO: Actually, this is still never triggered
-	if (fBounds.Width() > labelWidth)
+	if (frameWidth > labelWidth)
 		fSuper->DrawString(fLabel);
 	else {
 		char *truncatedLabel = new char[strlen(fLabel) + 4];
-		TruncateLabel(fBounds.Width(), truncatedLabel);
+		TruncateLabel(frameWidth, truncatedLabel);
 		fSuper->DrawString(truncatedLabel);
 		delete[] truncatedLabel;
 	}

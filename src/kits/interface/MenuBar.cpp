@@ -644,18 +644,17 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 		window->Unlock();
 
 		if (fState != MENU_STATE_CLOSED) {
-			// if user doesn't move the mouse, loop here,
+			// If user doesn't move the mouse, loop here,
 			// so we don't interfer with keyboard menu navigation
-			BPoint newLocation;
-			uint32 newButtons;
+			BPoint newLocation = where;
+			uint32 newButtons = buttons;
 			do {
 				snooze(snoozeAmount);
 				if (!LockLooper())
 					break;
 				GetMouse(&newLocation, &newButtons, true);
 				UnlockLooper();
-			} while (newLocation == where
-					&& newButtons == buttons);
+			} while (newLocation == where && newButtons == buttons);
 
 			where = newLocation;
 			buttons = newButtons;

@@ -203,7 +203,7 @@ BMenu::BMenu(const char* name, menu_layout layout)
 	fAscent(-1.0f),
 	fDescent(-1.0f),
 	fFontHeight(-1.0f),
-	fState(0),
+	fState(MENU_STATE_CLOSED),
 	fLayout(layout),
 	fExtraRect(NULL),
 	fMaxContentWidth(0.0f),
@@ -272,7 +272,7 @@ BMenu::BMenu(BMessage* archive)
 	fAscent(-1.0f),
 	fDescent(-1.0f),
 	fFontHeight(-1.0f),
-	fState(0),
+	fState(MENU_STATE_CLOSED),
 	fLayout(B_ITEMS_IN_ROW),
 	fExtraRect(NULL),
 	fMaxContentWidth(0.0f),
@@ -564,6 +564,7 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 					continue;
 
 				_InvokeItem(item);
+				break;
 			}
 			break;
 		}
@@ -1255,7 +1256,7 @@ BMenu::BMenu(BRect frame, const char* name, uint32 resizingMode, uint32 flags,
 	fAscent(-1.0f),
 	fDescent(-1.0f),
 	fFontHeight(-1.0f),
-	fState(0),
+	fState(MENU_STATE_CLOSED),
 	fLayout(layout),
 	fExtraRect(NULL),
 	fMaxContentWidth(0.0f),
@@ -1657,16 +1658,20 @@ BMenu::_Track(int* action, long start)
 
 		if (fState != MENU_STATE_CLOSED) {
 			bigtime_t snoozeAmount = 50000;
-			snooze(snoozeAmount);
 
-			BPoint newLocation;
-			uint32 newButtons;
+			BPoint newLocation = location;
+			uint32 newButtons = buttons;
 
-			bigtime_t newPollTime = system_time();
-			if (LockLooper()) {
+			// If user doesn't move the mouse, loop here,
+			// so we don't interfer with keyboard menu navigation
+			do {
+				snooze(snoozeAmount);
+				if (!LockLooper())
+					break;
 				GetMouse(&newLocation, &newButtons, true);
 				UnlockLooper();
-			}
+			} while (newLocation == location && newButtons == buttons);
+			bigtime_t newPollTime = system_time();
 
 			// mouseSpeed in px per ms
 			// (actually point_distance returns the square of the distance,
@@ -2343,16 +2348,16 @@ BMenu::_InvokeItem(BMenuItem* item, bool now)
 	if (!item->Submenu() && LockLooper()) {
 		snooze(50000);
 		item->Select(true);
-		Sync();
+		Window()->UpdateIfNeeded();
 		snooze(50000);
 		item->Select(false);
-		Sync();
+		Window()->UpdateIfNeeded();
 		snooze(50000);
 		item->Select(true);
-		Sync();
+		Window()->UpdateIfNeeded();
 		snooze(50000);
 		item->Select(false);
-		Sync();
+		Window()->UpdateIfNeeded();
 		UnlockLooper();
 	}
 
