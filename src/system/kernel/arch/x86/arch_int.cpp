@@ -553,12 +553,6 @@ ioapic_init(kernel_args *args)
 		return;
 	}
 
-	bool disableAPIC = get_safemode_boolean(B_SAFEMODE_DISABLE_APIC, false);
-	if (disableAPIC) {
-		args->arch_args.apic = NULL;
-		return;
-	}
-
 	// always map the local apic as it can be used for timers even if we
 	// don't end up using the io apic
 	sLocalAPIC = args->arch_args.apic;

@@ -393,7 +393,12 @@ smp_init_other_cpus(void)
 		TRACE(("smp disabled per safemode setting\n"));
 		gKernelArgs.num_cpus = 1;
 	}
-
+	
+	if (get_safemode_boolean(B_SAFEMODE_DISABLE_APIC, false)) {
+		TRACE(("local apic disabled per safemode setting\n"));
+		gKernelArgs.arch_args.apic_phys = 0;
+	}
+	
 	if (gKernelArgs.arch_args.apic_phys == 0)
 		return;
 

@@ -61,13 +61,11 @@ apic_write(uint32 offset, uint32 data)
 static status_t
 setup_apic(kernel_args *args, int32 cpu)
 {
-	uint32 config;
-
 	TRACE(("setting up the APIC for CPU %ld...\n", cpu));
 	TRACE(("	apic id %ld, version %ld\n", apic_read(APIC_ID), apic_read(APIC_VERSION)));
 
 	/* set spurious interrupt vector to 0xff */
-	config = apic_read(APIC_SPURIOUS_INTR_VECTOR) & 0xffffff00;
+	uint32 config = apic_read(APIC_SPURIOUS_INTR_VECTOR) & 0xffffff00;
 	config |= APIC_ENABLE | 0xff;
 	apic_write(APIC_SPURIOUS_INTR_VECTOR, config);
 
