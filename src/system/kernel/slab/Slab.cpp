@@ -198,6 +198,14 @@ class Reserve : public ObjectCacheTraceEntry {
 // #pragma mark -
 
 
+static void
+dump_slab(::slab* slab)
+{
+	kprintf("  %p  %p  %6" B_PRIuSIZE " %6" B_PRIuSIZE " %6" B_PRIuSIZE "  %p\n",
+		slab, slab->pages, slab->size, slab->count, slab->offset, slab->free);
+}
+
+
 static int
 dump_slabs(int argc, char* argv[])
 {
@@ -243,6 +251,26 @@ dump_cache_info(int argc, char* argv[])
 	kprintf("cookie:            %p\n", cache->cookie);
 	kprintf("resize entry don't wait: %p\n", cache->resize_entry_dont_wait);
 	kprintf("resize entry can wait:   %p\n", cache->resize_entry_can_wait);
+
+	kprintf("  slab        chunk         size   used offset  free\n");
+
+	SlabList::Iterator iterator = cache->empty.GetIterator();
+	if (iterator.HasNext())
+		kprintf("empty:\n");
+	while (::slab* slab = iterator.Next())
+		dump_slab(slab);
+
+	iterator = cache->partial.GetIterator();
+	if (iterator.HasNext())
+		kprintf("partial:\n");
+	while (::slab* slab = iterator.Next())
+		dump_slab(slab);
+
+	iterator = cache->full.GetIterator();
+	if (iterator.HasNext())
+		kprintf("full:\n");
+	while (::slab* slab = iterator.Next())
+		dump_slab(slab);
 
 	if ((cache->flags & CACHE_NO_DEPOT) == 0) {
 		kprintf("depot:\n");
