@@ -1,6 +1,6 @@
 /*
  * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -57,20 +57,17 @@ static const uint32 kDiskSystemFlags =
 // #pragma mark - BFSAddOn
 
 
-// constructor
 BFSAddOn::BFSAddOn()
 	: BDiskSystemAddOn(kPartitionTypeBFS, kDiskSystemFlags)
 {
 }
 
 
-// destructor
 BFSAddOn::~BFSAddOn()
 {
 }
 
 
-// CreatePartitionHandle
 status_t
 BFSAddOn::CreatePartitionHandle(BMutablePartition* partition,
 	BPartitionHandle** _handle)
@@ -90,7 +87,6 @@ BFSAddOn::CreatePartitionHandle(BMutablePartition* partition,
 }
 
 
-// CanInitialize
 bool
 BFSAddOn::CanInitialize(const BMutablePartition* partition)
 {
@@ -99,7 +95,6 @@ BFSAddOn::CanInitialize(const BMutablePartition* partition)
 }
 
 
-// GetInitializationParameterEditor
 status_t
 BFSAddOn::GetInitializationParameterEditor(const BMutablePartition* partition,
 	BPartitionParameterEditor** editor)
@@ -115,7 +110,6 @@ BFSAddOn::GetInitializationParameterEditor(const BMutablePartition* partition,
 }
 
 
-// ValidateInitialize
 status_t
 BFSAddOn::ValidateInitialize(const BMutablePartition* partition, BString* name,
 	const char* parameterString)
@@ -142,7 +136,6 @@ BFSAddOn::ValidateInitialize(const BMutablePartition* partition, BString* name,
 }
 
 
-// Initialize
 status_t
 BFSAddOn::Initialize(BMutablePartition* partition, const char* name,
 	const char* parameterString, BPartitionHandle** _handle)
@@ -219,10 +212,8 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	path.SetTo(&directory, ".");
 
 	int fd = open(path.Path(), O_RDONLY);
-	if (fd < 0) {
-	    printf("chkbfs: error opening '.'\n");
+	if (fd < 0)
 	    return errno;
-	}
 
 	struct check_control result;
 	memset(&result, 0, sizeof(result));
@@ -235,10 +226,8 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	}
 
 	// start checking
-	if (ioctl(fd, BFS_IOCTL_START_CHECKING, &result, sizeof(result)) < 0) {
-	    printf("chkbfs: error starting!\n");
+	if (ioctl(fd, BFS_IOCTL_START_CHECKING, &result, sizeof(result)) < 0)
 	    return errno;
-	}
 
 	off_t attributeDirectories = 0, attributes = 0;
 	off_t files = 0, directories = 0, indices = 0;
@@ -278,8 +267,7 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	}
 
 	// stop checking
-	if (ioctl(fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result)) < 0)
-	    printf("chkbfs: error stopping!\n");
+	ioctl(fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result));
 
 	close(fd);
 
@@ -300,7 +288,6 @@ BFSPartitionHandle::Repair(bool checkOnly)
 // #pragma mark -
 
 
-// get_disk_system_add_ons
 status_t
 get_disk_system_add_ons(BList* addOns)
 {
