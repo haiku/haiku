@@ -656,6 +656,15 @@ mmu_init(void)
 				// we ignore all memory beyond 4 GB
 				if (end > 0x100000000ULL)
 					end = 0x100000000ULL;
+
+				// Also ignore memory below 1 MB. Apparently some BIOSes fail to
+				// provide the correct range type for some ranges (cf. #1925).
+				// Later in the kernel we will reserve the range 0x0 - 0xa0000
+				// and apparently 0xa0000 - 0x100000 never contain usable
+				// memory, so we don't lose anything by doing that.
+				if (base < 0x100000)
+					base = 0x100000;
+
 				if (end <= base)
 					continue;
 
