@@ -1670,7 +1670,8 @@ BMenu::_Track(int* action, long start)
 					break;
 				GetMouse(&newLocation, &newButtons, true);
 				UnlockLooper();
-			} while (newLocation == location && newButtons == buttons);
+			} while (newLocation == location && newButtons == buttons
+				&& !(item && item->Submenu() != NULL));
 			bigtime_t newPollTime = system_time();
 
 			// mouseSpeed in px per ms
