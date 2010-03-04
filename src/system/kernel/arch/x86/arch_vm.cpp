@@ -141,16 +141,16 @@ static bool
 add_mtrrs_for_range(uint64 base, uint64 size, uint32 type)
 {
 	for (uint64 interval = B_PAGE_SIZE; size > 0; interval <<= 1) {
-		if (((base | size) & interval) != 0) {
-			if ((base & interval) != 0) {
-				if (!add_used_mtrr(base, interval, type))
-					return false;
-				base += interval;
-			} else {
-				if (!add_used_mtrr(base + size - interval, interval, type))
-					return false;
-			}
+		if ((base & interval) != 0) {
+			if (!add_used_mtrr(base, interval, type))
+				return false;
+			base += interval;
+			size -= interval;
+		}
 
+		if ((size & interval) != 0) {
+			if (!add_used_mtrr(base + size - interval, interval, type))
+				return false;
 			size -= interval;
 		}
 	}
