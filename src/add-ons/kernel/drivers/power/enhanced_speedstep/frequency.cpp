@@ -144,13 +144,16 @@ est_msr_info(uint64 msr, freq_info** _frequencyInfos)
 
 	int32 freq = info.cpu_clock_speed / 1000000;
 	uint16 id = msr >> 32;
-	int32 bus = freq / (id >> 8);
+	int32 bus = 0;
+	if (id >> 8)
+		freq / (id >> 8);
 
 	TRACE("est: Guessed bus clock (high) of %d MHz\n", int(bus));
 	if (!bus_speed_ok(bus)) {
 		// We may be running on the low frequency.
 		id = msr >> 48;
-		bus = freq / (id >> 8);
+		if (id >> 8)
+			bus = freq / (id >> 8);
 		TRACE("est: Guessed bus clock (low) of %d MHz\n", int(bus));
 		if (!bus_speed_ok(bus))
 			return B_ERROR;
