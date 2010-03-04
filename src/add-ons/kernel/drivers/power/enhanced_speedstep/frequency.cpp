@@ -146,7 +146,7 @@ est_msr_info(uint64 msr, freq_info** _frequencyInfos)
 	uint16 id = msr >> 32;
 	int32 bus = 0;
 	if (id >> 8)
-		freq / (id >> 8);
+		bus = freq / (id >> 8);
 
 	TRACE("est: Guessed bus clock (high) of %d MHz\n", int(bus));
 	if (!bus_speed_ok(bus)) {
