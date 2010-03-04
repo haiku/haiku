@@ -517,7 +517,7 @@ DefaultDecorator::GetFootprint(BRegion* region)
 
 	if (fLook == B_DOCUMENT_WINDOW_LOOK) {
 		// include the rectangular resize knob on the bottom right
-		float knobSize = kResizeKnobSize - fBorderWidth - 1.0;
+		float knobSize = kResizeKnobSize - fBorderWidth;
 		region->Include(BRect(fFrame.right - knobSize, fFrame.bottom - knobSize,
 			fFrame.right, fFrame.bottom));
 	}
