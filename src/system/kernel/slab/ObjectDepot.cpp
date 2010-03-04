@@ -143,6 +143,7 @@ exchange_with_empty(object_depot* depot, DepotMagazine*& magazine,
 		if (depot->full_count < depot->max_count) {
 			_push(depot->full, magazine);
 			depot->full_count++;
+			freeMagazine = NULL;
 		} else
 			freeMagazine = magazine;
 	}
@@ -252,8 +253,6 @@ object_depot_obtain(object_depot* depot)
 void
 object_depot_store(object_depot* depot, void* object, uint32 flags)
 {
-	DepotMagazine* freeMagazine = NULL;
-
 	ReadLocker readLocker(depot->outer_lock);
 	InterruptsLocker interruptsLocker;
 
@@ -268,6 +267,7 @@ object_depot_store(object_depot* depot, void* object, uint32 flags)
 		if (store->loaded != NULL && store->loaded->Push(object))
 			return;
 
+		DepotMagazine* freeMagazine = NULL;
 		if ((store->previous != NULL && store->previous->IsEmpty())
 			|| exchange_with_empty(depot, store->previous, freeMagazine)) {
 			std::swap(store->loaded, store->previous);
