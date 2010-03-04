@@ -199,8 +199,6 @@ MediaReplicant::AttachedToWindow()
 void
 MediaReplicant::Draw(BRect rect)
 {
-	BView::Draw(rect);
-
 	SetDrawingMode(B_OP_OVER);
 	DrawBitmap(fIcon);
 }
