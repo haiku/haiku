@@ -122,7 +122,7 @@ add_used_mtrr(uint64 base, uint64 size, uint32 type)
 {
 	if (sMemoryTypeRegistersUsed == sMemoryTypeRegisterCount) {
 		if (sMemoryTypeRegisterCount > 0) {
-			dprintf("add_used_mtrr(%#" B_PRIx64 ", %#" B_PRIx64 ", %" B_PRIu32
+			panic("add_used_mtrr(%#" B_PRIx64 ", %#" B_PRIx64 ", %" B_PRIu32
 				"): out of MTRRs!\n", base, size, type);
 		}
 		return false;
