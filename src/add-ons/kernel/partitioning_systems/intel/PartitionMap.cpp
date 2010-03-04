@@ -362,7 +362,7 @@ bool
 Partition::CheckLocation(off_t sessionSize) const
 {
 	if (fBlockSize == 0)
-			return false;
+		return false;
 	// offsets and size must be block aligned, partition table and partition must
 	// lie within the session
 	if (fPartitionTableOffset % fBlockSize != 0) {
