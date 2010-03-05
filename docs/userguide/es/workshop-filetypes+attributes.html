@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -10,16 +10,17 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Oscar Carballal Prego
+ *		Oscar Carballal
  *		Jorge G. Mare
  *		killa.fr0gg
+ *		miguel~1.mx
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Taller de trabajo: Tipos de archivo, Atributos, Indices, y consultas</title>
-	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+	<title>Taller: Tipos de archivo, atributos, índices, y consultas</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
@@ -30,18 +31,18 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../images/flags/es.png" alt="" /> Español</li>
-<li><a href="../fr/workshop-filetypes+attributes.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../de/workshop-filetypes+attributes.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../it/workshop-filetypes+attributes.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../ru/workshop-filetypes+attributes.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../sv_SE/workshop-filetypes+attributes.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="../jp/workshop-filetypes+attributes.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
-<li><a href="../en/workshop-filetypes+attributes.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+<li class="now"><img src="../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../fr/workshop-filetypes+attributes.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/workshop-filetypes+attributes.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/workshop-filetypes+attributes.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/workshop-filetypes+attributes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../sv_SE/workshop-filetypes+attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/workshop-filetypes+attributes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="queries.html">Queries</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Contenidos</a> 
 ::  <a href="applications.html">Aplicaciones</a>  »
 </span></div>
 </div>
@@ -53,28 +54,28 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Índice</td></tr>
 <tr class="index"><td>
-	<a href="#preparations">Preparations</a><br />
-	<a href="#custom-filetype">Creating a custom filetype</a><br />
-	<a href="#icon">Icon</a><br />
-        <a href="#file-recognition">File recognition</a><br />
-	<a href="#description">Description</a><br />
-	<a href="#pref_app">Preferred Application</a><br />
-	<a href="#extra_attribute">Extra Attributes</a><br />
-	<a href="#indexing">Indexing</a><br />
-	<a href="#filling-data">Filling in the data</a><br />
-	<a href="#query-db">Querying the database</a>
+	<a href="#preparations">Preparativos</a><br />
+	<a href="#custom-filetype">Crear un tipo de archivo personalizado</a><br />
+	  <a href="#icon">Icono</a><br />
+	  <a href="#file-recognition">Reconocimiento de archivos</a><br />
+	<a href="#description">Descripción</a><br />
+	  <a href="#pref_app">Aplicación preferida</a><br />
+	  <a href="#extra_attribute">Atributos adicionales</a><br />
+	<a href="#indexing">Indexado</a><br />
+	<a href="#filling-data">Completar la información</a><br />
+	<a href="#query-db">Consultar la base de datos</a>
 </td></tr>
 </table>
 
-<h1>Taller de trabajo: Tipos de archivo, Atributos, Indices, y consultas</h1>
+<h1>Taller: Tipos de archivo, atributos, índices, y consultas</h1>
 
-<p>Este es un taller de trabajo para mostrar el uso de los <a href="attributes.html">Atributos</a>, <a href="queries.html">Consultas</a>, la <a href="index.html">Indexación</a> y <a href="filetypes.html">Tipos de archivo</a> personalizados. Como ejemplo, construiremos una base de datos para llevar un registro de nuestra colección de DVDs.</p>
+<p>Este es un taller de trabajo para mostrar el uso de los <a href="attributes.html">Atributos</a>, <a href="queries.html">Consultas</a>, el <a href="index.html">Indexado</a> y <a href="filetypes.html">Tipos de archivo</a> personalizados. Como ejemplo, construiremos una base de datos para llevar un registro de nuestra colección de DVDs.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preparations" name="preparations">Preparativos</a></h2>
 <p>Primero decida qué tipo de archivo y atributos cubrirá nuestras necesidades. Originariamente, yo quise utilizar un archivo de marcadores con un enlace a la página de la película en IMdB, pero Haiku no dispone de un navegador "marcable" como el <span class="app">NetPositive</span> de BeOS en este momento, así que se me ocurrió esto: el archivo en sí mismo sería una imagen JPEG para la carátula de la película.<br />
-A eso añadimos unos poco atributos. Aquí tendremos que decidir si queremos consultarlo más tarde (entonces tendremos que añadirlo al índice) y además, qué tipo de atributo deberá ser. Los números (int, float) pueden ser evaluados de forma diferente al texto (&lt;/=/&gt; vs. es/contiene/comienza por).</p>
+A eso añadimos unos poco atributos. Aquí tendremos que decidir si queremos consultarlo más tarde (entonces tendremos que añadirlo al índice) y además, qué tipo de atributo deberá ser. Los números (int, float) pueden ser evaluados de forma diferente al texto (&lt;/=/&gt; en lugar de es/contiene/comienza por).</p>
 <p>Aquí están los atributos que me gustaría ver para mis DVDs:</p>
 <ul>
 <li>Título de la película</li>
@@ -89,8 +90,8 @@ A eso añadimos unos poco atributos. Aquí tendremos que decidir si queremos con
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="custom-filetype" name="custom-filetype">Creando un tipo de archivo personalizado</a></h2>
-<p>Start the <span class="app">Filetypes</span> preferences, and click on the <span class="button">Add...</span> button below the hierarchical list on the left. A small dialog opens and you specify in which MIME Group your new filetype will reside. You can also create a completely new group. Let's put it into "<i>applications</i>" and set the "Internal Name" to <i>DVDdb</i>.</p>
+<a id="custom-filetype" name="custom-filetype">Crear un tipo de archivo personalizado</a></h2>
+<p>Inicie las preferencias de <span class="app">Filetypes</span> (Tipos de archivo) y haga clic en el botón <span class="button">Add...</span> (añadir) debajo de la lista jerárquica de la izquierda. Al hacerlo, se abre una pequeña ventana de diálogo donde se especifica en qué grupo MIME residirá el nuevo tipo de archivo; se puede crear también un grupo completamente nuevo. Pongámoslo en "<i>applications</i>" (aplicaciones) y démosle <i>DVDdb</i> como el nombre interno (en "Internal Name").</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
 <p>Ahora, un panel para su nuevo tipo de archivo DVDdb se abre:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
@@ -98,7 +99,7 @@ A eso añadimos unos poco atributos. Aquí tendremos que decidir si queremos con
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="icon" name="icon">Icono</a></h3>
-<p>Double-click the icon well to open  <a href="applications/icon-o-matic.html">Icon-O-Matic</a> to design an icon for your filetype. You can also drag&amp;drop an icon from the icon well of another type, maybe as starting point for a modified version.</p>
+<p>Haga doble clic en el pozo de icono para abrir a <a href="applications/icon-o-matic.html">Icon-O-Matic</a> y diseñar un icono para su tipo de archivo. También puede arrastrar y soltar un icono desde el pozo de iconos de otro tipo, quizás como punto de referencia para una versión modificada.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -118,23 +119,23 @@ A eso añadimos unos poco atributos. Aquí tendremos que decidir si queremos con
 <a id="pref_app" name="pref_app">Aplicación preferida</a></h3>
 <p>Este menú muestra una lista de todos los aplicaciónes que pueden usar este tipa de file. Puede definir la programa que abre este file especifico cuando lo da clic doble.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">Select...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
-<tr><td class="onelinetop"><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
+<tr><td><span class="button">Select... (Seleccionar)</span></td><td> </td><td>abre una ventana de archivo donde se elige la aplicación a abrir para este tipo de archivo. Aquí configuramos <span class="app">ShowImage</span> para mostrar la carátula del DVD.</td></tr>
+<tr><td class="onelinetop"><span class="button">Same as... (Mismo que)</span></td><td> </td><td>abre una ventana de archivo donde se elige un archivo que ya tenga la aplicación preferida por la que estás buscando.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="extra_attribute" name="extra_attribute">Extra Attributes</a></h3>
-<p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel:</p>
+<a id="extra_attribute" name="extra_attribute">Atributos adicionales</a></h3>
+<p>Aquí ingresamos todos los atributos personalizados que decidimos en nuestras preparaciones. Dando clic en el botón <span class="button">Add...</span> se abre un cuadro de diálogo:</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
-<li><p><i>Attribute Name</i> - Appears e.g. as the column heading in Tracker windows.</p></li>
-<li><p><i>Internal Name</i> - Is used for indexing and querying the attribute.</p></li>
-<li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
+<li><p><i>Attribute Name</i> (nombre del atributo) - Aparece, p. ej., como la columna de encabezado en las ventanas de Tracker.</p></li>
+<li><p><i>Internal Name</i> (nombre interno) - Se usa para indexar y consultar al atributo.</p></li>
+<li><i>Type</i> (tipo) - Define el valor que el atributo puede manejar y por lo tanto cómo se consultará.
     <ul>
-    <li><span class="menu">String</span> for normal text</li>
-    <li><span class="menu">Boolean</span> for binary data: 0 or 1</li>
-    <li><span class="menu">Integer</span> for integer numbers with different ranges:
+    <li><span class="menu">String</span> para texto normal</li>
+    <li><span class="menu">Boolean</span> para información binaria: 0 ó 1</li>
+    <li><span class="menu">Integer</span> para números enteros con rangos diferentes:
         <ul>
         <li><span class="menu">8 bit</span>: ± 255</li>
         <li><span class="menu">16 bit</span>: ± 65,535</li>
@@ -142,30 +143,30 @@ A eso añadimos unos poco atributos. Aquí tendremos que decidir si queremos con
         <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
         </ul>
     </li>
-    <li><span class="menu">Float</span> for floatingpoint numbers, single precision</li>
-    <li><span class="menu">Double</span> for floatingpoint numbers, double precision</li>
-    <li><span class="menu">Time</span> for time and date format</li>
+    <li><span class="menu">Float</span> para números con punto flotante, de precisión sencilla</li>
+    <li><span class="menu">Double</span> para números con punto flotante, de precisión doble</li>
+    <li><span class="menu">Time</span> para formato de día y hora</li>
     </ul>
 </li>
 </ul>
 <ul>
-<li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:<ul>
-    <li><span class="menu">Display As</span> - Leave on "Default". In the future more option will become available, e.g. a bar or stars for a rating etc.</li>
-    <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
-    <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
-    <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
+<li><i>Visible</i> - Esta casilla de verificación determina si el atributo puede estar visible en una ventana de Tracker. Ya que Tracker será la interfaz de nuestra base de datos DVD, la comprobamos y definimos su visualización con:<ul>
+    <li><span class="menu">Display As</span> (desplegar como) - Déjela en "Default" (predeterminado). En el futuro estarán disponibles más opciones, p. ej., una barra o estrellas para calificar, etc.</li>
+    <li><span class="menu">Editable</span> - Determina si el atributo podrá editarse en Tracker.</li>
+    <li><span class="menu">Width</span> (ancho) - El ancho predeterminado de esa columna de atributos en una ventana de Tracker.</li>
+    <li><span class="menu">Alignment</span> (alineación) - El atributo se puede desplegar alineado a la izquierda, centrado o a la derecha.</li>
 </ul></li></ul>
-<p>Now, insert all the info for our attributes:</p>
+<p>Ahora, ingrese toda la información para nuestros atributos:</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">
 <tr><th>Nombre interno</th><th>Tipo de atributo</th><th>¿Indexado?</th><th>Descripción</th></tr>
-<tr><td>DVDdb:title</td>	<td>text</td>		<td>Si</td>	<td>Título de la película</td></tr>
-<tr><td>DVDdb:genre</td>	<td>text</td>		<td>Si</td>	<td>Género</td></tr>
+<tr><td>DVDdb:title</td>	<td>text</td>		<td>Sí</td>	<td>Título de la película</td></tr>
+<tr><td>DVDdb:genre</td>	<td>text</td>		<td>Sí</td>	<td>Género</td></tr>
 <tr><td>DVDdb:url</td>		<td>text</td>		<td>No</td>	<td>URL</td></tr>
-<tr><td>DVDdb:cast</td>		<td>text</td>		<td>Si</td>	<td>Director/Personal</td></tr>
+<tr><td>DVDdb:cast</td>		<td>text</td>		<td>Sí</td>	<td>Director/Personal</td></tr>
 <tr><td>DVDdb:plot</td>		<td>text</td>		<td>No</td>	<td>Argumento</td></tr>
-<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>Si</td>	<td>Rating 1 to 10</td></tr>
-<tr><td>DVDdb:coord</td>	<td>text</td>		<td>No</td>	<td>Shelf</td></tr>
-<tr><td>DVDdb:lent</td>		<td>text</td>		<td>Si</td>	<td>Lent to</td></tr>
+<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>Sí</td>	<td>Calificación de 1 a 10</td></tr>
+<tr><td>DVDdb:coord</td>	<td>text</td>		<td>No</td>	<td>Anaquel/Ubicación</td></tr>
+<tr><td>DVDdb:lent</td>		<td>text</td>		<td>Sí</td>	<td>Prestado a</td></tr>
 </table>
 
 <h2>
@@ -217,7 +218,7 @@ Open the folder containing your DVDdb files and arrange the attributes how you'd
 <div class="nav">
 <div class="inner"><span>
  «  <a href="queries.html">Queries</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Contenidos</a> 
 ::  <a href="applications.html">Aplicaciones</a>  »
 </span></div>
 </div>

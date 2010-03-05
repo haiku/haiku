@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -17,7 +17,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>L'interface graphique de Haiku</title>
-	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
@@ -28,14 +28,14 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
-<li><a href="../de/gui.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../it/gui.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../ru/gui.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../es/gui.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../sv_SE/gui.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="../jp/gui.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
-<li><a href="../en/gui.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+<li class="now"><img src="../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../de/gui.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/gui.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/gui.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/gui.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/gui.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/gui.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="filesystem-layout.html">Structure du système de fichiers</a> 
@@ -49,7 +49,7 @@
 
 <h1>L'interface graphique de Haiku</h1>
 
-<p>Haiku's graphical user interface is an integral part of the system. Unlike Unix-based operating systems, there's no separate window manager and booting just into a command line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.</p>
+<p>Interface graphique de Haiku est une partie intégrante du système. A l'inverse des systèmes Unix, il n'y a pas de gestionnaire de fenêtre indépendant, il n'est donc pas possible de démarrer dans un simple shell en ligne de commande. Haiku mettant l'accent sur la station de travail, ce n'est tout simplement pas considéré comme nécessaire.</p>
 <p>Comme vous avez sans doute déjà expérimenté d'autres environnements graphiques, nous allons sauter les standards tels que les menus, les menus contextuels sur clic droit, le glissé&amp;déposé, etc Regardons plutôt les quelques aspects uniques de l'interface graphique de Haiku.</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
 <p>Il n'y a que peu de choses dans l'interface graphique de Haïku qui ne sont pas évidentes et qui méritent une explication.</p>
@@ -60,7 +60,7 @@
 <li>Vous pouvez minimiser un fenêtre avec un double-clic sur son onglet (ou avec <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). Une fenêtre ainsi cachée peut être accédée via son entrée dans la <a href="deskbar.html">Deskbar</a> ou dans <a href="twitcher.html">Twitcher</a>.</li>
 <li>Vous pouvez envoyer une fenêtre à l'arrière plan avec un clic droit sur son onglet (ou sa bordure).</li></ul></li>
 <li><p>Le bouton de fermeture.</p></li>
-<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size. It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
+<li><p>Le bouton "zoom" (ou <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). Dans la plupart des applications, il élargira une fenêtre à la taille maximale. Cependant ce n'est pas obligatoire. La fenêtre du Tracker, par exemple, sera retaillée au mieux de son contenu.</p></li>
 <li><p>Le coin de redimensionnement. Tirer la bordure d'une fenêtre d'un autre endroit déplacera la fenêtre.</p></li>
 </ol>
 <div class="box-info">Tout en pressant <span class="key">CTRL</span> <span class="key">ALT</span>, vous pouvez cliquer n'importe où dans une fenêtre avec le bouton gauche de la souris pour la déplacer alors que le bouton droit de la souris l'enverra à l'arrière plan.</div>
@@ -70,9 +70,10 @@
 <a id="open-save-panel" name="open-save-panel">Les panneaux Ouvrir et Enregistrer</a></h2>
 <p>Lorsque vous ouvrez ou enregistrez un fichier à partir d'une application, un panneau comme celui-ci apparait :</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
-<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a pop-up menu for different file formats and their settings.<br />
-You can enter parent folders with the pop-up menu above the file listing.</p>
-<p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menu bar) into the panel. This changes the panel to that new location.</p>
+<p>Il dispose de toutes les choses habituelles : Une liste des fichiers du dossier en cours
+à choisir si vous êtes dans un panneau de sauvegarde, un champ texte pour entrer un nom de fichier, et une liste déroulante pour les formats de fichiers différents ainsi que leurs paramètres.<Br></Br>
+Vous pouvez remonter aux dossiers parents avec la liste déroulante au dessus de la liste des fichiers.</p>
+<p>Si vous avez déjà une fenêtre Tracker ouverte avec l'emplacement d'un fichier, vous pouvez simplement faire glisser un fichier ou la représentation d'un dossier (à savoir le symbole à l'extrême droite de la barre de menu) dans le panneau. Cela modifie le panneau à ce nouvel endroit.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -81,16 +82,16 @@ You can enter parent folders with the pop-up menu above the file listing.</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>Crée un nouveau dossier.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>Permet de renommer l'entrée sélectionnée.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Moves into the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> ou <span class="key">ENTRÉE</span></td><td></td><td> Moves into the selected folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Takes you to your Desktop.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Takes you to your Home folder.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>Ouvre le dossier parent.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> ou <span class="key">ENTRÉE</span></td><td></td><td>Ouvre le dossier sélectionné.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> vous envoie vers votre bureau.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> vous envoie vers votre dossier personnel.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="favorites-recent" name="favorites-recent">Les favoris et dossiers récents</a></h3>
-<p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<p>Le menu <span class="menu">Favorites</span> (favoris) des panneau ouvrir et sauvegarder met à votre disposition les dossiers récemment visités et les emplacements favoris que vous avez vous même définis. Comme indiqué par la petite flèche, vous pouvez également utiliser ces emplacements pour naviguer plus bas dans la hiérarchie par l'intermédiaire des sous-menus.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
 <p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add Current Folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Configure Favorites...</span> and delete its entry.<br />
 All Favorites are kept in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. So you might as well add and remove links to files and folders there directly.</p>

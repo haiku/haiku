@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -9,13 +9,16 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Jorge G. Mare
+ *		Oscar Carballal
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>E-mail</title>
-	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+	<title>Correo electrónico (E-mail)</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
@@ -26,14 +29,14 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../../images/flags/es.png" alt="" /> Español</li>
-<li><a href="../../fr/preferences/e-mail.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../../de/preferences/e-mail.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../../it/preferences/e-mail.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../../ru/preferences/e-mail.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../../sv_SE/preferences/e-mail.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="../../jp/preferences/e-mail.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
-<li><a href="../../en/preferences/e-mail.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+<li class="now"><img src="../../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../../fr/preferences/e-mail.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/e-mail.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/e-mail.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/e-mail.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../sv_SE/preferences/e-mail.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/preferences/e-mail.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="deskbar.html">Deskbar (Barra de Escritorio)</a> 
@@ -48,11 +51,11 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Índice</td></tr>
 <tr class="index"><td>
-	<a href="#creating">Creating a new e-mail account</a><br />
-	<a href="#incoming">Setting up incoming e-mail</a><br />
-	<a href="#outgoing">Setting up outgoing e-mail</a><br />
-	<a href="#filters">Setting up e-mail filters</a><br />
-	<a href="#settings">Setting up the Mail Service</a>
+	<a href="#creating">Creación de una cuenta de correo electrónico</a><br />
+	<a href="#incoming">Configuración para la recepción de mensajes</a><br />
+	<a href="#outgoing">Configuración para el envió de mensajes</a><br />
+	<a href="#filters">Configuración de filtros de mensajes</a><br />
+	<a href="#settings">Configuración del Servicio de Correo</a>
 </td></tr>
 </table>
 
@@ -62,26 +65,26 @@
 <tr><td>Ubicación:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
 <tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
-<p>Haiku provides a system that retrieves e-mail regularly via a Mail Service (also known as mail_daemon) and saves each mail as a single text file. It parses the mail and fills its attributes with all necessary header information, like from, to, subject and its unread status. Now it can be queried by you or any application. This system also makes switching e-mail clients easy as all the data and your configuration stays the same.<br />
-The configuration is done in the E-Mail preference panel.</p>
+<p>Haiku incluye un sistema que obtiene el correo electrónico regularmente mediante un servicio de correo (también conocido como mail_daemon) y guarda cada correo como un archivo de texto individual. Analiza el correo y rellena sus atributos con toda la información necesaria en la cabecera, como por ejemplo los campos De, Para, Asunto, y su estado de lectura. Ahora ya puede ser consultado por usted o por cualquier aplicación. Este sistema hace que cambiar de clientes de correo sea sencillo, ya que todos los datos y configuraciones permanecen iguales.<br />
+La configuración se realiza desde el panel de preferencias de la aplicación.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating a new e-mail account</a></h2>
-<p>Let's go through the process of setting up an e-mail account.<br />
-You start by clicking the <span class="button">Add</span> button to create a new, unnamed account. This opens a panel where you fill in your account info:</p>
+<a id="creating" name="creating">Creación de una cuenta de correo electrónico</a></h2>
+<p>Empecemos el proceso de configurar una cuenta de correo electrónico..<br />
+Se puede comenzar haciendo clic en el botón  <span class="button">Add (Añadir)</span> para crear una cuenta nueva sin nombre. Esto abre una ventana donde se rellena toda la información de la cuenta:</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>First, declare the <i>Account Type</i> which is either <span class="menu">Receive Mail Only</span>, <span class="menu">Send Mail Only</span>, or the most usual type, <span class="menu">Send and Receive Mail</span>. Then you set how you get your mail, via <span class="menu">POP3</span> or <span class="menu">IMAP</span>.</p>
-<p>Now you enter your <i>E-mail Address</i>, <i>Login Name</i> and <i>Password</i>, give an <i>Account Name</i> under which it will be known under Haiku and your <i>Real Name</i>.</p>
-<p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses and the following information is already filled in automatically. If that is not the case, just follow this guide and fill in the details to your e-mail account accordingly.</p>
+<p>Primero, escriba el tipo de cuenta <i>(Account Type)</i> que puede ser o bien <span class="menu">Sólo recibir correo  (Receive Mail Only)</span>, <span class="menu">Sólo enviar correo (Send Mail Only)</span>, o el tipo mas común, <span class="menu">Enviar y recibir correo (Send and Receive Mail)</span>. Después se selecciona la forma en la que obtiene el correo, con <span class="menu">POP3</span> o <span class="menu">IMAP</span>.</p>
+<p>Ahora se introduce la <i>dirección de correo electrónico (E-mail Address)</i>, <i>nombre de usuario (Login Name)</i> y <i>clave (Password)</i>, escriba un  <i>nombre para la cuenta (Account Name)</i> que será como se muestre en Haiku, y su <i>nombre real (Real Name)</i>.</p>
+<p>Si la cuenta es de algún proveedor importante de correo electrónico, Haiku ya conoce todos los detalles técnicos como las direcciones IP del servidor y la información se rellena automáticamente. Si ese no es el caso, sólo tiene que seguir esta guía y rellenar los detalles para su cuenta de correo adecuadamente.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="incoming" name="incoming">Setting up incoming e-mail</a></h2>
-<p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
+<a id="incoming" name="incoming">Configuración para la recepción de mensajes</a></h2>
+<p>Haga clic en <span class="menu">Entrante (Incoming)</span> bajo el nombre de su cuenta para configurar cómo se reciben los correos.</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
-<p>From the pop-up menu you choose the protocol used by your provider. <span class="menu">IMAP</span> and <span class="menu">POP3</span> are supported.</p>
-<p>Next is the <span class="menu">Mail Server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
+<p>Desde el menú emergente se elige el tipo de protocolo que usa su proveedor. <span class="menu">IMAP</span> y <span class="menu">POP3</span> están soportados.</p>
+<p>Lo siguiente es la dirección del <span class="menu">Servidor de Correo (Mail Server)</span> para los correos entrantes. Si su proveedor necesita que entre por algún puerto específico, añádalo directamente a la dirección, separado por dos puntos. Por ejemplo, <tt>pop.su-proveedor.org:1400</tt>.</p>
 <p>Then you enter your login information, <i>Username</i> and <i>Password</i>, and if necessary change the <i>Login Type</i> from the default <span class="menu">Plain Text</span> to <span class="menu">APOP</span> for authentication.</p>
 <p>If you use <i>POP3</i> and retrieve mails of this account from different computers, you may want to activate the option to <span class="menu">Leave mail on server</span> and only <span class="menu">Remove mail from server when deleted</span> locally.</p>
 <p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify a <span class="menu">Top Mailbox Folder</span> to only synchronize with a specific folder and its subfolders.</p>
@@ -91,7 +94,7 @@ You start by clicking the <span class="button">Add</span> button to create a new
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="outgoing" name="outgoing">Setting up outgoing e-mail</a></h2>
+<a id="outgoing" name="outgoing">Configuración para el envío de mensajes</a></h2>
 <p>Click on <span class="menu">Outgoing</span> under your account's name to set up how e-mails are sent.</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
 <p>As with incoming mail, you can also change the <i>Location</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
@@ -100,13 +103,13 @@ You start by clicking the <span class="button">Add</span> button to create a new
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filters" name="filters">Setting up e-mail filters</a></h2>
+<a id="filters" name="filters">Configuración de filtros de mensajes</a></h2>
 <p>If you want to filter your incoming email, you click on <span class="menu">E-Mail Filters</span> under your account's name to set up automatic sorting. You can add any number of filters that are applied one after the other. You can rearrange them by drag&amp;dropping them to their new position.<br />
 Besides the <span class="menu">R5 Daemon Filter</span> that's used for backward compatibility, there are two other <span class="menu">Incoming Mail Filters</span> you can add.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Spam Filter</h3>
+Filtro de mensajes no deseados (Spam)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
 <p>The spam filter uses statistical methods to classify a mail as unwanted spam. It assigns a value between 0 and 1 to it and you can decide what are the limits for a genuine mail and what will be considered spam.<br />
 You can have that spam rating added to the start of the subject.<br />
@@ -115,31 +118,31 @@ Also, the spam filter can learn from all incoming e-mail. Of course, you'll have
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Match Header</h3>
+Campos del encabezado como criterio de filtrado (Match Header)</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
 <p>This filter compares a header to a search pattern and performs some action when it matches.<br />
 With the first text field you specify which header to check against. These are available:</p>
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><span class="menu">Name</span></td><td style="width:5px;"> </td>
-		<td>the name of the sender</td></tr>
+		<td>Nombre del remitente</td></tr>
 	<tr><td><span class="menu">From</span></td><td> </td>
-		<td>the e-mail address of the sender</td></tr>
+		<td>Dirección de correo electrónico del remitente</td></tr>
 	<tr><td><span class="menu">To</span></td><td> </td>
-		<td>your e-mail address (different for each e-mail account)</td></tr>
+		<td>Su dirección de correo electrónico (una diferente para cada cuenta)</td></tr>
 	<tr><td><span class="menu">Reply To</span></td><td> </td>
-		<td>the e-mail address replies are sent to</td></tr>
+		<td>Dirección a la cual se envían las respuestas</td></tr>
 	<tr><td><span class="menu">When</span></td><td> </td>
-		<td>the date and time the mail was received</td></tr>
+		<td>Fecha y hora en que se ha recibido el mensaje</td></tr>
 	<tr><td><span class="menu">Subject</span></td><td> </td>
-		<td>the subject line</td></tr>
+		<td>Asunto del mensaje</td></tr>
 	<tr><td><span class="menu">Cc</span></td><td> </td>
-		<td>addresses of anyone receiving a carbon copy (Cc)</td></tr>
+		<td>Direcciones de quieres reciben copias del mensaje</td></tr>
 	<tr><td><span class="menu">Account</span></td><td> </td>
-		<td>the name of the e-mail's account</td></tr>
+		<td>Nombre de la cuenta de correo electrónico</td></tr>
 	<tr><td><span class="menu">Status</span></td><td> </td>
-		<td>The current status of the e-mail. Normally, this can be "Read", "Replied", "Sent", "Forwarded", "New", or anything you have defined yourself. However, unless you change it yourself in a filter, it will always be "New" after the Mail Service fetched the mail.</td></tr>
+		<td>Estado actual del mensaje. El estado del mensaje puede ser: "Read" (leido), "Replied" (respondido), "Sent" (enviado), "Forwarded" (transferido), "New" (nuevo) o cualquier otro estado definido por el usuario. Cuando el Servicio de Correo baja un mensaje, su estado inicial será siempre "New" (nuevo), salvo que se lo modifique mediante un filto.</td></tr>
 	<tr><td><span class="menu">Priority</span></td><td> </td>
-		<td>is set by the sender's e-mail program (e.g. "urgent")</td></tr>
+		<td>Prioridad del mensaje definida por el programa de correo electrónico remitente (por ejemplo, "urgente")</td></tr>
 	<tr><td><span class="menu">Thread</span></td><td> </td>
 		<td>essentially the same as "Subject", but without things like Re: or Fwd:</td></tr>
 	<tr><td><span class="menu">Classification Group</span></td><td> </td>
@@ -152,13 +155,13 @@ With the first text field you specify which header to check against. These are a
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Outgoing Mail Filters</h3>
+Filtros para mensajes enviados</h3>
 <p>At this moment, there's only one filter that deals with outgoing mail: <span class="cli">fortune</span>.
 <br />It will attach a randomly chosen funny or wise "fortune cookie" to the end of every mail before it's sent out. You can do a dry run by issuing the command <span class="cli">fortune</span> in a Terminal.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Setting up the Mail Service</a></h2>
+<a id="settings" name="settings">Configuración del Servicio de Correo</a></h2>
 <p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the Mail Service that does all the actual checking and fetching how to do its job.</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
 <p>Under <i>Mail Checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />

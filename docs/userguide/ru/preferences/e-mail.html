@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -9,13 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		michael_s
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>E-mail</title>
-	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+	<title>Электронная почта (E-mail)</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
@@ -26,14 +28,14 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../../images/flags/ru.png" alt="" /> Русский</li>
-<li><a href="../../fr/preferences/e-mail.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../../de/preferences/e-mail.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../../it/preferences/e-mail.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../../es/preferences/e-mail.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/preferences/e-mail.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="../../jp/preferences/e-mail.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
-<li><a href="../../en/preferences/e-mail.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+<li class="now"><img src="../../images/flags/ru.png" alt="" /> Русский</li>
+<li><a href="../../fr/preferences/e-mail.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/e-mail.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/e-mail.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../es/preferences/e-mail.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/e-mail.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/preferences/e-mail.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="deskbar.html">Deskbar - Панель задач</a> 
@@ -46,129 +48,130 @@
 <div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Индексация</td></tr>
+<tr class="heading"><td>Содержание</td></tr>
 <tr class="index"><td>
-	<a href="#creating">Creating a new e-mail account</a><br />
-	<a href="#incoming">Setting up incoming e-mail</a><br />
-	<a href="#outgoing">Setting up outgoing e-mail</a><br />
-	<a href="#filters">Setting up e-mail filters</a><br />
-	<a href="#settings">Setting up the Mail Service</a>
+	<a href="#creating">Создание нового аккаунта электронной почты</a><br />
+	<a href="#incoming">Настройки входящей электронной почты</a><br />
+	<a href="#outgoing">Настройки исходящей электронной почты</a><br />
+	<a href="#filters">Настройки фильтров электронной почты</a><br />
+	<a href="#settings">Настройка почтового сервиса</a>
 </td></tr>
 </table>
 
-<h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />E-mail</h2>
+<h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />Электронная почта (E-mail)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Настройки (Preferences)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
 <tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
-<p>Haiku provides a system that retrieves e-mail regularly via a Mail Service (also known as mail_daemon) and saves each mail as a single text file. It parses the mail and fills its attributes with all necessary header information, like from, to, subject and its unread status. Now it can be queried by you or any application. This system also makes switching e-mail clients easy as all the data and your configuration stays the same.<br />
-The configuration is done in the E-Mail preference panel.</p>
+<p>В Haiku включена система, которая регулярно доставляет электронную почту через почтовый сервис (также известный как mail_daemon) и сохраняет каждое письмо как один текстовый файл. Она анализирует письмо и заполняет его атрибуты всей необходимой информацией: от кого оно, к кому, тема письма и статус, что оно не прочитано, после чего эти данные становятся доступны вам и любому приложению. Также эта система позволяет легко менять почтовые клиенты, так как все данные и настройки остаются неизменными.
+Все параметры настраиваются в панели настроек электронной почты (E-Mail).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating a new e-mail account</a></h2>
-<p>Let's go through the process of setting up an e-mail account.<br />
-You start by clicking the <span class="button">Add</span> button to create a new, unnamed account. This opens a panel where you fill in your account info:</p>
+<a id="creating" name="creating">Создание нового аккаунта электронной почты</a></h2>
+<p>Пройдем через весь процесс настройки аккаунта электронной почты.<br />
+Сперва нажмте на кнопку <span class="button">Добавить (Add)</span>, чтобы создать новый аккаунт, при этом откроется панель, в которой необходимо заполнить ваши регистрационные данные:</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>First, declare the <i>Account Type</i> which is either <span class="menu">Receive Mail Only</span>, <span class="menu">Send Mail Only</span>, or the most usual type, <span class="menu">Send and Receive Mail</span>. Then you set how you get your mail, via <span class="menu">POP3</span> or <span class="menu">IMAP</span>.</p>
-<p>Now you enter your <i>E-mail Address</i>, <i>Login Name</i> and <i>Password</i>, give an <i>Account Name</i> under which it will be known under Haiku and your <i>Real Name</i>.</p>
-<p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses and the following information is already filled in automatically. If that is not the case, just follow this guide and fill in the details to your e-mail account accordingly.</p>
+<p>Здесь выбирается <i>Тип аккаунта (Account Type)</i>, позволяющий <span class="menu">Только получать почту (Receive Mail Only)</span>, <span class="menu">Только посылать почту (Send Mail Only)</span> и самый распространённый тип: <span class="menu">Посылать и получать почту (Send and Receive Mail)</span>. После этого выбирается тип получения почты: через протокол POP3 или IMAP.</p>
+<p>Теперь введите ваш <i>Адрес электронной почты (E-mail Address)</i>, <i>Логин (Login Name)</i> и <i>Пароль (Password)</i>, задайте <i>Имя аккаунта (Account Name)</i>, которое будет использоваться в Haiku, и ваше <i>Реальное имя (Real Name)</i>.</p>
+<p>Если у вас аккаунт от крупного провайдера электронной почты, то в Haiku уже имеются технические подробности, такие как IP-адреса серверов, и последующая информация заполняется автоматически. Если этого не произошло, то просто следуйте этому руководству и детально заполните все необходимые настройки для вашего аккаунта.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="incoming" name="incoming">Setting up incoming e-mail</a></h2>
-<p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
+<a id="incoming" name="incoming">Настройки входящей электронной почты</a></h2>
+<p>Клкните на <span class="menu">Входящие (Incoming)</span> под названием вашего аккаунта для настройки получения электронной почты.</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
-<p>From the pop-up menu you choose the protocol used by your provider. <span class="menu">IMAP</span> and <span class="menu">POP3</span> are supported.</p>
-<p>Next is the <span class="menu">Mail Server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
-<p>Then you enter your login information, <i>Username</i> and <i>Password</i>, and if necessary change the <i>Login Type</i> from the default <span class="menu">Plain Text</span> to <span class="menu">APOP</span> for authentication.</p>
-<p>If you use <i>POP3</i> and retrieve mails of this account from different computers, you may want to activate the option to <span class="menu">Leave mail on server</span> and only <span class="menu">Remove mail from server when deleted</span> locally.</p>
-<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify a <span class="menu">Top Mailbox Folder</span> to only synchronize with a specific folder and its subfolders.</p>
-<p>The <span class="menu">New Mail Notification</span> offers different methods to announce the arrival of new mail. Try different settings to see what works best for you.</p>
-<p>You can change the <i>Location</i> of your inbox (default: <span class="path">/boot/home/mail/in/</span>), which is useful if you'd like to separate the mails from different accounts into their own folders. However, queries let you sort things out just as well.</p>
-<p>Last on this page, you can opt to only <span class="menu">Partially download messages</span> that are larger than a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
+<p>Из выпадающего меню выберите протокол, используемый вашим провайдером (поддерживаются <span class="menu">IMAP</span> и <span class="menu">POP3</span>).</p>
+<p>Далее идёт адрес <span class="menu">Почтового сервера (Mail Server)</span> для входящих писем. Если ваш провайдер использует специфический порт, то его необходимо добавить после адреса через двоеточие. Например: <tt>pop.your-provider.org:1400</tt>.</p>
+<p>Затем введите информацию для авторизации: <i>Имя пользователя (Username)</i> и <i>Пароль (Password)</i>, если необходимо, то измените тип входа в систему с <span class="menu">Обычного текста (Plain Text)</span> (по умолчанию) на <span class="menu">APOP</span> для проверки подлинности.</p>
+<p>Если вы используете протокол <i>POP3</i> и получаете почту через этот аккаунт с разных компьютеров, то вы можете активировать опцию <span class="menu">Хранить почту на сервере (Leave mail on server)</span>, удаляться письма с сервера будут только при активации <span class="menu">Удалять почту с сервера при      локальном удалении (Remove mail from server when deleted)</span>.</p>
+<p>При использовании протокола <i>IMAP</i> вы также можете воспользоваться опцией <span class="menu">Удалять почту с сервера при локальном удалении (Remove mail from server when deleted)</span>, назначить <span class="menu">Главную папку для почты (Top Mailbox Folder)</span> для синхронизации с определенной папкой и ее подпапками.</p>
+<p><span class="menu">Уведомление о получении почты (New Mail Notification)</span> предлагает различные методы для сигнализирования о приходе новых писем. Сравните эти методы и выберите наиболее подходящий.</p>
+<p>Вы можете изменить <i>Расположение (Location)</i> папки "Входящие" (по умолчанию: <span class="path">/boot/home/mail/in/</span>), что может быть полезно, если вы хотите хранить письма из различных аккаунтов раздельно в своих собственных папках. Однако, запросы и в этом случае будут работать без проблем.</p>
+<p>И последнее: вы можете активировать <span class="menu">Частичную загрузку сообщений (Partially download messages)</span>, которые больше определенного размера. При этом будут приниматься только заголовки писем, и вы можете решить загружать ли письмо (и вложения, если они есть) целиком, прочитав его тему и адрес отправителя. Это полезно, если у вас медленное соединение и/или платный трафик.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="outgoing" name="outgoing">Setting up outgoing e-mail</a></h2>
-<p>Click on <span class="menu">Outgoing</span> under your account's name to set up how e-mails are sent.</p>
+<a id="outgoing" name="outgoing">Настройки исходящей электронной почты</a></h2>
+<p>Кликните на <span class="menu">Исходящие (Outgoing)</span> под именем вашего аккаунта для настройки отправки электронной почты.</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
-<p>As with incoming mail, you can also change the <i>Location</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
-<p>Next is the <i>SMTP Server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
-<p>If you need to login, you change the <i>Login Type</i> to <span class="menu">ESMTP</span> and enter username and password above. The other type is used for providers that need you to check for mail with <span class="menu">POP3 before SMTP</span> for identification.</p>
+<p>Как и для входящей почты, вы можете также изменить <i>Расположение (Location)</i> папки для отправляемых писем (по умолчанию: <span class="path">/boot/home/mail/out/</span>).
+</p>
+<p>Далее идет адрес <i>SMTP-сервера (SMTP Server)</i> для исходящей почты. Как и для сервера входящей почты, вы можете использовать в случае необходимости специфический порт, например: <tt>mail.your-provider.org:1200</tt>.</p>
+<p>Если необходима авторизация, то измените <i>Тип входа (Login Type)</i> на <span class="menu">ESMTP</span> и выше введите имя пользователя и пароль. Другой тип предназначен для провайдеров, которым для проверки почты нужна <span class="menu">Авторизация POP3 перед SMTP (POP3 before SMTP)</span>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filters" name="filters">Setting up e-mail filters</a></h2>
-<p>If you want to filter your incoming email, you click on <span class="menu">E-Mail Filters</span> under your account's name to set up automatic sorting. You can add any number of filters that are applied one after the other. You can rearrange them by drag&amp;dropping them to their new position.<br />
-Besides the <span class="menu">R5 Daemon Filter</span> that's used for backward compatibility, there are two other <span class="menu">Incoming Mail Filters</span> you can add.</p>
+<a id="filters" name="filters">Настройки фильтров электронной почты</a></h2>
+<p>Если вы хотите чтобы входящая почта фильтровалась, то кликнте на <span class="menu">Фильтры E-Mail (E-Mail Filters)</span> под названием вашего аккаунта  для настройки автоматической сортировки. Вы можете добавлять любое количество фильтров, которые будут применяются один за другим, можете менять их местами, перетаскивая мышкой между собой.<br />
+Кроме <span class="menu">Сервиса фильтров R5                              (R5 Daemon Filter)</span>, который используется для обеспечения обратной совместимости, существует два других почтовых фильтра для входящей почты, которые вы можете добавить.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Spam Filter</h3>
+Фильтр спама</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
-<p>The spam filter uses statistical methods to classify a mail as unwanted spam. It assigns a value between 0 and 1 to it and you can decide what are the limits for a genuine mail and what will be considered spam.<br />
-You can have that spam rating added to the start of the subject.<br />
-Also, the spam filter can learn from all incoming e-mail. Of course, you'll have to teach it by sorting out the false positives, mails that were mistakenly marked as spam. You'll find more on that when we discuss the application <span class="app">Mail</span>.</p>
-<p>Together with the following <span class="menu">Match Header</span> filter, you're able to automatically sort out detected spam mails.</p>
+<p>Фильтр спама использует статистические методы для выявления нежелательных писем. Он присваивает им значения от 0 до 1 и вы сами решаете какое значение допустимо для подлинной почты, а что будет считаться спамом.<br />
+Вы можете добавить этот спам-рейтинг к началу темы.<br />
+Кроме того, фильтр спама может обучаться на всей входящей электронной почте. Конечно, вам придётся научить его разбираться с ошибочными срабатываниями - письмами, которые были по ошибке помечены как спам. Более подробно об этом рассказано в описании приложения <span class="app">Mail</span>.</p>
+<p>Следующий фильтр <span class="menu">Сравнение заголовков (Match Header)</span> позволяет автоматически сортировать обнаруженный спам.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Match Header</h3>
+Сравнение заголовков</h3>
 <img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
-<p>This filter compares a header to a search pattern and performs some action when it matches.<br />
-With the first text field you specify which header to check against. These are available:</p>
+<p>Этот фильтр сравнивает заголовок письма с шаблоном  и выполняет определённое действие при обнаружении соответствия.<br />
+В первом текстовом поле вы определяете какие заголовки сопоставлять. Доступны следующие заголовки:</p>
 <table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><span class="menu">Name</span></td><td style="width:5px;"> </td>
-		<td>the name of the sender</td></tr>
-	<tr><td><span class="menu">From</span></td><td> </td>
-		<td>the e-mail address of the sender</td></tr>
-	<tr><td><span class="menu">To</span></td><td> </td>
-		<td>your e-mail address (different for each e-mail account)</td></tr>
-	<tr><td><span class="menu">Reply To</span></td><td> </td>
-		<td>the e-mail address replies are sent to</td></tr>
-	<tr><td><span class="menu">When</span></td><td> </td>
-		<td>the date and time the mail was received</td></tr>
-	<tr><td><span class="menu">Subject</span></td><td> </td>
-		<td>the subject line</td></tr>
-	<tr><td><span class="menu">Cc</span></td><td> </td>
-		<td>addresses of anyone receiving a carbon copy (Cc)</td></tr>
-	<tr><td><span class="menu">Account</span></td><td> </td>
-		<td>the name of the e-mail's account</td></tr>
-	<tr><td><span class="menu">Status</span></td><td> </td>
-		<td>The current status of the e-mail. Normally, this can be "Read", "Replied", "Sent", "Forwarded", "New", or anything you have defined yourself. However, unless you change it yourself in a filter, it will always be "New" after the Mail Service fetched the mail.</td></tr>
-	<tr><td><span class="menu">Priority</span></td><td> </td>
-		<td>is set by the sender's e-mail program (e.g. "urgent")</td></tr>
-	<tr><td><span class="menu">Thread</span></td><td> </td>
-		<td>essentially the same as "Subject", but without things like Re: or Fwd:</td></tr>
-	<tr><td><span class="menu">Classification Group</span></td><td> </td>
-		<td>depending on what the spam filter classified it as, this will either be empty (if uncertain) or contain the word "Genuine" or "Spam"</td></tr>
-	<tr><td><span class="menu">Spam/Genuine Estimate</span></td><td> </td>
-		<td>this is a numerical estimate that the spam filter assigned to the e-mail. They are shown in scientific notation, where 1.065e-12 translates to 1.065 divided by 10 to the 12th power, which in this case translates to 0.000000000001065.</td></tr>
+	<tr><td><span class="menu">Имя (Name)</span></td><td style="width:5px;"> </td>
+		<td>имя отправителя.</td></tr>
+	<tr><td><span class="menu">От (From)</span></td><td> </td>
+		<td>адрес электронной почты отправителя.</td></tr>
+	<tr><td><span class="menu">Кому (To)</span></td><td> </td>
+		<td>ваш адрес электронной почты (различный для каждого аккаунта).</td></tr>
+	<tr><td><span class="menu">Обратный адрес (Reply To)</span></td><td> </td>
+		<td>адрес электронной почты для ответа.</td></tr>
+	<tr><td><span class="menu">Когда (When)</span></td><td> </td>
+		<td>дата и время получения почты.</td></tr>
+	<tr><td><span class="menu">Тема (Subject)</span></td><td> </td>
+		<td>поле для темы письма.</td></tr>
+	<tr><td><span class="menu">Копия (Cc)</span></td><td> </td>
+		<td>адрес получающего копию письма.</td></tr>
+	<tr><td><span class="menu">Аккаунт (Account)</span></td><td> </td>
+		<td>название аккаунта электронной почты.</td></tr>
+	<tr><td><span class="menu">Статус (Status)</span></td><td> </td>
+		<td>текущий статус письма: "Прочитано", "Отвечено", "Послано", "Отправлено", "Новое" или любой другой, который вы назначите самостоятельно. Однако, если вы не измените его непосредственно в фильтре, то он всегда будет "Новое" после получения писем почтовым сервисом.</td></tr>
+	<tr><td><span class="menu">Приоритет (Priority)</span></td><td> </td>
+		<td>устанавливается почтовой программой отправителя (например: "Срочно").</td></tr>
+	<tr><td><span class="menu">Заголвок (Thread)</span></td><td> </td>
+		<td>то же самое, что и "Тема (Subject)", но без приставок типа "Re:" или "Fwd:".</td></tr>
+	<tr><td><span class="menu">Группа классификации (Classification Group)</span></td><td> </td>
+		<td>в зависимости от того, как фильтр спама классифицирует письмо, тут будет пусто (если письмо сомнительно), либо содержаться слово "Подлинное (Genuine)" или "Спам (Spam)".</td></tr>
+	<tr><td><span class="menu">Оценка на спам/подлинность (Spam/Genuine Estimate)</span></td><td> </td>
+		<td>это количественная оценка, которую фильтр спама назначил письму. Она показывается в экспоненциальном представлении, где 1.065e-12 преобразовывается в 1.065 поделённое на 10 в 12-ой степени, что в данном случае равняется 0.000000000001065.</td></tr>
 </table>
-<p>The second text field holds your search pattern. It accepts <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression" rel="nofollow">regular expressions</a> which gives it great flexibility, while unfortunately complicating things a bit. Read up on it a bit, it's well worth it and simple search patterns aren't <i>that</i> complicated at all.</p>
-<p>With the pop-up menu below it, you assign an action when the pattern matches. You can move or delete a mail, set the status to "Read" or anything else or set the e-mail account you'll reply with.</p>
+<p>Второе текстовое поле содержит ваш собственный шаблон. Здесь допускаются <a href="http://ru.wikipedia.org/wiki/%D0%A0%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%80%D0%BD%D1%8B%D0%B5_%D0%B2%D1%8B%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F" class="external free" title="http://ru.wikipedia.org/wiki/%D0%A0%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%80%D0%BD%D1%8B%D0%B5_%D0%B2%D1%8B%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F" rel="nofollow">регулярные выражения</a>, которые предоставляют большую гибкость, но придётся с ними разбираться. Почитайте об этом, оно стоит того, да и простые шаблоны составляются довольно просто.</p>
+<p>В выпадающем меню снизу назначается действие при срабатывании шаблона. Можно переместить или удалить письмо, установить ему статус "Прочитано" или любой другой, назначить аккаунт, через который будет сделан ответ.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Outgoing Mail Filters</h3>
-<p>At this moment, there's only one filter that deals with outgoing mail: <span class="cli">fortune</span>.
-<br />It will attach a randomly chosen funny or wise "fortune cookie" to the end of every mail before it's sent out. You can do a dry run by issuing the command <span class="cli">fortune</span> in a Terminal.</p>
+Фильтры для исходящей почты</h3>
+<p>На данный момент существует только один фильтр, предназначенный для исходящей почты: <span class="cli">fortune</span>.
+Он вставляет в конец письма забавный или мудрый текст ("Колесо Фортуны"), случайно выбранный перед отправкой. Пример можно увидеть, набрав <span class="cli">fortune</span> в терминале.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Setting up the Mail Service</a></h2>
-<p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the Mail Service that does all the actual checking and fetching how to do its job.</p>
+<a id="settings" name="settings">Настройка почтового сервиса</a></h2>
+<p>Теперь, когда серверы входящей и исходящей почты (и, возможно, некоторые фильтры) настроены, вы должны указать почтовому сервису когда и каким образом проверять и загружать почту.</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
-<p>Under <i>Mail Checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />
-If you're on a dial-up connection, you may want to do that <span class="menu">Only When Dial-Up is Connected</span> and also <span class="menu">Schedule Outgoing Mail When Dial-Up is Disconnected</span> to avoid dialing automatically in regularly only to check for mail.</p>
-<p>The Mail Service has a status window which you can set to show up <span class="menu">Never</span>, <span class="menu">While Sending</span>, <span class="menu">While Sending and Receiving</span> or <span class="menu">Always</span>.</p>
-<p>Make sure to <span class="menu">Start Mail Services on Startup</span> or there will be no mail_daemon running to do your bidding...</p>
+<p>Под <i>Проверкой почты (Mail Checking)</i> настраивается интервал, с которым будет проверяться наличие новых писем на почтовом сервере для данного аккаунта.<br />
+Если вы выходите в интернет через Dial-Up модем, то можете активировать проверку <span class="menu">Только при подключенном модемном соединении (Only When Dial-Up is Connected)</span>, а также <span class="menu">Отложить отправку исходящих писем при отключенном модемном соединении (Schedule Outgoing Mail When Dial-Up is Disconnected)</span>, чтобы избежать частого автоматического дозвона только для проверки почты.</p>
+<p>Почтовый сервис имеет окно статуса, которое можно настроить, чтобы оно отображалось <span class="menu">Никогда (Never)</span>, <span class="menu">Во время отправки (While Sending)</span>, <span class="menu">Во время отправки и получения (While Sending and Receiving)</span> или <span class="menu">Всегда (Always)</span>.</p>
+<p>Убедитесь, что <span class="menu">Запуск Почтового сервиса при входе в систему (Start Mail Services on Startup)</span> активен, в противном случае вы не сможете принимать и отправлять почту.</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
-<p><span class="menu">Edit Mailbox Menu...</span> will open the folder <span class="path">/boot/home/config/Mail/Menu Links/</span>. All folders or queries (!) or their links put into this folder will appear in the context menu of the mailbox icon of the Mail Services in the Deskbar tray.</p>
-<p>From that menu, you can also <span class="menu">Create New Message...</span>, <span class="menu">Check For Mail Now</span> or <span class="menu">Edit Preferences...</span>.</p>
-<p>The mailbox icon itself shows if there are unread messages (status "New") when there are envelopes inside.</p>
+<p><span class="menu">Редактирование меню почтового ящика (Edit Mailbox Menu)...</span> откроет папку <span class="path">/boot/home/config/Mail/Menu Links/</span>. Все папки, запросы или симлинки на них, помещенные в эту папку, появятся в контекстном меню значка почтового ящика в трее Deskbar.</p>
+<p>В этом меню вы также можете <span class="menu">Создать новое сообщение (Create New Message)...</span>, <span class="menu">Проверить почту (Check For Mail Now)</span> или <span class="menu">Редактировать настройки (Edit Preferences)...</span>.</p>
+<p>Значок почтового ящика в трее отображает наличие непрочитанных сообщений (со статусом "Новое"), если таковые имеются.</p>
 
 </div>
 </div>

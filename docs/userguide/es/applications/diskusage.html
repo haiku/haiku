@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -12,13 +12,14 @@
  * Translators:
  *		killa.fr0gg
  *		miguel~1.mx
+ *		Oscar Carballal
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>DiskUsage</title>
-	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
@@ -29,14 +30,14 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../../images/flags/es.png" alt="" /> Español</li>
-<li><a href="../../fr/applications/diskusage.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../../de/applications/diskusage.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../../it/applications/diskusage.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../../ru/applications/diskusage.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../../sv_SE/applications/diskusage.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="../../jp/applications/diskusage.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
-<li><a href="../../en/applications/diskusage.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+<li class="now"><img src="../../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../../fr/applications/diskusage.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/diskusage.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/diskusage.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/diskusage.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../sv_SE/applications/diskusage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/diskusage.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="diskprobe.html">DiskProbe</a> 
@@ -58,18 +59,18 @@
 <p>DiskUsage exhibe gráficamente el uso del espacio de los volúmenes.<br />
 Es una herramienta muy útil para contestar la pregunta, "<i>¿Qué pasó con todo mi espacio?</i>"</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
-<p>The concentric circles represent different levels in the file system hierarchy. Above, the circle in the center represents the <span class="path">/boot/home/</span> folder. Each segment of the ring immediately outside that circle is a file or folder under <span class="path">/boot/home/</span>. Every segment farther outside brings you one level deeper in the file hierarchy. You may have to resize the window to accommodate very deep folders.</p>
-<p>Above the graphic is a pop-up menu that lets you switch between all mounted volumes. Before the disk usage of a volume can be displayed, it has to be scanned. As this can take a while for larger disks, you can examine another volume while that scan is done in the background.</p>
+<p>Los círculos concéntricos representan los diferentes niveles en la jerarquía del sistema de archivos. En la imagen superior, el círculo del centro representa el directorio <span class="path">/boot/home/</span>. Cada segmento del anillo que esté fuera de ese círculo es un archivo o una carpeta dentro de <span class="path">/boot/home/</span>. Cada segmento más alejado le llevará a un nivel más profundo de la jerarquía de archivos. Puede que haya que redimensionar la ventana para acomodar directorios muy profundos.</p>
+<p>El el gráfico superior hay un menú emergente que le permite cambiar entre todos los volúmenes montados. Antes de que se muestre el uso de disco de un volumen, éste debe ser escaneado. Ya que esto puede tardar bastante para los discos más grandes, puede examinar otro volumen mientras el escaneo se realiza de fondo.</p>
 <div class="box-info"><ul>
-<li>If the graphical representation of a file or folder comprises less than about 2° of a circle, it is excluded from the display.</li>
-<li>The number of files that's reported for a folder includes files in subfolders too. A folder counts as a file.</li>
-<li>DiskUsage ignores symbolic links.</li>
+<li>Si la representación gráfica de un archivo o un directorio ocupa menos de 2º (grados) del círculo, es excluido de la imagen.</li>
+<li>El número de archivos que se muestran para cada directorio incluye también los archivos dentro de los subdirectorios. Un directorio cuenta como un archivo. </li>
+<li>DiskUsage ignora los enlaces simbólicos.</li>
 </ul></div>
-<p>As you move the mouse over a segment, information about that file or folder appears in the status bar at the bottom.</p>
-<p>Right-clicking a segment offers a context menu to <span class="menu">Get Info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open With</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
-Left-clicking a segment makes that file/folder the center circle.<br />
-Left-clicking the center circle moves you up one level.</p>
-<p>You can drag files and folders from DiskUsage to other applications or to the Desktop or other Tracker windows for copying. Vice versa, dropped volumes and folders on DiskUsage's window will zoom directly to them, making them the new center circle.</p>
+<p>Mientras mueve el ratón sobre un segmento, la información acerca de ese archivo o directorio aparecerá en la barra de estado de la parte inferior.</p>
+<p>Haciendo clic derecho en un segmento aparecerá un menú contextual para <span class="menu">Get Info (Obtener información)</span>, <span class="menu">Open (Abrir)</span> (con Tracker), <span class="menu">Open With (Abrir con)</span> otra aplicación adecuada o <span class="menu">Rescan (Volver a escanear)</span> ese directorio en particular.<br />
+Haciendo clic izquierdo en el segmento hará que la carpeta seleccionada se coloque en el centro del círculo.<br />
+El clic izquierdo en el centro del círculo le llevará un nivel hacia arriba de la jerarquía.</p>
+<p>Se pueden arrastrar archivos y directorios desde DiskUsage a otras aplicaciones, al Escritorio o a otras ventanas de Tracker para copiar. De la misma forma, arrastrar volúmenes y directorios dentro de DiskUsage provocará que el programa haga zoom directamente en ellos, haciendo que sean el centro del círculo.</p>
 
 </div>
 </div>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -11,13 +11,14 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Victor Widell
+ *		Jimmy Olsson
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>VirtualMemory</title>
-	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
@@ -28,14 +29,14 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../../images/flags/sv_SE.png" alt="" /> Svensk</li>
-<li><a href="../../fr/preferences/virtualmemory.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../../de/preferences/virtualmemory.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../../it/preferences/virtualmemory.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../../ru/preferences/virtualmemory.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../../es/preferences/virtualmemory.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../jp/preferences/virtualmemory.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
-<li><a href="../../en/preferences/virtualmemory.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+<li class="now"><img src="../../images/flags/sv_SE.png" alt="" /> Svensk</li>
+<li><a href="../../fr/preferences/virtualmemory.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/virtualmemory.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/virtualmemory.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/virtualmemory.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/virtualmemory.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../jp/preferences/virtualmemory.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/preferences/virtualmemory.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="tracker.html">Tracker</a> 
@@ -51,16 +52,16 @@
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>Plats:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
 <tr><td>Inställningar:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
-<span class="path">~/config/settings/VM_data</span> - Stores the panel's window position.</td></tr>
+<span class="path">~/config/settings/VM_data</span> - Lagrar panelens fönsterposition.</td></tr>
 </table>
-<p>Virtual memory let's the system swap out memory to harddisk, if the RAM can be used more sensibly for other things. So, even if you have lots of RAM, providing virtual memory is never a bad idea.</p>
+<p>Virtuellt minne låter systemet temporärt lägga ut data på hårddisken om RAM-minnet kan utnyttjas bättre till något annat. Så även om du har massor av RAM är det aldrig en dålig idé att avsätta virtuellt minne.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>You can set the size to even more than your physical memory size if needed. With today's huge harddisks, assigning the physical memory size shouldn't be a problem. Still, you can quickly adjust the size if your free space ever runs low. In that case you should also have a look at <a href="../applications/diskusage.html">DiskUsage</a> to find out what's eating up your diskspace.</p>
-<p>Normally, the swap file's written to your boot partition. If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file. Simply another partition on the same harddisk with your system/data won't help.<br />
-Upgrading your RAM is of course the most effective way to go...</p>
+<p>Du kan ange en storlek ännu större än ditt fysiska minne om det behövs. Med dagens gigantiska hårddiskar borde det inte vara något problem att ange en storlek lika stor som det fysiska minnet. Skulle du någon gång få ont om hårddiskutrymme kan du snabbt ändra storleken. I så fall borde du också ta en titt på <a href="../applications/diskusage.html">DiskUsage</a> för att ta reda på vad det är som äter upp ditt hårddiskutrymme.</p>
+<p>Normalt lagras den temporära filen på din startpartition. Om du ofta råkar ut för att hårddisken rasslar långa stunder när systemet för virtuellt minne skriver och läser data kan du prova att använda en separat hårddisk till den temporära filen. Det räcker inte att bara använda en annan partition på samma hårddisk.<br />
+Att uppgradera RAM-minnet är självklart den mest effektiva lösningen.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the VirtualMemory preferences.</td></tr>
+<tr><td><span class="button">Defaults</span></td><td> </td><td>återställer allt till standardinställningarna.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>ställer tillbaka inställningarna som de var när du startade intällningarna för VirtualMemory. </td></tr>
 </table>
 
 </div>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -17,7 +17,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>DiskUsage</title>
-	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
@@ -28,14 +28,14 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../../images/flags/fr.png" alt="" /> Français</li>
-<li><a href="../../de/applications/diskusage.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../../it/applications/diskusage.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../../ru/applications/diskusage.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../../es/applications/diskusage.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/applications/diskusage.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="../../jp/applications/diskusage.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
-<li><a href="../../en/applications/diskusage.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../../de/applications/diskusage.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/diskusage.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/diskusage.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/diskusage.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/diskusage.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/diskusage.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="diskprobe.html">DiskProbe</a> 
@@ -54,8 +54,8 @@
 <tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
 </table>
 <p><br /></p>
-<p>DiskUsage shows graphically how the space on your volumes is utilized.<br />
-A useful tool to answer the question, "<i>Where has all my disk space gone?</i>".</p>
+<p>DiskUsage montre graphiquement l'occupation de vos disque.<br />
+Cet outil vous sera utile pour visualiser "<i>où est passé tout votre espace disque</i>".</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
 <p>The concentric circles represent different levels in the file system hierarchy. Above, the circle in the center represents the <span class="path">/boot/home/</span> folder. Each segment of the ring immediately outside that circle is a file or folder under <span class="path">/boot/home/</span>. Every segment farther outside brings you one level deeper in the file hierarchy. You may have to resize the window to accommodate very deep folders.</p>
 <p>Above the graphic is a pop-up menu that lets you switch between all mounted volumes. Before the disk usage of a volume can be displayed, it has to be scanned. As this can take a while for larger disks, you can examine another volume while that scan is done in the background.</p>
@@ -64,7 +64,7 @@ A useful tool to answer the question, "<i>Where has all my disk space gone?</i>"
 <li>The number of files that's reported for a folder includes files in subfolders too. A folder counts as a file.</li>
 <li>DiskUsage ignores symbolic links.</li>
 </ul></div>
-<p>As you move the mouse over a segment, information about that file or folder appears in the status bar at the bottom.</p>
+<p>Lorsque vous déplacez la souris sur un segment, les informations de ce fichier ou de ce dossier apparaissent dans la barre d'état en bas.</p>
 <p>Right-clicking a segment offers a context menu to <span class="menu">Get Info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open With</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
 Left-clicking a segment makes that file/folder the center circle.<br />
 Left-clicking the center circle moves you up one level.</p>

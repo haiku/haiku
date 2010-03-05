@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -17,7 +17,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>Keymap</title>
-	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
@@ -28,14 +28,14 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../../images/flags/fr.png" alt="" /> Français</li>
-<li><a href="../../de/preferences/keymap.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../../it/preferences/keymap.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../../ru/preferences/keymap.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../../es/preferences/keymap.html"><img src="../../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../../sv_SE/preferences/keymap.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="../../jp/preferences/keymap.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
-<li><a href="../../en/preferences/keymap.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../../de/preferences/keymap.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/keymap.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/keymap.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/keymap.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/keymap.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/preferences/keymap.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="keyboard.html">Keyboard</a> 
@@ -60,26 +60,26 @@
 Thus, the Keymap preferences are not only for configuring your local keymap, but are also useful when looking for a special symbol used in other languages. For example, you can switch the keymap to "French", find the "ç" and copy it into your mail to François. (Though you'll find the "cedil" also in other keymaps...)</p>
 <p>Quand vous pressez les touches modificatrices comme <span class="key">MAJ</span>, <span class="key">CTRL</span> ou <span class="key">OPTION</span>, le clavier affiché est modifié en conséquence.</p>
 <p>Then there are the keys that are marked with a blue background. These keys are called <i>Dead Keys</i> that can change the key you press after that. If you click on such a blue key with your mouse, those changeable keys light up yellow. Click again and everything's back to normal. Examples are é, ñ, ó or ë.</p>
-<p>Below the keyboard representation are two more options:</p>
+<p>Sous l'image du clavier vous trouverez deux options supplémentaires :</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>for setting the above mentioned blue keys.</td></tr>
+<tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>pour la définition des touches bleues mentionnés ci-dessus.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td> </td><td>for using the shortcut key in Windows/Linux mode, i.e. <span class="key">CONTROL</span> (normally <span class="key">CTRL</span>) or Haiku mode, i.e. <span class="key">COMMAND</span> (normally <span class="key">ALT</span>).</td></tr>
 </table>
 <p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.<br />
 When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
 <p>To better match the Keymap panel to your physical keyboard, there are several different settings available from the <span class="menu">Layout</span> menu.</p>
 <p>The font used in the keyboard representation is set from the <span class="menu">Font</span> menu. Note, that it may or may not contain all symbols for a specific keymap.</p>
-<p>Finally, there's a <span class="button">Revert</span> button to bring back the settings that were active when you started the Keymap preferences.</p>
+<p>Enfin, un bouton <span class="button">Revert</span> restaurera les paramètres qui étaient actifs avant que vous ne commenciez à modifier la disposition du clavier.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="advanced-keymapping" name="advanced-keymapping">Advanced keymap manipulation</a></h2>
+<a id="advanced-keymapping" name="advanced-keymapping">Manipulation avancées sur la disposition du clavier</a></h2>
 <p>There's another method to customize your keymap besides the Keymap preference panel. It involves editing a text file containing loads of hex values, which may appear daunting on first sight, but isn't really that impossible to grasp.</p>
 <p>You can dump the current keymap with a command in Terminal:</p>
 <pre class="terminal">keymap -d MyKeymap</pre>
 <p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
 At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use e.g. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
-<p>When you're finished, you'll save the file and have your system load the modified keymap with this command:</p>
+<p>Lorsque vous avez terminé, vous pouvez enregistrer le fichier, et activer la nouvelle disposition du clavier avec cette commande :</p>
 <pre class="terminal">keymap -l MyKeymap</pre>
 <p>This is the dumped file (the rightmost keys of the stylized keyboard are cut-off for a nicer display on this page):</p>
 

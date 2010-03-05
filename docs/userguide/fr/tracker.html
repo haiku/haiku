@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../html-dtd/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <!-- 
@@ -17,7 +17,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>Tracker</title>
-	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
@@ -28,14 +28,14 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
-<li><a href="../de/tracker.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../it/tracker.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../ru/tracker.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../es/tracker.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../sv_SE/tracker.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="../jp/tracker.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
-<li><a href="../en/tracker.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+<li class="now"><img src="../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../de/tracker.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/tracker.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/tracker.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/tracker.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/tracker.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="teammonitor.html">Team Monitor</a> 
@@ -51,18 +51,19 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
-	<a href="#mounting-volumes">Mounting volumes</a><br />
-	<a href="#navigating">Navigating</a><br />
-	<a href="#appearance">Appearance</a><br />
-	<a href="#tracker-preferences">Tracker preferences</a><br />
-	<a href="#working-with-files">Working with files</a><br />
-	<a href="#transaction-status">Transaction status</a>
+	<a href="#mounting-volumes">Montage des volumes</a><br />
+	<a href="#navigating">Navigation</a><br />
+	<a href="#appearance">Apparence</a><br />
+	<a href="#tracker-preferences">Préférences du Tracker</a><br />
+	<a href="#working-with-files">Gérer vos fichiers</a><br />
+	<a href="#transaction-status">Statut de la transaction</a>
 </td></tr>
 </table>
 
 <h1>Tracker</h1>
 
-<p>The Tracker is the graphical interface to all your files. It let's you create new files and folders or find, launch or rename as well as copy or delete existing ones.</p>
+<p>Le Tracker est l'interface graphique pour tous vos fichiers. Il vous permet de créer de nouveaux fichiers et dossiers, de les lancer, 
+de les trouver, ainsi que de copier, renommer ou supprimer ceux qui existent.</p>
 <p>Being an application like any other (the Desktop with its icons is really just a fullscreen window in the background), Tracker appears with its windows in the Deskbar and can be quit and restarted. The easiest way to quit and restart a crashed or frozen Tracker (or a wayward Deskbar) is to call the <a href="teammonitor.html">Team Monitor</a>.</p>
 
 <h2>
@@ -72,7 +73,7 @@
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
 <p>There are also <span class="menu">Mount Settings</span> so you don't have to mount everything manually after every bootup.<br />
 The above settings will automatically mount any storage device you connect/insert and also mount all disks on bootup that were mounted previously.</p>
-<div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
+<div class="box-warning">Avant de déconnecter un disque dur externe ou une clée USB, assurez-vous que vous avez démonté le volume correctement. Ceci garantit que le transfert de toutes les données est terminée. Sinon, vous pourriez perdre des données ou corrompre le disque!</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -80,11 +81,12 @@ The above settings will automatically mount any storage device you connect/inser
 <p>By default, when you double-click a folder, Tracker opens a new window while leaving the parent window open. This can quickly lead to an overcrowded desktop.<br />
 You can prevent that by holding down the <span class="key">OPT</span> key, which automatically closes the parent window.<br />
 This is also true for keyboard navigation. For more on that, see topic <a href="keyboard-shortcuts.html">Shortcuts and key combinations</a>.</p>
-<p>Moving through your folders is one of Trackers main purposes, just like the file managers on other platforms. Haiku's Tracker has some unique features that will help you doing that efficiently.</p>
+<p>La fonction principale du Tracker est de se déplacer dans vos dossiers.
+À l'instar de tout autre gestionnaires de fichiers sur d'autres plateformes, les caractéristiques uniques du Tracker de Haiku vous permettront de faire cela efficacement.</p>
 
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Drilling down the submenus</a></h3>
-<p>Instead of double-clicking your way down folder after folder, there's a better way to drill down:</p>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Naviguer dans les sous menus</a></h3>
+<p>Il existe une meilleure façon de naviguer que celle qui consiste à double-cliquer dossier après dossier :</p>
 <img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
 <!-- screenshot needs updating to show /boot/system/documentation -->
 <p>Right-click onto a folder, and at the top of the usual context menu you'll find a submenu of the current folder that let's you navigate down a level. Just move down the hierarchy until you find the file or folder you're looking for and click on it to open it. The above shows the contents of the folder <span class="path">/boot/home/config/</span>.<br />
@@ -176,7 +178,8 @@ Si vous maintenez la touche <span class="key">MAJ</span> enfoncer, le menu devie
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="transaction-status" name="transaction-status">Statut de la transaction</a></h2>
-<p>When you copy, move or delete files, Tracker shows its progress with a status window. If you initiate more than one transaction, each job gets its own status display.</p>
+<p>Lorsque vous copier, déplacer ou supprimer des fichiers, le Tracker affiche un indicateur de progression dans une fenêtre de statut.
+Si vous initiez plusieurs tâches, un indicateur apparait pour chacune d'entre elles.</p>
 <img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
 <p>To the right are two buttons to pause or stop a transaction entirely. Sometimes it can be useful to temporarily pause a large transaction. For example, you may need to quickly launch a large application. Copying large amounts of data chokes your harddisk's IO bandwidth and thus delays your workflow.</p>
 

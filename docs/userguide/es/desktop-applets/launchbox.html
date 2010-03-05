@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "../../../html-dtd/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"> 
 <head>
 <!-- 
@@ -9,13 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		CapitanPico
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>LaunchBox</title>
-	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+	<title>LaunchBox (Lanzador de Aplicaciones)</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
@@ -26,14 +28,14 @@
 <div class="nav">
 <div class="inner">
 <ul class="lang-menu">
-<li class="now"><img src="../../../images/flags/es.png" alt="" /> Español</li>
-<li><a href="../../fr/desktop-applets/launchbox.html"><img src="../../../images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="../../de/desktop-applets/launchbox.html"><img src="../../../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../../it/desktop-applets/launchbox.html"><img src="../../../images/flags/it.png" alt="" />Italiano</a></li>
-<li><a href="../../ru/desktop-applets/launchbox.html"><img src="../../../images/flags/ru.png" alt="" />Русский</a></li>
-<li><a href="../../sv_SE/desktop-applets/launchbox.html"><img src="../../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="../../jp/desktop-applets/launchbox.html"><img src="../../../images/flags/jp.png" alt="" />日本語</a></li>
-<li><a href="../../en/desktop-applets/launchbox.html"><img src="../../../images/flags/gb.png" alt="" />English</a></li>
+<li class="now"><img src="../../images/flags/es.png" alt="" /> Español</li>
+<li><a href="../../fr/desktop-applets/launchbox.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/desktop-applets/launchbox.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/desktop-applets/launchbox.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/desktop-applets/launchbox.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../sv_SE/desktop-applets/launchbox.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/desktop-applets/launchbox.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/desktop-applets/launchbox.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
     <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
@@ -50,38 +52,38 @@
 <tr><td>Ubicación:</td><td></td><td><span class="path">/boot/system/apps/LaunchBox</span></td></tr>
 <tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/LaunchBox/*</span></td></tr>
 </table>
-<p>One or more LaunchBox applets can be started to organize shortcuts to your favorite applications or documents. You decide if each is shown on all or just the current workspace. They can also serve to quickly open a document in a specific application. For example, you could drag&amp;drop a HTML file onto a text editor in a LaunchBox to open it in the editor instead of its preferred application, the browser.</p>
+<p>Se pueden iniciar uno o varios componentes LaunchBox para organizar accesos directos a sus  aplicaciones y documentos favoritos. Puede decidir si cada uno de dichos accesos directos se muestra en todos los espacios de trabajo o sólo en el actual. También pueden servir para abrir rápidamente un documento con un programa determinado. Por ejemplo, se puede arrastrar y soltar un archivo HTML en un editor de texto en un LaunchBox para abrirlo en ese editor en vez de en el navegador predeteminado.</p>
 <img src="../images/desktop-applets-images/launchbox.png" alt="launchbox.png" />
-<p>All options are reached from the context menu:</p>
+<p>Todas las opciones son accesibles desde el menú contextual:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Add Button Here</span></td><td style="width:10px;"> </td><td>Adds an empty button.</td></tr>
-<tr><td><span class="menu">Clear Button</span></td><td> </td><td>Empties a button.</td></tr>
-<tr><td><span class="menu">Remove Button</span></td><td> </td><td>Removes a button.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Settings</span><br />
+<tr><td><span class="menu">Añadir Botón Aquí</span></td><td style="width:10px;"> </td><td>Añade un botón vacío.</td></tr>
+<tr><td><span class="menu">Limpiar botón</span></td><td> </td><td>Vacía un botón.</td></tr>
+<tr><td><span class="menu">Borrar botón</span></td><td> </td><td>Elimina un botón.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Herramientas</span><br />
 <span class="menu">- Horizontal Layout</span><br />
-<span class="menu">- Icon size</span><br />
-<span class="menu">- Ignore Double-click</span><br />
-<span class="menu">- Show Window Border</span><br />
-<span class="menu">- Auto Raise</span><br />
-<span class="menu">- Show On All Workspaces</span></td><td> </td><td class="onelinetop"><br />
-Aligns the buttons horizontally.<br />
-Sets the icon size between 16 and 64 pixel.<br />
-Launches the object only once, even when you (accidentally) double-click.<br />
-Shows the window border.<br />
-LaunchBox pops up if the mouse is near the screen edge.<br />
-Shows the LaunchBox on every workspace.</td></tr>
-<tr><td><span class="menu">Pad</span><br />
-<span class="menu">- New</span><br />
-<span class="menu">- Clone</span><br />
-<span class="menu">- Close</span></td><td> </td><td><br />
-Add a new pad.<br />
-Duplicate the current pad.<br />
-Close the current pad.</td></tr>
+<span class="menu">- Tamaño de icono</span><br />
+<span class="menu">- IgnorarDouble-click</span><br />
+<span class="menu">- Mostrar bordes de ventana</span><br />
+<span class="menu">- Auto-Alzar</span><br />
+<span class="menu">- Mostrar en todos los epacios de trabajo </span></td><td> </td><td class="onelinetop"><br />
+Alinea los botones horizontalmente.<br />
+Establece un tamaño de icono entre 16 y 64 píxeles.<br />
+Lanza el objeto sólo una vez aunque se clique dos veces accidentalmente sobre él.<br />
+Muestra el borde de la ventana.<br />
+LaunchBox emerge si el ratón está próximo al borde de la pantalla.<br />
+Muestra el LaunchBox en todos los espaciose de trabajo.</td></tr>
+<tr><td><span class="menu">Bloc</span><br />
+<span class="menu">- Nuevo</span><br />
+<span class="menu">- Clonar</span><br />
+<span class="menu">- Cerrar</span></td><td> </td><td><br />
+Añade un nuevo bloc de LaunchBox.<br />
+Duplica el bloc atual.<br />
+Cierra el bloque actual.</td></tr>
 <tr><td><span class="menu">LaunchBox</span><br />
-<span class="menu">- About...</span><br />
-<span class="menu">- Quit</span></td><td> </td><td><br />
-Shows the About window.<br />
-Quits all LaunchBox pads.</td><td> </td></tr>
+<span class="menu">- Acerca de...</span><br />
+<span class="menu">- Quitar</span></td><td> </td><td><br />
+Muestra la ventana "Acerca de..." .<br />
+Cierra todos los blocs LauchBox.</td><td> </td></tr>
 </table>
 
 </div>
