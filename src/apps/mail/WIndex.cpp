@@ -32,69 +32,78 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
+
+#include "WIndex.h"
+
 #include <File.h>
-#include <Node.h>
 #include <fs_attr.h>
 #include <Message.h>
-#include "WIndex.h"
+#include <Node.h>
+
+#include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 
 #define IVERSION	1
 
+
 static int32 kCRCTable = 0;
 
-int32 cmp_i_entries( const WIndexEntry *e1, const WIndexEntry *e2 );
+
+int32 cmp_i_entries(const WIndexEntry *e1, const WIndexEntry *e2);
 void gen_crc_table();
-unsigned long update_crc( unsigned long crc_accum, const char *data_blk_ptr, int data_blk_size ); 
+unsigned long update_crc(unsigned long crc_accum, const char *data_blk_ptr,
+	int data_blk_size);
 
 
-FileEntry::FileEntry( void )
+FileEntry::FileEntry(void)
 {
 	
 }
 
-FileEntry::FileEntry( const char *entryStr )
-	: BString( entryStr )
+
+FileEntry::FileEntry(const char *entryString)
+	:
+	BString(entryString)
 {
 	
 }
 
-status_t WIndex::SetTo( const char *dataPath, const char *indexPath )
+
+status_t
+WIndex::SetTo(const char *dataPath, const char *indexPath)
 {
-	BFile		*dataFile;
-	BFile		indexFile;
+	BFile* dataFile;
+	BFile indexFile;
 	
 	dataFile = new BFile();
-         
-	if( dataFile->SetTo( dataPath, B_READ_ONLY ) != B_OK )
+
+	if (dataFile->SetTo(dataPath, B_READ_ONLY) != B_OK) {
 		return B_ERROR;
-	else
-	{
+	} else {
 		bool buildIndex = true;
-		SetTo( dataFile );
+		SetTo(dataFile);
 		
 		time_t mtime;
 		time_t modified;
 		
-		dataFile->GetModificationTime( &mtime );
+		dataFile->GetModificationTime(&mtime);
 		
-		if( indexFile.SetTo( indexPath, B_READ_ONLY ) == B_OK )
-		{
+		if (indexFile.SetTo(indexPath, B_READ_ONLY) == B_OK) {
 			attr_info info;
-			if( (indexFile.GetAttrInfo( "WINDEX:version", &info ) == B_NO_ERROR) )
-			{
+			if ((indexFile.GetAttrInfo("WINDEX:version", &info) == B_OK)) {
 				uint32 version = 0;
-				indexFile.ReadAttr( "WINDEX:version", B_UINT32_TYPE, 0, &version, 4 );
-				if( IVERSION == version )
-				{
-					if( (indexFile.GetAttrInfo( "WINDEX:modified", &info ) == B_NO_ERROR) )
-					{
-						indexFile.ReadAttr( "WINDEX:modified", B_UINT32_TYPE, 0, &modified, 4 );
-						if( mtime == modified )
-						{
-							if (UnflattenIndex( &indexFile ) == B_OK)
+				indexFile.ReadAttr("WINDEX:version", B_UINT32_TYPE, 0,
+					&version, 4);
+				if (IVERSION == version) {
+					if ((indexFile.GetAttrInfo("WINDEX:modified", &info)
+						== B_OK)) {
+						indexFile.ReadAttr("WINDEX:modified", B_UINT32_TYPE, 0,
+							&modified, 4);
+
+						if (mtime == modified) {
+							if (UnflattenIndex(&indexFile) == B_OK)
 								buildIndex = false;
 						}
 					}
@@ -102,169 +111,189 @@ status_t WIndex::SetTo( const char *dataPath, const char *indexPath )
 			}
 			indexFile.Unset();
 		}
-		if( buildIndex )
-		{
-			// printf( "Building Index...\n" );
+		if (buildIndex) {
 			InitIndex();
 			BuildIndex();
-			if( indexFile.SetTo( indexPath, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE ) == B_OK )
-			{
-				FlattenIndex( &indexFile );
-				indexFile.WriteAttr( "WINDEX:modified", B_UINT32_TYPE, 0, &mtime, 4 );
+			if (indexFile.SetTo(indexPath,
+				B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) == B_OK) {
+				FlattenIndex(&indexFile);
+				indexFile.WriteAttr("WINDEX:modified", B_UINT32_TYPE, 0,
+					&mtime, 4);
 				uint32 version = IVERSION;
-				indexFile.WriteAttr( "WINDEX:version", B_UINT32_TYPE, 0, &version, 4 );
+				indexFile.WriteAttr("WINDEX:version", B_UINT32_TYPE, 0,
+					&version, 4);
 			}
 		}
 	}
 	return B_OK;
 }
 
-FileEntry::~FileEntry( void )
+
+FileEntry::~FileEntry(void)
 {
-	
+
 }
 
-WIndex::WIndex( int32 count )
+
+WIndex::WIndex(int32 count)
 {
-	entryList = NULL;
-	dataFile = NULL;
-	ePerB = count;
-	entrySize = sizeof( WIndexEntry );
-	if( !atomic_or( &kCRCTable, 1 ) )
+	fEntryList = NULL;
+	fDataFile = NULL;
+	fEntriesPerBlock = count;
+	fEntrySize = sizeof(WIndexEntry);
+	if (!atomic_or(&kCRCTable, 1))
 		gen_crc_table();
 }
 
-WIndex::WIndex( BPositionIO *dataFile, int32 count )
+
+WIndex::WIndex(BPositionIO *dataFile, int32 count)
 {
-	entryList = NULL;
-	this->dataFile = dataFile;
-	ePerB = count;
-	entrySize = sizeof( WIndexEntry );
-	if( !atomic_or( &kCRCTable, 1 ) )
+	fEntryList = NULL;
+	fDataFile = dataFile;
+	fEntriesPerBlock = count;
+	fEntrySize = sizeof(WIndexEntry);
+	if (!atomic_or(&kCRCTable, 1))
 		gen_crc_table();
 }
 
-WIndex::~WIndex( void )
+
+WIndex::~WIndex(void)
 {
-	if( entryList )
-		free( entryList );
-	delete dataFile;
+	if (fEntryList)
+		free(fEntryList);
+	delete fDataFile;
 }
 
-status_t WIndex::UnflattenIndex( BPositionIO *io )
+
+status_t
+WIndex::UnflattenIndex(BPositionIO *io)
 {
-	if( entryList )
-		free( entryList );
+	if (fEntryList)
+		free(fEntryList);
 	WIndexHead		head;
 	
-	io->Seek( 0, SEEK_SET );
-	io->Read( &head, sizeof( head ) );
-	io->Seek( head.offset, SEEK_SET );
+	io->Seek(0, SEEK_SET);
+	io->Read(&head, sizeof(head));
+	io->Seek(head.offset, SEEK_SET);
 	
-	entrySize = head.entrySize;
-	entries = head.entries;
-	maxEntries = ePerB;
-	blockSize = ePerB * entrySize;
-	blocks = entries/ePerB+1;;
-	isSorted = true;
+	fEntrySize = head.entrySize;
+	fEntries = head.entries;
+	fMaxEntries = fEntriesPerBlock;
+	fBlockSize = fEntriesPerBlock * fEntrySize;
+	fBlocks = fEntries / fEntriesPerBlock + 1;;
+	fIsSorted = true;
 	
-	int32 size = (head.entries+1) * head.entrySize;
-	if( !(entryList = (uint8 *)malloc( size )) )
+	int32 size = (head.entries + 1) * head.entrySize;
+	if (!(fEntryList = (uint8 *)malloc(size)))
 		return B_ERROR;
 		
-	if( entries )
-		io->Read( entryList, size );
+	if (fEntries)
+		io->Read(fEntryList, size);
 	
 	return B_OK;
 }
 
-status_t WIndex::FlattenIndex( BPositionIO *io )
+
+status_t
+WIndex::FlattenIndex(BPositionIO *io)
 {
-	if( entries && !isSorted )
+	if (fEntries && !fIsSorted)
 		SortItems();
 	WIndexHead		head;
 	
-	head.entries = entries;
-	head.entrySize = entrySize;
-	head.offset = sizeof( WIndexHead );
-	io->Seek( 0, SEEK_SET );
-	io->Write( &head, sizeof( head ) );
-	if( entries )
-		io->Write( entryList, head.entries * head.entrySize );
+	head.entries = fEntries;
+	head.entrySize = fEntrySize;
+	head.offset = sizeof(WIndexHead);
+	io->Seek(0, SEEK_SET);
+	io->Write(&head, sizeof(head));
+	if (fEntries)
+		io->Write(fEntryList, head.entries * head.entrySize);
 	
 	return B_OK;
 }
 
-int32 WIndex::Lookup( int32 key )
+
+int32
+WIndex::Lookup(int32 key)
 {
-	if( !entries )
+	if (!fEntries)
 		return -1;
-	if( !isSorted )
+	if (!fIsSorted)
 		SortItems();
 	
 	// Binary Search
 	int32	M, Lb, Ub;
 	Lb = 0;
-	Ub = entries-1;
-	while( true )
-	{
-		M = (Lb + Ub)/2;
-		if( key < ((WIndexEntry *)(entryList+(M*entrySize)))->key )
+	Ub = fEntries - 1;
+	while (true) {
+		M = (Lb + Ub) / 2;
+		if (key < ((WIndexEntry *)(fEntryList + (M * fEntrySize)))->key)
 			Ub = M - 1;
-		else if(key > ((WIndexEntry *)(entryList+(M*entrySize)))->key )
+		else if (key > ((WIndexEntry *)(fEntryList + (M * fEntrySize)))->key)
 			Lb = M + 1;
 		else
 			return M;
-		if( Lb > Ub )
-     		return -1;
+		if (Lb > Ub)
+			return -1;
 	}
 }
 
-status_t WIndex::AddItem( WIndexEntry *entry )
+
+status_t
+WIndex::AddItem(WIndexEntry *entry)
 {
-	if( BlockCheck() == B_ERROR )
+	if (_BlockCheck() == B_ERROR)
 		return B_ERROR;
-	memcpy( ((WIndexEntry *)(entryList+(entries*entrySize))), entry, entrySize );
-	entries++;
-	isSorted = false;
+	memcpy(((WIndexEntry *)(fEntryList + (fEntries * fEntrySize))), entry, 
+		fEntrySize);
+	fEntries++;
+	fIsSorted = false;
 	return B_OK;	
 }
 
-void WIndex::SortItems( void )
+
+void
+WIndex::SortItems(void)
 {
-	qsort( entryList, entries, entrySize, (int (*)(const void *, const void *))cmp_i_entries );
-	isSorted = true;
-	//for( int32 i = 0; i < entries; i++ )
-	//	printf( "Key = %ld\n", entryList[i].key );
+	qsort(fEntryList, fEntries, fEntrySize,
+		(int(*)(const void *, const void *))cmp_i_entries);
+
+	fIsSorted = true;
 }
 
-status_t WIndex::BlockCheck( void )
+
+status_t
+WIndex::_BlockCheck(void)
 {
-	if( entries < maxEntries )
+	if (fEntries < fMaxEntries)
 		return B_OK;
-	blocks = entries/ePerB+1;
-	entryList = (uint8 *)realloc( entryList, blockSize*blocks );
-	if( !entryList )
+	fBlocks = fEntries / fEntriesPerBlock + 1;
+	fEntryList = (uint8 *)realloc(fEntryList, fBlockSize * fBlocks);
+	if (!fEntryList)
 		return B_ERROR;
 	return B_OK;
 }
 
-status_t WIndex::InitIndex( void )
+
+status_t
+WIndex::InitIndex(void)
 {
-	if( entryList )
-		free( entryList );
-	isSorted = 0;
-	entries = 0;
-	maxEntries = ePerB;
-	blockSize = ePerB * entrySize;
-	blocks = 1;
-	entryList = (uint8 *)malloc( blockSize );
-	if( !entryList )
+	if (fEntryList)
+		free(fEntryList);
+	fIsSorted = 0;
+	fEntries = 0;
+	fMaxEntries = fEntriesPerBlock;
+	fBlockSize = fEntriesPerBlock * fEntrySize;
+	fBlocks = 1;
+	fEntryList = (uint8 *)malloc(fBlockSize);
+	if (!fEntryList)
 		return B_ERROR;
 	return B_OK;
 }
 
-int32 WIndex::GetKey( const char *s )
+
+int32
+WIndex::GetKey(const char *s)
 {
 	
 	int32	key = 0;
@@ -272,61 +301,70 @@ int32 WIndex::GetKey( const char *s )
 	int32	a = 84589;
 	int32	b = 45989;
 	int32	m = 217728;
-	while( *s )
-	{
+	while (*s) {
 		x = *s++ - 'a';
 		
-		key ^= (a*x + b) % m;
+		key ^= (a * x + b) % m;
 		key <<= 1;
 	}*/
 	
-	key = update_crc( 0, s, strlen(s) );
+	key = update_crc(0, s, strlen(s));
 	
-	if( key < 0 ) // No negavite values!
+	if (key < 0) // No negative values!
 		key = ~key;
 	
 	return key;
 }
 
-int32 cmp_i_entries( const WIndexEntry *e1, const WIndexEntry *e2 )
+
+int32
+cmp_i_entries(const WIndexEntry *e1, const WIndexEntry *e2)
 {
 	return e1->key - e2->key;
 }
 
-status_t WIndex::SetTo( BPositionIO *dataFile )
+
+status_t
+WIndex::SetTo(BPositionIO *dataFile)
 {
-	this->dataFile = dataFile;
+	fDataFile = dataFile;
 	return B_OK;
 }
 
-void WIndex::Unset( void )
+
+void
+WIndex::Unset(void)
 {
-	dataFile = NULL;
+	fDataFile = NULL;
 }
 
-int32 WIndex::FindFirst( const char *word )
+
+int32
+WIndex::FindFirst(const char *word)
 {
-	if( !entries )
+	if (!fEntries)
 		return -1;
 	
 	int32			index;
 	char			nword[256];
 	int32			key;
 	
-	NormalizeWord( word, nword );
-	key = GetKey( nword );
+	NormalizeWord(word, nword);
+	key = GetKey(nword);
 	
-	if( (index = Lookup( key )) < 0 )
+	if ((index = Lookup(key)) < 0)
 		return -1;
 	// Find first instance of key
-	while( (ItemAt( index-1 ))->key == key )
+	while ((ItemAt(index - 1))->key == key)
 		index--;
 	return index;
 }
 
-FileEntry *WIndex::GetEntry( int32 index )
+
+FileEntry*
+WIndex::GetEntry(int32 index)
 {
-	if( (index >= entries)||(index < 0) )
+	if ((index >= fEntries)||(index < 0))
 		return NULL;
 	WIndexEntry		*ientry;
 	FileEntry		*dentry;
@@ -334,34 +372,40 @@ FileEntry *WIndex::GetEntry( int32 index )
 	
 	dentry = new FileEntry();
 	
-	ientry = ItemAt( index );
+	ientry = ItemAt(index);
 	
 	int32 size;
 	
-	dataFile->Seek( ientry->offset, SEEK_SET );
-	buffer = dentry->LockBuffer( 256 );
-	dataFile->Read( buffer, 256 );
-	size = GetEntrySize( ientry, buffer );
+	fDataFile->Seek(ientry->offset, SEEK_SET);
+	buffer = dentry->LockBuffer(256);
+	fDataFile->Read(buffer, 256);
+	size = _GetEntrySize(ientry, buffer);
 	//buffer[256] = 0;
-	//printf( "Entry: = %s\n", buffer );
-	dentry->UnlockBuffer( size );
+	//printf("Entry: = %s\n", buffer);
+	dentry->UnlockBuffer(size);
 	return dentry;
 }
 
-size_t WIndex::GetEntrySize( WIndexEntry *entry, const char *entryData )
+
+size_t
+WIndex::_GetEntrySize(WIndexEntry *entry, const char *entryData)
 {
 	// eliminate unused parameter warning
 	(void)entry;
 	
-	return strcspn( entryData, "\n\r" );
+	return strcspn(entryData, "\n\r");
 }
 
-FileEntry *WIndex::GetEntry( const char *word )
+
+FileEntry*
+WIndex::GetEntry(const char *word)
 {
-	return GetEntry( FindFirst( word ) );
+	return GetEntry(FindFirst(word));
 }
 
-char *WIndex::NormalizeWord( const char *word, char *dest )
+
+char*
+WIndex::NormalizeWord(const char *word, char *dest)
 {
 	const char 	*src;
 	char		*dst;
@@ -369,9 +413,8 @@ char *WIndex::NormalizeWord( const char *word, char *dest )
 	// remove dots and copy
 	src = word;
 	dst = dest;
-	while( *src )
-	{
-		if( *src != '.' )
+	while (*src) {
+		if (*src != '.')
 			*dst++ = *src;
 		src++;
 	}
@@ -379,10 +422,11 @@ char *WIndex::NormalizeWord( const char *word, char *dest )
 	
 	// convert to lower-case
 	dst = dest;
-	while( *dst )
-		*dst++ = tolower( *dst );
+	while (*dst)
+		*dst++ = tolower(*dst);
 	return dest;
 }
+
 
 /* crc32h.c -- package to compute 32-bit CRC one byte at a time using   */ 
 /*             the high-bit first (Big-Endian) bit ordering convention  */ 
@@ -418,30 +462,48 @@ char *WIndex::NormalizeWord( const char *word, char *dest )
 /*  The table lookup technique was adapted from the algorithm described */ 
 /*  by Avram Perez, Byte-wise CRC Calculations, IEEE Micro 3, 40 (1983).*/ 
 
+
 #define POLYNOMIAL 0x04c11db7L 
+
 
 static unsigned long crc_table[256]; 
 
-void gen_crc_table() 
- /* generate the table of CRC remainders for all possible bytes */ 
- { register int i, j;  register unsigned long crc_accum; 
-   for ( i = 0;  i < 256;  i++ ) 
-       { crc_accum = ( (unsigned long) i << 24 ); 
-         for ( j = 0;  j < 8;  j++ ) 
-              { if ( crc_accum & 0x80000000L ) 
-                   crc_accum = 
-                     ( crc_accum << 1 ) ^ POLYNOMIAL; 
-                else 
-                   crc_accum = 
-                     ( crc_accum << 1 ); } 
-         crc_table[i] = crc_accum; } 
-   return; } 
 
-unsigned long update_crc( unsigned long crc_accum, const char *data_blk_ptr, int data_blk_size ) 
- /* update the CRC on the data block one byte at a time */ 
- { register int i, j; 
-   for ( j = 0;  j < data_blk_size;  j++ ) 
-       { i = ( (int) ( crc_accum >> 24) ^ *data_blk_ptr++ ) & 0xff; 
-         crc_accum = ( crc_accum << 8 ) ^ crc_table[i]; } 
-   return crc_accum; } 
-   
+void
+gen_crc_table()
+{
+	// generate the table of CRC remainders for all possible bytes
+
+	register int i, j;
+	register unsigned long crc_accum;
+
+	for (i = 0;  i < 256;  i++) {
+		crc_accum = ((unsigned long) i << 24);
+		for (j = 0;  j < 8;  j++) {
+			if (crc_accum & 0x80000000L)
+				crc_accum = (crc_accum << 1) ^ POLYNOMIAL;
+			else
+				crc_accum = (crc_accum << 1);
+		}
+		crc_table[i] = crc_accum;
+	}
+
+	return;
+}
+
+
+unsigned long
+update_crc(unsigned long crc_accum, const char *data_blk_ptr, int data_blk_size)
+{
+	// update the CRC on the data block one byte at a time
+
+	register int i, j;
+
+	for (j = 0;  j < data_blk_size;  j++) {
+		i = ((int) (crc_accum >> 24) ^ *data_blk_ptr++) & 0xff;
+		crc_accum = (crc_accum << 8) ^ crc_table[i];
+	}
+
+	return crc_accum;
+}
+

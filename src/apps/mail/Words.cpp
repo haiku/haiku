@@ -104,7 +104,7 @@ Words::Words(const char* dataPath, const char* indexPath, bool useMetaphone)
 	fUseMetaphone(useMetaphone)
 {
 	if (!useMetaphone)
-		entrySize = sizeof(uint32);
+		fEntrySize = sizeof(uint32);
 	SetTo(dataPath, indexPath);
 }
 
@@ -130,14 +130,14 @@ Words::BuildIndex(void)
 	int32			state = FIND_WORD;
 	
 	// Make sure we are at start of file
-	dataFile->Seek(0, SEEK_SET);
+	fDataFile->Seek(0, SEEK_SET);
 	entry.offset = -1;
 	
 	// Read blocks from thes until eof
 	while (true) {
 		// Get next block
-		blockOffset = dataFile->Position();
-		if ((blockSize = dataFile->Read(buffer, 16384)) == 0)
+		blockOffset = fDataFile->Position();
+		if ((blockSize = fDataFile->Read(buffer, 16384)) == 0)
 			break;
 		
 		// parse block

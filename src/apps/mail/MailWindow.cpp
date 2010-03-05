@@ -83,7 +83,6 @@ All rights reserved.
 #include "Status.h"
 #include "String.h"
 #include "Utilities.h"
-#include "Words.h"
 
 
 #define TR_CONTEXT "Mail"

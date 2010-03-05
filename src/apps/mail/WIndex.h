@@ -31,12 +31,13 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef _WORD_INDEX_H
 #define _WORD_INDEX_H
 
+
 #include <DataIO.h>
 #include <String.h>
+
 
 struct WIndexHead {
 	int32 entries;
@@ -44,64 +45,72 @@ struct WIndexHead {
 	int32 offset;	
 };
 
+
 struct WIndexEntry {
 	int32 key;
 	int32 offset;
 };
 
+
 class FileEntry : public BString {
 public:
-	FileEntry(void);
-	FileEntry(const char *entryStr);
-	virtual ~FileEntry(void);
+							FileEntry();
+							FileEntry(const char* entryStr);
+	virtual					~FileEntry();
 };
+
 
 class WIndex {
 public:
-	WIndex(BPositionIO *dataFile, int32 count = 100);
-	WIndex(int32 count = 100);
-	virtual ~WIndex(void);
+							WIndex(BPositionIO* dataFile, int32 count = 100);
+							WIndex(int32 count = 100);
+	virtual					~WIndex();
+
+			status_t		InitIndex();
+			status_t		UnflattenIndex(BPositionIO* io);
+			status_t		FlattenIndex(BPositionIO* io);
+
+			int32			Lookup(int32 key);
+
+	inline	WIndexEntry*	ItemAt(int32 index) {
+								return (WIndexEntry*)
+									(fEntryList + (index * fEntrySize));
+							}
+
+			status_t		AddItem(WIndexEntry* entry);
+	inline	int32			CountItems() {
+								return fEntries;
+							}
+	void SortItems();
+
+	virtual	int32			GetKey(const char* s);
+	virtual	char*			NormalizeWord(const char* word, char* dest);
 		
-	status_t InitIndex(void);
-	status_t UnflattenIndex(BPositionIO *io);
-	status_t FlattenIndex(BPositionIO *io);
-		
-	int32 Lookup(int32 key);
-		
-	inline WIndexEntry *ItemAt(int32 index)
-		{ return (WIndexEntry *)(entryList+(index*entrySize)); }
-	status_t AddItem(WIndexEntry *entry);
-	inline int32 CountItems(void)
-		{ return entries; }
-	void SortItems(void);
-		
-	virtual int32 GetKey(const char *s);
-	virtual char *NormalizeWord(const char *word, char *dest);
-		
-	status_t SetTo(BPositionIO *dataFile);
-	status_t SetTo(const char *dataPath, const char *indexPath);
-	void Unset(void);
-		
-	virtual status_t BuildIndex(void) = 0;
-		
-	virtual int32 FindFirst(const char *word);
-	virtual FileEntry *GetEntry(int32 index);
-	FileEntry *GetEntry(const char *word);
-		
+			status_t		SetTo(BPositionIO* dataFile);
+			status_t		SetTo(const char* dataPath, const char* indexPath);
+			void			Unset();
+
+	virtual	status_t		BuildIndex() = 0;
+
+	virtual	int32			FindFirst(const char* word);
+	virtual	FileEntry*		GetEntry(int32 index);
+			FileEntry*		GetEntry(const char* word);
+
 protected:
-	status_t BlockCheck(void);
-	virtual size_t GetEntrySize(WIndexEntry *entry, const char *entryData);
-		
-	int32 entrySize;
-	int32 entries;
-	int32 maxEntries;
-	int32 ePerB;
-	int32 blockSize;
-	int32 blocks;
-	bool isSorted;
-	uint8 *entryList;
-	BPositionIO *dataFile;
+			status_t		_BlockCheck();
+	virtual	size_t			_GetEntrySize(WIndexEntry* entry,
+								const char* entryData);
+
+			int32			fEntrySize;
+			int32			fEntries;
+			int32			fMaxEntries;
+			int32			fEntriesPerBlock;
+			int32			fBlockSize;
+			int32			fBlocks;
+			bool			fIsSorted;
+			uint8*			fEntryList;
+			BPositionIO*	fDataFile;
 };
 
-#endif // #ifndef _WORD_INDEX_H
+#endif	// _WORD_INDEX_H
 
