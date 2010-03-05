@@ -1104,9 +1104,6 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 	CopyDirectoryToHaikuImage system documentation
 		: [ FDirName $(HAIKU_TOP) docs images ]
 		: images : -x .svn ;
-	AddFilesToHaikuImage system documentation
-		: [ FDirName $(HAIKU_TOP) docs userguide Haiku-doc.css ]
-		: Haiku-doc.css ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/welcome/welcome_en.html : Welcome ;
 	AddSymlinkToHaikuImage home Desktop
