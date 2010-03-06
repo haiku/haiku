@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BLOCK_ALLOCATOR_H
@@ -54,10 +54,8 @@ public:
 								bool allocated = true);
 			status_t		CheckBlockRun(block_run run,
 								const char* type = NULL,
-								check_control* control = NULL,
 								bool allocated = true);
-			status_t		CheckInode(Inode* inode,
-								check_control* control = NULL);
+			status_t		CheckInode(Inode* inode);
 
 			size_t			BitmapSize() const;
 

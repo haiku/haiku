@@ -1,9 +1,10 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BFS_CONTROL_H
 #define BFS_CONTROL_H
+
 
 //! additional functionality exported via ioctl()
 
@@ -35,8 +36,8 @@ struct update_boot_block {
 #define BFS_IOCTL_STOP_CHECKING		14202
 #define BFS_IOCTL_CHECK_NEXT_NODE	14203
 
-/* all fields except "flags", and "name" must be set to zero before
- * BFS_IOCTL_START_CHECKING is called
+/* All fields except "flags", and "name" must be set to zero before
+ * BFS_IOCTL_START_CHECKING is called, and magic must be set.
  */
 struct check_control {
 	uint32		magic;
@@ -77,5 +78,6 @@ struct check_control {
 
 /* check control magic value */
 #define BFS_IOCTL_CHECK_MAGIC	'BChk'
+
 
 #endif	/* BFS_CONTROL_H */

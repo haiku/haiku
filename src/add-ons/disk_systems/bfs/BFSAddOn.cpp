@@ -267,7 +267,10 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	}
 
 	// stop checking
-	ioctl(fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result));
+	if (ioctl(fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result)) != 0) {
+		close(fd);
+		return errno;
+	}
 
 	close(fd);
 
