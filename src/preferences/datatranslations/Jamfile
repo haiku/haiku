@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences datatranslations ;
 
+UseLibraryHeaders lp_solve linprog alm ;
+
 Preference DataTranslations :
 	DataTranslations.cpp
 	DataTranslationsWindow.cpp
@@ -7,6 +9,6 @@ Preference DataTranslations :
 	IconView.cpp 
 	TranslatorListView.cpp
 
-	: be translation $(TARGET_LIBSUPC++)
+	: be translation $(TARGET_LIBSUPC++) liblpsolve55.so liblinprog.so libalm.so
 	: DataTranslations.rdef
 	;

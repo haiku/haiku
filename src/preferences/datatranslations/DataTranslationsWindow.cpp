@@ -1,11 +1,12 @@
 /*
- * Copyright 2002-2006, Haiku, Inc.
+ * Copyright 2002-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Oliver Siebenmarck
  *		Andrew McCall, mccall@digitalparadise.co.uk
  *		Michael Wilber
+ *		Maxime Simon
  */
 
 
@@ -29,6 +30,12 @@
 #include <TranslationDefs.h>
 #include <TranslatorRoster.h>
 
+#include "Area.h"
+#include "BALMLayout.h"
+#include "OperatorType.h"
+#include "XTab.h"
+#include "YTab.h"
+
 #define DTW_RIGHT	400
 #define DTW_BOTTOM	300
 
@@ -40,7 +47,7 @@ const uint32 kMsgSelectedTranslator = 'trsl';
 DataTranslationsWindow::DataTranslationsWindow()
 	: BWindow(BRect(0, 0, DTW_RIGHT, DTW_BOTTOM),
 		"DataTranslations", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	MoveTo(dynamic_cast<DataTranslationsApplication *>(be_app)->WindowCorner());
 
@@ -156,7 +163,13 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 	configRect.InsetBy(3, 3);
 	configRect.bottom -= 45;
 	float width = 0, height = 0;
-	fConfigView->GetPreferredSize(&width, &height);
+	if ((fConfigView->Flags() & B_SUPPORTS_LAYOUT) != 0) {
+		BSize configSize = fConfigView->ExplicitPreferredSize();
+		width = configSize.Width();
+		height = configSize.Height();
+	} else {
+		fConfigView->GetPreferredSize(&width, &height);
+	}
 	float widen = max_c(0, width - configRect.Width());
 	float heighten = max_c(0, height - configRect.Height());
 	if (widen > 0 || heighten > 0) {
@@ -187,50 +200,64 @@ DataTranslationsWindow::_SetupViews()
 	AddChild(mainView);
 
 	// Add the translators list view
-	fTranslatorListView = new TranslatorListView(BRect(10, 10, 120, Bounds().Height() - 10),
-		"TransList", B_SINGLE_SELECTION_LIST); 
+	fTranslatorListView = new TranslatorListView(BRect(0, 0, 1, 1), "TransList",
+		B_SINGLE_SELECTION_LIST);
 	fTranslatorListView->SetSelectionMessage(new BMessage(kMsgSelectedTranslator));
 
 	BScrollView *scrollView = new BScrollView("scroll_trans", fTranslatorListView,
     		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS,
     		false, true, B_FANCY_BORDER);
-	mainView->AddChild(scrollView);
 
 	// Box around the config and info panels
-	fRightBox = new BBox(BRect(130.0f + B_V_SCROLL_BAR_WIDTH, 8.0f, Bounds().Width() - 8.0f,
-		Bounds().Height() - 8.0f), "Right_Side", B_FOLLOW_ALL);
-	mainView->AddChild(fRightBox);
+	fRightBox = new BBox("Right_Side");
 
 	// Add the translator icon view
-	BRect rightRect(fRightBox->Bounds()), iconRect(0, 0, 31, 31);
-	rightRect.InsetBy(8, 8);
-	iconRect.OffsetTo(rightRect.left, rightRect.bottom - iconRect.Height());
-	fIconView = new IconView(iconRect, "Icon",
+	fIconView = new IconView(BRect(0, 0, 31, 31), "Icon",
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS);
-	fRightBox->AddChild(fIconView);
 
 	// Add the translator info button
-	BRect infoRect(0, 0, 80, 20);
-	BButton *button = new BButton(infoRect, "STD", "Info" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgTranslatorInfo), B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
-	button->ResizeToPreferred();
-	button->MoveTo(fRightBox->Bounds().Width() - button->Bounds().Width() - 10.0f,
-		fRightBox->Bounds().Height() - button->Bounds().Height() - 10.0f);
-	fRightBox->AddChild(button);
+	BButton *button = new BButton("STD", "Info" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgTranslatorInfo), B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 
 	// Add the translator name view
-	BRect tranNameRect(iconRect.right + 5, iconRect.top,
-		infoRect.left - 5, iconRect.bottom);
-	fTranslatorNameView = new BStringView(tranNameRect, "TranName", "None",
-    		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fRightBox->AddChild(fTranslatorNameView);
+	fTranslatorNameView = new BStringView("TranName", "None");
 
 	// Populate the translators list view   
 	_PopulateListView();
 
+	// Build the layout
+	BALMLayout *layout = new BALMLayout();
+	mainView->SetLayout(layout);
+
+	XTab *x1 = layout->AddXTab();
+	XTab *x2 = layout->AddXTab();
+	XTab *x3 = layout->AddXTab();
+	YTab *y1 = layout->AddYTab();
+
+	Area *leftArea = layout->AddArea(layout->Left(), layout->Top(),
+		x1, layout->Bottom(), scrollView);
+	leftArea->SetLeftInset(10);
+	leftArea->SetTopInset(10);
+	leftArea->SetBottomInset(10);
+
+	Area *rightArea = layout->AddArea(x1, layout->Top(), layout->Right(), y1, fRightBox);
+	rightArea->SetLeftInset(10);
+	rightArea->SetTopInset(10);
+	rightArea->SetRightInset(10);
+	rightArea->SetBottomInset(10);
+
+	Area *iconArea = layout->AddArea(x1, y1, x2, layout->Bottom(), fIconView);
+	iconArea->SetLeftInset(10);
+	iconArea->SetBottomInset(10);
+
+	Area *infoButtonArea = layout->AddArea(x3, y1, layout->Right(), layout->Bottom(), button);
+	infoButtonArea->SetRightInset(10);
+	infoButtonArea->SetBottomInset(10);
+
+	layout->AddConstraint(3.0, x1, -1.0, layout->Right(), OperatorType(EQ), 0.0);
+
 	fTranslatorListView->MakeFocus();
-	fTranslatorListView->Select(0, false);    
+	fTranslatorListView->Select(0);
 }
 
 
