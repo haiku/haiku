@@ -61,9 +61,10 @@ translation_format outputFormats[] = {
 status_t
 MakeConfig(BMessage *ioExtension, BView **outView, BRect *outExtent)
 {
-	outExtent->Set(0, 0, 239, 239);
-	GIFView *gifview = new GIFView(*outExtent, "TranslatorView");
+	GIFView *gifview = new GIFView("TranslatorView");
 	*outView = gifview;
+	gifview->ResizeTo(gifview->ExplicitPreferredSize());
+	*outExtent = gifview->Bounds();
 	return B_OK;
 }
 

@@ -9,6 +9,7 @@
 #include <Application.h>
 #include <Alert.h>
 #include <Screen.h>
+#include <GroupLayout.h>
 
 #include <stdio.h>
 
@@ -20,10 +21,11 @@ class PPMWindow :
 	public BWindow
 {
 public:
-	PPMWindow(
-			BRect area) :
-		BWindow(area, "PPM Settings", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+	PPMWindow(BRect area) :
+		BWindow(area, "PPM Settings", B_TITLED_WINDOW,
+			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 		{
+			SetLayout(new BGroupLayout(B_HORIZONTAL));
 		}
 	~PPMWindow()
 		{
@@ -39,7 +41,7 @@ main()
 {
 	BApplication app("application/x-vnd.Haiku-PPMTranslator");
 	BView * v = NULL;
-	BRect r(0,0,225,175);
+	BRect r(0, 0, 1, 1);
 	if (MakeConfig(NULL, &v, &r)) {
 		BAlert * err = new BAlert("Error", "Something is wrong with the PPMTranslator!", "OK");
 		err->Go();

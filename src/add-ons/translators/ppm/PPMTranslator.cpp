@@ -21,6 +21,11 @@
 #include <MenuItem.h>
 #include <CheckBox.h>
 #include <Bitmap.h>
+#include <StringView.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <SpaceLayoutItem.h>
 
 #include <ctype.h>
 #include <string.h>
@@ -430,14 +435,28 @@ class PPMView :
 {
 public:
 		PPMView(
-				const BRect & frame,
 				const char * name,
-				uint32 resize,
 				uint32 flags) :
-			BView(frame, name, resize, flags)
+			BView(name, flags)
 			{
 				SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 				SetLowColor(ViewColor());
+
+				mTitle = new BStringView("title", "PPM Image Translator");
+				mTitle->SetFont(be_bold_font);
+
+				char detail[100];
+				int ver = static_cast<int>(translatorVersion);
+				sprintf(detail, "Version %d.%d.%d %s", ver >> 8, ((ver >> 4) & 0xf),
+					(ver & 0xf), __DATE__);
+				mDetail = new BStringView("detail", detail);
+
+				mBasedOn = new BStringView("basedOn",
+					"Based on PPMTranslator sample code");
+
+				mCopyright = new BStringView("copyright",
+					"Sample code copyright 1999, Be Incorporated");
+
 				mMenu = new BPopUpMenu("Color Space");
 				mMenu->AddItem(new BMenuItem("None", CSMessage(B_NO_COLOR_SPACE)));
 				mMenu->AddItem(new BMenuItem("RGB 8:8:8 32 bits", CSMessage(B_RGB32)));
@@ -458,18 +477,37 @@ public:
 				mMenu->AddItem(new BMenuItem("RGB 5:5:5 16 bits big-endian", CSMessage(B_RGB15_BIG)));
 				mMenu->AddItem(new BMenuItem("RGBA 5:5:5:1 16 bits big-endian", CSMessage(B_RGBA15_BIG)));
 				mMenu->AddItem(new BMenuItem("RGB 5:6:5 16 bits big-endian", CSMessage(B_RGB16)));
-				mField = new BMenuField(BRect(10,110,190,130), "Color Space Field", "Input color space", mMenu);
-				mField->SetDivider(mField->StringWidth(mField->Label()) + 7);
-				mField->SetViewColor(ViewColor());
-				AddChild(mField);
-				SelectColorSpace(g_settings.out_space);
-				BMessage * msg = new BMessage(CHANGE_ASCII);
-				mAscii = new BCheckBox(BRect(10,135,170,155), "Write ASCII", "Write ASCII", msg);
-				if (g_settings.write_ascii) {
-					mAscii->SetValue(1);
-				}
-				mAscii->SetViewColor(ViewColor());
-				AddChild(mAscii);
+ 				mField = new BMenuField("Input Color Space", mMenu, NULL);
+ 				mField->SetViewColor(ViewColor());
+ 				SelectColorSpace(g_settings.out_space);
+ 				BMessage * msg = new BMessage(CHANGE_ASCII);
+ 				mAscii = new BCheckBox("Write ASCII", msg);
+ 				if (g_settings.write_ascii)
+ 					mAscii->SetValue(1);
+ 				mAscii->SetViewColor(ViewColor());
+ 
+ 				// Build the layout
+ 				SetLayout(new BGroupLayout(B_HORIZONTAL));
+ 
+ 				AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+ 					.Add(mTitle)
+ 					.Add(mDetail)
+ 					.AddGlue()
+ 					.Add(mBasedOn)
+ 					.Add(mCopyright)
+ 					.AddGlue()
+ 					.Add(BGridLayoutBuilder(10, 10)
+ 						.Add(mField->CreateLabelLayoutItem(), 0, 0)
+ 						.Add(mField->CreateMenuBarLayoutItem(), 1, 0)
+ 						.Add(mAscii, 0, 1)
+ 					)
+ 					.AddGlue()
+ 					.SetInsets(5, 5, 5, 5)
+ 				);
+ 
+ 				BFont font;
+ 				GetFont(&font);
+ 				SetExplicitPreferredSize(BSize((font.Size() * 350)/12, (font.Size() * 200)/12));
 			}
 		~PPMView()
 			{
@@ -481,36 +519,6 @@ public:
 			CHANGE_ASCII
 		};
 
-virtual	void Draw(
-				BRect area)
-			{
-				SetFont(be_bold_font);
-				font_height fh;
-				GetFontHeight(&fh);
-				float xbold, ybold;
-				xbold = fh.descent + 1;
-				ybold = fh.ascent + fh.descent * 2 + fh.leading;
-
-				char title[] = "PPM image translator";
-				DrawString(title, BPoint(xbold, ybold));
-
-				SetFont(be_plain_font);
-				font_height plainh;
-				GetFontHeight(&plainh);
-				float yplain;
-				yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-
-				char detail[100];
-				int ver = static_cast<int>(translatorVersion);
-				sprintf(detail, "Version %d.%d.%d %s", ver >> 8, ((ver >> 4) & 0xf),
-					(ver & 0xf), __DATE__);
-				DrawString(detail, BPoint(xbold, yplain + ybold));
-
-				DrawString("Based on PPMTranslator sample code",
-					BPoint(xbold, yplain * 3 + ybold));
-				DrawString("Sample code copyright 1999, Be Incorporated",
-					BPoint(xbold, yplain * 4 + ybold));
-			}
 virtual	void MessageReceived(
 				BMessage * message)
 			{
@@ -559,6 +567,10 @@ virtual	void AllAttached()
 			}
 
 private:
+		BStringView * mTitle;
+		BStringView * mDetail;
+		BStringView * mBasedOn;
+		BStringView * mCopyright;
 		BPopUpMenu * mMenu;
 		BMenuField * mField;
 		BCheckBox * mAscii;
@@ -604,8 +616,9 @@ MakeConfig(	/*	optional	*/
 	BView * * outView,
 	BRect * outExtent)
 {
-	PPMView * v = new PPMView(BRect(0,0,225,175), "PPMTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW);
+	PPMView * v = new PPMView("PPMTranslator Settings", B_WILL_DRAW);
 	*outView = v;
+	v->ResizeTo(v->ExplicitPreferredSize());;
 	*outExtent = v->Bounds();
 	if (ioExtension) {
 		v->SetSettings(ioExtension);

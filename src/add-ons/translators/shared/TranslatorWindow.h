@@ -48,7 +48,8 @@ public:
 };
 
 status_t
-LaunchTranslatorWindow(BTranslator *translator, const char *title, BRect rect);
+LaunchTranslatorWindow(BTranslator *translator, const char *title,
+						BRect rect = BRect(0, 0, 1, 1));
 
 #endif // #ifndef TRANSLATORWINDOW_H
 

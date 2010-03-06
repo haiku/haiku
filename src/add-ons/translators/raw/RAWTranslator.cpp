@@ -326,7 +326,7 @@ RAWTranslator::DerivedTranslate(BPositionIO* stream,
 BView *
 RAWTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new ConfigView(BRect(0, 0, 225, 175));
+	return new ConfigView();
 }
 
 

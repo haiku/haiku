@@ -11,8 +11,7 @@
 
 class ConfigView : public BView {
 	public:
-		ConfigView(const BRect &frame, uint32 resize = B_FOLLOW_ALL,
-			uint32 flags = B_WILL_DRAW);	
+		ConfigView(uint32 flags = B_WILL_DRAW);	
 		virtual ~ConfigView();
 };
 

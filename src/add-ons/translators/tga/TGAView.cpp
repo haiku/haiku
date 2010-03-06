@@ -1,6 +1,7 @@
 /*****************************************************************************/
 // TGAView
 // Written by Michael Wilber, OBOS Translation Kit Team
+// Use of Layout API added by Maxime Simon, maxime.simon@gmail.com, 2009.
 //
 // TGAView.cpp
 //
@@ -28,6 +29,10 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <SpaceLayoutItem.h>
+
 #include <stdio.h>
 #include <string.h>
 
@@ -36,32 +41,57 @@
 #include "TGATranslator.h"
 
 
-TGAView::TGAView(const BRect& frame, const char* name, uint32 resize,
-		uint32 flags, TranslatorSettings* settings)
+TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
 	:
-	BView(frame, name, resize, flags),
+	BView(name, flags),
 	fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 
-	fpchkIgnoreAlpha = new BCheckBox(BRect(10, 45, 180, 62),
-		"Ignore TGA alpha channel", "Ignore TGA alpha channel",
+ 	fTitle = new BStringView("title", "TGA Image Translator");
+ 	fTitle->SetFont(be_bold_font);
+ 
+ 	char detail[100];
+ 	sprintf(detail, "Version %d.%d.%d %s",
+ 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TGA_TRANSLATOR_VERSION)),
+ 		static_cast<int>(B_TRANSLATION_MINOR_VERSION(TGA_TRANSLATOR_VERSION)),
+ 		static_cast<int>(B_TRANSLATION_REVISION_VERSION(TGA_TRANSLATOR_VERSION)),
+ 		__DATE__);
+ 	fDetail = new BStringView("detail", detail);
+ 	fWrittenBy = new BStringView("writtenby",
+ 		"Written by the Haiku Translation Kit Team");
+ 
+ 	fpchkIgnoreAlpha = new BCheckBox("Ignore TGA alpha channel",
 		new BMessage(CHANGE_IGNORE_ALPHA));
-	int32 val = (fSettings->SetGetBool(TGA_SETTING_IGNORE_ALPHA)) ? 1 : 0;
-	fpchkIgnoreAlpha->SetValue(val);
-	fpchkIgnoreAlpha->SetViewColor(ViewColor());
-	AddChild(fpchkIgnoreAlpha);
-	fpchkIgnoreAlpha->ResizeToPreferred();
-
-	fpchkRLE = new BCheckBox(BRect(10, 67, 180, 84),
-		"Save with RLE compression", "Save with RLE compression",
+ 	int32 val = (fSettings->SetGetBool(TGA_SETTING_IGNORE_ALPHA)) ? 1 : 0;
+ 	fpchkIgnoreAlpha->SetValue(val);
+ 	fpchkIgnoreAlpha->SetViewColor(ViewColor());
+ 	
+ 	fpchkRLE = new BCheckBox("Save with RLE Compression",
 		new BMessage(CHANGE_RLE));
-	val = (fSettings->SetGetBool(TGA_SETTING_RLE)) ? 1 : 0;
-	fpchkRLE->SetValue(val);
-	fpchkRLE->SetViewColor(ViewColor());
-	AddChild(fpchkRLE);
-	fpchkRLE->ResizeToPreferred();
+ 	val = (fSettings->SetGetBool(TGA_SETTING_RLE)) ? 1 : 0;
+ 	fpchkRLE->SetValue(val);
+ 	fpchkRLE->SetViewColor(ViewColor());
+ 
+ 	// Build the layout
+ 	SetLayout(new BGroupLayout(B_HORIZONTAL));
+ 
+ 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+ 		.Add(fTitle)
+ 		.Add(fDetail)
+ 		.AddGlue()
+ 		.Add(fpchkIgnoreAlpha)
+ 		.Add(fpchkRLE)
+ 		.AddGlue()
+ 		.Add(fWrittenBy)
+ 		.AddGlue()
+ 		.SetInsets(5, 5, 5, 5)
+ 	);
+ 
+ 	BFont font;
+ 	GetFont(&font);
+ 	SetExplicitPreferredSize(BSize((font.Size() * 333)/12, (font.Size() * 200)/12));
 }
 
 
@@ -103,33 +133,3 @@ TGAView::MessageReceived(BMessage* message)
 	}
 }
 
-
-void
-TGAView::Draw(BRect area)
-{
-	SetFont(be_bold_font);
-	font_height fh;
-	GetFontHeight(&fh);
-	float xbold, ybold;
-	xbold = fh.descent + 1;
-	ybold = fh.ascent + fh.descent * 2 + fh.leading;
-
-	DrawString("TGA image translator", BPoint(xbold, ybold));
-
-	SetFont(be_plain_font);
-	font_height plainh;
-	GetFontHeight(&plainh);
-	float yplain;
-	yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-
-	char detail[100];
-	sprintf(detail, "Version %d.%d.%d %s",
-		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TGA_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_MINOR_VERSION(TGA_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_REVISION_VERSION(TGA_TRANSLATOR_VERSION)),
-		__DATE__);
-	DrawString(detail, BPoint(xbold, yplain + ybold));
-
-	DrawString("Written by the Haiku Translation Kit team",
-		BPoint(xbold, yplain * 7 + ybold));
-}

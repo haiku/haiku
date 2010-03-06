@@ -15,6 +15,7 @@
 #if SHOW_MODE && TEST_MODE
 #	include <Bitmap.h>
 #	include <BitmapStream.h>
+#	include <GroupLayout.h>
 #	include <String.h>
 #	include <View.h>
 #	include <Window.h>
@@ -114,14 +115,13 @@ main(int argc, char **argv)
 					if (status == B_OK)
 						status = output.DetachBitmap(&bitmap);
 					if (status == B_OK) {
-						BWindow* window = new BWindow(BRect(50, 50,
-								bitmap->Bounds().Width() + 50,
-								bitmap->Bounds().Height() + 50),
+						BWindow* window = new BWindow(BRect(0, 0, 1, 1),
 							"RAW", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS
-							| B_NOT_RESIZABLE);
+							| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS);
 						BView* view = new BView(window->Bounds(), NULL,
 							B_WILL_DRAW, B_FOLLOW_NONE);
 						window->AddChild(view);
+						window->SetLayout(new BGroupLayout(B_HORIZONTAL));
 						window->Show();
 						snooze(300000);
 						window->Lock();
@@ -140,8 +140,7 @@ main(int argc, char **argv)
 	}
 #endif
 
-	status_t status = LaunchTranslatorWindow(new RAWTranslator, "RAW Settings",
-		BRect(0, 0, 225, 175));
+	status_t status = LaunchTranslatorWindow(new RAWTranslator, "RAW Settings");
 	if (status != B_OK)
 		return 1;
 

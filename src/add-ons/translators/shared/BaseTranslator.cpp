@@ -642,8 +642,12 @@ BaseTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
 
 	BView *view = NewConfigView(AcquireSettings());
 		// implemented in derived class
+
 	if (view) {
 		*outView = view;
+		if ((view->Flags() & B_SUPPORTS_LAYOUT) != 0)
+			view->ResizeTo(view->ExplicitPreferredSize());
+
 		*outExtent = view->Bounds();
 
 		return B_OK;

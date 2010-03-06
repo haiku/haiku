@@ -16,13 +16,13 @@
 #include "GIFWindow.h"
 #include "GIFView.h"
 #include <Application.h>
+#include <GroupLayout.h>
 
 GIFWindow::GIFWindow(BRect rect, const char *name) :
-	BWindow(rect, name, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE,
-	B_CURRENT_WORKSPACE) {
-	
-	BRect r(Bounds());
-	gifview = new GIFView(r, "GIFView");
+	BWindow(rect, name, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+	| B_AUTO_UPDATE_SIZE_LIMITS, B_CURRENT_WORKSPACE) {
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	gifview = new GIFView("GIFView");
 	AddChild(gifview);
 }
 

@@ -54,8 +54,7 @@ main()
 {
 	BApplication app("application/x-vnd.Haiku-TIFFTranslator");
 	status_t result;
-	result = LaunchTranslatorWindow(new TIFFTranslator,
-		"TIFF Settings", BRect(0, 0, 225, 175));
+	result = LaunchTranslatorWindow(new TIFFTranslator, "TIFF Settings");
 	if (result == B_OK) {
 		app.Run();
 		return 0;

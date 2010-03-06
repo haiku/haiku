@@ -945,6 +945,5 @@ TIFFTranslator::DerivedTranslate(BPositionIO *inSource,
 BView *
 TIFFTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new TIFFView(BRect(0, 0, 225, 175), "TIFFTranslator Settings",
-		B_FOLLOW_ALL, B_WILL_DRAW, settings);
+	return new TIFFView("TIFFTranslator Settings", B_WILL_DRAW, settings);
 }

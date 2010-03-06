@@ -44,7 +44,7 @@ class Prefs;
 
 class GIFView : public BView {
  public:
-							GIFView(BRect rect, const char* name);
+							GIFView(const char* name);
 	virtual					~GIFView();
 
 	virtual	void			MessageReceived(BMessage* message);

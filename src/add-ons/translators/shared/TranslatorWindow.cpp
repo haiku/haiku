@@ -31,6 +31,7 @@
 
 #include <Screen.h>
 #include <Alert.h>
+#include <GroupLayout.h>
 #include "TranslatorWindow.h"
 
 // ---------------------------------------------------------------
@@ -48,8 +49,11 @@
 // ---------------------------------------------------------------
 TranslatorWindow::TranslatorWindow(BRect area, const char *title)
 	:	BWindow(area, title, B_TITLED_WINDOW,
-			B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+		// Set the layout on layout window
+		// Do nothing for a non-layout window
 }
 
 // ---------------------------------------------------------------
@@ -85,7 +89,6 @@ LaunchTranslatorWindow(BTranslator *translator, const char *title, BRect rect)
 	translator = NULL;
 
 	TranslatorWindow *wnd = new TranslatorWindow(rect, title);
-	view->ResizeTo(rect.Width(), rect.Height());
 	wnd->AddChild(view);
 	BPoint wndpt = B_ORIGIN;
 	{

@@ -2188,7 +2188,6 @@ TGATranslator::DerivedTranslate(BPositionIO *inSource,
 BView *
 TGATranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new TGAView(BRect(0, 0, 225, 175), "TGATranslator Settings",
-		B_FOLLOW_ALL, B_WILL_DRAW, settings);
+	return new TGAView("TGATranslator Settings", B_WILL_DRAW, settings);
 }
 

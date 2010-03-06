@@ -49,8 +49,7 @@ main()
 {
 	BApplication app("application/x-vnd.Haiku-TGATranslator");
 	status_t result;
-	result = LaunchTranslatorWindow(new TGATranslator,
-		"TGA Settings", BRect(0, 0, 225, 175));
+	result = LaunchTranslatorWindow(new TGATranslator, "TGA Settings");
 	if (result == B_OK) {
 		app.Run();
 		return 0;

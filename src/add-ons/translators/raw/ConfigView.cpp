@@ -1,5 +1,6 @@
 /*
  * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2009, Maxime Simon, maxime.simon@gmail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,54 +10,56 @@
 
 #include <StringView.h>
 #include <CheckBox.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 
 #include <stdio.h>
 #include <string.h>
 
 
-ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
-	: BView(frame, "RAWTranslator Settings", resize, flags)
+ConfigView::ConfigView(uint32 flags)
+	: BView("RAWTranslator Settings", flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	font_height fontHeight;
-	be_bold_font->GetHeight(&fontHeight);
-	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
+	BStringView *fTitle = new BStringView("title", "RAW Images");
+	fTitle->SetFont(be_bold_font);
 
-	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", "RAW images");
-	stringView->SetFont(be_bold_font);
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
-
-	rect.OffsetBy(0, height + 10);
 	char version[256];
 	sprintf(version, "Version %d.%d.%d, %s",
 		int(B_TRANSLATION_MAJOR_VERSION(RAW_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(RAW_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(RAW_TRANSLATOR_VERSION)),
 		__DATE__);
-	stringView = new BStringView(rect, "version", version);
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	BStringView *fVersion = new BStringView("version", version);
 
-	GetFontHeight(&fontHeight);
-	height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
+	BStringView *fCopyright = new BStringView("copyright",
+		B_UTF8_COPYRIGHT "2007-2009 Haiku Inc.");
 
-	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "copyright", B_UTF8_COPYRIGHT "2007 Haiku Inc.");
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	BStringView *fCopyright2 = new BStringView("copyright2",
+		"Based on Dave Coffin's dcraw 8.63");
 
-	rect.OffsetBy(0, height + 10);
-	stringView = new BStringView(rect, "copyright2", "Based on Dave Coffin's dcraw 8.63");
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	BStringView *fCopyright3 = new BStringView("copyright3",
+		B_UTF8_COPYRIGHT "1997-2007 Dave Coffin");
 
-	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "copyright3", B_UTF8_COPYRIGHT "1997-2007 Dave Coffin");
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	// Build the layout
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+		.Add(fTitle)
+		.AddGlue()
+		.Add(fVersion)
+		.Add(fCopyright)
+		.AddGlue()
+		.Add(fCopyright2)
+		.Add(fCopyright3)
+		.AddGlue()
+		.SetInsets(5, 5, 5, 5)
+	);
+
+	BFont font;
+	GetFont(&font);
+	SetExplicitPreferredSize(BSize((font.Size() * 233)/12, (font.Size() * 200)/12));
 }
 
 

@@ -2,6 +2,7 @@
 // TIFFView
 // Written by Michael Wilber, OBOS Translation Kit Team
 // Picking the compression method added by Stephan Aßmus, <stippi@yellowbites.com>
+// Use of Layout API added by Maxime Simon, maxime.simon@gmail.com, 2009.
 //
 // TIFFView.cpp
 //
@@ -32,6 +33,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <GridLayoutBuilder.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -73,14 +77,34 @@ add_menu_item(BMenu* menu,
 //
 // Returns:
 // ---------------------------------------------------------------
-TIFFView::TIFFView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags, TranslatorSettings *settings)
-	:	BView(frame, name, resize, flags)
+TIFFView::TIFFView(const char *name, uint32 flags, TranslatorSettings *settings)
+	:	BView(name, flags)
 {
 	fSettings = settings;
 
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
+
+	fTitle = new BStringView("title", "TIFF Image Translator");
+	fTitle->SetFont(be_bold_font);
+
+	char detail[100];
+	sprintf(detail, "Version %d.%d.%d %s",
+		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TIFF_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VERSION(TIFF_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVISION_VERSION(TIFF_TRANSLATOR_VERSION)),
+		__DATE__);
+	fDetail = new BStringView("detail", detail);
+
+	int16 i = 1;
+	fLibTIFF[0] = new BStringView(NULL, "TIFF Library:");
+	char libtiff[] = TIFFLIB_VERSION_STR;
+    char *tok = strtok(libtiff, "\n");
+    while (i < 5 && tok) {
+		fLibTIFF[i] = new BStringView(NULL, tok);
+		tok = strtok(NULL, "\n");
+		i++;
+    }
 
 	BPopUpMenu* menu = new BPopUpMenu("pick compression");
 
@@ -98,13 +122,31 @@ TIFFView::TIFFView(const BRect &frame, const char *name,
 // TODO ? - strip encoding is not implemented in libTIFF for this compression
 //	add_menu_item(menu, COMPRESSION_JP2000, "JPEG2000", currentCompression);
 
-	fCompressionMF = new BMenuField(BRect(20, 50, 215, 70), "compression",
-									"Use compression:", menu, true);
-	fCompressionMF->ResizeToPreferred();
-	fCompressionMF->SetDivider(
-		fCompressionMF->StringWidth(fCompressionMF->Label()) + 7);
-	AddChild(fCompressionMF);
-
+ 	fCompressionMF = new BMenuField("Use Compression:", menu, NULL);
+ 
+ 	// Build the layout
+ 	SetLayout(new BGroupLayout(B_VERTICAL));
+ 
+ 	i = 0;
+ 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+ 		.Add(fTitle)
+ 		.Add(fDetail)
+ 		.AddGlue()
+ 		.Add(fCompressionMF)
+ 		.AddGlue()
+ 		.Add(fLibTIFF[0])
+ 		.Add(fLibTIFF[1])
+ 		.Add(fLibTIFF[2])
+ 		.Add(fLibTIFF[3])
+ 			// Theses 4 adding above work because we know there are 4 strings
+ 			// but it's fragile: one string less in the library version and the application breaks
+ 		.AddGlue()
+ 		.SetInsets(5, 5, 5, 5)
+ 	);
+ 
+ 	BFont font;
+ 	GetFont(&font);
+ 	SetExplicitPreferredSize(BSize((font.Size() * 350)/12, (font.Size() * 200)/12));
 }
 
 // ---------------------------------------------------------------
@@ -148,7 +190,6 @@ TIFFView::MessageReceived(BMessage* message)
 				fSettings->SetGetInt32(TIFF_SETTING_COMPRESSION, &value);
 				fSettings->SaveSettings();
 			}
-			fCompressionMF->ResizeToPreferred();
 			break;
 		}
 		default:
@@ -178,55 +219,3 @@ TIFFView::AllAttached()
 }
 
 
-// ---------------------------------------------------------------
-// Draw
-//
-// Draws information about the TIFFTranslator to this view.
-//
-// Preconditions:
-//
-// Parameters: area,	not used
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-void
-TIFFView::Draw(BRect area)
-{
-	SetFont(be_bold_font);
-	font_height fh;
-	GetFontHeight(&fh);
-	float xbold, ybold;
-	xbold = fh.descent + 1;
-	ybold = fh.ascent + fh.descent * 2 + fh.leading;
-
-	char title[] = "TIFF image translator";
-	DrawString(title, BPoint(xbold, ybold));
-
-	SetFont(be_plain_font);
-	font_height plainh;
-	GetFontHeight(&plainh);
-	float yplain;
-	yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-
-	char detail[100];
-	sprintf(detail, "Version %d.%d.%d %s",
-		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TIFF_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_MINOR_VERSION(TIFF_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_REVISION_VERSION(TIFF_TRANSLATOR_VERSION)),
-		__DATE__);
-	DrawString(detail, BPoint(xbold, yplain + ybold));
-
-	int32 lineno = 6;
-	DrawString("TIFF library:", BPoint(xbold, yplain * lineno + ybold));
-	lineno += 2;
-
-	char libtiff[] = TIFFLIB_VERSION_STR;
-	char *tok = strtok(libtiff, "\n");
-	while (tok) {
-		DrawString(tok, BPoint(xbold, yplain * lineno + ybold));
-		lineno++;
-		tok = strtok(NULL, "\n");
-	}
-}

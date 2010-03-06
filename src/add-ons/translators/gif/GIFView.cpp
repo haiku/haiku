@@ -14,10 +14,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+//                      Maxime Simon, <maxime.simon@gmail.com>
 
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <GridLayoutBuilder.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <InterfaceKit.h>
 #include <String.h>
 
@@ -30,41 +34,21 @@ extern int32 translatorVersion;
 extern char translatorName[];
 
 // constructor
-GIFView::GIFView(BRect rect, const char *name)
-	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)
+GIFView::GIFView(const char *name)
+	: BView(name, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
-	font_height fh;
-	be_bold_font->GetHeight(&fh);
-	BRect r(10, 15, 10 + be_bold_font->StringWidth(translatorName),
-		15 + fh.ascent + fh.descent);
 
-	BStringView *title = new BStringView(r, "Title", translatorName);
+	BStringView *title = new BStringView("Title", translatorName);
 	title->SetFont(be_bold_font);
-	AddChild(title);
 
 	char version_string[100];
 	sprintf(version_string, "v%d.%d.%d %s", (int)(translatorVersion >> 8), (int)((translatorVersion >> 4) & 0xf),
 		(int)(translatorVersion & 0xf), __DATE__);
-	be_plain_font->GetHeight(&fh);
-	r.bottom = r.top + fh.ascent + fh.descent;
-	r.left = r.right + 2.0 * r.Height();
-	r.right = r.left + be_plain_font->StringWidth(version_string);
-
-	BStringView *version = new BStringView(r, "Version", version_string);
-	version->SetFont(be_plain_font);
-	AddChild(version);
+	BStringView *version = new BStringView("Version", version_string);
 
 	const char *copyrightString = "©2003 Daniel Switkin, software@switkin.com";
-	r.top = r.bottom + 5;
-	r.left = 10;
-	r.bottom = r.top + fh.ascent + fh.descent;
-	r.right = rect.right - 10;
-
-	BStringView *copyright = new BStringView(r, "Copyright", copyrightString);
-	copyright->ResizeToPreferred();
-	AddChild(copyright);
+	BStringView *copyright = new BStringView("Copyright", copyrightString);
 
 	// menu fields (Palette & Colors)
 	fWebSafeMI = new BMenuItem("Websafe", new BMessage(GV_WEB_SAFE), 0, 0);
@@ -89,81 +73,34 @@ GIFView::GIFView(BRect rect, const char *name)
 		count *= 2;
 	}
 	fColorCount256MI = fColorCountMI[7];
-	
-	r.top = r.bottom + 14;
-	r.bottom = r.top + 24;
-	fPaletteMF = new BMenuField(r, "PaletteMenuField", "Palette: ",
-		fPaletteM, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-	AddChild(fPaletteMF);
 
-	r.top = r.bottom + 5;
-	r.bottom = r.top + 24;
-	fColorCountMF = new BMenuField(r, "ColorCountMenuField", "Colors: ",
-		fColorCountM, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-	AddChild(fColorCountMF);
-
-	// align menu fields
-	float maxLabelWidth = ceilf(max_c(be_plain_font->StringWidth("Colors: "),
-									  be_plain_font->StringWidth("Palette: ")));
-	fPaletteMF->SetDivider(maxLabelWidth + 7);
-	fColorCountMF->SetDivider(maxLabelWidth + 7);
-
-	// check boxen
-	r.top = fColorCountMF->Frame().bottom + 5;
-	r.bottom = r.top + 10;
-	fUseDitheringCB = new BCheckBox(r, "UseDithering", "Use dithering",
-		new BMessage(GV_USE_DITHERING));
-	AddChild(fUseDitheringCB);
-
-	r.top = fUseDitheringCB->Frame().bottom + 2;
-	r.bottom = r.top + 10;
-	fInterlacedCB = new BCheckBox(r, "Interlaced", "Write interlaced images",
-		new BMessage(GV_INTERLACED));
-	AddChild(fInterlacedCB);
-	
-	r.top = fInterlacedCB->Frame().bottom + 2;
-	r.bottom = r.top + 10;
-	fUseTransparentCB = new BCheckBox(r, "UseTransparent", "Write transparent images",
-		new BMessage(GV_USE_TRANSPARENT));
-	AddChild(fUseTransparentCB);
-
-	// radio buttons
-	r.top = fUseTransparentCB->Frame().bottom + 2;
-	r.bottom = r.top + 10;
-	r.right = r.left + be_plain_font->StringWidth("Automatic (from alpha channel)") + 20;
-	fUseTransparentAutoRB = new BRadioButton(r, "UseTransparentAuto", "Automatic (from alpha channel)",
-		new BMessage(GV_USE_TRANSPARENT_AUTO));
-	AddChild(fUseTransparentAutoRB);
-	
-	r.top = fUseTransparentAutoRB->Frame().bottom + 0;
-	r.bottom = r.top + 10;
-	r.left = 10;
-	r.right = r.left + be_plain_font->StringWidth("Use RGB color") + 20;
-	fUseTransparentColorRB = new BRadioButton(r, "UseTransparentColor", "Use RGB color",
-		new BMessage(GV_USE_TRANSPARENT_COLOR));
-	AddChild(fUseTransparentColorRB);
-	
-	r.left = r.right + 1;
-	r.right = r.left + 30;
-	fTransparentRedTC = new BTextControl(r, "TransparentRed", "", "0",
-		new BMessage(GV_TRANSPARENT_RED));
-	AddChild(fTransparentRedTC);
-	fTransparentRedTC->SetDivider(0);
-	
-	r.left = r.right + 5;
-	r.right = r.left + 30;
-	fTransparentGreenTC = new BTextControl(r, "TransparentGreen", "", "0",
-		new BMessage(GV_TRANSPARENT_GREEN));
-	AddChild(fTransparentGreenTC);
-	fTransparentGreenTC->SetDivider(0);
-	
-	r.left = r.right + 5;
-	r.right = r.left + 30;
-	fTransparentBlueTC = new BTextControl(r, "TransparentBlue", "", "0",
-		new BMessage(GV_TRANSPARENT_BLUE));
-	AddChild(fTransparentBlueTC);
-	fTransparentBlueTC->SetDivider(0);
-
+ 	fPaletteMF = new BMenuField("Palette", fPaletteM, NULL);
+ 
+ 	fColorCountMF = new BMenuField("Colors", fColorCountM, NULL);
+ 
+ 	// check boxes
+ 	fUseDitheringCB = new BCheckBox("Use dithering",
+ 		new BMessage(GV_USE_DITHERING));
+ 
+ 	fInterlacedCB = new BCheckBox("Write interlaced images",
+ 		new BMessage(GV_INTERLACED));
+ 
+ 	fUseTransparentCB = new BCheckBox("Write transparent images",
+ 		new BMessage(GV_USE_TRANSPARENT));
+ 
+ 	// radio buttons
+ 	fUseTransparentAutoRB = new BRadioButton("Automatic (from alpha channel)",
+ 		new BMessage(GV_USE_TRANSPARENT_AUTO));
+ 
+ 	fUseTransparentColorRB = new BRadioButton("Use RGB color",
+ 		new BMessage(GV_USE_TRANSPARENT_COLOR));
+ 
+ 	fTransparentRedTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_RED));
+ 
+ 	fTransparentGreenTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_GREEN));
+ 
+ 	fTransparentBlueTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_BLUE));
+ 
 	BTextView *tr = fTransparentRedTC->TextView();
 	BTextView *tg = fTransparentGreenTC->TextView();
 	BTextView *tb = fTransparentBlueTC->TextView();
@@ -176,10 +113,45 @@ GIFView::GIFView(BRect rect, const char *name)
 		}
 	}
 
-	RestorePrefs();
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	if (copyright->Frame().right + 10 > Bounds().Width())
-		ResizeTo(copyright->Frame().right + 10, Bounds().Height());
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
+		.Add(BGridLayoutBuilder(10, 10)
+			.Add(title, 0, 0)
+			.Add(version, 1, 0)
+		)
+		.Add(copyright)
+		.AddGlue()
+
+		.Add(BGridLayoutBuilder(10, 10)
+			.Add(fPaletteMF->CreateLabelLayoutItem(), 0, 0)
+        	.Add(fPaletteMF->CreateMenuBarLayoutItem(), 1, 0)
+
+			.Add(fColorCountMF->CreateLabelLayoutItem(), 0, 1)
+        	.Add(fColorCountMF->CreateMenuBarLayoutItem(), 1, 1)
+		)
+		.AddGlue()
+
+		.Add(fUseDitheringCB)
+		.Add(fInterlacedCB)
+		.Add(fUseTransparentCB)
+
+		.Add(fUseTransparentAutoRB)
+		.Add(BGridLayoutBuilder(10, 10)
+			.Add(fUseTransparentColorRB, 0, 0)
+			.Add(fTransparentRedTC, 1, 0)
+			.Add(fTransparentGreenTC, 2, 0)
+			.Add(fTransparentBlueTC, 3, 0)
+		)
+		.AddGlue()
+		.SetInsets(5, 5, 5, 5)
+	);
+
+	BFont font;
+	GetFont(&font);
+	SetExplicitPreferredSize(BSize((font.Size() * 400)/12, (font.Size() * 300)/12));
+
+	RestorePrefs();
 }
 
 
