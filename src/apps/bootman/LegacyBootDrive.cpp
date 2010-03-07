@@ -199,7 +199,7 @@ PartitionRecorder::_Record(BPartition* partition)
 	
 	const char* type = partition->Type();
 	if (type == NULL)
-		type = TR("Unknown");
+		type = TR_CMT("Unknown", "Text is shown for an unknown partition type");
 		
 	BMessage message;
 	// Data as required by BootLoader.h
