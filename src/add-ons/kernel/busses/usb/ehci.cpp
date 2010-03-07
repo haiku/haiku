@@ -181,22 +181,24 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		uint32 legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function, extendedCapPointer, 4);
 		if ((legacySupport & EHCI_LEGSUP_CAPID_MASK) == EHCI_LEGSUP_CAPID) {
-			if (legacySupport & EHCI_LEGSUP_BIOSOWNED)
-				TRACE_ALWAYS("the host controller is bios owned\n");
+			if ((legacySupport & EHCI_LEGSUP_BIOSOWNED) != 0) {
+				TRACE_ALWAYS("the host controller is bios owned, claiming"
+					" ownership\n");
 
-			TRACE_ALWAYS("claiming ownership of the host controller\n");
-			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-				fPCIInfo->function, extendedCapPointer + 3, 1, 1);
+				sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+					fPCIInfo->function, extendedCapPointer + 3, 1, 1);
 
-			for (int32 i = 0; i < 20; i++) {
-				legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
-					fPCIInfo->device, fPCIInfo->function, extendedCapPointer, 4);
+				for (int32 i = 0; i < 20; i++) {
+					legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
+						fPCIInfo->device, fPCIInfo->function,
+						extendedCapPointer, 4);
 
-				if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
+					if ((legacySupport & EHCI_LEGSUP_BIOSOWNED) == 0)
+						break;
+
 					TRACE_ALWAYS("controller is still bios owned, waiting\n");
 					snooze(50000);
-				} else
-					break;
+				}
 			}
 
 			if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
@@ -520,7 +522,7 @@ status_t
 EHCI::AddTo(Stack *stack)
 {
 #ifdef TRACE_USB
-	set_dprintf_enabled(true); 
+	set_dprintf_enabled(true);
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	load_driver_symbols("ehci");
 #endif
