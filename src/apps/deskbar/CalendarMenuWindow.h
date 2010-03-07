@@ -18,7 +18,6 @@ namespace BPrivate {
 	class BCalendarView;
 }
 using BPrivate::BCalendarView;
-using BPrivate::BDate;
 
 
 class CalendarMenuWindow : public BWindow {

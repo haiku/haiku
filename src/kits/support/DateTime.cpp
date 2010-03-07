@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,11 +7,13 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include <DateTime.h>
+#include "DateTime.h"
 
 
 #include <time.h>
 #include <sys/time.h>
+
+#include <Message.h>
 
 
 namespace BPrivate {
@@ -56,10 +58,38 @@ BTime::BTime(int32 hour, int32 minute, int32 second, int32 microsecond)
 
 
 /*!
+	Constructs a new BTime object from the provided BMessage archive.
+*/
+BTime::BTime(const BMessage* archive)
+	: fMicroseconds(-1)
+{
+	if (archive == NULL)
+		return;
+	archive->FindInt64("mircoseconds", &fMicroseconds);
+}
+
+
+/*!
 	Empty destructor.
 */
 BTime::~BTime()
 {
+}
+
+
+/*!
+	Archives the BTime object into the provided BMessage object.
+	@returns	\c B_OK if all went well.
+				\c B_BAD_VALUE, if the message is \c NULL.
+				\c other error codes, depending on failure to append
+				fields to the message.
+*/
+status_t
+BTime::Archive(BMessage* into) const
+{
+	if (into == NULL)
+		return B_BAD_VALUE;
+	return into->AddInt64("mircoseconds", fMicroseconds);
 }
 
 
@@ -425,10 +455,47 @@ BDate::BDate(int32 year, int32 month, int32 day)
 
 
 /*!
+	Constructs a new BDate object from the provided archive.
+*/
+BDate::BDate(const BMessage* archive)
+	: fDay(-1),
+	  fYear(0),
+	  fMonth(-1)
+{
+	if (archive == NULL)
+		return;
+	archive->FindInt32("day", &fDay);
+	archive->FindInt32("year", &fYear);
+	archive->FindInt32("month", &fMonth);
+}
+
+
+/*!
 	Empty destructor.
 */
 BDate::~BDate()
 {
+}
+
+
+/*!
+	Archives the BDate object into the provided BMessage object.
+	@returns	\c B_OK if all went well.
+				\c B_BAD_VALUE, if the message is \c NULL.
+				\c other error codes, depending on failure to append
+				fields to the message.
+*/
+status_t
+BDate::Archive(BMessage* into) const
+{
+	if (into == NULL)
+		return B_BAD_VALUE;
+	status_t ret = into->AddInt32("day", fDay);
+	if (ret == B_OK)
+		ret = into->AddInt32("year", fYear);
+	if (ret == B_OK)
+		ret = into->AddInt32("month", fMonth);
+	return ret;
 }
 
 
@@ -1064,8 +1131,8 @@ BDate::_DateToJulianDay(int32 _year, int32 month, int32 day) const
 	Constructs a new BDateTime object. IsValid() will return false.
 */
 BDateTime::BDateTime()
-	: fDate(BDate()),
-	  fTime(BTime())
+	: fDate(),
+	  fTime()
 {
 }
 
@@ -1082,10 +1149,37 @@ BDateTime::BDateTime(const BDate& date, const BTime& time)
 
 
 /*!
+	Constructs a new BDateTime object. IsValid() will return false.
+*/
+BDateTime::BDateTime(const BMessage* archive)
+	: fDate(archive),
+	  fTime(archive)
+{
+}
+
+
+/*!
 	Empty destructor.
 */
 BDateTime::~BDateTime()
 {
+}
+
+
+/*!
+	Archives the BDateTime object into the provided BMessage object.
+	@returns	\c B_OK if all went well.
+				\c B_BAD_VALUE, if the message is \c NULL.
+				\c other error codes, depending on failure to append
+				fields to the message.
+*/
+status_t
+BDateTime::Archive(BMessage* into) const
+{
+	status_t ret = fDate.Archive(into);
+	if (ret == B_OK)
+		ret = fTime.Archive(into);
+	return ret;
 }
 
 

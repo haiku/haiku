@@ -15,12 +15,6 @@
 #include <OS.h>
 
 
-using BPrivate::BDate;
-using BPrivate::BTime;
-using BPrivate::BDateTime;
-using BPrivate::B_LOCAL_TIME;
-
-
 TTimeBaseView::TTimeBaseView(BRect frame, const char *name)
 	: BView(frame, name, B_FOLLOW_NONE, B_PULSE_NEEDED),
 	  fMessage(H_TIME_UPDATE)

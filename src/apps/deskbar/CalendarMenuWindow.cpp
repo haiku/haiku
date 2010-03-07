@@ -19,7 +19,6 @@
 
 
 using BPrivate::BCalendarView;
-using BPrivate::B_LOCAL_TIME;
 using BPrivate::B_WEEK_START_SUNDAY;
 using BPrivate::B_WEEK_START_MONDAY;
 

@@ -18,10 +18,6 @@
 #include <DateTime.h>
 
 
-using BPrivate::BDate;
-using BPrivate::BTime;
-
-
 class TTimeEdit : public TSectionEdit {
 	public:
 						TTimeEdit(BRect frame, const char *name, uint32 sections);

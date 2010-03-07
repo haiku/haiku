@@ -10,6 +10,7 @@ MergeObject <libbe>support_kit.o :
 	BlockCache.cpp
 	ByteOrder.cpp
 	DataIO.cpp
+	DateTime.cpp
 	BufferIO.cpp
 	Flattenable.cpp
 	List.cpp

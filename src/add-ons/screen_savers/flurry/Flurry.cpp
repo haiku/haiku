@@ -274,8 +274,8 @@ FlurryView::_SetupFlurryBaseInfo()
 double
 FlurryView::_CurrentTime() const
 {
-	return double(fDateTime.CurrentDateTime(B_LOCAL_TIME).Time_t() +
-		double(fTime.CurrentTime(B_LOCAL_TIME).Millisecond() / 1000.0));
+	return double(BDateTime::CurrentDateTime(B_LOCAL_TIME).Time_t() +
+		double(BTime::CurrentTime(B_LOCAL_TIME).Millisecond() / 1000.0));
 }
 
 

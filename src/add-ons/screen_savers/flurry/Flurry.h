@@ -39,8 +39,8 @@ private:
 			double					fOldFrameTime;
 			flurry_info_t*			fFlurryInfo_t;
 
-			BPrivate::BTime			fTime;
-			BPrivate::BDateTime		fDateTime;
+			BTime					fTime;
+			BDateTime				fDateTime;
 };
 
 
