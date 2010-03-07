@@ -195,6 +195,7 @@ Scanner::_GetFileInfo(BDirectory* dir, FileInfo* parent)
 			entry.GetRef(&child->ref);
 			entry.GetSize(&child->size);
 			child->parent = thisDir;
+			child->color = -1;
 			thisDir->children.push_back(child);
 
 			// Send a progress report periodically.

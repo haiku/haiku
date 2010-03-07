@@ -488,6 +488,11 @@ PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
 		return 0.0;
 	}
 
+	if (info != NULL && info->color >= 0 && level == 0)
+		colorIdx = info->color;
+	else if (info != NULL)
+		info->color = colorIdx;
+
 	VolumeSnapshot* snapshot = fScanners[fCurrentVolume]->Snapshot();
 
 	float cx = floorf(b.left + b.Width() / 2.0 + 0.5);
@@ -528,6 +533,7 @@ PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
 
 			// Record in-use space and free space for use during MouseMoved().
 			info = snapshot->rootDir;
+			info->color = colorIdx;
 			fMouseOverInfo[0].push_back(Segment(0.0, mySpan, info));
 			if (mySpan < 360.0 - kMinSegmentSpan) {
 				fMouseOverInfo[0].push_back(Segment(mySpan, 360.0,

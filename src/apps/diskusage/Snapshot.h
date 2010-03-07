@@ -35,6 +35,8 @@ struct FileInfo {
 			int					count;
 			FileInfo*			parent;
 			std::vector<FileInfo*>	children;
+
+			int					color;
 };
 
 
