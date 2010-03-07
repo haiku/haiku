@@ -199,9 +199,12 @@ BootManagerController::_RestoreMBR()
 	fSettings.FindString("file", &path);
 
 	BString message;
-	message << TR("About to restore the Master Boot Record (MBR) of")
-		<< " " << disk << " " << TR("from") << " " << path << ". " <<
-		TR("Do you wish to continue?");
+	message << TR_CMT("About to restore the Master Boot Record (MBR) of"
+		" %disk from %file. Do you wish to continue?",
+		"Don't translate the place holders: %disk and %file");
+	message.ReplaceFirst("%disk", disk);
+	message.ReplaceFirst("%file", path);
+
 	BAlert* alert = new BAlert("confirm", message.String(),
 		TR("Restore MBR"), TR("Back"),
 		NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
