@@ -26,7 +26,6 @@ const BCursor *B_CURSOR_SYSTEM_DEFAULT;
 const BCursor *B_CURSOR_I_BEAM;
 	// these are initialized in BApplication::InitData()
 
-
 BCursor::BCursor(const void *cursorData)
 	:
 	fServerToken(-1),
@@ -37,7 +36,7 @@ BCursor::BCursor(const void *cursorData)
 	if (data == B_HAND_CURSOR || data == B_I_BEAM_CURSOR) {
 		// just use the default cursors from the app_server
 		fServerToken = data == B_HAND_CURSOR ?
-			B_CURSOR_DEFAULT : B_CURSOR_TEXT;
+			B_CURSOR_ID_SYSTEM_DEFAULT : B_CURSOR_ID_I_BEAM;
 		return;
 	}
 
@@ -59,6 +58,14 @@ BCursor::BCursor(const void *cursorData)
 		link.Read<int32>(&fServerToken);
 		fNeedToFree = true;
 	}
+}
+
+
+BCursor::BCursor(BCursorID id)
+	:
+	fServerToken(id),
+	fNeedToFree(false)
+{
 }
 
 

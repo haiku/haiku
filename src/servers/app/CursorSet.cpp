@@ -85,7 +85,7 @@ CursorSet::Load(const char *path)
 	\return B_BAD_VALUE if cursor is NULL, otherwise B_OK
 */
 status_t
-CursorSet::AddCursor(cursor_which which, const BBitmap *cursor, const BPoint &hotspot)
+CursorSet::AddCursor(BCursorID which, const BBitmap *cursor, const BPoint &hotspot)
 {
 	if (!cursor)
 		return B_BAD_VALUE;
@@ -120,7 +120,7 @@ CursorSet::AddCursor(cursor_which which, const BBitmap *cursor, const BPoint &ho
 	function must convert the R5 cursor data into a BBitmap
 */
 status_t
-CursorSet::AddCursor(cursor_which which, uint8 *data)
+CursorSet::AddCursor(BCursorID which, uint8 *data)
 {
 	// Convert cursor data to a bitmap because all cursors are internally stored
 	// as bitmaps
@@ -142,7 +142,7 @@ CursorSet::AddCursor(cursor_which which, uint8 *data)
 	\param which System cursor specifier defined in CursorSet.h
 */
 void
-CursorSet::RemoveCursor(cursor_which which)
+CursorSet::RemoveCursor(BCursorID which)
 {
 	RemoveData(_CursorWhichToString(which));
 }
@@ -162,7 +162,7 @@ CursorSet::RemoveCursor(cursor_which which)
 	BBitmaps created by this function are the responsibility of the caller.
 */
 status_t
-CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot)
+CursorSet::FindCursor(BCursorID which, BBitmap **cursor, BPoint *hotspot)
 {
 	if (!cursor || !hotspot);
 		return B_BAD_VALUE;
@@ -211,7 +211,7 @@ CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot)
 	BBitmaps created by this function are the responsibility of the caller.
 */
 status_t
-CursorSet::FindCursor(cursor_which which, ServerCursor **_cursor)
+CursorSet::FindCursor(BCursorID which, ServerCursor **_cursor) const
 {
 	BMessage msg;
 	if (FindMessage(_CursorWhichToString(which), &msg) != B_OK)
@@ -281,29 +281,65 @@ CursorSet::SetName(const char *name)
 	\return Name for the cursor specifier
 */
 const char *
-CursorSet::_CursorWhichToString(cursor_which which)
+CursorSet::_CursorWhichToString(BCursorID which) const
 {
 	switch (which) {
-		case B_CURSOR_DEFAULT:
-			return "Default";
-		case B_CURSOR_TEXT:
-			return "Text";
-		case B_CURSOR_MOVE:
+		case B_CURSOR_ID_SYSTEM_DEFAULT:
+			return "System default";
+		case B_CURSOR_ID_CONTEXT_MENU:
+			return "Context menu";
+		case B_CURSOR_ID_COPY:
+			return "Copy";
+		case B_CURSOR_ID_CROSS_HAIR:
+			return "Cross hair";
+		case B_CURSOR_ID_NO_CURSOR:
+			return "No cursor";
+		case B_CURSOR_ID_FOLLOW_LINK:
+			return "Follow link";
+		case B_CURSOR_ID_GRAB:
+			return "Grab";
+		case B_CURSOR_ID_GRABBING:
+			return "Grabbing";
+		case B_CURSOR_ID_HELP:
+			return "Help";
+		case B_CURSOR_ID_I_BEAM:
+			return "I-beam";
+		case B_CURSOR_ID_I_BEAM_HORIZONTAL:
+			return "I-beam horizontal";
+		case B_CURSOR_ID_MOVE:
 			return "Move";
-		case B_CURSOR_DRAG:
-			return "Drag";
-		case B_CURSOR_RESIZE:
-			return "Resize";
-		case B_CURSOR_RESIZE_NWSE:
-			return "Resize NWSE";
-		case B_CURSOR_RESIZE_NESW:
-			return "Resize NESW";
-		case B_CURSOR_RESIZE_NS:
-			return "Resize NS";
-		case B_CURSOR_RESIZE_EW:
-			return "Resize EW";
-		case B_CURSOR_OTHER:
-			return "Other";
+		case B_CURSOR_ID_NOT_ALLOWED:
+			return "Not allowed";
+		case B_CURSOR_ID_PROGRESS:
+			return "Progress";
+		case B_CURSOR_ID_RESIZE_NORTH:
+			return "Resize North";
+		case B_CURSOR_ID_RESIZE_EAST:
+			return "Resize East";
+		case B_CURSOR_ID_RESIZE_SOUTH:
+			return "Resize South";
+		case B_CURSOR_ID_RESIZE_WEST:
+			return "Resize West";
+		case B_CURSOR_ID_RESIZE_NORTH_EAST:
+			return "Resize North East";
+		case B_CURSOR_ID_RESIZE_NORTH_WEST:
+			return "Resize North West";
+		case B_CURSOR_ID_RESIZE_SOUTH_EAST:
+			return "Resize South East";
+		case B_CURSOR_ID_RESIZE_SOUTH_WEST:
+			return "Resize South West";
+		case B_CURSOR_ID_RESIZE_NORTH_SOUTH:
+			return "Resize North South";
+		case B_CURSOR_ID_RESIZE_EAST_WEST:
+			return "Resize East West";
+		case B_CURSOR_ID_RESIZE_NORTH_EAST_SOUTH_WEST:
+			return "Resize North East South West";
+		case B_CURSOR_ID_RESIZE_NORTH_WEST_SOUTH_EAST:
+			return "Resize North West South East";
+		case B_CURSOR_ID_ZOOM_IN:
+			return "Zoom in";
+		case B_CURSOR_ID_ZOOM_OUT:
+			return "Zoom out";
 		default:
 			return "Invalid";
 	}

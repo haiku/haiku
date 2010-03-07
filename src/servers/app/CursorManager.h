@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,46 +29,68 @@ class ServerCursor;
 	of an application's cursors whenever an application closes.
 */
 class CursorManager : public BLocker {
-	public:
-						CursorManager();
-		virtual			~CursorManager();
+public:
+								CursorManager();
+								~CursorManager();
 
-		ServerCursor*	CreateCursor(team_id clientTeam,
+			ServerCursor*		CreateCursor(team_id clientTeam,
 									 const uint8* cursorData);
 
-		int32			AddCursor(ServerCursor* cursor, int32 token = -1);
-		void			DeleteCursors(team_id team);
+			int32				AddCursor(ServerCursor* cursor,
+									int32 token = -1);
+			void				DeleteCursors(team_id team);
 
-		bool			RemoveCursor(ServerCursor* cursor);
+			bool				RemoveCursor(ServerCursor* cursor);
 
-		void			SetCursorSet(const char* path);
-		ServerCursor*	GetCursor(cursor_which which);
-		cursor_which	GetCursorWhich();
-		void			ChangeCursor(cursor_which which, int32 token);
-		void			SetDefaults();
+			void				SetCursorSet(const char* path);
+			ServerCursor*		GetCursor(BCursorID which);
 
-		ServerCursor*	FindCursor(int32 token);
+			ServerCursor*		FindCursor(int32 token);
 
-	private:
-		ServerCursor*	_FindCursor(team_id cientTeam,
+private:
+			void				_InitCursor(ServerCursor*& cursorMember,
+									const uint8* cursorBits, BCursorID id,
+									const BPoint& hotSpot = B_ORIGIN);
+			void				_LoadCursor(ServerCursor*& cursorMember,
+									const CursorSet& set, BCursorID id);
+			ServerCursor*		_FindCursor(team_id cientTeam,
 									const uint8* cursorData);
-		void			_RemoveCursor(ServerCursor* cursor);
-//		ServerCursor*	_RemoveCursor(int32 index);
+			void				_RemoveCursor(ServerCursor* cursor);
 
-		BList			fCursorList;
-		BTokenSpace		fTokenSpace;
+private:
+			BList				fCursorList;
+			BTokenSpace			fTokenSpace;
 
-		// System cursor members
-		ServerCursor	*fDefaultCursor,
-						*fTextCursor,
-						*fMoveCursor,
-						*fDragCursor,
-						*fResizeCursor,
-						*fNWSECursor,
-						*fNESWCursor,
-						*fNSCursor,
-						*fEWCursor;
-		cursor_which	fCurrentWhich;
+			// System cursor members
+			ServerCursor*		fCursorSystemDefault;
+
+			ServerCursor*		fCursorContextMenu;
+			ServerCursor*		fCursorCopy;
+			ServerCursor*		fCursorCrossHair;
+			ServerCursor*		fCursorFollowLink;
+			ServerCursor*		fCursorGrab;
+			ServerCursor*		fCursorGrabbing;
+			ServerCursor*		fCursorHelp;
+			ServerCursor*		fCursorIBeam;
+			ServerCursor*		fCursorIBeamHorizontal;
+			ServerCursor*		fCursorMove;
+			ServerCursor*		fCursorNoCursor;
+			ServerCursor*		fCursorNotAllowed;
+			ServerCursor*		fCursorProgress;
+			ServerCursor*		fCursorResizeEast;
+			ServerCursor*		fCursorResizeEastWest;
+			ServerCursor*		fCursorResizeNorth;
+			ServerCursor*		fCursorResizeNorthEast;
+			ServerCursor*		fCursorResizeNorthEastSouthWest;
+			ServerCursor*		fCursorResizeNorthSouth;
+			ServerCursor*		fCursorResizeNorthWest;
+			ServerCursor*		fCursorResizeNorthWestSouthEast;
+			ServerCursor*		fCursorResizeSouth;
+			ServerCursor*		fCursorResizeSouthEast;
+			ServerCursor*		fCursorResizeSouthWest;
+			ServerCursor*		fCursorResizeWest;
+			ServerCursor*		fCursorZoomIn;
+			ServerCursor*		fCursorZoomOut;
 };
 
-#endif	/* CURSOR_MANAGER_H */
+#endif	// CURSOR_MANAGER_H
