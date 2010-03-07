@@ -82,11 +82,9 @@ EntryPage::_BuildUI()
 
 	text.Truncate(0);
 	text <<
-		TR("Install boot menu") << "\n\n" <<
-		TR("Choose this option to install a boot menu, "
-		"allowing you to select which operating "
-		"system to boot when you turn on your "
-		"computer.") << "\n";
+		TR("Uninstall boot menu") << "\n\n" <<
+		TR("Choose this option to remove the boot menu "
+		"previously installed by this program.\n");
 	fUninstallText = CreateDescription(textRect, "uninstallText", text);
 	MakeHeading(fUninstallText);
 	AddChild(fUninstallText);
