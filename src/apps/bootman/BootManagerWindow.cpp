@@ -16,12 +16,18 @@
 #include "DefaultPartitionPage.h"
 
 #include <Application.h>
+#include <Catalog.h>
 #include <Screen.h>
 
 #include <math.h>
 
+
+#define TR_CONTEXT "BootManagerWindow"
+
+
+
 BootManagerWindow::BootManagerWindow()
-	: BWindow(BRect(100, 100, 500, 400), "Boot Manager", B_TITLED_WINDOW, 
+	: BWindow(BRect(100, 100, 500, 400), TR("Boot Manager"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	float minWidth, maxWidth, minHeight, maxHeight;

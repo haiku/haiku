@@ -10,6 +10,7 @@
 #include "DefaultPartitionPage.h"
 
 
+#include <Catalog.h>
 #include <Message.h>
 
 #include <MenuItem.h>
@@ -20,6 +21,9 @@
 
 #include <string.h>
 #include <String.h>
+
+
+#define TR_CONTEXT "DefaultPartitionPage"
 
 
 const uint32 kMsgPartition = 'part';
@@ -89,22 +93,24 @@ DefaultPartitionPage::_BuildUI()
 {
 	BRect rect(Bounds());
 	
-	fDescription = CreateDescription(rect, "description", 
-		"Default Partition\n\n"
-		"Please specify a default partition and a timeout.\n"
+	BString text;
+	text <<
+		TR("Default Partition") << "\n\n" <<
+		TR("Please specify a default partition and a timeout.\n"
 		"The boot menu will load the default partition after "
 		"the timeout unless you select another partition. You "
 		"can also have the boot menu wait indefinitely for you "
-		"to select a partition."
-		);
+		"to select a partition.");
+
+	fDescription = CreateDescription(rect, "description", text);
 	MakeHeading(fDescription);
 	AddChild(fDescription);
 	LayoutDescriptionVertically(fDescription);
 	rect.top = fDescription->Frame().bottom + kTextDistance;
 	
 	BPopUpMenu* popUpMenu = _CreatePopUpMenu();	
-	fDefaultPartition = new BMenuField(rect, "partitions", "Default Partition:", 
-		popUpMenu);
+	fDefaultPartition = new BMenuField(rect, "partitions",
+		TR("Default Partition:"), popUpMenu);
 	float divider = be_plain_font->StringWidth(fDefaultPartition->Label()) + 3;
 	fDefaultPartition->SetDivider(divider);
 	AddChild(fDefaultPartition);
@@ -113,10 +119,14 @@ DefaultPartitionPage::_BuildUI()
 	rect.top = fDefaultPartition->Frame().bottom + kTextDistance;
 	int32 timeout;
 	fSettings->FindInt32("timeout", &timeout);
-	fWait0 = _CreateWaitRadioButton(rect, "wait0", "Wait Indefinitely", -1, timeout);
-	fWait5 = _CreateWaitRadioButton(rect, "wait5", "Wait 5 Seconds", 5, timeout);
-	fWait10 = _CreateWaitRadioButton(rect, "wait10", "Wait 10 Seconds", 10, timeout);
-	fWait15 = _CreateWaitRadioButton(rect, "wait15", "Wait 15 Seconds", 15, timeout);
+	fWait0 = _CreateWaitRadioButton(rect, "wait0", TR("Wait Indefinitely"),
+		-1, timeout);
+	fWait5 = _CreateWaitRadioButton(rect, "wait5", TR("Wait 5 Seconds"),
+		5, timeout);
+	fWait10 = _CreateWaitRadioButton(rect, "wait10", TR("Wait 10 Seconds"),
+		10, timeout);
+	fWait15 = _CreateWaitRadioButton(rect, "wait15", TR("Wait 15 Seconds"),
+		15, timeout);
 	
 	_Layout();
 }
@@ -131,7 +141,7 @@ DefaultPartitionPage::_CreatePopUpMenu()
 	BMenuItem* selectedItem = NULL;
 	int32 selectedItemIndex = 0;
 	
-	BPopUpMenu* menu = new BPopUpMenu("Partitions");
+	BPopUpMenu* menu = new BPopUpMenu(TR("Partitions"));
 	BMessage message;
 	for (int32 i = 0; fSettings->FindMessage("partition", i, &message) == B_OK; i ++) {
 		

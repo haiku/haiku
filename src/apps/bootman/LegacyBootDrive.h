@@ -18,6 +18,8 @@ const uint32 kBlockSize = 512;
 const uint32 kNumberOfBootLoaderBlocks = 4;
 
 const uint32 kMBRSignature = 0xAA55;
+
+const int32 kMaxBootMenuItemLength = 70;
 	
 typedef struct {
 	uint8 bootLoader[440];
@@ -31,15 +33,17 @@ class LegacyBootDrive : public BootDrive
 {
 public:
 	LegacyBootDrive();
-	virtual ~LegacyBootDrive();
+	~LegacyBootDrive();
 
-	virtual bool IsBootMenuInstalled(BMessage* settings);
-	virtual status_t ReadPartitions(BMessage* settings);
-	virtual status_t WriteBootMenu(BMessage* settings);
-	virtual status_t SaveMasterBootRecord(BMessage* settings, BFile* file);
-	virtual status_t RestoreMasterBootRecord(BMessage* settings, BFile* file);
+	bool IsBootMenuInstalled(BMessage* settings);
+	status_t ReadPartitions(BMessage* settings);
+	status_t WriteBootMenu(BMessage* settings);
+	status_t SaveMasterBootRecord(BMessage* settings, BFile* file);
+	status_t RestoreMasterBootRecord(BMessage* settings, BFile* file);
+	status_t GetDisplayText(const char* text, BString& displayText);
 
 private:
+	bool _ConvertToBIOSText(const char* text, BString& biosText);
 	bool _GetBiosDrive(const char* device, int8* drive);
 	status_t _ReadBlocks(int fd, uint8* buffer, size_t size);
 	status_t _WriteBlocks(int fd, const uint8* buffer, size_t size);

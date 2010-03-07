@@ -28,10 +28,14 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
+
+
+#define TR_CONTEXT "BootManagerController"
 
 
 BootManagerController::BootManagerController()
@@ -150,8 +154,9 @@ BootManagerController::_HasSelectedPartitions()
 			return true;
 	}
 
-	BAlert* alert = new BAlert("info", "At least one partition must be "
-		"selected!", "OK");
+	BAlert* alert = new BAlert("info",
+		TR("At least one partition must be selected!"),
+		TR("OK"));
 	alert->Go();
 
 	return false;
@@ -161,9 +166,10 @@ BootManagerController::_HasSelectedPartitions()
 bool
 BootManagerController::_WriteBootMenu()
 {
-		BAlert* alert = new BAlert("confirm", "About to write the boot menu "
-			"to disk. Are you sure you want to continue?", "Write boot menu",
-			"Back", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert("confirm", TR("About to write the boot menu "
+			"to disk. Are you sure you want to continue?"),
+			TR("Write boot menu"),
+			TR("Back"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
 		if (alert->Go() == 1)
 			return false;
@@ -193,11 +199,11 @@ BootManagerController::_RestoreMBR()
 	fSettings.FindString("file", &path);
 
 	BString message;
-	message << "About to restore the Master Boot Record (MBR) of "
-		<< disk << " from " << path << ". "
-		"Do you wish to continue?";
+	message << TR("About to restore the Master Boot Record (MBR) of")
+		<< " " << disk << " " << TR("from") << " " << path << ". " <<
+		TR("Do you wish to continue?");
 	BAlert* alert = new BAlert("confirm", message.String(),
-		"Restore MBR", "Back",
+		TR("Restore MBR"), TR("Back"),
 		NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 	if (alert->Go() == 1)
 		return false;
@@ -222,7 +228,7 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 		case kStateErrorEntry:
 			page = _CreateErrorEntryPage(frame);
 			wizard->SetPreviousButtonHidden(true);
-			wizard->SetNextButtonLabel("Done");
+			wizard->SetNextButtonLabel(TR("Done"));
 			break;
 		case kStateSaveMBR:
 			page = _CreateSaveMBRPage(frame);
@@ -240,21 +246,21 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 			break;
 		case kStateInstallSummary:
 			page = _CreateInstallSummaryPage(frame);
-			wizard->SetNextButtonLabel("Next");
+			wizard->SetNextButtonLabel(TR("Next"));
 			break;
 		case kStateInstalled:
 			page = _CreateInstalledPage(frame);
-			wizard->SetNextButtonLabel("Done");
+			wizard->SetNextButtonLabel(TR("Done"));
 			break;
 		case kStateUninstall:
 			page = _CreateUninstallPage(frame);
 			wizard->SetPreviousButtonHidden(false);
-			wizard->SetNextButtonLabel("Next");
+			wizard->SetNextButtonLabel(TR("Next"));
 			break;
 		case kStateUninstalled:
 			// TODO prevent overwriting MBR after clicking "Previous"
 			page = _CreateUninstalledPage(frame);
-			wizard->SetNextButtonLabel("Done");
+			wizard->SetNextButtonLabel(TR("Done"));
 			break;
 	}
 
@@ -269,14 +275,15 @@ BootManagerController::_CreateErrorEntryPage(BRect frame)
 
 	if (fReadPartitionsStatus == kErrorBootSectorTooSmall)
 		description <<
-			"Partition table not compatible\n\n"
-			"The partition table of the first hard disk is not compatible "
+			TR("Partition table not compatible") << "\n\n" <<
+			TR("The partition table of the first hard disk is not compatible "
 			"with Boot Manager.\n"
-			"Boot Manager needs 2 KB available space before the first partition.";
+			"Boot Manager needs 2 KB available space before the first "
+			"partition.");
 	else
 		description <<
-			"Error reading partition table\n\n"
-			"Boot Manager is unable to read the partition table!";
+			TR("Error reading partition table") << "\n\n" <<
+			TR("Boot Manager is unable to read the partition table!");
 
 	return new DescriptionPage(frame, "errorEntry", description.String(), true);
 }
@@ -290,16 +297,18 @@ BootManagerController::_CreateSaveMBRPage(BRect frame)
 	fSettings.FindString("disk", &disk);
 
 	description <<
-		"Backup Master Boot Record\n\n"
-		"The Master Boot Record (MBR) of the boot device:\n"
-		"\t" << disk << "\n"
+		TR("Backup Master Boot Record") << "\n\n" <<
+		TR("The Master Boot Record (MBR) of the boot device:\n"
+		"\t%s\n"
 		"will now be saved to disk. Please select a file to "
 		"save the MBR into.\n\n"
 		"If something goes wrong with the installation or if "
 		"you later wish to remove the boot menu, simply run the "
-		"bootman program and choose the 'Uninstall' option.";
+		"bootman program and choose the 'Uninstall' option.");
+	description.ReplaceFirst("%s", disk);
 
-	return new FileSelectionPage(&fSettings, frame, "saveMBR", description.String(),
+	return new FileSelectionPage(&fSettings, frame, "saveMBR",
+		description.String(),
 		B_SAVE_PANEL);
 }
 
@@ -313,15 +322,16 @@ BootManagerController::_CreateMBRSavedPage(BRect frame)
 
 	if (fSaveMBRStatus == B_OK) {
 		description <<
-			"Old Master Boot Record saved\n\n"
-			"The old Master Boot Record was successfully save to "
-			<< file << ".\n";
+			TR("Old Master Boot Record saved") << "\n\n" <<
+			TR("The old Master Boot Record was successfully save to %s.") <<
+			"\n";
 	} else {
 		description <<
-			"Old Master Boot Record Saved failure\n\n"
-			"The old Master Boot Record could not be saved to "
-			<< file << ".\n";
+			TR("Old Master Boot Record Saved failure") << "\n\n" <<
+			TR("The old Master Boot Record could not be saved to %s") <<
+			"\n";
 	}
+	description.ReplaceFirst("%s", file);
 
 	return new DescriptionPage(frame, "summary", description.String(), true);
 }
@@ -335,10 +345,11 @@ BootManagerController::_CreateInstallSummaryPage(BRect frame)
 	fSettings.FindString("disk", &disk);
 
 	description <<
-		"Summary\n\n"
-		"About to write the following boot menu to the boot disk "
-		"(" << disk << "). Please verify the information below "
-		"before continuing.\n\n";
+		TR("Summary") << "\n\n" <<
+		TR("About to write the following boot menu to the boot disk "
+		"(%s). Please verify the information below before continuing.") <<
+		"\n\n";
+	description.ReplaceFirst("%s", disk);
 
 	BMessage message;
 	for (int32 i = 0; fSettings.FindMessage("partition", i, &message) == B_OK; i ++) {
@@ -351,7 +362,12 @@ BootManagerController::_CreateInstallSummaryPage(BRect frame)
 		BString path;
 		message.FindString("name", &name);
 		message.FindString("path", &path);
-		description << name << "\t(" << path << ")\n";
+
+		BString displayName;
+		if (fBootDrive->GetDisplayText(name.String(), displayName))
+			description << displayName << "\t(" << path << ")\n";
+		else
+			description << name << "\t(" << path << ")\n";
 	}
 
 	return new DescriptionPage(frame, "summary", description.String(), true);
@@ -361,16 +377,19 @@ BootManagerController::_CreateInstallSummaryPage(BRect frame)
 WizardPageView*
 BootManagerController::_CreateInstalledPage(BRect frame)
 {
-	const char* description;
+	BString description;
 
 	if (fWriteBootMenuStatus == B_OK) {
-		description = "Installation of boot menu completed\n\n"
-		"The boot manager has been successfully installed "
-		"on your system.";
+		description <<
+			TR("Installation of boot menu completed") << "\n\n" <<
+			TR("The boot manager has been successfully installed "
+				"on your system.");
 	} else {
-		description = "Installation of boot menu failed\n\n"
-		"An error occured writing the boot menu. The Master Boot Record "
-		"might be destroyed, you should restore the MBR now!";
+		description <<
+			TR("Installation of boot menu failed") << "\n\n" <<
+			TR("An error occurred writing the boot menu. "
+				"The Master Boot Record might be destroyed, "
+				"you should restore the MBR now!");
 	}
 
 	return new DescriptionPage(frame, "done", description, true);
@@ -383,10 +402,10 @@ BootManagerController::_CreateUninstallPage(BRect frame)
 	BString description;
 
 	description <<
-		"Uninstall boot manager\n\n"
-		"Please locate the Master Boot Record (MBR) save file to "
-		"restore from. This is the file that was created when the "
-		"boot manager was first installed.";
+		TR("Uninstall boot manager") << "\n\n" <<
+		TR("Please locate the Master Boot Record (MBR) save file to "
+			"restore from. This is the file that was created when the "
+			"boot manager was first installed.");
 
 	return new FileSelectionPage(&fSettings, frame, "restoreMBR", description.String(),
 		B_OPEN_PANEL);
@@ -404,14 +423,15 @@ BootManagerController::_CreateUninstalledPage(BRect frame)
 
 	if (fRestoreMBRStatus == B_OK) {
 		description <<
-			"Uninstallation of boot menu completed\n\n"
-			"The Master Boot Record of the boot device "
-			"(" << disk << ") has been successfully restored from "
-			<< file << ".";
+			TR("Uninstallation of boot menu completed") << "\n\n" <<
+			TR("The Master Boot Record of the boot device "
+			"(%s) has been successfully restored from %s.");
+		description.ReplaceFirst("%s", disk);
+		description.ReplaceLast("%s", file);
 	} else {
 		description <<
-			"Uninstallation of boot menu failed\n\n"
-			"The Master Boot Record could not be restored!";
+			TR("Uninstallation of boot menu failed") << "\n\n" <<
+			TR("The Master Boot Record could not be restored!");
 	}
 
 	return new DescriptionPage(frame, "summary", description.String(), true);

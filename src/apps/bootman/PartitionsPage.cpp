@@ -11,6 +11,7 @@
 #include "PartitionsPage.h"
 
 
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <RadioButton.h>
 #include <ScrollView.h>
@@ -21,6 +22,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <String.h>
+
+
+#define TR_CONTEXT "PartitionsPage"
 
 
 const uint32 kMessageShow = 'show';
@@ -92,14 +96,15 @@ PartitionsPage::_BuildUI()
 {
 	BRect rect(Bounds());
 	
-	fDescription = CreateDescription(rect, "description", 
-		"Partitions\n\n"
-		"The following partitions were detected. Please "
+	BString text;
+	text <<
+		TR("Partitions") << "\n\n" <<
+		TR("The following partitions were detected. Please "
 		"check the box next to the partitions to be included "
 		"in the boot menu. You can also set the names of the "
 		"partitions as you would like them to appear in the "
-		"boot menu."
-		);
+		"boot menu.");
+	fDescription = CreateDescription(rect, "description", text);
 	MakeHeading(fDescription);
 	AddChild(fDescription);
 	LayoutDescriptionVertically(fDescription);
@@ -300,9 +305,6 @@ PartitionsPage::_ComputeColumnWidths(int32& showWidth, int32& nameWidth,
 			sizeWidth = width;
 	}
 }
-
-
-static const char kPrefix[] = " KMGTPE";
 
 
 void 

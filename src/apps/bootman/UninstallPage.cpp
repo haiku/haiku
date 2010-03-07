@@ -10,10 +10,14 @@
 #include "UninstallPage.h"
 
 
+#include <Catalog.h>
 #include <RadioButton.h>
 #include <TextView.h>
 
 #include <string.h>
+
+
+#define TR_CONTEXT "UninstallPage"
 
 
 UninstallPage::UninstallPage(BMessage* settings, BRect frame, const char* name)
@@ -44,11 +48,13 @@ UninstallPage::_BuildUI()
 {
 	BRect rect(Bounds());
 	
-	fDescription = CreateDescription(rect, "description", 
-		"Uninstall Boot Manager\n\n"
-		"Please locate the Master Boot Record (MBR) save file to "
+	BString text;
+	text <<
+		TR("Uninstall Boot Manager") << "\n\n" <<
+		TR("Please locate the Master Boot Record (MBR) save file to "
 		"restore from. This is the file that was created when the "
 		"boot manager was first installed.");
+	fDescription = CreateDescription(rect, "description", text);
 	
 	MakeHeading(fDescription);
 	AddChild(fDescription);

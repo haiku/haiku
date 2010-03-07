@@ -11,7 +11,12 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <TextView.h>
+
+
+#define TR_CONTEXT "BootManager"
 
 
 static const char* kSignature = "application/x-vnd.Haiku-bootman";
@@ -24,12 +29,16 @@ public:
 	virtual void ReadyToRun();
 
 	virtual void AboutRequested();
+
+private:
+	BCatalog fCatalog;
 };
 
 
 BootManager::BootManager()
 	: BApplication(kSignature)
 {
+	be_locale->GetAppCatalog(&fCatalog);
 }
 
 
@@ -44,12 +53,13 @@ BootManager::ReadyToRun()
 void
 BootManager::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "Haiku Boot Manager\n\n"
+	BAlert *alert = new BAlert("about",
+		TR("Haiku Boot Manager\n\n"
 		"written by\n"
 		"\tDavid Dengg\n"
 		"\tMichael Pfeiffer\n"
 		"\n"
-		"Copyright 2008-10, Haiku Inc.\n", "OK");
+		"Copyright 2008-10, Haiku Inc.\n"), TR("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 

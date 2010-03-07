@@ -107,5 +107,10 @@ TestBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 }
 
 
+status_t
+TestBootDrive::GetDisplayText(const char* text, BString& displayText)
+{
+	displayText = text;
+}
 
 

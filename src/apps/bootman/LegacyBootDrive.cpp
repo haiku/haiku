@@ -10,6 +10,7 @@
 #include "LegacyBootDrive.h"
 
 
+#include <Catalog.h>
 #include <Drivers.h>
 #include <DiskDevice.h>
 #include <DiskDeviceRoster.h>
@@ -20,6 +21,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <memory>
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,10 +32,12 @@
 #include <DataIO.h>
 #include <File.h>
 #include <String.h>
+#include <UTF8.h>
 
 #include "BootLoader.h"
 
 
+#define TR_CONTEXT "LegacyBootDrive"
 #define USE_SECOND_DISK 0
 #define GET_FIRST_BIOS_DRIVE 1
 
@@ -62,15 +66,18 @@ Buffer::WriteInt8(int8 value)
 bool
 Buffer::WriteInt16(int16 value)
 {
-	return WriteInt8(value & 0xff) && WriteInt8(value >> 8);
+	return WriteInt8(value & 0xff)
+		&& WriteInt8(value >> 8);
 }
 
 
 bool
 Buffer::WriteInt32(int32 value)
 {
-	return WriteInt8(value & 0xff) && WriteInt8(value >> 8) &&
-		WriteInt8(value >> 16) && WriteInt8(value >> 24);
+	return WriteInt8(value & 0xff)
+		&& WriteInt8(value >> 8)
+		&& WriteInt8(value >> 16)
+		&& WriteInt8(value >> 24);
 }
 
 
@@ -85,7 +92,8 @@ bool
 Buffer::WriteString(const char* value)
 {
 	int len = strlen(value) + 1;
-	return WriteInt8(len) && Write(value, len) == len;
+	return WriteInt8(len)
+		&& Write(value, len) == len;
 }
 
 
@@ -180,13 +188,18 @@ PartitionRecorder::_Record(BPartition* partition)
 	const char* name = partition->ContentName();
 	if (name == NULL) {
 		fIndex ++;
-		buffer << "Unnamed " << fIndex; 
+		BString number;
+		number << fIndex;
+		buffer << TR_CMT("Unnamed %d",
+			"Default name of a partition whose name could not be read from "
+			"disk");
+		buffer.ReplaceFirst("%d", number);
 		name = buffer.String();
 	}
 	
 	const char* type = partition->Type();
 	if (type == NULL)
-		type = "Unknown";
+		type = TR("Unknown");
 		
 	BMessage message;
 	// Data as required by BootLoader.h
@@ -280,10 +293,6 @@ LegacyBootDrive::ReadPartitions(BMessage *settings)
 status_t
 LegacyBootDrive::WriteBootMenu(BMessage *settings)
 {
-	printf("WriteBootMenu:\n");
-	// TODO fix crash since AddInt8("drive", ...)
-	// settings->PrintToStream();
-
 	BString path;
 	if (settings->FindString("disk", &path) != B_OK)
 		return B_BAD_VALUE;
@@ -355,7 +364,10 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 		if (!show)
 			continue;
 		
-		newBootLoader.WriteString(name.String());
+		BString biosName;
+		_ConvertToBIOSText(name.String(), biosName);
+
+		newBootLoader.WriteString(biosName.String());
 		newBootLoader.WriteInt8(drive);
 		newBootLoader.WriteInt64(offset / kBlockSize);
 	}	
@@ -466,6 +478,62 @@ LegacyBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 }
 
 
+status_t
+LegacyBootDrive::GetDisplayText(const char* text, BString& displayText)
+{
+	BString biosText;
+	if (!_ConvertToBIOSText(text, biosText)) {
+		displayText = "???";
+		return B_ERROR;
+	}
+
+	// convert back to UTF-8
+	int32 biosTextLength = biosText.Length();
+	int32 bufferLength = strlen(text);
+	char* buffer = displayText.LockBuffer(bufferLength + 1);
+	int32 state = 0;
+	if (convert_to_utf8(B_MS_DOS_CONVERSION,
+		biosText.String(), &biosTextLength,
+		buffer, &bufferLength, &state) != B_OK) {
+		displayText.UnlockBuffer(0);
+		displayText = "???";
+		return B_ERROR;
+	}
+
+	buffer[bufferLength] = '\0';
+	bufferLength ++;
+	displayText.UnlockBuffer(bufferLength);
+	return B_OK;
+}
+
+
+bool
+LegacyBootDrive::_ConvertToBIOSText(const char* text, BString& biosText)
+{
+	// convert text in UTF-8 to 'code page 437'
+	int32 textLength = strlen(text);
+
+	int32 biosTextLength = textLength;
+	char* buffer = biosText.LockBuffer(biosTextLength + 1);
+	if (buffer == NULL) {
+		biosText.UnlockBuffer(0);
+		return false;
+	}
+
+	int32 state = 0;
+	if (convert_from_utf8(B_MS_DOS_CONVERSION, text, &textLength,
+		buffer, &biosTextLength, &state) != B_OK) {
+		biosText.UnlockBuffer(0);
+		return false;
+	}
+
+	buffer[biosTextLength] = '\0';
+	biosTextLength ++;
+	biosText.UnlockBuffer(biosTextLength);
+	return biosTextLength <= kMaxBootMenuItemLength;
+}
+
+
 bool
 LegacyBootDrive::_GetBiosDrive(const char* device, int8* drive)
 {
@@ -487,7 +555,8 @@ status_t
 LegacyBootDrive::_ReadBlocks(int fd, uint8* buffer, size_t size)
 {
 	if (size % kBlockSize != 0) {
-		fprintf(stderr, "_ReadBlocks buffer size must be a multiple of %d\n", (int)kBlockSize);
+		fprintf(stderr, "_ReadBlocks buffer size must be a multiple of %d\n",
+			(int)kBlockSize);
 		return B_BAD_VALUE;
 	}
 	const size_t blocks = size / kBlockSize;
@@ -504,7 +573,8 @@ status_t
 LegacyBootDrive::_WriteBlocks(int fd, const uint8* buffer, size_t size)
 {
 	if (size % kBlockSize != 0) {
-		fprintf(stderr, "_WriteBlocks buffer size must be a multiple of %d\n", (int)kBlockSize);
+		fprintf(stderr, "_WriteBlocks buffer size must be a multiple of %d\n",
+			(int)kBlockSize);
 		return B_BAD_VALUE;
 	}
 	const size_t blocks = size / kBlockSize;
@@ -522,7 +592,8 @@ LegacyBootDrive::_CopyPartitionTable(MasterBootRecord* destination,
 		const MasterBootRecord* source)
 {
 	memcpy(destination->diskSignature, source->diskSignature, 
-		sizeof(source->diskSignature) + sizeof(source->reserved) + sizeof(source->partition));
+		sizeof(source->diskSignature) + sizeof(source->reserved) +
+		sizeof(source->partition));
 }
 
 

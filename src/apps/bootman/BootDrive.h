@@ -40,6 +40,9 @@ public:
 	virtual status_t WriteBootMenu(BMessage* settings) = 0;
 	virtual status_t SaveMasterBootRecord(BMessage* settings, BFile* file) = 0;
 	virtual status_t RestoreMasterBootRecord(BMessage* settings, BFile* file) = 0;
+	// Converts the specified text into a text as it will be shown
+	// in the boot menu.
+	virtual status_t GetDisplayText(const char* text, BString& displayText) = 0;
 };
 
 #endif	// BOOT_DRIVE_H

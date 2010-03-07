@@ -12,6 +12,11 @@
 #include "WizardPageView.h"
 
 #include <Box.h>
+#include <Catalog.h>
+
+
+#define TR_CONTEXT "WizardView"
+
 
 static const float kSeparatorHeight = 2;
 static const float kSeparatorDistance = 5;
@@ -138,13 +143,13 @@ WizardView::_BuildUI()
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(fSeparator);
 	
-	fPrevious = new BButton(BRect(0, 0, 100, 20), "previous", "Previous",
+	fPrevious = new BButton(BRect(0, 0, 100, 20), "previous", TR("Previous"),
 		new BMessage(kMessagePrevious), 
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(fPrevious);
 	fPrevious->ResizeToPreferred();
 	
-	fNext = new BButton(BRect(0, 0, 100, 20), "next", "Next", 
+	fNext = new BButton(BRect(0, 0, 100, 20), "next", TR("Next"),
 		new BMessage(kMessageNext), 
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(fNext);

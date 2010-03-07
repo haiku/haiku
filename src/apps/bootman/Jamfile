@@ -18,6 +18,30 @@ Application bootman :
 	WizardController.cpp
 	WizardPageView.cpp
 	WizardView.cpp
-	: be tracker $(TARGET_LIBSUPC++)
-	: bootman.rdef
+	: 
+	be 
+	textencoding
+	tracker
+	liblocale.so 
+	$(TARGET_LIBSUPC++)
+	: 
+	bootman.rdef
 ;
+
+DoCatalogs bootman :
+	x-vnd.Haiku-bootman
+	:
+	BootManager.cpp
+	BootManagerController.cpp
+	BootManagerWindow.cpp
+	DefaultPartitionPage.cpp
+	EntryPage.cpp
+	FileSelectionPage.cpp
+	LegacyBootDrive.cpp
+	PartitionsPage.cpp
+	UninstallPage.cpp
+	WizardView.cpp
+	:
+	en.catalog
+	:
+	;

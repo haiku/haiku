@@ -21,7 +21,7 @@ WizardController::StateStack::MakeEmpty()
 			next = stack->Next();
 			delete stack;
 			stack = next;
-		} while (next != NULL);						
+		} while (next != NULL);
 }
 
 

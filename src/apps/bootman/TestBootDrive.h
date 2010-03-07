@@ -14,13 +14,14 @@ class TestBootDrive : public BootDrive
 {
 public:
 	TestBootDrive();
-	virtual ~TestBootDrive();
+	~TestBootDrive();
 
-	virtual bool IsBootMenuInstalled(BMessage* settings);
-	virtual status_t ReadPartitions(BMessage* settings);
-	virtual status_t WriteBootMenu(BMessage* settings);
-	virtual status_t SaveMasterBootRecord(BMessage* settings, BFile* file);
-	virtual status_t RestoreMasterBootRecord(BMessage* settings, BFile* file);
+	bool IsBootMenuInstalled(BMessage* settings);
+	status_t ReadPartitions(BMessage* settings);
+	status_t WriteBootMenu(BMessage* settings);
+	status_t SaveMasterBootRecord(BMessage* settings, BFile* file);
+	status_t RestoreMasterBootRecord(BMessage* settings, BFile* file);
+	status_t GetDisplayText(const char* text, BString& displayText);
 };
 
 #endif	// TEST_BOOT_DRIVE_H
