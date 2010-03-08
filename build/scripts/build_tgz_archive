@@ -47,7 +47,7 @@ done
 echo "Building archive $archive ..."
 $rm -f $archive
 contents=$(cd $outputDir; ls)
-tar -C $outputDir -czf $archive $contents || exit 1
+tar -C $outputDir --format ustar -czf $archive $contents || exit 1
 
 # clean up
 $rm -rf $outputDir
