@@ -1,4 +1,5 @@
 #!/bin/sh
+set -o errexit
 
 if [ $# -lt 2 ]; then
 	echo "Usage: $0 <archive> <scripts> ..."
@@ -34,7 +35,7 @@ rm=rm
 
 # clear output dir
 $rm -rf $outputDir
-$mkdir $outputDir
+$mkdir -p $outputDir
 
 # populate output dir
 echo "Preparing contents of archive $archive ..."
@@ -47,7 +48,7 @@ done
 echo "Building archive $archive ..."
 $rm -f $archive
 contents=$(cd $outputDir; ls)
-tar -C $outputDir --format ustar -czf $archive $contents || exit 1
+tar -C $outputDir --format ustar -czf $archive $contents
 
 # clean up
 $rm -rf $outputDir

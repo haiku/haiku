@@ -1,4 +1,5 @@
 #!/bin/sh
+set -o errexit
 
 # The first argument is the shell script that initializes the variables:
 # sourceDir
