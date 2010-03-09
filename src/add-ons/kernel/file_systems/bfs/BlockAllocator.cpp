@@ -1374,13 +1374,13 @@ BlockAllocator::CheckNextNode(check_control* control)
 			fTarget(userTarget)
 		{
 		}
-		
+
 		~CopyControlOnExit()
 		{
 			if (fTarget != NULL)
 				user_memcpy(fTarget, fSource, sizeof(check_control));
 		}
-	
+
 	private:
 		check_control*	fSource;
 		check_control*	fTarget;
@@ -1451,8 +1451,8 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 		status_t status = fCheckCookie->iterator->GetNextEntry(name, &length,
 			B_FILE_NAME_LENGTH, &id);
-		if (status == B_ENTRY_NOT_FOUND) {
-			// there are no more entries in this iterator, free it and go on
+		if (status != B_OK) {
+			// we no longer need this iterator
 			delete fCheckCookie->iterator;
 			fCheckCookie->iterator = NULL;
 
@@ -1460,8 +1460,18 @@ BlockAllocator::CheckNextNode(check_control* control)
 			put_vnode(fVolume->FSVolume(),
 				fVolume->ToVnode(fCheckCookie->current));
 
-			continue;
-		} else if (status == B_OK) {
+			if (status == B_ENTRY_NOT_FOUND) {
+				// We iterated over all entries already, just go on to the next
+				continue;
+			}
+
+			// Iterating over the B+tree failed - we let the checkfs run
+			// fail completely, as we would delete all files we cannot
+			// access.
+			// TODO: maybe have a force parameter that actually does that.
+			// TODO: we also need to be able to repair broken B+trees!
+			return status;
+		} else {
 			// ignore "." and ".." entries
 			if (!strcmp(name, ".") || !strcmp(name, ".."))
 				continue;
