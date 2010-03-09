@@ -8,7 +8,7 @@ Filename: %s	file:ZipOMaticWindow.cpp		Имя файла: %s
 Let them continue	file:ZipOMatic.cpp		Позволить им продолжить
 Do you want to stop them?	file:ZipOMatic.cpp		Вы хотите остановить их?
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Вы уверены, что хотите остановить создание этого архива?
-%ld files added.	file:ZipOMaticWindow.cpp		Добавлено файлов :%ld
+%ld files added.	file:ZipOMaticWindow.cpp		Добавлено файлов: %ld
 Stopped	file:ZipOMaticWindow.cpp		Остановлено
 Archive	file:ZipperThread.cpp		Архив
 Drop files to zip.	file:ZipOMaticWindow.cpp		Перетащите файлы для сжатия в zip

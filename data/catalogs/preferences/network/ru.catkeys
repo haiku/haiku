@@ -11,7 +11,7 @@ Network	NetworkWindow		Сеть
 Adapter:	EthernetSettingsView		Адаптер:
 Revert	EthernetSettingsView		Вернуть
 Sending auto-config message failed: 	EthernetSettingsView		Не удалось отправить запрос автонастройки:
-Mode:	EthernetSettingsView		Режим:
+Mode:	EthernetSettingsView		Тип:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		net_server должен быть запущен для автонастройки!
 Auto-configuring failed: 	EthernetSettingsView		Не удалось выполнить автонастройку:
 Static	EthernetSettingsView		Статический
