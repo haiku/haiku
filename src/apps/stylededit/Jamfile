@@ -22,8 +22,8 @@ Application StyledEdit :
 
 DoCatalogs StyledEdit :
 	x-vnd.Haiku-StyledEdit
-	: pt.catkeys
-		FindWindow.cpp
+	:
+	FindWindow.cpp
 	ReplaceWindow.cpp
 	StyledEditApp.cpp
 	StyledEditWindow.cpp

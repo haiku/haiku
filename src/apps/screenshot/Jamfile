@@ -14,8 +14,8 @@ Application Screenshot :
 
 DoCatalogs Screenshot :
 	x-vnd.Haiku-Screenshot
-	: pt.catkeys
+	:
 		ScreenshotWindow.cpp
 	: en.catalog
-	: pt.catkeys
+	: pt.catkeys pt_br.catkeys uk.catkeys es.catkeys
 	;
