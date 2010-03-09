@@ -600,33 +600,36 @@ BLocaleRoster::LoadCatalog(const char *signature, const char *language,
 		const char *lang;
 		for (int32 l=0; languages.FindString("language", l, &lang)==B_OK; ++l) {
 			catalog = info->fInstantiateFunc(signature, lang, fingerprint);
-			if (catalog) {
+			if (catalog)
 				info->fLoadedCatalogs.AddItem(catalog);
-				// Chain-load catalogs for languages that depend on
-				// other languages.
-				// The current implementation uses the filename in order to
-				// detect dependencies (parenthood) between languages (it
-				// traverses from "english-british-oxford" to "english-british"
-				// to "english"):
-				// TODO :use ICU facilities instead, so we can handle more
-				// complex things such as fr_FR@euro, or whatever, encodings
-				// and so on.
-				int32 pos;
-				BString langName(lang);
-				BCatalogAddOn *currCatalog=catalog, *nextCatalog;
-				while ((pos = langName.FindLast('-')) >= 0) {
-					// language is based on parent, so we load that, too:
-					langName.Truncate(pos);
-					nextCatalog = info->fInstantiateFunc(signature,
-						langName.String(), fingerprint);
-					if (nextCatalog) {
-						info->fLoadedCatalogs.AddItem(nextCatalog);
+			// Chain-load catalogs for languages that depend on
+			// other languages.
+			// The current implementation uses the filename in order to
+			// detect dependencies (parenthood) between languages (it
+			// traverses from "english-british-oxford" to "english-british"
+			// to "english"):
+			// TODO :use ICU facilities instead, so we can handle more
+			// complex things such as fr_FR@euro, or whatever, encodings
+			// and so on.
+			int32 pos;
+			BString langName(lang);
+			BCatalogAddOn *currCatalog=catalog, *nextCatalog;
+			while ((pos = langName.FindLast('_')) >= 0) {
+				// language is based on parent, so we load that, too:
+				// (even if the parent catalog was not found)
+				langName.Truncate(pos);
+				nextCatalog = info->fInstantiateFunc(signature,
+					langName.String(), fingerprint);
+				if (nextCatalog) {
+					info->fLoadedCatalogs.AddItem(nextCatalog);
+					if(currCatalog)
 						currCatalog->fNext = nextCatalog;
-						currCatalog = nextCatalog;
-					}
+					else
+						catalog = nextCatalog;
+					currCatalog = nextCatalog;
 				}
-				return catalog;
 			}
+			return catalog;
 		}
 		info->UnloadIfPossible();
 	}
