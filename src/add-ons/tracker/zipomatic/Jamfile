@@ -20,8 +20,8 @@ DoCatalogs ZipOMatic-Z :
 	ZipOMaticWindow.cpp
 	ZipperThread.cpp
 	: en.catalog
-	: de.catkeys eo.catkeys es.catkeys fr.catkeys hu.catkeys it.catkeys
-	  ja.catkeys lt.catkeys nb.catkeys nl.catkeys pl.catkeys pt.catkeys pt_br.catkeys
+	: br.catkeys de.catkeys eo.catkeys es.catkeys fr.catkeys hu.catkeys
+	  it.catkeys ja.catkeys lt.catkeys nb.catkeys nl.catkeys pl.catkeys pt.catkeys
 	  ru.catkeys sv.catkeys uk.catkeys
 	;
 

@@ -1,0 +1,7 @@
+1	spanish	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
+Desktop (Live-CD)	BootPromptWindow		Escritorio (Live-CD)
+Language	BootPromptWindow		Idioma
+Welcome to Haiku!	BootPromptWindow		¡Bienvenido a Haiku!
+Run Installer	BootPromptWindow		Ejecutar instalación
+Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		¿Desea iniciar el Instalador o continuar iniciando el Escritorio? También se pueden seleccionar el idioma y la distribución de teclado preferidos en la lista de abajo.\n\nNota: La traducción de las aplicaciones de Haiku y otros componentes es un trabajo en curso. Con frecuencia puede encontrar cadenas sin traducir, pero si lo desea, puede unirse y colaborar en <www.haiku-os.org>.
+Keymap	BootPromptWindow		Distribución de teclado
