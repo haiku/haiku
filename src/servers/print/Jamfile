@@ -38,6 +38,5 @@ DoCatalogs print_server :
 	PrintServerApp.R5.cpp
 	: 
 	en.catalog
-	:
-	de.catkeys
+	: de.catkeys pt.catkeys
 	;

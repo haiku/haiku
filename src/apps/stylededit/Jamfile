@@ -22,11 +22,11 @@ Application StyledEdit :
 
 DoCatalogs StyledEdit :
 	x-vnd.Haiku-StyledEdit
-	:
-	FindWindow.cpp
+	: pt.catkeys
+		FindWindow.cpp
 	ReplaceWindow.cpp
 	StyledEditApp.cpp
 	StyledEditWindow.cpp
 	: en.catalog
-	:
-;
+	: pt.catkeys
+	;

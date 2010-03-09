@@ -29,7 +29,6 @@ DoCatalogs Printers :
 	PrintersWindow.cpp
 	: 
 	en.catalog
-	: 
-	de.catkeys ja.catkeys
+	: de.catkeys ja.catkeys pt.catkeys
 	;
 	
