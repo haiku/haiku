@@ -30,7 +30,7 @@ Application bootman :
 
 DoCatalogs bootman :
 	x-vnd.Haiku-bootman
-	: es.catkeys
+	: de.catkeys
 	BootManager.cpp
 	BootManagerController.cpp
 	BootManagerWindow.cpp
@@ -41,7 +41,7 @@ DoCatalogs bootman :
 	PartitionsPage.cpp
 	UninstallPage.cpp
 	WizardView.cpp
-	: es.catkeys
+	: de.catkeys
 	en.catalog
-	: es.catkeys
+	: de.catkeys
 	;
