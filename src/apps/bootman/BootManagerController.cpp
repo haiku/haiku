@@ -259,12 +259,12 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 		case kStateUninstall:
 			page = _CreateUninstallPage(frame);
 			wizard->SetPreviousButtonHidden(false);
-			wizard->SetNextButtonLabel(TR("Next"));
+			wizard->SetNextButtonLabel(TR_CMT("Next", "Button"));
 			break;
 		case kStateUninstalled:
 			// TODO prevent overwriting MBR after clicking "Previous"
 			page = _CreateUninstalledPage(frame);
-			wizard->SetNextButtonLabel(TR("Done"));
+			wizard->SetNextButtonLabel(TR_CMT("Done", "Button"));
 			break;
 	}
 
