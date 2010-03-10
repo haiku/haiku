@@ -180,6 +180,40 @@ remove_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
 }
 
 
+bool
+get_free_address_range(addr_range *ranges, uint32 numRanges, addr_t base,
+	size_t size, addr_t *_rangeBase)
+{
+	addr_t end = base + size - 1;
+	if (end < base)
+		return false;
+
+	// Note: We don't assume that the ranges are sorted, so we can't do this
+	// in a simple loop. Instead we restart the loop whenever our range
+	// intersects with an existing one.
+
+	for (uint32 i = 0; i < numRanges;) {
+		addr_t rangeStart = ranges[i].start;
+		addr_t rangeEnd = ranges[i].start + ranges[i].size - 1;
+
+		if (base <= rangeEnd && rangeStart <= end) {
+			base = rangeEnd + 1;
+			end = rangeEnd + size;
+			if (base == 0 || end < base)
+				return false;
+
+			i = 0;
+			continue;
+		}
+
+		i++;
+	}
+
+	*_rangeBase = base;
+	return true;
+}
+
+
 status_t
 insert_physical_memory_range(addr_t start, uint32 size)
 {
