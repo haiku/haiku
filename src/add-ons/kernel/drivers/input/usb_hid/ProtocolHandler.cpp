@@ -63,35 +63,40 @@ ProtocolHandler::AddHandlers(HIDDevice *device, ProtocolHandler ***handlerList,
 {
 	TRACE("adding protocol handlers\n");
 
-	uint32 count = 3;
-	ProtocolHandler *handlers[count];
-	handlers[0] = KeyboardDevice::AddHandler(device);
-	handlers[1] = MouseDevice::AddHandler(device);
-	handlers[2] = NULL; //GenericDevice::AddHandler(device);
+	HIDParser *parser = device->Parser();
+	uint32 reportCount = parser->CountReports(HID_REPORT_TYPE_INPUT);
 
 	*handlerCount = 0;
-	uint32 actualCount = 0;
-	for (uint32 i = 0; i < count; i++) {
-		if (handlers[i] != NULL)
-			actualCount++;
-	}
-
-	if (actualCount == 0) {
-		TRACE_ALWAYS("no handlers for hid device\n");
-		return;
-	}
-
 	*handlerList = (ProtocolHandler **)malloc(sizeof(ProtocolHandler *)
-		* actualCount);
+		* reportCount * 2 /* handler type count */);
 	if (*handlerList == NULL) {
 		TRACE_ALWAYS("out of memory allocating handler list\n");
 		return;
 	}
 
-	for (uint32 i = 0; i < count; i++) {
-		if (handlers[i] != NULL)
-			(*handlerList)[(*handlerCount)++] = handlers[i];
+	uint32 usedCount = 0;
+	ProtocolHandler *handler = NULL;
+	for (uint32  i = 0; i < reportCount; i++) {
+		HIDReport *report = parser->ReportAt(HID_REPORT_TYPE_INPUT, i);
+
+		handler = KeyboardDevice::AddHandler(device, report);
+		if (handler != NULL)
+			(*handlerList)[usedCount++] = handler;
+		handler = MouseDevice::AddHandler(device, report);
+		if (handler != NULL)
+			(*handlerList)[usedCount++] = handler;
 	}
+
+	if (usedCount == 0) {
+		TRACE_ALWAYS("no handlers for hid device\n");
+		return;
+	}
+
+	*handlerCount = usedCount;
+	ProtocolHandler **shrunkList = (ProtocolHandler **)realloc(
+		*handlerList, sizeof(ProtocolHandler *) * usedCount);
+	if (shrunkList != NULL)
+		*handlerList = shrunkList;
 
 	TRACE("added %ld handlers for hid device\n", *handlerCount);
 }

@@ -87,6 +87,8 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 
 	TRACE("keyboard device with %lu keys and %lu modifiers\n", fKeyCount,
 		fModifierCount);
+	TRACE("input report: %u; output report: %u\n", inputReport->ID(),
+		outputReport != NULL ? outputReport->ID() : 255);
 
 	fLastKeys = (uint16 *)malloc(fKeyCount * 2 * sizeof(uint16));
 	fCurrentKeys = &fLastKeys[fKeyCount];
@@ -143,55 +145,46 @@ KeyboardDevice::~KeyboardDevice()
 
 
 ProtocolHandler *
-KeyboardDevice::AddHandler(HIDDevice *device)
+KeyboardDevice::AddHandler(HIDDevice *device, HIDReport *input)
 {
-	HIDParser *parser = device->Parser();
-
-	// try to find the keyboard usage in any input report
-	HIDReport *input = NULL;
+	bool mayHaveOutput = false;
 	bool foundKeyboardUsage = false;
-	uint32 reportCount = parser->CountReports(HID_REPORT_TYPE_INPUT);
-	for (uint32  i = 0; i < reportCount; i++) {
-		input = parser->ReportAt(HID_REPORT_TYPE_INPUT, i);
-
-		for (uint32 j = 0; j < input->CountItems(); j++) {
-			HIDReportItem *item = input->ItemAt(j);
-			if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
-				|| (item->UsagePage() == HID_USAGE_PAGE_CONSUMER
-					&& item->Array())
-				|| (item->UsagePage() == HID_USAGE_PAGE_BUTTON
-					&& item->Array())) {
-				// found at least one item with a keyboard usage or with
-				// a consumer/button usage that is handled like a key
-				foundKeyboardUsage = true;
-				break;
-			}
-		}
-
-		if (foundKeyboardUsage)
+	for (uint32 i = 0; i < input->CountItems(); i++) {
+		HIDReportItem *item = input->ItemAt(i);
+		if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
+			|| (item->UsagePage() == HID_USAGE_PAGE_CONSUMER && item->Array())
+			|| (item->UsagePage() == HID_USAGE_PAGE_BUTTON && item->Array())) {
+			// found at least one item with a keyboard usage or with
+			// a consumer/button usage that is handled like a key
+			mayHaveOutput = item->UsagePage() == HID_USAGE_PAGE_KEYBOARD;
+			foundKeyboardUsage = true;
 			break;
+		}
 	}
 
 	if (!foundKeyboardUsage)
 		return NULL;
 
-	// try to find the led output report
 	HIDReport *output = NULL;
 	bool foundOutputReport = false;
-	reportCount = parser->CountReports(HID_REPORT_TYPE_OUTPUT);
-	for (uint32  i = 0; i < reportCount; i++) {
-		output = parser->ReportAt(HID_REPORT_TYPE_OUTPUT, i);
+	if (mayHaveOutput) {
+		// try to find the led output report
+		HIDParser *parser = device->Parser();
+		uint32 reportCount = parser->CountReports(HID_REPORT_TYPE_OUTPUT);
+		for (uint32  i = 0; i < reportCount; i++) {
+			output = parser->ReportAt(HID_REPORT_TYPE_OUTPUT, i);
 
-		for (uint32 j = 0; j < output->CountItems(); j++) {
-			HIDReportItem *item = output->ItemAt(j);
-			if (item->UsagePage() == HID_USAGE_PAGE_LED) {
-				foundOutputReport = true;
-				break;
+			for (uint32 j = 0; j < output->CountItems(); j++) {
+				HIDReportItem *item = output->ItemAt(j);
+				if (item->UsagePage() == HID_USAGE_PAGE_LED) {
+					foundOutputReport = true;
+					break;
+				}
 			}
-		}
 
-		if (foundOutputReport)
-			break;
+			if (foundOutputReport)
+				break;
+		}
 	}
 
 	return new(std::nothrow) KeyboardDevice(input,

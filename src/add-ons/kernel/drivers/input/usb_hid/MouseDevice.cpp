@@ -47,31 +47,25 @@ MouseDevice::MouseDevice(HIDReport *report, HIDReportItem *xAxis,
 
 	fWheel = report->FindItem(HID_USAGE_PAGE_GENERIC_DESKTOP,
 		HID_USAGE_ID_WHEEL);
+
+	TRACE("mouse device with %lu buttons and %swheel\n", buttonCount,
+		fWheel == NULL ? "no " : "");
+	TRACE("report id: %u\n", report->ID());
 }
 
 
 ProtocolHandler *
-MouseDevice::AddHandler(HIDDevice *device)
+MouseDevice::AddHandler(HIDDevice *device, HIDReport *report)
 {
-	HIDParser *parser = device->Parser();
-
 	// try to find at least an x and y axis
-	HIDReport *report = NULL;
-	HIDReportItem *xAxis = NULL;
-	HIDReportItem *yAxis = NULL;
-	uint32 reportCount = parser->CountReports(HID_REPORT_TYPE_INPUT);
-	for (uint32 i = 0; i < reportCount; i++) {
-		report = parser->ReportAt(HID_REPORT_TYPE_INPUT, i);
-		xAxis = report->FindItem(HID_USAGE_PAGE_GENERIC_DESKTOP,
-			HID_USAGE_ID_X);
-		yAxis = report->FindItem(HID_USAGE_PAGE_GENERIC_DESKTOP,
-			HID_USAGE_ID_Y);
+	HIDReportItem *xAxis = report->FindItem(HID_USAGE_PAGE_GENERIC_DESKTOP,
+		HID_USAGE_ID_X);
+	if (xAxis == NULL)
+		return NULL;
 
-		if (xAxis != NULL && yAxis != NULL)
-			break;
-	}
-
-	if (xAxis == NULL || yAxis == NULL)
+	HIDReportItem *yAxis = report->FindItem(HID_USAGE_PAGE_GENERIC_DESKTOP,
+		HID_USAGE_ID_Y);
+	if (yAxis == NULL)
 		return NULL;
 
 	return new(std::nothrow) MouseDevice(report, xAxis, yAxis);

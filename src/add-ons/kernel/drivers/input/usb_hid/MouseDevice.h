@@ -20,7 +20,8 @@ public:
 								MouseDevice(HIDReport *report,
 									HIDReportItem *xAxis, HIDReportItem *yAxis);
 
-static	ProtocolHandler *		AddHandler(HIDDevice *device);
+static	ProtocolHandler *		AddHandler(HIDDevice *device,
+									HIDReport *report);
 
 virtual	status_t				Control(uint32 op, void *buffer, size_t length);
 

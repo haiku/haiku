@@ -19,7 +19,8 @@ public:
 									HIDReport *outputReport);
 virtual							~KeyboardDevice();
 
-static	ProtocolHandler *		AddHandler(HIDDevice *device);
+static	ProtocolHandler *		AddHandler(HIDDevice *device,
+									HIDReport *input);
 
 virtual	status_t				Open(uint32 flags);
 virtual	status_t				Control(uint32 op, void *buffer, size_t length);
