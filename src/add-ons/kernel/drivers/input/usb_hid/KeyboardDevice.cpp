@@ -151,6 +151,9 @@ KeyboardDevice::AddHandler(HIDDevice *device, HIDReport *input)
 	bool foundKeyboardUsage = false;
 	for (uint32 i = 0; i < input->CountItems(); i++) {
 		HIDReportItem *item = input->ItemAt(i);
+		if (!item->HasData())
+			continue;
+
 		if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
 			|| (item->UsagePage() == HID_USAGE_PAGE_CONSUMER && item->Array())
 			|| (item->UsagePage() == HID_USAGE_PAGE_BUTTON && item->Array())) {
