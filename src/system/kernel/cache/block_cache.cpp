@@ -1586,6 +1586,10 @@ block_cache::_GetUnusedBlock()
 		if (block->original_data != NULL)
 			Free(block->original_data);
 
+#if BLOCK_CACHE_DEBUG_CHANGED
+		if (block->compare != NULL)
+			Free(block->compare);
+#endif
 		return block;
 	}
 
@@ -1809,6 +1813,12 @@ retry:
 		goto retry;
 	}
 
+	if (block->unused) {
+		//TRACE(("remove block %Ld from unused\n", blockNumber));
+		block->unused = false;
+		cache->unused_blocks.Remove(block);
+	}
+
 	if (*_allocated && readBlock) {
 		// read block into cache
 		int32 blockSize = cache->block_size;
@@ -1831,12 +1841,6 @@ retry:
 		TB(Read(cache, block));
 
 		mark_block_unbusy_reading(cache, block);
-	}
-
-	if (block->unused) {
-		//TRACE(("remove block %Ld from unused\n", blockNumber));
-		block->unused = false;
-		cache->unused_blocks.Remove(block);
 	}
 
 	block->ref_count++;
