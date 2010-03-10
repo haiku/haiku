@@ -111,10 +111,19 @@ get_next_virtual_address(size_t size)
 static addr_t
 get_next_physical_address(size_t size)
 {
-	addr_t address = sNextPhysicalAddress;
-	sNextPhysicalAddress += size;
+	addr_t base;
+	if (!get_free_address_range(gKernelArgs.physical_allocated_range,
+			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalAddress,
+			size, &base)) {
+		panic("Out of physical memory!");
+		return 0;
+	}
 
-	return address;
+	insert_physical_allocated_range(base, size);
+	sNextPhysicalAddress = base + size;
+		// TODO: Can overflow theoretically.
+
+	return base;
 }
 
 
@@ -558,10 +567,6 @@ mmu_init_for_kernel(void)
 		TRACE("gdt at virtual address %p\n",
 			(void*)gKernelArgs.arch_args.vir_gdt);
 	}
-
-	// save the memory we've physically allocated
-	gKernelArgs.physical_allocated_range[0].size
-		= sNextPhysicalAddress - gKernelArgs.physical_allocated_range[0].start;
 
 	// Save the memory we've virtually allocated (for the kernel and other
 	// stuff)
