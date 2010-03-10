@@ -95,7 +95,7 @@ DefaultPartitionPage::_BuildUI()
 	
 	BString text;
 	text <<
-		TR("Default Partition") << "\n\n" <<
+		TR_CMT("Default Partition", "Title") << "\n\n" <<
 		TR("Please specify a default partition and a timeout.\n"
 		"The boot menu will load the default partition after "
 		"the timeout unless you select another partition. You "
@@ -110,7 +110,7 @@ DefaultPartitionPage::_BuildUI()
 	
 	BPopUpMenu* popUpMenu = _CreatePopUpMenu();	
 	fDefaultPartition = new BMenuField(rect, "partitions",
-		TR("Default Partition:"), popUpMenu);
+		TR_CMT("Default Partition:", "Menu field label"), popUpMenu);
 	float divider = be_plain_font->StringWidth(fDefaultPartition->Label()) + 3;
 	fDefaultPartition->SetDivider(divider);
 	AddChild(fDefaultPartition);
@@ -141,9 +141,11 @@ DefaultPartitionPage::_CreatePopUpMenu()
 	BMenuItem* selectedItem = NULL;
 	int32 selectedItemIndex = 0;
 	
-	BPopUpMenu* menu = new BPopUpMenu(TR("Partitions"));
+	BPopUpMenu* menu = new BPopUpMenu(TR_CMT("Partitions",
+		"Pop up menu title"));
 	BMessage message;
-	for (int32 i = 0; fSettings->FindMessage("partition", i, &message) == B_OK; i ++) {
+	for (int32 i = 0; fSettings->FindMessage("partition", i, &message) == B_OK;
+		i ++) {
 		
 		bool show;
 		if (message.FindBool("show", &show) != B_OK || !show)

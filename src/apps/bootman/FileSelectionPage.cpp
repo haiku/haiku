@@ -102,12 +102,13 @@ FileSelectionPage::_BuildUI(const char* description)
 	fSettings->FindString("file", &file);
 	
 	// TODO align text and button 
-	fFile = new BTextControl(rect, "file", TR("File:"), file.String(),
-		new BMessage());
+	fFile = new BTextControl(rect, "file",
+		TR_CMT("File:", "Text control label"),
+		file.String(), new BMessage());
 	fFile->SetDivider(be_plain_font->StringWidth(fFile->Label()) + 5);
 	AddChild(fFile);
 	
-	fSelect = new BButton(rect, "select", TR("Select"),
+	fSelect = new BButton(rect, "select", TR_CMT("Select", "Button"),
 		new BMessage(kMsgOpenFilePanel),
 		B_FOLLOW_RIGHT);
 	fSelect->ResizeToPreferred();

@@ -98,7 +98,7 @@ PartitionsPage::_BuildUI()
 	
 	BString text;
 	text <<
-		TR("Partitions") << "\n\n" <<
+		TR_CMT("Partitions", "Title") << "\n\n" <<
 		TR("The following partitions were detected. Please "
 		"check the box next to the partitions to be included "
 		"in the boot menu. You can also set the names of the "

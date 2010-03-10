@@ -27,7 +27,8 @@
 
 
 BootManagerWindow::BootManagerWindow()
-	: BWindow(BRect(100, 100, 500, 400), TR("Boot Manager"), B_TITLED_WINDOW,
+	: BWindow(BRect(100, 100, 500, 400), TR_CMT("Boot Manager", "Window Title"),
+		B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	float minWidth, maxWidth, minHeight, maxHeight;

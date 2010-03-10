@@ -50,7 +50,7 @@ UninstallPage::_BuildUI()
 	
 	BString text;
 	text <<
-		TR("Uninstall Boot Manager") << "\n\n" <<
+		TR_CMT("Uninstall Boot Manager", "Title") << "\n\n" <<
 		TR("Please locate the Master Boot Record (MBR) save file to "
 		"restore from. This is the file that was created when the "
 		"boot manager was first installed.");

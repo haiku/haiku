@@ -143,13 +143,14 @@ WizardView::_BuildUI()
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(fSeparator);
 	
-	fPrevious = new BButton(BRect(0, 0, 100, 20), "previous", TR("Previous"),
+	fPrevious = new BButton(BRect(0, 0, 100, 20), "previous",
+		TR_CMT("Previous", "Button"),
 		new BMessage(kMessagePrevious), 
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(fPrevious);
 	fPrevious->ResizeToPreferred();
 	
-	fNext = new BButton(BRect(0, 0, 100, 20), "next", TR("Next"),
+	fNext = new BButton(BRect(0, 0, 100, 20), "next", TR_CMT("Next", "Button"),
 		new BMessage(kMessageNext), 
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(fNext);
