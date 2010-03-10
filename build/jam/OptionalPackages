@@ -941,8 +941,8 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package SQLite available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage sqlite-3.6.17-r1a1-x86-gcc2-2009-08-30.zip
-			: $(baseURL)/sqlite-3.6.17-r1a1-x86-gcc2-2009-08-30.zip
+		InstallOptionalHaikuImagePackage sqlite-3.6.22-x86-gcc2-2010-03-09.zip
+			: $(baseURL)/sqlite-3.6.22-x86-gcc2-2010-03-09.zip
 			:
 			: true
 		;
