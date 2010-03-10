@@ -79,6 +79,7 @@ const uint32 kSortRunningApps = 'SAps';
 const uint32 kSuperExpando = 'SprE';
 const uint32 kExpandNewTeams = 'ExTm';
 const uint32 kAutoRaise = 'AtRs';
+const uint32 kRestartTracker = 'TRAK';
 
 // from roster_private.h
 const uint32 kShutdownSystem = 301;

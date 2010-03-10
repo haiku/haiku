@@ -507,6 +507,13 @@ TBarApp::MessageReceived(BMessage* message)
 			run_be_about();
 			break;
 
+		case kRestartTracker:
+		{
+			BRoster roster;
+			roster.Launch(kTrackerSignature);
+			break;
+		}
+
 		default:
 			BApplication::MessageReceived(message);
 			break;

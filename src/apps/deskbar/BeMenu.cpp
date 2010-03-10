@@ -48,6 +48,7 @@ All rights reserved.
 #include "PublicCommands.h"
 #include "RecentItems.h"
 #include "StatusView.h"
+#include "tracker_private.h"
 
 #define ROSTER_SIG "application/x-vnd.Be-ROST"
 
@@ -222,7 +223,15 @@ TBeMenu::AddStandardBeMenuItems()
 	if (fBarView)
 		dragging = fBarView->Dragging();
 
-	BMenuItem* item = new BMenuItem(
+	BMenuItem* item;
+	BRoster roster;
+	if (!roster.IsRunning(kTrackerSignature)) {
+		item = new BMenuItem("Restart Tracker", new BMessage(kRestartTracker));
+		AddItem(item);
+		AddSeparatorItem();
+	}
+
+	item = new BMenuItem(
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
 	"About Haiku"
 #else
