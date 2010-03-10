@@ -303,6 +303,16 @@ BGLView::SetResizingMode(uint32 mode)
 
 
 void
+BGLView::GetPreferredSize(float* _width, float* _height)
+{
+	if (_width)
+		*_width = 0;
+	if (_height)
+		*_height = 0;
+}
+
+
+void
 BGLView::Show()
 {
 	BView::Show();

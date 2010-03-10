@@ -79,6 +79,9 @@ virtual status_t    GetSupportedSuites(BMessage *data);
 			void	EnableDirectMode(bool enabled);
 
 			void*	getGC()	{ return fGc; } // ???
+			
+	virtual void	GetPreferredSize(float* width, float* height);
+	
 private:
 
 	virtual void	_ReservedGLView1();
