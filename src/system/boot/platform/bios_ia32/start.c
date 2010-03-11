@@ -4,24 +4,26 @@
  */
 
 
-#include "serial.h"
-#include "console.h"
-#include "apm.h"
-#include "cpu.h"
-#include "mmu.h"
-#include "smp.h"
-#include "acpi.h"
-#include "keyboard.h"
-#include "bios.h"
-#include "multiboot.h"
+#include <string.h>
 
 #include <KernelExport.h>
+
+#include <arch/cpu.h>
 #include <boot/platform.h>
 #include <boot/heap.h>
 #include <boot/stage2.h>
-#include <arch/cpu.h>
 
-#include <string.h>
+#include "acpi.h"
+#include "apm.h"
+#include "bios.h"
+#include "console.h"
+#include "cpu.h"
+#include "debug.h"
+#include "keyboard.h"
+#include "mmu.h"
+#include "multiboot.h"
+#include "serial.h"
+#include "smp.h"
 
 
 #define HEAP_SIZE (128 * 1024)
@@ -79,7 +81,7 @@ platform_start_kernel(void)
 		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
 	smp_init_other_cpus();
-	serial_cleanup();
+	debug_cleanup();
 	mmu_init_for_kernel();
 	smp_boot_other_cpus();
 
@@ -128,6 +130,7 @@ _start(void)
 	console_init();
 	cpu_init();
 	mmu_init();
+	debug_init_post_mmu();
 	parse_multiboot_commandline(&args);
 
 	// reading the keyboard doesn't seem to work in graphics mode

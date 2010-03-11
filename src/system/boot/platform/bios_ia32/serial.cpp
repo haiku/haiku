@@ -34,10 +34,6 @@ static const uint32 kSerialBaudRate = 115200;
 static int32 sSerialEnabled = 0;
 static uint16 sSerialBasePort = 0x3f8;
 
-static char sBuffer[16384];
-static uint32 sBufferPosition;
-
-
 static void
 serial_putc(char c)
 {
@@ -54,11 +50,6 @@ serial_puts(const char* string, size_t size)
 {
 	if (sSerialEnabled <= 0)
 		return;
-
-	if (sBufferPosition + size < sizeof(sBuffer)) {
-		memcpy(sBuffer + sBufferPosition, string, size);
-		sBufferPosition += size;
-	}
 
 	while (size-- != 0) {
 		char c = string[0];
@@ -93,20 +84,6 @@ serial_enable(void)
 
 
 extern "C" void
-serial_cleanup(void)
-{
-	if (sSerialEnabled <= 0)
-		return;
-
-	gKernelArgs.debug_output = kernel_args_malloc(sBufferPosition);
-	if (gKernelArgs.debug_output != NULL) {
-		memcpy(gKernelArgs.debug_output, sBuffer, sBufferPosition);
-		gKernelArgs.debug_size = sBufferPosition;
-	}
-}
-
-
-extern "C" void
 serial_init(void)
 {
 	// copy the base ports of the optional 4 serial ports to the kernel args
@@ -133,4 +110,3 @@ serial_init(void)
 	serial_enable();
 #endif
 }
-

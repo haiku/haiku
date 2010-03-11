@@ -17,7 +17,7 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-local genericPlatformSources = 
+local genericPlatformSources =
 	text_menu.cpp
 	video_blit.cpp
 	video_splash.cpp
@@ -27,7 +27,7 @@ local genericPlatformSources =
 KernelMergeObject boot_platform_bios_ia32.o :
 	shell.S
 	start.c
-	debug.c
+	debug.cpp
 	bios.S
 	console.cpp
 	serial.cpp
@@ -44,7 +44,7 @@ KernelMergeObject boot_platform_bios_ia32.o :
 	video.cpp
 	apm.cpp
 	hpet.cpp
-	
+
 	$(genericPlatformSources)
 
 	# VESA/DDC EDID

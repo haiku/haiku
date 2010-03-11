@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -91,6 +91,7 @@ static int32 sDebuggerOnCPU = -1;
 static sem_id sSyslogNotify = -1;
 static struct syslog_message* sSyslogMessage;
 static struct ring_buffer* sSyslogBuffer;
+static size_t sSyslogBufferOffset = 0;
 static bool sSyslogDropped = false;
 
 static const char* sCurrentKernelDebuggerMessagePrefix;
@@ -106,7 +107,7 @@ static DebugOutputFilter* sDebugOutputFilter = NULL;
 DefaultDebugOutputFilter gDefaultDebugOutputFilter;
 static mutex sOutputLock = MUTEX_INITIALIZER("debug output");
 
-static void flush_pending_repeats(bool syslogOutput);
+static void flush_pending_repeats(bool notifySyslog);
 static void check_pending_repeats(void* data, int iter);
 
 static int64 sMessageRepeatFirstTime = 0;
@@ -180,7 +181,7 @@ void
 DefaultDebugOutputFilter::Print(const char* format, va_list args)
 {
 	vsnprintf(sInterruptOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
-	flush_pending_repeats(sInDebugger == 0);
+	flush_pending_repeats(false);
 	PrintString(sInterruptOutputBuffer);
 }
 
@@ -1065,12 +1066,14 @@ syslog_sender(void* data)
 				cpu_status state = disable_interrupts();
 				acquire_spinlock(&sSpinlock);
 
-				length = ring_buffer_readable(sSyslogBuffer);
+				length = ring_buffer_readable(sSyslogBuffer)
+					- sSyslogBufferOffset;
 				if (length > (int32)SYSLOG_MAX_MESSAGE_LENGTH)
 					length = SYSLOG_MAX_MESSAGE_LENGTH;
 
-				length = ring_buffer_read(sSyslogBuffer,
+				length = ring_buffer_peek(sSyslogBuffer, sSyslogBufferOffset,
 					(uint8*)sSyslogMessage->message, length);
+				sSyslogBufferOffset += length;
 				if (sSyslogDropped) {
 					// Add drop marker - since parts had to be dropped, it's
 					// guaranteed that we have enough space in the buffer now.
@@ -1111,29 +1114,33 @@ syslog_sender(void* data)
 
 
 static void
-syslog_write(const char* text, int32 length)
+syslog_write(const char* text, int32 length, bool notify)
 {
-	bool trunc = false;
-
 	if (sSyslogBuffer == NULL)
 		return;
 
-	if ((int32)ring_buffer_writable(sSyslogBuffer) < length) {
-		// truncate data
-		length = ring_buffer_writable(sSyslogBuffer);
+	if (length > sSyslogBuffer->size) {
+		text = "<DROP>";
+		length = 6;
+	}
 
-		if (length > 8) {
-			trunc = true;
-			length -= 8;
-		} else
+	int32 writable = ring_buffer_writable(sSyslogBuffer);
+	if (writable < length) {
+		// drop old data
+		size_t toDrop = length - writable;
+		ring_buffer_flush(sSyslogBuffer, toDrop);
+
+		if (toDrop > sSyslogBufferOffset) {
+			sSyslogBufferOffset = 0;
 			sSyslogDropped = true;
+		} else
+			sSyslogBufferOffset -= toDrop;
 	}
 
 	ring_buffer_write(sSyslogBuffer, (uint8*)text, length);
-	if (trunc)
-		ring_buffer_write(sSyslogBuffer, (uint8*)"<TRUNC>", 7);
 
-	release_sem_etc(sSyslogNotify, 1, B_DO_NOT_RESCHEDULE);
+	if (notify)
+		release_sem_etc(sSyslogNotify, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -1163,7 +1170,7 @@ syslog_init_post_threads(void)
 
 
 static status_t
-syslog_init(struct kernel_args* args)
+syslog_init_post_vm(struct kernel_args* args)
 {
 	status_t status;
 	int32 length = 0;
@@ -1177,7 +1184,7 @@ syslog_init(struct kernel_args* args)
 		goto err1;
 	}
 
-	{
+	if (sSyslogBuffer == NULL) {
 		size_t bufferSize = DEFAULT_SYSLOG_BUFFER_SIZE;
 		void* handle = load_driver_settings("kernel");
 		if (handle != NULL) {
@@ -1195,10 +1202,17 @@ syslog_init(struct kernel_args* args)
 		}
 
 		sSyslogBuffer = create_ring_buffer(bufferSize);
-	}
-	if (sSyslogBuffer == NULL) {
-		status = B_NO_MEMORY;
-		goto err2;
+
+		if (sSyslogBuffer == NULL) {
+			status = B_NO_MEMORY;
+			goto err2;
+		}
+	} else {
+		// create an area for the debug syslog buffer
+		void* base = (void*)ROUNDDOWN((addr_t)args->debug_output, B_PAGE_SIZE);
+		size_t size = ROUNDUP(args->debug_size, B_PAGE_SIZE);
+		create_area("syslog debug", &base, B_EXACT_ADDRESS, size,
+			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	}
 
 	// initialize syslog message
@@ -1209,14 +1223,14 @@ syslog_init(struct kernel_args* args)
 	//strcpy(sSyslogMessage->ident, "KERNEL");
 
 	if (args->debug_output != NULL)
-		syslog_write((const char*)args->debug_output, args->debug_size);
+		syslog_write((const char*)args->debug_output, args->debug_size, false);
 
 	char revisionBuffer[64];
 	length = snprintf(revisionBuffer, sizeof(revisionBuffer),
 		"Welcome to syslog debug output!\nHaiku revision: %lu\n",
 		get_haiku_revision());
 	syslog_write(revisionBuffer,
-		std::min(length, (ssize_t)sizeof(revisionBuffer) - 1));
+		std::min(length, (ssize_t)sizeof(revisionBuffer) - 1), false);
 
 	add_debugger_command_etc("syslog", &cmd_dump_syslog,
 		"Dumps the syslog buffer.",
@@ -1233,6 +1247,19 @@ err2:
 err1:
 	sSyslogOutputEnabled = false;
 	return status;
+}
+
+
+static status_t
+syslog_init(struct kernel_args* args)
+{
+	if (!args->keep_debug_output_buffer)
+		return B_OK;
+
+	sSyslogBuffer = create_ring_buffer_etc(args->debug_output, args->debug_size,
+		RING_BUFFER_INIT_FROM_BUFFER);
+
+	return B_OK;
 }
 
 
@@ -1273,7 +1300,7 @@ call_modules_hook(bool enter)
 
 //!	Must be called with the sSpinlock held.
 static void
-debug_output(const char* string, int32 length, bool syslogOutput)
+debug_output(const char* string, int32 length, bool notifySyslog)
 {
 	if (length >= OUTPUT_BUFFER_SIZE)
 		length = OUTPUT_BUFFER_SIZE - 1;
@@ -1285,12 +1312,12 @@ debug_output(const char* string, int32 length, bool syslogOutput)
 		if (sMessageRepeatFirstTime == 0)
 			sMessageRepeatFirstTime = sMessageRepeatLastTime;
 	} else {
-		flush_pending_repeats(syslogOutput);
+		flush_pending_repeats(notifySyslog);
 
 		if (sSerialDebugEnabled)
 			arch_debug_serial_puts(string);
-		if (sSyslogOutputEnabled && syslogOutput)
-			syslog_write(string, length);
+		if (sSyslogOutputEnabled)
+			syslog_write(string, length, notifySyslog);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
 			blue_screen_puts(string);
 		if (sSerialDebugEnabled) {
@@ -1308,7 +1335,7 @@ debug_output(const char* string, int32 length, bool syslogOutput)
 
 //!	Must be called with the sSpinlock held.
 static void
-flush_pending_repeats(bool syslogOutput)
+flush_pending_repeats(bool notifySyslog)
 {
 	if (sMessageRepeatCount <= 0)
 		return;
@@ -1321,8 +1348,8 @@ flush_pending_repeats(bool syslogOutput)
 
 		if (sSerialDebugEnabled)
 			arch_debug_serial_puts(temp);
-		if (sSyslogOutputEnabled && syslogOutput)
-			syslog_write(temp, length);
+		if (sSyslogOutputEnabled)
+			syslog_write(temp, length, notifySyslog);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
 			blue_screen_puts(temp);
 		if (sSerialDebugEnabled) {
@@ -1337,8 +1364,8 @@ flush_pending_repeats(bool syslogOutput)
 
 		if (sSerialDebugEnabled)
 			arch_debug_serial_puts(sLastOutputBuffer);
-		if (sSyslogOutputEnabled && syslogOutput)
-			syslog_write(sLastOutputBuffer, length);
+		if (sSyslogOutputEnabled)
+			syslog_write(sLastOutputBuffer, length, notifySyslog);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
 			blue_screen_puts(sLastOutputBuffer);
 		if (sSerialDebugEnabled) {
@@ -1374,7 +1401,7 @@ check_pending_repeats(void* /*data*/, int /*iteration*/)
 
 
 static void
-dprintf_args(const char* format, va_list args, bool syslogOutput)
+dprintf_args(const char* format, va_list args, bool notifySyslog)
 {
 	if (are_interrupts_enabled()) {
 		MutexLocker locker(sOutputLock);
@@ -1384,7 +1411,7 @@ dprintf_args(const char* format, va_list args, bool syslogOutput)
 		length = std::min(length, (int32)OUTPUT_BUFFER_SIZE - 1);
 
 		InterruptsSpinLocker _(sSpinlock);
-		debug_output(sOutputBuffer, length, syslogOutput);
+		debug_output(sOutputBuffer, length, notifySyslog);
 	} else {
 		InterruptsSpinLocker _(sSpinlock);
 
@@ -1392,7 +1419,7 @@ dprintf_args(const char* format, va_list args, bool syslogOutput)
 			format, args);
 		length = std::min(length, (int32)OUTPUT_BUFFER_SIZE - 1);
 
-		debug_output(sInterruptOutputBuffer, length, syslogOutput);
+		debug_output(sInterruptOutputBuffer, length, notifySyslog);
 	}
 }
 
@@ -1425,7 +1452,7 @@ void
 debug_puts(const char* string, int32 length)
 {
 	InterruptsSpinLocker _(sSpinlock);
-	debug_output(string, length, sSyslogOutputEnabled);
+	debug_output(string, length, true);
 }
 
 
@@ -1440,6 +1467,8 @@ status_t
 debug_init(kernel_args* args)
 {
 	new(&gDefaultDebugOutputFilter) DefaultDebugOutputFilter;
+
+	syslog_init(args);
 
 	debug_paranoia_init();
 	return arch_debug_console_init(args);
@@ -1484,7 +1513,7 @@ debug_init_post_vm(kernel_args* args)
 	if (sDebugScreenEnabled)
 		blue_screen_enter(true);
 
-	syslog_init(args);
+	syslog_init_post_vm(args);
 
 	return arch_debug_init(args);
 }
@@ -1785,7 +1814,7 @@ dprintf(const char* format, ...)
 		return;
 
 	va_start(args, format);
-	dprintf_args(format, args, sSyslogOutputEnabled);
+	dprintf_args(format, args, true);
 	va_end(args);
 }
 

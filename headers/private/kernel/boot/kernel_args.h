@@ -78,6 +78,7 @@ typedef struct kernel_args {
 
 	void		*debug_output;
 	uint32		debug_size;
+	bool		keep_debug_output_buffer;
 
 	platform_kernel_args platform_args;
 	arch_kernel_args arch_args;

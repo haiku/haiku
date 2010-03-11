@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 extern void serial_init(void);
+extern void serial_init_post_mmu(void);
 extern void serial_cleanup(void);
 
 extern void serial_puts(const char *string, size_t size);

@@ -5,23 +5,26 @@
 
 
 #include "menu.h"
-#include "loader.h"
-#include "RootFileSystem.h"
-#include "load_driver_settings.h"
+
+#include <string.h>
 
 #include <algorithm>
 
 #include <OS.h>
 
-#include <util/kernel_cpp.h>
 #include <boot/menu.h>
 #include <boot/stage2.h>
 #include <boot/vfs.h>
 #include <boot/platform.h>
 #include <boot/stdio.h>
 #include <safemode.h>
+#include <util/kernel_cpp.h>
+#include <util/ring_buffer.h>
 
-#include <string.h>
+#include "load_driver_settings.h"
+#include "loader.h"
+#include "pager.h"
+#include "RootFileSystem.h"
 
 
 #define TRACE_MENU
@@ -375,6 +378,48 @@ user_menu_boot_volume(Menu *menu, MenuItem *item)
 }
 
 
+static bool
+debug_menu_display_syslog(Menu *menu, MenuItem *item)
+{
+	ring_buffer* buffer = (ring_buffer*)gKernelArgs.debug_output;
+	if (buffer == NULL)
+		return true;
+
+	struct TextSource : PagerTextSource {
+		TextSource(ring_buffer* buffer)
+			:
+			fBuffer(buffer)
+		{
+		}
+
+		virtual size_t BytesAvailable() const
+		{
+			return ring_buffer_readable(fBuffer);
+		}
+
+		virtual size_t Read(size_t offset, void* buffer, size_t size) const
+		{
+			return ring_buffer_peek(fBuffer, offset, buffer, size);
+		}
+
+	private:
+		ring_buffer*	fBuffer;
+	};
+
+	pager(TextSource(buffer));
+
+	return true;
+}
+
+
+static bool
+debug_menu_toggle_debug_syslog(Menu *menu, MenuItem *item)
+{
+	gKernelArgs.keep_debug_output_buffer = item->IsMarked();
+	return true;
+}
+
+
 static Menu *
 add_boot_volume_menu(Directory *bootVolume)
 {
@@ -459,34 +504,66 @@ add_safe_mode_menu()
 
 	platform_add_menus(safeMenu);
 
+	safeMenu->AddSeparatorItem();
+	safeMenu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
+
+	return safeMenu;
+}
+
+
+static Menu *
+add_debug_menu()
+{
+	Menu *menu = new(nothrow) Menu(SAFE_MODE_MENU, "Debug Options");
+	MenuItem *item;
+
 #if DEBUG_SPINLOCK_LATENCIES
 	item = new(std::nothrow) MenuItem("Disable latency checks");
 	if (item != NULL) {
 		item->SetType(MENU_ITEM_MARKABLE);
 		item->SetData(B_SAFEMODE_DISABLE_LATENCY_CHECK);
 		item->SetHelpText("Disables latency check panics.");
-		safeMenu->AddItem(item);
+		menu->AddItem(item);
 	}
 #endif
 
-	safeMenu->AddItem(item
+	menu->AddItem(item
 		= new(nothrow) MenuItem("Enable serial debug output"));
 	item->SetData("serial_debug_output");
 	item->SetType(MENU_ITEM_MARKABLE);
     item->SetHelpText("Turns on forwarding the syslog output to the serial "
 		"interface.");
 
-	safeMenu->AddItem(item
+	menu->AddItem(item
 		= new(nothrow) MenuItem("Enable on screen debug output"));
 	item->SetData("debug_screen");
 	item->SetType(MENU_ITEM_MARKABLE);
     item->SetHelpText("Displays debug output on screen while the system "
 		"is booting, instead of the normal boot logo.");
 
-	safeMenu->AddSeparatorItem();
-	safeMenu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
+	menu->AddItem(item = new(nothrow) MenuItem("Enable debug syslog"));
+	item->SetType(MENU_ITEM_MARKABLE);
+	item->SetMarked(gKernelArgs.keep_debug_output_buffer);
+	item->SetTarget(&debug_menu_toggle_debug_syslog);
+    item->SetHelpText("Enables a special in-memory syslog buffer for this "
+    	"session that the boot loader will be able to access after rebooting.");
 
-	return safeMenu;
+	ring_buffer* syslogBuffer = (ring_buffer*)gKernelArgs.debug_output;
+	if (syslogBuffer != NULL && ring_buffer_readable(syslogBuffer) > 0) {
+		menu->AddSeparatorItem();
+
+		menu->AddItem(item
+			= new(nothrow) MenuItem("Display syslog from previous session"));
+		item->SetTarget(&debug_menu_display_syslog);
+		item->SetType(MENU_ITEM_NO_CHOICE);
+		item->SetHelpText(
+			"Displays the syslog from the previous Haiku session.");
+	}
+
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
+
+	return menu;
 }
 
 
@@ -527,6 +604,7 @@ user_menu(Directory **_bootVolume)
 {
 	Menu *menu = new(nothrow) Menu(MAIN_MENU);
 	Menu *safeModeMenu = NULL;
+	Menu *debugMenu = NULL;
 	MenuItem *item;
 
 	TRACE(("user_menu: enter\n"));
@@ -538,6 +616,10 @@ user_menu(Directory **_bootVolume)
 	// Add safe mode
 	menu->AddItem(item = new(nothrow) MenuItem("Select safe mode options",
 		safeModeMenu = add_safe_mode_menu()));
+
+	// add debug menu
+	menu->AddItem(item = new(nothrow) MenuItem("Select debug options",
+		debugMenu = add_debug_menu()));
 
 	// Add platform dependent menus
 	platform_add_menus(menu);
@@ -561,6 +643,7 @@ user_menu(Directory **_bootVolume)
 		*_bootVolume = (Directory *)item->Data();
 
 	apply_safe_mode_options(safeModeMenu);
+	apply_safe_mode_options(debugMenu);
 	delete menu;
 
 	TRACE(("user_menu: leave\n"));

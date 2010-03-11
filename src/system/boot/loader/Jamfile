@@ -50,17 +50,19 @@ UsePrivateHeaders shared storage ;
 }
 
 KernelStaticLibrary boot_loader :
-	main.cpp
-	vfs.cpp
-	RootFileSystem.cpp
-	partitions.cpp
-	heap.cpp
-	stdio.cpp
 	elf.cpp
-	menu.cpp
-	loader.cpp
+	heap.cpp
 	kernel_args.cpp
 	load_driver_settings.cpp
+	loader.cpp
+	main.cpp
+	menu.cpp
+	pager.cpp
+	partitions.cpp
+	RootFileSystem.cpp
+	stdio.cpp
+	vfs.cpp
+	vm.cpp
 
 	# libroot
 	driver_settings.c
@@ -69,6 +71,7 @@ KernelStaticLibrary boot_loader :
 	kernel_cpp.cpp
 	KMessage.cpp
 	list.cpp
+	ring_buffer.cpp
 	safemode_settings.cpp
 
 	: -fno-pic
@@ -89,7 +92,7 @@ KernelStaticLibrary boot_partitions :
 	;
 
 # Tell Jam where to find the utility sources
-SEARCH on [ FGristFiles kernel_cpp.cpp list.cpp ]
+SEARCH on [ FGristFiles kernel_cpp.cpp list.cpp ring_buffer.cpp ]
     = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]
