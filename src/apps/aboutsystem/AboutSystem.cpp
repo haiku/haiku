@@ -933,95 +933,110 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(TR("Translations:\n"));
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nBulgarian\n\n"));
+	fCreditsView->Insert(TR("\nBulgarian\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"cssvb94\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nDutch\n\n"));
+	fCreditsView->Insert(TR("\nDutch\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Meanwhile\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nEsperanto\n\n"));
+	fCreditsView->Insert(TR("\nEsperanto\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Travis D. Reed (Dancxjo)\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nFinnish\n\n"));
+	fCreditsView->Insert(TR("\nFinnish\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Jaakko Leikas (Garjala)\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nFrench\n\n"));
+	fCreditsView->Insert(TR("\nFrench\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
+		"Jean-Loïc Charroud\n"
 		"Adrien Destugues (PulkoMandy)\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nGerman\n\n"));
+	fCreditsView->Insert(TR("\nGerman\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Colin Günther\n"
-		"svend\n"
 		"leszek\n"
+		"Christian Morgenroth\n"
+		"Joachim Seemer (Humdinger)\n"
+		"svend\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nHungarian\n\n"));
+	fCreditsView->Insert(TR("\nHungarian\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Zoltán Mizsei (miqlas)\n"
 		"Zoltán Szabó (Bird)\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nItalian\n\n"));
+	fCreditsView->Insert(TR("\nItalian\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Andrea Bernardi\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nJapanese\n\n"));
+	fCreditsView->Insert(TR("\nJapanese\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"The JPBE.net user group\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nLituanian\n\n"));
+	fCreditsView->Insert(TR("\nLituanian\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Algirdas Buckus\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nPolish\n\n"));
+	fCreditsView->Insert(TR("\nPolish\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Artur Wyszyński\n"
 		"Hubert Hareńczyk\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nPortuguese\n\n"));
+	fCreditsView->Insert(TR("\nPortuguese\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Marcos Alves (Xeon3D)\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nRussian\n\n"));
+	fCreditsView->Insert(TR("\nRussian\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"StoroZ Gneva\n"
+		"Rustam Islamov (RISC aka HaikuBot)\n"
+		"Eugene Katashov (mrNoisy)\n"
+		"Michael Smirnov\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nSwedish\n\n"));
+	fCreditsView->Insert(TR("\nSpanish\n"));
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(
+		"Oscar Carballal (oscarcp)\n"
+		"Miguel Zúñiga González (miguel~1.mx)\n"
+	);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
+	fCreditsView->Insert(TR("\nSwedish\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Johan Holmberg\n"
+		"Jimmy Olsson (phalax)\n"
+		"Victor Widell\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nUkrainian\n\n"));
+	fCreditsView->Insert(TR("\nUkrainian\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Alex Rudyk (totish)\n"
