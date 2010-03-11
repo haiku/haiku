@@ -83,8 +83,8 @@ dprintf(const char *format, ...)
 void
 debug_init_post_mmu(void)
 {
-	// allocate 1 MB memory at 16 MB
-	addr_t base = 16 * 1024 * 1024;
+	// allocate 1 MB memory at 63 MB
+	addr_t base = 63 * 1024 * 1024;
 	size_t size = 1024 * 1024;
 	if (!mmu_allocate_physical(base, size))
 		return;
