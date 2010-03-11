@@ -90,7 +90,7 @@ InstallerApp::AboutRequested()
 	view->GetFont(&font);
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 14, &font);
+	view->SetFontAndColor(0, 9, &font);
 
 	alert->Go();
 }
