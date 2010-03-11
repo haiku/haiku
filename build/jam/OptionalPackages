@@ -33,7 +33,6 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	DevelopmentBase			- basic development environment (gcc, headers, libs,...)
 #	DevelopmentMin			- development headers, libs, tools, from sources only
 #	Expat					- XML parsing libraries
-#	Firefox					- the webbrowser NOTE: will be removed soon.
 #	Git						- the distributed version control system
 #	ICU-devel				- the headers for ICU (for development)
 #	KeymapSwitcher			- Desktop utility
@@ -546,13 +545,6 @@ if [ IsOptionalHaikuImagePackageAdded Expat ] {
 			: true
 		;
 	}
-}
-
-
-# Firefox web browser
-if [ IsOptionalHaikuImagePackageAdded Firefox ] {
-	Echo "Warning: The optional package Firefox is being replaced with"
-	"BeZillaBrowser" ;
 }
 
 
