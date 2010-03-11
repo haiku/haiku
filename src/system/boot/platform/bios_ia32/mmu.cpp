@@ -444,6 +444,23 @@ mmu_allocate(void *virtualAddress, size_t size)
 }
 
 
+/*!	Allocates the given physical range.
+	\return \c true, if the range could be allocated, \c false otherwise.
+*/
+bool
+mmu_allocate_physical(addr_t base, size_t size)
+{
+	addr_t foundBase;
+	if (!get_free_address_range(gKernelArgs.physical_allocated_range,
+			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalAddress,
+			size, &foundBase)) {
+		return B_BAD_VALUE;
+	}
+
+	return insert_physical_allocated_range(base, size) == B_OK;
+}
+
+
 /*!	This will unmap the allocated chunk of memory from the virtual
 	address space. It might not actually free memory (as its implementation
 	is very simple), but it might.
