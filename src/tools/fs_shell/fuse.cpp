@@ -159,7 +159,7 @@ static int
 fuse_readlink(const char* path, char* buffer, size_t size)
 {
 	PRINTD("##readlink\n");
-	size_t n_size = size - 1;
+	fssh_size_t n_size = size - 1;
 	fssh_status_t st = _kern_read_link(-1, path, buffer, &n_size);
 	if (st >= FSSH_B_OK)
 		buffer[n_size] = '\0';
@@ -423,7 +423,7 @@ fssh_fuse_session(const char* device, const char* mntPoint, const char* fsName)
 			fssh_strerror(fsDev));
 		return 1;
 	}
-	
+
 	if (!gIsDebug) {
 		bool isErr = false;
 		fssh_dev_t volumeID = get_volume_id();
@@ -450,7 +450,7 @@ fssh_fuse_session(const char* device, const char* mntPoint, const char* fsName)
 	argv[fuseArgCount++] = (const char*)"-s";
 	if (gIsDebug)
 		argv[fuseArgCount++] = (const char*)"-d";
-	
+
 	initialiseFuseOps(&gFUSEOperations);
 
 	int ret = fuse_main(fuseArgCount, (char**)argv, &gFUSEOperations, NULL);
