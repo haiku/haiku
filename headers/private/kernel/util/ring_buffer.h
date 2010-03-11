@@ -17,11 +17,17 @@ struct ring_buffer {
 };
 
 
+// flags for create_ring_buffer_etc()
+#define RING_BUFFER_INIT_FROM_BUFFER	0x01
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct ring_buffer *create_ring_buffer(size_t size);
+struct ring_buffer *create_ring_buffer_etc(void *memory, size_t size,
+			uint32 flags);
 void delete_ring_buffer(struct ring_buffer *buffer);
 
 void ring_buffer_clear(struct ring_buffer *buffer);
@@ -32,9 +38,12 @@ size_t ring_buffer_read(struct ring_buffer *buffer, uint8 *data, ssize_t length)
 size_t ring_buffer_write(struct ring_buffer *buffer, const uint8 *data, ssize_t length);
 ssize_t ring_buffer_user_read(struct ring_buffer *buffer, uint8 *data, ssize_t length);
 ssize_t ring_buffer_user_write(struct ring_buffer *buffer, const uint8 *data, ssize_t length);
+size_t ring_buffer_peek(struct ring_buffer *buffer, size_t offset, void *data,
+			size_t length);
 
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif	/* RING_BUFFER_H */

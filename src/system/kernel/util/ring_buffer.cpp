@@ -122,15 +122,38 @@ write_to_buffer(struct ring_buffer *buffer, const uint8 *data, ssize_t length,
 //	#pragma mark -
 
 
-struct ring_buffer *
+struct ring_buffer*
 create_ring_buffer(size_t size)
 {
-	struct ring_buffer *buffer = (ring_buffer *)malloc(sizeof(ring_buffer) + size);
-	if (buffer == NULL)
-		return NULL;
+	return create_ring_buffer_etc(NULL, size, 0);
+}
+
+
+struct ring_buffer*
+create_ring_buffer_etc(void* memory, size_t size, uint32 flags)
+{
+	if (memory == NULL) {
+		ring_buffer* buffer = (ring_buffer*)malloc(sizeof(ring_buffer) + size);
+		if (buffer == NULL)
+			return NULL;
+
+		buffer->size = size;
+		ring_buffer_clear(buffer);
+
+		return buffer;
+	}
+
+	size -= sizeof(ring_buffer);
+	ring_buffer* buffer = (ring_buffer*)memory;
 
 	buffer->size = size;
-	ring_buffer_clear(buffer);
+	if ((flags & RING_BUFFER_INIT_FROM_BUFFER) != 0
+		&& (size_t)buffer->size == size
+		&& buffer->in >= 0 && (size_t)buffer->in <= size
+		&& buffer->first >= 0 && (size_t)buffer->first < size) {
+		// structure looks valid
+	} else
+		ring_buffer_clear(buffer);
 
 	return buffer;
 }
@@ -202,6 +225,45 @@ ssize_t
 ring_buffer_user_write(struct ring_buffer *buffer, const uint8 *data, ssize_t length)
 {
 	return write_to_buffer(buffer, data, length, true);
+}
+
+
+/*!	Reads data from the ring buffer, but doesn't remove the data from it.
+	\param buffer The ring buffer.
+	\param offset The offset relative to the beginning of the data in the ring
+		buffer at which to start reading.
+	\param data The buffer to which to copy the data.
+	\param length The number of bytes to read at maximum.
+	\return The number of bytes actually read from the buffer.
+*/
+size_t
+ring_buffer_peek(struct ring_buffer* buffer, size_t offset, void* data,
+	size_t length)
+{
+	size_t available = buffer->in;
+
+	if (offset >= available || length == 0)
+		return 0;
+
+	if (offset + length > available)
+		length = available - offset;
+
+	if ((offset += buffer->first) >= (size_t)buffer->size)
+		offset -= buffer->size;
+
+	if (offset + length <= (size_t)buffer->size) {
+		// simple copy
+		memcpy(data, buffer->buffer + offset, length);
+	} else {
+		// need to copy both ends
+		size_t upper = buffer->size - offset;
+		size_t lower = length - upper;
+
+		memcpy(data, buffer->buffer + offset, upper);
+		memcpy((uint8*)data + upper, buffer->buffer, lower);
+	}
+
+	return length;
 }
 
 
