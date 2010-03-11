@@ -686,8 +686,8 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Nano available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage nano-2.0.9-r1a1-x86-gcc2-2009-08-30.zip
-			: $(baseURL)/nano-2.0.9-r1a1-x86-gcc2-2009-08-30.zip
+		InstallOptionalHaikuImagePackage nano-2.2.3-x86-gcc2-2010-03-11.zip
+			: $(baseURL)/nano-2.2.3-x86-gcc2-2010-03-11.zip
 			:
 		;
 	}
