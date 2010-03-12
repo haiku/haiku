@@ -98,9 +98,6 @@ debug_init_post_mmu(void)
 	size_t signatureLength = strlen(kDebugSyslogSignature);
 	bool recover = memcmp(buffer, kDebugSyslogSignature, signatureLength) == 0;
 
-	// clear the signature
-	memset(buffer, 0, signatureLength);
-
 	size -= signatureLength;
 	buffer = (uint8*)buffer + ROUNDUP(signatureLength, sizeof(void*));
 
@@ -115,16 +112,25 @@ debug_init_post_mmu(void)
 void
 debug_cleanup(void)
 {
-	if (gKernelArgs.keep_debug_output_buffer && sDebugSyslogBuffer != NULL) {
-		// copy the output gathered so far into the ring buffer
-		ring_buffer_clear(sDebugSyslogBuffer);
-		ring_buffer_write(sDebugSyslogBuffer, (uint8*)sBuffer, sBufferPosition);
-
-		// set the buffer signature, so we'll accept it as valid after reboot
+	if (sDebugSyslogBuffer != NULL) {
 		size_t signatureLength = strlen(kDebugSyslogSignature);
-		memcpy((void*)ROUNDDOWN((addr_t)sDebugSyslogBuffer, B_PAGE_SIZE),
-			kDebugSyslogSignature, signatureLength);
-	} else {
+		void* buffer
+			= (void*)ROUNDDOWN((addr_t)sDebugSyslogBuffer, B_PAGE_SIZE);
+
+		if (gKernelArgs.keep_debug_output_buffer) {
+			// copy the output gathered so far into the ring buffer
+			ring_buffer_clear(sDebugSyslogBuffer);
+			ring_buffer_write(sDebugSyslogBuffer, (uint8*)sBuffer, sBufferPosition);
+
+			memcpy(buffer, kDebugSyslogSignature, signatureLength);
+		} else {
+			// clear the signature
+			memset(buffer, 0, signatureLength);
+		}
+	} else
+		gKernelArgs.keep_debug_output_buffer = false;
+
+	if (!gKernelArgs.keep_debug_output_buffer) {
 		gKernelArgs.debug_output = kernel_args_malloc(sBufferPosition);
 		if (gKernelArgs.debug_output != NULL) {
 			memcpy(gKernelArgs.debug_output, sBuffer, sBufferPosition);
