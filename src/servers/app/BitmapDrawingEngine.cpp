@@ -28,6 +28,7 @@ BitmapDrawingEngine::IsParallelAccessLocked() const
 }
 #endif
 
+
 bool
 BitmapDrawingEngine::IsExclusiveAccessLocked() const
 {
