@@ -142,8 +142,11 @@ can_app_be_used(const entry_ref* ref)
 	// check whether the file is in trash
 	BPath trashPath;
 	BDirectory directory;
+	BVolume volume;
 	if (error == B_OK
-		&& find_directory(B_TRASH_DIRECTORY, &trashPath) == B_OK
+		&& volume.SetTo(ref->device) == B_OK
+		&& find_directory(B_TRASH_DIRECTORY, &trashPath, false, &volume)
+			== B_OK
 		&& directory.SetTo(trashPath.Path()) == B_OK
 		&& directory.Contains(&entry)) {
 		error = B_LAUNCH_FAILED_APP_IN_TRASH;
