@@ -51,12 +51,12 @@ public:
 	// locking
 			bool			LockParallelAccess();
 #if DEBUG
-			bool			IsParallelAccessLocked() const;
+	virtual	bool			IsParallelAccessLocked() const;
 #endif
 			void			UnlockParallelAccess();
 
 			bool			LockExclusiveAccess();
-			bool			IsExclusiveAccessLocked();
+	virtual	bool			IsExclusiveAccessLocked();
 			void			UnlockExclusiveAccess();
 
 	// for screen shots

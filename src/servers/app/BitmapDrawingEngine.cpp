@@ -18,6 +18,23 @@ BitmapDrawingEngine::~BitmapDrawingEngine()
 }
 
 
+bool
+BitmapDrawingEngine::IsParallelAccessLocked() const
+{
+	// We don't share the HWInterface instance that the Painter is
+	// attached to, so we never need to be locked.
+	return true;
+}
+
+
+bool
+BitmapDrawingEngine::IsExclusiveAccessLocked() const
+{
+	// See IsParallelAccessLocked().
+	return true;
+}
+
+
 status_t
 BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 {
@@ -63,7 +80,7 @@ BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 }
 
 
-UtilityBitmap *
+UtilityBitmap*
 BitmapDrawingEngine::ExportToBitmap(int32 width, int32 height,
 	color_space space)
 {

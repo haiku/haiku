@@ -468,22 +468,28 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 				if (allDirtyRegions != NULL)
 					copyRegion->Exclude(allDirtyRegions);
 
-				fDrawingEngine->CopyRegion(copyRegion, xOffset, yOffset);
+				if (fDrawingEngine->LockParallelAccess()) {
+					fDrawingEngine->CopyRegion(copyRegion, xOffset, yOffset);
+					fDrawingEngine->UnlockParallelAccess();
 
-				// Prevent those parts from being added to the dirty region...
-				newDirty->Exclude(copyRegion);
+					// Prevent those parts from being added to the dirty region...
+					newDirty->Exclude(copyRegion);
 
-				// The parts that could be copied are not dirty (at the
-				// target location!)
-				copyRegion->OffsetBy(xOffset, yOffset);
-				// ... and even exclude them from the pending dirty region!
-				if (fPendingUpdateSession->IsUsed())
-					fPendingUpdateSession->DirtyRegion().Exclude(copyRegion);
+					// The parts that could be copied are not dirty (at the
+					// target location!)
+					copyRegion->OffsetBy(xOffset, yOffset);
+					// ... and even exclude them from the pending dirty region!
+					if (fPendingUpdateSession->IsUsed())
+						fPendingUpdateSession->DirtyRegion().Exclude(copyRegion);
+				}
 
 				fRegionPool.Recycle(copyRegion);
 			} else {
 				// Fallback, should never be here.
-				fDrawingEngine->CopyRegion(region, xOffset, yOffset);
+				if (fDrawingEngine->LockParallelAccess()) {
+					fDrawingEngine->CopyRegion(region, xOffset, yOffset);
+					fDrawingEngine->UnlockParallelAccess();
+				}
 			}
 
 			if (allDirtyRegions != NULL)

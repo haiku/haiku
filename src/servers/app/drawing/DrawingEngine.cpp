@@ -458,7 +458,7 @@ void
 DrawingEngine::CopyRegion(/*const*/ BRegion* region, int32 xOffset,
 	int32 yOffset)
 {
-	ASSERT_EXCLUSIVE_LOCKED();
+	ASSERT_PARALLEL_LOCKED();
 
 	BRect frame = region->Frame();
 	frame = frame | frame.OffsetByCopy(xOffset, yOffset);

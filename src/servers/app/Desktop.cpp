@@ -1197,7 +1197,12 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	// moved into the dirty region (for now)
 	newDirtyRegion.Include(&window->VisibleRegion());
 
-	GetDrawingEngine()->CopyRegion(&copyRegion, (int32)x, (int32)y);
+	// NOTE: Having all windows locked should prevent any
+	// problems with locking the drawing engine here.
+	if (GetDrawingEngine()->LockParallelAccess()) {
+		GetDrawingEngine()->CopyRegion(&copyRegion, (int32)x, (int32)y);
+		GetDrawingEngine()->UnlockParallelAccess();
+	}
 
 	// in the dirty region, exclude the parts that we
 	// could move by blitting
