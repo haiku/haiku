@@ -3722,7 +3722,7 @@ struct PageFaultContext {
 	locked as well as all caches starting from the top cache to at least the
 	cache the page lives in.
 */
-static inline status_t
+static status_t
 fault_get_page(PageFaultContext& context)
 {
 	VMCache* cache = context.topCache;
