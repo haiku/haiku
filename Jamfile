@@ -157,6 +157,9 @@ if $(HAIKU_ADD_OPTIONAL_PACKAGES) {
 		[ FSplitString $(HAIKU_ADD_OPTIONAL_PACKAGES) : / ] ;
 }
 
+#include packages that are required by all images.
+AddOptionalHaikuImagePackages MandatoryPackages ; 
+
 # Evaluate optional package dependencies and prepare the optional build
 # features before parsing the Jamfile tree.
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackageDependencies ] ;

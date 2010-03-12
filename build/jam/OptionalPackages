@@ -15,7 +15,6 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	ABI-compliance-checker	- tool for checking ABI compatibility between libs
 #	APR						- support libraries used for example by Subversion
 #	APR-util				- Apache portable runtime utility library
-#	BasicCommandLineTools	- basic commandline tools
 #	Beam					- powerful native e-mail client
 #	BeBook					- the classic BeOS API documentation
 #	BeHappy					- special documentation (i.e. BeBook) browser
@@ -55,6 +54,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Perl					- the scripting language
 #	Python					- the scripting language
 #	Rsync					- remote directory synchronization
+#	Sed						- the ultimate stream editor
 #	SQLite					- the database implementation
 #	Subversion				- the version control system
 #	Tar						- archiving utility
@@ -106,20 +106,6 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 			:
 			: true
 		;
-	}
-}
-
-
-# BasicCommandLineTools
-if [ IsOptionalHaikuImagePackageAdded BasicCommandLineTools ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package BasicCommandLineTools available for $(TARGET_ARCH)" ;
-	} else {
-		# sed
-		InstallOptionalHaikuImagePackage sed-4.2.1-r1a1-x86-gcc2-2009-08-30.zip
-			: $(baseURL)/sed-4.2.1-r1a1-x86-gcc2-2009-08-30.zip
-			:
-			: true ;
 	}
 }
 
@@ -922,6 +908,20 @@ if [ IsOptionalHaikuImagePackageAdded Rsync ] {
 	} else {
 		InstallOptionalHaikuImagePackage rsync-3.0.7-x86-gcc2-2010-01-05.zip
 			: $(baseURL)/rsync-3.0.7-x86-gcc2-2010-01-05.zip
+			:
+		;
+	}
+}
+
+
+# Sed
+if [ IsOptionalHaikuImagePackageAdded Sed ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Sed available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage sed-4.2.1-r1a1-x86-gcc2-2009-08-30.zip
+			: $(baseURL)/sed-4.2.1-r1a1-x86-gcc2-2009-08-30.zip
+			:
 			:
 		;
 	}
