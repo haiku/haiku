@@ -57,7 +57,7 @@ public:
 	// locking
 			bool				LockParallelAccess() { return ReadLock(); }
 #if DEBUG
-			bool				IsParallelAccessLocked()
+			bool				IsParallelAccessLocked() const
 									{ return IsReadLocked(); }
 #endif
 			void				UnlockParallelAccess() { ReadUnlock(); }

@@ -50,7 +50,9 @@ public:
 
 	// locking
 			bool			LockParallelAccess();
-			bool			IsParallelAccessLocked();
+#if DEBUG
+			bool			IsParallelAccessLocked() const;
+#endif
 			void			UnlockParallelAccess();
 
 			bool			LockExclusiveAccess();

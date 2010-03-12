@@ -126,6 +126,15 @@ DrawingEngine::LockParallelAccess()
 }
 
 
+#if DEBUG
+bool
+DrawingEngine::IsParallelAccessLocked() const
+{
+	return fGraphicsCard->IsParallelAccessLocked();
+}
+#endif
+
+
 void
 DrawingEngine::UnlockParallelAccess()
 {

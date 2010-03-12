@@ -57,12 +57,12 @@ public:
 
 			// does the current thread hold a write lock ?
 			bool				IsWriteLocked(uint32 *stackBase = NULL,
-									thread_id *thread = NULL);
+									thread_id *thread = NULL) const;
 
 #if MULTI_LOCKER_DEBUG
 			// in DEBUG mode returns whether the lock is held
 			// in non-debug mode returns true
-			bool				IsReadLocked();
+			bool				IsReadLocked() const;
 #endif
 
 private:

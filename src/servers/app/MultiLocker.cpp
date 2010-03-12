@@ -149,7 +149,7 @@ MultiLocker::InitCheck()
 	contained.
 */
 bool
-MultiLocker::IsWriteLocked(uint32* _stackBase, thread_id* _thread)
+MultiLocker::IsWriteLocked(uint32* _stackBase, thread_id* _thread) const
 {
 #if TIMING
 	bigtime_t start = system_time();
@@ -518,7 +518,7 @@ MultiLocker::WriteUnlock()
 
 
 bool
-MultiLocker::IsReadLocked()
+MultiLocker::IsReadLocked() const
 {
 	if (fInit == B_NO_INIT)
 		return false;

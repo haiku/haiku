@@ -3188,7 +3188,7 @@ ServerApp::_AddBitmap(ServerBitmap* bitmap)
 void
 ServerApp::_DeleteBitmap(ServerBitmap* bitmap)
 {
-	ASSERT(fMapLock.IsLocked());
+	ASSERT(fMapLocker.IsLocked());
 
 	gBitmapManager->BitmapRemoved(bitmap);
 	fBitmapMap.erase(bitmap->Token());
@@ -3200,7 +3200,7 @@ ServerApp::_DeleteBitmap(ServerBitmap* bitmap)
 ServerBitmap*
 ServerApp::_FindBitmap(int32 token) const
 {
-	ASSERT(fMapLock.IsLocked());
+	ASSERT(fMapLocker.IsLocked());
 
 	BitmapMap::const_iterator iterator = fBitmapMap.find(token);
 	if (iterator == fBitmapMap.end())
@@ -3213,7 +3213,7 @@ ServerApp::_FindBitmap(int32 token) const
 ServerPicture*
 ServerApp::_FindPicture(int32 token) const
 {
-	ASSERT(fMapLock.IsLocked());
+	ASSERT(fMapLocker.IsLocked());
 
 	PictureMap::const_iterator iterator = fPictureMap.find(token);
 	if (iterator == fPictureMap.end())
