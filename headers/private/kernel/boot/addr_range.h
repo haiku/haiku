@@ -19,10 +19,10 @@ typedef struct addr_range {
 extern "C" {
 #endif
 
-status_t insert_address_range(addr_range *ranges, uint32 *_numRanges, uint32 maxRanges,
-	addr_t start, uint32 size);
-status_t remove_addr_range(addr_range *ranges, uint32 *_numRanges, uint32 maxRanges,
-	addr_t start, uint32 size);
+status_t insert_address_range(addr_range *ranges, uint32 *_numRanges,
+	uint32 maxRanges, addr_t start, uint32 size);
+status_t remove_address_range(addr_range *ranges, uint32 *_numRanges,
+	uint32 maxRanges, addr_t start, uint32 size);
 bool get_free_address_range(addr_range *ranges, uint32 numRanges, addr_t base,
 	size_t size, addr_t *_rangeBase);
 
