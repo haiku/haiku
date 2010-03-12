@@ -697,9 +697,24 @@ mmu_init(void)
 			}
 		}
 
-		// sort the range
+		// sort the ranges
 		sort_addr_range(gKernelArgs.physical_memory_range,
 			gKernelArgs.num_physical_memory_ranges);
+
+		// On some machines we get several ranges that contain only a few pages
+		// (or even only one) each, which causes us to run out of MTRRs later.
+		// So we remove all ranges smaller than 64 KB, hoping that this will
+		// leave us only with a few larger contiguous ranges (ideally one).
+		for (int32 i = gKernelArgs.num_physical_memory_ranges - 1; i >= 0;
+				i--) {
+			size_t size = gKernelArgs.physical_memory_range[i].size;
+			if (size < 64 * 1024) {
+				addr_t start = gKernelArgs.physical_memory_range[i].start;
+				remove_address_range(gKernelArgs.physical_memory_range,
+					&gKernelArgs.num_physical_memory_ranges,
+					MAX_PHYSICAL_MEMORY_RANGE, start, size);
+			}
+		}
 	} else {
 		// TODO: for now!
 		dprintf("No extended memory block - using 64 MB (fix me!)\n");
