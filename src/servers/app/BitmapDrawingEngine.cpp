@@ -18,6 +18,7 @@ BitmapDrawingEngine::~BitmapDrawingEngine()
 }
 
 
+#if DEBUG
 bool
 BitmapDrawingEngine::IsParallelAccessLocked() const
 {
@@ -25,7 +26,7 @@ BitmapDrawingEngine::IsParallelAccessLocked() const
 	// attached to, so we never need to be locked.
 	return true;
 }
-
+#endif
 
 bool
 BitmapDrawingEngine::IsExclusiveAccessLocked() const
