@@ -213,7 +213,7 @@ identify_png_header(BPositionIO *inSource, translator_info *outInfo)
 	uint8 buf[kSigSize];
 	if (inSource->Read(buf, kSigSize) != kSigSize)
 		return B_NO_TRANSLATOR;		
-	if (!png_check_sig(buf, kSigSize))
+	if (png_sig_cmp(buf, 0, kSigSize))
 		// if first 8 bytes of stream don't match PNG signature bail
 		return B_NO_TRANSLATOR;
 
@@ -322,7 +322,7 @@ PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 		png_uint_32 width, height;
 		int bit_depth, color_type, interlace_type;
 		png_get_IHDR(ppng, pinfo, &width, &height, &bit_depth, &color_type,
-			&interlace_type, int_p_NULL, int_p_NULL);
+			&interlace_type, NULL, NULL);
 		
 		// Setup image transformations to make converting it easier
 		bool balpha = false;
@@ -338,7 +338,7 @@ PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 		if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
 			// In order to convert from low-depth gray images to RGB,
 			// I first need to convert them to grayscale, 8 bpp
-			png_set_gray_1_2_4_to_8(ppng);
+			png_set_expand_gray_1_2_4_to_8(ppng);
 			
 		if (png_get_valid(ppng, pinfo, PNG_INFO_tRNS)) {
 			// if there is transparency data in the
@@ -469,9 +469,9 @@ PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 		
 		// free PNG handle / info structures
 		if (!pinfo)
-			png_destroy_read_struct(&ppng, png_infopp_NULL, png_infopp_NULL);
+			png_destroy_read_struct(&ppng, NULL, NULL);
 		else
-			png_destroy_read_struct(&ppng, &pinfo, png_infopp_NULL);
+			png_destroy_read_struct(&ppng, &pinfo, NULL);
 	}
 
 	return result;
@@ -907,7 +907,7 @@ PNGTranslator::translate_from_bits_to_png(BPositionIO *inSource,
 		
 		// free PNG handle / info structures
 		if (!pinfo)
-			png_destroy_write_struct(&ppng, png_infopp_NULL);
+			png_destroy_write_struct(&ppng, NULL);
 		else
 			png_destroy_write_struct(&ppng, &pinfo);
 	}
