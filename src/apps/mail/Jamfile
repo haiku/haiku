@@ -24,6 +24,7 @@ Application Mail :
 	MailPopUpMenu.cpp
 	MailSupport.cpp
 	MailWindow.cpp
+	MessageStatus.cpp
 	Prefs.cpp
 	QueryMenu.cpp
 	Signature.cpp
