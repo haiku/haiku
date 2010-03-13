@@ -204,6 +204,47 @@ class SigProcMask : public AbstractTraceEntry {
 		sigset_t	fOldMask;
 };
 
+
+class SigSuspend : public AbstractTraceEntry {
+	public:
+		SigSuspend(sigset_t mask)
+			:
+			fMask(mask),
+			fOldMask(thread_get_current_thread()->sig_block_mask)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("signal suspend: %#" B_PRIx32 ", old mask: %#" B_PRIx32,
+				fMask, fOldMask);
+		}
+
+	private:
+		sigset_t	fMask;
+		sigset_t	fOldMask;
+};
+
+
+class SigSuspendDone : public AbstractTraceEntry {
+	public:
+		SigSuspendDone()
+			:
+			fSignals(thread_get_current_thread()->sig_pending)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("signal suspend done: %#" B_PRIx32, fSignals);
+		}
+
+	private:
+		uint32		fSignals;
+};
+
 }	// namespace SignalTracing
 
 #	define T(x)	new(std::nothrow) SignalTracing::x
@@ -845,6 +886,8 @@ sigwait(const sigset_t *set, int *_signal)
 int
 sigsuspend(const sigset_t *mask)
 {
+	T(SigSuspend(*mask));
+
 	struct thread *thread = thread_get_current_thread();
 	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
 
@@ -862,6 +905,8 @@ sigsuspend(const sigset_t *mask)
 	atomic_set(&thread->sig_block_mask, oldMask);
 
 	update_current_thread_signals_flag();
+
+	T(SigSuspendDone());
 
 	// we're not supposed to actually succeed
 	return B_INTERRUPTED;
