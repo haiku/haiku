@@ -8,7 +8,6 @@ UseLibraryHeaders png zlib ;
 local shared_files =
 	png.c
 	pngerror.c
-	pnggccrd.c
 	pngget.c
 	pngmem.c
 	pngpread.c
@@ -18,7 +17,6 @@ local shared_files =
 	pngrutil.c
 	pngset.c
 	pngtrans.c
-	pngvcrd.c
 	pngwio.c
 	pngwrite.c
 	pngwtran.c
