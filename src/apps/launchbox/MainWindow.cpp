@@ -384,9 +384,9 @@ MainWindow::LoadSettings(const BMessage* message)
 			button->SetTo(signature.String(), true);
 		}
 
+		BEntry entry(path, true);
 		entry_ref ref;
-		BEntry entry(&ref, true);
-		if (entry.Exists())
+		if (entry.Exists() && entry.GetRef(&ref) == B_OK)
 			button->SetTo(&ref);
 
 		const char* text;
