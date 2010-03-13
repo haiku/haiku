@@ -263,7 +263,9 @@ class SigSuspendDone : public AbstractTraceEntry {
 static void
 update_thread_signals_flag(struct thread* thread)
 {
-	if (atomic_get(&thread->sig_pending) & ~atomic_get(&thread->sig_block_mask))
+	sigset_t mask = ~atomic_get(&thread->sig_block_mask)
+		| thread->sig_temp_enabled;
+	if (atomic_get(&thread->sig_pending) & mask)
 		atomic_or(&thread->flags, THREAD_FLAGS_SIGNALS_PENDING);
 	else
 		atomic_and(&thread->flags, ~THREAD_FLAGS_SIGNALS_PENDING);
@@ -307,7 +309,8 @@ bool
 handle_signals(struct thread *thread)
 {
 	uint32 signalMask = atomic_get(&thread->sig_pending)
-		& ~atomic_get(&thread->sig_block_mask);
+		& (~atomic_get(&thread->sig_block_mask) | thread->sig_temp_enabled);
+	thread->sig_temp_enabled = 0;
 
 	// If SIGKILL[THR] are pending, we ignore other signals.
 	// Otherwise check, if the thread shall stop for debugging.
@@ -903,6 +906,8 @@ sigsuspend(const sigset_t *mask)
 
 	// restore the original block mask
 	atomic_set(&thread->sig_block_mask, oldMask);
+
+	thread->sig_temp_enabled = ~*mask;
 
 	update_current_thread_signals_flag();
 

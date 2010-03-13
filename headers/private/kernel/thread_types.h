@@ -252,6 +252,7 @@ struct thread {
 
 	sigset_t		sig_pending;
 	sigset_t		sig_block_mask;
+	sigset_t		sig_temp_enabled;
 	struct sigaction sig_action[32];
 	addr_t			signal_stack_base;
 	size_t			signal_stack_size;

@@ -195,6 +195,7 @@ reset_signals(struct thread *thread)
 {
 	thread->sig_pending = 0;
 	thread->sig_block_mask = 0;
+	thread->sig_temp_enabled = 0;
 	memset(thread->sig_action, 0, 32 * sizeof(struct sigaction));
 	thread->signal_stack_base = 0;
 	thread->signal_stack_size = 0;
@@ -1164,8 +1165,9 @@ _dump_thread_info(struct thread *thread, bool shortInfo)
 		kprintf("(%d)\n", thread->cpu->cpu_num);
 	else
 		kprintf("\n");
-	kprintf("sig_pending:        %#lx (blocked: %#lx)\n", thread->sig_pending,
-		thread->sig_block_mask);
+	kprintf("sig_pending:        %#" B_PRIx32 " (blocked: %#" B_PRIx32
+		", temp enabled: %#" B_PRIx32 ")\n", thread->sig_pending,
+		thread->sig_block_mask, thread->sig_temp_enabled);
 	kprintf("in_kernel:          %d\n", thread->in_kernel);
 
 	if (thread->state == B_THREAD_WAITING) {
