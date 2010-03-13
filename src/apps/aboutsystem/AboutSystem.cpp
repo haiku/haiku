@@ -971,6 +971,7 @@ AboutView::_CreateCreditsView()
 		"leszek\n"
 		"Christian Morgenroth\n"
 		"Joachim Seemer (Humdinger)\n"
+		"Matthias Spreiter\n"
 		"svend\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
@@ -1015,15 +1016,18 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(TR("\nRussian\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
+		"Tatyana Fursic (iceid)\n"
 		"StoroZ Gneva\n"
 		"Rustam Islamov (RISC aka HaikuBot)\n"
 		"Eugene Katashov (mrNoisy)\n"
+		"Reznikov Sergei (Diver)\n"
 		"Michael Smirnov\n"
 	);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 	fCreditsView->Insert(TR("\nSpanish\n"));
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
+		"Nicolás C (CapitanPico)\n"
 		"Oscar Carballal (oscarcp)\n"
 		"Miguel Zúñiga González (miguel~1.mx)\n"
 	);
