@@ -1,3 +1,10 @@
+/*
+ * Copyright 2010 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jonas Sundström, jonas@kirilla.com
+ */
 #ifndef _MESSAGE_STATUS_H
 #define _MESSAGE_STATUS_H
 
