@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src bin vim ;
-
-SubInclude HAIKU_TOP src bin vim src ;
