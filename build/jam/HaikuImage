@@ -54,7 +54,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	safemode screen_blanker screenmode sdiff setdecor settype setversion
 	setvolume seq sha1sum shar shred shuf shutdown sleep sort spamdbm split
 	stat strace stty su sum sync sysinfo
-	tac tail tar tcpdump tcptester tee telnet telnetd test timeout top touch
+	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
 	tput tr traceroute translate trash true truncate tsort tty
 	uname unchop unexpand unmount uniq unlink unrar unshar unzip unzipsfx
 	<bin>updatedb uptime urlwrapper useradd uudecode uuencode

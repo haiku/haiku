@@ -248,4 +248,4 @@ SubInclude HAIKU_TOP src bin unzip ;
 SubInclude HAIKU_TOP src bin zip ;
 SubInclude HAIKU_TOP src bin gzip ;
 SubInclude HAIKU_TOP src bin bzip2 ;
-SubInclude HAIKU_TOP src bin tar ;
+#SubInclude HAIKU_TOP src bin tar ;
