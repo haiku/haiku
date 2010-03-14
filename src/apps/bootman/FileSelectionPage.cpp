@@ -101,19 +101,20 @@ FileSelectionPage::_BuildUI(const char* description)
 	BString file;
 	fSettings->FindString("file", &file);
 	
-	// TODO align text and button 
+	fSelect = new BButton(rect, "select", TR_CMT("Select", "Button"),
+		new BMessage(kMsgOpenFilePanel),
+		B_FOLLOW_RIGHT);
+	fSelect->ResizeToPreferred();
+
+	float selectLeft = rect.right - fSelect->Bounds().Width();
+	rect.right = selectLeft - kFileButtonDistance;
 	fFile = new BTextControl(rect, "file",
 		TR_CMT("File:", "Text control label"),
 		file.String(), new BMessage());
 	fFile->SetDivider(be_plain_font->StringWidth(fFile->Label()) + 5);
 	AddChild(fFile);
 	
-	fSelect = new BButton(rect, "select", TR_CMT("Select", "Button"),
-		new BMessage(kMsgOpenFilePanel),
-		B_FOLLOW_RIGHT);
-	fSelect->ResizeToPreferred();
-	float left = rect.right - fSelect->Frame().Width();
-	fSelect->MoveTo(left, 0);
+	fSelect->MoveTo(selectLeft, 0);
 	AddChild(fSelect);
 	
 	_Layout();
@@ -127,14 +128,27 @@ FileSelectionPage::_Layout()
 	
 	float left = fFile->Frame().left;
 	float top = fDescription->Frame().bottom + kTextDistance;
-	fFile->MoveTo(left, top);
+
+	// center "file" text field and "select" button vertically
+	float selectTop = top;
+	float fileTop = top;
+	float fileHeight = fFile->Bounds().Height();
+	float selectHeight = fSelect->Bounds().Height();
+	if (fileHeight < selectHeight) {
+		int delta = (int)((selectHeight - fileHeight + 1) / 2);
+		fileTop += delta;
+	} else {
+		int delta = (int)((fileHeight - selectHeight + 1) / 2);
+		selectTop += delta;
+	}
+
+	fFile->MoveTo(left, fileTop);
 	
 	float width = fSelect->Frame().left - kFileButtonDistance - left;
-	float height = fFile->Frame().Height();
-	fFile->ResizeTo(width, height);
+	fFile->ResizeTo(width, fileHeight);
 	
 	left = fSelect->Frame().left;
-	fSelect->MoveTo(left, top);
+	fSelect->MoveTo(left, selectTop);
 }
 
 

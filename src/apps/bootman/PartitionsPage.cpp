@@ -143,17 +143,31 @@ PartitionsPage::_Layout()
 	float height = Bounds().bottom - top;
 	fPartitionsScrollView->ResizeTo(width, height);
 	
+	// update scroll bar range and proportion
 	BScrollBar* scrollbar = fPartitionsScrollView->ScrollBar(B_HORIZONTAL);
-	float max = fPartitionsWidth - fPartitions->Bounds().IntegerWidth();
+	float viewWidth = fPartitions->Bounds().IntegerWidth();
+	float max = fPartitionsWidth - viewWidth;
 	if (max < 0)
 		max = 0;
 	scrollbar->SetRange(0, max);
+	float proportion;
+	if (fPartitionsWidth <= viewWidth)
+		proportion = 1.0;
+	else
+		proportion = viewWidth / fPartitionsWidth;
+	scrollbar->SetProportion(proportion);
 	
 	scrollbar = fPartitionsScrollView->ScrollBar(B_VERTICAL);
-	max = fPartitionsHeight - fPartitions->Bounds().IntegerHeight();
+	float viewHeight = fPartitions->Bounds().IntegerHeight();
+	max = fPartitionsHeight - viewHeight;
 	if (max < 0)
 		max = 0;
 	scrollbar->SetRange(0, max);
+	if (fPartitionsHeight <= viewHeight)
+		proportion = 1.0;
+	else
+		proportion = viewHeight / fPartitionsHeight;
+	scrollbar->SetProportion(proportion);
 }
 
 
@@ -166,14 +180,22 @@ PartitionsPage::_FillPartitionsView(BView* view)
 {
 	const int32 inset = 1;
 	
-
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
 	
-	const int32 height = (int32)(6 + 2*inset + fontHeight.ascent + fontHeight.descent);
+	int32 textControlHeight;
+	{
+		BTextControl control(BRect(0, 0, 100, 100), "", "", "", NULL);
+		control.ResizeToPreferred();
+		textControlHeight = control.Bounds().IntegerHeight();
+	}
+
+	const int32 textHeight = (int32)(fontHeight.ascent + fontHeight.descent);
+	const int32 height = (int32)(2*inset
+		+ max_c(textControlHeight, textHeight));
 	const int32 kDistance = (int32)(ceil(be_plain_font->StringWidth("x")));
 	
-	// show | name | type | size | path  
+	// show | name | type | size | path
 	int32 showWidth = 0;
 	int32 nameWidth = 0;
 	int32 typeWidth = 0;
@@ -181,8 +203,8 @@ PartitionsPage::_FillPartitionsView(BView* view)
 	int32 pathWidth = 0;
 	_ComputeColumnWidths(showWidth, nameWidth, typeWidth, sizeWidth, pathWidth);
 	
-	int32 totalWidth = showWidth + nameWidth + typeWidth + sizeWidth + pathWidth + 
-		2*inset + 4 * kDistance;
+	int32 totalWidth = showWidth + nameWidth + typeWidth + sizeWidth
+		+ pathWidth + 2 * inset + 4 * kDistance;
 	
 	int32 rowNumber = 0;
 	
@@ -207,10 +229,10 @@ PartitionsPage::_FillPartitionsView(BView* view)
 		// create row for partition data
 		BView* row = new BView(frame, "row", B_FOLLOW_TOP | B_FOLLOW_LEFT, 0);
 		row->SetViewColor(((rowNumber % 2) == 0) ? kEvenRowColor : kOddRowColor);
-		view->AddChild(row);		
-		frame.OffsetBy(0, height);
+		view->AddChild(row);
+		frame.OffsetBy(0, height + 1);
 
-		// box
+		// check box
 		BRect rect(row->Bounds());
 		rect.InsetBy(inset, inset);
 		rect.right = rect.left + showWidth;
@@ -218,8 +240,13 @@ PartitionsPage::_FillPartitionsView(BView* view)
 			_CreateControlMessage(kMessageShow, i));
 		if (show)
 			checkBox->SetValue(1);
+		// center vertically
+		checkBox->ResizeToPreferred();
+		const int32 showHeight = checkBox->Bounds().IntegerHeight();
+		if (showHeight < height)
+			checkBox->MoveTo(inset, (int)((height - showHeight + 1) / 2));
 		row->AddChild(checkBox);
-		rect.OffsetBy(showWidth + kDistance, 0);		
+		rect.OffsetBy(showWidth + kDistance, 0);
 		
 		// name
 		rect.right = rect.left + nameWidth;
@@ -235,7 +262,6 @@ PartitionsPage::_FillPartitionsView(BView* view)
 		row->AddChild(typeView);
 		rect.OffsetBy(typeWidth + kDistance, 0);
 
-		
 		// size
 		BString sizeText;
 		_CreateSizeText(size, &sizeText);
@@ -264,32 +290,24 @@ PartitionsPage::_ComputeColumnWidths(int32& showWidth, int32& nameWidth,
 	BCheckBox checkBox(BRect(0, 0, 100, 100), "show", "", new BMessage());
 	checkBox.ResizeToPreferred();
 	showWidth = checkBox.Bounds().IntegerWidth();
-	// reserve space for about 16 characters  
+	// reserve space for about 16 characters
 	nameWidth = (int32)ceil(be_plain_font->StringWidth("oooooooooooooooo"));
 	
-	const int32 kTextControlInsets = 6;
 	const int32 kStringViewInsets = 2;
 	
 	BMessage message;
 	for (int32 i = 0; fSettings->FindMessage("partition", i, &message) == B_OK; i ++) {
 		// get partition data
-		BString name;
 		BString type;
 		BString path;
 		int64 size;
-		message.FindString("name", &name);
 		message.FindString("type", &type);
 		message.FindString("path", &path);
 		message.FindInt64("size", &size);
 		BString sizeText;
 		_CreateSizeText(size, &sizeText);
 
-		int32 width = (int32)ceil(be_plain_font->StringWidth(name.String())) +
-			kTextControlInsets;	
-		if (nameWidth < width)
-			nameWidth = width;
-
-		width = (int32)ceil(be_plain_font->StringWidth(type.String())) +
+		int32 width = (int32)ceil(be_plain_font->StringWidth(type.String())) +
 			kStringViewInsets;	
 		if (typeWidth < width)
 			typeWidth = width;
