@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2010.02.11
-#	Date:    2010-02-11 03:15:02
+#	Version: 2010.03.01
+#	Date:    2010-03-01 03:15:01
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pciids.sf.net/.
@@ -1366,6 +1366,7 @@
 	68b8  Juniper [Radeon HD 5700 Series]
 	68c1  Redwood [Radeon HD 5600 Series]
 		1025 0347  Aspire 7740G
+	68e0  Manhattan [Mobility Radeon HD 5000 Series]
 	700f  PCI Bridge [IGP 320M]
 	7010  PCI Bridge [IGP 340M]
 	7100  R520 [Radeon X1800]
@@ -1647,6 +1648,7 @@
 	aa58  Juniper HDMI Audio [Radeon HD 5700 Series]
 	aa60  Redwood HDMI Audio [Radeon HD 5600 Series]
 		1025 0347  Aspire 7740G
+	aa68  Manhattan HDMI Audio [Mobility Radeon HD 5000 Series]
 	ac00  Theater 600 Pro
 	cab0  AGP Bridge [IGP 320M]
 	cab2  RS200/RS200M AGP Bridge [IGP 340M]
@@ -3490,6 +3492,8 @@
 	3017  Unassigned Hitachi Shared FC Device 3017
 	301d  PCIe-to-PCIe Bridge with Virtualization IO Assist Feature
 	3020  FIVE-EX based Fibre Channel to PCIe HBA
+	302c  M001 PCI Express Switch Upstream Port
+	302d  M001 PCI Express Switch Downstream Port
 	3505  SH7751 PCI Controller (PCIC)
 	350e  SH7751R PCI Controller (PCIC)
 1055  Efar Microsystems
@@ -6330,13 +6334,21 @@
 	087d  ION VGA
 	087e  ION LE VGA
 	087f  C79 [Quadro FX 470M]
-	0a20  GT200 [GeForce GT 220]
-	0a28  GeForce GT 230M
-	0a60  GT200 [GeForce G210]
+	0a20  GT216 [GeForce GT 220]
+	0a23  GT218 [GeForce 210]
+	0a28  GT216 [GeForce GT 230M]
+	0a2a  GT216 [GeForce GT 230M]
+	0a34  GT216 [GeForce GT 240M]
+	0a60  GT218 [GeForce G210]
+	0a62  GT218 [GeForce 205]
+	0a63  GT218 [GeForce 310]
 	0a64  GT218 [ION]
-	0a65  GT200 [GeForce 210]
-# formerly known as NVIDIA Quadro NVS 170M
-	0a6c  NVIDIA NVS 3100M
+	0a65  GT218 [GeForce 210]
+	0a66  GT218 [GeForce 310]
+	0a6c  NVS 3100M
+	0a74  GT218 [GeForce G210M]
+	0a75  GT218 [GeForce 310M]
+	0a78  GT218GL [Quadro FX 380 LP]
 	0a80  MCP79 Host Bridge
 	0a81  MCP79 Host Bridge
 	0a82  MCP79 Host Bridge
@@ -6397,6 +6409,9 @@
 	0be2  High Definition Audio Controller
 	0be3  High Definition Audio Controller
 	0be4  High Definition Audio Controller
+	0ca3  GT215 [GeForce GT 240]
+	0ca8  GT215 [GeForce GTS 260M]
+	0ca9  GT215 [GeForce GTS 250M]
 10df  Emulex Corporation
 	1ae5  LP6000 Fibre Channel Host Adapter
 	e100  Proteus-X: LightPulse IOV Fibre Channel Host Adapter
@@ -11212,6 +11227,7 @@
 	0811  Sentry5 External Interface Core
 	0816  BCM3302 Sentry5 MIPS32 CPU
 	1600  NetXtreme BCM5752 Gigabit Ethernet PCI Express
+		1028 01c1  Precision 490
 		1028 01c2  Latitude D620
 		103c 3015  PCIe LAN on Motherboard
 		107b 5048  E4500 Onboard
@@ -12459,16 +12475,16 @@
 		103c 1742  HP 82B 8Gbps dual port FC HBA
 		103c 1744  HP 42B 4Gbps dual port FC HBA
 		1657 0014  425/825 4Gbps/8Gbps PCIe dual port FC HBA
-	0014  BR-1020 FC/FCOE 10GB Eth / FC over Eth
+	0014  1010/1020/1007 10Gbps CNA
 		1657 0014  1010/1020/1007 10Gbps CNA - FCOE
 		1657 0015  1010/1020/1007 10Gbps CNA - LL
-	0017  415 4Gb/815 8Gb PCIe FC HBA
+	0017  415/815/41B/81B 4Gbps/8Gbps PCIe single port FC HBA
 		103c 1741  HP 41B 4Gbps single port FC HBA
 		103c 1743  HP 81B 8Gbps single port FC HBA
 		1657 0014  415/815 4Gbps/8Gbps single port PCIe FC HBA
-	0021  8Gbps FC HBA
+	0021  804/807 8Gbps FC HBA
+		103c 1779  804 8Gbps FC HBA for HP Bladsystem c-class
 		1657 0014  8Gbps FC HBA
-		1657 1779  804 8Gbps FC HBA for HP Bladsystem c-class
 # Same Device_ID used for 410 (1port) and 420 (2 port) HBAs.
 	0646  400 4Gbps PCIe FC HBA
 165a  Epix Inc
@@ -13285,6 +13301,7 @@
 	1048  L1 Gigabit Ethernet Adapter
 		1043 8226  P5KPL-VM Motherboard
 	1062  Atheros AR8132 / L1c Gigabit Ethernet Adapter
+	1063  AR8131 Gigabit Ethernet
 	1066  L2c Gigabit Ethernet Adapter
 	1067  L1c Gigabit Ethernet Adapter
 	1073  AR8151 v1.0 Gigabit Ethernet
@@ -13465,6 +13482,13 @@
 	2a2c  Dual DVB-S2-CI card
 	e2e4  Dual DVB-T/C-CI RF card
 1bad  ReFLEX CES
+1bb3  Bluecherry
+	4304  BC-04120A MPEG4 4 port video encoder / decoder
+	4309  BC-08240A MPEG4 4 port video encoder / decoder
+	4310  BC-16480A MPEG4 16 port video encoder / decoder
+	4e04  BC-04120A 4 port MPEG4 video encoder / decoder
+	4e09  BC-08240A 8 port MPEG4 video encoder / decoder
+	4e10  BC-16480A 16 port MPEG4 video encoder / decoder
 1c1c  Symphony
 	0001  82C101
 1d44  DPT
@@ -14059,6 +14083,7 @@
 	0089  WiMAX/WiFi Link 6050 Series
 		8086 1311  WiFi Link 6050 Series 2x2 6050AGN
 		8086 1316  WiFi Link 6050 Series 2x2 6050ABG
+	0101  Sandy Bridge PCI Express Root Port
 	0102  Sandy Bridge Integrated Graphics Controller
 	0103  Sandy Bridge Thermal Management Controller
 	0105  Sandy Bridge PCI Express Root Port
@@ -14128,7 +14153,28 @@
 		8086 01f7  SCRU32
 # uninitialized SRCU32 RAID Controller
 	061f  80303 I/O Processor
-	0800  SPI Ctrl 0
+	0800  Moorestown SPI Ctrl 0
+	0801  Moorestown SPI Ctrl 1
+	0802  Moorestown I2C 0
+	0803  Moorestown I2C 1
+	0804  Moorestown I2C 2
+	0805  Moorestown Keyboard Ctrl
+	0806  Moorestown USB Ctrl
+	0807  Moorestown SD Host Ctrl 0
+	0808  Moorestown SD Host Ctrl 1
+	0809  Moorestown NAND Ctrl
+	080a  Moorestown Audio Ctrl
+	080b  Moorestown ISP
+	080c  Moorestown Security Controller
+	080d  Moorestown External Displays
+	080e  Moorestown SCU IPC
+	080f  Moorestown GPIO Controller
+	0810  Moorestown Power Management Unit
+	0811  Moorestown OTG Ctrl
+	0812  Moorestown SPI Ctrl 2
+	0813  Moorestown SC DMA
+	0814  Moorestown LPE DMA
+	0815  Moorestown SSP0
 	0960  80960RP (i960RP) Microprocessor/Bridge
 	0962  80960RM (i960RM) Bridge
 	0964  80960RP (i960RP) Microprocessor/Bridge
@@ -15963,10 +16009,10 @@
 		103c 30a3  Compaq nw8440
 		10f7 8338  Panasonic CF-Y5 laptop
 		17aa 2009  ThinkPad T60/R60 series
-	27bc  Tigerpoint LPC Controller
+	27bc  NM10 Family LPC Controller
 	27bd  82801GHM (ICH7-M DH) LPC Interface Bridge
 		1025 006c  9814 WKMI
-	27c0  82801GB/GR/GH (ICH7 Family) SATA IDE Controller
+	27c0  N10/ICH7 Family SATA IDE Controller
 		1028 01ad  OptiPlex GX620
 		1028 01df  PowerEdge SC440
 		1028 01e6  PowerEdge 860
@@ -15976,7 +16022,7 @@
 		1462 7236  945P Neo3-F Rev. 2.2 motherboard
 		1775 11cc  CC11/CL11
 		8086 544e  DeskTop Board D945GTP
-	27c1  82801GR/GH (ICH7 Family) SATA AHCI Controller
+	27c1  N10/ICH7 Family SATA AHCI Controller
 		1028 01df  PowerEdge SC440
 		1775 11cc  CC11/CL11
 		8086 5842  DeskTop Board D975XBX
@@ -15992,7 +16038,7 @@
 		103c 30a3  Compaq nw8440
 		17aa 200d  ThinkPad T60/R60 series
 	27c6  82801GHM (ICH7-M DH) SATA RAID Controller
-	27c8  82801G (ICH7 Family) USB UHCI Controller #1
+	27c8  N10/ICH7 Family USB UHCI Controller #1
 		1025 006c  9814 WKMI
 		1028 01ad  OptiPlex GX620
 		1028 01d7  XPS M1210
@@ -16007,7 +16053,7 @@
 		1775 11cc  CC11/CL11
 		17aa 200a  ThinkPad T60/R60 series
 		8086 544e  DeskTop Board D945GTP
-	27c9  82801G (ICH7 Family) USB UHCI Controller #2
+	27c9  N10/ICH 7 Family USB UHCI Controller #2
 		1025 006c  9814 WKMI
 		1028 01ad  OptiPlex GX620
 		1028 01d7  XPS M1210
@@ -16022,7 +16068,7 @@
 		1775 11cc  CC11/CL11
 		17aa 200a  ThinkPad T60/R60 series
 		8086 544e  DeskTop Board D945GTP
-	27ca  82801G (ICH7 Family) USB UHCI Controller #3
+	27ca  N10/ICH 7 Family USB UHCI Controller #3
 		1025 006c  9814 WKMI
 		1028 01ad  OptiPlex GX620
 		1028 01d7  XPS M1210
@@ -16037,7 +16083,7 @@
 		1775 11cc  CC11/CL11
 		17aa 200a  ThinkPad T60/R60 series
 		8086 544e  DeskTop Board D945GTP
-	27cb  82801G (ICH7 Family) USB UHCI Controller #4
+	27cb  N10/ICH 7 Family USB UHCI Controller #4
 		1025 006c  9814 WKMI
 		1028 01ad  OptiPlex GX620
 		1028 01d7  XPS M1210
@@ -16051,7 +16097,7 @@
 		1775 11cc  CC11/CL11
 		17aa 200a  ThinkPad T60/R60 series
 		8086 544e  DeskTop Board D945GTP
-	27cc  82801G (ICH7 Family) USB2 EHCI Controller
+	27cc  N10/ICH 7 Family USB2 EHCI Controller
 		1025 006c  9814 WKMI
 		1028 01ad  OptiPlex GX620
 		1028 01d7  XPS M1210
@@ -16065,20 +16111,20 @@
 		1775 11cc  CC11/CL11
 		17aa 200b  ThinkPad T60/R60 series
 		8086 544e  DeskTop Board D945GTP
-	27d0  82801G (ICH7 Family) PCI Express Port 1
+	27d0  N10/ICH 7 Family PCI Express Port 1
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a3  Compaq nw8440
 		1775 11cc  CC11/CL11
-	27d2  82801G (ICH7 Family) PCI Express Port 2
+	27d2  N10/ICH 7 Family PCI Express Port 2
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a3  Compaq nw8440
 		1775 11cc  CC11/CL11
-	27d4  82801G (ICH7 Family) PCI Express Port 3
+	27d4  N10/ICH 7 Family PCI Express Port 3
 		1775 11cc  CC11/CL11
-	27d6  82801G (ICH7 Family) PCI Express Port 4
+	27d6  N10/ICH 7 Family PCI Express Port 4
 		103c 30a3  Compaq nw8440
 		1775 11cc  CC11/CL11
-	27d8  82801G (ICH7 Family) High Definition Audio Controller
+	27d8  N10/ICH 7 Family High Definition Audio Controller
 		1025 006c  9814 WKMI
 		1028 01d7  XPS M1210
 		103c 309f  Compaq nx9420 Notebook
@@ -16100,7 +16146,7 @@
 		17aa 3802  Lenovo 3000 C200 audio [Realtek ALC861VD]
 		8086 1112  DeskTop Board D945GTP
 		8086 27d8  DeskTop Board D945GTP
-	27da  82801G (ICH7 Family) SMBus Controller
+	27da  N10/ICH 7 Family SMBus Controller
 		1025 006c  9814 WKMI
 		1028 01ad  OptiPlex GX620
 		1028 01d7  XPS M1210
@@ -16113,7 +16159,7 @@
 		17aa 200f  ThinkPad T60/R60 series
 		8086 544e  DeskTop Board D945GTP
 		8086 5842  DeskTop Board D975XBX
-	27dc  82801G (ICH7 Family) LAN Controller
+	27dc  N10/ICH 7 Family LAN Controller
 		8086 308d  DeskTop Board D945GTP
 	27dd  82801G (ICH7 Family) AC'97 Modem Controller
 	27de  82801G (ICH7 Family) AC'97 Audio Controller
@@ -16578,8 +16624,10 @@
 	2b1c  Nehalem-EX Memory Controller 1a
 	2b1e  Nehalem-EX Memory Controller 1b
 	2b20  Nehalem-EX Last Level Cache Coherence Engine 0
+	2b22  Nehalem-EX System Configuration Controller 3
 	2b24  Nehalem-EX Last Level Cache Coherence Engine 1
 	2b28  Nehalem-EX Last Level Cache Coherence Engine 2
+	2b2a  Nehalem-EX System Configuration Controller 4
 	2b2c  Nehalem-EX Last Level Cache Coherence Engine 3
 	2b30  Nehalem-EX Last Level Cache Coherence Engine 4
 	2b34  Nehalem-EX Last Level Cache Coherence Engine 5
@@ -17196,6 +17244,7 @@
 	4032  5400 Chipset IOxAPIC
 	4035  5400 Chipset FBD Registers
 	4036  5400 Chipset FBD Registers
+	4100  Moorestown Graphics and Video
 	4108  Tunnel Creek Integrated Graphics Controller
 	4109  Tunnel Creek Integrated Graphics Controller
 	410a  Tunnel Creek Integrated Graphics Controller
@@ -17522,14 +17571,14 @@
 	9622  Integrated RAID
 	9641  Integrated RAID
 	96a1  Integrated RAID
-	a000  Pineview DMI Bridge
-	a001  Pineview Integrated Graphics Controller
-	a002  Pineview Integrated Graphics Controller
-	a003  Pineview CHAPS counter
-	a010  Pineview DMI Bridge
-	a011  Pineview Integrated Graphics Controller
-	a012  Pineview Integrated Graphics Controller
-	a013  Pineview CHAPS counter
+	a000  N10 Family DMI Bridge
+	a001  N10 Family Integrated Graphics Controller
+	a002  N10 Family Integrated Graphics Controller
+	a003  N10 Family CHAPS counter
+	a010  N10 Family DMI Bridge
+	a011  N10 Family Integrated Graphics Controller
+	a012  N10 Family Integrated Graphics Controller
+	a013  N10 Family CHAPS counter
 	a620  6400/6402 Advanced Memory Buffer (AMB)
 	b152  21152 PCI-to-PCI Bridge
 		8086 b152  21152 PCI-to-PCI Bridge
