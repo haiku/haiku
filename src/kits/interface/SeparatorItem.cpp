@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -68,7 +68,8 @@ BSeparatorItem::GetContentSize(float* _width, float* _height)
 		BFont font(be_plain_font);
 		if (Menu())
 			Menu()->GetFont(&font);
-		*_height = floorf(font.Size() * 0.8);
+		const float height = floorf((font.Size() * 0.8) / 2) * 2;
+		*_height = max_c(4, height);
 	}
 }
 
@@ -84,12 +85,13 @@ BSeparatorItem::Draw()
 	rgb_color oldColor = menu->HighColor();
 	rgb_color lowColor = menu->LowColor();
 
+	const float startTop = bounds.top + (floor(bounds.Height())) / 2;
 	menu->SetHighColor(tint_color(lowColor, B_DARKEN_1_TINT));
-	menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 4.0f),
-		BPoint(bounds.right - 1.0f, bounds.top + 4.0f));
+	menu->StrokeLine(BPoint(bounds.left + 1.0f, startTop),
+		BPoint(bounds.right - 1.0f, startTop));
 	menu->SetHighColor(tint_color(lowColor, B_LIGHTEN_2_TINT));
-	menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 5.0f),
-		BPoint(bounds.right - 1.0f, bounds.top + 5.0f));
+	menu->StrokeLine(BPoint(bounds.left + 1.0f, startTop + 1.0f),
+		BPoint(bounds.right - 1.0f, startTop + 1.0f));
 
 	menu->SetHighColor(oldColor);
 }
