@@ -929,7 +929,7 @@ out:
 			free(ptr);
 		break;
 	default:
-		fc->ioctl (cookie, cmd, data, length);
+		fc->ioctl (fc, cmd, data, length);
 		break;
 	}
 	return err;
