@@ -400,8 +400,7 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 		.Add(menuField2->CreateLabelLayoutItem(), 0, 2)
 		.Add(menuField2->CreateMenuBarLayoutItem(), 1, 2);
 	gridLayout->SetMinColumnWidth(1, 
-		menuField->StringWidth(
-			TR_CMT("SomethingLongHere", "!! length >= screenshot file name? !!")));
+		menuField->StringWidth("SomethingLongHere"));
 
 	layout->AddView(1, BGroupLayoutBuilder(B_VERTICAL)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10.0)
@@ -525,8 +524,7 @@ ScreenshotWindow::_AddItemToPathMenu(const char* path, BString& label,
 	message->AddString("path", path);
 
 	fOutputPathMenu->TruncateString(&label, B_TRUNCATE_MIDDLE,
-		fOutputPathMenu->StringWidth(
-			TR_CMT("SomethingLongHere", "!! length >= screenshot file name? !!")));
+		fOutputPathMenu->StringWidth("SomethingLongHere"));
 
 	fOutputPathMenu->AddItem(new BMenuItem(label.String(), message), index);
 
