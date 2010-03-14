@@ -90,7 +90,7 @@ SYSTEM_LIBS =
 	libpng.so
 	<revisioned>libroot.so
 	libscreensaver.so
-	libtextencoding.so libtracker.so libtranslation.so
+	libtextencoding.so libtiff.so libtracker.so libtranslation.so
 	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ;

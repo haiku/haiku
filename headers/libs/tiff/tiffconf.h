@@ -1,3 +1,4 @@
+/* libtiff/tiffconf.h.  Generated from tiffconf.h.in by configure.  */
 /*
   Configuration defines for installed libtiff.
   This file maintained for backward compatibility. Do not use definitions
@@ -8,85 +9,85 @@
 #define _TIFFCONF_
 
 /* Define to 1 if the system has the type `int16'. */
-#undef HAVE_INT16
+#define HAVE_INT16 1
 
 /* Define to 1 if the system has the type `int32'. */
-#undef HAVE_INT32
+#define HAVE_INT32 1
 
 /* Define to 1 if the system has the type `int8'. */
-#undef HAVE_INT8
+#define HAVE_INT8 1
 
 /* The size of a `int', as computed by sizeof. */
-#undef SIZEOF_INT
+#define SIZEOF_INT 4
 
 /* The size of a `long', as computed by sizeof. */
-#undef SIZEOF_LONG
+#define SIZEOF_LONG 4
 
 /* Compatibility stuff. */
 
 /* Define as 0 or 1 according to the floating point format suported by the
    machine */
-#undef HAVE_IEEEFP
+#define HAVE_IEEEFP 1
 
 /* Set the native cpu bit order (FILLORDER_LSB2MSB or FILLORDER_MSB2LSB) */
-#undef HOST_FILLORDER
+#define HOST_FILLORDER FILLORDER_LSB2MSB
 
 /* Native cpu byte order: 1 if big-endian (Motorola) or 0 if little-endian
    (Intel) */
-#undef HOST_BIGENDIAN
+#define HOST_BIGENDIAN 0
 
 /* Support CCITT Group 3 & 4 algorithms */
-#undef CCITT_SUPPORT
+#define CCITT_SUPPORT 1
 
 /* Support JPEG compression (requires IJG JPEG library) */
-#undef JPEG_SUPPORT
+#define JPEG_SUPPORT 1
 
 /* Support JBIG compression (requires JBIG-KIT library) */
-#undef JBIG_SUPPORT
+/* #undef JBIG_SUPPORT */
 
 /* Support LogLuv high dynamic range encoding */
-#undef LOGLUV_SUPPORT
+#define LOGLUV_SUPPORT 1
 
 /* Support LZW algorithm */
-#undef LZW_SUPPORT
+#define LZW_SUPPORT 1
 
 /* Support NeXT 2-bit RLE algorithm */
-#undef NEXT_SUPPORT
+#define NEXT_SUPPORT 1
 
 /* Support Old JPEG compresson (read contrib/ojpeg/README first! Compilation
    fails with unpatched IJG JPEG library) */
-#undef OJPEG_SUPPORT
+#define OJPEG_SUPPORT 1
 
 /* Support Macintosh PackBits algorithm */
-#undef PACKBITS_SUPPORT
+#define PACKBITS_SUPPORT 1
 
 /* Support Pixar log-format algorithm (requires Zlib) */
-#undef PIXARLOG_SUPPORT
+#define PIXARLOG_SUPPORT 1
 
 /* Support ThunderScan 4-bit RLE algorithm */
-#undef THUNDER_SUPPORT
+#define THUNDER_SUPPORT 1
 
 /* Support Deflate compression */
-#undef ZIP_SUPPORT
+#define ZIP_SUPPORT 1
 
 /* Support strip chopping (whether or not to convert single-strip uncompressed
    images to mutiple strips of ~8Kb to reduce memory usage) */
-#undef STRIPCHOP_DEFAULT
+#define STRIPCHOP_DEFAULT TIFF_STRIPCHOP
 
 /* Enable SubIFD tag (330) support */
-#undef SUBIFD_SUPPORT
+#define SUBIFD_SUPPORT 1
 
 /* Treat extra sample as alpha (default enabled). The RGBA interface will
    treat a fourth sample with no EXTRASAMPLE_ value as being ASSOCALPHA. Many
    packages produce RGBA files but don't mark the alpha properly. */
-#undef DEFAULT_EXTRASAMPLE_AS_ALPHA
+#define DEFAULT_EXTRASAMPLE_AS_ALPHA 1
 
 /* Pick up YCbCr subsampling info from the JPEG data stream to support files
    lacking the tag (default enabled). */
-#undef CHECK_JPEG_YCBCR_SUBSAMPLING
+#define CHECK_JPEG_YCBCR_SUBSAMPLING 1
 
 /* Support MS MDI magic number files as TIFF */
-#undef MDI_SUPPORT
+#define MDI_SUPPORT 1
 
 /*
  * Feature support definitions.
@@ -99,5 +100,11 @@
 #define ICC_SUPPORT
 #define PHOTOSHOP_SUPPORT
 #define IPTC_SUPPORT
+
+#include <SupportDefs.h>
+	// Use Be's typedefs for [u]int# instead of having libtiff define them.
+	// This resolves the problem of Be's types being redefined by libtiff
+	// without breaking or making mass changes to libtiff.
+
 
 #endif /* _TIFFCONF_ */
