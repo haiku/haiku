@@ -545,6 +545,7 @@ ActivityView::LegendLayoutItem::BaseAlignment()
 
 const rgb_color kWhite = (rgb_color){255, 255, 255, 255};
 const rgb_color kBlack = (rgb_color){0, 0, 0, 255};
+const float kDraggerSize = 7;
 
 
 ActivityView::ActivityView(BRect frame, const char* name,
@@ -556,8 +557,8 @@ ActivityView::ActivityView(BRect frame, const char* name,
 	_Init(settings);
 
 	BRect rect(Bounds());
-	rect.top = rect.bottom - 7;
-	rect.left = rect.right - 7;
+	rect.top = rect.bottom - kDraggerSize;
+	rect.left = rect.right - kDraggerSize;
 	BDragger* dragger = new BDragger(rect, this,
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(dragger);
@@ -578,8 +579,8 @@ ActivityView::ActivityView(const char* name, const BMessage* settings)
 	_Init(settings);
 
 	BRect rect(Bounds());
-	rect.top = rect.bottom - 7;
-	rect.left = rect.right - 7;
+	rect.top = rect.bottom - kDraggerSize;
+	rect.left = rect.right - kDraggerSize;
 	BDragger* dragger = new BDragger(rect, this,
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(dragger);
@@ -1112,7 +1113,7 @@ ActivityView::MessageReceived(BMessage* message)
 		{
 			BString attrName;
 			if (message->FindString("attr", &attrName) == B_OK) {
-				if (attrName == kDesktopAttrName) 
+				if (attrName == kDesktopAttrName)
 					_LoadBackgroundInfo(false);
 			} else
 				_LoadBackgroundInfo(false);
@@ -1235,15 +1236,12 @@ ActivityView::_LegendHeight() const
 	BAutolock _(fSourcesLock);
 
 	int32 rows = (fSources.CountItems() + 1) / 2;
-	
+
 	int32 boldMargin = Parent()
 		&& (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0 ? 2 : 0;
 
-	int32 draggerMargin = (fSources.CountItems() % 2) != 0 ? 0 : 7;
-
 	return rows * (4 + ceilf(fontHeight.ascent)
-		+ ceilf(fontHeight.descent) + ceilf(fontHeight.leading)) + boldMargin
-		+ draggerMargin;
+		+ ceilf(fontHeight.descent) + ceilf(fontHeight.leading)) + boldMargin;
 }
 
 
@@ -1259,6 +1257,7 @@ ActivityView::_LegendFrame() const
 		height = _LegendHeight();
 
 	BRect frame = Bounds();
+	frame.bottom -= kDraggerSize;
 	frame.top = frame.bottom - height;
 
 	return frame;
@@ -1488,8 +1487,11 @@ ActivityView::Draw(BRect updateRect)
 	// draw legend
 	BRect legendFrame = _LegendFrame();
 	SetLowColor(fLegendBackgroundColor);
-	if (drawBackground)
-		FillRect(legendFrame, B_SOLID_LOW);
+	if (drawBackground) {
+		BRect backgroundFrame(legendFrame);
+		backgroundFrame.bottom += kDraggerSize;
+		FillRect(backgroundFrame, B_SOLID_LOW);
+	}
 
 	BAutolock _(fSourcesLock);
 
@@ -1529,7 +1531,7 @@ ActivityView::Draw(BRect updateRect)
 		else {
 			rgb_color c = Parent()->ViewColor();
 			rgb_color textColor = c.red + c.green * 1.5f + c.blue * 0.50f
-				>= 300 ? kBlack : kWhite;			
+				>= 300 ? kBlack : kWhite;
 
 			int32 mask;
 			bool tmpOutline = false;
@@ -1582,7 +1584,7 @@ ActivityView::Draw(BRect updateRect)
 				} else {
 					// white text with black outline
 					rgb_color outlineColor = kBlack;
-				
+
 					font.SetFalseBoldWidth(1.0);
 					SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 
@@ -1590,7 +1592,7 @@ ActivityView::Draw(BRect updateRect)
 					SetHighColor(outlineColor);
 					DrawString(label.String(), BPoint(6 + colorBox.right, y));
 					DrawString(text.String(), BPoint(frame.right - width, y));
-				
+
 					font.SetFalseBoldWidth(0.0);
 					SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 
