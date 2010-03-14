@@ -237,9 +237,9 @@ PackageCredit::PackageCredit(const BMessage& packageDescription)
 		url = NULL;
 
 	fPackageName = package;
-	fCopyrights.SetTo(packageDescription, TR("Copyright"), COPYRIGHT_STRING);
-	fLicenses.SetTo(packageDescription, TR("License"));
-	fSources.SetTo(packageDescription, TR("SourceURL"));
+	fCopyrights.SetTo(packageDescription, "Copyright", COPYRIGHT_STRING);
+	fLicenses.SetTo(packageDescription, "License");
+	fSources.SetTo(packageDescription, "SourceURL");
 	fURL = url;
 }
 
