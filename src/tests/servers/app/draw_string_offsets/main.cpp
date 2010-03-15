@@ -43,7 +43,7 @@ TestView::Draw(BRect updateRect)
 	offsets[4].x = 30;
 	offsets[4].y = 10;
 
-	DrawString("Hello", strlen("Hello"), offsets);
+	DrawString("Hello", offsets, 5);
 }
 
 

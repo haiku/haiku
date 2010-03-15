@@ -433,8 +433,12 @@ public:
 			void				DrawString(const char* string, int32 length,
 									BPoint location,
 									escapement_delta* delta = 0L);
+			void				DrawString(const char* string,
+									const BPoint* locations,
+									int32 locationCount);
 			void				DrawString(const char* string, int32 length,
-									const BPoint* locations);
+									const BPoint* locations,
+									int32 locationCount);
 
 	virtual void            	SetFont(const BFont* font,
 									uint32 mask = B_FONT_ALL);

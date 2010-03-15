@@ -45,7 +45,6 @@
 #include <String.h>
 #include <Window.h>
 
-#include <utf8_functions.h>
 #include <AppMisc.h>
 #include <AppServerLink.h>
 #include <binary_compatibility/Interface.h>
@@ -2571,7 +2570,19 @@ BView::DrawString(const char* string, int32 length, BPoint location,
 
 
 void
-BView::DrawString(const char* string, int32 length, const BPoint* locations)
+BView::DrawString(const char* string, const BPoint* locations,
+	int32 locationCount)
+{
+	if (string == NULL)
+		return;
+
+	DrawString(string, strlen(string), locations, locationCount);
+}
+
+
+void
+BView::DrawString(const char* string, int32 length, const BPoint* locations,
+	int32 locationCount)
 {
 	if (fOwner == NULL || string == NULL || length < 1 || locations == NULL)
 		return;
@@ -2580,11 +2591,10 @@ BView::DrawString(const char* string, int32 length, const BPoint* locations)
 
 	fOwner->fLink->StartMessage(AS_DRAW_STRING_WITH_OFFSETS);
 
-	int32 glyphCount = UTF8CountChars(string, length);
 	fOwner->fLink->Attach<int32>(length);
-	fOwner->fLink->Attach<int32>(glyphCount);
+	fOwner->fLink->Attach<int32>(locationCount);
 	fOwner->fLink->Attach(string, length);
-	fOwner->fLink->Attach(locations, glyphCount * sizeof(BPoint));
+	fOwner->fLink->Attach(locations, locationCount * sizeof(BPoint));
 
 	_FlushIfNotInTransaction();
 
