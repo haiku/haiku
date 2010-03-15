@@ -151,7 +151,7 @@ Depends LocaleKit :
 	LocaleKitTests
 ;
 
-# Pepare the optional build features before parsing the Jamfile tree.
+# Prepare the optional build features before parsing the Jamfile tree.
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalBuildFeatures ] ;
 
 # Add optional packages given via HAIKU_ADD_OPTIONAL_PACKAGES.

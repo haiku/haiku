@@ -673,7 +673,7 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 
 # MandatoryPackages
 if [ IsOptionalHaikuImagePackageAdded MandatoryPackages ] { 
-	# Psuedo package for grouping packages, which are added to all images.
+	# Pseudo package for grouping packages, which are added to all images.
 }
 
 
