@@ -1,4 +1,4 @@
-1	de	x-vnd.Haiku-DriveSetup	3321530449
+1	german	x-vnd.Haiku-DriveSetup	3321530449
 Delete	MainWindow		Löschen
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Sind Sie sicher, dass Sie die gewählte Partition initialisieren möchten? Nach der Eingabe der Initialisierungsparameter kann die Aktion noch vor dem Schreiben der Änderungen auf das Medium abgebrochen werden.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf das Speichermedium schreiben möchten?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
@@ -41,7 +41,7 @@ There was an error preparing the disk for modifications.	MainWindow		Beim Vorber
 %3.1f MB	Support		%3.1f MB
 The partition %s is already mounted.	MainWindow		Die Partition %s ist bereits eingehangen.
 %3.1f GB	Support		%3.1f GB
-%ld MB	Support		%ld MB
+%ld MB	Support		Ende: %ld MB
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf das Speichermedium schreiben möchten?\n\nAlle Daten auf dem Medium %s gehen dabei unwiderruflich verloren!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf die gewählte Partition schreiben möchten?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
 Create…	MainWindow		Anlegen…
@@ -67,7 +67,7 @@ Validation of the given creation parameters failed.	MainWindow		Die Überprüfun
 Size	PartitionList		Größe
 Don't know how to gather initialization parameters for this disk system.	MainWindow		Initialisierungsparamter für dieses Medienschema konnten nicht ermittelt werden.
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter schlug fehl.
-The selected partition does not contain a partitioning system.	MainWindow		The selected partition does not contain a partitioning system.
+The selected partition does not contain a partitioning system.	MainWindow		Die ausgewählte Partition enthält kein Partitionierungssystem.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf das Speichermedium schreiben möchten?\n\nAlle Daten auf der Partition %s gehen dabei unwiderruflich verloren!
 The partition %s is currently mounted.	MainWindow		Die Partition %s ist momentan eingehangen.
 Partition size	CreateParamsPanel		Partitionsgröße

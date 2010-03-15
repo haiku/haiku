@@ -1,28 +1,28 @@
-1	german	application/x-vnd.Be-PRNT	403433619
-Add printer	AddPrinterDialog		Drucker anlegen
-Printer name:	AddPrinterDialog		Druckername:
-<pick one>	AddPrinterDialog		<auswählen>
-Printer type:	AddPrinterDialog		Druckertyp:
-Connected to:	AddPrinterDialog		Verbunden mit:
-Add	AddPrinterDialog		Hinzufügen
-Cancel	AddPrinterDialog		Abbrechen
+1	german	x-vnd.Be-PRNT	403433619
+Waiting	JobListView		Wartend
 page	JobListView		Seite
-pages	JobListView		Seiten
-%.2f KB	JobListView		%.2f KB
-Waiting	JobListView		Warten
-Processing	JobListView		In Bearbeitung
-Failed	JobListView		Fehlgeschlagen
-Completed	JobListView		Abgeschlossen
-Unknown status	JobListView		Unbekannter Zustand
-Default Printer	PrinterListView		Standard Drucker
-No pending jobs.	PrinterListView		Keine ausstehenden Aufträge.
-1 pending job.	PrinterListView		Ein ausstehender Auftrag.
- pending jobs.	PrinterListView		 ausstehende Aufträge.
+Cancel	AddPrinterDialog		Abbrechen
+Add printer	AddPrinterDialog		Drucker hinzufügen
 Printers	PrintersWindow		Drucker
-Print jobs for 	PrintersWindow		Druckaufträge für 
-Print jobs: No printer selected	PrintersWindow		Druckaufträge: Kein Drucker ausgewählt
-Add …	PrintersWindow		Hinzufügen …
-Remove	PrintersWindow		Entfernen
-Make default	PrintersWindow		Als Standard
-Cancel job	PrintersWindow		Auftrag abbrechen
+Default Printer	PrinterListView		Bevorzugter Drucker
+No pending jobs.	PrinterListView		Keine ausstehenden Druckaufträge.
+pages	JobListView		Seiten
+Processing	JobListView		Verarbeite
+Printer name:	AddPrinterDialog		Druckername:
+ pending jobs.	PrinterListView		 ausstehende Druckaufträge.
 Restart job	PrintersWindow		Auftrag neustarten
+Add	AddPrinterDialog		Hinzufügen
+Make default	PrintersWindow		Als bevorzugten Drucker wählen
+Cancel job	PrintersWindow		Druckauftrag abbrechen
+1 pending job.	PrinterListView		1 ausstehender Druckauftrag.
+Remove	PrintersWindow		Entfernen
+<pick one>	AddPrinterDialog		<Auswählen>
+Add …	PrintersWindow		Hinzufügen …
+Print jobs for 	PrintersWindow		Druckaufträge für 
+Failed	JobListView		Fehlgeschlagen
+%.2f KB	JobListView		%.2f KB
+Completed	JobListView		Abgeschlossen
+Print jobs: No printer selected	PrintersWindow		Druckaufträge: Kein Drucker ausgewählt
+Unknown status	JobListView		Unbekannter Status
+Connected to:	AddPrinterDialog		Verbunden mit:
+Printer type:	AddPrinterDialog		Druckermodell:

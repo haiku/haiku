@@ -1,12 +1,12 @@
 1	german	x-vnd.Be-MAIL	2102081210
 %d - Date	Mail		%d - Datum
-Attach attributes:	Mail		Dateiattribute anfügen:
+Attach attributes:	Mail		BFS-Attribute des Anhangs immer mitsenden:
 Inconsistency occurred in the undo/redo buffer.	Mail		Es ist eine Inkonsistenz im Rückgängig/Wiederherstellen-System aufgetreten.
 An error occurred trying to save the attachment.	Mail		Beim Speichern des Anhangs ist ein Fehler aufgetreten.
-Copy to new	Mail		Copy to new
+Copy to new	Mail		Zu neu kopieren
 Edit	Mail		Bearbeiten
 Print	Mail		Drucken
-New mail message	Mail		Neue Nachricht verfassen
+New mail message	Mail		Nachricht verfassen
 Automatically mark mail as read:	Mail		Nachrichten automatisch als gelesen markieren:
 Colored quotes:	Mail		Farbige Zitate:
 Subject:	Mail		Betreff:
@@ -60,7 +60,7 @@ Size:	Mail		Größe:
 Account from mail	Mail		Konto der Nachricht
 Edit signatures…	Mail		Signaturen bearbeiten…
 New	Mail		Neu
-Attachments: 	Mail		Anhänge:
+Attachments: 	Mail		Anhänge: 
 Set to %s	Mail		Setzen auf %s
 Forward	Mail		Weiterleiten
 E-mail draft could not be saved!	Mail		Nachrichtenentwurf konnte nicht gespeichert werden!
@@ -78,7 +78,7 @@ Page setup…	Mail		Seite einrichten…
 Text wrapping:	Mail		Textumbruch:
 Revert	Mail		Änderungen verwerfen
 File	Mail		Datei
-None	Mail		Keine
+None	Mail		Keines
 Copy link location	Mail		Linkadresse kopieren
 Show header	Mail		Nachrichtenkopf anzeigen
 %e - E-mail address	Mail		%e - Nachrichtenadresse
@@ -87,7 +87,7 @@ Show raw message	Mail		Rohnachricht anzeigen
 \\n - Newline	Mail		\\n - Zeilenumbruch
 Start now	Mail		Jetzt starten
 Close	Mail		Schließen
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Der Nachrichtendienst (mail_daemon) läuft nicht. Die Nachricht versendet, sobald der Dienst läuft.
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Der Nachrichtendienst (mail_daemon) läuft nicht. Die Nachricht wird versendet, sobald der Dienst läuft.
 Really delete this signature? This cannot be undone.	Mail		Diese Signatur tatsächlich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
 Open	Mail		Öffnen
 Quote	Mail		Zitat
@@ -99,7 +99,7 @@ Send message	Mail		Nachricht senden
 Remove enclosure	Mail		Anhang löschen
 Account:	Mail		Konto:
 Decoding:	Mail		Zeichendekodierung:
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Es konnte leider keine Anwendung gefunden werden, welche den 'Person' Datentypen unterstützt.
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Es konnte leider keine Anwendung gefunden werden, die den Datentyp 'Person' unterstützt.
 Do you wish to send this message before closing?	Mail		Möchten Sie diese Nachricht senden, bevor sie geschlossen wird?
 Delete	Mail		Löschen
 Leave as '%s'	Mail		Als '%s' belassen
@@ -110,7 +110,7 @@ Next	Mail		Nächste
 Set to…	Mail		Setzen auf…
 Use default account	Mail		Standardkonto verwenden
 Sorry	Mail		Entschuldigung
-Encoding:	Mail		Kodierung:
+Encoding:	Mail		Zeichenkodierung:
 Font:	Mail		Schriftsatz:
 Save address	Mail		Adresse speichern
 Queries	Mail		Suchabfragen
@@ -132,10 +132,10 @@ Set to Saved	Mail		Als gespeichert setzen
 Open this link	Mail		Diesen Link öffnen
 Auto signature:	Mail		Automatische Signatur:
 Add signature	Mail		Signatur hinzufügen
-Need Tracker to move items to trash	Mail		Der Tracker wird benötigt, um Nachrichten in den Müll zu verschieben.
+Need Tracker to move items to trash	Mail		Der Tracker wird benötigt, um Nachrichten in den Papierkorb zu verschieben.
 Mailing	Mail		Nachrichten
 Unread	Mail		Ungelesen
 Remove quote	Mail		Zitat entfernen
-Move to trash	Mail		In den Müll verschieben
+Move to trash	Mail		In den Papierkorb verschieben
 Select all	Mail		Alles auswählen
 An error occurred trying to save this signature.	Mail		Beim Speichern dieser Signatur ist ein Fehler aufgetreten.
