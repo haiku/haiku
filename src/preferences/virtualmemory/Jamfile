@@ -21,5 +21,5 @@ DoCatalogs VirtualMemory :
     VirtualMemory.cpp 
     SettingsWindow.cpp 
     : en.catalog 
-	: fr.catkeys nl.catkeys pl.catkeys uk.catkeys
+	: de.catkeys fr.catkeys nl.catkeys pl.catkeys uk.catkeys
     ; 

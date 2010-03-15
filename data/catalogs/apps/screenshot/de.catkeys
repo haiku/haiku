@@ -1,0 +1,28 @@
+1	german	x-vnd.Haiku-Screenshot	1342822790
+seconds	ScreenshotWindow		 Sekunden
+Options	ScreenshotWindow		Optionen
+Desktop	ScreenshotWindow		Desktop
+Include window border	ScreenshotWindow		Fensterrahmen einbeziehen
+Back to saving	ScreenshotWindow		Zurück
+Select	ScreenshotWindow		Auswählen
+Capture active window	ScreenshotWindow		Aktives Fenster aufnehmen
+Cancel	ScreenshotWindow		Abbrechen
+screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	bildschirmfoto
+Name:	ScreenshotWindow		Name:
+screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	bildschirmfoto1
+Save screenshot	ScreenshotWindow		Bildschirmfoto speichern
+Capture entire screen	ScreenshotWindow		Gesamten Bildschirm aufnehmen
+Choose folder	ScreenshotWindow		Ordner auswählen
+Take screenshot	ScreenshotWindow		Bildschirmfoto aufnehmen
+Save	ScreenshotWindow		Speichern
+Overwrite	ScreenshotWindow		Überschreiben
+Retake screenshot	ScreenshotWindow		Bildschirmfoto neu aufnehmen
+Choose folder...	ScreenshotWindow		Ordner auswählen...
+Please select	ScreenshotWindow		Bitte auswählen
+Save as:	ScreenshotWindow		Speichern als:
+Save in:	ScreenshotWindow		Speichern in:
+Take screenshot after a delay of	ScreenshotWindow		Bildschirmfoto aufnehmen mit einer Verzögerung von
+Artwork folder	ScreenshotWindow		Artwork Ordner
+Home folder	ScreenshotWindow		Home Ordner
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Eine Datei mit diesem Namen gibt es bereits.\nSind Sie sicher, dass Sie sie überschreiben möchten?
+Include mouse pointer	ScreenshotWindow		Mauszeiger einbeziehen

@@ -26,6 +26,6 @@ DoCatalogs Keyboard :
 	KeyboardView.cpp
 	: en.catalog
 	:
-	bg.catkeys eo.catkeys fr.catkeys hu.catkeys ja.catkeys lt.catkeys
-	pl.catkeys pt.catkeys ru.catkeys sv.catkeys uk.catkeys
+	bg.catkeys de.catkeys eo.catkeys fr.catkeys hu.catkeys ja.catkeys
+	lt.catkeys pl.catkeys pt.catkeys ru.catkeys sv.catkeys uk.catkeys
 	;

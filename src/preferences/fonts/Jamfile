@@ -18,8 +18,8 @@ DoCatalogs Fonts :
 	main.cpp
 	MainWindow.cpp
 	: en.catalog
-	: bg.catkeys pt_br.catkeys eo.catkeys es.catkeys fi.catkeys fr.catkeys
-	  hu.catkeys it.catkeys ja.catkeys lt.catkeys pl.catkeys pt.catkeys ru.catkeys
-	  sv.catkeys uk.catkeys
+	: bg.catkeys de.catkeys pt_br.catkeys eo.catkeys es.catkeys fi.catkeys
+	  fr.catkeys hu.catkeys it.catkeys ja.catkeys lt.catkeys pl.catkeys
+	  pt.catkeys ru.catkeys sv.catkeys uk.catkeys
 	;
 

@@ -17,5 +17,5 @@ DoCatalogs Screenshot :
 	:
 		ScreenshotWindow.cpp
 	: en.catalog
-	: pt.catkeys pt_br.catkeys uk.catkeys es.catkeys
+	: de.catkeys pt.catkeys pt_br.catkeys uk.catkeys es.catkeys
 	;
