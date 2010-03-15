@@ -1343,6 +1343,37 @@ DrawingEngine::DrawString(const char* string, int32 length,
 }
 
 
+BPoint
+DrawingEngine::DrawString(const char* string, int32 length,
+	const BPoint* offsets)
+{
+	ASSERT_PARALLEL_LOCKED();
+
+	// use a FontCacheRefernece to speed up the second pass of
+	// drawing the string
+	FontCacheReference cacheReference;
+
+	BPoint penLocation;
+	BRect b = fPainter->BoundingBox(string, length, offsets, &penLocation,
+		&cacheReference);
+	// stop here if we're supposed to render outside of the clipping
+	b = fPainter->ClipRect(b);
+	if (b.IsValid()) {
+//printf("bounding box '%s': %lld µs\n", string, system_time() - now);
+		AutoFloatingOverlaysHider _(fGraphicsCard, b);
+
+//now = system_time();
+		BRect touched = fPainter->DrawString(string, length, offsets,
+			&cacheReference);
+//printf("drawing string: %lld µs\n", system_time() - now);
+
+		_CopyToFront(touched);
+	}
+
+	return penLocation;
+}
+
+
 float
 DrawingEngine::StringWidth(const char* string, int32 length,
 	escapement_delta* delta)

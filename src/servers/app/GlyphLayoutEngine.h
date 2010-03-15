@@ -64,6 +64,7 @@ class GlyphLayoutEngine {
 									const escapement_delta* delta = NULL,
 									bool kerning = true,
 									uint8 spacing = B_BITMAP_SPACING,
+									const BPoint* offsets = NULL,
 									FontCacheReference* cacheReference = NULL);
 
 	static	bool				IsWhiteSpace(uint32 glyphCode);
@@ -101,7 +102,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	const ServerFont& font,
 	const char* utf8String, int32 length,
 	const escapement_delta* delta, bool kerning, uint8 spacing,
-	FontCacheReference* cacheReference)
+	const BPoint* offsets, FontCacheReference* cacheReference)
 {
 	// TODO: implement spacing modes
 
@@ -136,6 +137,10 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 
 	double x = 0.0;
 	double y = 0.0;
+	if (offsets) {
+		x = offsets[0].x;
+		y = offsets[0].y;
+	}
 
 	double advanceX = 0.0;
 	double advanceY = 0.0;
@@ -146,6 +151,24 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	const char* start = utf8String;
 	while ((charCode = UTF8ToCharCode(&utf8String))) {
 
+		if (offsets) {
+			// Use direct glyph locations instead of calculating them
+			// from the advance values
+			x = offsets[index].x;
+			y = offsets[index].y;
+		} else {
+// TODO: Currently disabled, because it works much too slow (doesn't seem
+// to be properly cached in FreeType.)
+//			if (kerning)
+//				entry->GetKerning(lastCharCode, charCode, &advanceX, &advanceY);
+
+			x += advanceX;
+			y += advanceY;
+
+			if (delta)
+				x += IsWhiteSpace(charCode) ? delta->space : delta->nonspace;
+		}
+
 		const GlyphCache* glyph = entry->Glyph(charCode);
 		if (glyph == NULL) {
 			fprintf(stderr, "failed to load glyph for 0x%04lx (%c)\n", charCode,
@@ -154,17 +177,6 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			consumer.ConsumeEmptyGlyph(index, charCode, x, y);
 			continue;
 		}
-
-// TODO: Currently disabled, because it works much too slow (doesn't seem
-// to be properly cached in FreeType.)
-//		if (kerning)
-//			entry->GetKerning(lastCharCode, charCode, &advanceX, &advanceY);
-
-		x += advanceX;
-		y += advanceY;
-
-		if (delta)
-			x += IsWhiteSpace(charCode) ? delta->space : delta->nonspace;
 
 		if (!consumer.ConsumeGlyph(index, charCode, glyph, entry, x, y)) {
 			advanceX = 0;

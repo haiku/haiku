@@ -200,11 +200,19 @@ class Painter {
 									uint32 length, BPoint baseLine,
 									const escapement_delta* delta,
 									FontCacheReference* cacheReference = NULL);
+			BRect				DrawString(const char* utf8String,
+									uint32 length, const BPoint* offsets,
+									FontCacheReference* cacheReference = NULL);
 
 			BRect				BoundingBox(const char* utf8String,
 									uint32 length, BPoint baseLine,
 									BPoint* penLocation,
 									const escapement_delta* delta,
+									FontCacheReference* cacheReference
+										= NULL) const;
+			BRect				BoundingBox(const char* utf8String,
+									uint32 length, const BPoint* offsets,
+									BPoint* penLocation,
 									FontCacheReference* cacheReference
 										= NULL) const;
 

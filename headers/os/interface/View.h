@@ -423,16 +423,18 @@ public:
 
 			void				DrawChar(char aChar);
 			void				DrawChar(char aChar, BPoint location);
-			void				DrawString(const char* aString,
+			void				DrawString(const char* string,
 									escapement_delta* delta = NULL);
-			void				DrawString(const char* aString,
+			void				DrawString(const char* string,
 									BPoint location,
 									escapement_delta* delta = NULL);
-			void				DrawString(const char* aString, int32 length,
+			void				DrawString(const char* string, int32 length,
 									escapement_delta* delta = NULL);
-			void				DrawString(const char* aString, int32 length,
+			void				DrawString(const char* string, int32 length,
 									BPoint location,
 									escapement_delta* delta = 0L);
+			void				DrawString(const char* string, int32 length,
+									const BPoint* locations);
 
 	virtual void            	SetFont(const BFont* font,
 									uint32 mask = B_FONT_ALL);

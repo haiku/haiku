@@ -1418,7 +1418,7 @@ Painter::DrawString(const char* utf8String, uint32 length, BPoint baseLine,
 		baseLine.y = roundf(baseLine.y);
 	}
 
-	BRect bounds(0.0, 0.0, -1.0, -1.0);
+	BRect bounds;
 
 	// text is not rendered with patterns, but we need to
 	// make sure that the previous pattern is restored
@@ -1427,6 +1427,32 @@ Painter::DrawString(const char* utf8String, uint32 length, BPoint baseLine,
 
 	bounds = fTextRenderer.RenderString(utf8String, length,
 		baseLine, fClippingRegion->Frame(), false, NULL, delta,
+		cacheReference);
+
+	SetPattern(oldPattern);
+
+	return _Clipped(bounds);
+}
+
+
+// DrawString
+BRect
+Painter::DrawString(const char* utf8String, uint32 length,
+	const BPoint* offsets, FontCacheReference* cacheReference)
+{
+	CHECK_CLIPPING
+
+	// TODO: Round offsets to device pixel grid if !fSubpixelPrecise?
+
+	BRect bounds;
+
+	// text is not rendered with patterns, but we need to
+	// make sure that the previous pattern is restored
+	pattern oldPattern = *fPatternHandler.GetR5Pattern();
+	SetPattern(B_SOLID_HIGH, true);
+
+	bounds = fTextRenderer.RenderString(utf8String, length,
+		offsets, fClippingRegion->Frame(), false, NULL,
 		cacheReference);
 
 	SetPattern(oldPattern);
@@ -1449,6 +1475,20 @@ Painter::BoundingBox(const char* utf8String, uint32 length, BPoint baseLine,
 	static BRect dummy;
 	return fTextRenderer.RenderString(utf8String, length,
 		baseLine, dummy, true, penLocation, delta, cacheReference);
+}
+
+
+// BoundingBox
+BRect
+Painter::BoundingBox(const char* utf8String, uint32 length,
+	const BPoint* offsets, BPoint* penLocation,
+	FontCacheReference* cacheReference) const
+{
+	// TODO: Round offsets to device pixel grid if !fSubpixelPrecise?
+
+	static BRect dummy;
+	return fTextRenderer.RenderString(utf8String, length,
+		offsets, dummy, true, penLocation, cacheReference);
 }
 
 

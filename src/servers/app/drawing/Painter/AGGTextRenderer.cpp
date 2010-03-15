@@ -304,7 +304,7 @@ private:
 	AGGTextRenderer&	fRenderer;
 };
 
-// RenderString
+
 BRect
 AGGTextRenderer::RenderString(const char* string, uint32 length,
 	const BPoint& baseLine, const BRect& clippingFrame, bool dryRun,
@@ -335,7 +335,41 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 		transform, transformOffset, nextCharPos, *this);
 
 	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, delta,
-		fKerning, B_BITMAP_SPACING, cacheReference);
+		fKerning, B_BITMAP_SPACING, NULL, cacheReference);
+
+	return transform.TransformBounds(renderer.Bounds());
+}
+
+
+BRect
+AGGTextRenderer::RenderString(const char* string, uint32 length,
+	const BPoint* offsets, const BRect& clippingFrame, bool dryRun,
+	BPoint* nextCharPos, FontCacheReference* cacheReference)
+{
+//printf("RenderString(\"%s\", length: %ld, dry: %d)\n", string, length, dryRun);
+
+	Transformable transform(fEmbeddedTransformation);
+
+	fCurves.approximation_scale(transform.scale());
+
+	// use a transformation behind the curves
+	// (only if glyph->data_type == agg::glyph_data_outline)
+	// in the pipeline for the rasterizer
+	FontCacheEntry::TransformedOutline
+		transformedOutline(fCurves, transform);
+	FontCacheEntry::TransformedContourOutline
+		transformedContourOutline(fContour, transform);
+
+	// for when we bypass the transformation pipeline
+	BPoint transformOffset(0.0, 0.0);
+	transform.Transform(&transformOffset);
+
+	StringRenderer renderer(clippingFrame, dryRun,
+		transformedOutline, transformedContourOutline,
+		transform, transformOffset, nextCharPos, *this);
+
+	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, NULL,
+		fKerning, B_BITMAP_SPACING, offsets, cacheReference);
 
 	return transform.TransformBounds(renderer.Bounds());
 }

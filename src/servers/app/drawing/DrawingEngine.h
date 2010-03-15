@@ -166,6 +166,8 @@ public:
 	virtual	BPoint			DrawString(const char* string, int32 length,
 								const BPoint& pt,
 								escapement_delta* delta = NULL);
+	virtual	BPoint			DrawString(const char* string, int32 length,
+								const BPoint* offsets);
 
 			float			StringWidth(const char* string, int32 length,
 								escapement_delta* delta = NULL);

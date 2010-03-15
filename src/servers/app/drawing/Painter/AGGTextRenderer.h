@@ -54,6 +54,12 @@ public:
 									const escapement_delta* delta,
 									FontCacheReference* cacheReference);
 
+			BRect				RenderString(const char* utf8String,
+									uint32 length, const BPoint* offsets,
+									const BRect& clippingFrame, bool dryRun,
+									BPoint* nextCharPos,
+									FontCacheReference* cacheReference);
+
 private:
 
 	class StringRenderer;

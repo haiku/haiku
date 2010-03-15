@@ -49,8 +49,10 @@
 #include <WindowPrivate.h>
 
 #include "clipping.h"
+#include "utf8_functions.h"
 
 #include "AppServer.h"
+#include "AutoDeleter.h"
 #include "Desktop.h"
 #include "DirectWindowInfo.h"
 #include "DrawingEngine.h"
@@ -2674,8 +2676,10 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 		case AS_DRAW_STRING_WITH_DELTA:
 		{
 			ViewDrawStringInfo info;
-			if (link.Read<ViewDrawStringInfo>(&info) != B_OK)
+			if (link.Read<ViewDrawStringInfo>(&info) != B_OK
+				|| info.stringLength <= 0) {
 				break;
+			}
 
 			const ssize_t kMaxStackStringSize = 4096;
 			char stackString[kMaxStackStringSize];
@@ -2714,6 +2718,63 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 			if (string != stackString)
 				free(string);
+			break;
+		}
+		case AS_DRAW_STRING_WITH_OFFSETS:
+		{
+			int32 stringLength;
+			if (link.Read<int32>(&stringLength) != B_OK || stringLength <= 0)
+				break;
+
+			int32 glyphCount;
+			if (link.Read<int32>(&glyphCount) != B_OK || glyphCount <= 0)
+				break;
+
+			const ssize_t kMaxStackStringSize = 512;
+			char stackString[kMaxStackStringSize];
+			char* string = stackString;
+			BPoint stackLocations[kMaxStackStringSize];
+			BPoint* locations = stackLocations;
+			MemoryDeleter stringDeleter;
+			MemoryDeleter locationsDeleter;
+			if (stringLength >= kMaxStackStringSize) {
+				// NOTE: Careful, the + 1 is for termination!
+				string = (char*)malloc((stringLength + 1 + 63) / 64 * 64);
+				if (string == NULL)
+					break;
+				stringDeleter.SetTo(string);
+			}
+			if (glyphCount > kMaxStackStringSize) {
+				locations = (BPoint*)malloc(
+					((glyphCount * sizeof(BPoint)) + 63) / 64 * 64);
+				if (locations == NULL)
+					break;
+				locationsDeleter.SetTo(locations);
+			}
+
+			if (link.Read(string, stringLength) != B_OK)
+				break;
+			// Count UTF8 glyphs and make sure we have enough locations
+			if ((int32)UTF8CountChars(string, stringLength) > glyphCount)
+				break;
+			if (link.Read(locations, glyphCount * sizeof(BPoint)) != B_OK)
+				break;
+			// Terminate the string, if nothing else, it's important
+			// for the DTRACE call below...
+			string[stringLength] = '\0';
+
+			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING_WITH_OFFSETS, View: %s "
+				"-> %s\n", Title(), fCurrentView->Name(), string));
+
+			for (int32 i = 0; i < stringLength; i++)
+				fCurrentView->ConvertToScreenForDrawing(&locations[i]);
+
+			BPoint penLocation = drawingEngine->DrawString(string,
+				stringLength, locations);
+
+			fCurrentView->ConvertFromScreenForDrawing(&penLocation);
+			fCurrentView->CurrentState()->SetPenLocation(penLocation);
+
 			break;
 		}
 

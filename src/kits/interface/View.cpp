@@ -45,6 +45,7 @@
 #include <String.h>
 #include <Window.h>
 
+#include <utf8_functions.h>
 #include <AppMisc.h>
 #include <AppServerLink.h>
 #include <binary_compatibility/Interface.h>
@@ -58,7 +59,6 @@
 #include <ToolTipManager.h>
 #include <TokenSpace.h>
 #include <ViewPrivate.h>
-
 
 using std::nothrow;
 
@@ -2562,6 +2562,29 @@ BView::DrawString(const char* string, int32 length, BPoint location,
 
 	fOwner->fLink->Attach<ViewDrawStringInfo>(info);
 	fOwner->fLink->Attach(string, length);
+
+	_FlushIfNotInTransaction();
+
+	// this modifies our pen location, so we invalidate the flag.
+	fState->valid_flags &= ~B_VIEW_PEN_LOCATION_BIT;
+}
+
+
+void
+BView::DrawString(const char* string, int32 length, const BPoint* locations)
+{
+	if (fOwner == NULL || string == NULL || length < 1 || locations == NULL)
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_DRAW_STRING_WITH_OFFSETS);
+
+	int32 glyphCount = UTF8CountChars(string, length);
+	fOwner->fLink->Attach<int32>(length);
+	fOwner->fLink->Attach<int32>(glyphCount);
+	fOwner->fLink->Attach(string, length);
+	fOwner->fLink->Attach(locations, glyphCount * sizeof(BPoint));
 
 	_FlushIfNotInTransaction();
 
