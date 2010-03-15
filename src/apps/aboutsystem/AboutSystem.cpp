@@ -48,7 +48,9 @@
 #include <cpu_type.h>
 
 #include <Catalog.h>
+#include <Language.h>
 #include <Locale.h>
+#include <LocaleRoster.h>
 
 #include "HyperTextActions.h"
 #include "HyperTextView.h"
@@ -932,39 +934,90 @@ AboutView::_CreateCreditsView()
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert(TR("Translations:\n"));
 
+	// TODO : sort languages alphabetically using collators
+	BLanguage* lang;
+	BString langName;
+
+	be_locale_roster->GetLanguage(&lang, "bg");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nBulgarian\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"cssvb94\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "nl");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nDutch\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Meanwhile\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "eo");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nEsperanto\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Travis D. Reed (Dancxjo)\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "fi");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nFinnish\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Jaakko Leikas (Garjala)\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "fr");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nFrench\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Jean-Loïc Charroud\n"
 		"Adrien Destugues (PulkoMandy)\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "de");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nGerman\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Colin Günther\n"
@@ -974,46 +1027,104 @@ AboutView::_CreateCreditsView()
 		"Matthias Spreiter\n"
 		"svend\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "hu");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nHungarian\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Zoltán Mizsei (miqlas)\n"
 		"Zoltán Szabó (Bird)\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "it");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nItalian\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Andrea Bernardi\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "ja");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nJapanese\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"The JPBE.net user group\n"
+		"Takashi Murai\n"
+		"Jorge G. Mare (Koki)\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "lt");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nLituanian\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Algirdas Buckus\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "pl");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nPolish\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Artur Wyszyński\n"
 		"Hubert Hareńczyk\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "pt");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nPortuguese\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Marcos Alves (Xeon3D)\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "ru");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nRussian\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Tatyana Fursic (iceid)\n"
@@ -1023,24 +1134,48 @@ AboutView::_CreateCreditsView()
 		"Reznikov Sergei (Diver)\n"
 		"Michael Smirnov\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "es");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nSpanish\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Nicolás C (CapitanPico)\n"
 		"Oscar Carballal (oscarcp)\n"
 		"Miguel Zúñiga González (miguel~1.mx)\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "sv");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nSwedish\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Johan Holmberg\n"
 		"Jimmy Olsson (phalax)\n"
 		"Victor Widell\n"
 	);
+
+	be_locale_roster->GetLanguage(&lang, "uk");
+	langName.Truncate(0);
+	lang->GetName(&langName);
+	delete lang;
+
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert(TR("\nUkrainian\n"));
+	fCreditsView->Insert("\n");
+	fCreditsView->Insert(langName);
+	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Alex Rudyk (totish)\n"
