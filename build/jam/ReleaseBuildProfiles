@@ -1,9 +1,13 @@
 DefineBuildProfile alpha-raw : image : "haiku-alpha.image" ;
 DefineBuildProfile alpha-vmware : vmware-image : "haiku-alpha.vmdk" ;
 DefineBuildProfile alpha-cd : cd-image : "haiku-alpha.iso" ;
+DefineBuildProfile alpha-anyboot : anyboot-image
+	: "haiku-alpha-anyboot.image" ;
 DefineBuildProfile nightly-raw : image : "haiku-nightly.image" ;
 DefineBuildProfile nightly-vmware : vmware-image : "haiku-nightly.vmdk" ;
 DefineBuildProfile nightly-cd : cd-image : "haiku-nightly.iso" ;
+DefineBuildProfile nightly-anyboot : anyboot-image
+	: "haiku-nightly-anyboot.image" ;
 
 switch $(HAIKU_BUILD_PROFILE) {
 	case "alpha-*" : {

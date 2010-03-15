@@ -1,3 +1,9 @@
+# Set anyboot file name and directory defaults.
+HAIKU_ANYBOOT_NAME ?= $(HAIKU_DEFAULT_ANYBOOT_NAME) ;
+HAIKU_ANYBOOT_DIR ?= $(HAIKU_DEFAULT_ANYBOOT_DIR) ;
+HAIKU_ANYBOOT = $(HAIKU_ANYBOOT_NAME) ;
+HAIKU_ANYBOOT_LABEL ?= $(HAIKU_DEFAULT_ANYBOOT_LABEL) ;
+
 rule BuildAnybootMBR binary : source {
 	Depends $(binary) : $(source) ;
 
@@ -10,14 +16,6 @@ actions BuildAnybootMBR1 {
 	$(RM) $(1)
 	$(TARGET_CC) $(MBR_SOURCE) -o $(1) -nostdlib -Xlinker --oformat=binary -Xlinker -S -Xlinker -N -Xlinker "-e start" -Xlinker "-Ttext=0x600"
 }
-
-local baseMBR = base_mbr.bin ;
-local mbrSource = [ FDirName $(HAIKU_TOP) src bin writembr mbr.S ] ;
-
-BuildAnybootMBR $(baseMBR) : $(mbrSource) ;
-
-MakeLocate $(baseMBR) : $(HAIKU_OUTPUT_DIR) ;
-
 
 rule BuildAnybootImage anybootImage : mbrPart : isoPart : imageFile {
 	local anyboot = <build>anyboot ;
@@ -34,14 +32,19 @@ actions BuildAnybootImage1 {
 	$(2[1]) $(1) $(2[2]) $(2[3]) $(2[4])
 }
 
-HAIKU_ANYBOOT_IMAGE = haiku-anyboot.image ;
-MakeLocate $(HAIKU_ANYBOOT_IMAGE) : $(HAIKU_OUTPUT_DIR) ;
-
-BuildAnybootImage $(HAIKU_ANYBOOT_IMAGE) : $(baseMBR) : $(HAIKU_CD_BOOT_IMAGE)
+local baseMBR = base_mbr.bin ;
+local mbrSource = [ FDirName $(HAIKU_TOP) src bin writembr mbr.S ] ;
+BuildAnybootMBR $(baseMBR) : $(mbrSource) ;
+MakeLocate $(baseMBR) : $(HAIKU_OUTPUT_DIR) ;
+MakeLocate $(HAIKU_ANYBOOT) : $(HAIKU_ANYBOOT_DIR) ;
+BuildAnybootImage $(HAIKU_ANYBOOT) : $(baseMBR) : $(HAIKU_CD_BOOT_IMAGE)
 	: $(HAIKU_IMAGE_NAME) ;
 
 # TODO: this one seems to cause the build to fail each other run (caching?)
-#RmTemps $(HAIKU_ANYBOOT_IMAGE) : $(baseMBR) ;
+#RmTemps $(HAIKU_ANYBOOT) : $(baseMBR) ;
+RmTemps $(HAIKU_ANYBOOT) : $(HAIKU_CD_BOOT_IMAGE) ;
+RmTemps $(HAIKU_ANYBOOT) : $(HAIKU_IMAGE_NAME) ;
+RmTemps $(HAIKU_ANYBOOT) : $(HAIKU_BOOT_FLOPPY) ;
 
 NotFile haiku-anyboot-image ;
-Depends haiku-anyboot-image : $(HAIKU_ANYBOOT_IMAGE) ;
+Depends haiku-anyboot-image : $(HAIKU_ANYBOOT) ;

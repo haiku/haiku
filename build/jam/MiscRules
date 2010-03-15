@@ -326,6 +326,14 @@ rule DefineBuildProfile name : type : path {
 	local startOffset ;
 
 	switch $(type) {
+		case "anyboot-image" : {
+			targetName ?= $(HAIKU_ANYBOOT_NAME) ;
+			targetName ?= $(HAIKU_DEFAULT_ANYBOOT_NAME) ;
+			HAIKU_ANYBOOT_DIR = $(targetDir) ;
+			HAIKU_ANYBOOT_NAME = $(targetName) ;
+			buildTarget = haiku-anyboot-image ;
+		}
+
 		case "cd-image" : {
 			targetName ?= $(HAIKU_CD_NAME) ;
 			targetName ?= $(HAIKU_DEFAULT_CD_NAME) ;
