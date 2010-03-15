@@ -761,6 +761,9 @@ rule AddOptionalHaikuImagePackages packages
 			HAIKU_OPTIONAL_PACKAGE_ADDED on $(package) = 1 ;
 			HAIKU_ADDED_OPTIONAL_PACKAGES += $(package) ;
 		}
+		local dependencies = [ on $(package)
+			return $(HAIKU_OPTIONAL_PACKAGE_DEPENDENCIES) ] ;
+		AddOptionalHaikuImagePackages $(dependencies) ;
 	}
 }
 
@@ -780,7 +783,8 @@ rule IsOptionalHaikuImagePackageAdded package
 
 rule OptionalPackageDependencies package : dependencies
 {
-	if [ IsOptionalHaikuImagePackageAdded $(package) ] {
+	HAIKU_OPTIONAL_PACKAGE_DEPENDENCIES on $(package) = $(dependencies) ;
+	if [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_ADDED) ] {
 		AddOptionalHaikuImagePackages $(dependencies) ;
 	}
 }

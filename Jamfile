@@ -151,13 +151,16 @@ Depends LocaleKit :
 	LocaleKitTests
 ;
 
+# Pepare the optional build features before parsing the Jamfile tree.
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalBuildFeatures ] ;
+
 # Add optional packages given via HAIKU_ADD_OPTIONAL_PACKAGES.
 if $(HAIKU_ADD_OPTIONAL_PACKAGES) {
 	AddOptionalHaikuImagePackages
 		[ FSplitString $(HAIKU_ADD_OPTIONAL_PACKAGES) : / ] ;
 }
 
-#include packages that are required by all images.
+# Include packages that are required by all images.
 AddOptionalHaikuImagePackages MandatoryPackages ;
 
 # If enabled, make sure that OpenSSL is added to the image.
@@ -165,10 +168,8 @@ if $(HAIKU_OPENSSL_ENABLED) {
 	AddOptionalHaikuImagePackages OpenSSL ;
 }
 
-# Evaluate optional package dependencies and prepare the optional build
-# features before parsing the Jamfile tree.
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackageDependencies ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalBuildFeatures ] ;
+# Evaluate optional package dependencies 
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackageDependencies ] ; 
 
 # Optionally we allow not to include the "src" subdirectory.
 if $(HAIKU_DONT_INCLUDE_SRC) {

@@ -671,6 +671,12 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 }
 
 
+# MandatoryPackages
+if [ IsOptionalHaikuImagePackageAdded MandatoryPackages ] { 
+	# Psuedo package for grouping packages, which are added to all images.
+}
+
+
 # Mercurial
 if [ IsOptionalHaikuImagePackageAdded Mercurial ] {
 	if $(TARGET_ARCH) != x86 {
