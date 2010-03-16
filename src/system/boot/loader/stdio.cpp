@@ -8,6 +8,7 @@
 #include <boot/stdio.h>
 #include <util/kernel_cpp.h>
 
+#include <errno.h>
 #include <stdarg.h>
 #include <string.h>
 
@@ -19,8 +20,16 @@
 //extern FILE *stdout;
 //extern FILE *stdin;
 
+
+#undef errno
 int errno;
-int *_errnop = &errno;
+
+
+int*
+_errnop(void)
+{
+	return &errno;
+}
 
 
 int

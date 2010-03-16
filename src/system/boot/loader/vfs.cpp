@@ -4,19 +4,25 @@
  */
 
 
-#include "RootFileSystem.h"
+#include <boot/vfs.h>
+
+#include <errno.h>
+#include <fcntl.h>
+#include <string.h>
+#include <sys/uio.h>
+#include <unistd.h>
 
 #include <StorageDefs.h>
-#include <boot/vfs.h>
+
 #include <boot/platform.h>
 #include <boot/partitions.h>
 #include <boot/stdio.h>
 #include <boot/stage2.h>
 #include <util/kernel_cpp.h>
+#include <syscall_utils.h>
 
-#include <unistd.h>
-#include <string.h>
-#include <fcntl.h>
+#include "RootFileSystem.h"
+
 
 using namespace boot;
 
@@ -92,7 +98,7 @@ Node::Close(void *cookie)
 }
 
 
-status_t 
+status_t
 Node::GetName(char *nameBuffer, size_t bufferSize) const
 {
 	return B_ERROR;
@@ -106,14 +112,14 @@ Node::GetFileMap(struct file_map_run *runs, int32 *count)
 }
 
 
-int32 
+int32
 Node::Type() const
 {
 	return 0;
 }
 
 
-off_t 
+off_t
 Node::Size() const
 {
 	return 0LL;
@@ -127,7 +133,7 @@ Node::Inode() const
 }
 
 
-status_t 
+status_t
 Node::Acquire()
 {
 	fRefCount++;
@@ -136,7 +142,7 @@ Node::Acquire()
 }
 
 
-status_t 
+status_t
 Node::Release()
 {
 	TRACE(("%p::Release(), fRefCount = %ld\n", this, fRefCount));
@@ -182,24 +188,31 @@ Directory::Directory()
 }
 
 
-ssize_t 
+ssize_t
 Directory::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	return B_ERROR;
 }
 
 
-ssize_t 
+ssize_t
 Directory::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	return B_ERROR;
 }
 
 
-int32 
+int32
 Directory::Type() const
 {
 	return S_IFDIR;
+}
+
+
+status_t
+Directory::CreateFile(const char *name, mode_t permissions, Node **_node)
+{
+	return EROFS;
 }
 
 
@@ -273,7 +286,7 @@ Descriptor::~Descriptor()
 }
 
 
-ssize_t 
+ssize_t
 Descriptor::Read(void *buffer, size_t bufferSize)
 {
 	ssize_t bytesRead = fNode->ReadAt(fCookie, fOffset, buffer, bufferSize);
@@ -284,7 +297,7 @@ Descriptor::Read(void *buffer, size_t bufferSize)
 }
 
 
-ssize_t 
+ssize_t
 Descriptor::ReadAt(off_t pos, void *buffer, size_t bufferSize)
 {
 	return fNode->ReadAt(fCookie, pos, buffer, bufferSize);
@@ -359,7 +372,7 @@ status_t
 register_boot_file_system(Directory *volume)
 {
 	gRoot->AddLink("boot", volume);
-	
+
 	Partition *partition;
 	status_t status = gRoot->GetPartitionFor(volume, &partition);
 	if (status != B_OK) {
@@ -497,17 +510,12 @@ mount_file_systems(stage2_args *args)
 }
 
 
+/*!	Resolves \a directory + \a path to a node.
+	Note that \a path will be modified by the function.
+*/
 static status_t
-get_node_for_path(Directory *directory, const char *pathName, Node **_node)
+get_node_for_path(Directory *directory, char *path, Node **_node)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH];
-	char *path = pathBuffer;
-
-	if (pathName == NULL)
-		return B_BAD_VALUE;
-
-	strlcpy(path, pathName, sizeof(pathBuffer));
-
 	directory->Acquire();
 		// balance Acquire()/Release() calls
 
@@ -584,7 +592,7 @@ open_node(Node *node, int mode)
 		return B_ERROR;
 
 	// get free descriptor
-	
+
 	int fd = 0;
 	for (; fd < MAX_VFS_DESCRIPTORS; fd++) {
 		if (sDescriptors[fd] == NULL)
@@ -596,7 +604,7 @@ open_node(Node *node, int mode)
 	TRACE(("got descriptor %d for node %p\n", fd, node));
 
 	// we got a free descriptor entry, now try to open the node
-	
+
 	void *cookie;
 	status_t status = node->Open(&cookie, mode);
 	if (status < B_OK)
@@ -619,10 +627,10 @@ dup(int fd)
 {
 	Descriptor *descriptor = get_descriptor(fd);
 	if (descriptor == NULL)
-		return B_FILE_ERROR;
+		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
 	descriptor->Acquire();
-	return fd;
+	RETURN_AND_SET_ERRNO(fd);
 }
 
 
@@ -631,9 +639,9 @@ read_pos(int fd, off_t offset, void *buffer, size_t bufferSize)
 {
 	Descriptor *descriptor = get_descriptor(fd);
 	if (descriptor == NULL)
-		return B_FILE_ERROR;
+		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
-	return descriptor->ReadAt(offset, buffer, bufferSize);
+	RETURN_AND_SET_ERRNO(descriptor->ReadAt(offset, buffer, bufferSize));
 }
 
 
@@ -642,9 +650,9 @@ read(int fd, void *buffer, size_t bufferSize)
 {
 	Descriptor *descriptor = get_descriptor(fd);
 	if (descriptor == NULL)
-		return B_FILE_ERROR;
+		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
-	return descriptor->Read(buffer, bufferSize);
+	RETURN_AND_SET_ERRNO(descriptor->Read(buffer, bufferSize));
 }
 
 
@@ -653,9 +661,9 @@ write_pos(int fd, off_t offset, const void *buffer, size_t bufferSize)
 {
 	Descriptor *descriptor = get_descriptor(fd);
 	if (descriptor == NULL)
-		return B_FILE_ERROR;
+		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
-	return descriptor->WriteAt(offset, buffer, bufferSize);
+	RETURN_AND_SET_ERRNO(descriptor->WriteAt(offset, buffer, bufferSize));
 }
 
 
@@ -664,32 +672,51 @@ write(int fd, const void *buffer, size_t bufferSize)
 {
 	Descriptor *descriptor = get_descriptor(fd);
 	if (descriptor == NULL)
-		return B_FILE_ERROR;
+		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
-	return descriptor->Write(buffer, bufferSize);
+	RETURN_AND_SET_ERRNO(descriptor->Write(buffer, bufferSize));
+}
+
+
+ssize_t
+writev(int fd, const struct iovec* vecs, size_t count)
+{
+	size_t totalWritten = 0;
+
+	for (size_t i = 0; i < count; i++) {
+		ssize_t written = write(fd, vecs[i].iov_base, vecs[i].iov_len);
+		if (written < 0)
+			return totalWritten == 0 ? written : totalWritten;
+
+		totalWritten += written;
+
+		if ((size_t)written != vecs[i].iov_len)
+			break;
+	}
+
+	return totalWritten;
 }
 
 
 int
 open(const char *name, int mode, ...)
 {
+	mode_t permissions = 0;
+	if ((mode & O_CREAT) != 0) {
+        va_list args;
+        va_start(args, mode);
+        permissions = va_arg(args, int) /*& ~__gUmask*/;
+            // adapt the permissions as required by POSIX
+        va_end(args);
+	}
+
 	// we always start at the top (there is no notion of a current directory (yet?))
-	if (name[0] == '/')
-		name++;
-
-	Node *node;
-	if (get_node_for_path(gRoot, name, &node) < B_OK)
-		return B_ENTRY_NOT_FOUND;
-
-	int fd = open_node(node, mode);
-
-	node->Release();
-	return fd;
+	RETURN_AND_SET_ERRNO(open_from(gRoot, name, mode, permissions));
 }
 
 
 int
-open_from(Directory *directory, const char *name, int mode)
+open_from(Directory *directory, const char *name, int mode, mode_t permissions)
 {
 	if (name[0] == '/') {
 		// ignore the directory and start from root if we are asked to do that
@@ -697,9 +724,51 @@ open_from(Directory *directory, const char *name, int mode)
 		name++;
 	}
 
+	char path[B_PATH_NAME_LENGTH];
+	if (strlcpy(path, name, sizeof(path)) >= sizeof(path))
+		return B_NAME_TOO_LONG;
+
 	Node *node;
-	if (get_node_for_path(directory, name, &node) < B_OK)
-		return B_ENTRY_NOT_FOUND;
+	status_t error = get_node_for_path(directory, path, &node);
+	if (error != B_OK) {
+		if (error != B_ENTRY_NOT_FOUND)
+			return error;
+
+		if ((mode & O_CREAT) == 0)
+			return B_ENTRY_NOT_FOUND;
+
+		// try to resolve the parent directory
+		strlcpy(path, name, sizeof(path));
+		if (char* lastSlash = strrchr(path, '/')) {
+			if (lastSlash[1] == '\0')
+				return B_ENTRY_NOT_FOUND;
+
+			lastSlash = '\0';
+			name = lastSlash + 1;
+
+			// resolve the directory
+			if (get_node_for_path(directory, path, &node) != B_OK)
+				return B_ENTRY_NOT_FOUND;
+
+			if (node->Type() != S_IFDIR) {
+				node->Release();
+				return B_NOT_A_DIRECTORY;
+			}
+
+			directory = static_cast<Directory*>(node);
+		} else
+			directory->Acquire();
+
+		// create the file
+		error = directory->CreateFile(name, permissions, &node);
+		directory->Release();
+
+		if (error != B_OK)
+			return error;
+	} else if ((mode & O_EXCL) != 0) {
+		node->Release();
+		return B_FILE_EXISTS;
+	}
 
 	int fd = open_node(node, mode);
 
@@ -729,13 +798,13 @@ close(int fd)
 {
 	Descriptor *descriptor = get_descriptor(fd);
 	if (descriptor == NULL)
-		return B_FILE_ERROR;
+		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
 	status_t status = descriptor->Release();
 	if (!descriptor->RefCount())
 		free_descriptor(fd);
 
-	return status;
+	RETURN_AND_SET_ERRNO(status);
 }
 
 
@@ -748,11 +817,11 @@ fstat(int fd, struct stat *stat)
 #endif
 {
 	if (stat == NULL)
-		return B_BAD_VALUE;
+		RETURN_AND_SET_ERRNO(B_BAD_VALUE);
 
 	Descriptor *descriptor = get_descriptor(fd);
 	if (descriptor == NULL)
-		return B_FILE_ERROR;
+		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
-	return descriptor->Stat(*stat);
+	RETURN_AND_SET_ERRNO(descriptor->Stat(*stat));
 }

@@ -6,6 +6,7 @@
 
 #include "menu.h"
 
+#include <errno.h>
 #include <string.h>
 
 #include <algorithm>
@@ -16,6 +17,7 @@
 #include <boot/stage2.h>
 #include <boot/vfs.h>
 #include <boot/platform.h>
+#include <boot/platform/generic/text_console.h>
 #include <boot/stdio.h>
 #include <safemode.h>
 #include <util/kernel_cpp.h>
@@ -359,6 +361,57 @@ Menu::Run()
 //	#pragma mark -
 
 
+static const char*
+size_to_string(off_t size, char* buffer, size_t bufferSize)
+{
+	static const char* const kPrefixes[] = { "K", "M", "G", "T", "P", NULL };
+	int32 nextIndex = 0;
+	int32 remainder = 0;
+	while (size >= 1024 && kPrefixes[nextIndex] != NULL) {
+		remainder = size % 1024;
+		size /= 1024;
+		nextIndex++;
+
+		if (size < 1024) {
+			// Compute the decimal remainder and make sure we have at most
+			// 3 decimal places (or 4 for 1000 <= size <= 1023).
+			int32 factor;
+			if (size >= 100)
+				factor = 100;
+			else if (size >= 10)
+				factor = 10;
+			else
+				factor = 1;
+
+			remainder = (remainder * 1000 + 5 * factor) / 1024;
+
+			if (remainder >= 1000) {
+				size++;
+				remainder = 0;
+			} else
+				remainder /= 10 * factor;
+		} else
+			size += (remainder + 512) / 1024;
+	}
+
+	if (remainder == 0) {
+		snprintf(buffer, bufferSize, "%" B_PRIdOFF, size);
+	} else {
+		snprintf(buffer, bufferSize, "%" B_PRIdOFF ".%" B_PRId32, size,
+			remainder);
+	}
+
+	size_t length = strlen(buffer);
+	snprintf(buffer + length, bufferSize - length, " %sB",
+		nextIndex == 0 ? "" : kPrefixes[nextIndex - 1]);
+
+	return buffer;
+}
+
+
+// #pragma mark -
+
+
 static bool
 user_menu_boot_volume(Menu *menu, MenuItem *item)
 {
@@ -412,10 +465,78 @@ debug_menu_display_syslog(Menu *menu, MenuItem *item)
 }
 
 
+static status_t
+save_syslog_to_volume(Directory* directory)
+{
+	// find an unused name
+	char name[16];
+	bool found = false;
+	for (int i = 0; i < 99; i++) {
+		snprintf(name, sizeof(name), "SYSLOG%02d.TXT", i);
+		Node* node = directory->Lookup(name, false);
+		if (node == NULL) {
+			found = true;
+			break;
+		}
+
+		node->Release();
+	}
+
+	if (!found) {
+		printf("Failed to find an unused name for the syslog file!\n");
+		return B_ERROR;
+	}
+
+	printf("Writing syslog to file \"%s\" ...\n", name);
+
+	int fd = open_from(directory, name, O_RDWR | O_CREAT | O_EXCL, 0644);
+	if (fd < 0) {
+		printf("Failed to create syslog file!\n");
+		return fd;
+	}
+
+	ring_buffer* syslogBuffer = (ring_buffer*)gKernelArgs.debug_output;
+	iovec vecs[2];
+	int32 vecCount = ring_buffer_get_vecs(syslogBuffer, vecs);
+	if (vecCount > 0) {
+		size_t toWrite = ring_buffer_readable(syslogBuffer);
+
+		ssize_t written = writev(fd, vecs, vecCount);
+		if (written < 0 || (size_t)written != toWrite) {
+			printf("Failed to write to the syslog file \"%s\"!\n", name);
+			close(fd);
+			return errno;
+		}
+	}
+
+	close(fd);
+
+	printf("Successfully wrote syslog file.\n");
+
+	return B_OK;
+}
+
+
 static bool
 debug_menu_toggle_debug_syslog(Menu *menu, MenuItem *item)
 {
 	gKernelArgs.keep_debug_output_buffer = item->IsMarked();
+	return true;
+}
+
+
+static bool
+debug_menu_save_syslog(Menu *menu, MenuItem *item)
+{
+	Directory* volume = (Directory*)item->Data();
+
+	console_clear_screen();
+
+	save_syslog_to_volume(volume);
+
+	printf("\nPress any key to continue\n");
+	console_wait_for_key();
+
 	return true;
 }
 
@@ -511,10 +632,80 @@ add_safe_mode_menu()
 }
 
 
+static Menu*
+add_save_debug_syslog_menu()
+{
+	Menu* menu = new(nothrow) Menu(STANDARD_MENU, "Save syslog to volume ...");
+	MenuItem* item;
+
+	const char* const kHelpText = "Currently only FAT32 volumes are supported. "
+		"Newly plugged in removable devices are only recognized after "
+		"rebooting.";
+
+	int32 itemsAdded = 0;
+
+	void* cookie;
+	if (gRoot->Open(&cookie, O_RDONLY) == B_OK) {
+		Node* node;
+		while (gRoot->GetNextNode(cookie, &node) == B_OK) {
+			Directory* volume = static_cast<Directory*>(node);
+			Partition* partition;
+			if (gRoot->GetPartitionFor(volume, &partition) != B_OK)
+				continue;
+
+			// we support only FAT32 volumes ATM
+			if (partition->content_type == NULL
+				|| strcmp(partition->content_type, kPartitionTypeFAT32) != 0) {
+				continue;
+			}
+
+			char name[B_FILE_NAME_LENGTH];
+			if (volume->GetName(name, sizeof(name)) != B_OK)
+				strcpy(name, "unnamed");
+
+			// append offset, size, and type to the name
+			size_t len = strlen(name);
+			char offsetBuffer[32];
+			char sizeBuffer[32];
+			snprintf(name + len, sizeof(name) - len,
+				" (%s, offset %s, size %s)", partition->content_type,
+				size_to_string(partition->offset, offsetBuffer,
+					sizeof(offsetBuffer)),
+				size_to_string(partition->size, sizeBuffer,
+					sizeof(sizeBuffer)));
+
+			item = new(nothrow) MenuItem(name);
+			item->SetData(volume);
+			item->SetTarget(&debug_menu_save_syslog);
+			item->SetType(MENU_ITEM_NO_CHOICE);
+			item->SetHelpText(kHelpText);
+			menu->AddItem(item);
+			itemsAdded++;
+		}
+
+		gRoot->Close(cookie);
+	}
+
+	if (itemsAdded == 0) {
+		menu->AddItem(item
+			= new(nothrow) MenuItem("No supported volumes found"));
+		item->SetType(MENU_ITEM_NO_CHOICE);
+		item->SetHelpText(kHelpText);
+		item->SetEnabled(false);
+	}
+
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new(nothrow) MenuItem("Return to debug menu"));
+	item->SetHelpText(kHelpText);
+
+	return menu;
+}
+
+
 static Menu *
 add_debug_menu()
 {
-	Menu *menu = new(nothrow) Menu(SAFE_MODE_MENU, "Debug Options");
+	Menu *menu = new(nothrow) Menu(STANDARD_MENU, "Debug Options");
 	MenuItem *item;
 
 #if DEBUG_SPINLOCK_LATENCIES
@@ -558,6 +749,11 @@ add_debug_menu()
 		item->SetType(MENU_ITEM_NO_CHOICE);
 		item->SetHelpText(
 			"Displays the syslog from the previous Haiku session.");
+
+		menu->AddItem(item = new(nothrow) MenuItem(
+			"Save syslog from previous session", add_save_debug_syslog_menu()));
+		item->SetHelpText("Saves the syslog from the previous Haiku session to "
+			"disk. Currently only FAT32 volumes are supported.");
 	}
 
 	menu->AddSeparatorItem();
@@ -625,10 +821,9 @@ user_menu(Directory **_bootVolume)
 	platform_add_menus(menu);
 
 	menu->AddSeparatorItem();
-	if (*_bootVolume == NULL) {
-		menu->AddItem(item = new(nothrow) MenuItem("Reboot"));
-		item->SetTarget(user_menu_reboot);
-	}
+
+	menu->AddItem(item = new(nothrow) MenuItem("Reboot"));
+	item->SetTarget(user_menu_reboot);
 
 	menu->AddItem(item = new(nothrow) MenuItem("Continue booting"));
 	if (*_bootVolume == NULL) {

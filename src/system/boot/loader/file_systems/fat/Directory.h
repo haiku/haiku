@@ -14,15 +14,19 @@
 
 namespace FATFS {
 
+struct dir_entry;
 class Volume;
 
 class Directory : public ::Directory {
 	public:
 		Directory();
-		Directory(Volume &volume, uint32 cluster, const char *name);
+		Directory(Volume &volume, off_t dirEntryOffset, uint32 cluster,
+			const char *name);
 		virtual ~Directory();
 
 		status_t InitCheck();
+
+		off_t DirEntryOffset() const	{ return fDirEntryOffset; }
 
 		virtual status_t Open(void **_cookie, int mode);
 		virtual status_t Close(void *cookie);
@@ -37,11 +41,21 @@ class Directory : public ::Directory {
 		virtual status_t GetName(char *name, size_t size) const;
 		virtual ino_t Inode() const;
 
+		virtual status_t CreateFile(const char *name, mode_t permissions,
+			Node **_node);
+
+		static status_t UpdateDirEntry(Volume& volume, off_t dirEntryOffset,
+			uint32 firstCluster, uint32 size);
+
 	private:
-		status_t GetNextEntry(void *cookie, 
+		status_t GetNextEntry(void *cookie,
 				uint8 mask = FAT_VOLUME, uint8 match = 0);
+		status_t _AddEntry(dir_entry& entry, off_t& _entryOffset);
+		off_t _GetStreamSize();
+
 		Volume			&fVolume;
 		Stream			fStream;
+		off_t			fDirEntryOffset;
 
 		typedef ::Directory _inherited;
 };

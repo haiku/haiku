@@ -27,6 +27,12 @@ class Volume;
 #define read16(buffer,off) \
         B_LENDIAN_TO_HOST_INT16(*(uint16 *)&buffer[off])
 
+#define write32(buffer, off, value) \
+        *(uint32*)&buffer[off] = B_HOST_TO_LENDIAN_INT32(value)
+
+#define write16(buffer, off, value) \
+        *(uint16*)&buffer[off] = B_HOST_TO_LENDIAN_INT16(value)
+
 enum name_lengths {
 	FATFS_BASENAME_LENGTH	= 8,
 	FATFS_EXTNAME_LENGTH	= 3,

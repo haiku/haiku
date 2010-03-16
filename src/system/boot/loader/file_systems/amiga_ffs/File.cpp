@@ -6,10 +6,11 @@
 
 #include "File.h"
 
-#include <util/kernel_cpp.h>
-
+#include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include <util/kernel_cpp.h>
 
 
 namespace FFS {
@@ -18,7 +19,7 @@ class Stream {
 	public:
 		Stream(int device, FileBlock &node);
 		~Stream();
-		
+
 		status_t InitCheck();
 		ssize_t ReadAt(off_t offset, uint8 *buffer, size_t size);
 
@@ -55,35 +56,35 @@ Stream::~Stream()
 }
 
 
-status_t 
+status_t
 Stream::InitCheck()
 {
 	return fBlock.BlockData() != NULL ? B_OK : B_NO_MEMORY;
 }
 
 
-int32 
+int32
 Stream::BlockOffset(off_t offset) const
 {
 	return offset % fNode.BlockSize();
 }
 
 
-int32 
+int32
 Stream::BlockIndex(off_t offset) const
 {
 	return (offset % (fNode.BlockSize() * fNode.NumDataBlocks())) / fNode.BlockSize();
 }
 
 
-int32 
+int32
 Stream::ExtensionBlockOffset(off_t offset) const
 {
 	return offset / (fNode.BlockSize() * fNode.NumDataBlocks());
 }
 
 
-status_t 
+status_t
 Stream::ReadNextExtension()
 {
 	int32 next;
@@ -99,7 +100,7 @@ Stream::ReadNextExtension()
 }
 
 
-ssize_t 
+ssize_t
 Stream::ReadAt(off_t offset, uint8 *buffer, size_t size)
 {
 	if (offset < 0)
@@ -139,8 +140,8 @@ Stream::ReadAt(off_t offset, uint8 *buffer, size_t size)
 
 		ssize_t bytesRead = read_pos(fDevice, block * fNode.BlockSize() + blockOffset,
 			buffer, toRead);
-		if (bytesRead < B_OK)
-			return bytesRead;
+		if (bytesRead < 0)
+			return errno;
 
 		bytesLeft -= bytesRead;
 		buffer += bytesRead;
@@ -172,7 +173,7 @@ File::~File()
 }
 
 
-status_t 
+status_t
 File::InitCheck()
 {
 	if (!fNode.IsFile())
@@ -182,7 +183,7 @@ File::InitCheck()
 }
 
 
-status_t 
+status_t
 File::Open(void **_cookie, int mode)
 {
 	Stream *stream = new(nothrow) Stream(fVolume.Device(), fNode);
@@ -199,7 +200,7 @@ File::Open(void **_cookie, int mode)
 }
 
 
-status_t 
+status_t
 File::Close(void *cookie)
 {
 	Stream *stream = (Stream *)cookie;
@@ -209,7 +210,7 @@ File::Close(void *cookie)
 }
 
 
-ssize_t 
+ssize_t
 File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	Stream *stream = (Stream *)cookie;
@@ -220,28 +221,28 @@ File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 }
 
 
-ssize_t 
+ssize_t
 File::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	return EROFS;
 }
 
 
-status_t 
+status_t
 File::GetName(char *nameBuffer, size_t bufferSize) const
 {
 	return fNode.GetName(nameBuffer, bufferSize);
 }
 
 
-int32 
+int32
 File::Type() const
 {
 	return S_IFREG;
 }
 
 
-off_t 
+off_t
 File::Size() const
 {
 	return fNode.Size();

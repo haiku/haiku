@@ -34,11 +34,20 @@ class Stream {
 		off_t	Size() const { return fSize; }
 		uint32	FirstCluster() const { return fFirstCluster; }
 
-		status_t ReadAt(off_t pos, uint8 *buffer, size_t *length);
+		void	SetSize(off_t size)		{ fSize = size; }
+
+		status_t ReadAt(off_t pos, void *buffer, size_t *length,
+					off_t *diskOffset = NULL);
+		status_t WriteAt(off_t pos, const void *buffer, size_t *length,
+					off_t *diskOffset = NULL);
 
 	private:
 		status_t		BuildClusterList();
+		status_t		_FindCluster(off_t pos, uint32& _cluster);
+		status_t		_FindOrCreateCluster(off_t pos, uint32& _cluster,
+							bool& _added);
 		status_t		FindBlock(off_t pos, off_t &block, off_t &offset);
+
 		Volume			&fVolume;
 		uint32			fFirstCluster;
 		uint32			fClusterCount;

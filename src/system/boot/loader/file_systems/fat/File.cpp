@@ -6,10 +6,12 @@
 
 #include "File.h"
 
-#include <util/kernel_cpp.h>
-
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include <util/kernel_cpp.h>
+
+#include "Directory.h"
 
 
 //#define TRACE(x) dprintf x
@@ -19,10 +21,12 @@
 namespace FATFS {
 
 
-File::File(Volume &volume, uint32 cluster, off_t size, const char *name)
+File::File(Volume &volume, off_t dirEntryOffset, uint32 cluster, off_t size,
+	const char *name)
 	:
 	fVolume(volume),
-	fStream(volume, cluster, size, name)
+	fStream(volume, cluster, size, name),
+	fDirEntryOffset(dirEntryOffset)
 {
 	TRACE(("FATFS::File::()\n"));
 }
@@ -51,14 +55,14 @@ File::Open(void **_cookie, int mode)
 	if (fStream.InitCheck() < B_OK)
 		return fStream.InitCheck();
 
-	return B_OK;
+	return Node::Open(_cookie, mode);
 }
 
 
 status_t
 File::Close(void *cookie)
 {
-	return B_OK;
+	return Node::Close(cookie);
 }
 
 
@@ -67,7 +71,7 @@ File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	TRACE(("FATFS::File::%s(, %Ld,, %d)\n", __FUNCTION__, pos, bufferSize));
 	status_t err;
-	err = fStream.ReadAt(pos, (uint8 *)buffer, &bufferSize);
+	err = fStream.ReadAt(pos, buffer, &bufferSize);
 	if (err < B_OK)
 		return err;
 	return bufferSize;
@@ -77,7 +81,25 @@ File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 ssize_t
 File::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
-	return EROFS;
+	off_t streamSize = fStream.Size();
+	uint32 firstCluster = fStream.FirstCluster();
+
+	// write data
+	size_t written = bufferSize;
+	status_t error = fStream.WriteAt(pos, buffer, &written);
+	if (error != B_OK)
+		return error;
+
+	// If the file size has changed, we need to adjust the directory entry.
+	if (fStream.Size() > streamSize || fStream.FirstCluster() != firstCluster) {
+		error = Directory::UpdateDirEntry(fVolume, fDirEntryOffset,
+			fStream.FirstCluster(), fStream.Size());
+		if (error != B_OK)
+			return error;
+			// TODO: Undo the changes!
+	}
+
+	return written;
 }
 
 
@@ -95,14 +117,14 @@ File::GetFileMap(struct file_map_run *runs, int32 *count)
 }
 
 
-int32 
+int32
 File::Type() const
 {
 	return S_IFREG;
 }
 
 
-off_t 
+off_t
 File::Size() const
 {
 	return fStream.Size();

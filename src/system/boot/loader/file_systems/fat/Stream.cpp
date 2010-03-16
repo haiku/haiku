@@ -8,17 +8,20 @@
 
 
 #include "Stream.h"
-#include "CachedBlock.h"
-#include "Directory.h"
-#include "File.h"
-
-#include <util/kernel_cpp.h>
-#include <boot/FileMapDisk.h>
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
+
+#include <algorithm>
+
+#include <boot/FileMapDisk.h>
+#include <util/kernel_cpp.h>
+
+#include "CachedBlock.h"
+#include "Directory.h"
+#include "File.h"
 
 //#define TRACE(x) dprintf x
 #define TRACE(x) do {} while (0)
@@ -104,11 +107,11 @@ Stream::GetFileMap(struct file_map_run *runs, int32 *count)
 
 
 status_t
-Stream::FindBlock(off_t pos, off_t &block, off_t &offset)
+Stream::_FindCluster(off_t pos, uint32& _cluster)
 {
 	//TRACE(("FATFS::Stream::%s(%Ld,,)\n", __FUNCTION__, pos));
 	uint32 index = (uint32)(pos / fVolume.ClusterSize());
-	if (pos >= fSize || index >= fClusterCount)
+	if (pos > fSize || index >= fClusterCount)
 		return B_BAD_VALUE;
 
 	uint32 cluster = 0;
@@ -147,22 +150,93 @@ Stream::FindBlock(off_t pos, off_t &block, off_t &offset)
 	fClusterMapCacheLast++;
 	fClusterMapCacheLast %= CLUSTER_MAP_CACHE_SIZE;
 
-	//cluster = fClusters[index];
-	// convert to position
-	offset = fVolume.ToOffset(cluster);
-	offset += (pos %= fVolume.ClusterSize());
-	// convert to block + offset
-	block = fVolume.ToBlock(offset);
-	offset %= fVolume.BlockSize();
-	//TRACE(("FATFS::Stream::FindBlock: %Ld:%Ld\n", block, offset));
+	_cluster = cluster;
 	return B_OK;
 }
 
 
 status_t
-Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
+Stream::_FindOrCreateCluster(off_t pos, uint32& _cluster, bool& _added)
+{
+	status_t error = _FindCluster(pos, _cluster);
+	if (error == B_OK) {
+		_added = false;
+		return B_OK;
+	}
+
+	// iterate through the cluster list
+	uint32 index = (uint32)(pos / fVolume.ClusterSize());
+	uint32 cluster = fFirstCluster;
+	uint32 clusterCount = 0;
+	if (cluster != 0) {
+		uint32 nextCluster = cluster;
+		while (clusterCount <= index) {
+			if (!fVolume.IsValidCluster(nextCluster)
+					|| fVolume.IsLastCluster(nextCluster)) {
+				break;
+			}
+
+			cluster = nextCluster;
+			clusterCount++;
+			nextCluster = fVolume.NextCluster(nextCluster);
+		}
+	}
+
+	if (clusterCount > index) {
+		// the cluster existed after all
+		_cluster = cluster;
+		_added = false;
+		return B_OK;
+	}
+
+	while (clusterCount <= index) {
+		uint32 newCluster;
+		error = fVolume.AllocateCluster(cluster, newCluster);
+		if (error != B_OK)
+			return error;
+
+		if (clusterCount == 0)
+			fFirstCluster = newCluster;
+
+		// TODO: We should support to zero out the new cluster. Maybe make this
+		// and optional parameter of WriteAt().
+
+		cluster = newCluster;
+		clusterCount++;
+	}
+
+	_cluster = cluster;
+	_added = true;
+	return B_OK;
+}
+
+
+status_t
+Stream::FindBlock(off_t pos, off_t &block, off_t &offset)
+{
+	uint32 cluster;
+	status_t error = _FindCluster(pos, cluster);
+	if (error != B_OK)
+		return error;
+
+	// convert to position
+	offset = fVolume.ClusterToOffset(cluster);
+	offset += (pos %= fVolume.ClusterSize());
+
+	// convert to block + offset
+	block = fVolume.ToBlock(offset);
+	offset %= fVolume.BlockSize();
+
+	return B_OK;
+}
+
+
+status_t
+Stream::ReadAt(off_t pos, void *_buffer, size_t *_length, off_t *diskOffset)
 {
 	TRACE(("FATFS::Stream::%s(%Ld, )\n", __FUNCTION__, pos));
+
+	uint8* buffer = (uint8*)_buffer;
 
 	// set/check boundaries for pos/length
 	if (pos < 0)
@@ -192,6 +266,9 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 		*_length = 0;
 		return B_BAD_VALUE;
 	}
+
+	if (diskOffset != NULL)
+		*diskOffset = fVolume.BlockToOffset(num) + offset;
 
 	uint32 bytesRead = 0;
 	uint32 blockSize = fVolume.BlockSize();
@@ -248,7 +325,7 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 			break;
 		}
 
-		if (read_pos(fVolume.Device(), fVolume.ToOffset(num),
+		if (read_pos(fVolume.Device(), fVolume.BlockToOffset(num),
 			buffer + bytesRead, fVolume.BlockSize()) < B_OK) {
 			*_length = bytesRead;
 			return B_BAD_VALUE;
@@ -270,6 +347,82 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 	*_length = bytesRead;
 	return B_OK;
+}
+
+
+status_t
+Stream::WriteAt(off_t pos, const void* _buffer, size_t* _length,
+	off_t* diskOffset)
+{
+	if (pos < 0)
+		return B_BAD_VALUE;
+
+	const uint8* buffer = (const uint8*)_buffer;
+	size_t length = *_length;
+	size_t totalWritten = 0;
+	status_t error = B_OK;
+
+	CachedBlock cachedBlock(fVolume);
+
+	while (length > 0) {
+		// get the cluster
+		uint32 cluster;
+		bool added;
+		error = _FindOrCreateCluster(pos, cluster, added);
+		if (error != B_OK)
+			break;
+
+		// convert to position
+		off_t inClusterOffset = pos % fVolume.ClusterSize();
+		off_t offset = fVolume.ClusterToOffset(cluster) + inClusterOffset;
+
+		if (diskOffset != NULL) {
+			*diskOffset = offset;
+			diskOffset = NULL;
+		}
+
+		// convert to block + offset
+		off_t block = fVolume.ToBlock(offset);
+		size_t inBlockOffset = offset % fVolume.BlockSize();
+
+		// write
+		size_t toWrite = std::min(fVolume.BlockSize() - inBlockOffset, length);
+		if (toWrite == (size_t)fVolume.BlockSize()) {
+			// write the whole block
+			ssize_t written = write_pos(fVolume.Device(),
+				fVolume.BlockToOffset(block), buffer, fVolume.BlockSize());
+			if (written < 0) {
+				error = written;
+				break;
+			}
+			if (written != fVolume.BlockSize()) {
+				error = B_ERROR;
+				break;
+			}
+		} else {
+			// write a partial block -- need to read it from disk first
+			error = cachedBlock.SetTo(block, CachedBlock::READ);
+			if (error != B_OK)
+				break;
+
+			memcpy(cachedBlock.Block() + inBlockOffset, buffer, toWrite);
+
+			error = cachedBlock.Flush();
+			if (error != B_OK)
+				break;
+		}
+
+		totalWritten += toWrite;
+		pos += toWrite;
+		buffer += toWrite;
+		length -= toWrite;
+
+		if (pos > fSize)
+			fSize = pos;
+	}
+
+	*_length = totalWritten;
+	return totalWritten > 0 ? B_OK : error;
 }
 
 

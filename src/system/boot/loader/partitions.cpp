@@ -4,19 +4,22 @@
  */
 
 
-#include "RootFileSystem.h"
+#include <boot/partitions.h>
+
+#include <errno.h>
+#include <unistd.h>
+#include <string.h>
 
 #include <boot/FileMapDisk.h>
-#include <boot/partitions.h>
-#include <boot/vfs.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/stdio.h>
+#include <boot/vfs.h>
 #include <ddm_modules.h>
 #include <util/kernel_cpp.h>
 
-#include <unistd.h>
-#include <string.h>
+#include "RootFileSystem.h"
+
 
 using namespace boot;
 
@@ -161,7 +164,8 @@ Partition::ReadAt(void *cookie, off_t position, void *buffer, size_t bufferSize)
 	if (position + bufferSize > this->size)
 		bufferSize = this->size - position;
 
-	return read_pos(fFD, this->offset + position, buffer, bufferSize);
+	ssize_t result = read_pos(fFD, this->offset + position, buffer, bufferSize);
+	return result < 0 ? errno : result;
 }
 
 
@@ -177,7 +181,9 @@ Partition::WriteAt(void *cookie, off_t position, const void *buffer,
 	if (position + bufferSize > this->size)
 		bufferSize = this->size - position;
 
-	return write_pos(fFD, this->offset + position, buffer, bufferSize);
+	ssize_t result = write_pos(fFD, this->offset + position, buffer,
+		bufferSize);
+	return result < 0 ? errno : result;
 }
 
 
@@ -231,8 +237,9 @@ Partition::_Mount(file_system_module_info *module, Directory **_fileSystem)
 		if (_fileSystem)
 			*_fileSystem = fileSystem;
 
-		// remember the module name that mounted us
+		// remember the module that mounted us
 		fModuleName = module->module_name;
+		this->content_type = module->pretty_name;
 
 		fIsFileSystem = true;
 
@@ -386,7 +393,7 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 			delete child;
 		}
 
-		// remember the module name that identified us
+		// remember the name of the module that identified us
 		fModuleName = bestModule->module.name;
 
 		return B_OK;

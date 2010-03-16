@@ -8,6 +8,7 @@
 #ifndef CACHED_BLOCK_H
 #define CACHED_BLOCK_H
 
+
 #include <SupportDefs.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -15,15 +16,25 @@
 
 #include "Volume.h"
 
+
 namespace FATFS {
 
 class CachedBlock {
+	public:
+		enum {
+			READ	= 0x01,
+			CLEAR	= 0x02,
+			FORCE	= 0x04,
+		};
+
 	public:
 		CachedBlock(Volume &volume);
 		CachedBlock(Volume &volume, off_t block);
 		~CachedBlock();
 
 		uint8 *SetTo(off_t block);
+		status_t SetTo(off_t blockNumber, uint32 flags);
+		status_t Flush();
 
 		void Unset();
 
@@ -43,25 +54,6 @@ inline void
 CachedBlock::Unset()
 {
 	fBlockNumber = -1;
-}
-
-
-inline uint8 *
-CachedBlock::SetTo(off_t block)
-{
-	if (block == fBlockNumber)
-		return fBlock;
-	if (fBlock == NULL) {
-		fBlock = (uint8 *)malloc(BlockSize());
-		if (fBlock == NULL)
-			return NULL;
-	}
-
-	fBlockNumber = block;
-	if (read_pos(fVolume.Device(), block << BlockShift(), fBlock, BlockSize()) < (ssize_t)BlockSize())
-		return NULL;
-
-	return fBlock;
 }
 
 

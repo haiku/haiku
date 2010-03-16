@@ -43,17 +43,24 @@ class Volume {
 		int32				NumBlocks() const { return (int32)((off_t)fTotalSectors * fBytesPerSector / fBlockSize); }
 		int32				NumSectors() const { return fTotalSectors; }
 		int32				NumClusters() const { return fTotalClusters; }
-		
+
 		uint32				NextCluster(uint32 cluster, uint32 skip=0);
 		bool				IsValidCluster(uint32 cluster) const;
 		bool				IsLastCluster(uint32 cluster) const;
 		uint32				InvalidClusterID() const { return (1 << fFatBits) - 1; }
 
-		off_t				ToOffset(uint32 cluster) const;
+		status_t			AllocateCluster(uint32 previousCluster,
+								uint32& _newCluster);
+
+		off_t				ClusterToOffset(uint32 cluster) const;
 //		uint32				ToCluster(off_t offset) const { return offset >> ClusterShift(); }
-		off_t				ToOffset(off_t block) const { return block << BlockShift(); }
+		off_t				BlockToOffset(off_t block) const
+								{ return block << BlockShift(); }
 		uint32				ToBlock(off_t offset) const { return offset >> BlockShift(); }
 
+	private:
+		status_t			_UpdateCluster(uint32 cluster, uint32 value);
+		status_t			_ClusterAllocated(uint32 cluster);
 
 	protected:
 		int					fDevice;
@@ -75,7 +82,8 @@ class Volume {
 		uint32				fDataStart;
 		uint32				fTotalClusters;
 		uint32				fRootDirCluster;
-		
+		uint16				fFSInfoSector;
+
 		CachedBlock			*fCachedBlock;
 		Directory			*fRoot;
 };

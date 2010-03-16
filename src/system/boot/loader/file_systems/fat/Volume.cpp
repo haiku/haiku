@@ -65,10 +65,10 @@ Volume::Volume(boot::Partition *partition)
 	// check the signature
 	if (((buf[0x1fe] != 0x55) || (buf[0x1ff] != 0xaa)) && (buf[0x15] == 0xf8))
 		goto err1;
-	
+
 	if (!memcmp(buf+3, "NTFS    ", 8) || !memcmp(buf+3, "HPFS    ", 8))
 		goto err1;
-	
+
 	TRACE(("%s: signature ok\n", __FUNCTION__));
 	fBytesPerSector = read16(buf,0xb);
 	switch (fBytesPerSector) {
@@ -85,7 +85,7 @@ Volume::Volume(boot::Partition *partition)
 		goto err1;
 	}
 	TRACE(("%s: block shift %d\n", __FUNCTION__, fBlockShift));
-	
+
 	fSectorsPerCluster = buf[0xd];
 	switch (fSectorsPerCluster) {
 	case 1:	case 2:	case 4:	case 8:
@@ -101,12 +101,12 @@ Volume::Volume(boot::Partition *partition)
 		fClusterShift += 1;
 	}
 	TRACE(("%s: cluster shift %d\n", __FUNCTION__, fClusterShift));
-	
+
 	fReservedSectors = read16(buf,0xe);
 	fFatCount = buf[0x10];
 	if ((fFatCount == 0) || (fFatCount > 8))
 		goto err1;
-	
+
 	fMediaDesc = buf[0x15];
 	if ((fMediaDesc != 0xf0) && (fMediaDesc < 0xf8))
 		goto err1;
@@ -124,32 +124,36 @@ Volume::Volume(boot::Partition *partition)
 		fRootDirCluster = read32(buf,0x2c);
 		if (fRootDirCluster >= fTotalClusters)
 			goto err1;
+
+		fFSInfoSector = read16(buf, 0x30);
+		if (fFSInfoSector < 1 || fFSInfoSector > fTotalSectors)
+			goto err1;
 	} else {
 		// FAT12/16
 		// XXX:FIXME
 		fFatBits = 16;
 		goto err1;
 	}
-	TRACE(("%s: block size %d, sector size %d, sectors/cluster %d\n", __FUNCTION__, 
+	TRACE(("%s: block size %d, sector size %d, sectors/cluster %d\n", __FUNCTION__,
 		fBlockSize, fBytesPerSector, fSectorsPerCluster));
-	TRACE(("%s: block shift %d, sector shift %d, cluster shift %d\n", __FUNCTION__, 
+	TRACE(("%s: block shift %d, sector shift %d, cluster shift %d\n", __FUNCTION__,
 		fBlockShift, fSectorShift, fClusterShift));
-	TRACE(("%s: reserved %d, max root entries %d, media %02x, sectors/fat %d\n", __FUNCTION__, 
+	TRACE(("%s: reserved %d, max root entries %d, media %02x, sectors/fat %d\n", __FUNCTION__,
 		fReservedSectors, fMaxRootEntries, fMediaDesc, fSectorsPerFat));
-	
-	
+
+
 	//if (fTotalSectors > partition->sectors_per_track * partition->cylinder_count * partition->head_count)
 	if ((off_t)fTotalSectors * fBytesPerSector > partition->size)
 		goto err1;
-	
-	TRACE(("%s: found fat%d filesystem, root dir at cluster %d\n", __FUNCTION__, 
+
+	TRACE(("%s: found fat%d filesystem, root dir at cluster %d\n", __FUNCTION__,
 		fFatBits, fRootDirCluster));
 
-	fRoot = new Directory(*this, fRootDirCluster, "/");
+	fRoot = new Directory(*this, 0, fRootDirCluster, "/");
 	return;
-	
+
 err1:
-	dprintf("fatfs: cannot mount (bad superblock ?)\n");
+	TRACE("fatfs: cannot mount (bad superblock ?)\n");
 	// XXX !? this triple-faults in QEMU ..
 	//delete fCachedBlock;
 }
@@ -163,7 +167,7 @@ Volume::~Volume()
 }
 
 
-status_t 
+status_t
 Volume::InitCheck()
 {
 	if (fCachedBlock == NULL)
@@ -175,7 +179,7 @@ Volume::InitCheck()
 }
 
 
-status_t 
+status_t
 Volume::GetName(char *name, size_t size) const
 {
 	//TODO: WRITEME
@@ -184,12 +188,12 @@ Volume::GetName(char *name, size_t size) const
 
 
 off_t
-Volume::ToOffset(uint32 cluster) const
+Volume::ClusterToOffset(uint32 cluster) const
 {
 	return (fDataStart << SectorShift()) + ((cluster - 2) << ClusterShift());
 }
 
-uint32 
+uint32
 Volume::NextCluster(uint32 cluster, uint32 skip)
 {
 	//TRACE(("%s(%d, %d)\n", __FUNCTION__, cluster, skip));
@@ -221,7 +225,7 @@ again:
 		return InvalidClusterID();
 
 	offset %= BlockSize();
-	
+
 	switch (fFatBits) {
 		case 32:
 			next = read32(buf, offset);
@@ -241,7 +245,7 @@ again:
 }
 
 
-bool 
+bool
 Volume::IsValidCluster(uint32 cluster) const
 {
 	if (cluster > 1 && cluster < fTotalClusters)
@@ -255,9 +259,140 @@ Volume::IsLastCluster(uint32 cluster) const
 {
 	if (cluster >= fTotalClusters && ((cluster & 0xff8) == 0xff8))
 		return true;
-	return false;	
+	return false;
 }
 
+
+/*!	Allocates a free cluster.
+	If \a previousCluster is a valid cluster idnex, its chain pointer is
+	changed to point to the newly allocated cluster.
+*/
+status_t
+Volume::AllocateCluster(uint32 previousCluster, uint32& _newCluster)
+{
+	if (fFatBits != 32)
+		return B_UNSUPPORTED;
+		// TODO: Support FAT16 and FAT12.
+
+	const int fatBytes = FatBits() / 8;
+	const uint32 blockOffsetMask = (uint32)BlockSize() - 1;
+
+	// Iterate through the FAT to find a free cluster.
+	off_t offset = fBytesPerSector * fReservedSectors;
+	offset += 2 * fatBytes;
+	for (uint32 i = 2; i < fTotalClusters; i++, offset += fatBytes) {
+		uint8* buffer = fCachedBlock->SetTo(ToBlock(offset));
+		if (buffer == NULL)
+			return B_ERROR;
+
+		uint32 value = read32(buffer, offset & blockOffsetMask);
+		if (value == 0) {
+			// found one -- mark it used (end of file)
+			status_t error = _UpdateCluster(i, 0x0ffffff8);
+			if (error != B_OK)
+				return error;
+
+			// If a previous cluster was given, update its list link.
+			if (IsValidCluster(previousCluster)) {
+				error = _UpdateCluster(previousCluster, i);
+				if (error != B_OK) {
+					_UpdateCluster(i, 0);
+					return error;
+				}
+			}
+
+			_ClusterAllocated(i);
+
+			_newCluster = i;
+			return B_OK;
+		}
+	}
+
+	return B_DEVICE_FULL;
+}
+
+
+status_t
+Volume::_UpdateCluster(uint32 cluster, uint32 value)
+{
+	if (fFatBits != 32 && fFatBits != 16)
+		return B_UNSUPPORTED;
+		// TODO: Support FAT12.
+
+	if (!IsValidCluster(cluster))
+		return InvalidClusterID();
+
+	// get the buffer we need to change
+	const int fatBytes = FatBits() / 8;
+
+	for (uint8 i = 0; i < fFatCount; i++) {
+		off_t offset
+			= fBytesPerSector * (fReservedSectors + i * fSectorsPerFat);
+		offset += cluster * fatBytes;
+
+		uint8* buffer = fCachedBlock->SetTo(ToBlock(offset));
+		if (buffer == NULL)
+			return InvalidClusterID();
+
+		offset %= BlockSize();
+
+		// set the value
+		switch (fFatBits) {
+			case 32:
+				*(uint32*)(buffer + offset) = B_HOST_TO_LENDIAN_INT32(value);
+				break;
+			case 16:
+				*(uint16*)(buffer + offset) = B_HOST_TO_LENDIAN_INT16(value);
+				break;
+			default:
+				return InvalidClusterID();
+		}
+
+		// write the block back to disk
+		status_t error = fCachedBlock->Flush();
+		if (error != B_OK) {
+			fCachedBlock->Unset();
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Volume::_ClusterAllocated(uint32 cluster)
+{
+	// update the FS info
+
+	// exists only for FAT32
+	if (fFatBits != 32)
+		return B_OK;
+
+	off_t offset = fBytesPerSector * fFSInfoSector;
+
+	status_t error = fCachedBlock->SetTo(offset / BlockSize(),
+		CachedBlock::READ);
+	if (error != B_OK)
+		return error;
+
+	uint8* buffer = fCachedBlock->Block() + offset % BlockSize();
+
+	// update number of free cluster
+	int32 freeClusters = read32(buffer, 0x1e8);
+	if (freeClusters != -1)
+		write32(buffer, 0x1e8, freeClusters - 1);
+
+	// update number of most recently allocated cluster
+	write32(buffer, 0x1ec, cluster);
+
+	// write the block back
+	error = fCachedBlock->Flush();
+	if (error != B_OK)
+		fCachedBlock->Unset();
+
+	return error;
+}
 
 
 //	#pragma mark -

@@ -61,6 +61,9 @@ class Directory : public Node {
 		virtual status_t GetNextNode(void *cookie, Node **_node) = 0;
 		virtual status_t Rewind(void *cookie) = 0;
 		virtual bool IsEmpty() = 0;
+
+		virtual status_t CreateFile(const char *name, mode_t permissions,
+			Node **_node);
 };
 
 /** The console based nodes don't need cookies for I/O, they
@@ -103,7 +106,8 @@ extern status_t register_boot_file_system(Directory *directory);
 extern Directory *get_boot_file_system(stage2_args *args);
 extern status_t mount_file_systems(stage2_args *args);
 extern int open_node(Node *node, int mode);
-extern int open_from(Directory *directory, const char *path, int mode);
+extern int open_from(Directory *directory, const char *path, int mode,
+			mode_t permissions = 0);
 
 extern Node *get_node_from(int fd);
 

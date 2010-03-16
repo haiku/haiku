@@ -16,10 +16,13 @@ namespace FATFS {
 
 class File : public Node {
 	public:
-		File(Volume &volume, uint32 cluster, off_t size, const char *name);
+		File(Volume &volume, off_t dirEntryOffset, uint32 cluster, off_t size,
+			const char *name);
 		virtual ~File();
 
 		status_t InitCheck();
+
+		off_t DirEntryOffset() const	{ return fDirEntryOffset; }
 
 		virtual status_t Open(void **_cookie, int mode);
 		virtual status_t Close(void *cookie);
@@ -37,6 +40,7 @@ class File : public Node {
 		Volume		&fVolume;
 		//FileBlock	fNode;
 		Stream		fStream;
+		off_t		fDirEntryOffset;
 };
 
 }	// namespace FATFS
