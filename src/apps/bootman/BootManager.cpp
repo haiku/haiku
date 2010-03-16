@@ -53,13 +53,18 @@ BootManager::ReadyToRun()
 void
 BootManager::AboutRequested()
 {
-	BAlert *alert = new BAlert("about",
-		TR("Haiku Boot Manager\n\n"
-		"written by\n"
+	BString aboutText;
+	const char* title = TR_CMT("Haiku Boot Manager", "About text title");
+	aboutText <<
+		title << "\n\n" <<
+		TR("written by") << "\n"
 		"\tDavid Dengg\n"
 		"\tMichael Pfeiffer\n"
-		"\n"
-		"Copyright 2008-10, Haiku Inc.\n"), TR("OK"));
+		"\n" <<
+		TR_CMT("Copyright %year, Haiku Inc.\n", "Leave %year untranslated");
+	aboutText.ReplaceLast("%year", "2008-2010");
+	BAlert *alert = new BAlert("about",
+		aboutText.String(), TR("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -68,7 +73,7 @@ BootManager::AboutRequested()
 	view->GetFont(&font);
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 18, &font);
+	view->SetFontAndColor(0, strlen(title), &font);
 
 	alert->Go();
 }
