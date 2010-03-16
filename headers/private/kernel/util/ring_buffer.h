@@ -9,6 +9,9 @@
 #include <OS.h>
 
 
+struct iovec;
+
+
 struct ring_buffer {
 	int32		first;
 	int32		in;
@@ -40,6 +43,7 @@ ssize_t ring_buffer_user_read(struct ring_buffer *buffer, uint8 *data, ssize_t l
 ssize_t ring_buffer_user_write(struct ring_buffer *buffer, const uint8 *data, ssize_t length);
 size_t ring_buffer_peek(struct ring_buffer *buffer, size_t offset, void *data,
 			size_t length);
+int32 ring_buffer_get_vecs(struct ring_buffer *buffer, struct iovec *vecs);
 
 #ifdef __cplusplus
 }

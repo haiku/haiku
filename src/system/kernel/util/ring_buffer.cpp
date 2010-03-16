@@ -13,6 +13,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/uio.h>
 
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 #define user_memcpy(x...) (memcpy(x), B_OK)
@@ -264,6 +265,40 @@ ring_buffer_peek(struct ring_buffer* buffer, size_t offset, void* data,
 	}
 
 	return length;
+}
+
+
+/*!	Returns iovecs describing the contents of the ring buffer.
+
+	\param buffer The ring buffer.
+	\param vecs Pointer to an iovec array with at least 2 elements to be filled
+		in by the function.
+	\return The number of iovecs the function has filled in to describe the
+		contents of the ring buffer. \c 0, if empty, \c 2 at maximum.
+*/
+int32
+ring_buffer_get_vecs(struct ring_buffer* buffer, struct iovec* vecs)
+{
+	if (buffer->in == 0)
+		return 0;
+
+	if (buffer->first + buffer->in <= buffer->size) {
+		// one element
+		vecs[0].iov_base = buffer->buffer + buffer->first;
+		vecs[0].iov_len = buffer->in;
+		return 1;
+	}
+
+	// two elements
+	size_t upper = buffer->size - buffer->first;
+	size_t lower = buffer->in - upper;
+
+	vecs[0].iov_base = buffer->buffer + buffer->first;
+	vecs[0].iov_len = upper;
+	vecs[1].iov_base = buffer->buffer;
+	vecs[1].iov_len = lower;
+
+	return 2;
 }
 
 
