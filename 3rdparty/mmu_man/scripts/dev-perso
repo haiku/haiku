@@ -89,6 +89,7 @@ function dev() {
 		mkdir "$DEVROOT/$1" && touch "$DEVROOT/$1/.profile"
 		# fallback
 	fi
+	export DEVPROJ="$1"
 	if [ ! -d "$DEVROOT/$1" ]; then
 		echo "invalid project name '$1'"
 		return 1
