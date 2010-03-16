@@ -528,7 +528,7 @@ LegacyBootDrive::_ConvertToBIOSText(const char* text, BString& biosText)
 
 	buffer[biosTextLength] = '\0';
 	biosText.UnlockBuffer(biosTextLength);
-	return biosTextLength <= kMaxBootMenuItemLength;
+	return biosTextLength < kMaxBootMenuItemLength;
 }
 
 
