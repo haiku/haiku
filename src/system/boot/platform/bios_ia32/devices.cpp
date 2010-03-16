@@ -33,6 +33,7 @@ extern uint32 gBootPartitionOffset;
 #define BIOS_GET_DRIVE_PARAMETERS		0x0800
 #define BIOS_IS_EXT_PRESENT				0x4100
 #define BIOS_EXT_READ					0x4200
+#define BIOS_EXT_WRITE					0x4300
 #define BIOS_GET_EXT_DRIVE_PARAMETERS	0x4800
 #define BIOS_BOOT_CD_GET_STATUS			0x4b01
 
@@ -531,7 +532,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 	}
 
 	sBlockDevicesAdded = true;
-	return B_OK; 
+	return B_OK;
 }
 
 
@@ -585,14 +586,14 @@ BIOSDrive::~BIOSDrive()
 }
 
 
-status_t 
+status_t
 BIOSDrive::InitCheck() const
 {
 	return fSize > 0 ? B_OK : B_ERROR;
 }
 
 
-ssize_t 
+ssize_t
 BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	uint32 offset = pos % fBlockSize;
@@ -706,15 +707,70 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 }
 
 
-ssize_t 
-BIOSDrive::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+ssize_t
+BIOSDrive::WriteAt(void* cookie, off_t pos, const void* buffer,
+	size_t bufferSize)
 {
-	// we don't have to know how to write
-	return B_NOT_ALLOWED;
+	// we support only LBA addressing
+	if (!fLBA) {
+		dprintf("BIOSDrive::WriteAt(): CHS addressing not supported\n");
+		return B_UNSUPPORTED;
+	}
+
+	// we support only block-aligned writes
+	if (pos % fBlockSize != 0 || bufferSize % fBlockSize != 0) {
+		dprintf("BIOSDrive::WriteAt(pos: %" B_PRIdOFF ", size: %" B_PRIuSIZE
+			"): Block-unaligned write not supported.\n", pos, bufferSize);
+		return B_UNSUPPORTED;
+	}
+
+	pos /= fBlockSize;
+
+	uint32 blocksLeft = bufferSize / fBlockSize;
+	int32 totalBytesWritten = 0;
+
+	uint32 scratchSize = 24 * 1024 / fBlockSize;
+		// maximum value allowed by Phoenix BIOS is 0x7f
+
+	while (blocksLeft > 0) {
+		uint32 blocksToWrite = blocksLeft;
+		if (blocksToWrite > scratchSize)
+			blocksToWrite = scratchSize;
+
+		uint32 bytesToWrite = blocksToWrite * fBlockSize;
+
+		memcpy((void*)kExtraSegmentScratch, buffer, bytesToWrite);
+
+		struct disk_address_packet* packet
+			= (disk_address_packet*)kDataSegmentScratch;
+		memset(packet, 0, sizeof(disk_address_packet));
+
+		packet->size = sizeof(disk_address_packet);
+		packet->number_of_blocks = blocksToWrite;
+		packet->buffer = kExtraSegmentScratch;
+		packet->lba = pos;
+
+		struct bios_regs regs;
+		regs.eax = BIOS_EXT_WRITE;	// al = 0x00 -- no write verify
+		regs.edx = fDriveID;
+		regs.esi = (addr_t)packet - kDataSegmentBase;
+		call_bios(0x13, &regs);
+
+		if (regs.flags & CARRY_FLAG)
+			return B_ERROR;
+
+		pos += blocksToWrite;
+		blocksLeft -= blocksToWrite;
+		bufferSize -= bytesToWrite;
+		buffer = (void*)((addr_t)buffer + bytesToWrite);
+		totalBytesWritten += bytesToWrite;
+	}
+
+	return totalBytesWritten;
 }
 
 
-off_t 
+off_t
 BIOSDrive::Size() const
 {
 	return fSize;
@@ -763,7 +819,7 @@ BIOSDrive::FillIdentifier()
 //	#pragma mark -
 
 
-status_t 
+status_t
 platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
 	TRACE(("boot drive ID: %x\n", gBootDriveID));
@@ -824,7 +880,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 }
 
 
-status_t 
+status_t
 platform_register_boot_device(Node *device)
 {
 	BIOSDrive *drive = (BIOSDrive *)device;
