@@ -24,6 +24,10 @@
 // Set to 0 to disable support for kernel breakpoints.
 #define KERNEL_BREAKPOINTS				1
 
+// Enables the debug syslog feature (accessing the previous syslog in the boot
+// loader) by default. Can be overridden in the boot loader menu.
+#define KDEBUG_ENABLE_DEBUG_SYSLOG		KDEBUG_LEVEL_1
+
 
 // block/file cache
 
