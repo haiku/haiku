@@ -501,7 +501,6 @@ LegacyBootDrive::GetDisplayText(const char* text, BString& displayText)
 	}
 
 	buffer[bufferLength] = '\0';
-	bufferLength ++;
 	displayText.UnlockBuffer(bufferLength);
 	return B_OK;
 }
@@ -528,7 +527,6 @@ LegacyBootDrive::_ConvertToBIOSText(const char* text, BString& biosText)
 	}
 
 	buffer[biosTextLength] = '\0';
-	biosTextLength ++;
 	biosText.UnlockBuffer(biosTextLength);
 	return biosTextLength <= kMaxBootMenuItemLength;
 }
