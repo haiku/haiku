@@ -192,7 +192,7 @@ PartitionRecorder::_Record(BPartition* partition)
 		number << fIndex;
 		buffer << TR_CMT("Unnamed %d",
 			"Default name of a partition whose name could not be read from "
-			"disk");
+			"disk; characters in codepage 437 are allowed only");
 		buffer.ReplaceFirst("%d", number);
 		name = buffer.String();
 	}
