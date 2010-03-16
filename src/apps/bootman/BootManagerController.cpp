@@ -368,7 +368,7 @@ BootManagerController::_CreateInstallSummaryPage(BRect frame)
 		message.FindString("path", &path);
 
 		BString displayName;
-		if (fBootDrive->GetDisplayText(name.String(), displayName))
+		if (fBootDrive->GetDisplayText(name.String(), displayName) == B_OK)
 			description << displayName << "\t(" << path << ")\n";
 		else
 			description << name << "\t(" << path << ")\n";
