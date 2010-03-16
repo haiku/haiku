@@ -71,6 +71,8 @@ extern "C" int kgets(char* buffer, int length);
 
 void call_modules_hook(bool enter);
 
+static void syslog_write(const char* text, int32 length, bool notify);
+
 
 int dbg_register_file[B_MAX_CPU_COUNT][14];
 	/* XXXmpetit -- must be made generic */
@@ -165,14 +167,18 @@ DebugOutputFilter::Print(const char* format, va_list args)
 void
 DefaultDebugOutputFilter::PrintString(const char* string)
 {
+	size_t length = strlen(string);
+
 	if (sSerialDebugEnabled)
 		arch_debug_serial_puts(string);
+	if (sSyslogOutputEnabled)
+		syslog_write(string, length, false);
 	if (sBlueScreenEnabled || sDebugScreenEnabled)
 		blue_screen_puts(string);
 
 	for (uint32 i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++) {
 		if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
-			sDebuggerModules[i]->debugger_puts(string, strlen(string));
+			sDebuggerModules[i]->debugger_puts(string, length);
 	}
 }
 
@@ -1051,7 +1057,10 @@ syslog_sender(void* data)
 
 	while (true) {
 		// wait for syslog data to become available
-		acquire_sem(sSyslogNotify);
+		acquire_sem_etc(sSyslogNotify, 1, B_RELATIVE_TIMEOUT, 5000000);
+			// Note: We time out since in some situations output is added to
+			// the syslog buffer without being allowed to notify us (e.g. in
+			// the kernel debugger).
 
 		sSyslogMessage->when = real_time_clock();
 
