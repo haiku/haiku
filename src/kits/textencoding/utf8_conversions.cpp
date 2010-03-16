@@ -29,6 +29,51 @@ using namespace BPrivate;
 int iconvctl(iconv_t icd, int request, void* argument);
 
 
+static void
+discard_invalid_input_character(iconv_t* conversion, char** inputBuffer,
+	size_t* inputLeft)
+{
+	if (*inputLeft == 0)
+		return;
+
+	char outputBuffer[1];
+
+	// skip the invalid input character only
+	size_t left = 1;
+	for (; left <= *inputLeft; left ++) {
+		// reset internal state
+		iconv(*conversion, NULL, NULL, NULL, NULL);
+
+		char* buffer = *inputBuffer;
+		char* output = outputBuffer;
+		size_t outputLeft = 1;
+		size_t size = iconv(*conversion, &buffer, &left,
+			&output, &outputLeft);
+
+		if (size != (size_t)-1) {
+			// should not reach here
+			break;
+		}
+
+		if (errno == EINVAL) {
+			// too few input bytes provided,
+			// increase input buffer size and try again
+			continue;
+		}
+
+		if (errno == EILSEQ) {
+			// minimal size of input buffer found
+			break;
+		}
+
+		// should not reach here
+	};
+
+	*inputBuffer += left;
+	*inputLeft -= left;
+}
+
+
 status_t
 convert_encoding(const char* from, const char* to, const char* src,
 	int32* srcLen, char* dst, int32* dstLen, int32* state,
@@ -71,11 +116,8 @@ convert_encoding(const char* from, const char* to, const char* src,
 			switch (errno) {
 				case EILSEQ: // unable to generate a corresponding character
 				{
-					// discard the input character
-					const int one = 1, zero = 0;
-					iconvctl(conversion, ICONV_SET_DISCARD_ILSEQ, (void*)&one);
-					iconv(conversion, inputBuffer, &inputLeft, &dst, &outputLeft);
-					iconvctl(conversion, ICONV_SET_DISCARD_ILSEQ, (void*)&zero);
+					discard_invalid_input_character(&conversion, inputBuffer,
+						&inputLeft);
 
 					// prepare to convert the substitute character to target encoding
 					char original = substitute;
@@ -96,7 +138,12 @@ convert_encoding(const char* from, const char* to, const char* src,
 					break;
 				}
 
-				case EINVAL: // incomplete multibyte sequence in the input
+				case EINVAL: // incomplete multibyte sequence at the end of the input
+					// TODO inputLeft bytes from inputBuffer should
+					// be stored in state variable, so that conversion
+					// can continue when the caller provides the missing
+					// bytes with the next call of this method
+
 					// we just eat bad bytes, as part of robustness/best-effort
 					inputBuffer++;
 					inputLeft--;
