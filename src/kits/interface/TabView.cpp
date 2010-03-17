@@ -1053,11 +1053,7 @@ BTabView::GetPreferredSize(float *width, float *height)
 BSize
 BTabView::MinSize()
 {
-	BSize size(_TabsMinSize());
-	BSize containerSize = fContainerView->MinSize();
-	if (containerSize.width > size.width)
-		size.width = containerSize.width;
-	size.height += containerSize.height;
+	BSize size = GetLayout()->MinSize();
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
@@ -1065,11 +1061,7 @@ BTabView::MinSize()
 BSize
 BTabView::MaxSize()
 {
-	BSize size(_TabsMinSize());
-	BSize containerSize = fContainerView->MaxSize();
-	if (containerSize.width > size.width)
-		size.width = containerSize.width;
-	size.height += containerSize.height;
+	BSize size = GetLayout()->MaxSize();
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 }
 
@@ -1077,11 +1069,7 @@ BTabView::MaxSize()
 BSize
 BTabView::PreferredSize()
 {
-	BSize size(_TabsMinSize());
-	BSize containerSize = fContainerView->PreferredSize();
-	if (containerSize.width > size.width)
-		size.width = containerSize.width;
-	size.height += containerSize.height;
+	BSize size = GetLayout()->PreferredSize();
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
 }
 
