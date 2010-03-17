@@ -61,14 +61,6 @@ static rgb_color sDarkShadowColor;
 
 const rgb_color kHighlightColor = {100, 100, 210, 255};
 
-const unsigned char kHorizontalResizeCursor[] = {
-	16, 1, 7, 7,
-	0, 0, 1, 0, 1, 0, 1, 0, 9, 32, 25, 48, 57, 56, 121, 60,
-	57, 56, 25, 48, 9, 32, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0,
-	3, 128, 3, 128, 3, 128, 15, 224, 31, 240, 63, 248, 127, 252, 255, 254,
-	127, 252, 63, 248, 31, 240, 15, 224, 3, 128, 3, 128, 3, 128, 0, 0
-};
-
 
 static void
 _DrawLine(BPoseView *view, BPoint from, BPoint to)
@@ -109,7 +101,7 @@ BTitleView::BTitleView(BRect frame, BPoseView *view)
 	: BView(frame, "TitleView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
 	fPoseView(view),
 	fTitleList(10, true),
-	fHorizontalResizeCursor(kHorizontalResizeCursor),
+	fHorizontalResizeCursor(B_CURSOR_ID_RESIZE_EAST_WEST),
 	fPreviouslyClickedColumnTitle(0),
 	fTrackingState(NULL)
 {

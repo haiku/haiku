@@ -9008,7 +9008,7 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 		if (!CheckDevicesEqual(&srcRef, targetModel)
 			&& !srcModel.IsVolume()
 			&& !srcModel.IsRoot()) {
-			BCursor copyCursor(kCopyCursor);
+			BCursor copyCursor(B_CURSOR_ID_COPY);
 			SetViewCursor(&copyCursor);
 			return true;
 		}
