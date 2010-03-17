@@ -2043,10 +2043,6 @@ TitleView::TitleView(BRect rect, OutlineView* horizontalSlave,
 	fUpSortArrow->SetBits((const void*) kUpSortArrow8x8, 64, 0, B_CMAP8);
 	fDownSortArrow->SetBits((const void*) kDownSortArrow8x8, 64, 0, B_CMAP8);
 
-//	fResizeCursor = new BCursor(kResizeCursorData);
-//	fMinResizeCursor = new BCursor(kMinResizeCursorData);
-//	fMaxResizeCursor = new BCursor(kMaxResizeCursorData);
-//	fColumnMoveCursor = new BCursor(kColumnMoveCursorData);
 	fResizeCursor = new BCursor(B_CURSOR_ID_RESIZE_EAST_WEST);
 	fMinResizeCursor = new BCursor(B_CURSOR_ID_RESIZE_EAST);
 	fMaxResizeCursor = new BCursor(B_CURSOR_ID_RESIZE_WEST);
