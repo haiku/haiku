@@ -168,8 +168,10 @@ KeyboardWindow::MessageReceived(BMessage* message)
 			if (delay >= 875000)
 				delay = 1000000;
 
+			fSettings.SetKeyboardRepeatDelay(delay);
+
 			slider = (BSlider* )FindView("delay_until_key_repeat");
-			if (slider !=NULL) 
+			if (slider != NULL) 
 				slider->SetValue(delay);
 
 			fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
