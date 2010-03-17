@@ -24,7 +24,7 @@
 /*
 	Grammar:
 
-	commandLine	:= commandPipe | ( "(" expression ")" )
+	commandLine	:= ( commandPipe [ ";" commandLine  ] ) | assignment
 	expression	:= term | assignment
 	assignment	:= lhs ( "=" | "+=" | "-=" | "*=" | "/=" | "%=" )
 				   expression
@@ -89,6 +89,7 @@ enum {
 	TOKEN_CLOSING_BRACE			= '}',
 
 	TOKEN_PIPE					= '|',
+	TOKEN_SEMICOLON				= ';',
 
 	TOKEN_STRING				= '"',
 	TOKEN_UNKNOWN				= '?',
@@ -181,7 +182,15 @@ public:
 
 	void SetCommandMode(bool commandMode)
 	{
+		if (fCommandMode == commandMode)
+			return;
+
 		fCommandMode = commandMode;
+
+		if (fReuseToken) {
+			// We can't reuse the token, since the parsing mode changed.
+			SetPosition(fCurrentToken.position);
+		}
 	}
 
 	const char* String() const
@@ -290,6 +299,7 @@ public:
 				case ']':
 				case '{':
 				case '}':
+				case ';':
 				{
 					int32 length = fCurrentChar - begin;
 					fCurrentToken.SetTo(begin, length, _CurrentPos() - length,
@@ -324,6 +334,7 @@ public:
 			case '[':
 			case ']':
 			case '|':
+			case ';':
 				fCurrentToken.SetTo(fCurrentChar, 1, _CurrentPos(),
 					*fCurrentChar);
 				fCurrentChar++;
@@ -403,6 +414,10 @@ public:
 			case ']':
 			case '"':
 				return true;
+
+			case '|':	// TODO: Move when we support & and | in expressions.
+			case ';':
+				return fCommandMode;
 
 			case '{':
 			case '}':
@@ -509,26 +524,38 @@ ExpressionParser::EvaluateCommand(const char* expressionString, int& returnCode)
 	const Token& token = fTokenizer.NextToken();
 	uint64 value = 0;
 
-	if (token.type == TOKEN_IDENTIFIER) {
-		fTokenizer.NextToken();
-		if (token.type & TOKEN_ASSIGN_FLAG) {
-			// an assignment
-			fTokenizer.SetTo(expressionString);
+	while (true) {
+		int32 startPosition = token.position;
+
+		if (token.type == TOKEN_IDENTIFIER) {
+			fTokenizer.NextToken();
+
+			if (token.type & TOKEN_ASSIGN_FLAG) {
+				// an assignment
+				fTokenizer.SetPosition(startPosition);
+				value =  _ParseExpression(true);
+				returnCode = 0;
+			} else {
+				// no assignment, so let's assume it's a command
+				fTokenizer.SetPosition(startPosition);
+				fTokenizer.SetCommandMode(true);
+				value = _ParseCommandPipe(returnCode);
+			}
+		} else if (token.type == TOKEN_STAR) {
+			// dereferenced address -- assignment
+			fTokenizer.SetPosition(startPosition);
 			value =  _ParseExpression(true);
 			returnCode = 0;
-		} else {
-			// no assignment, so let's assume it's a command
-			fTokenizer.SetTo(expressionString);
-			fTokenizer.SetCommandMode(true);
-			value = _ParseCommandPipe(returnCode);
-		}
-	} else if (token.type == TOKEN_STAR) {
-		// dereferenced address -- assignment
-		fTokenizer.SetTo(expressionString);
-		value =  _ParseExpression(true);
-		returnCode = 0;
-	} else
-		parse_exception("expected command or assignment", 0);
+		} else
+			parse_exception("expected command or assignment", token.position);
+
+		// might be chained with ";"
+		if (fTokenizer.NextToken().type != TOKEN_SEMICOLON)
+			break;
+
+		fTokenizer.SetCommandMode(false);
+		fTokenizer.NextToken();
+	}
 
 	if (token.type != TOKEN_END_OF_LINE)
 		parse_exception("parse error", token.position);
@@ -843,6 +870,7 @@ ExpressionParser::_ParseArgument(int& argc, char** argv)
 		case TOKEN_CLOSING_PARENTHESIS:
 		case TOKEN_CLOSING_BRACKET:
 		case TOKEN_PIPE:
+		case TOKEN_SEMICOLON:
 			// those don't belong to us
 			fTokenizer.RewindToken();
 			return false;
@@ -890,6 +918,7 @@ ExpressionParser::_GetUnparsedArgument(int& argc, char** argv)
 					done = true;
 				break;
 			case TOKEN_PIPE:
+			case TOKEN_SEMICOLON:
 				if (parentheses == 0 && brackets == 0)
 					done = true;
 				break;
