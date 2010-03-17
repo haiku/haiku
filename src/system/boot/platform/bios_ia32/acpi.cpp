@@ -33,7 +33,7 @@ static struct scan_spots_struct acpi_scan_spots[] = {
 };
 
 static acpi_descriptor_header *sAcpiRsdt; // System Description Table
-
+static int32 sNumEntries = -1;
 
 static status_t
 acpi_check_rsdt(acpi_rsdp *rsdp)
@@ -63,22 +63,21 @@ acpi_find_table(const char *signature)
 	if (sAcpiRsdt == NULL)
 		return NULL;
 
-	// Tried to keep numEntries a static variable; kept turning up 0 on table
-	// scan
-	// TODO: This calculates numEntries for every acpi probe.
-	int32 numEntries = (sAcpiRsdt->length - sizeof(acpi_descriptor_header)) / 4;
-	if (numEntries <= 0) {
+	if (sNumEntries == -1)
+		sNumEntries = (sAcpiRsdt->length - sizeof(acpi_descriptor_header)) / 4;
+		
+	if (sNumEntries <= 0) {
 		TRACE(("acpi: root system description table is empty\n"));
 		return NULL;
 	}
 
-	TRACE(("acpi: searching %ld entries for table '%.4s'\n", numEntries,
+	TRACE(("acpi: searching %ld entries for table '%.4s'\n", sNumEntries,
 		signature));
 
 	uint32 *pointer = (uint32 *)((uint8 *)sAcpiRsdt
 		+ sizeof(acpi_descriptor_header));
 
-	for (int32 j = 0; j < numEntries; j++, pointer++) {
+	for (int32 j = 0; j < sNumEntries; j++, pointer++) {
 		acpi_descriptor_header *header = (acpi_descriptor_header *)
 			mmu_map_physical_memory(*pointer, sizeof(acpi_descriptor_header),
 				kDefaultPageFlags);
