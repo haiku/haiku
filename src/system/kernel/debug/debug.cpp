@@ -748,6 +748,48 @@ print_kernel_debugger_message()
 
 
 static void
+execute_panic_commands()
+{
+	if (sCurrentKernelDebuggerMessage == NULL
+		|| strstr(sCurrentKernelDebuggerMessage,
+				kKDLMessageCommandSeparator) == NULL) {
+		return;
+	}
+
+	// Indeed there are commands to execute.
+	const size_t kCommandBufferSize = 512;
+	char* commandBuffer = (char*)debug_malloc(kCommandBufferSize);
+	if (commandBuffer != NULL) {
+		va_list tempArgs;
+		va_copy(tempArgs, sCurrentKernelDebuggerMessageArgs);
+
+		if (vsnprintf(commandBuffer, kCommandBufferSize,
+				sCurrentKernelDebuggerMessage, tempArgs)
+					< (int)kCommandBufferSize) {
+			const char* commands = strstr(commandBuffer,
+				kKDLMessageCommandSeparator);
+			if (commands != NULL) {
+				commands += strlen(kKDLMessageCommandSeparator);
+				kprintf("initial commands: %s\n", commands);
+				evaluate_debug_command(commands);
+			}
+		}
+
+		va_end(tempArgs);
+
+		debug_free(commandBuffer);
+	}
+}
+
+
+static void
+stack_trace_trampoline(void*)
+{
+	arch_debug_stack_trace();
+}
+
+
+static void
 kernel_debugger_loop(const char* messagePrefix, const char* message,
 	va_list args, int32 cpu)
 {
@@ -802,36 +844,23 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 		}
 	}
 
-	if (has_debugger_command("help")) {
-		// commands are registered already
-		if (sCurrentKernelDebuggerMessage != NULL
-			&& strstr(sCurrentKernelDebuggerMessage,
-					kKDLMessageCommandSeparator) != NULL) {
-			// The panic() message specifies commands to execute.
-			const size_t kCommandBufferSize = 512;
-			char* commandBuffer = (char*)debug_malloc(kCommandBufferSize);
-			if (commandBuffer != NULL) {
-				va_list tempArgs;
-				va_copy(tempArgs, sCurrentKernelDebuggerMessageArgs);
-				if (vsnprintf(commandBuffer, kCommandBufferSize,
-						sCurrentKernelDebuggerMessage, tempArgs)
-							< (int)kCommandBufferSize) {
-					const char* commands = strstr(commandBuffer,
-						kKDLMessageCommandSeparator);
-					if (commands != NULL) {
-						commands += strlen(kKDLMessageCommandSeparator);
-						kprintf("initial commands: %s\n", commands);
-						evaluate_debug_command(commands);
-					}
-				}
-				va_end(tempArgs);
+	if (!has_debugger_command("help") || message != NULL) {
+		// No commands yet or we came here via a panic(). Always print a stack
+		// trace in these cases.
+		debug_call_with_fault_handler(gCPU[sDebuggerOnCPU].fault_jump_buffer,
+			&stack_trace_trampoline, NULL);
+	}
 
-				debug_free(commandBuffer);
-			}
-		}
-	} else {
-		// no commands yet -- always print a stack trace at least
-		arch_debug_stack_trace();
+	if (has_debugger_command("help")) {
+		// Commands are registered already -- execute panic() commands. Do that
+		// with paging disabled, so everything is printed, even if the user
+		// can't use the keyboard.
+		bool pagingEnabled = blue_screen_paging_enabled();
+		blue_screen_set_paging(false);
+
+		execute_panic_commands();
+
+		blue_screen_set_paging(pagingEnabled);
 	}
 
 	int32 continuableLine = -1;
@@ -999,6 +1028,14 @@ static int
 cmd_dump_kdl_message(int argc, char** argv)
 {
 	print_kernel_debugger_message();
+	return 0;
+}
+
+
+static int
+cmd_execute_panic_commands(int argc, char** argv)
+{
+	execute_panic_commands();
 	return 0;
 }
 
@@ -1548,6 +1585,12 @@ debug_init_post_vm(kernel_args* args)
 		"Reprint the message printed when entering KDL",
 		"\n"
 		"Reprints the message printed when entering KDL.\n", 0);
+	add_debugger_command_etc("panic_commands", &cmd_execute_panic_commands,
+		"Execute commands associated with the panic() that caused "
+			"entering KDL",
+		"\n"
+		"Executes the commands associated with the panic() that caused "
+			"entering KDL.\n", 0);
 
 	debug_builtin_commands_init();
 
