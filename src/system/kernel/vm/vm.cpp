@@ -2795,6 +2795,8 @@ dump_cache(int argc, char** argv)
 	} else
 		kprintf("\t%ld in cache\n", cache->page_count);
 
+	set_debug_variable("_sourceCache", (addr_t)cache->source);
+
 	return 0;
 }
 

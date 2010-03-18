@@ -740,6 +740,11 @@ dump_page(int argc, char **argv)
 		}
 	}
 
+	set_debug_variable("_cache", (addr_t)page->Cache());
+	#if DEBUG_PAGE_ACCESS
+		set_debug_variable("_accessor", page->accessing_thread);
+	#endif
+
 	return 0;
 }
 
