@@ -165,7 +165,9 @@ vm_page_debug_access_start(vm_page* page)
 		threadID, -1);
 	if (previousThread != -1) {
 		panic("Invalid concurrent access to page %p (start), currently "
-			"accessed by: %" B_PRId32, page, previousThread);
+			"accessed by: %" B_PRId32
+			"@! page -m %p; sc %" B_PRId32 "; cache _cache", page,
+			previousThread, page, previousThread);
 	}
 }
 
@@ -178,7 +180,9 @@ vm_page_debug_access_end(vm_page* page)
 		threadID);
 	if (previousThread != threadID) {
 		panic("Invalid concurrent access to page %p (end) by current thread, "
-			"current accessor is: %" B_PRId32, page, previousThread);
+			"current accessor is: %" B_PRId32
+			"@! page -m %p; sc %" B_PRId32 "; cache _cache", page,
+			previousThread, page, previousThread);
 	}
 }
 
@@ -189,7 +193,9 @@ vm_page_debug_access_check(vm_page* page)
 	thread_id thread = page->accessing_thread;
 	if (thread != thread_get_current_thread_id()) {
 		panic("Invalid concurrent access to page %p (check), currently "
-			"accessed by: %" B_PRId32, page, thread);
+			"accessed by: %" B_PRId32
+			"@! page -m %p; sc %" B_PRId32 "; cache _cache", page, thread, page,
+			thread);
 	}
 }
 
