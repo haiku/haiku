@@ -52,6 +52,7 @@ struct attr_entry {
 	void *value;
 };
 
+#undef ASSERT
 #define ASSERT(op) if (!(op)) panic("ASSERT: %s in %s:%s", #op, __FILE__, __FUNCTION__)
 
 struct mount_fs_params

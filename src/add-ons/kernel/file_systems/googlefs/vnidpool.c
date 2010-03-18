@@ -4,6 +4,8 @@
  */
 
 #include <malloc.h>
+#include <string.h>
+#include <KernelExport.h>
 #include "vnidpool.h"
 
 /* primary type for the bitmap */
@@ -34,7 +36,7 @@ status_t vnidpool_alloc(struct vnidpool **pool, size_t size)
 	p->bitmap = (BMT *)(p + 1);
 	p->bmsize = size;
 	memset(p->bitmap, 0, size / sizeof(BMT));
-	dprintf("vnidpool_alloc: pool @ %p, bitmap @ %p, size %d\n", p, p->bitmap, p->bmsize);
+	dprintf("vnidpool_alloc: pool @ %p, bitmap @ %p, size %ld\n", p, p->bitmap, p->bmsize);
 	*pool = p;
 	return B_OK;
 }
@@ -84,7 +86,6 @@ status_t vnidpool_get(struct vnidpool *pool, ino_t *vnid)
 status_t vnidpool_put(struct vnidpool *pool, ino_t vnid)
 {
 	status_t err = B_ERROR;
-	uint32 i;
 	if (!pool)
 		return EINVAL;
 	if (LOCK(&pool->lock) < B_OK)

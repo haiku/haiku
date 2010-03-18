@@ -5,6 +5,7 @@
 
 #include <OS.h>
 #include <KernelExport.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
@@ -12,9 +13,11 @@
 #include <malloc.h>
 #include <sys/socket.h>
 #include "http_cnx.h"
+#include "googlefs.h"
 #include "google_request.h"
 #include "lists2.h"
 #include "settings.h"
+#include "string_utils.h"
 
 #define DO_PUBLISH
 //#define FAKE_INPUT "/boot/home/devel/drivers/googlefs/log2.html"
@@ -35,14 +38,14 @@
 extern int google_parse_results(const char *html, size_t htmlsize, struct google_result **results);
 
 // move that to ksocket inlined
-static kinet_aton(const char *in, struct in_addr *addr)
+static int kinet_aton(const char *in, struct in_addr *addr)
 {
 	int i;
 	unsigned long a;
 	uint32 inaddr = 0L;
 	const char *p = in;
 	for (i = 0; i < 4; i++) {
-		a = strtoul(p, &p, 10);
+		a = strtoul(p, (char **)&p, 10);
 		if (!p)
 			return -1;
 		inaddr = (inaddr >> 8) | ((a & 0x0ff) << 24);
@@ -55,14 +58,14 @@ static kinet_aton(const char *in, struct in_addr *addr)
 }
 
 
-status_t google_request_init()
+status_t google_request_init(void)
 {
 	status_t err;
 	err = http_init();
 	return err;
 }
 
-status_t google_request_uninit()
+status_t google_request_uninit(void)
 {
 	status_t err;
 	err = http_uninit();
@@ -74,8 +77,8 @@ status_t google_request_process(struct google_request *req)
 	struct sockaddr_in sin;
 	struct http_cnx *cnx = NULL;
 	struct google_result *res;
-	int err, i, count;
-	size_t len;
+	status_t err;
+	int count;
 	char *p = NULL;
 	char *url = NULL;
 	
@@ -106,7 +109,7 @@ status_t google_request_process(struct google_request *req)
 	if (!url)
 		goto err_url;
 	strcpy(url, BASEURL);
-	sprintf(url+strlen(url), FMT_NUM, max_results);
+	sprintf(url+strlen(url), FMT_NUM, (unsigned int)max_results);
 	sprintf(url+strlen(url), FMT_Q, p);
 	
 	dprintf("google_request: final URL: %s\n", url);
@@ -115,7 +118,7 @@ status_t google_request_process(struct google_request *req)
 	dprintf("google_request: http_get: error 0x%08lx\n", err);
 	if (err < 0)
 		goto err_url2;
-	dprintf("google_request: http_get: HEADERS %d:%s\n", cnx->headerslen, cnx->headers);
+	dprintf("google_request: http_get: HEADERS %ld:%s\n", cnx->headerslen, cnx->headers);
 	//dprintf("DATA: %d:%s\n", cnx->datalen, cnx->data);
 	
 	dprintf("google_request: buffer @ %p, len %ld\n", cnx->data, cnx->datalen);
@@ -216,4 +219,5 @@ status_t google_request_free(struct google_request *req)
 		return EINVAL;
 	free(req->query_string);
 	free(req);
+	return B_OK;
 }

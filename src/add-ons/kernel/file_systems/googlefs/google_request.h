@@ -30,8 +30,8 @@ struct google_result {
 	char similar_url[GR_MAX_URL];
 };
 
-extern status_t google_request_init();
-extern status_t google_request_uninit();
+extern status_t google_request_init(void);
+extern status_t google_request_uninit(void);
 extern status_t google_request_process(struct google_request *req);
 extern status_t google_request_process_async(struct google_request *req);
 extern status_t google_request_close(struct google_request *req);
