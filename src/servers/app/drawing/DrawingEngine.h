@@ -56,7 +56,7 @@ public:
 			void			UnlockParallelAccess();
 
 			bool			LockExclusiveAccess();
-	virtual	bool			IsExclusiveAccessLocked();
+	virtual	bool			IsExclusiveAccessLocked() const;
 			void			UnlockExclusiveAccess();
 
 	// for screen shots
@@ -138,11 +138,14 @@ public:
 	virtual	void			DrawShape(const BRect& bounds,
 								int32 opcount, const uint32* oplist,
 								int32 ptcount, const BPoint* ptlist,
-								bool filled);
+								bool filled, const BPoint& viewToScreenOffset,
+								float viewScale);
 	virtual	void			FillShape(const BRect& bounds,
-							  int32 opcount, const uint32* oplist,
-							  int32 ptcount, const BPoint* ptlist,
-							  const BGradient& gradient);
+								int32 opcount, const uint32* oplist,
+							 	int32 ptcount, const BPoint* ptlist,
+							 	const BGradient& gradient,
+							 	const BPoint& viewToScreenOffset,
+								float viewScale);
 
 	virtual	void			DrawTriangle(BPoint* points, const BRect& bounds,
 								bool filled);

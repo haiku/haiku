@@ -150,7 +150,7 @@ DrawingEngine::LockExclusiveAccess()
 
 
 bool
-DrawingEngine::IsExclusiveAccessLocked()
+DrawingEngine::IsExclusiveAccessLocked() const
 {
 	return fGraphicsCard->IsExclusiveAccessLocked();
 }
@@ -1141,16 +1141,30 @@ DrawingEngine::FillRoundRect(BRect r, float xrad, float yrad,
 
 void
 DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
-	const uint32* opList, int32 ptCount, const BPoint* ptList, bool filled)
+	const uint32* opList, int32 ptCount, const BPoint* ptList, bool filled,
+	const BPoint& viewToScreenOffset, float viewScale)
 {
 	ASSERT_PARALLEL_LOCKED();
 
-	// NOTE: hides cursor regardless of if and where
-	// shape is drawn on screen, TODO: optimize
+// TODO: bounds probably does not take curves and arcs into account...
+//	BRect clipped(bounds);
+//	if (!filled)
+//		extend_by_stroke_width(clipped, fPainter->PenSize());
+//	clipped = fPainter->ClipRect(bounds);
+//
+//	clipped.left = floorf(clipped.left);
+//	clipped.top = floorf(clipped.top);
+//	clipped.right = ceilf(clipped.right);
+//	clipped.bottom = ceilf(clipped.bottom);
+//
+//	if (!clipped.IsValid())
+//		return;
+//
+//	AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 	AutoFloatingOverlaysHider _(fGraphicsCard);
 
 	BRect touched = fPainter->DrawShape(opCount, opList, ptCount, ptList,
-		filled);
+		filled, viewToScreenOffset, viewScale);
 
 	_CopyToFront(touched);
 }
@@ -1159,16 +1173,27 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 void
 DrawingEngine::FillShape(const BRect& bounds, int32 opCount,
 	const uint32* opList, int32 ptCount, const BPoint* ptList,
-	const BGradient& gradient)
+	const BGradient& gradient, const BPoint& viewToScreenOffset,
+	float viewScale)
 {
 	ASSERT_PARALLEL_LOCKED();
 
-	// NOTE: hides cursor regardless of if and where
-	// shape is drawn on screen, TODO: optimize
+// TODO: bounds probably does not take curves and arcs into account...
+//	BRect clipped = fPainter->ClipRect(bounds);
+//
+//	clipped.left = floorf(clipped.left);
+//	clipped.top = floorf(clipped.top);
+//	clipped.right = ceilf(clipped.right);
+//	clipped.bottom = ceilf(clipped.bottom);
+//
+//	if (!clipped.IsValid())
+//		return;
+//
+//	AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 	AutoFloatingOverlaysHider _(fGraphicsCard);
 
 	BRect touched = fPainter->FillShape(opCount, opList, ptCount, ptList,
-		gradient);
+		gradient, viewToScreenOffset, viewScale);
 
 	_CopyToFront(touched);
 }

@@ -107,11 +107,15 @@ virtual	void					FillRoundRect(BRect rect, float xRadius,
 virtual	void					DrawShape(const BRect& bounds,
 									int32 opCount, const uint32* opList, 
 									int32 pointCount, const BPoint* pointList,
-									bool filled);
+									bool filled,
+									const BPoint& viewToScreenOffset,
+									float viewScale);
 virtual	void					FillShape(const BRect& bounds,
 							 		int32 opCount, const uint32* opList, 
 									int32 pointCount, const BPoint* pointList,
-									const BGradient& gradient);
+									const BGradient& gradient,
+									const BPoint& viewToScreenOffset,
+									float viewScale);
 	
 virtual	void					DrawTriangle(BPoint* points,
 									const BRect& bounds, bool filled);
@@ -131,6 +135,8 @@ virtual	void					StrokeLineArray(int32 numlines,
 virtual	BPoint					DrawString(const char* string, int32 length,
 									const BPoint& point,
 									escapement_delta* delta = NULL);
+virtual	BPoint					DrawString(const char* string, int32 length,
+									const BPoint* offsets);
 
 virtual	float					StringWidth(const char* string, int32 length,
 									escapement_delta* delta = NULL);

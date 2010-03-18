@@ -2541,18 +2541,16 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 				// this might seem a bit weird, but under R5, the shapes
 				// are always offset by the current pen location
-				BPoint penLocation
+				BPoint screenOffset
 					= fCurrentView->CurrentState()->PenLocation();
-				for (int32 i = 0; i < ptCount; i++) {
-					ptList[i] += penLocation;
-					fCurrentView->ConvertToScreenForDrawing(&ptList[i]);
-				}
+				shapeFrame.OffsetBy(screenOffset);
 
-				shapeFrame.OffsetBy(penLocation);
+				fCurrentView->ConvertToScreenForDrawing(&screenOffset);
 				fCurrentView->ConvertToScreenForDrawing(&shapeFrame);
 
 				drawingEngine->DrawShape(shapeFrame, opCount, opList, ptCount,
-					ptList, code == AS_FILL_SHAPE);
+					ptList, code == AS_FILL_SHAPE, screenOffset,
+					fCurrentView->Scale());
 			}
 
 			delete[] opList;
@@ -2581,15 +2579,16 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 				// this might seem a bit weird, but under R5, the shapes
 				// are always offset by the current pen location
-				BPoint penLocation
+				BPoint screenOffset
 					= fCurrentView->CurrentState()->PenLocation();
-				for (int32 i = 0; i < ptCount; i++) {
-					ptList[i] += penLocation;
-					fCurrentView->ConvertToScreenForDrawing(&ptList[i]);
-				}
+				shapeFrame.OffsetBy(screenOffset);
+
+				fCurrentView->ConvertToScreenForDrawing(&screenOffset);
+				fCurrentView->ConvertToScreenForDrawing(&shapeFrame);
 				fCurrentView->ConvertToScreenForDrawing(gradient);
 				drawingEngine->FillShape(shapeFrame, opCount, opList,
-					ptCount, ptList, *gradient);
+					ptCount, ptList, *gradient, screenOffset,
+					fCurrentView->Scale());
 			}
 
 			delete[] opList;

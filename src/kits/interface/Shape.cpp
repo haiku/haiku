@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Haiku, Inc.
+ * Copyright (c) 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -37,10 +37,10 @@ BShapeIterator::~BShapeIterator()
 
 
 status_t
-BShapeIterator::Iterate(BShape *shape)
+BShapeIterator::Iterate(BShape* shape)
 {
-	shape_data *data = (shape_data*)shape->fPrivateData;
-	BPoint *points = data->ptList;
+	shape_data* data = (shape_data*)shape->fPrivateData;
+	BPoint* points = data->ptList;
 
 	for (int32 i = 0; i < data->opCount; i++) {
 		int32 op = data->opList[i] & 0xFF000000;
@@ -62,6 +62,18 @@ BShapeIterator::Iterate(BShape *shape)
 			points += count;
 		}
 
+		if ((op & OP_LARGE_ARC_TO_CW) || (op & OP_LARGE_ARC_TO_CCW)
+			|| (op & OP_SMALL_ARC_TO_CW) || (op & OP_SMALL_ARC_TO_CCW)) {
+			int32 count = data->opList[i] & 0x00FFFFFF;
+			for (int32 i = 0; i < count / 3; i++) {
+				IterateArcTo(points[0].x, points[0].y, points[1].x,
+					op & (OP_LARGE_ARC_TO_CW | OP_LARGE_ARC_TO_CCW),
+					op & (OP_SMALL_ARC_TO_CCW | OP_LARGE_ARC_TO_CCW),
+					points[2]);
+				points += 3;
+			}
+		}
+
 		if (op & OP_CLOSE) {
 			IterateClose();
 		}
@@ -72,8 +84,21 @@ BShapeIterator::Iterate(BShape *shape)
 
 
 status_t
-BShapeIterator::IterateBezierTo(int32 bezierCount,
-										 BPoint *bezierPoints)
+BShapeIterator::IterateMoveTo(BPoint* point)
+{
+	return B_OK;
+}
+
+
+status_t
+BShapeIterator::IterateLineTo(int32 lineCount, BPoint* linePoints)
+{
+	return B_OK;
+}
+
+
+status_t
+BShapeIterator::IterateBezierTo(int32 bezierCount, BPoint* bezierPoints)
 {
 	return B_OK;
 }
@@ -87,23 +112,19 @@ BShapeIterator::IterateClose()
 
 
 status_t
-BShapeIterator::IterateLineTo(int32 lineCount, BPoint *linePoints)
+BShapeIterator::IterateArcTo(float& rx, float& ry, float& angle, bool largeArc,
+	bool counterClockWise, BPoint& point)
 {
 	return B_OK;
 }
 
 
-status_t
-BShapeIterator::IterateMoveTo ( BPoint *point )
-{
-	return B_OK;
-}
-
-
-void BShapeIterator::_ReservedShapeIterator1() {}
 void BShapeIterator::_ReservedShapeIterator2() {}
 void BShapeIterator::_ReservedShapeIterator3() {}
 void BShapeIterator::_ReservedShapeIterator4() {}
+
+
+// #pragma mark -
 
 
 BShape::BShape()
@@ -119,12 +140,12 @@ BShape::BShape(const BShape &copyFrom)
 }
 
 
-BShape::BShape(BMessage *archive)
+BShape::BShape(BMessage* archive)
 	:	BArchivable(archive)
 {
 	InitData();
 
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	ssize_t size = 0;
 	int32 count = 0;
@@ -134,8 +155,8 @@ BShape::BShape(BMessage *archive)
 		return;
 
 	int32 i = 0;
-	const uint32 *opPtr;
-	while (archive->FindData("ops", B_INT32_TYPE, i++, (const void **)&opPtr, &size) == B_OK)
+	const uint32* opPtr;
+	while (archive->FindData("ops", B_INT32_TYPE, i++, (const void**)&opPtr, &size) == B_OK)
 		data->opList[data->opCount++] = *opPtr;
 
 	archive->GetInfo("pts", &type, &count);
@@ -145,15 +166,15 @@ BShape::BShape(BMessage *archive)
 	}
 
 	i = 0;
-	const BPoint *ptPtr;
-	while (archive->FindData("pts", B_POINT_TYPE, i++, (const void **)&ptPtr, &size) == B_OK)
+	const BPoint* ptPtr;
+	while (archive->FindData("pts", B_POINT_TYPE, i++, (const void**)&ptPtr, &size) == B_OK)
 		data->ptList[data->ptCount++] = *ptPtr;
 }
 
 
 BShape::~BShape()
 {
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	free(data->opList);
 	free(data->ptList);
@@ -163,14 +184,14 @@ BShape::~BShape()
 
 
 status_t
-BShape::Archive(BMessage *archive, bool deep) const
+BShape::Archive(BMessage* archive, bool deep) const
 {
 	status_t err = BArchivable::Archive(archive, deep);
 
 	if (err != B_OK)
 		return err;
 
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	// If no valid shape data, return
 	if (data->opCount == 0 || data->ptCount == 0)
@@ -198,7 +219,7 @@ BShape::Archive(BMessage *archive, bool deep) const
 
 
 BArchivable*
-BShape::Instantiate(BMessage *archive)
+BShape::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BShape"))
 		return new BShape(archive);
@@ -207,10 +228,50 @@ BShape::Instantiate(BMessage *archive)
 }
 
 
+BShape&
+BShape::operator=(const BShape& other)
+{
+	if (this != &other) {
+		Clear();
+		AddShape(&other);
+	}
+
+	return *this;
+}
+
+
+bool
+BShape::operator==(const BShape& other) const
+{
+	if (this == &other)
+		return true;
+
+	shape_data* data = (shape_data*)fPrivateData;
+	shape_data* otherData = (shape_data*)other.fPrivateData;
+
+	if (data->opCount != otherData->opCount)
+		return false;
+	if (data->ptCount != otherData->ptCount)
+		return false;
+
+	return memcmp(data->opList, otherData->opList,
+			data->opCount * sizeof(uint32)) == 0
+		&& memcmp(data->ptList, otherData->ptList,
+			data->ptCount * sizeof(BPoint)) == 0;
+}
+
+
+bool
+BShape::operator!=(const BShape& other) const
+{
+	return !(*this == other);
+}
+
+
 void
 BShape::Clear()
 {
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	data->opCount = 0;
 	data->opSize = 0;
@@ -234,7 +295,7 @@ BShape::Clear()
 BRect
 BShape::Bounds() const
 {
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 	BRect bounds;
 
 	if (data->ptCount == 0)
@@ -262,10 +323,10 @@ BShape::Bounds() const
 
 
 status_t
-BShape::AddShape(const BShape *otherShape)
+BShape::AddShape(const BShape* otherShape)
 {
-	shape_data *data = (shape_data*)fPrivateData;
-	shape_data *otherData = (shape_data*)otherShape->fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
+	shape_data* otherData = (shape_data*)otherShape->fPrivateData;
 
 	if (!AllocateOps(otherData->opCount) || !AllocatePts(otherData->ptCount))
 		return B_NO_MEMORY;
@@ -287,7 +348,7 @@ BShape::AddShape(const BShape *otherShape)
 status_t
 BShape::MoveTo(BPoint point)
 {
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	// If the last op is MoveTo, replace the point
 	if (fBuildingOp == OP_MOVETO) {
@@ -316,7 +377,7 @@ BShape::LineTo(BPoint point)
 	if (!AllocatePts(1))
 		return B_NO_MEMORY;
 
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	// If the last op is MoveTo, replace the op and set the count
 	// If the last op is LineTo increase the count
@@ -342,10 +403,18 @@ BShape::LineTo(BPoint point)
 status_t
 BShape::BezierTo(BPoint controlPoints[3])
 {
+	return BezierTo(controlPoints[0], controlPoints[1], controlPoints[2]);
+}
+
+
+status_t
+BShape::BezierTo(const BPoint& control1, const BPoint& control2,
+	const BPoint& endPoint)
+{
 	if (!AllocatePts(3))
 		return B_NO_MEMORY;
 
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	// If the last op is MoveTo, replace the op and set the count
 	// If the last op is BezierTo increase the count
@@ -362,9 +431,54 @@ BShape::BezierTo(BPoint controlPoints[3])
 	}
 
 	// Add points
-	data->ptList[data->ptCount++] = controlPoints[0];
-	data->ptList[data->ptCount++] = controlPoints[1];
-	data->ptList[data->ptCount++] = controlPoints[2];
+	data->ptList[data->ptCount++] = control1;
+	data->ptList[data->ptCount++] = control2;
+	data->ptList[data->ptCount++] = endPoint;
+
+	return B_OK;
+}
+
+
+status_t
+BShape::ArcTo(float rx, float ry, float angle, bool largeArc,
+	bool counterClockWise, const BPoint& point)
+{
+	if (!AllocatePts(3))
+		return B_NO_MEMORY;
+
+	shape_data* data = (shape_data*)fPrivateData;
+
+	uint32 op;
+	if (largeArc) {
+		if (counterClockWise)
+			op = OP_LARGE_ARC_TO_CCW;
+		else
+			op = OP_LARGE_ARC_TO_CW;
+	} else {
+		if (counterClockWise)
+			op = OP_SMALL_ARC_TO_CCW;
+		else
+			op = OP_SMALL_ARC_TO_CW;
+	}
+
+	// If the last op is MoveTo, replace the op and set the count
+	// If the last op is ArcTo increase the count
+	// Otherwise add the op
+	if (fBuildingOp == op || fBuildingOp == (op | OP_MOVETO)) {
+		fBuildingOp |= op;
+		fBuildingOp += 3;
+		data->opList[data->opCount - 1] = fBuildingOp;
+	} else {
+		if (!AllocateOps(1))
+			return B_NO_MEMORY;
+		fBuildingOp = op + 3;
+		data->opList[data->opCount++] = fBuildingOp;
+	}
+
+	// Add points
+	data->ptList[data->ptCount++] = BPoint(rx, ry);
+	data->ptList[data->ptCount++] = BPoint(angle, 0);
+	data->ptList[data->ptCount++] = point;
 
 	return B_OK;
 }
@@ -380,7 +494,7 @@ BShape::Close()
 	if (!AllocateOps(1))
 		return B_NO_MEMORY;
 
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	// ToDo: Decide about that, it's not BeOS compatible
 	// If there was any op before we can attach the close to it
@@ -398,7 +512,7 @@ BShape::Close()
 
 
 status_t
-BShape::Perform(perform_code d, void *arg)
+BShape::Perform(perform_code d, void* arg)
 {
 	return BArchivable::Perform(d, arg);
 }
@@ -411,10 +525,10 @@ void BShape::_ReservedShape4() {}
 
 
 void
-BShape::GetData(int32 *opCount, int32 *ptCount, uint32 **opList,
-					 BPoint **ptList)
+BShape::GetData(int32* opCount, int32* ptCount, uint32** opList,
+	BPoint** ptList)
 {
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	*opCount = data->opCount;
 	*ptCount = data->ptCount;
@@ -424,15 +538,15 @@ BShape::GetData(int32 *opCount, int32 *ptCount, uint32 **opList,
 
 
 void
-BShape::SetData(int32 opCount, int32 ptCount, const uint32 *opList,
-				const BPoint *ptList)
+BShape::SetData(int32 opCount, int32 ptCount, const uint32* opList,
+				const BPoint* ptList)
 {
 	Clear();
 
 	if (opCount == 0)
 		return;
 
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	if (!AllocateOps(opCount) || !AllocatePts(ptCount))
 		return;
@@ -454,7 +568,7 @@ void
 BShape::InitData()
 {
 	fPrivateData = new shape_data;
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	fState = 0;
 	fBuildingOp = 0;
@@ -471,7 +585,7 @@ BShape::InitData()
 inline bool
 BShape::AllocateOps(int32 count)
 {
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	int32 newSize = (data->opCount + count + 255) / 256 * 256;
 	if (data->opSize >= newSize)
@@ -490,7 +604,7 @@ BShape::AllocateOps(int32 count)
 inline bool
 BShape::AllocatePts(int32 count)
 {
-	shape_data *data = (shape_data*)fPrivateData;
+	shape_data* data = (shape_data*)fPrivateData;
 
 	int32 newSize = (data->ptCount + count + 255) / 256 * 256;
 	if (data->ptSize >= newSize)
@@ -506,10 +620,11 @@ BShape::AllocatePts(int32 count)
 }
 
 
-//	#pragma mark - R4.5 compatibility
+//	#pragma mark - binary compatibility
 
 
 #if __GNUC__ < 3
+
 
 extern "C" BShape*
 __6BShapeR6BShape(void* self, BShape& copyFrom)
@@ -520,9 +635,25 @@ __6BShapeR6BShape(void* self, BShape& copyFrom)
 
 
 extern "C" BRect
-Bounds__6BShape(BShape *self)
+Bounds__6BShape(BShape* self)
 {
 	return self->Bounds();
 }
 
-#endif	// __GNUC__ < 3
+
+extern "C" void
+_ReservedShapeIterator1__14BShapeIterator(BShapeIterator* self)
+{
+}
+
+
+#else // __GNUC__ < 3
+
+
+extern "C" void
+_ZN14BShapeIterator23_ReservedShapeIterator1Ev(BShapeIterator* self)
+{
+}
+
+
+#endif // __GNUC__ >= 3

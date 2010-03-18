@@ -50,7 +50,7 @@ class Transformable;
 
 
 class Painter {
- public:
+public:
 								Painter();
 	virtual						~Painter();
 
@@ -132,12 +132,15 @@ class Painter {
 								// shapes
 			BRect				DrawShape(const int32& opCount,
 									const uint32* opList, const int32& ptCount,
-									const BPoint* ptList, bool filled) const;
+									const BPoint* ptList, bool filled,
+									const BPoint& viewToScreenOffset,
+									float viewScale) const;
 			BRect				FillShape(const int32& opCount,
-									const uint32* opList,
-									const int32& ptCount,
+									const uint32* opList, const int32& ptCount,
 									const BPoint* ptList,
-									const BGradient& gradient) const;
+									const BGradient& gradient,
+									const BPoint& viewToScreenOffset,
+									float viewScale) const;
 	
 								// rects
 			BRect				StrokeRect(const BRect& r) const;
@@ -237,7 +240,7 @@ class Painter {
 	inline	BRect				AlignAndClipRect(BRect rect) const;
 
 
- private:
+private:
 			void				_Transform(BPoint* point,
 									bool centerOffset = true) const;
 			BPoint				_Transform(const BPoint& point,
@@ -330,46 +333,46 @@ class Painter {
 			void				_FillPathGradientConic(VertexSource& path,
 									const BGradientConic& conic) const;
 	
-mutable agg::rendering_buffer	fBuffer;
+	mutable	agg::rendering_buffer fBuffer;
 
 	// AGG rendering and rasterization classes
-	pixfmt						fPixelFormat;
-mutable renderer_base			fBaseRenderer;
+			pixfmt				fPixelFormat;
+	mutable	renderer_base		fBaseRenderer;
 
-mutable scanline_unpacked_type	fUnpackedScanline;
-mutable scanline_packed_type	fPackedScanline;
-mutable scanline_packed_subpix_type fSubpixPackedScanline;
-mutable scanline_unpacked_subpix_type fSubpixUnpackedScanline;
-mutable rasterizer_subpix_type	fSubpixRasterizer;
-mutable rasterizer_type			fRasterizer;
-mutable renderer_subpix_type	fSubpixRenderer;
-mutable renderer_type			fRenderer;
-mutable renderer_bin_type		fRendererBin;
+	mutable	scanline_unpacked_type fUnpackedScanline;
+	mutable	scanline_packed_type fPackedScanline;
+	mutable	scanline_packed_subpix_type fSubpixPackedScanline;
+	mutable	scanline_unpacked_subpix_type fSubpixUnpackedScanline;
+	mutable	rasterizer_subpix_type fSubpixRasterizer;
+	mutable	rasterizer_type		fRasterizer;
+	mutable	renderer_subpix_type fSubpixRenderer;
+	mutable	renderer_type		fRenderer;
+	mutable	renderer_bin_type	fRendererBin;
 
-mutable agg::path_storage		fPath;
-mutable agg::conv_curve<agg::path_storage> fCurve;
+	mutable	agg::path_storage	fPath;
+	mutable	agg::conv_curve<agg::path_storage> fCurve;
 
 	// for internal coordinate rounding/transformation
-	bool						fSubpixelPrecise : 1;
-	bool						fValidClipping : 1;
-	bool						fDrawingText : 1;
-	bool						fAttached : 1;
+			bool				fSubpixelPrecise : 1;
+			bool				fValidClipping : 1;
+			bool				fDrawingText : 1;
+			bool				fAttached : 1;
 
-	float						fPenSize;
-	const BRegion*				fClippingRegion;
-	drawing_mode				fDrawingMode;
-	source_alpha				fAlphaSrcMode;
-	alpha_function				fAlphaFncMode;
-	cap_mode					fLineCapMode;
-	join_mode					fLineJoinMode;
-	float						fMiterLimit;
+			float				fPenSize;
+			const BRegion*		fClippingRegion;
+			drawing_mode		fDrawingMode;
+			source_alpha		fAlphaSrcMode;
+			alpha_function		fAlphaFncMode;
+			cap_mode			fLineCapMode;
+			join_mode			fLineJoinMode;
+			float				fMiterLimit;
 
-	PatternHandler				fPatternHandler;
+			PatternHandler		fPatternHandler;
 
 	// a class handling rendering and caching of glyphs
 	// it is setup to load from a specific Freetype supported
 	// font file which it gets from ServerFont
-mutable AGGTextRenderer			fTextRenderer;
+	mutable	AGGTextRenderer		fTextRenderer;
 };
 
 
@@ -382,6 +385,7 @@ Painter::ClipRect(BRect rect) const
 	rect.bottom = ceilf(rect.bottom);
 	return _Clipped(rect);
 }
+
 
 inline BRect
 Painter::AlignAndClipRect(BRect rect) const

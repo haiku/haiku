@@ -668,28 +668,31 @@ Painter::FillBezier(BPoint* p, const BGradient& gradient) const
 }
 
 
-// DrawShape
-BRect
-Painter::DrawShape(const int32& opCount, const uint32* opList,
-	const int32& ptCount, const BPoint* points, bool filled) const
+static void
+iterate_shape_data(agg::path_storage& path,
+	const int32& opCount, const uint32* opList,
+	const int32& ptCount, const BPoint* points,
+	const BPoint& viewToScreenOffset, float viewScale)
 {
-	CHECK_CLIPPING
-
 	// TODO: if shapes are ever used more heavily in Haiku,
 	// it would be nice to use BShape data directly (write
 	// an AGG "VertexSource" adaptor)
-	fPath.remove_all();
+	path.remove_all();
 	for (int32 i = 0; i < opCount; i++) {
 		uint32 op = opList[i] & 0xFF000000;
 		if (op & OP_MOVETO) {
-			fPath.move_to(points->x, points->y);
+			path.move_to(
+				points->x * viewScale + viewToScreenOffset.x,
+				points->y * viewScale + viewToScreenOffset.y);
 			points++;
 		}
 
 		if (op & OP_LINETO) {
 			int32 count = opList[i] & 0x00FFFFFF;
 			while (count--) {
-				fPath.line_to(points->x, points->y);
+				path.line_to(
+					points->x * viewScale + viewToScreenOffset.x,
+					points->y * viewScale + viewToScreenOffset.y);
 				points++;
 			}
 		}
@@ -697,16 +700,51 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 		if (op & OP_BEZIERTO) {
 			int32 count = opList[i] & 0x00FFFFFF;
 			while (count) {
-				fPath.curve4(points[0].x, points[0].y, points[1].x, points[1].y,
-					points[2].x, points[2].y);
+				path.curve4(
+					points[0].x * viewScale + viewToScreenOffset.x,
+					points[0].y * viewScale + viewToScreenOffset.y,
+					points[1].x * viewScale + viewToScreenOffset.x,
+					points[1].y * viewScale + viewToScreenOffset.y,
+					points[2].x * viewScale + viewToScreenOffset.x,
+					points[2].y * viewScale + viewToScreenOffset.y);
+				points += 3;
+				count -= 3;
+			}
+		}
+
+		if ((op & OP_LARGE_ARC_TO_CW) || (op & OP_LARGE_ARC_TO_CCW)
+			|| (op & OP_SMALL_ARC_TO_CW) || (op & OP_SMALL_ARC_TO_CCW)) {
+			int32 count = opList[i] & 0x00FFFFFF;
+			while (count) {
+				path.arc_to(
+					points[0].x * viewScale,
+					points[0].y * viewScale,
+					points[1].x,
+					op & (OP_LARGE_ARC_TO_CW | OP_LARGE_ARC_TO_CCW),
+					op & (OP_SMALL_ARC_TO_CW | OP_LARGE_ARC_TO_CW),
+					points[2].x * viewScale + viewToScreenOffset.x,
+					points[2].y * viewScale + viewToScreenOffset.y);
 				points += 3;
 				count -= 3;
 			}
 		}
 
 		if (op & OP_CLOSE)
-			fPath.close_polygon();
+			path.close_polygon();
 	}
+}
+
+
+// DrawShape
+BRect
+Painter::DrawShape(const int32& opCount, const uint32* opList,
+	const int32& ptCount, const BPoint* points, bool filled,
+	const BPoint& viewToScreenOffset, float viewScale) const
+{
+	CHECK_CLIPPING
+
+	iterate_shape_data(fPath, opCount, opList, ptCount, points,
+		viewToScreenOffset, viewScale);
 
 	if (filled)
 		return _FillPath(fCurve);
@@ -718,42 +756,13 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 // FillShape
 BRect
 Painter::FillShape(const int32& opCount, const uint32* opList,
-	const int32& ptCount, const BPoint* points, const BGradient& gradient) const
+	const int32& ptCount, const BPoint* points, const BGradient& gradient,
+	const BPoint& viewToScreenOffset, float viewScale) const
 {
 	CHECK_CLIPPING
 
-	// TODO: if shapes are ever used more heavily in Haiku,
-	// it would be nice to use BShape data directly (write
-	// an AGG "VertexSource" adaptor)
-	fPath.remove_all();
-	for (int32 i = 0; i < opCount; i++) {
-		uint32 op = opList[i] & 0xFF000000;
-		if (op & OP_MOVETO) {
-			fPath.move_to(points->x, points->y);
-			points++;
-		}
-
-		if (op & OP_LINETO) {
-			int32 count = opList[i] & 0x00FFFFFF;
-			while (count--) {
-				fPath.line_to(points->x, points->y);
-				points++;
-			}
-		}
-
-		if (op & OP_BEZIERTO) {
-			int32 count = opList[i] & 0x00FFFFFF;
-			while (count) {
-				fPath.curve4(points[0].x, points[0].y, points[1].x, points[1].y,
-					points[2].x, points[2].y);
-				points += 3;
-				count -= 3;
-			}
-		}
-
-		if (op & OP_CLOSE)
-			fPath.close_polygon();
-	}
+	iterate_shape_data(fPath, opCount, opList, ptCount, points,
+		viewToScreenOffset, viewScale);
 
 	return _FillPath(fCurve, gradient);
 }

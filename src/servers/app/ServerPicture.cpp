@@ -42,7 +42,7 @@ using std::stack;
 
 class ShapePainter : public BShapeIterator {
 public:
-	ShapePainter();
+	ShapePainter(View* view);
 	virtual ~ShapePainter();
 
 	status_t Iterate(const BShape* shape);
@@ -51,16 +51,21 @@ public:
 	virtual status_t IterateLineTo(int32 lineCount, BPoint* linePts);
 	virtual status_t IterateBezierTo(int32 bezierCount, BPoint* bezierPts);
 	virtual status_t IterateClose();
+	virtual status_t IterateArcTo(float& rx, float& ry,
+		float& angle, bool largeArc, bool counterClockWise, BPoint& point);
 
-	void Draw(View* view, BRect frame, bool filled);
+	void Draw(BRect frame, bool filled);
 
 private:
-	stack<uint32> fOpStack;
-	stack<BPoint> fPtStack;
+	View*			fView;
+	stack<uint32>	fOpStack;
+	stack<BPoint>	fPtStack;
 };
 
 
-ShapePainter::ShapePainter()
+ShapePainter::ShapePainter(View* view)
+	:
+	fView(view)
 {
 }
 
@@ -81,8 +86,14 @@ ShapePainter::Iterate(const BShape* shape)
 status_t
 ShapePainter::IterateMoveTo(BPoint* point)
 {
-	fOpStack.push(OP_MOVETO);
-	fPtStack.push(*point);
+	try {
+		fOpStack.push(OP_MOVETO);
+		BPoint transformed(*point);
+		fView->ConvertToScreenForDrawing(&transformed);
+		fPtStack.push(transformed);
+	} catch (std::bad_alloc) {
+		return B_NO_MEMORY;
+	}
 
 	return B_OK;
 }
@@ -91,9 +102,16 @@ ShapePainter::IterateMoveTo(BPoint* point)
 status_t
 ShapePainter::IterateLineTo(int32 lineCount, BPoint* linePts)
 {
-	fOpStack.push(OP_LINETO | lineCount);
-	for (int32 i = 0; i < lineCount; i++)
-		fPtStack.push(linePts[i]);
+	try {
+		fOpStack.push(OP_LINETO | lineCount);
+		for (int32 i = 0; i < lineCount; i++) {
+			BPoint transformed(linePts[i]);
+			fView->ConvertToScreenForDrawing(&transformed);
+			fPtStack.push(transformed);
+		}
+	} catch (std::bad_alloc) {
+		return B_NO_MEMORY;
+	}
 
 	return B_OK;
 }
@@ -103,27 +121,71 @@ status_t
 ShapePainter::IterateBezierTo(int32 bezierCount, BPoint* bezierPts)
 {
 	bezierCount *= 3;
-	fOpStack.push(OP_BEZIERTO | bezierCount);
-	for (int32 i = 0; i < bezierCount; i++)
-		fPtStack.push(bezierPts[i]);
+	try {
+		fOpStack.push(OP_BEZIERTO | bezierCount);
+		for (int32 i = 0; i < bezierCount; i++) {
+			BPoint transformed(bezierPts[i]);
+			fView->ConvertToScreenForDrawing(&transformed);
+			fPtStack.push(transformed);
+		}
+	} catch (std::bad_alloc) {
+		return B_NO_MEMORY;
+	}
 
 	return B_OK;
 }
 
 
 status_t
-ShapePainter::IterateClose(void)
+ShapePainter::IterateArcTo(float& rx, float& ry,
+	float& angle, bool largeArc, bool counterClockWise, BPoint& point)
 {
-	fOpStack.push(OP_CLOSE);
+	uint32 op;
+	if (largeArc) {
+		if (counterClockWise)
+			op = OP_LARGE_ARC_TO_CCW;
+		else
+			op = OP_LARGE_ARC_TO_CW;
+	} else {
+		if (counterClockWise)
+			op = OP_SMALL_ARC_TO_CCW;
+		else
+			op = OP_SMALL_ARC_TO_CW;
+	}
+
+	try {
+		fOpStack.push(op | 3);
+		fPtStack.push(BPoint(rx * fView->Scale(), ry * fView->Scale()));
+		fPtStack.push(BPoint(angle, 0));
+		BPoint transformed(point);
+		fView->ConvertToScreenForDrawing(&transformed);
+		fPtStack.push(transformed);
+	} catch (std::bad_alloc) {
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ShapePainter::IterateClose()
+{
+	try {
+		fOpStack.push(OP_CLOSE);
+	} catch (std::bad_alloc) {
+		return B_NO_MEMORY;
+	}
 
 	return B_OK;
 }
 
 
 void
-ShapePainter::Draw(View* view, BRect frame, bool filled)
+ShapePainter::Draw(BRect frame, bool filled)
 {
 	// We're going to draw the currently iterated shape.
+	// TODO: This can be more efficient by skipping the conversion.
 	int32 opCount = fOpStack.size();
 	int32 ptCount = fPtStack.size();
 
@@ -144,14 +206,15 @@ ShapePainter::Draw(View* view, BRect frame, bool filled)
 			fOpStack.pop();
 		}
 
-		for (i = (ptCount - 1); i >= 0; i--) {
+		for (i = ptCount - 1; i >= 0; i--) {
 			ptList[i] = fPtStack.top();
 			fPtStack.pop();
-			view->ConvertToScreenForDrawing(&ptList[i]);
 		}
 
-		view->Window()->GetDrawingEngine()->DrawShape(frame, opCount,
-			opList, ptCount, ptList, filled);
+		BPoint offset;
+		fView->ConvertToScreenForDrawing(&offset);
+		fView->Window()->GetDrawingEngine()->DrawShape(frame, opCount,
+			opList, ptCount, ptList, filled, offset, fView->Scale());
 
 		delete[] opList;
 		delete[] ptList;
@@ -399,20 +462,20 @@ fill_polygon(View* view, int32 numPoints, const BPoint* viewPoints)
 static void
 stroke_shape(View* view, const BShape* shape)
 {
-	ShapePainter drawShape;
+	ShapePainter drawShape(view);
 
 	drawShape.Iterate(shape);
-	drawShape.Draw(view, shape->Bounds(), false);
+	drawShape.Draw(shape->Bounds(), false);
 }
 
 
 static void
 fill_shape(View* view, const BShape* shape)
 {
-	ShapePainter drawShape;
+	ShapePainter drawShape(view);
 
 	drawShape.Iterate(shape);
-	drawShape.Draw(view, shape->Bounds(), true);
+	drawShape.Draw(shape->Bounds(), true);
 }
 
 

@@ -12,6 +12,7 @@
 #include "DrawState.h"
 
 #include <Bitmap.h>
+#include <utf8_functions.h>
 
 #include <new>
 
@@ -682,7 +683,7 @@ RemoteDrawingEngine::FillRoundRect(BRect rect, float xRadius, float yRadius,
 void
 RemoteDrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 	const uint32* opList, int32 pointCount, const BPoint* pointList,
-	bool filled)
+	bool filled, const BPoint& viewToScreenOffset, float viewScale)
 {
 	BRect clipBounds = bounds;
 	if (!filled)
@@ -699,13 +700,15 @@ RemoteDrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 	message.AddList(opList, opCount);
 	message.Add(pointCount);
 	message.AddList(pointList, pointCount);
+	// TODO: viewToScreenOffset and viewScale
 }
 
 
 void
 RemoteDrawingEngine::FillShape(const BRect& bounds, int32 opCount,
 	const uint32* opList, int32 pointCount, const BPoint* pointList,
-	const BGradient& gradient)
+	const BGradient& gradient, const BPoint& viewToScreenOffset,
+	float viewScale)
 {
 	if (!fClippingRegion.Intersects(bounds))
 		return;
@@ -719,6 +722,7 @@ RemoteDrawingEngine::FillShape(const BRect& bounds, int32 opCount,
 	message.Add(pointCount);
 	message.AddList(pointList, pointCount);
 	message.AddGradient(gradient);
+	// TODO: viewToScreenOffset and viewScale
 }
 
 
@@ -819,6 +823,37 @@ RemoteDrawingEngine::DrawString(const char* string, int32 length,
 
 	if (result != B_OK)
 		return point;
+
+	return fDrawStringResult;
+}
+
+
+BPoint
+RemoteDrawingEngine::DrawString(const char* string, int32 length,
+	const BPoint* offsets)
+{
+	// Guaranteed to have at least one point.
+	RemoteMessage message(NULL, fHWInterface->SendBuffer());
+
+	message.Start(RP_DRAW_STRING_WITH_OFFSETS);
+	message.Add(fToken);
+	message.AddString(string, length);
+	message.AddList(offsets, UTF8CountChars(string, length));
+
+	status_t result = _AddCallback();
+	if (message.Flush() != B_OK)
+		return offsets[0];
+
+	if (result != B_OK)
+		return offsets[0];
+
+	do {
+		result = acquire_sem_etc(fResultNotify, 1, B_RELATIVE_TIMEOUT,
+			1 * 1000 * 1000);
+	} while (result == B_INTERRUPTED);
+
+	if (result != B_OK)
+		return offsets[0];
 
 	return fDrawStringResult;
 }
