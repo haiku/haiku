@@ -621,6 +621,20 @@ blue_screen_enter(bool debugOutput)
 }
 
 
+bool
+blue_screen_paging_enabled(void)
+{
+	return sScreen.paging;
+}
+
+
+void
+blue_screen_set_paging(bool enabled)
+{
+	sScreen.paging = enabled;
+}
+
+
 void
 blue_screen_clear_screen(void)
 {

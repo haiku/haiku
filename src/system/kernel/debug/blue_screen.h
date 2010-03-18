@@ -16,6 +16,9 @@ extern "C" {
 status_t blue_screen_init(void);
 status_t blue_screen_enter(bool debugOutput);
 
+bool blue_screen_paging_enabled(void);
+void blue_screen_set_paging(bool enabled);
+
 void blue_screen_clear_screen(void);
 char blue_screen_getchar(void);
 void blue_screen_putchar(char c);
