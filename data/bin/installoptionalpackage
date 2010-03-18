@@ -30,7 +30,7 @@ declare availablePackagesKeys=""
 # Some Packages cannot be installed,
 # as they require either the source code or compiled binaries
 declare packageIgnoreList='Bluetooth Development DevelopmentMin \
-DevelopmentBase P7zip UserlandFS Welcome Wifi-ipw2100+fw Wifi-iprowifi2200+fw \
+DevelopmentBase UserlandFS Welcome Wifi-ipw2100+fw Wifi-iprowifi2200+fw \
 WifiFirmwareScriptData'
 
 
@@ -52,6 +52,10 @@ $urlLine
 $sslPkgLine
 $sslUrlLine
 declare -a functionArgs
+expanderRulesFile=`finddir B_COMMON_DATA_DIRECTORY`/expander.rules
+if [ -f \${expanderRulesFile} ] ; then
+	expanderRulesFileExists=1
+fi
 
 
 function ParseFunctionArguments()
@@ -229,6 +233,49 @@ function AddUserToHaikuImage()
 	
 	if [ \$userExists -ge 1 ] ; then
 		echo "\${passwdLine}" >> \${passwdFile}
+	fi
+}
+
+
+function AddExpanderRuleToHaikuImage()
+{
+	# AddExpanderRuleToHaikuImage <mimetype> : <extension> : <list> : <extract>
+	# Wrapper for Jam rule	
+	ParseFunctionArguments "\$@"
+	
+	local mimetype=\${functionArgs[0]}
+	local extension=\${functionArgs[1]}
+	local list=\${functionArgs[2]}
+	local extract=\${functionArgs[3]}
+
+	# clean up the variables	
+	TrimLeadingSpace mimetype
+	TrimEndingSpace mimetype
+	TrimLeadingSpace extension
+	TrimEndingSpace extension
+	TrimLeadingSpace list
+	TrimEndingSpace list
+	TrimLeadingSpace extract
+	TrimEndingSpace extract
+	local rule_raw="\${mimetype}\\t\${extension}\\t\${list}\\t\${extract}"
+	
+	# reset this at every invocation
+	ruleFound=
+		
+	if [ \${expanderRulesFileExists} ] ; then
+		# Check if a rule for the mimetype & extension exists.
+		while read line ; do 
+			existing_rule=`echo \$line | awk '{ print \$1\$2 }'`
+			if [ "\${mimetype}\${extension}" == "\${existing_rule}" ] ; then
+				ruleFound=1
+				break
+			fi	
+		done < "\${expanderRulesFile}"
+	fi
+	if ! [ \${expanderRulesFileExists} ] || ! [ \${ruleFound} ] ; then
+		# Either expander.rules does not exist or a rule for mimetype & 
+		# extension does not exist. Output the new rule directly to it.
+		echo -e \${rule_raw} >> \${expanderRulesFile}
 	fi
 }
 
@@ -530,6 +577,11 @@ function ConvertJamToBash()
 			isRule=1; 
 			if($0~/\;/) ORS="\n"; 
 			else ORS=" "; print 
+		}
+		/AddExpanderRuleToHaikuImage/,/\;/{
+			isRule=1; 
+			if($0~/\;/) ORS="\n"; 
+			else ORS=" "; print			
 		}
 		/Exit/,/\;/{
 			isRule=1;
