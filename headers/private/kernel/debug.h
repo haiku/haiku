@@ -67,6 +67,10 @@
 #define B_KDEBUG_DONT_PARSE_ARGUMENTS	(0x01)
 #define B_KDEBUG_PIPE_FINAL_RERUN		(0x02)
 
+
+struct arch_debug_registers;
+
+
 struct debugger_module_info {
 	module_info info;
 
@@ -91,8 +95,6 @@ struct debugger_demangle_module_info {
 		char* name, size_t nameSize, int32* _type, size_t* _argumentLength);
 };
 
-
-extern int dbg_register_file[B_MAX_CPU_COUNT][14];
 
 typedef struct debug_page_fault_info {
 	addr_t	fault_address;
@@ -170,6 +172,8 @@ extern status_t	debug_get_next_demangled_argument(uint32* _cookie,
 
 extern struct thread* debug_set_debugged_thread(struct thread* thread);
 extern struct thread* debug_get_debugged_thread();
+extern struct arch_debug_registers* debug_get_debug_registers(int32 cpu);
+
 
 extern status_t	_user_kernel_debugger(const char *message);
 extern void		_user_debug_output(const char *userString);

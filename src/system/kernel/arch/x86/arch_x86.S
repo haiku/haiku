@@ -194,46 +194,6 @@ done:
 FUNCTION_END(reboot)
 
 
-FUNCTION(arch_debug_save_registers):
-	pushl	%esi
-	pushl	%eax
-	movl	12(%esp), %esi
-
-	movl	%eax, 0(%esi)
-	movl	%ebx, 4(%esi)
-	movl	%ecx, 8(%esi)
-	movl	%edx, 12(%esi)
-
-	lea		16(%esp), %eax
-	movl	%eax, 16(%esi)	// caller's %esp
-	movl	%ebp, 20(%esi)
-
-	movl	4(%esp), %eax
-	movl	%eax, 24(%esi)	// caller's %esi
-	movl	%edi, 28(%esi)
-
-	movl	8(%esp), %eax
-	movl	%eax, 32(%esi)	// caller's %ebp
-
-	pushfl
-	popl	%eax
-	movl	%eax, 36(%esi)
-
-	xor	%eax, %eax
-	movw	%cs, %ax
-	movl	%eax, 40(%esi)
-	movw	%ss, %ax
-	movl	%eax, 44(%esi)
-	movw	%ds, %ax
-	movl	%eax, 48(%esi)
-	movw	%es, %ax
-	movl	%eax, 52(%esi)
-
-	popl	%eax
-	popl	%esi
-	ret
-FUNCTION_END(arch_debug_save_registers)
-
 /* status_t arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
 FUNCTION(arch_cpu_user_memcpy):
 	pushl	%esi

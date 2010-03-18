@@ -357,8 +357,19 @@ setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
 				write_cr3(newPageDirectory);
 			}
 
-			// read %ebp from the thread's stack stored by a pushad
-			*_ebp = thread->arch_info.current_stack.esp[2];
+			if (thread->state == B_THREAD_RUNNING) {
+				// The thread is currently running on another CPU.
+				if (thread->cpu == NULL)
+					return false;
+				arch_debug_registers* registers = debug_get_debug_registers(
+					thread->cpu->cpu_num);
+				if (registers == NULL)
+					return false;
+				*_ebp = registers->ebp;
+			} else {
+				// read %ebp from the thread's stack stored by a pushad
+				*_ebp = thread->arch_info.current_stack.esp[2];
+			}
 		} else
 			thread = NULL;
 	}
@@ -897,6 +908,15 @@ cmd_in_context(int argc, char** argv)
 
 
 void
+arch_debug_save_registers(struct arch_debug_registers* registers)
+{
+	// get the caller's frame pointer
+	stack_frame* frame = (stack_frame*)x86_read_ebp();
+	registers->ebp = (addr_t)frame->previous;
+}
+
+
+void
 arch_debug_stack_trace(void)
 {
 	stack_trace(0, NULL);
@@ -910,8 +930,21 @@ arch_debug_contains_call(struct thread *thread, const char *symbol,
 	addr_t ebp;
 	if (thread == thread_get_current_thread())
 		ebp = x86_read_ebp();
-	else
-		ebp = thread->arch_info.current_stack.esp[2];
+	else {
+		if (thread->state == B_THREAD_RUNNING) {
+			// The thread is currently running on another CPU.
+			if (thread->cpu == NULL)
+				return false;
+			arch_debug_registers* registers = debug_get_debug_registers(
+				thread->cpu->cpu_num);
+			if (registers == NULL)
+				return false;
+			ebp = registers->ebp;
+		} else {
+			// thread not running
+			ebp = thread->arch_info.current_stack.esp[2];
+		}
+	}
 
 	for (;;) {
 		if (!is_kernel_stack_address(thread, ebp))

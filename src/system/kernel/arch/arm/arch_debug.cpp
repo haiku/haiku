@@ -228,7 +228,7 @@ return 0;
 
 
 void
-arch_debug_save_registers(int *regs)
+arch_debug_save_registers(struct arch_debug_registers* registers)
 {
 }
 

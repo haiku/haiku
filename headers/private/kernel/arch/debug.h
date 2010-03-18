@@ -11,6 +11,7 @@
 
 #include <SupportDefs.h>
 
+#include <arch_debug.h>
 #include <cpu.h>
 
 
@@ -35,7 +36,7 @@ int32 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 void* arch_debug_get_interrupt_pc(bool* _isSyscall);
 bool arch_debug_contains_call(struct thread *thread, const char *symbol,
 		addr_t start, addr_t end);
-void arch_debug_save_registers(int *);
+void arch_debug_save_registers(struct arch_debug_registers* registers);
 void arch_debug_unset_current_thread(void);
 void arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
 		void (*function)(void*), void* parameter);

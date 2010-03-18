@@ -228,6 +228,7 @@ gdb_parse_command(void)
 
 		case 'g':
 		{
+#if 0
 			int cpu;
 
 			// command 'g' is used for reading the register
@@ -247,6 +248,10 @@ gdb_parse_command(void)
 			// dump in *big endian* format.
 			cpu = smp_get_current_cpu();
 			gdb_regreply(dbg_register_file[cpu], 14);
+#else
+			(void)gdb_regreply;
+			gdb_reply("E01");
+#endif
 
 			break;
 		}

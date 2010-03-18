@@ -80,9 +80,7 @@ void call_modules_hook(bool enter);
 
 static void syslog_write(const char* text, int32 length, bool notify);
 
-
-int dbg_register_file[B_MAX_CPU_COUNT][14];
-	/* XXXmpetit -- must be made generic */
+static arch_debug_registers sDebugRegisters[B_MAX_CPU_COUNT];
 
 static debug_page_fault_info sPageFaultInfo;
 
@@ -939,7 +937,7 @@ enter_kernel_debugger(int32 cpu)
 		smp_intercpu_int_handler(cpu);
 	}
 
-	arch_debug_save_registers(&dbg_register_file[cpu][0]);
+	arch_debug_save_registers(&sDebugRegisters[cpu]);
 	sPreviousDprintfState = set_dprintf_enabled(true);
 
 	if (!gKernelStartup && sDebuggerOnCPU != cpu && smp_get_num_cpus() > 1) {
@@ -1692,6 +1690,8 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 	if (sCPUTrapped[cpu])
 		return;
 
+	arch_debug_save_registers(&sDebugRegisters[cpu]);
+
 	sCPUTrapped[cpu] = true;
 
 	while (sInDebugger != 0) {
@@ -1989,6 +1989,16 @@ debug_get_next_demangled_argument(uint32* _cookie, const char* symbol,
 	}
 
 	return B_NOT_SUPPORTED;
+}
+
+
+struct arch_debug_registers*
+debug_get_debug_registers(int32 cpu)
+{
+	if (cpu < 0 || cpu > smp_get_num_cpus())
+		return NULL;
+
+	return &sDebugRegisters[cpu];
 }
 
 
