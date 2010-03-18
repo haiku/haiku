@@ -388,7 +388,7 @@ EthernetSettingsView::_SaveDNSConfiguration()
 
 	BFile file(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
 	if (file.InitCheck() != B_OK) {
-		fprintf(stderr, "failed to open /etc/resolv.conf for writing: %s\n",
+		fprintf(stderr, "failed to open %s for writing: %s\n", path.Path(), 
 			strerror(file.InitCheck()));
 		return;
 	}

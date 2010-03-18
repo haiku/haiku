@@ -1,11 +1,13 @@
 #include "DNSQuery.h"
 
-#include <ByteOrder.h>
-#include <NetAddress.h>
-#include <NetEndpoint.h>
-
 #include <errno.h>
 #include <stdio.h>
+
+#include <ByteOrder.h>
+#include <FindDirectory.h>
+#include <NetAddress.h>
+#include <NetEndpoint.h>
+#include <Path.h> 
 
 // #define DEBUG 1
 
@@ -155,11 +157,16 @@ DNSTools::GetDNSServers(BObjectList<BString>* serverList)
 	(line[sizeof(name) - 1] == ' ' || \
 	 line[sizeof(name) - 1] == '\t'))
 
+	BPath path;
+	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
 
-	register FILE* fp = fopen("/etc/resolv.conf", "r");
+	path.Append("network/resolv.conf");
+
+	register FILE* fp = fopen(path.Path(), "r");
 	if (fp == NULL) {
-		fprintf(stderr, "failed to open '/etc/resolv.conf' to "
-			"read nameservers: %s\n", strerror(errno));
+		fprintf(stderr, "failed to open '%s' to read nameservers: %s\n", 
+			path.Path(), strerror(errno));
 		return;
 	}
 

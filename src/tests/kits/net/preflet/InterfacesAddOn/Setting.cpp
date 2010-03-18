@@ -5,30 +5,32 @@
  * Author:
  *		Andre Alves Garzia, andre@andregarzia.com
  */
- 
+
+
 #include "Setting.h"
 
-#include <String.h>
-#include <File.h>
-#include <Path.h>
- 
-#include <SupportDefs.h>
-#include <AutoDeleter.h>
-
 #include <arpa/inet.h>
-#include <net/if.h>
-#include <net/if_dl.h>
-#include <net/if_media.h>
-#include <net/if_types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/sockio.h>
-
 #include <errno.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <resolv.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <sys/sockio.h>
 #include <unistd.h>
+
+#include <net/if_dl.h>
+#include <net/if_media.h>
+#include <net/if_types.h>
+
+#include <File.h>
+#include <Path.h>
+#include <String.h>
+
+#include <AutoDeleter.h>
+
 
 Setting::Setting(const char *name)
 	:
@@ -36,6 +38,7 @@ Setting::Setting(const char *name)
 {
 	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	fName = name;
+	
 	ReadConfiguration();	
 }
 
@@ -121,7 +124,6 @@ Setting::ReadConfiguration()
 	ifreq *interface = (ifreq *)buffer;
 	ifreq *end = (ifreq *)((uint8 *)buffer + size);
 
-
 	while (interface < end) {
 		route_entry& route = interface->ifr_route;
 
@@ -138,15 +140,15 @@ Setting::ReadConfiguration()
 		if (route.gateway != NULL)
 			addressSize += route.gateway->sa_len;
 
-		interface = (ifreq *)((addr_t)interface + 
-			IF_NAMESIZE + sizeof(route_entry) + addressSize);
+		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE 
+			+ sizeof(route_entry) + addressSize);
 	}
 
 	uint32 flags = 0;
 	if (ioctl(fSocket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
 		flags = request.ifr_flags;
 
-	fAuto = flags & IFF_AUTO_CONFIGURED;
+	fAuto = (flags & IFF_AUTO_CONFIGURED) != 0;
 	
 	if (ioctl(fSocket, SIOCGIFMEDIA, &request, sizeof(struct ifreq)) == 0)
 		fMedia = request.ifr_media;
@@ -154,45 +156,13 @@ Setting::ReadConfiguration()
 	// read resolv.conf for the dns.
 	fNameservers.MakeEmpty();
 
-#define	MATCH(line, name) \
-	(!strncmp(line, name, sizeof(name) - 1) && \
-	(line[sizeof(name) - 1] == ' ' || \
-	 line[sizeof(name) - 1] == '\t'))
+	res_init();
+	res_state state = __res_state();
 
-
-	register FILE *fp = fopen("/etc/resolv.conf", "r");
-	if (fp == NULL) {
-		fprintf(stderr, "failed to open '/etc/resolv.conf' to "
-			"read nameservers: %s\n", strerror(errno));
-		return;
-	}
-
-	int nserv = 0;
-	char buf[1024];
-	register char *cp; //, **pp;
-//	register int n;
-	int MAXNS = 2;
-
-	// read the config file
-	while (fgets(buf, sizeof(buf), fp) != NULL) {
-		// skip comments
-		if (*buf == ';' || *buf == '#')
-			continue;
-
-		// read nameservers to query
-		if (MATCH(buf, "nameserver") && nserv < MAXNS) {
-//			char sbuf[2];
-			cp = buf + sizeof("nameserver") - 1;
-			while (*cp == ' ' || *cp == '\t')
-				cp++;
-			cp[strcspn(cp, ";# \t\n")] = '\0';
-			if ((*cp != '\0') && (*cp != '\n')) {
-				fNameservers.AddItem(new BString(cp));
-				nserv++;
-			}
+	if (state != NULL) {
+		for (int i = 0; i < state->nscount; i++) {
+			fNameservers.AddItem(
+				new BString(inet_ntoa(state->nsaddr_list[i].sin_addr)));
 		}
-		continue; 
 	}
-
-	fclose(fp);
 }
