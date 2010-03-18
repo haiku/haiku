@@ -51,6 +51,11 @@
 #include "debug_variables.h"
 
 
+#if __GNUC__ == 2
+#	define va_copy(to, from)	__va_copy(to, from)
+#endif
+
+
 struct debug_memcpy_parameters {
 	void*		to;
 	const void*	from;
@@ -66,6 +71,8 @@ struct debug_strlcpy_parameters {
 
 
 static const char* const kKDLPrompt = "kdebug> ";
+static const char* const kKDLMessageCommandSeparator = "@!";
+	// separates panic() message from command list to execute
 
 extern "C" int kgets(char* buffer, int length);
 
@@ -696,14 +703,6 @@ kgets(char* buffer, int length)
 }
 
 
-static inline void
-kprintf_args(const char* format, va_list args)
-{
-	if (sDebugOutputFilter != NULL)
-		sDebugOutputFilter->Print(format, args);
-}
-
-
 static void
 print_kernel_debugger_message()
 {
@@ -711,9 +710,36 @@ print_kernel_debugger_message()
 			|| sCurrentKernelDebuggerMessage != NULL) {
 		if (sCurrentKernelDebuggerMessagePrefix != NULL)
 			kprintf("%s", sCurrentKernelDebuggerMessagePrefix);
-		if (sCurrentKernelDebuggerMessage != NULL) {
-			kprintf_args(sCurrentKernelDebuggerMessage,
-				sCurrentKernelDebuggerMessageArgs);
+		if (sCurrentKernelDebuggerMessage != NULL
+				&& sDebugOutputFilter != NULL) {
+			va_list args;
+			va_copy(args, sCurrentKernelDebuggerMessageArgs);
+
+			if (const char* commandDelimiter = strstr(
+					sCurrentKernelDebuggerMessage,
+					kKDLMessageCommandSeparator)) {
+				// The message string contains a list of commands to be
+				// executed when entering the kernel debugger. We don't
+				// want to print those, so we copy the interesting part of
+				// the format string.
+				if (commandDelimiter != sCurrentKernelDebuggerMessage) {
+					size_t length = commandDelimiter
+						- sCurrentKernelDebuggerMessage;
+					if (char* format = (char*)debug_malloc(length + 1)) {
+						memcpy(format, sCurrentKernelDebuggerMessage, length);
+						format[length] = '\0';
+						sDebugOutputFilter->Print(format, args);
+						debug_free(format);
+					} else {
+						// allocation failed -- just print everything
+						sDebugOutputFilter->Print(sCurrentKernelDebuggerMessage,
+							args);
+					}
+				}
+			} else
+				sDebugOutputFilter->Print(sCurrentKernelDebuggerMessage, args);
+
+			va_end(args);
 		}
 
 		kprintf("\n");
@@ -732,11 +758,8 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 
 	sCurrentKernelDebuggerMessagePrefix = messagePrefix;
 	sCurrentKernelDebuggerMessage = message;
-#if __GNUC__ == 2
-	__va_copy(sCurrentKernelDebuggerMessageArgs, args);
-#else
-	va_copy(sCurrentKernelDebuggerMessageArgs, args);
-#endif
+	if (sCurrentKernelDebuggerMessage != NULL)
+		va_copy(sCurrentKernelDebuggerMessageArgs, args);
 
 	print_kernel_debugger_message();
 
@@ -779,8 +802,37 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 		}
 	}
 
-	if (!has_debugger_command("help"))
+	if (has_debugger_command("help")) {
+		// commands are registered already
+		if (sCurrentKernelDebuggerMessage != NULL
+			&& strstr(sCurrentKernelDebuggerMessage,
+					kKDLMessageCommandSeparator) != NULL) {
+			// The panic() message specifies commands to execute.
+			const size_t kCommandBufferSize = 512;
+			char* commandBuffer = (char*)debug_malloc(kCommandBufferSize);
+			if (commandBuffer != NULL) {
+				va_list tempArgs;
+				va_copy(tempArgs, sCurrentKernelDebuggerMessageArgs);
+				if (vsnprintf(commandBuffer, kCommandBufferSize,
+						sCurrentKernelDebuggerMessage, tempArgs)
+							< (int)kCommandBufferSize) {
+					const char* commands = strstr(commandBuffer,
+						kKDLMessageCommandSeparator);
+					if (commands != NULL) {
+						commands += strlen(kKDLMessageCommandSeparator);
+						kprintf("initial commands: %s\n", commands);
+						evaluate_debug_command(commands);
+					}
+				}
+				va_end(tempArgs);
+
+				debug_free(commandBuffer);
+			}
+		}
+	} else {
+		// no commands yet -- always print a stack trace at least
 		arch_debug_stack_trace();
+	}
 
 	int32 continuableLine = -1;
 		// Index of the previous command line, if the command returned
@@ -831,7 +883,8 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 		}
 	}
 
-	va_end(sCurrentKernelDebuggerMessageArgs);
+	if (sCurrentKernelDebuggerMessage != NULL)
+		va_end(sCurrentKernelDebuggerMessageArgs);
 
 	delete_debug_alloc_pool(allocPool);
 
@@ -1851,7 +1904,7 @@ kprintf(const char* format, ...)
 	if (sDebugOutputFilter != NULL) {
 		va_list args;
 		va_start(args, format);
-		kprintf_args(format, args);
+		sDebugOutputFilter->Print(format, args);
 		va_end(args);
 	}
 }
