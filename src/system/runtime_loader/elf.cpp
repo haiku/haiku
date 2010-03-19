@@ -307,7 +307,6 @@ preload_image(char const* path)
 	image_t *image = NULL;
 	status_t status = load_image(path, B_LIBRARY_IMAGE, NULL, &image);
 	if (status < B_OK) {
-		rld_unlock();
 		KTRACE("rld: preload_image(\"%s\") failed to load container: %s", path,
 			strerror(status));
 		return status;
