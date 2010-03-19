@@ -98,6 +98,15 @@ print_type(const char *format, uint8 *pointer)
 }
 
 
+template<typename Type>
+static void
+print_type3(const char *format, uint8 *pointer)
+{
+	Type *item = (Type *)pointer;
+	printf(format, *item, *item, *item);
+}
+
+
 static status_t
 handle_reply(port_id replyPort, int32 *_code, bigtime_t timeout,
 	BMessage *reply)
@@ -595,11 +604,12 @@ BMessage::_PrintToStream(const char* indent) const
 					break;
 
 				case B_INT8_TYPE:
-					print_type<int8>("int8(0x%hx or %d or '%.1s')\n", pointer);
+					print_type3<int8>("int8(0x%hx or %d or '%.1s')\n",
+						pointer);
 					break;
 
 				case B_UINT8_TYPE:
-					print_type<uint8>("uint8(0x%hx or %u or '%.1s')\n",
+					print_type3<uint8>("uint8(0x%hx or %u or '%.1s')\n",
 						pointer);
 					break;
 
