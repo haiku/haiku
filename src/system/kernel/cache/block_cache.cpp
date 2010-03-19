@@ -1412,7 +1412,13 @@ block_cache::NewBlock(off_t blockNumber)
 	}
 	if (block == NULL) {
 		block = (cached_block*)object_cache_alloc(sBlockCache, 0);
-		if (block == NULL) {
+		if (block != NULL) {
+			block->current_data = Allocate();
+			if (block->current_data == NULL) {
+				object_cache_free(sBlockCache, block, 0);
+				return NULL;
+			}
+		} else {
 			TB(Error(this, blockNumber, "allocation failed"));
 			dprintf("block allocation failed, unused list is %sempty.\n",
 				unused_blocks.IsEmpty() ? "" : "not ");
@@ -1425,12 +1431,6 @@ block_cache::NewBlock(off_t blockNumber)
 				return NULL;
 			}
 		}
-	}
-
-	block->current_data = Allocate();
-	if (block->current_data == NULL) {
-		object_cache_free(sBlockCache, block, 0);
-		return NULL;
 	}
 
 	block->block_number = blockNumber;
