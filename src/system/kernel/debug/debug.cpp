@@ -845,8 +845,13 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 	if (!has_debugger_command("help") || message != NULL) {
 		// No commands yet or we came here via a panic(). Always print a stack
 		// trace in these cases.
-		debug_call_with_fault_handler(gCPU[sDebuggerOnCPU].fault_jump_buffer,
-			&stack_trace_trampoline, NULL);
+		jmp_buf* jumpBuffer = (jmp_buf*)debug_malloc(sizeof(jmp_buf));
+		if (jumpBuffer != NULL) {
+			debug_call_with_fault_handler(*jumpBuffer, &stack_trace_trampoline,
+				NULL);
+			debug_free(jumpBuffer);
+		} else
+			arch_debug_stack_trace();
 	}
 
 	if (has_debugger_command("help")) {
