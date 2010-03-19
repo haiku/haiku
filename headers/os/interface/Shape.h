@@ -63,6 +63,7 @@ public:
 
 			void				Clear();
 			BRect				Bounds() const;
+			BPoint				CurrentPosition() const;
 
 			status_t			AddShape(const BShape* other);
 

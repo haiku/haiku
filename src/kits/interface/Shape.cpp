@@ -301,13 +301,13 @@ BShape::Bounds() const
 	if (data->ptCount == 0)
 		return bounds;
 
+	// TODO: This implementation doesn't take into account curves at all.
 	bounds.left = data->ptList[0].x;
 	bounds.top = data->ptList[0].y;
 	bounds.right = data->ptList[0].x;
 	bounds.bottom = data->ptList[0].y;
 
-	for (int32 i = 1; i < data->ptCount; i++)
-	{
+	for (int32 i = 1; i < data->ptCount; i++) {
 		if (bounds.left > data->ptList[i].x)
 			bounds.left = data->ptList[i].x;
 		if (bounds.top > data->ptList[i].y)
@@ -319,6 +319,18 @@ BShape::Bounds() const
 	}
 
 	return bounds;
+}
+
+
+BPoint
+BShape::CurrentPosition() const
+{
+	shape_data* data = (shape_data*)fPrivateData;
+
+	if (data->ptCount == 0)
+		return B_ORIGIN;
+
+	return data->ptList[data->ptCount - 1];
 }
 
 
