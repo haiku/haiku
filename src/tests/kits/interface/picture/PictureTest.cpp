@@ -120,7 +120,7 @@ PictureView::AllAttached()
 
 	BMessage message;
 	picture->Archive(&message);
-	//message.PrintToStream();
+	message.PrintToStream();
 
 	BMallocIO stream;
 	
@@ -142,7 +142,7 @@ PictureView::AllAttached()
 
 	BMessage message2;
 	fPicture->Archive(&message2);
-	//message2.PrintToStream();
+	message2.PrintToStream();
 }
 
 
