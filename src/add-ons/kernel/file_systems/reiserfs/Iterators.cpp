@@ -1,17 +1,17 @@
 // Iterators.h
 //
-// Copyright (c) 2003, Ingo Weinhold (bonefish@cs.tu-berlin.de)
+// Copyright (c) 2003-2010, Ingo Weinhold (bonefish@cs.tu-berlin.de)
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -19,13 +19,16 @@
 // You can alternatively use *this file* under the terms of the the MIT
 // license included in this package.
 
+
 #include "Iterators.h"
+
 #include "Block.h"
 #include "BlockCache.h"
 #include "Key.h"
 #include "IndirectItem.h"
 #include "StatItem.h"
 #include "Tree.h"
+
 
 // min and max
 // We don't want to include <algobase.h> otherwise we also get <iostream.h>
@@ -246,7 +249,7 @@ TreeIterator::GetLevel() const
 	- \c DOWN: Down one level (in leaf direction). Goes to the child node of
 	  the current node the iterator currently points at. Points afterwards to
 	  the 0th child node of the new current node (unless it is a leaf node).
-	  
+
 	\c FORWARD and \c BACKWARDS do not change the current node!
 
 	\param direction \c FORWARD, \c BACKWARDS, \c UP or \c DOWN
@@ -799,7 +802,7 @@ ItemIterator::_SearchRightMost(LeafNode *node, const VKey *k,
 	This class basically wraps the ItemIterator class and provides a
 	more convenient interface for iteration through items of one given
 	object (directory, link or file). It finds only items of the object
-	identified by the dir and object ID specified on initialization. 
+	identified by the dir and object ID specified on initialization.
 */
 
 // constructor
@@ -1340,7 +1343,7 @@ StreamReader::ReadAt(off_t position, void *buffer, size_t bufferSize,
 					error = _ReadIndirectItem(inItemOffset, buffer, toRead);
 					break;
 				case TYPE_DIRECT:
-					error = _ReadDirectItem(inItemOffset, buffer, bufferSize);
+					error = _ReadDirectItem(inItemOffset, buffer, toRead);
 					break;
 				case TYPE_STAT_DATA:
 				case TYPE_DIRENTRY:
