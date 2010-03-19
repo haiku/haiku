@@ -166,7 +166,8 @@ block_allocator_init_boot()
 {
 	for (int index = 0; kBlockSizes[index] != 0; index++) {
 		char name[32];
-		snprintf(name, sizeof(name), "block cache: %lu", kBlockSizes[index]);
+		snprintf(name, sizeof(name), "block allocator: %lu",
+			kBlockSizes[index]);
 
 		uint32 flags = CACHE_DURING_BOOT;
 		size_t size = kBlockSizes[index];
