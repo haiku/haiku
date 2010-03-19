@@ -88,9 +88,7 @@ ShapePainter::IterateMoveTo(BPoint* point)
 {
 	try {
 		fOpStack.push(OP_MOVETO);
-		BPoint transformed(*point);
-		fView->ConvertToScreenForDrawing(&transformed);
-		fPtStack.push(transformed);
+		fPtStack.push(*point);
 	} catch (std::bad_alloc) {
 		return B_NO_MEMORY;
 	}
@@ -104,11 +102,8 @@ ShapePainter::IterateLineTo(int32 lineCount, BPoint* linePts)
 {
 	try {
 		fOpStack.push(OP_LINETO | lineCount);
-		for (int32 i = 0; i < lineCount; i++) {
-			BPoint transformed(linePts[i]);
-			fView->ConvertToScreenForDrawing(&transformed);
-			fPtStack.push(transformed);
-		}
+		for (int32 i = 0; i < lineCount; i++)
+			fPtStack.push(linePts[i]);
 	} catch (std::bad_alloc) {
 		return B_NO_MEMORY;
 	}
@@ -123,11 +118,8 @@ ShapePainter::IterateBezierTo(int32 bezierCount, BPoint* bezierPts)
 	bezierCount *= 3;
 	try {
 		fOpStack.push(OP_BEZIERTO | bezierCount);
-		for (int32 i = 0; i < bezierCount; i++) {
-			BPoint transformed(bezierPts[i]);
-			fView->ConvertToScreenForDrawing(&transformed);
-			fPtStack.push(transformed);
-		}
+		for (int32 i = 0; i < bezierCount; i++)
+			fPtStack.push(bezierPts[i]);
 	} catch (std::bad_alloc) {
 		return B_NO_MEMORY;
 	}
@@ -155,11 +147,9 @@ ShapePainter::IterateArcTo(float& rx, float& ry,
 
 	try {
 		fOpStack.push(op | 3);
-		fPtStack.push(BPoint(rx * fView->Scale(), ry * fView->Scale()));
+		fPtStack.push(BPoint(rx, ry));
 		fPtStack.push(BPoint(angle, 0));
-		BPoint transformed(point);
-		fView->ConvertToScreenForDrawing(&transformed);
-		fPtStack.push(transformed);
+		fPtStack.push(point);
 	} catch (std::bad_alloc) {
 		return B_NO_MEMORY;
 	}
@@ -211,7 +201,7 @@ ShapePainter::Draw(BRect frame, bool filled)
 			fPtStack.pop();
 		}
 
-		BPoint offset;
+		BPoint offset(fView->CurrentState()->PenLocation());
 		fView->ConvertToScreenForDrawing(&offset);
 		fView->Window()->GetDrawingEngine()->DrawShape(frame, opCount,
 			opList, ptCount, ptList, filled, offset, fView->Scale());
