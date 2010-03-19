@@ -27,7 +27,6 @@ MergeObject <libbe>app_kit.o :
 	Application.cpp
 	AppMisc.cpp
 	AppServerLink.cpp
-	AreaLink.cpp
 	Cursor.cpp
 	Clipboard.cpp
 	DesktopLink.cpp
