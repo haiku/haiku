@@ -120,7 +120,7 @@ PictureView::AllAttached()
 
 	BMessage message;
 	picture->Archive(&message);
-	message.PrintToStream();
+	//message.PrintToStream();
 
 	BMallocIO stream;
 	
@@ -134,13 +134,15 @@ PictureView::AllAttached()
 		stream.Seek(0, SEEK_SET);
 		fPicture = new BPicture();
 		status = fPicture->Unflatten(&stream);
-		if (status != B_OK)
+		if (status != B_OK) {
 			printf("Error unflattening BPicture: %s\n", strerror(status));
+			return;
+		}
 	}
 
 	BMessage message2;
 	fPicture->Archive(&message2);
-	message2.PrintToStream();
+	//message2.PrintToStream();
 }
 
 
