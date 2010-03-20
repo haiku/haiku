@@ -29,7 +29,8 @@ HyperTextAction::~HyperTextAction()
 void
 HyperTextAction::MouseOver(HyperTextView* view, BPoint where, BMessage* message)
 {
-	view->SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
+	BCursor linkCursor(B_CURSOR_ID_FOLLOW_LINK);
+	view->SetViewCursor(&linkCursor);
 }
 
 
