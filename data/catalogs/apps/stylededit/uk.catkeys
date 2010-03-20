@@ -1,0 +1,68 @@
+1	ukrainian	x-vnd.Haiku-StyledEdit	1909738892
+Paste	Menus		Вставити
+OK	LoadAlert		OK
+File	Menus		Файл
+???	LoadAlert		???
+Left	Menus		Вліво
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Повернутись до останньої версії \"%s\" ? 
+Search backwards	FindandReplaceWindow		Повторний пошук
+Size	Menus		Розмір
+Save	QuitAlert		Зберегти
+Page setup…	Menus		Встановити сторінку…
+Redo typing	Menus		Відмінити набір
+Print…	Menus		Друкувати…
+Replace same	Menus		Перемістити  це саме
+Can't undo	Menus		Неможливо відмінити
+Save	Menus		Зберегти
+Replace with:	FindandReplaceWindow		Перемістити з:
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо повернути, файл не знайдено: \"%s\".
+Case-sensitive	FindandReplaceWindow		Чутливий до регістра
+Green	Menus		Зелений
+Revert to saved…	Menus		Повернутись до збереження…
+Yellow	Menus		Жовтий
+Replace in all windows	FindandReplaceWindow		Замінити  у всіх вікнах
+Wrap lines	Menus		Перенос по словах
+Quit	Menus		Завершити
+Cancel	RevertToSavedAlert		Відмінити
+Document	Menus		Документ
+Clear	Menus		Очистити
+Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ? 
+Edit	Menus		Редагувати
+Font	Menus		Шрифт
+Replace all	FindandReplaceWindow		Замінити все
+Default	Open_and_SaveAsPanel		По замовчуванню
+Cancel	FindandReplaceWindow		Відмінити
+Close	Menus		Закрити
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Помилка при загрузці \"%s\":\n\tФормат не підтримується
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Не збережено
+Align	Menus		Вирівняти
+Color	Menus		Колір
+Red	Menus		Червоний
+Open…	Menus		Відкрити…
+Center	Menus		Центр
+Blue	Menus		Голубий
+Cyan	Menus		Циан
+Magenta	Menus		Фіолетовий
+New	Menus		Новий
+Wrap-around search	FindandReplaceWindow		Шукати по всьому документу
+Find selection	Menus		Знайти  вибране
+Find:	FindandReplaceWindow		Знайти:
+Error saving \"%s\":\n%s	SaveAlert		Помилка збереження "%s":\n%s
+Copy	Menus		Копіювати
+Cut	Menus		Вирізати
+Replace	FindandReplaceWindow		Перемістити
+Undo typing	Menus		Відмінити набір
+Find again	Menus		Повторний пошук
+Cancel	QuitAlert		Відмінити
+Find…	Menus		Знайти…
+Select all	Menus		Виділити все
+Error loading \"%s\":\n\t%s	LoadAlert		Помилка загрузки "%s":\n\t%s
+Black	Menus		Чорний
+Untitled 	StyledEditWindow		Неназваний
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		знайти
+Encoding	Open_and_SaveAsPanel		Kodierung
+Save as…	Menus		Зберегти як…
+Replace…	Menus		Перемістити…
+Right	Menus		Вправо

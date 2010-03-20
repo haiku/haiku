@@ -1,0 +1,57 @@
+1	ukrainian	x-vnd.Haiku-bootman	4122073978
+Wait 15 Seconds	DefaultPartitionPage		Очікування 15 секунд
+The boot manager has been successfully installed on your system.	BootManagerController		Бутменеджер успішно встановлений на Вашу систему.
+The old Master Boot Record was successfully save to %s.	BootManagerController		Старий запис MBR успішно був збережений в %s.
+Uninstall Boot Manager	UninstallPage	Деінсталювати Бутменеджер
+At least one partition must be selected!	BootManagerController		Принаймні один розділ слід вибрати!
+The old Master Boot Record could not be saved to %s	BootManagerController		Старий запис MBR не може бути збережений в %s .
+Restore MBR	BootManagerController	Button	Відновити MBR
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		MBR завантажуваного пристрою:\n\t%s\nуспішно збережений на диск.  Будь-ласка виберіть місце куди буде збережено  MBR.\n\nЯкщо дещо піде неправильно при встановленні або пізніше ви захочете видалити загрузочне меню просто запустіть програму Бутменеджер і виберіть опцію Деінсталювати.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Про відновлення MBR з %disk from %file. Бажаєте продовжити?
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Сталася помилка при записі загрузочного меню. MBR міг бути зруйнованим, ви повинні зараз  спробувати відновити  його!
+Partitions	PartitionsPage	Розділи
+Install boot menu	EntryPage	Встановити загрузочне меню
+Uninstall boot menu	EntryPage	Видалити загрузочне меню
+Select	FileSelectionPage	Button	Вибрати
+Uninstall boot manager	BootManagerController	Деінсталювати Бутменеджер
+Uninstallation of boot menu failed	BootManagerController	Видалення загрузочного меню призупинене
+Choose this option to install a boot menu, allowing you to select which operating system to boot when you turn on your computer.	EntryPage		Вибір цих пунктів при установці загрузочного меню дозволить при включенні комп"ютера  визначити операційну систему для запуску 
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Вкажіть файл з якого буде відновлено MBR. Це файл , який був створений при першому встановленні Бутменеджера.
+Unnamed %d	LegacyBootDrive	Default name of a partition whose name could not be read from disk	Неназваний %d
+Next	WizardView	Button	Наступний
+Uninstallation of boot menu completed	BootManagerController	Видалення загрузочного меню завершене.
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Таблиця розділів першого диска несумісна з Бутменеджером.\nБутменджер потребує 2 КВ доступного  простору , що розміщені до першого розділу.
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Були знайдені наступні розділи. Відмітьте  ті, що будуть включені до загручного меню. Ви також можете назвати пункти загрузочного меню за своїм смаком.
+The Master Boot Record of the boot device (%s) has been successfully restored from %s.	BootManagerController		MBR загрузочного диска (%s) був успішно відновлений з %s .
+Wait 5 Seconds	DefaultPartitionPage		Очікування 5 секунд
+Write boot menu	BootManagerController	Button	Запис  загрузочного меню
+Choose this option to remove the boot menu previously installed by this program.\n	EntryPage		Виберіть цей пункт для видалення загрузочного меню, що було попередньо встановлене програмою.\n
+The Master Boot Record could not be restored!	BootManagerController		MBR неможливо відновити!
+Default Partition	DefaultPartitionPage	Title	Розділи по замовчуванню
+Back	BootManagerController	Button	Назад
+Installation of boot menu completed	BootManagerController	Title	Встановлення загрузочного меню завершене
+Haiku Boot Manager\n\nwritten by\n\tDavid Dengg\n\tMichael Pfeiffer\n\nCopyright 2008-10, Haiku Inc.\n	BootManager		Haiku Бутменеджер\n\nАвтор:\n\tDavid Dengg\n\tMichael Pfeiffer\n\nCopyright 2008-10, Haiku Inc.\n\tПереклад українською Олекса Рудик aka totish\n\t
+File:	FileSelectionPage	Text control label	Файл:
+Previous	WizardView	Button	Попередній
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Про запис загрузочного меню на диск (%s) .Перевірте інформацію до встановлення .
+Boot Manager	BootManagerWindow	Window Title	Бутменеджер
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Вкажіть файл з якого буде відновлено MBR. Це файл, який був створений при першому встановленні Бутменеджера.
+Old Master Boot Record Saved failure	BootManagerController	Title	Старий запис MBR не було збережено
+Next	BootManagerController	Button	Наступний
+Partition table not compatible	BootManagerController	Таблиця розділів несумісна
+Old Master Boot Record saved	BootManagerController	Старий запис MBR збережено
+Boot Manager is unable to read the partition table!	BootManagerController		Бутменеджер не може прочитати таблицю розділів!
+Error reading partition table	BootManagerController	Помилка в читанні таблиці розділів
+OK	BootManager		OK
+Installation of boot menu failed	BootManagerController	Встановлення завантажувального меню призупинене
+Unknown	LegacyBootDrive	Text is shown for an unknown partition type	Невідомий тип
+Backup Master Boot Record	BootManagerController	Title	Відновлення MBR
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Про запис загрузочного меню на диск.  Ви впевнені, що бажаєте продовжити?
+Default Partition:	DefaultPartitionPage	Menu field label	Розділ по замовчуванню:
+Partitions	DefaultPartitionPage	Pop up menu title	Розділи
+Wait 10 Seconds	DefaultPartitionPage		Очікування 10 секунд
+Summary	BootManagerController	Title	Підсумок
+Wait Indefinitely	DefaultPartitionPage		Очікування не визначене
+OK	BootManagerController	Button	OK
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.	DefaultPartitionPage		Виберіть розділ по замовчуванню і затримку\nЗагрузочне меню запустить розділ по зовчуванню з затримкою, якщо не буде вибрано іншого розділу.
+Done	BootManagerController	Button	Виконано
