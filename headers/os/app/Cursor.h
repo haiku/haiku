@@ -15,6 +15,7 @@ enum BCursorID {
 
 	B_CURSOR_ID_CONTEXT_MENU					= 3,
 	B_CURSOR_ID_COPY							= 4,
+	B_CURSOR_ID_CREATE_LINK						= 29,
 	B_CURSOR_ID_CROSS_HAIR						= 5,
 	B_CURSOR_ID_FOLLOW_LINK						= 6,
 	B_CURSOR_ID_GRAB							= 7,

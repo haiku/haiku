@@ -38,10 +38,12 @@ CursorManager::CursorManager()
 		B_CURSOR_ID_CONTEXT_MENU, kHandHotspot);
 	_InitCursor(fCursorCopy, kCursorCopyBits,
 		B_CURSOR_ID_COPY, kHandHotspot);
+	_InitCursor(fCursorCreateLink, kCursorCreateLinkBits,
+		B_CURSOR_ID_CREATE_LINK, kHandHotspot);
 	_InitCursor(fCursorCrossHair, kCursorCrossHairBits,
 		B_CURSOR_ID_CROSS_HAIR, BPoint(10, 10));
 	_InitCursor(fCursorFollowLink, kCursorFollowLinkBits,
-		B_CURSOR_ID_FOLLOW_LINK, kHandHotspot);
+		B_CURSOR_ID_FOLLOW_LINK, BPoint(5, 0));
 	_InitCursor(fCursorGrab, kCursorGrabBits,
 		B_CURSOR_ID_GRAB, kHandHotspot);
 	_InitCursor(fCursorGrabbing, kCursorGrabbingBits,
@@ -222,6 +224,7 @@ CursorManager::SetCursorSet(const char* path)
 	_LoadCursor(fCursorSystemDefault, cursorSet, B_CURSOR_ID_SYSTEM_DEFAULT);
 	_LoadCursor(fCursorContextMenu, cursorSet, B_CURSOR_ID_CONTEXT_MENU);
 	_LoadCursor(fCursorCopy, cursorSet, B_CURSOR_ID_COPY);
+	_LoadCursor(fCursorCreateLink, cursorSet, B_CURSOR_ID_CREATE_LINK);
 	_LoadCursor(fCursorCrossHair, cursorSet, B_CURSOR_ID_CROSS_HAIR);
 	_LoadCursor(fCursorFollowLink, cursorSet, B_CURSOR_ID_FOLLOW_LINK);
 	_LoadCursor(fCursorGrab, cursorSet, B_CURSOR_ID_GRAB);
@@ -275,6 +278,8 @@ CursorManager::GetCursor(BCursorID which)
 			return fCursorContextMenu;
 		case B_CURSOR_ID_COPY:
 			return fCursorCopy;
+		case B_CURSOR_ID_CREATE_LINK:
+			return fCursorCreateLink;
 		case B_CURSOR_ID_CROSS_HAIR:
 			return fCursorCrossHair;
 		case B_CURSOR_ID_FOLLOW_LINK:

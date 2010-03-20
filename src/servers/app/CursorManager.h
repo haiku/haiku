@@ -66,6 +66,7 @@ private:
 
 			ServerCursor*		fCursorContextMenu;
 			ServerCursor*		fCursorCopy;
+			ServerCursor*		fCursorCreateLink;
 			ServerCursor*		fCursorCrossHair;
 			ServerCursor*		fCursorFollowLink;
 			ServerCursor*		fCursorGrab;

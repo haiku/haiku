@@ -15,6 +15,7 @@ const color_space kCursorFormat = B_RGBA32;
 
 extern const uint8 kCursorContextMenuBits[];
 extern const uint8 kCursorCopyBits[];
+extern const uint8 kCursorCreateLinkBits[];
 extern const uint8 kCursorCrossHairBits[];
 extern const uint8 kCursorFollowLinkBits[];
 extern const uint8 kCursorGrabBits[];
