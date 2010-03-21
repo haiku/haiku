@@ -315,6 +315,10 @@ rule CopySetHaikuRevision target : source
 		local gitIndex = <haiku-rootdir-git>index ;
 		SEARCH on $(gitIndex) = [ FDirName $(HAIKU_TOP) .git ] ;
 		Depends $(target) : $(gitIndex) ;
+	} else if [ Glob [ FDirName $(HAIKU_TOP) .hg ] : store ] {
+		local hgStore = <haiku-rootdir-hg>store ;
+		SEARCH on $(hgStore) = [ FDirName $(HAIKU_TOP) .hg ] ;
+		Depends $(target) : $(hgStore) ;
 	}
 
 	HAIKU_INCLUDE_IN_IMAGE on $(target)
@@ -341,6 +345,14 @@ actions CopySetHaikuRevision1
 			git log --max-count=1 --grep="git-svn-id:" 2> /dev/null |
 				grep "git-svn-id:" | cut -d '@' -f 2 |
 					awk '{printf $1}'`
+	fi
+	if [ "$revision" = 0 -o "$revision" = "" ]; then
+		# Try searching hg log for last svn commit
+		# Extract from "(svn r12345) ..." line
+		revision=`(cd $(HAIKU_TOP) &&
+			hg log --no-merges --template "{desc|firstline}\n") 2> /dev/null |
+			grep --max-count=1 "(svn r" |
+			sed -n -e 's,(svn r\(.*\)).*,\1,p'`
 	fi
 	if [ "$revision" = "" ]; then
 		revision=0
