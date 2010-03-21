@@ -15,6 +15,7 @@
 #include <Catalog.h>
 
 
+#undef TR_CONTEXT
 #define TR_CONTEXT "WizardView"
 
 

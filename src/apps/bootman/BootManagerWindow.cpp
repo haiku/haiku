@@ -22,6 +22,7 @@
 #include <math.h>
 
 
+#undef TR_CONTEXT
 #define TR_CONTEXT "BootManagerWindow"
 
 

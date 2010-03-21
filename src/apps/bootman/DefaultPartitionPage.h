@@ -11,10 +11,12 @@
 
 #include "WizardPageView.h"
 
+
 class BMenuField;
 class BMessage;
-class BRadioButton;
 class BPopUpMenu;
+class BRadioButton;
+class BSlider;
 class BTextView;
 
 
@@ -33,16 +35,12 @@ private:
 
 	void _BuildUI();
 	BPopUpMenu* _CreatePopUpMenu();
-	BRadioButton* _CreateWaitRadioButton(BRect frame, const char* name, const char* label, 
-		int32 timeout, int32 defaultTimeout);
+	void _GetTimeoutLabel(int32 timeout, BString& label);
 	void _Layout();
 	
 	BTextView* fDescription;
 	BMenuField* fDefaultPartition;
-	BRadioButton* fWait0;
-	BRadioButton* fWait5;
-	BRadioButton* fWait10;
-	BRadioButton* fWait15;
+	BSlider* fTimeoutSlider;
 };
 
 #endif	// DEFAULT_PARTITON_PAGE_H

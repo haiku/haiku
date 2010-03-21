@@ -11,23 +11,87 @@
 
 
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Message.h>
-
 #include <MenuItem.h>
 #include <MenuField.h>
 #include <PopUpMenu.h>
 #include <RadioButton.h>
-#include <TextView.h>
-
+#include <Slider.h>
 #include <string.h>
 #include <String.h>
+#include <TextView.h>
 
 
+#undef TR_CONTEXT
 #define TR_CONTEXT "DefaultPartitionPage"
 
 
-const uint32 kMsgPartition = 'part';
-const uint32 kMsgTimeout = 'time';
+enum {
+	kMsgPartition = 'part',
+	kMsgTimeout = 'time'
+};
+
+
+// The timeout code to wait indefinitely
+// Note: The timeout is encoded in seconds, -1 indicates to wait indefinitely
+const int32 kTimeoutIndefinitely = -1;
+const int32 kDefaultTimeout = kTimeoutIndefinitely;
+
+typedef struct {
+	int32 timeout;
+	const char* label;
+} TimeoutOption;
+
+static const TimeoutOption gTimeoutOptions[] =
+{
+	{ 0, TR_MARK("Immediately")},
+	{ 1, TR_MARK("After one second")},
+	{ 2, TR_MARK("After two seconds")},
+	{ 3, TR_MARK("After three seconds")},
+	{ 4, TR_MARK("After four seconds")},
+	{ 5, TR_MARK("After five seconds")},
+	{ 60, TR_MARK("After one minute")},
+	{ kTimeoutIndefinitely, TR_MARK("Never")}
+};
+
+
+#define kNumberOfTimeoutOptions \
+	(int32)(sizeof(gTimeoutOptions) / sizeof(TimeoutOption))
+
+
+static int32
+get_index_for_timeout(int32 timeout)
+{
+	int32 defaultIndex = 0;
+	for (int32 i = 0; i < kNumberOfTimeoutOptions; i ++) {
+		if (gTimeoutOptions[i].timeout == timeout)
+			return i;
+
+		if (gTimeoutOptions[i].timeout == kDefaultTimeout)
+			defaultIndex = i;
+	}
+	return defaultIndex;
+}
+
+
+static int32
+get_timeout_for_index(int32 index)
+{
+	if (index < 0)
+		return gTimeoutOptions[0].timeout;
+	if (index >= kNumberOfTimeoutOptions)
+		return gTimeoutOptions[kNumberOfTimeoutOptions-1].timeout;
+	return gTimeoutOptions[index].timeout;
+}
+
+
+const char*
+get_label_for_timeout(int32 timeout)
+{
+	int32 index = get_index_for_timeout(timeout);
+	return gTimeoutOptions[index].label;
+}
 
 
 DefaultPartitionPage::DefaultPartitionPage(BMessage* settings, BRect frame, const char* name)
@@ -55,10 +119,7 @@ void
 DefaultPartitionPage::AttachedToWindow()
 {
 	fDefaultPartition->Menu()->SetTargetForItems(this);
-	fWait0->SetTarget(this);
-	fWait5->SetTarget(this);
-	fWait10->SetTarget(this);
-	fWait15->SetTarget(this);
+	fTimeoutSlider->SetTarget(this);
 }
 
 
@@ -75,9 +136,13 @@ DefaultPartitionPage::MessageReceived(BMessage* msg)
 			break;
 		case kMsgTimeout:
 			{
-				int32 timeout;
-				msg->FindInt32("timeout", &timeout);
+				int32 sliderValue = fTimeoutSlider->Value();
+				int32 timeout = get_timeout_for_index(sliderValue);
 				fSettings->ReplaceInt32("timeout", timeout);
+
+				BString label;
+				_GetTimeoutLabel(timeout, label);
+				fTimeoutSlider->SetLabel(label.String());
 			}
 			break;
 		default:
@@ -86,7 +151,7 @@ DefaultPartitionPage::MessageReceived(BMessage* msg)
 }
 
 
-static const float kTextDistance = 10;
+#define kTextDistance be_control_look->DefaultItemSpacing();
 
 void
 DefaultPartitionPage::_BuildUI()
@@ -100,7 +165,8 @@ DefaultPartitionPage::_BuildUI()
 		"The boot menu will load the default partition after "
 		"the timeout unless you select another partition. You "
 		"can also have the boot menu wait indefinitely for you "
-		"to select a partition.");
+		"to select a partition.\n"
+		"Keep the 'ALT' key pressed to disable the timeout at boot time.");
 
 	fDescription = CreateDescription(rect, "description", text);
 	MakeHeading(fDescription);
@@ -116,17 +182,26 @@ DefaultPartitionPage::_BuildUI()
 	AddChild(fDefaultPartition);
 	fDefaultPartition->ResizeToPreferred();
 	
+	// timeout slider
 	rect.top = fDefaultPartition->Frame().bottom + kTextDistance;
 	int32 timeout;
 	fSettings->FindInt32("timeout", &timeout);
-	fWait0 = _CreateWaitRadioButton(rect, "wait0", TR("Wait Indefinitely"),
-		-1, timeout);
-	fWait5 = _CreateWaitRadioButton(rect, "wait5", TR("Wait 5 Seconds"),
-		5, timeout);
-	fWait10 = _CreateWaitRadioButton(rect, "wait10", TR("Wait 10 Seconds"),
-		10, timeout);
-	fWait15 = _CreateWaitRadioButton(rect, "wait15", TR("Wait 15 Seconds"),
-		15, timeout);
+	BString timeoutLabel;
+	_GetTimeoutLabel(timeout, timeoutLabel);
+
+	int32 sliderValue = get_index_for_timeout(timeout);
+
+	fTimeoutSlider = new BSlider(rect, "timeout", timeoutLabel.String(),
+		new BMessage(kMsgTimeout), 0, kNumberOfTimeoutOptions-1,
+		B_BLOCK_THUMB,
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fTimeoutSlider->SetModificationMessage(new BMessage(kMsgTimeout));
+	fTimeoutSlider->SetValue(sliderValue);
+	fTimeoutSlider->SetLimitLabels(TR("Immediately"),TR("Never"));
+	fTimeoutSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fTimeoutSlider->SetHashMarkCount(kNumberOfTimeoutOptions);
+	fTimeoutSlider->ResizeToPreferred();
+	AddChild(fTimeoutSlider);
 	
 	_Layout();
 }
@@ -169,20 +244,12 @@ DefaultPartitionPage::_CreatePopUpMenu()
 }
 
 
-BRadioButton* 
-DefaultPartitionPage::_CreateWaitRadioButton(BRect rect, const char* name, const char* label, int32 timeout, 
-	int32 defaultTimeout)
+void
+DefaultPartitionPage::_GetTimeoutLabel(int32 timeout, BString& label)
 {
-	BMessage* msg = new BMessage(kMsgTimeout);
-	msg->AddInt32("timeout", timeout);
-	BRadioButton* button = new BRadioButton(rect, name, label, msg);
-	AddChild(button);
-	button->ResizeToPreferred();
-
-	if (timeout == defaultTimeout)
-		button->SetValue(1);
-		
-	return button;
+	const char* text = TR(get_label_for_timeout(timeout));
+	label = TR("Timeout: %s");
+	label.ReplaceFirst("%s", text);
 }
 
 
@@ -194,18 +261,9 @@ DefaultPartitionPage::_Layout()
 	float left = fDefaultPartition->Frame().left;
 	float top = fDescription->Frame().bottom + kTextDistance;
 	
-	BView* controls[] = {
-		fDefaultPartition,
-		fWait0,
-		fWait5,
-		fWait10,
-		fWait15
-	};
-	
-	for (int i = 0; i < 5; i ++) {
-		BView* view = controls[i];
-		view->MoveTo(left, top);
-		top = view->Frame().bottom + 3;
-	}
+	fDefaultPartition->MoveTo(left, top);
+	top = fDefaultPartition->Frame().bottom + kTextDistance;
+
+	fTimeoutSlider->MoveTo(left, top);
 }
 

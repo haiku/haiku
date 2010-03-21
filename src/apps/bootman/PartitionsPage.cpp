@@ -24,6 +24,7 @@
 #include <String.h>
 
 
+#undef TR_CONTEXT
 #define TR_CONTEXT "PartitionsPage"
 
 

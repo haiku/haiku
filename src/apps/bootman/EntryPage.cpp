@@ -17,6 +17,7 @@
 #include <string.h>
 
 
+#undef TR_CONTEXT
 #define TR_CONTEXT "EntryPage"
 
 

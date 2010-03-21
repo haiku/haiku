@@ -16,6 +16,7 @@
 #include <TextView.h>
 
 
+#undef TR_CONTEXT
 #define TR_CONTEXT "BootManager"
 
 

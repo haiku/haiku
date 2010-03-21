@@ -96,6 +96,9 @@
 %assign	PROBE_CHAR						0x01	; -> zf = 0
 												;	al - ASCII char
 												;	ah - scan code
+
+%assign	GET_MODIFIER_KEYS				0x02	;-> al - modifier key bitmask
+
 ; timer services
 %assign READ_CLOCK						0x00	; -> cx	- high word
 												;	dx - low word
@@ -137,6 +140,16 @@
 %assign KEY_DOWN						0x50
 %assign KEY_UP							0x48
 %assign KEY_RETURN						0x1C
+
+; Modifier key bitmasks
+%assign MODIFIER_RIGHT_SHIFT_KEY		0x01
+%assign MODIFIER_LEFT_SHIFT_KEY			0x02
+%assign MODIFIER_CONTROL_KEY			0x04
+%assign MODIFIER_ALT_KEY				0x08
+%assign MODIFIER_SCROLL_LOCK_KEY		0x10
+%assign MODIFIER_NUM_LOCK_KEY			0x20
+%assign MODIFIER_CAPS_LOCK_KEY			0x40
+%assign MODIFIER_INSERT_KEY				0x80
 
 ; String constants with their length
 %define TITLE							'Haiku Boot Manager'
@@ -348,7 +361,7 @@ kMBRSignature:
 ; Use code available in stage 1
 %define printstr printStringStage2
 
-%assign	TIMEOUT_OFF	0xffff
+%assign	TIMEOUT_OFF		0xffff
 
 
 stage2:
@@ -375,6 +388,13 @@ stage2:
 	sub		bl, al								; y = TEXT_ROWS / 2 - number of items / 2
 	mov		[bp + firstLine], bl
 
+	mov		ah, GET_MODIFIER_KEYS				; Disable timeout if ALT key is pressed
+	int		BIOS_KEYBOARD_SERVICES
+	and		al, MODIFIER_ALT_KEY
+	jz		showMenu
+	mov		word [timeout], TIMEOUT_OFF
+
+showMenu:
 	call	printMenu
 
 	cmp		word [timeout], TIMEOUT_OFF

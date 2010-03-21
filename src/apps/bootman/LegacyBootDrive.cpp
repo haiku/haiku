@@ -37,6 +37,7 @@
 #include "BootLoader.h"
 
 
+#undef TR_CONTEXT
 #define TR_CONTEXT "LegacyBootDrive"
 #define USE_SECOND_DISK 0
 #define GET_FIRST_BIOS_DRIVE 1
