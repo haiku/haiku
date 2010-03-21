@@ -363,7 +363,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	// View Menu
 
 	if (!resending && fIncoming) {
-		menu = new BMenu("View");
+		menu = new BMenu(TR("View"));
 		menu->AddItem(fHeader = new BMenuItem(TR("Show header"),
 			new BMessage(M_HEADER), 'H'));
 		menu->AddItem(fRaw = new BMenuItem(TR("Show raw message"),
