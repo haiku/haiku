@@ -17,7 +17,13 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
+#include <GroupLayoutBuilder.h>
+#include <GridLayoutBuilder.h>
+#include <Locale.h>
+#include <LayoutBuilder.h>
 #include <RadioButton.h>
 #include <Rect.h>
 #include <String.h>
@@ -26,122 +32,61 @@
 #include "ShowImageConstants.h"
 
 
-static const char* kWidthLabel = "Width:";
-static const char* kHeightLabel = "Height:";
-static const char* kKeepAspectRatioLabel = "Keep original proportions";
-static const char* kApplyLabel = "Apply";
-
-static const float kLineDistance = 5;
-static const float kHorizontalIndent = 10;
-static const float kVerticalIndent = 10;
-
+#undef TR_CONTEXT
+#define TR_CONTEXT "ResizerWindow"
 
 ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	:
-	BWindow(BRect(100, 100, 300, 300), "Resize", B_FLOATING_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	BWindow(BRect(100, 100, 300, 300), TR("Resize"), B_FLOATING_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fOriginalWidth(width),
 	fOriginalHeight(height),
 	fTarget(target)
 {
-	BView* back_view = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW);
-	back_view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(back_view);
-	
-	const float widthLabelWidth = back_view->StringWidth(kWidthLabel);
-	const float heightLabelWidth = back_view->StringWidth(kHeightLabel);
-	const float column2 = max_c(widthLabelWidth, heightLabelWidth);
-
-	const float textControlWidth = column2 + back_view->StringWidth("999999");
-	const float keepAspectRatioLabelWidth = 20
-		+ back_view->StringWidth(kKeepAspectRatioLabel);
-	const float width2 = 2 * kHorizontalIndent
-		+ max_c(textControlWidth, keepAspectRatioLabelWidth);
-	
-	ResizeTo(width2+1, Bounds().Height()+1);
-	
-	const float top = kVerticalIndent;
-	const float left = kHorizontalIndent;
-	BRect rect(left, top, width2 - kHorizontalIndent, top + 10);
-	
 	BString widthValue;
 	widthValue << width;
-	fWidth = new BTextControl(rect, "width", kWidthLabel, widthValue.String(),
-		NULL);
+	fWidth = new BTextControl("width", TR("Width:"), widthValue.String(), NULL);
 	fWidth->SetModificationMessage(new BMessage(kWidthModifiedMsg));
-	AddControl(back_view, fWidth, column2, rect);
-					
+
 	BString heightValue;
 	heightValue << height;	
-	fHeight = new BTextControl(rect, "height", kHeightLabel,
-		heightValue.String(), NULL);
+	fHeight = new BTextControl("height",
+		TR("Height:"), heightValue.String(), NULL);
 	fHeight->SetModificationMessage(new BMessage(kHeightModifiedMsg));
-	AddControl(back_view, fHeight, column2, rect);
-	
-	fAspectRatio = new BCheckBox(rect, "Ratio", kKeepAspectRatioLabel,
-		new BMessage(kWidthModifiedMsg));
+
+	fAspectRatio = new BCheckBox("Ratio",
+		TR("Keep original proportions"), new BMessage(kWidthModifiedMsg));
 	fAspectRatio->SetValue(B_CONTROL_ON);
-	AddControl(back_view, fAspectRatio, column2, rect);
-	
-	fApply = new BButton(rect, "apply", kApplyLabel, new BMessage(kApplyMsg));
+
+	fApply = new BButton("apply", TR("Apply"), new BMessage(kApplyMsg));
 	fApply->MakeDefault(true);
-	AddControl(back_view, fApply, column2, rect);
-	LeftAlign(fApply);
+
+	const float spacing = be_control_look->DefaultItemSpacing();
+	const float labelspacing = be_control_look->DefaultLabelSpacing();
+	
+	SetLayout(new BGroupLayout(B_HORIZONTAL)); 
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(BGridLayoutBuilder(labelspacing, 0)
+				.Add(fWidth->CreateLabelLayoutItem(), 0, 0)
+				.Add(fWidth->CreateTextViewLayoutItem(), 1, 0)
+				.Add(fHeight->CreateLabelLayoutItem(), 0, 1)
+				.Add(fHeight->CreateTextViewLayoutItem(), 1, 1)
+				)
+		.Add(fAspectRatio)
+		.AddGroup(B_HORIZONTAL, 0) 
+			.AddGlue() 
+			.Add(fApply) 
+		.End() 
+		.SetInsets(spacing, spacing, spacing, spacing) 
+	); 
 	
 	fWidth->MakeFocus();
-	
-	ResizeTo(width2, rect.top);
+
 }
 
 
 ResizerWindow::~ResizerWindow()
 {
-}
-
-
-void
-ResizerWindow::AddControl(BView* view, BControl* control, float column2,
-	BRect& rect)
-{
-	float width, height;
-	view->AddChild(control);
-	control->GetPreferredSize(&width, &height);
-	if (dynamic_cast<BButton*>(control) != NULL) {
-		control->ResizeTo(width, height);
-	} else {
-		control->ResizeTo(control->Bounds().Width(), height);
-	}
-	float top = control->Frame().bottom + kLineDistance;
-	rect.OffsetTo(rect.left, top);
-
-	if (dynamic_cast<BTextControl*>(control) != NULL) {
-		((BTextControl*)control)->SetDivider(column2);
-	}
-}
-
-
-void
-ResizerWindow::AddSeparatorLine(BView* view, BRect& rect)
-{
-	const float lineWidth = 3;
-	BRect line(Bounds());
-	line.left += 3;
-	line.right -= 3;
-	line.top = rect.top;
-	line.bottom = line.top + lineWidth - 1;
-	BBox* separatorLine = new BBox(line, "", B_FOLLOW_LEFT_RIGHT,
-		B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
-	view->AddChild(separatorLine);
-	rect.OffsetBy(0, kLineDistance + lineWidth);
-}
-
-
-void
-ResizerWindow::LeftAlign(BControl* control)
-{
-	BRect frame = control->Frame();
-	float left = Bounds().Width() - frame.Width() - kHorizontalIndent;
-	control->MoveTo(left, frame.top);
 }
 
 

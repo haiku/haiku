@@ -14,6 +14,7 @@
 #include "ShowImageSettings.h"
 
 #include <Application.h>
+#include <Catalog.h>
 #include <FilePanel.h>
 
 
@@ -42,6 +43,7 @@ private:
 			BFilePanel			*fOpenPanel;
 			bool				fPulseStarted;
 			ShowImageSettings	fSettings;
+			BCatalog		fCatalog;
 };
 
 

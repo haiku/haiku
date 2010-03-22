@@ -15,8 +15,10 @@
 
 #include <AboutWindow.h>
 #include <Alert.h>
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <FilePanel.h>
+#include <Locale.h>
 #include <Path.h>
 #include <String.h>
 
@@ -26,13 +28,15 @@
 
 #define WINDOWS_TO_IGNORE 1
 
-extern const char *kApplicationSignature = "application/x-vnd.Haiku-ShowImage";
+extern const char* kApplicationSignature = "application/x-vnd.Haiku-ShowImage";
 
 
 ShowImageApp::ShowImageApp()
 	:
 	BApplication(kApplicationSignature)
 {
+	be_locale->GetAppCatalog(&fCatalog);
+
 	fPulseStarted = false;
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL);
 }
@@ -43,17 +47,20 @@ ShowImageApp::~ShowImageApp()
 }
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "AboutWindow"
+
 void
 ShowImageApp::AboutRequested()
 {
-	const char *authors[] = {
+	const char* authors[] = {
 		"Fernando F. Oliveira",
 		"Michael Wilber",
 		"Michael Pfeiffer",
 		"Ryan Leavengood",
 		NULL
 	};
-	BAboutWindow about("ShowImage", 2003, authors);
+	BAboutWindow about(TR("ShowImage"), 2003, authors);
 	about.Show();
 }
 
@@ -109,7 +116,7 @@ ShowImageApp::ArgvReceived(int32 argc, char **argv)
 	bool hasRefs = false;
 
 	// get current working directory
-	const char *cwd;
+	const char* cwd;
 	if (CurrentMessage() == NULL
 		|| CurrentMessage()->FindString("cwd", &cwd) != B_OK)
 		cwd = "";
@@ -139,7 +146,7 @@ ShowImageApp::ArgvReceived(int32 argc, char **argv)
 
 
 void
-ShowImageApp::MessageReceived(BMessage *message)
+ShowImageApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_FILE_OPEN:
@@ -167,7 +174,7 @@ ShowImageApp::MessageReceived(BMessage *message)
 
 
 void
-ShowImageApp::RefsReceived(BMessage *message)
+ShowImageApp::RefsReceived(BMessage* message)
 {
 	// If a tracker window opened me, get a messenger from it.
 	if (message->HasMessenger("TrackerViewToken"))
@@ -188,14 +195,14 @@ ShowImageApp::RefsReceived(BMessage *message)
 
 
 void
-ShowImageApp::Open(const entry_ref *ref)
+ShowImageApp::Open(const entry_ref* ref)
 {
 	new ShowImageWindow(ref, fTrackerMessenger);
 }
 
 
 void
-ShowImageApp::BroadcastToWindows(BMessage *message)
+ShowImageApp::BroadcastToWindows(BMessage* message)
 {
 	const int32 count = CountWindows();
 	for (int32 i = 0; i < count; i ++) {
@@ -217,7 +224,7 @@ ShowImageApp::CheckClipboard()
 	bool dataAvailable = false;
 
 	if (be_clipboard->Lock()) {
-		BMessage *clip = be_clipboard->Data();
+		BMessage* clip = be_clipboard->Data();
 		if (clip != NULL) {
 			BString className;
 			if (clip->FindString("class", &className) == B_OK) {

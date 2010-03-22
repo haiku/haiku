@@ -13,6 +13,12 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
+#include <ControlLook.h>
+#include <GroupLayoutBuilder.h>
+#include <GridLayoutBuilder.h>
+#include <Locale.h>
+#include <LayoutBuilder.h>
 #include <String.h>
 
 #include "ShowImageConstants.h"
@@ -23,8 +29,8 @@ PrintOptions::PrintOptions()
 	fOption(kFitToPage),
 	fZoomFactor(1.0),
 	fDPI(72.0),
-	fWidth(1024/72.0),
-	fHeight(768/72.0)
+	fWidth(1024 / 72.0),
+	fHeight(768 / 72.0)
 {
 }
 
@@ -68,12 +74,15 @@ PrintOptions::SetHeight(float h)
 }
 
 
-PrintOptionsWindow::PrintOptionsWindow(BPoint at, PrintOptions *options,
+#undef TR_CONTEXT
+#define TR_CONTEXT "PrintOptionsWindow"
+
+PrintOptionsWindow::PrintOptionsWindow(BPoint at, PrintOptions* options,
 	BWindow* listener)
 	:
-	BWindow(BRect(at.x, at.y, at.x + 300, at.y + 200), "Print options",
+	BWindow(BRect(at.x, at.y, at.x + 300, at.y + 200), TR("Print options"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
-		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fPrintOptions(options),
 	fCurrentOptions(*options),
 	fListener(listener),
@@ -94,35 +103,24 @@ PrintOptionsWindow::~PrintOptionsWindow()
 
 
 BRadioButton*
-PrintOptionsWindow::AddRadioButton(BView* view, BPoint& at, const char* name,
+PrintOptionsWindow::AddRadioButton(const char* name,
 	const char* label, uint32 what, bool selected)
 {
-	BRect rect(0, 0, 100, 20);
 	BRadioButton* button;
-	rect.OffsetBy(at);
-	button = new BRadioButton(rect, name, label, new BMessage(what));
-	view->AddChild(button);
-	button->ResizeToPreferred();
-	at.y += button->Bounds().Height() + kLineSkip;
+	button = new BRadioButton(name, label, new BMessage(what));
 	button->SetValue(selected ? B_CONTROL_ON : B_CONTROL_OFF);
 	return button;
 }
 
 
 BTextControl*
-PrintOptionsWindow::AddTextControl(BView* view, BPoint& at, const char* name,
-	const char* label, float value, float divider, uint32 what)
+PrintOptionsWindow::AddTextControl(const char* name,
+	const char* label, float value, uint32 what)
 {
-	BRect rect(0, 0, divider + 45, 20);
 	BTextControl* text;
-	rect.OffsetBy(at);
-	text = new BTextControl(rect, name, label, "", new BMessage(what));
-	view->AddChild(text);
+	text = new BTextControl(name, label, "", new BMessage(what));
 	text->SetModificationMessage(new BMessage(what));
-	text->SetDivider(divider);
-	text->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
 	SetValue(text, value);
-	at.y += text->Bounds().Height() + kLineSkip;
 	return text;
 }
 
@@ -130,68 +128,72 @@ PrintOptionsWindow::AddTextControl(BView* view, BPoint& at, const char* name,
 void
 PrintOptionsWindow::Setup()
 {
-	BRect rect(Bounds());
-	BPoint at(kIndent, kIndent), textAt;
 	BString value;
 	enum PrintOptions::Option op = fCurrentOptions.Option();
-	BRadioButton* rb;
+	BRadioButton* rbFit;
+	BRadioButton* rbZoom;
+	BRadioButton* rbDpi;
+	BRadioButton* rbResize;
 	BBox* line;
 	BButton* button;
 
-	BBox *panel = new BBox(rect, "top_panel", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-		B_PLAIN_BORDER);
-	AddChild(panel);
-
-	AddRadioButton(panel, at, "fit_to_page", "Fit image to page",
+	rbFit = AddRadioButton("fit_to_page", TR("Fit image to page"),
 		kMsgFitToPageSelected, op == PrintOptions::kFitToPage);
-	textAt = at;
-	rb = AddRadioButton(panel, at, "zoom_factor", "Zoom factor in %: ",
+
+	rbZoom = AddRadioButton("zoom_factor", TR("Zoom factor in %:"),
 		kMsgZoomFactorSelected, op == PrintOptions::kZoomFactor);
-	textAt.x = rb->Bounds().right + 5;
-	fZoomFactor = AddTextControl(panel, textAt, "zoom_factor_text", "",
-		fCurrentOptions.ZoomFactor()*100, 0, kMsgZoomFactorChanged);
 
-	textAt = at;
-	rb = AddRadioButton(panel, at, "dpi", "DPI: ", kMsgDPISelected,
+	fZoomFactor = AddTextControl("zoom_factor_text", "",
+		fCurrentOptions.ZoomFactor() * 100, kMsgZoomFactorChanged);
+
+	rbDpi = AddRadioButton("dpi", TR("DPI:"), kMsgDPISelected,
 		op == PrintOptions::kDPI);
-	textAt.x = rb->Bounds().right + 5;
-	fDPI = AddTextControl(panel, textAt, "dpi_text", "", fCurrentOptions.DPI(),
-		0, kMsgDPIChanged);
 
-	rb = AddRadioButton(panel, at, "width_and_height",
-		"Resize to (in 1/72 inches):", kMsgWidthAndHeightSelected,
+	fDPI = AddTextControl("dpi_text", "", fCurrentOptions.DPI(),
+		kMsgDPIChanged);
+
+	rbResize = AddRadioButton("width_and_height",
+		TR("Resize to (in 1/72 inches):"), kMsgWidthAndHeightSelected,
 		op == PrintOptions::kWidth || op == PrintOptions::kHeight);
-	at.x += 15;
-	textAt = at;
-	fWidth = AddTextControl(panel, textAt, "width", "Width: ",
-		fCurrentOptions.Width(), 40, kMsgWidthChanged);
-	textAt = at;
-	textAt.x += fWidth->Bounds().Width() + 5;
-	fHeight = AddTextControl(panel, textAt, "height", "Height: ",
-		fCurrentOptions.Height(), 40, kMsgHeightChanged);
 
-	at.x = 0;
-	at.y = textAt.y;
-	line = new BBox(BRect(rect.left+3, at.y, rect.right-3, at.y + 1), NULL,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	panel->AddChild(line);
+	fWidth = AddTextControl("width", TR("Width:"),
+		fCurrentOptions.Width(), kMsgWidthChanged);
 
-	at.y += 10;
-	rect.OffsetBy(at);
-	button = new BButton(rect, "job setup", "Job setup",
+	fHeight = AddTextControl("height", TR("Height: "),
+		fCurrentOptions.Height(), kMsgHeightChanged);
+
+	line = new BBox(B_EMPTY_STRING, B_WILL_DRAW | B_FRAME_EVENTS,
+		B_FANCY_BORDER);
+	line->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
+
+	button = new BButton("job setup", TR("Job setup"),
 		new BMessage(kMsgJobSetup));
-	panel->AddChild(button);
-	button->ResizeToPreferred();
-
 	SetDefaultButton(button);
 
-	// resize window
-	ResizeTo(fHeight->Frame().right + kIndent, button->Frame().bottom + kIndent);
-
-	// center button
-	button->MoveTo((Bounds().Width()-button->Bounds().Width())/2,
-		button->Frame().top);
+	const float spacing = be_control_look->DefaultItemSpacing();
+	
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(BGridLayoutBuilder()
+				.Add(rbFit, 0, 0)
+				.Add(rbZoom, 0, 1)
+				.Add(fZoomFactor, 1, 1)
+				.Add(rbDpi, 0, 2)
+				.Add(fDPI, 1, 2)
+				.Add(rbResize, 0, 3)
+				)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(fWidth)
+			.Add(fHeight)
+			.AddGlue()
+			.SetInsets(22, 0, 0, 0)
+		.End()
+		.Add(line)
+		.AddGroup(B_HORIZONTAL, 0)
+			.Add(button)
+		.End()
+		.SetInsets(spacing, spacing, spacing, spacing)
+	);
 }
 
 
@@ -245,14 +247,14 @@ PrintOptionsWindow::MessageReceived(BMessage* msg)
 		case kMsgZoomFactorChanged:
 			if (GetValue(fZoomFactor, &value)
 				&& fCurrentOptions.ZoomFactor() != value) {
-				fCurrentOptions.SetZoomFactor(value/100);
+				fCurrentOptions.SetZoomFactor(value / 100);
 				SetValue(fDPI, fCurrentOptions.DPI());
 			}
 			break;
 		case kMsgDPIChanged:
 			if (GetValue(fDPI, &value) && fCurrentOptions.DPI() != value) {
 				fCurrentOptions.SetDPI(value);
-				SetValue(fZoomFactor, 100*fCurrentOptions.ZoomFactor());
+				SetValue(fZoomFactor, 100 * fCurrentOptions.ZoomFactor());
 			}
 			break;
 		case kMsgWidthChanged:

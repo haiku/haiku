@@ -64,13 +64,11 @@ public:
 	void 			MessageReceived(BMessage* msg);
 
 private:
-	BRadioButton* 				AddRadioButton(BView* view, BPoint& at,
-									const char* name, const char* label,
+	BRadioButton* 				AddRadioButton(const char* name, const char* label,
 									uint32 what, bool selected);
 
-	BTextControl* 				AddTextControl(BView* view, BPoint& at, 
-									const char* name, const char* label,
-									float value, float divider, uint32 what);
+	BTextControl* 				AddTextControl(const char* name, const char* label,
+									float value, uint32 what);
 
 	void						Setup();
 	enum PrintOptions::Option	MsgToOption(uint32 what);

@@ -17,7 +17,17 @@ Application ShowImage :
 	ProgressWindow.cpp
 	ResizerWindow.cpp
 	: libshared.a
-	be tracker translation $(TARGET_LIBSUPC++)
+	be tracker translation liblocale.so $(TARGET_LIBSUPC++)
 	: ShowImage.rdef
 	;
 
+DoCatalogs ShowImage :
+	x-vnd.Haiku-ShowImage
+	:
+	PrintOptionsWindow.cpp
+	ResizerWindow.cpp
+	ShowImageApp.cpp
+	ShowImageWindow.cpp
+	: en.catalog
+	:
+;

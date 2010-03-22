@@ -21,10 +21,12 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <BitmapStream.h>
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <Entry.h>
 #include <File.h>
 #include <FilePanel.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -38,6 +40,7 @@
 #include <TranslationDefs.h>
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
+#include <stdlib.h> // for bs_printf()
 
 #include "EntryMenuItem.h"
 #include "ResizerWindow.h"
@@ -51,7 +54,7 @@
 
 class ShowImageWindow::RecentDocumentsMenu : public BMenu {
 public:
-			RecentDocumentsMenu(const char *title,
+			RecentDocumentsMenu(const char* title,
 				menu_layout layout = B_ITEMS_IN_COLUMN);
 	bool	AddDynamicItem(add_state addState);
 
@@ -60,7 +63,7 @@ private:
 };
 
 
-ShowImageWindow::RecentDocumentsMenu::RecentDocumentsMenu(const char *title,
+ShowImageWindow::RecentDocumentsMenu::RecentDocumentsMenu(const char* title,
 	menu_layout layout)
 	:
 	BMenu(title, layout)
@@ -77,7 +80,7 @@ ShowImageWindow::RecentDocumentsMenu::AddDynamicItem(add_state addState)
 	while (CountItems() > 0)
 		delete RemoveItem(0L);
 
-	BMenuItem *item;
+	BMenuItem* item;
 	BMessage list, *msg;
 	entry_ref ref;
 	char name[B_FILE_NAME_LENGTH];
@@ -106,7 +109,7 @@ const char* kTypeField = "be:type";
 const char* kTranslatorField = "be:translator";
 
 
-ShowImageWindow::ShowImageWindow(const entry_ref *ref,
+ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	const BMessenger& trackerMessenger)
 	:
 	BWindow(BRect(5, 24, 250, 100), "", B_DOCUMENT_WINDOW, 0),
@@ -143,7 +146,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 	fImageView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED);
 	// wrap a scroll view around the view
-	BScrollView *scrollView = new BScrollView("image_scroller", fImageView,
+	BScrollView* scrollView = new BScrollView("image_scroller", fImageView,
 		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
 	AddChild(scrollView);
 
@@ -154,7 +157,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 	rect.left 	= viewFrame.left + kstatusWidth;
 	rect.right	= viewFrame.right + 1;
 	rect.bottom += 1;
-	BScrollBar *horizontalScrollBar = new BScrollBar(rect, "hscroll",
+	BScrollBar* horizontalScrollBar = new BScrollBar(rect, "hscroll",
 		fImageView, 0, 150, B_HORIZONTAL);
 	AddChild(horizontalScrollBar);
 
@@ -170,7 +173,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 	rect.left	= viewFrame.right + 1;
 	rect.bottom	= viewFrame.bottom + 1;
 	rect.right	+= 1;
-	BScrollBar *verticalScrollBar = new BScrollBar(rect, "vscroll", fImageView,
+	BScrollBar* verticalScrollBar = new BScrollBar(rect, "vscroll", fImageView,
 		0, 150, B_VERTICAL);
 	AddChild(verticalScrollBar);
 
@@ -180,11 +183,14 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 	fImageView->SetImage(ref);
 	fImageView->SetTrackerMessenger(trackerMessenger);
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "LoadAlerts"
+
 	if (InitCheck() != B_OK) {
 		BAlert* alert;
-		alert = new BAlert("ShowImage",
-			"Could not load image! Either the file or an image translator for "
-			"it does not exist.", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
+		alert = new BAlert(TR("ShowImage"),
+			TR("Could not load image! Either the file or an image translator for it does not exist."),
+			TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
 		alert->Go();
 
 		// quit if file could not be opened
@@ -192,8 +198,11 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 		return;
 	}
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Menus"
+
 	// add View menu here so it can access ShowImageView methods
-	BMenu* menu = new BMenu("View");
+	BMenu* menu = new BMenu(TR("View"));
 	_BuildViewMenu(menu, false);
 	fBar->AddItem(menu);
 	_MarkMenuItem(fBar, MSG_DITHER_IMAGE, fImageView->GetDither());
@@ -238,18 +247,21 @@ ShowImageWindow::UpdateTitle()
 
 
 void
-ShowImageWindow::BuildContextMenu(BMenu *menu)
+ShowImageWindow::BuildContextMenu(BMenu* menu)
 {
 	_BuildViewMenu(menu, true);
 }
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Menus"
+
 void
-ShowImageWindow::_BuildViewMenu(BMenu *menu, bool popupMenu)
+ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 {
-	_AddItemMenu(menu, "Slide show", MSG_SLIDE_SHOW, 0, 0, this);
+	_AddItemMenu(menu, TR("Slide show"), MSG_SLIDE_SHOW, 0, 0, this);
 	_MarkMenuItem(menu, MSG_SLIDE_SHOW, fImageView->SlideShowStarted());
-	BMenu* delayMenu = new BMenu("Slide delay");
+	BMenu* delayMenu = new BMenu(TR("Slide delay"));
 	if (fSlideShowDelay == NULL)
 		fSlideShowDelay = delayMenu;
 
@@ -258,38 +270,38 @@ ShowImageWindow::_BuildViewMenu(BMenu *menu, bool popupMenu)
 	//		 if slide show delay is too short! (Especially if loading the image
 	//		 takes as long as or longer than the slide show delay). Should load
 	//		 in background thread!
-	_AddDelayItem(delayMenu, "3 seconds", 3);
-	_AddDelayItem(delayMenu, "4 seconds", 4);
-	_AddDelayItem(delayMenu, "5 seconds", 5);
-	_AddDelayItem(delayMenu, "6 seconds", 6);
-	_AddDelayItem(delayMenu, "7 seconds", 7);
-	_AddDelayItem(delayMenu, "8 seconds", 8);
-	_AddDelayItem(delayMenu, "9 seconds", 9);
-	_AddDelayItem(delayMenu, "10 seconds", 10);
-	_AddDelayItem(delayMenu, "20 seconds", 20);
+	_AddDelayItem(delayMenu, TR("3 seconds"), 3);
+	_AddDelayItem(delayMenu, TR("4 seconds"), 4);
+	_AddDelayItem(delayMenu, TR("5 seconds"), 5);
+	_AddDelayItem(delayMenu, TR("6 seconds"), 6);
+	_AddDelayItem(delayMenu, TR("7 seconds"), 7);
+	_AddDelayItem(delayMenu, TR("8 seconds"), 8);
+	_AddDelayItem(delayMenu, TR("9 seconds"), 9);
+	_AddDelayItem(delayMenu, TR("10 seconds"), 10);
+	_AddDelayItem(delayMenu, TR("20 seconds"), 20);
 	menu->AddItem(delayMenu);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, "Original size", MSG_ORIGINAL_SIZE, '1', 0, this);
-	_AddItemMenu(menu, "Zoom in", MSG_ZOOM_IN, '+', 0, this);
-	_AddItemMenu(menu, "Zoom out", MSG_ZOOM_OUT, '-', 0, this);
+	_AddItemMenu(menu, TR("Original size"), MSG_ORIGINAL_SIZE, '1', 0, this);
+	_AddItemMenu(menu, TR("Zoom in"), MSG_ZOOM_IN, '+', 0, this);
+	_AddItemMenu(menu, TR("Zoom out"), MSG_ZOOM_OUT, '-', 0, this);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, "High-quality zooming", MSG_SCALE_BILINEAR, 0, 0, this);
+	_AddItemMenu(menu, TR("High-quality zooming"), MSG_SCALE_BILINEAR, 0, 0, this);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, "Shrink to window", MSG_SHRINK_TO_WINDOW, 0, 0, this);
-	_AddItemMenu(menu, "Zoom to window", MSG_ZOOM_TO_WINDOW, 0, 0, this);
+	_AddItemMenu(menu, TR("Shrink to window"), MSG_SHRINK_TO_WINDOW, 0, 0, this);
+	_AddItemMenu(menu, TR("Zoom to window"), MSG_ZOOM_TO_WINDOW, 0, 0, this);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, "Full screen", MSG_FULL_SCREEN, B_ENTER, 0, this);
+	_AddItemMenu(menu, TR("Full screen"), MSG_FULL_SCREEN, B_ENTER, 0, this);
 	_MarkMenuItem(menu, MSG_FULL_SCREEN, fFullScreen);
 
-	_AddItemMenu(menu, "Show caption in full screen mode", MSG_SHOW_CAPTION, 0,
+	_AddItemMenu(menu, TR("Show caption in full screen mode"), MSG_SHOW_CAPTION, 0,
 		0, this);
 	_MarkMenuItem(menu, MSG_SHOW_CAPTION, fShowCaption);
 
@@ -309,84 +321,92 @@ ShowImageWindow::_BuildViewMenu(BMenu *menu, bool popupMenu)
 
 	if (popupMenu) {
 		menu->AddSeparatorItem();
-		_AddItemMenu(menu, "Use as background" B_UTF8_ELLIPSIS, MSG_DESKTOP_BACKGROUND, 0, 0,
-			this);
+		_AddItemMenu(menu, TR("Use as background" B_UTF8_ELLIPSIS),
+			MSG_DESKTOP_BACKGROUND, 0, 0, this);
 	}
 }
 
 
 void
-ShowImageWindow::AddMenus(BMenuBar *bar)
+ShowImageWindow::AddMenus(BMenuBar* bar)
 {
-	BMenu *menu = new BMenu("File");
-	fOpenMenu = new RecentDocumentsMenu("Open");
+	BMenu* menu = new BMenu(TR("File"));
+	fOpenMenu = new RecentDocumentsMenu(TR("Open"));
 	menu->AddItem(fOpenMenu);
 	fOpenMenu->Superitem()->SetTrigger('O');
 	fOpenMenu->Superitem()->SetMessage(new BMessage(MSG_FILE_OPEN));
 	fOpenMenu->Superitem()->SetTarget(be_app);
 	fOpenMenu->Superitem()->SetShortcut('O', 0);
 	menu->AddSeparatorItem();
-	BMenu *pmenuSaveAs = new BMenu("Save as" B_UTF8_ELLIPSIS, B_ITEMS_IN_COLUMN);
+	BMenu *pmenuSaveAs = new BMenu(TR("Save as" B_UTF8_ELLIPSIS),
+		B_ITEMS_IN_COLUMN);
 	BTranslationUtils::AddTranslationItems(pmenuSaveAs, B_TRANSLATOR_BITMAP);
 		// Fill Save As submenu with all types that can be converted
 		// to from the Be bitmap image format
 	menu->AddItem(pmenuSaveAs);
-	_AddItemMenu(menu, "Close", B_QUIT_REQUESTED, 'W', 0, this);
+	_AddItemMenu(menu, TR("Close"), B_QUIT_REQUESTED, 'W', 0, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Page setup" B_UTF8_ELLIPSIS, MSG_PAGE_SETUP, 0, 0, this);
-	_AddItemMenu(menu, "Print" B_UTF8_ELLIPSIS, MSG_PREPARE_PRINT, 'P', 0, this);
+	_AddItemMenu(menu, TR("Page setup" B_UTF8_ELLIPSIS),
+		MSG_PAGE_SETUP, 0, 0, this);
+	_AddItemMenu(menu, TR("Print" B_UTF8_ELLIPSIS),
+		MSG_PREPARE_PRINT, 'P', 0, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "About ShowImage" B_UTF8_ELLIPSIS, B_ABOUT_REQUESTED, 0, 0,
-		be_app);
+	_AddItemMenu(menu, TR("About ShowImage" B_UTF8_ELLIPSIS),
+		B_ABOUT_REQUESTED, 0, 0, 	be_app);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Quit", B_QUIT_REQUESTED, 'Q', 0, be_app);
+	_AddItemMenu(menu, TR("Quit"), B_QUIT_REQUESTED, 'Q', 0, be_app);
 	bar->AddItem(menu);
 
-	menu = new BMenu("Edit");
-	_AddItemMenu(menu, "Undo", B_UNDO, 'Z', 0, this, false);
+	menu = new BMenu(TR("Edit"));
+	_AddItemMenu(menu, TR("Undo"), B_UNDO, 'Z', 0, this, false);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Cut", B_CUT, 'X', 0, this, false);
-	_AddItemMenu(menu, "Copy", B_COPY, 'C', 0, this, false);
-	_AddItemMenu(menu, "Paste", B_PASTE, 'V', 0, this, false);
-	_AddItemMenu(menu, "Clear", MSG_CLEAR_SELECT, 0, 0, this, false);
+	_AddItemMenu(menu, TR("Cut"), B_CUT, 'X', 0, this, false);
+	_AddItemMenu(menu, TR("Copy"), B_COPY, 'C', 0, this, false);
+	_AddItemMenu(menu, TR("Paste"), B_PASTE, 'V', 0, this, false);
+	_AddItemMenu(menu, TR("Clear"), MSG_CLEAR_SELECT, 0, 0, this, false);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Select all", MSG_SELECT_ALL, 'A', 0, this);
+	_AddItemMenu(menu, TR("Select all"), MSG_SELECT_ALL, 'A', 0, this);
 	bar->AddItem(menu);
 
-	menu = fBrowseMenu = new BMenu("Browse");
-	_AddItemMenu(menu, "First page", MSG_PAGE_FIRST, B_LEFT_ARROW, B_SHIFT_KEY, this);
-	_AddItemMenu(menu, "Last page", MSG_PAGE_LAST, B_RIGHT_ARROW, B_SHIFT_KEY, this);
-	_AddItemMenu(menu, "Previous page", MSG_PAGE_PREV, B_LEFT_ARROW, 0, this);
-	_AddItemMenu(menu, "Next page", MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, this);
-	fGoToPageMenu = new BMenu("Go to page");
+	menu = fBrowseMenu = new BMenu(TR("Browse"));
+	_AddItemMenu(menu, TR("First page"),
+		MSG_PAGE_FIRST, B_LEFT_ARROW, B_SHIFT_KEY, this);
+	_AddItemMenu(menu, TR("Last page"),
+		MSG_PAGE_LAST, B_RIGHT_ARROW, B_SHIFT_KEY, this);
+	_AddItemMenu(menu, TR("Previous page"), MSG_PAGE_PREV, B_LEFT_ARROW, 0, this);
+	_AddItemMenu(menu, TR("Next page"), MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, this);
+	fGoToPageMenu = new BMenu(TR("Go to page"));
 	fGoToPageMenu->SetRadioMode(true);
 	menu->AddItem(fGoToPageMenu);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Previous file", MSG_FILE_PREV, B_UP_ARROW, 0, this);
-	_AddItemMenu(menu, "Next file", MSG_FILE_NEXT, B_DOWN_ARROW, 0, this);
+	_AddItemMenu(menu, TR("Previous file"), MSG_FILE_PREV, B_UP_ARROW, 0, this);
+	_AddItemMenu(menu, TR("Next file"), MSG_FILE_NEXT, B_DOWN_ARROW, 0, this);
 	bar->AddItem(menu);
 
-	menu = new BMenu("Image");
-	_AddItemMenu(menu, "Rotate clockwise", MSG_ROTATE_90, 'R', 0, this);
-	_AddItemMenu(menu, "Rotate counterclockwise", MSG_ROTATE_270, 'R', B_SHIFT_KEY, this);
+	menu = new BMenu(TR("Image"));
+	_AddItemMenu(menu, TR("Rotate clockwise"), MSG_ROTATE_90, 'R', 0, this);
+	_AddItemMenu(menu, TR("Rotate counterclockwise"),
+		MSG_ROTATE_270, 'R', B_SHIFT_KEY, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Flip left to right", MSG_FLIP_LEFT_TO_RIGHT, 0, 0, this);
-	_AddItemMenu(menu, "Flip top to bottom", MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
+	_AddItemMenu(menu, TR("Flip left to right"),
+		MSG_FLIP_LEFT_TO_RIGHT, 0, 0, this);
+	_AddItemMenu(menu, TR("Flip top to bottom"),
+		MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Invert colors", MSG_INVERT, 0, 0, this);
+	_AddItemMenu(menu, TR("Invert colors"), MSG_INVERT, 0, 0, this);
 	menu->AddSeparatorItem();
-	fResizeItem = _AddItemMenu(menu, "Resize" B_UTF8_ELLIPSIS,
+	fResizeItem = _AddItemMenu(menu, TR("Resize" B_UTF8_ELLIPSIS),
 		MSG_OPEN_RESIZER_WINDOW, 0, 0, this);
 	bar->AddItem(menu);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Use as background" B_UTF8_ELLIPSIS, MSG_DESKTOP_BACKGROUND, 0, 0,
-		this);
+	_AddItemMenu(menu, TR("Use as background" B_UTF8_ELLIPSIS),
+		MSG_DESKTOP_BACKGROUND, 0, 0, this);
 }
 
 
 BMenuItem*
-ShowImageWindow::_AddItemMenu(BMenu *menu, const char *label, uint32 what,
-	const char shortcut, uint32 modifier, const BHandler *target, bool enabled)
+ShowImageWindow::_AddItemMenu(BMenu* menu, const char* label, uint32 what,
+	const char shortcut, uint32 modifier, const BHandler* target, bool enabled)
 {
 	BMenuItem* item = new BMenuItem(label, new BMessage(what), shortcut, modifier);
 	menu->AddItem(item);
@@ -399,7 +419,7 @@ ShowImageWindow::_AddItemMenu(BMenu *menu, const char *label, uint32 what,
 
 
 BMenuItem*
-ShowImageWindow::_AddDelayItem(BMenu *menu, const char *label, float value)
+ShowImageWindow::_AddDelayItem(BMenu* menu, const char* label, float value)
 {
 	BMessage* message = new BMessage(MSG_SLIDE_SHOW_DELAY);
 	message->AddFloat("value", value);
@@ -417,7 +437,7 @@ ShowImageWindow::_AddDelayItem(BMenu *menu, const char *label, float value)
 
 
 void
-ShowImageWindow::WindowRedimension(BBitmap *pbitmap)
+ShowImageWindow::WindowRedimension(BBitmap* pbitmap)
 {
 	BScreen screen;
 	if (!screen.IsValid())
@@ -468,7 +488,7 @@ bool
 ShowImageWindow::_ToggleMenuItem(uint32 what)
 {
 	bool marked = false;
-	BMenuItem *item = fBar->FindItem(what);
+	BMenuItem* item = fBar->FindItem(what);
 	if (item != NULL) {
 		marked = !item->IsMarked();
 		item->SetMarked(marked);
@@ -478,7 +498,7 @@ ShowImageWindow::_ToggleMenuItem(uint32 what)
 
 
 void
-ShowImageWindow::_EnableMenuItem(BMenu *menu, uint32 what, bool enable)
+ShowImageWindow::_EnableMenuItem(BMenu* menu, uint32 what, bool enable)
 {
 	BMenuItem* item = menu->FindItem(what);
 	if (item && item->IsEnabled() != enable)
@@ -487,7 +507,7 @@ ShowImageWindow::_EnableMenuItem(BMenu *menu, uint32 what, bool enable)
 
 
 void
-ShowImageWindow::_MarkMenuItem(BMenu *menu, uint32 what, bool marked)
+ShowImageWindow::_MarkMenuItem(BMenu* menu, uint32 what, bool marked)
 {
 	BMenuItem* item = menu->FindItem(what);
 	if (item && item->IsMarked() != marked)
@@ -530,7 +550,7 @@ ShowImageWindow::_ResizeToWindow(bool shrink, uint32 what)
 
 
 void
-ShowImageWindow::MessageReceived(BMessage *message)
+ShowImageWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_MODIFIED:
@@ -578,7 +598,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 
 				for (int32 i = 1; i <= pages; i++) {
 					// Fill Go To page submenu with an entry for each page
-					BMessage *pgomsg = new BMessage(MSG_GOTO_PAGE);
+					BMessage* pgomsg = new BMessage(MSG_GOTO_PAGE);
 					pgomsg->AddInt32("page", i);
 
 					char shortcut = 0;
@@ -591,7 +611,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 					BString strCaption;
 					strCaption << i;
 
-					BMenuItem *item = new BMenuItem(strCaption.String(), pgomsg,
+					BMenuItem* item = new BMenuItem(strCaption.String(), pgomsg,
 						shortcut);
 					if (curPage == i)
 						item->SetMarked(true);
@@ -786,7 +806,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MSG_SLIDE_SHOW: {
-			BMenuItem *item = fBar->FindItem(message->what);
+			BMenuItem* item = fBar->FindItem(message->what);
 			if (!item)
 				break;
 			if (item->IsMarked()) {
@@ -892,7 +912,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 
 
 void
-ShowImageWindow::_SaveAs(BMessage *message)
+ShowImageWindow::_SaveAs(BMessage* message)
 {
 	// Read the translator and output type the user chose
 	translator_id outTranslator;
@@ -922,14 +942,14 @@ ShowImageWindow::_SaveAs(BMessage *message)
 
 
 void
-ShowImageWindow::_SaveToFile(BMessage *message)
+ShowImageWindow::_SaveToFile(BMessage* message)
 {
 	// Read in where the file should be saved
 	entry_ref dirRef;
 	if (message->FindRef("directory", &dirRef) != B_OK)
 		return;
 
-	const char *filename;
+	const char* filename;
 	if (message->FindString("name", &filename) != B_OK)
 		return;
 
@@ -945,8 +965,8 @@ ShowImageWindow::_SaveToFile(BMessage *message)
 
 	// Find the translator_format information needed to
 	// write a MIME attribute for the image file
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
-	const translation_format *outFormat = NULL;
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+	const translation_format* outFormat = NULL;
 	int32 outCount = 0;
 	if (roster->GetOutputFormats(outTranslator, &outFormat, &outCount) != B_OK
 		|| outCount < 1)
@@ -966,6 +986,25 @@ ShowImageWindow::_SaveToFile(BMessage *message)
 }
 
 
+// This is temporary solution for building BString with printf like format.
+// will be removed in the future.
+static void
+bs_printf(BString* string, const char* format, ...)
+{
+	va_list ap;
+	char* buf;
+
+	va_start(ap, format);
+	vasprintf(&buf, format, ap);
+	string->SetTo(buf);
+	free(buf);
+	va_end(ap);
+}
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "ClosePrompt"
+
 bool
 ShowImageWindow::_ClosePrompt()
 {
@@ -977,14 +1016,19 @@ ShowImageWindow::_ClosePrompt()
 	page = fImageView->CurrentPage();
 	BString prompt, name;
 	fImageView->GetName(&name);
-	prompt << "The document '" << name << "'";
-	if (count > 1)
-		prompt << " (page " << page << ")";
 
-	prompt << " has been changed. "
-		   << "Do you want to close the document?";
-	BAlert *pAlert = new BAlert("Close document", prompt.String(),
-		"Cancel", "Close");
+	if (count > 1) {
+		bs_printf(&prompt,
+			TR("The document '%s' (page %d) has been changed. Do you want to close the document?"),
+			name.String(), page);
+	} else {
+		bs_printf(&prompt,
+			TR("The document '%s' has been changed. Do you want to close the document?"),
+			name.String());
+	}
+	
+	BAlert* pAlert = new BAlert(TR("Close document"), prompt.String(),
+		TR("Cancel"), TR("Close"));
 	if (pAlert->Go() == 0) {
 		// Cancel
 		return false;
@@ -1104,15 +1148,15 @@ ShowImageWindow::_PrepareForPrint()
 	}
 
 	fPrintOptions.SetBounds(fImageView->GetBitmap()->Bounds());
-	fPrintOptions.SetWidth(fImageView->GetBitmap()->Bounds().Width()+1);
+	fPrintOptions.SetWidth(fImageView->GetBitmap()->Bounds().Width() + 1);
 
-	new PrintOptionsWindow(BPoint(Frame().left+30, Frame().top+50),
+	new PrintOptionsWindow(BPoint(Frame().left + 30, Frame().top + 50),
 		&fPrintOptions, this);
 }
 
 
 void
-ShowImageWindow::_Print(BMessage *msg)
+ShowImageWindow::_Print(BMessage* msg)
 {
 	status_t st;
 	if (msg->FindInt32("status", &st) != B_OK || st != B_OK)

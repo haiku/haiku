@@ -15,7 +15,6 @@
 
 
 #include <Messenger.h>
-#include <View.h>
 #include <Window.h>
 
 class BCheckBox;
@@ -50,10 +49,6 @@ class ResizerWindow : public BWindow {
 			kApplyMsg,
 		};
 
-		void			AddControl(BView* parent, BControl* control,
-							float column2, BRect& rect);
-		void			AddSeparatorLine(BView* parent, BRect& rect);
-		void			LeftAlign(BControl* control);
 
 		BTextControl*	fWidth;
 		BTextControl*	fHeight;
