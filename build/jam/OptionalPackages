@@ -222,7 +222,13 @@ if [ IsOptionalHaikuImagePackageAdded BeZillaBrowser ] {
  			:
  		;
  		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
+			: /boot/apps/BeZillaBrowser/BeZillaBrowser
+		;
+		if $(HAIKU_INCLUDE_SOURCES) = 1 {
+			InstallSourceArchive BeZillaBrowser-2010-01-21-src.7z
+				: http://www.haiku-files.org/files/sources/2010/BeZillaBrowser-2010-01-21-src.7z
+			;
+		}
 	} else {
 		InstallOptionalHaikuImagePackage
 			BeZillaBrowser-2.0.0.22pre-x86-gcc2-2010-03-14.zip
@@ -230,7 +236,13 @@ if [ IsOptionalHaikuImagePackageAdded BeZillaBrowser ] {
  			:
  		;
  		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
+			: /boot/apps/BeZillaBrowser/BeZillaBrowser
+		;
+		if $(HAIKU_INCLUDE_SOURCES) = 1 {
+			InstallSourceArchive BeZillaBrowser-2010-01-21-src.7z
+				: http://www.haiku-files.org/files/sources/2010/BeZillaBrowser-2010-01-21-src.7z
+			;
+		}
 	}
 }
 
@@ -760,6 +772,11 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/netsurf/NetSurf ;
+		if $(HAIKU_INCLUDE_SOURCES) = 1 {
+			InstallSourceArchive netsurf-r9862.7z
+				: http://www.haiku-files.org/files/sources/2010/netsurf-r9862.7z
+			;
+		}
 	}
 }
 
