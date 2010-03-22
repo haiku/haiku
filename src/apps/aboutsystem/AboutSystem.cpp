@@ -1068,9 +1068,11 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert("\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
-		"The JPBE.net user group\n"
-		"Takashi Murai\n"
+		"Hironoru Ichimiya\n"
 		"Jorge G. Mare (Koki)\n"
+		"Takashi Murai\n"
+		"SHINTA\n"
+		"The JPBE.net user group\n"
 	);
 
 	be_locale_roster->GetLanguage(&lang, "lt");
