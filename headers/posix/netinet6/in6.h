@@ -36,6 +36,12 @@ extern const struct in6_addr in6addr_any;
 extern const struct in6_addr in6addr_loopback;
 
 
+struct ipv6_mreq {
+	struct in6_addr ipv6mr_multiaddr;
+	unsigned	ipv6mr_interface;
+};
+
+
 /* Non-standard helper defines (same as in FreeBSD, though) */
 #define __IPV6_ADDR_SCOPE_NODELOCAL			0x01
 #define __IPV6_ADDR_SCOPE_INTFACELOCAL		0x01

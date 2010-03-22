@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NETINET_IN_H_
@@ -139,9 +139,15 @@ struct group_source_req {
 #define MCAST_JOIN_SOURCE_GROUP		22	/* group_source_req */
 #define MCAST_LEAVE_SOURCE_GROUP	23	/* group_source_req */
 
+/* IPPROTO_IPV6 options */
 #define IPV6_MULTICAST_IF			24	/* int */
 #define IPV6_MULTICAST_HOPS			25	/* int */
 #define IPV6_MULTICAST_LOOP			26	/* int */
+
+#define IPV6_UNICAST_HOPS			27	/* int */
+#define IPV6_JOIN_GROUP				28	/* struct ipv6_mreq */
+#define IPV6_LEAVE_GROUP			29	/* struct ipv6_mreq */
+#define IPV6_V6ONLY					30	/* int */
 
 #define INADDR_ANY					((in_addr_t)0x00000000)
 #define INADDR_LOOPBACK				((in_addr_t)0x7f000001)
