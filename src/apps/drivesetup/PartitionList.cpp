@@ -227,8 +227,8 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 	}
 
 	char size[1024];
-	SetField(new BStringField(string_for_size(partition->Size(), size)),
-		kSizeColumn);
+	SetField(new BStringField(string_for_size(partition->Size(), size,
+		sizeof(size))), kSizeColumn);
 }
 
 
@@ -250,7 +250,8 @@ PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 	SetField(new BStringField(kUnavailableString), kMountedAtColumn);
 
 	char sizeString[1024];
-	SetField(new BStringField(string_for_size(size, sizeString)), kSizeColumn);
+	SetField(new BStringField(string_for_size(size, sizeString,
+		sizeof(sizeString))), kSizeColumn);
 }
 
 

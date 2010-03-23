@@ -21,42 +21,15 @@
 #define TR_CONTEXT "Support"
 
 
-const char*
-string_for_size(off_t size, char *string)
-{
-	double kb = size / 1024.0;
-	if (kb < 1.0) {
-		sprintf(string, TR("%Ld B"), size);
-		return string;
-	}
-	float mb = kb / 1024.0;
-	if (mb < 1.0) {
-		sprintf(string, TR("%3.1f KB"), kb);
-		return string;
-	}
-	float gb = mb / 1024.0;
-	if (gb < 1.0) {
-		sprintf(string, TR("%3.1f MB"), mb);
-		return string;
-	}
-	float tb = gb / 1024.0;
-	if (tb < 1.0) {
-		sprintf(string, TR("%3.1f GB"), gb);
-		return string;
-	}
-	sprintf(string, TR("%.1f TB"), tb);
-	return string;
-}
-
-
 void
 dump_partition_info(const BPartition* partition)
 {
 	char size[1024];
 	printf("\tOffset(): %Ld\n", partition->Offset());
-	printf("\tSize(): %s\n", string_for_size(partition->Size(),size));
+	printf("\tSize(): %s\n", string_for_size(partition->Size(), size,
+		sizeof(size)));
 	printf("\tContentSize(): %s\n", string_for_size(partition->ContentSize(),
-		size));
+		size, sizeof(size)));
 	printf("\tBlockSize(): %ld\n", partition->BlockSize());
 	printf("\tIndex(): %ld\n", partition->Index());
 	printf("\tStatus(): %ld\n\n", partition->Status());
@@ -145,7 +118,9 @@ SizeSlider::~SizeSlider()
 const char*
 SizeSlider::UpdateText() const
 {
-	snprintf(fStatusLabel, sizeof(fStatusLabel), TR("%ld MB"),
+	// TODO: Perhaps replace with string_for_size, but it looks like
+	// Value() and fStartOffset are always in MiB.
+	snprintf(fStatusLabel, sizeof(fStatusLabel), TR("%ld MiB"),
 		Value() - fStartOffset);
 
 	return fStatusLabel;

@@ -11,12 +11,11 @@
 #include <HashString.h>
 #include <Slider.h>
 #include <String.h>
+#include "StringForSize.h"
 
 
 class BPartition;
 
-
-const char* string_for_size(off_t size, char *string);
 
 void dump_partition_info(const BPartition* partition);
 

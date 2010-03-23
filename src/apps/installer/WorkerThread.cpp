@@ -29,6 +29,7 @@
 #include "PackageViews.h"
 #include "PartitionMenuItem.h"
 #include "ProgressReporter.h"
+#include "StringForSize.h"
 #include "UnzipEngine.h"
 
 
@@ -47,9 +48,6 @@
 #endif
 
 const char BOOT_PATH[] = "/boot";
-
-extern void SizeAsString(off_t size, char* string);
-
 
 const uint32 MSG_START_INSTALLING = 'eSRT';
 
@@ -519,7 +517,7 @@ make_partition_label(BPartition* partition, char* label, char* menuLabel,
 	bool showContentType)
 {
 	char size[15];
-	SizeAsString(partition->Size(), size);
+	string_for_size(partition->Size(), size, sizeof(size));
 
 	BPath path;
 	partition->GetPath(&path);

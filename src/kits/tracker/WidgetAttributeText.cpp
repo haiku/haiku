@@ -222,17 +222,17 @@ TruncFileSizeBase(BString *result, int64 value, const View *view, float width)
 		const char *suffix;
 		float floatValue;
 		if (value >= kTBSize) {
-			suffix = "TB";
+			suffix = "TiB";
 			floatValue = (float)value / kTBSize;
 		} else if (value >= kGBSize) {
-			suffix = "GB";
+			suffix = "GiB";
 			floatValue = (float)value / kGBSize;
 		} else if (value >= kMBSize) {
-			suffix = "MB";
+			suffix = "MiB";
 			floatValue = (float)value / kMBSize;
 		} else {
 			ASSERT(value >= kKBSize);
-			suffix = "KB";
+			suffix = "KiB";
 			floatValue = (float)value / kKBSize;
 		}
 

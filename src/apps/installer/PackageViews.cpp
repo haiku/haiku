@@ -20,38 +20,13 @@
 #include <View.h>
 
 #include "InstallerWindow.h"
+#include "StringForSize.h"
 
 
 #undef TR_CONTEXT
 #define TR_CONTEXT "PackagesView"
 
 #define ICON_ATTRIBUTE "INSTALLER PACKAGE: ICON"
-
-void
-SizeAsString(off_t size, char *string)
-{
-	double kb = size / 1024.0;
-	if (kb < 1.0) {
-		sprintf(string, TR("%Ld B"), size);
-		return;
-	}
-	float mb = kb / 1024.0;
-	if (mb < 1.0) {
-		sprintf(string, TR("%3.1f KB"), kb);
-		return;
-	}
-	float gb = mb / 1024.0;
-	if (gb < 1.0) {
-		sprintf(string, TR("%3.1f MB"), mb);
-		return;
-	}
-	float tb = gb / 1024.0;
-	if (tb < 1.0) {
-		sprintf(string, TR("%3.1f GB"), gb);
-		return;
-	}
-	sprintf(string, TR("%.1f TB"), tb);
-}
 
 
 Package::Package(const char *folder)
@@ -131,9 +106,9 @@ err:
 
 
 void
-Package::GetSizeAsString(char *string)
+Package::GetSizeAsString(char* string, size_t stringSize)
 {
-	SizeAsString(fSize, string);
+	string_for_size(fSize, string, stringSize);
 }
 
 
@@ -166,7 +141,7 @@ PackageCheckBox::Draw(BRect update)
 {
 	BCheckBox::Draw(update);
 	char string[15];
-	fPackage->GetSizeAsString(string);
+	fPackage->GetSizeAsString(string, sizeof(string));
 	float width = StringWidth(string);
 	DrawString(string, BPoint(Bounds().right - width - 8, 11));
 
@@ -281,7 +256,7 @@ PackagesView::AddPackages(BList& packages, BMessage* msg)
 
 
 void
-PackagesView::GetTotalSizeAsString(char* string)
+PackagesView::GetTotalSizeAsString(char* string, size_t stringSize)
 {
 	int32 count = CountChildren();
 	int32 size = 0;
@@ -290,7 +265,7 @@ PackagesView::GetTotalSizeAsString(char* string)
 		if (cb && cb->Value())
 			size += cb->GetPackage()->Size();
 	}
-	SizeAsString(size, string);
+	string_for_size(size, string, stringSize);
 }
 
 

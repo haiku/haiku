@@ -191,7 +191,7 @@ InstallerWindow::InstallerWindow()
 		fPackagesView, B_WILL_DRAW, false, true);
 
 	const char* requiredDiskSpaceString
-		= TR("Additional disk space required: 0.0 KB");
+		= TR("Additional disk space required: 0.0 KiB");
 	fSizeView = new BStringView("size_view", requiredDiskSpaceString);
 	fSizeView->SetAlignment(B_ALIGN_RIGHT);
 	fSizeView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
@@ -378,9 +378,10 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case PACKAGE_CHECKBOX:
 		{
 			char buffer[15];
-			fPackagesView->GetTotalSizeAsString(buffer);
-			char string[255];
-			sprintf(string, TR("Additional disk space required: %s"), buffer);
+			fPackagesView->GetTotalSizeAsString(buffer, sizeof(buffer));
+			char string[256];
+			snprintf(string, sizeof(string),
+				TR("Additional disk space required: %s"), buffer);
 			fSizeView->SetText(string);
 			break;
 		}

@@ -55,7 +55,8 @@ public:
 									{ return fDescription; }
 			const int32			Size() const
 									{ return fSize; }
-			void				GetSizeAsString(char* string);
+			void				GetSizeAsString(char* string,
+									size_t stringSize);
 			const BBitmap*		Icon() const
 									{ return fIcon; }
 			bool				OnByDefault() const
@@ -110,7 +111,8 @@ public:
 
 			void				Clean();
 			void				AddPackages(BList& list, BMessage* message);
-			void				GetTotalSizeAsString(char* string);
+			void				GetTotalSizeAsString(char* string,
+									size_t stringSize);
 			void				GetPackagesToInstall(BList* list, int32* size);
 
 	virtual	void				FrameResized(float width, float height);

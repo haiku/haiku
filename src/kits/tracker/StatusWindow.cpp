@@ -51,6 +51,7 @@ All rights reserved.
 #include "Bitmaps.h"
 #include "Commands.h"
 #include "StatusWindow.h"
+#include "StringForSize.h"
 #include "DeskWindow.h"
 
 
@@ -178,7 +179,7 @@ public:
 };
 
 
-// #pragma mark -
+// #pragma mark - BStatusWindow
 
 
 BStatusWindow::BStatusWindow()
@@ -610,34 +611,6 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 }
 
 
-static const char*
-string_for_size(double size, char *string)
-{
-	double kb = size / 1024.0;
-	if (kb < 1.0) {
-		sprintf(string, "%d B", (int)size);
-		return string;
-	}
-	float mb = kb / 1024.0;
-	if (mb < 1.0) {
-		sprintf(string, "%3.1f KB", kb);
-		return string;
-	}
-	float gb = mb / 1024.0;
-	if (gb < 1.0) {
-		sprintf(string, "%3.1f MB", mb);
-		return string;
-	}
-	float tb = gb / 1024.0;
-	if (tb < 1.0) {
-		sprintf(string, "%3.1f GB", gb);
-		return string;
-	}
-	sprintf(string, "%.1f TB", tb);
-	return string;
-}
-
-
 void
 BStatusView::Draw(BRect updateRect)
 {
@@ -700,18 +673,22 @@ BStatusView::Draw(BRect updateRect)
 			if (fBytesPerSecond != 0.0) {
 				char sizeBuffer[128];
 				buffer = "(";
-				buffer << string_for_size((double)fSizeProcessed, sizeBuffer);
+				buffer << string_for_size((double)fSizeProcessed, sizeBuffer,
+					sizeof(sizeBuffer));
 				buffer << " of ";
-				buffer << string_for_size((double)fTotalSize, sizeBuffer);
+				buffer << string_for_size((double)fTotalSize, sizeBuffer,
+					sizeof(sizeBuffer));
 				buffer << ", ";
-				buffer << string_for_size(fBytesPerSecond, sizeBuffer);
+				buffer << string_for_size(fBytesPerSecond, sizeBuffer,
+					sizeof(sizeBuffer));
 				buffer << "/s)";
 				tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
 				if (tp.x > rightDivider)
 					DrawString(buffer.String(), tp);
 				else {
 					// complete string too wide, try with shorter version
-					buffer << string_for_size(fBytesPerSecond, sizeBuffer);
+					buffer << string_for_size(fBytesPerSecond, sizeBuffer,
+						sizeof(sizeBuffer));
 					buffer << "/s";
 					tp.x = fStatusBar->Frame().right
 						- StringWidth(buffer.String());

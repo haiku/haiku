@@ -675,11 +675,11 @@ BInfoWindow::GetSizeString(BString &result, off_t size, int32 fileCount)
 		bytes = numStr;
 
 	if (size >= kGBSize)
-		PrintFloat(result, (float)size / kGBSize) << " GB";
+		PrintFloat(result, (float)size / kGBSize) << " GiB";
 	else if (size >= kMBSize)
-		PrintFloat(result, (float)size / kMBSize) << " MB";
+		PrintFloat(result, (float)size / kMBSize) << " MiB";
 	else if (size >= kKBSize)
-		result << (int64)(size + kHalfKBSize) / kKBSize << "K";
+		result << (int64)(size + kHalfKBSize) / kKBSize << "KiB";
 	else
 		result << size;
 
