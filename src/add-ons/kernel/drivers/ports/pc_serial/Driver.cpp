@@ -57,7 +57,7 @@ static const uint32 sDefaultRates[] = {
 #if 0
 static const uint32 sBeBoxRates[] = {
 		0,		//B0
-		//...
+		//... TODO
 };
 #endif
 
@@ -381,13 +381,13 @@ scan_bus(bus_type bus)
 			if (irqdesc.d.m.mask & (1 << irq))
 				break;
 		}
-		TRACE_ALWAYS("irq %d\n", irq);
+		//TRACE_ALWAYS("irq %d\n", irq);
 		//TRACE_ALWAYS("irq: %lx,%lx,%lx\n", irqdesc.d.m.mask, irqdesc.d.m.flags, irqdesc.d.m.cookie);
 
 		TRACE_ALWAYS("found %s device %Ld [%x|%x|%x] "
-			/*"ID: '%16.16s'"*/" flags: %08lx status: %s\n",
+			/*"ID: '%16.16s'"*/" irq: %d flags: %08lx status: %s\n",
 			bus_name, cookie, dinfo.devtype.base, dinfo.devtype.subtype,
-			dinfo.devtype.interface, /*dinfo.id,*/ dinfo.flags,
+			dinfo.devtype.interface, /*dinfo.id,*/ irq, dinfo.flags,
 			strerror(dinfo.config_status));
 
 		// force enable I/O ports on PCI devices
@@ -466,9 +466,11 @@ scan_pci_alt()
 		// sanity check
 		if (info.header_type & PCI_header_type_mask != PCI_header_type_generic)
 			continue;
+		/*
 		TRACE_ALWAYS("probing PCI device %2d [%x|%x|%x] %04x:%04x\n",
 			ix, info.class_base, info.class_sub, info.class_api,
 			info.vendor_id, info.device_id);
+		*/
 
 		const struct serial_support_descriptor *supported = NULL;
 		for (int i = 0; sSupportedDevices[i].name; i++) {

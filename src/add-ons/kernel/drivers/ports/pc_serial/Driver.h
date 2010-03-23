@@ -123,7 +123,12 @@ typedef struct pc_serial_line_coding_s {
 #define CLS_LINE_DTR			0x0001
 #define CLS_LINE_RTS			0x0002
 
+
+
 #ifndef __HAIKU__
+
+// All this mess is due to BeOS R5 and BONE having
+// an incompatible module API for the same version
 
 typedef bool (*beos_tty_service_func)(struct tty *tty, struct ddrover *rover, uint op);
 

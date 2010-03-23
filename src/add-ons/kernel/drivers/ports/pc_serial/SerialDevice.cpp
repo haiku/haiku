@@ -221,7 +221,7 @@ SerialDevice::Service(struct tty *ptty, struct ddrover *ddr, uint flags)
 	if (&fTTY != ptty)
 		return false;
 
-	TRACE_ALWAYS("%s(,,0x%08lx)\n", __FUNCTION__, flags);
+	TRACE("%s(,,0x%08lx)\n", __FUNCTION__, flags);
 
 	if (flags <= TTYGETSIGNALS) {
 		switch (flags) {
@@ -230,7 +230,7 @@ SerialDevice::Service(struct tty *ptty, struct ddrover *ddr, uint flags)
 				
 				SetModes();
 				err = install_io_interrupt_handler(IRQ(), pc_serial_interrupt, this, 0);
-				TRACE_ALWAYS("installing irq handler for %d: %s\n", IRQ(), strerror(err));
+				TRACE("installing irq handler for %d: %s\n", IRQ(), strerror(err));
 				msr = ReadReg8(MSR);
 				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, msr & MSR_DCD);
 				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, msr & MSR_CTS);
@@ -390,7 +390,7 @@ SerialDevice::InterruptHandler()
 
 	gTTYModule->ttyilock(&fTTY, &fRover, false);
 	gTTYModule->ddrdone(&fRover);
-	dprintf("IRQ:r\n");
+	TRACE_FUNCRET("< IRQ:%d\n", ret);
 	return ret;
 }
 
