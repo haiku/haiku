@@ -8,6 +8,7 @@
  *		Axel Dörfler
  *		Hugo Santos
  *		Philippe Saint-Pierre
+ *		Vegard Wærp
  */
 
 
@@ -172,12 +173,17 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 6);
 	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 6);
 
+	fDomainTextControl = new BTextControl(TR("Domain:"), "", NULL);
+	SetupTextControl(fDomainTextControl);
+	layout->AddItem(fDomainTextControl->CreateLabelLayoutItem(), 0, 7);
+	layout->AddItem(fDomainTextControl->CreateTextViewLayoutItem(), 1, 7);
+
 	fErrorMessage = new BStringView("error", "");
 	fErrorMessage->SetAlignment(B_ALIGN_LEFT);
 	fErrorMessage->SetFont(be_bold_font);
 	fErrorMessage->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	layout->AddView(fErrorMessage, 1, 7);
+	layout->AddView(fErrorMessage, 1, 8);
 
 	// button group (TODO: move to window, but take care of
 	// enabling/disabling)
@@ -268,6 +274,7 @@ EthernetSettingsView::AttachedToWindow()
 	fGatewayTextControl->SetTarget(this);
 	fPrimaryDNSTextControl->SetTarget(this);
 	fSecondaryDNSTextControl->SetTarget(this);
+	fDomainTextControl->SetTarget(this);
 	fDeviceMenuField->Menu()->SetTargetForItems(this);
 	fTypeMenuField->Menu()->SetTargetForItems(this);
 
@@ -293,6 +300,7 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 	fNetMaskTextControl->SetText("");
 	fPrimaryDNSTextControl->SetText("");
 	fSecondaryDNSTextControl->SetText("");
+	fDomainTextControl->SetText("");
 
 	bool enableControls = false;
 	fTypeMenuField->SetEnabled(settings != NULL);
@@ -325,6 +333,7 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 			fPrimaryDNSTextControl->SetText(
 				settings->NameServers().ItemAt(0)->String());
 		}
+		fDomainTextControl->SetText(settings->Domain());
 	}
 
 	_EnableTextControls(enableControls);
@@ -339,6 +348,7 @@ EthernetSettingsView::_EnableTextControls(bool enable)
 	fNetMaskTextControl->SetEnabled(enable);
 	fPrimaryDNSTextControl->SetEnabled(enable);
 	fSecondaryDNSTextControl->SetEnabled(enable);
+	fDomainTextControl->SetEnabled(enable);
 }
 
 
@@ -360,6 +370,7 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 		fPrimaryDNSTextControl->Text()));
 	fCurrentSettings->NameServers().AddItem(new BString(
 		fSecondaryDNSTextControl->Text()));
+	fCurrentSettings->SetDomain(fDomainTextControl->Text());
 
 	fApplyButton->SetEnabled(false);
 	fRevertButton->SetEnabled(true);
@@ -403,6 +414,11 @@ EthernetSettingsView::_SaveDNSConfiguration()
 					<< settings->NameServers().ItemAt(j)->String()
 					<< "\n";
 			}
+		}
+		if (strlen(settings->Domain()) > 0) {
+			content << "domain\t"
+				<< settings->Domain()
+				<< "\n";
 		}
 	}
 

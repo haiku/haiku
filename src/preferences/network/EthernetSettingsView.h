@@ -6,6 +6,7 @@
  *		Andre Alves Garzia, andre@andregarzia.com
  *		Axel Dörfler
  *		Hugo Santos
+ *		Vegard Wærp
  */
 #ifndef ETHERNET_SETTINGS_VIEW_H
 #define ETHERNET_SETTINGS_VIEW_H
@@ -65,6 +66,7 @@ private:
 
 				BTextControl*	fPrimaryDNSTextControl;
 				BTextControl*	fSecondaryDNSTextControl;
+				BTextControl*	fDomainTextControl;
 
 				BStringView*	fErrorMessage;
 

@@ -5,6 +5,7 @@
  * Authors:
  *		Andre Alves Garzia, andre@andregarzia.com
  *		Axel Dörfler, axeld@pinc-software.de.
+ *		Vegard Wærp, vegarwa@online.no
  */
 
 
@@ -159,5 +160,6 @@ Settings::ReadConfiguration()
 			fNameServers.AddItem(
 				new BString(inet_ntoa(state->nsaddr_list[i].sin_addr)));
 		}
+		fDomain = state->dnsrch[0];
 	}
 }

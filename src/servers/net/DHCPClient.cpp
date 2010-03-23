@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Vegard Wærp, vegarwa@online.no
  */
 
 
@@ -681,6 +682,18 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				memcpy(name, data, size);
 				name[size] = '\0';
 				syslog(LOG_INFO, "DHCP domain name: \"%s\"\n", name);
+
+				BPath path;
+				if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK)
+					break;
+	
+				path.Append("network/resolv.conf");
+
+				FILE* file = fopen(path.Path(), "a");
+				if (file != NULL) {
+					fprintf(file, "domain %s\n", name);
+					fclose(file);
+				}
 				break;
 			}
 

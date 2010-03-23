@@ -2,8 +2,9 @@
  * Copyright 2004-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Author:
+ * Authors:
  *		Andre Alves Garzia, andre@andregarzia.com
+ *		Vegard Wærp, vegarwa@online.no
  */
 #ifndef SETTINGS_H
 #define SETTINGS_H
@@ -21,6 +22,7 @@ public:
 			void				SetIP(BString ip) { fIP = ip; }
 			void				SetGateway(BString ip) { fGateway = ip; }
 			void				SetNetmask(BString ip) { fNetmask = ip; }
+			void				SetDomain(BString domain) { fDomain = domain; }
 			void				SetAutoConfigure(bool autoConfigure)
 									{ fAuto = autoConfigure; }
 
@@ -28,6 +30,7 @@ public:
 			const char*			Gateway()  { return fGateway.String(); }
 			const char*			Netmask()  { return fNetmask.String(); }
 			const char*			Name()  { return fName.String(); }
+			const char*			Domain() { return fDomain.String(); }
 			bool				AutoConfigure() { return fAuto; }
 
 			BObjectList<BString>& NameServers() { return fNameServers; }
@@ -41,6 +44,7 @@ private:
 			BString				fGateway;
 			BString				fNetmask;
 			BString				fName;
+			BString				fDomain;
 			int					fSocket;
 			bool				fAuto;
 			BObjectList<BString> fNameServers;
