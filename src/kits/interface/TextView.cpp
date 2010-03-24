@@ -676,14 +676,10 @@ BTextView::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 	if (_PerformMouseMoved(where, code))
 		return;
 
-	bool sync = false;
 	switch (code) {
-		// We force a sync when the mouse enters the view
 		case B_ENTERED_VIEW:
-			sync = true;
-			// supposed to fall through
 		case B_INSIDE_VIEW:
-			_TrackMouse(where, message, sync);
+			_TrackMouse(where, message, true);
 			break;
 
 		case B_EXITED_VIEW:
