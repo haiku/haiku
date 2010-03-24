@@ -73,14 +73,21 @@ BBufferIO::ReadAt(off_t pos, void* buffer, size_t size)
 		|| pos < fBufferStart
 		|| pos > fBufferStart + fBufferUsed
 		|| pos + size > fBufferStart + fBufferUsed) {
-		if (fBufferIsDirty)
-			Flush(); // If there are pending writes, do them.
+		if (fBufferIsDirty) {
+			// If there are pending writes, do them.
+			Flush();
+		}
 
 		// ...cache as much as we can from the stream
-		fBufferUsed = fStream->ReadAt(pos, fBuffer, fBufferSize);
+		ssize_t sizeRead = fStream->ReadAt(pos, fBuffer, fBufferSize);
+		if (sizeRead < 0)
+			return sizeRead;
 
-		if (fBufferUsed > 0)
-			fBufferStart = pos; // The data is buffered starting from this offset
+		fBufferUsed = sizeRead;
+		if (fBufferUsed > 0) {
+			// The data is buffered starting from this offset
+			fBufferStart = pos;
+		}
 	}
 
 	size = min_c(size, fBufferUsed);
@@ -117,7 +124,8 @@ BBufferIO::WriteAt(off_t pos, const void* buffer, size_t size)
 		ssize_t read;
 		off_t where = pos;
 
-		if (pos + size <= fBufferSize) // Can we just cache from the beginning ?
+		// Can we just cache from the beginning?
+		if (pos + size <= fBufferSize)
 			where = 0;
 
 		// ...cache more.
