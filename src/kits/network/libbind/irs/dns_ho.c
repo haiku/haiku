@@ -578,6 +578,7 @@ ho_addrinfo(struct irs_ho *this, const char *name, const struct addrinfo *pai)
 
 	switch (pai->ai_family) {
 	case AF_UNSPEC:
+#if 0
 		/* prefer IPv6 */
 		q->qclass = C_IN;
 		q->qtype = T_AAAA;
@@ -591,6 +592,7 @@ ho_addrinfo(struct irs_ho *this, const char *name, const struct addrinfo *pai)
 		q2->anslen = sizeof(q2->qbuf);
 		q2->action = RESTGT_DOALWAYS;
 		break;
+#endif
 	case AF_INET:
 		q->qclass = C_IN;
 		q->qtype = T_A;
