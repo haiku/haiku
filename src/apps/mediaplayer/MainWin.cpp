@@ -1205,9 +1205,6 @@ MainWin::_SetupWindow()
 //	printf("MainWin::_SetupWindow\n");
 	// Populate the track menus
 	_SetupTrackMenus(fAudioTrackMenu, fVideoTrackMenu);
-	// Enable both if a file was loaded
-	fAudioTrackMenu->SetEnabled(fHasFile);
-	fVideoTrackMenu->SetEnabled(fHasFile);
 
 	fVideoMenu->SetEnabled(fHasVideo);
 	fAudioMenu->SetEnabled(fHasAudio);
@@ -1422,6 +1419,7 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu)
 		audioTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
 		audioTrackMenu->ItemAt(0)->SetMarked(true);
 	}
+	audioTrackMenu->SetEnabled(count > 1);
 
 
 	count = fController->VideoTrackCount();
@@ -1437,6 +1435,7 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu)
 		videoTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
 		videoTrackMenu->ItemAt(0)->SetMarked(true);
 	}
+	videoTrackMenu->SetEnabled(count > 1);
 }
 
 
