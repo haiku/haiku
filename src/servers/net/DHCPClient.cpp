@@ -336,7 +336,8 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	: AutoconfigClient("dhcp", target, device),
 	fConfiguration(kMsgConfigureInterface),
 	fRunner(NULL),
-	fLeaseTime(0)
+	fLeaseTime(0),
+	fRewriteResolvConf(true)
 {
 	fStartTime = system_time();
 	fTransactionID = (uint32)fStartTime;
@@ -462,6 +463,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 		// no need to check the status; in case of an error we'll just send
 		// the message again
 
+	fRewriteResolvConf = true;
 	// receive loop until we've got an offer and acknowledged it
 
 	while (state != ACKNOWLEDGED) {
@@ -614,15 +616,10 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 	message_option option;
 	const uint8* data;
 	size_t size;
-	// TODO: We write the resolv.conf file once per _ParseOptions() invokation.
-	// The invokation happens twice, once for DHCP_OFFER and once for DHCP_ACK.
-	// If the options in each of these invokations complement each other,
-	// specifically for OPTION_DOMAIN_NAME_SERVER and OPTION_DOMAIN_NAME, then
-	// we would lose the information from the previous invokation by
-	// overwriting the file. A good fix would be to parse resolv.conf, maintain
-	// all information and distinguish between user entered and auto-generated
-	// parts of the file.
-	bool resolvConfCreated = false;
+	// TODO: resolv.conf should be parsed, all information should be
+	// maintained and it should be distinguished between user entered
+	// and auto-generated parts of the file, with this method only re-writing
+	// the auto-generated parts of course.
 	while (message.NextOption(cookie, option, data, size)) {
 		// iterate through all options
 		switch (option) {
@@ -643,13 +640,13 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 					break;
 				}
 
-				const char* openMode = resolvConfCreated ? "a" : "w";
+				const char* openMode = fRewriteResolvConf ? "w" : "a";
 				FILE* file = fopen(path.Path(), openMode);
 				for (uint32 i = 0; i < size / 4; i++) {
 					syslog(LOG_INFO, "DNS: %s\n",
 						_ToString(&data[i * 4]).String());
 					if (file != NULL) {
-						resolvConfCreated = true;
+						fRewriteResolvConf = false;
 						fprintf(file, "nameserver %s\n",
 							_ToString(&data[i * 4]).String());
 					}
@@ -693,10 +690,10 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 					break;
 				}
 
-				const char* openMode = resolvConfCreated ? "a" : "w";
+				const char* openMode = fRewriteResolvConf ? "w" : "a";
 				FILE* file = fopen(path.Path(), openMode);
 				if (file != NULL) {
-					resolvConfCreated = true;
+					fRewriteResolvConf = false;
 					fprintf(file, "domain %.*s\n", (int)size,
 						(const char*)data);
 					fclose(file);

@@ -65,6 +65,7 @@ private:
 			bigtime_t			fRebindingTime;
 			bigtime_t			fLeaseTime;
 			status_t			fStatus;
+			bool				fRewriteResolvConf;
 };
 
 #endif	// DHCP_CLIENT_H
