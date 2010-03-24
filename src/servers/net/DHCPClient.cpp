@@ -614,6 +614,15 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 	message_option option;
 	const uint8* data;
 	size_t size;
+	// TODO: We write the resolv.conf file once per _ParseOptions() invokation.
+	// The invokation happens twice, once for DHCP_OFFER and once for DHCP_ACK.
+	// If the options in each of these invokations complement each other,
+	// specifically for OPTION_DOMAIN_NAME_SERVER and OPTION_DOMAIN_NAME, then
+	// we would lose the information from the previous invokation by
+	// overwriting the file. A good fix would be to parse resolv.conf, maintain
+	// all information and distinguish between user entered and auto-generated
+	// parts of the file.
+	bool resolvConfCreated = false;
 	while (message.NextOption(cookie, option, data, size)) {
 		// iterate through all options
 		switch (option) {
@@ -628,18 +637,19 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				break;
 			case OPTION_DOMAIN_NAME_SERVER:
 			{
-				// TODO: for now, we write it just out to resolv.conf
 				BPath path;
-				if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK)
+				if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK
+					|| path.Append("network/resolv.conf") != B_OK) {
 					break;
+				}
 
-				path.Append("network/resolv.conf");
-
-				FILE* file = fopen(path.Path(), "w");
+				const char* openMode = resolvConfCreated ? "a" : "w";
+				FILE* file = fopen(path.Path(), openMode);
 				for (uint32 i = 0; i < size / 4; i++) {
 					syslog(LOG_INFO, "DNS: %s\n",
 						_ToString(&data[i * 4]).String());
 					if (file != NULL) {
+						resolvConfCreated = true;
 						fprintf(file, "nameserver %s\n",
 							_ToString(&data[i * 4]).String());
 					}
@@ -668,30 +678,27 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				break;
 
 			case OPTION_HOST_NAME:
-			{
-				char name[256];
-				memcpy(name, data, size);
-				name[size] = '\0';
-				syslog(LOG_INFO, "DHCP host name: \"%s\"\n", name);
+				syslog(LOG_INFO, "DHCP host name: \"%.*s\"\n",
+					(int)size, (const char*)data);
 				break;
-			}
 
 			case OPTION_DOMAIN_NAME:
 			{
-				char name[256];
-				memcpy(name, data, size);
-				name[size] = '\0';
-				syslog(LOG_INFO, "DHCP domain name: \"%s\"\n", name);
+				syslog(LOG_INFO, "DHCP domain name: \"%.*s\"\n",
+					(int)size, (const char*)data);
 
 				BPath path;
-				if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK)
+				if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK
+					|| path.Append("network/resolv.conf") != B_OK) {
 					break;
-	
-				path.Append("network/resolv.conf");
+				}
 
-				FILE* file = fopen(path.Path(), "a");
+				const char* openMode = resolvConfCreated ? "a" : "w";
+				FILE* file = fopen(path.Path(), openMode);
 				if (file != NULL) {
-					fprintf(file, "domain %s\n", name);
+					resolvConfCreated = true;
+					fprintf(file, "domain %.*s\n", (int)size,
+						(const char*)data);
 					fclose(file);
 				}
 				break;
