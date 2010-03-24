@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -27,37 +27,44 @@ enum dhcp_state {
 
 
 class DHCPClient : public AutoconfigClient {
-	public:
-		DHCPClient(BMessenger target, const char* device);
-		virtual ~DHCPClient();
+public:
+								DHCPClient(BMessenger target,
+									const char* device);
+	virtual						~DHCPClient();
 
-		virtual status_t Initialize();
+	virtual	status_t			Initialize();
 
-		virtual void MessageReceived(BMessage* message);
+	virtual	void				MessageReceived(BMessage* message);
 
-	private:
-		status_t _Negotiate(dhcp_state state);
-		void _ParseOptions(dhcp_message& message, BMessage& address);
-		void _PrepareMessage(dhcp_message& message, dhcp_state state);
-		status_t _SendMessage(int socket, dhcp_message& message, sockaddr_in& address) const;
-		dhcp_state _CurrentState() const;
-		void _ResetTimeout(int socket, time_t& timeout, uint32& tries);
-		bool _TimeoutShift(int socket, time_t& timeout, uint32& tries);
-		void _RestartLease(bigtime_t lease);
-		BString _ToString(const uint8* data) const;
-		BString _ToString(in_addr_t address) const;
+private:
+			status_t			_Negotiate(dhcp_state state);
+			void				_ParseOptions(dhcp_message& message,
+									BMessage& address);
+			void				_PrepareMessage(dhcp_message& message,
+									dhcp_state state);
+			status_t			_SendMessage(int socket, dhcp_message& message,
+									sockaddr_in& address) const;
+			dhcp_state			_CurrentState() const;
+			void				_ResetTimeout(int socket, time_t& timeout,
+									uint32& tries);
+			bool				_TimeoutShift(int socket, time_t& timeout,
+									uint32& tries);
+			void				_RestartLease(bigtime_t lease);
+			BString				_ToString(const uint8* data) const;
+			BString				_ToString(in_addr_t address) const;
 
-		BMessage		fConfiguration;
-		BMessageRunner*	fRunner;
-		uint8			fMAC[6];
-		uint32			fTransactionID;
-		in_addr_t		fAssignedAddress;
-		sockaddr_in		fServer;
-		bigtime_t		fStartTime;
-		bigtime_t		fRenewalTime;
-		bigtime_t		fRebindingTime;
-		bigtime_t		fLeaseTime;
-		status_t		fStatus;
+private:
+			BMessage			fConfiguration;
+			BMessageRunner*		fRunner;
+			uint8				fMAC[6];
+			uint32				fTransactionID;
+			in_addr_t			fAssignedAddress;
+			sockaddr_in			fServer;
+			bigtime_t			fStartTime;
+			bigtime_t			fRenewalTime;
+			bigtime_t			fRebindingTime;
+			bigtime_t			fLeaseTime;
+			status_t			fStatus;
 };
 
 #endif	// DHCP_CLIENT_H
