@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2007-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -1071,7 +1071,7 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 		result = common_wait_for_objects(infos, numInfos, flags, timeout,
 			false);
 
-		if (user_memcpy(userInfos, infos, bytes) != B_OK) {
+		if (result >= 0 && user_memcpy(userInfos, infos, bytes) != B_OK) {
 			if (result >= 0)
 				result = B_BAD_ADDRESS;
 		} else
@@ -1083,4 +1083,3 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 
 	return result;
 }
-
