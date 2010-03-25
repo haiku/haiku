@@ -1,7 +1,7 @@
 1	italian	x-vnd.Haiku-Touchpad	3077633033
 Scrolling	TouchpadPrefView		Scorrimento
 Revert	TouchpadPrefView		Ripristina
-Two finger scrolling	TouchpadPrefView		Scorrimento a 2 dita
+Two finger scrolling	TouchpadPrefView		Scorrimento con 2 dita
 Defaults	TouchpadPrefView		Predefiniti
 Slow	TouchpadPrefView		Lento
 Horizontal scroll step size	TouchpadPrefView		Dimensione passo scorrimento orizzontale 

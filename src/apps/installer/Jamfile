@@ -25,7 +25,7 @@ DoCatalogs Installer :
 	ProgressReporter.cpp
 	WorkerThread.cpp
 	: en.catalog
-	: pt_br.catkeys de.catkeys hu.catkeys it.catkeys pl.catkeys ru.catkeys
+	: de.catkeys hu.catkeys it.catkeys pl.catkeys pt_br.catkeys ru.catkeys
 	  uk.catkeys
 	;
 

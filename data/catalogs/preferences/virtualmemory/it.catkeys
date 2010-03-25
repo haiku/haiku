@@ -1,19 +1,20 @@
-1	italian	x-vnd.Haiku-VirtualMemory	1076559693
+1	italian	x-vnd.Haiku-VirtualMemory	866260633
 Turn off	SettingsWindow		Disattiva
 GB	SettingsWindow		GB
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Disattivare la memoria virtuale può avere effetti collaterali sulla stabilità del sistema quando la memoria si esaurisce.\nLa memoria viruale non ha effetti sulle performance del sistema finché non si arriva a quel punto.\n\nSei veramente sicuro che vuoi disattivarla?
-Requested swap file size:	SettingsWindow		Dimensione del file di swap richiesto:
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Disattivare la memoria virtuale può avere effetti collaterali sulla stabilità del sistema quando la memoria si esaurisce.\nLa memoria virtuale non ha effetti sulle prestazioni del sistema finché non si arriva a quel punto.\n\nSei veramente sicuro di volerla disattivare?
+Requested swap file size:	SettingsWindow		Dimensione file di swap richiesto:
 Physical memory: 	SettingsWindow		Memoria fisica:
-Changes will take effect on restart!	SettingsWindow		I cambiamenti avranno effetto al riavvio!
+Changes will take effect on restart!	SettingsWindow		Le modifiche avranno effetto al riavvio!
 Defaults	SettingsWindow		Predefiniti
 KB	SettingsWindow		KB
 Use volume:	SettingsWindow		Usa volume:
 Keep enabled	SettingsWindow		Mantieni abilitato
+Revert	SettingsWindow		Ripristina
 999 MB	SettingsWindow		999 MB
-Current swap file size: 	SettingsWindow		Dimensione del file di swap attuale:
-VirtualMemory	SettingsWindow		MemoriaVirtuale
-OK	VirtualMemoryApp		OK
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		MemoriaVirtuale\n\tscritto da Axel Dörfler\n\tCopyright 2005, Haiku.\n
+Current swap file size: 	SettingsWindow		Dimensione file di swap attuale:
+VirtualMemory	SettingsWindow		VirtualMemory
+OK	VirtualMemoryApp		Ok
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tscritto da Axel Dörfler\n\tCopyright 2005, Haiku.\n
 Enable virtual memory	SettingsWindow		Abilita memoria virtuale
 MB	SettingsWindow		MB
 %Ld B	SettingsWindow		%Ld B
