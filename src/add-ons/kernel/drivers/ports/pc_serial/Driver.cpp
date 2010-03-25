@@ -405,9 +405,10 @@ scan_bus(bus_type bus)
 		}
 #endif
 
-		// instanciate devices on IO ports
 		resource_descriptor iodesc;
 		SerialDevice *master = NULL;
+
+		// instanciate devices on IO ports
 		for (int i = 0;
 			gConfigManagerModule->get_nth_resource_descriptor_of_type(
 			&config.c, i, B_IO_PORT_RESOURCE, &iodesc, sizeof(iodesc)) == B_OK;
@@ -461,6 +462,8 @@ scan_pci_alt()
 {
 	pci_info info;
 	int ix;
+	TRACE_ALWAYS("scanning PCI bus (alt)...\n");
+
 	// probe PCI devices
 	for (ix = 0; (*gPCIModule->get_nth_pci_info)(ix, &info) == B_OK; ix++) {
 		// sanity check
@@ -489,6 +492,7 @@ scan_pci_alt()
 				&& info.device_id != sSupportedDevices[i].match.device_id)
 				continue;
 			supported = &sSupportedDevices[i];
+			break;
 		}
 		if (supported == NULL)
 			continue;
@@ -497,23 +501,62 @@ scan_pci_alt()
 			ix, info.class_base, info.class_sub, info.class_api,
 			info.vendor_id, info.device_id, supported->name);
 
-		// find I/O ports
-		for (int r = 0; r < 6; r++) {
-			TRACE_ALWAYS("range at 0x%08lx len 0x%lx flags 0x%02x\n",
-				info.u.h0.base_registers[r], info.u.h0.base_register_sizes[r],
-				info.u.h0.base_register_flags[r]);
-			
-			// not I/O
-			if (info.u.h0.base_register_flags[r] & PCI_address_space == 0)
-				continue;
-			//
-			TRACE_ALWAYS("regs at 0x%08lx len 0x%lx\n",
-				info.u.h0.base_registers[r], info.u.h0.base_register_sizes[r]);
-			//&PCI_address_io_mask
-		}
 		// XXX: interrupt_line doesn't seem to 
 		TRACE_ALWAYS("irq line %d, pin %d\n",
 			info.u.h0.interrupt_line, info.u.h0.interrupt_pin);
+		int irq = info.u.h0.interrupt_line;
+
+		SerialDevice *master = NULL;
+
+		// find I/O ports
+		for (int r = 0; r < 6; r++) {
+			/**/
+			TRACE_ALWAYS("range at 0x%08lx len 0x%lx flags 0x%02x\n",
+				info.u.h0.base_registers[r], info.u.h0.base_register_sizes[r],
+				info.u.h0.base_register_flags[r]);
+			/**/
+
+			// not I/O
+			if ((info.u.h0.base_register_flags[r] & PCI_address_space) == 0)
+				continue;
+
+			uint32 regbase = info.u.h0.base_registers[r];
+			uint32 reglen = info.u.h0.base_register_sizes[r];
+
+			TRACE_ALWAYS("regs at 0x%08lx len 0x%lx\n",
+				regbase, reglen);
+			//&PCI_address_io_mask
+
+			if (reglen < supported->constraints.minsize)
+				continue;
+			if (reglen > supported->constraints.maxsize)
+				continue;
+
+			SerialDevice *device;
+			uint32 ioport = regbase;
+next_split_alt:
+			// no more to split
+			if ((ioport - regbase) >= reglen)
+				continue;
+		
+			TRACE_ALWAYS("inserting device at io 0x%04lx as %s\n", ioport, 
+				supported->name);
+
+			
+/**/
+			device = new SerialDevice(supported, ioport, irq, master);
+			if (pc_serial_insert_device(device) < B_OK) {
+				TRACE_ALWAYS("can't insert device\n");
+				continue;
+			}
+/**/			if (master == NULL)
+				master = device;
+			
+			ioport += supported->constraints.split;
+			goto next_split_alt;
+			// try next part of the I/O range now
+
+		}
 	}
 
 	return B_OK;
@@ -623,8 +666,8 @@ init_driver()
 
 
 	scan_bus(B_ISA_BUS);
-	scan_bus(B_PCI_BUS);
-
+	//scan_bus(B_PCI_BUS);
+	scan_pci_alt();
 
 	// XXX: ISA cards
 	// XXX: pcmcia
