@@ -1512,8 +1512,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			if (!gDictCount) {
 				beep();
 				(new BAlert("",
-					TR("The spell check feature requires the optional "
-						"\"words\" file on your BeOS CD."),
+					TR("Mail couldn't find its dictionary."),
 					TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
 					B_STOP_ALERT))->Go();
 			} else {
