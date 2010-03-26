@@ -347,6 +347,9 @@ ServerWindow::_Show()
 	// instead of doing it from this thread.
 	fDesktop->UnlockSingleWindow();
 	fDesktop->ShowWindow(fWindow);
+	if (fDirectWindowInfo && fDirectWindowInfo->IsFullScreen())
+		_ResizeToFullScreen();
+		
 	fDesktop->LockSingleWindow();
 }
 
