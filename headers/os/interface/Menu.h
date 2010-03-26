@@ -245,8 +245,7 @@ private:
 			bool				_ChooseTrigger(const char* title, int32& index,
 									uint32& trigger,
 									BPrivate::TriggerList& triggers);
-			void				_UpdateWindowViewSize(
-									bool updatePosition = true);
+			void				_UpdateWindowViewSize();
 			bool				_OkToProceed(BMenuItem* item);
 
 			bool				_CustomTrackingWantsToQuit();

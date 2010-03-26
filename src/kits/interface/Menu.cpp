@@ -16,6 +16,7 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <Bitmap.h>
 #include <ControlLook.h>
 #include <Debug.h>
 #include <File.h>
@@ -397,7 +398,7 @@ BMenu::AttachedToWindow()
 	if (!fAttachAborted) {
 		_CacheFontInfo();
 		_LayoutItems(0);
-		_UpdateWindowViewSize(false);
+		_UpdateWindowViewSize();
 	}
 }
 
@@ -433,7 +434,6 @@ BMenu::Draw(BRect updateRect)
 		Invalidate();
 		return;
 	}
-
 
 	DrawBackground(updateRect);
 	_DrawItems(updateRect);
@@ -705,7 +705,7 @@ BMenu::AddItem(BMenuItem* item, int32 index)
 	if (LockLooper()) {
 		if (!Window()->IsHidden()) {
 			_LayoutItems(index);
-			_UpdateWindowViewSize(false);
+			_UpdateWindowViewSize();
 			Invalidate();
 		}
 		UnlockLooper();
@@ -728,9 +728,8 @@ BMenu::AddItem(BMenuItem* item, BRect frame)
 	item->fBounds = frame;
 
 	int32 index = CountItems();
-	if (!_AddItem(item, index)) {
+	if (!_AddItem(item, index))
 		return false;
-	}
 
 	if (LockLooper()) {
 		if (!Window()->IsHidden()) {
@@ -827,7 +826,7 @@ BMenu::AddList(BList* list, int32 index)
 	if (locked && Window() != NULL && !Window()->IsHidden()) {
 		// Make sure we update the layout if needed.
 		_LayoutItems(index);
-		_UpdateWindowViewSize(false);
+		_UpdateWindowViewSize();
 		Invalidate();
 	}
 
@@ -1509,7 +1508,7 @@ BMenu::_Show(bool selectFirstItem)
 			return false;
 		}
 
-		_UpdateWindowViewSize(true);
+		_UpdateWindowViewSize();
 		window->Show();
 
 		if (selectFirstItem)
@@ -1991,7 +1990,7 @@ BMenu::_RemoveItems(int32 index, int32 count, BMenuItem* item,
 		InvalidateLayout();
 		if (locked && window != NULL) {
 			_LayoutItems(0);
-			_UpdateWindowViewSize(false);
+			_UpdateWindowViewSize();
 			Invalidate();
 		}
 	}
@@ -2144,13 +2143,13 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 	}
 
 	if (command)
-		frame.right += 17;
+		frame.right += BPrivate::MenuPrivate::MenuItemCommand()->Bounds().Width() + 1;
 	if (control)
-		frame.right += 17;
+		frame.right += BPrivate::MenuPrivate::MenuItemControl()->Bounds().Width() + 1;
 	if (option)
-		frame.right += 17;
+		frame.right += BPrivate::MenuPrivate::MenuItemOption()->Bounds().Width() + 1;
 	if (shift)
-		frame.right += 22;
+		frame.right += BPrivate::MenuPrivate::MenuItemShift()->Bounds().Width() + 1;
 
 	if (fMaxContentWidth > 0)
 		frame.right = min_c(frame.right, fMaxContentWidth);
@@ -2684,7 +2683,7 @@ BMenu::_ChooseTrigger(const char* title, int32& index, uint32& trigger,
 
 
 void
-BMenu::_UpdateWindowViewSize(bool updatePosition)
+BMenu::_UpdateWindowViewSize()
 {
 	BMenuWindow* window = static_cast<BMenuWindow*>(Window());
 	if (window == NULL)
@@ -2697,8 +2696,7 @@ BMenu::_UpdateWindowViewSize(bool updatePosition)
 		return;
 
 	bool scroll = false;
-	const BPoint screenLocation = updatePosition
-		? ScreenLocation() : window->Frame().LeftTop();
+	const BPoint screenLocation = ScreenLocation();
 	BRect frame = _CalcFrame(screenLocation, &scroll);
 	ResizeTo(frame.Width(), frame.Height());
 
@@ -2729,8 +2727,7 @@ BMenu::_UpdateWindowViewSize(bool updatePosition)
 			fFontHeight + fPad.top + fPad.bottom);
 	}
 
-	if (updatePosition)
-		window->MoveTo(frame.LeftTop());
+	window->MoveTo(frame.LeftTop());
 }
 
 
