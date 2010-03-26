@@ -4,126 +4,393 @@
  *
  * Authors:
  *		Stephen Deken, stephen.deken@gmail.com
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
+//----------------------------------------------------------------------------
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
+//
+// Permission to copy, use, modify, sell and distribute this software
+// is granted provided this copyright notice appears in all copies.
+// This software is provided "as is" without express or implied
+// warranty, and with no claim as to its suitability for any purpose.
+//
+//----------------------------------------------------------------------------
+// Contact: mcseem@antigrain.com
+//          mcseemagg@yahoo.com
+//          http://www.antigrain.com
+//----------------------------------------------------------------------------
 #ifndef _AFFINE_TRANSFORM_H
 #define _AFFINE_TRANSFORM_H
 
-#include <InterfaceDefs.h>
 
-#include <agg_trans_affine.h>
+#include <Flattenable.h>
+#include <Point.h>
 
-class BPoint;
+#include <math.h>
 
-namespace BPrivate {
 
-class BAffineTransform {
+class BAffineTransform : public BFlattenable {
+public:
+
+	static	const double			kDefaultEpsilon = 1e-14;
+
 public:
 									BAffineTransform();
+									BAffineTransform(double sx, double shy,
+										double shx, double sy, double tx,
+										double ty);
 									BAffineTransform(
 										const BAffineTransform& copyFrom);
-		virtual						~BAffineTransform();
+	virtual							~BAffineTransform();
 
-		virtual	BAffineTransform&	operator=(
-										const BAffineTransform& copyFrom);
+	// BFlattenable interface
+	virtual	bool					IsFixedSize() const;
+	virtual	type_code				TypeCode() const;
+	virtual	ssize_t					FlattenedSize() const;
+	virtual	status_t				Flatten(void* buffer,
+										ssize_t size) const;
+	virtual	status_t				Unflatten(type_code code,
+										const void* buffer, ssize_t size);
 
-		virtual	bool				operator==(
-										const BAffineTransform& other) const;
-		virtual	bool				operator!=(
-										const BAffineTransform& other) const;
-
-	// Callbacks
-		virtual	void				TransformationChanged() const;
+	// Construction
+	static	BAffineTransform		AffineTranslation(double x, double y);
+	static	BAffineTransform		AffineRotation(double angle);
+	static	BAffineTransform		AffineScaling(double x, double y);
+	static	BAffineTransform		AffineScaling(double scale);
+	static	BAffineTransform		AffineShearing(double x, double y);
 
 	// Application
-				BPoint				Apply(const BPoint& point) const;
-				void				Apply(BPoint* point) const;
-				void				Apply(BPoint* points, uint32 count) const;
+	inline	void					Apply(double* x, double* y) const;
+	inline	void					ApplyInverse(double* x, double* y) const;
 
-	// Rotation
-				void				Rotate(float angle);
-				void				Rotate(const BPoint& center, float angle);
-				BAffineTransform&	RotateBySelf(float angle);
-				BAffineTransform&	RotateBySelf(const BPoint& center, 
-										float angle);
-				BAffineTransform	RotateByCopy(float angle) const;
-				BAffineTransform	RotateByCopy(const BPoint& center,
-										float angle) const;
+			BPoint					Apply(const BPoint& point) const;
+			BPoint					ApplyInverse(const BPoint& point) const;
+
+			void					Apply(BPoint* point) const;
+			void					ApplyInverse(BPoint* point) const;
+
+			void					Apply(BPoint* points, uint32 count) const;
+			void					ApplyInverse(BPoint* points,
+										uint32 count) const;
 
 	// Translation
-				void				Translate(float deltaX, float deltaY);
-				void				Translate(const BPoint& delta);
-				BAffineTransform&	TranslateBySelf(float deltaX,
-										float deltaY);
-				BAffineTransform&	TranslateBySelf(const BPoint& delta);
-				BAffineTransform	TranslateByCopy(float deltaX,
-										float deltaY) const;
-				BAffineTransform	TranslateByCopy(const BPoint& delta) const;
+	inline	const BAffineTransform&	TranslateBy(double x, double y);
+			const BAffineTransform&	TranslateBy(const BPoint& delta);
+
+			BAffineTransform		TranslateByCopy(double x, double y) const;
+			BAffineTransform		TranslateByCopy(const BPoint& delta) const;
+
+	// Rotation
+	inline	const BAffineTransform&	RotateBy(double angle);
+			const BAffineTransform&	RotateBy(const BPoint& center,
+										double angle);
+
+			BAffineTransform		RotateByCopy(double angle) const;
+			BAffineTransform		RotateByCopy(const BPoint& center,
+										double angle) const;
 
 	// Scaling
-				void				Scale(float scale);
-				void				Scale(const BPoint& center, float scale);
-				void				Scale(float scaleX, float scaleY);
-				void				Scale(const BPoint& center, float scaleX,
-										float scaleY);
-				void				Scale(const BPoint& scale);
-				void				Scale(const BPoint& center,
+	inline	const BAffineTransform&	ScaleBy(double scale);
+			const BAffineTransform&	ScaleBy(const BPoint& center,
+										double scale);
+	inline	const BAffineTransform&	ScaleBy(double x, double y);
+			const BAffineTransform&	ScaleBy(const BPoint& center, double x,
+										double y);
+			const BAffineTransform&	ScaleBy(const BPoint& scale);
+			const BAffineTransform&	ScaleBy(const BPoint& center,
 										const BPoint& scale);
-				BAffineTransform&	ScaleBySelf(float scale);
-				BAffineTransform&	ScaleBySelf(const BPoint& center,
-										float scale);
-				BAffineTransform&	ScaleBySelf(float scaleX, float scaleY);
-				BAffineTransform&	ScaleBySelf(const BPoint& center,
-										float scaleX, float scaleY);
-				BAffineTransform&	ScaleBySelf(const BPoint& scale);
-				BAffineTransform&	ScaleBySelf(const BPoint& center,
-										const BPoint& scale);
-				BAffineTransform	ScaleByCopy(float scale) const;
-				BAffineTransform	ScaleByCopy(const BPoint& center,
-										float scale) const;
-				BAffineTransform	ScaleByCopy(float scaleX,
-										float scaleY) const;
-				BAffineTransform	ScaleByCopy(const BPoint& center,
-										float scaleX, float scaleY) const;
-				BAffineTransform	ScaleByCopy(const BPoint& scale) const;
-				BAffineTransform	ScaleByCopy(const BPoint& center,
+
+			BAffineTransform		ScaleByCopy(double scale) const;
+			BAffineTransform		ScaleByCopy(const BPoint& center,
+										double scale) const;
+			BAffineTransform		ScaleByCopy(double x, double y) const;
+			BAffineTransform		ScaleByCopy(const BPoint& center,
+										double x, double y) const;
+			BAffineTransform		ScaleByCopy(const BPoint& scale) const;
+			BAffineTransform		ScaleByCopy(const BPoint& center,
 										const BPoint& scale) const;
 
 	// Shearing
-				void				Shear(float shearX, float shearY);
-				void				Shear(const BPoint& center, float shearX,
-										float shearY);
-				void				Shear(const BPoint& shear);
-				void				Shear(const BPoint& center,
+	inline	const BAffineTransform&	ShearBy(double x, double y);
+			const BAffineTransform&	ShearBy(const BPoint& center, double x,
+										double y);
+			const BAffineTransform&	ShearBy(const BPoint& shear);
+			const BAffineTransform&	ShearBy(const BPoint& center,
 										const BPoint& shear);
 
-				BAffineTransform&	ShearBySelf(float shearX, float shearY);
-				BAffineTransform&	ShearBySelf(const BPoint& center,
-										float shearX, float shearY);
-				BAffineTransform&	ShearBySelf(const BPoint& shear);
-				BAffineTransform&	ShearBySelf(const BPoint& center,
-										const BPoint& shear);
-				BAffineTransform	ShearByCopy(float shearX,
-										float shearY) const;
-				BAffineTransform	ShearByCopy(const BPoint& center,
-										float shearX, float shearY) const;
-				BAffineTransform	ShearByCopy(const BPoint& shear) const;
-				BAffineTransform	ShearByCopy(const BPoint& center,
+			BAffineTransform		ShearByCopy(double x, double y) const;
+			BAffineTransform		ShearByCopy(const BPoint& center,
+										double x, double y) const;
+			BAffineTransform		ShearByCopy(const BPoint& shear) const;
+			BAffineTransform		ShearByCopy(const BPoint& center,
 										const BPoint& shear) const;
 
-private:
-				void				_Rotate(float angle);
-				void				_Scale(float scaleX, float scaleY);
-				void				_Translate(float deltaX, float deltaY);
-				void				_Shear(float shearX, float shearY);
+	// Multiplication
+	inline	const BAffineTransform&	Multiply(const BAffineTransform& other);
+			const BAffineTransform&	PreMultiply(const BAffineTransform& other);
+	inline	const BAffineTransform&	MultiplyInverse(
+										const BAffineTransform& other);
+	inline	const BAffineTransform&	PreMultiplyInverse(
+										const BAffineTransform& other);
 
-				void				_TransformPoint(BPoint& point) const;
+	// Operators
+	inline	BAffineTransform&		operator=(
+										const BAffineTransform& copyFrom);
 
-private:
-				agg::trans_affine	fTransformMatrix;
+	inline	bool					operator==(
+										const BAffineTransform& other) const;
+	inline	bool					operator!=(
+										const BAffineTransform& other) const;
+
+	inline	const BAffineTransform&	operator*=(const BAffineTransform& other);
+	inline	const BAffineTransform&	operator/=(const BAffineTransform& other);
+
+	inline	BAffineTransform		operator*(
+										const BAffineTransform& other) const;
+	inline	BAffineTransform		operator/(
+										const BAffineTransform& other) const;
+
+	inline	BAffineTransform		operator~() const;
+
+	// Utility
+			bool					IsValid(double epsilon
+										= kDefaultEpsilon) const;
+			bool					IsIdentity(double epsilon
+										= kDefaultEpsilon) const;
+			bool					IsEqual(const BAffineTransform& other,
+										double epsilon
+											= kDefaultEpsilon) const;
+
+			const BAffineTransform&	Invert();
+			const BAffineTransform&	FlipX();
+			const BAffineTransform&	FlipY();
+			const BAffineTransform&	Reset();
+
+	inline	double					Determinant() const;
+	inline	double					InverseDeterminant() const;
+			void					GetTranslation(double* tx,
+										double* ty) const;
+			double					Rotation() const;
+			double					Scale() const;
+			void					GetScale(double* sx, double* sy) const;
+			void					GetScaleAbs(double* sx,
+										double* sy) const;
+			bool					GetAffineParameters(double* translationX,
+										double* translationY, double* rotation,
+										double* scaleX, double* scaleY,
+										double* shearX, double* shearY) const;
+
+public:
+			double					sx;
+			double					shy;
+			double					shx;
+			double					sy;
+			double					tx;
+			double					ty;
 };
 
-} // namespace BPrivate
 
-using namespace BPrivate;
+// #pragma mark - inline methods
+
+
+inline void
+BAffineTransform::Apply(double* x, double* y) const
+{
+	register double tmp = *x;
+	*x = tmp * sx + *y * shx + tx;
+	*y = tmp * shy + *y * sy + ty;
+}
+
+
+inline void
+BAffineTransform::ApplyInverse(double* x, double* y) const
+{
+	register double d = InverseDeterminant();
+	register double a = (*x - tx) * d;
+	register double b = (*y - ty) * d;
+	*x = a * sy - b * shx;
+	*y = b * sx - a * shy;
+}
+
+
+// #pragma mark -
+
+
+inline const BAffineTransform&
+BAffineTransform::TranslateBy(double x, double y)
+{
+	tx += x;
+	ty += y;
+	return *this;
+}
+
+
+inline const BAffineTransform&
+BAffineTransform::RotateBy(double angle)
+{
+	double ca = cos(angle);
+	double sa = sin(angle);
+	double t0 = sx * ca - shy * sa;
+	double t2 = shx * ca - sy * sa;
+	double t4 = tx * ca - ty * sa;
+	shy = sx * sa + shy * ca;
+	sy = shx * sa + sy * ca;
+	ty = tx * sa + ty * ca;
+	sx = t0;
+	shx = t2;
+	tx = t4;
+	return *this;
+}
+
+
+inline const BAffineTransform&
+BAffineTransform::ScaleBy(double x, double y)
+{
+	double mm0 = x;
+		// Possible hint for the optimizer
+	double mm3 = y;
+	sx *= mm0;
+	shx *= mm0;
+	tx *= mm0;
+	shy *= mm3;
+	sy *= mm3;
+	ty *= mm3;
+	return *this;
+}
+
+
+inline const BAffineTransform&
+BAffineTransform::ScaleBy(double s)
+{
+	double m = s;
+		// Possible hint for the optimizer
+	sx *= m;
+	shx *= m;
+	tx *= m;
+	shy *= m;
+	sy *= m;
+	ty *= m;
+	return *this;
+}
+
+
+inline const BAffineTransform&
+BAffineTransform::ShearBy(double x, double y)
+{
+	BAffineTransform shearTransform = AffineShearing(x, y);
+	return PreMultiply(shearTransform);
+}
+
+
+// #pragma mark -
+
+
+inline const BAffineTransform&
+BAffineTransform::Multiply(const BAffineTransform& other)
+{
+	BAffineTransform t(other);
+	return *this = t.PreMultiply(*this);
+}
+
+
+inline const BAffineTransform&
+BAffineTransform::MultiplyInverse(const BAffineTransform& other)
+{
+	BAffineTransform t(other);
+	t.Invert();
+	return Multiply(t);
+}
+
+
+inline const BAffineTransform&
+BAffineTransform::PreMultiplyInverse(const BAffineTransform& other)
+{
+	BAffineTransform t(other);
+	t.Invert();
+	return *this = t.Multiply(*this);
+}
+
+
+// #pragma mark -
+
+
+inline BAffineTransform&
+BAffineTransform::operator=(const BAffineTransform& other)
+{
+	sx = other.sx;
+	shy = other.shy;
+	shx = other.shx;
+	sy = other.sy;
+	tx = other.tx;
+	ty = other.ty;
+	return *this;
+}
+
+inline bool
+BAffineTransform::operator==(const BAffineTransform& other) const
+{
+	return IsEqual(other);
+}
+
+inline bool
+BAffineTransform::operator!=(const BAffineTransform& other) const
+{
+	return !IsEqual(other);
+}
+
+
+inline const BAffineTransform&
+BAffineTransform::operator*=(const BAffineTransform& other)
+{
+	return Multiply(other);
+}
+
+
+inline const BAffineTransform&
+BAffineTransform::operator/=(const BAffineTransform& other)
+{
+	return MultiplyInverse(other);
+}
+
+
+inline BAffineTransform
+BAffineTransform::operator*(const BAffineTransform& other) const
+{
+	return BAffineTransform(*this).Multiply(other);
+}
+
+
+inline BAffineTransform
+BAffineTransform::operator/(const BAffineTransform& other) const
+{
+	return BAffineTransform(*this).MultiplyInverse(other);
+}
+
+
+inline BAffineTransform
+BAffineTransform::operator~() const
+{
+	BAffineTransform result(*this);
+	return result.Invert();
+}
+
+
+// #pragma mark -
+
+
+inline double
+BAffineTransform::Determinant() const
+{
+	return sx * sy - shy * shx;
+}
+
+
+inline double
+BAffineTransform::InverseDeterminant() const
+{
+	return 1.0 / (sx * sy - shy * shx);
+}
+
 
 #endif // _AFFINE_TRANSFORM_H

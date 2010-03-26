@@ -13,6 +13,7 @@
 
 
 enum {
+	B_AFFINE_TRANSFORM_TYPE			= 'AMTX',
 	B_ANY_TYPE						= 'ANYT',
 	B_ATOM_TYPE						= 'ATOM',
 	B_ATOMREF_TYPE					= 'ATMR',
@@ -64,7 +65,7 @@ enum {
 // System-wide MIME types for handling URL's
 
 extern const char *B_URL_HTTP; 		// application/x-vnd.Be.URL.http
-extern const char *B_URL_HTTPS; 		// application/x-vnd.Be.URL.https
+extern const char *B_URL_HTTPS; 	// application/x-vnd.Be.URL.https
 extern const char *B_URL_FTP;		// application/x-vnd.Be.URL.ftp
 extern const char *B_URL_GOPHER; 	// application/x-vnd.Be.URL.gopher
 extern const char *B_URL_MAILTO; 	// application/x-vnd.Be.URL.mailto
