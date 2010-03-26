@@ -52,6 +52,9 @@ public:
 									const debug_profiler_update& message);
 	virtual	bool				HandleHandedOver(
 									const debug_handed_over& message);
+
+	virtual	bool				UnhandledDebugMessage(int32 messageCode,
+									const debug_debugger_message_data& message);
 };
 
 

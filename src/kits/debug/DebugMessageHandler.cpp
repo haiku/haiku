@@ -71,56 +71,64 @@ BDebugMessageHandler::HandleDebugMessage(int32 messageCode,
 bool
 BDebugMessageHandler::HandleThreadDebugged(const debug_thread_debugged& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleDebuggerCall(const debug_debugger_call& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_DEBUGGER_CALL,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleBreakpointHit(const debug_breakpoint_hit& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_BREAKPOINT_HIT,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleWatchpointHit(const debug_watchpoint_hit& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_WATCHPOINT_HIT,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleSingleStep(const debug_single_step& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_SINGLE_STEP,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandlePreSyscall(const debug_pre_syscall& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_PRE_SYSCALL,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandlePostSyscall(const debug_post_syscall& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_POST_SYSCALL,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleSignalReceived(const debug_signal_received& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED,
+		(const debug_debugger_message_data&)message);
 }
 
 
@@ -128,68 +136,89 @@ bool
 BDebugMessageHandler::HandleExceptionOccurred(
 	const debug_exception_occurred& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleTeamCreated(const debug_team_created& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_TEAM_CREATED,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleTeamDeleted(const debug_team_deleted& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_TEAM_DELETED,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleTeamExec(const debug_team_exec& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_TEAM_EXEC,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleThreadCreated(const debug_thread_created& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_THREAD_CREATED,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleThreadDeleted(const debug_thread_deleted& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_THREAD_DELETED,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleImageCreated(const debug_image_created& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_IMAGE_CREATED,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleImageDeleted(const debug_image_deleted& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_IMAGE_DELETED,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleProfilerUpdate(const debug_profiler_update& message)
 {
-	return true;
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_PROFILER_UPDATE,
+		(const debug_debugger_message_data&)message);
 }
 
 
 bool
 BDebugMessageHandler::HandleHandedOver(const debug_handed_over& message)
+{
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_HANDED_OVER,
+		(const debug_debugger_message_data&)message);
+}
+
+
+/*!	Called by the base class versions of the specific Handle*() methods.
+	Can be overridded to handle any message not handled otherwise.
+*/
+bool
+BDebugMessageHandler::UnhandledDebugMessage(int32 messageCode,
+	const debug_debugger_message_data& message)
 {
 	return true;
 }
