@@ -140,12 +140,12 @@ BDebugContext::ClearWatchpoint(void* address)
 
 
 status_t
-BDebugContext::ContinueThread(thread_id thread)
+BDebugContext::ContinueThread(thread_id thread, bool singleStep)
 {
 	debug_nub_continue_thread message;
 	message.thread = thread;
 	message.handle_event = B_THREAD_DEBUG_HANDLE_EVENT;
-	message.single_step = false;
+	message.single_step = singleStep;
 
 	return SendDebugMessage(B_DEBUG_MESSAGE_CONTINUE_THREAD, &message,
 		sizeof(message), NULL, 0);

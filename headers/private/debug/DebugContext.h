@@ -42,7 +42,8 @@ public:
 									int32 length);
 			status_t			ClearWatchpoint(void* address);
 
-			status_t			ContinueThread(thread_id thread);
+			status_t			ContinueThread(thread_id thread,
+									bool singleStep = false);
 			status_t			SetThreadDebuggingFlags(thread_id thread,
 									int32 flags);
 			status_t			GetThreadCpuState(thread_id thread,
