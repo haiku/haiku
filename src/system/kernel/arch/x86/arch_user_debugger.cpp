@@ -806,6 +806,12 @@ x86_exit_user_debug_at_kernel_entry()
 	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_INSTALLED))
 		return;
 
+	// We need to save the current values of dr6 and dr7 in the CPU structure,
+	// since in case of a debug exception we might overwrite them before
+	// x86_handle_debug_exception() is called.
+	asm("movl %%dr6, %0" : "=r"(thread->cpu->arch.dr6));
+	asm("movl %%dr7, %0" : "=r"(thread->cpu->arch.dr7));
+
 	GRAB_THREAD_LOCK();
 
 	// disable user breakpoints
@@ -829,10 +835,11 @@ x86_exit_user_debug_at_kernel_entry()
 void
 x86_handle_debug_exception(struct iframe *frame)
 {
-	// get debug status and control registers
-	uint32 dr6, dr7;
-	asm("movl %%dr6, %0" : "=r"(dr6));
-	asm("movl %%dr7, %0" : "=r"(dr7));
+	// get debug status and control registers (saved earlier in
+	// x86_exit_user_debug_at_kernel_entry())
+	struct thread* thread = thread_get_current_thread();
+	uint32 dr6 = thread->cpu->arch.dr6;
+	uint32 dr7 = thread->cpu->arch.dr7;
 
 	TRACE(("i386_handle_debug_exception(): DR6: %lx, DR7: %lx\n", dr6, dr7));
 
@@ -889,7 +896,6 @@ x86_handle_debug_exception(struct iframe *frame)
 			// Determine whether the exception occurred at a syscall/trap
 			// kernel entry or whether this is genuine kernel single-stepping.
 			bool inKernel = true;
-			struct thread* thread = thread_get_current_thread();
 			if (thread->team != team_get_kernel_team()
 				&& i386_get_user_iframe() == NULL) {
 				// TODO: This is not yet fully correct, since a newly created

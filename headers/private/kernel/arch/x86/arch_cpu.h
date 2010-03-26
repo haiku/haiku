@@ -250,6 +250,9 @@ typedef struct arch_cpu_info {
 
 	struct vm_translation_map_arch_info* active_translation_map;
 
+	uint32				dr6;	// temporary storage for debug registers (cf.
+	uint32				dr7;	// x86_exit_user_debug_at_kernel_entry())
+
 	// local TSS for this cpu
 	struct tss			tss;
 	struct tss			double_fault_tss;
