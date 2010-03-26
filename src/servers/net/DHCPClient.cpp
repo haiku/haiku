@@ -336,8 +336,7 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	: AutoconfigClient("dhcp", target, device),
 	fConfiguration(kMsgConfigureInterface),
 	fRunner(NULL),
-	fLeaseTime(0),
-	fRewriteResolvConf(true)
+	fLeaseTime(0)
 {
 	fStartTime = system_time();
 	fTransactionID = (uint32)fStartTime;
@@ -463,7 +462,6 @@ DHCPClient::_Negotiate(dhcp_state state)
 		// no need to check the status; in case of an error we'll just send
 		// the message again
 
-	fRewriteResolvConf = true;
 	// receive loop until we've got an offer and acknowledged it
 
 	while (state != ACKNOWLEDGED) {
@@ -620,6 +618,10 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 	// maintained and it should be distinguished between user entered
 	// and auto-generated parts of the file, with this method only re-writing
 	// the auto-generated parts of course.
+	// TODO: We write resolv.conf once per _ParseOptions invokation, there
+	// is the first DHCP_OFFER message and the final DHCP_ACK message
+	// from the same server, which should contain all the final data.
+	bool resolvConfCreated = false;
 	while (message.NextOption(cookie, option, data, size)) {
 		// iterate through all options
 		switch (option) {
@@ -640,13 +642,13 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 					break;
 				}
 
-				const char* openMode = fRewriteResolvConf ? "w" : "a";
+				const char* openMode = resolvConfCreated ? "a" : "w";
 				FILE* file = fopen(path.Path(), openMode);
 				for (uint32 i = 0; i < size / 4; i++) {
 					syslog(LOG_INFO, "DNS: %s\n",
 						_ToString(&data[i * 4]).String());
 					if (file != NULL) {
-						fRewriteResolvConf = false;
+						resolvConfCreated = true;
 						fprintf(file, "nameserver %s\n",
 							_ToString(&data[i * 4]).String());
 					}
@@ -690,10 +692,10 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 					break;
 				}
 
-				const char* openMode = fRewriteResolvConf ? "w" : "a";
+				const char* openMode = resolvConfCreated ? "a" : "w";
 				FILE* file = fopen(path.Path(), openMode);
 				if (file != NULL) {
-					fRewriteResolvConf = false;
+					resolvConfCreated = true;
 					fprintf(file, "domain %.*s\n", (int)size,
 						(const char*)data);
 					fclose(file);
