@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 #define DRIVER_NAME		"pc_serial"		// driver name for debug output
-#define DEVICES_COUNT	2				// max simultaneously open devices
+#define DEVICES_COUNT	20				// max simultaneously open devices
 
 // avoid clashing with BeOS zz driver
 #define DEVFS_BASE		"ports/pc_serial"
