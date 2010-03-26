@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -135,7 +135,7 @@ struct dhcp_message {
 	uint8* PutOption(uint8* options, message_option option, uint32 data);
 	uint8* PutOption(uint8* options, message_option option, const uint8* data,
 		uint32 size);
-	uint8* FinishOptions(uint8 *);
+	uint8* FinishOptions(uint8* options);
 } _PACKED;
 
 #define DHCP_FLAG_BROADCAST		0x8000
@@ -144,7 +144,7 @@ struct dhcp_message {
 
 const uint32 kMsgLeaseTime = 'lstm';
 
-static const uint8 kRequiredParameters[] = {
+static const uint8 kRequestParameters[] = {
 	OPTION_SUBNET_MASK, OPTION_ROUTER_ADDRESS,
 	OPTION_DOMAIN_NAME_SERVER, OPTION_BROADCAST_ADDRESS,
 	OPTION_DOMAIN_NAME
@@ -274,7 +274,7 @@ dhcp_message::Size() const
 uint8*
 dhcp_message::PrepareMessage(uint8 type)
 {
-	uint8 *next = options;
+	uint8* next = options;
 	next = PutOption(next, OPTION_MESSAGE_TYPE, type);
 	next = PutOption(next, OPTION_MESSAGE_SIZE,
 		(uint16)htons(sizeof(dhcp_message)));
@@ -324,9 +324,9 @@ dhcp_message::PutOption(uint8* options, message_option option,
 
 
 uint8*
-dhcp_message::FinishOptions(uint8 *next)
+dhcp_message::FinishOptions(uint8* options)
 {
-	return PutOption(next, OPTION_END);
+	return PutOption(options, OPTION_END);
 }
 
 
@@ -408,7 +408,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 	int option = 1;
 	setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &option, sizeof(option));
 
-	if (bind(socket, (struct sockaddr *)&local, sizeof(local)) < 0) {
+	if (bind(socket, (struct sockaddr*)&local, sizeof(local)) < 0) {
 		close(socket);
 		return errno;
 	}
@@ -487,7 +487,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 		} else if (bytesReceived < 0)
 			break;
 
-		dhcp_message *message = (dhcp_message *)buffer;
+		dhcp_message* message = (dhcp_message*)buffer;
 		if (message->transaction_id != htonl(fTransactionID)
 			|| !message->HasOptions()
 			|| memcmp(message->mac_address, discover.mac_address,
@@ -743,7 +743,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 				next = message.PutOption(next, OPTION_REQUEST_IP_ADDRESS,
 					(uint32)fAssignedAddress);
 				next = message.PutOption(next, OPTION_REQUEST_PARAMETERS,
-					kRequiredParameters, sizeof(kRequiredParameters));
+					kRequestParameters, sizeof(kRequestParameters));
 			} else
 				message.client_address = fAssignedAddress;
 
@@ -753,9 +753,9 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 
 		case DHCP_DISCOVER:
 		{
-			uint8 *next = message.PrepareMessage(type);
+			uint8* next = message.PrepareMessage(type);
 			next = message.PutOption(next, OPTION_REQUEST_PARAMETERS,
-				kRequiredParameters, sizeof(kRequiredParameters));
+				kRequestParameters, sizeof(kRequestParameters));
 			message.FinishOptions(next);
 			break;
 		}
