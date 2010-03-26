@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src kits debug ;
 UsePrivateHeaders debug ;
 UsePrivateHeaders kernel ;
 	# for <util/DoublyLinkedList.h>
+UsePrivateHeaders libroot ;
 UsePrivateHeaders runtime_loader ;
 UsePrivateHeaders shared ;
 UsePrivateSystemHeaders ;
@@ -12,9 +13,13 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 
 SharedLibrary libdebug.so :
 	debug_support.cpp
+	DebugContext.cpp
 	DebugEventStream.cpp
+	DebugLooper.cpp
+	DebugMessageHandler.cpp
 	Image.cpp
 	SymbolLookup.cpp
+	TeamDebugger.cpp
 
 	# architecture specific
 	arch_debug_support.cpp
