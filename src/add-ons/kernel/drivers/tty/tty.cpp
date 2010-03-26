@@ -17,6 +17,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -1732,6 +1733,26 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 
 				toRead = readLocker.AvailableBytes();
 			} while (toRead < wanted);
+
+			if (user_memcpy(buffer, &toRead, sizeof(int)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			return B_OK;
+		}
+
+		case FIONREAD:
+		{
+			int toRead = 0;
+
+			// release the mutex and grab a read lock
+			locker.Unlock();
+			ReaderLocker readLocker(cookie);
+
+			status_t status = readLocker.AcquireReader(0, 1);
+			if (status >= B_OK)
+				toRead = readLocker.AvailableBytes();
+			else if(status != B_WOULD_BLOCK)
+				return status;
 
 			if (user_memcpy(buffer, &toRead, sizeof(int)) != B_OK)
 				return B_BAD_ADDRESS;
