@@ -12,7 +12,6 @@ UsePrivateHeaders kernel libroot ;
 
 StaticLibrary libshared.a :
 	AboutWindow.cpp
-	AffineTransform.cpp
 	CalendarView.cpp
 	ColorQuantizer.cpp
 	CommandPipe.cpp

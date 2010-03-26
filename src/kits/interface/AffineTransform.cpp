@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,14 +9,17 @@
 #include <AffineTransform.h>
 #include <Point.h>
 
+
 BAffineTransform::BAffineTransform()
-	: fTransformMatrix()
+	:
+	fTransformMatrix()
 {
 }
 
 
 BAffineTransform::BAffineTransform(const BAffineTransform& copyFrom)
-	: fTransformMatrix(copyFrom.fTransformMatrix)
+	:
+	fTransformMatrix(copyFrom.fTransformMatrix)
 {
 }
 
@@ -62,49 +65,27 @@ BAffineTransform::TransformationChanged() const
 BPoint
 BAffineTransform::Apply(const BPoint& point) const
 {
-	BPoint rval(point);
-	_TransformPoint(rval);
-	return rval;
+	BPoint result(point);
+	_TransformPoint(result);
+	return result;
+}
+
+
+void
+BAffineTransform::Apply(BPoint* point) const
+{
+	if (point)
+		_TransformPoint(*point);
 }
 
 
 void
 BAffineTransform::Apply(BPoint* points, uint32 count) const
 {
-	for (uint32 i = 0; i < count; ++i)
-		_TransformPoint(points[i]);
-}
-
-
-void
-BAffineTransform::_Rotate(float angle)
-{
-	if (angle != 0.0)
-		fTransformMatrix.multiply(agg::trans_affine_rotation(angle));
-}
-
-
-void
-BAffineTransform::_Scale(float scaleX, float scaleY)
-{
-	if (scaleX != 0.0 || scaleY != 0.0)
-		fTransformMatrix.multiply(agg::trans_affine_scaling(scaleX, scaleY));
-}
-
-
-void
-BAffineTransform::_Translate(float deltaX, float deltaY)
-{
-	if (deltaX != 0.0 || deltaY != 0.0)
-		fTransformMatrix.multiply(agg::trans_affine_translation(deltaX, deltaY));
-}
-
-
-void
-BAffineTransform::_Shear(float shearX, float shearY)
-{
-	if (shearX != 0.0 || shearY != 0.0)
-		fTransformMatrix.multiply(agg::trans_affine_skewing(shearX, shearY));
+	if (points) {
+		for (uint32 i = 0; i < count; ++i)
+			_TransformPoint(points[i]);
+	}
 }
 
 
@@ -320,7 +301,8 @@ BAffineTransform::ScaleByCopy(float scaleX, float scaleY) const
 
 
 BAffineTransform
-BAffineTransform::ScaleByCopy(const BPoint& center, float scaleX, float scaleY) const
+BAffineTransform::ScaleByCopy(const BPoint& center, float scaleX,
+	float scaleY) const
 {
 	BAffineTransform copy(*this);
 	copy.Scale(center, scaleX, scaleY);
@@ -416,7 +398,8 @@ BAffineTransform::ShearByCopy(float shearX, float shearY) const
 
 
 BAffineTransform
-BAffineTransform::ShearByCopy(const BPoint& center, float shearX, float shearY) const
+BAffineTransform::ShearByCopy(const BPoint& center, float shearX,
+	float shearY) const
 {
 	BAffineTransform copy(*this);
 	copy.Shear(center, shearX, shearY);
@@ -439,6 +422,43 @@ BAffineTransform::ShearByCopy(const BPoint& center, const BPoint& shear) const
 	BAffineTransform copy(*this);
 	copy.Shear(center, shear);
 	return copy;
+}
+
+
+// #pragma mark -
+
+
+void
+BAffineTransform::_Rotate(float angle)
+{
+	if (angle != 0.0)
+		fTransformMatrix.multiply(agg::trans_affine_rotation(angle));
+}
+
+
+void
+BAffineTransform::_Scale(float scaleX, float scaleY)
+{
+	if (scaleX != 0.0 || scaleY != 0.0)
+		fTransformMatrix.multiply(agg::trans_affine_scaling(scaleX, scaleY));
+}
+
+
+void
+BAffineTransform::_Translate(float deltaX, float deltaY)
+{
+	if (deltaX != 0.0 || deltaY != 0.0) {
+		fTransformMatrix.multiply(
+			agg::trans_affine_translation(deltaX, deltaY));
+	}
+}
+
+
+void
+BAffineTransform::_Shear(float shearX, float shearY)
+{
+	if (shearX != 0.0 || shearY != 0.0)
+		fTransformMatrix.multiply(agg::trans_affine_skewing(shearX, shearY));
 }
 
 

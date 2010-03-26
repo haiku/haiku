@@ -33,6 +33,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
 
 MergeObject <libbe>interface_kit.o :
 	AbstractLayoutItem.cpp
+	AffineTransform.cpp
 	Alert.cpp
 	Alignment.cpp
 	Bitmap.cpp
