@@ -1,4 +1,8 @@
 /*
+ * Copyright 2009-2010, François Revol, <revol@free.fr>.
+ * Sponsored by TuneTracker Systems.
+ * Based on the Haiku usb_serial driver which is:
+ *
  * Copyright (c) 2007-2008 by Michael Lotz
  * Heavily based on the original usb_serial driver which is:
  *

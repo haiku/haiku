@@ -1,4 +1,8 @@
 /*
+ * Copyright 2009-2010, François Revol, <revol@free.fr>.
+ * Sponsored by TuneTracker Systems.
+ * Based on the Haiku usb_serial driver which is:
+ *
  * Copyright (c) 2007-2008 by Michael Lotz
  * Heavily based on the original usb_serial driver which is:
  *
@@ -61,6 +65,8 @@ static const uint32 sBeBoxRates[] = {
 };
 #endif
 
+// XXX: should really be generated from metadata (CSV ?)
+
 static const struct serial_support_descriptor sSupportedDevices[] = {
 
 #ifdef HANDLE_ISA_COM
@@ -73,47 +79,71 @@ static const struct serial_support_descriptor sSupportedDevices[] = {
 	// vendor/device matches first
 
 /*
+	// vendor: OxfordSemi
+#define VN "OxfordSemi"
 	{ B_PCI_BUS, "OxfordSemi 16950 Serial Port", sDefaultRates, NULL, { 32, 32, 8 },
 	  { PCI_simple_communications, PCI_serial, PCI_serial_16950,
-		0x1415, 0x9501 } },
+		0x1415, 0x9501, PCI_INVAL, PCI_INVAL } },
 */
+
+
+	// vendor: NetMos
+#define VN "NetMos"
+
+	// used in Manhattan cards
+	// 1 function / port
+	{ B_PCI_BUS, VN" 16550 Serial Port", sDefaultRates, NULL, { 8, 8, 8, 0, 0, 0 },
+	  { PCI_simple_communications, PCI_serial, PCI_serial_16550,
+		0x9710, 0x9865, PCI_INVAL, PCI_INVAL } },
+
+	// http://www.moschip.com/data/products/NM9835/Data%20Sheet_9835.pdf
+	// single function with all ports
+	// only BAR 0 & 1 are UART
+	{ B_PCI_BUS, VN" 16550 Serial Port", sDefaultRates, NULL, { 8, 8, 8, 0x3, 2, 0x000f },
+	  { PCI_simple_communications, PCI_serial, PCI_serial_16550,
+		0x9710, 0x9835, PCI_INVAL, PCI_INVAL } },
+
+#undef VN
+
+
+
 	// generic fallback matches
 	/*
 	{ B_PCI_BUS, "Generic XT Serial Port", NULL },
 	  { PCI_INVAL, PCI_INVAL, PCI_simple_communications,
-		PCI_serial, PCI_serial_xt } },
+		PCI_serial, PCI_serial_xt, PCI_INVAL, PCI_INVAL } },
 		
 	{ B_PCI_BUS, "Generic 16450 Serial Port", NULL },
 	  { PCI_INVAL, PCI_INVAL, PCI_simple_communications,
-		PCI_serial, PCI_serial_16450 } },
+		PCI_serial, PCI_serial_16450, PCI_INVAL, PCI_INVAL } },
 		
 	*/
 	{ B_PCI_BUS, "Generic 16550 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
 	  { PCI_simple_communications, PCI_serial, PCI_serial_16550,
-		PCI_INVAL, PCI_INVAL } },
+		PCI_INVAL, PCI_INVAL, PCI_INVAL, PCI_INVAL } },
 
 	{ B_PCI_BUS, "Generic 16650 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
 	  { PCI_simple_communications, PCI_serial, PCI_serial_16650,
-		PCI_INVAL, PCI_INVAL } },
+		PCI_INVAL, PCI_INVAL, PCI_INVAL, PCI_INVAL } },
 
 	{ B_PCI_BUS, "Generic 16750 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
 	  { PCI_simple_communications, PCI_serial, PCI_serial_16750,
-		PCI_INVAL, PCI_INVAL } },
+		PCI_INVAL, PCI_INVAL, PCI_INVAL, PCI_INVAL } },
 
 	{ B_PCI_BUS, "Generic 16850 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
 	  { PCI_simple_communications, PCI_serial, PCI_serial_16850,
-		PCI_INVAL, PCI_INVAL } },
+		PCI_INVAL, PCI_INVAL, PCI_INVAL, PCI_INVAL } },
 
 	{ B_PCI_BUS, "Generic 16950 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
 	  { PCI_simple_communications, PCI_serial, PCI_serial_16950,
-		PCI_INVAL, PCI_INVAL } },
+		PCI_INVAL, PCI_INVAL, PCI_INVAL, PCI_INVAL } },
 
 	// non PCI_serial devices
 
 	// beos zz driver supported that one
 	{ B_PCI_BUS, "Lucent Modem", sDefaultRates, NULL, { 8, 8, 8 },
 	  { PCI_simple_communications, PCI_simple_communications_other, 0x00, 
-		0x11C1, 0x0480 } }, 
+		0x11C1, 0x0480, PCI_INVAL, PCI_INVAL } }, 
 
 	{ B_PCI_BUS, NULL, NULL, NULL, {0}, {0} }
 };
@@ -408,6 +438,9 @@ scan_bus(bus_type bus)
 		resource_descriptor iodesc;
 		SerialDevice *master = NULL;
 
+		//TODO: handle maxports
+		//TODO: handle subsystem_id_mask
+
 		// instanciate devices on IO ports
 		for (int i = 0;
 			gConfigManagerModule->get_nth_resource_descriptor_of_type(
@@ -508,20 +541,50 @@ scan_pci_alt()
 
 		SerialDevice *master = NULL;
 
+		uint8 portCount = 0;
+		uint32 maxPorts = DEVICES_COUNT;
+
+		if (supported->constraints.maxports) {
+			maxPorts = supported->constraints.maxports;
+			TRACE_ALWAYS("card supports up to %d ports\n", maxPorts);
+		}
+		if (supported->constraints.subsystem_id_mask) {
+			uint32 id = info.u.h0.subsystem_id;
+			uint32 mask = supported->constraints.subsystem_id_mask;
+			id &= mask;
+			//TRACE_ALWAYS("mask: %lx, masked: %lx\n", mask, id);
+			while (!(mask & 0x1)) {
+				mask >>= 1;
+				id >>= 1;
+			}
+			maxPorts = (uint8)id;
+			TRACE_ALWAYS("subsystem id tells card has %d ports\n", maxPorts);
+		}
+
 		// find I/O ports
 		for (int r = 0; r < 6; r++) {
+			uint32 regbase = info.u.h0.base_registers[r];
+			uint32 reglen = info.u.h0.base_register_sizes[r];
+
 			/**/
-			TRACE_ALWAYS("range at 0x%08lx len 0x%lx flags 0x%02x\n",
-				info.u.h0.base_registers[r], info.u.h0.base_register_sizes[r],
-				info.u.h0.base_register_flags[r]);
+			TRACE("ranges[%d] at 0x%08lx len 0x%lx flags 0x%02x\n", r,
+				regbase, reglen, info.u.h0.base_register_flags[r]);
 			/**/
+
+			// empty
+			if (reglen == 0)
+				continue;
 
 			// not I/O
 			if ((info.u.h0.base_register_flags[r] & PCI_address_space) == 0)
 				continue;
 
-			uint32 regbase = info.u.h0.base_registers[r];
-			uint32 reglen = info.u.h0.base_register_sizes[r];
+			// the range for sure doesn't contain any UART
+			if (supported->constraints.ignoremask & (1 << r)) {
+				TRACE_ALWAYS("ignored regs at 0x%08lx len 0x%lx\n",
+					regbase, reglen);
+				continue;
+			}
 
 			TRACE_ALWAYS("regs at 0x%08lx len 0x%lx\n",
 				regbase, reglen);
@@ -538,7 +601,10 @@ next_split_alt:
 			// no more to split
 			if ((ioport - regbase) >= reglen)
 				continue;
-		
+
+			if (portCount >= maxPorts)
+				break;
+
 			TRACE_ALWAYS("inserting device at io 0x%04lx as %s\n", ioport, 
 				supported->name);
 
@@ -553,6 +619,7 @@ next_split_alt:
 				master = device;
 			
 			ioport += supported->constraints.split;
+			portCount++;
 			goto next_split_alt;
 			// try next part of the I/O range now
 

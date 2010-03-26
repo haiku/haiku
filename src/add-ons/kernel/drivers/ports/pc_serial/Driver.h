@@ -1,4 +1,8 @@
 /*
+ * Copyright 2009-2010, François Revol, <revol@free.fr>.
+ * Sponsored by TuneTracker Systems.
+ * Based on the Haiku usb_serial driver which is:
+ *
  * Copyright (c) 2007-2008 by Michael Lotz
  * Heavily based on the original usb_serial driver which is:
  *
@@ -36,7 +40,7 @@ extern "C" {
 #endif
 
 #define DRIVER_NAME		"pc_serial"		// driver name for debug output
-#define DEVICES_COUNT	20				// max simultaneously open devices
+#define DEVICES_COUNT	2				// max simultaneously open devices
 
 // avoid clashing with BeOS zz driver
 #define DEVFS_BASE		"ports/pc_serial"
@@ -59,9 +63,13 @@ struct port_constraints {
 	uint32 minsize;
 	uint32 maxsize;
 	uint32 split;		// range to split I/O ports for each device
+	uint8 ignoremask;	// bitmask of BARs to ignore when probing
+	uint8 maxports;		// max number of ports on the card if > 0
+	uint32 subsystem_id_mask;	// if set mask with subsys id and shift to get maxports
 };
 
 #define PCI_INVAL 0xffff
+
 struct serial_support_descriptor {
 	bus_type bus;	// B_*_BUS
 	const char *name;
@@ -79,6 +87,8 @@ struct serial_support_descriptor {
 		// for PCI: if PCI_INVAL then match class
 		ushort	vendor_id;
 		ushort	device_id;
+		ushort	subsystem_vendor_id;
+		ushort	subsystem_device_id;
 	} match;
 };
 typedef struct serial_support_descriptor serial_support_descriptor;
