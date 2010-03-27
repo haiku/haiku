@@ -99,7 +99,11 @@ static sem_id sSyslogNotify = -1;
 static struct syslog_message* sSyslogMessage;
 static struct ring_buffer* sSyslogBuffer;
 static size_t sSyslogBufferOffset = 0;
+	// (relative) buffer offset of the yet unsent syslog messages
 static bool sSyslogDropped = false;
+static size_t sSyslogDebuggerOffset = 0;
+	// (relative) buffer offset of the kernel debugger messages of the current
+	// KDL session
 
 static const char* sCurrentKernelDebuggerMessagePrefix;
 static const char* sCurrentKernelDebuggerMessage;
@@ -801,6 +805,8 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 	if (sCurrentKernelDebuggerMessage != NULL)
 		va_copy(sCurrentKernelDebuggerMessageArgs, args);
 
+	sSyslogDebuggerOffset = ring_buffer_readable(sSyslogBuffer);
+
 	print_kernel_debugger_message();
 
 	kprintf("Welcome to Kernel Debugging Land...\n");
@@ -1051,50 +1057,77 @@ cmd_dump_syslog(int argc, char** argv)
 		return 0;
 	}
 
-	bool currentOnly = false;
-	if (argc > 1) {
-		if (!strcmp(argv[1], "-n"))
-			currentOnly = true;
-		else {
-			print_debugger_command_usage(argv[0]);
-			return 0;
-		}
+	bool unsentOnly = false;
+	bool ignoreKDLOutput = true;
+
+	int argi = 1;
+	for (; argi < argc; argi++) {
+		if (strcmp(argv[argi], "-n") == 0)
+			unsentOnly = true;
+		else if (strcmp(argv[argi], "-k") == 0)
+			ignoreKDLOutput = false;
+		else
+			break;
 	}
 
-	uint32 start = sSyslogBuffer->first;
-	size_t end = start + sSyslogBuffer->in;
-	if (!currentOnly) {
-		// Start the buffer after the current end (we don't really know if
-		// this part has been written to already).
-		start = (start + sSyslogBuffer->in) % sSyslogBuffer->size;
-		end = start + sSyslogBuffer->size;
-	} else if (!ring_buffer_readable(sSyslogBuffer)) {
-		kprintf("Syslog is empty.\n");
+	if (argi < argc) {
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
-	// break it down to lines to make it grep'able
+	size_t debuggerOffset = sSyslogDebuggerOffset;
+	size_t start = unsentOnly ? sSyslogBufferOffset : 0;
+	size_t end = ignoreKDLOutput
+		? debuggerOffset : ring_buffer_readable(sSyslogBuffer);
 
+	// allocate a buffer for processing the syslog output
+	size_t bufferSize = 1024;
+	char* buffer = (char*)debug_malloc(bufferSize);
+	char stackBuffer[64];
+	if (buffer == NULL) {
+		buffer = stackBuffer;
+		bufferSize = sizeof(stackBuffer);
+	}
+
+	// filter the output
 	bool newLine = false;
-	char line[256];
-	size_t linePos = 0;
-	for (uint32 i = start; i < end; i++) {
-		char c = sSyslogBuffer->buffer[i % sSyslogBuffer->size];
-		if (c == '\0' || (uint8)c == 0xcc)
-			continue;
+	while (start < end) {
+		size_t bytesRead = ring_buffer_peek(sSyslogBuffer, start, buffer,
+			std::min(end - start, bufferSize - 1));
+		if (bytesRead == 0)
+			break;
+		start += bytesRead;
 
-		line[linePos++] = c;
-		newLine = false;
+		// remove '\0' and 0xcc
+		size_t toPrint = 0;
+		for (size_t i = 0; i < bytesRead; i++) {
+			if (buffer[i] != '\0' && buffer[i] != 0xcc)
+				buffer[toPrint++] = buffer[i];
+		}
 
-		if (c == '\n' || linePos == sizeof(line) - 1) {
-			newLine = c == '\n';
-			line[linePos] = '\0';
-			linePos = 0;
-			kprintf(line);
+		if (toPrint > 0) {
+			newLine = buffer[toPrint - 1] == '\n';
+			buffer[toPrint] = '\0';
+			kputs(buffer);
+		}
+
+		if (debuggerOffset > sSyslogDebuggerOffset) {
+			// Our output caused older syslog output to be evicted from the
+			// syslog buffer. We need to adjust our offsets accordingly. Note,
+			// this can still go wrong, if the buffer was already full and more
+			// was written to it than we have processed, but we can't help that.
+			size_t diff = debuggerOffset - sSyslogDebuggerOffset;
+			start -= std::min(start, diff);
+			end -= std::min(end, diff);
+			debuggerOffset = sSyslogDebuggerOffset;
 		}
 	}
+
 	if (!newLine)
-		kprintf("\n");
+		kputs("\n");
+
+	if (buffer != stackBuffer)
+		debug_free(buffer);
 
 	return 0;
 }
@@ -1237,6 +1270,8 @@ syslog_write(const char* text, int32 length, bool notify)
 			sSyslogDropped = true;
 		} else
 			sSyslogBufferOffset -= toDrop;
+
+		sSyslogDebuggerOffset -= std::min(toDrop, sSyslogDebuggerOffset);
 	}
 
 	ring_buffer_write(sSyslogBuffer, (uint8*)text, length);
@@ -1336,7 +1371,8 @@ syslog_init_post_vm(struct kernel_args* args)
 
 	add_debugger_command_etc("syslog", &cmd_dump_syslog,
 		"Dumps the syslog buffer.",
-		"[-n]\nDumps the whole syslog buffer, or, if -n is specified, only "
+		"[ \"-n\" ] [ \"-k\" ]\n"
+		"Dumps the whole syslog buffer, or, if -k is specified, only "
 		"the part that hasn't been sent yet.\n", 0);
 
 	add_debugger_command("serial_input", &cmd_serial_input,
