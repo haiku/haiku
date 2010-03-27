@@ -1368,7 +1368,7 @@ AboutView::_CreateCreditsView()
 		.SetCopyright(COPYRIGHT_STRING "1995-2001 Lars Düning. "
 			"All rights reserved.")
 		.SetLicense("MkDepend")
-		.SetURL("http://bearnip.com/lars/be/mkdepend.html"));
+		.SetURL("http://bearnip.com/lars/be/"));
 
 	// libhttpd copyright (used as Poorman backend)
 	_AddPackageCredit(PackageCredit("libhttpd")
