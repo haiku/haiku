@@ -156,6 +156,28 @@ static const Translation gTranslations[] =
 #define kNumberOfTranslations (sizeof(gTranslations) / sizeof(Translation))
 
 
+static int
+TranslationComparator(const void* left, const void* right)
+{
+	const Translation* leftTranslation = *(const Translation**)left;
+	const Translation* rightTranslation = *(const Translation**)right;
+
+	BLanguage* language;
+	be_locale_roster->GetLanguage(&language, leftTranslation->languageCode);
+	BString leftName;
+	language->GetName(&leftName);
+	delete language;
+
+	be_locale_roster->GetLanguage(&language, rightTranslation->languageCode);
+	BString rightName;
+	language->GetName(&rightName);
+	delete language;
+
+	return be_locale->Collator()->Compare(leftName.String(),
+		rightName.String());
+}
+
+
 class AboutApp : public BApplication {
 public:
 								AboutApp();
@@ -1014,12 +1036,19 @@ AboutView::_CreateCreditsView()
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert(TR("Translations:\n"));
 
-	// TODO : sort languages alphabetically using collators
 	BLanguage* lang;
 	BString langName;
 
+	BList sortedTranslations;
 	for (uint32 i = 0; i < kNumberOfTranslations; i ++) {
-		const Translation& translation = gTranslations[i];
+		const Translation* translation = &gTranslations[i];
+		sortedTranslations.AddItem((void*)translation);
+	}
+	sortedTranslations.SortItems(TranslationComparator);
+
+	for (uint32 i = 0; i < kNumberOfTranslations; i ++) {
+		const Translation& translation =
+			*(const Translation*)sortedTranslations.ItemAt(i);
 
 		be_locale_roster->GetLanguage(&lang, translation.languageCode);
 		langName.Truncate(0);
