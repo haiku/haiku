@@ -74,6 +74,86 @@ static const rgb_color kHaikuOrange = { 255, 69, 0, 255 };
 static const rgb_color kHaikuYellow = { 255, 176, 0, 255 };
 static const rgb_color kLinkBlue = { 80, 80, 200, 255 };
 
+typedef struct
+{
+	const char* languageCode;
+	const char* names;
+} Translation;
+
+static const Translation gTranslations[] =
+{
+	{ "bg",
+		"cssvb94\n"
+	},
+	{ "nl",
+		"Meanwhile\n"
+	},
+	{ "eo",
+		"Travis D. Reed (Dancxjo)\n"
+	},
+	{ "fi",
+		"Jaakko Leikas (Garjala)\n"
+	},
+	{ "fr",
+		"Jean-Loïc Charroud\n"
+		"Adrien Destugues (PulkoMandy)\n"
+	},
+	{ "de",
+		"Colin Günther\n"
+		"leszek\n"
+		"Christian Morgenroth\n"
+		"Joachim Seemer (Humdinger)\n"
+		"Matthias Spreiter\n"
+		"svend\n"
+	},
+	{ "hu",
+		"Zoltán Mizsei (miqlas)\n"
+		"Zoltán Szabó (Bird)\n"
+	},
+	{ "it",
+		"Andrea Bernardi\n"
+	},
+	{ "ja",
+		"Hironoru Ichimiya\n"
+		"Jorge G. Mare (Koki)\n"
+		"Takashi Murai\n"
+		"SHINTA\n"
+		"The JPBE.net user group\n"
+	},
+	{ "lt",
+		"Algirdas Buckus\n"
+	},
+	{ "pl",
+		"Artur Wyszyński\n"
+		"Hubert Hareńczyk\n"
+	},
+	{ "pt",
+		"Marcos Alves (Xeon3D)\n"
+	},
+	{ "ru",
+		"Tatyana Fursic (iceid)\n"
+		"StoroZ Gneva\n"
+		"Rustam Islamov (RISC aka HaikuBot)\n"
+		"Eugene Katashov (mrNoisy)\n"
+		"Reznikov Sergei (Diver)\n"
+		"Michael Smirnov\n"
+	},
+	{ "es",
+		"Nicolás C (CapitanPico)\n"
+		"Oscar Carballal (oscarcp)\n"
+		"Miguel Zúñiga González (miguel~1.mx)\n"
+	},
+	{ "sv",
+		"Johan Holmberg\n"
+		"Jimmy Olsson (phalax)\n"
+		"Victor Widell\n"
+	},
+	{ "uk",
+		"Alex Rudyk (totish)\n"
+	}
+};
+
+#define kNumberOfTranslations (sizeof(gTranslations) / sizeof(Translation))
 
 
 class AboutApp : public BApplication {
@@ -938,250 +1018,23 @@ AboutView::_CreateCreditsView()
 	BLanguage* lang;
 	BString langName;
 
-	be_locale_roster->GetLanguage(&lang, "bg");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
+	for (uint32 i = 0; i < kNumberOfTranslations; i ++) {
+		const Translation& translation = gTranslations[i];
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"cssvb94\n"
-	);
+		be_locale_roster->GetLanguage(&lang, translation.languageCode);
+		langName.Truncate(0);
+		lang->GetName(&langName);
+		delete lang;
 
-	be_locale_roster->GetLanguage(&lang, "nl");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Meanwhile\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "eo");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Travis D. Reed (Dancxjo)\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "fi");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Jaakko Leikas (Garjala)\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "fr");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Jean-Loïc Charroud\n"
-		"Adrien Destugues (PulkoMandy)\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "de");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Colin Günther\n"
-		"leszek\n"
-		"Christian Morgenroth\n"
-		"Joachim Seemer (Humdinger)\n"
-		"Matthias Spreiter\n"
-		"svend\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "hu");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Zoltán Mizsei (miqlas)\n"
-		"Zoltán Szabó (Bird)\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "it");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Andrea Bernardi\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "ja");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Hironoru Ichimiya\n"
-		"Jorge G. Mare (Koki)\n"
-		"Takashi Murai\n"
-		"SHINTA\n"
-		"The JPBE.net user group\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "lt");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Algirdas Buckus\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "pl");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Artur Wyszyński\n"
-		"Hubert Hareńczyk\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "pt");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Marcos Alves (Xeon3D)\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "ru");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Tatyana Fursic (iceid)\n"
-		"StoroZ Gneva\n"
-		"Rustam Islamov (RISC aka HaikuBot)\n"
-		"Eugene Katashov (mrNoisy)\n"
-		"Reznikov Sergei (Diver)\n"
-		"Michael Smirnov\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "es");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Nicolás C (CapitanPico)\n"
-		"Oscar Carballal (oscarcp)\n"
-		"Miguel Zúñiga González (miguel~1.mx)\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "sv");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Johan Holmberg\n"
-		"Jimmy Olsson (phalax)\n"
-		"Victor Widell\n"
-	);
-
-	be_locale_roster->GetLanguage(&lang, "uk");
-	langName.Truncate(0);
-	lang->GetName(&langName);
-	delete lang;
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
-	fCreditsView->Insert("\n");
-	fCreditsView->Insert(langName);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(
-		"Alex Rudyk (totish)\n"
-	);
+		fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
+		fCreditsView->Insert("\n");
+		fCreditsView->Insert(langName);
+		fCreditsView->Insert("\n");
+		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+		fCreditsView->Insert(
+			translation.names
+		);
+	}
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert(TR("\n\nSpecial thanks to:\n"));
