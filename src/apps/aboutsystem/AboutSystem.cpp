@@ -1353,22 +1353,23 @@ AboutView::_CreateCreditsView()
 	// BColorQuantizer (originally CQuantizer code)
 	_AddPackageCredit(PackageCredit("CQuantizer")
 		.SetCopyright(COPYRIGHT_STRING "1996-1997 Jeff Prosise. "
-			"All rights reserved."));
-			// TODO: License!
+			"All rights reserved.")
+		.SetLicense("CQuantizer")
+		.SetURL("http://www.xdp.it"));
 
 	// MAPM (Mike's Arbitrary Precision Math Library) used by DeskCalc
 	_AddPackageCredit(PackageCredit("MAPM")
 		.SetCopyright(COPYRIGHT_STRING
 			"1999-2007 Michael C. Ring. All rights reserved.")
+		.SetLicense("MAPM")
 		.SetURL("http://tc.umn.edu/~ringx004"));
-			// TODO: License!
 
 	// MkDepend 1.7 copyright (Makefile dependency generator)
 	_AddPackageCredit(PackageCredit("MkDepend")
 		.SetCopyright(COPYRIGHT_STRING "1995-2001 Lars Düning. "
 			"All rights reserved.")
 		.SetLicense("MkDepend")
-		.SetURL("http://bearnip.com/lars/be/"));
+		.SetURL("http://bearnip.com/lars/be"));
 
 	// libhttpd copyright (used as Poorman backend)
 	_AddPackageCredit(PackageCredit("libhttpd")
