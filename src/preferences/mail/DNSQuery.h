@@ -51,7 +51,7 @@ private:
 
 class DNSTools {
 public:
-		static void		GetDNSServers(BObjectList<BString>* serverList);
+		static status_t		GetDNSServers(BObjectList<BString>* serverList);
 		static BString	ConvertToDNSName(const BString& string);
 		static BString	ConvertFromDNSName(const BString& string);
 };

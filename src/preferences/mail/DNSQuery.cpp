@@ -9,7 +9,7 @@
 #include <NetEndpoint.h>
 #include <Path.h> 
 
-// #define DEBUG 1
+ #define DEBUG 1
 
 #undef PRINT
 #ifdef DEBUG
@@ -149,9 +149,11 @@ BRawNetBuffer::_ReadSubString(BString& string, off_t pos)
 // #pragma mark - DNSTools
 
 
-void
+status_t
 DNSTools::GetDNSServers(BObjectList<BString>* serverList)
 {
+	// TODO: reading resolv.conf ourselves shouldn't be needed.
+	// we should have some function to retrieve the dns list
 #define	MATCH(line, name) \
 	(!strncmp(line, name, sizeof(name) - 1) && \
 	(line[sizeof(name) - 1] == ' ' || \
@@ -159,7 +161,7 @@ DNSTools::GetDNSServers(BObjectList<BString>* serverList)
 
 	BPath path;
 	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK)
-		return;
+		return B_ENTRY_NOT_FOUND;
 
 	path.Append("network/resolv.conf");
 
@@ -167,7 +169,7 @@ DNSTools::GetDNSServers(BObjectList<BString>* serverList)
 	if (fp == NULL) {
 		fprintf(stderr, "failed to open '%s' to read nameservers: %s\n", 
 			path.Path(), strerror(errno));
-		return;
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	int nserv = 0;
@@ -198,6 +200,8 @@ DNSTools::GetDNSServers(BObjectList<BString>* serverList)
 	}
 
 	fclose(fp);
+	
+	return B_OK;
 }
 
 
@@ -271,16 +275,14 @@ DNSQuery::ReadDNSServer(in_addr* add)
 {
 	// list owns the items
 	BObjectList<BString> dnsServerList(5, true);
-	DNSTools::GetDNSServers(&dnsServerList);
+	status_t status = DNSTools::GetDNSServers(&dnsServerList);
+	if (status != B_OK)
+		return status;
+		
 	BString* firstDNS = dnsServerList.ItemAt(0);
-	int status = -1;
-	if (firstDNS)
-		status = inet_aton(firstDNS->String(), add);
-	else
+	if (firstDNS == NULL || inet_aton(firstDNS->String(), add) != 1)
 		return B_ERROR;
 
-	if (status != 1)
-		return B_ERROR;
 	PRINT("dns server found: %s \n", firstDNS->String());
 	return B_OK;
 }
