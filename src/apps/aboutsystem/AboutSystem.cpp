@@ -1303,13 +1303,15 @@ AboutView::_CreateCreditsView()
 
 	// cortex copyrights
 	_AddPackageCredit(PackageCredit("Cortex")
-		.SetCopyright(COPYRIGHT_STRING "1999-2000 Eric Moon."));
-			// TODO: License!
+		.SetCopyright(COPYRIGHT_STRING "1999-2000 Eric Moon.")
+		.SetLicense("BSD (Alternate 3-clause)")
+		.SetURL("http://cortex.sourceforge.net/documentation"));
 
 	// FluidSynth copyrights
 	_AddPackageCredit(PackageCredit("FluidSynth")
-		.SetCopyright(COPYRIGHT_STRING "2003 Peter Hanappe and others."));
-			// TODO: License!
+		.SetCopyright(COPYRIGHT_STRING "2003 Peter Hanappe and others.")
+		.SetLicense("GNU LGPL v2")
+		.SetURL("http://www.fluidsynth.org"));
 
 	// CannaIM copyrights
 	_AddPackageCredit(PackageCredit("CannaIM")
@@ -1319,14 +1321,18 @@ AboutView::_CreateCreditsView()
 	// libxml2, libxslt, libexslt copyrights
 	_AddPackageCredit(PackageCredit("libxml2, libxslt")
 		.SetCopyright(COPYRIGHT_STRING
-			"1998-2003 Daniel Veillard. All rights reserved."));
+			"1998-2003 Daniel Veillard. All rights reserved.")
+		.SetURL("http://xmlsoft.org"));
 			// TODO: License!
+			// NOTE: MIT license + cannot use author name for promotion
 
 	_AddPackageCredit(PackageCredit("libexslt")
 		.SetCopyright(COPYRIGHT_STRING
 			"2001-2002 Thomas Broyer, Charlie "
-			"Bozeman and Daniel Veillard.  All rights reserved."));
+			"Bozeman and Daniel Veillard.  All rights reserved.")
+		.SetURL("http://xmlsoft.org"));
 			// TODO: License!
+			// NOTE: MIT license + cannot use author name for promotion
 
 	// Xiph.org Foundation copyrights
 	_AddPackageCredit(PackageCredit("Xiph.org Foundation")
@@ -1334,21 +1340,21 @@ AboutView::_CreateCreditsView()
 			COPYRIGHT_STRING "1994-2008 Xiph.Org. "
 			"All rights reserved.",
 			NULL)
+		.SetLicense("BSD (Alternate 3-clause)")
 		.SetURL("http://www.xiph.org"));
-			// TODO: License!
 
 	// The Tcpdump Group
 	_AddPackageCredit(PackageCredit("The Tcpdump Group")
 		.SetCopyright("tcpdump, libpcap")
+		.SetLicense("BSD (Alternate 3-clause)")
 		.SetURL("http://www.tcpdump.org"));
-			// TODO: License!
 
 	// Matroska
 	_AddPackageCredit(PackageCredit("libmatroska")
 		.SetCopyright(COPYRIGHT_STRING "2002-2003 Steve Lhomme. "
 			"All rights reserved.")
+		.SetLicense("GNU LGPL v2.1")
 		.SetURL("http://www.matroska.org"));
-			// TODO: License!
 
 	// BColorQuantizer (originally CQuantizer code)
 	_AddPackageCredit(PackageCredit("CQuantizer")
@@ -1368,7 +1374,7 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("MkDepend")
 		.SetCopyright(COPYRIGHT_STRING "1995-2001 Lars Düning. "
 			"All rights reserved.")
-		.SetLicense("MkDepend")
+		.SetLicense("BSD (Alternate 3-clause)")
 		.SetURL("http://bearnip.com/lars/be"));
 
 	// libhttpd copyright (used as Poorman backend)
