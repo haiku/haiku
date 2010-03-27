@@ -1366,8 +1366,9 @@ AboutView::_CreateCreditsView()
 	// MkDepend 1.7 copyright (Makefile dependency generator)
 	_AddPackageCredit(PackageCredit("MkDepend")
 		.SetCopyright(COPYRIGHT_STRING "1995-2001 Lars Düning. "
-			"All rights reserved."));
-			// TODO: License!
+			"All rights reserved.")
+		.SetLicense("MkDepend")
+		.SetURL("http://bearnip.com/lars/be/mkdepend.html"));
 
 	// libhttpd copyright (used as Poorman backend)
 	_AddPackageCredit(PackageCredit("libhttpd")
