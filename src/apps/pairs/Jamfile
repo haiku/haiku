@@ -17,4 +17,5 @@ DoCatalogs Pairs :
 	:
 	PairsWindow.cpp
 	: en.catalog
+	: uk.catkeys
 ;

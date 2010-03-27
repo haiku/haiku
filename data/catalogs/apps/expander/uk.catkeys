@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Expander	1738666712
+1	ukrainian	x-vnd.Haiku-Expander	2289329519
 Expand	ExpanderMenu		Розпакувати
 Set destination…	ExpanderMenu		Встановити ціль…
 File expanded	ExpanderWindow		Файл розпаковано
@@ -12,7 +12,6 @@ Hide contents	ExpanderWindow		Сховати вміст
 Cancel	ExpanderWindow		Відмінити
 Continue	ExpanderWindow		Продовжити
 Expander	ExpanderWindow	!! Window Title !!	Expander
-Expander\n\twriten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		Expander\n\tАвтор: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nоригінальна Be-версія \nDominic, Hiroshi, Peter, Pavel і Robert\n\tПереклад українською: Олекса Рудик aka totish\n
 The destination folder does not exist.	ExpanderWindow		Цільова папка відсутня.
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені, що хочете зупинити розпаковку цього архіва? Розпакована величина може бути некомплектною.
 Select	DirectoryFilePanel		Вибрати
