@@ -1101,7 +1101,7 @@ cmd_dump_syslog(int argc, char** argv)
 		// remove '\0' and 0xcc
 		size_t toPrint = 0;
 		for (size_t i = 0; i < bytesRead; i++) {
-			if (buffer[i] != '\0' && buffer[i] != 0xcc)
+			if (buffer[i] != '\0' && (uint8)buffer[i] != 0xcc)
 				buffer[toPrint++] = buffer[i];
 		}
 
