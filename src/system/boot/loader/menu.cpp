@@ -734,12 +734,6 @@ add_debug_menu()
     item->SetHelpText("Displays debug output on screen while the system "
 		"is booting, instead of the normal boot logo.");
 
-	// set debug syslog default; doesn't really belong here, but there's no
-	// better place ATM
-#if KDEBUG_ENABLE_DEBUG_SYSLOG
-	gKernelArgs.keep_debug_output_buffer = true;
-#endif
-
 	menu->AddItem(item = new(nothrow) MenuItem("Enable debug syslog"));
 	item->SetType(MENU_ITEM_MARKABLE);
 	item->SetMarked(gKernelArgs.keep_debug_output_buffer);

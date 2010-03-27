@@ -35,6 +35,11 @@ main(stage2_args *args)
 
 	TRACE(("boot(): heap initialized...\n"));
 
+	// set debug syslog default
+#if KDEBUG_ENABLE_DEBUG_SYSLOG
+	gKernelArgs.keep_debug_output_buffer = true;
+#endif
+
 	// construct boot_volume KMessage explicitely
 	new(&gKernelArgs.boot_volume) KMessage;
 
