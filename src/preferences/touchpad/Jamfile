@@ -17,5 +17,5 @@ DoCatalogs Touchpad :
 	main.cpp
 	: en.catalog
 	: de.catkeys es.catkeys fr.catkeys hu.catkeys it.catkeys lt.catkeys
-	  pl.catkeys pt.catkeys uk.catkeys
+	  pl.catkeys pt.catkeys ru.catkeys uk.catkeys
 	;

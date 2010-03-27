@@ -29,5 +29,5 @@ DoCatalogs ShowImage :
 	ShowImageApp.cpp
 	ShowImageWindow.cpp
 	: en.catalog
-	: it.catkeys uk.catkeys
+	: it.catkeys ru.catkeys uk.catkeys
 	;

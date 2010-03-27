@@ -1,0 +1,38 @@
+1	russian	x-vnd.Be-PSRV	2376709688
+Undefined	ConfigWindow		Неопределено
+A5	ConfigWindow		A5
+Cancel	PrintServerApp		Отмена
+copies	ConfigWindow		копий
+Legal	ConfigWindow		Правильный
+A2	ConfigWindow		A2
+to	ConfigWindow		в
+Page setup:	ConfigWindow		Настройка печати:
+OK	ConfigWindow		Ok
+Cancel	ConfigWindow		Отмена
+Yes	PrintServerApp		Да
+Would you like to set one up now?	PrintServerApp		Хотите настроить принтер сейчас?
+Portrait	ConfigWindow		Портрет
+All pages	ConfigWindow		Все страницы
+There is no default printer set up.	PrintServerApp		Не выбран принтер по умолчанию.
+Tabloid	ConfigWindow		Аннотация
+There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Принтер, который Вы собираетесь создать, уже существует, но его драйвер невозможно найти! Заменить?
+A4	ConfigWindow		A4
+Printer:	ConfigWindow		Принтер:
+Select a printer	ConfigWindow		Выберите принтер
+A1	ConfigWindow		A1
+No	PrintServerApp		Нет
+B5	ConfigWindow		B5
+Landscape	ConfigWindow		Альбом
+There are no printers set up.	PrintServerApp		Нет настроенных принтеров.
+Page	ConfigWindow		Страница
+Ledger	ConfigWindow		Книга
+Letter	ConfigWindow		Письмо
+There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Принтер, который Вы собираетесь создать, уже существует, но он не используется! Заменить?
+A0	ConfigWindow		A0
+A6	ConfigWindow		A6
+A3	ConfigWindow		A3
+OK	PrintServerApp		Oк
+Print setup	ConfigWindow		Настройка печати
+Would you like to make @ the default printer?	PrintServerApp		Вы хотите сделать @ принтером по умолчанию?
+Page setup	ConfigWindow		Настройка печати
+Paper setup:	ConfigWindow		Параметры бумаги:

@@ -1,0 +1,38 @@
+1	russian	x-vnd.Haiku-Expander	1738666712
+Expand	ExpanderMenu		Распаковать
+Set destination…	ExpanderMenu		Путь для извлечения…
+File expanded	ExpanderWindow		Файл распакован
+The destination is read only.	ExpanderWindow		Путь назначения доступен только для чтения.
+Expander: Open	ExpanderWindow		Expander: Открыть
+ is not supported	ExpanderWindow		 не поддерживается
+Select current	DirectoryFilePanel		Выбрать текущий
+Source	ExpanderWindow		Источник
+Error when expanding archive	ExpanderWindow		Ошибка при распаковке файла
+Hide contents	ExpanderWindow		Скрыть содержимое
+Cancel	ExpanderWindow		Отмена
+Continue	ExpanderWindow		Продолжить
+Expander	ExpanderWindow	!! Window Title !!	Expander
+Expander\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		Expander\n\tразработан Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nоригинальная Be версия разработана \nDominic, Hiroshi, Peter, Pavel и Robert\n
+The destination folder does not exist.	ExpanderWindow		Папка назначения не существует.
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Вы уверены, что хотите остановить распаковку этого\nархива? Некоторые файлы могли быть извлечены не полностью.
+Select	DirectoryFilePanel		Выбрать
+Creating listing for 	ExpanderWindow		Создается список файлов для 
+Settings	ExpanderMenu		Настройки
+Settings…	ExpanderMenu		Настройки…
+Expander: Choose destination	DirectoryFilePanel		Expander: Выбор папки для извлечения
+Show contents	ExpanderWindow		Показать содержимое
+Expanding file 	ExpanderWindow		Извлечение файла
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка была перемещена, переименована либо не\nподдерживается.
+The file doesn't exist	ExpanderWindow		Файл не существует
+Stop	ExpanderMenu		Остановить
+File	ExpanderMenu		Файл
+Expand	ExpanderWindow		Извлечь
+Close	ExpanderMenu		Закрыть
+The destination is not a folder.	ExpanderWindow		Указанный объет не является папкой.
+About Expander…	ExpanderMenu		О программе…
+OK	About		Oк
+Set source…	ExpanderMenu		Выбрать источник…
+Select '%s'	DirectoryFilePanel		Выбрать '%s'
+Show contents	ExpanderMenu		Показать содержимое
+Stop	ExpanderWindow		Остановить
+Destination	ExpanderWindow		Назначение

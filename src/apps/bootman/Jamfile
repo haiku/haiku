@@ -42,5 +42,5 @@ DoCatalogs bootman :
 	UninstallPage.cpp
 	WizardView.cpp
 	: en.catalog
-	: de.catkeys es.catkeys ja.catkeys uk.catkeys
+	: de.catkeys es.catkeys ja.catkeys ru.catkeys uk.catkeys
 	;
