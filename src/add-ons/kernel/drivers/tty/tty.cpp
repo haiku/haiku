@@ -1823,7 +1823,7 @@ tty_input_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 			// Non-blocking mode. Handle VMIN and VTIME.
 			bytesNeeded = tty->settings->termios.c_cc[VMIN];
 			bigtime_t vtime = tty->settings->termios.c_cc[VTIME] * 100000;
-			TRACE(("tty_input_read: icanon vmin %lu, vtime %Ldus\n", vmin,
+			TRACE(("tty_input_read: icanon vmin %lu, vtime %Ldus\n", bytesNeeded,
 				vtime));
 
 			if (bytesNeeded == 0) {
