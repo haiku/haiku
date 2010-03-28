@@ -8,10 +8,12 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 #include <sys/select.h>
 
 #include <OS.h>
@@ -145,7 +147,7 @@ public:
 
 	int Select(bigtime_t timeout = -1)
 	{
-		int count = max(max(fReadSet.Count(), fWriteSet.Count()),
+		int count = max_c(max_c(fReadSet.Count(), fWriteSet.Count()),
 			fErrorSet.Count());
 		fd_set *readSet = (fReadSet.Count() > 0 ? &fReadSet : NULL);
 		fd_set *writeSet = (fWriteSet.Count() > 0 ? &fWriteSet : NULL);
@@ -401,7 +403,8 @@ open_tty(int index, bool master)
 
 	char path[32];
 	sprintf(path, "/dev/%ct/r%x", (master ? 'p' : 't'), index);
-	int fd = open(path, O_RDWR);
+	// we do not want the slave to be our controlling tty
+	int fd = open(path, O_RDWR | (master ? 0 : O_NOCTTY));
 
 	if (fd < 0) {
 		fprintf(stderr, "Failed to open tty `%s': %s\n", path, strerror(errno));
@@ -801,6 +804,89 @@ private:
 	bool	fUnblock;
 };
 
+// TestIoctlFIONRead
+class TestIoctlFIONRead : public TestCase {
+public:
+	TestIoctlFIONRead(bool master)
+		: fMaster(-1),
+		  fSlave(-1),
+		  fTestMaster(master)
+	{
+		printf("TestIoctlFIONRead(%d)\n", master);
+	}
+
+
+protected:
+	virtual ~TestIoctlFIONRead()
+	{
+		close_tty(fMaster);
+		close_tty(fSlave);
+	}
+
+	virtual void Test()
+	{
+		fMaster = open_tty(0, true);
+		fSlave = open_tty(0, false);
+		
+		int fd = (fTestMaster ? fMaster : fSlave);
+		status_t err;
+		int toRead = -1;
+
+		errno = 0;
+		err = ioctl(fd, FIONREAD, NULL);
+		CHK(err == -1);
+printf("e: %s\n", strerror(errno));
+		// should be CHK(errno == EINVAL); !!
+		CHK(errno == EFAULT);
+
+		errno = 0;
+		err = ioctl(fd, FIONREAD, (void *)1);
+		CHK(err == -1);
+printf("e: %s\n", strerror(errno));
+		CHK(errno == EFAULT);
+
+		errno = 0;
+
+		err = ioctl(fd, FIONREAD, &toRead);
+printf("e: %s\n", strerror(errno));
+		//CHK(err == 0);
+		//CHK(toRead == 0);
+
+		WriteDontFail((fTestMaster ? fSlave : fMaster), 1);
+
+		errno = 0;
+
+		err = ioctl(fd, FIONREAD, &toRead);
+printf("e: %d\n", err);
+		CHK(err == 0);
+		CHK(toRead == 1);
+
+		WriteUntilBlock((fTestMaster ? fSlave : fMaster));
+
+		err = ioctl(fd, FIONREAD, &toRead);
+		CHK(err == 0);
+		CHK(toRead > 1);
+
+		close_tty((fTestMaster ? fSlave : fMaster));
+
+		err = ioctl(fd, FIONREAD, &toRead);
+		CHK(err == 0);
+		CHK(toRead > 1);
+
+		ReadDontFail(fd, toRead);
+
+		err = ioctl(fd, FIONREAD, &toRead);
+		CHK(err == 0);
+		CHK(toRead == 0);
+
+	}
+
+private:
+	int		fMaster;
+	int		fSlave;
+	bool	fTestMaster;
+};
+
 
 
 // #pragma mark -
@@ -842,6 +928,9 @@ main()
 	RUN_TEST(new TestSelectNotifyAfterPending(true,  false, true));
 	RUN_TEST(new TestSelectNotifyAfterPending(true,  true,  false));
 	RUN_TEST(new TestSelectNotifyAfterPending(true,  true,  true));
+
+	RUN_TEST(new TestIoctlFIONRead(true));
+	//RUN_TEST(new TestIoctlFIONRead(false));
 
 	return 0;
 }
