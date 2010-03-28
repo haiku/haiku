@@ -100,7 +100,7 @@ static const struct serial_support_descriptor sSupportedDevices[] = {
 	// single function with all ports
 	// only BAR 0 & 1 are UART
 	// http://www.moschip.com/data/products/NM9835/Data%20Sheet_9835.pdf
-	{ B_PCI_BUS, VN" 16550 Serial Port", sDefaultRates, NULL, { 8, 8, 8, 0x3, 2, 0x000f },
+	{ B_PCI_BUS, VN" 16550 Serial Port", sDefaultRates, NULL, { 8, 8, 8, ~0x3, 2, 0x000f },
 	  { PCI_simple_communications, PCI_serial, PCI_serial_16550,
 		0x9710, 0x9835, PCI_INVAL, PCI_INVAL } },
 
