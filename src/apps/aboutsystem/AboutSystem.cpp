@@ -1139,14 +1139,14 @@ AboutView::_CreateCreditsView()
 	// FFMpeg copyrights
 	_AddPackageCredit(PackageCredit("FFMpeg libavcodec")
 		.SetCopyright(COPYRIGHT_STRING "2000-2007 Fabrice Bellard, et al.")
+		.SetLicenses("GNU LGPL v2.1", "GNU LGPL v2", NULL)
 		.SetURL("http://www.ffmpeg.org"));
-			// TODO: License!
 
 	// AGG copyrights
 	_AddPackageCredit(PackageCredit("AntiGrain Geometry")
 		.SetCopyright(COPYRIGHT_STRING "2002-2006 Maxim Shemanarev (McSeem).")
+		.SetLicenses("Anti-Grain Geometry", "BSD (3-clause)", "GPC", NULL)
 		.SetURL("http://www.antigrain.com"));
-			// TODO: License!
 
 	// PDFLib copyrights
 	_AddPackageCredit(PackageCredit("PDFLib")
@@ -1155,6 +1155,7 @@ AboutView::_CreateCreditsView()
 			"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.")
 		.SetURL("http://www.pdflib.com"));
 			// TODO: License!
+			// NOTE: src/libs/pdflib/doc/PDFlib-license.pdf
 
 	// FreeType copyrights
 	_AddPackageCredit(PackageCredit("FreeType2")
@@ -1163,6 +1164,7 @@ AboutView::_CreateCreditsView()
 			"The FreeType Project.  All rights reserved.")
 		.SetURL("http://www.freetype.org"));
 			// TODO: License!
+			// NOTE: docs/freetype2/license.txt
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
 	_AddPackageCredit(PackageCredit("Mesa")
