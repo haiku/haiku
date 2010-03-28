@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Ingo Weinhold <ingo_weinhold@gmx.de>.
+ * Copyright 2006-2010, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +13,8 @@
 #include <LayoutUtils.h>
 #include <List.h>
 #include <View.h>
+
+#include <Referenceable.h>
 
 #include "ComplexLayouter.h"
 #include "OneElementLayouter.h"
@@ -50,7 +52,7 @@
 //#define DEBUG_LAYOUT
 
 // CompoundLayouter
-class BTwoDimensionalLayout::CompoundLayouter {
+class BTwoDimensionalLayout::CompoundLayouter : public BReferenceable {
 public:
 								CompoundLayouter(enum orientation orientation);
 	virtual						~CompoundLayouter();
@@ -138,6 +140,7 @@ private:
 class BTwoDimensionalLayout::LocalLayouter : private BLayoutContextListener {
 public:
 								LocalLayouter(BTwoDimensionalLayout* layout);
+								~LocalLayouter();
 
 	// interface for the BTwoDimensionalLayout class
 
@@ -891,6 +894,20 @@ BTwoDimensionalLayout::LocalLayouter::LocalLayouter(
 }
 
 
+BTwoDimensionalLayout::LocalLayouter::~LocalLayouter()
+{
+	if (fHLayouter != NULL) {
+		fHLayouter->RemoveLocalLayouter(this);
+		fHLayouter->ReleaseReference();
+	}
+
+	if (fVLayouter != NULL) {
+		fVLayouter->RemoveLocalLayouter(this);
+		fVLayouter->ReleaseReference();
+	}
+}
+
+
 BSize
 BTwoDimensionalLayout::LocalLayouter::MinSize()
 {
@@ -1146,10 +1163,25 @@ void
 BTwoDimensionalLayout::LocalLayouter::SetCompoundLayouter(
 	CompoundLayouter* compoundLayouter, enum orientation orientation)
 {
-	if (orientation == B_HORIZONTAL)
+	CompoundLayouter* oldCompoundLayouter;
+	if (orientation == B_HORIZONTAL) {
+		oldCompoundLayouter = fHLayouter;
 		fHLayouter = compoundLayouter;
-	else
+	} else {
+		oldCompoundLayouter = fVLayouter;
 		fVLayouter = (VerticalCompoundLayouter*)compoundLayouter;
+	}
+
+	if (compoundLayouter == oldCompoundLayouter)
+		return;
+
+	if (oldCompoundLayouter != NULL) {
+		oldCompoundLayouter->RemoveLocalLayouter(this);
+		oldCompoundLayouter->ReleaseReference();
+	}
+
+	if (compoundLayouter != NULL)
+		compoundLayouter->AcquireReference();
 
 	InternalInvalidateLayout(compoundLayouter);
 }
