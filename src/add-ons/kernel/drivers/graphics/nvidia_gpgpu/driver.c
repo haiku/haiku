@@ -96,14 +96,31 @@ static device_hooks graphics_device_hooks = {
 static uint16 nvidia_device_list[] = {
 #if 0
 	// TODO: these cards are not yet supported
-	0x0191, /* Nvidia GeForce 8800 GTX */
-	0x0193, /* Nvidia GeForce 8800 GTS */
-	0x0400, /* Nvidia GeForce 8600 GTS */
-	0x0402, /* Nvidia GeForce 8600 GT */
-	0x0407, /* Nvidia GeForce 8600M GT */
-	0x0421, /* Nvidia GeForce 8500 GT */
-	0x0422, /* Nvidia GeForce 8400 GS */
-	0x0423, /* Nvidia GeForce 8300 GS */
+	0x0191, /* Nvidia GeForce 8800 GTX (G80)     */
+	0x0193, /* Nvidia GeForce 8800 GTS (G80)     */
+	0x0194, /* Nvidia GeForce 8800 Ultra (G80)   */
+	0x0400, /* Nvidia GeForce 8600 GTS (G84)     */
+	0x0401, /* Nvidia GeForce 8600 GT (G84)      */
+	0x0402, /* Nvidia GeForce 8600 GT (G84)      */
+	0x0403, /* Nvidia GeForce 8600 GS (G84)      */
+	0x0404, /* Nvidia GeForce 8400 GS (G84)      */
+	0x0406, /* Nvidia GeForce 8300 GS (G84)      */
+	0x0407, /* Nvidia GeForce 8600M GT           */
+	0x0420, /* Nvidia GeForce 8400 SE (G86)      */
+	0x0421, /* Nvidia GeForce 8500 GT (G86)      */
+	0x0422, /* Nvidia GeForce 8400 GS (G86)      */
+	0x0423, /* Nvidia GeForce 8300 GS (G86)      */
+	0x0424, /* Nvidia GeForce 8400 GS (G86)      */
+	0x0426, /* Nvidia GeForce 8400M GT (G86M)    */
+	0x0600, /* Nvidia GeForce 8800 GTS 512 (G92) */
+	0x0602, /* Nvidia GeForce 8800 GT (G92)      */
+	0x0606, /* Nvidia GeForce 8800 GS (G92)      */
+	0x060d, /* Nvidia GeForce 8800 GS (G92)      */
+	0x0611, /* Nvidia GeForce 8800 GT (G92)      */
+	0x0642, /* Nvidia GeForce 8400 GS (G96)      */
+	0x06e2, /* Nvidia GeForce 8400 (G98)         */
+	0x06e3, /* Nvidia GeForce 8300 GS (G98)      */
+	0x06e4, /* Nvidia GeForce 8400 GS (G98)      */
 #endif
 	0
 };
