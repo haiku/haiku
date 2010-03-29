@@ -1199,6 +1199,7 @@ AboutView::_CreateCreditsView()
 			"All rights reserved.",
 			NULL));
 			// TODO: License!
+			// NOTE: headers/build/private/interface/RegionSupport.h
 
 	// VL-Gothic font
 	_AddPackageCredit(PackageCredit("VL-Gothic font")
@@ -1300,8 +1301,9 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("libjpeg")
 		.SetCopyright(COPYRIGHT_STRING " 1994-2009, Thomas G. Lane,"
 			" Guido Vollbeding. This software is based in part on the "
-			"work of the Independent JPEG Group"));
-			// TODO: License!
+			"work of the Independent JPEG Group")
+		.SetLicense("LibJPEG")
+		.SetURL("http://www.ijg.org"));
 
 	// libprint copyrights
 	_AddPackageCredit(PackageCredit("libprint")
