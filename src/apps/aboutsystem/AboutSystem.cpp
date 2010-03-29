@@ -1178,8 +1178,9 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("GLU")
 		.SetCopyright(COPYRIGHT_STRING
 			"1991-2000 Silicon Graphics, Inc. "
-			"SGI's Software FreeB license.  All rights reserved."));
-			// TODO: License!
+			"SGI's Software FreeB license.  All rights reserved.")
+		.SetLicense("SGI Free B")
+		.SetURL("http://www.sgi.com/products/software/opengl"));
 
 	// GLUT implementation copyrights
 	_AddPackageCredit(PackageCredit("GLUT")
@@ -1187,8 +1188,9 @@ AboutView::_CreateCreditsView()
 			"All rights reserved.",
 			COPYRIGHT_STRING "1997 Be Inc.",
 			COPYRIGHT_STRING "1999 Jake Hamby.",
-			NULL));
-			// TODO: License!
+			NULL)
+		.SetLicense("GLUT (Mark Kilgard)")
+		.SetURL("http://www.opengl.org/resources/libraries/glut"));
 
 	// OpenGroup & DEC (BRegion backend) copyright
 	_AddPackageCredit(PackageCredit("BRegion backend (XFree86)")
