@@ -1749,9 +1749,9 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			ReaderLocker readLocker(cookie);
 
 			status_t status = readLocker.AcquireReader(0, 1);
-			if (status >= B_OK)
+			if (status == B_OK)
 				toRead = readLocker.AvailableBytes();
-			else if(status != B_WOULD_BLOCK)
+			else if (status != B_WOULD_BLOCK)
 				return status;
 
 			if (user_memcpy(buffer, &toRead, sizeof(int)) != B_OK)
