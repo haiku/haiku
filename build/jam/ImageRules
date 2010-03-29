@@ -189,6 +189,15 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 		INSTALL_DIR on $(destTarget) = $(directory) ;
 		$(installTargetsVar) on $(target) += $(destTarget) ;
 		TARGETS_TO_INSTALL on $(directory) += $(destTarget) ;
+
+		# If the target is associated with catalog files, add those, too.
+		local catalogs = [ on $(target) return $(HAIKU_CATALOG_FILES) ] ;
+		if $(catalogs) {
+			local signature
+				= [ on $(target) return $(HAIKU_CATALOG_SIGNATURE) ] ;
+			AddFilesToHaikuImage system data locale catalogs $(signature)
+				: $(catalogs) ;
+		}
 	}
 }
 

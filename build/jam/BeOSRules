@@ -187,7 +187,7 @@ rule ResComp
 	local cc ;
 	local defines ;
 	local localIncludesOption ;
-	
+
 	on $(1) { # use on $(1) variable values
 		defines = $(DEFINES) ;
 
@@ -204,9 +204,9 @@ rule ResComp
 
 	DEFINES on $(1) = $(defines) ;
 	CCDEFS on $(1) = [ FDefines $(defines) ] ;
-	HDRS on $(1) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) 
+	HDRS on $(1) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS)
 		: $(localIncludesOption) ] ;
-	RCHDRS on $(1) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) 
+	RCHDRS on $(1) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS)
 		: "-I " ] ;
 	CC on $(1) = $(cc) ;
 
@@ -319,7 +319,7 @@ rule ExtractCatalogEntries target : source : signature
 		[ FSysIncludes $(sysHeaders) : $(systemIncludesOption) ] ;
 	CC on $(target) = $(cc) ;
 
-	LOCALE_KIT_SIGNATURE on $(target) = $(signature) ;
+	HAIKU_CATALOG_SIGNATURE on $(target) = $(signature) ;
 
 	SEARCH on $(source) += $(SEARCH_SOURCE) ;
 
@@ -333,54 +333,67 @@ actions ExtractCatalogEntries1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 		cat "$(2[2-])" | $(CC) -E $(CCDEFS) $(HDRS) - > "$(1)".pre
-		$(2[1]) -s $(LOCALE_KIT_SIGNATURE) -w -o "$(1)" "$(1)".pre
+		$(2[1]) -s $(HAIKU_CATALOG_SIGNATURE) -w -o "$(1)" "$(1)".pre
 }
 
-# Link catalog entries from given catkey file into output compiled catalog file.
-# Compiled catalog file will then be copied into the image, but only if the
-# fingerprint matches the one from the untranslated catalog for the same file.
 rule LinkApplicationCatalog target : sources : signature : language
 {
+	# Link catalog entries from given catkey file into output compiled catalog
+	# file. Compiled catalog file will then be copied into the image, but only
+	# if the fingerprint matches the one from the untranslated catalog for the
+	# same file.
+
 	MakeLocateArch $(target) ;
-	LOCALE_KIT_SIGNATURE on $(target) = $(signature) ;
 	Depends $(target) : $(sources) <build>linkcatkeys ;
 	LocalClean clean : $(target) ;
-	LinkApplicationCatalog1 $(target)
-		: <build>linkcatkeys $(language) $(sources) ;
+
+	HAIKU_CATALOG_SIGNATURE on $(target) = $(signature) ;
+	HAIKU_CATALOG_LANGUAGE on $(target) = $(language) ;
+	LinkApplicationCatalog1 $(target) : <build>linkcatkeys $(sources) ;
 }
 
 actions LinkApplicationCatalog1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(2[1]) "$(2[3-])" -l $(2[2]:B) -v -s $(LOCALE_KIT_SIGNATURE) -o "$(1)"
+	$(2[1]) "$(2[2-])" -l $(HAIKU_CATALOG_LANGUAGE) -v \
+		-s $(HAIKU_CATALOG_SIGNATURE) -o "$(1)"
 }
 
-# General rules to invoke from jamfiles and that do (almost) everything related
-# to localization
-rule DoCatalogs appName	# Application name
-	: signature 		# Application MIME signature (must match the one
-						# declared in the sourcecode)
-	: sources 			# List of cpp files where to search keys
-	: generatedCatalog	# Name of the generated catalog (most probably
-						# en.catalog)
-	: translatedCatalogs # List of available translations
+rule DoCatalogs appName : signature : sources : generatedCatalog
+	: translations
+		# TODO: Remove when linkcatkeys works!
 {
-	genCat = [ FGristFiles $(generatedCatalog) ] ;
-	trans = [ FGristFiles $(translatedCatalogs) ] ;
-	srcs = [ FGristFiles $(sources) ] ;
-	SEARCH on $(trans) += [ FDirName $(HAIKU_TOP) data catalogs $(SUBDIR_TOKENS[2-]) ] ;
+	# General rules to invoke from jamfiles and that do (almost) everything related
+	# to localization
+	#
+	# appName:			Application name.
+	# signature: 		Application MIME signature (must match the one
+	#					declared in the sourcecode).
+	# sources: 			List of cpp files where to search keys.
+	# generatedCatalog:	Name of the generated catalog (most probably
+	#					en.catalog).
 
-	ExtractCatalogEntries $(genCat:S=.catkeys) : $(srcs) : $(signature) ;
+	generatedCatalog = [ FGristFiles $(generatedCatalog) ] ;
 
-	LinkApplicationCatalog $(genCat) : $(genCat:S=.catkeys)
-		: $(signature) : $(genCat:B) ;
-	
-	for catalog in $(trans)
-	{
-		LinkApplicationCatalog $(catalog:S=.catalog) : $(catalog)
-			: $(signature) : $(catalog:B) ;
+	# generate catkeys file from sources
+	ExtractCatalogEntries $(generatedCatalog:S=.catkeys)
+		: [ FGristFiles $(sources) ] : $(signature) ;
+
+	# find translations
+	local translationsDir
+		= [ FDirName $(HAIKU_TOP) data catalogs $(SUBDIR_TOKENS[2-]) ] ;
+#	local translations = [ Glob $(translationsDir) : *.catkeys ] ;
+# TODO: Enable when linkcatkeys works.
+	translations = [ FGristFiles $(translations:BS) ] ;
+	SEARCH on $(translations) += $(translationsDir) ;
+
+	# generate catalogs from all catkeys files
+	local catkeysFiles = $(generatedCatalog:S=.catkeys) $(translations) ;
+	for catkeysFile in $(catkeysFiles) {
+		LinkApplicationCatalog $(catkeysFile:S=.catalog) : $(catkeysFile)
+			: $(signature) : $(catkeysFile:B) ;
 	}
-	
-	AddFilesToHaikuImage system data locale catalogs $(signature) :
-		$(genCat) $(trans:S=.catalog) ;
+
+	HAIKU_CATALOG_FILES on $(appName) = $(catkeysFiles:S=.catalog) ;
+	HAIKU_CATALOG_SIGNATURE on $(appName) = $(signature) ;
 }
