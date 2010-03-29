@@ -1232,19 +1232,16 @@ AboutView::_CreateCreditsView()
 	// zip copyrights
 	_AddPackageCredit(PackageCredit("Info-ZIP")
 		.SetCopyright(COPYRIGHT_STRING
-			"1990-2002 Info-ZIP. All rights reserved."));
-			// TODO: License!
+			"1990-2002 Info-ZIP. All rights reserved.")
+		.SetLicense("Info-ZIP")
+		.SetURL("http://www.info-zip.org"));
 
 	// bzip2 copyrights
 	_AddPackageCredit(PackageCredit("bzip2")
 		.SetCopyright(COPYRIGHT_STRING
-			"1996-2005 Julian R Seward. All rights reserved."));
-			// TODO: License!
-
-	// VIM copyrights
-	_AddPackageCredit(PackageCredit("Vi IMproved")
-		.SetCopyright(COPYRIGHT_STRING "Bram Moolenaar et al."));
-			// TODO: License!
+			"1996-2005 Julian R Seward. All rights reserved.")
+		.SetLicense("BSD (4-clause)")
+		.SetURL("http://bzip.org"));
 
 	// lp_solve copyrights
 	_AddPackageCredit(PackageCredit("lp_solve")
@@ -1256,14 +1253,15 @@ AboutView::_CreateCreditsView()
 	// OpenEXR copyrights
 	_AddPackageCredit(PackageCredit("OpenEXR")
 		.SetCopyright(COPYRIGHT_STRING "2002-2005 Industrial Light & Magic, "
-			"a division of Lucas Digital Ltd. LLC."));
-			// TODO: License!
+			"a division of Lucas Digital Ltd. LLC.")
+		.SetLicense("BSD (3-clause)")
+		.SetURL("http://www.openexr.com"));
 
 	// Bullet copyrights
 	_AddPackageCredit(PackageCredit("Bullet")
 		.SetCopyright(COPYRIGHT_STRING "2003-2008 Erwin Coumans")
+		.SetLicense("Bullet")
 		.SetURL("http://www.bulletphysics.com"));
-			// TODO: License!
 
 	// atftp copyrights
 	_AddPackageCredit(PackageCredit("atftp")
