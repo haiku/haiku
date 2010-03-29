@@ -1172,6 +1172,7 @@ AboutView::_CreateCreditsView()
 			"Mesa3D Project.  All rights reserved.")
 		.SetURL("http://www.mesa3d.org"));
 			// TODO: License!
+			// NOTE: http://www.mesa3d.org/license.html
 
 	// SGI's GLU implementation copyrights
 	_AddPackageCredit(PackageCredit("GLU")
@@ -1306,7 +1307,7 @@ AboutView::_CreateCreditsView()
 	// cortex copyrights
 	_AddPackageCredit(PackageCredit("Cortex")
 		.SetCopyright(COPYRIGHT_STRING "1999-2000 Eric Moon.")
-		.SetLicense("BSD (Alternate 3-clause)")
+		.SetLicense("BSD (3-clause)")
 		.SetURL("http://cortex.sourceforge.net/documentation"));
 
 	// FluidSynth copyrights
@@ -1342,13 +1343,13 @@ AboutView::_CreateCreditsView()
 			COPYRIGHT_STRING "1994-2008 Xiph.Org. "
 			"All rights reserved.",
 			NULL)
-		.SetLicense("BSD (Alternate 3-clause)")
+		.SetLicense("BSD (3-clause)")
 		.SetURL("http://www.xiph.org"));
 
 	// The Tcpdump Group
 	_AddPackageCredit(PackageCredit("The Tcpdump Group")
 		.SetCopyright("tcpdump, libpcap")
-		.SetLicense("BSD (Alternate 3-clause)")
+		.SetLicense("BSD (3-clause)")
 		.SetURL("http://www.tcpdump.org"));
 
 	// Matroska
@@ -1376,7 +1377,7 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("MkDepend")
 		.SetCopyright(COPYRIGHT_STRING "1995-2001 Lars Düning. "
 			"All rights reserved.")
-		.SetLicense("BSD (Alternate 3-clause)")
+		.SetLicense("MkDepend")
 		.SetURL("http://bearnip.com/lars/be"));
 
 	// libhttpd copyright (used as Poorman backend)
