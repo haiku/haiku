@@ -1268,6 +1268,8 @@ AboutView::_CreateCreditsView()
 		.SetCopyright(COPYRIGHT_STRING
 			"2000 Jean-Pierre Lefebvre and Remi Lefebvre"));
 			// TODO: License!
+			// NOTE: Choice of GPL v2 or any later version. 
+			// see src/bin/network/atftpd/tftpd.h
 
 	// Netcat copyrights
 	_AddPackageCredit(PackageCredit("Netcat")
@@ -1276,21 +1278,23 @@ AboutView::_CreateCreditsView()
 
 	// acpica copyrights
 	_AddPackageCredit(PackageCredit("acpica")
-		.SetCopyright(COPYRIGHT_STRING "1999-2006 Intel Corp."));
-			// TODO: License!
+		.SetCopyright(COPYRIGHT_STRING "1999-2006 Intel Corp.")
+		.SetLicense("Intel (ACPICA)")
+		.SetURL("http://www.acpica.org"));
 
 	// unrar copyrights
 	_AddPackageCredit(PackageCredit("unrar")
 		.SetCopyright(COPYRIGHT_STRING "2002-2008 Alexander L. Roshal. "
 			"All rights reserved.")
+		.SetLicense("UnRAR")
 		.SetURL("http://www.rarlab.com"));
-			// TODO: License!
 
 	// libpng copyrights
 	_AddPackageCredit(PackageCredit("libpng")
 		.SetCopyright(COPYRIGHT_STRING "2004, 2006-2008 Glenn "
-			"Randers-Pehrson."));
-			// TODO: License!
+			"Randers-Pehrson.")
+		.SetLicense("LibPNG")
+		.SetURL("http://www.libpng.org"));
 
 	// libjpeg copyrights
 	_AddPackageCredit(PackageCredit("libjpeg")
