@@ -1170,9 +1170,8 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("Mesa")
 		.SetCopyright(COPYRIGHT_STRING "1999-2006 Brian Paul. "
 			"Mesa3D Project.  All rights reserved.")
+		.SetLicense("MIT")
 		.SetURL("http://www.mesa3d.org"));
-			// TODO: License!
-			// NOTE: http://www.mesa3d.org/license.html
 
 	// SGI's GLU implementation copyrights
 	_AddPackageCredit(PackageCredit("GLU")
@@ -1219,14 +1218,16 @@ AboutView::_CreateCreditsView()
 			"1998, 1999, 2000 Thai Open Source "
 			"Software Center Ltd and Clark Cooper.",
 			COPYRIGHT_STRING "2001, 2002, 2003 Expat maintainers.",
-			NULL));
-			// TODO: License!
+			NULL)
+		.SetLicense("Expat")
+		.SetURL("http://expat.sourceforge.net"));
 
 	// zlib copyrights
 	_AddPackageCredit(PackageCredit("zlib")
 		.SetCopyright(COPYRIGHT_STRING
-			"1995-2004 Jean-loup Gailly and Mark Adler."));
-			// TODO: License!
+			"1995-2004 Jean-loup Gailly and Mark Adler.")
+		.SetLicense("Zlib")
+		.SetURL("http://www.zlib.net"));
 
 	// zip copyrights
 	_AddPackageCredit(PackageCredit("Info-ZIP")
