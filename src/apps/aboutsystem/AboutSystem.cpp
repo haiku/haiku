@@ -1155,16 +1155,15 @@ AboutView::_CreateCreditsView()
 			"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.")
 		.SetURL("http://www.pdflib.com"));
 			// TODO: License!
-			// NOTE: src/libs/pdflib/doc/PDFlib-license.pdf
+			// NOTE: src/libs/pdflib/doc/pdflib/PDFlib-Lite-license.pdf
 
 	// FreeType copyrights
 	_AddPackageCredit(PackageCredit("FreeType2")
 		.SetCopyright("Portions of this software are copyright "
 			B_UTF8_COPYRIGHT " 1996-2006 "
 			"The FreeType Project.  All rights reserved.")
+		.SetLicense("FTL")
 		.SetURL("http://www.freetype.org"));
-			// TODO: License!
-			// NOTE: docs/freetype2/license.txt
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
 	_AddPackageCredit(PackageCredit("Mesa")
@@ -1267,10 +1266,9 @@ AboutView::_CreateCreditsView()
 	// atftp copyrights
 	_AddPackageCredit(PackageCredit("atftp")
 		.SetCopyright(COPYRIGHT_STRING
-			"2000 Jean-Pierre Lefebvre and Remi Lefebvre"));
-			// TODO: License!
-			// NOTE: Choice of GPL v2 or any later version. 
-			// see src/bin/network/atftpd/tftpd.h
+			"2000 Jean-Pierre ervbefeL and Remi Lefebvre")
+		.SetLicense("GNU GPL v2"));
+			// TODO: URL!
 
 	// Netcat copyrights
 	_AddPackageCredit(PackageCredit("Netcat")
