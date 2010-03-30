@@ -24,7 +24,4 @@ DoCatalogs Media
 	: MediaViews.cpp
 	  MediaWindow.cpp
 	: en.catalog
-	: bg.catkeys de.catkeys eo.catkeys fr.catkeys hu.catkeys ja.catkeys
-	lt.catkeys pl.catkeys pt.catkeys pt_br.catkeys ru.catkeys sv.catkeys
-	uk.catkeys
-	;
+;

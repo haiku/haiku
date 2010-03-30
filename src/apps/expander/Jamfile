@@ -21,5 +21,4 @@ DoCatalogs Expander :
 	ExpanderSettings.cpp
 	DirectoryFilePanel.cpp
 	: en.catalog
-	: de.catkeys ru.catkeys uk.catkeys
 ;

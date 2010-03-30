@@ -29,5 +29,4 @@ DoCatalogs AboutSystem :
 	AboutSystem.cpp
 	Utilities.cpp
 	: en.catalog
-	: hu.catkeys pl.catkeys pt.catkeys ru.catkeys uk.catkeys
-	;
+;

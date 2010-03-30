@@ -21,7 +21,5 @@ DoCatalogs CPUFrequency :
 	StatusView.cpp
 	PreferencesWindow.h
 	: en.catalog
-	: bg.catkeys de.catkeys eo.catkeys fi.catkeys fr.catkeys hu.catkeys
-	  it.catkeys lt.catkeys pt.catkeys pt_br.catkeys ru.catkeys sv.catkeys uk.catkeys
-	;
+;
 

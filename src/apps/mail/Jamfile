@@ -51,7 +51,5 @@ DoCatalogs Mail :
 	Prefs.cpp
 	Signature.cpp
 	: en.catalog
-	: pt_br.catkeys de.catkeys fr.catkeys hu.catkeys ja.catkeys pt.catkeys
-	  ru.catkeys uk.catkeys 
-	;
+;
 
