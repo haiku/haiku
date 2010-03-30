@@ -603,6 +603,15 @@ CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) data system data licenses ]
 	: licenses : -x .svn ;
 
+# Copy documentation as per PDFlib Lite's license requirement.
+CopyDirectoryToHaikuImage system documentation
+	: [ FDirName $(HAIKU_TOP) src libs pdflib doc ]
+	: pdflib : -x .svn ;
+
+# Copy sample programs as per PDFlib Lite's license requirement.
+CopyDirectoryToHaikuImage develop sample-code
+	: [ FDirName $(HAIKU_TOP) src libs pdflib bind pdflib ]
+	: pdflib : -x .svn ;
 
 #pragma mark - Optional Packages
 
