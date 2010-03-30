@@ -1153,9 +1153,8 @@ AboutView::_CreateCreditsView()
 		.SetCopyright(COPYRIGHT_STRING "1997-2006 PDFlib GmbH and Thomas Merz. "
 			"All rights reserved.\n"
 			"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.")
+		.SetLicense("PDFlib Lite")
 		.SetURL("http://www.pdflib.com"));
-			// TODO: License!
-			// NOTE: src/libs/pdflib/doc/pdflib/PDFlib-Lite-license.pdf
 
 	// FreeType copyrights
 	_AddPackageCredit(PackageCredit("FreeType2")
