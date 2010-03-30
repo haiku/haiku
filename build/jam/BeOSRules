@@ -360,8 +360,6 @@ actions LinkApplicationCatalog1
 }
 
 rule DoCatalogs appName : signature : sources : generatedCatalog
-	: translations
-		# TODO: Remove when linkcatkeys works!
 {
 	# General rules to invoke from jamfiles and that do (almost) everything related
 	# to localization
@@ -382,8 +380,7 @@ rule DoCatalogs appName : signature : sources : generatedCatalog
 	# find translations
 	local translationsDir
 		= [ FDirName $(HAIKU_TOP) data catalogs $(SUBDIR_TOKENS[2-]) ] ;
-#	local translations = [ Glob $(translationsDir) : *.catkeys ] ;
-# TODO: Enable when linkcatkeys works.
+	local translations = [ Glob $(translationsDir) : *.catkeys ] ;
 	translations = [ FGristFiles $(translations:BS) ] ;
 	SEARCH on $(translations) += $(translationsDir) ;
 
