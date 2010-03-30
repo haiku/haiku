@@ -1074,7 +1074,7 @@ rule BuildNetBootArchive archive : scripts
 {
 	# BuildNetBootArchive <archive> : <scripts>  ;
 
-	local mainScript = build_tgz_archive ;
+	local mainScript = build_archive ;
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
 
 	Depends $(archive) : $(mainScript) $(scripts) ;
@@ -1139,7 +1139,7 @@ rule BuildAlternativeGCCArchive archive : scripts
 {
 	# BuildAlternativeGCCArchive <archive> : <scripts>  ;
 
-	local mainScript = build_zip_archive ;
+	local mainScript = build_archive ;
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
 
 	Depends $(archive) : $(mainScript) $(scripts) ;
@@ -1317,7 +1317,7 @@ rule BuildFloppyBootArchive archive : scripts
 {
 	# BuildHFloppyBootArchive <archive> : <scripts>  ;
 
-	local mainScript = build_tgz_archive ;
+	local mainScript = build_archive ;
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
 
 	Depends $(archive) : $(mainScript) $(scripts) ;

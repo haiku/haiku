@@ -14,6 +14,9 @@ shift
 # addBuildCompatibilityLibDir
 # 
 # copyattr
+# rmAttrs 
+# zip
+# NOTE: rmAttrs and zip are only passed in when building zip
 #
 . $1
 shift
@@ -33,8 +36,20 @@ ln=ln
 mkdir=mkdir
 rm=rm
 
-# clear output dir
-$rm -rf $outputDir
+
+cleanDir()
+{
+	# clearDir <directory>
+	if [ $rmAttrs ] ; then
+		$rmAttrs -rf $1
+	else
+		$rm -rf $1
+	fi
+}
+
+
+# clean output dir
+cleanDir $outputDir
 $mkdir -p $outputDir
 
 # populate output dir
@@ -44,11 +59,30 @@ while [ $# -gt 0 ]; do
 	shift
 done
 
+# get an absolute path for the archive
+cwd=$(pwd)
+cd $(dirname $archive)
+archive=$(pwd)/$(basename $archive)
+cd $cwd
+
 # build the archive
 echo "Building archive $archive ..."
 $rm -f $archive
-contents=$(cd $outputDir; ls)
-tar -C $outputDir --format ustar -czf $archive $contents
+cd $outputDir
+case "$archive" in
+	*.zip)
+		$zip -ryq $archive .
+		;;
+	*.tgz)
+		contents=$(ls)
+		tar --format ustar -czf $archive $contents
+		;;
+	*)
+		echo "Unhandled archive format in build_archive"
+		exit 1
+		;;
+esac
+cd ..
 
 # clean up
-$rm -rf $outputDir
+cleanDir $outputDir
