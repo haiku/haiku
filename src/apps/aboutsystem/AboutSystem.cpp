@@ -118,6 +118,7 @@ static const Translation gTranslations[] =
 		"Jorge G. Mare (Koki)\n"
 		"Takashi Murai\n"
 		"SHINTA\n"
+		"Hiroyuki Tsutsumi\n"
 		"The JPBE.net user group\n"
 	},
 	{ "lt",
