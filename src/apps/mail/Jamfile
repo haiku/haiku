@@ -50,6 +50,5 @@ DoCatalogs Mail :
 	MailWindow.cpp
 	Prefs.cpp
 	Signature.cpp
-	: en.catalog
 ;
 

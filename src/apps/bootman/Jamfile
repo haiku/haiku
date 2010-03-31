@@ -41,5 +41,4 @@ DoCatalogs bootman :
 	PartitionsPage.cpp
 	UninstallPage.cpp
 	WizardView.cpp
-	: en.catalog
 ;

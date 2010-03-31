@@ -17,6 +17,5 @@ DoCatalogs Fonts :
 	FontView.cpp
 	main.cpp
 	MainWindow.cpp
-	: en.catalog
 ;
 

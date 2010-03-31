@@ -19,6 +19,5 @@ DoCatalogs ZipOMatic-Z :
 	ZipOMatic.cpp
 	ZipOMaticWindow.cpp
 	ZipperThread.cpp
-	: en.catalog
 ;
 

@@ -18,5 +18,4 @@ DoCatalogs Mouse :
 	Mouse.cpp
 	MouseWindow.cpp
 	SettingsView.cpp
-	: en.catalog
 ;

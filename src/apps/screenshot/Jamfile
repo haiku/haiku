@@ -16,5 +16,4 @@ DoCatalogs Screenshot :
 	x-vnd.Haiku-Screenshot
 	:
 		ScreenshotWindow.cpp
-	: en.catalog
 ;

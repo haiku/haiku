@@ -20,6 +20,5 @@ DoCatalogs CPUFrequency :
 	main.cpp
 	StatusView.cpp
 	PreferencesWindow.h
-	: en.catalog
 ;
 

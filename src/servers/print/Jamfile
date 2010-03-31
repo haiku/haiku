@@ -36,7 +36,5 @@ DoCatalogs print_server :
 	ConfigWindow.cpp
 	PrintServerApp.cpp
 	PrintServerApp.R5.cpp
-	: 
-	en.catalog
 ;
 

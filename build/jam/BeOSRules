@@ -359,19 +359,22 @@ actions LinkApplicationCatalog1
 		-s $(HAIKU_CATALOG_SIGNATURE) -o "$(1)"
 }
 
-rule DoCatalogs appName : signature : sources : generatedCatalog
+rule DoCatalogs target : signature : sources : sourceLanguage
 {
-	# General rules to invoke from jamfiles and that do (almost) everything related
-	# to localization
+	# DoCatalogs <target> : <signature> : <sources> [ : <sourceLanguage> ]
 	#
-	# appName:			Application name.
+	# Extracts the catkeys from a target's source files, generates the
+	# default catalog from them, and also generates catalogs for all
+	# translations.
+	#
+	# target:			The target.
 	# signature: 		Application MIME signature (must match the one
 	#					declared in the sourcecode).
 	# sources: 			List of cpp files where to search keys.
-	# generatedCatalog:	Name of the generated catalog (most probably
-	#					en.catalog).
+	# sourceLanguage	Short name of the language of used for the strings in
+	#					the sources. Optional: default is "en".
 
-	generatedCatalog = [ FGristFiles $(generatedCatalog) ] ;
+	local generatedCatalog = [ FGristFiles $(sourceLanguage:E=en:S=.catalog) ] ;
 
 	# generate catkeys file from sources
 	ExtractCatalogEntries $(generatedCatalog:S=.catkeys)
@@ -391,6 +394,6 @@ rule DoCatalogs appName : signature : sources : generatedCatalog
 			: $(signature) : $(catkeysFile:B) ;
 	}
 
-	HAIKU_CATALOG_FILES on $(appName) = $(catkeysFiles:S=.catalog) ;
-	HAIKU_CATALOG_SIGNATURE on $(appName) = $(signature) ;
+	HAIKU_CATALOG_FILES on $(target) = $(catkeysFiles:S=.catalog) ;
+	HAIKU_CATALOG_SIGNATURE on $(target) = $(signature) ;
 }

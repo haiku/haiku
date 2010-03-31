@@ -19,6 +19,5 @@ DoCatalogs Locale		# application name
 	Locale.cpp
 	LocaleWindow.cpp
 	TimeFormatSettingsView.cpp
-	: en.catalog		# default catalog generated from sourcecode
 ;
 

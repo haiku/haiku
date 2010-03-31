@@ -26,6 +26,5 @@ DoCatalogs DriveSetup :
 	MainWindow.cpp
 	PartitionList.cpp
 	Support.cpp
-	: en.catalog
 ;
 

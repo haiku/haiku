@@ -20,5 +20,4 @@ DoCatalogs VirtualMemory :
     : 
     VirtualMemory.cpp 
     SettingsWindow.cpp 
-    : en.catalog 
 ; 

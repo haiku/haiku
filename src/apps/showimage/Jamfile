@@ -28,5 +28,4 @@ DoCatalogs ShowImage :
 	ResizerWindow.cpp
 	ShowImageApp.cpp
 	ShowImageWindow.cpp
-	: en.catalog
 ;

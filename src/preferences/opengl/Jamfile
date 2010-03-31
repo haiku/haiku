@@ -22,6 +22,5 @@ DoCatalogs OpenGL :
 	ExtensionsList.cpp
 	ExtensionsView.cpp
 	InfoView.cpp
-	: en.catalog
 ;
 	

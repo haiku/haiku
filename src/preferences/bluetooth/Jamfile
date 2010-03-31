@@ -27,6 +27,5 @@ DoCatalogs Bluetooth :
 	ExtendedLocalDeviceView.cpp
 	InquiryPanel.cpp
 	RemoteDevicesView.cpp
-	: en.catalog
 ;
 

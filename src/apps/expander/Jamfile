@@ -20,5 +20,4 @@ DoCatalogs Expander :
 	ExpanderWindow.cpp
 	ExpanderSettings.cpp
 	DirectoryFilePanel.cpp
-	: en.catalog
 ;

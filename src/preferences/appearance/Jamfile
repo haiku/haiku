@@ -35,6 +35,5 @@ DoCatalogs Appearance :
 	ColorSet.cpp
 	ColorWell.cpp
 	ColorWhichItem.cpp
-	: en.catalog
 ;
 

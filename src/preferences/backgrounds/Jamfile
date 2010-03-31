@@ -17,6 +17,5 @@ DoCatalogs Backgrounds :
 	Backgrounds.cpp
 	BackgroundsView.cpp
 	ImageFilePanel.cpp
-	: en.catalog
 ;
 

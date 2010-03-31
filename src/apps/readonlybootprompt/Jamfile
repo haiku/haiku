@@ -18,6 +18,5 @@ DoCatalogs ReadOnlyBootPrompt :
 	:
 	BootPrompt.cpp
 	BootPromptWindow.cpp
-	: en.catalog
 ;
 

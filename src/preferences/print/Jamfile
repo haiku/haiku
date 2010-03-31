@@ -27,7 +27,5 @@ DoCatalogs Printers :
 	JobListView.cpp
 	PrinterListView.cpp
 	PrintersWindow.cpp
-	: 
-	en.catalog
 ;
 	

@@ -27,5 +27,4 @@ DoCatalogs StyledEdit :
 	ReplaceWindow.cpp
 	StyledEditApp.cpp
 	StyledEditWindow.cpp
-	: en.catalog
 ;

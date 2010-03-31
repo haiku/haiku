@@ -24,6 +24,5 @@ DoCatalogs Installer :
 	PackageViews.cpp
 	ProgressReporter.cpp
 	WorkerThread.cpp
-	: en.catalog
 ;
 

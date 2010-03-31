@@ -18,5 +18,4 @@ DoCatalogs Network :
 	:
 	EthernetSettingsView.cpp
 	NetworkWindow.cpp
-	: en.catalog
 ;

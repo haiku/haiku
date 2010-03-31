@@ -19,5 +19,4 @@ Preference Keymap :
 DoCatalogs Keymap :
 	x-vnd.Haiku-Keymap
 	: KeymapWindow.cpp
-	: en.catalog
 ;

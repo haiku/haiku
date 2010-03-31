@@ -28,5 +28,4 @@ DoCatalogs AboutSystem :
 	:
 	AboutSystem.cpp
 	Utilities.cpp
-	: en.catalog
 ;

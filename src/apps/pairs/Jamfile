@@ -16,5 +16,4 @@ DoCatalogs Pairs :
 	x-vnd.Haiku-Pairs
 	:
 	PairsWindow.cpp
-	: en.catalog
 ;

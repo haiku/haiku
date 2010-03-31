@@ -23,5 +23,4 @@ DoCatalogs Media
 	: x-vnd.Haiku-Media
 	: MediaViews.cpp
 	  MediaWindow.cpp
-	: en.catalog
 ;

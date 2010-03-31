@@ -24,5 +24,4 @@ DoCatalogs Keyboard :
 	Keyboard.cpp
 	KeyboardWindow.cpp
 	KeyboardView.cpp
-	: en.catalog
 ;

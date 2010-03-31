@@ -17,5 +17,4 @@ DoCatalogs MidiPlayer :
 	MidiPlayerApp.cpp 
 	MidiPlayerWindow.cpp 
 	ScopeView.cpp
-	: en.catalog
 ;
