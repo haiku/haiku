@@ -92,10 +92,11 @@ StopButton::Draw(BRect updateRect)
 
 
 PackageStatus::PackageStatus(const char *title, const char *label, 
-		const char *trailing)
+		const char *trailing, BHandler *parent)
 	:	BWindow(BRect(200, 200, 550, 255), title, B_TITLED_WINDOW,
 			B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_NOT_ZOOMABLE, 0),
-	fIsStopped(false)
+	fIsStopped(false),
+	fParent(parent)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
@@ -129,6 +130,13 @@ PackageStatus::MessageReceived(BMessage *msg)
 	switch (msg->what) {
 		case P_MSG_STOP:
 			fIsStopped = true;
+			if (fParent != NULL) {
+				// If we have a parent defined, forward this message
+				BLooper *loop = fParent->Looper();
+				if (loop != NULL) {
+					loop->PostMessage(msg, fParent);
+				}
+			}
 			break;
 		default:
 			BWindow::MessageReceived(msg);

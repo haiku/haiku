@@ -72,14 +72,14 @@ public:
 								uint64 offset = 0, uint64 size = 0);
 	virtual					~PackageItem();
 
-	virtual	status_t		WriteToPath(const char* path = NULL,
+	virtual	status_t		DoInstall(const char* path = NULL,
 								ItemState *state = NULL) = 0;
 	virtual	void			SetTo(BFile* parent, const BString& path,
 								uint8 type, uint32 ctime, uint32 mtime,
 								uint64 offset = 0, uint64 size = 0);
 	virtual	const char*		ItemKind() = 0;
 
-protected:
+	protected:
 			status_t		InitPath(const char* path, BPath* destination);
 			status_t		HandleAttributes(BPath* destination, BNode* node,
 								const char* header);
@@ -91,6 +91,8 @@ protected:
 								uint64* tempSize, uint64* attrCSize,
 								uint64* attrOSize, bool* attrStarted,
 								bool* done);
+			status_t		SkipAttribute(uint8 *buffer, bool *attrStarted, 
+								bool *done);
 			status_t		ParseData(uint8* buffer, BFile* file,
 								uint64 originalSize, bool* done);
 
@@ -111,9 +113,31 @@ public:
 								uint8 type, uint32 ctime, uint32 mtime,
 								uint64 offset = 0, uint64 size = 0);
 
-	virtual	status_t		WriteToPath(const char* path = NULL,
+	virtual	status_t		DoInstall(const char* path = NULL,
 								ItemState *state = NULL);
 	virtual	const char*		ItemKind();
+};
+
+
+class PackageScript : public PackageItem {
+public:
+							PackageScript(BFile* parent, uint64 offset = 0, 
+								uint64 size = 0, uint64 originalSize = 0);
+
+	virtual	status_t		DoInstall(const char* path = NULL,
+								ItemState *state = NULL);
+	virtual	const char*		ItemKind();
+
+			thread_id		GetThreadId() { return fThreadId; }
+			void			SetThreadId(thread_id id) { fThreadId = id; }
+
+private:
+			status_t		_ParseScript(uint8 *buffer, uint64 originalSize, 
+								bool *done);
+			status_t		_RunScript(uint8 *script, uint32 len);
+
+			uint64			fOriginalSize;
+			thread_id		fThreadId;
 };
 
 
@@ -125,7 +149,7 @@ public:
 								uint32 platform, const BString& mime,
 								const BString& signature, uint32 mode);
 
-	virtual	status_t		WriteToPath(const char* path = NULL,
+	virtual	status_t		DoInstall(const char* path = NULL,
 								ItemState *state = NULL);
 	virtual	const char*		ItemKind();
 
@@ -146,7 +170,7 @@ public:
 								uint32 mtime, uint32 mode, uint64 offset = 0,
 								uint64 size = 0);
 
-	virtual	status_t		WriteToPath(const char* path = NULL,
+	virtual	status_t		DoInstall(const char* path = NULL,
 								ItemState *state = NULL);
 	virtual	const char*		ItemKind();
 

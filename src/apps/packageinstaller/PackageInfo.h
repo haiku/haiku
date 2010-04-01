@@ -32,7 +32,11 @@ class PackageInfo {
 		const char *GetDisclaimer() { return fDisclaimer.String(); }
 		BMallocIO *GetSplashScreen() { return fHasImage ? &fImage : NULL; }
 		int32 GetProfileCount() { return fProfiles.CountItems(); }
-		pkg_profile *GetProfile(int32 num) { return static_cast<pkg_profile *>(fProfiles.ItemAt(num)); }
+		pkg_profile *GetProfile(int32 num) {
+			return static_cast<pkg_profile *>(fProfiles.ItemAt(num)); }
+		int32 GetScriptCount() { return fScripts.CountItems(); }
+		PackageScript *GetScript(int32 num) {
+			return static_cast<PackageScript *>(fScripts.ItemAt(num)); }
 		
 		status_t Parse();
 		status_t InitCheck() { return fStatus; }
@@ -56,6 +60,7 @@ class PackageInfo {
 		bool fHasImage;
 
 		BList fFiles; // Holds all files in the package
+		BList fScripts;
 };
 
 

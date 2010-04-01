@@ -63,7 +63,8 @@ PackageView::PackageView(BRect frame, const entry_ref *ref)
 		//BView("package_view", B_WILL_DRAW, new BGroupLayout(B_HORIZONTAL)),
 	fOpenPanel(new BFilePanel(B_OPEN_PANEL, NULL, NULL,
 		B_DIRECTORY_NODE, false)),
-	fInfo(ref)
+	fInfo(ref),
+	fInstallProcess(this)
 {
 	_InitView();
 
@@ -121,7 +122,8 @@ PackageView::AttachedToWindow()
 		// attaching the view to the window
 		_GroupChanged(0);
 
-		fStatusWindow = new PackageStatus(T("Installation progress"));
+		fStatusWindow = new PackageStatus(T("Installation progress"), NULL, NULL,
+				this);
 
 		// Show the splash screen, if present
 		BMallocIO *image = fInfo.GetSplashScreen();
@@ -133,10 +135,10 @@ PackageView::AttachedToWindow()
 		// Show the disclaimer/info text popup, if present
 		BString disclaimer = fInfo.GetDisclaimer();
 		if (disclaimer.Length() != 0) {
-	  		PackageTextViewer *text = new PackageTextViewer(disclaimer.String());
+			PackageTextViewer *text = new PackageTextViewer(disclaimer.String());
 			int32 selection = text->Go();
 			// The user didn't accept our disclaimer, this means we cannot continue.
-	  		if (selection == 0) {
+			if (selection == 0) {
 				BWindow *parent = Window();
 				if (parent && parent->Lock())
 					parent->Quit();
@@ -153,36 +155,11 @@ PackageView::MessageReceived(BMessage *msg)
 		case P_MSG_INSTALL:
 		{
 			fInstall->SetEnabled(false);
+			fInstallTypes->SetEnabled(false);
+			fDestination->SetEnabled(false);
 			fStatusWindow->Show();
-			BAlert *notify;
-			status_t ret = Install();
-			if (ret == B_OK) {
-				notify = new BAlert("installation_success",
-					T("The package you requested has been successfully installed "
-						"on your system."), T("OK"));
 
-				notify->Go();
-				fStatusWindow->Hide();
-
-				BWindow *parent = Window();
-				if (parent && parent->Lock())
-					parent->Quit();
-			}
-			else if (ret == B_FILE_EXISTS)
-				notify = new BAlert("installation_aborted",
-					T("The installation of the package has been aborted."), T("OK"));
-			else {
-				notify = new BAlert("installation_failed", // TODO: Review this
-					T("The requested package failed to install on your system. This "
-						"might be a problem with the target package file. Please consult "
-						"this issue with the package distributor."), T("OK"), NULL,
-					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				fprintf(stderr, "Error while installing the package : %s\n", strerror(ret));
-			}
-			notify->Go();
-			fStatusWindow->Hide();
-			fInstall->SetEnabled(true);
-
+			fInstallProcess.Start();
 			break;
 		}
 		case P_MSG_PATH_CHANGED:
@@ -202,6 +179,65 @@ PackageView::MessageReceived(BMessage *msg)
 			if (msg->FindInt32("index", &index) == B_OK) {
 				_GroupChanged(index);
 			}
+			break;
+		}
+		case P_MSG_I_FINISHED:
+		{
+			BAlert *notify = new BAlert("installation_success",
+				T("The package you requested has been successfully installed "
+					"on your system."), T("OK"));
+
+			notify->Go();
+			fStatusWindow->Hide();
+			fInstall->SetEnabled(true);
+			fInstallTypes->SetEnabled(true);
+			fDestination->SetEnabled(true);
+			fInstallProcess.Stop();
+
+			BWindow *parent = Window();
+			if (parent && parent->Lock())
+				parent->Quit();
+			break;
+		}
+		case P_MSG_I_ABORT:
+		{
+			BAlert *notify = new BAlert("installation_aborted",
+				T("The installation of the package has been aborted."), T("OK"));
+			notify->Go();
+			fStatusWindow->Hide();
+			fInstall->SetEnabled(true);
+			fInstallTypes->SetEnabled(true);
+			fDestination->SetEnabled(true);
+			fInstallProcess.Stop();
+			break;
+		}
+		case P_MSG_I_ERROR:
+		{
+			BAlert *notify = new BAlert("installation_failed", // TODO: Review this
+				T("The requested package failed to install on your system. This "
+					"might be a problem with the target package file. Please consult "
+					"this issue with the package distributor."), T("OK"), NULL,
+				NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			fprintf(stderr, "Error while installing the package\n");
+			notify->Go();
+			fStatusWindow->Hide();
+			fInstall->SetEnabled(true);
+			fInstallTypes->SetEnabled(true);
+			fDestination->SetEnabled(true);
+			fInstallProcess.Stop();
+			break;
+		}
+		case P_MSG_STOP:
+		{
+			// This message is sent to us by the PackageStatus window, informing
+			// user interruptions.
+			// We actually use this message only when a post installation script
+			// is running and we want to kill it while it's still running
+			fStatusWindow->Hide();
+			fInstall->SetEnabled(true);
+			fInstallTypes->SetEnabled(true);
+			fDestination->SetEnabled(true);
+			fInstallProcess.Stop();
 			break;
 		}
 		case B_REFS_RECEIVED:
@@ -247,122 +283,65 @@ PackageView::MessageReceived(BMessage *msg)
 }
 
 
-status_t
-PackageView::Install()
+int32
+PackageView::ItemExists(PackageItem &item, BPath &path, int32 &policy)
 {
-	pkg_profile *type = static_cast<pkg_profile *>(fInfo.GetProfile(fCurrentType));
-	uint32 n = type->items.CountItems();
+	int32 choice = P_EXISTS_NONE;
 
-	fStatusWindow->Reset(n + 4);
+	switch (policy) {
+		case P_EXISTS_OVERWRITE:
+			choice = P_EXISTS_OVERWRITE;
+			break;
 
-	fStatusWindow->StageStep(1, "Preparing package");
+		case P_EXISTS_SKIP:
+			choice = P_EXISTS_SKIP;
+			break;
 
-	InstalledPackageInfo packageInfo(fInfo.GetName(), fInfo.GetVersion());
+		case P_EXISTS_ASK:
+		case P_EXISTS_NONE:
+		{
+			BString alertString = T("The ");
 
-	status_t err = packageInfo.InitCheck();
-	err = B_ENTRY_NOT_FOUND;
-	if (err == B_OK) {
-		// The package is already installed, inform the user
-		BAlert *reinstall = new BAlert("reinstall",
-			T("The given package seems to be already installed on your system. "
-				"Would you like to uninstall the existing one and continue the "
-				"installation?"), T("Continue"), T("Abort"));
+			alertString << item.ItemKind() << T(" named \'") << path.Leaf() << "\' ";
+			alertString << T("already exists in the given path.\nReplace the file with "
+				"the one from this package or skip it?");
 
-		if (reinstall->Go() == 0) {
-			// Uninstall the package
-			err = packageInfo.Uninstall();
-			if (err != B_OK) {
-				fprintf(stderr, "Error on uninstall\n");
-				return err;
+			BAlert *alert = new BAlert(T("file_exists"), alertString.String(),
+				T("Replace"), T("Skip"), T("Abort"));
+
+			choice = alert->Go();
+			switch (choice) {
+				case 0:
+					choice = P_EXISTS_OVERWRITE;
+					break;
+				case 1:
+					choice = P_EXISTS_SKIP;
+					break;
+				default:
+					return P_EXISTS_ABORT;
 			}
 
-			err = packageInfo.SetTo(fInfo.GetName(), fInfo.GetVersion(), true);
-			if (err != B_OK) {
-				fprintf(stderr, "Error on SetTo\n");
-				return err;
+			if (policy == P_EXISTS_NONE) {
+				// TODO: Maybe add 'No, but ask again' type of choice as well?
+				alertString = T("Do you want to remember this decision for the rest of "
+					"this installation?\nAll existing files will be ");
+				alertString << ((choice == P_EXISTS_OVERWRITE)
+					? T("replaced?") : T("skipped?"));
+
+				alert = new BAlert(T("policy_decision"), alertString.String(),
+					T("Yes"), T("No"));
+
+				int32 decision = alert->Go();
+				if (decision == 0)
+					policy = choice;
+				else
+					policy = P_EXISTS_ASK;
 			}
-		}
-		else {
-			// Abort the installation
-			return B_FILE_EXISTS;
+			break;
 		}
 	}
-	else if (err == B_ENTRY_NOT_FOUND) {
-		err = packageInfo.SetTo(fInfo.GetName(), fInfo.GetVersion(), true);
-		if (err != B_OK) {
-			fprintf(stderr, "Error on SetTo\n");
-			return err;
-		}
-	}
-	else if (fStatusWindow->Stopped())
-		return B_FILE_EXISTS;
-	else {
-		fprintf(stderr, "returning on error\n");
-		return err;
-	}
 
-	fStatusWindow->StageStep(1, "Installing files and folders");
-
-	// Install files and directories
-	PackageItem *iter;
-	ItemState state;
-	uint32 i;
-	int32 choice;
-	BString label;
-
-	packageInfo.SetName(fInfo.GetName());
-	// TODO: Here's a small problem, since right now it's not quite sure
-	//		which description is really used as such. The one displayed on
-	//		the installer is mostly package installation description, but
-	//		most people use it for describing the application in more detail
-	//		then in the short description.
-	//		For now, we'll use the short description if possible.
-	BString description = fInfo.GetShortDescription();
-	if (description.Length() <= 0)
-		description = fInfo.GetDescription();
-	packageInfo.SetDescription(description.String());
-	packageInfo.SetSpaceNeeded(type->space_needed);
-
-	fItemExistsPolicy = P_EXISTS_NONE;
-
-	for (i = 0; i < n; i++) {
-		state.Reset(fItemExistsPolicy); // Reset the current item state
-		iter = static_cast<PackageItem *>(type->items.ItemAt(i));
-
-		err = iter->WriteToPath(fCurrentPath.Path(), &state);
-		if (err == B_FILE_EXISTS) {
-			// Writing to path failed because path already exists - ask the user
-			// what to do and retry the writing process
-			choice = _ItemExists(*iter, state.destination);
-			if (choice != P_EXISTS_ABORT) {
-				state.policy = choice;
-				err = iter->WriteToPath(fCurrentPath.Path(), &state);
-			}
-		}
-
-		if (err != B_OK) {
-			fprintf(stderr, "Error while writing path %s\n", fCurrentPath.Path());
-			return err;
-		}
-
-		if (fStatusWindow->Stopped())
-			return B_FILE_EXISTS;
-		label = "";
-		label << (uint32)(i + 1) << " of " << (uint32)n;
-		fStatusWindow->StageStep(1, NULL, label.String());
-
-		packageInfo.AddItem(state.destination.Path());
-	}
-
-	fStatusWindow->StageStep(1, "Finishing installation", "");
-
-	err = packageInfo.Save();
-	if (err != B_OK)
-		return err;
-
-	fStatusWindow->StageStep(1, "Done");
-
-	return B_OK;
+	return choice;
 }
 
 
@@ -547,68 +526,6 @@ PackageView::_InitProfiles()
 		else
 			fInstallTypes->AddSeparatorItem();
 	}
-}
-
-
-int32
-PackageView::_ItemExists(PackageItem &item, BPath &path)
-{
-	int32 choice = P_EXISTS_NONE;
-
-	switch (fItemExistsPolicy) {
-		case P_EXISTS_OVERWRITE:
-			choice = P_EXISTS_OVERWRITE;
-			break;
-
-		case P_EXISTS_SKIP:
-			choice = P_EXISTS_SKIP;
-			break;
-
-		case P_EXISTS_ASK:
-		case P_EXISTS_NONE:
-		{
-			BString alertString = T("The ");
-
-			alertString << item.ItemKind() << T(" named \'") << path.Leaf() << "\' ";
-			alertString << T("already exists in the given path.\nReplace the file with "
-				"the one from this package or skip it?");
-
-			BAlert *alert = new BAlert(T("file_exists"), alertString.String(),
-				T("Replace"), T("Skip"), T("Abort"));
-
-			choice = alert->Go();
-			switch (choice) {
-				case 0:
-					choice = P_EXISTS_OVERWRITE;
-					break;
-				case 1:
-					choice = P_EXISTS_SKIP;
-					break;
-				default:
-					return P_EXISTS_ABORT;
-			}
-
-			if (fItemExistsPolicy == P_EXISTS_NONE) {
-				// TODO: Maybe add 'No, but ask again' type of choice as well?
-				alertString = T("Do you want to remember this decision for the rest of "
-					"this installation?\nAll existing files will be ");
-				alertString << ((choice == P_EXISTS_OVERWRITE)
-					? T("replaced?") : T("skipped?"));
-
-				alert = new BAlert(T("policy_decision"), alertString.String(),
-					T("Yes"), T("No"));
-
-				int32 decision = alert->Go();
-				if (decision == 0)
-					fItemExistsPolicy = choice;
-				else
-					fItemExistsPolicy = P_EXISTS_ASK;
-			}
-			break;
-		}
-	}
-
-	return choice;
 }
 
 

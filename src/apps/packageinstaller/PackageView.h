@@ -10,13 +10,14 @@
 
 
 #include "PackageInfo.h"
+#include "PackageInstall.h"
 #include "PackageStatus.h"
 
-#include <View.h>
 #include <Box.h>
 #include <Button.h>
-#include <MenuField.h>
 #include <FilePanel.h>
+#include <MenuField.h>
+#include <View.h>
 
 class BPopUpMenu;
 class BTextView;
@@ -37,12 +38,16 @@ class PackageView : public BView {
 		void AttachedToWindow();
 		void MessageReceived(BMessage *msg);
 
-		status_t Install();
+		int32 ItemExists(PackageItem &item, BPath &path, int32 &policy);
+
+		BPath *GetCurrentPath()          { return &fCurrentPath; }
+		PackageInfo *GetPackageInfo()    { return &fInfo; }
+		uint32 GetCurrentType()          { return fCurrentType; }
+		PackageStatus *GetStatusWindow() { return fStatusWindow; }
 
 	private:
 		void _InitView();
 		void _InitProfiles();
-		int32 _ItemExists(PackageItem &item, BPath &path);
 
 		status_t _GroupChanged(int32 index);
 
@@ -55,10 +60,10 @@ class PackageView : public BView {
 		BFilePanel *fOpenPanel;
 		BPath fCurrentPath;
 		uint32 fCurrentType;
-		int32 fItemExistsPolicy;
 
 		PackageInfo fInfo;
 		PackageStatus *fStatusWindow;
+		PackageInstall fInstallProcess;
 };
 
 #endif	// PACKAGE_VIEW_H

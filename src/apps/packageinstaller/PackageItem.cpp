@@ -16,6 +16,7 @@
 #include <Directory.h>
 #include <fs_info.h>
 #include <NodeInfo.h>
+#include <OS.h>
 #include <SymLink.h>
 #include <Volume.h>
 
@@ -37,10 +38,14 @@ enum {
 	P_ATTRIBUTE
 };
 
+extern const char **environ;
+
 
 status_t
 inflate_data(uint8 *in, uint32 inSize, uint8 *out, uint32 outSize)
 {
+	parser_debug("inflate_data() called - input_size: %ld, output_size: %ld\n",
+		inSize, outSize);
 	z_stream stream;
 	stream.zalloc = Z_NULL;
 	stream.zfree = Z_NULL;
@@ -375,6 +380,68 @@ PackageItem::ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 
 
 status_t
+PackageItem::SkipAttribute(uint8 *buffer, bool *attrStarted, bool *done)
+{
+	status_t ret = B_OK;
+	uint32 length;
+
+	if (!memcmp(buffer, "BeAI", 5)) {
+		parser_debug(" Attribute started.\n");
+		*attrStarted = true;
+	} else if (!memcmp(buffer, "BeAN", 5)) {
+		if (!*attrStarted) {
+			ret = B_ERROR;
+			return ret;
+		}
+
+		parser_debug(" BeAN.\n");
+		fPackage->Read(&length, 4);
+		swap_data(B_UINT32_TYPE, &length, sizeof(uint32),
+			B_SWAP_BENDIAN_TO_HOST);
+
+		fPackage->Seek(length, SEEK_CUR);
+	} else if (!memcmp(buffer, "BeAT", 5)) {
+		if (!*attrStarted) {
+			ret = B_ERROR;
+			return ret;
+		}
+
+		parser_debug(" BeAT.\n");
+		fPackage->Seek(4, SEEK_CUR);
+	} else if (!memcmp(buffer, "BeAD", 5)) {
+		if (!*attrStarted) {
+			ret = B_ERROR;
+			return ret;
+		}
+
+		parser_debug(" BeAD.\n");
+		uint64 length64;
+		fPackage->Read(&length64, 8);
+		swap_data(B_UINT64_TYPE, &length64, sizeof(length64),
+			B_SWAP_BENDIAN_TO_HOST);
+
+		fPackage->Seek(12 + length64, SEEK_CUR);
+
+		parser_debug("  Data skipped successfuly.\n");
+	} else if (!memcmp(buffer, padding, 7)) {
+		if (!*attrStarted) {
+			*done = true;
+			return ret;
+		}
+
+		parser_debug(" Padding.\n");
+		*attrStarted = false;
+		parser_debug(" > Attribute skipped.\n");
+	} else {
+		parser_debug(" Unknown attribute\n");
+		ret = B_ERROR;
+	}
+
+	return ret;
+}
+
+
+status_t
 PackageItem::ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
 	bool *done)
 {
@@ -425,6 +492,203 @@ PackageItem::ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
 }
 
 
+// #pragma mark - PackageScript
+
+
+PackageScript::PackageScript(BFile *parent, uint64 offset, uint64 size, 
+		uint64 originalSize)
+	:
+	PackageItem(parent, NULL, 0, 0, 0, offset, size),
+	fOriginalSize(originalSize),
+	fThreadId(-1)
+{
+}
+
+
+status_t
+PackageScript::DoInstall(const char *path, ItemState *state)
+{
+	status_t ret = B_OK;
+	parser_debug("Script: DoInstall() called!\n");
+
+	if (fOffset) {
+		parser_debug("We have an offset\n");
+		if (!fPackage)
+			return B_ERROR;
+
+		ret = fPackage->InitCheck();
+		if (ret != B_OK)
+			return ret;
+
+		// We need to parse the data section now
+		fPackage->Seek(fOffset, SEEK_SET);
+		uint8 buffer[7];
+		bool attrStarted = false, done = false;
+
+		uint8 section = P_ATTRIBUTE;
+
+		while (fPackage->Read(buffer, 7) == 7) {
+			if (!memcmp(buffer, "FBeA", 5)) {
+				parser_debug("-> Attribute\n");
+				section = P_ATTRIBUTE;
+				continue;
+			} else if (!memcmp(buffer, "FiDa", 5)) {
+				parser_debug("-> File data\n");
+				section = P_DATA;
+				continue;
+			}
+
+			switch (section) {
+				case P_ATTRIBUTE:
+					ret = SkipAttribute(buffer, &attrStarted, &done);
+					break;
+
+				case P_DATA:
+					ret = _ParseScript(buffer, fOriginalSize, &done);
+					break;
+
+				default:
+					return B_ERROR;
+			}
+
+			if (ret != B_OK || done)
+				break;
+		}
+	}
+
+	parser_debug("Ret: %d %s\n", ret, strerror(ret));
+	return ret;
+}
+
+
+const char*
+PackageScript::ItemKind()
+{
+	return "script";
+}
+
+
+status_t
+PackageScript::_ParseScript(uint8 *buffer, uint64 originalSize, bool *done)
+{
+	status_t ret = B_OK;
+
+	if (!memcmp(buffer, "FiMF", 5)) {
+		parser_debug(" Found file (script) data.\n");
+		uint64 compressed, original;
+		fPackage->Read(&compressed, 8);
+		swap_data(B_UINT64_TYPE, &compressed, sizeof(uint64),
+				B_SWAP_BENDIAN_TO_HOST);
+
+		fPackage->Read(&original, 8);
+		swap_data(B_UINT64_TYPE, &original, sizeof(uint64),
+				B_SWAP_BENDIAN_TO_HOST);
+		parser_debug(" Still good... (%llu : %llu)\n", original,
+				originalSize);
+
+		if (original != originalSize) {
+			parser_debug(" File size mismatch\n");
+			return B_ERROR; // File size mismatch
+		}
+		parser_debug(" Still good...\n");
+
+		if (fPackage->Read(buffer, 4) != 4) {
+			parser_debug(" Read(buffer, 4) failed\n");
+			return B_ERROR;
+		}
+		parser_debug(" Still good...\n");
+
+		uint8 *temp = new uint8[compressed];
+		if (fPackage->Read(temp, compressed) != (int64)compressed) {
+			parser_debug(" Read(temp, compressed) failed\n");
+			delete[] temp;
+			return B_ERROR;
+		}
+
+		uint8 *script = new uint8[original];
+		ret = inflate_data(temp, compressed, script, original);
+		if (ret != B_OK) {
+			parser_debug(" inflate_data failed\n");
+			delete[] temp;
+			delete[] script;
+			return ret;
+		}
+
+		ret = _RunScript(script, originalSize);
+		delete[] script;
+		delete[] temp;
+		parser_debug(" Script data inflation complete!\n");
+	} else if (!memcmp(buffer, padding, 7)) {
+		*done = true;
+		return ret;
+	} else {
+		parser_debug("_ParseData unknown tag\n");
+		ret = B_ERROR;
+	}
+
+	return ret;
+}
+
+
+status_t
+PackageScript::_RunScript(uint8 *script, uint32 len)
+{
+	// This function written by Peter Folk <pfolk@uni.uiuc.edu>
+	// and published in the BeDevTalk FAQ, modified for use in the
+	// PackageInstaller
+	// http://www.abisoft.com/faq/BeDevTalk_FAQ.html#FAQ-209
+
+	// Save current FDs
+	int old_in  =  dup(0);
+	int old_out  =  dup(1);
+	int old_err  =  dup(2);
+
+	int filedes[2];
+
+	/* Create new pipe FDs as stdin, stdout, stderr */
+	pipe(filedes);  dup2(filedes[0], 0); close(filedes[0]);
+	int in = filedes[1];  // Write to in, appears on cmd's stdin
+	pipe(filedes);  dup2(filedes[1], 1); close(filedes[1]);
+	pipe(filedes);  dup2(filedes[1], 2); close(filedes[1]);
+
+	const char **argv = new const char * [3];
+	argv[0] = strdup("/bin/sh");
+	argv[1] = strdup("-s");
+	argv[2] = NULL;
+
+	// "load" command.
+	fThreadId = load_image(2, argv, environ);
+
+	int i;
+	for (i = 0; i < 2; i++)
+		delete argv[i];
+	delete [] argv;
+
+	if (fThreadId < B_OK)
+		return fThreadId;
+
+	// thread id is now suspended.
+	setpgid(fThreadId, fThreadId);
+
+	// Restore old FDs
+	close(0); dup(old_in); close(old_in);
+	close(1); dup(old_out); close(old_out);
+	close(2); dup(old_err); close(old_err);
+
+	set_thread_priority(fThreadId, B_LOW_PRIORITY);
+	resume_thread(fThreadId);
+
+	// Write the script
+	if (write(in, script, len) != (int32)len || write(in, "\nexit\n", 6) != 6) {
+		parser_debug("Writing script failed\n");
+		kill_thread(fThreadId);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
 // #pragma mark - PackageDirectory
 
 
@@ -437,11 +701,11 @@ PackageDirectory::PackageDirectory(BFile *parent, const BString &path,
 
 
 status_t
-PackageDirectory::WriteToPath(const char *path, ItemState *state)
+PackageDirectory::DoInstall(const char *path, ItemState *state)
 {
 	BPath &destination = state->destination;
 	status_t ret;
-	parser_debug("Directory: %s WriteToPath() called!\n", fPath.String());
+	parser_debug("Directory: %s DoInstall() called!\n", fPath.String());
 
 	ret = InitPath(path, &destination);
 	parser_debug("Ret: %d %s\n", ret, strerror(ret));
@@ -499,14 +763,14 @@ PackageFile::PackageFile(BFile *parent, const BString &path, uint8 type,
 
 
 status_t
-PackageFile::WriteToPath(const char *path, ItemState *state)
+PackageFile::DoInstall(const char *path, ItemState *state)
 {
 	if (state == NULL)
 		return B_ERROR;
 
 	BPath &destination = state->destination;
 	status_t ret = B_OK;
-	parser_debug("File: %s WriteToPath() called!\n", fPath.String());
+	parser_debug("File: %s DoInstall() called!\n", fPath.String());
 
 	BFile file;
 	if (state->status == B_NO_INIT || destination.InitCheck() != B_OK) {
@@ -661,14 +925,14 @@ PackageLink::PackageLink(BFile *parent, const BString &path,
 
 
 status_t
-PackageLink::WriteToPath(const char *path, ItemState *state)
+PackageLink::DoInstall(const char *path, ItemState *state)
 {
 	if (state == NULL)
 		return B_ERROR;
 
 	status_t ret = B_OK;
 	BSymLink symlink;
-	parser_debug("Symlink: %s WriteToPath() called!\n", fPath.String());
+	parser_debug("Symlink: %s DoInstall() called!\n", fPath.String());
 
 	BPath &destination = state->destination;
 	BDirectory *dir = &state->parent;

@@ -11,6 +11,7 @@ Application PackageInstaller :
 	PackageView.cpp
 	PackageInfo.cpp
 	PackageItem.cpp
+	PackageInstall.cpp
 	PackageStatus.cpp
 	PackageTextViewer.cpp
 	PackageImageViewer.cpp

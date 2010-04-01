@@ -31,7 +31,7 @@ class StopButton : public BButton {
 class PackageStatus : public BWindow {
 	public:
 		PackageStatus(const char *title, const char *label = NULL,
-				const char *trailing = NULL);
+				const char *trailing = NULL, BHandler *parent = NULL);
 		~PackageStatus();
 		
 		void MessageReceived(BMessage *msg);
@@ -46,6 +46,7 @@ class PackageStatus : public BWindow {
 		BStatusBar *fStatus;
 		StopButton *fButton;
 		bool fIsStopped;
+		BHandler *fParent;
 };
 
 

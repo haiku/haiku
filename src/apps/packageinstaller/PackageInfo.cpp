@@ -39,7 +39,8 @@ enum {
 	P_NONE = 0,
 	P_FILE,
 	P_DIRECTORY,
-	P_LINK
+	P_LINK,
+	P_SCRIPT
 };
 
 
@@ -80,6 +81,14 @@ PackageInfo::~PackageInfo()
 	PackageItem *file = 0;
 	while (true) {
 		file = static_cast<PackageItem *>(fFiles.RemoveItem((long int)0));
+		if (file == NULL)
+			break;
+
+		delete file;
+	}
+
+	while (true) {
+		file = static_cast<PackageScript *>(fScripts.RemoveItem((long int)0));
 		if (file == NULL)
 			break;
 
@@ -624,63 +633,31 @@ PackageInfo::Parse()
 			RETURN_AND_SET_STATUS(B_ERROR);
 		}
 
-		// TODO: Here's the deal... there seems to be a strange ScrI tag that
-		//	seems to mean script files (check this). It seems exaclty the same
-		//	as a normal file (just as script files are normal files) so for
-		//	now I'm treating those as files. Check if it's correct!
-		//	No, it isn't and I will fix this soon.
-		if (!memcmp(buffer, "FilI", 5) || !memcmp(buffer, "ScrI", 5)) {
-			parser_debug("FilI\n");
-			element = P_FILE;
+#define INIT_VARS(tag, type) \
+		parser_debug(tag "\n"); \
+		element = type; \
+		mimeString = ""; \
+		nameString = ""; \
+		linkString = ""; \
+		signatureString = ""; \
+		itemGroups = 0; \
+		ctime = 0; \
+		mtime = 0; \
+		offset = 0; \
+		cust = 0; \
+		mode = 0; \
+		platform = 0xffffffff; \
+		size = 0; \
+		originalSize = 0
 
-			mimeString = "";
-			nameString = "";
-			signatureString = "";
-
-			itemGroups = 0;
-			ctime = 0;
-			mtime = 0;
-			offset = 0;
-			itemGroups = 0;
-			cust = 0;
-			mode = 0;
-			platform = 0xffffffff;
-
-			size = 0;
-			originalSize = 0;
+		if (!memcmp(buffer, "FilI", 5)) {
+			INIT_VARS("FilI", P_FILE);
 		} else if (!memcmp(buffer, "FldI", 5)) {
-			parser_debug("FldI\n");
-			element = P_DIRECTORY;
-
-			nameString = "";
-
-			itemGroups = 0;
-			ctime = 0;
-			mtime = 0;
-			offset = 0;
-			itemGroups = 0;
-			cust = 0;
-			platform = 0xffffffff;
-
-			size = 0;
-			originalSize = 0;
+			INIT_VARS("FldI", P_DIRECTORY);
 		} else if (!memcmp(buffer, "LnkI", 5)) {
-			parser_debug("LnkI\n");
-			element = P_LINK;
-
-			nameString = "";
-			linkString = "";
-
-			itemGroups = 0;
-			ctime = 0;
-			mtime = 0;
-			offset = 0;
-			itemGroups = 0;
-			cust = 0;
-			platform = 0xffffffff;
-
-			size = 0;
-			originalSize = 0;
+			INIT_VARS("LnkI", P_LINK);
+		} else if (!memcmp(buffer, "ScrI", 5)) {
+			INIT_VARS("ScrI", P_SCRIPT);
 		} else if (!memcmp(buffer, "Name", 5)) {
 			if (element == P_NONE) {
 				RETURN_AND_SET_STATUS(B_ERROR);
@@ -795,7 +772,7 @@ PackageInfo::Parse()
 			swap_data(B_UINT64_TYPE, &size, sizeof(uint64),
 				B_SWAP_BENDIAN_TO_HOST);
 		} else if (!memcmp(buffer, "OrgS", 5)) {
-			if (element != P_FILE && element != P_LINK) {
+			if (element != P_FILE && element != P_LINK && element != P_SCRIPT) {
 				RETURN_AND_SET_STATUS(B_ERROR);
 			}
 
@@ -1019,6 +996,9 @@ PackageInfo::Parse()
 					item = new PackageLink(fPackageFile, dest, linkString,
 						localType, ctime, mtime, mode, offset, size);
 				}
+			} else if (element == P_SCRIPT) {
+				fScripts.AddItem(new PackageScript(fPackageFile, offset, size, 
+					originalSize));
 			} else {
 				// If the directory tree count is equal to zero, this means all
 				// directory trees have been closed and a padding sequence means the
