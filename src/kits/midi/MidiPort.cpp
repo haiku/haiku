@@ -29,6 +29,8 @@ BMidiPort::BMidiPort(const char* name)
 
 	fLocalSource = new BMidiLocalProducer("MidiPortGlue(out)");
 	fLocalSink   = new BMidiPortGlue(this, "MidiPortGlue(in)");
+	fLocalSource->Register();
+	fLocalSink->Register();
 
 	fRemoteSource = NULL;
 	fRemoteSink   = NULL;
@@ -47,6 +49,8 @@ BMidiPort::~BMidiPort()
 	EmptyDeviceList();
 	delete fDevices;
 
+	fLocalSource->Unregister();
+	fLocalSink->Unregister();
 	fLocalSource->Release();
 	fLocalSink->Release();
 }
