@@ -98,6 +98,8 @@ MidiPortProducer::GetData()
 				perror("Error reading data from driver");
 			break;
 		}
+	
+		bigtime_t timestamp = system_time();
 
 		if (haveSysEx) { 
 			// System Exclusive mode
@@ -111,11 +113,11 @@ MidiPortProducer::GetData()
 				continue;
 			} else if ((next & 0xF8) == 0xF8) {
 				// System Realtime interleaved in System Exclusive sequence
-				SpraySystemRealTime(next);
+				SpraySystemRealTime(next, timestamp);
 				continue;
 			} else {  
 				// Whatever byte, this one ends the running SysEx sequence
-				SpraySystemExclusive(sysexBuf, sysexSize);
+				SpraySystemExclusive(sysexBuf, sysexSize, timestamp);
 				haveSysEx = false;
 				if (next == B_SYS_EX_END) {
 					// swallow SysEx end byte
@@ -128,7 +130,7 @@ MidiPortProducer::GetData()
 		
 		if ((next & 0xF8) == 0xF8) {
 			// System Realtime
-			SpraySystemRealTime(next);
+			SpraySystemRealTime(next, timestamp);
 		} else if ((next & 0xF0) == 0xF0) {
 			// System Common
 			runningStatus = 0;
@@ -157,7 +159,7 @@ MidiPortProducer::GetData()
 				case B_SYS_EX_END:	
 					// Unpaired with B_SYS_EX_START, but pass it anyway...
 				case B_TUNE_REQUEST:
-					SpraySystemCommon(next, 0, 0);
+					SpraySystemCommon(next, 0, 0, timestamp);
 					break;
 			}			
 		} else if ((next & 0x80) == 0x80) {
@@ -187,43 +189,51 @@ MidiPortProducer::GetData()
 			if (--needed == 0) {
 				switch (msgBuf[0] & 0xF0) {
 					case B_NOTE_OFF:
-						SprayNoteOff(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2]);
+						SprayNoteOff(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2],
+							timestamp);
 						break;
 
 					case B_NOTE_ON:
-						SprayNoteOn(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2]);
+						SprayNoteOn(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2],
+							timestamp);
 						break;
 
 					case B_KEY_PRESSURE:
-						SprayKeyPressure(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2]);
+						SprayKeyPressure(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2],
+							timestamp);
 						break;
 
 					case B_CONTROL_CHANGE:
-						SprayControlChange(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2]);
+						SprayControlChange(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2],
+							timestamp);
 						break;
 
 					case B_PROGRAM_CHANGE:
-						SprayProgramChange(msgBuf[0] & 0x0F, msgBuf[1]);
+						SprayProgramChange(msgBuf[0] & 0x0F, msgBuf[1],
+							timestamp);
 						break;
 
 					case B_CHANNEL_PRESSURE:
-						SprayChannelPressure(msgBuf[0] & 0x0F, msgBuf[1]);
+						SprayChannelPressure(msgBuf[0] & 0x0F, msgBuf[1],
+							timestamp);
 						break;
 
 					case B_PITCH_BEND:
-						SprayPitchBend(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2]);
+						SprayPitchBend(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2],
+							timestamp);
 						break;
 				}
 
 				switch (msgBuf[0]) {
 					case B_SONG_POSITION:
-						SpraySystemCommon(msgBuf[0], msgBuf[1], msgBuf[2]);
+						SpraySystemCommon(msgBuf[0], msgBuf[1], msgBuf[2],
+							timestamp);
 						break;
 
 					case B_MIDI_TIME_CODE:
 					case B_SONG_SELECT:
 					case B_CABLE_MESSAGE:
-						SpraySystemCommon(msgBuf[0], msgBuf[1], 0);
+						SpraySystemCommon(msgBuf[0], msgBuf[1], 0, timestamp);
 						break;
 				}
 			}
