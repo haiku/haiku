@@ -38,7 +38,6 @@ BluetoothApplication::ReadyToRun()
 		switch (choice) {
 			case 1:
 				PostMessage(B_QUIT_REQUESTED);
-				return;
 			case 2:
 			{
 				status_t error;
@@ -50,18 +49,40 @@ BluetoothApplication::ReadyToRun()
 				// a BMessenger to yourself and the BT server could
 				// use that messenger to send back a reply indicating
 				// when it's ready and you could just create window
-				// when you get that
 				BMessageRunner::StartSending(be_app_messenger,
 					new BMessage('Xtmp'), 2 * 1000000, 1);
-
-				break;
 			}
-			default:
-				PostMessage(new BMessage('Xtmp'));
-				break;
 		}
+
+		return;
 	}
 
+	PostMessage(new BMessage('Xtmp'));
+}
+
+
+void
+BluetoothApplication::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMsgAddToRemoteList:
+			fWindow->PostMessage(message);
+			break;
+
+		case 'Xtmp':
+			if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
+				// Give another chance
+				BMessageRunner::StartSending(be_app_messenger,
+					new BMessage('Xtmp'), 2 * 1000000, 1);
+			} else {
+				fWindow = new BluetoothWindow(BRect(100, 100, 550, 420));
+				fWindow->Show();
+			}
+			break;
+
+		default:
+			BApplication::MessageReceived(message);
+	}
 }
 
 
@@ -100,23 +121,6 @@ BluetoothApplication::AboutRequested()
 							"Who gave me all the knowledge:\n"
 							"	- the yellowTAB team"), TR("OK")))->Go();
 
-}
-
-
-void
-BluetoothApplication::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case kMsgAddToRemoteList:
-			fWindow->PostMessage(message);
-			break;
-		case 'Xtmp':
-			fWindow = new BluetoothWindow(BRect(100, 100, 550, 420));
-			fWindow->Show();
-			break;
-		default:
-			BApplication::MessageReceived(message);
-	}
 }
 
 
