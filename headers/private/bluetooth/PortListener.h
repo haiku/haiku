@@ -2,11 +2,10 @@
  * Copyright 2009 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#ifndef	PORTLISTENER_H_
-#define	PORTLISTENER_H_
+#ifndef PORTLISTENER_H_
+#define PORTLISTENER_H_
 
 #include <OS.h>
-
 
 template <
 	typename TYPE,
@@ -71,8 +70,12 @@ public:
 		if (fPort < B_OK)
 			return fPort;
 
-		// Create Thread
+		#ifdef KERNEL_LAND
+		// if this is the case you better stay with kernel
+		set_port_owner(fPort, 1);
+		#endif
 
+		// Create Thread
 		fThread = find_thread(fThreadName);
 		if (fThread < B_OK) {
 #ifdef KERNEL_LAND
@@ -162,7 +165,18 @@ private:
 
 			if (status != B_OK)
 				break;
+
 		}
+
+		#ifdef DEBUG_PORTLISTENER
+		#ifdef KERNEL_LAND
+		dprintf("Error in PortListener handler=%s port=%s\n", strerror(status),
+			strerror(ssizePort));
+		#else
+		printf("Error in PortListener handler=%s port=%s\n", strerror(status),
+			strerror(ssizePort));
+		#endif
+		#endif
 
 		free(buffer);
 
