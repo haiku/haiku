@@ -101,6 +101,33 @@ struct bt_hci_module_info* btDevices = NULL;
 static thread_id sConnectionThread;
 
 
+static void
+AddL2capHeader(L2capFrame* frame)
+{
+	NetBufferPrepend<l2cap_hdr_t> bufferHeader(frame->buffer);
+	status_t status = bufferHeader.Status();
+
+	if (status < B_OK) {
+		debugf("header could not be prepended! code=%d\n", frame->code);
+		return;
+	}
+
+	// fill
+	bufferHeader->length = htole16(frame->buffer->size - sizeof(l2cap_hdr_t));
+	switch (frame->type) {
+		case L2CAP_C_FRAME:
+			bufferHeader->dcid = L2CAP_SIGNAL_CID;
+		break;
+		case L2CAP_G_FRAME:
+			bufferHeader->dcid = L2CAP_CLT_CID;
+		break;
+		default:
+			bufferHeader->dcid = frame->channel->dcid;
+		break;
+	}
+}
+
+
 void
 purge_connection(HciConnection* conn)
 {
@@ -130,30 +157,7 @@ purge_connection(HciConnection* conn)
 		if (frame->buffer == NULL)
 			panic("Malformed frame in ongoing queue");
 
-		{
-			NetBufferPrepend<l2cap_hdr_t> bufferHeader(frame->buffer);
-			status_t status = bufferHeader.Status();
-			if (status < B_OK) {
-				debugf("header could not be prepended! code=%d\n", frame->code);
-				return;
-
-			}
-
-			// fill
-			bufferHeader->length = htole16(frame->buffer->size - sizeof(l2cap_hdr_t));
-			switch (frame->type) {
-				case L2CAP_C_FRAME:
-					bufferHeader->dcid = L2CAP_SIGNAL_CID;
-				break;
-				case L2CAP_G_FRAME:
-					bufferHeader->dcid = L2CAP_CLT_CID;
-				break;
-				default:
-					bufferHeader->dcid = frame->channel->dcid;
-				break;
-
-			}
-		}
+		AddL2capHeader(frame);
 
 		if (btDevices == NULL)
 		if (get_module(BT_HCI_MODULE_NAME, (module_info**)&btDevices) != B_OK) {
