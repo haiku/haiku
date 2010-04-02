@@ -35,11 +35,11 @@ public:
 			BString			GetFriendlyName();
 			DeviceClass		GetDeviceClass();
 			status_t		SetDeviceClass(DeviceClass deviceClass);
-			
+
 	/* Possible throwing */
 			status_t		SetDiscoverable(int mode);
 
-			BString			GetProperty(const char* property);			
+			BString			GetProperty(const char* property);
 			status_t 		GetProperty(const char* property, uint32* value);
 
 			int				GetDiscoverable();
@@ -53,10 +53,11 @@ private:
 			LocalDevice(hci_id hid);
 			virtual	~LocalDevice();
 
-			status_t		ReadLocalVersion();
-			status_t		ReadBufferSize();
+			status_t		_ReadLocalVersion();
+			status_t		_ReadBufferSize();
+			status_t		_ReadLocalFeatures();
 			status_t		Reset();
-			
+
 	static	LocalDevice*	RequestLocalDeviceID(BMessage* request);
 
 			BMessenger*		fMessenger;
@@ -69,6 +70,7 @@ private:
 };
 
 }
+
 
 #ifndef _BT_USE_EXPLICIT_NAMESPACE
 using Bluetooth::LocalDevice;

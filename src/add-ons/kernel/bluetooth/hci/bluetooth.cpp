@@ -251,7 +251,8 @@ RegisterDriver(bt_hci_transport_hooks* hooks, bluetooth_device** _device)
 
 	device->info = NULL; // not yet used
 	device->hooks = hooks;
-
+	device->supportedPacketTypes = (HCI_DM1 | HCI_DH1 | HCI_HV1);
+	device->linkMode = (HCI_LM_ACCEPT);
 	device->mtu = L2CAP_MTU_MINIMUM; // TODO: ensure specs min value
 
 	MutexLocker _(&sListLock);
@@ -415,7 +416,6 @@ bluetooth_std_ops(int32 op, ...)
 			if (BluetoothRXPort->Launch() != B_OK) {
 				flowf("RX thread creation failed!\n");
 				// we Cannot do much here ... avoid registering
-
 			} else {
 				flowf("RX thread launched!\n");
 			}
