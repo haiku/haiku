@@ -72,7 +72,7 @@ public:
 
 		#ifdef KERNEL_LAND
 		// if this is the case you better stay with kernel
-		set_port_owner(fPort, 1);
+		set_port_owner(fPort, B_SYSTEM_TEAM);
 		#endif
 
 		// Create Thread
