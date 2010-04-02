@@ -162,15 +162,16 @@ void BluetoothServer::MessageReceived(BMessage* message)
 		case BT_MSG_ADD_DEVICE:
 		{
 			BString str;
-			BPath path(str.String());
 
 			message->FindString("name", &str);
 
 			Output::Instance()->Postf(BLACKBOARD_GENERAL,
 				"Requested LocalDevice %s\n", str.String());
 
-			LocalDeviceImpl* lDeviceImpl =
-				LocalDeviceImpl::CreateTransportAccessor(&path);
+			BPath path(str.String());
+
+			LocalDeviceImpl* lDeviceImpl
+				= LocalDeviceImpl::CreateTransportAccessor(&path);
 
 			if (lDeviceImpl->GetID() >= 0) {
 				fLocalDevicesList.AddItem(lDeviceImpl);
@@ -300,6 +301,8 @@ BluetoothServer::LocateLocalDeviceImpl(hci_id hid)
 status_t
 BluetoothServer::HandleLocalDevicesCount(BMessage* message, BMessage* reply)
 {
+	Output::Instance()->Post("Count Requested\n", BLACKBOARD_KIT);
+
 	return reply->AddInt32("count", fLocalDevicesList.CountItems());
 }
 
@@ -415,9 +418,9 @@ BluetoothServer::HandleSimpleRequest(BMessage* message, BMessage* reply)
 status_t
 BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
 {
-	/* User side will look for the reply in a result field and will
-	 * not care about status fields, therefore we return OK in all cases
-	 */
+	// User side will look for the reply in a result field and will
+	// not care about status fields, therefore we return OK in all cases
+
 	LocalDeviceImpl* lDeviceImpl = LocateDelegateFromMessage(message);
 	if (lDeviceImpl == NULL) {
 		return B_ERROR;

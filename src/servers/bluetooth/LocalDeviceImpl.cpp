@@ -76,15 +76,17 @@ LocalDeviceImpl::~LocalDeviceImpl()
 
 }
 
+
 void
 LocalDeviceImpl::Unregister()
 {
 	BMessage* msg =	new	BMessage(BT_MSG_REMOVE_DEVICE);
-	
+
 	msg->AddInt32("hci_id", fHCIDelegate->Id());
 
-	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER, "Unregistering %x\n", fHCIDelegate->Id());
-	
+	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER, "Unregistering %x\n",
+		fHCIDelegate->Id());
+
 	be_app_messenger.SendMessage(msg);
 }
 
@@ -98,32 +100,32 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 {
 
 	printf("### Incoming event: len = %d\n", event->elen);
-	for (int16 index = 0; index < event->elen + 2; index++ ) {
+	for (int16 index = 0; index < event->elen + 2; index++) {
 		printf("%x:", ((uint8*)event)[index]);
 	}
 	printf("### \n");
 
-	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"Incomming %s event\n", 
+	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"Incomming %s event\n",
 		BluetoothEvent(event->ecode));
 
 	// Events here might have not been initated by us
 	// TODO: ML mark as handled pass a reply by parameter and reply in common
 	switch (event->ecode) {
 		case HCI_EVENT_HARDWARE_ERROR:
-			HardwareError((struct hci_ev_hardware_error*)(event+1));
+			HardwareError((struct hci_ev_hardware_error*)(event + 1));
 			return;
 
 		case HCI_EVENT_CONN_REQUEST:
-			ConnectionRequest((struct hci_ev_conn_request*)(event+1), NULL);
+			ConnectionRequest((struct hci_ev_conn_request*)(event + 1), NULL);
 			return;
 
 		case HCI_EVENT_CONN_COMPLETE:
 			// should belong to a request? can be sporadic or initiated by us¿?...
-			ConnectionComplete((struct hci_ev_conn_complete*)(event+1), NULL);
+			ConnectionComplete((struct hci_ev_conn_complete*)(event + 1), NULL);
 			return;
 
 		case HCI_EVENT_PIN_CODE_REQ:
-			PinCodeRequest((struct hci_ev_pin_code_req*)(event+1), NULL);
+			PinCodeRequest((struct hci_ev_pin_code_req*)(event + 1), NULL);
 			return;
 
 		default:
@@ -137,12 +139,12 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 	// Check if it is a requested one
 	if (event->ecode == HCI_EVENT_CMD_COMPLETE) {
 		request = FindPetition(event->ecode, ((struct hci_ev_cmd_complete*)
-				(event+1))->opcode, &eventIndexLocation);
+				(event + 1))->opcode, &eventIndexLocation);
 
 	} else if (event->ecode == HCI_EVENT_CMD_STATUS) {
 
 		request = FindPetition(event->ecode, ((struct hci_ev_cmd_status*)
-				(event+1))->opcode, &eventIndexLocation);
+				(event + 1))->opcode, &eventIndexLocation);
 
 	} else 	{
 		request = FindPetition(event->ecode);
@@ -157,17 +159,17 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 	// we are waiting for a reply
 	switch (event->ecode) {
 		case HCI_EVENT_INQUIRY_COMPLETE:
-			InquiryComplete((uint8*)(event+1), request);
+			InquiryComplete((uint8*)(event + 1), request);
 		break;
 
 		case HCI_EVENT_INQUIRY_RESULT:
-			InquiryResult((uint8*)(event+1), request);
+			InquiryResult((uint8*)(event + 1), request);
 		break;
 
 		case HCI_EVENT_DISCONNECTION_COMPLETE:
 			// should belong to a request?  can be sporadic or initiated by us¿?...
 			DisconnectionComplete((struct hci_ev_disconnection_complete_reply*)
-				(event+1), request);
+				(event + 1), request);
 		break;
 
 		case HCI_EVENT_AUTH_COMPLETE:
@@ -175,7 +177,7 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 
 		case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE:
 			RemoteNameRequestComplete((struct hci_ev_remote_name_request_complete_reply*)
-				(event+1), request);
+				(event + 1), request);
 		break;
 
 		case HCI_EVENT_ENCRYPT_CHANGE:
@@ -197,12 +199,12 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 		break;
 
 		case HCI_EVENT_CMD_COMPLETE:
-			CommandComplete((struct hci_ev_cmd_complete*)(event+1),
+			CommandComplete((struct hci_ev_cmd_complete*)(event + 1),
 				request, eventIndexLocation);
 		break;
 
 		case HCI_EVENT_CMD_STATUS:
-			CommandStatus((struct hci_ev_cmd_status*)(event+1), request,
+			CommandStatus((struct hci_ev_cmd_status*)(event + 1), request,
 				eventIndexLocation);
 		break;
 
@@ -210,7 +212,7 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 		break;
 
 		case HCI_EVENT_ROLE_CHANGE:
-			RoleChange((struct hci_ev_role_change*)(event+1), request,
+			RoleChange((struct hci_ev_role_change*)(event + 1), request,
 				eventIndexLocation);
 		break;
 
@@ -227,7 +229,7 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 		break;
 
 		case HCI_EVENT_LINK_KEY_NOTIFY:
-			LinkKeyNotify((struct hci_ev_link_key_notify*)(event+1),
+			LinkKeyNotify((struct hci_ev_link_key_notify*)(event + 1),
 				request, eventIndexLocation);
 		break;
 
@@ -238,7 +240,7 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 		break;
 
 		case HCI_EVENT_MAX_SLOT_CHANGE:
-			MaxSlotChange((struct hci_ev_max_slot_change*)(event+1), request,
+			MaxSlotChange((struct hci_ev_max_slot_change*)(event + 1), request,
 				eventIndexLocation);
 
 		break;
@@ -278,10 +280,11 @@ LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 
 
 void
-LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* request,
-				 int32 index) {
+LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
+	BMessage* request,
+	int32 index) {
 
-	int16   opcodeExpected;
+	int16 opcodeExpected;
 	BMessage reply;
 
 	// Handle command complete information
@@ -297,7 +300,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 		case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_VERSION):
 		{
-			struct hci_rp_read_loc_version* version = (struct hci_rp_read_loc_version*)(event+1);
+			struct hci_rp_read_loc_version* version = (struct hci_rp_read_loc_version*)(event + 1);
 
 
 			if (version->status == BT_OK) {
@@ -327,12 +330,60 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 			// This request is not gonna be used anymore
 			ClearWantedEvent(request);
+			break;
 		}
-		break;
+
+		case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_FEATURES):
+		{
+			struct hci_rp_read_loc_features* features
+				= (struct hci_rp_read_loc_features*)(event + 1);
+
+			if (features->status == BT_OK) {
+
+				if (!IsPropertyAvailable("features")) {
+					fProperties->AddData("features", B_ANY_TYPE, &features->features, 8);
+
+					uint16 packetType = HCI_DM1 | HCI_DH1 | HCI_HV1;
+					bool roleSwitch = (features->features[0] & LMP_RSWITCH) != 0;
+					bool encryptCapable = (features->features[0] & LMP_ENCRYPT) != 0;
+
+					if (features->features[0] & LMP_3SLOT)
+						packetType |= (HCI_DM3 | HCI_DH3);
+
+					if (features->features[0] & LMP_5SLOT)
+						packetType |= (HCI_DM5 | HCI_DH5);
+
+					if (features->features[1] & LMP_HV2)
+						packetType |= (HCI_HV2);
+
+					if (features->features[1] & LMP_HV3)
+						packetType |= (HCI_HV3);
+
+					fProperties->AddInt16("packet_type", packetType);
+					fProperties->AddBool("role_switch_capable", roleSwitch);
+					fProperties->AddBool("encrypt_capable", encryptCapable);
+
+					Output::Instance()->Postf(BLACKBOARD_KIT,
+						"Packet type %x role switch %d encrypt %d\n",
+						packetType, roleSwitch, encryptCapable);
+				}
+
+			}
+
+			Output::Instance()->Postf(BLACKBOARD_KIT, "Reply for Local Features %x\n", features->status);
+
+			reply.AddInt8("status", features->status);
+			printf("Sending reply ... %ld\n", request->SendReply(&reply));
+			reply.PrintToStream();
+
+			// This request is not gonna be used anymore
+			ClearWantedEvent(request);
+			break;
+		}
 
 		case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE):
 		{
-			struct hci_rp_read_buffer_size* buffer = (struct hci_rp_read_buffer_size*)(event+1);
+			struct hci_rp_read_buffer_size* buffer = (struct hci_rp_read_buffer_size*)(event + 1);
 
 			if (buffer->status == BT_OK) {
 
@@ -365,7 +416,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 		case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR):
 		{
-			struct hci_rp_read_bd_addr* readbdaddr = (struct hci_rp_read_bd_addr*)(event+1);
+			struct hci_rp_read_bd_addr* readbdaddr = (struct hci_rp_read_bd_addr*)(event + 1);
 
 			if (readbdaddr->status == BT_OK) {
 				reply.AddData("bdaddr", B_ANY_TYPE, &readbdaddr->bdaddr, sizeof(bdaddr_t));
@@ -386,13 +437,13 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_CLASS_OF_DEV):
 		{
-			struct hci_read_dev_class_reply* classDev = (struct hci_read_dev_class_reply*)(event+1);
+			struct hci_read_dev_class_reply* classDev = (struct hci_read_dev_class_reply*)(event + 1);
 
 			if (classDev->status == BT_OK) {
 				reply.AddData("devclass", B_ANY_TYPE, &classDev->dev_class, sizeof(classDev->dev_class));
 			}
 
-			Output::Instance()->Postf(BLACKBOARD_KIT, 
+			Output::Instance()->Postf(BLACKBOARD_KIT,
 				"Read DeviceClass status = %x DeviceClass = [%x][%x][%x]\n", classDev->status,
 				classDev->dev_class[0], classDev->dev_class[1], classDev->dev_class[2]);
 
@@ -408,7 +459,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME):
 		{
-			struct hci_rp_read_local_name* readLocalName = (struct hci_rp_read_local_name*)(event+1);
+			struct hci_rp_read_local_name* readLocalName = (struct hci_rp_read_local_name*)(event + 1);
 
 			if (readLocalName->status == BT_OK) {
 				reply.AddString("friendlyname", (const char*)readLocalName->local_name );
@@ -429,9 +480,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_PIN_CODE_REPLY):
 		{
-			uint8* statusReply = (uint8*)(event+1);
+			uint8* statusReply = (uint8*)(event + 1);
 
-			//TODO: This reply has to match the BDADDR of the outgoing message
+			// TODO: This reply has to match the BDADDR of the outgoing message
 			if (*statusReply == BT_OK) {
 				Output::Instance()->Post("Positive reply for pincode accept\n", BLACKBOARD_KIT);
 			} else {
@@ -450,10 +501,10 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_PIN_CODE_NEG_REPLY):
 		{
-			uint8* statusReply = (uint8*)(event+1);
-			//TODO: This reply might to match the BDADDR of the outgoing message
-			//  	xxx:FindPetition should be expanded....
+			uint8* statusReply = (uint8*)(event + 1);
 
+			// TODO: This reply might to match the BDADDR of the outgoing message
+			// => FindPetition should be expanded....
 			if (*statusReply == BT_OK) {
 				Output::Instance()->Post("Positive reply for pincode reject\n", BLACKBOARD_KIT);
 			} else {
@@ -475,7 +526,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_CLASS_OF_DEV):
 		case PACK_OPCODE(OGF_VENDOR_CMD, OCF_WRITE_BCM2035_BDADDR):
 		{
-			reply.AddInt8("status", *(uint8*)(event+1));
+			reply.AddInt8("status", *(uint8*)(event + 1));
 
 			Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s for %s status %x\n",
 				__FUNCTION__, BluetoothCommandOpcode(opcodeExpected), *(uint8*)(event+1));
@@ -496,9 +547,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 void
 LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* request,
-				int32 index) {
+	int32 index) {
 
-	int16   opcodeExpected;
+	int16 opcodeExpected;
 	BMessage reply;
 
 	// Handle command complete information
@@ -533,11 +584,10 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 
 		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST):
 		{
-			if (event->status==BT_OK) {
+			if (event->status == BT_OK) {
 				ClearWantedEvent(request, HCI_EVENT_CMD_STATUS,
 					PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST));
-			}
-			else {
+			} else {
 				Output::Instance()->Post("Wrong Command Status for remote friendly name\n", BLACKBOARD_KIT);
 
 				reply.AddInt8("status", event->status);
@@ -578,8 +628,8 @@ LocalDeviceImpl::InquiryResult(uint8* numberOfResponses, BMessage* request)
 	BMessage reply(BT_MSG_INQUIRY_DEVICE);
 
 	// skipping here the number of responses
-	reply.AddData("info", B_ANY_TYPE, numberOfResponses + 1
-		, (*numberOfResponses) * sizeof(struct inquiry_info) );
+	reply.AddData("info", B_ANY_TYPE, numberOfResponses + 1,
+		(*numberOfResponses) * sizeof(struct inquiry_info) );
 
 	reply.AddInt8("count", *numberOfResponses);
 
@@ -613,7 +663,7 @@ LocalDeviceImpl::RemoteNameRequestComplete(
 	reply.AddInt8("status", remotename->status);
 
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s for %s with status %s\n",
-		BluetoothEvent(HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE), 
+		BluetoothEvent(HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE),
 		bdaddrUtils::ToString(remotename->bdaddr), BluetoothError(remotename->status));
 
 	printf("Sending reply ... %ld\n", request->SendReply(&reply));
@@ -634,7 +684,7 @@ LocalDeviceImpl::ConnectionRequest(struct hci_ev_conn_request* event, BMessage* 
 		"Connection Incoming type %x from %s...\n",
 		event->link_type, bdaddrUtils::ToString(event->bdaddr));
 
-	/* TODO: add a possible request in the queue */
+	// TODO: add a possible request in the queue
 	if (true) { // Check Preferences if we are to accept this connection
 
 		command = buildAcceptConnectionRequest(event->bdaddr, 0x01 /*slave*/, &size);
@@ -669,12 +719,11 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event, BMessage
 {
 
 	if (event->status == BT_OK) {
-		uint8	cod[3] = {0,0,0};
+		uint8 cod[3] = {0, 0, 0};
 
 		ConnectionIncoming* iConnection = new ConnectionIncoming(
 			new RemoteDevice(event->bdaddr, cod));
 		iConnection->Show();
-
 
 		Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
 			"%s: Address %s handle=%#x type=%d encrypt=%d\n", __FUNCTION__,
@@ -685,8 +734,6 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event, BMessage
 		Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
 			"%s: failed with status %#x\n", __FUNCTION__, event->status);
 	}
-
-
 
 }
 
@@ -716,7 +763,7 @@ void
 LocalDeviceImpl::RoleChange(hci_ev_role_change* event, BMessage* request, int32 index)
 {
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s: Address %s role=%d status=%d\n",
-		 __FUNCTION__, bdaddrUtils::ToString(event->bdaddr), event->role, event->status);
+		__FUNCTION__, bdaddrUtils::ToString(event->bdaddr), event->role, event->status);
 }
 
 
@@ -730,7 +777,7 @@ LocalDeviceImpl::PageScanRepetitionModeChange(struct hci_ev_page_scan_rep_mode_c
 
 
 void
-LocalDeviceImpl::LinkKeyNotify(hci_ev_link_key_notify *event,
+LocalDeviceImpl::LinkKeyNotify(hci_ev_link_key_notify* event,
 	BMessage* request, int32 index)
 {
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s: Address %s, key=%s, type=%d\n",
@@ -740,21 +787,19 @@ LocalDeviceImpl::LinkKeyNotify(hci_ev_link_key_notify *event,
 
 
 void
-LocalDeviceImpl::MaxSlotChange(struct hci_ev_max_slot_change *event,
-	BMessage *request, int32 index)
+LocalDeviceImpl::MaxSlotChange(struct hci_ev_max_slot_change* event,
+	BMessage* request, int32 index)
 {
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s: Handle=%#x, max slots=%d\n",
-		 __FUNCTION__, event->handle, event->lmp_max_slots);
+		__FUNCTION__, event->handle, event->lmp_max_slots);
 }
 
 
 void
 LocalDeviceImpl::HardwareError(struct hci_ev_hardware_error* event)
 {
-
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),"%s: hardware code=%#x\n",
-		 __FUNCTION__, event->hardware_code);
-
+		__FUNCTION__, event->hardware_code);
 }
 
 
@@ -774,13 +819,13 @@ LocalDeviceImpl::ProcessSimpleRequest(BMessage* request)
 
 		AddWantedEvent(request);
 		// LEAK: is command buffer freed within the Message?
-		if (((HCITransportAccessor*)fHCIDelegate)->IssueCommand(command, size) 
+		if (((HCITransportAccessor*)fHCIDelegate)->IssueCommand(command, size)
 			== B_ERROR) {
 			// TODO: - Reply the request with error!
 			//       - Remove the just added request
 			(Output::Instance()->Post("## ERROR Command issue, REMOVING!\n", BLACKBOARD_KIT));
 			ClearWantedEvent(request);
-			
+
 		} else {
 			return B_OK;
 		}

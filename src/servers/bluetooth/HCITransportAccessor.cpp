@@ -23,8 +23,8 @@ HCITransportAccessor::HCITransportAccessor(BPath* path) : HCIDelegate(path)
 		printf("%s: hid retrieved %lx status=%ld\n", __FUNCTION__,
 			fIdentifier, status);
 	} else {
-		printf("%s: Device driver could not be opened %ld\n", __FUNCTION__,
-			fIdentifier);
+		printf("%s: Device driver %s could not be opened %ld\n", __FUNCTION__,
+			path->Path(), fIdentifier);
 		fIdentifier = B_ERROR;
 	}
 
@@ -59,10 +59,10 @@ printf("### \n");
 }
 
 
-status_t 
+status_t
 HCITransportAccessor::Launch() {
 
-	uint32 dummy;	
+	uint32 dummy;
 	return ioctl(fDescriptor, BT_UP, &dummy, sizeof(uint32));
 
 }
