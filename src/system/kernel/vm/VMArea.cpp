@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -13,6 +13,7 @@
 #include <new>
 
 #include <heap.h>
+#include <vm/VMAddressSpace.h>
 
 
 #define AREA_HASH_TABLE_SIZE 1024
@@ -72,6 +73,161 @@ VMArea::Init(const char* name, uint32 allocationFlags)
 
 	id = atomic_add(&sNextAreaID, 1);
 	return B_OK;
+}
+
+
+/*!	Returns whether any part of the given address range intersects with a wired
+	range of this area.
+	The area's top cache must be locked.
+*/
+bool
+VMArea::IsWired(addr_t base, size_t size) const
+{
+	for (VMAreaWiredRangeList::Iterator it = fWiredRanges.GetIterator();
+			VMAreaWiredRange* range = it.Next();) {
+		if (range->IntersectsWith(base, size))
+			return true;
+	}
+
+	return false;
+}
+
+
+/*!	Adds the given wired range to this area.
+	The area's top cache must be locked.
+*/
+void
+VMArea::Wire(VMAreaWiredRange* range)
+{
+	ASSERT(range->area == NULL);
+
+	range->area = this;
+	fWiredRanges.Add(range);
+}
+
+
+/*!	Adds a wired range to this area.
+	The area's top cache must be locked.
+
+	\return The newly created wired area object. \c NULL when out of memory.
+*/
+VMAreaWiredRange*
+VMArea::Wire(addr_t base, size_t size, bool writable)
+{
+	VMAreaWiredRange* range = new(std::nothrow) VMAreaWiredRange(base, size,
+		writable, true);
+	if (range == NULL)
+		return NULL;
+
+	Wire(range);
+
+	return range;
+}
+
+
+/*!	Removes the given wired range from this area.
+	Must balance a previous Wire() call.
+	The area's top cache must be locked.
+*/
+void
+VMArea::Unwire(VMAreaWiredRange* range)
+{
+	ASSERT(range->area == this);
+
+	// remove the range
+	range->area = NULL;
+	fWiredRanges.Remove(range);
+
+	// wake up waiters
+	for (VMAreaUnwiredWaiterList::Iterator it = range->waiters.GetIterator();
+			VMAreaUnwiredWaiter* waiter = it.Next();) {
+		waiter->condition.NotifyAll();
+	}
+
+	range->waiters.MakeEmpty();
+}
+
+
+/*!	Removes a wired range from this area.
+
+	Must balance a previous Wire() call.
+	The area's top cache must be locked.
+*/
+void
+VMArea::Unwire(addr_t base, size_t size, bool writable)
+{
+	for (VMAreaWiredRangeList::Iterator it = fWiredRanges.GetIterator();
+			VMAreaWiredRange* range = it.Next();) {
+		if (range->implicit && range->base == base && range->size == size
+				&& range->writable == writable) {
+			Unwire(range);
+			delete range;
+			return;
+		}
+	}
+
+	panic("VMArea::Unwire(%#" B_PRIxADDR ", %#" B_PRIxADDR ", %d): no such "
+		"range", base, size, writable);
+}
+
+
+/*!	If the area has any wired range, the given waiter is added to the range and
+	prepared for waiting.
+
+	\return \c true, if the waiter has been added, \c false otherwise.
+*/
+bool
+VMArea::AddWaiterIfWired(VMAreaUnwiredWaiter* waiter)
+{
+	VMAreaWiredRange* range = fWiredRanges.Head();
+	if (range == NULL)
+		return false;
+
+	waiter->area = this;
+	waiter->base = fBase;
+	waiter->size = fSize;
+	waiter->condition.Init(this, "area unwired");
+	waiter->condition.Add(&waiter->waitEntry);
+
+	range->waiters.Add(waiter);
+
+	return true;
+}
+
+
+/*!	If the given address range intersect with a wired range of this area, the
+	given waiter is added to the range and prepared for waiting.
+
+	\param waiter The waiter structure that will be added to the wired range
+		that intersects with the given address range.
+	\param base The base of the address range to check.
+	\param size The size of the address range to check.
+	\param ignoreRange If given, this wired range of the area is not checked
+		whether it intersects with the given address range. Useful when the
+		caller has added the range and only wants to check intersection with
+		other ranges.
+	\return \c true, if the waiter has been added, \c false otherwise.
+*/
+bool
+VMArea::AddWaiterIfWired(VMAreaUnwiredWaiter* waiter, addr_t base, size_t size,
+	VMAreaWiredRange* ignoreRange)
+{
+	for (VMAreaWiredRangeList::Iterator it = fWiredRanges.GetIterator();
+			VMAreaWiredRange* range = it.Next();) {
+		if (range != ignoreRange && range->IntersectsWith(base, size)) {
+			waiter->area = this;
+			waiter->base = base;
+			waiter->size = size;
+			waiter->condition.Init(this, "area unwired");
+			waiter->condition.Add(&waiter->waitEntry);
+
+			range->waiters.Add(waiter);
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

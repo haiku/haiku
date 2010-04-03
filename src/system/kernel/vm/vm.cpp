@@ -96,6 +96,11 @@ public:
 		SetTo(area);
 	}
 
+	inline void SetTo(VMCache* cache, bool alreadyLocked)
+	{
+		AutoLocker<VMCache, AreaCacheLocking>::SetTo(cache, alreadyLocked);
+	}
+
 	inline void SetTo(VMArea* area)
 	{
 		return AutoLocker<VMCache, AreaCacheLocking>::SetTo(
@@ -259,7 +264,8 @@ static cache_info* sCacheInfoTable;
 static void delete_area(VMAddressSpace* addressSpace, VMArea* area,
 	bool addressSpaceCleanup);
 static status_t vm_soft_fault(VMAddressSpace* addressSpace, addr_t address,
-	bool isWrite, bool isUser);
+	bool isWrite, bool isUser, vm_page** wirePage,
+	VMAreaWiredRange* wiredRange = NULL);
 static status_t map_backing_store(VMAddressSpace* addressSpace,
 	VMCache* cache, void** _virtualAddress, off_t offset, addr_t size,
 	uint32 addressSpec, int wiring, int protection, int mapping,
@@ -560,6 +566,7 @@ unmap_pages(VMArea* area, addr_t base, size_t size)
 	area, it is split in two; in this case the second area is returned via
 	\a _secondArea (the variable is left untouched in the other cases).
 	The address space must be write locked.
+	The caller must ensure that no part of the given range is wired.
 */
 static status_t
 cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
@@ -685,6 +692,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 /*!	Deletes all areas in the given address range.
 	The address space must be write-locked.
+	The caller must ensure that no part of the given range is wired.
 */
 static status_t
 unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
@@ -725,6 +733,10 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 /*! You need to hold the lock of the cache and the write lock of the address
 	space when calling this function.
 	Note, that in case of error your cache will be temporarily unlocked.
+	If \a addressSpec is \c B_EXACT_ADDRESS and the
+	\c CREATE_AREA_UNMAP_ADDRESS_RANGE flag is specified, the caller must ensure
+	that no part of the specified address range (base \c *_virtualAddress, size
+	\a size) is wired.
 */
 static status_t
 map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
@@ -846,6 +858,112 @@ err2:
 err1:
 	addressSpace->DeleteArea(area, allocationFlags);
 	return status;
+}
+
+
+/*!	Equivalent to wait_if_area_range_is_wired(area, area->Base(), area->Size(),
+	  locker1, locker2).
+*/
+template<typename LockerType1, typename LockerType2>
+static inline bool
+wait_if_area_is_wired(VMArea* area, LockerType1* locker1, LockerType2* locker2)
+{
+	area->cache->AssertLocked();
+
+	VMAreaUnwiredWaiter waiter;
+	if (!area->AddWaiterIfWired(&waiter))
+		return false;
+
+	// unlock everything and wait
+	if (locker1 != NULL)
+		locker1->Unlock();
+	if (locker2 != NULL)
+		locker2->Unlock();
+
+	waiter.waitEntry.Wait();
+
+	return true;
+}
+
+
+/*!	Checks whether the given area has any wired ranges intersecting with the
+	specified range and waits, if so.
+
+	When it has to wait, the function calls \c Unlock() on both \a locker1
+	and \a locker2, if given.
+	The area's top cache must be locked and must be unlocked as a side effect
+	of calling \c Unlock() on either \a locker1 or \a locker2.
+
+	If the function does not have to wait it does not modify or unlock any
+	object.
+
+	\param area The area to be checked.
+	\param base The base address of the range to check.
+	\param size The size of the address range to check.
+	\param locker1 An object to be unlocked when before starting to wait (may
+		be \c NULL).
+	\param locker2 An object to be unlocked when before starting to wait (may
+		be \c NULL).
+	\return \c true, if the function had to wait, \c false otherwise.
+*/
+template<typename LockerType1, typename LockerType2>
+static inline bool
+wait_if_area_range_is_wired(VMArea* area, addr_t base, size_t size,
+	LockerType1* locker1, LockerType2* locker2)
+{
+	area->cache->AssertLocked();
+
+	VMAreaUnwiredWaiter waiter;
+	if (!area->AddWaiterIfWired(&waiter, base, size))
+		return false;
+
+	// unlock everything and wait
+	if (locker1 != NULL)
+		locker1->Unlock();
+	if (locker2 != NULL)
+		locker2->Unlock();
+
+	waiter.waitEntry.Wait();
+
+	return true;
+}
+
+
+/*!	Checks whether the given address space has any wired ranges intersecting
+	with the specified range and waits, if so.
+
+	Similar to wait_if_area_range_is_wired(), with the following differences:
+	- All areas intersecting with the range are checked (respectively all until
+	  one is found that contains a wired range intersecting with the given
+	  range).
+	- The given address space must at least be read-locked and must be unlocked
+	  when \c Unlock() is called on \a locker.
+	- None of the areas' caches are allowed to be locked.
+*/
+template<typename LockerType>
+static inline bool
+wait_if_address_range_is_wired(VMAddressSpace* addressSpace, addr_t base,
+	size_t size, LockerType* locker)
+{
+	addr_t end = base + size - 1;
+	for (VMAddressSpace::AreaIterator it = addressSpace->GetAreaIterator();
+			VMArea* area = it.Next();) {
+		// TODO: Introduce a VMAddressSpace method to get a close iterator!
+		if (area->Base() > end)
+			return false;
+
+		if (base >= area->Base() + area->Size() - 1)
+			continue;
+
+		VMCache* cache = vm_area_get_locked_cache(area);
+
+		if (wait_if_area_range_is_wired(area, base, size, locker, cache))
+			return true;
+
+		cache->Unlock();
+	}
+
+	return false;
 }
 
 
@@ -1057,11 +1175,19 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			vm_page_reserve_pages(&reservation, reservedPages, priority);
 	}
 
-	status = locker.SetTo(team);
-	if (status != B_OK)
-		goto err0;
+	// Lock the address space and, if B_EXACT_ADDRESS and
+	// CREATE_AREA_UNMAP_ADDRESS_RANGE were specified, ensure the address range
+	// is not wired.
+	do {
+		status = locker.SetTo(team);
+		if (status != B_OK)
+			goto err0;
 
-	addressSpace = locker.AddressSpace();
+		addressSpace = locker.AddressSpace();
+	} while (addressSpec == B_EXACT_ADDRESS
+		&& (flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0
+		&& wait_if_address_range_is_wired(addressSpace, (addr_t)*address, size,
+			&locker));
 
 	if (wiring == B_CONTIGUOUS) {
 		// we try to allocate the page run here upfront as this may easily
@@ -1463,11 +1589,19 @@ area_id
 vm_create_null_area(team_id team, const char* name, void** address,
 	uint32 addressSpec, addr_t size, uint32 flags)
 {
-	AddressSpaceWriteLocker locker(team);
-	if (!locker.IsLocked())
-		return B_BAD_TEAM_ID;
-
 	size = PAGE_ALIGN(size);
+
+	// Lock the address space and, if B_EXACT_ADDRESS and
+	// CREATE_AREA_UNMAP_ADDRESS_RANGE were specified, ensure the address range
+	// is not wired.
+	AddressSpaceWriteLocker locker;
+	do {
+		if (locker.SetTo(team) != B_OK)
+			return B_BAD_TEAM_ID;
+	} while (addressSpec == B_EXACT_ADDRESS
+		&& (flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0
+		&& wait_if_address_range_is_wired(locker.AddressSpace(),
+			(addr_t)*address, size, &locker));
 
 	// create a null cache
 	int priority = (flags & CREATE_AREA_PRIORITY_VIP) != 0
@@ -1630,9 +1764,15 @@ _vm_map_file(team_id team, const char* name, void** _address,
 		vm_page_reservation* fReservation;
 	} pageUnreserver(reservedPreMapPages > 0 ? &reservation : NULL);
 
-	AddressSpaceWriteLocker locker(team);
-	if (!locker.IsLocked())
-		return B_BAD_TEAM_ID;
+	// Lock the address space and, if the specified address range shall be
+	// unmapped, ensure it is not wired.
+	AddressSpaceWriteLocker locker;
+	do {
+		if (locker.SetTo(team) != B_OK)
+			return B_BAD_TEAM_ID;
+	} while (unmapAddressRange
+		&& wait_if_address_range_is_wired(locker.AddressSpace(),
+			(addr_t)*_address, size, &locker));
 
 	// TODO: this only works for file systems that use the file cache
 	VMCache* cache;
@@ -1866,10 +2006,22 @@ vm_clone_area(team_id team, const char* name, void** address,
 }
 
 
+/*!	Deletes the specified area of the given address space.
+
+	The address space must be write-locked.
+	The caller must ensure that the area does not have any wired ranges.
+
+	\param addressSpace The address space containing the area.
+	\param area The area to be deleted.
+	\param deletingAddressSpace \c true, if the address space is in the process
+		of being deleted.
+*/
 static void
 delete_area(VMAddressSpace* addressSpace, VMArea* area,
 	bool deletingAddressSpace)
 {
+	ASSERT(!area->IsWired());
+
 	VMAreaHash::Remove(area);
 
 	// At this point the area is removed from the global hash table, but
@@ -1912,11 +2064,20 @@ vm_delete_area(team_id team, area_id id, bool kernel)
 {
 	TRACE(("vm_delete_area(team = 0x%lx, area = 0x%lx)\n", team, id));
 
+	// lock the address space and make sure the area isn't wired
 	AddressSpaceWriteLocker locker;
 	VMArea* area;
-	status_t status = locker.SetFromArea(team, id, area);
-	if (status != B_OK)
-		return status;
+	AreaCacheLocker cacheLocker;
+
+	do {
+		status_t status = locker.SetFromArea(team, id, area);
+		if (status != B_OK)
+			return status;
+
+		cacheLocker.SetTo(area);
+	} while (wait_if_area_is_wired(area, &locker, &cacheLocker));
+
+	cacheLocker.Unlock();
 
 	if (!kernel && (area->protection & B_KERNEL_AREA) != 0)
 		return B_NOT_ALLOWED;
@@ -1932,6 +2093,7 @@ vm_delete_area(team_id team, area_id id, bool kernel)
 	Preconditions:
 	- The given cache must be locked.
 	- All of the cache's areas' address spaces must be read locked.
+	- None of the cache's areas must have any wired ranges.
 */
 static status_t
 vm_copy_on_write_area(VMCache* lowerCache)
@@ -2004,22 +2166,47 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	VMAddressSpace* targetAddressSpace;
 	VMCache* cache;
 	VMArea* source;
-	status_t status = locker.AddTeam(team, true, &targetAddressSpace);
-	if (status == B_OK) {
-		status = locker.AddAreaCacheAndLock(sourceID, false, false, source,
-			&cache);
-	}
-	if (status != B_OK)
-		return status;
+	AreaCacheLocker cacheLocker;
+	status_t status;
+	bool sharedArea;
 
-	AreaCacheLocker cacheLocker(cache);	// already locked
+	bool restart;
+	do {
+		restart = false;
+
+		locker.Unset();
+		status = locker.AddTeam(team, true, &targetAddressSpace);
+		if (status == B_OK) {
+			status = locker.AddAreaCacheAndLock(sourceID, false, false, source,
+				&cache);
+		}
+		if (status != B_OK)
+			return status;
+
+		cacheLocker.SetTo(cache, true);	// already locked
+
+		sharedArea = (source->protection & B_SHARED_AREA) != 0;
+
+		// Make sure the source area (respectively, if not shared, all areas of
+		// the cache) doesn't have any wired ranges.
+		if (sharedArea) {
+			if (wait_if_area_is_wired(source, &locker, &cacheLocker))
+				restart = true;
+		} else {
+			for (VMArea* area = cache->areas; area != NULL;
+					area = area->cache_next) {
+				if (wait_if_area_is_wired(area, &locker, &cacheLocker)) {
+					restart = true;
+					break;
+				}
+			}
+		}
+	} while (restart);
 
 	if (addressSpec == B_CLONE_ADDRESS) {
 		addressSpec = B_EXACT_ADDRESS;
 		*_address = (void*)source->Base();
 	}
-
-	bool sharedArea = (source->protection & B_SHARED_AREA) != 0;
 
 	// First, create a cache on top of the source area, respectively use the
 	// existing one, if this is a shared area.
@@ -2063,32 +2250,65 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 	if (!arch_vm_supports_protection(newProtection))
 		return B_NOT_SUPPORTED;
 
+	bool becomesWritable
+		= (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0;
+
 	// lock address spaces and cache
 	MultiAddressSpaceLocker locker;
 	VMCache* cache;
 	VMArea* area;
-	status_t status = locker.AddAreaCacheAndLock(areaID, true, false, area,
-		&cache);
-	AreaCacheLocker cacheLocker(cache);	// already locked
+	status_t status;
+	AreaCacheLocker cacheLocker;
+	bool isWritable;
 
-	if (!kernel && (area->protection & B_KERNEL_AREA) != 0)
-		return B_NOT_ALLOWED;
+	bool restart;
+	do {
+		restart = false;
 
-	if (area->protection == newProtection)
-		return B_OK;
+		locker.Unset();
+		status = locker.AddAreaCacheAndLock(areaID, true, false, area, &cache);
+		if (status != B_OK)
+			return status;
 
-	if (team != VMAddressSpace::KernelID()
-		&& area->address_space->ID() != team) {
-		// unless you're the kernel, you are only allowed to set
-		// the protection of your own areas
-		return B_NOT_ALLOWED;
-	}
+		cacheLocker.SetTo(cache, true);	// already locked
+
+		if (!kernel && (area->protection & B_KERNEL_AREA) != 0)
+			return B_NOT_ALLOWED;
+
+		if (area->protection == newProtection)
+			return B_OK;
+
+		if (team != VMAddressSpace::KernelID()
+			&& area->address_space->ID() != team) {
+			// unless you're the kernel, you are only allowed to set
+			// the protection of your own areas
+			return B_NOT_ALLOWED;
+		}
+
+		isWritable
+			= (area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0;
+
+		// Make sure the area (respectively, if we're going to call
+		// vm_copy_on_write_area(), all areas of the cache) doesn't have any
+		// wired ranges.
+		if (!isWritable && becomesWritable && !list_is_empty(&cache->consumers)) {
+			for (VMArea* otherArea = cache->areas; otherArea != NULL;
+					otherArea = otherArea->cache_next) {
+				if (wait_if_area_is_wired(otherArea, &locker, &cacheLocker)) {
+					restart = true;
+					break;
+				}
+			}
+		} else {
+			if (wait_if_area_is_wired(area, &locker, &cacheLocker))
+				restart = true;
+		}
+	} while (restart);
 
 	bool changePageProtection = true;
 	bool changeTopCachePagesOnly = false;
 
-	if ((area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0
-		&& (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0) {
+	if (isWritable && !becomesWritable) {
 		// writable -> !writable
 
 		if (cache->source != NULL && cache->temporary) {
@@ -2116,8 +2336,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 			&& cache->page_count * 2 < area->Size() / B_PAGE_SIZE) {
 			changeTopCachePagesOnly = true;
 		}
-	} else if ((area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0
-		&& (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
+	} else if (!isWritable && becomesWritable) {
 		// !writable -> writable
 
 		if (!list_is_empty(&cache->consumers)) {
@@ -2308,6 +2527,8 @@ vm_clear_page_mapping_accessed_flags(struct vm_page *page)
 int32
 vm_remove_all_page_mappings_if_unaccessed(struct vm_page *page)
 {
+	ASSERT(page->wired_count == 0);
+
 	if (page->accessed)
 		return vm_clear_page_mapping_accessed_flags(page);
 
@@ -2942,7 +3163,15 @@ dump_available_memory(int argc, char** argv)
 }
 
 
-status_t
+/*!	Deletes all areas and reserved regions in the given address space.
+
+	The caller must ensure that none of the areas has any wired ranges.
+
+	\param addressSpace The address space.
+	\param deletingAddressSpace \c true, if the address space is in the process
+		of being deleted.
+*/
+void
 vm_delete_areas(struct VMAddressSpace* addressSpace, bool deletingAddressSpace)
 {
 	TRACE(("vm_delete_areas: called on address space 0x%lx\n",
@@ -2954,11 +3183,12 @@ vm_delete_areas(struct VMAddressSpace* addressSpace, bool deletingAddressSpace)
 	addressSpace->UnreserveAllAddressRanges(0);
 
 	// delete all the areas in this address space
-	while (VMArea* area = addressSpace->FirstArea())
+	while (VMArea* area = addressSpace->FirstArea()) {
+		ASSERT(!area->IsWired());
 		delete_area(addressSpace, area, deletingAddressSpace);
+	}
 
 	addressSpace->WriteUnlock();
-	return B_OK;
 }
 
 
@@ -3545,8 +3775,10 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			VMPageFaultTracing::PAGE_FAULT_ERROR_NO_ADDRESS_SPACE));
 	}
 
-	if (status == B_OK)
-		status = vm_soft_fault(addressSpace, pageAddress, isWrite, isUser);
+	if (status == B_OK) {
+		status = vm_soft_fault(addressSpace, pageAddress, isWrite, isUser,
+			NULL);
+	}
 
 	if (status < B_OK) {
 		dprintf("vm_page_fault: vm_soft_fault returned error '%s' on fault at "
@@ -3856,9 +4088,22 @@ fault_get_page(PageFaultContext& context)
 }
 
 
+/*!	Makes sure the address in the given address space is mapped.
+
+	\param addressSpace The address space.
+	\param originalAddress The address. Doesn't need to be page aligned.
+	\param isWrite If \c true the address shall be write-accessible.
+	\param isUser If \c true the access is requested by a userland team.
+	\param wirePage On success, if non \c NULL, the wired count of the page
+		mapped at the given address is incremented and the page is returned
+		via this parameter.
+	\param wiredRange If given, this wiredRange is ignored when checking whether
+		an already mapped page at the virtual address can be unmapped.
+	\return \c B_OK on success, another error code otherwise.
+*/
 static status_t
 vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
-	bool isWrite, bool isUser)
+	bool isWrite, bool isUser, vm_page** wirePage, VMAreaWiredRange* wiredRange)
 {
 	FTRACE(("vm_soft_fault: thid 0x%lx address 0x%lx, isWrite %d, isUser %d\n",
 		thread_get_current_thread_id(), originalAddress, isWrite, isUser));
@@ -3981,6 +4226,9 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 			// its protection. Otherwise we have to unmap it.
 			if (mappedPage == context.page) {
 				context.map->ProtectPage(area, address, newProtection);
+					// Note: We assume that ProtectPage() is atomic (i.e.
+					// the page isn't temporarily unmapped), otherwise we'd have
+					// to make sure it isn't wired.
 				mapPage = false;
 			} else
 				unmapPage = true;
@@ -3989,6 +4237,17 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 		context.map->Unlock();
 
 		if (unmapPage) {
+			// If the page is wired, we can't unmap it. Wait until it is unwired
+			// again and restart.
+			VMAreaUnwiredWaiter waiter;
+			if (area->AddWaiterIfWired(&waiter, address, B_PAGE_SIZE,
+					wiredRange)) {
+				// unlock everything and wait
+				context.UnlockAll();
+				waiter.waitEntry.Wait();
+				continue;
+			}
+
 			// Note: The mapped page is a page of a lower cache. We are
 			// guaranteed to have that cached locked, our new page is a copy of
 			// that page, and the page is not busy. The logic for that guarantee
@@ -4008,9 +4267,10 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 					&context.reservation) != B_OK) {
 				// Mapping can only fail, when the page mapping object couldn't
 				// be allocated. Save for the missing mapping everything is
-				// fine, though. We'll simply leave and probably fault again.
-				// To make sure we'll have more luck then, we ensure that the
-				// minimum object reserve is available.
+				// fine, though. If this was a regular page fault, we'll simply
+				// leave and probably fault again. To make sure we'll have more
+				// luck then, we ensure that the minimum object reserve is
+				// available.
 				DEBUG_PAGE_ACCESS_END(context.page);
 
 				context.UnlockAll();
@@ -4020,12 +4280,23 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 					// Apparently the situation is serious. Let's get ourselves
 					// killed.
 					status = B_NO_MEMORY;
+				} else if (wirePage != NULL) {
+					// The caller expects us to wire the page. Since
+					// object_cache_reserve() succeeded, we should now be able
+					// to allocate a mapping structure. Restart.
+					continue;
 				}
 
 				break;
 			}
 		} else if (context.page->State() == PAGE_STATE_INACTIVE)
 			vm_page_set_state(context.page, PAGE_STATE_ACTIVE);
+
+		// also wire the page, if requested
+		if (wirePage != NULL && status == B_OK) {
+			increment_page_wired_count(context.page);
+			*wirePage = context.page;
+		}
 
 		DEBUG_PAGE_ACCESS_END(context.page);
 
@@ -4228,35 +4499,6 @@ fill_area_info(struct VMArea* area, area_info* info, size_t size)
 }
 
 
-/*!
-	Tests whether or not the area that contains the specified address
-	needs any kind of locking, and actually exists.
-	Used by both lock_memory() and unlock_memory().
-*/
-static status_t
-test_lock_memory(VMAddressSpace* addressSpace, addr_t address,
-	bool& needsLocking)
-{
-	addressSpace->ReadLock();
-
-	VMArea* area = addressSpace->LookupArea(address);
-	if (area != NULL) {
-		// This determines if we need to lock the memory at all
-		needsLocking = area->cache_type != CACHE_TYPE_NULL
-			&& area->cache_type != CACHE_TYPE_DEVICE
-			&& area->wiring != B_FULL_LOCK
-			&& area->wiring != B_CONTIGUOUS;
-	}
-
-	addressSpace->ReadUnlock();
-
-	if (area == NULL)
-		return B_BAD_ADDRESS;
-
-	return B_OK;
-}
-
-
 static status_t
 vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 {
@@ -4269,38 +4511,63 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 	VMCache* cache;
 
 	MultiAddressSpaceLocker locker;
-	status_t status = locker.AddAreaCacheAndLock(areaID, true, true, area,
-		&cache);
-	if (status != B_OK)
-		return status;
-	AreaCacheLocker cacheLocker(cache);	// already locked
+	AreaCacheLocker cacheLocker;
 
-	// enforce restrictions
-	if (!kernel) {
-		if ((area->protection & B_KERNEL_AREA) != 0)
-			return B_NOT_ALLOWED;
-		// TODO: Enforce all restrictions (team, etc.)!
-	}
+	status_t status;
+	size_t oldSize;
+	bool anyKernelArea;
+	bool restart;
 
-	size_t oldSize = area->Size();
-	if (newSize == oldSize)
-		return B_OK;
+	do {
+		anyKernelArea = false;
+		restart = false;
 
-	// Resize all areas of this area's cache
+		locker.Unset();
+		status = locker.AddAreaCacheAndLock(areaID, true, true, area, &cache);
+		if (status != B_OK)
+			return status;
+		cacheLocker.SetTo(cache, true);	// already locked
 
-	if (cache->type != CACHE_TYPE_RAM)
-		return B_NOT_ALLOWED;
-
-	bool anyKernelArea = false;
-	if (oldSize < newSize) {
-		// We need to check if all areas of this cache can be resized
-		for (VMArea* current = cache->areas; current != NULL;
-				current = current->cache_next) {
-			if (!current->address_space->CanResizeArea(current, newSize))
-				return B_ERROR;
-			anyKernelArea |= current->address_space == VMAddressSpace::Kernel();
+		// enforce restrictions
+		if (!kernel) {
+			if ((area->protection & B_KERNEL_AREA) != 0)
+				return B_NOT_ALLOWED;
+			// TODO: Enforce all restrictions (team, etc.)!
 		}
-	}
+
+		oldSize = area->Size();
+		if (newSize == oldSize)
+			return B_OK;
+
+		if (cache->type != CACHE_TYPE_RAM)
+			return B_NOT_ALLOWED;
+
+		if (oldSize < newSize) {
+			// We need to check if all areas of this cache can be resized.
+			for (VMArea* current = cache->areas; current != NULL;
+					current = current->cache_next) {
+				if (!current->address_space->CanResizeArea(current, newSize))
+					return B_ERROR;
+				anyKernelArea
+					|= current->address_space == VMAddressSpace::Kernel();
+			}
+		} else {
+			// We're shrinking the areas, so we must make sure the affected
+			// ranges are not wired.
+			for (VMArea* current = cache->areas; current != NULL;
+					current = current->cache_next) {
+				anyKernelArea
+					|= current->address_space == VMAddressSpace::Kernel();
+
+				if (wait_if_area_range_is_wired(current,
+						current->Base() + newSize, oldSize - newSize, &locker,
+						&cacheLocker)) {
+					restart = true;
+					break;
+				}
+			}
+		}
+	} while (restart);
 
 	// Okay, looks good so far, so let's do it
 
@@ -4455,16 +4722,48 @@ user_memset(void* s, char c, size_t count)
 }
 
 
+/*!	Wires down the given address range in the specified team's address space.
+
+	If successful the function
+	- acquires a reference to the specified team's address space,
+	- adds respective wired ranges to all areas that intersect with the given
+	  address range,
+	- makes sure all pages in the given address range are mapped with the
+	  requested access permissions and increments their wired count.
+
+	It fails, when \a team doesn't specify a valid address space, when any part
+	of the specified address range is not covered by areas, when the concerned
+	areas don't allow mapping with the requested permissions, or when mapping
+	failed for another reason.
+
+	When successful the call must be balanced by a unlock_memory_etc() call with
+	the exact same parameters.
+
+	\param team Identifies the address (via team ID). \c B_CURRENT_TEAM is
+		supported.
+	\param address The start of the address range to be wired.
+	\param numBytes The size of the address range to be wired.
+	\param flags Flags. Currently only \c B_READ_DEVICE is defined, which
+		requests that the range must be wired writable ("read from device
+		into memory").
+	\return \c B_OK on success, another error code otherwise.
+*/
 status_t
 lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 {
-	VMAddressSpace* addressSpace = NULL;
-	addr_t unalignedBase = (addr_t)address;
-	addr_t end = unalignedBase + numBytes;
-	addr_t base = ROUNDDOWN(unalignedBase, B_PAGE_SIZE);
-	bool isUser = IS_USER_ADDRESS(address);
-	bool needsLocking = true;
+	addr_t lockBaseAddress = ROUNDDOWN((addr_t)address, B_PAGE_SIZE);
+	addr_t lockEndAddress = ROUNDUP((addr_t)address + numBytes, B_PAGE_SIZE);
 
+	// compute the page protection that is required
+	bool isUser = IS_USER_ADDRESS(address);
+	bool writable = (flags & B_READ_DEVICE) == 0;
+	uint32 requiredProtection = PAGE_PRESENT
+		| B_KERNEL_READ_AREA | (isUser ? B_READ_AREA : 0);
+	if (writable)
+		requiredProtection |= B_KERNEL_WRITE_AREA | (isUser ? B_WRITE_AREA : 0);
+
+	// get and read lock the address space
+	VMAddressSpace* addressSpace = NULL;
 	if (isUser) {
 		if (team == B_CURRENT_TEAM)
 			addressSpace = VMAddressSpace::GetCurrent();
@@ -4475,82 +4774,108 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 	if (addressSpace == NULL)
 		return B_ERROR;
 
-	// test if we're on an area that allows faults at all
+	AddressSpaceReadLocker addressSpaceLocker(addressSpace, true);
 
 	VMTranslationMap* map = addressSpace->TranslationMap();
+	status_t error = B_OK;
 
-	status_t status = test_lock_memory(addressSpace, base, needsLocking);
-	if (status < B_OK)
-		goto out;
-	if (!needsLocking)
-		goto out;
+	// iterate through all concerned areas
+	addr_t nextAddress = lockBaseAddress;
+	while (nextAddress != lockEndAddress) {
+		// get the next area
+		VMArea* area = addressSpace->LookupArea(nextAddress);
+		if (area == NULL) {
+			error = B_BAD_ADDRESS;
+			break;
+		}
 
-	for (; base < end; base += B_PAGE_SIZE) {
-		addr_t physicalAddress;
-		uint32 protection;
-		status_t status;
+		addr_t areaStart = nextAddress;
+		addr_t areaEnd = std::min(lockEndAddress, area->Base() + area->Size());
 
+		// Lock the area's top cache. This is a requirement for VMArea::Wire().
+		VMCacheChainLocker cacheChainLocker(vm_area_get_locked_cache(area));
+
+		// mark the area range wired
+		VMAreaWiredRange* range = area->Wire(areaStart, areaEnd - areaStart,
+			writable);
+		if (range == NULL) {
+			error = B_NO_MEMORY;
+			break;
+		}
+
+		// Depending on the area cache type and the wiring, we may not need to
+		// look at the individual pages.
+		if (area->cache_type == CACHE_TYPE_NULL
+			|| area->cache_type == CACHE_TYPE_DEVICE
+			|| area->wiring == B_FULL_LOCK
+			|| area->wiring == B_CONTIGUOUS) {
+			nextAddress = areaEnd;
+			continue;
+		}
+
+		// Lock the area's cache chain and the translation map. Needed to look
+		// up pages and play with their wired count.
+		cacheChainLocker.LockAllSourceCaches();
 		map->Lock();
-		status = map->Query(base, &physicalAddress, &protection);
-		map->Unlock();
 
-		if (status < B_OK)
-			goto out;
+		// iterate through the pages and wire them
+		for (; nextAddress != areaEnd; nextAddress += B_PAGE_SIZE) {
+			addr_t physicalAddress;
+			uint32 flags;
 
-		if ((protection & PAGE_PRESENT) != 0) {
-			// if B_READ_DEVICE is set, the caller intents to write to the locked
-			// memory, so if it hasn't been mapped writable, we'll try the soft
-			// fault anyway
-			if ((flags & B_READ_DEVICE) == 0
-				|| (protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
-				// update wiring
-				vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
-				if (page == NULL)
-					panic("couldn't lookup physical page just allocated\n");
-
+			vm_page* page;
+			if (map->Query(nextAddress, &physicalAddress, &flags) == B_OK
+				&& (flags & requiredProtection) == requiredProtection
+				&& (page = vm_lookup_page(physicalAddress / B_PAGE_SIZE))
+					!= NULL) {
+				// Already mapped with the correct permissions -- just increment
+				// the page's wired count.
 				increment_page_wired_count(page);
-				continue;
+			} else {
+				// Let vm_soft_fault() map the page for us, if possible. We need
+				// to fully unlock to avoid deadlocks. Since we have already
+				// wired the area itself, nothing disturbing will happen with it
+				// in the meantime.
+				map->Unlock();
+				cacheChainLocker.Unlock();
+				addressSpaceLocker.Unlock();
+
+				error = vm_soft_fault(addressSpace, nextAddress, writable,
+					isUser, &page, range);
+
+				addressSpaceLocker.Lock();
+				cacheChainLocker.SetTo(vm_area_get_locked_cache(area));
+				cacheChainLocker.LockAllSourceCaches();
+				map->Lock();
 			}
+
+			if (error != B_OK)
+				break;
 		}
 
-		status = vm_soft_fault(addressSpace, base, (flags & B_READ_DEVICE) != 0,
-			isUser);
-		if (status != B_OK)	{
-			dprintf("lock_memory(address = %p, numBytes = %lu, flags = %lu) "
-				"failed: %s\n", (void*)unalignedBase, numBytes, flags,
-				strerror(status));
-			goto out;
-		}
-
-		// TODO: Here's a race condition. We should probably add a parameter
-		// to vm_soft_fault() that would cause the page's wired count to be
-		// incremented immediately.
-		// TODO: After memory has been locked in an area, we need to prevent the
-		// area from being deleted, resized, cut, etc. That could be done using
-		// a "locked pages" count in VMArea, and maybe a condition variable, if
-		// we want to allow waiting for the area to become eligible for these
-		// operations again.
-
-		map->Lock();
-		status = map->Query(base, &physicalAddress, &protection);
 		map->Unlock();
+		cacheChainLocker.Unlock();
 
-		if (status < B_OK)
-			goto out;
-
-		// update wiring
-		vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
-		if (page == NULL)
-			panic("couldn't lookup physical page");
-
-		increment_page_wired_count(page);
-			// TODO: We need the cache to be locked at this point! See TODO
-			// above for a possible solution.
+		if (error != B_OK) {
+			// An error occurred, so abort right here. If the current address
+			// is the first in this area, unwire the area, since we won't get
+			// to it when reverting what we've done so far.
+			if (nextAddress == areaStart)
+				area->Unwire(range);
+			break;
+		}
 	}
 
-out:
-	addressSpace->Put();
-	return status;
+	if (error != B_OK) {
+		// An error occurred, so unwire all that we've already wired. Note that
+		// even if not a single page was wired, unlock_memory_etc() is called
+		// to put the address space reference.
+		addressSpaceLocker.Unlock();
+		unlock_memory_etc(team, (void*)address, nextAddress - lockBaseAddress,
+			flags);
+	}
+
+	return error;
 }
 
 
@@ -4561,16 +4886,28 @@ lock_memory(void* address, size_t numBytes, uint32 flags)
 }
 
 
+/*!	Unwires an address range previously wired with lock_memory_etc().
+
+	Note that a call to this function must balance a previous lock_memory_etc()
+	call with exactly the same parameters.
+*/
 status_t
 unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 {
-	VMAddressSpace* addressSpace = NULL;
-	addr_t unalignedBase = (addr_t)address;
-	addr_t end = unalignedBase + numBytes;
-	addr_t base = ROUNDDOWN(unalignedBase, B_PAGE_SIZE);
-	bool needsLocking = true;
+	addr_t lockBaseAddress = ROUNDDOWN((addr_t)address, B_PAGE_SIZE);
+	addr_t lockEndAddress = ROUNDUP((addr_t)address + numBytes, B_PAGE_SIZE);
 
-	if (IS_USER_ADDRESS(address)) {
+	// compute the page protection that is required
+	bool isUser = IS_USER_ADDRESS(address);
+	bool writable = (flags & B_READ_DEVICE) == 0;
+	uint32 requiredProtection = PAGE_PRESENT
+		| B_KERNEL_READ_AREA | (isUser ? B_READ_AREA : 0);
+	if (writable)
+		requiredProtection |= B_KERNEL_WRITE_AREA | (isUser ? B_WRITE_AREA : 0);
+
+	// get and read lock the address space
+	VMAddressSpace* addressSpace = NULL;
+	if (isUser) {
 		if (team == B_CURRENT_TEAM)
 			addressSpace = VMAddressSpace::GetCurrent();
 		else
@@ -4580,48 +4917,80 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 	if (addressSpace == NULL)
 		return B_ERROR;
 
+	AddressSpaceReadLocker addressSpaceLocker(addressSpace, true);
+
 	VMTranslationMap* map = addressSpace->TranslationMap();
+	status_t error = B_OK;
 
-	status_t status = test_lock_memory(addressSpace, base, needsLocking);
-	if (status < B_OK)
-		goto out;
-	if (!needsLocking)
-		goto out;
+	// iterate through all concerned areas
+	addr_t nextAddress = lockBaseAddress;
+	while (nextAddress != lockEndAddress) {
+		// get the next area
+		VMArea* area = addressSpace->LookupArea(nextAddress);
+		if (area == NULL) {
+			error = B_BAD_ADDRESS;
+			break;
+		}
 
-	for (; base < end; base += B_PAGE_SIZE) {
+		addr_t areaStart = nextAddress;
+		addr_t areaEnd = std::min(lockEndAddress, area->Base() + area->Size());
+
+		// Lock the area's top cache. This is a requirement for
+		// VMArea::Unwire().
+		VMCacheChainLocker cacheChainLocker(vm_area_get_locked_cache(area));
+
+		// Depending on the area cache type and the wiring, we may not need to
+		// look at the individual pages.
+		if (area->cache_type == CACHE_TYPE_NULL
+			|| area->cache_type == CACHE_TYPE_DEVICE
+			|| area->wiring == B_FULL_LOCK
+			|| area->wiring == B_CONTIGUOUS) {
+			nextAddress = areaEnd;
+			area->Unwire(areaStart, areaEnd - areaStart, writable);
+			continue;
+		}
+
+		// Lock the area's cache chain and the translation map. Needed to look
+		// up pages and play with their wired count.
+		cacheChainLocker.LockAllSourceCaches();
 		map->Lock();
 
-		addr_t physicalAddress;
-		uint32 protection;
-		status = map->Query(base, &physicalAddress, &protection);
-			// TODO: ATM there's no mechanism that guarantees that the page
-			// we've marked wired in lock_memory_etc() is the one we find here.
-			// If we only locked for reading, the original page might stem from
-			// a lower cache and a page fault in the meantime might have mapped
-			// a page from the top cache.
-			// Moreover fork() can insert a new top cache and re-map pages
-			// read-only at any time. This would even cause a violation of the
-			// lock_memory() guarantee.
+		// iterate through the pages and unwire them
+		for (; nextAddress != areaEnd; nextAddress += B_PAGE_SIZE) {
+			addr_t physicalAddress;
+			uint32 flags;
+
+			vm_page* page;
+			if (map->Query(nextAddress, &physicalAddress, &flags) == B_OK
+				&& (flags & PAGE_PRESENT) != 0
+				&& (page = vm_lookup_page(physicalAddress / B_PAGE_SIZE))
+					!= NULL) {
+				// Already mapped with the correct permissions -- just increment
+				// the page's wired count.
+				decrement_page_wired_count(page);
+			} else {
+				panic("unlock_memory_etc(): Failed to unwire page: address "
+					"space %p, address: %#" B_PRIxADDR, addressSpace,
+					nextAddress);
+				error = B_BAD_VALUE;
+				break;
+			}
+		}
 
 		map->Unlock();
+		cacheChainLocker.Unlock();
 
-		if (status < B_OK)
-			goto out;
-		if ((protection & PAGE_PRESENT) == 0)
-			panic("calling unlock_memory() on unmapped memory!");
+		// all pages are unwired -- remove the area's wired range as well
+		area->Unwire(areaStart, areaEnd - areaStart, writable);
 
-		// update wiring
-		vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
-		if (page == NULL)
-			panic("couldn't lookup physical page");
-
-		decrement_page_wired_count(page);
-			// TODO: We need the cache to be locked at this point!
+		if (error != B_OK)
+			break;
 	}
 
-out:
+	// get rid of the address space reference
 	addressSpace->Put();
-	return status;
+
+	return error;
 }
 
 
@@ -5209,8 +5578,10 @@ _user_map_file(const char* userName, void** userAddress, int addressSpec,
 		return B_BAD_ADDRESS;
 
 	if (addressSpec == B_EXACT_ADDRESS) {
-		if ((addr_t)address + size < (addr_t)address)
+		if ((addr_t)address + size < (addr_t)address
+				|| (addr_t)address % B_PAGE_SIZE != 0) {
 			return B_BAD_VALUE;
+		}
 		if (!IS_USER_ADDRESS(address)
 				|| !IS_USER_ADDRESS((addr_t)address + size)) {
 			return B_BAD_ADDRESS;
@@ -5240,17 +5611,22 @@ _user_unmap_memory(void* _address, size_t size)
 	addr_t address = (addr_t)_address;
 
 	// check params
-	if (size == 0 || (addr_t)address + size < (addr_t)address)
+	if (size == 0 || (addr_t)address + size < (addr_t)address
+			|| (addr_t)address % B_PAGE_SIZE != 0) {
 		return B_BAD_VALUE;
+	}
 
 	if (!IS_USER_ADDRESS(address) || !IS_USER_ADDRESS((addr_t)address + size))
 		return B_BAD_ADDRESS;
 
-	// write lock the address space
+	// Write lock the address space and ensure the address range is not wired.
 	AddressSpaceWriteLocker locker;
-	status_t status = locker.SetTo(team_get_current_team_id());
-	if (status != B_OK)
-		return status;
+	do {
+		status_t status = locker.SetTo(team_get_current_team_id());
+		if (status != B_OK)
+			return status;
+	} while (wait_if_address_range_is_wired(locker.AddressSpace(), address,
+			size, &locker));
 
 	// unmap
 	return unmap_address_range(locker.AddressSpace(), address, size, false);
@@ -5281,40 +5657,56 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 		return B_NOT_SUPPORTED;
 
 	// We need to write lock the address space, since we're going to play with
-	// the areas.
+	// the areas. Also make sure that none of the areas is wired and that we're
+	// actually allowed to change the protection.
 	AddressSpaceWriteLocker locker;
-	status_t status = locker.SetTo(team_get_current_team_id());
-	if (status != B_OK)
-		return status;
 
-	// First round: Check whether the whole range is covered by areas and we are
-	// allowed to modify them.
-	addr_t currentAddress = address;
-	size_t sizeLeft = size;
-	while (sizeLeft > 0) {
-		VMArea* area = locker.AddressSpace()->LookupArea(currentAddress);
-		if (area == NULL)
-			return B_NO_MEMORY;
+	bool restart;
+	do {
+		restart = false;
 
-		if ((area->protection & B_KERNEL_AREA) != 0)
-			return B_NOT_ALLOWED;
+		status_t status = locker.SetTo(team_get_current_team_id());
+		if (status != B_OK)
+			return status;
 
-		// TODO: For (shared) mapped files we should check whether the new
-		// protections are compatible with the file permissions. We don't have
-		// a way to do that yet, though.
+		// First round: Check whether the whole range is covered by areas and we
+		// are allowed to modify them.
+		addr_t currentAddress = address;
+		size_t sizeLeft = size;
+		while (sizeLeft > 0) {
+			VMArea* area = locker.AddressSpace()->LookupArea(currentAddress);
+			if (area == NULL)
+				return B_NO_MEMORY;
 
-		addr_t offset = currentAddress - area->Base();
-		size_t rangeSize = min_c(area->Size() - offset, sizeLeft);
+			if ((area->protection & B_KERNEL_AREA) != 0)
+				return B_NOT_ALLOWED;
 
-		currentAddress += rangeSize;
-		sizeLeft -= rangeSize;
-	}
+			AreaCacheLocker cacheLocker(area);
+
+			if (wait_if_area_is_wired(area, &locker, &cacheLocker)) {
+				restart = true;
+				break;
+			}
+
+			cacheLocker.Unlock();
+
+			// TODO: For (shared) mapped files we should check whether the new
+			// protections are compatible with the file permissions. We don't
+			// have a way to do that yet, though.
+
+			addr_t offset = currentAddress - area->Base();
+			size_t rangeSize = min_c(area->Size() - offset, sizeLeft);
+
+			currentAddress += rangeSize;
+			sizeLeft -= rangeSize;
+		}
+	} while (restart);
 
 	// Second round: If the protections differ from that of the area, create a
 	// page protection array and re-map mapped pages.
 	VMTranslationMap* map = locker.AddressSpace()->TranslationMap();
-	currentAddress = address;
-	sizeLeft = size;
+	addr_t currentAddress = address;
+	size_t sizeLeft = size;
 	while (sizeLeft > 0) {
 		VMArea* area = locker.AddressSpace()->LookupArea(currentAddress);
 		if (area == NULL)

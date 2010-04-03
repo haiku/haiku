@@ -12,6 +12,7 @@
 
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
+#include <util/SinglyLinkedList.h>
 #include <util/OpenHashTable.h>
 #include <vm/vm_types.h>
 
@@ -20,6 +21,46 @@ struct VMAddressSpace;
 struct VMCache;
 struct VMKernelAddressSpace;
 struct VMUserAddressSpace;
+
+
+struct VMAreaUnwiredWaiter
+	: public DoublyLinkedListLinkImpl<VMAreaUnwiredWaiter> {
+	VMArea*					area;
+	addr_t					base;
+	size_t					size;
+	ConditionVariable		condition;
+	ConditionVariableEntry	waitEntry;
+};
+
+typedef DoublyLinkedList<VMAreaUnwiredWaiter> VMAreaUnwiredWaiterList;
+
+
+struct VMAreaWiredRange : SinglyLinkedListLinkImpl<VMAreaWiredRange> {
+	VMArea*					area;
+	addr_t					base;
+	size_t					size;
+	bool					writable;
+	bool					implicit;	// range created automatically
+	VMAreaUnwiredWaiterList	waiters;
+
+	VMAreaWiredRange(addr_t base, size_t size, bool writable, bool implicit)
+		:
+		area(NULL),
+		base(base),
+		size(size),
+		writable(writable),
+		implicit(implicit)
+	{
+	}
+
+	bool IntersectsWith(addr_t base, size_t size) const
+	{
+		return this->base + this->size - 1 >= base
+			&& base + size - 1 >= this->base;
+	}
+};
+
+typedef SinglyLinkedList<VMAreaWiredRange> VMAreaWiredRangeList;
 
 
 struct VMArea {
@@ -48,6 +89,20 @@ struct VMArea {
 									{ return address >= fBase
 										&& address <= fBase + (fSize - 1); }
 
+			bool				IsWired() const
+									{ return !fWiredRanges.IsEmpty(); }
+			bool				IsWired(addr_t base, size_t size) const;
+
+			void				Wire(VMAreaWiredRange* range);
+			VMAreaWiredRange*	Wire(addr_t base, size_t size, bool writable);
+			void				Unwire(VMAreaWiredRange* range);
+			void				Unwire(addr_t base, size_t size, bool writable);
+
+			bool				AddWaiterIfWired(VMAreaUnwiredWaiter* waiter);
+			bool				AddWaiterIfWired(VMAreaUnwiredWaiter* waiter,
+									addr_t base, size_t size,
+									VMAreaWiredRange* ignoreRange = NULL);
+
 protected:
 								VMArea(VMAddressSpace* addressSpace,
 									uint32 wiring, uint32 protection);
@@ -67,6 +122,7 @@ protected:
 protected:
 			addr_t				fBase;
 			size_t				fSize;
+			VMAreaWiredRangeList fWiredRanges;
 };
 
 
