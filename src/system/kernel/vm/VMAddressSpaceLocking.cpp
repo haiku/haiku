@@ -173,6 +173,17 @@ AddressSpaceWriteLocker::AddressSpaceWriteLocker(team_id team)
 }
 
 
+AddressSpaceWriteLocker::AddressSpaceWriteLocker(VMAddressSpace* space,
+	bool getNewReference)
+	:
+	fSpace(NULL),
+	fLocked(false),
+	fDegraded(false)
+{
+	SetTo(space, getNewReference);
+}
+
+
 AddressSpaceWriteLocker::AddressSpaceWriteLocker()
 	:
 	fSpace(NULL),
@@ -207,6 +218,19 @@ AddressSpaceWriteLocker::SetTo(team_id team)
 	fSpace->WriteLock();
 	fLocked = true;
 	return B_OK;
+}
+
+
+void
+AddressSpaceWriteLocker::SetTo(VMAddressSpace* space, bool getNewReference)
+{
+	fSpace = space;
+
+	if (getNewReference)
+		fSpace->Get();
+
+	fSpace->WriteLock();
+	fLocked = true;
 }
 
 

@@ -53,10 +53,14 @@ private:
 class AddressSpaceWriteLocker : private AddressSpaceLockerBase {
 public:
 								AddressSpaceWriteLocker(team_id team);
+								AddressSpaceWriteLocker(VMAddressSpace* space,
+									bool getNewReference);
 								AddressSpaceWriteLocker();
 								~AddressSpaceWriteLocker();
 
 			status_t			SetTo(team_id team);
+			void				SetTo(VMAddressSpace* space,
+									bool getNewReference);
 			status_t			SetFromArea(area_id areaID, VMArea*& area);
 			status_t			SetFromArea(team_id team, area_id areaID,
 									bool allowKernel, VMArea*& area);
