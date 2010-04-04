@@ -123,7 +123,7 @@ WorkerThread::MessageReceived(BMessage* message)
 				}
 				if (partition->GetMountPoint(&targetDirectory) != B_OK) {
 					_SetStatusMessage(TR("The mount point could not be "
-						"retrieve."));
+						"retrieved."));
 					break;
 				}
 			} else if (fDDRoster.GetDeviceWithID(id, &device) == B_OK) {
@@ -136,7 +136,7 @@ WorkerThread::MessageReceived(BMessage* message)
 				}
 				if (device.GetMountPoint(&targetDirectory) != B_OK) {
 					_SetStatusMessage(TR("The mount point could not be "
-						"retrieve."));
+						"retrieved."));
 					break;
 				}
 			}
