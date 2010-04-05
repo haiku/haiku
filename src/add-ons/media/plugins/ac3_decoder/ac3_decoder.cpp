@@ -236,15 +236,6 @@ AC3Decoder::Setup(media_format *ioEncodedFormat,
 			return B_ERROR;
 	}
 
-	// Currently the liba52 library will remix for us
-	// TODO When AudioChannelConverter can handle more than 1 or 2 channels the below code can be removed
-
-	fFlags = A52_STEREO & A52_CHANNEL_MASK;
-	fChannelCount = 2;
-	fChannelMask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
-	static int nrm_offsets[6] = { 0, 1 };
-	fInterleaveOffset = nrm_offsets;
-
 	return B_OK;
 }
 
