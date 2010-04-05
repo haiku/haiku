@@ -106,25 +106,6 @@ VMArea::Wire(VMAreaWiredRange* range)
 }
 
 
-/*!	Adds a wired range to this area.
-	The area's top cache must be locked.
-
-	\return The newly created wired area object. \c NULL when out of memory.
-*/
-VMAreaWiredRange*
-VMArea::Wire(addr_t base, size_t size, bool writable)
-{
-	VMAreaWiredRange* range = new(std::nothrow) VMAreaWiredRange(base, size,
-		writable, true);
-	if (range == NULL)
-		return NULL;
-
-	Wire(range);
-
-	return range;
-}
-
-
 /*!	Removes the given wired range from this area.
 	Must balance a previous Wire() call.
 	The area's top cache must be locked.

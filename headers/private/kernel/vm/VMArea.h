@@ -94,7 +94,6 @@ struct VMArea {
 			bool				IsWired(addr_t base, size_t size) const;
 
 			void				Wire(VMAreaWiredRange* range);
-			VMAreaWiredRange*	Wire(addr_t base, size_t size, bool writable);
 			void				Unwire(VMAreaWiredRange* range);
 			void				Unwire(addr_t base, size_t size, bool writable);
 

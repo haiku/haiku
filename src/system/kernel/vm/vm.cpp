@@ -4792,16 +4792,22 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 		addr_t areaStart = nextAddress;
 		addr_t areaEnd = std::min(lockEndAddress, area->Base() + area->Size());
 
-		// Lock the area's top cache. This is a requirement for VMArea::Wire().
-		VMCacheChainLocker cacheChainLocker(vm_area_get_locked_cache(area));
-
-		// mark the area range wired
-		VMAreaWiredRange* range = area->Wire(areaStart, areaEnd - areaStart,
-			writable);
+		// allocate the wired range (do that before locking the cache to avoid
+		// deadlocks)
+		uint32 mallocFlags = isUser
+			? 0 : HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE;
+		VMAreaWiredRange* range = new(malloc_flags(mallocFlags))
+			VMAreaWiredRange(areaStart, areaEnd - areaStart, writable, true);
 		if (range == NULL) {
 			error = B_NO_MEMORY;
 			break;
 		}
+
+		// Lock the area's top cache. This is a requirement for VMArea::Wire().
+		VMCacheChainLocker cacheChainLocker(vm_area_get_locked_cache(area));
+
+		// mark the area range wired
+		area->Wire(range);
 
 		// Depending on the area cache type and the wiring, we may not need to
 		// look at the individual pages.
