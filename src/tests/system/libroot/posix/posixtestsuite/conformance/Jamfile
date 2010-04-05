@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src tests system libroot posix posixtestsuite conformance ;
-
-SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces ;

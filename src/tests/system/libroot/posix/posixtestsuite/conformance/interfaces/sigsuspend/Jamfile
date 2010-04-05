@@ -1,5 +1,0 @@
-SubDir HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sigsuspend ;
-
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) include ] ;
-
-SimpleTest sigsuspend_6-1 : 6-1.c ;

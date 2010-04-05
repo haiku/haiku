@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sigignore ;
-
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) include ] ;
-
-SimpleTest sigignore_1-1 : 1-1.c ;
-SimpleTest sigignore_4-1 : 4-1.c ;
-SimpleTest sigignore_5-core-buildonly : 5-core-buildonly.c ;
-SimpleTest sigignore_6-1 : 6-1.c ;
-SimpleTest sigignore_6-2 : 6-2.c ;

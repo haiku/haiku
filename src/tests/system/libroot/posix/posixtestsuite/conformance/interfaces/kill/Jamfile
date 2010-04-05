@@ -1,5 +1,0 @@
-SubDir HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces kill ;
-
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) include ] ;
-
-SimpleTest kill_2-1 : 2-1.c ;

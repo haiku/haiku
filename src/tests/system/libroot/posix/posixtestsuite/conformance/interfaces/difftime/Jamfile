@@ -1,6 +1,0 @@
-SubDir HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces difftime ;
-
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) include ] ;
-
-SimpleTest difftime_1-1 : 1-1.c ;
-
