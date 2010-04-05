@@ -64,17 +64,13 @@ struct _pthread_rwlock {
 	};
 };
 
-enum pthread_mutex_type {
-	PTHREAD_MUTEX_DEFAULT,
-	PTHREAD_MUTEX_NORMAL,
-	PTHREAD_MUTEX_ERRORCHECK,
-	PTHREAD_MUTEX_RECURSIVE
-};
+#define PTHREAD_MUTEX_DEFAULT		0
+#define PTHREAD_MUTEX_NORMAL		1
+#define PTHREAD_MUTEX_ERRORCHECK	2
+#define PTHREAD_MUTEX_RECURSIVE		3
 
-enum pthread_process_shared {
-	PTHREAD_PROCESS_PRIVATE,
-	PTHREAD_PROCESS_SHARED
-};
+#define PTHREAD_PROCESS_PRIVATE		0
+#define PTHREAD_PROCESS_SHARED		1
 
 /*
  * Flags for threads and thread attributes.
