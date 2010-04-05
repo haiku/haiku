@@ -1,6 +1,7 @@
 /*
- * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com.
+ * Copyright 2010 Adam Smith <adamd.smith@utoronto.ca>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "PairsView.h"
@@ -26,15 +27,17 @@
 #include "PairsGlobal.h"
 #include "PairsTopButton.h"
 
-// TODO: support custom board sizes
-
-PairsView::PairsView(BRect frame, const char* name, uint32 resizingMode)
-	: BView(frame, name, resizingMode, B_WILL_DRAW)
+PairsView::PairsView(BRect frame, const char* name, int width, int height,
+		uint32 resizingMode)
+	:
+	BView(frame, name, resizingMode, B_WILL_DRAW),
+	fWidth(width),
+	fHeight(height),
+	fNumOfCards(width * height),
+	fRandPos(new int[fNumOfCards]),
+	fPosX(new int[fNumOfCards]),
+	fPosY(new int[fNumOfCards])
 {
-	// init bitmap pointers
-	for (int i = 0; i < 8; i++)
-		fCard[i] = NULL;
-
 	CreateGameBoard();
 	_SetPairsBoard();
 }
@@ -55,11 +58,15 @@ PairsView::CreateGameBoard()
 
 PairsView::~PairsView()
 {
-	for (int i = 0; i < 8; i++)
-		delete fCard[i];
+	for (int i = 0; i < fCardBitmaps.CountItems(); i++)
+		delete ((BBitmap*)fCardBitmaps.ItemAt(i));
 
-	for (int i = 0; i < 16; i++)
-		delete fDeckCard[i];
+	for (int i = 0; i < fDeckCard.CountItems(); i++)
+		delete ((TopButton*)fDeckCard.ItemAt(i));
+
+	delete fRandPos;
+	delete fPosX;
+	delete fPosY;
 }
 
 
@@ -91,10 +98,10 @@ PairsView::_ReadRandomIcons()
 	// TODO: maybe read the icons only once at startup
 
 	// clean out any previous icons
-	for (int i = 0; i < 8; i++) {
-		delete fCard[i];
-		fCard[i] = NULL;
-	}
+	for (int i = 0; i < fCardBitmaps.CountItems(); i++)
+		delete ((BBitmap*)fCardBitmaps.ItemAt(i));
+
+	fCardBitmaps.MakeEmpty();
 
 	BDirectory appsDirectory;
 	BDirectory prefsDirectory;
@@ -149,19 +156,23 @@ PairsView::_ReadRandomIcons()
 		}
 	}
 
-	// pick eight random bitmaps from the ones we got in the list
+	// pick random bitmaps from the ones we got in the list
 	srand((unsigned)time(0));
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < fNumOfCards / 2; i++) {
 		int32 index = rand() % bitmaps.CountItems();
-		fCard[i] = (BBitmap*)bitmaps.RemoveItem(index);
-		if (fCard[i] == NULL) {
-			BAlert* alert = new BAlert("fatal", "Pairs did not find enough "
-				"vector icons in the system, it needs at least eight.",
+		BBitmap* bitmap = ((BBitmap*)bitmaps.RemoveItem(index));
+		if (bitmap == NULL) {
+			BString strErr;
+			strErr
+				<< "Pairs did not find enough vector icons in the system; it "
+				<< "needs at least " << fNumOfCards / 2;
+			BAlert* alert = new BAlert("fatal", strErr,
 				"OK", NULL, NULL, B_WIDTH_FROM_WIDEST, B_STOP_ALERT);
 			alert->Go();
 			exit(1);
 		}
+		fCardBitmaps.AddItem(bitmap);
 	}
 
 	// delete the remaining bitmaps from the list
@@ -173,15 +184,16 @@ PairsView::_ReadRandomIcons()
 void
 PairsView::_SetPairsBoard()
 {
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < fNumOfCards; i++) {
 		fButtonMessage = new BMessage(kMsgCardButton);
 		fButtonMessage->AddInt32("ButtonNum", i);
 
-		int x =  i % 4 * (kBitmapSize + 10) + 10;
-		int y =  i / 4 * (kBitmapSize + 10) + 10;
+		int x =  i % fWidth * (kBitmapSize + kSpaceSize) + kSpaceSize;
+		int y =  i / fHeight * (kBitmapSize + kSpaceSize) + kSpaceSize;
 
-		fDeckCard[i] = new TopButton(x, y, fButtonMessage);
-		AddChild(fDeckCard[i]);
+		TopButton* button = new TopButton(x, y, fButtonMessage);
+		fDeckCard.AddItem(button);
+		AddChild(button);
 	}
 }
 
@@ -193,23 +205,27 @@ PairsView::_GenerateCardPos()
 
 	srand((unsigned)time(0));
 
-	int positions[16];
-	for (int i = 0; i < 16; i++)
+	int* positions = new int[fNumOfCards];
+	for (int i = 0; i < fNumOfCards; i++)
 		positions[i] = i;
 
-	for (int i = 16; i >= 1; i--) {
+	for (int i = fNumOfCards; i >= 1; i--) {
 		int index = rand() % i;
 
-		fRandPos[16-i] = positions[index];
+		fRandPos[fNumOfCards - i] = positions[index];
 
 		for (int j = index; j < i - 1; j++)
 			positions[j] = positions[j + 1];
 	}
 
-	for (int i = 0; i < 16; i++) {
-		fPosX[i] = (fRandPos[i]) % 4 * (kBitmapSize + 10) + 10;
-		fPosY[i] = (fRandPos[i]) / 4 * (kBitmapSize + 10) + 10;
+	for (int i = 0; i < fNumOfCards; i++) {
+		fPosX[i] = (fRandPos[i]) % fWidth * (kBitmapSize + kSpaceSize)
+			+ kSpaceSize;
+		fPosY[i] = (fRandPos[i]) / fHeight * (kBitmapSize + kSpaceSize)
+			+ kSpaceSize;
 	}
+
+	delete [] positions;
 }
 
 
@@ -219,8 +235,10 @@ PairsView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_ALPHA);
 
 	// draw rand pair 1 & 2
-	for (int i = 0; i < 16; i++)
-		DrawBitmap(fCard[i % 8], BPoint(fPosX[i], fPosY[i]));
+	for (int i = 0; i < fNumOfCards; i++) {
+		BBitmap* bitmap = ((BBitmap*)fCardBitmaps.ItemAt(i % fNumOfCards / 2));
+		DrawBitmap(bitmap, BPoint(fPosX[i], fPosY[i]));
+	}
 }
 
 

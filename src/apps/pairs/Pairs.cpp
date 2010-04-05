@@ -1,6 +1,6 @@
 /*
- * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include <stdlib.h>
@@ -16,8 +16,9 @@ const char* kSignature = "application/x-vnd.Haiku-Pairs";
 
 
 Pairs::Pairs()
-	: BApplication(kSignature),
-	  fWindow(NULL)
+	:
+	BApplication(kSignature),
+	fWindow(NULL)
 {
 	be_locale->GetAppCatalog(&fCatalog);
 }

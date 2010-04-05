@@ -1,12 +1,11 @@
 /*
- * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef PAIRS_TOP_BUTTON_H
 #define PAIRS_TOP_BUTTON_H
 
-#include <OS.h> 
+#include <OS.h>
 
 class BButton;
 

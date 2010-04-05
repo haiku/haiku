@@ -1,8 +1,8 @@
 /*
- * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com.
+ * Copyright 2010 Adam Smith <adamd.smith@utoronto.ca>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef PAIRS_VIEW_H
 #define PAIRS_VIEW_H
 
@@ -15,6 +15,7 @@ class TopButton;
 class PairsView : public BView {
 public:
 								PairsView(BRect frame, const char* name,
+									int width, int height,
 									uint32 resizingMode);
 
 	virtual						~PairsView();
@@ -22,7 +23,11 @@ public:
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				CreateGameBoard();
 
-			TopButton*			fDeckCard[16];
+			int 				fWidth;
+			int					fHeight;
+			int					fNumOfCards;
+
+			BList				fDeckCard;
 			int					GetIconFromPos(int pos);
 
 private:
@@ -32,10 +37,10 @@ private:
 			bool				_HasBitmap(BList& bitmaps, BBitmap* bitmap);
 
 			BMessage*			fButtonMessage;
-			BBitmap*			fCard[8];
-			int					fRandPos[16];
-			int					fPosX[16];
-			int					fPosY[16];
+			BList				fCardBitmaps;
+			int*				fRandPos;
+			int*				fPosX;
+			int*				fPosY;
 };
 
 
