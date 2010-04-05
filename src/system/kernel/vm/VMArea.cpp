@@ -131,10 +131,12 @@ VMArea::Unwire(VMAreaWiredRange* range)
 
 /*!	Removes a wired range from this area.
 
-	Must balance a previous Wire() call.
+	Must balance a previous Wire() call. The first implicit range with matching
+	\a base, \a size, and \a writable attributes is removed and returned. It's
+	waiters are woken up as well.
 	The area's top cache must be locked.
 */
-void
+VMAreaWiredRange*
 VMArea::Unwire(addr_t base, size_t size, bool writable)
 {
 	for (VMAreaWiredRangeList::Iterator it = fWiredRanges.GetIterator();
@@ -142,13 +144,13 @@ VMArea::Unwire(addr_t base, size_t size, bool writable)
 		if (range->implicit && range->base == base && range->size == size
 				&& range->writable == writable) {
 			Unwire(range);
-			delete range;
-			return;
+			return range;
 		}
 	}
 
 	panic("VMArea::Unwire(%#" B_PRIxADDR ", %#" B_PRIxADDR ", %d): no such "
 		"range", base, size, writable);
+	return NULL;
 }
 
 

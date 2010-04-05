@@ -4762,6 +4762,9 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 	if (writable)
 		requiredProtection |= B_KERNEL_WRITE_AREA | (isUser ? B_WRITE_AREA : 0);
 
+	uint32 mallocFlags = isUser
+		? 0 : HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE;
+
 	// get and read lock the address space
 	VMAddressSpace* addressSpace = NULL;
 	if (isUser) {
@@ -4794,8 +4797,6 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 
 		// allocate the wired range (do that before locking the cache to avoid
 		// deadlocks)
-		uint32 mallocFlags = isUser
-			? 0 : HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE;
 		VMAreaWiredRange* range = new(malloc_flags(mallocFlags))
 			VMAreaWiredRange(areaStart, areaEnd - areaStart, writable, true);
 		if (range == NULL) {
@@ -4860,14 +4861,21 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 		}
 
 		map->Unlock();
-		cacheChainLocker.Unlock();
 
-		if (error != B_OK) {
+		if (error == B_OK) {
+			cacheChainLocker.Unlock();
+		} else {
 			// An error occurred, so abort right here. If the current address
 			// is the first in this area, unwire the area, since we won't get
 			// to it when reverting what we've done so far.
-			if (nextAddress == areaStart)
+			if (nextAddress == areaStart) {
 				area->Unwire(range);
+				cacheChainLocker.Unlock();
+				range->~VMAreaWiredRange();
+				free_etc(range, mallocFlags);
+			} else
+				cacheChainLocker.Unlock();
+
 			break;
 		}
 	}
@@ -4911,6 +4919,9 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 	if (writable)
 		requiredProtection |= B_KERNEL_WRITE_AREA | (isUser ? B_WRITE_AREA : 0);
 
+	uint32 mallocFlags = isUser
+		? 0 : HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE;
+
 	// get and read lock the address space
 	VMAddressSpace* addressSpace = NULL;
 	if (isUser) {
@@ -4951,8 +4962,16 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 			|| area->cache_type == CACHE_TYPE_DEVICE
 			|| area->wiring == B_FULL_LOCK
 			|| area->wiring == B_CONTIGUOUS) {
+			// unwire the range (to avoid deadlocks we delete the range after
+			// unlocking the cache)
 			nextAddress = areaEnd;
-			area->Unwire(areaStart, areaEnd - areaStart, writable);
+			VMAreaWiredRange* range = area->Unwire(areaStart,
+				areaEnd - areaStart, writable);
+			cacheChainLocker.Unlock();
+			if (range != NULL) {
+				range->~VMAreaWiredRange();
+				free_etc(range, mallocFlags);
+			}
 			continue;
 		}
 
@@ -4984,10 +5003,18 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 		}
 
 		map->Unlock();
+
+		// All pages are unwired. Remove the area's wired range as well (to
+		// avoid deadlocks we delete the range after unlocking the cache).
+		VMAreaWiredRange* range = area->Unwire(areaStart,
+			areaEnd - areaStart, writable);
+
 		cacheChainLocker.Unlock();
 
-		// all pages are unwired -- remove the area's wired range as well
-		area->Unwire(areaStart, areaEnd - areaStart, writable);
+		if (range != NULL) {
+			range->~VMAreaWiredRange();
+			free_etc(range, mallocFlags);
+		}
 
 		if (error != B_OK)
 			break;

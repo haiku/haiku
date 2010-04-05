@@ -95,7 +95,7 @@ struct VMArea {
 
 			void				Wire(VMAreaWiredRange* range);
 			void				Unwire(VMAreaWiredRange* range);
-			void				Unwire(addr_t base, size_t size, bool writable);
+			VMAreaWiredRange*	Unwire(addr_t base, size_t size, bool writable);
 
 			bool				AddWaiterIfWired(VMAreaUnwiredWaiter* waiter);
 			bool				AddWaiterIfWired(VMAreaUnwiredWaiter* waiter,
