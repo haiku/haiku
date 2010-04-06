@@ -197,7 +197,7 @@ status_t google_request_close(struct google_request *req)
 	return B_OK;
 }
 
-status_t google_request_open(const char *query_string, struct fs_nspace *ns, struct fs_node *query_node, struct google_request **req)
+status_t google_request_open(const char *query_string, struct fs_volume *volume, struct fs_node *query_node, struct google_request **req)
 {
 	struct google_request *r;
 	if (!req)
@@ -207,7 +207,7 @@ status_t google_request_open(const char *query_string, struct fs_nspace *ns, str
 		return ENOMEM;
 	memset(r, 0, sizeof(struct google_request));
 	r->query_string = strdup(query_string);
-	r->ns = ns;
+	r->volume = volume;
 	r->query_node = query_node;
 	*req = r;
 	return B_OK;

@@ -124,7 +124,7 @@ typedef struct fs_file_cookie fs_file_cookie;
 #define fs_query_cookie fs_file_cookie
 
 ino_t new_vnid(fs_nspace *ns);
-int googlefs_free_vnode(fs_nspace *ns, fs_node *node);
+int googlefs_free_vnode(fs_volume *_volume, fs_node *node);
 
 int googlefs_event(fs_nspace *ns, fs_node *node, int flags);
 

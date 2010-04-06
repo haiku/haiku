@@ -7,7 +7,7 @@
 
 struct google_request {
 	struct google_request *next;
-	struct fs_nspace *ns;
+	struct fs_volume *volume;
 	struct fs_node *query_node; /* root folder for that query */
 	char *query_string;
 	struct http_cnx *cnx;
@@ -35,7 +35,7 @@ extern status_t google_request_uninit(void);
 extern status_t google_request_process(struct google_request *req);
 extern status_t google_request_process_async(struct google_request *req);
 extern status_t google_request_close(struct google_request *req);
-extern status_t google_request_open(const char *query_string, struct fs_nspace *ns, struct fs_node *query_node, struct google_request **req);
+extern status_t google_request_open(const char *query_string, struct fs_volume *volume, struct fs_node *query_node, struct google_request **req);
 extern status_t google_request_free(struct google_request *req);
 
 #endif /* _GOOGLE_REQUEST_H */

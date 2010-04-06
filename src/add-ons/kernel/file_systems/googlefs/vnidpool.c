@@ -28,10 +28,7 @@ status_t vnidpool_alloc(struct vnidpool **pool, size_t size)
 	p = malloc(sizeof(struct vnidpool) + size / sizeof(BMT));
 	if (!p)
 		return B_NO_MEMORY;
-	if (new_lock(&p->lock, "vnidpool lock") < B_OK) {
-		free(p);
-		return B_NO_MEMORY;
-	}
+	new_lock(&p->lock, "vnidpool lock");
 	p->nextvnid = 1LL;
 	p->bitmap = (BMT *)(p + 1);
 	p->bmsize = size;

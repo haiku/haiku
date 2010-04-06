@@ -5,6 +5,8 @@
 #ifndef _HTTP_CNX_H
 #define _HTTP_CNX_H
 
+#include <OS.h>
+
 struct http_cnx {
 	int sock;
 	status_t err; /* 404, ... */
