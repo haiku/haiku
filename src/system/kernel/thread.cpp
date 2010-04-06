@@ -1705,8 +1705,9 @@ thread_reset_for_exec(void)
 {
 	struct thread *thread = thread_get_current_thread();
 
-	cancel_timer(&thread->alarm);
 	reset_signals(thread);
+
+	// Note: We don't cancel an alarm. It is supposed to survive exec*().
 }
 
 
