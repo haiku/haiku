@@ -4,6 +4,7 @@
  */
 
 
+#include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -912,7 +913,7 @@ user_debug_exception_occurred(debug_exception_type exception, int signal)
 	// the signal instead. An already installed debugger will be notified, if
 	// it has requested notifications of signal.
 	struct sigaction signalAction;
-	if (sigaction(signal, NULL, &signalAction) == B_OK
+	if (sigaction(signal, NULL, &signalAction) == 0
 		&& signalAction.sa_handler != SIG_DFL) {
 		return true;
 	}
@@ -2160,9 +2161,10 @@ debug_nub_thread(void *)
 				restore_interrupts(state);
 
 				// get the handler
-				if (result == B_OK) {
-					result = sigaction_etc(threadID, signal, NULL,
-						&reply.get_signal_handler.handler);
+				if (result == B_OK
+					&& sigaction_etc(threadID, signal, NULL,
+						&reply.get_signal_handler.handler) != 0) {
+					result = errno;
 				}
 
 				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_GET_SIGNAL_HANDLER: "
