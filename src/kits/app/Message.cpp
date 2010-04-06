@@ -604,12 +604,12 @@ BMessage::_PrintToStream(const char* indent) const
 					break;
 
 				case B_INT8_TYPE:
-					print_type3<int8>("int8(0x%hx or %d or '%.1s')\n",
+					print_type3<int8>("int8(0x%hx or %d or '%c')\n",
 						pointer);
 					break;
 
 				case B_UINT8_TYPE:
-					print_type3<uint8>("uint8(0x%hx or %u or '%.1s')\n",
+					print_type3<uint8>("uint8(0x%hx or %u or '%c')\n",
 						pointer);
 					break;
 
