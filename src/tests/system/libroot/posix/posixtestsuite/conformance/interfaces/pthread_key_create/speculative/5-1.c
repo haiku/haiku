@@ -36,7 +36,7 @@
 
 int NUM_OF_KEYS = PTHREAD_KEYS_MAX;
 
-static pthread_key_t keys[5];
+static pthread_key_t keys[NUM_OF_KEYS];
 
 int main()
 {
