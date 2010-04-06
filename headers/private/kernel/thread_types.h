@@ -348,16 +348,34 @@ struct thread_queue {
 
 // bits for the thread::flags field
 #define	THREAD_FLAGS_SIGNALS_PENDING		0x0001
+	// unblocked signals are pending (computed flag for optimization purposes)
 #define	THREAD_FLAGS_DEBUG_THREAD			0x0002
+	// forces the thread into the debugger as soon as possible (set by
+	// debug_thread())
 #define	THREAD_FLAGS_DEBUGGER_INSTALLED		0x0004
+	// a debugger is installed for the current team (computed flag for
+	// optimization purposes)
 #define	THREAD_FLAGS_BREAKPOINTS_DEFINED	0x0008
+	// hardware breakpoints are defined for the current team (computed flag for
+	// optimization purposes)
 #define	THREAD_FLAGS_BREAKPOINTS_INSTALLED	0x0010
+	// breakpoints are currently installed for the thread (i.e. the hardware is
+	// actually set up to trigger debug events for them)
 #define	THREAD_FLAGS_64_BIT_SYSCALL_RETURN	0x0020
+	// set by 64 bit return value syscalls
 #define	THREAD_FLAGS_RESTART_SYSCALL		0x0040
+	// set by handle_signals(), if the current syscall shall be restarted
 #define	THREAD_FLAGS_DONT_RESTART_SYSCALL	0x0080
-#define	THREAD_FLAGS_SYSCALL_RESTARTED		0x0100
-#define	THREAD_FLAGS_SYSCALL				0x0200
-	// Note: Set only for certain syscalls.
+	// explicitly disables automatic syscall restarts (e.g. resume_thread())
+#define	THREAD_FLAGS_ALWAYS_RESTART_SYSCALL	0x0100
+	// force syscall restart, even if a signal handler without SA_RESTART was
+	// invoked (e.g. sigwait())
+#define	THREAD_FLAGS_SYSCALL_RESTARTED		0x0200
+	// the current syscall has been restarted
+#define	THREAD_FLAGS_SYSCALL				0x0400
+	// the thread is currently in a syscall; set/reset only for certain
+	// functions (e.g. ioctl()) to allow inner functions to discriminate
+	// whether e.g. parameters where passed from userland or kernel
 
 
 #endif	/* _KERNEL_THREAD_TYPES_H */

@@ -11,6 +11,7 @@
 
 #include <ksignal.h>
 
+#include <errno.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -23,6 +24,7 @@
 #include <kscheduler.h>
 #include <sem.h>
 #include <syscall_restart.h>
+#include <syscall_utils.h>
 #include <team.h>
 #include <thread.h>
 #include <tracing.h>
@@ -331,9 +333,12 @@ handle_signals(struct thread *thread)
 
 	thread->user_thread->pending_signals = 0;
 
-	bool restart = (atomic_and(&thread->flags,
-			~THREAD_FLAGS_DONT_RESTART_SYSCALL)
-		& THREAD_FLAGS_DONT_RESTART_SYSCALL) == 0;
+	uint32 restartFlags = atomic_and(&thread->flags,
+		~THREAD_FLAGS_DONT_RESTART_SYSCALL);
+	bool alwaysRestart
+		= (restartFlags & THREAD_FLAGS_ALWAYS_RESTART_SYSCALL) != 0;
+	bool restart = alwaysRestart
+		|| (restartFlags & THREAD_FLAGS_DONT_RESTART_SYSCALL) == 0;
 
 	T(HandleSignals(signalMask));
 
@@ -475,8 +480,10 @@ handle_signals(struct thread *thread)
 		if (debugSignal && !notify_debugger(thread, signal, handler, false))
 			continue;
 
-		if (!restart || (handler->sa_flags & SA_RESTART) == 0)
+		if (!restart
+				|| ((!alwaysRestart && handler->sa_flags & SA_RESTART) == 0)) {
 			atomic_and(&thread->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
+		}
 
 		T(ExecuteSignalHandler(signal, handler));
 
@@ -702,8 +709,8 @@ has_signals_pending(void *_thread)
 }
 
 
-int
-sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
+static int
+sigprocmask_internal(int how, const sigset_t *set, sigset_t *oldSet)
 {
 	struct thread *thread = thread_get_current_thread();
 	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
@@ -735,11 +742,18 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 }
 
 
+int
+sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
+{
+	RETURN_AND_SET_ERRNO(sigprocmask_internal(how, set, oldSet));
+}
+
+
 /*!	\brief sigaction() for the specified thread.
 	A \a threadID is < 0 specifies the current thread.
 */
-int
-sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
+static status_t
+sigaction_etc_internal(thread_id threadID, int signal, const struct sigaction *act,
 	struct sigaction *oldAction)
 {
 	struct thread *thread;
@@ -789,6 +803,15 @@ sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
 	restore_interrupts(state);
 
 	return error;
+}
+
+
+int
+sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
+	struct sigaction *oldAction)
+{
+	RETURN_AND_SET_ERRNO(sigaction_etc_internal(threadID, signal, act,
+		oldAction));
 }
 
 
@@ -854,40 +877,57 @@ set_alarm(bigtime_t time, uint32 mode)
 /*!	Wait for the specified signals, and return the signal retrieved in
 	\a _signal.
 */
-int
-sigwait(const sigset_t *set, int *_signal)
+static status_t
+sigwait_internal(const sigset_t *set, int *_signal)
 {
-	struct thread *thread = thread_get_current_thread();
+	sigset_t requestedSignals = *set & BLOCKABLE_SIGNALS;
 
-	while (!has_signals_pending(thread)) {
-		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
-			THREAD_BLOCK_TYPE_SIGNAL, NULL);
-		thread_block();
-	}
+	struct thread* thread = thread_get_current_thread();
 
-	int signalsPending = atomic_get(&thread->sig_pending) & *set;
-
-	update_current_thread_signals_flag();
-
-	if (signalsPending) {
-		// select the lowest pending signal to return in _signal
-		for (int signal = 1; signal < NSIG; signal++) {
-			if ((SIGNAL_TO_MASK(signal) & signalsPending) != 0) {
-				*_signal = signal;
-				return B_OK;
+	while (true) {
+		sigset_t pendingSignals = atomic_get(&thread->sig_pending);
+		sigset_t blockedSignals = atomic_get(&thread->sig_block_mask);
+		sigset_t pendingRequestedSignals = pendingSignals & requestedSignals;
+		if ((pendingRequestedSignals) != 0) {
+			// select the lowest pending signal to return in _signal
+			for (int signal = 1; signal < NSIG; signal++) {
+				if ((SIGNAL_TO_MASK(signal) & pendingSignals) != 0) {
+					atomic_and(&thread->sig_pending, ~SIGNAL_TO_MASK(signal));
+					*_signal = signal;
+					return B_OK;
+				}
 			}
 		}
-	}
 
-	return B_INTERRUPTED;
+		if ((pendingSignals & ~blockedSignals) != 0) {
+			// Non-blocked signals are pending -- return to let them be handled.
+			return B_INTERRUPTED;
+		}
+
+		// No signals yet. Set the signal block mask to not include the
+		// requested mask and wait until we're interrupted.
+		atomic_set(&thread->sig_block_mask,
+			blockedSignals & ~(requestedSignals & BLOCKABLE_SIGNALS));
+
+		while (!has_signals_pending(thread)) {
+			thread_prepare_to_block(thread, B_CAN_INTERRUPT,
+				THREAD_BLOCK_TYPE_SIGNAL, NULL);
+			thread_block();
+		}
+
+		// restore the original block mask
+		atomic_set(&thread->sig_block_mask, blockedSignals);
+
+		update_current_thread_signals_flag();
+	}
 }
 
 
 /*!	Replace the current signal block mask and wait for any event to happen.
 	Before returning, the original signal block mask is reinstantiated.
 */
-int
-sigsuspend(const sigset_t *mask)
+static status_t
+sigsuspend_internal(const sigset_t *mask)
 {
 	T(SigSuspend(*mask));
 
@@ -918,8 +958,8 @@ sigsuspend(const sigset_t *mask)
 }
 
 
-int
-sigpending(sigset_t *set)
+static status_t
+sigpending_internal(sigset_t *set)
 {
 	struct thread *thread = thread_get_current_thread();
 
@@ -961,7 +1001,7 @@ _user_sigprocmask(int how, const sigset_t *userSet, sigset_t *userOldSet)
 				sizeof(sigset_t)) < B_OK))
 		return B_BAD_ADDRESS;
 
-	status = sigprocmask(how, userSet ? &set : NULL,
+	status = sigprocmask_internal(how, userSet ? &set : NULL,
 		userOldSet ? &oldSet : NULL);
 
 	// copy old set if asked for
@@ -1009,9 +1049,14 @@ _user_sigwait(const sigset_t *userSet, int *_userSignal)
 		return B_BAD_ADDRESS;
 
 	int signal;
-	status_t status = sigwait(&set, &signal);
-	if (status < B_OK)
-		return syscall_restart_handle_post(status);
+	status_t status = sigwait_internal(&set, &signal);
+	if (status == B_INTERRUPTED) {
+		// make sure we'll be restarted
+		struct thread* thread = thread_get_current_thread();
+		atomic_or(&thread->flags,
+			THREAD_FLAGS_ALWAYS_RESTART_SYSCALL | THREAD_FLAGS_RESTART_SYSCALL);
+		return status;
+	}
 
 	return user_memcpy(_userSignal, &signal, sizeof(int));
 }
@@ -1027,7 +1072,7 @@ _user_sigsuspend(const sigset_t *userMask)
 	if (user_memcpy(&mask, userMask, sizeof(sigset_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return sigsuspend(&mask);
+	return sigsuspend_internal(&mask);
 }
 
 
@@ -1042,7 +1087,7 @@ _user_sigpending(sigset_t *userSet)
 	if (!IS_USER_ADDRESS(userSet))
 		return B_BAD_ADDRESS;
 
-	status = sigpending(&set);
+	status = sigpending_internal(&set);
 	if (status == B_OK
 		&& user_memcpy(userSet, &set, sizeof(sigset_t)) < B_OK)
 		return B_BAD_ADDRESS;
