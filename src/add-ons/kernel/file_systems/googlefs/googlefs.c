@@ -27,7 +27,7 @@
 /* just publish fake entries; for debugging */
 //#define NO_SEARCH
 
-//#define TRACE_GOOGLEFS
+#define TRACE_GOOGLEFS
 #ifdef TRACE_GOOGLEFS
 #	define TRACE(x) dprintf x
 #else
@@ -169,7 +169,7 @@ int googlefs_mount(fs_volume *_vol, const char *devname, uint32 flags,
 		ns->nodes = root; // sll_insert
 		err = publish_vnode(_vol, *vnid, root, &sGoogleFSVnodeOps, S_IFDIR, 0);
 		if (err == B_OK) {
-			googlefs_publish_static_entries(ns);
+			googlefs_publish_static_entries(_vol);
 			TRACE((PFS "mount() OK, nspace@ %p, id %ld, root@ %p, id %Ld\n", ns, ns->nsid, root, ns->rootid));
 			return B_OK;
 		}
@@ -262,7 +262,7 @@ int googlefs_read_vnode(fs_volume *_volume, ino_t vnid, fs_node **node, char r)
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *n;
 	status_t err = B_OK;
-	TRACE((PFS "read_vnode(%ld, %Ld, %s)\n", ns->nsid, vnid, r?"r":"!r"));
+	TRACE((PFS "read_vnode(%ld, %Ld, %s)\n", _volume->id, vnid, r?"r":"!r"));
 	if (!r)
 		err = LOCK(&ns->l);
 	if (err)
@@ -279,7 +279,7 @@ int googlefs_read_vnode(fs_volume *_volume, ino_t vnid, fs_node **node, char r)
 
 int googlefs_release_vnode(fs_volume *_volume, fs_node *node, char r)
 {
-	TRACE((PFS "write_vnode(%ld, %Ld, %s)\n", ns->nsid, node->vnid, r?"r":"!r"));
+	TRACE((PFS "write_vnode(%ld, %Ld, %s)\n", _volume->id, node->vnid, r?"r":"!r"));
 	return B_OK;
 }
 
@@ -611,20 +611,20 @@ int googlefs_read(fs_volume *_volume, fs_node *node, fs_file_cookie *cookie, off
 
 int googlefs_write(fs_volume *_volume, fs_node *node, fs_file_cookie *cookie, off_t pos, const void *buf, size_t *len)
 {
-	TRACE((PFS"write(%ld, %Ld, %Ld, %ld)\n", ns->nsid, node->vnid, pos, *len));
+	TRACE((PFS"write(%ld, %Ld, %Ld, %ld)\n", _volume->id, node->vnid, pos, *len));
 	*len = 0;
 	return ENOSYS;
 }
 
 int googlefs_wstat(fs_volume *_volume, fs_node *node, struct stat *st, long mask)
 {
-	TRACE((PFS"wstat(%ld, %Ld, , 0x%08lx)\n", ns->nsid, node->vnid, mask));
+	TRACE((PFS"wstat(%ld, %Ld, , 0x%08lx)\n", _volume->id, node->vnid, mask));
 	return ENOSYS;
 }
 
 int googlefs_wfsstat(fs_volume *_volume, struct fs_info *info, long mask)
 {
-	TRACE((PFS"wfsstat(%ld, , 0x%08lx)\n", ns->nsid, mask));
+	TRACE((PFS"wfsstat(%ld, , 0x%08lx)\n", _volume->id, mask));
 	return ENOSYS;
 }
 
@@ -1373,7 +1373,7 @@ int googlefs_close_query(fs_volume *_volume, fs_query_cookie *cookie)
 /* protos are different... */
 int googlefs_free_query_cookie(fs_volume *_volume, fs_dir_cookie *cookie)
 {
-	TRACE((PFS"free_query_cookie(%ld)\n", ns->nsid));
+	TRACE((PFS"free_query_cookie(%ld)\n", _volume->id));
 	free(cookie);
 	return B_OK;
 }
