@@ -128,6 +128,8 @@ void *f1(void *parm)
 	currsec1.tv_sec = ts.tv_sec;
 	currsec1.tv_usec = ts.tv_nsec / 1000; 
 #else
+	(void)ts;
+	(void)rc;
 	gettimeofday(&currsec1, NULL);
 #endif
 	/* Absolute time, not relative. */
