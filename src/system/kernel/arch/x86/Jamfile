@@ -32,6 +32,7 @@ KernelMergeObject kernel_arch_x86.o :
 	apm.cpp
 	bios.cpp
 	cpuid.S
+	irq_routing_table.cpp
 	syscall.S
 	vm86.cpp
 	x86_physical_page_mapper.cpp

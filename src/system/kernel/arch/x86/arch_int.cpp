@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Clemens Zeidler, haiku@clemens-zeidler.de.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -29,8 +30,10 @@
 #include <arch/x86/vm86.h>
 
 #include "interrupts.h"
+#include "irq_routing_table.h"
 
 #include <ACPI.h>
+#include <AutoDeleter.h>
 #include <safemode.h>
 #include <string.h>
 #include <stdio.h>
@@ -578,11 +581,25 @@ ioapic_init(kernel_args *args)
 	// TODO: remove when the PCI IRQ routing through ACPI is available below
 	return;
 
-	acpi_module_info *acpi;
-	if (get_module(B_ACPI_MODULE_NAME, (module_info **)&acpi) != B_OK) {
+	// load acpi modul
+	status_t status;
+	acpi_module_info* acpiModule;
+	status = get_module(B_ACPI_MODULE_NAME, (module_info**)&acpiModule);
+	if (status != B_OK) {
 		dprintf("acpi module not available, not configuring ioapic\n");
 		return;
 	}
+	BPrivate::CObjectDeleter<const char, status_t>
+		acpiModulePutter(B_ACPI_MODULE_NAME, put_module);
+	// load pci modul
+	pci_module_info* pciModule;
+	status = get_module(B_PCI_MODULE_NAME, (module_info**)&pciModule);
+	if (status != B_OK) {
+		dprintf("could not load pci module, not configuring ioapic\n");
+		return;
+	}
+	CObjectDeleter<const char, status_t> pciModulePutter(B_PCI_MODULE_NAME,
+		put_module);
 
 	// map in the ioapic
 	sIOAPIC = (ioapic *)args->arch_args.ioapic;
@@ -645,8 +662,23 @@ ioapic_init(kernel_args *args)
 	// TODO: here ACPI needs to be used to properly set up the PCI IRQ
 	// routing.
 
+	IRQRoutingTable table;
+	status = read_irq_routing_table(pciModule, acpiModule, &table);
+	if (status != B_OK)
+		return;
+		
+	// configure apic interrupts assume 1:1 mapping
+	for (int i = 0; i < table.Count(); i++) {
+		irq_routing_entry& entry = table.ElementAt(i);
+		irq_discriptor irqDiscriptor;
+		read_current_irq(acpiModule, entry.source, &irqDiscriptor);
+		uint32 config = 0;
+		config |= irqDiscriptor.polarity;
+		config |= irqDiscriptor.interrupt_mode;
+		ioapic_configure_io_interrupt(irqDiscriptor.irq, config);
+	}
+	
 	// prefer the ioapic over the normal pic
-	put_module(B_ACPI_MODULE_NAME);
 	dprintf("using ioapic for interrupt routing\n");
 	sCurrentPIC = &ioapicController;
 	gUsingIOAPIC = true;
