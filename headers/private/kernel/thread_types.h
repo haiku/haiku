@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku Inc.
+ * Copyright 2004-2010, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Thread definition and structures
@@ -375,7 +375,7 @@ struct thread_queue {
 #define	THREAD_FLAGS_SYSCALL				0x0400
 	// the thread is currently in a syscall; set/reset only for certain
 	// functions (e.g. ioctl()) to allow inner functions to discriminate
-	// whether e.g. parameters where passed from userland or kernel
+	// whether e.g. parameters were passed from userland or kernel
 
 
 #endif	/* _KERNEL_THREAD_TYPES_H */
