@@ -19,7 +19,6 @@
 #include <sys/types.h>
 #include <strings.h>
 #include <semaphore.h>
-#include <features.h>
 #include <time.h>
 #include <unistd.h>
 #include <errno.h>
