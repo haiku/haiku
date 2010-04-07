@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src bin network setwep ;
+
+UsePrivateHeaders net ;
+UsePrivateHeaders kernel ;
+UsePrivateSystemHeaders ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+
+BinCommand setwep :
+	setwep.c
+	: $(TARGET_NETWORK_LIBS)
+;
