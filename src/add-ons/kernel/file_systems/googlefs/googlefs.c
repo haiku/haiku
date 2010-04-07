@@ -1757,21 +1757,21 @@ static fs_vnode_ops sGoogleFSVnodeOps = {
 	&googlefs_rewinddir,
 
 	/* attribute directory operations */
-	NULL,	// &googlefs_open_attrdir,
-	NULL,	// &googlefs_close_attrdir,
-	NULL,	// &googlefs_free_attrdircookie,
-	NULL,	// &googlefs_read_attrdir,
-	NULL,	// &googlefs_rewind_attrdir,
+	&googlefs_open_attrdir,
+	&googlefs_close_attrdir,
+	&googlefs_free_attrdircookie,
+	&googlefs_read_attrdir,
+	&googlefs_rewind_attrdir,
 
 	/* attribute operations */
 	NULL,	// &googlefs_create_attr
-	NULL,	// &googlefs_open_attr_h,
-	NULL,	// &googlefs_close_attr_h,
-	NULL,	// &googlefs_free_attr_cookie_h,
-	NULL,	// &googlefs_read_attr_h,
+	&googlefs_open_attr_h,
+	&googlefs_close_attr_h,
+	&googlefs_free_attr_cookie_h,
+	&googlefs_read_attr,
 	NULL,	// &googlefs_write_attr_h,
 
-	NULL,	// &googlefs_read_attr_stat_h,
+	&googlefs_read_attr_stat,
 	NULL,	// &googlefs_write_attr_stat
 	NULL,	// &googlefs_rename_attr
 	NULL,	// &googlefs_remove_attr
