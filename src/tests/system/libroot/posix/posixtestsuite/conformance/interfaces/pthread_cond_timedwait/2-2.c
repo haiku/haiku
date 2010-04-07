@@ -72,6 +72,8 @@ void *t1_func(void *arg)
 		fprintf(stderr,"Test FAILED: pthread_cond_timedwait return %d instead of ETIMEDOUT\n", rc);
 		pthread_exit((void*)PTS_FAIL);
         }
+
+	return NULL;
 }
 
 int main()
