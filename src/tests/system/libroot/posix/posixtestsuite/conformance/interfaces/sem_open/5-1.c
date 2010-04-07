@@ -29,14 +29,18 @@ int main()
 {
 	sem_t   *mysemp;
 	char semname[50];
+#ifdef _SC_SEM_VALUE_MAX
+	int counter = sysconf(_SC_SEM_VALUE_MAX);
+#else
 	int counter = SEM_VALUE_MAX;
+#endif
 
 	if (counter >= INT_MAX)
 	{
 		return PTS_PASS;
 	}
 
-	sprintf(semname, "/" FUNCTION "_" TEST "_%d", getpid());
+	sprintf(semname, "/" FUNCTION "_" TEST "_%ld", (long)getpid());
 
 	++counter;
 	mysemp = sem_open(semname, O_CREAT, 0444, counter);
