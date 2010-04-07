@@ -184,7 +184,7 @@ void * test( void * arg )
 	sigset_t set;
 	int i, j=0;
 	int signals[] = { SIGBUS, SIGKILL, SIGABRT, SIGCHLD, SIGHUP };
-#define NSIG (sizeof(signals)/sizeof(int))
+#define NUM_SIGNALS (sizeof(signals)/sizeof(int))
 	int operation[] = {SIG_SETMASK, SIG_BLOCK, SIG_UNBLOCK};
 
 	ret = sigemptyset( &set );
@@ -210,10 +210,10 @@ void * test( void * arg )
 		for ( i = 0; i < 3; i++ )
 		{
 			j++;
-			j %= 2 * NSIG;
+			j %= 2 * NUM_SIGNALS;
 
-			if ( j >= NSIG )
-				ret = sigdelset( &set, signals[ j - NSIG ] );
+			if ( j >= NUM_SIGNALS )
+				ret = sigdelset( &set, signals[ j - NUM_SIGNALS ] );
 			else
 				ret = sigaddset( &set, signals[ j ] );
 
