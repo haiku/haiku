@@ -73,8 +73,8 @@ int main()
   sa.sa_handler = sigbus_handler;
   sigaction(SIGBUS, &sa, NULL);
 
-  snprintf(tmpfname, sizeof(tmpfname), "pts_mmap_11_3_%d",
-           getpid());
+  snprintf(tmpfname, sizeof(tmpfname), "pts_mmap_11_3_%ld",
+           (long)getpid());
   /* Create shared object */
   shm_unlink(tmpfname);
   fd = shm_open(tmpfname, O_RDWR|O_CREAT|O_EXCL, S_IRUSR|S_IWUSR);

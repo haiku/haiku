@@ -73,10 +73,10 @@ int main()
   /* Size of the file */
   total_size = 2 * page_size;
 
-  snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_mmap_3_1_%d",
-           getpid());
-  snprintf(tmpfname2, sizeof(tmpfname2), "/tmp/pts_mmap_3_1_2_%d",
-           getpid());
+  snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_mmap_3_1_%ld",
+           (long)getpid());
+  snprintf(tmpfname2, sizeof(tmpfname2), "/tmp/pts_mmap_3_1_2_%ld",
+           (long)getpid());
   data = (char *) malloc(total_size); 
   unlink(tmpfname);
   unlink(tmpfname2);

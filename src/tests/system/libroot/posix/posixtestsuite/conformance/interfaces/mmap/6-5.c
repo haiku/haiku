@@ -48,8 +48,8 @@ int main()
 
   /* Create the file */
 
-  snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_mmap_6_5_%d",
-           getpid());
+  snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_mmap_6_5_%ld",
+           (long)getpid());
   unlink(tmpfname);
   fd = open(tmpfname, O_CREAT | O_RDWR | O_EXCL,
             S_IRUSR | S_IWUSR);

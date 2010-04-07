@@ -58,8 +58,8 @@ int main()
 
   char * ch;
 
-  snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_mmap_7_1_%d",
-           getpid());
+  snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_mmap_7_1_%ld",
+           (long)getpid());
   unlink(tmpfname);
   fd = open(tmpfname, O_CREAT | O_RDWR | O_EXCL,
             S_IRUSR | S_IWUSR);

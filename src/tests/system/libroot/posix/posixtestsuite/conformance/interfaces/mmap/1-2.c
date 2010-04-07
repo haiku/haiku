@@ -37,8 +37,8 @@ int main()
   int fd;
   off_t off = 0;
  
-  snprintf(tmpfname, sizeof(tmpfname), "pts_mmap_1_2_%d",
-           getpid());
+  snprintf(tmpfname, sizeof(tmpfname), "pts_mmap_1_2_%ld",
+           (long)getpid());
 	
   /* Create shared object */
 	shm_unlink(tmpfname);

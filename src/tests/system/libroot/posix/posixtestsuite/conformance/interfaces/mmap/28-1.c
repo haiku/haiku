@@ -62,8 +62,8 @@ int main()
 		return PTS_UNRESOLVED;
   }
 
-  snprintf(tmpfname, sizeof(tmpfname), "pts_mmap_28_1_%d",
-           getpid());
+  snprintf(tmpfname, sizeof(tmpfname), "pts_mmap_28_1_%ld",
+           (long)getpid());
   /* Create shared object */
 	shm_unlink(tmpfname);
 	shm_fd = shm_open(tmpfname, O_RDWR|O_CREAT|O_EXCL, S_IRUSR|S_IWUSR);

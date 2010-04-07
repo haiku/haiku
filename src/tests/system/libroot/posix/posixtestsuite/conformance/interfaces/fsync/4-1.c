@@ -34,8 +34,8 @@ int main()
   int total_size = 1024; 
   int fd;
 
-  snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_fsync_4_1_%d",
-           getpid());
+  snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_fsync_4_1_%ld",
+           (long)getpid());
   unlink(tmpfname);
   fd = open(tmpfname, O_CREAT | O_RDWR | O_EXCL,
             S_IRUSR | S_IWUSR);

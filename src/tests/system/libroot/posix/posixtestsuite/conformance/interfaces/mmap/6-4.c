@@ -46,8 +46,8 @@ int main()
   off_t off = 0;
   int prot;
 
-  snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_mmap_6_4_%d",
-           getpid());
+  snprintf(tmpfname, sizeof(tmpfname), "/tmp/pts_mmap_6_4_%ld",
+           (long)getpid());
 
   /* Create a tmp file, set the content as 'a' */
   unlink(tmpfname);

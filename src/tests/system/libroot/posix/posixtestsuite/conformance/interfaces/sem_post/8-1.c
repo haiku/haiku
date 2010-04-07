@@ -117,7 +117,7 @@ int main()
 	int retval = PTS_UNRESOLVED;
 	int status;
 
-	snprintf(semname, 20, "/" TEST "_%d", getpid());
+	snprintf(semname, 20, "/" TEST "_%ld", (long)getpid());
 	/* Initial value of Semaphore is 1 */
 	sem = sem_open(semname, O_CREAT, 0777, 1);
 	if( sem == SEM_FAILED || sem == NULL ) {
@@ -125,7 +125,7 @@ int main()
 		return PTS_UNRESOLVED;
 	}
 	
-	snprintf(semname_1, 20, "/" TEST "_%d_1", getpid());
+	snprintf(semname_1, 20, "/" TEST "_%ld_1", (long)getpid());
 	sem_1 = sem_open(semname_1, O_CREAT, 0777, val);
 	if( sem_1 == SEM_FAILED || sem_1 == NULL ) {
 		perror(ERROR_PREFIX "sem_open: sem_1");
@@ -159,7 +159,7 @@ int main()
 		retval = PTS_UNRESOLVED; 
 		goto clean_up;
 	}
-	fprintf(stderr, "P: child_1:%d forked\n", c_1);
+	fprintf(stderr, "P: child_1:%ld forked\n", (long)c_1);
 	
 	sleep(1);
 	c_2 = fork();
@@ -174,7 +174,7 @@ int main()
 		retval = PTS_UNRESOLVED; 
 		goto clean_up;
 	}
-	fprintf(stderr, "P: child_2: %d forked\n", c_2);
+	fprintf(stderr, "P: child_2: %ld forked\n", (long)c_2);
 
 	/* Make sure the two children has been waiting */	
 	/*do { 
@@ -189,7 +189,7 @@ int main()
 		/* Child 3 */
 		child_fn(priority - 1, 3);
 	}
-	fprintf(stderr, "P: child_3: %d forked\n", c_3);
+	fprintf(stderr, "P: child_3: %ld forked\n", (long)c_3);
 	
 	/* Make sure child 3 has been waiting for the lock */	
 	/*do { 
@@ -221,15 +221,15 @@ int main()
 				retval = PTS_PASS;
 				goto clean_up;
 			}
-			printf("Test Fail: Expect child_1: %d, got %d\n",
-				c_1, ret_pid);
+			printf("Test Fail: Expect child_1: %ld, got %ld\n",
+				(long)c_1, (long)ret_pid);
 			retval = PTS_FAIL;
 			goto clean_up;
 		}		
 		else
 		{
-			printf("Test Fail: Expect child_3: %d, got %d\n",
-			c_3, ret_pid);
+			printf("Test Fail: Expect child_3: %ld, got %ld\n",
+			(long)c_3, (long)ret_pid);
 			retval = PTS_FAIL;
 			sem_post(sem);
 			while((wait(NULL) > 0));
@@ -238,8 +238,8 @@ int main()
 	}
 	else
 	{
-		printf("Test Fail: Expect child_2: %d, got %d\n",
-			c_2, ret_pid);
+		printf("Test Fail: Expect child_2: %ld, got %ld\n",
+			(long)c_2, (long)ret_pid);
 		retval = PTS_FAIL;
 		sem_post(sem);
 		sem_post(sem);
