@@ -345,7 +345,7 @@ int googlefs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *
 	} else
 		err = ENOENT;
 	if (err == B_OK) {
-		if (get_vnode(ns->nsid, *vnid, (void **)&dummy) != 0) /* inc ref count */
+		if (get_vnode(_volume, *vnid, (void **)&dummy) != B_OK) /* inc ref count */
 			err = EINVAL;
 	}
 	UNLOCK(&base->l);
@@ -1300,7 +1300,7 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 	reused = (qn != NULL);
 	if (reused) {
 		TRACE((PFS"open_query: reusing %ld:%Ld\n", ns->nsid, qn->vnid));
-		err = get_vnode(ns->nsid, qn->vnid, (void **)&dummy); /* inc ref count */
+		err = get_vnode(_volume, qn->vnid, (void **)&dummy); /* inc ref count */
 		if (err)
 			goto err_mkdir;
 		/* wait for the query to complete */
@@ -1323,7 +1323,7 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 	if (err)
 		goto err_qs;
 
-	err = get_vnode(ns->nsid, qn->vnid, (void **)&dummy); /* inc ref count */
+	err = get_vnode(_volume, qn->vnid, (void **)&dummy); /* inc ref count */
 	if (err)
 		goto err_mkdir;
 
