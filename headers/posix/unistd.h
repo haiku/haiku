@@ -36,8 +36,18 @@
 #define _POSIX_SAVED_IDS		1
 #define _POSIX_VDISABLE			((unsigned char)-2)
 	/* TODO: Check this! */
-#define _POSIX_SEMAPHORES		(200112L)
-#define _POSIX_THREADS			(200112L)
+/* TODO: Update these to the current POSIX version! Ideally after actually
+	supporting the features. */
+#define _POSIX_SEMAPHORES					(200112L)
+#define _POSIX_THREADS						(200112L)
+#define _POSIX_MAPPED_FILES					(200809L)
+#define _POSIX_THREAD_PROCESS_SHARED		(200809L)
+#define _POSIX_THREAD_ATTR_STACKADDR		(-1)	/* currently unsupported */
+#define _POSIX_THREAD_ATTR_STACKSIZE		(200809L)
+#define _POSIX_THREAD_PRIORITY_SCHEDULING	(-1)	/* currently unsupported */
+#define _POSIX_REALTIME_SIGNALS				(-1)	/* currently unsupported */
+#define _POSIX_MEMORY_PROTECTION			(200809L)
+#define _POSIX_SEM_VALUE_MAX				INT_MAX
 
 /* pathconf() constants */
 /* BeOS supported values, do not touch */
@@ -51,7 +61,6 @@
 #define _PC_VDISABLE			8
 #define _PC_LINK_MAX			25
 /* new values */
-/* TODO: reorder */
 #define _PC_SYNC_IO				26
 #define _PC_ASYNC_IO			27
 #define _PC_PRIO_IO				28
@@ -79,6 +88,7 @@
 #define _SC_STREAM_MAX			22
 #define _SC_TZNAME_MAX			23
 #define _SC_VERSION				24
+/* new values */
 #define _SC_GETGR_R_SIZE_MAX	25
 #define _SC_GETPW_R_SIZE_MAX	26
 #define _SC_PAGE_SIZE			27
@@ -87,20 +97,28 @@
 #define _SC_SEM_VALUE_MAX		29
 #define _SC_SEMAPHORES			30
 #define _SC_THREADS				31
-/* TODO: check and reorder */
-#define _SC_IOV_MAX				32
-#define _SC_UIO_MAXIOV			_SC_IOV_MAX
-#define _SC_NPROCESSORS_MAX		33
-#define _SC_NPROCESSORS_CONF	34
-#define _SC_NPROCESSORS_ONLN	35
-#define _SC_CPUID_MAX			36
-#define _SC_ATEXIT_MAX			37
-#define _SC_PASS_MAX			39
-#define _SC_PHYS_PAGES			40
-#define _SC_AVPHYS_PAGES		41
-#define _SC_PIPE				42
-#define _SC_SELECT				43
-#define _SC_POLL				44
+/* TODO: check */
+#define _SC_IOV_MAX						32
+#define _SC_UIO_MAXIOV					_SC_IOV_MAX
+#define _SC_NPROCESSORS_MAX				33
+#define _SC_NPROCESSORS_CONF			34
+#define _SC_NPROCESSORS_ONLN			35
+#define _SC_CPUID_MAX					36
+#define _SC_ATEXIT_MAX					37
+#define _SC_PASS_MAX					39
+#define _SC_PHYS_PAGES					40
+#define _SC_AVPHYS_PAGES				41
+#define _SC_PIPE						42
+#define _SC_SELECT						43
+#define _SC_POLL						44
+#define _SC_MAPPED_FILES				45
+#define _SC_THREAD_PROCESS_SHARED		46
+#define _SC_THREAD_STACK_MIN			47
+#define _SC_THREAD_ATTR_STACKADDR		48
+#define _SC_THREAD_ATTR_STACKSIZE		49
+#define _SC_THREAD_PRIORITY_SCHEDULING	50
+#define _SC_REALTIME_SIGNALS			51
+#define	_SC_MEMORY_PROTECTION			52
 
 
 /* confstr() constants */

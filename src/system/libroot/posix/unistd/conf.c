@@ -18,6 +18,7 @@
 #include <fs_info.h>
 #include <libroot_private.h>
 #include <posix/realtime_sem_defs.h>
+#include <thread_defs.h>
 #include <user_group.h>
 
 bool _kern_cpu_enabled(int cpu);
@@ -69,7 +70,7 @@ sysconf(int name)
 		case _SC_SEM_NSEMS_MAX:
 			return MAX_POSIX_SEMS;
 		case _SC_SEM_VALUE_MAX:
-			return MAX_POSIX_SEM_VALUE;
+			return _POSIX_SEM_VALUE_MAX;
 		case _SC_SEMAPHORES:
 			return _POSIX_SEMAPHORES;
 		case _SC_THREADS:
@@ -130,14 +131,28 @@ sysconf(int name)
 			}
 			return info.max_pages - info.used_pages;
 		}
-		/*
+		case _SC_MAPPED_FILES:
+			return _POSIX_MAPPED_FILES;
+		case _SC_THREAD_PROCESS_SHARED:
+			return _POSIX_THREAD_PROCESS_SHARED;
+		case _SC_THREAD_STACK_MIN:
+			return MIN_USER_STACK_SIZE;
+		case _SC_THREAD_ATTR_STACKADDR:
+			return _POSIX_THREAD_ATTR_STACKADDR;
+		case _SC_THREAD_ATTR_STACKSIZE:
+			return _POSIX_THREAD_ATTR_STACKSIZE;
+		case _SC_THREAD_PRIORITY_SCHEDULING:
+			return _POSIX_THREAD_PRIORITY_SCHEDULING;
+		case _SC_REALTIME_SIGNALS:
+			return _POSIX_REALTIME_SIGNALS;
+		case _SC_MEMORY_PROTECTION:
+			return _POSIX_MEMORY_PROTECTION;
+
+		// not POSIX (anymore)
 		case _SC_PIPE:
-			return 1;
 		case _SC_SELECT:
-			return 1;
 		case _SC_POLL:
 			return 1;
-		*/
 	}
 
 	errno = EINVAL;
