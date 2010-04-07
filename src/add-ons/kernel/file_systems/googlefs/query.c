@@ -35,6 +35,10 @@ char *query_unescape_string(const char *q, const char **newq, char delim)
 	int backslash = 0;
 	int i;
 	char *p, *p2;
+
+	if (*q == '*')
+		q++;
+
 	p = malloc(10);
 	if (!p)
 		return NULL;
@@ -59,10 +63,14 @@ char *query_unescape_string(const char *q, const char **newq, char delim)
 			break;
 		} else {
 			p[i] = *q;
+			if (p[i] == '*')
+				p[i] = ' ';
 		}
 		q++;
 	}
 	p[i] = '\0';
+	if (i > 0 && p[i-1] == ' ')
+		p[i-1] = '\0';
 	if (newq)
 		*newq = q;
 	if (i)

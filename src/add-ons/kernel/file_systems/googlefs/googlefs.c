@@ -27,7 +27,7 @@
 /* just publish fake entries; for debugging */
 //#define NO_SEARCH
 
-#define TRACE_GOOGLEFS
+//#define TRACE_GOOGLEFS
 #ifdef TRACE_GOOGLEFS
 #	define TRACE(x) dprintf x
 #else
@@ -201,7 +201,7 @@ status_t googlefs_unmount(fs_volume *_volume)
 	}
 	
 	// Unlike in BeOS, we need to put the reference to our root node ourselves
-	put_vnode(ns->nsid, ns->rootid);
+	put_vnode(_volume, ns->rootid);
 	
 	free_lock(&ns->l);
 	vnidpool_free(ns->vnids);
@@ -295,7 +295,7 @@ int googlefs_release_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 static int compare_fs_node_by_name(fs_node *node, char *name)
 {
 	//return memcmp(node->name, name, GOOGLEFS_NAME_LEN);
-	TRACE((PFS"find_by_name: '%s' <> '%s'\n", node->name, name));
+	//TRACE((PFS"find_by_name: '%s' <> '%s'\n", node->name, name));
 	return strncmp(node->name, name, GOOGLEFS_NAME_LEN);
 }
 
@@ -1276,10 +1276,10 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 		else if (strcmp(p, "\")&&(BEOS:TYPE==\"application/x-vnd.Be-bookmark\"))"))
 			accepted = false;
 		else {
-			if (qstring[0] == '*')
-				strcpy(qstring+1, qstring);
-			if (qstring[strlen(qstring)-1] == '*')
-				qstring[strlen(qstring)-1] = '\0';
+			//if (qstring[0] == '*')
+			//	strcpy(qstring+1, qstring);
+			//if (qstring[strlen(qstring)-1] == '*')
+			//	qstring[strlen(qstring)-1] = '\0';
 			if (!query_strip_bracketed_Cc(qstring))
 				goto err_qs;
 		}
@@ -1378,7 +1378,7 @@ err_gro:
 	if (qn->request)
 		google_request_close(qn->request);
 err_gn:
-	put_vnode(ns->nsid, qn->vnid);
+	put_vnode(_volume, qn->vnid);
 err_mkdir:
 	if (!reused)
 		googlefs_unlink_gen(_volume, ns->root, qn->name);
@@ -1410,7 +1410,7 @@ int googlefs_close_query(fs_volume *_volume, fs_query_cookie *cookie)
 	/* if last cookie on the query and sync_unlink, trash all */
 	if (sync_unlink_queries && !q->opened)
 		err = googlefs_unlink_node_rec(_volume, q);
-	err = put_vnode(ns->nsid, q->vnid);
+	err = put_vnode(_volume, q->vnid);
 	return err;
 }
 
@@ -1565,118 +1565,6 @@ googlefs_std_ops(int32 op, ...)
 	}
 }
 
-#if 0
-static file_system_module_info sGoogleFSModule = {
-	{
-		"file_systems/googlefs" B_CURRENT_FS_API_VERSION,
-		0,
-		googlefs_std_ops,
-	},
-
-	"googlefs",					// short_name
-	GOOGLEFS_PRETTY_NAME,		// pretty_name
-	0,	// DDM flags
-
-	// scanning
-	NULL,	// fs_identify_partition,
-	NULL,	// fs_scan_partition,
-	NULL,	// fs_free_identify_partition_cookie,
-	NULL,	// free_partition_content_cookie()
-
-	&googlefs_mount,
-	&googlefs_unmount,
-	&googlefs_rfsstat,
-	NULL,
-	NULL,
-
-	/* vnode operations */
-	&googlefs_walk,
-	&googlefs_get_vnode_name,
-	&googlefs_read_vnode,
-	&googlefs_release_vnode,
-	&googlefs_remove_vnode,
-
-	/* VM file access */
-	NULL, 	// &googlefs_can_page
-	NULL,	// &googlefs_read_pages
-	NULL, 	// &googlefs_write_pages
-
-	NULL,	// &googlefs_get_file_map,
-
-	NULL, 	// &googlefs_ioctl
-	&googlefs_setflags,
-	NULL,	// &googlefs_select
-	NULL,	// &googlefs_deselect
-	NULL, 	// &googlefs_fsync
-
-	NULL,	// &googlefs_read_link,
-	NULL, 	// &googlefs_create_symlink,
-
-	NULL, 	// &googlefs_link,
-	NULL,	// &googlefs_unlink,
-	NULL, 	// &googlefs_rename,
-
-	&googlefs_access,
-	&googlefs_rstat,
-	&googlefs_wstat,
-
-	/* file operations */
-	&googlefs_create,
-	&googlefs_open,
-	&googlefs_close,
-	&googlefs_free_cookie,
-	&googlefs_read,
-	NULL, 	// &googlefs_write,
-
-	/* directory operations */
-	&googlefs_mkdir,
-	&googlefs_rmdir,
-	&googlefs_opendir,
-	&googlefs_closedir,
-	&googlefs_free_dircookie,
-	&googlefs_readdir,
-	&googlefs_rewinddir,
-	
-	/* attribute directory operations */
-	&googlefs_open_attrdir,
-	&googlefs_close_attrdir,
-	&googlefs_free_attrdircookie,
-	&googlefs_read_attrdir,
-	&googlefs_rewind_attrdir,
-
-	/* attribute operations */
-	NULL,	// &googlefs_create_attr
-	&googlefs_open_attr_h,
-	&googlefs_close_attr_h,
-	&googlefs_free_attr_cookie_h,
-	&googlefs_read_attr_h,
-	NULL,	// &googlefs_write_attr_h,
-
-	&googlefs_read_attr_stat_h,
-	NULL,	// &googlefs_write_attr_stat
-	NULL,	// &googlefs_rename_attr
-	NULL,	// &googlefs_remove_attr
-
-	/* index directory & index operations */
-	NULL,	// &googlefs_open_index_dir
-	NULL,	// &googlefs_close_index_dir
-	NULL,	// &googlefs_free_index_dir_cookie
-	NULL,	// &googlefs_read_index_dir
-	NULL,	// &googlefs_rewind_index_dir
-
-	NULL,	// &googlefs_create_index
-	NULL,	// &googlefs_remove_index
-	NULL,	// &googlefs_stat_index
-
-	/* query operations */
-	&googlefs_open_query,
-	&googlefs_close_query,
-	&googlefs_free_query_cookie,
-	&googlefs_read_query,
-	NULL,	// &googlefs_rewind_query,
-};
-
-#endif
 
 static fs_volume_ops sGoogleFSVolumeOps = {
 	&googlefs_unmount,
@@ -1697,10 +1585,10 @@ static fs_volume_ops sGoogleFSVolumeOps = {
 	NULL,	// &googlefs_stat_index
 
 	/* query operations */
-	NULL,	// &googlefs_open_query,
-	NULL,	// &googlefs_close_query,
-	NULL,	// &googlefs_free_query_cookie,
-	NULL,	// &googlefs_read_query,
+	&googlefs_open_query,
+	&googlefs_close_query,
+	&googlefs_free_query_cookie,
+	&googlefs_read_query,
 	NULL,	// &googlefs_rewind_query,
 };
 
