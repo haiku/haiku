@@ -34,9 +34,9 @@
 static const char* 
 get_string(const char* val, const char* sep, u_int8_t* buf, int* lenp)
 {
-	int			len;
-	int			hexstr;
-	u_int8_t*	p;
+	int len;
+	int hexstr;
+	u_int8_t* p;
 
 	len = *lenp;
 	p = buf;
@@ -73,18 +73,17 @@ get_string(const char* val, const char* sep, u_int8_t* buf, int* lenp)
 				| tohex((u_char) val[1]);
 #undef tohex
 			val += 2;
-		} else {
+		} else
 			*p++ = *val++;
-		}
 	}
 	len = p - buf;
 	/* The string "-" is treated as the empty string. */
 	if (!hexstr && len == 1 && buf[0] == '-') {
 		len = 0;
 		memset(buf, 0, *lenp);
-	} else if (len < *lenp) {
+	} else if (len < *lenp)
 		memset(p, 0, *lenp - len);
-	}
+
 	*lenp = len;
 	return val;
 }
@@ -109,9 +108,9 @@ set80211(int s, const char* dev, int type, int val, int len, void* data)
 static void
 set80211ssid(const char* dev, const char* val, int s)
 {
-	int			ssid;
-	int			len;
-	u_int8_t	data[IEEE80211_NWID_LEN];
+	int ssid;
+	int len;
+	u_int8_t data[IEEE80211_NWID_LEN];
 
 	ssid = 0;
 	len = strlen(val);
@@ -131,10 +130,10 @@ set80211ssid(const char* dev, const char* val, int s)
 static void
 set80211nwkey(const char* dev, const char* val, int s)
 {
-	int			txkey;
-	int			i;
-	int			len;
-	u_int8_t	data[IEEE80211_KEYBUF_SIZE];
+	int txkey;
+	int i;
+	int len;
+	u_int8_t data[IEEE80211_KEYBUF_SIZE];
 
 	set80211(s, dev, IEEE80211_IOC_WEP, IEEE80211_WEP_ON, 0, NULL);
 
@@ -177,7 +176,7 @@ get80211val(int s, const char* dev, int type, int* val)
 	(void) strncpy(ireq.i_name, dev, sizeof(ireq.i_name));
 	ireq.i_type = type;
 	if (ioctl(s, SIOCG80211, &ireq) < 0)
-			return -1;
+		return -1;
 	*val = ireq.i_val;
 	return 0;
 }
@@ -189,8 +188,8 @@ getid(int s, const char* dev, int ix, void* data, size_t len, int* plen,
 {
 	struct ieee80211req ireq;
 
-	(void) memset(&ireq, 0, sizeof(ireq));
-	(void) strncpy(ireq.i_name, dev, sizeof(ireq.i_name));
+	(void)memset(&ireq, 0, sizeof(ireq));
+	(void)strncpy(ireq.i_name, dev, sizeof(ireq.i_name));
 	ireq.i_type = (!mesh) ? IEEE80211_IOC_SSID : IEEE80211_IOC_MESH_ID;
 	ireq.i_val = ix;
 	ireq.i_data = data;
@@ -205,8 +204,8 @@ getid(int s, const char* dev, int ix, void* data, size_t len, int* plen,
 static void
 print_string(const u_int8_t* buf, int len)
 {
-	int		i;
-	int		hasspc;
+	int i;
+	int hasspc;
 
 	i = 0;
 	hasspc = 0;
@@ -232,10 +231,10 @@ print_string(const u_int8_t* buf, int len)
 static void
 show_status(const char* dev, int s)
 {
-	int			len;
-	int			i;
-	int			num;
-	uint8_t		data[32];
+	int len;
+	int i;
+	int num;
+	uint8_t data[32];
 
 	if (getid(s, dev, -1, data, sizeof(data), &len, 0) < 0) {
 		fprintf(stderr, "error: not a wifi device\n");
@@ -253,10 +252,8 @@ show_status(const char* dev, int s)
 				print_string(data, len);
 			}
 		}
-	} else {
+	} else
 		print_string(data, len);
-	}
-
 }
 
 
