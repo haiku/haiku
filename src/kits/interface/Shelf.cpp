@@ -1108,21 +1108,32 @@ BShelf::operator=(const BShelf &)
 status_t
 BShelf::_Archive(BMessage *data) const
 {
-	BHandler::Archive(data);
+	status_t status = BHandler::Archive(data);
+	if (status != B_OK)
+		return status;
 
-	data->AddBool("_zom_dsp", DisplaysZombies());
-	data->AddBool("_zom_alw", AllowsZombies());
-	data->AddInt32("_sg_cnt", fGenCount);
+	status = data->AddBool("_zom_dsp", DisplaysZombies());
+	if (status != B_OK)
+		return status;
+
+	status = data->AddBool("_zom_alw", AllowsZombies());
+	if (status != B_OK)
+		return status;
+
+	status = data->AddInt32("_sg_cnt", fGenCount);
+	if (status != B_OK)
+		return status;
 
 	BMessage archive('ARCV');
-
 	for (int32 i = 0; i < fReplicants.CountItems(); i++) {
 		if (((replicant_data *)fReplicants.ItemAt(i))->Archive(&archive) == B_OK)
-			data->AddMessage("replicant", &archive);
+			status = data->AddMessage("replicant", &archive);
+		if (status != B_OK)
+			break;
 		archive.MakeEmpty();
 	}
 
-	return B_OK;
+	return status;
 }
 
 
@@ -1480,7 +1491,7 @@ BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 			const char *name;
 			if (msg->FindString("name", &name) != B_OK)
 				break;
-			for (int32 i=0; i<CountReplicants(); i++) {
+			for (int32 i = 0; i < CountReplicants(); i++) {
 				BView *view = NULL;
 				ReplicantAt(i, &view, &ID, &err);
 				if (err == B_OK) {
@@ -1498,7 +1509,7 @@ BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 			uint32 id;
 			if (msg->FindInt32("id", (int32 *)&id) != B_OK)
 				break;
-			for (int32 i=0; i<CountReplicants(); i++) {
+			for (int32 i = 0; i < CountReplicants(); i++) {
 				BView *view = NULL;
 				ReplicantAt(i, &view, &ID, &err);
 				if (err == B_OK) {
