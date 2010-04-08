@@ -5,8 +5,9 @@
  *
  * Many parts
  * 
- * Copyright 2001 The Aerospace Corporation.  All rights reserved.
- * Copyright (c) 1997, 1998, 2000 The NetBSD Foundation, Inc. All rights reserved.
+ * Copyright 2001 The Aerospace Corporation.
+ * Copyright (c) 1997, 1998, 2000 The NetBSD Foundation, Inc.
+ * All rights reserved.
  * Distributed under the terms of the 2-clause BSD license.
  *
  * Authors:
@@ -33,9 +34,9 @@
 static const char* 
 get_string(const char* val, const char* sep, u_int8_t* buf, int* lenp)
 {
-	int		len;
-	int		hexstr;
-	u_int8_t* p;
+	int			len;
+	int			hexstr;
+	u_int8_t*	p;
 
 	len = *lenp;
 	p = buf;
@@ -55,15 +56,13 @@ get_string(const char* val, const char* sep, u_int8_t* buf, int* lenp)
 				return NULL;
 			}
 			if (!isxdigit((u_char) val[1])) {
-				printf("%s: odd count hexadecimal digits",
-				__func__);
+				printf("%s: odd count hexadecimal digits", __func__);
 				return NULL;
 			}
 		}
 		if (p >= buf + len) {
 			if (hexstr)
-				printf("%s: hexadecimal digits too long",
-				__func__);
+				printf("%s: hexadecimal digits too long", __func__);
 			else
 				printf("string too long", __func__);
 			return NULL;
@@ -74,16 +73,18 @@ get_string(const char* val, const char* sep, u_int8_t* buf, int* lenp)
 				| tohex((u_char) val[1]);
 #undef tohex
 			val += 2;
-		} else
+		} else {
 			*p++ = *val++;
+		}
 	}
 	len = p - buf;
 	/* The string "-" is treated as the empty string. */
 	if (!hexstr && len == 1 && buf[0] == '-') {
 		len = 0;
 		memset(buf, 0, *lenp);
-	} else if (len < *lenp)
+	} else if (len < *lenp) {
 		memset(p, 0, *lenp - len);
+	}
 	*lenp = len;
 	return val;
 }
@@ -108,8 +109,8 @@ set80211(int s, const char* dev, int type, int val, int len, void* data)
 static void
 set80211ssid(const char* dev, const char* val, int s)
 {
-	int		ssid;
-	int		len;
+	int			ssid;
+	int			len;
 	u_int8_t	data[IEEE80211_NWID_LEN];
 
 	ssid = 0;
@@ -130,8 +131,9 @@ set80211ssid(const char* dev, const char* val, int s)
 static void
 set80211nwkey(const char* dev, const char* val, int s)
 {
-	int		txkey;
-	int		i, len;
+	int			txkey;
+	int			i;
+	int			len;
 	u_int8_t	data[IEEE80211_KEYBUF_SIZE];
 
 	set80211(s, dev, IEEE80211_IOC_WEP, IEEE80211_WEP_ON, 0, NULL);
@@ -166,26 +168,122 @@ set80211nwkey(const char* dev, const char* val, int s)
 }
 
 
+static int
+get80211val(int s, const char* dev, int type, int* val)
+{
+	struct ieee80211req ireq;
+
+	(void) memset(&ireq, 0, sizeof(ireq));
+	(void) strncpy(ireq.i_name, dev, sizeof(ireq.i_name));
+	ireq.i_type = type;
+	if (ioctl(s, SIOCG80211, &ireq) < 0)
+			return -1;
+	*val = ireq.i_val;
+	return 0;
+}
+
+
+static int
+getid(int s, const char* dev, int ix, void* data, size_t len, int* plen,
+	int mesh)
+{
+	struct ieee80211req ireq;
+
+	(void) memset(&ireq, 0, sizeof(ireq));
+	(void) strncpy(ireq.i_name, dev, sizeof(ireq.i_name));
+	ireq.i_type = (!mesh) ? IEEE80211_IOC_SSID : IEEE80211_IOC_MESH_ID;
+	ireq.i_val = ix;
+	ireq.i_data = data;
+	ireq.i_len = len;
+	if (ioctl(s, SIOCG80211, &ireq) < 0)
+		return -1;
+	*plen = ireq.i_len;
+	return 0;
+}
+
+
+static void
+print_string(const u_int8_t* buf, int len)
+{
+	int		i;
+	int		hasspc;
+
+	i = 0;
+	hasspc = 0;
+	for (; i < len; i++) {
+		if (!isprint(buf[i]) && buf[i] != '\0')
+			break;
+		if (isspace(buf[i]))
+				hasspc++;
+	}
+	if (i == len) {
+		if (hasspc || len == 0 || buf[0] == '\0')
+			printf("\"%.*s\"", len, buf);
+		else
+			printf("%.*s", len, buf);
+	} else {
+		printf("0x");
+		for (i = 0; i < len; i++)
+			printf("%02x", buf[i]);
+	}
+}
+
+
+static void
+show_status(const char* dev, int s)
+{
+	int			len;
+	int			i;
+	int			num;
+	uint8_t		data[32];
+
+	if (getid(s, dev, -1, data, sizeof(data), &len, 0) < 0) {
+		fprintf(stderr, "error: not a wifi device\n");
+		exit(1);
+	}
+
+	if (get80211val(s, dev, IEEE80211_IOC_NUMSSIDS, &num) < 0)
+		num = 0;
+	printf("ssid ");
+	if (num > 1) {
+		for (i = 0; i < num; i++) {
+			if (getid(s, dev, i, data, sizeof(data), &len, 0) >= 0
+				&& len > 0) {
+				printf(" %d:", i + 1);
+				print_string(data, len);
+			}
+		}
+	} else {
+		print_string(data, len);
+	}
+
+}
+
+
 void
 usage()
 {
-	fprintf(stderr, "usage: setwep device_path ssid [key]\n");
+	fprintf(stderr, "usage: setwep device_path [ssid] [key]\n");
 	exit(1);
 }
 
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 	int s = socket(AF_INET, SOCK_DGRAM, 0);
 
-	if (argc < 3) {
+	if (argc < 2)
 		usage();
-	}
-	set80211ssid(argv[1], argv[2], s);
 
-	if (argc == 4) {
+	if (argc == 2)
+		show_status(argv[1], s);
+
+	if (argc > 3)
+		set80211ssid(argv[1], argv[2], s);
+
+	if (argc == 4)
 		set80211nwkey(argv[1], argv[3], s);
-	}
+
 	return 0;
 }
