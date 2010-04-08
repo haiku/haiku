@@ -222,7 +222,7 @@ static int compare_fs_node_by_vnid(fs_node *node, ino_t *id)
 static int googlefs_free_vnode(fs_volume *_volume, fs_node *node)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
-	TRACE((PFS "%s(%ld, %Ld, %s)\n", __FUNCTION__, ns->nsid, node->vnid));
+	TRACE((PFS "%s(%ld, %Ld)\n", __FUNCTION__, ns->nsid, node->vnid));
 	free_lock(&node->l);
 	atomic_add(&ns->nodecount, -1);
 	vnidpool_put(ns->vnids, node->vnid);
@@ -246,12 +246,15 @@ int googlefs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 	if (node->vnid == ns->rootid) {
 		TRACE((PFS "asked to remove the root node!!\n"));
 	}
+TRACE((PFS "SLL_REMOVE(ns->nodes %p, nlnext, %p)\n", ns->nodes, node));
 	//LOCK(&node->l);
 	err = SLL_REMOVE(ns->nodes, nlnext, node);
 	/* query dirs must be removed from the query list too */
+TRACE((PFS "SLL_REMOVE(ns->queries %p, qnext, %p)\n", ns->nodes, node));
 	err = SLL_REMOVE(ns->queries, qnext, node);
 	if (node->parent) {
 		LOCK(&node->parent->l);
+TRACE((PFS "SLL_REMOVE(node->parent->children %p, next, %p)\n", node->parent->children, node));
 		SLL_REMOVE(node->parent->children, next, node);
 		UNLOCK(&node->parent->l);
 	}
@@ -617,11 +620,9 @@ int googlefs_read(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie, o
 	fs_node *node = (fs_node *)_node->private_node;
 	status_t err = B_OK;
 	TRACE((PFS"read(%ld, %Ld, %Ld, %ld)\n", ns->nsid, node->vnid, pos, *len));
-	if (node->data_size == 0 || !node->data)
-		err = ENOSYS;
 	if (pos < 0 || pos > node->data_size)
 		err = EFPOS;
-	if (err) {
+	if (err || node->data_size == 0 || !node->data) {
 		*len = 0;
 		return err;
 	}
