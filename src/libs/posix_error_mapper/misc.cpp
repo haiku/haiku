@@ -46,7 +46,7 @@ WRAPPER_FUNCTION(void, perror, (const char* errorPrefix),
 	// convert errno to negative error code
 	int* error = real_errnop();
 	int oldError = *error;
-	if (*error < 0)
+	if (*error > 0)
 		*error = B_TO_NEGATIVE_ERROR(*error);
 
 	// call the real perror()
