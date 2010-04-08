@@ -214,7 +214,7 @@ print_string(const u_int8_t* buf, int len)
 		if (!isprint(buf[i]) && buf[i] != '\0')
 			break;
 		if (isspace(buf[i]))
-				hasspc++;
+			hasspc++;
 	}
 	if (i == len) {
 		if (hasspc || len == 0 || buf[0] == '\0')
