@@ -27,7 +27,7 @@
 /* just publish fake entries; for debugging */
 //#define NO_SEARCH
 
-//#define TRACE_GOOGLEFS
+#define TRACE_GOOGLEFS
 #ifdef TRACE_GOOGLEFS
 #	define TRACE(x) dprintf x
 #else
@@ -197,7 +197,7 @@ status_t googlefs_unmount(fs_volume *_volume)
 	/* anything in still in use ? */
 	for (node = ns->nodes; node; node = ns->nodes) {
 		ns->nodes = node->nlnext; /* better cache that before we free node */
-		googlefs_free_vnode(ns, node);
+		googlefs_free_vnode(_volume, node);
 	}
 	
 	// Unlike in BeOS, we need to put the reference to our root node ourselves
@@ -255,7 +255,7 @@ int googlefs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 		SLL_REMOVE(node->parent->children, next, node);
 		UNLOCK(&node->parent->l);
 	}
-	googlefs_free_vnode(ns, node);
+	googlefs_free_vnode(_volume, node);
 	if (!reenter)
 		UNLOCK(&ns->l);
 	return err;
@@ -597,7 +597,7 @@ int googlefs_free_cookie(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *co
 //	if (err)
 //		goto err_n_l;
 	if (/*!node->is_perm &&*/ false) { /* not yet */
-		err = remove_vnode(ns->nsid, node->vnid);
+		err = remove_vnode(_volume, node->vnid);
 		ns->root->st.st_mtime = time(NULL);
 #if 0
 		notify_listener(B_ENTRY_REMOVED, ns->nsid, ns->rootid, 0LL, node->vnid, NULL);
@@ -809,7 +809,7 @@ static int googlefs_unlink_gen(fs_volume *_volume, fs_node *dir, const char *nam
 			SLL_REMOVE(dir->children, next, n);
 			notify_entry_removed(ns->nsid, dir->vnid, name, n->vnid);
 			//notify_listener(B_STAT_CHANGED, ns->nsid, 0LL, 0LL, dir->vnid, NULL);
-			remove_vnode(ns->nsid, n->vnid);
+			remove_vnode(_volume, n->vnid);
 			err = B_OK;
 		}
 	}
