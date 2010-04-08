@@ -140,7 +140,7 @@ AutoConfigWindow::MessageReceived(BMessage* msg)
 bool 
 AutoConfigWindow::QuitRequested(void)
 {
-	return(TRUE);
+	return true;
 }
 
 
