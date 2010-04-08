@@ -28,6 +28,10 @@ public:
 								BControlLook();
 	virtual						~BControlLook();
 
+	// TODO: Probably more convenient to pull these enums into global
+	// namespace and rename them to e.g. "B_CONTROL_LOOK_FOCUSED" instead of
+	// "BControlLook::B_FOCUSED".
+
 	enum frame_type {
 		B_BUTTON_FRAME,
 		B_MENU_FRAME,
