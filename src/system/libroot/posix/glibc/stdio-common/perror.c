@@ -44,7 +44,7 @@ perror(const char *s)
 		colon = ": ";
 
 	if (strerror_r(errno, buffer, sizeof(buffer)) != 0)
-		sprintf("Unknown error %ld", errno);
+		snprintf(buffer, sizeof(buffer), "Unknown error %d", errno);
 
 	fprintf(stderr, "%s%s%s\n", s, colon, buffer);
 }
