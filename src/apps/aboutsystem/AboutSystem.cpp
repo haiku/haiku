@@ -1076,8 +1076,7 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(TR("The Haikuware team and their bounty program\n"));
 	fCreditsView->Insert(TR("The BeGeistert team\n"));
 	fCreditsView->Insert(TR("Google & their Google Summer of Code program\n\n"));
-	fCreditsView->Insert(TR("... and the many community members making "
-		"donations!\n\n"));
+	fCreditsView->Insert(TR("... and the many people making donations!\n\n"));
 
 	// copyrights for various projects we use
 
