@@ -1074,7 +1074,8 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(TR("Michael Phipps (project founder)\n\n"));
 	fCreditsView->Insert(TR("The Haiku-Ports team\n"));
 	fCreditsView->Insert(TR("The Haikuware team and their bounty program\n"));
-	fCreditsView->Insert(TR("The BeGeistert team\n\n"));
+	fCreditsView->Insert(TR("The BeGeistert team\n"));
+	fCreditsView->Insert(TR("Google & their Google Summer of Code program\n\n"));
 	fCreditsView->Insert(TR("... and the many community members making "
 		"donations!\n\n"));
 
