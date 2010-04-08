@@ -43,7 +43,7 @@ void sighdl(int sig)
 }
 
 int main() {
-	char semname[20];
+	char semname[50];
 	int val;
 
 	sprintf(semname, "/" FUNCTION "_" TEST "_%ld", (long)getpid());
@@ -59,7 +59,7 @@ int main() {
 
 	if( sem_post(gsemp) == -1 ) {
 		perror(ERROR_PREFIX "sem_post");
-		exit(PTS_UNRESOLVED); 
+		exit(PTS_UNRESOLVED);
 	}
 
 	/* Checking if the value of the Semaphore incremented by one */

@@ -40,12 +40,12 @@ void handler(int signo)
 {
 	if( sem_post(gsemp) == -1 ) {
 		perror(ERROR_PREFIX "sem_post");
-		exit(PTS_UNRESOLVED); 
+		exit(PTS_UNRESOLVED);
 	}
 }
 
 int main() {
-	char semname[20];
+	char semname[50];
 	struct sigaction act;
 	int val;
 

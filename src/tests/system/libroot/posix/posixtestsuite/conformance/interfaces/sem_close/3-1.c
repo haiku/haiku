@@ -1,13 +1,13 @@
 /*
     Copyright (c) 2002, Intel Corporation. All rights reserved.
     Created by:  majid.awad REMOVE-THIS AT intel DOT com
-    This file is licensed under the GPL license.  For the full content 
-    of this license, see the COPYING file at the top level of this 
+    This file is licensed under the GPL license.  For the full content
+    of this license, see the COPYING file at the top level of this
     source tree.
  */
 
 /*
-    sem_close will have no effect on the state of the semaphore if 
+    sem_close will have no effect on the state of the semaphore if
     sem_unlink has been unsuccessful.
 */
 
@@ -30,12 +30,12 @@
 int main()
 {
 	sem_t   *mysemp;
-	char semname[20];
+	char semname[50];
 
 	sprintf(semname, "/" FUNCTION "_" TEST "_%ld", (long)getpid());
 
 	mysemp = sem_open(semname, O_CREAT, 0444, 1) ;
-	if (mysemp == SEM_FAILED) {	
+	if (mysemp == SEM_FAILED) {
   		perror(ERROR_PREFIX "sem_open");
 		return PTS_UNRESOLVED;
 		}
@@ -47,7 +47,7 @@ int main()
 		}
 		puts("TEST PASSED");
 		return PTS_PASS;
-	} else { 
+	} else {
 
 		puts("TEST FAILED");
 		return PTS_FAIL;

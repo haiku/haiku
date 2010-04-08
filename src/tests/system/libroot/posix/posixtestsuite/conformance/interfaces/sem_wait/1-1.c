@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2003, Intel Corporation. All rights reserved.
  * Created by:  majid.awad REMOVE-THIS AT intel DOT com
- * This file is licensed under the GPL license.  For the full content 
- * of this license, see the COPYING file at the top level of this 
+ * This file is licensed under the GPL license.  For the full content
+ * of this license, see the COPYING file at the top level of this
  * source tree.
  */
 
@@ -29,7 +29,7 @@
 
 int main() {
 	sem_t *mysemp;
-	char semname[20];
+	char semname[50];
 	int val;
 
 	sprintf(semname, "/" FUNCTION "_" TEST "_%ld", (long)getpid());
@@ -45,7 +45,7 @@ int main() {
 	/* Lock Semaphore */
 	if( sem_wait(mysemp) == -1 ) {
 		perror(ERROR_PREFIX "sem_wait");
-		return PTS_UNRESOLVED; 
+		return PTS_UNRESOLVED;
 	}
 
 
@@ -60,7 +60,7 @@ int main() {
 		sem_close(mysemp);
 		sem_unlink(semname);
 		return PTS_PASS;
-	} else { 
+	} else {
 		puts("TEST FAILED");
 		return PTS_FAIL;
 	}

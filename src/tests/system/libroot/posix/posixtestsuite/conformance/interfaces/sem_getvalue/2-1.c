@@ -1,8 +1,8 @@
 /*
     Copyright (c) 2003, Intel Corporation. All rights reserved.
     Created by:  majid.awad REMOVE-THIS AT intel DOT com
-    This file is licensed under the GPL license.  For the full content 
-    of this license, see the COPYING file at the top level of this 
+    This file is licensed under the GPL license.  For the full content
+    of this license, see the COPYING file at the top level of this
     source tree.
  */
 
@@ -26,7 +26,7 @@
 
 int main() {
 
-	char semname[20];
+	char semname[50];
 	sem_t *mysemp;
 	int val;
 
@@ -47,7 +47,7 @@ int main() {
 
 	if( sem_getvalue(mysemp, &val) < 0 ) {
 		perror(ERROR_PREFIX "sem_getvalue");
-		return PTS_UNRESOLVED; 
+		return PTS_UNRESOLVED;
 	}
 
 	/*
