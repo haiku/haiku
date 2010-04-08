@@ -76,8 +76,8 @@ AutoConfig::PrintProviderInfo(provider_info* pInfo)
 	printf("pop_mail_host: %s\n", pInfo->pop_server.String());
 	printf("imap_mail_host: %s\n", pInfo->imap_server.String());
 	printf("smtp_host: %s\n", pInfo->smtp_server.String());
-	printf("pop authentification: %i\n", int(pInfo->authentification_pop));
-	printf("smtp authentification: %i\n",
+	printf("pop authentication: %i\n", int(pInfo->authentification_pop));
+	printf("smtp authentication: %i\n",
 			int(pInfo->authentification_smtp));
 	printf("username_pattern: %i\n",
 			int(pInfo->username_pattern));
@@ -142,7 +142,7 @@ AutoConfig::ReadProviderInfo(BNode *node, provider_info* info)
 		infoFound = true;
 	}
 
-	// authentification type
+	// authentication type
 	int32 authType;
 	size = node->ReadAttr(ATTR_NAME_AUTHPOP, B_INT32_TYPE, 0, &authType,
 							sizeof(int32));
