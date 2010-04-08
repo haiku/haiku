@@ -1083,6 +1083,11 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/common/bin/gvim ;
+		# TODO: move this symlink to the archive
+		AddSymlinkToHaikuImage common bin : vim : vi ;
+		# TODO: remove vimrc from the repository and add it to the archive
+		SEARCH on <etc>vimrc = [ FDirName $(HAIKU_TOP) data etc vim ] ;
+		AddFilesToHaikuImage common etc vim : <etc>vimrc ;
 	} else {
 		InstallOptionalHaikuImagePackage vim-7.2-r1a1-x86-gcc2-2009-09-06.zip
 			:  $(baseURL)/vim-7.2-r1a1-x86-gcc2-2009-09-06.zip
@@ -1090,6 +1095,11 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/common/bin/gvim ;
+		# TODO: move this symlink to the archive
+		AddSymlinkToHaikuImage common bin : vim : vi ;
+		# TODO: remove vimrc from the repository and add it to the archive
+		SEARCH on <etc>vimrc = [ FDirName $(HAIKU_TOP) data etc vim ] ;
+		AddFilesToHaikuImage common etc vim : <etc>vimrc ;
 	}
 }
 

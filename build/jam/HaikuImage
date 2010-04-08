@@ -376,8 +376,6 @@ AddSymlinkToHaikuImage system bin : unzip : zipinfo ;
 AddSymlinkToHaikuImage system bin : gawk : awk ;
 AddSymlinkToHaikuImage system bin : grep : egrep ;
 AddSymlinkToHaikuImage system bin : grep : fgrep ;
-AddSymlinkToHaikuImage system bin : vim : vi ;
-AddSymlinkToHaikuImage system bin : vim : view ;
 
 
 # scripts and data files
@@ -426,9 +424,6 @@ SEARCH on <bash_completion>subversion =
 	[ FDirName $(HAIKU_TOP) data etc bash_completion.d ] ;
 AddFilesToHaikuImage common etc bash_completion.d :
 	<bash_completion>subversion ;
-
-SEARCH on <etc>vimrc = [ FDirName $(HAIKU_TOP) data etc vim ] ;
-AddFilesToHaikuImage common etc vim : <etc>vimrc ;
 
 local dataFiles = teapot.data ;
 dataFiles = $(dataFiles:G=data) ;
