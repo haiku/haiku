@@ -262,7 +262,7 @@ VMAreaHash::Find(const char* name)
 VMAreaHash::Insert(VMArea* area)
 {
 	WriteLock();
-	sTable.Insert(area);
+	sTable.InsertUnchecked(area);
 	WriteUnlock();
 }
 
@@ -271,6 +271,6 @@ VMAreaHash::Insert(VMArea* area)
 VMAreaHash::Remove(VMArea* area)
 {
 	WriteLock();
-	sTable.Remove(area);
+	sTable.RemoveUnchecked(area);
 	WriteUnlock();
 }
