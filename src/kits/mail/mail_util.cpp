@@ -327,7 +327,6 @@ static int handle_non_rfc2047_encoding(char **buffer,size_t *bufferLength,size_t
 
 _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 {
-	char *string = *bufp;
 	char *head, *tail;
 	char *charset, *encoding, *end;
 	ssize_t ret = B_OK;
@@ -335,6 +334,8 @@ _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 	if (bufp == NULL || *bufp == NULL)
 		return -1;
 
+	char *string = *bufp;
+	
 	//---------Handle *&&^%*&^ non-RFC compliant, 8bit mail
 	if (handle_non_rfc2047_encoding(bufp,bufLen,&strLen))
 		return strLen;
