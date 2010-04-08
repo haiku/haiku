@@ -388,8 +388,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 		: $(baseURL)/automake-1.11.1-x86-gcc2-2009-12-23.zip
 		:
 		: true ;
-	InstallOptionalHaikuImagePackage libtool-2.2.6b-x86-gcc2-2009-11-18.zip
-		: $(baseURL)/libtool-2.2.6b-x86-gcc2-2009-11-18.zip
+	InstallOptionalHaikuImagePackage libtool-2.2.6b-x86-gcc2-2010-04-08.zip
+		: $(baseURL)/libtool-2.2.6b-x86-gcc2-2010-04-08.zip
 		:
 		: true ;
 	InstallOptionalHaikuImagePackage texinfo-4.13a-r1a1-x86-gcc2-2009-08-30.zip
