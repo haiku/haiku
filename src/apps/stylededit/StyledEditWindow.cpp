@@ -841,14 +841,36 @@ StyledEditWindow::Save(BMessage* message)
 
 	status_t status = B_ERROR;
 	if (dir.InitCheck() == B_OK && entry.InitCheck() == B_OK) {
+		struct stat st;
 		BFile file(&entry, B_READ_WRITE | B_CREATE_FILE);
-		if (file.InitCheck() == B_OK)
+		if (file.InitCheck() == B_OK
+			&& (status = file.GetStat(&st)) == B_OK) {
+			// check the file permissions
+			if (!((getuid() == st.st_uid && (S_IWUSR & st.st_mode))
+				|| (getgid() == st.st_gid && (S_IWGRP & st.st_mode))
+				|| (S_IWOTH & st.st_mode))) {
+				BString alertText;
+				bs_printf(&alertText, TR("This file is marked Read-Only. "
+					"Save changes to the document \"%s\"? "), name);
+				switch (_ShowAlert(alertText, TR("Cancel"), TR("Don't save"),
+					TR("Save"), B_WARNING_ALERT)) {
+					case 0:
+						return B_CANCELED;
+					case 1:
+						return B_OK;
+					default:
+						break;
+				}
+			}
+			
 			status = fTextView->WriteStyledEditFile(&file);
+		}
 	}
 
 	if (status != B_OK) {
 		BString alertText;
-		bs_printf(&alertText, TR("Error saving \"%s\":\n%s"), name, strerror(status));
+		bs_printf(&alertText, TR("Error saving \"%s\":\n%s"), name,
+			strerror(status));
 
 		_ShowAlert(alertText, TR("OK"), "", "", B_STOP_ALERT);
 		return status;
