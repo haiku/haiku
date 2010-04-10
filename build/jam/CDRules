@@ -2,7 +2,7 @@ rule BuildHaikuCD haikuCD : bootFloppy : scripts
 {
 	# BuildHaikuCD <haiku cd> : <bootFloppy> : <scripts> ;
 
-	local mainScript = build_haiku_cd ;
+	local mainScript = build_haiku_image ;
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
 
 	Depends $(haikuCD) : $(mainScript) $(scripts) ;

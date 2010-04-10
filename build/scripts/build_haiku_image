@@ -5,50 +5,69 @@ set -o errexit
 # sourceDir
 # outputDir
 # tmpDir
+# addBuildCompatibilityLibDir
+# The following are only for image types:
 # installDir
 # isImage
 # imagePath
 # imageSize
 # imageLabel
-# addBuildCompatibilityLibDir
 # updateOnly
 # dontClearImage
 # isVMwareImage
 # optionalPackageDescriptions
 #
 # addattr
-# bfsShell
 # copyattr
-# fsShellCommand
-# makebootable
-# resattr
 # rc
 # rmAttrs
 # unzip
+# The following are only for image types:
+# bfsShell
+# fsShellCommand
+# makebootable
+# resattr
 # vmdkimage
+# The following is only for cd types:
+# generate_attribute_stores
+# isCD
 #
 if [ $# -gt 0 ]; then
 	. $1
 	shift
 fi
 
-# If the haiku image path is a symlink resolve it now (makebootable needs the
-# path of the actual device path under Linux).
-normalizedImagePath=''
-if readlink -f "$imagePath" > /dev/null 2>&1 ; then
-	normalizedImagePath=$(readlink -f "$imagePath")
-elif greadlink -f "$imagePath" > /dev/null 2>&1 ; then
-	normalizedImagePath=$(greadlink -f "$imagePath")
-fi
-if [ -n "$normalizedImagePath" ]; then
-	imagePath="$normalizedImagePath"
+if [ ! $isCD ]; then
+	# If the haiku image path is a symlink resolve it now (makebootable needs the
+	# path of the actual device path under Linux).
+	normalizedImagePath=''
+	if readlink -f "$imagePath" > /dev/null 2>&1 ; then
+		normalizedImagePath=$(readlink -f "$imagePath")
+	elif greadlink -f "$imagePath" > /dev/null 2>&1 ; then
+		normalizedImagePath=$(greadlink -f "$imagePath")
+	fi
+	if [ -n "$normalizedImagePath" ]; then
+		imagePath="$normalizedImagePath"
+	fi
 fi
 
 # this adds the build library dir to LD_LIBRARY_PATH
 eval "$addBuildCompatibilityLibDir"
 
 # map the shell commands
-if [ $isImage ]; then
+if [ $isCD ]; then
+	outputDir=$tmpDir/cdsource
+
+	sPrefix=
+	tPrefix="$outputDir/"
+	cd=cd
+	scd=:
+	cp="$copyattr -d"
+	copyAttrs="$copyattr"
+	ln=ln
+	mkdir=mkdir
+	rm=rm
+elif [ $isImage ]; then
 	sPrefix=:
 	tPrefix=/myfs/
 	cd="$fsShellCommand cd"
@@ -119,6 +138,11 @@ if [ "$optionalPackageDescriptions" ]; then
 	cp "$optionalPackageDescriptions" $copyrightsFile
 fi
 
+if [ $isCD ]; then
+	# setup output dir
+	$rmAttrs -rf "$outputDir"
+	mkdir -p "$outputDir"
+fi 
 
 # create the image and mount it
 if [ $isImage ]; then
@@ -225,6 +249,21 @@ if [ ! $updateOnly ]; then
 	fi
 fi
 
+if [ $isCD ]; then
+	# generate the attribute stores
+	echo "Generating attribute stores ..."
+	$generate_attribute_stores "$tPrefix"
+
+	echo "Copying boot image ..."
+	$cp "$cdBootFloppy" "$outputDir"
+
+	# build the iso image
+	echo "Building CD image ..."
+	mkisofs -uid 0 -gid 0 -b `basename $cdBootFloppy` -R -V "$cdLabel" -o "$cdImagePath" "$tPrefix"
+
+	# cleanup output dir
+	$rmAttrs -rf "$outputDir"
+fi
 
 # unmount
 if [ $isImage ]; then
