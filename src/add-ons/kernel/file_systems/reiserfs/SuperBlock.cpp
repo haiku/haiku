@@ -32,9 +32,10 @@ using std::nothrow;
 	\class DirEntry
 	\brief Represents the on-disk structure for super block of the FS.
 
-	There exist two versions of the structure and this class can deal with
-	both of them. The Init() methods tries to find and read the super block
-	from disk.
+	There exist two versions of the structure and this class can deal with both
+	of them. This class can also handle a very old layout that puts the super
+	block in a different location. The Init() methods tries to find and read
+	the super block from disk.
 */
 
 // read_super_block
@@ -95,14 +96,18 @@ SuperBlock::~SuperBlock()
 status_t
 SuperBlock::Init(int device, off_t offset)
 {
-	// Not sure, if I understand the weird versioning.
 	status_t error = B_OK;
-	// try old version
+	// try old version and old layout
 	if (read_super_block(device, REISERFS_OLD_DISK_OFFSET_IN_BYTES + offset,
 						 REISERFS_SUPER_MAGIC_STRING, &fOldData) == B_OK) {
+PRINT(("SuperBlock: ReiserFS 3.5 (old layout)\n"));
+		fFormatVersion = REISERFS_3_5;
+	// try old version and new layout
+	} else if (read_super_block(device, REISERFS_DISK_OFFSET_IN_BYTES + offset,
+			REISERFS_SUPER_MAGIC_STRING, &fOldData) == B_OK) {
 PRINT(("SuperBlock: ReiserFS 3.5\n"));
 		fFormatVersion = REISERFS_3_5;
-	// try new version
+	// try new version and new layout
 	} else if (read_super_block(device, REISERFS_DISK_OFFSET_IN_BYTES + offset,
 			REISER2FS_SUPER_MAGIC_STRING, &fOldData) == B_OK) {
 PRINT(("SuperBlock: ReiserFS 3.6\n"));
