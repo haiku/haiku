@@ -11,6 +11,7 @@
 /*
  * Top -- a program for finding the top cpu-eating threads
  */
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,7 +45,16 @@ static thread_time_list_t freelist[FREELIST_SIZE];
 
 static char *clear_string; /* output string for clearing the screen */
 static int rows;	/* how many rows on the screen */
+static int screen_size_changed = 0;	/* tells to refresh the screen size */
 static int cpus;	/* how many cpus we are runing on */
+
+/* SIGWINCH handler */
+static void
+winch_handler(int notused)
+{
+	(void) notused;
+	screen_size_changed = 1;
+}
 
 /*
  * Grow the list to add just one more entry
@@ -289,7 +299,7 @@ compare(
 }
 
 static int
-setup_term(void)
+setup_term(bool onlyRows)
 {
 	char *term;
 	char *str;
@@ -304,6 +314,8 @@ setup_term(void)
 		return (0);
 	}
 	rows = ws.ws_row;
+	if (onlyRows)
+		return 1;
 	term = getenv("TERM");
 	if (term == NULL) {
 		return (0);
@@ -357,6 +369,10 @@ gather(
 	old_busy = *busy_wait_time;
 	*busy_wait_time = info._busy_wait_time;
 	if (old != NULL) {
+		if (screen_size_changed) {
+			setup_term(true);
+			screen_size_changed = 0;
+		}
 		compare(old, &times, old_busy, *busy_wait_time, uinterval, refresh);
 		free_times(old);
 	}
@@ -423,7 +439,7 @@ main(int argc, char **argv)
 		usage(myname);
 	}
 	if (refresh) {
-		if (!setup_term()) {
+		if (!setup_term(false)) {
 			refresh = 0;
 		}
 	}
@@ -436,6 +452,9 @@ main(int argc, char **argv)
 			   (iters == 1) ? "" : "s", interval,
 			   (interval == 1) ? "" : "s");
 	}
+	
+	signal(SIGWINCH, winch_handler);
+	
 	then = system_time();
 	uinterval = interval * 1000000;
 	baseline = gather(NULL, &busy, 0, refresh);
