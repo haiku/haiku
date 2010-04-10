@@ -105,16 +105,20 @@ function dev() {
 	history -r
 	# set the prompt
 	# cf. http://tldp.org/HOWTO/Bash-Prompt-HOWTO/
+	NICEPS1='\[\033[1m\][\u@\h \w]\[\033[0m\]\$ '
 	case "$TERM" in
 	dumb|emacs)
 		# simpler prompt
 		export PS1='[\u@\h \w]\$ '
 		;;
+	linux)
+		export PS1="$NICEPS1"
+		;;
 	*)
 		# prompt: set window title to [project:folder] also
 		#export PS1='\[\033]0;['$1':\W]\a\]\[\033[1m\][\u@\h \w]\[\033[0m\]\$ '
 		#export PS1='\033]0;['$1':\W]\a\033[1m[\u@\h \w]\033[0m\$ '
-		export PS1='\[\033[1m\][\u@\h \w]\[\033[0m\]\$ '
+		export PS1="$NICEPS1"
 		export PROMPT_COMMAND='echo -en "\033]0;['$1':${PWD##*/}]\a"'
 		;;
 	esac
@@ -122,6 +126,9 @@ function dev() {
 	case "$OSTYPE" in
 	beos|haiku)
 		prio $$ 1
+		;;
+	darwin10.*)
+		renice 3 $$
 		;;
 	linux-*)
 		# linux doesn't really need it much
