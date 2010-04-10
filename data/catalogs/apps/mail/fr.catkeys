@@ -1,8 +1,9 @@
-1	french	x-vnd.Be-MAIL	2102081210
+1	french	x-vnd.Be-MAIL	3640755640
+View	Mail		Vue
 %d - Date	Mail		%d - Date
-Attach attributes:	Mail		Attributs du fichier joint:
-Inconsistency occurred in the undo/redo buffer.	Mail		Une erreur est survenur dans le tampon d'annulation.
-An error occurred trying to save the attachment.	Mail		Une erreur s'est produit en essayent de sauvegarder le fichier joint.
+Attach attributes:	Mail		Attributs du fichier joint : 
+Inconsistency occurred in the undo/redo buffer.	Mail		Une erreur est survenue dans le tampon d'annulation.
+An error occurred trying to save the attachment.	Mail		Une erreur s'est produite en essayant de sauvegarder le fichier joint.
 Copy to new	Mail		Copier vers nouveau
 Edit	Mail		Modifier
 Print	Mail		Imprimer
@@ -13,23 +14,23 @@ Subject:	Mail		Sujet :
 Reply to all	Mail		Répondre à tous
 Show icons & labels	Mail		Montrer les icônes et les textes
 Remove attachment	Mail		Retirer le fichier joint
-Button bar:	Mail		Button bar :
+Button bar:	Mail		Barre d'icônes :
 Beginner	Mail		Débutant
 Don't save	Mail		Ne pas enregistrer
 Expert	Mail		Expert
-Reply account:	Mail		Compte pour la réponse:
+Reply account:	Mail		Compte pour la réponse :
 Discard	Mail		Ignorer
 Message	Mail		Message
 Reply to sender	Mail		Répondre à l'expéditeur
 There is no installed handler for URL links.	Mail		Il n'y a pas d'application pour ouvrir les liens.
 Signature	Mail		Signature
-Find again	Mail		Chercher encore
-Bcc:	Mail		Bcc :
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Votre texte principal contient %ld charactères non décodables. Peut être qu'un jeu de charactère différent fonctionnerait mieux? Sélectionnez Envoyer pour envoyer le message tout de même (un caractère de substitution remplacera ceux qui ne peuvent être encodés), ou choisissez Annuler pour revenir et essayer de régler le problème.
+Find again	Mail		Chercher de nouveau
+Bcc:	Mail		Cci :
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Votre texte principal contient %ld charactères non décodables. Peut être qu'un jeu de charactère différent fonctionnerait mieux? Sélectionnez "Envoyer" pour envoyer le message tout de même (un caractère de substitution remplacera ceux qui ne peuvent être encodés), ou choisissez "Annuler" pour revenir et essayer de régler le problème.
 Signature:	Mail		Signature :
 Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nÉcrit par Robert Polic.\nAmélioré par Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
-Save changes to this signature?	Mail		Sauver les changements apportés à cette signature ?
-Cc:	Mail		Cc:
+Save changes to this signature?	Mail		Enregistrer les modifications apportées à cette signature ?
+Cc:	Mail		Cc :
 Find	Mail		Trouver
 Preferences…	Mail		Préférences…
 Undo	Mail		Annuler
@@ -55,26 +56,26 @@ Quit	Mail		Quitter
 %n - Full name	Mail		%n - Nom complet
  Read 	Mail		Lu
 Trash	Mail		Corbeille
-Default account:	Mail		Compte par défaut:
-Size:	Mail		Taille:
+Default account:	Mail		Compte par défaut :
+Size:	Mail		Taille :
 Account from mail	Mail		Compte de courrier
 Edit signatures…	Mail		Modifier les signatures…
 New	Mail		Nouveau
-Attachments: 	Mail		Fichiers attachés: 
+Attachments: 	Mail		Fichiers attachés : 
 Set to %s	Mail		Changer en %s
 Forward	Mail		Transférer
 E-mail draft could not be saved!	Mail		Le brouillon n'a pu être sauvegardé!
-To:	Mail		À:
+To:	Mail		À :
 Only files can be added as attachments.	Mail		Seuls des fichiers peuvent être joints à un message.
 Previous message	Mail		Message précédent
-Title:	Mail		Titre:
+Title:	Mail		Titre :
 Find…	Mail		Chercher…
 Accounts…	Mail		Comptes…
 Mail preferences	Mail		Préférences du courriel
 Initial spell check mode:	Mail		Mode de correction orthographique initial :
 Leave same	Mail		Laisser à l'identique
 About Mail…	Mail		A propos de Mail…
-Page setup…	Mail		Réglages de page…
+Page setup…	Mail		Mise en page…
 Text wrapping:	Mail		Retour à la ligne :
 Revert	Mail		Défaire
 File	Mail		Fichier
@@ -99,11 +100,12 @@ Send message	Mail		Envoyer le message
 Remove enclosure	Mail		Enlever pièce-jointe
 Account:	Mail		Compte :
 Decoding:	Mail		Décodage :
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Désolé, aucune application ne poeut ouvrir les données 'Person'.
-Do you wish to send this message before closing?	Mail		Voulez-vous fermer ce message avant de l'anvoyer ?
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Désolé, aucune application ne peut ouvrir les données 'Person'.
+Do you wish to send this message before closing?	Mail		Voulez-vous fermer ce message avant de l'envoyer ?
 Delete	Mail		Effacer
 Leave as '%s'	Mail		Laisser '%s'
 Copy	Mail		Copier
+Mail couldn't find its dictionary.	Mail		Mail n'a pas trouvé son dictionaire.
 Reply preamble:	Mail		Préambule de réponse :
 Signatures	Mail		Signatures
 Next	Mail		Suivant
@@ -122,8 +124,7 @@ Save as draft	Mail		Sauvegarder comme brouillon
 The mail_daemon could not be started:\n\t	Mail		mail_daemon n'a pu être démarré :\n\t
 Open attachment	Mail		Ouvrir le fichier joint
 Reply	Mail		Répondre
-The spell check feature requires the optional \"words\" file on your BeOS CD.	Mail		La correction orthographique a besoin du fichier \"words\".
-From:	Mail		De:
+From:	Mail		De :
 Couldn't open this signature. Sorry.	Mail		Cette signature n'a pu être ouverte. Désolé.
 Open draft	Mail		Ouvrir le brouillon
 Cut	Mail		Couper
@@ -131,11 +132,11 @@ Check spelling	Mail		Vérifier l'orthographe
 Set to Saved	Mail		Set to Saved
 Open this link	Mail		Ouvrir ce lien
 Auto signature:	Mail		Signature automatique :
-Add signature	Mail		Ajouter la signautre
+Add signature	Mail		Ajouter la signature
 Need Tracker to move items to trash	Mail		Le tracker est indispensable pour mettre des objets à la poubelle.
 Mailing	Mail		Publipostage
 Unread	Mail		Non lu
 Remove quote	Mail		Enlever la citation
 Move to trash	Mail		Déplacer vers la corbeille
 Select all	Mail		Tout sélectionner
-An error occurred trying to save this signature.	Mail		Une erreur est survenue en essayent de sauvegarder cette signature.
+An error occurred trying to save this signature.	Mail		Une erreur est survenue en essayant de sauvegarder cette signature.
