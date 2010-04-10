@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <SupportDefs.h>
 
 struct uhci_td_control_status {
