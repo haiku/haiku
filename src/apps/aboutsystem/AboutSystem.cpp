@@ -1196,9 +1196,9 @@ AboutView::_CreateCreditsView()
 			COPYRIGHT_STRING "1987, 1988 Digital Equipment "
 			"Corporation, Maynard, Massachusetts.\n"
 			"All rights reserved.",
-			NULL));
-			// TODO: License!
-			// NOTE: headers/build/private/interface/RegionSupport.h
+			NULL)
+		.SetLicenses("OpenGroup", "DEC", NULL));
+			// TODO: URL
 
 	// VL-Gothic font
 	_AddPackageCredit(PackageCredit("VL-Gothic font")
