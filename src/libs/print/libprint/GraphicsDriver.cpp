@@ -581,7 +581,8 @@ GraphicsDriver::printJob(BFile *spoolFile)
 			}
 			endDoc(success);
 		
-			fStatusWindow -> Quit();
+			fStatusWindow->Lock();
+			fStatusWindow->Quit();
 		}
 		cleanupBitmap();
 		cleanupData();
