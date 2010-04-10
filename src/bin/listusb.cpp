@@ -155,7 +155,7 @@ main(int argc, char *argv[])
 			if (argv[i][1] == 'v')
 				verbose = true;
 			else {
-				printf("Usage: listusb [-v] [device]");
+				printf("Usage: listusb [-v] [device]\n\n");
 				printf("-v: Show more detailed information including interfaces, configurations, etc.\n\n");
 				printf("If a device is not specified, all devices found on the bus will be listed\n");
 				return 1;
