@@ -36,6 +36,7 @@ All rights reserved.
 
 
 #include <Application.h>
+#include <Catalog.h>
 #include <List.h>
 #include "BarWindow.h"
 #include "PreferencesWindow.h"
@@ -178,6 +179,8 @@ class TBarApp : public BApplication {
 		static BLocker sSubscriberLock;
 		static BList sBarTeamInfoList;
 		static BList sSubscribers;
+
+		BCatalog fCatalog;
 };
 
 #endif	// BAR_APP_H

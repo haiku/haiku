@@ -39,10 +39,12 @@ All rights reserved.
 #include <AppFileInfo.h>
 #include <Autolock.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Dragger.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <Mime.h>
 #include <Path.h>
 #include <Roster.h>
@@ -93,6 +95,7 @@ TBarApp::TBarApp()
 	InitSettings();
 	InitIconPreloader();
 
+	be_locale->GetAppCatalog(&fCatalog);
 	be_roster->StartWatching(this);
 
 	sBarTeamInfoList.MakeEmpty();

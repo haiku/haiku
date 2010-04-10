@@ -37,7 +37,9 @@ All rights reserved.
 
 #include <string.h>
 
+#include <Catalog.h>
 #include <Debug.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
 #include <PopUpMenu.h>
@@ -65,6 +67,9 @@ enum {
 	kShowCalendar
 };
 
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "TimeView"
 
 TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 	bool milTime, bool fullDate, bool euroDate, bool)
@@ -171,12 +176,12 @@ TTimeView::GetPreferredSize(float* width, float* height)
 	// overlap the bevels in the parent view.
 	if (ShowingDate())
 		*width = fOrientation ?
-			 min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fDateStr))
-			 : kHMargin + StringWidth(fDateStr);
+			min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fDateStr))
+			: kHMargin + StringWidth(fDateStr);
 	else {
 		*width = fOrientation ?
-			 min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fTimeStr))
-			 : kHMargin + StringWidth(fTimeStr);
+			min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fTimeStr))
+			: kHMargin + StringWidth(fTimeStr);
 	}
 }
 
@@ -295,7 +300,7 @@ TTimeView::StartLongClickNotifier(BPoint where)
 		// use the doubleClickSpeed as a threshold
 
 	fLongClickMessageRunner = new BMessageRunner(BMessenger(this),
-		 &longClickMessage, longClickThreshold, 1);
+		&longClickMessage, longClickThreshold, 1);
 }
 
 
@@ -323,7 +328,7 @@ TTimeView::GetCurrentTime()
 	}
 
 	//	remove leading 0 from time when hour is less than 10
-	const char *str = tmp;
+	const char* str = tmp;
 	if (str[0] == '0')
 		str++;
 
@@ -544,7 +549,7 @@ TTimeView::CalculateTextPlacement()
 	BRect rectArray[1];
 	escapement_delta delta = { 0.0, 0.0 };
 	font.GetBoundingBoxesForStrings(stringArray, 1, B_SCREEN_METRIC, &delta,
-		 rectArray);
+		rectArray);
 
 	fTimeLocation.y = fDateLocation.y = ceilf((bounds.Height() -
 		rectArray[0].Height() + 1.0) / 2.0 - rectArray[0].top);
@@ -558,14 +563,14 @@ TTimeView::ShowClockOptions(BPoint point)
 	menu->SetFont(be_plain_font);
 	BMenuItem* item;
 
-	item = new BMenuItem("Change time" B_UTF8_ELLIPSIS,
+	item = new BMenuItem(TR("Change time" B_UTF8_ELLIPSIS),
 		new BMessage(kChangeClock));
 	menu->AddItem(item);
 
-	item = new BMenuItem("Hide time", new BMessage('time'));
+	item = new BMenuItem(TR("Hide time"), new BMessage('time'));
 	menu->AddItem(item);
 
-	item = new BMenuItem("Show calendar" B_UTF8_ELLIPSIS,
+	item = new BMenuItem(TR("Show calendar" B_UTF8_ELLIPSIS),
 		new BMessage(kShowCalendar));
 	menu->AddItem(item);
 

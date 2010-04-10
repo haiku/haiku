@@ -47,9 +47,11 @@ All rights reserved.
 #include <Application.h>
 #include <Beep.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Directory.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
@@ -118,6 +120,9 @@ DumpList(BList* itemlist)
 #endif	/* DB_ADDONS */
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Tray"
+
 // don't change the name of this view to anything other than "Status"!
 
 TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
@@ -162,6 +167,7 @@ TReplicantTray::AttachedToWindow()
 
 	Window()->SetPulseRate(1000000);
 	DealWithClock(fBarView->ShowingClock());
+
 
 #ifdef DB_ADDONS
 	// load addons and rehydrate archives
@@ -412,7 +418,7 @@ TReplicantTray::ShowReplicantMenu(BPoint point)
 	if (fBarView->ShowingClock())
 		fClock->ShowClockOptions(ConvertToScreen(point));
 	else {
-		BMenuItem* item = new BMenuItem("Show Time", new BMessage('time'));
+		BMenuItem* item = new BMenuItem(TR("Show Time"), new BMessage('time'));
 		menu->AddItem(item);
 		menu->SetTargetForItems(this);
 		BPoint where = ConvertToScreen(point);
@@ -562,7 +568,7 @@ TReplicantTray::RunAddOnQuery(BVolume* volume, const char* predicate)
 
 
 bool
-TReplicantTray::IsAddOn(entry_ref &ref)
+TReplicantTray::IsAddOn(entry_ref& ref)
 {
 	BFile file(&ref, B_READ_ONLY);
 
@@ -574,7 +580,7 @@ TReplicantTray::IsAddOn(entry_ref &ref)
 
 
 DeskbarItemInfo*
-TReplicantTray::DeskbarItemFor(node_ref &nodeRef)
+TReplicantTray::DeskbarItemFor(node_ref& nodeRef)
 {
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
 		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->ItemAt(i);
@@ -606,7 +612,7 @@ TReplicantTray::DeskbarItemFor(int32 id)
 
 
 bool
-TReplicantTray::NodeExists(node_ref &nodeRef)
+TReplicantTray::NodeExists(node_ref& nodeRef)
 {
 	return DeskbarItemFor(nodeRef) != NULL;
 }
@@ -837,7 +843,7 @@ TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool force)
 
 
 status_t
-TReplicantTray::AddItem(int32 id, node_ref nodeRef, BEntry &entry, bool isAddOn)
+TReplicantTray::AddItem(int32 id, node_ref nodeRef, BEntry& entry, bool isAddOn)
 {
 	DeskbarItemInfo* item = new DeskbarItemInfo;
 	if (item == NULL)
@@ -1200,7 +1206,7 @@ TReplicantTray::ViewAt(int32* index, int32* id, int32 target, bool byIndex)
 	*index = -1;
 	
 	BView* view;
-	if (byIndex){
+	if (byIndex) {
 		if (fShelf->ReplicantAt(target, &view, (uint32*)id)) {
 			if (view) {
 				*index = target;
@@ -1386,7 +1392,7 @@ TReplicantTray::RealignReplicants(int32 startIndex)
 		fRightBottomReplicant.Set(0, 0, 0, 0);
 
 	BView* view = NULL;
-	for (int32 i = startIndex ; i < count ; i++){
+	for (int32 i = startIndex ; i < count ; i++) {
 		fShelf->ReplicantAt(i, &view);
 		if (view != NULL) {
 			BPoint loc = LocationForReplicant(i, view->Frame().Width());
@@ -1459,9 +1465,9 @@ TDragRegion::FrameMoved(BPoint)
 {
 	if (fBarView->Left() && fBarView->Vertical() && fDragLocation
 		!= kNoDragRegion)
-		fChild->MoveTo(5,2);
+		fChild->MoveTo(5, 2);
 	else
-		fChild->MoveTo(2,2);
+		fChild->MoveTo(2, 2);
 }
 
 
@@ -1572,7 +1578,7 @@ TDragRegion::DragRegion() const
 	dragRegion.top += kTopBottomInset;
 	dragRegion.bottom -= kTopBottomInset;
 
-	bool placeOnLeft=false;
+	bool placeOnLeft = false;
 	if (fDragLocation == kAutoPlaceDragRegion) {
 		if (fBarView->Vertical() && fBarView->Left())
 			placeOnLeft = true;
@@ -1608,7 +1614,7 @@ TDragRegion::MouseDown(BPoint thePoint)
 	if (!dragRegion.Contains(thePoint))
 		return;
 
-	while(true) {
+	while (true) {
 		GetMouse(&where, &buttons);
 		if (!buttons)
 			break;

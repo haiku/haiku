@@ -9,8 +9,10 @@
 
 #include "PreferencesWindow.h"
 
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <GroupLayout.h>
+#include <Locale.h>
 #include <LayoutBuilder.h>
 #include <OpenWithTracker.h>
 #include <RadioButton.h>
@@ -22,17 +24,20 @@
 #include "StatusView.h"
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "PreferencesWindow"
+
 PreferencesWindow::PreferencesWindow(BRect frame)
 	:
-	BWindow(frame, "Deskbar preferences", B_TITLED_WINDOW,
+	BWindow(frame, TR("Deskbar preferences"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	// Controls
-	fMenuRecentDocuments = new BCheckBox("Recent documents:",
+	fMenuRecentDocuments = new BCheckBox(TR("Recent documents:"),
 		new BMessage(kUpdateRecentCounts));
-	fMenuRecentApplications = new BCheckBox("Recent applications:",
+	fMenuRecentApplications = new BCheckBox(TR("Recent applications:"),
 		new BMessage(kUpdateRecentCounts));
-	fMenuRecentFolders = new BCheckBox("Recent folders:",
+	fMenuRecentFolders = new BCheckBox(TR("Recent folders:"),
 		new BMessage(kUpdateRecentCounts));
 
 	fMenuRecentDocumentCount = new BTextControl(NULL, NULL,
@@ -42,25 +47,25 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fMenuRecentFolderCount = new BTextControl(NULL, NULL,
 		new BMessage(kUpdateRecentCounts));
 
-	fAppsSort = new BCheckBox("Sort running applications",
+	fAppsSort = new BCheckBox(TR("Sort running applications"),
 		new BMessage(kSortRunningApps));
-	fAppsSortTrackerFirst = new BCheckBox("Tracker always first",
+	fAppsSortTrackerFirst = new BCheckBox(TR("Tracker always first"),
 		new BMessage(kTrackerFirst));
-	fAppsShowExpanders = new BCheckBox("Show application expander",
+	fAppsShowExpanders = new BCheckBox(TR("Show application expander"),
 		new BMessage(kSuperExpando));
-	fAppsExpandNew = new BCheckBox("Expand new applications",
+	fAppsExpandNew = new BCheckBox(TR("Expand new applications"),
 		new BMessage(kExpandNewTeams));
 
-	fClock24Hours = new BCheckBox("24 hour clock", new BMessage(kMilTime));
-	fClockSeconds = new BCheckBox("Show seconds",
+	fClock24Hours = new BCheckBox(TR("24 hour clock"), new BMessage(kMilTime));
+	fClockSeconds = new BCheckBox(TR("Show seconds"),
 		new BMessage(kShowSeconds));
-	fClockEuropeanDate = new BCheckBox("European date",
+	fClockEuropeanDate = new BCheckBox(TR("European date"),
 		new BMessage(kEuroDate));
-	fClockFullDate = new BCheckBox("Full date", new BMessage(kFullDate));
+	fClockFullDate = new BCheckBox(TR("Full date"), new BMessage(kFullDate));
 
-	fWindowAlwaysOnTop = new BCheckBox("Always on top",
+	fWindowAlwaysOnTop = new BCheckBox(TR("Always on top"),
 		new BMessage(kAlwaysTop));
-	fWindowAutoRaise = new BCheckBox("Auto-raise", new BMessage(kAutoRaise));
+	fWindowAutoRaise = new BCheckBox(TR("Auto-raise"), new BMessage(kAutoRaise));
 
 	BTextView* docTextView = fMenuRecentDocumentCount->TextView();
 	BTextView* appTextView = fMenuRecentApplicationCount->TextView();
@@ -149,10 +154,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fClockBox = new BBox("fClockBox");
 	fWindowBox = new BBox("fWindowBox");
 
-	fMenuBox->SetLabel("Menu");
-	fAppsBox->SetLabel("Applications");
-	fClockBox->SetLabel("Clock");
-	fWindowBox->SetLabel("Window");
+	fMenuBox->SetLabel(TR("Menu"));
+	fAppsBox->SetLabel(TR("Applications"));
+	fClockBox->SetLabel(TR("Clock"));
+	fWindowBox->SetLabel(TR("Window"));
 
 	BView* view;
 	view = BLayoutBuilder::Group<>()
@@ -169,7 +174,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 					.Add(fMenuRecentApplicationCount)
 					.End()
 				.End()
-			.Add(new BButton("Edit menu" B_UTF8_ELLIPSIS,
+			.Add(new BButton(TR("Edit menu" B_UTF8_ELLIPSIS),
 				new BMessage(kEditMenuInTracker)))
 			.SetInsets(10, 10, 10, 10)
 			.End()

@@ -34,7 +34,9 @@ All rights reserved.
 
 #include <Debug.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Dragger.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Roster.h>
@@ -49,6 +51,9 @@ All rights reserved.
 #include "RecentItems.h"
 #include "StatusView.h"
 #include "tracker_private.h"
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "BeMenu"
 
 #define ROSTER_SIG "application/x-vnd.Be-ROST"
 
@@ -67,6 +72,8 @@ class DeskbarMountMenu : public BPrivate::MountMenu {
 namespace BPrivate {
 	BMenu* TrackerBuildRecentFindItemsMenu(const char*);
 }
+
+
 using namespace BPrivate;
 
 
@@ -134,7 +141,7 @@ void
 TBeMenu::DoneBuildingItemList()
 {
 	if (fItemList->CountItems() <= 0) {
-		BMenuItem* item = new BMenuItem("<Be folder is empty>", 0);
+		BMenuItem* item = new BMenuItem(TR("<Be folder is empty>"), 0);
 		item->SetEnabled(false);
 		AddItem(item);
 	} else
@@ -150,8 +157,8 @@ TBeMenu::AddNextItem()
 
 	TrackingHookData* data = fBarView->GetTrackingHookData();
 	if (fAddState == kAddingRecents) {
-		const char* recentTitle[] = {"Recent documents", "Recent folders",
-			"Recent applications"};
+		static const char* recentTitle[] = {TR_MARK("Recent documents"),
+			TR_MARK("Recent folders"), TR_MARK("Recent applications")};
 		const int recentType[] = {kRecentDocuments, kRecentFolders,
 			kRecentApplications};
 		const int recentTypes = 3;
@@ -160,7 +167,7 @@ TBeMenu::AddNextItem()
 		bool enabled = false;
 
 		for (int i = 0; i < recentTypes; i++) {
-			recentItem[i] = new TRecentsMenu(recentTitle[i], fBarView,
+			recentItem[i] = new TRecentsMenu(TR(recentTitle[i]), fBarView,
 				recentType[i]);
 
 			if (recentItem[i])
@@ -226,63 +233,75 @@ TBeMenu::AddStandardBeMenuItems()
 	BMenuItem* item;
 	BRoster roster;
 	if (!roster.IsRunning(kTrackerSignature)) {
-		item = new BMenuItem("Restart Tracker", new BMessage(kRestartTracker));
+		item = new BMenuItem(TR("Restart Tracker"), new BMessage(kRestartTracker));
 		AddItem(item);
 		AddSeparatorItem();
 	}
 
+	static const char* kAboutHaikuMenuItemStr = TR_MARK(
+		"About Haiku" B_UTF8_ELLIPSIS);
+	static const char* kAboutThisSystemMenuItemStr = TR_MARK(
+		"About this system" B_UTF8_ELLIPSIS);
+
 	item = new BMenuItem(
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
-	"About Haiku"
+	TR(kAboutHaikuMenuItemStr)
 #else
-	"About this system"
+	TR(kAboutThisSystemMenuItemStr)
 #endif
-		B_UTF8_ELLIPSIS, new BMessage(kShowSplash));
+		, new BMessage(kShowSplash));
 	item->SetEnabled(!dragging);
 	AddItem(item);
+
+	static const char* kFindMenuItemStr = TR_MARK("Find" B_UTF8_ELLIPSIS);
 
 #ifdef SHOW_RECENT_FIND_ITEMS
-	item = new BMenuItem(TrackerBuildRecentFindItemsMenu("Find"B_UTF8_ELLIPSIS),
+	item = new BMenuItem(
+		TrackerBuildRecentFindItemsMenu(kFindMenuItemStr),
 		new BMessage(kFindButton));
 #else
- 	item = new BMenuItem("Find"B_UTF8_ELLIPSIS, new BMessage(kFindButton));
+ 	item = new BMenuItem(TR(kFindMenuItemStr), new BMessage(kFindButton));
 #endif
 	item->SetEnabled(!dragging);
 	AddItem(item);
 
-	item = new BMenuItem("Show replicants", new BMessage(kToggleDraggers));
+	item = new BMenuItem(TR("Show replicants"), new BMessage(kToggleDraggers));
 	item->SetEnabled(!dragging);
 	item->SetMarked(BDragger::AreDraggersDrawn());
 	AddItem(item);
 
+	static const char* kMountMenuStr = TR_MARK("Mount");
+
 #ifdef MOUNT_MENU_IN_DESKBAR
-	DeskbarMountMenu* mountMenu = new DeskbarMountMenu("Mount");
+	DeskbarMountMenu* mountMenu = new DeskbarMountMenu(TR(kMountMenuStr));
 	mountMenu->SetEnabled(!dragging);
 	AddItem(mountMenu);
 #endif
 
-	item = new BMenuItem("Deskbar preferences" B_UTF8_ELLIPSIS,
+	item = new BMenuItem(TR("Deskbar preferences" B_UTF8_ELLIPSIS),
 		new BMessage(kConfigShow));
  	item->SetTarget(be_app);
 	AddItem(item);
 
 	AddSeparatorItem();
 
-	BMenu* shutdownMenu = new BMenu("Shutdown" B_UTF8_ELLIPSIS);
+	BMenu* shutdownMenu = new BMenu(TR("Shutdown" B_UTF8_ELLIPSIS));
 
-	item = new BMenuItem("Restart system", new BMessage(kRebootSystem));
+	item = new BMenuItem(TR("Restart system"), new BMessage(kRebootSystem));
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 
+	static const char* kSuspendMenuItemStr = TR_MARK("Suspend");
+
 #ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
-		item = new BMenuItem("Suspend", new BMessage(kSuspendSystem));
+		item = new BMenuItem(kSuspendMenuItemStr), new BMessage(kSuspendSystem));
 		item->SetEnabled(!dragging);
 		shutdownMenu->AddItem(item);
 	}
 #endif
 
-	item = new BMenuItem("Power off", new BMessage(kShutdownSystem));
+	item = new BMenuItem(TR("Power off"), new BMessage(kShutdownSystem));
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 	shutdownMenu->SetFont(be_plain_font);
@@ -367,10 +386,10 @@ TBeMenu::ScreenLocation()
 
 	if (expando && vertical && fBarView->Left()) {
 		PRINT(("Left\n"));
-		point = rect.RightTop() + BPoint(0,3);
+		point = rect.RightTop() + BPoint(0, 3);
 	} else if (expando && vertical && !fBarView->Left()) {
 		PRINT(("Right\n"));
-		point = rect.LeftTop() - BPoint(Bounds().Width(), 0) + BPoint(0,3);
+		point = rect.LeftTop() - BPoint(Bounds().Width(), 0) + BPoint(0, 3);
 	} else
 		point = BMenu::ScreenLocation();
 
@@ -632,6 +651,7 @@ DeskbarMountMenu::AddDynamicItem(add_state s)
 
 	return false;
 }
+
 
 #endif
 

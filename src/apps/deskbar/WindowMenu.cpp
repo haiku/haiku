@@ -35,6 +35,8 @@ All rights reserved.
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <Window.h>
 
 #include "BarApp.h"
@@ -57,6 +59,9 @@ const int32 kTeamFloater = 4;
 const int32 kListFloater = 5;
 const int32 kSystemFloater = 6;
 
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "WindowMenu"
 
 bool
 TWindowMenu::WindowShouldBeListed(uint32 behavior)
@@ -173,7 +178,7 @@ TWindowMenu::AttachedToWindow()
 	int32 itemCount = CountItems() + parentMenuItems;
 	if (itemCount < 1) {
 		TWindowMenuItem* noWindowsItem =
- 			new TWindowMenuItem("No windows", -1, false, false);
+ 			new TWindowMenuItem(TR("No windows"), -1, false, false);
 
 		noWindowsItem->SetEnabled(false);
 
@@ -183,7 +188,7 @@ TWindowMenu::AttachedToWindow()
 		// it. (but we only add this option if the application is not Tracker.)
  		if (fApplicationSignature.ICompare(kTrackerSignature) != 0) {
 			AddSeparatorItem();
-			AddItem(new TShowHideMenuItem("Quit application", fTeam,
+			AddItem(new TShowHideMenuItem(TR("Quit application"), fTeam,
 				B_QUIT_REQUESTED));
  		}
 	} else {
@@ -191,11 +196,11 @@ TWindowMenu::AttachedToWindow()
 		//	to the menu
 		if (!dragging) {
 			TShowHideMenuItem* hide =
-				new TShowHideMenuItem("Hide all", fTeam, B_MINIMIZE_WINDOW);
+				new TShowHideMenuItem(TR("Hide all"), fTeam, B_MINIMIZE_WINDOW);
 			TShowHideMenuItem* show =
-				new TShowHideMenuItem("Show all", fTeam, B_BRING_TO_FRONT);
+				new TShowHideMenuItem(TR("Show all"), fTeam, B_BRING_TO_FRONT);
 			TShowHideMenuItem* close =
-				new TShowHideMenuItem("Close all", fTeam, B_QUIT_REQUESTED);
+				new TShowHideMenuItem(TR("Close all"), fTeam, B_QUIT_REQUESTED);
 
 			if (miniCount == itemCount)
 				hide->SetEnabled(false);

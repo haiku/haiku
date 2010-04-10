@@ -39,6 +39,15 @@ Application Deskbar :
 	ResourceSet.cpp
 	Switcher.cpp
 	$(targetSource)
-	: be tracker $(targetLib) $(TARGET_LIBSUPC++)
+	: be tracker liblocale.so $(targetLib) $(TARGET_LIBSUPC++)
 	;
 
+DoCatalogs Deskbar :
+	application/x-vnd.Be-TSKB
+	:
+	BeMenu.cpp
+	PreferencesWindow.cpp
+	StatusView.cpp
+	TimeView.cpp
+	WindowMenu.cpp
+	;
