@@ -180,6 +180,7 @@ struct termios {
 #define TCVTIME				(TCGETA + 14)	/* pass in bigtime_t, old value saved */
 #define TIOCGPGRP			(TCGETA + 15)	/* Gets the process group ID of the TTY device */
 #define TIOCSPGRP			(TCGETA + 16)	/* Sets the process group ID ('pgid' in BeOS) */
+#define TIOCSCTTY			(TCGETA + 17)	/* Become controlling TTY */
 
 /* Event codes.  Returned from TCWAITEVENT */
 #define EV_RING			0x0001

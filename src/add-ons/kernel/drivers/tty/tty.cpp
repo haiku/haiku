@@ -1652,6 +1652,24 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 				tty->settings->pgrp_id = groupID;
 			return error;
 		}
+		
+		// become controlling TTY
+		case TIOCSCTTY:
+		{
+			TRACE(("tty: become controlling tty\n"));
+			pid_t processID = getpid();
+			pid_t sessionID = getsid(processID);
+			// Only session leaders can become controlling tty
+			if (processID != sessionID)
+				return B_NOT_ALLOWED;
+			// Check if already controlling tty
+			if (team_get_controlling_tty() == tty->index)
+				return B_OK;
+			tty->settings->session_id = sessionID;
+			tty->settings->pgrp_id = sessionID;
+			team_set_controlling_tty(tty->index);
+			return B_OK;
+		}
 
 		// get and set window size
 

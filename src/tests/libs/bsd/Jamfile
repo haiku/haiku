@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src tests libs bsd ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+SimpleTest forkpty_test : forkpty.c : libbsd.so ;
+
+
