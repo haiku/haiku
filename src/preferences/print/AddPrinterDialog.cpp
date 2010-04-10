@@ -149,10 +149,15 @@ AddPrinterDialog::HandleChangedTransport(BMessage *msg)
 		void* pointer;
 		if (msg->FindPointer("source", &pointer) == B_OK) {
 			BMenuItem* item = (BMenuItem*)pointer;
+
+			// Update printer name with Transport Path if not filled in
+			if (strlen(fName->Text()) == 0)
+				fName->SetText(item->Label());
+
 			BMenu* menu = item->Menu();
 			int32 index = fTransport->IndexOf(menu);
 			item = fTransport->ItemAt(index);
-			if (item != NULL) 
+			if (item != NULL)
 				item->SetMarked(true);
 		}
 	} else {
@@ -379,9 +384,8 @@ void AddPrinterDialog::FillTransportMenu(BMenu* menu)
 			SetMessage(new BMessage(kTransportSelectedMsg));
 
 		for (int32 pidx=0; reply.FindString("port_id", pidx, &portId) == B_OK; pidx++) {
-			reply.FindString("port_name", pidx, &portName);
-
-			if (!portName.Length())
+			if (reply.FindString("port_name", pidx, &portName) != B_OK ||
+				!portName.Length())
 				portName = portId;
 
 			// Create menu item in submenu for port
@@ -399,6 +403,6 @@ AddPrinterDialog::Update()
 	fOk->SetEnabled(fNameText != "" && fPrinterText != "" && 
 		(fTransportText != "" || fPrinterText == "Preview"));
 	
-	fTransport->SetEnabled(fPrinterText != "" && fPrinterText != "Preview");	
+	fTransport->SetEnabled(fPrinterText != "Preview");
 }
 
