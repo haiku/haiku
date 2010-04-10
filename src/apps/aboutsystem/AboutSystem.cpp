@@ -1330,17 +1330,15 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("libxml2, libxslt")
 		.SetCopyright(COPYRIGHT_STRING
 			"1998-2003 Daniel Veillard. All rights reserved.")
+		.SetLicense("MIT (advertising clause)")
 		.SetURL("http://xmlsoft.org"));
-			// TODO: License!
-			// NOTE: MIT license + cannot use author name for promotion
 
 	_AddPackageCredit(PackageCredit("libexslt")
 		.SetCopyright(COPYRIGHT_STRING
 			"2001-2002 Thomas Broyer, Charlie "
 			"Bozeman and Daniel Veillard.  All rights reserved.")
+		.SetLicense("MIT (advertising clause)")
 		.SetURL("http://xmlsoft.org"));
-			// TODO: License!
-			// NOTE: MIT license + cannot use author name for promotion
 
 	// Xiph.org Foundation copyrights
 	_AddPackageCredit(PackageCredit("Xiph.org Foundation")
