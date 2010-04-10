@@ -2,14 +2,14 @@ SubDir HAIKU_TOP src add-ons print transports usb_port ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders print ;
+UsePrivateHeaders shared print ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits print ] ;
 
 Addon USB\ Port :
 	USBTransport.cpp
 	PrintTransportAddOn.cpp
-	: be $(TARGET_LIBSUPC++)
+	: libshared.a libdevice.so be $(TARGET_LIBSUPC++)
 ;
 
 Package haiku-printingkit-cvs :
