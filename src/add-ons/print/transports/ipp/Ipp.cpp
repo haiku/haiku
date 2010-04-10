@@ -4,7 +4,184 @@
 #include "IppTransport.h"
 #include "DbgMsg.h"
 
+#include <PrintTransportAddOn.h>
+#include <NetEndpoint.h>
+#include <String.h>
+#include <OS.h>
+
+#include <HashString.h>
+#include <HashMap.h>
+
 IppTransport *transport = NULL;
+
+// Set transport_features so we stay loaded
+uint32 transport_features = B_TRANSPORT_IS_HOTPLUG | B_TRANSPORT_IS_NETWORK;
+
+
+class IPPPrinter
+{
+public:
+	IPPPrinter(const BString& uri, uint32 type)
+		{ fURI=uri; fType=type; }
+
+	uint32 fType, fState;
+	BString fURI, fLocation, fInfo, fMakeModel, fAttributes;
+};
+
+
+class IPPPrinterRoster
+{
+public:
+	IPPPrinterRoster();
+	~IPPPrinterRoster();
+
+	status_t ListPorts(BMessage *msg);
+	status_t Listen();
+private:
+	char *parseString(BString& outStr, char*& pos);
+
+	static status_t ippListeningThread(void *cookie);
+
+	typedef HashMap<HashString,IPPPrinter*> IPPPrinterMap;
+	IPPPrinterMap fPrinters;
+	BNetEndpoint *fEndpt;
+};
+
+
+static IPPPrinterRoster gRoster;
+
+
+IPPPrinterRoster::IPPPrinterRoster()
+{
+	thread_id thid;
+
+	// Setup our (UDP) listening endpoint
+	fEndpt = new BNetEndpoint(SOCK_DGRAM);
+	if (!fEndpt)
+		return;
+
+	if (fEndpt->InitCheck() != B_OK)
+		return;
+
+	if (fEndpt->Bind(BNetAddress(INADDR_ANY, 631)) != B_OK)
+		return;
+
+	// Now create thread for listening
+	thid = spawn_thread(ippListeningThread, "IPPListener", B_LOW_PRIORITY, this);
+	if (thid <= 0)
+		return;
+
+	resume_thread(thid);
+}
+
+
+IPPPrinterRoster::~IPPPrinterRoster()
+{
+	if (fEndpt)
+		delete fEndpt;
+}
+
+
+status_t
+IPPPrinterRoster::Listen()
+{
+	BNetAddress srcAddress;
+	uint32 type, state;
+	char packet[1541];
+	char uri[256];
+	char* pos;
+	int32 len;
+
+	while((len=fEndpt->ReceiveFrom(packet, sizeof(packet) -1, srcAddress)) > 0) {
+		packet[len] = '\0';
+
+		// Verify packet format
+		if (sscanf(packet, "%lx%lx%1023s", &type, &state, uri) == 3) {
+			IPPPrinter *printer = fPrinters.Get(uri);
+			if (!printer) {
+				printer = new IPPPrinter(uri, type);
+				fPrinters.Put(printer->fURI.String(), printer);
+			}
+
+			printer->fState=state;
+
+			// Check for option parameters
+			if ((pos=strchr(packet, '"')) != NULL) {
+				BString str;
+				if (parseString(str, pos))
+					printer->fLocation = str;
+				if (pos && parseString(str, pos))
+					printer->fInfo = str;
+				if (pos && parseString(str, pos))
+					printer->fMakeModel = str;
+
+				if (pos)
+					printer->fAttributes = pos;
+			}
+
+			DBGMSG(("Printer: %s\nLocation: %s\nInfo: %s\nMakeModel: %s\nAttributes: %s\n",
+				printer->fURI.String(), printer->fLocation.String(), printer->fInfo.String(),
+				printer->fMakeModel.String(), printer->fAttributes.String()));
+		}
+	}
+
+	return len;
+}
+
+
+status_t IPPPrinterRoster::ListPorts(BMessage* msg)
+{
+	IPPPrinterMap::Iterator iterator = fPrinters.GetIterator();
+	while (iterator.HasNext()) {
+		const IPPPrinterMap::Entry& entry = iterator.Next();
+		msg->AddString("port_id", entry.value->fURI);
+
+		BString name = entry.value->fInfo;
+		if (name.Length() && entry.value->fLocation.Length()) {
+			name.Append(" [");
+			name.Append(entry.value->fLocation);
+			name.Append("]");
+		}
+
+		msg->AddString("port_name", name);
+	}
+
+	return B_OK;
+}
+
+
+char*
+IPPPrinterRoster::parseString(BString& outStr, char*& pos)
+{
+	outStr = "";
+
+	if (*pos == '"')
+		pos++;
+
+	while(*pos && *pos != '"')
+		outStr.Append(*pos++, 1);
+
+	if (*pos == '"')
+		++pos;
+
+	while(*pos && isspace(*pos))
+		++pos;
+
+	if (!*pos)
+		pos = NULL;
+
+	return pos;
+}
+
+
+status_t
+IPPPrinterRoster::ippListeningThread(void *cookie)
+{
+	return ((IPPPrinterRoster*)cookie)->Listen();
+}
+
+
+// --- general transport hooks
 
 extern "C" _EXPORT void exit_transport()
 {
@@ -14,6 +191,12 @@ extern "C" _EXPORT void exit_transport()
 		transport = NULL;
 	}
 	DBGMSG(("< exit_transport\n"));
+}
+
+// List detected printers
+extern "C" _EXPORT status_t list_transport_ports(BMessage* msg)
+{
+	return gRoster.ListPorts(msg);
 }
 
 extern "C" _EXPORT BDataIO *init_transport(BMessage *msg)

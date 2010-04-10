@@ -4,6 +4,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
+UsePrivateHeaders shared print ;
+
 Addon IPP : 
 	Ipp.cpp
 	IppSetupDlg.cpp
@@ -15,7 +17,7 @@ Addon IPP :
 	Socket.o
 	SocketStream.o
 	DbgMsg.o
-	: be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++)
+	: libshared.a be bnetapi $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++)
 ;
 
 ObjectReferences
