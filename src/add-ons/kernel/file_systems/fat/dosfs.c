@@ -577,6 +577,11 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	}
 
 	vol = volume_init(fd, buf, vol_flags, fs_flags, &geo);
+	if (vol == NULL) {
+		dprintf("dosfs error: failed to initialize volume\n");
+		err = B_ERROR;
+		goto error1;
+	}
 
 	/* check that the partition is large enough to contain the file system */
 	if (vol->total_sectors > geo.sectors_per_track * geo.cylinder_count
@@ -664,12 +669,13 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 error3:
 	uninit_vcache(vol);
 error2:
-	volume_uninit(vol);
-error1:
 	if (!(vol->flags & B_FS_IS_READONLY) && (vol->flags & B_FS_IS_REMOVABLE)
 		&& (vol->fs_flags & FS_FLAGS_LOCK_DOOR)) {
 		lock_removable_device(fd, false);
 	}
+
+	volume_uninit(vol);
+error1:
 	close(fd);
 error0:
 	return err >= B_NO_ERROR ? EINVAL : err;
