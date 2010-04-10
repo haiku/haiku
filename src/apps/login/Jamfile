@@ -19,7 +19,7 @@ Application Login :
 	LoginWindow.cpp
 	LoginView.cpp
 	main.cpp
-	: be tracker $(mu_libs)
+	: be tracker $(mu_libs) $(TARGET_LIBSTDC++)
 	: Login.rdef
 ;
 
