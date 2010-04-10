@@ -1,0 +1,33 @@
+1	finnish	x-vnd.Haiku-About	3438887663
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ja hänen NewOS-ytimensä)\n
+%ld Processors:	AboutView		%ld suoritinta:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektin perustaja)\n\n
+The Haiku-Ports team\n	AboutView		Haiku-Ports -ryhmä\n
+Website, marketing & documentation:\n	AboutView		Web-sivusto, markkinointi ja dokumentaatio:\n
+Revision	AboutView		Korjausversio
+Source Code: 	AboutView		Lähdekoodi: 
+Processor:	AboutView		Suoritin:
+Kernel:	AboutView		Ydin:
+Contributors:\n	AboutView		Avustajat:\n
+Unknown	AboutView		Tuntematon
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… ja luultavasti vielä jotain muuta, jonka joku unohti mainita (anteeksi!)\n\n
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Muisti:
+Past maintainers:\n	AboutView		Entiset ylläpitäjät:\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Koodin, joka on uniikkia Haikulle, erityisesti ydin ja kaikki koodi johon sovellukset linkittävät, levitysehtona on  
+\n\nSpecial thanks to:\n	AboutView		\n\nErityiskiitokset:\n
+Licenses: 	AboutView		Lisenssit: 
+. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Jotkut järjestelmäkirjastot sisältävät kolmannen osapuolen koodia, jota levitetään LGPL-lisenssin alaisena. Löydät kolmannen osapuolen koodin copyright-oikeudet alapuolelta.\n\n
+\nCopyrights\n\n	AboutView		\nCopyright-oikeudet\n\n
+Current maintainers:\n	AboutView		Nykyiset ylläpitäjät:\n
+Time running:	AboutView		Aika kuluu:
+MIT license	AboutView		MIT-lisenssi
+The Haikuware team and their bounty program\n	AboutView		Haikuware-ryhmä ja heidän bounty-ohjelmansa\n
+About this system	AboutWindow		Tästä järjestelmästä
+Version:	AboutView		Versio:
+%ld MHz	AboutView		%ld MHz
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Haiku-koodin copyright on Haiku, Inc. -yhtiöllä tai kullekin kuuluvalla tekijällä, milloin lähdekoodissa on nimenomaisesti niin ilmaistu\n\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Napsauta lisenssinimeä vastaavan lisenssin lukemiseksi.]\n\n
+%d MB total, %d MB used (%d%%)	AboutView		%d Mt yhteensä, %d Mt käytetty (%d%%)
+License: 	AboutView		Lisenssi: 
+Translations:\n	AboutView		Käännökset:\n

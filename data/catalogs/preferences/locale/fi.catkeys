@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Locale	1007621035
+1	finnish	x-vnd.Haiku-Locale	1551394073
 Day in month (2 digits)	TimeFormatSettings		kuukaudenpäivä (2 merkkiä)
 Available languages	Locale Preflet Window		Valittavat kielet
 Day of week (name)	TimeFormatSettings		viikonpäivä (nimi)
@@ -14,7 +14,7 @@ Before	TimeFormatSettings		Ennen
 Year	TimeFormatSettings		Vuosi
 Day of week in month	TimeFormatSettings		viikonpäivä kuukaudessa
 Short format:	TimeFormatSettings		Lyhyt muoto:
-Currency symbol:	TimeFormatSettings		Valuutta symboli:
+Currency symbol:	TimeFormatSettings		Valuuttasymboli:
 Space	TimeFormatSettings		Väli
 Language	Locale Preflet Window		Kieli
 Month number	TimeFormatSettings		kuukauden numero
@@ -24,23 +24,24 @@ Decimal separator: 	TimeFormatSettings		Desimaalierotin
 Symbol position	TimeFormatSettings		Symbolin paikka
 Day of week (short name)	TimeFormatSettings		viikonpäivä (lyhyt nimi)
 Numbers	TimeFormatSettings		Numerot
-24 hour	TimeFormatSettings		24 Tuntia
+24 hour	TimeFormatSettings		24 tuntia
  (unknown format)	TimeFormatSettings		 (tuntematon muoto)
 Negative marker:	TimeFormatSettings		Negatiivisuuden merkki:
 Day in month	TimeFormatSettings		kuukauden päivä
-Defaults	Locale Preflet Window		Oletusasetukset
+OK	Locale Preflet Window		Valmis
+Defaults	Locale Preflet Window		Oletukset
+Month	TimeFormatSettings		Kuukausi
 Separator	TimeFormatSettings		Erotin
 Country	Locale Preflet Window		Maa
 Month number (2 digits)	TimeFormatSettings		kuukauden numero (2 merkkiä)
 Revert	Locale Preflet Window		Palauta
 Negative marker	TimeFormatSettings		Negatiivisuuden merkki
-OK	Locale Preflet Window		Ok
 Day of week	TimeFormatSettings		viikonpäivä
 List separator: 	TimeFormatSettings		Listaerotin
+12 hour	TimeFormatSettings		12 tuntia
 Time	TimeFormatSettings		Aika
 Date	TimeFormatSettings		Päivämäärä
-12 hour	TimeFormatSettings		12 Tuntia
-Locale	Locale Preflet		Locale
+Locale	Locale Preflet		Maa-asetus
 None	TimeFormatSettings		Ei mikään
 Clock	TimeFormatSettings		Kello
 Example:	TimeFormatSettings		Esimerkki:

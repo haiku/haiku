@@ -1,0 +1,24 @@
+1	finnish	x-vnd.Haiku-Mouse	104106491
+Click to activate	SettingsView		Napsauta aktivoidaksesi
+Mouse type:	SettingsView		Hiirityyppi:
+Warp	SettingsView		Vääristymä
+2-Button	SettingsView		2-painike
+Double-click test area	SettingsView		Kaksoisnapsautuksen testausalue
+Revert	MouseWindow		Palauta
+...by Andrew Edward McCall	MouseApplication		...: Andrew Edward McCall
+Mouse acceleration	SettingsView		Hiiren kiihdytys
+Click to focus	SettingsView		Napsauta kohdistamiseksi
+3-Button	SettingsView		3-painike
+Mouse speed	SettingsView		Hiiren nopeus
+Focus mode:	SettingsView		Kohdistustila:
+Instant warp	SettingsView		Pikavääristymä
+Dig Deal	MouseApplication		Dig Deal
+1-Button	SettingsView		1-painike
+Double-click speed	SettingsView		Kaksoisnapsautusnopeus
+Defaults	MouseWindow		Oletukset
+Focus follows mouse	SettingsView		Kohdistus seuraa hiirtä
+Accept first click	SettingsView		Hyväksy ensimmäinen napsautus
+Fast	SettingsView		Nopea
+Normal	SettingsView		Normaali
+Mouse	MouseWindow		Hiiri
+Slow	SettingsView		Hidas

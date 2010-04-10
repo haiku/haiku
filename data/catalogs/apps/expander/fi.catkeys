@@ -1,0 +1,38 @@
+1	finnish	x-vnd.Haiku-Expander	1738666712
+Expand	ExpanderMenu		Laajenna
+Set destination…	ExpanderMenu		Aseta kohde…
+File expanded	ExpanderWindow		Tiedosto laajennettu
+The destination is read only.	ExpanderWindow		Kohde on kirjoitussuojattu.
+Expander: Open	ExpanderWindow		Laajentaja: Avaa
+ is not supported	ExpanderWindow		 ei tueta
+Select current	DirectoryFilePanel		Valitse nykyinen
+Source	ExpanderWindow		Lähde
+Error when expanding archive	ExpanderWindow		Virhe laajennettaessa arkistoa
+Hide contents	ExpanderWindow		Piilota sisällöt
+Cancel	ExpanderWindow		Peru
+Continue	ExpanderWindow		Jatka
+Expander	ExpanderWindow	!! Window Title !!	Laajentaja
+Expander\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		Laajentaja\n\ttekijä: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nalkuperäinen Be-versio: \nDominic, Hiroshi, Peter, Pavel ja Robert\n
+The destination folder does not exist.	ExpanderWindow		Kohdekansiota ei ole olemassa.
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Oletko varma, että haluat pysäyttää tämän arkiston\nlaajentamisen? Laajennetut alkiot eivät ehkä ole valmiita.
+Select	DirectoryFilePanel		Valitse
+Creating listing for 	ExpanderWindow		Luodaan luettelo kohteelle 
+Settings	ExpanderMenu		Asetukset
+Settings…	ExpanderMenu		Asetukset…
+Expander: Choose destination	DirectoryFilePanel		Laajentaja: Valitse kohde
+Show contents	ExpanderWindow		Näytä sisällöt
+Expanding file 	ExpanderWindow		Laajennetaan tiedosto 
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Kansio on joko siirretty, nimetty uudelleen tai sitä\nei tueta.
+The file doesn't exist	ExpanderWindow		Tiedostoa ei ole olemassa
+Stop	ExpanderMenu		Pysäytä
+File	ExpanderMenu		Tiedosto
+Expand	ExpanderWindow		Laajenna
+Close	ExpanderMenu		Sulje
+The destination is not a folder.	ExpanderWindow		Kohde ei ole kansio.
+About Expander…	ExpanderMenu		Laajentajasta…
+OK	About		Valmis
+Set source…	ExpanderMenu		Aseta lähde…
+Select '%s'	DirectoryFilePanel		Valitse '%s'
+Show contents	ExpanderMenu		Näytä sisällöt
+Stop	ExpanderWindow		Pysäytä
+Destination	ExpanderWindow		Kohde

@@ -1,0 +1,28 @@
+1	finnish	x-vnd.Haiku-Screenshot	1342822790
+seconds	ScreenshotWindow		 sekuntia
+Options	ScreenshotWindow		Valitsimet
+Desktop	ScreenshotWindow		Työpöytä
+Include window border	ScreenshotWindow		Sisällytä ikkunaraja
+Back to saving	ScreenshotWindow		Takaisin tallentamiseen
+Select	ScreenshotWindow		Valitse
+Capture active window	ScreenshotWindow		Sieppaa aktiivinen ikkuna
+Cancel	ScreenshotWindow		Peru
+screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	ruudunkaappaus
+Name:	ScreenshotWindow		Nimi:
+screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	ruudunkaappaus1
+Save screenshot	ScreenshotWindow		Tallenna ruudunkaappaus
+Capture entire screen	ScreenshotWindow		Sieppaa koko näyttö
+Choose folder	ScreenshotWindow		Valitse kansio
+Take screenshot	ScreenshotWindow		Ota ruudunkaappaus
+Save	ScreenshotWindow		Tallenna
+Overwrite	ScreenshotWindow		Korvaa
+Retake screenshot	ScreenshotWindow		Ota ruudunkaappaus uudelleen
+Choose folder...	ScreenshotWindow		Valitse kansio...
+Please select	ScreenshotWindow		Valitse
+Save as:	ScreenshotWindow		Tallenna nimellä:
+Save in:	ScreenshotWindow		Tallenna kohteeseen:
+Take screenshot after a delay of	ScreenshotWindow		Ota ruudunkaappaus viiveellä:
+Artwork folder	ScreenshotWindow		Kuvatiedostokansio
+Home folder	ScreenshotWindow		Kotikansio
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tämä tiedosto on jo olemassa.\n Oletko varma, että haluat korvata sen?
+Include mouse pointer	ScreenshotWindow		Sisällytä hiiren osoitin

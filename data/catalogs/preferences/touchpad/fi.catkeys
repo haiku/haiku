@@ -1,0 +1,18 @@
+1	finnish	x-vnd.Haiku-Touchpad	3077633033
+Scrolling	TouchpadPrefView		Vieritys
+Revert	TouchpadPrefView		Palauta
+Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
+Defaults	TouchpadPrefView		Oletukset
+Slow	TouchpadPrefView		Hidas
+Horizontal scroll step size	TouchpadPrefView		Vaakasuoran vierityksen askelkoko
+High	TouchpadPrefView		Korkea
+Tap gesture	TouchpadPrefView		Napautusele
+Horizontal scrolling	TouchpadPrefView		Vaakasuora vieritys
+Wide	TouchpadPrefView		Leveä
+Fast	TouchpadPrefView		Nopea
+Tap click sensitivity	TouchpadPrefView		Napautusnapsausherkkyys
+Scroll acceleration	TouchpadPrefView		Vierityskiihtyvyys
+Vertical scroll step size	TouchpadPrefView		Pystysuoran vierityksen askelkoko
+Off	TouchpadPrefView		Pois päältä
+Small	TouchpadPrefView		Pieni
+Touchpad	TouchpadMain		Levyhiiri
