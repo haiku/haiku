@@ -10,6 +10,7 @@ SubDir HAIKU_TOP src system kernel ;
 	SubDirC++Flags $(defines) ;
 }
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) locks ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) scheduler ] ;
 
 UsePrivateHeaders libroot ;
@@ -34,7 +35,6 @@ KernelMergeObject kernel_core.o :
 	kernel_daemon.cpp
 	linkhack.c
 	listeners.cpp
-	lock.cpp
 	low_resource_manager.cpp
 	main.cpp
 	module.cpp
@@ -52,6 +52,10 @@ KernelMergeObject kernel_core.o :
 	timer.cpp
 	usergroup.cpp
 	wait_for_objects.cpp
+
+	# locks
+	lock.cpp
+	user_mutex.cpp
 
 	# scheduler
 	scheduler.cpp

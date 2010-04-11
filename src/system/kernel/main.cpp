@@ -47,6 +47,7 @@
 #include <team.h>
 #include <timer.h>
 #include <user_debugger.h>
+#include <user_mutex.h>
 #include <vfs.h>
 #include <vm/vm.h>
 #include <boot/kernel_args.h>
@@ -256,6 +257,9 @@ main2(void *unused)
 
 	TRACE("init ports\n");
 	port_init(&sKernelArgs);
+
+	TRACE("init user mutex\n");
+	user_mutex_init();
 
 	TRACE("Init modules\n");
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_1_INIT_MODULES);

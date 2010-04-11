@@ -44,6 +44,7 @@
 #include <thread.h>
 #include <tracing.h>
 #include <user_atomic.h>
+#include <user_mutex.h>
 #include <usergroup.h>
 #include <util/AutoLock.h>
 #include <vfs.h>

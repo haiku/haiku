@@ -71,6 +71,13 @@ extern status_t		_kern_get_safemode_option(const char *parameter,
 extern ssize_t		_kern_wait_for_objects(object_wait_info* infos, int numInfos,
 						uint32 flags, bigtime_t timeout);
 
+/* user mutex functions */
+extern status_t		_kern_mutex_lock(int32* mutex, const char* name,
+						uint32 flags, bigtime_t timeout);
+extern status_t		_kern_mutex_unlock(int32* mutex, uint32 flags);
+extern status_t		_kern_mutex_switch_lock(int32* fromMutex, int32* toMutex,
+						const char* name, uint32 flags, bigtime_t timeout);
+
 /* sem functions */
 extern sem_id		_kern_create_sem(int count, const char *name);
 extern status_t		_kern_delete_sem(sem_id id);
