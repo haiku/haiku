@@ -142,7 +142,6 @@ printf("e:%s\n", extension.String());
 					int32 cr = contents.FindFirst('\n');
 					if (cr < 0)
 						cr = contents.Length();
-					//contents.MoveInto(line, 0, cr);
 					contents.CopyInto(line, 0, cr);
 					contents.Remove(0, cr+1);
 					line.RemoveAll("\r");
@@ -174,8 +173,6 @@ printf("e:%s\n", extension.String());
 								break;
 							} else
 								state = 3;
-							break;
-							
 							break;
 						default:
 							break;
