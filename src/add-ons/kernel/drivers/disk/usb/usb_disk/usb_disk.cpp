@@ -273,7 +273,8 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	command.data_transfer_length = (dataLength != NULL ? *dataLength : 0);
 	command.flags = (directionIn ? CBW_DATA_INPUT : CBW_DATA_OUTPUT);
 	command.lun = lun->logical_unit_number;
-	command.command_block_length = opLength;
+	command.command_block_length
+		= device->is_atapi ? ATAPI_COMMAND_LENGTH : opLength;
 	memset(command.command_block, 0, sizeof(command.command_block));
 
 	switch (opLength) {
@@ -492,7 +493,7 @@ usb_disk_mode_sense(device_lun *lun)
 
 	lun->write_protected
 		= (parameter.device_specific & SCSI_DEVICE_SPECIFIC_WRITE_PROTECT) != 0;
-	TRACE_ALWAYS("write protected: %s\n", lun->write_protected ? "yes" : "no");	
+	TRACE_ALWAYS("write protected: %s\n", lun->write_protected ? "yes" : "no");
 	return B_OK;
 }
 
@@ -504,8 +505,14 @@ usb_disk_test_unit_ready(device_lun *lun)
 	if (!lun->device->tur_supported)
 		return B_OK;
 
-	status_t result = usb_disk_operation(lun, SCSI_TEST_UNIT_READY_6, 6, 0, 0,
-		NULL, NULL, true);
+	status_t result;
+	if (lun->device->is_atapi) {
+		result = usb_disk_operation(lun, SCSI_START_STOP_UNIT_6, 6, 0, 1,
+			NULL, NULL, false);
+	} else {
+		result = usb_disk_operation(lun, SCSI_TEST_UNIT_READY_6, 6, 0, 0,
+			NULL, NULL, true);
+	}
 
 	if (result == B_DEV_INVALID_IOCTL) {
 		lun->device->tur_supported = false;
@@ -539,10 +546,10 @@ usb_disk_inquiry(device_lun *lun)
 	TRACE("peripherial_qualifier    0x%02x\n", parameter.peripherial_qualifier);
 	TRACE("removable_medium         %s\n", parameter.removable_medium ? "yes" : "no");
 	TRACE("version                  0x%02x\n", parameter.version);
-	TRACE("response_data_format     0x%02x\n", parameter.response_data_format);	
-	TRACE_ALWAYS("vendor_identification    \"%.8s\"\n", parameter.vendor_identification);	
-	TRACE_ALWAYS("product_identification   \"%.16s\"\n", parameter.product_identification);	
-	TRACE_ALWAYS("product_revision_level   \"%.4s\"\n", parameter.product_revision_level);	
+	TRACE("response_data_format     0x%02x\n", parameter.response_data_format);
+	TRACE_ALWAYS("vendor_identification    \"%.8s\"\n", parameter.vendor_identification);
+	TRACE_ALWAYS("product_identification   \"%.16s\"\n", parameter.product_identification);
+	TRACE_ALWAYS("product_revision_level   \"%.4s\"\n", parameter.product_revision_level);
 	lun->device_type = parameter.peripherial_device_type; /* 1:1 mapping */
 	lun->removable = (parameter.removable_medium == 1);
 	return B_OK;
@@ -652,6 +659,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 	device->current_tag = 0;
 	device->sync_support = SYNC_SUPPORT_RELOAD;
 	device->tur_supported = true;
+	device->is_atapi = false;
 	device->luns = NULL;
 
 	// scan through the interfaces to find our bulk-only data interface
@@ -667,7 +675,9 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 			continue;
 
 		if (interface->descr->interface_class == 0x08 /* mass storage */
-			&& interface->descr->interface_subclass == 0x06 /* SCSI */
+			&& (interface->descr->interface_subclass == 0x06 /* SCSI */
+				|| interface->descr->interface_subclass == 0x02 /* ATAPI */
+				|| interface->descr->interface_subclass == 0x05 /* ATAPI */)
 			&& interface->descr->interface_protocol == 0x50 /* bulk-only */) {
 
 			bool hasIn = false;
@@ -696,6 +706,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 				continue;
 
 			device->interface = interface->descr->interface_number;
+			device->is_atapi = interface->descr->interface_subclass != 0x06;
 			break;
 		}
 	}
@@ -746,8 +757,11 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 			status_t ready = usb_disk_test_unit_ready(lun);
 			if (ready == B_OK || ready == B_DEV_NO_MEDIA) {
 				if (ready == B_OK) {
-					// TODO: check for write protection
-					//if (usb_disk_mode_sense(lun) != B_OK)
+					if (lun->device_type == B_CD)
+						lun->write_protected = true;
+					// TODO: check for write protection; disabled since
+					// some devices lock up when getting the mode sense
+					else if (/*usb_disk_mode_sense(lun) != B_OK*/true)
 						lun->write_protected = false;
 				}
 
@@ -1193,7 +1207,7 @@ usb_disk_write(void *cookie, off_t position, const void *buffer,
 //
 
 
-status_t 
+status_t
 init_hardware()
 {
 	TRACE("init_hardware()\n");
@@ -1210,8 +1224,10 @@ init_driver()
 		&usb_disk_device_removed
 	};
 
-	static usb_support_descriptor supportedDevices = {
-		0x08 /* mass storage */, 0x06 /* SCSI */, 0x50 /* bulk only */, 0, 0
+	static usb_support_descriptor supportedDevices[] = {
+		{ 0x08 /* mass storage */, 0x06 /* SCSI */, 0x50 /* bulk */, 0, 0 },
+		{ 0x08 /* mass storage */, 0x02 /* ATAPI */, 0x50 /* bulk */, 0, 0 },
+		{ 0x08 /* mass storage */, 0x05 /* ATAPI */, 0x50 /* bulk */, 0, 0 }
 	};
 
 	gDeviceList = NULL;
@@ -1228,7 +1244,7 @@ init_driver()
 		return result;
 	}
 
-	gUSBModule->register_driver(DRIVER_NAME, &supportedDevices, 1, NULL);
+	gUSBModule->register_driver(DRIVER_NAME, supportedDevices, 3, NULL);
 	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
 	return B_OK;
 }

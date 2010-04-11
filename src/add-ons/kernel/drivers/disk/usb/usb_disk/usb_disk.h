@@ -15,6 +15,7 @@
 #define REQUEST_MASS_STORAGE_RESET	0xff
 #define REQUEST_GET_MAX_LUN			0xfe
 #define MAX_LOGICAL_UNIT_NUMBER		15
+#define ATAPI_COMMAND_LENGTH		12
 
 #define CBW_SIGNATURE				0x43425355
 #define CBW_DATA_OUTPUT				0x00
@@ -45,6 +46,7 @@ typedef struct disk_device_s {
 	uint32		current_tag;
 	uint8		sync_support;
 	bool		tur_supported;
+	bool		is_atapi;
 
 	// used to store callback information
 	sem_id		notify;
