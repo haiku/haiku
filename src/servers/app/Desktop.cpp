@@ -179,7 +179,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			{
 				STRACE(("Set Workspace %ld\n", key - 1));
 
-				fDesktop->SetWorkspaceAsync(key - 2,
+				fDesktop->SetWorkspaceAsync(key - B_F1_KEY,
 					(modifiers & B_SHIFT_KEY) != 0);
 				return B_SKIP_MESSAGE;
 			}
@@ -1620,7 +1620,8 @@ Desktop::KeyboardEventTarget()
 
 
 /*!	Tries to set the focus to the specified \a focus window. It will make sure,
-	however, that the window actually can have focus.
+	however, that the window actually can have focus. You are allowed to pass
+	in a NULL pointer for \a focus.
 
 	Besides the B_AVOID_FOCUS flag, a modal window, or a BWindowScreen can both
 	prevent it from getting focus.
@@ -3119,7 +3120,10 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 		movedWindow->Anchor(index).position = movedWindow->Frame().LeftTop();
 	}
 
-	fLastWorkspaceFocus[previousIndex] = FocusWindow();
+	if (movedWindow == NULL || movedWindow->InWorkspace(previousIndex))
+		fLastWorkspaceFocus[previousIndex] = FocusWindow();
+	else
+		fLastWorkspaceFocus[previousIndex] = NULL;
 
 	// build region of windows that are no longer visible in the new workspace
 
