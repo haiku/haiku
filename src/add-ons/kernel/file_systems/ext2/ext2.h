@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef EXT2_H
@@ -65,7 +65,24 @@ struct ext2_super_block {
 	uint16	_reserved2;
 	uint32	default_mount_options;
 	uint32	first_meta_block_group;
-	uint32	_reserved3[190];
+	uint32	fs_creation_time;
+	uint32	journal_inode_backup[17];
+
+	// ext4 support
+	uint32	num_blocks_hi;
+	uint32	reserved_blocks_hi;
+	uint32	free_blocks_hi;
+	uint16	min_inode_size;
+	uint16	want_inode_size;
+	uint32	flags;
+	uint16	raid_stride;
+	uint16	mmp_interval;
+	uint64	mmp_block;
+	uint32	raid_stripe_width;
+	uint8	groups_per_flex_shift;
+	uint8	_reserved3;
+	uint16	_reserved4;
+	uint32	_reserved5[162];
 
 	uint16 Magic() const { return B_LENDIAN_TO_HOST_INT16(magic); }
 	uint32 BlockShift() const { return B_LENDIAN_TO_HOST_INT32(block_shift) + 10; }
@@ -180,6 +197,8 @@ struct ext2_inode {
 	uint16	uid_high;
 	uint16	gid_high;
 	uint32	_reserved2;
+	uint16	extra_inode_size;
+	uint16	_padding2;
 
 	uint16 Mode() const { return B_LENDIAN_TO_HOST_INT16(mode); }
 	uint32 Flags() const { return B_LENDIAN_TO_HOST_INT32(flags); }
