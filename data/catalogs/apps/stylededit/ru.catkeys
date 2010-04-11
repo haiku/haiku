@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	1909738892
+1	russian	x-vnd.Haiku-StyledEdit	2750476595
 Paste	Menus		Вставить
 OK	LoadAlert		Oк
 File	Menus		Файл
@@ -15,6 +15,7 @@ Replace same	Menus		Заменить совпадение
 Can't undo	Menus		Невозможно отменить
 Save	Menus		Сохранить
 Replace with:	FindandReplaceWindow		Заменить на:
+Cancel	SaveAlert		Отмена
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
 Case-sensitive	FindandReplaceWindow		Учитывать регистр
 Green	Menus		Зеленый
@@ -32,6 +33,7 @@ Font	Menus		Шрифт
 Replace all	FindandReplaceWindow		Заменить все
 Default	Open_and_SaveAsPanel		По умолчанию
 Cancel	FindandReplaceWindow		Отмена
+Save	SaveAlert		Сохранить
 Close	Menus		Закрыть
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Ошибка открытия \"%s\":\n\tНеподдерживаемый формат
 OK	RevertToSavedAlert		Oк
@@ -57,7 +59,9 @@ Find again	Menus		Найти далее
 Cancel	QuitAlert		Отмена
 Find…	Menus		Найти…
 Select all	Menus		Выделить всё
+Don't save	SaveAlert		Не сохранять
 Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
 Black	Menus		Черный
 Untitled 	StyledEditWindow		Безымянный 
 OK	SaveAlert		Oк

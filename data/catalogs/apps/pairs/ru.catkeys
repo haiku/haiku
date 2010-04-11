@@ -1,3 +1,10 @@
-1	russian	x-vnd.Haiku-Pairs	575304885
+1	russian	x-vnd.Haiku-Pairs	794776701
+Expert (8x8)	PairsWindow		Эксперт (8x8)
+Beginner (4x4)	PairsWindow		Новичок (4x4)
 Quit game	PairsWindow		Выход
+Game	PairsWindow		Игра
+Size	PairsWindow		Размер
+New	PairsWindow		Новая
+Intermediate (6x6)	PairsWindow		Средний (6x6)
+Quit	PairsWindow		Выход
 New game	PairsWindow		Новая игра

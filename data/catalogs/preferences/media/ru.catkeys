@@ -2,7 +2,7 @@
 Ready for use…	Media Window		Готово к использованию…
 Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для аудио позволяет системе выполнять аудио операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
 Video input:	Media views		Видео вход:
-Enable real-time video	Media views		Режим видео реального времени
+Enable real-time video	Media views		Включить видео режим реального времени
 Waiting for media_server to quit.	Media Window		Ожидание выключения медиа сервера.
 Cleaning up.	Media Window		Очистка.
 Defaults	Media views		По умолчанию
@@ -19,7 +19,7 @@ Could not connect to the media server.\nWould you like to start it ?	Media Windo
 Real-time	Media views		Реальное время
 Restart media services	Media views		Перезапустить медиа службы
 Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для видео позволяет системе выполнять видео операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
-Telling media_addon_server to quit.	Media Window		Запос завершения работы media_addon_server.
+Telling media_addon_server to quit.	Media Window		Запрос завершения работы media_addon_server.
 This hardware has no controls.	Media Window		Это оборудование не имеет настраиваемых параметров.
 Audio output:	Media views		Аудио выход:
 Restarting media services\nStarting media server…\n	Media Window		Перезапуск медиа служб\nЗапуск медиа сервера…\n

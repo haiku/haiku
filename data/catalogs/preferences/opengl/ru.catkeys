@@ -13,7 +13,7 @@ Max. recommended vertex elements:	Capabilities		Максимальное рек�
 GLU version:	InfoView		Версия GLU:
 Model stack size:	Capabilities		Размер стека модели:
 Projection stack size:	Capabilities		Размер стека проекции:
-Max. lights:	Capabilities		Максимальное колличество освещения:
+Max. lights:	Capabilities		Максимальное колличество источников света:
 Max. 2D texture size:	Capabilities		Максимальный размер 2D текстур:
 Max. convolution:	Capabilities		Максимальный оборот:
 GLUT API version:	InfoView		Версия GLUT API:
