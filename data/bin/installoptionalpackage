@@ -30,8 +30,7 @@ declare availablePackagesKeys=""
 # Some Packages cannot be installed,
 # as they require either the source code or compiled binaries
 declare packageIgnoreList='Bluetooth Development DevelopmentMin \
-DevelopmentBase UserlandFS Welcome Wifi-ipw2100+fw Wifi-iprowifi2200+fw \
-WifiFirmwareScriptData'
+DevelopmentBase UserlandFS Welcome WifiFirmwareScriptData'
 
 
 function CreateInstallerScript()
