@@ -10,6 +10,10 @@ Addon PS\ Compatible :
 	PSEntry.cpp
 	PS.cpp
 	PSCap.cpp
+	PSData.cpp
+	SelectPPDDlg.cpp
+	PPDParser.cpp
+	FilterIO.cpp
 	: be libprint.a $(TARGET_LIBSTDC++)
 ;
 

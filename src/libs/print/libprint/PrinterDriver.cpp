@@ -49,9 +49,20 @@ PrinterDriver::~PrinterDriver()
 	fPrinterData = NULL;
 }
 
+
+PrinterData*
+PrinterDriver::InstantiatePrinterData(BNode* node)
+{
+	return new PrinterData(node);
+}
+
 void 
 PrinterDriver::InitPrinterDataAndCap() {
-	fPrinterData = new PrinterData(fSpoolFolder);
+	fPrinterData = InstantiatePrinterData(fSpoolFolder);
+	fPrinterData->load();
+	// NOTE: moved the load above from the constructor of PrinterData as
+	//   we're inheriting from PrinterData and want our overridden versions
+	//   of load to be called
 	fPrinterCap = InstantiatePrinterCap(fPrinterData);
 }
 

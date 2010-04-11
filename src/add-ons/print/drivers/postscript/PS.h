@@ -8,7 +8,10 @@
 
 #include "GraphicsDriver.h"
 
+
+class FilterIO;
 class Halftone;
+
 
 class PSDriver : public GraphicsDriver {
 public:
@@ -32,9 +35,15 @@ private:
 		int size);
 	void jobEnd();
 
+	void StartFilterIfNeeded();
+	void FlushFilterIfNeeded();
+	void writePSString(const char *format, ...);
+	void writePSData(const void *data, size_t size);
+
 	int fPrintedPages;
 	int fCompressionMethod;
 	Halftone *fHalftone;
+	FilterIO *fFilterIO;
 };
 
 #endif	/* __PS_H */

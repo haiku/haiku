@@ -17,10 +17,9 @@ const char *PD_TRANSPORT        = "transport";
 const char *PD_PROTOCOL_CLASS   = "libprint:protocolClass";
 
 PrinterData::PrinterData(BNode *node)
-	: fProtocolClass(0)
-	, fNode(node)
+	: fNode(node),
+	fProtocolClass(0)
 {
-	load();
 }
 
 PrinterData::~PrinterData()

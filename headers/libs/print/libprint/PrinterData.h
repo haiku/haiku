@@ -20,9 +20,9 @@ class BNode;
 class PrinterData {
 public:
 	PrinterData(BNode *node = NULL);
-	~PrinterData();
-	void load();
-	void save();
+	virtual ~PrinterData();
+	virtual void load();
+	virtual void save();
 
 	const string &getDriverName() const;
 	const string &getPrinterName() const;
@@ -40,14 +40,13 @@ protected:
 	PrinterData(const PrinterData &printer_data);
 	PrinterData &operator = (const PrinterData &printer_data);
 
+	BNode  *fNode;
 private:
 	string fDriverName;
 	string fPrinterName;
 	string fComments;
 	string fTransport;
 	int    fProtocolClass;
-	
-	BNode  *fNode;
 };
 
 inline const string &PrinterData::getDriverName() const

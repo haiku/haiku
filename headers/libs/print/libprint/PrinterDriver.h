@@ -26,6 +26,7 @@ public:
 	virtual const char* GetCopyright() const = 0;
 
 	virtual PrinterCap* InstantiatePrinterCap(PrinterData* printerData) = 0;
+	virtual PrinterData* InstantiatePrinterData(BNode* node);
 	virtual GraphicsDriver* InstantiateGraphicsDriver(BMessage* settings, PrinterData* printerData, PrinterCap* printerCap) = 0;
 	
 	void InitPrinterDataAndCap();
