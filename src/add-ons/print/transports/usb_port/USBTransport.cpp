@@ -31,11 +31,12 @@
 #define PIT_1284_4_COMPATIBLE		0x03
 #define PIT_VENDOR_SPECIFIC		0xff
 
+
 class USBPrinter
 {
 public:
 	USBPrinter(const BString& id, const BString& name,
-		const BUSBInterface *intf, const BUSBEndpoint* in, const BUSBEndpoint* out);
+		const BUSBInterface *interface, const BUSBEndpoint* in, const BUSBEndpoint* out);
 
 	ssize_t Write(const void *buf, size_t size);
 	ssize_t Read(void *buf, size_t size);
@@ -43,8 +44,8 @@ public:
 	const BUSBInterface	*fInterface;
 	const BUSBEndpoint	*fOut;
 	const BUSBEndpoint	*fIn;
-	BString				fName;
-	BString				fID;
+	BString			fName;
+	BString			fID;
 };
 
 
@@ -85,10 +86,12 @@ uint32 transport_features = B_TRANSPORT_IS_HOTPLUG;
 
 USBPrinterRoster gUSBPrinterRoster;
 
+
 USBPrinterRoster::USBPrinterRoster()
 {
 	Start();
 }
+
 
 USBPrinter *USBPrinterRoster::Printer(const BString& key)
 {
@@ -98,36 +101,37 @@ USBPrinter *USBPrinterRoster::Printer(const BString& key)
 	return NULL;
 }
 
+
 status_t USBPrinterRoster::DeviceAdded(BUSBDevice* dev)
 {
-	const BUSBConfiguration *cfg = dev->ActiveConfiguration();
+	const BUSBConfiguration *config = dev->ActiveConfiguration();
 	const BUSBEndpoint *in = NULL, *out = NULL;
 	const BUSBInterface *printer = NULL;
 
 	// Try to find a working printer interface in this device
-	if (cfg) {
-		for (uint32 idx=0; printer == NULL && idx < cfg->CountInterfaces(); idx++) {
-			const BUSBInterface *intf=cfg->InterfaceAt(idx);
-			if (intf->Class() == PRINTER_INTERFACE_CLASS &&
-				intf->Subclass() == PRINTER_INTERFACE_SUBCLASS &&
-				(intf->Protocol() == PIT_UNIDIRECTIONAL ||
-				 intf->Protocol() == PIT_BIDIRECTIONAL ||
-				 intf->Protocol() == PIT_1284_4_COMPATIBLE)) {
+	if (config) {
+		for (uint32 idx = 0; printer == NULL && idx < config->CountInterfaces(); idx++) {
+			const BUSBInterface *interface = config->InterfaceAt(idx);
+			if (interface->Class() == PRINTER_INTERFACE_CLASS &&
+				interface->Subclass() == PRINTER_INTERFACE_SUBCLASS &&
+				(interface->Protocol() == PIT_UNIDIRECTIONAL ||
+				 interface->Protocol() == PIT_BIDIRECTIONAL ||
+				 interface->Protocol() == PIT_1284_4_COMPATIBLE)) {
 				// Found a usable Printer interface!
-				for (uint32 eptidx=0; eptidx < intf->CountEndpoints(); eptidx++) {
-					const BUSBEndpoint *ept = intf->EndpointAt(eptidx);
-					if (!ept->IsBulk())
+				for (uint32 endpointIdx = 0; endpointIdx < interface->CountEndpoints(); endpointIdx++) {
+					const BUSBEndpoint *endpoint = interface->EndpointAt(endpointIdx);
+					if (!endpoint->IsBulk())
 						continue;
 
-					if (ept->IsInput())
-						in = ept;
-					else if (ept->IsOutput())
-						out = ept;
+					if (endpoint->IsInput())
+						in = endpoint;
+					else if (endpoint->IsOutput())
+						out = endpoint;
 
 					if (!in || !out)
 						continue;
 
-					printer = intf;
+					printer = interface;
 					break;
 				}
 			}
@@ -138,28 +142,29 @@ status_t USBPrinterRoster::DeviceAdded(BUSBDevice* dev)
 		// We found a working printer interface, lets determine a unique ID
 		//  for it now, and a user identification for display in the Printers
 		//  preference.
-		BString port_id = dev->SerialNumberString();
-		if (!port_id.Length()) {
+		BString portId = dev->SerialNumberString();
+		if (!portId.Length()) {
 			// No persistent unique ID available, use the vendor/product
 			//   ID for now. This will be unique as long as no two similar
 			//   devices are attached.
-			port_id << dev->VendorID() << "/" << dev->ProductID();
+			portId << dev->VendorID() << "/" << dev->ProductID();
 		}
 
-		BString port_name = dev->ManufacturerString();
-		if (port_name.Length())
-			port_name << " ";
-		port_name << dev->ProductString();
+		BString portName = dev->ManufacturerString();
+		if (portName.Length())
+			portName << " ";
+		portName << dev->ProductString();
 
 		//TODO: Do we want to use usb.ids to find proper name if strings
 		//        are not supplied by USB?
 
-		fPrinters.Put(port_id.String(), new USBPrinter(port_id, port_name,
+		fPrinters.Put(portId.String(), new USBPrinter(portId, portName,
 			printer, in, out));
 	}
 
 	return B_OK;
 }
+
 
 void USBPrinterRoster::DeviceRemoved(BUSBDevice* dev)
 {
@@ -229,11 +234,13 @@ instantiate_transport(BDirectory *printer, BMessage *msg)
 	return NULL;
 }
 
+
 // List detected printers
 status_t list_transport_ports(BMessage* msg)
 {
 	return gUSBPrinterRoster.ListPrinters(msg);
 }
+
 
 // Implementation of USBTransport
 USBTransport::USBTransport(BDirectory *printer, BMessage *msg) 
