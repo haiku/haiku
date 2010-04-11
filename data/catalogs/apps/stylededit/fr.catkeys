@@ -1,0 +1,68 @@
+1	french	x-vnd.Haiku-StyledEdit	1909738892
+Paste	Menus		Coller
+OK	LoadAlert		OK
+File	Menus		Fichier
+???	LoadAlert		???
+Left	Menus		À gauche
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Retourner à la dernière version de \"%s\"? 
+Search backwards	FindandReplaceWindow		Chercher en arrière
+Size	Menus		Taille
+Save	QuitAlert		Sauvegarder
+Page setup…	Menus		Réglages de page…
+Redo typing	Menus		Refaire la frappe
+Print…	Menus		Imprimer…
+Replace same	Menus		Remplacer le même
+Can't undo	Menus		Impossible d'annuler
+Save	Menus		Sauvegarder
+Replace with:	FindandReplaceWindow		Pemplacer par :
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossible de revenir, fichier non trouvé : \"%s\".
+Case-sensitive	FindandReplaceWindow		Sensible à la casse
+Green	Menus		Vert
+Revert to saved…	Menus		Dernière version enregistrée…
+Yellow	Menus		Jaune
+Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
+Wrap lines	Menus		Retour à la ligne
+Quit	Menus		Quitter
+Cancel	RevertToSavedAlert		Annuler
+Document	Menus		Document
+Clear	Menus		Vider
+Save changes to the document \"%s\"? 	QuitAlert		Enregistrer les modifications du document \"%s\"? 
+Edit	Menus		Modifier
+Font	Menus		Police
+Replace all	FindandReplaceWindow		Tout remplacer
+Default	Open_and_SaveAsPanel		Défaut
+Cancel	FindandReplaceWindow		Annuler
+Close	Menus		Fermer
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erreur de chargement de \"%s\":\n\tFormat inconnu
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Ne pas enregistrer
+Align	Menus		Aligner
+Color	Menus		Couleur
+Red	Menus		Rouge
+Open…	Menus		Ouvrir…
+Center	Menus		Centré
+Blue	Menus		Bleu
+Cyan	Menus		Cyan
+Magenta	Menus		Magenta
+New	Menus		Nouveau
+Wrap-around search	FindandReplaceWindow		Recherche en boucle
+Find selection	Menus		Chercher la sélection
+Find:	FindandReplaceWindow		Chercher :
+Error saving \"%s\":\n%s	SaveAlert		Erreur d'enregistrement de \"%s\":\n%s
+Copy	Menus		Copier
+Cut	Menus		Couper
+Replace	FindandReplaceWindow		Remplacer
+Undo typing	Menus		Défaire la frappe
+Find again	Menus		Chercher encore
+Cancel	QuitAlert		Annuler
+Find…	Menus		Chercher…
+Select all	Menus		Tout sélectionner
+Error loading \"%s\":\n\t%s	LoadAlert		Erreur de chargement de \"%s\":\n\t%s
+Black	Menus		Noir
+Untitled 	StyledEditWindow		Sans titre
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		Trouver
+Encoding	Open_and_SaveAsPanel		Encodage
+Save as…	Menus		Enregistrer sous…
+Replace…	Menus		Remplacer…
+Right	Menus		À droite

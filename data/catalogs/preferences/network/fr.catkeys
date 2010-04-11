@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Network	2897060402
+1	french	x-vnd.Haiku-Network	3643490310
 Gateway:	EthernetSettingsView		Passerelle :
 Netmask:	EthernetSettingsView		Masque de sous-réseau :
 DHCP	EthernetSettingsView		DHCP
@@ -9,6 +9,7 @@ DNS #1:	EthernetSettingsView		DNS n°1 :
 IP address:	EthernetSettingsView		Adresse IP :
 Network	NetworkWindow		Réseau
 Adapter:	EthernetSettingsView		Adaptateur :
+Domain:	EthernetSettingsView		Domaine:
 Revert	EthernetSettingsView		Défaire
 Sending auto-config message failed: 	EthernetSettingsView		Échec d'envoi du message de configuration automatique :
 Mode:	EthernetSettingsView		Mode :

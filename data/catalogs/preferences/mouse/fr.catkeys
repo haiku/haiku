@@ -12,7 +12,7 @@ Click to focus	SettingsView		Cliquer pour focus
 Mouse speed	SettingsView		Vitesse de la souris
 Focus mode:	SettingsView		Méthode de focus :
 Instant warp	SettingsView		Téléportation instantanée
-Dig Deal	MouseApplication		Dig Deal
+Dig Deal	MouseApplication		Et alors ?
 1-Button	SettingsView		1 bouton
 Double-click speed	SettingsView		Vitesse du double clic
 Defaults	MouseWindow		Défauts

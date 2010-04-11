@@ -1,6 +1,6 @@
 1	french	x-vnd.Haiku-Media	2505372198
 Ready for use…	Media Window		Prêt à servir…
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Activer le son temps réel permet au système d'enregistrer et lire le son aussi rapidement que possible. Ceci utilise plus de mémoire et de temps processeur.\n\nN'activez cette option que si vous avez besoin de la latence la plus faible possible.
+Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Activer le son temps réel permet au système d'enregistrer et lire le son aussi rapidement que possible. Ceci utilise plus de mémoire et de temps processeur.\n\n N'activez cette option que si vous avez besoin de la latence la plus faible possible.
 Video input:	Media views		Entrée vidéo:
 Enable real-time video	Media views		Activer la vidéo temps réel
 Waiting for media_server to quit.	Media Window		Attente de la fin du serveur media.
@@ -16,9 +16,9 @@ Starting media server…	Media Window		Démarrage du serveur média…
 Done shutting down.	Media Window		Arrêt terminé.
 Video output:	Media views		Sortie vidéo:
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossible de se connecter au serveur media.\nVoulez-vous le démarrer ?
-Real-time	Media views		Tems réel
+Real-time	Media views		Temps réel
 Restart media services	Media views		Redémarrer les services media
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Activer la vidéo temps réel permet au système d'effectuer les opérations vidéo aussi rapidement et fluidement que possible. Ceci est fait en utilisant plus de mémoire.\n\nN'activez cette option que si vous avez besoin de la latence la plus faible possible.
+Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Activer la vidéo temps réel permet au système d'effectuer les opérations vidéo aussi rapidement et fluidement que possible. Ceci est fait en utilisant plus de mémoire.\n\n N'activez cette option que si vous avez besoin de la latence la plus faible possible.
 Telling media_addon_server to quit.	Media Window		Demande au serveur add-on media de quitter.
 This hardware has no controls.	Media Window		Ce matériel n'a pas de contrôles.
 Audio output:	Media views		Sortie audio:
