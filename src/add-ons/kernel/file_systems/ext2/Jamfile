@@ -13,6 +13,7 @@ UsePrivateKernelHeaders ;
 KernelAddon ext2 :
 	Volume.cpp
 	Inode.cpp
+	AttributeIterator.cpp
 	DirectoryIterator.cpp
 
 	kernel_interface.cpp

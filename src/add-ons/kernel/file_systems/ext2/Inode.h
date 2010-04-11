@@ -49,6 +49,9 @@ public:
 			status_t	FindBlock(off_t offset, uint32& block);
 			status_t	ReadAt(off_t pos, uint8 *buffer, size_t *length);
 
+			status_t	AttributeBlockReadAt(off_t pos, uint8 *buffer,
+							size_t *length);
+
 			ext2_inode&	Node() { return *fNode; }
 
 			void*		FileCache() const { return fCache; }
@@ -66,6 +69,7 @@ private:
 	void*				fCache;
 	void*				fMap;
 	ext2_inode*			fNode;
+	ext2_xattr_header*	fAttributesBlock;
 };
 
 #endif	// INODE_H

@@ -11,9 +11,18 @@
 #include <fs_cache.h>
 #include <fs_info.h>
 
+#include "AttributeIterator.h"
 #include "DirectoryIterator.h"
 #include "ext2.h"
 #include "Inode.h"
+
+
+//#define TRACE_EXT2
+#ifdef TRACE_EXT2
+#	define TRACE(x...) dprintf("\33[34mext2:\33[0m " x)
+#else
+#	define TRACE(x...) ;
+#endif
 
 
 #define EXT2_IO_SIZE	65536
@@ -497,6 +506,198 @@ ext2_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 }
 
 
+static status_t 
+ext2_open_attr_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
+{
+	Inode* inode = (Inode*)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	TRACE("%s()\n", __FUNCTION__);
+
+	if (!(volume->SuperBlock().CompatibleFeatures() & EXT2_FEATURE_EXT_ATTR))
+		return ENOSYS;
+
+	// on directories too ?
+	if (!inode->IsFile())
+		return EINVAL;
+
+	AttributeIterator* iterator = new(std::nothrow) AttributeIterator(inode);
+	if (iterator == NULL)
+		return B_NO_MEMORY;
+
+	*_cookie = iterator;
+	return B_OK;
+}
+
+static status_t
+ext2_close_attr_dir(fs_volume* _volume, fs_vnode* _node, void* cookie)
+{
+	TRACE("%s()\n", __FUNCTION__);
+	return B_OK;
+}
+
+
+static status_t
+ext2_free_attr_dir_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
+{
+	TRACE("%s()\n", __FUNCTION__);
+	delete (AttributeIterator *)_cookie;
+	return B_OK;
+}
+
+
+static status_t
+ext2_read_attr_dir(fs_volume* _volume, fs_vnode* _node,
+				void* _cookie, struct dirent* dirent, size_t bufferSize,
+				uint32* _num)
+{
+	Inode* inode = (Inode*)_node->private_node;
+	AttributeIterator *iterator = (AttributeIterator *)_cookie;
+	TRACE("%s()\n", __FUNCTION__);
+
+	size_t length = bufferSize;
+	status_t status = iterator->GetNext(dirent->d_name, &length);
+	if (status == B_ENTRY_NOT_FOUND) {
+		*_num = 0;
+		return B_OK;
+	} else if (status != B_OK)
+		return status;
+
+	Volume* volume = (Volume*)_volume->private_volume;
+
+	dirent->d_dev = volume->ID();
+	dirent->d_ino = inode->ID();
+	dirent->d_reclen = sizeof(struct dirent) + length;
+
+	*_num = 1;
+	return B_OK;
+}
+
+
+static status_t
+ext2_rewind_attr_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie)
+{
+	AttributeIterator *iterator = (AttributeIterator *)_cookie;
+	TRACE("%s()\n", __FUNCTION__);
+	return iterator->Rewind();
+}
+
+
+	/* attribute operations */
+static status_t
+ext2_create_attr(fs_volume* _volume, fs_vnode* _node,
+	const char* name, uint32 type, int openMode, void** _cookie)
+{
+	return EROFS;
+}
+
+
+static status_t
+ext2_open_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
+	int openMode, void** _cookie)
+{
+	TRACE("%s()\n", __FUNCTION__);
+	if ((openMode & O_RWMASK) != O_RDONLY)
+		return EROFS;
+
+	Inode* inode = (Inode*)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+
+	if (!(volume->SuperBlock().CompatibleFeatures() & EXT2_FEATURE_EXT_ATTR))
+		return ENOSYS;
+
+	// on directories too ?
+	if (!inode->IsFile())
+		return EINVAL;
+
+	ext2_xattr_entry *entry = new ext2_xattr_entry;
+
+	AttributeIterator i(inode);
+	status_t status = i.Find(name, entry);
+	if (status == B_OK) {
+		entry->Dump();
+		*_cookie = entry;
+		return B_OK;
+	}
+	
+	delete entry;
+	return status;
+}
+
+
+static status_t
+ext2_close_attr(fs_volume* _volume, fs_vnode* _node,
+	void* cookie)
+{
+	return B_OK;
+}
+
+
+static status_t
+ext2_free_attr_cookie(fs_volume* _volume, fs_vnode* _node,
+	void* cookie)
+{
+	ext2_xattr_entry *entry = (ext2_xattr_entry *)cookie;
+
+	delete entry;
+	return B_OK;
+}
+
+
+static status_t
+ext2_read_attr(fs_volume* _volume, fs_vnode* _node, void* cookie,
+	off_t pos, void* buffer, size_t* length)
+{
+	return ENOSYS;
+}
+
+
+static status_t
+ext2_write_attr(fs_volume* _volume, fs_vnode* _node, void* cookie,
+	off_t pos, const void* buffer, size_t* length)
+{
+	return EROFS;
+}
+
+
+
+static status_t
+ext2_read_attr_stat(fs_volume* _volume, fs_vnode* _node,
+	void* cookie, struct stat* stat)
+{
+	ext2_xattr_entry *entry = (ext2_xattr_entry *)cookie;
+
+	stat->st_type = B_RAW_TYPE;
+	stat->st_size = entry->ValueSize();
+	TRACE("%s: st_size %d\n", __FUNCTION__, stat->st_size);
+
+	return B_OK;
+}
+
+
+static status_t
+ext2_write_attr_stat(fs_volume* _volume, fs_vnode* _node,
+	void* cookie, const struct stat* stat, int statMask)
+{
+	return EROFS;
+}
+
+
+static status_t
+ext2_rename_attr(fs_volume* _volume, fs_vnode* fromVnode,
+	const char* fromName, fs_vnode* toVnode, const char* toName)
+{
+	return ENOSYS;
+}
+
+
+static status_t
+ext2_remove_attr(fs_volume* _volume, fs_vnode* vnode,
+	const char* name)
+{
+	return ENOSYS;
+}
+
+
 fs_volume_ops gExt2VolumeOps = {
 	&ext2_unmount,
 	&ext2_read_fs_info,
@@ -556,7 +757,25 @@ fs_vnode_ops gExt2VnodeOps = {
 	&ext2_read_dir,
 	&ext2_rewind_dir,
 
-	NULL,
+	/* attribute directory operations */
+	&ext2_open_attr_dir,
+	&ext2_close_attr_dir,
+	&ext2_free_attr_dir_cookie,
+	&ext2_read_attr_dir,
+	&ext2_rewind_attr_dir,
+
+	/* attribute operations */
+	NULL, //&ext2_create_attr,
+	&ext2_open_attr,
+	&ext2_close_attr,
+	&ext2_free_attr_cookie,
+	NULL, //&ext2_read_attr,
+	NULL, //&ext2_write_attr,
+	&ext2_read_attr_stat,
+	NULL, //&ext2_write_attr_stat,
+	NULL, //&ext2_rename_attr,
+	NULL, //&ext2_remove_attr,
+	
 };
 
 static file_system_module_info sExt2FileSystem = {

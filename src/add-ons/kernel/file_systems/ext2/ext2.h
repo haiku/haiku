@@ -10,6 +10,7 @@
 
 #include <ByteOrder.h>
 #include <fs_interface.h>
+#include <KernelExport.h>
 
 
 #define EXT2_SUPER_BLOCK_OFFSET	1024
@@ -285,6 +286,78 @@ struct ext2_dir_entry {
 #define EXT2_TYPE_FIFO			5
 #define EXT2_TYPE_SOCKET		6
 #define EXT2_TYPE_SYMLINK		7
+
+#define EXT2_XATTR_MAGIC		0xea020000
+#define EXT2_XATTR_ROUND		((1 << 2) - 1)
+#define EXT2_XATTR_NAME_LENGTH	255
+
+#define EXT2_XATTR_INDEX_USER	1
+
+struct ext2_xattr_header {
+	uint32	magic;
+	uint32	refcount;
+	uint32	blocks;		// must be 1 for ext2
+	uint32	hash;
+	uint32	reserved[4];	// zero
+
+	bool IsValid() const
+	{
+		return B_LENDIAN_TO_HOST_INT32(magic) == EXT2_XATTR_MAGIC
+			&& B_LENDIAN_TO_HOST_INT32(blocks) == 1
+			&& refcount <= 1024;
+	}
+
+	void Dump() const {
+		for (int i = 0; i < Length(); i++)
+			dprintf("%02x ", ((uint8 *)this)[i]);
+		dprintf("\n");
+	}
+
+	static size_t Length()
+	{
+		return sizeof(ext2_xattr_header);
+	}
+};
+
+struct ext2_xattr_entry {
+	uint8	name_length;
+	uint8	name_index;
+	uint16	value_offset;
+	uint32	value_block;	// must be zero for ext2
+	uint32	value_size;
+	uint32	hash;
+	char	name[EXT2_XATTR_NAME_LENGTH];
+
+	uint8 NameLength() const { return name_length; }
+	uint8 NameIndex() const { return name_index; }
+	uint16 ValueOffset() const { return
+			B_LENDIAN_TO_HOST_INT16(value_offset); }
+	uint32 ValueSize() const { return
+			B_LENDIAN_TO_HOST_INT32(value_size); }
+
+	// padded sizes
+	uint32 Length() const { return (MinimumSize() + NameLength()
+		+ EXT2_XATTR_ROUND) & ~EXT2_XATTR_ROUND; }
+
+	bool IsValid() const
+	{
+		return NameLength() > 0 && value_block == 0;
+			// There is no maximum size, as the last entry spans until the
+			// end of the block
+	}
+
+	void Dump(bool full=false) const {
+		for (int i = 0; i < (full ? sizeof(this) : MinimumSize()); i++)
+			dprintf("%02x ", ((uint8 *)this)[i]);
+		dprintf("\n");
+	}
+
+	static size_t MinimumSize()
+	{
+		return sizeof(ext2_xattr_entry) - EXT2_XATTR_NAME_LENGTH;
+	}
+} _PACKED;
+
 
 extern fs_volume_ops gExt2VolumeOps;
 extern fs_vnode_ops gExt2VnodeOps;

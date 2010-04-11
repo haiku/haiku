@@ -7,11 +7,12 @@
 #include "Inode.h"
 
 #include <fs_cache.h>
+#include <string.h>
 
 #include "CachedBlock.h"
 
 
-//#define TRACE_EXT2
+#define TRACE_EXT2
 #ifdef TRACE_EXT2
 #	define TRACE(x...) dprintf("\33[34mext2:\33[0m " x)
 #else
@@ -25,7 +26,8 @@ Inode::Inode(Volume* volume, ino_t id)
 	fID(id),
 	fCache(NULL),
 	fMap(NULL),
-	fNode(NULL)
+	fNode(NULL),
+	fAttributesBlock(NULL)
 {
 	rw_lock_init(&fLock, "ext2 inode");
 
@@ -52,6 +54,11 @@ Inode::~Inode()
 {
 	file_cache_delete(FileCache());
 	file_map_delete(Map());
+
+	if (fAttributesBlock) {
+		uint32 block = B_LENDIAN_TO_HOST_INT32(Node().file_access_control);
+		block_cache_put(fVolume->BlockCache(), block);
+	}
 
 	if (fNode != NULL) {
 		uint32 block;
@@ -206,3 +213,30 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 	return file_cache_read(FileCache(), NULL, pos, buffer, _length);
 }
 
+
+status_t
+Inode::AttributeBlockReadAt(off_t pos, uint8* buffer, size_t* _length)
+{
+	size_t length = *_length;
+
+	if (!fAttributesBlock) {
+		uint32 block = B_LENDIAN_TO_HOST_INT32(Node().file_access_control);
+
+		if (block == 0)
+			return B_ENTRY_NOT_FOUND;
+
+		TRACE("inode %Ld attributes at block %lu\n", ID(), block);
+		fAttributesBlock = (ext2_xattr_header*)block_cache_get(
+			GetVolume()->BlockCache(), block);
+	}
+
+	if (!fAttributesBlock)
+		return B_ENTRY_NOT_FOUND;
+
+	if (pos < 0LL || ((uint32)pos + length) > GetVolume()->BlockSize())
+		return ERANGE;
+
+	memcpy(buffer, ((uint8 *)fAttributesBlock) + (uint32)pos, length);
+	*_length = length;
+	return B_NO_ERROR;
+}
