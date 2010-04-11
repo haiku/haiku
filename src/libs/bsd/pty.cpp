@@ -29,13 +29,12 @@ openpty(int* _master, int* _slave, char* name, struct termios* termAttrs,
 		return -1;
 	}
 
-	if (termAttrs != NULL && tcsetattr(master, TCSANOW, termAttrs) != 0
-		|| windowSize != NULL
-			&& ioctl(master, TIOCSWINSZ, windowSize, sizeof(winsize)) != 0) {
-		// TODO we should either close master and slaves and return -1 
-		// 		or we do nothing!
+	if ((termAttrs != NULL && tcsetattr(master, TCSANOW, termAttrs) != 0)
+		|| (windowSize != NULL
+			&& ioctl(master, TIOCSWINSZ, windowSize, sizeof(winsize)) != 0)) {
 		close(slave);
 		close(master);
+		return -1;
 	}
 
 	*_master = master;
@@ -52,14 +51,14 @@ int
 login_tty(int fd)
 {
 	setsid();
-	
+
 	if (ioctl(fd, TIOCSCTTY, NULL) != 0)
 		return -1;
-		
+
 	dup2(fd, 0);
 	dup2(fd, 1);
 	dup2(fd, 2);
-	
+
 	close(fd);
 	return 0;
 }
@@ -72,7 +71,7 @@ forkpty(int* _master, char* name, struct termios* termAttrs,
 	int master, slave;
 	if (openpty(&master, &slave, name, termAttrs, windowSize) != 0)
 		return -1;
-		
+
 	int pid = fork();
 	if (pid < 0) {
 		close(master);
@@ -84,7 +83,7 @@ forkpty(int* _master, char* name, struct termios* termAttrs,
 		close(master);
 		return login_tty(slave);
 	}
-	
+
 	// parent
 	close (slave);
 	*_master = master;
