@@ -134,7 +134,7 @@ protected:
 public:
 			enum run_mode {
 				B_OFFLINE = 1,
-					// This mode has realtime constraint.
+					// This mode has no realtime constraint.
 				B_DECREASE_PRECISION,
 					// When late, try to catch up by reducing quality.
 				B_INCREASE_LATENCY,
