@@ -166,7 +166,7 @@ private:
 			void				_DrawTriangleThumb();
 
 			BPoint				_Location() const;
-			void				_SetLocation(BPoint point);
+			void				_SetLocationForValue(int32 value);
 
 			float				_MinPosition() const;
 			float				_MaxPosition() const;

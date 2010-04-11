@@ -363,8 +363,6 @@ BSlider::AttachedToWindow()
 {
 	ResizeToPreferred();
 
-	fLocation.Set(9.0f, 0.0f);
-	
 #if USE_OFF_SCREEN_VIEW
 	BRect bounds(Bounds());
 
@@ -395,8 +393,11 @@ BSlider::AttachedToWindow()
 		view->UnlockLooper();
 	}
 
-	SetValue(Value());
+	int32 value = Value();
+	SetValue(value);
 		// makes sure the value is within valid bounds
+	_SetLocationForValue(Value());
+		// makes sure the location is correct
 	UpdateTextChanged();
 }
 
@@ -672,22 +673,8 @@ BSlider::SetValue(int32 value)
 
 	if (value == Value())
 		return;
-
-	BPoint loc;
-	float range = (float)(fMaxValue - fMinValue);
-	if (range == 0)
-		range = 1;
-
-	float pos = (float)(value - fMinValue) / range *
-		(_MaxPosition() - _MinPosition());
-
-	if (fOrientation == B_HORIZONTAL) {
-		loc.x = ceil(_MinPosition() + pos);
-		loc.y = 0;
-	} else {
-		loc.x = 0;
-		loc.y = floor(_MaxPosition() - pos);
-	}
+	
+	_SetLocationForValue(value);
 
 	BRect oldThumbFrame = ThumbFrame();
 
@@ -697,8 +684,6 @@ BSlider::SetValue(int32 value)
 		oldThumbFrame.top = BarFrame().top;
 	else
 		oldThumbFrame.right = BarFrame().right;
-
-	_SetLocation(loc);
 
 	BControl::SetValueNoUpdate(value);
 	BRect invalid = oldThumbFrame | ThumbFrame();
@@ -2030,9 +2015,24 @@ BSlider::_Location() const
 
 
 void
-BSlider::_SetLocation(BPoint p)
+BSlider::_SetLocationForValue(int32 value)
 {
-	fLocation = p;
+	BPoint loc;
+	float range = (float)(fMaxValue - fMinValue);
+	if (range == 0)
+		range = 1;
+
+	float pos = (float)(value - fMinValue) / range *
+		(_MaxPosition() - _MinPosition());
+
+	if (fOrientation == B_HORIZONTAL) {
+		loc.x = ceil(_MinPosition() + pos);
+		loc.y = 0;
+	} else {
+		loc.x = 0;
+		loc.y = floor(_MaxPosition() - pos);
+	}
+	fLocation = loc;
 }
 
 
