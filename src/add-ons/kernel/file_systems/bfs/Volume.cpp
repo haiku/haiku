@@ -344,7 +344,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	// check if the device size is large enough to hold the file system
 	off_t diskSize;
-	if (opener.GetSize(&diskSize) != B_OK)
+	if (opener.GetSize(&diskSize, &fDeviceBlockSize) != B_OK)
 		RETURN_ERROR(B_ERROR);
 	if (diskSize < (NumBlocks() << BlockShift()))
 		RETURN_ERROR(B_BAD_VALUE);

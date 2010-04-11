@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -87,9 +87,9 @@ iterative_io_get_vecs_hook(void* cookie, io_request* request, off_t offset,
 	size_t size, struct file_io_vec* vecs, size_t* _count)
 {
 	Inode* inode = (Inode*)cookie;
-	return file_map_translate(inode->Map(), offset, size, vecs, _count, 512);
-		// TODO: Use the actual block size of the underlying device for the
-		// alignment!
+
+	return file_map_translate(inode->Map(), offset, size, vecs, _count, 
+		inode->GetVolume()->BlockSize());
 }
 
 

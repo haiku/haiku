@@ -65,6 +65,7 @@ public:
 			off_t			FreeBlocks() const
 								{ return NumBlocks() - UsedBlocks(); }
 
+			uint32			DeviceBlockSize() const { return fDeviceBlockSize; }
 			uint32			BlockSize() const { return fBlockSize; }
 			uint32			BlockShift() const { return fBlockShift; }
 			uint32			InodeSize() const
@@ -142,6 +143,7 @@ protected:
 			int				fDevice;
 			disk_super_block fSuperBlock;
 
+			uint32			fDeviceBlockSize;
 			uint32			fBlockSize;
 			uint32			fBlockShift;
 			uint32			fAllocationGroupShift;
