@@ -85,6 +85,8 @@ public:
 			: le2h(fOldData->s_tree_height));
 	}
 
+	status_t GetLabel(char* buffer, size_t bufferSize) const;
+
 private:
 	uint32	fFormatVersion;
 	union {

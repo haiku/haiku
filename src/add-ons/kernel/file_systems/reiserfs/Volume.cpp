@@ -262,10 +262,12 @@ Volume::GetName() const
 void
 Volume::UpdateName(partition_id partitionID)
 {
+	if (fSuperBlock->GetLabel(fVolumeName, sizeof(fVolumeName)) == B_OK)
+		return;
 	if (get_default_partition_content_name(partitionID, "ReiserFS",
-			fVolumeName, sizeof(fVolumeName)) != B_OK) {
-		strlcpy(fVolumeName, "ReiserFS Volume", sizeof(fVolumeName));
-	}
+			fVolumeName, sizeof(fVolumeName)) == B_OK)
+		return;
+	strlcpy(fVolumeName, "ReiserFS Volume", sizeof(fVolumeName));
 }
 
 

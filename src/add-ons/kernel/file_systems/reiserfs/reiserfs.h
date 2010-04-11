@@ -272,7 +272,14 @@ struct reiserfs_super_block
                                    superblock. -Hans */
   uint16 s_reserved;
   uint32 s_inode_generation;
-  char s_unused[124] ;			/* zero filled by mkreiserfs */
+  uint32 s_flags;
+  char s_uuid[16];
+  char s_label[16];
+  uint16 s_mnt_count;
+  uint16 s_max_mnt_count;
+  uint32 s_lastcheck;
+  uint32 s_check_interval;
+  char s_unused[76] ;			/* zero filled by mkreiserfs */
 } _PACKED;
 
 #define SB_SIZE (sizeof(struct reiserfs_super_block))

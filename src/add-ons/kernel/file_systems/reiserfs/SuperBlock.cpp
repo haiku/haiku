@@ -109,7 +109,7 @@ PRINT(("SuperBlock: ReiserFS 3.5\n"));
 		fFormatVersion = REISERFS_3_5;
 	// try new version and new layout
 	} else if (read_super_block(device, REISERFS_DISK_OFFSET_IN_BYTES + offset,
-			REISER2FS_SUPER_MAGIC_STRING, &fOldData) == B_OK) {
+			REISER2FS_SUPER_MAGIC_STRING, &fCurrentData) == B_OK) {
 PRINT(("SuperBlock: ReiserFS 3.6\n"));
 		fFormatVersion = REISERFS_3_6;
 	// failure
@@ -119,3 +119,16 @@ PRINT(("SuperBlock: ReiserFS 3.6\n"));
 	return error;
 }
 
+
+// GetLabel
+status_t
+SuperBlock::GetLabel(char* buffer, size_t bufferSize) const
+{
+	if (GetFormatVersion() == REISERFS_3_6 && fCurrentData->s_label[0]) {
+		size_t len = MIN(sizeof(fCurrentData->s_label), bufferSize - 1);
+		memcpy(buffer, fCurrentData->s_label, len);
+		buffer[len] = '\0';
+		return B_OK;
+	}
+	return B_ENTRY_NOT_FOUND;
+}
