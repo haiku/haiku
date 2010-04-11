@@ -39,6 +39,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	LibIconv				- text encoding conversion library
 #	LibLayout				- GCC2 package needed by some BeOS apps to compile
 #	LibXML2					- the XML support libary
+#	LibXSLT					- xslt library and utility
 #	Links					- the web browser
 #	Mercurial				- the distributed version control system
 #	Nano					- the command line text editor
@@ -666,8 +667,22 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibXML2 available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage libxml2-2.7.6-x86-gcc2-2009-10-19.zip
-			: $(baseURL)/libxml2-2.7.6-x86-gcc2-2009-10-19.zip
+		InstallOptionalHaikuImagePackage libxml2-2.7.7-x86-gcc2-2010-04-11.zip
+			: $(baseURL)/libxml2-2.7.7-x86-gcc2-2010-04-11.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# LibXSLT
+if [ IsOptionalHaikuImagePackageAdded LibXSLT ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package LibXSLT available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage libxslt-1.1.26-x86-gcc2-2010-04-11.zip
+			: $(baseURL)/libxslt-1.1.26-x86-gcc2-2010-04-11.zip
 			:
 			: true
 		;
