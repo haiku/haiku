@@ -72,9 +72,9 @@
 #	define PROBE(buffer, window) \
 	dprintf("TCP PROBE %llu %s %s %ld snxt %lu suna %lu cw %lu sst %lu win %lu swin %lu smax-suna %lu savail %lu sqused %lu rto %llu\n", \
 		system_time(), PrintAddress(buffer->source), \
-		PrintAddress(buffer->destination), buffer->size, (uint32)fSendNext, \
-		(uint32)fSendUnacknowledged, fCongestionWindow, fSlowStartThreshold, \
-		window, fSendWindow, (uint32)(fSendMax - fSendUnacknowledged), \
+		PrintAddress(buffer->destination), buffer->size, fSendNext.Number(), \
+		fSendUnacknowledged.Number(), fCongestionWindow, fSlowStartThreshold, \
+		window, fSendWindow, (fSendMax - fSendUnacknowledged).Number(), \
 		fSendQueue.Available(fSendNext), fSendQueue.Used(), fRetransmitTimeout)
 #else
 #	define PROBE(buffer, window)	do { } while (0)
@@ -1298,13 +1298,27 @@ TCPEndpoint::_NotifyReader()
 bool
 TCPEndpoint::_AddData(tcp_segment_header& segment, net_buffer* buffer)
 {
+	if ((segment.flags & TCP_FLAG_FINISH) != 0) {
+		// Remember the position of the finish received flag
+		fFinishReceived = true;
+		fFinishReceivedAt = segment.sequence + buffer->size;
+	}
+
 	fReceiveQueue.Add(buffer, segment.sequence);
 	fReceiveNext = fReceiveQueue.NextSequence();
+
+	if (fFinishReceived) {
+		// Set or reset the finish flag on the current segment
+		if (fReceiveNext < fFinishReceivedAt)
+			segment.flags &= ~TCP_FLAG_FINISH;
+		else
+			segment.flags |= TCP_FLAG_FINISH;
+	}
 
 	TRACE("  _AddData(): adding data, receive next = %lu. Now have %lu bytes.",
 		fReceiveNext.Number(), fReceiveQueue.Available());
 
-	if (segment.flags & TCP_FLAG_PUSH)
+	if ((segment.flags & TCP_FLAG_PUSH) != 0)
 		fReceiveQueue.SetPushPointer();
 
 	return fReceiveQueue.Available() > 0;
@@ -1315,6 +1329,7 @@ void
 TCPEndpoint::_PrepareReceivePath(tcp_segment_header& segment)
 {
 	fInitialReceiveSequence = segment.sequence;
+	fFinishReceived = false;
 
 	// count the received SYN
 	segment.sequence++;
@@ -1686,7 +1701,8 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 	bool notify = false;
 
-	if (buffer->size > 0 &&	_ShouldReceive())
+	if ((buffer->size > 0 || (segment.flags & TCP_FLAG_FINISH) != 0)
+		&& _ShouldReceive())
 		notify = _AddData(segment, buffer);
 	else {
 		if ((fFlags & FLAG_NO_RECEIVE) != 0)
@@ -1695,7 +1711,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		action = (action & ~KEEP) | DROP;
 	}
 
-	if (segment.flags & TCP_FLAG_FINISH) {
+	if ((segment.flags & TCP_FLAG_FINISH) != 0) {
 		segmentLength++;
 		if (fState != CLOSED && fState != LISTEN && fState != SYNCHRONIZE_SENT) {
 			TRACE("Receive(): peer is finishing connection!");
@@ -1989,7 +2005,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 
 		// Determine if we should really send this segment
 		if (!force && !_ShouldSendSegment(segment, segmentLength,
-			segmentMaxSize, flightSize)) {
+				segmentMaxSize, flightSize)) {
 			if (fSendQueue.Available()
 				&& !gStackModule->is_timer_active(&fPersistTimer)
 				&& !gStackModule->is_timer_active(&fRetransmitTimer))

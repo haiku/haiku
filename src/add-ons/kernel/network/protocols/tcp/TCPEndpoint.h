@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -170,6 +170,8 @@ private:
 	uint32			fReceiveWindow;
 	uint32			fReceiveMaxSegmentSize;
 	BufferQueue		fReceiveQueue;
+	bool			fFinishReceived;
+	tcp_sequence	fFinishReceivedAt;
 	tcp_sequence	fInitialReceiveSequence;
 
 	// round trip time and retransmit timeout computation
