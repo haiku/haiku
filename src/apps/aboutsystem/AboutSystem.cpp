@@ -93,6 +93,7 @@ static const Translation gTranslations[] =
 	},
 	{ "fi",
 		"Jaakko Leikas (Garjala)\n"
+		"Jorma Karvonen (Karvjorm)\n"
 	},
 	{ "fr",
 		"Jean-Loïc Charroud\n"
