@@ -3935,7 +3935,7 @@ BView::RemoveSelf()
 bool
 BView::_RemoveSelf()
 {
-	STRACE(("BView(%s)::RemoveSelf()\n", Name()));
+	STRACE(("BView(%s)::_RemoveSelf()\n", Name()));
 
 	// Remove this child from its parent
 
@@ -3959,7 +3959,7 @@ BView::_RemoveSelf()
 
 	parent->InvalidateLayout();
 
-	STRACE(("DONE: BView(%s)::RemoveSelf()\n", Name()));
+	STRACE(("DONE: BView(%s)::_RemoveSelf()\n", Name()));
 
 	return true;
 }
@@ -4792,11 +4792,11 @@ BView::_InitData(BRect frame, const char* name, uint32 resizingMode,
 {
 	// Info: The name of the view is set by BHandler constructor
 
-	STRACE(("BView::InitData: enter\n"));
+	STRACE(("BView::_InitData: enter\n"));
 
 	// initialize members
 	if ((resizingMode & ~_RESIZE_MASK_) || (flags & _RESIZE_MASK_))
-		printf("%s BView::InitData(): resizing mode or flags swapped\n", name);
+		printf("%s BView::_InitData(): resizing mode or flags swapped\n", name);
 
 	// There are applications that swap the resize mask and the flags in the
 	// BView constructor. This does not cause problems under BeOS as it just
