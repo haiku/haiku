@@ -81,7 +81,6 @@ UrlWrapper::RefsReceived(BMessage* msg)
 		BString mimetype;
 		BString extension(ref.name);
 		extension.Remove(0, extension.FindLast('.') + 1);
-printf("e:%s\n", extension.String());
 		if (f.InitCheck() == B_OK && ni.InitCheck() == B_OK) {
 			ni.GetType(mimetype.LockBuffer(B_MIME_TYPE_LENGTH));
 			mimetype.UnlockBuffer();
@@ -186,8 +185,6 @@ printf("e:%s\n", extension.String());
 					args[1] = (char*)u.String();
 					mimetype = kURLHandlerSigBase;
 					mimetype += u.Proto();
-					printf("sig:'%s'\n", mimetype.String());
-					printf("url:'%s'\n", u.String());
 					err = be_roster->Launch(mimetype.String(), 1, args+1);
 					if (err < B_OK)
 						err = be_roster->Launch(kAppSig, 1, args+1);
