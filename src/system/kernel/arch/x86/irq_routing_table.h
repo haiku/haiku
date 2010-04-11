@@ -26,9 +26,9 @@ struct irq_routing_entry
 typedef Vector<irq_routing_entry> IRQRoutingTable;
 
 
-struct irq_discriptor
+struct irq_descriptor
 {
-	irq_discriptor();
+	irq_descriptor();
 	// bit 0 is interrupt 0, bit 2 is interrupt 2, and so on
 	int16			irq;
 	bool			shareable;
@@ -39,21 +39,21 @@ struct irq_discriptor
 };
 
 
-void print_irq_discriptor(irq_discriptor* discriptor);
+void print_irq_descriptor(irq_descriptor* descriptor);
 void print_irq_routing_table(IRQRoutingTable* table);
 
 
 status_t read_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
 			IRQRoutingTable* table);
-status_t read_irq_discriptor(acpi_module_info* acpi, acpi_handle device,
-			const char* method, irq_discriptor* discriptor);
+status_t read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
+			const char* method, irq_descriptor* descriptor);
 
 status_t read_current_irq(acpi_module_info* acpi, acpi_handle device,
-			irq_discriptor* discriptor);
+			irq_descriptor* descriptor);
 status_t read_possible_irq(acpi_module_info* acpi, acpi_handle device,
-			irq_discriptor* discriptor);
+			irq_descriptor* descriptor);
 
 status_t set_acpi_irq(acpi_module_info* acpi, acpi_handle device,
-			irq_discriptor* discriptor);
+			irq_descriptor* descriptor);
 
 #endif

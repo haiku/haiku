@@ -25,7 +25,7 @@ const int kIRQDescriptor = 0x04;
 const char* kACPIPciRootName = "PNP0A03";
 
 
-irq_discriptor::irq_discriptor()
+irq_descriptor::irq_descriptor()
 	:
 	irq(0),
 	shareable(false),
@@ -37,10 +37,10 @@ irq_discriptor::irq_discriptor()
 
 
 void
-print_irq_discriptor(irq_discriptor* discriptor)
+print_irq_descriptor(irq_descriptor* descriptor)
 {
 	for (int i = 0; i < 16; i++) {
-		if (discriptor->irq >> i & 0x01)
+		if (descriptor->irq >> i & 0x01)
 			dprintf("interrupt: %i\n", i);
 	}
 	
@@ -50,9 +50,9 @@ print_irq_discriptor(irq_discriptor* discriptor)
 	const char* edgeTriggeredString = " edge triggered";
 
 	dprintf("shareable: %i, polarity: %s, interrupt_mode: %s\n",
-		discriptor->shareable, discriptor->polarity == B_HIGH_ACTIVE_POLARITY
+		descriptor->shareable, descriptor->polarity == B_HIGH_ACTIVE_POLARITY
 			? activeHighString : activeLowString,
-		discriptor->interrupt_mode == B_LEVEL_TRIGGERED	? levelTriggeredString
+		descriptor->interrupt_mode == B_LEVEL_TRIGGERED	? levelTriggeredString
 			: edgeTriggeredString);
 }
 
@@ -181,8 +181,8 @@ read_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
 
 
 status_t
-read_irq_discriptor(acpi_module_info* acpi, acpi_handle device,
-	const char* method, irq_discriptor* discriptor)
+read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
+	const char* method, irq_descriptor* descriptor)
 {
 	acpi_data buffer;
 	buffer.pointer = NULL;
@@ -201,7 +201,7 @@ read_irq_discriptor(acpi_module_info* acpi, acpi_handle device,
 	int8* resourcePointer = (int8*)resourceBuffer[0].data.buffer.buffer;
 	int8 integer = resourcePointer[0];
 	if (integer >> 3 != kIRQDescriptor) {
-		TRACE("resource is not a irq discriptor\n");
+		TRACE("resource is not a irq descriptor\n");
 		return B_ERROR;
 	}
 
@@ -211,9 +211,9 @@ read_irq_discriptor(acpi_module_info* acpi, acpi_handle device,
 		return B_ERROR;
 	}
 
-	discriptor->irq = resourcePointer[2];
-	discriptor->irq = discriptor->irq << 8;
-	discriptor->irq |= resourcePointer[1];
+	descriptor->irq = resourcePointer[2];
+	descriptor->irq = descriptor->irq << 8;
+	descriptor->irq |= resourcePointer[1];
 
 	// if size equal 2 we are don't else read the third entry
 	if (size == 2)
@@ -223,12 +223,12 @@ read_irq_discriptor(acpi_module_info* acpi, acpi_handle device,
 	int bit;
 	
 	bit = irqInfo & 0x01;
-	discriptor->interrupt_mode = (bit == 0) ? B_LEVEL_TRIGGERED
+	descriptor->interrupt_mode = (bit == 0) ? B_LEVEL_TRIGGERED
 		: B_EDGE_TRIGGERED;
 	bit = irqInfo >> 3 & 0x01;
-	discriptor->polarity = (bit == 0) ? B_HIGH_ACTIVE_POLARITY
+	descriptor->polarity = (bit == 0) ? B_HIGH_ACTIVE_POLARITY
 		: B_LOW_ACTIVE_POLARITY;
-	discriptor->shareable = irqInfo >> 4 & 0x01;
+	descriptor->shareable = irqInfo >> 4 & 0x01;
 
 	return B_OK;
 }
@@ -236,39 +236,39 @@ read_irq_discriptor(acpi_module_info* acpi, acpi_handle device,
 
 status_t
 read_current_irq(acpi_module_info* acpi, acpi_handle device,
-	irq_discriptor* discriptor)
+	irq_descriptor* descriptor)
 {
-	return read_irq_discriptor(acpi, device, "_CRS", discriptor);
+	return read_irq_descriptor(acpi, device, "_CRS", descriptor);
 }
 
 
 status_t
 read_possible_irq(acpi_module_info* acpi, acpi_handle device,
-	irq_discriptor* discriptor)
+	irq_descriptor* descriptor)
 {
-	return read_irq_discriptor(acpi, device, "_PRS", discriptor);
+	return read_irq_descriptor(acpi, device, "_PRS", descriptor);
 }
 
 
 status_t
 set_acpi_irq(acpi_module_info* acpi, acpi_handle device,
-	irq_discriptor* discriptor)
+	irq_descriptor* descriptor)
 {
 	acpi_object_type outBuffer;
 	outBuffer.object_type = ACPI_TYPE_BUFFER;
 
 	int8 data[4];
 	data[0] = 0x23;
-	data[1] = discriptor->irq & 0xFF;
-	data[2] = discriptor->irq >> 8;
+	data[1] = descriptor->irq & 0xFF;
+	data[2] = descriptor->irq >> 8;
 
 	data[3] = 0;
 	int8 bit;
-	bit = (discriptor->interrupt_mode == B_HIGH_ACTIVE_POLARITY) ? 0 : 1;
+	bit = (descriptor->interrupt_mode == B_HIGH_ACTIVE_POLARITY) ? 0 : 1;
 	data[3] |= bit;
-	bit = (discriptor->polarity == B_LEVEL_TRIGGERED) ? 0 : 1;
+	bit = (descriptor->polarity == B_LEVEL_TRIGGERED) ? 0 : 1;
 	data[3] |= bit << 3;
-	bit = discriptor->shareable ? 1 : 0;
+	bit = descriptor->shareable ? 1 : 0;
 	data[3] |= bit << 4;
 
 	outBuffer.data.buffer.length = sizeof(data);

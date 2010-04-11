@@ -581,7 +581,7 @@ ioapic_init(kernel_args *args)
 	// TODO: remove when the PCI IRQ routing through ACPI is available below
 	return;
 
-	// load acpi modul
+	// load acpi module
 	status_t status;
 	acpi_module_info* acpiModule;
 	status = get_module(B_ACPI_MODULE_NAME, (module_info**)&acpiModule);
@@ -591,7 +591,7 @@ ioapic_init(kernel_args *args)
 	}
 	BPrivate::CObjectDeleter<const char, status_t>
 		acpiModulePutter(B_ACPI_MODULE_NAME, put_module);
-	// load pci modul
+	// load pci module
 	pci_module_info* pciModule;
 	status = get_module(B_PCI_MODULE_NAME, (module_info**)&pciModule);
 	if (status != B_OK) {
@@ -670,12 +670,12 @@ ioapic_init(kernel_args *args)
 	// configure apic interrupts assume 1:1 mapping
 	for (int i = 0; i < table.Count(); i++) {
 		irq_routing_entry& entry = table.ElementAt(i);
-		irq_discriptor irqDiscriptor;
-		read_current_irq(acpiModule, entry.source, &irqDiscriptor);
+		irq_descriptor irqDescriptor;
+		read_current_irq(acpiModule, entry.source, &irqDescriptor);
 		uint32 config = 0;
-		config |= irqDiscriptor.polarity;
-		config |= irqDiscriptor.interrupt_mode;
-		ioapic_configure_io_interrupt(irqDiscriptor.irq, config);
+		config |= irqDescriptor.polarity;
+		config |= irqDescriptor.interrupt_mode;
+		ioapic_configure_io_interrupt(irqDescriptor.irq, config);
 	}
 	
 	// prefer the ioapic over the normal pic
