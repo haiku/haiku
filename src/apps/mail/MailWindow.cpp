@@ -2160,7 +2160,7 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 		fContentView->fTextView->SetText(text, finish - start);
 		free(text);
 
-		finish = fContentView->fTextView->CountLines() - 1;
+		finish = fContentView->fTextView->CountLines();
 		for (int32 loop = 0; loop < finish; loop++) {
 			fContentView->fTextView->GoToLine(loop);
 			fContentView->fTextView->Insert((const char *)QUOTE);
