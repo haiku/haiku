@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010, François Revol, <revol@free.fr>.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef ATTRIBUTE_ITERATOR_H
@@ -26,8 +26,6 @@ public:
 
 			status_t	Find(const char* name, ext2_xattr_entry *_entry);
 
-			//ext2_xattr_entry&	Entry() const { return fEntry; }
-
 private:
 						AttributeIterator(const AttributeIterator&);
 						AttributeIterator &operator=(const AttributeIterator&);
@@ -39,7 +37,6 @@ private:
 private:
 	Inode*				fInode;
 	off_t				fOffset;
-	//ext2_xattr_entry	fEntry;
 };
 
 #endif	// ATTRIBUTE_ITERATOR_H

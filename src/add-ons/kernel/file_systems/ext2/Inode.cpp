@@ -12,7 +12,7 @@
 #include "CachedBlock.h"
 
 
-#define TRACE_EXT2
+//#define TRACE_EXT2
 #ifdef TRACE_EXT2
 #	define TRACE(x...) dprintf("\33[34mext2:\33[0m " x)
 #else
@@ -217,6 +217,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 status_t
 Inode::AttributeBlockReadAt(off_t pos, uint8* buffer, size_t* _length)
 {
+	TRACE("Inode::%s(%Ld, , %lu)\n", __FUNCTION__, pos, *_length);
 	size_t length = *_length;
 
 	if (!fAttributesBlock) {
@@ -237,6 +238,7 @@ Inode::AttributeBlockReadAt(off_t pos, uint8* buffer, size_t* _length)
 		return ERANGE;
 
 	memcpy(buffer, ((uint8 *)fAttributesBlock) + (uint32)pos, length);
+
 	*_length = length;
 	return B_NO_ERROR;
 }

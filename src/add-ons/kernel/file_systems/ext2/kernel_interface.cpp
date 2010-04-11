@@ -614,7 +614,7 @@ ext2_open_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
 	AttributeIterator i(inode);
 	status_t status = i.Find(name, entry);
 	if (status == B_OK) {
-		entry->Dump();
+		//entry->Dump();
 		*_cookie = entry;
 		return B_OK;
 	}
@@ -647,7 +647,20 @@ static status_t
 ext2_read_attr(fs_volume* _volume, fs_vnode* _node, void* cookie,
 	off_t pos, void* buffer, size_t* length)
 {
-	return ENOSYS;
+	TRACE("%s()\n", __FUNCTION__);
+
+	Inode* inode = (Inode*)_node->private_node;
+	Volume* volume = (Volume*)_volume->private_volume;
+	ext2_xattr_entry *entry = (ext2_xattr_entry *)cookie;
+
+	if (!entry->IsValid())
+		return EINVAL;
+
+	if (pos < 0 || (pos + *length) > entry->ValueSize())
+		return ERANGE;
+
+	return inode->AttributeBlockReadAt(entry->ValueOffset() + pos,
+		(uint8 *)buffer, length);
 }
 
 
@@ -769,7 +782,7 @@ fs_vnode_ops gExt2VnodeOps = {
 	&ext2_open_attr,
 	&ext2_close_attr,
 	&ext2_free_attr_cookie,
-	NULL, //&ext2_read_attr,
+	&ext2_read_attr,
 	NULL, //&ext2_write_attr,
 	&ext2_read_attr_stat,
 	NULL, //&ext2_write_attr_stat,

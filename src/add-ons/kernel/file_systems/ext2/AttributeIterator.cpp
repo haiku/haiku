@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010, François Revol, <revol@free.fr>.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -31,7 +31,7 @@ AttributeIterator::AttributeIterator(Inode* inode)
 	size_t length = sizeof(header);
 	if (fInode->AttributeBlockReadAt(fOffset, (uint8*)&header, &length) == B_OK
 		&& length == sizeof(header)) {
-		header.Dump();
+		//header.Dump();
 		if (header.IsValid()) {
 			fOffset = sizeof(header);
 			TRACE("AttributeIterator::%s: header valid\n", __FUNCTION__);
@@ -63,7 +63,7 @@ AttributeIterator::GetNext(char* name, size_t* _nameLength, ext2_xattr_entry *_e
 	status_t status = fInode->AttributeBlockReadAt(fOffset, (uint8*)_entry, &length);
 	TRACE("AttributeIterator::%s:AttributeBlockReadAt(%Ld): 0x%08lx len %d\n",
 		__FUNCTION__, fOffset, status, length);
-	_entry->Dump();
+	//_entry->Dump();
 
 	if (status != B_OK)
 		return status;
@@ -73,13 +73,6 @@ AttributeIterator::GetNext(char* name, size_t* _nameLength, ext2_xattr_entry *_e
 		__FUNCTION__, fOffset, _entry->NameLength(), _entry->IsValid() ? ' ' : '!');
 	if (!_entry->IsValid())
 		return B_BAD_DATA;
-
-//XXX dead code:
-	if (_entry->NameLength() == 0) {
-		fOffset = 0;
-		return B_ENTRY_NOT_FOUND;
-	}
-
 
 	TRACE("xattr block offset %Ld: entry ino %Lu, length %u, name length %u,"
 		" index %d\n",
@@ -101,11 +94,10 @@ AttributeIterator::GetNext(char* name, size_t* _nameLength, ext2_xattr_entry *_e
 	if (status == B_OK) {
 		const char *indexNames[] = { "0", "user" };
 
-		//name[MIN(length, EXT2_XATTR_NAME_LENGTH - 1)] = '\0';
 		size_t l;
 
-	TRACE("AttributeIterator::%s: len %d nlen %d\n",
-		__FUNCTION__, length, *_nameLength);
+		TRACE("AttributeIterator::%s: len %d nlen %d\n",
+			__FUNCTION__, length, *_nameLength);
 		if (_entry->NameIndex() < ((sizeof(indexNames) / sizeof(indexNames[0]))))
 			l = snprintf(name, *_nameLength, "%s.%s.%.*s",
 				"linux", indexNames[_entry->NameIndex()], length, _entry->name);
@@ -119,22 +111,9 @@ AttributeIterator::GetNext(char* name, size_t* _nameLength, ext2_xattr_entry *_e
 			name[l] = '\0';
 		}
 
-		//name[*_nameLength++] = '\0';
+		TRACE("AttributeIterator::%s: name %.*s len %d nlen %d\n",
+			__FUNCTION__, *_nameLength, name, length, *_nameLength);
 
-	TRACE("AttributeIterator::%s: name %.*s len %d nlen %d\n",
-		__FUNCTION__, *_nameLength, name, length, *_nameLength);
-
-
-/*	length = *_nameLength;
-
-		if (*_nameLength < length)
-			length = *_nameLength - 1;
-		memcpy(name, _entry->name, length);
-		name[length] = '\0';
-
-		*_entry = entry;
-		*_nameLength = length;
-*/
 		fOffset += _entry->Length();
 	}
 
