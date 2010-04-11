@@ -56,7 +56,6 @@ class BCatalog {
 extern BCatalog* be_catalog;
 extern BCatalog* be_app_catalog;
 
-
 #ifndef B_AVOID_TRANSLATION_MACROS
 // macros for easy catalog-access, define B_AVOID_TRANSLATION_MACROS if
 // you don't want these:

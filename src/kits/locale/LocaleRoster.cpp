@@ -415,6 +415,16 @@ BLocaleRoster::~BLocaleRoster()
 
 
 status_t
+BLocaleRoster::GetSystemCatalog(BCatalogAddOn **catalog) const
+{
+	if(!catalog)
+		return B_BAD_VALUE;
+	*catalog = be_locale_roster->LoadCatalog("system");
+	return B_OK;
+}
+
+
+status_t
 BLocaleRoster::GetDefaultCollator(BCollator **collator) const
 {
 	// It should just use the archived collator from the locale settings;

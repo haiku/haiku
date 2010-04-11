@@ -36,6 +36,7 @@ class BLocaleRoster {
 
 //		status_t GetLocaleFor(const char *langCode, const char *countryCode);
 
+		status_t GetSystemCatalog(BCatalogAddOn **) const;
 		status_t GetDefaultCollator(BCollator **) const;
 		status_t GetDefaultLanguage(BLanguage **) const;
 		status_t GetDefaultCountry(BCountry **) const;
