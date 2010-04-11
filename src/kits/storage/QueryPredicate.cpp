@@ -254,8 +254,8 @@ status_t
 ValueNode<float>::GetString(BString &predicate)
 {
 	char buffer[32];
-	int32 value = fValue;
-	sprintf(buffer, "0x%08lx", *(int32*)&value);
+	int32 value = (int32)fValue;
+	sprintf(buffer, "0x%08lx", value);
 	predicate.SetTo(buffer);
 	return B_OK;
 }
@@ -266,8 +266,8 @@ status_t
 ValueNode<double>::GetString(BString &predicate)
 {
 	char buffer[32];
-	int64 value = fValue;
-	sprintf(buffer, "0x%016Lx", *(int64*)&value);
+	int64 value = (int64)fValue;
+	sprintf(buffer, "0x%016Lx", value);
 	predicate.SetTo(buffer);
 	return B_OK;
 }
