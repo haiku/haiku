@@ -1,9 +1,9 @@
-1	portuguese	x-vnd.Haiku-Installer	507071589
+1	portuguese	x-vnd.Haiku-Installer	3609821010
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Tem a certeza que deseja abortar a instalação e reiniciar o sistema?
-%3.1f MB	PackagesView		%3.1f MB
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\tescrito por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A instalação terminou. O sector de arranque foi escrito em '%s'. Carregue em Terminar para sair do instalador ou escolha um novo volume de destino para executar outra instalação.
 Quit	InstallerApp		Terminar
+Additional disk space required: 0.0 KiB	InstallerWindow		Espaço em disco adicional necessário: 0.0 KiB
 Stop	InstallerWindow	In alert after pressing Stop	Parar
 Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A instalação terminou. O sector de arranque foi escrito em '%s'. Carregue em Terminar para sair do instalador ou escolha um novo volume de destino para executar outra instalação.
 Install progress:  	InstallerWindow		Progresso da instalação:
@@ -18,7 +18,6 @@ Continue	InstallerWindow	In alert after pressing Stop	Continuar
 Write boot sector to '%s'	InstallerWindow		Escrever sector de arranque em '%s'
 Collecting copy information.	InstallProgress		A obter informações da cópia.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem usando o menu. Depois clique em \"Iniciar\".
-%3.1f KB	PackagesView		%3.1f KB
 Quit	InstallerWindow		Terminar
 Boot sector successfully written.	InstallProgress		Sector de arranque escrito com sucesso.
 Performing installation.	InstallProgress		A executar a instalação
@@ -27,7 +26,6 @@ Boot sector not written because of an  internal error.	InstallProgress		O sector
 Finishing Installation.	InstallProgress		A terminar a instalação
 README	InstallerApp		LEIAME
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		O disco de destino poderá não ter espaço suficiente. Tente escolher outro disco ou então não escolha tantos pacotes opcionais para instalar.
-%Ld B	PackagesView		%Ld B
 Scanning for disks…	InstallerWindow		A procurar por discos...
 The disk can't be mounted. Please choose a different disk.	InstallProgress		O disco não pôde ser montado. Por favor escolha um disco diferente.
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
@@ -35,7 +33,6 @@ Launch the DriveSetup utility to partition\navailable hard drives and other medi
 Show optional packages	InstallerWindow		Mostrar pacotes opcionais
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Não foi encontrada nenhuma partição que seja própria para a instalação. Por favor prepare e inicialize pelo menos uma partição com o Sistema de Ficheiros Be.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco em que deseja instalar a partir do menu. Depois clique em \"Iniciar\".
-%.1f TB	PackagesView		%.1f TB
 Unknown Type	InstallProgress	Partition content type	Tipo desconhecido
 <none>	InstallerWindow	No partition available	<nenhum>
 Installation canceled.	InstallProgress		Instalação cancelada.
@@ -46,7 +43,6 @@ Restart system	InstallerWindow		Reiniciar sistema
 OK	InstallerWindow		OK
 Set up partitions…	InstallerWindow		Preparar partições
 The partition can't be mounted. Please choose a different partition.	InstallProgress		A partição não pode ser montada. Por favor escolhe uma partição diferente.
-The mount point could not be retrieve.	InstallProgress		Não foi possível obter o ponto de montagem.
 Install anyway	InstallProgress		Instalar na mesma
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Ocorreu um erro e a instalação não foi completada:\n\nErro:  %s
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Carregue no botão Iniciar para instalar a partir de '%1s' em '%2s'.
@@ -59,9 +55,7 @@ Welcome to the Haiku Installer!\n\nIMPORTANT INFORMATION BEFORE INSTALLING HAIKU
 Write boot sector	InstallerWindow		Escrever sector de arranque
 Cancel	InstallerWindow		Cancelar
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, a aplicação para configurar as partições de disco, não pôde ser iniciada.
-%3.1f GB	PackagesView		%3.1f GB
 No optional packages available.	PackagesView		Não existem pacotes opcionais disponíveis.
-Additional disk space required: 0.0 KB	InstallerWindow		Espaço em disco adicional necessário: 0.0 KB
 Continue	InstallerApp		Continuar
 Additional disk space required: %s	InstallerWindow		Espaço em disco adicional necessário: %s
 Cancel	InstallProgress		Cancelar

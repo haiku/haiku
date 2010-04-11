@@ -1,4 +1,5 @@
-1	portuguese	x-vnd.Be-MAIL	2102081210
+1	portuguese	x-vnd.Be-MAIL	3640755640
+View	Mail		Ver
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Incluir atributos dos anexos:
 Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Anular/Refazer.
@@ -36,9 +37,9 @@ Undo	Mail		Anular
 Leave as New	Mail		Marcar como nova
 An error occurred trying to open this signature.	Mail		Ocorreu um erro ao tentar abrir esta assinatura.
 No file attributes, just plain data	Mail		Sem atributos de ficheiro, apenas dados simples
-Edit queries…	Mail		Editar consultas...
+Edit queries…	Mail		Editar consultas…
 Paste	Mail		Colar
-Save attachment…	Mail		Guardar anexo...
+Save attachment…	Mail		Guardar anexo…
 Include file attributes in attachments	Mail		Incluir atributos do BeOS nos anexos?
 OK	Mail		OK
 Send	Mail		Enviar
@@ -48,8 +49,8 @@ Hide	Mail		Ocultar
 Forward without attachments	Mail		Reencaminhar sem anexos
 Previous	Mail		Anterior
 Redo	Mail		Refazer
-Add enclosure…	Mail		Adicionar anexo...
-Print…	Mail		Imprimir...
+Add enclosure…	Mail		Adicionar anexo…
+Print…	Mail		Imprimir…
 Warn unencodable:	Mail		Aviso incodificável:
 Quit	Mail		Sair
 %n - Full name	Mail		%n - Nome completo
@@ -58,7 +59,7 @@ Trash	Mail		Lixo
 Default account:	Mail		Conta Predefenida:
 Size:	Mail		Tamanho:
 Account from mail	Mail		Conta relativa ao e-mail
-Edit signatures…	Mail		Editar assinaturas...
+Edit signatures…	Mail		Editar assinaturas…
 New	Mail		Novo
 Attachments: 	Mail		Anexos:
 Set to %s	Mail		Defenir como %s
@@ -68,13 +69,13 @@ To:	Mail		Para:
 Only files can be added as attachments.	Mail		Apenas ficheiros podem ser adicionados como anexos.
 Previous message	Mail		Mensagem anterior
 Title:	Mail		Título:
-Find…	Mail		Pesquisar...
-Accounts…	Mail		Contas...
+Find…	Mail		Pesquisar…
+Accounts…	Mail		Contas…
 Mail preferences	Mail		Preferências de E-Mail
 Initial spell check mode:	Mail		Modo de correcção ortográfica inicial:
 Leave same	Mail		Deixar na mesma
-About Mail…	Mail		Sobre o Mail...
-Page setup…	Mail		Configurar página...
+About Mail…	Mail		Sobre o Mail…
+Page setup…	Mail		Configurar página…
 Text wrapping:	Mail		Moldagem do texto
 Revert	Mail		Reverter
 File	Mail		Ficheiro
@@ -104,10 +105,11 @@ Do you wish to send this message before closing?	Mail		Quer enviar esta mensagem
 Delete	Mail		Apagar
 Leave as '%s'	Mail		Deixar como '%s'
 Copy	Mail		Copiar
+Mail couldn't find its dictionary.	Mail		Mail não encontrou o seu dicionário.
 Reply preamble:	Mail		Sumário da resposta:
 Signatures	Mail		Assinaturas
 Next	Mail		Seguinte
-Set to…	Mail		Defenir como...
+Set to…	Mail		Defenir como…
 Use default account	Mail		Usar conta predefenida
 Sorry	Mail		Desculpe
 Encoding:	Mail		Codificação:
@@ -122,7 +124,6 @@ Save as draft	Mail		Salvar como rascunho
 The mail_daemon could not be started:\n\t	Mail		Não foi possível iniciar o mail_daemon:\n\t
 Open attachment	Mail		Abrir anexo
 Reply	Mail		Responder
-The spell check feature requires the optional \"words\" file on your BeOS CD.	Mail		A funcionalidade de Correcção Ortográfica necessita do ficheiro opcional \"words\" que se encontra no seu CD do BeOS.
 From:	Mail		De:
 Couldn't open this signature. Sorry.	Mail		Desculpe, não foi possível abrir esta assinatura.
 Open draft	Mail		Abrir rascunho

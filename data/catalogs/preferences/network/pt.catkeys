@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Network	2897060402
+1	portuguese	x-vnd.Haiku-Network	3643490310
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Máscara de Rede:
 DHCP	EthernetSettingsView		DHCP
@@ -9,6 +9,7 @@ DNS #1:	EthernetSettingsView		DNS #1:
 IP address:	EthernetSettingsView		Endereço IP:
 Network	NetworkWindow		Rede
 Adapter:	EthernetSettingsView		Adaptador:
+Domain:	EthernetSettingsView		Domínio:
 Revert	EthernetSettingsView		Reverter
 Sending auto-config message failed: 	EthernetSettingsView		Erro ao enviar mensagem de configuração automática:
 Mode:	EthernetSettingsView		Modo:
