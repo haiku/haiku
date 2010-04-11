@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,9 +15,10 @@
 
 
 // NOTE: this header is used by other applications (such as ifconfig,
-// and Network) because of these two defines
+// and Network) because of these three defines
 #define kNetServerSignature		"application/x-vnd.haiku-net_server"
 #define kMsgConfigureInterface	'COif'
+#define kMsgConfigureResolver	'COrs'
 
 
 extern bool get_family_index(const char* name, int32& familyIndex);

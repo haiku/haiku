@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ * 		Vegard Wærp, vegarwa@online.no
  */
 
 
@@ -33,6 +34,7 @@
 #include <Roster.h>
 #include <Server.h>
 #include <TextView.h>
+#include <FindDirectory.h>
 
 #include "AutoconfigLooper.h"
 #include "Services.h"
@@ -57,6 +59,7 @@ class NetServer : public BServer {
 		bool _TestForInterface(int socket, const char* name);
 		status_t _ConfigureInterface(int socket, BMessage& interface,
 			bool fromMessage = false);
+		status_t _ConfigureResolver(BMessage& resolverConfiguration);
 		bool _QuitLooperForDevice(const char* device);
 		AutoconfigLooper* _LooperForDevice(const char* device);
 		status_t _ConfigureDevice(int socket, const char* path);
@@ -300,6 +303,7 @@ NetServer::MessageReceived(BMessage* message)
 			close(socket);
 			break;
 		}
+
 		case kMsgInterfaceSettingsUpdated:
 		{
 			// we need a socket to talk to the networking stack
@@ -342,6 +346,16 @@ NetServer::MessageReceived(BMessage* message)
 			message->SendReply(&reply);
 
 			close(socket);
+			break;
+		}
+
+		case kMsgConfigureResolver:
+		{
+			status_t status = _ConfigureResolver(*message);
+			
+			BMessage reply(B_REPLY);
+			reply.AddInt32("status", status);
+			message->SendReply(&reply);
 			break;
 		}
 
@@ -716,6 +730,37 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface,
 		fDeviceMap[device] = looper;
 	}
 
+	return B_OK;
+}
+
+
+status_t
+NetServer::_ConfigureResolver(BMessage& resolverConfiguration)
+{
+	// TODO: resolv.conf should be parsed, all information should be
+	// maintained and it should be distinguished between user entered
+	// and auto-generated parts of the file, with this method only re-writing
+	// the auto-generated parts of course.
+
+	BPath path;
+	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK
+		|| path.Append("network/resolv.conf") != B_OK)
+		return B_ERROR;
+
+	FILE* file = fopen(path.Path(), "w");
+	if (file != NULL) {
+		const char* nameserver;
+		for (int32 i = 0; resolverConfiguration.FindString("nameserver", i,
+				&nameserver) == B_OK; i++) {
+			fprintf(file, "nameserver %s\n", nameserver);
+		}
+
+		const char* domain;
+		if (resolverConfiguration.FindString("domain", &domain) == B_OK)
+			fprintf(file, "domain %s\n", domain);
+		
+		fclose(file);
+	}
 	return B_OK;
 }
 

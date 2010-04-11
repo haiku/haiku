@@ -11,10 +11,8 @@
 #include "DHCPClient.h"
 #include "NetServer.h"
 
-#include <FindDirectory.h>
 #include <Message.h>
 #include <MessageRunner.h>
-#include <Path.h>
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -336,6 +334,7 @@ dhcp_message::FinishOptions(uint8* options)
 DHCPClient::DHCPClient(BMessenger target, const char* device)
 	: AutoconfigClient("dhcp", target, device),
 	fConfiguration(kMsgConfigureInterface),
+	fResolverConfiguration(kMsgConfigureResolver),
 	fRunner(NULL),
 	fLeaseTime(0)
 {
@@ -519,7 +518,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 				BMessage address;
 				address.AddString("family", "inet");
 				address.AddString("address", _ToString(fAssignedAddress));
-				_ParseOptions(*message, address);
+				fResolverConfiguration.MakeEmpty();
+				_ParseOptions(*message, address, fResolverConfiguration);
 
 				fConfiguration.AddMessage("address", &address);
 
@@ -543,7 +543,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 				// TODO: we might want to configure the stuff, don't we?
 				BMessage address;
-				_ParseOptions(*message, address);
+				fResolverConfiguration.MakeEmpty();
+				_ParseOptions(*message, address, fResolverConfiguration);
 					// TODO: currently, only lease time and DNS is updated this way
 
 				// our address request has been acknowledged
@@ -552,6 +553,12 @@ DHCPClient::_Negotiate(dhcp_state state)
 				// configure interface
 				BMessage reply;
 				status = Target().SendMessage(&fConfiguration, &reply);
+				if (status == B_OK)
+					status = reply.FindInt32("status", &fStatus);
+					
+				// configure resolver
+				reply.MakeEmpty();
+				status = Target().SendMessage(&fResolverConfiguration, &reply);
 				if (status == B_OK)
 					status = reply.FindInt32("status", &fStatus);
 				break;
@@ -609,20 +616,13 @@ DHCPClient::_RestartLease(bigtime_t leaseTime)
 
 
 void
-DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
+DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
+	BMessage& resolverConfiguration)
 {
 	dhcp_option_cookie cookie;
 	message_option option;
 	const uint8* data;
 	size_t size;
-	// TODO: resolv.conf should be parsed, all information should be
-	// maintained and it should be distinguished between user entered
-	// and auto-generated parts of the file, with this method only re-writing
-	// the auto-generated parts of course.
-	// TODO: We write resolv.conf once per _ParseOptions invokation, there
-	// is the first DHCP_OFFER message and the final DHCP_ACK message
-	// from the same server, which should contain all the final data.
-	bool resolvConfCreated = false;
 	while (message.NextOption(cookie, option, data, size)) {
 		// iterate through all options
 		switch (option) {
@@ -637,24 +637,14 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				break;
 			case OPTION_DOMAIN_NAME_SERVER:
 			{
-				BPath path;
-				if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK
-					|| path.Append("network/resolv.conf") != B_OK) {
-					break;
-				}
-
-				const char* openMode = resolvConfCreated ? "a" : "w";
-				FILE* file = fopen(path.Path(), openMode);
 				for (uint32 i = 0; i < size / 4; i++) {
 					syslog(LOG_INFO, "DNS: %s\n",
 						_ToString(&data[i * 4]).String());
-					if (file != NULL) {
-						resolvConfCreated = true;
-						fprintf(file, "nameserver %s\n",
-							_ToString(&data[i * 4]).String());
-					}
+					resolverConfiguration.AddString("nameserver",
+						_ToString(&data[i * 4]).String());
 				}
-				fclose(file);
+				resolverConfiguration.AddInt32("nameserver_count",
+					size / 4);
 				break;
 			}
 			case OPTION_SERVER_ADDRESS:
@@ -678,29 +668,19 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				break;
 
 			case OPTION_HOST_NAME:
-				syslog(LOG_INFO, "DHCP host name: \"%.*s\"\n",
-					(int)size, (const char*)data);
+				syslog(LOG_INFO, "DHCP host name: \"%.*s\"\n", (int)size,
+					(const char*)data);
 				break;
 
 			case OPTION_DOMAIN_NAME:
 			{
-				syslog(LOG_INFO, "DHCP domain name: \"%.*s\"\n",
-					(int)size, (const char*)data);
+				char domain[256];
+				strlcpy(domain, (const char*)data,
+					min_c(size + 1, sizeof(domain)));
 
-				BPath path;
-				if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK
-					|| path.Append("network/resolv.conf") != B_OK) {
-					break;
-				}
-
-				const char* openMode = resolvConfCreated ? "a" : "w";
-				FILE* file = fopen(path.Path(), openMode);
-				if (file != NULL) {
-					resolvConfCreated = true;
-					fprintf(file, "domain %.*s\n", (int)size,
-						(const char*)data);
-					fclose(file);
-				}
+				syslog(LOG_INFO, "DHCP domain name: \"%s\"\n", domain);
+				
+				resolverConfiguration.AddString("domain", domain);	
 				break;
 			}
 

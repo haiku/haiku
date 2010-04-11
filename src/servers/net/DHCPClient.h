@@ -39,7 +39,8 @@ public:
 private:
 			status_t			_Negotiate(dhcp_state state);
 			void				_ParseOptions(dhcp_message& message,
-									BMessage& address);
+									BMessage& address,
+									BMessage& resolverConfiguration);
 			void				_PrepareMessage(dhcp_message& message,
 									dhcp_state state);
 			status_t			_SendMessage(int socket, dhcp_message& message,
@@ -55,6 +56,7 @@ private:
 
 private:
 			BMessage			fConfiguration;
+			BMessage			fResolverConfiguration;
 			BMessageRunner*		fRunner;
 			uint8				fMAC[6];
 			uint32				fTransactionID;
