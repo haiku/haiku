@@ -2166,15 +2166,14 @@ idle_scan_active_pages(page_stats& pageStats)
 			continue;
 		}
 
-		DEBUG_PAGE_ACCESS_START(page);
-
 		if (page->busy) {
 			// page is busy -- requeue at the end
 			vm_page_requeue(page, true);
 			cache->ReleaseRefAndUnlock();
-			DEBUG_PAGE_ACCESS_END(page);
 			continue;
 		}
+
+		DEBUG_PAGE_ACCESS_START(page);
 
 		// Get the page active/modified flags and update the page's usage count.
 		// We completely unmap inactive temporary pages. This saves us to
