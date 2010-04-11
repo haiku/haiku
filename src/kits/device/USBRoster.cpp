@@ -189,7 +189,7 @@ RosterLooper::RosterLooper(BUSBRoster *roster)
 {
 	BEntry entry("/dev/bus/usb");
 	if (!entry.Exists()) {
-		fprintf(stderr, "USBKit: usb_raw not published");
+		fprintf(stderr, "USBKit: usb_raw not published\n");
 		return;
 	}
 
