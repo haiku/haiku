@@ -31,12 +31,14 @@
 #include <string.h>
 
 // no addr_t under standard BeOS
-#ifndef HAIKU_HOST_PLATFORM_HAIKU
+#if !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST) \
+	&& !defined(HAIKU_HOST_PLATFORM_HAIKU)
 	typedef unsigned long haiku_build_addr_t;
 #	define addr_t haiku_build_addr_t
 #endif
 
-#ifndef HAIKU_HOST_PLATFORM_HAIKU
+#if !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST) \
+	&& !defined(HAIKU_HOST_PLATFORM_HAIKU)
 
 struct sockaddr_storage {
 	uint8	ss_len;			/* total length */
@@ -79,6 +81,9 @@ typedef int socklen_t;
 		__attribute__((format(__printf__, _format_, _args_)))
 #endif
 
+#if 0
+// NOTE: This is probably only needed on platforms which don't use ELF
+// as binary format. So could probably be removed completely.
 #if defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST) \
 	&& !defined(HAIKU_HOST_PLATFORM_HAIKU)
 // BeOS version of BeBuild.h defines this
@@ -89,6 +94,7 @@ typedef int socklen_t;
 #	define _IMPEXP_TRANSLATION	__declspec(dllimport)
 #	define _IMPEXP_DEVICE		__declspec(dllimport)
 #	define _IMPEXP_NET			__declspec(dllimport)
+#endif
 #endif
 
 #if defined(__cplusplus) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
@@ -161,7 +167,8 @@ extern float	roundf(float value);
 #	define B_DOCUMENT_TEXT_COLOR		B_MENU_ITEM_TEXT_COLOR
 #endif
 
-#if !defined(HAIKU_HOST_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+#if !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST) \
+	&& !defined(HAIKU_HOST_PLATFORM_HAIKU)
 #	if !defined(B_NOT_SUPPORTED) && !defined(HAIKU_HOST_PLATFORM_DANO)
 #		define B_NOT_SUPPORTED			(B_ERROR)
 #	endif
@@ -185,7 +192,8 @@ extern float	roundf(float value);
 #	define INT64_MAX LONGLONG_MAX
 #endif
 
-#ifndef HAIKU_HOST_PLATFORM_HAIKU
+#if !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST) \
+	&& !defined(HAIKU_HOST_PLATFORM_HAIKU)
 #	define	B_MPEG_2_AUDIO_LAYER_1 (enum mpeg_id)0x201
 #	define	B_MPEG_2_AUDIO_LAYER_2 (enum mpeg_id)0x202
 #	define	B_MPEG_2_AUDIO_LAYER_3 (enum mpeg_id)0x203
@@ -196,7 +204,8 @@ extern float	roundf(float value);
 #endif
 
 // TODO: experimental API (keep in sync with Accelerant.h)
-#ifndef HAIKU_HOST_PLATFORM_HAIKU
+#if !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST) \
+	&& !defined(HAIKU_HOST_PLATFORM_HAIKU)
 typedef struct {
 	uint32	version;
 	char	vendor[128];
