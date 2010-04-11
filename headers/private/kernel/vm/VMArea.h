@@ -43,6 +43,10 @@ struct VMAreaWiredRange : SinglyLinkedListLinkImpl<VMAreaWiredRange> {
 	bool					implicit;	// range created automatically
 	VMAreaUnwiredWaiterList	waiters;
 
+	VMAreaWiredRange()
+	{
+	}
+
 	VMAreaWiredRange(addr_t base, size_t size, bool writable, bool implicit)
 		:
 		area(NULL),
@@ -53,6 +57,15 @@ struct VMAreaWiredRange : SinglyLinkedListLinkImpl<VMAreaWiredRange> {
 	{
 	}
 
+	void SetTo(addr_t base, size_t size, bool writable, bool implicit)
+	{
+		this->area = NULL;
+		this->base = base;
+		this->size = size;
+		this->writable = writable;
+		this->implicit = implicit;
+	}
+
 	bool IntersectsWith(addr_t base, size_t size) const
 	{
 		return this->base + this->size - 1 >= base
@@ -61,6 +74,16 @@ struct VMAreaWiredRange : SinglyLinkedListLinkImpl<VMAreaWiredRange> {
 };
 
 typedef SinglyLinkedList<VMAreaWiredRange> VMAreaWiredRangeList;
+
+
+struct VMPageWiringInfo {
+	VMAreaWiredRange	range;
+	addr_t				physicalAddress;
+							// the actual physical address corresponding to
+							// the virtual address passed to vm_wire_page()
+							// (i.e. with in-page offset)
+	vm_page*			page;
+};
 
 
 struct VMArea {

@@ -4722,6 +4722,142 @@ user_memset(void* s, char c, size_t count)
 }
 
 
+/*!	Wires a single page at the given address.
+
+	\param team The team whose address space the address belongs to. Supports
+		also \c B_CURRENT_TEAM. If the given address is a kernel address, the
+		parameter is ignored.
+	\param address address The virtual address to wire down. Does not need to
+		be page aligned.
+	\param writable If \c true the page shall be writable.
+	\param info On success the info is filled in, among other things
+		containing the physical address the given virtual one translates to.
+	\return \c B_OK, when the page could be wired, another error code otherwise.
+*/
+status_t
+vm_wire_page(team_id team, addr_t address, bool writable,
+	VMPageWiringInfo* info)
+{
+	addr_t pageAddress = ROUNDDOWN((addr_t)address, B_PAGE_SIZE);
+	info->range.SetTo(pageAddress, B_PAGE_SIZE, writable, false);
+
+	// compute the page protection that is required
+	bool isUser = IS_USER_ADDRESS(address);
+	uint32 requiredProtection = PAGE_PRESENT
+		| B_KERNEL_READ_AREA | (isUser ? B_READ_AREA : 0);
+	if (writable)
+		requiredProtection |= B_KERNEL_WRITE_AREA | (isUser ? B_WRITE_AREA : 0);
+
+	// get and read lock the address space
+	VMAddressSpace* addressSpace = NULL;
+	if (isUser) {
+		if (team == B_CURRENT_TEAM)
+			addressSpace = VMAddressSpace::GetCurrent();
+		else
+			addressSpace = VMAddressSpace::Get(team);
+	} else
+		addressSpace = VMAddressSpace::GetKernel();
+	if (addressSpace == NULL)
+		return B_ERROR;
+
+	AddressSpaceReadLocker addressSpaceLocker(addressSpace, true);
+
+	VMTranslationMap* map = addressSpace->TranslationMap();
+	status_t error = B_OK;
+
+	// get the area
+	VMArea* area = addressSpace->LookupArea(pageAddress);
+	if (area == NULL) {
+		addressSpace->Put();
+		return B_BAD_ADDRESS;
+	}
+
+	// Lock the area's top cache. This is a requirement for VMArea::Wire().
+	VMCacheChainLocker cacheChainLocker(vm_area_get_locked_cache(area));
+
+	// mark the area range wired
+	area->Wire(&info->range);
+
+	// Lock the area's cache chain and the translation map. Needed to look
+	// up the page and play with its wired count.
+	cacheChainLocker.LockAllSourceCaches();
+	map->Lock();
+
+	addr_t physicalAddress;
+	uint32 flags;
+	vm_page* page;
+	if (map->Query(pageAddress, &physicalAddress, &flags) == B_OK
+		&& (flags & requiredProtection) == requiredProtection
+		&& (page = vm_lookup_page(physicalAddress / B_PAGE_SIZE))
+			!= NULL) {
+		// Already mapped with the correct permissions -- just increment
+		// the page's wired count.
+		increment_page_wired_count(page);
+
+		map->Unlock();
+		cacheChainLocker.Unlock();
+		addressSpaceLocker.Unlock();
+	} else {
+		// Let vm_soft_fault() map the page for us, if possible. We need
+		// to fully unlock to avoid deadlocks. Since we have already
+		// wired the area itself, nothing disturbing will happen with it
+		// in the meantime.
+		map->Unlock();
+		cacheChainLocker.Unlock();
+		addressSpaceLocker.Unlock();
+
+		error = vm_soft_fault(addressSpace, pageAddress, writable, isUser,
+			&page, &info->range);
+
+		if (error != B_OK) {
+			// The page could not be mapped -- clean up.
+			VMCache* cache = vm_area_get_locked_cache(area);
+			area->Unwire(&info->range);
+			cache->ReleaseRefAndUnlock();
+			addressSpace->Put();
+			return error;
+		}
+	}
+
+	info->physicalAddress = page->physical_page_number * B_PAGE_SIZE
+		+ address % B_PAGE_SIZE;
+	info->page = page;
+
+	return B_OK;
+}
+
+
+/*!	Unwires a single page previously wired via vm_wire_page().
+
+	\param info The same object passed to vm_wire_page() before.
+*/
+void
+vm_unwire_page(VMPageWiringInfo* info)
+{
+	// lock the address space
+	VMArea* area = info->range.area;
+	AddressSpaceReadLocker addressSpaceLocker(area->address_space, false);
+		// takes over our reference
+
+	// lock the top cache
+	VMCache* cache = vm_area_get_locked_cache(area);
+	VMCacheChainLocker cacheChainLocker(cache);
+
+	if (info->page->Cache() != cache) {
+		// The page is not in the top cache, so we lock the whole cache chain
+		// before touching the page's wired count.
+		cacheChainLocker.LockAllSourceCaches();
+	}
+
+	decrement_page_wired_count(info->page);
+
+	// remove the wired range from the range
+	area->Unwire(&info->range);
+
+	cacheChainLocker.Unlock();
+}
+
+
 /*!	Wires down the given address range in the specified team's address space.
 
 	If successful the function
