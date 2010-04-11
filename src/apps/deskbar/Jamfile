@@ -43,7 +43,7 @@ Application Deskbar :
 	;
 
 DoCatalogs Deskbar :
-	application/x-vnd.Be-TSKB
+	x-vnd.Be-TSKB
 	:
 	BeMenu.cpp
 	PreferencesWindow.cpp
