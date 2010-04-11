@@ -1,0 +1,75 @@
+1	lithuanian	x-vnd.Haiku-DriveSetup	2303126039
+Delete	MainWindow		Šalinti
+Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Tikrai norite įžymėti pasirinktą skirsnį?\nPo įžymėjimo apibrėžčių įvedimo galėsite atšaukti šį veiksmą prieš pat įrašant pakeitimus į laikmeną.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Tikrai dabar norite pakeitimus įrašyti tiesiai į laikmeną?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skirsnyje, bus negrįžtamai prarasti!
+Rescan	MainWindow		Peržvalgyti
+OK	MainWindow		Gerai
+Could not aquire partitioning information.	MainWindow		Neišgaunami duomenys apie skirsnius.
+There's no space on the partition where a child partition could be created.	MainWindow		Nepakanka poskirsniui vietos skirsnyje.
+%ld MiB	Support		%ld MiB
+<empty>	PartitionList		<tuščia>
+Unable to find the selected partition by ID.	MainWindow		Nerandamas pasirinktas skirsnis pagal ID.
+Select a partition from the list below.	DiskView		Pasirinkite skirsnį iš sąrašo žemiau
+No disk devices have been recognized.	DiskView		Neatpažinta jokių laikmeninių įrenginių.
+The selected disk is read-only.	MainWindow		Pasirinkta laikmena yra tik skaitymui.
+Partition name:	CreateParamsPanel		Skirsnio pavadinimas:
+Initialize	InitParamsPanel		Įžymėti
+Could not mount partition %s.	MainWindow		Neprijungiamas skirsnis %s.
+The partition %s is already unmounted.	MainWindow		Skirsnis %s jau atjungtas.
+Failed to initialize the partition. No changes have been written to disk.	MainWindow		Įžymėti skirsnio nepavyko. Pakeitimų į laikmeną įrašyta nebuvo.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Pašalinti skirsnio nepavyko. Pakeitimų į laikmeną įrašyta nebuvo.
+Partition type:	CreateParamsPanel		Skirsnio tipas:
+Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Tikrai norite įžymėti skrisnį \"%s\"?\nPo įžymėjimo apibrėžčių įvedimo galėsite atšaukti šį veiksmą prieš pat įrašant pakeitimus į laikmeną.
+Could not delete the selected partition.	MainWindow		Pasirinkto skirsnio pašalinti negalima.
+Initialize	MainWindow		Įžymėti
+Error: 	MainWindow	in any error alert	Klaida: 
+Partition %ld	DiskView		Skirsnis %ld
+The partition %s has been successfully initialized.\n	MainWindow		Skirsnis %s sėkmingai įžymėtas.\n
+<empty>	DiskView		<tuščia>
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Įžymėti skirsnio %s nepavyko. (Pakeitįmų į laikmeną įrašyta nebuvo.)
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Tikrai dabar norite pakeitimus įrašyti tiesiai į laikmeną?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skirsnyje, bus negrįžtamai prarasti!
+Mounted at	PartitionList		Prijungtas kaip
+Failed to initialize the partition %s!\n	MainWindow		Nepavyko įžymėti skirsnio %s!\n
+There was an error acquiring the partition row.	MainWindow		Klaida išgaunant skirsnių sąrašą.
+You need to select a partition entry from the list.	MainWindow		Būtina pasirinkti skirsnį iš sąrašo.
+Format (not implemented)	MainWindow		Formatuoti (dar nepadaryta)
+The currently selected partition does not have a parent partition.	MainWindow		Pasirinkas skirsnis nėra kokio skirsnio poskirsnis.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Tikrai dabar norite pakeitimus įrašyti tiesiai į laikmeną?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skirsnyje, bus negrįžtamai prarasti!
+Offset: %ld MB	Support		Poslinkis: %ld MiB
+Write changes	MainWindow		Įrašyti pakeitimus
+There was an error preparing the disk for modifications.	MainWindow		Klaida įrašant pakeitimus į laikmeną.
+The partition %s is already mounted.	MainWindow		Skirsnis %s jau prijungtas.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Tikrai norite pakeitimus įrašyti tiesiai į laikmeną?\n\nJei tęsite toliau – visi duomenys, esantys skirsnyje %s, bus negrįžtamai prarasti!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Tikrai norite pašalinti pasirinktą skirsnį?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skirsnyje, bus negrįžtamai prarasti!
+Create…	MainWindow		Kurti…
+Disk system \"%s\"\" not found!	MainWindow		Laikmenų „%s\"“ nerasta!
+Could not unmount partition %s.	MainWindow		Skirsnis %s neatjungiamas.
+Mount	MainWindow		Jungti
+Create	CreateParamsPanel		Kurti
+Device	PartitionList		Įrenginys
+Disk	MainWindow		Laikmena
+Device	DiskView		Įrenginys
+Volume name	PartitionList		Skirsnio pavadinimas
+Continue	MainWindow		Tęsti
+Cannot delete the selected partition.	MainWindow		Pasirinktas skirsnis yra nepašalinamas.
+Mount all	MainWindow		Prijungti viską
+Cancel	MainWindow		Atsisakyti
+Delete partition	MainWindow		Šalinti skirsnį
+End: %ld MB	Support		Baiga: %ld MiB
+Eject	MainWindow		Išimti
+Partition	MainWindow		Skirsnis
+File system	PartitionList		Bylų sistema
+Validation of the given creation parameters failed.	MainWindow		Nevykusios kūrimo apibrėžtys.
+Size	PartitionList		Dydis
+Don't know how to gather initialization parameters for this disk system.	MainWindow		Nežinomos įžymėjimo apibrėžtys šioms laikmenoms.
+Validation of the given initialization parameters failed.	MainWindow		Nevykusios įžymėjimo apibrėžtys.
+The selected partition does not contain a partitioning system.	MainWindow		Pasirinktas skirsnis nėra niekaip skirstytas.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Tikrai dabar norite pakeitimus įrašyti tiesiai į laikmeną?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skirsnyje, bus negrįžtamai prarasti!
+The partition %s is currently mounted.	MainWindow		Skirsnis %s jau yra prijungtas.
+Partition size	CreateParamsPanel		Skirsnio dydis
+Surface test (not implemented)	MainWindow		Paviršiaus patikra (dar nepadaryta)
+Cancel	InitParamsPanel		Atsisakyti
+Cancel	CreateParamsPanel		Atsisakyti
+Creation of the partition has failed.	MainWindow		Nepavyko sukurti skirsnio.
+The currently selected partition is not empty.	MainWindow		Pasirinktas skirnis nėra tuščias.
+Unmount	MainWindow		Atjungti

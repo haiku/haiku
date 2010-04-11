@@ -1,0 +1,142 @@
+1	lithuanian	x-vnd.Be-MAIL	3640755640
+View	Mail		Roda
+%d - Date	Mail		%d - data
+Attach attributes:	Mail		Pridėti bylų atributus:
+Inconsistency occurred in the undo/redo buffer.	Mail		Nesutapimas buferyje atšaukti/grąžinti.
+An error occurred trying to save the attachment.	Mail		Klaida išsaugant priedėlį.
+Copy to new	Mail		Kopijuoti į naujus
+Edit	Mail		Taisa
+Print	Mail		Spauda
+New mail message	Mail		Naujas laiškas
+Automatically mark mail as read:	Mail		Savaime ženklinti laiškus kaip skaitytus:
+Colored quotes:	Mail		Spalvotos citatos:
+Subject:	Mail		Tema:
+Reply to all	Mail		Atsakyti visiems
+Show icons & labels	Mail		Rodyti ženkliukus ir poraštes
+Remove attachment	Mail		Šalinti priedėlį
+Button bar:	Mail		Mygtukų juosta:
+Beginner	Mail		Naujokas
+Don't save	Mail		Neišsaugoti
+Expert	Mail		Žinovas
+Reply account:	Mail		Atsakyti paskyra:
+Discard	Mail		Atmesti
+Message	Mail		Pranešimas
+Reply to sender	Mail		Atsakyti siuntėjui
+There is no installed handler for URL links.	Mail		Nėra priemonės tvarkytis su URL nuorodomis.
+Signature	Mail		Prierašas
+Find again	Mail		Rasti dar
+Bcc:	Mail		Slapukas:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Pagrindiniame tekste yra nekoduojamas simbolis %ld. Gali būti, kad kitokia koduotė geriau tiktų? Spauskite „Siųsti“, kad visvien išsiųstumėte (nekoduojami simboliai bus pakeisti kuoduojamais), arba spauskite „Atsisakyti“ ir bandykite taisyti laiško tekstą.
+Signature:	Mail		Prierašas:
+Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail (Paštas)\n\nParašyta Robert'o Polic'o.\nTobulinta Dr. Zoidberg'o grupės.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Save changes to this signature?	Mail		Išsaugoti šio prierašo keitimus?
+Cc:	Mail		Kopija:
+Find	Mail		Rasti
+Preferences…	Mail		Parinktys…
+Undo	Mail		Atšaukti
+Leave as New	Mail		Palikti kaip naują
+An error occurred trying to open this signature.	Mail		Klaida atidarant šį prierašą.
+No file attributes, just plain data	Mail		Be bylos atributų, tiesiog tekstas
+Edit queries…	Mail		Taisyti užklausas…
+Paste	Mail		Įdėti
+Save attachment…	Mail		Išsaugoti priedėlį…
+Include file attributes in attachments	Mail		Įtraukti priedėlin bylos atributus
+OK	Mail		Gerai
+Send	Mail		Siųsti
+Show icons only	Mail		Rodyti tik ženkliukus
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Priedėlių šalinimas iš persiunčiamo laiško dar nepalaikomas!\nKažin ar tai tinkamai veiks.
+Hide	Mail		Slėpti
+Forward without attachments	Mail		Persiųsti be priedėlių
+Previous	Mail		Ankstesnis
+Redo	Mail		Grąžinti
+Add enclosure…	Mail		Pridėti intarpą…
+Print…	Mail		Spausdinti…
+Warn unencodable:	Mail		Įspėti apie neiškodavimus:
+Quit	Mail		Baigti
+%n - Full name	Mail		%n – Pilnas pavadinimas
+ Read 	Mail		 skaityta 
+Trash	Mail		Šiukšlinė
+Default account:	Mail		Numatytoji paskyra:
+Size:	Mail		Dydis:
+Account from mail	Mail		Paskyra iš laiško
+Edit signatures…	Mail		Taisyti prierašus…
+New	Mail		Naują
+Attachments: 	Mail		Priedėliai: 
+Set to %s	Mail		Nustatyti į %s
+Forward	Mail		Persiųsti
+E-mail draft could not be saved!	Mail		Juodraštis neišsaugomas!
+To:	Mail		Kam:
+Only files can be added as attachments.	Mail		Tik bylos gali būti priedėliais.
+Previous message	Mail		Ankstesnis laiškas
+Title:	Mail		Antraštė:
+Find…	Mail		Rasti…
+Accounts…	Mail		Paskyros…
+Mail preferences	Mail		Pašto parinktys
+Initial spell check mode:	Mail		Pradinis rašybos tikrinimas:
+Leave same	Mail		Palikti
+About Mail…	Mail		Apie programą…
+Page setup…	Mail		Puslapio nustatymai…
+Text wrapping:	Mail		Eilučių perkėlimas:
+Revert	Mail		Grįžti
+File	Mail		Byla
+None	Mail		Nieko
+Copy link location	Mail		Kopijuoti nuorodą
+Show header	Mail		Rodyti antraštę
+%e - E-mail address	Mail		%e – El.pašto adresas
+Resend	Mail		Siųsti vėl
+Show raw message	Mail		Rodyti neapdorotą laišką
+\\n - Newline	Mail		\\n – nauja eilutė
+Start now	Mail		Leisti dabar
+Close	Mail		Uždaryti
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Nepaleistas mail_daemon'as. Laiškas jau elėje ir bus išsiųstas kai tik mail_daemon'as pasileis.
+Really delete this signature? This cannot be undone.	Mail		Tikrai pašalinti šį prierašą? Šis veiksmas neatšaukiamas.
+Open	Mail		Atidaryti
+Quote	Mail		Citata
+Add	Mail		Pridėti
+Next message	Mail		Kitas laiškas
+User interface	Mail		Vartotojo sąsaja
+Cancel	Mail		Atsisakyti
+Send message	Mail		Siųsti laišką
+Remove enclosure	Mail		Šalinti intarpus
+Account:	Mail		Paskyra:
+Decoding:	Mail		Dekodavimas:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Nerandama priemonės bylų „Person“ tipui.
+Do you wish to send this message before closing?	Mail		Norite išsiųsti šį laišką prieš uždarymą?
+Delete	Mail		Šalinti
+Leave as '%s'	Mail		Palikti kaip '%s'
+Copy	Mail		Kopija
+Mail couldn't find its dictionary.	Mail		Nerandamas laiško žodynėlis
+Reply preamble:	Mail		Atsakyti įžanga:
+Signatures	Mail		Prierašai
+Next	Mail		Kitas
+Set to…	Mail		Nustatyti į…
+Use default account	Mail		Naudoti numatytąją paskyrą
+Sorry	Mail		Atleiskite
+Encoding:	Mail		Koduotė:
+Font:	Mail		Rašmenys:
+Save address	Mail		Išsaugoti adresą
+Queries	Mail		Užklausos
+Do you wish to save this message as a draft before closing?	Mail		Norite išsaugoti šį laišką kaip juodraštį prieš uždarant?
+Save	Mail		Išsaugoti
+Random	Mail		Atsitiktinai
+Close and 	Mail		Uždaryti ir 
+Save as draft	Mail		Išsaugoti kaip juodraštį
+The mail_daemon could not be started:\n\t	Mail		Nepaleidžiamas mail_daemon'as:\n\t
+Open attachment	Mail		Atidaryti priedėlį
+Reply	Mail		Atsakyti
+From:	Mail		Nuo:
+Couldn't open this signature. Sorry.	Mail		Neatidaromas prierašas. Atleiskite.
+Open draft	Mail		Atidaryti juodraštį
+Cut	Mail		Iškirpti
+Check spelling	Mail		Tikrinti rašybą
+Set to Saved	Mail		Į išsaugotus
+Open this link	Mail		Atidaryti nuorodą
+Auto signature:	Mail		Pasirašinėti:
+Add signature	Mail		Pridėti prierašą
+Need Tracker to move items to trash	Mail		Dėmenų šalinimui Šiukšlinėn reikalingas paleistas Tracker'is
+Mailing	Mail		Siuntimas
+Unread	Mail		Neskaityta
+Remove quote	Mail		Šalinti citatą
+Move to trash	Mail		Mesti šiukšlinėn
+Select all	Mail		Žymėti viską
+An error occurred trying to save this signature.	Mail		Klaida išsaugant šį prierašą.

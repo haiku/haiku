@@ -1,0 +1,38 @@
+1	lithuanian	x-vnd.Haiku-Expander	1738666712
+Expand	ExpanderMenu		Išskleisti
+Set destination…	ExpanderMenu		Paskirti vietą…
+File expanded	ExpanderWindow		Byla išskleista
+The destination is read only.	ExpanderWindow		Paskirties vieta tik skaitymui.
+Expander: Open	ExpanderWindow		Skleideris: Atidaryti
+ is not supported	ExpanderWindow		 nepalaikoma
+Select current	DirectoryFilePanel		Parinkti esamą
+Source	ExpanderWindow		Šaltinis
+Error when expanding archive	ExpanderWindow		Klaida išskleidžiant bylą
+Hide contents	ExpanderWindow		Slėpti turinį
+Cancel	ExpanderWindow		Atsisakyti
+Continue	ExpanderWindow		Tęsti
+Expander	ExpanderWindow	!! Window Title !!	Skleideris
+Expander\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		Expander „Skleideris“\n\tparašytas Jérôme'o Duval'io\n\tCopyright 2004-2006, Haiku Inc.\n\npirminė „Be“ versija parašyta \nDominic'o, Hiroshi'o, Peter'io, Pavel'o ir Robert'o\n
+The destination folder does not exist.	ExpanderWindow		Paskirties aplanko nėra.
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Tikrai norite stabdyti skleidimą šio\narchyvo? Kai kurios bylos gali būti ne iki galo išskleistos.
+Select	DirectoryFilePanel		Parinkti
+Creating listing for 	ExpanderWindow		Kuriamas sąrašas: 
+Settings	ExpanderMenu		Nustatymai
+Settings…	ExpanderMenu		Nustatymai…
+Expander: Choose destination	DirectoryFilePanel		Skleideris: šaltinio vietos parinkimas
+Show contents	ExpanderWindow		Rodyti turinį
+Expanding file 	ExpanderWindow		Bylos skleidimas
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Aplankas buvo perkeltas, pervadintas arba\nnepalaikomas.
+The file doesn't exist	ExpanderWindow		Tokios bylos nėra
+Stop	ExpanderMenu		Stop
+File	ExpanderMenu		Byla
+Expand	ExpanderWindow		Išskleisti
+Close	ExpanderMenu		Uždaryti
+The destination is not a folder.	ExpanderWindow		Paskirties vieta nėra aplankas.
+About Expander…	ExpanderMenu		Apie programą…
+OK	About		Gerai
+Set source…	ExpanderMenu		Parinkti šaltinį…
+Select '%s'	DirectoryFilePanel		Rinktis '%s'
+Show contents	ExpanderMenu		Rodyti turinį
+Stop	ExpanderWindow		Stop
+Destination	ExpanderWindow		Paskirtis

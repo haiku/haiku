@@ -5,7 +5,7 @@ Day of week (name)	TimeFormatSettings		savaitės diena (pavadinimas)
 Separator:	TimeFormatSettings		Skirtukas:
 Year (4 digits)	TimeFormatSettings		Metai (4 skaitmenys)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Neprieinamos kalbos! Nepavyks šituo pasinaudoti!
-Thousand separator: 	TimeFormatSettings		Tūkstančių skirtukas: 
+Thousand separator: 	TimeFormatSettings		Tūkstančių skirtukas:
 After	TimeFormatSettings		Po
 Month name	TimeFormatSettings		mėnesio pavadinimas
 Long format:	TimeFormatSettings		Pilnai:
@@ -25,7 +25,7 @@ Symbol position	TimeFormatSettings		Ženklo vieta
 Day of week (short name)	TimeFormatSettings		savaitės diena (trumpai)
 Numbers	TimeFormatSettings		Skaičiai
 24 hour	TimeFormatSettings		24 valnadų
- (unknown format)	TimeFormatSettings		 (nežinomas)
+ (unknown format)	TimeFormatSettings		 (nežinoma)
 Negative marker:	TimeFormatSettings		Neigiamumo žymuo:
 Day in month	TimeFormatSettings		diena mėnesyje
 OK	Locale Preflet Window		Gerai
