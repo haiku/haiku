@@ -45,6 +45,7 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
 	buttonRect.left+= 5 + buttonWidth;
 	buttonRect.right = buttonRect.left + buttonWidth;
 	fNextButton = new BButton(buttonRect, "ok", "OK", new BMessage(kOkMsg));
+	fNextButton->MakeDefault(true);
 	fRootView->AddChild(fNextButton);
 	
 	fBoxRect = Bounds();
@@ -54,6 +55,10 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
 	fMainView = new AutoConfigView(fBoxRect, fAutoConfig);
 	fMainView->SetLabel("Account settings");
 	fRootView->AddChild(fMainView);
+	
+	// Add a shortcut to close the window using Command-W
+	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+	
 }
 
 
