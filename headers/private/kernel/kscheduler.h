@@ -1,6 +1,6 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_SCHEDULER_H
@@ -22,17 +22,19 @@ struct scheduler_ops {
 	void (*enqueue_in_run_queue)(struct thread* thread);
 	void (*reschedule)(void);
 	void (*set_thread_priority)(struct thread* thread, int32 priority);
-	// called when the thread structure is first created -
-	// initialization of per-thread housekeeping data structures should
-	// be done here
+	bigtime_t (*estimate_max_scheduling_latency)(struct thread* thread);
+
 	void (*on_thread_create)(struct thread* thread);
-	// called when a thread structure is initialized and made ready for
-	// use - should be used to reset the housekeeping data structures
-	// if needed
+		// called when the thread structure is first created -
+		// initialization of per-thread housekeeping data structures should
+		// be done here
 	void (*on_thread_init)(struct thread* thread);
-	// called when a thread structure is freed - freeing up any allocated
-	// mem on the scheduler's part should be done here
+		// called when a thread structure is initialized and made ready for
+		// use - should be used to reset the housekeeping data structures
+		// if needed
 	void (*on_thread_destroy)(struct thread* thread);
+		// called when a thread structure is freed - freeing up any allocated
+		// mem on the scheduler's part should be done here
 
 	void (*start)(void);
 };
@@ -61,6 +63,7 @@ void scheduler_remove_listener(struct SchedulerListener* listener);
 
 void scheduler_init(void);
 
+bigtime_t _user_estimate_max_scheduling_latency(thread_id thread);
 status_t _user_analyze_scheduling(bigtime_t from, bigtime_t until, void* buffer,
 	size_t size, struct scheduling_analysis* analysis);
 

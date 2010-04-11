@@ -1,6 +1,6 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  * Distributed under the terms of the MIT License.
  *
@@ -34,6 +34,9 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+
+const bigtime_t kThreadQuantum = 3000;
 
 
 // The run queue. Holds the threads ready to run ordered by priority.
@@ -157,6 +160,22 @@ simple_set_thread_priority(struct thread *thread, int32 priority)
 	// set priority and re-insert
 	thread->priority = thread->next_priority = priority;
 	simple_enqueue_in_run_queue(thread);
+}
+
+
+static bigtime_t
+simple_estimate_max_scheduling_latency(struct thread* thread)
+{
+	// TODO: This is probably meant to be called periodically to return the
+	// current estimate depending on the system usage; we return fixed estimates
+	// per thread priority, though.
+	
+	if (thread->priority >= B_REAL_TIME_DISPLAY_PRIORITY)
+		return kThreadQuantum / 4;
+	if (thread->priority >= B_DISPLAY_PRIORITY)
+		return kThreadQuantum;
+
+	return 2 * kThreadQuantum;
 }
 
 
@@ -322,8 +341,8 @@ simple_reschedule(void)
 	}
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
-		bigtime_t quantum = 3000;	// ToDo: calculate quantum!
-		timer *quantumTimer = &oldThread->cpu->quantum_timer;
+		bigtime_t quantum = kThreadQuantum;	// TODO: calculate quantum?
+		timer* quantumTimer = &oldThread->cpu->quantum_timer;
 
 		if (!oldThread->cpu->preempted)
 			cancel_timer(quantumTimer);
@@ -377,6 +396,7 @@ static scheduler_ops kSimpleOps = {
 	simple_enqueue_in_run_queue,
 	simple_reschedule,
 	simple_set_thread_priority,
+	simple_estimate_max_scheduling_latency,
 	simple_on_thread_create,
 	simple_on_thread_init,
 	simple_on_thread_destroy,

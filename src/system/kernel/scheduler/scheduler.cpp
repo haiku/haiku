@@ -1,7 +1,9 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include <kscheduler.h>
 #include <listeners.h>
@@ -67,4 +69,23 @@ scheduler_init(void)
 		"Analyzes scheduler tracing information for a given thread.\n"
 		"  <thread>  - ID of the thread.\n", 0);
 #endif
+}
+
+
+// #pragma mark - Syscalls
+
+
+bigtime_t
+_user_estimate_max_scheduling_latency(thread_id id)
+{
+	syscall_64_bit_return_value();
+
+	InterruptsSpinLocker locker(gThreadSpinlock);
+
+	struct thread* thread = id < 0
+		? thread_get_current_thread() : thread_get_thread_struct_locked(id);
+	if (thread == NULL)
+		return 0;
+
+	return gScheduler->estimate_max_scheduling_latency(thread);
 }

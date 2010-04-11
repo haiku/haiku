@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku. All rights reserved.
+ * Copyright 2004-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,8 @@
 
 
 #include <scheduler.h>
+
+#include <syscalls.h>
 
 
 static struct {
@@ -39,6 +41,8 @@ suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter,
 	int32 priority = what == B_DEFAULT_MEDIA_PRIORITY ? 0x0a : 0;
 		// default priority
 
+	// TODO: this needs kernel support, and is a pretty simplistic solution
+
 	for (i = 0; sWhatPriorityArray[i].what != (uint32)-1; i ++) {
 		if ((what & sWhatPriorityArray[i].what) != 0) {
 			priority = sWhatPriorityArray[i].priority;
@@ -53,9 +57,6 @@ suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter,
 bigtime_t
 estimate_max_scheduling_latency(thread_id thread)
 {
-	if (thread == -1)
-		thread = find_thread(NULL);
-
-	return 0;
+	return _kern_estimate_max_scheduling_latency(thread);
 }
 

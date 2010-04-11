@@ -1,7 +1,7 @@
 /*
  * Copyright 2009, Rene Gollent, rene@gollent.com.
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  * Distributed under the terms of the MIT License.
  *
@@ -321,6 +321,24 @@ affine_set_thread_priority(struct thread *thread, int32 priority)
 }
 
 
+static bigtime_t
+affine_estimate_max_scheduling_latency(struct thread* thread)
+{
+	// TODO: This is probably meant to be called periodically to return the
+	// current estimate depending on the system usage; we return fixed estimates
+	// per thread priority, though.
+	
+	if (thread->priority >= B_REAL_TIME_DISPLAY_PRIORITY)
+		return kMinThreadQuantum / 4;
+	if (thread->priority >= B_DISPLAY_PRIORITY)
+		return kMinThreadQuantum;
+	if (thread->priority < B_NORMAL_PRIORITY)
+		return 2 * kMaxThreadQuantum;
+
+	return 2 * kMinThreadQuantum;
+}
+
+
 static void
 context_switch(struct thread *fromThread, struct thread *toThread)
 {
@@ -556,6 +574,7 @@ static scheduler_ops kAffineOps = {
 	affine_enqueue_in_run_queue,
 	affine_reschedule,
 	affine_set_thread_priority,
+	affine_estimate_max_scheduling_latency,
 	affine_on_thread_create,
 	affine_on_thread_init,
 	affine_on_thread_destroy,

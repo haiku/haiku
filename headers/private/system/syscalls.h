@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku Inc. All rights reserved.
+ * Copyright 2004-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYSTEM_SYSCALLS_H
@@ -176,6 +176,8 @@ extern status_t		_kern_block_thread(uint32 flags, bigtime_t timeout);
 extern status_t		_kern_unblock_thread(thread_id thread, status_t status);
 extern status_t		_kern_unblock_threads(thread_id* threads, uint32 count,
 						status_t status);
+
+extern bigtime_t	_kern_estimate_max_scheduling_latency(thread_id thread);
 
 // user/group functions
 extern gid_t		_kern_getgid(bool effective);
