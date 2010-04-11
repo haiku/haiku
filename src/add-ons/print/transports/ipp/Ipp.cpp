@@ -18,8 +18,7 @@ IppTransport *transport = NULL;
 uint32 transport_features = B_TRANSPORT_IS_HOTPLUG | B_TRANSPORT_IS_NETWORK;
 
 
-class IPPPrinter
-{
+class IPPPrinter {
 public:
 	IPPPrinter(const BString& uri, uint32 type)
 		{ fURI=uri; fType=type; }
@@ -29,8 +28,7 @@ public:
 };
 
 
-class IPPPrinterRoster
-{
+class IPPPrinterRoster {
 public:
 	IPPPrinterRoster();
 	~IPPPrinterRoster();
@@ -38,9 +36,9 @@ public:
 	status_t ListPorts(BMessage *msg);
 	status_t Listen();
 private:
-	char *_parseString(BString& outStr, char*& pos);
+	char *_ParseString(BString& outStr, char*& pos);
 
-	static status_t _ippListeningThread(void *cookie);
+	static status_t _IPPListeningThread(void *cookie);
 
 	typedef HashMap<HashString,IPPPrinter*> IPPPrinterMap;
 	IPPPrinterMap fPrinters;
@@ -66,7 +64,7 @@ IPPPrinterRoster::IPPPrinterRoster()
 		return;
 
 	// Now create thread for listening
-	fListenThreadID = spawn_thread(_ippListeningThread, "IPPListener", B_LOW_PRIORITY, this);
+	fListenThreadID = spawn_thread(_IPPListeningThread, "IPPListener", B_LOW_PRIORITY, this);
 	if (fListenThreadID <= 0)
 		return;
 
@@ -107,11 +105,11 @@ IPPPrinterRoster::Listen()
 			// Check for option parameters
 			if ((pos=strchr(packet, '"')) != NULL) {
 				BString str;
-				if (_parseString(str, pos))
+				if (_ParseString(str, pos))
 					printer->fLocation = str;
-				if (pos && _parseString(str, pos))
+				if (pos && _ParseString(str, pos))
 					printer->fInfo = str;
-				if (pos && _parseString(str, pos))
+				if (pos && _ParseString(str, pos))
 					printer->fMakeModel = str;
 
 				if (pos)
@@ -128,7 +126,8 @@ IPPPrinterRoster::Listen()
 }
 
 
-status_t IPPPrinterRoster::ListPorts(BMessage* msg)
+status_t
+IPPPrinterRoster::ListPorts(BMessage* msg)
 {
 	IPPPrinterMap::Iterator iterator = fPrinters.GetIterator();
 	while (iterator.HasNext()) {
@@ -150,7 +149,7 @@ status_t IPPPrinterRoster::ListPorts(BMessage* msg)
 
 
 char*
-IPPPrinterRoster::_parseString(BString& outStr, char*& pos)
+IPPPrinterRoster::_ParseString(BString& outStr, char*& pos)
 {
 	outStr = "";
 
@@ -174,7 +173,7 @@ IPPPrinterRoster::_parseString(BString& outStr, char*& pos)
 
 
 status_t
-IPPPrinterRoster::_ippListeningThread(void *cookie)
+IPPPrinterRoster::_IPPListeningThread(void *cookie)
 {
 	return ((IPPPrinterRoster*)cookie)->Listen();
 }
@@ -182,7 +181,8 @@ IPPPrinterRoster::_ippListeningThread(void *cookie)
 
 // --- general transport hooks
 
-extern "C" _EXPORT void exit_transport()
+extern "C" _EXPORT void
+exit_transport()
 {
 	DBGMSG(("> exit_transport\n"));
 	if (transport) {
@@ -192,13 +192,17 @@ extern "C" _EXPORT void exit_transport()
 	DBGMSG(("< exit_transport\n"));
 }
 
+
 // List detected printers
-extern "C" _EXPORT status_t list_transport_ports(BMessage* msg)
+extern "C" _EXPORT status_t
+list_transport_ports(BMessage* msg)
 {
 	return gRoster.ListPorts(msg);
 }
 
-extern "C" _EXPORT BDataIO *init_transport(BMessage *msg)
+
+extern "C" _EXPORT BDataIO *
+init_transport(BMessage *msg)
 {
 	DBGMSG(("> init_transport\n"));
 

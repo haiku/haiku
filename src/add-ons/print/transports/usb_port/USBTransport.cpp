@@ -32,11 +32,10 @@
 #define PIT_VENDOR_SPECIFIC		0xff
 
 
-class USBPrinter
-{
+class USBPrinter {
 public:
 	USBPrinter(const BString& id, const BString& name,
-		const BUSBInterface *interface, const BUSBEndpoint* in, const BUSBEndpoint* out);
+		const BUSBInterface *interface, const BUSBEndpoint *in, const BUSBEndpoint *out);
 
 	ssize_t Write(const void *buf, size_t size);
 	ssize_t Read(void *buf, size_t size);
@@ -53,8 +52,8 @@ class USBPrinterRoster : public BUSBRoster {
 public:
 	USBPrinterRoster();
 
-	status_t DeviceAdded(BUSBDevice* dev);
-	void DeviceRemoved(BUSBDevice* dev);
+	status_t DeviceAdded(BUSBDevice *dev);
+	void DeviceRemoved(BUSBDevice *dev);
 
 	USBPrinter *Printer(const BString& key);
 
@@ -65,8 +64,7 @@ private:
 };
 
 
-class USBTransport : public BDataIO 
-{	
+class USBTransport : public BDataIO {
 public:
 	USBTransport(BDirectory *printer, BMessage *msg);
 	~USBTransport();
@@ -93,7 +91,8 @@ USBPrinterRoster::USBPrinterRoster()
 }
 
 
-USBPrinter *USBPrinterRoster::Printer(const BString& key)
+USBPrinter *
+USBPrinterRoster::Printer(const BString& key)
 {
 	if (fPrinters.ContainsKey(key.String()))
 		return fPrinters.Get(key.String());
@@ -102,7 +101,8 @@ USBPrinter *USBPrinterRoster::Printer(const BString& key)
 }
 
 
-status_t USBPrinterRoster::DeviceAdded(BUSBDevice* dev)
+status_t
+USBPrinterRoster::DeviceAdded(BUSBDevice *dev)
 {
 	const BUSBConfiguration *config = dev->ActiveConfiguration();
 	const BUSBEndpoint *in = NULL, *out = NULL;
@@ -112,11 +112,11 @@ status_t USBPrinterRoster::DeviceAdded(BUSBDevice* dev)
 	if (config) {
 		for (uint32 idx = 0; printer == NULL && idx < config->CountInterfaces(); idx++) {
 			const BUSBInterface *interface = config->InterfaceAt(idx);
-			if (interface->Class() == PRINTER_INTERFACE_CLASS &&
-				interface->Subclass() == PRINTER_INTERFACE_SUBCLASS &&
-				(interface->Protocol() == PIT_UNIDIRECTIONAL ||
-				 interface->Protocol() == PIT_BIDIRECTIONAL ||
-				 interface->Protocol() == PIT_1284_4_COMPATIBLE)) {
+			if (interface->Class() == PRINTER_INTERFACE_CLASS
+				&& interface->Subclass() == PRINTER_INTERFACE_SUBCLASS
+				&& (interface->Protocol() == PIT_UNIDIRECTIONAL
+				|| interface->Protocol() == PIT_BIDIRECTIONAL
+				||  interface->Protocol() == PIT_1284_4_COMPATIBLE)) {
 				// Found a usable Printer interface!
 				for (uint32 endpointIdx = 0; endpointIdx < interface->CountEndpoints(); endpointIdx++) {
 					const BUSBEndpoint *endpoint = interface->EndpointAt(endpointIdx);
@@ -166,7 +166,8 @@ status_t USBPrinterRoster::DeviceAdded(BUSBDevice* dev)
 }
 
 
-void USBPrinterRoster::DeviceRemoved(BUSBDevice* dev)
+void 
+USBPrinterRoster::DeviceRemoved(BUSBDevice* dev)
 {
 	PrinterMap::Iterator iterator = fPrinters.GetIterator();
 	while (iterator.HasNext()) {
@@ -181,7 +182,8 @@ void USBPrinterRoster::DeviceRemoved(BUSBDevice* dev)
 }
 
 
-status_t USBPrinterRoster::ListPrinters(BMessage* msg)
+status_t 
+USBPrinterRoster::ListPrinters(BMessage* msg)
 {
 	PrinterMap::Iterator iterator = fPrinters.GetIterator();
 	while (iterator.HasNext()) {
@@ -195,14 +197,15 @@ status_t USBPrinterRoster::ListPrinters(BMessage* msg)
 
 
 USBPrinter::USBPrinter(const BString& id, const BString& name,
-	const BUSBInterface *intf, const BUSBEndpoint* in, const BUSBEndpoint* out)
+	const BUSBInterface *intf, const BUSBEndpoint *in, const BUSBEndpoint *out)
 	: fInterface(intf), fOut(out), fIn(in), fName(name), fID(id)
 {
 }
 
 
 //TODO: see usb_printer.cpp for error handling during read/write!
-ssize_t USBPrinter::Write(const void *buf, size_t size)
+ssize_t 
+USBPrinter::Write(const void *buf, size_t size)
 {
 	if (!buf || size <= 0)
 		return B_BAD_VALUE;
@@ -212,7 +215,8 @@ ssize_t USBPrinter::Write(const void *buf, size_t size)
 }
 
 
-ssize_t USBPrinter::Read(void *buf, size_t size)
+ssize_t
+USBPrinter::Read(void *buf, size_t size)
 {
 	if (!buf || size <= 0)
 		return B_BAD_VALUE;
@@ -236,7 +240,8 @@ instantiate_transport(BDirectory *printer, BMessage *msg)
 
 
 // List detected printers
-status_t list_transport_ports(BMessage* msg)
+status_t 
+list_transport_ports(BMessage* msg)
 {
 	return gUSBPrinterRoster.ListPrinters(msg);
 }
