@@ -38,13 +38,14 @@ public:
 	status_t ListPorts(BMessage *msg);
 	status_t Listen();
 private:
-	char *parseString(BString& outStr, char*& pos);
+	char *_parseString(BString& outStr, char*& pos);
 
-	static status_t ippListeningThread(void *cookie);
+	static status_t _ippListeningThread(void *cookie);
 
 	typedef HashMap<HashString,IPPPrinter*> IPPPrinterMap;
 	IPPPrinterMap fPrinters;
-	BNetEndpoint *fEndpt;
+	BNetEndpoint *fEndpoint;
+	thread_id fListenThreadID;
 };
 
 
@@ -53,32 +54,30 @@ static IPPPrinterRoster gRoster;
 
 IPPPrinterRoster::IPPPrinterRoster()
 {
-	thread_id thid;
-
 	// Setup our (UDP) listening endpoint
-	fEndpt = new BNetEndpoint(SOCK_DGRAM);
-	if (!fEndpt)
+	fEndpoint = new BNetEndpoint(SOCK_DGRAM);
+	if (!fEndpoint)
 		return;
 
-	if (fEndpt->InitCheck() != B_OK)
+	if (fEndpoint->InitCheck() != B_OK)
 		return;
 
-	if (fEndpt->Bind(BNetAddress(INADDR_ANY, 631)) != B_OK)
+	if (fEndpoint->Bind(BNetAddress(INADDR_ANY, 631)) != B_OK)
 		return;
 
 	// Now create thread for listening
-	thid = spawn_thread(ippListeningThread, "IPPListener", B_LOW_PRIORITY, this);
-	if (thid <= 0)
+	fListenThreadID = spawn_thread(_ippListeningThread, "IPPListener", B_LOW_PRIORITY, this);
+	if (fListenThreadID <= 0)
 		return;
 
-	resume_thread(thid);
+	resume_thread(fListenThreadID);
 }
 
 
 IPPPrinterRoster::~IPPPrinterRoster()
 {
-	if (fEndpt)
-		delete fEndpt;
+	kill_thread(fListenThreadID);
+	delete fEndpoint;
 }
 
 
@@ -92,7 +91,7 @@ IPPPrinterRoster::Listen()
 	char* pos;
 	int32 len;
 
-	while((len=fEndpt->ReceiveFrom(packet, sizeof(packet) -1, srcAddress)) > 0) {
+	while ((len=fEndpoint->ReceiveFrom(packet, sizeof(packet) -1, srcAddress)) > 0) {
 		packet[len] = '\0';
 
 		// Verify packet format
@@ -108,11 +107,11 @@ IPPPrinterRoster::Listen()
 			// Check for option parameters
 			if ((pos=strchr(packet, '"')) != NULL) {
 				BString str;
-				if (parseString(str, pos))
+				if (_parseString(str, pos))
 					printer->fLocation = str;
-				if (pos && parseString(str, pos))
+				if (pos && _parseString(str, pos))
 					printer->fInfo = str;
-				if (pos && parseString(str, pos))
+				if (pos && _parseString(str, pos))
 					printer->fMakeModel = str;
 
 				if (pos)
@@ -151,7 +150,7 @@ status_t IPPPrinterRoster::ListPorts(BMessage* msg)
 
 
 char*
-IPPPrinterRoster::parseString(BString& outStr, char*& pos)
+IPPPrinterRoster::_parseString(BString& outStr, char*& pos)
 {
 	outStr = "";
 
@@ -175,7 +174,7 @@ IPPPrinterRoster::parseString(BString& outStr, char*& pos)
 
 
 status_t
-IPPPrinterRoster::ippListeningThread(void *cookie)
+IPPPrinterRoster::_ippListeningThread(void *cookie)
 {
 	return ((IPPPrinterRoster*)cookie)->Listen();
 }
