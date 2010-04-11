@@ -4473,7 +4473,7 @@ BTextView::_DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 				Highlight(fSelStart, fSelEnd);
 		} else {
 			if (fCaretVisible)
-				_DrawCaret(fSelStart);
+				_DrawCaret(fSelStart, true);
 		}
 	}
 
@@ -4512,7 +4512,7 @@ BTextView::_RequestDrawLines(int32 startLine, int32 endLine)
 
 
 void
-BTextView::_DrawCaret(int32 offset)
+BTextView::_DrawCaret(int32 offset, bool visible)
 {
 	float lineHeight;
 	BPoint caretPoint = PointAt(offset, &lineHeight);
@@ -4523,7 +4523,10 @@ BTextView::_DrawCaret(int32 offset)
 	caretRect.top = caretPoint.y;
 	caretRect.bottom = caretPoint.y + lineHeight - 1;
 
-	InvertRect(caretRect);
+	if (visible)
+		InvertRect(caretRect);
+	else
+		Invalidate(caretRect);
 }
 
 
@@ -4549,8 +4552,8 @@ BTextView::_HideCaret()
 void
 BTextView::_InvertCaret()
 {
-	_DrawCaret(fSelStart);
 	fCaretVisible = !fCaretVisible;
+	_DrawCaret(fSelStart, fCaretVisible);
 	fCaretTime = system_time();
 }
 
@@ -4568,7 +4571,7 @@ BTextView::_DragCaret(int32 offset)
 
 	// hide the previous drag caret
 	if (fDragOffset != -1)
-		_DrawCaret(fDragOffset);
+		_DrawCaret(fDragOffset, false);
 
 	// do we have a new location?
 	if (offset != -1) {
@@ -4580,7 +4583,7 @@ BTextView::_DragCaret(int32 offset)
 			}
 		}
 
-		_DrawCaret(offset);
+		_DrawCaret(offset, true);
 	}
 
 	fDragOffset = offset;

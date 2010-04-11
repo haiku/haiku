@@ -336,7 +336,7 @@ private:
 			void				_RequestDrawLines(int32 startLine,
 									int32 endLine);
 
-			void				_DrawCaret(int32 offset);
+			void				_DrawCaret(int32 offset, bool visible);
 			void				_ShowCaret();
 			void				_HideCaret();
 			void				_InvertCaret();
