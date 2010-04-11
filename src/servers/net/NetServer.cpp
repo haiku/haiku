@@ -45,34 +45,39 @@ typedef std::map<std::string, AutoconfigLooper*> LooperMap;
 
 
 class NetServer : public BServer {
-	public:
-		NetServer(status_t& status);
-		virtual ~NetServer();
+public:
+								NetServer(status_t& status);
+	virtual						~NetServer();
 
-		virtual void AboutRequested();
-		virtual void ReadyToRun();
-		virtual void MessageReceived(BMessage* message);
+	virtual	void				AboutRequested();
+	virtual	void				ReadyToRun();
+	virtual	void				MessageReceived(BMessage* message);
 
-	private:
-		bool _IsValidInterface(int socket, const char* name);
-		void _RemoveInvalidInterfaces(int socket);
-		bool _TestForInterface(int socket, const char* name);
-		status_t _ConfigureInterface(int socket, BMessage& interface,
-			bool fromMessage = false);
-		status_t _ConfigureResolver(BMessage& resolverConfiguration);
-		bool _QuitLooperForDevice(const char* device);
-		AutoconfigLooper* _LooperForDevice(const char* device);
-		status_t _ConfigureDevice(int socket, const char* path);
-		void _ConfigureDevices(int socket, const char* path,
-			BMessage* suggestedInterface = NULL);
-		void _ConfigureInterfaces(int socket, BMessage* _missingDevice = NULL);
-		void _BringUpInterfaces();
-		void _StartServices();
-		void _HandleDeviceMonitor(int socket, BMessage* message);
+private:
+			bool				_IsValidInterface(int socket, const char* name);
+			void				_RemoveInvalidInterfaces(int socket);
+			bool				_TestForInterface(int socket, const char* name);
+			status_t			_ConfigureInterface(int socket,
+									BMessage& interface,
+									bool fromMessage = false);
+			status_t			_ConfigureResolver(
+									BMessage& resolverConfiguration);
+			bool				_QuitLooperForDevice(const char* device);
+			AutoconfigLooper*	_LooperForDevice(const char* device);
+			status_t			_ConfigureDevice(int socket, const char* path);
+			void				_ConfigureDevices(int socket, const char* path,
+									BMessage* suggestedInterface = NULL);
+			void				_ConfigureInterfaces(int socket,
+									BMessage* _missingDevice = NULL);
+			void				_BringUpInterfaces();
+			void				_StartServices();
+			void				_HandleDeviceMonitor(int socket,
+									BMessage* message);
 
-		Settings	fSettings;
-		LooperMap	fDeviceMap;
-		BMessenger	fServices;
+private:
+			Settings			fSettings;
+			LooperMap			fDeviceMap;
+			BMessenger			fServices;
 };
 
 
