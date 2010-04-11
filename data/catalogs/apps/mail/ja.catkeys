@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	3196085791
+1	japanese	x-vnd.Be-MAIL	3640755640
 View	Mail		表示
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付：
@@ -105,6 +105,7 @@ Do you wish to send this message before closing?	Mail		閉じる前にこのメ�
 Delete	Mail		削除
 Leave as '%s'	Mail		「%s」のままにする
 Copy	Mail		コピー
+Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データが見つかりません。
 Reply preamble:	Mail		返信の前書き：
 Signatures	Mail		署名の編集
 Next	Mail		次へ
@@ -123,7 +124,6 @@ Save as draft	Mail		下書きとして保存
 The mail_daemon could not be started:\n\t	Mail		メールサービス（mail_daemon）を起動できませんでした。
 Open attachment	Mail		添付ファイルを開く
 Reply	Mail		返信
-The spell check feature requires the optional \"words\" file on your BeOS CD.	Mail		スペルチェク機能は BeOS CD の optional \"words\" ファイルが必要です。
 From:	Mail		差出人：
 Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。
 Open draft	Mail		下書きを開く
