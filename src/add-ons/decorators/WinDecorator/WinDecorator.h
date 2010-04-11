@@ -6,15 +6,20 @@
 class WinDecorator: public Decorator
 {
 public:
-				WinDecorator(DesktopSettings& settings,
-					BRect frame, window_look wlook,
-					uint32 wflags);
-				~WinDecorator(void);
+					WinDecorator(DesktopSettings& settings,
+						BRect frame, window_look wlook,
+						uint32 wflags);
+					~WinDecorator(void);
 
-	void		SetTitle(const char* string,
-	 				BRegion* updateRegion = NULL);
-	void		FontsChanged(DesktopSettings& settings,
-					BRegion* updateRegion);
+	void			SetTitle(const char* string,
+	 					BRegion* updateRegion = NULL);
+	void			FontsChanged(DesktopSettings& settings,
+						BRegion* updateRegion);
+	virtual void	SetLook(DesktopSettings& settings,
+						window_look look,
+						BRegion* updateRegion = NULL);
+	virtual void	SetFlags(uint32 flags,
+						BRegion* updateRegion = NULL);
 	
 	void MoveBy(BPoint pt);
 	void ResizeBy(BPoint pt, BRegion* dirty);

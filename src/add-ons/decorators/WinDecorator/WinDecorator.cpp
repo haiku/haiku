@@ -30,21 +30,29 @@
 WinDecorator::WinDecorator(DesktopSettings& settings, BRect rect,
 		window_look look, uint32 flags)
 	:
-	Decorator(settings, rect, look, flags)
+	Decorator(settings, rect, look, flags),
+	taboffset(0)
 {
-	taboffset=0;
 
+	_UpdateFont(settings);
+
+	// common colors to both focus and non focus state
 	frame_highcol = (rgb_color){ 255, 255, 255, 255 };
 	frame_midcol = (rgb_color){ 216, 216, 216, 255 };
 	frame_lowcol = (rgb_color){ 110, 110, 110, 255 };
 	frame_lowercol = (rgb_color){ 0, 0, 0, 255 };
 
+	// state based colors
 	fFocusTabColor = settings.UIColor(B_WINDOW_TAB_COLOR);
 	fFocusTextColor = settings.UIColor(B_WINDOW_TEXT_COLOR);
 	fNonFocusTabColor = settings.UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
 	fNonFocusTextColor = settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
 
-	_UpdateFont(settings);
+	// Set appropriate colors based on the current focus value. In this case,
+	// each decorator defaults to not having the focus.
+	_SetFocus();
+
+	// Do initial decorator setup
 	_DoLayout();
 	
 	textoffset=5;
@@ -103,6 +111,55 @@ WinDecorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
 
 
 void
+WinDecorator::SetLook(DesktopSettings& settings, window_look look,
+	BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
+
+	fLook = look;
+
+	_UpdateFont(settings);
+	_DoLayout();
+
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
+}
+
+
+void
+WinDecorator::SetFlags(uint32 flags, BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
+
+	Decorator::SetFlags(flags, updateRegion);
+	_DoLayout();
+
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
+}
+
+
+void
 WinDecorator::MoveBy(BPoint pt)
 {
 	// Move all internal rectangles the appropriate amount
@@ -139,6 +196,33 @@ WinDecorator::ResizeBy(BPoint offset, BRegion* dirty)
 
 
 void
+WinDecorator::Draw(BRect update)
+{
+	STRACE(("WinDecorator::Draw(): ")); update.PrintToStream();
+
+	fDrawingEngine->SetDrawState(&fDrawState);
+
+	_DrawFrame(update);
+	_DrawTab(update);
+}
+
+
+void
+WinDecorator::Draw(void)
+{
+	STRACE(("WinDecorator::Draw()\n"));
+
+	fDrawingEngine->SetDrawState(&fDrawState);
+
+	_DrawFrame(fBorderRect);
+	_DrawTab(fTabRect);
+}
+
+
+// TODO : GetSizeLimits
+
+
+void
 WinDecorator::GetFootprint(BRegion* region)
 {
 	// This function calculates the decorator's footprint in coordinates
@@ -159,20 +243,16 @@ WinDecorator::GetFootprint(BRegion* region)
 
 
 click_type
-WinDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
+WinDecorator::Clicked(BPoint where, int32 buttons, int32 modifiers)
 {
-	if (fCloseRect.Contains(pt)) {
-		STRACE(("WinDecorator():Clicked() - Close\n"));
+	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(where))
 		return CLICK_CLOSE;
-	}
 
-	if (fZoomRect.Contains(pt)) {
-		STRACE(("WinDecorator():Clicked() - Zoom\n"));
+	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(where))
 		return CLICK_ZOOM;
-	}
 	
 	// Clicking in the tab?
-	if (fTabRect.Contains(pt)) {
+	if (fTabRect.Contains(where)) {
 		// Here's part of our window management stuff
 		/* TODO This is missing CLICK_MOVETOFRONT
 		if(buttons==B_PRIMARY_MOUSE_BUTTON && !IsFocus())
@@ -182,9 +262,14 @@ WinDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	}
 
 	// We got this far, so user is clicking on the border?
-	if (fBorderRect.Contains(pt) && !fFrame.Contains(pt)) {
+	if (fBorderRect.Contains(where) && !fFrame.Contains(where)) {
 		STRACE(("WinDecorator():Clicked() - Resize\n"));
-		return CLICK_RESIZE;
+		if (!(fFlags & B_NOT_RESIZABLE)
+			&& (fLook == B_TITLED_WINDOW_LOOK
+				|| fLook == B_FLOATING_WINDOW_LOOK
+				|| fLook == B_MODAL_WINDOW_LOOK)) {
+					return CLICK_RESIZE;
+		}
 	}
 
 	// Guess user didn't click anything
@@ -242,6 +327,11 @@ WinDecorator::_DoLayout()
 
 		fMinimizeRect=fZoomRect;
 		fMinimizeRect.OffsetBy(0-fZoomRect.Width()-1,0);
+	} else {
+		fTabRect.Set(0.0, 0.0, -1.0, -1.0);
+		fCloseRect.Set(0.0, 0.0, -1.0, -1.0);
+		fZoomRect.Set(0.0, 0.0, -1.0, -1.0);
+		fMinimizeRect.Set(0.0, 0.0, -1.0, -1.0);
 	}
 }
 
@@ -249,17 +339,22 @@ WinDecorator::_DoLayout()
 void
 WinDecorator::_DrawTitle(BRect r)
 {
+	//fDrawingEngine->SetDrawingMode(B_OP_OVER);
 	fDrawingEngine->SetHighColor(textcol);
 	fDrawingEngine->SetLowColor(IsFocus()?fFocusTabColor:fNonFocusTabColor);
 
 	fTruncatedTitle = Title();
 	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END,
-		(fTabRect.left + textoffset) - (fZoomRect.left - 5));
+		((fZoomRect.IsValid() ? fZoomRect.left :
+			fCloseRect.IsValid() ? fCloseRect.left : fTabRect.right) - 5)
+		- (fTabRect.left + textoffset));
 	fTruncatedTitleLength = fTruncatedTitle.Length();
-	fDrawingEngine->SetFont(fDrawState.Font());
 
+	//fDrawingEngine->SetFont(fDrawState.Font());
 	fDrawingEngine->DrawString(fTruncatedTitle,fTruncatedTitleLength,
 		BPoint(fTabRect.left+textoffset,fCloseRect.bottom-1));
+
+	//fDrawingEngine->SetDrawingMode(B_OP_COPY);
 }
 
 
@@ -280,30 +375,6 @@ WinDecorator::_SetFocus(void)
 		tab_highcol=fNonFocusTabColor;
 		textcol=fNonFocusTextColor;
 	}
-}
-
-
-void
-WinDecorator::Draw(BRect update)
-{
-	STRACE(("WinDecorator::Draw(): ")); update.PrintToStream();
-
-	fDrawingEngine->SetDrawState(&fDrawState);
-
-	_DrawFrame(update);
-	_DrawTab(update);
-}
-
-
-void
-WinDecorator::Draw(void)
-{
-	STRACE(("WinDecorator::Draw()\n"));
-
-	fDrawingEngine->SetDrawState(&fDrawState);
-
-	_DrawFrame(fBorderRect);
-	_DrawTab(fTabRect);
 }
 
 
@@ -372,22 +443,22 @@ WinDecorator::_DrawMinimize(BRect r)
 
 
 void
-WinDecorator::_DrawTab(BRect r)
+WinDecorator::_DrawTab(BRect invalid)
 {
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
-	if(fLook==B_NO_BORDER_WINDOW_LOOK)
+	if (!fTabRect.IsValid() || !invalid.Intersects(fTabRect) || fLook==B_NO_BORDER_WINDOW_LOOK)
 		return;
-
 
 	fDrawingEngine->FillRect(fTabRect,tab_highcol);
 
-	_DrawTitle(r);
+	_DrawTitle(fTabRect);
 
 	// Draw the buttons if we're supposed to	
-	if(!(fFlags & B_NOT_CLOSABLE))
+	// TODO : we should still draw the buttons if they are disabled, but grey them out
+	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
 		_DrawClose(fCloseRect);
-	if(!(fFlags & B_NOT_ZOOMABLE))
+	if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
 		_DrawZoom(fZoomRect);
 }
 
