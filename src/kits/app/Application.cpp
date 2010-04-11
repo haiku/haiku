@@ -1250,6 +1250,7 @@ BApplication::_ConnectToServer()
 	fServerLink->AttachString(fAppName);
 
 	area_id sharedReadOnlyArea;
+	team_id serverTeam;
 	port_id serverPort;
 
 	int32 code;
@@ -1259,12 +1260,13 @@ BApplication::_ConnectToServer()
 		// directly; we now talk to our server alter ego only.
 		fServerLink->Read<port_id>(&serverPort);
 		fServerLink->Read<area_id>(&sharedReadOnlyArea);
+		fServerLink->Read<team_id>(&serverTeam);
 	} else {
 		fServerLink->SetSenderPort(-1);
 		debugger("BApplication: couldn't obtain new app_server comm port");
 		return B_ERROR;
 	}
-
+	fServerLink->SetTargetTeam(serverTeam);
 	fServerLink->SetSenderPort(serverPort);
 
 	status = _SetupServerAllocator();

@@ -43,6 +43,9 @@ public:
 			void				SetSenderPort(port_id port);
 			port_id				SenderPort();
 
+			void				SetTargetTeam(team_id team);
+			team_id				TargetTeam();
+
 			status_t			StartMessage(int32 code, size_t minSize = 0);
 			void				CancelMessage();
 			status_t			EndMessage();
@@ -106,6 +109,20 @@ inline port_id
 ServerLink::SenderPort()
 {
 	return fSender->Port();
+}
+
+
+inline void
+ServerLink::SetTargetTeam(team_id team)
+{
+	fSender->SetTargetTeam(team);
+}
+
+
+inline team_id
+ServerLink::TargetTeam()
+{
+	return fSender->TargetTeam();
 }
 
 

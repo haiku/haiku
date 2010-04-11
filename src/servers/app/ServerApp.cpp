@@ -116,6 +116,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 
 	fLink.SetSenderPort(fClientReplyPort);
 	fLink.SetReceiverPort(fMessagePort);
+	fLink.SetTargetTeam(clientTeam);
 
 	// we let the application own the port, so that we get aware when it's gone
 	if (set_port_owner(fMessagePort, clientTeam) < B_OK) {
@@ -2993,10 +2994,15 @@ ServerApp::_MessageLooper()
 {
 	// Message-dispatching loop for the ServerApp
 
+	// get our own team ID
+	thread_info threadInfo;
+	get_thread_info(fThread, &threadInfo);
+
 	// First let's tell the client how to talk with us.
 	fLink.StartMessage(B_OK);
 	fLink.Attach<port_id>(fMessagePort);
 	fLink.Attach<area_id>(fDesktop->SharedReadOnlyArea());
+	fLink.Attach<team_id>(threadInfo.team);
 	fLink.Flush();
 
 	BPrivate::LinkReceiver &receiver = fLink.Receiver();
