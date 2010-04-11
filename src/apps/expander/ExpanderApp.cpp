@@ -31,8 +31,12 @@ ExpanderApp::ExpanderApp()
 void
 ExpanderApp::AboutRequested()
 {
+	BString appName = TR("Expander");
+	int nameLength = appName.CountChars();
 	BAlert* alert = new BAlert("about", 
-		TR("Expander\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n"),
+		appName.Append(TR("\n\twritten by Jérôme Duval\n"
+			"\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \n"
+			"Dominic, Hiroshi, Peter, Pavel and Robert\n")),
 		TR("OK"));
 	BTextView* view = alert->TextView();
 	BFont font;
@@ -42,7 +46,7 @@ ExpanderApp::AboutRequested()
 	view->GetFont(&font);
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 8, &font);
+	view->SetFontAndColor(0, nameLength, &font);
 
 	alert->Go();
 }
