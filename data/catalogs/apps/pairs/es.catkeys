@@ -1,3 +1,10 @@
-1	spanish	x-vnd.Haiku-Pairs	575304885
+1	spanish	x-vnd.Haiku-Pairs	794776701
+Expert (8x8)	PairsWindow		Experto (8x8)
+Beginner (4x4)	PairsWindow		Principiante (4x4)
 Quit game	PairsWindow		Finalizar partida
+Game	PairsWindow		Juego
+Size	PairsWindow		Tamaño
+New	PairsWindow		Nuevo
+Intermediate (6x6)	PairsWindow		Intermedio (6x6)
+Quit	PairsWindow		Salir
 New game	PairsWindow		Nueva partida

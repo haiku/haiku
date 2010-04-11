@@ -2,7 +2,7 @@
 Scrolling	TouchpadPrefView		Desplazamiento
 Revert	TouchpadPrefView		Revertir
 Two finger scrolling	TouchpadPrefView		Desplazamiento con dos dedos
-Defaults	TouchpadPrefView		Valores por defecto
+Defaults	TouchpadPrefView		Valores predeterminados
 Slow	TouchpadPrefView		Lento
 Horizontal scroll step size	TouchpadPrefView		Incrementos en desplazamiento horizontal
 High	TouchpadPrefView		Alta

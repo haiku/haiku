@@ -3,23 +3,23 @@ List stack size:	Capabilities		Tamaño de pila de listas:
 Information	InfoView		Información
 Max. clipping planes:	Capabilities		Planos de clipping máximos:
 Max. texture units:	Capabilities		Unidades de textura máximas:
-Renderer name:	InfoView		Nombre del renderer:
+Renderer name:	InfoView		Nombre del renderizador:
 Vendor name:	InfoView		Nombre del suministrador:
 Attributes stack size:	Capabilities		Tamaño de pila de atributos:
 OpenGL version:	InfoView		Versión de OpenGL:
 Name stack size:	Capabilities		Tamaño de pila de nombre:
 Auxiliary buffer(s):	Capabilities		Búfer(es) auxiliares:
-Max. recommended vertex elements:	Capabilities		Elementos de vertice recomendados máximo:
+Max. recommended vertex elements:	Capabilities		Nº máx. recomendado de vertices:
 GLU version:	InfoView		Versión de GLU:
 Model stack size:	Capabilities		Tamaño de pila de modelo:
 Projection stack size:	Capabilities		Tamaño de pila de proyección:
-Max. lights:	Capabilities		Luces máximas:
-Max. 2D texture size:	Capabilities		Tamaño de textura 2D máxima:
-Max. convolution:	Capabilities		Convulsión máxima:
+Max. lights:	Capabilities		Nº máx. Luces:
+Max. 2D texture size:	Capabilities		Tam. máx. texturas 2D:
+Max. convolution:	Capabilities		Nº máx. convoluciones:
 GLUT API version:	InfoView		Versión de API de GLUT:
 Texture stack size:	Capabilities		Tamaño de pila de textura:
-Max. evaluators equation order:	Capabilities		Orden de ecuación de evaluadores máximo:
-Max. 3D texture size:	Capabilities		Tamaño de textura 3D máxima:
+Max. evaluators equation order:	Capabilities		Orden máx. de evaluadores de ecuación:
+Max. 3D texture size:	Capabilities		Tamaño máx de textura 3D:
 Capabilities	Capabilities		Capacidades
 Max. recommended index elements:	Capabilities		Elementos de índice recomendados máximos:
 Available	Extensions		Disponible

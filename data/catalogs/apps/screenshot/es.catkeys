@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-Screenshot	1091349652
+1	spanish	x-vnd.Haiku-Screenshot	1342822790
 seconds	ScreenshotWindow		segundos
 Options	ScreenshotWindow		Opciones
 Desktop	ScreenshotWindow		Escritorio
@@ -10,7 +10,6 @@ Cancel	ScreenshotWindow		Cancelar
 screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	captura de pantalla
 Name:	ScreenshotWindow		Nombre:
 screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	captura de pantalla1
-SomethingLongHere	ScreenshotWindow	!! length >= screenshot file name? !!	AlgoLargoAquí
 Save screenshot	ScreenshotWindow		Guardar captura de pantalla
 Capture entire screen	ScreenshotWindow		Capturar pantalla completa
 Choose folder	ScreenshotWindow		Elegir carpeta
@@ -23,7 +22,7 @@ Please select	ScreenshotWindow		Por favor seleccione
 Save as:	ScreenshotWindow		Guardar como:
 Save in:	ScreenshotWindow		Guardar en:
 Take screenshot after a delay of	ScreenshotWindow		Capturar pantalla después de un retardo de
-Artwork folder	ScreenshotWindow		Carpeta de capturas
+Artwork folder	ScreenshotWindow		Carpeta de material gráfico
 Home folder	ScreenshotWindow		Carpeta de inicio
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		El fichero ya existe.\n ¿Desea sobreescribirlo?
 Include mouse pointer	ScreenshotWindow		Incluir puntero de ratón

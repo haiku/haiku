@@ -4,7 +4,7 @@ GB	SettingsWindow		GB
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desactivar la memoria virtual tendrá efectos negativos sobre la estabilidad del sistema una vez que se agote la memoria RAM.\nLa memoria virtual no afecta el rendimiento del sistema hasta que no se alcance este punto.\n\n¿Está seguro de querer desactivarla?
 Requested swap file size:	SettingsWindow		Tamaño del archivo de intercambio solicitado:
 Physical memory: 	SettingsWindow		Memoria física:
-Changes will take effect on restart!	SettingsWindow		Los cambios se aplicarán al reiniciar.
+Changes will take effect on restart!	SettingsWindow		Los cambios se aplicarán al reiniciar!
 Defaults	SettingsWindow		Valores predeterminados
 KB	SettingsWindow		KB
 Use volume:	SettingsWindow		Usar volumen:
