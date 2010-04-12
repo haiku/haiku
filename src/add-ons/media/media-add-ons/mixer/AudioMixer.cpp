@@ -90,6 +90,9 @@ multi_audio_format_specialize(media_multi_audio_format *format,
 const static bigtime_t kMaxLatency = 150000;
 	// 150 ms is the maximum latency we publish
 
+const bigtime_t kMinMixingTime = 3500;
+const bigtime_t kMaxJitter = 1500;
+
 
 AudioMixer::AudioMixer(BMediaAddOn *addOn, bool isSystemMixer)
 	:
@@ -311,7 +314,7 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 void
 AudioMixer::HandleInputBuffer(BBuffer* buffer, bigtime_t lateness)
 {
-	if (lateness > 0) {
+	if (lateness > kMaxJitter) {
 		debug_printf("Received buffer %Ld usec late\n", lateness);
 		if (RunMode() == B_DROP_DATA || RunMode() == B_DECREASE_PRECISION
 			|| RunMode() == B_INCREASE_LATENCY) {
@@ -907,8 +910,9 @@ AudioMixer::Connect(status_t error, const media_source &source,
 	TRACE("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
+	// plus mixing time, plus jitter
 	fInternalLatency = BufferDuration()
-		+ max(4500LL, bigtime_t(0.5 * BufferDuration()));
+		+ max(kMinMixingTime, bigtime_t(0.5 * BufferDuration())) + kMaxJitter;
 	TRACE("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
