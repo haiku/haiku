@@ -976,7 +976,6 @@ X86VMTranslationMap::Protect(addr_t start, addr_t end, uint32 attributes)
 	page_directory_entry *pd = fArchData->pgdir_virt;
 
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
-	end = ROUNDUP(end, B_PAGE_SIZE);
 
 	TRACE("protect_tmap: pages 0x%lx to 0x%lx, attributes %lx\n", start, end,
 		attributes);
@@ -1022,12 +1021,15 @@ restart:
 		// set the new protection flags -- we want to do that atomically,
 		// without changing the accessed or dirty flag
 		page_table_entry oldEntry;
-		do {
+		while (true) {
 			oldEntry = test_and_set_page_table_entry(&pt[index],
 				(entry & ~(X86_PTE_WRITABLE | X86_PTE_USER))
 					| newProtectionFlags,
 				entry);
-		} while (oldEntry != entry);
+			if (oldEntry == entry)
+				break;
+			entry = oldEntry;
+		}
 
 		if ((oldEntry & X86_PTE_ACCESSED) != 0) {
 			// Note, that we only need to invalidate the address, if the
