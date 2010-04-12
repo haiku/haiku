@@ -112,6 +112,14 @@ unix_is_empty_address(const sockaddr *address, bool checkPort)
 		&& memcmp(address, &kEmptyAddress, kEmptyAddress.sun_len) == 0;
 }
 
+static bool
+unix_is_same_family(const sockaddr *address)
+{
+	if (address == NULL)
+		return false;
+ 
+	return address->sa_family == AF_UNIX;
+}
 
 static int32
 unix_first_mask_bit(const sockaddr *mask)
@@ -290,6 +298,7 @@ net_address_module_info gAddressModule = {
 	unix_equal_addresses_and_ports,
 	unix_equal_masked_addresses,
 	unix_is_empty_address,
+	unix_is_same_family,
 	unix_first_mask_bit,
 	unix_check_mask,
 	unix_print_address,
@@ -302,5 +311,6 @@ net_address_module_info gAddressModule = {
 	unix_update_to,
 	unix_hash_address_pair,
 	unix_checksum_address,
-	NULL	// matches_broadcast_address
+	NULL,	// matches_broadcast_address
+	NULL	// get_loopback_address
 };

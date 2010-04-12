@@ -107,6 +107,18 @@ ipv4_is_empty_address(const sockaddr *address, bool checkPort)
 		&& (!checkPort || ((sockaddr_in *)address)->sin_port == 0);
 }
 
+/*!	Checks if the given \a address is an IPv4 address.
+	\return false if \a address is NULL, or with family different from AF_INET
+		true if it has AF_INET address family
+*/
+static bool
+ipv4_is_same_family(const sockaddr *address)
+{
+	if (address == NULL)
+		return false;
+
+	return address->sa_family == AF_INET;
+}
 
 /*!	Compares the IP-addresses of the two given address structures \a a and \a b.
 	\return true if IP-addresses of \a a and \a b are equal, false if not
@@ -477,6 +489,16 @@ ipv4_checksum_address(struct Checksum *checksum, const sockaddr *address)
 	return B_OK;
 }
 
+static void
+ipv4_get_loopback_address(sockaddr *result)
+{
+	sockaddr_in *resultIn = (sockaddr_in *)result;
+	memset(resultIn, 0, sizeof(resultIn));
+	resultIn->sin_len = sizeof(sockaddr_in);
+	resultIn->sin_family = AF_INET;
+	resultIn->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+}
+
 
 net_address_module_info gIPv4AddressModule = {
 	{
@@ -491,6 +513,7 @@ net_address_module_info gIPv4AddressModule = {
 	ipv4_equal_addresses_and_ports,
 	ipv4_equal_masked_addresses,
 	ipv4_is_empty_address,
+	ipv4_is_same_family,
 	ipv4_first_mask_bit,
 	ipv4_check_mask,
 	ipv4_print_address,
@@ -503,5 +526,6 @@ net_address_module_info gIPv4AddressModule = {
 	ipv4_update_to,
 	ipv4_hash_address_pair,
 	ipv4_checksum_address,
-	NULL // ipv4_matches_broadcast_address,
+	NULL, // ipv4_matches_broadcast_address,
+	ipv4_get_loopback_address
 };

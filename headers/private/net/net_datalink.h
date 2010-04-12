@@ -113,6 +113,7 @@ struct net_address_module_info {
 	bool (*equal_masked_addresses)(const sockaddr *a, const sockaddr *b, 
 					const sockaddr *mask);
 	bool (*is_empty_address)(const sockaddr *address, bool checkPort);
+	bool (*is_same_family)(const sockaddr *address);
 
 	int32 (*first_mask_bit)(const sockaddr *mask);
 
@@ -142,6 +143,8 @@ struct net_address_module_info {
 
 	bool (*matches_broadcast_address)(const sockaddr *address, 
 					const sockaddr *mask, const sockaddr *broadcastAddr);
+
+	void (*get_loopback_address)(sockaddr *result);
 };
 
 #endif	// NET_DATALINK_H

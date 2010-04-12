@@ -100,6 +100,18 @@ l2cap_is_empty_address(const sockaddr *address, bool checkPort)
 		&& (!checkPort || ((sockaddr_l2cap *)address)->l2cap_psm == 0) );
 }
 
+/*!	Checks if the given \a address is L2CAP address.
+	\return false if \a address is NULL, or with family different from AF_BLUETOOTH
+		true if it has AF_BLUETOOTH address family
+*/
+static bool
+l2cap_is_same_family(const sockaddr *address)
+{
+	if (address == NULL)
+		return false;
+ 
+	return address->sa_family == AF_BLUETOOTH;
+}
 
 /*!
 	Compares the IP-addresses of the two given address structures \a a and \a b.
@@ -401,6 +413,7 @@ net_address_module_info gL2cap4AddressModule = {
 	l2cap_equal_addresses_and_ports,
 	l2cap_equal_masked_addresses,
 	l2cap_is_empty_address,
+	l2cap_is_same_family,
 	l2cap_first_mask_bit,
 	l2cap_check_mask,
 	l2cap_print_address,
@@ -413,5 +426,6 @@ net_address_module_info gL2cap4AddressModule = {
 	l2cap_update_to,
 	l2cap_hash_address_pair,
 	l2cap_checksum_address,
-	NULL // l2cap_matches_broadcast_address,
+	NULL,	// l2cap_matches_broadcast_address,
+	NULL	// get_loopback_address
 };

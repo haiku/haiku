@@ -81,7 +81,8 @@ public:
 	status_t				Close();
 	status_t				Free();
 
-	status_t				SendRoutedData(net_buffer *buffer, net_route *route);
+	status_t				SendRoutedData(net_buffer *buffer,
+								net_route *route);
 	status_t				SendData(net_buffer *buffer);
 
 	ssize_t					BytesAvailable();
@@ -101,8 +102,9 @@ public:
 private:
 	UdpDomainSupport		*fManager;
 	bool					fActive;
-								// an active UdpEndpoint is part of the endpoint
-								// hash (and it is bound and optionally connected)
+								// an active UdpEndpoint is part of the
+								// endpoint hash (and it is bound and optionally
+								// connected)
 
 	UdpEndpoint				*fLink;
 };
@@ -127,12 +129,13 @@ struct UdpHashDefinition {
 
 	size_t Hash(UdpEndpoint *endpoint) const
 	{
-		return _Mix(endpoint->LocalAddress().HashPair(*endpoint->PeerAddress()));
+		return _Mix(endpoint->LocalAddress().HashPair(
+			*endpoint->PeerAddress()));
 	}
 
 	static size_t _Mix(size_t hash)
 	{
-		// move the bits into the relevant range (as defined by kNumHashBuckets):
+		// move the bits into the relevant range (as defined by kNumHashBuckets)
 		return (hash & 0x000007FF) ^ (hash & 0x003FF800) >> 11
 			^ (hash & 0xFFC00000UL) >> 22;
 	}
@@ -287,6 +290,9 @@ status_t
 UdpDomainSupport::BindEndpoint(UdpEndpoint *endpoint,
 	const sockaddr *address)
 {
+	if (!AddressModule()->is_same_family(address))
+		return EAFNOSUPPORT;
+
 	MutexLocker _(fLock);
 
 	if (endpoint->IsActive())
@@ -312,6 +318,19 @@ UdpDomainSupport::ConnectEndpoint(UdpEndpoint *endpoint,
 		// so we reset the peer address:
 		endpoint->PeerAddress().SetToEmpty();
 	} else {
+		if (!AddressModule()->is_same_family(address))
+			return EAFNOSUPPORT;
+
+		// consider destination address INADDR_ANY as INADDR_LOOPBACK
+		sockaddr_storage _address;
+		if (AddressModule()->is_empty_address(address, false)) {
+			AddressModule()->get_loopback_address((sockaddr *)&_address);
+			// for IPv4 and IPv6 the port is at the same offset
+			((sockaddr_in&)_address).sin_port
+				= ((sockaddr_in *)address)->sin_port;
+			address = (sockaddr *)&_address;
+		}
+
 		status_t status = endpoint->PeerAddress().SetTo(address);
 		if (status < B_OK)
 			return status;
@@ -398,7 +417,8 @@ UdpDomainSupport::_Bind(UdpEndpoint *endpoint, const sockaddr *address)
 
 		if (otherEndpoint->LocalAddress().EqualPorts(address)) {
 			// port is already bound, SO_REUSEADDR or SO_REUSEPORT is required:
-			if ((otherEndpoint->Socket()->options & (SO_REUSEADDR | SO_REUSEPORT)) == 0
+			if ((otherEndpoint->Socket()->options
+					& (SO_REUSEADDR | SO_REUSEPORT)) == 0
 				|| (socketOptions & (SO_REUSEADDR | SO_REUSEPORT)) == 0)
 				return EADDRINUSE;
 

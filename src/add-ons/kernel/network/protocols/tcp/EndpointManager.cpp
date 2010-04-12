@@ -362,9 +362,9 @@ EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 status_t
 EndpointManager::Bind(TCPEndpoint* endpoint, const sockaddr* address)
 {
-	// TODO: check the family:
-	// if (!AddressModule()->is_understandable(address))
-	//	return EAFNOSUPPORT;
+	// check the family
+	if (!AddressModule()->is_same_family(address))
+		return EAFNOSUPPORT;
 
 	WriteLocker locker(fLock);
 

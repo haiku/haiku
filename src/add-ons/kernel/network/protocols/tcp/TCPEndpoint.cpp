@@ -584,6 +584,9 @@ TCPEndpoint::Connect(const sockaddr* address)
 {
 	TRACE("Connect() on address %s", PrintAddress(address));
 
+	if (!AddressModule()->is_same_family(address))
+		return EAFNOSUPPORT;
+
 	MutexLocker locker(fLock);
 
 	if (gStackModule->is_restarted_syscall()) {
@@ -604,14 +607,13 @@ TCPEndpoint::Connect(const sockaddr* address)
 	} else if (fState != CLOSED)
 		return EINPROGRESS;
 
-	// TODO: this is IPv4 specific, and doesn't belong here!
 	// consider destination address INADDR_ANY as INADDR_LOOPBACK
-	sockaddr_in _address;
-	if (((sockaddr_in*)address)->sin_addr.s_addr == INADDR_ANY) {
-		memcpy(&_address, address, sizeof(sockaddr_in));
-		_address.sin_len = sizeof(sockaddr_in);
-		_address.sin_addr.s_addr = INADDR_LOOPBACK;
-		address = (sockaddr*)&_address;
+	sockaddr_storage _address;
+	if (AddressModule()->is_empty_address(address, false)) {
+		AddressModule()->get_loopback_address((sockaddr *)&_address);
+		// for IPv4 and IPv6 the port is at the same offset
+		((sockaddr_in &)_address).sin_port = ((sockaddr_in *)address)->sin_port;
+		address = (sockaddr *)&_address;
 	}
 
 	status_t status = _PrepareSendPath(address);
