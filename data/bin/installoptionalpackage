@@ -47,6 +47,7 @@ HAIKU_GCC_VERSION[1]=${HAIKU_GCC_VERSION[1]}
 isHybridBuild=${isHybridBuild}
 TARGET_ARCH=${TARGET_ARCH}
 HAIKU_IMAGE_HOST_NAME=`uname -n`
+HAIKU_INCLUDE_SOURCES=0
 $urlLine
 $sslPkgLine
 $sslUrlLine
@@ -545,7 +546,7 @@ function ConvertJamToBash()
 		
 		ConvertIfStatements "$line"
 		ConvertVariables "$line"
-		ReplaceComparators "$line"
+		#ReplaceComparators "$line"
 		
 		line=${line/"IsOptionalHaikuImagePackageAdded"/'"SomeText" !='}
 		generatedBash[$countGenBashLine]=${line}
@@ -638,6 +639,7 @@ function ConvertIfStatements()
 				line=${line/"$compound"/"] $compound ["}
 			fi
 		done
+		ReplaceComparators "$line"
 	fi
 	# Assume all remaining closing braces are part of if statements
 	line=${line/'}'/'fi'}
@@ -670,6 +672,7 @@ function ReplaceComparators()
 		line=${line//'>'/'-gt'}
 		line=${line//'<'/'-lt'}
 		line=${line//'!='/'-ne'}
+		line=${line//'='/'-eq'}
 	fi
 }
 
