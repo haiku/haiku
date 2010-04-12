@@ -13,6 +13,8 @@
 
 #include <ColorControl.h>
 
+#include <algorithm>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -79,11 +81,8 @@ BColorControl::_InitData(color_control_layout layout, float size,
 	// we need to translate some strings, and in order to do so, we need
 	// to use the LocaleBackend to reache liblocale.so
 	if (gLocaleBackend == NULL)
-{
-printf("trying to load backend\n");
 		LocaleBackend::LoadBackend();
-printf("backend = %p\n", gLocaleBackend);
-}	
+
 	fPaletteMode = BScreen(B_MAIN_SCREEN_ID).ColorSpace() == B_CMAP8;
 		//TODO: we don't support workspace and colorspace changing for now 
 		//		so we take the main_screen colorspace at startup
@@ -115,7 +114,8 @@ printf("backend = %p\n", gLocaleBackend);
 		SetValue(value);
 	} else {
 		BRect rect(0.0f, 0.0f, 70.0f, 15.0f);
-		float labelWidth = StringWidth("Green:") + 5;
+		float labelWidth = std::max(StringWidth(red),
+			std::max(StringWidth(green), StringWidth(blue))) + 5;
 		rect.right = labelWidth + StringWidth("999") + 20;
 
 		// red

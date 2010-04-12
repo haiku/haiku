@@ -26,7 +26,7 @@ static void
 LoadBackend()
 {
 	image_id libLocaleAddonID = load_add_on("/system/lib/liblocale.so");
-printf("backend-id: %ld\n", libLocaleAddonID);
+
 	if (libLocaleAddonID < 0)
 		return;
 	LocaleBackend* (*createInstanceFunc)();
@@ -34,7 +34,6 @@ printf("backend-id: %ld\n", libLocaleAddonID);
 			B_SYMBOL_TYPE_TEXT, (void**)&createInstanceFunc) != B_OK)
 		return;
 
-printf("invoking creator func\n");
 	gLocaleBackend = createInstanceFunc();
 }
 
