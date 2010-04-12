@@ -2048,14 +2048,17 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area,
 	if (!area->cache->temporary)
 		area->cache->WriteModified();
 
+	uint32 allocationFlags = addressSpace == VMAddressSpace::Kernel()
+		? HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE : 0;
+
 	arch_vm_unset_memory_type(area);
-	addressSpace->RemoveArea(area, 0);
+	addressSpace->RemoveArea(area, allocationFlags);
 	addressSpace->Put();
 
 	area->cache->RemoveArea(area);
 	area->cache->ReleaseRef();
 
-	addressSpace->DeleteArea(area, 0);
+	addressSpace->DeleteArea(area, allocationFlags);
 }
 
 
