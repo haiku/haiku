@@ -171,6 +171,7 @@ fs_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct diren
 {
 	nspace *ns = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
+	char *name = NULL;
 	attrdircookie *cookie = (attrdircookie *)_cookie;
 	uint32 numEntries = 0;
 	status_t result = B_NO_ERROR;
@@ -190,7 +191,7 @@ fs_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct diren
 			if (attr->name_length == 0)
 				continue;
 			
-			char *name = ntfs_attr_name_get((const ntfschar *)(((char *)attr)
+			name = ntfs_attr_name_get((const ntfschar *)(((char *)attr)
 				+ attr->name_offset), attr->name_length);
 			dprintf("found AT_DATA '%s'\n", name);
 			bufsize = MIN(bufsize, sizeof(struct dirent) + strlen(name) + 1);
