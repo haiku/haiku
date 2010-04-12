@@ -5,14 +5,14 @@
  * Distributed under the terms of the MIT License.
  *
  */
-
 #ifndef __FIREWIRE_CARD_H
 #define __FIREWIRE_CARD_H
 
+
 #include <SupportDefs.h>
 
-class FireWireCard
-{
+
+class FireWireCard {
 public:
 	enum fmt_type {
 		FMT_MPEGTS = 0,
@@ -33,7 +33,7 @@ private:
 	ssize_t		DvRead(void** buffer);
 	status_t	DvExtract(void* dest, void** src, ssize_t* sizeUsed);
 	ssize_t		MpegtsRead(void** buffer);
-	status_t	MpegtsExtract(void* dest, void** src, 
+	status_t	MpegtsExtract(void* dest, void** src,
 				ssize_t* sizeUsed);
 
 	status_t	fInitStatus;
@@ -47,4 +47,3 @@ private:
 };
 
 #endif
-
