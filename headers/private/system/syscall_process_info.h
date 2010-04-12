@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the Haiku License.
+ */
 #ifndef _SYSTEM_SYSCALL_PROCESS_INFO_H
 #define _SYSTEM_SYSCALL_PROCESS_INFO_H
 

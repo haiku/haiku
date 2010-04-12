@@ -1,9 +1,9 @@
+/* crypt - simple encryption algorithm used for passwords
+ *
+ * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+ */
 #ifndef ZOIDBERG_CRYPT_H
 #define ZOIDBERG_CRYPT_H
-/* crypt - simple encryption algorithm used for passwords
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-*/
 
 
 #define PASSWORD_LENGTH 32

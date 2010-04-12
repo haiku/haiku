@@ -1,12 +1,10 @@
-/* 
-** Copyright 2009, Adrien Destugues, pulkomandy@gmail.com.
-** Distributed under the terms of the MIT License.
-*/
+/*
+ * Copyright 2009, Adrien Destugues, pulkomandy@gmail.com.
+ * Distributed under the terms of the MIT License.
+ */
 /* This file holds various wrapper functions to interface easily between ICU
  * and the Be API.
  */
-
-
 #ifndef __ICU_WRAPPER_H__
 #define __ICU_WRAPPER_H__
 
@@ -24,9 +22,9 @@ class BStringByteSink : public ByteSink {
 			{ dest_->Append(data, n); }
 	private:
 		BString* dest_;
-		BStringByteSink(); 
-		BStringByteSink(const BStringByteSink &); 
-		BStringByteSink &operator=(const BStringByteSink &); 
+		BStringByteSink();
+		BStringByteSink(const BStringByteSink &);
+		BStringByteSink &operator=(const BStringByteSink &);
 };
 
 

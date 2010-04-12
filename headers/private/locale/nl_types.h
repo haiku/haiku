@@ -1,8 +1,8 @@
+/*
+ * Distributed under the terms of the OpenBeOS License.
+ */
 #ifndef _NL_TYPES_H_
 #define _NL_TYPES_H_
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
 
 
 #define	NL_SETD			0

@@ -1,7 +1,7 @@
-/* 
-** Copyright 2009, Adrien Destugues, pulkomandy@gmail.com.
-** Distributed under the terms of the MIT License.
-*/
+/*
+ * Copyright 2009, Adrien Destugues, pulkomandy@gmail.com.
+ * Distributed under the terms of the MIT License.
+ */
 /*
  * This file declares all the things we need to add to a catalog add-on to be
  * able to use it in the developper tools (linkcatkeys, dumpcatalog, and the

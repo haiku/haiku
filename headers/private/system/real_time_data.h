@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the Haiku License.
+ */
 #ifndef _KERNEL_REAL_TIME_DATA_H
 #define _KERNEL_REAL_TIME_DATA_H
 

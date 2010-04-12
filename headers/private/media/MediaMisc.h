@@ -4,7 +4,6 @@
  *
  * This file may be used under the terms of the MIT License.
  */
-
 #ifndef _MEDIA_MISC_H_
 #define _MEDIA_MISC_H_
 

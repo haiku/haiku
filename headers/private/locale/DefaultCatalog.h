@@ -1,7 +1,7 @@
-/* 
-** Copyright 2009, Adrien Destugues, pulkomandy@gmail.com.
-** Distributed under the terms of the MIT License.
-*/
+/*
+ * Copyright 2009, Adrien Destugues, pulkomandy@gmail.com.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _DEFAULT_CATALOG_H_
 #define _DEFAULT_CATALOG_H_
 

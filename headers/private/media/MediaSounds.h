@@ -1,8 +1,7 @@
-/* 
+/*
  * Copyright 2007, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _MEDIA_SOUNDS_H
 #define _MEDIA_SOUNDS_H
 

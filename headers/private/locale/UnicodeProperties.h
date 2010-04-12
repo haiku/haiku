@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the OpenBeOS License.
+ */
 #ifndef _UNICODE_PROPERTIES_H_
 #define _UNICODE_PROPERTIES_H_
 

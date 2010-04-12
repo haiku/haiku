@@ -4,7 +4,6 @@
  *
  * This file may be used under the terms of the MIT License.
  */
-
 #ifndef _MEDIA_ROSTER_EX_H_
 #define _MEDIA_ROSTER_EX_H_
 
@@ -39,9 +38,9 @@ public:
 	status_t IncrementAddonFlavorInstancesCount(media_addon_id addonid, int32 flavorid);
 	status_t DecrementAddonFlavorInstancesCount(media_addon_id addonid, int32 flavorid);
 	status_t ReleaseNodeAll(const media_node& node);
-	
+
 	status_t SetNodeCreator(media_node_id node, team_id creator);
-	
+
 	status_t RegisterNode(BMediaNode * node, media_addon_id addonid, int32 flavorid);
 	status_t InstantiateDormantNode(media_addon_id addonid, int32 flavorid, team_id creator, media_node *out_node);
 	status_t GetDormantFlavorInfo(media_addon_id addonid, int32 flavorid, dormant_flavor_info *out_flavor);
@@ -53,7 +52,7 @@ public:
 	status_t GetAllInputs(BBufferConsumer *node, List<media_input> *list);
 	status_t PublishOutputs(const media_node & node, List<media_output> *list);
 	status_t PublishInputs(const media_node & node, List<media_input> *list);
-	
+
 	BTimeSource *MakeTimeSourceObject(media_node_id timesource_id);
 
 private:
