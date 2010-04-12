@@ -526,6 +526,5 @@ net_address_module_info gIPv4AddressModule = {
 	ipv4_update_to,
 	ipv4_hash_address_pair,
 	ipv4_checksum_address,
-	NULL, // ipv4_matches_broadcast_address,
 	ipv4_get_loopback_address
 };

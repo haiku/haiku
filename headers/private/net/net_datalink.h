@@ -74,7 +74,7 @@ struct net_datalink_module_info {
 					uint32 *_matchedType);
 	bool (*is_local_link_address)(struct net_domain *domain, bool unconfigured,
 					const struct sockaddr *address, net_interface **_interface);
-				
+
 	net_interface *(*get_interface)(struct net_domain *domain, uint32 index);
 	net_interface *(*get_interface_with_address)(struct net_domain *domain,
 					const struct sockaddr *address);
@@ -104,13 +104,13 @@ struct net_address_module_info {
 	status_t (*copy_address)(const sockaddr *from, sockaddr **to,
 					bool replaceWithZeros, const sockaddr *mask);
 
-	status_t (*mask_address)(const sockaddr *address, const sockaddr *mask, 
+	status_t (*mask_address)(const sockaddr *address, const sockaddr *mask,
 					sockaddr *result);
-	
+
 	bool (*equal_addresses)(const sockaddr *a, const sockaddr *b);
 	bool (*equal_ports)(const sockaddr *a, const sockaddr *b);
 	bool (*equal_addresses_and_ports)(const sockaddr *a, const sockaddr *b);
-	bool (*equal_masked_addresses)(const sockaddr *a, const sockaddr *b, 
+	bool (*equal_masked_addresses)(const sockaddr *a, const sockaddr *b,
 					const sockaddr *mask);
 	bool (*is_empty_address)(const sockaddr *address, bool checkPort);
 	bool (*is_same_family)(const sockaddr *address);
@@ -118,8 +118,8 @@ struct net_address_module_info {
 	int32 (*first_mask_bit)(const sockaddr *mask);
 
 	bool (*check_mask)(const sockaddr *address);
-	
-	status_t (*print_address)(const sockaddr *address, char **buffer, 
+
+	status_t (*print_address)(const sockaddr *address, char **buffer,
 					bool printPort);
 	status_t (*print_address_buffer)(const sockaddr *address, char *buffer,
 					size_t bufferSize, bool printPort);
@@ -135,14 +135,11 @@ struct net_address_module_info {
 
 	status_t (*update_to)(sockaddr *address, const sockaddr *from);
 
-	uint32 (*hash_address_pair)(const sockaddr *ourAddress, 
+	uint32 (*hash_address_pair)(const sockaddr *ourAddress,
 					const sockaddr *peerAddress);
 
-	status_t (*checksum_address)(struct Checksum *checksum, 
+	status_t (*checksum_address)(struct Checksum *checksum,
 					const sockaddr *address);
-
-	bool (*matches_broadcast_address)(const sockaddr *address, 
-					const sockaddr *mask, const sockaddr *broadcastAddr);
 
 	void (*get_loopback_address)(sockaddr *result);
 };

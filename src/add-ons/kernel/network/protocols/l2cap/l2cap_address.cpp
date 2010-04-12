@@ -109,7 +109,7 @@ l2cap_is_same_family(const sockaddr *address)
 {
 	if (address == NULL)
 		return false;
- 
+
 	return address->sa_family == AF_BLUETOOTH;
 }
 
@@ -426,6 +426,5 @@ net_address_module_info gL2cap4AddressModule = {
 	l2cap_update_to,
 	l2cap_hash_address_pair,
 	l2cap_checksum_address,
-	NULL,	// l2cap_matches_broadcast_address,
 	NULL	// get_loopback_address
 };

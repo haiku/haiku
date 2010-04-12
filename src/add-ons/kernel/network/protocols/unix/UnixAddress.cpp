@@ -117,7 +117,7 @@ unix_is_same_family(const sockaddr *address)
 {
 	if (address == NULL)
 		return false;
- 
+
 	return address->sa_family == AF_UNIX;
 }
 
@@ -214,7 +214,7 @@ unix_mask_address(const sockaddr *address, const sockaddr *mask,
 	return unix_set_to(result, address);
 }
 
- 
+
 static status_t
 unix_set_to_defaults(sockaddr *defaultMask, sockaddr *defaultBroadcast,
 	sockaddr *address, sockaddr *netmask)
@@ -311,6 +311,5 @@ net_address_module_info gAddressModule = {
 	unix_update_to,
 	unix_hash_address_pair,
 	unix_checksum_address,
-	NULL,	// matches_broadcast_address
 	NULL	// get_loopback_address
 };
