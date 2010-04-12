@@ -254,8 +254,13 @@ status_t
 ValueNode<float>::GetString(BString &predicate)
 {
 	char buffer[32];
-	int32 value = *reinterpret_cast<int32*>(&fValue);
-	sprintf(buffer, "0x%08lx", value);
+	union {
+		int32 asInteger;
+		float asFloat;
+	} value;
+	value.asFloat = fValue;
+//	int32 value = *reinterpret_cast<int32*>(&fValue);
+	sprintf(buffer, "0x%08lx", value.asInteger);
 	predicate.SetTo(buffer);
 	return B_OK;
 }
@@ -266,8 +271,13 @@ status_t
 ValueNode<double>::GetString(BString &predicate)
 {
 	char buffer[32];
-	int64 value = *reinterpret_cast<int64*>(&fValue);
-	sprintf(buffer, "0x%016Lx", value);
+	union {
+		int64 asInteger;
+		double asFloat;
+	} value;
+//	int64 value = *reinterpret_cast<int64*>(&fValue);
+	value.asFloat = fValue;
+	sprintf(buffer, "0x%016Lx", value.asInteger);
 	predicate.SetTo(buffer);
 	return B_OK;
 }

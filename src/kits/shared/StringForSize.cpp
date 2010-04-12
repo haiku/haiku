@@ -8,8 +8,9 @@
 #include <stdio.h>
 
 #include <Catalog.h>
-#include <Locale.h>
-#include <LocaleRoster.h>
+#include <LocaleBackend.h>
+using BPrivate::gLocaleBackend;
+using BPrivate::LocaleBackend;
 
 
 namespace BPrivate {
@@ -18,35 +19,37 @@ namespace BPrivate {
 const char*
 string_for_size(double size, char* string, size_t stringSize)
 {
-	BCatalogAddOn* systemCatalog;
-	be_locale_roster->GetSystemCatalog(&systemCatalog);
+	// we need to translate some strings, and in order to do so, we need
+	// to use the LocaleBackend to reache liblocale.so
+	if (gLocaleBackend == NULL)
+		LocaleBackend::LoadBackend();
 	double kib = size / 1024.0;
 	if (kib < 1.0) {
 		snprintf(string, stringSize,
-			systemCatalog->GetString("%d bytes","StringForSize",""),
+			gLocaleBackend->GetString("%d bytes","StringForSize",""),
 			(int)size);
 		return string;
 	}
 	double mib = kib / 1024.0;
 	if (mib < 1.0) {
 		snprintf(string, stringSize,
-			systemCatalog->GetString("%3.2f KiB","StringForSize",""), kib);
+			gLocaleBackend->GetString("%3.2f KiB","StringForSize",""), kib);
 		return string;
 	}
 	double gib = mib / 1024.0;
 	if (gib < 1.0) {
 		snprintf(string, stringSize,
-			systemCatalog->GetString("%3.2f MiB","StringForSize",""), mib);
+			gLocaleBackend->GetString("%3.2f MiB","StringForSize",""), mib);
 		return string;
 	}
 	double tib = gib / 1024.0;
 	if (tib < 1.0) {
 		snprintf(string, stringSize,
-			systemCatalog->GetString("%3.2f GiB","StringForSize",""), gib);
+			gLocaleBackend->GetString("%3.2f GiB","StringForSize",""), gib);
 		return string;
 	}
 	snprintf(string, stringSize,
-		systemCatalog->GetString("%.2f TiB","StringForSize",""), tib);
+		gLocaleBackend->GetString("%.2f TiB","StringForSize",""), tib);
 	return string;
 }
 
