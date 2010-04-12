@@ -49,6 +49,7 @@ SetSupportedPlatformsForTarget libbe_test.so : libbe_test ;
 SetVersionScript libbe_test.so : libbe_test_versions ;
 
 SharedLibrary libbe_test.so :
+	LocaleBackend.cpp
 	:
 	<libbe>app_kit.o
 	<libbe>interface_kit.o
