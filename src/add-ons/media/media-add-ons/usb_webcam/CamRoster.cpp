@@ -18,7 +18,6 @@ extern "C" status_t get_webcam_addon_##modname(WebCamMediaAddOn* webcam, CamDevi
 #undef B_WEBCAM_MKINTFUNC
 
 
-
 CamRoster::CamRoster(WebCamMediaAddOn* _addon)
 	: BUSBRoster(),
 	fLocker("WebcamRosterLock"),
@@ -40,8 +39,7 @@ CamRoster::DeviceAdded(BUSBDevice* _device)
 {
 	PRINT((CH "()" CT));
 	status_t err;
-	for( int16 i = fCamerasAddons.CountItems()-1; i >= 0; --i )
-	{
+	for (int16 i = fCamerasAddons.CountItems() - 1; i >= 0; --i ) {
 		CamDeviceAddon *ao = (CamDeviceAddon *)fCamerasAddons.ItemAt(i);
 		PRINT((CH ": checking %s for support..." CT, ao->BrandName()));
 		err = ao->Sniff(_device);
@@ -50,8 +48,7 @@ CamRoster::DeviceAdded(BUSBDevice* _device)
 		CamDevice *cam = ao->Instantiate(*this, _device);
 		PRINT((CH ": found camera %s:%s!" CT, cam->BrandName(), cam->ModelName()));
 		err = cam->InitCheck();
-		if (err >= B_OK)
-		{
+		if (err >= B_OK) {
 			fCameras.AddItem(cam);
 			fAddon->CameraAdded(cam);
 			return B_OK;
@@ -66,11 +63,9 @@ void
 CamRoster::DeviceRemoved(BUSBDevice* _device)
 {
 	PRINT((CH "()" CT));
-	for(int32 i = 0; i < fCameras.CountItems(); ++i)
-	{
+	for (int32 i = 0; i < fCameras.CountItems(); ++i) {
 		CamDevice* cam = (CamDevice *)fCameras.ItemAt(i);
-		if( cam->Matches(_device) )
-		{
+		if (cam->Matches(_device)) {
 			PRINT((CH ": camera %s:%s removed" CT, cam->BrandName(), cam->ModelName()));
 			fCameras.RemoveItem(i);
 			fAddon->CameraRemoved(cam);
@@ -78,9 +73,9 @@ CamRoster::DeviceRemoved(BUSBDevice* _device)
 			//delete cam;
 			cam->Unplugged();
 			return;
-		}	
+		}
 	}
-}	
+}
 
 
 uint32
@@ -154,9 +149,9 @@ CamRoster::LoadExternalAddons()
 	status_t err;
 	CamDeviceAddon *addon;
 	status_t (*get_webcam_addon_func)(WebCamMediaAddOn* webcam, CamDeviceAddon **addon);
-	for (index = 0; get_nth_image_symbol(fAddon->ImageID(), 
-										index, NULL, NULL, 
-										&sclass, 
+	for (index = 0; get_nth_image_symbol(fAddon->ImageID(),
+										index, NULL, NULL,
+										&sclass,
 										(void **)&get_webcam_addon_func) == B_OK; index++) {
 		PRINT((CH ": got sym" CT));
 //		if (sclass != B_SYMBOL_TYPE_TEXT)

@@ -78,16 +78,16 @@ CamDevice::~CamDevice()
 	if (fDeframer)
 		delete fDeframer;
 }
-					
+
 
 status_t
 CamDevice::InitCheck()
 {
 	return fInitStatus;
 }
-					
 
-bool 
+
+bool
 CamDevice::Matches(BUSBDevice* _device)
 {
 	return (_device) == (fDevice);
@@ -182,12 +182,12 @@ CamDevice::StopTransfer()
 	if (err < B_OK)
 		return err;
 	fTransferEnabled = false;
-	
+
 	// the thread itself might Lock()
 	fLocker.Unlock();
 	wait_for_thread(fPumpThread, &err);
 	fLocker.Lock();
-	
+
 	return B_OK;
 }
 
@@ -233,18 +233,19 @@ CamDevice::AddParameters(BParameterGroup *group, int32 &index)
 	fFirstParameterID = index;
 }
 
+
 status_t
 CamDevice::GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size)
 {
 	return B_BAD_VALUE;
 }
 
+
 status_t
 CamDevice::SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size)
 {
 	return B_BAD_VALUE;
 }
-
 
 
 size_t
@@ -395,6 +396,7 @@ CamDevice::WriteIIC8(uint8 address, uint8 data)
 	return WriteIIC(address, &data, 1);
 }
 
+
 ssize_t
 CamDevice::WriteIIC16(uint8 address, uint16 data)
 {
@@ -404,8 +406,6 @@ CamDevice::WriteIIC16(uint8 address, uint16 data)
 		data = B_HOST_TO_LENDIAN_INT16(data);
 	return WriteIIC(address, (uint8 *)&data, 2);
 }
-
-
 
 
 ssize_t
@@ -467,7 +467,7 @@ CamDevice::ProbeSensor()
 		BString name;
 		sensors.CopyInto(name, i, sensors.FindFirst(',', i) - i);
 		PRINT((CH ": probing sensor '%s'..." CT, name.String()));
-		
+
 		fSensor = CreateSensor(name.String());
 		if (fSensor) {
 			err = fSensor->Probe();
@@ -523,7 +523,7 @@ CamDevice::DataPumpThread()
 #ifndef DEBUG_DISCARD_INPUT
 			len = fBulkIn->BulkTransfer(fBuffer, fBufferLen);
 #endif
-			
+
 			//PRINT((CH ": got %ld bytes" CT, len));
 #ifdef DEBUG_WRITE_DUMP
 			write(fDumpFD, fBuffer, len);
@@ -561,7 +561,7 @@ CamDevice::DataPumpThread()
 #ifndef DEBUG_DISCARD_INPUT
 			len = fIsoIn->IsochronousTransfer(fBuffer, fBufferLen, packetDescriptors, numPacketDescriptors);
 #endif
-			
+
 			//PRINT((CH ": got %d bytes" CT, len));
 #ifdef DEBUG_WRITE_DUMP
 			write(fDumpFD, fBuffer, len);
@@ -618,7 +618,7 @@ CamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 	if (length > GetDevice()->MaxEndpoint0PacketSize())
 		return EINVAL;
 	ret = GetDevice()->ControlTransfer(
-				USB_REQTYPE_VENDOR | USB_REQTYPE_INTERFACE_OUT | dir, 
+				USB_REQTYPE_VENDOR | USB_REQTYPE_INTERFACE_OUT | dir,
 				request, value, index, length, data);
 	return ret;
 }
@@ -653,8 +653,7 @@ CamDeviceAddon::Sniff(BUSBDevice *device)
 		return EINVAL;
 
 	bool supported = false;
-	for (uint32 i = 0; !supported && fSupportedDevices[i].vendor; i++)
-	{
+	for (uint32 i = 0; !supported && fSupportedDevices[i].vendor; i++) {
 		if ((fSupportedDevices[i].desc.vendor != 0
 			&& device->VendorID() != fSupportedDevices[i].desc.vendor)
 			|| (fSupportedDevices[i].desc.product != 0
@@ -711,4 +710,3 @@ CamDeviceAddon::SetSupportedDevices(const usb_webcam_support_descriptor *devs)
 {
 	fSupportedDevices = devs;
 }
-

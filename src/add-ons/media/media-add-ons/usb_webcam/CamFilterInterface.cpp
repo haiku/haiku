@@ -9,12 +9,12 @@
 
 
 CamFilterInterface::CamFilterInterface(CamDevice *device)
-: BPositionIO(),
-fDevice(device),
-fNextOfKin(NULL)
+	: BPositionIO(),
+	fDevice(device),
+	fNextOfKin(NULL)
 {
 	fVideoFrame = BRect(0,0,-1,-1);
-	
+
 }
 
 
@@ -145,4 +145,3 @@ CamFilterInterface::SetVideoFrame(BRect frame)
 	fVideoFrame = frame;
 	return B_OK;
 }
-

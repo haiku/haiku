@@ -82,31 +82,31 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	uchar data[8]; /* store bytes returned from sonix commands */
 	status_t err;
 	fFrameTagState = 0;
-	
+
 	fRGain = fGGain = fBGain = 0;
 	// unknown
 	fBrightness = 0.5;
-	
+
 	memset(fCachedRegs, 0, SN9C102_REG_COUNT);
 	fChipVersion = 2;
 	if ((GetDevice()->ProductID() & ~0x3F) == 0x6080) {
 		fChipVersion = 3; // says V4L2
 	}
 	err = ProbeSensor();
-	
+
 //	fDeframer = new CamBufferingDeframer(this);
 	fDeframer = new CamStreamingDeframer(this);
 	fDeframer->RegisterSOFTags(sof_marks, 2, sizeof(sof_mark_1), 12);
 	fDeframer->RegisterEOFTags(eof_marks, 4, sizeof(eof_mark_1), sizeof(eof_mark_1));
 	SetDataInput(fDeframer);
-	
+
 	/* init hw */
-	
+
 	const BUSBConfiguration *config = GetDevice()->ConfigurationAt(0);
 	if (config) {
 		const BUSBInterface *inter = config->InterfaceAt(0);
 		uint32 i;
-		
+
 		GetDevice()->SetConfiguration(config);
 
 		for (i = 0; inter && (i < inter->CountEndpoints()); i++) {
@@ -119,14 +119,14 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 		}
 
 	}
-	
+
 	/* sanity check */
 	err = ReadReg(SN9C102_ASIC_ID, data);
 	if (err < 0 || data[0] != 0x10) {
 		PRINT((CH ": BAD ASIC signature! (%u != %u)" CT, data[0], 0x10));
 		return;
 	}
-	
+
 		//XXX: the XP driver sends this to the ICECAM... need to investigate.
 #if 1
 	uint8 tmp_3[] = {
@@ -149,7 +149,7 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	uint8 tmp_2[] = {0x44, 0x44};
 	WriteReg(SN9C102_CHIP_CTRL, tmp_2, 2);
 		//URB_FUNCTION_VENDOR_INTERFACE:
-		//(USBD_TRANSFER_DIRECTION_OUT, ~USBD_SHORT_TRANSFER_OK) 
+		//(USBD_TRANSFER_DIRECTION_OUT, ~USBD_SHORT_TRANSFER_OK)
 
 	uint8 tmp_3[] = {
 		0x44, 0x44, 0x00, 0x00, 0x00, 0x04, 0x00, 0xa0,
@@ -197,7 +197,7 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	//WriteReg8(SN9C102_PIX_CLK, 0x4b);
 
 //###############
-	
+
 	if (Sensor()) {
 		PRINT((CH ": CamSensor: %s" CT, Sensor()->Name()));
 		fInitStatus = Sensor()->Setup();
@@ -237,11 +237,11 @@ SonixCamDevice::StartTransfer()
 {
 	status_t err;
 	uint8 r;
-	
+
 	SetScale(1);
 	if (Sensor())
 		SetVideoFrame(fVideoFrame);
-	
+
 	//SetVideoFrame(BRect(0, 0, 320-1, 240-1));
 
 DumpRegs();
@@ -261,7 +261,7 @@ SonixCamDevice::StopTransfer()
 {
 	status_t err;
 	uint8 r;
-	
+
 DumpRegs();
 	err = CamDevice::StopTransfer();
 //	if (err < 0)
@@ -418,8 +418,8 @@ SonixCamDevice::ReadIIC(uint8 address, uint8 *data)
 	err = WaitReadyIIC();
 	//dprintf(ID "sonix_i2c_write_multi: sonix_i2c_wait_ready error 0x%08lx\n", err);
 	//if (err) return err;
-	
-	
+
+
 	//dprintf(ID "sonix_i2c_write_multi(, %02x, %d, {%02x, %02x, %02x, %02x, %02x})\n", slave, count, d0, d1, d2, d3, d4);
 	buffer[0] = (1 << 4) | Sensor()->Use400kHz()?0x01:0
 				  | 0x02 | Sensor()->UseRealIIC()?0x80:0; /* read 1 byte */
@@ -431,7 +431,7 @@ SonixCamDevice::ReadIIC(uint8 address, uint8 *data)
 	err = WaitReadyIIC();
 	//dprintf(ID "sonix_i2c_write_multi: sonix_i2c_wait_ready error 0x%08lx\n", err);
 	if (err < B_OK) return err;
-	
+
 	err = ReadReg(SN9C102_I2C_DATA0, buffer, 5);
 	if (err < 5) return EIO;
 
@@ -477,7 +477,7 @@ SonixCamDevice::SetScale(float scale)
 	status_t err;
 	uint8 r;
 	int iscale = (int)scale;
-	
+
 	PRINT((CH "(%u)" CT, iscale));
 	err = ReadReg(SN9C102_SYNC_N_SCALE, &r, 1, true);
 	if (err < 0)
@@ -509,25 +509,25 @@ SonixCamDevice::AddParameters(BParameterGroup *group, int32 &index)
 	BParameterGroup *g;
 	BContinuousParameter *p;
 	CamDevice::AddParameters(group, index);
-	
+
 	// R,G,B gains
 	g = group->MakeGroup("RGB gain");
-	p = g->MakeContinuousParameter(index++, 
-		B_MEDIA_RAW_VIDEO, "RGB gain", 
+	p = g->MakeContinuousParameter(index++,
+		B_MEDIA_RAW_VIDEO, "RGB gain",
 		B_GAIN, "", 1.0, 1.0+(float)(SN9C102_RGB_GAIN_MAX)/8, (float)1.0/8);
 
 	p->SetChannelCount(3);
 #if 0
 	// Contrast - NON FUNCTIONAL
 	g = group->MakeGroup("Contrast");
-	p = g->MakeContinuousParameter(index++, 
-		B_MEDIA_RAW_VIDEO, "Contrast", 
+	p = g->MakeContinuousParameter(index++,
+		B_MEDIA_RAW_VIDEO, "Contrast",
 		B_GAIN, "", 0.0, 1.0, 1.0/256);
 
 	// Brightness - NON FUNCTIONAL
 	g = group->MakeGroup("Brightness");
-	p = g->MakeContinuousParameter(index++, 
-		B_MEDIA_RAW_VIDEO, "Brightness", 
+	p = g->MakeContinuousParameter(index++,
+		B_MEDIA_RAW_VIDEO, "Brightness",
 		B_GAIN, "", 0.0, 1.0, 1.0/256);
 
 #endif
@@ -620,7 +620,7 @@ SonixCamDevice::SetParameterValue(int32 id, bigtime_t when, const void *value, s
 			fBrightness = gains[0];
 			// it actually ends up writing to SN9C102_V_SIZE...
 			WriteReg8(SN9C10x_BRIGHTNESS, ((uint8)(fBrightness * 256)));
-			
+
 			return B_OK;
 #endif
 	}
@@ -656,7 +656,7 @@ SonixCamDevice::ValidateStartOfFrameTag(const uint8 *tag, size_t taglen)
 	// supposedly corresponding with an equal byte in the end tag
 	fFrameTagState = tag[7] & 0xC0;
 	PRINT((CH "(, %d) state %x" CT, taglen, fFrameTagState));
-	
+
 	// which seems to be the same as of the EOF tag
 	return true;
 }
@@ -692,14 +692,14 @@ SonixCamDevice::GetFrameBitmap(BBitmap **bm, bigtime_t *stamp /* = NULL */)
 	if (err < B_OK)
 		return err;
 	PRINT((CH ": VideoFrame = %fx%f,%fx%f" CT, VideoFrame().left, VideoFrame().top, VideoFrame().right, VideoFrame().bottom));
-	
+
 	long int w = (long)(VideoFrame().right - VideoFrame().left + 1);
 	long int h = (long)(VideoFrame().bottom - VideoFrame().top + 1);
 	b = new BBitmap(VideoFrame().OffsetToSelf(0,0), 0, B_RGB32, w*4);
 	PRINT((CH ": Frame: %dx%d" CT, w, h));
-	
+
 	bayer2rgb24((unsigned char *)b->Bits(), (unsigned char *)f->Buffer(), w, h);
-	
+
 	PRINT((CH ": got 1 frame (len %d)" CT, b->BitsLength()));
 	*bm = b;
 	return B_OK;
@@ -727,12 +727,12 @@ SonixCamDevice::FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp)
 	long int w = (long)(VideoFrame().right - VideoFrame().left + 1);
 	long int h = (long)(VideoFrame().bottom - VideoFrame().top + 1);
 	PRINT((CH ": VideoFrame = %fx%f,%fx%f Frame: %dx%d" CT, VideoFrame().left, VideoFrame().top, VideoFrame().right, VideoFrame().bottom, w, h));
-	
+
 	if (buffer->SizeAvailable() >= (size_t)w*h*4)
 		bayer2rgb32le((unsigned char *)buffer->Data(), (unsigned char *)f->Buffer(), w, h);
-	
+
 	delete f;
-	
+
 	PRINT((CH ": available %d, required %d" CT, buffer->SizeAvailable(), w*h*4));
 	if (buffer->SizeAvailable() < (size_t)w*h*4)
 		return E2BIG;
@@ -747,18 +747,18 @@ SonixCamDevice::DumpRegs()
 {
 	uint8 regs[SN9C102_REG_COUNT];
 	status_t err;
-	
+
 	//err = sonix_get_regs(dev, SN_ASIC_ID, regs, SN_REG_COUNT);
 	err = ReadReg(0, regs, SN9C102_REG_COUNT);
 	if (err < 0)
 		return;
-	printf("REG1: %02x %02x %02x %02x  %02x %02x %02x %02x\n", 
+	printf("REG1: %02x %02x %02x %02x  %02x %02x %02x %02x\n",
 			regs[0], regs[1], regs[2], regs[3], regs[4], regs[5], regs[6], regs[7]);
-	printf("   2: %02x %02x %02x %02x  %02x %02x %02x %02x\n", 
+	printf("   2: %02x %02x %02x %02x  %02x %02x %02x %02x\n",
 			regs[8], regs[9], regs[10], regs[11], regs[12], regs[13], regs[14], regs[15]);
-	printf("   3: %02x %02x %02x %02x  %02x %02x %02x %02x\n", 
+	printf("   3: %02x %02x %02x %02x  %02x %02x %02x %02x\n",
 			regs[16], regs[17], regs[18], regs[19], regs[20], regs[21], regs[22], regs[23]);
-	printf("   4: %02x %02x %02x %02x  %02x %02x %02x %02x\n", 
+	printf("   4: %02x %02x %02x %02x  %02x %02x %02x %02x\n",
 			regs[24], regs[25], regs[26], regs[27], regs[28], regs[29], regs[30], regs[31]);
 }
 
@@ -774,7 +774,7 @@ SonixCamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 	if (length > GetDevice()->MaxEndpoint0PacketSize())
 		return EINVAL;
 	ret = GetDevice()->ControlTransfer(
-				USB_REQTYPE_VENDOR | USB_REQTYPE_INTERFACE_OUT | dir, 
+				USB_REQTYPE_VENDOR | USB_REQTYPE_INTERFACE_OUT | dir,
 				request, value, index, length, data);
 	return ret;
 }
@@ -996,5 +996,3 @@ void bayer2rgb32le(unsigned char *dst, unsigned char *src, long int WIDTH, long 
     }
 
 }
-
-

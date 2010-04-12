@@ -49,11 +49,13 @@
 //#define FIELD_RATE 29.97f
 #define FIELD_RATE 5.f
 
+
 int32 VideoProducer::fInstances = 0;
+
 
 VideoProducer::VideoProducer(
 		BMediaAddOn *addon, CamDevice *dev, const char *name, int32 internal_id)
-  :	BMediaNode(name),
+	: BMediaNode(name),
 	BMediaEventLooper(),
 	BBufferProducer(B_MEDIA_RAW_VIDEO),
 	BControllable()
@@ -88,6 +90,7 @@ VideoProducer::VideoProducer(
 	return;
 }
 
+
 VideoProducer::~VideoProducer()
 {
 	if (fInitStatus == B_OK) {
@@ -102,13 +105,14 @@ VideoProducer::~VideoProducer()
 	atomic_add(&fInstances, -1);
 }
 
-/* BMediaNode */
 
+/* BMediaNode */
 port_id
 VideoProducer::ControlPort() const
 {
 	return BMediaNode::ControlPort();
 }
+
 
 BMediaAddOn *
 VideoProducer::AddOn(int32 *internal_id) const
@@ -118,18 +122,21 @@ VideoProducer::AddOn(int32 *internal_id) const
 	return fAddOn;
 }
 
-status_t 
+
+status_t
 VideoProducer::HandleMessage(int32 /*message*/, const void* /*data*/, size_t /*size*/)
 {
 	return B_ERROR;
 }
 
-void 
+
+void
 VideoProducer::Preroll()
 {
 	/* This hook may be called before the node is started to give the hardware
 	 * a chance to start. */
 }
+
 
 void
 VideoProducer::SetTimeSource(BTimeSource* /*time_source*/)
@@ -138,15 +145,18 @@ VideoProducer::SetTimeSource(BTimeSource* /*time_source*/)
 	release_sem(fFrameSync);
 }
 
+
 status_t
 VideoProducer::RequestCompleted(const media_request_info &info)
 {
 	return BMediaNode::RequestCompleted(info);
 }
 
+
 /* BMediaEventLooper */
 
-void 
+
+void
 VideoProducer::NodeRegistered()
 {
 	if (fInitStatus != B_OK) {
@@ -155,7 +165,7 @@ VideoProducer::NodeRegistered()
 	}
 
 	/* Set up the parameter web */
-	
+
 	//TODO: remove and put sensible stuff there
 	BParameterWeb *web = new BParameterWeb();
 	BParameterGroup *main = web->MakeGroup(Name());
@@ -200,7 +210,7 @@ VideoProducer::NodeRegistered()
 	fOutput.source.port = ControlPort();
 	fOutput.source.id = 0;
 	fOutput.destination = media_destination::null;
-	strcpy(fOutput.name, Name());	
+	strcpy(fOutput.name, Name());
 
 	/* Tailor these for the output of your device */
 	fOutput.format.type = B_MEDIA_RAW_VIDEO;
@@ -213,11 +223,13 @@ VideoProducer::NodeRegistered()
 	Run();
 }
 
+
 void
 VideoProducer::Start(bigtime_t performance_time)
 {
 	BMediaEventLooper::Start(performance_time);
 }
+
 
 void
 VideoProducer::Stop(bigtime_t performance_time, bool immediate)
@@ -225,11 +237,13 @@ VideoProducer::Stop(bigtime_t performance_time, bool immediate)
 	BMediaEventLooper::Stop(performance_time, immediate);
 }
 
+
 void
 VideoProducer::Seek(bigtime_t media_time, bigtime_t performance_time)
 {
 	BMediaEventLooper::Seek(media_time, performance_time);
 }
+
 
 void
 VideoProducer::TimeWarp(bigtime_t at_real_time, bigtime_t to_performance_time)
@@ -237,11 +251,13 @@ VideoProducer::TimeWarp(bigtime_t at_real_time, bigtime_t to_performance_time)
 	BMediaEventLooper::TimeWarp(at_real_time, to_performance_time);
 }
 
+
 status_t
 VideoProducer::AddTimer(bigtime_t at_performance_time, int32 cookie)
 {
 	return BMediaEventLooper::AddTimer(at_performance_time, cookie);
 }
+
 
 void
 VideoProducer::SetRunMode(run_mode mode)
@@ -249,14 +265,14 @@ VideoProducer::SetRunMode(run_mode mode)
 	BMediaEventLooper::SetRunMode(mode);
 }
 
-void 
+
+void
 VideoProducer::HandleEvent(const media_timed_event *event,
 		bigtime_t lateness, bool realTimeEvent)
 {
 	TOUCH(lateness); TOUCH(realTimeEvent);
 
-	switch(event->type)
-	{
+	switch(event->type) {
 		case BTimedEventQueue::B_START:
 			HandleStart(event->event_time);
 			break;
@@ -278,11 +294,13 @@ VideoProducer::HandleEvent(const media_timed_event *event,
 	}
 }
 
-void 
+
+void
 VideoProducer::CleanUpEvent(const media_timed_event *event)
 {
 	BMediaEventLooper::CleanUpEvent(event);
 }
+
 
 bigtime_t
 VideoProducer::OfflineTime()
@@ -290,11 +308,13 @@ VideoProducer::OfflineTime()
 	return BMediaEventLooper::OfflineTime();
 }
 
+
 void
 VideoProducer::ControlLoop()
 {
 	BMediaEventLooper::ControlLoop();
 }
+
 
 status_t
 VideoProducer::DeleteHook(BMediaNode * node)
@@ -302,9 +322,11 @@ VideoProducer::DeleteHook(BMediaNode * node)
 	return BMediaEventLooper::DeleteHook(node);
 }
 
+
 /* BBufferProducer */
 
-status_t 
+
+status_t
 VideoProducer::FormatSuggestionRequested(
 		media_type type, int32 quality, media_format *format)
 {
@@ -326,7 +348,8 @@ VideoProducer::FormatSuggestionRequested(
 	return B_OK;
 }
 
-status_t 
+
+status_t
 VideoProducer::FormatProposal(const media_source &output, media_format *format)
 {
 	status_t err;
@@ -344,7 +367,7 @@ VideoProducer::FormatProposal(const media_source &output, media_format *format)
 	err = format_is_compatible(*format, fOutput.format) ?
 			B_OK : B_MEDIA_BAD_FORMAT;
 
-	uint32 width = format->u.raw_video.display.line_width; 
+	uint32 width = format->u.raw_video.display.line_width;
 	uint32 height = format->u.raw_video.display.line_count;
 
 	*format = fOutput.format;
@@ -362,10 +385,11 @@ VideoProducer::FormatProposal(const media_source &output, media_format *format)
 			format->u.raw_video.display.line_count));
 
 	return err;
-		
+
 }
 
-status_t 
+
+status_t
 VideoProducer::FormatChangeRequested(const media_source &source,
 		const media_destination &destination, media_format *io_format,
 		int32 *_deprecated_)
@@ -373,11 +397,12 @@ VideoProducer::FormatChangeRequested(const media_source &source,
 	TOUCH(destination); TOUCH(io_format); TOUCH(_deprecated_);
 	if (source != fOutput.source)
 		return B_MEDIA_BAD_SOURCE;
-		
-	return B_ERROR;	
+
+	return B_ERROR;
 }
 
-status_t 
+
+status_t
 VideoProducer::GetNextOutput(int32 *cookie, media_output *out_output)
 {
 	if (!out_output)
@@ -385,13 +410,14 @@ VideoProducer::GetNextOutput(int32 *cookie, media_output *out_output)
 
 	if ((*cookie) != 0)
 		return B_BAD_INDEX;
-	
+
 	*out_output = fOutput;
 	(*cookie)++;
 	return B_OK;
 }
 
-status_t 
+
+status_t
 VideoProducer::DisposeOutputCookie(int32 cookie)
 {
 	TOUCH(cookie);
@@ -399,7 +425,8 @@ VideoProducer::DisposeOutputCookie(int32 cookie)
 	return B_OK;
 }
 
-status_t 
+
+status_t
 VideoProducer::SetBufferGroup(const media_source &for_source,
 		BBufferGroup *group)
 {
@@ -408,7 +435,8 @@ VideoProducer::SetBufferGroup(const media_source &for_source,
 	return B_ERROR;
 }
 
-status_t 
+
+status_t
 VideoProducer::VideoClippingChanged(const media_source &for_source,
 		int16 num_shorts, int16 *clip_data,
 		const media_video_display_info &display, int32 *_deprecated_)
@@ -419,14 +447,16 @@ VideoProducer::VideoClippingChanged(const media_source &for_source,
 	return B_ERROR;
 }
 
-status_t 
+
+status_t
 VideoProducer::GetLatency(bigtime_t *out_latency)
 {
 	*out_latency = EventLatency() + SchedulingLatency();
 	return B_OK;
 }
 
-status_t 
+
+status_t
 VideoProducer::PrepareToConnect(const media_source &source,
 		const media_destination &destination, media_format *format,
 		media_source *out_source, char *out_name)
@@ -444,7 +474,7 @@ VideoProducer::PrepareToConnect(const media_source &source,
 
 	if (source != fOutput.source)
 		return B_MEDIA_BAD_SOURCE;
-	
+
 	if (fOutput.destination != media_destination::null)
 		return B_MEDIA_ALREADY_CONNECTED;
 
@@ -502,7 +532,8 @@ VideoProducer::PrepareToConnect(const media_source &source,
 	return B_OK;
 }
 
-void 
+
+void
 VideoProducer::Connect(status_t error, const media_source &source,
 		const media_destination &destination, const media_format &format,
 		char *io_name)
@@ -522,8 +553,8 @@ VideoProducer::Connect(status_t error, const media_source &source,
 		return;
 	}
 
-	if (	(source != fOutput.source) || (error < B_OK) ||
-			!const_cast<media_format *>(&format)->Matches(&fOutput.format)) {
+	if (source != fOutput.source || error < B_OK
+		|| !const_cast<media_format *>(&format)->Matches(&fOutput.format)) {
 		PRINTF(1, ("Connect: Connect error\n"));
 		return;
 	}
@@ -538,7 +569,7 @@ VideoProducer::Connect(status_t error, const media_source &source,
 					(1000000 / fOutput.format.u.raw_video.field_rate));
 		fFrameBase = fFrame;
 	}
-	
+
 	fConnectedFormat = format.u.raw_video;
 
 	/* get the latency */
@@ -578,7 +609,7 @@ VideoProducer::Connect(status_t error, const media_source &source,
 	release_sem(fFrameSync);
 }
 
-void 
+void
 VideoProducer::Disconnect(const media_source &source,
 		const media_destination &destination)
 {
@@ -599,7 +630,7 @@ VideoProducer::Disconnect(const media_source &source,
 	if (fRunning)
 		HandleStop();
 #endif
-	
+
 	fEnabled = false;
 	fOutput.destination = media_destination::null;
 
@@ -611,14 +642,16 @@ VideoProducer::Disconnect(const media_source &source,
 	fConnected = false;
 }
 
-void 
+
+void
 VideoProducer::LateNoticeReceived(const media_source &source,
 		bigtime_t how_much, bigtime_t performance_time)
 {
 	TOUCH(source); TOUCH(how_much); TOUCH(performance_time);
 }
 
-void 
+
+void
 VideoProducer::EnableOutput(const media_source &source, bool enabled,
 		int32 *_deprecated_)
 {
@@ -630,7 +663,8 @@ VideoProducer::EnableOutput(const media_source &source, bool enabled,
 	fEnabled = enabled;
 }
 
-status_t 
+
+status_t
 VideoProducer::SetPlayRate(int32 numer, int32 denom)
 {
 	TOUCH(numer); TOUCH(denom);
@@ -638,7 +672,8 @@ VideoProducer::SetPlayRate(int32 numer, int32 denom)
 	return B_ERROR;
 }
 
-void 
+
+void
 VideoProducer::AdditionalBufferRequested(const media_source &source,
 		media_buffer_id prev_buffer, bigtime_t prev_time,
 		const media_seek_tag *prev_tag)
@@ -646,7 +681,8 @@ VideoProducer::AdditionalBufferRequested(const media_source &source,
 	TOUCH(source); TOUCH(prev_buffer); TOUCH(prev_time); TOUCH(prev_tag);
 }
 
-void 
+
+void
 VideoProducer::LatencyChanged(const media_source &source,
 		const media_destination &destination, bigtime_t new_latency,
 		uint32 flags)
@@ -654,9 +690,11 @@ VideoProducer::LatencyChanged(const media_source &source,
 	TOUCH(source); TOUCH(destination); TOUCH(new_latency); TOUCH(flags);
 }
 
-/* BControllable */									
 
-status_t 
+/* BControllable */
+
+
+status_t
 VideoProducer::GetParameterValue(
 	int32 id, bigtime_t *last_change, void *value, size_t *size)
 {
@@ -694,6 +732,7 @@ VideoProducer::GetParameterValue(
 	return B_BAD_VALUE;
 }
 
+
 void
 VideoProducer::SetParameterValue(
 	int32 id, bigtime_t when, const void *value, size_t size)
@@ -729,13 +768,16 @@ VideoProducer::SetParameterValue(
 		BroadcastNewParameterValue(when, id, (void *)value, size);
 }
 
+
 status_t
 VideoProducer::StartControlPanel(BMessenger *out_messenger)
 {
 	return BControllable::StartControlPanel(out_messenger);
 }
 
+
 /* VideoProducer */
+
 
 void
 VideoProducer::HandleStart(bigtime_t performance_time)
@@ -778,6 +820,7 @@ err1:
 	return;
 }
 
+
 void
 VideoProducer::HandleStop(void)
 {
@@ -797,6 +840,7 @@ VideoProducer::HandleStop(void)
 	fRunning = false;
 }
 
+
 void
 VideoProducer::HandleTimeWarp(bigtime_t performance_time)
 {
@@ -807,6 +851,7 @@ VideoProducer::HandleTimeWarp(bigtime_t performance_time)
 	release_sem(fFrameSync);
 }
 
+
 void
 VideoProducer::HandleSeek(bigtime_t performance_time)
 {
@@ -816,6 +861,7 @@ VideoProducer::HandleSeek(bigtime_t performance_time)
 	/* Tell frame generation thread to recalculate delay value */
 	release_sem(fFrameSync);
 }
+
 
 void
 VideoProducer::_UpdateStats()
@@ -829,15 +875,14 @@ VideoProducer::_UpdateStats()
 		<< rfps << " real, missed: " << fStats[0].missed;
 	memcpy(&fStats[1], &fStats[0], sizeof(fStats[0]));
 	fLastColorChange = system_time();
-	BroadcastNewParameterValue(fLastColorChange, P_INFO, 
+	BroadcastNewParameterValue(fLastColorChange, P_INFO,
 		(void *)fInfoString.String(), fInfoString.Length()+1);
 }
 
 
-
 /* The following functions form the thread that generates frames. You should
  * replace this with the code that interfaces to your hardware. */
-int32 
+int32
 VideoProducer::FrameGenerator()
 {
 	bigtime_t wait_until = system_time();
@@ -869,8 +914,8 @@ PRINT(("PS: %Ld\n", fProcessingLatency));
 		if (wait_until < system_time())
 			continue;
 
-		PRINTF(1, ("FrameGenerator: wait until %Ld, %ctimed out, %crunning, %cenabled.\n", 
-					wait_until, 
+		PRINTF(1, ("FrameGenerator: wait until %Ld, %ctimed out, %crunning, %cenabled.\n",
+					wait_until,
 					(err == B_OK)?'!':' ',
 					(fRunning)?' ':'!',
 					(fEnabled)?' ':'!'));
@@ -922,7 +967,7 @@ PRINT(("PS: %Ld\n", fProcessingLatency));
 		h->u.raw_video.line_count = fConnectedFormat.display.line_count;
 
 		// This is where we fill the video buffer.
-		
+
 #if 0
 		uint32 *p = (uint32 *)buffer->Data();
 		/* Fill in a pattern */
@@ -933,7 +978,7 @@ PRINT(("PS: %Ld\n", fProcessingLatency));
 
 		//NO! must be called without lock!
 		//BAutolock lock(fCamDevice->Locker());
-		
+
 		bigtime_t now = system_time();
 		bigtime_t stamp;
 //#ifdef UseFillFrameBuffer
@@ -981,6 +1026,7 @@ PRINT(("PS: %Ld\n", fProcessingLatency));
 	PRINTF(1, ("FrameGenerator: thread existed.\n"));
 	return B_OK;
 }
+
 
 int32
 VideoProducer::_frame_generator_(void *data)

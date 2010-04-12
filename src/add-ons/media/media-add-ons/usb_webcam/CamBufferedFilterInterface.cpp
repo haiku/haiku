@@ -9,8 +9,8 @@
 
 
 CamBufferedFilterInterface::CamBufferedFilterInterface(CamDevice *device, bool allowWrite)
-: CamFilterInterface(device),
-fAllowWrite(allowWrite)
+	: CamFilterInterface(device),
+	fAllowWrite(allowWrite)
 {
 }
 

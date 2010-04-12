@@ -26,9 +26,8 @@
 
 
 // This class represents each webcam
-class NW80xCamDevice : public CamDevice
-{
-	public: 
+class NW80xCamDevice : public CamDevice {
+	public:
 						NW80xCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device);
 						~NW80xCamDevice();
 	virtual bool		SupportsBulk();
@@ -39,7 +38,7 @@ class NW80xCamDevice : public CamDevice
 	// generic register-like access
 	virtual ssize_t		WriteReg(uint16 address, uint8 *data, size_t count=1);
 	virtual ssize_t		ReadReg(uint16 address, uint8 *data, size_t count=1, bool cached=false);
-	
+
 	// I2C-like access
 	virtual status_t	GetStatusIIC();
 	virtual status_t	WaitReadyIIC();
@@ -61,10 +60,10 @@ class NW80xCamDeviceAddon : public CamDeviceAddon
 	public:
 						NW80xCamDeviceAddon(WebCamMediaAddOn* webcam);
 	virtual 			~NW80xCamDeviceAddon();
-						
+
 	virtual const char	*BrandName();
 	virtual NW80xCamDevice	*Instantiate(CamRoster &roster, BUSBDevice *from);
-	
+
 };
 
 #endif /* _NW80X_CAM_CAM_DEVICE_H */

@@ -14,8 +14,7 @@
 class WebCamMediaAddOn;
 class CamDeviceAddon;
 
-class CamRoster : public BUSBRoster
-{
+class CamRoster : public BUSBRoster {
 public:
 						CamRoster(WebCamMediaAddOn* _addon);
 	virtual				~CamRoster();
@@ -29,7 +28,7 @@ public:
 			CamDevice*	CameraAt(int32 index);
 
 
-	
+
 private:
 			status_t	LoadInternalAddons();
 			status_t	LoadExternalAddons();

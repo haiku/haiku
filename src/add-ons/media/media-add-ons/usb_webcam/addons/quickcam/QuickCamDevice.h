@@ -26,9 +26,8 @@
 
 
 // This class represents each webcam
-class QuickCamDevice : public CamDevice
-{
-	public: 
+class QuickCamDevice : public CamDevice {
+	public:
 						QuickCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device);
 						~QuickCamDevice();
 	virtual bool		SupportsBulk();
@@ -39,7 +38,7 @@ class QuickCamDevice : public CamDevice
 	// generic register-like access
 	virtual ssize_t		WriteReg(uint16 address, uint8 *data, size_t count=1);
 	virtual ssize_t		ReadReg(uint16 address, uint8 *data, size_t count=1, bool cached=false);
-	
+
 	// I2C-like access
 	virtual status_t	GetStatusIIC();
 	virtual status_t	WaitReadyIIC();
@@ -56,15 +55,14 @@ class QuickCamDevice : public CamDevice
 
 // the addon itself, that instanciate
 
-class QuickCamDeviceAddon : public CamDeviceAddon
-{
+class QuickCamDeviceAddon : public CamDeviceAddon {
 	public:
 						QuickCamDeviceAddon(WebCamMediaAddOn* webcam);
 	virtual 			~QuickCamDeviceAddon();
-						
+
 	virtual const char	*BrandName();
 	virtual QuickCamDevice	*Instantiate(CamRoster &roster, BUSBDevice *from);
-	
+
 };
 
 #endif /* _QUICK_CAM_CAM_DEVICE_H */

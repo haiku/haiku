@@ -23,7 +23,7 @@ public:
 
 
 HDCS1000Sensor::HDCS1000Sensor(CamDevice *_camera)
-: CamSensor(_camera)
+	: CamSensor(_camera)
 {
 }
 
@@ -50,7 +50,7 @@ HDCS1000Sensor::Probe()
 	}
 	return ENODEV;
 }
-					
+
 
 B_WEBCAM_DECLARE_SENSOR(HDCS1000Sensor, hdcs1000)
 

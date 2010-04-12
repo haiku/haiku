@@ -16,7 +16,7 @@
 #define SN9C102_R_GAIN		0x05
 #define SN9C102_B_GAIN		0x06
 #define SN9C102_I2C_SETUP	0x08
-#define SN9C102_I2C_SLAVE_ID	0x09 
+#define SN9C102_I2C_SLAVE_ID	0x09
 #define SN9C102_I2C_DATA0	0x0a
 #define SN9C102_I2C_DATA1	0x0b
 #define SN9C102_I2C_DATA2	0x0c
@@ -24,11 +24,11 @@
 #define SN9C102_I2C_DATA4	0x0e
 #define SN9C102_CONTROL_STAT	0x0f /*I2C ??*/
 #define SN9C102_R_B_GAIN		0x10	/* datasheet says so but it's WRONG */
-#define SN9C102_G_GAIN		0x11 /* Green channel gain control. -> Gain = (1+G_GAIN/8) 
+#define SN9C102_G_GAIN		0x11 /* Green channel gain control. -> Gain = (1+G_GAIN/8)
 							    Note: It is sync with VSYNC */
-#define SN9C102_H_START		0x12 /* Start active pixel number after H­sync of sensor 
-							    Note: 
-							    The 1st line sequence of image data is BGBGBG 
+#define SN9C102_H_START		0x12 /* Start active pixel number after H­sync of sensor
+							    Note:
+							    The 1st line sequence of image data is BGBGBG
 							    The 2nd line sequence of image data is GRGRGR */
 #define SN9C102_V_START		0x13 /* Start active line number after V­sync of sensor */
 #define SN9C102_OFFSET		0x14 /* Offset adjustment for sensor image data. */
@@ -54,9 +54,8 @@
 #define SN9C102_RGB_GAIN_MAX	0x7f
 
 // This class represents each webcam
-class SonixCamDevice : public CamDevice
-{
-	public: 
+class SonixCamDevice : public CamDevice {
+	public:
 						SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device);
 						~SonixCamDevice();
 	virtual bool		SupportsBulk();
@@ -70,13 +69,13 @@ class SonixCamDevice : public CamDevice
 	// generic register-like access
 	virtual ssize_t		WriteReg(uint16 address, uint8 *data, size_t count=1);
 	virtual ssize_t		ReadReg(uint16 address, uint8 *data, size_t count=1, bool cached=false);
-	
+
 	// I2C-like access
 	virtual status_t	GetStatusIIC();
 	virtual status_t	WaitReadyIIC();
 	virtual ssize_t		WriteIIC(uint8 address, uint8 *data, size_t count=1);
 	virtual ssize_t		ReadIIC(uint8 address, uint8 *data);
-					
+
 	virtual status_t	SetVideoFrame(BRect rect);
 	virtual status_t	SetScale(float scale);
 	virtual status_t	SetVideoParams(float brightness, float contrast, float hue, float red, float green, float blue);
@@ -94,7 +93,7 @@ class SonixCamDevice : public CamDevice
 
 	virtual status_t	GetFrameBitmap(BBitmap **bm, bigtime_t *stamp=NULL);
 	virtual status_t	FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp=NULL);
-	
+
 
 	void				DumpRegs();
 
@@ -105,7 +104,7 @@ class SonixCamDevice : public CamDevice
 	int					fChipVersion;
 
 	int					fFrameTagState;
-	
+
 	uint8				fRGain;
 	uint8				fGGain;
 	uint8				fBGain;
@@ -115,15 +114,14 @@ class SonixCamDevice : public CamDevice
 
 // the addon itself, that instanciate
 
-class SonixCamDeviceAddon : public CamDeviceAddon
-{
+class SonixCamDeviceAddon : public CamDeviceAddon {
 	public:
 						SonixCamDeviceAddon(WebCamMediaAddOn* webcam);
 	virtual 			~SonixCamDeviceAddon();
-						
+
 	virtual const char	*BrandName();
 	virtual SonixCamDevice	*Instantiate(CamRoster &roster, BUSBDevice *from);
-	
+
 };
 
 

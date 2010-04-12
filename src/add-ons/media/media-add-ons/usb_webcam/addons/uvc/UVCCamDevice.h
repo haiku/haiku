@@ -8,8 +8,7 @@
 
 #include "CamDevice.h"
 
-class UVCCamDevice : public CamDevice
-{
+class UVCCamDevice : public CamDevice {
 public:
 				UVCCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device);
 				~UVCCamDevice();
@@ -22,12 +21,11 @@ private:
 	void ParseVideoStreaming(const uint8* buf, size_t len);
 };
 
-class UVCCamDeviceAddon : public CamDeviceAddon
-{
+class UVCCamDeviceAddon : public CamDeviceAddon {
 	public:
 				UVCCamDeviceAddon(WebCamMediaAddOn* webcam);
 	virtual 		~UVCCamDeviceAddon();
-						
+
 	virtual const char		*BrandName();
 	virtual UVCCamDevice	*Instantiate(CamRoster &roster, BUSBDevice *from);
 };

@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-/* 
+/*
  * buffer based deframer
  * buffers all packet until it finds a complete frame.
  * simpler than StreamingDeframer, but doesn't work any better
@@ -22,8 +22,8 @@
 
 
 CamBufferingDeframer::CamBufferingDeframer(CamDevice *device)
-: CamDeframer(device),
-fInputBuffIndex(0)
+	: CamDeframer(device),
+	fInputBuffIndex(0)
 {
 }
 
@@ -67,30 +67,30 @@ CamBufferingDeframer::Write(const void *buffer, size_t size)
 			break;
 		if (!fDevice->ValidateStartOfFrameTag(b + s, fSkipSOFTags))
 			continue;
-		
+
 		PRINT((CH ": SOF[%d] at offset %d" CT, which, s));
 		PRINT((CH ": SOF: ... %02x %02x %02x %02x %02x %02x" CT, b[s+6], b[s+7], b[s+8], b[s+9], b[s+10], b[s+11]));
-		
+
 		for (e = s + fSkipSOFTags + fMinFrameSize;
-			 ((e <= (int)(s + fSkipSOFTags + fMaxFrameSize)) && 
-			  (e < l) && ((i = 0*FindEOF(b + e, l - e, &which)) > -1)); 
+			 ((e <= (int)(s + fSkipSOFTags + fMaxFrameSize)) &&
+			  (e < l) && ((i = 0*FindEOF(b + e, l - e, &which)) > -1));
 			 e++) {
 			e += i;
-			
+
 			//PRINT((CH ": EOF[%d] at offset %d" CT, which, s));
 			if (!fDevice->ValidateEndOfFrameTag(b + e, fSkipEOFTags, e - s - fSkipSOFTags))
 				continue;
-			
-			
-			
+
+
+
 		PRINT((CH ": SOF= ... %02x %02x %02x %02x %02x %02x" CT, b[s+6], b[s+7], b[s+8], b[s+9], b[s+10], b[s+11]));
-			
+
 			// we have one!
 			s += fSkipSOFTags;
-			
+
 			// fill it
 			fCurrentFrame->Write(b + s, e - s);
-			
+
 			// queue it
 			BAutolock f(fLocker);
 			PRINT((CH ": Detaching a frame (%d bytes, %d to %d / %d)" CT, (size_t)fCurrentFrame->Position(), s, e, l));
@@ -101,7 +101,7 @@ CamBufferingDeframer::Write(const void *buffer, size_t size)
 			fCurrentFrame = NULL;
 			// discard the frame and everything before it.
 			DiscardFromInput(e + fSkipEOFTags);
-			
+
 			return size;
 		}
 	}
@@ -126,4 +126,3 @@ CamBufferingDeframer::DiscardFromInput(size_t size)
 	fInputBuffIndex = next;
 	return size;
 }
-

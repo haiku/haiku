@@ -48,19 +48,19 @@ WebCamMediaAddOn::~WebCamMediaAddOn()
 }
 
 
-status_t 
+status_t
 WebCamMediaAddOn::InitCheck(const char **out_failure_text)
 {
 	if (fInitStatus < B_OK) {
 		*out_failure_text = "No cameras attached";
 		return fInitStatus;
 	}
- 
+
 	return B_OK;
 }
 
 
-int32 
+int32
 WebCamMediaAddOn::CountFlavors()
 {
 	PRINT((CH "()" CT));
@@ -78,10 +78,10 @@ WebCamMediaAddOn::CountFlavors()
 
 
 /*
- * The pointer to the flavor received only needs to be valid between 
+ * The pointer to the flavor received only needs to be valid between
  * successive calls to BMediaAddOn::GetFlavorAt().
  */
-status_t 
+status_t
 WebCamMediaAddOn::GetFlavorAt(int32 n, const flavor_info **out_info)
 {
 	PRINT((CH "(%d, ) roster %p is %lx" CT, n, fRoster, fInitStatus));
@@ -191,7 +191,7 @@ WebCamMediaAddOn::FillDefaultFlavorInfo(flavor_info* info)
 
 
 BMediaAddOn *
-make_media_addon(image_id imid)
+make_media_addon(image_id id)
 {
-	return new WebCamMediaAddOn(imid);
+	return new WebCamMediaAddOn(id);
 }

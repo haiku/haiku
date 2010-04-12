@@ -21,8 +21,7 @@ class BTextParameter;
 class VideoProducer :
 	public virtual BMediaEventLooper,
 	public virtual BBufferProducer,
-	public virtual BControllable
-{
+	public virtual BControllable {
 public:
 						VideoProducer(BMediaAddOn *addon, CamDevice *dev,
 								const char *name, int32 internal_id);
@@ -37,7 +36,7 @@ virtual port_id		ControlPort() const;
 virtual	BMediaAddOn	*AddOn(int32 * internal_id) const;
 virtual	status_t 	HandleMessage(int32 message, const void *data,
 							size_t size);
-protected:	
+protected:
 virtual	void 		Preroll();
 virtual void		SetTimeSource(BTimeSource * time_source);
 virtual status_t	RequestCompleted(const media_request_info & info);
@@ -59,7 +58,7 @@ virtual bigtime_t	OfflineTime();
 virtual void		ControlLoop();
 virtual status_t	DeleteHook(BMediaNode * node);
 
-/* BBufferProducer */									
+/* BBufferProducer */
 protected:
 virtual	status_t	FormatSuggestionRequested(media_type type, int32 quality,
 							media_format * format);
@@ -98,7 +97,7 @@ virtual	void		LatencyChanged(const media_source & source,
 							const media_destination & destination,
 							bigtime_t new_latency, uint32 flags);
 
-/* BControllable */									
+/* BControllable */
 protected:
 virtual status_t	GetParameterValue(int32 id, bigtime_t *last_change,
 							void *value, size_t *size);

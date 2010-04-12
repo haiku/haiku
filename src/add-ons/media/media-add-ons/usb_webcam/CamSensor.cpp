@@ -15,15 +15,15 @@ CamSensor::CamSensor(CamDevice *_camera)
 	  fLastParameterChanges(0),
 	  fCamDevice(_camera)
 {
-	
+
 }
 
 
 CamSensor::~CamSensor()
 {
-	
+
 }
-					
+
 
 status_t
 CamSensor::Probe()
@@ -31,21 +31,21 @@ CamSensor::Probe()
 	// default is to match by USB IDs
 	return B_OK;
 }
-					
+
 
 status_t
 CamSensor::InitCheck()
 {
 	return fInitStatus;
 }
-					
+
 
 status_t
 CamSensor::Setup()
 {
 	return fInitStatus;
 }
-					
+
 
 const char *
 CamSensor::Name()
@@ -130,9 +130,7 @@ status_t
 CamSensor::ProbeByIICSignature(const uint8 *regList, const uint8 *matchList,
 	size_t count)
 {
-	int i;
-
-	for (i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		uint8 value = 0;
 		ssize_t len;
 		len = Device()->ReadIIC8(regList[i], &value);

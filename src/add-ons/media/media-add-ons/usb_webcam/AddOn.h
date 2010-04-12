@@ -14,12 +14,11 @@ extern "C" _EXPORT BMediaAddOn *make_media_addon(image_id you);
 class CamRoster;
 class CamDevice;
 
-class WebCamMediaAddOn : public BMediaAddOn
-{
+class WebCamMediaAddOn : public BMediaAddOn {
 public:
 						WebCamMediaAddOn(image_id imid);
 	virtual 			~WebCamMediaAddOn();
-	
+
 	virtual	status_t	InitCheck(const char **out_failure_text);
 
 	virtual	int32		CountFlavors();
@@ -44,7 +43,7 @@ public:
 		status_t		CameraAdded(CamDevice* device);
 		status_t		CameraRemoved(CamDevice* device);
 		void			FillDefaultFlavorInfo(flavor_info* info);
-		
+
 private:
 	uint32				fInternalIDCounter;
 	status_t			fInitStatus;

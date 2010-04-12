@@ -9,22 +9,21 @@
 #include <Rect.h>
 
 // This class represents the camera's (cmos or whatever) sensor chip
-class CamColorSpaceTransform
-{
-	public: 
+class CamColorSpaceTransform {
+	public:
 						CamColorSpaceTransform();
 	virtual				~CamColorSpaceTransform();
 
 	virtual status_t	InitCheck();
-	
+
 	virtual const char*	Name();
 	virtual color_space	OutputSpace();
-	
+
 	virtual status_t	SetVideoFrame(BRect rect);
 	virtual BRect		VideoFrame() const { return fVideoFrame; };
-	
+
 	static CamColorSpaceTransform *Create(const char *name);
-	
+
 	protected:
 		status_t		fInitStatus;
 		BRect			fVideoFrame;

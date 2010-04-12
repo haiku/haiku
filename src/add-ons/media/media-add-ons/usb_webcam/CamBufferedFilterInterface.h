@@ -10,8 +10,7 @@
 #include <interface/Rect.h>
 #include "CamFilterInterface.h"
 
-class CamBufferedFilterInterface : public CamFilterInterface 
-{
+class CamBufferedFilterInterface : public CamFilterInterface {
 public:
 			CamBufferedFilterInterface(CamDevice *device, bool allowWrite);
 virtual 	~CamBufferedFilterInterface();

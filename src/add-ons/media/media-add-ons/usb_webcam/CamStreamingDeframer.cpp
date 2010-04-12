@@ -3,11 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-/* 
+/*
  * stream based deframer
  * has a state machine and handles each packet separately.
  * much more complex than the buffering one, and I thought it didn't work,
- * but since I fixed the rest it seems to be working even better without 
+ * but since I fixed the rest it seems to be working even better without
  * taking the cpu over like the other one.
  */
 
@@ -21,7 +21,7 @@
 
 
 CamStreamingDeframer::CamStreamingDeframer(CamDevice *device)
-: CamDeframer(device)
+	: CamDeframer(device)
 {
 }
 
@@ -56,7 +56,7 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 	// update in case resolution changed
 	fMinFrameSize = fDevice->MinRawFrameSize();
 	fMaxFrameSize = fDevice->MaxRawFrameSize();
-	
+
 	if (fInputBuff.Position()) {
 		// residual data ? append to it
 		fInputBuff.Write(buffer, size);
@@ -67,13 +67,13 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 	}
 	// whole buffer belongs to a frame, simple
 	if ((fState == ST_FRAME) && (fCurrentFrame->Position() + bufsize < fMinFrameSize)) {
-		// no residual data, and 
+		// no residual data, and
 		fCurrentFrame->Write(buf, bufsize);
 		fInputBuff.Seek(0LL, SEEK_SET);
 		fInputBuff.SetSize(0);
 		return size;
 	}
-	
+
 	// waiting for a frame...
 	if (fState == ST_SYNC) {
 		i = 0;
@@ -94,7 +94,7 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 			fState = ST_FRAME;
 		}
 	}
-	
+
 	// check for end of frame
 	if (fState == ST_FRAME) {
 #if 0
@@ -122,7 +122,7 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 				i = bufsize;
 		}
 		PRINT((CH ": checking for EOF; bufsize=%d i=%d" CT, bufsize, i));
-		
+
 		if (i + (int)fSkipEOFTags > bufsize) { // not enough room to check for EOF, leave it for next time
 			end = i;
 			i = -1; // don't detach yet
@@ -178,9 +178,9 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 			fState = ST_SYNC;
 		}
 	}
-	
-	
-	
+
+
+
 
 	// put the remainder in input buff, discarding old data
 #if 0
@@ -196,4 +196,3 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 	fInputBuff.SetSize(bufsize - end);
 	return size;
 }
-

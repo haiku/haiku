@@ -3,9 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "UVCCamDevice.h"
 #include "USB_video.h"
+
 #include <stdio.h>
+
 
 usb_webcam_support_descriptor kSupportedDevices[] = {
 	// ofcourse we support a generic UVC device...
@@ -33,7 +36,9 @@ usb_webcam_support_descriptor kSupportedDevices[] = {
 	{{ 0, 0, 0, 0, 0}, NULL, NULL, NULL }
 };
 
-static void print_guid(const uint8* buf)
+
+static void
+print_guid(const uint8* buf)
 {
 	printf("%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
 		buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7],
@@ -78,7 +83,9 @@ UVCCamDevice::UVCCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	}
 }
 
-void UVCCamDevice::ParseVideoStreaming(const uint8* buffer, size_t len)
+
+void
+UVCCamDevice::ParseVideoStreaming(const uint8* buffer, size_t len)
 {
 	int c, i, sz;
 
@@ -198,7 +205,9 @@ void UVCCamDevice::ParseVideoStreaming(const uint8* buffer, size_t len)
 	}
 }
 
-void UVCCamDevice::ParseVideoControl(const uint8* buffer, size_t len)
+
+void
+UVCCamDevice::ParseVideoControl(const uint8* buffer, size_t len)
 {
 	int c, i;
 
@@ -283,24 +292,32 @@ void UVCCamDevice::ParseVideoControl(const uint8* buffer, size_t len)
 	}
 }
 
+
 UVCCamDevice::~UVCCamDevice()
 {
 }
 
-bool UVCCamDevice::SupportsIsochronous()
+
+bool
+UVCCamDevice::SupportsIsochronous()
 {
 	return true;
 }
 
-status_t UVCCamDevice::StartTransfer()
+
+status_t
+UVCCamDevice::StartTransfer()
 {
 	return CamDevice::StartTransfer();
 }
 
-status_t UVCCamDevice::StopTransfer()
+
+status_t
+UVCCamDevice::StopTransfer()
 {
 	return CamDevice::StopTransfer();
 }
+
 
 UVCCamDeviceAddon::UVCCamDeviceAddon(WebCamMediaAddOn* webcam)
 	: CamDeviceAddon(webcam)

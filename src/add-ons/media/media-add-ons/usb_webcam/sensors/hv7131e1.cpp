@@ -27,9 +27,9 @@ public:
 
 
 HV7131E1Sensor::HV7131E1Sensor(CamDevice *_camera)
-: CamSensor(_camera)
+	: CamSensor(_camera)
 {
-	
+
 }
 
 
@@ -41,7 +41,7 @@ HV7131E1Sensor::~HV7131E1Sensor()
 status_t
 HV7131E1Sensor::Probe()
 {
-	return ProbeByIICSignature(sProbeAddressList, sProbeMatchList, 
+	return ProbeByIICSignature(sProbeAddressList, sProbeMatchList,
 		sizeof(sProbeMatchList));
 }
 

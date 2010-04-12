@@ -10,8 +10,7 @@
 #include <interface/Rect.h>
 class CamDevice;
 
-class CamFilterInterface : public BPositionIO 
-{
+class CamFilterInterface : public BPositionIO {
 public:
 			CamFilterInterface(CamDevice *device);
 virtual 	~CamFilterInterface();

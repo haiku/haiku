@@ -7,8 +7,7 @@
 
 #include "CamDeframer.h"
 
-class CamStreamingDeframer : public CamDeframer 
-{
+class CamStreamingDeframer : public CamDeframer {
 public:
 			CamStreamingDeframer(CamDevice *device);
 virtual 	~CamStreamingDeframer();
