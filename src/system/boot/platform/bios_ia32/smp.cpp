@@ -18,8 +18,9 @@
 #include <safemode.h>
 #include <boot/stage2.h>
 #include <boot/menu.h>
+#include <arch/x86/apic.h>
 #include <arch/x86/arch_acpi.h>
-#include <arch/x86/arch_apic.h>
+#include <arch/x86/arch_smp.h>
 #include <arch/x86/arch_system_info.h>
 
 #include "mmu.h"
@@ -393,12 +394,12 @@ smp_init_other_cpus(void)
 		TRACE(("smp disabled per safemode setting\n"));
 		gKernelArgs.num_cpus = 1;
 	}
-	
+
 	if (get_safemode_boolean(B_SAFEMODE_DISABLE_APIC, false)) {
 		TRACE(("local apic disabled per safemode setting\n"));
 		gKernelArgs.arch_args.apic_phys = 0;
 	}
-	
+
 	if (gKernelArgs.arch_args.apic_phys == 0)
 		return;
 
@@ -585,14 +586,14 @@ smp_add_safemode_menus(Menu *menu)
 		item->SetHelpText("Disables using the IO APIC for interrupt handling, "
 			"forcing instead the use of the PIC.");
 	}
-#endif			
+#endif
 	if (gKernelArgs.arch_args.apic_phys != 0) {
 		menu->AddItem(item = new(nothrow) MenuItem("Disable LOCAL APIC"));
 		item->SetType(MENU_ITEM_MARKABLE);
 		item->SetData(B_SAFEMODE_DISABLE_APIC);
 		item->SetHelpText("Disables using the LOCAL APIC for timekeeping.");
 	}
-	
+
 	if (gKernelArgs.num_cpus < 2)
 		return;
 

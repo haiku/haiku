@@ -107,6 +107,8 @@
 #define IOAPIC_REDIR_TABLE		0x10
 */
 
+#if !_BOOT_MODE
+
 bool		apic_available();
 uint32		apic_read(uint32 offset);
 void		apic_write(uint32 offset, uint32 data);
@@ -115,5 +117,7 @@ void		apic_end_of_interrupt();
 
 status_t	apic_init(kernel_args *args);
 status_t	apic_per_cpu_init(kernel_args *args, int32 cpu);
+
+#endif // !_BOOT_MODE
 
 #endif	/* _KERNEL_ARCH_x86_APIC_H */
