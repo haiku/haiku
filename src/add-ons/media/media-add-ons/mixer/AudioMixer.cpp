@@ -1,7 +1,7 @@
 /*
  * Copyright 2002 David Shipman,
  * Copyright 2003-2007 Marcus Overhagen
- * Copyright 2007-2009 Haiku Inc. All rights reserved.
+ * Copyright 2007-2010 Haiku Inc. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -85,6 +85,10 @@ multi_audio_format_specialize(media_multi_audio_format *format,
 #define FORMAT_USER_DATA_TYPE 		0x7294a8f3
 #define FORMAT_USER_DATA_MAGIC_1	0xc84173bd
 #define FORMAT_USER_DATA_MAGIC_2	0x4af62b7d
+
+
+const static bigtime_t kMaxLatency = 150000;
+	// 150 ms is the maximum latency we publish
 
 
 AudioMixer::AudioMixer(BMediaAddOn *addOn, bool isSystemMixer)
@@ -312,7 +316,7 @@ AudioMixer::HandleInputBuffer(BBuffer* buffer, bigtime_t lateness)
 		if (RunMode() == B_DROP_DATA || RunMode() == B_DECREASE_PRECISION
 			|| RunMode() == B_INCREASE_LATENCY) {
 			debug_printf("sending notify\n");
-			
+
 			// Build a media_source out of the header data
 			media_source source = media_source::null;
 			source.port = buffer->Header()->source_port;
@@ -944,13 +948,13 @@ AudioMixer::Connect(status_t error, const media_source &source,
 
 
 void
-AudioMixer::Disconnect(const media_source &what, const media_destination &where)
+AudioMixer::Disconnect(const media_source& what, const media_destination& where)
 {
 	TRACE("AudioMixer::Disconnect\n");
 	fCore->Lock();
 
 	// Make sure that our connection is the one being disconnected
-	MixerOutput * output = fCore->Output();
+	MixerOutput* output = fCore->Output();
 	if (!output
 		|| output->MediaOutput().node != Node()
 		|| output->MediaOutput().source != what
@@ -999,6 +1003,11 @@ AudioMixer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 			return;
 
 		fInternalLatency += howMuch;
+
+		// At some point a too large latency can get annoying
+		if (fInternalLatency > kMaxLatency)
+			fInternalLatency = kMaxLatency;
+
 		fLastLateNotification = TimeSource()->Now();
 
 		debug_printf("AudioMixer: increasing internal latency to %Ld usec\n", fInternalLatency);

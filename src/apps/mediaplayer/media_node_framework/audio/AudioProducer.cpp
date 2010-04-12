@@ -2,8 +2,9 @@
  * Copyright (c) 1998-99, Be Incorporated, All Rights Reserved.
  * Distributed under the terms of the Be Sample Code license.
  *
- * Copyright (c) 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
- * Copyright (c) 2000-2008, Stephan Aßmus <superstippi@gmx.de>,
+ * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
+ * Copyright 2000-2008, Stephan Aßmus <superstippi@gmx.de>,
  * All Rights Reserved. Distributed under the terms of the MIT license.
  */
 
@@ -45,6 +46,10 @@
 #	define TRACE_BUFFER(x...)
 #	define ERROR(x...)		fprintf(stderr, x)
 #endif
+
+
+const static bigtime_t kMaxLatency = 150000;
+	// 150 ms is the maximum latency we publish
 
 
 #if DEBUG_TO_FILE
@@ -507,6 +512,11 @@ AudioProducer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 			// ...
 		} else if (RunMode() == B_INCREASE_LATENCY) {
 			fInternalLatency += howMuch;
+
+			// At some point a too large latency can get annoying
+			if (fInternalLatency > kMaxLatency)
+				fInternalLatency = kMaxLatency;
+
 			SetEventLatency(fLatency + fInternalLatency);
 		} else {
 			size_t sampleSize
