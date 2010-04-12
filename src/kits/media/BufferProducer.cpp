@@ -1,10 +1,7 @@
 /*
- * Copyright 2002-2010, Haiku.
+ * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2003, Marcus Overhagen, <Marcus@Overhagen.de>.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Marcus Overhagen, <Marcus@Overhagen.de>
- *		Axel Dörfler, axeld@pinc-software.de.
  */
 
 
