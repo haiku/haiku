@@ -105,12 +105,6 @@
 #define IOAPIC_VERSION			0x1
 #define IOAPIC_ARB				0x2
 #define IOAPIC_REDIR_TABLE		0x10
-
-#define IPI_CACHE_FLUSH			0x40
-#define IPI_INV_TLB				0x41
-#define IPI_INV_PTE				0x42
-#define IPI_INV_RESCHED			0x43
-#define IPI_STOP				0x44
 */
 
 bool		apic_available();
