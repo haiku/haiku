@@ -398,7 +398,6 @@ fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *vnid)
 		ERRPRINT("fs_walk - VNID = %d\n",*vnid);
 
 		ntfs_inode_close(bi);
-		free(unicode);
 
 		if (*vnid == (u64)-1) {
 			result = EINVAL;
@@ -414,6 +413,9 @@ fs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *vnid)
 
 exit:
 	ERRPRINT("fs_walk - EXIT, result is %s\n", strerror(result));
+
+	if (unicode)
+		free(unicode);
 
 	UNLOCK_VOL(ns);
 
