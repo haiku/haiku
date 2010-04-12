@@ -25,7 +25,7 @@
 #include <arch/user_debugger.h>
 #include <arch/vm.h>
 
-#include <arch/x86/arch_apic.h>
+#include <arch/x86/apic.h>
 #include <arch/x86/descriptors.h>
 #include <arch/x86/vm86.h>
 
@@ -133,7 +133,6 @@ typedef struct ioapic_s {
 
 static ioapic *sIOAPIC = NULL;
 static uint32 sIOAPICMaxRedirectionEntry = 23;
-static void *sLocalAPIC = NULL;
 
 static uint32 sIRQToIOAPICPin[256];
 
@@ -470,7 +469,7 @@ ioapic_is_spurious_interrupt(int32 num)
 static void
 ioapic_end_of_interrupt(int32 num)
 {
-	*(volatile uint32 *)((char *)sLocalAPIC + APIC_EOI) = 0;
+	apic_end_of_interrupt();
 }
 
 
@@ -551,19 +550,12 @@ ioapic_init(kernel_args *args)
 		&ioapic_end_of_interrupt
 	};
 
+	// always init the local apic as it can be used for timers even if we
+	// don't end up using the io apic
+	apic_init(args);
+
 	if (args->arch_args.apic == NULL) {
 		dprintf("no local apic available\n");
-		return;
-	}
-
-	// always map the local apic as it can be used for timers even if we
-	// don't end up using the io apic
-	sLocalAPIC = args->arch_args.apic;
-	if (vm_map_physical_memory(B_SYSTEM_TEAM, "local apic", &sLocalAPIC,
-			B_EXACT_ADDRESS, B_PAGE_SIZE,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-			args->arch_args.apic_phys, true) < 0) {
-		panic("mapping the local apic failed");
 		return;
 	}
 
@@ -666,7 +658,7 @@ ioapic_init(kernel_args *args)
 	status = read_irq_routing_table(pciModule, acpiModule, &table);
 	if (status != B_OK)
 		return;
-		
+
 	// configure apic interrupts assume 1:1 mapping
 	for (int i = 0; i < table.Count(); i++) {
 		irq_routing_entry& entry = table.ElementAt(i);
@@ -677,7 +669,7 @@ ioapic_init(kernel_args *args)
 		config |= irqDescriptor.interrupt_mode;
 		ioapic_configure_io_interrupt(irqDescriptor.irq, config);
 	}
-	
+
 	// prefer the ioapic over the normal pic
 	dprintf("using ioapic for interrupt routing\n");
 	sCurrentPIC = &ioapicController;

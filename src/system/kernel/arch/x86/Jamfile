@@ -29,6 +29,7 @@ KernelMergeObject kernel_arch_x86.o :
 	arch_interrupts.S
 	arch_system_info.cpp
 	arch_user_debugger.cpp
+	apic.cpp
 	apm.cpp
 	bios.cpp
 	cpuid.S

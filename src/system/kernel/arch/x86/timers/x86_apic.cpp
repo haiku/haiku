@@ -11,52 +11,37 @@
 #include <arch/x86/timer.h>
 
 #include <int.h>
-#include <arch/x86/arch_apic.h>
+#include <arch/x86/apic.h>
 
 #include <arch/cpu.h>
 #include <arch/smp.h>
 
-#include "apic.h"
+#include "apic_timer.h"
 
 
 /* Method Prototypes */
-static int apic_get_priority();
-static status_t apic_set_hardware_timer(bigtime_t relativeTimeout);
-static status_t apic_clear_hardware_timer();
-static status_t apic_init(struct kernel_args *args);
+static int apic_timer_get_priority();
+static status_t apic_timer_set_hardware_timer(bigtime_t relativeTimeout);
+static status_t apic_timer_clear_hardware_timer();
+static status_t apic_timer_init(struct kernel_args *args);
 
-static void *sApicPtr = NULL;
 static uint32 sApicTicsPerSec = 0;
 
 extern bool gUsingIOAPIC;
 
 struct timer_info gAPICTimer = {
 	"APIC",
-	&apic_get_priority,
-	&apic_set_hardware_timer,
-	&apic_clear_hardware_timer,
-	&apic_init
+	&apic_timer_get_priority,
+	&apic_timer_set_hardware_timer,
+	&apic_timer_clear_hardware_timer,
+	&apic_timer_init
 };
 
 
 static int
-apic_get_priority()
+apic_timer_get_priority()
 {
 	return 3;
-}
-
-
-static uint32
-_apic_read(uint32 offset)
-{
-	return *(volatile uint32 *)((char *)sApicPtr + offset);
-}
-
-
-static void
-_apic_write(uint32 offset, uint32 data)
-{
-	*(volatile uint32 *)((char *)sApicPtr + offset) = data;
 }
 
 
@@ -66,7 +51,7 @@ apic_timer_interrupt(void *data)
 	// if we are not using the IO APIC we need to acknowledge the
 	// interrupt ourselfs
 	if (!gUsingIOAPIC)
-		_apic_write(APIC_EOI, 0);
+		apic_end_of_interrupt();
 
 	return timer_interrupt();
 }
@@ -75,11 +60,8 @@ apic_timer_interrupt(void *data)
 #define MIN_TIMEOUT 1
 
 static status_t
-apic_set_hardware_timer(bigtime_t relativeTimeout)
+apic_timer_set_hardware_timer(bigtime_t relativeTimeout)
 {
-	if (sApicPtr == NULL)
-		return B_ERROR;
-
 	if (relativeTimeout < MIN_TIMEOUT)
 		relativeTimeout = MIN_TIMEOUT;
 
@@ -88,18 +70,18 @@ apic_set_hardware_timer(bigtime_t relativeTimeout)
 
 	cpu_status state = disable_interrupts();
 
-	uint32 config = _apic_read(APIC_LVT_TIMER) | APIC_LVT_MASKED; // mask the timer
-	_apic_write(APIC_LVT_TIMER, config);
+	uint32 config = apic_read(APIC_LVT_TIMER) | APIC_LVT_MASKED; // mask the timer
+	apic_write(APIC_LVT_TIMER, config);
 
-	_apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
+	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
 
-	config = _apic_read(APIC_LVT_TIMER) & ~APIC_LVT_MASKED; // unmask the timer
-	_apic_write(APIC_LVT_TIMER, config);
+	config = apic_read(APIC_LVT_TIMER) & ~APIC_LVT_MASKED; // unmask the timer
+	apic_write(APIC_LVT_TIMER, config);
 
 	//TRACE_TIMER(("arch_smp_set_apic_timer: config 0x%lx, timeout %Ld, tics/sec %lu, tics %lu\n",
 	//	config, relativeTimeout, sApicTicsPerSec, ticks));
 
-	_apic_write(APIC_INITIAL_TIMER_COUNT, ticks); // start it up
+	apic_write(APIC_INITIAL_TIMER_COUNT, ticks); // start it up
 
 	restore_interrupts(state);
 
@@ -108,18 +90,15 @@ apic_set_hardware_timer(bigtime_t relativeTimeout)
 
 
 static status_t
-apic_clear_hardware_timer()
+apic_timer_clear_hardware_timer()
 {
-	if (sApicPtr == NULL)
-		return B_ERROR;
-
 	cpu_status state = disable_interrupts();
 
-	uint32 config = _apic_read(APIC_LVT_TIMER) | APIC_LVT_MASKED;
+	uint32 config = apic_read(APIC_LVT_TIMER) | APIC_LVT_MASKED;
 		// mask the timer
-	_apic_write(APIC_LVT_TIMER, config);
+	apic_write(APIC_LVT_TIMER, config);
 
-	_apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
+	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
 
 	restore_interrupts(state);
 	return B_OK;
@@ -127,42 +106,31 @@ apic_clear_hardware_timer()
 
 
 static status_t
-apic_init(struct kernel_args *args)
+apic_timer_init(struct kernel_args *args)
 {
-	/* If we're in this method, arch_smp called the special init function.
-	   Therefore, if we got here with sApicPtr NULL, there is no APIC! */
-	if (sApicPtr == NULL)
+	if (!apic_available())
 		return B_ERROR;
+
+	sApicTicsPerSec = args->arch_args.apic_time_cv_factor;
+	install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE,
+		&apic_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
 
 	return B_OK;
 }
 
 
 status_t
-apic_init_timer(struct kernel_args *args, int32 cpu)
+apic_timer_per_cpu_init(struct kernel_args *args, int32 cpu)
 {
-	if (args->arch_args.apic == NULL)
-		return B_ERROR;
-	
-	/* This is in place of apic_preinit; if we're not already initialized,
-	   register the interrupt handler and set the pointers */
-	if (sApicPtr == NULL) {
-		sApicPtr = (void *)args->arch_args.apic;
-		sApicTicsPerSec = args->arch_args.apic_time_cv_factor;
-		install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE,
-			&apic_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
-	}
-
 	/* setup timer */
-	uint32 config = _apic_read(APIC_LVT_TIMER) & APIC_LVT_TIMER_MASK;
+	uint32 config = apic_read(APIC_LVT_TIMER) & APIC_LVT_TIMER_MASK;
 	config |= 0xfb | APIC_LVT_MASKED; // vector 0xfb, timer masked
-	_apic_write(APIC_LVT_TIMER, config);
+	apic_write(APIC_LVT_TIMER, config);
 
-	_apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the clock
+	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the clock
 
-	config = _apic_read(APIC_TIMER_DIVIDE_CONFIG) & 0xfffffff0;
+	config = apic_read(APIC_TIMER_DIVIDE_CONFIG) & 0xfffffff0;
 	config |= APIC_TIMER_DIVIDE_CONFIG_1; // clock division by 1
-	_apic_write(APIC_TIMER_DIVIDE_CONFIG, config);
-
+	apic_write(APIC_TIMER_DIVIDE_CONFIG, config);
 	return B_OK;
 }

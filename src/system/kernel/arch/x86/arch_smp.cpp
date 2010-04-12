@@ -17,16 +17,13 @@
 #include <arch/vm.h>
 #include <arch/smp.h>
 
-#include <timer.h>
-
+#include <arch/x86/apic.h>
+#include <arch/x86/arch_smp.h>
 #include <arch/x86/smp_priv.h>
-#include <arch/x86/arch_apic.h>
 #include <arch/x86/timer.h>
 
 #include <string.h>
 #include <stdio.h>
-
-#include "timers/apic.h"
 
 
 //#define TRACE_ARCH_SMP
@@ -36,84 +33,12 @@
 #	define TRACE(x) ;
 #endif
 
-static void *sLocalAPIC = NULL;
 static uint32 sCPUAPICIds[B_MAX_CPU_COUNT];
 static uint32 sCPUOSIds[B_MAX_CPU_COUNT];
 static uint32 sAPICVersions[B_MAX_CPU_COUNT];
 
 extern bool gUsingIOAPIC;
 extern "C" void init_sse(void);
-
-static uint32
-apic_read(uint32 offset)
-{
-	return *(volatile uint32 *)((char *)sLocalAPIC + offset);
-}
-
-
-static void
-apic_write(uint32 offset, uint32 data)
-{
-	*(volatile uint32 *)((char *)sLocalAPIC + offset) = data;
-}
-
-
-static status_t
-setup_apic(kernel_args *args, int32 cpu)
-{
-	TRACE(("setting up the APIC for CPU %ld...\n", cpu));
-	TRACE(("	apic id %ld, version %ld\n", apic_read(APIC_ID), apic_read(APIC_VERSION)));
-
-	/* set spurious interrupt vector to 0xff */
-	uint32 config = apic_read(APIC_SPURIOUS_INTR_VECTOR) & 0xffffff00;
-	config |= APIC_ENABLE | 0xff;
-	apic_write(APIC_SPURIOUS_INTR_VECTOR, config);
-
-	// don't touch the LINT0/1 configuration in virtual wire mode
-	// ToDo: implement support for other modes...
-#if 0
-	if (cpu == 0) {
-		/* setup LINT0 as ExtINT */
-		config = (apic_read(APIC_LINT0) & 0xffff00ff);
-		config |= APIC_LVT_DM_ExtINT | APIC_LVT_IIPP | APIC_LVT_TM;
-		apic_write(APIC_LINT0, config);
-
-		/* setup LINT1 as NMI */
-		config = (apic_read(APIC_LINT1) & 0xffff00ff);
-		config |= APIC_LVT_DM_NMI | APIC_LVT_IIPP;
-		apic_write(APIC_LINT1, config);
-	}
-	if (cpu > 0) {
-		dprintf("LINT0: %p\n", (void *)apic_read(APIC_LINT0));
-		dprintf("LINT1: %p\n", (void *)apic_read(APIC_LINT1));
-
-		/* disable LINT0/1 */
-		config = apic_read(APIC_LINT0);
-		apic_write(APIC_LINT0, config | APIC_LVT_MASKED);
-
-		config = apic_read(APIC_LINT1);
-		apic_write(APIC_LINT1, config | APIC_LVT_MASKED);
-	} else {
-		dprintf("0: LINT0: %p\n", (void *)apic_read(APIC_LINT0));
-		dprintf("0: LINT1: %p\n", (void *)apic_read(APIC_LINT1));
-	}
-#endif
-
-	apic_init_timer(args, cpu);
-
-	/* setup error vector to 0xfe */
-	config = (apic_read(APIC_LVT_ERROR) & 0xffffff00) | 0xfe;
-	apic_write(APIC_LVT_ERROR, config);
-
-	/* accept all interrupts */
-	config = apic_read(APIC_TASK_PRIORITY) & 0xffffff00;
-	apic_write(APIC_TASK_PRIORITY, config);
-
-	config = apic_read(APIC_SPURIOUS_INTR_VECTOR);
-	apic_write(APIC_EOI, 0);
-
-	return B_OK;
-}
 
 
 static int32
@@ -126,7 +51,7 @@ i386_ici_interrupt(void *data)
 	// if we are not using the IO APIC we need to acknowledge the
 	// interrupt ourselfs
 	if (!gUsingIOAPIC)
-		apic_write(APIC_EOI, 0);
+		apic_end_of_interrupt();
 
 	return smp_intercpu_int_handler(cpu);
 }
@@ -154,7 +79,7 @@ i386_smp_error_interrupt(void *data)
 	// if we are not using the IO APIC we need to acknowledge the
 	// interrupt ourselfs
 	if (!gUsingIOAPIC)
-		apic_write(APIC_EOI, 0);
+		apic_end_of_interrupt();
 
 	return B_HANDLED_INTERRUPT;
 }
@@ -165,10 +90,10 @@ arch_smp_init(kernel_args *args)
 {
 	TRACE(("arch_smp_init: entry\n"));
 
-	if (args->arch_args.apic == NULL)
+	if (!apic_available()) {
+		// if we don't have an apic we can't do smp
 		return B_OK;
-
-	sLocalAPIC = args->arch_args.apic;
+	}
 
 	// setup some globals
 	memcpy(sCPUAPICIds, args->arch_args.cpu_apic_id, sizeof(args->arch_args.cpu_apic_id));
@@ -194,7 +119,7 @@ arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
 {
 	// set up the local apic on the current cpu
 	TRACE(("arch_smp_init_percpu: setting up the apic on cpu %ld\n", cpu));
-	setup_apic(args, cpu);
+	apic_per_cpu_init(args, cpu);
 
 	init_sse();
 
