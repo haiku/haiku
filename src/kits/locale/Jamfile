@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src kits locale ;
 
-UsePrivateHeaders locale shared ;
+UsePrivateHeaders libbe locale shared ;
 UsePublicHeaders locale storage ;
 UseLibraryHeaders icu ;
 
@@ -24,6 +24,7 @@ SharedLibrary liblocale.so
 	  IntegerFormatParameters.cpp
 	  langinfo.cpp
 	  Language.cpp
+	  LibbeLocaleBackend.cpp
 	  LibraryInit.cpp
 	  Locale.cpp
 	  LocaleRoster.cpp
@@ -36,9 +37,13 @@ SharedLibrary liblocale.so
 	: be $(TARGET_LIBSTDC++) libicu-common.so libicu-i18n.so
 	;
 
+SEARCH on [ FGristFiles StringForSize.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
+SEARCH on [ FGristFiles ColorControl.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+
 DoCatalogs liblocale.so :
 	system
-	: ../shared/StringForSize.cpp
+	: StringForSize.cpp
+	  ColorControl.cpp
 	:
-	: '"systemCatalog\\s*->\\s*GetString\\s*"'
+	: '"(systemCatalog\\s*->\\s*GetString\\s*|BCatalogAddOn\\s*::\\s*MarkForTranslation\\s*)"'
 ;

@@ -19,6 +19,7 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 
 UsePrivateHeaders [ FDirName kernel ] ;  # For KMessage.h
 #UsePrivateHeaders syslog_daemon ;		# For syslog.cpp
+UsePrivateHeaders libbe ;
 
 # Build our libbe.so
 
@@ -27,6 +28,7 @@ AddResources libbe.so : libbe_version.rdef ;
 SetVersionScript libbe.so : libbe_versions ;
 
 SharedLibrary libbe.so :
+	LocaleBackend.cpp
 	:
 	<libbe>app_kit.o
 	<libbe>interface_kit.o

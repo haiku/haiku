@@ -23,8 +23,16 @@
 #include <Screen.h>
 #include <Window.h>
 
+#include <Catalog.h>
+#include <LocaleBackend.h>
+using BPrivate::gLocaleBackend;
+using BPrivate::LocaleBackend;
+
 #include <binary_compatibility/Interface.h>
 
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "ColorControl"
 
 static const uint32 kMsgColorEntered = 'ccol';
 static const uint32 kMinCellSize = 6;
@@ -68,6 +76,14 @@ void
 BColorControl::_InitData(color_control_layout layout, float size,
 	bool useOffscreen, BMessage* archive)
 {
+	// we need to translate some strings, and in order to do so, we need
+	// to use the LocaleBackend to reache liblocale.so
+	if (gLocaleBackend == NULL)
+{
+printf("trying to load backend\n");
+		LocaleBackend::LoadBackend();
+printf("backend = %p\n", gLocaleBackend);
+}	
 	fPaletteMode = BScreen(B_MAIN_SCREEN_ID).ColorSpace() == B_CMAP8;
 		//TODO: we don't support workspace and colorspace changing for now 
 		//		so we take the main_screen colorspace at startup
@@ -78,6 +94,15 @@ BColorControl::_InitData(color_control_layout layout, float size,
 	fSelectedPaletteColorIndex = -1;
 	fPreviousSelectedPaletteColorIndex = -1;
 	fFocusedComponent = 0;
+
+	const char* red = TR_MARK("Red:");
+	const char* green = TR_MARK("Green:");
+	const char* blue = TR_MARK("Blue:");
+	if (gLocaleBackend) {
+		red = gLocaleBackend->GetString(red, "ColorControl");
+		green = gLocaleBackend->GetString(green, "ColorControl");
+		blue = gLocaleBackend->GetString(blue, "ColorControl");
+	}
 		
 	if (archive) {
 		fRedText = (BTextControl*)FindView("_red");
@@ -95,7 +120,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 
 		// red
 
-		fRedText = new BTextControl(rect, "_red", "Red:", "0",
+		fRedText = new BTextControl(rect, "_red", red, "0",
 			new BMessage(kMsgColorEntered), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		fRedText->SetDivider(labelWidth);
@@ -111,7 +136,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 		// green
 
 		rect.OffsetBy(0.0f, offset);
-		fGreenText = new BTextControl(rect, "_green", "Green:", "0",
+		fGreenText = new BTextControl(rect, "_green", green, "0",
 			new BMessage(kMsgColorEntered), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		fGreenText->SetDivider(labelWidth);
@@ -125,7 +150,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 		// blue
 
 		rect.OffsetBy(0.0f, offset);
-		fBlueText = new BTextControl(rect, "_blue", "Blue:", "0",
+		fBlueText = new BTextControl(rect, "_blue", blue, "0",
 			new BMessage(kMsgColorEntered), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		fBlueText->SetDivider(labelWidth);
