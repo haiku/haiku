@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-StyledEdit	1909738892
+1	lithuanian	x-vnd.Haiku-StyledEdit	2750476595
 Paste	Menus		Įdėti
 OK	LoadAlert		Gerai
 File	Menus		Byla
@@ -15,6 +15,7 @@ Replace same	Menus		Keisti vienodus
 Can't undo	Menus		Neatšaukiama
 Save	Menus		Išsaugoti
 Replace with:	FindandReplaceWindow		Keisti į:
+Cancel	SaveAlert		Atsisakyti
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Negrįžtama, byla nerasta: „%s“.
 Case-sensitive	FindandReplaceWindow		Paisyti registro
 Green	Menus		Žalia
@@ -32,6 +33,7 @@ Font	Menus		Rašmenys
 Replace all	FindandReplaceWindow		Keisti viską
 Default	Open_and_SaveAsPanel		Numatytai
 Cancel	FindandReplaceWindow		Atsisakyti
+Save	SaveAlert		Išsaugoti
 Close	Menus		Uždaryti
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Įkėlimo klaida „%s“:\n\tNepalaikomas formatas
 OK	RevertToSavedAlert		Gerai
@@ -57,7 +59,9 @@ Find again	Menus		Rasti dar
 Cancel	QuitAlert		Atsisakyti
 Find…	Menus		Rasti…
 Select all	Menus		Žymėti viską
+Don't save	SaveAlert		Neišsaugoti
 Error loading \"%s\":\n\t%s	LoadAlert		Klaida įkeliant „%s“:\n\t%s
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Byla žymėta tik skaitymui. Išsaugoti dokumento „%s“ keitimus? 
 Black	Menus		Juoda
 Untitled 	StyledEditWindow		Bevardis 
 OK	SaveAlert		Gerai

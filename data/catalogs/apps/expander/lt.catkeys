@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Expander	1738666712
+1	lithuanian	x-vnd.Haiku-Expander	3642794258
 Expand	ExpanderMenu		Išskleisti
 Set destination…	ExpanderMenu		Paskirti vietą…
 File expanded	ExpanderWindow		Byla išskleista
@@ -12,7 +12,6 @@ Hide contents	ExpanderWindow		Slėpti turinį
 Cancel	ExpanderWindow		Atsisakyti
 Continue	ExpanderWindow		Tęsti
 Expander	ExpanderWindow	!! Window Title !!	Skleideris
-Expander\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		Expander „Skleideris“\n\tparašytas Jérôme'o Duval'io\n\tCopyright 2004-2006, Haiku Inc.\n\npirminė „Be“ versija parašyta \nDominic'o, Hiroshi'o, Peter'io, Pavel'o ir Robert'o\n
 The destination folder does not exist.	ExpanderWindow		Paskirties aplanko nėra.
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Tikrai norite stabdyti skleidimą šio\narchyvo? Kai kurios bylos gali būti ne iki galo išskleistos.
 Select	DirectoryFilePanel		Parinkti
@@ -25,10 +24,12 @@ Expanding file 	ExpanderWindow		Bylos skleidimas
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Aplankas buvo perkeltas, pervadintas arba\nnepalaikomas.
 The file doesn't exist	ExpanderWindow		Tokios bylos nėra
 Stop	ExpanderMenu		Stop
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tparašyta Jérôme'o Duval'io\n\tCopyright 2004-2006, Haiku Inc.\n\npirminė „Be“ versija \nDominic'o, Hiroshi'o, Peter'io, Pavel'o bei Robert'o\n
 File	ExpanderMenu		Byla
 Expand	ExpanderWindow		Išskleisti
 Close	ExpanderMenu		Uždaryti
 The destination is not a folder.	ExpanderWindow		Paskirties vieta nėra aplankas.
+Expander	About		Skleideris
 About Expander…	ExpanderMenu		Apie programą…
 OK	About		Gerai
 Set source…	ExpanderMenu		Parinkti šaltinį…
