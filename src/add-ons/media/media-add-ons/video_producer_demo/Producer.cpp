@@ -2,6 +2,8 @@
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
+
+
 #include <fcntl.h>
 #include <malloc.h>
 #include <math.h>
@@ -717,7 +719,7 @@ VideoProducer::FrameGenerator()
 				*(p++) = ((((x+y)^0^x)+fFrame) & 0xff) * (0x01010101 & fColor);
 
 		/* Send the buffer on down to the consumer */
-		if (SendBuffer(buffer, fOutput.destination) < B_OK) {
+		if (SendBuffer(buffer, fOutput.source, fOutput.destination) < B_OK) {
 			PRINTF(-1, ("FrameGenerator: Error sending buffer\n"));
 			/* If there is a problem sending the buffer, return it to its
 			 * buffer group. */

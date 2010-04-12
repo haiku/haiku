@@ -5,6 +5,8 @@
  * Copyright (c) 2002, 2003 Jerome Duval (jerome.duval@free.fr)
  * Distributed under the terms of the MIT License.
  */
+
+
 #include "OpenSoundNode.h"
 
 #include <Autolock.h>
@@ -2356,8 +2358,10 @@ OpenSoundNode::_RecThread(NodeOutput* output)
 		if (buffer) {
 			// send the buffer downstream if and only if output is enabled
 			status_t err = B_ERROR;
-			if (output->fOutputEnabled)
-				err = SendBuffer(buffer, output->fOutput.destination);
+			if (output->fOutputEnabled) {
+				err = SendBuffer(buffer, output->fOutput.source,
+					output->fOutput.destination);
+			}
 //			TRACE("OpenSoundNode::_RunThread: I avail: %d, OE %d, %s\n",
 //				avail, output->fOutputEnabled, strerror(err));
 			if (err != B_OK) {

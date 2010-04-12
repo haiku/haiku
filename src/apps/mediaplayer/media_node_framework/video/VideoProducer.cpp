@@ -5,6 +5,8 @@
  *	Copyright (c) 2000-2008, Stephan Aßmus <superstippi@gmx.de>,
  *	All Rights Reserved. Distributed under the terms of the MIT license.
  */
+
+
 #include "VideoProducer.h"
 
 #include <stdio.h>
@@ -812,7 +814,8 @@ h->start_time = 0;
 							err = B_OK;
 						}
 						// Send the buffer on down to the consumer
-						if (SendBuffer(buffer, fOutput.destination) < B_OK) {
+						if (SendBuffer(buffer, fOutput.source,
+								fOutput.destination) < B_OK) {
 							ERROR("_FrameGeneratorThread: Error "
 								"sending buffer\n");
 							// If there is a problem sending the buffer,

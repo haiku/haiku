@@ -671,7 +671,8 @@ struct media_header {
 	};
 	type_code		user_data_type;
 	uchar			user_data[64];	// user_data_type indicates what this is
-	uint32			_reserved_[2];
+	int32			source;
+	port_id			source_port;
 
 	off_t			file_pos;		// where in a file this data came from
 	size_t			orig_size;		// and how big it was.  if unused, zero out

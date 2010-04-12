@@ -100,7 +100,8 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn, bool isSystemMixer)
 	fBufferGroup(0),
 	fDownstreamLatency(1),
 	fInternalLatency(1),
-	fDisableStop(false)
+	fDisableStop(false),
+	fLastLateNotification(0)
 {
 	BMediaNode::AddNodeKind(B_SYSTEM_MIXER);
 
@@ -294,13 +295,6 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 
 	//PRINT(4, "buffer received at %12Ld, should arrive at %12Ld, delta %12Ld\n", TimeSource()->Now(), buffer->Header()->start_time, TimeSource()->Now() - buffer->Header()->start_time);
 
-	// Note: The following code is outcommented on purpose
-	// and is about to be modified at a later point
-	//	HandleInputBuffer(buffer, 0);
-	//	buffer->Recycle();
-	//	return;
-
-
 	// to receive the buffer at the right time,
 	// push it through the event looper
 	media_timed_event event(buffer->Header()->start_time,
@@ -311,37 +305,33 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 
 
 void
-AudioMixer::HandleInputBuffer(BBuffer *buffer, bigtime_t lateness)
+AudioMixer::HandleInputBuffer(BBuffer* buffer, bigtime_t lateness)
 {
-	// Note: The following code is outcommented on purpose
-	// and is about to be modified at a later point
-	/*
-	if (lateness > 5000) {
-		printf("Received buffer with way to high lateness %Ld\n", lateness);
-		if (RunMode() != B_DROP_DATA) {
-			printf("sending notify\n");
-			NotifyLateProducer(channel->fInput.source, lateness / 2, TimeSource()->Now());
-		} else if (RunMode() == B_DROP_DATA) {
-			printf("dropping buffer\n");
-			return;
+	if (lateness > 0) {
+		debug_printf("Received buffer %Ld usec late\n", lateness);
+		if (RunMode() == B_DROP_DATA || RunMode() == B_DECREASE_PRECISION
+			|| RunMode() == B_INCREASE_LATENCY) {
+			debug_printf("sending notify\n");
+			
+			// Build a media_source out of the header data
+			media_source source = media_source::null;
+			source.port = buffer->Header()->source_port;
+			source.id = buffer->Header()->source;
+
+			NotifyLateProducer(source, lateness, TimeSource()->Now());
+
+			if (RunMode() == B_DROP_DATA) {
+				debug_printf("dropping buffer\n");
+				return;
+			}
 		}
 	}
-	*/
 
 	//	printf("Received buffer with lateness %Ld\n", lateness);
 
 	fCore->Lock();
 	fCore->BufferReceived(buffer, lateness);
 	fCore->Unlock();
-
-	// Note: The following code is outcommented on purpose
-	// and is about to be modified at a later point
-	/*
-		if ((B_OFFLINE == RunMode()) && (B_DATA_AVAILABLE == channel->fProducerDataStatus))
-		{
-			RequestAdditionalBuffer(channel->fInput.source, buffer);
-		}
-	*/
 }
 
 
@@ -894,9 +884,8 @@ AudioMixer::Connect(status_t error, const media_source &source,
 		return;
 	}
 
-	/* Switch our prefered format to have the same
-	 * frame_rate and channel count as the output.
-	 */
+	// Switch our prefered format to have the same
+	// frame_rate and channel count as the output.
 	fDefaultFormat.u.raw_audio.frame_rate = format.u.raw_audio.frame_rate;
 	fDefaultFormat.u.raw_audio.channel_count = format.u.raw_audio.channel_count;
 
@@ -953,6 +942,7 @@ AudioMixer::Connect(status_t error, const media_source &source,
 	UpdateParameterWeb();
 }
 
+
 void
 AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 {
@@ -991,37 +981,37 @@ AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 
 
 void
-AudioMixer::LateNoticeReceived(const media_source &what, bigtime_t how_much,
-	bigtime_t performance_time)
+AudioMixer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
+	bigtime_t performanceTime)
 {
 	// We've produced some late buffers... Increase Latency
 	// is the only runmode in which we can do anything about this
+	// TODO: quality could be decreased, too
 
-	ERROR("AudioMixer::LateNoticeReceived, %Ld too late at %Ld\n", how_much,
-		performance_time);
-	// Note: The following code is outcommented on purpose
-	// and is about to be modified at a later point
-	/*
-	if (what == fOutput.source) {
-		if (RunMode() == B_INCREASE_LATENCY) {
-			fInternalLatency += how_much;
+	ERROR("AudioMixer::LateNoticeReceived, %Ld too late at %Ld\n", howMuch,
+		performanceTime);
 
-			if (fInternalLatency > 50000)
-				fInternalLatency = 50000;
+	if (what == fCore->Output()->MediaOutput().source
+		&& RunMode() == B_INCREASE_LATENCY) {
+		// We need to ignore subsequent notices whose performance time
+		// lies before the performance time of the last notification
+		if (performanceTime < fLastLateNotification)
+			return;
 
-			printf("AudioMixer: increasing internal latency to %Ld usec\n", fInternalLatency);
-			SetEventLatency(fDownstreamLatency + fInternalLatency);
+		fInternalLatency += howMuch;
+		fLastLateNotification = TimeSource()->Now();
 
-			PublishEventLatencyChange();
-		}
+		debug_printf("AudioMixer: increasing internal latency to %Ld usec\n", fInternalLatency);
+		SetEventLatency(fDownstreamLatency + fInternalLatency);
+
+		PublishEventLatencyChange();
 	}
-	*/
 }
 
 
 void
-AudioMixer::EnableOutput(const media_source &what, bool enabled,
-	int32 *_deprecated_)
+AudioMixer::EnableOutput(const media_source& what, bool enabled,
+	int32 */*deprecated*/)
 {
 	// we only have one output
 	if (what.id != 0 || what.port != ControlPort())
@@ -1046,12 +1036,12 @@ AudioMixer::NodeRegistered()
 
 
 void
-AudioMixer::SetTimeSource(BTimeSource * time_source)
+AudioMixer::SetTimeSource(BTimeSource* timeSource)
 {
 	TRACE("AudioMixer::SetTimeSource: timesource is now %ld\n",
-		time_source->ID());
+		timeSource->ID());
 	fCore->Lock();
-	fCore->SetTimingInfo(time_source, fDownstreamLatency);
+	fCore->SetTimingInfo(timeSource, fDownstreamLatency);
 	fCore->Unlock();
 }
 
@@ -1156,6 +1146,14 @@ AudioMixer::CreateBufferGroup()
 }
 
 
+status_t
+AudioMixer::SendBuffer(BBuffer* buffer, MixerOutput* output)
+{
+	return BBufferProducer::SendBuffer(buffer, output->MediaOutput().source,
+		output->MediaOutput().destination);
+}
+
+
 float
 AudioMixer::dB_to_Gain(float db)
 {
@@ -1200,7 +1198,7 @@ AudioMixer::Gain_to_dB(float gain)
 }
 
 
-//	#pragma markß - BControllable methods
+// #pragma mark - BControllable methods
 
 
 status_t

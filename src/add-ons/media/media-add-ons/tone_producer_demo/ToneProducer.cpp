@@ -797,17 +797,18 @@ ToneProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness, bo
 	case BTimedEventQueue::B_HANDLE_BUFFER:
 		{
 			// make sure we're both started *and* connected before delivering a buffer
-			if ((RunState() == BMediaEventLooper::B_STARTED) && (mOutput.destination != media_destination::null))
-			{
+			if (RunState() == BMediaEventLooper::B_STARTED
+				&& mOutput.destination != media_destination::null) {
 				// Get the next buffer of data
 				BBuffer* buffer = FillNextBuffer(event->event_time);
-				if (buffer)
-				{
+				if (buffer) {
 					// send the buffer downstream if and only if output is enabled
 					status_t err = B_ERROR;
-					if (mOutputEnabled) err = SendBuffer(buffer, mOutput.destination);
-					if (err)
-					{
+					if (mOutputEnabled) {
+						err = SendBuffer(buffer, mOutput.source,
+							mOutput.destination);
+					}
+					if (err) {
 						// we need to recycle the buffer ourselves if output is disabled or
 						// if the call to SendBuffer() fails
 						buffer->Recycle();
@@ -820,8 +821,10 @@ ToneProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness, bo
 				mFramesSent += nFrames;
 
 				// The buffer is on its way; now schedule the next one to go
-				bigtime_t nextEvent = mStartTime + bigtime_t(double(mFramesSent) / double(mOutput.format.u.raw_audio.frame_rate) * 1000000.0);
-				media_timed_event nextBufferEvent(nextEvent, BTimedEventQueue::B_HANDLE_BUFFER);
+				bigtime_t nextEvent = mStartTime + bigtime_t(double(mFramesSent)
+					/ double(mOutput.format.u.raw_audio.frame_rate) * 1000000.0);
+				media_timed_event nextBufferEvent(nextEvent,
+					BTimedEventQueue::B_HANDLE_BUFFER);
 				EventQueue()->AddEvent(nextBufferEvent);
 			}
 		}

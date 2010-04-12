@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku.
+ * Copyright 2002-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -664,7 +664,8 @@ SoundPlayNode::SendNewBuffer(const media_timed_event* event,
 			}
 */
 			// send the buffer downstream if and only if output is enabled
-			if (B_OK != SendBuffer(buffer, fOutput.destination)) {
+			if (SendBuffer(buffer, fOutput.source, fOutput.destination)
+					!= B_OK) {
 				// we need to recycle the buffer
 				// if the call to SendBuffer() fails
 				printf("SoundPlayNode::SendNewBuffer: Buffer sending "

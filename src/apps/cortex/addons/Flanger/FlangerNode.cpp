@@ -296,8 +296,8 @@ void FlangerNode::BufferReceived(
 	// process and retransmit buffer
 	filterBuffer(pBuffer);
 
-	status_t err = SendBuffer(pBuffer, m_output.destination);
-	if(err < B_OK) {
+	status_t err = SendBuffer(pBuffer, m_output.source, m_output.destination);
+	if (err < B_OK) {
 		PRINT(("FlangerNode::BufferReceived():\n"
 			"\tSendBuffer() failed: %s\n", strerror(err)));
 		pBuffer->Recycle();
@@ -309,12 +309,11 @@ void FlangerNode::BufferReceived(
 //   pFormat; as of R4.5 the Media Kit passes poInput->format to
 //   the producer in BBufferProducer::Connect().
 
-status_t FlangerNode::Connected(
-	const media_source& source,
-	const media_destination& destination,
-	const media_format& format,
-	media_input* poInput) {
-
+status_t
+FlangerNode::Connected(const media_source& source,
+	const media_destination& destination, const media_format& format,
+	media_input* poInput)
+{
 	PRINT(("FlangerNode::Connected()\n"
 		"\tto source %ld\n", source.id));
 

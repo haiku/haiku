@@ -8,6 +8,7 @@
  * Copyright (c) 2004-2007 Marcus Overhagen <marcus@overhagen.de>
  */
 
+
 #include "FireWireDVNode.h"
 
 #include <fcntl.h>
@@ -602,7 +603,8 @@ FireWireDVNode::card_reader_thread()
 			hdr->start_time = TimeSource()->PerformanceTimeFor(system_time());
 
 			fLock.Lock();
-			if (B_OK != SendBuffer(buf, fOutputEncVideo.destination)) {
+			if (SendBuffer(buf, fOutputEncVideo.source,
+					fOutputEncVideo.destination) != B_OK) {
 				TRACE("OutVideo: sending buffer failed\n");
 				buf->Recycle();
 			} 

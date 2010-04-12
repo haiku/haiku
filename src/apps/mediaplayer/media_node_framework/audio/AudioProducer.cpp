@@ -7,6 +7,7 @@
  * All Rights Reserved. Distributed under the terms of the MIT license.
  */
 
+
 #include "AudioProducer.h"
 
 #include <math.h>
@@ -465,7 +466,7 @@ AudioProducer::Disconnect(const media_source& what,
 	TRACE("%p->AudioProducer::Disconnect()\n", this);
 
 	// Make sure that our connection is the one being disconnected
-	if ((where == fOutput.destination) && (what == fOutput.source)) {
+	if (where == fOutput.destination && what == fOutput.source) {
 		fOutput.destination = media_destination::null;
 		fOutput.format = fPreferredFormat;
 		TRACE("AudioProducer:  deleting buffer group...\n");
@@ -547,7 +548,7 @@ AudioProducer::LatencyChanged(const media_source& source,
 {
 	TRACE("%p->AudioProducer::LatencyChanged(%lld)\n", this, newLatency);
 
-	if ((source == fOutput.source) && (destination == fOutput.destination)) {
+	if (source == fOutput.source && destination == fOutput.destination) {
 		fLatency = newLatency;
 		SetEventLatency(fLatency + fInternalLatency);
 	}
@@ -610,20 +611,22 @@ printf("B_START: start time: %lld\n", fStartTime);
 			TRACE("AudioProducer::HandleEvent(B_STOP) done\n");
 			break;
 
-		case BTimedEventQueue::B_HANDLE_BUFFER: {
+		case BTimedEventQueue::B_HANDLE_BUFFER:
+		{
 			TRACE_BUFFER("AudioProducer::HandleEvent(B_HANDLE_BUFFER)\n");
-			if ((RunState() == BMediaEventLooper::B_STARTED)
-				&& (fOutput.destination != media_destination::null)) {
+			if (RunState() == BMediaEventLooper::B_STARTED
+				&& fOutput.destination != media_destination::null) {
 				BBuffer* buffer = _FillNextBuffer(event->event_time);
 				if (buffer) {
 					status_t err = B_ERROR;
-					if (fOutputEnabled)
-						err = SendBuffer(buffer, fOutput.destination);
+					if (fOutputEnabled) {
+						err = SendBuffer(buffer, fOutput.source,
+							fOutput.destination);
+					}
 					if (err)
 						buffer->Recycle();
 				}
-				size_t sampleSize
-					= fOutput.format.u.raw_audio.format
+				size_t sampleSize = fOutput.format.u.raw_audio.format
 						& media_raw_audio_format::B_AUDIO_SIZE_MASK;
 
 				size_t nFrames = fOutput.format.u.raw_audio.buffer_size

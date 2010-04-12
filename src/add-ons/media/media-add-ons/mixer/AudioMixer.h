@@ -1,11 +1,11 @@
 /*
  * Copyright 2002 David Shipman,
  * Copyright 2003-2007 Marcus Overhagen
- * Copyright 2007 Haiku Inc. All rights reserved.
+ * Copyright 2007-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _AUDIOMIXER_H
-#define _AUDIOMIXER_H
+#ifndef AUDIO_MIXER_H
+#define AUDIO_MIXER_H
 
 
 #include <BufferConsumer.h>
@@ -17,125 +17,126 @@
 
 
 class MixerCore;
+class MixerOutput;
 
 
 class AudioMixer : public BBufferConsumer, public BBufferProducer,
 	public BControllable, public BMediaEventLooper {
 public:
-							AudioMixer(BMediaAddOn *addOn, bool isSystemMixer);
-							~AudioMixer();
+								AudioMixer(BMediaAddOn* addOn,
+									bool isSystemMixer);
+	virtual						~AudioMixer();
 
-		void				DisableNodeStop();
+			void				DisableNodeStop();
 
-		// AudioMixer support
-		void				ApplySettings();
+	// AudioMixer support
+			void				ApplySettings();
 
-		void				PublishEventLatencyChange();
-		void				UpdateParameterWeb();
+			void				PublishEventLatencyChange();
+			void				UpdateParameterWeb();
 
-		void				HandleInputBuffer(BBuffer *buffer, bigtime_t lateness);
+			void				HandleInputBuffer(BBuffer* buffer,
+									bigtime_t lateness);
 
-		BBufferGroup *		CreateBufferGroup();
+			BBufferGroup*		CreateBufferGroup();
 
-		float				dB_to_Gain(float db);
-		float				Gain_to_dB(float gain);
+			status_t			SendBuffer(BBuffer* buffer,
+									MixerOutput* output);
 
-		// BMediaNode methods
-		BMediaAddOn *		AddOn(int32 *internal_id) const;
-		void				NodeRegistered();
-		void 				Stop(bigtime_t performance_time, bool immediate);
-		void 				SetTimeSource(BTimeSource * time_source);
-		using BBufferProducer::SendBuffer;
+			float				dB_to_Gain(float db);
+			float				Gain_to_dB(float gain);
+
+	// BMediaNode methods
+	virtual	BMediaAddOn*		AddOn(int32* _internalID) const;
+	virtual	void				NodeRegistered();
+	virtual	void 				Stop(bigtime_t performanceTime, bool immediate);
+	virtual	void 				SetTimeSource(BTimeSource* timeSource);
 
 protected:
-		// BControllable methods
-		status_t 			GetParameterValue(int32 id,
-											bigtime_t *last_change,
-											void *value,
-											size_t *ioSize);
+	// BControllable methods
+	virtual	status_t 			GetParameterValue(int32 id,
+									bigtime_t* _lastChange, void* _value,
+									size_t* _size);
+	virtual	void				SetParameterValue(int32 id, bigtime_t when,
+									const void* value, size_t size);
 
-		void				SetParameterValue(int32 id, bigtime_t when,
-											const void *value,
-											size_t size);
+	// BBufferConsumer methods
+	virtual	status_t			HandleMessage(int32 message, const void* data,
+									size_t size);
+	virtual	status_t			AcceptFormat(const media_destination& dest,
+									media_format* format);
+	virtual	status_t			GetNextInput(int32* cookie,
+									media_input* _input);
+	virtual	void				DisposeInputCookie(int32 cookie);
+	virtual	void				BufferReceived(BBuffer *buffer);
+	virtual	void				ProducerDataStatus(
+									const media_destination& forWhom,
+									int32 status, bigtime_t atPerformanceTime);
+	virtual	status_t			GetLatencyFor(const media_destination& forWhom,
+									bigtime_t* _latency,
+									media_node_id* _timesource);
+	virtual	status_t			Connected(const media_source& producer,
+									const media_destination& where,
+									const media_format& withFormat,
+									media_input* _input);
+	virtual	void				Disconnected(const media_source& producer,
+									const media_destination& where);
+	virtual	status_t			FormatChanged(const media_source& producer,
+									const media_destination& consumer,
+									int32 changeTag,
+									const media_format& format);
 
-		// BBufferConsumer methods
-		status_t			HandleMessage(int32 message, const void* data,
-											size_t size);
-		status_t			AcceptFormat(const media_destination &dest,
-											media_format *format);
-		status_t			GetNextInput(int32 *cookie,
-											media_input *out_input);
-		void				DisposeInputCookie(int32 cookie);
-		void				BufferReceived(BBuffer *buffer);
-		void				ProducerDataStatus(const media_destination &for_whom,
-											int32 status,
-											bigtime_t at_performance_time);
-		status_t			GetLatencyFor(const media_destination &for_whom,
-											bigtime_t *out_latency,
-											media_node_id *out_timesource);
-		status_t			Connected(const media_source &producer,
-											const media_destination &where,
-											const media_format &with_format,
-											media_input *out_input);
-		void				Disconnected(const media_source &producer,
-											const media_destination &where);
-		status_t			FormatChanged(const media_source &producer,
-											const media_destination &consumer,
-											int32 change_tag,
-											const media_format &format);
-
-		// BBufferProducer methods
-		status_t 			FormatSuggestionRequested(media_type type,
-											int32 quality,
-											media_format *format);
-		status_t 			FormatProposal(const media_source &output,
-											media_format *format);
-		status_t			FormatChangeRequested(
-											const media_source& source,
-											const media_destination &destination,
-											media_format *io_format,
-											int32 *_deprecated_);
-		status_t			GetNextOutput(int32 *cookie,media_output *out_output);
-		status_t			DisposeOutputCookie(int32 cookie);
-		status_t			SetBufferGroup(const media_source &for_source,
-											BBufferGroup *group);
-		status_t			GetLatency(bigtime_t *out_latency);
-		status_t			PrepareToConnect(const media_source &what,
-											const media_destination &where,
-											media_format *format,
-											media_source *out_source,
-											char *out_name);
-		void				Connect(status_t error,
-											const media_source &source,
-											const media_destination &destination,
-											const media_format &format,
-											char *io_name);
-		void				Disconnect(const media_source &what,
-											const media_destination &where);
-		void				LateNoticeReceived(const media_source &what,
-											bigtime_t how_much,
-											bigtime_t performance_time);
-		void				EnableOutput(const media_source &what,
-											bool enabled,
-											int32 *_deprecated_);
-		void				LatencyChanged(const media_source &source,
-											const media_destination &destination,
-											bigtime_t new_latency, uint32 flags);
+	// BBufferProducer methods
+	virtual	status_t 			FormatSuggestionRequested(media_type type,
+									int32 quality, media_format* format);
+	virtual	status_t 			FormatProposal(const media_source& output,
+									media_format* format);
+	virtual	status_t			FormatChangeRequested(
+									const media_source& source,
+									const media_destination &destination,
+									media_format* format,
+									int32* /*deprecated*/);
+	virtual	status_t			GetNextOutput(int32* cookie,
+									media_output* _output);
+	virtual	status_t			DisposeOutputCookie(int32 cookie);
+	virtual	status_t			SetBufferGroup(const media_source& source,
+									BBufferGroup* group);
+	virtual	status_t			GetLatency(bigtime_t* _latency);
+	virtual	status_t			PrepareToConnect(const media_source& what,
+									const media_destination& where,
+									media_format* format, media_source* _source,
+									char* _name);
+	virtual	void				Connect(status_t error,
+									const media_source& source,
+									const media_destination& destination,
+									const media_format& format, char *_name);
+	virtual	void				Disconnect(const media_source& what,
+									const media_destination& where);
+	virtual	void				LateNoticeReceived(const media_source& what,
+									bigtime_t howMuch,
+									bigtime_t performanceTime);
+	virtual	void				EnableOutput(const media_source& what,
+									bool enabled, int32* /*_deprecated_*/);
+	virtual	void				LatencyChanged(const media_source& source,
+									const media_destination& destination,
+									bigtime_t newLatency, uint32 flags);
 
 		// BMediaEventLooper methods
-		void				HandleEvent(const media_timed_event *event,
-											bigtime_t lateness,
-											bool realTimeEvent = false);
+	virtual	void				HandleEvent(const media_timed_event* event,
+									bigtime_t lateness,
+									bool realTimeEvent = false);
 
 private:
-		BMediaAddOn			*fAddOn;
-		MixerCore			*fCore;
-		BParameterWeb		*fWeb; // local pointer to parameterweb
-		BBufferGroup		*fBufferGroup;
-		bigtime_t			fDownstreamLatency;
-		bigtime_t			fInternalLatency;
-		bool				fDisableStop;
-		media_format		fDefaultFormat;
+			BMediaAddOn*		fAddOn;
+			MixerCore*			fCore;
+			BParameterWeb*		fWeb;
+			BBufferGroup*		fBufferGroup;
+			bigtime_t			fDownstreamLatency;
+			bigtime_t			fInternalLatency;
+			bool				fDisableStop;
+			media_format		fDefaultFormat;
+			bigtime_t			fLastLateNotification;
 };
 
-#endif	// _AUDIOMIXER_H
+
+#endif	// AUDIO_MIXER_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -530,8 +530,7 @@ MixerCore::MixThread()
 				hdr->size_used = size;
 				hdr->time_source = fTimeSource->ID();
 				hdr->start_time = event_time;
-				if (fNode->SendBuffer(buf, fOutput->MediaOutput().destination)
-						!= B_OK) {
+				if (fNode->SendBuffer(buf, fOutput) != B_OK) {
 #if DEBUG
 					ERROR("MixerCore: SendBuffer failed for buffer %Ld\n",
 						buffer_num);
@@ -664,8 +663,7 @@ MixerCore::MixThread()
 			fOutput->AdjustByteOrder(buf);
 
 			// send the buffer
-			status_t res = fNode->SendBuffer(buf,
-				fOutput->MediaOutput().destination);
+			status_t res = fNode->SendBuffer(buf, fOutput);
 			if (res != B_OK) {
 #if DEBUG
 				ERROR("MixerCore: SendBuffer failed for buffer %Ld\n",

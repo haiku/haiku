@@ -1764,7 +1764,7 @@ MultiAudioNode::_RunThread()
 						// enabled
 						status_t err = B_ERROR;
 						if (output->fOutputEnabled) {
-							err = SendBuffer(buffer,
+							err = SendBuffer(buffer, output->fOutput.source,
 								output->fOutput.destination);
 						}
 						if (err) {

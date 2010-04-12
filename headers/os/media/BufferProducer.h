@@ -138,6 +138,7 @@ protected:
 
 	// NOTE: Use this function to pass on the buffer on to the BBufferConsumer.
 			status_t			SendBuffer(BBuffer* buffer,
+									const media_source& source, 
 									const media_destination& destination);
 
 			status_t			SendDataStatus(int32 status,
@@ -204,6 +205,10 @@ private:
 	virtual	status_t			_Reserved_BufferProducer_13(void*);
 	virtual	status_t			_Reserved_BufferProducer_14(void*);
 	virtual	status_t			_Reserved_BufferProducer_15(void*);
+
+	// deprecated calls
+			status_t			SendBuffer(BBuffer* buffer,
+									const media_destination& destination);
 
 private:
 			friend class BBufferConsumer;

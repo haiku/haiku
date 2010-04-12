@@ -22,6 +22,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
 #include <fcntl.h>
 #include <malloc.h>
 #include <math.h>
@@ -1670,7 +1671,8 @@ DVBMediaNode::raw_audio_thread()
 		hdr->time_source = TimeSource()->ID();	// set time source id
 		hdr->start_time = start_time;			// set start time
 		lock.Lock();
-		if (B_OK != SendBuffer(buf, fOutputRawAudio.destination)) {
+		if (SendBuffer(buf, fOutputRawAudio.source, fOutputRawAudio.destination)
+				!= B_OK) {
 			TRACE("audio: sending buffer failed\n");
 			buf->Recycle();
 		} 
@@ -1866,7 +1868,8 @@ DVBMediaNode::raw_video_thread()
 		hdr->time_source = TimeSource()->ID();	// set time source id
 		hdr->start_time = start_time;			// set start time
 		lock.Lock();
-		if (B_OK != SendBuffer(buf, fOutputRawVideo.destination)) {
+		if (SendBuffer(buf, fOutputRawVideo.source, fOutputRawVideo.destination)
+				!= B_OK) {
 			TRACE("video: sending buffer failed\n");
 			buf->Recycle();
 		} 

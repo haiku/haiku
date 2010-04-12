@@ -968,7 +968,7 @@ PRINT(("PS: %Ld\n", fProcessingLatency));
 
 		PRINTF(1, ("FrameGenerator: SendBuffer...\n"));
 		/* Send the buffer on down to the consumer */
-		if (SendBuffer(buffer, fOutput.destination) < B_OK) {
+		if (SendBuffer(buffer, fOutput.source, fOutput.destination) < B_OK) {
 			PRINTF(-1, ("FrameGenerator: Error sending buffer\n"));
 			/* If there is a problem sending the buffer, return it to its
 			 * buffer group. */

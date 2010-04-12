@@ -523,8 +523,8 @@ void AudioFilterNode::BufferReceived(
 	// process and retransmit buffer
 	processBuffer(buffer, outBuffer);
 
-	status_t err = SendBuffer(outBuffer, m_output.destination);
-	if(err < B_OK) {
+	status_t err = SendBuffer(outBuffer, m_output.source, m_output.destination);
+	if (err < B_OK) {
 		PRINT(("AudioFilterNode::BufferReceived():\n"
 			"\tSendBuffer() failed: %s\n", strerror(err)));
 		outBuffer->Recycle();

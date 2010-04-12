@@ -1,73 +1,53 @@
-/*****************************************************************************/
-// GameProdcure.h
-//
-// This produce creates audio buffer on behalf of the GameKit.
-//
-// Copyright (c) 2001 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		GameProducer.cpp
-//	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
-//	Description:	A MediaKit producer node which mixes sound from the GameKit
-//					and sends them to the audio mixer
-/*****************************************************************************/
+/*
+ * Copyright 2002-2010 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Christopher ML Zumwalt May (zummy@users.sf.net)
+ */
 
-// Standard Includes -----------------------------------------------------------
+
+/*!	A MediaKit producer node which mixes sound from the GameKit
+	and sends them to the audio mixer
+*/
+
+
 #include <string.h>
 #include <stdio.h>
 
-// System Includes -------------------------------------------------------------
-#include <ByteOrder.h>
-#include <BufferGroup.h>
 #include <Buffer.h>
+#include <BufferGroup.h>
+#include <ByteOrder.h>
 #include <List.h>
-#include <TimeSource.h>
 #include <MediaDefs.h>
+#include <TimeSource.h>
 
-// Project Includes ------------------------------------------------------------
 #include "GameSoundBuffer.h"
 #include "GameSoundDevice.h"
 #include "GSUtility.h"
 
-// Local Includes --------------------------------------------------------------
 #include "GameProducer.h"
 
-// Local Defines ---------------------------------------------------------------
-struct _gs_play 
-{
-	gs_id sound;
-	bool * hook;
+
+struct _gs_play  {
+	gs_id		sound;
+	bool*		hook;
 	
-	_gs_play * next;
-	_gs_play * previous;
+	_gs_play*	next;
+	_gs_play*	previous;
 };
 
-GameProducer::GameProducer(GameSoundBuffer * object, 
-							const gs_audio_format * format)
-		:	BMediaNode("GameProducer.h"),
-			BBufferProducer(B_MEDIA_RAW_AUDIO),
-			BMediaEventLooper(),
-			fBufferGroup(NULL),
-			fLatency(0),
-			fInternalLatency(0),
-			fOutputEnabled(true)
+
+GameProducer::GameProducer(GameSoundBuffer* object,
+		const gs_audio_format* format)
+	:
+	BMediaNode("GameProducer.h"),
+	BBufferProducer(B_MEDIA_RAW_AUDIO),
+	BMediaEventLooper(),
+	fBufferGroup(NULL),
+	fLatency(0),
+	fInternalLatency(0),
+	fOutputEnabled(true)
 {
 	// initialize our preferred format object
 	fPreferredFormat.type = B_MEDIA_RAW_AUDIO;
@@ -468,8 +448,10 @@ GameProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness, bo
 				if (buffer) {
 					// send the buffer downstream if and only if output is enabled
 					status_t err = B_ERROR;
-					if (fOutputEnabled)
-						err = SendBuffer(buffer, fOutput.destination);
+					if (fOutputEnabled) {
+						err = SendBuffer(buffer, fOutput.source,
+							fOutput.destination);
+					}
 					if (err) {
 						// we need to recycle the buffer ourselves if output is disabled or
 						// if the call to SendBuffer() fails
