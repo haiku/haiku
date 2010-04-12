@@ -18,6 +18,7 @@
 #include <InterfaceDefs.h>
 #include <LayoutUtils.h>
 #include <Message.h>
+#include <String.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <Window.h>
@@ -204,28 +205,22 @@ void
 _BTextInput_::InsertText(const char* inText, int32 inLength,
 	int32 inOffset, const text_run_array* inRuns)
 {
-	char* buffer = NULL;
-
-	if (strpbrk(inText, "\r\n") && inLength <= 1024) {
-		buffer = (char*)malloc(inLength + 1);
-
-		if (buffer) {
-			strlcpy(buffer, inText, inLength + 1);
-
-			for (int32 i = 0; i < inLength; i++) {
-				if (buffer[i] == '\r' || buffer[i] == '\n')
-					buffer[i] = ' ';
-			}
-		}
+	// Filter all line breaks, note that inText is not terminated.
+	if (inLength == 1) {
+		if (*inText == '\n' || *inText == '\r')
+			BTextView::InsertText(" ", 1, inOffset, inRuns);
+		else
+			BTextView::InsertText(inText, 1, inOffset, inRuns);
+	} else {
+		BString filteredText(inText, inLength);
+		filteredText.ReplaceAll('\n', ' ');
+		filteredText.ReplaceAll('\r', ' ');
+		BTextView::InsertText(filteredText.String(), inLength, inOffset,
+			inRuns);
 	}
-
-	BTextView::InsertText(buffer ? buffer : inText, inLength, inOffset,
-		inRuns);
 
 	TextControl()->InvokeNotify(TextControl()->ModificationMessage(),
 		B_CONTROL_MODIFIED);
-
-	free(buffer);
 }
 
 
