@@ -91,6 +91,20 @@ typedef struct filecookie
 	off_t	last_size;
 } filecookie;
 
+typedef struct attrcookie
+{
+	int	omode;
+	ntfs_inode *inode;
+	ntfs_attr *stream;
+	// MFT ref for EA ?
+} attrcookie;
+
+typedef struct attrdircookie
+{
+	ntfs_inode *inode;
+	ntfs_attr_search_ctx *ctx;
+} attrdircookie;
+
 #define ntfs_mark_free_space_outdated(ns) (ns->state |= (NF_FreeClustersOutdate | NF_FreeMFTOutdate));
 
 
