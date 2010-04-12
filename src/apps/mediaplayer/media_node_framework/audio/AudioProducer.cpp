@@ -37,13 +37,13 @@
 // debugging
 //#define TRACE_AUDIO_PRODUCER
 #ifdef TRACE_AUDIO_PRODUCER
-# define TRACE(x...)		printf(x)
-# define TRACE_BUFFER(x...)
-# define ERROR(x...)		fprintf(stderr, x)
+#	define TRACE(x...)		printf(x)
+#	define TRACE_BUFFER(x...)
+#	define ERROR(x...)		fprintf(stderr, x)
 #else
-# define TRACE(x...)
-# define TRACE_BUFFER(x...)
-# define ERROR(x...)		fprintf(stderr, x)
+#	define TRACE(x...)
+#	define TRACE_BUFFER(x...)
+#	define ERROR(x...)		fprintf(stderr, x)
 #endif
 
 
@@ -85,24 +85,63 @@ init_media_file(media_format format, BMediaTrack** _track)
 #endif // DEBUG_TO_FILE
 
 
+static bigtime_t
+estimate_internal_latency(const media_format& format)
+{
+	bigtime_t startTime = system_time();
+	// calculate the number of samples per buffer
+	int32 sampleSize = format.u.raw_audio.format
+		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
+	int32 sampleCount = format.u.raw_audio.buffer_size / sampleSize;
+	// alloc float buffers of this size
+	const int bufferCount = 10;	// number of input buffers
+	float* buffers[bufferCount + 1];
+	for (int32 i = 0; i < bufferCount + 1; i++)
+		buffers[i] = new float[sampleCount];
+	float* outBuffer = buffers[bufferCount];
+	// fill all buffers save the last one with arbitrary data and merge them
+	// into the last one
+	for (int32 i = 0; i < bufferCount; i++) {
+		for (int32 k = 0; k < sampleCount; k++) {
+			buffers[i][k] = ((float)i * (float)k)
+				/ float(bufferCount * sampleCount);
+		}
+	}
+	for (int32 k = 0; k < sampleCount; k++) {
+		outBuffer[k] = 0;
+		for (int32 i = 0; i < bufferCount; i++)
+			outBuffer[k] += buffers[i][k];
+		outBuffer[k] /= bufferCount;
+	}
+	// cleanup
+	for (int32 i = 0; i < bufferCount + 1; i++)
+		delete[] buffers[i];
+	return system_time() - startTime;
+}
 
-// constructor
+
+// #pragma mark -
+
+
 AudioProducer::AudioProducer(const char* name, AudioSupplier* supplier,
 		bool lowLatency)
-	: BMediaNode(name),
-	  BBufferProducer(B_MEDIA_RAW_AUDIO),
-	  BMediaEventLooper(),
+	:
+	BMediaNode(name),
+	BBufferProducer(B_MEDIA_RAW_AUDIO),
+	BMediaEventLooper(),
 
-	  fBufferGroup(NULL),
-	  fLatency(0),
-	  fInternalLatency(0),
-	  fLowLatency(lowLatency),
-	  fOutputEnabled(true),
-	  fFramesSent(0),
-	  fStartTime(0),
-	  fSupplier(supplier),
+	fBufferGroup(NULL),
+	fLatency(0),
+	fInternalLatency(0),
+	fLastLateNotice(0),
+	fNextScheduledBuffer(0),
+	fLowLatency(lowLatency),
+	fOutputEnabled(true),
+	fFramesSent(0),
+	fStartTime(0),
+	fSupplier(supplier),
 
-	  fPeakListener(NULL)
+	fPeakListener(NULL)
 {
 	TRACE("%p->AudioProducer::AudioProducer(%s, %p, %d)\n", this, name,
 		supplier, lowLatency);
@@ -135,9 +174,11 @@ AudioProducer::AudioProducer(const char* name, AudioSupplier* supplier,
 	// we're not connected yet
 	fOutput.destination = media_destination::null;
 	fOutput.format = fPreferredFormat;
+
 	// init the audio supplier
-	if (fSupplier) {
+	if (fSupplier != NULL) {
 		fSupplier->SetAudioProducer(this);
+		SetInitialLatency(fSupplier->InitialLatency());
 	}
 }
 
@@ -359,41 +400,6 @@ AudioProducer::PrepareToConnect(const media_source& what,
 }
 
 
-static bigtime_t
-estimate_internal_latency(const media_format& format)
-{
-	bigtime_t startTime = system_time();
-	// calculate the number of samples per buffer
-	int32 sampleSize = format.u.raw_audio.format
-		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
-	int32 sampleCount = format.u.raw_audio.buffer_size / sampleSize;
-	// alloc float buffers of this size
-	const int bufferCount = 10;	// number of input buffers
-	float* buffers[bufferCount + 1];
-	for (int32 i = 0; i < bufferCount + 1; i++)
-		buffers[i] = new float[sampleCount];
-	float* outBuffer = buffers[bufferCount];
-	// fill all buffers save the last one with arbitrary data and merge them
-	// into the last one
-	for (int32 i = 0; i < bufferCount; i++) {
-		for (int32 k = 0; k < sampleCount; k++) {
-			buffers[i][k] = ((float)i * (float)k)
-				/ float(bufferCount * sampleCount);
-		}
-	}
-	for (int32 k = 0; k < sampleCount; k++) {
-		outBuffer[k] = 0;
-		for (int32 i = 0; i < bufferCount; i++)
-			outBuffer[k] += buffers[i][k];
-		outBuffer[k] /= bufferCount;
-	}
-	// cleanup
-	for (int32 i = 0; i < bufferCount + 1; i++)
-		delete[] buffers[i];
-	return system_time() - startTime;
-}
-
-
 void
 AudioProducer::Connect(status_t error, const media_source& source,
 	 const media_destination& destination, const media_format& format,
@@ -490,6 +496,13 @@ AudioProducer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 	// If we're late, we need to catch up. Respond in a manner appropriate
 	// to our current run mode.
 	if (what == fOutput.source) {
+		// Ignore the notices for buffers we already send out (or scheduled
+		// their event) before we processed the last notice
+		if (fLastLateNotice > performanceTime)
+			return;
+
+		fLastLateNotice = fNextScheduledBuffer;
+
 		if (RunMode() == B_RECORDING) {
 			// ...
 		} else if (RunMode() == B_INCREASE_LATENCY) {
@@ -595,9 +608,10 @@ AudioProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 			TRACE("AudioProducer::HandleEvent(B_START)\n");
 			if (RunState() != B_STARTED) {
 				fFramesSent = 0;
-				fStartTime = event->event_time;
+				fStartTime = event->event_time + fSupplier->InitialLatency();
 printf("B_START: start time: %lld\n", fStartTime);
-				media_timed_event firstBufferEvent(fStartTime,
+				media_timed_event firstBufferEvent(
+					fStartTime - fSupplier->InitialLatency(),
 					BTimedEventQueue::B_HANDLE_BUFFER);
 				EventQueue()->AddEvent(firstBufferEvent);
 			}
@@ -607,7 +621,7 @@ printf("B_START: start time: %lld\n", fStartTime);
 		case BTimedEventQueue::B_STOP:
 			TRACE("AudioProducer::HandleEvent(B_STOP)\n");
 			EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true,
-									  BTimedEventQueue::B_HANDLE_BUFFER);
+				BTimedEventQueue::B_HANDLE_BUFFER);
 			TRACE("AudioProducer::HandleEvent(B_STOP) done\n");
 			break;
 
@@ -633,10 +647,10 @@ printf("B_START: start time: %lld\n", fStartTime);
 					/ (sampleSize * fOutput.format.u.raw_audio.channel_count);
 				fFramesSent += nFrames;
 
-				bigtime_t nextEvent = fStartTime
+				fNextScheduledBuffer = fStartTime
 					+ bigtime_t(double(fFramesSent) * 1000000.0
-					  / double(fOutput.format.u.raw_audio.frame_rate));
-				media_timed_event nextBufferEvent(nextEvent,
+						/ double(fOutput.format.u.raw_audio.frame_rate));
+				media_timed_event nextBufferEvent(fNextScheduledBuffer,
 					BTimedEventQueue::B_HANDLE_BUFFER);
 				EventQueue()->AddEvent(nextBufferEvent);
 			} else {
@@ -663,7 +677,8 @@ AudioProducer::ChangeFormat(media_format* format)
 {
 	TRACE("AudioProducer::ChangeFormat()\n");
 
-	format->u.raw_audio.buffer_size = media_raw_audio_format::wildcard.buffer_size;
+	format->u.raw_audio.buffer_size
+		= media_raw_audio_format::wildcard.buffer_size;
 
 	status_t ret = _SpecializeFormat(format);
 	if (ret != B_OK) {
@@ -677,7 +692,8 @@ AudioProducer::ChangeFormat(media_format* format)
 		return ret;
 	}
 
-	ret = BBufferProducer::ChangeFormat(fOutput.source, fOutput.destination, format);
+	ret = BBufferProducer::ChangeFormat(fOutput.source, fOutput.destination,
+		format);
 	if (ret != B_OK) {
 		TRACE("  ChangeFormat(): %s\n", strerror(ret));
 		return ret;
@@ -707,20 +723,20 @@ AudioProducer::_SpecializeFormat(media_format* format)
 	}
 
 	if (format->u.raw_audio.channel_count
-		== media_raw_audio_format::wildcard.channel_count) {
+			== media_raw_audio_format::wildcard.channel_count) {
 		format->u.raw_audio.channel_count = 2;
 		TRACE("  -> adjusting channel count, it was wildcard\n");
 	}
 
 	if (format->u.raw_audio.frame_rate
-		== media_raw_audio_format::wildcard.frame_rate) {
+			== media_raw_audio_format::wildcard.frame_rate) {
 		format->u.raw_audio.frame_rate = 44100.0;
 		TRACE("  -> adjusting frame rate, it was wildcard\n");
 	}
 
 	// check the buffer size, which may still be wildcarded
 	if (format->u.raw_audio.buffer_size
-		== media_raw_audio_format::wildcard.buffer_size) {
+			== media_raw_audio_format::wildcard.buffer_size) {
 		// pick something comfortable to suggest
 		TRACE("  -> adjusting buffer size, it was wildcard\n");
 
@@ -734,7 +750,6 @@ AudioProducer::_SpecializeFormat(media_format* format)
 
 		if (!fLowLatency)
 			format->u.raw_audio.buffer_size *= 3;
-
 	}
 
 	return B_OK;
@@ -794,9 +809,9 @@ AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 		// number of sample in the buffer
 
 	// fill in the buffer header
-	media_header* hdr = buffer->Header();
-	hdr->type = B_MEDIA_RAW_AUDIO;
-	hdr->time_source = TimeSource()->ID();
+	media_header* header = buffer->Header();
+	header->type = B_MEDIA_RAW_AUDIO;
+	header->time_source = TimeSource()->ID();
 	buffer->SetSizeUsed(fOutput.format.u.raw_audio.buffer_size);
 
 	bigtime_t performanceTime = bigtime_t(double(fFramesSent)
@@ -817,9 +832,9 @@ AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 
 	// stamp buffer
 	if (RunMode() == B_RECORDING) {
-		hdr->start_time = eventTime;
+		header->start_time = eventTime;
 	} else {
-		hdr->start_time = fStartTime + performanceTime;
+		header->start_time = fStartTime + performanceTime;
 	}
 
 #if DEBUG_TO_FILE

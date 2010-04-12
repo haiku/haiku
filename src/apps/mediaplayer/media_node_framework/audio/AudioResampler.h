@@ -1,7 +1,10 @@
 /*
- * Copyright © 2000-2006 Ingo Weinhold <ingo_weinhold@gmx.de>
+ * Copyright 2000-2006 Ingo Weinhold <ingo_weinhold@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT licensce.
  */
+#ifndef AUDIO_RESAMPLER_H
+#define AUDIO_RESAMPLER_H
+
 
 /*! This AudioReader does both resampling an audio source to a different
 	sample rate and rescaling the time, e.g. it is possible to convert the
@@ -9,10 +12,9 @@
 	(time scale = -2).
 */
 
-#ifndef AUDIO_RESAMPLER_H
-#define AUDIO_RESAMPLER_H
 
 #include "AudioReader.h"
+
 
 class AudioResampler : public AudioReader {
 public:
@@ -21,6 +23,7 @@ public:
 									float frameRate, float timeScale = 1.0);
 	virtual						~AudioResampler();
 
+	virtual bigtime_t			InitialLatency() const;
 	virtual	status_t			Read(void* buffer, int64 pos, int64 frames);
 
 	virtual	status_t			InitCheck() const;

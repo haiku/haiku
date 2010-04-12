@@ -1,9 +1,10 @@
 /*
- * Copyright © 2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2008 Stephan Aßmus <superstippi@gmx.de>
  * All Rights Reserved. Distributed under the terms of the MIT license.
  */
 #ifndef PROXY_AUDIO_SUPPLIER_H
 #define PROXY_AUDIO_SUPPLIER_H
+
 
 #include <Locker.h>
 
@@ -26,6 +27,7 @@ public:
 	virtual	status_t			GetFrames(void* buffer, int64 frameCount,
 									bigtime_t startTime, bigtime_t endTime);
 
+	virtual bigtime_t			InitialLatency() const;
 	virtual	void				SetFormat(const media_format& format);
 	virtual	const media_format&	Format() const;
 
@@ -49,16 +51,16 @@ private:
 			void*				_SkipFrames(void* buffer, int64 frames) const;
 
 private:
-	BLocker						fSupplierLock;
+	mutable BLocker				fSupplierLock;
 
-	PlaybackManager*			fPlaybackManager;
-	float						fVideoFrameRate;
-	float						fVolume;
+			PlaybackManager*	fPlaybackManager;
+			float				fVideoFrameRate;
+			float				fVolume;
 
-	AudioTrackSupplier*			fSupplier;
-	AudioReader*				fAdapter;
-	AudioVolumeConverter*		fVolumeConverter;
-	AudioResampler				fAudioResampler;
+			AudioTrackSupplier*	fSupplier;
+			AudioReader*		fAdapter;
+			AudioVolumeConverter* fVolumeConverter;
+			AudioResampler		fAudioResampler;
 };
 
 

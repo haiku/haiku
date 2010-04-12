@@ -1,6 +1,8 @@
-/*	Copyright (c) 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
+/*	Copyright 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
  *	All Rights Reserved. Distributed under the terms of the MIT license.
  */
+
+
 #include "AudioSupplier.h"
 
 #include "AudioProducer.h"
@@ -26,6 +28,6 @@ AudioSupplier::SetAudioProducer(AudioProducer* producer)
 status_t
 AudioSupplier::InitCheck() const
 {
-	return (fAudioProducer ? B_OK : B_NO_INIT);
+	return fAudioProducer ? B_OK : B_NO_INIT;
 }
 

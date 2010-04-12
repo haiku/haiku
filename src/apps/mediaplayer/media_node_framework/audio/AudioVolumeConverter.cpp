@@ -1,7 +1,8 @@
 /*
- * Copyright © 2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2008 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT licensce.
  */
+
 
 #include "AudioVolumeConverter.h"
 
@@ -13,29 +14,10 @@
 
 //#define TRACE_AUDIO_CONVERTER
 #ifdef TRACE_AUDIO_CONVERTER
-# define TRACE(x...)	printf(x)
+#	define TRACE(x...)	printf(x)
 #else
-# define TRACE(x...)
+#	define TRACE(x...)
 #endif
-
-
-AudioVolumeConverter::AudioVolumeConverter(AudioReader* source, float volume)
-	: AudioReader(),
-	  fSource(NULL),
-	  fVolume(volume),
-	  fPreviousVolume(volume)
-{
-	if (source && source->Format().type == B_MEDIA_RAW_AUDIO)
-		fFormat = source->Format();
-	else
-		source = NULL;
-	fSource = source;
-}
-
-
-AudioVolumeConverter::~AudioVolumeConverter()
-{
-}
 
 
 template<typename SampleType>
@@ -63,6 +45,36 @@ convert(SampleType* buffer, const int32 frames, const int32 channels,
 			buffer++;
 		}
 	}
+}
+
+
+// #pragma mark -
+
+
+AudioVolumeConverter::AudioVolumeConverter(AudioReader* source, float volume)
+	:
+	AudioReader(),
+	fSource(NULL),
+	fVolume(volume),
+	fPreviousVolume(volume)
+{
+	if (source && source->Format().type == B_MEDIA_RAW_AUDIO)
+		fFormat = source->Format();
+	else
+		source = NULL;
+	fSource = source;
+}
+
+
+AudioVolumeConverter::~AudioVolumeConverter()
+{
+}
+
+
+bigtime_t
+AudioVolumeConverter::InitialLatency() const
+{
+	return fSource->InitialLatency();
 }
 
 

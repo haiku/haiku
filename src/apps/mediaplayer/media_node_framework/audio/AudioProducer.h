@@ -8,9 +8,10 @@
 #ifndef AUDIO_PRODUCER_H
 #define AUDIO_PRODUCER_H
 
+
 #include <BufferProducer.h>
-//#include <Controllable.h>
 #include <MediaEventLooper.h>
+
 
 class AudioSupplier;
 class BHandler;
@@ -18,6 +19,7 @@ class BHandler;
 enum {
 	MSG_PEAK_NOTIFICATION		= 'pknt'
 };
+
 
 class AudioProducer : public BBufferProducer, public BMediaEventLooper {
 public:
@@ -116,6 +118,8 @@ private:
 			bool				fUsingOurBuffers;
 			bigtime_t			fLatency;
 			bigtime_t			fInternalLatency;
+			bigtime_t			fLastLateNotice;
+			bigtime_t			fNextScheduledBuffer;
 			bool				fLowLatency;
 			media_output		fOutput;
 			bool				fOutputEnabled;

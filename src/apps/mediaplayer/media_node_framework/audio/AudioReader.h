@@ -18,6 +18,7 @@ public:
 			void				SetFormat(const media_format& format);
 			const media_format&	Format() const;
 
+	virtual bigtime_t			InitialLatency() const = 0;
 	virtual	status_t			Read(void* buffer, int64 pos, int64 frames) = 0;
 
 			void				SetOutOffset(int64 offset);

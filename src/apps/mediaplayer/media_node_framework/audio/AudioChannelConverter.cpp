@@ -1,7 +1,9 @@
 /*
- * Copyright © 2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2008 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT licensce.
  */
+
+
 #include "AudioChannelConverter.h"
 
 #include <new>
@@ -10,27 +12,13 @@
 
 using std::nothrow;
 
+
 //#define TRACE_AUDIO_CONVERTER
 #ifdef TRACE_AUDIO_CONVERTER
-# define TRACE(x...)	printf(x)
+#	define TRACE(x...)	printf(x)
 #else
-# define TRACE(x...)
+#	define TRACE(x...)
 #endif
-
-
-AudioChannelConverter::AudioChannelConverter(AudioReader* source,
-		const media_format& format)
-	: AudioReader(format),
-	  fSource(source)
-{
-	// TODO: check the format and make sure everything matches
-	// except for channel count
-}
-
-
-AudioChannelConverter::~AudioChannelConverter()
-{
-}
 
 
 template<typename Type, typename BigType>
@@ -76,6 +64,31 @@ convert(Type* inBuffer, Type* outBuffer, int32 inChannels, int32 outChannels,
 			}
 			break;
 	}
+}
+
+
+// #pragma mark -
+
+
+AudioChannelConverter::AudioChannelConverter(AudioReader* source,
+		const media_format& format)
+	: AudioReader(format),
+	  fSource(source)
+{
+	// TODO: check the format and make sure everything matches
+	// except for channel count
+}
+
+
+AudioChannelConverter::~AudioChannelConverter()
+{
+}
+
+
+bigtime_t
+AudioChannelConverter::InitialLatency() const
+{
+	fSource->InitialLatency();
 }
 
 

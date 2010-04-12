@@ -1,7 +1,9 @@
 /*
- * Copyright © 2000-2006 Ingo Weinhold <ingo_weinhold@gmx.de>
+ * Copyright 2000-2006 Ingo Weinhold <ingo_weinhold@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT licensce.
  */
+
+
 #include "AudioResampler.h"
 
 #include <stdio.h>
@@ -11,37 +13,10 @@
 
 //#define TRACE_AUDIO_RESAMPLER
 #ifdef TRACE_AUDIO_RESAMPLER
-# define TRACE(x...)	printf(x)
+#	define TRACE(x...)	printf(x)
 #else
-# define TRACE(x...)
+#	define TRACE(x...)
 #endif
-
-
-AudioResampler::AudioResampler()
-	: AudioReader(),
-	  fSource(NULL),
-	  fTimeScale(1.0),
-	  fInOffset(0)
-{
-}
-
-
-AudioResampler::AudioResampler(AudioReader* source, float frameRate,
-		float timeScale)
-	: AudioReader(),
-	  fSource(NULL),
-	  fTimeScale(timeScale),
-	  fInOffset(0)
-{
-	SetSource(source);
-	if (fSource)
-		fFormat.u.raw_audio.frame_rate = frameRate;
-}
-
-
-AudioResampler::~AudioResampler()
-{
-}
 
 
 //! Calculates the greatest common divider of /a/ and /b/.
@@ -89,6 +64,45 @@ resample_linear(void* _inBuffer, void* _outBuffer, uint32 channelCount,
 				+ timeDiff1 * inFrameBuf2.ReadSample()) / timeDiff);
 		}
 	}
+}
+
+
+// #pragma mark -
+
+
+AudioResampler::AudioResampler()
+	:
+	AudioReader(),
+	fSource(NULL),
+	fTimeScale(1.0),
+	fInOffset(0)
+{
+}
+
+
+AudioResampler::AudioResampler(AudioReader* source, float frameRate,
+		float timeScale)
+	:
+	AudioReader(),
+	fSource(NULL),
+	fTimeScale(timeScale),
+	fInOffset(0)
+{
+	SetSource(source);
+	if (fSource)
+		fFormat.u.raw_audio.frame_rate = frameRate;
+}
+
+
+AudioResampler::~AudioResampler()
+{
+}
+
+
+bigtime_t
+AudioResampler::InitialLatency() const
+{
+	return fSource->InitialLatency();
 }
 
 
@@ -185,7 +199,7 @@ AudioResampler::SetSource(AudioReader* source)
 		TRACE("AudioResampler::SetSource() - NULL source\n");
 		return;
 	}
-		
+
 	if (source->Format().type != B_MEDIA_RAW_AUDIO) {
 		TRACE("AudioResampler::SetSource() - not B_MEDIA_RAW_AUDIO\n");
 		return;
@@ -197,7 +211,7 @@ AudioResampler::SetSource(AudioReader* source)
 		TRACE("AudioResampler::SetSource() - not host byte order\n");
 		return;
 	}
-	
+
 	float frameRate = FrameRate();
 		// don't overwrite previous audio frame rate
 	fSource = source;

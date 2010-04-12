@@ -1,8 +1,9 @@
 /*
- * Copyright © 2000-2006 Ingo Weinhold <ingo_weinhold@gmx.de>
- * Copyright © 2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2000-2006 Ingo Weinhold <ingo_weinhold@gmx.de>
+ * Copyright 2008 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT licensce.
  */
+
 
 #include "AudioFormatConverter.h"
 
@@ -12,42 +13,10 @@
 
 //#define TRACE_AUDIO_CONVERTER
 #ifdef TRACE_AUDIO_CONVERTER
-# define TRACE(x...)	printf(x)
+#	define TRACE(x...)	printf(x)
 #else
-# define TRACE(x...)
+#	define TRACE(x...)
 #endif
-
-
-AudioFormatConverter::AudioFormatConverter(AudioReader* source, uint32 format,
-		uint32 byte_order)
-	: AudioReader(),
-	  fSource(NULL)
-{
-	uint32 hostByteOrder
-		= (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
-	if (source && source->Format().type == B_MEDIA_RAW_AUDIO
-		&& source->Format().u.raw_audio.byte_order == hostByteOrder) {
-		fFormat = source->Format();
-		fFormat.u.raw_audio.format = format;
-		fFormat.u.raw_audio.byte_order = byte_order;
-		int32 inSampleSize = source->Format().u.raw_audio.format
-			& media_raw_audio_format::B_AUDIO_SIZE_MASK;
-		int32 outSampleSize = fFormat.u.raw_audio.format
-			& media_raw_audio_format::B_AUDIO_SIZE_MASK;
-		if (inSampleSize != outSampleSize) {
-			fFormat.u.raw_audio.buffer_size
-				= source->Format().u.raw_audio.buffer_size * outSampleSize
-				  / inSampleSize;
-		}
-	} else
-		source = NULL;
-	fSource = source;
-}
-
-
-AudioFormatConverter::~AudioFormatConverter()
-{
-}
 
 
 struct ReadFloat {
@@ -150,8 +119,7 @@ convert(const ReadT& read, const WriteT& write,
 }
 
 
-static
-void
+static void
 swap_sample_byte_order(void* buffer, uint32 format, size_t length)
 {
 	type_code type = B_ANY_TYPE;
@@ -174,6 +142,48 @@ swap_sample_byte_order(void* buffer, uint32 format, size_t length)
 		swap_data(type, buffer, length, B_SWAP_ALWAYS);
 }
 
+
+// #pragma mark -
+
+
+AudioFormatConverter::AudioFormatConverter(AudioReader* source, uint32 format,
+		uint32 byte_order)
+	:
+	AudioReader(),
+	fSource(NULL)
+{
+	uint32 hostByteOrder
+		= (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
+	if (source && source->Format().type == B_MEDIA_RAW_AUDIO
+		&& source->Format().u.raw_audio.byte_order == hostByteOrder) {
+		fFormat = source->Format();
+		fFormat.u.raw_audio.format = format;
+		fFormat.u.raw_audio.byte_order = byte_order;
+		int32 inSampleSize = source->Format().u.raw_audio.format
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK;
+		int32 outSampleSize = fFormat.u.raw_audio.format
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK;
+		if (inSampleSize != outSampleSize) {
+			fFormat.u.raw_audio.buffer_size
+				= source->Format().u.raw_audio.buffer_size * outSampleSize
+				  / inSampleSize;
+		}
+	} else
+		source = NULL;
+	fSource = source;
+}
+
+
+AudioFormatConverter::~AudioFormatConverter()
+{
+}
+
+
+bigtime_t
+AudioFormatConverter::InitialLatency() const
+{
+	fSource->InitialLatency();
+}
 
 status_t
 AudioFormatConverter::Read(void* buffer, int64 pos, int64 frames)

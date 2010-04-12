@@ -1,7 +1,9 @@
-/*	
- * Copyright © 2008 Stephan Aßmus <superstippi@gmx.de>
+/*
+ * Copyright 2008 Stephan Aßmus <superstippi@gmx.de>
  * All Rights Reserved. Distributed under the terms of the MIT license.
  */
+
+
 #include "ProxyAudioSupplier.h"
 
 #include <algorithm>
@@ -33,8 +35,9 @@ using std::swap;
 
 struct PlayingInterval {
 	PlayingInterval(bigtime_t startTime, bigtime_t endTime)
-		: start_time(startTime)
-		, end_time(endTime)
+		:
+		start_time(startTime),
+		end_time(endTime)
 	{
 	}
 
@@ -47,16 +50,17 @@ struct PlayingInterval {
 
 
 ProxyAudioSupplier::ProxyAudioSupplier(PlaybackManager* playbackManager)
-	: fSupplierLock("audio supplier lock")
+	:
+	fSupplierLock("audio supplier lock"),
 
-	, fPlaybackManager(playbackManager)
-	, fVideoFrameRate(25.0)
-	, fVolume(1.0)
+	fPlaybackManager(playbackManager),
+	fVideoFrameRate(25.0),
+	fVolume(1.0),
 
-	, fSupplier(NULL)
-	, fAdapter(NULL)
-	, fVolumeConverter(NULL)
-	, fAudioResampler()
+	fSupplier(NULL),
+	fAdapter(NULL),
+	fVolumeConverter(NULL),
+	fAudioResampler()
 {
 	TRACE("ProxyAudioSupplier()\n");
 }
@@ -67,6 +71,18 @@ ProxyAudioSupplier::~ProxyAudioSupplier()
 	TRACE("~ProxyAudioSupplier()\n");
 	delete fAdapter;
 	delete fVolumeConverter;
+}
+
+
+bigtime_t
+ProxyAudioSupplier::InitialLatency() const
+{
+	BAutolock _(fSupplierLock);
+
+	if (fSupplier == NULL)
+		return 0;
+
+	return fSupplier->InitialLatency();
 }
 
 
@@ -100,7 +116,7 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 				ERROR("GetFrames() - zero duration audio interval! start "
 					"time: %lld\n", intervalStartTime);
 				break;
-			}				
+			}
 			if (!playingIntervals.AddItem(interval)) {
 				delete interval;
 				error = B_NO_MEMORY;
@@ -182,7 +198,7 @@ ProxyAudioSupplier::SetFormat(const media_format& format)
 {
 //printf("ProxyAudioSupplier::SetFormat()\n");
 	#ifdef TRACE_PROXY_AUDIO_SUPPLIER
-		char string[256];		
+		char string[256];
 		string_for_format(format, string, 256);
 		TRACE("SetFormat(%s)\n", string);
 	#endif
@@ -257,6 +273,7 @@ ProxyAudioSupplier::Volume()
 
 
 // #pragma mark - audio/video/frame/time conversion
+
 
 int64
 ProxyAudioSupplier::_AudioFrameForVideoFrame(int64 frame) const

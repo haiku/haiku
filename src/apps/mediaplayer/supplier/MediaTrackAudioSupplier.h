@@ -1,21 +1,24 @@
 /*
- * Copyright © 2000-2004 Ingo Weinhold <ingo_weinhold@gmx.de>
- * Copyright © 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2000-2004 Ingo Weinhold <ingo_weinhold@gmx.de>
+ * Copyright 2006-2008 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MEDIA_TRACK_AUDIO_SUPPLIER_H
 #define MEDIA_TRACK_AUDIO_SUPPLIER_H
 
+
 #include <List.h>
 
 #include "AudioTrackSupplier.h"
+
 
 class BMediaTrack;
 struct media_codec_info;
 struct media_format;
 
+
 class MediaTrackAudioSupplier : public AudioTrackSupplier {
- public:
+public:
 								MediaTrackAudioSupplier(BMediaTrack* track,
 									int32 trackIndex);
 	virtual						~MediaTrackAudioSupplier();
@@ -27,6 +30,7 @@ class MediaTrackAudioSupplier : public AudioTrackSupplier {
 
 	// AudioReader interface
 	// (needed to reuse the class as AudioResampler input)
+	virtual bigtime_t			InitialLatency() const;
 	virtual	status_t			Read(void* buffer, int64 pos, int64 frames);
 
 	virtual	status_t			InitCheck() const;
@@ -34,7 +38,7 @@ class MediaTrackAudioSupplier : public AudioTrackSupplier {
 	virtual	int32				TrackIndex() const
 									{ return fTrackIndex; }
 
- private:
+private:
 			struct Buffer;
 			void				_InitFromTrack();
 

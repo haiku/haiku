@@ -115,7 +115,14 @@ MediaTrackAudioSupplier::Duration() const
 // #pragma mark - AudioReader
 
 
-// Read
+bigtime_t
+MediaTrackAudioSupplier::InitialLatency() const
+{
+	// TODO: this is just a wild guess, and not really founded on anything.
+	return 100000;
+}
+
+
 status_t
 MediaTrackAudioSupplier::Read(void* buffer, int64 pos, int64 frames)
 {
@@ -518,15 +525,15 @@ MediaTrackAudioSupplier::_ReadCachedFrames(void*& dest, int64& pos,
 	}
 }
 
-// _ReadUncachedFrames
-//
-// Reads /frames/ frames from /position/ into /buffer/. The frames are not
-// read from the cache, but read frames are cached, if possible.
-// New cache buffers are stamped with the supplied time.
-// If an error occurs, the untouched part of the buffer is set to 0.
+
+/*!	Reads /frames/ frames from /position/ into /buffer/. The frames are not
+	read from the cache, but read frames are cached, if possible.
+	New cache buffers are stamped with the supplied time.
+	If an error occurs, the untouched part of the buffer is set to 0.
+*/
 status_t
 MediaTrackAudioSupplier::_ReadUncachedFrames(void* buffer, int64 position,
-									  int64 frames, bigtime_t time)
+	int64 frames, bigtime_t time)
 {
 	TRACE("_ReadUncachedFrames()\n");
 	status_t error = B_OK;

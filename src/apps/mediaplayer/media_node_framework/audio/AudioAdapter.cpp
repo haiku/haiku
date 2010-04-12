@@ -77,6 +77,13 @@ AudioAdapter::~AudioAdapter()
 }
 
 
+bigtime_t
+AudioAdapter::InitialLatency() const
+{
+	return fSource->InitialLatency();
+}
+
+
 status_t
 AudioAdapter::Read(void* buffer, int64 pos, int64 frames)
 {
