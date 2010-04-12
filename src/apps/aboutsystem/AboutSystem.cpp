@@ -888,6 +888,7 @@ AboutView::_CreateCreditsView()
 		"Ryan Leavengood\n"
 		"Michael Lotz\n"
 		"Brecht Machiels\n"
+		"Matt Madia\n"
 		"Scott McCreary\n"
 		"David McPaul\n"
 		"Fredrik Modéen\n"
@@ -939,7 +940,6 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(
 		"Phil Greenway\n"
 		"Gavin James\n"
-		"Matt Madia\n"
 		"Jorge G. Mare (aka Koki)\n"
 		"Urias McCullough\n"
 		"Niels Sascha Reedijk\n"
