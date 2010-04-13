@@ -231,7 +231,8 @@ ScreenMode::GetOriginalMode(screen_mode& mode, int32 workspace) const
 {
 	if (workspace == ~0)
 		workspace = current_workspace();
-	else if(workspace > 31)
+		// TODO this should use kMaxWorkspaces
+	else if (workspace > 31)
 		return B_BAD_INDEX;
 
 	mode = fOriginal[workspace];

@@ -421,7 +421,7 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 			if (FindPrinterDriver(printerName, tmp) == B_OK) {
 				if (fDefaultPrinter) {
 					// the printer exists, but is not the default printer
-					if(strcmp(fDefaultPrinter->Name(), printerName) != 0)
+					if (strcmp(fDefaultPrinter->Name(), printerName) != 0)
 						rc = B_OK;
 					return rc;
 				}

@@ -78,7 +78,7 @@ DefaultManager::LoadState()
 	CALLED();
 	status_t err = B_OK;
 	BPath path;
-	if((err = find_directory(B_USER_SETTINGS_DIRECTORY, &path))!=B_OK)
+	if ((err = find_directory(B_USER_SETTINGS_DIRECTORY, &path)) != B_OK)
 		return err;
 
 	path.Append(kDefaultManagerSettingsDirectory);
@@ -102,7 +102,7 @@ DefaultManager::LoadState()
 			return B_ERROR;
 		if (file.Read(&default_type, sizeof(uint32)) < (int32)sizeof(uint32))
 			return B_ERROR;
-		if(settings.Unflatten(&file)==B_OK) {
+		if (settings.Unflatten(&file) == B_OK) {
 			settings.PrintToStream();
 			fMsgList.AddItem(new BMessage(settings));
 		}
@@ -131,7 +131,7 @@ DefaultManager::SaveState(NodeManager *node_manager)
 
 	uint32 default_types[] = {kMsgTypeVideoIn, kMsgTypeVideoOut,
 		kMsgTypeAudioIn, kMsgTypeAudioOut};
-	uint32 media_node_ids[] = {fPhysicalVideoIn, fPhysicalVideoOut, 
+	uint32 media_node_ids[] = {fPhysicalVideoIn, fPhysicalVideoOut,
 		fPhysicalAudioIn, fPhysicalAudioOut};
 	for (uint32 i=0; i<sizeof(default_types)/sizeof(default_types[0]); i++) {
 		BMessage *settings = new BMessage();
@@ -152,7 +152,7 @@ DefaultManager::SaveState(NodeManager *node_manager)
 		BPath path(&ref);
 		settings->AddInt32(kDefaultManagerAddon, info.addon);
 		settings->AddInt32(kDefaultManagerFlavorId, info.flavor_id);
-		settings->AddInt32(kDefaultManagerInput, 
+		settings->AddInt32(kDefaultManagerInput,
 			default_types[i] == kMsgTypeAudioOut ? fPhysicalAudioOutInputID : 0);
 		settings->AddString(kDefaultManagerFlavorName, info.name);
 		settings->AddString(kDefaultManagerPath, path.Path());
@@ -170,14 +170,14 @@ DefaultManager::SaveState(NodeManager *node_manager)
 	for (int32 i = 0; i < category_count; i++) {
 		BMessage *settings = (BMessage *)list.ItemAt(i);
 		uint32 default_type;
-		if (settings->FindInt32(kDefaultManagerType, 
+		if (settings->FindInt32(kDefaultManagerType,
 			(int32*)&default_type) < B_OK)
 			return B_ERROR;
 		if (file.Write(&kMsgHeader, sizeof(uint32)) < (int32)sizeof(uint32))
 			return B_ERROR;
 		if (file.Write(&default_type, sizeof(uint32)) < (int32)sizeof(uint32))
 			return B_ERROR;
-		if(settings->Flatten(&file) < B_OK)
+		if (settings->Flatten(&file) < B_OK)
 			return B_ERROR;
 		delete settings;
 	}
@@ -210,14 +210,14 @@ DefaultManager::Set(media_node_id node_id, const char *input_name,
 		case AUDIO_OUTPUT:
 			fPhysicalAudioOut = node_id;
 			fPhysicalAudioOutInputID = input_id;
-			strcpy(fPhysicalAudioOutInputName, 
+			strcpy(fPhysicalAudioOutInputName,
 				input_name ? input_name : "<null>");
 			return B_OK;
 		case TIME_SOURCE:
 			return B_ERROR;
 
 		// called by the media_server's ServerApp::StartSystemTimeSource()
-		case SYSTEM_TIME_SOURCE: 
+		case SYSTEM_TIME_SOURCE:
 		{
 			ASSERT(fSystemTimeSource == -1);
 			fSystemTimeSource = node_id;
@@ -304,7 +304,7 @@ DefaultManager::Get(media_node_id *nodeid, char *input_name, int32 *inputid,
 status_t
 DefaultManager::Rescan()
 {
-	thread_id	fThreadId = spawn_thread(rescan_thread, "rescan defaults", 
+	thread_id fThreadId = spawn_thread(rescan_thread, "rescan defaults",
 		B_NORMAL_PRIORITY - 2, this);
 	resume_thread(fThreadId);
 	return B_OK;
@@ -384,10 +384,10 @@ DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type,
 	int32 input_id;
 	bool isAudio = type & B_MEDIA_RAW_AUDIO;
 
-	for(int32 i=0; i<fMsgList.CountItems(); i++) {
+	for (int32 i = 0; i < fMsgList.CountItems(); i++) {
 		msg = (BMessage *)fMsgList.ItemAt(i);
 		int32 msgType;
-		if(msg->FindInt32(kDefaultManagerType, &msgType) == B_OK
+		if (msg->FindInt32(kDefaultManagerType, &msgType) == B_OK
 			&& ((uint32)msgType == default_type)) {
 			const char *name = NULL;
 			const char *path = NULL;
@@ -409,10 +409,10 @@ DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type,
 	count = MAX_NODE_INFOS;
 	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count,
 		isInput ? NULL : &format, isInput ? &format : NULL, NULL,
-		isInput ? B_BUFFER_PRODUCER | B_PHYSICAL_INPUT 
+		isInput ? B_BUFFER_PRODUCER | B_PHYSICAL_INPUT
 			: B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
 	if (rv != B_OK || count < 1) {
-		ERROR("Couldn't find physical %s %s node\n", 
+		ERROR("Couldn't find physical %s %s node\n",
 			isAudio ? "audio" : "video", isInput ? "input" : "output");
 		return;
 	}
@@ -428,18 +428,18 @@ DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type,
 					continue;
 				}
 				// skip the Firewire audio driver
-				if (0 == strcmp(info[i].name, "DV Input")) 
+				if (0 == strcmp(info[i].name, "DV Input"))
 					continue;
 			} else {
 				if (0 == strcmp(info[i].name, "None Out")) {
 					// we keep the Null audio driver if none else matchs
 					*id = info[i].node.node;
-					if(msg)
+					if (msg)
 						fPhysicalAudioOutInputID = input_id;
 					continue;
 				}
 				// skip the Firewire audio driver
-				if (0 == strcmp(info[i].name, "DV Output")) 
+				if (0 == strcmp(info[i].name, "DV Output"))
 					continue;
 			}
 		}
@@ -518,14 +518,14 @@ DefaultManager::FindTimeSource()
 			// The BeOS R5 None Out node pretend to be a physical time source,
 			// that is pretty dumb
 			// skip the Null audio driver
-			if (0 == strcmp(info[i].name, "None Out")) 
+			if (0 == strcmp(info[i].name, "None Out"))
 				continue;
 			// skip the Firewire audio driver
-			if (0 != strstr(info[i].name, "DV Output")) 
+			if (0 != strstr(info[i].name, "DV Output"))
 				continue;
 			printf("Default DAC timesource \"%s\" created!\n", info[i].name);
 			fTimeSource = info[i].node.node;
-			BMediaRoster::Roster()->StartTimeSource(info[i].node, 
+			BMediaRoster::Roster()->StartTimeSource(info[i].node,
 				system_time() + 1000);
 			return;
 		}
@@ -612,7 +612,7 @@ DefaultManager::ConnectMixerToOutput()
 
 	for (int32 i = 0; i < count; i++) {
 		input = inputs[i];
-		if(input.destination.id == fPhysicalAudioOutInputID)
+		if (input.destination.id == fPhysicalAudioOutInputID)
 			break;
 	}
 

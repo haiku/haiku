@@ -22,7 +22,7 @@
 //	File Name:		Angle.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
 //	Description:	Angle class for speeding up trig functions
-//  
+//
 //------------------------------------------------------------------------------
 #include "Angle.h"
 #include <math.h>
@@ -62,7 +62,7 @@ Angle::~Angle()
 void
 Angle::Normalize()
 {
-	// if the value of the angle is >=360 or <0, make it so that it is 
+	// if the value of the angle is >=360 or <0, make it so that it is
 	// within those bounds
     fAngleValue = fmodf(fAngleValue, 360);
     if (fAngleValue < 0)
@@ -87,15 +87,15 @@ Angle::Sine()
 Angle
 Angle::InvSine(float value)
 {
-	// Returns the inverse sine of a value in the range 0 <= value <= 1 via 
+	// Returns the inverse sine of a value in the range 0 <= value <= 1 via
 	//	reverse-lookup any value out of range causes the function to return 0
-	
+
 	// Filter out bad values
 	value = fabs(value);
 
 	if (value > 1)
 		return Angle(0);
-		
+
 	uint16 i = 90;
 	while (value < sSinTable[i])
 		i--;
@@ -104,7 +104,7 @@ Angle::InvSine(float value)
 	// to the passed value
 	if ((value - sSinTable[i]) > (sSinTable[i + 1] - value))
 		return Angle(i + 1);
-	
+
 	return Angle(i);		// value is closer to previous
 }
 
@@ -127,7 +127,7 @@ Angle::Cosine(void)
 Angle
 Angle::InvCosine(float value)
 {
-	// Returns the inverse cosine of a value in the range 0 <= value <= 1 via 
+	// Returns the inverse cosine of a value in the range 0 <= value <= 1 via
 	//	reverse-lookup any value out of range causes the function to return 0
 
 	// Filter out bad values
@@ -135,7 +135,7 @@ Angle::InvCosine(float value)
 
 	if (value > 1)
 		return 0;
-		
+
 	uint16 i = 90;
 	while (value > sCosTable[i])
 		i--;
@@ -160,7 +160,7 @@ Angle::Tangent(int *status)
 			*status = 0;
 		return 0.0;
 	}
-	
+
 	return sTanTable[(int)fAngleValue];
 }
 
@@ -177,12 +177,12 @@ Angle::InvTangent(float value)
 
 	if (value > 1)
 		return Angle(0);
-		
+
 	uint16 i = 90;
 	while (value > sTanTable[i])
 		i--;
 
-	if( (value - sTanTable[i]) < (sTanTable[i+1] - value) )
+	if ((value - sTanTable[i]) < (sTanTable[i+1] - value))
 		return Angle(i+1);
 
 	return Angle(i);		// value is closer to previous
@@ -209,7 +209,7 @@ Angle::Quadrant()
 
 	if (fAngleValue < 270)
 		return 3;
-	
+
 	return 4;
 }
 
@@ -279,13 +279,13 @@ Angle::_InitTrigTables()
 		// Get these so that we can do some superfast assignments
 		double sinValue = sin(currentRadian);
 		double cosValue = cos(currentRadian);
-		
+
 		// Do 4 assignments, taking advantage of sin/cos symmetry
 		sSinTable[i] = sinValue;
 		sSinTable[i + 90] = cosValue;
 		sSinTable[i + 180] = sinValue * -1;
 		sSinTable[i + 270] = cosValue * -1;
-		
+
 		sCosTable[i] = cosValue;
 		sCosTable[i + 90] = sinValue * -1;
 		sCosTable[i + 180] = cosValue * -1;

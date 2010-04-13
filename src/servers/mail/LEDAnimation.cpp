@@ -1,31 +1,29 @@
+
+
 #include "LEDAnimation.h"
 
 #include <InterfaceDefs.h>
 
-#define SNOOZE_TIME 150000
 #include <stdio.h>
 
-/***********************************************************
- * Constructor
- ***********************************************************/
+#define SNOOZE_TIME 150000
+
+
 LEDAnimation::LEDAnimation()
-	:fThread(-1)
-	,fRunning(false)
-	,fOrigModifiers(::modifiers())
+	:
+	fThread(-1),
+	fRunning(false),
+	fOrigModifiers(::modifiers())
 {
 }
 
-/***********************************************************
- * Destructor
- ***********************************************************/
+
 LEDAnimation::~LEDAnimation()
 {
 	Stop();
 }
 
-/***********************************************************
- * Start
- ***********************************************************/
+
 void
 LEDAnimation::Start()
 {
@@ -40,9 +38,7 @@ LEDAnimation::Start()
 	::resume_thread(fThread);
 }
 
-/***********************************************************
- * Stop
- ***********************************************************/
+
 void
 LEDAnimation::Stop()
 {
@@ -57,44 +53,39 @@ LEDAnimation::Stop()
 	::set_keyboard_locks(fOrigModifiers);
 }
 
-/***********************************************************
- * AnimationThread
- ***********************************************************/
+
 int32
 LEDAnimation::AnimationThread(void* data)
 {
 	LEDAnimation *anim = (LEDAnimation*)data;
-	
-	while (anim->fRunning)
-	{
-		LED(B_NUM_LOCK,true);	
+
+	while (anim->fRunning) {
+		LED(B_NUM_LOCK,true);
 		LED(B_NUM_LOCK,false);
-		
-		LED(B_CAPS_LOCK,true);	
+
+		LED(B_CAPS_LOCK,true);
 		LED(B_CAPS_LOCK,false);
-		
-		LED(B_SCROLL_LOCK,true);	
+
+		LED(B_SCROLL_LOCK,true);
 		LED(B_SCROLL_LOCK,false);
-		
-		LED(B_CAPS_LOCK,true);	
-		LED(B_CAPS_LOCK,false);				
+
+		LED(B_CAPS_LOCK,true);
+		LED(B_CAPS_LOCK,false);
 	}
 	anim->fThread = -1;
 	return 0;
 }
 
-/***********************************************************
- * LED
- ***********************************************************/
+
 void
 LEDAnimation::LED(uint32 mod,bool on)
 {
 	uint32 current_modifiers = ::modifiers();
-	if(on)
+	if (on)
 		current_modifiers |= mod;
 	else
 		current_modifiers &= ~mod;
 	::set_keyboard_locks(current_modifiers);
-	if(on)
+	if (on)
 		::snooze(SNOOZE_TIME);
 }
