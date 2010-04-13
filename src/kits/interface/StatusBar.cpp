@@ -474,9 +474,9 @@ BStatusBar::SetBarHeight(float barHeight)
 		return;
 
 	// resize so that the height fits
-	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
+	if ((Flags() & B_SUPPORTS_LAYOUT) != 0)
 		InvalidateLayout();
-	} else {
+	else {
 		float width, height;
 		GetPreferredSize(&width, &height);
 		ResizeTo(Bounds().Width(), height);
