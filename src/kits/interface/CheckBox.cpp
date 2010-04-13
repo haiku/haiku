@@ -611,6 +611,8 @@ BCheckBox::_ValidatePreferredSize()
 
 		fPreferredSize.height = (float)ceil(6.0f + fontHeight.ascent
 			+ fontHeight.descent);
+
+		ResetLayoutInvalidation();
 	}
 
 	return fPreferredSize;

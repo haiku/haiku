@@ -438,6 +438,8 @@ BStringView::_ValidatePreferredSize()
 	
 		fPreferredSize.height = ceilf(fontHeight.ascent + fontHeight.descent 
 			+ fontHeight.leading);
+
+		ResetLayoutInvalidation();
 	}
 
 	return fPreferredSize;

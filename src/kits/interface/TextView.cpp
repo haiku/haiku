@@ -1095,7 +1095,7 @@ BTextView::Perform(perform_code code, void* _data)
 			BTextView::GetHeightForWidth(data->width, &data->min, &data->max,
 				&data->preferred);
 			return B_OK;
-}
+		}
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
@@ -2823,6 +2823,7 @@ BTextView::_ValidateLayoutData()
 	}
 
 	fLayoutData->valid = true;
+	ResetLayoutInvalidation();
 
 	TRACE("width: %.2f, height: %.2f\n", min.width, min.height);
 }

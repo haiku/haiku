@@ -2034,6 +2034,7 @@ BMenu::_ValidatePreferredSize()
 	if (!fLayoutData->preferred.IsWidthSet() || ResizingMode()
 			!= fLayoutData->lastResizingMode) {
 		_ComputeLayout(0, true, false, NULL, NULL);
+		ResetLayoutInvalidation();
 	}
 
 	return fLayoutData->preferred;

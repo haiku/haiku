@@ -2146,6 +2146,8 @@ BSlider::_ValidateMinSize()
 	fMinSize.width = width;
 	fMinSize.height = height;
 
+	ResetLayoutInvalidation();
+
 	return fMinSize;
 }
 

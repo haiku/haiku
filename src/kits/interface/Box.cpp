@@ -871,5 +871,6 @@ BBox::_ValidateLayoutData()
 	}
 
 	fLayoutData->valid = true;
+	ResetLayoutInvalidation();
 }
 

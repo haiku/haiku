@@ -1115,6 +1115,7 @@ BTextControl::_ValidateLayoutData()
 	fLayoutData->min = min;
 
 	fLayoutData->valid = true;
+	ResetLayoutInvalidation();
 
 	TRACE("width: %.2f, height: %.2f\n", min.width, min.height);
 }
