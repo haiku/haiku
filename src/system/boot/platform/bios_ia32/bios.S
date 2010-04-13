@@ -1,16 +1,17 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+/*!	This file contains code to call BIOS functions out of a protected
+	mode environment. It doesn't use the virtual86 mode - it switches
+	to real mode, make the BIOS call, and switch back to protected
+	mode again. It's meant to be used in a single-threaded boot loader,
+	not in a multi-tasking operating system.
+	It relies on the real mode segment descriptors found in shell.S.
 */
 
-
-/** This file contains code to call BIOS functions out of a protected
- *	mode environment. It doesn't use the virtual86 mode - it switches
- *	to real mode, make the BIOS call, and switch back to protected
- *	mode again. It's meant to be used in a single-threaded boot loader,
- *	not in a multi-tasking operating system.
- *	It relies on the real mode segment descriptors found in shell.S.
- */
 
 #define FUNCTION(x) .globl x ; x ## :
 
@@ -31,12 +32,12 @@
 .text
 .code32
 
-/**	This function brings you back to protected mode after you've
- *	switched to it using switch_to_real_mode().
- *	Should restore the whole environment to what it looked like
- *	before. Clobbers %eax.
- */
 
+/*!	This function brings you back to protected mode after you've
+	switched to it using switch_to_real_mode().
+	Should restore the whole environment to what it looked like
+	before. Clobbers %eax.
+*/
 FUNCTION(switch_to_protected_mode)
 	cli						// turn off interrupts
 
@@ -85,13 +86,13 @@ _no_paging:
 
 //--------------------------------------------------------------
 
-/** Switches from protected mode back to real mode.
- *	It will disable paging and set the real mode segment selectors to 0x1000,
- *	except for the stack selector, which will be 0x0 (the stack is at 0x9000
- *	which is where the BFS boot loader puts it as well).
- *	Clobbers %eax.
- */
 
+/*!	Switches from protected mode back to real mode.
+	It will disable paging and set the real mode segment selectors to 0x1000,
+	except for the stack selector, which will be 0x0 (the stack is at 0x9000
+	which is where the BFS boot loader puts it as well).
+	Clobbers %eax.
+*/
 FUNCTION(switch_to_real_mode)
 	// save the %esp register
 	movl	%esp, %eax
@@ -156,11 +157,11 @@ _real_code_segment:
 
 //--------------------------------------------------------------
 
-/** void call_bios(uint8 num, struct bios_regs *regs)
- *	Does a BIOS call by triggering a software interrupt in real
- *	mode.
- */
 
+/*!	void call_bios(uint8 num, struct bios_regs *regs)
+	Does a BIOS call by triggering a software interrupt in real
+	mode.
+*/
 FUNCTION(call_bios)
 	pushal
 	pushfl
@@ -235,12 +236,12 @@ int_number:
 
 //--------------------------------------------------------------
 
-/** uint32  search_keyboard_buffer()
- *  Search in keyboard buffer keycodes for F8, F12 or Space 
- *  if not found - search ESC keycode at the end of this buffer (2 positions)
- */
 
-FUNCTION(search_keyboard_buffer)
+/*!	uint32  boot_key_in_keyboard_buffer()
+	Search keyboard buffer for the keycodes for space in the first run, and,
+	if not found - for the escape key at the last two positions of this buffer
+*/
+FUNCTION(boot_key_in_keyboard_buffer)
 	pushal
 	pushfl
 
@@ -253,27 +254,23 @@ FUNCTION(search_keyboard_buffer)
 	cld
 	push	%ds
 	xorl	%eax, %eax
-	mov	%ax, %ds
-	mov	$0x41E, %si	// BIOS kbd buffer
+	mov		%ax, %ds
+	mov		$0x41E, %si		// BIOS kbd buffer
 search_cycle1:
 	lodsw
-	cmp	$0x4200, %ax	// test F8 key
-	jz	to_ret
-	cmp	$0x8600, %ax	// test F12 key
-	jz	to_ret
-	cmp	$0x3920, %ax	// test Space key
-	jz	to_ret
-	cmp	$0x440, %si
-	jnz	search_cycle1
+	cmp		$0x3920, %ax	// test space key
+	jz		to_ret
+	cmp		$0x440, %si
+	jnz		search_cycle1
 
 	addw	0x41C, %si
 	movw	-0x42(%si), %ax
-	cmp	$0x011B, %ax	// test ESC key
-	jz	to_ret
+	cmp		$0x011B, %ax	// test ESC key
+	jz		to_ret
 	movw	-0x44(%si), %ax
-	cmp	$0x011B, %ax	// test ESC key
+	cmp		$0x011B, %ax	// test ESC key
 to_ret:
-	pop	%ds
+	pop		%ds
 
 	// save %eax
 	movl	%eax, (SAVED_EAX - 0x10000)
@@ -290,6 +287,7 @@ to_ret:
 	ret
 
 //--------------------------------------------------------------
+
 
 .globl idt_descriptor
 idt_descriptor:

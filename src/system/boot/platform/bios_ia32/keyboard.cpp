@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "keyboard.h"
@@ -10,10 +10,9 @@
 #include <boot/platform.h>
 
 
-/** Note, checking for keys doesn't seem to work in graphics
- *	mode, at least in Bochs.
- */
-
+/*!	Note, checking for keys doesn't seem to work in graphics
+	mode, at least in Bochs.
+*/
 static uint16
 check_for_key(void)
 {
@@ -68,9 +67,9 @@ check_for_boot_keys(void)
 		// LShift or RShift - option menu
 		options |= BOOT_OPTION_MENU;
 	} else {
-		keycode = search_keyboard_buffer();
-		if (keycode == 0x4200 || keycode == 0x8600 || keycode == 0x3920) {
-			// F8 or F12 or Space - option menu
+		keycode = boot_key_in_keyboard_buffer();
+		if (keycode == 0x3920) {
+			// space - option menu
 			options |= BOOT_OPTION_MENU;
 		} else if (keycode == 0x011B) {
 			// ESC - debug output

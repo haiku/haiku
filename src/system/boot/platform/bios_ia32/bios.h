@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef BIOS_H
 #define BIOS_H
 
@@ -28,23 +28,27 @@ struct bios_regs {
 
 #define ADDRESS_SEGMENT(address) ((addr_t)(address) >> 4)
 #define ADDRESS_OFFSET(address) ((addr_t)(address) & 0xf)
-#define LINEAR_ADDRESS(segment, offset) (((addr_t)(segment) << 4) + (addr_t)(offset))
+#define LINEAR_ADDRESS(segment, offset) \
+	(((addr_t)(segment) << 4) + (addr_t)(offset))
 #define SEGMENTED_TO_LINEAR(segmented) \
 	LINEAR_ADDRESS((addr_t)(segmented) >> 16, (addr_t)(segmented) & 0xffff)
+
 
 static const addr_t kDataSegmentScratch = 0x10020;	// about 768 bytes
 static const addr_t kDataSegmentBase = 0x10000;
 static const addr_t kExtraSegmentScratch = 0x2000;	// about 24 kB
 
-extern
+
 #ifdef __cplusplus
-"C"
+extern "C" {
 #endif
-void call_bios(uint8 num, struct bios_regs *regs);
-extern
+
+void	call_bios(uint8 num, struct bios_regs* regs);
+uint32	boot_key_in_keyboard_buffer(void);
+
 #ifdef __cplusplus
-"C"
+}
 #endif
-uint32 search_keyboard_buffer();
+
 
 #endif	/* BIOS_H */
