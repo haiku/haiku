@@ -6,6 +6,8 @@
 #include <OS.h>
 #include <KernelExport.h>
 
+#include <debug.h>
+
 #include "disasm_arch.h"
 #include "udis86.h"
 
@@ -20,7 +22,8 @@ static int
 read_next_byte(struct ud*)
 {
 	uint8_t buffer;
-	if (user_memcpy(&buffer, (void*)sCurrentReadAddress, 1) != B_OK) {
+	if (debug_memcpy(B_CURRENT_TEAM, &buffer, (void*)sCurrentReadAddress, 1)
+			!= B_OK) {
 		kprintf("<read fault>\n");
 		return UD_EOI;
 	}

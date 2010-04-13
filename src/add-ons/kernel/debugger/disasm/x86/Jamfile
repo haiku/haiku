@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel debugger disasm $(TARGET_ARCH) ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 UseHeaders [ LibraryHeaders udis86 ] ;
 UseHeaders [ LibraryHeaders [ FDirName udis86 libudis86 ] ] ;
+UsePrivateKernelHeaders ;
 
 DEFINES += __UD_STANDALONE__ ;
 DEFINES += assert=disasm_arch_assert ;
