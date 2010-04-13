@@ -429,8 +429,12 @@ BButton::MakeDefault(bool flag)
 		if (!fDrawAsDefault) {
 			fDrawAsDefault = true;
 
-			ResizeBy(6.0f, 6.0f);
-			MoveBy(-3.0f, -3.0f);
+			if ((Flags() & B_SUPPORTS_LAYOUT) != 0)
+				InvalidateLayout();
+			else {
+				ResizeBy(6.0f, 6.0f);
+				MoveBy(-3.0f, -3.0f);
+			}
 		}
 
 		if (window && oldDefault != this)
@@ -441,8 +445,12 @@ BButton::MakeDefault(bool flag)
 
 		fDrawAsDefault = false;
 
-		ResizeBy(-6.0f, -6.0f);
-		MoveBy(3.0f, 3.0f);
+		if ((Flags() & B_SUPPORTS_LAYOUT) != 0)
+			InvalidateLayout();
+		else {
+			ResizeBy(-6.0f, -6.0f);
+			MoveBy(3.0f, 3.0f);
+		}
 
 		if (window && oldDefault == this)
 			window->SetDefaultButton(NULL);
@@ -727,6 +735,8 @@ BButton::_ValidatePreferredSize()
 		fPreferredSize.height
 			= ceilf((fontHeight.ascent + fontHeight.descent) * 1.8)
 				+ (fDrawAsDefault ? 6.0f : 0);
+
+		ResetLayoutInvalidation();
 	}
 
 	return fPreferredSize;
