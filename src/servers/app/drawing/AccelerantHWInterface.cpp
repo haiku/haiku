@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
  */
+
 
 /*!	Accelerant based HWInterface implementation */
 
@@ -400,18 +401,24 @@ AccelerantHWInterface::_SetupDefaultHooks()
 status_t
 AccelerantHWInterface::Shutdown()
 {
-	if (fAccelerantHook) {
-		uninit_accelerant UninitAccelerant
+	if (fAccelerantHook != NULL) {
+		uninit_accelerant uninitAccelerant
 			= (uninit_accelerant)fAccelerantHook(B_UNINIT_ACCELERANT, NULL);
-		if (UninitAccelerant)
-			UninitAccelerant();
+		if (uninitAccelerant != NULL)
+			uninitAccelerant();
+
+		fAccelerantHook = NULL;
 	}
 
-	if (fAccelerantImage >= 0)
+	if (fAccelerantImage >= 0) {
 		unload_add_on(fAccelerantImage);
+		fAccelerantImage = -1;
+	}
 
-	if (fCardFD >= 0)
+	if (fCardFD >= 0) {
 		close(fCardFD);
+		fCardFD = -1;
+	}
 
 	return B_OK;
 }
