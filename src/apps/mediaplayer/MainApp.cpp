@@ -43,11 +43,16 @@
 #include "SettingsWindow.h"
 
 
-MainApp* gMainApp;
+
+static const char* kCurrentPlaylistFilename = "MediaPlayer Current Playlist";
+
 const char* kAppSig = "application/x-vnd.Haiku-MediaPlayer";
+
+MainApp* gMainApp;
 
 static const char* kMediaServerSig = B_MEDIA_SERVER_SIGNATURE;
 static const char* kMediaServerAddOnSig = "application/x-vnd.Be.addon-host";
+
 
 MainApp::MainApp()
 	:
@@ -116,7 +121,7 @@ MainApp::QuitRequested()
 
 		BMessage quitMessage;
 		playerWindow->GetQuitMessage(&quitMessage);
-		
+
 		// Store the playlist if there is one. If the user has multiple
 		// instances playing audio at the this time, the first instance wins.
 		BMessage playlistArchive;
@@ -569,9 +574,6 @@ MainApp::_HandleFilePanelResult(BFilePanel* panel, const BMessage* message)
 }
 
 
-static const char* kCurrentPlaylistFilename = "MediaPlayer Current Playlist";
-
-
 void
 MainApp::_StoreCurrentPlaylist(const BMessage* message) const
 {
@@ -604,6 +606,7 @@ MainApp::_RestoreCurrentPlaylist(BMessage* message) const
 
 	return message->Unflatten(&file);
 }
+
 
 void
 MainApp::_InstallPlaylistMimeType()

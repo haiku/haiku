@@ -1,12 +1,11 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus 	<superstippi@gmx.de>
  *		Fredrik Modéen 	<fredrik@modeen.se>
  */
-
 #ifndef PLAYLIST_WINDOW_H
 #define PLAYLIST_WINDOW_H
 
@@ -15,6 +14,7 @@
 #include <Window.h>
 
 #include "ListenerAdapter.h"
+
 
 class BMenuBar;
 class BMenuItem;
@@ -27,9 +27,11 @@ class RWLocker;
 class BButton;
 class BFilePanel;
 
+
 enum {
 	M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH	= 'rmtr'
 };
+
 
 class PlaylistWindow : public BWindow {
 public:
@@ -62,5 +64,6 @@ private:
 
 			entry_ref			fSavedPlaylistRef;
 };
+
 
 #endif // PLAYLIST_WINDOW_H

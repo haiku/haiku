@@ -176,9 +176,8 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			// player window, _not_ when it is dropped in this window
 			// outside of the playlist!
 			int32 appendIndex;
-			if (message->FindInt32("append_index", &appendIndex) == B_OK) {
+			if (message->FindInt32("append_index", &appendIndex) == B_OK)
 				fListView->RefsReceived(message, appendIndex);
-			}
 			break;
 		}
 

@@ -1,8 +1,13 @@
-/*	
+/*
  * Copyright (c) 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
  * Copyright (c) 2000-2008, Stephan Aßmus <superstippi@gmx.de>,
  * All Rights Reserved. Distributed under the terms of the MIT license.
  */
+
+
+//! This class controls our media nodes and general playback
+
+
 #include "NodeManager.h"
 
 #include <stdio.h>
@@ -18,52 +23,59 @@
 #include "VideoProducer.h"
 #include "VideoSupplier.h"
 
+
 // debugging
 //#define TRACE_NODE_MANAGER
 #ifdef TRACE_NODE_MANAGER
-# define TRACE(x...)	printf(x)
-# define ERROR(x...)	fprintf(stderr, x)
+#	define TRACE(x...)	printf(x)
+#	define ERROR(x...)	fprintf(stderr, x)
 #else
-# define TRACE(x...)
-# define ERROR(x...)	fprintf(stderr, x)
+#	define TRACE(x...)
+#	define ERROR(x...)	fprintf(stderr, x)
 #endif
 
 #define print_error(str, status) printf(str ", error: %s\n", strerror(status))
 
+
 NodeManager::Connection::Connection()
-	: connected(false)
+	:
+	connected(false)
 {
 	memset(&format, 0, sizeof(media_format));
 }
 
-// constructor
+
+// #pragma mark -
+
+
 NodeManager::NodeManager()
-	: PlaybackManager(),
-	  fMediaRoster(NULL),
-	  fAudioProducer(NULL),
-	  fVideoConsumer(NULL),
-	  fVideoProducer(NULL),
-	  fTimeSource(media_node::null),
-	  fAudioConnection(),
-	  fVideoConnection(),
-	  fPerformanceTimeBase(0),
-	  fStatus(B_NO_INIT),
-	  fVideoTarget(NULL),
-	  fAudioSupplier(NULL),
-	  fVideoSupplier(NULL),
-	  fVideoBounds(0, 0, -1, -1),
-	  fPeakListener(NULL)
+	:
+	PlaybackManager(),
+	fMediaRoster(NULL),
+	fAudioProducer(NULL),
+	fVideoConsumer(NULL),
+	fVideoProducer(NULL),
+	fTimeSource(media_node::null),
+	fAudioConnection(),
+	fVideoConnection(),
+	fPerformanceTimeBase(0),
+	fStatus(B_NO_INIT),
+	fVideoTarget(NULL),
+	fAudioSupplier(NULL),
+	fVideoSupplier(NULL),
+	fVideoBounds(0, 0, -1, -1),
+	fPeakListener(NULL)
 {
 }
 
-// destructor
+
 NodeManager::~NodeManager()
 {
 	_StopNodes();
 	_TearDownNodes();
 }
 
-// Init
+
 status_t
 NodeManager::Init(BRect videoBounds, float videoFrameRate,
 	color_space preferredVideoFormat, float audioFrameRate,
@@ -87,14 +99,14 @@ NodeManager::Init(BRect videoBounds, float videoFrameRate,
 		audioFrameRate, audioChannels, enabledNodes, useOverlays, true);
 }
 
-// InitCheck
+
 status_t
 NodeManager::InitCheck()
 {
 	return fStatus;
 }
 
-// SetPlayMode
+
 void
 NodeManager::SetPlayMode(int32 mode, bool continuePlaying)
 {
@@ -108,7 +120,7 @@ NodeManager::SetPlayMode(int32 mode, bool continuePlaying)
 	PlaybackManager::SetPlayMode(mode, continuePlaying);
 }
 
-// CleanupNodes
+
 status_t
 NodeManager::CleanupNodes()
 {
@@ -116,7 +128,7 @@ NodeManager::CleanupNodes()
 	return _TearDownNodes(false);
 }
 
-// FormatChanged
+
 status_t
 NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
 	color_space preferredVideoFormat, float audioFrameRate,
@@ -154,7 +166,7 @@ NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
 	return ret;
 }
 
-// RealTimeForTime
+
 bigtime_t
 NodeManager::RealTimeForTime(bigtime_t time) const
 {
@@ -170,7 +182,7 @@ NodeManager::RealTimeForTime(bigtime_t time) const
 	return result;
 }
 
-// TimeForRealTime
+
 bigtime_t
 NodeManager::TimeForRealTime(bigtime_t time) const
 {
@@ -185,7 +197,7 @@ NodeManager::TimeForRealTime(bigtime_t time) const
 	return result;
 }
 
-// SetCurrentAudioTime
+
 void
 NodeManager::SetCurrentAudioTime(bigtime_t time)
 {
@@ -197,7 +209,7 @@ NodeManager::SetCurrentAudioTime(bigtime_t time)
 	}
 }
 
-// SetVideoBounds
+
 void
 NodeManager::SetVideoBounds(BRect bounds)
 {
@@ -207,14 +219,14 @@ NodeManager::SetVideoBounds(BRect bounds)
 	}
 }
 
-// VideoBounds
+
 BRect
 NodeManager::VideoBounds() const
 {
 	return fVideoBounds;
 }
 
-// SetVideoTarget
+
 void
 NodeManager::SetVideoTarget(VideoTarget* videoTarget)
 {
@@ -225,14 +237,14 @@ NodeManager::SetVideoTarget(VideoTarget* videoTarget)
 	}
 }
 
-// GetVideoTarget
+
 VideoTarget*
 NodeManager::GetVideoTarget() const
 {
 	return fVideoTarget;
 }
 
-// SetVolume
+
 void
 NodeManager::SetVolume(float percent)
 {
@@ -240,7 +252,7 @@ NodeManager::SetVolume(float percent)
 	// our audio node...
 }
 
-// SetPeakListener
+
 void
 NodeManager::SetPeakListener(BHandler* handler)
 {
@@ -249,9 +261,10 @@ NodeManager::SetPeakListener(BHandler* handler)
 		fAudioProducer->SetPeakListener(fPeakListener);
 }
 
+
 // #pragma mark -
 
-// _SetUpNodes
+
 status_t
 NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes,
 	bool useOverlays, float audioFrameRate, uint32 audioChannels)
@@ -287,7 +300,7 @@ NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes,
 		}
 	} else
 		printf("running without video node\n");
-	
+
 	// setup the audio nodes
 	if (enabledNodes != VIDEO_ONLY) {
 		fStatus = _SetUpAudioNodes(audioFrameRate, audioChannels);
@@ -309,7 +322,6 @@ fNoAudio = true;
 }
 
 
-// _SetUpVideoNodes
 status_t
 NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 	bool useOverlays)
@@ -317,14 +329,14 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 	// create the video producer node
 	fVideoProducer = new VideoProducer(NULL, "MediaPlayer video out", 0,
 		this, fVideoSupplier);
-	
+
 	// register the producer node
 	fStatus = fMediaRoster->RegisterNode(fVideoProducer);
 	if (fStatus != B_OK) {
 		print_error("Can't register the video producer", fStatus);
 		return fStatus;
 	}
-	
+
 	// make sure the Media Roster knows that we're using the node
 //	fMediaRoster->GetNodeFor(fVideoProducer->Node().node,
 //		&fVideoConnection.producer);
@@ -333,7 +345,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 	// create the video consumer node
 	fVideoConsumer = new VideoConsumer("MediaPlayer video in", NULL, 0, this,
 		fVideoTarget);
-	
+
 	// register the consumer node
 	fStatus = fMediaRoster->RegisterNode(fVideoConsumer);
 	if (fStatus != B_OK) {
@@ -345,7 +357,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 //	fMediaRoster->GetNodeFor(fVideoConsumer->Node().node,
 //		&fVideoConnection.consumer);
 	fVideoConnection.consumer = fVideoConsumer->Node();
-	
+
 	// find free producer output
 	media_input videoInput;
 	media_output videoOutput;
@@ -384,7 +396,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 		}
 	};
 	format.u.raw_video = videoFormat;
-	
+
 	// connect video producer to consumer (hopefully using overlays)
 	fVideoConsumer->SetTryOverlay(useOverlays);
 	fStatus = fMediaRoster->Connect(videoOutput.source, videoInput.destination,
@@ -406,7 +418,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 		}
 
 		fVideoConsumer->SetTryOverlay(false);
-		// connect video producer to consumer (not using overlays and using 
+		// connect video producer to consumer (not using overlays and using
 		// a colorspace that BViews support drawing)
 		fStatus = fMediaRoster->Connect(videoOutput.source,
 			videoInput.destination, &format, &videoOutput, &videoInput);
@@ -417,7 +429,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 			fStatus);
 		return fStatus;
 	}
-	
+
 	// the inputs and outputs might have been reassigned during the
 	// nodes' negotiation of the Connect().  That's why we wait until
 	// after Connect() finishes to save their contents.
@@ -433,7 +445,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 		print_error("Can't set the timesource for the video source", fStatus);
 		return fStatus;
 	}
-	
+
 	fStatus = fMediaRoster->SetTimeSourceFor(fVideoConsumer->ID(),
 		fTimeSource.node);
 	if (fStatus != B_OK) {
@@ -444,7 +456,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 	return fStatus;
 }
 
-// _SetUpAudioNodes
+
 status_t
 NodeManager::_SetUpAudioNodes(float audioFrameRate, uint32 audioChannels)
 {
@@ -517,7 +529,7 @@ NodeManager::_SetUpAudioNodes(float audioFrameRate, uint32 audioChannels)
 	return fStatus;
 }
 
-// _TearDownNodes
+
 status_t
 NodeManager::_TearDownNodes(bool disconnect)
 {
@@ -600,7 +612,7 @@ TRACE("NodeManager::_TearDownNodes() done\n");
 	return err;
 }
 
-// _StartNodes
+
 status_t
 NodeManager::_StartNodes()
 {
@@ -619,22 +631,22 @@ NodeManager::_StartNodes()
 			&latency);
 		if (status < B_OK) {
 			print_error("error getting latency for video producer",
-				status);	
+				status);
 		} else
 			TRACE("video latency: %Ld\n", latency);
 		status = fMediaRoster->SetProducerRunModeDelay(
 			fVideoConnection.producer, latency);
 		if (status < B_OK) {
 			print_error("error settings run mode delay for video producer",
-				status);	
+				status);
 		}
-	
+
 		// start the nodes
 		status = fMediaRoster->GetInitialLatencyFor(
 			fVideoConnection.producer, &initLatency);
 		if (status < B_OK) {
 			print_error("error getting initial latency for video producer",
-				status);	
+				status);
 		}
 	}
 	initLatency += estimate_max_scheduling_latency();
@@ -646,7 +658,7 @@ NodeManager::_StartNodes()
 			&audioLatency);
 		TRACE("audio latency: %Ld\n", audioLatency);
 	}
-	
+
 	BTimeSource* timeSource;
 	if (fVideoProducer) {
 		timeSource = fMediaRoster->MakeTimeSourceFor(
@@ -656,7 +668,7 @@ NodeManager::_StartNodes()
 			fAudioConnection.producer);
 	}
 	bool running = timeSource->IsRunning();
-	
+
 	// workaround for people without sound cards
 	// because the system time source won't be running
 	bigtime_t real = BTimeSource::RealTime();
@@ -712,7 +724,7 @@ printf("performance time for %lld: %lld\n", real + latency
 	return status;
 }
 
-// _StopNodes
+
 void
 NodeManager::_StopNodes()
 {
@@ -739,4 +751,3 @@ NodeManager::_StopNodes()
 	}
 	TRACE("NodeManager::_StopNodes() done\n");
 }
-

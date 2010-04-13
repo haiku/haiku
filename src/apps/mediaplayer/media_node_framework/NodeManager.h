@@ -1,17 +1,16 @@
-/*	
+/*
  * Copyright (c) 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
  * Copyright (c) 2000-2008, Stephan Aßmus <superstippi@gmx.de>,
  * All Rights Reserved. Distributed under the terms of the MIT license.
  */
-
-//! This class controls our media nodes and general playback
-
 #ifndef NODE_MANAGER_H
 #define NODE_MANAGER_H
+
 
 #include <MediaNode.h>
 
 #include "PlaybackManager.h"
+
 
 class BMediaRoster;
 class AudioProducer;
@@ -21,8 +20,9 @@ class VideoConsumer;
 class AudioSupplier;
 class VideoSupplier;
 
+
 class NodeManager : public PlaybackManager {
- public:
+public:
 								NodeManager();
 	virtual						~NodeManager();
 
@@ -59,7 +59,7 @@ class NodeManager : public PlaybackManager {
 
 	virtual	void				SetPlayMode(int32 mode,
 									bool continuePlaying = true);
-									
+
 	virtual	bigtime_t			RealTimeForTime(bigtime_t time) const;
 	virtual	bigtime_t			TimeForRealTime(bigtime_t time) const;
 
@@ -89,7 +89,7 @@ class NodeManager : public PlaybackManager {
 			status_t			_StartNodes();
 			void				_StopNodes();
 
- private:
+private:
 	struct Connection {
 			Connection();
 
@@ -116,7 +116,7 @@ private:
 			bigtime_t			fPerformanceTimeBase;
 
 			status_t			fStatus;
-			// 
+			//
 			VideoTarget*		fVideoTarget;
 			AudioSupplier*		fAudioSupplier;
 			VideoSupplier*		fVideoSupplier;

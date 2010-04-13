@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "PlaylistListView.h"
 
 #include <new>
@@ -31,6 +32,7 @@
 #include "PlaylistObserver.h"
 #include "RandomizePLItemsCommand.h"
 #include "RemovePLItemsCommand.h"
+
 
 using std::nothrow;
 
@@ -75,9 +77,13 @@ private:
 };
 
 
+// #pragma mark -
+
+
 PlaylistListView::Item::Item(PlaylistItem* item)
-	: SimpleItem(item->Name().String()),
-	  fItem(item)
+	:
+	SimpleItem(item->Name().String()),
+	fItem(item)
 {
 	fItem->AddListener(this);
 }

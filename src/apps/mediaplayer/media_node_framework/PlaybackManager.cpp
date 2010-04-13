@@ -1,5 +1,6 @@
 // PlaybackManager.cpp
 
+
 #include <algorithm>
 #include <stdio.h>
 
@@ -13,16 +14,19 @@
 
 #include "PlaybackManager.h"
 
+
 using namespace std;
+
 
 //#define TRACE_NODE_MANAGER
 #ifdef TRACE_NODE_MANAGER
-# define TRACE(x...)	printf(x)
-# define ERROR(x...)	fprintf(stderr, x)
+#	define TRACE(x...)	printf(x)
+#	define ERROR(x...)	fprintf(stderr, x)
 #else
-# define TRACE(x...)
-# define ERROR(x...)	fprintf(stderr, x)
+#	define TRACE(x...)
+#	define ERROR(x...)	fprintf(stderr, x)
 #endif
+
 
 void
 tdebug(const char* str)
