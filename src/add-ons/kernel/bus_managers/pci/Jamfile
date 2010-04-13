@@ -3,12 +3,13 @@ SubDir HAIKU_TOP src add-ons kernel bus_managers pci ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders [ FDirName kernel util ] ;
+UseHeaders [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 
 KernelAddon pci :
 	pci.cpp
 	pci_fixup.cpp
 	pci_info.cpp
-	pci_module.c
+	pci_module.cpp
 	pci_root.cpp
 	pci_device.cpp
 	: pci_arch_bus_manager.a

@@ -15,6 +15,9 @@
 
 #include "pci_controller.h"
 
+#ifdef __INTEL__
+#include "pci_arch_info.h"
+#endif
 
 #define TRACE_PCI
 #ifndef TRACE_PCI
@@ -22,7 +25,6 @@
 #else
 #	define TRACE(x) dprintf x
 #endif
-
 
 #ifdef __cplusplus
 
@@ -45,6 +47,9 @@ struct PCIDev {
 	uint8				device;
 	uint8				function;
 	pci_info			info;
+#ifdef __INTEL__
+	pci_arch_info		arch_info;
+#endif
 };
 
 

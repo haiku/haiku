@@ -83,7 +83,7 @@ typedef struct pci_info {
 			ulong	rom_base_pci;			/* rom base addr, viewed from pci */
 			uchar	interrupt_line;			/* interrupt line */
 			uchar	interrupt_pin;			/* interrupt pin */
-			ushort	bridge_control;		
+			ushort	bridge_control;
 			ushort	subsystem_id;			/* subsystem (add-in card) id */
 			ushort	subsystem_vendor_id;	/* subsystem (add-in card) vendor id */
 		} h1;
@@ -109,7 +109,7 @@ typedef struct pci_info {
 			ushort  secondary_status;
 			ushort  bridge_control;
 #endif /* __HAIKU_PCI_BUS_MANAGER_TESTING */
-		} h2;			
+		} h2;
 	} u;
 } pci_info;
 
@@ -221,7 +221,7 @@ struct pci_module_info {
 #define PCI_primary_bus								0x18 /* (1 byte) */
 #define PCI_secondary_bus							0x19 /* (1 byte) */
 #define PCI_subordinate_bus							0x1A /* (1 byte) */
-#define PCI_secondary_latency						0x1B /* (1 byte) latency of secondary bus */	
+#define PCI_secondary_latency						0x1B /* (1 byte) latency of secondary bus */
 #define PCI_io_base									0x1C /* (1 byte) io base address register for 2ndry bus*/
 #define PCI_io_limit								0x1D /* (1 byte) */
 #define PCI_secondary_status						0x1E /* (2 bytes) */
@@ -236,7 +236,7 @@ struct pci_module_info {
 #define PCI_sub_vendor_id_1                         0x34 /* (2 bytes) */
 #define PCI_sub_device_id_1                         0x36 /* (2 bytes) */
 #define PCI_bridge_rom_base							0x38
-#define PCI_bridge_control							0x3E /* (2 bytes) */																		
+#define PCI_bridge_control							0x3E /* (2 bytes) */
 
 
 /* PCI type 2 header offsets */
@@ -245,7 +245,7 @@ struct pci_module_info {
 #define PCI_primary_bus_2							0x18 /* (1 byte) */
 #define PCI_secondary_bus_2							0x19 /* (1 byte) */
 #define PCI_subordinate_bus_2						0x1A /* (1 byte) */
-#define PCI_secondary_latency_2                     0x1B /* (1 byte) latency of secondary bus */	
+#define PCI_secondary_latency_2                     0x1B /* (1 byte) latency of secondary bus */
 #define PCI_memory_base0_2                          0x1C /* (4 bytes) */
 #define PCI_memory_limit0_2                         0x20 /* (4 bytes) */
 #define PCI_memory_base1_2                          0x24 /* (4 bytes) */
@@ -588,8 +588,8 @@ struct pci_module_info {
 
 /** types of PCI header */
 
-#define PCI_header_type_generic				0x00		
-#define PCI_header_type_PCI_to_PCI_bridge	0x01		
+#define PCI_header_type_generic				0x00
+#define PCI_header_type_PCI_to_PCI_bridge	0x01
 #define PCI_header_type_cardbus             0x02
 
 
@@ -676,6 +676,34 @@ struct pci_module_info {
 #define PCI_pm_state_d1         0x01
 #define PCI_pm_state_d2         0x02
 #define PCI_pm_state_d3         0x03
+
+/** MSI registers **/
+#define PCI_msi_control			0x02
+#define PCI_msi_address			0x04
+#define PCI_msi_address_high	0x08
+#define PCI_msi_data			0x08
+#define PCI_msi_data_64bit		0x0c
+#define PCI_msi_mask			0x10
+#define PCI_msi_pending			0x14
+
+/** MSI control register values **/
+#define PCI_msi_control_enable		0x0001
+#define PCI_msi_control_vector		0x0100
+#define PCI_msi_control_64bit		0x0080
+#define PCI_msi_control_mme_mask	0x0070
+#define PCI_msi_control_mme_1		0x0000
+#define PCI_msi_control_mme_2		0x0010
+#define PCI_msi_control_mme_4		0x0020
+#define PCI_msi_control_mme_8		0x0030
+#define PCI_msi_control_mme_16		0x0040
+#define PCI_msi_control_mme_32		0x0050
+#define PCI_msi_control_mmc_mask	0x000e
+#define PCI_msi_control_mmc_1		0x0000
+#define PCI_msi_control_mmc_2		0x0002
+#define PCI_msi_control_mmc_4		0x0004
+#define PCI_msi_control_mmc_8		0x0006
+#define PCI_msi_control_mmc_16		0x0008
+#define PCI_msi_control_mmc_32		0x000a
 
 #ifdef __cplusplus
 }

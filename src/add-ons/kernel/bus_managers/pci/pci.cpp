@@ -103,7 +103,7 @@ pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
 		return B_ERROR;
 
-	//TRACE(("%s(%d [%d:%d], %d, %d, %s, %p)\n", __FUNCTION__, virtualBus, 
+	//TRACE(("%s(%d [%d:%d], %d, %d, %s, %p)\n", __FUNCTION__, virtualBus,
 	//	domain, bus, device, function, driverName, nodeCookie));
 
 	device_attr matchPCIRoot[] = {
@@ -140,7 +140,7 @@ pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 	root = gDeviceManager->get_root_node();
 	if (!root)
 		return status;
-	
+
 	pci = NULL;
 	if (gDeviceManager->get_next_child_node(root, matchPCIRoot, &pci) < B_OK)
 		goto err0;
@@ -148,16 +148,16 @@ pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 	node = NULL;
 	if (gDeviceManager->get_next_child_node(pci, matchThis, &node) < B_OK)
 		goto err1;
-	
+
 	// common API for all legacy modules ?
 	//status = legacy_driver_register(node, driverName, nodeCookie, PCI_LEGACY_DRIVER_MODULE_NAME);
 
-	status = gDeviceManager->register_node(node, PCI_LEGACY_DRIVER_MODULE_NAME, 
+	status = gDeviceManager->register_node(node, PCI_LEGACY_DRIVER_MODULE_NAME,
 		legacyAttrs, NULL, &legacy);
 	if (status < B_OK)
 		goto err2;
 
-	status = gDeviceManager->register_node(legacy, PCI_LEGACY_DRIVER_MODULE_NAME, 
+	status = gDeviceManager->register_node(legacy, PCI_LEGACY_DRIVER_MODULE_NAME,
 		drvAttrs, NULL, NULL);
 	if (status < B_OK)
 		goto err3;
@@ -192,7 +192,7 @@ pci_unreserve_device(uchar virtualBus, uchar device, uchar function,
 	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
 		return B_ERROR;
 
-	//TRACE(("%s(%d [%d:%d], %d, %d, %s, %p)\n", __FUNCTION__, virtualBus, 
+	//TRACE(("%s(%d [%d:%d], %d, %d, %s, %p)\n", __FUNCTION__, virtualBus,
 	//	domain, bus, device, function, driverName, nodeCookie));
 
 	device_attr matchPCIRoot[] = {
@@ -237,7 +237,7 @@ pci_unreserve_device(uchar virtualBus, uchar device, uchar function,
 	node = NULL;
 	if (gDeviceManager->get_next_child_node(pci, matchThis, &node) < B_OK)
 		goto err1;
-	
+
 	// common API for all legacy modules ?
 	//status = legacy_driver_unregister(node, driverName, nodeCookie);
 
@@ -1325,6 +1325,9 @@ PCI::_RefreshDeviceInfo(PCIBus *bus)
 	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
 		_ReadBasicInfo(dev);
 		_ReadHeaderInfo(dev);
+#ifdef __INTEL__
+		pci_read_arch_info(dev);
+#endif
 		if (dev->child)
 			_RefreshDeviceInfo(dev->child);
 	}
