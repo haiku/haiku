@@ -2120,7 +2120,7 @@ heap_init_post_thread()
 	for (int32 i = 1; i < heapCount; i++) {
 		addr_t base = 0;
 		size_t size = HEAP_GROW_SIZE * HEAP_CLASS_COUNT;
-		area_id perCPUHeapArea = create_area("per cpu inital heap",
+		area_id perCPUHeapArea = create_area("per cpu initial heap",
 			(void **)&base, B_ANY_KERNEL_ADDRESS, size, B_FULL_LOCK,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (perCPUHeapArea < 0)
