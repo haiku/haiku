@@ -1,11 +1,12 @@
 /*
- * Copyright 2007-2009, Haiku. All rights reserved.
+ * Copyright 2007-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus 	<superstippi@gmx.de>
  *		Fredrik Modéen	<fredrik@modeen.se>
  */
+
 
 #include "PlaylistWindow.h"
 
@@ -34,6 +35,7 @@
 #include "PlaylistListView.h"
 #include "RWLocker.h"
 
+
 // TODO:
 // Maintaining a playlist file on disk is a bit tricky. The playlist ref should
 // be discarded when the user
@@ -58,16 +60,37 @@ enum {
 	M_PLAYLIST_REMOVE						= 'rmov'
 };
 
-#define SPACE 5
+
+static void
+display_save_alert(const char* message)
+{
+	BAlert* alert = new BAlert("Save error", message, "OK", NULL, NULL,
+		B_WIDTH_AS_USUAL, B_STOP_ALERT);
+	alert->Go(NULL);
+}
+
+
+static void
+display_save_alert(status_t error)
+{
+	BString errorMessage("Saving the playlist failed.\n\nError: ");
+	errorMessage << strerror(error);
+	display_save_alert(errorMessage.String());
+}
+
+
+// #pragma mark -
+
 
 PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 		Controller* controller)
-	: BWindow(frame, "Playlist", B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+	:
+	BWindow(frame, "Playlist", B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS),
-	  fPlaylist(playlist),
-	  fLocker(new RWLocker("command stack lock")),
-	  fCommandStack(new CommandStack(fLocker)),
-	  fCommandStackListener(this)
+	fPlaylist(playlist),
+	fLocker(new RWLocker("command stack lock")),
+	fCommandStack(new CommandStack(fLocker)),
+	fCommandStackListener(this)
 {
 	frame = Bounds();
 
@@ -142,8 +165,13 @@ PlaylistWindow::MessageReceived(BMessage* message)
 
 		case B_REFS_RECEIVED:
 			// Used for when we open a playlist from playlist window
-			message->AddInt32("append_index", APPEND_INDEX_REPLACE_PLAYLIST);
-		case B_SIMPLE_DATA: {
+			if (!message->HasInt32("append_index")) {
+				message->AddInt32("append_index",
+					APPEND_INDEX_REPLACE_PLAYLIST);
+			}
+			// supposed to fall through
+		case B_SIMPLE_DATA:
+		{
 			// only accept this message when it comes from the
 			// player window, _not_ when it is dropped in this window
 			// outside of the playlist!
@@ -154,7 +182,8 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case M_PLAYLIST_OPEN: {
+		case M_PLAYLIST_OPEN:
+		{
 			BMessenger target(this);
 			BMessage result(B_REFS_RECEIVED);
 			BMessage appMessage(M_SHOW_OPEN_PANEL);
@@ -165,15 +194,15 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			be_app->PostMessage(&appMessage);
 			break;
 		}
-		case M_PLAYLIST_SAVE: {
+
+		case M_PLAYLIST_SAVE:
 			if (fSavedPlaylistRef != entry_ref()) {
 				_SavePlaylist(fSavedPlaylistRef);
 				break;
-			} else {
-				// FALL THROUGH
 			}
-		}
-		case M_PLAYLIST_SAVE_AS: {
+			// supposed to fall through
+		case M_PLAYLIST_SAVE_AS:
+		{
 			BMessenger target(this);
 			BMessage result(M_PLAYLIST_SAVE_RESULT);
 			BMessage appMessage(M_SHOW_SAVE_PANEL);
@@ -184,10 +213,10 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			be_app->PostMessage(&appMessage);
 			break;
 		}
-		case M_PLAYLIST_SAVE_RESULT: {
+
+		case M_PLAYLIST_SAVE_RESULT:
 			_SavePlaylist(message);
 			break;
-		}
 
 		case M_PLAYLIST_EMPTY:
 			fListView->RemoveAll();
@@ -200,8 +229,6 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			break;
 		case M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH:
 		{
-printf("M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH\n");
-message->PrintToStream();
 			int32 index;
 			if (message->FindInt32("playlist index", &index) == B_OK)
 				fListView->RemoveToTrash(index);
@@ -286,24 +313,6 @@ PlaylistWindow::_ObjectChanged(const Notifier* object)
 		else
 			fRedoMI->SetLabel("<nothing to redo>");
 	}
-}
-
-
-static void
-display_save_alert(const char* message)
-{
-	BAlert* alert = new BAlert("Save error", message, "OK", NULL, NULL,
-		B_WIDTH_AS_USUAL, B_STOP_ALERT);
-	alert->Go(NULL);
-}
-
-
-static void
-display_save_alert(status_t error)
-{
-	BString errorMessage("Saving the playlist failed.\n\nError: ");
-	errorMessage << strerror(error);
-	display_save_alert(errorMessage.String());
 }
 
 
