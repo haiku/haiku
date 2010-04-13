@@ -140,6 +140,9 @@ status_t vm_memcpy_to_physical(addr_t to, const void* from, size_t length,
 			bool user);
 void vm_memcpy_physical_page(addr_t to, addr_t from);
 
+status_t vm_debug_copy_page_memory(team_id teamID, void* unsafeMemory,
+			void* buffer, size_t size, bool copyToUnsafe);
+
 // user syscalls
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
 			size_t size, uint32 lock, uint32 protection);

@@ -296,9 +296,10 @@ gdb_parse_command(void)
 			// for gdb may be trying to access an stray pointer
 			// We copy the memory to a safe buffer using
 			// the bulletproof debug_memcpy().
-			if (debug_memcpy(sSafeMemory, (char*)address, len) < 0)
+			if (debug_memcpy(B_CURRENT_TEAM, sSafeMemory, (char*)address, len)
+					< 0) {
 				gdb_reply("E02");
-			else
+			} else
 				gdb_memreply(sSafeMemory, len);
 
 			break;

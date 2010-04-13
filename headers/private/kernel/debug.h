@@ -132,8 +132,10 @@ extern bool		debug_is_kernel_memory_accessible(addr_t address, size_t size,
 					uint32 protection);
 extern int		debug_call_with_fault_handler(jmp_buf jumpBuffer,
 					void (*function)(void*), void* parameter);
-extern status_t	debug_memcpy(void* to, const void* from, size_t size);
-extern ssize_t	debug_strlcpy(char* to, const char* from, size_t size);
+extern status_t	debug_memcpy(team_id teamID, void* to, const void* from,
+					size_t size);
+extern ssize_t	debug_strlcpy(team_id teamID, char* to, const char* from,
+					size_t size);
 
 extern char		kgetc(void);
 extern void		kputs(const char *string);
@@ -172,8 +174,9 @@ extern status_t	debug_get_next_demangled_argument(uint32* _cookie,
 
 extern struct thread* debug_set_debugged_thread(struct thread* thread);
 extern struct thread* debug_get_debugged_thread();
-extern struct arch_debug_registers* debug_get_debug_registers(int32 cpu);
+extern bool debug_is_debugged_team(team_id teamID);
 
+extern struct arch_debug_registers* debug_get_debug_registers(int32 cpu);
 
 extern status_t	_user_kernel_debugger(const char *message);
 extern void		_user_debug_output(const char *userString);
@@ -181,5 +184,28 @@ extern void		_user_debug_output(const char *userString);
 #ifdef __cplusplus
 }
 #endif
+
+
+#ifdef __cplusplus
+
+struct DebuggedThreadSetter {
+	DebuggedThreadSetter(struct thread* thread)
+		:
+		fPreviousThread(debug_set_debugged_thread(thread))
+	{
+	}
+
+	~DebuggedThreadSetter()
+	{
+		debug_set_debugged_thread(fPreviousThread);
+	}
+
+private:
+	struct thread*	fPreviousThread;
+};
+
+
+#endif	// __cplusplus
+
 
 #endif	/* _KERNEL_DEBUG_H */

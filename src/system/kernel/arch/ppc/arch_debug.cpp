@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku Inc. All rights reserved.
+ * Copyright 2003-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -65,8 +65,10 @@ static status_t
 get_next_frame(addr_t framePointer, addr_t *next, addr_t *ip)
 {
 	stack_frame frame;
-	if (debug_memcpy(&frame, (void*)framePointer, sizeof(frame)) != B_OK)
+	if (debug_memcpy(B_CURRENT_TEAM, &frame, (void*)framePointer, sizeof(frame))
+			!= B_OK) {
 		return B_BAD_ADDRESS;
+	}
 
 	*ip = frame.return_address;
 	*next = (addr_t)frame.previous;

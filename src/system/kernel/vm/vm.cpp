@@ -2640,9 +2640,11 @@ display_mem(int argc, char** argv)
 		// string mode
 		for (i = 0; true; i++) {
 			char c;
-			if (debug_memcpy(&c, (char*)copyAddress + i, 1) != B_OK
-				|| c == '\0')
+			if (debug_memcpy(B_CURRENT_TEAM, &c, (char*)copyAddress + i, 1)
+					!= B_OK
+				|| c == '\0') {
 				break;
+			}
 
 			if (c == '\n')
 				kprintf("\\n");
@@ -2671,8 +2673,8 @@ display_mem(int argc, char** argv)
 
 				for (j = 0; j < displayed; j++) {
 					char c;
-					if (debug_memcpy(&c, (char*)copyAddress + i * itemSize + j,
-							1) != B_OK) {
+					if (debug_memcpy(B_CURRENT_TEAM, &c,
+							(char*)copyAddress + i * itemSize + j, 1) != B_OK) {
 						displayed = j;
 						break;
 					}
@@ -2689,8 +2691,8 @@ display_mem(int argc, char** argv)
 				kprintf("  ");
 			}
 
-			if (debug_memcpy(&value, (uint8*)copyAddress + i * itemSize,
-					itemSize) != B_OK) {
+			if (debug_memcpy(B_CURRENT_TEAM, &value,
+					(uint8*)copyAddress + i * itemSize, itemSize) != B_OK) {
 				kprintf("read fault");
 				break;
 			}
@@ -4655,6 +4657,93 @@ void
 vm_memcpy_physical_page(addr_t to, addr_t from)
 {
 	return sPhysicalPageMapper->MemcpyPhysicalPage(to, from);
+}
+
+
+/*!	Copies a range of memory directly from/to a page that might not be mapped
+	at the moment.
+
+	For \a unsafeMemory the current mapping (if any is ignored). The function
+	walks through the respective area's cache chain to find the physical page
+	and copies from/to it directly.
+	The memory range starting at \a unsafeMemory with a length of \a size bytes
+	must not cross a page boundary.
+
+	\param teamID The team ID identifying the address space \a unsafeMemory is
+		to be interpreted in. Ignored, if \a unsafeMemory is a kernel address
+		(the kernel address space is assumed in this case). If \c B_CURRENT_TEAM
+		is passed, the address space of the thread returned by
+		debug_get_debugged_thread() is used.
+	\param unsafeMemory The start of the unsafe memory range to be copied
+		from/to.
+	\param buffer A safely accessible kernel buffer to be copied from/to.
+	\param size The number of bytes to be copied.
+	\param copyToUnsafe If \c true, memory is copied from \a buffer to
+		\a unsafeMemory, the other way around otherwise.
+*/
+status_t
+vm_debug_copy_page_memory(team_id teamID, void* unsafeMemory, void* buffer,
+	size_t size, bool copyToUnsafe)
+{
+	if (size > B_PAGE_SIZE
+			|| ((addr_t)unsafeMemory + size) % B_PAGE_SIZE < size) {
+		return B_BAD_VALUE;
+	}
+
+	// get the address space for the debugged thread
+	VMAddressSpace* addressSpace;
+	if (IS_KERNEL_ADDRESS(unsafeMemory)) {
+		addressSpace = VMAddressSpace::Kernel();
+	} else if (teamID == B_CURRENT_TEAM) {
+		struct thread* thread = debug_get_debugged_thread();
+		if (thread == NULL || thread->team == NULL)
+			return B_BAD_ADDRESS;
+
+		addressSpace = thread->team->address_space;
+	} else
+		addressSpace = VMAddressSpace::DebugGet(teamID);
+
+	if (addressSpace == NULL)
+		return B_BAD_ADDRESS;
+
+	// get the area
+	VMArea* area = addressSpace->LookupArea((addr_t)unsafeMemory);
+	if (area == NULL)
+		return B_BAD_ADDRESS;
+
+	// search the page
+	off_t cacheOffset = (addr_t)unsafeMemory - area->Base()
+		+ area->cache_offset;
+	VMCache* cache = area->cache;
+	vm_page* page = NULL;
+	while (cache != NULL) {
+		page = cache->DebugLookupPage(cacheOffset);
+		if (page != NULL)
+			break;
+
+		// Page not found in this cache -- if it is paged out, we must not try
+		// to get it from lower caches.
+		if (cache->DebugHasPage(cacheOffset))
+			break;
+
+		cache = cache->source;
+	}
+
+	if (page == NULL)
+		return B_UNSUPPORTED;
+
+	// copy from/to physical memory
+	addr_t physicalAddress = page->physical_page_number * B_PAGE_SIZE
+		+ (addr_t)unsafeMemory % B_PAGE_SIZE;
+
+	if (copyToUnsafe) {
+		if (page->Cache() != area->cache)
+			return B_UNSUPPORTED;
+
+		return vm_memcpy_to_physical(physicalAddress, buffer, size, false);
+	}
+
+	return vm_memcpy_from_physical(buffer, physicalAddress, size, false);
 }
 
 

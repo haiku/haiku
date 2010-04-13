@@ -1852,33 +1852,69 @@ debug_call_with_fault_handler(jmp_buf jumpBuffer, void (*function)(void*),
 
 /*!	Similar to user_memcpy(), but can only be invoked from within the kernel
 	debugger (and must not be used outside).
+	The supplied \a teamID specifies the address space in which to interpret
+	the addresses. It can be \c B_CURRENT_TEAM for debug_get_debugged_thread(),
+	or any valid team ID. If the addresses are both kernel addresses, the
+	argument is ignored and the current address space is used.
 */
 status_t
-debug_memcpy(void* to, const void* from, size_t size)
+debug_memcpy(team_id teamID, void* to, const void* from, size_t size)
 {
 	// don't allow address overflows
 	if ((addr_t)from + size < (addr_t)from || (addr_t)to + size < (addr_t)to)
 		return B_BAD_ADDRESS;
 
-	debug_memcpy_parameters parameters = {to, from, size};
+	// Try standard memcpy() with fault handler, if the addresses can be
+	// interpreted in the current address space.
+	if ((IS_KERNEL_ADDRESS(from) && IS_KERNEL_ADDRESS(to))
+			|| debug_is_debugged_team(teamID)) {
+		debug_memcpy_parameters parameters = {to, from, size};
 
-	if (debug_call_with_fault_handler(gCPU[sDebuggerOnCPU].fault_jump_buffer,
-			&debug_memcpy_trampoline, &parameters) != 0) {
-		return B_BAD_ADDRESS;
+		if (debug_call_with_fault_handler(gCPU[sDebuggerOnCPU].fault_jump_buffer,
+				&debug_memcpy_trampoline, &parameters) == 0) {
+			return B_OK;
+		}
 	}
+
+	// Try harder. The pages of the respective memory could be unmapped but
+	// still exist in a cache (the page daemon does that with inactive pages).
+	while (size > 0) {
+		uint8 buffer[32];
+		size_t toCopy = std::min(size, sizeof(buffer));
+
+		// restrict the size so we don't cross page boundaries
+		if (((addr_t)from + toCopy) % B_PAGE_SIZE < toCopy)
+			toCopy -= ((addr_t)from + toCopy) % B_PAGE_SIZE;
+		if (((addr_t)to + toCopy) % B_PAGE_SIZE < toCopy)
+			toCopy -= ((addr_t)to + toCopy) % B_PAGE_SIZE;
+
+		if (vm_debug_copy_page_memory(teamID, (void*)from, buffer, toCopy,
+				false) != B_OK
+			|| vm_debug_copy_page_memory(teamID, to, buffer, toCopy, true)
+				!= B_OK) {
+			return B_BAD_ADDRESS;
+		}
+
+		from = (const uint8*)from + toCopy;
+		to = (uint8*)to + toCopy;
+		size -= toCopy;
+	}
+
 	return B_OK;
 }
 
 
 /*!	Similar to user_strlcpy(), but can only be invoked from within the kernel
 	debugger (and must not be used outside).
+	The supplied \a teamID specifies the address space in which to interpret
+	the addresses. It can be \c B_CURRENT_TEAM for debug_get_debugged_thread(),
+	or any valid team ID. If the addresses are both kernel addresses, the
+	argument is ignored and the current address space is used.
 */
 ssize_t
-debug_strlcpy(char* to, const char* from, size_t size)
+debug_strlcpy(team_id teamID, char* to, const char* from, size_t size)
 {
-	if (size == 0)
-		return 0;
-	if (from == NULL || to == NULL)
+	if (from == NULL || (to == NULL && size > 0))
 		return B_BAD_ADDRESS;
 
 	// limit size to avoid address overflows
@@ -1887,18 +1923,80 @@ debug_strlcpy(char* to, const char* from, size_t size)
 		// NOTE: Since strlcpy() determines the length of \a from, the source
 		// address might still overflow.
 
-	debug_strlcpy_parameters parameters = {to, from, maxSize};
+	// Try standard strlcpy() with fault handler, if the addresses can be
+	// interpreted in the current address space.
+	if ((IS_KERNEL_ADDRESS(from) && IS_KERNEL_ADDRESS(to))
+			|| debug_is_debugged_team(teamID)) {
+		debug_strlcpy_parameters parameters = {to, from, maxSize};
 
-	if (debug_call_with_fault_handler(gCPU[sDebuggerOnCPU].fault_jump_buffer,
-			&debug_strlcpy_trampoline, &parameters) != 0) {
-		return B_BAD_ADDRESS;
+		if (debug_call_with_fault_handler(
+				gCPU[sDebuggerOnCPU].fault_jump_buffer,
+				&debug_strlcpy_trampoline, &parameters) == 0) {
+			// If we hit the address overflow boundary, fail.
+			if (parameters.result >= maxSize && maxSize < size)
+				return B_BAD_ADDRESS;
+
+			return parameters.result;
+		}
 	}
 
-	// If we hit the address overflow boundary, fail.
-	if (parameters.result >= maxSize && maxSize < size)
-		return B_BAD_ADDRESS;
+	// Try harder. The pages of the respective memory could be unmapped but
+	// still exist in a cache (the page daemon does that with inactive pages).
+	size_t totalLength = 0;
+	while (maxSize > 0) {
+		char buffer[32];
+		size_t toCopy = std::min(maxSize, sizeof(buffer));
 
-	return parameters.result;
+		// restrict the size so we don't cross page boundaries
+		if (((addr_t)from + toCopy) % B_PAGE_SIZE < toCopy)
+			toCopy -= ((addr_t)from + toCopy) % B_PAGE_SIZE;
+		if (((addr_t)to + toCopy) % B_PAGE_SIZE < toCopy)
+			toCopy -= ((addr_t)to + toCopy) % B_PAGE_SIZE;
+
+		// copy the next part of the string from the source
+		if (vm_debug_copy_page_memory(teamID, (void*)from, buffer, toCopy,
+				false) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+
+		// determine the length of the part and whether we've reached the end
+		// of the string
+		size_t length = strnlen(buffer, toCopy);
+		bool endOfString = length < toCopy;
+
+		from = (const char*)from + toCopy;
+		totalLength += length;
+		maxSize -= length;
+
+		if (endOfString) {
+			// only copy the actual string, including the terminating null
+			toCopy = length + 1;
+		}
+
+		if (size > 0) {
+			// We still have space left in the target buffer.
+			if (size <= length) {
+				// Not enough space for the complete part. Null-terminate it and
+				// copy what we can.
+				buffer[size - 1] = '\0';
+				totalLength += length - size;
+				toCopy = size;
+			}
+
+			if (vm_debug_copy_page_memory(teamID, to, buffer, toCopy, true)
+					!= B_OK) {
+				return B_BAD_ADDRESS;
+			}
+
+			to = (char*)to + toCopy;
+			size -= toCopy;
+		}
+
+		if (endOfString)
+			return totalLength;
+	}
+
+	return totalLength;
 }
 
 
@@ -2057,6 +2155,22 @@ debug_get_debugged_thread()
 {
 	return sDebuggedThread != NULL
 		? sDebuggedThread : thread_get_current_thread();
+}
+
+
+/*!	Returns whether the supplied team ID refers to the same team the currently
+	debugged thread (debug_get_debugged_thread()) belongs to.
+	Always returns \c true, if \c B_CURRENT_TEAM is given.
+*/
+bool
+debug_is_debugged_team(team_id teamID)
+{
+	if (teamID == B_CURRENT_TEAM)
+		return true;
+
+	struct thread* thread = debug_get_debugged_thread();
+	return thread != NULL && thread->team != NULL
+		&& thread->team->id == teamID;
 }
 
 

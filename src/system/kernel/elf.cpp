@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -1467,8 +1467,10 @@ public:
 		if (!IS_USER_ADDRESS(address))
 			return false;
 
-		if (debug_debugger_running())
-			return debug_strlcpy(buffer, address, bufferSize) >= 0;
+		if (debug_debugger_running()) {
+			return debug_strlcpy(B_CURRENT_TEAM, buffer, address, bufferSize)
+				>= 0;
+		}
 		return user_strlcpy(buffer, address, bufferSize) >= 0;
 	}
 
@@ -1491,7 +1493,7 @@ UserSymbolLookup::_Read(const T* address, T& data)
 		return false;
 
 	if (debug_debugger_running())
-		return debug_memcpy(&data, address, sizeof(T)) == B_OK;
+		return debug_memcpy(B_CURRENT_TEAM, &data, address, sizeof(T)) == B_OK;
 	return user_memcpy(&data, address, sizeof(T)) == B_OK;
 }
 

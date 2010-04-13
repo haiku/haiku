@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -81,7 +81,7 @@ static status_t
 get_next_frame_debugger(addr_t ebp, addr_t *_next, addr_t *_eip)
 {
 	stack_frame frame;
-	if (debug_memcpy(&frame, (void*)ebp, sizeof(frame)) != B_OK)
+	if (debug_memcpy(B_CURRENT_TEAM, &frame, (void*)ebp, sizeof(frame)) != B_OK)
 		return B_BAD_ADDRESS;
 
 	*_eip = frame.return_address;
@@ -126,6 +126,21 @@ set_debug_argument_variable(int32 index, uint64 value)
 }
 
 
+template<typename Type>
+static Type
+read_function_argument_value(void* argument, bool& _valueKnown)
+{
+	Type value;
+	if (debug_memcpy(B_CURRENT_TEAM, &value, argument, sizeof(Type)) == B_OK) {
+		_valueKnown = true;
+		return value;
+	}
+
+	_valueKnown = false;
+	return 0;
+}
+
+
 static status_t
 print_demangled_call(const char* image, const char* symbol, addr_t args,
 	bool noObjectMethod, bool addDebugVariables)
@@ -151,10 +166,15 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 		const char* lastName = strrchr(name, ':') - 1;
 		int namespaceLength = lastName - name;
 
-		kprintf("<%s> %.*s<\33[32m%p\33[0m>%s", image, namespaceLength, name,
-			*(uint32 **)arg, lastName);
+		uint32 argValue = 0;
+		if (debug_memcpy(B_CURRENT_TEAM, &argValue, arg, 4) == B_OK) {
+			kprintf("<%s> %.*s<\33[32m%#" B_PRIx32 "\33[0m>%s", image,
+				namespaceLength, name, argValue, lastName);
+		} else
+			kprintf("<%s> %.*s<???>%s", image, namespaceLength, name, lastName);
+
 		if (addDebugVariables)
-			set_debug_variable("_this", *(uint32 *)arg);
+			set_debug_variable("_this", argValue);
 		arg++;
 	} else
 		kprintf("<%s> %s", image, name);
@@ -172,78 +192,103 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 		// retrieve value and type identifier
 
 		uint64 value;
+		bool valueKnown = false;
 
 		switch (type) {
 			case B_INT64_TYPE:
-				value = *(int64*)arg;
-				kprintf("int64: \33[34m%Ld\33[0m", value);
+				value = read_function_argument_value<int64>(arg, valueKnown);
+				if (valueKnown)
+					kprintf("int64: \33[34m%Ld\33[0m", value);
 				break;
 			case B_INT32_TYPE:
-				value = *(int32*)arg;
-				kprintf("int32: \33[34m%ld\33[0m", (int32)value);
+				value = read_function_argument_value<int32>(arg, valueKnown);
+				if (valueKnown)
+					kprintf("int32: \33[34m%ld\33[0m", (int32)value);
 				break;
 			case B_INT16_TYPE:
-				value = *(int16*)arg;
-				kprintf("int16: \33[34m%d\33[0m", (int16)value);
+				value = read_function_argument_value<int16>(arg, valueKnown);
+				if (valueKnown)
+					kprintf("int16: \33[34m%d\33[0m", (int16)value);
 				break;
 			case B_INT8_TYPE:
-				value = *(int8*)arg;
-				kprintf("int8: \33[34m%d\33[0m", (int8)value);
+				value = read_function_argument_value<int8>(arg, valueKnown);
+				if (valueKnown)
+					kprintf("int8: \33[34m%d\33[0m", (int8)value);
 				break;
 			case B_UINT64_TYPE:
-				value = *(uint64*)arg;
-				kprintf("uint64: \33[34m%#Lx\33[0m", value);
-				if (value < 0x100000)
-					kprintf(" (\33[34m%Lu\33[0m)", value);
+				value = read_function_argument_value<uint64>(arg, valueKnown);
+				if (valueKnown) {
+					kprintf("uint64: \33[34m%#Lx\33[0m", value);
+					if (value < 0x100000)
+						kprintf(" (\33[34m%Lu\33[0m)", value);
+				}
 				break;
 			case B_UINT32_TYPE:
-				value = *(uint32*)arg;
-				kprintf("uint32: \33[34m%#lx\33[0m", (uint32)value);
-				if (value < 0x100000)
-					kprintf(" (\33[34m%lu\33[0m)", (uint32)value);
+				value = read_function_argument_value<uint32>(arg, valueKnown);
+				if (valueKnown) {
+					kprintf("uint32: \33[34m%#lx\33[0m", (uint32)value);
+					if (value < 0x100000)
+						kprintf(" (\33[34m%lu\33[0m)", (uint32)value);
+				}
 				break;
 			case B_UINT16_TYPE:
-				value = *(uint16*)arg;
-				kprintf("uint16: \33[34m%#x\33[0m (\33[34m%u\33[0m)",
-					(uint16)value, (uint16)value);
+				value = read_function_argument_value<uint16>(arg, valueKnown);
+				if (valueKnown) {
+					kprintf("uint16: \33[34m%#x\33[0m (\33[34m%u\33[0m)",
+						(uint16)value, (uint16)value);
+				}
 				break;
 			case B_UINT8_TYPE:
-				value = *(uint8*)arg;
-				kprintf("uint8: \33[34m%#x\33[0m (\33[34m%u\33[0m)",
-					(uint8)value, (uint8)value);
+				value = read_function_argument_value<uint8>(arg, valueKnown);
+				if (valueKnown) {
+					kprintf("uint8: \33[34m%#x\33[0m (\33[34m%u\33[0m)",
+						(uint8)value, (uint8)value);
+				}
 				break;
 			case B_BOOL_TYPE:
-				value = *(uint8*)arg;
-				kprintf("\33[34m%s\33[0m", value ? "true" : "false");
+				value = read_function_argument_value<uint8>(arg, valueKnown);
+				if (valueKnown)
+					kprintf("\33[34m%s\33[0m", value ? "true" : "false");
 				break;
 			default:
 				if (buffer[0])
 					kprintf("%s: ", buffer);
 
 				if (length == 4) {
-					value = *(uint32*)arg;
-					if (value == 0
-						&& (type == B_POINTER_TYPE || type == B_REF_TYPE))
-						kprintf("NULL");
-					else
-						kprintf("\33[34m%#lx\33[0m", (uint32)value);
+					value = read_function_argument_value<uint32>(arg,
+						valueKnown);
+					if (valueKnown) {
+						if (value == 0
+							&& (type == B_POINTER_TYPE || type == B_REF_TYPE))
+							kprintf("NULL");
+						else
+							kprintf("\33[34m%#lx\33[0m", (uint32)value);
+					}
 					break;
 				}
 
-				if (length == 8)
-					value = *(uint64*)arg;
-				else
+
+				if (length == 8) {
+					value = read_function_argument_value<uint64>(arg,
+						valueKnown);
+				} else
 					value = (uint64)arg;
-				kprintf("\33[34m%#Lx\33[0m", value);
+
+				if (valueKnown)
+					kprintf("\33[34m%#Lx\33[0m", value);
 				break;
 		}
 
-		if (type == B_STRING_TYPE) {
+		if (!valueKnown)
+			kprintf("???");
+
+		if (valueKnown && type == B_STRING_TYPE) {
 			if (value == 0)
 				kprintf(" \33[31m\"<NULL>\"\33[0m");
-			else if (debug_strlcpy(buffer, (char*)value, kBufferSize) < B_OK)
+			else if (debug_strlcpy(B_CURRENT_TEAM, buffer, (char*)value,
+					kBufferSize) < B_OK) {
 				kprintf(" \33[31m\"<???>\"\33[0m");
-			else
+			} else
 				kprintf(" \33[36m\"%s\"\33[0m", buffer);
 		}
 
@@ -564,6 +609,8 @@ stack_trace(int argc, char **argv)
 			&thread, &ebp, &oldPageDirectory))
 		return 0;
 
+	DebuggedThreadSetter threadSetter(thread);
+
 	if (thread != NULL) {
 		kprintf("stack trace for thread %ld \"%s\"\n", thread->id,
 			thread->name);
@@ -736,6 +783,8 @@ show_call(int argc, char **argv)
 			&oldPageDirectory))
 		return 0;
 
+	DebuggedThreadSetter threadSetter(thread);
+
 	int32 callIndex = strtoul(argv[argc == 3 ? 2 : 1], NULL, 0);
 
 	if (thread != NULL)
@@ -816,6 +865,8 @@ dump_iframes(int argc, char **argv)
 	if (thread != NULL)
 		kprintf("iframes for thread %ld \"%s\"\n", thread->id, thread->name);
 
+	DebuggedThreadSetter threadSetter(thread);
+
 	struct iframe* frame = find_previous_iframe(thread, x86_read_ebp());
 	while (frame != NULL) {
 		print_iframe(frame);
@@ -889,12 +940,11 @@ cmd_in_context(int argc, char** argv)
 		}
 	}
 
-	struct thread* previousThread = debug_set_debugged_thread(thread);
-
 	// execute the command
-	evaluate_debug_command(commandLine);
-
-	debug_set_debugged_thread(previousThread);
+	{
+		DebuggedThreadSetter threadSetter(thread);
+		evaluate_debug_command(commandLine);
+	}
 
 	// reset the page directory
 	if (oldPageDirectory)
@@ -927,6 +977,8 @@ bool
 arch_debug_contains_call(struct thread *thread, const char *symbol,
 	addr_t start, addr_t end)
 {
+	DebuggedThreadSetter threadSetter(thread);
+
 	addr_t ebp;
 	if (thread == thread_get_current_thread())
 		ebp = x86_read_ebp();

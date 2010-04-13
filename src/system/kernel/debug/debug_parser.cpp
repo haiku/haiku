@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de
  * Copyright 2006, Stephan Aßmus, superstippi@gmx.de
  * Distributed under the terms of the MIT License.
  */
@@ -723,7 +723,7 @@ ExpressionParser::_ParseExpression(bool expectAssignment)
 					break;
 			}
 
-			if (debug_memcpy(address, &buffer, size) != B_OK) {
+			if (debug_memcpy(B_CURRENT_TEAM, address, &buffer, size) != B_OK) {
 				snprintf(sTempBuffer, sizeof(sTempBuffer),
 					"failed to write to address %p", address);
 				parse_exception(sTempBuffer, position);
@@ -1062,7 +1062,7 @@ ExpressionParser::_ParseDereference(void** _address, uint32* _size)
 
 	// read bytes from address into a tempory buffer
 	uint64 buffer;
-	if (debug_memcpy(&buffer, address, size) != B_OK) {
+	if (debug_memcpy(B_CURRENT_TEAM, &buffer, address, size) != B_OK) {
 		snprintf(sTempBuffer, sizeof(sTempBuffer),
 			"failed to dereference address %p", address);
 		parse_exception(sTempBuffer, starPosition);
