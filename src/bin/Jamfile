@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src bin ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders app shared storage support usb ;
 UsePrivateSystemHeaders ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
@@ -106,6 +108,11 @@ StdBinCommands
 	WindowShade.cpp
 #	yes.cpp
 	: be : $(haiku-utils_rsrc) ;
+	
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : setdecor
+		: tests!apps ;
+}
 
 # standard commands that need libbe.so and libsupc++.so
 StdBinCommands
