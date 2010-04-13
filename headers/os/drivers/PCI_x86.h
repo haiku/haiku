@@ -1,3 +1,7 @@
+/*
+ *	Copyright 2010, Haiku Inc. All Rights Reserved.
+ *	Distributed under the terms of the MIT License.
+ */
 #ifndef PCI_X86_H
 #define PCI_X86_H
 
