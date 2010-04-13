@@ -19,6 +19,7 @@
 
 #include <Drivers.h>
 #include <ether_driver.h>
+#include <PCI_x86.h>
 
 #include <compat/sys/haiku-module.h>
 
@@ -149,6 +150,10 @@ _fbsd_init_driver(driver_t *driver)
 	if (status < B_OK)
 		return status;
 
+	// if it fails we just don't support x86 specific features (like MSIs)
+	if (get_module(B_PCI_X86_MODULE_NAME, (module_info **)&gPCIx86) != B_OK)
+		gPCIx86 = NULL;
+
 	status = init_hard_clock();
 	if (status < B_OK)
 		goto err1;
@@ -220,6 +225,9 @@ err2:
 	uninit_hard_clock();
 err1:
 	put_module(B_PCI_MODULE_NAME);
+	if (gPCIx86 != NULL)
+		put_module(B_PCI_X86_MODULE_NAME);
+
 	return status;
 }
 
@@ -243,4 +251,6 @@ _fbsd_uninit_driver(driver_t *driver)
 	uninit_mutexes();
 
 	put_module(B_PCI_MODULE_NAME);
+	if (gPCIx86 != NULL)
+		put_module(B_PCI_X86_MODULE_NAME);
 }
