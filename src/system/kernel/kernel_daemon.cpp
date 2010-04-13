@@ -29,6 +29,7 @@ struct daemon : DoublyLinkedListLinkImpl<struct daemon> {
 	void*		arg;
 	int32		frequency;
 	int32		offset;
+	bool		executing;
 };
 
 
@@ -49,11 +50,14 @@ private:
 	static	status_t			_DaemonThreadEntry(void* data);
 			struct daemon*		_NextDaemon(struct daemon& marker);
 			status_t			_DaemonThread();
+			bool				_IsDaemon() const;
 
 private:
 			recursive_lock		fLock;
 			DaemonList			fDaemons;
 			thread_id			fThread;
+			ConditionVariable	fUnregisterCondition;
+			int32				fUnregisterWaiters;
 };
 
 
@@ -72,6 +76,7 @@ KernelDaemon::Init(const char* name)
 		return fThread;
 
 	send_signal_etc(fThread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	fUnregisterCondition.Init(this, name);
 
 	return B_OK;
 }
@@ -90,6 +95,7 @@ KernelDaemon::Register(daemon_hook function, void* arg, int frequency)
 	daemon->function = function;
 	daemon->arg = arg;
 	daemon->frequency = frequency;
+	daemon->executing = false;
 
 	RecursiveLocker _(fLock);
 
@@ -117,7 +123,7 @@ KernelDaemon::Register(daemon_hook function, void* arg, int frequency)
 status_t
 KernelDaemon::Unregister(daemon_hook function, void* arg)
 {
-	RecursiveLocker _(fLock);
+	RecursiveLocker locker(fLock);
 
 	DaemonList::Iterator iterator = fDaemons.GetIterator();
 
@@ -127,6 +133,22 @@ KernelDaemon::Unregister(daemon_hook function, void* arg)
 
 		if (daemon->function == function && daemon->arg == arg) {
 			// found it!
+			if (!_IsDaemon()) {
+				// wait if it's busy
+				while (daemon->executing) {
+					fUnregisterWaiters++;
+
+					ConditionVariableEntry entry;
+					fUnregisterCondition.Add(&entry);
+
+					locker.Unlock();
+
+					entry.Wait();
+					
+					locker.Lock();
+				}
+			}
+
 			iterator.Remove();
 			delete daemon;
 			return B_OK;
@@ -154,11 +176,12 @@ KernelDaemon::Dump()
 			if (strchr(imageName, '/') != NULL)
 				imageName = strrchr(imageName, '/') + 1;
 
-			kprintf("\t%s:%s (%p), arg %p\n", imageName, symbol,
-				daemon->function, daemon->arg);
-		} else {
-			kprintf("\t%p, arg %p\n", daemon->function, daemon->arg);
-		}
+			kprintf("\t%s:%s (%p)", imageName, symbol, daemon->function);
+		} else
+			kprintf("\t%p", daemon->function);
+
+		kprintf(", arg %p%s\n", daemon->arg,
+			daemon->executing ? " (running) " : "");
 	}
 }
 
@@ -205,8 +228,19 @@ KernelDaemon::_DaemonThread()
 
 		// iterate through the list and execute each daemon if needed
 		while (struct daemon* daemon = _NextDaemon(marker)) {
+			daemon->executing = true;
+			locker.Unlock();
+
 			if (((iteration + daemon->offset) % daemon->frequency) == 0)
 				daemon->function(daemon->arg, iteration);
+
+			locker.Lock();
+			daemon->executing = false;
+		}
+
+		if (fUnregisterWaiters != 0) {
+			fUnregisterCondition.NotifyAll();
+			fUnregisterWaiters = 0;
 		}
 
 		locker.Unlock();
@@ -219,7 +253,14 @@ KernelDaemon::_DaemonThread()
 }
 
 
-//	#pragma mark -
+bool
+KernelDaemon::_IsDaemon() const
+{
+	return find_thread(NULL) == fThread;
+}
+
+
+// #pragma mark -
 
 
 static int
