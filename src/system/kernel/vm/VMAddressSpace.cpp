@@ -297,6 +297,13 @@ VMAddressSpace::DebugNext(VMAddressSpace* addressSpace)
 }
 
 
+/*static*/ VMAddressSpace*
+VMAddressSpace::DebugGet(team_id teamID)
+{
+	return sAddressSpaceTable.Lookup(teamID);
+}
+
+
 /*static*/ void
 VMAddressSpace::_DeleteIfUnreferenced(team_id id)
 {

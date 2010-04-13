@@ -115,6 +115,7 @@ public:
 
 	static	VMAddressSpace*		DebugFirst();
 	static	VMAddressSpace*		DebugNext(VMAddressSpace* addressSpace);
+	static	VMAddressSpace*		DebugGet(team_id teamID);
 
 protected:
 	static	void				_DeleteIfUnreferenced(team_id id);
