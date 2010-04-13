@@ -1,7 +1,7 @@
-/* File System and Drivers select support
-** 
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _DRIVERS_SELECT_H
 #define _DRIVERS_SELECT_H
 
@@ -37,4 +37,4 @@ extern status_t notify_select_event(struct selectsync *sync, uint8 event);
 }
 #endif
 
-#endif /* _DRIVERS_SELECT_H */
+#endif	/* _DRIVERS_SELECT_H */

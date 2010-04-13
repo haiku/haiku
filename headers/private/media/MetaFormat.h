@@ -1,6 +1,6 @@
 /*
  * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the OpenBeOS License.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef META_FORMAT_H
 #define META_FORMAT_H
@@ -19,7 +19,8 @@ namespace media {
 
 struct meta_format {
 	meta_format();
-	meta_format(const media_format_description &description, const media_format &format, int32 id);
+	meta_format(const media_format_description &description,
+		const media_format &format, int32 id);
 	meta_format(const media_format_description &description);
 	meta_format(const meta_format &other);
 
@@ -32,8 +33,10 @@ struct meta_format {
 	int32 id;
 };
 
-typedef status_t (*_MakeFormatHookFunc)(const media_format_description *descriptions,
-						int32 descriptionsCount, media_format *format, uint32 flags);
+typedef status_t (*_MakeFormatHookFunc)(
+	const media_format_description *descriptions, int32 descriptionsCount,
+	media_format *format, uint32 flags);
+
 extern _MakeFormatHookFunc _gMakeFormatHook;
 
 }	// namespace media

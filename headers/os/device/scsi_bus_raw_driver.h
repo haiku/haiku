@@ -1,10 +1,12 @@
 /*
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _SCSI_BUS_RAW_DRIVER_H
+#define _SCSI_BUS_RAW_DRIVER_H
 
-/*
-	Part of Open SCSI bus manager
+
+/*!	Part of Open SCSI bus manager
 
 	Devfs entry for raw bus access.
 
@@ -13,10 +15,9 @@
 	be retrieved from.
 */
 
-#ifndef _SCSI_BUS_RAW_DRIVER_H
-#define _SCSI_BUS_RAW_DRIVER_H
 
 #include <Drivers.h>
+
 
 // we start with +300 to not collide with any other SCSI opcode defined
 // in scsiprobe_driver.h or scsi.h;
@@ -26,4 +27,4 @@ enum {
 	B_SCSI_BUS_RAW_PATH_INQUIRY
 };
 
-#endif
+#endif	/* _SCSI_BUS_RAW_DRIVER_H */

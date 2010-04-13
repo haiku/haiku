@@ -1,10 +1,12 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _ISA2_H
+#define _ISA2_H
 
-/*
-	ISA bus manager
+
+/*!	ISA bus manager
 
 	This is an improper name - this bus manager uses the PnP manager to
 	load device drivers, but calling it ISA PnP manager would be wrong as
@@ -24,11 +26,10 @@
 	meanwhile.
 */
 
-#ifndef _ISA2_H
-#define _ISA2_H
 
 #include <device_manager.h>
 #include <ISA.h>
+
 
 // maximum size of one dma transfer
 // (in bytes for 8 bit transfer, in words for 16 bit transfer)

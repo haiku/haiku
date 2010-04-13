@@ -1,10 +1,12 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef __LOCKED_POOL_H__
+#define __LOCKED_POOL_H__
 
-/*
-	Paging-safe allocation of locked memory.
+
+/*!	Paging-safe allocation of locked memory.
 
 	Library for managing temporary, locked memory with the condition of 
 	not calling any function during allocation that can lead to paging.
@@ -28,10 +30,9 @@
 	pool is allocated.
 */
 
-#ifndef __LOCKED_POOL_H__
-#define __LOCKED_POOL_H__
 
 #include <device_manager.h>
+
 
 typedef struct locked_pool *locked_pool_cookie;
 
