@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_LOCKER_H
@@ -10,36 +10,39 @@
 
 
 class BLocker {
-	public:
-		BLocker();
-		BLocker(const char* name);
-		BLocker(bool benaphoreStyle);
-		BLocker(const char* name, bool benaphoreStyle);
-		virtual ~BLocker();
+public:
+								BLocker();
+								BLocker(const char* name);
+								BLocker(bool benaphoreStyle);
+								BLocker(const char* name, bool benaphoreStyle);
+	virtual						~BLocker();
 
-		status_t InitCheck() const;
+			status_t			InitCheck() const;
 
-		bool Lock(void);
-		status_t LockWithTimeout(bigtime_t timeout);
-		void Unlock(void);
+			bool				Lock();
+			status_t			LockWithTimeout(bigtime_t timeout);
+			void				Unlock();
 
-		thread_id LockingThread(void) const;
-		bool IsLocked(void) const;
-		int32 CountLocks(void) const;
-		int32 CountLockRequests(void) const;
-		sem_id Sem(void) const;
+			thread_id			LockingThread() const;
+			bool				IsLocked() const;
+			int32				CountLocks() const;
+			int32				CountLockRequests() const;
+			sem_id				Sem() const;
 
-	private:
-		BLocker(const char *name, bool benaphoreStyle, bool);
-		void InitLocker(const char *name, bool benaphore_style);
-		bool AcquireLock(bigtime_t timeout, status_t *error);
+private:
+								BLocker(const char* name, bool benaphoreStyle,
+									bool _ignored);
+			void				InitLocker(const char* name,
+									bool benaphoreStyle);
+			bool				AcquireLock(bigtime_t timeout, status_t* error);
 
-		int32	fBenaphoreCount;
-		sem_id	fSemaphoreID;
-		thread_id fLockOwner;
-		int32	fRecursiveCount;
+			int32				fBenaphoreCount;
+			sem_id				fSemaphoreID;
+			thread_id			fLockOwner;
+			int32				fRecursiveCount;
 
-		int32 _reserved[4];
+			int32				_reserved[4];
 };
 
-#endif // _LOCKER_H
+
+#endif	// _LOCKER_H
