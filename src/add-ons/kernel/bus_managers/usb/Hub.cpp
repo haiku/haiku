@@ -218,60 +218,65 @@ Hub::Explore(change_item **changeList)
 				// new device attached!
 				TRACE_ALWAYS("port %ld: new device connected\n", i);
 
-				// wait some time for the device to power up
-				snooze(USB_DELAY_DEVICE_POWER_UP);
+				int32 retry = 2;
+				while (retry--) {
+					// wait some time for the device to power up
+					snooze(USB_DELAY_DEVICE_POWER_UP);
 
-				// reset the port, this will also enable it
-				result = ResetPort(i);
-				if (result < B_OK) {
-					TRACE_ERROR("resetting port %ld failed\n", i);
-					continue;
-				}
+					// reset the port, this will also enable it
+					result = ResetPort(i);
+					if (result < B_OK) {
+						TRACE_ERROR("resetting port %ld failed\n", i);
+						break;
+					}
 
-				result = UpdatePortStatus(i);
-				if (result < B_OK)
-					continue;
+					result = UpdatePortStatus(i);
+					if (result < B_OK)
+						break;
 
-				if ((fPortStatus[i].status & PORT_STATUS_CONNECTION) == 0) {
-					// device has vanished after reset, ignore
-					TRACE("device disappeared on reset\n");
-					continue;
-				}
+					if ((fPortStatus[i].status & PORT_STATUS_CONNECTION) == 0) {
+						// device has vanished after reset, ignore
+						TRACE("device disappeared on reset\n");
+						break;
+					}
 
-				if (fChildren[i] != NULL) {
-					TRACE_ERROR("new device on a port that is already in use\n");
-					fChildren[i]->Changed(changeList, false);
-					fChildren[i] = NULL;
-				}
+					if (fChildren[i] != NULL) {
+						TRACE_ERROR("new device on a port that is already in "
+							"use\n");
+						fChildren[i]->Changed(changeList, false);
+						fChildren[i] = NULL;
+					}
 
-				usb_speed speed = USB_SPEED_FULLSPEED;
-				if (fPortStatus[i].status & PORT_STATUS_LOW_SPEED)
-					speed = USB_SPEED_LOWSPEED;
-				if (fPortStatus[i].status & PORT_STATUS_HIGH_SPEED)
-					speed = USB_SPEED_HIGHSPEED;
+					usb_speed speed = USB_SPEED_FULLSPEED;
+					if (fPortStatus[i].status & PORT_STATUS_LOW_SPEED)
+						speed = USB_SPEED_LOWSPEED;
+					if (fPortStatus[i].status & PORT_STATUS_HIGH_SPEED)
+						speed = USB_SPEED_HIGHSPEED;
 
-				// either let the device inherit our addresses (if we are
-				// already potentially using a transaction translator) or set
-				// ourselfs as the hub when we might become the transaction
-				// translator for the device.
-				int8 hubAddress = HubAddress();
-				uint8 hubPort = HubPort();
-				if (Speed() == USB_SPEED_HIGHSPEED) {
-					hubAddress = DeviceAddress();
-					hubPort = i + 1;
-				}
+					// either let the device inherit our addresses (if we are
+					// already potentially using a transaction translator) or
+					// set ourselfs as the hub when we might become the
+					// transaction translator for the device.
+					int8 hubAddress = HubAddress();
+					uint8 hubPort = HubPort();
+					if (Speed() == USB_SPEED_HIGHSPEED) {
+						hubAddress = DeviceAddress();
+						hubPort = i + 1;
+					}
 
-				Device *newDevice = GetBusManager()->AllocateDevice(this,
-					hubAddress, hubPort, speed);
+					Device *newDevice = GetBusManager()->AllocateDevice(this,
+						hubAddress, hubPort, speed);
 
-				if (newDevice) {
-					newDevice->Changed(changeList, true);
-					fChildren[i] = newDevice;
-				} else {
-					// the device failed to setup correctly, disable the port
-					// so that the device doesn't get in the way of future
-					// addressing.
-					DisablePort(i);
+					if (newDevice) {
+						newDevice->Changed(changeList, true);
+						fChildren[i] = newDevice;
+						break;
+					} else {
+						// the device failed to setup correctly, disable the
+						// port so that the device doesn't get in the way of
+						// future addressing.
+						DisablePort(i);
+					}
 				}
 			} else {
 				// Device removed...
