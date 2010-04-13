@@ -871,7 +871,7 @@ void
 BSoundPlayer::_NotifySoundDone(play_id id, bool gotToPlay)
 {
 	CALLED();
-	_Notify(B_SOUND_DONE, id, gotToPlay);
+	Notify(B_SOUND_DONE, id, gotToPlay);
 }
 
 
@@ -915,7 +915,7 @@ BSoundPlayer::_GetVolumeSlider()
 
 
 void
-BSoundPlayer::_Notify(sound_player_notification what, ...)
+BSoundPlayer::Notify(sound_player_notification what, ...)
 {
 	CALLED();
 	if (fLocker.Lock()) {
@@ -927,7 +927,7 @@ BSoundPlayer::_Notify(sound_player_notification what, ...)
 
 
 void
-BSoundPlayer::_PlayBuffer(void* buffer, size_t size,
+BSoundPlayer::PlayBuffer(void* buffer, size_t size,
 	const media_raw_audio_format& format)
 {
 	if (fLocker.Lock()) {

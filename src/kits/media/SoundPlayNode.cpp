@@ -829,7 +829,7 @@ SoundPlayNode::FillNextBuffer(bigtime_t eventTime)
 	}
 
 	if (fPlayer->HasData()) {
-		fPlayer->_PlayBuffer(buffer->Data(),
+		fPlayer->PlayBuffer(buffer->Data(),
 			fOutput.format.u.raw_audio.buffer_size, fOutput.format.u.raw_audio);
 	} else
 		memset(buffer->Data(), 0, fOutput.format.u.raw_audio.buffer_size);

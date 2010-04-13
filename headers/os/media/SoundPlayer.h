@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All rights reserved.
+ * Copyright 2009-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SOUND_PLAYER_H
@@ -152,8 +152,9 @@ private:
 
 			void				_NotifySoundDone(play_id sound, bool gotToPlay);
 
-	virtual	void				_Notify(sound_player_notification what, ...);
-	virtual	void				_PlayBuffer(void* buffer, size_t size,
+	// TODO: those two shouldn't be virtual
+	virtual	void				Notify(sound_player_notification what, ...);
+	virtual	void				PlayBuffer(void* buffer, size_t size,
 									const media_raw_audio_format& format);
 
 private:
