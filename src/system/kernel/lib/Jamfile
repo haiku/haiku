@@ -84,6 +84,7 @@ KernelMergeObject kernel_lib_posix.o :
 	usergroup.cpp
 	write.c
 	# string
+	ffs.cpp
 	memchr.c
 	memcmp.c
 	memmove.c
