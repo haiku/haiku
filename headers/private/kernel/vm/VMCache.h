@@ -153,6 +153,9 @@ public:
 	virtual	void				AcquireStoreRef();
 	virtual	void				ReleaseStoreRef();
 
+	virtual	bool				DebugHasPage(off_t offset);
+			vm_page*			DebugLookupPage(off_t offset);
+
 public:
 			VMArea*				areas;
 			list_link			consumer_link;

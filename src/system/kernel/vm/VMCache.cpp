@@ -1239,6 +1239,27 @@ VMCache::ReleaseStoreRef()
 }
 
 
+/*!	Kernel debugger version of HasPage().
+	Does not do any locking.
+*/
+bool
+VMCache::DebugHasPage(off_t offset)
+{
+	// default that works for all subclasses that don't lock anyway
+	return HasPage(offset);
+}
+
+
+/*!	Kernel debugger version of LookupPage().
+	Does not do any locking.
+*/
+vm_page*
+VMCache::DebugLookupPage(off_t offset)
+{
+	return pages.Lookup((page_num_t)(offset >> PAGE_SHIFT));
+}
+
+
 /*!	Wakes up threads waiting for page events.
 	\param page The page for which events occurred.
 	\param events The mask of events that occurred.

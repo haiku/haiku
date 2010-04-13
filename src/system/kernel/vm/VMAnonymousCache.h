@@ -40,6 +40,7 @@ public:
 
 	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);
+	virtual	bool				DebugHasPage(off_t offset);
 
 	virtual	status_t			Read(off_t offset, const iovec* vecs,
 									size_t count, uint32 flags,
