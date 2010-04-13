@@ -580,8 +580,11 @@ status_t
 VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 {
 	mutex_init(&fLock, "VMCache");
+
 	VMCache dummyCache;
 	list_init_etc(&consumers, offset_of_member(dummyCache, consumer_link));
+		// TODO: This is disgusting! Use DoublyLinkedList!
+
 	areas = NULL;
 	fRefCount = 1;
 	source = NULL;
