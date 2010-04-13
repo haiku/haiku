@@ -20,8 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
+#include <syslog.h>
+#include <unistd.h>
 
 #include <Accelerant.h>
 #include <Cursor.h>
@@ -312,7 +313,8 @@ AccelerantHWInterface::_OpenAccelerant(int device)
 		return B_ERROR;
 
 	if (_SetupDefaultHooks() != B_OK) {
-		ATRACE(("cannot setup default hooks\n"));
+		syslog(LOG_ERR, "Accelerant %s does not export the required hooks.\n",
+			signature);
 
 		uninit_accelerant uninitAccelerant = (uninit_accelerant)
 			fAccelerantHook(B_UNINIT_ACCELERANT, NULL);
