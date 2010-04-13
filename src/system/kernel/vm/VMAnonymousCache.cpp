@@ -494,6 +494,19 @@ VMAnonymousCache::HasPage(off_t offset)
 }
 
 
+bool
+VMAnonymousCache::DebugHasPage(off_t offset)
+{
+	page_num_t pageIndex = offset >> PAGE_SHIFT;
+	swap_hash_key key = { this, pageIndex };
+	swap_block* swap = sSwapHashTable.Lookup(key);
+	if (swap == NULL)
+		return false;
+
+	return swap->swap_slots[pageIndex & SWAP_BLOCK_MASK] != SWAP_SLOT_NONE;
+}
+
+
 status_t
 VMAnonymousCache::Read(off_t offset, const iovec* vecs, size_t count,
 	uint32 flags, size_t* _numBytes)
