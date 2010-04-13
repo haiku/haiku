@@ -3496,9 +3496,16 @@ void
 _user_exit_team(status_t returnValue)
 {
 	struct thread* thread = thread_get_current_thread();
+	struct thread* mainThread = thread->team->main_thread;
 
-	thread->exit.status = returnValue;
-	thread->exit.reason = THREAD_RETURN_EXIT;
+	mainThread->exit.status = returnValue;
+	mainThread->exit.reason = THREAD_RETURN_EXIT;
+
+	// Also set the exit code in the current thread for the sake of it
+	if (thread != mainThread) {
+		thread->exit.status = returnValue;
+		thread->exit.reason = THREAD_RETURN_EXIT;
+	}
 
 	send_signal(thread->id, SIGKILL);
 }
