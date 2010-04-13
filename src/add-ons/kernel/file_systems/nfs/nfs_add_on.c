@@ -1324,8 +1324,6 @@ dprintf("nfs: nfsd at %08x:%d\n", ns->nfsAddr.sin_addr.s_addr, ntohs(ns->nfsAddr
 					S_IFDIR, 0)) < B_OK)
 		goto err_publish;
 
-	_vol->private_volume = ns;
-
 	ns->first=rootNode;
 
 	return B_OK;
