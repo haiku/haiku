@@ -27,8 +27,6 @@ static status_t apic_timer_init(struct kernel_args *args);
 
 static uint32 sApicTicsPerSec = 0;
 
-extern bool gUsingIOAPIC;
-
 struct timer_info gAPICTimer = {
 	"APIC",
 	&apic_timer_get_priority,
@@ -48,11 +46,6 @@ apic_timer_get_priority()
 static int32
 apic_timer_interrupt(void *data)
 {
-	// if we are not using the IO APIC we need to acknowledge the
-	// interrupt ourselfs
-	if (!gUsingIOAPIC)
-		apic_end_of_interrupt();
-
 	return timer_interrupt();
 }
 

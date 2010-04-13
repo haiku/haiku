@@ -10,6 +10,7 @@
  */
 
 #include <arch/x86/apic.h>
+#include <arch/x86/msi.h>
 
 #include <debug.h>
 #include <vm/vm.h>
@@ -71,6 +72,7 @@ apic_init(kernel_args *args)
 		return B_ERROR;
 	}
 
+	msi_init();
 	return B_OK;
 }
 

@@ -37,7 +37,6 @@ static uint32 sCPUAPICIds[B_MAX_CPU_COUNT];
 static uint32 sCPUOSIds[B_MAX_CPU_COUNT];
 static uint32 sAPICVersions[B_MAX_CPU_COUNT];
 
-extern bool gUsingIOAPIC;
 extern "C" void init_sse(void);
 
 
@@ -47,12 +46,6 @@ i386_ici_interrupt(void *data)
 	// genuine inter-cpu interrupt
 	int cpu = smp_get_current_cpu();
 	TRACE(("inter-cpu interrupt on cpu %d\n", cpu));
-
-	// if we are not using the IO APIC we need to acknowledge the
-	// interrupt ourselfs
-	if (!gUsingIOAPIC)
-		apic_end_of_interrupt();
-
 	return smp_intercpu_int_handler(cpu);
 }
 
@@ -75,12 +68,6 @@ i386_smp_error_interrupt(void *data)
 {
 	// smp error interrupt
 	TRACE(("smp error interrupt on cpu %ld\n", smp_get_current_cpu()));
-
-	// if we are not using the IO APIC we need to acknowledge the
-	// interrupt ourselfs
-	if (!gUsingIOAPIC)
-		apic_end_of_interrupt();
-
 	return B_HANDLED_INTERRUPT;
 }
 
