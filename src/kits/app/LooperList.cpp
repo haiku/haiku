@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Erik Jaesler (erik@cgsoftware.com)
  */
+
 
 //! Maintains a global list of all loopers in a given team.
 
@@ -58,10 +59,11 @@ BLooperList::IsLocked()
 void
 BLooperList::AddLooper(BLooper* looper)
 {
-	BAutolock Listlock(fLock);
+	BAutolock locker(fLock);
 	AssertLocked();
 	if (!IsLooperValid(looper)) {
-		LooperDataIterator i = find_if(fData.begin(), fData.end(), EmptySlotPred);
+		LooperDataIterator i
+			= find_if(fData.begin(), fData.end(), EmptySlotPred);
 		if (i == fData.end()) {
 			fData.push_back(LooperData(looper));
 			looper->Lock();
@@ -76,7 +78,7 @@ BLooperList::AddLooper(BLooper* looper)
 bool
 BLooperList::IsLooperValid(const BLooper* looper)
 {
-	BAutolock Listlock(fLock);
+	BAutolock locker(fLock);
 	AssertLocked();
 
 	return find_if(fData.begin(), fData.end(),
@@ -87,7 +89,7 @@ BLooperList::IsLooperValid(const BLooper* looper)
 bool
 BLooperList::RemoveLooper(BLooper* looper)
 {
-	BAutolock Listlock(fLock);
+	BAutolock locker(fLock);
 	AssertLocked();
 
 	LooperDataIterator i = find_if(fData.begin(), fData.end(),
@@ -104,7 +106,7 @@ BLooperList::RemoveLooper(BLooper* looper)
 void
 BLooperList::GetLooperList(BList* list)
 {
-	BAutolock Listlock(fLock);
+	BAutolock locker(fLock);
 	AssertLocked();
 
 	for (uint32 i = 0; i < fData.size(); ++i) {
@@ -117,7 +119,7 @@ BLooperList::GetLooperList(BList* list)
 int32
 BLooperList::CountLoopers()
 {
-	BAutolock Listlock(fLock);
+	BAutolock locker(fLock);
 	AssertLocked();
 	return (int32)fData.size();
 }
@@ -126,7 +128,7 @@ BLooperList::CountLoopers()
 BLooper*
 BLooperList::LooperAt(int32 index)
 {
-	BAutolock Listlock(fLock);
+	BAutolock locker(fLock);
 	AssertLocked();
 
 	BLooper* looper = NULL;
@@ -140,10 +142,12 @@ BLooperList::LooperAt(int32 index)
 BLooper*
 BLooperList::LooperForThread(thread_id thread)
 {
-	BAutolock Listlock(fLock);
+	BAutolock locker(fLock);
 	AssertLocked();
+
 	BLooper* looper = NULL;
-	LooperDataIterator i = find_if(fData.begin(), fData.end(), FindThreadPred(thread));
+	LooperDataIterator i
+		= find_if(fData.begin(), fData.end(), FindThreadPred(thread));
 	if (i != fData.end())
 		looper = i->looper;
 
@@ -154,10 +158,12 @@ BLooperList::LooperForThread(thread_id thread)
 BLooper*
 BLooperList::LooperForName(const char* name)
 {
-	BAutolock Listlock(fLock);
+	BAutolock locker(fLock);
 	AssertLocked();
+
 	BLooper* looper = NULL;
-	LooperDataIterator i = find_if(fData.begin(), fData.end(), FindNamePred(name));
+	LooperDataIterator i
+		= find_if(fData.begin(), fData.end(), FindNamePred(name));
 	if (i != fData.end())
 		looper = i->looper;
 
@@ -168,10 +174,12 @@ BLooperList::LooperForName(const char* name)
 BLooper*
 BLooperList::LooperForPort(port_id port)
 {
-	BAutolock Listlock(fLock);
+	BAutolock locker(fLock);
 	AssertLocked();
+
 	BLooper* looper = NULL;
-	LooperDataIterator i = find_if(fData.begin(), fData.end(), FindPortPred(port));
+	LooperDataIterator i
+		= find_if(fData.begin(), fData.end(), FindPortPred(port));
 	if (i != fData.end())
 		looper = i->looper;
 
@@ -180,9 +188,9 @@ BLooperList::LooperForPort(port_id port)
 
 
 bool
-BLooperList::EmptySlotPred(LooperData& Data)
+BLooperList::EmptySlotPred(LooperData& data)
 {
-	return Data.looper == NULL;
+	return data.looper == NULL;
 }
 
 
@@ -198,13 +206,15 @@ BLooperList::AssertLocked()
 
 
 BLooperList::LooperData::LooperData()
-	: looper(NULL)
+	:
+	looper(NULL)
 {
 }
 
 
 BLooperList::LooperData::LooperData(BLooper* looper)
-	: looper(looper)
+	:
+	looper(looper)
 {
 }
 
@@ -226,30 +236,30 @@ BLooperList::LooperData::operator=(const LooperData& other)
 
 
 bool
-BLooperList::FindLooperPred::operator()(BLooperList::LooperData& Data)
+BLooperList::FindLooperPred::operator()(BLooperList::LooperData& data)
 {
-	return Data.looper && looper == Data.looper;
+	return data.looper && looper == data.looper;
 }
 
 
 bool
-BLooperList::FindThreadPred::operator()(LooperData& Data)
+BLooperList::FindThreadPred::operator()(LooperData& data)
 {
-	return Data.looper && thread == Data.looper->Thread();
+	return data.looper && thread == data.looper->Thread();
 }
 
 
 bool
-BLooperList::FindNamePred::operator()(LooperData& Data)
+BLooperList::FindNamePred::operator()(LooperData& data)
 {
-	return Data.looper && !strcmp(name, Data.looper->Name());
+	return data.looper && !strcmp(name, data.looper->Name());
 }
 
 
 bool
-BLooperList::FindPortPred::operator()(LooperData& Data)
+BLooperList::FindPortPred::operator()(LooperData& data)
 {
-	return Data.looper && port == _get_looper_port_(Data.looper);
+	return data.looper && port == _get_looper_port_(data.looper);
 }
 
 }	// namespace BPrivate
