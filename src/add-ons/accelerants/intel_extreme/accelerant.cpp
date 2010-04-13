@@ -134,6 +134,22 @@ init_common(int device, bool isClone)
 	sharedCloner.Keep();
 	regsCloner.Keep();
 
+	// The overlay registers, hardware status, and cursor memory share
+	// a single area with the shared_info
+
+	gInfo->overlay_registers = (struct overlay_registers *)
+		(gInfo->shared_info->graphics_memory
+		+ gInfo->shared_info->overlay_offset);
+
+	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
+		// allocate some extra memory for the 3D context
+		if (intel_allocate_memory(INTEL_i965_3D_CONTEXT_SIZE,
+				B_APERTURE_NON_RESERVED, gInfo->context_base) == B_OK) {
+			gInfo->context_offset = gInfo->context_base
+				- (addr_t)gInfo->shared_info->graphics_memory;
+		}
+	}
+
 	return B_OK;
 }
 
