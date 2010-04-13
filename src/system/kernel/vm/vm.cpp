@@ -955,12 +955,10 @@ wait_if_address_range_is_wired(VMAddressSpace* addressSpace, addr_t base,
 		if (base >= area->Base() + area->Size() - 1)
 			continue;
 
-		VMCache* cache = vm_area_get_locked_cache(area);
+		AreaCacheLocker cacheLocker(vm_area_get_locked_cache(area));
 
-		if (wait_if_area_range_is_wired(area, base, size, locker, cache))
+		if (wait_if_area_range_is_wired(area, base, size, locker, &cacheLocker))
 			return true;
-
-		cache->Unlock();
 	}
 
 	return false;
