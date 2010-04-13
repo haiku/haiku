@@ -400,8 +400,8 @@ MainApp::MessageReceived(BMessage* message)
 void
 MainApp::AboutRequested()
 {
-	BAlert* alert = new BAlert("about", NAME"\n\nWritten by Marcus Overhagen "
-		", Stephan Aßmus and Frederik Modéen", "Thanks");
+	BAlert* alert = new BAlert("about", NAME"\n\nWritten by Marcus Overhagen, "
+		"Stephan Aßmus and Frederik Modéen", "Thanks");
 	alert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 		// Make sure it is on top of any player windows that may have the
 		// floating all window feel.
