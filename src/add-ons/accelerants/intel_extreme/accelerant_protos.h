@@ -21,12 +21,12 @@ void spin(bigtime_t delay);
 
 // general
 status_t intel_init_accelerant(int fd);
-ssize_t intel_accelerant_clone_info_size(void);
-void intel_get_accelerant_clone_info(void *data);
-status_t intel_clone_accelerant(void *data);
+//ssize_t intel_accelerant_clone_info_size(void);
+//void intel_get_accelerant_clone_info(void *data);
+//status_t intel_clone_accelerant(void *data);
 void intel_uninit_accelerant(void);
-status_t intel_get_accelerant_device_info(accelerant_device_info *info);
-sem_id intel_accelerant_retrace_semaphore(void);
+//status_t intel_get_accelerant_device_info(accelerant_device_info *info);
+//sem_id intel_accelerant_retrace_semaphore(void);
 
 // modes & constraints
 uint32 intel_accelerant_mode_count(void);

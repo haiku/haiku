@@ -102,27 +102,29 @@ init_common(int device, bool isClone)
 
 	// get basic info from driver
 
-	intel_get_private_data data;
-	data.magic = INTEL_PRIVATE_DATA_MAGIC;
+	radeon_get_private_data data;
+	data.magic = RADEON_PRIVATE_DATA_MAGIC;
 
-	if (ioctl(device, INTEL_GET_PRIVATE_DATA, &data,
-			sizeof(intel_get_private_data)) != 0) {
+	if (ioctl(device, RADEON_GET_PRIVATE_DATA, &data,
+			sizeof(radeon_get_private_data)) != 0) {
 		free(gInfo);
 		return B_ERROR;
 	}
 
 	AreaCloner sharedCloner;
-	gInfo->shared_info_area = sharedCloner.Clone("intel extreme shared info",
+	gInfo->shared_info_area = sharedCloner.Clone("radeon hd shared info",
 		(void **)&gInfo->shared_info, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		data.shared_info_area);
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
 		free(gInfo);
+		TRACE(("radeon_init_accelerant() failed shared area%i, %i\n", data.shared_info_area,
+			gInfo->shared_info_area));
 		return status;
 	}
 
 	AreaCloner regsCloner;
-	gInfo->regs_area = regsCloner.Clone("intel extreme regs",
+	gInfo->regs_area = regsCloner.Clone("radeon hd regs",
 		(void **)&gInfo->regs, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		gInfo->shared_info->registers_area);
 	status = regsCloner.InitCheck();
@@ -130,7 +132,7 @@ init_common(int device, bool isClone)
 		free(gInfo);
 		return status;
 	}
-
+	
 	sharedCloner.Keep();
 	regsCloner.Keep();
 
@@ -142,8 +144,6 @@ init_common(int device, bool isClone)
 static void
 uninit_common(void)
 {
-	intel_free_memory(gInfo->context_base);
-
 	delete_area(gInfo->regs_area);
 	delete_area(gInfo->shared_info_area);
 
@@ -162,47 +162,19 @@ uninit_common(void)
 
 /*! Init primary accelerant */
 status_t
-intel_init_accelerant(int device)
+radeon_init_accelerant(int device)
 {
-	TRACE(("intel_init_accelerant()\n"));
+	TRACE(("radeon_init_accelerant()\n"));
 
 	status_t status = init_common(device, false);
 	if (status != B_OK)
 		return status;
 
-	intel_shared_info &info = *gInfo->shared_info;
+	radeon_shared_info &info = *gInfo->shared_info;
 
-	init_lock(&info.accelerant_lock, "intel extreme accelerant");
-	init_lock(&info.engine_lock, "intel extreme engine");
+	init_lock(&info.accelerant_lock, "radeon hd accelerant");
+	init_lock(&info.engine_lock, "radeon hd engine");
 
-	setup_ring_buffer(info.primary_ring_buffer, "intel primary ring buffer");
-
-	// determine head depending on what's already enabled from the BIOS
-	// TODO: it would be nicer to retrieve this data via DDC - else the
-	//	display is gone for good if the BIOS decides to only show the
-	//	picture on the connected analog monitor!
-	gInfo->head_mode = 0;
-	if (read32(INTEL_DISPLAY_B_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
-		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
-	if (read32(INTEL_DISPLAY_A_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
-		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
-
-	uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT);
-
-	// If we have an enabled display pipe we save the passed information and
-	// assume it is the valid panel size..
-	// Later we query for proper EDID info if it exists, or figure something
-	// else out. (Default modes, etc.)
-	if ((lvds & DISPLAY_PIPE_ENABLED) != 0) {
-		save_lvds_mode();
-		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
-	}
-
-	TRACE(("head detected: %d\n", gInfo->head_mode));
-	TRACE(("adpa: %08lx, dova: %08lx, dovb: %08lx, lvds: %08lx\n",
-		read32(INTEL_DISPLAY_A_ANALOG_PORT),
-		read32(INTEL_DISPLAY_A_DIGITAL_PORT),
-		read32(INTEL_DISPLAY_B_DIGITAL_PORT), read32(INTEL_DISPLAY_LVDS_PORT)));
 
 	status = create_mode_list();
 	if (status != B_OK) {
@@ -210,31 +182,32 @@ intel_init_accelerant(int device)
 		return status;
 	}
 
+	TRACE(("radeon_init_accelerant() done\n"));
 	return B_OK;
 }
 
-
+/*
 ssize_t
-intel_accelerant_clone_info_size(void)
+radeon_accelerant_clone_info_size(void)
 {
-	TRACE(("intel_accelerant_clone_info_size()\n"));
+	TRACE(("radeon_accelerant_clone_info_size()\n"));
 	// clone info is device name, so return its maximum size
 	return B_PATH_NAME_LENGTH;
 }
 
 
 void
-intel_get_accelerant_clone_info(void *info)
+radeon_get_accelerant_clone_info(void *info)
 {
-	TRACE(("intel_get_accelerant_clone_info()\n"));
-	ioctl(gInfo->device, INTEL_GET_DEVICE_NAME, info, B_PATH_NAME_LENGTH);
+	TRACE(("radeon_get_accelerant_clone_info()\n"));
+	ioctl(gInfo->device, RADEON_GET_DEVICE_NAME, info, B_PATH_NAME_LENGTH);
 }
 
 
 status_t
-intel_clone_accelerant(void *info)
+radeon_clone_accelerant(void *info)
 {
-	TRACE(("intel_clone_accelerant()\n"));
+	TRACE(("radeon_clone_accelerant()\n"));
 
 	// create full device name
 	char path[B_PATH_NAME_LENGTH];
@@ -268,38 +241,34 @@ err1:
 	close(fd);
 	return status;
 }
-
+*/
 
 /*! This function is called for both, the primary accelerant and all of
 	its clones.
 */
 void
-intel_uninit_accelerant(void)
+radeon_uninit_accelerant(void)
 {
-	TRACE(("intel_uninit_accelerant()\n"));
-
-	// delete accelerant instance data
-	delete_area(gInfo->mode_list_area);
+	TRACE(("radeon_uninit_accelerant()\n"));
+	
 	gInfo->mode_list = NULL;
-
-	intel_shared_info &info = *gInfo->shared_info;
+	
+	radeon_shared_info &info = *gInfo->shared_info;
 
 	uninit_lock(&info.accelerant_lock);
 	uninit_lock(&info.engine_lock);
 
-	uninit_ring_buffer(info.primary_ring_buffer);
-
 	uninit_common();
 }
 
-
+/*
 status_t
-intel_get_accelerant_device_info(accelerant_device_info *info)
+radeon_get_accelerant_device_info(accelerant_device_info *info)
 {
-	TRACE(("intel_get_accelerant_device_info()\n"));
+	TRACE(("radeon_get_accelerant_device_info()\n"));
 
 	info->version = B_ACCELERANT_VERSION;
-	strcpy(info->name, gInfo->shared_info->device_type.InFamily(INTEL_TYPE_7xx)
+	strcpy(info->name, gInfo->shared_info->device_type.InFamily(RADEON_TYPE_7xx)
 		? "Intel Extreme Graphics 1" : "Intel Extreme Graphics 2");
 	strcpy(info->chipset, gInfo->shared_info->device_identifier);
 	strcpy(info->serial_no, "None");
@@ -312,9 +281,9 @@ intel_get_accelerant_device_info(accelerant_device_info *info)
 
 
 sem_id
-intel_accelerant_retrace_semaphore()
+radeon_accelerant_retrace_semaphore()
 {
-	TRACE(("intel_accelerant_retrace_semaphore()\n"));
+	TRACE(("radeon_accelerant_retrace_semaphore()\n"));
 	return gInfo->shared_info->vblank_sem;
-}
+}*/
 

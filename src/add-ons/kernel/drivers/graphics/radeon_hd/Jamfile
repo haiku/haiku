@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src add-ons kernel drivers graphics radeon_hd ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders [ FDirName graphics radeon_hd ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders graphics kernel ;
+UsePrivateHeaders shared ;
+
+KernelAddon radeon_hd :
+	driver.cpp
+	device.cpp
+	radeon_hd.cpp
+	: libgraphicscommon.a
+;
+
+SEARCH on [ FGristFiles
+		kernel_cpp.cpp 
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+Package haiku-radeon_hd-cvs :
+	radeon_hd : 
+	boot home config add-ons kernel drivers bin ;
+PackageDriverSymLink haiku-radeon_hd-cvs : graphics radeon_hd ;
