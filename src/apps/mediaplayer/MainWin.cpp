@@ -908,7 +908,10 @@ MainWin::OpenPlaylist(const BMessage* playlistArchive)
 
 	playlistLocker.Unlock();
 
-	playlistArchive->FindInt64("position", (int64*)&fInitialSeekPosition);
+	if (currentIndex != -1) {
+		// Restore the current play position only if we have something to play
+		playlistArchive->FindInt64("position", (int64*)&fInitialSeekPosition);
+	}
 
 	if (IsHidden())
 		Show();
@@ -1051,6 +1054,7 @@ MainWin::GetQuitMessage(BMessage* message)
 	message->AddRect("window frame", Frame());
 	message->AddBool("audio only", !fHasVideo);
 	message->AddInt64("creation time", fCreationTime);
+
 	if (!fHasVideo && fHasAudio) {
 		// store playlist, current index and position if this is audio
 		BMessage playlistArchive;
@@ -1061,6 +1065,7 @@ MainWin::GetQuitMessage(BMessage* message)
 
 		if (!fPlaylist)
 			return;
+
 		BAutolock playlistLocker(fPlaylist);
 		if (fPlaylist->Archive(&playlistArchive) != B_OK
 			|| playlistArchive.AddInt32("index",
@@ -1189,6 +1194,7 @@ MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
 		fHasVideo = fController->VideoTrackCount() != 0;
 		fHasAudio = fController->AudioTrackCount() != 0;
 		SetTitle(item->Name().String());
+
 		fController->SetTimePosition(fInitialSeekPosition);
 		fInitialSeekPosition = 0;
 	}
