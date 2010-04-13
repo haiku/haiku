@@ -56,6 +56,7 @@ private:
 								BString& label, int32 index, bool markItem);
 
 			void			_UpdatePreviewPanel();
+			void			_UpdateFilenameSelection();
 			BString			_FindValidFileName(const char* name);
 			int32			_PathIndexInMenu(const BString& path) const;
 
@@ -76,6 +77,7 @@ private:
 			BCheckBox*		fShowMouse;
 			BButton*		fBackToSave;
 			BButton*		fTakeScreenshot;
+			BButton*		fSaveScreenshot;
 			BTextControl*	fNameControl;
 			BMenu*			fTranslatorMenu;
 			BMenu*			fOutputPathMenu;

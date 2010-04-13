@@ -159,6 +159,9 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			BCardLayout* layout = dynamic_cast<BCardLayout*> (GetLayout());
 			if (layout)
 				layout->SetVisibleItem(1L);
+
+			fSaveScreenshot->MakeDefault(true);
+
 			SetTitle(TR("Save screenshot"));
 			break;
 		}
@@ -168,12 +171,14 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			_TakeScreenshot();
 			_UpdatePreviewPanel();
 			Show();
+			_UpdateFilenameSelection();
 			break;
 		
 		case kImageOutputFormat:
 			message->FindInt32("be:type", &fImageFileType);
 			message->FindInt32("be:translator", &fTranslator);
 			fNameControl->SetText(_FindValidFileName(fNameControl->Text()).String());
+			_UpdateFilenameSelection();
 			break;
 		
 		case kLocationChanged:
@@ -183,6 +188,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 				fLastSelectedPath = static_cast<BMenuItem*> (source);
 
 			fNameControl->SetText(_FindValidFileName(fNameControl->Text()).String());
+			_UpdateFilenameSelection();
 			break;
 		}
 		
@@ -235,6 +241,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			
 			if (layout)
 				layout->SetVisibleItem(0L);
+			SetDefaultButton(NULL);
 			
 			SetTitle(TR("Take Screenshot"));
 			fBackToSave->SetEnabled(true);
@@ -280,8 +287,11 @@ ScreenshotWindow::_InitWindow()
 		_TakeScreenshot();
 		_UpdatePreviewPanel();
 		layout->SetVisibleItem(1L);
-	} else
+		fSaveScreenshot->MakeDefault(true);
+	} else {
 		layout->SetVisibleItem(0L);
+		SetDefaultButton(NULL);
+	}
 }
 
 
@@ -392,6 +402,9 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
+	fSaveScreenshot  = new BButton("", 
+		TR("Save"), new BMessage(kFinishScreenshot));
+
 	BGridLayout* gridLayout = BGridLayoutBuilder(0.0, 5.0)
 		.Add(fNameControl->CreateLabelLayoutItem(), 0, 0)
 		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 0)
@@ -416,7 +429,7 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 			.Add(new BButton("", TR("Options"), new BMessage(kShowOptions)))
 			.AddGlue()
 			.Add(new BButton("", TR("Cancel"), new BMessage(B_QUIT_REQUESTED)))
-			.Add(new BButton("", TR("Save"), new BMessage(kFinishScreenshot)))
+			.Add(fSaveScreenshot)
 			.End()
 		.SetInsets(10.0, 10.0, 10.0, 10.0)
 	);
@@ -561,7 +574,20 @@ ScreenshotWindow::_UpdatePreviewPanel()
 	if (layout)
 		layout->SetVisibleItem(1L);
 
+	_UpdateFilenameSelection();
+
 	SetTitle(TR("Save screenshot"));
+}
+
+
+void
+ScreenshotWindow::_UpdateFilenameSelection()
+{
+	fNameControl->MakeFocus(true);
+	fNameControl->TextView()->Select(0,
+		fNameControl->TextView()->TextLength() -
+		fExtension.Length());
+	fNameControl->TextView()->ScrollToSelection();
 }
 
 
