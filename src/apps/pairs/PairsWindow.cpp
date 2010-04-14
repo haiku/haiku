@@ -220,13 +220,16 @@ PairsWindow::MessageReceived(BMessage* message)
 				// game end and results
 				if (fFinishPairs == fPairsView->fNumOfCards / 2) {
 					BString strAbout;
+					BString score;
+					score << fButtonClicks;
 					strAbout
 						<< "Pairs\n"
-						<< "\twritten by Ralf Schülke\n"
-						<< "\tCopyright 2008-2010, Haiku Inc.\n"
-						<< "\n"
-						<< "You completed the game in " << fButtonClicks
-						<< " clicks.\n";
+						"\twritten by Ralf Schülke\n"
+						"\tCopyright 2008-2010, Haiku Inc.\n"
+						"\n"
+						"You completed the game in %s clicks.\n";
+						
+					strAbout.Replace("%s", score.String(), 1);
 
 					BAlert* alert = new BAlert("about", TR(strAbout.String()),
 						TR("New game"), TR("Quit game"));
