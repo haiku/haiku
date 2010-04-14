@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers arch ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers arch $(TARGET_ARCH) ;

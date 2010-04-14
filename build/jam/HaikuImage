@@ -244,7 +244,7 @@ AddNewDriversToHaikuImage power : $(X86_ONLY)acpi_battery ;
 AddNewDriversToHaikuImage power : $(X86_ONLY)acpi_embedded_controller ;
 
 # legacy drivers
-AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
+AddDriversToHaikuImage				: console dprintf null
 									  random <driver>tty zero ;
 AddDriversToHaikuImage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage audio old	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
