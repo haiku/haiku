@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,8 +13,13 @@
 #include <File.h>
 #include <InputServerTypes.h>
 #include <Message.h>
-#include <input_globals.h>
+#ifdef CONSOLED
+#	include <FindDirectory.h>
+#else
+#	include <input_globals.h>
+#endif
 
+#include <errno.h>
 #include <new>
 #include <stdlib.h>
 #include <stdio.h>
@@ -86,6 +91,7 @@ Keymap::Keymap()
 	:
 	fChars(NULL)
 {
+#ifndef CONSOLED
 	key_map *keys;
 	_get_key_map(&keys, &fChars, &fCharsSize);
 
@@ -93,6 +99,7 @@ Keymap::Keymap()
 		memcpy(&fKeys, keys, sizeof(key_map));
 		free(keys);
 	}
+#endif
 }
 
 
@@ -437,7 +444,8 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 status_t
 Keymap::LoadCurrent()
 {
-	key_map *keys = NULL;
+#ifndef CONSOLED
+	key_map* keys = NULL;
 	free(fChars);
 	fChars = NULL;
 
@@ -449,5 +457,43 @@ Keymap::LoadCurrent()
 	memcpy(&fKeys, keys, sizeof(fKeys));
 	free(keys);
 	return B_OK;
+#else	// CONSOLED
+	char path[PATH_MAX];
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, -1, false,
+		path, sizeof(path));
+	if (status != B_OK)
+		return status;
+
+	strlcat(path, "/Key_map", sizeof(path));
+	int file = open(path, O_RDONLY);
+	if (file < 0)
+		return errno;
+
+	if (read(file, &fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys)) {
+		fprintf(stderr, "error reading keymap keys\n");
+		return B_BAD_VALUE;
+	}
+
+	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++)
+		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
+
+	if (read(file, &fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32)) {
+		fprintf(stderr, "error reading keymap size\n");
+		return B_BAD_VALUE;
+	}
+
+	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
+	if (fCharsSize < 0)
+		return B_BAD_VALUE;
+
+	fChars = new char[fCharsSize];
+
+	if (read(file, fChars, fCharsSize) < 0) {
+		fprintf(stderr, "error reading keymap chars\n");
+		return B_ERROR;
+	}
+
+	return B_OK;
+#endif	// CONSOLED
 }
 
