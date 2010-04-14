@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Haiku, Inc.
+ * Copyright 2008-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors (in chronological order):
@@ -17,8 +17,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <keyboard_mouse_driver.h>
+
 #include "ps2_service.h"
-#include "kb_mouse_driver.h"
 
 
 const char* kSynapticsPath[4] = {

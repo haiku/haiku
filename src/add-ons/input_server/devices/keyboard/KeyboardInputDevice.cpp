@@ -23,8 +23,7 @@
 #include <Path.h>
 #include <String.h>
 
-#include "ATKeymap.h"
-#include "kb_mouse_driver.h"
+#include <keyboard_mouse_driver.h>
 
 
 #undef TRACE
@@ -142,8 +141,6 @@ KeyboardDevice::KeyboardDevice(KeyboardInputDevice* owner, const char* path)
 	fDeviceRef.name = get_short_name(path);
 	fDeviceRef.type = B_KEYBOARD_DEVICE;
 	fDeviceRef.cookie = this;
-
-	fIsAT = strstr(path, "keyboard/at") != NULL;
 
 	if (be_app->Lock()) {
 		be_app->AddHandler(this);
@@ -274,7 +271,7 @@ KeyboardDevice::_ControlThread()
 
 	_UpdateSettings(0);
 
-	uint8 buffer[16];
+	raw_key_info keyInfo;
 	uint8 activeDeadKey = 0;
 	uint32 lastKeyCode = 0;
 	uint32 repeatCount = 1;
@@ -284,7 +281,7 @@ KeyboardDevice::_ControlThread()
 	memset(states, 0, sizeof(states));
 
 	while (fActive) {
-		if (ioctl(fFD, KB_READ, &buffer) != B_OK) {
+		if (ioctl(fFD, KB_READ, &keyInfo) != B_OK) {
 			_ControlThreadCleanup();
 			// TOAST!
 			return 0;
@@ -296,30 +293,14 @@ KeyboardDevice::_ControlThread()
 			fUpdateSettings = false;
 		}
 
-		uint32 keycode = 0;
-		bool isKeyDown = false;
-		bigtime_t timestamp = 0;
+		uint32 keycode = keyInfo.keycode;
+		bool isKeyDown = keyInfo.is_keydown;
 
-		LOG_EVENT("KB_READ :");
-
-		if (fIsAT) {
-			at_kbd_io* atKeyboard = (at_kbd_io*)buffer;
-			if (atKeyboard->scancode > 0)
-				keycode = kATKeycodeMap[atKeyboard->scancode - 1];
-			isKeyDown = atKeyboard->is_keydown;
-			timestamp = atKeyboard->timestamp;
-			LOG_EVENT(" %02x", atKeyboard->scancode);
-		} else {
-			raw_key_info* rawKeyInfo= (raw_key_info*)buffer;
-			isKeyDown = rawKeyInfo->is_keydown;
-			timestamp = rawKeyInfo->timestamp;
-			keycode = rawKeyInfo->be_keycode;
-		}
+		LOG_EVENT("KB_READ: %Ld, %02x, %02lx\n", keyInfo.timestamp, isKeyDown,
+			keycode);
 
 		if (keycode == 0)
 			continue;
-
-		LOG_EVENT(" %Ld, %02x, %02lx\n", timestamp, isKeyDown, keycode);
 
 		if (isKeyDown && keycode == 0x68) {
 			// MENU KEY for Tracker
@@ -402,7 +383,7 @@ KeyboardDevice::_ControlThread()
 				if (message == NULL)
 					continue;
 
-				message->AddInt64("when", timestamp);
+				message->AddInt64("when", keyInfo.timestamp);
 				message->AddInt32("be:old_modifiers", oldModifiers);
 				message->AddInt32("modifiers", fModifiers);
 				message->AddData("states", B_UINT8_TYPE, states, 16);
@@ -440,7 +421,7 @@ KeyboardDevice::_ControlThread()
 		else
 			msg->what = isKeyDown ? B_UNMAPPED_KEY_DOWN : B_UNMAPPED_KEY_UP;
 
-		msg->AddInt64("when", timestamp);
+		msg->AddInt64("when", keyInfo.timestamp);
 		msg->AddInt32("key", keycode);
 		msg->AddInt32("modifiers", fModifiers);
 		msg->AddData("states", B_UINT8_TYPE, states, 16);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008 Haiku, Inc.
+ * Copyright 2001-2010 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * PS/2 mouse device driver
@@ -11,13 +11,14 @@
  *      Marcus Overhagen <marcus@overhagen.de>
  *		Clemens Zeidler	<czeidler@gmx.de>
  */
-
 #ifndef __PS2_STANDARD_MOUSE_H
 #define __PS2_STANDARD_MOUSE_H
+
 
 #include <Drivers.h>
 
 #include "packet_buffer.h"
+
 
 #define MOUSE_HISTORY_SIZE				256
 	// we record that many mouse packets before we start to drop them
@@ -25,12 +26,11 @@
 #define F_MOUSE_TYPE_STANDARD			0x1
 #define F_MOUSE_TYPE_INTELLIMOUSE		0x2
 
-typedef struct
-{
-	ps2_dev *		dev;
+typedef struct {
+	ps2_dev*		dev;
 
 	sem_id			standard_mouse_sem;
-	packet_buffer *	standard_mouse_buffer;
+	packet_buffer*	standard_mouse_buffer;
 	bigtime_t		click_last_time;
 	bigtime_t		click_speed;
 	int				click_count;
@@ -38,23 +38,29 @@ typedef struct
 	int				flags;
 	size_t			packet_index;
 	uint8			packet_buffer[PS2_MAX_PACKET_SIZE];
-
 } standard_mouse_cookie;
 
 
-status_t probe_standard_mouse(ps2_dev *dev);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-status_t standard_mouse_open(const char *name, uint32 flags, void **_cookie);
-status_t standard_mouse_close(void *_cookie);
-status_t standard_mouse_freecookie(void *_cookie);
-status_t standard_mouse_ioctl(void *_cookie, uint32 op, void *buffer,
+status_t probe_standard_mouse(ps2_dev* dev);
+
+status_t standard_mouse_open(const char* name, uint32 flags, void** _cookie);
+status_t standard_mouse_close(void* _cookie);
+status_t standard_mouse_freecookie(void* _cookie);
+status_t standard_mouse_ioctl(void* _cookie, uint32 op, void* buffer,
 	size_t length);
 
-int32 standard_mouse_handle_int(ps2_dev *dev);
-void standard_mouse_disconnect(ps2_dev *dev);
+int32 standard_mouse_handle_int(ps2_dev* dev);
+void standard_mouse_disconnect(ps2_dev* dev);
 
 device_hooks gStandardMouseDeviceHooks;
 
+#ifdef __cplusplus
+}
+#endif
 
-#endif /* __PS2_STANDARD_MOUSE_H */
 
+#endif	/* __PS2_STANDARD_MOUSE_H */

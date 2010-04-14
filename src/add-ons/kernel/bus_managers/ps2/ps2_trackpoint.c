@@ -1,8 +1,19 @@
+/*
+ * Copyright 2009-2010, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Clemens Zeidler (haiku@Clemens-Zeidler.de)
+ */
+
+
 #include <malloc.h>
 #include <string.h>
 
-#include "kb_mouse_driver.h"
+#include <keyboard_mouse_driver.h>
+
 #include "ps2_trackpoint.h"
+
 
 const char* kTrackpointPath[4] = {
 	"input/mouse/ps2/ibm_trackpoint_0",

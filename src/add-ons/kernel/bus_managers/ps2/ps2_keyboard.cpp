@@ -21,8 +21,9 @@
 #include <lock.h>
 #include <util/AutoLock.h>
 
+#include "ATKeymap.h"
 #include "ps2_service.h"
-#include "kb_mouse_driver.h"
+#include "keyboard_mouse_driver.h"
 #include "packet_buffer.h"
 
 
@@ -123,7 +124,7 @@ keyboard_handle_int(ps2_dev *dev)
 		EMERGENCY_SYS_REQ	= 0x04,
 	};
 	static int emergencyKeyStatus = 0;
-	at_kbd_io keyInfo;
+	raw_key_info keyInfo;
 	uint8 scancode = dev->history[0].data;
 
 	if (atomic_get(&sKeyboardOpenCount) == 0)
@@ -176,7 +177,7 @@ keyboard_handle_int(ps2_dev *dev)
 		keyInfo.timestamp = system_time();
 		keyInfo.is_keydown = false;
 		for (size_t i = 0; i < sizeof(kKeys) / sizeof(kKeys[0]); i++) {
-			keyInfo.scancode = kKeys[i];
+			keyInfo.keycode = kATKeycodeMap[kKeys[i] - 1];
 			if (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo,
 					sizeof(keyInfo)) != 0)
 				release_sem_etc(sKeyboardSem, 1, B_DO_NOT_RESCHEDULE);
@@ -186,7 +187,7 @@ keyboard_handle_int(ps2_dev *dev)
 	}
 
 	keyInfo.timestamp = dev->history[0].time;
-	keyInfo.scancode = scancode;
+	keyInfo.keycode = kATKeycodeMap[scancode - 1];
 
 	if (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo,
 			sizeof(keyInfo)) == 0) {
@@ -203,7 +204,7 @@ keyboard_handle_int(ps2_dev *dev)
 
 
 static status_t
-read_keyboard_packet(at_kbd_io *packet, bool isDebugger)
+read_keyboard_packet(raw_key_info *packet, bool isDebugger)
 {
 	status_t status;
 
@@ -326,7 +327,8 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 			return sKeyboardSem;
 		}
 
-		sKeyBuffer = create_packet_buffer(KEY_BUFFER_SIZE * sizeof(at_kbd_io));
+		sKeyBuffer
+			= create_packet_buffer(KEY_BUFFER_SIZE * sizeof(raw_key_info));
 		if (sKeyBuffer == NULL) {
 			delete_sem(sKeyboardSem);
 			delete cookie;
@@ -411,7 +413,7 @@ keyboard_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 			} else if (!cookie->is_debugger && !cookie->is_reader)
 				return B_BUSY;
 
-			at_kbd_io packet;
+			raw_key_info packet;
 			status_t status = read_keyboard_packet(&packet,
 				cookie->is_debugger);
 			TRACE("ps2: ioctl KB_READ: %s\n", strerror(status));

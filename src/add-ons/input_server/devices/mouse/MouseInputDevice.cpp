@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku.
+ * Copyright 2004-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,9 +30,9 @@
 #include <String.h>
 #include <View.h>
 
-#include "kb_mouse_settings.h"
-#include "kb_mouse_driver.h"
-#include "touchpad_settings.h"
+#include <kb_mouse_settings.h>
+#include <keyboard_mouse_driver.h>
+#include <touchpad_settings.h>
 
 
 #undef TRACE

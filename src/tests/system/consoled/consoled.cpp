@@ -20,9 +20,8 @@
 #include <InterfaceDefs.h>
 #include <OS.h>
 
-#include <kb_mouse_driver.h>
+#include <keyboard_mouse_driver.h>
 
-#include "ATKeymap.h"
 #include "SystemKeymap.h"
 #include "Keymap.h"
 
@@ -30,7 +29,6 @@
 struct console {
 	int			console_fd;
 	int			keyboard_fd;
-	bool		is_at;
 
 	int			tty_master_fd;
 	int			tty_slave_fd;
@@ -89,26 +87,12 @@ keyboard_reader(void* arg)
 	keymap.LoadCurrent();
 
 	for (;;) {
-		char buffer[16];
-		if (ioctl(con->keyboard_fd, KB_READ, &buffer) != 0)
+		raw_key_info rawKeyInfo;
+		if (ioctl(con->keyboard_fd, KB_READ, &rawKeyInfo) != 0)
 			break;
 
-		uint32 keycode = 0;
-		bool isKeyDown = false;
-		bigtime_t timestamp = 0;
-
-		if (con->is_at) {
-			at_kbd_io* atKeyboard = (at_kbd_io*)buffer;
-			if (atKeyboard->scancode > 0)
-				keycode = kATKeycodeMap[atKeyboard->scancode - 1];
-			isKeyDown = atKeyboard->is_keydown;
-			timestamp = atKeyboard->timestamp;
-		} else {
-			raw_key_info* rawKeyInfo= (raw_key_info*)buffer;
-			isKeyDown = rawKeyInfo->is_keydown;
-			timestamp = rawKeyInfo->timestamp;
-			keycode = rawKeyInfo->be_keycode;
-		}
+		uint32 keycode = rawKeyInfo.keycode;
+		bool isKeyDown = rawKeyInfo.is_keydown;
 
 		if (keycode == 0)
 			continue;
@@ -197,11 +181,9 @@ console_writer(void* arg)
 
 /*!	Opens the first keyboard driver it finds starting from the given
 	location \a start that supports the debugger extension.
-	\a isAT determines whether this is an AT keyboard (that returns
-	different keycodes) or not.
 */
 static int
-open_keyboard(const char* start, bool& isAT)
+open_keyboard(const char* start)
 {
 	DIR* dir = opendir(start);
 	if (dir == NULL)
@@ -226,16 +208,15 @@ open_keyboard(const char* start, bool& isAT)
 			continue;
 		
 		if (S_ISDIR(stat.st_mode))
-			return open_keyboard(path, isAT);
+			return open_keyboard(path);
 		
 		// Try to open it as a device
 		fd = open(path, O_RDONLY);
 		if (fd >= 0) {
 			// Turn on debugger mode
-			if (ioctl(fd, KB_SET_DEBUG_READER, NULL, 0) == 0) {
-				isAT = strstr(path, "keyboard/at") != NULL;
+			if (ioctl(fd, KB_SET_DEBUG_READER, NULL, 0) == 0)
 				break;
-			}
+
 			close(fd);
 			fd = -1;
 		}
@@ -261,7 +242,7 @@ start_console(struct console* con)
 	if (con->console_fd < 0)
 		return -2;
 
-	con->keyboard_fd = open_keyboard("/dev/input/keyboard", con->is_at);
+	con->keyboard_fd = open_keyboard("/dev/input/keyboard");
 	if (con->keyboard_fd < 0)
 		return -3;
 

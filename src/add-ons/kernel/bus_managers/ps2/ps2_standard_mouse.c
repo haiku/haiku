@@ -1,8 +1,6 @@
 /*
- * Copyright 2001-2008 Haiku, Inc.
+ * Copyright 2001-2010 Haiku, Inc.
  * Distributed under the terms of the MIT License.
- *
- * PS/2 mouse device driver
  *
  * Authors (in chronological order):
  * 		Elad Lahav (elad@eldarshany.com)
@@ -12,51 +10,54 @@
  *		Clemens Zeidler	<czeidler@gmx.de>
  */
 
-/*
- * A PS/2 mouse is connected to the IBM 8042 controller, and gets its
- * name from the IBM PS/2 personal computer, which was the first to
- * use this device. All resources are shared between the keyboard, and
- * the mouse, referred to as the "Auxiliary Device".
- *
- * I/O:
- * ~~~
- * The controller has 3 I/O registers:
- * 1. Status (input), mapped to port 64h
- * 2. Control (output), mapped to port 64h
- * 3. Data (input/output), mapped to port 60h
- *
- * Data:
- * ~~~~
- * A packet read from the mouse data port is composed of
- * three bytes:
- * byte 0: status byte, where
- * - bit 7: Y overflow (1 = true)
- * - bit 6: X overflow (1 = true)
- * - bit 5: MSB of Y offset
- * - bit 4: MSB of X offset
- * - bit 3: Syncronization bit (always 1)
- * - bit 2: Middle button (1 = down)
- * - bit 1: Right button (1 = down)
- * - bit 0: Left button (1 = down)
- * byte 1: X position change, since last probed (-127 to +127)
- * byte 2: Y position change, since last probed (-127 to +127)
- *
- * Intellimouse mice send a four byte packet, where the first three
- * bytes are the same as standard mice, and the last one reports the
- * Z position, which is, usually, the wheel movement.
- *
- * Interrupts:
- * ~~~~~~~~~~
- * The PS/2 mouse device is connected to interrupt 12.
- * The controller uses 3 consecutive interrupts to inform the computer
- * that it has new data. On the first the data register holds the status
- * byte, on the second the X offset, and on the 3rd the Y offset.
- */
+/*!	PS/2 mouse device driver
 
+	A PS/2 mouse is connected to the IBM 8042 controller, and gets its
+	name from the IBM PS/2 personal computer, which was the first to
+	use this device. All resources are shared between the keyboard, and
+	the mouse, referred to as the "Auxiliary Device".
+
+	I/O:
+	~~~
+	The controller has 3 I/O registers:
+	1. Status (input), mapped to port 64h
+	2. Control (output), mapped to port 64h
+	3. Data (input/output), mapped to port 60h
+
+	Data:
+	~~~~
+	A packet read from the mouse data port is composed of
+	three bytes:
+		byte 0: status byte, where
+			- bit 7: Y overflow (1 = true)
+			- bit 6: X overflow (1 = true)
+			- bit 5: MSB of Y offset
+			- bit 4: MSB of X offset
+			- bit 3: Syncronization bit (always 1)
+			- bit 2: Middle button (1 = down)
+			- bit 1: Right button (1 = down)
+			- bit 0: Left button (1 = down)
+		byte 1: X position change, since last probed (-127 to +127)
+		byte 2: Y position change, since last probed (-127 to +127)
+
+	Intellimouse mice send a four byte packet, where the first three
+	bytes are the same as standard mice, and the last one reports the
+	Z position, which is, usually, the wheel movement.
+
+	Interrupts:
+	~~~~~~~~~~
+	The PS/2 mouse device is connected to interrupt 12.
+	The controller uses 3 consecutive interrupts to inform the computer
+	that it has new data. On the first the data register holds the status
+	byte, on the second the X offset, and on the 3rd the Y offset.
+*/
+
+
+#include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
 
-#include "kb_mouse_driver.h"
+#include <keyboard_mouse_driver.h>
+
 #include "ps2_service.h"
 #include "ps2_standard_mouse.h"
 
@@ -74,8 +75,9 @@ const char* kIntelliMousePath[4] = {
 	"input/mouse/ps2/intelli_3"
 };
 
-/** Set sampling rate of the ps2 port.
- */
+
+/*!	Set sampling rate of the ps2 port.
+*/
 static inline status_t
 ps2_set_sample_rate(ps2_dev *dev, uint8 rate)
 {
@@ -83,8 +85,8 @@ ps2_set_sample_rate(ps2_dev *dev, uint8 rate)
 }
 
 
-/** Converts a packet received by the mouse to a "movement".
- */
+/*!	Converts a packet received by the mouse to a "movement".
+*/
 static void
 ps2_packet_to_movement(standard_mouse_cookie *cookie, uint8 packet[],
 	mouse_movement *pos)
@@ -145,8 +147,8 @@ ps2_packet_to_movement(standard_mouse_cookie *cookie, uint8 packet[],
 }
 
 
-/** Read a mouse event from the mouse events chain buffer.
- */
+/*!	Read a mouse event from the mouse events chain buffer.
+*/
 static status_t
 standard_mouse_read_event(standard_mouse_cookie *cookie,
 	mouse_movement *movement)
@@ -181,6 +183,9 @@ standard_mouse_read_event(standard_mouse_cookie *cookie,
 }
 
 
+// #pragma mark -
+
+
 void
 standard_mouse_disconnect(ps2_dev *dev)
 {
@@ -191,12 +196,12 @@ standard_mouse_disconnect(ps2_dev *dev)
 }
 
 
-/** Interrupt handler for the mouse device. Called whenever the I/O
- *	controller generates an interrupt for the PS/2 mouse. Reads mouse
- *	information from the data port, and stores it, so it can be accessed
- *	by read() operations. The full data is obtained using 3 consecutive
- *	calls to the handler, each holds a different byte on the data port.
- */
+/*!	Interrupt handler for the mouse device. Called whenever the I/O
+	controller generates an interrupt for the PS/2 mouse. Reads mouse
+	information from the data port, and stores it, so it can be accessed
+	by read() operations. The full data is obtained using 3 consecutive
+	calls to the handler, each holds a different byte on the data port.
+*/
 int32
 standard_mouse_handle_int(ps2_dev *dev)
 {

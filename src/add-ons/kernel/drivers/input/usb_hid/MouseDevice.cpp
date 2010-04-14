@@ -1,8 +1,11 @@
 /*
-	Driver for USB Human Interface Devices.
-	Copyright (C) 2008-2009 Michael Lotz <mmlr@mlotz.ch>
-	Distributed under the terms of the MIT license.
-*/
+ * Copyright 2008-2009 Michael Lotz <mmlr@mlotz.ch>
+ * Distributed under the terms of the MIT license.
+ */
+
+
+//!	Driver for USB Human Interface Devices.
+
 
 #include "Driver.h"
 #include "MouseDevice.h"
@@ -15,8 +18,7 @@
 #include <string.h>
 #include <usb/USB_hid.h>
 
-// input server private for mouse_movement, MS_READ, etc...
-#include "kb_mouse_driver.h"
+#include <keyboard_mouse_driver.h>
 
 
 MouseDevice::MouseDevice(HIDReport *report, HIDReportItem *xAxis,

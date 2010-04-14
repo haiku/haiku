@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT license.
  */
 
+
 #include <new>
 #include <stdlib.h>
 #include <string.h>
@@ -18,13 +19,13 @@
 #include "HIDReport.h"
 #include "HIDReportItem.h"
 
-// input server private for raw_key_info, KB_READ, etc...
-#include "kb_mouse_driver.h"
+#include <keyboard_mouse_driver.h>
 
 
 #define LEFT_ALT_KEY	0x04
 #define RIGHT_ALT_KEY	0x40
 #define ALT_KEYS		(LEFT_ALT_KEY | RIGHT_ALT_KEY)
+
 
 static usb_id sDebugKeyboardPipe = 0;
 static size_t sDebugKeyboardReportSize = 0;
@@ -296,7 +297,7 @@ void
 KeyboardDevice::_WriteKey(uint32 key, bool down)
 {
 	raw_key_info info;
-	info.be_keycode = key;
+	info.keycode = key;
 	info.is_keydown = down;
 	info.timestamp = system_time();
 	RingBufferWrite(&info, sizeof(raw_key_info));

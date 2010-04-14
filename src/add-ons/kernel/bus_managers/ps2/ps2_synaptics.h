@@ -1,8 +1,8 @@
 /*
- * Copyright 2008-2009, Haiku, Inc.
+ * Copyright 2008-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * Authors (in chronological order):
+ * Authors:
  *		Clemens Zeidler (haiku@Clemens-Zeidler.de)
  */
 #ifndef PS2_SYNAPTICS_H
@@ -11,11 +11,12 @@
 
 #include <KernelExport.h>
 
-#include "kb_mouse_driver.h"
+#include <keyboard_mouse_driver.h>
+#include <touchpad_settings.h>
+
 #include "movement_maker.h"
 #include "packet_buffer.h"
 #include "ps2_service.h"
-#include "touchpad_settings.h"
 
 
 #define SYN_TOUCHPAD			0x47

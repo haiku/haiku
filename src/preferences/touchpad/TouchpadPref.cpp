@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Haiku, Inc.
+ * Copyright 2008-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,7 +14,7 @@
 #include <File.h>
 #include <String.h>
 
-#include "kb_mouse_driver.h"
+#include <keyboard_mouse_driver.h>
 
 
 TouchpadPref::TouchpadPref()

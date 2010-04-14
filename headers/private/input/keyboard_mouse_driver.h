@@ -1,17 +1,14 @@
-//
-// kb_mouse_driver.h
-//
-#ifndef _KB_MOUSE_DRIVER_H
-#define _KB_MOUSE_DRIVER_H
+/*
+ * Copyright 2002-2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _KEYBOARD_MOUSE_DRIVER_H
+#define _KEYBOARD_MOUSE_DRIVER_H
 
 
 #include <SupportDefs.h>
 #include <Drivers.h>
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define KEY_Scroll      0x0f
 #define KEY_Pause       0x10
@@ -75,60 +72,55 @@ enum {
 
 
 typedef struct {
-	bigtime_t       timestamp;
-	uint32          be_keycode;
-	bool            is_keydown;
+	bigtime_t	timestamp;
+	uint32		keycode;
+	bool		is_keydown;
 } raw_key_info;
 
 
 typedef struct {
-	bigtime_t       timestamp;
-	uint8           scancode;
-	bool            is_keydown;
-} at_kbd_io;
-
-
-typedef struct {
-	bool    num_lock;
-	bool    caps_lock;
-	bool    scroll_lock;
+	bool		num_lock;
+	bool		caps_lock;
+	bool		scroll_lock;
 } led_info;
 
 
 typedef struct {
-  int32 	cookie;
-  uint32 	buttons;
-  int32 	xdelta;
-  int32 	ydelta;
-  int32 	clicks;
-  int32 	modifiers;
-  bigtime_t timestamp;
-  int32 	wheel_ydelta;
-  int32		wheel_xdelta;
+	int32		cookie;
+	uint32		buttons;
+	int32		xdelta;
+	int32		ydelta;
+	int32		clicks;
+	int32		modifiers;
+	bigtime_t	timestamp;
+	int32		wheel_ydelta;
+	int32		wheel_xdelta;
 } mouse_movement;
 
+
 typedef struct {
-  uint32	buttons;
-  float		xpos;
-  float		ypos;
-  bool		has_contact;
-  float		pressure;
-  int32		clicks;
-  bool		eraser;
-  bigtime_t	timestamp;
-  int32		wheel_ydelta;
-  int32		wheel_xdelta;
-  float		tilt_x;
-  float		tilt_y;
+	uint32		buttons;
+	float		xpos;
+	float		ypos;
+	bool		has_contact;
+	float		pressure;
+	int32		clicks;
+	bool		eraser;
+	bigtime_t	timestamp;
+	int32		wheel_ydelta;
+	int32		wheel_xdelta;
+	float		tilt_x;
+	float		tilt_y;
 } tablet_movement;
+
 
 #define B_ONE_FINGER	0x01
 #define B_TWO_FINGER	0x02
 #define B_MULTI_FINGER	0x04
 #define B_PEN			0x08
 
-typedef struct
-{
+
+typedef struct {
 	uint8		buttons;
 	uint32		xPosition;
 	uint32		yPosition;
@@ -141,9 +133,5 @@ typedef struct
 	// 12		maximum reportable width; extrem wide contact
 } touchpad_movement;
 
-#ifdef __cplusplus
-}
-#endif
 
-#endif
-
+#endif	// _KB_MOUSE_DRIVER_H
