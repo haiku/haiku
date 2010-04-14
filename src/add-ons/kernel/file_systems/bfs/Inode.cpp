@@ -1565,7 +1565,9 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 		writeLocker.Lock();
 	}
 
-	if (pos + length > Size()) {
+	off_t oldSize = Size();
+
+	if (pos + length > oldSize) {
 		// let's grow the data stream to the size needed
 		status_t status = SetFileSize(transaction, pos + length);
 		if (status != B_OK) {
@@ -1588,6 +1590,9 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 	}
 
 	writeLocker.Unlock();
+
+	if (oldSize < pos)
+		FillGapWithZeros(oldSize, pos);
 
 	// If we don't want to write anything, we can now return (we may
 	// just have changed the file size using the position parameter)
