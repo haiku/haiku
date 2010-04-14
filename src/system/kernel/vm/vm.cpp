@@ -5871,7 +5871,7 @@ _user_unmap_memory(void* _address, size_t size)
 
 	// check params
 	if (size == 0 || (addr_t)address + size < (addr_t)address
-			|| (addr_t)address % B_PAGE_SIZE != 0) {
+		|| (addr_t)address % B_PAGE_SIZE != 0) {
 		return B_BAD_VALUE;
 	}
 
