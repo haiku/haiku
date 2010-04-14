@@ -64,13 +64,9 @@ Server input_server :
 	: be $(TARGET_LIBSTDC++)
 ;
 
+Includes [ FGristFiles InputServer.cpp ] : [ FGristFiles SystemKeymap.h ] ;
+
 SEARCH on [ FGristFiles AddOnMonitor.cpp
-	AddOnMonitorHandler.cpp
-	NodeMonitorHandler.cpp ] += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits storage ] ;
-
-Package haiku-inputkit-cvs :
-	input_server :
-	boot beos system servers ;
-
-Packages haiku-inputkit-cvs :
-	README LICENSE install.sh ;
+		AddOnMonitorHandler.cpp
+		NodeMonitorHandler.cpp ]
+	+= [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits storage ] ;
