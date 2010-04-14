@@ -2857,11 +2857,16 @@ get_new_fd(int type, struct fs_mount* mount, struct vnode* vnode,
 	descriptor->type = type;
 	descriptor->open_mode = openMode;
 
-	fd = new_fd(get_current_io_context(kernel), descriptor);
+	io_context* context = get_current_io_context(kernel);
+	fd = new_fd(context, descriptor);
 	if (fd < 0) {
 		free(descriptor);
 		return B_NO_MORE_FDS;
 	}
+
+	mutex_lock(&context->io_mutex);
+	fd_set_close_on_exec(context, fd, (openMode & O_CLOEXEC) != 0);
+	mutex_unlock(&context->io_mutex);
 
 	return fd;
 }
