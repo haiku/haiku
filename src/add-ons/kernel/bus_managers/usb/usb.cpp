@@ -323,14 +323,29 @@ status_t
 queue_bulk_v(usb_pipe pipe, iovec *vector, size_t vectorCount,
 	usb_callback_func callback, void *callbackCookie)
 {
-	TRACE_MODULE("queue_bulk(%ld, %p, %ld, %p, %p)\n",
+	TRACE_MODULE("queue_bulk_v(%ld, %p, %ld, %p, %p)\n",
 		pipe, vector, vectorCount, callback, callbackCookie);
 	Object *object = gUSBStack->GetObject(pipe);
 	if (!object || (object->Type() & USB_OBJECT_BULK_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
 
 	return ((BulkPipe *)object)->QueueBulkV(vector, vectorCount, callback,
-		callbackCookie);
+		callbackCookie, false);
+}
+
+
+status_t
+queue_bulk_v_physical(usb_pipe pipe, iovec *vector, size_t vectorCount,
+	usb_callback_func callback, void *callbackCookie)
+{
+	TRACE_MODULE("queue_bulk_v_physical(%ld, %p, %ld, %p, %p)\n",
+		pipe, vector, vectorCount, callback, callbackCookie);
+	Object *object = gUSBStack->GetObject(pipe);
+	if (!object || (object->Type() & USB_OBJECT_BULK_PIPE) == 0)
+		return B_DEV_INVALID_PIPE;
+
+	return ((BulkPipe *)object)->QueueBulkV(vector, vectorCount, callback,
+		callbackCookie, true);
 }
 
 
@@ -537,6 +552,7 @@ struct usb_module_info gModuleInfoV3 = {
 	get_device_parent,					// get_device_parent
 	reset_port,							// reset_port
 	disable_port						// disable_port
+	//queue_bulk_v_physical				// queue_bulk_v_physical
 };
 
 

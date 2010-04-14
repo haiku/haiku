@@ -397,7 +397,8 @@ virtual	const char *					TypeName() { return "bulk pipe"; };
 		status_t						QueueBulkV(iovec *vector,
 											size_t vectorCount,
 											usb_callback_func callback,
-											void *callbackCookie);
+											void *callbackCookie,
+											bool physical);
 };
 
 
@@ -603,6 +604,9 @@ public:
 		uint8 *						Data() { return (uint8 *)fData.iov_base; };
 		size_t						DataLength() { return fData.iov_len; };
 
+		void						SetPhysical(bool physical);
+		bool						IsPhysical() { return fPhysical; };
+
 		void						SetVector(iovec *vector, size_t vectorCount);
 		iovec *						Vector() { return fVector; };
 		size_t						VectorCount() { return fVectorCount; };
@@ -633,6 +637,7 @@ private:
 		iovec *						fVector;
 		size_t						fVectorCount;
 		void *						fBaseAddress;
+		bool						fPhysical;
 		bool						fFragmented;
 		size_t						fActualLength;
 		area_id						fUserArea;

@@ -17,6 +17,7 @@ Transfer::Transfer(Pipe *pipe)
 		fVector(&fData),
 		fVectorCount(0),
 		fBaseAddress(NULL),
+		fPhysical(false),
 		fFragmented(false),
 		fActualLength(0),
 		fUserArea(-1),
@@ -73,6 +74,13 @@ Transfer::SetData(uint8 *data, size_t dataLength)
 		if (_CalculateBandwidth() < B_OK)
 			TRACE_ERROR("can't calculate bandwidth\n");
 	}
+}
+
+
+void
+Transfer::SetPhysical(bool physical)
+{
+	fPhysical = physical;
 }
 
 
