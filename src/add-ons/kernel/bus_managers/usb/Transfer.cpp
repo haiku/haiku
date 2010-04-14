@@ -180,7 +180,7 @@ Transfer::PrepareKernelAccess()
 	// we got a userspace buffer, need to clone the area for that
 	// space first and map the iovecs to this cloned area.
 	fClonedArea = clone_area("userspace accessor", &clonedMemory,
-		B_ANY_ADDRESS, B_WRITE_AREA | B_KERNEL_WRITE_AREA, fUserArea);
+		B_ANY_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, fUserArea);
 
 	if (fClonedArea < B_OK)
 		return fClonedArea;
