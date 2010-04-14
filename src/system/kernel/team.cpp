@@ -3496,7 +3496,8 @@ void
 _user_exit_team(status_t returnValue)
 {
 	struct thread* thread = thread_get_current_thread();
-	struct thread* mainThread = thread->team->main_thread;
+	struct team* team = thread->team;
+	struct thread* mainThread = team->main_thread;
 
 	mainThread->exit.status = returnValue;
 	mainThread->exit.reason = THREAD_RETURN_EXIT;
@@ -3505,6 +3506,13 @@ _user_exit_team(status_t returnValue)
 	if (thread != mainThread) {
 		thread->exit.status = returnValue;
 		thread->exit.reason = THREAD_RETURN_EXIT;
+	}
+
+	if ((atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_PREVENT_EXIT)
+			!= 0) {
+		// This team is currently being debugged, and requested that teams
+		// should not be exited.
+		user_debug_stop_thread();
 	}
 
 	send_signal(thread->id, SIGKILL);

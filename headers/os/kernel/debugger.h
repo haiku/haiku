@@ -5,6 +5,7 @@
 #ifndef _DEBUGGER_H
 #define _DEBUGGER_H
 
+
 #include <signal.h>
 
 #include <image.h>
@@ -16,6 +17,7 @@
 #include <arch/m68k/arch_debugger.h>
 #include <arch/mipsel/arch_debugger.h>
 #include <arch/arm/arch_debugger.h>
+
 
 #ifdef __INTEL__
 	typedef struct x86_debug_cpu_state debug_cpu_state;
@@ -64,6 +66,7 @@ enum {
 	B_TEAM_DEBUG_TEAM_CREATION					= 0x00080000,
 	B_TEAM_DEBUG_THREADS						= 0x00100000,
 	B_TEAM_DEBUG_IMAGES							= 0x00200000,
+	B_TEAM_DEBUG_PREVENT_EXIT					= 0x00400000,
 
 	// new thread handling
 	B_TEAM_DEBUG_STOP_NEW_THREADS				= 0x01000000,

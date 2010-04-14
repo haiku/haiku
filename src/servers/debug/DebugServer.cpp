@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <map>
 
 #include <errno.h>
@@ -25,6 +26,7 @@
 
 #include <util/DoublyLinkedList.h>
 
+
 #define USE_GUI true
 	// define to false if the debug server shouldn't use GUI (i.e. an alert)
 
@@ -35,8 +37,10 @@
 #	define TRACE(x) ;
 #endif
 
+
 using std::map;
 using std::nothrow;
+
 
 static const char *kSignature = "application/x-vnd.Haiku-debug_server";
 
@@ -46,7 +50,6 @@ static const char *kTerminalPath	= "/boot/system/apps/Terminal";
 static const char *kGDBPath			= "/bin/gdb";
 
 
-// KillTeam
 static void
 KillTeam(team_id team, const char *appName = NULL)
 {
@@ -71,7 +74,7 @@ KillTeam(team_id team, const char *appName = NULL)
 
 // #pragma mark -
 
-// DebugMessage
+
 class DebugMessage : public DoublyLinkedListLinkImpl<DebugMessage> {
 public:
 	DebugMessage()
@@ -92,7 +95,6 @@ private:
 typedef DoublyLinkedList<DebugMessage>	DebugMessageList;
 
 
-// TeamDebugHandler
 class TeamDebugHandler : public BLocker {
 public:
 	TeamDebugHandler(team_id team);
@@ -144,11 +146,11 @@ private:
 };
 
 
-// TeamDebugHandlerRoster
 class TeamDebugHandlerRoster : public BLocker {
 private:
 	TeamDebugHandlerRoster()
-		: BLocker("team debug handler roster")
+		:
+		BLocker("team debug handler roster")
 	{
 	}
 
@@ -259,7 +261,6 @@ private:
 TeamDebugHandlerRoster *TeamDebugHandlerRoster::sRoster = NULL;
 
 
-// DebugServer
 class DebugServer : public BServer {
 public:
 	DebugServer(status_t &error);
@@ -285,13 +286,14 @@ private:
 
 // #pragma mark -
 
-// constructor
+
 TeamDebugHandler::TeamDebugHandler(team_id team)
-	: BLocker("team debug handler"),
-	  fMessages(),
-	  fMessageCountSem(-1),
-	  fTeam(team),
-	  fHandlerThread(-1)
+	:
+	BLocker("team debug handler"),
+	fMessages(),
+	fMessageCountSem(-1),
+	fTeam(team),
+	fHandlerThread(-1)
 {
 	fDebugContext.nub_port = -1;
 	fDebugContext.reply_port = -1;
@@ -299,7 +301,7 @@ TeamDebugHandler::TeamDebugHandler(team_id team)
 	fExecutablePath[0] = '\0';
 }
 
-// destructor
+
 TeamDebugHandler::~TeamDebugHandler()
 {
 	// delete the message count semaphore and wait for the thread to die
@@ -322,7 +324,7 @@ TeamDebugHandler::~TeamDebugHandler()
 	}
 }
 
-// Init
+
 status_t
 TeamDebugHandler::Init(port_id nubPort)
 {
@@ -352,6 +354,13 @@ TeamDebugHandler::Init(port_id nubPort)
 		return error;
 	}
 
+	// set team flags
+	debug_nub_set_team_flags message;
+	message.flags = B_TEAM_DEBUG_PREVENT_EXIT;
+
+	send_debug_message(&fDebugContext, B_DEBUG_MESSAGE_SET_TEAM_FLAGS, &message,
+		sizeof(message), NULL, 0);
+
 	// create the message count semaphore
 	char name[B_OS_NAME_LENGTH];
 	snprintf(name, sizeof(name), "team %ld message count", fTeam);
@@ -377,14 +386,14 @@ TeamDebugHandler::Init(port_id nubPort)
 	return B_OK;
 }
 
-// Team
+
 team_id
 TeamDebugHandler::Team() const
 {
 	return fTeam;
 }
 
-// PushMessage
+
 status_t
 TeamDebugHandler::PushMessage(DebugMessage *message)
 {
@@ -396,7 +405,7 @@ TeamDebugHandler::PushMessage(DebugMessage *message)
 	return B_OK;
 }
 
-// _PopMessage
+
 status_t
 TeamDebugHandler::_PopMessage(DebugMessage *&message)
 {
@@ -418,7 +427,7 @@ TeamDebugHandler::_PopMessage(DebugMessage *&message)
 	return B_OK;
 }
 
-// _EnterDebugger
+
 thread_id
 TeamDebugHandler::_EnterDebugger()
 {
@@ -482,14 +491,14 @@ TeamDebugHandler::_EnterDebugger()
 	return thread;
 }
 
-// _KillTeam
+
 void
 TeamDebugHandler::_KillTeam()
 {
 	KillTeam(fTeam, fTeamInfo.args);
 }
 
-// _HandleMessage
+
 bool
 TeamDebugHandler::_HandleMessage(DebugMessage *message)
 {
@@ -577,7 +586,7 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 	return kill;
 }
 
-// _LookupSymbolAddress
+
 void
 TeamDebugHandler::_LookupSymbolAddress(
 	debug_symbol_lookup_context *lookupContext, const void *address,
@@ -631,7 +640,7 @@ TeamDebugHandler::_LookupSymbolAddress(
 	}
 }
 
-// _PrintStackTrace
+
 void
 TeamDebugHandler::_PrintStackTrace(thread_id thread)
 {
@@ -707,7 +716,6 @@ TeamDebugHandler::_NotifyRegistrar(team_id team, bool openAlert,
 }
 
 
-// _InitGUI
 status_t
 TeamDebugHandler::_InitGUI()
 {
@@ -716,14 +724,14 @@ TeamDebugHandler::_InitGUI()
 	return app->InitGUIContext();
 }
 
-// _HandlerThreadEntry
+
 status_t
 TeamDebugHandler::_HandlerThreadEntry(void *data)
 {
 	return ((TeamDebugHandler*)data)->_HandlerThread();
 }
 
-// _HandlerThread
+
 status_t
 TeamDebugHandler::_HandlerThread()
 {
@@ -806,35 +814,35 @@ TeamDebugHandler::_HandlerThread()
 	return B_OK;
 }
 
-// _ExecutableNameEquals
+
 bool
 TeamDebugHandler::_ExecutableNameEquals(const char *name) const
 {
 	return strcmp(_LastPathComponent(fExecutablePath), name) == 0;
 }
 
-// _IsAppServer
+
 bool
 TeamDebugHandler::_IsAppServer() const
 {
 	return _ExecutableNameEquals("app_server");
 }
 
-// _IsInputServer
+
 bool
 TeamDebugHandler::_IsInputServer() const
 {
 	return _ExecutableNameEquals("input_server");
 }
 
-// _IsRegistrar
+
 bool
 TeamDebugHandler::_IsRegistrar() const
 {
 	return _ExecutableNameEquals("registrar");
 }
 
-// _IsGUIServer
+
 bool
 TeamDebugHandler::_IsGUIServer() const
 {
@@ -842,7 +850,7 @@ TeamDebugHandler::_IsGUIServer() const
 	return _IsAppServer() || _IsInputServer() || _IsRegistrar();
 }
 
-// _LastPathComponent
+
 const char *
 TeamDebugHandler::_LastPathComponent(const char *path)
 {
@@ -850,7 +858,7 @@ TeamDebugHandler::_LastPathComponent(const char *path)
 	return lastSlash ? lastSlash + 1 : path;
 }
 
-// _FindTeam
+
 team_id
 TeamDebugHandler::_FindTeam(const char *name)
 {
@@ -868,7 +876,7 @@ TeamDebugHandler::_FindTeam(const char *name)
 	return B_ENTRY_NOT_FOUND;
 }
 
-// _AreGUIServersAlive
+
 bool
 TeamDebugHandler::_AreGUIServersAlive()
 {
@@ -879,16 +887,17 @@ TeamDebugHandler::_AreGUIServersAlive()
 
 // #pragma mark -
 
-// constructor
+
 DebugServer::DebugServer(status_t &error)
-	: BServer(kSignature, false, &error),
-	  fListenerPort(-1),
-	  fListener(-1),
-	  fTerminating(false)
+	:
+	BServer(kSignature, false, &error),
+	fListenerPort(-1),
+	fListener(-1),
+	fTerminating(false)
 {
 }
 
-// Init
+
 status_t
 DebugServer::Init()
 {
@@ -904,6 +913,7 @@ DebugServer::Init()
 		return fListener;
 
 	// register as default debugger
+	// TODO: could set default flags
 	status_t error = install_default_debugger(fListenerPort);
 	if (error != B_OK)
 		return error;
@@ -922,14 +932,14 @@ DebugServer::QuitRequested()
 	return false;
 }
 
-// _ListenerEntry
+
 status_t
 DebugServer::_ListenerEntry(void *data)
 {
 	return ((DebugServer*)data)->_Listener();
 }
 
-// _Listener
+
 status_t
 DebugServer::_Listener()
 {
@@ -963,7 +973,7 @@ message->Data().origin.team, code));
 
 // #pragma mark -
 
-// main
+
 int
 main()
 {
