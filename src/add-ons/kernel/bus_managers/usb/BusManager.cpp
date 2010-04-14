@@ -13,7 +13,8 @@
 BusManager::BusManager(Stack *stack)
 	:	fInitOK(false),
 		fStack(stack),
-		fRootHub(NULL)
+		fRootHub(NULL),
+		fUSBID(fStack->IndexOfBusManager(this))
 {
 	mutex_init(&fLock, "usb busmanager lock");
 
