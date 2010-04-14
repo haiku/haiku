@@ -15,8 +15,15 @@
 #include <NodeInfo.h>
 #include <String.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include <stdio.h>
 #include <string.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Preferred App Menu"
 
 
 static int
@@ -240,13 +247,14 @@ retrieve_preferred_app(BMessage* message, bool sameAs, const char* forType,
 	}
 
 	if (status != B_OK) {
-		error_alert("File could not be opened", status, B_STOP_ALERT);
+		error_alert(TR("File could not be opened"), status, B_STOP_ALERT);
 		return status;
 	}
 
 	if (!preferred[0]) {
-		error_alert(sameAs ? "Could not retrieve preferred application of this file."
-			: "Could not retrieve application signature.");
+		error_alert(sameAs ?
+			TR("Could not retrieve preferred application of this file.")
+			: TR("Could not retrieve application signature."));
 		return B_ERROR;
 	}
 
@@ -274,13 +282,13 @@ retrieve_preferred_app(BMessage* message, bool sameAs, const char* forType,
 			description[0] = '\0';
 
 		char warning[512];
-		snprintf(warning, sizeof(warning), "The application \"%s\" does not "
-			"support this file type.\n"
-			"Are you sure you want to set it anyway?",
+		snprintf(warning, sizeof(warning), TR("The application \"%s\" does "
+			"not support this file type.\n"
+			"Are you sure you want to set it anyway?"),
 			description[0] ? description : preferred);
 
 		BAlert* alert = new BAlert("FileTypes Request", warning,
-			"Set Preferred Application", "Cancel", NULL, B_WIDTH_AS_USUAL,
+			TR("Set Preferred Application"), "Cancel", NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
 		if (alert->Go() == 1)
 			return B_ERROR;

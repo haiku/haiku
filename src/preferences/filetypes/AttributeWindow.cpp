@@ -10,7 +10,9 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
@@ -22,6 +24,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Attribute Window"
 
 
 const uint32 kMsgAttributeUpdated = 'atup';
@@ -85,7 +91,7 @@ display_as_parameter(const char* special)
 
 AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 		AttributeItem* attributeItem)
-	: BWindow(BRect(100, 100, 350, 200), "Attribute", B_MODAL_WINDOW_LOOK,
+	: BWindow(BRect(100, 100, 350, 200), TR("Attribute"), B_MODAL_WINDOW_LOOK,
 		B_MODAL_SUBSET_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE
 			| B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target),
@@ -100,7 +106,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	AddChild(topView);
 
 	rect.InsetBy(8.0f, 8.0f);
-	fPublicNameControl = new BTextControl(rect, "public", "Attribute name:",
+	fPublicNameControl = new BTextControl(rect, "public", TR("Attribute name:"),
 		fAttribute.PublicName(), NULL, B_FOLLOW_LEFT_RIGHT);
 	fPublicNameControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
 
@@ -115,7 +121,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 
 	rect = fPublicNameControl->Frame();
 	rect.OffsetBy(0.0f, rect.Height() + 5.0f);
-	fAttributeControl = new BTextControl(rect, "internal", "Internal name:",
+	fAttributeControl = new BTextControl(rect, "internal", TR("Internal name:"),
 		fAttribute.Name(), NULL, B_FOLLOW_LEFT_RIGHT);
 	fAttributeControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
 	fAttributeControl->SetDivider(labelWidth);
@@ -145,7 +151,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 
 	rect.OffsetBy(0.0f, rect.Height() + 4.0f);
 	BMenuField* menuField = new BMenuField(rect, "types",
-		"Type:", fTypeMenu);
+		TR("Type:"), fTypeMenu);
 	menuField->SetDivider(labelWidth);
 	menuField->SetAlignment(B_ALIGN_RIGHT);
 	menuField->GetPreferredSize(&width, &height);
@@ -157,7 +163,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	BBox* box = new BBox(rect, "", B_FOLLOW_LEFT_RIGHT);
 	topView->AddChild(box);
 
-	fVisibleCheckBox = new BCheckBox(rect, "visible", "Visible",
+	fVisibleCheckBox = new BCheckBox(rect, "visible", TR("Visible"),
 		new BMessage(kMsgVisibilityChanged));
 	fVisibleCheckBox->SetValue(fAttribute.Visible());
 	fVisibleCheckBox->ResizeToPreferred();
@@ -185,13 +191,13 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	rect.OffsetTo(8.0f, fVisibleCheckBox->Bounds().Height());
 	rect.right -= 18.0f;
 	fDisplayAsMenuField = new BMenuField(rect, "display as",
-		"Display as:", menu);
+		TR("Display as:"), menu);
 	fDisplayAsMenuField->SetDivider(labelWidth);
 	fDisplayAsMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fDisplayAsMenuField->ResizeTo(rect.Width(), height);
 	box->AddChild(fDisplayAsMenuField);
 
-	fEditableCheckBox = new BCheckBox(rect, "editable", "Editable",
+	fEditableCheckBox = new BCheckBox(rect, "editable", TR("Editable"),
 		new BMessage(kMsgAttributeUpdated), B_FOLLOW_RIGHT);
 	fEditableCheckBox->SetValue(fAttribute.Editable());
 	fEditableCheckBox->ResizeToPreferred();
@@ -202,7 +208,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 
 	rect.OffsetBy(0.0f, menuField->Bounds().Height() + 4.0f);
 	rect.bottom = rect.top + fPublicNameControl->Bounds().Height();
-	fSpecialControl = new BTextControl(rect, "special", "Special:",
+	fSpecialControl = new BTextControl(rect, "special", TR("Special:"),
 		display_as_parameter(fAttribute.DisplayAs()), NULL,
 		B_FOLLOW_LEFT_RIGHT);
 	fSpecialControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
@@ -214,7 +220,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	char text[64];
 	snprintf(text, sizeof(text), "%ld", fAttribute.Width());
 	rect.OffsetBy(0.0f, fSpecialControl->Bounds().Height() + 4.0f);
-	fWidthControl = new BTextControl(rect, "width", "Width:",
+	fWidthControl = new BTextControl(rect, "width", TR("Width:"),
 		text, NULL, B_FOLLOW_LEFT_RIGHT);
 	fWidthControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
 	fWidthControl->SetDivider(labelWidth);
@@ -234,9 +240,9 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 		int32		alignment;
 		const char*	name;
 	} kAlignmentMap[] = {
-		{B_ALIGN_LEFT, "Left"},
-		{B_ALIGN_RIGHT, "Right"},
-		{B_ALIGN_CENTER, "Center"},
+		{B_ALIGN_LEFT, TR("Left")},
+		{B_ALIGN_RIGHT, TR("Right")},
+		{B_ALIGN_CENTER, TR("Center")},
 		{0, NULL}
 	};
 
@@ -254,7 +260,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 
 	rect.OffsetBy(0.0f, menuField->Bounds().Height() + 1.0f);
 	fAlignmentMenuField = new BMenuField(rect, "alignment",
-		"Alignment:", menu);
+		TR("Alignment:"), menu);
 	fAlignmentMenuField->SetDivider(labelWidth);
 	fAlignmentMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fAlignmentMenuField->ResizeTo(rect.Width(), height);
@@ -262,7 +268,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	box->ResizeBy(0.0f, fAlignmentMenuField->Bounds().Height() * 2.0f
 		+ fVisibleCheckBox->Bounds().Height());
 
-	fAcceptButton = new BButton(rect, "add", item ? "Done" : "Add",
+	fAcceptButton = new BButton(rect, "add", item ? TR("Done") : TR("Add"),
 		new BMessage(kMsgAccept), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fAcceptButton->ResizeToPreferred();
 	fAcceptButton->MoveTo(Bounds().Width() - 8.0f - fAcceptButton->Bounds().Width(),
@@ -270,7 +276,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	fAcceptButton->SetEnabled(false);
 	topView->AddChild(fAcceptButton);
 
-	BButton* button = new BButton(rect, "cancel", "Cancel",
+	BButton* button = new BButton(rect, "cancel", TR("Cancel"),
 		new BMessage(B_QUIT_REQUESTED), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveTo(fAcceptButton->Frame().left - 10.0f - button->Bounds().Width(),
@@ -489,7 +495,7 @@ AttributeWindow::MessageReceived(BMessage* message)
 			}
 
 			if (status != B_OK)
-				error_alert("Could not change attributes", status);
+				error_alert(TR("Could not change attributes"), status);
 
 			PostMessage(B_QUIT_REQUESTED);
 			break;

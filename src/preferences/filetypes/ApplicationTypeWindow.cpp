@@ -16,8 +16,10 @@
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <File.h>
+#include <Locale.h>
 #include <ListView.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -34,6 +36,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Application Type Window"
 
 
 const uint32 kMsgSave = 'save';
@@ -229,7 +235,7 @@ SupportedTypeListView::AcceptsDrag(const BMessage* message)
 
 ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entry)
 	: BWindow(BRect(0.0f, 0.0f, 250.0f, 340.0f).OffsetBySelf(position),
-		"Application Type", B_TITLED_WINDOW,
+		TR("Application Type"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
 	fChangedProperties(0)
 {
@@ -238,17 +244,17 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), NULL);
 	AddChild(menuBar);
 
-	BMenu* menu = new BMenu("File");
-	fSaveMenuItem = new BMenuItem("Save", new BMessage(kMsgSave), 'S');
+	BMenu* menu = new BMenu(TR("File"));
+	fSaveMenuItem = new BMenuItem(TR("Save"), new BMessage(kMsgSave), 'S');
 	fSaveMenuItem->SetEnabled(false);
 	menu->AddItem(fSaveMenuItem);
 	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem("Save into resource file" B_UTF8_ELLIPSIS,
-		NULL));
+	menu->AddItem(item = new BMenuItem(
+		TR("Save into resource file" B_UTF8_ELLIPSIS), NULL));
 	item->SetEnabled(false);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED),
+	menu->AddItem(new BMenuItem(TR("Close"), new BMessage(B_QUIT_REQUESTED),
 		'W', B_COMMAND_KEY));
 	menuBar->AddItem(menu);
 
@@ -261,7 +267,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	AddChild(topView);
 
 	rect = topView->Bounds().InsetByCopy(8.0f, 8.0f);
-	fSignatureControl = new BTextControl(rect, "signature", "Signature:", NULL,
+	fSignatureControl = new BTextControl(rect, "signature", TR("Signature:"), NULL,
 		new BMessage(kMsgSignatureChanged), B_FOLLOW_LEFT_RIGHT);
 	fSignatureControl->SetModificationMessage(
 		new BMessage(kMsgSignatureChanged));
@@ -296,40 +302,40 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	BBox* box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
 	topView->AddChild(box);
 
-	fFlagsCheckBox = new BCheckBox(rect, "flags", "Application flags",
+	fFlagsCheckBox = new BCheckBox(rect, "flags", TR("Application flags"),
 		new BMessage(kMsgToggleAppFlags));
 	fFlagsCheckBox->SetValue(B_CONTROL_ON);
 	fFlagsCheckBox->ResizeToPreferred();
 	box->SetLabel(fFlagsCheckBox);
 
 	rect.top = fFlagsCheckBox->Bounds().Height() + 4.0f;
-	fSingleLaunchButton = new BRadioButton(rect, "single", "Single launch",
+	fSingleLaunchButton = new BRadioButton(rect, "single", TR("Single launch"),
 		new BMessage(kMsgAppFlagsChanged));
 	fSingleLaunchButton->ResizeToPreferred();
 	box->AddChild(fSingleLaunchButton);
 
 	rect.OffsetBy(0.0f, fSingleLaunchButton->Bounds().Height() + 0.0f);
 	fMultipleLaunchButton = new BRadioButton(rect, "multiple",
-		"Multiple launch", new BMessage(kMsgAppFlagsChanged));
+		TR("Multiple launch"), new BMessage(kMsgAppFlagsChanged));
 	fMultipleLaunchButton->ResizeToPreferred();
 	box->AddChild(fMultipleLaunchButton);
 
 	rect.OffsetBy(0.0f, fSingleLaunchButton->Bounds().Height() + 0.0f);
 	fExclusiveLaunchButton = new BRadioButton(rect, "exclusive",
-		"Exclusive launch", new BMessage(kMsgAppFlagsChanged));
+		TR("Exclusive launch"), new BMessage(kMsgAppFlagsChanged));
 	fExclusiveLaunchButton->ResizeToPreferred();
 	box->AddChild(fExclusiveLaunchButton);
 
 	rect.top = fSingleLaunchButton->Frame().top;
 	rect.left = fExclusiveLaunchButton->Frame().right + 4.0f;
-	fArgsOnlyCheckBox = new BCheckBox(rect, "args only", "Args only",
+	fArgsOnlyCheckBox = new BCheckBox(rect, "args only", TR("Args only"),
 		new BMessage(kMsgAppFlagsChanged));
 	fArgsOnlyCheckBox->ResizeToPreferred();
 	box->AddChild(fArgsOnlyCheckBox);
 
 	rect.top += fArgsOnlyCheckBox->Bounds().Height();
 	fBackgroundAppCheckBox = new BCheckBox(rect, "background",
-		"Background app", new BMessage(kMsgAppFlagsChanged));
+		TR("Background app"), new BMessage(kMsgAppFlagsChanged));
 	fBackgroundAppCheckBox->ResizeToPreferred();
 	box->AddChild(fBackgroundAppCheckBox);
 
@@ -373,12 +379,12 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.left = 8.0f;
 	rect.right = Bounds().Width() - 8.0f;
 	BBox* typeBox = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	typeBox->SetLabel("Supported types");
+	typeBox->SetLabel(TR("Supported types"));
 	topView->AddChild(typeBox);
 
 	rect = typeBox->Bounds().InsetByCopy(8.0f, 6.0f);
 	rect.top += ceilf(fontHeight.ascent);
-	fAddTypeButton = new BButton(rect, "add type", "Add" B_UTF8_ELLIPSIS,
+	fAddTypeButton = new BButton(rect, "add type", TR("Add" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgAddType), B_FOLLOW_RIGHT);
 	fAddTypeButton->ResizeToPreferred();
 	fAddTypeButton->MoveBy(rect.right - fAddTypeButton->Bounds().Width()
@@ -387,7 +393,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 
 	rect = fAddTypeButton->Frame();
 	rect.OffsetBy(0, rect.Height() + 4.0f);
-	fRemoveTypeButton = new BButton(rect, "remove type", "Remove",
+	fRemoveTypeButton = new BButton(rect, "remove type", TR("Remove"),
 		new BMessage(kMsgRemoveType), B_FOLLOW_RIGHT);
 	typeBox->AddChild(fRemoveTypeButton);
 
@@ -426,7 +432,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.right = Bounds().Width() - 8.0f;
 	box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
 		// the resizing mode will later also be set to B_FOLLOW_BOTTOM
-	box->SetLabel("Version info");
+	box->SetLabel(TR("Version info"));
 	topView->AddChild(box);
 
 	BMenuField* menuField;
@@ -446,7 +452,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 
 	rect.top = 4.0f + ceilf(fontHeight.ascent + fontHeight.descent);
 	rect.bottom = rect.top + height;
-	fMajorVersionControl = new BTextControl(rect, "major", "Version:", NULL,
+	fMajorVersionControl = new BTextControl(rect, "major", TR("Version:"), NULL,
 		NULL);
 	fMajorVersionControl->SetDivider(fMajorVersionControl->StringWidth(
 		fMajorVersionControl->Label()) + 4.0f);
@@ -475,13 +481,13 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	box->AddChild(fMinorVersionControl);
 
 	fVarietyMenu = new BPopUpMenu("variety", true, true);
-	fVarietyMenu->AddItem(new BMenuItem("Development", NULL));
-	fVarietyMenu->AddItem(new BMenuItem("Alpha", NULL));
-	fVarietyMenu->AddItem(new BMenuItem("Beta", NULL));
-	fVarietyMenu->AddItem(new BMenuItem("Gamma", NULL));
-	fVarietyMenu->AddItem(item = new BMenuItem("Golden master", NULL));
+	fVarietyMenu->AddItem(new BMenuItem(TR("Development"), NULL));
+	fVarietyMenu->AddItem(new BMenuItem(TR("Alpha"), NULL));
+	fVarietyMenu->AddItem(new BMenuItem(TR("Beta"), NULL));
+	fVarietyMenu->AddItem(new BMenuItem(TR("Gamma"), NULL));
+	fVarietyMenu->AddItem(item = new BMenuItem(TR("Golden master"), NULL));
 	item->SetMarked(true);
-	fVarietyMenu->AddItem(new BMenuItem("Final", NULL));
+	fVarietyMenu->AddItem(new BMenuItem(TR("Final"), NULL));
 
 	rect.top--;
 		// BMenuField oddity
@@ -503,7 +509,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 
 	rect = box->Bounds().InsetByCopy(8.0f, 0.0f);
 	rect.top = fInternalVersionControl->Frame().bottom + 8.0f;
-	fShortDescriptionControl = new BTextControl(rect, "short desc", "Short description:",
+	fShortDescriptionControl = new BTextControl(rect, "short desc", TR("Short description:"),
 		NULL, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	float labelWidth = fShortDescriptionControl->StringWidth(
 		fShortDescriptionControl->Label()) + 4.0f;
@@ -518,7 +524,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 
 	rect.OffsetBy(0.0f, fShortDescriptionControl->Bounds().Height() + 5.0f);
 	rect.right = rect.left + labelWidth;
-	StringView* label = new StringView(rect, NULL, "Long description:", NULL);
+	StringView* label = new StringView(rect, NULL, TR("Long description:"), NULL);
 	label->SetDivider(labelWidth);
 	box->AddChild(label);
 
@@ -1088,9 +1094,9 @@ bool
 ApplicationTypeWindow::QuitRequested()
 {
 	if (_NeedsSaving(CHECK_ALL) != 0) {
-		BAlert* alert = new BAlert("Save request", "Do you want to save "
-			"the changes?", "Quit, don't save", "Cancel", "Save",
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert(TR("Save request"), TR("Do you want to "
+			"save the changes?"), TR("Quit, don't save"), TR("Cancel"),
+			TR("Save"), B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 choice = alert->Go();
 		switch (choice) {
 			case 0:

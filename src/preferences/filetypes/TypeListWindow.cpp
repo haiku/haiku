@@ -8,17 +8,24 @@
 #include "TypeListWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <ScrollView.h>
 
 #include <string.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "TypeListWindow"
 
 
 const uint32 kMsgTypeSelected = 'tpsl';
 const uint32 kMsgSelected = 'seld';
 
 
-TypeListWindow::TypeListWindow(const char* currentType, uint32 what, BWindow* target)
-	: BWindow(BRect(100, 100, 360, 440), "Choose type", B_MODAL_WINDOW,
+TypeListWindow::TypeListWindow(const char* currentType, uint32 what,
+		BWindow* target)
+	: BWindow(BRect(100, 100, 360, 440), TR("Choose type"), B_MODAL_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target),
 	fWhat(what)
@@ -28,15 +35,16 @@ TypeListWindow::TypeListWindow(const char* currentType, uint32 what, BWindow* ta
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(topView);
 
-	fSelectButton = new BButton(rect, "select", "Done",
+	fSelectButton = new BButton(rect, "select", TR("Done"),
 		new BMessage(kMsgSelected), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fSelectButton->ResizeToPreferred();
-	fSelectButton->MoveTo(topView->Bounds().right - 8.0f - fSelectButton->Bounds().Width(),
+	fSelectButton->MoveTo(topView->Bounds().right - 8.0f 
+		- fSelectButton->Bounds().Width(),
 		topView->Bounds().bottom - 8.0f - fSelectButton->Bounds().Height());
 	fSelectButton->SetEnabled(false);
 	topView->AddChild(fSelectButton);
 
-	BButton* button = new BButton(fSelectButton->Frame(), "cancel", "Cancel",
+	BButton* button = new BButton(fSelectButton->Frame(), "cancel", TR("Cancel"),
 		new BMessage(B_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveBy(-button->Bounds().Width() - 8.0f, 0.0f);

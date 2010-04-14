@@ -13,6 +13,8 @@
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <Alert.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <TextView.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
@@ -22,6 +24,10 @@
 
 #include <stdio.h>
 #include <string.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "FileTypes"
 
 
 const char *kSignature = "application/x-vnd.Haiku-FileTypes";
@@ -70,6 +76,8 @@ class FileTypes : public BApplication {
 		BWindow		*fApplicationTypesWindow;
 		uint32		fWindowCount;
 		uint32		fTypeWindowCount;
+		
+		BCatalog fCatalog;
 };
 
 
@@ -163,6 +171,7 @@ FileTypes::FileTypes()
 	fWindowCount(0),
 	fTypeWindowCount(0)
 {
+	be_locale->GetAppCatalog(&fCatalog);
 	fFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
 		B_FILE_NODE | B_DIRECTORY_NODE, false);
 }
@@ -207,11 +216,11 @@ FileTypes::RefsReceived(BMessage *message)
 
 			char buffer[1024];
 			snprintf(buffer, sizeof(buffer),
-				"Could not open \"%s\":\n"
-				"%s",
+				TR("Could not open \"%s\":\n"
+				"%s"),
 				ref.name, strerror(status));
 
-			(new BAlert("FileTypes request",
+			(new BAlert(TR("FileTypes request"),
 				buffer, "Ok", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 
@@ -278,7 +287,7 @@ FileTypes::ArgvReceived(int32 argc, char **argv)
 
 		if ((status = entry.SetTo(path.Path(), false)) != B_OK
 			|| (status = entry.GetRef(&ref)) != B_OK) {
-			fprintf(stderr, "Could not open file \"%s\": %s\n",
+			fprintf(stderr, TR("Could not open file \"%s\": %s\n"),
 				path.Path(), strerror(status));
 			continue;
 		}
@@ -347,7 +356,7 @@ FileTypes::MessageReceived(BMessage *message)
 			// the open file panel sends us a message when it's done
 			const char* subTitle;
 			if (message->FindString("title", &subTitle) != B_OK)
-				subTitle = "Open File";
+				subTitle = TR("Open File");
 
 			int32 what;
 			if (message->FindInt32("message", &what) != B_OK)
@@ -398,9 +407,9 @@ FileTypes::MessageReceived(BMessage *message)
 void
 FileTypes::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "FileTypes\n"
+	BAlert *alert = new BAlert("about", TR("FileTypes\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2006-2007, Haiku.\n", "Ok");
+		"\tCopyright 2006-2007, Haiku.\n"), TR("Ok"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -448,7 +457,7 @@ error_alert(const char* message, status_t status, alert_type type)
 	if (status != B_OK)
 		snprintf(warning, sizeof(warning), "%s:\n\t%s\n", message, strerror(status));
 
-	(new BAlert("FileTypes Request",
+	(new BAlert(TR("FileTypes Request"),
 		status == B_OK ? message : warning,
 		"Ok", NULL, NULL, B_WIDTH_AS_USUAL, type))->Go();
 }

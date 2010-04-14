@@ -25,9 +25,24 @@ Preference FileTypes :
 
 	PreferredAppMenu.cpp
 	StringView.cpp
-	: be tracker $(TARGET_LIBSUPC++)
+	: be tracker $(TARGET_LIBSUPC++) liblocale.so
 	: FileTypes.rdef FileTypes.icons.rdef
 	;
+
+DoCatalogs FileTypes :
+	x-vnd.Haiku-FileTypes
+	:
+	ApplicationTypeWindow.cpp
+	AttributeWindow.cpp
+	ExtensionWindow.cpp
+	FileTypes.cpp
+	FileTypeWindow.cpp
+	FileTypesWindow.cpp
+	IconView.cpp
+	NewFileTypeWindow.cpp
+	PreferredAppMenu.cpp
+	TypeListWindow.cpp
+;
 
 if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : FileTypes

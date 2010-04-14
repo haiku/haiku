@@ -9,6 +9,8 @@
 #include "NewFileTypeWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
@@ -17,6 +19,10 @@
 #include <TextControl.h>
 
 #include <string.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "New File Type Window"
 
 
 const uint32 kMsgSupertypeChosen = 'sptc';
@@ -28,7 +34,7 @@ const uint32 kMsgAddType = 'atyp';
 
 
 NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* currentType)
-	: BWindow(BRect(100, 100, 350, 200), "New file type", B_TITLED_WINDOW,
+	: BWindow(BRect(100, 100, 350, 200), TR("New file type"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target)
 {
@@ -37,7 +43,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(topView);
 
-	float labelWidth = be_plain_font->StringWidth("Internal name:") + 2.0f;
+	float labelWidth = be_plain_font->StringWidth(TR("Internal name:")) + 2.0f;
 
 	rect.InsetBy(8.0f, 6.0f);
 	fSupertypesMenu = new BPopUpMenu("supertypes");
@@ -61,11 +67,11 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 		if (i > 1)
 			fSupertypesMenu->AddSeparatorItem();
 	}
-	fSupertypesMenu->AddItem(new BMenuItem("Add new group",
+	fSupertypesMenu->AddItem(new BMenuItem(TR("Add new group"),
 		new BMessage(kMsgNewSupertypeChosen)));
 
 	BMenuField* menuField = new BMenuField(rect, "supertypes",
-		"Group:", fSupertypesMenu);
+		TR("Group:"), fSupertypesMenu);
 	menuField->SetDivider(labelWidth);
 	menuField->SetAlignment(B_ALIGN_RIGHT);
 	float width, height;
@@ -73,7 +79,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 	menuField->ResizeTo(rect.Width(), height);
 	topView->AddChild(menuField);
 
-	fNameControl = new BTextControl(rect, "internal", "Internal name:", "",
+	fNameControl = new BTextControl(rect, "internal", TR("Internal name:"), "",
 		NULL, B_FOLLOW_LEFT_RIGHT);
 	fNameControl->SetModificationMessage(new BMessage(kMsgNameUpdated));
 	fNameControl->SetDivider(labelWidth);
@@ -91,7 +97,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 	fNameControl->MoveTo(8.0f, 12.0f + menuField->Bounds().Height());
 	topView->AddChild(fNameControl);
 
-	fAddButton = new BButton(rect, "add", "Add type", new BMessage(kMsgAddType),
+	fAddButton = new BButton(rect, "add", TR("Add type"), new BMessage(kMsgAddType),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fAddButton->ResizeToPreferred();
 	fAddButton->MoveTo(Bounds().Width() - 8.0f - fAddButton->Bounds().Width(),
@@ -99,7 +105,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 	fAddButton->SetEnabled(false);
 	topView->AddChild(fAddButton);
 
-	BButton* button = new BButton(rect, "cancel", "Cancel",
+	BButton* button = new BButton(rect, "cancel", TR("Cancel"),
 		new BMessage(B_QUIT_REQUESTED), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveTo(fAddButton->Frame().left - 10.0f - button->Bounds().Width(),
@@ -128,14 +134,14 @@ NewFileTypeWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgSupertypeChosen:
-			fAddButton->SetLabel("Add type");
-			fNameControl->SetLabel("Internal name:");
+			fAddButton->SetLabel(TR("Add type"));
+			fNameControl->SetLabel(TR("Internal name:"));
 			fNameControl->MakeFocus(true);
 			break;
 
 		case kMsgNewSupertypeChosen:
-			fAddButton->SetLabel("Add group");
-			fNameControl->SetLabel("Group name:");
+			fAddButton->SetLabel(TR("Add group"));
+			fNameControl->SetLabel(TR("Group name:"));
 			fNameControl->MakeFocus(true);
 			break;
 
@@ -164,13 +170,13 @@ NewFileTypeWindow::MessageReceived(BMessage* message)
 
 				BMimeType mimeType(type.String());
 				if (mimeType.IsInstalled()) {
-					error_alert("This file type already exists.");
+					error_alert(TR("This file type already exists."));
 					break;
 				}
 
 				status_t status = mimeType.Install();
 				if (status != B_OK)
-					error_alert("Could not install file type", status);
+					error_alert(TR("Could not install file type"), status);
 				else {
 					BMessage update(kMsgSelectNewType);
 					update.AddString("type", type.String());

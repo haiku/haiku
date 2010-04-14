@@ -15,6 +15,8 @@
 #include <Application.h>
 #include <AppFileInfo.h>
 #include <Bitmap.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Mime.h>
 #include <NodeMonitor.h>
@@ -25,6 +27,11 @@
 #include <new>
 #include <stdlib.h>
 #include <string.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Icon View"
+
 
 using namespace std;
 
@@ -816,12 +823,16 @@ IconView::MouseDown(BPoint where)
 		menu->SetFont(be_plain_font);
 
 		bool hasIcon = fHasType ? fSource == kOwnIcon : fIcon != NULL;
-		if (hasIcon)
-			menu->AddItem(new BMenuItem("Edit icon" B_UTF8_ELLIPSIS, new BMessage(kMsgEditIcon)));
-		else
-			menu->AddItem(new BMenuItem("Add icon" B_UTF8_ELLIPSIS, new BMessage(kMsgAddIcon)));
+		if (hasIcon) {
+			menu->AddItem(new BMenuItem(TR("Edit icon" B_UTF8_ELLIPSIS),
+				new BMessage(kMsgEditIcon)));
+		} else {
+			menu->AddItem(new BMenuItem(TR("Add icon" B_UTF8_ELLIPSIS),
+				new BMessage(kMsgAddIcon)));
+		}
 
-		BMenuItem* item = new BMenuItem("Remove icon", new BMessage(kMsgRemoveIcon));
+		BMenuItem* item = new BMenuItem(TR("Remove icon"),
+			new BMessage(kMsgRemoveIcon));
 		if (!hasIcon)
 			item->SetEnabled(false);
 

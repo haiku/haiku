@@ -9,6 +9,8 @@
 #include "FileTypesWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
@@ -17,6 +19,10 @@
 #include <TextControl.h>
 
 #include <string.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Extension Window"
 
 
 const uint32 kMsgExtensionUpdated = 'exup';
@@ -103,7 +109,7 @@ replace_extension(BMimeType& type, const char* newExtension,
 
 ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 		const char* extension)
-	: BWindow(BRect(100, 100, 350, 200), "Extension", B_MODAL_WINDOW_LOOK,
+	: BWindow(BRect(100, 100, 350, 200), TR("Extension"), B_MODAL_WINDOW_LOOK,
 		B_MODAL_SUBSET_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE
 			| B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target),
@@ -116,7 +122,7 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 	AddChild(topView);
 
 	rect.InsetBy(8.0f, 8.0f);
-	fExtensionControl = new BTextControl(rect, "extension", "Extension:", extension,
+	fExtensionControl = new BTextControl(rect, "extension", TR("Extension:"), extension,
 		NULL, B_FOLLOW_LEFT_RIGHT);
 
 	float labelWidth = fExtensionControl->StringWidth(fExtensionControl->Label()) + 2.0f;
@@ -136,7 +142,7 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 	fExtensionControl->ResizeTo(rect.Width(), height);
 	topView->AddChild(fExtensionControl);
 
-	fAcceptButton = new BButton(rect, "add", extension ? "Done" : "Add",
+	fAcceptButton = new BButton(rect, "add", extension ? TR("Done") : TR("Add"),
 		new BMessage(kMsgAccept), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fAcceptButton->ResizeToPreferred();
 	fAcceptButton->MoveTo(Bounds().Width() - 8.0f - fAcceptButton->Bounds().Width(),
@@ -144,7 +150,7 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 	fAcceptButton->SetEnabled(false);
 	topView->AddChild(fAcceptButton);
 
-	BButton* button = new BButton(rect, "cancel", "Cancel",
+	BButton* button = new BButton(rect, "cancel", TR("Cancel"),
 		new BMessage(B_QUIT_REQUESTED), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveTo(fAcceptButton->Frame().left - 10.0f - button->Bounds().Width(),
@@ -202,7 +208,7 @@ ExtensionWindow::MessageReceived(BMessage* message)
 			status_t status = replace_extension(fMimeType, newExtension,
 				fExtension.String());
 			if (status != B_OK)
-				error_alert("Could not change file extensions", status);
+				error_alert(TR("Could not change file extensions"), status);
 
 			PostMessage(B_QUIT_REQUESTED);
 			break;
@@ -213,4 +219,3 @@ ExtensionWindow::MessageReceived(BMessage* message)
 			break;
 	}
 }
-
