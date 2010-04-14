@@ -7,18 +7,25 @@
 #include "ConfigWindow.h"
 
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 
+
+class BCatalog;
 
 class MailConfigApp : public BApplication {
 	public:
 		MailConfigApp();
 		~MailConfigApp();
+	private:
+		BCatalog fCatalog;
 };
 
 
 MailConfigApp::MailConfigApp()
 	: BApplication("application/x-vnd.Haiku-Mail")
 {
+	be_locale->GetAppCatalog(&fCatalog);
 	(new ConfigWindow())->Show();
 }
 

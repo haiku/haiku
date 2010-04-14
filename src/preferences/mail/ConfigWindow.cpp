@@ -39,6 +39,9 @@
 #include <FindDirectory.h>
 #include <Path.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include <MailSettings.h>
 
 #include <new>
@@ -46,6 +49,11 @@
 #include <string.h>
 
 #include <MDRLanguage.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Config Window"
+
 
 using std::nothrow;
 
@@ -264,7 +272,7 @@ ConfigWindow::ConfigWindow()
 	BView *view;
 	rect = tabView->Bounds();  rect.bottom -= tabView->TabHeight() + 4;
 	tabView->AddTab(view = new BView(rect,NULL,B_FOLLOW_ALL,0));
-	tabView->TabAt(0)->SetLabel(MDR_DIALECT_CHOICE ("Accounts","アカウント"));
+	tabView->TabAt(0)->SetLabel(TR ("Accounts"));
 	view->SetViewColor(top->ViewColor());
 	
 	// accounts listview
@@ -278,13 +286,13 @@ ConfigWindow::ConfigWindow()
 
 	rect.top = rect.bottom + 8;  rect.bottom = rect.top + height;
 	BRect sizeRect = rect;
-	sizeRect.right = sizeRect.left + 30 + view->StringWidth(MDR_DIALECT_CHOICE ("Add","追加"));
-	view->AddChild(new BButton(sizeRect,NULL,MDR_DIALECT_CHOICE ("Add","追加"),
+	sizeRect.right = sizeRect.left + 30 + view->StringWidth(TR ("Add"));
+	view->AddChild(new BButton(sizeRect,NULL,TR ("Add"),
 		new BMessage(kMsgAddAccount),B_FOLLOW_BOTTOM));
 
 	sizeRect.left = sizeRect.right+3;
-	sizeRect.right = sizeRect.left + 30 + view->StringWidth(MDR_DIALECT_CHOICE ("Remove","削除"));
-	view->AddChild(fRemoveButton = new BButton(sizeRect,NULL,MDR_DIALECT_CHOICE ("Remove","削除"),
+	sizeRect.right = sizeRect.left + 30 + view->StringWidth(TR ("Remove"));
+	view->AddChild(fRemoveButton = new BButton(sizeRect,NULL,TR ("Remove"),
 		new BMessage(kMsgRemoveAccount),B_FOLLOW_BOTTOM));
 
 	// accounts config view
@@ -299,30 +307,30 @@ ConfigWindow::ConfigWindow()
 
 	rect = tabView->Bounds();	rect.bottom -= tabView->TabHeight() + 4;
 	tabView->AddTab(view = new CenterContainer(rect));
-	tabView->TabAt(1)->SetLabel(MDR_DIALECT_CHOICE ("Settings","一般"));
+	tabView->TabAt(1)->SetLabel(TR ("Settings"));
 
 	rect = view->Bounds().InsetByCopy(8,8);
 	rect.right -= 1;	rect.bottom = rect.top + height * 5 + 15;
 	BBox *box = new BBox(rect);
-	box->SetLabel(MDR_DIALECT_CHOICE ("Mail checking","メールチェック間隔"));
+	box->SetLabel(TR ("Mail checking"));
 	view->AddChild(box);
 
 	rect = box->Bounds().InsetByCopy(8,8);
 	rect.top += 7;	rect.bottom = rect.top + height + 5;
 	BRect tile = rect.OffsetByCopy(0,1);
-	int32 labelWidth = (int32)view->StringWidth(MDR_DIALECT_CHOICE ("Check every","メールチェック間隔："))+6;
+	int32 labelWidth = (int32)view->StringWidth(TR ("Check every"))+6;
 	tile.right = 80 + labelWidth;
-	fIntervalControl = new BTextControl(tile,"time",MDR_DIALECT_CHOICE ("Check every","メールチェック間隔："),
+	fIntervalControl = new BTextControl(tile,"time",TR ("Check every"),
 	NULL,NULL);
 	fIntervalControl->SetDivider(labelWidth);
 	box->AddChild(fIntervalControl);
 
 	BPopUpMenu *frequencyPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *frequencyStrings[] = {
-		MDR_DIALECT_CHOICE ("never","チェックしない"),
-		MDR_DIALECT_CHOICE ("minutes","分毎チェック"),
-		MDR_DIALECT_CHOICE ("hours","時間毎チェック"),
-		MDR_DIALECT_CHOICE ("days","日間毎チェック")};
+		TR ("never"),
+		TR ("minutes"),
+		TR ("hours"),
+		TR ("days")};
 	BMenuItem *item;
 	for (int32 i = 0;i < 4;i++)
 	{
@@ -338,27 +346,27 @@ ConfigWindow::ConfigWindow()
 
 	rect.OffsetBy(0,height + 9);	rect.bottom -= 2;
 	fPPPActiveCheckBox = new BCheckBox(rect,"ppp active",
-		MDR_DIALECT_CHOICE ("Only when dial-up is connected","PPP接続中時のみ"), NULL);
+		TR ("Only when dial-up is connected"), NULL);
 	box->AddChild(fPPPActiveCheckBox);
 	
 	rect.OffsetBy(0,height + 9);	rect.bottom -= 2;
 	fPPPActiveSendCheckBox = new BCheckBox(rect,"ppp activesend",
-		MDR_DIALECT_CHOICE ("Schedule outgoing mail when dial-up is disconnected","PPP切断時、送信メールを送信箱に入れる"), NULL);
+		TR ("Schedule outgoing mail when dial-up is disconnected"), NULL);
 	box->AddChild(fPPPActiveSendCheckBox);
 
 	// Miscellaneous settings box
 	
 	rect = box->Frame();  rect.bottom = rect.top + 3*height + 30;
 	box = new BBox(rect);
-	box->SetLabel(MDR_DIALECT_CHOICE ("Miscellaneous","その他の設定"));
+	box->SetLabel(TR ("Miscellaneous"));
 	view->AddChild(box);
 
 	BPopUpMenu *statusPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *statusModes[] = {
-		MDR_DIALECT_CHOICE ("Never","表示しない"),
-		MDR_DIALECT_CHOICE ("While sending","送信時"),
-		MDR_DIALECT_CHOICE ("While sending and receiving","送受信時"),
-		MDR_DIALECT_CHOICE ("Always","常に表示")};
+		TR ("Never"),
+		TR ("While sending"),
+		TR ("While sending and receiving"),
+		TR ("Always")};
 	BMessage *msg;
 	for (int32 i = 0;i < 4;i++)
 	{
@@ -371,9 +379,9 @@ ConfigWindow::ConfigWindow()
 	rect.top += 7;
 	rect.bottom = rect.top + height + 5;
 	labelWidth = (int32)view->StringWidth(
-		MDR_DIALECT_CHOICE ("Show connection status window:","ステータスの表示：")) + 8;
+		TR ("Show connection status window:")) + 8;
 	fStatusModeField = new BMenuField(rect,"show status",
-		MDR_DIALECT_CHOICE ("Show connection status window:","ステータスの表示："),
+		TR ("Show connection status window:"),
 	statusPopUp);
 	fStatusModeField->SetDivider(labelWidth);
 	box->AddChild(fStatusModeField);
@@ -381,7 +389,7 @@ ConfigWindow::ConfigWindow()
 	rect = fStatusModeField->Frame();;
 	rect.OffsetBy(0, rect.Height() + 10);
 	BButton *button = new BButton(rect,B_EMPTY_STRING,
-		MDR_DIALECT_CHOICE ("Edit mailbox menu…","メニューリンクの設定"),
+		TR ("Edit mailbox menu…"),
 		msg = new BMessage(B_REFS_RECEIVED));
 	button->ResizeToPreferred();
 	box->AddChild(button);
@@ -402,7 +410,7 @@ ConfigWindow::ConfigWindow()
 	rect = button->Frame();
 	rect.OffsetBy(rect.Width() + 30,0);
 	fAutoStartCheckBox = new BCheckBox(rect,"start daemon",
-		MDR_DIALECT_CHOICE ("Start mail services on startup","Mail Servicesを自動起動"),NULL);
+		TR ("Start mail services on startup"),NULL);
 	fAutoStartCheckBox->ResizeToPreferred();
 	box->AddChild(fAutoStartCheckBox);
 
@@ -413,7 +421,7 @@ ConfigWindow::ConfigWindow()
 	rect = tabView->Frame();
 	rect.top = rect.bottom + 5;  rect.bottom = rect.top + height + 5;
 	BButton *saveButton = new BButton(rect,"apply",
-		MDR_DIALECT_CHOICE ("Apply","適用"),
+		TR ("Apply"),
 		new BMessage(kMsgSaveSettings));
 	float w,h;
 	saveButton->GetPreferredSize(&w,&h);
@@ -422,7 +430,7 @@ ConfigWindow::ConfigWindow()
 	top->AddChild(saveButton);
 
 	BButton *revertButton = new BButton(rect,"revert",
-		MDR_DIALECT_CHOICE ("Revert","復元"),
+		TR ("Revert"),
 		new BMessage(kMsgRevertSettings));
 	revertButton->GetPreferredSize(&w,&h);
 	revertButton->ResizeTo(w,h);
@@ -487,12 +495,10 @@ ConfigWindow::MakeHowToView()
 	text->SetViewColor(fConfigView->Parent()->ViewColor());
 	text->SetAlignment(B_ALIGN_CENTER);
 	text->SetText(
-		MDR_DIALECT_CHOICE ("\n\nCreate a new account with the Add button.\n\n"
+		TR ("\n\nCreate a new account with the Add button.\n\n"
 		"Remove an account with the Remove button on the selected item.\n\n"
-		"Select an item in the list to change its settings.",
-		"\n\nアカウントの新規作成は\"追加\"ボタンを\n使います。"
-		"\n\nアカウント自体またはアカウントの\n送受信設定を削除するには\n項目を選択して\"削除\"ボタンを使います。"
-		"\n\nアカウント内容の変更は、\nマウスで項目をクリックしてください。"));
+		"Select an item in the list to change its settings."
+		));
 	rect = text->Bounds();
 	text->ResizeTo(rect.Width(), text->TextHeight(0, 42));
 	text->SetTextRect(rect);
@@ -519,8 +525,8 @@ ConfigWindow::LoadSettings()
 		// move own window
 		MoveTo(settings.ConfigWindowFrame().LeftTop());
 	} else {
-		fprintf(stderr, MDR_DIALECT_CHOICE("Error retrieving general settings: %s\n",
-			"一般設定の収得に失敗： %s\n"), strerror(status));
+		fprintf(stderr, TR("Error retrieving general settings: %s\n"
+			), strerror(status));
 	}
 
 	BScreen screen(this);
@@ -746,9 +752,8 @@ ConfigWindow::RevertToLastSettings()
 	{
 		char text[256];
 		sprintf(text,
-			MDR_DIALECT_CHOICE ("\nThe general settings couldn't be reverted.\n\n"
-			"Error retrieving general settings:\n%s\n",
-			"\n一般設定を戻せませんでした。\n\n一般設定収得エラー：\n%s\n"),
+			TR ("\nThe general settings couldn't be reverted.\n\n"
+			"Error retrieving general settings:\n%s\n"),
 			strerror(status));
 		(new BAlert("Error",text,"OK",NULL,NULL,B_WIDTH_AS_USUAL,B_WARNING_ALERT))->Go();
 	}

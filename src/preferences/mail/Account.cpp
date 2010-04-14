@@ -22,10 +22,16 @@
 #include <Entry.h>
 #include <Path.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include <MailSettings.h>
 #include <stdio.h>
 
 #include <MDRLanguage.h>
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Account"
 
 static BList gAccounts;
 static BListView *gListView;
@@ -98,12 +104,12 @@ Account::Account(BMailChain *inbound,BMailChain *outbound)
 	if (fSettings)
 		label << fSettings->Name();
 	else
-		label << MDR_DIALECT_CHOICE ("Unnamed","名称未定");
+		label << TR("Unnamed");
 	fAccountItem = new AccountItem(label.String(),this,ACCOUNT_ITEM);
 
-	fInboundItem = new AccountItem(MDR_DIALECT_CHOICE ("   · Incoming","   - 受信"),this,INBOUND_ITEM);
-	fOutboundItem = new AccountItem(MDR_DIALECT_CHOICE ("   · Outgoing","   - 送信"),this,OUTBOUND_ITEM);
-	fFilterItem = new AccountItem(MDR_DIALECT_CHOICE ("   · E-mail filters","   - フィルタ"),this,FILTER_ITEM);
+	fInboundItem = new AccountItem(TR ("   · Incoming"),this,INBOUND_ITEM);
+	fOutboundItem = new AccountItem(TR ("   · Outgoing"),this,OUTBOUND_ITEM);
+	fFilterItem = new AccountItem(TR ("   · E-mail filters"),this,FILTER_ITEM);
 }
 
 
@@ -254,9 +260,9 @@ void Account::CreateInbound()
 	if (!(fInbound = NewMailChain()))
 	{
 		(new BAlert(
-			MDR_DIALECT_CHOICE ("E-mail","メール"),
-			MDR_DIALECT_CHOICE ("Could not create inbound chain.","受信チェーンは作成できませんでした。"),
-			MDR_DIALECT_CHOICE ("OK","了解")))->Go();
+			TR ("E-mail"),
+			TR ("Could not create inbound chain."),
+			TR ("OK")))->Go();
 		return;
 	}
 	fInbound->SetChainDirection(inbound);
@@ -294,11 +300,11 @@ void Account::CreateInbound()
 	// New Mail Notification
 	path = addOnPath;
 	path.Append(kSystemFilterAddOnPath);
-	path.Append(MDR_DIALECT_CHOICE ("New mail notification", "着信通知方法"));
+	path.Append(TR ("New mail notification"));
 	if (!BEntry(path.Path()).Exists()) {
 		find_directory(B_BEOS_ADDONS_DIRECTORY,&path);
 		path.Append(kSystemFilterAddOnPath);
-		path.Append(MDR_DIALECT_CHOICE ("New mail notification", "着信通知方法"));
+		path.Append(TR ("New mail notification"));
 	}
 	BEntry(path.Path()).GetRef(&ref);
 	fInbound->AddFilter(msg,ref);
@@ -306,11 +312,11 @@ void Account::CreateInbound()
 	// Inbox
 	path = addOnPath;
 	path.Append(kSystemFilterAddOnPath);
-	path.Append(MDR_DIALECT_CHOICE ("Inbox", "受信箱"));
+	path.Append(TR ("Inbox"));
 	if (!BEntry(path.Path()).Exists()) {
 		find_directory(B_BEOS_ADDONS_DIRECTORY,&path);
 		path.Append(kSystemFilterAddOnPath);
-		path.Append(MDR_DIALECT_CHOICE ("Inbox", "受信箱"));
+		path.Append(TR ("Inbox"));
 	}
 	BEntry(path.Path()).GetRef(&ref);
 	fInbound->AddFilter(msg,ref);
@@ -326,9 +332,9 @@ void Account::CreateOutbound()
 	if (!(fOutbound = NewMailChain()))
 	{
 		(new BAlert(
-			MDR_DIALECT_CHOICE ("E-mail","メール"),
-			MDR_DIALECT_CHOICE ("Could not create outbound chain.","送信チェーンは作成できませんでした。"),
-			MDR_DIALECT_CHOICE ("OK","了解")))->Go();
+			TR ("E-mail"),
+			TR ("Could not create outbound chain."),
+			TR ("OK")))->Go();
 		return;
 	}
 	fOutbound->SetChainDirection(outbound);
@@ -341,11 +347,11 @@ void Account::CreateOutbound()
 		
 	path = addOnPath;
 	path.Append(kSystemFilterAddOnPath);
-	path.Append(MDR_DIALECT_CHOICE ("Outbox", "送信箱"));
+	path.Append(TR ("Outbox"));
 	if (!BEntry(path.Path()).Exists()) {
 		find_directory(B_BEOS_ADDONS_DIRECTORY,&path);
 		path.Append(kSystemFilterAddOnPath);
-		path.Append(MDR_DIALECT_CHOICE ("Outbox", "送信箱"));
+		path.Append(TR ("Outbox"));
 	}
 	BEntry(path.Path()).GetRef(&ref);
 	fOutbound->AddFilter(msg,ref);
