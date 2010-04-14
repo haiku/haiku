@@ -2,155 +2,52 @@ SubDir HAIKU_TOP src tests system libroot posix ;
 
 UsePrivateHeaders libroot syslog_daemon ;
 
-SimpleTest abort_test
-	: abort_test.cpp
-;
 
-SimpleTest SyslogTest
-	: SyslogTest.cpp syslog.cpp
-;
-
-SimpleTest clearenv
-	: clearenv.cpp
-;
-
-SimpleTest dirent_test
-	: dirent_test.cpp
-;
-
-SimpleTest flock_test
-	: flock_test.cpp
-;
-
-SimpleTest memalign_test
-	: memalign_test.cpp
-;
-
-SimpleTest mprotect_test
-	: mprotect_test.cpp
-;
-
-SimpleTest realtime_sem_test1
-	: realtime_sem_test1.cpp
-;
-
+# POSIX/libc tests
+SimpleTest abort_test : abort_test.cpp ;
+SimpleTest SyslogTest : SyslogTest.cpp syslog.cpp ;
+SimpleTest clearenv : clearenv.cpp ;
+SimpleTest dirent_test : dirent_test.cpp ;
+SimpleTest flock_test : flock_test.cpp ;
+SimpleTest memalign_test : memalign_test.cpp ;
+SimpleTest mprotect_test : mprotect_test.cpp ;
+SimpleTest realtime_sem_test1 : realtime_sem_test1.cpp ;
+SimpleTest seek_and_write_test : seek_and_write_test.cpp ;
 SimpleTest setpgid_test : setpgid_test.cpp ;
+SimpleTest setjmp_test : setjmp_test.c ;
+SimpleTest setjmp_test2 : setjmp_test2.S ;
+SimpleTest signal_in_allocator_test : signal_in_allocator_test.cpp ;
+SimpleTest signal_in_allocator_test2 : signal_in_allocator_test2.cpp ;
+SimpleTest signal_test : signal_test.cpp ;
+SimpleTest sigsetjmp_test : sigsetjmp_test.c ;
+SimpleTest <test>truncate : truncate.cpp ;
+SimpleTest init_rld_after_fork_test : init_rld_after_fork_test.cpp ;
 
-SimpleTest setjmp_test
-	: setjmp_test.c
-;
+# XSI tests
+SimpleTest xsi_msg_queue_test1 : xsi_msg_queue_test1.cpp ;
+SimpleTest xsi_sem_test1 : xsi_sem_test1.cpp ;
 
-SimpleTest setjmp_test2
-	: setjmp_test2.S
-;
+# wide character tests
+SimpleTest mbtest : mbtest.c ;
+SimpleTest testmb : testmb.c ;
+SimpleTest tst-btowc : tst-btowc.c ;
+SimpleTest tst-fgetws : tst-fgetws.c ;
+SimpleTest tst-getwc : tst-getwc.c ;
+SimpleTest tst-mbrtowc : tst-mbrtowc.c ;
+SimpleTest tst-swprintf : tst-swprintf.c ;
+SimpleTest tst-swscanf : tst-swscanf.c ;
+SimpleTest tst-swscanf2 : tst-swscanf2.c ;
+SimpleTest tst-ungetwc1 : tst-ungetwc1.c ;
+SimpleTest tst-ungetwc2 : tst-ungetwc2.c ;
+SimpleTest tst-wcrtomb : tst-wcrtomb.c ;
+SimpleTest tst-wcsnlen : tst-wcsnlen.c ;
+SimpleTest tst-wcstof : tst-wcstof.c ;
+SimpleTest tst-wprintf : tst-wprintf.c ;
+SimpleTest tst-wprintf2 : tst-wprintf2.c ;
+SimpleTest tst-wscanf : tst-wscanf.c ;
+SimpleTest test_wcfuncs : test_wcfuncs.c ;
+SimpleTest test_wctype : test_wctype.c ;
 
-SimpleTest signal_in_allocator_test
-	: signal_in_allocator_test.cpp
-;
-
-SimpleTest signal_in_allocator_test2
-	: signal_in_allocator_test2.cpp
-;
-
-SimpleTest signal_test
-	: signal_test.cpp
-;
-
-SimpleTest sigsetjmp_test
-	: sigsetjmp_test.c
-;
-
-SimpleTest <test>truncate
-	: truncate.cpp
-;
-
-SimpleTest init_rld_after_fork_test
-	: init_rld_after_fork_test.cpp
-;
-
-SimpleTest xsi_msg_queue_test1
-	: xsi_msg_queue_test1.cpp
-;
-
-SimpleTest xsi_sem_test1
-	: xsi_sem_test1.cpp
-;
-
-SimpleTest mbtest
-	: mbtest.c
-;
-
-SimpleTest testmb
-	: testmb.c
-;
-
-SimpleTest tst-btowc
-	: tst-btowc.c
-;
-
-SimpleTest tst-fgetws
-	: tst-fgetws.c
-;
-
-SimpleTest tst-getwc
-	: tst-getwc.c
-;
-
-SimpleTest tst-mbrtowc
-	: tst-mbrtowc.c
-;
-
-SimpleTest tst-swprintf
-	: tst-swprintf.c
-;
-
-SimpleTest tst-swscanf
-	: tst-swscanf.c
-;
-
-SimpleTest tst-swscanf2
-	: tst-swscanf2.c
-;
-
-SimpleTest tst-ungetwc1
-	: tst-ungetwc1.c
-;
-
-SimpleTest tst-ungetwc2
-	: tst-ungetwc2.c
-;
-
-SimpleTest tst-wcrtomb
-	: tst-wcrtomb.c
-;
-
-SimpleTest tst-wcsnlen
-	: tst-wcsnlen.c
-;
-
-SimpleTest tst-wcstof
-	: tst-wcstof.c
-;
-
-SimpleTest tst-wprintf
-	: tst-wprintf.c
-;
-
-SimpleTest tst-wprintf2
-	: tst-wprintf2.c
-;
-
-SimpleTest tst-wscanf
-	: tst-wscanf.c
-;
-
-SimpleTest test_wcfuncs
-	: test_wcfuncs.c
-;
-
-SimpleTest test_wctype
-	: test_wctype.c
-;
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
