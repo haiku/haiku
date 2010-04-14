@@ -10,7 +10,7 @@
 #ifndef UHCI_H
 #define UHCI_H
 
-#include "usb_p.h"
+#include "usb_private.h"
 #include "uhci_hardware.h"
 #include <lock.h>
 
@@ -202,7 +202,7 @@ inline	uint8						ReadReg8(uint32 reg);
 inline	uint16						ReadReg16(uint32 reg);
 inline	uint32						ReadReg32(uint32 reg);
 
-static	pci_module_info *			sPCIModule; 
+static	pci_module_info *			sPCIModule;
 
 		uint32						fRegisterBase;
 		pci_info *					fPCIInfo;

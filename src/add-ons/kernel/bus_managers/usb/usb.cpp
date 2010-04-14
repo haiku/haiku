@@ -8,7 +8,7 @@
  */
 
 #include <util/kernel_cpp.h>
-#include "usb_p.h"
+#include "usb_private.h"
 #include <USB_rle.h>
 
 #define USB_MODULE_NAME "module"

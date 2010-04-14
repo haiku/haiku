@@ -6,7 +6,8 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
-#include "usb_p.h"
+
+#include "usb_private.h"
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
  #include <kernel.h>

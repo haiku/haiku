@@ -10,7 +10,7 @@
 #ifndef OHCI_H
 #define OHCI_H
 
-#include "usb_p.h"
+#include "usb_private.h"
 #include "ohci_hardware.h"
 #include <lock.h>
 

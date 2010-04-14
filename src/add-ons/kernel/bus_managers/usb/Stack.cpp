@@ -10,7 +10,7 @@
 #include <module.h>
 #include <unistd.h>
 #include <util/kernel_cpp.h>
-#include "usb_p.h"
+#include "usb_private.h"
 #include "PhysicalMemoryAllocator.h"
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU

@@ -6,7 +6,7 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  */
 
-#include "usb_p.h"
+#include "usb_private.h"
 
 
 Object::Object(Stack *stack, BusManager *bus)

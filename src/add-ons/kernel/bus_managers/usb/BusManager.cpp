@@ -7,7 +7,7 @@
  *		Niels S. Reedijk
  */
 
-#include "usb_p.h"
+#include "usb_private.h"
 
 
 BusManager::BusManager(Stack *stack)

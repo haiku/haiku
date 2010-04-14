@@ -6,7 +6,7 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  */
 
-#include "usb_p.h"
+#include "usb_private.h"
 
 
 Interface::Interface(Object *parent, uint8 interfaceIndex)

@@ -8,7 +8,7 @@
 #ifndef EHCI_H
 #define EHCI_H
 
-#include "usb_p.h"
+#include "usb_private.h"
 #include "ehci_hardware.h"
 
 
