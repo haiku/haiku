@@ -4,8 +4,10 @@
 #ifndef _KB_MOUSE_DRIVER_H
 #define _KB_MOUSE_DRIVER_H
 
+
 #include <SupportDefs.h>
 #include <Drivers.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +52,8 @@ enum {
 	KB_RESERVED_1,
 	KB_CANCEL_CONTROL_ALT_DEL,
 	KB_DELAY_CONTROL_ALT_DEL,
-	
+	KB_SET_DEBUG_READER,
+
 	MS_READ = B_DEVICE_OP_CODES_END + 100,
 	MS_NUM_EVENTS,
 	MS_GET_ACCEL,

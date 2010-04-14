@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009 Haiku, Inc.
+ * Copyright 2004-2010 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors (in chronological order):
@@ -8,13 +8,18 @@
  *      Marcus Overhagen <marcus@overhagen.de>
  */
 
+
 /*! PS/2 keyboard device driver */
 
 
 #include <string.h>
 
+#include <new>
+
 #include <debug.h>
 #include <debugger_keymaps.h>
+#include <lock.h>
+#include <util/AutoLock.h>
 
 #include "ps2_service.h"
 #include "kb_mouse_driver.h"
@@ -39,7 +44,16 @@ enum {
 };
 
 
-static int32 sKeyboardOpenMask;
+struct keyboard_cookie {
+	bool is_reader;
+	bool is_debugger;
+};
+
+
+static mutex sInitializeLock = MUTEX_INITIALIZER("keyboard init");
+static int32 sKeyboardOpenCount = 0;
+static bool sHasKeyboardReader = false;
+static bool sHasDebugReader = false;
 static sem_id sKeyboardSem;
 static struct packet_buffer *sKeyBuffer;
 static bool sIsExtended = false;
@@ -112,7 +126,7 @@ keyboard_handle_int(ps2_dev *dev)
 	at_kbd_io keyInfo;
 	uint8 scancode = dev->history[0].data;
 
-	if (atomic_and(&sKeyboardOpenMask, 1) == 0)
+	if (atomic_get(&sKeyboardOpenCount) == 0)
 		return B_HANDLED_INTERRUPT;
 
 	// TODO: Handle braindead "pause" key special case
@@ -154,7 +168,6 @@ keyboard_handle_int(ps2_dev *dev)
 	} else if (emergencyKeyStatus > EMERGENCY_SYS_REQ
 		&& debug_emergency_key_pressed(kUnshiftedKeymap[scancode])) {
 		static const int kKeys[] = {LEFT_ALT_KEY, RIGHT_ALT_KEY, SYS_REQ_KEY};
-		int i;
 
 		// we probably have lost some keys, so reset our key states
 		emergencyKeyStatus = 0;
@@ -162,7 +175,7 @@ keyboard_handle_int(ps2_dev *dev)
 		// send key ups for alt-sysreq
 		keyInfo.timestamp = system_time();
 		keyInfo.is_keydown = false;
-		for (i = 0; i < sizeof(kKeys) / sizeof(kKeys[0]); i++) {
+		for (size_t i = 0; i < sizeof(kKeys) / sizeof(kKeys[0]); i++) {
 			keyInfo.scancode = kKeys[i];
 			if (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo,
 					sizeof(keyInfo)) != 0)
@@ -190,19 +203,28 @@ keyboard_handle_int(ps2_dev *dev)
 
 
 static status_t
-read_keyboard_packet(at_kbd_io *packet)
+read_keyboard_packet(at_kbd_io *packet, bool isDebugger)
 {
 	status_t status;
 
 	TRACE("ps2: read_keyboard_packet: enter\n");
 
-	status = acquire_sem_etc(sKeyboardSem, 1, B_CAN_INTERRUPT, 0);
-	if (status < B_OK)
-		return status;
+	while (true) {
+		status = acquire_sem_etc(sKeyboardSem, 1, B_CAN_INTERRUPT, 0);
+		if (status != B_OK)
+			return status;
 
-	if (!ps2_device[PS2_DEVICE_KEYB].active) {
-		TRACE("ps2: read_keyboard_packet, Error device no longer active\n");
-		return B_ERROR;
+		if (!ps2_device[PS2_DEVICE_KEYB].active) {
+			TRACE("ps2: read_keyboard_packet, Error device no longer active\n");
+			return B_ERROR;
+		}
+
+		if (isDebugger || !sHasDebugReader)
+			break;
+
+		// Give the debugger a chance to read this packet
+		release_sem(sKeyboardSem);
+		snooze(100000);
 	}
 
 	if (packet_buffer_read(sKeyBuffer, (uint8 *)packet, sizeof(*packet)) == 0) {
@@ -223,9 +245,10 @@ ps2_keyboard_disconnect(ps2_dev *dev)
 {
 	// the keyboard might not be opened at this point
 	INFO("ps2: ps2_keyboard_disconnect %s\n", dev->name);
-	if (sKeyboardOpenMask)
+	if (atomic_get(&sKeyboardOpenCount) != 0)
 		release_sem(sKeyboardSem);
 }
+
 
 //	#pragma mark -
 
@@ -275,64 +298,73 @@ probe_keyboard(void)
 static status_t
 keyboard_open(const char *name, uint32 flags, void **_cookie)
 {
-	status_t status;
-
 	TRACE("ps2: keyboard_open %s\n", name);
 
-	if (atomic_or(&sKeyboardOpenMask, 1) != 0)
-		return B_BUSY;
+	keyboard_cookie* cookie = new(std::nothrow) keyboard_cookie();
+	if (cookie == NULL)
+		return B_NO_MEMORY;
 
-	status = probe_keyboard();
-	if (status != B_OK) {
-		INFO("ps2: keyboard probing failed\n");
-		ps2_service_notify_device_removed(&ps2_device[PS2_DEVICE_KEYB]);
-		goto err1;
+	cookie->is_reader = false;
+	cookie->is_debugger = false;
+
+	MutexLocker locker(sInitializeLock);
+
+	if (atomic_get(&sKeyboardOpenCount) == 0) {
+		status_t status = probe_keyboard();
+		if (status != B_OK) {
+			INFO("ps2: keyboard probing failed\n");
+			ps2_service_notify_device_removed(&ps2_device[PS2_DEVICE_KEYB]);
+			delete cookie;
+			return status;
+		}
+
+		INFO("ps2: keyboard found\n");
+
+		sKeyboardSem = create_sem(0, "keyboard_sem");
+		if (sKeyboardSem < 0) {
+			delete cookie;
+			return sKeyboardSem;
+		}
+
+		sKeyBuffer = create_packet_buffer(KEY_BUFFER_SIZE * sizeof(at_kbd_io));
+		if (sKeyBuffer == NULL) {
+			delete_sem(sKeyboardSem);
+			delete cookie;
+			return B_NO_MEMORY;
+		}
+
+		ps2_device[PS2_DEVICE_KEYB].disconnect = &ps2_keyboard_disconnect;
+		ps2_device[PS2_DEVICE_KEYB].handle_int = &keyboard_handle_int;
+
+		atomic_or(&ps2_device[PS2_DEVICE_KEYB].flags, PS2_FLAG_ENABLED);
 	}
 
-	INFO("ps2: keyboard found\n");
-
-	sKeyboardSem = create_sem(0, "keyboard_sem");
-	if (sKeyboardSem < 0) {
-		status = sKeyboardSem;
-		goto err1;
-	}
-
-	sKeyBuffer = create_packet_buffer(KEY_BUFFER_SIZE * sizeof(at_kbd_io));
-	if (sKeyBuffer == NULL) {
-		status = B_NO_MEMORY;
-		goto err2;
-	}
-
-	*_cookie = NULL;
-	ps2_device[PS2_DEVICE_KEYB].disconnect = &ps2_keyboard_disconnect;
-	ps2_device[PS2_DEVICE_KEYB].handle_int = &keyboard_handle_int;
-
-	atomic_or(&ps2_device[PS2_DEVICE_KEYB].flags, PS2_FLAG_ENABLED);
+	atomic_add(&sKeyboardOpenCount, 1);
+	*_cookie = cookie;
 
 	TRACE("ps2: keyboard_open %s success\n", name);
 	return B_OK;
-
-err2:
-	delete_sem(sKeyboardSem);
-err1:
-	atomic_and(&sKeyboardOpenMask, 0);
-
-	TRACE("ps2: keyboard_open %s failed\n", name);
-	return status;
 }
 
 
 static status_t
-keyboard_close(void *cookie)
+keyboard_close(void *_cookie)
 {
+	keyboard_cookie *cookie = (keyboard_cookie *)_cookie;
+
 	TRACE("ps2: keyboard_close enter\n");
 
-	delete_packet_buffer(sKeyBuffer);
-	delete_sem(sKeyboardSem);
+	if (atomic_add(&sKeyboardOpenCount, -1) == 1) {
+		delete_packet_buffer(sKeyBuffer);
+		delete_sem(sKeyboardSem);
 
-	atomic_and(&ps2_device[PS2_DEVICE_KEYB].flags, ~PS2_FLAG_ENABLED);
+		atomic_and(&ps2_device[PS2_DEVICE_KEYB].flags, ~PS2_FLAG_ENABLED);
 
-	atomic_and(&sKeyboardOpenMask, 0);
+		if (cookie->is_reader)
+			sHasKeyboardReader = false;
+		if (cookie->is_debugger)
+			sHasDebugReader = false;
+	}
 
 	TRACE("ps2: keyboard_close done\n");
 	return B_OK;
@@ -342,6 +374,7 @@ keyboard_close(void *cookie)
 static status_t
 keyboard_freecookie(void *cookie)
 {
+	delete (keyboard_cookie*)cookie;
 	return B_OK;
 }
 
@@ -365,16 +398,26 @@ keyboard_write(void *cookie, off_t pos, const void *buffer,  size_t *_length)
 
 
 static status_t
-keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
+keyboard_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
+	keyboard_cookie *cookie = (keyboard_cookie *)_cookie;
+
 	switch (op) {
 		case KB_READ:
 		{
+			if (!sHasKeyboardReader && !cookie->is_debugger) {
+				cookie->is_reader = true;
+				sHasKeyboardReader = true;
+			} else if (!cookie->is_debugger && !cookie->is_reader)
+				return B_BUSY;
+
 			at_kbd_io packet;
-			status_t status;
-			TRACE("ps2: ioctl KB_READ\n");
-			if ((status = read_keyboard_packet(&packet)) < B_OK)
+			status_t status = read_keyboard_packet(&packet,
+				cookie->is_debugger);
+			TRACE("ps2: ioctl KB_READ: %s\n", strerror(status));
+			if (status != B_OK)
 				return status;
+
 			return user_memcpy(buffer, &packet, sizeof(packet));
 		}
 
@@ -451,6 +494,14 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case KB_CANCEL_CONTROL_ALT_DEL:
 		case KB_DELAY_CONTROL_ALT_DEL:
 			INFO("ps2: ioctl 0x%lx not implemented yet, returning B_OK\n", op);
+			return B_OK;
+
+		case KB_SET_DEBUG_READER:
+			if (sHasDebugReader)
+				return B_BUSY;
+
+			cookie->is_debugger = true;
+			sHasDebugReader = true;
 			return B_OK;
 
 		default:
