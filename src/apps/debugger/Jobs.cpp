@@ -278,10 +278,8 @@ LoadImageDebugInfoJob::Do()
 	if (error == B_OK) {
 		error = fImage->SetImageDebugInfo(debugInfo, IMAGE_DEBUG_INFO_LOADED);
 		debugInfo->ReleaseReference();
-	} else {
+	} else
 		fImage->SetImageDebugInfo(NULL, IMAGE_DEBUG_INFO_UNAVAILABLE);
-		delete debugInfo;
-	}
 
 	return error;
 }
