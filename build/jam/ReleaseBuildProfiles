@@ -21,7 +21,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		AddOptionalHaikuImagePackages BePDF BeZillaBrowser Clockwerk Pe Vision
 			VLC WonderBrush ;
 		AddOptionalHaikuImagePackages CVS Development Git Mercurial
-			Python Subversion OpenSSH ;
+			Python Subversion OpenSSH OpenSSL ;
 		AddOptionalHaikuImagePackages Nano P7zip Welcome BeBook ;
 	}
 
@@ -38,7 +38,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_IMAGE_SIZE = 450 ;
 
 		AddOptionalHaikuImagePackages Pe Nano Vision P7zip ;
-		AddOptionalHaikuImagePackages Development Subversion OpenSSH ;
+		AddOptionalHaikuImagePackages Development Subversion OpenSSH OpenSSL ;
 	}
 }
 
