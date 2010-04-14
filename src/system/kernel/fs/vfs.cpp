@@ -58,6 +58,7 @@
 #include "fifo.h"
 #include "IORequest.h"
 #include "unused_vnodes.h"
+#include "vfs_tracing.h"
 #include "Vnode.h"
 #include "../cache/vnode_store.h"
 
@@ -4740,17 +4741,18 @@ vfs_exec_io_context(io_context* context)
 io_context*
 vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 {
-	size_t tableSize;
-	struct io_context* context;
-
-	context = (io_context*)malloc(sizeof(struct io_context));
+	io_context* context = (io_context*)malloc(sizeof(io_context));
 	if (context == NULL)
 		return NULL;
 
-	memset(context, 0, sizeof(struct io_context));
+	TIOC(NewIOContext(context, parentContext));
+
+	memset(context, 0, sizeof(io_context));
 	context->ref_count = 1;
 
 	MutexLocker parentLocker;
+
+	size_t tableSize;
 	if (parentContext) {
 		parentLocker.SetTo(parentContext->io_mutex, false);
 		tableSize = parentContext->table_size;
@@ -4799,6 +4801,8 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 				if (closeOnExec && purgeCloseOnExec)
 					continue;
 
+				TFD(InheritFD(context, i, descriptor, parentContext));
+
 				context->fds[i] = descriptor;
 				context->num_used_fds++;
 				atomic_add(&descriptor->ref_count, 1);
@@ -4834,6 +4838,8 @@ static status_t
 vfs_free_io_context(io_context* context)
 {
 	uint32 i;
+
+	TIOC(FreeIOContext(context));
 
 	if (context->root)
 		put_vnode(context->root);
@@ -4880,6 +4886,8 @@ vfs_resize_fd_table(struct io_context* context, const int newSize)
 {
 	if (newSize <= 0 || newSize > MAX_FD_TABLE_SIZE)
 		return EINVAL;
+
+	TIOC(ResizeIOContext(context, newSize));
 
 	MutexLocker _(context->io_mutex);
 

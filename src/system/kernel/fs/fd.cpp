@@ -23,6 +23,8 @@
 #include <vfs.h>
 #include <wait_for_objects.h>
 
+#include "vfs_tracing.h"
+
 
 //#define TRACE_FD
 #ifdef TRACE_FD
@@ -168,6 +170,8 @@ new_fd_etc(struct io_context* context, struct file_descriptor* descriptor,
 		goto err;
 	}
 
+	TFD(NewFD(context, fd, descriptor));
+
 	context->fds[fd] = descriptor;
 	context->num_used_fds++;
 	atomic_add(&descriptor->open_count, 1);
@@ -193,6 +197,8 @@ void
 put_fd(struct file_descriptor* descriptor)
 {
 	int32 previous = atomic_add(&descriptor->ref_count, -1);
+
+	TFD(PutFD(descriptor));
 
 	TRACE(("put_fd(descriptor = %p [ref = %ld, cookie = %p])\n",
 		descriptor, descriptor->ref_count, descriptor->cookie));
@@ -291,8 +297,10 @@ get_fd_locked(struct io_context* context, int fd)
 		// Disconnected descriptors cannot be accessed anymore
 		if (descriptor->open_mode & O_DISCONNECTED)
 			descriptor = NULL;
-		else
+		else {
+			TFD(GetFD(context, fd, descriptor));
 			inc_fd_ref_count(descriptor);
+		}
 	}
 
 	return descriptor;
@@ -341,8 +349,10 @@ remove_fd(struct io_context* context, int fd)
 	select_info* selectInfos = NULL;
 	bool disconnected = false;
 
-	if (descriptor)	{
+	if (descriptor != NULL)	{
 		// fd is valid
+		TFD(RemoveFD(context, fd, descriptor));
+
 		context->fds[fd] = NULL;
 		fd_set_close_on_exec(context, fd, false);
 		context->num_used_fds--;
@@ -427,6 +437,8 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 	select_info* selectInfos = NULL;
 	if (oldfd != newfd) {
 		// Now do the work
+		TFD(Dup2FD(context, oldfd, newfd));
+
 		evicted = context->fds[newfd];
 		selectInfos = context->select_infos[newfd];
 		context->select_infos[newfd] = NULL;
