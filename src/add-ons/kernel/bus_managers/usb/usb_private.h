@@ -7,11 +7,11 @@
  *		Niels S. Reedijk
  */
 
-#ifndef _USB_P_
-#define _USB_P_
+#ifndef _USB_PRIVATE_H
+#define _USB_PRIVATE_H
 
 #include "BeOSCompatibility.h"
-#include "usbspec_p.h"
+#include "usbspec_private.h"
 #include <lock.h>
 
 
@@ -659,4 +659,4 @@ private:
 		uint16						fBandwidth;
 };
 
-#endif
+#endif // _USB_PRIVATE_H

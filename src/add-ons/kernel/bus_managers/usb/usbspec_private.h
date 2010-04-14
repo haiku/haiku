@@ -7,8 +7,8 @@
  *		Niels S. Reedijk
  */
 
-#ifndef _USBSPEC_P_
-#define _USBSPEC_P_
+#ifndef _USBSPEC_PRIVATE_H
+#define _USBSPEC_PRIVATE_H
 
 #include <KernelExport.h>
 #include <util/Vector.h>
@@ -113,4 +113,4 @@ struct usb_port_status
 #define C_PORT_OVER_CURRENT			19
 #define C_PORT_RESET				20
 
-#endif
+#endif // _USBSPEC_PRIVATE_H
