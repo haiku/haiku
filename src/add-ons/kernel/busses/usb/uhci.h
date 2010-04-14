@@ -112,7 +112,7 @@ static	status_t					AddTo(Stack *stack);
 
 		status_t					ResetPort(uint8 index);
 
-virtual	const char *				TypeName() { return "uhci"; };
+virtual	const char *				TypeName() const { return "uhci"; };
 
 private:
 		// Controller resets

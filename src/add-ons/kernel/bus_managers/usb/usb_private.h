@@ -126,11 +126,11 @@ public:
 		Object *						GetObject(usb_id id);
 
 		// only for the kernel debugger
-		Object *						GetObjectNoLock(usb_id id);
+		Object *						GetObjectNoLock(usb_id id) const;
 
 		void							AddBusManager(BusManager *bus);
 		int32							IndexOfBusManager(BusManager *bus);
-		BusManager *					BusManagerAt(int32 index);
+		BusManager *					BusManagerAt(int32 index) const;
 
 		status_t						AllocateChunk(void **logicalAddress,
 											void **physicalAddress,
@@ -221,7 +221,7 @@ virtual	status_t						NotifyPipeChange(Pipe *pipe,
 		void							SetRootHub(Hub *hub) { fRootHub = hub; }
 
 		usb_id							USBID() const { return fUSBID; }
-virtual	const char *					TypeName() = 0;
+virtual	const char *					TypeName() const = 0;
 
 protected:
 		bool							fInitOK;
@@ -358,7 +358,7 @@ virtual	const char *					TypeName() const
 										// status packet. The toggle always
 										// starts at 1.
 virtual	bool							DataToggle() const { return true; }
-virtual	void							SetDataToggle(bool toggle) const {}
+virtual	void							SetDataToggle(bool toggle) {}
 
 		status_t						SendRequest(uint8 requestType,
 											uint8 request, uint16 value,

@@ -207,7 +207,7 @@ Stack::GetObject(usb_id id)
 
 
 Object *
-Stack::GetObjectNoLock(usb_id id)
+Stack::GetObjectNoLock(usb_id id) const
 {
 	if (id >= fObjectMaxCount)
 		return NULL;
@@ -270,7 +270,7 @@ Stack::IndexOfBusManager(BusManager *busManager)
 
 
 BusManager *
-Stack::BusManagerAt(int32 index)
+Stack::BusManagerAt(int32 index) const
 {
 	return fBusManagers.ElementAt(index);
 }
