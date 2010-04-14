@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007 Haiku, Inc.
+ * Copyright 2005-2010 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * PS/2 bus manager
@@ -9,6 +9,7 @@
  */
 #ifndef __PS2_DEV_H
 #define __PS2_DEV_H
+
 
 struct ps2_dev;
 typedef struct ps2_dev ps2_dev;
@@ -59,6 +60,11 @@ extern ps2_dev ps2_device[PS2_DEVICE_COUNT];
 #define PS2_FLAG_NACK		(1 << 5)
 #define PS2_FLAG_GETID		(1 << 6)
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void 		ps2_dev_send(ps2_dev *dev, uint8 data);
 
 status_t	ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks);
@@ -81,4 +87,9 @@ void		ps2_dev_unpublish(ps2_dev *dev);
 
 int32		ps2_dev_handle_int(ps2_dev *dev);
 
+#ifdef __cplusplus
+}
 #endif
+
+
+#endif	/* __PS2_DEV_H */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007 Haiku, Inc.
+ * Copyright 2004-2010 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * PS/2 bus manager
@@ -46,8 +46,12 @@ extern device_hooks gPointingDeviceHooks;
 extern bool gActiveMultiplexingEnabled;
 extern sem_id gControllerSem;
 
-// prototypes from common.c
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// prototypes from common.c
 status_t		ps2_init(void);
 void			ps2_uninit(void);
 
@@ -65,5 +69,10 @@ extern status_t ps2_command(uint8 cmd, const uint8 *out, int out_count,
 
 // prototypes from keyboard.c & mouse.c
 extern status_t probe_keyboard(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* __PS2_COMMON_H */
