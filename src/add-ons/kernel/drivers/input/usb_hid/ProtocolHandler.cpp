@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <stdlib.h>
 #include <ring_buffer.h>
 
@@ -103,7 +104,7 @@ ProtocolHandler::AddHandlers(HIDDevice *device, ProtocolHandler ***handlerList,
 
 
 status_t
-ProtocolHandler::Open(uint32 flags)
+ProtocolHandler::Open(uint32 flags, uint32 *cookie)
 {
 	return fDevice->Open(this, flags);
 }
@@ -117,7 +118,7 @@ ProtocolHandler::Close()
 
 
 status_t
-ProtocolHandler::Control(uint32 op, void *buffer, size_t length)
+ProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
 {
 	TRACE_ALWAYS("control on base class\n");
 	return B_ERROR;

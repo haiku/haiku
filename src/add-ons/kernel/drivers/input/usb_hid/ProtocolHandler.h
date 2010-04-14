@@ -5,48 +5,53 @@
 #ifndef PROTOCOL_HANDLER_H
 #define PROTOCOL_HANDLER_H
 
+
 #include <SupportDefs.h>
+
 
 class HIDDevice;
 class HIDReport;
+
 
 class ProtocolHandler {
 public:
 								ProtocolHandler(HIDDevice *device,
 									const char *basePath,
 									size_t ringBufferSize);
-virtual							~ProtocolHandler();
+	virtual						~ProtocolHandler();
 
-		status_t				InitCheck() { return fStatus; };
+			status_t			InitCheck() { return fStatus; };
 
-		HIDDevice *				Device() { return fDevice; };
+			HIDDevice *			Device() { return fDevice; };
 
-		const char *			BasePath() { return fBasePath; };
-		void					SetPublishPath(char *publishPath);
-		const char *			PublishPath() { return fPublishPath; };
+			const char *		BasePath() { return fBasePath; };
+			void				SetPublishPath(char *publishPath);
+			const char *		PublishPath() { return fPublishPath; };
 
-static	void					AddHandlers(HIDDevice *device,
+	static	void				AddHandlers(HIDDevice *device,
 									ProtocolHandler ***handlerList,
 									uint32 *handlerCount);
 
-virtual	status_t				Open(uint32 flags);
-virtual	status_t				Close();
+	virtual	status_t			Open(uint32 flags, uint32 *cookie);
+	virtual	status_t			Close();
 
-virtual	status_t				Control(uint32 op, void *buffer, size_t length);
+	virtual	status_t			Control(uint32 *cookie, uint32 op, void *buffer,
+									size_t length);
 
-		int32					RingBufferReadable();
-		status_t				RingBufferRead(void *buffer, size_t length);
-		status_t				RingBufferWrite(const void *buffer,
+			int32				RingBufferReadable();
+			status_t			RingBufferRead(void *buffer, size_t length);
+			status_t			RingBufferWrite(const void *buffer,
 									size_t length);
 
 protected:
-		status_t				fStatus;
+			status_t			fStatus;
 
 private:
-		HIDDevice *				fDevice;
-		const char *			fBasePath;
-		char *					fPublishPath;
-		struct ring_buffer *	fRingBuffer;
+			HIDDevice *			fDevice;
+			const char *		fBasePath;
+			char *				fPublishPath;
+			struct ring_buffer *fRingBuffer;
 };
+
 
 #endif // PROTOCOL_HANDLER_H

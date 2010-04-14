@@ -1,8 +1,11 @@
 /*
-	Driver for USB Human Interface Devices.
-	Copyright (C) 2008-2009 Michael Lotz <mmlr@mlotz.ch>
-	Distributed under the terms of the MIT license.
+ * Copyright 2008-2009 Michael Lotz <mmlr@mlotz.ch>
+ * Distributed under the terms of the MIT license.
  */
+
+
+//!	Driver for USB Human Interface Devices.
+
 
 #include "DeviceList.h"
 #include "Driver.h"
@@ -10,9 +13,17 @@
 #include "ProtocolHandler.h"
 
 #include <lock.h>
+#include <util/AutoLock.h>
+
 #include <new>
 #include <stdio.h>
 #include <string.h>
+
+
+struct device_cookie {
+	ProtocolHandler*	handler;
+	uint32				cookie;
+};
 
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -163,21 +174,34 @@ usb_hid_device_removed(void *cookie)
 
 
 static status_t
-usb_hid_open(const char *name, uint32 flags, void **cookie)
+usb_hid_open(const char *name, uint32 flags, void **_cookie)
 {
-	TRACE("open(%s, %lu, %p)\n", name, flags, cookie);
-	mutex_lock(&sDriverLock);
+	TRACE("open(%s, %lu, %p)\n", name, flags, _cookie);
+	
+	device_cookie *cookie = new(std::nothrow) device_cookie();
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	MutexLocker locker(sDriverLock);
 
 	ProtocolHandler *handler = (ProtocolHandler *)gDeviceList->FindDevice(name);
-	if (handler == NULL) {
-		mutex_unlock(&sDriverLock);
-		return B_ENTRY_NOT_FOUND;
+	TRACE("  name %s: handler %p\n", name, handler);
+
+	cookie->handler = handler;
+	cookie->cookie = 0;
+
+	status_t result = handler == NULL ? B_ENTRY_NOT_FOUND : B_OK;
+	if (result == B_OK)
+		result = handler->Open(flags, &cookie->cookie);
+
+	if (result != B_OK) {
+		delete cookie;
+		return result;
 	}
 
-	status_t result = handler->Open(flags);
-	*cookie = handler;
-	mutex_unlock(&sDriverLock);
-	return result;
+	*_cookie = cookie;
+
+	return B_OK;
 }
 
 
@@ -201,30 +225,34 @@ usb_hid_write(void *cookie, off_t position, const void *buffer,
 
 
 static status_t
-usb_hid_control(void *cookie, uint32 op, void *buffer, size_t length)
+usb_hid_control(void *_cookie, uint32 op, void *buffer, size_t length)
 {
+	device_cookie *cookie = (device_cookie *)_cookie;
+
 	TRACE("control(%p, %lu, %p, %lu)\n", cookie, op, buffer, length);
-	ProtocolHandler *handler = (ProtocolHandler *)cookie;
-	return handler->Control(op, buffer, length);
+	return cookie->handler->Control(&cookie->cookie, op, buffer, length);
 }
 
 
 static status_t
-usb_hid_close(void *cookie)
+usb_hid_close(void *_cookie)
 {
+	device_cookie *cookie = (device_cookie *)_cookie;
+
 	TRACE("close(%p)\n", cookie);
-	ProtocolHandler *handler = (ProtocolHandler *)cookie;
-	return handler->Close();
+	return cookie->handler->Close();
 }
 
 
 static status_t
-usb_hid_free(void *cookie)
+usb_hid_free(void *_cookie)
 {
+	device_cookie *cookie = (device_cookie *)_cookie;
 	TRACE("free(%p)\n", cookie);
+
 	mutex_lock(&sDriverLock);
 
-	HIDDevice *device = ((ProtocolHandler *)cookie)->Device();
+	HIDDevice *device = cookie->handler->Device();
 	if (device->IsOpen()) {
 		// another handler of this device is still open so we can't free it
 	} else if (device->IsRemoved()) {
@@ -242,6 +270,8 @@ usb_hid_free(void *cookie)
 	}
 
 	mutex_unlock(&sDriverLock);
+
+	delete cookie;
 	return B_OK;
 }
 

@@ -26,6 +26,8 @@
 #define RIGHT_ALT_KEY	0x40
 #define ALT_KEYS		(LEFT_ALT_KEY | RIGHT_ALT_KEY)
 
+#define KEYBOARD_FLAG_DEBUGGER	0x01
+
 
 static usb_id sDebugKeyboardPipe = 0;
 static size_t sDebugKeyboardReportSize = 0;
@@ -57,7 +59,8 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 	fModifierCount(0),
 	fLastModifiers(0),
 	fCurrentKeys(NULL),
-	fLastKeys(NULL)
+	fLastKeys(NULL),
+	fHasDebugReader(false)
 {
 	// find modifiers and keys
 	for (uint32 i = 0; i < inputReport->CountItems(); i++) {
@@ -197,9 +200,9 @@ KeyboardDevice::AddHandler(HIDDevice *device, HIDReport *input)
 
 
 status_t
-KeyboardDevice::Open(uint32 flags)
+KeyboardDevice::Open(uint32 flags, uint32 *cookie)
 {
-	status_t status = ProtocolHandler::Open(flags);
+	status_t status = ProtocolHandler::Open(flags, cookie);
 	if (status != B_OK) {
 		TRACE_ALWAYS("keyboard device failed to open: %s\n",
 			strerror(status));
@@ -213,7 +216,7 @@ KeyboardDevice::Open(uint32 flags)
 
 
 status_t
-KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
+KeyboardDevice::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
 {
 	switch (op) {
 		case KB_READ:
@@ -285,6 +288,14 @@ KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
 			if (user_memcpy(buffer, &fRepeatDelay, sizeof(fRepeatDelay))
 					!= B_OK)
 				return B_BAD_ADDRESS;
+			return B_OK;
+
+		case KB_SET_DEBUG_READER:
+			if (fHasDebugReader)
+				return B_BUSY;
+
+			*cookie |= KEYBOARD_FLAG_DEBUGGER;
+			fHasDebugReader = true;
 			return B_OK;
 	}
 

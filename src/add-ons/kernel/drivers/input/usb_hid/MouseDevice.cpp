@@ -75,7 +75,7 @@ MouseDevice::AddHandler(HIDDevice *device, HIDReport *report)
 
 
 status_t
-MouseDevice::Control(uint32 op, void *buffer, size_t length)
+MouseDevice::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
 {
 	switch (op) {
 		case MS_READ:

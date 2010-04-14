@@ -1,7 +1,12 @@
 /*
-	Copyright (C) 2008-2009 Michael Lotz <mmlr@mlotz.ch>
-	Distributed under the terms of the MIT license.
-*/
+ * Copyright 2008-2009 Michael Lotz <mmlr@mlotz.ch>
+ * Distributed under the terms of the MIT license.
+ */
+
+
+//!	Driver for USB Human Interface Devices.
+
+
 #include "Driver.h"
 #include "HIDDevice.h"
 #include "HIDReport.h"
