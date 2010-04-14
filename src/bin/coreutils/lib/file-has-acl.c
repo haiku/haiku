@@ -1,6 +1,6 @@
 /* Test whether a file has a nontrivial access control list.
 
-   Copyright (C) 2002-2003, 2005-2009 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2005-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ acl_access_nontrivial (acl_t acl)
   /* acl is non-trivial if it has some entries other than for "user::",
      "group::", and "other::".  Normally these three should be present
      at least, allowing us to write
-	return (3 < acl_entries (acl));
+        return (3 < acl_entries (acl));
      but the following code is more robust.  */
 #  if HAVE_ACL_FIRST_ENTRY /* Linux, FreeBSD */
 
@@ -63,9 +63,9 @@ acl_access_nontrivial (acl_t acl)
     {
       acl_tag_t tag;
       if (acl_get_tag_type (ace, &tag) < 0)
-	return -1;
+        return -1;
       if (!(tag == ACL_USER_OBJ || tag == ACL_GROUP_OBJ || tag == ACL_OTHER))
-	return 1;
+        return 1;
     }
   return got_one;
 
@@ -82,8 +82,8 @@ acl_access_nontrivial (acl_t acl)
       acl_tag_t tag = ace->ae_tag;
 
       if (!(tag == ACL_USER_OBJ || tag == ACL_GROUP_OBJ
-	    || tag == ACL_OTHER_OBJ))
-	return 1;
+            || tag == ACL_OTHER_OBJ))
+        return 1;
     }
   return 0;
 
@@ -101,13 +101,13 @@ acl_access_nontrivial (acl_t acl)
 
       tag = ace->entry->acl_type;
       if (!(tag == ACL_USER_OBJ || tag == ACL_GROUP_OBJ || tag == ACL_OTHER))
-	return 1;
+        return 1;
 
       perm = ace->entry->acl_perm;
       /* On Tru64, perm can also contain non-standard bits such as
-	 PERM_INSERT, PERM_DELETE, PERM_MODIFY, PERM_LOOKUP, ... */
+         PERM_INSERT, PERM_DELETE, PERM_MODIFY, PERM_LOOKUP, ... */
       if ((perm & ~(ACL_READ | ACL_WRITE | ACL_EXECUTE)) != 0)
-	return 1;
+        return 1;
     }
   return 0;
 
@@ -135,15 +135,15 @@ acl_nontrivial (int count, aclent_t *entries)
       aclent_t *ace = &entries[i];
 
       /* Note: If ace->a_type = USER_OBJ, ace->a_id is the st_uid from stat().
-	 If ace->a_type = GROUP_OBJ, ace->a_id is the st_gid from stat().
-	 We don't need to check ace->a_id in these cases.  */
+         If ace->a_type = GROUP_OBJ, ace->a_id is the st_gid from stat().
+         We don't need to check ace->a_id in these cases.  */
       if (!(ace->a_type == USER_OBJ
-	    || ace->a_type == GROUP_OBJ
-	    || ace->a_type == OTHER_OBJ
-	    /* Note: Cygwin does not return a CLASS_OBJ ("mask:") entry
-	       sometimes.  */
-	    || ace->a_type == CLASS_OBJ))
-	return 1;
+            || ace->a_type == GROUP_OBJ
+            || ace->a_type == OTHER_OBJ
+            /* Note: Cygwin does not return a CLASS_OBJ ("mask:") entry
+               sometimes.  */
+            || ace->a_type == CLASS_OBJ))
+        return 1;
     }
   return 0;
 }
@@ -169,41 +169,41 @@ acl_ace_nontrivial (int count, ace_t *entries)
   for (i = 0; i < count; i++)
     if (entries[i].a_flags & (ACE_OWNER | ACE_GROUP | ACE_OTHER))
       {
-	old_convention = 1;
-	break;
+        old_convention = 1;
+        break;
       }
 
   if (old_convention)
     /* Running on Solaris 10.  */
     for (i = 0; i < count; i++)
       {
-	ace_t *ace = &entries[i];
+        ace_t *ace = &entries[i];
 
-	/* Note:
-	   If ace->a_flags = ACE_OWNER, ace->a_who is the st_uid from stat().
-	   If ace->a_flags = ACE_GROUP, ace->a_who is the st_gid from stat().
-	   We don't need to check ace->a_who in these cases.  */
-	if (!(ace->a_type == ALLOW
-	      && (ace->a_flags == ACE_OWNER
-		  || ace->a_flags == ACE_GROUP
-		  || ace->a_flags == ACE_OTHER)))
-	  return 1;
+        /* Note:
+           If ace->a_flags = ACE_OWNER, ace->a_who is the st_uid from stat().
+           If ace->a_flags = ACE_GROUP, ace->a_who is the st_gid from stat().
+           We don't need to check ace->a_who in these cases.  */
+        if (!(ace->a_type == ALLOW
+              && (ace->a_flags == ACE_OWNER
+                  || ace->a_flags == ACE_GROUP
+                  || ace->a_flags == ACE_OTHER)))
+          return 1;
       }
   else
     /* Running on Solaris 10 (newer version) or Solaris 11.  */
     for (i = 0; i < count; i++)
       {
-	ace_t *ace = &entries[i];
+        ace_t *ace = &entries[i];
 
-	if (!(ace->a_type == ACE_ACCESS_ALLOWED_ACE_TYPE
-	      && (ace->a_flags == NEW_ACE_OWNER
-		  || ace->a_flags
-		     == (NEW_ACE_GROUP | NEW_ACE_IDENTIFIER_GROUP)
-		  || ace->a_flags == ACE_EVERYONE)
-	      && (ace->a_access_mask
-		  & ~(NEW_ACE_READ_DATA | NEW_ACE_WRITE_DATA | NEW_ACE_EXECUTE))
-		 == 0))
-	  return 1;
+        if (!(ace->a_type == ACE_ACCESS_ALLOWED_ACE_TYPE
+              && (ace->a_flags == NEW_ACE_OWNER
+                  || ace->a_flags
+                     == (NEW_ACE_GROUP | NEW_ACE_IDENTIFIER_GROUP)
+                  || ace->a_flags == ACE_EVERYONE)
+              && (ace->a_access_mask
+                  & ~(NEW_ACE_READ_DATA | NEW_ACE_WRITE_DATA | NEW_ACE_EXECUTE))
+                 == 0))
+          return 1;
       }
 
   return 0;
@@ -227,18 +227,14 @@ acl_nontrivial (int count, struct acl_entry *entries, struct stat *sb)
       struct acl_entry *ace = &entries[i];
 
       if (!((ace->uid == sb->st_uid && ace->gid == ACL_NSGROUP)
-	    || (ace->uid == ACL_NSUSER && ace->gid == sb->st_gid)
-	    || (ace->uid == ACL_NSUSER && ace->gid == ACL_NSGROUP)))
-	return 1;
+            || (ace->uid == ACL_NSUSER && ace->gid == sb->st_gid)
+            || (ace->uid == ACL_NSUSER && ace->gid == ACL_NSGROUP)))
+        return 1;
     }
   return 0;
 }
 
-#elif USE_ACL && HAVE_ACLX_GET && 0 /* AIX */
-
-/* TODO */
-
-#elif USE_ACL && HAVE_STATACL /* older AIX */
+#elif USE_ACL && (HAVE_ACLX_GET || HAVE_STATACL) /* AIX */
 
 /* Return 1 if the given ACL is non-trivial.
    Return 0 if it is trivial, i.e. equivalent to a simple stat() mode.  */
@@ -264,6 +260,40 @@ acl_nontrivial (struct acl *a)
   return (acl_last (a) != a->acl_ext ? 1 : 0);
 }
 
+# if HAVE_ACLX_GET && defined ACL_AIX_WIP /* newer AIX */
+
+/* Return 1 if the given ACL is non-trivial.
+   Return 0 if it is trivial, i.e. equivalent to a simple stat() mode.  */
+int
+acl_nfs4_nontrivial (nfs4_acl_int_t *a)
+{
+#  if 1 /* let's try this first */
+  return (a->aclEntryN > 0 ? 1 : 0);
+#  else
+  int count = a->aclEntryN;
+  int i;
+
+  for (i = 0; i < count; i++)
+    {
+      nfs4_ace_int_t *ace = &a->aclEntry[i];
+
+      if (!((ace->flags & ACE4_ID_SPECIAL) != 0
+            && (ace->aceWho.special_whoid == ACE4_WHO_OWNER
+                || ace->aceWho.special_whoid == ACE4_WHO_GROUP
+                || ace->aceWho.special_whoid == ACE4_WHO_EVERYONE)
+            && ace->aceType == ACE4_ACCESS_ALLOWED_ACE_TYPE
+            && ace->aceFlags == 0
+            && (ace->aceMask & ~(ACE4_READ_DATA | ACE4_LIST_DIRECTORY
+                                 | ACE4_WRITE_DATA | ACE4_ADD_FILE
+                                 | ACE4_EXECUTE)) == 0))
+        return 1;
+    }
+  return 0;
+#  endif
+}
+
+# endif
+
 #endif
 
 
@@ -284,67 +314,67 @@ file_has_acl (char const *name, struct stat const *sb)
       int ret;
 
       if (HAVE_ACL_EXTENDED_FILE) /* Linux */
-	{
-	  /* On Linux, acl_extended_file is an optimized function: It only
-	     makes two calls to getxattr(), one for ACL_TYPE_ACCESS, one for
-	     ACL_TYPE_DEFAULT.  */
-	  ret = acl_extended_file (name);
-	}
+        {
+          /* On Linux, acl_extended_file is an optimized function: It only
+             makes two calls to getxattr(), one for ACL_TYPE_ACCESS, one for
+             ACL_TYPE_DEFAULT.  */
+          ret = acl_extended_file (name);
+        }
       else /* FreeBSD, MacOS X, IRIX, Tru64 */
-	{
+        {
 #  if HAVE_ACL_TYPE_EXTENDED /* MacOS X */
-	  /* On MacOS X, acl_get_file (name, ACL_TYPE_ACCESS)
-	     and acl_get_file (name, ACL_TYPE_DEFAULT)
-	     always return NULL / EINVAL.  There is no point in making
-	     these two useless calls.  The real ACL is retrieved through
-	     acl_get_file (name, ACL_TYPE_EXTENDED).  */
-	  acl_t acl = acl_get_file (name, ACL_TYPE_EXTENDED);
-	  if (acl)
-	    {
-	      ret = acl_extended_nontrivial (acl);
-	      acl_free (acl);
-	    }
-	  else
-	    ret = -1;
+          /* On MacOS X, acl_get_file (name, ACL_TYPE_ACCESS)
+             and acl_get_file (name, ACL_TYPE_DEFAULT)
+             always return NULL / EINVAL.  There is no point in making
+             these two useless calls.  The real ACL is retrieved through
+             acl_get_file (name, ACL_TYPE_EXTENDED).  */
+          acl_t acl = acl_get_file (name, ACL_TYPE_EXTENDED);
+          if (acl)
+            {
+              ret = acl_extended_nontrivial (acl);
+              acl_free (acl);
+            }
+          else
+            ret = -1;
 #  else /* FreeBSD, IRIX, Tru64 */
-	  acl_t acl = acl_get_file (name, ACL_TYPE_ACCESS);
-	  if (acl)
-	    {
-	      int saved_errno;
+          acl_t acl = acl_get_file (name, ACL_TYPE_ACCESS);
+          if (acl)
+            {
+              int saved_errno;
 
-	      ret = acl_access_nontrivial (acl);
-	      saved_errno = errno;
-	      acl_free (acl);
-	      errno = saved_errno;
+              ret = acl_access_nontrivial (acl);
+              saved_errno = errno;
+              acl_free (acl);
+              errno = saved_errno;
 #   if HAVE_ACL_FREE_TEXT /* Tru64 */
-	      /* On OSF/1, acl_get_file (name, ACL_TYPE_DEFAULT) always
-		 returns NULL with errno not set.  There is no point in
-		 making this call.  */
+              /* On OSF/1, acl_get_file (name, ACL_TYPE_DEFAULT) always
+                 returns NULL with errno not set.  There is no point in
+                 making this call.  */
 #   else /* FreeBSD, IRIX */
-	      /* On Linux, FreeBSD, IRIX, acl_get_file (name, ACL_TYPE_ACCESS)
-		 and acl_get_file (name, ACL_TYPE_DEFAULT) on a directory
-		 either both succeed or both fail; it depends on the
-		 filesystem.  Therefore there is no point in making the second
-		 call if the first one already failed.  */
-	      if (ret == 0 && S_ISDIR (sb->st_mode))
-		{
-		  acl = acl_get_file (name, ACL_TYPE_DEFAULT);
-		  if (acl)
-		    {
-		      ret = (0 < acl_entries (acl));
-		      acl_free (acl);
-		    }
-		  else
-		    ret = -1;
-		}
+              /* On Linux, FreeBSD, IRIX, acl_get_file (name, ACL_TYPE_ACCESS)
+                 and acl_get_file (name, ACL_TYPE_DEFAULT) on a directory
+                 either both succeed or both fail; it depends on the
+                 file system.  Therefore there is no point in making the second
+                 call if the first one already failed.  */
+              if (ret == 0 && S_ISDIR (sb->st_mode))
+                {
+                  acl = acl_get_file (name, ACL_TYPE_DEFAULT);
+                  if (acl)
+                    {
+                      ret = (0 < acl_entries (acl));
+                      acl_free (acl);
+                    }
+                  else
+                    ret = -1;
+                }
 #   endif
-	    }
-	  else
-	    ret = -1;
+            }
+          else
+            ret = -1;
 #  endif
-	}
+        }
       if (ret < 0)
-	return ACL_NOT_WELL_SUPPORTED (errno) ? 0 : -1;
+        return ACL_NOT_WELL_SUPPORTED (errno) ? 0 : -1;
       return ret;
 
 # elif HAVE_ACL && defined GETACLCNT /* Solaris, Cygwin, not HP-UX */
@@ -352,109 +382,109 @@ file_has_acl (char const *name, struct stat const *sb)
 #  if defined ACL_NO_TRIVIAL
 
       /* Solaris 10 (newer version), which has additional API declared in
-	 <sys/acl.h> (acl_t) and implemented in libsec (acl_set, acl_trivial,
-	 acl_fromtext, ...).  */
+         <sys/acl.h> (acl_t) and implemented in libsec (acl_set, acl_trivial,
+         acl_fromtext, ...).  */
       return acl_trivial (name);
 
 #  else /* Solaris, Cygwin, general case */
 
       /* Solaris 2.5 through Solaris 10, Cygwin, and contemporaneous versions
-	 of Unixware.  The acl() call returns the access and default ACL both
-	 at once.  */
+         of Unixware.  The acl() call returns the access and default ACL both
+         at once.  */
       int count;
       {
-	aclent_t *entries;
+        aclent_t *entries;
 
-	for (;;)
-	  {
-	    count = acl (name, GETACLCNT, 0, NULL);
+        for (;;)
+          {
+            count = acl (name, GETACLCNT, 0, NULL);
 
-	    if (count < 0)
-	      {
-		if (errno == ENOSYS || errno == ENOTSUP)
-		  break;
-		else
-		  return -1;
-	      }
+            if (count < 0)
+              {
+                if (errno == ENOSYS || errno == ENOTSUP)
+                  break;
+                else
+                  return -1;
+              }
 
-	    if (count == 0)
-	      break;
+            if (count == 0)
+              break;
 
-	    /* Don't use MIN_ACL_ENTRIES:  It's set to 4 on Cygwin, but Cygwin
-	       returns only 3 entries for files with no ACL.  But this is safe:
-	       If there are more than 4 entries, there cannot be only the
-	       "user::", "group::", "other:", and "mask:" entries.  */
-	    if (count > 4)
-	      return 1;
+            /* Don't use MIN_ACL_ENTRIES:  It's set to 4 on Cygwin, but Cygwin
+               returns only 3 entries for files with no ACL.  But this is safe:
+               If there are more than 4 entries, there cannot be only the
+               "user::", "group::", "other:", and "mask:" entries.  */
+            if (count > 4)
+              return 1;
 
-	    entries = (aclent_t *) malloc (count * sizeof (aclent_t));
-	    if (entries == NULL)
-	      {
-		errno = ENOMEM;
-		return -1;
-	      }
-	    if (acl (name, GETACL, count, entries) == count)
-	      {
-		if (acl_nontrivial (count, entries))
-		  {
-		    free (entries);
-		    return 1;
-		  }
-		free (entries);
-		break;
-	      }
-	    /* Huh? The number of ACL entries changed since the last call.
-	       Repeat.  */
-	    free (entries);
-	  }
+            entries = (aclent_t *) malloc (count * sizeof (aclent_t));
+            if (entries == NULL)
+              {
+                errno = ENOMEM;
+                return -1;
+              }
+            if (acl (name, GETACL, count, entries) == count)
+              {
+                if (acl_nontrivial (count, entries))
+                  {
+                    free (entries);
+                    return 1;
+                  }
+                free (entries);
+                break;
+              }
+            /* Huh? The number of ACL entries changed since the last call.
+               Repeat.  */
+            free (entries);
+          }
       }
 
 #   ifdef ACE_GETACL
       /* Solaris also has a different variant of ACLs, used in ZFS and NFSv4
-	 file systems (whereas the other ones are used in UFS file systems).  */
+         file systems (whereas the other ones are used in UFS file systems).  */
       {
-	ace_t *entries;
+        ace_t *entries;
 
-	for (;;)
-	  {
-	    count = acl (name, ACE_GETACLCNT, 0, NULL);
+        for (;;)
+          {
+            count = acl (name, ACE_GETACLCNT, 0, NULL);
 
-	    if (count < 0)
-	      {
-		if (errno == ENOSYS || errno == EINVAL)
-		  break;
-		else
-		  return -1;
-	      }
+            if (count < 0)
+              {
+                if (errno == ENOSYS || errno == EINVAL)
+                  break;
+                else
+                  return -1;
+              }
 
-	    if (count == 0)
-	      break;
+            if (count == 0)
+              break;
 
-	    /* If there are more than 3 entries, there cannot be only the
-	       ACE_OWNER, ACE_GROUP, ACE_OTHER entries.  */
-	    if (count > 3)
-	      return 1;
+            /* If there are more than 3 entries, there cannot be only the
+               ACE_OWNER, ACE_GROUP, ACE_OTHER entries.  */
+            if (count > 3)
+              return 1;
 
-	    entries = (ace_t *) malloc (count * sizeof (ace_t));
-	    if (entries == NULL)
-	      {
-		errno = ENOMEM;
-		return -1;
-	      }
-	    if (acl (name, ACE_GETACL, count, entries) == count)
-	      {
-		if (acl_ace_nontrivial (count, entries))
-		  {
-		    free (entries);
-		    return 1;
-		  }
-		free (entries);
-		break;
-	      }
-	    /* Huh? The number of ACL entries changed since the last call.
-	       Repeat.  */
-	    free (entries);
-	  }
+            entries = (ace_t *) malloc (count * sizeof (ace_t));
+            if (entries == NULL)
+              {
+                errno = ENOMEM;
+                return -1;
+              }
+            if (acl (name, ACE_GETACL, count, entries) == count)
+              {
+                if (acl_ace_nontrivial (count, entries))
+                  {
+                    free (entries);
+                    return 1;
+                  }
+                free (entries);
+                break;
+              }
+            /* Huh? The number of ACL entries changed since the last call.
+               Repeat.  */
+            free (entries);
+          }
       }
 #   endif
 
@@ -467,48 +497,104 @@ file_has_acl (char const *name, struct stat const *sb)
       struct acl_entry entries[NACLENTRIES];
 
       for (;;)
-	{
-	  count = getacl (name, 0, NULL);
+        {
+          count = getacl (name, 0, NULL);
 
-	  if (count < 0)
-	    return (errno == ENOSYS || errno == EOPNOTSUPP ? 0 : -1);
+          if (count < 0)
+            return (errno == ENOSYS || errno == EOPNOTSUPP ? 0 : -1);
 
-	  if (count == 0)
-	    return 0;
+          if (count == 0)
+            return 0;
 
-	  if (count > NACLENTRIES)
-	    /* If NACLENTRIES cannot be trusted, use dynamic memory
-	       allocation.  */
-	    abort ();
+          if (count > NACLENTRIES)
+            /* If NACLENTRIES cannot be trusted, use dynamic memory
+               allocation.  */
+            abort ();
 
-	  /* If there are more than 3 entries, there cannot be only the
-	     (uid,%), (%,gid), (%,%) entries.  */
-	  if (count > 3)
-	    return 1;
+          /* If there are more than 3 entries, there cannot be only the
+             (uid,%), (%,gid), (%,%) entries.  */
+          if (count > 3)
+            return 1;
 
-	  if (getacl (name, count, entries) == count)
-	    {
-	      struct stat statbuf;
+          if (getacl (name, count, entries) == count)
+            {
+              struct stat statbuf;
 
-	      if (stat (name, &statbuf) < 0)
-		return -1;
+              if (stat (name, &statbuf) < 0)
+                return -1;
 
-	      return acl_nontrivial (count, entries, &statbuf);
-	    }
-	  /* Huh? The number of ACL entries changed since the last call.
-	     Repeat.  */
-	}
+              return acl_nontrivial (count, entries, &statbuf);
+            }
+          /* Huh? The number of ACL entries changed since the last call.
+             Repeat.  */
+        }
 
-# elif HAVE_ACLX_GET && 0 /* AIX */
+# elif HAVE_ACLX_GET && defined ACL_AIX_WIP /* AIX */
 
-      /* TODO: use aclx_get(), and then?  */
+      acl_type_t type;
+      char aclbuf[1024];
+      void *acl = aclbuf;
+      size_t aclsize = sizeof (aclbuf);
+      mode_t mode;
+
+      for (;;)
+        {
+          /* The docs say that type being 0 is equivalent to ACL_ANY, but it
+             is not true, in AIX 5.3.  */
+          type.u64 = ACL_ANY;
+          if (aclx_get (name, 0, &type, aclbuf, &aclsize, &mode) >= 0)
+            break;
+          if (errno != ENOSPC)
+            {
+              if (acl != aclbuf)
+                {
+                  int saved_errno = errno;
+                  free (acl);
+                  errno = saved_errno;
+                }
+              return -1;
+            }
+          aclsize = 2 * aclsize;
+          if (acl != aclbuf)
+            free (acl);
+          acl = malloc (aclsize);
+          if (acl == NULL)
+            {
+              errno = ENOMEM;
+              return -1;
+            }
+        }
+
+      if (type.u64 == ACL_AIXC)
+        {
+          int result = acl_nontrivial ((struct acl *) acl);
+          if (acl != aclbuf)
+            free (acl);
+          return result;
+        }
+      else if (type.u64 == ACL_NFS4)
+        {
+          int result = acl_nfs4_nontrivial ((nfs4_acl_int_t *) acl);
+          if (acl != aclbuf)
+            free (acl);
+          return result;
+        }
+      else
+        {
+          /* A newer type of ACL has been introduced in the system.
+             We should better support it.  */
+          if (acl != aclbuf)
+            free (acl);
+          errno = EINVAL;
+          return -1;
+        }
 
 # elif HAVE_STATACL /* older AIX */
 
       union { struct acl a; char room[4096]; } u;
 
       if (statacl (name, STX_NORMAL, &u.a, sizeof (u)) < 0)
-	return -1;
+        return -1;
 
       return acl_nontrivial (&u.a);
 

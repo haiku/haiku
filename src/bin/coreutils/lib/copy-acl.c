@@ -1,6 +1,6 @@
 /* copy-acl.c - copy access control list from one file to another file
 
-   Copyright (C) 2002-2003, 2005-2008 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2005-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@
 
 static int
 qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
-	   int dest_desc, mode_t mode)
+           int dest_desc, mode_t mode)
 {
 #if USE_ACL && HAVE_ACL_GET_FILE
   /* POSIX 1003.1e (draft 17 -- abandoned) specific version.  */
@@ -58,9 +58,9 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   if (acl == NULL)
     {
       if (ACL_NOT_WELL_SUPPORTED (errno))
-	return qset_acl (dst_name, dest_desc, mode);
+        return qset_acl (dst_name, dest_desc, mode);
       else
-	return -2;
+        return -2;
     }
 
   if (HAVE_ACL_SET_FD && dest_desc != -1)
@@ -72,17 +72,17 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
       int saved_errno = errno;
 
       if (ACL_NOT_WELL_SUPPORTED (errno) && !acl_access_nontrivial (acl))
-	{
-	  acl_free (acl);
-	  return chmod_or_fchmod (dst_name, dest_desc, mode);
-	}
+        {
+          acl_free (acl);
+          return chmod_or_fchmod (dst_name, dest_desc, mode);
+        }
       else
-	{
-	  acl_free (acl);
-	  chmod_or_fchmod (dst_name, dest_desc, mode);
-	  errno = saved_errno;
-	  return -1;
-	}
+        {
+          acl_free (acl);
+          chmod_or_fchmod (dst_name, dest_desc, mode);
+          errno = saved_errno;
+          return -1;
+        }
     }
   else
     acl_free (acl);
@@ -90,28 +90,28 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   if (mode & (S_ISUID | S_ISGID | S_ISVTX))
     {
       /* We did not call chmod so far, and either the mode and the ACL are
-	 separate or special bits are to be set which don't fit into ACLs.  */
+         separate or special bits are to be set which don't fit into ACLs.  */
 
       if (chmod_or_fchmod (dst_name, dest_desc, mode) != 0)
-	return -1;
+        return -1;
     }
 
   if (S_ISDIR (mode))
     {
       acl = acl_get_file (src_name, ACL_TYPE_DEFAULT);
       if (acl == NULL)
-	return -2;
+        return -2;
 
       if (acl_set_file (dst_name, ACL_TYPE_DEFAULT, acl))
-	{
-	  int saved_errno = errno;
+        {
+          int saved_errno = errno;
 
-	  acl_free (acl);
-	  errno = saved_errno;
-	  return -1;
-	}
+          acl_free (acl);
+          errno = saved_errno;
+          return -1;
+        }
       else
-	acl_free (acl);
+        acl_free (acl);
     }
   return 0;
 
@@ -125,14 +125,14 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   /* On MacOS X,  acl_get_file (name, ACL_TYPE_ACCESS)
      and          acl_get_file (name, ACL_TYPE_DEFAULT)
      always return NULL / EINVAL.  You have to use
-		  acl_get_file (name, ACL_TYPE_EXTENDED)
+                  acl_get_file (name, ACL_TYPE_EXTENDED)
      or           acl_get_fd (open (name, ...))
      to retrieve an ACL.
      On the other hand,
-		  acl_set_file (name, ACL_TYPE_ACCESS, acl)
+                  acl_set_file (name, ACL_TYPE_ACCESS, acl)
      and          acl_set_file (name, ACL_TYPE_DEFAULT, acl)
      have the same effect as
-		  acl_set_file (name, ACL_TYPE_EXTENDED, acl):
+                  acl_set_file (name, ACL_TYPE_EXTENDED, acl):
      Each of these calls sets the file's ACL.  */
 
   acl_t acl;
@@ -145,9 +145,9 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   if (acl == NULL)
     {
       if (ACL_NOT_WELL_SUPPORTED (errno))
-	return qset_acl (dst_name, dest_desc, mode);
+        return qset_acl (dst_name, dest_desc, mode);
       else
-	return -2;
+        return -2;
     }
 
   if (HAVE_ACL_SET_FD && dest_desc != -1)
@@ -159,17 +159,17 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
       int saved_errno = errno;
 
       if (ACL_NOT_WELL_SUPPORTED (errno) && !acl_extended_nontrivial (acl))
-	{
-	  acl_free (acl);
-	  return chmod_or_fchmod (dst_name, dest_desc, mode);
-	}
+        {
+          acl_free (acl);
+          return chmod_or_fchmod (dst_name, dest_desc, mode);
+        }
       else
-	{
-	  acl_free (acl);
-	  chmod_or_fchmod (dst_name, dest_desc, mode);
-	  errno = saved_errno;
-	  return -1;
-	}
+        {
+          acl_free (acl);
+          chmod_or_fchmod (dst_name, dest_desc, mode);
+          errno = saved_errno;
+          return -1;
+        }
     }
   else
     acl_free (acl);
@@ -189,8 +189,8 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   int ret;
   acl_t *aclp = NULL;
   ret = (source_desc < 0
-	 ? acl_get (src_name, ACL_NO_TRIVIAL, &aclp)
-	 : facl_get (source_desc, ACL_NO_TRIVIAL, &aclp));
+         ? acl_get (src_name, ACL_NO_TRIVIAL, &aclp)
+         : facl_get (source_desc, ACL_NO_TRIVIAL, &aclp));
   if (ret != 0 && errno != ENOSYS)
     return -2;
 
@@ -201,16 +201,16 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   if (aclp)
     {
       ret = (dest_desc < 0
-	     ? acl_set (dst_name, aclp)
-	     : facl_set (dest_desc, aclp));
+             ? acl_set (dst_name, aclp)
+             : facl_set (dest_desc, aclp));
       if (ret != 0)
-	{
-	  int saved_errno = errno;
+        {
+          int saved_errno = errno;
 
-	  acl_free (aclp);
-	  errno = saved_errno;
-	  return -1;
-	}
+          acl_free (aclp);
+          errno = saved_errno;
+          return -1;
+        }
       acl_free (aclp);
     }
 
@@ -248,82 +248,82 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   for (;;)
     {
       ace_count = (source_desc != -1
-		   ? facl (source_desc, ACE_GETACLCNT, 0, NULL)
-		   : acl (src_name, ACE_GETACLCNT, 0, NULL));
+                   ? facl (source_desc, ACE_GETACLCNT, 0, NULL)
+                   : acl (src_name, ACE_GETACLCNT, 0, NULL));
 
       if (ace_count < 0)
-	{
-	  if (errno == ENOSYS || errno == EINVAL)
-	    {
-	      ace_count = 0;
-	      ace_entries = NULL;
-	      break;
-	    }
-	  else
-	    return -2;
-	}
+        {
+          if (errno == ENOSYS || errno == EINVAL)
+            {
+              ace_count = 0;
+              ace_entries = NULL;
+              break;
+            }
+          else
+            return -2;
+        }
 
       if (ace_count == 0)
-	{
-	  ace_entries = NULL;
-	  break;
-	}
+        {
+          ace_entries = NULL;
+          break;
+        }
 
       ace_entries = (ace_t *) malloc (ace_count * sizeof (ace_t));
       if (ace_entries == NULL)
-	{
-	  errno = ENOMEM;
-	  return -2;
-	}
+        {
+          errno = ENOMEM;
+          return -2;
+        }
 
       if ((source_desc != -1
-	   ? facl (source_desc, ACE_GETACL, ace_count, ace_entries)
-	   : acl (src_name, ACE_GETACL, ace_count, ace_entries))
-	  == ace_count)
-	break;
+           ? facl (source_desc, ACE_GETACL, ace_count, ace_entries)
+           : acl (src_name, ACE_GETACL, ace_count, ace_entries))
+          == ace_count)
+        break;
       /* Huh? The number of ACL entries changed since the last call.
-	 Repeat.  */
+         Repeat.  */
     }
 #  endif
 
   for (;;)
     {
       count = (source_desc != -1
-	       ? facl (source_desc, GETACLCNT, 0, NULL)
-	       : acl (src_name, GETACLCNT, 0, NULL));
+               ? facl (source_desc, GETACLCNT, 0, NULL)
+               : acl (src_name, GETACLCNT, 0, NULL));
 
       if (count < 0)
-	{
-	  if (errno == ENOSYS || errno == ENOTSUP)
-	    {
-	      count = 0;
-	      entries = NULL;
-	      break;
-	    }
-	  else
-	    return -2;
-	}
+        {
+          if (errno == ENOSYS || errno == ENOTSUP)
+            {
+              count = 0;
+              entries = NULL;
+              break;
+            }
+          else
+            return -2;
+        }
 
       if (count == 0)
-	{
-	  entries = NULL;
-	  break;
-	}
+        {
+          entries = NULL;
+          break;
+        }
 
       entries = (aclent_t *) malloc (count * sizeof (aclent_t));
       if (entries == NULL)
-	{
-	  errno = ENOMEM;
-	  return -2;
-	}
+        {
+          errno = ENOMEM;
+          return -2;
+        }
 
       if ((source_desc != -1
-	   ? facl (source_desc, GETACL, count, entries)
-	   : acl (src_name, GETACL, count, entries))
-	  == count)
-	break;
+           ? facl (source_desc, GETACL, count, entries)
+           : acl (src_name, GETACL, count, entries))
+          == count)
+        break;
       /* Huh? The number of ACL entries changed since the last call.
-	 Repeat.  */
+         Repeat.  */
     }
 
   /* Is there an ACL of either kind?  */
@@ -339,10 +339,10 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   if (!MODE_INSIDE_ACL)
     {
       /* On Cygwin, it is necessary to call chmod before acl, because
-	 chmod can change the contents of the ACL (in ways that don't
-	 change the allowed accesses, but still visible).  */
+         chmod can change the contents of the ACL (in ways that don't
+         change the allowed accesses, but still visible).  */
       if (chmod_or_fchmod (dst_name, dest_desc, mode) != 0)
-	saved_errno = errno;
+        saved_errno = errno;
       did_chmod = 1;
     }
 
@@ -353,16 +353,16 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   if (count > 0)
     {
       ret = (dest_desc != -1
-	     ? facl (dest_desc, SETACL, count, entries)
-	     : acl (dst_name, SETACL, count, entries));
+             ? facl (dest_desc, SETACL, count, entries)
+             : acl (dst_name, SETACL, count, entries));
       if (ret < 0 && saved_errno == 0)
-	{
-	  saved_errno = errno;
-	  if (errno == ENOSYS && !acl_nontrivial (count, entries))
-	    saved_errno = 0;
-	}
+        {
+          saved_errno = errno;
+          if (errno == ENOSYS && !acl_nontrivial (count, entries))
+            saved_errno = 0;
+        }
       else
-	did_chmod = 1;
+        did_chmod = 1;
     }
   free (entries);
 
@@ -370,15 +370,15 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   if (ace_count > 0)
     {
       ret = (dest_desc != -1
-	     ? facl (dest_desc, ACE_SETACL, ace_count, ace_entries)
-	     : acl (dst_name, ACE_SETACL, ace_count, ace_entries));
+             ? facl (dest_desc, ACE_SETACL, ace_count, ace_entries)
+             : acl (dst_name, ACE_SETACL, ace_count, ace_entries));
       if (ret < 0 && saved_errno == 0)
-	{
-	  saved_errno = errno;
-	  if ((errno == ENOSYS || errno == EINVAL || errno == ENOTSUP)
-	      && !acl_ace_nontrivial (ace_count, ace_entries))
-	    saved_errno = 0;
-	}
+        {
+          saved_errno = errno;
+          if ((errno == ENOSYS || errno == EINVAL || errno == ENOTSUP)
+              && !acl_ace_nontrivial (ace_count, ace_entries))
+            saved_errno = 0;
+        }
     }
   free (ace_entries);
 #  endif
@@ -387,13 +387,13 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
       && did_chmod <= ((mode & (S_ISUID | S_ISGID | S_ISVTX)) ? 1 : 0))
     {
       /* We did not call chmod so far, and either the mode and the ACL are
-	 separate or special bits are to be set which don't fit into ACLs.  */
+         separate or special bits are to be set which don't fit into ACLs.  */
 
       if (chmod_or_fchmod (dst_name, dest_desc, mode) != 0)
-	{
-	  if (saved_errno == 0)
-	    saved_errno = errno;
-	}
+        {
+          if (saved_errno == 0)
+            saved_errno = errno;
+        }
     }
 
   if (saved_errno)
@@ -414,60 +414,60 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   for (;;)
     {
       count = (source_desc != -1
-	       ? fgetacl (source_desc, 0, NULL)
-	       : getacl (src_name, 0, NULL));
+               ? fgetacl (source_desc, 0, NULL)
+               : getacl (src_name, 0, NULL));
 
       if (count < 0)
-	{
-	  if (errno == ENOSYS || errno == EOPNOTSUPP)
-	    {
-	      count = 0;
-	      break;
-	    }
-	  else
-	    return -2;
-	}
+        {
+          if (errno == ENOSYS || errno == EOPNOTSUPP)
+            {
+              count = 0;
+              break;
+            }
+          else
+            return -2;
+        }
 
       if (count == 0)
-	break;
+        break;
 
       if (count > NACLENTRIES)
-	/* If NACLENTRIES cannot be trusted, use dynamic memory allocation.  */
-	abort ();
+        /* If NACLENTRIES cannot be trusted, use dynamic memory allocation.  */
+        abort ();
 
       if ((source_desc != -1
-	   ? fgetacl (source_desc, count, entries)
-	   : getacl (src_name, count, entries))
-	  == count)
-	break;
+           ? fgetacl (source_desc, count, entries)
+           : getacl (src_name, count, entries))
+          == count)
+        break;
       /* Huh? The number of ACL entries changed since the last call.
-	 Repeat.  */
+         Repeat.  */
     }
 
   if (count == 0)
     return qset_acl (dst_name, dest_desc, mode);
 
   ret = (dest_desc != -1
-	 ? fsetacl (dest_desc, count, entries)
-	 : setacl (dst_name, count, entries));
+         ? fsetacl (dest_desc, count, entries)
+         : setacl (dst_name, count, entries));
   if (ret < 0)
     {
       int saved_errno = errno;
 
       if (errno == ENOSYS || errno == EOPNOTSUPP)
-	{
-	  struct stat source_statbuf;
+        {
+          struct stat source_statbuf;
 
-	  if ((source_desc != -1
-	       ? fstat (source_desc, &source_statbuf)
-	       : stat (src_name, &source_statbuf)) == 0)
-	    {
-	      if (!acl_nontrivial (count, entries, &source_statbuf))
-		return chmod_or_fchmod (dst_name, dest_desc, mode);
-	    }
-	  else
-	    saved_errno = errno;
-	}
+          if ((source_desc != -1
+               ? fstat (source_desc, &source_statbuf)
+               : stat (src_name, &source_statbuf)) == 0)
+            {
+              if (!acl_nontrivial (count, entries, &source_statbuf))
+                return chmod_or_fchmod (dst_name, dest_desc, mode);
+            }
+          else
+            saved_errno = errno;
+        }
 
       chmod_or_fchmod (dst_name, dest_desc, mode);
       errno = saved_errno;
@@ -477,7 +477,7 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
   if (mode & (S_ISUID | S_ISGID | S_ISVTX))
     {
       /* We did not call chmod so far, and either the mode and the ACL are
-	 separate or special bits are to be set which don't fit into ACLs.  */
+         separate or special bits are to be set which don't fit into ACLs.  */
 
       return chmod_or_fchmod (dst_name, dest_desc, mode);
     }
@@ -499,8 +499,8 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
     return -2;
 
   ret = (dest_desc != -1
-	 ? fchacl (dest_desc, &u.a, u.a.acl_len)
-	 : chacl (dst_name, &u.a, u.a.acl_len));
+         ? fchacl (dest_desc, &u.a, u.a.acl_len)
+         : chacl (dst_name, &u.a, u.a.acl_len));
   if (ret < 0)
     {
       int saved_errno = errno;
@@ -534,7 +534,7 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
 
 int
 copy_acl (const char *src_name, int source_desc, const char *dst_name,
-	  int dest_desc, mode_t mode)
+          int dest_desc, mode_t mode)
 {
   int ret = qcopy_acl (src_name, source_desc, dst_name, dest_desc, mode);
   switch (ret)

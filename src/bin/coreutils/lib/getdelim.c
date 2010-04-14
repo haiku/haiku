@@ -2,8 +2,8 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* getdelim.c --- Implementation of replacement getdelim function.
-   Copyright (C) 1994, 1996, 1997, 1998, 2001, 2003, 2005, 2006, 2007,
-   2008, 2009 Free Software Foundation, Inc.
+   Copyright (C) 1994, 1996, 1997, 1998, 2001, 2003, 2005, 2006, 2007, 2008,
+   2009, 2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -24,6 +24,10 @@
 
 #include <config.h>
 
+/* Don't use __attribute__ __nonnull__ in this compilation unit.  Otherwise gcc
+   optimizes away the lineptr == NULL || n == NULL || fp == NULL tests below.  */
+#define _GL_ARG_NONNULL(params)
+
 #include <stdio.h>
 
 #include <limits.h>
@@ -37,15 +41,15 @@
 
 #if USE_UNLOCKED_IO
 # include "unlocked-io.h"
-# define getc_maybe_unlocked(fp)	getc(fp)
+# define getc_maybe_unlocked(fp)        getc(fp)
 #elif !HAVE_FLOCKFILE || !HAVE_FUNLOCKFILE || !HAVE_DECL_GETC_UNLOCKED
 # undef flockfile
 # undef funlockfile
 # define flockfile(x) ((void) 0)
 # define funlockfile(x) ((void) 0)
-# define getc_maybe_unlocked(fp)	getc(fp)
+# define getc_maybe_unlocked(fp)        getc(fp)
 #else
-# define getc_maybe_unlocked(fp)	getc_unlocked(fp)
+# define getc_maybe_unlocked(fp)        getc_unlocked(fp)
 #endif
 
 /* Read up to (and including) a DELIMITER from FP into *LINEPTR (and
@@ -74,10 +78,10 @@ getdelim (char **lineptr, size_t *n, int delimiter, FILE *fp)
       *n = 120;
       new_lineptr = (char *) realloc (*lineptr, *n);
       if (new_lineptr == NULL)
-	{
-	  result = -1;
-	  goto unlock_return;
-	}
+        {
+          result = -1;
+          goto unlock_return;
+        }
       *lineptr = new_lineptr;
     }
 
@@ -87,44 +91,44 @@ getdelim (char **lineptr, size_t *n, int delimiter, FILE *fp)
 
       i = getc_maybe_unlocked (fp);
       if (i == EOF)
-	{
-	  result = -1;
-	  break;
-	}
+        {
+          result = -1;
+          break;
+        }
 
       /* Make enough space for len+1 (for final NUL) bytes.  */
       if (cur_len + 1 >= *n)
-	{
-	  size_t needed_max =
-	    SSIZE_MAX < SIZE_MAX ? (size_t) SSIZE_MAX + 1 : SIZE_MAX;
-	  size_t needed = 2 * *n + 1;   /* Be generous. */
-	  char *new_lineptr;
+        {
+          size_t needed_max =
+            SSIZE_MAX < SIZE_MAX ? (size_t) SSIZE_MAX + 1 : SIZE_MAX;
+          size_t needed = 2 * *n + 1;   /* Be generous. */
+          char *new_lineptr;
 
-	  if (needed_max < needed)
-	    needed = needed_max;
-	  if (cur_len + 1 >= needed)
-	    {
-	      result = -1;
-	      errno = EOVERFLOW;
-	      goto unlock_return;
-	    }
+          if (needed_max < needed)
+            needed = needed_max;
+          if (cur_len + 1 >= needed)
+            {
+              result = -1;
+              errno = EOVERFLOW;
+              goto unlock_return;
+            }
 
-	  new_lineptr = (char *) realloc (*lineptr, needed);
-	  if (new_lineptr == NULL)
-	    {
-	      result = -1;
-	      goto unlock_return;
-	    }
+          new_lineptr = (char *) realloc (*lineptr, needed);
+          if (new_lineptr == NULL)
+            {
+              result = -1;
+              goto unlock_return;
+            }
 
-	  *lineptr = new_lineptr;
-	  *n = needed;
-	}
+          *lineptr = new_lineptr;
+          *n = needed;
+        }
 
       (*lineptr)[cur_len] = i;
       cur_len++;
 
       if (i == delimiter)
-	break;
+        break;
     }
   (*lineptr)[cur_len] = '\0';
   result = cur_len ? cur_len : result;

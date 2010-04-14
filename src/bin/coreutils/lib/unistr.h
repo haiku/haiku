@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Elementary Unicode string functions.
-   Copyright (C) 2001-2002, 2005-2009 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2005-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published
@@ -21,6 +21,9 @@
 #define _UNISTR_H
 
 #include "unitypes.h"
+
+/* Get common macros for C.  */
+#include "unused-parameter.h"
 
 /* Get bool.  */
 #include <stdbool.h>
@@ -84,32 +87,32 @@ extern const uint32_t *
 /* Convert an UTF-8 string to an UTF-16 string.  */
 extern uint16_t *
        u8_to_u16 (const uint8_t *s, size_t n, uint16_t *resultbuf,
-		  size_t *lengthp);
+                  size_t *lengthp);
 
 /* Convert an UTF-8 string to an UCS-4 string.  */
 extern uint32_t *
        u8_to_u32 (const uint8_t *s, size_t n, uint32_t *resultbuf,
-		  size_t *lengthp);
+                  size_t *lengthp);
 
 /* Convert an UTF-16 string to an UTF-8 string.  */
 extern uint8_t *
        u16_to_u8 (const uint16_t *s, size_t n, uint8_t *resultbuf,
-		  size_t *lengthp);
+                  size_t *lengthp);
 
 /* Convert an UTF-16 string to an UCS-4 string.  */
 extern uint32_t *
        u16_to_u32 (const uint16_t *s, size_t n, uint32_t *resultbuf,
-		   size_t *lengthp);
+                   size_t *lengthp);
 
 /* Convert an UCS-4 string to an UTF-8 string.  */
 extern uint8_t *
        u32_to_u8 (const uint32_t *s, size_t n, uint8_t *resultbuf,
-		  size_t *lengthp);
+                  size_t *lengthp);
 
 /* Convert an UCS-4 string to an UTF-16 string.  */
 extern uint16_t *
        u32_to_u16 (const uint32_t *s, size_t n, uint16_t *resultbuf,
-		   size_t *lengthp);
+                   size_t *lengthp);
 
 
 /* Elementary string functions.  */
@@ -186,7 +189,8 @@ extern int
        u32_mbtouc_unsafe (ucs4_t *puc, const uint32_t *s, size_t n);
 # else
 static inline int
-u32_mbtouc_unsafe (ucs4_t *puc, const uint32_t *s, size_t n _UNUSED_PARAMETER_)
+u32_mbtouc_unsafe (ucs4_t *puc,
+                   const uint32_t *s, size_t n _GL_UNUSED_PARAMETER)
 {
   uint32_t c = *s;
 
@@ -256,7 +260,7 @@ extern int
        u32_mbtouc (ucs4_t *puc, const uint32_t *s, size_t n);
 # else
 static inline int
-u32_mbtouc (ucs4_t *puc, const uint32_t *s, size_t n _UNUSED_PARAMETER_)
+u32_mbtouc (ucs4_t *puc, const uint32_t *s, size_t n _GL_UNUSED_PARAMETER)
 {
   uint32_t c = *s;
 
@@ -354,12 +358,12 @@ u32_uctomb (uint32_t *s, ucs4_t uc, int n)
   if (uc < 0xd800 || (uc >= 0xe000 && uc < 0x110000))
     {
       if (n > 0)
-	{
-	  *s = uc;
-	  return 1;
-	}
+        {
+          *s = uc;
+          return 1;
+        }
       else
-	return -2;
+        return -2;
     }
   else
     return -1;
@@ -528,8 +532,8 @@ extern uint16_t *
 extern uint32_t *
        u32_strncpy (uint32_t *dest, const uint32_t *src, size_t n);
 
-/* Copy no more than N units of SRC to DEST, returning the address of
-   the last unit written into DEST.  */
+/* Copy no more than N units of SRC to DEST.  Return a pointer past the last
+   non-NUL unit written into DEST.  */
 /* Similar to stpncpy().  */
 extern uint8_t *
        u8_stpncpy (uint8_t *dest, const uint8_t *src, size_t n);

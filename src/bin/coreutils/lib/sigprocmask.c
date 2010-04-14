@@ -1,5 +1,5 @@
 /* POSIX compatible signal blocking.
-   Copyright (C) 2006-2008 Free Software Foundation, Inc.
+   Copyright (C) 2006-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -72,9 +72,9 @@ ext_signal (int sig, handler_t handler)
     {
     case SIGPIPE:
       {
-	handler_t old_handler = SIGPIPE_handler;
-	SIGPIPE_handler = handler;
-	return old_handler;
+        handler_t old_handler = SIGPIPE_handler;
+        SIGPIPE_handler = handler;
+        return old_handler;
       }
     default: /* System defined signal */
       return signal (sig, handler);
@@ -90,7 +90,7 @@ sigismember (const sigset_t *set, int sig)
     {
       #ifdef SIGABRT_COMPAT
       if (sig == SIGABRT_COMPAT)
-	sig = SIGABRT;
+        sig = SIGABRT;
       #endif
 
       return (*set >> sig) & 1;
@@ -113,7 +113,7 @@ sigaddset (sigset_t *set, int sig)
     {
       #ifdef SIGABRT_COMPAT
       if (sig == SIGABRT_COMPAT)
-	sig = SIGABRT;
+        sig = SIGABRT;
       #endif
 
       *set |= 1U << sig;
@@ -133,7 +133,7 @@ sigdelset (sigset_t *set, int sig)
     {
       #ifdef SIGABRT_COMPAT
       if (sig == SIGABRT_COMPAT)
-	sig = SIGABRT;
+        sig = SIGABRT;
       #endif
 
       *set &= ~(1U << sig);
@@ -204,60 +204,60 @@ sigprocmask (int operation, const sigset_t *set, sigset_t *old_set)
       sigset_t to_block;
 
       switch (operation)
-	{
-	case SIG_BLOCK:
-	  new_blocked_set = blocked_set | *set;
-	  break;
-	case SIG_SETMASK:
-	  new_blocked_set = *set;
-	  break;
-	case SIG_UNBLOCK:
-	  new_blocked_set = blocked_set & ~*set;
-	  break;
-	default:
-	  errno = EINVAL;
-	  return -1;
-	}
+        {
+        case SIG_BLOCK:
+          new_blocked_set = blocked_set | *set;
+          break;
+        case SIG_SETMASK:
+          new_blocked_set = *set;
+          break;
+        case SIG_UNBLOCK:
+          new_blocked_set = blocked_set & ~*set;
+          break;
+        default:
+          errno = EINVAL;
+          return -1;
+        }
       to_unblock = blocked_set & ~new_blocked_set;
       to_block = new_blocked_set & ~blocked_set;
 
       if (to_block != 0)
-	{
-	  int sig;
+        {
+          int sig;
 
-	  for (sig = 0; sig < NSIG; sig++)
-	    if ((to_block >> sig) & 1)
-	      {
-		pending_array[sig] = 0;
-		if ((old_handlers[sig] = signal (sig, blocked_handler)) != SIG_ERR)
-		  blocked_set |= 1U << sig;
-	      }
-	}
+          for (sig = 0; sig < NSIG; sig++)
+            if ((to_block >> sig) & 1)
+              {
+                pending_array[sig] = 0;
+                if ((old_handlers[sig] = signal (sig, blocked_handler)) != SIG_ERR)
+                  blocked_set |= 1U << sig;
+              }
+        }
 
       if (to_unblock != 0)
-	{
-	  sig_atomic_t received[NSIG];
-	  int sig;
+        {
+          sig_atomic_t received[NSIG];
+          int sig;
 
-	  for (sig = 0; sig < NSIG; sig++)
-	    if ((to_unblock >> sig) & 1)
-	      {
-		if (signal (sig, old_handlers[sig]) != blocked_handler)
-		  /* The application changed a signal handler while the signal
-		     was blocked, bypassing our rpl_signal replacement.
-		     We don't support this.  */
-		  abort ();
-		received[sig] = pending_array[sig];
-		blocked_set &= ~(1U << sig);
-		pending_array[sig] = 0;
-	      }
-	    else
-	      received[sig] = 0;
+          for (sig = 0; sig < NSIG; sig++)
+            if ((to_unblock >> sig) & 1)
+              {
+                if (signal (sig, old_handlers[sig]) != blocked_handler)
+                  /* The application changed a signal handler while the signal
+                     was blocked, bypassing our rpl_signal replacement.
+                     We don't support this.  */
+                  abort ();
+                received[sig] = pending_array[sig];
+                blocked_set &= ~(1U << sig);
+                pending_array[sig] = 0;
+              }
+            else
+              received[sig] = 0;
 
-	  for (sig = 0; sig < NSIG; sig++)
-	    if (received[sig])
-	      raise (sig);
-	}
+          for (sig = 0; sig < NSIG; sig++)
+            if (received[sig])
+              raise (sig);
+        }
     }
   return 0;
 }
@@ -274,26 +274,26 @@ rpl_signal (int sig, handler_t handler)
     {
       #ifdef SIGABRT_COMPAT
       if (sig == SIGABRT_COMPAT)
-	sig = SIGABRT;
+        sig = SIGABRT;
       #endif
 
       if (blocked_set & (1U << sig))
-	{
-	  /* POSIX states that sigprocmask and signal are both
-	     async-signal-safe.  This is not true of our
-	     implementation - there is a slight data race where an
-	     asynchronous interrupt on signal A can occur after we
-	     install blocked_handler but before we have updated
-	     old_handlers for signal B, such that handler A can see
-	     stale information if it calls signal(B).  Oh well -
-	     signal handlers really shouldn't try to manipulate the
-	     installed handlers of unrelated signals.  */
-	  handler_t result = old_handlers[sig];
-	  old_handlers[sig] = handler;
-	  return result;
-	}
+        {
+          /* POSIX states that sigprocmask and signal are both
+             async-signal-safe.  This is not true of our
+             implementation - there is a slight data race where an
+             asynchronous interrupt on signal A can occur after we
+             install blocked_handler but before we have updated
+             old_handlers for signal B, such that handler A can see
+             stale information if it calls signal(B).  Oh well -
+             signal handlers really shouldn't try to manipulate the
+             installed handlers of unrelated signals.  */
+          handler_t result = old_handlers[sig];
+          old_handlers[sig] = handler;
+          return result;
+        }
       else
-	return signal (sig, handler);
+        return signal (sig, handler);
     }
   else
     {
@@ -312,15 +312,15 @@ rpl_raise (int sig)
     {
     case SIGPIPE:
       if (blocked_set & (1U << sig))
-	pending_array[sig] = 1;
+        pending_array[sig] = 1;
       else
-	{
-	  handler_t handler = SIGPIPE_handler;
-	  if (handler == SIG_DFL)
-	    exit (128 + SIGPIPE);
-	  else if (handler != SIG_IGN)
-	    (*handler) (sig);
-	}
+        {
+          handler_t handler = SIGPIPE_handler;
+          if (handler == SIG_DFL)
+            exit (128 + SIGPIPE);
+          else if (handler != SIG_IGN)
+            (*handler) (sig);
+        }
       return 0;
     default: /* System defined signal */
       return raise (sig);

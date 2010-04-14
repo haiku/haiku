@@ -1,5 +1,5 @@
 /* Iterating through multibyte strings: macros for multi-byte encodings.
-   Copyright (C) 2001, 2005, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2005, 2007, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -77,13 +77,13 @@
 
    Here are the function prototypes of the macros.
 
-   extern void		mbui_init (mbui_iterator_t iter, const char *startptr);
-   extern bool		mbui_avail (mbui_iterator_t iter);
-   extern void		mbui_advance (mbui_iterator_t iter);
-   extern mbchar_t	mbui_cur (mbui_iterator_t iter);
-   extern const char *	mbui_cur_ptr (mbui_iterator_t iter);
-   extern void		mbui_reloc (mbui_iterator_t iter, ptrdiff_t ptrdiff);
-   extern void		mbui_copy (mbui_iterator_t *new, const mbui_iterator_t *old);
+   extern void          mbui_init (mbui_iterator_t iter, const char *startptr);
+   extern bool          mbui_avail (mbui_iterator_t iter);
+   extern void          mbui_advance (mbui_iterator_t iter);
+   extern mbchar_t      mbui_cur (mbui_iterator_t iter);
+   extern const char *  mbui_cur_ptr (mbui_iterator_t iter);
+   extern void          mbui_reloc (mbui_iterator_t iter, ptrdiff_t ptrdiff);
+   extern void          mbui_copy (mbui_iterator_t *new, const mbui_iterator_t *old);
  */
 
 #ifndef _MBUITER_H
@@ -108,16 +108,16 @@
 
 struct mbuiter_multi
 {
-  bool in_shift;	/* true if next byte may not be interpreted as ASCII */
-  mbstate_t state;	/* if in_shift: current shift state */
-  bool next_done;	/* true if mbui_avail has already filled the following */
-  struct mbchar cur;	/* the current character:
-	const char *cur.ptr		pointer to current character
-	The following are only valid after mbui_avail.
-	size_t cur.bytes		number of bytes of current character
-	bool cur.wc_valid		true if wc is a valid wide character
-	wchar_t cur.wc			if wc_valid: the current character
-	*/
+  bool in_shift;        /* true if next byte may not be interpreted as ASCII */
+  mbstate_t state;      /* if in_shift: current shift state */
+  bool next_done;       /* true if mbui_avail has already filled the following */
+  struct mbchar cur;    /* the current character:
+        const char *cur.ptr             pointer to current character
+        The following are only valid after mbui_avail.
+        size_t cur.bytes                number of bytes of current character
+        bool cur.wc_valid               true if wc is a valid wide character
+        wchar_t cur.wc                  if wc_valid: the current character
+        */
 };
 
 static inline void
@@ -131,8 +131,8 @@ mbuiter_multi_next (struct mbuiter_multi *iter)
   if (is_basic (*iter->cur.ptr))
     {
       /* These characters are part of the basic character set.  ISO C 99
-	 guarantees that their wide character code is identical to their
-	 char code.  */
+         guarantees that their wide character code is identical to their
+         char code.  */
       iter->cur.bytes = 1;
       iter->cur.wc = *iter->cur.ptr;
       iter->cur.wc_valid = true;
@@ -143,40 +143,40 @@ mbuiter_multi_next (struct mbuiter_multi *iter)
       iter->in_shift = true;
     with_shift:
       iter->cur.bytes = mbrtowc (&iter->cur.wc, iter->cur.ptr,
-				 strnlen1 (iter->cur.ptr, MB_CUR_MAX),
-				 &iter->state);
+                                 strnlen1 (iter->cur.ptr, MB_CUR_MAX),
+                                 &iter->state);
       if (iter->cur.bytes == (size_t) -1)
-	{
-	  /* An invalid multibyte sequence was encountered.  */
-	  iter->cur.bytes = 1;
-	  iter->cur.wc_valid = false;
-	  /* Whether to set iter->in_shift = false and reset iter->state
-	     or not is not very important; the string is bogus anyway.  */
-	}
+        {
+          /* An invalid multibyte sequence was encountered.  */
+          iter->cur.bytes = 1;
+          iter->cur.wc_valid = false;
+          /* Whether to set iter->in_shift = false and reset iter->state
+             or not is not very important; the string is bogus anyway.  */
+        }
       else if (iter->cur.bytes == (size_t) -2)
-	{
-	  /* An incomplete multibyte character at the end.  */
-	  iter->cur.bytes = strlen (iter->cur.ptr);
-	  iter->cur.wc_valid = false;
-	  /* Whether to set iter->in_shift = false and reset iter->state
-	     or not is not important; the string end is reached anyway.  */
-	}
+        {
+          /* An incomplete multibyte character at the end.  */
+          iter->cur.bytes = strlen (iter->cur.ptr);
+          iter->cur.wc_valid = false;
+          /* Whether to set iter->in_shift = false and reset iter->state
+             or not is not important; the string end is reached anyway.  */
+        }
       else
-	{
-	  if (iter->cur.bytes == 0)
-	    {
-	      /* A null wide character was encountered.  */
-	      iter->cur.bytes = 1;
-	      assert (*iter->cur.ptr == '\0');
-	      assert (iter->cur.wc == 0);
-	    }
-	  iter->cur.wc_valid = true;
+        {
+          if (iter->cur.bytes == 0)
+            {
+              /* A null wide character was encountered.  */
+              iter->cur.bytes = 1;
+              assert (*iter->cur.ptr == '\0');
+              assert (iter->cur.wc == 0);
+            }
+          iter->cur.wc_valid = true;
 
-	  /* When in the initial state, we can go back treating ASCII
-	     characters more quickly.  */
-	  if (mbsinit (&iter->state))
-	    iter->in_shift = false;
-	}
+          /* When in the initial state, we can go back treating ASCII
+             characters more quickly.  */
+          if (mbsinit (&iter->state))
+            iter->in_shift = false;
+        }
     }
   iter->next_done = true;
 }

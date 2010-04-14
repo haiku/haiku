@@ -22,6 +22,7 @@ StaticLibrary libfetish.a :
 	backupfile.c
 	base64.c
 	basename.c
+	basename-lgpl.c
 	buffer-lcm.c
 	c-strcasecmp.c
 	c-strtod.c
@@ -40,6 +41,7 @@ StaticLibrary libfetish.a :
 	diacrit.c
 	dirchownmod.c
 	dirname.c
+	dirname-lgpl.c
 	dup-safer.c
 #	dup2.c
 	error.c
@@ -51,6 +53,7 @@ StaticLibrary libfetish.a :
 	fchmodat.c
 	fchownat.c
 #	fchown-stub.c
+	fcntl.c
 	fd-reopen.c
 	fd-safer.c
 	file-has-acl.c
@@ -59,14 +62,17 @@ StaticLibrary libfetish.a :
 #	fileblocks.c
 	filemode.c
 	filenamecat.c
+	filenamecat-lgpl.c
 	filevercmp.c
 	fnmatch.c
+	fopen.c
 	fopen-safer.c
 	fpending.c
 	fprintftime.c
 	freadahead.c
 	freadptr.c
 	freadseek.c
+	freopen-safer.c
 #	fsusage.c
 #	ftruncate.c
 	fts.c
@@ -133,11 +139,14 @@ StaticLibrary libfetish.a :
 	modechange.c
 #	mountlist.c
 	nanosleep.c
+	nproc.c
 #	obstack.c
 	offtostr.c
+	open.c
 	open-safer.c
 	openat-die.c
 	openat-proc.c
+	openat-safer.c
 	openat.c
 	opendir-safer.c
 	physmem.c
@@ -158,7 +167,6 @@ StaticLibrary libfetish.a :
 	readtokens0.c
 #	realloc.c
 #	regex.c
-	rename-dest-slash.c
 	rename.c
 	root-dev-ino.c
 #	rmdir.c
@@ -196,7 +204,6 @@ StaticLibrary libfetish.a :
 #	strtoul.c
 #	strtoull.c
 #	strtoumax.c
-	strverscmp.c
 #	tempname.c
 	time_r.c
 	trim.c
@@ -205,7 +212,6 @@ StaticLibrary libfetish.a :
 	uinttostr.c
 	umaxtostr.c
 	unicodeio.c
-	unlinkdir.c
 	unsetenv.c
 	userspec.c
 #	utime.c

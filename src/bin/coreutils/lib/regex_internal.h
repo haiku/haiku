@@ -2,8 +2,8 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-   Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free
+   Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
@@ -31,9 +31,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _LIBC
-# include <langinfo.h>
-#else
+#include <langinfo.h>
+#ifndef _LIBC
 # include "localcharset.h"
 #endif
 #if defined HAVE_LOCALE_H || defined _LIBC
@@ -829,7 +828,8 @@ re_string_wchar_at (const re_string_t *pstr, Idx idx)
 
 static int
 internal_function __attribute ((pure))
-re_string_elem_size_at (const re_string_t *pstr, Idx idx)
+re_string_elem_size_at (const re_string_t *pstr _UNUSED_PARAMETER_,
+			Idx idx _UNUSED_PARAMETER_)
 {
 # ifdef _LIBC
   const unsigned char *p, *extra;

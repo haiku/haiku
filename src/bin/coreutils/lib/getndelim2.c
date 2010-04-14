@@ -1,8 +1,8 @@
 /* getndelim2 - Read a line from a stream, stopping at one of 2 delimiters,
    with bounded memory allocation.
 
-   Copyright (C) 1993, 1996, 1997, 1998, 2000, 2003, 2004, 2006, 2008 Free
-   Software Foundation, Inc.
+   Copyright (C) 1993, 1996, 1997, 1998, 2000, 2003, 2004, 2006, 2008, 2009,
+   2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -71,8 +71,8 @@ ssize_t
 getndelim2 (char **lineptr, size_t *linesize, size_t offset, size_t nmax,
             int delim1, int delim2, FILE *stream)
 {
-  size_t nbytes_avail;		/* Allocated but unused bytes in *LINEPTR.  */
-  char *read_pos;		/* Where we're reading into *LINEPTR. */
+  size_t nbytes_avail;          /* Allocated but unused bytes in *LINEPTR.  */
+  char *read_pos;               /* Where we're reading into *LINEPTR. */
   ssize_t bytes_stored = -1;
   char *ptr = *lineptr;
   size_t size = *linesize;
@@ -83,7 +83,7 @@ getndelim2 (char **lineptr, size_t *linesize, size_t offset, size_t nmax,
       size = nmax < MIN_CHUNK ? nmax : MIN_CHUNK;
       ptr = malloc (size);
       if (!ptr)
-	return -1;
+        return -1;
     }
 
   if (size < offset)
@@ -107,7 +107,7 @@ getndelim2 (char **lineptr, size_t *linesize, size_t offset, size_t nmax,
   do
     {
       /* Here always ptr + size == read_pos + nbytes_avail.
-	 Also nbytes_avail > 0 || size < nmax.  */
+         Also nbytes_avail > 0 || size < nmax.  */
 
       int c IF_LINT (= 0);
       const char *buffer;
@@ -115,89 +115,89 @@ getndelim2 (char **lineptr, size_t *linesize, size_t offset, size_t nmax,
 
       buffer = freadptr (stream, &buffer_len);
       if (buffer)
-	{
-	  if (delim1 != EOF)
-	    {
-	      const char *end = memchr2 (buffer, delim1, delim2, buffer_len);
-	      if (end)
-		{
-		  buffer_len = end - buffer + 1;
-		  found_delimiter = true;
-		}
-	    }
-	}
+        {
+          if (delim1 != EOF)
+            {
+              const char *end = memchr2 (buffer, delim1, delim2, buffer_len);
+              if (end)
+                {
+                  buffer_len = end - buffer + 1;
+                  found_delimiter = true;
+                }
+            }
+        }
       else
-	{
-	  c = getc (stream);
-	  if (c == EOF)
-	    {
-	      /* Return partial line, if any.  */
-	      if (read_pos == ptr)
-		goto unlock_done;
-	      else
-		break;
-	    }
-	  if (c == delim1 || c == delim2)
-	    found_delimiter = true;
-	  buffer_len = 1;
-	}
+        {
+          c = getc (stream);
+          if (c == EOF)
+            {
+              /* Return partial line, if any.  */
+              if (read_pos == ptr)
+                goto unlock_done;
+              else
+                break;
+            }
+          if (c == delim1 || c == delim2)
+            found_delimiter = true;
+          buffer_len = 1;
+        }
 
       /* We always want at least one byte left in the buffer, since we
-	 always (unless we get an error while reading the first byte)
-	 NUL-terminate the line buffer.  */
+         always (unless we get an error while reading the first byte)
+         NUL-terminate the line buffer.  */
 
       if (nbytes_avail < buffer_len + 1 && size < nmax)
-	{
-	  /* Grow size proportionally, not linearly, to avoid O(n^2)
-	     running time.  */
-	  size_t newsize = size < MIN_CHUNK ? size + MIN_CHUNK : 2 * size;
-	  char *newptr;
+        {
+          /* Grow size proportionally, not linearly, to avoid O(n^2)
+             running time.  */
+          size_t newsize = size < MIN_CHUNK ? size + MIN_CHUNK : 2 * size;
+          char *newptr;
 
-	  /* Increase newsize so that it becomes
-	     >= (read_pos - ptr) + buffer_len.  */
-	  if (newsize - (read_pos - ptr) < buffer_len + 1)
-	    newsize = (read_pos - ptr) + buffer_len + 1;
-	  /* Respect nmax.  This handles possible integer overflow.  */
-	  if (! (size < newsize && newsize <= nmax))
-	    newsize = nmax;
+          /* Increase newsize so that it becomes
+             >= (read_pos - ptr) + buffer_len.  */
+          if (newsize - (read_pos - ptr) < buffer_len + 1)
+            newsize = (read_pos - ptr) + buffer_len + 1;
+          /* Respect nmax.  This handles possible integer overflow.  */
+          if (! (size < newsize && newsize <= nmax))
+            newsize = nmax;
 
-	  if (GETNDELIM2_MAXIMUM < newsize - offset)
-	    {
-	      size_t newsizemax = offset + GETNDELIM2_MAXIMUM + 1;
-	      if (size == newsizemax)
-		goto unlock_done;
-	      newsize = newsizemax;
-	    }
+          if (GETNDELIM2_MAXIMUM < newsize - offset)
+            {
+              size_t newsizemax = offset + GETNDELIM2_MAXIMUM + 1;
+              if (size == newsizemax)
+                goto unlock_done;
+              newsize = newsizemax;
+            }
 
-	  nbytes_avail = newsize - (read_pos - ptr);
-	  newptr = realloc (ptr, newsize);
-	  if (!newptr)
-	    goto unlock_done;
-	  ptr = newptr;
-	  size = newsize;
-	  read_pos = size - nbytes_avail + ptr;
-	}
+          nbytes_avail = newsize - (read_pos - ptr);
+          newptr = realloc (ptr, newsize);
+          if (!newptr)
+            goto unlock_done;
+          ptr = newptr;
+          size = newsize;
+          read_pos = size - nbytes_avail + ptr;
+        }
 
       /* Here, if size < nmax, nbytes_avail >= buffer_len + 1.
-	 If size == nmax, nbytes_avail > 0.  */
+         If size == nmax, nbytes_avail > 0.  */
 
       if (1 < nbytes_avail)
-	{
-	  size_t copy_len = nbytes_avail - 1;
-	  if (buffer_len < copy_len)
-	    copy_len = buffer_len;
-	  if (buffer)
-	    memcpy (read_pos, buffer, copy_len);
-	  else
-	    *read_pos = c;
-	  read_pos += copy_len;
-	  nbytes_avail -= copy_len;
-	}
+        {
+          size_t copy_len = nbytes_avail - 1;
+          if (buffer_len < copy_len)
+            copy_len = buffer_len;
+          if (buffer)
+            memcpy (read_pos, buffer, copy_len);
+          else
+            *read_pos = c;
+          read_pos += copy_len;
+          nbytes_avail -= copy_len;
+        }
 
       /* Here still nbytes_avail > 0.  */
 
       if (buffer && freadseek (stream, buffer_len))
-	goto unlock_done;
+        goto unlock_done;
     }
   while (!found_delimiter);
 

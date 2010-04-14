@@ -1,4 +1,4 @@
-/* Copyright (C) 1992,1995-1999,2000-2002,2005-2008 Free Software Foundation, Inc.
+/* Copyright (C) 1992, 1995-2002, 2005-2010 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,10 @@
 
 #include <config.h>
 
+/* Don't use __attribute__ __nonnull__ in this compilation unit.  Otherwise gcc
+   optimizes away the name == NULL test below.  */
+#define _GL_ARG_NONNULL(params)
+
 /* Specification.  */
 #include <stdlib.h>
 
@@ -28,15 +32,15 @@
 #include <unistd.h>
 
 #if !_LIBC
-# define __environ	environ
+# define __environ      environ
 #endif
 
 #if _LIBC
 /* This lock protects against simultaneous modifications of `environ'.  */
 # include <bits/libc-lock.h>
 __libc_lock_define_initialized (static, envlock)
-# define LOCK	__libc_lock_lock (envlock)
-# define UNLOCK	__libc_lock_unlock (envlock)
+# define LOCK   __libc_lock_lock (envlock)
+# define UNLOCK __libc_lock_unlock (envlock)
 #else
 # define LOCK
 # define UNLOCK
@@ -47,6 +51,7 @@ __libc_lock_define_initialized (static, envlock)
 # define unsetenv __unsetenv
 #endif
 
+#if _LIBC || !HAVE_UNSETENV
 
 int
 unsetenv (const char *name)
@@ -68,13 +73,13 @@ unsetenv (const char *name)
   while (*ep != NULL)
     if (!strncmp (*ep, name, len) && (*ep)[len] == '=')
       {
-	/* Found it.  Remove this pointer by moving later ones back.  */
-	char **dp = ep;
+        /* Found it.  Remove this pointer by moving later ones back.  */
+        char **dp = ep;
 
-	do
-	  dp[0] = dp[1];
-	while (*dp++);
-	/* Continue the loop in case NAME appears again.  */
+        do
+          dp[0] = dp[1];
+        while (*dp++);
+        /* Continue the loop in case NAME appears again.  */
       }
     else
       ++ep;
@@ -88,3 +93,28 @@ unsetenv (const char *name)
 # undef unsetenv
 weak_alias (__unsetenv, unsetenv)
 #endif
+
+#else /* HAVE_UNSETENV */
+
+# undef unsetenv
+
+/* Call the underlying unsetenv, in case there is hidden bookkeeping
+   that needs updating beyond just modifying environ.  */
+int
+rpl_unsetenv (const char *name)
+{
+  int result = 0;
+  if (!name || !*name || strchr (name, '='))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+  while (getenv (name))
+# if !VOID_UNSETENV
+    result =
+# endif
+      unsetenv (name);
+  return result;
+}
+
+#endif /* HAVE_UNSETENV */

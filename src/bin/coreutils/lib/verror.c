@@ -1,5 +1,5 @@
 /* va_list error handler for noninteractive utilities
-   Copyright (C) 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -59,8 +59,8 @@ verror_at_line (int status, int errnum, const char *file,
   if (message)
     {
       /* Until http://sourceware.org/bugzilla/show_bug.cgi?id=2997 is fixed,
-	 glibc violates GNU Coding Standards when the file argument to
-	 error_at_line is NULL.  */
+         glibc violates GNU Coding Standards when the file argument to
+         error_at_line is NULL.  */
       if (file)
         error_at_line (status, errnum, file, line_number, "%s", message);
       else

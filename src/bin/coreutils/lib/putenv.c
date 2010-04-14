@@ -1,5 +1,5 @@
-/* Copyright (C) 1991, 1994, 1997-1998, 2000, 2003-2008
-   Free Software Foundation, Inc.
+/* Copyright (C) 1991, 1994, 1997-1998, 2000, 2003-2010 Free Software
+   Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C
    Library.  Bugs can be reported to bug-glibc@prep.ai.mit.edu.
@@ -44,8 +44,8 @@ extern char **environ;
 /* This lock protects against simultaneous modifications of `environ'.  */
 # include <bits/libc-lock.h>
 __libc_lock_define_initialized (static, envlock)
-# define LOCK	__libc_lock_lock (envlock)
-# define UNLOCK	__libc_lock_unlock (envlock)
+# define LOCK   __libc_lock_lock (envlock)
+# define UNLOCK __libc_lock_unlock (envlock)
 #else
 # define LOCK
 # define UNLOCK
@@ -71,13 +71,13 @@ _unsetenv (const char *name)
   while (*ep != NULL)
     if (!strncmp (*ep, name, len) && (*ep)[len] == '=')
       {
-	/* Found it.  Remove this pointer by moving later ones back.  */
-	char **dp = ep;
+        /* Found it.  Remove this pointer by moving later ones back.  */
+        char **dp = ep;
 
-	do
-	  dp[0] = dp[1];
-	while (*dp++);
-	/* Continue the loop in case NAME appears again.  */
+        do
+          dp[0] = dp[1];
+        while (*dp++);
+        /* Continue the loop in case NAME appears again.  */
       }
     else
       ++ep;
@@ -106,7 +106,7 @@ putenv (char *string)
   size = 0;
   for (ep = environ; *ep != NULL; ++ep)
     if (!strncmp (*ep, string, name_end - string) &&
-	(*ep)[name_end - string] == '=')
+        (*ep)[name_end - string] == '=')
       break;
     else
       ++size;
@@ -116,9 +116,9 @@ putenv (char *string)
       static char **last_environ = NULL;
       char **new_environ = (char **) malloc ((size + 2) * sizeof (char *));
       if (new_environ == NULL)
-	return -1;
+        return -1;
       (void) memcpy ((void *) new_environ, (void *) environ,
-		     size * sizeof (char *));
+                     size * sizeof (char *));
       new_environ[size] = (char *) string;
       new_environ[size + 1] = NULL;
       free (last_environ);

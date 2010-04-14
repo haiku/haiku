@@ -1,6 +1,6 @@
 /* Save and restore the working directory, possibly using a child process.
 
-   Copyright (C) 2006, 2007, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,38 +45,38 @@ savewd_save (struct savewd *wd)
     case INITIAL_STATE:
       /* Save the working directory, or prepare to fall back if possible.  */
       {
-	int fd = open_safer (".", O_RDONLY);
-	if (0 <= fd)
-	  {
-	    wd->state = FD_STATE;
-	    wd->val.fd = fd;
-	    break;
-	  }
-	if (errno != EACCES && errno != ESTALE)
-	  {
-	    wd->state = ERROR_STATE;
-	    wd->val.errnum = errno;
-	    break;
-	  }
+        int fd = open_safer (".", O_RDONLY);
+        if (0 <= fd)
+          {
+            wd->state = FD_STATE;
+            wd->val.fd = fd;
+            break;
+          }
+        if (errno != EACCES && errno != ESTALE)
+          {
+            wd->state = ERROR_STATE;
+            wd->val.errnum = errno;
+            break;
+          }
       }
       wd->state = FORKING_STATE;
       wd->val.child = -1;
       /* Fall through.  */
     case FORKING_STATE:
       if (wd->val.child < 0)
-	{
-	  /* "Save" the initial working directory by forking a new
-	     subprocess that will attempt all the work from the chdir
-	     until until the next savewd_restore.  */
-	  wd->val.child = fork ();
-	  if (wd->val.child != 0)
-	    {
-	      if (0 < wd->val.child)
-		return true;
-	      wd->state = ERROR_STATE;
-	      wd->val.errnum = errno;
-	    }
-	}
+        {
+          /* "Save" the initial working directory by forking a new
+             subprocess that will attempt all the work from the chdir
+             until until the next savewd_restore.  */
+          wd->val.child = fork ();
+          if (wd->val.child != 0)
+            {
+              if (0 < wd->val.child)
+                return true;
+              wd->state = ERROR_STATE;
+              wd->val.errnum = errno;
+            }
+        }
       break;
 
     case FD_STATE:
@@ -94,7 +94,7 @@ savewd_save (struct savewd *wd)
 
 int
 savewd_chdir (struct savewd *wd, char const *dir, int options,
-	      int open_result[2])
+              int open_result[2])
 {
   int fd = -1;
   int result = 0;
@@ -105,50 +105,50 @@ savewd_chdir (struct savewd *wd, char const *dir, int options,
       || (options & (HAVE_WORKING_O_NOFOLLOW ? SAVEWD_CHDIR_NOFOLLOW : 0)))
     {
       fd = open (dir,
-		 (O_RDONLY | O_DIRECTORY | O_NOCTTY | O_NONBLOCK
-		  | (options & SAVEWD_CHDIR_NOFOLLOW ? O_NOFOLLOW : 0)));
+                 (O_RDONLY | O_DIRECTORY | O_NOCTTY | O_NONBLOCK
+                  | (options & SAVEWD_CHDIR_NOFOLLOW ? O_NOFOLLOW : 0)));
 
       if (open_result)
-	{
-	  open_result[0] = fd;
-	  open_result[1] = errno;
-	}
+        {
+          open_result[0] = fd;
+          open_result[1] = errno;
+        }
 
       if (fd < 0 && (errno != EACCES || (options & SAVEWD_CHDIR_READABLE)))
-	result = -1;
+        result = -1;
     }
 
   if (result == 0 && ! (0 <= fd && options & SAVEWD_CHDIR_SKIP_READABLE))
     {
       if (savewd_save (wd))
-	{
-	  open_result = NULL;
-	  result = -2;
-	}
+        {
+          open_result = NULL;
+          result = -2;
+        }
       else
-	{
-	  result = (fd < 0 ? chdir (dir) : fchdir (fd));
+        {
+          result = (fd < 0 ? chdir (dir) : fchdir (fd));
 
-	  if (result == 0)
-	    switch (wd->state)
-	      {
-	      case FD_STATE:
-		wd->state = FD_POST_CHDIR_STATE;
-		break;
+          if (result == 0)
+            switch (wd->state)
+              {
+              case FD_STATE:
+                wd->state = FD_POST_CHDIR_STATE;
+                break;
 
-	      case ERROR_STATE:
-	      case FD_POST_CHDIR_STATE:
-	      case FINAL_STATE:
-		break;
+              case ERROR_STATE:
+              case FD_POST_CHDIR_STATE:
+              case FINAL_STATE:
+                break;
 
-	      case FORKING_STATE:
-		assert (wd->val.child == 0);
-		break;
+              case FORKING_STATE:
+                assert (wd->val.child == 0);
+                break;
 
-	      default:
-		assert (false);
-	      }
-	}
+              default:
+                assert (false);
+              }
+        }
     }
 
   if (0 <= fd && ! open_result)
@@ -169,23 +169,23 @@ savewd_restore (struct savewd *wd, int status)
     case INITIAL_STATE:
     case FD_STATE:
       /* The working directory is the desired directory, so there's no
-	 work to do.  */
+         work to do.  */
       break;
 
     case FD_POST_CHDIR_STATE:
       /* Restore the working directory using fchdir.  */
       if (fchdir (wd->val.fd) == 0)
-	{
-	  wd->state = FD_STATE;
-	  break;
-	}
+        {
+          wd->state = FD_STATE;
+          break;
+        }
       else
-	{
-	  int chdir_errno = errno;
-	  close (wd->val.fd);
-	  wd->state = ERROR_STATE;
-	  wd->val.errnum = chdir_errno;
-	}
+        {
+          int chdir_errno = errno;
+          close (wd->val.fd);
+          wd->state = ERROR_STATE;
+          wd->val.errnum = chdir_errno;
+        }
       /* Fall through.  */
     case ERROR_STATE:
       /* Report an error if asked to restore the working directory.  */
@@ -194,21 +194,21 @@ savewd_restore (struct savewd *wd, int status)
 
     case FORKING_STATE:
       /* "Restore" the working directory by waiting for the subprocess
-	 to finish.  */
+         to finish.  */
       {
-	pid_t child = wd->val.child;
-	if (child == 0)
-	  _exit (status);
-	if (0 < child)
-	  {
-	    int child_status;
-	    while (waitpid (child, &child_status, 0) < 0)
-	      assert (errno == EINTR);
-	    wd->val.child = -1;
-	    if (! WIFEXITED (child_status))
-	      raise (WTERMSIG (child_status));
-	    return WEXITSTATUS (child_status);
-	  }
+        pid_t child = wd->val.child;
+        if (child == 0)
+          _exit (status);
+        if (0 < child)
+          {
+            int child_status;
+            while (waitpid (child, &child_status, 0) < 0)
+              assert (errno == EINTR);
+            wd->val.child = -1;
+            if (! WIFEXITED (child_status))
+              raise (WTERMSIG (child_status));
+            return WEXITSTATUS (child_status);
+          }
       }
       break;
 
@@ -262,8 +262,8 @@ savewd_delegating (struct savewd const *wd)
 
 int
 savewd_process_files (int n_files, char **file,
-		      int (*act) (char *, struct savewd *, void *),
-		      void *options)
+                      int (*act) (char *, struct savewd *, void *),
+                      void *options)
 {
   int i = 0;
   int last_relative;
@@ -278,18 +278,18 @@ savewd_process_files (int n_files, char **file,
   for (; i < last_relative; i++)
     {
       if (! savewd_delegating (&wd))
-	{
-	  int s = act (file[i], &wd, options);
-	  if (exit_status < s)
-	    exit_status = s;
-	}
+        {
+          int s = act (file[i], &wd, options);
+          if (exit_status < s)
+            exit_status = s;
+        }
 
       if (! IS_ABSOLUTE_FILE_NAME (file[i + 1]))
-	{
-	  int r = savewd_restore (&wd, exit_status);
-	  if (exit_status < r)
-	    exit_status = r;
-	}
+        {
+          int r = savewd_restore (&wd, exit_status);
+          if (exit_status < r)
+            exit_status = r;
+        }
     }
 
   savewd_finish (&wd);
@@ -298,7 +298,7 @@ savewd_process_files (int n_files, char **file,
     {
       int s = act (file[i], &wd, options);
       if (exit_status < s)
-	exit_status = s;
+        exit_status = s;
     }
 
   return exit_status;

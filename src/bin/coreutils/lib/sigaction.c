@@ -1,5 +1,5 @@
 /* POSIX compatible signal blocking.
-   Copyright (C) 2008 Free Software Foundation, Inc.
+   Copyright (C) 2008, 2009, 2010 Free Software Foundation, Inc.
    Written by Eric Blake <ebb9@byu.net>, 2008.
 
    This program is free software: you can redistribute it and/or modify
@@ -91,7 +91,7 @@ sigaction_handler (int sig)
     {
       /* Unexpected situation; be careful to avoid recursive abort.  */
       if (sig == SIGABRT)
-	signal (SIGABRT, SIG_DFL);
+        signal (SIGABRT, SIG_DFL);
       abort ();
     }
 

@@ -1,6 +1,6 @@
 /* mountlist.c -- return a list of mounted file systems
 
-   Copyright (C) 1991, 1992, 1997-2009 Free Software Foundation, Inc.
+   Copyright (C) 1991-1992, 1997-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,10 +37,10 @@
 # include <sys/param.h>
 #endif
 
-#if defined MOUNTED_GETFSSTAT	/* OSF_1 and Darwin1.3.x */
+#if defined MOUNTED_GETFSSTAT   /* OSF_1 and Darwin1.3.x */
 # if HAVE_SYS_UCRED_H
 #  include <grp.h> /* needed on OSF V4.0 for definition of NGROUPS,
-		      NGROUPS is used as an array dimension in ucred.h */
+                      NGROUPS is used as an array dimension in ucred.h */
 #  include <sys/ucred.h> /* needed by powerpc-apple-darwin1.3.7 */
 # endif
 # if HAVE_SYS_MOUNT_H
@@ -56,44 +56,44 @@
 # endif
 #endif /* MOUNTED_GETFSSTAT */
 
-#ifdef MOUNTED_GETMNTENT1	/* 4.3BSD, SunOS, HP-UX, Dynix, Irix.  */
+#ifdef MOUNTED_GETMNTENT1       /* 4.3BSD, SunOS, HP-UX, Dynix, Irix.  */
 # include <mntent.h>
 # if !defined MOUNTED
-#  if defined _PATH_MOUNTED	/* GNU libc  */
+#  if defined _PATH_MOUNTED     /* GNU libc  */
 #   define MOUNTED _PATH_MOUNTED
 #  endif
-#  if defined MNT_MNTTAB	/* HP-UX.  */
+#  if defined MNT_MNTTAB        /* HP-UX.  */
 #   define MOUNTED MNT_MNTTAB
 #  endif
-#  if defined MNTTABNAME	/* Dynix.  */
+#  if defined MNTTABNAME        /* Dynix.  */
 #   define MOUNTED MNTTABNAME
 #  endif
 # endif
 #endif
 
-#ifdef MOUNTED_GETMNTINFO	/* 4.4BSD.  */
+#ifdef MOUNTED_GETMNTINFO       /* 4.4BSD.  */
 # include <sys/mount.h>
 #endif
 
-#ifdef MOUNTED_GETMNTINFO2	/* NetBSD 3.0.  */
+#ifdef MOUNTED_GETMNTINFO2      /* NetBSD 3.0.  */
 # include <sys/statvfs.h>
 #endif
 
-#ifdef MOUNTED_GETMNT		/* Ultrix.  */
+#ifdef MOUNTED_GETMNT           /* Ultrix.  */
 # include <sys/mount.h>
 # include <sys/fs_types.h>
 #endif
 
-#ifdef MOUNTED_FS_STAT_DEV	/* BeOS.  */
+#ifdef MOUNTED_FS_STAT_DEV      /* BeOS.  */
 # include <fs_info.h>
 # include <dirent.h>
 #endif
 
-#ifdef MOUNTED_FREAD		/* SVR2.  */
+#ifdef MOUNTED_FREAD            /* SVR2.  */
 # include <mnttab.h>
 #endif
 
-#ifdef MOUNTED_FREAD_FSTYP	/* SVR3.  */
+#ifdef MOUNTED_FREAD_FSTYP      /* SVR3.  */
 # include <mnttab.h>
 # include <sys/fstyp.h>
 # include <sys/statfs.h>
@@ -103,11 +103,11 @@
 # include <mntent.h>
 #endif
 
-#ifdef MOUNTED_GETMNTENT2	/* SVR4.  */
+#ifdef MOUNTED_GETMNTENT2       /* SVR4.  */
 # include <sys/mnttab.h>
 #endif
 
-#ifdef MOUNTED_VMOUNT		/* AIX.  */
+#ifdef MOUNTED_VMOUNT           /* AIX.  */
 # include <fshelp.h>
 # include <sys/vfs.h>
 #endif
@@ -145,26 +145,26 @@
 #undef closedir
 
 #ifndef ME_DUMMY
-# define ME_DUMMY(Fs_name, Fs_type)		\
-    (strcmp (Fs_type, "autofs") == 0		\
-     || strcmp (Fs_type, "none") == 0		\
-     || strcmp (Fs_type, "proc") == 0		\
-     || strcmp (Fs_type, "subfs") == 0		\
-     /* for NetBSD 3.0 */			\
-     || strcmp (Fs_type, "kernfs") == 0		\
-     /* for Irix 6.5 */				\
+# define ME_DUMMY(Fs_name, Fs_type)             \
+    (strcmp (Fs_type, "autofs") == 0            \
+     || strcmp (Fs_type, "none") == 0           \
+     || strcmp (Fs_type, "proc") == 0           \
+     || strcmp (Fs_type, "subfs") == 0          \
+     /* for NetBSD 3.0 */                       \
+     || strcmp (Fs_type, "kernfs") == 0         \
+     /* for Irix 6.5 */                         \
      || strcmp (Fs_type, "ignore") == 0)
 #endif
 
 #ifndef ME_REMOTE
 /* A file system is `remote' if its Fs_name contains a `:'
    or if (it is of type (smbfs or cifs) and its Fs_name starts with `//').  */
-# define ME_REMOTE(Fs_name, Fs_type)		\
-    (strchr (Fs_name, ':') != NULL		\
-     || ((Fs_name)[0] == '/'			\
-	 && (Fs_name)[1] == '/'			\
-	 && (strcmp (Fs_type, "smbfs") == 0	\
-	     || strcmp (Fs_type, "cifs") == 0)))
+# define ME_REMOTE(Fs_name, Fs_type)            \
+    (strchr (Fs_name, ':') != NULL              \
+     || ((Fs_name)[0] == '/'                    \
+         && (Fs_name)[1] == '/'                 \
+         && (strcmp (Fs_type, "smbfs") == 0     \
+             || strcmp (Fs_type, "cifs") == 0)))
 #endif
 
 #if MOUNTED_GETMNTINFO
@@ -277,7 +277,7 @@ fsp_to_string (const struct statfs *fsp)
 
 #endif /* MOUNTED_GETMNTINFO */
 
-#ifdef MOUNTED_VMOUNT		/* AIX.  */
+#ifdef MOUNTED_VMOUNT           /* AIX.  */
 static char *
 fstype_to_string (int t)
 {
@@ -315,10 +315,10 @@ dev_from_mount_options (char const *mount_options)
       errno = 0;
       dev = strtoul (optval, &optvalend, 16);
       if (optval != optvalend
-	  && (*optvalend == '\0' || *optvalend == ',')
-	  && ! (dev == ULONG_MAX && errno == ERANGE)
-	  && dev == (dev_t) dev)
-	return dev;
+          && (*optvalend == '\0' || *optvalend == ',')
+          && ! (dev == ULONG_MAX && errno == ERANGE)
+          && dev == (dev_t) dev)
+        return dev;
     }
 
 # endif
@@ -383,18 +383,18 @@ read_file_system_list (bool need_fs_type)
 
     while ((mnt = getmntent (fp)))
       {
-	me = xmalloc (sizeof *me);
-	me->me_devname = xstrdup (mnt->mnt_fsname);
-	me->me_mountdir = xstrdup (mnt->mnt_dir);
-	me->me_type = xstrdup (mnt->mnt_type);
-	me->me_type_malloced = 1;
-	me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
-	me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
-	me->me_dev = dev_from_mount_options (mnt->mnt_opts);
+        me = xmalloc (sizeof *me);
+        me->me_devname = xstrdup (mnt->mnt_fsname);
+        me->me_mountdir = xstrdup (mnt->mnt_dir);
+        me->me_type = xstrdup (mnt->mnt_type);
+        me->me_type_malloced = 1;
+        me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
+        me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
+        me->me_dev = dev_from_mount_options (mnt->mnt_opts);
 
-	/* Add to the linked list. */
-	*mtail = me;
-	mtail = &me->me_next;
+        /* Add to the linked list. */
+        *mtail = me;
+        mtail = &me->me_next;
       }
 
     if (endmntent (fp) == 0)
@@ -402,7 +402,7 @@ read_file_system_list (bool need_fs_type)
   }
 #endif /* MOUNTED_GETMNTENT1. */
 
-#ifdef MOUNTED_GETMNTINFO	/* 4.4BSD.  */
+#ifdef MOUNTED_GETMNTINFO       /* 4.4BSD.  */
   {
     struct statfs *fsp;
     int entries;
@@ -412,25 +412,25 @@ read_file_system_list (bool need_fs_type)
       return NULL;
     for (; entries-- > 0; fsp++)
       {
-	char *fs_type = fsp_to_string (fsp);
+        char *fs_type = fsp_to_string (fsp);
 
-	me = xmalloc (sizeof *me);
-	me->me_devname = xstrdup (fsp->f_mntfromname);
-	me->me_mountdir = xstrdup (fsp->f_mntonname);
-	me->me_type = fs_type;
-	me->me_type_malloced = 0;
-	me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
-	me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
-	me->me_dev = (dev_t) -1;	/* Magic; means not known yet. */
+        me = xmalloc (sizeof *me);
+        me->me_devname = xstrdup (fsp->f_mntfromname);
+        me->me_mountdir = xstrdup (fsp->f_mntonname);
+        me->me_type = fs_type;
+        me->me_type_malloced = 0;
+        me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
+        me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
+        me->me_dev = (dev_t) -1;        /* Magic; means not known yet. */
 
-	/* Add to the linked list. */
-	*mtail = me;
-	mtail = &me->me_next;
+        /* Add to the linked list. */
+        *mtail = me;
+        mtail = &me->me_next;
       }
   }
 #endif /* MOUNTED_GETMNTINFO */
 
-#ifdef MOUNTED_GETMNTINFO2	/* NetBSD 3.0.  */
+#ifdef MOUNTED_GETMNTINFO2      /* NetBSD 3.0.  */
   {
     struct statvfs *fsp;
     int entries;
@@ -440,44 +440,44 @@ read_file_system_list (bool need_fs_type)
       return NULL;
     for (; entries-- > 0; fsp++)
       {
-	me = xmalloc (sizeof *me);
-	me->me_devname = xstrdup (fsp->f_mntfromname);
-	me->me_mountdir = xstrdup (fsp->f_mntonname);
-	me->me_type = xstrdup (fsp->f_fstypename);
-	me->me_type_malloced = 1;
-	me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
-	me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
-	me->me_dev = (dev_t) -1;	/* Magic; means not known yet. */
+        me = xmalloc (sizeof *me);
+        me->me_devname = xstrdup (fsp->f_mntfromname);
+        me->me_mountdir = xstrdup (fsp->f_mntonname);
+        me->me_type = xstrdup (fsp->f_fstypename);
+        me->me_type_malloced = 1;
+        me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
+        me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
+        me->me_dev = (dev_t) -1;        /* Magic; means not known yet. */
 
-	/* Add to the linked list. */
-	*mtail = me;
-	mtail = &me->me_next;
+        /* Add to the linked list. */
+        *mtail = me;
+        mtail = &me->me_next;
       }
   }
 #endif /* MOUNTED_GETMNTINFO2 */
 
-#ifdef MOUNTED_GETMNT		/* Ultrix.  */
+#ifdef MOUNTED_GETMNT           /* Ultrix.  */
   {
     int offset = 0;
     int val;
     struct fs_data fsd;
 
     while (errno = 0,
-	   0 < (val = getmnt (&offset, &fsd, sizeof (fsd), NOSTAT_MANY,
-			      (char *) 0)))
+           0 < (val = getmnt (&offset, &fsd, sizeof (fsd), NOSTAT_MANY,
+                              (char *) 0)))
       {
-	me = xmalloc (sizeof *me);
-	me->me_devname = xstrdup (fsd.fd_req.devname);
-	me->me_mountdir = xstrdup (fsd.fd_req.path);
-	me->me_type = gt_names[fsd.fd_req.fstype];
-	me->me_type_malloced = 0;
-	me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
-	me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
-	me->me_dev = fsd.fd_req.dev;
+        me = xmalloc (sizeof *me);
+        me->me_devname = xstrdup (fsd.fd_req.devname);
+        me->me_mountdir = xstrdup (fsd.fd_req.path);
+        me->me_type = gt_names[fsd.fd_req.fstype];
+        me->me_type_malloced = 0;
+        me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
+        me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
+        me->me_dev = fsd.fd_req.dev;
 
-	/* Add to the linked list. */
-	*mtail = me;
-	mtail = &me->me_next;
+        /* Add to the linked list. */
+        *mtail = me;
+        mtail = &me->me_next;
       }
     if (val < 0)
       goto free_then_fail;
@@ -537,7 +537,7 @@ read_file_system_list (bool need_fs_type)
 
             if (lstat (name, &statbuf) >= 0 && S_ISDIR (statbuf.st_mode))
               {
-		struct rootdir_entry *re = xmalloc (sizeof *re);
+                struct rootdir_entry *re = xmalloc (sizeof *re);
                 re->name = name;
                 re->dev = statbuf.st_dev;
                 re->ino = statbuf.st_ino;
@@ -563,11 +563,11 @@ read_file_system_list (bool need_fs_type)
             if (re->dev == fi.dev && re->ino == fi.root)
               break;
 
-	  me = xmalloc (sizeof *me);
+          me = xmalloc (sizeof *me);
           me->me_devname = xstrdup (fi.device_name[0] != '\0' ? fi.device_name : fi.fsh_name);
           me->me_mountdir = xstrdup (re != NULL ? re->name : fi.fsh_name);
           me->me_type = xstrdup (fi.fsh_name);
-	  me->me_type_malloced = 1;
+          me->me_type_malloced = 1;
           me->me_dev = fi.dev;
           me->me_dummy = 0;
           me->me_remote = (fi.flags & B_FS_IS_SHARED) != 0;
@@ -588,7 +588,7 @@ read_file_system_list (bool need_fs_type)
   }
 #endif /* MOUNTED_FS_STAT_DEV */
 
-#if defined MOUNTED_GETFSSTAT	/* __alpha running OSF_1 */
+#if defined MOUNTED_GETFSSTAT   /* __alpha running OSF_1 */
   {
     int numsys, counter;
     size_t bufsize;
@@ -606,24 +606,24 @@ read_file_system_list (bool need_fs_type)
 
     if (numsys < 0)
       {
-	free (stats);
-	return (NULL);
+        free (stats);
+        return (NULL);
       }
 
     for (counter = 0; counter < numsys; counter++)
       {
-	me = xmalloc (sizeof *me);
-	me->me_devname = xstrdup (stats[counter].f_mntfromname);
-	me->me_mountdir = xstrdup (stats[counter].f_mntonname);
-	me->me_type = xstrdup (FS_TYPE (stats[counter]));
-	me->me_type_malloced = 1;
-	me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
-	me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
-	me->me_dev = (dev_t) -1;	/* Magic; means not known yet. */
+        me = xmalloc (sizeof *me);
+        me->me_devname = xstrdup (stats[counter].f_mntfromname);
+        me->me_mountdir = xstrdup (stats[counter].f_mntonname);
+        me->me_type = xstrdup (FS_TYPE (stats[counter]));
+        me->me_type_malloced = 1;
+        me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
+        me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
+        me->me_dev = (dev_t) -1;        /* Magic; means not known yet. */
 
-	/* Add to the linked list. */
-	*mtail = me;
-	mtail = &me->me_next;
+        /* Add to the linked list. */
+        *mtail = me;
+        mtail = &me->me_next;
       }
 
     free (stats);
@@ -642,47 +642,47 @@ read_file_system_list (bool need_fs_type)
 
     while (fread (&mnt, sizeof mnt, 1, fp) > 0)
       {
-	me = xmalloc (sizeof *me);
-# ifdef GETFSTYP			/* SVR3.  */
-	me->me_devname = xstrdup (mnt.mt_dev);
+        me = xmalloc (sizeof *me);
+# ifdef GETFSTYP                        /* SVR3.  */
+        me->me_devname = xstrdup (mnt.mt_dev);
 # else
-	me->me_devname = xmalloc (strlen (mnt.mt_dev) + 6);
-	strcpy (me->me_devname, "/dev/");
-	strcpy (me->me_devname + 5, mnt.mt_dev);
+        me->me_devname = xmalloc (strlen (mnt.mt_dev) + 6);
+        strcpy (me->me_devname, "/dev/");
+        strcpy (me->me_devname + 5, mnt.mt_dev);
 # endif
-	me->me_mountdir = xstrdup (mnt.mt_filsys);
-	me->me_dev = (dev_t) -1;	/* Magic; means not known yet. */
-	me->me_type = "";
-	me->me_type_malloced = 0;
-# ifdef GETFSTYP			/* SVR3.  */
-	if (need_fs_type)
-	  {
-	    struct statfs fsd;
-	    char typebuf[FSTYPSZ];
+        me->me_mountdir = xstrdup (mnt.mt_filsys);
+        me->me_dev = (dev_t) -1;        /* Magic; means not known yet. */
+        me->me_type = "";
+        me->me_type_malloced = 0;
+# ifdef GETFSTYP                        /* SVR3.  */
+        if (need_fs_type)
+          {
+            struct statfs fsd;
+            char typebuf[FSTYPSZ];
 
-	    if (statfs (me->me_mountdir, &fsd, sizeof fsd, 0) != -1
-		&& sysfs (GETFSTYP, fsd.f_fstyp, typebuf) != -1)
-	      {
-		me->me_type = xstrdup (typebuf);
-		me->me_type_malloced = 1;
-	      }
-	  }
+            if (statfs (me->me_mountdir, &fsd, sizeof fsd, 0) != -1
+                && sysfs (GETFSTYP, fsd.f_fstyp, typebuf) != -1)
+              {
+                me->me_type = xstrdup (typebuf);
+                me->me_type_malloced = 1;
+              }
+          }
 # endif
-	me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
-	me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
+        me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
+        me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
 
-	/* Add to the linked list. */
-	*mtail = me;
-	mtail = &me->me_next;
+        /* Add to the linked list. */
+        *mtail = me;
+        mtail = &me->me_next;
       }
 
     if (ferror (fp))
       {
-	/* The last fread() call must have failed.  */
-	int saved_errno = errno;
-	fclose (fp);
-	errno = saved_errno;
-	goto free_then_fail;
+        /* The last fread() call must have failed.  */
+        int saved_errno = errno;
+        fclose (fp);
+        errno = saved_errno;
+        goto free_then_fail;
       }
 
     if (fclose (fp) == EOF)
@@ -690,29 +690,29 @@ read_file_system_list (bool need_fs_type)
   }
 #endif /* MOUNTED_FREAD || MOUNTED_FREAD_FSTYP.  */
 
-#ifdef MOUNTED_GETMNTTBL	/* DolphinOS goes its own way.  */
+#ifdef MOUNTED_GETMNTTBL        /* DolphinOS goes its own way.  */
   {
     struct mntent **mnttbl = getmnttbl (), **ent;
     for (ent=mnttbl;*ent;ent++)
       {
-	me = xmalloc (sizeof *me);
-	me->me_devname = xstrdup ( (*ent)->mt_resource);
-	me->me_mountdir = xstrdup ( (*ent)->mt_directory);
-	me->me_type = xstrdup ((*ent)->mt_fstype);
-	me->me_type_malloced = 1;
-	me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
-	me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
-	me->me_dev = (dev_t) -1;	/* Magic; means not known yet. */
+        me = xmalloc (sizeof *me);
+        me->me_devname = xstrdup ( (*ent)->mt_resource);
+        me->me_mountdir = xstrdup ( (*ent)->mt_directory);
+        me->me_type = xstrdup ((*ent)->mt_fstype);
+        me->me_type_malloced = 1;
+        me->me_dummy = ME_DUMMY (me->me_devname, me->me_type);
+        me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
+        me->me_dev = (dev_t) -1;        /* Magic; means not known yet. */
 
-	/* Add to the linked list. */
-	*mtail = me;
-	mtail = &me->me_next;
+        /* Add to the linked list. */
+        *mtail = me;
+        mtail = &me->me_next;
       }
     endmnttbl ();
   }
 #endif
 
-#ifdef MOUNTED_GETMNTENT2	/* SVR4.  */
+#ifdef MOUNTED_GETMNTENT2       /* SVR4.  */
   {
     struct mnttab mnt;
     char *table = MNTTAB;
@@ -731,19 +731,19 @@ read_file_system_list (bool need_fs_type)
     lockfd = open (MNTTAB_LOCK, O_RDONLY);
     if (0 <= lockfd)
       {
-	struct flock flock;
-	flock.l_type = F_RDLCK;
-	flock.l_whence = SEEK_SET;
-	flock.l_start = 0;
-	flock.l_len = 0;
-	while (fcntl (lockfd, F_SETLKW, &flock) == -1)
-	  if (errno != EINTR)
-	    {
-	      int saved_errno = errno;
-	      close (lockfd);
-	      errno = saved_errno;
-	      return NULL;
-	    }
+        struct flock flock;
+        flock.l_type = F_RDLCK;
+        flock.l_whence = SEEK_SET;
+        flock.l_start = 0;
+        flock.l_len = 0;
+        while (fcntl (lockfd, F_SETLKW, &flock) == -1)
+          if (errno != EINTR)
+            {
+              int saved_errno = errno;
+              close (lockfd);
+              errno = saved_errno;
+              return NULL;
+            }
       }
     else if (errno != ENOENT)
       return NULL;
@@ -755,23 +755,23 @@ read_file_system_list (bool need_fs_type)
       ret = errno;
     else
       {
-	while ((ret = getmntent (fp, &mnt)) == 0)
-	  {
-	    me = xmalloc (sizeof *me);
-	    me->me_devname = xstrdup (mnt.mnt_special);
-	    me->me_mountdir = xstrdup (mnt.mnt_mountp);
-	    me->me_type = xstrdup (mnt.mnt_fstype);
-	    me->me_type_malloced = 1;
-	    me->me_dummy = MNT_IGNORE (&mnt) != 0;
-	    me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
-	    me->me_dev = dev_from_mount_options (mnt.mnt_mntopts);
+        while ((ret = getmntent (fp, &mnt)) == 0)
+          {
+            me = xmalloc (sizeof *me);
+            me->me_devname = xstrdup (mnt.mnt_special);
+            me->me_mountdir = xstrdup (mnt.mnt_mountp);
+            me->me_type = xstrdup (mnt.mnt_fstype);
+            me->me_type_malloced = 1;
+            me->me_dummy = MNT_IGNORE (&mnt) != 0;
+            me->me_remote = ME_REMOTE (me->me_devname, me->me_type);
+            me->me_dev = dev_from_mount_options (mnt.mnt_mntopts);
 
-	    /* Add to the linked list. */
-	    *mtail = me;
-	    mtail = &me->me_next;
-	  }
+            /* Add to the linked list. */
+            *mtail = me;
+            mtail = &me->me_next;
+          }
 
-	ret = fclose (fp) == EOF ? errno : 0 < ret ? 0 : -1;
+        ret = fclose (fp) == EOF ? errno : 0 < ret ? 0 : -1;
       }
 
     if (0 <= lockfd && close (lockfd) != 0)
@@ -779,13 +779,13 @@ read_file_system_list (bool need_fs_type)
 
     if (0 <= ret)
       {
-	errno = ret;
-	goto free_then_fail;
+        errno = ret;
+        goto free_then_fail;
       }
   }
 #endif /* MOUNTED_GETMNTENT2.  */
 
-#ifdef MOUNTED_VMOUNT		/* AIX.  */
+#ifdef MOUNTED_VMOUNT           /* AIX.  */
   {
     int bufsize;
     char *entries, *thisent;
@@ -802,53 +802,53 @@ read_file_system_list (bool need_fs_type)
     n_entries = mntctl (MCTL_QUERY, bufsize, (struct vmount *) entries);
     if (n_entries < 0)
       {
-	int saved_errno = errno;
-	free (entries);
-	errno = saved_errno;
-	return NULL;
+        int saved_errno = errno;
+        free (entries);
+        errno = saved_errno;
+        return NULL;
       }
 
     for (i = 0, thisent = entries;
-	 i < n_entries;
-	 i++, thisent += vmp->vmt_length)
+         i < n_entries;
+         i++, thisent += vmp->vmt_length)
       {
-	char *options, *ignore;
+        char *options, *ignore;
 
-	vmp = (struct vmount *) thisent;
-	me = xmalloc (sizeof *me);
-	if (vmp->vmt_flags & MNT_REMOTE)
-	  {
-	    char *host, *dir;
+        vmp = (struct vmount *) thisent;
+        me = xmalloc (sizeof *me);
+        if (vmp->vmt_flags & MNT_REMOTE)
+          {
+            char *host, *dir;
 
-	    me->me_remote = 1;
-	    /* Prepend the remote dirname.  */
-	    host = thisent + vmp->vmt_data[VMT_HOSTNAME].vmt_off;
-	    dir = thisent + vmp->vmt_data[VMT_OBJECT].vmt_off;
-	    me->me_devname = xmalloc (strlen (host) + strlen (dir) + 2);
-	    strcpy (me->me_devname, host);
-	    strcat (me->me_devname, ":");
-	    strcat (me->me_devname, dir);
-	  }
-	else
-	  {
-	    me->me_remote = 0;
-	    me->me_devname = xstrdup (thisent +
-				      vmp->vmt_data[VMT_OBJECT].vmt_off);
-	  }
-	me->me_mountdir = xstrdup (thisent + vmp->vmt_data[VMT_STUB].vmt_off);
-	me->me_type = xstrdup (fstype_to_string (vmp->vmt_gfstype));
-	me->me_type_malloced = 1;
-	options = thisent + vmp->vmt_data[VMT_ARGS].vmt_off;
-	ignore = strstr (options, "ignore");
-	me->me_dummy = (ignore
-			&& (ignore == options || ignore[-1] == ',')
-			&& (ignore[sizeof "ignore" - 1] == ','
-			    || ignore[sizeof "ignore" - 1] == '\0'));
-	me->me_dev = (dev_t) -1; /* vmt_fsid might be the info we want.  */
+            me->me_remote = 1;
+            /* Prepend the remote dirname.  */
+            host = thisent + vmp->vmt_data[VMT_HOSTNAME].vmt_off;
+            dir = thisent + vmp->vmt_data[VMT_OBJECT].vmt_off;
+            me->me_devname = xmalloc (strlen (host) + strlen (dir) + 2);
+            strcpy (me->me_devname, host);
+            strcat (me->me_devname, ":");
+            strcat (me->me_devname, dir);
+          }
+        else
+          {
+            me->me_remote = 0;
+            me->me_devname = xstrdup (thisent +
+                                      vmp->vmt_data[VMT_OBJECT].vmt_off);
+          }
+        me->me_mountdir = xstrdup (thisent + vmp->vmt_data[VMT_STUB].vmt_off);
+        me->me_type = xstrdup (fstype_to_string (vmp->vmt_gfstype));
+        me->me_type_malloced = 1;
+        options = thisent + vmp->vmt_data[VMT_ARGS].vmt_off;
+        ignore = strstr (options, "ignore");
+        me->me_dummy = (ignore
+                        && (ignore == options || ignore[-1] == ',')
+                        && (ignore[sizeof "ignore" - 1] == ','
+                            || ignore[sizeof "ignore" - 1] == '\0'));
+        me->me_dev = (dev_t) -1; /* vmt_fsid might be the info we want.  */
 
-	/* Add to the linked list. */
-	*mtail = me;
-	mtail = &me->me_next;
+        /* Add to the linked list. */
+        *mtail = me;
+        mtail = &me->me_next;
       }
     free (entries);
   }
@@ -865,13 +865,13 @@ read_file_system_list (bool need_fs_type)
 
     while (mount_list)
       {
-	me = mount_list->me_next;
-	free (mount_list->me_devname);
-	free (mount_list->me_mountdir);
-	if (mount_list->me_type_malloced)
-	  free (mount_list->me_type);
-	free (mount_list);
-	mount_list = me;
+        me = mount_list->me_next;
+        free (mount_list->me_devname);
+        free (mount_list->me_mountdir);
+        if (mount_list->me_type_malloced)
+          free (mount_list->me_type);
+        free (mount_list);
+        mount_list = me;
       }
 
     errno = saved_errno;

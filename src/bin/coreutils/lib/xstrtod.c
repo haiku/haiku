@@ -1,7 +1,7 @@
 /* error-checking interface to strtod-like functions
 
-   Copyright (C) 1996, 1999, 2000, 2003, 2004, 2005, 2006 Free
-   Software Foundation, Inc.
+   Copyright (C) 1996, 1999-2000, 2003-2006, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@
 
 bool
 XSTRTOD (char const *str, char const **ptr, DOUBLE *result,
-	 DOUBLE (*convert) (char const *, char **))
+         DOUBLE (*convert) (char const *, char **))
 {
   DOUBLE val;
   char *terminator;
@@ -58,9 +58,9 @@ XSTRTOD (char const *str, char const **ptr, DOUBLE *result,
   else
     {
       /* Allow underflow (in which case CONVERT returns zero),
-	 but flag overflow as an error. */
+         but flag overflow as an error. */
       if (val != 0 && errno == ERANGE)
-	ok = false;
+        ok = false;
     }
 
   if (ptr != NULL)

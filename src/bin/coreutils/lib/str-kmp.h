@@ -3,7 +3,7 @@
 #line 1
 /* Substring search in a NUL terminated string of 'char' elements,
    using the Knuth-Morris-Pratt algorithm.
-   Copyright (C) 2005-2008 Free Software Foundation, Inc.
+   Copyright (C) 2005-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2005.
 
    This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@
    Return false if it was aborted because not enough memory was available.  */
 static bool
 knuth_morris_pratt_unibyte (const char *haystack, const char *needle,
-			    const char **resultp)
+                            const char **resultp)
 {
   size_t m = strlen (needle);
 
@@ -65,46 +65,46 @@ knuth_morris_pratt_unibyte (const char *haystack, const char *needle,
 
     for (i = 2; i < m; i++)
       {
-	/* Here: j = i-1 - table[i-1].
-	   The inequality needle[x..i-1] != needle[0..i-1-x] is known to hold
-	   for x < table[i-1], by induction.
-	   Furthermore, if j>0: needle[i-1-j..i-2] = needle[0..j-1].  */
-	unsigned char b = CANON_ELEMENT ((unsigned char) needle[i - 1]);
+        /* Here: j = i-1 - table[i-1].
+           The inequality needle[x..i-1] != needle[0..i-1-x] is known to hold
+           for x < table[i-1], by induction.
+           Furthermore, if j>0: needle[i-1-j..i-2] = needle[0..j-1].  */
+        unsigned char b = CANON_ELEMENT ((unsigned char) needle[i - 1]);
 
-	for (;;)
-	  {
-	    /* Invariants: The inequality needle[x..i-1] != needle[0..i-1-x]
-	       is known to hold for x < i-1-j.
-	       Furthermore, if j>0: needle[i-1-j..i-2] = needle[0..j-1].  */
-	    if (b == CANON_ELEMENT ((unsigned char) needle[j]))
-	      {
-		/* Set table[i] := i-1-j.  */
-		table[i] = i - ++j;
-		break;
-	      }
-	    /* The inequality needle[x..i-1] != needle[0..i-1-x] also holds
-	       for x = i-1-j, because
-	         needle[i-1] != needle[j] = needle[i-1-x].  */
-	    if (j == 0)
-	      {
-		/* The inequality holds for all possible x.  */
-		table[i] = i;
-		break;
-	      }
-	    /* The inequality needle[x..i-1] != needle[0..i-1-x] also holds
-	       for i-1-j < x < i-1-j+table[j], because for these x:
-		 needle[x..i-2]
-		 = needle[x-(i-1-j)..j-1]
-		 != needle[0..j-1-(x-(i-1-j))]  (by definition of table[j])
-		    = needle[0..i-2-x],
-	       hence needle[x..i-1] != needle[0..i-1-x].
-	       Furthermore
-		 needle[i-1-j+table[j]..i-2]
-		 = needle[table[j]..j-1]
-		 = needle[0..j-1-table[j]]  (by definition of table[j]).  */
-	    j = j - table[j];
-	  }
-	/* Here: j = i - table[i].  */
+        for (;;)
+          {
+            /* Invariants: The inequality needle[x..i-1] != needle[0..i-1-x]
+               is known to hold for x < i-1-j.
+               Furthermore, if j>0: needle[i-1-j..i-2] = needle[0..j-1].  */
+            if (b == CANON_ELEMENT ((unsigned char) needle[j]))
+              {
+                /* Set table[i] := i-1-j.  */
+                table[i] = i - ++j;
+                break;
+              }
+            /* The inequality needle[x..i-1] != needle[0..i-1-x] also holds
+               for x = i-1-j, because
+                 needle[i-1] != needle[j] = needle[i-1-x].  */
+            if (j == 0)
+              {
+                /* The inequality holds for all possible x.  */
+                table[i] = i;
+                break;
+              }
+            /* The inequality needle[x..i-1] != needle[0..i-1-x] also holds
+               for i-1-j < x < i-1-j+table[j], because for these x:
+                 needle[x..i-2]
+                 = needle[x-(i-1-j)..j-1]
+                 != needle[0..j-1-(x-(i-1-j))]  (by definition of table[j])
+                    = needle[0..i-2-x],
+               hence needle[x..i-1] != needle[0..i-1-x].
+               Furthermore
+                 needle[i-1-j+table[j]..i-2]
+                 = needle[table[j]..j-1]
+                 = needle[0..j-1-table[j]]  (by definition of table[j]).  */
+            j = j - table[j];
+          }
+        /* Here: j = i - table[i].  */
       }
   }
 
@@ -121,29 +121,29 @@ knuth_morris_pratt_unibyte (const char *haystack, const char *needle,
     /* Invariant: phaystack = rhaystack + j.  */
     while (*phaystack != '\0')
       if (CANON_ELEMENT ((unsigned char) needle[j])
-	  == CANON_ELEMENT ((unsigned char) *phaystack))
-	{
-	  j++;
-	  phaystack++;
-	  if (j == m)
-	    {
-	      /* The entire needle has been found.  */
-	      *resultp = rhaystack;
-	      break;
-	    }
-	}
+          == CANON_ELEMENT ((unsigned char) *phaystack))
+        {
+          j++;
+          phaystack++;
+          if (j == m)
+            {
+              /* The entire needle has been found.  */
+              *resultp = rhaystack;
+              break;
+            }
+        }
       else if (j > 0)
-	{
-	  /* Found a match of needle[0..j-1], mismatch at needle[j].  */
-	  rhaystack += table[j];
-	  j -= table[j];
-	}
+        {
+          /* Found a match of needle[0..j-1], mismatch at needle[j].  */
+          rhaystack += table[j];
+          j -= table[j];
+        }
       else
-	{
-	  /* Found a mismatch at needle[0] already.  */
-	  rhaystack++;
-	  phaystack++;
-	}
+        {
+          /* Found a mismatch at needle[0] already.  */
+          rhaystack++;
+          phaystack++;
+        }
   }
 
   freea (table);

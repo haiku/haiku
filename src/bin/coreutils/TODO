@@ -12,7 +12,6 @@ Modify chmod so that it does not change an inode's st_ctime
   Discussed more recently on <http://bugs.debian.org/497514>.
 
 document the following in coreutils.texi:
-  mktemp
   [
   pinky
 
@@ -59,10 +58,6 @@ See notes in README -- and remove them once there's a work-around.
 Integrate use of sendfile, suggested here:
   http://mail.gnu.org/archive/html/bug-fileutils/2003-03/msg00030.html
 I don't plan to do that, since a few tests demonstrate no significant benefit.
-
-Should printf '\0123' print "\n3"?
-  per report from TAKAI Kousuke on Mar 27
-  http://mail.gnu.org/archive/html/bug-coreutils/2003-03/index.html
 
 printf: consider adapting builtins/printf.def from bash
 
@@ -170,7 +165,7 @@ pr's use of nstrftime can make it malloc a very large (up to SIZE_MAX) buffer
 
 -----
 
-Copyright (C) 2002-2009 Free Software Foundation, Inc.
+Copyright (C) 2002-2010 Free Software Foundation, Inc.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

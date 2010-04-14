@@ -2,7 +2,8 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Case-insensitive string comparison functions in C locale.
-   Copyright (C) 1995-1996, 2001, 2003, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1995-1996, 2001, 2003, 2005, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

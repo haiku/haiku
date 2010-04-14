@@ -1,5 +1,5 @@
 /* Determine the number of screen columns needed for a character.
-   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2007, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ rpl_wcwidth (wchar_t wc)
   if (STREQ (encoding, "UTF-8", 'U', 'T', 'F', '-', '8', 0, 0, 0 ,0))
     {
       /* We assume that in a UTF-8 locale, a wide character is the same as a
-	 Unicode character.  */
+         Unicode character.  */
       return uc_width (wc, encoding);
     }
   else

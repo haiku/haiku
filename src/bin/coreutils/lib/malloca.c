@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Safe automatic memory allocation.
-   Copyright (C) 2003, 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2006-2007, 2009-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software; you can redistribute it and/or modify
@@ -77,21 +77,21 @@ mmalloca (size_t n)
       char *p = (char *) malloc (nplus);
 
       if (p != NULL)
-	{
-	  size_t slot;
+        {
+          size_t slot;
 
-	  p += HEADER_SIZE;
+          p += HEADER_SIZE;
 
-	  /* Put a magic number into the indicator word.  */
-	  ((int *) p)[-1] = MAGIC_NUMBER;
+          /* Put a magic number into the indicator word.  */
+          ((int *) p)[-1] = MAGIC_NUMBER;
 
-	  /* Enter p into the hash table.  */
-	  slot = (unsigned long) p % HASH_TABLE_SIZE;
-	  ((struct header *) (p - HEADER_SIZE))->next = mmalloca_results[slot];
-	  mmalloca_results[slot] = p;
+          /* Enter p into the hash table.  */
+          slot = (unsigned long) p % HASH_TABLE_SIZE;
+          ((struct header *) (p - HEADER_SIZE))->next = mmalloca_results[slot];
+          mmalloca_results[slot] = p;
 
-	  return p;
-	}
+          return p;
+        }
     }
   /* Out of memory.  */
   return NULL;
@@ -112,28 +112,28 @@ freea (void *p)
   if (p != NULL)
     {
       /* Attempt to quickly distinguish the mmalloca() result - which has
-	 a magic indicator word - and the alloca() result - which has an
-	 uninitialized indicator word.  It is for this test that sa_increment
-	 additional bytes are allocated in the alloca() case.  */
+         a magic indicator word - and the alloca() result - which has an
+         uninitialized indicator word.  It is for this test that sa_increment
+         additional bytes are allocated in the alloca() case.  */
       if (((int *) p)[-1] == MAGIC_NUMBER)
-	{
-	  /* Looks like a mmalloca() result.  To see whether it really is one,
-	     perform a lookup in the hash table.  */
-	  size_t slot = (unsigned long) p % HASH_TABLE_SIZE;
-	  void **chain = &mmalloca_results[slot];
-	  for (; *chain != NULL;)
-	    {
-	      if (*chain == p)
-		{
-		  /* Found it.  Remove it from the hash table and free it.  */
-		  char *p_begin = (char *) p - HEADER_SIZE;
-		  *chain = ((struct header *) p_begin)->next;
-		  free (p_begin);
-		  return;
-		}
-	      chain = &((struct header *) ((char *) *chain - HEADER_SIZE))->next;
-	    }
-	}
+        {
+          /* Looks like a mmalloca() result.  To see whether it really is one,
+             perform a lookup in the hash table.  */
+          size_t slot = (unsigned long) p % HASH_TABLE_SIZE;
+          void **chain = &mmalloca_results[slot];
+          for (; *chain != NULL;)
+            {
+              if (*chain == p)
+                {
+                  /* Found it.  Remove it from the hash table and free it.  */
+                  char *p_begin = (char *) p - HEADER_SIZE;
+                  *chain = ((struct header *) p_begin)->next;
+                  free (p_begin);
+                  return;
+                }
+              chain = &((struct header *) ((char *) *chain - HEADER_SIZE))->next;
+            }
+        }
       /* At this point, we know it was not a mmalloca() result.  */
     }
 }

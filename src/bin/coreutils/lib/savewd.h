@@ -1,6 +1,6 @@
 /* Save and restore the working directory, possibly using a subprocess.
 
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,29 +31,29 @@ struct savewd
   enum
     {
       /* This object has been created but does not yet represent
-	 the working directory.  */
+         the working directory.  */
       INITIAL_STATE,
 
       /* val.fd is the original working directory's file descriptor.
-	 It is still the working directory.  */
+         It is still the working directory.  */
       FD_STATE,
 
       /* Like FD_STATE, but the working directory has changed, so
-	 restoring it will require a fchdir.  */
+         restoring it will require a fchdir.  */
       FD_POST_CHDIR_STATE,
 
       /* Fork and let the subprocess do the work.  val.child is 0 in a
-	 child, negative in a childless parent, and the child process
-	 ID in a parent with a child.  */
+         child, negative in a childless parent, and the child process
+         ID in a parent with a child.  */
       FORKING_STATE,
 
       /* A serious problem argues against further efforts.  val.errnum
-	 contains the error number (e.g., EIO).  */
+         contains the error number (e.g., EIO).  */
       ERROR_STATE,
 
       /* savewd_finish has been called, so the application no longer
-	 cares whether the working directory is saved, and there is no
-	 more work to do.  */
+         cares whether the working directory is saved, and there is no
+         more work to do.  */
       FINAL_STATE
     } state;
 
@@ -106,7 +106,7 @@ enum
    Return -2 if a subprocess was spun off to do the real work, -1
    (setting errno) if unsuccessful, 0 if successful.  */
 int savewd_chdir (struct savewd *wd, char const *dir, int options,
-		  int open_result[2]);
+                  int open_result[2]);
 
 /* Restore the working directory from *WD.  STATUS indicates the exit
    status corresponding to the work done since the last save; this is
@@ -142,7 +142,7 @@ void savewd_finish (struct savewd *wd);
    Return the maximum exit status that any call to ACT returned, or
    EXIT_SUCCESS (i.e., 0) if no calls were made.  */
 int savewd_process_files (int n_files, char **file,
-			  int (*act) (char *, struct savewd *, void *),
-			  void *options);
+                          int (*act) (char *, struct savewd *, void *),
+                          void *options);
 
 #endif

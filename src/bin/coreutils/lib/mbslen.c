@@ -1,5 +1,5 @@
 /* Counting the multibyte characters in a string.
-   Copyright (C) 2007-2008 Free Software Foundation, Inc.
+   Copyright (C) 2007-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2007.
 
    This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ mbslen (const char *string)
 
       count = 0;
       for (mbui_init (iter, string); mbui_avail (iter); mbui_advance (iter))
-	count++;
+        count++;
 
       return count;
     }

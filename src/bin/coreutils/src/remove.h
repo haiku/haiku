@@ -1,6 +1,6 @@
 /* Remove directory entries.
 
-   Copyright (C) 1998, 2000, 2002, 2003-2009 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2000, 2002-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ struct rm_options
   /* If true, query the user about whether to remove each file.  */
   enum rm_interactive interactive;
 
+  // FIXME: remove
   /* If true, do not traverse into (or remove) any directory that is
      on a file system (i.e., that has a different device number) other
      than that of the corresponding command line argument.  Note that
@@ -88,7 +89,6 @@ enum RM_status
     }								\
   while (0)
 
-enum RM_status rm (size_t n_files, char const *const *file,
-                   struct rm_options const *x);
+extern enum RM_status rm (char *const *file, struct rm_options const *x);
 
 #endif

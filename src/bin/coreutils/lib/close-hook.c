@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Hook for making the close() function extensible.
-   Copyright (C) 2009 Free Software Foundation, Inc.
+   Copyright (C) 2009, 2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This program is free software: you can redistribute it and/or modify it
@@ -69,7 +69,7 @@ register_close_hook (close_hook_fn hook, struct close_hook *link)
     {
       /* The link is already in use.  */
       if (link->private_fn != hook)
-	abort ();
+        abort ();
     }
 }
 

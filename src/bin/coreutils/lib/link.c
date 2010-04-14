@@ -3,7 +3,7 @@
 #line 1
 /* Emulate link on platforms that lack it, namely native Windows platforms.
 
-   Copyright (C) 2009 Free Software Foundation, Inc.
+   Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,19 +36,19 @@
 
 /* CreateHardLink was introduced only in Windows 2000.  */
 typedef BOOL (WINAPI * CreateHardLinkFuncType) (LPCTSTR lpFileName,
-						LPCTSTR lpExistingFileName,
-						LPSECURITY_ATTRIBUTES lpSecurityAttributes);
+                                                LPCTSTR lpExistingFileName,
+                                                LPSECURITY_ATTRIBUTES lpSecurityAttributes);
 static CreateHardLinkFuncType CreateHardLinkFunc = NULL;
 static BOOL initialized = FALSE;
 
 static void
 initialize (void)
 {
-  HMODULE kernel32 = LoadLibrary ("kernel32.dll");
+  HMODULE kernel32 = GetModuleHandle ("kernel32.dll");
   if (kernel32 != NULL)
     {
       CreateHardLinkFunc =
-	(CreateHardLinkFuncType) GetProcAddress (kernel32, "CreateHardLinkA");
+        (CreateHardLinkFuncType) GetProcAddress (kernel32, "CreateHardLinkA");
     }
   initialized = TRUE;
 }
@@ -106,39 +106,39 @@ link (const char *file1, const char *file2)
        * system. */
       DWORD err = GetLastError ();
       switch (err)
-	{
-	case ERROR_ACCESS_DENIED:
-	  errno = EACCES;
-	  break;
+        {
+        case ERROR_ACCESS_DENIED:
+          errno = EACCES;
+          break;
 
-	case ERROR_INVALID_FUNCTION:	/* fs does not support hard links */
-	  errno = EPERM;
-	  break;
+        case ERROR_INVALID_FUNCTION:    /* fs does not support hard links */
+          errno = EPERM;
+          break;
 
-	case ERROR_NOT_SAME_DEVICE:
-	  errno = EXDEV;
-	  break;
+        case ERROR_NOT_SAME_DEVICE:
+          errno = EXDEV;
+          break;
 
-	case ERROR_PATH_NOT_FOUND:
-	case ERROR_FILE_NOT_FOUND:
-	  errno = ENOENT;
-	  break;
+        case ERROR_PATH_NOT_FOUND:
+        case ERROR_FILE_NOT_FOUND:
+          errno = ENOENT;
+          break;
 
-	case ERROR_INVALID_PARAMETER:
-	  errno = ENAMETOOLONG;
-	  break;
+        case ERROR_INVALID_PARAMETER:
+          errno = ENAMETOOLONG;
+          break;
 
-	case ERROR_TOO_MANY_LINKS:
-	  errno = EMLINK;
-	  break;
+        case ERROR_TOO_MANY_LINKS:
+          errno = EMLINK;
+          break;
 
-	case ERROR_ALREADY_EXISTS:
-	  errno = EEXIST;
-	  break;
+        case ERROR_ALREADY_EXISTS:
+          errno = EEXIST;
+          break;
 
-	default:
-	  errno = EIO;
-	}
+        default:
+          errno = EIO;
+        }
       return -1;
     }
 
@@ -165,11 +165,13 @@ rpl_link (char const *file1, char const *file2)
       || (len2 && file2[len2 - 1] == '/'))
     {
       /* Let link() decide whether hard-linking directories is legal.
-         If stat() fails, link() will probably fail for the same
-         reason; so we only have to worry about successful stat() and
-         non-directory.  */
+         If stat() fails, then link() should fail for the same reason
+         (although on Solaris 9, link("file/","oops") mistakenly
+         succeeds); if stat() succeeds, require a directory.  */
       struct stat st;
-      if (stat (file1, &st) == 0 && !S_ISDIR (st.st_mode))
+      if (stat (file1, &st))
+        return -1;
+      if (!S_ISDIR (st.st_mode))
         {
           errno = ENOTDIR;
           return -1;

@@ -1,5 +1,5 @@
 /* timeout -- run a command with bounded time
-   Copyright (C) 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -72,12 +72,6 @@
 #define PROGRAM_NAME "timeout"
 
 #define AUTHORS proper_name_utf8 ("Padraig Brady", "P\303\241draig Brady")
-
-/* Note ETIMEDOUT is 110 on GNU/Linux systems but this is non standard */
-#define EXIT_TIMEDOUT 124
-
-/* Internal failure.  */
-#define EXIT_CANCELED 125
 
 static int timed_out;
 static int term_signal = SIGTERM;  /* same default as kill command.  */
@@ -153,13 +147,12 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       fputs (_("\n\
-If the command times out, then we exit with status 124,\n\
-otherwise the normal exit status of the command is returned.\n\
-If no signal is specified, the TERM signal is sent. The TERM signal\n\
-will kill processes which do not catch this signal. For other processes,\n\
-it may be necessary to use the KILL (9) signal, since this signal cannot\n\
-be caught.\n"), stdout);
-      emit_bug_reporting_address ();
+If the command times out, then exit with status 124.  Otherwise, exit\n\
+with the status of COMMAND.  If no signal is specified, send the TERM\n\
+signal upon timeout.  The TERM signal kills any process that does not\n\
+block or catch that signal.  For other processes, it may be necessary to\n\
+use the KILL (9) signal, since this signal cannot be caught.\n"), stdout);
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -203,7 +196,7 @@ apply_time_suffix (unsigned long *x, char suffix_char)
 }
 
 static void
-install_signal_handlers (void)
+install_signal_handlers (int sigterm)
 {
   struct sigaction sa;
   sigemptyset(&sa.sa_mask);  /* Allow concurrent calls to handler */
@@ -213,8 +206,9 @@ install_signal_handlers (void)
   sigaction (SIGALRM, &sa, NULL); /* our timeout.  */
   sigaction (SIGINT, &sa, NULL);  /* Ctrl-C at terminal for example.  */
   sigaction (SIGQUIT, &sa, NULL); /* Ctrl-\ at terminal for example.  */
-  sigaction (SIGTERM, &sa, NULL); /* if we're killed, stop monitored proc.  */
   sigaction (SIGHUP, &sa, NULL);  /* terminal closed for example.  */
+  sigaction (SIGTERM, &sa, NULL); /* if we're killed, stop monitored proc.  */
+  sigaction (sigterm, &sa, NULL); /* user specified termination signal.  */
 }
 
 int
@@ -278,9 +272,10 @@ main (int argc, char **argv)
 
   /* Setup handlers before fork() so that we
      handle any signals caused by child, without races.  */
-  install_signal_handlers ();
+  install_signal_handlers (term_signal);
   signal (SIGTTIN, SIG_IGN);    /* don't sTop if background child needs tty.  */
   signal (SIGTTOU, SIG_IGN);    /* don't sTop if background child needs tty.  */
+  signal (SIGCHLD, SIG_DFL);    /* Don't inherit CHLD handling from parent.   */
 
   monitored_pid = fork ();
   if (monitored_pid == -1)

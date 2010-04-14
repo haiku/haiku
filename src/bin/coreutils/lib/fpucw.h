@@ -1,5 +1,5 @@
 /* Manipulating the FPU control word.
-   Copyright (C) 2007-2008 Free Software Foundation, Inc.
+   Copyright (C) 2007-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2007.
 
    This program is free software: you can redistribute it and/or modify
@@ -70,19 +70,19 @@ typedef unsigned short fpucw_t; /* glibc calls this fpu_control_t */
 # define FPU_PC_EXTENDED 0x300  /* glibc calls this _FPU_EXTENDED */
 
 # define GET_FPUCW() \
-  ({ fpucw_t _cw;						\
-     __asm__ __volatile__ ("fnstcw %0" : "=m" (*&_cw));		\
-     _cw;							\
+  ({ fpucw_t _cw;                                               \
+     __asm__ __volatile__ ("fnstcw %0" : "=m" (*&_cw));         \
+     _cw;                                                       \
    })
 # define SET_FPUCW(word) \
-  (void)({ fpucw_t _ncw = (word);				\
-           __asm__ __volatile__ ("fldcw %0" : : "m" (*&_ncw));	\
+  (void)({ fpucw_t _ncw = (word);                               \
+           __asm__ __volatile__ ("fldcw %0" : : "m" (*&_ncw));  \
          })
 
 # define DECL_LONG_DOUBLE_ROUNDING \
   fpucw_t oldcw;
 # define BEGIN_LONG_DOUBLE_ROUNDING() \
-  (void)(oldcw = GET_FPUCW (),					\
+  (void)(oldcw = GET_FPUCW (),                                  \
          SET_FPUCW ((oldcw & ~FPU_PC_MASK) | FPU_PC_EXTENDED))
 # define END_LONG_DOUBLE_ROUNDING() \
   SET_FPUCW (oldcw)

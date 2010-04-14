@@ -1,5 +1,5 @@
 /* system-dependent definitions for coreutils
-   Copyright (C) 1989, 1991-2009 Free Software Foundation, Inc.
+   Copyright (C) 1989, 1991-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -44,16 +44,8 @@ you must include <sys/types.h> before including this file
 
 #include "configmake.h"
 
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif
+#include <sys/time.h>
+#include <time.h>
 
 /* Since major is a function on SVR4, we can't use `ifndef major'.  */
 #if MAJOR_IN_MKDEV
@@ -86,16 +78,8 @@ you must include <sys/types.h> before including this file
 
 #include <errno.h>
 
-/* Some systems don't define the following symbols.  */
-#ifndef EDQUOT
-# define EDQUOT (-1)
-#endif
-#ifndef EISDIR
-# define EISDIR (-1)
-#endif
-#ifndef ENOSYS
-# define ENOSYS (-1)
-#endif
+/* Some systems don't define this; POSIX mentions it but says it is
+   obsolete, so gnulib does not provide it either.  */
 #ifndef ENODATA
 # define ENODATA (-1)
 #endif
@@ -107,8 +91,10 @@ you must include <sys/types.h> before including this file
 /* Exit statuses for programs like 'env' that exec other programs.  */
 enum
 {
-  EXIT_CANNOT_INVOKE = 126,
-  EXIT_ENOENT = 127
+  EXIT_TIMEDOUT = 124, /* Time expired before child completed.  */
+  EXIT_CANCELED = 125, /* Internal error prior to exec attempt.  */
+  EXIT_CANNOT_INVOKE = 126, /* Program located, but not usable.  */
+  EXIT_ENOENT = 127 /* Could not find program to exec.  */
 };
 
 #include "exitfail.h"
@@ -122,13 +108,6 @@ initialize_exit_failure (int status)
 }
 
 #include <fcntl.h>
-
-#ifndef F_OK
-# define F_OK 0
-# define X_OK 1
-# define W_OK 2
-# define R_OK 4
-#endif
 
 #include <dirent.h>
 #ifndef _D_EXACT_NAMLEN
@@ -233,10 +212,6 @@ enum
 
 #include <ctype.h>
 
-#if ! (defined isblank || HAVE_DECL_ISBLANK)
-# define isblank(c) ((c) == ' ' || (c) == '\t')
-#endif
-
 /* ISDIGIT differs from isdigit, as follows:
    - Its arg may be any int or unsigned int; it need not be an unsigned char
      or EOF.
@@ -278,30 +253,6 @@ select_plural (uintmax_t n)
 }
 
 #define STREQ(a, b) (strcmp (a, b) == 0)
-
-#if !HAVE_DECL_FREE
-void free ();
-#endif
-
-#if !HAVE_DECL_MALLOC
-char *malloc ();
-#endif
-
-#if !HAVE_DECL_MEMCHR
-char *memchr ();
-#endif
-
-#if !HAVE_DECL_REALLOC
-char *realloc ();
-#endif
-
-#if !HAVE_DECL_GETENV
-char *getenv ();
-#endif
-
-#if !HAVE_DECL_LSEEK
-off_t lseek ();
-#endif
 
 #if !HAVE_DECL_GETLOGIN
 char *getlogin ();
@@ -547,10 +498,6 @@ enum
   while (0)
 #endif
 
-#ifndef EOVERFLOW
-# define EOVERFLOW EINVAL
-#endif
-
 #if ! HAVE_SYNC
 # define sync() /* empty */
 #endif
@@ -635,10 +582,10 @@ Otherwise, units default to 1024 bytes (or 512 if POSIXLY_CORRECT is set).\n\
 "), program);
 }
 
-#include "hard-locale.h"
 static inline void
-emit_bug_reporting_address (void)
+emit_ancillary_info (void)
 {
+  const char *lc_messages;
   printf (_("\nReport %s bugs to %s\n"), last_component (program_name),
           PACKAGE_BUGREPORT);
   /* FIXME 2010: use AC_PACKAGE_URL once we require autoconf-2.64 */
@@ -646,8 +593,10 @@ emit_bug_reporting_address (void)
           PACKAGE_NAME, PACKAGE);
   fputs (_("General help using GNU software: <http://www.gnu.org/gethelp/>\n"),
          stdout);
-
-  if (hard_locale (LC_MESSAGES))
+  /* Don't output this redundant message for English locales.
+     Note we still output for 'C' so that it gets included in the man page.  */
+  lc_messages = setlocale (LC_MESSAGES, NULL);
+  if (lc_messages && strncmp (lc_messages, "en_", 3))
     {
       /* TRANSLATORS: Replace LANG_CODE in this URL with your language code
          <http://translationproject.org/team/LANG_CODE.html> to form one of
@@ -657,6 +606,8 @@ emit_bug_reporting_address (void)
                 "<http://translationproject.org/team/>\n"),
                 last_component (program_name));
     }
+  printf (_("For complete documentation, run: "
+            "info coreutils '%s invocation'\n"), last_component (program_name));
 }
 
 #include "inttostr.h"
@@ -721,6 +672,18 @@ io_blksize (struct stat sb)
 }
 
 void usage (int status) ATTRIBUTE_NORETURN;
+
+#define emit_cycle_warning(file_name)	\
+  do					\
+    {					\
+      error (0, 0, _("\
+WARNING: Circular directory structure.\n\
+This almost certainly means that you have a corrupted file system.\n\
+NOTIFY YOUR SYSTEM MANAGER.\n\
+The following directory is part of the cycle:\n  %s\n"), \
+             quote (file_name));	\
+    }					\
+  while (0)
 
 #ifndef ARRAY_CARDINALITY
 # define ARRAY_CARDINALITY(Array) (sizeof (Array) / sizeof *(Array))

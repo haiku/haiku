@@ -1,7 +1,7 @@
 /* exclude.h -- declarations for excluding file names
 
-   Copyright (C) 1992, 1993, 1994, 1997, 1999, 2001, 2002, 2003, 2005,
-   2006, 2009 Free Software Foundation, Inc.
+   Copyright (C) 1992, 1993, 1994, 1997, 1999, 2001, 2002, 2003, 2005, 2006,
+   2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,6 +15,11 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+
+#ifndef _GL_EXCLUDE_H
+#define _GL_EXCLUDE_H 1
+
+#include <stdbool.h>
 
 /* Written by Paul Eggert <eggert@twinsun.com>
    and Sergey Poznyakoff <gray@gnu.org> */
@@ -40,6 +45,8 @@ struct exclude *new_exclude (void);
 void free_exclude (struct exclude *);
 void add_exclude (struct exclude *, char const *, int);
 int add_exclude_file (void (*) (struct exclude *, char const *, int),
-		      struct exclude *, char const *, int, char);
+                      struct exclude *, char const *, int, char);
 bool excluded_file_name (struct exclude const *, char const *);
 bool exclude_fnmatch (char const *pattern, char const *f, int options);
+
+#endif /* _GL_EXCLUDE_H */

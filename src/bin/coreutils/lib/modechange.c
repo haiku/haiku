@@ -1,7 +1,7 @@
 /* modechange.c -- file mode manipulation
 
-   Copyright (C) 1989, 1990, 1997, 1998, 1999, 2001, 2003, 2004, 2005,
-   2006 Free Software Foundation, Inc.
+   Copyright (C) 1989-1990, 1997-1999, 2001, 2003-2006, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -56,22 +56,22 @@ octal_to_mode (unsigned int octal)
   /* Help the compiler optimize the usual case where mode_t uses
      the traditional octal representation.  */
   return ((S_ISUID == SUID && S_ISGID == SGID && S_ISVTX == SVTX
-	   && S_IRUSR == RUSR && S_IWUSR == WUSR && S_IXUSR == XUSR
-	   && S_IRGRP == RGRP && S_IWGRP == WGRP && S_IXGRP == XGRP
-	   && S_IROTH == ROTH && S_IWOTH == WOTH && S_IXOTH == XOTH)
-	  ? octal
-	  : (mode_t) ((octal & SUID ? S_ISUID : 0)
-		      | (octal & SGID ? S_ISGID : 0)
-		      | (octal & SVTX ? S_ISVTX : 0)
-		      | (octal & RUSR ? S_IRUSR : 0)
-		      | (octal & WUSR ? S_IWUSR : 0)
-		      | (octal & XUSR ? S_IXUSR : 0)
-		      | (octal & RGRP ? S_IRGRP : 0)
-		      | (octal & WGRP ? S_IWGRP : 0)
-		      | (octal & XGRP ? S_IXGRP : 0)
-		      | (octal & ROTH ? S_IROTH : 0)
-		      | (octal & WOTH ? S_IWOTH : 0)
-		      | (octal & XOTH ? S_IXOTH : 0)));
+           && S_IRUSR == RUSR && S_IWUSR == WUSR && S_IXUSR == XUSR
+           && S_IRGRP == RGRP && S_IWGRP == WGRP && S_IXGRP == XGRP
+           && S_IROTH == ROTH && S_IWOTH == WOTH && S_IXOTH == XOTH)
+          ? octal
+          : (mode_t) ((octal & SUID ? S_ISUID : 0)
+                      | (octal & SGID ? S_ISGID : 0)
+                      | (octal & SVTX ? S_ISVTX : 0)
+                      | (octal & RUSR ? S_IRUSR : 0)
+                      | (octal & WUSR ? S_IWUSR : 0)
+                      | (octal & XUSR ? S_IXUSR : 0)
+                      | (octal & RGRP ? S_IRGRP : 0)
+                      | (octal & WGRP ? S_IWGRP : 0)
+                      | (octal & XGRP ? S_IXGRP : 0)
+                      | (octal & ROTH ? S_IROTH : 0)
+                      | (octal & WOTH ? S_IWOTH : 0)
+                      | (octal & XOTH ? S_IXOTH : 0)));
 }
 
 /* Special operations flags.  */
@@ -97,11 +97,11 @@ enum
 /* Description of a mode change.  */
 struct mode_change
 {
-  char op;			/* One of "=+-".  */
-  char flag;			/* Special operations flag.  */
-  mode_t affected;		/* Set for u, g, o, or a.  */
-  mode_t value;			/* Bits to add/remove.  */
-  mode_t mentioned;		/* Bits explicitly mentioned.  */
+  char op;                      /* One of "=+-".  */
+  char flag;                    /* Special operations flag.  */
+  mode_t affected;              /* Set for u, g, o, or a.  */
+  mode_t value;                 /* Bits to add/remove.  */
+  mode_t mentioned;             /* Bits explicitly mentioned.  */
 };
 
 /* Return a mode_change array with the specified `=ddd'-style
@@ -144,15 +144,15 @@ mode_compile (char const *mode_string)
       mode_t mentioned;
 
       do
-	{
-	  octal_mode = 8 * octal_mode + *mode_string++ - '0';
-	  if (ALLM < octal_mode)
-	    return NULL;
-	}
+        {
+          octal_mode = 8 * octal_mode + *mode_string++ - '0';
+          if (ALLM < octal_mode)
+            return NULL;
+        }
       while ('0' <= *mode_string && *mode_string < '8');
 
       if (*mode_string)
-	return NULL;
+        return NULL;
 
       mode = octal_to_mode (octal_mode);
       mentioned = (mode & (S_ISUID | S_ISGID)) | S_ISVTX | S_IRWXUGO;
@@ -176,97 +176,97 @@ mode_compile (char const *mode_string)
 
       /* Turn on all the bits in `affected' for each group given.  */
       for (;; mode_string++)
-	switch (*mode_string)
-	  {
-	  default:
-	    goto invalid;
-	  case 'u':
-	    affected |= S_ISUID | S_IRWXU;
-	    break;
-	  case 'g':
-	    affected |= S_ISGID | S_IRWXG;
-	    break;
-	  case 'o':
-	    affected |= S_ISVTX | S_IRWXO;
-	    break;
-	  case 'a':
-	    affected |= CHMOD_MODE_BITS;
-	    break;
-	  case '=': case '+': case '-':
-	    goto no_more_affected;
-	  }
+        switch (*mode_string)
+          {
+          default:
+            goto invalid;
+          case 'u':
+            affected |= S_ISUID | S_IRWXU;
+            break;
+          case 'g':
+            affected |= S_ISGID | S_IRWXG;
+            break;
+          case 'o':
+            affected |= S_ISVTX | S_IRWXO;
+            break;
+          case 'a':
+            affected |= CHMOD_MODE_BITS;
+            break;
+          case '=': case '+': case '-':
+            goto no_more_affected;
+          }
     no_more_affected:;
 
       do
-	{
-	  char op = *mode_string++;
-	  mode_t value;
-	  char flag = MODE_COPY_EXISTING;
-	  struct mode_change *change;
+        {
+          char op = *mode_string++;
+          mode_t value;
+          char flag = MODE_COPY_EXISTING;
+          struct mode_change *change;
 
-	  switch (*mode_string++)
-	    {
-	    case 'u':
-	      /* Set the affected bits to the value of the `u' bits
-		 on the same file.  */
-	      value = S_IRWXU;
-	      break;
-	    case 'g':
-	      /* Set the affected bits to the value of the `g' bits
-		 on the same file.  */
-	      value = S_IRWXG;
-	      break;
-	    case 'o':
-	      /* Set the affected bits to the value of the `o' bits
-		 on the same file.  */
-	      value = S_IRWXO;
-	      break;
+          switch (*mode_string++)
+            {
+            case 'u':
+              /* Set the affected bits to the value of the `u' bits
+                 on the same file.  */
+              value = S_IRWXU;
+              break;
+            case 'g':
+              /* Set the affected bits to the value of the `g' bits
+                 on the same file.  */
+              value = S_IRWXG;
+              break;
+            case 'o':
+              /* Set the affected bits to the value of the `o' bits
+                 on the same file.  */
+              value = S_IRWXO;
+              break;
 
-	    default:
-	      value = 0;
-	      flag = MODE_ORDINARY_CHANGE;
+            default:
+              value = 0;
+              flag = MODE_ORDINARY_CHANGE;
 
-	      for (mode_string--;; mode_string++)
-		switch (*mode_string)
-		  {
-		  case 'r':
-		    value |= S_IRUSR | S_IRGRP | S_IROTH;
-		    break;
-		  case 'w':
-		    value |= S_IWUSR | S_IWGRP | S_IWOTH;
-		    break;
-		  case 'x':
-		    value |= S_IXUSR | S_IXGRP | S_IXOTH;
-		    break;
-		  case 'X':
-		    flag = MODE_X_IF_ANY_X;
-		    break;
-		  case 's':
-		    /* Set the setuid/gid bits if `u' or `g' is selected.  */
-		    value |= S_ISUID | S_ISGID;
-		    break;
-		  case 't':
-		    /* Set the "save text image" bit if `o' is selected.  */
-		    value |= S_ISVTX;
-		    break;
-		  default:
-		    goto no_more_values;
-		  }
-	    no_more_values:;
-	    }
+              for (mode_string--;; mode_string++)
+                switch (*mode_string)
+                  {
+                  case 'r':
+                    value |= S_IRUSR | S_IRGRP | S_IROTH;
+                    break;
+                  case 'w':
+                    value |= S_IWUSR | S_IWGRP | S_IWOTH;
+                    break;
+                  case 'x':
+                    value |= S_IXUSR | S_IXGRP | S_IXOTH;
+                    break;
+                  case 'X':
+                    flag = MODE_X_IF_ANY_X;
+                    break;
+                  case 's':
+                    /* Set the setuid/gid bits if `u' or `g' is selected.  */
+                    value |= S_ISUID | S_ISGID;
+                    break;
+                  case 't':
+                    /* Set the "save text image" bit if `o' is selected.  */
+                    value |= S_ISVTX;
+                    break;
+                  default:
+                    goto no_more_values;
+                  }
+            no_more_values:;
+            }
 
-	  change = &mc[used++];
-	  change->op = op;
-	  change->flag = flag;
-	  change->affected = affected;
-	  change->value = value;
-	  change->mentioned = (affected ? affected & value : value);
-	}
+          change = &mc[used++];
+          change->op = op;
+          change->flag = flag;
+          change->affected = affected;
+          change->value = value;
+          change->mentioned = (affected ? affected & value : value);
+        }
       while (*mode_string == '=' || *mode_string == '+'
-	     || *mode_string == '-');
+             || *mode_string == '-');
 
       if (*mode_string != ',')
-	break;
+        break;
     }
 
   if (*mode_string == 0)
@@ -308,7 +308,7 @@ mode_create_from_ref (const char *ref_file)
 
 mode_t
 mode_adjust (mode_t oldmode, bool dir, mode_t umask_value,
-	     struct mode_change const *changes, mode_t *pmode_bits)
+             struct mode_change const *changes, mode_t *pmode_bits)
 {
   /* The adjusted mode.  */
   mode_t newmode = oldmode & CHMOD_MODE_BITS;
@@ -320,63 +320,63 @@ mode_adjust (mode_t oldmode, bool dir, mode_t umask_value,
     {
       mode_t affected = changes->affected;
       mode_t omit_change =
-	(dir ? S_ISUID | S_ISGID : 0) & ~ changes->mentioned;
+        (dir ? S_ISUID | S_ISGID : 0) & ~ changes->mentioned;
       mode_t value = changes->value;
 
       switch (changes->flag)
-	{
-	case MODE_ORDINARY_CHANGE:
-	  break;
+        {
+        case MODE_ORDINARY_CHANGE:
+          break;
 
-	case MODE_COPY_EXISTING:
-	  /* Isolate in `value' the bits in `newmode' to copy.  */
-	  value &= newmode;
+        case MODE_COPY_EXISTING:
+          /* Isolate in `value' the bits in `newmode' to copy.  */
+          value &= newmode;
 
-	  /* Copy the isolated bits to the other two parts.  */
-	  value |= ((value & (S_IRUSR | S_IRGRP | S_IROTH)
-		     ? S_IRUSR | S_IRGRP | S_IROTH : 0)
-		    | (value & (S_IWUSR | S_IWGRP | S_IWOTH)
-		       ? S_IWUSR | S_IWGRP | S_IWOTH : 0)
-		    | (value & (S_IXUSR | S_IXGRP | S_IXOTH)
-		       ? S_IXUSR | S_IXGRP | S_IXOTH : 0));
-	  break;
+          /* Copy the isolated bits to the other two parts.  */
+          value |= ((value & (S_IRUSR | S_IRGRP | S_IROTH)
+                     ? S_IRUSR | S_IRGRP | S_IROTH : 0)
+                    | (value & (S_IWUSR | S_IWGRP | S_IWOTH)
+                       ? S_IWUSR | S_IWGRP | S_IWOTH : 0)
+                    | (value & (S_IXUSR | S_IXGRP | S_IXOTH)
+                       ? S_IXUSR | S_IXGRP | S_IXOTH : 0));
+          break;
 
-	case MODE_X_IF_ANY_X:
-	  /* Affect the execute bits if execute bits are already set
-	     or if the file is a directory.  */
-	  if ((newmode & (S_IXUSR | S_IXGRP | S_IXOTH)) | dir)
-	    value |= S_IXUSR | S_IXGRP | S_IXOTH;
-	  break;
-	}
+        case MODE_X_IF_ANY_X:
+          /* Affect the execute bits if execute bits are already set
+             or if the file is a directory.  */
+          if ((newmode & (S_IXUSR | S_IXGRP | S_IXOTH)) | dir)
+            value |= S_IXUSR | S_IXGRP | S_IXOTH;
+          break;
+        }
 
       /* If WHO was specified, limit the change to the affected bits.
-	 Otherwise, apply the umask.  Either way, omit changes as
-	 requested.  */
+         Otherwise, apply the umask.  Either way, omit changes as
+         requested.  */
       value &= (affected ? affected : ~umask_value) & ~ omit_change;
 
       switch (changes->op)
-	{
-	case '=':
-	  /* If WHO was specified, preserve the previous values of
-	     bits that are not affected by this change operation.
-	     Otherwise, clear all the bits.  */
-	  {
-	    mode_t preserved = (affected ? ~affected : 0) | omit_change;
-	    mode_bits |= CHMOD_MODE_BITS & ~preserved;
-	    newmode = (newmode & preserved) | value;
-	    break;
-	  }
+        {
+        case '=':
+          /* If WHO was specified, preserve the previous values of
+             bits that are not affected by this change operation.
+             Otherwise, clear all the bits.  */
+          {
+            mode_t preserved = (affected ? ~affected : 0) | omit_change;
+            mode_bits |= CHMOD_MODE_BITS & ~preserved;
+            newmode = (newmode & preserved) | value;
+            break;
+          }
 
-	case '+':
-	  mode_bits |= value;
-	  newmode |= value;
-	  break;
+        case '+':
+          mode_bits |= value;
+          newmode |= value;
+          break;
 
-	case '-':
-	  mode_bits |= value;
-	  newmode &= ~value;
-	  break;
-	}
+        case '-':
+          mode_bits |= value;
+          newmode &= ~value;
+          break;
+        }
     }
 
   if (pmode_bits)

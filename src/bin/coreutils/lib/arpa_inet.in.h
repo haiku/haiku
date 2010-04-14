@@ -3,7 +3,7 @@
 #line 1
 /* A GNU-like <arpa/inet.h>.
 
-   Copyright (C) 2005-2006, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,8 +22,11 @@
 #ifndef _GL_ARPA_INET_H
 
 /* Gnulib's sys/socket.h is responsible for pulling in winsock2.h etc
-   under MinGW. */
-#include <sys/socket.h>
+   under MinGW.
+   But avoid namespace pollution on glibc systems.  */
+#ifndef __GLIBC__
+# include <sys/socket.h>
+#endif
 
 #if @HAVE_ARPA_INET_H@
 
@@ -40,6 +43,8 @@
 #define _GL_ARPA_INET_H
 
 /* The definition of GL_LINK_WARNING is copied here.  */
+
+/* The definition of _GL_ARG_NONNULL is copied here.  */
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,7 +68,8 @@ extern "C" {
    For more details, see the POSIX:2001 specification
    <http://www.opengroup.org/susv3xsh/inet_ntop.html>.  */
 extern const char *inet_ntop (int af, const void *restrict src,
-			      char *restrict dst, socklen_t cnt);
+                              char *restrict dst, socklen_t cnt)
+     _GL_ARG_NONNULL ((2, 3));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef inet_ntop
@@ -75,13 +81,14 @@ extern const char *inet_ntop (int af, const void *restrict src,
 
 #if @GNULIB_INET_PTON@
 # if !@HAVE_DECL_INET_PTON@
-extern int inet_pton (int af, const char *restrict src, void *restrict dst);
+extern int inet_pton (int af, const char *restrict src, void *restrict dst)
+     _GL_ARG_NONNULL ((2, 3));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef inet_pton
 # define inet_pton(af,src,dst) \
   (GL_LINK_WARNING ("inet_pton is unportable - " \
-		    "use gnulib module inet_pton for portability"), \
+                    "use gnulib module inet_pton for portability"), \
    inet_pton (af, src, dst))
 #endif
 

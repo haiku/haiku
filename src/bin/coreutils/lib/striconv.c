@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Charset conversion.
-   Copyright (C) 2001-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001-2007, 2009-2010 Free Software Foundation, Inc.
    Written by Bruno Haible and Simon Josefsson.
 
    This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,7 @@
 
 int
 mem_cd_iconv (const char *src, size_t srclen, iconv_t cd,
-	      char **resultp, size_t *lengthp)
+              char **resultp, size_t *lengthp)
 {
 # define tmpbufsize 4096
   size_t length;
@@ -70,33 +70,33 @@ mem_cd_iconv (const char *src, size_t srclen, iconv_t cd,
 
     while (insize > 0)
       {
-	char *outptr = tmpbuf;
-	size_t outsize = tmpbufsize;
-	size_t res = iconv (cd,
-			    (ICONV_CONST char **) &inptr, &insize,
-			    &outptr, &outsize);
+        char *outptr = tmpbuf;
+        size_t outsize = tmpbufsize;
+        size_t res = iconv (cd,
+                            (ICONV_CONST char **) &inptr, &insize,
+                            &outptr, &outsize);
 
-	if (res == (size_t)(-1))
-	  {
-	    if (errno == E2BIG)
-	      ;
-	    else if (errno == EINVAL)
-	      break;
-	    else
-	      return -1;
-	  }
+        if (res == (size_t)(-1))
+          {
+            if (errno == E2BIG)
+              ;
+            else if (errno == EINVAL)
+              break;
+            else
+              return -1;
+          }
 # if !defined _LIBICONV_VERSION && !defined __GLIBC__
-	/* Irix iconv() inserts a NUL byte if it cannot convert.
-	   NetBSD iconv() inserts a question mark if it cannot convert.
-	   Only GNU libiconv and GNU libc are known to prefer to fail rather
-	   than doing a lossy conversion.  */
-	else if (res > 0)
-	  {
-	    errno = EILSEQ;
-	    return -1;
-	  }
+        /* Irix iconv() inserts a NUL byte if it cannot convert.
+           NetBSD iconv() inserts a question mark if it cannot convert.
+           Only GNU libiconv and GNU libc are known to prefer to fail rather
+           than doing a lossy conversion.  */
+        else if (res > 0)
+          {
+            errno = EILSEQ;
+            return -1;
+          }
 # endif
-	count += outptr - tmpbuf;
+        count += outptr - tmpbuf;
       }
     /* Avoid glibc-2.1 bug and Solaris 2.7 bug.  */
 # if defined _LIBICONV_VERSION \
@@ -107,7 +107,7 @@ mem_cd_iconv (const char *src, size_t srclen, iconv_t cd,
       size_t res = iconv (cd, NULL, NULL, &outptr, &outsize);
 
       if (res == (size_t)(-1))
-	return -1;
+        return -1;
       count += outptr - tmpbuf;
     }
 # endif
@@ -126,10 +126,10 @@ mem_cd_iconv (const char *src, size_t srclen, iconv_t cd,
     {
       result = (char *) malloc (length);
       if (result == NULL)
-	{
-	  errno = ENOMEM;
-	  return -1;
-	}
+        {
+          errno = ENOMEM;
+          return -1;
+        }
     }
 
   /* Avoid glibc-2.1 bug and Solaris 2.7-2.9 bug.  */
@@ -148,27 +148,27 @@ mem_cd_iconv (const char *src, size_t srclen, iconv_t cd,
 
     while (insize > 0)
       {
-	size_t res = iconv (cd,
-			    (ICONV_CONST char **) &inptr, &insize,
-			    &outptr, &outsize);
+        size_t res = iconv (cd,
+                            (ICONV_CONST char **) &inptr, &insize,
+                            &outptr, &outsize);
 
-	if (res == (size_t)(-1))
-	  {
-	    if (errno == EINVAL)
-	      break;
-	    else
-	      goto fail;
-	  }
+        if (res == (size_t)(-1))
+          {
+            if (errno == EINVAL)
+              break;
+            else
+              goto fail;
+          }
 # if !defined _LIBICONV_VERSION && !defined __GLIBC__
-	/* Irix iconv() inserts a NUL byte if it cannot convert.
-	   NetBSD iconv() inserts a question mark if it cannot convert.
-	   Only GNU libiconv and GNU libc are known to prefer to fail rather
-	   than doing a lossy conversion.  */
-	else if (res > 0)
-	  {
-	    errno = EILSEQ;
-	    goto fail;
-	  }
+        /* Irix iconv() inserts a NUL byte if it cannot convert.
+           NetBSD iconv() inserts a question mark if it cannot convert.
+           Only GNU libiconv and GNU libc are known to prefer to fail rather
+           than doing a lossy conversion.  */
+        else if (res > 0)
+          {
+            errno = EILSEQ;
+            goto fail;
+          }
 # endif
       }
     /* Avoid glibc-2.1 bug and Solaris 2.7 bug.  */
@@ -178,7 +178,7 @@ mem_cd_iconv (const char *src, size_t srclen, iconv_t cd,
       size_t res = iconv (cd, NULL, NULL, &outptr, &outsize);
 
       if (res == (size_t)(-1))
-	goto fail;
+        goto fail;
     }
 # endif
     if (outsize != 0)
@@ -194,9 +194,9 @@ mem_cd_iconv (const char *src, size_t srclen, iconv_t cd,
   {
     if (result != *resultp)
       {
-	int saved_errno = errno;
-	free (result);
-	errno = saved_errno;
+        int saved_errno = errno;
+        free (result);
+        errno = saved_errno;
       }
     return -1;
   }
@@ -227,7 +227,7 @@ str_cd_iconv (const char *src, iconv_t cd)
   if (retval < 0)
     {
       if (result != NULL)
-	abort ();
+        abort ();
       return NULL;
     }
 
@@ -237,7 +237,7 @@ str_cd_iconv (const char *src, iconv_t cd)
   if (final_result == NULL)
     {
       if (result != NULL)
-	free (result);
+        free (result);
       errno = ENOMEM;
       return NULL;
     }
@@ -288,81 +288,81 @@ str_cd_iconv (const char *src, iconv_t cd)
 
     for (;;)
       {
-	/* Here inptr + inbytes_remaining = src + strlen (src),
-		outptr + outbytes_remaining = result + result_size - 1.  */
-	size_t res = iconv (cd,
-			    (ICONV_CONST char **) &inptr, &inbytes_remaining,
-			    &outptr, &outbytes_remaining);
+        /* Here inptr + inbytes_remaining = src + strlen (src),
+                outptr + outbytes_remaining = result + result_size - 1.  */
+        size_t res = iconv (cd,
+                            (ICONV_CONST char **) &inptr, &inbytes_remaining,
+                            &outptr, &outbytes_remaining);
 
-	if (res == (size_t)(-1))
-	  {
-	    if (errno == EINVAL)
-	      break;
-	    else if (errno == E2BIG)
-	      {
-		size_t used = outptr - result;
-		size_t newsize = result_size * 2;
-		char *newresult;
+        if (res == (size_t)(-1))
+          {
+            if (errno == EINVAL)
+              break;
+            else if (errno == E2BIG)
+              {
+                size_t used = outptr - result;
+                size_t newsize = result_size * 2;
+                char *newresult;
 
-		if (!(newsize > result_size))
-		  {
-		    errno = ENOMEM;
-		    goto failed;
-		  }
-		newresult = (char *) realloc (result, newsize);
-		if (newresult == NULL)
-		  {
-		    errno = ENOMEM;
-		    goto failed;
-		  }
-		result = newresult;
-		result_size = newsize;
-		outptr = result + used;
-		outbytes_remaining = result_size - 1 - used;
-	      }
-	    else
-	      goto failed;
-	  }
-	else
-	  break;
+                if (!(newsize > result_size))
+                  {
+                    errno = ENOMEM;
+                    goto failed;
+                  }
+                newresult = (char *) realloc (result, newsize);
+                if (newresult == NULL)
+                  {
+                    errno = ENOMEM;
+                    goto failed;
+                  }
+                result = newresult;
+                result_size = newsize;
+                outptr = result + used;
+                outbytes_remaining = result_size - 1 - used;
+              }
+            else
+              goto failed;
+          }
+        else
+          break;
       }
     /* Avoid glibc-2.1 bug and Solaris 2.7 bug.  */
 # if defined _LIBICONV_VERSION \
      || !((__GLIBC__ - 0 == 2 && __GLIBC_MINOR__ - 0 <= 1) || defined __sun)
     for (;;)
       {
-	/* Here outptr + outbytes_remaining = result + result_size - 1.  */
-	size_t res = iconv (cd, NULL, NULL, &outptr, &outbytes_remaining);
+        /* Here outptr + outbytes_remaining = result + result_size - 1.  */
+        size_t res = iconv (cd, NULL, NULL, &outptr, &outbytes_remaining);
 
-	if (res == (size_t)(-1))
-	  {
-	    if (errno == E2BIG)
-	      {
-		size_t used = outptr - result;
-		size_t newsize = result_size * 2;
-		char *newresult;
+        if (res == (size_t)(-1))
+          {
+            if (errno == E2BIG)
+              {
+                size_t used = outptr - result;
+                size_t newsize = result_size * 2;
+                char *newresult;
 
-		if (!(newsize > result_size))
-		  {
-		    errno = ENOMEM;
-		    goto failed;
-		  }
-		newresult = (char *) realloc (result, newsize);
-		if (newresult == NULL)
-		  {
-		    errno = ENOMEM;
-		    goto failed;
-		  }
-		result = newresult;
-		result_size = newsize;
-		outptr = result + used;
-		outbytes_remaining = result_size - 1 - used;
-	      }
-	    else
-	      goto failed;
-	  }
-	else
-	  break;
+                if (!(newsize > result_size))
+                  {
+                    errno = ENOMEM;
+                    goto failed;
+                  }
+                newresult = (char *) realloc (result, newsize);
+                if (newresult == NULL)
+                  {
+                    errno = ENOMEM;
+                    goto failed;
+                  }
+                result = newresult;
+                result_size = newsize;
+                outptr = result + used;
+                outbytes_remaining = result_size - 1 - used;
+              }
+            else
+              goto failed;
+          }
+        else
+          break;
       }
 # endif
 
@@ -378,7 +378,7 @@ str_cd_iconv (const char *src, iconv_t cd)
       char *smaller_result = (char *) realloc (result, length);
 
       if (smaller_result != NULL)
-	result = smaller_result;
+        result = smaller_result;
     }
 
   return result;
@@ -404,7 +404,7 @@ str_iconv (const char *src, const char *from_codeset, const char *to_codeset)
       char *result = strdup (src);
 
       if (result == NULL)
-	errno = ENOMEM;
+        errno = ENOMEM;
       return result;
     }
   else
@@ -416,44 +416,44 @@ str_iconv (const char *src, const char *from_codeset, const char *to_codeset)
       /* Avoid glibc-2.1 bug with EUC-KR.  */
 # if (__GLIBC__ - 0 == 2 && __GLIBC_MINOR__ - 0 <= 1) && !defined _LIBICONV_VERSION
       if (c_strcasecmp (from_codeset, "EUC-KR") == 0
-	  || c_strcasecmp (to_codeset, "EUC-KR") == 0)
-	{
-	  errno = EINVAL;
-	  return NULL;
-	}
+          || c_strcasecmp (to_codeset, "EUC-KR") == 0)
+        {
+          errno = EINVAL;
+          return NULL;
+        }
 # endif
       cd = iconv_open (to_codeset, from_codeset);
       if (cd == (iconv_t) -1)
-	return NULL;
+        return NULL;
 
       result = str_cd_iconv (src, cd);
 
       if (result == NULL)
-	{
-	  /* Close cd, but preserve the errno from str_cd_iconv.  */
-	  int saved_errno = errno;
-	  iconv_close (cd);
-	  errno = saved_errno;
-	}
+        {
+          /* Close cd, but preserve the errno from str_cd_iconv.  */
+          int saved_errno = errno;
+          iconv_close (cd);
+          errno = saved_errno;
+        }
       else
-	{
-	  if (iconv_close (cd) < 0)
-	    {
-	      /* Return NULL, but free the allocated memory, and while doing
-		 that, preserve the errno from iconv_close.  */
-	      int saved_errno = errno;
-	      free (result);
-	      errno = saved_errno;
-	      return NULL;
-	    }
-	}
+        {
+          if (iconv_close (cd) < 0)
+            {
+              /* Return NULL, but free the allocated memory, and while doing
+                 that, preserve the errno from iconv_close.  */
+              int saved_errno = errno;
+              free (result);
+              errno = saved_errno;
+              return NULL;
+            }
+        }
       return result;
 #else
       /* This is a different error code than if iconv_open existed but didn't
-	 support from_codeset and to_codeset, so that the caller can emit
-	 an error message such as
-	   "iconv() is not supported. Installing GNU libiconv and
-	    then reinstalling this package would fix this."  */
+         support from_codeset and to_codeset, so that the caller can emit
+         an error message such as
+           "iconv() is not supported. Installing GNU libiconv and
+            then reinstalling this package would fix this."  */
       errno = ENOSYS;
       return NULL;
 #endif

@@ -1,6 +1,6 @@
 # Make coreutils man pages.				-*-Makefile-*-
 
-# Copyright (C) 2002-2009 Free Software Foundation, Inc.
+# Copyright (C) 2002-2010 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -80,6 +80,7 @@ mv.1:		$(common_dep)	$(srcdir)/mv.x		../src/mv.c
 nice.1:		$(common_dep)	$(srcdir)/nice.x	../src/nice.c
 nl.1:		$(common_dep)	$(srcdir)/nl.x		../src/nl.c
 nohup.1:	$(common_dep)	$(srcdir)/nohup.x	../src/nohup.c
+nproc.1:	$(common_dep)	$(srcdir)/nproc.x	../src/nproc.c
 od.1:		$(common_dep)	$(srcdir)/od.x		../src/od.c
 paste.1:	$(common_dep)	$(srcdir)/paste.x	../src/paste.c
 pathchk.1:	$(common_dep)	$(srcdir)/pathchk.x	../src/pathchk.c

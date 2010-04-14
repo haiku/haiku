@@ -1,7 +1,6 @@
 /* An interface to read and write that retries (if necessary) until complete.
 
-   Copyright (C) 1993, 1994, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1993-1994, 1997-2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -65,12 +64,12 @@ full_rw (int fd, const void *buf, size_t count)
     {
       size_t n_rw = safe_rw (fd, ptr, count);
       if (n_rw == (size_t) -1)
-	break;
+        break;
       if (n_rw == 0)
-	{
-	  errno = ZERO_BYTE_TRANSFER_ERRNO;
-	  break;
-	}
+        {
+          errno = ZERO_BYTE_TRANSFER_ERRNO;
+          break;
+        }
       total += n_rw;
       ptr += n_rw;
       count -= n_rw;

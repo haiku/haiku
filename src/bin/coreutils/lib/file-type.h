@@ -1,6 +1,6 @@
 /* Return a string describing the type of a file.
 
-   Copyright (C) 1993, 1994, 2001, 2002, 2004, 2005 Free Software
+   Copyright (C) 1993-1994, 2001-2002, 2004-2005, 2009-2010 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify

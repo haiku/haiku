@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Store a character in UTF-8 string.
-   Copyright (C) 2002, 2005-2006, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005-2006, 2009-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
    This program is free software: you can redistribute it and/or modify it
@@ -36,10 +36,10 @@ u8_uctomb (uint8_t *s, ucs4_t uc, int n)
   if (uc < 0x80)
     {
       if (n > 0)
-	{
-	  s[0] = uc;
-	  return 1;
-	}
+        {
+          s[0] = uc;
+          return 1;
+        }
       /* else return -2, below.  */
     }
   else
@@ -47,43 +47,43 @@ u8_uctomb (uint8_t *s, ucs4_t uc, int n)
       int count;
 
       if (uc < 0x800)
-	count = 2;
+        count = 2;
       else if (uc < 0x10000)
-	{
-	  if (uc < 0xd800 || uc >= 0xe000)
-	    count = 3;
-	  else
-	    return -1;
-	}
+        {
+          if (uc < 0xd800 || uc >= 0xe000)
+            count = 3;
+          else
+            return -1;
+        }
 #if 0
       else if (uc < 0x200000)
-	count = 4;
+        count = 4;
       else if (uc < 0x4000000)
-	count = 5;
+        count = 5;
       else if (uc <= 0x7fffffff)
-	count = 6;
+        count = 6;
 #else
       else if (uc < 0x110000)
-	count = 4;
+        count = 4;
 #endif
       else
-	return -1;
+        return -1;
 
       if (n >= count)
-	{
-	  switch (count) /* note: code falls through cases! */
-	    {
+        {
+          switch (count) /* note: code falls through cases! */
+            {
 #if 0
-	    case 6: s[5] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0x4000000;
-	    case 5: s[4] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0x200000;
+            case 6: s[5] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0x4000000;
+            case 5: s[4] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0x200000;
 #endif
-	    case 4: s[3] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0x10000;
-	    case 3: s[2] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0x800;
-	    case 2: s[1] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0xc0;
-	  /*case 1:*/ s[0] = uc;
-	    }
-	  return count;
-	}
+            case 4: s[3] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0x10000;
+            case 3: s[2] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0x800;
+            case 2: s[1] = 0x80 | (uc & 0x3f); uc = uc >> 6; uc |= 0xc0;
+          /*case 1:*/ s[0] = uc;
+            }
+          return count;
+        }
     }
   return -2;
 }

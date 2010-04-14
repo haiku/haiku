@@ -1,5 +1,5 @@
 /* GNU's pinky.
-   Copyright (C) 1992-1997, 1999-2006, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 1992-1997, 1999-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 #include "canon-host.h"
 #include "error.h"
+#include "hard-locale.h"
 #include "readutmp.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -526,7 +527,7 @@ usage (int status)
 A lightweight `finger' program;  print user information.\n\
 The utmp file will be %s.\n\
 "), UTMP_FILE);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

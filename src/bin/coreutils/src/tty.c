@@ -1,5 +1,5 @@
 /* tty -- print the name of the terminal connected to standard input
-   Copyright (C) 1990-2005, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 1990-2005, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ Print the file name of the terminal connected to standard input.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

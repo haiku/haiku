@@ -2,7 +2,7 @@
 
 # Bootstrap this package from checked-out sources.
 
-# Copyright (C) 2003-2009 Free Software Foundation, Inc.
+# Copyright (C) 2003-2010 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,6 +69,10 @@ gnulib_modules=
 
 # Any gnulib files needed that are not in modules.
 gnulib_files=
+
+# A function to be called after everything else in this script.
+# Override it via your own definition in bootstrap.conf.
+bootstrap_epilogue() { :; }
 
 # The command to download all .po files for a specified domain into
 # a specified directory.  Fill in the first %s is the domain name, and
@@ -150,12 +154,18 @@ vc_ignore=auto
 
 # find_tool ENVVAR NAMES...
 # -------------------------
+# Search for a required program.  Use the value of ENVVAR, if set,
+# otherwise find the first of the NAMES that can be run (i.e.,
+# supports --version).  If found, set ENVVAR to the program name,
+# die otherwise.
 find_tool ()
 {
   # Find sha1sum, named gsha1sum on MacPorts.
   find_tool_envvar=$1
   shift
-  if eval test x"\$$find_tool_envvar" = x; then
+  find_tool_names=$@
+  eval "find_tool_res=\$$find_tool_envvar"
+  if test x"$find_tool_res" = x; then
     for i
     do
       if ($i --version </dev/null) >/dev/null 2>&1; then
@@ -163,16 +173,18 @@ find_tool ()
        break
       fi
     done
+  else
+    find_tool_error_prefix="\$$find_tool_envvar: "
   fi
   if test x"$find_tool_res" = x; then
-    echo >&2 "$0: $find_tool_name is required"
+    echo >&2 "$0: one of these is required: $find_tool_names"
     exit 1
   fi
   ($find_tool_res --version </dev/null) >/dev/null 2>&1 || {
-    echo >&2 "$0: cannot run $find_tool_res --version"
+    echo >&2 "$0: ${find_tool_error_prefix}cannot run $find_tool_res --version"
     exit 1
   }
-  eval "$find_tool_envvar=\"$find_tool_res\""
+  eval "$find_tool_envvar=\$find_tool_res"
   eval "export $find_tool_envvar"
 }
 
@@ -302,10 +314,20 @@ get_version() {
   $app --version >/dev/null 2>&1 || return 1
 
   $app --version 2>&1 |
-  sed -n 's/[^0-9.]*\([0-9]\{1,\}\.[.a-z0-9-]*\).*/\1/p
+  sed -n '# extract version within line
+          s/.*[v ]\{1,\}\([0-9]\{1,\}\.[.a-z0-9-]*\).*/\1/
           t done
+
+          # extract version at start of line
+          s/^\([0-9]\{1,\}\.[.a-z0-9-]*\).*/\1/
+          t done
+
           d
+
           :done
+          #the following essentially does s/5.005/5.5/
+          s/\.0*\([1-9]\)/.\1/g
+          p
           q'
 }
 
@@ -405,7 +427,7 @@ case ${GNULIB_SRCDIR--} in
         git_modules_config submodule.gnulib.url >/dev/null; then
     git submodule init
     GNULIB_SRCDIR=`cd $GNULIB_SRCDIR && pwd`
-    git config --replace-all submodule.gnulib.url $GNULIB_SRCDIR
+    git_modules_config --replace-all submodule.gnulib.url $GNULIB_SRCDIR
     echo "$0: getting gnulib files..."
     git submodule update || exit $?
     GNULIB_SRCDIR=gnulib
@@ -721,6 +743,10 @@ find "$m4_base" "$source_base" \
 
 # Reconfigure, getting other files.
 
+# Skip autoheader if it's not needed.
+grep -E '^[	 ]*AC_CONFIG_HEADERS?\>' configure.ac >/dev/null ||
+  AUTOHEADER=true
+
 for command in \
   libtool \
   "${ACLOCAL-aclocal} --force -I m4" \
@@ -789,10 +815,6 @@ if test $with_gettext = yes; then
   fi
 fi
 
-# Horrible, coreutils-specific kludges.
-# Change paths in gnulib-tests/gnulib.mk from "../.." to "..".
-m=gnulib-tests/gnulib.mk
-sed 's,\.\./\.\.,..,g' $m > $m-t
-mv -f $m-t $m
+bootstrap_epilogue
 
 echo "$0: done.  Now you can run './configure'."

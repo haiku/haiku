@@ -1,6 +1,6 @@
 /* Make a file's ancestor directories.
 
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -65,8 +65,8 @@
 
 ptrdiff_t
 mkancesdirs (char *file, struct savewd *wd,
-	     int (*make_dir) (char const *, char const *, void *),
-	     void *make_dir_arg)
+             int (*make_dir) (char const *, char const *, void *),
+             void *make_dir_arg)
 {
   /* Address of the previous directory separator that follows an
      ordinary byte in a file name in the left-to-right scan, or NULL
@@ -90,63 +90,63 @@ mkancesdirs (char *file, struct savewd *wd,
   while ((c = *p++))
     if (ISSLASH (*p))
       {
-	if (! ISSLASH (c))
-	  sep = p;
+        if (! ISSLASH (c))
+          sep = p;
       }
     else if (ISSLASH (c) && *p && sep)
       {
-	/* Don't bother to make or test for "." since it does not
-	   affect the algorithm.  */
-	if (! (sep - component == 1 && component[0] == '.'))
-	  {
-	    int make_dir_errno = 0;
-	    int savewd_chdir_options = 0;
-	    int chdir_result;
+        /* Don't bother to make or test for "." since it does not
+           affect the algorithm.  */
+        if (! (sep - component == 1 && component[0] == '.'))
+          {
+            int make_dir_errno = 0;
+            int savewd_chdir_options = 0;
+            int chdir_result;
 
-	    /* Temporarily modify FILE to isolate this file name
-	       component.  */
-	    *sep = '\0';
+            /* Temporarily modify FILE to isolate this file name
+               component.  */
+            *sep = '\0';
 
-	    /* Invoke MAKE_DIR on this component, except don't bother
-	       with ".." since it must exist if its "parent" does.  */
-	    if (sep - component == 2
-		&& component[0] == '.' && component[1] == '.')
-	      made_dir = false;
-	    else
-	      switch (make_dir (file, component, make_dir_arg))
-		{
-		case -1:
-		  make_dir_errno = errno;
-		  break;
+            /* Invoke MAKE_DIR on this component, except don't bother
+               with ".." since it must exist if its "parent" does.  */
+            if (sep - component == 2
+                && component[0] == '.' && component[1] == '.')
+              made_dir = false;
+            else
+              switch (make_dir (file, component, make_dir_arg))
+                {
+                case -1:
+                  make_dir_errno = errno;
+                  break;
 
-		case 0:
-		  savewd_chdir_options |= SAVEWD_CHDIR_READABLE;
-		  /* Fall through.  */
-		case 1:
-		  made_dir = true;
-		  break;
-		}
+                case 0:
+                  savewd_chdir_options |= SAVEWD_CHDIR_READABLE;
+                  /* Fall through.  */
+                case 1:
+                  made_dir = true;
+                  break;
+                }
 
-	    if (made_dir)
-	      savewd_chdir_options |= SAVEWD_CHDIR_NOFOLLOW;
+            if (made_dir)
+              savewd_chdir_options |= SAVEWD_CHDIR_NOFOLLOW;
 
-	    chdir_result =
-	      savewd_chdir (wd, component, savewd_chdir_options, NULL);
+            chdir_result =
+              savewd_chdir (wd, component, savewd_chdir_options, NULL);
 
-	    /* Undo the temporary modification to FILE, unless there
-	       was a failure.  */
-	    if (chdir_result != -1)
-	      *sep = '/';
+            /* Undo the temporary modification to FILE, unless there
+               was a failure.  */
+            if (chdir_result != -1)
+              *sep = '/';
 
-	    if (chdir_result != 0)
-	      {
-		if (make_dir_errno != 0 && errno == ENOENT)
-		  errno = make_dir_errno;
-		return chdir_result;
-	      }
-	  }
+            if (chdir_result != 0)
+              {
+                if (make_dir_errno != 0 && errno == ENOENT)
+                  errno = make_dir_errno;
+                return chdir_result;
+              }
+          }
 
-	component = p;
+        component = p;
       }
 
   return component - file;

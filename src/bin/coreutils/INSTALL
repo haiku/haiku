@@ -2,7 +2,7 @@ Installation Instructions
 *************************
 
 Copyright (C) 1994, 1995, 1996, 1999, 2000, 2001, 2002, 2004, 2005,
-2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 
    Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
@@ -69,6 +69,10 @@ of `autoconf'.
 
   5. Optionally, type `make installcheck' to repeat any self-tests, but
      this time using the binaries in their final installed location.
+     This target does not install anything.  Running this target as a
+     regular user, particularly if the prior `make install' required
+     root privileges, verifies that the installation completed
+     correctly.
 
   6. You can remove the program binaries and object files from the
      source code directory by typing `make clean'.  To also remove the
@@ -141,7 +145,7 @@ Installation Names
 `/usr/local/bin', include files under `/usr/local/include', etc.  You
 can specify an installation prefix other than `/usr/local' by giving
 `configure' the option `--prefix=PREFIX', where PREFIX must be an
-absolute path.
+absolute file name.
 
    You can specify separate installation prefixes for
 architecture-specific files and architecture-independent files.  If you
@@ -155,7 +159,7 @@ kinds of files.  Run `configure --help' for a list of the directories
 you can set and what kinds of files go in them.  In general, the
 default for these options is expressed in terms of `${prefix}', so that
 specifying just `--prefix' will affect all of the other directory
-specifications.
+specifications that were not explicitly provided.
 
    The most portable way to affect installation locations is to pass the
 correct locations to `configure'; however, many packages provide one or
@@ -165,28 +169,25 @@ having to reconfigure or recompile.
 
    The first method involves providing an override variable for each
 affected directory.  For example, `make install
-prefix=/path/to/alternate' will choose an alternate location, as well as
-influencing all other directory configuration variables that were
-expressed in terms of `${prefix}' (or, put another way, all directories
-specified during `configure' but not in terms of the common prefix must
-each be overridden at install time for the entire installation to be
-relocated).  The approach of makefile variable overrides for each
-directory variable is required by the GNU Coding Standards, and ideally
-causes no recompilation.  However, some platforms have known
-limitations with the semantics of shared libraries that end up
-requiring recompilation when using this method, particularly noticeable
-in packages that use GNU Libtool.
+prefix=/alternate/directory' will choose an alternate location for all
+directory configuration variables that were expressed in terms of
+`${prefix}'.  Any directories that were specified during `configure',
+but not in terms of `${prefix}', must each be overridden at install
+time for the entire installation to be relocated.  The approach of
+makefile variable overrides for each directory variable is required by
+the GNU Coding Standards, and ideally causes no recompilation.
+However, some platforms have known limitations with the semantics of
+shared libraries that end up requiring recompilation when using this
+method, particularly noticeable in packages that use GNU Libtool.
 
    The second method involves providing the `DESTDIR' variable.  For
-example, `make install DESTDIR=/path/to/alternate' will prepend
-`/path/to/alternate' before all installation paths.  The approach of
+example, `make install DESTDIR=/alternate/directory' will prepend
+`/alternate/directory' before all installation names.  The approach of
 `DESTDIR' overrides is not required by the GNU Coding Standards, and
 does not work on platforms that have drive letters.  On the other hand,
 it does better at avoiding recompilation issues, and works well even
 when some directory options were not specified in terms of `${prefix}'
-at `configure' time.  For packages which support `DESTDIR', the
-variable should remain undefined during `configure' and `make all', and
-only be specified during `make install'.
+at `configure' time.
 
 Optional Features
 =================

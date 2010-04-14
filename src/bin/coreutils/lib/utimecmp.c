@@ -1,6 +1,6 @@
 /* utimecmp.c -- compare file time stamps
 
-   Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2004-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
+
 #include "hash.h"
 #include "intprops.h"
 #include "stat-time.h"
@@ -37,17 +39,19 @@
 # define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
-enum { BILLION = 1000 * 1000 * 1000 };
+#define BILLION (1000 * 1000 * 1000)
 
 /* Best possible resolution that utimens can set and stat can return,
    due to system-call limitations.  It must be a power of 10 that is
    no greater than 1 billion.  */
-#if (HAVE_WORKING_UTIMES					\
-     && (defined HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC		\
-	 || defined HAVE_STRUCT_STAT_ST_ATIMESPEC_TV_NSEC	\
-	 || defined HAVE_STRUCT_STAT_ST_ATIMENSEC		\
-	 || defined HAVE_STRUCT_STAT_ST_ATIM_ST__TIM_TV_NSEC	\
-	 || defined HAVE_STRUCT_STAT_ST_SPARE1))
+#if HAVE_UTIMENSAT
+enum { SYSCALL_RESOLUTION = 1 };
+#elif ((HAVE_FUTIMESAT || HAVE_WORKING_UTIMES)                  \
+       && (defined HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC             \
+           || defined HAVE_STRUCT_STAT_ST_ATIMESPEC_TV_NSEC     \
+           || defined HAVE_STRUCT_STAT_ST_ATIMENSEC             \
+           || defined HAVE_STRUCT_STAT_ST_ATIM_ST__TIM_TV_NSEC  \
+           || defined HAVE_STRUCT_STAT_ST_SPARE1))
 enum { SYSCALL_RESOLUTION = 1000 };
 #else
 enum { SYSCALL_RESOLUTION = BILLION };
@@ -100,6 +104,8 @@ dev_info_compare (void const *x, void const *y)
    DST_NAME and status DST_STAT) is older than SRC_STAT, the same age
    as SRC_STAT, or newer than SRC_STAT, respectively.
 
+   DST_NAME may be NULL if OPTIONS is 0.
+
    If OPTIONS & UTIMECMP_TRUNCATE_SOURCE, do the comparison after SRC is
    converted to the destination's timestamp resolution as filtered through
    utimens.  In this case, return -2 if the exact answer cannot be
@@ -109,9 +115,9 @@ dev_info_compare (void const *x, void const *y)
 
 int
 utimecmp (char const *dst_name,
-	  struct stat const *dst_stat,
-	  struct stat const *src_stat,
-	  int options)
+          struct stat const *dst_stat,
+          struct stat const *src_stat,
+          int options)
 {
   /* Things to watch out for:
 
@@ -147,169 +153,195 @@ utimecmp (char const *dst_name,
       /* Time stamp resolution in nanoseconds.  */
       int res;
 
+      /* Quick exit, if possible.  Since the worst resolution is 2
+         seconds, anything that differs by more than that does not
+         needs source truncation.  */
+      if (dst_s == src_s && dst_ns == src_ns)
+        return 0;
+      if (dst_s <= src_s - 2)
+        return -1;
+      if (src_s <= dst_s - 2)
+        return 1;
+
       if (! ht)
-	ht = hash_initialize (16, NULL, dev_info_hash, dev_info_compare, free);
+        ht = hash_initialize (16, NULL, dev_info_hash, dev_info_compare, free);
       if (! new_dst_res)
-	{
-	  new_dst_res = xmalloc (sizeof *new_dst_res);
-	  new_dst_res->resolution = 2 * BILLION;
-	  new_dst_res->exact = false;
-	}
+        {
+          new_dst_res = xmalloc (sizeof *new_dst_res);
+          new_dst_res->resolution = 2 * BILLION;
+          new_dst_res->exact = false;
+        }
       new_dst_res->dev = dst_stat->st_dev;
       dst_res = hash_insert (ht, new_dst_res);
       if (! dst_res)
-	xalloc_die ();
+        xalloc_die ();
 
       if (dst_res == new_dst_res)
-	{
-	  /* NEW_DST_RES is now in use in the hash table, so allocate a
-	     new entry next time.  */
-	  new_dst_res = NULL;
-	}
+        {
+          /* NEW_DST_RES is now in use in the hash table, so allocate a
+             new entry next time.  */
+          new_dst_res = NULL;
+        }
 
       res = dst_res->resolution;
 
+#ifdef _PC_TIMESTAMP_RESOLUTION
+      /* If the system will tell us the resolution, we're set!  */
       if (! dst_res->exact)
-	{
-	  /* This file system's resolution is not known exactly.
-	     Deduce it, and store the result in the hash table.  */
+        {
+          res = pathconf (dst_name, _PC_TIMESTAMP_RESOLUTION);
+          if (0 < res)
+            {
+              dst_res->resolution = res;
+              dst_res->exact = true;
+            }
+        }
+#endif
 
-	  time_t dst_a_s = dst_stat->st_atime;
-	  time_t dst_c_s = dst_stat->st_ctime;
-	  time_t dst_m_s = dst_s;
-	  int dst_a_ns = get_stat_atime_ns (dst_stat);
-	  int dst_c_ns = get_stat_ctime_ns (dst_stat);
-	  int dst_m_ns = dst_ns;
+      if (! dst_res->exact)
+        {
+          /* This file system's resolution is not known exactly.
+             Deduce it, and store the result in the hash table.  */
 
-	  /* Set RES to an upper bound on the file system resolution
-	     (after truncation due to SYSCALL_RESOLUTION) by inspecting
-	     the atime, ctime and mtime of the existing destination.
-	     We don't know of any file system that stores atime or
-	     ctime with a higher precision than mtime, so it's valid to
-	     look at them too.  */
-	  {
-	    bool odd_second = (dst_a_s | dst_c_s | dst_m_s) & 1;
+          time_t dst_a_s = dst_stat->st_atime;
+          time_t dst_c_s = dst_stat->st_ctime;
+          time_t dst_m_s = dst_s;
+          int dst_a_ns = get_stat_atime_ns (dst_stat);
+          int dst_c_ns = get_stat_ctime_ns (dst_stat);
+          int dst_m_ns = dst_ns;
 
-	    if (SYSCALL_RESOLUTION == BILLION)
-	      {
-		if (odd_second | dst_a_ns | dst_c_ns | dst_m_ns)
-		  res = BILLION;
-	      }
-	    else
-	      {
-		int a = dst_a_ns;
-		int c = dst_c_ns;
-		int m = dst_m_ns;
+          /* Set RES to an upper bound on the file system resolution
+             (after truncation due to SYSCALL_RESOLUTION) by inspecting
+             the atime, ctime and mtime of the existing destination.
+             We don't know of any file system that stores atime or
+             ctime with a higher precision than mtime, so it's valid to
+             look at them too.  */
+          {
+            bool odd_second = (dst_a_s | dst_c_s | dst_m_s) & 1;
 
-		/* Write it this way to avoid mistaken GCC warning
-		   about integer overflow in constant expression.  */
-		int SR10 = SYSCALL_RESOLUTION;  SR10 *= 10;
+            if (SYSCALL_RESOLUTION == BILLION)
+              {
+                if (odd_second | dst_a_ns | dst_c_ns | dst_m_ns)
+                  res = BILLION;
+              }
+            else
+              {
+                int a = dst_a_ns;
+                int c = dst_c_ns;
+                int m = dst_m_ns;
 
-		if ((a % SR10 | c % SR10 | m % SR10) != 0)
-		  res = SYSCALL_RESOLUTION;
-		else
-		  for (res = SR10, a /= SR10, c /= SR10, m /= SR10;
-		       (res < dst_res->resolution
-			&& (a % 10 | c % 10 | m % 10) == 0);
-		       res *= 10, a /= 10, c /= 10, m /= 10)
-		    if (res == BILLION)
-		      {
-			if (! odd_second)
-			  res *= 2;
-			break;
-		      }
-	      }
+                /* Write it this way to avoid mistaken GCC warning
+                   about integer overflow in constant expression.  */
+                int SR10 = SYSCALL_RESOLUTION;  SR10 *= 10;
 
-	    dst_res->resolution = res;
-	  }
+                if ((a % SR10 | c % SR10 | m % SR10) != 0)
+                  res = SYSCALL_RESOLUTION;
+                else
+                  for (res = SR10, a /= SR10, c /= SR10, m /= SR10;
+                       (res < dst_res->resolution
+                        && (a % 10 | c % 10 | m % 10) == 0);
+                       res *= 10, a /= 10, c /= 10, m /= 10)
+                    if (res == BILLION)
+                      {
+                        if (! odd_second)
+                          res *= 2;
+                        break;
+                      }
+              }
 
-	  if (SYSCALL_RESOLUTION < res)
-	    {
-	      struct timespec timespec[2];
-	      struct stat dst_status;
+            dst_res->resolution = res;
+          }
 
-	      /* Ignore source time stamp information that must necessarily
-		 be lost when filtered through utimens.  */
-	      src_ns -= src_ns % SYSCALL_RESOLUTION;
+          if (SYSCALL_RESOLUTION < res)
+            {
+              struct timespec timespec[2];
+              struct stat dst_status;
 
-	      /* If the time stamps disagree widely enough, there's no need
-		 to interrogate the file system to deduce the exact time
-		 stamp resolution; return the answer directly.  */
-	      {
-		time_t s = src_s & ~ (res == 2 * BILLION);
-		if (src_s < dst_s || (src_s == dst_s && src_ns <= dst_ns))
-		  return 1;
-		if (dst_s < s
-		    || (dst_s == s && dst_ns < src_ns - src_ns % res))
-		  return -1;
-	      }
+              /* Ignore source time stamp information that must necessarily
+                 be lost when filtered through utimens.  */
+              src_ns -= src_ns % SYSCALL_RESOLUTION;
 
-	      /* Determine the actual time stamp resolution for the
-		 destination file system (after truncation due to
-		 SYSCALL_RESOLUTION) by setting the access time stamp of the
-		 destination to the existing access time, except with
-		 trailing nonzero digits.  */
+              /* If the time stamps disagree widely enough, there's no need
+                 to interrogate the file system to deduce the exact time
+                 stamp resolution; return the answer directly.  */
+              {
+                time_t s = src_s & ~ (res == 2 * BILLION);
+                if (src_s < dst_s || (src_s == dst_s && src_ns <= dst_ns))
+                  return 1;
+                if (dst_s < s
+                    || (dst_s == s && dst_ns < src_ns - src_ns % res))
+                  return -1;
+              }
 
-	      timespec[0].tv_sec = dst_a_s;
-	      timespec[0].tv_nsec = dst_a_ns;
-	      timespec[1].tv_sec = dst_m_s | (res == 2 * BILLION);
-	      timespec[1].tv_nsec = dst_m_ns + res / 9;
+              /* Determine the actual time stamp resolution for the
+                 destination file system (after truncation due to
+                 SYSCALL_RESOLUTION) by setting the access time stamp of the
+                 destination to the existing access time, except with
+                 trailing nonzero digits.  */
 
-	      /* Set the modification time.  But don't try to set the
-		 modification time of symbolic links; on many hosts this sets
-		 the time of the pointed-to file.  */
-	      if (S_ISLNK (dst_stat->st_mode)
-		  || utimens (dst_name, timespec) != 0)
-		return -2;
+              timespec[0].tv_sec = dst_a_s;
+              timespec[0].tv_nsec = dst_a_ns;
+              timespec[1].tv_sec = dst_m_s | (res == 2 * BILLION);
+              timespec[1].tv_nsec = dst_m_ns + res / 9;
 
-	      /* Read the modification time that was set.  It's safe to call
-		 'stat' here instead of worrying about 'lstat'; either the
-		 caller used 'stat', or the caller used 'lstat' and found
-		 something other than a symbolic link.  */
-	      {
-		int stat_result = stat (dst_name, &dst_status);
+              /* Set the modification time.  But don't try to set the
+                 modification time of symbolic links; on many hosts this sets
+                 the time of the pointed-to file.  */
+              if ((S_ISLNK (dst_stat->st_mode)
+                   ? lutimens (dst_name, timespec)
+                   : utimens (dst_name, timespec)) != 0)
+                return -2;
 
-		if (stat_result
-		    | (dst_status.st_mtime ^ dst_m_s)
-		    | (get_stat_mtime_ns (&dst_status) ^ dst_m_ns))
-		  {
-		    /* The modification time changed, or we can't tell whether
-		       it changed.  Change it back as best we can.  */
-		    timespec[1].tv_sec = dst_m_s;
-		    timespec[1].tv_nsec = dst_m_ns;
-		    utimens (dst_name, timespec);
-		  }
+              /* Read the modification time that was set.  */
+              {
+                int stat_result = (S_ISLNK (dst_stat->st_mode)
+                                   ? lstat (dst_name, &dst_status)
+                                   : stat (dst_name, &dst_status));
 
-		if (stat_result != 0)
-		  return -2;
-	      }
+                if (stat_result
+                    | (dst_status.st_mtime ^ dst_m_s)
+                    | (get_stat_mtime_ns (&dst_status) ^ dst_m_ns))
+                  {
+                    /* The modification time changed, or we can't tell whether
+                       it changed.  Change it back as best we can.  */
+                    timespec[1].tv_sec = dst_m_s;
+                    timespec[1].tv_nsec = dst_m_ns;
+                    if (S_ISLNK (dst_stat->st_mode))
+                      lutimens (dst_name, timespec);
+                    else
+                      utimens (dst_name, timespec);
+                  }
 
-	      /* Determine the exact resolution from the modification time
-		 that was read back.  */
-	      {
-		int old_res = res;
-		int a = (BILLION * (dst_status.st_mtime & 1)
-			 + get_stat_mtime_ns (&dst_status));
+                if (stat_result != 0)
+                  return -2;
+              }
 
-		res = SYSCALL_RESOLUTION;
+              /* Determine the exact resolution from the modification time
+                 that was read back.  */
+              {
+                int old_res = res;
+                int a = (BILLION * (dst_status.st_mtime & 1)
+                         + get_stat_mtime_ns (&dst_status));
 
-		for (a /= res; a % 10 != 0; a /= 10)
-		  {
-		    if (res == BILLION)
-		      {
-			res *= 2;
-			break;
-		      }
-		    res *= 10;
-		    if (res == old_res)
-		      break;
-		  }
-	      }
-	    }
+                res = SYSCALL_RESOLUTION;
 
-	  dst_res->resolution = res;
-	  dst_res->exact = true;
-	}
+                for (a /= res; a % 10 != 0; a /= 10)
+                  {
+                    if (res == BILLION)
+                      {
+                        res *= 2;
+                        break;
+                      }
+                    res *= 10;
+                    if (res == old_res)
+                      break;
+                  }
+              }
+            }
+
+          dst_res->resolution = res;
+          dst_res->exact = true;
+        }
 
       /* Truncate the source's time stamp according to the resolution.  */
       src_s &= ~ (res == 2 * BILLION);
@@ -318,7 +350,7 @@ utimecmp (char const *dst_name,
 
   /* Compare the time stamps and return -1, 0, 1 accordingly.  */
   return (dst_s < src_s ? -1
-	  : dst_s > src_s ? 1
-	  : dst_ns < src_ns ? -1
-	  : dst_ns > src_ns);
+          : dst_s > src_s ? 1
+          : dst_ns < src_ns ? -1
+          : dst_ns > src_ns);
 }

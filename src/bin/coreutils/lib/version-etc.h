@@ -1,5 +1,5 @@
 /* Print --version and bug-reporting information in a consistent format.
-   Copyright (C) 1999, 2003, 2005, 2009 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2003, 2005, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -50,26 +50,26 @@ extern const char version_etc_copyright[];
 
 /* N_AUTHORS names are supplied in array AUTHORS.  */
 extern void version_etc_arn (FILE *stream,
-			     const char *command_name, const char *package,
-			     const char *version,
-			     const char * const * authors, size_t n_authors);
+                             const char *command_name, const char *package,
+                             const char *version,
+                             const char * const * authors, size_t n_authors);
 
 /* Names are passed in the NULL-terminated array AUTHORS.  */
 extern void version_etc_ar (FILE *stream,
-			    const char *command_name, const char *package,
-			    const char *version, const char * const * authors);
+                            const char *command_name, const char *package,
+                            const char *version, const char * const * authors);
 
 /* Names are passed in the NULL-terminated va_list.  */
 extern void version_etc_va (FILE *stream,
-			    const char *command_name, const char *package,
-			    const char *version, va_list authors);
+                            const char *command_name, const char *package,
+                            const char *version, va_list authors);
 
 /* Names are passed as separate arguments, with an additional
    NULL argument at the end.  */
 extern void version_etc (FILE *stream,
-			 const char *command_name, const char *package,
-			 const char *version,
-			 /* const char *author1, ..., NULL */ ...)
+                         const char *command_name, const char *package,
+                         const char *version,
+                         /* const char *author1, ..., NULL */ ...)
   ATTRIBUTE_SENTINEL;
 
 /* Display the usual `Report bugs to' stanza */

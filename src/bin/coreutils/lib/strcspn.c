@@ -1,4 +1,5 @@
-/* Copyright (C) 1991, 1994, 1996-1997, 2002-2003, 2005-2006 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 1994, 1996-1997, 2002-2003, 2005-2006, 2009-2010 Free
+ * Software Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C Library.
    Bugs can be reported to bug-glibc@gnu.org.

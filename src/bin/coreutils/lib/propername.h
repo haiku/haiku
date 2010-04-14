@@ -1,5 +1,5 @@
 /* Localization of proper names.
-   Copyright (C) 2006, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2008, 2009, 2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -96,7 +96,7 @@ extern const char * proper_name (const char *name);
    escape sequences.  NAME_ASCII is a fallback written only with ASCII
    characters.  */
 extern const char * proper_name_utf8 (const char *name_ascii,
-				      const char *name_utf8);
+                                      const char *name_utf8);
 
 #ifdef __cplusplus
 }

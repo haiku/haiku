@@ -1,5 +1,5 @@
 /* du -- summarize disk usage
-   Copyright (C) 1988-1991, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1988-1991, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
    Rewritten to use nftw, then to use fts by Jim Meyering.  */
 
 #include <config.h>
-#include <stdio.h>
 #include <getopt.h>
 #include <sys/types.h>
 #include <assert.h>
@@ -40,6 +39,7 @@
 #include "quotearg.h"
 #include "same.h"
 #include "stat-time.h"
+#include "stdio--.h"
 #include "xfts.h"
 #include "xstrtol.h"
 
@@ -67,7 +67,6 @@ extern bool fts_debug;
 
 /* Hash structure for inode and device numbers.  The separate entry
    structure makes it easier to rehash "in place".  */
-
 struct entry
 {
   ino_t st_ino;
@@ -194,7 +193,6 @@ enum
   FILES0_FROM_OPTION,
   HUMAN_SI_OPTION,
   MAX_DEPTH_OPTION,
-  MEGABYTES_LONG_OPTION,
   TIME_OPTION,
   TIME_STYLE_OPTION
 };
@@ -332,7 +330,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       emit_blocksize_note ("DU");
       emit_size_note ();
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -493,6 +491,15 @@ process_file (FTS *fts, FTSENT *ent)
          we were able to stat it, so we do have a size.  */
       error (0, ent->fts_errno, _("cannot read directory %s"), quote (file));
       ok = false;
+      break;
+
+    case FTS_DC:		/* directory that causes cycles */
+      if (cycle_warning_required (fts, ent))
+        {
+          emit_cycle_warning (file);
+          return false;
+        }
+      ok = true;
       break;
 
     default:
@@ -757,10 +764,6 @@ main (int argc, char **argv)
           }
           break;
 
-        case MEGABYTES_LONG_OPTION: /* FIXME: remove in 2009 */
-          error (0, 0,
-                 _("the --megabytes option is deprecated; use -m instead"));
-          /* fall through */
         case 'm':
           human_output_opts = 0;
           output_block_size = 1024 * 1024;
@@ -845,7 +848,7 @@ main (int argc, char **argv)
   if (!ok)
     usage (EXIT_FAILURE);
 
-  if (opt_all & opt_summarize_only)
+  if (opt_all && opt_summarize_only)
     {
       error (0, 0, _("cannot both summarize and show all entries"));
       usage (EXIT_FAILURE);

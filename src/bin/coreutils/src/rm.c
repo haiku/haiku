@@ -1,5 +1,5 @@
 /* `rm' file deletion utility for GNU.
-   Copyright (C) 88, 90, 91, 1994-2009 Free Software Foundation, Inc.
+   Copyright (C) 1988, 1990-1991, 1994-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,32 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* Written by Paul Rubin, David MacKenzie, and Richard Stallman.
-   Reworked to use chdir and avoid recursion by Jim Meyering.  */
-
-/* Implementation overview:
-
-   In the `usual' case, RM saves no state for directories it is processing.
-   When a removal fails (either due to an error or to an interactive `no'
-   reply), the failure is noted (see description of `ht' in remove.c's
-   remove_cwd_entries function) so that when/if the containing directory
-   is reopened, RM doesn't try to remove the entry again.
-
-   RM may delete arbitrarily deep hierarchies -- even ones in which file
-   names (from root to leaf) are longer than the system-imposed maximum.
-   It does this by using chdir to change to each directory in turn before
-   removing the entries in that directory.
-
-   RM detects directory cycles lazily.  See lib/cycle-check.c.
-
-   RM is careful to avoid forming full file names whenever possible.
-   A full file name is formed only when it is about to be used -- e.g.
-   in a diagnostic or in an interactive-mode prompt.
-
-   RM minimizes the number of lstat system calls it makes.  On systems
-   that have valid d_type data in directory entries, RM makes only one
-   lstat call per command line argument -- regardless of the depth of
-   the hierarchy.  */
+/* Initially written by Paul Rubin, David MacKenzie, and Richard Stallman.
+   Reworked to use chdir and avoid recursion, and later, rewritten
+   once again, to use fts, by Jim Meyering.  */
 
 #include <config.h>
 #include <stdio.h>
@@ -203,7 +180,7 @@ Note that if you use rm to remove a file, it is usually possible to recover\n\
 the contents of that file.  If you want more assurance that the contents are\n\
 truly unrecoverable, consider using shred.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -348,7 +325,7 @@ main (int argc, char **argv)
         }
     }
 
-  if (x.recursive & preserve_root)
+  if (x.recursive && preserve_root)
     {
       static struct dev_ino dev_ino_buf;
       x.root_dev_ino = get_root_dev_ino (&dev_ino_buf);
@@ -356,10 +333,9 @@ main (int argc, char **argv)
         error (EXIT_FAILURE, errno, _("failed to get attributes of %s"),
                quote ("/"));
     }
-
   {
   size_t n_files = argc - optind;
-  char const *const *file = (char const *const *) argv + optind;
+  char **file =  argv + optind;
 
   if (prompt_once && (x.recursive || 3 < n_files))
     {
@@ -371,8 +347,9 @@ main (int argc, char **argv)
       if (!yesno ())
         exit (EXIT_SUCCESS);
     }
+  
   {
-  enum RM_status status = rm (n_files, file, &x);
+  enum RM_status status = rm (file, &x);
   assert (VALID_STATUS (status));
   exit (status == RM_ERROR ? EXIT_FAILURE : EXIT_SUCCESS);
   }

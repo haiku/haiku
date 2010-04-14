@@ -1,7 +1,7 @@
 /* A more useful interface to strtol.
 
-   Copyright (C) 1995, 1996, 1998, 1999, 2001, 2002, 2003, 2004, 2006, 2007,
-   2008 Free Software Foundation, Inc.
+   Copyright (C) 1995-1996, 1998-1999, 2001-2004, 2006-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ enum strtol_error
     LONGINT_INVALID_SUFFIX_CHAR = 2,
 
     LONGINT_INVALID_SUFFIX_CHAR_WITH_OVERFLOW = (LONGINT_INVALID_SUFFIX_CHAR
-						 | LONGINT_OVERFLOW),
+                                                 | LONGINT_OVERFLOW),
     LONGINT_INVALID = 4
   };
 typedef enum strtol_error strtol_error;
@@ -72,7 +72,7 @@ _DECLARE_XSTRTOL (xstrtoumax, uintmax_t)
    After reporting an error, exit with a failure status.  */
 
 void xstrtol_fatal (enum strtol_error,
-		    int, char, struct option const *,
-		    char const *) ATTRIBUTE_NORETURN;
+                    int, char, struct option const *,
+                    char const *) ATTRIBUTE_NORETURN;
 
 #endif /* not XSTRTOL_H_ */

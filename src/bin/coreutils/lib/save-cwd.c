@@ -1,7 +1,7 @@
 /* save-cwd.c -- Save and restore current working directory.
 
-   Copyright (C) 1995, 1997, 1998, 2003, 2004, 2005, 2006 Free
-   Software Foundation, Inc.
+   Copyright (C) 1995, 1997-1998, 2003-2006, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,20 @@
 #include "save-cwd.h"
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "chdir-long.h"
-#include "fcntl--.h"
+#include "unistd--.h"
 #include "xgetcwd.h"
+
+#if GNULIB_FCNTL_SAFER
+# include "fcntl--.h"
+#else
+# define GNULIB_FCNTL_SAFER 0
+#endif
 
 /* On systems without the fchdir function (WOE), pretend that open
    always returns -1 so that save_cwd resorts to using xgetcwd.
@@ -70,6 +76,8 @@ save_cwd (struct saved_cwd *cwd)
   cwd->name = NULL;
 
   cwd->desc = open (".", O_RDONLY);
+  if (!GNULIB_FCNTL_SAFER)
+    cwd->desc = fd_safer (cwd->desc);
   if (cwd->desc < 0)
     {
       cwd->name = xgetcwd ();

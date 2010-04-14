@@ -1,5 +1,5 @@
 /* sort - sort lines of text (with all kinds of options).
-   Copyright (C) 1988, 1991-2009 Free Software Foundation, Inc.
+   Copyright (C) 1988, 1991-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "argmatch.h"
 #include "error.h"
 #include "filevercmp.h"
+#include "hard-locale.h"
 #include "hash.h"
 #include "md5.h"
 #include "physmem.h"
@@ -43,6 +44,7 @@
 #include "strnumcmp.h"
 #include "xmemcoll.h"
 #include "xmemxfrm.h"
+#include "xnanosleep.h"
 #include "xstrtol.h"
 
 #if HAVE_SYS_RESOURCE_H
@@ -106,13 +108,13 @@ enum
     /* The number of times we should try to fork a compression process
        (we retry if the fork call fails).  We don't _need_ to compress
        temp files, this is just to reduce disk access, so this number
-       can be small.  */
-    MAX_FORK_TRIES_COMPRESS = 2,
+       can be small.  Each retry doubles in duration.  */
+    MAX_FORK_TRIES_COMPRESS = 4,
 
     /* The number of times we should try to fork a decompression process.
        If we can't fork a decompression process, we can't sort, so this
-       number should be big.  */
-    MAX_FORK_TRIES_DECOMPRESS = 8
+       number should be big.  Each retry doubles in duration.  */
+    MAX_FORK_TRIES_DECOMPRESS = 9
   };
 
 /* The representation of the decimal point in the current locale.  */
@@ -414,7 +416,7 @@ The locale specified by the environment affects sort order.\n\
 Set LC_ALL=C to get the traditional sort order that uses\n\
 native byte values.\n\
 "), stdout );
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
 
   exit (status);
@@ -867,7 +869,7 @@ pipe_fork (int pipefds[2], size_t tries)
 #if HAVE_WORKING_FORK
   struct tempnode *saved_temphead;
   int saved_errno;
-  unsigned int wait_retry = 1;
+  double wait_retry = 0.25;
   pid_t pid IF_LINT (= -1);
   struct cs_status cs;
 
@@ -894,7 +896,7 @@ pipe_fork (int pipefds[2], size_t tries)
         break;
       else
         {
-          sleep (wait_retry);
+          xnanosleep (wait_retry);
           wait_retry *= 2;
           reap_some ();
         }
@@ -1473,7 +1475,7 @@ limfield (const struct line *line, const struct keyfield *key)
       {
         while (ptr < lim && *ptr != tab)
           ++ptr;
-        if (ptr < lim && (eword | echar))
+        if (ptr < lim && (eword || echar))
           ++ptr;
       }
   else
@@ -2034,7 +2036,7 @@ keycompare (const struct line *a, const struct line *b)
 
       if (key->random)
         diff = compare_random (texta, lena, textb, lenb);
-      else if (key->numeric | key->general_numeric | key->human_numeric)
+      else if (key->numeric || key->general_numeric || key->human_numeric)
         {
           char savea = *lima, saveb = *limb;
 
@@ -2200,7 +2202,7 @@ compare (const struct line *a, const struct line *b)
   if (keylist)
     {
       diff = keycompare (a, b);
-      if (diff | unique | stable)
+      if (diff || unique || stable)
         return diff;
     }
 
@@ -3260,6 +3262,7 @@ main (int argc, char **argv)
         }
 #endif
   }
+  signal (SIGCHLD, SIG_DFL); /* Don't inherit CHLD handling from parent.  */
 
   /* The signal mask is known, so it is safe to invoke exit_cleanup.  */
   atexit (exit_cleanup);
@@ -3306,7 +3309,7 @@ main (int argc, char **argv)
             {
               bool minus_pos_usage = (optind != argc && argv[optind][0] == '-'
                                       && ISDIGIT (argv[optind][1]));
-              obsolete_usage |= minus_pos_usage & ~posixly_correct;
+              obsolete_usage |= minus_pos_usage && !posixly_correct;
               if (obsolete_usage)
                 {
                   /* Treat +POS1 [-POS2] as a key if possible; but silently
@@ -3315,7 +3318,7 @@ main (int argc, char **argv)
                   s = parse_field_count (optarg + 1, &key->sword, NULL);
                   if (s && *s == '.')
                     s = parse_field_count (s + 1, &key->schar, NULL);
-                  if (! (key->sword | key->schar))
+                  if (! (key->sword || key->schar))
                     key->sword = SIZE_MAX;
                   if (! s || *set_ordering (s, key, bl_start))
                     key = NULL;
@@ -3406,7 +3409,7 @@ main (int argc, char **argv)
                   badfieldspec (optarg, N_("character offset is zero"));
                 }
             }
-          if (! (key->sword | key->schar))
+          if (! (key->sword || key->schar))
             key->sword = SIZE_MAX;
           s = set_ordering (s, key, bl_start);
           if (*s != ',')
@@ -3595,14 +3598,14 @@ main (int argc, char **argv)
       if (! (key->ignore
              || key->translate
              || (key->skipsblanks
-                 | key->reverse
-                 | key->skipeblanks
-                 | key->month
-                 | key->numeric
-                 | key->version
-                 | key->general_numeric
-                 | key->human_numeric
-                 | key->random)))
+                 || key->reverse
+                 || key->skipeblanks
+                 || key->month
+                 || key->numeric
+                 || key->version
+                 || key->general_numeric
+                 || key->human_numeric
+                 || key->random)))
         {
           key->ignore = gkey.ignore;
           key->translate = gkey.translate;
@@ -3623,13 +3626,13 @@ main (int argc, char **argv)
   if (!keylist && (gkey.ignore
                    || gkey.translate
                    || (gkey.skipsblanks
-                       | gkey.skipeblanks
-                       | gkey.month
-                       | gkey.numeric
-                       | gkey.general_numeric
-                       | gkey.human_numeric
-                       | gkey.random
-                       | gkey.version)))
+                       || gkey.skipeblanks
+                       || gkey.month
+                       || gkey.numeric
+                       || gkey.general_numeric
+                       || gkey.human_numeric
+                       || gkey.random
+                       || gkey.version)))
     {
       insertkey (&gkey);
       need_random |= gkey.random;

@@ -1,5 +1,5 @@
 /* An ftello() function that works around platform bugs.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -41,10 +41,10 @@ rpl_ftello (FILE *fp)
   if ((fp->_flags & __SL64) == 0)
     {
       /* Cygwin 1.5.0 through 1.5.24 failed to open stdin in 64-bit
-	 mode; but has an ftello that requires 64-bit mode.  */
+         mode; but has an ftello that requires 64-bit mode.  */
       FILE *tmp = fopen ("/dev/null", "r");
       if (!tmp)
-	return -1;
+        return -1;
       fp->_flags |= __SL64;
       fp->_seek64 = tmp->_seek64;
       fclose (tmp);

@@ -1,6 +1,6 @@
 /* set-mode-acl.c - set access control list equivalent to a mode
 
-   Copyright (C) 2002-2003, 2005-2009 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2005-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -79,15 +79,15 @@ qset_acl (char const *name, int desc, mode_t mode)
     {
       acl = acl_from_mode (mode);
       if (!acl)
-	return -1;
+        return -1;
     }
   else /* FreeBSD, IRIX, Tru64 */
     {
       /* If we were to create the ACL using the functions acl_init(),
-	 acl_create_entry(), acl_set_tag_type(), acl_set_qualifier(),
-	 acl_get_permset(), acl_clear_perm[s](), acl_add_perm(), we
-	 would need to create a qualifier.  I don't know how to do this.
-	 So create it using acl_from_text().  */
+         acl_create_entry(), acl_set_tag_type(), acl_set_qualifier(),
+         acl_get_permset(), acl_clear_perm[s](), acl_add_perm(), we
+         would need to create a qualifier.  I don't know how to do this.
+         So create it using acl_from_text().  */
 
 #   if HAVE_ACL_FREE_TEXT /* Tru64 */
       char acl_text[] = "u::---,g::---,o::---,";
@@ -107,7 +107,7 @@ qset_acl (char const *name, int desc, mode_t mode)
 
       acl = acl_from_text (acl_text);
       if (!acl)
-	return -1;
+        return -1;
     }
   if (HAVE_ACL_SET_FD && desc != -1)
     ret = acl_set_fd (desc, acl);
@@ -119,12 +119,12 @@ qset_acl (char const *name, int desc, mode_t mode)
       acl_free (acl);
 
       if (ACL_NOT_WELL_SUPPORTED (errno))
-	return chmod_or_fchmod (name, desc, mode);
+        return chmod_or_fchmod (name, desc, mode);
       else
-	{
-	  errno = saved_errno;
-	  return -1;
-	}
+        {
+          errno = saved_errno;
+          return -1;
+        }
     }
   else
     acl_free (acl);
@@ -135,7 +135,7 @@ qset_acl (char const *name, int desc, mode_t mode)
   if (mode & (S_ISUID | S_ISGID | S_ISVTX))
     {
       /* We did not call chmod so far, so the special bits have not yet
-	 been set.  */
+         been set.  */
       return chmod_or_fchmod (name, desc, mode);
     }
   return 0;
@@ -150,14 +150,14 @@ qset_acl (char const *name, int desc, mode_t mode)
   /* On MacOS X,  acl_get_file (name, ACL_TYPE_ACCESS)
      and          acl_get_file (name, ACL_TYPE_DEFAULT)
      always return NULL / EINVAL.  You have to use
-		  acl_get_file (name, ACL_TYPE_EXTENDED)
+                  acl_get_file (name, ACL_TYPE_EXTENDED)
      or           acl_get_fd (open (name, ...))
      to retrieve an ACL.
      On the other hand,
-		  acl_set_file (name, ACL_TYPE_ACCESS, acl)
+                  acl_set_file (name, ACL_TYPE_ACCESS, acl)
      and          acl_set_file (name, ACL_TYPE_DEFAULT, acl)
      have the same effect as
-		  acl_set_file (name, ACL_TYPE_EXTENDED, acl):
+                  acl_set_file (name, ACL_TYPE_EXTENDED, acl):
      Each of these calls sets the file's ACL.  */
 
   acl_t acl;
@@ -174,27 +174,27 @@ qset_acl (char const *name, int desc, mode_t mode)
 
       acl = acl_init (0);
       if (acl)
-	{
-	  if (HAVE_ACL_SET_FD && desc != -1)
-	    ret = acl_set_fd (desc, acl);
-	  else
-	    ret = acl_set_file (name, ACL_TYPE_EXTENDED, acl);
-	  if (ret != 0)
-	    {
-	      int saved_errno = errno;
+        {
+          if (HAVE_ACL_SET_FD && desc != -1)
+            ret = acl_set_fd (desc, acl);
+          else
+            ret = acl_set_file (name, ACL_TYPE_EXTENDED, acl);
+          if (ret != 0)
+            {
+              int saved_errno = errno;
 
-	      acl_free (acl);
+              acl_free (acl);
 
-	      if (ACL_NOT_WELL_SUPPORTED (saved_errno))
-		return chmod_or_fchmod (name, desc, mode);
-	      else
-		{
-		  errno = saved_errno;
-		  return -1;
-		}
-	    }
-	  acl_free (acl);
-	}
+              if (ACL_NOT_WELL_SUPPORTED (saved_errno))
+                return chmod_or_fchmod (name, desc, mode);
+              else
+                {
+                  errno = saved_errno;
+                  return -1;
+                }
+            }
+          acl_free (acl);
+        }
     }
 
   /* Since !MODE_INSIDE_ACL, we have to call chmod explicitly.  */
@@ -235,7 +235,7 @@ qset_acl (char const *name, int desc, mode_t mode)
   if (ret < 0)
     {
       if (saved_errno == ENOSYS || saved_errno == EOPNOTSUPP)
-	return chmod_or_fchmod (name, desc, mode);
+        return chmod_or_fchmod (name, desc, mode);
       errno = saved_errno;
       return -1;
     }
@@ -243,7 +243,7 @@ qset_acl (char const *name, int desc, mode_t mode)
   if (mode & (S_ISUID | S_ISGID | S_ISVTX))
     {
       /* We did not call chmod so far, so the special bits have not yet
-	 been set.  */
+         been set.  */
       return chmod_or_fchmod (name, desc, mode);
     }
   return 0;
@@ -268,41 +268,41 @@ qset_acl (char const *name, int desc, mode_t mode)
 
     for (;;)
       {
-	if (desc != -1)
-	  count = facl (desc, ACE_GETACLCNT, 0, NULL);
-	else
-	  count = acl (name, ACE_GETACLCNT, 0, NULL);
-	if (count <= 0)
-	  {
-	    convention = -1;
-	    break;
-	  }
-	entries = (ace_t *) malloc (count * sizeof (ace_t));
-	if (entries == NULL)
-	  {
-	    errno = ENOMEM;
-	    return -1;
-	  }
-	if ((desc != -1
-	     ? facl (desc, ACE_GETACL, count, entries)
-	     : acl (name, ACE_GETACL, count, entries))
-	    == count)
-	  {
-	    int i;
+        if (desc != -1)
+          count = facl (desc, ACE_GETACLCNT, 0, NULL);
+        else
+          count = acl (name, ACE_GETACLCNT, 0, NULL);
+        if (count <= 0)
+          {
+            convention = -1;
+            break;
+          }
+        entries = (ace_t *) malloc (count * sizeof (ace_t));
+        if (entries == NULL)
+          {
+            errno = ENOMEM;
+            return -1;
+          }
+        if ((desc != -1
+             ? facl (desc, ACE_GETACL, count, entries)
+             : acl (name, ACE_GETACL, count, entries))
+            == count)
+          {
+            int i;
 
-	    convention = 0;
-	    for (i = 0; i < count; i++)
-	      if (entries[i].a_flags & (ACE_OWNER | ACE_GROUP | ACE_OTHER))
-		{
-		  convention = 1;
-		  break;
-		}
-	    free (entries);
-	    break;
-	  }
-	/* Huh? The number of ACL entries changed since the last call.
-	   Repeat.  */
-	free (entries);
+            convention = 0;
+            for (i = 0; i < count; i++)
+              if (entries[i].a_flags & (ACE_OWNER | ACE_GROUP | ACE_OTHER))
+                {
+                  convention = 1;
+                  break;
+                }
+            free (entries);
+            break;
+          }
+        /* Huh? The number of ACL entries changed since the last call.
+           Repeat.  */
+        free (entries);
       }
   }
 
@@ -312,58 +312,58 @@ qset_acl (char const *name, int desc, mode_t mode)
       int ret;
 
       if (convention)
-	{
-	  /* Running on Solaris 10.  */
-	  entries[0].a_type = ALLOW;
-	  entries[0].a_flags = ACE_OWNER;
-	  entries[0].a_who = 0; /* irrelevant */
-	  entries[0].a_access_mask = (mode >> 6) & 7;
-	  entries[1].a_type = ALLOW;
-	  entries[1].a_flags = ACE_GROUP;
-	  entries[1].a_who = 0; /* irrelevant */
-	  entries[1].a_access_mask = (mode >> 3) & 7;
-	  entries[2].a_type = ALLOW;
-	  entries[2].a_flags = ACE_OTHER;
-	  entries[2].a_who = 0;
-	  entries[2].a_access_mask = mode & 7;
-	}
+        {
+          /* Running on Solaris 10.  */
+          entries[0].a_type = ALLOW;
+          entries[0].a_flags = ACE_OWNER;
+          entries[0].a_who = 0; /* irrelevant */
+          entries[0].a_access_mask = (mode >> 6) & 7;
+          entries[1].a_type = ALLOW;
+          entries[1].a_flags = ACE_GROUP;
+          entries[1].a_who = 0; /* irrelevant */
+          entries[1].a_access_mask = (mode >> 3) & 7;
+          entries[2].a_type = ALLOW;
+          entries[2].a_flags = ACE_OTHER;
+          entries[2].a_who = 0;
+          entries[2].a_access_mask = mode & 7;
+        }
       else
-	{
-	  /* Running on Solaris 10 (newer version) or Solaris 11.  */
-	  entries[0].a_type = ACE_ACCESS_ALLOWED_ACE_TYPE;
-	  entries[0].a_flags = NEW_ACE_OWNER;
-	  entries[0].a_who = 0; /* irrelevant */
-	  entries[0].a_access_mask =
-	    (mode & 0400 ? NEW_ACE_READ_DATA : 0)
-	    | (mode & 0200 ? NEW_ACE_WRITE_DATA : 0)
-	    | (mode & 0100 ? NEW_ACE_EXECUTE : 0);
-	  entries[1].a_type = ACE_ACCESS_ALLOWED_ACE_TYPE;
-	  entries[1].a_flags = NEW_ACE_GROUP | NEW_ACE_IDENTIFIER_GROUP;
-	  entries[1].a_who = 0; /* irrelevant */
-	  entries[1].a_access_mask =
-	    (mode & 0040 ? NEW_ACE_READ_DATA : 0)
-	    | (mode & 0020 ? NEW_ACE_WRITE_DATA : 0)
-	    | (mode & 0010 ? NEW_ACE_EXECUTE : 0);
-	  entries[2].a_type = ACE_ACCESS_ALLOWED_ACE_TYPE;
-	  entries[2].a_flags = ACE_EVERYONE;
-	  entries[2].a_who = 0;
-	  entries[2].a_access_mask =
-	    (mode & 0004 ? NEW_ACE_READ_DATA : 0)
-	    | (mode & 0002 ? NEW_ACE_WRITE_DATA : 0)
-	    | (mode & 0001 ? NEW_ACE_EXECUTE : 0);
-	}
+        {
+          /* Running on Solaris 10 (newer version) or Solaris 11.  */
+          entries[0].a_type = ACE_ACCESS_ALLOWED_ACE_TYPE;
+          entries[0].a_flags = NEW_ACE_OWNER;
+          entries[0].a_who = 0; /* irrelevant */
+          entries[0].a_access_mask =
+            (mode & 0400 ? NEW_ACE_READ_DATA : 0)
+            | (mode & 0200 ? NEW_ACE_WRITE_DATA : 0)
+            | (mode & 0100 ? NEW_ACE_EXECUTE : 0);
+          entries[1].a_type = ACE_ACCESS_ALLOWED_ACE_TYPE;
+          entries[1].a_flags = NEW_ACE_GROUP | NEW_ACE_IDENTIFIER_GROUP;
+          entries[1].a_who = 0; /* irrelevant */
+          entries[1].a_access_mask =
+            (mode & 0040 ? NEW_ACE_READ_DATA : 0)
+            | (mode & 0020 ? NEW_ACE_WRITE_DATA : 0)
+            | (mode & 0010 ? NEW_ACE_EXECUTE : 0);
+          entries[2].a_type = ACE_ACCESS_ALLOWED_ACE_TYPE;
+          entries[2].a_flags = ACE_EVERYONE;
+          entries[2].a_who = 0;
+          entries[2].a_access_mask =
+            (mode & 0004 ? NEW_ACE_READ_DATA : 0)
+            | (mode & 0002 ? NEW_ACE_WRITE_DATA : 0)
+            | (mode & 0001 ? NEW_ACE_EXECUTE : 0);
+        }
       if (desc != -1)
-	ret = facl (desc, ACE_SETACL,
-		    sizeof (entries) / sizeof (ace_t), entries);
+        ret = facl (desc, ACE_SETACL,
+                    sizeof (entries) / sizeof (ace_t), entries);
       else
-	ret = acl (name, ACE_SETACL,
-		   sizeof (entries) / sizeof (ace_t), entries);
+        ret = acl (name, ACE_SETACL,
+                   sizeof (entries) / sizeof (ace_t), entries);
       if (ret < 0 && errno != EINVAL && errno != ENOTSUP)
-	{
-	  if (errno == ENOSYS)
-	    return chmod_or_fchmod (name, desc, mode);
-	  return -1;
-	}
+        {
+          if (errno == ENOSYS)
+            return chmod_or_fchmod (name, desc, mode);
+          return -1;
+        }
     }
 #   endif
 
@@ -387,16 +387,16 @@ qset_acl (char const *name, int desc, mode_t mode)
       ret = acl (name, SETACL, sizeof (entries) / sizeof (aclent_t), entries);
     if (ret < 0)
       {
-	if (errno == ENOSYS)
-	  return chmod_or_fchmod (name, desc, mode);
-	return -1;
+        if (errno == ENOSYS)
+          return chmod_or_fchmod (name, desc, mode);
+        return -1;
       }
   }
 
   if (!MODE_INSIDE_ACL || (mode & (S_ISUID | S_ISGID | S_ISVTX)))
     {
       /* We did not call chmod so far, so the special bits have not yet
-	 been set.  */
+         been set.  */
       return chmod_or_fchmod (name, desc, mode);
     }
   return 0;
@@ -433,21 +433,124 @@ qset_acl (char const *name, int desc, mode_t mode)
   if (ret < 0)
     {
       if (errno == ENOSYS || errno == EOPNOTSUPP)
-	return chmod_or_fchmod (name, desc, mode);
+        return chmod_or_fchmod (name, desc, mode);
       return -1;
     }
 
   if (mode & (S_ISUID | S_ISGID | S_ISVTX))
     {
       /* We did not call chmod so far, so the special bits have not yet
-	 been set.  */
+         been set.  */
       return chmod_or_fchmod (name, desc, mode);
     }
   return 0;
 
-# elif HAVE_ACLX_GET && 0 /* AIX */
+# elif HAVE_ACLX_GET && defined ACL_AIX_WIP /* AIX */
 
-  /* TODO: use aclx_fput or aclx_put, respectively */
+  acl_type_list_t types;
+  size_t types_size = sizeof (types);
+  acl_type_t type;
+
+  if (aclx_gettypes (name, &types, &types_size) < 0
+      || types.num_entries == 0)
+    return chmod_or_fchmod (name, desc, mode);
+
+  /* XXX Do we need to clear all types of ACLs for the given file, or is it
+     sufficient to clear the first one?  */
+  type = types.entries[0];
+  if (type.u64 == ACL_AIXC)
+    {
+      union { struct acl a; char room[128]; } u;
+      int ret;
+
+      u.a.acl_len = (char *) &u.a.acl_ext[0] - (char *) &u.a; /* no entries */
+      u.a.acl_mode = mode & ~(S_IXACL | 0777);
+      u.a.u_access = (mode >> 6) & 7;
+      u.a.g_access = (mode >> 3) & 7;
+      u.a.o_access = mode & 7;
+
+      if (desc != -1)
+        ret = aclx_fput (desc, SET_ACL | SET_MODE_S_BITS,
+                         type, &u.a, u.a.acl_len, mode);
+      else
+        ret = aclx_put (name, SET_ACL | SET_MODE_S_BITS,
+                        type, &u.a, u.a.acl_len, mode);
+      if (!(ret < 0 && errno == ENOSYS))
+        return ret;
+    }
+  else if (type.u64 == ACL_NFS4)
+    {
+      union { nfs4_acl_int_t a; char room[128]; } u;
+      nfs4_ace_int_t *ace;
+      int ret;
+
+      u.a.aclVersion = NFS4_ACL_INT_STRUCT_VERSION;
+      u.a.aclEntryN = 0;
+      ace = &u.a.aclEntry[0];
+      {
+        ace->flags = ACE4_ID_SPECIAL;
+        ace->aceWho.special_whoid = ACE4_WHO_OWNER;
+        ace->aceType = ACE4_ACCESS_ALLOWED_ACE_TYPE;
+        ace->aceFlags = 0;
+        ace->aceMask =
+          (mode & 0400 ? ACE4_READ_DATA | ACE4_LIST_DIRECTORY : 0)
+          | (mode & 0200
+             ? ACE4_WRITE_DATA | ACE4_ADD_FILE | ACE4_APPEND_DATA
+               | ACE4_ADD_SUBDIRECTORY
+             : 0)
+          | (mode & 0100 ? ACE4_EXECUTE : 0);
+        ace->aceWhoString[0] = '\0';
+        ace->entryLen = (char *) &ace->aceWhoString[4] - (char *) ace;
+        ace = (nfs4_ace_int_t *) (char *) &ace->aceWhoString[4];
+        u.a.aclEntryN++;
+      }
+      {
+        ace->flags = ACE4_ID_SPECIAL;
+        ace->aceWho.special_whoid = ACE4_WHO_GROUP;
+        ace->aceType = ACE4_ACCESS_ALLOWED_ACE_TYPE;
+        ace->aceFlags = 0;
+        ace->aceMask =
+          (mode & 0040 ? ACE4_READ_DATA | ACE4_LIST_DIRECTORY : 0)
+          | (mode & 0020
+             ? ACE4_WRITE_DATA | ACE4_ADD_FILE | ACE4_APPEND_DATA
+               | ACE4_ADD_SUBDIRECTORY
+             : 0)
+          | (mode & 0010 ? ACE4_EXECUTE : 0);
+        ace->aceWhoString[0] = '\0';
+        ace->entryLen = (char *) &ace->aceWhoString[4] - (char *) ace;
+        ace = (nfs4_ace_int_t *) (char *) &ace->aceWhoString[4];
+        u.a.aclEntryN++;
+      }
+      {
+        ace->flags = ACE4_ID_SPECIAL;
+        ace->aceWho.special_whoid = ACE4_WHO_EVERYONE;
+        ace->aceType = ACE4_ACCESS_ALLOWED_ACE_TYPE;
+        ace->aceFlags = 0;
+        ace->aceMask =
+          (mode & 0004 ? ACE4_READ_DATA | ACE4_LIST_DIRECTORY : 0)
+          | (mode & 0002
+             ? ACE4_WRITE_DATA | ACE4_ADD_FILE | ACE4_APPEND_DATA
+               | ACE4_ADD_SUBDIRECTORY
+             : 0)
+          | (mode & 0001 ? ACE4_EXECUTE : 0);
+        ace->aceWhoString[0] = '\0';
+        ace->entryLen = (char *) &ace->aceWhoString[4] - (char *) ace;
+        ace = (nfs4_ace_int_t *) (char *) &ace->aceWhoString[4];
+        u.a.aclEntryN++;
+      }
+      u.a.aclLength = (char *) ace - (char *) &u.a;
+
+      if (desc != -1)
+        ret = aclx_fput (desc, SET_ACL | SET_MODE_S_BITS,
+                         type, &u.a, u.a.aclLength, mode);
+      else
+        ret = aclx_put (name, SET_ACL | SET_MODE_S_BITS,
+                        type, &u.a, u.a.aclLength, mode);
+      if (!(ret < 0 && errno == ENOSYS))
+        return ret;
+    }
+
+  return chmod_or_fchmod (name, desc, mode);
 
 # elif HAVE_STATACL /* older AIX */
 

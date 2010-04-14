@@ -1,5 +1,5 @@
 /* chmod -- change permission modes of files
-   Copyright (C) 89, 90, 91, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1989-1991, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -228,6 +228,15 @@ process_file (FTS *fts, FTSENT *ent)
         error (0, 0, _("cannot operate on dangling symlink %s"),
                quote (file_full_name));
       ok = false;
+      break;
+
+    case FTS_DC:		/* directory that causes cycles */
+      if (cycle_warning_required (fts, ent))
+        {
+          emit_cycle_warning (file_full_name);
+          return false;
+        }
+      break;
 
     default:
       break;
@@ -279,7 +288,7 @@ process_file (FTS *fts, FTSENT *ent)
         }
     }
 
-  if (chmod_succeeded & diagnose_surprises)
+  if (chmod_succeeded && diagnose_surprises)
     {
       mode_t naively_expected_mode =
         mode_adjust (old_mode, S_ISDIR (old_mode) != 0, 0, change, NULL);
@@ -379,7 +388,7 @@ Change the mode of each FILE to MODE.\n\
 \n\
 Each MODE is of the form `[ugoa]*([-+=]([rwxXst]*|[ugo]))+'.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -523,7 +532,7 @@ main (int argc, char **argv)
       umask_value = umask (0);
     }
 
-  if (recurse & preserve_root)
+  if (recurse && preserve_root)
     {
       static struct dev_ino dev_ino_buf;
       root_dev_ino = get_root_dev_ino (&dev_ino_buf);

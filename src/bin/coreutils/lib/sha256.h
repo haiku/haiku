@@ -1,6 +1,6 @@
 /* Declarations of functions and data types used for SHA256 and SHA224 sum
    library functions.
-   Copyright (C) 2005, 2006, 2008, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2008, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,14 +47,14 @@ extern void sha224_init_ctx (struct sha256_ctx *ctx);
    starting at BUFFER.
    It is necessary that LEN is a multiple of 64!!! */
 extern void sha256_process_block (const void *buffer, size_t len,
-				  struct sha256_ctx *ctx);
+                                  struct sha256_ctx *ctx);
 
 /* Starting with the result of former calls of this function (or the
    initialization function update the context for the next LEN bytes
    starting at BUFFER.
    It is NOT required that LEN is a multiple of 64.  */
 extern void sha256_process_bytes (const void *buffer, size_t len,
-				  struct sha256_ctx *ctx);
+                                  struct sha256_ctx *ctx);
 
 /* Process the remaining bytes in the buffer and put result from CTX
    in first 32 (28) bytes following RESBUF.  The result is always in little

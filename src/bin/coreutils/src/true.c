@@ -1,5 +1,5 @@
 /* Exit with a status code indicating success.
-   Copyright (C) 1999-2003, 2005, 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 1999-2003, 2005, 2007-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,25 +47,25 @@ Usage: %s [ignored command line arguments]\n\
   fputs (HELP_OPTION_DESCRIPTION, stdout);
   fputs (VERSION_OPTION_DESCRIPTION, stdout);
   printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
-  emit_bug_reporting_address ();
+  emit_ancillary_info ();
   exit (status);
 }
 
 int
 main (int argc, char **argv)
 {
-  initialize_main (&argc, &argv);
-  set_program_name (argv[0]);
-  setlocale (LC_ALL, "");
-  bindtextdomain (PACKAGE, LOCALEDIR);
-  textdomain (PACKAGE);
-
-  atexit (close_stdout);
-
   /* Recognize --help or --version only if it's the only command-line
      argument.  */
   if (argc == 2)
     {
+      initialize_main (&argc, &argv);
+      set_program_name (argv[0]);
+      setlocale (LC_ALL, "");
+      bindtextdomain (PACKAGE, LOCALEDIR);
+      textdomain (PACKAGE);
+
+      atexit (close_stdout);
+
       if (STREQ (argv[1], "--help"))
         usage (EXIT_STATUS);
 

@@ -1,6 +1,6 @@
 /* group-member.c -- determine whether group id is in calling user's group list
 
-   Copyright (C) 1994, 1997, 1998, 2003, 2005, 2006 Free Software
+   Copyright (C) 1994, 1997-1998, 2003, 2005-2006, 2009-2010 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -32,10 +32,8 @@
 struct group_info
   {
     int n_groups;
-    GETGROUPS_T *group;
+    gid_t *group;
   };
-
-#if HAVE_GETGROUPS
 
 static void
 free_group_info (struct group_info const *g)
@@ -48,7 +46,7 @@ get_group_info (struct group_info *gi)
 {
   int n_groups;
   int n_group_slots = getgroups (0, NULL);
-  GETGROUPS_T *group;
+  gid_t *group;
 
   if (n_group_slots < 0)
     return false;
@@ -72,18 +70,14 @@ get_group_info (struct group_info *gi)
   return true;
 }
 
-#endif /* not HAVE_GETGROUPS */
-
 /* Return non-zero if GID is one that we have in our groups list.
-   If there is no getgroups function, return non-zero if GID matches
-   either of the current or effective group IDs.  */
+   Note that the groups list is not guaranteed to contain the current
+   or effective group ID, so they should generally be checked
+   separately.  */
 
 int
 group_member (gid_t gid)
 {
-#ifndef HAVE_GETGROUPS
-  return ((gid == getgid ()) || (gid == getegid ()));
-#else
   int i;
   int found;
   struct group_info gi;
@@ -96,16 +90,15 @@ group_member (gid_t gid)
   for (i = 0; i < gi.n_groups; i++)
     {
       if (gid == gi.group[i])
-	{
-	  found = 1;
-	  break;
-	}
+        {
+          found = 1;
+          break;
+        }
     }
 
   free_group_info (&gi);
 
   return found;
-#endif /* HAVE_GETGROUPS */
 }
 
 #ifdef TEST
@@ -119,7 +112,7 @@ main (int argc, char **argv)
 
   program_name = argv[0];
 
-  for (i=1; i<argc; i++)
+  for (i = 1; i < argc; i++)
     {
       gid_t gid;
 

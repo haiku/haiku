@@ -1,6 +1,6 @@
 /* Compile-time assert-like macros.
 
-   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -110,8 +110,8 @@
 
        #if 4 <= __GNUC__
        # define verify(R) \
-	   extern int (* verify_function__ (void)) \
-		      [__builtin_constant_p (R) && (R) ? 1 : -1]
+           extern int (* verify_function__ (void)) \
+                      [__builtin_constant_p (R) && (R) ? 1 : -1]
        #endif
 
    * In C++, any struct definition inside sizeof is invalid.

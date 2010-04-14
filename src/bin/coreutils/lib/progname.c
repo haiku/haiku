@@ -1,6 +1,6 @@
 /* Program name management.
-   Copyright (C) 2001-2003, 2005-2009 Free Software Foundation, Inc.
-   Written by Bruno Haible <haible@clisp.cons.org>, 2001.
+   Copyright (C) 2001-2003, 2005-2010 Free Software Foundation, Inc.
+   Written by Bruno Haible <bruno@clisp.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 #include "progname.h"
 
 #include <errno.h> /* get program_invocation_name declaration */
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -30,7 +32,9 @@
    To be initialized by main().  */
 const char *program_name = NULL;
 
-/* Set program_name, based on argv[0].  */
+/* Set program_name, based on argv[0].
+   argv0 must be a string allocated with indefinite extent, and must not be
+   modified after this call.  */
 void
 set_program_name (const char *argv0)
 {
@@ -42,13 +46,30 @@ set_program_name (const char *argv0)
   const char *slash;
   const char *base;
 
+  /* Sanity check.  POSIX requires the invoking process to pass a non-NULL
+     argv[0].  */
+  if (argv0 == NULL)
+    {
+      /* It's a bug in the invoking program.  Help diagnosing it.  */
+      fputs ("A NULL argv[0] was passed through an exec system call.\n",
+             stderr);
+      abort ();
+    }
+
   slash = strrchr (argv0, '/');
   base = (slash != NULL ? slash + 1 : argv0);
   if (base - argv0 >= 7 && strncmp (base - 7, "/.libs/", 7) == 0)
     {
       argv0 = base;
       if (strncmp (base, "lt-", 3) == 0)
-	argv0 = base + 3;
+        {
+          argv0 = base + 3;
+          /* On glibc systems, remove the "lt-" prefix from the variable
+             program_invocation_short_name.  */
+#if HAVE_DECL_PROGRAM_INVOCATION_SHORT_NAME
+          program_invocation_short_name = (char *) argv0;
+#endif
+        }
     }
 
   /* But don't strip off a leading <dirname>/ in general, because when the user
@@ -62,9 +83,9 @@ set_program_name (const char *argv0)
 
   program_name = argv0;
 
-  /* On glibc systems, when the gnulib module 'error' is not used, the error()
-     function comes from libc and uses the variable program_invocation_name,
-     not program_name.  So set this variable as well.  */
+  /* On glibc systems, the error() function comes from libc and uses the
+     variable program_invocation_name, not program_name.  So set this variable
+     as well.  */
 #if HAVE_DECL_PROGRAM_INVOCATION_NAME
   program_invocation_name = (char *) argv0;
 #endif

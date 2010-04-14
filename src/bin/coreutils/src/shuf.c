@@ -1,6 +1,6 @@
 /* Shuffle lines of text.
 
-   Copyright (C) 2006, 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 2006-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include <config.h>
 
-#include <stdio.h>
 #include <sys/types.h>
 #include "system.h"
 
@@ -29,6 +28,7 @@
 #include "quotearg.h"
 #include "randint.h"
 #include "randperm.h"
+#include "stdio--.h"
 #include "xstrtol.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -71,7 +71,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 \n\
 With no FILE, or when FILE is -, read standard input.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
 
   exit (status);

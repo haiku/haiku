@@ -1,5 +1,5 @@
 /* stty -- change and print terminal line settings
-   Copyright (C) 1990-2005, 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 1990-2005, 2007-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -279,18 +279,18 @@ static struct mode_info const mode_info[] =
   {"cr0", output, SANE_SET, CR0, CRDLY},
 #endif
 #ifdef TABDLY
-#ifdef TAB3
+# ifdef TAB3
   {"tab3", output, SANE_UNSET, TAB3, TABDLY},
-#endif
-#ifdef TAB2
+# endif
+# ifdef TAB2
   {"tab2", output, SANE_UNSET, TAB2, TABDLY},
-#endif
-#ifdef TAB1
+# endif
+# ifdef TAB1
   {"tab1", output, SANE_UNSET, TAB1, TABDLY},
-#endif
-#ifdef TAB0
+# endif
+# ifdef TAB0
   {"tab0", output, SANE_SET, TAB0, TABDLY},
-#endif
+# endif
 #else
 # ifdef OXTABS
   {"tab3", output, SANE_UNSET, OXTABS, 0},
@@ -724,7 +724,7 @@ prints baud rate, line discipline, and deviations from stty sane.  In\n\
 settings, CHAR is taken literally, or coded as in ^c, 0x37, 0177 or\n\
 127; special values ^- or undef used to disable special characters.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -817,13 +817,13 @@ main (int argc, char **argv)
     }
 
   /* Specifying both -a and -g gets an error.  */
-  if (verbose_output & recoverable_output)
+  if (verbose_output && recoverable_output)
     error (EXIT_FAILURE, 0,
            _("the options for verbose and stty-readable output styles are\n"
              "mutually exclusive"));
 
   /* Specifying any other arguments with -a or -g gets an error.  */
-  if (!noargs && (verbose_output | recoverable_output))
+  if (!noargs && (verbose_output || recoverable_output))
     error (EXIT_FAILURE, 0,
            _("when specifying an output style, modes may not be set"));
 
@@ -849,7 +849,7 @@ main (int argc, char **argv)
   if (tcgetattr (STDIN_FILENO, &mode))
     error (EXIT_FAILURE, errno, "%s", device_name);
 
-  if (verbose_output | recoverable_output | noargs)
+  if (verbose_output || recoverable_output || noargs)
     {
       max_col = screen_columns ();
       current_col = 0;
@@ -883,7 +883,7 @@ main (int argc, char **argv)
               break;
             }
         }
-      if (!match_found & reversed)
+      if (!match_found && reversed)
         {
           error (0, 0, _("invalid argument %s"), quote (arg - 1));
           usage (EXIT_FAILURE);

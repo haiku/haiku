@@ -1,5 +1,5 @@
 /* printenv -- print all or part of environment
-   Copyright (C) 1989-1997, 1999-2005, 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 1989-1997, 1999-2005, 2007-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@
 #include <getopt.h>
 
 #include "system.h"
-#include "long-options.h"
 
 /* Exit status for syntax errors, etc.  */
 enum { PRINTENV_FAILURE = 2 };
@@ -45,7 +44,13 @@ enum { PRINTENV_FAILURE = 2 };
   proper_name ("David MacKenzie"), \
   proper_name ("Richard Mlynarik")
 
-extern char **environ;
+static struct option const longopts[] =
+{
+  {"null", no_argument, NULL, '0'},
+  {GETOPT_HELP_OPTION_DECL},
+  {GETOPT_VERSION_OPTION_DECL},
+  {NULL, 0, NULL, 0}
+};
 
 void
 usage (int status)
@@ -56,17 +61,19 @@ usage (int status)
   else
     {
       printf (_("\
-Usage: %s [VARIABLE]...\n\
-  or:  %s OPTION\n\
+Usage: %s [OPTION]... [VARIABLE]...\n\
 Print the values of the specified environment VARIABLE(s).\n\
 If no VARIABLE is specified, print name and value pairs for them all.\n\
 \n\
 "),
-              program_name, program_name);
+              program_name);
+      fputs (_("\
+  -0, --null     end each output line with 0 byte rather than newline\n\
+"), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -78,6 +85,8 @@ main (int argc, char **argv)
   char *ep, *ap;
   int i;
   bool ok;
+  int optc;
+  bool opt_nul_terminate_output = false;
 
   initialize_main (&argc, &argv);
   set_program_name (argv[0]);
@@ -88,15 +97,24 @@ main (int argc, char **argv)
   initialize_exit_failure (PRINTENV_FAILURE);
   atexit (close_stdout);
 
-  parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE_NAME, Version,
-                      usage, AUTHORS, (char const *) NULL);
-  if (getopt_long (argc, argv, "+", NULL, NULL) != -1)
-    usage (PRINTENV_FAILURE);
+  while ((optc = getopt_long (argc, argv, "+iu:0", longopts, NULL)) != -1)
+    {
+      switch (optc)
+        {
+        case '0':
+          opt_nul_terminate_output = true;
+          break;
+        case_GETOPT_HELP_CHAR;
+        case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
+        default:
+          usage (PRINTENV_FAILURE);
+        }
+    }
 
   if (optind >= argc)
     {
       for (env = environ; *env != NULL; ++env)
-        puts (*env);
+        printf ("%s%c", *env, opt_nul_terminate_output ? '\0' : '\n');
       ok = true;
     }
   else
@@ -107,6 +125,10 @@ main (int argc, char **argv)
         {
           bool matched = false;
 
+          /* 'printenv a=b' is silent, even if 'a=b=c' is in environ.  */
+          if (strchr (argv[i], '='))
+            continue;
+
           for (env = environ; *env; ++env)
             {
               ep = *env;
@@ -115,7 +137,8 @@ main (int argc, char **argv)
                 {
                   if (*ep == '=' && *ap == '\0')
                     {
-                      puts (ep + 1);
+                      printf ("%s%c", ep + 1,
+                              opt_nul_terminate_output ? '\0' : '\n');
                       matched = true;
                       break;
                     }

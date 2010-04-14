@@ -1,5 +1,5 @@
 /* GNU fmt -- simple text formatter.
-   Copyright (C) 1994-2006, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 1994-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -293,7 +293,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 \n\
 With no FILE, or when FILE is -, read standard input.\n"),
              stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

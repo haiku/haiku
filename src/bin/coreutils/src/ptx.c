@@ -1,5 +1,5 @@
 /* Permuted index for GNU, with keywords in their context.
-   Copyright (C) 1990, 1991, 1993, 1998-2009 Free Software Foundation, Inc.
+   Copyright (C) 1990-1991, 1993, 1998-2010 Free Software Foundation, Inc.
    François Pinard <pinard@iro.umontreal.ca>, 1988.
 
    This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,6 @@
 
 #include <config.h>
 
-#include <stdio.h>
 #include <getopt.h>
 #include <sys/types.h>
 #include "system.h"
@@ -29,6 +28,7 @@
 #include "quote.h"
 #include "quotearg.h"
 #include "regex.h"
+#include "stdio--.h"
 #include "xstrtol.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -455,7 +455,7 @@ initialize_regex (void)
       if (!*context_regex.string)
         context_regex.string = NULL;
     }
-  else if (gnu_extensions & !input_reference)
+  else if (gnu_extensions && !input_reference)
     context_regex.string = "[.?!][]\"')}]*\\($\\|\t\\|  \\)[ \t\n]*";
   else
     context_regex.string = "\n";
@@ -1296,7 +1296,7 @@ fix_output_parameters (void)
   /* If the reference appears to the left of the output line, reserve some
      space for it right away, including one gap size.  */
 
-  if ((auto_reference | input_reference) & !right_reference)
+  if ((auto_reference || input_reference) && !right_reference)
     line_width -= reference_max_width + gap_size;
 
   /* The output lines, minimally, will contain from left to right a left
@@ -1660,7 +1660,7 @@ output_one_roff_line (void)
 
   /* Conditionally output the `reference' field.  */
 
-  if (auto_reference | input_reference)
+  if (auto_reference || input_reference)
     {
       fputs (" \"", stdout);
       print_field (reference);
@@ -1699,7 +1699,7 @@ output_one_tex_line (void)
   fputs ("}{", stdout);
   print_field (head);
   putchar ('}');
-  if (auto_reference | input_reference)
+  if (auto_reference || input_reference)
     {
       putchar ('{');
       print_field (reference);
@@ -1791,12 +1791,12 @@ output_one_dumb_line (void)
     }
   else
 
-    if ((auto_reference | input_reference) & right_reference)
+    if ((auto_reference || input_reference) && right_reference)
       print_spaces (half_line_width
                     - (keyafter.end - keyafter.start)
                     - (keyafter_truncation ? truncation_string_length : 0));
 
-  if ((auto_reference | input_reference) & right_reference)
+  if ((auto_reference || input_reference) && right_reference)
     {
       /* Output the `reference' field.  */
 
@@ -1923,7 +1923,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 \n\
 With no FILE or if FILE is -, read Standard Input.  `-F /' by default.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

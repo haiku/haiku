@@ -1,6 +1,6 @@
 /* Invoke open, but avoid some glitches.
 
-   Copyright (C) 2005, 2006, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ open_safer (char const *file, int flags, ...)
       va_start (ap, flags);
 
       /* We have to use PROMOTED_MODE_T instead of mode_t, otherwise GCC 4
-	 creates crashing code when 'mode_t' is smaller than 'int'.  */
+         creates crashing code when 'mode_t' is smaller than 'int'.  */
       mode = va_arg (ap, PROMOTED_MODE_T);
 
       va_end (ap);

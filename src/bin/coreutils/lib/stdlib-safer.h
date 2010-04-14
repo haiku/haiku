@@ -1,6 +1,6 @@
 /* Invoke stdlib.h functions, but avoid some glitches.
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,3 +18,15 @@
 /* Written by Paul Eggert.  */
 
 int mkstemp_safer (char *);
+
+#if GNULIB_MKOSTEMP
+int mkostemp_safer (char *, int);
+#endif
+
+#if GNULIB_MKOSTEMPS
+int mkostemps_safer (char *, int, int);
+#endif
+
+#if GNULIB_MKSTEMPS
+int mkstemps_safer (char *, int);
+#endif

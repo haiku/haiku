@@ -1,6 +1,6 @@
 /* Sort a vector of pointers to data.
 
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,15 +28,15 @@
 typedef int (*comparison_function) (void const *, void const *);
 
 static void mpsort_with_tmp (void const **restrict, size_t,
-			     void const **restrict, comparison_function);
+                             void const **restrict, comparison_function);
 
 /* Sort a vector BASE containing N pointers, placing the sorted array
    into TMP.  Compare pointers with CMP.  N must be at least 2.  */
 
 static void
 mpsort_into_tmp (void const **restrict base, size_t n,
-		 void const **restrict tmp,
-		 comparison_function cmp)
+                 void const **restrict tmp,
+                 comparison_function cmp)
 {
   size_t n1 = n / 2;
   size_t n2 = n - n1;
@@ -56,23 +56,23 @@ mpsort_into_tmp (void const **restrict base, size_t n,
   for (;;)
     if (cmp (ba, bb) <= 0)
       {
-	*tmp++ = ba;
-	a++;
-	if (a == alim)
-	  {
-	    a = b;
-	    alim = blim;
-	    break;
-	  }
-	ba = base[a];
+        *tmp++ = ba;
+        a++;
+        if (a == alim)
+          {
+            a = b;
+            alim = blim;
+            break;
+          }
+        ba = base[a];
       }
     else
       {
-	*tmp++ = bb;
-	b++;
-	if (b == blim)
-	  break;
-	bb = base[b];
+        *tmp++ = bb;
+        b++;
+        if (b == blim)
+          break;
+        bb = base[b];
       }
 
   memcpy (tmp, base + a, (alim - a) * sizeof *base);
@@ -84,21 +84,21 @@ mpsort_into_tmp (void const **restrict base, size_t n,
 
 static void
 mpsort_with_tmp (void const **restrict base, size_t n,
-		 void const **restrict tmp,
-		 comparison_function cmp)
+                 void const **restrict tmp,
+                 comparison_function cmp)
 {
   if (n <= 2)
     {
       if (n == 2)
-	{
-	  void const *p0 = base[0];
-	  void const *p1 = base[1];
-	  if (! (cmp (p0, p1) <= 0))
-	    {
-	      base[0] = p1;
-	      base[1] = p0;
-	    }
-	}
+        {
+          void const *p0 = base[0];
+          void const *p1 = base[1];
+          if (! (cmp (p0, p1) <= 0))
+            {
+              base[0] = p1;
+              base[1] = p0;
+            }
+        }
     }
   else
     {
@@ -115,33 +115,33 @@ mpsort_with_tmp (void const **restrict base, size_t n,
       mpsort_with_tmp (base + n1, n2, tmp, cmp);
 
       if (n1 < 2)
-	tmp[0] = base[0];
+        tmp[0] = base[0];
       else
-	mpsort_into_tmp (base, n1, tmp, cmp);
+        mpsort_into_tmp (base, n1, tmp, cmp);
 
       tt = tmp[t];
       bb = base[b];
 
       for (i = 0; ; )
-	if (cmp (tt, bb) <= 0)
-	  {
-	    base[i++] = tt;
-	    t++;
-	    if (t == tlim)
-	      break;
-	    tt = tmp[t];
-	  }
-	else
-	  {
-	    base[i++] = bb;
-	    b++;
-	    if (b == blim)
-	      {
-		memcpy (base + i, tmp + t, (tlim - t) * sizeof *base);
-		break;
-	      }
-	    bb = base[b];
-	  }
+        if (cmp (tt, bb) <= 0)
+          {
+            base[i++] = tt;
+            t++;
+            if (t == tlim)
+              break;
+            tt = tmp[t];
+          }
+        else
+          {
+            base[i++] = bb;
+            b++;
+            if (b == blim)
+              {
+                memcpy (base + i, tmp + t, (tlim - t) * sizeof *base);
+                break;
+              }
+            bb = base[b];
+          }
     }
 }
 

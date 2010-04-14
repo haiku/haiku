@@ -1,6 +1,6 @@
 /* xfts.c -- a wrapper for fts_open
 
-   Copyright (C) 2003, 2005-2007, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,13 +21,9 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <assert.h>
 
-#include "error.h"
-
-#include "gettext.h"
-#define _(msgid) gettext (msgid)
-
-#include "quote.h"
 #include "xalloc.h"
 #include "xfts.h"
 
@@ -40,24 +36,30 @@ xfts_open (char * const *argv, int options,
   FTS *fts = fts_open (argv, options | FTS_CWDFD, compar);
   if (fts == NULL)
     {
-      /* This can fail in three ways: out of memory, invalid bit_flags,
-         and one or more of the FILES is an empty string.  We could try
-         to decipher that errno==EINVAL means invalid bit_flags and
-         errno==ENOENT means there's an empty string, but that seems wrong.
-         Ideally, fts_open would return a proper error indicator.  For now,
-         we'll presume that the bit_flags are valid and just check for
-         empty strings.  */
-      bool invalid_arg = false;
-      for (; *argv; ++argv)
-        {
-          if (**argv == '\0')
-            invalid_arg = true;
-        }
-      if (invalid_arg)
-        error (EXIT_FAILURE, 0, _("invalid argument: %s"), quote (""));
-      else
-        xalloc_die ();
+      /* This can fail in two ways: out of memory or with errno==EINVAL,
+         which indicates it was called with invalid bit_flags.  */
+      assert (errno != EINVAL);
+      xalloc_die ();
     }
 
   return fts;
+}
+
+/* When fts_read returns FTS_DC to indicate a directory cycle,
+   it may or may not indicate a real problem.  When a program like
+   chgrp performs a recursive traversal that requires traversing
+   symbolic links, it is *not* a problem.  However, when invoked
+   with "-P -R", it deserves a warning.  The fts_options member
+   records the options that control this aspect of fts's behavior,
+   so test that.  */
+bool
+cycle_warning_required (FTS const *fts, FTSENT const *ent)
+{
+#define ISSET(Fts,Opt) ((Fts)->fts_options & (Opt))
+  /* When dereferencing no symlinks, or when dereferencing only
+     those listed on the command line and we're not processing
+     a command-line argument, then a cycle is a serious problem. */
+  return ((ISSET (fts, FTS_PHYSICAL) && !ISSET (fts, FTS_COMFOLLOW))
+          || (ISSET (fts, FTS_PHYSICAL) && ISSET (fts, FTS_COMFOLLOW)
+              && ent->fts_level != FTS_ROOTLEVEL));
 }

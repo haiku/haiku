@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Safe automatic memory allocation.
-   Copyright (C) 2003-2007 Free Software Foundation, Inc.
+   Copyright (C) 2003-2007, 2009-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software; you can redistribute it and/or modify
@@ -57,7 +57,7 @@ extern "C" {
    the function returns.  Upon failure, it returns NULL.  */
 #if HAVE_ALLOCA
 # define malloca(N) \
-  ((N) < 4032 - sa_increment					    \
+  ((N) < 4032 - sa_increment                                        \
    ? (void *) ((char *) alloca ((N) + sa_increment) + sa_increment) \
    : mmalloca (N))
 #else
@@ -125,10 +125,10 @@ enum
   sa_alignment_longdouble = sa_alignof (long double),
   sa_alignment_max = ((sa_alignment_long - 1) | (sa_alignment_double - 1)
 #if HAVE_LONG_LONG_INT
-		      | (sa_alignment_longlong - 1)
+                      | (sa_alignment_longlong - 1)
 #endif
-		      | (sa_alignment_longdouble - 1)
-		     ) + 1,
+                      | (sa_alignment_longdouble - 1)
+                     ) + 1,
 /* The increment that guarantees room for a magic word must be >= sizeof (int)
    and a multiple of sa_alignment_max.  */
   sa_increment = ((sizeof (int) + sa_alignment_max - 1) / sa_alignment_max) * sa_alignment_max

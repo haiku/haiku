@@ -1,6 +1,6 @@
 /* Convert file size to number of blocks on System V-like machines.
 
-   Copyright (C) 1990, 1997, 1998, 1999, 2004, 2005, 2006 Free Software
+   Copyright (C) 1990, 1997-1999, 2004-2006, 2009-2010 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ typedef long daddr_t; /* for disk address */
 # endif /* !NINDIR */
 
 /* Number of direct block addresses in an inode. */
-# define NDIR	10
+# define NDIR   10
 
 /* Return the number of 512-byte blocks in a file of SIZE bytes. */
 
@@ -57,12 +57,12 @@ st_blocks (off_t size)
       indrblks = (datablks - NDIR - 1) / NINDIR + 1;
 
       if (datablks > NDIR + NINDIR)
-	{
-	  indrblks += (datablks - NDIR - NINDIR - 1) / (NINDIR * NINDIR) + 1;
+        {
+          indrblks += (datablks - NDIR - NINDIR - 1) / (NINDIR * NINDIR) + 1;
 
-	  if (datablks > NDIR + NINDIR + NINDIR * NINDIR)
-	    indrblks++;
-	}
+          if (datablks > NDIR + NINDIR + NINDIR * NINDIR)
+            indrblks++;
+        }
     }
 
   return datablks + indrblks;

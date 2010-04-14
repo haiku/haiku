@@ -1,5 +1,6 @@
 /* comm -- compare two sorted files line by line.
-   Copyright (C) 86, 90, 91, 1995-2005, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 1986, 1990-1991, 1995-2005, 2008-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,6 +24,7 @@
 #include "system.h"
 #include "linebuffer.h"
 #include "error.h"
+#include "hard-locale.h"
 #include "quote.h"
 #include "stdio--.h"
 #include "memcmp2.h"
@@ -140,7 +142,7 @@ Examples:\n\
   %s -3  file1 file2  Print lines in file1 not in file2, and vice versa.\n\
 "),
               program_name, program_name);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

@@ -1,5 +1,5 @@
 /* Compute MD5, SHA1, SHA224, SHA256, SHA384 or SHA512 checksum of files or strings
-   Copyright (C) 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -195,7 +195,7 @@ should be a former output of this program.  The default mode is to print\n\
 a line with checksum, a character indicating type (`*' for binary, ` ' for\n\
 text), and name for each FILE.\n"),
               DIGEST_REFERENCE);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
 
   exit (status);
@@ -251,11 +251,10 @@ static bool
 split_3 (char *s, size_t s_len,
          unsigned char **hex_digest, int *binary, char **file_name)
 {
-  size_t i;
   bool escaped_filename = false;
   size_t algo_name_len;
 
-  i = 0;
+  size_t i = 0;
   while (ISWHITE (s[i]))
     ++i;
 
@@ -263,11 +262,13 @@ split_3 (char *s, size_t s_len,
   algo_name_len = strlen (DIGEST_TYPE_STRING);
   if (strncmp (s + i, DIGEST_TYPE_STRING, algo_name_len) == 0)
     {
-      if (strncmp (s + i + algo_name_len, " (", 2) == 0)
+      if (s[i + algo_name_len] == ' ')
+        ++i;
+      if (s[i + algo_name_len] == '(')
         {
           *binary = 0;
-          return bsd_split_3 (s +      i + algo_name_len + 2,
-                              s_len - (i + algo_name_len + 2),
+          return bsd_split_3 (s +      i + algo_name_len + 1,
+                              s_len - (i + algo_name_len + 1),
                               hex_digest, file_name);
         }
     }
@@ -512,7 +513,6 @@ digest_check (const char *checkfile_name)
               if (!status_only)
                 {
                   printf (_("%s: FAILED open or read\n"), filename);
-                  fflush (stdout);
                 }
             }
           else
@@ -538,7 +538,6 @@ digest_check (const char *checkfile_name)
                     printf ("%s: %s\n", filename, _("FAILED"));
                   else if (!quiet)
                     printf ("%s: %s\n", filename, _("OK"));
-                  fflush (stdout);
                 }
             }
         }
@@ -618,6 +617,10 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
+  /* Line buffer stdout to ensure lines are written atomically and immediately
+     so that processes running in parallel do not intersperse their output.  */
+  setvbuf (stdout, NULL, _IOLBF, 0);
+
   while ((opt = getopt_long (argc, argv, "bctw", long_options, NULL)) != -1)
     switch (opt)
       {
@@ -661,21 +664,21 @@ main (int argc, char **argv)
       usage (EXIT_FAILURE);
     }
 
-  if (status_only & !do_check)
+  if (status_only && !do_check)
     {
       error (0, 0,
        _("the --status option is meaningful only when verifying checksums"));
       usage (EXIT_FAILURE);
     }
 
-  if (warn & !do_check)
+  if (warn && !do_check)
     {
       error (0, 0,
        _("the --warn option is meaningful only when verifying checksums"));
       usage (EXIT_FAILURE);
     }
 
-  if (quiet & !do_check)
+  if (quiet && !do_check)
     {
       error (0, 0,
        _("the --quiet option is meaningful only when verifying checksums"));

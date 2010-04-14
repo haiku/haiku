@@ -1,5 +1,5 @@
 /* Convert wide character to multibyte character.
-   Copyright (C) 2008 Free Software Foundation, Inc.
+   Copyright (C) 2008, 2009, 2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This program is free software: you can redistribute it and/or modify
@@ -43,11 +43,11 @@ wcrtomb (char *s, wchar_t wc, mbstate_t *ps)
       int ret = wctomb (s, wc);
 
       if (ret >= 0)
-	return ret;
+        return ret;
       else
-	{
-	  errno = EILSEQ;
-	  return (size_t)(-1);
-	}
+        {
+          errno = EILSEQ;
+          return (size_t)(-1);
+        }
     }
 }

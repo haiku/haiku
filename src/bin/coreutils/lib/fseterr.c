@@ -1,5 +1,5 @@
 /* Set the error indicator of a stream.
-   Copyright (C) 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 2007-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -63,8 +63,8 @@ fseterr (FILE *fp)
       fputc ('\0', fp); /* This should set the error indicator.  */
       fflush (fp);      /* Or this.  */
       if (dup2 (fd2, fd) < 0)
-	/* Whee... we botched the stream and now cannot restore it!  */
-	abort ();
+        /* Whee... we botched the stream and now cannot restore it!  */
+        abort ();
       close (fd2);
     }
   errno = saved_errno;

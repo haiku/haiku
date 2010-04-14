@@ -1,5 +1,5 @@
 /* provide a replacement openat function
-   Copyright (C) 2004-2009 Free Software Foundation, Inc.
+   Copyright (C) 2004-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,18 +22,107 @@
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <string.h>
 #include <sys/stat.h>
 
 #include "dirname.h" /* solely for definition of IS_ABSOLUTE_FILE_NAME */
 #include "openat-priv.h"
 #include "save-cwd.h"
 
-/* We can't use "fcntl--.h", so that openat_safer does not interfere.  */
-#if GNULIB_FCNTL_SAFER
-# include "fcntl-safer.h"
-# undef open
-# define open open_safer
+#if HAVE_OPENAT
+
+# undef openat
+
+/* Like openat, but work around Solaris 9 bugs with trailing slash.  */
+int
+rpl_openat (int dfd, char const *filename, int flags, ...)
+{
+  mode_t mode;
+  int fd;
+
+  mode = 0;
+  if (flags & O_CREAT)
+    {
+      va_list arg;
+      va_start (arg, flags);
+
+      /* We have to use PROMOTED_MODE_T instead of mode_t, otherwise GCC 4
+         creates crashing code when 'mode_t' is smaller than 'int'.  */
+      mode = va_arg (arg, PROMOTED_MODE_T);
+
+      va_end (arg);
+    }
+
+#if OPEN_TRAILING_SLASH_BUG
+  /* If the filename ends in a slash and one of O_CREAT, O_WRONLY, O_RDWR
+     is specified, then fail.
+     Rationale: POSIX <http://www.opengroup.org/susv3/basedefs/xbd_chap04.html>
+     says that
+       "A pathname that contains at least one non-slash character and that
+        ends with one or more trailing slashes shall be resolved as if a
+        single dot character ( '.' ) were appended to the pathname."
+     and
+       "The special filename dot shall refer to the directory specified by
+        its predecessor."
+     If the named file already exists as a directory, then
+       - if O_CREAT is specified, open() must fail because of the semantics
+         of O_CREAT,
+       - if O_WRONLY or O_RDWR is specified, open() must fail because POSIX
+         <http://www.opengroup.org/susv3/functions/open.html> says that it
+         fails with errno = EISDIR in this case.
+     If the named file does not exist or does not name a directory, then
+       - if O_CREAT is specified, open() must fail since open() cannot create
+         directories,
+       - if O_WRONLY or O_RDWR is specified, open() must fail because the
+         file does not contain a '.' directory.  */
+  if (flags & (O_CREAT | O_WRONLY | O_RDWR))
+    {
+      size_t len = strlen (filename);
+      if (len > 0 && filename[len - 1] == '/')
+        {
+          errno = EISDIR;
+          return -1;
+        }
+    }
 #endif
+
+  fd = openat (dfd, filename, flags, mode);
+
+#if OPEN_TRAILING_SLASH_BUG
+  /* If the filename ends in a slash and fd does not refer to a directory,
+     then fail.
+     Rationale: POSIX <http://www.opengroup.org/susv3/basedefs/xbd_chap04.html>
+     says that
+       "A pathname that contains at least one non-slash character and that
+        ends with one or more trailing slashes shall be resolved as if a
+        single dot character ( '.' ) were appended to the pathname."
+     and
+       "The special filename dot shall refer to the directory specified by
+        its predecessor."
+     If the named file without the slash is not a directory, open() must fail
+     with ENOTDIR.  */
+  if (fd >= 0)
+    {
+      /* We know len is positive, since open did not fail with ENOENT.  */
+      size_t len = strlen (filename);
+      if (filename[len - 1] == '/')
+        {
+          struct stat statbuf;
+
+          if (fstat (fd, &statbuf) >= 0 && !S_ISDIR (statbuf.st_mode))
+            {
+              close (fd);
+              errno = ENOTDIR;
+              return -1;
+            }
+        }
+    }
+#endif
+
+  return fd;
+}
+
+#else /* !HAVE_OPENAT */
 
 /* Replacement for Solaris' openat function.
    <http://www.google.com/search?q=openat+site:docs.sun.com>
@@ -54,7 +143,7 @@ openat (int fd, char const *file, int flags, ...)
       va_start (arg, flags);
 
       /* We have to use PROMOTED_MODE_T instead of mode_t, otherwise GCC 4
-	 creates crashing code when 'mode_t' is smaller than 'int'.  */
+         creates crashing code when 'mode_t' is smaller than 'int'.  */
       mode = va_arg (arg, PROMOTED_MODE_T);
 
       va_end (arg);
@@ -76,7 +165,7 @@ openat (int fd, char const *file, int flags, ...)
 
 int
 openat_permissive (int fd, char const *file, int flags, mode_t mode,
-		   int *cwd_errno)
+                   int *cwd_errno)
 {
   struct saved_cwd saved_cwd;
   int saved_errno;
@@ -91,18 +180,18 @@ openat_permissive (int fd, char const *file, int flags, mode_t mode,
     char *proc_file = openat_proc_name (buf, fd, file);
     if (proc_file)
       {
-	int open_result = open (proc_file, flags, mode);
-	int open_errno = errno;
-	if (proc_file != buf)
-	  free (proc_file);
-	/* If the syscall succeeds, or if it fails with an unexpected
-	   errno value, then return right away.  Otherwise, fall through
-	   and resort to using save_cwd/restore_cwd.  */
-	if (0 <= open_result || ! EXPECTED_ERRNO (open_errno))
-	  {
-	    errno = open_errno;
-	    return open_result;
-	  }
+        int open_result = open (proc_file, flags, mode);
+        int open_errno = errno;
+        if (proc_file != buf)
+          free (proc_file);
+        /* If the syscall succeeds, or if it fails with an unexpected
+           errno value, then return right away.  Otherwise, fall through
+           and resort to using save_cwd/restore_cwd.  */
+        if (0 <= open_result || ! EXPECTED_ERRNO (open_errno))
+          {
+            errno = open_errno;
+            return open_result;
+          }
       }
   }
 
@@ -110,8 +199,17 @@ openat_permissive (int fd, char const *file, int flags, mode_t mode,
   if (! save_ok)
     {
       if (! cwd_errno)
-	openat_save_fail (errno);
+        openat_save_fail (errno);
       *cwd_errno = errno;
+    }
+  if (0 <= fd && fd == saved_cwd.desc)
+    {
+      /* If saving the working directory collides with the user's
+         requested fd, then the user's fd must have been closed to
+         begin with.  */
+      free_cwd (&saved_cwd);
+      errno = EBADF;
+      return -1;
     }
 
   err = fchdir (fd);
@@ -122,11 +220,17 @@ openat_permissive (int fd, char const *file, int flags, mode_t mode,
       err = open (file, flags, mode);
       saved_errno = errno;
       if (save_ok && restore_cwd (&saved_cwd) != 0)
-	{
-	  if (! cwd_errno)
-	    openat_restore_fail (errno);
-	  *cwd_errno = errno;
-	}
+        {
+          if (! cwd_errno)
+            {
+              /* Don't write a message to just-created fd 2.  */
+              saved_errno = errno;
+              if (err == STDERR_FILENO)
+                close (err);
+              openat_restore_fail (saved_errno);
+            }
+          *cwd_errno = errno;
+        }
     }
 
   free_cwd (&saved_cwd);
@@ -147,57 +251,15 @@ openat_needs_fchdir (void)
       char buf[OPENAT_BUFFER_SIZE];
       char *proc_file = openat_proc_name (buf, fd, ".");
       if (proc_file)
-	{
-	  needs_fchdir = false;
-	  if (proc_file != buf)
-	    free (proc_file);
-	}
+        {
+          needs_fchdir = false;
+          if (proc_file != buf)
+            free (proc_file);
+        }
       close (fd);
     }
 
   return needs_fchdir;
 }
 
-/* Replacement for Solaris' function by the same name.
-   <http://www.google.com/search?q=fstatat+site:docs.sun.com>
-   First, try to simulate it via l?stat ("/proc/self/fd/FD/FILE").
-   Failing that, simulate it via save_cwd/fchdir/(stat|lstat)/restore_cwd.
-   If either the save_cwd or the restore_cwd fails (relatively unlikely),
-   then give a diagnostic and exit nonzero.
-   Otherwise, this function works just like Solaris' fstatat.  */
-
-#define AT_FUNC_NAME fstatat
-#define AT_FUNC_F1 lstat
-#define AT_FUNC_F2 stat
-#define AT_FUNC_USE_F1_COND AT_SYMLINK_NOFOLLOW
-#define AT_FUNC_POST_FILE_PARAM_DECLS , struct stat *st, int flag
-#define AT_FUNC_POST_FILE_ARGS        , st
-#include "at-func.c"
-#undef AT_FUNC_NAME
-#undef AT_FUNC_F1
-#undef AT_FUNC_F2
-#undef AT_FUNC_USE_F1_COND
-#undef AT_FUNC_POST_FILE_PARAM_DECLS
-#undef AT_FUNC_POST_FILE_ARGS
-
-/* Replacement for Solaris' function by the same name.
-   <http://www.google.com/search?q=unlinkat+site:docs.sun.com>
-   First, try to simulate it via (unlink|rmdir) ("/proc/self/fd/FD/FILE").
-   Failing that, simulate it via save_cwd/fchdir/(unlink|rmdir)/restore_cwd.
-   If either the save_cwd or the restore_cwd fails (relatively unlikely),
-   then give a diagnostic and exit nonzero.
-   Otherwise, this function works just like Solaris' unlinkat.  */
-
-#define AT_FUNC_NAME unlinkat
-#define AT_FUNC_F1 rmdir
-#define AT_FUNC_F2 unlink
-#define AT_FUNC_USE_F1_COND AT_REMOVEDIR
-#define AT_FUNC_POST_FILE_PARAM_DECLS , int flag
-#define AT_FUNC_POST_FILE_ARGS        /* empty */
-#include "at-func.c"
-#undef AT_FUNC_NAME
-#undef AT_FUNC_F1
-#undef AT_FUNC_F2
-#undef AT_FUNC_USE_F1_COND
-#undef AT_FUNC_POST_FILE_PARAM_DECLS
-#undef AT_FUNC_POST_FILE_ARGS
+#endif /* !HAVE_OPENAT */

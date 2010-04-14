@@ -1,7 +1,7 @@
 /* An interface to read and write that retries after interrupts.
 
-   Copyright (C) 1993, 1994, 1998, 2002, 2003, 2004, 2005, 2006 Free
-   Software Foundation, Inc.
+   Copyright (C) 1993-1994, 1998, 2002-2006, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -66,12 +66,12 @@ safe_rw (int fd, void const *buf, size_t count)
       ssize_t result = rw (fd, buf, count);
 
       if (0 <= result)
-	return result;
+        return result;
       else if (IS_EINTR (errno))
-	continue;
+        continue;
       else if (errno == EINVAL && BUGGY_READ_MAXIMUM < count)
-	count = BUGGY_READ_MAXIMUM;
+        count = BUGGY_READ_MAXIMUM;
       else
-	return result;
+        return result;
     }
 }

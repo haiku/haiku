@@ -1,7 +1,7 @@
 /* human.c -- print human readable file size
 
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006, 2007, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,15 +36,15 @@
 
 static const char power_letter[] =
 {
-  0,	/* not used */
-  'K',	/* kibi ('k' for kilo is a special case) */
-  'M',	/* mega or mebi */
-  'G',	/* giga or gibi */
-  'T',	/* tera or tebi */
-  'P',	/* peta or pebi */
-  'E',	/* exa or exbi */
-  'Z',	/* zetta or 2**70 */
-  'Y'	/* yotta or 2**80 */
+  0,    /* not used */
+  'K',  /* kibi ('k' for kilo is a special case) */
+  'M',  /* mega or mebi */
+  'G',  /* giga or gibi */
+  'T',  /* tera or tebi */
+  'P',  /* peta or pebi */
+  'E',  /* exa or exbi */
+  'Z',  /* zetta or 2**70 */
+  'Y'   /* yotta or 2**80 */
 };
 
 
@@ -78,7 +78,7 @@ adjust_value (int inexact_style, long double value)
 
 static char *
 group_number (char *number, size_t numberlen,
-	      char const *grouping, char const *thousands_sep)
+              char const *grouping, char const *thousands_sep)
 {
   register char *d;
   size_t grouplen = SIZE_MAX;
@@ -97,19 +97,19 @@ group_number (char *number, size_t numberlen,
       unsigned char g = *grouping;
 
       if (g)
-	{
-	  grouplen = g < CHAR_MAX ? g : i;
-	  grouping++;
-	}
+        {
+          grouplen = g < CHAR_MAX ? g : i;
+          grouping++;
+        }
 
       if (i < grouplen)
-	grouplen = i;
+        grouplen = i;
 
       d -= grouplen;
       i -= grouplen;
       memcpy (d, buf + i, grouplen);
       if (i == 0)
-	return d;
+        return d;
 
       d -= thousands_seplen;
       memcpy (d, thousands_sep, thousands_seplen);
@@ -152,7 +152,7 @@ group_number (char *number, size_t numberlen,
 
 char *
 human_readable (uintmax_t n, char *buf, int opts,
-		uintmax_t from_block_size, uintmax_t to_block_size)
+                uintmax_t from_block_size, uintmax_t to_block_size)
 {
   int inexact_style =
     opts & (human_round_to_nearest | human_floor | human_ceiling);
@@ -195,16 +195,16 @@ human_readable (uintmax_t n, char *buf, int opts,
   if (to_block_size <= from_block_size)
     {
       if (from_block_size % to_block_size == 0)
-	{
-	  uintmax_t multiplier = from_block_size / to_block_size;
-	  amt = n * multiplier;
-	  if (amt / multiplier == n)
-	    {
-	      tenths = 0;
-	      rounding = 0;
-	      goto use_integer_arithmetic;
-	    }
-	}
+        {
+          uintmax_t multiplier = from_block_size / to_block_size;
+          amt = n * multiplier;
+          if (amt / multiplier == n)
+            {
+              tenths = 0;
+              rounding = 0;
+              goto use_integer_arithmetic;
+            }
+        }
     }
   else if (from_block_size != 0 && to_block_size % from_block_size == 0)
     {
@@ -229,37 +229,37 @@ human_readable (uintmax_t n, char *buf, int opts,
 
     if (! (opts & human_autoscale))
       {
-	sprintf (buf, "%.0Lf", adjust_value (inexact_style, damt));
-	buflen = strlen (buf);
-	nonintegerlen = 0;
+        sprintf (buf, "%.0Lf", adjust_value (inexact_style, damt));
+        buflen = strlen (buf);
+        nonintegerlen = 0;
       }
     else
       {
-	long double e = 1;
-	exponent = 0;
+        long double e = 1;
+        exponent = 0;
 
-	do
-	  {
-	    e *= base;
-	    exponent++;
-	  }
-	while (e * base <= damt && exponent < exponent_max);
+        do
+          {
+            e *= base;
+            exponent++;
+          }
+        while (e * base <= damt && exponent < exponent_max);
 
-	damt /= e;
+        damt /= e;
 
-	sprintf (buf, "%.1Lf", adjust_value (inexact_style, damt));
-	buflen = strlen (buf);
-	nonintegerlen = decimal_pointlen + 1;
+        sprintf (buf, "%.1Lf", adjust_value (inexact_style, damt));
+        buflen = strlen (buf);
+        nonintegerlen = decimal_pointlen + 1;
 
-	if (1 + nonintegerlen + ! (opts & human_base_1024) < buflen
-	    || ((opts & human_suppress_point_zero)
-		&& buf[buflen - 1] == '0'))
-	  {
-	    sprintf (buf, "%.0Lf",
-		     adjust_value (inexact_style, damt * 10) / 10);
-	    buflen = strlen (buf);
-	    nonintegerlen = 0;
-	  }
+        if (1 + nonintegerlen + ! (opts & human_base_1024) < buflen
+            || ((opts & human_suppress_point_zero)
+                && buf[buflen - 1] == '0'))
+          {
+            sprintf (buf, "%.0Lf",
+                     adjust_value (inexact_style, damt * 10) / 10);
+            buflen = strlen (buf);
+            nonintegerlen = 0;
+          }
       }
 
     p = psuffix - buflen;
@@ -277,77 +277,77 @@ human_readable (uintmax_t n, char *buf, int opts,
 
     if (opts & human_autoscale)
       {
-	exponent = 0;
+        exponent = 0;
 
-	if (base <= amt)
-	  {
-	    do
-	      {
-		unsigned int r10 = (amt % base) * 10 + tenths;
-		unsigned int r2 = (r10 % base) * 2 + (rounding >> 1);
-		amt /= base;
-		tenths = r10 / base;
-		rounding = (r2 < base
-			    ? (r2 + rounding) != 0
-			    : 2 + (base < r2 + rounding));
-		exponent++;
-	      }
-	    while (base <= amt && exponent < exponent_max);
+        if (base <= amt)
+          {
+            do
+              {
+                unsigned int r10 = (amt % base) * 10 + tenths;
+                unsigned int r2 = (r10 % base) * 2 + (rounding >> 1);
+                amt /= base;
+                tenths = r10 / base;
+                rounding = (r2 < base
+                            ? (r2 + rounding) != 0
+                            : 2 + (base < r2 + rounding));
+                exponent++;
+              }
+            while (base <= amt && exponent < exponent_max);
 
-	    if (amt < 10)
-	      {
-		if (inexact_style == human_round_to_nearest
-		    ? 2 < rounding + (tenths & 1)
-		    : inexact_style == human_ceiling && 0 < rounding)
-		  {
-		    tenths++;
-		    rounding = 0;
+            if (amt < 10)
+              {
+                if (inexact_style == human_round_to_nearest
+                    ? 2 < rounding + (tenths & 1)
+                    : inexact_style == human_ceiling && 0 < rounding)
+                  {
+                    tenths++;
+                    rounding = 0;
 
-		    if (tenths == 10)
-		      {
-			amt++;
-			tenths = 0;
-		      }
-		  }
+                    if (tenths == 10)
+                      {
+                        amt++;
+                        tenths = 0;
+                      }
+                  }
 
-		if (amt < 10
-		    && (tenths || ! (opts & human_suppress_point_zero)))
-		  {
-		    *--p = '0' + tenths;
-		    p -= decimal_pointlen;
-		    memcpy (p, decimal_point, decimal_pointlen);
-		    tenths = rounding = 0;
-		  }
-	      }
-	  }
+                if (amt < 10
+                    && (tenths || ! (opts & human_suppress_point_zero)))
+                  {
+                    *--p = '0' + tenths;
+                    p -= decimal_pointlen;
+                    memcpy (p, decimal_point, decimal_pointlen);
+                    tenths = rounding = 0;
+                  }
+              }
+          }
       }
 
     if (inexact_style == human_round_to_nearest
-	? 5 < tenths + (0 < rounding + (amt & 1))
-	: inexact_style == human_ceiling && 0 < tenths + rounding)
+        ? 5 < tenths + (0 < rounding + (amt & 1))
+        : inexact_style == human_ceiling && 0 < tenths + rounding)
       {
-	amt++;
+        amt++;
 
-	if ((opts & human_autoscale)
-	    && amt == base && exponent < exponent_max)
-	  {
-	    exponent++;
-	    if (! (opts & human_suppress_point_zero))
-	      {
-		*--p = '0';
-		p -= decimal_pointlen;
-		memcpy (p, decimal_point, decimal_pointlen);
-	      }
-	    amt = 1;
-	  }
+        if ((opts & human_autoscale)
+            && amt == base && exponent < exponent_max)
+          {
+            exponent++;
+            if (! (opts & human_suppress_point_zero))
+              {
+                *--p = '0';
+                p -= decimal_pointlen;
+                memcpy (p, decimal_point, decimal_pointlen);
+              }
+            amt = 1;
+          }
       }
 
     integerlim = p;
 
     do
       {
-	int digit = amt % 10;
-	*--p = digit + '0';
+        int digit = amt % 10;
+        *--p = digit + '0';
       }
     while ((amt /= 10) != 0);
   }
@@ -359,28 +359,28 @@ human_readable (uintmax_t n, char *buf, int opts,
   if (opts & human_SI)
     {
       if (exponent < 0)
-	{
-	  uintmax_t power;
-	  exponent = 0;
-	  for (power = 1; power < to_block_size; power *= base)
-	    if (++exponent == exponent_max)
-	      break;
-	}
+        {
+          uintmax_t power;
+          exponent = 0;
+          for (power = 1; power < to_block_size; power *= base)
+            if (++exponent == exponent_max)
+              break;
+        }
 
       if ((exponent | (opts & human_B)) && (opts & human_space_before_unit))
-	*psuffix++ = ' ';
+        *psuffix++ = ' ';
 
       if (exponent)
-	*psuffix++ = (! (opts & human_base_1024) && exponent == 1
-		      ? 'k'
-		      : power_letter[exponent]);
+        *psuffix++ = (! (opts & human_base_1024) && exponent == 1
+                      ? 'k'
+                      : power_letter[exponent]);
 
       if (opts & human_B)
-	{
-	  if ((opts & human_base_1024) && exponent)
-	    *psuffix++ = 'i';
-	  *psuffix++ = 'B';
-	}
+        {
+          if ((opts & human_base_1024) && exponent)
+            *psuffix++ = 'i';
+          *psuffix++ = 'B';
+        }
     }
 
   *psuffix = '\0';
@@ -421,37 +421,37 @@ humblock (char const *spec, uintmax_t *block_size, int *options)
   else
     {
       if (*spec == '\'')
-	{
-	  opts |= human_group_digits;
-	  spec++;
-	}
+        {
+          opts |= human_group_digits;
+          spec++;
+        }
 
       if (0 <= (i = ARGMATCH (spec, block_size_args, block_size_opts)))
-	{
-	  opts |= block_size_opts[i];
-	  *block_size = 1;
-	}
+        {
+          opts |= block_size_opts[i];
+          *block_size = 1;
+        }
       else
-	{
-	  char *ptr;
-	  strtol_error e = xstrtoumax (spec, &ptr, 0, block_size,
-				       "eEgGkKmMpPtTyYzZ0");
-	  if (e != LONGINT_OK)
-	    {
-	      *options = 0;
-	      return e;
-	    }
-	  for (; ! ('0' <= *spec && *spec <= '9'); spec++)
-	    if (spec == ptr)
-	      {
-		opts |= human_SI;
-		if (ptr[-1] == 'B')
-		  opts |= human_B;
-		if (ptr[-1] != 'B' || ptr[-2] == 'i')
-		  opts |= human_base_1024;
-		break;
-	      }
-	}
+        {
+          char *ptr;
+          strtol_error e = xstrtoumax (spec, &ptr, 0, block_size,
+                                       "eEgGkKmMpPtTyYzZ0");
+          if (e != LONGINT_OK)
+            {
+              *options = 0;
+              return e;
+            }
+          for (; ! ('0' <= *spec && *spec <= '9'); spec++)
+            if (spec == ptr)
+              {
+                opts |= human_SI;
+                if (ptr[-1] == 'B')
+                  opts |= human_B;
+                if (ptr[-1] != 'B' || ptr[-2] == 'i')
+                  opts |= human_base_1024;
+                break;
+              }
+        }
     }
 
   *options = opts;

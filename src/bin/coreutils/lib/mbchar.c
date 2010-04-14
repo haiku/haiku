@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2006 Free Software Foundation, Inc.
+/* Copyright (C) 2001, 2006, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@
 /* Bit table of characters in the ISO C "basic character set".  */
 const unsigned int is_basic_table [UCHAR_MAX / 32 + 1] =
 {
-  0x00001a00,		/* '\t' '\v' '\f' */
-  0xffffffef,		/* ' '...'#' '%'...'?' */
-  0xfffffffe,		/* 'A'...'Z' '[' '\\' ']' '^' '_' */
-  0x7ffffffe		/* 'a'...'z' '{' '|' '}' '~' */
+  0x00001a00,           /* '\t' '\v' '\f' */
+  0xffffffef,           /* ' '...'#' '%'...'?' */
+  0xfffffffe,           /* 'A'...'Z' '[' '\\' ']' '^' '_' */
+  0x7ffffffe            /* 'a'...'z' '{' '|' '}' '~' */
   /* The remaining bits are 0.  */
 };
 

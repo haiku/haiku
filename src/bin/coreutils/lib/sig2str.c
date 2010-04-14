@@ -1,6 +1,6 @@
 /* sig2str.c -- convert between signal names and numbers
 
-   Copyright (C) 2002, 2004, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ static struct numname { int num; char const name[8]; } numname_table[] =
 
     /* Unix Version 7.  */
 #ifdef SIGIOT
-    NUMNAME (IOT),	/* Older name for ABRT.  */
+    NUMNAME (IOT),      /* Older name for ABRT.  */
 #endif
 #ifdef SIGEMT
     NUMNAME (EMT),
@@ -215,16 +215,16 @@ static struct numname { int num; char const name[8]; } numname_table[] =
 
     /* Older AIX versions.  */
 #ifdef SIGALRM1
-    NUMNAME (ALRM1),	/* unknown; taken from Bash 2.05 */
+    NUMNAME (ALRM1),    /* unknown; taken from Bash 2.05 */
 #endif
 #ifdef SIGKAP
-    NUMNAME (KAP),	/* Older name for SIGGRANT.  */
+    NUMNAME (KAP),      /* Older name for SIGGRANT.  */
 #endif
 #ifdef SIGVIRT
-    NUMNAME (VIRT),	/* unknown; taken from Bash 2.05 */
+    NUMNAME (VIRT),     /* unknown; taken from Bash 2.05 */
 #endif
 #ifdef SIGWINDOW
-    NUMNAME (WINDOW),	/* Older name for SIGWINCH.  */
+    NUMNAME (WINDOW),   /* Older name for SIGWINCH.  */
 #endif
 
     /* BeOS */
@@ -263,32 +263,32 @@ str2signum (char const *signame)
       char *endp;
       long int n = strtol (signame, &endp, 10);
       if (! *endp && n <= SIGNUM_BOUND)
-	return n;
+        return n;
     }
   else
     {
       unsigned int i;
       for (i = 0; i < NUMNAME_ENTRIES; i++)
-	if (strcmp (numname_table[i].name, signame) == 0)
-	  return numname_table[i].num;
+        if (strcmp (numname_table[i].name, signame) == 0)
+          return numname_table[i].num;
 
       {
-	char *endp;
-	int rtmin = SIGRTMIN;
-	int rtmax = SIGRTMAX;
+        char *endp;
+        int rtmin = SIGRTMIN;
+        int rtmax = SIGRTMAX;
 
-	if (0 < rtmin && strncmp (signame, "RTMIN", 5) == 0)
-	  {
-	    long int n = strtol (signame + 5, &endp, 10);
-	    if (! *endp && 0 <= n && n <= rtmax - rtmin)
-	      return rtmin + n;
-	  }
-	else if (0 < rtmax && strncmp (signame, "RTMAX", 5) == 0)
-	  {
-	    long int n = strtol (signame + 5, &endp, 10);
-	    if (! *endp && rtmin - rtmax <= n && n <= 0)
-	      return rtmax + n;
-	  }
+        if (0 < rtmin && strncmp (signame, "RTMIN", 5) == 0)
+          {
+            long int n = strtol (signame + 5, &endp, 10);
+            if (! *endp && 0 <= n && n <= rtmax - rtmin)
+              return rtmin + n;
+          }
+        else if (0 < rtmax && strncmp (signame, "RTMAX", 5) == 0)
+          {
+            long int n = strtol (signame + 5, &endp, 10);
+            if (! *endp && rtmin - rtmax <= n && n <= 0)
+              return rtmax + n;
+          }
       }
     }
 
@@ -316,8 +316,8 @@ sig2str (int signum, char *signame)
   for (i = 0; i < NUMNAME_ENTRIES; i++)
     if (numname_table[i].num == signum)
       {
-	strcpy (signame, numname_table[i].name);
-	return 0;
+        strcpy (signame, numname_table[i].name);
+        return 0;
       }
 
   {
@@ -329,13 +329,13 @@ sig2str (int signum, char *signame)
 
     if (signum <= rtmin + (rtmax - rtmin) / 2)
       {
-	int delta = signum - rtmin;
-	sprintf (signame, delta ? "RTMIN+%d" : "RTMIN", delta);
+        int delta = signum - rtmin;
+        sprintf (signame, delta ? "RTMIN+%d" : "RTMIN", delta);
       }
     else
       {
-	int delta = rtmax - signum;
-	sprintf (signame, delta ? "RTMAX-%d" : "RTMAX", delta);
+        int delta = rtmax - signum;
+        sprintf (signame, delta ? "RTMAX-%d" : "RTMAX", delta);
       }
 
     return 0;

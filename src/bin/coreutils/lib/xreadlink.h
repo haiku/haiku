@@ -1,6 +1,7 @@
-/* unlinkdir.h - determine (and maybe change) whether we can unlink directories
+/* Reading symbolic links without size limitation.
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003-2004, 2007, 2009-2010 Free Software Foundation,
+   Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,12 +16,12 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* Written by Paul Eggert and Jim Meyering.  */
+/* Written by Jim Meyering <jim@meyering.net>  */
 
-#include <stdbool.h>
+#include <stddef.h>
 
-#if UNLINK_CANNOT_UNLINK_DIR
-# define cannot_unlink_dir() true
-#else
-bool cannot_unlink_dir (void);
+extern char *xreadlink (char const *filename);
+
+#if GNULIB_XREADLINKAT
+extern char *xreadlinkat (int fd, char const *filename);
 #endif

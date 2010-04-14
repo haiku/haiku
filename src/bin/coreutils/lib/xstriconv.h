@@ -1,5 +1,5 @@
 /* Charset conversion with out-of-memory checking.
-   Copyright (C) 2001-2004, 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001-2004, 2006-2007, 2009-2010 Free Software Foundation, Inc.
    Written by Bruno Haible and Simon Josefsson.
 
    This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ extern "C" {
    in *LENGTHP.  *RESULTP is set to a freshly allocated memory block, or is
    unchanged if no dynamic memory allocation was necessary.  */
 extern int xmem_cd_iconv (const char *src, size_t srclen, iconv_t cd,
-			  char **resultp, size_t *lengthp);
+                          char **resultp, size_t *lengthp);
 
 /* Convert an entire string from one encoding to another, using iconv.
    The original string is the NUL-terminated string starting at SRC.
@@ -67,7 +67,7 @@ extern char * xstr_cd_iconv (const char *src, iconv_t cd);
    Return value: the freshly allocated resulting NUL-terminated string if
    successful, otherwise NULL and errno set.  */
 extern char * xstr_iconv (const char *src,
-			  const char *from_codeset, const char *to_codeset);
+                          const char *from_codeset, const char *to_codeset);
 
 
 #ifdef __cplusplus

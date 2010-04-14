@@ -1,5 +1,5 @@
 /* Convert unibyte character to wide character.
-   Copyright (C) 2008 Free Software Foundation, Inc.
+   Copyright (C) 2008, 2009, 2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ btowc (int c)
 
       buf[0] = c;
       if (mbtowc (&wc, buf, 1) >= 0)
-	return wc;
+        return wc;
     }
   return WEOF;
 }

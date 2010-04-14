@@ -1,7 +1,7 @@
 /* A more useful interface to strtol.
 
-   Copyright (C) 1995, 1996, 1998, 1999, 2001-2004, 2006-2008
-   Free Software Foundation, Inc.
+   Copyright (C) 1995-1996, 1998-1999, 2001-2004, 2006-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,9 +45,9 @@
 
 static void
 xstrtol_error (enum strtol_error err,
-	       int opt_idx, char c, struct option const *long_options,
-	       char const *arg,
-	       int exit_status)
+               int opt_idx, char c, struct option const *long_options,
+               char const *arg,
+               int exit_status)
 {
   char const *hyphens = "--";
   char const *msgid;
@@ -90,8 +90,8 @@ xstrtol_error (enum strtol_error err,
 
 void
 xstrtol_fatal (enum strtol_error err,
-	       int opt_idx, char c, struct option const *long_options,
-	       char const *arg)
+               int opt_idx, char c, struct option const *long_options,
+               char const *arg)
 {
   xstrtol_error (err, opt_idx, c, long_options, arg, exit_failure);
   abort ();

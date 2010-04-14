@@ -1,5 +1,5 @@
 /* seq - print sequence of numbers to standard output.
-   Copyright (C) 1994-2009 Free Software Foundation, Inc.
+   Copyright (C) 1994-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ FORMAT must be suitable for printing one argument of type `double';\n\
 it defaults to %.PRECf if FIRST, INCREMENT, and LAST are all fixed point\n\
 decimal numbers with maximum precision PREC, and to %g otherwise.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -148,6 +148,7 @@ scan_arg (const char *arg)
 
   if (! arg[strcspn (arg, "xX")] && isfinite (ret.value))
     {
+      char const *e;
       char const *decimal_point = strchr (arg, '.');
       if (! decimal_point)
         ret.precision = 0;
@@ -161,8 +162,7 @@ scan_arg (const char *arg)
                         : (decimal_point == arg                /* .#  -> 0.# */
                            || ! ISDIGIT (decimal_point[-1]))); /* -.# -> 0.# */
         }
-      {
-      char const *e = strchr (arg, 'e');
+      e = strchr (arg, 'e');
       if (! e)
         e = strchr (arg, 'E');
       if (e)
@@ -170,7 +170,6 @@ scan_arg (const char *arg)
           long exponent = strtol (e + 1, NULL, 10);
           ret.precision += exponent < 0 ? -exponent : 0;
         }
-      }
     }
 
   return ret;
@@ -317,19 +316,18 @@ get_default_format (operand first, operand step, operand last)
           size_t first_width = first.width + (prec - first.precision);
           /* adjust last_width to use precision from first/step */
           size_t last_width = last.width + (prec - last.precision);
+          size_t width;
           if (last.precision && prec == 0)
             last_width--;  /* don't include space for '.' */
           if (last.precision == 0 && prec)
             last_width++;  /* include space for '.' */
-         {
-          size_t width = MAX (first_width, last_width);
+          width = MAX (first_width, last_width);
           if (width <= INT_MAX)
             {
               int w = width;
               sprintf (format_buf, "%%0%d.%dLf", w, prec);
               return format_buf;
             }
-         }
         }
       else
         {

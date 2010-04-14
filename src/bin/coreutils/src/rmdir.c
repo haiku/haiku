@@ -1,6 +1,6 @@
 /* rmdir -- remove directories
 
-   Copyright (C) 90, 91, 1995-2002, 2004-2009 Free Software Foundation, Inc.
+   Copyright (C) 1990-1991, 1995-2002, 2004-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ static struct option const longopts[] =
 static bool
 errno_rmdir_non_empty (int error_number)
 {
-  return (error_number == RMDIR_ERRNO_NOT_EMPTY);
+  return error_number == ENOTEMPTY || error_number == EEXIST;
 }
 
 /* Return true if when rmdir fails with errno == ERROR_NUMBER
@@ -177,7 +177,7 @@ Remove the DIRECTORY(ies), if they are empty.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

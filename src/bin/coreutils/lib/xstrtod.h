@@ -1,6 +1,7 @@
 /* Error-checking interface to strtod-like functions.
 
-   Copyright (C) 1996, 1998, 2003, 2004, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1998, 2003-2004, 2006, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,8 +24,8 @@
 # include <stdbool.h>
 
 bool xstrtod (const char *str, const char **ptr, double *result,
-	      double (*convert) (char const *, char **));
+              double (*convert) (char const *, char **));
 bool xstrtold (const char *str, const char **ptr, long double *result,
-	       long double (*convert) (char const *, char **));
+               long double (*convert) (char const *, char **));
 
 #endif /* not XSTRTOD_H */

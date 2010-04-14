@@ -1,5 +1,5 @@
 /* paste - merge lines of files
-   Copyright (C) 1997-2005, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 1997-2005, 2008-2010 Free Software Foundation, Inc.
    Copyright (C) 1984 David M. Ihnat
 
    This program is free software: you can redistribute it and/or modify
@@ -450,7 +450,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       /* FIXME: add a couple of examples.  */
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

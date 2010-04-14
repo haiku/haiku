@@ -1,6 +1,6 @@
 /* linebuffer.c -- read arbitrarily long lines
 
-   Copyright (C) 1986, 1991, 1998, 1999, 2001, 2003, 2004, 2006, 2007
+   Copyright (C) 1986, 1991, 1998-1999, 2001, 2003-2004, 2006-2007, 2009-2010
    Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ readlinebuffer (struct linebuffer *linebuffer, FILE *stream)
    Otherwise, return LINEBUFFER.  */
 struct linebuffer *
 readlinebuffer_delim (struct linebuffer *linebuffer, FILE *stream,
-		      char delimiter)
+                      char delimiter)
 {
   int c;
   char *buffer = linebuffer->buffer;
@@ -71,21 +71,21 @@ readlinebuffer_delim (struct linebuffer *linebuffer, FILE *stream,
     {
       c = getc (stream);
       if (c == EOF)
-	{
-	  if (p == buffer || ferror (stream))
-	    return NULL;
-	  if (p[-1] == delimiter)
-	    break;
-	  c = delimiter;
-	}
+        {
+          if (p == buffer || ferror (stream))
+            return NULL;
+          if (p[-1] == delimiter)
+            break;
+          c = delimiter;
+        }
       if (p == end)
-	{
-	  size_t oldsize = linebuffer->size;
-	  buffer = x2realloc (buffer, &linebuffer->size);
-	  p = buffer + oldsize;
-	  linebuffer->buffer = buffer;
-	  end = buffer + linebuffer->size;
-	}
+        {
+          size_t oldsize = linebuffer->size;
+          buffer = x2realloc (buffer, &linebuffer->size);
+          p = buffer + oldsize;
+          linebuffer->buffer = buffer;
+          end = buffer + linebuffer->size;
+        }
       *p++ = c;
     }
   while (c != delimiter);

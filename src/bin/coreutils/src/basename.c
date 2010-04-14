@@ -1,5 +1,5 @@
 /* basename -- strip directory and suffix from file names
-   Copyright (C) 1990-1997, 1999-2009 Free Software Foundation, Inc.
+   Copyright (C) 1990-1997, 1999-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ Examples:\n\
   %s include/stdio.h .h  Output \"stdio\".\n\
 "),
               program_name, program_name);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

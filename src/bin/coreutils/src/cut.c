@@ -1,5 +1,5 @@
 /* cut - remove parts of lines of files
-   Copyright (C) 1997-2009 Free Software Foundation, Inc.
+   Copyright (C) 1997-2010 Free Software Foundation, Inc.
    Copyright (C) 1984 David M. Ihnat
 
    This program is free software: you can redistribute it and/or modify
@@ -235,7 +235,7 @@ Each range is one of:\n\
 \n\
 With no FILE, or when FILE is -, read standard input.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

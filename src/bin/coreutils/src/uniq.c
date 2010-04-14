@@ -1,5 +1,5 @@
 /* uniq -- remove duplicate lines from a sorted file
-   Copyright (C) 86, 91, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1986, 1991, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 
 #include <config.h>
 
-#include <stdio.h>
 #include <getopt.h>
 #include <sys/types.h>
 
@@ -26,8 +25,10 @@
 #include "argmatch.h"
 #include "linebuffer.h"
 #include "error.h"
+#include "hard-locale.h"
 #include "posixver.h"
 #include "quote.h"
+#include "stdio--.h"
 #include "xmemcoll.h"
 #include "xstrtol.h"
 #include "memcasecmp.h"
@@ -174,7 +175,7 @@ Note: 'uniq' does not detect repeated lines unless they are adjacent.\n\
 You may want to sort the input first, or use `sort -u' without `uniq'.\n\
 Also, comparisons honor the rules specified by `LC_COLLATE'.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

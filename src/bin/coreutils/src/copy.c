@@ -1,5 +1,5 @@
 /* copy.c -- core functions for copying files and directories
-   Copyright (C) 89, 90, 91, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1989-1991, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -128,17 +128,12 @@ static char const *top_level_dst_name;
 static inline int
 utimens_symlink (char const *file, struct timespec const *timespec)
 {
-  int err = 0;
-
-#if HAVE_UTIMENSAT
-  err = utimensat (AT_FDCWD, file, timespec, AT_SYMLINK_NOFOLLOW);
+  int err = lutimens (file, timespec);
   /* When configuring on a system with new headers and libraries, and
      running on one with a kernel that is old enough to lack the syscall,
      utimensat fails with ENOSYS.  Ignore that.  */
   if (err && errno == ENOSYS)
     err = 0;
-#endif
-
   return err;
 }
 
@@ -454,11 +449,11 @@ set_owner (const struct cp_options *x, char const *dst_name, int dest_desc,
      group.  Avoid the window by first changing to a restrictive
      temporary mode if necessary.  */
 
-  if (!new_dst && (x->preserve_mode | x->move_mode | x->set_mode))
+  if (!new_dst && (x->preserve_mode || x->move_mode || x->set_mode))
     {
       mode_t old_mode = dst_sb->st_mode;
       mode_t new_mode =
-        (x->preserve_mode | x->move_mode ? src_sb->st_mode : x->mode);
+        (x->preserve_mode || x->move_mode ? src_sb->st_mode : x->mode);
       mode_t restrictive_temp_mode = old_mode & new_mode & S_IRWXU;
 
       if ((USE_ACL
@@ -928,6 +923,24 @@ copy_reg (char const *src_name, char const *dst_name,
         }
     }
 
+  /* To allow copying xattrs on read-only files, temporarily chmod u+rw.
+     This workaround is required as an inode permission check is done
+     by xattr_permission() in fs/xattr.c of the GNU/Linux kernel tree.  */
+  if (x->preserve_xattr)
+    {
+      bool access_changed = false;
+
+      if (!(sb.st_mode & S_IWUSR) && geteuid() != 0)
+        access_changed = fchmod_or_lchmod (dest_desc, dst_name, 0600) == 0;
+
+      if (!copy_attr_by_fd (src_name, source_desc, dst_name, dest_desc, x)
+          && x->require_preserve_xattr)
+        return_val = false;
+
+      if (access_changed)
+        fchmod_or_lchmod (dest_desc, dst_name, dst_mode & ~omitted_permissions);
+    }
+
   if (x->preserve_ownership && ! SAME_OWNER_AND_GROUP (*src_sb, sb))
     {
       switch (set_owner (x, dst_name, dest_desc, src_sb, *new_dst, &sb))
@@ -943,11 +956,6 @@ copy_reg (char const *src_name, char const *dst_name,
     }
 
   set_author (dst_name, dest_desc, src_sb);
-
-  if (x->preserve_xattr && ! copy_attr_by_fd (src_name, source_desc,
-                                              dst_name, dest_desc, x)
-      && x->require_preserve_xattr)
-    return_val = false;
 
   if (x->preserve_mode || x->move_mode)
     {
@@ -1770,7 +1778,9 @@ copy_internal (char const *src_name, char const *dst_name,
         }
       else
         {
-          bool link_failed = (link (earlier_file, dst_name) != 0);
+          /* We want to guarantee that symlinks are not followed.  */
+          bool link_failed = (linkat (AT_FDCWD, earlier_file, AT_FDCWD,
+                                      dst_name, 0) != 0);
 
           /* If the link failed because of an existing destination,
              remove that file and then call link again.  */
@@ -1783,7 +1793,8 @@ copy_internal (char const *src_name, char const *dst_name,
                 }
               if (x->verbose)
                 printf (_("removed %s\n"), quote (dst_name));
-              link_failed = (link (earlier_file, dst_name) != 0);
+              link_failed = (linkat (AT_FDCWD, earlier_file, AT_FDCWD,
+                                     dst_name, 0) != 0);
             }
 
           if (link_failed)
@@ -2081,25 +2092,15 @@ copy_internal (char const *src_name, char const *dst_name,
         }
     }
 
-  /* POSIX 2008 states that it is implementation-defined whether
-     link() on a symlink creates a hard-link to the symlink, or only
-     to the referent (effectively dereferencing the symlink) (POSIX
-     2001 required the latter behavior, although many systems provided
-     the former).  Yet cp, invoked with `--link --no-dereference',
-     should not follow the link.  We can approximate the desired
-     behavior by skipping this hard-link creating block and instead
-     copying the symlink, via the `S_ISLNK'- copying code below.
-     LINK_FOLLOWS_SYMLINKS is tri-state; if it is -1, we don't know
-     how link() behaves, so we use the fallback case for safety.
-
-     FIXME - use a gnulib linkat emulation for more fine-tuned
-     emulation, particularly when LINK_FOLLOWS_SYMLINKS is -1.  */
+  /* cp, invoked with `--link --no-dereference', should not follow the
+     link; we guarantee this with gnulib's linkat module (on systems
+     where link(2) follows the link, gnulib creates a symlink with
+     identical contents, which is good enough for our purposes).  */
   else if (x->hard_link
-           && (!LINK_FOLLOWS_SYMLINKS
-               || !S_ISLNK (src_mode)
+           && (!S_ISLNK (src_mode)
                || x->dereference != DEREF_NEVER))
     {
-      if (link (src_name, dst_name))
+       if (linkat (AT_FDCWD, src_name, AT_FDCWD, dst_name, 0))
         {
           error (0, errno, _("cannot create link %s"), quote (dst_name));
           goto un_backup;

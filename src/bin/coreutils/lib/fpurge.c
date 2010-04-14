@@ -1,5 +1,5 @@
 /* Flushing buffers of a FILE stream.
-   Copyright (C) 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 2007-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -75,13 +75,13 @@ fpurge (FILE *fp)
   fp_->_p = fp_->_bf._base;
   fp_->_r = 0;
   fp_->_w = ((fp_->_flags & (__SLBF | __SNBF | __SRD)) == 0 /* fully buffered and not currently reading? */
-	     ? fp_->_bf._size
-	     : 0);
+             ? fp_->_bf._size
+             : 0);
   /* Avoid memory leak when there is an active ungetc buffer.  */
   if (fp_ub._base != NULL)
     {
       if (fp_ub._base != fp_->_ubuf)
-	free (fp_ub._base);
+        free (fp_ub._base);
       fp_ub._base = NULL;
     }
   return 0;

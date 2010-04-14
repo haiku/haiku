@@ -1,6 +1,6 @@
 /* Convert string to double, using the C locale.
 
-   Copyright (C) 2003, 2004, 2006, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2003-2004, 2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ C_STRTOD (char const *nptr, char **endptr)
   if (!locale)
     {
       if (endptr)
-	*endptr = (char *) nptr;
+        *endptr = (char *) nptr;
       return 0; /* errno is set here */
     }
 
@@ -87,11 +87,11 @@ C_STRTOD (char const *nptr, char **endptr)
     {
       saved_locale = strdup (saved_locale);
       if (saved_locale == NULL)
-	{
-	  if (endptr)
-	    *endptr = (char *) nptr;
-	  return 0; /* errno is set here */
-	}
+        {
+          if (endptr)
+            *endptr = (char *) nptr;
+          return 0; /* errno is set here */
+        }
       setlocale (LC_NUMERIC, "C");
     }
 

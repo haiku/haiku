@@ -1,6 +1,5 @@
 /* tail -- output the last part of file(s)
-   Copyright (C) 1989, 90, 91, 1995-2006, 2008-2009 Free Software
-   Foundation, Inc.
+   Copyright (C) 1989-1991, 1995-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -52,6 +51,12 @@
 # include <sys/inotify.h>
 /* `select' is used by tail_forever_inotify.  */
 # include <sys/select.h>
+
+/* inotify needs to know if a file is local.  */
+# include "fs.h"
+# if HAVE_SYS_STATFS_H
+#  include <sys/statfs.h>
+# endif
 #endif
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -105,9 +110,6 @@ struct File_spec
   /* The actual file name, or "-" for stdin.  */
   char *name;
 
-  /* File descriptor on which the file is open; -1 if it's not open.  */
-  int fd;
-
   /* Attributes of the file the last time we checked.  */
   off_t size;
   struct timespec mtime;
@@ -115,23 +117,26 @@ struct File_spec
   ino_t ino;
   mode_t mode;
 
-  /* 1 if O_NONBLOCK is clear, 0 if set, -1 if not known.  */
-  int blocking;
-
   /* The specified name initially referred to a directory or some other
      type for which tail isn't meaningful.  Unlike for a permission problem
      (tailable, below) once this is set, the name is not checked ever again.  */
   bool ignore;
 
-  /* See description of DEFAULT_MAX_N_... below.  */
-  uintmax_t n_unchanged_stats;
+  /* See the description of fremote.  */
+  bool remote;
 
   /* A file is tailable if it exists, is readable, and is of type
      IS_TAILABLE_FILE_TYPE.  */
   bool tailable;
 
+  /* File descriptor on which the file is open; -1 if it's not open.  */
+  int fd;
+
   /* The value of errno seen last time we checked this file.  */
   int errnum;
+
+  /* 1 if O_NONBLOCK is clear, 0 if set, -1 if not known.  */
+  int blocking;
 
 #if HAVE_INOTIFY
   /* The watch descriptor used by inotify.  */
@@ -144,6 +149,9 @@ struct File_spec
   /* Offset in NAME of the basename part.  */
   size_t basename_start;
 #endif
+
+  /* See description of DEFAULT_MAX_N_... below.  */
+  uintmax_t n_unchanged_stats;
 };
 
 #if HAVE_INOTIFY
@@ -201,8 +209,7 @@ static bool have_read_stdin;
    more expensive) code unconditionally. Intended solely for testing.  */
 static bool presume_input_pipe;
 
-/* If nonzero then don't use inotify even if available.
-   Intended solely for testing.  */
+/* If nonzero then don't use inotify even if available.  */
 static bool disable_inotify;
 
 /* For long options that have no equivalent short option, use a
@@ -260,8 +267,8 @@ With no FILE, or when FILE is -, read standard input.\n\
 Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
      fputs (_("\
-  -c, --bytes=K            output the last K bytes; alternatively, use +K to\n\
-                           output bytes starting with the Kth of each file\n\
+  -c, --bytes=K            output the last K bytes; alternatively, use -c +K\n\
+                           to output bytes starting with the Kth of each file\n\
 "), stdout);
      fputs (_("\
   -f, --follow[={name|descriptor}]\n\
@@ -272,7 +279,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
      printf (_("\
   -n, --lines=K            output the last K lines, instead of the last %d;\n\
-                           or use +K to output lines starting with the Kth\n\
+                           or use -n +K to output lines starting with the Kth\n\
       --max-unchanged-stats=N\n\
                            with --follow=name, reopen a FILE which has not\n\
                            changed size after N (default %d) iterations\n\
@@ -308,16 +315,12 @@ GB 1000*1000*1000, G 1024*1024*1024, and so on for T, P, E, Z, Y.\n\
      fputs (_("\
 With --follow (-f), tail defaults to following the file descriptor, which\n\
 means that even if a tail'ed file is renamed, tail will continue to track\n\
-its end.  \
-"), stdout);
-     fputs (_("\
-This default behavior is not desirable when you really want to\n\
+its end.  This default behavior is not desirable when you really want to\n\
 track the actual name of the file, not the file descriptor (e.g., log\n\
 rotation).  Use --follow=name in that case.  That causes tail to track the\n\
-named file by reopening it periodically to see if it has been removed and\n\
-recreated by some other program.\n\
+named file in a way that accommodates renaming, removal and creation.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -865,6 +868,56 @@ start_lines (const char *pretty_filename, int fd, uintmax_t n_lines,
     }
 }
 
+#if HAVE_INOTIFY
+/* Without inotify support, always return false.  Otherwise, return false
+   when FD is open on a file known to reside on a local file system.
+   If fstatfs fails, give a diagnostic and return true.
+   If fstatfs cannot be called, return true.  */
+static bool
+fremote (int fd, const char *name)
+{
+  bool remote = true;           /* be conservative (poll by default).  */
+
+# if HAVE_FSTATFS && HAVE_STRUCT_STATFS_F_TYPE && defined __linux__
+  struct statfs buf;
+  int err = fstatfs (fd, &buf);
+  if (err != 0)
+    {
+      error (0, errno, _("cannot determine location of %s. "
+                         "reverting to polling"), quote (name));
+    }
+  else
+    {
+      switch (buf.f_type)
+        {
+        case S_MAGIC_AFS:
+        case S_MAGIC_CIFS:
+        case S_MAGIC_CODA:
+        case S_MAGIC_FUSEBLK:
+        case S_MAGIC_FUSECTL:
+        case S_MAGIC_GFS:
+        case S_MAGIC_KAFS:
+        case S_MAGIC_LUSTRE:
+        case S_MAGIC_NCP:
+        case S_MAGIC_NFS:
+        case S_MAGIC_NFSD:
+        case S_MAGIC_OCFS2:
+        case S_MAGIC_SMB:
+          break;
+        default:
+          remote = false;
+        }
+    }
+# endif
+
+  return remote;
+}
+#else
+/* Without inotify support, whether a file is remote is irrelevant.
+   Always return "false" in that case.  */
+# define fremote(fd, name) false
+#endif
+
 /* FIXME: describe */
 
 static void
@@ -920,6 +973,15 @@ recheck (struct File_spec *f, bool blocking)
  giving up on this name"),
              quote (pretty_name (f)));
       f->ignore = true;
+    }
+  else if (!disable_inotify && fremote (fd, pretty_name (f)))
+    {
+      ok = false;
+      f->errnum = -1;
+      error (0, 0, _("%s has been replaced with a remote file. "
+                     "giving up on this name"), quote (pretty_name (f)));
+      f->ignore = true;
+      f->remote = true;
     }
   else
     {
@@ -1126,7 +1188,7 @@ tail_forever (struct File_spec *f, size_t n_files, double sleep_interval)
           break;
         }
 
-      if ((!any_input | blocking) && fflush (stdout) != 0)
+      if ((!any_input || blocking) && fflush (stdout) != 0)
         error (EXIT_FAILURE, errno, _("write error"));
 
       /* If nothing was read, sleep and/or check for dead writers.  */
@@ -1134,9 +1196,6 @@ tail_forever (struct File_spec *f, size_t n_files, double sleep_interval)
         {
           if (writer_is_dead)
             break;
-
-          if (xnanosleep (sleep_interval))
-            error (EXIT_FAILURE, errno, _("cannot read realtime clock"));
 
           /* Once the writer is dead, read the files once more to
              avoid a race condition.  */
@@ -1146,11 +1205,43 @@ tail_forever (struct File_spec *f, size_t n_files, double sleep_interval)
                                signal to the writer, so kill fails and sets
                                errno to EPERM.  */
                             && errno != EPERM);
+
+          if (!writer_is_dead && xnanosleep (sleep_interval))
+            error (EXIT_FAILURE, errno, _("cannot read realtime clock"));
+
         }
     }
 }
 
 #if HAVE_INOTIFY
+
+/* Return true if any of the N_FILES files in F is remote, i.e., has
+   an open file descriptor and is on a network file system.  */
+
+static bool
+any_remote_file (const struct File_spec *f, size_t n_files)
+{
+  size_t i;
+
+  for (i = 0; i < n_files; i++)
+    if (0 <= f[i].fd && f[i].remote)
+      return true;
+  return false;
+}
+
+/* Return true if any of the N_FILES files in F represents
+   stdin and is tailable.  */
+
+static bool
+tailable_stdin (const struct File_spec *f, size_t n_files)
+{
+  size_t i;
+
+  for (i = 0; i < n_files; i++)
+    if (!f[i].ignore && STREQ (f[i].name, "-"))
+      return true;
+  return false;
+}
 
 static size_t
 wd_hasher (const void *entry, size_t tabsize)
@@ -1167,31 +1258,73 @@ wd_comparator (const void *e1, const void *e2)
   return spec1->wd == spec2->wd;
 }
 
+/* Helper function used by `tail_forever_inotify'.  */
+static void
+check_fspec (struct File_spec *fspec, int wd, int *prev_wd)
+{
+  struct stat stats;
+  char const *name = pretty_name (fspec);
+
+  if (fstat (fspec->fd, &stats) != 0)
+    {
+      close_fd (fspec->fd, name);
+      fspec->fd = -1;
+      fspec->errnum = errno;
+      return;
+    }
+
+  if (S_ISREG (fspec->mode) && stats.st_size < fspec->size)
+    {
+      error (0, 0, _("%s: file truncated"), name);
+      *prev_wd = wd;
+      xlseek (fspec->fd, stats.st_size, SEEK_SET, name);
+      fspec->size = stats.st_size;
+    }
+  else if (S_ISREG (fspec->mode) && stats.st_size == fspec->size
+           && timespec_cmp (fspec->mtime, get_stat_mtime (&stats)) == 0)
+    return;
+
+  if (wd != *prev_wd)
+    {
+      if (print_headers)
+        write_header (name);
+      *prev_wd = wd;
+    }
+
+  uintmax_t bytes_read = dump_remainder (name, fspec->fd, COPY_TO_EOF);
+  fspec->size += bytes_read;
+
+  if (fflush (stdout) != 0)
+    error (EXIT_FAILURE, errno, _("write error"));
+}
+
 /* Tail N_FILES files forever, or until killed.
    Check modifications using the inotify events system.  */
-
 static void
 tail_forever_inotify (int wd, struct File_spec *f, size_t n_files,
                       double sleep_interval)
 {
-  size_t i;
   unsigned int max_realloc = 3;
-  Hash_table *wd_table;
+
+  /* Map an inotify watch descriptor to the name of the file it's watching.  */
+  Hash_table *wd_to_name;
 
   bool found_watchable = false;
+  bool writer_is_dead = false;
   int prev_wd;
   size_t evlen = 0;
   char *evbuf;
   size_t evbuf_off = 0;
   size_t len = 0;
 
-  wd_table = hash_initialize (n_files, NULL, wd_hasher, wd_comparator, NULL);
-  if (! wd_table)
+  wd_to_name = hash_initialize (n_files, NULL, wd_hasher, wd_comparator, NULL);
+  if (! wd_to_name)
     xalloc_die ();
 
   /* Add an inotify watch for each watched file.  If -F is specified then watch
      its parent directory too, in this way when they re-appear we can add them
      again to the watch list.  */
+  size_t i;
   for (i = 0; i < n_files; i++)
     {
       if (!f[i].ignore)
@@ -1235,7 +1368,7 @@ tail_forever_inotify (int wd, struct File_spec *f, size_t n_files,
               continue;
             }
 
-          if (hash_insert (wd_table, &(f[i])) == NULL)
+          if (hash_insert (wd_to_name, &(f[i])) == NULL)
             xalloc_die ();
 
           found_watchable = true;
@@ -1247,6 +1380,14 @@ tail_forever_inotify (int wd, struct File_spec *f, size_t n_files,
 
   prev_wd = f[n_files - 1].wd;
 
+  /* Check files again.  New data can be available since last time we checked
+     and before they are watched by inotify.  */
+  for (i = 0; i < n_files; i++)
+    {
+      if (!f[i].ignore)
+        check_fspec (&f[i], f[i].wd, &prev_wd);
+    }
+
   evlen += sizeof (struct inotify_event) + 1;
   evbuf = xmalloc (evlen);
 
@@ -1255,41 +1396,37 @@ tail_forever_inotify (int wd, struct File_spec *f, size_t n_files,
      This loop sleeps on the `safe_read' call until a new event is notified.  */
   while (1)
     {
-      char const *name;
       struct File_spec *fspec;
-      uintmax_t bytes_read;
-      struct stat stats;
-
       struct inotify_event *ev;
 
       /* When watching a PID, ensure that a read from WD will not block
-         indefinetely.  */
+         indefinitely.  */
       if (pid)
         {
-          fd_set rfd;
-          struct timeval select_timeout;
-          int n_descriptors;
+          if (writer_is_dead)
+            exit (EXIT_SUCCESS);
 
-          FD_ZERO (&rfd);
-          FD_SET (wd, &rfd);
+          writer_is_dead = (kill (pid, 0) != 0 && errno != EPERM);
 
-          select_timeout.tv_sec = (time_t) sleep_interval;
-          select_timeout.tv_usec = 1000000 * (sleep_interval
-                                              - select_timeout.tv_sec);
-
-          n_descriptors = select (wd + 1, &rfd, NULL, NULL, &select_timeout);
-
-          if (n_descriptors == -1)
-            error (EXIT_FAILURE, errno, _("error monitoring inotify event"));
-
-          if (n_descriptors == 0)
+          struct timeval delay; /* how long to wait for file changes.  */
+          if (writer_is_dead)
+            delay.tv_sec = delay.tv_usec = 0;
+          else
             {
-              /* See if the process we are monitoring is still alive.  */
-              if (kill (pid, 0) != 0 && errno != EPERM)
-                exit (EXIT_SUCCESS);
-
-              continue;
+              delay.tv_sec = (time_t) sleep_interval;
+              delay.tv_usec = 1000000 * (sleep_interval - delay.tv_sec);
             }
+
+           fd_set rfd;
+           FD_ZERO (&rfd);
+           FD_SET (wd, &rfd);
+
+           int file_change = select (wd + 1, &rfd, NULL, NULL, &delay);
+
+           if (file_change == 0)
+             continue;
+           else if (file_change == -1)
+             error (EXIT_FAILURE, errno, _("error monitoring inotify event"));
         }
 
       if (len <= evbuf_off)
@@ -1315,41 +1452,59 @@ tail_forever_inotify (int wd, struct File_spec *f, size_t n_files,
       ev = (struct inotify_event *) (evbuf + evbuf_off);
       evbuf_off += sizeof (*ev) + ev->len;
 
-      if (ev->len)
+      if (ev->len) /* event on ev->name in watched directory  */
         {
-          for (i = 0; i < n_files; i++)
+          size_t j;
+          for (j = 0; j < n_files; j++)
             {
               /* With N=hundreds of frequently-changing files, this O(N^2)
                  process might be a problem.  FIXME: use a hash table?  */
-              if (f[i].parent_wd == ev->wd
-                  && STREQ (ev->name, f[i].name + f[i].basename_start))
+              if (f[j].parent_wd == ev->wd
+                  && STREQ (ev->name, f[j].name + f[j].basename_start))
                 break;
             }
 
           /* It is not a watched file.  */
-          if (i == n_files)
+          if (j == n_files)
             continue;
 
-          f[i].wd = inotify_add_watch (wd, f[i].name, inotify_wd_mask);
-
-          if (f[i].wd < 0)
+          /* It's fine to add the same file more than once.  */
+          int new_wd = inotify_add_watch (wd, f[j].name, inotify_wd_mask);
+          if (new_wd < 0)
             {
-              error (0, errno, _("cannot watch %s"), quote (f[i].name));
+              error (0, errno, _("cannot watch %s"), quote (f[j].name));
               continue;
             }
 
-          fspec = &(f[i]);
-          if (hash_insert (wd_table, fspec) == NULL)
+          fspec = &(f[j]);
+
+          /* Remove `fspec' and re-add it using `new_fd' as its key.  */
+          hash_delete (wd_to_name, fspec);
+          fspec->wd = new_wd;
+
+          /* If the file was moved then inotify will use the source file wd for
+             the destination file.  Make sure the key is not present in the
+             table.  */
+          struct File_spec *prev = hash_delete (wd_to_name, fspec);
+          if (prev && prev != fspec)
+            {
+              if (follow_mode == Follow_name)
+                recheck (prev, false);
+              prev->wd = -1;
+              close_fd (prev->fd, pretty_name (prev));
+            }
+
+          if (hash_insert (wd_to_name, fspec) == NULL)
             xalloc_die ();
 
           if (follow_mode == Follow_name)
-            recheck (&(f[i]), false);
+            recheck (fspec, false);
         }
       else
         {
           struct File_spec key;
           key.wd = ev->wd;
-          fspec = hash_lookup (wd_table, &key);
+          fspec = hash_lookup (wd_to_name, &key);
         }
 
       if (! fspec)
@@ -1357,47 +1512,23 @@ tail_forever_inotify (int wd, struct File_spec *f, size_t n_files,
 
       if (ev->mask & (IN_ATTRIB | IN_DELETE_SELF | IN_MOVE_SELF))
         {
-          if (ev->mask & (IN_DELETE_SELF | IN_MOVE_SELF))
+          /* For IN_DELETE_SELF, we always want to remove the watch.
+             However, for IN_MOVE_SELF (the file we're watching has
+             been clobbered via a rename), when tailing by NAME, we
+             must continue to watch the file.  It's only when following
+             by file descriptor that we must remove the watch.  */
+          if ((ev->mask & IN_DELETE_SELF)
+              || ((ev->mask & IN_MOVE_SELF) && follow_mode == Follow_descriptor))
             {
-              inotify_rm_watch (wd, f[i].wd);
-              hash_delete (wd_table, &(f[i]));
+              inotify_rm_watch (wd, fspec->wd);
+              hash_delete (wd_to_name, fspec);
             }
           if (follow_mode == Follow_name)
             recheck (fspec, false);
 
           continue;
         }
-
-      name = pretty_name (fspec);
-
-      if (fstat (fspec->fd, &stats) != 0)
-        {
-          close_fd (fspec->fd, name);
-          fspec->fd = -1;
-          fspec->errnum = errno;
-          continue;
-        }
-
-      if (S_ISREG (fspec->mode) && stats.st_size < fspec->size)
-        {
-          error (0, 0, _("%s: file truncated"), name);
-          prev_wd = ev->wd;
-          xlseek (fspec->fd, stats.st_size, SEEK_SET, name);
-          fspec->size = stats.st_size;
-        }
-
-      if (ev->wd != prev_wd)
-        {
-          if (print_headers)
-            write_header (name);
-          prev_wd = ev->wd;
-        }
-
-      bytes_read = dump_remainder (name, fspec->fd, COPY_TO_EOF);
-      fspec->size += bytes_read;
-
-      if (fflush (stdout) != 0)
-        error (EXIT_FAILURE, errno, _("write error"));
+      check_fspec (fspec, ev->wd, &prev_wd);
     }
 }
 #endif
@@ -1596,7 +1727,7 @@ tail_file (struct File_spec *f, uintmax_t n_units)
           /* Before the tail function provided `read_pos', there was
              a race condition described in the URL below.  This sleep
              call made the window big enough to exercise the problem.  */
-          sleep (1);
+          xnanosleep (1);
 #endif
           f->errnum = ok - 1;
           if (fstat (fd, &stats) < 0)
@@ -1626,6 +1757,7 @@ tail_file (struct File_spec *f, uintmax_t n_units)
                  to avoid a race condition described by Ken Raeburn:
         http://mail.gnu.org/archive/html/bug-textutils/2003-05/msg00007.html */
               record_open_fd (f, fd, read_pos, &stats, (is_stdin ? -1 : 1));
+              f->remote = fremote (fd, pretty_name (f));
             }
         }
       else
@@ -1866,6 +1998,35 @@ parse_options (int argc, char **argv,
     }
 }
 
+/* Mark as '.ignore'd each member of F that corresponds to a
+   pipe or fifo, and return the number of non-ignored members.  */
+static size_t
+ignore_fifo_and_pipe (struct File_spec *f, size_t n_files)
+{
+  /* When there is no FILE operand and stdin is a pipe or FIFO
+     POSIX requires that tail ignore the -f option.
+     Since we allow multiple FILE operands, we extend that to say: with -f,
+     ignore any "-" operand that corresponds to a pipe or FIFO.  */
+  size_t n_viable = 0;
+
+  size_t i;
+  for (i = 0; i < n_files; i++)
+    {
+      bool is_a_fifo_or_pipe =
+        (STREQ (f[i].name, "-")
+         && !f[i].ignore
+         && 0 <= f[i].fd
+         && (S_ISFIFO (f[i].mode)
+             || (HAVE_FIFO_PIPES != 1 && isapipe (f[i].fd))));
+      if (is_a_fifo_or_pipe)
+        f[i].ignore = true;
+      else
+        ++n_viable;
+    }
+
+  return n_viable;
+}
+
 int
 main (int argc, char **argv)
 {
@@ -1957,42 +2118,31 @@ main (int argc, char **argv)
   for (i = 0; i < n_files; i++)
     ok &= tail_file (&F[i], n_units);
 
-  /* When there is no FILE operand and stdin is a pipe or FIFO
-     POSIX requires that tail ignore the -f option.
-     Since we allow multiple FILE operands, we extend that to say:
-     ignore any "-" operand that corresponds to a pipe or FIFO.  */
-  {
-  size_t n_viable = 0;
-  for (i = 0; i < n_files; i++)
-    {
-      bool is_a_fifo_or_pipe =
-        (STREQ (F[i].name, "-")
-         && !F[i].ignore
-         && 0 <= F[i].fd
-         && (S_ISFIFO (F[i].mode)
-             || (HAVE_FIFO_PIPES != 1 && isapipe (F[i].fd))));
-      if (is_a_fifo_or_pipe)
-        F[i].ignore = true;
-      else
-        ++n_viable;
-    }
-
-  if (forever && n_viable)
+  if (forever && ignore_fifo_and_pipe (F, n_files))
     {
 #if HAVE_INOTIFY
-      /* If the user specifies stdin via a command line argument of "-",
-         or implicitly by providing no arguments, we won't use inotify.
+      /* tailable_stdin() checks if the user specifies stdin via  "-",
+         or implicitly by providing no arguments. If so, we won't use inotify.
          Technically, on systems with a working /dev/stdin, we *could*,
          but would it be worth it?  Verifying that it's a real device
          and hooked up to stdin is not trivial, while reverting to
-         non-inotify-based tail_forever is easy and portable.  */
-      bool stdin_cmdline_arg = false;
+         non-inotify-based tail_forever is easy and portable.
 
-      for (i = 0; i < n_files; i++)
-        if (!F[i].ignore && STREQ (F[i].name, "-"))
-          stdin_cmdline_arg = true;
+         any_remote_file() checks if the user has specified any
+         files that reside on remote file systems.  inotify is not used
+         in this case because it would miss any updates to the file
+         that were not initiated from the local system.
 
-      if (!disable_inotify && !stdin_cmdline_arg)
+         FIXME: inotify doesn't give any notification when a new
+         (remote) file or directory is mounted on top a watched file.
+         When follow_mode == Follow_name we would ideally like to detect that.
+         Note if there is a change to the original file then we'll
+         recheck it and follow the new file, or ignore it if the
+         file has changed to being remote.  */
+      if (tailable_stdin (F, n_files) || any_remote_file (F, n_files))
+        disable_inotify = true;
+
+      if (!disable_inotify)
         {
           int wd = inotify_init ();
           if (wd < 0)
@@ -2014,7 +2164,6 @@ main (int argc, char **argv)
 #endif
       tail_forever (F, n_files, sleep_interval);
     }
-  }
 
   if (have_read_stdin && close (STDIN_FILENO) < 0)
     error (EXIT_FAILURE, errno, "-");

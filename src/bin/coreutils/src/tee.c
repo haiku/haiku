@@ -1,5 +1,5 @@
 /* tee - read from standard input and write to standard output and files.
-   Copyright (C) 85,1990-2006, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 1985, 1990-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ Copy standard input to each FILE, and also to standard output.\n\
 \n\
 If a FILE is -, copy again to standard output.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

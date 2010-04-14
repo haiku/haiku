@@ -1,6 +1,6 @@
 /* sockets.c --- wrappers for Windows socket functions
 
-   Copyright (C) 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@
 #if WINDOWS_SOCKETS
 
 /* This includes winsock2.h on MinGW. */
-#include <sys/socket.h>
+# include <sys/socket.h>
 
-#include "close-hook.h"
+# include "close-hook.h"
 
 /* Get set_winsock_errno, FD_TO_SOCKET etc. */
-#include "w32sock.h"
+# include "w32sock.h"
 
 static int
 close_fd_maybe_socket (int fd, const struct close_hook *remaining_list)
@@ -46,21 +46,21 @@ close_fd_maybe_socket (int fd, const struct close_hook *remaining_list)
     {
       /* fd refers to a socket.  */
       /* FIXME: other applications, like squid, use an undocumented
-	 _free_osfhnd free function.  But this is not enough: The 'osfile'
-	 flags for fd also needs to be cleared, but it is hard to access it.
-	 Instead, here we just close twice the file descriptor.  */
+         _free_osfhnd free function.  But this is not enough: The 'osfile'
+         flags for fd also needs to be cleared, but it is hard to access it.
+         Instead, here we just close twice the file descriptor.  */
       if (closesocket (sock))
-	{
-	  set_winsock_errno ();
-	  return -1;
-	}
+        {
+          set_winsock_errno ();
+          return -1;
+        }
       else
-	{
-	  /* This call frees the file descriptor and does a
-	     CloseHandle ((HANDLE) _get_osfhandle (fd)), which fails.  */
-	  _close (fd);
-	  return 0;
-	}
+        {
+          /* This call frees the file descriptor and does a
+             CloseHandle ((HANDLE) _get_osfhandle (fd)), which fails.  */
+          _close (fd);
+          return 0;
+        }
     }
   else
     /* Some other type of file descriptor.  */
@@ -71,10 +71,10 @@ static struct close_hook close_sockets_hook;
 
 static int initialized_sockets_version /* = 0 */;
 
-#endif
+#endif /* WINDOWS_SOCKETS */
 
 int
-gl_sockets_startup (int version)
+gl_sockets_startup (int version _GL_UNUSED)
 {
 #if WINDOWS_SOCKETS
   if (version > initialized_sockets_version)
@@ -84,13 +84,13 @@ gl_sockets_startup (int version)
 
       err = WSAStartup (version, &data);
       if (err != 0)
-	return 1;
+        return 1;
 
       if (data.wVersion < version)
-	return 2;
+        return 2;
 
       if (initialized_sockets_version == 0)
-	register_close_hook (close_fd_maybe_socket, &close_sockets_hook);
+        register_close_hook (close_fd_maybe_socket, &close_sockets_hook);
 
       initialized_sockets_version = version;
     }

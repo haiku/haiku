@@ -1,7 +1,7 @@
 /* argmatch.c -- find a match for a string in an array
 
-   Copyright (C) 1990, 1998, 1999, 2001, 2002, 2003, 2004, 2005, 2006, 2007
-   Free Software Foundation, Inc.
+   Copyright (C) 1990, 1998, 1999, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+   2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -81,12 +81,12 @@ argmatch_exit_fn argmatch_die = __argmatch_die;
 
 ptrdiff_t
 argmatch (const char *arg, const char *const *arglist,
-	  const char *vallist, size_t valsize)
+          const char *vallist, size_t valsize)
 {
-  size_t i;			/* Temporary index in ARGLIST.  */
-  size_t arglen;		/* Length of ARG.  */
-  ptrdiff_t matchind = -1;	/* Index of first nonexact match.  */
-  bool ambiguous = false;	/* If true, multiple nonexact match(es).  */
+  size_t i;                     /* Temporary index in ARGLIST.  */
+  size_t arglen;                /* Length of ARG.  */
+  ptrdiff_t matchind = -1;      /* Index of first nonexact match.  */
+  bool ambiguous = false;       /* If true, multiple nonexact match(es).  */
 
   arglen = strlen (arg);
 
@@ -94,26 +94,26 @@ argmatch (const char *arg, const char *const *arglist,
   for (i = 0; arglist[i]; i++)
     {
       if (!strncmp (arglist[i], arg, arglen))
-	{
-	  if (strlen (arglist[i]) == arglen)
-	    /* Exact match found.  */
-	    return i;
-	  else if (matchind == -1)
-	    /* First nonexact match found.  */
-	    matchind = i;
-	  else
-	    {
-	      /* Second nonexact match found.  */
-	      if (vallist == NULL
-		  || memcmp (vallist + valsize * matchind,
-			     vallist + valsize * i, valsize))
-		{
-		  /* There is a real ambiguity, or we could not
-		     disambiguate. */
-		  ambiguous = true;
-		}
-	    }
-	}
+        {
+          if (strlen (arglist[i]) == arglen)
+            /* Exact match found.  */
+            return i;
+          else if (matchind == -1)
+            /* First nonexact match found.  */
+            matchind = i;
+          else
+            {
+              /* Second nonexact match found.  */
+              if (vallist == NULL
+                  || memcmp (vallist + valsize * matchind,
+                             vallist + valsize * i, valsize))
+                {
+                  /* There is a real ambiguity, or we could not
+                     disambiguate. */
+                  ambiguous = true;
+                }
+            }
+        }
     }
   if (ambiguous)
     return -2;
@@ -130,11 +130,11 @@ void
 argmatch_invalid (const char *context, const char *value, ptrdiff_t problem)
 {
   char const *format = (problem == -1
-			? _("invalid argument %s for %s")
-			: _("ambiguous argument %s for %s"));
+                        ? _("invalid argument %s for %s")
+                        : _("ambiguous argument %s for %s"));
 
   error (0, 0, format, quotearg_n_style (0, ARGMATCH_QUOTING_STYLE, value),
-	 quote_n (1, context));
+         quote_n (1, context));
 }
 
 /* List the valid arguments for argmatch.
@@ -143,7 +143,7 @@ argmatch_invalid (const char *context, const char *value, ptrdiff_t problem)
    VALSIZE is the size of the elements of VALLIST */
 void
 argmatch_valid (const char *const *arglist,
-		const char *vallist, size_t valsize)
+                const char *vallist, size_t valsize)
 {
   size_t i;
   const char *last_val = NULL;
@@ -153,14 +153,14 @@ argmatch_valid (const char *const *arglist,
   fprintf (stderr, _("Valid arguments are:"));
   for (i = 0; arglist[i]; i++)
     if ((i == 0)
-	|| memcmp (last_val, vallist + valsize * i, valsize))
+        || memcmp (last_val, vallist + valsize * i, valsize))
       {
-	fprintf (stderr, "\n  - `%s'", arglist[i]);
-	last_val = vallist + valsize * i;
+        fprintf (stderr, "\n  - `%s'", arglist[i]);
+        last_val = vallist + valsize * i;
       }
     else
       {
-	fprintf (stderr, ", `%s'", arglist[i]);
+        fprintf (stderr, ", `%s'", arglist[i]);
       }
   putc ('\n', stderr);
 }
@@ -173,9 +173,9 @@ argmatch_valid (const char *const *arglist,
 
 ptrdiff_t
 __xargmatch_internal (const char *context,
-		      const char *arg, const char *const *arglist,
-		      const char *vallist, size_t valsize,
-		      argmatch_exit_fn exit_fn)
+                      const char *arg, const char *const *arglist,
+                      const char *vallist, size_t valsize,
+                      argmatch_exit_fn exit_fn)
 {
   ptrdiff_t res = argmatch (arg, arglist, vallist, valsize);
   if (res >= 0)
@@ -194,8 +194,8 @@ __xargmatch_internal (const char *context,
    return the first corresponding argument in ARGLIST */
 const char *
 argmatch_to_argument (const char *value,
-		      const char *const *arglist,
-		      const char *vallist, size_t valsize)
+                      const char *const *arglist,
+                      const char *vallist, size_t valsize)
 {
   size_t i;
 
@@ -263,14 +263,14 @@ main (int argc, const char *const *argv)
 
   if ((cp = getenv ("VERSION_CONTROL")))
     backup_type = XARGMATCH ("$VERSION_CONTROL", cp,
-			     backup_args, backup_vals);
+                             backup_args, backup_vals);
 
   if (argc == 2)
     backup_type = XARGMATCH (program_name, argv[1],
-			     backup_args, backup_vals);
+                             backup_args, backup_vals);
 
   printf ("The version control is `%s'\n",
-	  ARGMATCH_TO_ARGUMENT (backup_type, backup_args, backup_vals));
+          ARGMATCH_TO_ARGUMENT (backup_type, backup_args, backup_vals));
 
   return 0;
 }

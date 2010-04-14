@@ -1,8 +1,6 @@
 /* backupfile.c -- make Emacs style backup file names
 
-   Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-   1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 Free Software
-   Foundation, Inc.
+   Copyright (C) 1990-2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -103,18 +101,18 @@ check_extension (char *file, size_t filelen, char e)
       long name_max;
 
       /* Temporarily modify the buffer into its parent directory name,
-	 invoke pathconf on the directory, and then restore the buffer.  */
+         invoke pathconf on the directory, and then restore the buffer.  */
       char tmp[sizeof "."];
       memcpy (tmp, base, sizeof ".");
       strcpy (base, ".");
       errno = 0;
       name_max = pathconf (file, _PC_NAME_MAX);
       if (0 <= name_max || errno == 0)
-	{
-	  long size = baselen_max = name_max;
-	  if (name_max != size)
-	    baselen_max = SIZE_MAX;
-	}
+        {
+          long size = baselen_max = name_max;
+          if (name_max != size)
+            baselen_max = SIZE_MAX;
+        }
       memcpy (base, tmp, sizeof ".");
     }
 
@@ -123,21 +121,21 @@ check_extension (char *file, size_t filelen, char e)
       /* Live within DOS's 8.3 limit.  */
       char *dot = strchr (base, '.');
       if (!dot)
-	baselen_max = 8;
+        baselen_max = 8;
       else
-	{
-	  char const *second_dot = strchr (dot + 1, '.');
-	  baselen_max = (second_dot
-			 ? second_dot - base
-			 : dot + 1 - base + 3);
-	}
+        {
+          char const *second_dot = strchr (dot + 1, '.');
+          baselen_max = (second_dot
+                         ? second_dot - base
+                         : dot + 1 - base + 3);
+        }
     }
 
   if (baselen_max < baselen)
     {
       baselen = file + filelen - base;
       if (baselen_max <= baselen)
-	baselen = baselen_max - 1;
+        baselen = baselen_max - 1;
       base[baselen] = e;
       base[baselen + 1] = '\0';
     }
@@ -203,41 +201,41 @@ numbered_backup (char **buffer, size_t buffer_size, size_t filelen)
       size_t new_buflen;
 
       if (! REAL_DIR_ENTRY (dp) || _D_EXACT_NAMLEN (dp) < baselen + 4)
-	continue;
+        continue;
 
       if (memcmp (buf + base_offset, dp->d_name, baselen + 2) != 0)
-	continue;
+        continue;
 
       p = dp->d_name + baselen + 2;
 
       /* Check whether this file has a version number and if so,
-	 whether it is larger.  Use string operations rather than
-	 integer arithmetic, to avoid problems with integer overflow.  */
+         whether it is larger.  Use string operations rather than
+         integer arithmetic, to avoid problems with integer overflow.  */
 
       if (! ('1' <= *p && *p <= '9'))
-	continue;
+        continue;
       all_9s = (*p == '9');
       for (versionlen = 1; ISDIGIT (p[versionlen]); versionlen++)
-	all_9s &= (p[versionlen] == '9');
+        all_9s &= (p[versionlen] == '9');
 
       if (! (p[versionlen] == '~' && !p[versionlen + 1]
-	     && (versionlenmax < versionlen
-		 || (versionlenmax == versionlen
-		     && memcmp (buf + filelen + 2, p, versionlen) <= 0))))
-	continue;
+             && (versionlenmax < versionlen
+                 || (versionlenmax == versionlen
+                     && memcmp (buf + filelen + 2, p, versionlen) <= 0))))
+        continue;
 
       /* This directory has the largest version number seen so far.
-	 Append this highest numbered extension to the file name,
-	 prepending '0' to the number if it is all 9s.  */
+         Append this highest numbered extension to the file name,
+         prepending '0' to the number if it is all 9s.  */
 
       versionlenmax = all_9s + versionlen;
       result = (all_9s ? BACKUP_IS_LONGER : BACKUP_IS_SAME_LENGTH);
       new_buflen = filelen + 2 + versionlenmax + 1;
       if (buffer_size <= new_buflen)
-	{
-	  buf = xnrealloc (buf, 2, new_buflen);
-	  buffer_size = new_buflen * 2;
-	}
+        {
+          buf = xnrealloc (buf, 2, new_buflen);
+          buffer_size = new_buflen * 2;
+        }
       q = buf + filelen;
       *q++ = '.';
       *q++ = '~';
@@ -249,7 +247,7 @@ numbered_backup (char **buffer, size_t buffer_size, size_t filelen)
 
       q += versionlen;
       while (*--q == '9')
-	*q = '0';
+        *q = '0';
       ++*q;
     }
 
@@ -286,15 +284,15 @@ find_backup_file_name (char const *file, enum backup_type backup_type)
     switch (numbered_backup (&s, ssize, filelen))
       {
       case BACKUP_IS_SAME_LENGTH:
-	return s;
+        return s;
 
       case BACKUP_IS_LONGER:
-	simple = false;
-	break;
+        simple = false;
+        break;
 
       case BACKUP_IS_NEW:
-	simple = (backup_type == numbered_existing_backups);
-	break;
+        simple = (backup_type == numbered_existing_backups);
+        break;
       }
 
   if (simple)

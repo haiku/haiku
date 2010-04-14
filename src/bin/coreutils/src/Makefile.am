@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 
-## Copyright (C) 1990, 1991, 1993-2009 Free Software Foundation, Inc.
+## Copyright (C) 1990-1991, 1993-2010 Free Software Foundation, Inc.
 
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -24,25 +24,115 @@ no_install__progs = \
   arch hostname su
 
 build_if_possible__progs = \
-  chroot df hostid nice pinky stdbuf libstdbuf.so stty su uname uptime users who
+  chroot	\
+  df		\
+  hostid	\
+  libstdbuf.so	\
+  nice		\
+  pinky		\
+  stdbuf	\
+  stty		\
+  su		\
+  uptime	\
+  users		\
+  who
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 
 EXTRA_PROGRAMS = \
   $(no_install__progs) \
   $(build_if_possible__progs) \
-  [ chcon chgrp chown chmod cp dd dircolors du \
-  ginstall link ln dir vdir ls mkdir \
-  mkfifo mknod mktemp \
-  mv nohup readlink rm rmdir shred stat sync touch unlink \
-  cat cksum comm csplit cut expand fmt fold head join groups md5sum \
-  nl od paste pr ptx sha1sum sha224sum sha256sum sha384sum sha512sum \
-  shuf sort split sum tac tail tr tsort unexpand uniq wc \
-  basename date dirname echo env expr factor false \
-  id kill logname pathchk printenv printf pwd \
-  runcon seq sleep tee \
-  test timeout true truncate tty whoami yes \
-  base64
+  [		\
+  base64	\
+  basename	\
+  cat		\
+  chcon		\
+  chgrp		\
+  chmod		\
+  chown		\
+  cksum		\
+  comm		\
+  cp		\
+  csplit	\
+  cut		\
+  date		\
+  dd		\
+  dir		\
+  dircolors	\
+  dirname	\
+  du		\
+  echo		\
+  env		\
+  expand	\
+  expr		\
+  factor	\
+  false		\
+  fmt		\
+  fold		\
+  ginstall	\
+  groups	\
+  head		\
+  id		\
+  join		\
+  kill		\
+  link		\
+  ln		\
+  logname	\
+  ls		\
+  md5sum	\
+  mkdir		\
+  mkfifo	\
+  mknod		\
+  mktemp	\
+  mv		\
+  nl		\
+  nproc		\
+  nohup		\
+  od		\
+  paste		\
+  pathchk	\
+  pr		\
+  printenv	\
+  printf	\
+  ptx		\
+  pwd		\
+  readlink	\
+  rm		\
+  rmdir		\
+  runcon	\
+  seq		\
+  sha1sum	\
+  sha224sum	\
+  sha256sum	\
+  sha384sum	\
+  sha512sum	\
+  shred		\
+  shuf		\
+  sleep		\
+  sort		\
+  split		\
+  stat		\
+  sum		\
+  sync		\
+  tac		\
+  tail		\
+  tee		\
+  test		\
+  timeout	\
+  touch		\
+  tr		\
+  true		\
+  truncate	\
+  tsort		\
+  tty		\
+  uname		\
+  unexpand	\
+  uniq		\
+  unlink	\
+  vdir		\
+  wc		\
+  whoami	\
+  yes
 
 bin_PROGRAMS = $(OPTIONAL_BIN_PROGS)
 
@@ -50,20 +140,20 @@ noinst_PROGRAMS = setuidgid getlimits
 
 pkglib_PROGRAMS = $(OPTIONAL_PKGLIB_PROGS)
 
-noinst_HEADERS = \
-  chown-core.h \
-  copy.h \
-  cp-hash.h \
-  dircolors.h \
-  fs.h \
-  group-list.h \
-  ls.h \
-  operand2sig.h \
-  prog-fprintf.h \
-  remove.h \
-  system.h \
-  wheel-size.h \
-  wheel.h \
+noinst_HEADERS =	\
+  chown-core.h		\
+  copy.h		\
+  cp-hash.h		\
+  dircolors.h		\
+  fs.h			\
+  group-list.h		\
+  ls.h			\
+  operand2sig.h		\
+  prog-fprintf.h	\
+  remove.h		\
+  system.h		\
+  wheel-size.h		\
+  wheel.h		\
   uname.h
 
 EXTRA_DIST = dcgen dircolors.hin tac-pipe.c \
@@ -87,99 +177,219 @@ nodist_libver_a_SOURCES = version.c version.h
 # replacement functions defined in libcoreutils.a.
 LDADD = libver.a ../lib/libcoreutils.a $(LIBINTL) ../lib/libcoreutils.a
 
+# First, list all programs, to make listing per-program libraries easier.
+# See [ below.
+arch_LDADD = $(LDADD)
+base64_LDADD = $(LDADD)
+basename_LDADD = $(LDADD)
 cat_LDADD = $(LDADD)
+chcon_LDADD = $(LDADD)
+chgrp_LDADD = $(LDADD)
+chmod_LDADD = $(LDADD)
+chown_LDADD = $(LDADD)
+chroot_LDADD = $(LDADD)
+cksum_LDADD = $(LDADD)
+comm_LDADD = $(LDADD)
+nproc_LDADD = $(LDADD)
+cp_LDADD = $(LDADD)
+csplit_LDADD = $(LDADD)
+cut_LDADD = $(LDADD)
+date_LDADD = $(LDADD)
+dd_LDADD = $(LDADD)
 df_LDADD = $(LDADD)
+# See dir_LDADD below
+dircolors_LDADD = $(LDADD)
+dirname_LDADD = $(LDADD)
 du_LDADD = $(LDADD)
+echo_LDADD = $(LDADD)
+env_LDADD = $(LDADD)
+expand_LDADD = $(LDADD)
+expr_LDADD = $(LDADD)
+factor_LDADD = $(LDADD)
+false_LDADD = $(LDADD)
+fmt_LDADD = $(LDADD)
+fold_LDADD = $(LDADD)
 getlimits_LDADD = $(LDADD)
+ginstall_LDADD = $(LDADD)
+groups_LDADD = $(LDADD)
+head_LDADD = $(LDADD)
+hostid_LDADD = $(LDADD)
+hostname_LDADD = $(LDADD)
+id_LDADD = $(LDADD)
+join_LDADD = $(LDADD)
+kill_LDADD = $(LDADD)
+link_LDADD = $(LDADD)
+ln_LDADD = $(LDADD)
+logname_LDADD = $(LDADD)
+ls_LDADD = $(LDADD)
+md5sum_LDADD = $(LDADD)
+mkdir_LDADD = $(LDADD)
+mkfifo_LDADD = $(LDADD)
+mknod_LDADD = $(LDADD)
+mktemp_LDADD = $(LDADD)
+mv_LDADD = $(LDADD)
+nice_LDADD = $(LDADD)
+nl_LDADD = $(LDADD)
+nohup_LDADD = $(LDADD)
+od_LDADD = $(LDADD)
+paste_LDADD = $(LDADD)
+pathchk_LDADD = $(LDADD)
+pinky_LDADD = $(LDADD)
+pr_LDADD = $(LDADD)
+printenv_LDADD = $(LDADD)
+printf_LDADD = $(LDADD)
 ptx_LDADD = $(LDADD)
+pwd_LDADD = $(LDADD)
+readlink_LDADD = $(LDADD)
+rm_LDADD = $(LDADD)
+rmdir_LDADD = $(LDADD)
+runcon_LDADD = $(LDADD)
+seq_LDADD = $(LDADD)
+setuidgid_LDADD = $(LDADD)
+sha1sum_LDADD = $(LDADD)
+sha224sum_LDADD = $(LDADD)
+sha256sum_LDADD = $(LDADD)
+sha384sum_LDADD = $(LDADD)
+sha512sum_LDADD = $(LDADD)
+shred_LDADD = $(LDADD)
+shuf_LDADD = $(LDADD)
+sleep_LDADD = $(LDADD)
+sort_LDADD = $(LDADD)
 split_LDADD = $(LDADD)
+stat_LDADD = $(LDADD)
 stdbuf_LDADD = $(LDADD)
+stty_LDADD = $(LDADD)
+su_LDADD = $(LDADD)
+sum_LDADD = $(LDADD)
+sync_LDADD = $(LDADD)
+tac_LDADD = $(LDADD)
+tail_LDADD = $(LDADD)
+tee_LDADD = $(LDADD)
+test_LDADD = $(LDADD)
 timeout_LDADD = $(LDADD)
+touch_LDADD = $(LDADD)
+tr_LDADD = $(LDADD)
+true_LDADD = $(LDADD)
 truncate_LDADD = $(LDADD)
+tsort_LDADD = $(LDADD)
+tty_LDADD = $(LDADD)
+uname_LDADD = $(LDADD)
+unexpand_LDADD = $(LDADD)
+uniq_LDADD = $(LDADD)
+unlink_LDADD = $(LDADD)
+uptime_LDADD = $(LDADD)
+users_LDADD = $(LDADD)
+# See vdir_LDADD below
+wc_LDADD = $(LDADD)
+who_LDADD = $(LDADD)
+whoami_LDADD = $(LDADD)
+yes_LDADD = $(LDADD)
 
-# for eaccess in lib/euidaccess.c.
-chcon_LDADD = $(LDADD) $(LIB_SELINUX)
-cp_LDADD = $(LDADD) $(LIB_EACCESS) $(LIB_SELINUX)
-ginstall_LDADD = $(LDADD) $(LIB_EACCESS) $(LIB_SELINUX)
-mkdir_LDADD = $(LDADD) $(LIB_SELINUX)
-mkfifo_LDADD = $(LDADD) $(LIB_SELINUX)
-mknod_LDADD = $(LDADD) $(LIB_SELINUX)
-mv_LDADD = $(LDADD) $(LIB_EACCESS) $(LIB_SELINUX)
-runcon_LDADD = $(LDADD) $(LIB_SELINUX)
-pathchk_LDADD = $(LDADD) $(LIB_EACCESS)
-rm_LDADD = $(LDADD) $(LIB_EACCESS)
-test_LDADD = $(LDADD) $(LIB_EACCESS)
-# This is for the '[' program.  Automake transliterates '[' to '_'.
-__LDADD = $(LDADD) $(LIB_EACCESS)
+# Synonyms.  Recall that Automake transliterates '[' to '_'.
+__LDADD = $(test_LDADD)
+dir_LDADD = $(ls_LDADD)
+vdir_LDADD = $(ls_LDADD)
 
-# for clock_gettime and fdatasync
-dd_LDADD = $(LDADD) $(LIB_GETHRXTIME) $(LIB_FDATASYNC)
-dir_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME) $(LIB_SELINUX) $(LIB_CAP)
-id_LDADD = $(LDADD) $(LIB_SELINUX)
-ls_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME) $(LIB_SELINUX) $(LIB_CAP)
-mktemp_LDADD = $(LDADD) $(LIB_GETHRXTIME)
-pr_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
-shred_LDADD = $(LDADD) $(LIB_GETHRXTIME) $(LIB_FDATASYNC)
-shuf_LDADD = $(LDADD) $(LIB_GETHRXTIME)
-tac_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
-vdir_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME) $(LIB_SELINUX) $(LIB_CAP)
+# Shared files
+copy_LDADD =
+cp_LDADD += $(copy_LDADD)
+ginstall_LDADD += $(copy_LDADD)
+mv_LDADD += $(copy_LDADD)
 
-## If necessary, add -lm to resolve use of pow in lib/strtod.c.
-sort_LDADD = $(LDADD) $(POW_LIB) $(LIB_GETHRXTIME)
+remove_LDADD =
+mv_LDADD += $(remove_LDADD)
+rm_LDADD += $(remove_LDADD)
 
-# for get_date and gettime
-date_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
-touch_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
+# for eaccess, euidaccess
+copy_LDADD += $(LIB_EACCESS)
+remove_LDADD += $(LIB_EACCESS)
+test_LDADD += $(LIB_EACCESS)
 
-# If necessary, add -lm to resolve use of pow in lib/strtod.c.
-# If necessary, add -liconv to resolve use of iconv in lib/unicodeio.c.
-printf_LDADD = $(LDADD) $(POW_LIB) $(LIBICONV)
+# for selinux use
+chcon_LDADD += $(LIB_SELINUX)
+copy_LDADD += $(LIB_SELINUX)
+ginstall_LDADD += $(LIB_SELINUX)
+id_LDADD += $(LIB_SELINUX)
+ls_LDADD += $(LIB_SELINUX)
+mkdir_LDADD += $(LIB_SELINUX)
+mkfifo_LDADD += $(LIB_SELINUX)
+mknod_LDADD += $(LIB_SELINUX)
+runcon_LDADD += $(LIB_SELINUX)
+stat_LDADD += $(LIB_SELINUX)
 
-# If necessary, add -lm to resolve use of pow in lib/strtod.c.
-seq_LDADD = $(LDADD) $(POW_LIB)
+# for gettime, settime, utimecmp, utimens
+copy_LDADD += $(LIB_CLOCK_GETTIME)
+date_LDADD += $(LIB_CLOCK_GETTIME)
+ginstall_LDADD += $(LIB_CLOCK_GETTIME)
+ls_LDADD += $(LIB_CLOCK_GETTIME)
+pr_LDADD += $(LIB_CLOCK_GETTIME)
+touch_LDADD += $(LIB_CLOCK_GETTIME)
 
-# If necessary, add libraries to resolve the `pow' reference in lib/strtod.c
-# and the `nanosleep' reference in lib/xnanosleep.c.
-nanosec_libs = $(LDADD) $(POW_LIB) $(LIB_NANOSLEEP)
+# for gethrxtime, randint, randread, gen_tempname, mkstemp
+dd_LDADD += $(LIB_GETHRXTIME)
+mktemp_LDADD += $(LIB_GETHRXTIME)
+shred_LDADD += $(LIB_GETHRXTIME)
+shuf_LDADD += $(LIB_GETHRXTIME)
+sort_LDADD += $(LIB_GETHRXTIME)
+tac_LDADD += $(LIB_GETHRXTIME)
+
+# for cap_get_file
+ls_LDADD += $(LIB_CAP)
+
+# for fdatasync
+dd_LDADD += $(LIB_FDATASYNC)
+shred_LDADD += $(LIB_FDATASYNC)
+
+# for strtod, strtold
+printf_LDADD += $(POW_LIB)
+seq_LDADD += $(POW_LIB)
+sleep_LDADD += $(POW_LIB)
+sort_LDADD += $(POW_LIB)
+tail_LDADD += $(POW_LIB)
+uptime_LDADD += $(POW_LIB)
+
+# for xnanosleep
+sleep_LDADD += $(LIB_NANOSLEEP)
+sort_LDADD += $(LIB_NANOSLEEP)
+tail_LDADD += $(LIB_NANOSLEEP)
 
 # for various GMP functions
-expr_LDADD = $(LDADD) $(LIB_GMP)
+expr_LDADD += $(LIB_GMP)
+factor_LDADD += $(LIB_GMP)
 
-# for various GMP functions
-factor_LDADD = $(LDADD) $(LIB_GMP)
+# for getloadavg
+uptime_LDADD += $(GETLOADAVG_LIBS)
 
-sleep_LDADD = $(nanosec_libs)
-tail_LDADD = $(nanosec_libs)
+# for crypt
+su_LDADD += $(LIB_CRYPT)
 
-# If necessary, add -lm to resolve use of pow in lib/strtod.c.
-uptime_LDADD = $(LDADD) $(POW_LIB) $(GETLOADAVG_LIBS)
-
-su_LDADD = $(LDADD) $(LIB_CRYPT)
-
-dir_LDADD += $(LIB_ACL)
+# for various ACL functions
+copy_LDADD += $(LIB_ACL)
 ls_LDADD += $(LIB_ACL)
-vdir_LDADD += $(LIB_ACL)
-cp_LDADD += $(LIB_ACL) $(LIB_XATTR)
-mv_LDADD += $(LIB_ACL) $(LIB_XATTR)
-ginstall_LDADD += $(LIB_ACL) $(LIB_XATTR)
 
-stat_LDADD = $(LDADD) $(LIB_SELINUX)
+# for various xattr functions
+copy_LDADD += $(LIB_XATTR)
 
-# Append $(LIBICONV) to each program that uses proper_name_utf8.
+# for print_unicode_char, proper_name_utf8
 cat_LDADD += $(LIBICONV)
 cp_LDADD += $(LIBICONV)
 df_LDADD += $(LIBICONV)
 du_LDADD += $(LIBICONV)
 getlimits_LDADD += $(LIBICONV)
+printf_LDADD += $(LIBICONV)
 ptx_LDADD += $(LIBICONV)
 split_LDADD += $(LIBICONV)
 stdbuf_LDADD += $(LIBICONV)
 timeout_LDADD += $(LIBICONV)
 truncate_LDADD += $(LIBICONV)
 
-# programs that use getaddrinfo (e.g., via canon_host)
-pinky_LDADD = $(LDADD) $(GETADDRINFO_LIB)
-who_LDADD = $(LDADD) $(GETADDRINFO_LIB)
+# for canon_host
+pinky_LDADD += $(GETADDRINFO_LIB)
+who_LDADD += $(GETADDRINFO_LIB)
+
+# for gethostname, uname
+hostname_LDADD += $(GETHOSTNAME_LIB)
+uname_LDADD += $(GETHOSTNAME_LIB)
 
 $(PROGRAMS): ../lib/libcoreutils.a
 
@@ -274,6 +484,7 @@ rmdir_SOURCES = rmdir.c prog-fprintf.c
 
 uname_SOURCES = uname.c uname-uname.c
 arch_SOURCES = uname.c uname-arch.c
+nproc_SOURCES = nproc.c
 
 md5sum_SOURCES = md5sum.c
 md5sum_CPPFLAGS = -DHASH_ALGO_MD5=1 $(AM_CPPFLAGS)
@@ -329,6 +540,59 @@ wheel.h: wheel-gen.pl Makefile.am
 # test doesn't support --help or --version.
 # Tell automake to exempt then from that installcheck test.
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT = false test
+
+# Compare fs.h with the list of file system names/magic-numbers in the
+# Linux statfs man page.  This target prints any new name/number pairs.
+# Also compare against /usr/include/linux/magic.h
+.PHONY: fs-magic-compare
+fs-magic-compare: fs-magic fs-kernel-magic fs-def
+	join -v1 -t@ fs-magic fs-def
+	join -v1 -t@ fs-kernel-magic fs-def
+
+CLEANFILES += fs-def
+fs-def: fs.h
+	grep '^# *define ' $< > $@-t && mv $@-t $@
+
+# Massage bits of the statfs man page and definitions from
+# /usr/include/linux/magic.h to be in a form consistent with what's in fs.h.
+fs_normalize_perl_subst =			\
+  -e 's/MINIX_SUPER_MAGIC\b/MINIX/;'		\
+  -e 's/MINIX_SUPER_MAGIC2\b/MINIX_30/;'	\
+  -e 's/MINIX2_SUPER_MAGIC\b/MINIX_V2/;'	\
+  -e 's/MINIX2_SUPER_MAGIC2\b/MINIX_V2_30/;'	\
+  -e 's/MINIX3_SUPER_MAGIC\b/MINIX_V3/;'	\
+  -e 's/CIFS_MAGIC_NUMBER/CIFS/;'		\
+  -e 's/(_SUPER)?_MAGIC//;'			\
+  -e 's/\s+0x(\S+)/" 0x" . uc $$1/e;'		\
+  -e 's/(\s+0x)(\X{3})\b/$${1}0$$2/;'		\
+  -e 's/(\s+0x)(\X{6})\b/$${1}00$$2/;'		\
+  -e 's/(\s+0x)(\X{7})\b/$${1}0$$2/;'		\
+  -e 's/^\s+//;'				\
+  -e 's/^\#define\s+//;'			\
+  -e 's/^_(XIAFS)/$$1/;'			\
+  -e 's/^USBDEVICE/USBDEVFS/;'			\
+  -e 's/NTFS_SB/NTFS/;'				\
+  -e 's/^/\# define S_MAGIC_/;'			\
+  -e 's,\s*/\* .*? \*/,,;'
+
+CLEANFILES += fs-magic
+fs-magic: Makefile
+	man statfs \
+          |perl -ne '/File system types:/.../Nobody kno/ and print'	\
+          |grep 0x | perl -p						\
+            $(fs_normalize_perl_subst)					\
+          | grep -Ev 'S_MAGIC_EXT[34]|STACK_END'			\
+          | LC_ALL=C sort						\
+          > $@-t && mv $@-t $@
+
+CLEANFILES += fs-kernel-magic
+fs-kernel-magic: Makefile
+	perl -ne '/^#define.*0x/ and print' /usr/include/linux/magic.h	\
+          | perl -p							\
+            $(fs_normalize_perl_subst)					\
+          | grep -Ev 'S_MAGIC_EXT[34]|STACK_END'			\
+          | LC_ALL=C sort						\
+          > $@-t && mv $@-t $@
 
 BUILT_SOURCES += fs.h
 fs.h: stat.c extract-magic
@@ -453,7 +717,7 @@ sc_tight_scope: $(bin_PROGRAMS)
 	( printf 'main\nusage\n_.*\n';					\
 	  grep -h -A1 '^extern .*[^;]$$' $$src				\
 	    | grep -vE '^(extern |--)' | sed 's/ .*//';			\
-	  perl -ne '/^extern \S+ (\S*) \(/ and print "$$1\n"' $$hdr;	\
+	  perl -ne '/^extern (?:enum )?\S+ (\S*) \(/ and print "$$1\n"' $$hdr;	\
 	) | $(ASSORT) -u | sed 's/^/^/;s/$$/$$/' > $$t;			\
 	nm -e *.$(OBJEXT)						\
 	    | sed -n 's/.* T //p'					\

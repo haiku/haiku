@@ -1,6 +1,6 @@
 /* Internal declarations for getopt.
-   Copyright (C) 1989-1994,1996-1999,2001,2003,2004
-   Free Software Foundation, Inc.
+   Copyright (C) 1989-1994, 1996-1999, 2001, 2003-2004, 2009-2010 Free Software
+   Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -17,12 +17,14 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #ifndef _GETOPT_INT_H
-#define _GETOPT_INT_H	1
+#define _GETOPT_INT_H   1
+
+#include <getopt.h>
 
 extern int _getopt_internal (int ___argc, char **___argv,
-			     const char *__shortopts,
-		             const struct option *__longopts, int *__longind,
-			     int __long_only, int __posixly_correct);
+                             const char *__shortopts,
+                             const struct option *__longopts, int *__longind,
+                             int __long_only, int __posixly_correct);
 
 
 /* Reentrant versions which can handle parsing multiple argument
@@ -108,23 +110,23 @@ struct _getopt_data
 
 /* The initializer is necessary to set OPTIND and OPTERR to their
    default values and to clear the initialization flag.  */
-#define _GETOPT_DATA_INITIALIZER	{ 1, 1 }
+#define _GETOPT_DATA_INITIALIZER        { 1, 1 }
 
 extern int _getopt_internal_r (int ___argc, char **___argv,
-			       const char *__shortopts,
-			       const struct option *__longopts, int *__longind,
-			       int __long_only, int __posixly_correct,
-			       struct _getopt_data *__data);
+                               const char *__shortopts,
+                               const struct option *__longopts, int *__longind,
+                               int __long_only, struct _getopt_data *__data,
+                               int __posixly_correct);
 
 extern int _getopt_long_r (int ___argc, char **___argv,
-			   const char *__shortopts,
-			   const struct option *__longopts, int *__longind,
-			   struct _getopt_data *__data);
+                           const char *__shortopts,
+                           const struct option *__longopts, int *__longind,
+                           struct _getopt_data *__data);
 
 extern int _getopt_long_only_r (int ___argc, char **___argv,
-				const char *__shortopts,
-				const struct option *__longopts,
-				int *__longind,
-				struct _getopt_data *__data);
+                                const char *__shortopts,
+                                const struct option *__longopts,
+                                int *__longind,
+                                struct _getopt_data *__data);
 
 #endif /* getopt_int.h */

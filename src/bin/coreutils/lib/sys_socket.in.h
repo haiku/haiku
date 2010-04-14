@@ -3,7 +3,7 @@
 #line 1
 /* Provide a sys/socket header file for systems lacking it (read: MinGW)
    and for systems where it is incomplete.
-   Copyright (C) 2005-2009 Free Software Foundation, Inc.
+   Copyright (C) 2005-2010 Free Software Foundation, Inc.
    Written by Simon Josefsson.
 
    This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,8 @@
 #ifndef _GL_SYS_SOCKET_H
 #define _GL_SYS_SOCKET_H
 
+/* The definition of _GL_ARG_NONNULL is copied here.  */
+
 #if !@HAVE_SA_FAMILY_T@
 typedef unsigned short  sa_family_t;
 #endif
@@ -57,10 +59,10 @@ typedef unsigned short  sa_family_t;
 # define __ss_aligntype unsigned long int
 # define _SS_SIZE 256
 # define _SS_PADSIZE \
-    (_SS_SIZE - ((sizeof (sa_family_t) >= alignof (__ss_aligntype)	\
-		  ? sizeof (sa_family_t)				\
-		  : alignof (__ss_aligntype))				\
-		 + sizeof (__ss_aligntype)))
+    (_SS_SIZE - ((sizeof (sa_family_t) >= alignof (__ss_aligntype)      \
+                  ? sizeof (sa_family_t)                                \
+                  : alignof (__ss_aligntype))                           \
+                 + sizeof (__ss_aligntype)))
 
 struct sockaddr_storage
 {
@@ -180,7 +182,7 @@ rpl_fd_isset (SOCKET fd, fd_set * set)
 # if @GNULIB_SOCKET@
 #  if @HAVE_WINSOCK2_H@
 #   undef socket
-#   define socket		rpl_socket
+#   define socket               rpl_socket
 extern int rpl_socket (int, int, int protocol);
 #  endif
 # elif @HAVE_WINSOCK2_H@
@@ -197,8 +199,8 @@ extern int rpl_socket (int, int, int protocol);
 # if @GNULIB_CONNECT@
 #  if @HAVE_WINSOCK2_H@
 #   undef connect
-#   define connect		rpl_connect
-extern int rpl_connect (int, struct sockaddr *, int);
+#   define connect              rpl_connect
+extern int rpl_connect (int, struct sockaddr *, int) _GL_ARG_NONNULL ((2));
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef connect
@@ -214,7 +216,7 @@ extern int rpl_connect (int, struct sockaddr *, int);
 # if @GNULIB_ACCEPT@
 #  if @HAVE_WINSOCK2_H@
 #   undef accept
-#   define accept		rpl_accept
+#   define accept               rpl_accept
 extern int rpl_accept (int, struct sockaddr *, int *);
 #  endif
 # elif @HAVE_WINSOCK2_H@
@@ -231,8 +233,8 @@ extern int rpl_accept (int, struct sockaddr *, int *);
 # if @GNULIB_BIND@
 #  if @HAVE_WINSOCK2_H@
 #   undef bind
-#   define bind			rpl_bind
-extern int rpl_bind (int, struct sockaddr *, int);
+#   define bind                 rpl_bind
+extern int rpl_bind (int, struct sockaddr *, int) _GL_ARG_NONNULL ((2));
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef bind
@@ -248,8 +250,9 @@ extern int rpl_bind (int, struct sockaddr *, int);
 # if @GNULIB_GETPEERNAME@
 #  if @HAVE_WINSOCK2_H@
 #   undef getpeername
-#   define getpeername		rpl_getpeername
-extern int rpl_getpeername (int, struct sockaddr *, int *);
+#   define getpeername          rpl_getpeername
+extern int rpl_getpeername (int, struct sockaddr *, int *)
+     _GL_ARG_NONNULL ((2, 3));
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef getpeername
@@ -265,8 +268,9 @@ extern int rpl_getpeername (int, struct sockaddr *, int *);
 # if @GNULIB_GETSOCKNAME@
 #  if @HAVE_WINSOCK2_H@
 #   undef getsockname
-#   define getsockname		rpl_getsockname
-extern int rpl_getsockname (int, struct sockaddr *, int *);
+#   define getsockname          rpl_getsockname
+extern int rpl_getsockname (int, struct sockaddr *, int *)
+     _GL_ARG_NONNULL ((2, 3));
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef getsockname
@@ -282,8 +286,9 @@ extern int rpl_getsockname (int, struct sockaddr *, int *);
 # if @GNULIB_GETSOCKOPT@
 #  if @HAVE_WINSOCK2_H@
 #   undef getsockopt
-#   define getsockopt		rpl_getsockopt
-extern int rpl_getsockopt (int, int, int, void *, socklen_t *);
+#   define getsockopt           rpl_getsockopt
+extern int rpl_getsockopt (int, int, int, void *, socklen_t *)
+     _GL_ARG_NONNULL ((4, 5));
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef getsockopt
@@ -299,7 +304,7 @@ extern int rpl_getsockopt (int, int, int, void *, socklen_t *);
 # if @GNULIB_LISTEN@
 #  if @HAVE_WINSOCK2_H@
 #   undef listen
-#   define listen		rpl_listen
+#   define listen               rpl_listen
 extern int rpl_listen (int, int);
 #  endif
 # elif @HAVE_WINSOCK2_H@
@@ -316,8 +321,8 @@ extern int rpl_listen (int, int);
 # if @GNULIB_RECV@
 #  if @HAVE_WINSOCK2_H@
 #   undef recv
-#   define recv			rpl_recv
-extern int rpl_recv (int, void *, int, int);
+#   define recv                 rpl_recv
+extern int rpl_recv (int, void *, int, int) _GL_ARG_NONNULL ((2));
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef recv
@@ -333,8 +338,8 @@ extern int rpl_recv (int, void *, int, int);
 # if @GNULIB_SEND@
 #  if @HAVE_WINSOCK2_H@
 #   undef send
-#   define send			rpl_send
-extern int rpl_send (int, const void *, int, int);
+#   define send                 rpl_send
+extern int rpl_send (int, const void *, int, int) _GL_ARG_NONNULL ((2));
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef send
@@ -350,8 +355,9 @@ extern int rpl_send (int, const void *, int, int);
 # if @GNULIB_RECVFROM@
 #  if @HAVE_WINSOCK2_H@
 #   undef recvfrom
-#   define recvfrom		rpl_recvfrom
-extern int rpl_recvfrom (int, void *, int, int, struct sockaddr *, int *);
+#   define recvfrom             rpl_recvfrom
+extern int rpl_recvfrom (int, void *, int, int, struct sockaddr *, int *)
+     _GL_ARG_NONNULL ((2));
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef recvfrom
@@ -367,8 +373,9 @@ extern int rpl_recvfrom (int, void *, int, int, struct sockaddr *, int *);
 # if @GNULIB_SENDTO@
 #  if @HAVE_WINSOCK2_H@
 #   undef sendto
-#   define sendto		rpl_sendto
-extern int rpl_sendto (int, const void *, int, int, struct sockaddr *, int);
+#   define sendto               rpl_sendto
+extern int rpl_sendto (int, const void *, int, int, struct sockaddr *, int)
+     _GL_ARG_NONNULL ((2));
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef sendto
@@ -384,8 +391,9 @@ extern int rpl_sendto (int, const void *, int, int, struct sockaddr *, int);
 # if @GNULIB_SETSOCKOPT@
 #  if @HAVE_WINSOCK2_H@
 #   undef setsockopt
-#   define setsockopt		rpl_setsockopt
-extern int rpl_setsockopt (int, int, int, const void *, socklen_t);
+#   define setsockopt           rpl_setsockopt
+extern int rpl_setsockopt (int, int, int, const void *, socklen_t)
+     _GL_ARG_NONNULL ((4));
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef setsockopt
@@ -401,7 +409,7 @@ extern int rpl_setsockopt (int, int, int, const void *, socklen_t);
 # if @GNULIB_SHUTDOWN@
 #  if @HAVE_WINSOCK2_H@
 #   undef shutdown
-#   define shutdown		rpl_shutdown
+#   define shutdown             rpl_shutdown
 extern int rpl_shutdown (int, int);
 #  endif
 # elif @HAVE_WINSOCK2_H@
@@ -417,7 +425,7 @@ extern int rpl_shutdown (int, int);
 
 # if @HAVE_WINSOCK2_H@
 #  undef select
-#  define select		select_used_without_including_sys_select_h
+#  define select                select_used_without_including_sys_select_h
 # endif
 
 # ifdef __cplusplus
@@ -440,7 +448,7 @@ extern "C" {
 #  define accept4 rpl_accept4
 # endif
 extern int accept4 (int sockfd, struct sockaddr *addr, socklen_t *addrlen,
-		    int flags);
+                    int flags);
 #elif defined GNULIB_POSIXCHECK
 # undef accept4
 # define accept4(s,a,l,f) \

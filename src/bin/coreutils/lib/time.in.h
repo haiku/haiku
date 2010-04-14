@@ -3,7 +3,7 @@
 #line 1
 /* A more-standard <time.h>.
 
-   Copyright (C) 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 2007-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@
 /* NetBSD 5.0 mis-defines NULL.  */
 #include <stddef.h>
 
+/* The definition of _GL_ARG_NONNULL is copied here.  */
+
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -69,13 +71,14 @@ struct timespec
    <http://www.opengroup.org/susv3xsh/nanosleep.html>.  */
 # if @REPLACE_NANOSLEEP@
 #  define nanosleep rpl_nanosleep
-int nanosleep (struct timespec const *__rqtp, struct timespec *__rmtp);
+extern int nanosleep (struct timespec const *__rqtp, struct timespec *__rmtp)
+     _GL_ARG_NONNULL ((1));
 # endif
 
 /* Return the 'time_t' representation of TP and normalize TP.  */
 # if @REPLACE_MKTIME@
 #  define mktime rpl_mktime
-extern time_t mktime (struct tm *__tp);
+extern time_t mktime (struct tm *__tp) _GL_ARG_NONNULL ((1));
 # endif
 
 /* Convert TIMER to RESULT, assuming local time and UTC respectively.  See
@@ -86,10 +89,12 @@ extern time_t mktime (struct tm *__tp);
 #  define localtime_r rpl_localtime_r
 #  undef gmtime_r
 #  define gmtime_r rpl_gmtime_r
-struct tm *localtime_r (time_t const *restrict __timer,
-			struct tm *restrict __result);
-struct tm *gmtime_r (time_t const *restrict __timer,
-		     struct tm *restrict __result);
+extern struct tm *localtime_r (time_t const *restrict __timer,
+                               struct tm *restrict __result)
+     _GL_ARG_NONNULL ((1, 2));
+extern struct tm *gmtime_r (time_t const *restrict __timer,
+                            struct tm *restrict __result)
+     _GL_ARG_NONNULL ((1, 2));
 # endif
 
 /* Parse BUF as a time stamp, assuming FORMAT specifies its layout, and store
@@ -98,15 +103,17 @@ struct tm *gmtime_r (time_t const *restrict __timer,
 # if @REPLACE_STRPTIME@
 #  undef strptime
 #  define strptime rpl_strptime
-char *strptime (char const *restrict __buf, char const *restrict __format,
-		struct tm *restrict __tm);
+extern char *strptime (char const *restrict __buf,
+                       char const *restrict __format,
+                       struct tm *restrict __tm)
+     _GL_ARG_NONNULL ((1, 2, 3));
 # endif
 
 /* Convert TM to a time_t value, assuming UTC.  */
 # if @REPLACE_TIMEGM@
 #  undef timegm
 #  define timegm rpl_timegm
-time_t timegm (struct tm *__tm);
+extern time_t timegm (struct tm *__tm) _GL_ARG_NONNULL ((1));
 # endif
 
 /* Encourage applications to avoid unsafe functions that can overrun

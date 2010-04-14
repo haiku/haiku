@@ -1,7 +1,6 @@
 /* Invoke fopen, but avoid some glitches.
 
-   Copyright (C) 2001, 2004, 2005, 2006, 2009 Free Software
-   Foundation, Inc.
+   Copyright (C) 2001, 2004-2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,26 +37,26 @@ fopen_safer (char const *file, char const *mode)
       int fd = fileno (fp);
 
       if (0 <= fd && fd <= STDERR_FILENO)
-	{
-	  int f = dup_safer (fd);
+        {
+          int f = dup_safer (fd);
 
-	  if (f < 0)
-	    {
-	      int e = errno;
-	      fclose (fp);
-	      errno = e;
-	      return NULL;
-	    }
+          if (f < 0)
+            {
+              int e = errno;
+              fclose (fp);
+              errno = e;
+              return NULL;
+            }
 
-	  if (fclose (fp) != 0
-	      || ! (fp = fdopen (f, mode)))
-	    {
-	      int e = errno;
-	      close (f);
-	      errno = e;
-	      return NULL;
-	    }
-	}
+          if (fclose (fp) != 0
+              || ! (fp = fdopen (f, mode)))
+            {
+              int e = errno;
+              close (f);
+              errno = e;
+              return NULL;
+            }
+        }
     }
 
   return fp;

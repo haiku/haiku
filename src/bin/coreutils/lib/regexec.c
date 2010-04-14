@@ -2,8 +2,8 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-   Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free
+   Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
@@ -21,6 +21,8 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. */
 
+#include "verify.h"
+#include "intprops.h"
 static reg_errcode_t match_ctx_init (re_match_context_t *cache, int eflags,
 				     Idx n) internal_function;
 static void match_ctx_clean (re_match_context_t *mctx) internal_function;
@@ -381,8 +383,11 @@ re_search_2_stub (struct re_pattern_buffer *bufp,
   Idx len = length1 + length2;
   char *s = NULL;
 
-  if (BE (length1 < 0 || length2 < 0 || stop < 0 || len < length1, 0))
-    return -2;
+  verify (! TYPE_SIGNED (Idx));
+  if (BE (len < length1, 0))
+     return -2;
+  /* if (BE (length1 < 0 || length2 < 0 || stop < 0, 0))
+     return -2; */
 
   /* Concatenate the strings.  */
   if (length2 > 0)
@@ -434,11 +439,14 @@ re_search_stub (struct re_pattern_buffer *bufp,
   Idx last_start = start + range;
 
   /* Check for out-of-range.  */
-  if (BE (start < 0 || start > length, 0))
-    return -1;
+  verify (! TYPE_SIGNED (Idx));
+  /* if (BE (start < 0, 0))
+     return -1; */
+  if (BE (start > length, 0))
+     return -1;
   if (BE (length < last_start || (0 <= range && last_start < start), 0))
     last_start = length;
-  else if (BE (last_start < 0 || (range < 0 && start <= last_start), 0))
+  else if (BE (/* last_start < 0 || */ (range < 0 && start <= last_start), 0))
     last_start = 0;
 
   __libc_lock_lock (dfa->lock);
@@ -3952,15 +3960,20 @@ check_node_accept_bytes (const re_dfa_t *dfa, Idx node_idx,
 		_NL_CURRENT (LC_COLLATE, _NL_COLLATE_EXTRAMB);
 	      indirect = (const int32_t *)
 		_NL_CURRENT (LC_COLLATE, _NL_COLLATE_INDIRECTMB);
-	      idx = findidx (&cp);
+	      int32_t idx = findidx (&cp);
 	      if (idx > 0)
 		for (i = 0; i < cset->nequiv_classes; ++i)
 		  {
 		    int32_t equiv_class_idx = cset->equiv_classes[i];
-		    size_t weight_len = weights[idx];
-		    if (weight_len == weights[equiv_class_idx])
+		    size_t weight_len = weights[idx & 0xffffff];
+		    if (weight_len == weights[equiv_class_idx & 0xffffff]
+			&& (idx >> 24) == (equiv_class_idx >> 24))
 		      {
 			Idx cnt = 0;
+
+			idx &= 0xffffff;
+			equiv_class_idx &= 0xffffff;
+
 			while (cnt <= weight_len
 			       && (weights[equiv_class_idx + 1 + cnt]
 				   == weights[idx + 1 + cnt]))

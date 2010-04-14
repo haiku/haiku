@@ -1,7 +1,7 @@
 /* backupfile.h -- declarations for making Emacs style backup file names
 
-   Copyright (C) 1990, 1991, 1992, 1997, 1998, 1999, 2003, 2004 Free
-   Software Foundation, Inc.
+   Copyright (C) 1990-1992, 1997-1999, 2003-2004, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ enum backup_type
   numbered_backups
 };
 
-# define VALID_BACKUP_TYPE(Type)	\
+# define VALID_BACKUP_TYPE(Type)        \
   ((unsigned int) (Type) <= numbered_backups)
 
 extern char const *simple_backup_suffix;

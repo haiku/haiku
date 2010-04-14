@@ -1,5 +1,5 @@
 /* install - copy files and set attributes
-   Copyright (C) 89, 90, 91, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1989-1991, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -563,7 +563,7 @@ main (int argc, char **argv)
     }
 
   /* Check for invalid combinations of arguments. */
-  if (dir_arg & strip_files)
+  if (dir_arg && strip_files)
     error (EXIT_FAILURE, 0,
            _("the strip option may not be used when installing a directory"));
   if (dir_arg && target_directory)
@@ -1005,7 +1005,7 @@ the VERSION_CONTROL environment variable.  Here are the values:\n\
   existing, nil   numbered if numbered backups exist, simple otherwise\n\
   simple, never   always make simple backups\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

@@ -1,6 +1,6 @@
 /* Return the number of entries in an ACL.
 
-   Copyright (C) 2002-2003, 2005-2009 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2005-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,26 +37,26 @@ acl_entries (acl_t acl)
 #if HAVE_ACL_FIRST_ENTRY /* Linux, FreeBSD, MacOS X */
 # if HAVE_ACL_TYPE_EXTENDED /* MacOS X */
       /* acl_get_entry returns 0 when it successfully fetches an entry,
-	 and -1/EINVAL at the end.  */
+         and -1/EINVAL at the end.  */
       acl_entry_t ace;
       int got_one;
 
       for (got_one = acl_get_entry (acl, ACL_FIRST_ENTRY, &ace);
-	   got_one >= 0;
-	   got_one = acl_get_entry (acl, ACL_NEXT_ENTRY, &ace))
-	count++;
+           got_one >= 0;
+           got_one = acl_get_entry (acl, ACL_NEXT_ENTRY, &ace))
+        count++;
 # else /* Linux, FreeBSD */
       /* acl_get_entry returns 1 when it successfully fetches an entry,
-	 and 0 at the end.  */
+         and 0 at the end.  */
       acl_entry_t ace;
       int got_one;
 
       for (got_one = acl_get_entry (acl, ACL_FIRST_ENTRY, &ace);
-	   got_one > 0;
-	   got_one = acl_get_entry (acl, ACL_NEXT_ENTRY, &ace))
-	count++;
+           got_one > 0;
+           got_one = acl_get_entry (acl, ACL_NEXT_ENTRY, &ace))
+        count++;
       if (got_one < 0)
-	return -1;
+        return -1;
 # endif
 #else /* IRIX, Tru64 */
 # if HAVE_ACL_TO_SHORT_TEXT /* IRIX */
@@ -65,7 +65,7 @@ acl_entries (acl_t acl)
 # endif
 # if HAVE_ACL_FREE_TEXT /* Tru64 */
       /* Don't use acl_get_entry: it takes only one argument and does not
-	 work.  */
+         work.  */
       count = acl->acl_num;
 # endif
 #endif

@@ -1,7 +1,7 @@
 /* fsusage.c -- return space usage of mounted file systems
 
-   Copyright (C) 1991-1992, 1996, 1998-1999, 2002-2006, 2009
-   Free Software Foundation, Inc.
+   Copyright (C) 1991-1992, 1996, 1998-1999, 2002-2006, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include <limits.h>
 #include <sys/types.h>
 
-#if STAT_STATVFS		/* POSIX 1003.1-2001 (and later) with XSI */
+#if STAT_STATVFS                /* POSIX 1003.1-2001 (and later) with XSI */
 # include <sys/statvfs.h>
 #else
 /* Don't include backward-compatibility files unless they're needed.
@@ -40,16 +40,16 @@
 # if HAVE_SYS_VFS_H
 #  include <sys/vfs.h>
 # endif
-# if HAVE_SYS_FS_S5PARAM_H	/* Fujitsu UXP/V */
+# if HAVE_SYS_FS_S5PARAM_H      /* Fujitsu UXP/V */
 #  include <sys/fs/s5param.h>
 # endif
 # if defined HAVE_SYS_FILSYS_H && !defined _CRAY
-#  include <sys/filsys.h>	/* SVR2 */
+#  include <sys/filsys.h>       /* SVR2 */
 # endif
 # if HAVE_SYS_STATFS_H
 #  include <sys/statfs.h>
 # endif
-# if HAVE_DUSTAT_H		/* AIX PS/2 */
+# if HAVE_DUSTAT_H              /* AIX PS/2 */
 #  include <sys/dustat.h>
 # endif
 # include "full-read.h"
@@ -67,13 +67,13 @@
 #define PROPAGATE_ALL_ONES(x) \
   ((sizeof (x) < sizeof (uintmax_t) \
     && (~ (x) == (sizeof (x) < sizeof (int) \
-		  ? - (1 << (sizeof (x) * CHAR_BIT)) \
-		  : 0))) \
+                  ? - (1 << (sizeof (x) * CHAR_BIT)) \
+                  : 0))) \
    ? UINTMAX_MAX : (uintmax_t) (x))
 
 /* Extract the top bit of X as an uintmax_t value.  */
 #define EXTRACT_TOP_BIT(x) ((x) \
-			    & ((uintmax_t) 1 << (sizeof (x) * CHAR_BIT - 1)))
+                            & ((uintmax_t) 1 << (sizeof (x) * CHAR_BIT - 1)))
 
 /* If a value is negative, many space usage primitives store it into an
    integer variable by assignment, even if the variable's type is unsigned.
@@ -94,7 +94,7 @@
 int
 get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp)
 {
-#if defined STAT_STATVFS		/* POSIX */
+#if defined STAT_STATVFS                /* POSIX */
 
   struct statvfs fsd;
 
@@ -103,10 +103,10 @@ get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp)
 
   /* f_frsize isn't guaranteed to be supported.  */
   fsp->fsu_blocksize = (fsd.f_frsize
-			? PROPAGATE_ALL_ONES (fsd.f_frsize)
-			: PROPAGATE_ALL_ONES (fsd.f_bsize));
+                        ? PROPAGATE_ALL_ONES (fsd.f_frsize)
+                        : PROPAGATE_ALL_ONES (fsd.f_bsize));
 
-#elif defined STAT_STATFS2_FS_DATA	/* Ultrix */
+#elif defined STAT_STATFS2_FS_DATA      /* Ultrix */
 
   struct fs_data fsd;
 
@@ -121,7 +121,7 @@ get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp)
   fsp->fsu_files = PROPAGATE_ALL_ONES (fsd.fd_req.gtot);
   fsp->fsu_ffree = PROPAGATE_ALL_ONES (fsd.fd_req.gfree);
 
-#elif defined STAT_READ_FILSYS		/* SVR2 */
+#elif defined STAT_READ_FILSYS          /* SVR2 */
 # ifndef SUPERBOFF
 #  define SUPERBOFF (SUPERB * 512)
 # endif
@@ -152,8 +152,8 @@ get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp)
   fsp->fsu_bavail = PROPAGATE_TOP_BIT (fsd.s_tfree);
   fsp->fsu_bavail_top_bit_set = EXTRACT_TOP_BIT (fsd.s_tfree) != 0;
   fsp->fsu_files = (fsd.s_isize == -1
-		    ? UINTMAX_MAX
-		    : (fsd.s_isize - 2) * INOPB * (fsd.s_type == Fs2b ? 2 : 1));
+                    ? UINTMAX_MAX
+                    : (fsd.s_isize - 2) * INOPB * (fsd.s_type == Fs2b ? 2 : 1));
   fsp->fsu_ffree = PROPAGATE_ALL_ONES (fsd.s_tinode);
 
 #elif defined STAT_STATFS3_OSF1
@@ -165,7 +165,7 @@ get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp)
 
   fsp->fsu_blocksize = PROPAGATE_ALL_ONES (fsd.f_fsize);
 
-#elif defined STAT_STATFS2_BSIZE	/* 4.3BSD, SunOS 4, HP-UX, AIX */
+#elif defined STAT_STATFS2_BSIZE        /* 4.3BSD, SunOS 4, HP-UX, AIX */
 
   struct statfs fsd;
 
@@ -189,7 +189,7 @@ get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp)
     }
 # endif /* STATFS_TRUNCATES_BLOCK_COUNTS */
 
-#elif defined STAT_STATFS2_FSIZE	/* 4.4BSD */
+#elif defined STAT_STATFS2_FSIZE        /* 4.4BSD */
 
   struct statfs fsd;
 
@@ -198,7 +198,7 @@ get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp)
 
   fsp->fsu_blocksize = PROPAGATE_ALL_ONES (fsd.f_fsize);
 
-#elif defined STAT_STATFS4		/* SVR3, Dynix, Irix, AIX */
+#elif defined STAT_STATFS4              /* SVR3, Dynix, Irix, AIX */
 
 # if !_AIX && !defined _SEQUENT_ && !defined DOLPHIN
 #  define f_bavail f_bfree

@@ -41,6 +41,7 @@ StdBinCommands
 	mknod.c
 	nl.c
 	nohup.c
+	nproc.c
 	od.c
 	paste.c
 	pathchk.c

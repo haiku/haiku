@@ -1,6 +1,6 @@
 /* w32sock.h --- internal auxilliary functions for Windows socket functions
 
-   Copyright (C) 2008 Free Software Foundation, Inc.
+   Copyright (C) 2008, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ static inline void
 set_winsock_errno (void)
 {
   int err = WSAGetLastError ();
-  WSASetLastError (0);
 
   /* Map some WSAE* errors to the runtime library's error codes.  */
   switch (err)

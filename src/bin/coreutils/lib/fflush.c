@@ -1,5 +1,5 @@
 /* fflush.c -- allow flushing input streams
-   Copyright (C) 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 2007-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ clear_ungetc_buffer_preserving_position (FILE *fp)
 {
   if (fp->_flags & _IO_IN_BACKUP)
     /* _IO_free_backup_area is a bit complicated.  Simply call fseek.  */
-    fseek (fp, 0, SEEK_CUR);
+    fseeko (fp, 0, SEEK_CUR);
 }
 
 #else
@@ -63,7 +63,7 @@ clear_ungetc_buffer (FILE *fp)
 # elif defined _IOERR               /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw */
   /* Nothing to do.  */
 # else                              /* other implementations */
-  fseek (fp, 0, SEEK_CUR);
+  fseeko (fp, 0, SEEK_CUR);
 # endif
 }
 
@@ -91,7 +91,22 @@ static inline void
 update_fpos_cache (FILE *fp, off_t pos)
 {
 #if defined __sferror || defined __DragonFly__ /* FreeBSD, NetBSD, OpenBSD, DragonFly, MacOS X, Cygwin */
+# if defined __CYGWIN__
+  /* fp_->_offset is typed as an integer.  */
   fp_->_offset = pos;
+# else
+  /* fp_->_offset is an fpos_t.  */
+  /* Use a union, since on NetBSD, the compilation flags determine
+     whether fpos_t is typedef'd to off_t or a struct containing a
+     single off_t member.  */
+  union
+    {
+      fpos_t f;
+      off_t o;
+    } u;
+  u.o = pos;
+  fp_->_offset = u.f;
+# endif
   fp_->_flags |= __SOFF;
 #endif
 }

@@ -1,5 +1,5 @@
 /* Change the protections of file relative to an open directory.
-   Copyright (C) 2006, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,17 +20,19 @@
 
 #include <sys/stat.h>
 
-#include "dirname.h" /* solely for definition of IS_ABSOLUTE_FILE_NAME */
-#include "openat.h"
-#include "openat-priv.h"
-#include "save-cwd.h"
+#include <errno.h>
 
 #ifndef HAVE_LCHMOD
 /* Use a different name, to avoid conflicting with any
    system-supplied declaration.  */
 # undef lchmod
 # define lchmod lchmod_rpl
-static int lchmod (char const *f, mode_t m) { errno = ENOSYS; return -1; }
+static int
+lchmod (char const *f _GL_UNUSED, mode_t m _GL_UNUSED)
+{
+  errno = ENOSYS;
+  return -1;
+}
 #endif
 
 /* Solaris 10 has no function like this.

@@ -1,6 +1,6 @@
 /* fsusage.h -- declarations for file system space usage info
 
-   Copyright (C) 1991, 1992, 1997, 2003, 2004, 2005, 2006 Free Software
+   Copyright (C) 1991-1992, 1997, 2003-2006, 2009-2010 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -26,13 +26,13 @@
 
 struct fs_usage
 {
-  uintmax_t fsu_blocksize;	/* Size of a block.  */
-  uintmax_t fsu_blocks;		/* Total blocks. */
-  uintmax_t fsu_bfree;		/* Free blocks available to superuser. */
-  uintmax_t fsu_bavail;		/* Free blocks available to non-superuser. */
-  bool fsu_bavail_top_bit_set;	/* 1 if fsu_bavail represents a value < 0.  */
-  uintmax_t fsu_files;		/* Total file nodes. */
-  uintmax_t fsu_ffree;		/* Free file nodes. */
+  uintmax_t fsu_blocksize;      /* Size of a block.  */
+  uintmax_t fsu_blocks;         /* Total blocks. */
+  uintmax_t fsu_bfree;          /* Free blocks available to superuser. */
+  uintmax_t fsu_bavail;         /* Free blocks available to non-superuser. */
+  bool fsu_bavail_top_bit_set;  /* 1 if fsu_bavail represents a value < 0.  */
+  uintmax_t fsu_files;          /* Total file nodes. */
+  uintmax_t fsu_ffree;          /* Free file nodes. */
 };
 
 int get_fs_usage (char const *file, char const *disk, struct fs_usage *fsp);

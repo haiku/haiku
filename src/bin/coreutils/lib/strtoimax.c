@@ -1,6 +1,6 @@
 /* Convert string representation of a number into an intmax_t value.
 
-   Copyright (C) 1999, 2001, 2002, 2003, 2004, 2006 Free Software
+   Copyright (C) 1999, 2001, 2002, 2003, 2004, 2006, 2009, 2010 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -63,7 +63,7 @@ strtoimax (char const *ptr, char **endptr, int base)
 {
 #if Have_long_long
   verify (sizeof (Int) == sizeof (Unsigned long int)
-	  || sizeof (Int) == sizeof (Unsigned long long int));
+          || sizeof (Int) == sizeof (Unsigned long long int));
 
   if (sizeof (Int) != sizeof (Unsigned long int))
     return strtoll (ptr, endptr, base);

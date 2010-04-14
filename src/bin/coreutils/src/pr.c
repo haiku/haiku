@@ -1,5 +1,5 @@
 /* pr -- convert text files for printing.
-   Copyright (C) 88, 91, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1988, 1991, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -314,6 +314,7 @@
 #include <sys/types.h>
 #include "system.h"
 #include "error.h"
+#include "hard-locale.h"
 #include "mbswidth.h"
 #include "quote.h"
 #include "stat-time.h"
@@ -1094,11 +1095,11 @@ main (int argc, char **argv)
   if (first_page_number == 0)
     first_page_number = 1;
 
-  if (parallel_files & explicit_columns)
+  if (parallel_files && explicit_columns)
     error (EXIT_FAILURE, 0,
          _("cannot specify number of columns when printing in parallel"));
 
-  if (parallel_files & print_across_flag)
+  if (parallel_files && print_across_flag)
     error (EXIT_FAILURE, 0,
        _("cannot specify both printing across and printing in parallel"));
 
@@ -1110,7 +1111,7 @@ main (int argc, char **argv)
     {
       if (old_w)
         {
-          if (parallel_files | explicit_columns)
+          if (parallel_files || explicit_columns)
             {
               /* activate -W */
               truncate_lines = true;
@@ -1127,7 +1128,7 @@ main (int argc, char **argv)
       else if (!use_col_separator)
         {
           /* No -S option read */
-          if (old_s & (parallel_files | explicit_columns))
+          if (old_s && (parallel_files || explicit_columns))
             {
               if (!truncate_lines)
                 {
@@ -1414,7 +1415,7 @@ init_funcs (void)
       /* When numbering lines of parallel files, we enlarge the
          first column to accomodate the number.  Looks better than
          the Sys V approach. */
-      if (parallel_files & numbered_lines)
+      if (parallel_files && numbered_lines)
         h_next = h + chars_per_column + number_width;
       else
         h_next = h + chars_per_column;
@@ -1465,7 +1466,7 @@ init_funcs (void)
 
      Doesn't need to be stored unless we intend to balance
      columns on the last page. */
-  if (storing_columns & balance_columns)
+  if (storing_columns && balance_columns)
     {
       p->char_func = store_char;
       p->print_func = print_stored;
@@ -1862,7 +1863,7 @@ print_page (void)
       if (cols_ready_to_print () <= 0 && !extremities)
         break;
 
-      if (double_space & pv)
+      if (double_space && pv)
         {
           putchar ('\n');
           --lines_left_on_page;
@@ -1876,9 +1877,9 @@ print_page (void)
 
   pad_vertically = pv;
 
-  if (pad_vertically & extremities)
+  if (pad_vertically && extremities)
     pad_down (lines_left_on_page + lines_per_footer);
-  else if (keep_FF & print_a_FF)
+  else if (keep_FF && print_a_FF)
     {
       putchar ('\f');
       print_a_FF = false;
@@ -2068,7 +2069,7 @@ add_line_number (COLUMN *p)
                           output_position);
     }
 
-  if (truncate_lines & !parallel_files)
+  if (truncate_lines && !parallel_files)
     input_position += number_width;
 }
 
@@ -2402,10 +2403,10 @@ print_header (void)
   lhs_spaces = available_width >> 1;
   rhs_spaces = available_width - lhs_spaces;
 
-  printf ("\n\n%*.*s%s%*.*s%s%*.*s%s\n\n\n",
-          chars_per_margin, chars_per_margin, " ",
-          date_text, lhs_spaces, lhs_spaces, " ",
-          file_text, rhs_spaces, rhs_spaces, " ", page_text);
+  printf ("\n\n%*s%s%*s%s%*s%s\n\n\n",
+          chars_per_margin, "",
+          date_text, lhs_spaces, " ",
+          file_text, rhs_spaces, " ", page_text);
 
   print_a_header = false;
   output_position = 0;
@@ -2457,7 +2458,7 @@ read_line (COLUMN *p)
       if ((c = getc (p->fp)) != '\n')
         ungetc (c, p->fp);
       FF_only = true;
-      if (print_a_header & !storing_columns)
+      if (print_a_header && !storing_columns)
         {
           pad_vertically = true;
           print_header ();
@@ -2485,10 +2486,10 @@ read_line (COLUMN *p)
     {
       pad_vertically = true;
 
-      if (print_a_header & !storing_columns)
+      if (print_a_header && !storing_columns)
         print_header ();
 
-      if (parallel_files & align_empty_cols)
+      if (parallel_files && align_empty_cols)
         {
           /* We have to align empty columns at the beginning of a line. */
           k = separators_not_printed;
@@ -2834,7 +2835,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
                     omit warning when a file cannot be opened\n\
 "), stdout);
       fputs (_("\
-  -s[CHAR],--separator[=CHAR]\n\
+  -s[CHAR], --separator[=CHAR]\n\
                     separate columns by a single character, default for CHAR\n\
                     is the <TAB> character without -w and \'no char\' with -w\n\
                     -s[CHAR] turns off line truncation of all 3 column\n\
@@ -2867,10 +2868,10 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       fputs (_("\
 \n\
--t is implied if PAGE_LENGTH <= 10.  With no FILE, or when\n\
-FILE is -, read standard input.\n\
+-t is implied if PAGE_LENGTH <= 10.  With no FILE, or when FILE is -, read\n\
+standard input.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

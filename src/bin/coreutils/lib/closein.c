@@ -1,6 +1,6 @@
 /* Close standard input, rewinding seekable stdin if necessary.
 
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -86,22 +86,22 @@ close_stdin (void)
   if (freadahead (stdin) > 0)
     {
       /* Only attempt flush if stdin is seekable, as fflush is entitled to
-	 fail on non-seekable streams.  */
+         fail on non-seekable streams.  */
       if (fseeko (stdin, 0, SEEK_CUR) == 0 && fflush (stdin) != 0)
-	fail = true;
+        fail = true;
     }
   if (close_stream (stdin) != 0)
     fail = true;
   if (fail)
     {
       /* Report failure, but defer exit until after closing stdout,
-	 since the failure report should still be flushed.  */
+         since the failure report should still be flushed.  */
       char const *close_error = _("error closing file");
       if (file_name)
-	error (0, errno, "%s: %s", quotearg_colon (file_name),
-	       close_error);
+        error (0, errno, "%s: %s", quotearg_colon (file_name),
+               close_error);
       else
-	error (0, errno, "%s", close_error);
+        error (0, errno, "%s", close_error);
     }
 
   close_stdout ();

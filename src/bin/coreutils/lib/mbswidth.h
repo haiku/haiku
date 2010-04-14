@@ -1,5 +1,5 @@
 /* Determine the number of screen columns needed for a string.
-   Copyright (C) 2000-2004, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2000-2004, 2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ extern "C" {
 /* If this bit is set, return -1 upon finding a non-printable character.
    Otherwise, assume unprintable characters have width 0 if they are
    control characters and 1 otherwise.  */
-#define MBSW_REJECT_UNPRINTABLE	2
+#define MBSW_REJECT_UNPRINTABLE 2
 
 
 /* Returns the number of screen columns needed for STRING.  */

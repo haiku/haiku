@@ -1,7 +1,6 @@
 /* Which POSIX version to conform to, for utilities.
 
-   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software
-   Foundation, Inc.
+   Copyright (C) 2002-2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -48,7 +47,7 @@ posix2_version (void)
       char *e;
       long int i = strtol (s, &e, 10);
       if (! *e)
-	v = i;
+        v = i;
     }
 
   return v < INT_MIN ? INT_MIN : v < INT_MAX ? v : INT_MAX;

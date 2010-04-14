@@ -2,8 +2,8 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-   Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free
+   Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
@@ -21,6 +21,8 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. */
 
+#include "verify.h"
+#include "intprops.h"
 static void re_string_construct_common (const char *str, Idx len,
 					re_string_t *pstr,
 					RE_TRANSLATE_TYPE trans, bool icase,
@@ -1393,7 +1395,10 @@ static void
 internal_function
 re_node_set_remove_at (re_node_set *set, Idx idx)
 {
-  if (idx < 0 || idx >= set->nelem)
+  verify (! TYPE_SIGNED (Idx));
+  /* if (idx < 0)
+     return; */
+  if (idx >= set->nelem)
     return;
   --set->nelem;
   for (; idx < set->nelem; idx++)

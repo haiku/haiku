@@ -1,5 +1,5 @@
 /* join - join lines of two files on a common field
-   Copyright (C) 91, 1995-2006, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 1991, 1995-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 
 #include "system.h"
 #include "error.h"
+#include "hard-locale.h"
 #include "linebuffer.h"
 #include "memcasecmp.h"
 #include "quote.h"
@@ -208,7 +209,7 @@ Note, comparisons honor the rules specified by `LC_COLLATE'.\n\
 If the input is not sorted and some lines cannot be joined, a\n\
 warning message will be given.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

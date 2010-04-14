@@ -44,7 +44,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	listport listres listsem listusb ln locate logger login logname ls lsindex
 	mail2mbox makebootable mbox2mail md5sum merge message mimeset mkdos mkdir
 	mkfifo mkfs mkindex modifiers mount mount_nfs mountvolume mv
-	netcat netstat nl nohup
+	netcat netstat nl nohup nproc
 	od open
 	passwd paste patch pathchk pc ping play playfile playsound playwav pr prio
 	printenv printf profile ps ptx pwd

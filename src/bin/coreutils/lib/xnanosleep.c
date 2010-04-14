@@ -1,7 +1,6 @@
 /* xnanosleep.c -- a more convenient interface to nanosleep
 
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software
-   Foundation, Inc.
+   Copyright (C) 2002-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -57,10 +56,10 @@ xnanosleep (double seconds)
      in some rare (perhaps theoretical) cases but that is better than
      undefined behavior.  */
   bool overflow = ((time_t) ((double) TIME_T_MAX / 2) == TIME_T_MAX / 2
-		   ? TIME_T_MAX < seconds
-		   : (time_t) ((long double) TIME_T_MAX / 2) == TIME_T_MAX / 2
-		   ? TIME_T_MAX < (long double) seconds
-		   : TIME_T_MAX <= (long double) seconds);
+                   ? TIME_T_MAX < seconds
+                   : (time_t) ((long double) TIME_T_MAX / 2) == TIME_T_MAX / 2
+                   ? TIME_T_MAX < (long double) seconds
+                   : TIME_T_MAX <= (long double) seconds);
 
   struct timespec ts_sleep;
 
@@ -74,45 +73,45 @@ xnanosleep (double seconds)
       ts_sleep.tv_sec = floor_seconds;
 
       /* Round up to the next whole number, if necessary, so that we
-	 always sleep for at least the requested amount of time.  Assuming
-	 the default rounding mode, we don't have to worry about the
-	 rounding error when computing 'ns' above, since the error won't
-	 cause 'ns' to drop below an integer boundary.  */
+         always sleep for at least the requested amount of time.  Assuming
+         the default rounding mode, we don't have to worry about the
+         rounding error when computing 'ns' above, since the error won't
+         cause 'ns' to drop below an integer boundary.  */
       ts_sleep.tv_nsec = ns;
       ts_sleep.tv_nsec += (ts_sleep.tv_nsec < ns);
 
       /* Normalize the interval length.  nanosleep requires this.  */
       if (BILLION <= ts_sleep.tv_nsec)
-	{
-	  if (ts_sleep.tv_sec == TIME_T_MAX)
-	    overflow = true;
-	  else
-	    {
-	      ts_sleep.tv_sec++;
-	      ts_sleep.tv_nsec -= BILLION;
-	    }
-	}
+        {
+          if (ts_sleep.tv_sec == TIME_T_MAX)
+            overflow = true;
+          else
+            {
+              ts_sleep.tv_sec++;
+              ts_sleep.tv_nsec -= BILLION;
+            }
+        }
     }
 
   for (;;)
     {
       if (overflow)
-	{
-	  ts_sleep.tv_sec = TIME_T_MAX;
-	  ts_sleep.tv_nsec = BILLION - 1;
-	}
+        {
+          ts_sleep.tv_sec = TIME_T_MAX;
+          ts_sleep.tv_nsec = BILLION - 1;
+        }
 
       /* Linux-2.6.8.1's nanosleep returns -1, but doesn't set errno
-	 when resumed after being suspended.  Earlier versions would
-	 set errno to EINTR.  nanosleep from linux-2.6.10, as well as
-	 implementations by (all?) other vendors, doesn't return -1
-	 in that case;  either it continues sleeping (if time remains)
-	 or it returns zero (if the wake-up time has passed).  */
+         when resumed after being suspended.  Earlier versions would
+         set errno to EINTR.  nanosleep from linux-2.6.10, as well as
+         implementations by (all?) other vendors, doesn't return -1
+         in that case;  either it continues sleeping (if time remains)
+         or it returns zero (if the wake-up time has passed).  */
       errno = 0;
       if (nanosleep (&ts_sleep, NULL) == 0)
-	break;
+        break;
       if (errno != EINTR && errno != 0)
-	return -1;
+        return -1;
     }
 
   return 0;

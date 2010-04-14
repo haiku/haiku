@@ -1,5 +1,5 @@
 /* Get a list of group IDs associated with a specified user ID.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,5 +15,5 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include <sys/types.h>
-int getugroups (int maxcount, GETGROUPS_T *grouplist, char const *username,
-		gid_t gid);
+int getugroups (int maxcount, gid_t *grouplist, char const *username,
+                gid_t gid);

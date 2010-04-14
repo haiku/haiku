@@ -3,7 +3,7 @@
 #line 1
 /* A GNU-like <iconv.h>.
 
-   Copyright (C) 2007-2008 Free Software Foundation, Inc.
+   Copyright (C) 2007-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@
 #ifndef _GL_ICONV_H
 #define _GL_ICONV_H
 
+/* The definition of _GL_ARG_NONNULL is copied here.  */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,7 +42,8 @@ extern "C" {
 /* An iconv_open wrapper that supports the IANA standardized encoding names
    ("ISO-8859-1" etc.) as far as possible.  */
 # define iconv_open rpl_iconv_open
-extern iconv_t iconv_open (const char *tocode, const char *fromcode);
+extern iconv_t iconv_open (const char *tocode, const char *fromcode)
+     _GL_ARG_NONNULL ((1, 2));
 #endif
 
 #if @REPLACE_ICONV_UTF@
@@ -59,8 +62,8 @@ extern iconv_t iconv_open (const char *tocode, const char *fromcode);
 #if @REPLACE_ICONV@
 # define iconv rpl_iconv
 extern size_t iconv (iconv_t cd,
-		     @ICONV_CONST@ char **inbuf, size_t *inbytesleft,
-		     char **outbuf, size_t *outbytesleft);
+                     @ICONV_CONST@ char **inbuf, size_t *inbytesleft,
+                     char **outbuf, size_t *outbytesleft);
 # define iconv_close rpl_iconv_close
 extern int iconv_close (iconv_t cd);
 #endif

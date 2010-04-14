@@ -1,5 +1,5 @@
 /* mv -- move or rename files
-   Copyright (C) 86, 89, 90, 91, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1986, 1989-1991, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -220,11 +220,14 @@ do_move (const char *source, const char *dest, const struct cp_options *x)
         {
           struct rm_options rm_options;
           enum RM_status status;
+          char const *dir[2];
 
           rm_option_init (&rm_options);
           rm_options.verbose = x->verbose;
+          dir[0] = dir_to_remove;
+          dir[1] = NULL;
 
-          status = rm (1, &dir_to_remove, &rm_options);
+          status = rm ((void*) dir, &rm_options);
           assert (VALID_STATUS (status));
           if (status == RM_ERROR)
             ok = false;
@@ -328,7 +331,7 @@ the VERSION_CONTROL environment variable.  Here are the values:\n\
   existing, nil   numbered if numbered backups exist, simple otherwise\n\
   simple, never   always make simple backups\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

@@ -1,5 +1,6 @@
 /* hash - hashing table processing.
-   Copyright (C) 1998, 1999, 2001, 2003, 2009 Free Software Foundation, Inc.
+   Copyright (C) 1998-1999, 2001, 2003, 2009-2010 Free Software Foundation,
+   Inc.
    Written by Jim Meyering <meyering@ascend.com>, 1998.
 
    This program is free software: you can redistribute it and/or modify
@@ -47,11 +48,11 @@ struct hash_tuning
     /* This structure is mainly used for `hash_initialize', see the block
        documentation of `hash_reset_tuning' for more complete comments.  */
 
-    float shrink_threshold;	/* ratio of used buckets to trigger a shrink */
-    float shrink_factor;	/* ratio of new smaller size to original size */
-    float growth_threshold;	/* ratio of used buckets to trigger a growth */
-    float growth_factor;	/* ratio of new bigger size to original size */
-    bool is_n_buckets;		/* if CANDIDATE really means table size */
+    float shrink_threshold;     /* ratio of used buckets to trigger a shrink */
+    float shrink_factor;        /* ratio of new smaller size to original size */
+    float growth_threshold;     /* ratio of used buckets to trigger a growth */
+    float growth_factor;        /* ratio of new bigger size to original size */
+    bool is_n_buckets;          /* if CANDIDATE really means table size */
   };
 
 typedef struct hash_tuning Hash_tuning;
@@ -79,8 +80,8 @@ size_t hash_do_for_each (const Hash_table *, Hash_processor, void *);
 size_t hash_string (const char *, size_t);
 void hash_reset_tuning (Hash_tuning *);
 Hash_table *hash_initialize (size_t, const Hash_tuning *,
-			     Hash_hasher, Hash_comparator,
-			     Hash_data_freer) ATTRIBUTE_WUR;
+                             Hash_hasher, Hash_comparator,
+                             Hash_data_freer) ATTRIBUTE_WUR;
 void hash_clear (Hash_table *);
 void hash_free (Hash_table *);
 

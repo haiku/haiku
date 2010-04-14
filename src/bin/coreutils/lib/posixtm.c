@@ -1,7 +1,6 @@
 /* Parse dates for touch and date.
 
-   Copyright (C) 1989, 1990, 1991, 1998, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007 Free Software Foundation Inc.
+   Copyright (C) 1989-1991, 1998, 2000-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -66,33 +65,33 @@ year (struct tm *tm, const int *digit_pair, size_t n, unsigned int syntax_bits)
     case 1:
       tm->tm_year = *digit_pair;
       /* Deduce the century based on the year.
-	 POSIX requires that 00-68 be interpreted as 2000-2068,
-	 and that 69-99 be interpreted as 1969-1999.  */
+         POSIX requires that 00-68 be interpreted as 2000-2068,
+         and that 69-99 be interpreted as 1969-1999.  */
       if (digit_pair[0] <= 68)
-	{
-	  if (syntax_bits & PDS_PRE_2000)
-	    return 1;
-	  tm->tm_year += 100;
-	}
+        {
+          if (syntax_bits & PDS_PRE_2000)
+            return 1;
+          tm->tm_year += 100;
+        }
       break;
 
     case 2:
       if (! (syntax_bits & PDS_CENTURY))
-	return 1;
+        return 1;
       tm->tm_year = digit_pair[0] * 100 + digit_pair[1] - 1900;
       break;
 
     case 0:
       {
-	time_t now;
-	struct tm *tmp;
+        time_t now;
+        struct tm *tmp;
 
-	/* Use current year.  */
-	time (&now);
-	tmp = localtime (&now);
-	if (! tmp)
-	  return 1;
-	tm->tm_year = tmp->tm_year;
+        /* Use current year.  */
+        time (&now);
+        tmp = localtime (&now);
+        if (! tmp)
+          return 1;
+        tm->tm_year = tmp->tm_year;
       }
       break;
 
@@ -113,8 +112,8 @@ posix_time_parse (struct tm *tm, const char *s, unsigned int syntax_bits)
 
   size_t s_len = strlen (s);
   size_t len = (((syntax_bits & PDS_SECONDS) && (dot = strchr (s, '.')))
-		? (size_t) (dot - s)
-		: s_len);
+                ? (size_t) (dot - s)
+                : s_len);
 
   if (len != 8 && len != 10 && len != 12)
     return 1;
@@ -122,10 +121,10 @@ posix_time_parse (struct tm *tm, const char *s, unsigned int syntax_bits)
   if (dot)
     {
       if (!(syntax_bits & PDS_SECONDS))
-	return 1;
+        return 1;
 
       if (s_len - len != 3)
-	return 1;
+        return 1;
     }
 
   for (i = 0; i < len; i++)
@@ -140,7 +139,7 @@ posix_time_parse (struct tm *tm, const char *s, unsigned int syntax_bits)
   if (syntax_bits & PDS_LEADING_YEAR)
     {
       if (year (tm, p, len - 4, syntax_bits))
-	return 1;
+        return 1;
       p += len - 4;
       len = 4;
     }
@@ -156,7 +155,7 @@ posix_time_parse (struct tm *tm, const char *s, unsigned int syntax_bits)
   if (syntax_bits & PDS_TRAILING_YEAR)
     {
       if (year (tm, p, len, syntax_bits))
-	return 1;
+        return 1;
     }
 
   /* Handle seconds.  */
@@ -170,7 +169,7 @@ posix_time_parse (struct tm *tm, const char *s, unsigned int syntax_bits)
 
       ++dot;
       if (!ISDIGIT (dot[0]) || !ISDIGIT (dot[1]))
-	return 1;
+        return 1;
       seconds = 10 * (dot[0] - '0') + dot[1] - '0';
 
       tm->tm_sec = seconds;
@@ -201,117 +200,36 @@ posixtime (time_t *p, const char *s, unsigned int syntax_bits)
   else
     {
       /* mktime returns -1 for errors, but -1 is also a valid time_t
-	 value.  Check whether an error really occurred.  */
+         value.  Check whether an error really occurred.  */
       tm = localtime (&t);
       if (! tm)
-	return false;
+        return false;
     }
 
-  /* Reject dates like "September 31" and times like "25:61".  */
+  /* Reject dates like "September 31" and times like "25:61".
+     Do not reject times that specify "60" as the number of seconds.  */
   if ((tm0.tm_year ^ tm->tm_year)
       | (tm0.tm_mon ^ tm->tm_mon)
       | (tm0.tm_mday ^ tm->tm_mday)
       | (tm0.tm_hour ^ tm->tm_hour)
       | (tm0.tm_min ^ tm->tm_min)
       | (tm0.tm_sec ^ tm->tm_sec))
-    return false;
+    {
+      /* Any mismatch without 60 in the tm_sec field is invalid.  */
+      if (tm0.tm_sec != 60)
+        return false;
+
+      {
+        /* Allow times like 01:35:60 or 23:59:60.  */
+        time_t dummy;
+        char buf[16];
+        char *b = stpcpy (buf, s);
+        strcpy (b - 2, "59");
+        if (!posixtime (&dummy, buf, syntax_bits))
+          return false;
+      }
+    }
 
   *p = t;
   return true;
 }
-
-#ifdef TEST_POSIXTIME
-/*
-    Test mainly with syntax_bits == 13
-    (aka: (PDS_LEADING_YEAR | PDS_CENTURY | PDS_SECONDS))
-
-    This test data assumes Universal Time, e.g., TZ="UTC0".
-
-    This test data also assumes that time_t is signed and is at least
-    39 bits wide, so that it can represent all years from 0000 through
-    9999.  A host with 32-bit signed time_t can represent only time
-    stamps in the range 1901-12-13 20:45:52 through 2038-01-18
-    03:14:07 UTC, assuming POSIX time_t with no leap seconds, so test
-    cases outside this range will not work on such a host.
-
-    Also, the first two lines of test data assume that the current
-    year is 2002.
-
-BEGIN-DATA
-12131415.16     13   1039788916 Fri Dec 13 14:15:16 2002
-12131415.16     13   1039788916 Fri Dec 13 14:15:16 2002
-000001010000.00 13 -62167132800 Sun Jan  1 00:00:00 0000
-190112132045.52 13  -2147483648 Fri Dec 13 20:45:52 1901
-190112132045.53 13  -2147483647 Fri Dec 13 20:45:53 1901
-190112132046.52 13  -2147483588 Fri Dec 13 20:46:52 1901
-190112132145.52 13  -2147480048 Fri Dec 13 21:45:52 1901
-190112142045.52 13  -2147397248 Sat Dec 14 20:45:52 1901
-190201132045.52 13  -2144805248 Mon Jan 13 20:45:52 1902
-196912312359.59 13           -1 Wed Dec 31 23:59:59 1969
-197001010000.00 13            0 Thu Jan  1 00:00:00 1970
-197001010000.01 13            1 Thu Jan  1 00:00:01 1970
-197001010001.00 13           60 Thu Jan  1 00:01:00 1970
-197001010100.00 13         3600 Thu Jan  1 01:00:00 1970
-197001020000.00 13        86400 Fri Jan  2 00:00:00 1970
-197002010000.00 13      2678400 Sun Feb  1 00:00:00 1970
-197101010000.00 13     31536000 Fri Jan  1 00:00:00 1971
-197001000000.00 13            * *
-197000010000.00 13            * *
-197001010000.60 13            * *
-197001010060.00 13            * *
-197001012400.00 13            * *
-197001320000.00 13            * *
-197013010000.00 13            * *
-203801190314.06 13   2147483646 Tue Jan 19 03:14:06 2038
-203801190314.07 13   2147483647 Tue Jan 19 03:14:07 2038
-203801190314.08 13   2147483648 Tue Jan 19 03:14:08 2038
-999912312359.59 13 253402300799 Fri Dec 31 23:59:59 9999
-1112131415      13   1323785700 Tue Dec 13 14:15:00 2011
-1112131415.16   13   1323785716 Tue Dec 13 14:15:16 2011
-201112131415.16 13   1323785716 Tue Dec 13 14:15:16 2011
-191112131415.16 13  -1831974284 Wed Dec 13 14:15:16 1911
-203712131415.16 13   2144326516 Sun Dec 13 14:15:16 2037
-3712131415.16   13   2144326516 Sun Dec 13 14:15:16 2037
-6812131415.16   13   3122633716 Thu Dec 13 14:15:16 2068
-6912131415.16   13     -1590284 Sat Dec 13 14:15:16 1969
-7012131415.16   13     29945716 Sun Dec 13 14:15:16 1970
-1213141599       2    945094500 Mon Dec 13 14:15:00 1999
-1213141500       2    976716900 Wed Dec 13 14:15:00 2000
-END-DATA
-
-*/
-
-# define MAX_BUFF_LEN 1024
-
-int
-main (void)
-{
-  char buff[MAX_BUFF_LEN + 1];
-
-  buff[MAX_BUFF_LEN] = 0;
-  while (fgets (buff, MAX_BUFF_LEN, stdin) && buff[0])
-    {
-      char time_str[MAX_BUFF_LEN];
-      unsigned int syntax_bits;
-      time_t t;
-      if (sscanf (buff, "%s %u", time_str, &syntax_bits) != 2)
-	printf ("*\n");
-      else
-	{
-	  printf ("%-15s %2u ", time_str, syntax_bits);
-	  if (posixtime (&t, time_str, syntax_bits))
-	    printf ("%12ld %s", (long int) t, ctime (&t));
-	  else
-	    printf ("%12s %s", "*", "*\n");
-	}
-    }
-  exit (0);
-
-}
-#endif
-
-/*
-Local Variables:
-compile-command: "gcc -DTEST_POSIXTIME -g -O -Wall -W posixtm.c"
-End:
-*/

@@ -1,5 +1,5 @@
 /* stdbuf -- setup the standard streams for a command
-   Copyright (C) 2009 Free Software Foundation, Inc.
+   Copyright (C) 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,8 +24,10 @@
 
 #include "system.h"
 #include "error.h"
+#include "filenamecat.h"
 #include "posixver.h"
 #include "quote.h"
+#include "xreadlink.h"
 #include "xstrtol.h"
 #include "c-ctype.h"
 
@@ -35,12 +37,7 @@
 
 #define AUTHORS proper_name_utf8 ("Padraig Brady", "P\303\241draig Brady")
 
-/* Internal error  */
-enum { EXIT_CANCELED = 125 };
-
 static char *program_path;
-
-extern char **environ;
 
 static struct
 {
@@ -125,7 +122,7 @@ for e.g.) then that will override corresponding settings changed by `stdbuf'.\n\
 Also some filters (like `dd' and `cat' etc.) don't use streams for I/O,\n\
 and are thus unaffected by `stdbuf' settings.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -145,34 +142,26 @@ set_program_path (const char *arg)
     }
   else
     {
-      char *path;
-      char tmppath[PATH_MAX + 1];
-      ssize_t len = readlink ("/proc/self/exe", tmppath, sizeof (tmppath) - 1);
-      if (len > 0)
-        {
-          tmppath[len] = '\0';
-          program_path = dir_name (tmppath);
-        }
+      char *path = xreadlink ("/proc/self/exe");
+      if (path)
+        program_path = dir_name (path);
       else if ((path = getenv ("PATH")))
         {
           char *dir;
           path = xstrdup (path);
           for (dir = strtok (path, ":"); dir != NULL; dir = strtok (NULL, ":"))
             {
-              int req = snprintf (tmppath, sizeof (tmppath), "%s/%s", dir, arg);
-              if (req >= sizeof (tmppath))
+              char *candidate = file_name_concat (dir, arg, NULL);
+              if (access (candidate, X_OK) == 0)
                 {
-                  error (0, 0, _("path truncated when looking for %s"),
-                         quote (arg));
-                }
-              else if (access (tmppath, X_OK) == 0)
-                {
-                  program_path = dir_name (tmppath);
+                  program_path = dir_name (candidate);
+                  free (candidate);
                   break;
                 }
+              free (candidate);
             }
-          free (path);
         }
+      free (path);
     }
 }
 

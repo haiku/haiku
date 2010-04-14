@@ -1,7 +1,7 @@
 /* -*- buffer-read-only: t -*- vi: set ro: */
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
-/* Copyright (C) 2001-2003, 2006-2008 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2003, 2006-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software; you can redistribute it and/or modify

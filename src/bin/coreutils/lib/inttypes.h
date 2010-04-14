@@ -1,46 +1,94 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
-/* Copyright (C) 2006 Free Software Foundation, Inc.
+/* Copyright (C) 2006-2010 Free Software Foundation, Inc.
    Written by Paul Eggert, Bruno Haible, Derek Price.
    This file is part of gnulib.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 2.1, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
-
-/* Include the original <inttypes.h> if it exists, and if this file
-   has not been included yet or if this file includes gnulib stdint.h
-   which in turn includes this file.  */
-#if ! defined INTTYPES_H || defined _GL_JUST_INCLUDE_ABSOLUTE_INTTYPES_H
-# if 1
-#  include_next "inttypes.h"
-# endif
-#endif
-
-#if ! defined INTTYPES_H && ! defined _GL_JUST_INCLUDE_ABSOLUTE_INTTYPES_H
-#define INTTYPES_H
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /*
  * ISO C 99 <inttypes.h> for platforms that lack it.
  * <http://www.opengroup.org/susv3xbd/inttypes.h.html>
  */
 
-/* Include <stdint.h> or the gnulib replacement.  */
-#include <stdint.h>
+/* Include the original <inttypes.h> if it exists, and if this file
+   has not been included yet or if this file includes gnulib stdint.h
+   which in turn includes this file.
+   The include_next requires a split double-inclusion guard.  */
+#if ! defined INTTYPES_H || defined _GL_JUST_INCLUDE_SYSTEM_INTTYPES_H
+# if 1
+#  if __GNUC__ >= 3
+#pragma GCC system_header
+#  endif
+#  include_next <inttypes.h>
+# endif
+#endif
+
+#if ! defined INTTYPES_H && ! defined _GL_JUST_INCLUDE_SYSTEM_INTTYPES_H
+#define INTTYPES_H
+
+/* Include <stdint.h> or the gnulib replacement.
+   But avoid namespace pollution on glibc systems.  */
+#ifndef __GLIBC__
+# include <stdint.h>
+#endif
 /* Get CHAR_BIT.  */
 #include <limits.h>
 
 #if !(INT_MIN == INT32_MIN && INT_MAX == INT32_MAX)
 # error "This file assumes that 'int' has exactly 32 bits. Please report your platform and compiler to <bug-gnulib@gnu.org>."
+#endif
+
+/* The definition of GL_LINK_WARNING is copied here.  */
+/* GL_LINK_WARNING("literal string") arranges to emit the literal string as
+   a linker warning on most glibc systems.
+   We use a linker warning rather than a preprocessor warning, because
+   #warning cannot be used inside macros.  */
+#ifndef GL_LINK_WARNING
+  /* This works on platforms with GNU ld and ELF object format.
+     Testing __GLIBC__ is sufficient for asserting that GNU ld is in use.
+     Testing __ELF__ guarantees the ELF object format.
+     Testing __GNUC__ is necessary for the compound expression syntax.  */
+# if defined __GLIBC__ && defined __ELF__ && defined __GNUC__
+#  define GL_LINK_WARNING(message) \
+     GL_LINK_WARNING1 (__FILE__, __LINE__, message)
+#  define GL_LINK_WARNING1(file, line, message) \
+     GL_LINK_WARNING2 (file, line, message)  /* macroexpand file and line */
+#  define GL_LINK_WARNING2(file, line, message) \
+     GL_LINK_WARNING3 (file ":" #line ": warning: " message)
+#  define GL_LINK_WARNING3(message) \
+     ({ static const char warning[sizeof (message)]             \
+          __attribute__ ((__unused__,                           \
+                          __section__ (".gnu.warning"),         \
+                          __aligned__ (1)))                     \
+          = message "\n";                                       \
+        (void)0;                                                \
+     })
+# else
+#  define GL_LINK_WARNING(message) ((void) 0)
+# endif
+#endif
+
+/* The definition of _GL_ARG_NONNULL is copied here.  */
+/* _GL_ARG_NONNULL((n,...,m)) tells the compiler and static analyzer tools
+   that the values passed as arguments n, ..., m must be non-NULL pointers.
+   n = 1 stands for the first argument, n = 2 for the second argument etc.  */
+#ifndef _GL_ARG_NONNULL
+# if (__GNUC__ == 3 && __GNUC_MINOR__ >= 3) || __GNUC__ > 3
+#  define _GL_ARG_NONNULL(params) __attribute__ ((__nonnull__ params))
+# else
+#  define _GL_ARG_NONNULL(params)
+# endif
 #endif
 
 /* 7.8.1 Macros for format specifiers */
@@ -164,7 +212,7 @@
 #  endif
 # endif
 # ifdef INT64_MAX
-#  if INT64_MAX == LONG_MAX
+#  if (0 ? defined _LP64 : 0)
 #   define _PRI64_PREFIX "l"
 #  elif defined _MSC_VER || defined __MINGW32__
 #   define _PRI64_PREFIX "I64"
@@ -181,7 +229,7 @@
 #  endif
 # endif
 # ifdef UINT64_MAX
-#  if UINT64_MAX == ULONG_MAX
+#  if (0 ? defined _LP64 : 0)
 #   define _PRIu64_PREFIX "l"
 #  elif defined _MSC_VER || defined __MINGW32__
 #   define _PRIu64_PREFIX "I64"
@@ -482,7 +530,7 @@
 
 # if !defined PRIdMAX || 0
 #  undef PRIdMAX
-#  if INTMAX_MAX > INT32_MAX
+#  if 1
 #   define PRIdMAX PRId64
 #  else
 #   define PRIdMAX "ld"
@@ -490,7 +538,7 @@
 # endif
 # if !defined PRIiMAX || 0
 #  undef PRIiMAX
-#  if INTMAX_MAX > INT32_MAX
+#  if 1
 #   define PRIiMAX PRIi64
 #  else
 #   define PRIiMAX "li"
@@ -498,7 +546,7 @@
 # endif
 # if !defined PRIoMAX || 0
 #  undef PRIoMAX
-#  if UINTMAX_MAX > UINT32_MAX
+#  if 1
 #   define PRIoMAX PRIo64
 #  else
 #   define PRIoMAX "lo"
@@ -506,7 +554,7 @@
 # endif
 # if !defined PRIuMAX || 0
 #  undef PRIuMAX
-#  if UINTMAX_MAX > UINT32_MAX
+#  if 1
 #   define PRIuMAX PRIu64
 #  else
 #   define PRIuMAX "lu"
@@ -514,7 +562,7 @@
 # endif
 # if !defined PRIxMAX || 0
 #  undef PRIxMAX
-#  if UINTMAX_MAX > UINT32_MAX
+#  if 1
 #   define PRIxMAX PRIx64
 #  else
 #   define PRIxMAX "lx"
@@ -522,7 +570,7 @@
 # endif
 # if !defined PRIXMAX || 0
 #  undef PRIXMAX
-#  if UINTMAX_MAX > UINT32_MAX
+#  if 1
 #   define PRIXMAX PRIX64
 #  else
 #   define PRIXMAX "lX"
@@ -657,7 +705,7 @@
 #  endif
 # endif
 # ifdef INT64_MAX
-#  if INT64_MAX == LONG_MAX
+#  if (0 ? defined _LP64 : 0)
 #   define _SCN64_PREFIX "l"
 #  elif defined _MSC_VER || defined __MINGW32__
 #   define _SCN64_PREFIX "I64"
@@ -674,7 +722,7 @@
 #  endif
 # endif
 # ifdef UINT64_MAX
-#  if UINT64_MAX == ULONG_MAX
+#  if (0 ? defined _LP64 : 0)
 #   define _SCNu64_PREFIX "l"
 #  elif defined _MSC_VER || defined __MINGW32__
 #   define _SCNu64_PREFIX "I64"
@@ -957,7 +1005,7 @@
 
 # if !defined SCNdMAX || 0
 #  undef SCNdMAX
-#  if INTMAX_MAX > INT32_MAX
+#  if 1
 #   define SCNdMAX SCNd64
 #  else
 #   define SCNdMAX "ld"
@@ -965,7 +1013,7 @@
 # endif
 # if !defined SCNiMAX || 0
 #  undef SCNiMAX
-#  if INTMAX_MAX > INT32_MAX
+#  if 1
 #   define SCNiMAX SCNi64
 #  else
 #   define SCNiMAX "li"
@@ -973,7 +1021,7 @@
 # endif
 # if !defined SCNoMAX || 0
 #  undef SCNoMAX
-#  if UINTMAX_MAX > UINT32_MAX
+#  if 1
 #   define SCNoMAX SCNo64
 #  else
 #   define SCNoMAX "lo"
@@ -981,7 +1029,7 @@
 # endif
 # if !defined SCNuMAX || 0
 #  undef SCNuMAX
-#  if UINTMAX_MAX > UINT32_MAX
+#  if 1
 #   define SCNuMAX SCNu64
 #  else
 #   define SCNuMAX "lu"
@@ -989,7 +1037,7 @@
 # endif
 # if !defined SCNxMAX || 0
 #  undef SCNxMAX
-#  if UINTMAX_MAX > UINT32_MAX
+#  if 1
 #   define SCNxMAX SCNx64
 #  else
 #   define SCNxMAX "lx"
@@ -1035,20 +1083,53 @@
 extern "C" {
 #endif
 
-#if !1
+#if 0
+# if !1
 extern intmax_t imaxabs (intmax_t);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef imaxabs
+# define imaxabs(a) \
+    (GL_LINK_WARNING ("imaxabs is unportable - " \
+                      "use gnulib module imaxabs for portability"), \
+     imaxabs (a))
 #endif
 
-#if !1
+#if 0
+# if !1
 typedef struct { intmax_t quot; intmax_t rem; } imaxdiv_t;
 extern imaxdiv_t imaxdiv (intmax_t, intmax_t);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef imaxdiv
+# define imaxdiv(a,b) \
+    (GL_LINK_WARNING ("imaxdiv is unportable - " \
+                      "use gnulib module imaxdiv for portability"), \
+     imaxdiv (a, b))
 #endif
 
-#if !1
-extern intmax_t strtoimax (const char *, char **, int);
+#if 1
+# if !1
+extern intmax_t strtoimax (const char *, char **, int) _GL_ARG_NONNULL ((1));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef strtoimax
+# define strtoimax(p,e,b) \
+    (GL_LINK_WARNING ("strtoimax is unportable - " \
+                      "use gnulib module strtoimax for portability"), \
+     strtoimax (p, e, b))
 #endif
-#if !1
-extern uintmax_t strtoumax (const char *, char **, int);
+
+#if 1
+# if !1
+extern uintmax_t strtoumax (const char *, char **, int) _GL_ARG_NONNULL ((1));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef strtoumax
+# define strtoumax(p,e,b) \
+    (GL_LINK_WARNING ("strtoumax is unportable - " \
+                      "use gnulib module strtoumax for portability"), \
+     strtoumax (p, e, b))
 #endif
 
 /* Don't bother defining or declaring wcstoimax and wcstoumax, since
@@ -1058,4 +1139,4 @@ extern uintmax_t strtoumax (const char *, char **, int);
 }
 #endif
 
-#endif /* INTTYPES_H */
+#endif /* !defined INTTYPES_H && !defined _GL_JUST_INCLUDE_SYSTEM_INTTYPES_H */

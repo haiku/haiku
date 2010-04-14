@@ -1,5 +1,5 @@
 /* wc - print the number of lines, words, and bytes in files
-   Copyright (C) 85, 91, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1985, 1991, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ read standard input.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -205,10 +205,10 @@ wc (int fd, char const *file_x, struct fstatus *fstatus)
   else
 #endif
     {
-      count_bytes = print_bytes | print_chars;
+      count_bytes = print_bytes || print_chars;
       count_chars = false;
     }
-  count_complicated = print_words | print_linelength;
+  count_complicated = print_words || print_linelength;
 
   /* When counting only bytes, save some line- and word-counting
      overhead.  If FD is a `regular' Unix file, using lseek is enough
@@ -220,7 +220,7 @@ wc (int fd, char const *file_x, struct fstatus *fstatus)
      `(dd ibs=99k skip=1 count=0; ./wc -c) < /etc/group'
      should make wc report `0' bytes.  */
 
-  if (count_bytes & !count_chars & !print_lines & !count_complicated)
+  if (count_bytes && !count_chars && !print_lines && !count_complicated)
     {
       off_t current_pos, end_pos;
 
@@ -601,6 +601,10 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
+  /* Line buffer stdout to ensure lines are written atomically and immediately
+     so that processes running in parallel do not intersperse their output.  */
+  setvbuf (stdout, NULL, _IOLBF, 0);
+
   print_lines = print_words = print_chars = print_bytes = false;
   print_linelength = false;
   total_lines = total_words = total_chars = total_bytes = max_line_length = 0;
@@ -640,8 +644,8 @@ main (int argc, char **argv)
         usage (EXIT_FAILURE);
       }
 
-  if (! (print_lines | print_words | print_chars | print_bytes
-         | print_linelength))
+  if (! (print_lines || print_words || print_chars || print_bytes
+         || print_linelength))
     print_lines = print_words = print_bytes = true;
 
   if (files_from)

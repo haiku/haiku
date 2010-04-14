@@ -1,6 +1,6 @@
 /* Work around a bug of lstat on some systems
 
-   Copyright (C) 1997-1999, 2000-2006, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1997-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,11 +19,18 @@
 
 #include <config.h>
 
-/* Get the original definition of open.  It might be defined as a macro.  */
-#define __need_system_sys_stat_h
-#include <sys/types.h>
-#include <sys/stat.h>
-#undef __need_system_sys_stat_h
+#if !HAVE_LSTAT
+/* On systems that lack symlinks, our replacement <sys/stat.h> already
+   defined lstat as stat, so there is nothing further to do other than
+   avoid an empty file.  */
+typedef int dummy;
+#else /* HAVE_LSTAT */
+
+/* Get the original definition of lstat.  It might be defined as a macro.  */
+# define __need_system_sys_stat_h
+# include <sys/types.h>
+# include <sys/stat.h>
+# undef __need_system_sys_stat_h
 
 static inline int
 orig_lstat (const char *filename, struct stat *buf)
@@ -32,10 +39,10 @@ orig_lstat (const char *filename, struct stat *buf)
 }
 
 /* Specification.  */
-#include <sys/stat.h>
+# include <sys/stat.h>
 
-#include <string.h>
-#include <errno.h>
+# include <string.h>
+# include <errno.h>
 
 /* lstat works differently on Linux and Solaris systems.  POSIX (see
    `pathname resolution' in the glossary) requires that programs like
@@ -56,27 +63,29 @@ rpl_lstat (const char *file, struct stat *sbuf)
   size_t len;
   int lstat_result = orig_lstat (file, sbuf);
 
-  if (lstat_result != 0 || !S_ISLNK (sbuf->st_mode))
+  if (lstat_result != 0)
     return lstat_result;
 
+  /* This replacement file can blindly check against '/' rather than
+     using the ISSLASH macro, because all platforms with '\\' either
+     lack symlinks (mingw) or have working lstat (cygwin) and thus do
+     not compile this file.  0 len should have already been filtered
+     out above, with a failure return of ENOENT.  */
   len = strlen (file);
-  if (len == 0 || file[len - 1] != '/')
+  if (file[len - 1] != '/' || S_ISDIR (sbuf->st_mode))
     return 0;
 
-  /* FILE refers to a symbolic link and the name ends with a slash.
-     Call stat() to get info about the link's referent.  */
-
-  /* If stat fails, then we do the same.  */
-  if (stat (file, sbuf) != 0)
-    return -1;
-
-  /* If FILE references a directory, return 0.  */
-  if (S_ISDIR (sbuf->st_mode))
-    return 0;
-
-  /* Here, we know stat succeeded and FILE references a non-directory.
-     But it was specified via a name including a trailing slash.
-     Fail with errno set to ENOTDIR to indicate the contradiction.  */
-  errno = ENOTDIR;
-  return -1;
+  /* At this point, a trailing slash is only permitted on
+     symlink-to-dir; but it should have found information on the
+     directory, not the symlink.  Call stat() to get info about the
+     link's referent.  Our replacement stat guarantees valid results,
+     even if the symlink is not pointing to a directory.  */
+  if (!S_ISLNK (sbuf->st_mode))
+    {
+      errno = ENOTDIR;
+      return -1;
+    }
+  return stat (file, sbuf);
 }
+
+#endif /* HAVE_LSTAT */

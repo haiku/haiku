@@ -1,5 +1,5 @@
 /* provide a chdir function that tries not to fail due to ENAMETOOLONG
-   Copyright (C) 2004-2009 Free Software Foundation, Inc.
+   Copyright (C) 2004-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,18 +20,22 @@
 
 #include "chdir-long.h"
 
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <errno.h>
 #include <stdio.h>
-#include <assert.h>
-
-#include "fcntl--.h"
 
 #ifndef PATH_MAX
 # error "compile this file only if your system defines PATH_MAX"
 #endif
+
+/* The results of openat() in this file are not leaked to any
+   single-threaded code that could use stdio.
+   FIXME - if the kernel ever adds support for multi-thread safety for
+   avoiding standard fds, then we should use openat_safer.  */
 
 struct cd_buf
 {
@@ -68,7 +72,7 @@ static int
 cdb_advance_fd (struct cd_buf *cdb, char const *dir)
 {
   int new_fd = openat (cdb->fd, dir,
-		       O_RDONLY | O_DIRECTORY | O_NOCTTY | O_NONBLOCK);
+                       O_RDONLY | O_DIRECTORY | O_NOCTTY | O_NONBLOCK);
   if (new_fd < 0)
     return -1;
 
@@ -131,27 +135,27 @@ chdir_long (char *dir)
        code in the following loop cleaner.  */
     if (n_leading_slash == 2)
       {
-	int err;
-	/* Find next slash.
-	   We already know that dir[2] is neither a slash nor '\0'.  */
-	char *slash = memchr (dir + 3, '/', dir_end - (dir + 3));
-	if (slash == NULL)
-	  {
-	    errno = ENAMETOOLONG;
-	    return -1;
-	  }
-	*slash = '\0';
-	err = cdb_advance_fd (&cdb, dir);
-	*slash = '/';
-	if (err != 0)
-	  goto Fail;
-	dir = find_non_slash (slash + 1);
+        int err;
+        /* Find next slash.
+           We already know that dir[2] is neither a slash nor '\0'.  */
+        char *slash = memchr (dir + 3, '/', dir_end - (dir + 3));
+        if (slash == NULL)
+          {
+            errno = ENAMETOOLONG;
+            return -1;
+          }
+        *slash = '\0';
+        err = cdb_advance_fd (&cdb, dir);
+        *slash = '/';
+        if (err != 0)
+          goto Fail;
+        dir = find_non_slash (slash + 1);
       }
     else if (n_leading_slash)
       {
-	if (cdb_advance_fd (&cdb, "/") != 0)
-	  goto Fail;
-	dir += n_leading_slash;
+        if (cdb_advance_fd (&cdb, "/") != 0)
+          goto Fail;
+        dir += n_leading_slash;
       }
 
     assert (*dir != '/');
@@ -159,31 +163,31 @@ chdir_long (char *dir)
 
     while (PATH_MAX <= dir_end - dir)
       {
-	int err;
-	/* Find a slash that is PATH_MAX or fewer bytes away from dir.
-	   I.e. see if there is a slash that will give us a name of
-	   length PATH_MAX-1 or less.  */
-	char *slash = memrchr (dir, '/', PATH_MAX);
-	if (slash == NULL)
-	  {
-	    errno = ENAMETOOLONG;
-	    return -1;
-	  }
+        int err;
+        /* Find a slash that is PATH_MAX or fewer bytes away from dir.
+           I.e. see if there is a slash that will give us a name of
+           length PATH_MAX-1 or less.  */
+        char *slash = memrchr (dir, '/', PATH_MAX);
+        if (slash == NULL)
+          {
+            errno = ENAMETOOLONG;
+            return -1;
+          }
 
-	*slash = '\0';
-	assert (slash - dir < PATH_MAX);
-	err = cdb_advance_fd (&cdb, dir);
-	*slash = '/';
-	if (err != 0)
-	  goto Fail;
+        *slash = '\0';
+        assert (slash - dir < PATH_MAX);
+        err = cdb_advance_fd (&cdb, dir);
+        *slash = '/';
+        if (err != 0)
+          goto Fail;
 
-	dir = find_non_slash (slash + 1);
+        dir = find_non_slash (slash + 1);
       }
 
     if (dir < dir_end)
       {
-	if (cdb_advance_fd (&cdb, dir) != 0)
-	  goto Fail;
+        if (cdb_advance_fd (&cdb, dir) != 0)
+          goto Fail;
       }
 
     if (cdb_fchdir (&cdb) != 0)
@@ -224,10 +228,10 @@ main (int argc, char *argv[])
     {
       int saved_errno = errno;
       if (feof (stdin))
-	exit (0);
+        exit (0);
 
       error (EXIT_FAILURE, saved_errno,
-	     "reading standard input");
+             "reading standard input");
     }
   else if (len == 0)
     exit (0);
@@ -237,12 +241,12 @@ main (int argc, char *argv[])
 
   if (chdir_long (line) != 0)
     error (EXIT_FAILURE, errno,
-	   "chdir_long failed: %s", line);
+           "chdir_long failed: %s", line);
 
   if (argc <= 1)
     {
       /* Using `pwd' here makes sense only if it is a robust implementation,
-	 like the one in coreutils after the 2004-04-19 changes.  */
+         like the one in coreutils after the 2004-04-19 changes.  */
       char const *cmd = "pwd";
       execlp (cmd, (char *) NULL);
       error (EXIT_FAILURE, errno, "%s", cmd);

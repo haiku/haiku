@@ -1,5 +1,5 @@
 /* chcon -- change security context of files
-   Copyright (C) 2005-2009 Free Software Foundation, Inc.
+   Copyright (C) 2005-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -267,6 +267,14 @@ process_file (FTS *fts, FTSENT *ent)
       ok = false;
       break;
 
+    case FTS_DC:		/* directory that causes cycles */
+      if (cycle_warning_required (fts, ent))
+        {
+          emit_cycle_warning (file_full_name);
+          return false;
+        }
+      break;
+
     default:
       break;
     }
@@ -380,7 +388,7 @@ one takes effect.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -546,10 +554,10 @@ main (int argc, char **argv)
   if (reference_file && component_specified)
     {
       error (0, 0, _("conflicting security context specifiers given"));
-      usage (1);
+      usage (EXIT_FAILURE);
     }
 
-  if (recurse & preserve_root)
+  if (recurse && preserve_root)
     {
       static struct dev_ino dev_ino_buf;
       root_dev_ino = get_root_dev_ino (&dev_ino_buf);

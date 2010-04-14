@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* base64.c -- Encode binary data using printable characters.
-   Copyright (C) 1999, 2000, 2001, 2004, 2005, 2006 Free Software
+   Copyright (C) 1999, 2000, 2001, 2004, 2005, 2006, 2009, 2010 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -70,7 +70,7 @@ to_uchar (char ch)
    terminate the output buffer. */
 void
 base64_encode (const char *restrict in, size_t inlen,
-	       char *restrict out, size_t outlen)
+               char *restrict out, size_t outlen)
 {
   static const char b64str[64] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -79,27 +79,27 @@ base64_encode (const char *restrict in, size_t inlen,
     {
       *out++ = b64str[(to_uchar (in[0]) >> 2) & 0x3f];
       if (!--outlen)
-	break;
+        break;
       *out++ = b64str[((to_uchar (in[0]) << 4)
-		       + (--inlen ? to_uchar (in[1]) >> 4 : 0))
-		      & 0x3f];
+                       + (--inlen ? to_uchar (in[1]) >> 4 : 0))
+                      & 0x3f];
       if (!--outlen)
-	break;
+        break;
       *out++ =
-	(inlen
-	 ? b64str[((to_uchar (in[1]) << 2)
-		   + (--inlen ? to_uchar (in[2]) >> 6 : 0))
-		  & 0x3f]
-	 : '=');
+        (inlen
+         ? b64str[((to_uchar (in[1]) << 2)
+                   + (--inlen ? to_uchar (in[2]) >> 6 : 0))
+                  & 0x3f]
+         : '=');
       if (!--outlen)
-	break;
+        break;
       *out++ = inlen ? b64str[to_uchar (in[2]) & 0x3f] : '=';
       if (!--outlen)
-	break;
+        break;
       if (inlen)
-	inlen--;
+        inlen--;
       if (inlen)
-	in += 3;
+        in += 3;
     }
 
   if (outlen)
@@ -156,71 +156,71 @@ base64_encode_alloc (const char *in, size_t inlen, char **out)
 
    IBM C V6 for AIX mishandles "#define B64(x) ...'x'...", so use "_"
    as the formal parameter rather than "x".  */
-#define B64(_)					\
-  ((_) == 'A' ? 0				\
-   : (_) == 'B' ? 1				\
-   : (_) == 'C' ? 2				\
-   : (_) == 'D' ? 3				\
-   : (_) == 'E' ? 4				\
-   : (_) == 'F' ? 5				\
-   : (_) == 'G' ? 6				\
-   : (_) == 'H' ? 7				\
-   : (_) == 'I' ? 8				\
-   : (_) == 'J' ? 9				\
-   : (_) == 'K' ? 10				\
-   : (_) == 'L' ? 11				\
-   : (_) == 'M' ? 12				\
-   : (_) == 'N' ? 13				\
-   : (_) == 'O' ? 14				\
-   : (_) == 'P' ? 15				\
-   : (_) == 'Q' ? 16				\
-   : (_) == 'R' ? 17				\
-   : (_) == 'S' ? 18				\
-   : (_) == 'T' ? 19				\
-   : (_) == 'U' ? 20				\
-   : (_) == 'V' ? 21				\
-   : (_) == 'W' ? 22				\
-   : (_) == 'X' ? 23				\
-   : (_) == 'Y' ? 24				\
-   : (_) == 'Z' ? 25				\
-   : (_) == 'a' ? 26				\
-   : (_) == 'b' ? 27				\
-   : (_) == 'c' ? 28				\
-   : (_) == 'd' ? 29				\
-   : (_) == 'e' ? 30				\
-   : (_) == 'f' ? 31				\
-   : (_) == 'g' ? 32				\
-   : (_) == 'h' ? 33				\
-   : (_) == 'i' ? 34				\
-   : (_) == 'j' ? 35				\
-   : (_) == 'k' ? 36				\
-   : (_) == 'l' ? 37				\
-   : (_) == 'm' ? 38				\
-   : (_) == 'n' ? 39				\
-   : (_) == 'o' ? 40				\
-   : (_) == 'p' ? 41				\
-   : (_) == 'q' ? 42				\
-   : (_) == 'r' ? 43				\
-   : (_) == 's' ? 44				\
-   : (_) == 't' ? 45				\
-   : (_) == 'u' ? 46				\
-   : (_) == 'v' ? 47				\
-   : (_) == 'w' ? 48				\
-   : (_) == 'x' ? 49				\
-   : (_) == 'y' ? 50				\
-   : (_) == 'z' ? 51				\
-   : (_) == '0' ? 52				\
-   : (_) == '1' ? 53				\
-   : (_) == '2' ? 54				\
-   : (_) == '3' ? 55				\
-   : (_) == '4' ? 56				\
-   : (_) == '5' ? 57				\
-   : (_) == '6' ? 58				\
-   : (_) == '7' ? 59				\
-   : (_) == '8' ? 60				\
-   : (_) == '9' ? 61				\
-   : (_) == '+' ? 62				\
-   : (_) == '/' ? 63				\
+#define B64(_)                                  \
+  ((_) == 'A' ? 0                               \
+   : (_) == 'B' ? 1                             \
+   : (_) == 'C' ? 2                             \
+   : (_) == 'D' ? 3                             \
+   : (_) == 'E' ? 4                             \
+   : (_) == 'F' ? 5                             \
+   : (_) == 'G' ? 6                             \
+   : (_) == 'H' ? 7                             \
+   : (_) == 'I' ? 8                             \
+   : (_) == 'J' ? 9                             \
+   : (_) == 'K' ? 10                            \
+   : (_) == 'L' ? 11                            \
+   : (_) == 'M' ? 12                            \
+   : (_) == 'N' ? 13                            \
+   : (_) == 'O' ? 14                            \
+   : (_) == 'P' ? 15                            \
+   : (_) == 'Q' ? 16                            \
+   : (_) == 'R' ? 17                            \
+   : (_) == 'S' ? 18                            \
+   : (_) == 'T' ? 19                            \
+   : (_) == 'U' ? 20                            \
+   : (_) == 'V' ? 21                            \
+   : (_) == 'W' ? 22                            \
+   : (_) == 'X' ? 23                            \
+   : (_) == 'Y' ? 24                            \
+   : (_) == 'Z' ? 25                            \
+   : (_) == 'a' ? 26                            \
+   : (_) == 'b' ? 27                            \
+   : (_) == 'c' ? 28                            \
+   : (_) == 'd' ? 29                            \
+   : (_) == 'e' ? 30                            \
+   : (_) == 'f' ? 31                            \
+   : (_) == 'g' ? 32                            \
+   : (_) == 'h' ? 33                            \
+   : (_) == 'i' ? 34                            \
+   : (_) == 'j' ? 35                            \
+   : (_) == 'k' ? 36                            \
+   : (_) == 'l' ? 37                            \
+   : (_) == 'm' ? 38                            \
+   : (_) == 'n' ? 39                            \
+   : (_) == 'o' ? 40                            \
+   : (_) == 'p' ? 41                            \
+   : (_) == 'q' ? 42                            \
+   : (_) == 'r' ? 43                            \
+   : (_) == 's' ? 44                            \
+   : (_) == 't' ? 45                            \
+   : (_) == 'u' ? 46                            \
+   : (_) == 'v' ? 47                            \
+   : (_) == 'w' ? 48                            \
+   : (_) == 'x' ? 49                            \
+   : (_) == 'y' ? 50                            \
+   : (_) == 'z' ? 51                            \
+   : (_) == '0' ? 52                            \
+   : (_) == '1' ? 53                            \
+   : (_) == '2' ? 54                            \
+   : (_) == '3' ? 55                            \
+   : (_) == '4' ? 56                            \
+   : (_) == '5' ? 57                            \
+   : (_) == '6' ? 58                            \
+   : (_) == '7' ? 59                            \
+   : (_) == '8' ? 60                            \
+   : (_) == '9' ? 61                            \
+   : (_) == '+' ? 62                            \
+   : (_) == '/' ? 63                            \
    : -1)
 
 static const signed char b64[0x100] = {
@@ -331,12 +331,12 @@ get_4 (struct base64_decode_context *ctx,
     {
       char const *t = *in;
       if (4 <= in_end - *in && memchr (t, '\n', 4) == NULL)
-	{
-	  /* This is the common case: no newline.  */
-	  *in += 4;
-	  *n_non_newline = 4;
-	  return (char *) t;
-	}
+        {
+          /* This is the common case: no newline.  */
+          *in += 4;
+          *n_non_newline = 4;
+          return (char *) t;
+        }
     }
 
   {
@@ -344,13 +344,13 @@ get_4 (struct base64_decode_context *ctx,
     char const *p = *in;
     while (p < in_end)
       {
-	char c = *p++;
-	if (c != '\n')
-	  {
-	    ctx->buf[ctx->i++] = c;
-	    if (ctx->i == 4)
-	      break;
-	  }
+        char c = *p++;
+        if (c != '\n')
+          {
+            ctx->buf[ctx->i++] = c;
+            if (ctx->i == 4)
+              break;
+          }
       }
 
     *in = p;
@@ -359,12 +359,12 @@ get_4 (struct base64_decode_context *ctx,
   }
 }
 
-#define return_false				\
-  do						\
-    {						\
-      *outp = out;				\
-      return false;				\
-    }						\
+#define return_false                            \
+  do                                            \
+    {                                           \
+      *outp = out;                              \
+      return false;                             \
+    }                                           \
   while (false)
 
 /* Decode up to four bytes of base64-encoded data, IN, of length INLEN
@@ -375,7 +375,7 @@ get_4 (struct base64_decode_context *ctx,
    *OUTLEN to reflect the number of bytes remaining in *OUT.  */
 static inline bool
 decode_4 (char const *restrict in, size_t inlen,
-	  char *restrict *outp, size_t *outleft)
+          char *restrict *outp, size_t *outleft)
 {
   char *out = *outp;
   if (inlen < 2)
@@ -387,7 +387,7 @@ decode_4 (char const *restrict in, size_t inlen,
   if (*outleft)
     {
       *out++ = ((b64[to_uchar (in[0])] << 2)
-		| (b64[to_uchar (in[1])] >> 4));
+                | (b64[to_uchar (in[1])] >> 4));
       --*outleft;
     }
 
@@ -397,43 +397,43 @@ decode_4 (char const *restrict in, size_t inlen,
   if (in[2] == '=')
     {
       if (inlen != 4)
-	return_false;
+        return_false;
 
       if (in[3] != '=')
-	return_false;
+        return_false;
     }
   else
     {
       if (!isbase64 (in[2]))
-	return_false;
+        return_false;
 
       if (*outleft)
-	{
-	  *out++ = (((b64[to_uchar (in[1])] << 4) & 0xf0)
-		    | (b64[to_uchar (in[2])] >> 2));
-	  --*outleft;
-	}
+        {
+          *out++ = (((b64[to_uchar (in[1])] << 4) & 0xf0)
+                    | (b64[to_uchar (in[2])] >> 2));
+          --*outleft;
+        }
 
       if (inlen == 3)
-	return_false;
+        return_false;
 
       if (in[3] == '=')
-	{
-	  if (inlen != 4)
-	    return_false;
-	}
+        {
+          if (inlen != 4)
+            return_false;
+        }
       else
-	{
-	  if (!isbase64 (in[3]))
-	    return_false;
+        {
+          if (!isbase64 (in[3]))
+            return_false;
 
-	  if (*outleft)
-	    {
-	      *out++ = (((b64[to_uchar (in[2])] << 6) & 0xc0)
-			| b64[to_uchar (in[3])]);
-	      --*outleft;
-	    }
-	}
+          if (*outleft)
+            {
+              *out++ = (((b64[to_uchar (in[2])] << 6) & 0xc0)
+                        | b64[to_uchar (in[3])]);
+              --*outleft;
+            }
+        }
     }
 
   *outp = out;
@@ -460,8 +460,8 @@ decode_4 (char const *restrict in, size_t inlen,
 
 bool
 base64_decode_ctx (struct base64_decode_context *ctx,
-		   const char *restrict in, size_t inlen,
-		   char *restrict out, size_t *outlen)
+                   const char *restrict in, size_t inlen,
+                   char *restrict out, size_t *outlen)
 {
   size_t outleft = *outlen;
   bool ignore_newlines = ctx != NULL;
@@ -479,57 +479,57 @@ base64_decode_ctx (struct base64_decode_context *ctx,
     {
       size_t outleft_save = outleft;
       if (ctx_i == 0 && !flush_ctx)
-	{
-	  while (true)
-	    {
-	      /* Save a copy of outleft, in case we need to re-parse this
-		 block of four bytes.  */
-	      outleft_save = outleft;
-	      if (!decode_4 (in, inlen, &out, &outleft))
-		break;
+        {
+          while (true)
+            {
+              /* Save a copy of outleft, in case we need to re-parse this
+                 block of four bytes.  */
+              outleft_save = outleft;
+              if (!decode_4 (in, inlen, &out, &outleft))
+                break;
 
-	      in += 4;
-	      inlen -= 4;
-	    }
-	}
+              in += 4;
+              inlen -= 4;
+            }
+        }
 
       if (inlen == 0 && !flush_ctx)
-	break;
+        break;
 
       /* Handle the common case of 72-byte wrapped lines.
-	 This also handles any other multiple-of-4-byte wrapping.  */
+         This also handles any other multiple-of-4-byte wrapping.  */
       if (inlen && *in == '\n' && ignore_newlines)
-	{
-	  ++in;
-	  --inlen;
-	  continue;
-	}
+        {
+          ++in;
+          --inlen;
+          continue;
+        }
 
       /* Restore OUT and OUTLEFT.  */
       out -= outleft_save - outleft;
       outleft = outleft_save;
 
       {
-	char const *in_end = in + inlen;
-	char const *non_nl;
+        char const *in_end = in + inlen;
+        char const *non_nl;
 
-	if (ignore_newlines)
-	  non_nl = get_4 (ctx, &in, in_end, &inlen);
-	else
-	  non_nl = in;  /* Might have nl in this case. */
+        if (ignore_newlines)
+          non_nl = get_4 (ctx, &in, in_end, &inlen);
+        else
+          non_nl = in;  /* Might have nl in this case. */
 
-	/* If the input is empty or consists solely of newlines (0 non-newlines),
-	   then we're done.  Likewise if there are fewer than 4 bytes when not
-	   flushing context and not treating newlines as garbage.  */
-	if (inlen == 0 || (inlen < 4 && !flush_ctx && ignore_newlines))
-	  {
-	    inlen = 0;
-	    break;
-	  }
-	if (!decode_4 (non_nl, inlen, &out, &outleft))
-	  break;
+        /* If the input is empty or consists solely of newlines (0 non-newlines),
+           then we're done.  Likewise if there are fewer than 4 bytes when not
+           flushing context and not treating newlines as garbage.  */
+        if (inlen == 0 || (inlen < 4 && !flush_ctx && ignore_newlines))
+          {
+            inlen = 0;
+            break;
+          }
+        if (!decode_4 (non_nl, inlen, &out, &outleft))
+          break;
 
-	inlen = in_end - in;
+        inlen = in_end - in;
       }
     }
 
@@ -551,8 +551,8 @@ base64_decode_ctx (struct base64_decode_context *ctx,
    undefined. */
 bool
 base64_decode_alloc_ctx (struct base64_decode_context *ctx,
-			 const char *in, size_t inlen, char **out,
-			 size_t *outlen)
+                         const char *in, size_t inlen, char **out,
+                         size_t *outlen)
 {
   /* This may allocate a few bytes too many, depending on input,
      but it's not worth the extra CPU time to compute the exact size.

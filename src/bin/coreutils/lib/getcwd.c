@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-1999, 2004-2009 Free Software Foundation, Inc.
+/* Copyright (C) 1991-1999, 2004-2010 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -67,7 +67,7 @@
 #endif
 
 #ifndef PATH_MAX
-# ifdef	MAXPATHLEN
+# ifdef MAXPATHLEN
 #  define PATH_MAX MAXPATHLEN
 # else
 #  define PATH_MAX 1024
@@ -157,10 +157,10 @@ __getcwd (char *buf, size_t size)
   if (size == 0)
     {
       if (buf != NULL)
-	{
-	  __set_errno (EINVAL);
-	  return NULL;
-	}
+        {
+          __set_errno (EINVAL);
+          return NULL;
+        }
 
       allocated = BIG_FILE_NAME_LENGTH + 1;
     }
@@ -169,7 +169,7 @@ __getcwd (char *buf, size_t size)
     {
       dir = malloc (allocated);
       if (dir == NULL)
-	return NULL;
+        return NULL;
     }
   else
     dir = buf;
@@ -202,7 +202,7 @@ __getcwd (char *buf, size_t size)
 #if HAVE_OPENAT_SUPPORT
       fd = openat (fd, "..", O_RDONLY);
       if (fd < 0)
-	goto lose;
+        goto lose;
       fd_needs_closing = true;
       parent_status = fstat (fd, &st);
 #else
@@ -212,13 +212,13 @@ __getcwd (char *buf, size_t size)
       parent_status = __lstat (dotlist, &st);
 #endif
       if (parent_status != 0)
-	goto lose;
+        goto lose;
 
       if (dirstream && __closedir (dirstream) != 0)
-	{
-	  dirstream = NULL;
-	  goto lose;
-	}
+        {
+          dirstream = NULL;
+          goto lose;
+        }
 
       /* Figure out if this directory is a mount point.  */
       dotdev = st.st_dev;
@@ -229,138 +229,138 @@ __getcwd (char *buf, size_t size)
 #if HAVE_OPENAT_SUPPORT
       dirstream = fdopendir (fd);
       if (dirstream == NULL)
-	goto lose;
+        goto lose;
       /* Reset fd.  It may have been closed by fdopendir.  */
       fd = dirfd (dirstream);
       fd_needs_closing = false;
 #else
       dirstream = __opendir (dotlist);
       if (dirstream == NULL)
-	goto lose;
+        goto lose;
       dotlist[dotlen++] = '/';
 #endif
       for (;;)
-	{
-	  /* Clear errno to distinguish EOF from error if readdir returns
-	     NULL.  */
-	  __set_errno (0);
-	  d = __readdir (dirstream);
+        {
+          /* Clear errno to distinguish EOF from error if readdir returns
+             NULL.  */
+          __set_errno (0);
+          d = __readdir (dirstream);
 
-	  /* When we've iterated through all directory entries without finding
-	     one with a matching d_ino, rewind the stream and consider each
-	     name again, but this time, using lstat.  This is necessary in a
-	     chroot on at least one system (glibc-2.3.6 + linux 2.6.12), where
-	     .., ../.., ../../.., etc. all had the same device number, yet the
-	     d_ino values for entries in / did not match those obtained
-	     via lstat.  */
-	  if (d == NULL && errno == 0 && use_d_ino)
-	    {
-	      use_d_ino = false;
-	      rewinddir (dirstream);
-	      d = __readdir (dirstream);
-	    }
+          /* When we've iterated through all directory entries without finding
+             one with a matching d_ino, rewind the stream and consider each
+             name again, but this time, using lstat.  This is necessary in a
+             chroot on at least one system (glibc-2.3.6 + linux 2.6.12), where
+             .., ../.., ../../.., etc. all had the same device number, yet the
+             d_ino values for entries in / did not match those obtained
+             via lstat.  */
+          if (d == NULL && errno == 0 && use_d_ino)
+            {
+              use_d_ino = false;
+              rewinddir (dirstream);
+              d = __readdir (dirstream);
+            }
 
-	  if (d == NULL)
-	    {
-	      if (errno == 0)
-		/* EOF on dirstream, which can mean e.g., that the current
-		   directory has been removed.  */
-		__set_errno (ENOENT);
-	      goto lose;
-	    }
-	  if (d->d_name[0] == '.' &&
-	      (d->d_name[1] == '\0' ||
-	       (d->d_name[1] == '.' && d->d_name[2] == '\0')))
-	    continue;
+          if (d == NULL)
+            {
+              if (errno == 0)
+                /* EOF on dirstream, which can mean e.g., that the current
+                   directory has been removed.  */
+                __set_errno (ENOENT);
+              goto lose;
+            }
+          if (d->d_name[0] == '.' &&
+              (d->d_name[1] == '\0' ||
+               (d->d_name[1] == '.' && d->d_name[2] == '\0')))
+            continue;
 
-	  if (use_d_ino)
-	    {
-	      bool match = (MATCHING_INO (d, thisino) || mount_point);
-	      if (! match)
-		continue;
-	    }
+          if (use_d_ino)
+            {
+              bool match = (MATCHING_INO (d, thisino) || mount_point);
+              if (! match)
+                continue;
+            }
 
-	  {
-	    int entry_status;
+          {
+            int entry_status;
 #if HAVE_OPENAT_SUPPORT
-	    entry_status = fstatat (fd, d->d_name, &st, AT_SYMLINK_NOFOLLOW);
+            entry_status = fstatat (fd, d->d_name, &st, AT_SYMLINK_NOFOLLOW);
 #else
-	    /* Compute size needed for this file name, or for the file
-	       name ".." in the same directory, whichever is larger.
-	       Room for ".." might be needed the next time through
-	       the outer loop.  */
-	    size_t name_alloc = _D_ALLOC_NAMLEN (d);
-	    size_t filesize = dotlen + MAX (sizeof "..", name_alloc);
+            /* Compute size needed for this file name, or for the file
+               name ".." in the same directory, whichever is larger.
+               Room for ".." might be needed the next time through
+               the outer loop.  */
+            size_t name_alloc = _D_ALLOC_NAMLEN (d);
+            size_t filesize = dotlen + MAX (sizeof "..", name_alloc);
 
-	    if (filesize < dotlen)
-	      goto memory_exhausted;
+            if (filesize < dotlen)
+              goto memory_exhausted;
 
-	    if (dotsize < filesize)
-	      {
-		/* My, what a deep directory tree you have, Grandma.  */
-		size_t newsize = MAX (filesize, dotsize * 2);
-		size_t i;
-		if (newsize < dotsize)
-		  goto memory_exhausted;
-		if (dotlist != dots)
-		  free (dotlist);
-		dotlist = malloc (newsize);
-		if (dotlist == NULL)
-		  goto lose;
-		dotsize = newsize;
+            if (dotsize < filesize)
+              {
+                /* My, what a deep directory tree you have, Grandma.  */
+                size_t newsize = MAX (filesize, dotsize * 2);
+                size_t i;
+                if (newsize < dotsize)
+                  goto memory_exhausted;
+                if (dotlist != dots)
+                  free (dotlist);
+                dotlist = malloc (newsize);
+                if (dotlist == NULL)
+                  goto lose;
+                dotsize = newsize;
 
-		i = 0;
-		do
-		  {
-		    dotlist[i++] = '.';
-		    dotlist[i++] = '.';
-		    dotlist[i++] = '/';
-		  }
-		while (i < dotlen);
-	      }
+                i = 0;
+                do
+                  {
+                    dotlist[i++] = '.';
+                    dotlist[i++] = '.';
+                    dotlist[i++] = '/';
+                  }
+                while (i < dotlen);
+              }
 
-	    memcpy (dotlist + dotlen, d->d_name, _D_ALLOC_NAMLEN (d));
-	    entry_status = __lstat (dotlist, &st);
+            memcpy (dotlist + dotlen, d->d_name, _D_ALLOC_NAMLEN (d));
+            entry_status = __lstat (dotlist, &st);
 #endif
-	    /* We don't fail here if we cannot stat() a directory entry.
-	       This can happen when (network) file systems fail.  If this
-	       entry is in fact the one we are looking for we will find
-	       out soon as we reach the end of the directory without
-	       having found anything.  */
-	    if (entry_status == 0 && S_ISDIR (st.st_mode)
-		&& st.st_dev == thisdev && st.st_ino == thisino)
-	      break;
-	  }
-	}
+            /* We don't fail here if we cannot stat() a directory entry.
+               This can happen when (network) file systems fail.  If this
+               entry is in fact the one we are looking for we will find
+               out soon as we reach the end of the directory without
+               having found anything.  */
+            if (entry_status == 0 && S_ISDIR (st.st_mode)
+                && st.st_dev == thisdev && st.st_ino == thisino)
+              break;
+          }
+        }
 
       dirroom = dirp - dir;
       namlen = _D_EXACT_NAMLEN (d);
 
       if (dirroom <= namlen)
-	{
-	  if (size != 0)
-	    {
-	      __set_errno (ERANGE);
-	      goto lose;
-	    }
-	  else
-	    {
-	      char *tmp;
-	      size_t oldsize = allocated;
+        {
+          if (size != 0)
+            {
+              __set_errno (ERANGE);
+              goto lose;
+            }
+          else
+            {
+              char *tmp;
+              size_t oldsize = allocated;
 
-	      allocated += MAX (allocated, namlen);
-	      if (allocated < oldsize
-		  || ! (tmp = realloc (dir, allocated)))
-		goto memory_exhausted;
+              allocated += MAX (allocated, namlen);
+              if (allocated < oldsize
+                  || ! (tmp = realloc (dir, allocated)))
+                goto memory_exhausted;
 
-	      /* Move current contents up to the end of the buffer.
-		 This is guaranteed to be non-overlapping.  */
-	      dirp = memcpy (tmp + allocated - (oldsize - dirroom),
-			     tmp + dirroom,
-			     oldsize - dirroom);
-	      dir = tmp;
-	    }
-	}
+              /* Move current contents up to the end of the buffer.
+                 This is guaranteed to be non-overlapping.  */
+              dirp = memcpy (tmp + allocated - (oldsize - dirroom),
+                             tmp + dirroom,
+                             oldsize - dirroom);
+              dir = tmp;
+            }
+        }
       dirp -= namlen;
       memcpy (dirp, d->d_name, namlen);
       *--dirp = '/';

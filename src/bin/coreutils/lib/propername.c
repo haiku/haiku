@@ -1,5 +1,5 @@
 /* Localization of proper names.
-   Copyright (C) 2006-2009 Free Software Foundation, Inc.
+   Copyright (C) 2006-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -55,92 +55,92 @@ mbsstr_trimmed_wordbounded (const char *string, const char *sub)
     {
       const char *tsub_in_string = mbsstr (string, tsub);
       if (tsub_in_string == NULL)
-	break;
+        break;
       else
-	{
-	  if (MB_CUR_MAX > 1)
-	    {
-	      mbui_iterator_t string_iter;
-	      bool word_boundary_before;
-	      bool word_boundary_after;
+        {
+          if (MB_CUR_MAX > 1)
+            {
+              mbui_iterator_t string_iter;
+              bool word_boundary_before;
+              bool word_boundary_after;
 
-	      mbui_init (string_iter, string);
-	      word_boundary_before = true;
-	      if (mbui_cur_ptr (string_iter) < tsub_in_string)
-		{
-		  mbchar_t last_char_before_tsub;
-		  do
-		    {
-		      if (!mbui_avail (string_iter))
-			abort ();
-		      last_char_before_tsub = mbui_cur (string_iter);
-		      mbui_advance (string_iter);
-		    }
-		  while (mbui_cur_ptr (string_iter) < tsub_in_string);
-		  if (mb_isalnum (last_char_before_tsub))
-		    word_boundary_before = false;
-		}
+              mbui_init (string_iter, string);
+              word_boundary_before = true;
+              if (mbui_cur_ptr (string_iter) < tsub_in_string)
+                {
+                  mbchar_t last_char_before_tsub;
+                  do
+                    {
+                      if (!mbui_avail (string_iter))
+                        abort ();
+                      last_char_before_tsub = mbui_cur (string_iter);
+                      mbui_advance (string_iter);
+                    }
+                  while (mbui_cur_ptr (string_iter) < tsub_in_string);
+                  if (mb_isalnum (last_char_before_tsub))
+                    word_boundary_before = false;
+                }
 
-	      mbui_init (string_iter, tsub_in_string);
-	      {
-		mbui_iterator_t tsub_iter;
+              mbui_init (string_iter, tsub_in_string);
+              {
+                mbui_iterator_t tsub_iter;
 
-		for (mbui_init (tsub_iter, tsub);
-		     mbui_avail (tsub_iter);
-		     mbui_advance (tsub_iter))
-		  {
-		    if (!mbui_avail (string_iter))
-		      abort ();
-		    mbui_advance (string_iter);
-		  }
-	      }
-	      word_boundary_after = true;
-	      if (mbui_avail (string_iter))
-		{
-		  mbchar_t first_char_after_tsub = mbui_cur (string_iter);
-		  if (mb_isalnum (first_char_after_tsub))
-		    word_boundary_after = false;
-		}
+                for (mbui_init (tsub_iter, tsub);
+                     mbui_avail (tsub_iter);
+                     mbui_advance (tsub_iter))
+                  {
+                    if (!mbui_avail (string_iter))
+                      abort ();
+                    mbui_advance (string_iter);
+                  }
+              }
+              word_boundary_after = true;
+              if (mbui_avail (string_iter))
+                {
+                  mbchar_t first_char_after_tsub = mbui_cur (string_iter);
+                  if (mb_isalnum (first_char_after_tsub))
+                    word_boundary_after = false;
+                }
 
-	      if (word_boundary_before && word_boundary_after)
-		{
-		  found = true;
-		  break;
-		}
+              if (word_boundary_before && word_boundary_after)
+                {
+                  found = true;
+                  break;
+                }
 
-	      mbui_init (string_iter, tsub_in_string);
-	      if (!mbui_avail (string_iter))
-		break;
-	      string = tsub_in_string + mb_len (mbui_cur (string_iter));
-	    }
-	  else
-	    {
-	      bool word_boundary_before;
-	      const char *p;
-	      bool word_boundary_after;
+              mbui_init (string_iter, tsub_in_string);
+              if (!mbui_avail (string_iter))
+                break;
+              string = tsub_in_string + mb_len (mbui_cur (string_iter));
+            }
+          else
+            {
+              bool word_boundary_before;
+              const char *p;
+              bool word_boundary_after;
 
-	      word_boundary_before = true;
-	      if (string < tsub_in_string)
-		if (isalnum ((unsigned char) tsub_in_string[-1]))
-		  word_boundary_before = false;
+              word_boundary_before = true;
+              if (string < tsub_in_string)
+                if (isalnum ((unsigned char) tsub_in_string[-1]))
+                  word_boundary_before = false;
 
-	      p = tsub_in_string + strlen (tsub);
-	      word_boundary_after = true;
-	      if (*p != '\0')
-		if (isalnum ((unsigned char) *p))
-		  word_boundary_after = false;
+              p = tsub_in_string + strlen (tsub);
+              word_boundary_after = true;
+              if (*p != '\0')
+                if (isalnum ((unsigned char) *p))
+                  word_boundary_after = false;
 
-	      if (word_boundary_before && word_boundary_after)
-		{
-		  found = true;
-		  break;
-		}
+              if (word_boundary_before && word_boundary_after)
+                {
+                  found = true;
+                  break;
+                }
 
-	      if (*tsub_in_string == '\0')
-		break;
-	      string = tsub_in_string + 1;
-	    }
-	}
+              if (*tsub_in_string == '\0')
+                break;
+              string = tsub_in_string + 1;
+            }
+        }
     }
   free (tsub);
   return found;
@@ -158,16 +158,16 @@ proper_name (const char *name)
     {
       /* See whether the translation contains the original name.  */
       if (mbsstr_trimmed_wordbounded (translation, name))
-	return translation;
+        return translation;
       else
-	{
-	  /* Return "TRANSLATION (NAME)".  */
-	  char *result =
-	    XNMALLOC (strlen (translation) + 2 + strlen (name) + 1 + 1, char);
+        {
+          /* Return "TRANSLATION (NAME)".  */
+          char *result =
+            XNMALLOC (strlen (translation) + 2 + strlen (name) + 1 + 1, char);
 
-	  sprintf (result, "%s (%s)", translation, name);
-	  return result;
-	}
+          sprintf (result, "%s (%s)", translation, name);
+          return result;
+        }
     }
   else
     return name;
@@ -196,37 +196,37 @@ proper_name_utf8 (const char *name_ascii, const char *name_utf8)
     {
 #if HAVE_ICONV
       name_converted = alloc_name_converted =
-	xstr_iconv (name_utf8, "UTF-8", locale_code);
+        xstr_iconv (name_utf8, "UTF-8", locale_code);
 
 # if (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2) || __GLIBC__ > 2 \
      || _LIBICONV_VERSION >= 0x0105
       {
-	char *converted_translit;
+        char *converted_translit;
 
-	size_t len = strlen (locale_code);
-	char *locale_code_translit = XNMALLOC (len + 10 + 1, char);
-	memcpy (locale_code_translit, locale_code, len);
-	memcpy (locale_code_translit + len, "//TRANSLIT", 10 + 1);
+        size_t len = strlen (locale_code);
+        char *locale_code_translit = XNMALLOC (len + 10 + 1, char);
+        memcpy (locale_code_translit, locale_code, len);
+        memcpy (locale_code_translit + len, "//TRANSLIT", 10 + 1);
 
-	converted_translit =
-	  xstr_iconv (name_utf8, "UTF-8", locale_code_translit);
+        converted_translit =
+          xstr_iconv (name_utf8, "UTF-8", locale_code_translit);
 
-	free (locale_code_translit);
+        free (locale_code_translit);
 
-	if (converted_translit != NULL)
-	  {
+        if (converted_translit != NULL)
+          {
 #  if !_LIBICONV_VERSION
-	    /* Don't use the transliteration if it added question marks.
-	       glibc's transliteration falls back to question marks; libiconv's
-	       transliteration does not.
-	       mbschr is equivalent to strchr in this case.  */
-	    if (strchr (converted_translit, '?') != NULL)
-	      free (converted_translit);
-	    else
+            /* Don't use the transliteration if it added question marks.
+               glibc's transliteration falls back to question marks; libiconv's
+               transliteration does not.
+               mbschr is equivalent to strchr in this case.  */
+            if (strchr (converted_translit, '?') != NULL)
+              free (converted_translit);
+            else
 #  endif
-	      name_converted_translit = alloc_name_converted_translit =
-		converted_translit;
-	  }
+              name_converted_translit = alloc_name_converted_translit =
+                converted_translit;
+          }
       }
 # endif
 #endif
@@ -239,8 +239,8 @@ proper_name_utf8 (const char *name_ascii, const char *name_utf8)
 
   /* The name in locale encoding.  */
   name = (name_converted != NULL ? name_converted :
-	  name_converted_translit != NULL ? name_converted_translit :
-	  name_ascii);
+          name_converted_translit != NULL ? name_converted_translit :
+          name_ascii);
 
   /* See whether we have a translation.  Some translators have not understood
      that they should use the UTF-8 form of the name, if possible.  So if the
@@ -249,39 +249,39 @@ proper_name_utf8 (const char *name_ascii, const char *name_utf8)
     {
       /* See whether the translation contains the original name.  */
       if (mbsstr_trimmed_wordbounded (translation, name_ascii)
-	  || (name_converted != NULL
-	      && mbsstr_trimmed_wordbounded (translation, name_converted))
-	  || (name_converted_translit != NULL
-	      && mbsstr_trimmed_wordbounded (translation, name_converted_translit)))
-	{
-	  if (alloc_name_converted != NULL)
-	    free (alloc_name_converted);
-	  if (alloc_name_converted_translit != NULL)
-	    free (alloc_name_converted_translit);
-	  return translation;
-	}
+          || (name_converted != NULL
+              && mbsstr_trimmed_wordbounded (translation, name_converted))
+          || (name_converted_translit != NULL
+              && mbsstr_trimmed_wordbounded (translation, name_converted_translit)))
+        {
+          if (alloc_name_converted != NULL)
+            free (alloc_name_converted);
+          if (alloc_name_converted_translit != NULL)
+            free (alloc_name_converted_translit);
+          return translation;
+        }
       else
-	{
-	  /* Return "TRANSLATION (NAME)".  */
-	  char *result =
-	    XNMALLOC (strlen (translation) + 2 + strlen (name) + 1 + 1, char);
+        {
+          /* Return "TRANSLATION (NAME)".  */
+          char *result =
+            XNMALLOC (strlen (translation) + 2 + strlen (name) + 1 + 1, char);
 
-	  sprintf (result, "%s (%s)", translation, name);
+          sprintf (result, "%s (%s)", translation, name);
 
-	  if (alloc_name_converted != NULL)
-	    free (alloc_name_converted);
-	  if (alloc_name_converted_translit != NULL)
-	    free (alloc_name_converted_translit);
-	  return result;
-	}
+          if (alloc_name_converted != NULL)
+            free (alloc_name_converted);
+          if (alloc_name_converted_translit != NULL)
+            free (alloc_name_converted_translit);
+          return result;
+        }
     }
   else
     {
       if (alloc_name_converted != NULL && alloc_name_converted != name)
-	free (alloc_name_converted);
+        free (alloc_name_converted);
       if (alloc_name_converted_translit != NULL
-	  && alloc_name_converted_translit != name)
-	free (alloc_name_converted_translit);
+          && alloc_name_converted_translit != name)
+        free (alloc_name_converted_translit);
       return name;
     }
 }

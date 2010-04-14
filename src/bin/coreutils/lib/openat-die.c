@@ -1,6 +1,6 @@
 /* Report a save- or restore-cwd failure in our openat replacement and then exit.
 
-   Copyright (C) 2005, 2006, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ void
 openat_save_fail (int errnum)
 {
   error (exit_failure, errnum,
-	 _("unable to record current working directory"));
+         _("unable to record current working directory"));
 
   /* The `noreturn' attribute cannot be applied to error, since it returns
      when its first argument is 0.  To help compilers understand that this
@@ -40,11 +40,16 @@ openat_save_fail (int errnum)
   abort ();
 }
 
+
+/* Exit with an error about failure to restore the working directory
+   during an openat emulation.  The caller must ensure that fd 2 is
+   not a just-opened fd, even when openat_safer is not in use.  */
+
 void
 openat_restore_fail (int errnum)
 {
   error (exit_failure, errnum,
-	 _("failed to return to initial working directory"));
+         _("failed to return to initial working directory"));
 
   /* As above.  */
   abort ();

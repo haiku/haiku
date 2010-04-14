@@ -1,5 +1,282 @@
 GNU coreutils NEWS                                    -*- outline -*-
 
+* Noteworthy changes in release 8.4 (2010-01-13) [stable]
+
+** Bug fixes
+
+  nproc --all is now guaranteed to be as large as the count
+  of available processors, which may not have been the case
+  on GNU/Linux systems with neither /proc nor /sys available.
+  [bug introduced in coreutils-8.1]
+
+** Build-related
+
+  Work around a build failure when using buggy <sys/capability.h>.
+  Alternatively, configure with --disable-libcap.
+
+  Compilation would fail on systems using glibc-2.7..2.9 due to changes in
+  gnulib's wchar.h that tickled a bug in at least those versions of glibc's
+  own <wchar.h> header.  Now, gnulib works around the bug in those older
+  glibc <wchar.h> headers.
+
+  Building would fail with a link error (cp/copy.o) when XATTR headers
+  were installed without the corresponding library.  Now, configure
+  detects that and disables xattr support, as one would expect.
+
+
+* Noteworthy changes in release 8.3 (2010-01-07) [stable]
+
+** Bug fixes
+
+  cp -p, install -p, mv, and touch -c could trigger a spurious error
+  message when using new glibc coupled with an old kernel.
+  [bug introduced in coreutils-6.12].
+
+  ls -l --color no longer prints "argetm" in front of dangling
+  symlinks when the 'LINK target' directive was given to dircolors.
+  [bug introduced in fileutils-4.0]
+
+  pr's page header was improperly formatted for long file names.
+  [bug introduced in coreutils-7.2]
+
+  rm -r --one-file-system works once again.
+  The rewrite to make rm use fts introduced a regression whereby
+  a commmand of the above form would fail for all subdirectories.
+  [bug introduced in coreutils-8.0]
+
+  stat -f recognizes more file system types: k-afs, fuseblk, gfs/gfs2, ocfs2,
+  and rpc_pipefs. Also Minix V3 is displayed correctly as minix3, not minux3.
+  [bug introduced in coreutils-8.1]
+
+  tail -f (inotify-enabled) once again works with remote files.
+  The use of inotify with remote files meant that any changes to those
+  files that was not done from the local system would go unnoticed.
+  [bug introduced in coreutils-7.5]
+
+  tail -F (inotify-enabled) would abort when a tailed file is repeatedly
+  renamed-aside and then recreated.
+  [bug introduced in coreutils-7.5]
+
+  tail -F (inotify-enabled) could fail to follow renamed files.
+  E.g., given a "tail -F a b" process, running "mv a b" would
+  make tail stop tracking additions to "b".
+  [bug introduced in coreutils-7.5]
+
+  touch -a and touch -m could trigger bugs in some file systems, such
+  as xfs or ntfs-3g, and fail to update timestamps.
+  [bug introduced in coreutils-8.1]
+
+  wc now prints counts atomically so that concurrent
+  processes will not intersperse their output.
+  [the issue dates back to the initial implementation]
+
+
+* Noteworthy changes in release 8.2 (2009-12-11) [stable]
+
+** Bug fixes
+
+  id's use of mgetgroups no longer writes beyond the end of a malloc'd buffer
+  [bug introduced in coreutils-8.1]
+
+  id no longer crashes on systems without supplementary group support.
+  [bug introduced in coreutils-8.1]
+
+  rm once again handles zero-length arguments properly.
+  The rewrite to make rm use fts introduced a regression whereby
+  a command like "rm a '' b" would fail to remove "a" and "b", due to
+  the presence of the empty string argument.
+  [bug introduced in coreutils-8.0]
+
+  sort is now immune to the signal handling of its parent.
+  Specifically sort now doesn't exit with an error message
+  if it uses helper processes for compression and its parent
+  ignores CHLD signals. [bug introduced in coreutils-6.9]
+
+  tail without -f no longer access uninitialized memory
+  [bug introduced in coreutils-7.6]
+
+  timeout is now immune to the signal handling of its parent.
+  Specifically timeout now doesn't exit with an error message
+  if its parent ignores CHLD signals. [bug introduced in coreutils-7.6]
+
+  a user running "make distcheck" in the coreutils source directory,
+  with TMPDIR unset or set to the name of a world-writable directory,
+  and with a malicious user on the same system
+  was vulnerable to arbitrary code execution
+  [bug introduced in coreutils-5.0]
+
+
+* Noteworthy changes in release 8.1 (2009-11-18) [stable]
+
+** Bug fixes
+
+  chcon no longer exits immediately just because SELinux is disabled.
+  Even then, chcon may still be useful.
+  [bug introduced in coreutils-8.0]
+
+  chcon, chgrp, chmod, chown and du now diagnose an ostensible directory cycle
+  and arrange to exit nonzero.  Before, they would silently ignore the
+  offending directory and all "contents."
+
+  env -u A=B now fails, rather than silently adding A to the
+  environment.  Likewise, printenv A=B silently ignores the invalid
+  name.  [the bugs date back to the initial implementation]
+
+  ls --color now handles files with capabilities correctly.  Previously
+  files with capabilities were often not colored, and also sometimes, files
+  without capabilites were colored in error. [bug introduced in coreutils-7.0]
+
+  md5sum now prints checksums atomically so that concurrent
+  processes will not intersperse their output.
+  This also affected sum, sha1sum, sha224sum, sha384sum and sha512sum.
+  [the bug dates back to the initial implementation]
+
+  mktemp no longer leaves a temporary file behind if it was unable to
+  output the name of the file to stdout.
+  [the bug dates back to the initial implementation]
+
+  nice -n -1 PROGRAM now runs PROGRAM even when its internal setpriority
+  call fails with errno == EACCES.
+  [the bug dates back to the initial implementation]
+
+  nice, nohup, and su now refuse to execute the subsidiary program if
+  they detect write failure in printing an otherwise non-fatal warning
+  message to stderr.
+
+  stat -f recognizes more file system types: afs, cifs, anon-inode FS,
+  btrfs, cgroupfs, cramfs-wend, debugfs, futexfs, hfs, inotifyfs, minux3,
+  nilfs, securityfs, selinux, xenfs
+
+  tail -f (inotify-enabled) now avoids a race condition.
+  Before, any data appended in the tiny interval between the initial
+  read-to-EOF and the inotify watch initialization would be ignored
+  initially (until more data was appended), or forever, if the file
+  were first renamed or unlinked or never modified.
+  [The race was introduced in coreutils-7.5]
+
+  tail -F (inotify-enabled) now consistently tails a file that has been
+  replaced via renaming.  That operation provokes either of two sequences
+  of inotify events.  The less common sequence is now handled as well.
+  [The bug came with the implementation change in coreutils-7.5]
+
+  timeout now doesn't exit unless the command it is monitoring does,
+  for any specified signal. [bug introduced in coreutils-7.0].
+
+** Changes in behavior
+
+  chroot, env, nice, and su fail with status 125, rather than 1, on
+  internal error such as failure to parse command line arguments; this
+  is for consistency with stdbuf and timeout, and avoids ambiguity
+  with the invoked command failing with status 1.  Likewise, nohup
+  fails with status 125 instead of 127.
+
+  du (due to a change in gnulib's fts) can now traverse NFSv4 automounted
+  directories in which the stat'd device number of the mount point differs
+  during a traversal.  Before, it would fail, because such a mismatch would
+  usually represent a serious error or a subversion attempt.
+
+  echo and printf now interpret \e as the Escape character (0x1B).
+
+  rm -f /read-only-fs/nonexistent now succeeds and prints no diagnostic
+  on systems with an unlinkat syscall that sets errno to EROFS in that case.
+  Before, it would fail with a "Read-only file system" diagnostic.
+  Also, "rm /read-only-fs/nonexistent" now reports "file not found" rather
+  than the less precise "Read-only file system" error.
+
+** New programs
+
+  nproc: Print the number of processing units available to a process.
+
+** New features
+
+  env and printenv now accept the option --null (-0), as a means to
+  avoid ambiguity with newlines embedded in the environment.
+
+  md5sum --check now also accepts openssl-style checksums.
+  So do sha1sum, sha224sum, sha384sum and sha512sum.
+
+  mktemp now accepts the option --suffix to provide a known suffix
+  after the substitution in the template.  Additionally, uses such as
+  "mktemp fileXXXXXX.txt" are able to infer an appropriate --suffix.
+
+  touch now accepts the option --no-dereference (-h), as a means to
+  change symlink timestamps on platforms with enough support.
+
+
+* Noteworthy changes in release 8.0 (2009-10-06) [beta]
+
+** Bug fixes
+
+  cp --preserve=xattr and --archive now preserve extended attributes even
+  when the source file doesn't have write access.
+  [bug introduced in coreutils-7.1]
+
+  touch -t [[CC]YY]MMDDhhmm[.ss] now accepts a timestamp string ending in .60,
+  to accommodate leap seconds.
+  [the bug dates back to the initial implementation]
+
+  ls --color now reverts to the color of a base file type consistently
+  when the color of a more specific type is disabled.
+  [bug introduced in coreutils-5.90]
+
+  ls -LR exits with status 2, not 0, when it encounters a cycle
+
+  ls -is is now consistent with ls -lis in ignoring values returned
+  from a failed stat/lstat.  For example ls -Lis now prints "?", not "0",
+  for the inode number and allocated size of a dereferenced dangling symlink.
+
+  tail --follow --pid now avoids a race condition where data written
+  just before the process dies might not have been output by tail.
+  Also, tail no longer delays at all when the specified pid is not live.
+  [The race was introduced in coreutils-7.5,
+   and the unnecessary delay was present since textutils-1.22o]
+
+** Portability
+
+  On Solaris 9, many commands would mistakenly treat file/ the same as
+  file.  Now, even on such a system, path resolution obeys the POSIX
+  rules that a trailing slash ensures that the preceeding name is a
+  directory or a symlink to a directory.
+
+** Changes in behavior
+
+  id no longer prints SELinux " context=..." when the POSIXLY_CORRECT
+  environment variable is set.
+
+  readlink -f now ignores a trailing slash when deciding if the
+  last component (possibly via a dangling symlink) can be created,
+  since mkdir will succeed in that case.
+
+** New features
+
+  ln now accepts the options --logical (-L) and --physical (-P),
+  added by POSIX 2008.  The default behavior is -P on systems like
+  GNU/Linux where link(2) creates hard links to symlinks, and -L on
+  BSD systems where link(2) follows symlinks.
+
+  stat: without -f, a command-line argument of "-" now means standard input.
+  With --file-system (-f), an argument of "-" is now rejected.
+  If you really must operate on a file named "-", specify it as
+  "./-" or use "--" to separate options from arguments.
+
+** Improvements
+
+  rm: rewrite to use gnulib's fts
+  This makes rm -rf significantly faster (400-500%) in some pathological
+  cases, and slightly slower (20%) in at least one pathological case.
+
+  rm -r deletes deep hierarchies more efficiently.  Before, execution time
+  was quadratic in the depth of the hierarchy, now it is merely linear.
+  However, this improvement is not as pronounced as might be expected for
+  very deep trees, because prior to this change, for any relative name
+  length longer than 8KiB, rm -r would sacrifice official conformance to
+  avoid the disproportionate quadratic performance penalty.  Leading to
+  another improvement:
+
+  rm -r is now slightly more standards-conformant when operating on
+  write-protected files with relative names longer than 8KiB.
+
+
 * Noteworthy changes in release 7.6 (2009-09-11) [stable]
 
 ** Bug fixes
@@ -2629,10 +2906,10 @@ packages, see ./old/*/NEWS.
 
 ========================================================================
 
-Copyright (C) 2001-2009 Free Software Foundation, Inc.
+Copyright (C) 2001-2010 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.2 or
+under the terms of the GNU Free Documentation License, Version 1.3 or
 any later version published by the Free Software Foundation; with no
 Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
 Texts.  A copy of the license is included in the ``GNU Free

@@ -1,6 +1,6 @@
 /* touch -- change modification and access times of files
-   Copyright (C) 87, 1989-1991, 1995-2005, 2007-2009
-   Free Software Foundation, Inc.
+   Copyright (C) 1987, 1989-1991, 1995-2005, 2007-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <sys/types.h>
+#include <assert.h>
 
 #include "system.h"
 #include "argmatch.h"
@@ -57,6 +58,9 @@ static bool no_create;
 /* (-r) If true, use times from a reference file.  */
 static bool use_ref;
 
+/* (-h) If true, change the times of an existing symlink, if possible.  */
+static bool no_dereference;
+
 /* If true, the only thing we have to do is change both the
    modification and access time to the current time, so we don't
    have to own the file, just be able to read and write it.
@@ -84,6 +88,7 @@ static struct option const longopts[] =
   {"date", required_argument, NULL, 'd'},
   {"file", required_argument, NULL, 'r'}, /* FIXME: remove --file in 2010 */
   {"reference", required_argument, NULL, 'r'},
+  {"no-dereference", no_argument, NULL, 'h'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
@@ -119,15 +124,13 @@ static bool
 touch (const char *file)
 {
   bool ok;
-  struct stat sbuf;
   int fd = -1;
   int open_errno = 0;
-  struct timespec timespec[2];
-  struct timespec const *t;
+  struct timespec const *t = newtime;
 
   if (STREQ (file, "-"))
     fd = STDOUT_FILENO;
-  else if (! no_create)
+  else if (! (no_create || no_dereference))
     {
       /* Try to open FILE, creating it if necessary.  */
       fd = fd_reopen (STDIN_FILENO, file,
@@ -144,24 +147,13 @@ touch (const char *file)
 
   if (change_times != (CH_ATIME | CH_MTIME))
     {
-      /* We're setting only one of the time values.  stat the target to get
-         the other one.  If we have the file descriptor already, use fstat.
-         Otherwise, either we're in no-create mode (and hence didn't call open)
-         or FILE is inaccessible or a directory, so we have to use stat.  */
-      if (fd != -1 ? fstat (fd, &sbuf) : stat (file, &sbuf))
+      /* We're setting only one of the time values.  */
+      if (change_times == CH_MTIME)
+        newtime[0].tv_nsec = UTIME_OMIT;
+      else
         {
-          if (open_errno)
-            error (0, open_errno, _("creating %s"), quote (file));
-          else
-            {
-              if (no_create && (errno == ENOENT || errno == EBADF))
-                return true;
-              error (0, errno, _("failed to get attributes of %s"),
-                     quote (file));
-            }
-          if (fd == STDIN_FILENO)
-            close (fd);
-          return false;
+          assert (change_times == CH_ATIME);
+          newtime[1].tv_nsec = UTIME_OMIT;
         }
     }
 
@@ -171,18 +163,9 @@ touch (const char *file)
          write access to the file, but don't own it.  */
       t = NULL;
     }
-  else
-    {
-      timespec[0] = (change_times & CH_ATIME
-                     ? newtime[0]
-                     : get_stat_atime (&sbuf));
-      timespec[1] = (change_times & CH_MTIME
-                     ? newtime[1]
-                     : get_stat_mtime (&sbuf));
-      t = timespec;
-    }
 
-  ok = (gl_futimens (fd, (fd == STDOUT_FILENO ? NULL : file), t) == 0);
+  ok = ((no_dereference && fd == -1) ? lutimens (file, t)
+        : gl_futimens (fd, (fd == STDOUT_FILENO ? NULL : file), t)) == 0;
 
   if (fd == STDIN_FILENO)
     {
@@ -195,8 +178,7 @@ touch (const char *file)
   else if (fd == STDOUT_FILENO)
     {
       /* Do not diagnose "touch -c - >&-".  */
-      if (!ok && errno == EBADF && no_create
-          && change_times == (CH_ATIME | CH_MTIME))
+      if (!ok && errno == EBADF && no_create)
         return true;
     }
 
@@ -234,7 +216,8 @@ usage (int status)
       fputs (_("\
 Update the access and modification times of each FILE to the current time.\n\
 \n\
-A FILE argument that does not exist is created empty.\n\
+A FILE argument that does not exist is created empty, unless -c or -h\n\
+is supplied.\n\
 \n\
 A FILE argument string of - is handled specially and causes touch to\n\
 change the times of the file associated with standard output.\n\
@@ -248,6 +231,11 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -c, --no-create        do not create any files\n\
   -d, --date=STRING      parse STRING and use it instead of current time\n\
   -f                     (ignored)\n\
+"), stdout);
+      fputs (_("\
+  -h, --no-dereference   affect each symbolic link instead of any referenced\n\
+                         file (useful only on systems that can change the\n\
+                         timestamps of a symlink)\n\
   -m                     change only the modification time\n\
 "), stdout);
       fputs (_("\
@@ -263,7 +251,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 \n\
 Note that the -d and -t options accept different time-date formats.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -288,7 +276,7 @@ main (int argc, char **argv)
   change_times = 0;
   no_create = use_ref = false;
 
-  while ((c = getopt_long (argc, argv, "acd:fmr:t:", longopts, &long_idx)) != -1)
+  while ((c = getopt_long (argc, argv, "acd:fhmr:t:", longopts, &long_idx)) != -1)
     {
       switch (c)
         {
@@ -305,6 +293,10 @@ main (int argc, char **argv)
           break;
 
         case 'f':
+          break;
+
+        case 'h':
+          no_dereference = true;
           break;
 
         case 'm':
@@ -356,7 +348,10 @@ main (int argc, char **argv)
   if (use_ref)
     {
       struct stat ref_stats;
-      if (stat (ref_file, &ref_stats))
+      /* Don't use (no_dereference?lstat:stat) (args), since stat
+         might be an object-like macro.  */
+      if (no_dereference ? lstat (ref_file, &ref_stats)
+          : stat (ref_file, &ref_stats))
         error (EXIT_FAILURE, errno,
                _("failed to get attributes of %s"), quote (ref_file));
       newtime[0] = get_stat_atime (&ref_stats);
@@ -429,10 +424,7 @@ main (int argc, char **argv)
       if (change_times == (CH_ATIME | CH_MTIME))
         amtime_now = true;
       else
-        {
-          gettime (&newtime[0]);
-          newtime[1] = newtime[0];
-        }
+        newtime[1].tv_nsec = newtime[0].tv_nsec = UTIME_NOW;
     }
 
   if (optind == argc)

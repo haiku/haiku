@@ -1,5 +1,4 @@
-/* Copyright (C) 1991-1999, 2000, 2001, 2003, 2004, 2005, 2006, 2007, 2009 Free Software
-   Foundation, Inc.
+/* Copyright (C) 1991-2001, 2003-2007, 2009-2010 Free Software Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C Library.
    Bugs can be reported to bug-glibc@prep.ai.mit.edu.
@@ -27,6 +26,7 @@
 #else
 # include <config.h>
 # if FPRINTFTIME
+#  include "ignore-value.h"
 #  include "fprintftime.h"
 # else
 #  include "strftime.h"
@@ -96,9 +96,9 @@ extern char *tzname[];
    implementations (e.g., UNICOS 9.0 on a Cray Y-MP EL) don't shift
    right in the usual way when A < 0, so SHR falls back on division if
    ordinary A >> B doesn't seem to be the usual signed shift.  */
-#define SHR(a, b)	\
-  (-1 >> 1 == -1	\
-   ? (a) >> (b)		\
+#define SHR(a, b)       \
+  (-1 >> 1 == -1        \
+   ? (a) >> (b)         \
    : (a) / (1 << (b)) - ((a) % (1 << (b)) < 0))
 
 /* Bound on length of the string representing an integer type or expression T.
@@ -113,7 +113,7 @@ extern char *tzname[];
 #ifndef __isleap
 /* Nonzero if YEAR is a leap year (every 4 years,
    except every 100th isn't, and every 400th is).  */
-# define __isleap(year)	\
+# define __isleap(year) \
   ((year) % 4 == 0 && ((year) % 100 != 0 || (year) % 400 == 0))
 #endif
 
@@ -166,27 +166,27 @@ extern char *tzname[];
 # define advance(P, N) ((P) += (N))
 #endif
 
-#define add(n, f)							      \
-  do									      \
-    {									      \
-      int _n = (n);							      \
-      int _delta = width - _n;						      \
-      int _incr = _n + (_delta > 0 ? _delta : 0);			      \
-      if ((size_t) _incr >= maxsize - i)				      \
-	return 0;							      \
-      if (p)								      \
-	{								      \
-	  if (digits == 0 && _delta > 0)				      \
-	    {								      \
-	      if (pad == L_('0'))					      \
-		memset_zero (p, _delta);				      \
-	      else							      \
-		memset_space (p, _delta);				      \
-	    }								      \
-	  f;								      \
-	  advance (p, _n);						      \
-	}								      \
-      i += _incr;							      \
+#define add(n, f)                                                             \
+  do                                                                          \
+    {                                                                         \
+      int _n = (n);                                                           \
+      int _delta = width - _n;                                                \
+      int _incr = _n + (_delta > 0 ? _delta : 0);                             \
+      if ((size_t) _incr >= maxsize - i)                                      \
+        return 0;                                                             \
+      if (p)                                                                  \
+        {                                                                     \
+          if (digits == 0 && _delta > 0)                                      \
+            {                                                                 \
+              if (pad == L_('0'))                                             \
+                memset_zero (p, _delta);                                      \
+              else                                                            \
+                memset_space (p, _delta);                                     \
+            }                                                                 \
+          f;                                                                  \
+          advance (p, _n);                                                    \
+        }                                                                     \
+      i += _incr;                                                             \
     } while (0)
 
 #if FPRINTFTIME
@@ -197,22 +197,35 @@ extern char *tzname[];
 
 #if FPRINTFTIME
 # define cpy(n, s) \
-    add ((n),								      \
-	 if (to_lowcase)						      \
-	   fwrite_lowcase (p, (s), _n);					      \
-	 else if (to_uppcase)						      \
-	   fwrite_uppcase (p, (s), _n);					      \
-	 else								      \
-	   fwrite ((s), _n, 1, p))
+    add ((n),                                                                 \
+     do                                                                       \
+       {                                                                      \
+         if (to_lowcase)                                                      \
+           fwrite_lowcase (p, (s), _n);                                       \
+         else if (to_uppcase)                                                 \
+           fwrite_uppcase (p, (s), _n);                                       \
+         else                                                                 \
+           {                                                                  \
+             /* We are ignoring the value of fwrite here, in spite of the     \
+                fact that technically, that may not be valid: the fwrite      \
+                specification in POSIX 2008 defers to that of fputc, which    \
+                is intended to be consistent with the one from ISO C,         \
+                which permits failure due to ENOMEM *without* setting the     \
+                stream's error indicator.  */                                 \
+             ignore_value (fwrite ((s), _n, 1, p));                           \
+           }                                                                  \
+       }                                                                      \
+     while (0)                                                                \
+    )
 #else
-# define cpy(n, s)							      \
-    add ((n),								      \
-	 if (to_lowcase)						      \
-	   memcpy_lowcase (p, (s), _n LOCALE_ARG);			      \
-	 else if (to_uppcase)						      \
-	   memcpy_uppcase (p, (s), _n LOCALE_ARG);			      \
-	 else								      \
-	   MEMCPY ((void *) p, (void const *) (s), _n))
+# define cpy(n, s)                                                            \
+    add ((n),                                                                 \
+         if (to_lowcase)                                                      \
+           memcpy_lowcase (p, (s), _n LOCALE_ARG);                            \
+         else if (to_uppcase)                                                 \
+           memcpy_uppcase (p, (s), _n LOCALE_ARG);                            \
+         else                                                                 \
+           MEMCPY ((void *) p, (void const *) (s), _n))
 #endif
 
 #ifdef COMPILE_WIDE
@@ -221,13 +234,13 @@ extern char *tzname[];
 #  define __mbsrtowcs_l(d, s, l, st, loc) __mbsrtowcs (d, s, l, st)
 # endif
 # define widen(os, ws, l) \
-  {									      \
-    mbstate_t __st;							      \
-    const char *__s = os;						      \
-    memset (&__st, '\0', sizeof (__st));				      \
-    l = __mbsrtowcs_l (NULL, &__s, 0, &__st, loc);			      \
-    ws = (wchar_t *) alloca ((l + 1) * sizeof (wchar_t));		      \
-    (void) __mbsrtowcs_l (ws, &__s, l, &__st, loc);			      \
+  {                                                                           \
+    mbstate_t __st;                                                           \
+    const char *__s = os;                                                     \
+    memset (&__st, '\0', sizeof (__st));                                      \
+    l = __mbsrtowcs_l (NULL, &__s, 0, &__st, loc);                            \
+    ws = (wchar_t *) alloca ((l + 1) * sizeof (wchar_t));                     \
+    (void) __mbsrtowcs_l (ws, &__s, l, &__st, loc);                           \
   }
 #endif
 
@@ -237,8 +250,8 @@ extern char *tzname[];
    function gets as an additional argument the locale which has to be
    used.  To access the values we have to redefine the _NL_CURRENT
    macro.  */
-# define strftime		__strftime_l
-# define wcsftime		__wcsftime_l
+# define strftime               __strftime_l
+# define wcsftime               __wcsftime_l
 # undef _NL_CURRENT
 # define _NL_CURRENT(category, item) \
   (current->values[_NL_ITEM_INDEX (item)].string)
@@ -301,7 +314,7 @@ fwrite_uppcase (FILE *fp, const CHAR_T *src, size_t len)
 #else
 static CHAR_T *
 memcpy_lowcase (CHAR_T *dest, const CHAR_T *src,
-		size_t len LOCALE_PARAM_PROTO)
+                size_t len LOCALE_PARAM_PROTO)
 {
   while (len-- > 0)
     dest[len] = TOLOWER ((UCHAR_T) src[len], loc);
@@ -310,7 +323,7 @@ memcpy_lowcase (CHAR_T *dest, const CHAR_T *src,
 
 static CHAR_T *
 memcpy_uppcase (CHAR_T *dest, const CHAR_T *src,
-		size_t len LOCALE_PARAM_PROTO)
+                size_t len LOCALE_PARAM_PROTO)
 {
   while (len-- > 0)
     dest[len] = TOUPPER ((UCHAR_T) src[len], loc);
@@ -338,10 +351,10 @@ tm_diff (const struct tm *a, const struct tm *b)
   int intervening_leap_days = (a4 - b4) - (a100 - b100) + (a400 - b400);
   int years = a->tm_year - b->tm_year;
   int days = (365 * years + intervening_leap_days
-	      + (a->tm_yday - b->tm_yday));
+              + (a->tm_yday - b->tm_yday));
   return (60 * (60 * (24 * days + (a->tm_hour - b->tm_hour))
-		+ (a->tm_min - b->tm_min))
-	  + (a->tm_sec - b->tm_sec));
+                + (a->tm_min - b->tm_min))
+          + (a->tm_sec - b->tm_sec));
 }
 #endif /* ! HAVE_TM_GMTOFF */
 
@@ -363,8 +376,8 @@ iso_week_days (int yday, int wday)
   /* Add enough to the first operand of % to make it nonnegative.  */
   int big_enough_multiple_of_7 = (-YDAY_MINIMUM / 7 + 2) * 7;
   return (yday
-	  - (yday - wday + ISO_WEEK1_WDAY + big_enough_multiple_of_7) % 7
-	  + ISO_WEEK1_WDAY - ISO_WEEK_START_WDAY);
+          - (yday - wday + ISO_WEEK1_WDAY + big_enough_multiple_of_7) % 7
+          + ISO_WEEK1_WDAY - ISO_WEEK_START_WDAY);
 }
 
 
@@ -405,9 +418,9 @@ iso_week_days (int yday, int wday)
    to indicate that the result should be converted to upper case.  */
 static size_t
 strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
-		STRFTIME_ARG (size_t maxsize)
-		const CHAR_T *format,
-		const struct tm *tp extra_args_spec LOCALE_PARAM_PROTO)
+                STRFTIME_ARG (size_t maxsize)
+                const CHAR_T *format,
+                const struct tm *tp extra_args_spec LOCALE_PARAM_PROTO)
 {
 #if defined _LIBC && defined USE_IN_EXTENDED_LOCALE_MODEL
   struct locale_data *const current = loc->__locales[LC_TIME];
@@ -433,8 +446,8 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 # define f_month \
   ((const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(MON_1) + tp->tm_mon))
 # define ampm \
-  ((const CHAR_T *) _NL_CURRENT (LC_TIME, tp->tm_hour > 11		      \
-				 ? NLW(PM_STR) : NLW(AM_STR)))
+  ((const CHAR_T *) _NL_CURRENT (LC_TIME, tp->tm_hour > 11                    \
+                                 ? NLW(PM_STR) : NLW(AM_STR)))
 
 # define aw_len STRLEN (a_wkday)
 # define am_len STRLEN (a_month)
@@ -471,12 +484,12 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
   if (ut)
     {
       if (! (zone && *zone))
-	zone = "GMT";
+        zone = "GMT";
     }
   else
     {
       /* POSIX.1 requires that local time zone information be used as
-	 though strftime called tzset.  */
+         though strftime called tzset.  */
 # if HAVE_TZSET
       tzset ();
 # endif
@@ -491,22 +504,22 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 
   for (f = format; *f != '\0'; ++f)
     {
-      int pad = 0;		/* Padding for number ('-', '_', or 0).  */
-      int modifier;		/* Field modifier ('E', 'O', or 0).  */
-      int digits = 0;		/* Max digits for numeric format.  */
-      int number_value;		/* Numeric value to be printed.  */
+      int pad = 0;              /* Padding for number ('-', '_', or 0).  */
+      int modifier;             /* Field modifier ('E', 'O', or 0).  */
+      int digits = 0;           /* Max digits for numeric format.  */
+      int number_value;         /* Numeric value to be printed.  */
       unsigned int u_number_value; /* (unsigned int) number_value.  */
-      bool negative_number;	/* The number is negative.  */
+      bool negative_number;     /* The number is negative.  */
       bool always_output_a_sign; /* +/- should always be output.  */
-      int tz_colon_mask;	/* Bitmask of where ':' should appear.  */
+      int tz_colon_mask;        /* Bitmask of where ':' should appear.  */
       const CHAR_T *subfmt;
       CHAR_T sign_char;
       CHAR_T *bufp;
       CHAR_T buf[1
-		 + 2 /* for the two colons in a %::z or %:::z time zone */
-		 + (sizeof (int) < sizeof (time_t)
-		    ? INT_STRLEN_BOUND (time_t)
-		    : INT_STRLEN_BOUND (int))];
+                 + 2 /* for the two colons in a %::z or %:::z time zone */
+                 + (sizeof (int) < sizeof (time_t)
+                    ? INT_STRLEN_BOUND (time_t)
+                    : INT_STRLEN_BOUND (int))];
       int width = -1;
       bool to_lowcase = false;
       bool to_uppcase = upcase;
@@ -516,900 +529,900 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
 
 #if DO_MULTIBYTE && !defined COMPILE_WIDE
       switch (*f)
-	{
-	case L_('%'):
-	  break;
+        {
+        case L_('%'):
+          break;
 
-	case L_('\b'): case L_('\t'): case L_('\n'):
-	case L_('\v'): case L_('\f'): case L_('\r'):
-	case L_(' '): case L_('!'): case L_('"'): case L_('#'): case L_('&'):
-	case L_('\''): case L_('('): case L_(')'): case L_('*'): case L_('+'):
-	case L_(','): case L_('-'): case L_('.'): case L_('/'): case L_('0'):
-	case L_('1'): case L_('2'): case L_('3'): case L_('4'): case L_('5'):
-	case L_('6'): case L_('7'): case L_('8'): case L_('9'): case L_(':'):
-	case L_(';'): case L_('<'): case L_('='): case L_('>'): case L_('?'):
-	case L_('A'): case L_('B'): case L_('C'): case L_('D'): case L_('E'):
-	case L_('F'): case L_('G'): case L_('H'): case L_('I'): case L_('J'):
-	case L_('K'): case L_('L'): case L_('M'): case L_('N'): case L_('O'):
-	case L_('P'): case L_('Q'): case L_('R'): case L_('S'): case L_('T'):
-	case L_('U'): case L_('V'): case L_('W'): case L_('X'): case L_('Y'):
-	case L_('Z'): case L_('['): case L_('\\'): case L_(']'): case L_('^'):
-	case L_('_'): case L_('a'): case L_('b'): case L_('c'): case L_('d'):
-	case L_('e'): case L_('f'): case L_('g'): case L_('h'): case L_('i'):
-	case L_('j'): case L_('k'): case L_('l'): case L_('m'): case L_('n'):
-	case L_('o'): case L_('p'): case L_('q'): case L_('r'): case L_('s'):
-	case L_('t'): case L_('u'): case L_('v'): case L_('w'): case L_('x'):
-	case L_('y'): case L_('z'): case L_('{'): case L_('|'): case L_('}'):
-	case L_('~'):
-	  /* The C Standard requires these 98 characters (plus '%') to
-	     be in the basic execution character set.  None of these
-	     characters can start a multibyte sequence, so they need
-	     not be analyzed further.  */
-	  add1 (*f);
-	  continue;
+        case L_('\b'): case L_('\t'): case L_('\n'):
+        case L_('\v'): case L_('\f'): case L_('\r'):
+        case L_(' '): case L_('!'): case L_('"'): case L_('#'): case L_('&'):
+        case L_('\''): case L_('('): case L_(')'): case L_('*'): case L_('+'):
+        case L_(','): case L_('-'): case L_('.'): case L_('/'): case L_('0'):
+        case L_('1'): case L_('2'): case L_('3'): case L_('4'): case L_('5'):
+        case L_('6'): case L_('7'): case L_('8'): case L_('9'): case L_(':'):
+        case L_(';'): case L_('<'): case L_('='): case L_('>'): case L_('?'):
+        case L_('A'): case L_('B'): case L_('C'): case L_('D'): case L_('E'):
+        case L_('F'): case L_('G'): case L_('H'): case L_('I'): case L_('J'):
+        case L_('K'): case L_('L'): case L_('M'): case L_('N'): case L_('O'):
+        case L_('P'): case L_('Q'): case L_('R'): case L_('S'): case L_('T'):
+        case L_('U'): case L_('V'): case L_('W'): case L_('X'): case L_('Y'):
+        case L_('Z'): case L_('['): case L_('\\'): case L_(']'): case L_('^'):
+        case L_('_'): case L_('a'): case L_('b'): case L_('c'): case L_('d'):
+        case L_('e'): case L_('f'): case L_('g'): case L_('h'): case L_('i'):
+        case L_('j'): case L_('k'): case L_('l'): case L_('m'): case L_('n'):
+        case L_('o'): case L_('p'): case L_('q'): case L_('r'): case L_('s'):
+        case L_('t'): case L_('u'): case L_('v'): case L_('w'): case L_('x'):
+        case L_('y'): case L_('z'): case L_('{'): case L_('|'): case L_('}'):
+        case L_('~'):
+          /* The C Standard requires these 98 characters (plus '%') to
+             be in the basic execution character set.  None of these
+             characters can start a multibyte sequence, so they need
+             not be analyzed further.  */
+          add1 (*f);
+          continue;
 
-	default:
-	  /* Copy this multibyte sequence until we reach its end, find
-	     an error, or come back to the initial shift state.  */
-	  {
-	    mbstate_t mbstate = mbstate_zero;
-	    size_t len = 0;
-	    size_t fsize;
+        default:
+          /* Copy this multibyte sequence until we reach its end, find
+             an error, or come back to the initial shift state.  */
+          {
+            mbstate_t mbstate = mbstate_zero;
+            size_t len = 0;
+            size_t fsize;
 
-	    if (! format_end)
-	      format_end = f + strlen (f) + 1;
-	    fsize = format_end - f;
+            if (! format_end)
+              format_end = f + strlen (f) + 1;
+            fsize = format_end - f;
 
-	    do
-	      {
-		size_t bytes = mbrlen (f + len, fsize - len, &mbstate);
+            do
+              {
+                size_t bytes = mbrlen (f + len, fsize - len, &mbstate);
 
-		if (bytes == 0)
-		  break;
+                if (bytes == 0)
+                  break;
 
-		if (bytes == (size_t) -2)
-		  {
-		    len += strlen (f + len);
-		    break;
-		  }
+                if (bytes == (size_t) -2)
+                  {
+                    len += strlen (f + len);
+                    break;
+                  }
 
-		if (bytes == (size_t) -1)
-		  {
-		    len++;
-		    break;
-		  }
+                if (bytes == (size_t) -1)
+                  {
+                    len++;
+                    break;
+                  }
 
-		len += bytes;
-	      }
-	    while (! mbsinit (&mbstate));
+                len += bytes;
+              }
+            while (! mbsinit (&mbstate));
 
-	    cpy (len, f);
-	    f += len - 1;
-	    continue;
-	  }
-	}
+            cpy (len, f);
+            f += len - 1;
+            continue;
+          }
+        }
 
 #else /* ! DO_MULTIBYTE */
 
       /* Either multibyte encodings are not supported, they are
-	 safe for formats, so any non-'%' byte can be copied through,
-	 or this is the wide character version.  */
+         safe for formats, so any non-'%' byte can be copied through,
+         or this is the wide character version.  */
       if (*f != L_('%'))
-	{
-	  add1 (*f);
-	  continue;
-	}
+        {
+          add1 (*f);
+          continue;
+        }
 
 #endif /* ! DO_MULTIBYTE */
 
       /* Check for flags that can modify a format.  */
       while (1)
-	{
-	  switch (*++f)
-	    {
-	      /* This influences the number formats.  */
-	    case L_('_'):
-	    case L_('-'):
-	    case L_('0'):
-	      pad = *f;
-	      continue;
+        {
+          switch (*++f)
+            {
+              /* This influences the number formats.  */
+            case L_('_'):
+            case L_('-'):
+            case L_('0'):
+              pad = *f;
+              continue;
 
-	      /* This changes textual output.  */
-	    case L_('^'):
-	      to_uppcase = true;
-	      continue;
-	    case L_('#'):
-	      change_case = true;
-	      continue;
+              /* This changes textual output.  */
+            case L_('^'):
+              to_uppcase = true;
+              continue;
+            case L_('#'):
+              change_case = true;
+              continue;
 
-	    default:
-	      break;
-	    }
-	  break;
-	}
+            default:
+              break;
+            }
+          break;
+        }
 
       /* As a GNU extension we allow to specify the field width.  */
       if (ISDIGIT (*f))
-	{
-	  width = 0;
-	  do
-	    {
-	      if (width > INT_MAX / 10
-		  || (width == INT_MAX / 10 && *f - L_('0') > INT_MAX % 10))
-		/* Avoid overflow.  */
-		width = INT_MAX;
-	      else
-		{
-		  width *= 10;
-		  width += *f - L_('0');
-		}
-	      ++f;
-	    }
-	  while (ISDIGIT (*f));
-	}
+        {
+          width = 0;
+          do
+            {
+              if (width > INT_MAX / 10
+                  || (width == INT_MAX / 10 && *f - L_('0') > INT_MAX % 10))
+                /* Avoid overflow.  */
+                width = INT_MAX;
+              else
+                {
+                  width *= 10;
+                  width += *f - L_('0');
+                }
+              ++f;
+            }
+          while (ISDIGIT (*f));
+        }
 
       /* Check for modifiers.  */
       switch (*f)
-	{
-	case L_('E'):
-	case L_('O'):
-	  modifier = *f++;
-	  break;
+        {
+        case L_('E'):
+        case L_('O'):
+          modifier = *f++;
+          break;
 
-	default:
-	  modifier = 0;
-	  break;
-	}
+        default:
+          modifier = 0;
+          break;
+        }
 
       /* Now do the specified format.  */
       format_char = *f;
       switch (format_char)
-	{
+        {
 #define DO_NUMBER(d, v) \
-	  digits = d;							      \
-	  number_value = v; goto do_number
+          digits = d;                                                         \
+          number_value = v; goto do_number
 #define DO_SIGNED_NUMBER(d, negative, v) \
-	  digits = d;							      \
-	  negative_number = negative;					      \
-	  u_number_value = v; goto do_signed_number
+          digits = d;                                                         \
+          negative_number = negative;                                         \
+          u_number_value = v; goto do_signed_number
 
-	  /* The mask is not what you might think.
-	     When the ordinal i'th bit is set, insert a colon
-	     before the i'th digit of the time zone representation.  */
+          /* The mask is not what you might think.
+             When the ordinal i'th bit is set, insert a colon
+             before the i'th digit of the time zone representation.  */
 #define DO_TZ_OFFSET(d, negative, mask, v) \
-	  digits = d;							      \
-	  negative_number = negative;					      \
-	  tz_colon_mask = mask;						      \
-	  u_number_value = v; goto do_tz_offset
+          digits = d;                                                         \
+          negative_number = negative;                                         \
+          tz_colon_mask = mask;                                               \
+          u_number_value = v; goto do_tz_offset
 #define DO_NUMBER_SPACEPAD(d, v) \
-	  digits = d;							      \
-	  number_value = v; goto do_number_spacepad
+          digits = d;                                                         \
+          number_value = v; goto do_number_spacepad
 
-	case L_('%'):
-	  if (modifier != 0)
-	    goto bad_format;
-	  add1 (*f);
-	  break;
+        case L_('%'):
+          if (modifier != 0)
+            goto bad_format;
+          add1 (*f);
+          break;
 
-	case L_('a'):
-	  if (modifier != 0)
-	    goto bad_format;
-	  if (change_case)
-	    {
-	      to_uppcase = true;
-	      to_lowcase = false;
-	    }
+        case L_('a'):
+          if (modifier != 0)
+            goto bad_format;
+          if (change_case)
+            {
+              to_uppcase = true;
+              to_lowcase = false;
+            }
 #ifdef _NL_CURRENT
-	  cpy (aw_len, a_wkday);
-	  break;
+          cpy (aw_len, a_wkday);
+          break;
 #else
-	  goto underlying_strftime;
+          goto underlying_strftime;
 #endif
 
-	case 'A':
-	  if (modifier != 0)
-	    goto bad_format;
-	  if (change_case)
-	    {
-	      to_uppcase = true;
-	      to_lowcase = false;
-	    }
+        case 'A':
+          if (modifier != 0)
+            goto bad_format;
+          if (change_case)
+            {
+              to_uppcase = true;
+              to_lowcase = false;
+            }
 #ifdef _NL_CURRENT
-	  cpy (STRLEN (f_wkday), f_wkday);
-	  break;
+          cpy (STRLEN (f_wkday), f_wkday);
+          break;
 #else
-	  goto underlying_strftime;
+          goto underlying_strftime;
 #endif
 
-	case L_('b'):
-	case L_('h'):
-	  if (change_case)
-	    {
-	      to_uppcase = true;
-	      to_lowcase = false;
-	    }
-	  if (modifier != 0)
-	    goto bad_format;
+        case L_('b'):
+        case L_('h'):
+          if (change_case)
+            {
+              to_uppcase = true;
+              to_lowcase = false;
+            }
+          if (modifier != 0)
+            goto bad_format;
 #ifdef _NL_CURRENT
-	  cpy (am_len, a_month);
-	  break;
+          cpy (am_len, a_month);
+          break;
 #else
-	  goto underlying_strftime;
+          goto underlying_strftime;
 #endif
 
-	case L_('B'):
-	  if (modifier != 0)
-	    goto bad_format;
-	  if (change_case)
-	    {
-	      to_uppcase = true;
-	      to_lowcase = false;
-	    }
+        case L_('B'):
+          if (modifier != 0)
+            goto bad_format;
+          if (change_case)
+            {
+              to_uppcase = true;
+              to_lowcase = false;
+            }
 #ifdef _NL_CURRENT
-	  cpy (STRLEN (f_month), f_month);
-	  break;
+          cpy (STRLEN (f_month), f_month);
+          break;
 #else
-	  goto underlying_strftime;
+          goto underlying_strftime;
 #endif
 
-	case L_('c'):
-	  if (modifier == L_('O'))
-	    goto bad_format;
+        case L_('c'):
+          if (modifier == L_('O'))
+            goto bad_format;
 #ifdef _NL_CURRENT
-	  if (! (modifier == 'E'
-		 && (*(subfmt =
-		       (const CHAR_T *) _NL_CURRENT (LC_TIME,
-						     NLW(ERA_D_T_FMT)))
-		     != '\0')))
-	    subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(D_T_FMT));
+          if (! (modifier == 'E'
+                 && (*(subfmt =
+                       (const CHAR_T *) _NL_CURRENT (LC_TIME,
+                                                     NLW(ERA_D_T_FMT)))
+                     != '\0')))
+            subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(D_T_FMT));
 #else
-	  goto underlying_strftime;
+          goto underlying_strftime;
 #endif
 
-	subformat:
-	  {
-	    size_t len = strftime_case_ (to_uppcase,
-					 NULL, STRFTIME_ARG ((size_t) -1)
-					 subfmt,
-					 tp extra_args LOCALE_ARG);
-	    add (len, strftime_case_ (to_uppcase, p,
-				      STRFTIME_ARG (maxsize - i)
-				      subfmt,
-				      tp extra_args LOCALE_ARG));
-	  }
-	  break;
+        subformat:
+          {
+            size_t len = strftime_case_ (to_uppcase,
+                                         NULL, STRFTIME_ARG ((size_t) -1)
+                                         subfmt,
+                                         tp extra_args LOCALE_ARG);
+            add (len, strftime_case_ (to_uppcase, p,
+                                      STRFTIME_ARG (maxsize - i)
+                                      subfmt,
+                                      tp extra_args LOCALE_ARG));
+          }
+          break;
 
 #if !(defined _NL_CURRENT && HAVE_STRUCT_ERA_ENTRY)
-	underlying_strftime:
-	  {
-	    /* The relevant information is available only via the
-	       underlying strftime implementation, so use that.  */
-	    char ufmt[5];
-	    char *u = ufmt;
-	    char ubuf[1024]; /* enough for any single format in practice */
-	    size_t len;
-	    /* Make sure we're calling the actual underlying strftime.
-	       In some cases, config.h contains something like
-	       "#define strftime rpl_strftime".  */
+        underlying_strftime:
+          {
+            /* The relevant information is available only via the
+               underlying strftime implementation, so use that.  */
+            char ufmt[5];
+            char *u = ufmt;
+            char ubuf[1024]; /* enough for any single format in practice */
+            size_t len;
+            /* Make sure we're calling the actual underlying strftime.
+               In some cases, config.h contains something like
+               "#define strftime rpl_strftime".  */
 # ifdef strftime
 #  undef strftime
-	    size_t strftime ();
+            size_t strftime ();
 # endif
 
-	    /* The space helps distinguish strftime failure from empty
-	       output.  */
-	    *u++ = ' ';
-	    *u++ = '%';
-	    if (modifier != 0)
-	      *u++ = modifier;
-	    *u++ = format_char;
-	    *u = '\0';
-	    len = strftime (ubuf, sizeof ubuf, ufmt, tp);
-	    if (len != 0)
-	      cpy (len - 1, ubuf + 1);
-	  }
-	  break;
+            /* The space helps distinguish strftime failure from empty
+               output.  */
+            *u++ = ' ';
+            *u++ = '%';
+            if (modifier != 0)
+              *u++ = modifier;
+            *u++ = format_char;
+            *u = '\0';
+            len = strftime (ubuf, sizeof ubuf, ufmt, tp);
+            if (len != 0)
+              cpy (len - 1, ubuf + 1);
+          }
+          break;
 #endif
 
-	case L_('C'):
-	  if (modifier == L_('O'))
-	    goto bad_format;
-	  if (modifier == L_('E'))
-	    {
+        case L_('C'):
+          if (modifier == L_('O'))
+            goto bad_format;
+          if (modifier == L_('E'))
+            {
 #if HAVE_STRUCT_ERA_ENTRY
-	      struct era_entry *era = _nl_get_era_entry (tp HELPER_LOCALE_ARG);
-	      if (era)
-		{
+              struct era_entry *era = _nl_get_era_entry (tp HELPER_LOCALE_ARG);
+              if (era)
+                {
 # ifdef COMPILE_WIDE
-		  size_t len = __wcslen (era->era_wname);
-		  cpy (len, era->era_wname);
+                  size_t len = __wcslen (era->era_wname);
+                  cpy (len, era->era_wname);
 # else
-		  size_t len = strlen (era->era_name);
-		  cpy (len, era->era_name);
+                  size_t len = strlen (era->era_name);
+                  cpy (len, era->era_name);
 # endif
-		  break;
-		}
+                  break;
+                }
 #else
-	      goto underlying_strftime;
+              goto underlying_strftime;
 #endif
-	    }
+            }
 
-	  {
-	    int century = tp->tm_year / 100 + TM_YEAR_BASE / 100;
-	    century -= tp->tm_year % 100 < 0 && 0 < century;
-	    DO_SIGNED_NUMBER (2, tp->tm_year < - TM_YEAR_BASE, century);
-	  }
+          {
+            int century = tp->tm_year / 100 + TM_YEAR_BASE / 100;
+            century -= tp->tm_year % 100 < 0 && 0 < century;
+            DO_SIGNED_NUMBER (2, tp->tm_year < - TM_YEAR_BASE, century);
+          }
 
-	case L_('x'):
-	  if (modifier == L_('O'))
-	    goto bad_format;
+        case L_('x'):
+          if (modifier == L_('O'))
+            goto bad_format;
 #ifdef _NL_CURRENT
-	  if (! (modifier == L_('E')
-		 && (*(subfmt =
-		       (const CHAR_T *)_NL_CURRENT (LC_TIME, NLW(ERA_D_FMT)))
-		     != L_('\0'))))
-	    subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(D_FMT));
-	  goto subformat;
+          if (! (modifier == L_('E')
+                 && (*(subfmt =
+                       (const CHAR_T *)_NL_CURRENT (LC_TIME, NLW(ERA_D_FMT)))
+                     != L_('\0'))))
+            subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(D_FMT));
+          goto subformat;
 #else
-	  goto underlying_strftime;
+          goto underlying_strftime;
 #endif
-	case L_('D'):
-	  if (modifier != 0)
-	    goto bad_format;
-	  subfmt = L_("%m/%d/%y");
-	  goto subformat;
+        case L_('D'):
+          if (modifier != 0)
+            goto bad_format;
+          subfmt = L_("%m/%d/%y");
+          goto subformat;
 
-	case L_('d'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('d'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER (2, tp->tm_mday);
+          DO_NUMBER (2, tp->tm_mday);
 
-	case L_('e'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('e'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER_SPACEPAD (2, tp->tm_mday);
+          DO_NUMBER_SPACEPAD (2, tp->tm_mday);
 
-	  /* All numeric formats set DIGITS and NUMBER_VALUE (or U_NUMBER_VALUE)
-	     and then jump to one of these labels.  */
+          /* All numeric formats set DIGITS and NUMBER_VALUE (or U_NUMBER_VALUE)
+             and then jump to one of these labels.  */
 
-	do_tz_offset:
-	  always_output_a_sign = true;
-	  goto do_number_body;
+        do_tz_offset:
+          always_output_a_sign = true;
+          goto do_number_body;
 
-	do_number_spacepad:
-	  /* Force `_' flag unless overridden by `0' or `-' flag.  */
-	  if (pad != L_('0') && pad != L_('-'))
-	    pad = L_('_');
+        do_number_spacepad:
+          /* Force `_' flag unless overridden by `0' or `-' flag.  */
+          if (pad != L_('0') && pad != L_('-'))
+            pad = L_('_');
 
-	do_number:
-	  /* Format NUMBER_VALUE according to the MODIFIER flag.  */
-	  negative_number = number_value < 0;
-	  u_number_value = number_value;
+        do_number:
+          /* Format NUMBER_VALUE according to the MODIFIER flag.  */
+          negative_number = number_value < 0;
+          u_number_value = number_value;
 
-	do_signed_number:
-	  always_output_a_sign = false;
-	  tz_colon_mask = 0;
+        do_signed_number:
+          always_output_a_sign = false;
+          tz_colon_mask = 0;
 
-	do_number_body:
-	  /* Format U_NUMBER_VALUE according to the MODIFIER flag.
-	     NEGATIVE_NUMBER is nonzero if the original number was
-	     negative; in this case it was converted directly to
-	     unsigned int (i.e., modulo (UINT_MAX + 1)) without
-	     negating it.  */
-	  if (modifier == L_('O') && !negative_number)
-	    {
+        do_number_body:
+          /* Format U_NUMBER_VALUE according to the MODIFIER flag.
+             NEGATIVE_NUMBER is nonzero if the original number was
+             negative; in this case it was converted directly to
+             unsigned int (i.e., modulo (UINT_MAX + 1)) without
+             negating it.  */
+          if (modifier == L_('O') && !negative_number)
+            {
 #ifdef _NL_CURRENT
-	      /* Get the locale specific alternate representation of
-		 the number.  If none exist NULL is returned.  */
-	      const CHAR_T *cp = nl_get_alt_digit (u_number_value
-						   HELPER_LOCALE_ARG);
+              /* Get the locale specific alternate representation of
+                 the number.  If none exist NULL is returned.  */
+              const CHAR_T *cp = nl_get_alt_digit (u_number_value
+                                                   HELPER_LOCALE_ARG);
 
-	      if (cp != NULL)
-		{
-		  size_t digitlen = STRLEN (cp);
-		  if (digitlen != 0)
-		    {
-		      cpy (digitlen, cp);
-		      break;
-		    }
-		}
+              if (cp != NULL)
+                {
+                  size_t digitlen = STRLEN (cp);
+                  if (digitlen != 0)
+                    {
+                      cpy (digitlen, cp);
+                      break;
+                    }
+                }
 #else
-	      goto underlying_strftime;
+              goto underlying_strftime;
 #endif
-	    }
+            }
 
-	  bufp = buf + sizeof (buf) / sizeof (buf[0]);
+          bufp = buf + sizeof (buf) / sizeof (buf[0]);
 
-	  if (negative_number)
-	    u_number_value = - u_number_value;
+          if (negative_number)
+            u_number_value = - u_number_value;
 
-	  do
-	    {
-	      if (tz_colon_mask & 1)
-		*--bufp = ':';
-	      tz_colon_mask >>= 1;
-	      *--bufp = u_number_value % 10 + L_('0');
-	      u_number_value /= 10;
-	    }
-	  while (u_number_value != 0 || tz_colon_mask != 0);
+          do
+            {
+              if (tz_colon_mask & 1)
+                *--bufp = ':';
+              tz_colon_mask >>= 1;
+              *--bufp = u_number_value % 10 + L_('0');
+              u_number_value /= 10;
+            }
+          while (u_number_value != 0 || tz_colon_mask != 0);
 
-	do_number_sign_and_padding:
-	  if (digits < width)
-	    digits = width;
+        do_number_sign_and_padding:
+          if (digits < width)
+            digits = width;
 
-	  sign_char = (negative_number ? L_('-')
-		       : always_output_a_sign ? L_('+')
-		       : 0);
+          sign_char = (negative_number ? L_('-')
+                       : always_output_a_sign ? L_('+')
+                       : 0);
 
-	  if (pad == L_('-'))
-	    {
-	      if (sign_char)
-		add1 (sign_char);
-	    }
-	  else
-	    {
-	      int padding = digits - (buf + (sizeof (buf) / sizeof (buf[0]))
-				      - bufp) - !!sign_char;
+          if (pad == L_('-'))
+            {
+              if (sign_char)
+                add1 (sign_char);
+            }
+          else
+            {
+              int padding = digits - (buf + (sizeof (buf) / sizeof (buf[0]))
+                                      - bufp) - !!sign_char;
 
-	      if (padding > 0)
-		{
-		  if (pad == L_('_'))
-		    {
-		      if ((size_t) padding >= maxsize - i)
-			return 0;
+              if (padding > 0)
+                {
+                  if (pad == L_('_'))
+                    {
+                      if ((size_t) padding >= maxsize - i)
+                        return 0;
 
-		      if (p)
-			memset_space (p, padding);
-		      i += padding;
-		      width = width > padding ? width - padding : 0;
-		      if (sign_char)
-			add1 (sign_char);
-		    }
-		  else
-		    {
-		      if ((size_t) digits >= maxsize - i)
-			return 0;
+                      if (p)
+                        memset_space (p, padding);
+                      i += padding;
+                      width = width > padding ? width - padding : 0;
+                      if (sign_char)
+                        add1 (sign_char);
+                    }
+                  else
+                    {
+                      if ((size_t) digits >= maxsize - i)
+                        return 0;
 
-		      if (sign_char)
-			add1 (sign_char);
+                      if (sign_char)
+                        add1 (sign_char);
 
-		      if (p)
-			memset_zero (p, padding);
-		      i += padding;
-		      width = 0;
-		    }
-		}
-	      else
-		{
-		  if (sign_char)
-		    add1 (sign_char);
-		}
-	    }
+                      if (p)
+                        memset_zero (p, padding);
+                      i += padding;
+                      width = 0;
+                    }
+                }
+              else
+                {
+                  if (sign_char)
+                    add1 (sign_char);
+                }
+            }
 
-	  cpy (buf + sizeof (buf) / sizeof (buf[0]) - bufp, bufp);
-	  break;
+          cpy (buf + sizeof (buf) / sizeof (buf[0]) - bufp, bufp);
+          break;
 
-	case L_('F'):
-	  if (modifier != 0)
-	    goto bad_format;
-	  subfmt = L_("%Y-%m-%d");
-	  goto subformat;
+        case L_('F'):
+          if (modifier != 0)
+            goto bad_format;
+          subfmt = L_("%Y-%m-%d");
+          goto subformat;
 
-	case L_('H'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('H'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER (2, tp->tm_hour);
+          DO_NUMBER (2, tp->tm_hour);
 
-	case L_('I'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('I'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER (2, hour12);
+          DO_NUMBER (2, hour12);
 
-	case L_('k'):		/* GNU extension.  */
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('k'):           /* GNU extension.  */
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER_SPACEPAD (2, tp->tm_hour);
+          DO_NUMBER_SPACEPAD (2, tp->tm_hour);
 
-	case L_('l'):		/* GNU extension.  */
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('l'):           /* GNU extension.  */
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER_SPACEPAD (2, hour12);
+          DO_NUMBER_SPACEPAD (2, hour12);
 
-	case L_('j'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('j'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_SIGNED_NUMBER (3, tp->tm_yday < -1, tp->tm_yday + 1U);
+          DO_SIGNED_NUMBER (3, tp->tm_yday < -1, tp->tm_yday + 1U);
 
-	case L_('M'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('M'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER (2, tp->tm_min);
+          DO_NUMBER (2, tp->tm_min);
 
-	case L_('m'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('m'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_SIGNED_NUMBER (2, tp->tm_mon < -1, tp->tm_mon + 1U);
+          DO_SIGNED_NUMBER (2, tp->tm_mon < -1, tp->tm_mon + 1U);
 
 #ifndef _LIBC
-	case L_('N'):		/* GNU extension.  */
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('N'):           /* GNU extension.  */
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  number_value = ns;
-	  if (width == -1)
-	    width = 9;
-	  else
-	    {
-	      /* Take an explicit width less than 9 as a precision.  */
-	      int j;
-	      for (j = width; j < 9; j++)
-		number_value /= 10;
-	    }
+          number_value = ns;
+          if (width == -1)
+            width = 9;
+          else
+            {
+              /* Take an explicit width less than 9 as a precision.  */
+              int j;
+              for (j = width; j < 9; j++)
+                number_value /= 10;
+            }
 
-	  DO_NUMBER (width, number_value);
+          DO_NUMBER (width, number_value);
 #endif
 
-	case L_('n'):
-	  add1 (L_('\n'));
-	  break;
+        case L_('n'):
+          add1 (L_('\n'));
+          break;
 
-	case L_('P'):
-	  to_lowcase = true;
+        case L_('P'):
+          to_lowcase = true;
 #ifndef _NL_CURRENT
-	  format_char = L_('p');
+          format_char = L_('p');
 #endif
-	  /* FALLTHROUGH */
+          /* FALLTHROUGH */
 
-	case L_('p'):
-	  if (change_case)
-	    {
-	      to_uppcase = false;
-	      to_lowcase = true;
-	    }
+        case L_('p'):
+          if (change_case)
+            {
+              to_uppcase = false;
+              to_lowcase = true;
+            }
 #ifdef _NL_CURRENT
-	  cpy (ap_len, ampm);
-	  break;
+          cpy (ap_len, ampm);
+          break;
 #else
-	  goto underlying_strftime;
+          goto underlying_strftime;
 #endif
 
-	case L_('R'):
-	  subfmt = L_("%H:%M");
-	  goto subformat;
+        case L_('R'):
+          subfmt = L_("%H:%M");
+          goto subformat;
 
-	case L_('r'):
+        case L_('r'):
 #ifdef _NL_CURRENT
-	  if (*(subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME,
-						       NLW(T_FMT_AMPM)))
-	      == L_('\0'))
-	    subfmt = L_("%I:%M:%S %p");
-	  goto subformat;
+          if (*(subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME,
+                                                       NLW(T_FMT_AMPM)))
+              == L_('\0'))
+            subfmt = L_("%I:%M:%S %p");
+          goto subformat;
 #else
-	  goto underlying_strftime;
+          goto underlying_strftime;
 #endif
 
-	case L_('S'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('S'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER (2, tp->tm_sec);
+          DO_NUMBER (2, tp->tm_sec);
 
-	case L_('s'):		/* GNU extension.  */
-	  {
-	    struct tm ltm;
-	    time_t t;
+        case L_('s'):           /* GNU extension.  */
+          {
+            struct tm ltm;
+            time_t t;
 
-	    ltm = *tp;
-	    t = mktime (&ltm);
+            ltm = *tp;
+            t = mktime (&ltm);
 
-	    /* Generate string value for T using time_t arithmetic;
-	       this works even if sizeof (long) < sizeof (time_t).  */
+            /* Generate string value for T using time_t arithmetic;
+               this works even if sizeof (long) < sizeof (time_t).  */
 
-	    bufp = buf + sizeof (buf) / sizeof (buf[0]);
-	    negative_number = t < 0;
+            bufp = buf + sizeof (buf) / sizeof (buf[0]);
+            negative_number = t < 0;
 
-	    do
-	      {
-		int d = t % 10;
-		t /= 10;
-		*--bufp = (negative_number ? -d : d) + L_('0');
-	      }
-	    while (t != 0);
+            do
+              {
+                int d = t % 10;
+                t /= 10;
+                *--bufp = (negative_number ? -d : d) + L_('0');
+              }
+            while (t != 0);
 
-	    digits = 1;
-	    always_output_a_sign = false;
-	    goto do_number_sign_and_padding;
-	  }
+            digits = 1;
+            always_output_a_sign = false;
+            goto do_number_sign_and_padding;
+          }
 
-	case L_('X'):
-	  if (modifier == L_('O'))
-	    goto bad_format;
+        case L_('X'):
+          if (modifier == L_('O'))
+            goto bad_format;
 #ifdef _NL_CURRENT
-	  if (! (modifier == L_('E')
-		 && (*(subfmt =
-		       (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(ERA_T_FMT)))
-		     != L_('\0'))))
-	    subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(T_FMT));
-	  goto subformat;
+          if (! (modifier == L_('E')
+                 && (*(subfmt =
+                       (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(ERA_T_FMT)))
+                     != L_('\0'))))
+            subfmt = (const CHAR_T *) _NL_CURRENT (LC_TIME, NLW(T_FMT));
+          goto subformat;
 #else
-	  goto underlying_strftime;
+          goto underlying_strftime;
 #endif
-	case L_('T'):
-	  subfmt = L_("%H:%M:%S");
-	  goto subformat;
+        case L_('T'):
+          subfmt = L_("%H:%M:%S");
+          goto subformat;
 
-	case L_('t'):
-	  add1 (L_('\t'));
-	  break;
+        case L_('t'):
+          add1 (L_('\t'));
+          break;
 
-	case L_('u'):
-	  DO_NUMBER (1, (tp->tm_wday - 1 + 7) % 7 + 1);
+        case L_('u'):
+          DO_NUMBER (1, (tp->tm_wday - 1 + 7) % 7 + 1);
 
-	case L_('U'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('U'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER (2, (tp->tm_yday - tp->tm_wday + 7) / 7);
+          DO_NUMBER (2, (tp->tm_yday - tp->tm_wday + 7) / 7);
 
-	case L_('V'):
-	case L_('g'):
-	case L_('G'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
-	  {
-	    /* YEAR is a leap year if and only if (tp->tm_year + TM_YEAR_BASE)
-	       is a leap year, except that YEAR and YEAR - 1 both work
-	       correctly even when (tp->tm_year + TM_YEAR_BASE) would
-	       overflow.  */
-	    int year = (tp->tm_year
-			+ (tp->tm_year < 0
-			   ? TM_YEAR_BASE % 400
-			   : TM_YEAR_BASE % 400 - 400));
-	    int year_adjust = 0;
-	    int days = iso_week_days (tp->tm_yday, tp->tm_wday);
+        case L_('V'):
+        case L_('g'):
+        case L_('G'):
+          if (modifier == L_('E'))
+            goto bad_format;
+          {
+            /* YEAR is a leap year if and only if (tp->tm_year + TM_YEAR_BASE)
+               is a leap year, except that YEAR and YEAR - 1 both work
+               correctly even when (tp->tm_year + TM_YEAR_BASE) would
+               overflow.  */
+            int year = (tp->tm_year
+                        + (tp->tm_year < 0
+                           ? TM_YEAR_BASE % 400
+                           : TM_YEAR_BASE % 400 - 400));
+            int year_adjust = 0;
+            int days = iso_week_days (tp->tm_yday, tp->tm_wday);
 
-	    if (days < 0)
-	      {
-		/* This ISO week belongs to the previous year.  */
-		year_adjust = -1;
-		days = iso_week_days (tp->tm_yday + (365 + __isleap (year - 1)),
-				      tp->tm_wday);
-	      }
-	    else
-	      {
-		int d = iso_week_days (tp->tm_yday - (365 + __isleap (year)),
-				       tp->tm_wday);
-		if (0 <= d)
-		  {
-		    /* This ISO week belongs to the next year.  */
-		    year_adjust = 1;
-		    days = d;
-		  }
-	      }
+            if (days < 0)
+              {
+                /* This ISO week belongs to the previous year.  */
+                year_adjust = -1;
+                days = iso_week_days (tp->tm_yday + (365 + __isleap (year - 1)),
+                                      tp->tm_wday);
+              }
+            else
+              {
+                int d = iso_week_days (tp->tm_yday - (365 + __isleap (year)),
+                                       tp->tm_wday);
+                if (0 <= d)
+                  {
+                    /* This ISO week belongs to the next year.  */
+                    year_adjust = 1;
+                    days = d;
+                  }
+              }
 
-	    switch (*f)
-	      {
-	      case L_('g'):
-		{
-		  int yy = (tp->tm_year % 100 + year_adjust) % 100;
-		  DO_NUMBER (2, (0 <= yy
-				 ? yy
-				 : tp->tm_year < -TM_YEAR_BASE - year_adjust
-				 ? -yy
-				 : yy + 100));
-		}
+            switch (*f)
+              {
+              case L_('g'):
+                {
+                  int yy = (tp->tm_year % 100 + year_adjust) % 100;
+                  DO_NUMBER (2, (0 <= yy
+                                 ? yy
+                                 : tp->tm_year < -TM_YEAR_BASE - year_adjust
+                                 ? -yy
+                                 : yy + 100));
+                }
 
-	      case L_('G'):
-		DO_SIGNED_NUMBER (4, tp->tm_year < -TM_YEAR_BASE - year_adjust,
-				  (tp->tm_year + (unsigned int) TM_YEAR_BASE
-				   + year_adjust));
+              case L_('G'):
+                DO_SIGNED_NUMBER (4, tp->tm_year < -TM_YEAR_BASE - year_adjust,
+                                  (tp->tm_year + (unsigned int) TM_YEAR_BASE
+                                   + year_adjust));
 
-	      default:
-		DO_NUMBER (2, days / 7 + 1);
-	      }
-	  }
+              default:
+                DO_NUMBER (2, days / 7 + 1);
+              }
+          }
 
-	case L_('W'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('W'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER (2, (tp->tm_yday - (tp->tm_wday - 1 + 7) % 7 + 7) / 7);
+          DO_NUMBER (2, (tp->tm_yday - (tp->tm_wday - 1 + 7) % 7 + 7) / 7);
 
-	case L_('w'):
-	  if (modifier == L_('E'))
-	    goto bad_format;
+        case L_('w'):
+          if (modifier == L_('E'))
+            goto bad_format;
 
-	  DO_NUMBER (1, tp->tm_wday);
+          DO_NUMBER (1, tp->tm_wday);
 
-	case L_('Y'):
-	  if (modifier == 'E')
-	    {
+        case L_('Y'):
+          if (modifier == 'E')
+            {
 #if HAVE_STRUCT_ERA_ENTRY
-	      struct era_entry *era = _nl_get_era_entry (tp HELPER_LOCALE_ARG);
-	      if (era)
-		{
+              struct era_entry *era = _nl_get_era_entry (tp HELPER_LOCALE_ARG);
+              if (era)
+                {
 # ifdef COMPILE_WIDE
-		  subfmt = era->era_wformat;
+                  subfmt = era->era_wformat;
 # else
-		  subfmt = era->era_format;
+                  subfmt = era->era_format;
 # endif
-		  goto subformat;
-		}
+                  goto subformat;
+                }
 #else
-	      goto underlying_strftime;
+              goto underlying_strftime;
 #endif
-	    }
-	  if (modifier == L_('O'))
-	    goto bad_format;
-	  else
-	    DO_SIGNED_NUMBER (4, tp->tm_year < -TM_YEAR_BASE,
-			      tp->tm_year + (unsigned int) TM_YEAR_BASE);
+            }
+          if (modifier == L_('O'))
+            goto bad_format;
+          else
+            DO_SIGNED_NUMBER (4, tp->tm_year < -TM_YEAR_BASE,
+                              tp->tm_year + (unsigned int) TM_YEAR_BASE);
 
-	case L_('y'):
-	  if (modifier == L_('E'))
-	    {
+        case L_('y'):
+          if (modifier == L_('E'))
+            {
 #if HAVE_STRUCT_ERA_ENTRY
-	      struct era_entry *era = _nl_get_era_entry (tp HELPER_LOCALE_ARG);
-	      if (era)
-		{
-		  int delta = tp->tm_year - era->start_date[0];
-		  DO_NUMBER (1, (era->offset
-				 + delta * era->absolute_direction));
-		}
+              struct era_entry *era = _nl_get_era_entry (tp HELPER_LOCALE_ARG);
+              if (era)
+                {
+                  int delta = tp->tm_year - era->start_date[0];
+                  DO_NUMBER (1, (era->offset
+                                 + delta * era->absolute_direction));
+                }
 #else
-	      goto underlying_strftime;
+              goto underlying_strftime;
 #endif
-	    }
+            }
 
-	  {
-	    int yy = tp->tm_year % 100;
-	    if (yy < 0)
-	      yy = tp->tm_year < - TM_YEAR_BASE ? -yy : yy + 100;
-	    DO_NUMBER (2, yy);
-	  }
+          {
+            int yy = tp->tm_year % 100;
+            if (yy < 0)
+              yy = tp->tm_year < - TM_YEAR_BASE ? -yy : yy + 100;
+            DO_NUMBER (2, yy);
+          }
 
-	case L_('Z'):
-	  if (change_case)
-	    {
-	      to_uppcase = false;
-	      to_lowcase = true;
-	    }
+        case L_('Z'):
+          if (change_case)
+            {
+              to_uppcase = false;
+              to_lowcase = true;
+            }
 
 #if HAVE_TZNAME
-	  /* The tzset() call might have changed the value.  */
-	  if (!(zone && *zone) && tp->tm_isdst >= 0)
-	    zone = tzname[tp->tm_isdst != 0];
+          /* The tzset() call might have changed the value.  */
+          if (!(zone && *zone) && tp->tm_isdst >= 0)
+            zone = tzname[tp->tm_isdst != 0];
 #endif
-	  if (! zone)
-	    zone = "";
+          if (! zone)
+            zone = "";
 
 #ifdef COMPILE_WIDE
-	  {
-	    /* The zone string is always given in multibyte form.  We have
-	       to transform it first.  */
-	    wchar_t *wczone;
-	    size_t len;
-	    widen (zone, wczone, len);
-	    cpy (len, wczone);
-	  }
+          {
+            /* The zone string is always given in multibyte form.  We have
+               to transform it first.  */
+            wchar_t *wczone;
+            size_t len;
+            widen (zone, wczone, len);
+            cpy (len, wczone);
+          }
 #else
-	  cpy (strlen (zone), zone);
+          cpy (strlen (zone), zone);
 #endif
-	  break;
+          break;
 
-	case L_(':'):
-	  /* :, ::, and ::: are valid only just before 'z'.
-	     :::: etc. are rejected later.  */
-	  for (colons = 1; f[colons] == L_(':'); colons++)
-	    continue;
-	  if (f[colons] != L_('z'))
-	    goto bad_format;
-	  f += colons;
-	  goto do_z_conversion;
+        case L_(':'):
+          /* :, ::, and ::: are valid only just before 'z'.
+             :::: etc. are rejected later.  */
+          for (colons = 1; f[colons] == L_(':'); colons++)
+            continue;
+          if (f[colons] != L_('z'))
+            goto bad_format;
+          f += colons;
+          goto do_z_conversion;
 
-	case L_('z'):
-	  colons = 0;
+        case L_('z'):
+          colons = 0;
 
-	do_z_conversion:
-	  if (tp->tm_isdst < 0)
-	    break;
+        do_z_conversion:
+          if (tp->tm_isdst < 0)
+            break;
 
-	  {
-	    int diff;
-	    int hour_diff;
-	    int min_diff;
-	    int sec_diff;
+          {
+            int diff;
+            int hour_diff;
+            int min_diff;
+            int sec_diff;
 #if HAVE_TM_GMTOFF
-	    diff = tp->tm_gmtoff;
+            diff = tp->tm_gmtoff;
 #else
-	    if (ut)
-	      diff = 0;
-	    else
-	      {
-		struct tm gtm;
-		struct tm ltm;
-		time_t lt;
+            if (ut)
+              diff = 0;
+            else
+              {
+                struct tm gtm;
+                struct tm ltm;
+                time_t lt;
 
-		ltm = *tp;
-		lt = mktime (&ltm);
+                ltm = *tp;
+                lt = mktime (&ltm);
 
-		if (lt == (time_t) -1)
-		  {
-		    /* mktime returns -1 for errors, but -1 is also a
-		       valid time_t value.  Check whether an error really
-		       occurred.  */
-		    struct tm tm;
+                if (lt == (time_t) -1)
+                  {
+                    /* mktime returns -1 for errors, but -1 is also a
+                       valid time_t value.  Check whether an error really
+                       occurred.  */
+                    struct tm tm;
 
-		    if (! __localtime_r (&lt, &tm)
-			|| ((ltm.tm_sec ^ tm.tm_sec)
-			    | (ltm.tm_min ^ tm.tm_min)
-			    | (ltm.tm_hour ^ tm.tm_hour)
-			    | (ltm.tm_mday ^ tm.tm_mday)
-			    | (ltm.tm_mon ^ tm.tm_mon)
-			    | (ltm.tm_year ^ tm.tm_year)))
-		      break;
-		  }
+                    if (! __localtime_r (&lt, &tm)
+                        || ((ltm.tm_sec ^ tm.tm_sec)
+                            | (ltm.tm_min ^ tm.tm_min)
+                            | (ltm.tm_hour ^ tm.tm_hour)
+                            | (ltm.tm_mday ^ tm.tm_mday)
+                            | (ltm.tm_mon ^ tm.tm_mon)
+                            | (ltm.tm_year ^ tm.tm_year)))
+                      break;
+                  }
 
-		if (! __gmtime_r (&lt, &gtm))
-		  break;
+                if (! __gmtime_r (&lt, &gtm))
+                  break;
 
-		diff = tm_diff (&ltm, &gtm);
-	      }
+                diff = tm_diff (&ltm, &gtm);
+              }
 #endif
 
-	    hour_diff = diff / 60 / 60;
-	    min_diff = diff / 60 % 60;
-	    sec_diff = diff % 60;
+            hour_diff = diff / 60 / 60;
+            min_diff = diff / 60 % 60;
+            sec_diff = diff % 60;
 
-	    switch (colons)
-	      {
-	      case 0: /* +hhmm */
-		DO_TZ_OFFSET (5, diff < 0, 0, hour_diff * 100 + min_diff);
+            switch (colons)
+              {
+              case 0: /* +hhmm */
+                DO_TZ_OFFSET (5, diff < 0, 0, hour_diff * 100 + min_diff);
 
-	      case 1: tz_hh_mm: /* +hh:mm */
-		DO_TZ_OFFSET (6, diff < 0, 04, hour_diff * 100 + min_diff);
+              case 1: tz_hh_mm: /* +hh:mm */
+                DO_TZ_OFFSET (6, diff < 0, 04, hour_diff * 100 + min_diff);
 
-	      case 2: tz_hh_mm_ss: /* +hh:mm:ss */
-		DO_TZ_OFFSET (9, diff < 0, 024,
-			      hour_diff * 10000 + min_diff * 100 + sec_diff);
+              case 2: tz_hh_mm_ss: /* +hh:mm:ss */
+                DO_TZ_OFFSET (9, diff < 0, 024,
+                              hour_diff * 10000 + min_diff * 100 + sec_diff);
 
-	      case 3: /* +hh if possible, else +hh:mm, else +hh:mm:ss */
-		if (sec_diff != 0)
-		  goto tz_hh_mm_ss;
-		if (min_diff != 0)
-		  goto tz_hh_mm;
-		DO_TZ_OFFSET (3, diff < 0, 0, hour_diff);
+              case 3: /* +hh if possible, else +hh:mm, else +hh:mm:ss */
+                if (sec_diff != 0)
+                  goto tz_hh_mm_ss;
+                if (min_diff != 0)
+                  goto tz_hh_mm;
+                DO_TZ_OFFSET (3, diff < 0, 0, hour_diff);
 
-	      default:
-		goto bad_format;
-	      }
-	  }
+              default:
+                goto bad_format;
+              }
+          }
 
-	case L_('\0'):		/* GNU extension: % at end of format.  */
-	    --f;
-	    /* Fall through.  */
-	default:
-	  /* Unknown format; output the format, including the '%',
-	     since this is most likely the right thing to do if a
-	     multibyte string has been misparsed.  */
-	bad_format:
-	  {
-	    int flen;
-	    for (flen = 1; f[1 - flen] != L_('%'); flen++)
-	      continue;
-	    cpy (flen, &f[1 - flen]);
-	  }
-	  break;
-	}
+        case L_('\0'):          /* GNU extension: % at end of format.  */
+            --f;
+            /* Fall through.  */
+        default:
+          /* Unknown format; output the format, including the '%',
+             since this is most likely the right thing to do if a
+             multibyte string has been misparsed.  */
+        bad_format:
+          {
+            int flen;
+            for (flen = 1; f[1 - flen] != L_('%'); flen++)
+              continue;
+            cpy (flen, &f[1 - flen]);
+          }
+          break;
+        }
     }
 
 #if ! FPRINTFTIME
@@ -1428,11 +1441,11 @@ strftime_case_ (bool upcase, STREAM_OR_CHAR_T *s,
    written, use NULL for S and (size_t) -1 for MAXSIZE.  */
 size_t
 my_strftime (STREAM_OR_CHAR_T *s, STRFTIME_ARG (size_t maxsize)
-	     const CHAR_T *format,
-	     const struct tm *tp extra_args_spec LOCALE_PARAM_PROTO)
+             const CHAR_T *format,
+             const struct tm *tp extra_args_spec LOCALE_PARAM_PROTO)
 {
   return strftime_case_ (false, s, STRFTIME_ARG (maxsize)
-			 format, tp extra_args LOCALE_ARG);
+                         format, tp extra_args LOCALE_ARG);
 }
 
 #if defined _LIBC && ! FPRINTFTIME
@@ -1445,7 +1458,7 @@ libc_hidden_def (my_strftime)
    strftime function plus the ut argument, but without the ns argument.  */
 size_t
 emacs_strftimeu (char *s, size_t maxsize, const char *format,
-		 const struct tm *tp, int ut)
+                 const struct tm *tp, int ut)
 {
   return my_strftime (s, maxsize, format, tp, ut, 0);
 }

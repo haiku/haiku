@@ -1,7 +1,7 @@
 /* readlink wrapper to return the link name in malloc'd storage.
    Unlike xreadlink and xreadlink_with_size, don't ever call exit.
 
-   Copyright (C) 2001, 2003-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,16 +22,12 @@
 
 #include "areadlink.h"
 
-#include <stdio.h>
 #include <errno.h>
 #include <limits.h>
-#include <sys/types.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t) -1)
-#endif
 #ifndef SSIZE_MAX
 # define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
 #endif
@@ -61,8 +57,8 @@ areadlink_with_size (char const *file, size_t size)
   size_t symlink_max = SYMLINK_MAX;
   size_t INITIAL_LIMIT_BOUND = 8 * 1024;
   size_t initial_limit = (symlink_max < INITIAL_LIMIT_BOUND
-			  ? symlink_max + 1
-			  : INITIAL_LIMIT_BOUND);
+                          ? symlink_max + 1
+                          : INITIAL_LIMIT_BOUND);
 
   /* The initial buffer size for the link value.  */
   size_t buf_size = size < initial_limit ? size + 1 : initial_limit;
@@ -74,35 +70,35 @@ areadlink_with_size (char const *file, size_t size)
       char *buffer = malloc (buf_size);
 
       if (buffer == NULL)
-	return NULL;
+        return NULL;
       r = readlink (file, buffer, buf_size);
       link_length = r;
 
       /* On AIX 5L v5.3 and HP-UX 11i v2 04/09, readlink returns -1
-	 with errno == ERANGE if the buffer is too small.  */
+         with errno == ERANGE if the buffer is too small.  */
       if (r < 0 && errno != ERANGE)
-	{
-	  int saved_errno = errno;
-	  free (buffer);
-	  errno = saved_errno;
-	  return NULL;
-	}
+        {
+          int saved_errno = errno;
+          free (buffer);
+          errno = saved_errno;
+          return NULL;
+        }
 
       if (link_length < buf_size)
-	{
-	  buffer[link_length] = 0;
-	  return buffer;
-	}
+        {
+          buffer[link_length] = 0;
+          return buffer;
+        }
 
       free (buffer);
       if (buf_size <= MAXSIZE / 2)
-	buf_size *= 2;
+        buf_size *= 2;
       else if (buf_size < MAXSIZE)
-	buf_size = MAXSIZE;
+        buf_size = MAXSIZE;
       else
-	{
-	  errno = ENOMEM;
-	  return NULL;
-	}
+        {
+          errno = ENOMEM;
+          return NULL;
+        }
     }
 }

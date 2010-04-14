@@ -1,5 +1,5 @@
 /* provide a chdir function that tries not to fail due to ENAMETOOLONG
-   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2004-2005, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <limits.h>
 
 #ifndef PATH_MAX
-# ifdef	MAXPATHLEN
+# ifdef MAXPATHLEN
 #  define PATH_MAX MAXPATHLEN
 # endif
 #endif

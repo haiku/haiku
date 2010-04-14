@@ -1,5 +1,5 @@
 /* Convert multibyte character to wide character.
-   Copyright (C) 1999-2002, 2005-2009 Free Software Foundation, Inc.
+   Copyright (C) 1999-2002, 2005-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This program is free software: you can redistribute it and/or modify
@@ -63,30 +63,30 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
     switch (nstate)
       {
       case 0:
-	p = s;
-	m = n;
-	break;
+        p = s;
+        m = n;
+        break;
       case 3:
-	buf[2] = pstate[3];
-	/*FALLTHROUGH*/
+        buf[2] = pstate[3];
+        /*FALLTHROUGH*/
       case 2:
-	buf[1] = pstate[2];
-	/*FALLTHROUGH*/
+        buf[1] = pstate[2];
+        /*FALLTHROUGH*/
       case 1:
-	buf[0] = pstate[1];
-	p = buf;
-	m = nstate;
-	buf[m++] = s[0];
-	if (n >= 2 && m < 4)
-	  {
-	    buf[m++] = s[1];
-	    if (n >= 3 && m < 4)
-	      buf[m++] = s[2];
-	  }
-	break;
+        buf[0] = pstate[1];
+        p = buf;
+        m = nstate;
+        buf[m++] = s[0];
+        if (n >= 2 && m < 4)
+          {
+            buf[m++] = s[1];
+            if (n >= 3 && m < 4)
+              buf[m++] = s[2];
+          }
+        break;
       default:
-	errno = EINVAL;
-	return (size_t)(-1);
+        errno = EINVAL;
+        return (size_t)(-1);
       }
 
     /* Here m > 0.  */
@@ -99,208 +99,208 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
       int res = mbtowc (pwc, p, m);
 
       if (res >= 0)
-	{
-	  if (pwc != NULL && ((*pwc == 0) != (res == 0)))
-	    abort ();
-	  if (nstate >= (res > 0 ? res : 1))
-	    abort ();
-	  res -= nstate;
-	  pstate[0] = 0;
-	  return res;
-	}
+        {
+          if (pwc != NULL && ((*pwc == 0) != (res == 0)))
+            abort ();
+          if (nstate >= (res > 0 ? res : 1))
+            abort ();
+          res -= nstate;
+          pstate[0] = 0;
+          return res;
+        }
 
       /* mbtowc does not distinguish between invalid and incomplete multibyte
-	 sequences.  But mbrtowc needs to make this distinction.
-	 There are two possible approaches:
-	   - Use iconv() and its return value.
-	   - Use built-in knowledge about the possible encodings.
-	 Given the low quality of implementation of iconv() on the systems that
-	 lack mbrtowc(), we use the second approach.
-	 The possible encodings are:
-	   - 8-bit encodings,
-	   - EUC-JP, EUC-KR, GB2312, EUC-TW, BIG5, GB18030, SJIS,
-	   - UTF-8.
-	 Use specialized code for each.  */
+         sequences.  But mbrtowc needs to make this distinction.
+         There are two possible approaches:
+           - Use iconv() and its return value.
+           - Use built-in knowledge about the possible encodings.
+         Given the low quality of implementation of iconv() on the systems that
+         lack mbrtowc(), we use the second approach.
+         The possible encodings are:
+           - 8-bit encodings,
+           - EUC-JP, EUC-KR, GB2312, EUC-TW, BIG5, GB18030, SJIS,
+           - UTF-8.
+         Use specialized code for each.  */
       if (m >= 4 || m >= MB_CUR_MAX)
-	goto invalid;
+        goto invalid;
       /* Here MB_CUR_MAX > 1 and 0 < m < 4.  */
       {
-	const char *encoding = locale_charset ();
+        const char *encoding = locale_charset ();
 
-	if (STREQ (encoding, "UTF-8", 'U', 'T', 'F', '-', '8', 0, 0, 0, 0))
-	  {
-	    /* Cf. unistr/u8-mblen.c.  */
-	    unsigned char c = (unsigned char) p[0];
+        if (STREQ (encoding, "UTF-8", 'U', 'T', 'F', '-', '8', 0, 0, 0, 0))
+          {
+            /* Cf. unistr/u8-mblen.c.  */
+            unsigned char c = (unsigned char) p[0];
 
-	    if (c >= 0xc2)
-	      {
-		if (c < 0xe0)
-		  {
-		    if (m == 1)
-		      goto incomplete;
-		  }
-		else if (c < 0xf0)
-		  {
-		    if (m == 1)
-		      goto incomplete;
-		    if (m == 2)
-		      {
-			unsigned char c2 = (unsigned char) p[1];
+            if (c >= 0xc2)
+              {
+                if (c < 0xe0)
+                  {
+                    if (m == 1)
+                      goto incomplete;
+                  }
+                else if (c < 0xf0)
+                  {
+                    if (m == 1)
+                      goto incomplete;
+                    if (m == 2)
+                      {
+                        unsigned char c2 = (unsigned char) p[1];
 
-			if ((c2 ^ 0x80) < 0x40
-			    && (c >= 0xe1 || c2 >= 0xa0)
-			    && (c != 0xed || c2 < 0xa0))
-			  goto incomplete;
-		      }
-		  }
-		else if (c <= 0xf4)
-		  {
-		    if (m == 1)
-		      goto incomplete;
-		    else /* m == 2 || m == 3 */
-		      {
-			unsigned char c2 = (unsigned char) p[1];
+                        if ((c2 ^ 0x80) < 0x40
+                            && (c >= 0xe1 || c2 >= 0xa0)
+                            && (c != 0xed || c2 < 0xa0))
+                          goto incomplete;
+                      }
+                  }
+                else if (c <= 0xf4)
+                  {
+                    if (m == 1)
+                      goto incomplete;
+                    else /* m == 2 || m == 3 */
+                      {
+                        unsigned char c2 = (unsigned char) p[1];
 
-			if ((c2 ^ 0x80) < 0x40
-			    && (c >= 0xf1 || c2 >= 0x90)
-			    && (c < 0xf4 || (c == 0xf4 && c2 < 0x90)))
-			  {
-			    if (m == 2)
-			      goto incomplete;
-			    else /* m == 3 */
-			      {
-				unsigned char c3 = (unsigned char) p[2];
+                        if ((c2 ^ 0x80) < 0x40
+                            && (c >= 0xf1 || c2 >= 0x90)
+                            && (c < 0xf4 || (c == 0xf4 && c2 < 0x90)))
+                          {
+                            if (m == 2)
+                              goto incomplete;
+                            else /* m == 3 */
+                              {
+                                unsigned char c3 = (unsigned char) p[2];
 
-				if ((c3 ^ 0x80) < 0x40)
-				  goto incomplete;
-			      }
-			  }
-		      }
-		  }
-	      }
-	    goto invalid;
-	  }
+                                if ((c3 ^ 0x80) < 0x40)
+                                  goto incomplete;
+                              }
+                          }
+                      }
+                  }
+              }
+            goto invalid;
+          }
 
-	/* As a reference for this code, you can use the GNU libiconv
-	   implementation.  Look for uses of the RET_TOOFEW macro.  */
+        /* As a reference for this code, you can use the GNU libiconv
+           implementation.  Look for uses of the RET_TOOFEW macro.  */
 
-	if (STREQ (encoding, "EUC-JP", 'E', 'U', 'C', '-', 'J', 'P', 0, 0, 0))
-	  {
-	    if (m == 1)
-	      {
-		unsigned char c = (unsigned char) p[0];
+        if (STREQ (encoding, "EUC-JP", 'E', 'U', 'C', '-', 'J', 'P', 0, 0, 0))
+          {
+            if (m == 1)
+              {
+                unsigned char c = (unsigned char) p[0];
 
-		if ((c >= 0xa1 && c < 0xff) || c == 0x8e || c == 0x8f)
-		  goto incomplete;
-	      }
-	    if (m == 2)
-	      {
-		unsigned char c = (unsigned char) p[0];
+                if ((c >= 0xa1 && c < 0xff) || c == 0x8e || c == 0x8f)
+                  goto incomplete;
+              }
+            if (m == 2)
+              {
+                unsigned char c = (unsigned char) p[0];
 
-		if (c == 0x8f)
-		  {
-		    unsigned char c2 = (unsigned char) p[1];
+                if (c == 0x8f)
+                  {
+                    unsigned char c2 = (unsigned char) p[1];
 
-		    if (c2 >= 0xa1 && c2 < 0xff)
-		      goto incomplete;
-		  }
-	      }
-	    goto invalid;
-	  }
-	if (STREQ (encoding, "EUC-KR", 'E', 'U', 'C', '-', 'K', 'R', 0, 0, 0)
-	    || STREQ (encoding, "GB2312", 'G', 'B', '2', '3', '1', '2', 0, 0, 0)
-	    || STREQ (encoding, "BIG5", 'B', 'I', 'G', '5', 0, 0, 0, 0, 0))
-	  {
-	    if (m == 1)
-	      {
-		unsigned char c = (unsigned char) p[0];
+                    if (c2 >= 0xa1 && c2 < 0xff)
+                      goto incomplete;
+                  }
+              }
+            goto invalid;
+          }
+        if (STREQ (encoding, "EUC-KR", 'E', 'U', 'C', '-', 'K', 'R', 0, 0, 0)
+            || STREQ (encoding, "GB2312", 'G', 'B', '2', '3', '1', '2', 0, 0, 0)
+            || STREQ (encoding, "BIG5", 'B', 'I', 'G', '5', 0, 0, 0, 0, 0))
+          {
+            if (m == 1)
+              {
+                unsigned char c = (unsigned char) p[0];
 
-		if (c >= 0xa1 && c < 0xff)
-		  goto incomplete;
-	      }
-	    goto invalid;
-	  }
-	if (STREQ (encoding, "EUC-TW", 'E', 'U', 'C', '-', 'T', 'W', 0, 0, 0))
-	  {
-	    if (m == 1)
-	      {
-		unsigned char c = (unsigned char) p[0];
+                if (c >= 0xa1 && c < 0xff)
+                  goto incomplete;
+              }
+            goto invalid;
+          }
+        if (STREQ (encoding, "EUC-TW", 'E', 'U', 'C', '-', 'T', 'W', 0, 0, 0))
+          {
+            if (m == 1)
+              {
+                unsigned char c = (unsigned char) p[0];
 
-		if ((c >= 0xa1 && c < 0xff) || c == 0x8e)
-		  goto incomplete;
-	      }
-	    else /* m == 2 || m == 3 */
-	      {
-		unsigned char c = (unsigned char) p[0];
+                if ((c >= 0xa1 && c < 0xff) || c == 0x8e)
+                  goto incomplete;
+              }
+            else /* m == 2 || m == 3 */
+              {
+                unsigned char c = (unsigned char) p[0];
 
-		if (c == 0x8e)
-		  goto incomplete;
-	      }
-	    goto invalid;
-	  }
-	if (STREQ (encoding, "GB18030", 'G', 'B', '1', '8', '0', '3', '0', 0, 0))
-	  {
-	    if (m == 1)
-	      {
-		unsigned char c = (unsigned char) p[0];
+                if (c == 0x8e)
+                  goto incomplete;
+              }
+            goto invalid;
+          }
+        if (STREQ (encoding, "GB18030", 'G', 'B', '1', '8', '0', '3', '0', 0, 0))
+          {
+            if (m == 1)
+              {
+                unsigned char c = (unsigned char) p[0];
 
-		if ((c >= 0x90 && c <= 0xe3) || (c >= 0xf8 && c <= 0xfe))
-		  goto incomplete;
-	      }
-	    else /* m == 2 || m == 3 */
-	      {
-		unsigned char c = (unsigned char) p[0];
+                if ((c >= 0x90 && c <= 0xe3) || (c >= 0xf8 && c <= 0xfe))
+                  goto incomplete;
+              }
+            else /* m == 2 || m == 3 */
+              {
+                unsigned char c = (unsigned char) p[0];
 
-		if (c >= 0x90 && c <= 0xe3)
-		  {
-		    unsigned char c2 = (unsigned char) p[1];
+                if (c >= 0x90 && c <= 0xe3)
+                  {
+                    unsigned char c2 = (unsigned char) p[1];
 
-		    if (c2 >= 0x30 && c2 <= 0x39)
-		      {
-			if (m == 2)
-			  goto incomplete;
-			else /* m == 3 */
-			  {
-			    unsigned char c3 = (unsigned char) p[2];
+                    if (c2 >= 0x30 && c2 <= 0x39)
+                      {
+                        if (m == 2)
+                          goto incomplete;
+                        else /* m == 3 */
+                          {
+                            unsigned char c3 = (unsigned char) p[2];
 
-			    if (c3 >= 0x81 && c3 <= 0xfe)
-			      goto incomplete;
-			  }
-		      }
-		  }
-	      }
-	    goto invalid;
-	  }
-	if (STREQ (encoding, "SJIS", 'S', 'J', 'I', 'S', 0, 0, 0, 0, 0))
-	  {
-	    if (m == 1)
-	      {
-		unsigned char c = (unsigned char) p[0];
+                            if (c3 >= 0x81 && c3 <= 0xfe)
+                              goto incomplete;
+                          }
+                      }
+                  }
+              }
+            goto invalid;
+          }
+        if (STREQ (encoding, "SJIS", 'S', 'J', 'I', 'S', 0, 0, 0, 0, 0))
+          {
+            if (m == 1)
+              {
+                unsigned char c = (unsigned char) p[0];
 
-		if ((c >= 0x81 && c <= 0x9f) || (c >= 0xe0 && c <= 0xea)
-		    || (c >= 0xf0 && c <= 0xf9))
-		  goto incomplete;
-	      }
-	    goto invalid;
-	  }
+                if ((c >= 0x81 && c <= 0x9f) || (c >= 0xe0 && c <= 0xea)
+                    || (c >= 0xf0 && c <= 0xf9))
+                  goto incomplete;
+              }
+            goto invalid;
+          }
 
-	/* An unknown multibyte encoding.  */
-	goto incomplete;
+        /* An unknown multibyte encoding.  */
+        goto incomplete;
       }
 
      incomplete:
       {
-	size_t k = nstate;
-	/* Here 0 <= k < m < 4.  */
-	pstate[++k] = s[0];
-	if (k < m)
-	  {
-	    pstate[++k] = s[1];
-	    if (k < m)
-	      pstate[++k] = s[2];
-	  }
-	if (k != m)
-	  abort ();
+        size_t k = nstate;
+        /* Here 0 <= k < m < 4.  */
+        pstate[++k] = s[0];
+        if (k < m)
+          {
+            pstate[++k] = s[1];
+            if (k < m)
+              pstate[++k] = s[2];
+          }
+        if (k != m)
+          abort ();
       }
       pstate[0] = m;
       return (size_t)(-2);
@@ -341,25 +341,25 @@ rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
 
     if (!mbsinit (ps))
       {
-	/* Parse the rest of the multibyte character byte for byte.  */
-	size_t count = 0;
-	for (; n > 0; s++, n--)
-	  {
-	    wchar_t wc;
-	    size_t ret = mbrtowc (&wc, s, 1, ps);
+        /* Parse the rest of the multibyte character byte for byte.  */
+        size_t count = 0;
+        for (; n > 0; s++, n--)
+          {
+            wchar_t wc;
+            size_t ret = mbrtowc (&wc, s, 1, ps);
 
-	    if (ret == (size_t)(-1))
-	      return (size_t)(-1);
-	    count++;
-	    if (ret != (size_t)(-2))
-	      {
-		/* The multibyte character has been completed.  */
-		if (pwc != NULL)
-		  *pwc = wc;
-		return (wc == 0 ? 0 : count);
-	      }
-	  }
-	return (size_t)(-2);
+            if (ret == (size_t)(-1))
+              return (size_t)(-1);
+            count++;
+            if (ret != (size_t)(-2))
+              {
+                /* The multibyte character has been completed.  */
+                if (pwc != NULL)
+                  *pwc = wc;
+                return (wc == 0 ? 0 : count);
+              }
+          }
+        return (size_t)(-2);
       }
   }
 # endif
@@ -371,10 +371,10 @@ rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
 
     if (ret != (size_t)(-1) && ret != (size_t)(-2))
       {
-	if (pwc != NULL)
-	  *pwc = wc;
-	if (wc == 0)
-	  ret = 0;
+        if (pwc != NULL)
+          *pwc = wc;
+        if (wc == 0)
+          ret = 0;
       }
     return ret;
   }

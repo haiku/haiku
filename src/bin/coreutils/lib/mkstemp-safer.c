@@ -1,6 +1,6 @@
 /* Invoke mkstemp, but avoid some glitches.
 
-   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2005-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,3 +32,32 @@ mkstemp_safer (char *templ)
 {
   return fd_safer (mkstemp (templ));
 }
+
+#if GNULIB_MKOSTEMP
+/* Like mkostemp, but do not return STDIN_FILENO, STDOUT_FILENO, or
+   STDERR_FILENO.  */
+int
+mkostemp_safer (char *templ, int flags)
+{
+  return fd_safer_flag (mkostemp (templ, flags), flags);
+}
+#endif
+
+#if GNULIB_MKOSTEMPS
+/* Like mkostemps, but do not return STDIN_FILENO, STDOUT_FILENO, or
+   STDERR_FILENO.  */
+int
+mkostemps_safer (char *templ, int suffixlen, int flags)
+{
+  return fd_safer_flag (mkostemps (templ, suffixlen, flags), flags);
+}
+#endif
+
+#if GNULIB_MKSTEMPS
+/* Like mkstemps, but do not return STDIN_FILENO, STDOUT_FILENO, or
+   STDERR_FILENO.  */
+int mkstemps_safer (char *templ, int suffixlen)
+{
+  return fd_safer (mkstemps (templ, suffixlen));
+}
+#endif

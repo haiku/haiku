@@ -1,6 +1,6 @@
 /* Like stdlib.h, but redefine some names to avoid glitches.
 
-   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2005-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,3 +22,15 @@
 
 #undef mkstemp
 #define mkstemp mkstemp_safer
+
+#if GNULIB_MKOSTEMP
+# define mkostemp mkostemp_safer
+#endif
+
+#if GNULIB_MKOSTEMPS
+# define mkostemps mkostemps_safer
+#endif
+
+#if GNULIB_MKSTEMPS
+# define mkstemps mkstemps_safer
+#endif

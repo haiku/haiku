@@ -1,6 +1,6 @@
 # Make coreutils.					-*-Makefile-*-
 
-# Copyright (C) 1990, 1993-2009 Free Software Foundation, Inc.
+# Copyright (C) 1990, 1993-2010 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,6 +47,8 @@ syntax_check_exceptions =		\
   .x-sc_po_check			\
   .x-sc_program_name			\
   .x-sc_prohibit_atoi_atof		\
+  .x-sc_prohibit_fail_0			\
+  .x-sc_prohibit_magic_number_exit	\
   .x-sc_prohibit_stat_st_blocks		\
   .x-sc_prohibit_strcmp			\
   .x-sc_prohibit_tab_based_indentation	\

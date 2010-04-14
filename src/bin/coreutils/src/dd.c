@@ -1,5 +1,5 @@
 /* dd -- convert a file while copying it.
-   Copyright (C) 85, 90, 91, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1985, 1990-1991, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -575,7 +575,7 @@ Options are:\n\
 
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -769,7 +769,7 @@ install_signal_handlers (void)
 static void
 process_signals (void)
 {
-  while (interrupt_signal | info_signal_count)
+  while (interrupt_signal || info_signal_count)
     {
       int interrupt;
       int infos;

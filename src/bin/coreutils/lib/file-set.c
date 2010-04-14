@@ -1,5 +1,5 @@
 /* Specialized functions to manipulate a set of files.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -42,15 +42,15 @@ record_file (Hash_table *ht, char const *file, struct stat const *stats)
     struct F_triple *ent_from_table = hash_insert (ht, ent);
     if (ent_from_table == NULL)
       {
-	/* Insertion failed due to lack of memory.  */
-	xalloc_die ();
+        /* Insertion failed due to lack of memory.  */
+        xalloc_die ();
       }
 
     if (ent_from_table != ent)
       {
-	/* There was alread a matching entry in the table, so ENT was
-	   not inserted.  Free it.  */
-	triple_free (ent);
+        /* There was alread a matching entry in the table, so ENT was
+           not inserted.  Free it.  */
+        triple_free (ent);
       }
   }
 }
@@ -59,7 +59,7 @@ record_file (Hash_table *ht, char const *file, struct stat const *stats)
    for the file described by FILE and STATS.  */
 bool
 seen_file (Hash_table const *ht, char const *file,
-	   struct stat const *stats)
+           struct stat const *stats)
 {
   struct F_triple new_ent;
 

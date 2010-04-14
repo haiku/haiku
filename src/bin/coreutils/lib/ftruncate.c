@@ -38,11 +38,11 @@ ftruncate (int fd, off_t length)
     {
       /* Extend file length. */
       if (lseek (fd, (length - 1), SEEK_SET) < 0)
-	return -1;
+        return -1;
 
       /* Write a "0" byte. */
       if (write (fd, "", 1) != 1)
-	return -1;
+        return -1;
     }
   else
     {
@@ -52,14 +52,14 @@ ftruncate (int fd, off_t length)
       fl.l_whence = 0;
       fl.l_len = 0;
       fl.l_start = length;
-      fl.l_type = F_WRLCK;	/* write lock on file space */
+      fl.l_type = F_WRLCK;      /* write lock on file space */
 
       /* This relies on the *undocumented* F_FREESP argument to fcntl,
-	 which truncates the file so that it ends at the position
-	 indicated by fl.l_start.  Will minor miracles never cease?  */
+         which truncates the file so that it ends at the position
+         indicated by fl.l_start.  Will minor miracles never cease?  */
 
       if (fcntl (fd, F_FREESP, &fl) < 0)
-	return -1;
+        return -1;
     }
 
   return 0;

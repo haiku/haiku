@@ -1,7 +1,7 @@
 /* -*- buffer-read-only: t -*- vi: set ro: */
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
-/* Copyright (C) 2001-2002, 2004-2009 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2002, 2004-2010 Free Software Foundation, Inc.
    Written by Paul Eggert, Bruno Haible, Sam Steingold, Peter Burwood.
    This file is part of gnulib.
 
@@ -105,8 +105,8 @@
   ((signed) \
    ? ~ _STDINT_MIN (signed, bits, zero) \
    : /* The expression for the unsigned case.  The subtraction of (signed) \
-	is a nop in the unsigned case and avoids "signed integer overflow" \
-	warnings in the signed case.  */ \
+        is a nop in the unsigned case and avoids "signed integer overflow" \
+        warnings in the signed case.  */ \
      ((((zero) + 1) << ((bits) ? (bits) - 1 - (signed) : 0)) - 1) * 2 + 1)
 
 /* 7.18.1.1. Exact-width integer types */
@@ -457,10 +457,10 @@ typedef int _verify_intmax_size[2 * (sizeof (intmax_t) == sizeof (uintmax_t)) - 
 #undef SIG_ATOMIC_MAX
 #define SIG_ATOMIC_MIN  \
    _STDINT_MIN (@HAVE_SIGNED_SIG_ATOMIC_T@, @BITSIZEOF_SIG_ATOMIC_T@, \
-		0@SIG_ATOMIC_T_SUFFIX@)
+                0@SIG_ATOMIC_T_SUFFIX@)
 #define SIG_ATOMIC_MAX  \
    _STDINT_MAX (@HAVE_SIGNED_SIG_ATOMIC_T@, @BITSIZEOF_SIG_ATOMIC_T@, \
-		0@SIG_ATOMIC_T_SUFFIX@)
+                0@SIG_ATOMIC_T_SUFFIX@)
 
 
 /* size_t limit */

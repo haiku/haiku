@@ -1,5 +1,5 @@
 /* tsort - topological sort.
-   Copyright (C) 1998-2005, 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 1998-2005, 2007-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 
 #include <config.h>
 
-#include <stdio.h>
 #include <assert.h>
 #include <getopt.h>
 #include <sys/types.h>
@@ -32,6 +31,7 @@
 #include "error.h"
 #include "quote.h"
 #include "readtokens.h"
+#include "stdio--.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "tsort"
@@ -87,7 +87,7 @@ With no FILE, or when FILE is -, read standard input.\n\
 "), program_name);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
 
   exit (status);

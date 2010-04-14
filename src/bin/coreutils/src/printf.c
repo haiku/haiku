@@ -1,5 +1,5 @@
 /* printf - format and print data
-   Copyright (C) 1990-2009 Free Software Foundation, Inc.
+   Copyright (C) 1990-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
    \a = alert (bell)
    \b = backspace
    \c = produce no further output
+   \e = escape
    \f = form feed
    \n = new line
    \r = carriage return
@@ -101,22 +102,21 @@ Print ARGUMENT(s) according to FORMAT, or execute according to OPTION:\n\
 FORMAT controls the output as in C printf.  Interpreted sequences are:\n\
 \n\
   \\\"      double quote\n\
-  \\NNN    character with octal value NNN (1 to 3 digits)\n\
-  \\\\      backslash\n\
 "), stdout);
       fputs (_("\
+  \\\\      backslash\n\
   \\a      alert (BEL)\n\
   \\b      backspace\n\
   \\c      produce no further output\n\
+  \\e      escape\n\
   \\f      form feed\n\
-"), stdout);
-      fputs (_("\
   \\n      new line\n\
   \\r      carriage return\n\
   \\t      horizontal tab\n\
   \\v      vertical tab\n\
 "), stdout);
       fputs (_("\
+  \\NNN    byte with octal value NNN (1 to 3 digits)\n\
   \\xHH    byte with hexadecimal value HH (1 to 2 digits)\n\
   \\uHHHH  Unicode (ISO/IEC 10646) character with hex value HHHH (4 digits)\n\
   \\UHHHHHHHH  Unicode character with hex value HHHHHHHH (8 digits)\n\
@@ -130,7 +130,7 @@ and all C format specifications ending with one of diouxXfeEgGcs, with\n\
 ARGUMENTs converted to proper type first.  Variable widths are handled.\n\
 "), stdout);
       printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -200,6 +200,9 @@ print_esc_char (char c)
     case 'c':			/* Cancel the rest of the output. */
       exit (EXIT_SUCCESS);
       break;
+    case 'e':			/* Escape. */
+      putchar ('\x1B');
+      break;
     case 'f':			/* Form feed. */
       putchar ('\f');
       break;
@@ -256,7 +259,7 @@ print_esc (const char *escstart, bool octal_0)
         esc_value = esc_value * 8 + octtobin (*p);
       putchar (esc_value);
     }
-  else if (*p && strchr ("\"\\abcfnrtv", *p))
+  else if (*p && strchr ("\"\\abcefnrtv", *p))
     print_esc_char (*p++);
   else if (*p == 'u' || *p == 'U')
     {

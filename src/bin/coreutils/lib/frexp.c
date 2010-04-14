@@ -1,5 +1,5 @@
 /* Split a double into fraction and mantissa.
-   Copyright (C) 2007-2008 Free Software Foundation, Inc.
+   Copyright (C) 2007-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -85,73 +85,73 @@ FUNC (DOUBLE x, int *expptr)
     exponent = 0;
     if (x >= L_(1.0))
       {
-	/* A positive exponent.  */
-	DOUBLE pow2_i; /* = pow2[i] */
-	DOUBLE powh_i; /* = powh[i] */
+        /* A positive exponent.  */
+        DOUBLE pow2_i; /* = pow2[i] */
+        DOUBLE powh_i; /* = powh[i] */
 
-	/* Invariants: pow2_i = 2^2^i, powh_i = 2^-2^i,
-	   x * 2^exponent = argument, x >= 1.0.  */
-	for (i = 0, pow2_i = L_(2.0), powh_i = L_(0.5);
-	     ;
-	     i++, pow2_i = pow2_i * pow2_i, powh_i = powh_i * powh_i)
-	  {
-	    if (x >= pow2_i)
-	      {
-		exponent += (1 << i);
-		x *= powh_i;
-	      }
-	    else
-	      break;
+        /* Invariants: pow2_i = 2^2^i, powh_i = 2^-2^i,
+           x * 2^exponent = argument, x >= 1.0.  */
+        for (i = 0, pow2_i = L_(2.0), powh_i = L_(0.5);
+             ;
+             i++, pow2_i = pow2_i * pow2_i, powh_i = powh_i * powh_i)
+          {
+            if (x >= pow2_i)
+              {
+                exponent += (1 << i);
+                x *= powh_i;
+              }
+            else
+              break;
 
-	    pow2[i] = pow2_i;
-	    powh[i] = powh_i;
-	  }
-	/* Avoid making x too small, as it could become a denormalized
-	   number and thus lose precision.  */
-	while (i > 0 && x < pow2[i - 1])
-	  {
-	    i--;
-	    powh_i = powh[i];
-	  }
-	exponent += (1 << i);
-	x *= powh_i;
-	/* Here 2^-2^i <= x < 1.0.  */
+            pow2[i] = pow2_i;
+            powh[i] = powh_i;
+          }
+        /* Avoid making x too small, as it could become a denormalized
+           number and thus lose precision.  */
+        while (i > 0 && x < pow2[i - 1])
+          {
+            i--;
+            powh_i = powh[i];
+          }
+        exponent += (1 << i);
+        x *= powh_i;
+        /* Here 2^-2^i <= x < 1.0.  */
       }
     else
       {
-	/* A negative or zero exponent.  */
-	DOUBLE pow2_i; /* = pow2[i] */
-	DOUBLE powh_i; /* = powh[i] */
+        /* A negative or zero exponent.  */
+        DOUBLE pow2_i; /* = pow2[i] */
+        DOUBLE powh_i; /* = powh[i] */
 
-	/* Invariants: pow2_i = 2^2^i, powh_i = 2^-2^i,
-	   x * 2^exponent = argument, x < 1.0.  */
-	for (i = 0, pow2_i = L_(2.0), powh_i = L_(0.5);
-	     ;
-	     i++, pow2_i = pow2_i * pow2_i, powh_i = powh_i * powh_i)
-	  {
-	    if (x < powh_i)
-	      {
-		exponent -= (1 << i);
-		x *= pow2_i;
-	      }
-	    else
-	      break;
+        /* Invariants: pow2_i = 2^2^i, powh_i = 2^-2^i,
+           x * 2^exponent = argument, x < 1.0.  */
+        for (i = 0, pow2_i = L_(2.0), powh_i = L_(0.5);
+             ;
+             i++, pow2_i = pow2_i * pow2_i, powh_i = powh_i * powh_i)
+          {
+            if (x < powh_i)
+              {
+                exponent -= (1 << i);
+                x *= pow2_i;
+              }
+            else
+              break;
 
-	    pow2[i] = pow2_i;
-	    powh[i] = powh_i;
-	  }
-	/* Here 2^-2^i <= x < 1.0.  */
+            pow2[i] = pow2_i;
+            powh[i] = powh_i;
+          }
+        /* Here 2^-2^i <= x < 1.0.  */
       }
 
     /* Invariants: x * 2^exponent = argument, and 2^-2^i <= x < 1.0.  */
     while (i > 0)
       {
-	i--;
-	if (x < powh[i])
-	  {
-	    exponent -= (1 << i);
-	    x *= pow2[i];
-	  }
+        i--;
+        if (x < powh[i])
+          {
+            exponent -= (1 << i);
+            x *= pow2[i];
+          }
       }
     /* Here 0.5 <= x < 1.0.  */
   }

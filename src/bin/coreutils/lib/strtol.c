@@ -1,8 +1,7 @@
 /* Convert string representation of a number into an integer value.
 
    Copyright (C) 1991, 1992, 1994, 1995, 1996, 1997, 1998, 1999, 2003, 2005,
-   2006, 2007
-   Free Software Foundation, Inc.
+   2006, 2007, 2009, 2010 Free Software Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C
    Library.  Bugs can be reported to bug-glibc@gnu.org.
@@ -139,14 +138,14 @@
    your host.  */
 # define TYPE_MINIMUM(t) \
    ((t) (! TYPE_SIGNED (t) \
-	 ? (t) 0 \
-	 : TYPE_SIGNED_MAGNITUDE (t) \
-	 ? ~ (t) 0 \
-	 : ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1)))
+         ? (t) 0 \
+         : TYPE_SIGNED_MAGNITUDE (t) \
+         ? ~ (t) 0 \
+         : ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1)))
 # define TYPE_MAXIMUM(t) \
    ((t) (! TYPE_SIGNED (t) \
-	 ? (t) -1 \
-	 : ~ (~ (t) 0 << (sizeof (t) * CHAR_BIT - 1))))
+         ? (t) -1 \
+         : ~ (~ (t) 0 << (sizeof (t) * CHAR_BIT - 1))))
 
 # ifndef ULONG_LONG_MAX
 #  define ULONG_LONG_MAX TYPE_MAXIMUM (unsigned long long)
@@ -238,7 +237,7 @@
 
 INT
 INTERNAL (strtol) (const STRING_TYPE *nptr, STRING_TYPE **endptr,
-		   int base, int group LOCALE_PARAM_PROTO)
+                   int base, int group LOCALE_PARAM_PROTO)
 {
   int negative;
   register unsigned LONG int cutoff;
@@ -263,18 +262,18 @@ INTERNAL (strtol) (const STRING_TYPE *nptr, STRING_TYPE **endptr,
     {
       grouping = _NL_CURRENT (LC_NUMERIC, GROUPING);
       if (*grouping <= 0 || *grouping == CHAR_MAX)
-	grouping = NULL;
+        grouping = NULL;
       else
-	{
-	  /* Figure out the thousands separator character.  */
+        {
+          /* Figure out the thousands separator character.  */
 # if defined _LIBC || defined _HAVE_BTOWC
-	  thousands = __btowc (*_NL_CURRENT (LC_NUMERIC, THOUSANDS_SEP));
-	  if (thousands == WEOF)
-	    thousands = L'\0';
+          thousands = __btowc (*_NL_CURRENT (LC_NUMERIC, THOUSANDS_SEP));
+          if (thousands == WEOF)
+            thousands = L'\0';
 # endif
-	  if (thousands == L'\0')
-	    grouping = NULL;
-	}
+          if (thousands == L'\0')
+            grouping = NULL;
+        }
     }
   else
     grouping = NULL;
@@ -312,12 +311,12 @@ INTERNAL (strtol) (const STRING_TYPE *nptr, STRING_TYPE **endptr,
   if (*s == L_('0'))
     {
       if ((base == 0 || base == 16) && TOUPPER (s[1]) == L_('X'))
-	{
-	  s += 2;
-	  base = 16;
-	}
+        {
+          s += 2;
+          base = 16;
+        }
       else if (base == 0)
-	base = 8;
+        base = 8;
     }
   else if (base == 0)
     base = 10;
@@ -331,14 +330,14 @@ INTERNAL (strtol) (const STRING_TYPE *nptr, STRING_TYPE **endptr,
       /* Find the end of the digit string and check its grouping.  */
       end = s;
       for (c = *end; c != L_('\0'); c = *++end)
-	if ((wchar_t) c != thousands
-	    && ((wchar_t) c < L_('0') || (wchar_t) c > L_('9'))
-	    && (!ISALPHA (c) || (int) (TOUPPER (c) - L_('A') + 10) >= base))
-	  break;
+        if ((wchar_t) c != thousands
+            && ((wchar_t) c < L_('0') || (wchar_t) c > L_('9'))
+            && (!ISALPHA (c) || (int) (TOUPPER (c) - L_('A') + 10) >= base))
+          break;
       if (*s == thousands)
-	end = s;
+        end = s;
       else
-	end = correctly_grouped_prefix (s, end, thousands, grouping);
+        end = correctly_grouped_prefix (s, end, thousands, grouping);
     }
   else
 #endif
@@ -352,23 +351,23 @@ INTERNAL (strtol) (const STRING_TYPE *nptr, STRING_TYPE **endptr,
   for (c = *s; c != L_('\0'); c = *++s)
     {
       if (s == end)
-	break;
+        break;
       if (c >= L_('0') && c <= L_('9'))
-	c -= L_('0');
+        c -= L_('0');
       else if (ISALPHA (c))
-	c = TOUPPER (c) - L_('A') + 10;
+        c = TOUPPER (c) - L_('A') + 10;
       else
-	break;
+        break;
       if ((int) c >= base)
-	break;
+        break;
       /* Check for overflow.  */
       if (i > cutoff || (i == cutoff && c > cutlim))
-	overflow = 1;
+        overflow = 1;
       else
-	{
-	  i *= (unsigned LONG int) base;
-	  i += c;
-	}
+        {
+          i *= (unsigned LONG int) base;
+          i += c;
+        }
     }
 
   /* Check if anything actually happened.  */
@@ -385,8 +384,8 @@ INTERNAL (strtol) (const STRING_TYPE *nptr, STRING_TYPE **endptr,
      `unsigned LONG int', but outside the range of `LONG int'.  */
   if (overflow == 0
       && i > (negative
-	      ? -((unsigned LONG int) (STRTOL_LONG_MIN + 1)) + 1
-	      : (unsigned LONG int) STRTOL_LONG_MAX))
+              ? -((unsigned LONG int) (STRTOL_LONG_MIN + 1)) + 1
+              : (unsigned LONG int) STRTOL_LONG_MAX))
     overflow = 1;
 #endif
 
@@ -411,11 +410,11 @@ noconv:
   if (endptr != NULL)
     {
       if (save - nptr >= 2 && TOUPPER (save[-1]) == L_('X')
-	  && save[-2] == L_('0'))
-	*endptr = (STRING_TYPE *) &save[-1];
+          && save[-2] == L_('0'))
+        *endptr = (STRING_TYPE *) &save[-1];
       else
-	/*  There was no number to convert.  */
-	*endptr = (STRING_TYPE *) nptr;
+        /*  There was no number to convert.  */
+        *endptr = (STRING_TYPE *) nptr;
     }
 
   return 0L;
@@ -429,7 +428,7 @@ INT
 weak_function
 #endif
 strtol (const STRING_TYPE *nptr, STRING_TYPE **endptr,
-	int base LOCALE_PARAM_PROTO)
+        int base LOCALE_PARAM_PROTO)
 {
   return INTERNAL (strtol) (nptr, endptr, base, 0 LOCALE_PARAM);
 }

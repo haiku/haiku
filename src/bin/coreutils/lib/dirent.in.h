@@ -1,5 +1,5 @@
 /* A GNU-like <dirent.h>.
-   Copyright (C) 2006-2009 Free Software Foundation, Inc.
+   Copyright (C) 2006-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,12 @@
 #ifndef _GL_DIRENT_H
 #define _GL_DIRENT_H
 
+/* Get ino_t.  Needed on some systems, including glibc 2.8.  */
+#include <sys/types.h>
+
 /* The definition of GL_LINK_WARNING is copied here.  */
+
+/* The definition of _GL_ARG_NONNULL is copied here.  */
 
 
 #ifdef __cplusplus
@@ -35,20 +40,16 @@ extern "C" {
 
 /* Declare overridden functions.  */
 
-#if @REPLACE_FCHDIR@
-# define opendir rpl_opendir
-extern DIR * opendir (const char *);
+#if @REPLACE_CLOSEDIR@
 # define closedir rpl_closedir
-extern int closedir (DIR *);
+extern int closedir (DIR *) _GL_ARG_NONNULL ((1));
 #endif
-
-/* Declare other POSIX functions.  */
 
 #if @GNULIB_DIRFD@
 # if !@HAVE_DECL_DIRFD@ && !defined dirfd
 /* Return the file descriptor associated with the given directory stream,
    or -1 if none exists.  */
-extern int dirfd (DIR const *dir);
+extern int dirfd (DIR *dir) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef dirfd
@@ -59,7 +60,11 @@ extern int dirfd (DIR const *dir);
 #endif
 
 #if @GNULIB_FDOPENDIR@
-# if !@HAVE_FDOPENDIR@
+# if @REPLACE_FDOPENDIR@
+#  undef fdopendir
+#  define fdopendir rpl_fdopendir
+# endif
+# if !@HAVE_FDOPENDIR@ || @REPLACE_FDOPENDIR@
 /* Open a directory stream visiting the given directory file
    descriptor.  Return NULL and set errno if fd is not visiting a
    directory.  On success, this function consumes fd (it will be
@@ -75,6 +80,11 @@ extern DIR *fdopendir (int fd);
      fdopendir (f))
 #endif
 
+#if @REPLACE_OPENDIR@
+# define opendir rpl_opendir
+extern DIR * opendir (const char *) _GL_ARG_NONNULL ((1));
+#endif
+
 #if @GNULIB_SCANDIR@
 /* Scan the directory DIR, calling FILTER on each directory entry.
    Entries for which FILTER returns nonzero are individually malloc'd,
@@ -82,8 +92,9 @@ extern DIR *fdopendir (int fd);
    *NAMELIST.  Returns the number of entries selected, or -1 on error.  */
 # if !@HAVE_SCANDIR@
 extern int scandir (const char *dir, struct dirent ***namelist,
-		    int (*filter) (const struct dirent *),
-		    int (*cmp) (const struct dirent **, const struct dirent **));
+                    int (*filter) (const struct dirent *),
+                    int (*cmp) (const struct dirent **, const struct dirent **))
+     _GL_ARG_NONNULL ((1, 2, 4));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef scandir
@@ -96,7 +107,8 @@ extern int scandir (const char *dir, struct dirent ***namelist,
 #if @GNULIB_ALPHASORT@
 /* Compare two 'struct dirent' entries alphabetically.  */
 # if !@HAVE_ALPHASORT@
-extern int alphasort (const struct dirent **, const struct dirent **);
+extern int alphasort (const struct dirent **, const struct dirent **)
+     _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef alphasort

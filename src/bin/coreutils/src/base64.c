@@ -1,5 +1,5 @@
 /* Base64 encode/decode strings or files.
-   Copyright (C) 2004-2009 Free Software Foundation, Inc.
+   Copyright (C) 2004-2010 Free Software Foundation, Inc.
 
    This file is part of Base64.
 
@@ -68,9 +68,8 @@ Base64 encode or decode FILE, or standard input, to standard output.\n\
   -i, --ignore-garbage  When decoding, ignore non-alphabet characters.\n\
 \n\
 "), stdout);
-      fputs (_("\
-      --help            Display this help and exit.\n\
-      --version         Output version information and exit.\n"), stdout);
+      fputs (HELP_OPTION_DESCRIPTION, stdout);
+      fputs (VERSION_OPTION_DESCRIPTION, stdout);
       fputs (_("\
 \n\
 With no FILE, or when FILE is -, read standard input.\n"), stdout);
@@ -81,7 +80,7 @@ When decoding, the input may contain newlines in addition to the bytes of\n\
 the formal base64 alphabet.  Use --ignore-garbage to attempt to recover\n\
 from any other non-alphabet bytes in the encoded stream.\n"),
              stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
 
   exit (status);

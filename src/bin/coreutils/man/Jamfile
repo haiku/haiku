@@ -30,7 +30,6 @@ fold.1
 groups.1
 head.1
 hostid.1
-hostname.1
 id.1
 install.1
 join.1
@@ -67,7 +66,6 @@ sort.1
 split.1
 #stat.1
 stty.1
-su.1
 sum.1
 sync.1
 tac.1

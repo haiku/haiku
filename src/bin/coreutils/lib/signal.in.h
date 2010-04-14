@@ -1,6 +1,6 @@
 /* A GNU-like <signal.h>.
 
-   Copyright (C) 2006-2009 Free Software Foundation, Inc.
+   Copyright (C) 2006-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@
 
 /* The definition of GL_LINK_WARNING is copied here.  */
 
+/* The definition of _GL_ARG_NONNULL is copied here.  */
+
 /* Define pid_t, uid_t.
    Also, mingw defines sigset_t not in <signal.h>, but in <sys/types.h>.  */
 #include <sys/types.h>
@@ -48,6 +50,11 @@
 typedef int rpl_sig_atomic_t;
 # undef sig_atomic_t
 # define sig_atomic_t rpl_sig_atomic_t
+#endif
+
+/* A set or mask of signals.  */
+#if !@HAVE_SIGSET_T@
+typedef unsigned int sigset_t;
 #endif
 
 #ifdef __cplusplus
@@ -66,69 +73,103 @@ extern "C" {
 #endif
 
 
-#if !@HAVE_POSIX_SIGNALBLOCKING@
+#if @GNULIB_SIGPROCMASK@
+# if !@HAVE_POSIX_SIGNALBLOCKING@
 
 /* Maximum signal number + 1.  */
-# ifndef NSIG
-#  define NSIG 32
-# endif
+#  ifndef NSIG
+#   define NSIG 32
+#  endif
 
 /* This code supports only 32 signals.  */
 typedef int verify_NSIG_constraint[2 * (NSIG <= 32) - 1];
 
-/* A set or mask of signals.  */
-# if !@HAVE_SIGSET_T@
-typedef unsigned int sigset_t;
-# endif
-
 /* Test whether a given signal is contained in a signal set.  */
-extern int sigismember (const sigset_t *set, int sig);
+extern int sigismember (const sigset_t *set, int sig) _GL_ARG_NONNULL ((1));
 
 /* Initialize a signal set to the empty set.  */
-extern int sigemptyset (sigset_t *set);
+extern int sigemptyset (sigset_t *set) _GL_ARG_NONNULL ((1));
 
 /* Add a signal to a signal set.  */
-extern int sigaddset (sigset_t *set, int sig);
+extern int sigaddset (sigset_t *set, int sig) _GL_ARG_NONNULL ((1));
 
 /* Remove a signal from a signal set.  */
-extern int sigdelset (sigset_t *set, int sig);
+extern int sigdelset (sigset_t *set, int sig) _GL_ARG_NONNULL ((1));
 
 /* Fill a signal set with all possible signals.  */
-extern int sigfillset (sigset_t *set);
+extern int sigfillset (sigset_t *set) _GL_ARG_NONNULL ((1));
 
 /* Return the set of those blocked signals that are pending.  */
-extern int sigpending (sigset_t *set);
+extern int sigpending (sigset_t *set) _GL_ARG_NONNULL ((1));
 
 /* If OLD_SET is not NULL, put the current set of blocked signals in *OLD_SET.
    Then, if SET is not NULL, affect the current set of blocked signals by
    combining it with *SET as indicated in OPERATION.
    In this implementation, you are not allowed to change a signal handler
    while the signal is blocked.  */
-# define SIG_BLOCK   0  /* blocked_set = blocked_set | *set; */
-# define SIG_SETMASK 1  /* blocked_set = *set; */
-# define SIG_UNBLOCK 2  /* blocked_set = blocked_set & ~*set; */
+#  define SIG_BLOCK   0  /* blocked_set = blocked_set | *set; */
+#  define SIG_SETMASK 1  /* blocked_set = *set; */
+#  define SIG_UNBLOCK 2  /* blocked_set = blocked_set & ~*set; */
 extern int sigprocmask (int operation, const sigset_t *set, sigset_t *old_set);
 
-# define signal rpl_signal
+#  define signal rpl_signal
 /* Install the handler FUNC for signal SIG, and return the previous
    handler.  */
 extern void (*signal (int sig, void (*func) (int))) (int);
 
-# if GNULIB_defined_SIGPIPE
+#  if GNULIB_defined_SIGPIPE
 
 /* Raise signal SIG.  */
-#  undef raise
-#  define raise rpl_raise
+#   undef raise
+#   define raise rpl_raise
 extern int raise (int sig);
 
-# endif
+#  endif
 
-#endif /* !@HAVE_POSIX_SIGNALBLOCKING@ */
+# endif /* !@HAVE_POSIX_SIGNALBLOCKING@ */
+#elif defined GNULIB_POSIXCHECK
+# undef sigaddset
+# define sigaddset(s,n) \
+  (GL_LINK_WARNING ("sigaddset is unportable - "        \
+                    "use gnulib module sigprocmask for portability"),   \
+   sigaddset (s, n))
+# undef sigdelset
+# define sigdelset(s,n) \
+  (GL_LINK_WARNING ("sigdelset is unportable - "        \
+                    "use gnulib module sigprocmask for portability"),   \
+   sigdelset (s, n))
+# undef sigemptyset
+# define sigemptyset(s) \
+  (GL_LINK_WARNING ("sigemptyset is unportable - "        \
+                    "use gnulib module sigprocmask for portability"),   \
+   sigemptyset (s))
+# undef sigfillset
+# define sigfillset(s) \
+  (GL_LINK_WARNING ("sigfillset is unportable - "        \
+                    "use gnulib module sigprocmask for portability"),   \
+   sigfillset (s))
+# undef sigismember
+# define sigismember(s,n) \
+  (GL_LINK_WARNING ("sigismember is unportable - "        \
+                    "use gnulib module sigprocmask for portability"),   \
+   sigismember (s, n))
+# undef sigpending
+# define sigpending(s) \
+  (GL_LINK_WARNING ("sigpending is unportable - "        \
+                    "use gnulib module sigprocmask for portability"),   \
+   sigpending (s))
+# undef sigprocmask
+# define sigprocmask(h,s,o)                               \
+  (GL_LINK_WARNING ("sigprocmask is unportable - "        \
+                    "use gnulib module sigprocmask for portability"),   \
+   sigprocmask (h, s, o))
+#endif /* @GNULIB_SIGPROCMASK@ */
 
 
-#if !@HAVE_SIGACTION@
+#if @GNULIB_SIGACTION@
+# if !@HAVE_SIGACTION@
 
-# if !@HAVE_SIGINFO_T@
+#  if !@HAVE_SIGINFO_T@
 /* Present to allow compilation, but unsupported by gnulib.  */
 union sigval
 {
@@ -150,7 +191,7 @@ struct siginfo_t
   union sigval si_value;
 };
 typedef struct siginfo_t siginfo_t;
-# endif /* !@HAVE_SIGINFO_T@ */
+#  endif /* !@HAVE_SIGINFO_T@ */
 
 /* We assume that platforms which lack the sigaction() function also lack
    the 'struct sigaction' type, and vice versa.  */
@@ -170,22 +211,28 @@ struct sigaction
   /* Not all POSIX flags are supported.  */
   int sa_flags;
 };
-# define sa_handler _sa_func._sa_handler
-# define sa_sigaction _sa_func._sa_sigaction
+#  define sa_handler _sa_func._sa_handler
+#  define sa_sigaction _sa_func._sa_sigaction
 /* Unsupported flags are not present.  */
-# define SA_RESETHAND 1
-# define SA_NODEFER 2
-# define SA_RESTART 4
+#  define SA_RESETHAND 1
+#  define SA_NODEFER 2
+#  define SA_RESTART 4
 
 extern int sigaction (int, const struct sigaction *restrict,
                       struct sigaction *restrict);
 
-#elif !@HAVE_STRUCT_SIGACTION_SA_SIGACTION@
+# elif !@HAVE_STRUCT_SIGACTION_SA_SIGACTION@
 
-# define sa_sigaction sa_handler
+#  define sa_sigaction sa_handler
 
-#endif /* !@HAVE_SIGACTION@, !@HAVE_STRUCT_SIGACTION_SA_SIGACTION@ */
-
+# endif /* !@HAVE_SIGACTION@, !@HAVE_STRUCT_SIGACTION_SA_SIGACTION@ */
+#elif defined GNULIB_POSIXCHECK
+# undef sigaction
+# define sigaction(s,a,o)                               \
+  (GL_LINK_WARNING ("sigaction is unportable - "        \
+                    "use gnulib module sigaction for portability"),   \
+   sigaction (s, a, o))
+#endif
 
 /* Some systems don't have SA_NODEFER.  */
 #ifndef SA_NODEFER

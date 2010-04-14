@@ -1,5 +1,5 @@
 /* unlink utility for GNU.
-   Copyright (C) 2001, 2002, 2004, 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2004, 2007-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ Usage: %s FILE\n\
              stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

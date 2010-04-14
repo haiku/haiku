@@ -1,6 +1,6 @@
 /* Like <fcntl.h>, but with non-working flags defined to 0.
 
-   Copyright (C) 2006-2009 Free Software Foundation, Inc.
+   Copyright (C) 2006-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,8 +25,10 @@
 /* Special invocation convention.  */
 
 #include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#ifndef __GLIBC__ /* Avoid namespace pollution on glibc systems.  */
+# include <sys/stat.h>
+# include <unistd.h>
+#endif
 #@INCLUDE_NEXT@ @NEXT_FCNTL_H@
 
 #else
@@ -35,8 +37,10 @@
 #ifndef _GL_FCNTL_H
 
 #include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#ifndef __GLIBC__ /* Avoid namespace pollution on glibc systems.  */
+# include <sys/stat.h>
+# include <unistd.h>
+#endif
 /* The include_next requires a split double-inclusion guard.  */
 #@INCLUDE_NEXT@ @NEXT_FCNTL_H@
 
@@ -46,6 +50,8 @@
 
 /* The definition of GL_LINK_WARNING is copied here.  */
 
+/* The definition of _GL_ARG_NONNULL is copied here.  */
+
 
 /* Declare overridden functions.  */
 
@@ -53,23 +59,48 @@
 extern "C" {
 #endif
 
+#if @GNULIB_FCNTL@
+# if @REPLACE_FCNTL@
+#  undef fcntl
+#  define fcntl rpl_fcntl
+# endif
+# if !@HAVE_FCNTL@ || @REPLACE_FCNTL@
+extern int fcntl (int fd, int action, ...);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef fcntl
+# define fcntl \
+    (GL_LINK_WARNING ("fcntl is not always POSIX compliant - " \
+                      "use gnulib module fcntl for portability"), \
+     fcntl)
+#endif
+
 #if @GNULIB_OPEN@
 # if @REPLACE_OPEN@
 #  undef open
 #  define open rpl_open
-extern int open (const char *filename, int flags, ...);
+extern int open (const char *filename, int flags, ...) _GL_ARG_NONNULL ((1));
 # endif
+#elif defined GNULIB_POSIXCHECK
+# undef open
+# define open \
+    (GL_LINK_WARNING ("open is not always POSIX compliant - " \
+                      "use gnulib module open for portability"), \
+     open)
 #endif
 
 #if @GNULIB_OPENAT@
-# if !@HAVE_OPENAT@
+# if @REPLACE_OPENAT@
 #  undef openat
 #  define openat rpl_openat
-int openat (int fd, char const *file, int flags, /* mode_t mode */ ...);
+# endif
+# if !@HAVE_OPENAT@ || @REPLACE_OPENAT@
+extern int openat (int fd, char const *file, int flags, /* mode_t mode */ ...)
+     _GL_ARG_NONNULL ((2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef openat
-# define openat(f,u,g) \
+# define openat \
     (GL_LINK_WARNING ("openat is not portable - " \
                       "use gnulib module openat for portability"), \
      openat)
@@ -79,10 +110,29 @@ int openat (int fd, char const *file, int flags, /* mode_t mode */ ...);
 }
 #endif
 
-/* Fix up the FD_* macros.  */
+/* Fix up the FD_* macros, only known to be missing on mingw.  */
 
 #ifndef FD_CLOEXEC
 # define FD_CLOEXEC 1
+#endif
+
+/* Fix up the supported F_* macros.  Intentionally leave other F_*
+   macros undefined.  Only known to be missing on mingw.  */
+
+#ifndef F_DUPFD_CLOEXEC
+# define F_DUPFD_CLOEXEC 0x40000000
+/* Witness variable: 1 if gnulib defined F_DUPFD_CLOEXEC, 0 otherwise.  */
+# define GNULIB_defined_F_DUPFD_CLOEXEC 1
+#else
+# define GNULIB_defined_F_DUPFD_CLOEXEC 0
+#endif
+
+#ifndef F_DUPFD
+# define F_DUPFD 1
+#endif
+
+#ifndef F_GETFD
+# define F_GETFD 2
 #endif
 
 /* Fix up the O_* macros.  */

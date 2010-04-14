@@ -1,5 +1,5 @@
 /* tac - concatenate and print files in reverse
-   Copyright (C) 1988-1991, 1995-2006, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 1988-1991, 1995-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -633,6 +633,8 @@ main (int argc, char **argv)
   if (! (read_size < half_buffer_size && half_buffer_size < G_buffer_size))
     xalloc_die ();
   G_buffer = xmalloc (G_buffer_size);
+  {
+  void *buf = G_buffer;
   if (sentinel_length)
     {
       strcpy (G_buffer, separator);
@@ -661,6 +663,11 @@ main (int argc, char **argv)
   output ((char *) NULL, (char *) NULL);
 
   if (have_read_stdin && close (STDIN_FILENO) < 0)
-    error (EXIT_FAILURE, errno, "-");
+    {
+      error (0, errno, "-");
+      ok = false;
+    }
+  free (buf);
+  }
   exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

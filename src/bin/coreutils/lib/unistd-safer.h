@@ -1,6 +1,6 @@
 /* Invoke unistd-like functions, but avoid some glitches.
 
-   Copyright (C) 2001, 2003, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003, 2005, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,8 +15,17 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* Written by Paul Eggert.  */
+/* Written by Paul Eggert and Eric Blake.  */
 
 int dup_safer (int);
 int fd_safer (int);
 int pipe_safer (int[2]);
+
+#if GNULIB_FD_SAFER_FLAG
+int dup_safer_flag (int, int);
+int fd_safer_flag (int, int);
+#endif
+
+#if GNULIB_PIPE2_SAFER
+int pipe2_safer (int[2], int);
+#endif

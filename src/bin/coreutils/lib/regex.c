@@ -2,7 +2,8 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002, 2003, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2005, 2006, 2009, 2010 Free Software Foundation,
+   Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 

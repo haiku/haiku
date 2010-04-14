@@ -1,5 +1,5 @@
 /* POSIX compatible write() function.
-   Copyright (C) 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 2008-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This program is free software: you can redistribute it and/or modify
@@ -46,14 +46,14 @@ rpl_write (int fd, const void *buf, size_t count)
   if (ret < 0)
     {
       if (GetLastError () == ERROR_NO_DATA
-	  && GetFileType ((HANDLE) _get_osfhandle (fd)) == FILE_TYPE_PIPE)
-	{
-	  /* Try to raise signal SIGPIPE.  */
-	  raise (SIGPIPE);
-	  /* If it is currently blocked or ignored, change errno from EINVAL
-	     to EPIPE.  */
-	  errno = EPIPE;
-	}
+          && GetFileType ((HANDLE) _get_osfhandle (fd)) == FILE_TYPE_PIPE)
+        {
+          /* Try to raise signal SIGPIPE.  */
+          raise (SIGPIPE);
+          /* If it is currently blocked or ignored, change errno from EINVAL
+             to EPIPE.  */
+          errno = EPIPE;
+        }
     }
   return ret;
 }

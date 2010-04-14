@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Character set conversion.
-   Copyright (C) 2007, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -70,33 +70,33 @@ rpl_iconv_open (const char *tocode, const char *fromcode)
       && fromcode[3] == '-')
     {
       if (c_toupper (tocode[0]) == 'U'
-	  && c_toupper (tocode[1]) == 'T'
-	  && c_toupper (tocode[2]) == 'F'
-	  && tocode[3] == '-')
-	{
-	  if (strcmp (fromcode + 4, "8") == 0)
-	    {
-	      if (c_strcasecmp (tocode + 4, "16BE") == 0)
-		return _ICONV_UTF8_UTF16BE;
-	      if (c_strcasecmp (tocode + 4, "16LE") == 0)
-		return _ICONV_UTF8_UTF16LE;
-	      if (c_strcasecmp (tocode + 4, "32BE") == 0)
-		return _ICONV_UTF8_UTF32BE;
-	      if (c_strcasecmp (tocode + 4, "32LE") == 0)
-		return _ICONV_UTF8_UTF32LE;
-	    }
-	  else if (strcmp (tocode + 4, "8") == 0)
-	    {
-	      if (c_strcasecmp (fromcode + 4, "16BE") == 0)
-		return _ICONV_UTF16BE_UTF8;
-	      if (c_strcasecmp (fromcode + 4, "16LE") == 0)
-		return _ICONV_UTF16LE_UTF8;
-	      if (c_strcasecmp (fromcode + 4, "32BE") == 0)
-		return _ICONV_UTF32BE_UTF8;
-	      if (c_strcasecmp (fromcode + 4, "32LE") == 0)
-		return _ICONV_UTF32LE_UTF8;
-	    }
-	}
+          && c_toupper (tocode[1]) == 'T'
+          && c_toupper (tocode[2]) == 'F'
+          && tocode[3] == '-')
+        {
+          if (strcmp (fromcode + 4, "8") == 0)
+            {
+              if (c_strcasecmp (tocode + 4, "16BE") == 0)
+                return _ICONV_UTF8_UTF16BE;
+              if (c_strcasecmp (tocode + 4, "16LE") == 0)
+                return _ICONV_UTF8_UTF16LE;
+              if (c_strcasecmp (tocode + 4, "32BE") == 0)
+                return _ICONV_UTF8_UTF32BE;
+              if (c_strcasecmp (tocode + 4, "32LE") == 0)
+                return _ICONV_UTF8_UTF32LE;
+            }
+          else if (strcmp (tocode + 4, "8") == 0)
+            {
+              if (c_strcasecmp (fromcode + 4, "16BE") == 0)
+                return _ICONV_UTF16BE_UTF8;
+              if (c_strcasecmp (fromcode + 4, "16LE") == 0)
+                return _ICONV_UTF16LE_UTF8;
+              if (c_strcasecmp (fromcode + 4, "32BE") == 0)
+                return _ICONV_UTF32BE_UTF8;
+              if (c_strcasecmp (fromcode + 4, "32LE") == 0)
+                return _ICONV_UTF32LE_UTF8;
+            }
+        }
     }
 #endif
 
@@ -119,20 +119,20 @@ rpl_iconv_open (const char *tocode, const char *fromcode)
 
   /* Convert the encodings to upper case, because
        1. in the arguments of iconv_open() on AIX, HP-UX, and OSF/1 the case
-	  matters,
+          matters,
        2. it makes searching in the table faster.  */
   {
     const char *p = fromcode;
     char *q = fromcode_upper;
     while ((*q = c_toupper (*p)) != '\0')
       {
-	p++;
-	q++;
-	if (q == &fromcode_upper[SIZEOF (fromcode_upper)])
-	  {
-	    errno = EINVAL;
-	    return (iconv_t)(-1);
-	  }
+        p++;
+        q++;
+        if (q == &fromcode_upper[SIZEOF (fromcode_upper)])
+          {
+            errno = EINVAL;
+            return (iconv_t)(-1);
+          }
       }
     fromcode_upper_end = q;
   }
@@ -142,13 +142,13 @@ rpl_iconv_open (const char *tocode, const char *fromcode)
     char *q = tocode_upper;
     while ((*q = c_toupper (*p)) != '\0')
       {
-	p++;
-	q++;
-	if (q == &tocode_upper[SIZEOF (tocode_upper)])
-	  {
-	    errno = EINVAL;
-	    return (iconv_t)(-1);
-	  }
+        p++;
+        q++;
+        if (q == &tocode_upper[SIZEOF (tocode_upper)])
+          {
+            errno = EINVAL;
+            return (iconv_t)(-1);
+          }
       }
     tocode_upper_end = q;
   }

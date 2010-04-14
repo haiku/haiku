@@ -1,7 +1,7 @@
 /* filemode.c -- make a string describing file modes
 
-   Copyright (C) 1985, 1990, 1993, 1998-2000, 2004, 2006 Free Software
-   Foundation, Inc.
+   Copyright (C) 1985, 1990, 1993, 1998-2000, 2004, 2006, 2009-2010 Free
+   Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -99,18 +99,18 @@ strmode (mode_t mode, char *str)
   str[1] = mode & S_IRUSR ? 'r' : '-';
   str[2] = mode & S_IWUSR ? 'w' : '-';
   str[3] = (mode & S_ISUID
-	    ? (mode & S_IXUSR ? 's' : 'S')
-	    : (mode & S_IXUSR ? 'x' : '-'));
+            ? (mode & S_IXUSR ? 's' : 'S')
+            : (mode & S_IXUSR ? 'x' : '-'));
   str[4] = mode & S_IRGRP ? 'r' : '-';
   str[5] = mode & S_IWGRP ? 'w' : '-';
   str[6] = (mode & S_ISGID
-	    ? (mode & S_IXGRP ? 's' : 'S')
-	    : (mode & S_IXGRP ? 'x' : '-'));
+            ? (mode & S_IXGRP ? 's' : 'S')
+            : (mode & S_IXGRP ? 'x' : '-'));
   str[7] = mode & S_IROTH ? 'r' : '-';
   str[8] = mode & S_IWOTH ? 'w' : '-';
   str[9] = (mode & S_ISVTX
-	    ? (mode & S_IXOTH ? 't' : 'T')
-	    : (mode & S_IXOTH ? 'x' : '-'));
+            ? (mode & S_IXOTH ? 't' : 'T')
+            : (mode & S_IXOTH ? 'x' : '-'));
   str[10] = ' ';
   str[11] = '\0';
 }
@@ -122,43 +122,43 @@ strmode (mode_t mode, char *str)
    12 characters are stored in STR.
    The characters stored in STR are:
 
-   0	File type, as in ftypelet above, except that other letters are used
+   0    File type, as in ftypelet above, except that other letters are used
         for files whose type cannot be determined solely from st_mode:
 
-	    'F' semaphore
-	    'M' migrated file (Cray DMF)
-	    'Q' message queue
-	    'S' shared memory object
-	    'T' typed memory object
+            'F' semaphore
+            'M' migrated file (Cray DMF)
+            'Q' message queue
+            'S' shared memory object
+            'T' typed memory object
 
-   1	'r' if the owner may read, '-' otherwise.
+   1    'r' if the owner may read, '-' otherwise.
 
-   2	'w' if the owner may write, '-' otherwise.
+   2    'w' if the owner may write, '-' otherwise.
 
-   3	'x' if the owner may execute, 's' if the file is
-	set-user-id, '-' otherwise.
-	'S' if the file is set-user-id, but the execute
-	bit isn't set.
+   3    'x' if the owner may execute, 's' if the file is
+        set-user-id, '-' otherwise.
+        'S' if the file is set-user-id, but the execute
+        bit isn't set.
 
-   4	'r' if group members may read, '-' otherwise.
+   4    'r' if group members may read, '-' otherwise.
 
-   5	'w' if group members may write, '-' otherwise.
+   5    'w' if group members may write, '-' otherwise.
 
-   6	'x' if group members may execute, 's' if the file is
-	set-group-id, '-' otherwise.
-	'S' if it is set-group-id but not executable.
+   6    'x' if group members may execute, 's' if the file is
+        set-group-id, '-' otherwise.
+        'S' if it is set-group-id but not executable.
 
-   7	'r' if any user may read, '-' otherwise.
+   7    'r' if any user may read, '-' otherwise.
 
-   8	'w' if any user may write, '-' otherwise.
+   8    'w' if any user may write, '-' otherwise.
 
-   9	'x' if any user may execute, 't' if the file is "sticky"
-	(will be retained in swap space after execution), '-'
-	otherwise.
-	'T' if the file is sticky but not executable.
+   9    'x' if any user may execute, 't' if the file is "sticky"
+        (will be retained in swap space after execution), '-'
+        otherwise.
+        'T' if the file is sticky but not executable.
 
    10   ' ' for compatibility with 4.4BSD strmode,
-	since this interface does not support ACLs.
+        since this interface does not support ACLs.
 
    11   '\0'.  */
 

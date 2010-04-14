@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Determine alignment of types.
-   Copyright (C) 2003-2004, 2006, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2003-2004, 2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

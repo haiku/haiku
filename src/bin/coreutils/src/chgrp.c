@@ -1,5 +1,5 @@
 /* chgrp -- change group ownership of files
-   Copyright (C) 89, 90, 91, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1989-1991, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ Examples:\n\
   %s -hR staff /u  Change the group of /u and subfiles to \"staff\".\n\
 "),
               program_name, program_name);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -293,7 +293,7 @@ main (int argc, char **argv)
       gid = parse_group (group_name);
     }
 
-  if (chopt.recurse & preserve_root)
+  if (chopt.recurse && preserve_root)
     {
       static struct dev_ino dev_ino_buf;
       chopt.root_dev_ino = get_root_dev_ino (&dev_ino_buf);

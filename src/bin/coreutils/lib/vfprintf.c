@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Formatted output to a stream.
-   Copyright (C) 2004, 2006-2008 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2006-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -55,13 +55,16 @@ vfprintf (FILE *fp, const char *format, va_list args)
   if (fwrite (output, 1, len, fp) < len)
     {
       if (output != buf)
-	{
-	  int saved_errno = errno;
-	  free (output);
-	  errno = saved_errno;
-	}
+        {
+          int saved_errno = errno;
+          free (output);
+          errno = saved_errno;
+        }
       return -1;
     }
+
+  if (output != buf)
+    free (output);
 
   if (len > INT_MAX)
     {

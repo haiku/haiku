@@ -1,6 +1,6 @@
 /* Unicode character output to streams with locale dependent encoding.
 
-   Copyright (C) 2000-2003, 2005, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2000-2003, 2005, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,21 +28,21 @@
    Returns whatever the callback returned.
    Assumes that the locale doesn't change between two calls.  */
 extern long unicode_to_mb (unsigned int code,
-			   long (*success) (const char *buf, size_t buflen,
-					    void *callback_arg),
-			   long (*failure) (unsigned int code, const char *msg,
-					    void *callback_arg),
-			   void *callback_arg);
+                           long (*success) (const char *buf, size_t buflen,
+                                            void *callback_arg),
+                           long (*failure) (unsigned int code, const char *msg,
+                                            void *callback_arg),
+                           void *callback_arg);
 
 /* Outputs the Unicode character CODE to the output stream STREAM.
    Upon failure, exit if exit_on_error is true, otherwise output a fallback
    notation.  */
 extern void print_unicode_char (FILE *stream, unsigned int code,
-				int exit_on_error);
+                                int exit_on_error);
 
 /* Simple success callback that outputs the converted string.
    The STREAM is passed as callback_arg.  */
 extern long fwrite_success_callback (const char *buf, size_t buflen,
-				     void *callback_arg);
+                                     void *callback_arg);
 
 #endif

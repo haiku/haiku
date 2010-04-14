@@ -1,5 +1,5 @@
 /* Charset conversion with out-of-memory checking.
-   Copyright (C) 2001-2004, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2001-2004, 2006, 2009-2010 Free Software Foundation, Inc.
    Written by Bruno Haible.
 
    This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@
 
 int
 xmem_cd_iconv (const char *src, size_t srclen, iconv_t cd,
-	       char **resultp, size_t *lengthp)
+               char **resultp, size_t *lengthp)
 {
   int retval = mem_cd_iconv (src, srclen, cd, resultp, lengthp);
 

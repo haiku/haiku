@@ -1,7 +1,7 @@
 /* idcache.c -- map user and group IDs, cached for speed
 
-   Copyright (C) 1985, 1988, 1989, 1990, 1997, 1998, 2003, 2005-2007
-   Free Software Foundation, Inc.
+   Copyright (C) 1985, 1988-1990, 1997-1998, 2003, 2005-2007, 2009-2010 Free
+   Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -73,10 +73,10 @@ getuser (uid_t uid)
   for (tail = user_alist; tail; tail = tail->next)
     {
       if (tail->id.u == uid)
-	{
-	  match = tail;
-	  break;
-	}
+        {
+          match = tail;
+          break;
+        }
     }
 
   if (match == NULL)
@@ -123,7 +123,7 @@ getuidbyname (const char *user)
   if (!pwent && strspn (user, digits) < strlen (user))
     {
       setenv ("USER", user, 1);
-      pwent = getpwnam (user);	/* now it will succeed */
+      pwent = getpwnam (user);  /* now it will succeed */
     }
 #endif
 
@@ -155,10 +155,10 @@ getgroup (gid_t gid)
   for (tail = group_alist; tail; tail = tail->next)
     {
       if (tail->id.g == gid)
-	{
-	  match = tail;
-	  break;
-	}
+        {
+          match = tail;
+          break;
+        }
     }
 
   if (match == NULL)
@@ -205,7 +205,7 @@ getgidbyname (const char *group)
   if (!grent && strspn (group, digits) < strlen (group))
     {
       setenv ("GROUP", group, 1);
-      grent = getgrnam (group);	/* now it will succeed */
+      grent = getgrnam (group); /* now it will succeed */
     }
 #endif
 

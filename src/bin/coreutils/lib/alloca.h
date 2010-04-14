@@ -1,12 +1,15 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+/* -*- buffer-read-only: t -*- vi: set ro: */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+#line 1
 /* Memory allocation on the stack.
 
-   Copyright (C) 1995, 1999, 2001, 2002, 2003, 2004, 2006 Free Software
-   Foundation, Inc.
+   Copyright (C) 1995, 1999, 2001-2004, 2006-2010 Free Software Foundation,
+   Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published
-   by the Free Software Foundation; either version 2, or (at your option)
+   by the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -21,8 +24,8 @@
 
 /* Avoid using the symbol _ALLOCA_H here, as Bison assumes _ALLOCA_H
    means there is a real alloca function.  */
-#ifndef _GNULIB_ALLOCA_H
-# define _GNULIB_ALLOCA_H
+#ifndef _GL_ALLOCA_H
+#define _GL_ALLOCA_H
 
 /* alloca (N) returns a pointer to N bytes of memory
    allocated on the stack, which will last until the function returns.
@@ -43,6 +46,8 @@
 # elif defined _MSC_VER
 #  include <malloc.h>
 #  define alloca _alloca
+# elif defined __DECC && defined __VMS
+#  define alloca __ALLOCA
 # else
 #  include <stddef.h>
 #  ifdef  __cplusplus
@@ -52,4 +57,4 @@ void *alloca (size_t);
 # endif
 #endif
 
-#endif /* _GNULIB_ALLOCA_H */
+#endif /* _GL_ALLOCA_H */

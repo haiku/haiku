@@ -1,4 +1,2211 @@
+2010-01-13  Jim Meyering  <meyering@redhat.com>
+
+	version 8.4
+	* NEWS: Record release date.
+
+2010-01-13  Pádraig Brady  <P@draigBrady.com>
+
+	tests: avoid spurious failures on older shells
+	* tests/tail-2/inotify-hash-abuse: Use kill rather than wait
+	to determine if the tail process is still running.
+	* tests/tail-2/inotify-hash-abuse2: Ditto.
+
+2010-01-13  Jim Meyering  <meyering@redhat.com>
+
+	tests: work around spurious test failure with OpenBSD4.5's /bin/sh
+	* tests/ls/infloop: OpenBSD4.5's /bin/sh would mistakenly include
+	"set -x"-output in an application's stderr stream when stderr is
+	redirected before stdout.  This was causing one spurious test failure.
+	The work-around: redirect stdout first.
+	Reported by Nelson Beebe.
+
+	tests: don't silently skip the sort-version tests
+	* tests/misc/sort-version: Don't use <<- and indented here-doc contents.
+	s/<<-/<</ and unindent the here-document contents.  Otherwise,
+	bash would ignore the indented delimiter and use EOF, thus silently
+	skipping this test.  OpenBSD5.4's shell reported the failure:
+	  $ printf 'cat<<-x\n foo\n x\n'|sh
+	  sh: <stdin>[4]: here document `x' unclosed
+	  [Exit 1]
+	by contrast, bash warns but still exits successfully:
+	  $ printf 'cat<<-x\n foo\n x\n'|bash && echo you lose
+	  bash: line 3: warning: here-document at line 1 delimited by \
+	    end-of-file (wanted `x')
+	   foo
+	   x
+	  you lose
+
+2010-01-12  Eric Blake  <ebb9@byu.net>
+
+	tests: avoid spurious failure on old kernel
+	* tests/touch/no-dereference: Skip test if utimensat doesn't
+	support symlinks.
+	Reported by Bernhard Voelker.
+
+2010-01-12  Pádraig Brady  <P@draigBrady.com>
+
+	maint: update info about getting the prerequisite automake
+	* README-prereq: Now that we require automake-1.11.1
+	update the instructions from getting it from the git repo
+
+	maint: remove an already handled item from TODO
+	* TODO: The question regarding printf octal escapes is answered in
+	commit 4bcefa62, 2003-04-21, "Fix printf POSIX compatibility bug ..."
+
+	maint: fix tests on solaris by using /usr/xpg4/bin
+	* tests/check.mk: Prepend /usr/xpg4/bin to the $PATH if present.
+	Using the more standard utilities allows tests such as misc/printenv,
+	which uses the -E option to grep, to complete.
+
+2010-01-12  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib, to get fixed getlogin-related tests
+
+	build: fix build failure due to missing libxattr
+	Configure is supposed to detect insufficient XATTR support.
+	However, if a system has the required headers, but no library,
+	the configure script would mistakenly enable USE_XATTR.
+	* m4/xattr.m4 (gl_FUNC_XATTR): If the attr_copy_file function
+	is not found, don't set USE_XATTR.
+	Nelson Beebe reported a link failure on RHEL 5.3.
+	Also, do not let the combination of --disable-xattr and
+	a stray LIB_XATTR environment setting perturb the build.
+	* NEWS (Build-related): Mention it.
+
+	doc: mention the wchar.h vs. glibc build problem
+	* NEWS (Build-related): Mention the wchar.h issue.
+
+2010-01-12  Pádraig Brady  <P@draigBrady.com>
+
+	nproc: return a possibly more accurate total CPU count
+	* gnulib: Update, for num_processors() improvement.
+	* NEWS: Mention the fix.
+
+2010-01-12  Kamil Dudka  <kdudka@redhat.com>
+
+	ls: reorder includes to work around broken <sys/capability.h>
+	* src/ls.c: Include <sys/capability.h> later, to avoid build
+	failure with a header from libcap-2.16-1 or earlier.
+	See http://bugzilla.redhat.com/483548 for details.
+
+2010-01-08  Eric Blake  <ebb9@byu.net>
+
+	maint: move coreutils specific rule into cfg.mk
+	* gnulib: Update, for maint.mk improvement.
+	* cfg.mk (_makefile_at_at_check_excpetions): New rule, needed
+	for latest change to maint.mk.
+
+2010-01-07  Jim Meyering  <meyering@redhat.com>
+
+	post-release administrivia
+	* NEWS: Add header line for next release.
+	* .prev-version: Record previous version.
+	* cfg.mk (old_NEWS_hash): Auto-update.
+
+	version 8.3
+	* NEWS: Record release date.
+
+	maint: change an email address in THANKS
+	* THANKS: Adjust Denis' address.
+
+2010-01-07  Eric Blake  <ebb9@byu.net>
+
+	pr: ensure the page header line is of the required format
+	Before this change, with too long a file name, the name would
+	abut the date field on the left and possibly also the "Page N"
+	field on the right, rather than leaving a one-space separator
+	in each case.  Fixes a regression introduced on Mar 6 2009,
+	by commit a4053c5291d5797734b3e4f042f9e1adf3944fd6
+
+	* src/pr.c (print_header): Ensure that there is at least one
+	space before and after the file name part of the header line.
+	* NEWS: Mention it.
+	* tests/pr/W20l24f-ll: s/xPage/ x Page/.
+	* THANKS: Update.
+	Reported by Denis McKeon, in https://savannah.gnu.org/bugs/?28492.
+
+	maint: apply correct license to auxiliary files
+	* gnulib: Update, for maint.mk improvements.
+	* HACKING: Use GFDL 1.3, not 1.2.
+	* NEWS: Likewise.
+	* README: Likewise.
+	* cfg.mk (old_NEWS_hash): Update accordingly.
+	* .gitignore: Ignore file created by 'make update-NEWS-hash'.
+
+2010-01-06  Jim Meyering  <meyering@redhat.com>
+
+	build: require newer versions of automake and autoconf
+	* configure.ac: Require autoconf-2.62 and automake-1.11.1 or newer.
+	* bootstrap.conf (buildreq): Require automake-1.11.1 or newer,
+	to ensure people use a version with the fix for CVE-2009-4029.
+	Note that the coreutils-8.2 tarball included a fixed Makefile.in.
+	Require autoconf-2.62, per automake.
+
+2010-01-06  Eric Blake  <ebb9@byu.net>
+
+	cp, touch: avoid problem with new glibc
+	* gnulib: Update, for utimens fix.
+	* NEWS: Mention the fix.
+	Reported by Guillaume Ayoub in http://bugs.debian.org/563726.
+	See also http://bugzilla.redhat.com/552320.
+
+2010-01-05  Philip Rowlands  <phr@doc.ic.ac.uk>
+
+	doc: fix typo in NEWS
+	* NEWS: Fix typo: s/repeated/repeatedly/
+
+2010-01-05  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest
+
+	maint: always free a buffer, to avoid even semblance of a leak
+	* src/tac.c (main): Free the input buffer in most cases.
+
+2010-01-04  Jim Meyering  <meyering@redhat.com>
+
+	maint: use more readable operator: "||" rather than "|"
+	* src/cp.c (make_dir_parents_private): Use "||" rather than "|",
+	so that clang understands there is no undefined pointer dereference.
+
+2010-01-03  Jim Meyering  <meyering@redhat.com>
+
+	maint: record update-copyright options for this package
+	* cfg.mk: Next time, just run "make update-copyright".
+
+2010-01-01  Eric Blake  <ebb9@byu.net>
+
+	ls: fix color of broken symlinks colored as target
+	* src/ls.c (print_color_indicator): When using 'LINK target' in
+	dircolors, treat broken symlink as C_ORPHAN.
+	* tests/misc/ls-misc (sl-dangle2, sl-dangle3, sl-dangle4)
+	(sl-dangle5): Test for it, and add more coverage.
+	* NEWS: Document it.
+	* THANKS: Update.
+	Reported by Chris Jones.
+
+2010-01-01  Jim Meyering  <meyering@redhat.com>
+
+	df: use fputs in place of printf in a few more places
+	* src/df.c (print_header): Use fputs rather than printf in more places.
+	Suggested by Eric Blake.
+
+	build: update gnulib submodule to latest
+
+	maint: add a few copyrights; remove obsolete README file
+	* tests/README: Remove long-obsolete file.
+	* tests/Makefile.am (EXTRA_DIST): Remove README.
+	* tests/misc/truncate-dir-fail: Add copyright comment.
+	* tests/misc/selinux: Likewise.
+	* tests/misc/chcon: Likewise.
+	* tests/misc/chcon-fail: Likewise.
+	* tests/sample-test: Use only 2010 in this list.
+
+	maint: update all FSF copyright year lists to include 2010
+	Use this command:
+	git ls-files | grep -v COPYING \
+	  | xargs env UPDATE_COPYRIGHT_USE_INTERVALS=1 \
+	      build-aux/update-copyright
+
+2010-01-01  Stéphane Raimbault  <stephane.raimbault@makina-corpus.com>
+
+	pr --help: add missing space between short and long options usage message
+	* src/pr.c (usage): Add missing space.
+
+	pr --help: improve a line-break
+	* src/pr.c (usage): Move the newline character a bit farther.
+
+	df: add comments to help translators align column headers
+	* src/df.c (print_header): Add a comment telling translators to
+	retain the message length, and another to align header translations.
+
+2009-12-31  Jim Meyering  <meyering@redhat.com>
+
+	maint: newer gnulib; don't hard-code my GPG key ID
+	* cfg.mk (gpg_key_ID): Remove definition, now that maint.mk automates it.
+	* gnulib: Update to latest.
+
+	doc: update tail's documentation to allow for new -F semantics
+	* src/tail.c (usage): Reword tail -F description, so that it no
+	longer mentions details specific to the non-inotify implementation.
+	Also, join diagnostic strings (while staying under the 509-byte limit)
+	to ease formatting of translations.  The latter was prompted by
+	a report from Stéphane Raimbault.
+	* doc/coreutils.texi (tail invocation): Update description here, too.
+
+2009-12-31  Eric Blake  <ebb9@byu.net>
+
+	touch: work around ntfs-3g bug
+	* gnulib: Update, for utimensat fix.
+	* NEWS: Improve wording about touch fixes.
+	* THANKS: Update.
+	Reported by Stuart Citrin.
+
+2009-12-30  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest
+
+	doc: mention two tail -F bug fixes in NEWS
+	* NEWS (Bug fixes): Two tail -F fixes.
+
+	tail: test for a bug in inotify-enabled tail -F
+	tail -F a b would stop tracking additions to b after "mv a b".
+	* tests/tail-2/F-vs-rename: New file.
+	* tests/Makefile.am (TESTS): Add it.
+
+2009-12-30  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	tail -F: don't stop following the target of a rename
+	This fixes a bug whereby tail -F would fail to track changes
+	to a file that was a target of a rename, and when the source of
+	the rename was another tailed file.
+
+	* src/tail.c (tail_forever_inotify): Ensure the wd is not already
+	present in the hash table before trying to add it.  When a new watch
+	descriptor is added to the `wd_to_name' hash table, check that it is
+	not already present.  If it is present then remove the previous element.
+
+2009-12-30  Pádraig Brady  <P@draigBrady.com>
+
+	maint: improve the info about $PATH in README-prereq
+	* README-prereq: It wasn't obvious that the $PATH should
+	be set before building any of the prerequisite packages,
+	so move that information up.
+
+2009-12-29  Jim Meyering  <meyering@redhat.com>
+
+	tail: add another test to exercise abort-inducing flaw in tail -F
+	* tests/tail-2/inotify-hash-abuse2: New test, based on a reproducer
+	by Rob Wortman.
+	* tests/Makefile.am (TESTS): Add it.
+
+	tail: add a test to exercise abort-inducing flaw in tail -F
+	* tests/tail-2/inotify-hash-abuse: New file, derived from
+	a report by Rob Wortman.
+	* tests/Makefile.am (TESTS): Add it.
+	Improved by: Pádraig Brady.
+
+2009-12-29  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	tail: remove `fdspec' from the hash table before changing its key
+	* src/tail.c (tail_forever_inotify): Avoid modifying fdspec->wd while
+	it is in the wd_to_name hash table.  Once it is removed, it can be
+	added using the new `wd' as key for the hash table.  This fixes the
+	abort-inducing bug reported by Rob Wortman in
+	http://thread.gmane.org/gmane.comp.gnu.coreutils.bugs/19372
+
+2009-12-29  Jim Meyering  <meyering@redhat.com>
+
+	maint: quiet "make" in doc/
+	* doc/Makefile.am (constants.texi): Add a use of AM_V_GEN.
+
+	tail: rename an internal variable
+	* src/tail.c (tail_forever_inotify): s/wd_table/wd_to_name/
+
+	tail: avoid read-beyond-end-of-buffer error
+	* src/tail.c (tail_forever_inotify): Do not use f[i] in a context
+	where i may be larger than the largest valid index.  In the final
+	"if" clause in which we'd remove an inotify watch, we might have
+	used f[n_files].  Use fspec instead, since it is guaranteed to
+	be defined.
+
+2009-12-26  Eric Blake  <ebb9@byu.net>
+
+	maint: ignore more built files
+	Recent gnulib changes added new built files.
+
+	* .gitignore: Add arg-nonnull.h, link-warning.h,
+	unused-parameter.h.
+
+	tac: supply link dependency
+	* src/Makefile.am (tac_LDADD): Add LIB_GETHRXTIME.
+	* THANKS: Update.
+	Reported by Robert Schwebel.
+
+2009-12-26  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest
+
+	tail: shrink internal struct by 8 bytes
+	* tail.c (struct File_spec): Rearrange struct members to decrease
+	size by 8 bytes to 76,96 on i686,x86_64 respectively.
+
+2009-12-25  Jim Meyering  <meyering@redhat.com>
+
+	maint: tail: avoid in-function #if directives
+	* src/tail.c (fremote): Add a comment.
+	Move definition "up" to precede first use, so we can
+	remove its prototype and the #if..#endif around each use.
+	(any_remote_file): Rename from any_remote_files.
+
+2009-12-25  Pádraig Brady  <P@draigBrady.com>
+
+	tail: fix --follow to not use inotify on remote files
+	* src/tail.c (struct File_spec): Add a flag to record if file is remote.
+	(recheck): If we're using inotify then check if the file has gone remote
+	and if so, drop it with a warning.
+	(any_remote_files): A new function to check for any open remote files.
+	(tailable_stdin): A new function to refactor the check for whether
+	a tailable file was specified through stdin.
+	(fremote): A new function to check if a file descriptor
+	refers to a remote file.
+	(tail_forever_inotify): Add some comments.
+	(tail_file): Record if a file is remote when initially opened.
+	(main): Disable inotify if any remote files specified.
+	Also document the caveat about remounted files not
+	being noticed by inotify.
+	* NEWS: Mention the fix.
+
+2009-12-23  Pádraig Brady  <P@draigBrady.com>
+
+	wc: line-buffer the printed counts
+	* src/wc.c (main): Set stdout to line buffered mode
+	to ensure parallel running instances don't intersperse
+	their output.  This adds 6.5% to the run time in the worst case
+	of many zero length files, but has neglible impact for
+	standard sized files.
+	* tests/misc/wc-parallel: New test for atomic output.
+	* tests/Makefile.am: Reference it.
+	* NEWS: Mention the fix
+	This is similar to commit 710fe413, 20-10-2009,
+	"md5sum, sha*sum, sum: line-buffer the printed checksums"
+
+2009-12-22  Pádraig Brady  <P@draigBrady.com>
+
+	stat: Recognize k-afs, gfs, ocfs2 file system types
+	* src/stat.c (human_fstype): Add k-afs, gfs/gfs2 and ocfs2.
+	* NEWS: Update the stat -f entry.
+
+	stat: add support for more file system types
+	* src/stat.c (human_fstype): Add the following FS types:
+	fuseblk, rpc_pipefs.  Also fix a typo of minux3 to minix3,
+	and mention the fs-magic-compare make target to help update the list.
+	* NEWS: Mention the fix.
+
+2009-12-20  Jim Meyering  <meyering@redhat.com>
+
+	build: correct coreutils-specific distcheck rules
+	* dist-check.mk (built_programs): Use $(bin_PROGRAMS), not $(PROGRAMS).
+	Otherwise, my-instcheck would fail due to non-installation of e.g.,
+	the noinst_PROGRAMS, setuidgid and getlimits.
+	(taint-distcheck): Correct the grep command that checks for libtool
+	traces in configure.
+
+2009-12-20  Eric Blake  <ebb9@byu.net>
+
+	touch: fix ctime regression in 'touch -a'
+	Regression introduced in coreutils 8.1 due to a bug in the Linux
+	kernel implementation of utimensat with mtime of UTIME_OMIT.
+
+	* gnulib: Update to latest, to pick up utimensat fix.
+	* NEWS: Mention the change.
+	* THANKS: Update.
+	Reported by John Stanley.
+
+2009-12-19  Pádraig Brady  <P@draigBrady.com>
+
+	maint: don't include the strverscmp gnulib module
+	* bootstrap.conf (gnulib_modules): Remove the strverscmp module
+	which is not used since commit e505736f, on 03-10-2008,
+	"ls and sort: use filevercmp instead of strverscmp"
+
+	doc: enhance and reference info about version comparison
+	* doc/coreutils.texi (sort invocation): Reference the additional
+	info about filevercmp rather than the unused strverscmp.
+	(Details about version sort): Add some examples that are not
+	handled well by fileversmp.
+	* src/ls.c: Change a comment referencing the now unused strverscmp.
+
+	rm: fix --one-file-system regression due to fts conversion
+	* src/remove.c (rm_fts): Fix incorrect comparison of
+	device and inode numbers.
+	* tests/rm/one-file-system2: Add a separate test so
+	that it can be run as a normal user (It doesn't need to mount).
+	* tests/Makefile.am: Reference it.
+	* NEWS: Mention the fix.
+	Reported by Jan Larres.
+
+2009-12-14  Jim Meyering  <meyering@redhat.com>
+
+	maint: improve dist-check.mk rules
+	* dist-check.mk (null_AM_MAKEFLAGS): Remove LIBTOOL.  Adding it was
+	erroneous, since it is required when building from a distribution
+	tarball of a libtool-using project.  Reported by Ralf Wildenhues.
+	(my-distcheck): Reorganize to use a subshell and set -e, so that
+	failures propagate "out".  Without this change, setting LIBTOOL=false
+	would cause a failure that would then be ignored, probably due to a
+	problem in $(install-transform-check).
+
+2009-12-14  Thiago Farina  <tfransosi@gmail.com>
+
+	base64: use *_OPTION_DESCRIPTION macros instead of hard-coded strings
+	* src/base64 (usage): Use HELP_OPTION_DESCRIPTION and
+	VERSION_OPTION_DESCRIPTION macros, not literal strings.
+
+2009-12-13  Jim Meyering  <meyering@redhat.com>
+
+	tests: unpack xz-compressed tarballs when possible, not always *.gz
+	* dist-check.mk: Unpack compressed tarball using xz when possible,
+	since that's faster.
+
+	maint: make dist-check.mk more easily shared
+	* dist-check.mk (built_programs): More generic, but still assumes src/.
+	Don't set GZIP in environment when untarring.
+	(my-distcheck): Use $(DIST_ARCHIVES), rather than assuming that
+	there is always a .tar.gz file.
+
+	nohup: if fd_repoen fails (redirecting stdin), report it
+	* src/nohup.c (main): Don't ignore fd_reopen failure.
+
+	tests: make the taint-distcheck rule easier to share with other projects
+	* dist-check.mk (taint-distcheck): Skip this test in a project
+	that uses libtool.
+
+	stat: recognize "sockfs" file system type, ...
+	... now that its magic number appears in <linux/magic.h>.
+	* src/stat.c (human_fstype) [S_MAGIC_SOCKFS]: Add case.
+
+	maint: move definitions from maint.mk to dist-check.mk
+	* dist-check.mk (null_AM_MAKEFLAGS): Define here, not in maint.mk.
+	(built_programs): Likewise.
+	(my-distcheck): Move comments to...
+	(coreutils-path-check): ...the code they refer to.
+	Remove obsolete comments.
+	(null_AM_MAKEFLAGS): Add gperf, even though it's not used here.
+	* gnulib: Update to latest, for fixed maint.mk.
+
+2009-12-12  Jim Meyering  <meyering@redhat.com>
+
+	tests: tail-without-inotify: avoid spurious test failure
+	* tests/tail-2/wait: Account for the possibility that the kernel
+	lacks inotify support.  Reported by Chris Clayton.
+
+	factor: add a missing va_end
+	* src/factor.c (debug): Add missing va_end.
+
+2009-12-11  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest; adapt a patch
+	* gl/lib/tempname.c.diff: Adjust patch to apply to gnulib, now that
+	most TABs in indentation have been converted to spaces by running
+	this command: f=tempname.c.diff; patch-xform $f > k && mv k $f
+
+	post-release administrivia
+	* NEWS: Add header line for next release.
+	* .prev-version: Record previous version.
+	* cfg.mk (old_NEWS_hash): Auto-update.
+
+	version 8.2
+	* NEWS: Record release date.
+
+	tests: use a slightly better CU_TEST_NAME setting
+	* tests/check.mk (CU_TEST_NAME): Better test names.
+
+	tail: don't call fstat on an uninitialized FD
+	This bug showed up via valgrind as a "Conditional jump or move
+	depends on uninitialized value(s)" error.
+	* src/tail.c (ignore_fifo_and_pipe): New function.
+	(main): Use it only when tailing forever.
+	The code to compute n_viable and mark some F[i] as ignored would call
+	isapipe on an uninitialized file descriptor.  But n_viable and those
+	.ignored marks are useful/used only when tailing forever.  This bug
+	was introduced via commit f0ff8c73 (7.6), "tail: make the new
+	piped-stdin test as portable as the old one".
+	* NEWS (Bug fixes): Mention it.
+
+	doc: NEWS: mention that gnulib's mgetgroups fix affects id
+	* NEWS (Bug fixes): Mention the "id" bug fix inherited via this gnulib
+	change: "mgetgroups: do not write bytes beyond end of malloc'd buffer"
+	http://git.sv.gnu.org/cgit/gnulib.git/commit/?id=51d5e813e9ee6cf23
+
+2009-12-10  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest
+
+	tests: avoid spurious failure when run via valgrind
+	* tests/misc/printenv: Ignore LD_PRELOAD differences.
+
+2009-12-09  Jim Meyering  <meyering@redhat.com>
+
+	doc: NEWS: the "make distcheck" vulnerability dates back to 5.0
+	* NEWS (Bug fixes): Correct the introduced-in version number.
+	This was introduced on 2003-04-02 by commit 722a49ea.
+
+	doc: NEWS: mention the "make distcheck" vulnerability
+	* NEWS (Bug fixes): Mention implications of the "make distcheck" change.
+	This was introduced on 2008-07-22 by commit 9bb0d576, "tests: ensure
+	"make check" w/tainted build dir no longer impacts $HOME".
+
+	tests: don't let "umask 077" cause root-only cp/preserve-gid failure
+	* tests/cp/preserve-gid: Use working_umask_or_skip_ to set umask to 022.
+
+2009-12-08  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest
+
+2009-12-08  Pádraig Brady  <P@draigBrady.com>
+
+	maint: remove an erroneous comment
+	* tests/misc/timeout: Remove an erroneous comment
+	introduced through copy and paste.
+
+	sort: fix failure if sort's parent has ignored SIGCHLD
+	* src/sort.c (main): Reset the SIGCHLD handler to the default
+	as otherwise wait() could return an error.
+	* tests/misc/sort-compress: Set the CHLD handler in a subshell
+	to SIG_IGN to ensure the sort command resets it to SIG_DFL.
+	* NEWS: Mention the fix.
+
+	timeout: fix failure if timeout's parent has ignored SIGCHLD
+	* src/timeout.c (main): Reset the SIGCHLD handler to the default
+	as otherwise wait() could return -1 and set errno to ECHILD.
+	This condition was ignored until commit 0b1dcf33, on 31-08-2009,
+	"timeout: defensive handling of all wait() errors"
+	but subsequently timeout would run the command correctly
+	but then fail with an error message.
+	* tests/misc/timeout: In a subshell set the CHLD handler to
+	SIG_IGN to ensure the timeout command resets it to SIG_DFL.
+	* NEWS: Mention the fix.
+
+	tests: fix stty-row-col failure on small fixed terminals
+	* tests/misc/stty-row-col: Linux virtual consoles at least,
+	issue an error if you try to increase their size, so skip the
+	test if we can't increase the dimensions of the tty by 1 cell.
+	Reported by Matthew Burgess.
+
+	tests: fix stty failure with serial control settings
+	* tests/misc/stty: Don't check the serial control settings as
+	these are ignored by various Linux kernels.
+	Reported by Matthew Burgess.
+
+2009-12-07  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest
+
+	build: distcheck: do not leave a $TMPDIR/coreutils directory behind
+	* dist-check.mk (tmpdir): Rename from TMPDIR.  Use ./tests/torture
+	unconditionally, rather than $TMPDIR-with-default-to-/tmp.
+	Otherwise, running "make distcheck" could leave an empty /tmp/coreutils
+	directory behind.
+	(tp): Simplify, now that it's always in the build-dir.
+	(taint-distcheck): Set HOME earlier, in case $(MAKE) misbehaves.
+	(my-instcheck, coreutils-path-check): Add diagnostics, so it's easier
+	to diagnose when each runs.
+	(coreutils-path-check): Run configure with --quiet, to reduce output.
+	Inspired by Ralf Wildenhues' report of /tmp/coreutils being left behind.
+
+2009-12-06  Jim Meyering  <meyering@redhat.com>
+
+	tests: readdir-mountpoint-inode avoid false-positive w/virtualbox
+	* tests/ls/readdir-mountpoint-inode: With some systems, stat can
+	succeed on a mount point and report that the inode number is 0.
+	Since ls displays "?" for those, that would otherwise show up as a
+	difference.  Skip such mount points.  Reported by Sergei Steshenko
+	in http://thread.gmane.org/gmane.comp.gnu.coreutils.bugs/19142
+
+2009-12-06  Pádraig Brady  <P@draigBrady.com>
+
+	tests: don't run tail-2/inotify-race by default
+	* tests/tail-2/inotify-race: Note the caveats of the test.
+	I.E. the intermittent skips and the gdb hang reported
+	by Alan Curry.  Add extra info to the log on why the test
+	is skipped as it may be due to multiple reasons.  Mark
+	the test as very expensive so that it's not normally run.
+
+2009-12-05  Eric Blake  <ebb9@byu.net>
+
+	id: handle systems without getgroups support
+	If getgroups failed with ENOSYS, mgetgroups would unnecessarily
+	fail, and that provoked id into freeing an uninitialized pointer.
+	Meanwhile, we were not using xalloc_die properly.  Both issues
+	are better solved in gnulib, by introducing xgetgroups; this
+	patch uses the new interface.
+
+	Regression introduced by commit 6a31fd8d7.
+
+	* gnulib: Update, for mgetgroups improvments.
+	* src/id.c (print_full_info): Adjust caller to die on allocation
+	failure, and no longer worry about ENOSYS.
+	* src/group-list.c (print_group_list): Likewise.
+	* src/setuidgid.c (main): Likewise.
+	* NEWS: Mention the fix.
+	* THANKS: Update.
+	Reported by Scott Harrison.
+
+2009-12-03  Jim Meyering  <meyering@redhat.com>
+
+	tests: fix a bug in sanitize_path_ that inhibited verbose output
+	* tests/test-lib.sh (sanitize_path_): Use "set -- ...", not "set - ...",
+	since the latter turns off the -x setting we rely on for VERBOSE=yes
+	output.
+
+2009-12-01  Eric Blake  <ebb9@byu.net>
+
+	sort: fix link failure on Solaris
+	Commit f9d0bb8481 made sort depend on xnanosleep.
+
+	* src/Makefile.am (sort_LDADD): Add LIB_NANOSLEEP.
+
+2009-12-01  Jim Meyering  <meyering@redhat.com>
+
+	rm: fix empty-name bug introduced with conversion to use fts
+	While "rm ''" would properly fail, "rm F1 '' F2" would fail
+	to remove F1 and F2, due to the empty string argument.
+	This bug was introduced on 2009-07-12, via commit 4f73ecaf,
+	"rm: rewrite to use fts".
+	* gnulib: Update to latest, for fixed fts.c.
+	* NEWS (Bug fixes): Describe it.
+	* tests/rm/empty-name: Adjust for changed diagnostic.
+	(mk_file): Define, copied from misc/ls-misc.
+	(empty-name-2): New test, for today's fix.
+	* lib/xfts.c (xfts_open): Reflect the change in fts_open, now that
+	it no longer fails immediately when one argument is the empty string.
+	Assert that the bit flags were not the cause of failure.
+	* po/POTFILES.in: Remove xfts.c.
+	* THANKS: Update.
+	Reported by Ladislav Hagara.
+
+2009-11-30  Pádraig Brady  <P@draigBrady.com>
+
+	bootstrap: fix handling of various perl --version formats
+	* bootstrap (get_version): Don't use perl's $] special
+	variable, as that requires updating all bootstrap.conf files to
+	use perl's x.yyyzzz version format.  Instead make the regular
+	expression more general to support version formats from older
+	perl-5.005_002 (5.5.2) and perl-5.11 which has other numbers
+	in the version line.
+
+2009-11-29  Jim Meyering  <meyering@redhat.com>
+
+	bootstrap: update from gnulib, for perl-5.11.x support
+	* bootstrap (get_version): Handle perl separately,
+	since perl-5.11's --version output is different.
+
+	build: update gnulib submodule to latest
+
+2009-11-28  Jim Meyering  <meyering@redhat.com>
+
+	maint: chown.c: remove a comment
+	* src/chown.c: Remove old spec-like comment.
+
+2009-11-24  Eric Blake  <ebb9@byu.net>
+
+	tests: fix link failure on cygwin
+	Counterpart to commit 8fe40b84bd8, since test-link.c uses rename,
+	and we override gnulib with a rename() replacement that can xalloc_die.
+
+	* gl/modules/link-tests.diff: New file.
+
+	build: fix link failure on cygwin
+	Cygwin 1.5 has a broken sleep, and the gnulib tests dragged in
+	rpl_sleep which then caused a link failure because it wasn't in
+	libcoreutils.a.  We could solve it by using the gnulib sleep module.
+	However, sleep and usleep may interact poorly with SIGALRM, and they
+	have less granularity; so it is better to adopt a policy that if we
+	must sleep, prefer xnanosleep.
+
+	* src/sort.c (pipe_fork): Use xnanosleep, to avoid the need for
+	rpl_sleep on cygwin, and to reduce granularity.
+	(MAX_FORK_TRIES_COMPRESS, MAX_FORK_TRIES_DECOMPRESS): Increase,
+	to account for reduction in granularity.
+	* src/tail.c (tail_file): Use xnanosleep in debug code.
+	* cfg.mk (sc_prohibit_sleep): New rule.
+
+2009-11-23  Jim Meyering  <meyering@redhat.com>
+
+	tests: avoid test failures when PATH contains an unsearchable directory
+	* tests/test-lib.sh (sanitize_path_): New function.
+	Always call it.
+
+2009-11-22  Dmitry V. Levin  <ldv@altlinux.org>
+
+	tests: do not fail on read-only root file system
+	* tests/touch/not-owner: Handle the case when the root file system is
+	mounted read-only.
+	Reported by Solar Designer.
+
+2009-11-20  Jim Meyering  <meyering@redhat.com>
+
+	maint: cfg.mk: remove factored-out ftp host/dir definitions
+	* cfg.mk (gnu_ftp_host-alpha, gnu_ftp_host-beta gnu_ftp_host-stable):
+	(gnu_rel_host, url_dir_list): Remove definitions.  The defaults,
+	now provided by maint.mk, are the same.
+	* gnulib: Update for latest, including those maint.mk additions.
+
+	maint: correct comments in test scripts
+	* tests/misc/pwd-long: Fix spelling of cygwin1.dll in comment.
+	* tests/rm/fail-eperm: Likewise.
+	Reported by Eric Blake.
+
+	maint: don't list "warnings" module explicitly
+	* bootstrap.conf (gnulib_modules): Remove "warnings", now that
+	it's pulled in automatically via "manywarnings".
+
+	maint: move xfreopen module to gnulib
+	* gl/lib/xfreopen.c: Remove file.
+	* gl/lib/xfreopen.h: Likewise.
+	* gl/modules/xfreopen: Likewise.
+
+	build: update gnulib submodule to latest
+
+2009-11-19  Jim Meyering  <meyering@redhat.com>
+
+	tests: avoid spurious failures due to insecure directory in PATH
+	These tests perform no PATH search, and used to simply delete PATH from
+	the environment.  However, that is not portable, as seen on Cygwin,
+	where cygwin.dll must be resolvable via PATH when starting a sub-shell.
+	With commit 0cc04241, we took the alternate approach of untainting the
+	incoming $ENV{PATH}, but that fails when it contains an other-writable
+	directory.  Instead, now we hard code it to '/bin:/usr/bin'.
+
+	* tests/misc/pwd-long: Hard code $ENV{PATH} to a safe value.
+	* tests/rm/fail-eperm: Likewise.
+	Reported by Gilles Espinasse, Andreas Schwab, and Bauke Jan Douma.
+
+2009-11-18  Jim Meyering  <meyering@redhat.com>
+
+	build: "make stable" emitted an invalid gnupload command
+	* cfg.mk (gnu_ftp_host-stable): Rename from gnu_ftp_host-major.
+	* README-release: Change another s/major/stable/.
+
+	post-release administrivia
+	* NEWS: Add header line for next release.
+	* .prev-version: Record previous version.
+	* cfg.mk (old_NEWS_hash): Auto-update.
+
+	version 8.1
+	* NEWS: Record release date.
+
+	build: update gnulib for Solaris utimens workaround
+
+	build: update gnulib submodule to latest
+
+2009-11-17  Jim Meyering  <meyering@redhat.com>
+
+	maint: remove local gnulib-related patches
+	* gl/lib/printf-args.c.diff: Remove file.  No longer needed.
+	* gl/lib/vasnprintf.c.diff: Likewise.
+
+	build: update gnulib for Solaris 10 unsetenv work-around
+
+	doc: mention the du/fts vs. NFSv4 mount-point work-around
+	* NEWS (Changes in behavior): Mention it.
+
+	build: update from gnulib for (un)setenv fixes
+
+2009-11-16  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest
+
+	true, false: perform initialization only when argc == 2
+	* src/true.c (main): There is no reason to examine argv[0],
+	call atexit, etc., in the usual case in which we're about to exit.
+	This has the side effect of making it so that these programs
+	no longer segfault when subjected to execve abuse.
+	Before this change, these commands would make "true" segfault:
+	  printf '%s\n' '#include <unistd.h>' 'int main(int c, char**v)' \
+	    '{ execve (v[1], 0, 0); }' > k.c && gcc k.c && ./a.out $PWD/true
+	Now it succeeds.  Reported by Tetsuo Handa and Bart Van Assche
+	via Ondřej Vašík in http://bugzilla.redhat.com/537684.
+
+	tail -F can fail to track a file after it's been rotated
+	Tailing forever and by-name (--follow=name, -F), tail would
+	sometimes fail to follow a file that had been removed via rename.
+	If you can't apply this patch and have tail 7.6 or newer, you can
+	work around the bug via the undocumented --disable-inotify option.
+	* src/tail.c (tail_forever_inotify): When tailing by name (-F),
+	do not un-watch a file upon receipt of the IN_MOVE_SELF event.
+	Reported by Arjan Opmeer in http://bugs.debian.org/548439.
+	* NEWS (Bug fixes): Mention it.
+	Also see http://marc.info/?l=coreutils-bug&m=125829031916515
+	* tests/Makefile.am (TESTS): Add tail-2/inotify-rotate.
+	* tests/tail-2/inotify-rotate: New test.
+
+2009-11-14  Jim Meyering  <meyering@redhat.com>
+
+	tests: help-version: exit nonzero when $built_programs is empty
+	* tests/misc/help-version: Use "Exit 1", rather than "Exit $fail"
+	with fail defined to 0 when $built_programs is empty.
+
+	build: do use AM_GNU_GETTEXT's "need-formatstring-macros" option
+	* configure.ac: Revert commit 49741b61 and add a comment.
+	Reported by Eric Blake.
+
+2009-11-14  Pádraig Brady  <P@draigBrady.com>
+
+	tests: avoid a spurious failure on a loaded system
+	* tests/misc/timeout-parameters: This test could fail due to
+	the 1-second timeout expiring before a command of "no_such"
+	could be exec'd and fail.  Increase to 10 seconds.
+
+2009-11-13  Jim Meyering  <meyering@redhat.com>
+
+	build: require gettext-0.17
+	* configure.ac: Require gettext-0.17; it was released two years ago.
+
+	build: correct gettext configure-time support
+	* configure.ac: Use AM_GNU_GETTEXT([external], [need-ngettext]),
+	rather than AM_GNU_GETTEXT([external], [need-formatstring-macros]).
+	Reported by Martin Jacobs in
+	http://thread.gmane.org/gmane.comp.parsers.bison.bugs/3181
+	* THANKS: Add his name.
+
+	build: update gnulib to latest, for fixed test-getgroups.c
+
+	tests: avoid a spurious timeout on a heavily-loaded system
+	* tests/misc/timeout-parameters: This test would fail due to
+	the 1-second timeout expiring before a command of "." could
+	be exec'd and fail.  Increase to 10 seconds.
+
+2009-11-13  Eric Blake  <ebb9@byu.net>
+
+	build: update gnulib, for getgroups improvements
+	A replacement getgroups is now guaranteed to exist, but it may
+	fail with ENOSYS.  mgetgroups is moved to gnulib, and now takes
+	gid_t instead of GETGROUPS_T (but setgroups still needs GETGROUPS_T).
+
+	* gnulib: Update to latest.
+	* gl/modules/mgetgroups: Delete, moved to gnulib.
+	* gl/m4/mgetgroups.m4: Likewise.
+	* gl/lib/mgetgroups.h: Likewise.
+	* gl/lib/mgetgroups.c: Likewise.
+	* src/group-list.c (print_group_list): Adjust callers.
+	* src/id.c (print_full_info): Likewise.
+
+2009-11-12  Jim Meyering  <meyering@redhat.com>
+
+	build: bootstrap: add a comment; generalize autoheader check
+	* bootstrap: Sync from gnulib and diff.
+
+	build: update gnulib to latest; more *BSD and Solaris work-arounds
+
+2009-11-11  Jim Meyering  <meyering@redhat.com>
+
+	bootstrap: use git_modules_config in one more place
+	* bootstrap: Make bootstrap's --gnulib-srcdir more useful (for testing).
+
+2009-11-10  Eric Blake  <ebb9@byu.net>
+
+	doc: fix typo
+	* doc/coreutils.texi (mktemp invocation): Quote shell variable.
+
+2009-11-09  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest for its FreeBSD fixes
+
+2009-11-09  Pádraig Brady  <P@draigBrady.com>
+
+	ls: fix capability coloring
+	Capability checking was incorrectly done on just the base name
+	rather than on the whole path.  Consequently there could be both
+	false positives and negatives when coloring files with capabilities.
+	Also capability checking was not done at all in certain cases for
+	non executable files.  Note passing absolute rather than relative
+	names to cap_get_file() reduces the has_capability() overhead
+	from around 33% to 30%.  I.E. ls --color is now around 3% faster.
+
+	* src/ls.c (struct fileinfo): Add a has_capability member.
+	(print_color_indicator): Refactor to pass just a fileinfo pointer
+	and a flag to say if we're dealing with a symlink target.
+	(print_name_with_quoting): Likewise.
+	(gobble_file): Set has_capability in the fileinfo struct.  Also do
+	a capability check even if executable coloring is disabled.
+	Ditto for SETUID and SETUID coloring.
+	Comment on how expensive has_capability() is.
+	(print_long_format): Adjust to refactored print_name_with_quoting.
+	(quote_name): Likewise.
+	(print_file_name_and_frills): Likewise.
+	* tests/ls/capability: Test the various false positive and negatives.
+	* THANKS: Add reporter (Ivan Labath).
+	* NEWS: Mention the fix.
+
+2009-11-07  Eric Blake  <ebb9@byu.net>
+
+	build: consistently use freopen-safer
+	cat, head, ptx, shuf, tac, tail, tee, tr, and uniq used freopen
+	on stdout, and were potentially vulnerable.  dircolors, du, and
+	tsort only used it on stdin, which is unaffected by freopen_safer,
+	but this covers all uses for consistency.
+
+	* cfg.mk (sc_require_stdio_safer): New rule.
+	* gl/modules/xfreopen (Depends-on): Add freopen-safer.
+	* gl/lib/xfreopen.c (includes): Use stdio--.h.
+	* src/ptx.c (includes): Likewise.
+	* src/shuf.c (includes): Likewise.
+	* src/uniq.c (includes): Likewise.
+	* src/dircolors.c (includes): Likewise.
+	* src/du.c (includes): Likewise.
+	* src/tsort.c (includes): Likewise.
+
+	mktemp: fix bug with -q and closed stdout
+	If stdin or stdout is closed, then freopen(,stderr) can violate
+	the premise that STDERR_FILENO==fileno(stderr), which in turn
+	breaks mktemp -q.
+
+	* bootstrap.conf (gnulib_modules): Add freopen-safer.
+	* src/mktemp.c (includes): Use stdio--.h.
+	* tests/misc/close-stdout: Enhance test to catch bug.
+
+2009-11-07  Jim Meyering  <meyering@redhat.com>
+
+	maint: make du's cycle-detection code consistent
+	* src/du.c (process_file): Revert the du.c-changing part of
+	commit 8ba5d1a7. Use cycle_warning_required instead.
+
+	chcon, chgrp, chmod and chown now diagnose a directory cycle
+	* lib/xfts.c (cycle_warning_required): New function.
+	* lib/xfts.h: Declare it.
+	* src/chown-core.c (change_file_owner): Diagnose a cycle.
+	* src/chmod.c (process_file): Likewise.
+	* src/chcon.c (process_file): Likewise.
+	* NEWS (Bug fixes): Mention this.
+
+2009-11-06  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	nproc: A new program to count the available processors
+	* AUTHORS: Add my name.
+	* NEWS: Mention it.
+	* README: Likewise.
+	* bootstrap.conf (gnulib_modules): Add nproc.
+	* doc/coreutils.texi (nproc invocation): Add nproc info.
+	* man/Makefile.am (nproc.1): Add dependency.
+	* man/nproc.x: New template.
+	* man/.gitignore: Ignore generated man page.
+	* po/POTFILES.in: Add src/nproc.c.
+	* src/.gitignore: Exclude nproc.
+	* src/Makefile.am (EXTRA_PROGRAMS): Add nproc.
+	* src/nproc.c: New file.
+	* tests/Makefile.am (TESTS): Add misc/nproc-{avail,positive}.
+	* tests/misc/nproc-avail: New file.
+	* tests/misc/nproc-positive: New file.
+
+2009-11-06  Jim Meyering  <meyering@redhat.com>
+
+	build: move do-release-commit-and-tag to gnulib
+	* bootstrap.conf (gnulib_modules): Add do-release-commit-and-tag.
+	* build-aux/do-release-commit-and-tag: Remove file.  Now it's in gnulib.
+	* gnulib: Update submodule to the latest, to get the just-moved script.
+
+2009-11-05  Eric Blake  <ebb9@byu.net>
+
+	mktemp: use more robust means to avoid double-close of stdout
+	Reverts earlier patch - fflush() can succeed but fclose() fail for
+	some cases of write failures, and we want to catch those.
+
+	* src/mktemp.c (stdout_closed): New variable.
+	(maybe_close_stdout): New function, borrowed from dd.c.
+	(main): Track whether stdout has been closed.
+
+	mktemp: enhance test to catch just-fixed typo behavior
+	Penance for botching the conflict resolution while rebasing my series.
+
+	* tests/misc/mktemp (check_tmp): Test for the bug when wrong parameter
+	is used.
+
+2009-11-05  Jim Meyering  <meyering@redhat.com>
+
+	mktemp: don't try to close stdout twice
+	* src/mktemp.c (main): Rather than calling close_stream (which would
+	make atexit-called close_stdout try to close it a second time),
+	check for write failure via ferror and fflush.
+
+	mktemp: don't use suff_len in place of #-of-`X's variable
+	* src/mktemp.c (mkstemp_len, mkdtemp_len): Pass x_len as final
+	argument, and not suff_len.
+
+2009-11-05  Eric Blake  <ebb9@byu.net>
+
+	mktemp: add suffix handling
+	Now that mkstemps is supported, we might as well use it.
+
+	* src/mktemp.c (TMPDIR_OPTION): New enum value.
+	(longopts): Add new option.
+	(usage): Document it.
+	(count_trailing_X_s): Rename...
+	(count_consecutive_X_s): ...to this, and add parameter.
+	(mkstemp_len, mkdtemp_len): Add parameter.
+	(main): Implement new option.
+	(AUTHORS): Add myself.
+	* AUTHORS (mktemp): Likewise.
+	* tests/misc/mktemp: Test new option.
+	* doc/coreutils.texi (mktemp invocation): Document it.
+	* NEWS: Likewise.
+	Fixes http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=548316.
+
+	build: reflect gnulib changes to tempname
+	In glibc 2.11 and gnulib, gen_tempname added a parameter
+	suffixlen (unfortunately, it is typed as int rather than
+	size_t, for historical compatibility to a poor choice by BSD).
+
+	* gnulib: Import latest changes.
+	* gl/lib/tempname.h.diff: Accommodate new suffixlen parameter.
+	* gl/lib/tempname.c.diff (check_x_suffix): Allow for X in suffix
+	beyond x_suffix_len.
+	(gen_tempname_len): Add suffixlen parameter.
+	(__gen_tempname): Update caller.
+	* src/mktemp.c (mkstemp_len, mkdtemp_len): Update callers.
+
+	build: override gnulib tempname via diff
+	Diffs are more robust than wholesale replacement, because bootstrap
+	will inform us of any incompatible changes made in upstream gnulib.
+
+	* gl/lib/tempname.h: Change...
+	* gl/lib/tempname.h.diff: ...to diff.
+	* gl/lib/tempname.c: Change...
+	* gl/lib/tempname.c.diff: ...to diff.
+
+	mktemp: rearrange --help output
+	* src/mktemp.c (usage): Align indentation and sort by long
+	options.  Describe valid templates.
+	Suggested by http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=548316.
+
+	tests: enhance mktemp test
+	* tests/misc/mktemp: Add more coverage.
+
+	doc: document mktemp
+	* doc/coreutils.texi (mktemp invocation): New node.
+	* TODO: Delete completed task.
+
+	mktemp: don't leave file behind on write failure
+	* src/mktemp.c (main): Remove just-created file if stdout had
+	problems.
+	* bootstrap.conf (gnulib_modules): Add remove.
+	* tests/misc/close-stdout: Test it.
+	* NEWS: Document it.
+
+2009-11-05  Jim Meyering  <meyering@redhat.com>
+
+	du: cleanup: remove dead-code vestige of already-removed option
+	* src/du.c (MEGABYTES_LONG_OPTION, main): Remove vestiges
+	of already-removed long option, --megabytes.
+
+	du now diagnoses cycles, rather than ignoring them
+	* src/du.c (symlink_deref_bits): New global, decl moved from ...
+	(main): ...here.
+	(process_file): When fts detects a directory cycle that can't
+	be due to symlinks, report it and arrange to exit nonzero.
+	* NEWS (Bug fixes): Mention it.
+
+	maint: factor out cycle warning, now that du will use it, too
+	* src/system.h (emit_cycle_warning): Define.  Factored out of...
+	* src/remove.c (rm_fts): ...here.  Use the new macro.
+
+2009-11-03  Jim Meyering  <meyering@redhat.com>
+
+	tests: rm: add test for today's change in behavior
+	* tests/Makefile.am (root_tests): Add rm/read-only to the list.
+	* tests/rm/read-only: New file.
+
+	rm -f: ignore EROFS when it's really ENOENT
+	rm -f must not print a diagnostic for a nonexistent file.  However,
+	most linux-based kernel unlinkat functions set errno to EROFS when
+	the named file (regardless of whether it exists) would lie on a
+	read-only file system.  remove.c now performs an extra fstatat call
+	in that case, to determine whether the file exists.
+	* src/remove.c (excise): Map EROFS to ENOENT, if a file is nonexistent.
+	Reported by Steven Drake in <http://savannah.gnu.org/bugs/?27923>.
+	* NEWS (Changes in behavior): Mention it.
+
+	tests: inotify-race: don't let malfunctioning gdb hang the test
+	* tests/tail-2/inotify-race: Apply timeout to each gdb invocation.
+
+2009-11-02  Eric Blake  <ebb9@byu.net>
+
+	build: avoid some warnings
+	* gl/lib/mbsalign.c (mbsalign): Mark unused parameter.
+	* bootstrap.conf (gnulib_modules): Remove obsolete
+	rename-dest-slash.
+	* gnulib-tests/Makefile.am (AM_CFLAGS): Reduce set of warnings for
+	gnulib tests.
+	* gl/modules/rename-tests.diff (Makefile.am): New file, to add
+	LIBINTL to LDADD, since we avoid canonicalize-lgpl module.
+	* gl/lib/regcomp.c.diff (regerror, calc_next)
+	(build_collating_symbol, parse_bracket_element, build_equiv_class)
+	(free_tree): Mark unused parameters.
+	* gl/lib/regex_internal.h.diff (re_string_elem_size_at): New file,
+	to mark unused parameters.
+	* gl/lib/printf-args.c.diff (PRINTF_FETCHARGS): New file, to avoid
+	type mismatch.
+	* gl/lib/vasnprintf.c (VASNPRINTF): New file, to avoid shadowing
+	local variable name.
+	* .gitignore: Ignore temporary build artifacts.
+
+	build: update gnulib submodule to latest, for fewer compiler warnings
+
+2009-10-31  Jim Meyering  <meyering@redhat.com>
+
+	admin: automate one more part of the release process
+	This script automates the process of updating NEWS, performs
+	the resulting final commit (thus with a consistent log message),
+	and applies a signed tag (v$VERSION) to the result.
+	* build-aux/do-release-commit-and-tag: New script.
+	* README-release: Document it.
+
+	admin: fix typo in release procedure
+	* README-release: s/gzip/coreutils/
+
+2009-10-30  Jim Meyering  <meyering@redhat.com>
+
+	tests: prohibit fail=0 initialization
+	* cfg.mk (sc_prohibit_fail_0): New rule.
+	* .x-sc_prohibit_fail_0: New file.
+	* Makefile.am (syntax_check_exceptions): Distribute the new file.
+
+	tests: factor 350 fail=0 initializations into test-lib.sh
+	Run this command to remove the factored-out "fail=0" lines.
+	perl -ni -e '/^fail=0$/ or print' $(g grep -l '^fail=0$')
+	* tests/test-lib.sh: Initialize fail=0 here, not in 300+ scripts.
+	* tests/...: nearly all bourne shell scripts
+	Suggested by Eric Blake.
+
+	tests: remove the less-regular fail=0 assignments manually
+	* tests/tail-2/assert-2:
+	* tests/tail-2/assert:
+	* tests/cp/file-perm-race:
+	* tests/misc/df:
+	* tests/misc/truncate-dir-fail:
+
+2009-10-29  Jim Meyering  <meyering@redhat.com>
+
+	tests: don't let a fail=1 env. setting induce unwarranted test failure
+	* cfg.mk (sc_fail_is_initialized): New rule.
+	Fix the offenders:
+	* tests/cp/acl: Set fail=0
+	* tests/cp/backup-is-src: Likewise.
+	* tests/cp/file-perm-race: Likewise.
+	* tests/cp/reflink-auto: Likewise.
+	* tests/cp/same-file: Likewise.
+	* tests/ln/backup-1: Likewise.
+	* tests/misc/su-fail: Likewise.
+	* tests/misc/truncate-owned-by-other: Likewise.
+	* tests/mkdir/p-3: Likewise.
+	* tests/mkdir/selinux: Likewise.
+	* tests/mkdir/special-1: Likewise.
+	* tests/mv/acl: Likewise.
+	* tests/mv/backup-is-src: Likewise.
+	* tests/mv/diag: Likewise.
+	* tests/mv/force: Likewise.
+	* tests/mv/hard-link-1: Likewise.
+	* tests/mv/into-self-3: Likewise.
+	* tests/mv/sticky-to-xpart: Likewise.
+	* tests/touch/now-owned-by-other: Likewise.
+
+	remove stray closing comment delimiter, "*/", in previous change
+	* gl/lib/regexec.c.diff: Fix a typo.
+
+2009-10-29  Eric Blake  <ebb9@byu.net>
+
+	maint: avoid exiting with magic number
+	Cope with gnulib's new sc_prohibit_magic_number_exit rule.
+
+	* .x-sc_prohibit_magic_number_exit: New file, to add exemptions.
+	* Makefile.am (syntax_check_exceptions): Distribute it.
+	* lib/euidaccess-stat.c (main): Fix culprits.
+	* src/chcon.c (main): Likewise.
+	* src/runcon.c (main): Likewise.
+	* src/setuidgid.c (main): Likewise.
+
+2009-10-29  Jim Meyering  <meyering@redhat.com>
+
+	build (--enable-gcc-warnings): enable gcc's -Werror also in lib/
+	* configure.ac (GNULIB_WARN_CFLAGS): Define.
+	* lib/Makefile.am (AM_CFLAGS): Use $(GNULIB_WARN_CFLAGS)
+	rather than $(WARN_CFLAGS) and add $(WERROR_CFLAGS).
+	* gl/lib/regcomp.c.diff: New file.
+	* gl/lib/regex_internal.c.diff: New file.
+	* gl/lib/regexec.c.diff: New file.
+
+	build: update gnulib submodule to latest
+
+	build: allow whitespace violations in gl/lib/*.diff files
+	* .gitattributes: Exempt gl/lib/*.diff.
+	* .x-sc_prohibit_tab_based_indentation: Likewise.
+	* .x-sc_space_tab:Likewise.
+
+2009-10-29  Eric Blake  <ebb9@byu.net>
+
+	nice, nohup, su: detect write failure to stderr
+	These programs can print non-fatal diagnostics to stderr prior to
+	exec'ing a subsidiary program.  However, if we thought the situation
+	warranted a diagnostic, we insist that the diagnostic be printed
+	without error, rather than blindly exec, as it may be a security risk.
+
+	For an example, try 'nice -n -1 nice 2>/dev/full'.  Failure to raise
+	priority (by lowering niceness) is not fatal, but failure to inform
+	the user about failure to change priority is dangerous.
+
+	* src/nice.c (main): Declare failure if writing advisory message
+	to stderr fails.
+	* src/nohup.c (main): Likewise.
+	* src/su.c (main): Likewise.
+	* tests/misc/nice: Test this.
+	* tests/misc/nohup: Likewise.
+	* NEWS: Document this.
+
+2009-10-28  Jim Meyering  <meyering@redhat.com>
+
+	doc: tell --enable-gcc-warnings users where to report problems
+	* README-hacking: Add a caveat for --enable-gcc-warnings.
+
+	build: make doc checks more user-friendly
+	* doc/Makefile.am (check-texinfo): Begin moving each individual test
+	into its own rules.
+	(sc-avoid-builtin, sc-avoid-path): New rules.
+	Extracted from check-texinfo.
+	(syntax_checks): Add them.
+
+	doc: avoid failing "make check"
+	* doc/coreutils.texi (env invocation): s/builtin/built-in/
+
+2009-10-28  Pádraig Brady  <P@draigBrady.com>
+
+	doc: improve the echo and printf help on escapes
+	* src/printf.c (usage): Merge strings with echo.c to
+	aid translators.  Move the description for \NNN beside
+	the other numeric escape codes.  Don't mention
+	"character" as that suggests character conversion.
+	* src/echo.c (usage): Likewise.
+	Also mention the \xHH escape sequence.
+
+	echo, printf: interpret \e as the Escape character
+	Match gcc, perl, bash, ksh, tcsh, ... in supporting \e.
+	* src/printf.c (print_escape_char): Output \x1B when \e encountered.
+	* src/echo.c (main): Likewise.
+	* src/stat.c (print_escape_char): Likewise.
+	* doc/coreutils.texi (echo invocation): Add \e to the list.
+	* tests/misc/printf: Verify that \e outputs \x1B.
+	* NEWS: Mention the change in behaviour.
+
+2009-10-28  Eric Blake  <ebb9@byu.net>
+
+	printenv: ignore bogus variable names
+	Exposed by env a=b=c printenv a=b.
+
+	* src/printenv.c (main): Silently reject = in names.
+	* tests/misc/printenv: Test for it.
+	* NEWS: Document this.
+
+2009-10-28  Pádraig Brady  <P@draigBrady.com>
+
+	maint: avoid "make syntax-check" failure
+	* src/printenv.c: Remove unused "long-options.h"
+
+2009-10-28  Eric Blake  <ebb9@byu.net>
+
+	doc: turn env comments into documentation
+	* src/env.c: Convert introductory comments...
+	* doc/coreutils.texi (env invocation): ...into documentation.
+	Suggested by Jim Meyering.
+
+	env, printenv: add -0/--null option
+	Allows for unambiguous processing when environment values (or even
+	non-portable names!) contain newline.
+
+	* src/env.c (longopts): Add new option.
+	(usage): Document it.
+	(main): Implement it.
+	* src/printenv.c (longopts): New variable.
+	(usage): Document new option.
+	(main): Implement it.
+	* doc/coreutils.texi (Common options): New macro optNull.
+	(du invocation, env invocation, printenv invocation): Use it.
+	* NEWS: Mention this.
+	* tests/misc/env-null: New test.
+	* tests/Makefile.am (TESTS): Run it.
+
+	tests: add printenv coverage
+	* tests/misc/printenv: New test.
+	* tests/Makefile.am (TESTS): Run it.
+	* .gitignore: Ignore more cruft.
+
+	tests: fix PATH problems on cygwin
+	* tests/misc/sort-compress: Remove non-portable over-restriction
+	of PATH; besides, commit 3ea177e changed sort to no longer default
+	to gzip.
+	* tests/rm/fail-eperm: Untaint, rather than clear, PATH.
+	* tests/misc/pwd-long: Likewise.  Also skip test if long path
+	cannot be created.
+	(normalize_to_cwd_relative): Use eq rather than ==, since cygwin
+	perl doesn't properly handle 64-bit ino_t numerically.
+
+2009-10-27  Eric Blake  <ebb9@byu.net>
+
+	tests: clean up tests of env -- handling
+	The comment in env.c about -- handling has not matched the behavior
+	in the code since the initial commit back in 1992.
+
+	* src/env.c: Fix bogus comment.
+	* tests/misc/env: Further tweaks, avoiding PATH problems inherent
+	in testing -i, and testing program name containing =.
+	* doc/coreutils.texi (env invocation): Mention that intermediate
+	program is needed to invoke program with name containing =.
+
+	doc: document PATH interactions with env
+	* doc/coreutils.texi (env invocation): Mention that PATH is
+	modified prior to exec.
+	* tests/misc/env: Test this.
+
+	env: reject bogus -u arguments
+	* src/env.c (main): Use unsetenv rather than putenv to remove
+	items from environ, and check for failure.
+	* bootstrap.conf (gnulib_modules): Add unsetenv.
+	* tests/misc/env: Test this.
+	* NEWS: Document it.
+
+	maint: let gnulib provide environ
+	* bootstrap.conf (gnulib_modules): Add environ.
+	* src/env.c (environ): Delete declaration.
+	* src/printenv.c (environ): Likewise.
+	* src/stdbuf.c (environ): Likewise.
+	* src/su.c (environ): Likewise.
+
+2009-10-26  Eric Blake  <ebb9@byu.net>
+
+	tests: avoid file name not portable to cygwin
+	* tests/misc/chroot-fail: Use 'no_such', not '...', since cygwin
+	1.5 silently strips trailing dots.
+	* tests/misc/nice-fail: Likewise.
+	* tests/misc/stdbuf: Likewise.
+	* tests/misc/timeout-parameters: Likewise.
+
+2009-10-26  Jim Meyering  <meyering@redhat.com>
+
+	tests: rm/one-file-system: work around umount failure
+	* tests/rm/one-file-system (cleanup_): Unmount a/b, rather than
+	"$other_partition_tmpdir", to accommodate those who link /etc/mtab
+	to /proc/mounts.  Reported by Gilles Espinasse in
+	http://thread.gmane.org/gmane.comp.gnu.coreutils.bugs/18508
+
+	tests: adjust new env test not to fail
+	* tests/misc/env: Create ./-i as a link to our "echo" binary,
+	rather than as a bourne shell script, so that env can exec it.
+	Set PATH to ".".
+
+	tests: nice: adjust new tests to work more portably
+	* tests/misc/nice (tests): Accommodate a nice program for which
+	"nice -n -1 nice" prints nothing.  It should print -1 or (usually) 0.
+	Otherwise, we'd get syntax errors.
+
+	nice: execute program even when setpriority fails due to EACCES
+	* src/nice.c (perm_related_errno): New function.
+	(main): Use it, rather than testing only errno == EPERM.
+	* NEWS (Bug fixes): Mention it.
+
+2009-10-26  Pádraig Brady  <P@draigBrady.com>
+
+	timeout: don't orphan monitored programs if they ignore specified signals
+	* src/timeout.c (install_signal_handlers): Handle any user
+	specified signal, so that if it does not cause the child
+	to exit then we don't exit and orphan the child. Previously this
+	for example, would leave an orphan dd process running:
+	timeout -sUSR1 1s dd if=/dev/zero of=/dev/null
+	* NEWS: Mention the fix.
+
+2009-10-24  Eric Blake  <ebb9@byu.net>
+
+	tests: test recent status changes
+	* tests/misc/nice: Enhance test.
+	* tests/misc/chroot-fail: New test.
+	* tests/misc/env: Likewise.
+	* tests/misc/nice-fail: Likewise.
+	* tests/misc/su-fail: Likewise.
+	* tests/Makefile.am (TESTS): Run new tests.
+
+	maint: move chroot test
+	* tests/chroot/credentials: Move...
+	* tests/misc/chroot-credentials: ...here, to reduce number of
+	directories.
+	* tests/Makefile.am (root_tests): Reflect rename.
+
+	tests: enhance stdbuf and timeout tests
+	* tests/misc/timeout-parameters: Validate exact exit status.
+	* tests/misc/stdbuf: Likewise.
+	* tests/misc/timeout: Likewise.  Use require_built_.
+	* tests/misc/arch: Likewise.
+
+	nohup: use EXIT_CANCELED if not POSIXLY_CORRECT
+	* src/nohup.c (NOHUP_FAILURE): Rename...
+	(POSIX_NOHUP_FAILURE): ...to this.
+	(main): Pay attention to POSIXLY_CORRECT, to determine whether to
+	use status 125 or 127.
+	* doc/coreutils.texi (nohup invocation): Document this.
+	* NEWS: Likewise.
+	* tests/misc/invalid-opt (exit_status): Adjust expected results.
+	* tests/misc/help-version (expected_failure_status): Likewise.
+	* tests/misc/nohup: Likewise.
+
+	chroot, env, nice, su: use EXIT_CANCELED for internal failure
+	* src/chroot.c (main): Use EXIT_CANCELED, not EXIT_FAILURE.
+	* src/env.c (main): Likewise.
+	* src/nice.c (main): Likewise.
+	* src/su.c (change_identity, main): Likewise.
+	* doc/coreutils.texi (chroot invocation, env invocation)
+	(nice invocation, su invocation): Document this.
+	* NEWS: Likewise.
+	* tests/misc/invalid-opt (exit_status): Adjust expected results.
+	* tests/misc/help-version (expected_failure_status): Likewise.
+
+	tests: accommodate BSD getopt
+	* tests/misc/invalid-opt (err_subst): Support alternate spelling.
+
+2009-10-23  Eric Blake  <ebb9@byu.net>
+
+	build: prohibit improper use of stat and lstat
+	* cfg.mk (sc_prohibit_stat_macro_address): New rule.
+	* src/ln.c (do_link): Adjust comment to avoid false positive.
+	* src/stat.c (do_stat): Likewise.
+	* src/touch.c (main): Likewise.
+
+	build: update gnulib submodule to latest, for test cleanups
+
+2009-10-22  Eric Blake  <ebb9@byu.net>
+
+	maint: turn on compiler warnings for gnulib tests
+	* gnulib-tests/Makefile.am (AM_CFLAGS): Add WARN_CFLAGS.
+	* configure.ac (enable-gcc-warnings): Also use -funit-at-a-time,
+	to silence gcc 4.3.4 -Wdisabled-optimization.
+	* .gitignore: Ignore some more files.
+
+2009-10-22  Jim Meyering  <meyering@redhat.com>
+
+	build: prohibit direct use of readlink or readlinkat
+	* cfg.mk (sc_prohibit_readlink): New rule.
+	Suggested by Eric Blake.
+
+2009-10-22  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	tests: add a test for the `tail -f' race condition bug
+	If new data becomes available between the initial read and when tail
+	registers the inotify watch descriptors, ensure that it is read
+	before a new event happens on the file.
+	* tests/Makefile.am (TESTS): Add tail-2/inotify-race.
+	* tests/tail-2/inotify-race: New file.
+
+	tail -f: avoid a race condition
+	* NEWS (Bug fixes): Mention it.
+	* src/tail.c (check_fspec): New function.
+	(tail_forever_inotify): Ensure there is no new data before entering the
+	inotify events wait loop.
+
+2009-10-22  Eric Blake  <ebb9@byu.net>
+
+	build: update gnulib submodule to latest, for utimens enhancements
+
+	tests: ensure touch honors trailing slash
+	* tests/touch/trailing-slash: New test.
+	* tests/Makefile.am (TESTS): Run it.
+
+2009-10-21  Pádraig Brady  <P@draigBrady.com>
+
+	md5sum, sha*sum, sum: line-buffer the printed checksums
+	* src/md5sum.c (main): Set stdout to line buffered mode
+	to ensure parallel running instances don't intersperse
+	their output.  This adds 5% to the run time in the worst case
+	of many zero length files, or 2% with standard file sizes.
+	* src/sum.c (main): Likewise.
+	* tests/misc/md5sum-parallel: New test for atomic output.
+	* tests/Makefile.am: Reference it.
+	* NEWS: Mention the fix
+
+2009-10-20  Pádraig Brady  <P@draigBrady.com>
+
+	maint: issue warnings for more missing optional libraries
+	* README-hacking: Suggest to use ./configure --quiet so that
+	any warnings are easily noticed.
+	* m4/gmp.m4 (cu_GMP): Warn if libgmp is not available.
+	* m4/jm-macros.m4 (coreutils_MACROS): Normalize the libcap warning.
+	* m4/xattr.m4 (gl_FUNC_XATTR): Warn if libattr is not available.
+
+2009-10-19  Jim Meyering  <meyering@redhat.com>
+
+	build: use gnulib's isblank module
+	* bootstrap.conf (gnulib_modules): Add isblank.
+	* src/system.h (isblank): Don't define.
+	* m4/check-decl.m4: Don't check for isblank declaration.
+	* gnulib: Update submodule to latest.
+
+2009-10-18  Jim Meyering  <meyering@redhat.com>
+
+	maint: factor out duplication in currently unused rules
+	* src/Makefile.am (fs_normalize_perl_subst): Define.
+	(fs-magic, fs-kernel-magic): Use it.
+
+2009-10-17  Eric Blake  <ebb9@byu.net>
+
+	touch: add -h to change symlink timestamps, where supported
+	* src/touch.c (no_dereference): New flag variable.
+	(longopts): Add -h/--no-dereference.
+	(touch): Add symlink handling.
+	(usage): Document new option.
+	(main): Accept new option.
+	* NEWS: Document it.
+	* doc/coreutils.texi (touch invocation): Likewise.  Also mention
+	birthtime.
+	* tests/touch/no-dereference: New test.
+	* tests/Makefile.am (TESTS): Run it.
+
+2009-10-17  Jim Meyering  <meyering@redhat.com>
+
+	tests: abmon-align: avoid test failure
+	* tests/ls/abmon-align: Don't remove (1d;) the first line of output.
+	That was making the test consider only 11 of 12 month names.
+	Rewrite not to use \(.*\), as that provoked a malfunction in GNU sed
+	on powerpc Mac OS X (though we don't know yet whether this is due to a
+	sed bug, or to miscompilation).  Nelson Beebe reported the test failure.
+
+	build: update gnulib submodule to latest
+
+2009-10-15  Jim Meyering  <meyering@vm.meyering.net.localdomain>
+
+	build: don't let environment settings perturb build
+	Setting the envvars, LIB_FDATASYNC, LIB_XATTR or LIB_CRYPT
+	could cause a configure-time and/or build-time malfunction.
+	Typically, a configure-time function-in-library test is performed
+	via code like this:
+
+	  LIB_VAR=
+	  AC_SUBST([LIB_VAR])
+	  prefix_saved_LIBS=$LIBS
+	    AC_SEARCH_LIBS([FUNC], [LIB_NAME],
+	                   [test "$ac_cv_search_FUNC" = "none required" ||
+	                    LIB_VAR=$ac_cv_search_FUNC])
+	  LIBS=$prefix_saved_LIBS
+
+	However, in each of the files affected by this change, the LIB_VAR=
+	initialization was omitted.  Thus, when set in the environment, its
+	value would propagate into generated Makefiles when FUNC is not found
+	in LIB_NAME.
+	* m4/jm-macros.m4 (coreutils_MACROS): Initialize AC_SUBST'd var
+	* m4/lib-check.m4 (cu_LIB_CHECK): Likewise.
+	* m4/xattr.m4 (gl_FUNC_XATTR): Likewise.
+
+2009-10-13  C de-Avillez  <hggdh2@gmail.com>
+
+	tail: add add missing backslash at the end of a line in usage
+	* src/tail.c (usage): Add missing backslash at the end of a line.
+
+2009-10-12  Eric Blake  <ebb9@byu.net>
+
+	tail: tweak usage for more clarity
+	* src/tail.c (usage): Spell out -n +K.
+	* THANKS: Update.
+	Reported by Jan-Pawel Wrozstinski.
+
+2009-10-10  Eric Blake  <ebb9@byu.net>
+
+	touch: optimize use of utimens
+	* src/touch.c (main): Use UTIME_NOW rather than calling gettime.
+	(touch): Use UTIME_OMIT rather than stat.
+
+	copy: allow symlink timestamp preservation on more systems
+	* src/copy.c (utimens_symlink): Simplify by using lutimens.
+	* m4/jm-macros.m4 (coreutils_MACROS): Drop utimensat; gnulib does
+	this for us.
+	* tests/cp/preserve-slink-time: Recognize lutimes support.
+
+	build: update gnulib submodule to latest, for utimens improvements
+
+2009-10-10  Jim Meyering  <meyering@redhat.com>
+
+	tests: adjust tail-2/pid to work around FreeBSD 6.1 failure
+	* tests/tail-2/pid: Run tail -f --pid=... on an actual file, not on
+	/dev/null, to avoid this failure on FreeBSD 6.1: tail: /dev/null:
+	cannot change nonblocking mode: Inappropriate ioctl for device
+
+2009-10-10  Eric Blake  <ebb9@byu.net>
+
+	maint: touch up previous LDADD patch
+	* src/Makefile.am (dir_LDADD): Delete; the ls_LDADD line covers this.
+
+2009-10-10  Jim Meyering  <meyering@redhat.com>
+
+	build: build uname(1) unconditionally
+	Before, on a system without the uname function, the build
+	system would detect that and not build/install a uname program.
+	Now that gnulib guarantees a uname function, ...
+	* configure.ac: Don't check for the uname function.
+	* src/Makefile.am (build_if_possible__progs): Move uname...
+	(EXTRA_PROGRAMS): ...to this list.
+
+	maint: list program names one per line
+	* src/Makefile.am (EXTRA_PROGRAMS): List them one per line.
+	(build_if_possible__progs): Likewise.
+
+	build: ls: fix link failure due to missing -lacl
+	* src/Makefile.am (ls_LDADD): Re-add $(LIB_ACL).
+	Inadvertently-removed by commit 78c93601.
+
+2009-10-10  Eric Blake  <ebb9@byu.net>
+
+	maint: touch up previous LDADD patch
+	* src/Makefile.am (stdbuf_LDADD): Add missing primer.
+	(hostname_LDADD, uname_LDADD): Add GETHOSTNAME_LIB.
+	* bootstrap.conf (gnulib_modules): Add uname.
+
+	maint: improve additional library tracking
+	* src/Makefile.am (LDADD): Refactor, to make per-library additions
+	to individual programs easier to maintain.
+
+2009-10-09  Jim Meyering  <meyering@redhat.com>
+
+	chcon: don't disable just because SELinux is disabled
+	* src/chcon.c (main): Now that gnulib provides getfilecon wrappers,
+	we can revert most of the 2009-10-05 commit 3a97d664, "chcon: exit
+	immediately if SELinux is disabled", since chcon is still useful as
+	long as the file system provides handlers for the security.*
+	name space.  gnulib's getfilecon wrappers ensure that an offending
+	context now evokes a return value of -1.
+	Prompted by comments from Stephen Smalley in
+	http://thread.gmane.org/gmane.comp.gnu.coreutils.bugs/18378/focus=18394
+	* NEWS (Bug fixes): Mention it.
+
+	ls: remove explicit getfilecon work-around
+	* src/ls.c (gobble_file): Remove l?getfilecon work-around,
+	now that the gnulib wrappers handle it for us.
+
+	build: update gnulib submodule to latest, for getfilecon wrappers
+
+2009-10-09  Eric Blake  <ebb9@byu.net>
+
+	maint: use X2NREALLOC in more places
+	* src/chroot.c (set_additional_groups): Use X2NREALLOC rather than
+	x2nrealloc.
+	* src/factor.c (emit_factor): Likewise.
+	* src/setuidgid.c (main): Likewise.
+
+	maint: remove unused macros and declarations
+	* src/system.h (EDQUOT, EISDIR, ENOSYS, EOVERFLOW, F_OK, X_OK)
+	(W_OK, R_OK): Delete; macros provided by gnulib.
+	(includes): Gnulib guarantees both <time.h> and <sys/time.h>, in
+	either order.
+	(free, malloc, memchr, realloc, getenv, lseek): Delete, gnulib
+	guarantees these declarations.
+	* m4/check-decl.m4 (gl_CHECK_DECLS): Delete checks now done by
+	gnulib.
+
+	maint: move timeout exit statuses
+	* src/timeout.c (EXIT_TIMEDOUT, EXIT_CANCELED): Remove as
+	macros...
+	* src/system.h (EXIT_TIMEDOUT, EXIT_CANCELED): ...and provide as
+	enum values instead.
+	* src/stdbuf.c (EXIT_CANCELED): Delete.
+
+	stat: test recent patch
+	* tests/misc/stat-slash: New test.
+	* tests/Makefile.am (TESTS): Run it.
+
+2009-10-08  Eric Blake  <ebb9@byu.net>
+
+	stdbuf: improve path search
+	* src/stdbuf.c (set_program_path): Use gnulib methods for better
+	file name handling.
+	* bootstrap.conf (gnulib_modules): Add xreadlink.
+
+	stat: work with recent gnulib changes
+	* src/stat.c (do_stat): Don't mask function-like stat macro.
+
+2009-10-08  Jim Meyering  <meyering@redhat.com>
+
+	stat: add support for many more file system types
+	* src/stat.c (human_fstype): Add the following FS types,
+	from <linux/magic.h>: afs, anon-inode FS, btrfs, cgroupfs,
+	cramfs-wend, debugfs, futexfs, inotifyfs, minux3, securityfs,
+	selinux, xenfs.
+	Also add "nilfs".
+	* src/Makefile.am (fs-kernel-magic): New rule.
+	* NEWS (Bug fixes): Mention this.
+
+	stat: recognize CIFS and HFS file system types
+	* src/stat.c (human_fstype) [CIFS, HFS]: Add new file system types.
+	Prompted by a report from Stuart Kemp.
+	Normalize the form of a few hexadecimal magic numbers.
+	Alphabetize on S_MAGIC_ case names.
+	* src/Makefile.am (fs-magic-compare, fs-def, fs-magic): New rules, to
+	automate comparison of our list with that in the Linux statfs man page.
+	* NEWS (Bug fixes): Mention it.
+
+2009-10-07  Guenter Knauf  <lists@gknw.net>
+
+	md5sum, sha*sum: also accept openssl checksum syntax
+	* src/md5sum.c (split_3): Accept openssl checksum syntax, which
+	differs only by two spaces from that of the bsd checksum tools:
+	openssl: MD5(f)= d41d8cd98f00b204e9800998ecf8427e
+	bsd:     MD5 (f) = d41d8cd98f00b204e9800998ecf8427e
+
+2009-10-06  Jim Meyering  <meyering@redhat.com>
+
+	maint: make release-making instructions more generic
+	* README-release: Make instructions more generic.
+
+	post-release administrivia
+	* NEWS: Add header line for next release.
+	* .prev-version: Record previous version.
+	* cfg.mk (old_NEWS_hash): Auto-update.
+
+	version 8.0
+	* NEWS: Record release date.
+
+	build: update gnulib submodule to latest
+
+2009-10-06  Ondřej Vašík  <ovasik@redhat.com>
+
+	chcon: exit immediately if SELinux is disabled
+	This change happens to avoid an abort in chcon when SELinux is
+	disabled while operating on a file with an "unlabeled" context from
+	back in 2006.  However, that same abort can still be triggered by the
+	same file when running chcon with SELinux enabled.  This bug in chcon
+	will be fixed in a subsequent commit via a getfilecon wrapper.  See
+	http://thread.gmane.org/gmane.comp.gnu.coreutils.bugs/18378/focus=18384
+	for how to correct your disk attributes to avoid triggering this bug.
+	* src/chcon.c (main): Exit immediately if SELinux is disabled.
+	Reported in http://bugzilla.redhat.com/527142 by Yanko Kaneti.
+	* src/runcon.c (main): Do not hardcode program name in error message.
+	* THANKS: Update.
+
+2009-10-03  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest
+
+2009-10-02  James R. Van Zandt  <jrvz@comcast.net>
+
+	dircolors: highlight .cgm and .emf as images
+	* src/dircolors.hin: Add .cgm, .emf.
+	* THANKS: Update.
+
+2009-10-02  Jim Meyering  <meyering@redhat.com>
+
+	maint: remove obsolete syntax-check exclusion
+	* cfg.mk (local-checks-to-skip): Remove strftime-check.
+
+2009-10-02  Pádraig Brady  <P@draigBrady.com>
+
+	tail: avoid a race where we could miss new data with --pid
+	* src/tail.c (tail_forever, tail_forever_inotify): Close a race in
+	tail_forever_inotify where new data written after the file check by
+	a now dead process, but before the pid check, is not output.  We use
+	the POSIX guarantee that read() and write() are serialized wrt each
+	other even in separate processes, to assume full file consistency
+	after exit() and so poll for new data _after_ the writer has exited.
+	This also allows us to not redundantly _wait_ for new data if the
+	process is dead.
+	* tests/tail-2/pid: Remove the now partially invalid sub second sleep
+	check as we now don't unconditionally wait, and replace it with a check
+	for the redundant sleep.  Also clarify some of the existing comments.
+	* NEWS: Mention the fix.
+
+2009-10-02  Jim Meyering  <meyering@redhat.com>
+
+	maint: move gnu-web-doc-update script to gnulib
+	* bootstrap.conf (gnulib_modules): Add gnu-web-doc-update.
+	Remove gendocs, since gnu-web-doc-update depends on it.
+	* gnu-web-doc-update: Remove file, now that we get it from gnulib.
+
+	build: update gnulib submodule to latest
+
+2009-09-30  Jim Meyering  <meyering@redhat.com>
+
+	tests: tail-2/pid: use a 3-second timeout, not 1
+	* tests/tail-2/pid: When using the timeout program to ensuring that
+	tail -s.1 --pid=$PID_T_MAX does not wait forever, use a timeout longer
+	than 1 second.  A 1-second timeout could be too short on a very busy
+	system, and result in a timeout, and hence false-positive failure.
+
+	2009-09-30  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest
+
+	build: translate diagnostics from two new files
+	* po/POTFILES.in: Add two new files: lib/siglist.h, lib/strsignal.c
+
+	build: now that we use the lock module, don't exclude lock.m4
+	* bootstrap.conf: Don't exclude lock.m4.
+
+2009-09-30  Pádraig Brady  <P@draigBrady.com>
+
+	ls: always print "?" for allocated size of a dereferenced dangling symlink
+	Previously for `ls -Ls` (but not `ls -Lsl`), we referenced
+	the st_blocks returned from the previous failed stat() call.
+	This undefined value was seen to be 0 for dangling symlinks at least.
+	* src/ls.c (print_file_name_and_frills, length_of_file_name_and_frills):
+	Don't use st_blocks if the previous stat() failed
+	* tests/ls/dangle: Add a test case
+	* NEWS: Mention the fix, and roll up related items into a single entry.
+
+2009-09-30  Jim Meyering  <meyering@redhat.com>
+
+	build: use gnulib's freopen module
+	* bootstrap.conf (gnulib_modules): Add freopen, strsignal, fsync.
+	Exposed via make CFLAGS=-DGNULIB_POSIXCHECK 2>&1 \
+	|perl -lne '/.* use gnulib module (\S+).*/ and print $1' \
+	|sort |uniq -c|sort -nr
+	(avoided_gnulib_modules): Don't avoid the "lock" module.
+	Now it's required, as a dependency of the strsignal module.
+
+2009-09-29  Jim Meyering  <meyering@redhat.com>
+
+	stat: interpret "-" as standard input
+	* src/stat.c (do_stat): Interpret a command line argument of "-"
+	to mean "standard input", like many other tools do.
+	(do_statfs): Fail upon any attempt to use "-".
+	* NEWS (Changes in behavior): Mention it.
+	* tests/misc/stat-hyphen: New test, to exercise the above.
+	* tests/Makefile.am (TESTS): Add misc/stat-hyphen.
+
+	ls: don't use an undefined struct stat after failed stat/lstat
+	* src/ls.c (format_inode): Access f->stat only if f->stat_ok is set.
+	* NEWS (Bug fixes): Mention it.
+	Improved-by: Pádraig Brady <P@draigBrady.com>
+
+	ls: print "?", not "0" as inode of dereferenced dangling symlink
+	ls prints inode numbers two ways: for long (-l) listings,
+	and for short ones, e.g., ls -li and ls -i.  The code to print
+	long listings properly printed "?" when the inode was unknown,
+	but the code for handling short listings would print 0 instead.
+	Factor out the formatting code into a new function so ls prints
+	the right string ("?") from both places:
+	* NEWS (Bug fixes): Mention it.
+	* src/ls.c (format_inode): New function.
+	(print_long_format): Use it here.
+	(print_file_name_and_frills): Use it here, too.
+	* tests/ls/dangle: Exercise this fix.
+	Reported by Yang Ren in http://bugzilla.redhat.com/525400
+
+	ls: with -LR, exit with status 2 upon detecting a cycle
+	* src/ls.c (print_dir): Diagnosing the cycle is not enough.
+	Also set exit status to 2.  This is what Solaris' /bin/ls does, too.
+	* tests/ls/infloop: Rework test: match both expected stdout and stderr.
+	Require an exit status of 2 in this case.
+	* doc/coreutils.texi (ls invocation): Mention that a loop provokes
+	in an exit status of 2.
+	* NEWS (Bug fixes): Mention it.
+	Reported by Yang Ren in http://bugzilla.redhat.com/525402.
+	* THANKS: Correct ordering of Yang Ren's names.
+
+2009-09-26  Jim Meyering  <meyering@redhat.com>
+
+	maint: factor coreutils-specific code out of bootstrap
+	* bootstrap (bootstrap_epilogue): Define a default, empty function.
+	Remove coreutils-specific code, and instead,
+	invoke this new function at the end of this script.
+	* bootstrap.conf (bootstrap_epilogue): Define, to override the default.
+
+2009-09-25  Eric Blake  <ebb9@byu.net>
+
+	cp, mv: use linkat to guarantee semantics
+	* src/copy.c (copy_internal): Use linkat, not link.
+
+	ln: add -L/-P options
+	* src/ln.c (STAT_LIKE_LINK): Delete.
+	(logical): New flag.
+	(long_options): Add -L, -P.
+	(usage): Mention them.
+	(main): Choose between them.
+	(do_link): Perform correct action.
+	* tests/ln/misc: Move hard-to-sym portion of test...
+	* tests/ln/hard-to-sym: ...into new test, and add more.
+	* tests/Makefile.am (TESTS): Run new test.
+	* NEWS: Document this.
+	* doc/coreutils.texi (link invocation, ln invocation): Likewise.
+	* bootstrap.conf (gnulib_modules): Add linkat.
+
+	build: update gnulib submodule to latest
+
+2009-09-23  Pádraig Brady  <P@draigBrady.com>
+
+	maint: Use logical rather than bitwise operators on bools
+	This is because bitwise operators are:
+	- confusing and inconsistent in a boolean context
+	- non short circuiting
+	- brittle in C89 where bool can be an int (so > 1)
+
+	maint: expr: avoid compiler warnings without GMP
+	* src/expr.c (mpz_clear, mpz_get_str, mpz_out_str)
+	[!HAVE_GMP]: Reference unused arguments.
+
+2009-09-23  Eric Blake  <ebb9@byu.net>
+
+	build: update gnulib submodule to latest
+
+	maint: summarize gnulib changes
+	* NEWS: Provide a blurb about recent gnulib improvements.  Fix typo
+	in readlink blurb.
+
+2009-09-23  Jim Meyering  <meyering@redhat.com>
+
+	doc: ls: further improve --help message re --color
+	* src/ls.c (usage): Correct grammar, change voice, shorten.
+	Inspired by a report from Bruno Schulenberg.
+
+2009-09-23  Eric Blake  <ebb9@byu.net>
+
+	readlink: pick up gnulib changes to readlink -f
+	* bootstrap.conf (obsolete_gnulib_modules): Move rename...
+	(gnulib_modules): ...here.  Add symlink.
+	* NEWS: Document the change in readlink.
+	* doc/coreutils.texi (readlink invocation): Likewise.
+	* tests/readlink/can-f: Update test to new semantics, and add test
+	of loop.
+
+2009-09-23  Jim Meyering  <meyering@redhat.com>
+
+	maint: df.c: adapt to newer gnulib
+	* src/df.c: Don't include "canonicalize.h".  No longer needed,
+	since canonicalize_file_name is now guaranteed to be declared
+	in <stdlib.h>, thanks to gnulib.
+
+	build: update gnulib submodule to latest
+
+2009-09-22  Pádraig Brady  <P@draigBrady.com>
+
+	doc: stdbuf: mention it can have a non standard exit status
+	* doc/coreutils.texi (Exit status): Add stdbuf to the list
+
+	maint: uptime: fix a theoretical compile warning
+	* src/uptime.c (print_uptime) [!HAVE_UTMPX_H && !HAVE_UTMP_H]:
+	Reference possibly unused arguments.
+
+	ls: fix a performance regression
+	* src/ls.c (print_color_indicator): This reinstates commit f3f1ccfd,
+	21-10-2008, "ls: make it possible to disable file capabilities checking"
+	which was inadvertently reverted with commit 3a169f4c, 14-09-2009,
+	"ls: handle disabling of colors consistently ...".
+
+2009-09-22  Eric Blake  <ebb9@byu.net>
+
+	build: avoid compiler warnings on cygwin 1.5
+	* src/copy.c (utimens_symlink): Avoid unused variables.
+	* src/su.c (getusershell): Rely on gnulib for prototype.
+
+2009-09-21  Jim Meyering  <meyering@redhat.com>
+
+	doc: ls: add an article, "the"
+	* src/ls.c (usage): Tweak wording.
+
+2009-09-21  Pádraig Brady  <P@draigBrady.com>
+
+	ls: handle disabling of colors consistently for all tile types
+	* src/ls.c (print_color_indicator): Use consistent syntax for
+	all file and directory subtypes, and fall back to the color
+	of the base type if there is no enabled color for the subtype.
+	This allows turning off specific colors for o+w dirs for example.
+	* tests/ls/color-dtype-dir: Add a case to test that turning off
+	coloring for o+w directories, falls back to standard dir color.
+	* NEWS: Mention the fix
+	Introduced by commit ac467814, 2005-09-05,
+	"Colorize set-user-ID ... files and sticky ... directories."
+
+	doc: ls: make help for --color more concise and accurate
+	* src/ls.c (usage): Shorten the --color ancillary info by
+	two lines, while replacing --color=none with --color=never.
+	Mention "always" is the default parameter of the --color option,
+	along with the primary help for that option.
+	Mention the ancillary --color info in the --color primary help.
+
+	doc: normalize and add missing entries to texinfo menu
+	* doc/coreutils.texi: Add the missing arch, base64, link, readlink,
+	and unlink entries.  Also remove extraneous '.' from some entries
+	and try to align all entries on the same column.
+	* THANKS: Add Benno Schulenberg.
+
+	doc: mention the texinfo documentation in --help
+	* src/system.h: Rename emit_bug_reporting_address() to
+	emit_ancillary_info() and update it to not print the translation
+	project address in en_* locales, and _do_ print it in the 'C'
+	(and other) locales so that it's included in the default man page.
+	Also mention how to invoke the texinfo documentation for each command.
+	Also move the "hard-locale.h" include to the 8 files that now use it.
+	* man/help2man: Strip the newly added texinfo reference from the
+	--help output as a more verbose version is already added by help2man.
+	Suggestion from C de-Avillez
+
+2009-09-21  Jim Meyering  <meyering@redhat.com>
+
+	maint: automate the web-doc updating procedure
+	* gnu-web-doc-update: New script, destined for gnulib.
+	* README-release: Refer to the new script.
+
+2009-09-19  Jim Meyering  <meyering@redhat.com>
+
+	dircolors: arrange to highlight names with the .lz suffix
+	* src/dircolors.hin: Add .lz, for GNU lzip.
+	Suggested by Matias A. Fonzo.
+
+	mktemp: adapt to new, 3-argument gen_tempname_len
+	* src/mktemp.c (mkstemp_len, mkdtemp_len): Update callers of
+	gen_tempname_len.
+	* gl/lib/tempname.c, gl/lib/tempname.h: Rebase against recently
+	API-modified copy of tempname module in gnulib.
+	Reported by Lluís Batlle.
+
+2009-09-17  Jim Meyering  <meyering@redhat.com>
+
+	build: merge bootstrap changes from gnulib
+	* bootstrap: Update from gnulib.
+
+2009-09-17  Eric Blake  <ebb9@byu.net>
+
+	rm, rmdir: improve cross-compilation support
+	* bootstrap.conf (gnulib_modules): Drop rmdir-errno.
+	* src/rmdir.c (errno_rmdir_non_empty): Check both cases allowed by
+	POSIX, rather than relying on configure-time check that might
+	fail during cross-compilation.  Reverts commit 9b6eb98d41.
+
+2009-09-15  Ondřej Vašík  <ovasik@redhat.com>
+
+	cp: fix a probably redundant chmod when setting xattrs
+	* src/copy.c (copy_reg): Fix initial value of access_changed variable.
+	This was introduced by Pádraig Brady in commit cca83faf, 2009-09-14,
+	"cp,mv: preserve extended attributes even for read-only files"
+
+2009-09-14  Jim Meyering  <meyering@redhat.com>
+
+	doc: NEWS: mention origin of touch -t ....60 bug
+	* NEWS: It is an old bug.
+
+	doc: touch, document that it accepts .60
+	* doc/coreutils.texi (touch invocation): Document that SS may be 60.
+
+	touch: don't reject "60" as number of seconds in a legacy time stamp
+	A valid command like "touch -t 197101010000.60 F" would fail due
+	to the suffix of ".60".  This bug is fixed via the latest change
+	to gnulib's posixtm module.
+	* tests/touch/60-seconds: New test.
+	* tests/Makefile.am (TESTS): Add it.
+	* NEWS (Bug fixes): Mention it.
+
+	build: update gnulib submodule to latest, for fixed posixtm module
+
+	maint: use #!/bin/sh consistently in shell-based test scripts
+	* tests/misc/sort-continue: Change first line to standard #!/bin/sh,
+	not #!/bin/bash (though it doesn't matter, since each is invoked
+	via $(SHELL) dir/test-name.
+
+2009-09-14  Pádraig Brady  <P@draigBrady.com>
+
+	tests: fix dd/skip-seek-past-file to work on ecryptfs
+	* tests/dd/skip-seek-past-file: Require sparse support
+	to ensure that when we're checking if we can create an
+	$OFF_T_MAX length file, that we don't actually allocate
+	any space.  This was an issue on ecryptfs and was reported
+	by Bert Wesarg.
+
+2009-09-14  Ondřej Vašík  <ovasik@redhat.com>
+
+	cp,mv: preserve extended attributes even for read-only files
+	* src/copy.c (copy_reg): Temporarily set u+rw on the destination file
+	to allow GNU/Linux to set xattrs.
+	* tests/misc/xattr: Test that change.
+	* NEWS (Bug fixes): Mention it.
+	Reported by Ernest N. Mamikonyan.
+
+2009-09-14  Jim Meyering  <meyering@redhat.com>
+
+	doc: improve timeout's --help message
+	* src/timeout.c (usage): Improve --help description.
+
+2009-09-13  Jim Meyering  <meyering@redhat.com>
+
+	maint: use consistent cpp indentation in all .c files
+	* src/stty.c: Make cpp indentation reflect nesting.
+	* src/factor.c: Likewise.
+
+	doc: NEWS: say quadratic and linear, rather than O(N^2) and O(N)
+	* NEWS: Use a slightly less technical description.
+	Suggested by Andreas Schwab.
+
+	doc: improve NEWS
+	* NEWS (rm -r, without -f): Mention that the N in "O(N)" represents
+	hierarchy depth.  Suggested by Ralf Wildenhues.
+	(rm -r, standards conformance): Make wording more accurate.
+
 2009-09-11  Jim Meyering  <meyering@redhat.com>
+
+	id: don't print context=... when POSIXLY_CORRECT is set
+	* src/id.c (print_full_info) [POSIXLY_CORRECT]: Don't print context.
+	Reported by Ulrich Drepper.
+	* NEWS (Changes in behavior): Mention it.
+	* doc/coreutils.texi (id invocation): Document that id also prints the
+	security context, when possible, and when POSIXLY_CORRECT is not set.
+	* tests/id/no-context: New file.  Test for this.
+	* tests/Makefile.am (TESTS): Add it.
+
+2009-09-11  Eric Blake  <ebb9@byu.net>
+
+	rm: avoid compiler warning
+	* src/remove.c (rm_fts): Don't allow fall-through when assertions
+	are disabled.
+
+	euidaccess-stat: remove unnecessary macros
+	* lib/euidaccess-stat.c (F_OK, R_OK, W_OK, X_OK): Delete; now
+	guaranteed by gnulib.
+
+	rm: use gnulib faccessat
+	* bootstrap.conf (gnulib_modules): Add faccessat.  Replace strdup
+	with strdup-posix.
+	* m4/jm-macros.m4 (coreutils_MACROS): Revert previous change, now
+	that gnulib does it for us.
+	* src/remove.c (write_protected_non_symlink): Use faccessat in
+	more situations.
+
+2009-09-11  Jim Meyering  <meyering@redhat.com>
+
+	rm: improve efficiency of rm -r (without -f) from O(N^2) to O(N)
+	where N is the depth of the deepest hierarchy rm is processing.
+	* src/remove.c (write_protected_non_symlink): Use faccessat to
+	avoid O(N)-per-entry cost of calling euidaccess.
+	* m4/jm-macros.m4 (coreutils_MACROS): Check for faccessat.
+	* NEWS (Improvements): Mention it.
+
+	build: placate gcc's new -Wskip-jump-init
+	* remove.c (rm_fts): Put braces around each of the two offending blocks.
+	* configure.ac: Don't turn off -Wjump-misses-init.
+	With the rewrite of remove.c, it is no longer needed.
+
+	rm: rewrite to use fts
+	* remove.c: Don't include "unlinkdir.h"; no longer used.
+	Do not include <setjmp.h> or "cycle-check.h".  Likewise.
+	Include "xfts.h".
+	(dir_name, dir_len): Remove definitions.
+	(CONSECUTIVE_READDIR_UNLINK_THRESHOLD): Likewise.
+	(INODE_SORT_DIR_ENTRIES_THRESHOLD, NEED_REWIND, D_TYPE): Likewise.
+	(struct dirstack_state, Dirstack_state): Likewise.
+	(g_buf, g_n_allocated): Remove declarations.
+	(hash_freer, hash_compare_strings, rm_malloc): Remove functions.
+	(rm_free, push_dir, top_dir, pop_dir, right_justify): Likewise.
+	(full_filename0, xfull_filename, full_filename_): Likewise.
+	(AD_stack_height, AD_stack_top, AD_stack_pop, AD_stack_clear): Likewise.
+	(obstack_init_minimal, ds_init, ds_clear, ds_free): Likewise.
+	(AD_pop_and_chdir, AD_ensure_initialized, AD_mark_helper): Likewise.
+	(AD_mark_as_unremovable, AD_mark_current_as_unremovable): Likewise.
+	(AD_push_initial, AD_push, AD_push, AD_is_removable): Likewise.
+	(write_protected_non_symlink): Change 3rd parameter from
+	dirstack_state "ds" to full_name.
+	(prompt): Adjust parameters.  Now, state comes from FTS/FTSENT pair.
+	Those replace fd_cwd and "ds".  Remove "filename".  Remove pdirent_type
+	in favor of new "is_dir" parameter.  Rename is_empty to is_empty_p.
+	(DO_RMDIR, DO_UNLINK): Remove definitions.
+	(remove_entry, fd_to_subdirp, compare_ino): Remove functions.
+	(dirent_count, dirent_inode_sort_may_be_useful): Likewise.
+	(preprocess_dir): Likewise.
+	(fts_skip_tree, mark_ancestor_dirs, excise, rm_fts): New functions.
+	(remove_cwd_entries, remove_dir, rm_1): Remove functions.
+	(rm): Rewrite as a simple loop calling fts_read and dispatching
+	each entry via rm_fts.
+	* src/rm.c (main): Adapt to new signature of rm().
+	* bootstrap.conf (gnulib_modules): Remove unlinkdir, no longer used.
+	* src/Makefile.am (sc_tight_scope): Also recognize an extern "enum"
+	declaration.
+	* tests/rm/empty-name: Adjust expected output to match new diagnostic.
+	* NEWS (Improvements): Mention it.
+
+	maint: doc: adjust README-release
+	* README-release: Remove mention of bootstrap's old
+	--gnulib-srcdir=/gnulib option.  No longer needed, and its
+	use can lead to subtle problems.
+
+	post-release administrivia
+	* NEWS: Add header line for next release.
+	* .prev-version: Record previous version.
+	* cfg.mk (old_NEWS_hash): Auto-update.
 
 	version 7.6
 	* NEWS: Record release date.

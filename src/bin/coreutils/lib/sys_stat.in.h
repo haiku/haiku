@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Provide a more complete sys/stat header file.
-   Copyright (C) 2005-2009 Free Software Foundation, Inc.
+   Copyright (C) 2005-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -41,6 +41,9 @@
 /* Get nlink_t.  */
 #include <sys/types.h>
 
+/* Get struct timespec.  */
+#include <time.h>
+
 /* The include_next requires a split double-inclusion guard.  */
 #@INCLUDE_NEXT@ @NEXT_SYS_STAT_H@
 
@@ -48,6 +51,8 @@
 #define _GL_SYS_STAT_H
 
 /* The definition of GL_LINK_WARNING is copied here.  */
+
+/* The definition of _GL_ARG_NONNULL is copied here.  */
 
 /* Before doing "#define mkdir rpl_mkdir" below, we need to include all
    headers that may declare mkdir().  */
@@ -281,9 +286,95 @@
 # define S_IRWXUGO (S_IRWXU | S_IRWXG | S_IRWXO)
 #endif
 
+/* Macros for futimens and utimensat.  */
+#ifndef UTIME_NOW
+# define UTIME_NOW (-1)
+# define UTIME_OMIT (-2)
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+
+#if @GNULIB_FCHMODAT@
+# if !@HAVE_FCHMODAT@
+extern int fchmodat (int fd, char const *file, mode_t mode, int flag)
+     _GL_ARG_NONNULL ((2));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef fchmodat
+# define fchmodat(d,n,m,f)                         \
+    (GL_LINK_WARNING ("fchmodat is not portable - " \
+                      "use gnulib module openat for portability"), \
+     fchmodat (d, n, m, f))
+#endif
+
+
+#if @REPLACE_FSTAT@
+# define fstat rpl_fstat
+extern int fstat (int fd, struct stat *buf) _GL_ARG_NONNULL ((2));
+#endif
+
+
+#if @GNULIB_FSTATAT@
+# if @REPLACE_FSTATAT@
+#  undef fstatat
+#  define fstatat rpl_fstatat
+# endif
+# if !@HAVE_FSTATAT@ || @REPLACE_FSTATAT@
+extern int fstatat (int fd, char const *name, struct stat *st, int flags)
+     _GL_ARG_NONNULL ((2, 3));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef fstatat
+# define fstatat(d,n,s,f)                         \
+    (GL_LINK_WARNING ("fstatat is not portable - " \
+                      "use gnulib module openat for portability"), \
+     fstatat (d, n, s, f))
+#endif
+
+
+#if @GNULIB_FUTIMENS@
+# if @REPLACE_FUTIMENS@
+#  undef futimens
+#  define futimens rpl_futimens
+# endif
+# if !@HAVE_FUTIMENS@ || @REPLACE_FUTIMENS@
+extern int futimens (int fd, struct timespec const times[2]);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef futimens
+# define futimens(f,t)                         \
+    (GL_LINK_WARNING ("futimens is not portable - " \
+                      "use gnulib module futimens for portability"), \
+     futimens (f, t))
+#endif
+
+
+#if @GNULIB_LCHMOD@
+/* Change the mode of FILENAME to MODE, without dereferencing it if FILENAME
+   denotes a symbolic link.  */
+# if !@HAVE_LCHMOD@
+/* The lchmod replacement follows symbolic links.  Callers should take
+   this into account; lchmod should be applied only to arguments that
+   are known to not be symbolic links.  On hosts that lack lchmod,
+   this can lead to race conditions between the check and the
+   invocation of lchmod, but we know of no workarounds that are
+   reliable in general.  You might try requesting support for lchmod
+   from your operating system supplier.  */
+#  define lchmod chmod
+# endif
+# if 0 /* assume already declared */
+extern int lchmod (const char *filename, mode_t mode) _GL_ARG_NONNULL ((1));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef lchmod
+# define lchmod(f,m) \
+    (GL_LINK_WARNING ("lchmod is unportable - " \
+                      "use gnulib module lchmod for portability"), \
+     lchmod (f, m))
 #endif
 
 
@@ -295,92 +386,22 @@ extern "C" {
 # elif @REPLACE_LSTAT@
 #  undef lstat
 #  define lstat rpl_lstat
-extern int rpl_lstat (const char *name, struct stat *buf);
+extern int rpl_lstat (const char *name, struct stat *buf)
+     _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef lstat
-# define lstat(p,b)							\
-  (GL_LINK_WARNING ("lstat is unportable - "				\
-		    "use gnulib module lstat for portability"),		\
+# define lstat(p,b)                                                     \
+  (GL_LINK_WARNING ("lstat is unportable - "                            \
+                    "use gnulib module lstat for portability"),         \
    lstat (p, b))
 #endif
 
 
-#if @GNULIB_FCHMODAT@
-# if !@HAVE_FCHMODAT@
-extern int fchmodat (int fd, char const *file, mode_t mode, int flag);
-# endif
-#elif defined GNULIB_POSIXCHECK
-# undef fchmodat
-# define fchmodat(d,n,m,f)                         \
-    (GL_LINK_WARNING ("fchmodat is not portable - " \
-                      "use gnulib module openat for portability"), \
-     fchmodat (d, n, m, f))
-#endif
-
-
-#if @GNULIB_FSTATAT@
-# if @REPLACE_FSTATAT@
-#  undef fstatat
-#  define fstatat rpl_fstatat
-# endif
-# if !@HAVE_FSTATAT@ || @REPLACE_FSTATAT@
-extern int fstatat (int fd, char const *name, struct stat *st, int flags);
-# endif
-#elif defined GNULIB_POSIXCHECK
-# undef fstatat
-# define fstatat(d,n,s,f)                         \
-    (GL_LINK_WARNING ("fstatat is not portable - " \
-                      "use gnulib module openat for portability"), \
-     fstatat (d, n, s, f))
-#endif
-
-
-#if @GNULIB_MKDIRAT@
-# if !@HAVE_MKDIRAT@
-extern int mkdirat (int fd, char const *file, mode_t mode);
-# endif
-#elif defined GNULIB_POSIXCHECK
-# undef mkdirat
-# define mkdirat(d,n,m)                         \
-    (GL_LINK_WARNING ("mkdirat is not portable - " \
-                      "use gnulib module openat for portability"), \
-     mkdirat (d, n, m))
-#endif
-
-#if @GNULIB_MKFIFOAT@
-# if !@HAVE_MKFIFOAT@
-int mkfifoat (int fd, char const *file, mode_t mode);
-# endif
-#elif defined GNULIB_POSIXCHECK
-# undef mkfifoat
-# define mkfifoat(d,n,m)				     \
-    (GL_LINK_WARNING ("mkfifoat is not portable - " \
-                      "use gnulib module mkfifoat for portability"), \
-     mkfifoat (d, n, m))
-#endif
-
-#if @GNULIB_MKNODAT@
-# if !@HAVE_MKNODAT@
-int mknodat (int fd, char const *file, mode_t mode, dev_t dev);
-# endif
-#elif defined GNULIB_POSIXCHECK
-# undef mknodat
-# define mknodat(f,n,m,d)			     \
-    (GL_LINK_WARNING ("mknodat is not portable - " \
-                      "use gnulib module mkfifoat for portability"), \
-     mknodat (f, n, m, d))
-#endif
-
-#if @REPLACE_FCHDIR@
-# define fstat rpl_fstat
-extern int fstat (int fd, struct stat *buf);
-#endif
-
 #if @REPLACE_MKDIR@
 # undef mkdir
 # define mkdir rpl_mkdir
-extern int mkdir (char const *name, mode_t mode);
+extern int mkdir (char const *name, mode_t mode) _GL_ARG_NONNULL ((1));
 #else
 /* mingw's _mkdir() function has 1 argument, but we pass 2 arguments.
    Additionally, it declares _mkdir (and depending on compile flags, an
@@ -398,30 +419,125 @@ rpl_mkdir (char const *name, mode_t mode)
 #endif
 
 
-/* Declare BSD extensions.  */
-
-#if @GNULIB_LCHMOD@
-/* Change the mode of FILENAME to MODE, without dereferencing it if FILENAME
-   denotes a symbolic link.  */
-# if !@HAVE_LCHMOD@
-/* The lchmod replacement follows symbolic links.  Callers should take
-   this into account; lchmod should be applied only to arguments that
-   are known to not be symbolic links.  On hosts that lack lchmod,
-   this can lead to race conditions between the check and the
-   invocation of lchmod, but we know of no workarounds that are
-   reliable in general.  You might try requesting support for lchmod
-   from your operating system supplier.  */
-#  define lchmod chmod
-# endif
-# if 0 /* assume already declared */
-extern int lchmod (const char *filename, mode_t mode);
+#if @GNULIB_MKDIRAT@
+# if !@HAVE_MKDIRAT@
+extern int mkdirat (int fd, char const *file, mode_t mode)
+     _GL_ARG_NONNULL ((2));
 # endif
 #elif defined GNULIB_POSIXCHECK
-# undef lchmod
-# define lchmod(f,m) \
-    (GL_LINK_WARNING ("lchmod is unportable - " \
-                      "use gnulib module lchmod for portability"), \
-     lchmod (f, m))
+# undef mkdirat
+# define mkdirat(d,n,m)                         \
+    (GL_LINK_WARNING ("mkdirat is not portable - " \
+                      "use gnulib module openat for portability"), \
+     mkdirat (d, n, m))
+#endif
+
+
+#if @GNULIB_MKFIFO@
+# if @REPLACE_MKFIFO@
+#  undef mkfifo
+#  define mkfifo rpl_mkfifo
+# endif
+# if !@HAVE_MKFIFO@ || @REPLACE_MKFIFO@
+extern int mkfifo (char const *file, mode_t mode) _GL_ARG_NONNULL ((1));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef mkfifo
+# define mkfifo(n,m)                                                    \
+    (GL_LINK_WARNING ("mkfifo is not portable - "                       \
+                      "use gnulib module mkfifo for portability"),      \
+     mkfifo (n, m))
+#endif
+
+
+#if @GNULIB_MKFIFOAT@
+# if !@HAVE_MKFIFOAT@
+extern int mkfifoat (int fd, char const *file, mode_t mode)
+     _GL_ARG_NONNULL ((2));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef mkfifoat
+# define mkfifoat(d,n,m)                                     \
+    (GL_LINK_WARNING ("mkfifoat is not portable - " \
+                      "use gnulib module mkfifoat for portability"), \
+     mkfifoat (d, n, m))
+#endif
+
+
+#if @GNULIB_MKNOD@
+# if @REPLACE_MKNOD@
+#  undef mknod
+#  define mknod rpl_mknod
+# endif
+# if !@HAVE_MKNOD@ || @REPLACE_MKNOD@
+extern int mknod (char const *file, mode_t mode, dev_t dev)
+     _GL_ARG_NONNULL ((1));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef mknod
+# define mknod(n,m,d)                                                   \
+    (GL_LINK_WARNING ("mknod is not portable - "                        \
+                      "use gnulib module mknod for portability"),       \
+     mknod (n, m, d))
+#endif
+
+
+#if @GNULIB_MKNODAT@
+# if !@HAVE_MKNODAT@
+extern int mknodat (int fd, char const *file, mode_t mode, dev_t dev)
+     _GL_ARG_NONNULL ((2));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef mknodat
+# define mknodat(f,n,m,d)                            \
+    (GL_LINK_WARNING ("mknodat is not portable - " \
+                      "use gnulib module mkfifoat for portability"), \
+     mknodat (f, n, m, d))
+#endif
+
+
+#if @GNULIB_STAT@
+# if @REPLACE_STAT@
+/* We can't use the object-like #define stat rpl_stat, because of
+   struct stat.  This means that rpl_stat will not be used if the user
+   does (stat)(a,b).  Oh well.  */
+#  undef stat
+#  ifdef _LARGE_FILES
+    /* With _LARGE_FILES defined, AIX (only) defines stat to stat64,
+       so we have to replace stat64() instead of stat(). */
+#   define stat stat64
+#   undef stat64
+#   define stat64(name, st) rpl_stat (name, st)
+#  else /* !_LARGE_FILES */
+#   define stat(name, st) rpl_stat (name, st)
+#  endif /* !_LARGE_FILES */
+extern int stat (const char *name, struct stat *buf) _GL_ARG_NONNULL ((1, 2));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef stat
+# define stat(p,b)                                                      \
+  (GL_LINK_WARNING ("stat is unportable - "                             \
+                    "use gnulib module stat for portability"),          \
+   stat (p, b))
+#endif
+
+
+#if @GNULIB_UTIMENSAT@
+# if @REPLACE_UTIMENSAT@
+#  undef utimensat
+#  define utimensat rpl_utimensat
+# endif
+# if !@HAVE_UTIMENSAT@ || @REPLACE_UTIMENSAT@
+   extern int utimensat (int fd, char const *name,
+                         struct timespec const times[2], int flag)
+        _GL_ARG_NONNULL ((2));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef utimensat
+# define utimensat(d,n,t,f)                          \
+    (GL_LINK_WARNING ("utimensat is not portable - " \
+                      "use gnulib module utimensat for portability"), \
+     utimensat (d, n, t, f))
 #endif
 
 

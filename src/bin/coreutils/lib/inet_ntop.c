@@ -3,7 +3,7 @@
 #line 1
 /* inet_ntop.c -- convert IPv4 and IPv6 addresses from binary to text form
 
-   Copyright (C) 2005, 2006, 2008, 2009  Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -62,15 +62,15 @@ static const char *inet_ntop6 (const unsigned char *src, char *dst, socklen_t si
 
 /* char *
  * inet_ntop(af, src, dst, size)
- *	convert a network format address to presentation format.
+ *      convert a network format address to presentation format.
  * return:
- *	pointer to presentation format address (`dst'), or NULL (see errno).
+ *      pointer to presentation format address (`dst'), or NULL (see errno).
  * author:
- *	Paul Vixie, 1996.
+ *      Paul Vixie, 1996.
  */
 const char *
 inet_ntop (int af, const void *restrict src,
-	   char *restrict dst, socklen_t cnt)
+           char *restrict dst, socklen_t cnt)
 {
   switch (af)
     {
@@ -93,14 +93,14 @@ inet_ntop (int af, const void *restrict src,
 
 /* const char *
  * inet_ntop4(src, dst, size)
- *	format an IPv4 address
+ *      format an IPv4 address
  * return:
- *	`dst' (as a const)
+ *      `dst' (as a const)
  * notes:
- *	(1) uses no statics
- *	(2) takes a u_char* not an in_addr as input
+ *      (1) uses no statics
+ *      (2) takes a u_char* not an in_addr as input
  * author:
- *	Paul Vixie, 1996.
+ *      Paul Vixie, 1996.
  */
 static const char *
 inet_ntop4 (const unsigned char *src, char *dst, socklen_t size)
@@ -125,9 +125,9 @@ inet_ntop4 (const unsigned char *src, char *dst, socklen_t size)
 
 /* const char *
  * inet_ntop6(src, dst, size)
- *	convert IPv6 binary address into presentation (printable) format
+ *      convert IPv6 binary address into presentation (printable) format
  * author:
- *	Paul Vixie, 1996.
+ *      Paul Vixie, 1996.
  */
 static const char *
 inet_ntop6 (const unsigned char *src, char *dst, socklen_t size)
@@ -160,26 +160,26 @@ inet_ntop6 (const unsigned char *src, char *dst, socklen_t size)
   for (i = 0; i < (NS_IN6ADDRSZ / NS_INT16SZ); i++)
     {
       if (words[i] == 0)
-	{
-	  if (cur.base == -1)
-	    cur.base = i, cur.len = 1;
-	  else
-	    cur.len++;
-	}
+        {
+          if (cur.base == -1)
+            cur.base = i, cur.len = 1;
+          else
+            cur.len++;
+        }
       else
-	{
-	  if (cur.base != -1)
-	    {
-	      if (best.base == -1 || cur.len > best.len)
-		best = cur;
-	      cur.base = -1;
-	    }
-	}
+        {
+          if (cur.base != -1)
+            {
+              if (best.base == -1 || cur.len > best.len)
+                best = cur;
+              cur.base = -1;
+            }
+        }
     }
   if (cur.base != -1)
     {
       if (best.base == -1 || cur.len > best.len)
-	best = cur;
+        best = cur;
     }
   if (best.base != -1 && best.len < 2)
     best.base = -1;
@@ -192,28 +192,28 @@ inet_ntop6 (const unsigned char *src, char *dst, socklen_t size)
     {
       /* Are we inside the best run of 0x00's? */
       if (best.base != -1 && i >= best.base && i < (best.base + best.len))
-	{
-	  if (i == best.base)
-	    *tp++ = ':';
-	  continue;
-	}
+        {
+          if (i == best.base)
+            *tp++ = ':';
+          continue;
+        }
       /* Are we following an initial run of 0x00s or any real hex? */
       if (i != 0)
-	*tp++ = ':';
+        *tp++ = ':';
       /* Is this address an encapsulated IPv4? */
       if (i == 6 && best.base == 0 &&
-	  (best.len == 6 || (best.len == 5 && words[5] == 0xffff)))
-	{
-	  if (!inet_ntop4 (src + 12, tp, sizeof tmp - (tp - tmp)))
-	    return (NULL);
-	  tp += strlen (tp);
-	  break;
-	}
+          (best.len == 6 || (best.len == 5 && words[5] == 0xffff)))
+        {
+          if (!inet_ntop4 (src + 12, tp, sizeof tmp - (tp - tmp)))
+            return (NULL);
+          tp += strlen (tp);
+          break;
+        }
       {
-	int len = sprintf (tp, "%x", words[i]);
-	if (len < 0)
-	  return NULL;
-	tp += len;
+        int len = sprintf (tp, "%x", words[i]);
+        if (len < 0)
+          return NULL;
+        tp += len;
       }
     }
   /* Was it a trailing run of 0x00's? */

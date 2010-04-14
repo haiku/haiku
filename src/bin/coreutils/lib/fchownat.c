@@ -4,7 +4,7 @@
    when the buggy fchownat-with-AT_SYMLINK_NOFOLLOW operates on a symlink, it
    mistakenly affects the symlink referent, rather than the symlink itself.
 
-   Copyright (C) 2006-2007, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,10 +25,12 @@
 
 #include <unistd.h>
 
-#include "dirname.h" /* solely for definition of IS_ABSOLUTE_FILE_NAME */
+#include <errno.h>
+#include <string.h>
+
 #include "openat.h"
-#include "openat-priv.h"
-#include "save-cwd.h"
+
+#if !HAVE_FCHOWNAT
 
 /* Replacement for Solaris' function by the same name.
    Invoke chown or lchown on file, FILE, using OWNER and GROUP, in the
@@ -38,10 +40,68 @@
    then (chown|lchown)/restore_cwd.  If either the save_cwd or the
    restore_cwd fails, then give a diagnostic and exit nonzero.  */
 
-#define AT_FUNC_NAME fchownat
-#define AT_FUNC_F1 lchown
-#define AT_FUNC_F2 chown
-#define AT_FUNC_USE_F1_COND AT_SYMLINK_NOFOLLOW
-#define AT_FUNC_POST_FILE_PARAM_DECLS , uid_t owner, gid_t group, int flag
-#define AT_FUNC_POST_FILE_ARGS        , owner, group
-#include "at-func.c"
+# define AT_FUNC_NAME fchownat
+# define AT_FUNC_F1 lchown
+# define AT_FUNC_F2 chown
+# define AT_FUNC_USE_F1_COND AT_SYMLINK_NOFOLLOW
+# define AT_FUNC_POST_FILE_PARAM_DECLS , uid_t owner, gid_t group, int flag
+# define AT_FUNC_POST_FILE_ARGS        , owner, group
+# include "at-func.c"
+# undef AT_FUNC_NAME
+# undef AT_FUNC_F1
+# undef AT_FUNC_F2
+# undef AT_FUNC_USE_F1_COND
+# undef AT_FUNC_POST_FILE_PARAM_DECLS
+# undef AT_FUNC_POST_FILE_ARGS
+
+#else /* HAVE_FCHOWNAT */
+
+# undef fchownat
+
+# if FCHOWNAT_NOFOLLOW_BUG
+
+/* Failure to handle AT_SYMLINK_NOFOLLOW requires the /proc/self/fd or
+   fchdir workaround to call lchown for lchownat, but there is no need
+   to penalize chownat.  */
+static int
+local_lchownat (int fd, char const *file, uid_t owner, gid_t group);
+
+# define AT_FUNC_NAME local_lchownat
+# define AT_FUNC_F1 lchown
+# define AT_FUNC_POST_FILE_PARAM_DECLS , uid_t owner, gid_t group
+# define AT_FUNC_POST_FILE_ARGS        , owner, group
+# include "at-func.c"
+# undef AT_FUNC_NAME
+# undef AT_FUNC_F1
+# undef AT_FUNC_POST_FILE_PARAM_DECLS
+# undef AT_FUNC_POST_FILE_ARGS
+
+# endif
+
+/* Work around bugs with trailing slash, using the same workarounds as
+   chown and lchown.  */
+
+int
+rpl_fchownat (int fd, char const *file, uid_t owner, gid_t group, int flag)
+{
+# if FCHOWNAT_NOFOLLOW_BUG
+  if (flag == AT_SYMLINK_NOFOLLOW)
+    return local_lchownat (fd, file, owner, group);
+# endif
+# if CHOWN_TRAILING_SLASH_BUG
+  {
+    size_t len = strlen (file);
+    struct stat st;
+    if (len && file[len - 1] == '/')
+      {
+        if (statat (fd, file, &st))
+          return -1;
+        if (flag == AT_SYMLINK_NOFOLLOW)
+          return fchownat (fd, file, owner, group, 0);
+      }
+  }
+# endif
+  return fchownat (fd, file, owner, group, flag);
+}
+
+#endif /* HAVE_FCHOWNAT */

@@ -1,6 +1,6 @@
 /* Declarations of functions and data types used for SHA512 and SHA384 sum
    library functions.
-   Copyright (C) 2005, 2006, 2008, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2008, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -48,14 +48,14 @@ extern void sha384_init_ctx (struct sha512_ctx *ctx);
    starting at BUFFER.
    It is necessary that LEN is a multiple of 128!!! */
 extern void sha512_process_block (const void *buffer, size_t len,
-				  struct sha512_ctx *ctx);
+                                  struct sha512_ctx *ctx);
 
 /* Starting with the result of former calls of this function (or the
    initialization function update the context for the next LEN bytes
    starting at BUFFER.
    It is NOT required that LEN is a multiple of 128.  */
 extern void sha512_process_bytes (const void *buffer, size_t len,
-				  struct sha512_ctx *ctx);
+                                  struct sha512_ctx *ctx);
 
 /* Process the remaining bytes in the buffer and put result from CTX
    in first 64 (48) bytes following RESBUF.  The result is always in little

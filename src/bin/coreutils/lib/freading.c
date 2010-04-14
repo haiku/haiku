@@ -1,5 +1,5 @@
 /* Retrieve information about a FILE stream.
-   Copyright (C) 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 2007-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,8 +33,8 @@ freading (FILE *fp)
      fast macros.  */
 #if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
   return ((fp->_flags & _IO_NO_WRITES) != 0
-	  || ((fp->_flags & (_IO_NO_READS | _IO_CURRENTLY_PUTTING)) == 0
-	      && fp->_IO_read_base != NULL));
+          || ((fp->_flags & (_IO_NO_READS | _IO_CURRENTLY_PUTTING)) == 0
+              && fp->_IO_read_base != NULL));
 #elif defined __sferror || defined __DragonFly__ /* FreeBSD, NetBSD, OpenBSD, DragonFly, MacOS X, Cygwin */
   return (fp_->_flags & __SRD) != 0;
 #elif defined __EMX__               /* emx+gcc */
@@ -45,7 +45,7 @@ freading (FILE *fp)
   return (fp->__modeflags & (__FLAG_READONLY | __FLAG_READING)) != 0;
 #elif defined __QNX__               /* QNX */
   return ((fp->_Mode & 0x2 /* _MOPENW */) == 0
-	  || (fp->_Mode & 0x1000 /* _MREAD */) != 0);
+          || (fp->_Mode & 0x1000 /* _MREAD */) != 0);
 #elif defined __MINT__              /* Atari FreeMiNT */
   if (!fp->__mode.__write)
     return 1;

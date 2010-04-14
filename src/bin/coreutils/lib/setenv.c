@@ -1,4 +1,4 @@
-/* Copyright (C) 1992,1995-1999,2000-2003,2005-2008 Free Software Foundation, Inc.
+/* Copyright (C) 1992, 1995-2003, 2005-2010 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,11 @@
 #if !_LIBC
 # include <config.h>
 #endif
+
+/* Don't use __attribute__ __nonnull__ in this compilation unit.  Otherwise gcc
+   optimizes away the name == NULL test below.  */
+#define _GL_ARG_NONNULL(params)
+
 #include <alloca.h>
 
 /* Specification.  */
@@ -32,22 +37,22 @@
 # include <unistd.h>
 #endif
 
-#if _LIBC || !HAVE_SETENV
-
 #if !_LIBC
 # include "malloca.h"
 #endif
 
+#if _LIBC || !HAVE_SETENV
+
 #if !_LIBC
-# define __environ	environ
+# define __environ      environ
 #endif
 
 #if _LIBC
 /* This lock protects against simultaneous modifications of `environ'.  */
 # include <bits/libc-lock.h>
 __libc_lock_define_initialized (static, envlock)
-# define LOCK	__libc_lock_lock (envlock)
-# define UNLOCK	__libc_lock_unlock (envlock)
+# define LOCK   __libc_lock_lock (envlock)
+# define UNLOCK __libc_lock_unlock (envlock)
 #else
 # define LOCK
 # define UNLOCK
@@ -66,8 +71,8 @@ __libc_lock_define_initialized (static, envlock)
    values are from a small set.  Outside glibc this will eat up all
    memory after a while.  */
 #if defined _LIBC || (defined HAVE_SEARCH_H && defined HAVE_TSEARCH \
-		      && defined __GNUC__)
-# define USE_TSEARCH	1
+                      && defined __GNUC__)
+# define USE_TSEARCH    1
 # include <search.h>
 typedef int (*compar_fn_t) (const void *, const void *);
 
@@ -76,9 +81,9 @@ typedef int (*compar_fn_t) (const void *, const void *);
 static void *known_values;
 
 # define KNOWN_VALUE(Str) \
-  ({									      \
-    void *value = tfind (Str, &known_values, (compar_fn_t) strcmp);	      \
-    value != NULL ? *(char **) value : NULL;				      \
+  ({                                                                          \
+    void *value = tfind (Str, &known_values, (compar_fn_t) strcmp);           \
+    value != NULL ? *(char **) value : NULL;                                  \
   })
 # define STORE_VALUE(Str) \
   tsearch (Str, &known_values, (compar_fn_t) strcmp)
@@ -105,7 +110,7 @@ static char **last_environ;
    free the strings.  */
 int
 __add_to_environ (const char *name, const char *value, const char *combined,
-		  int replace)
+                  int replace)
 {
   register char **ep;
   register size_t size;
@@ -122,10 +127,10 @@ __add_to_environ (const char *name, const char *value, const char *combined,
   if (ep != NULL)
     {
       for (; *ep != NULL; ++ep)
-	if (!strncmp (*ep, name, namelen) && (*ep)[namelen] == '=')
-	  break;
-	else
-	  ++size;
+        if (!strncmp (*ep, name, namelen) && (*ep)[namelen] == '=')
+          break;
+        else
+          ++size;
     }
 
   if (ep == NULL || *ep == NULL)
@@ -137,76 +142,76 @@ __add_to_environ (const char *name, const char *value, const char *combined,
 
       /* We allocated this space; we can extend it.  */
       new_environ =
-	(char **) (last_environ == NULL
-		   ? malloc ((size + 2) * sizeof (char *))
-		   : realloc (last_environ, (size + 2) * sizeof (char *)));
+        (char **) (last_environ == NULL
+                   ? malloc ((size + 2) * sizeof (char *))
+                   : realloc (last_environ, (size + 2) * sizeof (char *)));
       if (new_environ == NULL)
-	{
-	  UNLOCK;
-	  return -1;
-	}
+        {
+          UNLOCK;
+          return -1;
+        }
 
       /* If the whole entry is given add it.  */
       if (combined != NULL)
-	/* We must not add the string to the search tree since it belongs
-	   to the user.  */
-	new_environ[size] = (char *) combined;
+        /* We must not add the string to the search tree since it belongs
+           to the user.  */
+        new_environ[size] = (char *) combined;
       else
-	{
-	  /* See whether the value is already known.  */
+        {
+          /* See whether the value is already known.  */
 #ifdef USE_TSEARCH
 # ifdef _LIBC
-	  new_value = (char *) alloca (namelen + 1 + vallen);
-	  __mempcpy (__mempcpy (__mempcpy (new_value, name, namelen), "=", 1),
-		     value, vallen);
+          new_value = (char *) alloca (namelen + 1 + vallen);
+          __mempcpy (__mempcpy (__mempcpy (new_value, name, namelen), "=", 1),
+                     value, vallen);
 # else
-	  new_value = (char *) malloca (namelen + 1 + vallen);
-	  if (new_value == NULL)
-	    {
-	      __set_errno (ENOMEM);
-	      UNLOCK;
-	      return -1;
-	    }
-	  memcpy (new_value, name, namelen);
-	  new_value[namelen] = '=';
-	  memcpy (&new_value[namelen + 1], value, vallen);
+          new_value = (char *) malloca (namelen + 1 + vallen);
+          if (new_value == NULL)
+            {
+              __set_errno (ENOMEM);
+              UNLOCK;
+              return -1;
+            }
+          memcpy (new_value, name, namelen);
+          new_value[namelen] = '=';
+          memcpy (&new_value[namelen + 1], value, vallen);
 # endif
 
-	  new_environ[size] = KNOWN_VALUE (new_value);
-	  if (new_environ[size] == NULL)
+          new_environ[size] = KNOWN_VALUE (new_value);
+          if (new_environ[size] == NULL)
 #endif
-	    {
-	      new_environ[size] = (char *) malloc (namelen + 1 + vallen);
-	      if (new_environ[size] == NULL)
-		{
+            {
+              new_environ[size] = (char *) malloc (namelen + 1 + vallen);
+              if (new_environ[size] == NULL)
+                {
 #if defined USE_TSEARCH && !defined _LIBC
-		  freea (new_value);
+                  freea (new_value);
 #endif
-		  __set_errno (ENOMEM);
-		  UNLOCK;
-		  return -1;
-		}
+                  __set_errno (ENOMEM);
+                  UNLOCK;
+                  return -1;
+                }
 
 #ifdef USE_TSEARCH
-	      memcpy (new_environ[size], new_value, namelen + 1 + vallen);
+              memcpy (new_environ[size], new_value, namelen + 1 + vallen);
 #else
-	      memcpy (new_environ[size], name, namelen);
-	      new_environ[size][namelen] = '=';
-	      memcpy (&new_environ[size][namelen + 1], value, vallen);
+              memcpy (new_environ[size], name, namelen);
+              new_environ[size][namelen] = '=';
+              memcpy (&new_environ[size][namelen + 1], value, vallen);
 #endif
-	      /* And save the value now.  We cannot do this when we remove
-		 the string since then we cannot decide whether it is a
-		 user string or not.  */
-	      STORE_VALUE (new_environ[size]);
-	    }
+              /* And save the value now.  We cannot do this when we remove
+                 the string since then we cannot decide whether it is a
+                 user string or not.  */
+              STORE_VALUE (new_environ[size]);
+            }
 #if defined USE_TSEARCH && !defined _LIBC
-	  freea (new_value);
+          freea (new_value);
 #endif
-	}
+        }
 
       if (__environ != last_environ)
-	memcpy ((char *) new_environ, (char *) __environ,
-		size * sizeof (char *));
+        memcpy ((char *) new_environ, (char *) __environ,
+                size * sizeof (char *));
 
       new_environ[size + 1] = NULL;
 
@@ -218,57 +223,57 @@ __add_to_environ (const char *name, const char *value, const char *combined,
 
       /* Use the user string if given.  */
       if (combined != NULL)
-	np = (char *) combined;
+        np = (char *) combined;
       else
-	{
+        {
 #ifdef USE_TSEARCH
-	  char *new_value;
+          char *new_value;
 # ifdef _LIBC
-	  new_value = alloca (namelen + 1 + vallen);
-	  __mempcpy (__mempcpy (__mempcpy (new_value, name, namelen), "=", 1),
-		     value, vallen);
+          new_value = alloca (namelen + 1 + vallen);
+          __mempcpy (__mempcpy (__mempcpy (new_value, name, namelen), "=", 1),
+                     value, vallen);
 # else
-	  new_value = malloca (namelen + 1 + vallen);
-	  if (new_value == NULL)
-	    {
-	      __set_errno (ENOMEM);
-	      UNLOCK;
-	      return -1;
-	    }
-	  memcpy (new_value, name, namelen);
-	  new_value[namelen] = '=';
-	  memcpy (&new_value[namelen + 1], value, vallen);
+          new_value = malloca (namelen + 1 + vallen);
+          if (new_value == NULL)
+            {
+              __set_errno (ENOMEM);
+              UNLOCK;
+              return -1;
+            }
+          memcpy (new_value, name, namelen);
+          new_value[namelen] = '=';
+          memcpy (&new_value[namelen + 1], value, vallen);
 # endif
 
-	  np = KNOWN_VALUE (new_value);
-	  if (np == NULL)
+          np = KNOWN_VALUE (new_value);
+          if (np == NULL)
 #endif
-	    {
-	      np = malloc (namelen + 1 + vallen);
-	      if (np == NULL)
-		{
+            {
+              np = malloc (namelen + 1 + vallen);
+              if (np == NULL)
+                {
 #if defined USE_TSEARCH && !defined _LIBC
-		  freea (new_value);
+                  freea (new_value);
 #endif
-		  __set_errno (ENOMEM);
-		  UNLOCK;
-		  return -1;
-		}
+                  __set_errno (ENOMEM);
+                  UNLOCK;
+                  return -1;
+                }
 
 #ifdef USE_TSEARCH
-	      memcpy (np, new_value, namelen + 1 + vallen);
+              memcpy (np, new_value, namelen + 1 + vallen);
 #else
-	      memcpy (np, name, namelen);
-	      np[namelen] = '=';
-	      memcpy (&np[namelen + 1], value, vallen);
+              memcpy (np, name, namelen);
+              np[namelen] = '=';
+              memcpy (&np[namelen + 1], value, vallen);
 #endif
-	      /* And remember the value.  */
-	      STORE_VALUE (np);
-	    }
+              /* And remember the value.  */
+              STORE_VALUE (np);
+            }
 #if defined USE_TSEARCH && !defined _LIBC
-	  freea (new_value);
+          freea (new_value);
 #endif
-	}
+        }
 
       *ep = np;
     }
@@ -281,6 +286,12 @@ __add_to_environ (const char *name, const char *value, const char *combined,
 int
 setenv (const char *name, const char *value, int replace)
 {
+  if (name == NULL || *name == '\0' || strchr (name, '=') != NULL)
+    {
+      __set_errno (EINVAL);
+      return -1;
+    }
+
   return __add_to_environ (name, value, NULL, replace);
 }
 
@@ -328,3 +339,45 @@ weak_alias (__clearenv, clearenv)
 #endif
 
 #endif /* _LIBC || !HAVE_SETENV */
+
+/* The rest of this file is called into use when replacing an existing
+   but buggy setenv.  Known bugs include failure to diagnose invalid
+   name, and consuming a leading '=' from value.  */
+#if HAVE_SETENV
+
+# undef setenv
+# define STREQ(a, b) (strcmp (a, b) == 0)
+
+int
+rpl_setenv (const char *name, const char *value, int replace)
+{
+  int result;
+  if (!name || !*name || strchr (name, '='))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+  /* Call the real setenv even if replace is 0, in case implementation
+     has underlying data to update, such as when environ changes.  */
+  result = setenv (name, value, replace);
+  if (result == 0 && replace && *value == '=')
+    {
+      char *tmp = getenv (name);
+      if (!STREQ (tmp, value))
+        {
+          int saved_errno;
+          size_t len = strlen (value);
+          tmp = malloca (len + 2);
+          /* Since leading '=' is eaten, double it up.  */
+          *tmp = '=';
+          memcpy (tmp + 1, value, len + 1);
+          result = setenv (name, tmp, replace);
+          saved_errno = errno;
+          freea (tmp);
+          errno = saved_errno;
+        }
+    }
+  return result;
+}
+
+#endif /* HAVE_SETENV */

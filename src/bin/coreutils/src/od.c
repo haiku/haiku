@@ -1,5 +1,5 @@
 /* od -- dump files in octal and other formats
-   Copyright (C) 92, 1995-2009 Free Software Foundation, Inc.
+   Copyright (C) 1992, 1995-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -394,7 +394,7 @@ output line.\n\
 Option --string without a number implies 3; option --width without a number\n\
 implies 32.  By default, od uses -A o -t oS -w16.\n\
 "), stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -878,7 +878,7 @@ open_next_file (void)
     }
   while (in_stream == NULL);
 
-  if (limit_bytes_to_format & !flag_dump_strings)
+  if (limit_bytes_to_format && !flag_dump_strings)
     setvbuf (in_stream, NULL, _IONBF, 0);
 
   return ok;
@@ -1742,7 +1742,7 @@ it must be one character from [doxn]"),
         od [file] [[+]offset[.][b]]
   */
 
-  if (!modern | traditional)
+  if (!modern || traditional)
     {
       uintmax_t o1;
       uintmax_t o2;

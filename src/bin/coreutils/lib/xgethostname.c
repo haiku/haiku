@@ -1,7 +1,7 @@
 /* xgethostname.c -- return current hostname with unlimited length
 
-   Copyright (C) 1992, 1996, 2000, 2001, 2003, 2004, 2005, 2006, 2009
-   Free Software Foundation, Inc.
+   Copyright (C) 1992, 1996, 2000-2001, 2003-2006, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@ xgethostname (void)
   while (1)
     {
       /* Use SIZE_1 here rather than SIZE to work around the bug in
-	 SunOS 5.5's gethostname whereby it NUL-terminates HOSTNAME
-	 even when the name is as long as the supplied buffer.  */
+         SunOS 5.5's gethostname whereby it NUL-terminates HOSTNAME
+         even when the name is as long as the supplied buffer.  */
       size_t size_1;
 
       hostname = x2realloc (hostname, &size);
@@ -55,19 +55,19 @@ xgethostname (void)
       errno = 0;
 
       if (gethostname (hostname, size_1) == 0)
-	{
-	  if (! hostname[size_1 - 1])
-	    break;
-	}
+        {
+          if (! hostname[size_1 - 1])
+            break;
+        }
       else if (errno != 0 && errno != ENAMETOOLONG && errno != EINVAL
-	       /* OSX/Darwin does this when the buffer is not large enough */
-	       && errno != ENOMEM)
-	{
-	  int saved_errno = errno;
-	  free (hostname);
-	  errno = saved_errno;
-	  return NULL;
-	}
+               /* OSX/Darwin does this when the buffer is not large enough */
+               && errno != ENOMEM)
+        {
+          int saved_errno = errno;
+          free (hostname);
+          errno = saved_errno;
+          return NULL;
+        }
     }
 
   return hostname;

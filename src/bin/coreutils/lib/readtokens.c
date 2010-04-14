@@ -1,6 +1,7 @@
 /* readtokens.c  -- Functions for reading tokens from an input stream.
 
-   Copyright (C) 1990-1991, 1999-2004, 2006, 2009 Free Software Foundation, Inc.
+   Copyright (C) 1990-1991, 1999-2004, 2006, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -60,9 +61,9 @@ init_tokenbuffer (token_buffer *tokenbuffer)
 
 size_t
 readtoken (FILE *stream,
-	   const char *delim,
-	   size_t n_delim,
-	   token_buffer *tokenbuffer)
+           const char *delim,
+           size_t n_delim,
+           token_buffer *tokenbuffer)
 {
   char *p;
   int c;
@@ -79,13 +80,13 @@ readtoken (FILE *stream,
     {
       same_delimiters = true;
       for (i = 0; i < n_delim; i++)
-	{
-	  if (delim[i] != saved_delim[i])
-	    {
-	      same_delimiters = false;
-	      break;
-	    }
-	}
+        {
+          if (delim[i] != saved_delim[i])
+            {
+              same_delimiters = false;
+              break;
+            }
+        }
     }
 
   if (!same_delimiters)
@@ -94,10 +95,10 @@ readtoken (FILE *stream,
       saved_delim = delim;
       memset (isdelim, 0, sizeof isdelim);
       for (j = 0; j < n_delim; j++)
-	{
-	  unsigned char ch = delim[j];
-	  isdelim[ch] = 1;
-	}
+        {
+          unsigned char ch = delim[j];
+          isdelim[ch] = 1;
+        }
     }
 
   /* FIXME: don't fool with this caching.  Use strchr instead.  */
@@ -113,21 +114,21 @@ readtoken (FILE *stream,
   for (;;)
     {
       if (c < 0 && i == 0)
-	return -1;
+        return -1;
 
       if (i == n)
-	p = x2nrealloc (p, &n, sizeof *p);
+        p = x2nrealloc (p, &n, sizeof *p);
 
       if (c < 0)
-	{
-	  p[i] = 0;
-	  break;
-	}
+        {
+          p[i] = 0;
+          break;
+        }
       if (isdelim[c])
-	{
-	  p[i] = 0;
-	  break;
-	}
+        {
+          p[i] = 0;
+          break;
+        }
       p[i++] = c;
       c = getc (stream);
     }
@@ -146,11 +147,11 @@ readtoken (FILE *stream,
 
 size_t
 readtokens (FILE *stream,
-	    size_t projected_n_tokens,
-	    const char *delim,
-	    size_t n_delim,
-	    char ***tokens_out,
-	    size_t **token_lengths)
+            size_t projected_n_tokens,
+            const char *delim,
+            size_t n_delim,
+            char ***tokens_out,
+            size_t **token_lengths)
 {
   token_buffer tb, *token = &tb;
   char **tokens;
@@ -161,7 +162,7 @@ readtokens (FILE *stream,
   if (projected_n_tokens == 0)
     projected_n_tokens = 64;
   else
-    projected_n_tokens++;	/* add one for trailing NULL pointer */
+    projected_n_tokens++;       /* add one for trailing NULL pointer */
 
   sz = projected_n_tokens;
   tokens = xnmalloc (sz, sizeof *tokens);
@@ -174,18 +175,18 @@ readtokens (FILE *stream,
       char *tmp;
       size_t token_length = readtoken (stream, delim, n_delim, token);
       if (n_tokens >= sz)
-	{
-	  tokens = x2nrealloc (tokens, &sz, sizeof *tokens);
-	  lengths = xnrealloc (lengths, sz, sizeof *lengths);
-	}
+        {
+          tokens = x2nrealloc (tokens, &sz, sizeof *tokens);
+          lengths = xnrealloc (lengths, sz, sizeof *lengths);
+        }
 
       if (token_length == (size_t) -1)
-	{
-	  /* don't increment n_tokens for NULL entry */
-	  tokens[n_tokens] = NULL;
-	  lengths[n_tokens] = 0;
-	  break;
-	}
+        {
+          /* don't increment n_tokens for NULL entry */
+          tokens[n_tokens] = NULL;
+          lengths[n_tokens] = 0;
+          break;
+        }
       tmp = xnmalloc (token_length + 1, sizeof *tmp);
       lengths[n_tokens] = token_length;
       tokens[n_tokens] = memcpy (tmp, token->buffer, token_length + 1);

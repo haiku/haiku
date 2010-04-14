@@ -3,7 +3,7 @@
 #line 1
 /* A GNU-like <string.h>.
 
-   Copyright (C) 1995-1996, 2001-2009 Free Software Foundation, Inc.
+   Copyright (C) 1995-1996, 2001-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,11 @@
 /* NetBSD 5.0 mis-defines NULL.  */
 #include <stddef.h>
 
+/* MirBSD defines mbslen as a macro.  */
+#if @GNULIB_MBSLEN@ && defined __MirBSD__
+# include <wchar.h>
+#endif
+
 #ifndef __attribute__
 /* This feature is available in gcc versions 2.5 and later.  */
 # if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
@@ -48,6 +53,8 @@
 
 /* The definition of GL_LINK_WARNING is copied here.  */
 
+/* The definition of _GL_ARG_NONNULL is copied here.  */
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +66,7 @@ extern "C" {
 # if @REPLACE_MEMCHR@
 #  define memchr rpl_memchr
 extern void *memchr (void const *__s, int __c, size_t __n)
-  __attribute__ ((__pure__));
+     __attribute__ ((__pure__)) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef memchr
@@ -76,8 +83,8 @@ extern void *memchr (void const *__s, int __c, size_t __n)
 # endif
 # if ! @HAVE_DECL_MEMMEM@ || @REPLACE_MEMMEM@
 extern void *memmem (void const *__haystack, size_t __haystack_len,
-		     void const *__needle, size_t __needle_len)
-  __attribute__ ((__pure__));
+                     void const *__needle, size_t __needle_len)
+     __attribute__ ((__pure__)) _GL_ARG_NONNULL ((1, 3));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef memmem
@@ -93,7 +100,8 @@ extern void *memmem (void const *__haystack, size_t __haystack_len,
 #if @GNULIB_MEMPCPY@
 # if ! @HAVE_MEMPCPY@
 extern void *mempcpy (void *restrict __dest, void const *restrict __src,
-		      size_t __n);
+                      size_t __n)
+     _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef mempcpy
@@ -107,7 +115,7 @@ extern void *mempcpy (void *restrict __dest, void const *restrict __src,
 #if @GNULIB_MEMRCHR@
 # if ! @HAVE_DECL_MEMRCHR@
 extern void *memrchr (void const *, int, size_t)
-  __attribute__ ((__pure__));
+     __attribute__ ((__pure__)) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef memrchr
@@ -123,7 +131,7 @@ extern void *memrchr (void const *, int, size_t)
 #if @GNULIB_RAWMEMCHR@
 # if ! @HAVE_RAWMEMCHR@
 extern void *rawmemchr (void const *__s, int __c_in)
-  __attribute__ ((__pure__));
+     __attribute__ ((__pure__)) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef rawmemchr
@@ -136,7 +144,8 @@ extern void *rawmemchr (void const *__s, int __c_in)
 /* Copy SRC to DST, returning the address of the terminating '\0' in DST.  */
 #if @GNULIB_STPCPY@
 # if ! @HAVE_STPCPY@
-extern char *stpcpy (char *restrict __dst, char const *restrict __src);
+extern char *stpcpy (char *restrict __dst, char const *restrict __src)
+     _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef stpcpy
@@ -152,7 +161,8 @@ extern char *stpcpy (char *restrict __dst, char const *restrict __src);
 # if ! @HAVE_STPNCPY@
 #  define stpncpy gnu_stpncpy
 extern char *stpncpy (char *restrict __dst, char const *restrict __src,
-		      size_t __n);
+                      size_t __n)
+     _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef stpncpy
@@ -177,7 +187,7 @@ extern char *stpncpy (char *restrict __dst, char const *restrict __src,
 #if @GNULIB_STRCHRNUL@
 # if ! @HAVE_STRCHRNUL@
 extern char *strchrnul (char const *__s, int __c_in)
-  __attribute__ ((__pure__));
+     __attribute__ ((__pure__)) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef strchrnul
@@ -194,7 +204,7 @@ extern char *strchrnul (char const *__s, int __c_in)
 #  define strdup rpl_strdup
 # endif
 # if !(@HAVE_DECL_STRDUP@ || defined strdup) || @REPLACE_STRDUP@
-extern char *strdup (char const *__s);
+extern char *strdup (char const *__s) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef strdup
@@ -211,7 +221,7 @@ extern char *strdup (char const *__s);
 #  define strndup rpl_strndup
 # endif
 # if @REPLACE_STRNDUP@ || ! @HAVE_DECL_STRNDUP@
-extern char *strndup (char const *__string, size_t __n);
+extern char *strndup (char const *__string, size_t __n) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef strndup
@@ -227,7 +237,7 @@ extern char *strndup (char const *__string, size_t __n);
 #if @GNULIB_STRNLEN@
 # if ! @HAVE_DECL_STRNLEN@
 extern size_t strnlen (char const *__string, size_t __maxlen)
-  __attribute__ ((__pure__));
+     __attribute__ ((__pure__)) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef strnlen
@@ -254,7 +264,7 @@ extern size_t strnlen (char const *__string, size_t __maxlen)
 #if @GNULIB_STRPBRK@
 # if ! @HAVE_STRPBRK@
 extern char *strpbrk (char const *__s, char const *__accept)
-  __attribute__ ((__pure__));
+     __attribute__ ((__pure__)) _GL_ARG_NONNULL ((1, 2));
 # endif
 # if defined GNULIB_POSIXCHECK
 /* strpbrk() assumes the second argument is a list of single-byte characters.
@@ -316,7 +326,8 @@ extern char *strpbrk (char const *__s, char const *__accept)
    See also strtok_r().  */
 #if @GNULIB_STRSEP@
 # if ! @HAVE_STRSEP@
-extern char *strsep (char **restrict __stringp, char const *restrict __delim);
+extern char *strsep (char **restrict __stringp, char const *restrict __delim)
+     _GL_ARG_NONNULL ((1, 2));
 # endif
 # if defined GNULIB_POSIXCHECK
 #  undef strsep
@@ -337,8 +348,8 @@ extern char *strsep (char **restrict __stringp, char const *restrict __delim);
 #if @GNULIB_STRSTR@
 # if @REPLACE_STRSTR@
 #  define strstr rpl_strstr
-char *strstr (const char *haystack, const char *needle)
-  __attribute__ ((__pure__));
+extern char *strstr (const char *haystack, const char *needle)
+     __attribute__ ((__pure__)) _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 /* strstr() does not work with multibyte strings if the locale encoding is
@@ -363,7 +374,7 @@ char *strstr (const char *haystack, const char *needle)
 # endif
 # if ! @HAVE_STRCASESTR@ || @REPLACE_STRCASESTR@
 extern char *strcasestr (const char *haystack, const char *needle)
-  __attribute__ ((__pure__));
+     __attribute__ ((__pure__)) _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 /* strcasestr() does not work with multibyte strings:
@@ -382,12 +393,12 @@ extern char *strcasestr (const char *haystack, const char *needle)
 /* Parse S into tokens separated by characters in DELIM.
    If S is NULL, the saved pointer in SAVE_PTR is used as
    the next starting point.  For example:
-	char s[] = "-abc-=-def";
-	char *sp;
-	x = strtok_r(s, "-", &sp);	// x = "abc", sp = "=-def"
-	x = strtok_r(NULL, "-=", &sp);	// x = "def", sp = NULL
-	x = strtok_r(NULL, "=", &sp);	// x = NULL
-		// s = "abc\0-def\0"
+        char s[] = "-abc-=-def";
+        char *sp;
+        x = strtok_r(s, "-", &sp);      // x = "abc", sp = "=-def"
+        x = strtok_r(NULL, "-=", &sp);  // x = "def", sp = NULL
+        x = strtok_r(NULL, "=", &sp);   // x = NULL
+                // s = "abc\0-def\0"
 
    This is a variant of strtok() that is multithread-safe.
 
@@ -410,7 +421,8 @@ extern char *strcasestr (const char *haystack, const char *needle)
 # endif
 # if ! @HAVE_DECL_STRTOK_R@ || @REPLACE_STRTOK_R@
 extern char *strtok_r (char *restrict s, char const *restrict delim,
-		       char **restrict save_ptr);
+                       char **restrict save_ptr)
+     _GL_ARG_NONNULL ((2, 3));
 # endif
 # if defined GNULIB_POSIXCHECK
 #  undef strtok_r
@@ -435,13 +447,19 @@ extern char *strtok_r (char *restrict s, char const *restrict delim,
 #if @GNULIB_MBSLEN@
 /* Return the number of multibyte characters in the character string STRING.
    This considers multibyte characters, unlike strlen, which counts bytes.  */
-extern size_t mbslen (const char *string);
+# ifdef __MirBSD__  /* MirBSD defines mbslen as a macro.  Override it.  */
+#  undef mbslen
+# endif
+# if @HAVE_MBSLEN@  /* AIX, OSF/1, MirBSD define mbslen already in libc.  */
+#  define mbslen rpl_mbslen
+# endif
+extern size_t mbslen (const char *string) _GL_ARG_NONNULL ((1));
 #endif
 
 #if @GNULIB_MBSNLEN@
 /* Return the number of multibyte characters in the character string starting
    at STRING and ending at STRING + LEN.  */
-extern size_t mbsnlen (const char *string, size_t len);
+extern size_t mbsnlen (const char *string, size_t len) _GL_ARG_NONNULL ((1));
 #endif
 
 #if @GNULIB_MBSCHR@
@@ -450,7 +468,7 @@ extern size_t mbsnlen (const char *string, size_t len);
    Unlike strchr(), this function works correctly in multibyte locales with
    encodings such as GB18030.  */
 # define mbschr rpl_mbschr /* avoid collision with HP-UX function */
-extern char * mbschr (const char *string, int c);
+extern char * mbschr (const char *string, int c) _GL_ARG_NONNULL ((1));
 #endif
 
 #if @GNULIB_MBSRCHR@
@@ -459,7 +477,7 @@ extern char * mbschr (const char *string, int c);
    Unlike strrchr(), this function works correctly in multibyte locales with
    encodings such as GB18030.  */
 # define mbsrchr rpl_mbsrchr /* avoid collision with HP-UX function */
-extern char * mbsrchr (const char *string, int c);
+extern char * mbsrchr (const char *string, int c) _GL_ARG_NONNULL ((1));
 #endif
 
 #if @GNULIB_MBSSTR@
@@ -467,7 +485,8 @@ extern char * mbsrchr (const char *string, int c);
    string HAYSTACK.  Return NULL if NEEDLE is not found in HAYSTACK.
    Unlike strstr(), this function works correctly in multibyte locales with
    encodings different from UTF-8.  */
-extern char * mbsstr (const char *haystack, const char *needle);
+extern char * mbsstr (const char *haystack, const char *needle)
+     _GL_ARG_NONNULL ((1, 2));
 #endif
 
 #if @GNULIB_MBSCASECMP@
@@ -477,7 +496,8 @@ extern char * mbsstr (const char *haystack, const char *needle);
    Note: This function may, in multibyte locales, return 0 for strings of
    different lengths!
    Unlike strcasecmp(), this function works correctly in multibyte locales.  */
-extern int mbscasecmp (const char *s1, const char *s2);
+extern int mbscasecmp (const char *s1, const char *s2)
+     _GL_ARG_NONNULL ((1, 2));
 #endif
 
 #if @GNULIB_MBSNCASECMP@
@@ -490,7 +510,8 @@ extern int mbscasecmp (const char *s1, const char *s2);
    of different lengths!
    Unlike strncasecmp(), this function works correctly in multibyte locales.
    But beware that N is not a byte count but a character count!  */
-extern int mbsncasecmp (const char *s1, const char *s2, size_t n);
+extern int mbsncasecmp (const char *s1, const char *s2, size_t n)
+     _GL_ARG_NONNULL ((1, 2));
 #endif
 
 #if @GNULIB_MBSPCASECMP@
@@ -503,7 +524,8 @@ extern int mbsncasecmp (const char *s1, const char *s2, size_t n);
    smaller length than PREFIX!
    Unlike strncasecmp(), this function works correctly in multibyte
    locales.  */
-extern char * mbspcasecmp (const char *string, const char *prefix);
+extern char * mbspcasecmp (const char *string, const char *prefix)
+     _GL_ARG_NONNULL ((1, 2));
 #endif
 
 #if @GNULIB_MBSCASESTR@
@@ -512,7 +534,8 @@ extern char * mbspcasecmp (const char *string, const char *prefix);
    Note: This function may, in multibyte locales, return success even if
    strlen (haystack) < strlen (needle) !
    Unlike strcasestr(), this function works correctly in multibyte locales.  */
-extern char * mbscasestr (const char *haystack, const char *needle);
+extern char * mbscasestr (const char *haystack, const char *needle)
+     _GL_ARG_NONNULL ((1, 2));
 #endif
 
 #if @GNULIB_MBSCSPN@
@@ -521,7 +544,8 @@ extern char * mbscasestr (const char *haystack, const char *needle);
    beginning of the string to this occurrence, or to the end of the string
    if none exists.
    Unlike strcspn(), this function works correctly in multibyte locales.  */
-extern size_t mbscspn (const char *string, const char *accept);
+extern size_t mbscspn (const char *string, const char *accept)
+     _GL_ARG_NONNULL ((1, 2));
 #endif
 
 #if @GNULIB_MBSPBRK@
@@ -530,7 +554,8 @@ extern size_t mbscspn (const char *string, const char *accept);
    exists.
    Unlike strpbrk(), this function works correctly in multibyte locales.  */
 # define mbspbrk rpl_mbspbrk /* avoid collision with HP-UX function */
-extern char * mbspbrk (const char *string, const char *accept);
+extern char * mbspbrk (const char *string, const char *accept)
+     _GL_ARG_NONNULL ((1, 2));
 #endif
 
 #if @GNULIB_MBSSPN@
@@ -539,7 +564,8 @@ extern char * mbspbrk (const char *string, const char *accept);
    beginning of the string to this occurrence, or to the end of the string
    if none exists.
    Unlike strspn(), this function works correctly in multibyte locales.  */
-extern size_t mbsspn (const char *string, const char *reject);
+extern size_t mbsspn (const char *string, const char *reject)
+     _GL_ARG_NONNULL ((1, 2));
 #endif
 
 #if @GNULIB_MBSSEP@
@@ -557,7 +583,8 @@ extern size_t mbsspn (const char *string, const char *reject);
    Caveat: The identity of the delimiting character is lost.
 
    See also mbstok_r().  */
-extern char * mbssep (char **stringp, const char *delim);
+extern char * mbssep (char **stringp, const char *delim)
+     _GL_ARG_NONNULL ((1, 2));
 #endif
 
 #if @GNULIB_MBSTOK_R@
@@ -565,19 +592,20 @@ extern char * mbssep (char **stringp, const char *delim);
    the character string DELIM.
    If STRING is NULL, the saved pointer in SAVE_PTR is used as
    the next starting point.  For example:
-	char s[] = "-abc-=-def";
-	char *sp;
-	x = mbstok_r(s, "-", &sp);	// x = "abc", sp = "=-def"
-	x = mbstok_r(NULL, "-=", &sp);	// x = "def", sp = NULL
-	x = mbstok_r(NULL, "=", &sp);	// x = NULL
-		// s = "abc\0-def\0"
+        char s[] = "-abc-=-def";
+        char *sp;
+        x = mbstok_r(s, "-", &sp);      // x = "abc", sp = "=-def"
+        x = mbstok_r(NULL, "-=", &sp);  // x = "def", sp = NULL
+        x = mbstok_r(NULL, "=", &sp);   // x = NULL
+                // s = "abc\0-def\0"
 
    Caveat: It modifies the original string.
    Caveat: These functions cannot be used on constant strings.
    Caveat: The identity of the delimiting character is lost.
 
    See also mbssep().  */
-extern char * mbstok_r (char *string, const char *delim, char **save_ptr);
+extern char * mbstok_r (char *string, const char *delim, char **save_ptr)
+     _GL_ARG_NONNULL ((2, 3));
 #endif
 
 /* Map any int, typically from errno, into an error message.  */
@@ -612,7 +640,7 @@ extern char *strsignal (int __sig);
 
 #if @GNULIB_STRVERSCMP@
 # if !@HAVE_STRVERSCMP@
-extern int strverscmp (const char *, const char *);
+extern int strverscmp (const char *, const char *) _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef strverscmp

@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Substitute for <sys/select.h>.
-   Copyright (C) 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 2007-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,12 +45,18 @@
 # include <sys/types.h>
 
 /* On OSF/1 4.0, <sys/select.h> provides only a forward declaration
-   of 'struct timeval', and no definition of this type.  */
-# include <sys/time.h>
+   of 'struct timeval', and no definition of this type.
+   But avoid namespace pollution on glibc systems.  */
+# ifndef __GLIBC__
+#  include <sys/time.h>
+# endif
 
 /* On Solaris 10, <sys/select.h> provides an FD_ZERO implementation
-   that relies on memset(), but without including <string.h>.  */
-# include <string.h>
+   that relies on memset(), but without including <string.h>.
+   But avoid namespace pollution on glibc systems.  */
+# ifndef __GLIBC__
+#  include <string.h>
+# endif
 
 /* The include_next requires a split double-inclusion guard.  */
 # @INCLUDE_NEXT@ @NEXT_SYS_SELECT_H@

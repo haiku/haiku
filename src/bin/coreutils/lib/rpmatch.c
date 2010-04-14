@@ -1,7 +1,7 @@
 /* Determine whether string value is affirmation or negative response
    according to current locale's data.
 
-   Copyright (C) 1996, 1998, 2000, 2002, 2003, 2006-2008 Free Software
+   Copyright (C) 1996, 1998, 2000, 2002-2003, 2006-2010 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@
    The resulting string may only be used until the next nl_langinfo call.  */
 static const char *
 localized_pattern (const char *english_pattern, nl_item nl_index,
-		   bool posixly_correct)
+                   bool posixly_correct)
 {
   const char *translated_pattern;
 
@@ -65,7 +65,7 @@ localized_pattern (const char *english_pattern, nl_item nl_index,
       translated_pattern = nl_langinfo (nl_index);
       /* Check against a broken system return value.  */
       if (translated_pattern != NULL && translated_pattern[0] != '\0')
-	return translated_pattern;
+        return translated_pattern;
    }
 
   /* Look in the gnulib message catalog.  */
@@ -73,11 +73,11 @@ localized_pattern (const char *english_pattern, nl_item nl_index,
   if (translated_pattern == english_pattern)
     {
       /* The gnulib message catalog provides no translation.
-	 Try the system's message catalog.  */
+         Try the system's message catalog.  */
       translated_pattern = nl_langinfo (nl_index);
       /* Check against a broken system return value.  */
       if (translated_pattern != NULL && translated_pattern[0] != '\0')
-	return translated_pattern;
+        return translated_pattern;
       /* Fall back to English.  */
       translated_pattern = english_pattern;
     }
@@ -97,20 +97,20 @@ try (const char *response, const char *pattern, char **lastp, regex_t *re)
 
       /* The pattern has changed.  */
       if (*lastp != NULL)
-	{
-	  /* Free the old compiled pattern.  */
-	  regfree (re);
-	  free (*lastp);
-	  *lastp = NULL;
-	}
+        {
+          /* Free the old compiled pattern.  */
+          regfree (re);
+          free (*lastp);
+          *lastp = NULL;
+        }
       /* Put the PATTERN into safe memory before calling regcomp.
-	 (regcomp may call nl_langinfo, overwriting PATTERN's storage.  */
+         (regcomp may call nl_langinfo, overwriting PATTERN's storage.  */
       safe_pattern = strdup (pattern);
       if (safe_pattern == NULL)
-	return -1;
+        return -1;
       /* Compile the pattern and cache it for future runs.  */
       if (regcomp (re, safe_pattern, REG_EXTENDED) != 0)
-	return -1;
+        return -1;
       *lastp = safe_pattern;
     }
 
@@ -168,6 +168,6 @@ rpmatch (const char *response)
 #else
   /* Test against "^[yY]" and "^[nN]", hardcoded to avoid requiring regex */
   return (*response == 'y' || *response == 'Y' ? 1
-	  : *response == 'n' || *response == 'N' ? 0 : -1);
+          : *response == 'n' || *response == 'N' ? 0 : -1);
 #endif
 }

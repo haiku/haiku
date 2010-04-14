@@ -1,5 +1,5 @@
 /* setuidgid - run a command with the UID and GID of a specified user
-   Copyright (C) 2003-2009 Free Software Foundation, Inc.
+   Copyright (C) 2003-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ This program is useful only when run by root (user ID zero).\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -110,7 +110,7 @@ main (int argc, char **argv)
                       error (EXIT_FAILURE, 0, _("invalid group %s"),
                              quote (gr));
                     if (n_gids == n_gids_allocated)
-                      gids = x2nrealloc (gids, &n_gids_allocated, sizeof *gids);
+                      gids = X2NREALLOC (gids, &n_gids_allocated);
                     gids[n_gids++] = tmp_ul;
 
                     if (*ptr == '\0')
@@ -179,9 +179,9 @@ main (int argc, char **argv)
 #if HAVE_SETGROUPS
     if (n_gids == 0)
       {
-        int n = mgetgroups (pwd->pw_name, pwd->pw_gid, &gids);
+        int n = xgetgroups (pwd->pw_name, pwd->pw_gid, &gids);
         if (n <= 0)
-          error (1, errno, _("failed to get groups for user %s"),
+          error (EXIT_FAILURE, errno, _("failed to get groups for user %s"),
                  quote (pwd->pw_name));
         n_gids = n;
       }

@@ -1,5 +1,5 @@
 /* pathchk -- check whether file names are valid or portable
-   Copyright (C) 1991-2009 Free Software Foundation, Inc.
+   Copyright (C) 1991-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ Diagnose invalid or unportable file names.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }
@@ -270,7 +270,7 @@ validate_file_name (char *file, bool check_basic_portability,
   if (check_extra_portability && ! no_leading_hyphen (file))
     return false;
 
-  if ((check_basic_portability | check_extra_portability)
+  if ((check_basic_portability || check_extra_portability)
       && filelen == 0)
     {
       /* Fail, since empty names are not portable.  As of

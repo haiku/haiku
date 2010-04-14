@@ -1,6 +1,6 @@
 /* Detect cycles in file tree walks.
 
-   Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2003-2006, 2009-2010 Free Software Foundation, Inc.
 
    Written by Jim Meyering.
 
@@ -53,15 +53,15 @@ setup_dir (FTS *fts)
     {
       enum { HT_INITIAL_SIZE = 31 };
       fts->fts_cycle.ht = hash_initialize (HT_INITIAL_SIZE, NULL, AD_hash,
-					   AD_compare, free);
+                                           AD_compare, free);
       if (! fts->fts_cycle.ht)
-	return false;
+        return false;
     }
   else
     {
       fts->fts_cycle.state = malloc (sizeof *fts->fts_cycle.state);
       if (! fts->fts_cycle.state)
-	return false;
+        return false;
       cycle_check_init (fts->fts_cycle.state);
     }
 
@@ -80,40 +80,40 @@ enter_dir (FTS *fts, FTSENT *ent)
       struct Active_dir *ad_from_table;
 
       if (!ad)
-	return false;
+        return false;
 
       ad->dev = st->st_dev;
       ad->ino = st->st_ino;
       ad->fts_ent = ent;
 
       /* See if we've already encountered this directory.
-	 This can happen when following symlinks as well as
-	 with a corrupted directory hierarchy. */
+         This can happen when following symlinks as well as
+         with a corrupted directory hierarchy. */
       ad_from_table = hash_insert (fts->fts_cycle.ht, ad);
 
       if (ad_from_table != ad)
-	{
-	  free (ad);
-	  if (!ad_from_table)
-	    return false;
+        {
+          free (ad);
+          if (!ad_from_table)
+            return false;
 
-	  /* There was an entry with matching dev/inode already in the table.
-	     Record the fact that we've found a cycle.  */
-	  ent->fts_cycle = ad_from_table->fts_ent;
-	  ent->fts_info = FTS_DC;
-	}
+          /* There was an entry with matching dev/inode already in the table.
+             Record the fact that we've found a cycle.  */
+          ent->fts_cycle = ad_from_table->fts_ent;
+          ent->fts_info = FTS_DC;
+        }
     }
   else
     {
       if (cycle_check (fts->fts_cycle.state, ent->fts_statp))
-	{
-	  /* FIXME: setting fts_cycle like this isn't proper.
-	     To do what the documentation requires, we'd have to
-	     go around the cycle again and find the right entry.
-	     But no callers in coreutils use the fts_cycle member. */
-	  ent->fts_cycle = ent;
-	  ent->fts_info = FTS_DC;
-	}
+        {
+          /* FIXME: setting fts_cycle like this isn't proper.
+             To do what the documentation requires, we'd have to
+             go around the cycle again and find the right entry.
+             But no callers in coreutils use the fts_cycle member. */
+          ent->fts_cycle = ent;
+          ent->fts_info = FTS_DC;
+        }
     }
 
   return true;
@@ -133,15 +133,15 @@ leave_dir (FTS *fts, FTSENT *ent)
       obj.ino = st->st_ino;
       found = hash_delete (fts->fts_cycle.ht, &obj);
       if (!found)
-	abort ();
+        abort ();
       free (found);
     }
   else
     {
       FTSENT *parent = ent->fts_parent;
       if (parent != NULL && 0 <= parent->fts_level)
-	CYCLE_CHECK_REFLECT_CHDIR_UP (fts->fts_cycle.state,
-				      *(parent->fts_statp), *st);
+        CYCLE_CHECK_REFLECT_CHDIR_UP (fts->fts_cycle.state,
+                                      *(parent->fts_statp), *st);
     }
 }
 
@@ -153,7 +153,7 @@ free_dir (FTS *sp)
   if (sp->fts_options & (FTS_TIGHT_CYCLE_CHECK | FTS_LOGICAL))
     {
       if (sp->fts_cycle.ht)
-	hash_free (sp->fts_cycle.ht);
+        hash_free (sp->fts_cycle.ht);
     }
   else
     free (sp->fts_cycle.state);

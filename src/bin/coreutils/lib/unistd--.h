@@ -1,6 +1,6 @@
 /* Like unistd.h, but redefine some names to avoid glitches.
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,3 +25,8 @@
 
 #undef pipe
 #define pipe pipe_safer
+
+#if GNULIB_PIPE2_SAFER
+# undef pipe2
+# define pipe2 pipe2_safer
+#endif

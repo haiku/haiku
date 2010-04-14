@@ -1,7 +1,7 @@
 /* exclude.c -- exclude file names
 
-   Copyright (C) 1992, 1993, 1994, 1997, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2009 Free Software Foundation, Inc.
+   Copyright (C) 1992, 1993, 1994, 1997, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -56,9 +56,9 @@
 #endif
 
 verify (((EXCLUDE_ANCHORED | EXCLUDE_INCLUDE | EXCLUDE_WILDCARDS)
-	 & (FNM_PATHNAME | FNM_NOESCAPE | FNM_PERIOD | FNM_LEADING_DIR
-	    | FNM_CASEFOLD | FNM_EXTMATCH))
-	== 0);
+         & (FNM_PATHNAME | FNM_NOESCAPE | FNM_PERIOD | FNM_LEADING_DIR
+            | FNM_CASEFOLD | FNM_EXTMATCH))
+        == 0);
 
 
 /* Exclusion patterns are grouped into a singly-linked list of
@@ -121,15 +121,15 @@ fnmatch_pattern_has_wildcards (const char *str, int options)
     {
       size_t n = strcspn (str, cset);
       if (str[n] == 0)
-	break;
+        break;
       else if (str[n] == '\\')
-	{
-	  str += n + 1;
-	  if (*str)
-	    str++;
-	}
+        {
+          str += n + 1;
+          if (*str)
+            str++;
+        }
       else
-	return true;
+        return true;
     }
   return false;
 }
@@ -164,9 +164,9 @@ string_hasher_ci (void const *data, size_t n_buckets)
       wchar_t wc;
 
       if (m.wc_valid)
-	wc = towlower (m.wc);
+        wc = towlower (m.wc);
       else
-	wc = *m.ptr;
+        wc = *m.ptr;
 
       value = (value * 31 + wc) % n_buckets;
     }
@@ -213,13 +213,13 @@ new_exclude_segment (struct exclude *ex, enum exclude_type type, int options)
 
     case exclude_hash:
       sp->v.table = hash_initialize (0, NULL,
-				     (options & FNM_CASEFOLD) ?
-				       string_hasher_ci
-				       : string_hasher,
-				     (options & FNM_CASEFOLD) ?
-				       string_compare_ci
-				       : string_compare,
-				     string_free);
+                                     (options & FNM_CASEFOLD) ?
+                                       string_hasher_ci
+                                       : string_hasher,
+                                     (options & FNM_CASEFOLD) ?
+                                       string_compare_ci
+                                       : string_compare,
+                                     string_free);
       break;
     }
   if (ex->tail)
@@ -269,41 +269,41 @@ fnmatch_no_wildcards (char const *pattern, char const *f, int options)
 {
   if (! (options & FNM_LEADING_DIR))
     return ((options & FNM_CASEFOLD)
-	    ? mbscasecmp (pattern, f)
-	    : strcmp (pattern, f));
+            ? mbscasecmp (pattern, f)
+            : strcmp (pattern, f));
   else if (! (options & FNM_CASEFOLD))
     {
       size_t patlen = strlen (pattern);
       int r = strncmp (pattern, f, patlen);
       if (! r)
-	{
-	  r = f[patlen];
-	  if (r == '/')
-	    r = 0;
-	}
+        {
+          r = f[patlen];
+          if (r == '/')
+            r = 0;
+        }
       return r;
     }
   else
     {
       /* Walk through a copy of F, seeing whether P matches any prefix
-	 of F.
+         of F.
 
-	 FIXME: This is an O(N**2) algorithm; it should be O(N).
-	 Also, the copy should not be necessary.  However, fixing this
-	 will probably involve a change to the mbs* API.  */
+         FIXME: This is an O(N**2) algorithm; it should be O(N).
+         Also, the copy should not be necessary.  However, fixing this
+         will probably involve a change to the mbs* API.  */
 
       char *fcopy = xstrdup (f);
       char *p;
       int r;
       for (p = fcopy; ; *p++ = '/')
-	{
-	  p = strchr (p, '/');
-	  if (p)
-	    *p = '\0';
-	  r = mbscasecmp (pattern, fcopy);
-	  if (!p || r <= 0)
-	    break;
-	}
+        {
+          p = strchr (p, '/');
+          if (p)
+            *p = '\0';
+          r = mbscasecmp (pattern, fcopy);
+          if (!p || r <= 0)
+            break;
+        }
       free (fcopy);
       return r;
     }
@@ -322,7 +322,7 @@ exclude_fnmatch (char const *pattern, char const *f, int options)
   if (! (options & EXCLUDE_ANCHORED))
     for (p = f; *p && ! matched; p++)
       if (*p == '/' && p[1] != '/')
-	matched = ((*matcher) (pattern, p + 1, options) == 0);
+        matched = ((*matcher) (pattern, p + 1, options) == 0);
 
   return matched;
 }
@@ -343,7 +343,7 @@ excluded_file_pattern_p (struct exclude_segment const *seg, char const *f)
       char const *pattern = exclude[i].pattern;
       int options = exclude[i].options;
       if (excluded != exclude_fnmatch (pattern, f, options))
-	return !excluded;
+        return !excluded;
     }
   return excluded;
 }
@@ -353,7 +353,7 @@ excluded_file_pattern_p (struct exclude_segment const *seg, char const *f)
    terminator included) */
 static bool
 excluded_file_name_p (struct exclude_segment const *seg, char const *f,
-		      char *buffer)
+                      char *buffer)
 {
   int options = seg->options;
   bool excluded = !! (options & EXCLUDE_INCLUDE);
@@ -365,29 +365,29 @@ excluded_file_name_p (struct exclude_segment const *seg, char const *f,
       strcpy (buffer, f);
 
       while (1)
-	{
-	  if (hash_lookup (table, buffer))
-	    return !excluded;
-	  if (options & FNM_LEADING_DIR)
-	    {
-	      char *p = strrchr (buffer, '/');
-	      if (p)
-		{
-		  *p = 0;
-		  continue;
-		}
-	    }
-	  break;
-	}
+        {
+          if (hash_lookup (table, buffer))
+            return !excluded;
+          if (options & FNM_LEADING_DIR)
+            {
+              char *p = strrchr (buffer, '/');
+              if (p)
+                {
+                  *p = 0;
+                  continue;
+                }
+            }
+          break;
+        }
 
       if (!(options & EXCLUDE_ANCHORED))
-	{
-	  f = strchr (f, '/');
-	  if (f)
-	    f++;
-	}
+        {
+          f = strchr (f, '/');
+          if (f)
+            f++;
+        }
       else
-	break;
+        break;
     }
   while (f);
   return excluded;
@@ -415,22 +415,25 @@ excluded_file_name (struct exclude const *ex, char const *f)
       bool rc;
 
       switch (seg->type)
-	{
-	case exclude_pattern:
-	  rc = excluded_file_pattern_p (seg, f);
-	  break;
+        {
+        case exclude_pattern:
+          rc = excluded_file_pattern_p (seg, f);
+          break;
 
-	case exclude_hash:
-	  if (!filename)
-	    filename = xmalloc (strlen (f) + 1);
-	  rc = excluded_file_name_p (seg, f, filename);
-	  break;
-	}
+        case exclude_hash:
+          if (!filename)
+            filename = xmalloc (strlen (f) + 1);
+          rc = excluded_file_name_p (seg, f, filename);
+          break;
+
+        default:
+          abort ();
+        }
       if (rc != excluded)
-	{
-	  excluded = rc;
-	  break;
-	}
+        {
+          excluded = rc;
+          break;
+        }
     }
   free (filename);
   return excluded;
@@ -450,16 +453,16 @@ add_exclude (struct exclude *ex, char const *pattern, int options)
       struct patopts *patopts;
 
       if (ex->tail && ex->tail->type == exclude_pattern
-	  && ((ex->tail->options & EXCLUDE_INCLUDE) ==
-	      (options & EXCLUDE_INCLUDE)))
-	seg = ex->tail;
+          && ((ex->tail->options & EXCLUDE_INCLUDE) ==
+              (options & EXCLUDE_INCLUDE)))
+        seg = ex->tail;
       else
-	seg = new_exclude_segment (ex, exclude_pattern, options);
+        seg = new_exclude_segment (ex, exclude_pattern, options);
 
       pat = &seg->v.pat;
       if (pat->exclude_count == pat->exclude_alloc)
-	pat->exclude = x2nrealloc (pat->exclude, &pat->exclude_alloc,
-				   sizeof *pat->exclude);
+        pat->exclude = x2nrealloc (pat->exclude, &pat->exclude_alloc,
+                                   sizeof *pat->exclude);
       patopts = &pat->exclude[pat->exclude_count++];
       patopts->pattern = pattern;
       patopts->options = options;
@@ -468,18 +471,18 @@ add_exclude (struct exclude *ex, char const *pattern, int options)
     {
       char *str, *p;
 #define EXCLUDE_HASH_FLAGS (EXCLUDE_INCLUDE|EXCLUDE_ANCHORED|\
-			    FNM_LEADING_DIR|FNM_CASEFOLD)
+                            FNM_LEADING_DIR|FNM_CASEFOLD)
       if (ex->tail && ex->tail->type == exclude_hash
-	  && ((ex->tail->options & EXCLUDE_HASH_FLAGS) ==
-	      (options & EXCLUDE_HASH_FLAGS)))
-	seg = ex->tail;
+          && ((ex->tail->options & EXCLUDE_HASH_FLAGS) ==
+              (options & EXCLUDE_HASH_FLAGS)))
+        seg = ex->tail;
       else
-	seg = new_exclude_segment (ex, exclude_hash, options);
+        seg = new_exclude_segment (ex, exclude_hash, options);
 
       str = xstrdup (pattern);
       p = hash_insert (seg->v.table, str);
       if (p != str)
-	free (str);
+        free (str);
     }
 }
 
@@ -490,8 +493,8 @@ add_exclude (struct exclude *ex, char const *pattern, int options)
 
 int
 add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
-		  struct exclude *ex, char const *file_name, int options,
-		  char line_end)
+                  struct exclude *ex, char const *file_name, int options,
+                  char line_end)
 {
   bool use_stdin = file_name[0] == '-' && !file_name[1];
   FILE *in;
@@ -512,7 +515,7 @@ add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
   while ((c = getc (in)) != EOF)
     {
       if (buf_count == buf_alloc)
-	buf = x2realloc (buf, &buf_alloc);
+        buf = x2realloc (buf, &buf_alloc);
       buf[buf_count++] = c;
     }
 
@@ -530,22 +533,22 @@ add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
   for (p = buf; p < lim; p++)
     if (*p == line_end)
       {
-	char *pattern_end = p;
+        char *pattern_end = p;
 
-	if (isspace ((unsigned char) line_end))
-	  {
-	    for (; ; pattern_end--)
-	      if (pattern_end == pattern)
-		goto next_pattern;
-	      else if (! isspace ((unsigned char) pattern_end[-1]))
-		break;
-	  }
+        if (isspace ((unsigned char) line_end))
+          {
+            for (; ; pattern_end--)
+              if (pattern_end == pattern)
+                goto next_pattern;
+              else if (! isspace ((unsigned char) pattern_end[-1]))
+                break;
+          }
 
-	*pattern_end = '\0';
-	(*add_func) (ex, pattern, options);
+        *pattern_end = '\0';
+        (*add_func) (ex, pattern, options);
 
       next_pattern:
-	pattern = p + 1;
+        pattern = p + 1;
       }
 
   errno = e;

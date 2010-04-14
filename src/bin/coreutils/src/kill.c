@@ -1,5 +1,5 @@
 /* kill -- send a signal to a process
-   Copyright (C) 2002, 2003, 2004, 2005, 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 2002-2005, 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -111,7 +111,7 @@ or the exit status of a process terminated by a signal.\n\
 PID is an integer; if negative it identifies a process group.\n\
 "), stdout);
       printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
-      emit_bug_reporting_address ();
+      emit_ancillary_info ();
     }
   exit (status);
 }

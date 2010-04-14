@@ -1,7 +1,6 @@
 /* GNU's read utmp module.
 
-   Copyright (C) 1992-2001, 2003, 2004, 2005, 2006 Free Software
-   Foundation, Inc.
+   Copyright (C) 1992-2001, 2003-2006, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -71,7 +70,7 @@ desirable_utmp_entry (STRUCT_UTMP const *u, int options)
   if ((options & READ_UTMP_CHECK_PIDS)
       && user_proc
       && (UT_PID (u) <= 0
-	  || (kill (UT_PID (u), 0) < 0 && errno == ESRCH)))
+          || (kill (UT_PID (u), 0) < 0 && errno == ESRCH)))
     return false;
   return true;
 }
@@ -87,7 +86,7 @@ desirable_utmp_entry (STRUCT_UTMP const *u, int options)
 
 int
 read_utmp (char const *file, size_t *n_entries, STRUCT_UTMP **utmp_buf,
-	   int options)
+           int options)
 {
   size_t n_read = 0;
   size_t n_alloc = 0;
@@ -105,10 +104,10 @@ read_utmp (char const *file, size_t *n_entries, STRUCT_UTMP **utmp_buf,
   while ((u = GET_UTMP_ENT ()) != NULL)
     if (desirable_utmp_entry (u, options))
       {
-	if (n_read == n_alloc)
-	  utmp = x2nrealloc (utmp, &n_alloc, sizeof *utmp);
+        if (n_read == n_alloc)
+          utmp = x2nrealloc (utmp, &n_alloc, sizeof *utmp);
 
-	utmp[n_read++] = *u;
+        utmp[n_read++] = *u;
       }
 
   END_UTMP_ENT ();
@@ -123,7 +122,7 @@ read_utmp (char const *file, size_t *n_entries, STRUCT_UTMP **utmp_buf,
 
 int
 read_utmp (char const *file, size_t *n_entries, STRUCT_UTMP **utmp_buf,
-	   int options)
+           int options)
 {
   size_t n_read = 0;
   size_t n_alloc = 0;
@@ -137,9 +136,9 @@ read_utmp (char const *file, size_t *n_entries, STRUCT_UTMP **utmp_buf,
   for (;;)
     {
       if (n_read == n_alloc)
-	utmp = x2nrealloc (utmp, &n_alloc, sizeof *utmp);
+        utmp = x2nrealloc (utmp, &n_alloc, sizeof *utmp);
       if (fread (&utmp[n_read], sizeof utmp[n_read], 1, f) == 0)
-	break;
+        break;
       n_read += desirable_utmp_entry (&utmp[n_read], options);
     }
 

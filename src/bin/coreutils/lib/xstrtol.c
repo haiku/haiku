@@ -1,7 +1,7 @@
 /* A more useful interface to strtol.
 
-   Copyright (C) 1995, 1996, 1998, 1999, 2000, 2001, 2003, 2004, 2005,
-   2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 1995-1996, 1998-2001, 2003-2007, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ bkm_scale_by_power (__strtol_t *x, int base, int power)
 
 strtol_error
 __xstrtol (const char *s, char **ptr, int strtol_base,
-	   __strtol_t *val, const char *valid_suffixes)
+           __strtol_t *val, const char *valid_suffixes)
 {
   char *t_ptr;
   char **p;
@@ -89,9 +89,9 @@ __xstrtol (const char *s, char **ptr, int strtol_base,
       const char *q = s;
       unsigned char ch = *q;
       while (isspace (ch))
-	ch = *++q;
+        ch = *++q;
       if (ch == '-')
-	return LONGINT_INVALID;
+        return LONGINT_INVALID;
     }
 
   errno = 0;
@@ -100,16 +100,16 @@ __xstrtol (const char *s, char **ptr, int strtol_base,
   if (*p == s)
     {
       /* If there is no number but there is a valid suffix, assume the
-	 number is 1.  The string is invalid otherwise.  */
+         number is 1.  The string is invalid otherwise.  */
       if (valid_suffixes && **p && strchr (valid_suffixes, **p))
-	tmp = 1;
+        tmp = 1;
       else
-	return LONGINT_INVALID;
+        return LONGINT_INVALID;
     }
   else if (errno != 0)
     {
       if (errno != ERANGE)
-	return LONGINT_INVALID;
+        return LONGINT_INVALID;
       err = LONGINT_OVERFLOW;
     }
 
@@ -129,98 +129,98 @@ __xstrtol (const char *s, char **ptr, int strtol_base,
       strtol_error overflow;
 
       if (!strchr (valid_suffixes, **p))
-	{
-	  *val = tmp;
-	  return err | LONGINT_INVALID_SUFFIX_CHAR;
-	}
+        {
+          *val = tmp;
+          return err | LONGINT_INVALID_SUFFIX_CHAR;
+        }
 
       if (strchr (valid_suffixes, '0'))
-	{
-	  /* The ``valid suffix'' '0' is a special flag meaning that
-	     an optional second suffix is allowed, which can change
-	     the base.  A suffix "B" (e.g. "100MB") stands for a power
-	     of 1000, whereas a suffix "iB" (e.g. "100MiB") stands for
-	     a power of 1024.  If no suffix (e.g. "100M"), assume
-	     power-of-1024.  */
+        {
+          /* The ``valid suffix'' '0' is a special flag meaning that
+             an optional second suffix is allowed, which can change
+             the base.  A suffix "B" (e.g. "100MB") stands for a power
+             of 1000, whereas a suffix "iB" (e.g. "100MiB") stands for
+             a power of 1024.  If no suffix (e.g. "100M"), assume
+             power-of-1024.  */
 
-	  switch (p[0][1])
-	    {
-	    case 'i':
-	      if (p[0][2] == 'B')
-		suffixes += 2;
-	      break;
+          switch (p[0][1])
+            {
+            case 'i':
+              if (p[0][2] == 'B')
+                suffixes += 2;
+              break;
 
-	    case 'B':
-	    case 'D': /* 'D' is obsolescent */
-	      base = 1000;
-	      suffixes++;
-	      break;
-	    }
-	}
+            case 'B':
+            case 'D': /* 'D' is obsolescent */
+              base = 1000;
+              suffixes++;
+              break;
+            }
+        }
 
       switch (**p)
-	{
-	case 'b':
-	  overflow = bkm_scale (&tmp, 512);
-	  break;
+        {
+        case 'b':
+          overflow = bkm_scale (&tmp, 512);
+          break;
 
-	case 'B':
-	  overflow = bkm_scale (&tmp, 1024);
-	  break;
+        case 'B':
+          overflow = bkm_scale (&tmp, 1024);
+          break;
 
-	case 'c':
-	  overflow = 0;
-	  break;
+        case 'c':
+          overflow = 0;
+          break;
 
-	case 'E': /* exa or exbi */
-	  overflow = bkm_scale_by_power (&tmp, base, 6);
-	  break;
+        case 'E': /* exa or exbi */
+          overflow = bkm_scale_by_power (&tmp, base, 6);
+          break;
 
-	case 'G': /* giga or gibi */
-	case 'g': /* 'g' is undocumented; for compatibility only */
-	  overflow = bkm_scale_by_power (&tmp, base, 3);
-	  break;
+        case 'G': /* giga or gibi */
+        case 'g': /* 'g' is undocumented; for compatibility only */
+          overflow = bkm_scale_by_power (&tmp, base, 3);
+          break;
 
-	case 'k': /* kilo */
-	case 'K': /* kibi */
-	  overflow = bkm_scale_by_power (&tmp, base, 1);
-	  break;
+        case 'k': /* kilo */
+        case 'K': /* kibi */
+          overflow = bkm_scale_by_power (&tmp, base, 1);
+          break;
 
-	case 'M': /* mega or mebi */
-	case 'm': /* 'm' is undocumented; for compatibility only */
-	  overflow = bkm_scale_by_power (&tmp, base, 2);
-	  break;
+        case 'M': /* mega or mebi */
+        case 'm': /* 'm' is undocumented; for compatibility only */
+          overflow = bkm_scale_by_power (&tmp, base, 2);
+          break;
 
-	case 'P': /* peta or pebi */
-	  overflow = bkm_scale_by_power (&tmp, base, 5);
-	  break;
+        case 'P': /* peta or pebi */
+          overflow = bkm_scale_by_power (&tmp, base, 5);
+          break;
 
-	case 'T': /* tera or tebi */
-	case 't': /* 't' is undocumented; for compatibility only */
-	  overflow = bkm_scale_by_power (&tmp, base, 4);
-	  break;
+        case 'T': /* tera or tebi */
+        case 't': /* 't' is undocumented; for compatibility only */
+          overflow = bkm_scale_by_power (&tmp, base, 4);
+          break;
 
-	case 'w':
-	  overflow = bkm_scale (&tmp, 2);
-	  break;
+        case 'w':
+          overflow = bkm_scale (&tmp, 2);
+          break;
 
-	case 'Y': /* yotta or 2**80 */
-	  overflow = bkm_scale_by_power (&tmp, base, 8);
-	  break;
+        case 'Y': /* yotta or 2**80 */
+          overflow = bkm_scale_by_power (&tmp, base, 8);
+          break;
 
-	case 'Z': /* zetta or 2**70 */
-	  overflow = bkm_scale_by_power (&tmp, base, 7);
-	  break;
+        case 'Z': /* zetta or 2**70 */
+          overflow = bkm_scale_by_power (&tmp, base, 7);
+          break;
 
-	default:
-	  *val = tmp;
-	  return err | LONGINT_INVALID_SUFFIX_CHAR;
-	}
+        default:
+          *val = tmp;
+          return err | LONGINT_INVALID_SUFFIX_CHAR;
+        }
 
       err |= overflow;
       *p += suffixes;
       if (**p)
-	err |= LONGINT_INVALID_SUFFIX_CHAR;
+        err |= LONGINT_INVALID_SUFFIX_CHAR;
     }
 
   *val = tmp;
