@@ -575,3 +575,64 @@ DefaultCatalog::Create(const char *signature, const char *language)
 	}
 	return catalog;
 }
+
+extern "C" status_t
+default_catalog_get_available_languages(BMessage* availableLanguages,
+	const char* sigPattern, const char* langPattern = NULL,
+	int32 fingerprint = 0)
+{
+	if (availableLanguages == NULL || sigPattern == NULL)
+		return B_BAD_DATA;
+
+	app_info appInfo;
+	be_app->GetAppInfo(&appInfo);
+	node_ref nref;
+	nref.device = appInfo.ref.device;
+	nref.node = appInfo.ref.directory;
+	BDirectory appDir(&nref);
+	BString catalogName("locale/");
+	catalogName << kCatFolder
+		<< "/" << sigPattern ;
+	BPath catalogPath(&appDir, catalogName.String());
+	BEntry file(catalogPath.Path());
+	BDirectory dir(&file);
+	
+	char fileName[B_FILE_NAME_LENGTH];
+	while(dir.GetNextEntry(&file) == B_OK) {			
+		file.GetName(fileName);
+		BString langName(fileName);
+		langName.Replace(kCatExtension,"",1);
+		availableLanguages->AddString("langs",langName);
+	}
+
+	// search in data folders
+
+	directory_which which[] = {
+		B_USER_DATA_DIRECTORY,
+		B_COMMON_DATA_DIRECTORY,
+		B_SYSTEM_DATA_DIRECTORY
+	};
+
+	for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
+		BPath path;
+		if (find_directory(which[i], &path) == B_OK) {
+			catalogName = BString("locale/") 
+				<< kCatFolder
+				<< "/" << sigPattern;
+			
+			BPath catalogPath(path.Path(), catalogName.String());
+			BEntry file(catalogPath.Path());
+			BDirectory dir(&file);
+			
+			char fileName[B_FILE_NAME_LENGTH];
+			while(dir.GetNextEntry(&file) == B_OK) {			
+				file.GetName(fileName);
+				BString langName(fileName);
+				langName.Replace(kCatExtension,"",1);
+				availableLanguages->AddString("langs",langName);
+			}
+		}
+	}
+	
+	return B_OK;
+}

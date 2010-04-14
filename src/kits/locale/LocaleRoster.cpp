@@ -47,6 +47,9 @@ typedef BCatalogAddOn *(*CreateCatalogFunc)(const char *name,
 
 typedef BCatalogAddOn *(*InstantiateEmbeddedCatalogFunc)(
 	entry_ref *appOrAddOnRef);
+	
+typedef status_t (*GetAvailableLanguagesFunc)(BMessage*, const char*,
+	const char*, int32);
 
 static BLocaleRoster gLocaleRoster;
 BLocaleRoster *be_locale_roster = &gLocaleRoster;
@@ -62,6 +65,7 @@ struct BCatalogAddOnInfo {
 	InstantiateCatalogFunc fInstantiateFunc;
 	InstantiateEmbeddedCatalogFunc fInstantiateEmbeddedFunc;
 	CreateCatalogFunc fCreateFunc;
+	GetAvailableLanguagesFunc fLanguagesFunc;
 	uint8 fPriority;
 	BList fLoadedCatalogs;
 	bool fIsEmbedded;
@@ -84,6 +88,7 @@ BCatalogAddOnInfo::BCatalogAddOnInfo(const BString& name, const BString& path,
 	fInstantiateFunc(NULL),
 	fInstantiateEmbeddedFunc(NULL),
 	fCreateFunc(NULL),
+	fLanguagesFunc(NULL),
 	fPriority(priority),
 	fIsEmbedded(path.Length()==0)
 {
@@ -118,6 +123,8 @@ BCatalogAddOnInfo::MakeSureItsLoaded()
 				B_SYMBOL_TYPE_TEXT, (void **)&fInstantiateEmbeddedFunc);
 			get_image_symbol(fAddOnImage, "create_catalog",
 				B_SYMBOL_TYPE_TEXT, (void **)&fCreateFunc);
+			get_image_symbol(fAddOnImage, "get_available_languages",
+				B_SYMBOL_TYPE_TEXT, (void **)&fLanguagesFunc);
 			log_team(LOG_DEBUG, "catalog-add-on %s has been loaded",
 				fName.String());
 		} else {
@@ -125,6 +132,9 @@ BCatalogAddOnInfo::MakeSureItsLoaded()
 				fName.String(), strerror(fAddOnImage));
 			return false;
 		}
+	} else if (fIsEmbedded) {
+		// The built-in catalog still has to provide this function
+		fLanguagesFunc = default_catalog_get_available_languages;
 	}
 	return true;
 }
@@ -139,6 +149,7 @@ BCatalogAddOnInfo::UnloadIfPossible()
 		fInstantiateFunc = NULL;
 		fInstantiateEmbeddedFunc = NULL;
 		fCreateFunc = NULL;
+		fLanguagesFunc = NULL;
 		log_team(LOG_DEBUG, "catalog-add-on %s has been unloaded",
 			fName.String());
 	}
@@ -529,6 +540,29 @@ BLocaleRoster::GetInstalledLanguages(BMessage *languages) const
 		languages->AddString("langs", icuLocaleList[i].getName());
 	}
 
+	return B_OK;
+}
+
+
+status_t
+BLocaleRoster::GetInstalledCatalogs(BMessage * languageList, const char* sigPattern,
+	const char* langPattern, int32 fingerprint) const
+{
+	if (languageList == NULL)
+		return B_BAD_VALUE;
+	
+	int32 count = gRosterData.fCatalogAddOnInfos.CountItems();
+	for (int32 i = 0; i < count; ++i) {
+		BCatalogAddOnInfo *info
+			= (BCatalogAddOnInfo*)gRosterData.fCatalogAddOnInfos.ItemAt(i);
+
+		if (!info->MakeSureItsLoaded() || !info->fInstantiateFunc)
+			continue;
+			
+		info->fLanguagesFunc(languageList, sigPattern, langPattern,
+			fingerprint);
+	}
+	
 	return B_OK;
 }
 

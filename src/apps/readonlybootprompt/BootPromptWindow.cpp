@@ -266,36 +266,33 @@ BootPromptWindow::_PopulateLanguages()
 		firstPreferredLanguage = "en";
 	}
 
-// TODO: Use this API instead once it's ready.
-//	BMessage installedCatalogs;
-//	be_locale_roster->GetInstalledCatalogs(&installedCatalogs);
-//	installedCatalogs.PrintToStream();
+	BMessage installedCatalogs;
+	be_locale_roster->GetInstalledCatalogs(&installedCatalogs,
+		"x-vnd.Haiku-ReadOnlyBootPrompt");
 
 	// Try to instantiate a BCatalog for each language, it will only work
 	// for translations of this application. So the list of languages will be
 	//  limited to catalogs written for this application, which is on purpose!
+	
 	const char* languageString;
 	for (int32 i = 0;
-		fInstalledLanguages.FindString("langs", i, &languageString) == B_OK;
+		installedCatalogs.FindString("langs", i, &languageString) == B_OK;
 		i++) {
-		BCatalog catalog("x-vnd.Haiku-ReadOnlyBootPrompt", languageString);
-		if (catalog.InitCheck() == B_OK) {
-			BLanguage* language;
-			if (be_locale_roster->GetLanguage(&language,
-					BString(languageString)) == B_OK) {
-				BString name;
-				language->GetName(&name);
-				LanguageItem* item = new LanguageItem(name.String(),
-					languageString);
-				fLanguagesListView->AddItem(item);
-				// Select this item if it is the first preferred language
-				if (strcmp(firstPreferredLanguage, languageString) == 0) {
-					fLanguagesListView->Select(
-						fLanguagesListView->CountItems() - 1);
-				}
-			} else
-				printf("failed to get BLanguage for %s\n", languageString);
-		}
+		BLanguage* language;
+		if (be_locale_roster->GetLanguage(&language,
+				BString(languageString)) == B_OK) {
+			BString name;
+			language->GetName(&name);
+			LanguageItem* item = new LanguageItem(name.String(),
+				languageString);
+			fLanguagesListView->AddItem(item);
+			// Select this item if it is the first preferred language
+			if (strcmp(firstPreferredLanguage, languageString) == 0) {
+				fLanguagesListView->Select(
+					fLanguagesListView->CountItems() - 1);
+			}
+		} else
+			printf("failed to get BLanguage for %s\n", languageString);
 	}
 
 	// Re-enable sending the selection message.

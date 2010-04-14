@@ -61,6 +61,10 @@ class DefaultCatalog : public BHashMapCatalog {
 		mutable BString		fPath;
 };
 
+extern "C" status_t
+default_catalog_get_available_languages(BMessage* availableLanguages,
+	const char* sigPattern, const char* langPattern = NULL,
+	int32 fingerprint = 0);
 
 }	// namespace BPrivate
 

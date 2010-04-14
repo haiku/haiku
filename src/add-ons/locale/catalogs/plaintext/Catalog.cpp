@@ -417,13 +417,22 @@ instantiate_catalog(const char *signature, const char *language,
 }
 
 
-extern "C"
-BCatalogAddOn *create_catalog(const char *signature,
-	const char *language)
+extern "C" BCatalogAddOn *
+create_catalog(const char *signature, const char *language)
 {
 	PlainTextCatalog *catalog
 		= new(std::nothrow) PlainTextCatalog("emptycat", signature, language);
 	return catalog;
+}
+
+
+extern "C" status_t
+get_available_languages(BMessage* availableLanguages,
+	const char* sigPattern = NULL, const char* langPattern = NULL,
+	int32 fingerprint = 0)
+{
+	// TODO
+	return B_ERROR;
 }
 
 
