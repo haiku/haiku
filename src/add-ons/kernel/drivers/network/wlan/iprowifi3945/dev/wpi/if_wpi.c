@@ -182,7 +182,7 @@ static uint32_t	wpi_mem_read(struct wpi_softc *, uint16_t);
 static void	wpi_mem_write(struct wpi_softc *, uint16_t, uint32_t);
 static void	wpi_mem_write_region_4(struct wpi_softc *, uint16_t,
 		    const uint32_t *, int);
-static uint16_t	wpi_read_prom_data(struct wpi_softc *, uint32_t, void *, int);
+static int	wpi_read_prom_data(struct wpi_softc *, uint32_t, void *, int);
 static int	wpi_alloc_fwmem(struct wpi_softc *);
 static void	wpi_free_fwmem(struct wpi_softc *);
 static int	wpi_load_firmware(struct wpi_softc *);
@@ -490,7 +490,7 @@ wpi_attach(device_t dev)
 	struct wpi_softc *sc = device_get_softc(dev);
 	struct ifnet *ifp;
 	struct ieee80211com *ic;
-	int ac, error, supportsa = 1;
+	int ac, error, result, supportsa = 1;
 	uint32_t tmp;
 	const struct wpi_ident *ident;
 	uint8_t macaddr[IEEE80211_ADDR_LEN];
@@ -547,6 +547,9 @@ wpi_attach(device_t dev)
 	sc->sc_sh = rman_get_bushandle(sc->mem);
 
 	sc->irq_rid = 0;
+	if ((result = pci_msi_count(dev)) == 1 &&
+	    pci_alloc_msi(dev, &result) == 0)
+		sc->irq_rid = 1;
 	sc->irq = bus_alloc_resource_any(dev, SYS_RES_IRQ, &sc->irq_rid,
 	    RF_ACTIVE | RF_SHAREABLE);
 	if (sc->irq == NULL) {
@@ -747,6 +750,8 @@ wpi_detach(device_t dev)
 	if (sc->irq != NULL) {
 		bus_teardown_intr(dev, sc->irq, sc->sc_ih);
 		bus_release_resource(dev, SYS_RES_IRQ, sc->irq_rid, sc->irq);
+		if (sc->irq_rid == 1)
+			pci_release_msi(dev);
 	}
 
 	if (sc->mem != NULL)
@@ -1352,7 +1357,7 @@ wpi_mem_write_region_4(struct wpi_softc *sc, uint16_t addr,
  * using the traditional bit-bang method. Data is read up until len bytes have
  * been obtained.
  */
-static uint16_t
+static int
 wpi_read_prom_data(struct wpi_softc *sc, uint32_t addr, void *data, int len)
 {
 	int ntries;
