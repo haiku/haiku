@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku Inc. All rights reserved.
+ * Copyright 2003-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,7 @@
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 
 #include <int.h>
 
@@ -27,6 +28,7 @@
 #include <vm/VMAddressSpace.h>
 
 #include <string.h>
+
 
 // defined in arch_exceptions.S
 extern int __irqvec_start;
@@ -309,6 +311,13 @@ arch_int_init_post_vm(kernel_args *args)
 	// set the exception context for this CPU
 	ppc_set_current_cpu_exception_context(ppc_get_cpu_exception_context(0));
 
+	return B_OK;
+}
+
+
+status_t
+arch_int_init_io(kernel_args* args)
+{
 	return B_OK;
 }
 

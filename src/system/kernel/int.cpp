@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -120,7 +120,7 @@ interrupts_enabled(void)
 
 
 status_t
-int_init(kernel_args *args)
+int_init(kernel_args* args)
 {
 	TRACE(("init_int_handlers: entry\n"));
 
@@ -129,7 +129,7 @@ int_init(kernel_args *args)
 
 
 status_t
-int_init_post_vm(kernel_args *args)
+int_init_post_vm(kernel_args* args)
 {
 	int i;
 
@@ -157,7 +157,14 @@ int_init_post_vm(kernel_args *args)
 
 
 status_t
-int_init_post_device_manager(kernel_args *args)
+int_init_io(kernel_args* args)
+{
+	return arch_int_init_io(args);
+}
+
+
+status_t
+int_init_post_device_manager(kernel_args* args)
 {
 	arch_debug_install_interrupt_handlers();
 
@@ -172,7 +179,7 @@ int
 int_io_interrupt_handler(int vector, bool levelTriggered)
 {
 	int status = B_UNHANDLED_INTERRUPT;
-	struct io_handler *io;
+	struct io_handler* io;
 	bool handled = false;
 
 	if (!sVectors[vector].no_lock_vector)

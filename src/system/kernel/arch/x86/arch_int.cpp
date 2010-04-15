@@ -1,7 +1,7 @@
 /*
  * Copyright 2010, Clemens Zeidler, haiku@clemens-zeidler.de.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -538,7 +538,22 @@ ioapic_configure_io_interrupt(int32 num, uint32 config)
 
 
 static void
-ioapic_init(kernel_args *args)
+ioapic_map(kernel_args* args)
+{
+	// map in the ioapic
+	sIOAPIC = (ioapic *)args->arch_args.ioapic;
+	if (vm_map_physical_memory(B_SYSTEM_TEAM, "ioapic", (void**)&sIOAPIC,
+			B_EXACT_ADDRESS, B_PAGE_SIZE,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			args->arch_args.ioapic_phys, true) < 0) {
+		panic("mapping the ioapic failed");
+		return;
+	}
+}
+
+
+static void
+ioapic_init(kernel_args* args)
 {
 	static const interrupt_controller ioapicController = {
 		"82093AA IOAPIC",
@@ -548,10 +563,6 @@ ioapic_init(kernel_args *args)
 		&ioapic_is_spurious_interrupt,
 		&ioapic_end_of_interrupt
 	};
-
-	// always init the local apic as it can be used for timers even if we
-	// don't end up using the io apic
-	apic_init(args);
 
 	if (args->arch_args.apic == NULL) {
 		dprintf("no local apic available\n");
@@ -569,8 +580,11 @@ ioapic_init(kernel_args *args)
 		return;
 	}
 
-	// TODO: remove when the PCI IRQ routing through ACPI is available below
-	return;
+	uint32 version = ioapic_read_32(IO_APIC_VERSION);
+	if (version == 0xffffffff) {
+		dprintf("ioapic seems inaccessible, not using it\n");
+		return;
+	}
 
 	// load acpi module
 	status_t status;
@@ -582,6 +596,7 @@ ioapic_init(kernel_args *args)
 	}
 	BPrivate::CObjectDeleter<const char, status_t>
 		acpiModulePutter(B_ACPI_MODULE_NAME, put_module);
+
 	// load pci module
 	pci_module_info* pciModule;
 	status = get_module(B_PCI_MODULE_NAME, (module_info**)&pciModule);
@@ -591,22 +606,6 @@ ioapic_init(kernel_args *args)
 	}
 	CObjectDeleter<const char, status_t> pciModulePutter(B_PCI_MODULE_NAME,
 		put_module);
-
-	// map in the ioapic
-	sIOAPIC = (ioapic *)args->arch_args.ioapic;
-	if (vm_map_physical_memory(B_SYSTEM_TEAM, "ioapic", (void**)&sIOAPIC,
-			B_EXACT_ADDRESS, B_PAGE_SIZE,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-			args->arch_args.ioapic_phys, true) < 0) {
-		panic("mapping the ioapic failed");
-		return;
-	}
-
-	uint32 version = ioapic_read_32(IO_APIC_VERSION);
-	if (version == 0xffffffff) {
-		dprintf("ioapic seems inaccessible, not using it\n");
-		return;
-	}
 
 	sLevelTriggeredInterrupts = 0;
 	sIOAPICMaxRedirectionEntry
@@ -1346,7 +1345,13 @@ arch_int_init(struct kernel_args *args)
 status_t
 arch_int_init_post_vm(struct kernel_args *args)
 {
-	ioapic_init(args);
+	// Always init the local apic as it can be used for timers even if we
+	// don't end up using the io apic
+	apic_init(args);
+
+	// We need to map in the I/O APIC here, since we would lose the already
+	// wired mapping before arch_int_init_io() is called.
+	ioapic_map(args);
 
 	// create IDT area for the boot CPU
 	area_id area = create_area("idt", (void**)&sIDTs[0], B_EXACT_ADDRESS,
@@ -1375,6 +1380,14 @@ arch_int_init_post_vm(struct kernel_args *args)
 	}
 
 	return area >= B_OK ? B_OK : area;
+}
+
+
+status_t
+arch_int_init_io(kernel_args* args)
+{
+	ioapic_init(args);
+	return B_OK;
 }
 
 

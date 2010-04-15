@@ -1,21 +1,19 @@
 /*
- * Copyright 2003-2006, Haiku Inc. All rights reserved.
+ * Copyright 2003-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  * 		Axel Dörfler <axeld@pinc-software.de>
  * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  * 		François Revol <revol@free.fr>
- * Distributed under the terms of the MIT License.
- *
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <int.h>
 
-//#include <arch_platform.h>
 #include <arch/smp.h>
 #include <boot/kernel_args.h>
 #include <device_manager.h>
@@ -112,6 +110,7 @@ print_iframe(struct iframe *frame)
 #warning ARM WRITEME
 }
 
+
 status_t
 arch_int_init(kernel_args *args)
 {
@@ -144,6 +143,12 @@ arch_int_init_post_vm(kernel_args *args)
 	return err;
 }
 
+
+status_t
+arch_int_init_io(kernel_args* args)
+{
+	return B_OK;
+}
 
 
 status_t

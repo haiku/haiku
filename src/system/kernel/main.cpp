@@ -171,6 +171,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		kernel_daemon_init();
 		arch_platform_init_post_thread(&sKernelArgs);
 
+		TRACE("init I/O interrupts\n");
+		int_init_io(&sKernelArgs);
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);
 		low_resource_manager_init_post_thread();

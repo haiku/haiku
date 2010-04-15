@@ -1,17 +1,16 @@
 /*
- * Copyright 2003-2009, Haiku Inc. All rights reserved.
+ * Copyright 2003-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  * 		Axel Dörfler <axeld@pinc-software.de>
  * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  * 		François Revol <revol@free.fr>
- * Distributed under the terms of the MIT License.
- *
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 
 #include <int.h>
 
@@ -121,6 +120,7 @@ print_iframe(struct iframe *frame)
 #endif
 }
 
+
 static addr_t
 fault_address(struct iframe *iframe)
 {
@@ -145,6 +145,7 @@ fault_address(struct iframe *iframe)
 	}
 }
 
+
 static bool
 fault_was_write(struct iframe *iframe)
 {
@@ -161,6 +162,7 @@ fault_was_write(struct iframe *iframe)
 			return false;
 	}
 }
+
 
 extern "C" void m68k_exception_entry(struct iframe *iframe);
 void
@@ -344,6 +346,13 @@ arch_int_init_post_vm(kernel_args *args)
 	status_t err;
 	err = M68KPlatform::Default()->InitPIC(args);
 	return err;
+}
+
+
+status_t
+arch_int_init_io(kernel_args* args)
+{
+	return B_OK;
 }
 
 

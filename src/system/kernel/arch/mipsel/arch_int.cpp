@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku Inc. All rights reserved.
+ * Copyright 2003-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,9 +11,9 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <int.h>
 
-//#include <arch_platform.h>
 #include <arch/smp.h>
 #include <boot/kernel_args.h>
 #include <device_manager.h>
@@ -76,6 +76,13 @@ arch_int_init_post_vm(kernel_args* args)
 {
 #warning IMPLEMENT arch_int_init_post_vm
 	return B_ERROR;
+}
+
+
+status_t
+arch_int_init_io(kernel_args* args)
+{
+	return B_OK;
 }
 
 
