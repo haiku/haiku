@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,12 +45,12 @@ find_own_image()
 extern "C" void
 initialize_before()
 {
-	// determine if we have to run in R5 compatibility mode
+	// determine if we have to run in BeOS compatibility mode
 
 	// get image of executable
 	image_info info;
 	uint32 cookie = 0;
-	if (get_next_image_info(B_CURRENT_TEAM, (int32 *)&cookie, &info) != B_OK)
+	if (get_next_image_info(B_CURRENT_TEAM, (int32*)&cookie, &info) != B_OK)
 		return;
 
 	if (get_image_symbol(info.id, "__gHaikuStartupCode", B_SYMBOL_TYPE_DATA,
@@ -60,7 +60,7 @@ initialize_before()
 	}
 
 	// We're using the BeOS startup code, check if BONE libraries are in
-	// use, and if not, enable the R5 compatibility layer.
+	// use, and if not, enable the BeOS R5 compatibility layer.
 	// As dependencies to network libraries may be "hidden" in libraries, we
 	// may have to scan not only the executable, but every loaded image.
 	int enable = 0;
@@ -85,7 +85,6 @@ initialize_before()
 			debug_printf("libnetwork.so running in R5 compatibility mode.\n");
 			return;
 		}
-	} while(enable == 0 
-		&& get_next_image_info(B_CURRENT_TEAM, (int32 *)&cookie, &info) 
-			== B_OK);
+	} while (enable == 0
+		&& get_next_image_info(B_CURRENT_TEAM, (int32*)&cookie, &info) == B_OK);
 }
