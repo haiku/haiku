@@ -21,6 +21,8 @@ MergeObject <libbe>storage_kit.o :
 	Entry.cpp
 	EntryList.cpp
 	File.cpp
+	FileDescriptorIO.cpp
+	FileIO.cpp
 	FindDirectory.cpp
 	Mime.cpp
 	MimeType.cpp
