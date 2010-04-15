@@ -1,7 +1,8 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de. All rights reserved.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include <user_group.h>
 
@@ -24,25 +25,27 @@
 using BPrivate::Tokenizer;
 
 
+static const char* const kUserGroupLockName = "user group";
+
 const char* BPrivate::kPasswdFile = "/etc/passwd";
 const char* BPrivate::kGroupFile = "/etc/group";
 const char* BPrivate::kShadowPwdFile = "/etc/shadow";
 
-static lazy_mutex sUserGroupLock;
+static mutex sUserGroupLock = MUTEX_INITIALIZER(kUserGroupLockName);
 static port_id sRegistrarPort = -1;
 
 
 status_t
 BPrivate::user_group_lock()
 {
-	return lazy_mutex_lock(&sUserGroupLock);
+	return mutex_lock(&sUserGroupLock);
 }
 
 
 status_t
 BPrivate::user_group_unlock()
 {
-	lazy_mutex_unlock(&sUserGroupLock);
+	mutex_unlock(&sUserGroupLock);
 	return B_OK;
 }
 
@@ -385,12 +388,11 @@ BPrivate::parse_shadow_pwd_line(char* line, char*& name, char*& password,
 void
 __init_pwd_backend(void)
 {
-	lazy_mutex_init(&sUserGroupLock, "user group");
 }
 
 
 void
 __reinit_pwd_backend_after_fork(void)
 {
-	lazy_mutex_init(&sUserGroupLock, "user group");
+	mutex_init(&sUserGroupLock, kUserGroupLockName);
 }

@@ -18,7 +18,9 @@
 #include <user_runtime.h>
 
 
-static lazy_mutex sEnvLock;
+static const char* const kEnvLockName = "env lock";
+
+static mutex sEnvLock = MUTEX_INITIALIZER(kEnvLockName);
 static char **sManagedEnviron;
 
 char **environ = NULL;
@@ -27,14 +29,14 @@ char **environ = NULL;
 static inline void
 lock_variables(void)
 {
-	lazy_mutex_lock(&sEnvLock);
+	mutex_lock(&sEnvLock);
 }
 
 
 static inline void
 unlock_variables(void)
 {
-	lazy_mutex_unlock(&sEnvLock);
+	mutex_unlock(&sEnvLock);
 }
 
 
@@ -186,7 +188,7 @@ update_variable(const char *name, int32 length, const char *value,
 static void
 environ_fork_hook(void)
 {
-	lazy_mutex_init(&sEnvLock, "env lock");
+	mutex_init(&sEnvLock, kEnvLockName);
 }
 
 
@@ -199,7 +201,6 @@ __init_env(const struct user_space_program_args *args)
 	// Following POSIX, there is no need to make any of the environment
 	// functions thread-safe - but we do it anyway as much as possible to
 	// protect our implementation
-	lazy_mutex_init(&sEnvLock, "env lock");
 	environ = args->env;
 	sManagedEnviron = NULL;
 

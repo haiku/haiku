@@ -79,16 +79,22 @@ rw_lock_unblock(rw_lock *lock)
 }
 
 
-status_t
+void
 rw_lock_init(rw_lock *lock, const char *name)
 {
-	lock->name = name;
+	rw_lock_init_etc(lock, name, 0);
+}
+
+
+void
+rw_lock_init_etc(rw_lock *lock, const char *name, uint32 flags)
+{
 	lock->waiters = NULL;
 	lock->holder = -1;
 	lock->reader_count = 0;
 	lock->writer_count = 0;
 	lock->owner_count = 0;
-	return mutex_init(&lock->lock, name);
+	mutex_init_etc(&lock->lock, name, flags);
 }
 
 

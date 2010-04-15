@@ -29,18 +29,18 @@ typedef struct  _pthread_spinlock	*pthread_spinlock_t;
 
 struct _pthread_mutex {
 	uint32_t	flags;
-	int32_t		count;
-	int32_t		sem;
+	int32_t		lock;
+	int32_t		unused;
 	int32_t		owner;
 	int32_t		owner_count;
 };
 
 struct _pthread_cond {
 	uint32_t		flags;
-	int32_t			sem;
+	int32_t			unused;
 	pthread_mutex_t	*mutex;
 	int32_t			waiter_count;
-	int32_t			event_counter;
+	int32_t			lock;
 };
 
 struct _pthread_once {

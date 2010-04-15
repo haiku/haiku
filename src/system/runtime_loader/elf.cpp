@@ -38,6 +38,8 @@
 // a handle returned by load_library() (dlopen())
 #define RLD_GLOBAL_SCOPE	((void*)-2l)
 
+static const char* const kLockName = "runtime loader";
+
 
 typedef void (*init_term_function)(image_id);
 
@@ -47,7 +49,7 @@ image_t* gProgramImage;
 static image_t** sPreloadedImages = NULL;
 static uint32 sPreloadedImageCount = 0;
 
-static recursive_lock sLock;
+static recursive_lock sLock = RECURSIVE_LOCK_INITIALIZER(kLockName);
 
 
 static inline void
@@ -928,8 +930,6 @@ terminate_program(void)
 void
 rldelf_init(void)
 {
-	recursive_lock_init(&sLock, "runtime loader");
-
 	init_add_ons();
 
 	// create the debug area
@@ -962,9 +962,7 @@ rldelf_init(void)
 status_t
 elf_reinit_after_fork(void)
 {
-	status_t error = recursive_lock_init(&sLock, "runtime loader");
-	if (error != B_OK)
-		return error;
+	recursive_lock_init(&sLock, kLockName);
 
 	// We also need to update the IDs of our images. We are the child and
 	// and have cloned images with different IDs. Since in most cases (fork()

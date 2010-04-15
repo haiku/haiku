@@ -25,26 +25,27 @@ extern void _IO_cleanup(void);
 extern void _thread_do_exit_work(void);
 
 struct exit_stack_info {
-	void				(*exit_stack[ATEXIT_MAX])(void);
-	int32				stack_size;
-	lazy_recursive_lock	lock;
+	void			(*exit_stack[ATEXIT_MAX])(void);
+	int32			stack_size;
+	recursive_lock	lock;
 };
 
 
-static struct exit_stack_info sExitStackInfo = { {}, 0, {} };
+static struct exit_stack_info sExitStackInfo
+	= { {}, 0, RECURSIVE_LOCK_INITIALIZER("exit stack lock") };
 
 
 static void inline
 _exit_stack_lock()
 {
-	lazy_recursive_lock_lock(&sExitStackInfo.lock);
+	recursive_lock_lock(&sExitStackInfo.lock);
 }
 
 
 static void inline
 _exit_stack_unlock()
 {
-	lazy_recursive_lock_unlock(&sExitStackInfo.lock);
+	recursive_lock_unlock(&sExitStackInfo.lock);
 }
 
 
@@ -80,16 +81,6 @@ _call_atexit_hooks_for_range(addr_t start, addr_t size)
 	}
 
 	_exit_stack_unlock();
-}
-
-
-void
-__init_exit_stack_lock(void)
-{
-	status_t error = lazy_recursive_lock_init(&sExitStackInfo.lock,
-		"exit stack lock");
-	if (error != B_OK)
-		debugger("failed to create exit stack lock");
 }
 
 

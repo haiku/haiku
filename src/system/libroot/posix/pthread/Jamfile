@@ -11,10 +11,10 @@ MergeObject posix_pthread.o :
 	pthread_attr.c
 	pthread_cancel.cpp
 	pthread_cleanup.cpp
-	pthread_cond.c
+	pthread_cond.cpp
 	pthread_condattr.c
 	pthread_key.cpp
-	pthread_mutex.c
+	pthread_mutex.cpp
 	pthread_mutexattr.c
 	pthread_once.cpp
 	pthread_rwlock.cpp

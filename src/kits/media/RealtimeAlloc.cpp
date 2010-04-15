@@ -75,7 +75,7 @@ typedef DoublyLinkedList<rtm_pool> PoolList;
 const static uint32 kAlignment = 256;
 	// all memory chunks will be a multiple of this
 
-static mutex sPoolsLock = {-1, -1};
+static mutex sPoolsLock = MUTEX_INITIALIZER("rtm pools");
 static PoolList sPools;
 
 
@@ -270,13 +270,6 @@ pool_for(void* buffer)
 }
 
 
-static void
-pool_init(void)
-{
-	mutex_init(&sPoolsLock, "rtm pools");
-}
-
-
 // #pragma mark - public API
 
 
@@ -287,14 +280,10 @@ rtm_create_pool(rtm_pool** _pool, size_t totalSize, const char* name)
 	if (pool == NULL)
 		return B_NO_MEMORY;
 
-	if (name == NULL)
-		name = "realtime pool";
-
-	status_t status = mutex_init(&pool->lock, name);
-	if (status != B_OK) {
-		free(pool);
-		return status;
-	}
+	if (name != NULL)
+		mutex_init_etc(&pool->lock, name, MUTEX_FLAG_CLONE_NAME);
+	else
+		mutex_init(&pool->lock, "realtime pool");
 
 	// Allocate enough space for at least one allocation over \a totalSize
 	pool->max_size = (totalSize + sizeof(FreeChunk) - 1 + B_PAGE_SIZE)
@@ -320,9 +309,6 @@ rtm_create_pool(rtm_pool** _pool, size_t totalSize, const char* name)
 	pool->free_anchor.SetTo(0, chunk);
 
 	*_pool = pool;
-
-	static pthread_once_t sOnce = PTHREAD_ONCE_INIT;
-	pthread_once(&sOnce, &pool_init);
 
 	MutexLocker _(&sPoolsLock);
 	sPools.Add(pool);

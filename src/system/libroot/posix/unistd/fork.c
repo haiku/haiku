@@ -21,9 +21,11 @@ typedef struct fork_hook {
 	void (*function)(void);
 } fork_hook;
 
+#define FORK_LOCK_NAME "fork lock"
+
 static fork_hook *sPrepareHooks, *sParentHooks, *sChildHooks;
 static fork_hook *sLastParentHook, *sLastChildHook;
-static lazy_mutex sForkLock;
+static mutex sForkLock = MUTEX_INITIALIZER(FORK_LOCK_NAME);
 
 extern thread_id __main_thread_id;
 
@@ -93,14 +95,6 @@ call_fork_hooks(fork_hook *hook)
 }
 
 
-status_t
-__init_fork(void)
-{
-	lazy_mutex_init(&sForkLock, "fork lock");
-	return B_OK;
-}
-
-
 /**	Private support function that registers the hooks that will be executed
  *	before and after the team is fork()ed.
  *	It is called from pthread_atfork() and atfork().
@@ -109,7 +103,7 @@ __init_fork(void)
 status_t
 __register_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
 {
-	status_t status = lazy_mutex_lock(&sForkLock);
+	status_t status = mutex_lock(&sForkLock);
 	if (status != B_OK)
 		return status;
 
@@ -122,7 +116,7 @@ __register_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(voi
 	if (status == B_OK && child)
 		status = add_fork_hook(&sChildHooks, &sLastChildHook, child);
 
-	lazy_mutex_unlock(&sForkLock);
+	mutex_unlock(&sForkLock);
 	return status;
 }
 
@@ -133,7 +127,7 @@ fork(void)
 	thread_id thread;
 	status_t status;
 
-	status = lazy_mutex_lock(&sForkLock);
+	status = mutex_lock(&sForkLock);
 	if (status != B_OK)
 		return status;
 
@@ -143,7 +137,7 @@ fork(void)
 	thread = _kern_fork();
 	if (thread < 0) {
 		// something went wrong
-		lazy_mutex_unlock(&sForkLock);
+		mutex_unlock(&sForkLock);
 		errno = thread;
 		return -1;
 	}
@@ -152,7 +146,10 @@ fork(void)
 		// we are the child
 		// ToDo: initialize child
 		__main_thread_id = find_thread(NULL);
-		__init_fork();
+		mutex_init(&sForkLock, FORK_LOCK_NAME);
+			// TODO: The lock is already initialized and we in the fork()ing
+			// process we should make sure that it is in a consistent state when
+			// calling the kernel.
 		__gRuntimeLoader->reinit_after_fork();
 		__reinit_pwd_backend_after_fork();
 
@@ -160,7 +157,7 @@ fork(void)
 	} else {
 		// we are the parent
 		call_fork_hooks(sParentHooks);
-		lazy_mutex_unlock(&sForkLock);
+		mutex_unlock(&sForkLock);
 	}
 
 	return thread;

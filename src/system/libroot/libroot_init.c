@@ -52,9 +52,7 @@ initialize_before(image_id imageID)
 	__gRuntimeLoader->call_atexit_hooks_for_range
 		= _call_atexit_hooks_for_range;
 
-	__init_exit_stack_lock();
 	__init_time();
-	__init_fork();
 	__init_heap();
 	__init_env(__gRuntimeLoader->program_args);
 	__init_pwd_backend();

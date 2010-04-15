@@ -12,31 +12,22 @@ extern "C" {
 #endif
 
 typedef struct mutex {
-	int32	benaphore;
-	sem_id	semaphore;
+	const char*	name;
+	int32		lock;
+	uint32		flags;
 } mutex;
 
-status_t	mutex_init(mutex *lock, const char *name);
+#define MUTEX_FLAG_CLONE_NAME		0x1
+#define MUTEX_INITIALIZER(name)		{ name, 0, 0 }
+
+void		mutex_init(mutex *lock, const char *name);
+void		mutex_init_etc(mutex *lock, const char *name, uint32 flags);
 void		mutex_destroy(mutex *lock);
 status_t	mutex_lock(mutex *lock);
 void		mutex_unlock(mutex *lock);
 
 
-typedef struct lazy_mutex {
-	int32		benaphore;
-	sem_id		semaphore;
-	const char*	name;
-} lazy_mutex;
-
-status_t	lazy_mutex_init(lazy_mutex *lock, const char *name);
-				// name will not be cloned and must rename valid
-void		lazy_mutex_destroy(lazy_mutex *lock);
-status_t	lazy_mutex_lock(lazy_mutex *lock);
-void		lazy_mutex_unlock(lazy_mutex *lock);
-
-
 typedef struct rw_lock {
-	const char *			name;
 	mutex					lock;
 	struct rw_lock_waiter *	waiters;
 	struct rw_lock_waiter *	last_waiter;
@@ -46,7 +37,12 @@ typedef struct rw_lock {
 	int32					owner_count;
 } rw_lock;
 
-status_t	rw_lock_init(rw_lock *lock, const char *name);
+#define RW_LOCK_FLAG_CLONE_NAME			MUTEX_FLAG_CLONE_NAME
+#define RW_LOCK_INITIALIZER(name)		{ MUTEX_INITIALIZER(name), NULL, \
+											NULL, -1, 0, 0, 0 }
+
+void		rw_lock_init(rw_lock *lock, const char *name);
+void		rw_lock_init_etc(rw_lock *lock, const char *name, uint32 flags);
 void		rw_lock_destroy(rw_lock *lock);
 status_t	rw_lock_read_lock(rw_lock *lock);
 status_t	rw_lock_read_unlock(rw_lock *lock);
@@ -57,29 +53,19 @@ status_t	rw_lock_write_unlock(rw_lock *lock);
 typedef struct recursive_lock {
 	mutex		lock;
 	thread_id	holder;
-	int			recursion;
+	int32		recursion;
 } recursive_lock;
 
-status_t	recursive_lock_init(recursive_lock *lock, const char *name);
+#define RECURSIVE_LOCK_FLAG_CLONE_NAME		MUTEX_FLAG_CLONE_NAME
+#define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), -1, 0 }
+
+void		recursive_lock_init(recursive_lock *lock, const char *name);
+void		recursive_lock_init_etc(recursive_lock *lock, const char *name,
+				uint32 flags);
 void		recursive_lock_destroy(recursive_lock *lock);
 status_t	recursive_lock_lock(recursive_lock *lock);
 void		recursive_lock_unlock(recursive_lock *lock);
 int32		recursive_lock_get_recursion(recursive_lock *lock);
-
-
-typedef struct lazy_recursive_lock {
-	lazy_mutex	lock;
-	thread_id	holder;
-	int			recursion;
-} lazy_recursive_lock;
-
-status_t	lazy_recursive_lock_init(lazy_recursive_lock *lock,
-				const char *name);
-				// name will not be cloned and must rename valid
-void		lazy_recursive_lock_destroy(lazy_recursive_lock *lock);
-status_t	lazy_recursive_lock_lock(lazy_recursive_lock *lock);
-void		lazy_recursive_lock_unlock(lazy_recursive_lock *lock);
-int32		lazy_recursive_lock_get_recursion(lazy_recursive_lock *lock);
 
 
 #define		INIT_ONCE_UNINITIALIZED	-1

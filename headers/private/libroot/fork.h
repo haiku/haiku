@@ -13,7 +13,6 @@
 extern "C" {
 #endif
 
-extern status_t __init_fork(void);
 extern status_t __register_atfork(void(*prepare)(void), void(*parent)(void),
 	void(*child)(void));
 
