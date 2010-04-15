@@ -239,8 +239,10 @@ open_keyboards(int target, const char* start, struct keyboard* previous)
 		if (::stat(path, &stat) != 0)
 			continue;
 
-		if (S_ISDIR(stat.st_mode))
-			return open_keyboards(target, path, previous);
+		if (S_ISDIR(stat.st_mode)) {
+			keyboard = open_keyboards(target, path, keyboard);
+			continue;
+		}
 
 		// Try to open it as a device
 		int fd = open(path, O_RDONLY);
