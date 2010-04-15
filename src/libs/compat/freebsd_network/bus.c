@@ -263,7 +263,7 @@ intr_fast_wrapper(void *data)
 
 	intr->handler(intr->arg);
 
-	/* no way to know, so let other devices get it as well */
+	// We don't know if the interrupt has been handled.
 	return B_UNHANDLED_INTERRUPT;
 }
 
@@ -330,8 +330,8 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 
 	if (filter != NULL) {
 		status = install_io_interrupt_handler(intr->irq,
-			(interrupt_handler)intr->filter, intr->arg, B_NO_HANDLED_INFO);
-	} else if (flags & INTR_FAST) {
+			(interrupt_handler)intr->filter, intr->arg, 0);
+	} else if ((flags & INTR_FAST) != 0) {
 		status = install_io_interrupt_handler(intr->irq,
 			intr_fast_wrapper, intr, B_NO_HANDLED_INFO);
 	} else {
