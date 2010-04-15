@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,6 +19,7 @@
 #include "console.h"
 #include "cpu.h"
 #include "debug.h"
+#include "hpet.h"
 #include "keyboard.h"
 #include "mmu.h"
 #include "multiboot.h"
