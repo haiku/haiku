@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -3927,8 +3927,8 @@ BView::RemoveSelf()
 {
 	if (fParent && fParent->fLayoutData->fLayout)
 		return fParent->fLayoutData->fLayout->RemoveView(this);
-	else
-		return _RemoveSelf();
+
+	return _RemoveSelf();
 }
 
 
