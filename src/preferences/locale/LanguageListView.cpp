@@ -7,6 +7,7 @@
 #include "Locale.h"
 
 #include <Bitmap.h>
+#include <Country.h>
 
 
 #define MAX_DRAG_HEIGHT		200.0
@@ -19,6 +20,56 @@ LanguageListItem::LanguageListItem(const char* text, const char* code)
 	BStringItem(text),
 	fLanguageCode(code)
 {
+	// TODO: should probably keep the BCountry as a member of the class
+	BCountry myCountry(code);
+	BRect bounds(0, 0, 15, 15);
+	icon = new BBitmap(bounds, B_RGBA32);
+	myCountry.GetIcon(icon);
+}
+
+
+//MediaListItem - DrawItem
+void 
+LanguageListItem::DrawItem(BView *owner, BRect frame, bool complete)
+{
+	rgb_color kHighlight = { 140,140,140,0 };
+	rgb_color kBlack = { 0,0,0,0 };
+
+	BRect r(frame);
+
+	if (IsSelected() || complete) {
+		rgb_color color;
+		if (IsSelected()) {
+			color = kHighlight;
+		} else {
+			color = owner->ViewColor();
+		}
+		owner->SetHighColor(color);
+		owner->SetLowColor(color);
+		owner->FillRect(r);
+		owner->SetHighColor(kBlack);
+	} else {
+		owner->SetLowColor(owner->ViewColor());
+	}
+	
+	frame.left += 4;
+	BRect iconFrame(frame);
+	iconFrame.Set(iconFrame.left, iconFrame.top+1, iconFrame.left+15, iconFrame.top+16);
+
+	owner->SetDrawingMode(B_OP_OVER);
+	owner->DrawBitmap(icon, iconFrame);
+	owner->SetDrawingMode(B_OP_COPY);
+
+	frame.left += 16 * (OutlineLevel() + 1);
+	owner->SetHighColor(kBlack);
+	
+	BFont		font = be_plain_font;
+	font_height	finfo;
+	font.GetHeight(&finfo);
+	owner->SetFont(&font);
+	owner->MovePenTo(frame.left+8, frame.top + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 2) +
+					(finfo.ascent + finfo.descent) - 1);
+	owner->DrawString(Text());
 }
 
 
@@ -140,7 +191,8 @@ void LanguageListView::MessageReceived (BMessage* message)
 			}
 			Invoke(fMsgPrefLanguagesChanged);
 		}
-	} else BOutlineListView::MessageReceived(message);
+	} else
+		BOutlineListView::MessageReceived(message);
 }
 
 
@@ -209,58 +261,57 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 		}
 		BBitmap* dragBitmap = new BBitmap(dragRect, B_RGB32, true);
 		if (dragBitmap && dragBitmap->IsValid()) {
-			if (BView* v = new BView(dragBitmap->Bounds(), "helper",
-									 B_FOLLOW_NONE, B_WILL_DRAW)) {
-				dragBitmap->AddChild(v);
-				dragBitmap->Lock();
-				BRect itemBounds(dragRect) ;
-				itemBounds.bottom = 0.0;
-				// let all selected items, that fit into our drag_bitmap, draw
-				for (int32 i = 0; i < numItems; i++) {
-					int32 index = FullListCurrentSelection(i);
-					LanguageListItem* item
-						= static_cast<LanguageListItem*>(FullListItemAt(index));
-					itemBounds.bottom = itemBounds.top + ceilf(item->Height());
-					if (itemBounds.bottom > dragRect.bottom)
-						itemBounds.bottom = dragRect.bottom;
-					item->DrawItem(v, itemBounds);
-					itemBounds.top = itemBounds.bottom + 1.0;
-				}
-				// make a black frame arround the edge
-				v->SetHighColor(0, 0, 0, 255);
-				v->StrokeRect(v->Bounds());
-				v->Sync();
-	
-				uint8* bits = (uint8*)dragBitmap->Bits();
-				int32 height = (int32)dragBitmap->Bounds().Height() + 1;
-				int32 width = (int32)dragBitmap->Bounds().Width() + 1;
-				int32 bpr = dragBitmap->BytesPerRow();
-	
-				if (fade) {
-					for (int32 y = 0; y < height - ALPHA / 2;
-							y++, bits += bpr) {
-						uint8* line = bits + 3;
-						for (uint8* end = line + 4 * width; line < end;
-								line += 4)
-							*line = ALPHA;
-					}
-					for (int32 y = height - ALPHA / 2; y < height;
-							y++, bits += bpr) {
-						uint8* line = bits + 3;
-						for (uint8* end = line + 4 * width; line < end;
-								line += 4)
-							*line = (height - y) << 1;
-					}
-				} else {
-					for (int32 y = 0; y < height; y++, bits += bpr) {
-						uint8* line = bits + 3;
-						for (uint8* end = line + 4 * width; line < end;
-								line += 4)
-							*line = ALPHA;
-					}
-				}
-				dragBitmap->Unlock();
+			BView* v = new BView(dragBitmap->Bounds(), "helper",
+				B_FOLLOW_NONE, B_WILL_DRAW);
+			dragBitmap->AddChild(v);
+			dragBitmap->Lock();
+			BRect itemBounds(dragRect) ;
+			itemBounds.bottom = 0.0;
+			// let all selected items, that fit into our drag_bitmap, draw
+			for (int32 i = 0; i < numItems; i++) {
+				int32 index = FullListCurrentSelection(i);
+				LanguageListItem* item
+					= static_cast<LanguageListItem*>(FullListItemAt(index));
+				itemBounds.bottom = itemBounds.top + ceilf(item->Height());
+				if (itemBounds.bottom > dragRect.bottom)
+					itemBounds.bottom = dragRect.bottom;
+				item->DrawItem(v, itemBounds);
+				itemBounds.top = itemBounds.bottom + 1.0;
 			}
+			// make a black frame arround the edge
+			v->SetHighColor(0, 0, 0, 255);
+			v->StrokeRect(v->Bounds());
+			v->Sync();
+
+			uint8* bits = (uint8*)dragBitmap->Bits();
+			int32 height = (int32)dragBitmap->Bounds().Height() + 1;
+			int32 width = (int32)dragBitmap->Bounds().Width() + 1;
+			int32 bpr = dragBitmap->BytesPerRow();
+
+			if (fade) {
+				for (int32 y = 0; y < height - ALPHA / 2;
+						y++, bits += bpr) {
+					uint8* line = bits + 3;
+					for (uint8* end = line + 4 * width; line < end;
+							line += 4)
+						*line = ALPHA;
+				}
+				for (int32 y = height - ALPHA / 2; y < height;
+						y++, bits += bpr) {
+					uint8* line = bits + 3;
+					for (uint8* end = line + 4 * width; line < end;
+							line += 4)
+						*line = (height - y) << 1;
+				}
+			} else {
+				for (int32 y = 0; y < height; y++, bits += bpr) {
+					uint8* line = bits + 3;
+					for (uint8* end = line + 4 * width; line < end;
+							line += 4)
+						*line = ALPHA;
+				}
+			}
+			dragBitmap->Unlock();
 		} else {
 			delete dragBitmap;
 			dragBitmap = NULL;
@@ -317,7 +368,6 @@ LanguageListView::MouseMoved(BPoint where, uint32 transit, const BMessage* msg)
 				break;
 			}
 		}
-	} else {
+	} else
 		BOutlineListView::MouseMoved(where, transit, msg);
-	}
 }

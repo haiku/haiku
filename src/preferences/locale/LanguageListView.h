@@ -1,3 +1,9 @@
+/*
+ * Copyright 2010, Adrien Destugues, pulkomandy@gmail.com
+ * All rights reserved. Distributed under the terms of the MIT License.
+*/
+
+
 #ifndef __LANGUAGE_LIST_VIEW_H
 #define __LANGUAGE_LIST_VIEW_H
 
@@ -7,8 +13,7 @@
 #include <String.h>
 
 
-class LanguageListItem: public BStringItem
-{
+class LanguageListItem: public BStringItem {
 	public:
 		LanguageListItem(const char* text, const char* code);
 
@@ -21,9 +26,13 @@ class LanguageListItem: public BStringItem
 		~LanguageListItem() {};
 
 		const inline BString LanguageCode() { return fLanguageCode; }
+		
+		//virtual void Update(BView *owner, const BFont *finfo);
+		virtual void DrawItem(BView *owner, BRect frame, bool complete = false);
 
 	private:
 		const BString fLanguageCode;
+		BBitmap* icon;
 };
 
 
@@ -36,8 +45,7 @@ compare_list_items(const void* _a, const void* _b)
 }
 
 
-class LanguageListView: public BOutlineListView
-{
+class LanguageListView: public BOutlineListView {
 	public:
 		LanguageListView(const char* name, list_view_type type);
 

@@ -4,6 +4,8 @@ UsePrivateHeaders libbe locale shared ;
 UsePublicHeaders locale storage icon ;
 UseLibraryHeaders icu icon ;
 
+AddResources liblocale.so : CountryFlags.rdef ;
+
 SharedLibrary liblocale.so
 	: cat.cpp
 	  Catalog.cpp
