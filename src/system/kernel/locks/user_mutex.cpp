@@ -87,7 +87,7 @@ remove_user_mutex_entry(UserMutexEntry* entry)
 	// if any, add the next entry to the table.
 	sUserMutexTable.Remove(entry);
 
-	firstEntry = entry->otherEntries.Head();
+	firstEntry = entry->otherEntries.RemoveHead();
 	if (firstEntry != NULL) {
 		firstEntry->otherEntries.MoveFrom(&entry->otherEntries);
 		sUserMutexTable.Insert(firstEntry);
@@ -151,12 +151,17 @@ static void
 user_mutex_unlock_locked(vint32* mutex, addr_t physicalAddress, uint32 flags)
 {
 	if (UserMutexEntry* entry = sUserMutexTable.Lookup(physicalAddress)) {
+		// Someone is waiting -- set the locked flag. It might still be set,
+		// but when using userland atomic operations, the caller will usually
+		// have cleared it already.
+		int32 oldValue = atomic_or(mutex, B_USER_MUTEX_LOCKED);
+
 		// unblock the first thread
 		entry->locked = true;
 		entry->condition.NotifyOne();
 
 		if ((flags & B_USER_MUTEX_UNBLOCK_ALL) != 0
-				&& (*mutex & B_USER_MUTEX_DISABLED) != 0) {
+				|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
 			// unblock all the other waiting threads as well
 			for (UserMutexEntryList::Iterator it
 					= entry->otherEntries.GetIterator();
@@ -165,6 +170,9 @@ user_mutex_unlock_locked(vint32* mutex, addr_t physicalAddress, uint32 flags)
 				otherEntry->condition.NotifyOne();
 			}
 		}
+	} else {
+		// no one is waiting -- clear locked flag
+		atomic_and(mutex, ~(int32)B_USER_MUTEX_LOCKED);
 	}
 }
 
@@ -293,10 +301,6 @@ _user_mutex_switch_lock(int32* fromMutex, int32* toMutex, const char* name,
 		return B_BAD_ADDRESS;
 	}
 
-	syscall_restart_handle_timeout_pre(flags, timeout);
-
-	status_t error = user_mutex_switch_lock(fromMutex, toMutex, name,
+	return user_mutex_switch_lock(fromMutex, toMutex, name,
 		flags | B_CAN_INTERRUPT, timeout);
-
-	return syscall_restart_handle_timeout_post(error, timeout);
 }
