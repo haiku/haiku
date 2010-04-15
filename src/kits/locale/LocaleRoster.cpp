@@ -556,7 +556,7 @@ BLocaleRoster::GetInstalledCatalogs(BMessage * languageList, const char* sigPatt
 		BCatalogAddOnInfo *info
 			= (BCatalogAddOnInfo*)gRosterData.fCatalogAddOnInfos.ItemAt(i);
 
-		if (!info->MakeSureItsLoaded() || !info->fInstantiateFunc)
+		if (!info->MakeSureItsLoaded() || !info->fLanguagesFunc)
 			continue;
 			
 		info->fLanguagesFunc(languageList, sigPattern, langPattern,
