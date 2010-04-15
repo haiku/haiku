@@ -1,20 +1,23 @@
-/* Deferred Procedure Call support kernel module
- *
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+/*
+ * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Philippe Houdoin, philippe.houdoin@free.fr
  */
 
+
+//!	Deferred Procedure Call support kernel module
+
+
 #include <KernelExport.h>
+
+#include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-#ifndef COMPILE_FOR_R5
-	#include <stdio.h>	// For snprintf()
-#endif
-
 #include <dpc.h>
+
 
 // Private DPC queue structures
 typedef struct {
@@ -42,15 +45,15 @@ dpc_thread(void *arg)
 {
 	dpc_queue *queue = arg;
 	dpc_slot dpc;
-	
+
 	// Let's wait forever/until semaphore death for new DPC slot to show up
 	while (acquire_sem(queue->wakeup_sem) == B_OK) {
 		cpu_status former;
-	
+
 		// grab the next dpc slot
 		former = disable_interrupts();
 		acquire_spinlock(&queue->lock);
-		
+
 		dpc = queue->slots[queue->head];
 		queue->head = (queue->head++) % queue->size;
 		queue->count--;
@@ -73,7 +76,9 @@ dpc_thread(void *arg)
 	return 0;
 }
 
-// ---- Public API
+
+// #pragma mark - public API
+
 
 static status_t
 new_dpc_queue(void **handle, const char *name, int32 priority)
@@ -93,14 +98,8 @@ new_dpc_queue(void **handle, const char *name, int32 priority)
 	queue->count = 0;
 	B_INITIALIZE_SPINLOCK(&queue->lock);	// Init the spinlock
 
-#ifdef __HAIKU__
 	snprintf(str, sizeof(str), "%.*s_wakeup_sem", 
 		(int) sizeof(str) - 11, name);
-#else
-	strncpy(str, name, sizeof(str) - 1);
-	strncat(str, "_wakeup_sem", sizeof(str) - 1);
-	str[sizeof(str) - 1] = '\0';
-#endif
 
 	queue->wakeup_sem = create_sem(0, str);
 	if (queue->wakeup_sem < B_OK) {
@@ -108,7 +107,6 @@ new_dpc_queue(void **handle, const char *name, int32 priority)
 		free(queue);
 		return status;
 	}
-	set_sem_owner(queue->wakeup_sem, B_SYSTEM_TEAM);
 	
 	// Fire a kernel thread to actually handle (aka call them!)
 	// the queued/deferred procedure calls
@@ -119,7 +117,7 @@ new_dpc_queue(void **handle, const char *name, int32 priority)
 		free(queue);
 		return status;
 	}
-	resume_thread(queue->thread);
+	send_signal_etc(queue->thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	*handle = queue;
 
@@ -167,7 +165,7 @@ queue_dpc(void *handle, dpc_func function, void *arg)
 	
 	if (!queue || !function)
 		return B_BAD_VALUE;
-		
+
 	// Try to be safe being called from interrupt handlers:
 	former = disable_interrupts();
 	acquire_spinlock(&queue->lock);
@@ -211,6 +209,7 @@ std_ops(int32 op, ...)
 			return B_ERROR;
 	}
 }
+
 
 static dpc_module_info sDPCModule = {
 	{
