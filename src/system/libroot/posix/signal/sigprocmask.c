@@ -26,6 +26,8 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 int
 pthread_sigmask(int how, const sigset_t *set, sigset_t *oldSet)
 {
+	// TODO: This is obviously broken as sigprocmask() should set the team's
+	// signal mask!
 	return sigprocmask(how, set, oldSet);
 }
 
