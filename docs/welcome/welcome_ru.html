@@ -4,14 +4,14 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de> 
  * Translators:
- *		michael_s
+ *		Michael Smirnov
  *		Rustam
  *
 -->
@@ -36,6 +36,7 @@
 <li><a href="welcome_es.html"><img src="images/flags/es.png" alt="" />Español</a></li>
 <li><a href="welcome_sv_SE.html"><img src="images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="welcome_jp.html"><img src="images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="welcome_uk.html"><img src="images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="welcome_en.html"><img src="images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -48,7 +49,7 @@
 
 <h2>
 <a id="welcome" name="welcome">Добро пожаловать в Haiku!</a></h2>
-<p>Большое спасибо за проявленный интерес к Haiku! Это наш первый публичный релиз и мы надеемся привлечь новых разработчиков к нашему проекту и дать будущим пользователям шанс увидеть Haiku в деле. Понятно, что этот <i>альфа-релиз</i> далеко не полностью соответствует намеченным нами целям, и не предоставляет все функции, которые мы собирались дать конечному пользователю, запланировав их для финальной версии R1. Однако, мы надеемся, что этот релиз позволит вам заметить большой потенциал Haiku, и вы найдёте немного времени для её изучения.</p>
+<p>Большое спасибо за проявленный интерес к Haiku! Это наш первый публичный релиз, мы надеемся привлечь новых разработчиков к нашему проекту, и дать будущим пользователям шанс увидеть Haiku в деле. Понятно, что этот <i>альфа-релиз</i> далеко не полностью соответствует намеченным нами целям, и не предоставляет все функции, которые мы собирались дать конечному пользователю, запланировав их для финальной версии R1. Однако, мы надеемся, что этот релиз позволит вам заметить большой потенциал Haiku, и вы найдёте немного времени для её изучения.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -75,8 +76,6 @@
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="software" name="software">Установка дополнительных программ</a></h2>
 <p>Так как Haiku бинарно и на уровне исходных кодов совместима с BeOS, то многие BeOS-приложения работают и в ней. Загрузив архив с программой, просто распакуйте его (достаточно двойного клика для открытия архива в <span class="app">Expander</span>) в <span class="path">/boot/apps/</span>, и оттуда же запускайте это приложение.</p>
-<div class="box-info">Исключением являются опциональные пакеты (OptionalPackages), которые уже включены в Haiku при её компиляции из исходных кодов, однако их также можно загрузить и добавить в любую установленную копию Haiku. У них одно отличие от обычных архивов с программами: их следует распаковывать в корень загрузочного диска <span class="path">/boot</span>.<br />
-Для отладочных целей на сайте с опциональными пакетами хранятся их устаревшие версии, которые не совместимы с новыми ревизиями Haiku, и они в первую очередь предназначены для разработчиков, но не для конечных пользователей.</div>
 
 <p>Популярные каталоги программ:</p>
 <ul>
@@ -84,8 +83,13 @@
 	<li><a href="http://www.bebits.com" class="printurl">BeBits</a> самый популярный каталог программ для BeOS (в последнее время и для Haiku).</li>
 	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> библиотеки, необходимые для портирования приложений.</li>
 	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> хранилище для разрабатываемых приложений с открытым исходным кодом для BeOS и Haiku.</li>
-	<li><a href="http://haiku-files.org/files/optional-packages/" class="printurl">OptionalPackages</a> в основном используется при компиляции Haiku из исходных кодов.</li>
 </ul>
+
+<p>Также существуют так называемые дополнительные пакеты (Optional Packages), которые используются при сборке Haiku. Они не предназначены для скачивания и установки конечными пользователями, однако имеется сервисный скрипт, <tt>installoptionalpackage</tt>, которым можно воспользоваться пока менеджер пакетов для Haiku находится в разработке. Он позволит вам установить большинство доступных дополнительных пакетов.<br />
+Для этого нужно выполнить команду в терминале:</p>
+<p><tt>installoptionalpackage -l</tt> - список всех доступных пакетов<br />
+<tt>installoptionalpackage -a {packagename}</tt> - загрузит и добавит пакет в вашу систему.<br />
+<tt>installoptionalpackage -a "{packagename} {packagename}"</tt> - установит несколько пакетов сразу, кавычки необходимы.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>

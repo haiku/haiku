@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,6 +33,7 @@
 <li><a href="welcome_es.html"><img src="images/flags/es.png" alt="" />Español</a></li>
 <li><a href="welcome_sv_SE.html"><img src="images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="welcome_jp.html"><img src="images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="welcome_uk.html"><img src="images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="welcome_en.html"><img src="images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -72,8 +73,6 @@
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="software" name="software">Installing more software</a></h2>
 <p>Because of our binary and source compatibility, many BeOS applications run on Haiku. After downloading a package, simply unzip it (double clicking opens <span class="app">Expander</span>) to <span class="path">/boot/apps/</span> and start the application from there.</p>
-<div class="box-info">An exception are OptionalPackages, which are normally included when building Haiku directly from source. Those can, however, also be downloaded and added to any running Haiku system. The only difference to normal archives: you have to unzip directly to root <span class="path">/</span>.<br />
-For debugging purposes the OptionalPackage site keeps older versions which are not compatible with newer Haiku revisions. OptionalPackages are primarily for developers, less so for end-users.</div>
 
 <p>Popular software repositories are:</p>
 <ul>
@@ -81,8 +80,13 @@ For debugging purposes the OptionalPackage site keeps older versions which are n
 	<li><a href="http://www.bebits.com" class="printurl">BeBits</a></li>
 	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> maintains patches for ported software</li>
 	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> hosts native BeOS and Haiku open source software projects</li>
-	<li><a href="http://haiku-files.org/files/optional-packages/" class="printurl">OptionalPackages</a> are mostly used when building Haiku from source</li>
 </ul>
+
+<p>There are also so called Optional Packages, which are used by Haiku's build system. It is not intended for end users to manually extract and install them. However, a utility script is provided, <tt>installoptionalpackage</tt>. This script is meant to bridge the gap while Haiku's package management is still under construction. It will allow you to install most of the available Optional Packages.<br />
+You'll have to run a command in Terminal:</p>
+<p><tt>installoptionalpackage -l</tt> - lists all available packages.<br />
+<tt>installoptionalpackage -a {packagename}</tt> - will download and add the package to your system.<br />
+<tt>installoptionalpackage -a "{packagename} {packagename}"</tt> - will install several at once. The quotes are indeed necessary.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
