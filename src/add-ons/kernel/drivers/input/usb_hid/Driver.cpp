@@ -240,7 +240,7 @@ usb_hid_close(void *_cookie)
 	device_cookie *cookie = (device_cookie *)_cookie;
 
 	TRACE("close(%p)\n", cookie);
-	return cookie->handler->Close();
+	return cookie->handler->Close(&cookie->cookie);
 }
 
 

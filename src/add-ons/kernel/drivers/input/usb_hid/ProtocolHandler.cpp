@@ -111,7 +111,7 @@ ProtocolHandler::Open(uint32 flags, uint32 *cookie)
 
 
 status_t
-ProtocolHandler::Close()
+ProtocolHandler::Close(uint32 *cookie)
 {
 	return fDevice->Close(this);
 }

@@ -20,20 +20,20 @@ public:
 									size_t ringBufferSize);
 	virtual						~ProtocolHandler();
 
-			status_t			InitCheck() { return fStatus; };
+			status_t			InitCheck() { return fStatus; }
 
-			HIDDevice *			Device() { return fDevice; };
+			HIDDevice *			Device() { return fDevice; }
 
-			const char *		BasePath() { return fBasePath; };
+			const char *		BasePath() { return fBasePath; }
 			void				SetPublishPath(char *publishPath);
-			const char *		PublishPath() { return fPublishPath; };
+			const char *		PublishPath() { return fPublishPath; }
 
 	static	void				AddHandlers(HIDDevice *device,
 									ProtocolHandler ***handlerList,
 									uint32 *handlerCount);
 
 	virtual	status_t			Open(uint32 flags, uint32 *cookie);
-	virtual	status_t			Close();
+	virtual	status_t			Close(uint32 *cookie);
 
 	virtual	status_t			Control(uint32 *cookie, uint32 op, void *buffer,
 									size_t length);
