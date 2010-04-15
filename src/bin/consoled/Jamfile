@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src tests system consoled ;
+SubDir HAIKU_TOP src bin consoled ;
 
 UsePrivateHeaders input ;
 UsePrivateHeaders kernel ;
