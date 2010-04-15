@@ -245,13 +245,16 @@ BMenuItem::SetTrigger(char trigger)
 	// try uppercase letters first
 
 	const char* pos = strchr(Label(), toupper(trigger));
+	trigger = tolower(trigger);
+
 	if (pos == NULL) {
 		// take lowercase, too
 		pos = strchr(Label(), trigger);
 	}
+
 	if (pos != NULL) {
 		fTriggerIndex = UTF8CountChars(Label(), pos - Label());
-		fTrigger = tolower(UTF8ToCharCode(&pos));
+		fTrigger = trigger;
 	} else {
 		fTrigger = 0;
 		fTriggerIndex = -1;
