@@ -1,8 +1,8 @@
 SubDir HAIKU_TOP src kits locale ;
 
 UsePrivateHeaders libbe locale shared ;
-UsePublicHeaders locale storage ;
-UseLibraryHeaders icu ;
+UsePublicHeaders locale storage icon ;
+UseLibraryHeaders icu icon ;
 
 SharedLibrary liblocale.so
 	: cat.cpp

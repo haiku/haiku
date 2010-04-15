@@ -6,6 +6,9 @@
 #include <LocaleStrings.h>
 #include <String.h>
 
+
+class BBitmap;
+
 namespace icu_4_2 {
 	class DateFormat;
 	class Locale;
@@ -21,13 +24,13 @@ class BCountry {
 	public:
 		BCountry(const char* languageCode, const char* countryCode);
 		BCountry(const char* languageAndCountryCode = "en_US");
-		virtual ~BCountry();
+		virtual 		~BCountry();
 
-		virtual bool Name(BString&) const;
-		const char* Code() const;
+		virtual bool 	Name(BString&) const;
+		const char*		Code() const;
+		status_t		GetIcon(BBitmap* result);
 
-		// see definitions below
-		const char *GetString(uint32 id) const;
+		const char*		GetString(uint32 id) const;
 
 		// date & time
 

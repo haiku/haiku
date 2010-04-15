@@ -9,6 +9,7 @@
 
 #include <assert.h>
 
+#include <IconUtils.h>
 #include <String.h>
 
 #include <unicode/datefmt.h>
@@ -83,6 +84,17 @@ const char*
 BCountry::Code() const
 {
 	return fICULocale->getName();
+}
+
+
+status_t
+BCountry::GetIcon(BBitmap* result)
+{
+	// TODO: a proper way to locate the library being used ?
+	BNode storage("/boot/system/lib/liblocale.so");
+	if (storage.InitCheck() != B_OK)
+   		return B_ERROR;
+	return BIconUtils::GetVectorIcon(&storage, Code(), result);	
 }
 
 
