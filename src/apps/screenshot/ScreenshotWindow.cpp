@@ -5,7 +5,9 @@
  * Authors:
  *		Karsten Heimrich
  *		Fredrik Modéen
+ *		Christophe Huriaux
  */
+
 
 #include "ScreenshotWindow.h"
 
@@ -75,23 +77,29 @@ enum {
 
 class DirectoryRefFilter : public BRefFilter {
 public:
-	virtual			~DirectoryRefFilter() {}
-			bool	Filter(const entry_ref* ref, BNode* node,
-						struct stat_beos* stat, const char* filetype)
-					{
-						return node->IsDirectory();
-					}
+	virtual ~DirectoryRefFilter()
+	{
+	}
+
+	virtual bool Filter(const entry_ref* ref, BNode* node,
+		struct stat_beos* stat, const char* filetype)
+	{
+		return node->IsDirectory();
+	}
 };
 
 
 // #pragma mark - ScreenshotWindow
+
+
 #undef TR_CONTEXT
 #define TR_CONTEXT "ScreenshotWindow"
 
 
 ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	bool includeMouse, bool grabActiveWindow, bool showConfigWindow,
-	bool saveScreenshotSilent, int32 imageFileType, int32 translator)
+	bool saveScreenshotSilent, int32 imageFileType, int32 translator,
+	const char* outputFilename)
 	:
 	BWindow(BRect(0, 0, 200.0, 100.0), TR("Retake screenshot"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_QUIT_ON_WINDOW_CLOSE |
@@ -107,6 +115,7 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	fGrabActiveWindow(grabActiveWindow),
 	fShowConfigWindow(showConfigWindow),
 	fSaveScreenshotSilent(saveScreenshotSilent),
+	fOutputFilename(outputFilename),
 	fExtension(""),
 	fTranslator(translator),
 	fImageFileType(imageFileType)
@@ -805,10 +814,13 @@ ScreenshotWindow::_SaveScreenshot()
 	if (path == NULL)
 		return B_ERROR;
 
-	if (fSaveScreenshotSilent)	
-		path.Append(_FindValidFileName(
-			TR_CMT("screenshot1", "!! Filename of first screenshot !!")).String());
-	else
+	if (fSaveScreenshotSilent) {
+		if (!fOutputFilename.Compare("")) {
+			path.Append(_FindValidFileName(TR_CMT("screenshot1",
+					"!! Filename of first screenshot !!")).String());
+		} else
+			path.SetTo(fOutputFilename);
+	} else
 		path.Append(fNameControl->Text());
 	
 	BEntry entry;
@@ -817,7 +829,8 @@ ScreenshotWindow::_SaveScreenshot()
 	if (!fSaveScreenshotSilent) {
 		if (entry.Exists()) {
 			BAlert* overwriteAlert = new BAlert(TR("overwrite"), 
-				TR("This file already exists.\n Are you sure would you like to overwrite it?"),
+				TR("This file already exists.\n Are you sure would you like "
+					"to overwrite it?"),
 				TR("Cancel"), TR("Overwrite"), NULL, B_WIDTH_AS_USUAL, 
 				B_EVEN_SPACING, B_WARNING_ALERT);
 

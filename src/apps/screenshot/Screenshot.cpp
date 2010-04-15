@@ -85,6 +85,7 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 {
 	bigtime_t delay = 0;
 
+	const char* outputFilename = NULL;
 	bool includeBorder = false;
 	bool includeMouse = false;
 	bool grabActiveWindow = false;
@@ -127,22 +128,24 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 					, argv[i]);
 				exit(0);
 			}
-		}
+		} else if (i == argc - 1)
+			outputFilename = argv[i];
 	}
 	
 	fArgvReceived = true;
 	
 	new ScreenshotWindow(delay, includeBorder, includeMouse, grabActiveWindow, 
 		showConfigureWindow, saveScreenshotSilent, fImageFileType, 
-		fTranslator);
+		fTranslator, outputFilename);
 }
 
 
 void
 Screenshot::_ShowHelp() const
 {
-	printf("Screenshot [OPTION]... Creates a bitmap of the current screen\n\n");
-	printf("OPTION\n");
+	printf("Screenshot [OPTIONS] [FILE]  Creates a bitmap of the current screen\n\n");
+	printf("FILE is the optional output path / filename used in silent mode. If FILE is not given, a default filename will be generated in the prefered directory.\n\n");
+	printf("OPTIONS\n");
 	printf("  -o, --options         Show options window first\n");
 	printf("  -m, --mouse-pointer   Include the mouse pointer\n");
 	printf("  -b, --border          Include the window border\n");

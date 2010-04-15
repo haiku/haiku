@@ -37,7 +37,8 @@ public:
 								bool showConfigWindow = false,
 								bool saveScreenshotSilent = false,
 								int32 imageFileType = B_PNG_FORMAT,
-								int32 translator = 8);
+								int32 translator = 8,
+								const char* outputFilename = NULL);
 	virtual					~ScreenshotWindow();
 
 	virtual	void			MessageReceived(BMessage* message);
@@ -93,6 +94,7 @@ private:
 			bool			fGrabActiveWindow;
 			bool			fShowConfigWindow;
 			bool			fSaveScreenshotSilent;
+			BString			fOutputFilename;
 			BString			fExtension;
 
 			int32			fTranslator;
