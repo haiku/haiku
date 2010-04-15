@@ -26,16 +26,24 @@
 #include "Keymap.h"
 
 
+struct console;
+
+struct keyboard {
+	struct keyboard*	next;
+	int					device;
+	int					target;
+	thread_id			thread;
+};
+
 struct console {
-	int			console_fd;
-	int			keyboard_fd;
+	int					console_fd;
+	thread_id			console_writer;
 
-	int			tty_master_fd;
-	int			tty_slave_fd;
-	int			tty_num;
+	struct keyboard*	keyboards;
 
-	thread_id	keyboard_reader;
-	thread_id	console_writer;
+	int					tty_master_fd;
+	int					tty_slave_fd;
+	int					tty_num;
 };
 
 
@@ -79,7 +87,7 @@ update_leds(int fd, uint32 modifiers)
 static int32
 keyboard_reader(void* arg)
 {
-	struct console* con = (struct console*)arg;
+	struct keyboard* keyboard = (struct keyboard*)arg;
 	uint8 activeDeadKey = 0;
 	uint32 modifiers = 0;
 
@@ -88,7 +96,7 @@ keyboard_reader(void* arg)
 
 	for (;;) {
 		raw_key_info rawKeyInfo;
-		if (ioctl(con->keyboard_fd, KB_READ, &rawKeyInfo) != 0)
+		if (ioctl(keyboard->device, KB_READ, &rawKeyInfo) != 0)
 			break;
 
 		uint32 keycode = rawKeyInfo.keycode;
@@ -123,7 +131,7 @@ keyboard_reader(void* arg)
 
 			if (modifiers != oldModifiers) {
 				if (isLock)
-					update_leds(con->keyboard_fd, modifiers);
+					update_leds(keyboard->device, modifiers);
 			}
 		}
 
@@ -137,7 +145,7 @@ keyboard_reader(void* arg)
 			keymap.GetChars(keycode, modifiers, activeDeadKey, &string,
 				&numBytes);
 			if (numBytes > 0)
-				write(con->tty_master_fd, string, numBytes);
+				write(keyboard->target, string, numBytes);
 
 			delete[] string;
 		}
@@ -179,17 +187,41 @@ console_writer(void* arg)
 }
 
 
-/*!	Opens the first keyboard driver it finds starting from the given
-	location \a start that supports the debugger extension.
+static void
+stop_keyboards(struct console* con)
+{
+	// close devices
+
+	for (struct keyboard* keyboard = con->keyboards; keyboard != NULL;
+			keyboard = keyboard->next) {
+		close(keyboard->device);
+	}
+
+	// wait for the threads
+
+	for (struct keyboard* keyboard = con->keyboards; keyboard != NULL;) {
+		struct keyboard* next = keyboard->next;
+		wait_for_thread(keyboard->thread, NULL);
+
+		delete keyboard;
+		keyboard = next;
+	}
+
+	con->keyboards = NULL;
+}
+
+
+/*!	Opens the all keyboard drivers it finds starting from the given
+	location \a start that support the debugger extension.
 */
-static int
-open_keyboard(const char* start)
+static struct keyboard*
+open_keyboards(int target, const char* start, struct keyboard* previous)
 {
 	DIR* dir = opendir(start);
 	if (dir == NULL)
-		return -1;
+		return NULL;
 
-	int fd = -1;
+	struct keyboard* keyboard = previous;
 
 	while (true) {
 		dirent* entry = readdir(dir);
@@ -206,24 +238,36 @@ open_keyboard(const char* start)
 		struct stat stat;
 		if (::stat(path, &stat) != 0)
 			continue;
-		
+
 		if (S_ISDIR(stat.st_mode))
-			return open_keyboard(path);
-		
+			return open_keyboards(target, path, previous);
+
 		// Try to open it as a device
-		fd = open(path, O_RDONLY);
+		int fd = open(path, O_RDONLY);
 		if (fd >= 0) {
 			// Turn on debugger mode
-			if (ioctl(fd, KB_SET_DEBUG_READER, NULL, 0) == 0)
-				break;
+			if (ioctl(fd, KB_SET_DEBUG_READER, NULL, 0) == 0) {
+				keyboard = new ::keyboard();
+				keyboard->device = fd;
+				keyboard->target = target;
+				keyboard->thread = spawn_thread(&keyboard_reader, path,
+					B_URGENT_DISPLAY_PRIORITY, keyboard);
+				if (keyboard->thread < 0) {
+					close(fd);
+					return NULL;
+				}
 
-			close(fd);
-			fd = -1;
+				if (previous != NULL)
+					previous->next = keyboard;
+
+				resume_thread(keyboard->thread);
+			} else
+				close(fd);
 		}
 	}
 
 	closedir(dir);
-	return fd;
+	return keyboard;
 }
 
 
@@ -232,19 +276,13 @@ start_console(struct console* con)
 {
 	memset(con, 0, sizeof(struct console));
 	con->console_fd = -1;
-	con->keyboard_fd = -1;
 	con->tty_master_fd = -1;
 	con->tty_slave_fd = -1;
-	con->keyboard_reader = -1;
 	con->console_writer = -1;
 
 	con->console_fd = open("/dev/console", O_WRONLY);
 	if (con->console_fd < 0)
 		return -2;
-
-	con->keyboard_fd = open_keyboard("/dev/input/keyboard");
-	if (con->keyboard_fd < 0)
-		return -3;
 
 	DIR* dir = opendir("/dev/pt");
 	if (dir != NULL) {
@@ -294,19 +332,18 @@ start_console(struct console* con)
 	}
 
 	if (con->tty_master_fd < 0 || con->tty_slave_fd < 0)
-		return -4;
+		return -3;
 
-	con->keyboard_reader = spawn_thread(&keyboard_reader, "console reader",
-		B_URGENT_DISPLAY_PRIORITY, con);
-	if (con->keyboard_reader < 0)
-		return -7;
+	con->keyboards
+		= open_keyboards(con->tty_master_fd, "/dev/input/keyboard", NULL);
+	if (con->keyboards == NULL)
+		return -4;
 
 	con->console_writer = spawn_thread(&console_writer, "console writer",
 		B_URGENT_DISPLAY_PRIORITY, con);
 	if (con->console_writer < 0)
-		return -8;
+		return -5;
 
-	resume_thread(con->keyboard_reader);
 	resume_thread(con->console_writer);
 	setenv("TERM", "xterm", true);
 
@@ -321,14 +358,11 @@ stop_console(struct console* con)
 	close(con->tty_master_fd);
 	close(con->tty_slave_fd);
 
-	// close console and keyboard
+	// close console and keyboards
 	close(con->console_fd);
-	close(con->keyboard_fd);
+	wait_for_thread(con->console_writer, NULL);
 
-	// wait for the threads
-	status_t returnCode;
-	wait_for_thread(con->console_writer, &returnCode);
-	wait_for_thread(con->keyboard_reader, &returnCode);
+	stop_keyboards(con);
 }
 
 
