@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Installer	3609821010
+1	portuguese	x-vnd.Haiku-Installer	4246631894
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Tem a certeza que deseja abortar a instalação e reiniciar o sistema?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\tescrito por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A instalação terminou. O sector de arranque foi escrito em '%s'. Carregue em Terminar para sair do instalador ou escolha um novo volume de destino para executar outra instalação.
@@ -63,4 +63,5 @@ Try installing anyway	InstallProgress		Tentar instalar na mesma
 Are you sure you want to to stop the installation?	InstallerWindow		Tem a certeza que deseja parar a instalação?
 Writes the Haiku boot code to the partition start\nsector. This step is automatically performed by\nthe installation, but you can manually make a\npartition bootable in case you do not need to\nperform an installation.	InstallerWindow		Escreve o código de arranque do Haiku para o sector de início da partição. Este passo é feito automaticamente pela\n instalação, mas pode marcar uma partição\n como partiçaõ de arranque caso não\n precise de instalar.
 Onto:	InstallerWindow		Em:
+The mount point could not be retrieved.	InstallProgress		Não foi possível obter o ponto de montagem.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		O volume de destino não está vazio. Tem a certeza que deseja instalar na mesma?\n\nNota: A pasta de sistema será uma cópia nova a partir do volume de origem e todo o conteúdo das outras pastas será junto. Os ficheiros que existam em ambos os volumes serão substituídos pelos do volume de origem.
