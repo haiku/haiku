@@ -48,7 +48,6 @@ virtual				~TextGapBuffer();
 //		void		Resize(int32 size);
 
 protected:
-		int32	fExtraCount;		// when realloc()-ing
 		int32	fItemCount;			// logical count
 		char *	fBuffer;			// allocated memory
 		int32	fBufferCount;		// physical count

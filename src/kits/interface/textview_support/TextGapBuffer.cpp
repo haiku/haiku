@@ -20,18 +20,20 @@
 
 namespace BPrivate {
 
+static const int32 kTextGapBufferBlockSize = 2048;
+
+
 TextGapBuffer::TextGapBuffer()
-	:	fExtraCount(2048),
-		fItemCount(0),
+	:	fItemCount(0),
 		fBuffer(NULL),
-		fBufferCount(fExtraCount + fItemCount),
+		fBufferCount(kTextGapBufferBlockSize + fItemCount),
 		fGapIndex(fItemCount),
 		fGapCount(fBufferCount - fGapIndex),
 		fScratchBuffer(NULL),
 		fScratchSize(0),
 		fPasswordMode(false)
 {
-	fBuffer = (char *)malloc(fExtraCount + fItemCount);
+	fBuffer = (char *)malloc(kTextGapBufferBlockSize + fItemCount);
 	fScratchBuffer = NULL;
 }
 
@@ -56,7 +58,7 @@ TextGapBuffer::InsertText(const char *inText, int32 inNumItems, int32 inAtIndex)
 		MoveGapTo(inAtIndex);
 
 	if (fGapCount < inNumItems)
-		SizeGapTo(inNumItems + fExtraCount);
+		SizeGapTo(inNumItems + kTextGapBufferBlockSize);
 
 	memcpy(fBuffer + fGapIndex, inText, inNumItems);
 
@@ -91,7 +93,7 @@ TextGapBuffer::InsertText(BFile *file, int32 fileOffset, int32 inNumItems, int32
 		MoveGapTo(inAtIndex);
 
 	if (fGapCount < inNumItems)
-		SizeGapTo(inNumItems + fExtraCount);
+		SizeGapTo(inNumItems + kTextGapBufferBlockSize);
 
 	// Finally, read the data and put it into the buffer
 	if (file->ReadAt(fileOffset, fBuffer + fGapIndex, inNumItems) > 0) {
@@ -119,8 +121,8 @@ TextGapBuffer::RemoveRange(int32 start, int32 end)
 	fGapCount += inNumItems;
 	fItemCount -= inNumItems;
 
-	if (fGapCount > fExtraCount)
-		SizeGapTo(fExtraCount);
+	if (fGapCount > kTextGapBufferBlockSize)
+		SizeGapTo(kTextGapBufferBlockSize);
 }
 
 
@@ -278,8 +280,11 @@ const char *
 TextGapBuffer::RealText()
 {
 	MoveGapTo(fItemCount);
-	fBuffer[fItemCount] = '\0';
 
+	if (fGapCount == 0)
+		SizeGapTo(kTextGapBufferBlockSize);
+
+	fBuffer[fItemCount] = '\0';
 	return fBuffer;
 }
 
