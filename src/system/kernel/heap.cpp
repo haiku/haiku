@@ -1711,18 +1711,27 @@ heap_free(heap_allocator *heap, void *address)
 		WriteLocker areaWriteLocker(heap->area_lock);
 		MutexLocker pageLocker(heap->page_lock);
 
+		area_id areasToDelete[heap->empty_areas - 1];
+		int32 areasToDeleteIndex = 0;
+
 		area = heap->areas;
 		while (area != NULL && heap->empty_areas > 1) {
 			heap_area *next = area->next;
 			if (area->area >= 0
 				&& area->free_page_count == area->page_count
 				&& heap_remove_area(heap, area) == B_OK) {
-				delete_area(area->area);
+				areasToDelete[areasToDeleteIndex++] = area->area;
 				heap->empty_areas--;
 			}
 
 			area = next;
 		}
+
+		pageLocker.Unlock();
+		areaWriteLocker.Unlock();
+
+		for (int32 i = 0; i < areasToDeleteIndex; i++)
+			delete_area(areasToDelete[i]);
 	}
 
 	return B_OK;
