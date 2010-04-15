@@ -142,7 +142,19 @@ enum {
     D1MODE_VIEWPORT_SIZE           = 0x6584,
     D1MODE_EXT_OVERSCAN_LEFT_RIGHT = 0x6588,
     D1MODE_EXT_OVERSCAN_TOP_BOTTOM = 0x658C,
-    D1MODE_DATA_FORMAT             = 0x6528
+    D1MODE_DATA_FORMAT             = 0x6528,
+    
+     /* D1SCL */
+    D1SCL_ENABLE                   = 0x6590,
+    D1SCL_TAP_CONTROL              = 0x6594,
+    D1MODE_CENTER                  = 0x659C, /* guess */
+    D1SCL_HVSCALE                  = 0x65A4, /* guess */
+    D1SCL_HFILTER                  = 0x65B0, /* guess */
+    D1SCL_VFILTER                  = 0x65C0, /* guess */
+    D1SCL_UPDATE                   = 0x65CC,
+    D1SCL_DITHER                   = 0x65D4, /* guess */
+    D1SCL_FLIP_CONTROL             = 0x65D8 /* guess */
+    
 };
 
 
@@ -202,10 +214,10 @@ DxModeSet(display_mode *mode)
     /* Horizontal */
     write32(regOffset + D1CRTC_H_TOTAL, displayTiming.h_total - 1);
 	
-    uint16 blankStart = displayTiming.h_sync_end;
-    uint16 blankEnd = displayTiming.h_total;
-    write32(regOffset + D1CRTC_H_BLANK_START_END,
-		blankStart | (blankEnd << 16));
+    uint16 blankStart = displayTiming.h_display; //displayTiming.h_sync_end;
+    uint16 blankEnd = displayTiming.h_sync_start;//displayTiming.h_total;
+  //  write32(regOffset + D1CRTC_H_BLANK_START_END,
+	//	blankStart | (blankEnd << 16));
 
     write32(regOffset + D1CRTC_H_SYNC_A,
 		(displayTiming.h_sync_end - displayTiming.h_sync_start) << 16);
@@ -215,10 +227,10 @@ DxModeSet(display_mode *mode)
     /* Vertical */
     write32(regOffset + D1CRTC_V_TOTAL, displayTiming.v_total - 1);
 
-    blankStart = displayTiming.v_sync_end;
-    blankEnd = displayTiming.v_total;
-    write32(regOffset + D1CRTC_V_BLANK_START_END,
-		blankStart | (blankEnd << 16));
+    blankStart = displayTiming.v_display;//displayTiming.v_sync_end;
+    blankEnd = displayTiming.v_sync_start;//displayTiming.v_total;
+  //  write32(regOffset + D1CRTC_V_BLANK_START_END,
+	//	blankStart | (blankEnd << 16));
 
     /* set interlaced */
     //if (Mode->Flags & V_INTERLACE) {
@@ -241,11 +253,33 @@ DxModeSet(display_mode *mode)
 }
 
 
+static void
+DxModeScale(display_mode *mode)
+{
+	uint32 regOffset = D1_REG_OFFSET;
+	
+	/* D1Mode registers */
+    write32(regOffset + D1MODE_VIEWPORT_SIZE,
+		mode->timing.v_display | (mode->timing.h_display << 16));
+    write32(regOffset + D1MODE_VIEWPORT_START, 0);
+
+ /*  write32(regOffset + D1MODE_EXT_OVERSCAN_LEFT_RIGHT,
+		(Overscan.OverscanLeft << 16) | Overscan.OverscanRight);
+    write32(regOffset + D1MODE_EXT_OVERSCAN_TOP_BOTTOM,
+		(Overscan.OverscanTop << 16) | Overscan.OverscanBottom);
+*/
+    write32(regOffset + D1SCL_ENABLE, 0);
+	write32(regOffset + D1SCL_TAP_CONTROL, 0);
+	write32(regOffset + D1MODE_CENTER, 0);
+}
+    
+     
 status_t
 radeon_set_display_mode(display_mode *mode)
 {
-	//DxModeSet(mode);
+	DxModeSet(mode);
 	
+	DxModeScale(mode);
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(*mode, colorMode, bytesPerRow, bitsPerPixel);
