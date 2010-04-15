@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -36,6 +36,9 @@ static const console_color kSliderBackgroundColor = DARK_GRAY;
 static const console_color kArrowColor = GRAY;
 
 static int32 sMenuOffset = 0;
+
+
+static void run_menu(Menu* menu);
 
 
 static int32
@@ -340,8 +343,48 @@ select_next_valid_item(Menu *menu, int32 selected)
 }
 
 
+static bool
+invoke_item(Menu* menu, MenuItem* item, int32& selected, char key)
+{
+	// leave the menu
+	if (item->Submenu() != NULL && key == TEXT_CONSOLE_KEY_RETURN) {
+		int32 offset = sMenuOffset;
+		menu->Hide();
+
+		run_menu(item->Submenu());
+		if (item->Target() != NULL)
+			(*item->Target())(menu, item);
+
+		// restore current menu
+		sMenuOffset = offset;
+		menu->FindSelected(&selected);
+		menu->Show();
+		draw_menu(menu);
+	} else if (item->Type() == MENU_ITEM_MARKABLE) {
+		// toggle state
+		item->SetMarked(!item->IsMarked());
+		print_item_at(selected, item);
+
+		if (item->Target() != NULL)
+			(*item->Target())(menu, item);
+	} else if (key == TEXT_CONSOLE_KEY_RETURN) {
+		// the space key does not exit the menu, only return does
+		if (menu->Type() == CHOICE_MENU
+			&& item->Type() != MENU_ITEM_NO_CHOICE
+			&& item->Type() != MENU_ITEM_TITLE)
+			item->SetMarked(true);
+
+		if (item->Target() != NULL)
+			(*item->Target())(menu, item);
+		return true;
+	}
+
+	return false;
+}
+
+
 static void
-run_menu(Menu *menu)
+run_menu(Menu* menu)
 {
 	sMenuOffset = 0;
 	menu->Show();
@@ -413,43 +456,25 @@ run_menu(Menu *menu)
 			}
 		} else if (key == TEXT_CONSOLE_KEY_RETURN
 			|| key == TEXT_CONSOLE_KEY_SPACE) {
-			// leave the menu
-			if (item->Submenu() != NULL && key == TEXT_CONSOLE_KEY_RETURN) {
-				int32 offset = sMenuOffset;
-				menu->Hide();
-
-				run_menu(item->Submenu());
-				if (item->Target() != NULL)
-					(*item->Target())(menu, item);
-
-				// restore current menu
-				sMenuOffset = offset;
-				menu->FindSelected(&selected);
-				menu->Show();
-				draw_menu(menu);
-			} else if (item->Type() == MENU_ITEM_MARKABLE) {
-				// toggle state
-				item->SetMarked(!item->IsMarked());
-				print_item_at(selected, item);
-
-				if (item->Target() != NULL)
-					(*item->Target())(menu, item);
-			} else if (key == TEXT_CONSOLE_KEY_RETURN) {
-				// the space key does not exit the menu
-
-				if (menu->Type() == CHOICE_MENU
-					&& item->Type() != MENU_ITEM_NO_CHOICE
-					&& item->Type() != MENU_ITEM_TITLE)
-					item->SetMarked(true);
-
-				if (item->Target() != NULL)
-					(*item->Target())(menu, item);
-
+			if (invoke_item(menu, item, selected, key))
 				break;
-			}
-		} else if (key == TEXT_CONSOLE_KEY_ESCAPE && menu->Type() != MAIN_MENU)
+		} else if (key == TEXT_CONSOLE_KEY_ESCAPE
+			&& menu->Type() != MAIN_MENU) {
 			// escape key was hit
 			break;
+		} else {
+			// Shortcut processing
+			shortcut_hook function = menu->FindShortcut(key);
+			if (function != NULL)
+				function(key);
+			else {
+				item = menu->FindItemByShortcut(key);
+				if (item != NULL && invoke_item(menu, item, selected,
+						TEXT_CONSOLE_KEY_RETURN)) {
+					break;
+				}
+			}
+		}
 	}
 
 	menu->Hide();

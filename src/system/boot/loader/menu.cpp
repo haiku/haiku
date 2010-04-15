@@ -151,22 +151,28 @@ MenuItem::SetData(const void *data)
 }
 
 
-/** This sets a help text that is shown when the item is
- *	selected.
- *	Note, unlike the label, the string is not copied, it's
- *	just referenced and has to stay valid as long as the
- *	item's menu is being used.
- */
-
+/*!	This sets a help text that is shown when the item is
+	selected.
+	Note, unlike the label, the string is not copied, it's
+	just referenced and has to stay valid as long as the
+	item's menu is being used.
+*/
 void
-MenuItem::SetHelpText(const char *text)
+MenuItem::SetHelpText(const char* text)
 {
 	fHelpText = text;
 }
 
 
 void
-MenuItem::SetMenu(Menu *menu)
+MenuItem::SetShortcut(char key)
+{
+	fShortcut = key;
+}
+
+
+void
+MenuItem::SetMenu(Menu* menu)
 {
 	fMenu = menu;
 }
@@ -175,14 +181,15 @@ MenuItem::SetMenu(Menu *menu)
 //	#pragma mark -
 
 
-Menu::Menu(menu_type type, const char *title)
+Menu::Menu(menu_type type, const char* title)
 	:
 	fTitle(title),
 	fChoiceText(NULL),
 	fCount(0),
 	fIsHidden(true),
 	fType(type),
-	fSuperItem(NULL)
+	fSuperItem(NULL),
+	fShortcuts(NULL)
 {
 }
 
@@ -199,7 +206,7 @@ Menu::~Menu()
 }
 
 
-MenuItem *
+MenuItem*
 Menu::ItemAt(int32 index)
 {
 	if (index < 0 || index >= fCount)
@@ -218,13 +225,12 @@ Menu::ItemAt(int32 index)
 
 
 int32
-Menu::IndexOf(MenuItem *searchedItem)
+Menu::IndexOf(MenuItem* searchedItem)
 {
-	MenuItemIterator iterator = ItemIterator();
-	MenuItem *item;
 	int32 index = 0;
 
-	while ((item = iterator.Next()) != NULL) {
+	MenuItemIterator iterator = ItemIterator();
+	while (MenuItem* item = iterator.Next()) {
 		if (item == searchedItem)
 			return index;
 
@@ -242,13 +248,11 @@ Menu::CountItems() const
 }
 
 
-MenuItem *
-Menu::FindItem(const char *label)
+MenuItem*
+Menu::FindItem(const char* label)
 {
 	MenuItemIterator iterator = ItemIterator();
-	MenuItem *item;
-
-	while ((item = iterator.Next()) != NULL) {
+	while (MenuItem* item = iterator.Next()) {
 		if (item->Label() != NULL && !strcmp(item->Label(), label))
 			return item;
 	}
@@ -257,13 +261,11 @@ Menu::FindItem(const char *label)
 }
 
 
-MenuItem *
+MenuItem*
 Menu::FindMarked()
 {
 	MenuItemIterator iterator = ItemIterator();
-	MenuItem *item;
-
-	while ((item = iterator.Next()) != NULL) {
+	while (MenuItem* item = iterator.Next()) {
 		if (item->IsMarked())
 			return item;
 	}
@@ -272,14 +274,13 @@ Menu::FindMarked()
 }
 
 
-MenuItem *
-Menu::FindSelected(int32 *_index)
+MenuItem*
+Menu::FindSelected(int32* _index)
 {
-	MenuItemIterator iterator = ItemIterator();
-	MenuItem *item;
 	int32 index = 0;
 
-	while ((item = iterator.Next()) != NULL) {
+	MenuItemIterator iterator = ItemIterator();
+	while (MenuItem* item = iterator.Next()) {
 		if (item->IsSelected()) {
 			if (_index != NULL)
 				*_index = index;
@@ -294,7 +295,7 @@ Menu::FindSelected(int32 *_index)
 
 
 void
-Menu::AddItem(MenuItem *item)
+Menu::AddItem(MenuItem* item)
 {
 	item->fMenu = this;
 	fItems.Add(item);
@@ -305,7 +306,7 @@ Menu::AddItem(MenuItem *item)
 status_t
 Menu::AddSeparatorItem()
 {
-	MenuItem *item = new(nothrow) MenuItem();
+	MenuItem* item = new(std::nothrow) MenuItem();
 	if (item == NULL)
 		return B_NO_MEMORY;
 
@@ -316,16 +317,14 @@ Menu::AddSeparatorItem()
 }
 
 
-MenuItem *
+MenuItem*
 Menu::RemoveItemAt(int32 index)
 {
 	if (index < 0 || index >= fCount)
 		return NULL;
 
 	MenuItemIterator iterator = ItemIterator();
-	MenuItem *item;
-
-	while ((item = iterator.Next()) != NULL) {
+	while (MenuItem* item = iterator.Next()) {
 		if (index-- == 0) {
 			RemoveItem(item);
 			return item;
@@ -337,7 +336,7 @@ Menu::RemoveItemAt(int32 index)
 
 
 void
-Menu::RemoveItem(MenuItem *item)
+Menu::RemoveItem(MenuItem* item)
 {
 	item->fMenu = NULL;
 	fItems.Remove(item);
@@ -346,10 +345,51 @@ Menu::RemoveItem(MenuItem *item)
 
 
 void
-Menu::Draw(MenuItem *item)
+Menu::AddShortcut(char key, shortcut_hook function)
 {
-	if (!IsHidden())
-		platform_update_menu_item(this, item);
+	Menu::shortcut* shortcut = new(std::nothrow) struct Menu::shortcut;
+	if (shortcut == NULL)
+		return;
+
+	shortcut->key = key;
+	shortcut->function = function;
+
+	shortcut->next = fShortcuts;
+	fShortcuts = shortcut;
+}
+
+
+shortcut_hook
+Menu::FindShortcut(char key) const
+{
+	if (key == 0)
+		return NULL;
+
+	const Menu::shortcut* shortcut = fShortcuts;
+	while (shortcut != NULL) {
+		if (shortcut->key == key)
+			return shortcut->function;
+
+		shortcut = shortcut->next;
+	}
+
+	return NULL;
+}
+
+
+MenuItem*
+Menu::FindItemByShortcut(char key)
+{
+	if (key == 0)
+		return NULL;
+
+	MenuItemList::Iterator iterator = ItemIterator();
+	while (MenuItem* item = iterator.Next()) {
+		if (item->Shortcut() == key)
+			return item;
+	}
+
+	return NULL;
 }
 
 
@@ -357,6 +397,14 @@ void
 Menu::Run()
 {
 	platform_run_menu(this);
+}
+
+
+void
+Menu::Draw(MenuItem* item)
+{
+	if (!IsHidden())
+		platform_update_menu_item(this, item);
 }
 
 
@@ -415,9 +463,9 @@ size_to_string(off_t size, char* buffer, size_t bufferSize)
 
 
 static bool
-user_menu_boot_volume(Menu *menu, MenuItem *item)
+user_menu_boot_volume(Menu* menu, MenuItem* item)
 {
-	Menu *super = menu->Supermenu();
+	Menu* super = menu->Supermenu();
 	if (super == NULL) {
 		// huh?
 		return true;
@@ -434,7 +482,7 @@ user_menu_boot_volume(Menu *menu, MenuItem *item)
 
 
 static bool
-debug_menu_display_syslog(Menu *menu, MenuItem *item)
+debug_menu_display_syslog(Menu* menu, MenuItem* item)
 {
 	ring_buffer* buffer = (ring_buffer*)gKernelArgs.debug_output;
 	if (buffer == NULL)
@@ -520,7 +568,7 @@ save_syslog_to_volume(Directory* directory)
 
 
 static bool
-debug_menu_toggle_debug_syslog(Menu *menu, MenuItem *item)
+debug_menu_toggle_debug_syslog(Menu* menu, MenuItem* item)
 {
 	gKernelArgs.keep_debug_output_buffer = item->IsMarked();
 	return true;
@@ -528,7 +576,7 @@ debug_menu_toggle_debug_syslog(Menu *menu, MenuItem *item)
 
 
 static bool
-debug_menu_save_syslog(Menu *menu, MenuItem *item)
+debug_menu_save_syslog(Menu* menu, MenuItem* item)
 {
 	Directory* volume = (Directory*)item->Data();
 
@@ -543,17 +591,17 @@ debug_menu_save_syslog(Menu *menu, MenuItem *item)
 }
 
 
-static Menu *
-add_boot_volume_menu(Directory *bootVolume)
+static Menu*
+add_boot_volume_menu(Directory* bootVolume)
 {
-	Menu *menu = new(nothrow) Menu(CHOICE_MENU, "Select Boot Volume");
-	MenuItem *item;
-	void *cookie;
+	Menu* menu = new(std::nothrow) Menu(CHOICE_MENU, "Select Boot Volume");
+	MenuItem* item;
+	void* cookie;
 	int32 count = 0;
 
 	if (gRoot->Open(&cookie, O_RDONLY) == B_OK) {
-		Directory *volume;
-		while (gRoot->GetNextNode(cookie, (Node **)&volume) == B_OK) {
+		Directory* volume;
+		while (gRoot->GetNextNode(cookie, (Node**)&volume) == B_OK) {
 			// only list bootable volumes
 			if (!is_bootable(volume))
 				continue;
@@ -601,11 +649,11 @@ add_boot_volume_menu(Directory *bootVolume)
 }
 
 
-static Menu *
+static Menu*
 add_safe_mode_menu()
 {
-	Menu *safeMenu = new(nothrow) Menu(SAFE_MODE_MENU, "Safe Mode Options");
-	MenuItem *item;
+	Menu* safeMenu = new(nothrow) Menu(SAFE_MODE_MENU, "Safe Mode Options");
+	MenuItem* item;
 
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Safe mode"));
 	item->SetData(B_SAFEMODE_SAFE_MODE);
@@ -704,11 +752,11 @@ add_save_debug_syslog_menu()
 }
 
 
-static Menu *
+static Menu*
 add_debug_menu()
 {
-	Menu *menu = new(nothrow) Menu(STANDARD_MENU, "Debug Options");
-	MenuItem *item;
+	Menu* menu = new(std::nothrow) Menu(STANDARD_MENU, "Debug Options");
+	MenuItem* item;
 
 #if DEBUG_SPINLOCK_LATENCIES
 	item = new(std::nothrow) MenuItem("Disable latency checks");
@@ -766,22 +814,21 @@ add_debug_menu()
 
 
 static void
-apply_safe_mode_options(Menu *menu)
+apply_safe_mode_options(Menu* menu)
 {
-	MenuItemIterator iterator = menu->ItemIterator();
-	MenuItem *item;
 	char buffer[2048];
 	int32 pos = 0;
 
 	buffer[0] = '\0';
 
-	while ((item = iterator.Next()) != NULL) {
+	MenuItemIterator iterator = menu->ItemIterator();
+	while (MenuItem* item = iterator.Next()) {
 		if (item->Type() == MENU_ITEM_SEPARATOR || !item->IsMarked()
 			|| item->Data() == NULL || (uint32)pos > sizeof(buffer))
 			continue;
 
 		size_t totalBytes = snprintf(buffer + pos, sizeof(buffer) - pos,
-			"%s true\n", (const char *)item->Data());
+			"%s true\n", (const char*)item->Data());
 		pos += std::min(totalBytes, sizeof(buffer) - pos - 1);
 	}
 
@@ -790,7 +837,7 @@ apply_safe_mode_options(Menu *menu)
 
 
 static bool
-user_menu_reboot(Menu *menu, MenuItem *item)
+user_menu_reboot(Menu* menu, MenuItem* item)
 {
 	platform_exit();
 	return true;
@@ -798,25 +845,25 @@ user_menu_reboot(Menu *menu, MenuItem *item)
 
 
 status_t
-user_menu(Directory **_bootVolume)
+user_menu(Directory** _bootVolume)
 {
-	Menu *menu = new(nothrow) Menu(MAIN_MENU);
-	Menu *safeModeMenu = NULL;
-	Menu *debugMenu = NULL;
-	MenuItem *item;
+	Menu* menu = new(std::nothrow) Menu(MAIN_MENU);
+	Menu* safeModeMenu = NULL;
+	Menu* debugMenu = NULL;
+	MenuItem* item;
 
 	TRACE(("user_menu: enter\n"));
 
 	// Add boot volume
-	menu->AddItem(item = new(nothrow) MenuItem("Select boot volume",
+	menu->AddItem(item = new(std::nothrow) MenuItem("Select boot volume",
 		add_boot_volume_menu(*_bootVolume)));
 
 	// Add safe mode
-	menu->AddItem(item = new(nothrow) MenuItem("Select safe mode options",
+	menu->AddItem(item = new(std::nothrow) MenuItem("Select safe mode options",
 		safeModeMenu = add_safe_mode_menu()));
 
 	// add debug menu
-	menu->AddItem(item = new(nothrow) MenuItem("Select debug options",
+	menu->AddItem(item = new(std::nothrow) MenuItem("Select debug options",
 		debugMenu = add_debug_menu()));
 
 	// Add platform dependent menus
@@ -824,20 +871,22 @@ user_menu(Directory **_bootVolume)
 
 	menu->AddSeparatorItem();
 
-	menu->AddItem(item = new(nothrow) MenuItem("Reboot"));
+	menu->AddItem(item = new(std::nothrow) MenuItem("Reboot"));
 	item->SetTarget(user_menu_reboot);
+	item->SetShortcut('r');
 
-	menu->AddItem(item = new(nothrow) MenuItem("Continue booting"));
+	menu->AddItem(item = new(std::nothrow) MenuItem("Continue booting"));
 	if (*_bootVolume == NULL) {
 		item->SetEnabled(false);
 		menu->ItemAt(0)->Select(true);
-	}
+	} else
+		item->SetShortcut('b');
 
 	menu->Run();
 
 	// See if a new boot device has been selected, and propagate that back
 	if (item->Data() != NULL)
-		*_bootVolume = (Directory *)item->Data();
+		*_bootVolume = (Directory*)item->Data();
 
 	apply_safe_mode_options(safeModeMenu);
 	apply_safe_mode_options(debugMenu);

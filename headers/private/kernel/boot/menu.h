@@ -13,7 +13,8 @@
 class Menu;
 class MenuItem;
 
-typedef bool (*menu_item_hook)(Menu *, MenuItem *);
+typedef bool (*menu_item_hook)(Menu* menu, MenuItem* item);
+typedef void (*shortcut_hook)(char key);
 
 
 enum menu_item_type {
@@ -52,6 +53,9 @@ public:
 			void				SetHelpText(const char* text);
 			const char*			HelpText() const { return fHelpText; }
 
+			void				SetShortcut(char key);
+			char				Shortcut() const { return fShortcut; }
+
 			const char*			Label() const { return fLabel; }
 			Menu*				Submenu() const { return fSubMenu; }
 
@@ -70,6 +74,7 @@ private:
 			Menu*				fSubMenu;
 			const void*			fData;
 			const char*			fHelpText;
+			char				fShortcut;
 };
 
 
@@ -122,13 +127,23 @@ public:
 									{ fChoiceText = text; }
 			const char*			ChoiceText() const { return fChoiceText; }
 
-			void Run();
+			void				AddShortcut(char key, shortcut_hook function);
+			shortcut_hook		FindShortcut(char key) const;
+			MenuItem*			FindItemByShortcut(char key);
+
+			void				Run();
 
 private:
 			friend class MenuItem;
 			void				Draw(MenuItem* item);
 
 private:
+			struct shortcut {
+				shortcut*		next;
+				shortcut_hook	function;
+				char			key;
+			};
+
 			const char*			fTitle;
 			const char*			fChoiceText;
 			int32				fCount;
@@ -136,6 +151,7 @@ private:
 			MenuItemList		fItems;
 			menu_type			fType;
 			MenuItem*			fSuperItem;
+			shortcut*			fShortcuts;
 };
 
 
