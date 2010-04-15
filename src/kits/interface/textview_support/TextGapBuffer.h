@@ -27,7 +27,7 @@ virtual				~TextGapBuffer();
 		void		InsertText(BFile *file, int32 fileOffset, int32 amount,
 						int32 atIndex);
 		void		RemoveRange(int32 start, int32 end);
-		
+
 		void		MoveGapTo(int32 toIndex);
 		void		SizeGapTo(int32 inCount);
 
@@ -36,12 +36,12 @@ virtual				~TextGapBuffer();
 		const char 	*Text();
 		const char 	*RealText();
 		int32		Length() const;
-		
+
 		const char 	*GetString(int32 fromOffset, int32 *numBytes);
 		void		GetString(int32 offset, int32 length, char *buffer);
-		
+
 		char		RealCharAt(int32 offset) const;
-				
+
 		bool		PasswordMode() const;
 		void		SetPasswordMode(bool);
 
@@ -60,14 +60,14 @@ protected:
 };
 
 
-inline int32 
+inline int32
 TextGapBuffer::Length() const
 {
 	return fItemCount;
 }
 
 
-inline char 
+inline char
 TextGapBuffer::RealCharAt(long index) const
 {
 	return (index < fGapIndex) ? fBuffer[index] : fBuffer[index + fGapCount];
