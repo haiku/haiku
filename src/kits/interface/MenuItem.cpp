@@ -32,9 +32,9 @@ const float kLightBGTint = (B_LIGHTEN_1_TINT + B_LIGHTEN_1_TINT + B_NO_TINT) / 3
 // map control key shortcuts to drawable Unicode characters
 // cf. http://unicode.org/charts/PDF/U2190.pdf
 const char *kUTF8ControlMap[] = {
-	NULL, 
+	NULL,
 	"\xe2\x86\xb8", /* B_HOME U+21B8 */
-	NULL, NULL, 
+	NULL, NULL,
 	NULL, /* B_END */
 	NULL, /* B_INSERT */
 	NULL, NULL,
@@ -46,7 +46,7 @@ const char *kUTF8ControlMap[] = {
 	NULL, /* B_PAGE_DOWN */
 	NULL, NULL, NULL,
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL,
 	"\xe2\x86\x90", /* B_LEFT_ARROW */
 	"\xe2\x86\x92", /* B_RIGHT_ARROW */
 	"\xe2\x86\x91", /* B_UP_ARROW */
@@ -61,7 +61,7 @@ BMenuItem::BMenuItem(const char *label, BMessage *message, char shortcut,
 	_InitData();
 	if (label != NULL)
 		fLabel = strdup(label);
-		
+
 	SetMessage(message);
 
 	fShortcutChar = shortcut;
@@ -178,7 +178,7 @@ BMenuItem::Archive(BMessage *data, bool deep) const
 
 
 BMenuItem::~BMenuItem()
-{	
+{
 	free(fLabel);
 	delete fSubmenu;
 }
@@ -191,7 +191,7 @@ BMenuItem::SetLabel(const char *string)
 		free(fLabel);
 		fLabel = NULL;
 	}
-	
+
 	if (string != NULL)
 		fLabel = strdup(string);
 
@@ -433,7 +433,7 @@ BMenuItem::DrawContent()
 		lineEnd.x += escapements[fTriggerIndex] * font.Size();
 
 		fSuper->StrokeLine(lineStart, lineEnd);
-	}	
+	}
 }
 
 
@@ -516,9 +516,9 @@ BMenuItem::IsSelected() const
 
 BPoint
 BMenuItem::ContentLocation() const
-{	
+{
 	const BRect &padding = MenuPrivate(fSuper).Padding();
-	
+
 	return BPoint(fBounds.left + padding.left,
 		fBounds.top + padding.top);
 }
@@ -565,7 +565,7 @@ void
 BMenuItem::_InitMenuData(BMenu *menu)
 {
 	fSubmenu = menu;
-	
+
 	MenuPrivate(fSubmenu).SetSuperItem(this);
 
 	BMenuItem *item = menu->FindMarked();
@@ -583,7 +583,7 @@ BMenuItem::Install(BWindow *window)
 	if (fSubmenu) {
 		MenuPrivate(fSubmenu).Install(window);
 	}
-	
+
 	fWindow = window;
 
 	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow)
@@ -639,7 +639,7 @@ BMenuItem::Uninstall()
 	if (fSubmenu != NULL) {
 		MenuPrivate(fSubmenu).Uninstall();
 	}
-	
+
 	if (Target() == fWindow)
 		SetTarget(BMessenger());
 
@@ -674,7 +674,7 @@ BMenuItem::Select(bool selected)
 	if (Submenu() || IsEnabled()) {
 		fSelected = selected;
 		Highlight(selected);
-	}	
+	}
 }
 
 
@@ -726,8 +726,8 @@ BMenuItem::_DrawShortcutSymbol()
 	menu->GetFont(&font);
 	BPoint where = ContentLocation();
 	where.x = fBounds.right - font.Size();
-	
-	if (fSubmenu)	
+
+	if (fSubmenu)
 		where.x -= fBounds.Height() - 3;
 
 	const float ascent = MenuPrivate(fSuper).Ascent();
@@ -737,8 +737,8 @@ BMenuItem::_DrawShortcutSymbol()
 		fSuper->DrawChar(fShortcutChar, where + BPoint(0, ascent));
 
 	where.y += (fBounds.Height() - 11) / 2 - 1;
-	where.x -= 4;	
-	
+	where.x -= 4;
+
 	if (fModifiers & B_COMMAND_KEY) {
 		const BBitmap *command = MenuPrivate::MenuItemCommand();
 		const BRect &rect = command->Bounds();
@@ -759,9 +759,9 @@ BMenuItem::_DrawShortcutSymbol()
 		where.x -= rect.Width() + 1;
 		fSuper->DrawBitmap(option, where);
 	}
-	
+
 	if (fModifiers & B_SHIFT_KEY) {
-		const BBitmap *shift = MenuPrivate::MenuItemShift();		
+		const BBitmap *shift = MenuPrivate::MenuItemShift();
 		const BRect &rect = shift->Bounds();
 		where.x -= rect.Width() + 1;
 		fSuper->DrawBitmap(shift, where);
