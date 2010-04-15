@@ -22,26 +22,26 @@ public:
 								~HIDDevice();
 
 			void				SetParentCookie(int32 cookie);
-			int32				ParentCookie() { return fParentCookie; };
+			int32				ParentCookie() const { return fParentCookie; }
 
-			status_t			InitCheck() { return fStatus; };
+			status_t			InitCheck() const { return fStatus; }
 
-			bool				IsOpen() { return fOpenCount > 0; };
+			bool				IsOpen() const { return fOpenCount > 0; };
 			status_t			Open(ProtocolHandler *handler, uint32 flags);
 			status_t			Close(ProtocolHandler *handler);
 
 			void				Removed();
-			bool				IsRemoved() { return fRemoved; };
+			bool				IsRemoved() const { return fRemoved; }
 
 			status_t			MaybeScheduleTransfer();
 
 			status_t			SendReport(HIDReport *report);
 
-			HIDParser *			Parser() { return &fParser; };
-			ProtocolHandler *	ProtocolHandlerAt(uint32 index);
+			HIDParser *			Parser() { return &fParser; }
+			ProtocolHandler *	ProtocolHandlerAt(uint32 index) const;
 
 			// only to be used for the kernel debugger information
-			usb_pipe			InterruptPipe() { return fInterruptPipe; };
+			usb_pipe			InterruptPipe() const { return fInterruptPipe; }
 
 private:
 	static	void				_TransferCallback(void *cookie,

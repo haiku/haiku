@@ -221,7 +221,7 @@ HIDDevice::SendReport(HIDReport *report)
 
 
 ProtocolHandler *
-HIDDevice::ProtocolHandlerAt(uint32 index)
+HIDDevice::ProtocolHandlerAt(uint32 index) const
 {
 	if (index >= fProtocolHandlerCount)
 		return NULL;
