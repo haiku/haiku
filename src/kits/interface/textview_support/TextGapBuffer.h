@@ -33,11 +33,11 @@ virtual				~TextGapBuffer();
 
 		bool		FindChar(char inChar, int32 fromIndex, int32 *ioDelta);
 
-		const char 	*Text();
-		const char 	*RealText();
+		const char *Text();
+		const char *RealText();
 		int32		Length() const;
 
-		const char 	*GetString(int32 fromOffset, int32 *numBytes);
+		const char *GetString(int32 fromOffset, int32 *numBytes);
 		void		GetString(int32 offset, int32 length, char *buffer);
 
 		char		RealCharAt(int32 offset) const;
@@ -50,11 +50,11 @@ virtual				~TextGapBuffer();
 protected:
 		int32	fExtraCount;		// when realloc()-ing
 		int32	fItemCount;			// logical count
-		char	*fBuffer;			// allocated memory
+		char *	fBuffer;			// allocated memory
 		int32	fBufferCount;		// physical count
 		int32	fGapIndex;			// gap position
 		int32	fGapCount;			// gap count
-		char	*fScratchBuffer;	// for GetString
+		char *	fScratchBuffer;		// for GetString
 		int32	fScratchSize;		// scratch size
 		bool	fPasswordMode;
 };
@@ -68,9 +68,15 @@ TextGapBuffer::Length() const
 
 
 inline char
-TextGapBuffer::RealCharAt(long index) const
+TextGapBuffer::RealCharAt(int32 index) const
 {
-	return (index < fGapIndex) ? fBuffer[index] : fBuffer[index + fGapCount];
+	if (index < 0 || index >= fItemCount) {
+		if (index != fItemCount)
+			debugger("RealCharAt: invalid index supplied");
+		return 0;
+	}
+
+	return index < fGapIndex ? fBuffer[index] : fBuffer[index + fGapCount];
 }
 
 } // namespace BPrivate

@@ -129,21 +129,22 @@ TextGapBuffer::MoveGapTo(int32 toIndex)
 {
 	if (toIndex == fGapIndex)
 		return;
+	if (toIndex > fItemCount) {
+		debugger("MoveGapTo: invalid toIndex supplied");
+		return;
+	}
 
-	long gapEndIndex = fGapIndex + fGapCount;
-	long srcIndex = 0;
-	long dstIndex = 0;
-	long count = 0;
+	int32 srcIndex = 0;
+	int32 dstIndex = 0;
+	int32 count = 0;
 	if (toIndex > fGapIndex) {
-		long trailGapCount = fBufferCount - gapEndIndex;
-		srcIndex = toIndex + (gapEndIndex - toIndex);
-		dstIndex =  fGapIndex;
-		count = fGapCount + (toIndex - srcIndex);
-		count = (count > trailGapCount) ? trailGapCount : count;
+		srcIndex = fGapIndex + fGapCount;
+		dstIndex = fGapIndex;
+		count = toIndex - fGapIndex;
 	} else {
 		srcIndex = toIndex;
-		dstIndex = toIndex + (gapEndIndex - fGapIndex);
-		count = gapEndIndex - dstIndex;
+		dstIndex = toIndex + fGapCount;
+		count = fGapIndex- toIndex;
 	}
 
 	if (count > 0)
