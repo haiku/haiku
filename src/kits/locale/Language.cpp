@@ -142,8 +142,6 @@ BLanguage::GetName(BString* name)
 	
 	preferredLanguage.FindString("language", 0, &appLanguage);
 	
-	printf("lang : %s\n",appLanguage.String());
-	
 	UnicodeString s;
    	fICULocale->getDisplayName(Locale(appLanguage), s);
 	BStringByteSink converter(name);

@@ -91,18 +91,25 @@ BCountry::Code() const
 status_t
 BCountry::GetIcon(BBitmap* result)
 {
+	if (result == NULL)
+		return B_BAD_DATA;
 	// TODO: a proper way to locate the library being used ?
 	BResources storage("/boot/system/lib/liblocale.so");
 	if (storage.InitCheck() != B_OK)
    		return B_ERROR;
    	size_t size;
-   	const void* buffer = storage.LoadResource(B_VECTOR_ICON_TYPE, Code(),
-   		&size);
-   	if (buffer != NULL && size != 0) {
-		return BIconUtils::GetVectorIcon(static_cast<const uint8*>(buffer),
-			size, result);
-   	} else
-   		return B_BAD_DATA;
+   	const char* code = fICULocale->getCountry();
+	if (code != NULL) {
+		printf("this is %s drawing\n",code);
+   		const void* buffer = storage.LoadResource(B_VECTOR_ICON_TYPE, code,
+   			&size);
+   		if (buffer != NULL && size != 0) {
+   			puts("    icon found!");
+			return BIconUtils::GetVectorIcon(static_cast<const uint8*>(buffer),
+				size, result);
+   		}
+	}
+   	return B_BAD_DATA;
 }
 
 

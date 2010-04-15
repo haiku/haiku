@@ -1,6 +1,9 @@
 /*
- * Copyright 2010, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2006-2010, Haiku.
  * All rights reserved. Distributed under the terms of the MIT License.
+ * Authors:
+ *		Adrien Destugues <pulkomandy@gmail.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
 */
 
 
@@ -20,19 +23,18 @@ class LanguageListItem: public BStringItem {
 		LanguageListItem(const LanguageListItem& other)
 			:
 			BStringItem(other.Text()),
-			fLanguageCode(other.fLanguageCode)
+			fLanguageCode(other.fLanguageCode),
+			fIcon(other.fIcon)
 		{}
 
-		~LanguageListItem() {};
+		~LanguageListItem();
 
 		const inline BString LanguageCode() { return fLanguageCode; }
-		
-		//virtual void Update(BView *owner, const BFont *finfo);
-		virtual void DrawItem(BView *owner, BRect frame, bool complete = false);
+		void DrawItem(BView *owner, BRect frame, bool complete = false);
 
 	private:
 		const BString fLanguageCode;
-		BBitmap* icon;
+		BBitmap* fIcon;
 };
 
 

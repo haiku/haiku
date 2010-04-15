@@ -1,13 +1,19 @@
 /*
- * Copyright 2010, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2006-2010, Haiku.
  * All rights reserved. Distributed under the terms of the MIT License.
+ * Authors:
+ *		Adrien Destugues <pulkomandy@gmail.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
 */
-
 #include "LanguageListView.h"
 #include "Locale.h"
 
 #include <Bitmap.h>
 #include <Country.h>
+
+#include <stdio.h>
+
+#include <new>
 
 
 #define MAX_DRAG_HEIGHT		200.0
@@ -23,8 +29,17 @@ LanguageListItem::LanguageListItem(const char* text, const char* code)
 	// TODO: should probably keep the BCountry as a member of the class
 	BCountry myCountry(code);
 	BRect bounds(0, 0, 15, 15);
-	icon = new BBitmap(bounds, B_RGBA32);
-	myCountry.GetIcon(icon);
+	fIcon = new(std::nothrow) BBitmap(bounds, B_RGBA32);
+	if (fIcon && myCountry.GetIcon(fIcon) != B_OK) {
+		delete fIcon;
+		fIcon = NULL;
+	}
+}
+
+
+LanguageListItem::~LanguageListItem()
+{
+	delete fIcon;	
 }
 
 
@@ -56,9 +71,11 @@ LanguageListItem::DrawItem(BView *owner, BRect frame, bool complete)
 	BRect iconFrame(frame);
 	iconFrame.Set(iconFrame.left, iconFrame.top+1, iconFrame.left+15, iconFrame.top+16);
 
-	owner->SetDrawingMode(B_OP_OVER);
-	owner->DrawBitmap(icon, iconFrame);
-	owner->SetDrawingMode(B_OP_COPY);
+	if (fIcon && fIcon->IsValid()) {
+		owner->SetDrawingMode(B_OP_OVER);
+		owner->DrawBitmap(fIcon, iconFrame);
+		owner->SetDrawingMode(B_OP_COPY);
+	}
 
 	frame.left += 16 * (OutlineLevel() + 1);
 	owner->SetHighColor(kBlack);
