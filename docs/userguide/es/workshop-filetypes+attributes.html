@@ -38,12 +38,13 @@
 <li><a href="../ru/workshop-filetypes+attributes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../sv_SE/workshop-filetypes+attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/workshop-filetypes+attributes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/workshop-filetypes+attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="queries.html">Queries</a> 
-::  <a href="contents.html" class="uplink">Contenidos</a> 
-::  <a href="applications.html">Aplicaciones</a>  »
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
 </span></div>
 </div>
 
@@ -171,10 +172,10 @@ A eso añadimos unos poco atributos. Aquí tendremos que decidir si queremos con
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="indexing" name="indexing">Indexing</a></h2>
-<p>Before we start entering data in our little DVD database, we should add certain attributes to the <a href="index.html">Index</a>. Only indexed attributes can use Haiku's fast <a href="queries.html">Queries</a>.<br />
-So, what will we be searching in the future? We probably won't ask "What's in the B4 coordinate in my shelf?" or "Does the IMdB URL or the plot of the movie contain the word 'pope-shenooda'?".</p>
-<p>This leaves these attributes:</p>
+<a id="indexing" name="indexing">Indexado</a></h2>
+<p>Antes que empecemos a ingresar información en nuestra pequeña base de datos de DVD, deberíamos agregar ciertos atributos al <a href="index.html">índice</a>. Únicamente los atributos indexados pueden usar las <a href="queries.html">consultas</a> rápidas de Haiku.<br />
+Asi que, ¿qué estaremos buscando en el futuro? Probablemente no preguntemos "¿Qué está en la coordenada B4 en mi estante?" o "¿El URL de IMdB o la trama de la película contienen la palabra 'pope-shenooda'?"</p>
+<p>Lo anterior deja estos atributos:</p>
 <table summary="Attribute Type" cellpadding="10" border="1">
 <tr><th>Nombre interno</th><th>Tipo de atributo</th></tr>
 <tr><td>DVDdb:title</td><td>text</td></tr>
@@ -183,33 +184,33 @@ So, what will we be searching in the future? We probably won't ask "What's in th
 <tr><td>DVDdb:rating</td><td>int-32</td></tr>
 </table>
 
-<p>To index them, we open a Terminal and simply add one attribute after the other:</p>
+<p>Para indexarlos, abrimos una Terminal y simplemente agregamos un atributo después del otro:</p>
 <pre class="terminal">mkindex -t string DVDdb:title
 mkindex -t string DVDdb:genre
 mkindex -t string DVDdb:cast
 mkindex -t int DVDdb:rating</pre>
-<p>The <span class="cli">-t</span> option defines the type of attribute, which is "string" for all but the rating, which is an integer number.</p>
+<p>La opción <span class="cli">-t</span> define el tipo de atributo, el cual es "string" para todos excepto la calificación, que es un número entero.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filling-data" name="filling-data">Filling in the data</a></h2>
-<p>Now, everything's set and we can begin putting some data into our base.<br />
-Since our basic file is a cover image, we go to some online resource like IMdB, look for our first movie and save the cover or movie poster in a new folder where we want to keep our DVDdb files.</p>
-<p>Opening that folder we see a typical Tracker window with one JPEG in it. Right-clicking it, we change its filetype to <tt>application/DVDdb</tt> with the <span class="app">Filetype Addon</span>. There's more info on this in the <a href="filetypes.html">Filetypes</a> document.</p>
-<p>Now, we activate all our DVDdb attributes from the <span class="menu">Attributes</span> menu of the Tracker window and rearrange the columns to our taste:</p>
+<a id="filling-data" name="filling-data">Completar la información</a></h2>
+<p>Ahora, todo está listo y podemos comenzar a poner información en nuestra base.<br />
+ya que nuestro archivo básico es una imagen de portada, vamos a algún recurso en línea como IMdB, buscamos nuestra primera película y guardamos la portada o el afiche (poster) de la película en una carpeta nueva donde queramos mantener nuestros archivos DVDdb.</p>
+<p>Al abrir esa carpeta vemos una ventana típica de Tracker con un JPEG en ella. Al darle clic derecho, cambiamos su tipo de archivo a <tt>application/DVDdb</tt> con el agregado <span class="app">Filetype Addon</span>. Hay más información sobre esto en el documento <a href="filetypes.html">Tipos de archivo</a>.</p>
+<p>Enseguida, activamos todos nuestros atributos DVDdb desde el menú <span class="menu">Attributes</span> de la ventana de Tracker y reacomodamos las columnas a nuestro gusto:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
-<p>By clicking on a yet empty attribute (or pressing <span class="key">ALT</span> <span class="key">E</span>) we enter editing mode and fill each attribute. With <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span> you can navigate between attributes.</p>
-<p>In our example, we usually start with a downloaded JPG cover and change its type to applications/DVDdb. There's another elegant way to produce a file to work with. Just copy an empty file of our filetype to <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> and rename it to DVDdb.</p>
-<p>Right-clicking into a Tracker window, you'll find a new entry under <span class="menu">New...</span> besides the default "New folder".</p>
+<p>Dando clic en un atributo todavía vacío (o presionando <span class="key">ALT</span> <span class="key">E</span>) ingresamos al modo de edición y llenamos cada atributo. Con <span class="key">TAB</span> y <span class="key">MAYÚSUCULAS</span> <span class="key">TAB</span> se puede navegar entre atributos.</p>
+<p>En nuestro ejemplo, usualmente comenzamos con una portada JPEG descargada y cambiamos su tipo a applications/DVDdb. Hay otra manera elegante de producir un archivo para trabajarlo. Sólo copie un archivo vacío de nuestro tipo de archivo a <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> y renómbrelo a DVDdb.</p>
+<p>Dando clic derecho dentro de una ventana de Tracker, encontrará una nueva entrada debado de <span class="menu">New...</span> además de la predeterminada "New folder" (carpeta nueva).</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-db" name="query-db">Querying the database</a></h2>
-<p>Several hours of grunt work later, we have a nice little database that you can query to find all your Christina Ricci movies that have a 7+ rating...  :)</p>
-<p>You can assign a sensible attribute layout for query results of a specific filetype.<br />
-Open the folder containing your DVDdb files and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy Layout</span>.</p>
-<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder and rename it to <i>group/filetype</i>, replacing slashes with underscores; in our case "applications_DVDdb".</p>
-<p>Open the new folder and paste in the layout with <span class="menu">Attributes | Paste Layout</span>. Voilà:</p>
+<a id="query-db" name="query-db">Consultar la base de datos</a></h2>
+<p>Bastantes horas de trabajo a regañadientes después, tenemos una agradable pequeña base de datos que podemos consultar para encontrar todas las películas de Christina Ricci en nuestro poder que tengan calificación de 7+ :)</p>
+<p>Se puede asignar una vista de atributos sensible para los resultados de búsqueda de un tipo de archivos específico.<br />
+Para ello abra una carpeta con archivos DVDdb y reacomode los atributos como le gustaría que se presentaran los resultados de la consulta. Copie esta vista con el menú <span class="menu">Attributes | Copy Layout</span>.</p>
+<p>Abra <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, cree una nueva carpeta y cámbiele el nombre a <i>group/filetype</i>, remplazando las diagonales con guiones bajos: en nuestro caso "applications_DVDdb".</p>
+<p>Abra la carpeta nueva y pegue la vista con <span class="menu">Attributes | Paste Layout</span>. ¡Listo!:</p>
 <img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
 
 </div>
@@ -218,8 +219,8 @@ Open the folder containing your DVDdb files and arrange the attributes how you'd
 <div class="nav">
 <div class="inner"><span>
  «  <a href="queries.html">Queries</a> 
-::  <a href="contents.html" class="uplink">Contenidos</a> 
-::  <a href="applications.html">Aplicaciones</a>  »
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
 </span></div>
 </div>
 

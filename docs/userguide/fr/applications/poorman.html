@@ -35,6 +35,7 @@
 <li><a href="../../es/applications/poorman.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../sv_SE/applications/poorman.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/applications/poorman.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/poorman.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../en/applications/poorman.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,18 +55,27 @@
 <tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/PoorMan Settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>PoorMan is a nice little webserver that's extremly easy to set up. Naturally it doesn't offer any advanced features like other heavy duty server software, it's after all only a poor man's webserver.</p>
-<p>Upon its first launch, PoorMan asks for the folder that is about to be served to the web. If you go with the <span class="button">Default</span>, a new folder <span class="path">/boot/home/public_html</span> is created for you. As a start page a HTML file named by default <span class="cli">index.html</span> has to be present there.</p>
-<p>PoorMan presents itself with a simple console that logs its activity. Then, there's status information if the server is running, which folder is being served, and a hit counter. Settings are changed with <span class="menu">Edit | Settings...</span>:
+<p>Poorman est un sympatique petit serveur web, extrêmement facile à configurer. Bien entendu, il ne propose pas des fonctionnalités avancées des autres poids lourds que sont les logiciels pour serveurs, mais ce n'est après tout qu'un serveur du pauvre.</p>
+<p>Lors de son premier lancement, Poorman 
+vous demande le dossier à publier sur le Web.
+Si vous démarrer avec <span class="button">Default</span>, un nouveau dossier <span class="path">/boot/home/public_html</span> est créé pour vous. À l'intérieur, un fichier nommé par défaut <span class="cli">index.html</span>
+devra être présent pour servir de 
+page d'accueil.</p>
+<p>PoorMan se présente sous la forme d'une simple console qui trace son activité.
+Vous trouverez aussi les informations sur l'état de fonctionnement du serveur, le dossier publié et le compteur de pages servies.
+Les réglages sont accessibles via <span class="menu">Edit | Settings...</span> :
 </p>
 <p><img id="poorman" src="../images/apps-images/poorman.png" alt="poorman.png" /></p>
 <p>Le panneau de réglages est divisé en trois onglets :</p>
-<p>In <span class="menu">Site</span> you can select another folder to serve, enter another start page and have the option to send a file listing if the start page isn't present.<br />
-<span class="menu">Logging</span> lets you de/activate logging to the console or optionally to a separate logfile.<br />
-The <span class="menu">Advanced</span> tab holds the setting for the maximum simultaneous connections.</p>
-<p>The menu items of the console window are all self-explanatory. With them you can e.g. save (parts) of the console output, clear the console or logging file and start/stop the server or clear the hit counter.</p>
+<p>dans <span class="menu">Site</span>, vous pouvez sélectionner un autre dossier à publier, choisir une page d'accueil, ainsi que la possibilité 
+de renvoyer une liste de fichiers si la page demandée n'est pas présente.<br />
+<span class="menu">Logging</span> vous permet d'exploiter le journal du serveur vers la console ou eventuellement un fichier distinct.<br />
+L'onglet <span class="menu">Advanced</span> contient le paramétrage du nombre maximum de connexions simultanées.</p>
+<p>Les éléments du menu de la fenêtre de la console parlent d'eux-mêmes. Avec eux, vous pouvez par exemple sauvegarder les  messages de la console (ou une partie), 
+nettoyer la console ou les fichiers de traces, arrêter/démarrer le serveur ou réinitialiser le compteur des connexions.</p>
 
-<div class="box-info">If you want to try out if PoorMan's working, choose <span class="path">/boot/apps/BePDF/docs/</span> as folder and <span class="cli">index.html</span> as start page. Then point your browser to the URL 127.0.0.1, which is your local host.</div>
+<div class="box-info">Si vous voulez expérimenter le fonctionnement de PoorMan, Choisissez 
+le dossier <span class="path">/boot/apps/BePDF/docs/</span> et la page d'accueil <span class="cli">index.html</span>. Ensuite, l'aide de votre navigateur, accédez à l'URL http://127.0.0.1 (votre hôte local).</div>
 
 </div>
 </div>

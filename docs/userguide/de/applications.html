@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Humdinger
+ *		Finest Bug
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -36,11 +37,12 @@
 <li><a href="../es/applications.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/applications.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/applications.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/applications.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/applications.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
-::  <a href="contents.html" class="uplink">Inhalt</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="desktop-applets.html">Desktop Applets</a>  »
 </span></div>
 </div>
@@ -52,19 +54,19 @@
 
 <p>Vor der Beschreibung der von Haiku mitgelieferten Anwendungen, eine Erklärung wie man Programme installiert und deinstalliert, die man sich z. B. von Webseiten heruntergeladen hat, die auf der <a href="../../welcome/welcome_de.html#software">Willkommen</a> Seite gelistet sind.
 </p>
-<div class="box-info">Archive sollten immer unter Haiku entpackt/installiert werden. Packt man sie nämlich zum Beispiel unter Linux oder Windows aus und kopiert später einfach nur den Ordern rüber zu Haiku, fehlen wichtige Attribute. Diese werden von den anderen Betriebssystemen nämlich in der Regel ignoriert.</div>
+<div class="box-info">Archive sollten immer unter Haiku entpackt/installiert werden. Packt man sie zum Beispiel unter Linux oder Windows aus, und kopiert später einfach nur den Ordner nach Haiku, gehen wichtige Attribute verloren. Diese werden von anderen Betriebssystemen in der Regel ignoriert.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="install" name="install">Anwendungen installieren</a></h2>
 <p>Haiku Software kommt immer als Archiv. Meist ist es ein ZIP, einige alte BeOS Pakete kommen auch mal in Software Valet's PKG Format. Software Valet konnte automatisch Installationsskripte ausführen, so dass man nach dem Doppelklicken nur noch einen Zielordner angeben musste und alles weitere von selbst ging.<br />
-Handelt es sich um ein ZIP Archiv, öffnet ein Doppelklick den <span class="app">Expander</span> wo man ebenfalls den Zielordner angeben kann und es anschließend entpackt. Wie im Kapitel <a href="filesystem-layout.html">Dateisystem Layout</a> beschrieben, ist das Ziel entweder</p>
+Handelt es sich um ein ZIP Archiv, öffnet ein Doppelklick den <span class="app">Expander</span> wo man ebenfalls den Zielordner angeben kann und es anschließend entpackt. Wie im Kapitel <a href="filesystem-layout.html">Dateisystem Layout</a> beschrieben, ist das Ziel entweder:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>für Anwendungen auf die alle Benutzer Zugriff haben sollen</td></tr>
 <tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>für Anwendungen auf die man nur selbst Zugriff haben soll</td></tr>
 </table>
-<p>Diese Unterscheidung wird natürlich erst relevant wenn Haiku mehrere Benutzer unterstützt.</p>
-<p>Ist das Archiv entpackt, sollte man mal in das neue Verzeichnis schauen. Oft enthält es ReadMe Dateien oder andere interessante Informationen.</p>
+<p>Dieser Unterschied wird natürlich erst relevant, sobald Haiku ein Mehrbenutzersystem geworden ist.</p>
+<p>Ist das Archiv entpackt, sollte man einen Blick in das neue Verzeichnis werfen. Oft enthält es ReadMe Dateien oder andere interessante Informationen.</p>
 <p>Einige Programme benötigen noch weitere Konfiguration. So müssen z.B. <a href="tracker-add-ons.html">Tracker Add-Ons</a>, <a href="preferences/datatranslations.html">Translatoren</a> und andere Erweiterungen in besonderen Ordnern abgelegt werden. Oft findet man dazu ein kleines Skript (meistens mit der Endung <span class="cli">.sh</span>) wie <span class="cli">install</span>, das nach einem Doppelklick alles nötige erledigt.<br />
 Manchmal findet man auch Ordner, die mit dem entsprechenden Zielort verlinkt sind und z.B."<span class="cli">drag [filename] here...</span>" heißen. Man folgt also einfach dieser Anweisung, macht also ein Drag&amp;Drop der entsprechenden Datei auf den Ordner und verschiebt sie so.</p>
 <p>Meistens ist sowas aber nicht nötig und es bleibt beim einfachen Entpacken.<br />
@@ -160,7 +162,7 @@ Andernfalls löscht man einfach den Ordner der Anwendung.</p>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
-::  <a href="contents.html" class="uplink">Inhalt</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="desktop-applets.html">Desktop Applets</a>  »
 </span></div>
 </div>

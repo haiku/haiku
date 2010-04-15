@@ -35,12 +35,13 @@
 <li><a href="../es/filetypes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/filetypes.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/filetypes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/filetypes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/filetypes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="deskbar.html">Deskbar</a> 
-::  <a href="contents.html" class="uplink">Sommaire</a> 
-::  <a href="attributes.html">Attributs</a>  »
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="attributes.html">Attributes</a>  »
 </span></div>
 </div>
 
@@ -56,7 +57,7 @@ Haiku utilise un type <acronym title="Multipurpose Internet Mail Extensions">MIM
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="specific-file" name="specific-file">Définir le type d'un fichier</a></h2>
-<p>You can change the type of a specific file, its icon and the associated application. Select the file and invoke the <span class="menu">Add-Ons | Filetype add-on</span> from the right-click context menu.</p>
+<p>Vous pouvez changer le type d'un fichier spécifique, son icône et l'application associée. Sélectionnez le fichier et invoquez le menu contextuel <span class="menu">Add-Ons | filetype add-on</span> à l'aide d'un clic droit.</p>
 <img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
 
 <h3>
@@ -72,7 +73,11 @@ la chaîne MIME correcte à la main, ou en utilisant l'un des deux boutons sous 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preferred-app" name="preferred-app">L'application préférée</a></h3>
-<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked. You could, for example, change a HTML file's preferred application from the browser to a text editor while you're working on it. Every other HTML file still opens in the browser, only this particular one starts in your text editor.</p>
+<p>Cette liste déroulante affiche toutes les applications qui peuvent gérer ce type de fichier.
+De là, vous pouvez choisir le programme qui doit ouvrir ce fichiers quand on double-clique dessus.
+Vous pouvez, par exemple, changer l'application préférée d'un fichier HTML pour remplacer le navigateur par un éditeur de texte pendant que vous travaillez dessus. 
+Seul ce fichier s'ouvrira dans votre éditeur de texte.
+Tout les autres fichier HTML continueront à s'ouvrir dans le navigateur.</p>
 
 <p>The <span class="menu">Default Application</span> is the one that's set globally for that filetype. If you don't find the program you want to associate with this file in the pop-up menu, you'll again find the buttons <span class="button">Select...</span> and <span class="button">Same As...</span> which do the similar thing described under "The File Type" above.</p>
 
@@ -84,9 +89,9 @@ la chaîne MIME correcte à la main, ou en utilisant l'un des deux boutons sous 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings-apps" name="settings-apps">Paramètres spécifiques aux applications</a></h2>
-<p>If you invoke the <span class="app">Filetype Add-On</span> on an executable (here: <span class="app">StyledEdit</span>), you'll get a different dialog:</p>
+<p>Si vous appelez l'extension <span class="app">Filetype Add-On</span> sur un fichier exécutable (ici : <span class="app">StyledEdit</span>), vous obtiendrez une boîte de dialogue différentes :</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
-<p>En haut, plutôt qu'une chaîne MIME normalisée, vous verrez la signature unique de l'application. Elle permettra au système de trouver où se trouve le programme.</p>
+<p>En haut, plutôt qu'une chaîne MIME normalisée, vous verrez la signature unique de l'application. Elle permettra au système de retrouver l'endroit où le programme est installé.</p>
 <p>En dessous, vous trouverez plusieurs drapeaux qui contrôlent le comportement des applications :</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Single Launch</span></td><td> </td><td>Une seule instance de l'application peut être exécutée par fichier exécutable. 
@@ -96,7 +101,8 @@ Néanmoins, si vous avez deux copies de cette application, elles peuvent fonctio
 <tr><td><span class="menu">Args Only</span></td><td> </td><td>Indique que l'application ne répond pas aux messages.</td></tr>
 <tr><td><span class="menu">Background App</span></td><td> </td><td>L'application n'apparaitra pas dans <a href="twitcher.html">Twitcher</a> ou dans la liste des applications en cours de la Deskbar.</td></tr>
 </table>
-<p>Then there's the list of supported filetypes. You can add (and remove) filetypes if you think the application can handle them. As a consequence, the app will appear in the menu for preferred applications or Tracker's <span class="menu">Open with...</span> context menu when you right-click on a file of that type.</p>
+<p>Puis vous trouvez la liste des types de fichiers pris en charge. Vous pouvez ajouter (et supprimer) des types de fichier si vous pensez que l'application peut les manipuler.
+En conséquence, l'application apparaîtra dans le menu pour les applications privilégiées, ou dans le menu contextuel <span class="menu">Open with...</span> du Tracker quand vous faites un clic-droit sur un fichier de ce type.</p>
 <p>Au bas, vous trouverez la version et le copyright. Comme la signature de l'application, ils sont remplis par l'auteur de l'Application et ne devraient pas être modifiés.</p>
 
 <h2>
@@ -112,8 +118,8 @@ Néanmoins, si vous avez deux copies de cette application, elles peuvent fonctio
 <div class="nav">
 <div class="inner"><span>
  «  <a href="deskbar.html">Deskbar</a> 
-::  <a href="contents.html" class="uplink">Sommaire</a> 
-::  <a href="attributes.html">Attributs</a>  »
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="attributes.html">Attributes</a>  »
 </span></div>
 </div>
 

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Калькулятор (DeskCalc)</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/uk.png" alt="" /> Українська</li>
+<li><a href="../../fr/applications/deskcalc.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/deskcalc.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/deskcalc.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/deskcalc.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/deskcalc.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/deskcalc.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/deskcalc.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/deskcalc.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="codycam.html">CodyCam</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
+::  <a href="diskprobe.html">DiskProbe</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/deskcalc-icon_64.png" alt="deskcalc-icon_64.png" width="64" height="64" />Калькулятор (DeskCalc)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Додатки(Applications)</span></td></tr>
+<tr><td>Розташування в Tracker:</td><td></td><td><span class="path">/boot/system/apps/DeskCalc</span></td></tr>
+<tr><td>Настройки розташовані за адресою:</td><td></td><td><span class="path">~/config/settings/DeskCalc_settings</span></td></tr>
+</table>
+<p><br /></p>
+<p>DeskCalc - простий калькулятор, що не позбавлений деяких корисних функцій, як може видатися спочатку.</p>
+<img src="../../images/apps-images/deskcalc.png" alt="deskcalc.png" />
+<ul>
+<li><p>DeskCalc розуміє значно більше команд ніж дозволяє його скромна клавіатура.<br />
+Окрім операторів <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>, <tt>%</tt>, <tt>^</tt> і констант <tt>pi</tt> and <tt>e</tt> він підтримує наступнв функції:<br />
+<tt>acos</tt>, <tt>asin</tt>, <tt>atan</tt>, <tt>atan2</tt>, <tt>ceil</tt>, <tt>cos</tt>, <tt>cosh</tt>, <tt>exp</tt>, <tt>floor</tt>, <tt>log</tt>, <tt>log10</tt>, <tt>pow</tt>, <tt>sin</tt>, <tt>sinh</tt>, <tt>sqrt</tt>, <tt>tan</tt>, <tt>tanh</tt>.</p></li>
+<li><p>DeskCalc дуже толерантний до дій користувача:<br />
+<tt>/</tt>, <tt>:</tt>, <tt>\</tt> - інтерпритуються як оператори ділення,<br />
+<tt>*</tt>, <tt>x</tt> - символи множення.<br />
+Одначе слід пам'ятати, що <tt>.</tt> і <tt>,</tt> рахуються знаками позначення дробової частини і використовувати їх для позначення розрядів не можна .</p></li>
+<li><p>Меню по правому кліку робить доступними наступні опції:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="menu">Включити режим Num Lock при старті (Enable Num Lock on start up)</span></td><td style="width:15px;"></td><td>автоматично активує цифровий блок при пуску DeskCalc</td></tr>
+<tr><td><span class="menu">Відобразити Клавіатуру (Show Keypad)</span></td><td></td><td>налаштовує відображення клавіатури</td></tr>
+</table></li>
+<li><p>Ви можете змінити розмір калькулятора до потрібного і розташувати його у вигляді репліканта <a href="../gui.html#replicants">Replicant</a> якщо перетягнути за символ у правому нижньому кутку. Але слід впевнитись, що настройка <span class="menu">Показувати репліканти (Show Replicants)</span> активована для Deskbar'у.</p></li>
+<li><p>Клавіатуру можна розмалювати способом перетягування кольорів  з будь-якої програми, що має палітру, наприклад, з <span class="app">Icon-O-Matic</span>.</p></li>
+<li><p>Ви можете пролистати історію своїх обчислень рухаючись <span class="key">↑</span> і <span class="key">↓</span>.</p></li>
+<li><p>Ви можете перемістити вміст DeskCalс у будь-який додаток. Або закинути у вікно Tracker'a або робочого столу і текстовий файл з буфера створиться там.</p>
+<p>А  ще краще, що можлива зворотня дія :<br />
+Створення фрагментів, які описують різні стадії ваших обчислень і переміщення їх у вікно DeskCalc.<br />
+Або переміщення варіантів з листа просто у DeskCalc.</p></li>
+<li><p>DeskCalc можна запустити із терміналу Terminal. Просто візьміть стрічку з діями у подвійні лапки як тут:</p>
+<pre class="terminal">~&gt; DeskCalc "sin(45)*(cos(12)+3.45)"
+3.6536554673202546181795194727005826674359494735820338441084848</pre></li>
+</ul>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="codycam.html">CodyCam</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
+::  <a href="diskprobe.html">DiskProbe</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		miguel~1.mx
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Shortcuts and key combinations</title>
+	<title>Atajos y combinaciones de teclado</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -33,11 +35,12 @@
 <li><a href="../ru/keyboard-shortcuts.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../sv_SE/keyboard-shortcuts.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/keyboard-shortcuts.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/keyboard-shortcuts.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/keyboard-shortcuts.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
-::  <a href="contents.html" class="uplink">Contenidos</a> 
+ «  <a href="tracker-add-ons.html">Agregados de Tracker</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="deskbar.html">Deskbar (Barra de Escritorio)</a>  »
 </span></div>
 </div>
@@ -45,85 +48,84 @@
 <div id="content">
 <div>
 
-<h1>Shortcuts and key combinations</h1>
+<h1>Atajos y combinaciones de teclado</h1>
 
-<p>By default, Haiku's shortcut key, to invoke commands from menus for example, is not the usual <span class="key">CTRL</span> key, but <span class="key">ALT</span> instead. This has historical reasons, because the BeOS was inspired somewhat by MacOS. After you get used to it, it actually has advantages as e.g. <span class="key">ALT</span> <span class="key">C</span> and <span class="key">ALT</span> <span class="key">V</span> integrate seamlessly into the <acronym title="Bourne Again Shell">bash</acronym> shell of the Terminal, where <span class="key">CTRL</span> <span class="key">C</span> quits the running process.</p>
-<p>In any case, you can switch to the maybe more familiar <span class="key">CTRL</span> key in the <a href="preferences/keymap.html">Keymap</a> preferences. The user guide will always describes the default configuration with the command key being <span class="key">ALT</span>.</p>
-<p>If you're in doubt which keys are the <span class="key">OPT</span> or <span class="key">MENU</span> keys on your particular keymap/keyboard-layout, again use the <a href="preferences/keymap.html">Keymap</a> preferences. There you can see what keystroke is sent when you press a key on your keyboard.</p>
+<p>Predeterminadamente, la tecla de atajo de Haiku para invocar comandos desde los menús, no es la usual <span class="key">CTRL</span> sino <span class="key">ALT</span>. Esto tiene razones históricas, debido a que BeOS se inspiró de alguna manera por MacOS. Después que se acostumbre, realmente tiene ventajas, p. ej., <span class="key">ALT</span> <span class="key">C</span> y <span class="key">ALT</span> <span class="key">V</span> se integran directamente dentro de la Terminal de shell <acronym title="Bourne Again Shell">Bash</acronym>, mientras que <span class="key">CTRL</span> <span class="key">C</span> cierra el proceso que esté corriendo.</p>
+<p>De cualquier modo, puede cambiar a la tal vez más familiar tecla <span class="key">CTRL</span> en las preferencias de <a href="preferences/keymap.html">Distribución de teclado</a>. La guía de usuario siempre describirá la configuración predeterminada con la tecla <span class="key">ALT</span> como tecla de comando.</p>
+<p>Si hubiera duda sobre cuáles teclas son <span class="key">OPT</span> o <span class="key">MENU</span> en el teclado que esté usando, abra de nuevo el diálogo de preferencias <a href="preferences/keymap.html">Distribución de teclado</a> preferences. Allí se puede ver qué pulso de tecla se envía cuando se presiona alguna tecla del teclado.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="general" name="general">General shortcuts</a></h2>
-<p>Here's a table of many of the most commonly used shortcuts that are always available, even if there isn't a corresponding menu:</p>
+<a id="general" name="general">Atajos de teclado generales</a></h2>
+<p>Aquí hay una tabla de muchos de los atajos más comúnmente usados que están siempre disponibles, incluso si no haya un menú correspondiente:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>Switches to <a href="workspaces.html">Workspace</a> X (<span class="key">Fx</span> is the function key corresponding to that workspace). Take the active window with you by adding <span class="key">SHIFT</span></td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span>/<span class="key">→</span>/<span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Navigates spatially the rows/columns of the available workspaces. Add <span class="key">SHIFT</span> to take the active window with you.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>Hold down to bring up the <a href="twitcher.html">Twitcher</a>.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td>Opens the <a href="teammonitor.html">Team Monitor</a>.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>Enters the menu bar (leave with <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>Copies the selection to the  clipboard.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">X</span></td><td></td><td>Cuts the selection to the clipboard.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">V</span></td><td></td><td>Pastes the clipboard's contents.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>Closes the active window.</td></tr><tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Zooms a window to an alternative size (maximum size for most applications).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>Minimizes the active window.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Hides (minimizes) all windows of the active application.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Pulls the active window to the front (only applicable with the mouse setting <a href="preferences/mouse.html">Focus Follows Mouse</a>).</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Sends the active window to the back. </td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">Q</span></td><td></td><td>Quits an application.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>Intercambia al <a href="workspaces.html">Espacio de trabajo</a> X (donde <span class="key">Fx</span> es la tecla de función correspondiente a ese espacio de trabajo). Lleve la ventana activa con usted agregando la tecla <span class="key">MAYÚSCULAS</span></td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span>/<span class="key">→</span>/<span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Navega espacialmente entre filas y columnas de los espacios de trabajo disponibles. Agregue <span class="key">MAYÚSCULAS</span> para llevar la ventana activa con usted.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>Mantener presionado para traer a <a href="twitcher.html">Twitcher</a>.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td>Abre el <a href="teammonitor.html">Monitor de actividad</a>.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>Ingresa la barra de menú (se sale con <span class="key">ESC</span>).</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>Copia la selección al portapapeles.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">X</span></td><td></td><td>Corta la selección al portapapeles.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">V</span></td><td></td><td>Pega el contenido del portapapeles.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>Cierra la ventana activa.</td></tr><tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Ajusta una ventana a un tamaño alternativo (tamaño máximo para la mayoría de las aplicaciones).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>Minimiza la ventana activa.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Oculta (minimiza) todas las ventanas de la aplicación activa.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Jala la ventana activa al frente (sólo aplica cuando está activa la preferencia del ratón <a href="preferences/mouse.html">El foco sigue al ratón</a>).</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Envía la ventana activa al fondo.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Q</span></td><td></td><td>Cierra una aplicación.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tracker-navigation" name="tracker-navigation">Shortcuts for Tracker navigation</a></h2>
-<p>Additionally to the general shortcuts, here are some more for navigating with Tracker:</p>
+<a id="tracker-navigation" name="tracker-navigation">Atajos de navegación de Tracker</a></h2>
+<p>Adicionalmente a los atajos generales, aquí hay algunos más para navegar con Tracker:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:15px;"></td><td>Opens the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> o <span class="key">ENTER</span></td><td></td><td>Opens the selected folder.</td></tr>
-<tr><td><span class="key">OPT</span></td><td></td><td>Holding it while opening a folder will automatically close the parent folder. This also works when navigating with the mouse.</td></tr>
-<tr><td><span class="key">MENU</span></td><td></td><td>Opens the Deskbar menu (leave with <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Undo last action. The undo history is only limited by the available memory. Note, this only works for actions on the file itself, changed attributes and permission settings can't be undone with this. Also, once a file is removed from <i>Trash</i> it's gone for good.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">Z</span></td><td></td><td>Redo the action you just reverted with <span class="key">ALT</span> <span class="key">Z</span>.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:15px;"></td><td>Abre la carpeta padre.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> o <span class="key">ENTER</span></td><td></td><td>Abre la carpeta seleccionada.</td></tr>
+<tr><td><span class="key">OPT</span></td><td></td><td>Manteniéndolo mientras se abre una carpeta automáticamente se cerrará el folder padre. Esto también funciona cuando se navegue con el ratón.</td></tr>
+<tr><td><span class="key">MENU</span></td><td></td><td>Abre el menú de la barra de escritorio Deskbar (se sale de ella con <span class="key">ESC</span>).</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Deshacer la última acción. La historia de deshacer se limita sólo por la memoria disponible. Nótese, esto sólo funciona para acciones en el propio archivo, los cambios de atributos y selecciones de permiso no pueden deshacerse con esto. También, una vez que un archivo se removió de la <i>Basura</i> se fue para siempre.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">MAYÚSCULAS</span> <span class="key">Z</span></td><td></td><td>Rehacer la acción que se acaba de revertir con <span class="key">ALT</span> <span class="key">Z</span>.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="terminal" name="terminal">Shortcuts in Terminal</a></h2>
+<a id="terminal" name="terminal">Atajos en la Terminal</a></h2>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td style="width:15px;"></td><td>Opens another Terminal session in a new window.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td></td><td>Opens another Terminal session in a new tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">1</span>, <span class="key">2</span>, <span class="key">3</span>...</td><td></td><td>Switches to the corresponding tab.</td></tr>
-<tr><td><span class="key">SHIFT</span> <span class="key">←</span>/<span class="key">→</span></td><td></td><td>Switches to the previous/next tab.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">TAB</span></td><td></td><td>Switch to the next Terminal window.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">+</span>, <span class="key">-</span></td><td></td><td>Increase/Decrease font size.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Enter/leave fullscreen mode.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Scrolls the Terminal output up/down one line.</td></tr>
-<tr><td class="onelinetop"><span class="key"> SHIFT</span> <span class="key">PageUP</span>/<span class="key">PageDOWN</span></td><td></td><td> Scrolls the Terminal output up/down one page.</td></tr>
-<tr><td><span class="key">TAB</span></td><td></td><td>Tab-completion. After entering a few letters, press <span class="key">TAB</span> once to auto-complete a filename or path. If there is more than one match, it stops where the name starts to differ and you have to provide some more letters to further distinguish them. You can also press <span class="key">TAB</span> twice to have all matches listed.</td></tr>
-<tr><td><span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Moves up or down in a history of all previously entered commands.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Bash history. All the commands you enter
-are stored in the file <span class="path">~/.bash_history</span>. Press <span class="key">CTRL</span> <span class="key">R</span> and start to enter a command and you'll be provided with the first match from the bash history. Keep pressing <span class="key">CTRL</span> <span class="key">R</span> until you find the right command line and press <span class="key">ENTER</span> to execute it.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">C</span></td><td></td><td>Stops the currently running command.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">D</span></td><td></td><td>Closes the current Terminal session.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td style="width:15px;"></td><td>Abre otra sesión de Terminal en una ventana nueva.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td></td><td>Abre otra sesión de Terminal en una pestaña nueva.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">1</span>, <span class="key">2</span>, <span class="key">3</span>...</td><td></td><td>Intercambia a la pestaña correspondiente.</td></tr>
+<tr><td><span class="key">MAYÚSCULAS</span> <span class="key">←</span>/<span class="key">→</span></td><td></td><td>Intercambia a la pestaña previa/siguiente.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">TAB</span></td><td></td><td>Intercambia a la siguiente ventana de Terminal.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">+</span>, <span class="key">-</span></td><td></td><td>Incrementa/Decrementa el tamaño de letra.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Entra y sale del modo a pantalla completa.</td></tr>
+<tr><td class="onelinetop"><span class="key">MAYÚSCULAS</span> <span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Desplaza la salida de la Terminal hacia arriba/abajo una línea.</td></tr>
+<tr><td class="onelinetop"><span class="key">MAYÚSCULAS</span> <span class="key">AvPag</span>/<span class="key">RePag</span></td><td></td><td>Desplaza la salida de Terminal hacia arriba/abajo una página.</td></tr>
+<tr><td><span class="key">TAB</span></td><td></td><td>Completado de línea de comandos. Tras ingresar algunas letras, presione <span class="key">TAB</span> una vez para autocompletar un nombre de archivo o ruta. Si hay más de una concordancia, se detiene donde el nombre comienza a diferenciarse y deben proporcionarse algunas letras más para distinguirlas más. También se puede presionar <span class="key">TAB</span> dos veces para tener un listado de todas las concordancias.</td></tr>
+<tr><td><span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Se mueve hacia arriba o abajo en la historia de todos los comandos ingresados previamente.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Historial de Bash. Todos los comandos que se ingresen se almacenan en el archivo <span class="path">~/.bash_history</span>. Presione <span class="key">CTRL</span> <span class="key">R</span> y al comenzar a ingresar un comando y se le proporcionará la primer concordancia del historial de Bash. Siga presionando <span class="key">CTRL</span> <span class="key">R</span> hasta que encuentre la línea de comando justa y presione <span class="key">ENTER</span> para ejecutarla.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">C</span></td><td></td><td>Detiene el comando corriendo actualmente.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">D</span></td><td></td><td>Cierra la sesión actual de Terminal.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="other-combos" name="other-combos">Other key combinations</a></h2>
-<p>You can add or remove items to/from a selection by holding down a modifier key while clicking on a entry (or file in case of Tracker).</p>
+<a id="other-combos" name="other-combos">Otras combinaciones de teclas</a></h2>
+<p>Se pueden agregar o remover ítems de/a alguna selección sosteniendo una tecla modificadora mientras se dé clic en alguna entrada (o archivo en el caso de Tracker).</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">SHIFT</span></td><td style="width:15px;"></td><td>This will select everything between the first selected item and the one you click on.</td></tr>
-<tr><td><span class="key">ALT</span></td><td></td><td>Adds or removes the item you're clicking on from the selection.</td></tr>
+<tr><td><span class="key">MAYÚSCULAS</span></td><td style="width:15px;"></td><td>Seleccionará todo entre el primer item señalado y al que se le dé clic después.</td></tr>
+<tr><td><span class="key">ALT</span></td><td></td><td>Agrega o remueve el elemento sobre el que se haga clic en la selección.</td></tr>
 </table>
-<p>In a Tracker window, if you just start typing, Tracker scrolls to and selects the file that best fits your incremental search. If there's no file starting with your typed letters, files that contain the search string anywhere in their name or other displayed attributes are selected. This search is <i>not</i> case-sensitive.<br />
-The letters you type appear at the bottom-left, where normally the number of items is listed. After a second it reverts back and you could start a new incremental search.</p>
+<p>En una ventana nueva, apenas y comience a escribir, Tracker se desplaza y selecciona el archivo que mejor se ajusta la búsqueda incremental. Si no hubiera archivo comenzando con las letras que se apunten, los archivos que contengan la cadena de búsqueda en cualquier parte en su nombre u otro atributo desplegado se seleccionan. Esta búsqueda <i>no</i> distingue entre mayúsculas y minúsculas.<br />
+Las letras que escribió aparecen en la parte inferior izquierda, donde normalmente el número de lista de elementos. Después de un segundo se revierte y se puede iniciar una nueva búsqueda intelectual.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
-::  <a href="contents.html" class="uplink">Contenidos</a> 
+ «  <a href="tracker-add-ons.html">Agregados de Tracker</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="deskbar.html">Deskbar (Barra de Escritorio)</a>  »
 </span></div>
 </div>

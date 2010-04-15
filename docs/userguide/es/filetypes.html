@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Oscar Carballal
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Filetypes</title>
+	<title>Tipos de archivo</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -33,22 +35,23 @@
 <li><a href="../ru/filetypes.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../sv_SE/filetypes.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/filetypes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/filetypes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/filetypes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="deskbar.html">Deskbar (Barra de Escritorio)</a> 
-::  <a href="contents.html" class="uplink">Contenidos</a> 
-::  <a href="attributes.html">Atributos</a>  »
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="attributes.html">Attributes</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
 
-<h1>Filetypes</h1>
+<h1>Tipos de archivo</h1>
 
-<p>Other than Windows, Haiku doesn't rely on the 3-letter file extension for a file type (e.g. .txt, .jpg, .mp3). This method is only a last resort fallback. Haiku uses <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> types just like it's custom on the internet.</p>
-<div class="box-info">While there's no reason to use file extensions in Haiku, remember to add them to files you want to share with users of other operating systems, e.g. over email, uploading to a server or via exchange of an USB drive. Otherwise their system may not recognize the file type.</div>
+<p>Al contrario que Windows, Haiku no depende de la extensión de tres letras al final del archivo para definir un tipo de archivo (e.j.: .txt, .jpg, .mp3). Este método es el último recurso de todos. Haiku utiliza tipos <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> como es costumbre en Internet.</p>
+<div class="box-info">Debido a que no hay razón para utilizar extensiones de archivo en Haiku, deberá recordar ponerlas cuando quiera compartir archivos con usuarios de otros sistemas operativos a través de, por ejemplo, correo electrónico, subiendo el archivo a un servidor o intercambiándolo en una unidad USB. De lo contrario, puede que el sistema no reconozca el tipo de archivo.</div>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="specific-file" name="specific-file">Setting the filetype of a specific file</a></h2>
@@ -57,28 +60,28 @@
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="filetype" id="filetype">The File Type</a></h3>
-<p>The above is a PNG file, it's MIME string image/png. Let's say you definitely know that it's not a PNG but a GIF. You can change that either by entering the correct MIME string by hand or with one of the two buttons below the textbox:</p>
+<a name="filetype" id="filetype">El tipo de archivo</a></h3>
+<p>La imagen mostrada arriba es un archivo PNG y su cadena MIME es image/png. Digamos que sabe que no es un PNG, sino un GIF. Puede cambiarlo escribiendo ls cadena MIME correcta a mano, o bien mediante alguno de los dos botones debajo del cuadro de texto.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Select... (Seleccionar)</span></td><td> </td><td>shows a hierarchical list of filetypes where you navigate to <tt>image | GIF Image</tt>.</td></tr>
-<tr><td><span class="button">Same as... (Mismo que)</span></td><td> </td><td>opens a file dialog where you choose any file that already has the filetype you're looking for.</td></tr>
+<tr><td><span class="button">Select... (Seleccionar)</span></td><td> </td><td>muestra una lista jerárquica donde puede navegar hasta <tt>image | GIF Image</tt>.</td></tr>
+<tr><td><span class="button">Same as... (Mismo que)</span></td><td> </td><td>abre un diálogo de archivo donde puede elegir cualquier archivo que ya contenga el tipo que está buscando.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preferred-app" name="preferred-app">The Preferred Application</a></h3>
-<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked. You could, for example, change a HTML file's preferred application from the browser to a text editor while you're working on it. Every other HTML file still opens in the browser, only this particular one starts in your text editor.</p>
+<a id="preferred-app" name="preferred-app">La aplicación preferida</a></h3>
+<p>Este menú desplegable muestra una lista de todas las aplicaciones que pueden manejar este tipo de archivo en particular. Aquí se puede seleccionar que aplicación debe abrir el archivo al hacer doble clic sobre él. Se puede, por ejemplo, cambiar la aplicación preferida para abrir HTML de un navegador a un editor de texto mientras se está trabajando en él. Todos los demás ficheros HTML se abrirán todavía con el navegador, sólo este se abrirá en el editor de texto.</p>
 
-<p>The <span class="menu">Default Application</span> is the one that's set globally for that filetype. If you don't find the program you want to associate with this file in the pop-up menu, you'll again find the buttons <span class="button">Select...</span> and <span class="button">Same As...</span> which do the similar thing described under "The File Type" above.</p>
+<p>La <span class="menu">Default Application (Aplicación preferida)</span> es la única que se configura de forma global para el tipo de archivo. Si no encuentra la aplicación que quiere asociar con este tipo de archivo en el menú desplegable, encontrará de nuevo los botones <span class="button">Select... (Seleccionar)</span> and <span class="button">Same As... (Mismo que)</span> que cumplen las mismas funciones que se decribieron en "El tipo de archivo".</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">The Icon</a></h3>
+<a id="icon" name="icon">El Icono</a></h3>
 <p>If you're wondering why the icon well on the top right is empty: Icons are normally inherited from the system default for that filetype. You can open the <span class="app">Filetype Add-On</span> of a file that contains an icon and drag&amp;drop it into your file's icon well. Or you double-click the icon well and create or edit your own icon. For more info on icons and how to create your own, see topic <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings-apps" name="settings-apps">Special settings for applications</a></h2>
+<a id="settings-apps" name="settings-apps">Configuraciones especiales para aplicaciones</a></h2>
 <p>If you invoke the <span class="app">Filetype Add-On</span> on an executable (here: <span class="app">StyledEdit</span>), you'll get a different dialog:</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
 <p>On top, you'll see, instead of a standardized MIME string, the unique application signature. With it, the system finds the program wherever it's installed.</p>
@@ -106,8 +109,8 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="deskbar.html">Deskbar (Barra de Escritorio)</a> 
-::  <a href="contents.html" class="uplink">Contenidos</a> 
-::  <a href="attributes.html">Atributos</a>  »
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="attributes.html">Attributes</a>  »
 </span></div>
 </div>
 

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Настройка дисків (DriveSetup)</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/uk.png" alt="" /> Українська</li>
+<li><a href="../../fr/applications/drivesetup.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/drivesetup.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/drivesetup.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/drivesetup.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/drivesetup.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/drivesetup.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/drivesetup.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="diskusage.html">DiskUsage</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
+::  <a href="expander.html">Expander</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />Настройка дисків (DriveSetup)</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Додатки(Applications)</span></td></tr>
+<tr><td>Розташування в Tracker:</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
+<tr><td>Настройки розташовані за адресою:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
+</table>
+<p><br /></p>
+<p>Настройка дисків (DriveSetup) -це утиліта для створення, видалення та ініціалізації розділів.  На даний момент вона не може переміщати або змінювати їх розмір, тому Вам знадобиться нерозмічений том (можливо зовнішній USB - накопичувач або другий вінчестер), або доведеться скористатись сторонньою утилітою <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> для виділення вільного простору для нового розділу.</p>
+<img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
+<p>Верхню частину вікна займає графічне прдставлення всіх розділів пристрою, який Ви вибрали зі списку, що розташований нижче. Попри 4 первиннні розділи кожен з дисків може містити кілька розширених/логічних розділів. Щоб побачити детальнішу інформацію про кожний з логічних дисків, Вам знадобиться розгорнути список розділів , клікнувши по елементу +/-, що передує назві диску.</p>
+<p>Вибравши розділ зі списку, Ви можете змонтувати його або відмонтувати за допомогою команд в меню <span class="menu">Розділ (Partition)</span> чи натиснувши <span class="key">ALT</span> <span class="key">M</span> або <span class="key">ALT</span> <span class="key">U</span>.</p>
+<p>Крім того можна видалити розділ <span class="menu">Розділ (Partition) | Видалити (Delete)</span>.<br />
+Однак слід пам'ятати наступне:</p>
+<div class="box-stop">Дії з створення/видалення/ініціалізації розділів досить небезпечні. Перевірте зайвий раз чи Ви працюєте з потрібним розділом і потурбуйтесь про резервну копію даних на випадок, коли щось піде не так!</div>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="creating" name="creating">Створення нового розділу</a></h2>
+<div class="box-info">Якщо у ваших планах використовувати весь обєм диску як, наприклад, у випадку USB - накопичувача або карточки  Compact Flash, Ви можете пропустити процес створення розділів і перейти безпосередньо до  <a href="#initializing">ініціалізації (Initializing)</a>.</div>
+<p>Якщо використати неформатований простір на диску, який позначено <tt>&lt;empty&gt;</tt>, то можна створити розділ вибравши <span class="menu">Розділ (Partition) | Створити (Create...)</span>(<span class="key">ALT</span> <span class="key">C</span>).</p>
+<img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
+<p>У цьому діалозі Ви повинні задати розмір і тип файлової системи. Виберіть <span class="menu">Be File System</span> якщо Вам потрібний розділ для встановлення Haiku або Ви бажаєте використати всі переваги цієї системи такі як атрибути і запити .
+Зверніть увагу на те, що інші операційні системи можуть мати труднощі з доступом до такого розділу.</p>
+<p>Якщо Ви створили первинний розділ замість чергового розширеного/логічного,діалог вище,
+також покаже прапорець <span class="menu">Активний розділ (Active Partition)</span>. Якщо Ви збираєтесь використати цей розділ для загрузки Haiku, то Вам необхідно його відмітити.</p>
+<p>Перед спробою використання або підмонтування нового розділу необхідно обовязково його ініціалізувати (відформатувати) у файлову систему.
+</p>
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="initializing" name="initializing">Ініціалізація розділу (Initializing a partition)</a></h2>
+<p>Ініціалізіція розділу відбувається тільки у випадку коли він повністю відмонтований за допомогою команд меню <span class="menu">Розділ (Partition) | Ініціалізувати (Initialize)</span> .</p>
+<img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
+<p>Тут Вам потрібно вибрати імя розділу та розмір блоку. Рекомендується розмір 2048 байт на блок, хоча за потреби його можна змінити.<br />
+Ініціалізація знищить всі дані на цьому розділі!</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="diskusage.html">DiskUsage</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
+::  <a href="expander.html">Expander</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

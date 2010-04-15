@@ -9,13 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<meta name="robots" content="all" />
-	<title>Applications</title>
+	<title>アプリケーション</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -34,6 +36,7 @@
 <li><a href="../ru/applications.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/applications.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/applications.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../uk/applications.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/applications.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -46,34 +49,33 @@
 <div id="content">
 <div>
 
-<h1>Applications</h1>
+<h1>アプリケーション</h1>
 
-<p>Before diving into all the applications that come with Haiku, let's have a more detailed look at how to install and uninstall programs you downloaded somewhere, for example from a site mentioned on the <a href="../../welcome/welcome_jp.html#software">Welcome</a> page.</p>
-<div class="box-info">You should only unpack/install archives within Haiku. If you extract a package under Linux or Windows, for example, and just copy the folder over to Haiku later, all the vital attributes are stripped, because those operating systems don't normally handle meta data.</div>
+<p>Haikuに付属しているアプリケーションの海に飛び込む前に、<a href="../../welcome/welcome_jp.html#software">Welcome</a>ページで触れたウェブサイトなどからあなたがダウンロードしたプログラムを、どのようにインストールまたはアンインストールすれば良いのか、もう少し詳しく見て行きましょう。</p>
+<div class="box-info">書庫ファイルの解凍とインストールは、Haikuの上でのみ行ってください。もし、例えばLinuxやWindowsといった他のオペレーティングシステムの上でパッケージを解凍したあと、できたフォルダを単にHaikuにコピーしただけでは、必要なファイル属性が失われてしまいます。というのは、これらのオペレーティングシステムでは、通常メタデータを取り扱うことができないからです。</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="install" name="install">Installing applications</a></h2>
-<p>Haiku software always comes as an archive. Most of the time it's a ZIP, some old BeOS packages come in Software Valet's PKG format. Software Valet was able to automatically execute installation scripts, so after double-clicking you just select a destination folder and everything's taken care of.<br />
-If it's a ZIP archive, double-clicking opens <span class="app">Expander</span> where you also set the destination and unpack it. As explained in the topic <a href="filesystem-layout.html">Filesystem layout</a>, that destination is either</p>
+<a id="install" name="install">アプリケーションのインストール</a></h2>
+<p>Haikuのソフトウェアは必ず1つの書庫ファイルの形で提供されます。多くの場合はZIPファイルですが、古いBeOS用のパッケージについては、Software Valetと呼ばれるPKGフォーマットで提供される場合があります。Software Valetはインストール・スクリプトを自動的に実行できるように設計されているため、ファイルをダブルクリックしたあとは、インストール先フォルダを選択するだけで良く、必要な処理が自動的に行われます。<br />
+ソフトウェアがZIP形式の書庫ファイルである場合、そのファイルをダブルクリックすると、<span class="app">Expander</span>が開きますので、そこで解凍先を指定してファイルを解凍することができます。<a href="filesystem-layout.html">ファイルシステム・レイアウト</a>のトピックの中で解説されているように、解凍先は次のどちらかになります:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td> for applications available to every user</td></tr>
-<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td> for applications only available to yourself</td></tr>
+<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>すべてのユーザーが使用できるアプリケーション用</td></tr>
+<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>各個人のみが使用できるアプリケーション用</td></tr>
 </table>
-<p>This distinction will only become relevant once Haiku gets multi-user support, of course.</p>
-<p>Once the archive is unpacked, you should have a look into the newly created folder. Often you find ReadMe files or other documentation of interest.</p>
-<p>Some programs need further configurations. For example, <a href="tracker-add-ons.html">Tracker Add-Ons</a>, <a href="preferences/datatranslations.html">Translators</a> or other system enhancing components have to be put into the right folders. Either you'll find a little script file (often with the suffix <span class="cli">.sh</span>) like <span class="cli">install</span> that you simply double click to have all taken care of.<br />
-Sometimes you'll find folders that link to the correct destination named "<span class="cli">drag [filename] here...</span>". So, you simply follow that instruction and you're done.</p>
-<p>Most of the time, however, nothing of the sort is necessary and you're done after unpacking.<br />
-Topics <a href="deskbar.html">Deskbar</a> or <a href="desktop-applets/launchbox.html">LaunchBox</a> describe how to add shortcuts to your newly installed application.</p>
+<p>もちろん、Haikuがマルチユーザーをサポートするようになって初めて、この区別が関係してきます。</p>
+<p>書庫ファイルが解凍されたら、新しく作成されたフォルダの中身を覗いてみましょう。多くの場合、ReadMeファイルや興味深いドキュメントが見つかります。</p>
+<p>さらに設定が必要になるプログラムもあります。例えば<a href="tracker-add-ons.html">Trackerアドオン</a>や<a href="preferences/datatranslations.html">Translators</a>、あるいはシステムを拡張する他のコンポーネントは、所定のフォルダに置く必要があります。あるいは、<span class="cli">install</span>といった小さなスクリプトファイル（多くの場合名前が<span class="cli">.sh</span>で終わります）が見つかるかもしれません。このファイルをダブルクリックするだけで、すべてが自動的に処理されます。<br />
+"<span class="cli">drag [filename] here...</span>"という名前の、正しいインストール先にリンクされたフォルダが見つかるかもしれません。その場合はその指示に従うだけで、インストールが完了します。</p>
+<p>しかしほとんどのケースでは上述のような作業は必要なく、ファイルを解凍するだけでインストールは完了します。<a href="deskbar.html">Deskbar</a>や<a href="desktop-applets/launchbox.html">LaunchBox</a>のトピックの中で、新しくインストールしたアプリケーションへのショートカットを追加する方法が解説されています。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="uninstall" name="uninstall">Uninstalling applications</a></h2>
-<p>If the installation was done with an install script, chances are, there's an uninstall script as well. In that case, double-click it and you're done.<br />
-Otherwise, uninstalling is simply done by deleting the application's folder.</p>
-<p>This, of course, leaves back possible configuration files in your <span class="path">~/config/settings</span> folder. This may be on purpose, if you want to keep those settings in case you'll install the program again in the future. Also, when the installation involved those "<span class="cli">drag [filename] here...</span>" folders, those files are also left behind.</p>
-<p>One method to quickly get to all the app's files is to do a quick query for a significant part of the application's name. This will reveal the app's binary, its installation folder and its settings as well as possible links in the Deskbar etc. Simply select all relevant files and delete them.</p>
+<a id="uninstall" name="uninstall">アプリケーションのアンインストール</a></h2>
+<p>もしインストール作業をインストール・スクリプトで行ったのであれば、おそらくアンインストール・スクリプトが用意されているでしょう。アンインストール・スクリプトが用意されている場合は、それをダブルクリックすれば作業は完了します。<br />
+アンインストール・スクリプトが用意されていない場合は、そのアプリケーションのフォルダを削除するだけで、アンインストール作業は完了します。</p>
+<p>もちろんこの方法では、設定が復元できるよう、あなたの<span class="path">~/config/settings</span>フォルダの中に設定ファイルが残されます。将来もう一度同じプログラムをインストールするときに備えて、あなたが現在の設定を保持しておきたいと思う場合には、この仕様は大変有効なものであるかもしれません。また、"<span class="cli">drag [filename] here...</span>"フォルダ方式でインストールを行った場合にも、設定ファイルが残ります。</p>
+<p>あるアプリケーションに関係するすべてのファイルをすばやく見つける方法の1つに、アプリケーション名の特徴的な部分に対して簡易検索を行う、というものがあります。これにより、そのアプリケーションのバイナリやインストールフォルダ、設定ファイル、Deskbar中の考えられるリンクなどが明らかになります。そのアプリケーションに関係するすべてのファイルを選択して削除するだけで、アンインストール作業は完了します。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

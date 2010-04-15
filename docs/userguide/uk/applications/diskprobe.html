@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>DiskProbe</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/uk.png" alt="" /> Українська</li>
+<li><a href="../../fr/applications/diskprobe.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/diskprobe.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/diskprobe.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/diskprobe.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/diskprobe.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/diskprobe.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/diskprobe.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../en/applications/diskprobe.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="deskcalc.html">Калькулятор (DeskCalc)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
+::  <a href="diskusage.html">DriveUsage</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/apps-images/diskprobe-icon_64.png" alt="diskprobe-icon_64.png" width="64" height="64" />DiskProbe</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Додатки(Applications)</span></td></tr>
+<tr><td>Розташування в Tracker:</td><td></td><td><span class="path">/boot/system/apps/DiskProbe</span></td></tr>
+<tr><td>Настройки розташовані за адресою:</td><td></td><td><span class="path">~/config/settings/DiskProbe_data</span></td></tr>
+</table>
+<p><br /></p>
+<p>DiskProbe це HEX редактор для перегляду і редагування вмісту файлу або пристрою на рівні байтів, він працює на самому низькому рівні і тому може серйозно пошкодити дані, якщо бути обережним!</p>
+<div class="box-warning">Завжди слід працювати тільки з резервною копією файлу, а особливо уважним слід бути при роботі безпосередньо з пристроєм!.</div>
+<p>При запуску DiskProbe у Вас спочатку спитають про файл або пристрій з яким Ви плануєте працювати. Після вибору відкриється вікно:</p>
+<p><img id="diskprobe" src="../images/apps-images/diskprobe.png" alt="diskprobe.png" /></p>
+<p>В основному вікні завжди відображається один блок даних, розмір якого можна виставити з меню <span class="menu">Вид (View) | Розмір блока (BlockSize)</span>. Зліва показано зміщення від початку блока, по середині дані у вигляді HEX значень і справа теж саме і вигляді символів ASCII.<br />
+Ви можете переходити  від блоку до блоку за допомогою верхнього повзунка або клавіш <span class="key">ALT</span> <span class="key">←</span> і <span class="key">ALT</span> <span class="key">→</span> і переключатись між HEX і ASCII колонками по <span class="key">TAB</span>.</p>
+<p>Пункт меню <span class="menu">Блок (Block) | Вибір (Selection)</span> Не тільки дасть вибір з різним порядком байтів (в шістнадцятковому або десятковому виді, який встановлюється через меню <span class="menu">Вид (View) | Представлення (Base)</span>), він також інтерпретує його як зміщення блоків до яких треба перейти. Пункт буде недоступним (сірим),якщо позиція буде за межами файлу/пристрою<br />
+Ця функція зручна в основному при перегляді файлових систем, бо вони часто містять посилання на інші блоки.</p>
+<p>Якщо файл, який Ви переглядаєте включає в себе атрибути, то через меню <span class="menu">Атрибути (Attributes)</span> можна відкрити будь-який з них у новому вікні DiskProbe . Ось атрибут авторських прав додатку <span class="app">Про систему (AboutSystem)</span> :
+</p><p><img id="diskprobe-attribute" src="../images/apps-images/diskprobe-about-attr.png" alt="diskprobe-about-attr.png" /></p>
+<p>В залежності від виду атрибуту відкриється потрібний таб редактора, в додаток до постійно присутнього таба <i>Raw Editor</i>.Наприклад,редактор для текста і MIME - типів, переглядач векторних іконок.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="deskcalc.html">Калькулятор (DeskCalc)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
+::  <a href="diskusage.html">DriveUsage</a>  »
+</span></div>
+</div>
+
+</body>
+</html>
