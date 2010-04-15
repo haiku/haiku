@@ -175,7 +175,7 @@ TextGapBuffer::SizeGapTo(long inCount)
 const char *
 TextGapBuffer::GetString(int32 fromOffset, int32 *_numBytes)
 {
-	char *result = (char *)"";
+	const char *result = "";
 	if (_numBytes == NULL)
 		return result;
 
@@ -216,7 +216,7 @@ TextGapBuffer::GetString(int32 fromOffset, int32 *_numBytes)
 		}
 		result = fScratchBuffer;
 
-		char *scratchPtr = result;
+		char *scratchPtr = fScratchBuffer;
 		for (uint32 i = 0; i < numChars; i++) {
 			memcpy(scratchPtr, B_UTF8_BULLET, charLen);
 			scratchPtr += charLen;
