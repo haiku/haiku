@@ -89,12 +89,16 @@ struct cache_description {
 	{0x7A, "L2 cache: 256 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
 	{0x7B, "L2 cache: 512 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
 	{0x7C, "L2 cache: 1024 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
+	{0x7D, "L2 cache: 2048 KB, 8-way set associative, 64 bytes/line"},
 	{0x7E, /* IA-64 */ "L2 cache: 256 KB, 8-way set associative, 128 bytes/line, sectored"},
+	{0x7F, "L2 cache: 256 KB, 2-way set associative, 64 bytes/line, sectored"},
 	{0x81, "L2 cache: 128 KB, 8-way set associative, 32 bytes/line"},
 	{0x82, "L2 cache: 256 KB, 8-way set associative, 32 bytes/line"},
 	{0x83, "L2 cache: 512 KB, 8-way set associative, 32 bytes/line"},
 	{0x84, "L2 cache: 1024 KB, 8-way set associative, 32 bytes/line"},
 	{0x85, "L2 cache: 2048 KB, 8-way set associative, 32 bytes/line"},
+	{0x86, "L2 cache: 512 KB, 4-way set associative, 64 bytes/line"},
+	{0x87, "L2 cache: 1024 KB, 8-way set associative, 64 bytes/line"},
 	{0x88, /* IA-64 */ "L3 cache: 2 MB, 4-way set associative, 64 bytes/line"},
 	{0x89, /* IA-64 */ "L3 cache: 4 MB, 4-way set associative, 64 bytes/line"},
 	{0x8A, /* IA-64 */ "L3 cache: 8 MB, 4-way set associative, 64 bytes/line"},
@@ -141,11 +145,11 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 {
 	int i, j, maxDesc;
 
-	uint8 cacheDescriptors[15];	// Max 
-	
+	uint8 cacheDescriptors[15];	// Max
+
 	maxDesc = 0;
-	i = 0;	
-	
+	i = 0;
+
 	// put valid values into array
 	if ((info->regs.eax & 0x80000000) == 0) {
 		// eax is valid, include values
@@ -200,7 +204,7 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 				break;
 			}
 		}
-		
+
 		// Reached the end without finding a descriptor
 		if (sIntelCacheDescriptions[j].code == 0)
 			printf("\tUnknown cache descriptor 0x%02x\n", cacheDescriptors[i]);
@@ -279,8 +283,8 @@ print_cache_desc(int32 cpu)
 	cpuid_info info;
 	get_cpuid(&info, 0x80000005, cpu);
 
-	putchar('\n');	
-	
+	putchar('\n');
+
 	if (info.regs.eax)
 		print_TLB(info.regs.eax, info.regs.ebx ? "2M/4M-byte" : NULL);
 	if (info.regs.ebx)
@@ -309,32 +313,32 @@ print_intel_cache_desc(int32 cpu)
 	get_cpuid(&info, 0x00000004, cpu);
 
 	putchar('\n');
-	
+
 	type = info.regs.eax & 0xf;
 	level = (info.regs.eax & 0x70) >> 4;
 	isFullyAssoc = info.regs.eax & 0x100;
-	
+
 	lineSize = (info.regs.ebx & 0xfff) + 1;
 	linesPerTag = ((info.regs.ebx & 0x3ff000) >> 12) + 1;
 	ways = ((info.regs.ebx & 0xffc00000) >> 22) + 1;
-	
+
 	sets = info.regs.ecx;
 
 	printf("\tL%ld ",level);
-	
+
 	switch (type) {
-		case 1: printf("Data cache "); break;	
-		case 2: printf("Inst cache "); break;	
+		case 1: printf("Data cache "); break;
+		case 2: printf("Inst cache "); break;
 		case 3: printf("Unified cache "); break;
 		default: break;
-	}	
-	
+	}
+
 	if (isFullyAssoc)
 		printf("fully associative, ");
 	else
 		printf("%lu-way set associative, ", ways);
 	printf("%lu lines/tag, %lu bytes/line\n", linesPerTag, lineSize);
-	
+
 	get_cpuid(&info, 0x80000006, cpu);
 	print_level2_cache(info.regs.ecx, "L2 cache");
 }
