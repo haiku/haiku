@@ -182,10 +182,8 @@ RosterData::RosterData()
 	BAutolock lock(fLock);
 	assert(lock.IsLocked());
 
-	// TODO: make a decision about log-facility and -options
 	openlog_team("liblocale.so", LOG_PID, LOG_USER);
 #ifndef DEBUG
-	// TODO: find out why the following bugger isn't working!
 	setlogmask_team(LOG_UPTO(LOG_WARNING));
 #endif
 
@@ -650,9 +648,9 @@ BLocaleRoster::LoadCatalog(const char *signature, const char *language,
 			// other languages.
 			// The current implementation uses the filename in order to
 			// detect dependencies (parenthood) between languages (it
-			// traverses from "english-british-oxford" to "english-british"
+			// traverses from "english_british_oxford" to "english_british"
 			// to "english"):
-			// TODO :use ICU facilities instead, so we can handle more
+			// TODO: use ICU facilities instead, so we can handle more
 			// complex things such as fr_FR@euro, or whatever, encodings
 			// and so on.
 			int32 pos;

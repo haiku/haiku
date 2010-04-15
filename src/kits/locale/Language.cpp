@@ -8,6 +8,9 @@
 
 #include <iostream>
 
+#include <Catalog.h>
+#include <Locale.h>
+#include <LocaleRoster.h>
 #include <Path.h>
 #include <String.h>
 #include <FindDirectory.h>
@@ -133,10 +136,16 @@ BLanguage::GetString(uint32 id) const
 status_t
 BLanguage::GetName(BString* name)
 {
-	// TODO: This will return the language not in the current be_app_catalog,
-	// but in the current system wide language! Don't know the exact reason.
+	BMessage preferredLanguage;
+	be_locale_roster->GetPreferredLanguages(&preferredLanguage);
+	BString appLanguage;
+	
+	preferredLanguage.FindString("language", 0, &appLanguage);
+	
+	printf("lang : %s\n",appLanguage.String());
+	
 	UnicodeString s;
-   	fICULocale->getDisplayName(s);
+   	fICULocale->getDisplayName(Locale(appLanguage), s);
 	BStringByteSink converter(name);
 	s.toUTF8(converter);
 	return B_OK;
