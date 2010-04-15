@@ -5,6 +5,7 @@ UsePrivateHeaders locale ;
 UsePrivateHeaders shared ;
 
 Preference Locale :
+	LanguageListView.cpp
 	Locale.cpp
 	LocaleWindow.cpp
 	TimeFormatSettingsView.cpp
