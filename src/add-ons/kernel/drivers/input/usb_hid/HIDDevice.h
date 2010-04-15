@@ -26,9 +26,10 @@ public:
 
 			status_t			InitCheck() const { return fStatus; }
 
-			bool				IsOpen() const { return fOpenCount > 0; };
+			bool				IsOpen() const { return fOpenCount > 0; }
 			status_t			Open(ProtocolHandler *handler, uint32 flags);
 			status_t			Close(ProtocolHandler *handler);
+			int32				OpenCount() const { return fOpenCount; }
 
 			void				Removed();
 			bool				IsRemoved() const { return fRemoved; }

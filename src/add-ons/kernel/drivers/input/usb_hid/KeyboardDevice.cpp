@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include <usb/USB_hid.h>
+#include <util/AutoLock.h>
 
 #include <debug.h>
 
@@ -26,7 +27,8 @@
 #define RIGHT_ALT_KEY	0x40
 #define ALT_KEYS		(LEFT_ALT_KEY | RIGHT_ALT_KEY)
 
-#define KEYBOARD_FLAG_DEBUGGER	0x01
+#define KEYBOARD_FLAG_READER	0x01
+#define KEYBOARD_FLAG_DEBUGGER	0x02
 
 
 static usb_id sDebugKeyboardPipe = 0;
@@ -60,8 +62,11 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 	fLastModifiers(0),
 	fCurrentKeys(NULL),
 	fLastKeys(NULL),
+	fHasReader(0),
 	fHasDebugReader(false)
 {
+	mutex_init(&fLock, "usb keyboard");
+
 	// find modifiers and keys
 	for (uint32 i = 0; i < inputReport->CountItems(); i++) {
 		HIDReportItem *item = inputReport->ItemAt(i);
@@ -145,6 +150,8 @@ KeyboardDevice::~KeyboardDevice()
 		remove_debugger_command("get_usb_keyboard_config",
 			&debug_get_keyboard_config);
 	}
+
+	mutex_destroy(&fLock);
 }
 
 
@@ -209,9 +216,24 @@ KeyboardDevice::Open(uint32 flags, uint32 *cookie)
 		return status;
 	}
 
-	fCurrentRepeatDelay = B_INFINITE_TIMEOUT;
-	fCurrentRepeatKey = 0;
+	if (Device()->OpenCount() == 1) {
+		fCurrentRepeatDelay = B_INFINITE_TIMEOUT;
+		fCurrentRepeatKey = 0;
+	}
+
 	return B_OK;
+}
+
+
+status_t
+KeyboardDevice::Close(uint32 *cookie)
+{
+	if ((*cookie & KEYBOARD_FLAG_DEBUGGER) != 0)
+		fHasDebugReader = false;
+	if ((*cookie & KEYBOARD_FLAG_READER) != 0)
+		atomic_and(&fHasReader, 0);
+
+	return ProtocolHandler::Close(cookie);
 }
 
 
@@ -221,32 +243,52 @@ KeyboardDevice::Control(uint32 *cookie, uint32 op, void *buffer, size_t length)
 	switch (op) {
 		case KB_READ:
 		{
-			bigtime_t enterTime = system_time();
-			while (RingBufferReadable() == 0) {
-				status_t result = _ReadReport(fCurrentRepeatDelay);
-				if (result != B_OK && result != B_TIMED_OUT)
-					return result;
+			if (*cookie == 0) {
+				if (atomic_or(&fHasReader, 1) != 0)
+					return B_BUSY;
 
-				if (!Device()->IsOpen())
-					return B_ERROR;
-
-				if (RingBufferReadable() == 0 && fCurrentRepeatKey != 0
-					&& system_time() - enterTime > fCurrentRepeatDelay) {
-					// this case is for handling key repeats, it means no
-					// interrupt transfer has happened or it didn't produce any
-					// new key events, but a repeated key down is due
-					_WriteKey(fCurrentRepeatKey, true);
-
-					// the next timeout is reduced to the repeat_rate
-					fCurrentRepeatDelay = fRepeatRate;
-					break;
-				}
+				// We're the first, so we become the only reader
+				*cookie = KEYBOARD_FLAG_READER;
 			}
 
-			// process what is in the ring_buffer, it could be written
-			// there because we handled an interrupt transfer or because
-			// we wrote the current repeat key
-			return RingBufferRead(buffer, sizeof(raw_key_info));
+			while (true) {
+				MutexLocker locker(fLock);
+
+				bigtime_t enterTime = system_time();
+				while (RingBufferReadable() == 0) {
+					status_t result = _ReadReport(fCurrentRepeatDelay);
+					if (result != B_OK && result != B_TIMED_OUT)
+						return result;
+
+					if (!Device()->IsOpen())
+						return B_ERROR;
+
+					if (RingBufferReadable() == 0 && fCurrentRepeatKey != 0
+						&& system_time() - enterTime > fCurrentRepeatDelay) {
+						// this case is for handling key repeats, it means no
+						// interrupt transfer has happened or it didn't produce any
+						// new key events, but a repeated key down is due
+						_WriteKey(fCurrentRepeatKey, true);
+
+						// the next timeout is reduced to the repeat_rate
+						fCurrentRepeatDelay = fRepeatRate;
+						break;
+					}
+				}
+
+				if (fHasDebugReader && (*cookie & KEYBOARD_FLAG_DEBUGGER)
+						== 0) {
+					// Handover buffer to the debugger instead
+					locker.Unlock();
+					snooze(25000);
+					continue;
+				}
+
+				// process what is in the ring_buffer, it could be written
+				// there because we handled an interrupt transfer or because
+				// we wrote the current repeat key
+				return RingBufferRead(buffer, sizeof(raw_key_info));
+			}
 		}
 
 		case KB_SET_LEDS:

@@ -8,6 +8,8 @@
 
 #include "ProtocolHandler.h"
 
+#include <lock.h>
+
 
 class HIDReportItem;
 
@@ -27,6 +29,8 @@ public:
 									HIDReport *input);
 
 	virtual	status_t			Open(uint32 flags, uint32 *cookie);
+	virtual	status_t			Close(uint32 *cookie);
+
 	virtual	status_t			Control(uint32 *cookie, uint32 op, void *buffer,
 									size_t length);
 
@@ -36,6 +40,8 @@ private:
 			status_t			_ReadReport(bigtime_t timeout);
 
 private:
+			mutex				fLock;
+
 			HIDReport *			fInputReport;
 			HIDReport *			fOutputReport;
 
@@ -55,6 +61,7 @@ private:
 			uint16 *			fCurrentKeys;
 			uint16 *			fLastKeys;
 
+			int32				fHasReader;
 			bool				fHasDebugReader;
 };
 
