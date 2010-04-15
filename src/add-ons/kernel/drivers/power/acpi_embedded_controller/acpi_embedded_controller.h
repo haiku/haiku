@@ -36,7 +36,7 @@
 #include <dpc.h>
 #include <Drivers.h>
 #include <KernelExport.h>
-
+#include <lock.h>
 
 // #define TRACE_EMBEDDED_CONTROLLER
 #ifdef TRACE_EMBEDDED_CONTROLLER
@@ -117,6 +117,7 @@ AcpiUtStrupr(char *SrcString)
 #define ACPI_READ                       0
 #define ACPI_WRITE                      1
 
+typedef uint8                           EC_COMMAND;
 
 #define EC_COMMAND_UNKNOWN              ((EC_COMMAND) 0x00)
 #define EC_COMMAND_READ                 ((EC_COMMAND) 0x80)
@@ -148,32 +149,26 @@ AcpiUtStrupr(char *SrcString)
 
 typedef uint8                           EC_STATUS;
 
-#define EC_FLAG_OUTPUT_BUFFER           ((uint8) 0x01)
-#define EC_FLAG_INPUT_BUFFER            ((uint8) 0x02)
-#define EC_FLAG_DATA_IS_CMD             ((uint8) 0x08)
-#define EC_FLAG_BURST_MODE              ((uint8) 0x10)
+#define EC_FLAG_OUTPUT_BUFFER           ((EC_STATUS) 0x01)
+#define EC_FLAG_INPUT_BUFFER            ((EC_STATUS) 0x02)
+#define EC_FLAG_DATA_IS_CMD             ((EC_STATUS) 0x08)
+#define EC_FLAG_BURST_MODE              ((EC_STATUS) 0x10)
 
 /*
  * EC_EVENT:
  * ---------
  */
+typedef uint8                           EC_EVENT;
 
-#define EC_EVENT_UNKNOWN                ((uint8) 0x00)
-#define EC_EVENT_OUTPUT_BUFFER_FULL     ((uint8) 0x01)
-#define EC_EVENT_INPUT_BUFFER_EMPTY     ((uint8) 0x02)
-#define EC_EVENT_SCI                    ((uint8) 0x20)
-#define EC_EVENT_SMI                    ((uint8) 0x40)
+#define EC_EVENT_UNKNOWN                ((EC_EVENT) 0x00)
+#define EC_EVENT_OUTPUT_BUFFER_FULL     ((EC_EVENT) 0x01)
+#define EC_EVENT_INPUT_BUFFER_EMPTY     ((EC_EVENT) 0x02)
+#define EC_EVENT_SCI                    ((EC_EVENT) 0x20)
+#define EC_EVENT_SMI                    ((EC_EVENT) 0x40)
 
 /* Data byte returned after burst enable indicating it was successful. */
 #define EC_BURST_ACK                    0x90
 
-/* Total time in ms spent waiting for a response from EC. */
-#define EC_TIMEOUT      750
-
-static int      ec_burst_mode = 1;
-static int      ec_polled_mode = 0;
-
-static int      ec_timeout = EC_TIMEOUT;
 
 /*
  * Register access primitives
@@ -214,6 +209,7 @@ struct acpi_ec_cookie {
 
     int                 		ec_glk;
     uint32						ec_glkhandle;
+    mutex						ec_lock;
     int                 		ec_burstactive;
     int                 		ec_sci_pending;
     vint32						ec_gencount;
@@ -243,10 +239,16 @@ struct acpi_ec_cookie {
          ((status) & EC_FLAG_INPUT_BUFFER) == 0))
 
 
+static int      ec_burst_mode = 1;
+static int      ec_polled_mode = 0;
+
+static int      ec_timeout = EC_TIMEOUT;
+
 static status_t
 EcLock(struct acpi_ec_cookie *sc)
 {
     status_t status;
+
 
     /* If _GLK is non-zero, acquire the global lock. */
     status = B_OK;
@@ -256,7 +258,7 @@ EcLock(struct acpi_ec_cookie *sc)
         if (status != B_OK)
             return status;
     }
-
+	mutex_lock(&sc->ec_lock);
    return status;
 }
 
@@ -264,26 +266,26 @@ EcLock(struct acpi_ec_cookie *sc)
 static void
 EcUnlock(struct acpi_ec_cookie *sc)
 {
+    mutex_unlock(&sc->ec_lock);    
     if (sc->ec_glk)
         sc->ec_acpi_module->release_global_lock(sc->ec_glkhandle);
 }
 
-typedef unsigned int	EC_EVENT;
-typedef unsigned int	EC_COMMAND;
 
 static uint32	        EcGpeHandler(void *context);
-static status_t			EcSpaceSetup(acpi_handle region, uint32 function,
+
+static acpi_status		EcSpaceSetup(acpi_handle region, uint32 function,
                                 void *context, void **return_Context);
-static status_t			EcSpaceHandler(uint32 function,
+static acpi_status		EcSpaceHandler(uint32 function,
                                 acpi_physical_address address,
                                 uint32 width, int *value,
                                 void *context, void *regionContext);
-static status_t			EcWaitEvent(struct acpi_ec_cookie *sc, EC_EVENT event,
-                                	int32 gen_count);
-static status_t			EcCommand(struct acpi_ec_cookie *sc, EC_COMMAND cmd);
-static status_t			EcRead(struct acpi_ec_cookie *sc, uint8 address,
+static acpi_status		EcWaitEvent(struct acpi_ec_cookie *sc, EC_EVENT event,
+                               	int32 gen_count);
+static acpi_status		EcCommand(struct acpi_ec_cookie *sc, EC_COMMAND cmd);
+static acpi_status		EcRead(struct acpi_ec_cookie *sc, uint8 address,
                                 uint8 *readData);
-static status_t			EcWrite(struct acpi_ec_cookie *sc, uint8 address,
+static acpi_status		EcWrite(struct acpi_ec_cookie *sc, uint8 address,
                                 uint8 *writeData);
 
 

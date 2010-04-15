@@ -34,7 +34,8 @@ enum {
 	ACPI_ADR_SPACE_SMBUS			= 4,
 	ACPI_ADR_SPACE_CMOS 			= 5,
 	ACPI_ADR_SPACE_PCI_BAR_TARGET	= 6,
-	ACPI_ADR_SPACE_DATA_TABLE		= 7,
+	ACPI_ADR_SPACE_IPMI				= 7,
+	ACPI_ADR_SPACE_DATA_TABLE		= 8,
 	ACPI_ADR_SPACE_FIXED_HARDWARE	= 127
 };
 
@@ -66,6 +67,8 @@ enum {
 	ACPI_TYPE_PROCESSOR,
 	ACPI_TYPE_THERMAL,
 	ACPI_TYPE_BUFFER_FIELD,
+	ACPI_TYPE_DDB_HANDLE,
+	ACPI_TYPE_DEBUG_OBJECT,
 	ACPI_TYPE_LOCAL_REFERENCE = 0x14
 };
 
@@ -123,6 +126,23 @@ enum {
 	ACPI_ALLOCATE_BUFFER = -1,
 };
 
+/*
+ * acpi_status should return ACPI specific error codes, not BeOS ones.
+ */ 
+typedef uint32 acpi_status;
+
+#define AE_CODE_PROGRAMMER              0x1000
+ 
+#define AE_OK                           0x0000
+#define AE_ERROR                        0x0001
+#define AE_NOT_ACQUIRED                 0x0014
+#define AE_NO_HARDWARE_RESPONSE         0x0016
+#define AE_BAD_PARAMETER                (0x0001 | AE_CODE_PROGRAMMER)
+#define AE_BAD_ADDRESS                  (0x0009 | AE_CODE_PROGRAMMER)
+ 
+#else
+#error "Our ACPI.h uses different naming than actypes.h.\n" \\
+		"If you need actypes.h this probably needs updating."
 
 #endif	// __ACTYPES_H__
 
@@ -146,11 +166,11 @@ typedef struct acpi_prt
 
 typedef uint32 (*acpi_event_handler)(void *Context);
 
-typedef status_t (*acpi_adr_space_handler)(uint32 function,
+typedef acpi_status (*acpi_adr_space_handler)(uint32 function,
 	acpi_physical_address address, uint32 bitWidth, int *value,
 	void *handlerContext, void *regionContext);
 
-typedef status_t (*acpi_adr_space_setup)(acpi_handle regionHandle,
+typedef acpi_status (*acpi_adr_space_setup)(acpi_handle regionHandle,
 	uint32 function, void *handlerContext, void **regionContext);
 
 typedef void (*acpi_notify_handler)(acpi_handle device, uint32 value,
