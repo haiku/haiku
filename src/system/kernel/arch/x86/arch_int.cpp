@@ -540,6 +540,16 @@ ioapic_configure_io_interrupt(int32 num, uint32 config)
 static void
 ioapic_map(kernel_args* args)
 {
+	if (args->arch_args.apic == NULL) {
+		dprintf("no local apic available\n");
+		return;
+	}
+
+	if (args->arch_args.ioapic == NULL) {
+		dprintf("no ioapic available, not using ioapics for interrupt routing\n");
+		return;
+	}
+
 	// map in the ioapic
 	sIOAPIC = (ioapic *)args->arch_args.ioapic;
 	if (vm_map_physical_memory(B_SYSTEM_TEAM, "ioapic", (void**)&sIOAPIC,
@@ -564,17 +574,10 @@ ioapic_init(kernel_args* args)
 		&ioapic_end_of_interrupt
 	};
 
-	if (args->arch_args.apic == NULL) {
-		dprintf("no local apic available\n");
+	if (sIOAPIC == NULL)
 		return;
-	}
 
-	if (args->arch_args.ioapic == NULL) {
-		dprintf("no ioapic available, not using ioapics for interrupt routing\n");
-		return;
-	}
-
-	if (!get_safemode_boolean(B_SAFEMODE_DISABLE_IOAPIC, false)) {
+	if (!get_safemode_boolean(B_SAFEMODE_DISABLE_IOAPIC, true)) {
 		dprintf("ioapic explicitly disabled, not using ioapics for interrupt "
 			"routing\n");
 		return;
@@ -606,6 +609,16 @@ ioapic_init(kernel_args* args)
 	}
 	CObjectDeleter<const char, status_t> pciModulePutter(B_PCI_MODULE_NAME,
 		put_module);
+
+	// TODO: here ACPI needs to be used to properly set up the PCI IRQ
+	// routing.
+
+	IRQRoutingTable table;
+	status = read_irq_routing_table(pciModule, acpiModule, &table);
+	if (status != B_OK) {
+		dprintf("reading IRQ routing table failed, no ioapic.\n");
+		return;
+	}
 
 	sLevelTriggeredInterrupts = 0;
 	sIOAPICMaxRedirectionEntry
@@ -648,14 +661,6 @@ ioapic_init(kernel_args* args)
 	// setup default 1:1 mapping
 	for (uint32 i = 0; i < 256; i++)
 		sIRQToIOAPICPin[i] = i;
-
-	// TODO: here ACPI needs to be used to properly set up the PCI IRQ
-	// routing.
-
-	IRQRoutingTable table;
-	status = read_irq_routing_table(pciModule, acpiModule, &table);
-	if (status != B_OK)
-		return;
 
 	// configure apic interrupts assume 1:1 mapping
 	for (int i = 0; i < table.Count(); i++) {
