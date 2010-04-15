@@ -149,7 +149,7 @@ fs_vnode_ops gNTFSVnodeOps = {
 	&fs_rewind_attrib_dir,
 
 	/* attribute operations */
-	NULL,	//&fs_create_attr,
+	&fs_create_attrib,
 	&fs_open_attrib,
 	&fs_close_attrib,
 	&fs_free_attrib_cookie,

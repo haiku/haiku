@@ -231,12 +231,106 @@ exit:
 
 
 status_t
+fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name, uint32 type, int openMode,
+	void** _cookie)
+{
+	nspace *ns = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_node->private_node;
+	attrcookie *cookie = NULL;
+	ntfschar *uname = NULL;
+	int ulen;
+	ntfs_inode *ni = NULL;
+	ntfs_attr *na = NULL;
+	status_t result = B_NO_ERROR;
+
+	ERRPRINT("%s - ENTER\n", __FUNCTION__);
+
+	LOCK_VOL(ns);
+
+	if (node == NULL) {
+		result = EINVAL;
+		goto exit;
+	}
+
+	ni = ntfs_inode_open(ns->ntvol, node->vnid);
+	if (ni == NULL) {
+		result = errno;
+		ERRPRINT("%s - inode_open: %s\n", __FUNCTION__, strerror(result));
+		goto exit;
+	}
+
+	// UXA demangling TODO
+
+	// check for EA first... TODO: WRITEME
+
+
+	// check for a named stream
+	if (true) {
+		uname = ntfs_calloc(MAX_PATH);
+		ulen = ntfs_mbstoucs(name, &uname);
+		if (ulen < 0) {
+			result = EILSEQ;
+		ERRPRINT("%s - mb alloc: %s\n", __FUNCTION__, strerror(result));
+			goto exit;
+		}
+
+		na = ntfs_attr_open(ni, AT_DATA, uname, ulen);
+		if (na) {
+			result = EEXIST;
+		ERRPRINT("%s - ntfs_attr_open: %s\n", __FUNCTION__, strerror(result));
+			goto exit;
+		}
+		if (ntfs_non_resident_attr_record_add(ni, AT_DATA, uname, ulen, 0, 32, 0) < 0) {
+			result = errno;
+		ERRPRINT("%s - ntfs_non_resident_attr_record_add: %s\n", __FUNCTION__, strerror(result));
+			goto exit;
+		}
+		na = ntfs_attr_open(ni, AT_DATA, uname, ulen);
+		if (!na) {
+			result = errno;
+		ERRPRINT("%s - ntfs_attr_open: %s\n", __FUNCTION__, strerror(result));
+			goto exit;
+		}
+	}
+
+
+	cookie = (attrcookie*)ntfs_calloc(sizeof(attrcookie));
+
+	if (cookie != NULL) {
+		cookie->omode = openMode;
+		*_cookie = (void*)cookie;
+		cookie->inode = ni;
+		cookie->stream = na;
+		ni = NULL;
+		na = NULL;
+	} else
+		result = ENOMEM;
+
+exit:
+	if (uname)
+		free(uname);
+
+	if (na)
+		ntfs_attr_close(na);
+
+	if (ni)
+		ntfs_inode_close(ni);
+
+	ERRPRINT("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
+
+	UNLOCK_VOL(ns);
+
+	return result;
+}
+
+
+status_t
 fs_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name, int openMode, void **_cookie)
 {
 	nspace *ns = (nspace*)_vol->private_volume;
 	vnode *node = (vnode*)_node->private_node;
 	attrcookie *cookie = NULL;
-	ntfschar *unicode = NULL;
+	ntfschar *uname = NULL;
 	int ulen;
 	ntfs_inode *ni = NULL;
 	ntfs_attr *na = NULL;
@@ -264,14 +358,14 @@ fs_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name, int openMode,
 
 	// check for a named stream
 	if (true) {
-		unicode = ntfs_calloc(MAX_PATH);
-		ulen = ntfs_mbstoucs(name, &unicode);
+		uname = ntfs_calloc(MAX_PATH);
+		ulen = ntfs_mbstoucs(name, &uname);
 		if (ulen < 0) {
 			result = EILSEQ;
 			goto exit;
 		}
 
-		na = ntfs_attr_open(ni, AT_DATA, unicode, ulen);
+		na = ntfs_attr_open(ni, AT_DATA, uname, ulen);
 		if (na) {
 			if (openMode & O_TRUNC) {
 				if (ntfs_attr_truncate(na, 0))
@@ -294,8 +388,8 @@ fs_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name, int openMode,
 		result = ENOMEM;
 
 exit:
-	if (unicode)
-		free(unicode);
+	if (uname)
+		free(uname);
 
 	if (na)
 		ntfs_attr_close(na);
