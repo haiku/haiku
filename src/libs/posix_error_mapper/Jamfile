@@ -12,4 +12,5 @@ StaticLibrary libposix_error_mapper.a :
 	pthread_rwlock.cpp
 	pthread_specific.cpp
 	pthread_thread.cpp
+	signal.cpp
 ;

@@ -1,7 +1,8 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include <pthread.h>
 
@@ -49,4 +50,18 @@ WRAPPER_FUNCTION(int, pthread_setcancelstate,
 
 WRAPPER_FUNCTION(int, pthread_setcanceltype, (int type, int *_oldType),
 	return B_TO_POSITIVE_ERROR(sReal_pthread_setcanceltype(type, _oldType));
+)
+
+
+WRAPPER_FUNCTION(int, pthread_getschedparam,
+		(pthread_t thread, int *policy, struct sched_param *param),
+	return B_TO_POSITIVE_ERROR(sReal_pthread_getschedparam(thread, policy,
+		param));
+)
+
+
+WRAPPER_FUNCTION(int, pthread_setschedparam,
+		(pthread_t thread, int policy, const struct sched_param *param),
+	return B_TO_POSITIVE_ERROR(sReal_pthread_setschedparam(thread, policy,
+		param));
 )

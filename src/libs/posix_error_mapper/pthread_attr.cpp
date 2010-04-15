@@ -1,7 +1,8 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include <pthread.h>
 
@@ -57,4 +58,18 @@ WRAPPER_FUNCTION(int, pthread_attr_setscope,
 		(pthread_attr_t *attr, int contentionScope),
 	return B_TO_POSITIVE_ERROR(sReal_pthread_attr_setscope(attr,
 		contentionScope));
+)
+
+
+WRAPPER_FUNCTION(int, pthread_attr_setschedparam,
+		(pthread_attr_t *attr, const struct sched_param *param),
+	return B_TO_POSITIVE_ERROR(sReal_pthread_attr_setschedparam(attr,
+		param));
+)
+
+
+WRAPPER_FUNCTION(int, pthread_attr_getschedparam,
+		(const pthread_attr_t *attr, struct sched_param *param),
+	return B_TO_POSITIVE_ERROR(sReal_pthread_attr_getschedparam(attr,
+		param));
 )
