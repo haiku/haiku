@@ -531,8 +531,8 @@ KeyboardDevice::_UpdateSettings(uint32 opcode)
 	if (opcode == 0 || opcode == B_KEY_MAP_CHANGED
 		|| opcode == B_KEY_LOCKS_CHANGED) {
 		BAutolock lock(fKeymapLock);
-		fKeymap.LoadCurrent();
-		fModifiers = fKeymap.Locks();
+		fKeymap.RetrieveCurrent();
+		fModifiers = fKeymap.Map().lock_settings;
 		_UpdateLEDs();
 		fControlKey = fKeymap.KeyForModifier(B_LEFT_CONTROL_KEY);
 		fCommandKey = fKeymap.KeyForModifier(B_LEFT_COMMAND_KEY);

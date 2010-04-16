@@ -16,14 +16,13 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include <FindDirectory.h>
 #include <image.h>
 #include <InterfaceDefs.h>
 #include <OS.h>
 
 #include <keyboard_mouse_driver.h>
-
-#include "SystemKeymap.h"
-#include "Keymap.h"
+#include <Keymap.h>
 
 
 struct console;
@@ -91,8 +90,19 @@ keyboard_reader(void* arg)
 	uint8 activeDeadKey = 0;
 	uint32 modifiers = 0;
 
-	Keymap keymap;
-	keymap.LoadCurrent();
+	BKeymap keymap;
+	// Load current keymap from disk (we can't talk to the input server)
+	// TODO: find a better way (we shouldn't have to care about the on-disk
+	// location)
+	char path[PATH_MAX];
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, -1, false,
+		path, sizeof(path));
+	if (status == B_OK) {
+		strlcat(path, "/Key_map", sizeof(path));
+		status = keymap.SetTo(path);
+	}
+	if (status != B_OK)
+		keymap.SetToDefault();
 
 	for (;;) {
 		raw_key_info rawKeyInfo;

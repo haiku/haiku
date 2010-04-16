@@ -12,7 +12,7 @@ Addon <input>keyboard :
 	TeamMonitorWindow.cpp
 	TeamListItem.cpp
 
-	: input_server be $(TARGET_LIBSUPC++) ;
+	: input_server be libshared.a $(TARGET_LIBSUPC++) ;
 
 Package haiku-inputkit-cvs :
 	<input>keyboard :

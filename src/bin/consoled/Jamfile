@@ -1,25 +1,9 @@
 SubDir HAIKU_TOP src bin consoled ;
 
-UsePrivateHeaders input ;
-UsePrivateHeaders kernel ;
+UsePrivateHeaders input kernel shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) src apps terminal ] ;
-UseHeaders [ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) servers input ] ;
-
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons input_server devices
-	keyboard ] ;
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers input ] ;
-
-{
-	local defines = [ FDefines CONSOLED ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
-}
 
 Application consoled :
 	consoled.cpp
-
-	Keymap.cpp
-	: $(TARGET_LIBSUPC++)
+	: be libshared.a $(TARGET_LIBSUPC++)
 ;
-
-Includes [ FGristFiles consoled.cpp ] : <src!servers!input>SystemKeymap.h ;

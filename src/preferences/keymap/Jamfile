@@ -12,7 +12,7 @@ Preference Keymap :
 	KeymapListItem.cpp
 	KeymapWindow.cpp
 
-	: be tracker liblocale.so $(TARGET_LIBSTDC++)
+	: be tracker liblocale.so libshared.a $(TARGET_LIBSTDC++)
 	: Keymap.rdef
 ;
 

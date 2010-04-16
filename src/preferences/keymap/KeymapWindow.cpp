@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009 Haiku Inc. All rights reserved.
+ * Copyright 2004-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -647,12 +647,12 @@ KeymapWindow::_UpdateDeadKeyMenu()
 void
 KeymapWindow::_UpdateButtons()
 {
-	if (!fCurrentMap.Equals(fAppliedMap)) {
+	if (fCurrentMap != fAppliedMap) {
 		fCurrentMap.SetName(kCurrentKeymapName);
 		_UseKeymap();
 	}
 
-	fRevertButton->SetEnabled(!fCurrentMap.Equals(fPreviousMap));
+	fRevertButton->SetEnabled(fCurrentMap != fPreviousMap);
 
 	_UpdateDeadKeyMenu();
 	_UpdateSwitchShortcutButton();
