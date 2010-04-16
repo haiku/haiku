@@ -12,7 +12,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 }
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
-HAIKU_OPENSSL_PACKAGE = openssl-0.9.8m-x86-gcc2-2010-03-03.zip ;
+HAIKU_OPENSSL_PACKAGE = openssl-1.0.0-x86-gcc2-2010-04-08.zip ;
 HAIKU_OPENSSL_URL = $(baseURL)/$(HAIKU_OPENSSL_PACKAGE) ;
 
 if $(HAIKU_BUILD_FEATURE_SSL) {

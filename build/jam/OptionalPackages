@@ -356,8 +356,8 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Curl available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage curl-7.20.0-x86-gcc2-2010-03-03.zip
-			: $(baseURL)/curl-7.20.0-x86-gcc2-2010-03-03.zip
+		InstallOptionalHaikuImagePackage curl-7.20.1-x86-gcc2-2010-04-16.zip
+			: $(baseURL)/curl-7.20.1-x86-gcc2-2010-04-16.zip
 			:
 			: true
 		;
@@ -596,8 +596,8 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Git available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage git-1.6.4.2-r1a1-x86-gcc2-2009-08-30.zip
-			: $(baseURL)/git-1.6.4.2-r1a1-x86-gcc2-2009-08-30.zip
+		InstallOptionalHaikuImagePackage git-1.7.0.5-x86-gcc2-2010-04-14.zip
+			: $(baseURL)/git-1.7.0.5-x86-gcc2-2010-04-14.zip
 			:
 			: true
 		;
@@ -762,8 +762,8 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Neon available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage neon-0.29.3-x86-gcc2-2010-02-28.zip
-			: $(baseURL)/neon-0.29.3-x86-gcc2-2010-02-28.zip
+		InstallOptionalHaikuImagePackage neon-0.29.3-x86-gcc2-2010-04-08.zip
+			: $(baseURL)/neon-0.29.3-x86-gcc2-2010-04-08.zip
 			:
 			: true
 		;
@@ -865,8 +865,8 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 				"variable to be set!" ;
 		}
 
-		InstallOptionalHaikuImagePackage openssh-5.3p1-r1a1-x86-gcc2-2009-10-11.zip
-			: $(baseURL)/openssh-5.3p1-r1a1-x86-gcc2-2009-10-11.zip
+		InstallOptionalHaikuImagePackage openssh-5.5p1-x86-gcc2-2010-04-16.zip
+			: $(baseURL)/openssh-5.5p1-x86-gcc2-2010-04-16.zip
 			:
 		;
 
@@ -974,8 +974,8 @@ if [ IsOptionalHaikuImagePackageAdded Python ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Python available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage python-2.6.5-x86-gcc2-2010-03-20.zip
-			: $(baseURL)/python-2.6.5-x86-gcc2-2010-03-20.zip
+		InstallOptionalHaikuImagePackage python-2.6.5-x86-gcc2-2010-04-08.zip
+			: $(baseURL)/python-2.6.5-x86-gcc2-2010-04-08.zip
 			:
 			: true
 		;
@@ -1029,8 +1029,8 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Subversion available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage subversion-1.6.9-x86-gcc2-2010-03-15.zip
-			: $(baseURL)/subversion-1.6.9-x86-gcc2-2010-03-15.zip
+		InstallOptionalHaikuImagePackage subversion-1.6.9-x86-gcc2-2010-04-08.zip
+			: $(baseURL)/subversion-1.6.9-x86-gcc2-2010-04-08.zip
 			:
 			: true
 		;
