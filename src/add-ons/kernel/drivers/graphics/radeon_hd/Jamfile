@@ -6,6 +6,7 @@ UsePrivateHeaders [ FDirName graphics radeon_hd ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders graphics kernel ;
 UsePrivateHeaders shared ;
+UsePrivateKernelHeaders ;
 
 KernelAddon radeon_hd :
 	driver.cpp

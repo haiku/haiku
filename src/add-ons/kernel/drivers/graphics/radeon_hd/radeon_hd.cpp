@@ -20,6 +20,7 @@
 
 #include <driver_settings.h>
 #include <util/kernel_cpp.h>
+#include <vm/vm.h>
 
 
 #define TRACE_DEVICE
@@ -231,6 +232,10 @@ radeon_hd_init(radeon_info &info)
 		dprintf(DEVICE_NAME ": could not map framebuffer!\n");
 		return info.framebuffer_area;
 	}
+	
+	// Turn on write combining for the area
+	vm_set_area_memory_type(info.framebuffer_area,
+		info.pci->u.h0.base_registers[RHD_FB_BAR], B_MTR_WC);
 	
 	sharedCreator.Detach();
 	mmioMapper.Detach();
