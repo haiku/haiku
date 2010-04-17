@@ -91,7 +91,7 @@ struct cache_description {
 	{0x7C, "L2 cache: 1024 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
 	{0x7D, "L2 cache: 2048 KB, 8-way set associative, 64 bytes/line"},
 	{0x7E, /* IA-64 */ "L2 cache: 256 KB, 8-way set associative, 128 bytes/line, sectored"},
-	{0x7F, "L2 cache: 256 KB, 2-way set associative, 64 bytes/line, sectored"},
+	{0x7F, "L2 cache: 512 KB, 2-way set associative, 64 bytes/line"},
 	{0x81, "L2 cache: 128 KB, 8-way set associative, 32 bytes/line"},
 	{0x82, "L2 cache: 256 KB, 8-way set associative, 32 bytes/line"},
 	{0x83, "L2 cache: 512 KB, 8-way set associative, 32 bytes/line"},

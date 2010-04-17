@@ -189,6 +189,8 @@ get_cpu_model_string(system_info *info)
 			return "Core 2";
 		case B_CPU_INTEL_PENTIUM_CORE_2_45_NM:
 			get_cpuid_model_string(cpuidName);
+			if (strcasestr(cpuidName, "Core") == NULL)
+				return "Pentium";
 			if (strcasestr(cpuidName, "Celeron") != NULL)
 				return "Core 2 Celeron";
 			if (strcasestr(cpuidName, "Duo") != NULL
