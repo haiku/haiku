@@ -1,10 +1,7 @@
 /*
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
-
 #ifndef _LOCALDEVICE_IMPL_H_
 #define _LOCALDEVICE_IMPL_H_
 
@@ -21,7 +18,7 @@
 class LocalDeviceImpl : public LocalDeviceHandler {
 
 private:
-	LocalDeviceImpl(HCIDelegate* hd);	
+	LocalDeviceImpl(HCIDelegate* hd);
 
 public:
 
@@ -34,9 +31,11 @@ public:
 	void HandleEvent(struct hci_event_header* event);
 
 	// Request handling
-	status_t GetAddress(bdaddr_t* bdaddr, BMessage* request);
-	status_t GetFriendlyName(BString str, BMessage* request);
 	status_t ProcessSimpleRequest(BMessage* request);
+
+private:
+	void HandleUnexpectedEvent(struct hci_event_header* event);
+	void HandleExpectedRequest(struct hci_event_header* event, BMessage* request);
 
 	// Events handling
 	void CommandComplete(struct hci_ev_cmd_complete* event, BMessage* request, int32 index);
@@ -54,10 +53,10 @@ public:
 
 	// Pairing
 	void PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* request);
-	void RoleChange(struct hci_ev_role_change* event, BMessage* request, int32 index);
-	void LinkKeyNotify(struct hci_ev_link_key_notify* event, BMessage* request, int32 index);
-	void PageScanRepetitionModeChange(struct hci_ev_page_scan_rep_mode_change* event, BMessage* request, int32 index);
-	void MaxSlotChange(struct hci_ev_max_slot_change* event, BMessage* request, int32 index);
+	void RoleChange(struct hci_ev_role_change* event, BMessage* request);
+	void LinkKeyNotify(struct hci_ev_link_key_notify* event, BMessage* request);
+	void PageScanRepetitionModeChange(struct hci_ev_page_scan_rep_mode_change* event, BMessage* request);
+	void MaxSlotChange(struct hci_ev_max_slot_change* event, BMessage* request);
 
 	void HardwareError(struct hci_ev_hardware_error* event);
 
