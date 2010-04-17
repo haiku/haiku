@@ -21,10 +21,10 @@ typedef int							pthread_key_t;
 typedef struct  _pthread_once		pthread_once_t;
 typedef struct  _pthread_rwlock		pthread_rwlock_t;
 typedef struct  _pthread_rwlockattr	*pthread_rwlockattr_t;
+typedef struct  _pthread_spinlock	pthread_spinlock_t;
 /*
 typedef struct  _pthread_barrier	*pthread_barrier_t;
 typedef struct  _pthread_barrierattr *pthread_barrierattr_t;
-typedef struct  _pthread_spinlock	*pthread_spinlock_t;
 */
 
 struct _pthread_mutex {
@@ -62,6 +62,10 @@ struct _pthread_rwlock {
 			void*		waiters[2];
 		} local;
 	};
+};
+
+struct _pthread_spinlock {
+	int32_t		lock;
 };
 
 #define PTHREAD_MUTEX_DEFAULT		0
@@ -205,6 +209,13 @@ extern int pthread_rwlockattr_getpshared(const pthread_rwlockattr_t *attr,
 	int *shared);
 extern int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr,
 	int shared);
+
+/* spinlock functions */
+extern int pthread_spin_init(pthread_spinlock_t* spinlock, int pshared);
+extern int pthread_spin_destroy(pthread_spinlock_t* spinlock);
+extern int pthread_spin_lock(pthread_spinlock_t* spinlock);
+extern int pthread_spin_trylock(pthread_spinlock_t* spinlock);
+extern int pthread_spin_unlock(pthread_spinlock_t* spinlock);
 
 /* misc. functions */
 extern int pthread_atfork(void (*prepare)(void), void (*parent)(void),

@@ -18,5 +18,6 @@ MergeObject posix_pthread.o :
 	pthread_mutexattr.c
 	pthread_once.cpp
 	pthread_rwlock.cpp
+	pthread_spinlock.c
 ;
 
