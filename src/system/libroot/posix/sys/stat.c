@@ -54,7 +54,7 @@ _lstat_current(const char* path, struct stat* stat)
 int
 fstatat(int fd, const char *path, struct stat *st, int flag)
 {
-	int status = _kern_read_stat(fd, path, (flag & AT_SYMLINK_NOFOLLOW) != 0,
+	int status = _kern_read_stat(fd, path, (flag & AT_SYMLINK_NOFOLLOW) == 0,
 		st, sizeof(struct stat));
 
 	RETURN_AND_SET_ERRNO(status);
