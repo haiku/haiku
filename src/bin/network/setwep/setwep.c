@@ -4,7 +4,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Many parts
- * 
+ *
  * Copyright 2001 The Aerospace Corporation.
  * Copyright (c) 1997, 1998, 2000 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -31,7 +31,7 @@
 #include <net80211/ieee80211_ioctl.h>
 #include <net80211/ieee80211_haiku.h>
 
-static const char* 
+static const char*
 get_string(const char* val, const char* sep, u_int8_t* buf, int* lenp)
 {
 	int len;
@@ -254,6 +254,8 @@ show_status(const char* dev, int s)
 		}
 	} else
 		print_string(data, len);
+
+	printf("\n");
 }
 
 
