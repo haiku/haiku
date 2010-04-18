@@ -835,11 +835,22 @@ x86_exit_user_debug_at_kernel_entry()
 void
 x86_handle_debug_exception(struct iframe *frame)
 {
-	// get debug status and control registers (saved earlier in
-	// x86_exit_user_debug_at_kernel_entry())
 	struct thread* thread = thread_get_current_thread();
-	uint32 dr6 = thread->cpu->arch.dr6;
-	uint32 dr7 = thread->cpu->arch.dr7;
+
+	// Get dr6 and dr7. If the given iframe is a userland frame, the exception
+	// obviously occurred in userland. In that case
+	// x86_exit_user_debug_at_kernel_entry() has already been invoked and dr6
+	// and dr7 are stored in the cpu info. Otherwise we need to fetch the
+	// current values from the registers.
+	uint32 dr6;
+	uint32 dr7;
+	if (IFRAME_IS_USER(frame)) {
+		dr6 = thread->cpu->arch.dr6;
+		dr7 = thread->cpu->arch.dr7;
+	} else {
+		asm("movl %%dr6, %0" : "=r"(dr6));
+		asm("movl %%dr7, %0" : "=r"(dr7));
+	}
 
 	TRACE(("i386_handle_debug_exception(): DR6: %lx, DR7: %lx\n", dr6, dr7));
 
