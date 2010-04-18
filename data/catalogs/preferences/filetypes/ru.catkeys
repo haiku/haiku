@@ -1,0 +1,122 @@
+1	russian	x-vnd.Haiku-FileTypes	4169608688
+Display as:	Attribute Window		Отображать как:
+Args only	Application Type Window		Только аргументы
+Add group	New File Type Window		Добавить группу
+Remove	Application Type Window		Удалить
+Select same type as	FileType Window		Выбрать такой же тип как у
+Remove icon	Icon View		Удалить значок
+Supported types	Application Type Window		Поддерживаемые типы
+Internal name:	New File Type Window		Внутреннее имя:
+Could not open file \"%s\": %s\n	FileTypes		Невозможно открыть файл \"%s\": %s\n
+New file type	New File Type Window		Новый тип файла
+Add icon…	Icon View		Добавить значок…
+FileTypes Request	FileType Window		Запрос типа файла
+Do you want to save the changes?	Application Type Window		Хотите сохранить изменения?
+Multiple files from \"	FileType Window		Несколько файлов из \"
+File type	FileType Window		Тип файла
+Could not change attributes	Attribute Window		Невозможно изменить атрибуты
+Show icons in list	FileType Window		Отображать значки в списке
+Cancel	TypeListWindow		Отмена
+Ok	FileTypes		Oк
+File	FileType Window		Файл
+Recognition rule is not valid:\n\n	FileType Window		Неправильное правило распознания:\n\n
+This file type already exists.	New File Type Window		Этот тип файла уже существует.
+Save	Application Type Window		Сохранить
+Show recognition rule	FileType Window		Отображать правило распознания
+Add	Extension Window		Добавить
+Select same preferred application as	FileType Window		Выбрать такое же предпочтительное приложение как у
+Cancel	Attribute Window		Отмена
+Multiple launch	Application Type Window		Множественный запуск
+Group:	New File Type Window		Группа:
+Done	Extension Window		Готово
+Attribute	Attribute Window		Атрибут
+Extra attributes	FileType Window		Дополнительные атрибуты
+Could not open file	FileType Window		Невозможно открыть файл
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileType Window		После удаления супер типа, его невозможно будет восстановить.\nВсе типы файлов принадлежащие этому супер типу будут также удалены!\n\Вы действительно хотите сделать это? Для удаления целой группы, удерживайте клавишу Shift и нажмите кнопку \"Удалить\".
+Group name:	New File Type Window		Имя группы:
+Could not retrieve preferred application of this file.	Preferred App Menu		Невозможно получить предпочтительное приложение для этого файла.
+Preferred application	FileType Window		Предпочтительное приложение
+Quit	FileType Window		Выход
+no icon	FileType Window		нет значка
+File recognition	FileType Window		Распознание файла
+Same as…	FileType Window		Такое же как…
+File	Application Type Window		Файл
+Version:	Application Type Window		Версия:
+FileTypes request	FileTypes		Запрос типа файла
+Select…	FileType Window		Выбрать…
+Description:	FileType Window		Описание:
+Right	Attribute Window		По правому краю
+Internal name:	FileType Window		Внутреннее имя:
+None	FileType Window		Не выбрано
+Development	Application Type Window		Разработка
+Icon	FileType Window		Значок
+Special:	Attribute Window		Особый:
+Alpha	Application Type Window		Альфа
+Signature:	Application Type Window		Сигнатура:
+Done	TypeListWindow		Готово
+Quit, don't save	Application Type Window		Выйти без сохранения
+Add…	Application Type Window		Добавить...
+Type name:	FileType Window		Название типа:
+(from application)	FileType Window		(из приложения)
+Select preferred application	FileType Window		Выбрать предпочтительное приложение
+Single launch	Application Type Window		Одиночный запуск
+Could not retrieve application signature.	Preferred App Menu		Невозможно получить сигнатуру приложения.
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Приложение \"%s\" не поддерживает данный тип файла.\nВы действительно хотите его установить?
+Type:	Attribute Window		Тип:
+Done	Attribute Window		Готово
+Set Preferred Application	Preferred App Menu		Установить предпочтительное приложение
+Background app	Application Type Window		Фоновое приложение
+Add new group	New File Type Window		Добавить новую группу
+Add…	FileType Window		Добавить...
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileType Window		После удаления типа файла, его невозможно будет восстановить.\nВы действительно хотите удалить его?
+Rule:	FileType Window		Правило:
+Cancel	Application Type Window		Отмена
+Cancel	New File Type Window		Отмена
+Extension:	Extension Window		Расширение:
+Add	Attribute Window		Добавить
+Close	Application Type Window		Закрыть
+Open…	FileType Window		Открыть…
+Golden master	Application Type Window		Золотой
+Could not open \"%s\":\n%s	FileTypes		Невозмножно открыть \"%s\":\n%s
+Alignment:	Attribute Window		Выравнивание:
+Cancel	Extension Window		Отмена
+Could not remove file type: %s\n	FileType Window		Невозможно удалить тип файла: %s\n
+Remove	FileType Window		Удалить
+Application flags	Application Type Window		Флаги приложения
+FileTypes\n\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		Типы Файлов\n\tразработал Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+Editable	Attribute Window		Редактируемый
+Width:	Attribute Window		Ширина:
+Choose type	TypeListWindow		Выбрать тип
+Save request	Application Type Window		Сохранить запрос
+Cancel	FileType Window		Отмена
+Beta	Application Type Window		Бета
+Extensions:	FileType Window		Расширения:
+About FileTypes…	FileType Window		О приложении…
+Attribute name:	Attribute Window		Имя атрибута:
+Extension	Extension Window		Расширение
+Add type	New File Type Window		Добавить тип
+[Multiple files]	FileType Window		[Несколько файлов]
+Could not set preferred application	FileType Window		Невозможно назначить предпочтительное приложение
+Internal name:	Attribute Window		Внутреннее имя:
+Final	Application Type Window		Окончание
+Open File	FileTypes		Открыть файл
+Settings	FileType Window		Настройки
+New resource file…	FileType Window		Новый ресурс-файл…
+Exclusive launch	Application Type Window		Единственный запуск
+Gamma	Application Type Window		Гамма
+Default application	FileType Window		Приложение по умолчанию
+Long description:	Application Type Window		Подробное описание:
+Application types…	FileType Window		Типы приложений…
+(from super type)	FileType Window		(из супер типа)
+Description	FileType Window		Описание
+Version info	Application Type Window		Версия приложения
+Center	Attribute Window		По центру
+Short description:	Application Type Window		Краткое описание:
+File could not be opened	Preferred App Menu		Невозможно открыть файл
+Could not change file extensions	Extension Window		Невозможно изменить расширения файла
+Edit icon…	Icon View		Изменить значок…
+Save into resource file…	Application Type Window		Сохранить в ресурс-файл…
+Left	Attribute Window		По левому краю
+Visible	Attribute Window		Видимый
+Could not install file type	New File Type Window		Невозможно уставновить тип файла
+Application Type	Application Type Window		Тип приложения

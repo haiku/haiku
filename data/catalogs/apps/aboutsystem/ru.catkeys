@@ -14,7 +14,7 @@ Unknown	AboutView		Неизвестен
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… а также те, кого мы забыли упомянуть (простите!)\n\n
 %.2f GHz	AboutView		%.2f ГГц
 Memory:	AboutView		Память:
-Google & their Google Summer of Code program\n\n	AboutView		Корпарации Google & и их программе Google Summer of Code\n\n
+Google & their Google Summer of Code program\n\n	AboutView		Корпорации Google и их программе Google Summer of Code\n\n
 Past maintainers:\n	AboutView		Предыдущие разработчики:\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Код, написанный специально для Haiku, особенно ядро и весь код, с которым могут быть связаны приложения, распространяется на условиях 
 \n\nSpecial thanks to:\n	AboutView		\n\nОсобая благодарность:\n
@@ -31,6 +31,6 @@ The BeGeistert team\n	AboutView		команде BeGeistert\n
 %ld MHz	AboutView		%ld МГц
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде.\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Щелкните левой кнопкой мыши на название лицензии для её прочтения.]\n\n
-%d MB total, %d MB used (%d%%)	AboutView		%d Мб всего, %d Мб (%d%%) занято
+%d MB total, %d MB used (%d%%)	AboutView		%d МБ всего, %d МБ (%d%%) занято
 License: 	AboutView		Лицензия: 
 Translations:\n	AboutView		Переводчики:\n

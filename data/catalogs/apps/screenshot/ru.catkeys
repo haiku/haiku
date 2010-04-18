@@ -7,9 +7,9 @@ Back to saving	ScreenshotWindow		Назад к сохранению
 Select	ScreenshotWindow		Выбрать
 Capture active window	ScreenshotWindow		Захватить активное окно
 Cancel	ScreenshotWindow		Отмена
-screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	снимок экрана
+screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	screenshot
 Name:	ScreenshotWindow		Имя:
-screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	снимок экрана1
+screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	screenshot1
 Save screenshot	ScreenshotWindow		Сохранить снимок экрана
 Capture entire screen	ScreenshotWindow		Захватить весь экран
 Choose folder	ScreenshotWindow		Выбрать папку

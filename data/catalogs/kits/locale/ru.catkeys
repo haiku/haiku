@@ -1,0 +1,9 @@
+1	russian	system	2677153267
+%3.2f GiB	StringForSize		%3.2f ГиБ
+%3.2f KiB	StringForSize		%3.2f КиБ
+%d bytes	StringForSize		%Ld байт
+Green:	ColorControl		Зеленый:
+%.2f TiB	StringForSize		%.2f ТиБ
+Red:	ColorControl		Красный:
+%3.2f MiB	StringForSize		%3.2f МиБ
+Blue:	ColorControl		Синий:

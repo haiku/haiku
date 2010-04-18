@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Expander	1738666712
+1	russian	x-vnd.Haiku-Expander	3642794258
 Expand	ExpanderMenu		Распаковать
 Set destination…	ExpanderMenu		Путь для извлечения…
 File expanded	ExpanderWindow		Файл распакован
@@ -12,7 +12,6 @@ Hide contents	ExpanderWindow		Скрыть содержимое
 Cancel	ExpanderWindow		Отмена
 Continue	ExpanderWindow		Продолжить
 Expander	ExpanderWindow	!! Window Title !!	Expander
-Expander\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		Expander\n\tразработан Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nОригинальная Be версия разработана \nDominic, Hiroshi, Peter, Pavel и Robert\n
 The destination folder does not exist.	ExpanderWindow		Папка назначения не существует.
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Вы уверены, что хотите остановить распаковку этого\nархива? Некоторые файлы могли быть извлечены не полностью.
 Select	DirectoryFilePanel		Выбрать
@@ -25,10 +24,12 @@ Expanding file 	ExpanderWindow		Извлечение файла
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка была перемещена, переименована либо не\nподдерживается.
 The file doesn't exist	ExpanderWindow		Файл не существует
 Stop	ExpanderMenu		Остановить
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tразработан Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nОригиналььная Be версия разработана\nDominic, Hiroshi, Peter, Pavel and Robert\n
 File	ExpanderMenu		Файл
 Expand	ExpanderWindow		Извлечь
 Close	ExpanderMenu		Закрыть
 The destination is not a folder.	ExpanderWindow		Указанный объет не является папкой.
+Expander	About		Expander
 About Expander…	ExpanderMenu		О программе…
 OK	About		Oк
 Set source…	ExpanderMenu		Выбрать источник…

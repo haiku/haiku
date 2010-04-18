@@ -1,31 +1,31 @@
-1	russian	application/x-vnd.Be-TSKB	3714198408
+1	russian	x-vnd.Be-TSKB	3714198408
 Edit menu…	PreferencesWindow		Изменить меню…
 Applications	PreferencesWindow		Приложения
 24 hour clock	PreferencesWindow		24-х часовой формат
-Recent documents:	PreferencesWindow		Недавно открытые документы:
-Recent folders	BeMenu		Недавно открытые папки
+Recent documents:	PreferencesWindow		Последние документы:
+Recent folders	BeMenu		Последние папки
 Sort running applications	PreferencesWindow		Сортировать запущенные приложения
-Recent applications	BeMenu		Недавно запущенные приложения
+Recent applications	BeMenu		Последние приложения
 Change time…	TimeView		Настроить время…
 <Be folder is empty>	BeMenu		<Папка Be пуста>
 Window	PreferencesWindow		Окно
 Menu	PreferencesWindow		Меню
 Show seconds	PreferencesWindow		Отображать секунды
-Always on top	PreferencesWindow		Всегда поверх
-Show all	WindowMenu		Отобразить все окна
+Always on top	PreferencesWindow		Всегда сверху
+Show all	WindowMenu		Показать все
 No windows	WindowMenu		Нет окон
 Power off	BeMenu		Выключить компьютер
-Auto-raise	PreferencesWindow		Всплывать
+Auto-raise	PreferencesWindow		Всплывать при наведении
 Full date	PreferencesWindow		Полная дата
 Hide time	TimeView		Скрыть часы
-Recent folders:	PreferencesWindow		Недавно открытые папки:
-Deskbar preferences…	BeMenu		Настройки Deskbar…
+Recent folders:	PreferencesWindow		Последние папки:
+Deskbar preferences…	BeMenu		Настроить Deskbar…
 Show application expander	PreferencesWindow		Отображать экспандер приложения
-Close all	WindowMenu		Закрыть все окна
+Close all	WindowMenu		Закрыть все
 Deskbar preferences	PreferencesWindow		Настройки Deskbar
 Mount	BeMenu		Смонтировать
-European date	PreferencesWindow		Европейский cтиль отображения
-Recent applications:	PreferencesWindow		Недавно запущенные приложения:
+European date	PreferencesWindow		Европейский cтиль
+Recent applications:	PreferencesWindow		Последние приложения:
 Tracker always first	PreferencesWindow		Tracker всегда первый
 About Haiku…	BeMenu		О Haiku…
 Show calendar…	TimeView		Показать календарь…
@@ -35,9 +35,9 @@ Restart Tracker	BeMenu		Перезапустить Tracker
 Show Time	Tray		Отображать время
 Expand new applications	PreferencesWindow		Раскрывать запущенное приложение
 Clock	PreferencesWindow		Часы
-Recent documents	BeMenu		Недавно открытые документы
-Hide all	WindowMenu		Скрыть все окна
-Shutdown…	BeMenu		Выключение…
+Recent documents	BeMenu		Последние документы
+Hide all	WindowMenu		Скрыть все
+Shutdown…	BeMenu		Завершение работы…
 Suspend	BeMenu		Приостановить
 Quit application	WindowMenu		Закрыть приложение
 About this system…	BeMenu		Об этой системе…

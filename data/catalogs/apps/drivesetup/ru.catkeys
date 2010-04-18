@@ -35,7 +35,7 @@ You need to select a partition entry from the list.	MainWindow		Вам нужн�
 Format (not implemented)	MainWindow		Форматировать (еще не реализовано)
 The currently selected partition does not have a parent partition.	MainWindow		Выбранный раздел не имеет родительского раздела.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nВсе данные на выбранном диске будут безвозвратно потеряны, если Вы продолжите!
-Offset: %ld MB	Support		Смещение: %ld Мб
+Offset: %ld MB	Support		Смещение: %ld МБ
 Write changes	MainWindow		Записать изменения
 There was an error preparing the disk for modifications.	MainWindow		Произошла ошибка при сохранении изменений на диск.
 The partition %s is already mounted.	MainWindow		Раздел %s уже смонтирован.
@@ -55,7 +55,7 @@ Cannot delete the selected partition.	MainWindow		Невозможно удал�
 Mount all	MainWindow		Монтировать всё
 Cancel	MainWindow		Отмена
 Delete partition	MainWindow		Удалить раздел
-End: %ld MB	Support		Конец: %ld Мб
+End: %ld MB	Support		Конец: %ld МБ
 Eject	MainWindow		Извлечь
 Partition	MainWindow		Раздел
 File system	PartitionList		Файловая система

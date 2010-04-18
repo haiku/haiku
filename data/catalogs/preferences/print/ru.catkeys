@@ -9,18 +9,18 @@ No pending jobs.	PrinterListView		Нет заданий в очереди
 pages	JobListView		страниц
 Processing	JobListView		Обработка
 Printer name:	AddPrinterDialog		Имя принтера:
- pending jobs.	PrinterListView		 заданий в очереди.
-Restart job	PrintersWindow		Перезапустить задание
+ pending jobs.	PrinterListView		 заданий в очереди
+Restart job	PrintersWindow		Перезапустить
 Add	AddPrinterDialog		Добавить
 Make default	PrintersWindow		Сделать основным
-Cancel job	PrintersWindow		Отменить задание
-1 pending job.	PrinterListView		1 неоконченное задание.
+Cancel job	PrintersWindow		Отменить
+1 pending job.	PrinterListView		1 неоконченное задание
 Remove	PrintersWindow		Удалить
 <pick one>	AddPrinterDialog		<Выбрать>
 Add …	PrintersWindow		Добавить …
 Print jobs for 	PrintersWindow		Задания печати для 
 Failed	JobListView		Не удалось
-%.2f KB	JobListView		%.2f Кб
+%.2f KB	JobListView		%.2f КБ
 Completed	JobListView		Завершено
 Print jobs: No printer selected	PrintersWindow		Не выбран принтер
 Unknown status	JobListView		Статус неизвестен
