@@ -5,6 +5,9 @@
 
 
 #include <pthread.h>
+
+#include <arch_cpu_defs.h>
+
 #include "pthread_private.h"
 
 
@@ -35,7 +38,8 @@ int
 pthread_spin_lock(pthread_spinlock_t* lock)
 {
 	while (atomic_test_and_set((int32*)&lock->lock, LOCKED, UNLOCKED) == LOCKED)
-		; // spin
+		SPINLOCK_PAUSE(); // spin
+			// TODO: On UP machines we should thread_yield() in the loop.
 	return 0;
 }
 
