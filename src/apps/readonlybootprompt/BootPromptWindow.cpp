@@ -130,12 +130,16 @@ BootPromptWindow::BootPromptWindow()
 		)
 	);
 
-	// This call in the first _PopulateKeymaps had no effect yet, since the
-	// list wasn't attatched to the window yet.
-	fKeymapsListView->ScrollToSelection();
-
 	CenterOnScreen();
 	Show();
+	Lock();
+
+	// This call in the first _PopulateLanguages/Keymaps had no effect yet,
+	// since the list wasn't attached to the window yet.
+	fLanguagesListView->ScrollToSelection();
+	fKeymapsListView->ScrollToSelection();
+
+	Unlock();
 }
 
 
@@ -294,6 +298,8 @@ BootPromptWindow::_PopulateLanguages()
 		} else
 			printf("failed to get BLanguage for %s\n", languageString);
 	}
+
+	fLanguagesListView->ScrollToSelection();
 
 	// Re-enable sending the selection message.
 	fLanguagesListView->SetSelectionMessage(
