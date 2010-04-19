@@ -278,6 +278,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fBlockSize = 1UL << fSuperBlock.BlockShift();
 	fFirstDataBlock = fSuperBlock.FirstDataBlock();
 
+	fNumInodes = fSuperBlock.NumInodes();
 	fNumGroups = (fSuperBlock.NumBlocks() - fFirstDataBlock - 1)
 		/ fSuperBlock.BlocksPerGroup() + 1;
 	fGroupsPerBlock = fBlockSize / sizeof(ext2_block_group);

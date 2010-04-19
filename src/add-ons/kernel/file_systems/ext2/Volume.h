@@ -38,6 +38,8 @@ public:
 			fs_volume*			FSVolume() const { return fFSVolume; }
 			const char*			Name() const;
 
+			uint32				NumInodes() const
+									{ return fNumInodes; }
 			off_t				NumBlocks() const
 									{ return fSuperBlock.NumBlocks(); }
 			off_t				FreeBlocks() const
@@ -74,6 +76,7 @@ private:
 			uint32				fBlockSize;
 			uint32				fBlockShift;
 			uint32				fFirstDataBlock;
+			uint32				fNumInodes;
 			uint32				fNumGroups;
 			uint32				fGroupsPerBlock;
 			ext2_block_group**	fGroupBlocks;
