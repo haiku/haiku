@@ -184,23 +184,33 @@ standard_gcc_settings()
 					$headers/$d"
 			done
 
-			# when not building the crosscompiler, to use cpp headers from
-			# tree first, but fallback to local C++ system headers (like <new>)
-			# if [ "$buildCrossTools" = "" ]; then
-			#	HAIKU_CXX_HEADERS_DIR="headers/cpp $HAIKU_CXX_HEADERS_DIR"
-			# fi
+			# Unset the HAIKU_{SHARED,STATIC}_LIB{STD,SUP}CXX variables, if the
+			# compiler didn't give us actual file names. Otherwise resolve
+			# symlinks to avoid problems when copying the libraries to the
+			# image.
 
 			if [ $HAIKU_STATIC_LIBSTDCXX = libstdc++.a ]; then
 				HAIKU_STATIC_LIBSTDCXX=
+			else
+				HAIKU_STATIC_LIBSTDCXX=`readlink -e $HAIKU_STATIC_LIBSTDCXX`
 			fi
+
 			if [ $HAIKU_SHARED_LIBSTDCXX = libstdc++.so ]; then
 				HAIKU_SHARED_LIBSTDCXX=
+			else
+				HAIKU_SHARED_LIBSTDCXX=`readlink -e $HAIKU_SHARED_LIBSTDCXX`
 			fi
+
 			if [ $HAIKU_STATIC_LIBSUPCXX = libsupc++.a ]; then
 				HAIKU_STATIC_LIBSUPCXX=
+			else
+				HAIKU_STATIC_LIBSUPCXX=`readlink -e $HAIKU_STATIC_LIBSUPCXX`
 			fi
+
 			if [ $HAIKU_SHARED_LIBSUPCXX = libsupc++.so ]; then
 				HAIKU_SHARED_LIBSUPCXX=
+			else
+				HAIKU_SHARED_LIBSUPCXX=`readlink -e $HAIKU_SHARED_LIBSUPCXX`
 			fi
 		;;
 		2.9*)
