@@ -144,6 +144,7 @@ assertparams()
 #
 standard_gcc_settings()
 {
+	greadlink --help >/dev/null 2>&1 && readlink=greadlink || readlink=readlink
 	# PLATFORM_LINKLIBS
 	gcclib=`$HAIKU_CC -print-libgcc-file-name`
 	gccdir=`dirname ${gcclib}`
@@ -192,25 +193,25 @@ standard_gcc_settings()
 			if [ $HAIKU_STATIC_LIBSTDCXX = libstdc++.a ]; then
 				HAIKU_STATIC_LIBSTDCXX=
 			else
-				HAIKU_STATIC_LIBSTDCXX=`readlink -e $HAIKU_STATIC_LIBSTDCXX`
+				HAIKU_STATIC_LIBSTDCXX=`$readlink -e $HAIKU_STATIC_LIBSTDCXX`
 			fi
 
 			if [ $HAIKU_SHARED_LIBSTDCXX = libstdc++.so ]; then
 				HAIKU_SHARED_LIBSTDCXX=
 			else
-				HAIKU_SHARED_LIBSTDCXX=`readlink -e $HAIKU_SHARED_LIBSTDCXX`
+				HAIKU_SHARED_LIBSTDCXX=`$readlink -e $HAIKU_SHARED_LIBSTDCXX`
 			fi
 
 			if [ $HAIKU_STATIC_LIBSUPCXX = libsupc++.a ]; then
 				HAIKU_STATIC_LIBSUPCXX=
 			else
-				HAIKU_STATIC_LIBSUPCXX=`readlink -e $HAIKU_STATIC_LIBSUPCXX`
+				HAIKU_STATIC_LIBSUPCXX=`$readlink -e $HAIKU_STATIC_LIBSUPCXX`
 			fi
 
 			if [ $HAIKU_SHARED_LIBSUPCXX = libsupc++.so ]; then
 				HAIKU_SHARED_LIBSUPCXX=
 			else
-				HAIKU_SHARED_LIBSUPCXX=`readlink -e $HAIKU_SHARED_LIBSUPCXX`
+				HAIKU_SHARED_LIBSUPCXX=`$readlink -e $HAIKU_SHARED_LIBSUPCXX`
 			fi
 		;;
 		2.9*)
