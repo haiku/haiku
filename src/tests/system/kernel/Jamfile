@@ -47,6 +47,8 @@ SimpleTest port_wakeup_test_7 : port_wakeup_test_7.cpp ;
 SimpleTest port_wakeup_test_8 : port_wakeup_test_8.cpp ;
 SimpleTest port_wakeup_test_9 : port_wakeup_test_9.cpp ;
 
+SimpleTest mmap_resize_test : mmap_resize_test.cpp ;
+
 SimpleTest reserved_areas_test : reserved_areas_test.cpp ;
 
 SimpleTest select_check : select_check.cpp ;
