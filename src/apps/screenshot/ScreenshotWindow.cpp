@@ -98,8 +98,7 @@ public:
 
 ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	bool includeMouse, bool grabActiveWindow, bool showConfigWindow,
-	bool saveScreenshotSilent, int32 imageFileType, int32 translator,
-	const char* outputFilename)
+	bool saveScreenshotSilent, int32 imageFileType, const char* outputFilename)
 	:
 	BWindow(BRect(0, 0, 200.0, 100.0), TR("Retake screenshot"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_QUIT_ON_WINDOW_CLOSE |
@@ -117,7 +116,6 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	fSaveScreenshotSilent(saveScreenshotSilent),
 	fOutputFilename(outputFilename),
 	fExtension(""),
-	fTranslator(translator),
 	fImageFileType(imageFileType)
 {
 	if (fSaveScreenshotSilent) {
@@ -185,7 +183,6 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 		
 		case kImageOutputFormat:
 			message->FindInt32("be:type", &fImageFileType);
-			message->FindInt32("be:translator", &fTranslator);
 			fNameControl->SetText(_FindValidFileName(fNameControl->Text()).String());
 			_UpdateFilenameSelection();
 			break;
@@ -616,27 +613,32 @@ ScreenshotWindow::_FindValidFileName(const char* name)
 		return baseName;
 	
 	BTranslatorRoster* roster = BTranslatorRoster::Default();
-	const translation_format* formats = NULL;
 
-	int32 numFormats;
-	if (roster->GetOutputFormats(fTranslator, &formats, &numFormats) == B_OK) {
-		for (int32 i = 0; i < numFormats; ++i) {
-			if (formats[i].type == uint32(fImageFileType)) {
-				BMimeType mimeType(formats[i].MIME);
-				BMessage msgExtensions;				
-				if (mimeType.GetFileExtensions(&msgExtensions) == B_OK) {
-					const char* extension;
-					if (msgExtensions.FindString("extensions", 0, &extension) == B_OK) {
-						fExtension.SetTo(extension);
-						fExtension.Prepend(".");
-					} else
-						fExtension.SetTo("");
+	translator_id id = 0;
+	if (_FindTranslator(fImageFileType, &id) == B_OK) {
+
+		const translation_format* formats = NULL;
+	
+		int32 numFormats;
+		if (roster->GetOutputFormats(id, &formats, &numFormats) == B_OK) {
+			for (int32 i = 0; i < numFormats; ++i) {
+				if (formats[i].type == uint32(fImageFileType)) {
+					BMimeType mimeType(formats[i].MIME);
+					BMessage msgExtensions;				
+					if (mimeType.GetFileExtensions(&msgExtensions) == B_OK) {
+						const char* extension;
+						if (msgExtensions.FindString("extensions", 0, &extension) == B_OK) {
+							fExtension.SetTo(extension);
+							fExtension.Prepend(".");
+						} else
+							fExtension.SetTo("");
+					}
+					break;
 				}
-				break;
 			}
 		}
 	}
-	
+
 	BPath outputPath = orgPath;
 	BString fileName;
 	fileName << baseName << fExtension;
@@ -855,10 +857,15 @@ ScreenshotWindow::_SaveScreenshot()
 	if (nodeInfo.InitCheck() != B_OK)
 		return B_ERROR;
 
+	translator_id id = 0;
+	if (_FindTranslator(fImageFileType, &id) != B_OK)
+		return B_ERROR;
+
 	int32 numFormats;
 	const translation_format* formats = NULL;
-	if (roster->GetOutputFormats(fTranslator, &formats, &numFormats) != B_OK)
-		return B_OK;
+
+	if (roster->GetOutputFormats(id, &formats, &numFormats) != B_OK)
+		return B_ERROR;
 
 	for (int32 i = 0; i < numFormats; ++i) {
 		if (formats[i].type == uint32(fImageFileType)) {
@@ -866,6 +873,7 @@ ScreenshotWindow::_SaveScreenshot()
 			break;
 		}
 	}
+
 	return B_OK;
 }
 
@@ -957,4 +965,36 @@ ScreenshotWindow::_MakeTabSpaceTransparent(BRect* frame)
 		view.Looper()->Unlock();
 	}
 	fScreenshot->RemoveChild(&view);
+}
+
+
+status_t
+ScreenshotWindow::_FindTranslator(uint32 imageType, translator_id* id)
+{
+	translator_id* translators = NULL;
+	int32 numTranslators = 0;
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+	status_t status = roster->GetAllTranslators(&translators, &numTranslators);
+	if (status != B_OK)
+		return status;
+
+	status = B_ERROR;
+	for (int32 x = 0; x < numTranslators && status != B_OK; x++) {
+		int32 numFormats;
+		const translation_format* formats = NULL;
+
+		if (roster->GetOutputFormats(x, &formats, &numFormats) == B_OK) {
+			for (int32 i = 0; i < numFormats; ++i) {
+				if (formats[i].type == imageType) {
+					*id = x;
+					status = B_OK;
+					break;
+				}
+			}
+		}
+	}
+
+	delete [] translators;
+
+	return status;
 }

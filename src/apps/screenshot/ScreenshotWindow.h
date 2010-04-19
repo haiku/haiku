@@ -12,6 +12,7 @@
 
 #include <String.h>
 #include <Window.h>
+#include <TranslationDefs.h>
 #include <TranslatorFormats.h>
 
 
@@ -37,7 +38,6 @@ public:
 								bool showConfigWindow = false,
 								bool saveScreenshotSilent = false,
 								int32 imageFileType = B_PNG_FORMAT,
-								int32 translator = 8,
 								const char* outputFilename = NULL);
 	virtual					~ScreenshotWindow();
 
@@ -70,6 +70,8 @@ private:
 
 			status_t		_SaveScreenshot();
 
+			status_t		_FindTranslator(uint32 imageType, translator_id* id);
+
 			PreviewView*	fPreview;
 			BRadioButton*	fActiveWindow;
 			BRadioButton*	fWholeDesktop;
@@ -97,7 +99,6 @@ private:
 			BString			fOutputFilename;
 			BString			fExtension;
 
-			int32			fTranslator;
 			int32			fImageFileType;
 };
 

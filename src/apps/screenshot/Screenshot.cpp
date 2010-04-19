@@ -29,8 +29,7 @@ Screenshot::Screenshot()
 	BApplication("application/x-vnd.Haiku-Screenshot"),
 	fArgvReceived(false),
 	fRefsReceived(false),
-	fImageFileType(B_PNG_FORMAT),
-	fTranslator(8)
+	fImageFileType(B_PNG_FORMAT)
 {
 	be_locale->GetAppCatalog(&fCatalog);
 }
@@ -136,7 +135,7 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 	
 	new ScreenshotWindow(delay, includeBorder, includeMouse, grabActiveWindow, 
 		showConfigureWindow, saveScreenshotSilent, fImageFileType, 
-		fTranslator, outputFilename);
+		outputFilename);
 }
 
 
@@ -164,26 +163,20 @@ Screenshot::_ShowHelp() const
 void
 Screenshot::_SetImageTypeSilence(const char* name)
 {
-	if (strcmp(name, "bmp") == 0) {
+	if (strcmp(name, "bmp") == 0)
 		fImageFileType = B_BMP_FORMAT;
-		fTranslator = 1;
-	} else if (strcmp(name, "gif") == 0) {
+	else if (strcmp(name, "gif") == 0)
 		fImageFileType = B_GIF_FORMAT;
-		fTranslator = 3;
-	} else if (strcmp(name, "jpg") == 0) {
+	else if (strcmp(name, "jpg") == 0 || strcmp(name, "jpeg") == 0)
 		fImageFileType = B_JPEG_FORMAT;
-		fTranslator = 6;
-	} else if (strcmp(name, "ppm") == 0) {
+	else if (strcmp(name, "ppm") == 0)
 		fImageFileType = B_PPM_FORMAT;
-		fTranslator = 9;
-	} else if (strcmp(name, "targa") == 0) {
+	else if (strcmp(name, "targa") == 0 || strcmp(name, "tga") == 0)
 		fImageFileType = B_TGA_FORMAT;
-		fTranslator = 14;
-	} else if (strcmp(name, "tif") == 0) {
+	else if (strcmp(name, "tif") == 0 || strcmp(name, "tiff") == 0)
 		fImageFileType = B_TIFF_FORMAT;
-		fTranslator = 15;
-	} else { //png
+	else {
+		// Default to PNG.
 		fImageFileType = B_PNG_FORMAT;
-		fTranslator = 8;
 	}
 }

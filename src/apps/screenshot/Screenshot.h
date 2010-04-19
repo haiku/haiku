@@ -30,7 +30,6 @@ private:
 	bool				fArgvReceived;
 	bool				fRefsReceived;
 	int32				fImageFileType;
-	int32				fTranslator;
 	BCatalog				fCatalog;
 };
 
