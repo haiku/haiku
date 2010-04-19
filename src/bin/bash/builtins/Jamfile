@@ -81,5 +81,5 @@ StaticLibrary libbuiltins.a
 	  [ FGristFiles $(bashDefFiles:S=.c) ]
 ;
 
-# common.c and mkbuiltins.c include builtext.h
-Includes [ FGristFiles common.c mkbuiltins.c ] : <bash>builtext.h ;
+# common.c includes builtext.h
+Includes [ FGristFiles common.c ] : <bash>builtext.h ;
