@@ -22,7 +22,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 			VLC WonderBrush ;
 		AddOptionalHaikuImagePackages CVS Development Git Mercurial
 			Python Subversion OpenSSH OpenSSL ;
-		AddOptionalHaikuImagePackages Nano P7zip Welcome BeBook ;
+		AddOptionalHaikuImagePackages Nano P7zip Welcome BeBook XZ-Utils ;
 	}
 
 	case "beta-*" : {
@@ -37,7 +37,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_IMAGE_HOST_NAME = shredder ;
 		HAIKU_IMAGE_SIZE = 450 ;
 
-		AddOptionalHaikuImagePackages Pe Nano Vision P7zip ;
+		AddOptionalHaikuImagePackages Pe Nano Vision P7zip XZ-Utils ;
 		AddOptionalHaikuImagePackages Development Subversion OpenSSH OpenSSL ;
 	}
 }
