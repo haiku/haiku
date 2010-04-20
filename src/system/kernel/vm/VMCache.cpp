@@ -1078,8 +1078,9 @@ VMCache::Resize(off_t newSize, int priority)
 			DEBUG_PAGE_ACCESS_START(page);
 			vm_remove_all_page_mappings(page);
 			ASSERT(page->wired_count == 0);
-				// TODO: Find a real solution! Unmapping is probably fine, but
-				// we have no way of unmapping wired pages here.
+				// TODO: Find a real solution! If the page is wired
+				// temporarily (e.g. by lock_memory()), we actually must not
+				// unmap it!
 			RemovePage(page);
 			vm_page_free(this, page);
 				// Note: When iterating through a IteratableSplayTree
@@ -1145,10 +1146,19 @@ VMCache::Commit(off_t size, int priority)
 }
 
 
+/*!	Returns whether the cache's underlying backing store could deliver the
+	page at the given offset.
+
+	Basically it returns whether a Read() at \a offset would at least read a
+	partial page (assuming that no unexpected errors occur or the situation
+	changes in the meantime).
+*/
 bool
 VMCache::HasPage(off_t offset)
 {
-	return offset >= virtual_base && offset <= virtual_end;
+	// In accordance with Fault() the default implementation doesn't have a
+	// backing store and doesn't allow faults.
+	return false;
 }
 
 
