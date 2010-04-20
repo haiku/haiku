@@ -161,6 +161,7 @@ BKeymap::IsModifierKey(uint32 keyCode) const
 {
 	return keyCode == fKeys.caps_key
 		|| keyCode == fKeys.num_key
+		|| keyCode == fKeys.scroll_key
 		|| keyCode == fKeys.left_shift_key
 		|| keyCode == fKeys.right_shift_key
 		|| keyCode == fKeys.left_command_key
@@ -426,7 +427,7 @@ BKeymap&
 BKeymap::operator=(const BKeymap& other)
 {
 	Unset();
-	
+
 	fChars = new char[fCharsSize];
 	fCharsSize = other.fCharsSize;
 	memcpy(fChars, other.fChars, fCharsSize);
