@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src build libshared ;
+
+USES_BE_API on libshared_build.a = true ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private shared ] : true ;
+
+BuildPlatformStaticLibrary libshared_build.a :
+	Keymap.cpp
+;
+
+SEARCH on [ FGristFiles Keymap.cpp ]
+	= [ FDirName $(HAIKU_TOP) src kits shared ] ;

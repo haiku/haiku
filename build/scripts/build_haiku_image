@@ -43,6 +43,8 @@ if [ ! $isCD ]; then
 	normalizedImagePath=''
 	if readlink -f "$imagePath" > /dev/null 2>&1 ; then
 		normalizedImagePath=$(readlink -f "$imagePath")
+	elif realpath "$imagePath" > /dev/null 2>&1 ; then
+		normalizedImagePath=$(realpath "$imagePath")		
 	elif greadlink -f "$imagePath" > /dev/null 2>&1 ; then
 		normalizedImagePath=$(greadlink -f "$imagePath")
 	fi

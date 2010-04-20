@@ -95,7 +95,8 @@ BinCommand bash :
 Includes [ FGristFiles trap.c ] : <bash>signames.h ;
 
 # some sources include the generated builtext.h
-Includes [ FGristFiles execute_cmd.c nojobs.c jobs.c parse.c subst.c trap.c ]
+Includes [ FGristFiles execute_cmd.c nojobs.c jobs.c parse.c subst.c trap.c
+		parse.y ]
 	: <bash>builtext.h ;
 
 # y.tab.h includes parse.h

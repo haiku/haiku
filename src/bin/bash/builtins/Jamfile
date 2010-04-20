@@ -67,11 +67,6 @@ for bashDefFile in [ FGristFiles $(bashDefFiles) ] {
 	MkBuiltinsComp $(source) : $(bashDefFile) ;
 }
 
-# TODO: Work-around for a bug in jam. These dependencies aren't necessary, but
-# without them a jam run with multiple jobs sometimes tries to build builtins.o
-# before builtins.c has been built.
-Depends [ FGristFiles builtins.c ] : [ FGristFiles $(bashDefFiles:S=.c) ] ;
-
 # generate builtext.h and builtins.c
 MkBuiltinsExt <bash>builtext.h [ FGristFiles builtins.c ] : $(bashDefFiles) ;
 
@@ -81,5 +76,5 @@ StaticLibrary libbuiltins.a
 	  [ FGristFiles $(bashDefFiles:S=.c) ]
 ;
 
-# common.c and mkbuiltins.c include builtext.h
-Includes [ FGristFiles common.c mkbuiltins.c ] : <bash>builtext.h ;
+# common.c includes builtext.h
+Includes [ FGristFiles common.c ] : <bash>builtext.h ;

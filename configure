@@ -144,6 +144,14 @@ assertparams()
 #
 standard_gcc_settings()
 {
+	if which greadlink > /dev/null 2>&1; then
+		readlink="greadlink -e"
+	elif which realpath > /dev/null 2>&1; then
+		readlink=realpath
+	else
+		readlink="readlink -e"
+	fi
+
 	# PLATFORM_LINKLIBS
 	gcclib=`$HAIKU_CC -print-libgcc-file-name`
 	gccdir=`dirname ${gcclib}`
@@ -184,23 +192,33 @@ standard_gcc_settings()
 					$headers/$d"
 			done
 
-			# when not building the crosscompiler, to use cpp headers from
-			# tree first, but fallback to local C++ system headers (like <new>)
-			# if [ "$buildCrossTools" = "" ]; then
-			#	HAIKU_CXX_HEADERS_DIR="headers/cpp $HAIKU_CXX_HEADERS_DIR"
-			# fi
+			# Unset the HAIKU_{SHARED,STATIC}_LIB{STD,SUP}CXX variables, if the
+			# compiler didn't give us actual file names. Otherwise resolve
+			# symlinks to avoid problems when copying the libraries to the
+			# image.
 
 			if [ $HAIKU_STATIC_LIBSTDCXX = libstdc++.a ]; then
 				HAIKU_STATIC_LIBSTDCXX=
+			else
+				HAIKU_STATIC_LIBSTDCXX=`$readlink $HAIKU_STATIC_LIBSTDCXX`
 			fi
+
 			if [ $HAIKU_SHARED_LIBSTDCXX = libstdc++.so ]; then
 				HAIKU_SHARED_LIBSTDCXX=
+			else
+				HAIKU_SHARED_LIBSTDCXX=`$readlink $HAIKU_SHARED_LIBSTDCXX`
 			fi
+
 			if [ $HAIKU_STATIC_LIBSUPCXX = libsupc++.a ]; then
 				HAIKU_STATIC_LIBSUPCXX=
+			else
+				HAIKU_STATIC_LIBSUPCXX=`$readlink $HAIKU_STATIC_LIBSUPCXX`
 			fi
+
 			if [ $HAIKU_SHARED_LIBSUPCXX = libsupc++.so ]; then
 				HAIKU_SHARED_LIBSUPCXX=
+			else
+				HAIKU_SHARED_LIBSUPCXX=`$readlink $HAIKU_SHARED_LIBSUPCXX`
 			fi
 		;;
 		2.9*)
@@ -241,7 +259,7 @@ get_build_tool_path()
 		path="`pwd`/`basename "$path"`"
 		cd $oldPwd
 	else
-		which "$path" &> /dev/null || {
+		which "$path" > /dev/null 2>&1 || {
 			echo "Build tool \"$path\" not found." >&2
 			exit 1
 		}
@@ -292,13 +310,13 @@ HAIKU_USE_GCC_PIPE=0
 HAIKU_HOST_USE_32BIT=0
 HAIKU_HOST_USE_XATTR=0
 HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR=
-HAIKU_ADD_ALTERNATIVE_GCC_LIBS=
+HAIKU_ADD_ALTERNATIVE_GCC_LIBS=0
 HOST_GCC_LD=`gcc -print-prog-name=ld`
 HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
 HOST_SFDISK=$SFDISK_BINARY
 
-haikuRequiredLegacyGCCVersion="2.95.3-haiku-090629"
+haikuRequiredLegacyGCCVersion="2.95.3-haiku-100420"
 export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
 
@@ -448,6 +466,7 @@ if [ $targetArch = "x86" ]; then
 		0.[0-6].*)		;;
 		*)				versionOK=1 ;;
 	esac
+versionOK=1
 
 	if [ $versionOK = 0 ]; then
 		echo "The yasm assembler version 0.7.0 or later must be installed."

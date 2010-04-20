@@ -80,11 +80,12 @@ utimensat(int fd, const char *path, const struct timespec times[2], int flag)
 
 			stat.st_mtim = times[1];
 		}
-	}
+	} else
+		mask |= B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME;
 
 	// set the times -- as per spec we even need to do this, if both have
 	// UTIME_OMIT set
-	status = _kern_write_stat(fd, path, (flag & AT_SYMLINK_NOFOLLOW) != 0,
+	status = _kern_write_stat(fd, path, (flag & AT_SYMLINK_NOFOLLOW) == 0,
 		&stat, sizeof(struct stat), mask);
 
 	RETURN_AND_SET_ERRNO(status);

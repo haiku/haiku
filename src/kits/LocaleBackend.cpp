@@ -6,6 +6,7 @@
 
 #include "LocaleBackend.h"
 
+#include <dlfcn.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
@@ -25,13 +26,14 @@ static pthread_once_t sBackendInitOnce = PTHREAD_ONCE_INIT;
 static void
 LoadBackend()
 {
-	image_id libLocaleAddonID = load_add_on("/system/lib/liblocale.so");
-
-	if (libLocaleAddonID < 0)
+	void* imageHandle = dlopen("liblocale.so", RTLD_LAZY);
+	if (imageHandle == NULL)
 		return;
-	LocaleBackend* (*createInstanceFunc)();
-	if (get_image_symbol(libLocaleAddonID, "CreateLocaleBackendInstance", 
-			B_SYMBOL_TYPE_TEXT, (void**)&createInstanceFunc) != B_OK)
+
+	typedef LocaleBackend* (*symbolType)();
+	symbolType createInstanceFunc = (symbolType)dlsym(imageHandle,
+		"CreateLocaleBackendInstance");
+	if (createInstanceFunc == NULL)
 		return;
 
 	gLocaleBackend = createInstanceFunc();

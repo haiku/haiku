@@ -1,13 +1,9 @@
 SubDir HAIKU_TOP src bin keymap ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+UsePrivateHeaders shared storage ;
 
 BinCommand keymap :
 	main.cpp
 	Keymap.cpp
-	: be $(TARGET_LIBSUPC++) ;
-
-Package haiku-inputkit-cvs :
-        keymap :
-        boot home config bin ;
-
+	: be libshared.a $(TARGET_LIBSUPC++) ;

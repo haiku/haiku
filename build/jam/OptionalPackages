@@ -6,7 +6,8 @@
 # packages. (It does not matter if a package was built with either compiler,
 # the system should have the respective other system libs.)
 local isHybridBuild ;
-if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
+if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
+		&& $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 	isHybridBuild = 1 ;
 }
 
@@ -725,7 +726,7 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 
 
 # MandatoryPackages
-if [ IsOptionalHaikuImagePackageAdded MandatoryPackages ] { 
+if [ IsOptionalHaikuImagePackageAdded MandatoryPackages ] {
 	# Pseudo package for grouping packages, which are added to all images.
 }
 
