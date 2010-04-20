@@ -144,9 +144,9 @@ assertparams()
 #
 standard_gcc_settings()
 {
-	if [ `which greadlink` ]; then
+	if [ `which greadlink > /dev/null 2>&1` ]; then
 		readlink="greadlink -e"
-	elif [ `which realpath` ]; then
+	elif [ `which realpath > /dev/null 2>&1` ]; then
 		readlink=realpath
 	else
 		readlink="readlink -e"
