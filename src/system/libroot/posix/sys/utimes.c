@@ -54,7 +54,6 @@ utimensat(int fd, const char *path, const struct timespec times[2], int flag)
 		bigtime_t now = real_time_clock_usecs();
 		stat.st_atim.tv_sec = stat.st_mtim.tv_sec = now / 1000000;
 		stat.st_atim.tv_nsec = stat.st_mtim.tv_nsec = (now % 1000000) * 1000;
-		mask |= B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME;
 	}
 
 	if (times != NULL) {
@@ -81,7 +80,8 @@ utimensat(int fd, const char *path, const struct timespec times[2], int flag)
 
 			stat.st_mtim = times[1];
 		}
-	}
+	} else
+		mask |= B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME;
 
 	// set the times -- as per spec we even need to do this, if both have
 	// UTIME_OMIT set
