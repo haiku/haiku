@@ -613,7 +613,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		// If no one else uses the area's cache, we can resize it, too.
 		if (cache->areas == area && area->cache_next == NULL
-			&& list_is_empty(&cache->consumers)) {
+			&& list_is_empty(&cache->consumers)
+			&& cache->type == CACHE_TYPE_RAM) {
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
