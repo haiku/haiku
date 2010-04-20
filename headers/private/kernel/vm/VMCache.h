@@ -110,7 +110,7 @@ public:
 			status_t			WriteModified();
 			status_t			SetMinimalCommitment(off_t commitment,
 									int priority);
-			status_t			Resize(off_t newSize, int priority);
+	virtual	status_t			Resize(off_t newSize, int priority);
 
 			status_t			FlushAndRemoveAllPages();
 
