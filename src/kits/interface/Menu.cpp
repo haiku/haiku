@@ -398,7 +398,7 @@ BMenu::AttachedToWindow()
 	if (!fAttachAborted) {
 		_CacheFontInfo();
 		_LayoutItems(0);
-		_UpdateWindowViewSize();
+		_UpdateWindowViewSize(false);
 	}
 }
 
@@ -705,7 +705,7 @@ BMenu::AddItem(BMenuItem* item, int32 index)
 	if (LockLooper()) {
 		if (!Window()->IsHidden()) {
 			_LayoutItems(index);
-			_UpdateWindowViewSize();
+			_UpdateWindowViewSize(false);
 			Invalidate();
 		}
 		UnlockLooper();
@@ -826,7 +826,7 @@ BMenu::AddList(BList* list, int32 index)
 	if (locked && Window() != NULL && !Window()->IsHidden()) {
 		// Make sure we update the layout if needed.
 		_LayoutItems(index);
-		_UpdateWindowViewSize();
+		_UpdateWindowViewSize(false);
 		Invalidate();
 	}
 
@@ -1508,7 +1508,7 @@ BMenu::_Show(bool selectFirstItem)
 			return false;
 		}
 
-		_UpdateWindowViewSize();
+		_UpdateWindowViewSize(true);
 		window->Show();
 
 		if (selectFirstItem)
@@ -1990,7 +1990,7 @@ BMenu::_RemoveItems(int32 index, int32 count, BMenuItem* item,
 		InvalidateLayout();
 		if (locked && window != NULL) {
 			_LayoutItems(0);
-			_UpdateWindowViewSize();
+			_UpdateWindowViewSize(false);
 			Invalidate();
 		}
 	}
@@ -2300,7 +2300,7 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 	if (!scroll) {
 		// basically, if this returns false, it means
 		// that the menu frame won't fit completely inside the screen
-		// TODO: Scrolling, will currently only work up/down,
+		// TODO: Scrolling will currently only work up/down,
 		// not left/right
 		scroll = screenFrame.Height() < frame.Height();
 	}
@@ -2684,7 +2684,7 @@ BMenu::_ChooseTrigger(const char* title, int32& index, uint32& trigger,
 
 
 void
-BMenu::_UpdateWindowViewSize()
+BMenu::_UpdateWindowViewSize(const bool &move)
 {
 	BMenuWindow* window = static_cast<BMenuWindow*>(Window());
 	if (window == NULL)
@@ -2697,7 +2697,7 @@ BMenu::_UpdateWindowViewSize()
 		return;
 
 	bool scroll = false;
-	const BPoint screenLocation = ScreenLocation();
+	const BPoint screenLocation = move ? ScreenLocation() : window->Frame().LeftTop();
 	BRect frame = _CalcFrame(screenLocation, &scroll);
 	ResizeTo(frame.Width(), frame.Height());
 
@@ -2728,7 +2728,8 @@ BMenu::_UpdateWindowViewSize()
 			fFontHeight + fPad.top + fPad.bottom);
 	}
 
-	window->MoveTo(frame.LeftTop());
+	if (move)
+		window->MoveTo(frame.LeftTop());
 }
 
 
