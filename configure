@@ -252,7 +252,7 @@ get_build_tool_path()
 		path="`pwd`/`basename "$path"`"
 		cd $oldPwd
 	else
-		which "$path" &> /dev/null || {
+		which "$path" > /dev/null 2>&1 || {
 			echo "Build tool \"$path\" not found." >&2
 			exit 1
 		}
