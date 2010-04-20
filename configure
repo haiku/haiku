@@ -144,13 +144,14 @@ assertparams()
 #
 standard_gcc_settings()
 {
-	if [ `which greadlink > /dev/null 2>&1` ]; then
+	if which greadlink > /dev/null 2>&1; then
 		readlink="greadlink -e"
-	elif [ `which realpath > /dev/null 2>&1` ]; then
+	elif which realpath > /dev/null 2>&1; then
 		readlink=realpath
 	else
 		readlink="readlink -e"
 	fi
+
 	# PLATFORM_LINKLIBS
 	gcclib=`$HAIKU_CC -print-libgcc-file-name`
 	gccdir=`dirname ${gcclib}`
