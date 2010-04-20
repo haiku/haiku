@@ -4,4 +4,4 @@ SubInclude HAIKU_TOP src build icu ;
 SubInclude HAIKU_TOP src build libbe ;
 SubInclude HAIKU_TOP src build libhaikucompat ;
 SubInclude HAIKU_TOP src build libroot ;
-
+SubInclude HAIKU_TOP src build libshared ;

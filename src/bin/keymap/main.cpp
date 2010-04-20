@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include <Application.h>
+#include <FileIO.h>
 
 #include "Keymap.h"
 
@@ -68,9 +69,11 @@ load_keymap(Keymap& keymap, const char* name, bool source)
 			status = keymap.LoadSource(stdin);
 	} else {
 		if (name != NULL)
-			status = keymap.Load(name);
-		else
-			status = keymap.Load(stdin);
+			status = keymap.SetTo(name);
+		else {
+			BFileIO fileIO(stdin);
+			status = keymap.SetTo(fileIO);
+		}
 	}
 
 	if (status != B_OK) {
@@ -82,7 +85,7 @@ load_keymap(Keymap& keymap, const char* name, bool source)
 
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 	const char* output = NULL;
 	const char* input = NULL;
@@ -179,7 +182,7 @@ main(int argc, char **argv)
 		case kSaveText:
 		{
 			if (input == NULL) {
-				status_t status = keymap.LoadCurrent();
+				status_t status = keymap.SetToCurrent();
 				if (status != B_OK) {
 					fprintf(stderr, "%s: error while getting keymap: %s!\n",
 						sProgramName, keymap_error(status));
