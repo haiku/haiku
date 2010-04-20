@@ -3,13 +3,10 @@ SubDir HAIKU_TOP src build libbe ;
 USES_BE_API on libshared_build.a = true ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers build private shared ] : true ;
-UseHeaders [ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) servers input ] ;
 
 BuildPlatformStaticLibrary libshared_build.a :
 	Keymap.cpp
 ;
-
-Includes [ FGristFiles Keymap.cpp ] : <src!servers!input>SystemKeymap.h ;
 
 SEARCH on [ FGristFiles Keymap.cpp ]
 	= [ FDirName $(HAIKU_TOP) src kits shared ] ;
