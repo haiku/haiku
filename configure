@@ -144,7 +144,11 @@ assertparams()
 #
 standard_gcc_settings()
 {
-	greadlink --help >/dev/null 2>&1 && readlink=greadlink || readlink=readlink
+	if [ `which greadlink` ]; then
+		readlink=greadlink
+	else
+		readlink=readlink
+	fi
 	# PLATFORM_LINKLIBS
 	gcclib=`$HAIKU_CC -print-libgcc-file-name`
 	gccdir=`dirname ${gcclib}`
