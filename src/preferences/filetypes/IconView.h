@@ -50,8 +50,8 @@ class Icon {
 
 		Icon& operator=(const Icon& source);
 
-		void AdoptLarge(BBitmap *large);
-		void AdoptMini(BBitmap *mini);
+		void AdoptLarge(BBitmap* large);
+		void AdoptMini(BBitmap* mini);
 		void AdoptData(uint8* data, size_t size);
 
 		static BBitmap* AllocateBitmap(int32 size, int32 space = -1);
@@ -63,11 +63,11 @@ class Icon {
 		size_t		fSize;
 };
 
+class BSize;
+
 class IconView : public BControl {
 	public:
-		IconView(BRect rect, const char* name,
-			uint32 resizeMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			uint32 flags = B_NAVIGABLE);
+		IconView(const char* name, uint32 flags = B_NAVIGABLE);
 		virtual ~IconView();
 
 		virtual void AttachedToWindow();
@@ -75,6 +75,10 @@ class IconView : public BControl {
 		virtual void MessageReceived(BMessage* message);
 		virtual void Draw(BRect updateRect);
 		virtual void GetPreferredSize(float* _width, float* _height);
+
+		virtual BSize MaxSize();
+		virtual BSize MinSize();
+		virtual BSize PreferredSize();
 
 		virtual void MouseDown(BPoint where);
 		virtual void MouseUp(BPoint where);
@@ -92,9 +96,9 @@ class IconView : public BControl {
 		void SetIconSize(int32 size);
 		void ShowIconHeap(bool show);
 		void ShowEmptyFrame(bool show);
-		void SetTarget(const BMessenger& target);
+		status_t SetTarget(const BMessenger& target);
 		void SetModificationMessage(BMessage* message);
-		void Invoke(const BMessage* message = NULL);
+		status_t Invoke(const BMessage* message = NULL);
 
 		::Icon* Icon();
 		int32 IconSize() const { return fIconSize; } 

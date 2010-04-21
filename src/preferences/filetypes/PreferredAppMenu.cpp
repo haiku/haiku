@@ -9,14 +9,13 @@
 
 #include <Alert.h>
 #include <AppFileInfo.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <String.h>
-
-#include <Catalog.h>
-#include <Locale.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -163,9 +162,11 @@ update_preferred_app_menu(BMenu* menu, BMimeType* type, uint32 what,
 			|| item->Message()->FindString("signature", &signature) != B_OK)
 			continue;
 
-		if (preferredFrom == NULL && !strcasecmp(signature, preferred)
-			|| preferredFrom != NULL && !strcasecmp(signature, preferredFrom))
+		if ((preferredFrom == NULL && !strcasecmp(signature, preferred))
+			|| (preferredFrom != NULL
+				&& !strcasecmp(signature, preferredFrom))) {
 			select = item;
+		}
 
 		if (last == NULL || strcmp(last->Label(), item->Label())) {
 			if (lastItemSame)
@@ -191,8 +192,8 @@ update_preferred_app_menu(BMenu* menu, BMimeType* type, uint32 what,
 		// We don't select the item earlier, so that the menu field can
 		// pick up the signature as well as label.
 		select->SetMarked(true);
-	} else if (preferredFrom == NULL && preferred[0]
-		|| preferredFrom && preferredFrom[0]) {
+	} else if ((preferredFrom == NULL && preferred[0])
+		|| (preferredFrom != NULL && preferredFrom[0])) {
 		// The preferred application is not an application that support
 		// this file type!
 		BMenuItem* item = create_application_item(preferredFrom
@@ -252,9 +253,9 @@ retrieve_preferred_app(BMessage* message, bool sameAs, const char* forType,
 	}
 
 	if (!preferred[0]) {
-		error_alert(sameAs ?
-			TR("Could not retrieve preferred application of this file.")
-			: TR("Could not retrieve application signature."));
+		error_alert(sameAs
+			? TR("Could not retrieve preferred application of this file")
+			: TR("Could not retrieve application signature"));
 		return B_ERROR;
 	}
 
@@ -287,9 +288,9 @@ retrieve_preferred_app(BMessage* message, bool sameAs, const char* forType,
 			"Are you sure you want to set it anyway?"),
 			description[0] ? description : preferred);
 
-		BAlert* alert = new BAlert("FileTypes Request", warning,
-			TR("Set Preferred Application"), "Cancel", NULL, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT);
+		BAlert* alert = new BAlert(TR("FileTypes request"), warning,
+			TR("Set Preferred Application"), TR("Cancel"), NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go() == 1)
 			return B_ERROR;
 	}

@@ -9,6 +9,8 @@
 
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
+#include <GroupLayoutBuilder.h>
 #include <Locale.h>
 #include <ScrollView.h>
 
@@ -16,58 +18,58 @@
 
 
 #undef TR_CONTEXT
-#define TR_CONTEXT "TypeListWindow"
+#define TR_CONTEXT "Type List Window"
 
 
 const uint32 kMsgTypeSelected = 'tpsl';
 const uint32 kMsgSelected = 'seld';
 
 
-TypeListWindow::TypeListWindow(const char* currentType, uint32 what,
-		BWindow* target)
-	: BWindow(BRect(100, 100, 360, 440), TR("Choose type"), B_MODAL_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
+TypeListWindow::TypeListWindow(const char* currentType,
+	uint32 what, BWindow* target)
+	:
+	BWindow(BRect(100, 100, 360, 440), TR("Choose type"), B_MODAL_WINDOW,
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fTarget(target),
 	fWhat(what)
 {
-	BRect rect = Bounds();
-	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
+	float padding = 3.0f;
+	//if (be_control_look)
+		// padding = be_control_look->DefaultItemSpacing();
+		// seems too big
 
-	fSelectButton = new BButton(rect, "select", TR("Done"),
-		new BMessage(kMsgSelected), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	fSelectButton->ResizeToPreferred();
-	fSelectButton->MoveTo(topView->Bounds().right - 8.0f 
-		- fSelectButton->Bounds().Width(),
-		topView->Bounds().bottom - 8.0f - fSelectButton->Bounds().Height());
+	fSelectButton = new BButton("select", TR("Done"),
+		new BMessage(kMsgSelected));
 	fSelectButton->SetEnabled(false);
-	topView->AddChild(fSelectButton);
 
-	BButton* button = new BButton(fSelectButton->Frame(), "cancel", TR("Cancel"),
-		new BMessage(B_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->MoveBy(-button->Bounds().Width() - 8.0f, 0.0f);
-	topView->AddChild(button);
+	BButton* button = new BButton("cancel", TR("Cancel"),
+		new BMessage(B_CANCEL));
 
 	fSelectButton->MakeDefault(true);
 
-	rect.bottom = button->Frame().top - 10.0f;
-	rect.top = 10.0f;
-	rect.left = 10.0f;
-	rect.right -= 10.0f + B_V_SCROLL_BAR_WIDTH;
-	fListView = new MimeTypeListView(rect, "typeview", NULL, true, false,
-		B_FOLLOW_ALL);
+	fListView = new MimeTypeListView("typeview", NULL, true, false);
 	fListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
 	fListView->SetInvocationMessage(new BMessage(kMsgSelected));
 
 	BScrollView* scrollView = new BScrollView("scrollview", fListView,
-		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-	topView->AddChild(scrollView);
+		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
+
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+		.Add(scrollView)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)		
+			.Add(button)
+			.Add(fSelectButton)
+		)
+		.SetInsets(padding, padding, padding, padding)
+	);
+
+	BAlignment buttonAlignment = 
+		BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_CENTER);
+	button->SetExplicitAlignment(buttonAlignment);
+	fSelectButton->SetExplicitAlignment(buttonAlignment);
 
 	MoveTo(target->Frame().LeftTop() + BPoint(15.0f, 15.0f));
-	SetSizeLimits(button->Bounds().Width() + fSelectButton->Bounds().Width() + 64.0f, 32767.0f,
-		fSelectButton->Bounds().Height() * 5.0f, 32767.0f);
 }
 
 

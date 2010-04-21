@@ -15,13 +15,17 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <File.h>
 #include <Locale.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <PopUpMenu.h>
+#include <SpaceLayoutItem.h>
 #include <TextControl.h>
 
 #include <stdio.h>
@@ -45,35 +49,23 @@ const uint32 kMsgSamePreferredAppAsOpened = 'spaO';
 
 
 FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
-	: BWindow(BRect(0.0f, 0.0f, 200.0f, 200.0f).OffsetBySelf(position),
+	:
+	BWindow(BRect(0.0f, 0.0f, 200.0f, 200.0f).OffsetBySelf(position),
 		TR("File type"), B_TITLED_WINDOW,
-		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE |
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BRect rect = Bounds();
-	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
+	float padding = 3.0f;
+	// if (be_control_look)
+		// padding = be_control_look->DefaultItemSpacing();
+			// too big!
 
 	// "File Type" group
+	BBox* fileTypeBox = new BBox("file type BBox");
+	fileTypeBox->SetLabel(TR("File type"));
 
-	BFont font(be_bold_font);
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
-
-	rect.InsetBy(8.0f, 8.0f);
-	BBox* box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	box->SetLabel(TR("File type"));
-	topView->AddChild(box);
-
-	rect = box->Bounds();
-	rect.InsetBy(8.0f, 4.0f + fontHeight.ascent + fontHeight.descent);
-	fTypeControl = new BTextControl(rect, "type", NULL, NULL,
-		new BMessage(kMsgTypeEntered), B_FOLLOW_LEFT_RIGHT);
-	fTypeControl->SetDivider(0.0f);
-	float width, height;
-	fTypeControl->GetPreferredSize(&width, &height);
-	fTypeControl->ResizeTo(rect.Width(), height);
-	box->AddChild(fTypeControl);
+	fTypeControl = new BTextControl("type", NULL, "Type Control",
+		new BMessage(kMsgTypeEntered));
 
 	// filter out invalid characters that can't be part of a MIME type name
 	BTextView* textView = fTypeControl->TextView();
@@ -82,55 +74,32 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		textView->DisallowChar(disallowedCharacters[i]);
 	}
 
-	rect.OffsetBy(0.0f, fTypeControl->Bounds().Height() + 5.0f);
-	fSelectTypeButton = new BButton(rect, "select type",
-		TR("Select" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgSelectType), B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	fSelectTypeButton->ResizeToPreferred();
-	box->AddChild(fSelectTypeButton);
+	fSelectTypeButton = new BButton("select type",
+		TR("Select" B_UTF8_ELLIPSIS), new BMessage(kMsgSelectType));
 
-	rect.OffsetBy(fSelectTypeButton->Bounds().Width() + 8.0f, 0.0f);
-	fSameTypeAsButton = new BButton(rect, "same type as",
-		TR("Same as" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgSameTypeAs), B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	fSameTypeAsButton->ResizeToPreferred();
-	box->AddChild(fSameTypeAsButton);
+	fSameTypeAsButton = new BButton("same type as",
+		TR("Same as" B_UTF8_ELLIPSIS), new BMessage(kMsgSameTypeAs));
 
-	width = font.StringWidth("Icon") + 16.0f;
-	if (width < B_LARGE_ICON + 16.0f)
-		width = B_LARGE_ICON + 16.0f;
-
-	height = fSelectTypeButton->Frame().bottom + 8.0f;
-	if (height < 8.0f + B_LARGE_ICON + fontHeight.ascent + fontHeight.descent)
-		height = 8.0f + B_LARGE_ICON + fontHeight.ascent + fontHeight.descent;
-	box->ResizeTo(box->Bounds().Width() - width - 8.0f, height);
+	fileTypeBox->AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(fTypeControl, 0, 0, 2, 1)
+		.Add(fSelectTypeButton, 0, 1)
+		.Add(fSameTypeAsButton, 1, 1)
+		.SetInsets(padding, padding, padding, padding)
+	);
 
 	// "Icon" group
 
-	rect = box->Frame();
-	rect.left = rect.right + 8.0f;
-	rect.right += width + 8.0f;
-	float iconBoxWidth = rect.Width();
-	box = new BBox(rect, NULL, B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	box->SetLabel("Icon");
-	topView->AddChild(box);
-
-	rect = BRect(8.0f, 0.0f, 7.0f + B_LARGE_ICON, B_LARGE_ICON - 1.0f);
-	rect.OffsetBy(0.0f, (box->Bounds().Height() - rect.Height()) / 2.0f);
-	if (rect.top < fontHeight.ascent + fontHeight.descent + 4.0f)
-		rect.top = fontHeight.ascent + fontHeight.descent + 4.0f;
-	fIconView = new IconView(rect, "icon");
-	box->AddChild(fIconView);
+	BBox* iconBox = new BBox("icon BBox");
+	iconBox->SetLabel(TR("Icon"));
+	fIconView = new IconView("icon");
+	iconBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
+		.Add(fIconView)
+		.SetInsets(padding, padding, padding, padding));
 
 	// "Preferred Application" group
 
-	rect.top = box->Frame().bottom + 8.0f;
-	rect.bottom = rect.top + box->Bounds().Height();
-	rect.left = 8.0f;
-	rect.right = Bounds().Width() - 8.0f;
-	box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	box->SetLabel(TR("Preferred application"));
-	topView->AddChild(box);
+	BBox* preferredBox = new BBox("preferred BBox");
+	preferredBox->SetLabel(TR("Preferred application"));
 
 	BMenu* menu = new BPopUpMenu("preferred");
 	BMenuItem* item;
@@ -138,43 +107,31 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		new BMessage(kMsgPreferredAppChosen)));
 	item->SetMarked(true);
 
-	rect = fTypeControl->Frame();
-	BView* constrainingView = new BView(rect, NULL, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW);
-	constrainingView->SetViewColor(topView->ViewColor());
+	fPreferredField = new BMenuField("preferred", NULL, menu);
 
-	fPreferredField = new BMenuField(rect.OffsetToCopy(B_ORIGIN), "preferred",
-		NULL, menu);
-	fPreferredField->GetPreferredSize(&width, &height);
-	fPreferredField->ResizeTo(rect.Width(), height);
-	constrainingView->ResizeTo(rect.Width(), height);
-	constrainingView->AddChild(fPreferredField);
-		// we embed the menu field in another view to make it behave like
-		// we want so that it can't obscure other elements with larger
-		// labels
+	fSelectAppButton = new BButton("select app", TR("Select" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgSelectPreferredApp));
 
-	box->AddChild(constrainingView);
+	fSameAppAsButton = new BButton("same app as", TR("Same as" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgSamePreferredAppAs));
 
-	rect.OffsetBy(0.0f, height + 5.0f);
-	fSelectAppButton = new BButton(rect, "select app",
-		TR("Select" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgSelectPreferredApp), B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	fSelectAppButton->ResizeToPreferred();
-	box->AddChild(fSelectAppButton);
+	preferredBox->AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(fPreferredField, 0, 0, 2, 1)
+		.Add(fSelectAppButton, 0, 1)
+		.Add(fSameAppAsButton, 1, 1)
+		.Add(BSpaceLayoutItem::CreateGlue(), 3, 0, 1, 2)
+		.SetInsets(padding, padding, padding, padding)
+	);
 
-	rect.OffsetBy(fSelectAppButton->Bounds().Width() + 8.0f, 0.0f);
-	fSameAppAsButton = new BButton(rect, "same app as",
-		TR("Same as" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgSamePreferredAppAs), B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	fSameAppAsButton->ResizeToPreferred();
-	box->AddChild(fSameAppAsButton);
-	box->ResizeBy(0.0f, height - fTypeControl->Bounds().Height());
-
-	ResizeTo(fSameAppAsButton->Frame().right + 100.0f, box->Frame().bottom + 8.0f);
-	SetSizeLimits(fSameAppAsButton->Frame().right + iconBoxWidth + 32.0f, 32767.0f,
-		Bounds().Height(), Bounds().Height());
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(fileTypeBox, 0, 0, 1, 2)
+		.Add(iconBox, 1, 1, 1, 2)
+		.Add(preferredBox, 0, 2, 1, 2)
+		.SetInsets(padding, padding, padding, padding)
+	);
 
 	fTypeControl->MakeFocus(true);
-
 	BMimeType::StartWatching(this);
 	_SetTo(refs);
 }
@@ -190,6 +147,7 @@ BString
 FileTypeWindow::_Title(const BMessage& refs)
 {
 	BString title;
+
 	entry_ref ref;
 	if (refs.FindRef("refs", 1, &ref) == B_OK) {
 		bool same = false;
@@ -213,15 +171,18 @@ FileTypeWindow::_Title(const BMessage& refs)
 
 		char name[B_FILE_NAME_LENGTH];
 		if (same && parent.GetName(name) == B_OK) {
-			title = TR("Multiple files from \"");
-			title.Append(name);
-			title.Append("\"");
+			char buffer[512];
+			snprintf(buffer, sizeof(buffer),
+				TR("Multiple files from \"%s\" file type"), name);
+			title = buffer;
 		} else
-			title = TR("[Multiple files]");
-	} else if (refs.FindRef("refs", 0, &ref) == B_OK)
-		title = ref.name;
+			title = TR("[Multiple files] file types");
+	} else if (refs.FindRef("refs", 0, &ref) == B_OK) {
+		char buffer[512];
+		snprintf(buffer, sizeof(buffer), TR("%s file type"), ref.name);
+		title = buffer;
+	}
 
-	title.Append(" file type");
 	return title;
 }
 
@@ -443,7 +404,8 @@ FileTypeWindow::MessageReceived(BMessage* message)
 		case kMsgSamePreferredAppAs:
 		{
 			BMessage panel(kMsgOpenFilePanel);
-			panel.AddString("title", TR("Select same preferred application as"));
+			panel.AddString("title",
+				TR("Select same preferred application as"));
 			panel.AddInt32("message", kMsgSamePreferredAppAsOpened);
 			panel.AddMessenger("target", this);
 
@@ -478,11 +440,9 @@ FileTypeWindow::MessageReceived(BMessage* message)
 				break;
 
 			if (which == B_MIME_TYPE_DELETED
-#ifdef __HAIKU__
-				|| which == B_SUPPORTED_TYPES_CHANGED
-#endif
-				)
+				|| which == B_SUPPORTED_TYPES_CHANGED) {
 				_UpdatePreferredApps();
+			}
 			break;
 
 		default:

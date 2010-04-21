@@ -52,10 +52,9 @@ class MimeTypeItem : public BStringItem {
 
 class MimeTypeListView : public BOutlineListView {
 	public:
-		MimeTypeListView(BRect rect, const char* name,
+		MimeTypeListView(const char* name,
 			const char* supertype = NULL, bool showIcons = false,
-			bool applicationMode = false,
-			uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP);
+			bool applicationMode = false);
 		virtual ~MimeTypeListView();
 
 		void SelectNewType(const char* type);

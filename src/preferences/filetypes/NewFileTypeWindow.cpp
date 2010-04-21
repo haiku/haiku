@@ -10,12 +10,18 @@
 
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
+#include <GroupLayout.h>
+#include <GridLayoutBuilder.h>
 #include <Locale.h>
+#include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
 #include <PopUpMenu.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
+#include <StringView.h>
 #include <TextControl.h>
 
 #include <string.h>
@@ -33,19 +39,14 @@ const uint32 kMsgNameUpdated = 'nmup';
 const uint32 kMsgAddType = 'atyp';
 
 
-NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* currentType)
-	: BWindow(BRect(100, 100, 350, 200), TR("New file type"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
+NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target,
+	const char* currentType)
+	:
+	BWindow(BRect(100, 100, 350, 200), TR("New file type"), B_MODAL_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE | B_ASYNCHRONOUS_CONTROLS 
+		| B_AUTO_UPDATE_SIZE_LIMITS ),
 	fTarget(target)
 {
-	BRect rect = Bounds();
-	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
-
-	float labelWidth = be_plain_font->StringWidth(TR("Internal name:")) + 2.0f;
-
-	rect.InsetBy(8.0f, 6.0f);
 	fSupertypesMenu = new BPopUpMenu("supertypes");
 	BMenuItem* item;
 	BMessage types;
@@ -67,55 +68,54 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 		if (i > 1)
 			fSupertypesMenu->AddSeparatorItem();
 	}
+
 	fSupertypesMenu->AddItem(new BMenuItem(TR("Add new group"),
 		new BMessage(kMsgNewSupertypeChosen)));
+	BMenuField* typesMenuField = new BMenuField(NULL, fSupertypesMenu);
 
-	BMenuField* menuField = new BMenuField(rect, "supertypes",
-		TR("Group:"), fSupertypesMenu);
-	menuField->SetDivider(labelWidth);
-	menuField->SetAlignment(B_ALIGN_RIGHT);
-	float width, height;
-	menuField->GetPreferredSize(&width, &height);
-	menuField->ResizeTo(rect.Width(), height);
-	topView->AddChild(menuField);
+	BStringView* typesMenuLabel = new BStringView(NULL, TR("Group:"));
+		// Create a separate label view, otherwise things don't line up right
+	typesMenuLabel->SetAlignment(B_ALIGN_LEFT);
+	typesMenuLabel->SetExplicitAlignment(
+		BAlignment(B_ALIGN_LEFT, B_ALIGN_USE_FULL_HEIGHT));
 
-	fNameControl = new BTextControl(rect, "internal", TR("Internal name:"), "",
-		NULL, B_FOLLOW_LEFT_RIGHT);
+	fNameControl = new BTextControl(TR("Internal name:"), "", NULL);
 	fNameControl->SetModificationMessage(new BMessage(kMsgNameUpdated));
-	fNameControl->SetDivider(labelWidth);
-	fNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
 	// filter out invalid characters that can't be part of a MIME type name
-	BTextView* textView = fNameControl->TextView();
+	BTextView* nameControlTextView = fNameControl->TextView();
 	const char* disallowedCharacters = "/<>@,;:\"()[]?=";
 	for (int32 i = 0; disallowedCharacters[i]; i++) {
-		textView->DisallowChar(disallowedCharacters[i]);
+		nameControlTextView->DisallowChar(disallowedCharacters[i]);
 	}
 
-	fNameControl->GetPreferredSize(&width, &height);
-	fNameControl->ResizeTo(rect.Width(), height);
-	fNameControl->MoveTo(8.0f, 12.0f + menuField->Bounds().Height());
-	topView->AddChild(fNameControl);
+	fAddButton = new BButton(TR("Add type"), new BMessage(kMsgAddType));
 
-	fAddButton = new BButton(rect, "add", TR("Add type"), new BMessage(kMsgAddType),
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	fAddButton->ResizeToPreferred();
-	fAddButton->MoveTo(Bounds().Width() - 8.0f - fAddButton->Bounds().Width(),
-		Bounds().Height() - 8.0f - fAddButton->Bounds().Height());
-	fAddButton->SetEnabled(false);
-	topView->AddChild(fAddButton);
+	float padding = 3.0f;
+	// if (be_control_look)
+		// padding = be_control_look->DefaultItemSpacing();
 
-	BButton* button = new BButton(rect, "cancel", TR("Cancel"),
-		new BMessage(B_QUIT_REQUESTED), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->MoveTo(fAddButton->Frame().left - 10.0f - button->Bounds().Width(),
-		fAddButton->Frame().top);
-	topView->AddChild(button);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGridLayoutBuilder(padding, padding)
+		.SetInsets(padding, padding, padding, padding)
+		.Add(typesMenuLabel, 0, 0)
+		.Add(typesMenuField, 1, 0, 2)
+		.Add(fNameControl->CreateLabelLayoutItem(), 0, 1)
+		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 1, 2)
+		.Add(BSpaceLayoutItem::CreateGlue(), 0, 2)
+		.Add(new BButton(TR("Cancel"), new BMessage(B_QUIT_REQUESTED)), 1, 2)
+		.Add(fAddButton, 2, 2)
+		.SetColumnWeight(0, 3)
+		);
 
-	ResizeTo(labelWidth * 4.0f + 24.0f, fNameControl->Bounds().Height()
-		+ menuField->Bounds().Height() + fAddButton->Bounds().Height() + 30.0f);
-	SetSizeLimits(button->Bounds().Width() + fAddButton->Bounds().Width() + 26.0f,
-		32767.0f, Frame().Height(), Frame().Height());
+	BAlignment fullSize = BAlignment(B_ALIGN_USE_FULL_WIDTH,
+		B_ALIGN_USE_FULL_HEIGHT);
+	typesMenuField->MenuBar()->SetExplicitAlignment(fullSize);
+	fNameControl->TextView()->SetExplicitAlignment(fullSize);
+
+	BLayoutItem* nameControlLabelItem = fNameControl->CreateLabelLayoutItem();
+	nameControlLabelItem->SetExplicitMinSize(nameControlLabelItem->MinSize());
+		// stops fNameControl's label from truncating under certain conditions
 
 	fAddButton->MakeDefault(true);
 	fNameControl->MakeFocus(true);
@@ -137,12 +137,14 @@ NewFileTypeWindow::MessageReceived(BMessage* message)
 			fAddButton->SetLabel(TR("Add type"));
 			fNameControl->SetLabel(TR("Internal name:"));
 			fNameControl->MakeFocus(true);
+			InvalidateLayout(true);
 			break;
 
 		case kMsgNewSupertypeChosen:
 			fAddButton->SetLabel(TR("Add group"));
 			fNameControl->SetLabel(TR("Group name:"));
 			fNameControl->MakeFocus(true);
+			InvalidateLayout(true);
 			break;
 
 		case kMsgNameUpdated:
@@ -160,7 +162,8 @@ NewFileTypeWindow::MessageReceived(BMessage* message)
 			BMenuItem* item = fSupertypesMenu->FindMarked();
 			if (item != NULL) {
 				BString type;
-				if (fSupertypesMenu->IndexOf(item) != fSupertypesMenu->CountItems() - 1) {
+				if (fSupertypesMenu->IndexOf(item)
+						!= fSupertypesMenu->CountItems() - 1) {
 					// add normal type
 					type = item->Label();
 					type.Append("/");
@@ -170,7 +173,7 @@ NewFileTypeWindow::MessageReceived(BMessage* message)
 
 				BMimeType mimeType(type.String());
 				if (mimeType.IsInstalled()) {
-					error_alert(TR("This file type already exists."));
+					error_alert(TR("This file type already exists"));
 					break;
 				}
 
@@ -201,3 +204,5 @@ NewFileTypeWindow::QuitRequested()
 	fTarget.SendMessage(kMsgNewTypeWindowClosed);
 	return true;
 }
+
+

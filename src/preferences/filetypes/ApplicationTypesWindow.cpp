@@ -18,6 +18,9 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <Locale.h>
+#include <ControlLook.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
@@ -60,7 +63,7 @@ const uint32 kMsgRemoveUninstalled = 'runs';
 const uint32 kMsgEdit = 'edit';
 
 
-const char*
+const char* 
 variety_to_text(uint32 variety)
 {
 #if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
@@ -94,42 +97,34 @@ variety_to_text(uint32 variety)
 //	#pragma mark -
 
 
-ProgressWindow::ProgressWindow(const char* message, int32 max, volatile bool* signalQuit)
-	: BWindow(BRect(0, 0, 300, 200), TR("Progress"), B_MODAL_WINDOW_LOOK,
-		B_MODAL_SUBSET_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE),
+ProgressWindow::ProgressWindow(const char* message,
+	int32 max, volatile bool* signalQuit)
+	:
+	BWindow(BRect(0, 0, 300, 200), TR("Progress"), B_MODAL_WINDOW_LOOK, 
+		B_MODAL_SUBSET_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | 
+			B_NOT_V_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fQuitListener(signalQuit)
 {
-	BView* topView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
-
 	char count[100];
 	snprintf(count, sizeof(count), "/%ld", max);
 
-	BRect rect = Bounds().InsetByCopy(8, 8);
-	fStatusBar = new BStatusBar(rect, "status", message, count);
+	fStatusBar = new BStatusBar("status", message, count);
 	fStatusBar->SetMaxValue(max);
-	fStatusBar->SetResizingMode(B_FOLLOW_LEFT_RIGHT);
-	float width, height;
-	fStatusBar->GetPreferredSize(&width, &height);
-	fStatusBar->ResizeTo(rect.Width(), height);
-	topView->AddChild(fStatusBar);
-
-	fAbortButton = new BButton(rect, "abort", TR("Abort"), new BMessage(B_CANCEL),
-		B_FOLLOW_H_CENTER | B_FOLLOW_TOP);
-	fAbortButton->ResizeToPreferred();
-	fAbortButton->MoveTo((Bounds().Width() - fAbortButton->Bounds().Width()) / 2,
-		fStatusBar->Frame().bottom + 10.0f);
-	topView->AddChild(fAbortButton);
-
-	ResizeTo(width * 1.4f, fAbortButton->Frame().bottom + 8.0f);
-	SetSizeLimits(width + 42.0f, 32767.0f,
-		Bounds().Height(), Bounds().Height());
+	fAbortButton = new BButton("abort", TR("Abort"), new BMessage(B_CANCEL));
+	
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 3.0f)
+		.Add(fStatusBar)
+		.Add(fAbortButton)
+		.SetInsets(3.0f, 3.0f, 3.0f, 3.0f)
+	);
 
 	// center on screen
 	BScreen screen(this);
-	MoveTo(screen.Frame().left + (screen.Frame().Width() - Bounds().Width()) / 2.0f,
-		screen.Frame().top + (screen.Frame().Height() - Bounds().Height()) / 2.0f);
+	MoveTo(screen.Frame().left + (screen.Frame().Width() 
+			- Bounds().Width()) / 2.0f,
+		screen.Frame().top + (screen.Frame().Height()
+			- Bounds().Height()) / 2.0f);
 }
 
 
@@ -165,138 +160,115 @@ ProgressWindow::MessageReceived(BMessage* message)
 //	#pragma mark -
 
 
-ApplicationTypesWindow::ApplicationTypesWindow(const BMessage &settings)
+ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	: BWindow(_Frame(settings), TR("Application types"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
+
+	float padding = 3.0f;
+	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
+	BAlignment fullWidthTopAlignment = 
+		BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_TOP);
+	if (be_control_look) {
+		// padding = be_control_look->DefaultItemSpacing();
+			// seems too big
+		labelAlignment = be_control_look->DefaultLabelAlignment();
+	}
+
 	// Application list
+	BView* currentView = new BGroupView(B_VERTICAL, padding);
 
-	BRect rect = Bounds();
-	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
-
-	BButton* button = new BButton(rect, "remove", TR("Remove uninstalled"),
-		new BMessage(kMsgRemoveUninstalled), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->MoveTo(8.0f, rect.bottom - 8.0f - button->Bounds().Height());
-	topView->AddChild(button);
-
-	rect.bottom = button->Frame().top - 10.0f;
-	rect.top = 10.0f;
-	rect.left = 10.0f;
-	rect.right = 170;
-
-	fTypeListView = new MimeTypeListView(rect, "listview", "application", true, true,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
+	fTypeListView = new MimeTypeListView("listview", "application", true, true);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
 	fTypeListView->SetInvocationMessage(new BMessage(kMsgTypeInvoked));
 
 	BScrollView* scrollView = new BScrollView("scrollview", fTypeListView,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-	topView->AddChild(scrollView);
+		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
+
+	BButton* button = new BButton("remove", TR("Remove uninstalled"),
+		new BMessage(kMsgRemoveUninstalled));
+
+	SetLayout(BGroupLayoutBuilder(B_HORIZONTAL));
 
 	// "Information" group
 
-	BFont font(be_bold_font);
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
+	BBox* infoBox = new BBox((char*)NULL);
+	infoBox->SetLabel(TR("Information"));
+	infoBox->SetExplicitAlignment(fullWidthTopAlignment);
+	
+	fNameView = new StringView(TR("Name:"), NULL);
+	fNameView->TextView()->SetExplicitAlignment(labelAlignment);
+	fNameView->LabelView()->SetExplicitAlignment(labelAlignment);
+	fSignatureView = new StringView(TR("Signature:"), NULL);
+	fSignatureView->TextView()->SetExplicitAlignment(labelAlignment);
+	fSignatureView->LabelView()->SetExplicitAlignment(labelAlignment);
+	fPathView = new StringView(TR("Path:"), NULL);
+	fPathView->TextView()->SetExplicitAlignment(labelAlignment);
+	fPathView->LabelView()->SetExplicitAlignment(labelAlignment);
 
-	rect.left = rect.right + 12.0f + B_V_SCROLL_BAR_WIDTH;
-	rect.top -= 2.0f;
-	rect.right = topView->Bounds().Width() - 8.0f;
-	rect.bottom = rect.top + ceilf(fontHeight.ascent) + 24.0f;
-	BBox* box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	box->SetLabel(TR("Information"));
-	topView->AddChild(box);
-
-	BRect innerRect = box->Bounds().InsetByCopy(8.0f, 6.0f);
-	float labelWidth = topView->StringWidth(TR("Description:")) + 4.0f;
-
-	innerRect.right = box->Bounds().Width() - 8.0f;
-	innerRect.top += ceilf(fontHeight.ascent);
-	fNameView = new StringView(innerRect, "name", TR("Name:"), NULL, B_FOLLOW_LEFT_RIGHT);
-	fNameView->SetDivider(labelWidth);
-	float width, height;
-	fNameView->GetPreferredSize(&width, &height);
-	fNameView->ResizeTo(innerRect.Width(), height);
-	box->ResizeBy(0, fNameView->Bounds().Height() * 3.0f);
-	box->AddChild(fNameView);
-
-	innerRect.OffsetBy(0, fNameView->Bounds().Height() + 5.0f);
-	innerRect.bottom = innerRect.top + height;
-	fSignatureView = new StringView(innerRect, "signature", TR("Signature:"), NULL,
-		B_FOLLOW_LEFT_RIGHT);
-	fSignatureView->SetDivider(labelWidth);
-	box->AddChild(fSignatureView);
-
-	innerRect.OffsetBy(0, fNameView->Bounds().Height() + 5.0f);
-	fPathView = new StringView(innerRect, "path", TR("Path:"), NULL,
-		B_FOLLOW_LEFT_RIGHT);
-	fPathView->SetDivider(labelWidth);
-	box->AddChild(fPathView);
+	infoBox->AddChild(
+		BGridLayoutBuilder(padding, padding)
+			.Add(fNameView->LabelView(), 0, 0)
+			.Add(fNameView->TextView(), 1, 0, 2)
+			.Add(fSignatureView->LabelView(), 0, 1)
+			.Add(fSignatureView->TextView(), 1, 1, 2)
+			.Add(fPathView->LabelView(), 0, 2)
+			.Add(fPathView->TextView(), 1, 2, 2)
+			.SetInsets(padding, padding, padding, padding)
+	);
 
 	// "Version" group
 
-	rect.top = box->Frame().bottom + 8.0f;
-	rect.bottom = rect.top + ceilf(fontHeight.ascent)
-		+ fNameView->Bounds().Height() * 4.0f + 20.0f;
-	box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	box->SetLabel(TR("Version"));
-	topView->AddChild(box);
+	BBox* versionBox = new BBox("");
+	versionBox->SetLabel(TR("Version"));
+	versionBox->SetExplicitAlignment(fullWidthTopAlignment);
 
-	innerRect = fNameView->Frame();
-	fVersionView = new StringView(innerRect, "version", TR("Version:"), NULL,
-		B_FOLLOW_LEFT_RIGHT);
-	fVersionView->SetDivider(labelWidth);
-	box->AddChild(fVersionView);
-
-	innerRect.OffsetBy(0, fNameView->Bounds().Height() + 5.0f);
-	innerRect.right = innerRect.left + labelWidth;
-	fDescriptionLabel = new StringView(innerRect, "description", TR("Description:"), NULL);
-	fDescriptionLabel->SetDivider(labelWidth);
-	box->AddChild(fDescriptionLabel);
-
-	innerRect.left = innerRect.right + 3.0f;
-	innerRect.top += 1.0f;
-	innerRect.right = box->Bounds().Width() - 8.0f;
-	innerRect.bottom += fNameView->Bounds().Height() * 2.0f - 1.0f;
-	fDescriptionView = new BTextView(innerRect, "description",
-		innerRect.OffsetToCopy(B_ORIGIN), B_FOLLOW_LEFT_RIGHT,
-		B_WILL_DRAW | B_FRAME_EVENTS);
+	fVersionView = new StringView(TR("Version:"), NULL);
+	fVersionView->TextView()->SetExplicitAlignment(labelAlignment);
+	fVersionView->LabelView()->SetExplicitAlignment(labelAlignment);
+	fDescriptionLabel = new StringView(TR("Description:"), NULL);
+	fDescriptionLabel->LabelView()->SetExplicitAlignment(labelAlignment);
+	fDescriptionView = new BTextView("description");
 	fDescriptionView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fDescriptionView->SetLowColor(fDescriptionView->ViewColor());
 	fDescriptionView->MakeEditable(false);
-	box->AddChild(fDescriptionView);
+	
+	versionBox->AddChild(currentView = 
+		BGridLayoutBuilder(padding, padding)
+			.Add(fVersionView->LabelView(), 0, 0)
+			.Add(fVersionView->TextView(), 1, 0)
+			.Add(fDescriptionLabel->LabelView(), 0, 1)
+			.Add(fDescriptionView, 1, 1, 2, 2)
+			.SetInsets(padding, padding, padding, padding)
+	);
+	currentView->SetExplicitAlignment(fullWidthTopAlignment);
 
 	// Launch and Tracker buttons
 
-	rect = box->Frame();
-	rect.top = rect.bottom + 8.0f;
-	rect.bottom = rect.top + 20.0f;
-	fTrackerButton = new BButton(rect, "tracker", TR("Show in Tracker" B_UTF8_ELLIPSIS), NULL,
-		B_FOLLOW_RIGHT);
-	fTrackerButton->ResizeToPreferred();
-	fTrackerButton->MoveTo(rect.right - fTrackerButton->Bounds().Width(), rect.top);
-	topView->AddChild(fTrackerButton);
+	fEditButton = new BButton(TR("Edit" B_UTF8_ELLIPSIS), new BMessage(kMsgEdit));
+	// launch and tracker buttons get messages in _SetType()
+	fLaunchButton = new BButton(TR("Launch"));
+	fTrackerButton = new BButton(TR("Show in Tracker" B_UTF8_ELLIPSIS));
 
-	fLaunchButton = new BButton(rect, "launch", TR("Launch"), NULL,
-		B_FOLLOW_RIGHT);
-	fLaunchButton->ResizeToPreferred();
-	fLaunchButton->MoveTo(fTrackerButton->Frame().left - 6.0f
-		- fLaunchButton->Bounds().Width(), rect.top);
-	topView->AddChild(fLaunchButton);
-	
-	fEditButton = new BButton(rect, "edit", TR("Edit" B_UTF8_ELLIPSIS), new BMessage(kMsgEdit),
-		B_FOLLOW_RIGHT);
-	fEditButton->ResizeToPreferred();
-	fEditButton->MoveTo(fLaunchButton->Frame().left - 6.0f
-		- fEditButton->Bounds().Width(), rect.top);
-	topView->AddChild(fEditButton);
-
-	SetSizeLimits(scrollView->Frame().right + 22.0f + fTrackerButton->Frame().Width()
-		+ fLaunchButton->Frame().Width() + 6 + fEditButton->Frame().Width(), 32767.0f,
-		fTrackerButton->Frame().bottom + 8.0f, 32767.0f);
+	AddChild(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+		.Add(BGroupLayoutBuilder(B_VERTICAL, padding)
+			.Add(scrollView)
+			.Add(button)
+			.SetInsets(padding, padding, padding, padding)
+		, 3)
+		.Add(BGroupLayoutBuilder(B_VERTICAL, padding)
+			.Add(infoBox)
+			.Add(versionBox)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+				.Add(fEditButton)
+				.Add(fLaunchButton)
+				.Add(fTrackerButton)
+			)
+			.AddGlue()
+			.SetInsets(padding, padding, padding, padding)
+		)
+		.SetInsets(padding, padding, padding, padding)
+	);
 
 	BMimeType::StartWatching(this);
 	_SetType(NULL);
@@ -328,13 +300,15 @@ ApplicationTypesWindow::_RemoveUninstalled()
 	int32 removed = 0;
 	volatile bool quit = false;
 
-	BWindow* progressWindow = new ProgressWindow(TR("Removing uninstalled application types"),
-		fTypeListView->FullListCountItems(), &quit);
+	BWindow* progressWindow = 
+		new ProgressWindow(TR("Removing uninstalled application types"),
+			fTypeListView->FullListCountItems(), &quit);
 	progressWindow->AddToSubset(this);
 	progressWindow->Show();
 
 	for (int32 i = fTypeListView->FullListCountItems(); i-- > 0 && !quit;) {
-		MimeTypeItem* item = dynamic_cast<MimeTypeItem*>(fTypeListView->FullListItemAt(i));
+		MimeTypeItem* item = dynamic_cast<MimeTypeItem*>
+			(fTypeListView->FullListItemAt(i));
 		progressWindow->PostMessage(B_UPDATE_STATUS_BAR);
 
 		if (item == NULL)
@@ -381,9 +355,9 @@ ApplicationTypesWindow::_RemoveUninstalled()
 	progressWindow->PostMessage(B_QUIT_REQUESTED);
 
 	char message[512];
-	// TODO : use ICU to properly format this
-	snprintf(message, sizeof(message), TR("%ld Application type%s could be removed."),
-		removed, removed == 1 ? "" : "s");
+	// TODO: Use ICU to properly format this.
+	snprintf(message, sizeof(message), TR("%ld Application type%s could be "
+		"removed."), removed, removed == 1 ? "" : "s");
 	error_alert(message, B_OK, B_INFO_ALERT);
 }
 
@@ -456,11 +430,14 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 				BAppFileInfo appInfo(&file);
 				version_info versionInfo;
 				if (appInfo.InitCheck() == B_OK
-					&& appInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND) == B_OK) {
+					&& appInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND)
+						== B_OK) {
 					char version[256];
 					snprintf(version, sizeof(version), "%lu.%lu.%lu, %s/%lu",
-						versionInfo.major, versionInfo.middle, versionInfo.minor,
-						variety_to_text(versionInfo.variety), versionInfo.internal);
+						versionInfo.major, versionInfo.middle,
+						versionInfo.minor,
+						variety_to_text(versionInfo.variety),
+						versionInfo.internal);
 					fVersionView->SetText(version);
 					fDescriptionView->SetText(versionInfo.long_info);
 				} else {
@@ -481,21 +458,13 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 	fNameView->SetEnabled(enabled);
 	fSignatureView->SetEnabled(enabled);
 	fPathView->SetEnabled(enabled);
-
+	
 	fVersionView->SetEnabled(enabled);
 	fDescriptionLabel->SetEnabled(enabled);
 
 	fTrackerButton->SetEnabled(enabled && appFound);
 	fLaunchButton->SetEnabled(enabled && appFound);
 	fEditButton->SetEnabled(enabled && appFound);
-}
-
-
-void
-ApplicationTypesWindow::FrameResized(float width, float height)
-{
-	// This works around a flaw of BTextView
-	fDescriptionView->SetTextRect(fDescriptionView->Bounds());
 }
 
 
@@ -537,10 +506,8 @@ ApplicationTypesWindow::MessageReceived(BMessage* message)
 		}
 		
 		case kMsgEdit:
-		{
 			fTypeListView->Invoke();
 			break;
-		}
 		
 		case kMsgRemoveUninstalled:
 			_RemoveUninstalled();
@@ -551,8 +518,9 @@ ApplicationTypesWindow::MessageReceived(BMessage* message)
 			const char* type;
 			int32 which;
 			if (message->FindString("be:type", &type) != B_OK
-				|| message->FindInt32("be:which", &which) != B_OK)
+				|| message->FindInt32("be:which", &which) != B_OK) {
 				break;
+			}
 
 			if (fCurrentType.Type() == NULL)
 				break;
