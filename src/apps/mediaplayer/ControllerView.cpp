@@ -97,7 +97,12 @@ ControllerView::EnabledButtons()
 void
 ControllerView::TogglePlaying()
 {
-	fController->TogglePlaying();
+	BAutolock _(fPlaylist);
+	if (fPlaylist->CurrentItemIndex() < 0) {
+		// No valid playlist item - start again from the first one
+		fPlaylist->SetCurrentItemIndex(0);
+	} else
+		fController->TogglePlaying();
 }
 
 
