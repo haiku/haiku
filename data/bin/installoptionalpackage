@@ -27,6 +27,7 @@
 
 declare -A availablePackages
 declare availablePackagesKeys=""
+declare wantsToInstall=""
 # Some Packages cannot be installed,
 # as they require either the source code or compiled binaries
 declare packageIgnoreList='Bluetooth Development DevelopmentMin \
@@ -476,13 +477,26 @@ function IsPackageAndDepsOkToInstall()
 }
 
 
-function AddPackage()
+function BuildListOfRequestedPackages()
 {
-	# AddPackage <name>
+	if [ "$1" = '-a' ]; then
+		shift
+	fi
+	while [ $# -gt 0 ]; do
+		wantsToInstall="${wantsToInstall} $1"
+		shift
+	done
+	echo "wantsToInstall: ${wantsToInstall}"
+}
+
+
+function AddPackages()
+{
+	# AddPackages
 	packagesToInstall=""
 	proceedWithInstallation=false
 	
-	for desiredPackage in ${1}; do
+	for desiredPackage in ${wantsToInstall}; do
 		if IsPackageNameValid $desiredPackage  ; then
 			for item in ${availablePackages[${desiredPackage}]} ; do
 				if ! ContainsSubstring "${packagesToInstall}" "${item}" ; then
@@ -695,11 +709,15 @@ Disclaimer:
     http://dev.haiku-os.org/wiki/PackageManagerIdeas
     http://dev.haiku-os.org/wiki/PackageFormat
 
-Usage: ./installoptionalpackage [-f] [-h] [-l] [-a "<pkg> [<pkg> ...]"]
--a      Add one or more packages and all dependencies
--f		Remove cached data and list installable packages
--h		Print this help.
--l      List installable packages
+Usage: ./installoptionalpackage [<pkg> [<pkg> ...]]
+  or   ./installoptionalpackage [-a <pkg> [<pkg> ...]]
+  or   ./installoptionalpackage [-f|-h|-l]
+
+Options:  
+-a     Add one or more packages and all dependencies
+-f     Remove cached data and list installable packages
+-h     Print this help.
+-l     List installable packages
 
 EOF
 }
@@ -747,11 +765,19 @@ else
 	Init
 fi
 
+# Support `installoptionalpackage <pkg> <pkg> ...`
+if [ "$1" != '-f' ] && [ "$1" != '-l' ] && [ "$1" != '-h' ]; then
+	BuildListOfRequestedPackages $@
+	AddPackages
+	exit 0
+fi	
+
 # Parse the arguments given to the script.
 while getopts "a:fhl" opt; do
 	case $opt in
 		a)
-			AddPackage "$OPTARG"
+			BuildListOfRequestedPackages $@
+			AddPackages
 			exit 0
 			;;
 		f)
