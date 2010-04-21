@@ -68,7 +68,8 @@ static const uint32 kMsgRebootTick = 'TMrt';
 TeamMonitorWindow::TeamMonitorWindow()
 	: BWindow(BRect(0, 0, 350, 300), "Team Monitor",
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
-		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS,
+		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
+			| B_CLOSE_ON_ESCAPE,
 		B_ALL_WORKSPACES),
 	fQuitting(false),
 	fUpdateRunner(NULL)
@@ -144,6 +145,7 @@ TeamMonitorWindow::TeamMonitorWindow()
 
 	AddShortcut('T', B_COMMAND_KEY | B_OPTION_KEY,
 		new BMessage(kMsgLaunchTerminal));
+	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 }
 
 
