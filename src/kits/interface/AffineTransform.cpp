@@ -26,6 +26,9 @@
 #include <TypeConstants.h>
 
 
+const BAffineTransform B_AFFINE_IDENTITY_TRANSFORM;
+
+
 BAffineTransform::BAffineTransform()
 	:
 	sx(1.0),
@@ -370,6 +373,36 @@ BAffineTransform
 BAffineTransform::ScaleByCopy(const BPoint& center, const BPoint& scale) const
 {
 	return ScaleByCopy(center, scale.x, scale.y);
+}
+
+
+const BAffineTransform&
+BAffineTransform::SetScale(double scale)
+{
+	return SetScale(scale, scale);
+}
+
+
+const BAffineTransform&
+BAffineTransform::SetScale(double x, double y)
+{
+	double tx;
+	double ty;
+	double rotation;
+	double shearX;
+	double shearY;
+	if (!GetAffineParameters(&tx, &ty, &rotation, NULL, NULL,
+			&shearX, &shearY)) {
+		return *this;
+	}
+
+	BAffineTransform result;
+	result.ShearBy(shearX, shearY);
+	result.ScaleBy(x, y);
+	result.RotateBy(rotation);
+	result.TranslateBy(tx, ty);
+
+	return *this = result;
 }
 
 
