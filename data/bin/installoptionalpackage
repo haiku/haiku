@@ -486,7 +486,6 @@ function BuildListOfRequestedPackages()
 		wantsToInstall="${wantsToInstall} $1"
 		shift
 	done
-	echo "wantsToInstall: ${wantsToInstall}"
 }
 
 
