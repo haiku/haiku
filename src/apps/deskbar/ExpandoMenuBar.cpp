@@ -302,16 +302,14 @@ TExpandoMenuBar::MouseDown(BPoint where)
 	TTeamMenuItem* item = TeamItemAtPoint(where, &menuItem);
 
 	// check for three finger salute, a.k.a. Vulcan Death Grip
-	if (message != NULL) {
+	if (message != NULL && item != NULL && !fBarView->Dragging()) {
 		int32 modifiers = 0;
 		message->FindInt32("modifiers", &modifiers);
 
 		if ((modifiers & B_COMMAND_KEY) != 0
 			&& (modifiers & B_OPTION_KEY) != 0
-			&& (modifiers & B_SHIFT_KEY) != 0
-			&& !fBarView->Dragging()
-			&& item != NULL) {
-			const BList	*teams = item->Teams();
+			&& (modifiers & B_SHIFT_KEY) != 0) {
+			const BList* teams = item->Teams();
 			int32 teamCount = teams->CountItems();
 
 			team_id teamID;
@@ -324,50 +322,44 @@ TExpandoMenuBar::MouseDown(BPoint where)
 
 			return;
 		}
-	}
 
-	// control click - show all/hide all shortcut
-	int32 modifiers;
-	if (message != NULL && message->FindInt32("modifiers", &modifiers) == B_OK
-		&& (modifiers & B_CONTROL_KEY) != 0
-		&& !fBarView->Dragging()
-		&& item != NULL) {
-		// show/hide item's teams
-		BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
-			? kMinimizeTeam : kBringTeamToFront);
-		showMessage.AddInt32("itemIndex", IndexOf(item));
-		Window()->PostMessage(&showMessage, this);
-		return;
-	}
-
-	// Check the bounds of the expand Team icon
-	if (fShowTeamExpander && fVertical && !fBarView->Dragging()
-		&& item != NULL) {
-		BRect expanderRect = item->ExpanderBounds();
-		if (expanderRect.Contains(where)) {
-			// Let the update thread wait...
-			BAutolock locker(sMonLocker);
-
-			// Toggle the item
-			item->ToggleExpandState(true);
-			item->Draw();
-
-			// Absorb the message.
+		// control click - show all/hide all shortcut
+		if ((modifiers & B_CONTROL_KEY) != 0) {
+			// show/hide item's teams
+			BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
+				? kMinimizeTeam : kBringTeamToFront);
+			showMessage.AddInt32("itemIndex", IndexOf(item));
+			Window()->PostMessage(&showMessage, this);
 			return;
 		}
-	}
 
-	// double-click on an item brings the team to front
-	int32 clicks;
-	if (message != NULL && message->FindInt32("clicks", &clicks) == B_OK
-		&& clicks > 1) {
-		if (item == menuItem && item == fLastClickItem) {
+		// Check the bounds of the expand Team icon
+		if (fShowTeamExpander && fVertical) {
+			BRect expanderRect = item->ExpanderBounds();
+			if (expanderRect.Contains(where)) {
+				// Let the update thread wait...
+				BAutolock locker(sMonLocker);
+
+				// Toggle the item
+				item->ToggleExpandState(true);
+				item->Draw();
+
+				// Absorb the message.
+				return;
+			}
+		}
+
+		// double-click on an item brings the team to front
+		int32 clicks;
+		if (message->FindInt32("clicks", &clicks) == B_OK && clicks > 1
+			&& item == menuItem && item == fLastClickItem) {
 			// activate this team
 			be_roster->ActivateApp((team_id)item->Teams()->ItemAt(0));
 			return;
 		}
-	} else
+
 		fLastClickItem = item;
+	}
 
 	BMenuBar::MouseDown(where);
 }
