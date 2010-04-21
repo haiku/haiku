@@ -55,11 +55,11 @@
 #include "PlaylistWindow.h"
 #include "Settings.h"
 
+
 #define MIN_WIDTH 250
 
 
-int
-MainWin::sNoVideoWidth = MIN_WIDTH;
+int MainWin::sNoVideoWidth = MIN_WIDTH;
 
 
 // XXX TODO: why is lround not defined?
@@ -365,23 +365,23 @@ MainWin::FrameResized(float newWidth, float newHeight)
 
 
 void
-MainWin::Zoom(BPoint rec_position, float rec_width, float rec_height)
+MainWin::Zoom(BPoint /*position*/, float /*width*/, float /*height*/)
 {
 	PostMessage(M_TOGGLE_FULLSCREEN);
 }
 
 
 void
-MainWin::DispatchMessage(BMessage *msg, BHandler *handler)
+MainWin::DispatchMessage(BMessage* msg, BHandler* handler)
 {
 	if ((msg->what == B_MOUSE_DOWN)
 		&& (handler == fBackground || handler == fVideoView
-				|| handler == fControls))
+			|| handler == fControls))
 		_MouseDown(msg, dynamic_cast<BView*>(handler));
 
 	if ((msg->what == B_MOUSE_MOVED)
 		&& (handler == fBackground || handler == fVideoView
-				|| handler == fControls))
+			|| handler == fControls))
 		_MouseMoved(msg, dynamic_cast<BView*>(handler));
 
 	if ((msg->what == B_MOUSE_UP)
@@ -390,7 +390,6 @@ MainWin::DispatchMessage(BMessage *msg, BHandler *handler)
 
 	if ((msg->what == B_KEY_DOWN)
 		&& (handler == fBackground || handler == fVideoView)) {
-
 		// special case for PrintScreen key
 		if (msg->FindInt32("key") == B_PRINT_KEY) {
 			fVideoView->OverlayScreenshotPrepare();
@@ -480,7 +479,6 @@ MainWin::MessageReceived(BMessage* msg)
 						if (result == B_OK)
 							fController->SetVolume(newVolume);
 					}
-
 					break;
 				}
 
@@ -496,7 +494,6 @@ MainWin::MessageReceived(BMessage* msg)
 
 						result = reply.AddString("result", item->LocationURI());
 					}
-
 					break;
 				}
 
@@ -601,13 +598,9 @@ MainWin::MessageReceived(BMessage* msg)
 			bool hadNext = fPlaylist->SetCurrentItemIndex(
 				fPlaylist->CurrentItemIndex() + 1);
 			if (!hadNext) {
-				if (fHasVideo) {
-					if (fCloseWhenDonePlayingMovie)
-						PostMessage(B_QUIT_REQUESTED);
-				} else {
-					if (fCloseWhenDonePlayingSound)
-						PostMessage(B_QUIT_REQUESTED);
-				}
+				if ((fHasVideo && fCloseWhenDonePlayingMovie)
+					|| (fHasAudio && fCloseWhenDonePlayingSound))
+					PostMessage(B_QUIT_REQUESTED);
 			}
 			break;
 		}
@@ -1282,7 +1275,7 @@ MainWin::_CreateMenu()
 //		new BMessage(M_FILE_OPEN), 'O'));
 	// Add recent files
 	BRecentFilesList recentFiles(10, false, NULL, kAppSig);
-	BMenuItem *item = new BMenuItem(recentFiles.NewFileListMenu(
+	BMenuItem* item = new BMenuItem(recentFiles.NewFileListMenu(
 		"Open file"B_UTF8_ELLIPSIS, new BMessage(B_REFS_RECEIVED),
 		NULL, this, 10, false, NULL, 0, kAppSig), new BMessage(M_FILE_OPEN));
 	item->SetShortcut('O', 0);
@@ -1478,14 +1471,15 @@ MainWin::_GetUnscaledVideoSize(int& videoWidth, int& videoHeight) const
 	}
 }
 
+
 void
 MainWin::_SetWindowSizeLimits()
 {
 	int minWidth;
 	int minHeight;
 	_GetMinimumWindowSize(minWidth, minHeight);
-	SetSizeLimits(minWidth - 1, 32000, minHeight - 1, fHasVideo ?
-		32000 : minHeight - 1);
+	SetSizeLimits(minWidth - 1, 32000, minHeight - 1,
+		fHasVideo ? 32000 : minHeight - 1);
 }
 
 
@@ -1623,51 +1617,40 @@ MainWin::_ResizeVideoView(int x, int y, int width, int height)
 
 
 void
-MainWin::_MouseDown(BMessage *msg, BView* originalHandler)
+MainWin::_MouseDown(BMessage* msg, BView* originalHandler)
 {
-	BPoint screen_where;
 	uint32 buttons = msg->FindInt32("buttons");
 
-	// On Zeta, only "screen_where" is relyable, "where" and "be:view_where"
+	// On Zeta, only "screen_where" is reliable, "where" and "be:view_where"
 	// seem to be broken
-	if (B_OK != msg->FindPoint("screen_where", &screen_where)) {
+	BPoint screenWhere;
+	if (msg->FindPoint("screen_where", &screenWhere) != B_OK) {
+		// TODO: remove
 		// Workaround for BeOS R5, it has no "screen_where"
-		if (!originalHandler || msg->FindPoint("where", &screen_where) < B_OK)
+		if (!originalHandler || msg->FindPoint("where", &screenWhere) < B_OK)
 			return;
-		originalHandler->ConvertToScreen(&screen_where);
+		originalHandler->ConvertToScreen(&screenWhere);
 	}
 
-//	msg->PrintToStream();
+	// double click handling
 
-//	if (1 == msg->FindInt32("buttons") && msg->FindInt32("clicks") == 1) {
+	if (msg->FindInt32("clicks") % 2 == 0) {
+		BRect rect(screenWhere.x - 1, screenWhere.y - 1, screenWhere.x + 1,
+			screenWhere.y + 1);
+		if (rect.Contains(fMouseDownMousePos)) {
+			if (buttons == B_PRIMARY_MOUSE_BUTTON)
+				PostMessage(M_TOGGLE_FULLSCREEN);
+			else if (buttons == B_SECONDARY_MOUSE_BUTTON)
+				PostMessage(M_TOGGLE_NO_INTERFACE);
 
-	if (1 == buttons && msg->FindInt32("clicks") % 2 == 0) {
-		BRect r(screen_where.x - 1, screen_where.y - 1, screen_where.x + 1,
-			screen_where.y + 1);
-		if (r.Contains(fMouseDownMousePos)) {
-			PostMessage(M_TOGGLE_FULLSCREEN);
-			return;
-		}
-	}
-
-	if (2 == buttons && msg->FindInt32("clicks") % 2 == 0) {
-		BRect r(screen_where.x - 1, screen_where.y - 1, screen_where.x + 1,
-			screen_where.y + 1);
-		if (r.Contains(fMouseDownMousePos)) {
-			PostMessage(M_TOGGLE_NO_INTERFACE);
 			return;
 		}
 	}
 
-/*
-		// very broken in Zeta:
-		fMouseDownMousePos = fVideoView->ConvertToScreen(
-			msg->FindPoint("where"));
-*/
-	fMouseDownMousePos = screen_where;
+	fMouseDownMousePos = screenWhere;
 	fMouseDownWindowPos = Frame().LeftTop();
 
-	if (buttons == 1 && !fIsFullscreen) {
+	if (buttons == B_PRIMARY_MOUSE_BUTTON && !fIsFullscreen) {
 		// start mouse tracking
 		fVideoView->SetMouseEventMask(B_POINTER_EVENTS | B_NO_POINTER_HISTORY
 			/* | B_LOCK_WINDOW_FOCUS */);
@@ -1676,41 +1659,38 @@ MainWin::_MouseDown(BMessage *msg, BView* originalHandler)
 
 	// pop up a context menu if right mouse button is down for 200 ms
 
-	if ((buttons & 2) == 0)
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
 		return;
+
 	bigtime_t start = system_time();
 	bigtime_t delay = 200000;
 	BPoint location;
 	do {
 		fVideoView->GetMouse(&location, &buttons);
-		if ((buttons & 2) == 0)
+		if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
 			break;
 		snooze(1000);
 	} while (system_time() - start < delay);
 
-	if (buttons & 2)
-		_ShowContextMenu(screen_where);
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
+		_ShowContextMenu(screenWhere);
 }
 
 
 void
-MainWin::_MouseMoved(BMessage *msg, BView* originalHandler)
+MainWin::_MouseMoved(BMessage* msg, BView* originalHandler)
 {
 //	msg->PrintToStream();
 
 	BPoint mousePos;
 	uint32 buttons = msg->FindInt32("buttons");
 
-	if (1 == buttons && fMouseDownTracking && !fIsFullscreen) {
-/*
-		// very broken in Zeta:
-		BPoint mousePos = msg->FindPoint("where");
-		printf("view where: %.0f, %.0f => ", mousePos.x, mousePos.y);
-		fVideoView->ConvertToScreen(&mousePos);
-*/
-		// On Zeta, only "screen_where" is relyable, "where"
+	if (buttons == B_PRIMARY_MOUSE_BUTTON && fMouseDownTracking
+		&& !fIsFullscreen) {
+		// On Zeta, only "screen_where" is reliable, "where"
 		// and "be:view_where" seem to be broken
-		if (B_OK != msg->FindPoint("screen_where", &mousePos)) {
+		if (msg->FindPoint("screen_where", &mousePos) != B_OK) {
+			// TODO: remove
 			// Workaround for BeOS R5, it has no "screen_where"
 			if (!originalHandler || msg->FindPoint("where", &mousePos) < B_OK)
 				return;
@@ -1728,19 +1708,18 @@ MainWin::_MouseMoved(BMessage *msg, BView* originalHandler)
 
 
 void
-MainWin::_MouseUp(BMessage *msg)
+MainWin::_MouseUp(BMessage* msg)
 {
-//	msg->PrintToStream();
 	fMouseDownTracking = false;
 }
 
 
 void
-MainWin::_ShowContextMenu(const BPoint &screen_point)
+MainWin::_ShowContextMenu(const BPoint& screenPoint)
 {
 	printf("Show context menu\n");
-	BPopUpMenu *menu = new BPopUpMenu("context menu", false, false);
-	BMenuItem *item;
+	BPopUpMenu* menu = new BPopUpMenu("context menu", false, false);
+	BMenuItem* item;
 	menu->AddItem(item = new BMenuItem("Full screen",
 		new BMessage(M_TOGGLE_FULLSCREEN), 'F'));
 	item->SetMarked(fIsFullscreen);
@@ -1781,9 +1760,9 @@ MainWin::_ShowContextMenu(const BPoint &screen_point)
 	menu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q'));
 
 	menu->SetTargetForItems(this);
-	BRect r(screen_point.x - 5, screen_point.y - 5, screen_point.x + 5,
-		screen_point.y + 5);
-	menu->Go(screen_point, true, true, r, true);
+	BRect rect(screenPoint.x - 5, screenPoint.y - 5, screenPoint.x + 5,
+		screenPoint.y + 5);
+	menu->Go(screenPoint, true, true, rect, true);
 }
 
 
@@ -1791,7 +1770,7 @@ MainWin::_ShowContextMenu(const BPoint &screen_point)
 	Return true if it shouldn't be passed to the view.
 */
 bool
-MainWin::_KeyDown(BMessage *msg)
+MainWin::_KeyDown(BMessage* msg)
 {
 	// TODO: use the shortcut mechanism instead!
 
@@ -1820,19 +1799,19 @@ MainWin::_KeyDown(BMessage *msg)
 			return true;
 
 		case B_ENTER:		// Enter / Return
-			if (modifier & B_COMMAND_KEY) {
+			if ((modifier & B_COMMAND_KEY) != 0) {
 				PostMessage(M_TOGGLE_FULLSCREEN);
 				return true;
-			} else
-				break;
+			}
+			break;
 
 		case B_TAB:
 			if ((modifier & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
 					| B_MENU_KEY)) == 0) {
 				PostMessage(M_TOGGLE_FULLSCREEN);
 				return true;
-			} else
-				break;
+			}
+			break;
 
 		case B_UP_ARROW:
 			if ((modifier & B_COMMAND_KEY) != 0)
@@ -1876,17 +1855,15 @@ MainWin::_KeyDown(BMessage *msg)
 			if ((modifier & B_COMMAND_KEY) == 0) {
 				PostMessage(M_VOLUME_UP);
 				return true;
-			} else {
-				break;
 			}
+			break;
 
 		case 0x25:  		// numeric keypad -
 			if ((modifier & B_COMMAND_KEY) == 0) {
 				PostMessage(M_VOLUME_DOWN);
 				return true;
-			} else {
-				break;
 			}
+			break;
 
 		case 0x38:			// numeric keypad up arrow
 			PostMessage(M_VOLUME_UP);
