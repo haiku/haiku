@@ -32,7 +32,6 @@
 extern char* gDeviceNames[];
 extern radeon_info* gDeviceInfo[];
 extern pci_module_info* gPCI;
-extern agp_gart_module_info* gGART;
 extern mutex gLock;
 
 

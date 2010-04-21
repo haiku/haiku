@@ -186,62 +186,6 @@ radeon_init_accelerant(int device)
 	return B_OK;
 }
 
-/*
-ssize_t
-radeon_accelerant_clone_info_size(void)
-{
-	TRACE(("radeon_accelerant_clone_info_size()\n"));
-	// clone info is device name, so return its maximum size
-	return B_PATH_NAME_LENGTH;
-}
-
-
-void
-radeon_get_accelerant_clone_info(void *info)
-{
-	TRACE(("radeon_get_accelerant_clone_info()\n"));
-	ioctl(gInfo->device, RADEON_GET_DEVICE_NAME, info, B_PATH_NAME_LENGTH);
-}
-
-
-status_t
-radeon_clone_accelerant(void *info)
-{
-	TRACE(("radeon_clone_accelerant()\n"));
-
-	// create full device name
-	char path[B_PATH_NAME_LENGTH];
-	strcpy(path, "/dev/");
-#ifdef __HAIKU__
-	strlcat(path, (const char *)info, sizeof(path));
-#else
-	strcat(path, (const char *)info);
-#endif
-
-	int fd = open(path, B_READ_WRITE);
-	if (fd < 0)
-		return errno;
-
-	status_t status = init_common(fd, true);
-	if (status != B_OK)
-		goto err1;
-
-	// get read-only clone of supported display modes
-	status = gInfo->mode_list_area = clone_area(
-		"intel extreme cloned modes", (void **)&gInfo->mode_list,
-		B_ANY_ADDRESS, B_READ_AREA, gInfo->shared_info->mode_list_area);
-	if (status < B_OK)
-		goto err2;
-
-	return B_OK;
-
-err2:
-	uninit_common();
-err1:
-	close(fd);
-	return status;
-}
-*/
 
 /*! This function is called for both, the primary accelerant and all of
 	its clones.
@@ -260,30 +204,4 @@ radeon_uninit_accelerant(void)
 
 	uninit_common();
 }
-
-/*
-status_t
-radeon_get_accelerant_device_info(accelerant_device_info *info)
-{
-	TRACE(("radeon_get_accelerant_device_info()\n"));
-
-	info->version = B_ACCELERANT_VERSION;
-	strcpy(info->name, gInfo->shared_info->device_type.InFamily(RADEON_TYPE_7xx)
-		? "Intel Extreme Graphics 1" : "Intel Extreme Graphics 2");
-	strcpy(info->chipset, gInfo->shared_info->device_identifier);
-	strcpy(info->serial_no, "None");
-
-	info->memory = gInfo->shared_info->graphics_memory_size;
-	info->dac_speed = gInfo->shared_info->pll_info.max_frequency;
-
-	return B_OK;
-}
-
-
-sem_id
-radeon_accelerant_retrace_semaphore()
-{
-	TRACE(("radeon_accelerant_retrace_semaphore()\n"));
-	return gInfo->shared_info->vblank_sem;
-}*/
 

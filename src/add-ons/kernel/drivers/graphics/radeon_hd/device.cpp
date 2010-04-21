@@ -113,8 +113,7 @@ device_open(const char *name, uint32 /*flags*/, void **_cookie)
 		if (!thisName)
 			return B_BAD_VALUE;
 	}
-	TRACE((DEVICE_NAME ": device id %i\n", id));
-	
+
 	radeon_info *info = gDeviceInfo[id];
 
 	mutex_lock(&gLock);
@@ -196,54 +195,6 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 			((char *)buffer)[B_PATH_NAME_LENGTH - 1] = '\0';
 #endif
 			return B_OK;
-
-		// graphics mem manager
-		case RADEON_ALLOCATE_GRAPHICS_MEMORY:
-		{
-			radeon_allocate_graphics_memory allocMemory;
-#ifdef __HAIKU__
-			if (user_memcpy(&allocMemory, buffer,
-					sizeof(radeon_allocate_graphics_memory)) < B_OK)
-				return B_BAD_ADDRESS;
-#else
-			memcpy(&allocMemory, buffer, sizeof(radeon_allocate_graphics_memory));
-#endif
-
-			if (allocMemory.magic != RADEON_PRIVATE_DATA_MAGIC)
-				return B_BAD_VALUE;
-
-			status_t status = radeon_allocate_memory(*info, allocMemory.size,
-				allocMemory.alignment, allocMemory.flags,
-				(addr_t *)&allocMemory.buffer_base);
-			if (status == B_OK) {
-				// copy result
-#ifdef __HAIKU__
-				if (user_memcpy(buffer, &allocMemory,
-						sizeof(radeon_allocate_graphics_memory)) < B_OK)
-					return B_BAD_ADDRESS;
-#else
-				memcpy(buffer, &allocMemory,
-					sizeof(radeon_allocate_graphics_memory));
-#endif
-			}
-			return status;
-		}
-
-		case RADEON_FREE_GRAPHICS_MEMORY:
-		{
-			radeon_free_graphics_memory freeMemory;
-#ifdef __HAIKU__
-			if (user_memcpy(&freeMemory, buffer,
-					sizeof(radeon_free_graphics_memory)) < B_OK)
-				return B_BAD_ADDRESS;
-#else
-			memcpy(&freeMemory, buffer, sizeof(radeon_free_graphics_memory));
-#endif
-
-			if (freeMemory.magic == RADEON_PRIVATE_DATA_MAGIC)
-				return radeon_free_memory(*info, freeMemory.buffer_base);
-			break;
-		}
 
 		default:
 			TRACE((DEVICE_NAME ": ioctl() unknown message %ld (length = %ld)\n",

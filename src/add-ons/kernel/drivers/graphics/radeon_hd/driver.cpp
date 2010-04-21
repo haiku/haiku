@@ -48,7 +48,6 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 char* gDeviceNames[MAX_CARDS + 1];
 radeon_info* gDeviceInfo[MAX_CARDS];
 pci_module_info* gPCI;
-agp_gart_module_info* gGART;
 mutex gLock;
 
 
@@ -118,13 +117,6 @@ init_driver(void)
 	status_t status = get_module(B_PCI_MODULE_NAME, (module_info**)&gPCI);
 	if (status != B_OK) {
 		TRACE((DEVICE_NAME ": pci module unavailable\n"));
-		return status;
-	}
-
-	status = get_module(B_AGP_GART_MODULE_NAME, (module_info**)&gGART);
-	if (status != B_OK) {
-		TRACE((DEVICE_NAME ": AGP GART module unavailable\n"));
-		put_module(B_PCI_MODULE_NAME);
 		return status;
 	}
 
@@ -206,7 +198,6 @@ uninit_driver(void)
 		free(name);
 	}
 
-	put_module(B_AGP_GART_MODULE_NAME);
 	put_module(B_PCI_MODULE_NAME);
 }
 

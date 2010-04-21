@@ -10,7 +10,6 @@ Addon radeon_hd.accelerant :
 	accelerant.cpp
 	engine.cpp
 	hooks.cpp
-	memory.cpp
 	mode.cpp
 	: be libaccelerantscommon.a
 ;

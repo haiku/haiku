@@ -56,10 +56,6 @@ write32(uint32 offset, uint32 value)
 	*(volatile uint32 *)(gInfo->regs + offset) = value;
 }
 
-// memory.cpp
-extern void radeon_free_memory(uint32 base);
-extern status_t radeon_allocate_memory(size_t size, uint32 flags, uint32 &base);
-
 // modes.cpp 
 extern status_t create_mode_list(void);
 
