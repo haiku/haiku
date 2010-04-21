@@ -147,7 +147,7 @@ keyboard_reader(void* arg)
 
 		uint8 newDeadKey = 0;
 		if (activeDeadKey == 0 || !isKeyDown)
-			newDeadKey = keymap.IsDeadKey(keycode, modifiers);
+			newDeadKey = keymap.ActiveDeadKey(keycode, modifiers);
 
 		char* string = NULL;
 		int32 numBytes = 0;

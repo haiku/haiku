@@ -398,7 +398,7 @@ KeyboardDevice::_ControlThread()
 
 		uint8 newDeadKey = 0;
 		if (activeDeadKey == 0 || !isKeyDown)
-			newDeadKey = fKeymap.IsDeadKey(keycode, fModifiers);
+			newDeadKey = fKeymap.ActiveDeadKey(keycode, fModifiers);
 
 		char* string = NULL;
 		char* rawString = NULL;
