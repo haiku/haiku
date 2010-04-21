@@ -599,7 +599,7 @@ MainWin::MessageReceived(BMessage* msg)
 				fPlaylist->CurrentItemIndex() + 1);
 			if (!hadNext) {
 				if ((fHasVideo && fCloseWhenDonePlayingMovie)
-					|| (fHasAudio && fCloseWhenDonePlayingSound))
+					|| (!fHasVideo && fCloseWhenDonePlayingSound))
 					PostMessage(B_QUIT_REQUESTED);
 			}
 			break;
