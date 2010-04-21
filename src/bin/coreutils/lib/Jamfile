@@ -204,7 +204,7 @@ StaticLibrary libfetish.a :
 #	strtoul.c
 #	strtoull.c
 #	strtoumax.c
-#	tempname.c
+	tempname.c
 	time_r.c
 	trim.c
 	u8-uctomb.c

@@ -39,6 +39,7 @@ StdBinCommands
 	logname.c
 	mkfifo.c
 	mknod.c
+	mktemp.c
 	nl.c
 	nohup.c
 	nproc.c
