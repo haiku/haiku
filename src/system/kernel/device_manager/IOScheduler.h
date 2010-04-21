@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -16,6 +16,7 @@
 #include <util/OpenHashTable.h>
 
 #include "dma_resources.h"
+#include "IOCallback.h"
 #include "IORequest.h"
 
 
@@ -27,16 +28,6 @@
 #define IO_SCHEDULER_REQUEST_FINISHED	0x08
 #define IO_SCHEDULER_OPERATION_STARTED	0x10
 #define IO_SCHEDULER_OPERATION_FINISHED	0x20
-
-
-class IOCallback {
-public:
-	virtual						~IOCallback();
-
-	virtual	status_t			DoIO(IOOperation* operation) = 0;
-};
-
-typedef status_t (*io_callback)(void* data, io_operation* operation);
 
 
 struct IORequestOwner : DoublyLinkedListLinkImpl<IORequestOwner> {
@@ -113,9 +104,6 @@ private:
 			void				_AddRequestOwner(IORequestOwner* owner);
 			IORequestOwner*		_GetRequestOwner(team_id team, thread_id thread,
 									bool allocate);
-
-	static	status_t			_IOCallbackWrapper(void* data,
-									io_operation* operation);
 
 private:
 			DMAResource*		fDMAResource;

@@ -11,12 +11,13 @@ KernelMergeObject kernel_device_manager.o :
 	FileDevice.cpp
 	id_generator.cpp
 	io_resources.cpp
-	IOScheduler.cpp
 	legacy_drivers.cpp
 
 	dma_resources.cpp
 	io_requests.cpp
+	IOCallback.cpp
 	IORequest.cpp
+	IOScheduler.cpp
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;
