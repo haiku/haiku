@@ -309,7 +309,7 @@ function ErrorExit()
 
 function Init()
 {
-	
+
 	# Set up some directory paths
 	baseDir=`finddir B_COMMON_DATA_DIRECTORY`/optional-packages
 	tmpDir=`finddir B_COMMON_TEMP_DIRECTORY`
@@ -322,16 +322,23 @@ function Init()
 	if ! [ -d ${baseDir} ] ; then
 		mkdir -p ${baseDir}
 	fi
-	
+
+	DetectSystemConfiguration
+	DownloadAllBuildFiles
+	ReadPackageNamesIntoMemory
+}
+
+
+function DownloadAllBuildFiles()
+{
+	# DownloadAllBuildFiles
 	# Retreive the necessary jam files from svn.
 	local buildFiles="OptionalPackages OptionalPackageDependencies \
 		OptionalBuildFeatures"
 	for file in ${buildFiles} ; do
 		GetBuildFile ${file}
 	done
-
-	DetectSystemConfiguration
-	ReadPackageNamesIntoMemory
+	
 }
 
 
@@ -688,11 +695,30 @@ Disclaimer:
     http://dev.haiku-os.org/wiki/PackageManagerIdeas
     http://dev.haiku-os.org/wiki/PackageFormat
 
-Usage: ./installoptionalpackage [-l] [-a "<pkg> [<pkg> ...]"]
--l      List installable packages
+Usage: ./installoptionalpackage [-f] [-h] [-l] [-a "<pkg> [<pkg> ...]"]
 -a      Add one or more packages and all dependencies
+-f		Remove cached data and list installable packages
+-h		Print this help.
+-l      List installable packages
 
 EOF
+}
+
+
+function RemoveCachedFiles()
+{
+	# RemoveCachedFiles
+	echo "Removing cached files ..."
+	if [ -d ${baseDir} ]; then
+		rm -rf ${baseDir}
+	fi
+	
+	# Unset variables, which prevents duplicate entries.
+	declare -A availablePackages
+	declare availablePackagesKeys=""
+	
+	# Reinitialize
+	Init
 }
 
 
@@ -722,10 +748,15 @@ else
 fi
 
 # Parse the arguments given to the script.
-while getopts "a:lh" opt; do
+while getopts "a:fhl" opt; do
 	case $opt in
 		a)
 			AddPackage "$OPTARG"
+			exit 0
+			;;
+		f)
+			RemoveCachedFiles
+			ListPackages
 			exit 0
 			;;
 		h)
