@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2010, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -74,7 +74,7 @@ compare_image_boot(const void* _a, const void* _b)
 	} else
 		return 0;
 
-	int compare = strcmp(a->ContentName(), b->ContentName());
+	int compare = strcasecmp(a->ContentName(), b->ContentName());
 	if (!compare)
 		return 0;
 
@@ -196,6 +196,10 @@ DiskBootMethod::IsBootDevice(KDiskDevice* device, bool strict)
 	TRACE(("boot device: bus %ld, device %ld\n", disk->bus_type,
 		disk->device_type));
 
+	// Assume that CD boots only happen off removable media.
+	if (fMethod == BOOT_METHOD_CD && !device->IsRemovable())
+		return false;
+
 	switch (disk->bus_type) {
 		case PCI_BUS:
 		case LEGACY_BUS:
@@ -246,26 +250,49 @@ DiskBootMethod::IsBootDevice(KDiskDevice* device, bool strict)
 bool
 DiskBootMethod::IsBootPartition(KPartition* partition, bool& foundForSure)
 {
+	off_t bootPartitionOffset = fBootVolume.GetInt64(
+		BOOT_VOLUME_PARTITION_OFFSET, 0);
+
 	if (!fBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
 		// the simple case: we can just boot from the selected boot
 		// device
-		if (partition->Offset()
-				== fBootVolume.GetInt64(BOOT_VOLUME_PARTITION_OFFSET, 0)) {
+		if (partition->Offset() == bootPartitionOffset) {
+			dprintf("Identified boot partition by partition offset.\n");
 			foundForSure = true;
 			return true;
 		}
 	} else {
-		// for now, we will just collect all BFS/ISO9660 volumes
-		if (fMethod == BOOT_METHOD_CD
-			&& fBootVolume.GetBool(BOOT_VOLUME_USER_SELECTED, false)
-			&& partition->Type() != NULL
-			&& strcmp(partition->Type(), kPartitionTypeDataSession)) {
-			return false;
+		// For now, unless we can positively identify an anyboot CD, we will
+		// just collect all BFS/ISO9660 volumes.
+
+		if (fMethod == BOOT_METHOD_CD) {
+			// Check for the boot partition of an anyboot CD. We identify it as
+			// such, if it is the only primary partition on the CD, has type
+			// BFS, and the boot partition offset is 0.
+			KDiskDevice* device = partition->Device();
+			if (IsBootDevice(device, false) && bootPartitionOffset == 0
+				&& partition->Parent() == device && device->CountChildren() == 1
+				&& device->ContentType() != NULL
+				&& strcmp(device->ContentType(), kPartitionTypeIntel) == 0
+				&& partition->ContentType() != NULL
+				&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0) {
+				dprintf("Identified anyboot CD.\n");
+				foundForSure = true;
+				return true;
+			}
+
+			// Ignore non-session partitions, if a boot partition was selected
+			// by the user.
+			if (fBootVolume.GetBool(BOOT_VOLUME_USER_SELECTED, false)
+				&& partition->Type() != NULL
+				&& strcmp(partition->Type(), kPartitionTypeDataSession) != 0) {
+				return false;
+			}
 		}
 
 		if (partition->ContentType() != NULL
-			&& (!strcmp(partition->ContentType(), "Be File System")
-			|| !strcmp(partition->ContentType(), "ISO9660 File System"))) {
+			&& (strcmp(partition->ContentType(), kPartitionTypeBFS) == 0
+			|| strcmp(partition->ContentType(), kPartitionTypeISO9660) == 0)) {
 			return true;
 		}
 	}
@@ -449,18 +476,19 @@ vfs_mount_boot_file_system(kernel_args* args)
 
 		const char* fsName = NULL;
 		bool readOnly = false;
-		if (strcmp(bootPartition->ContentType(), "ISO9660 File System") == 0) {
+		if (strcmp(bootPartition->ContentType(), kPartitionTypeISO9660) == 0) {
 			fsName = "iso9660:write_overlay:attribute_overlay";
 			readOnly = true;
 		} else if (bootPartition->IsReadOnly()
-			&& strcmp(bootPartition->ContentType(), "Be File System") == 0) {
+			&& strcmp(bootPartition->ContentType(), kPartitionTypeBFS) == 0) {
 			fsName = "bfs:write_overlay";
 			readOnly = true;
 		}
 
 		TRACE(("trying to mount boot partition: %s\n", path.Path()));
 		gBootDevice = _kern_mount("/boot", path.Path(), fsName, 0, NULL, 0);
-		if (gBootDevice >= B_OK) {
+		if (gBootDevice >= 0) {
+			dprintf("Mounted boot partition: %s\n", path.Path());
 			gReadOnlyBootDevice = readOnly;
 			break;
 		}
