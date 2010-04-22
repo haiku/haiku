@@ -1,11 +1,14 @@
 /*
+ * Copyright 2010, Michael Lotz, mmlr@mlotz.ch.
  * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ATA_INFOBLOCK_H
 #define ATA_INFOBLOCK_H
 
+
 #include <lendian_bitfield.h>
+
 
 #define ATA_WORD_0_ATA_DEVICE		0
 #define ATA_WORD_0_ATAPI_DEVICE		2
@@ -291,7 +294,22 @@ typedef struct ata_device_infoblock {
 
 	uint16	word_95_99_reserved[5];
 	uint64	lba48_sector_count;
-	uint16	word_104_126_reserved[23];
+	uint16	word_104_105_reserved[2];
+
+	LBITFIELD6(
+		logical_sectors_per_physical_sector		: 4,	// 2^x exponent
+		word_106_bit_4_11_reserved				: 8,
+		logical_sector_not_512_bytes			: 1,
+		multiple_logical_per_physical_sectors	: 1,
+		word_106_bit_14_one						: 1,
+		word_106_bit_15_zero					: 1
+	);
+
+	uint16	word_107_116_reserved[10];
+
+	uint32	logical_sector_size;						// in words, see 106
+
+	uint16	word_119_126_reserved[8];
 
 	LBITFIELD2(
 		removable_media_status_supported_2		: 2,	// 1 = supported
@@ -322,7 +340,15 @@ typedef struct ata_device_infoblock {
 
 	uint16	word_161_175_reserved_compact_flash_assoc[15];
 	uint16	current_media_serial_number[30];
-	uint16	word_206_254_reserved[49];
+	uint16	word_206_208_reserved[3];
+
+	LBITFIELD3(
+		logical_sector_offset					: 14,
+		word_209_bit_14_one						: 1,
+		word_209_bit_15_zero					: 1
+	);
+
+	uint16	word_210_254_reserved[45];
 
 	LBITFIELD2(
 		signature								: 8,
