@@ -492,13 +492,16 @@ AboutView::AboutView()
 		B_ALIGN_VERTICAL_UNSET));
 
 	// GCC version
-#if __GNUC__ != 2
-	snprintf(string, sizeof(string), "GCC %d", __GNUC__);
+	BEntry gccFourHybrid("/boot/system/lib/gcc2/libstdc++.r4.so");
+	BEntry gccTwoHybrid("/boot/system/lib/gcc4/libsupc++.so");
+	if (gccFourHybrid.Exists() || gccTwoHybrid.Exists())
+		snprintf(string, sizeof(string), TR("GCC %d Hybrid"), __GNUC__);
+	else
+		snprintf(string, sizeof(string), "GCC %d", __GNUC__);
 
 	BStringView* gccView = new BStringView("gcctext", string);
 	gccView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
-#endif
 
 	// CPU count, type and clock speed
 	char processorLabel[256];
@@ -560,9 +563,7 @@ AboutView::AboutView()
 			.AddGroup(B_VERTICAL)
 				.Add(_CreateLabel("oslabel", TR("Version:")))
 				.Add(versionView)
-#if __GNUC__ != 2
 				.Add(gccView)
-#endif
 				.AddStrut(offset)
 				.Add(_CreateLabel("cpulabel", processorLabel))
 				.Add(cpuView)
