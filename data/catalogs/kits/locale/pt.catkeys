@@ -1,6 +1,9 @@
-1	portuguese	system	1811097932
+1	portuguese	system	2677153267
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%Ld bytes
+Green:	ColorControl		Verde:
 %.2f TiB	StringForSize		%.2f TiB
+Red:	ColorControl		Vermelho:
 %3.2f MiB	StringForSize		%3.2f MiB
+Blue:	ColorControl		Azul:

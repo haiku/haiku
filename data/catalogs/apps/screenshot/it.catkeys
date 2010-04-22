@@ -1,0 +1,28 @@
+1	italian	x-vnd.Haiku-Screenshot	1342822790
+seconds	ScreenshotWindow		 secondi
+Options	ScreenshotWindow		Opzioni
+Desktop	ScreenshotWindow		Scrivania
+Include window border	ScreenshotWindow		Includi bordi finestra
+Back to saving	ScreenshotWindow		Torna al salvataggio
+Select	ScreenshotWindow		Seleziona
+Capture active window	ScreenshotWindow		Cattura finestra attiva
+Cancel	ScreenshotWindow		Annulla
+screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	schermata
+Name:	ScreenshotWindow		Nome:
+screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	schermata1
+Save screenshot	ScreenshotWindow		Salva
+Capture entire screen	ScreenshotWindow		Cattura intero schermo
+Choose folder	ScreenshotWindow		Seleziona cartella
+Take screenshot	ScreenshotWindow		Cattura schermata
+Save	ScreenshotWindow		Salva
+Overwrite	ScreenshotWindow		Sovrascrivi
+Retake screenshot	ScreenshotWindow		Ri-cattura schermata
+Choose folder...	ScreenshotWindow		Seleziona cartella...
+Please select	ScreenshotWindow		Seleziona
+Save as:	ScreenshotWindow		Salva come:
+Save in:	ScreenshotWindow		Salva in:
+Take screenshot after a delay of	ScreenshotWindow		Cattura schermata dopo una pausa di
+Artwork folder	ScreenshotWindow		Cartella delle arti
+Home folder	ScreenshotWindow		Cartella home
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Questo file è già esistente.\n Sei sicuro di volerlo sovrascrivere? 
+Include mouse pointer	ScreenshotWindow		Includi puntatore mouse

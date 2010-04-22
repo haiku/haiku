@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Mouse	104106491
+1	polish	x-vnd.Haiku-Mouse	2895129857
 Click to activate	SettingsView		Kliknij by aktywować
 Mouse type:	SettingsView		Rodzaj myszy:
 Warp	SettingsView		Warp
@@ -12,7 +12,6 @@ Click to focus	SettingsView		Kliknij by zaznaczyć
 Mouse speed	SettingsView		Prędkość wskaźnika
 Focus mode:	SettingsView		Tryb zaznaczania:
 Instant warp	SettingsView		Natychmiastowe przeniesienie
-Dig Deal	MouseApplication		Dig Deal
 1-Button	SettingsView		Jednoprzyciskowa
 Double-click speed	SettingsView		Prędkość dwukrotnego kliknięcia
 Defaults	MouseWindow		Domyślne

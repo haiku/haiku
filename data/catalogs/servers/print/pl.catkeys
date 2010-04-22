@@ -1,0 +1,12 @@
+1	polish	x-vnd.Be-PSRV	501315577
+Page setup:	ConfigWindow		Ustawienia strony:
+Yes	PrintServerApp		Tak
+All pages	ConfigWindow		Wszystkie strony
+There is no default printer set up.	PrintServerApp		Brak ustawionej domyślnej drukarki.
+Printer:	ConfigWindow		Drukarka:
+Select a printer	ConfigWindow		Wybierz drukarke
+There are no printers set up.	PrintServerApp		Brak ustawionej drukarki.
+Page	ConfigWindow		Strona
+Print setup	ConfigWindow		Ustawienia wydruku
+Page setup	ConfigWindow		Ustawienia strony
+Paper setup:	ConfigWindow		Ustawienia papieru:

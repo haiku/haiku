@@ -1,74 +1,74 @@
 1	ukrainian	x-vnd.Haiku-ShowImage	1282650517
 Paste	Menus		Вставити
-Use as background…	Menus		Використати як тло…
-File	Menus		File
-5 seconds	Menus		5 секунд
-Slide delay	Menus		Затримка слайдшоу
-Zoom in	Menus		Збільшити
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' було змінено. Ви бажаєте закрити документ?
-Page setup…	Menus		Настройка друку…
-8 seconds	Menus		8 секунд
+Use as background…	Menus		Використати як фон…
+File	Menus		Файл
+5 seconds	Menus		5 сек.
+Slide delay	Menus		Затримка слайда
+Zoom in	Menus		Збільшення
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' було змінено. Ви хочете закрити його?
+Page setup…	Menus		Налаштувати сторінку…
+8 seconds	Menus		8 сек.
 Print…	Menus		Друкувати…
 Previous page	Menus		Попередня сторінка
 View	Menus		Вигляд
-Full screen	Menus		На повний екран
+Full screen	Menus		У повний екран
 Go to page	Menus		Перейти до сторінки
 Zoom out	Menus		Зменшити
-20 seconds	Menus		20 секунд
-Quit	Menus		Вийти
+20 seconds	Menus		20 сек.
+Quit	Menus		Завершити
 Invert colors	Menus		Інвертувати кольори
-3 seconds	Menus		3 секунди
-Rotate counterclockwise	Menus		Повернути проти год. стрілки
-10 seconds	Menus		10 секунд
+3 seconds	Menus		3 сек.
+Rotate counterclockwise	Menus		Обертати проти год. стрілки
+10 seconds	Menus		10 сек.
 High-quality zooming	Menus		Високоякісне збільшення
 Clear	Menus		Очистити
-Browse	Menus		Перегляд
-6 seconds	Menus		6 секунд
+Browse	Menus		Переглянути
+6 seconds	Menus		6 сек.
 Edit	Menus		Редагувати
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Неможливо завантажити зображення! Файл або транслятор для нього відсутній.
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Неможливо завантажити зображення! Жодного файла або оброблювача зображень для нього не знайдено.
 First page	Menus		Перша сторінка
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (pagina %d) було змінено. Ви бажаєте закрити документ?
-About ShowImage…	Menus		Про Переглядач зображень…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (сторінка %d) були змінені. Ви хочете закрити документ?
+About ShowImage…	Menus		 Про Переглядач зображень…
 Open	Menus		Відкрити
-OK	LoadAlerts		Ok
+OK	LoadAlerts		OK
 Close	Menus		Закрити
 Close	ClosePrompt		Закрити
 Height:	ResizerWindow		Висота:
 Undo	Menus		Відмінити
-Resize to (in 1/72 inches):	PrintOptionsWindow		Змінити розмір (1/72 дюйми):
+Resize to (in 1/72 inches):	PrintOptionsWindow		Змінити розмір (в 1/72 дюйма):
 Apply	ResizerWindow		Використати
 Keep original proportions	ResizerWindow		Зберегти оригінальні пропорції
-9 seconds	Menus		9 секунд
-Flip left to right	Menus		Відобразити зліва направо
-Show caption in full screen mode	Menus		Показати назву в повноекранному режимі
-DPI:	PrintOptionsWindow		Роздільча здатність (DPI):
+9 seconds	Menus		9 сек.
+Flip left to right	Menus		Пересунути горизонтально
+Show caption in full screen mode	Menus		Показати заголовок в повний екран
+DPI:	PrintOptionsWindow		Роздільча здатність(DPI):
 Next file	Menus		Наступний файл
 4 seconds	Menus		4 секунди
-Zoom to window	Menus		Підігнати до вікна
+Zoom to window	Menus		Збільшити вікно
 Close document	ClosePrompt		Закрити документ
-ShowImage	LoadAlerts		Переглядач зображень
-Height: 	PrintOptionsWindow		Висота: 
+ShowImage	LoadAlerts		Показати малюнок
+Height: 	PrintOptionsWindow		Висота:
 Cancel	ClosePrompt		Відмінити
-Resize…	Menus		Змінити розмір…
-Print options	PrintOptionsWindow		Опції друку
+Resize…	Menus		Зміна розміру ...
+Print options	PrintOptionsWindow		Параметри друку
 Width:	ResizerWindow		Ширина:
 Copy	Menus		Копіювати
 Cut	Menus		Вирізати
 ShowImage	AboutWindow		Переглядач зображень
-7 seconds	Menus		7 секунд
+7 seconds	Menus		7 секунди
 Last page	Menus		Остання сторінка
-Previous file	Menus		Попередній файл 
-Resize	ResizerWindow		Змінити розмір
+Previous file	Menus		Попереднє фото
+Resize	ResizerWindow		Зміна розміру
 Slide show	Menus		Слайдшоу
-Fit image to page	PrintOptionsWindow		Підігнати зображення до сторінки
+Fit image to page	PrintOptionsWindow		Підігнати зображення під вікно
 Flip top to bottom	Menus		Відобразити зверху вниз
-Select all	Menus		Вибрати все
-Zoom factor in %:	PrintOptionsWindow		Збільшення в  %:
+Select all	Menus		Виділити все
+Zoom factor in %:	PrintOptionsWindow		Масштаб зображення %:
 Width:	PrintOptionsWindow		Ширина:
 Image	Menus		Зображення
-Rotate clockwise	Menus		Повернути за год. стрілкою
-Job setup	PrintOptionsWindow		Настроїти завдання
+Rotate clockwise	Menus		Поворот за годинниковою стрілкою
+Job setup	PrintOptionsWindow		Настройка завдання
 Original size	Menus		Оригінальний розмір
 Next page	Menus		Наступна сторінка
 Save as…	Menus		Зберегти як…
-Shrink to window	Menus		Стиснути до вікна
+Shrink to window	Menus		Згортання вікна

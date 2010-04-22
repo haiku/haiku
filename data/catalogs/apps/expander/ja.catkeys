@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Expander	1738666712
+1	japanese	x-vnd.Haiku-Expander	3642794258
 Expand	ExpanderMenu		解凍
 Set destination…	ExpanderMenu		解凍先を指定…
 File expanded	ExpanderWindow		ファイル解凍が完了しました
@@ -12,7 +12,6 @@ Hide contents	ExpanderWindow		内容を隠す
 Cancel	ExpanderWindow		中止
 Continue	ExpanderWindow		続ける
 Expander	ExpanderWindow	!! Window Title !!	Expander
-Expander\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		Expander\n\tJérôme Duval 作\n\tCopyright 2004-2006, Haiku Inc.\n\nオリジナル BeOS 版の作者\nDominic, Hiroshi, Peter, Pavel and Robert\n
 The destination folder does not exist.	ExpanderWindow		解凍先フォルダーは存在しません。
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		倉庫ファイルの解凍はまだ完了していません。それでも中止しますか？
 Select	DirectoryFilePanel		選択
@@ -25,10 +24,12 @@ Expanding file 	ExpanderWindow		ファイルを解凍中
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		指定されたフォルダー移動されたか、名前が変更されたか、\nサポートされていません。
 The file doesn't exist	ExpanderWindow		ファイルは存在しません
 Stop	ExpanderMenu		中止
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tJérôme Duval 作\n\tCopyright 2004-2006, Haiku Inc.\n\n元の Be バージョンの作者\nDominic, Hiroshi, Peter, Pavel および Robert\n
 File	ExpanderMenu		ファイル
 Expand	ExpanderWindow		解凍
 Close	ExpanderMenu		閉じる
 The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
+Expander	About		Expander
 About Expander…	ExpanderMenu		Expander について…
 OK	About		Ok
 Set source…	ExpanderMenu		書庫ファイルを指定…

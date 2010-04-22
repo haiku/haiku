@@ -1,0 +1,26 @@
+1	norwegian bokmål	x-vnd.Be-PRNT	3558162814
+Waiting	JobListView		Venter
+page	JobListView		side
+Cancel	AddPrinterDialog		Avbryt
+Add printer	AddPrinterDialog		Legg til ny skriver
+Printers	PrintersWindow		Skrivere
+Default Printer	PrinterListView		Standardskriver
+No pending jobs.	PrinterListView		Ingen ventende jobber.
+pages	JobListView		sider
+Processing	JobListView		Behandler
+Printer name:	AddPrinterDialog		Skrivernavn:
+ pending jobs.	PrinterListView		 ventene jobber.
+Restart job	PrintersWindow		Start jobb på nytt
+Add	AddPrinterDialog		Legg til
+Make default	PrintersWindow		Sett som standard
+Cancel job	PrintersWindow		Avbryt jobb
+1 pending job.	PrinterListView		1 ventende jobb.
+Remove	PrintersWindow		Fjern
+<pick one>	AddPrinterDialog		<velg en>
+Add …	PrintersWindow		Legg til …
+Failed	JobListView		Mislyktes
+%.2f KB	JobListView		%.2f KB
+Completed	JobListView		Utført
+Unknown status	JobListView		Ukjent status
+Connected to:	AddPrinterDialog		Tilkoblet:
+Printer type:	AddPrinterDialog		Skrivertype:

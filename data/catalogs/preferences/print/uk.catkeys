@@ -1,0 +1,28 @@
+1	ukrainian	x-vnd.Be-PRNT	403433619
+Waiting	JobListView		Очікування
+page	JobListView		сторінка
+Cancel	AddPrinterDialog		Відмінити
+Add printer	AddPrinterDialog		Додати принтер
+Printers	PrintersWindow		Принтери
+Default Printer	PrinterListView		Принтер по замовчуванню
+No pending jobs.	PrinterListView		Завдання, що виконуються, відсутні.
+pages	JobListView		сторінки
+Processing	JobListView		Обробка
+Printer name:	AddPrinterDialog		І'мя принтера:
+ pending jobs.	PrinterListView		 Завдання, що виконуються.
+Restart job	PrintersWindow		Перезапустити завдання
+Add	AddPrinterDialog		Додати
+Make default	PrintersWindow		Зробити по замовчуванню
+Cancel job	PrintersWindow		Відмінити завдання
+1 pending job.	PrinterListView		1 завдання, що виконується.
+Remove	PrintersWindow		Видалити
+<pick one>	AddPrinterDialog		<виберіть>
+Add …	PrintersWindow		Додати …
+Print jobs for 	PrintersWindow		Завдання для 
+Failed	JobListView		Зупинено
+%.2f KB	JobListView		%.2f KB
+Completed	JobListView		Завершено
+Print jobs: No printer selected	PrintersWindow		Завдання на друк: Принтер не вибрано
+Unknown status	JobListView		Стан невідомий
+Connected to:	AddPrinterDialog		Підключений до:
+Printer type:	AddPrinterDialog		Тип принтера:

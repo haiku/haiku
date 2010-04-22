@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-DriveSetup	3054434002
+1	spanish	x-vnd.Haiku-DriveSetup	2303126039
 Delete	MainWindow		Eliminar
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		¿Está seguro que quiere inicializar la partición seleccionada? Después de introducir los parámetros de inicialización, podrá abortar esta operación antes de escribir los cambios en el disco.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\n¡Toda la información de la partición se perderá irremisiblemente si lo hace!.
@@ -6,6 +6,7 @@ Rescan	MainWindow		Actualizar lista de dispositivos
 OK	MainWindow		Aceptar
 Could not aquire partitioning information.	MainWindow		No se pudo obtener información de la partición.
 There's no space on the partition where a child partition could be created.	MainWindow		No hay espacio en la partición para crear una partición hija.
+%ld MiB	Support		%ld MiB
 <empty>	PartitionList		<vacío>
 Unable to find the selected partition by ID.	MainWindow		Imposible encontrar la partición seleccionada por ID.
 Select a partition from the list below.	DiskView		Elija una partición de la lista inferior.

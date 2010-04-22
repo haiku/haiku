@@ -1,0 +1,24 @@
+1	german	x-vnd.Haiku-OpenGL	2182311498
+List stack size:	Capabilities		Listen-Stackgröße:
+Information	InfoView		Information
+Max. clipping planes:	Capabilities		Max. Anzahl Clipping-Ebenen:
+Max. texture units:	Capabilities		Max. Textur Einheiten:
+Renderer name:	InfoView		Renderer-Name:
+Vendor name:	InfoView		Herstellername:
+Attributes stack size:	Capabilities		Attribute-Stackgröße:
+OpenGL version:	InfoView		OpenGL-Version:
+Name stack size:	Capabilities		Namen-Stackgröße:
+Auxiliary buffer(s):	Capabilities		Auxiliary-Buffer:
+Max. recommended vertex elements:	Capabilities		Max. Anzahl empfohlener Vertexelemente:
+GLU version:	InfoView		GLU-Version:
+Model stack size:	Capabilities		Model-Stackgröße:
+Projection stack size:	Capabilities		Projektionen-Stackgröße:
+Max. lights:	Capabilities		Max. Anzahl Lichter:
+Max. 2D texture size:	Capabilities		Max. 2D-Texturgröße:
+GLUT API version:	InfoView		GLUT API-Version:
+Texture stack size:	Capabilities		Texturen-Stackgröße:
+Max. 3D texture size:	Capabilities		Max. 3D Texturgröße:
+Capabilities	Capabilities		Fähigkeiten
+Max. recommended index elements:	Capabilities		Max. Anzahl empfohlener Indexelemente:
+Available	Extensions		Verfügbar
+Extensions	Extensions		Erweiterungen

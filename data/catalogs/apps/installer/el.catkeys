@@ -1,0 +1,66 @@
+1	greek	x-vnd.Haiku-Installer	3609821010
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Είστε σίγουρος πως θέλετε να ακυρώσετε την εγκατάσταση και να επανεκκινήσετε το σύστημα;
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Το πρόγραμμα εγκατάστασης\n\γράφτηκε από τους Jérôme Duval και Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Η εγκατάσταση ολοκληρώθηκε. Ο τομέας εκκίνησης γράφτηκε σε '% s'. Πατήστε Έξοδος για να εγκαταλείψετε την εγκατάσταση ή επιλέξετε μία νέα μονάδα για να εκτελέσετε μια άλλη εγκατάσταση.
+Quit	InstallerApp		Έξοδος
+Additional disk space required: 0.0 KiB	InstallerWindow		Απαιτείται επιπρόσθετος χώρος στο δίσκο: 0.0 KiB
+Stop	InstallerWindow	In alert after pressing Stop	Τερματισμός
+Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Η εγκατάσταση ολοκληρώθηκε. Ο τομέας εκκίνησης γράφτηκε σε '% s'. Πατήστε Έξοδος για να κάνετε επανεκκίνηση του υπολογιστή ή επιλέξετε μια νέα μονάδα για να εκτελέσετε μια άλλη εγκατάσταση.
+Install progress:  	InstallerWindow		Πρόοδος εγκατάστασης:  
+Starting Installation.	InstallProgress		Έναρξη εγκατάστασης.
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Είστε σίγουρος ότι θέλετε να εγκαταστήσετε στον τρέχον δίσκο εκκίνησης; Το πρόγραμμα εγκατάστασης θα πρέπει να κάνει επανεκκίνηση το σύστημά σας εάν συνεχίσετε.
+OK	InstallerApp		Εντάξει
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Επιλέξτε την προέλευση και το δίσκο προορισμού από τα αναδυόμενα μενού. Στη συνέχεια, κάντε κλικ στην \ "Εκκίνηση \".
+Install from:	InstallerWindow		Εγκατάσταση από:
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld από %2ld
+Installer	InstallerWindow		Πρόγραμμα εγκατάστασης
+Continue	InstallerWindow	In alert after pressing Stop	Συνέχεια
+Write boot sector to '%s'	InstallerWindow		Ο τομέας εκκίνησης γράφεται σε '% s'.
+Collecting copy information.	InstallProgress		Συλλογή πληροφοριών αντιγραφής.
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο προέλευσης από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Εκκίνηση\".
+Quit	InstallerWindow		Έξοδος
+Boot sector successfully written.	InstallProgress		Ο τομέας εκκίνησης γράφτηκε επιτυχώς.
+Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη
+scanning…	InstallerWindow		εξετάζει...
+Boot sector not written because of an  internal error.	InstallProgress		Ο τομέας εκκίνησης δεν γράφτηκε εξαιτίας ενός εσωτερικού σφάλματος.
+Finishing Installation.	InstallProgress		Τερματισμός εγκατάστασης.
+README	InstallerApp		README
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Ο δίσκος προορισμού μπορεί να μην έχει αρκετό χώρο. Δοκιμάστε να επιλέξετε ένα διαφορετικό δίσκο ή επιλέξτε να μην εγκαταστήσετε προαιρετικά στοιχεία.
+Scanning for disks…	InstallerWindow		Εξέταση για δίσκους ...
+The disk can't be mounted. Please choose a different disk.	InstallProgress		Ο δίσκος δεν μπορεί να προσαρτηθεί. Παρακαλώ επιλέξτε ένα διαφορετικό δίσκο.
+?? of ??	InstallerWindow	Unknown progress	?? από ??
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Ξεκινήστε το βοηθητικό πρόγραμμα DriveSetup για την κατάτμηση \n διαθέσιμων σκληρών δίσκων και άλλων μέσων αποθήκευσης. \nΟι κατατμήσεις μπορoύν να αρχικοποιηθούν με το \n το Be σύστημα αρχείων το οποίο απαιτήται για την εκκίνηση Haiku \ nκατάτμηση.
+Show optional packages	InstallerWindow		Δείτε προαιρετικά πακέτα
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Δεν βρέθηκαν κατάλληλες κατατμήσεις για την εγκατάσταση. Παρακαλώ να ορίσετε κατατμήσεις και να αρχικοποιήσετε τουλάχιστον μια κατάτμση με σύστημα αρχείων Be.
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο που θέλετε να εγκαταστήσετε από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \ "Εκκίνηση \".
+Unknown Type	InstallProgress	Partition content type	Άγνωστος τύπος
+<none>	InstallerWindow	No partition available	<κανένα>
+Installation canceled.	InstallProgress		Η εγκατάσταση ακυρώθηκε.
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Δεν μπορείτε να εγκαταστήσετε τα περιεχόμενα του δίσκου επάνω στον ίδιο δίσκο. Παρακαλώ επιλέξτε ένα διαφορετικό δίσκο.
+Hide optional packages	InstallerWindow		Απόκρυψη προαιρετικών πακέτων
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Κλείστε το παράθυρο DriveSetup πριν το κλείσιμο του παράθυρου προγράματος εγκατάστασης.
+Restart system	InstallerWindow		Επανεκκίνηση συστήματος
+OK	InstallerWindow		Εντάξει
+Set up partitions…	InstallerWindow		Ρύθμιση κατατμήσεων ...
+The partition can't be mounted. Please choose a different partition.	InstallProgress		Η κατάτμηση δεν μπορεί να προσαρτηθεί. Παρακαλώ επιλέξτε μία διαφορετική κατάτμηση.
+Install anyway	InstallProgress		Εγκατάσταση ούτως η άλλος
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Εντοπισμός λάθους η εγκατάσταση δεν ολοκληρώθηκε: \ n \ nσφάλμα:% s
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Πατήστε το κουμπί Έναρξη για να εγκαταστήσετε από το '% 1s "πάνω"% 2s
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Εκτελέσει DriveSetup ... \ n \ n Κλήστε το DriveSetup να συνεχίσετε με την εγκατάσταση.
+OK	InstallProgress		Ναι
+Please choose target	InstallerWindow		Παρακαλώ επιλέξτε στόχο
+???	InstallerWindow	Unknown partition name	;;;
+Begin	InstallerWindow		Έναρξη
+Welcome to the Haiku Installer!\n\nIMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\nThis is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n1)  If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer installations so we do not recommend using it.\nIf you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n2)  The Installer will take no steps to integrate Haiku into an existing boot menu. The Haiku partition itself will be made bootable. If you have GRUB already installed, edit your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n\tsudo <your favorite text editor> /boot/grub/menu.lst\n\nYou'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\nWith GRUB it's: (hdN,n)\n\nAll harddisks start with \"hd\"\n\"N\" is the hard disk number, starting with \"0\".\n\"n\" is the partition number, also starting with \"0\".\nThe first logical partition always has the number 4, regardless of the number of primary partitions.\n\nSo behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n\t# Haiku on /dev/sda7\n\ttitle\t\t\t\tHaiku\n\trootnoverify\t\t(hd0,6)\n\tchainloader\t\t+1\n\nYou can see the correct partition in GParted for example.\n\n3)  When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\nHave fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Καλώς ήλθατε στο Haiku Installer! \ N \ n ΣΥΜΑΝΤΙΚΕΣ ΠΛΗΡΟΦΟΡΙΕΣ Πριν την εγκατάσταση Haiku \ n \ nΑυτό το είναι άλφα ποιότητας λογισμικό! Αυτό σημαίνει ότι υπάρχει υψηλός κίνδυνος απώλειας σημαντικών δεδομένων. Κάντε συχνές backups! Σας έχουμε προειδοποιήσει. \ N \ n1) Εάν εγκαθιστάτε το Haiku επάνω σε πραγματικό υλικό (εκτός εντός ενός εξομοιωτή) συνιστάται να έχετε ήδη ετοιμάσει ένα διαμέρισμα του σκληρού δίσκου. Το πρόγραμμα εγκατάστασης DriveSetup θα προετοιμασεί υπάρχουσες κατατμήσεις με το Haiku σύστημα αρχείων, οι επιλογές για να αλλάξει η τελική μορφή διαμερισμάτων δεν έχουν δοκιμαστεί σε αρκετά μεγάλη ποικιλία εγκαταστάσεων ηλεκτρονικών υπολογιστών και έτσι δεν συνιστούμε τη χρήση του. \ NΑν δεν έχετε δημιουργήσει ακόμη ένα διαμέρισμα, απλώς κάντε επανεκκίνηση του Η/Υ, δημιουργήστε το διαμέρισμα χρησιμοποιώντας οποιοδήποτε εργαλείο αισθάνεστε πιο άνετα, και κάντε επανεκκίνηση στο Haiku για να συνεχίσετε με την εγκατάσταση. Μπορείτε για παράδειγμα να χρησιμοποιήσετε το GParted Live-CD, μπορεί επίσης να αλλάξετε το μέγεθος των κατατμήσεων που υπάρχουν για μεγαλύτερο χώρο. \ N \ n2) Το πρόγραμμα εγκατάστασης δεν θα λάβει μέτρα για την ενσωμάτωση Haiku σε ένα υπάρχον μενού εκκίνησης. Το διαμέρισμα Haiku θα γίνει bootable. Εάν έχετε ήδη εγκαταστήσει το GRUB, επεξεργαστείτε το αρχείο / boot / grub / menu.lst με το πρόγραμμα επεξεργασίας τις επιλογής σας από ένα τερματικό σαν αυτό: \ n \ n \ tsudo / boot / grub / menu.lst \ n \ nνα σημειωθεί ότι το GRUB χρησιμοποιεί μια διαφορετική στρατηγική για την ονοματοδοσία των σκληρών δίσκών από το Linux. \ n \ nμε το GRUB είναι: (HDN, n) \ n \ nΌλοι η σκληροί δίσκοι αρχίζουν με \ "HD \" \ n \ "N \" είναι ο αριθμός σκληρό δίσκο, ξεκινώντας με \ "0 \". \ n \ "n \" είναι ο αριθμός διαμερίσματος, επίσης, ξεκινώντας με \ "0 \". \ nΗ πρώτη λογική κατάτμηση πάντα έχει τον αριθμό 4, ανεξάρτητα από τον αριθμό των πρωτεύων διαμερίσματων. \ n \ NΈτσι πίσω από τις άλλες εγγραφές μενού προς το κάτω μέρος του αρχείου, προσθέστε κάτι παρόμοιο με αυτές τις γραμμές: \ n \ n \ t # Haiku σχετικά / dev/sda7 \ n \ ttitle \ t \ t \ t \ tHaiku \ n \ trootnoverify \ t \ t (hd0, 6) \ n \ tchainloader \ t \ 1 \ n \ nΜπορείτε να δείτε το σωστό διαμέρισμα στο GParted για παράδειγμα. \ n \ n3) Όταν κάνετε επιτυχή εκκίνηση στο Haiku για πρώτη φορά, επιβεβαιωθείτε ότι έχετε διαβάσει \ "Welcome \" την τεκμηρίωση μας, υπάρχει ένας σύνδεσμος στην επιφάνεια εργασίας. \ n \ nΚαλή διασκέδαση και ευχαριστούμε πολύ για τη δοκιμή του Haiku! Ελπίζουμε να σας αρέσει!
+Write boot sector	InstallerWindow		Εγραφή του τομέα εκκίνησης
+Cancel	InstallerWindow		Άκυρο
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, η αίτηση για να διαμορφώσετε κατατμήσεις δίσκων, δεν μπορεί να ξεκινήσει.
+No optional packages available.	PackagesView		Δεν είναι διαθέσιμα τα προαιρετικά πακέτα.
+Continue	InstallerApp		Συνέχεια
+Additional disk space required: %s	InstallerWindow		Επιπλέον χώρο στο δίσκο που απαιτείται: %s
+Cancel	InstallProgress		Άκυρο
+Try installing anyway	InstallProgress		Δοκιμάστε όπως έχει την εγκατάσταση
+Are you sure you want to to stop the installation?	InstallerWindow		Είστε σίγουροι ότι θέλετε για να σταματήσει η εγκατάσταση;
+Writes the Haiku boot code to the partition start\nsector. This step is automatically performed by\nthe installation, but you can manually make a\npartition bootable in case you do not need to\nperform an installation.	InstallerWindow		Εγραφεί του κώδικα εκκίνησης Haiku στο τομέα έναρξη \ n. Αυτό το βήμα εκτελείται αυτόματα από \ nΤην εγκατάσταση, αλλά μπορείτε να πραγματοποιήσετε μια χειροκίνητα \ n ένα διαμέρισμα εκκίνησης σε περίπτωση που δεν χρειάζεται να \ n εκτελέσετε μια εγκατάσταση.
+Onto:	InstallerWindow		Επάνω:
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Το προεπιλεγμένο διαμερισμά του δίσκου δεν είναι άδειο. Είστε σίγουροι ότι θέλετε να κάνετε την εγκατάσταση; \ n \ nNote: Ο «φάκελος συστήματος» θα είναι μια καθαρή αντιγραφή από την πηγή εγκατάστασης, όλοι οι άλλοι φακέλοι, θα πρέπει να συγχωνευθούν, ενώ τα αρχεία και οι συνδέσμοι που υπάρχουν τόσο στην πηγή και την πρεπιλεγμένη μονάδα θα αντικατασταθούν με την έκδοση της μονάδα εγκατάστασης.

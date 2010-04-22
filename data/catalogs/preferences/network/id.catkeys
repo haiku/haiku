@@ -1,0 +1,18 @@
+1	indonesian	x-vnd.Haiku-Network	3643490310
+Gateway:	EthernetSettingsView		Gateway:
+Netmask:	EthernetSettingsView		Netmask:
+DHCP	EthernetSettingsView		DHCP
+DNS #2:	EthernetSettingsView		DNS #2:
+Apply	EthernetSettingsView		Terapkan
+OK	EthernetSettingsView		OK
+DNS #1:	EthernetSettingsView		DNS #1:
+IP address:	EthernetSettingsView		Alamat IP:
+Network	NetworkWindow		Jaringan
+Adapter:	EthernetSettingsView		Adapter:
+Domain:	EthernetSettingsView		Domain:
+Revert	EthernetSettingsView		Pulihkan
+Sending auto-config message failed: 	EthernetSettingsView		Pengiriman pesan auto-config message gagal: 
+Mode:	EthernetSettingsView		Mode:
+The net_server needs to run for the auto configuration!	EthernetSettingsView		net_server harus dijalankan konfigurasi secara otomatis!
+Auto-configuring failed: 	EthernetSettingsView		Konfigurasi secara otomatis gagal: 
+Static	EthernetSettingsView		Statik

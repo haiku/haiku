@@ -1,0 +1,67 @@
+1	korean	x-vnd.Haiku-Installer	4246631894
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		당신은 설치를 중단하고 시스템을 다시 시작하겠습니까?
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		설치 프로그램\n\tJérôme Duval 과 Stephan Aßmus 작성\n\t저작권 2005-2010, Haiku.\n\n
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		설치가 완료됨.  부트 섹터는 '%s'로 기록되었습니다.  나가기를 눌려서 설치프로그램을 나가거나 새로운 목적 볼륨을 선택해서 다른 설치를 할 수 있습니다.
+Quit	InstallerApp		나가기
+Additional disk space required: 0.0 KiB	InstallerWindow		추가로 요구되는 디스크 용량 0.0 KiB
+Stop	InstallerWindow	In alert after pressing Stop	정지
+Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		설치가 완료됨.  부트 섹터는 '%s'로 기록되었습니다.  나가기를 눌려서  컴푸터를 다시 시작하거나새로운 목적 볼륨을 선택해서 다른 설치를 할 수 있습니다
+Install progress:  	InstallerWindow		설치 과정:  
+Starting Installation.	InstallProgress		설치 시작.
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		당신은 현재의 부팅 디스크에 설치하겠습니까? 만약 당신이 계속 진행한다면 설치프로그램은  컴퓨터를 재부팅하게 될 것입니다.
+OK	InstallerApp		확인
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		팝업 메뉴에서 원본 디스크와 대상 디스크를 선택하십시오. 그리고 \"시작\"을 클릭하십시오.
+Install from:	InstallerWindow		원본:
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld 의 %2ld
+Installer	InstallerWindow		설치프로그램
+Continue	InstallerWindow	In alert after pressing Stop	계속
+Write boot sector to '%s'	InstallerWindow		부트 섹터는 '%s'로 기록됨
+Collecting copy information.	InstallProgress		복사 정보 모으는 중.
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		팝업 메뉴에서 원본 디스크를 선택하십시오. 그리고 \"시작\"을 클릭하십시오.
+Quit	InstallerWindow		나가기
+Boot sector successfully written.	InstallProgress		부트 섹터가 성공적으로 기록되었습니다.
+Performing installation.	InstallProgress		설치 작업중.
+scanning…	InstallerWindow		탐색중…
+Boot sector not written because of an  internal error.	InstallProgress		부트 섹터가 내부 에러로 인해 기록되지 않았습니다.
+Finishing Installation.	InstallProgress		설치 완료중.
+README	InstallerApp		README
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		대상 디스크에는 충분한 공간이 없습니다. 다른 디스크를 선택하거나 설치 옵션 항목을 선택 해제하기 바랍니다.
+Scanning for disks…	InstallerWindow		디스크 검색중…
+The disk can't be mounted. Please choose a different disk.	InstallProgress		이 디스크는 마운트 할 수 없습니다. 다른 디스크를 선택해 주십시오.
+?? of ??	InstallerWindow	Unknown progress	?? 의 ??
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		사용가능한 하드디스크와 다른 미디어의 \파티션을 만들기 위해 드라이브 설정 유틸리티를 시작합니다.\n파티션은 Haiku 부트 파티션에 필요한 \nBe 파일 시스템으로 \n초기화합니다.
+Show optional packages	InstallerWindow		선택적인 패키지 보기
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		설치에 적합한 어떤 파티션도 찾을 수 없습니다. 파티션을 준비해서 최소한 하나의 파티션을 Be 파일 시스템으로 초기화하십시오.
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		팝업 메뉴에서 설치할 디스크를 선택하십시오. 그리고 \"시작\"을 클릭하십시오
+Unknown Type	InstallProgress	Partition content type	알수 없는 형식
+<none>	InstallerWindow	No partition available	<없음>
+Installation canceled.	InstallProgress		설치가 취소됨.
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		당신은 디스크에 설치 할 수 없습니다. 다른 디스크를 선택하십시오.
+Hide optional packages	InstallerWindow		선택적인 패키지 숨기기
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		설치프로그램 창을 닫기 전에 드라이브설정 창을 닫기 바랍니다.
+Restart system	InstallerWindow		시스템 재시작
+OK	InstallerWindow		확인
+Set up partitions…	InstallerWindow		파티션 설정…
+The partition can't be mounted. Please choose a different partition.	InstallProgress		이 파티션을 마운트 할 수 없습니다.다른 파티션을 선탹해 주십시오.
+Install anyway	InstallProgress		어떻든 설치
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		에러가 발생해서 설치가 완료되지 않았습니다:\n\n에러:  %s
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s'에서 '%2s'에 설치를 시작하려면 시작 버튼을 누르십시오.
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		드라이브설정 프로그램이 실행중입니다…\n\n드라이브설정 프로그램을 닫고 설치를 계속하십시오.
+OK	InstallProgress		확인
+Please choose target	InstallerWindow		설치할 위치를 선택하십시오
+???	InstallerWindow	Unknown partition name	???
+Begin	InstallerWindow		시작
+Welcome to the Haiku Installer!\n\nIMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\nThis is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n1)  If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer installations so we do not recommend using it.\nIf you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n2)  The Installer will take no steps to integrate Haiku into an existing boot menu. The Haiku partition itself will be made bootable. If you have GRUB already installed, edit your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n\tsudo <your favorite text editor> /boot/grub/menu.lst\n\nYou'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\nWith GRUB it's: (hdN,n)\n\nAll harddisks start with \"hd\"\n\"N\" is the hard disk number, starting with \"0\".\n\"n\" is the partition number, also starting with \"0\".\nThe first logical partition always has the number 4, regardless of the number of primary partitions.\n\nSo behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n\t# Haiku on /dev/sda7\n\ttitle\t\t\t\tHaiku\n\trootnoverify\t\t(hd0,6)\n\tchainloader\t\t+1\n\nYou can see the correct partition in GParted for example.\n\n3)  When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\nHave fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Haiku 설치프로그램에 오신 것을 환영합니다!\n\nINSTALLING HAIKU를 설치하기 전에 알아야할 중요한 정보\n\n이것은 alpha 정도의 소프트웨어입니다! 이것이 의미하는 것은 위험성이 크거나 중요한 데이터를 잃어버릴수 있다는 것입니다. 자주 백업을 하십시오! 당신은 경고를 받았습니다.\n\n1)  만약 당신이 Haiku를 실제 하드웨어(에뮬레이터 안이 아니고)에 설치하려면 먼저 준비된 하드 디스크 파티션이 요구됩니다. 이 설치프로그램과 드라이브설정 도구는 Haiku 네이티브 파일 시스템으로 존재하는 파티션을 초기화해 줄 것입니다 ,그러나 실제 하드 레이아웃의 옵션을 바꾸는 것은 충분히 매우 다양한 컴퓨터 설치에서 테스트되지 않았습니다. 그래서 우리는 이것을 사용하는 것을 요구하지 않습니다.\n만약 당신이 파티션을 아직 안 만들었다면, 단순히 재부팅하고, 당신이 가장 편한 도굴르 사용해서 파티션을 만들고, 그리고 Haiku로 재부팅해서 설치를 계속합니다. 당신은 예를 들어 Gparted 라이브 시디를 사용한다면, 공간을 만들기 위해 기존의 파티션 크기를 조절할 수 있습니다.\n\n2) \n설치 프로그램은 Haiku를 기존의 부트메뉴에 통합하는 것에는 아무런 방법도 제공하지 않습니다. Haiku 파티션은 그 자체로 부팅이 가능하게 될 것입니다. 만약 당신이 이미 GRUB을 설치했다면, 당신의 /boot/grub/menu.lst를 당신이 좋아하는 터미널에서 sudo <당신이 선호하는 텍스트 편집기> /boot/grub/menu.lst 같이 선호하는 편집기로 열어서 편집하십시오\n\n당신은 GRUB이 하드 드라이브 이름 인식이 리녹스하고는 다르다는 것을 주의하십시오.\n\nGRUB 에서는 이런  표현을 합니다:(hdN,n)\n\n 모든 하드디스크는 \"hd\" 로 시작한다 . \ n \ "N \"는 하드 디스크의 번호에서 \ "0 \"부터 시작합니다. \ n \ "n \"는 파티션 번호, 이것도 \ "0 \"부터 시작합니다. \ n 일차의 수에 관계없이 첫 번째 논리 파티션은 항상 4라는 숫자가 표시됩니다. \ n \ n 따라서 Haiku을 GRUB 메뉴에 추가하려면 menu.lst 파일의 끝에 다음과 같은 설명을합니다. \ n \ n \ t # Haiku on / dev/sda7 \ n \ ttitle \ t \ t \ t \ tHaiku \ n \ trootnoverify \ t \ t (hd0, 6) \ n \ tchainloader \ t \ t +1 \ n \ n 당신 예를 든 Gparte를 사용해서 올바른 파티션을 파악할 수 있습니다.\n\n3)처음으로 Haiku호 성공적으로 부팅했을 떄, 반드시 우리의 \"Welcome\" 문를 읽으십시오, 그 문서는 \데스크탑에 링크로 되어있습니다.\n\n우리의 Haiku를 사용해주신 것에 대해 즐겁고 정말 갑사합니다! 우리는 당신이 이것을 좋아하기를 희망합니다!
+Write boot sector	InstallerWindow		부트 섹터 쓰기
+Cancel	InstallerWindow		취소
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		디스크 파티션을 설정하는 프로그램, 디스크설정,은 실행할 수 없습니다.
+No optional packages available.	PackagesView		선택적인 패키지가 가능하지 않음.
+Continue	InstallerApp		계속
+Additional disk space required: %s	InstallerWindow		추가로 요구되는 디스크 공간: %s
+Cancel	InstallProgress		취소
+Try installing anyway	InstallProgress		어떻든 설치 시도중
+Are you sure you want to to stop the installation?	InstallerWindow		당신은 정말로 설치를 중단하시겠습니까?
+Writes the Haiku boot code to the partition start\nsector. This step is automatically performed by\nthe installation, but you can manually make a\npartition bootable in case you do not need to\nperform an installation.	InstallerWindow		파티션 시작 섹터에 Haiku 부트 코드를 \n기록합니다. 이 과정은 설치하는 동안 자동으로 \n이루어집니다, 그러나 당신은 수동으로 부팅가능한 \n파티션을 만들었을 경우에는 설치과정을 수행 할 \n필요는 없습니다.
+Onto:	InstallerWindow		대상:
+The mount point could not be retrieved.	InstallProgress		마운트 포인트를 찾을 수 없습니다.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		설치할 볼륨은 비어있지 않습니다. 당신은 어쨌든 설치하겠습니까?\n\n주의: 'system' 폴더는 원본 볼륨에서 깨끗하게 복사되고, 다른 모든 폴더는 합쳐지고, 원본과 대상 볼륨에 같이 존재하는  파일과 링크는 원본 볼륨에 있는 것이 덮어씌어질 것입니다.

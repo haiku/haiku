@@ -14,19 +14,19 @@ Show seconds	PreferencesWindow		Rodyti sekundes
 Always on top	PreferencesWindow		Visada viršuje
 Show all	WindowMenu		Rodyti viską
 No windows	WindowMenu		Jokių langų
-Power off	BeMenu		Išjungti
+Power off	BeMenu		Išjungti kompiuterį
 Auto-raise	PreferencesWindow		Išsikėlimas
 Full date	PreferencesWindow		Pilna data
 Hide time	TimeView		Slėpti laiką
 Recent folders:	PreferencesWindow		Naudoti aplankai:
 Deskbar preferences…	BeMenu		Deskbar'o parinktys…
-Show application expander	PreferencesWindow		Rodyti programų skleidiklį
+Show application expander	PreferencesWindow		Rodyti programų skleiduką
 Close all	WindowMenu		Uždaryti viską
 Deskbar preferences	PreferencesWindow		Deskbar'o parinktys
-Mount	BeMenu		Jungti
+Mount	BeMenu		Prijungti
 European date	PreferencesWindow		Europietiška data
 Recent applications:	PreferencesWindow		Naudotos programos:
-Tracker always first	PreferencesWindow		Tracker'is visada  pirmas
+Tracker always first	PreferencesWindow		Tracker'is visada pirmiau
 About Haiku…	BeMenu		Apie Haiku…
 Show calendar…	TimeView		Rodyti kalendorių…
 Restart system	BeMenu		Perleisti kompiuterį
@@ -37,7 +37,7 @@ Expand new applications	PreferencesWindow		Išskleisti naujas programas
 Clock	PreferencesWindow		Laikrodis
 Recent documents	BeMenu		Naudoti dokumentai
 Hide all	WindowMenu		Slėpti viską
-Shutdown…	BeMenu		Išjungti…
+Shutdown…	BeMenu		Išjungimas…
 Suspend	BeMenu		Pristabdyti
 Quit application	WindowMenu		Uždaryti programą
 About this system…	BeMenu		Apie šią sistemą…

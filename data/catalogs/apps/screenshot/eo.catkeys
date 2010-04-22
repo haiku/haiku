@@ -1,0 +1,28 @@
+1	esperanto	x-vnd.Haiku-Screenshot	1342822790
+seconds	ScreenshotWindow		sekondoj
+Options	ScreenshotWindow		Agordoj
+Desktop	ScreenshotWindow		Labortablo
+Include window border	ScreenshotWindow		Inkludi fenestran randon
+Back to saving	ScreenshotWindow		Reiri al la konservado
+Select	ScreenshotWindow		Elekti
+Capture active window	ScreenshotWindow		Kapti aktivan fenestron
+Cancel	ScreenshotWindow		Nuligi
+screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	ekrankopio
+Name:	ScreenshotWindow		Nomo:
+screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	ekrankopio1
+Save screenshot	ScreenshotWindow		Konservi ekrankopion
+Capture entire screen	ScreenshotWindow		Kopii la tutan ekranon
+Choose folder	ScreenshotWindow		Elektu dosierujon
+Take screenshot	ScreenshotWindow		Kopii la ekranon
+Save	ScreenshotWindow		Konservi
+Overwrite	ScreenshotWindow		Anstataŭigi
+Retake screenshot	ScreenshotWindow		Rekopii la ekranon
+Choose folder...	ScreenshotWindow		Elektu dosierujon...
+Please select	ScreenshotWindow		Bonvole elektu
+Save as:	ScreenshotWindow		Konservi kiel:
+Save in:	ScreenshotWindow		Konservi en:
+Take screenshot after a delay of	ScreenshotWindow		Kopii la ekranon post malfruo de
+Artwork folder	ScreenshotWindow		Belartaĵa dosierujo
+Home folder	ScreenshotWindow		Hejma dosierujo
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ĉi tiu dosiero jam ekzistas.\n Ĉu vi certas, ke vi volas anstataŭigi ĝin?
+Include mouse pointer	ScreenshotWindow		Inkluzi la muskursoron

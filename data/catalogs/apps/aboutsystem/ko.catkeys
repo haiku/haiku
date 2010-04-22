@@ -1,0 +1,36 @@
+1	korean	x-vnd.Haiku-About	3196829578
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (그리고 그가 개발한 NewOS 커널)\n
+%ld Processors:	AboutView		%ld 프로세서:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (프로젝트 창시자)\n\n
+The Haiku-Ports team\n	AboutView		Haiku-Ports 팀n
+Website, marketing & documentation:\n	AboutView		웹사이트, 마케팅& 문서:\n
+Revision	AboutView		리비젼
+Source Code: 	AboutView		소스 코드: 
+Processor:	AboutView		프로세서:
+Kernel:	AboutView		커널:
+Contributors:\n	AboutView		공헌자:\n
+Unknown	AboutView		알수 없음
+... and the many people making donations!\n\n	AboutView		...그리고 많은 사람들이 기부를 했습니다!\n\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… 그리고 그 외에 도움을 주신 분중에 빠진분이 있을 수도 잇습니다 (죄송합니다!)\n\n
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		메모리:
+Google & their Google Summer of Code program\n\n	AboutView		Google 과 Google Summer of Code 프로그램\n\n
+Past maintainers:\n	AboutView		과거 유지관리자:\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Haiku에 고유한 코드, 특히 커널과 커널을 링크하는 어플리케이션의 모든 코드는 다음 라이센스에 따라 배포됨
+\n\nSpecial thanks to:\n	AboutView		\n\n다음 분께 특별히 감사드립니다:\n
+Licenses: 	AboutView		라이센스: 
+. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. 써드 파티 코드에 포함된 어떤 시스템 라이브러리는 LGPL라이센스로 배포됩니다. 당신은 아래 써드 파티 코드에서 저작권을 찾을 수 있습니다.\n\n
+\nCopyrights\n\n	AboutView		\n저작권\n\n
+Current maintainers:\n	AboutView		현재 유지관리자:\n
+Time running:	AboutView		실행 시간:
+MIT license	AboutView		MIT 라이센스
+The Haikuware team and their bounty program\n	AboutView		The Haikuware 팀과 그들의 상금 프로그램\n
+About this system	AboutWindow		시스템 정보
+Version:	AboutView		버젼:
+The BeGeistert team\n	AboutView		BeGeistert 팀\n
+%ld MHz	AboutView		%ld MHz
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Haiku 코드의 저작권은 Haiku, Inc에 있거나. 아니면 소스에 명확하게 기록되어있는 개개의 제작자에게 있습니다.\n\n
+[Click a license name to read the respective license.]\n\n	AboutView		[라이센스 이름을 클릭해서 각각의 라이센스 읽기]\n\n
+%d MB total, %d MB used (%d%%)	AboutView		전채 %d MB , 사용된 양 %d MB (%d%%)
+License: 	AboutView		라이센스: 
+Translations:\n	AboutView		번역자:\n

@@ -1,0 +1,72 @@
+1	italian	x-vnd.Haiku-StyledEdit	2750476595
+Paste	Menus		Incolla
+OK	LoadAlert		Ok
+File	Menus		File
+???	LoadAlert		???
+Left	Menus		Sinistra
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Ripristina l'ultima versione di \"%s\"? 
+Search backwards	FindandReplaceWindow		Ricerca retrograda
+Size	Menus		Dimensione
+Save	QuitAlert		Salva
+Page setup…	Menus		Imposta pagina…
+Redo typing	Menus		Ripeti digitazione
+Print…	Menus		Stampa…
+Replace same	Menus		Sostituisci identici
+Can't undo	Menus		Impossibile annullare
+Save	Menus		Salva
+Replace with:	FindandReplaceWindow		Sostituisci con:
+Cancel	SaveAlert		Annulla
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossibile ripristinare, file non trovato: \"%s\".
+Case-sensitive	FindandReplaceWindow		Sensibile alle maiuscole/minuscole
+Green	Menus		Verde
+Revert to saved…	Menus		Ripristina quanto salvato…
+Yellow	Menus		Giallo
+Replace in all windows	FindandReplaceWindow		Sostituisci in tutte le finestre
+Wrap lines	Menus		Contenzione linee
+Quit	Menus		Esci
+Cancel	RevertToSavedAlert		Annulla
+Document	Menus		Documento
+Clear	Menus		Ripulisci
+Save changes to the document \"%s\"? 	QuitAlert		Salva modifiche sul documento \"%s\"? 
+Edit	Menus		Modifica
+Font	Menus		Font
+Replace all	FindandReplaceWindow		Sostituisci tutto
+Default	Open_and_SaveAsPanel		Predefinito
+Cancel	FindandReplaceWindow		Annulla
+Save	SaveAlert		Salva
+Close	Menus		Chiudi
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Errore nel caricamento \"%s\":\n\tFormato non supportato
+OK	RevertToSavedAlert		Ok
+Don't save	QuitAlert		Non salvare
+Align	Menus		Allineamento
+Color	Menus		Colore
+Red	Menus		Rosso
+Open…	Menus		Apri…
+Center	Menus		Centro
+Blue	Menus		Blu
+Cyan	Menus		Ciano
+Magenta	Menus		Magenta
+New	Menus		Nuovo
+Wrap-around search	FindandReplaceWindow		Ricerca continua
+Find selection	Menus		Trova selezione
+Find:	FindandReplaceWindow		Trova:
+Error saving \"%s\":\n%s	SaveAlert		Errore nel salvataggio \"%s\":\n%s
+Copy	Menus		Copia
+Cut	Menus		Taglia
+Replace	FindandReplaceWindow		Sostituisci
+Undo typing	Menus		Annulla digitazione
+Find again	Menus		Trova ancora
+Cancel	QuitAlert		Annulla
+Find…	Menus		Trova…
+Select all	Menus		Seleziona tutto
+Don't save	SaveAlert		Non salvare
+Error loading \"%s\":\n\t%s	LoadAlert		Errore nel caricamento di \"%s\":\n\t%s
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Il file è segnalato come in Sola Lettura. Salvo le modifiche sul documento \"%s\"? 
+Black	Menus		Nero
+Untitled 	StyledEditWindow		Senza Titolo
+OK	SaveAlert		Ok
+Find	FindandReplaceWindow		Trova
+Encoding	Open_and_SaveAsPanel		Codifica
+Save as…	Menus		Salva come…
+Replace…	Menus		Sostituisci…
+Right	Menus		Destra

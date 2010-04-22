@@ -1,0 +1,142 @@
+1	italian	x-vnd.Be-MAIL	3640755640
+View	Mail		Visualizza
+%d - Date	Mail		%d - Data
+Attach attributes:	Mail		Allega attributi:
+Inconsistency occurred in the undo/redo buffer.	Mail		Si è verificata un'inconsistenza nel buffer annulla/ripeti.
+An error occurred trying to save the attachment.	Mail		Si è verificato un errore provando a salvare l'allegato.
+Copy to new	Mail		Copia su nuovo
+Edit	Mail		Modifica
+Print	Mail		Stampa
+New mail message	Mail		Nuovo messaggio
+Automatically mark mail as read:	Mail		Imposta messaggio come letto in automatico:
+Colored quotes:	Mail		Citazioni colorate:
+Subject:	Mail		Oggetto:
+Reply to all	Mail		Rispondi a tutti
+Show icons & labels	Mail		Mostra icone ed etichette
+Remove attachment	Mail		Rimuovi allegato
+Button bar:	Mail		Barra pulsanti:
+Beginner	Mail		Principiante
+Don't save	Mail		Non salvare
+Expert	Mail		Esperto
+Reply account:	Mail		Account di risposta:
+Discard	Mail		Scarta
+Message	Mail		Messaggio
+Reply to sender	Mail		Rispondi al mittente
+There is no installed handler for URL links.	Mail		Non è installato alcun gestore per i collegamenti URL.
+Signature	Mail		Firma
+Find again	Mail		Trova ancora
+Bcc:	Mail		Ccn:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il tuo testo principale contiene %ld caratteri non codificabili. Forse un set di caratteri differente potrebbe funzionare meglio? Premi Invia per spedirlo comunque (verranno usati caratteri sostitutivi al posto di quelli non codificabili), oppure scegli Annulla per tornare indietro e provare a metterlo a posto.
+Signature:	Mail		Firma:
+Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\Scritto da Robert Polic.\nMigliorato dalla Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Save changes to this signature?	Mail		Salvi le modifiche per questa firma?
+Cc:	Mail		Cc:
+Find	Mail		Trova
+Preferences…	Mail		Preferenze…
+Undo	Mail		Annulla
+Leave as New	Mail		Lascia come Nuovo
+An error occurred trying to open this signature.	Mail		Si è verificato un errore tentando d'aprire questa firma.
+No file attributes, just plain data	Mail		Nessun attributo dei file, solo i dati grezzi
+Edit queries…	Mail		Modifica query…
+Paste	Mail		Incolla
+Save attachment…	Mail		Salva allegato…
+Include file attributes in attachments	Mail		Includi gli attributi dei file negli allegati
+OK	Mail		Ok
+Send	Mail		Invia
+Show icons only	Mail		Mostra solo le icone
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		La rimozione di allegati da un messaggio inoltrato non è stato ancora implementato\nNon funziona ancora correttamente.
+Hide	Mail		Nascondi
+Forward without attachments	Mail		Inoltra senza allegati
+Previous	Mail		Precedente
+Redo	Mail		Ripeti
+Add enclosure…	Mail		Aggiungi allegato…
+Print…	Mail		Stampa…
+Warn unencodable:	Mail		Avvisa se non codificabile:
+Quit	Mail		Esci
+%n - Full name	Mail		%n - Nome completo
+ Read 	Mail		Letto
+Trash	Mail		Cestino
+Default account:	Mail		Account predefinito:
+Size:	Mail		Dimensione:
+Account from mail	Mail		Account dal messaggio
+Edit signatures…	Mail		Modifica le firme…
+New	Mail		Nuovo
+Attachments: 	Mail		Allegati: 
+Set to %s	Mail		Imposta come %s
+Forward	Mail		Inoltra
+E-mail draft could not be saved!	Mail		Impossibile salvare la bozza del messaggio!
+To:	Mail		A:
+Only files can be added as attachments.	Mail		Solamente i file possono essere aggiunti come allegati.
+Previous message	Mail		Messaggio precedente
+Title:	Mail		Titolo:
+Find…	Mail		Trova…
+Accounts…	Mail		Account…
+Mail preferences	Mail		Preferenze di Mail
+Initial spell check mode:	Mail		Modalità correzione grammaticale iniziale:
+Leave same	Mail		Lascia inalterato
+About Mail…	Mail		Informazioni su Mail…
+Page setup…	Mail		Imposta pagina…
+Text wrapping:	Mail		Contenzione testo:
+Revert	Mail		Ripristina
+File	Mail		File
+None	Mail		Nessuna
+Copy link location	Mail		Copia collegamento
+Show header	Mail		Mostra intestazione
+%e - E-mail address	Mail		%e - Indirizzo e-mail
+Resend	Mail		Reinvia
+Show raw message	Mail		Mostra messaggio grezzo
+\\n - Newline	Mail		\\n - Nuova linea
+Start now	Mail		Inizia ora
+Close	Mail		Chiudi
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Il mail_daemon non è in esecuzione. Il messaggio è stato accodato e sarà inviato quando il mail_daemon verrà avviato.
+Really delete this signature? This cannot be undone.	Mail		Elimini davvero questa firma? Questo non potrà essere annullata.
+Open	Mail		Apri
+Quote	Mail		Citazione
+Add	Mail		Aggiungi
+Next message	Mail		Messaggio seguente
+User interface	Mail		Interfaccia utente
+Cancel	Mail		Annulla
+Send message	Mail		Invia messaggio
+Remove enclosure	Mail		Rimuovi allegato
+Account:	Mail		Account:
+Decoding:	Mail		Decodifica:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Spiacente, impossibile trovare un'applicazione che gestisca il tipo di dati 'Person'.
+Do you wish to send this message before closing?	Mail		Vuoi inviare questo messaggio prima di chiudere?
+Delete	Mail		Elimina
+Leave as '%s'	Mail		Lascia come '%s'
+Copy	Mail		Copia
+Mail couldn't find its dictionary.	Mail		Mail non può trovare il proprio dizionario.
+Reply preamble:	Mail		Preambolo di risposta:
+Signatures	Mail		Firme
+Next	Mail		Seguente
+Set to…	Mail		Imposta come…
+Use default account	Mail		Usa account predefinito
+Sorry	Mail		Spiacente
+Encoding:	Mail		Codifica:
+Font:	Mail		Font:
+Save address	Mail		Salva indirizzo
+Queries	Mail		Query
+Do you wish to save this message as a draft before closing?	Mail		Vuoi salvare questo messaggio come bozza prima di chiudere?
+Save	Mail		Salva
+Random	Mail		Casuale
+Close and 	Mail		Chiudi e
+Save as draft	Mail		Salva come bozza
+The mail_daemon could not be started:\n\t	Mail		Il mail_daemon non può essere avviato:\n\t
+Open attachment	Mail		Apri l'allegato
+Reply	Mail		Rispondi
+From:	Mail		Da:
+Couldn't open this signature. Sorry.	Mail		Spiacente. Impossibile aprire questa firma.
+Open draft	Mail		Apri bozza
+Cut	Mail		Taglia
+Check spelling	Mail		Correzione grammaticale
+Set to Saved	Mail		Imposta come Salvato
+Open this link	Mail		Apri questo collegamento
+Auto signature:	Mail		Firma automatica:
+Add signature	Mail		Aggiungi firma
+Need Tracker to move items to trash	Mail		Necessiti del Tracker per spostare oggetti nel cestino
+Mailing	Mail		Mailing
+Unread	Mail		Non letto
+Remove quote	Mail		Rimuovi citazione
+Move to trash	Mail		Sposta nel cestino
+Select all	Mail		Seleziona tutto
+An error occurred trying to save this signature.	Mail		Si è verificato un errore tentando di salvare questa firma.

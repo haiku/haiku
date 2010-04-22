@@ -1,0 +1,44 @@
+1	korean	x-vnd.Be-TSKB	3714198408
+Edit menu…	PreferencesWindow		메뉴 편집…
+Applications	PreferencesWindow		어플리케이션
+24 hour clock	PreferencesWindow		24시간 시계
+Recent documents:	PreferencesWindow		최근 사용한 문서:
+Recent folders	BeMenu		최근 사용한 폴더
+Sort running applications	PreferencesWindow		실행중인 어플리케이션 정렬
+Recent applications	BeMenu		최근 사용한 어플리케이션
+Change time…	TimeView		시간 바꾸기…
+<Be folder is empty>	BeMenu		<Be 폴더는 비워있음>
+Window	PreferencesWindow		창
+Menu	PreferencesWindow		메뉴
+Show seconds	PreferencesWindow		초 보여주기
+Always on top	PreferencesWindow		항상 위에
+Show all	WindowMenu		모두 보여주기
+No windows	WindowMenu		창 없음
+Power off	BeMenu		전원 끄기
+Auto-raise	PreferencesWindow		자동 확장
+Full date	PreferencesWindow		완전한 날짜
+Hide time	TimeView		시간 숨기기
+Recent folders:	PreferencesWindow		최근 사용한 폴더들:
+Deskbar preferences…	BeMenu		데스크바 속성…
+Show application expander	PreferencesWindow		어플리케이션 확장 보여주기
+Close all	WindowMenu		모두 닫기
+Deskbar preferences	PreferencesWindow		데스크바 속성
+Mount	BeMenu		마운트
+European date	PreferencesWindow		유럽식 날짜
+Recent applications:	PreferencesWindow		최근 사용한 어플리케이션:
+Tracker always first	PreferencesWindow		항상 트랙커를 처음에 놓기
+About Haiku…	BeMenu		Haiku 정보…
+Show calendar…	TimeView		달력 보여주기…
+Restart system	BeMenu		시스템 재시작
+Find…	BeMenu		찾기…
+Restart Tracker	BeMenu		트랙커 재시작
+Show Time	Tray		시간 보여주기
+Expand new applications	PreferencesWindow		새 어플리케이션 확장
+Clock	PreferencesWindow		시계
+Recent documents	BeMenu		최근 사용한 문서
+Hide all	WindowMenu		모두 숨기기
+Shutdown…	BeMenu		닫기…
+Suspend	BeMenu		일시 정지
+Quit application	WindowMenu		어플리케이션 나가기
+About this system…	BeMenu		시스템 정보…
+Show replicants	BeMenu		복제품 보여주기

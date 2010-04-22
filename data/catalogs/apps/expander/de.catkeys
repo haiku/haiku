@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Expander	1738666712
+1	german	x-vnd.Haiku-Expander	2289329519
 Expand	ExpanderMenu		Entpacken
 Set destination…	ExpanderMenu		Ziel wählen…
 File expanded	ExpanderWindow		Datei entpackt
@@ -12,7 +12,6 @@ Hide contents	ExpanderWindow		Inhalt verbergen
 Cancel	ExpanderWindow		Abbrechen
 Continue	ExpanderWindow		Fortsetzen
 Expander	ExpanderWindow	!! Window Title !!	Expander
-Expander\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		Expander\n\tAutor: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nursprüngliche Be-Version von \nDominic, Hiroshi, Peter, Pavel und Robert\n
 The destination folder does not exist.	ExpanderWindow		Der Zielordner existiert nicht.
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Sind Sie sicher, dass Sie den Entpackvorgang abbrechen wollen? Die entpackten Einträge sind eventuell nicht vollständig.
 Select	DirectoryFilePanel		Auswählen

@@ -1,0 +1,41 @@
+1	greek	x-vnd.Haiku-DriveSetup	974188342
+Delete	MainWindow		Διαγραφή
+OK	MainWindow		Εντάξει
+%ld MiB	Support		%ld MiB
+<empty>	PartitionList		<άδειο>
+Unable to find the selected partition by ID.	MainWindow		Αδύνατο να βρεθεί η επιλεγμένη κατάτμηση ID.
+Select a partition from the list below.	DiskView		Επιλέξτε μία κατάτμηση από την παρακάτω λίστα.
+The selected disk is read-only.	MainWindow		Ο επιλεγμένος δίσκος είναι μόνο ανάγνωσης.
+Partition name:	CreateParamsPanel		Όνομα διαμερίσματος:
+Initialize	InitParamsPanel		Αρχικοποίηση
+Partition type:	CreateParamsPanel		Τύπος διαμερίσματος:
+Initialize	MainWindow		Αρχικοποίηση
+Error: 	MainWindow	in any error alert	Σφάλμα: 
+Partition %ld	DiskView		Διαμέρισμα %ld
+The partition %s has been successfully initialized.\n	MainWindow		Το διαμέρισμα %s αρχικοποιήθηκε επιτυχώς .\n
+<empty>	DiskView		<άδειο>
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Η αρχικοποίηση του διαμερίσματος %s απέτυχε. (Τίποτα δεν γράφτηκε στο δίσκο.)
+The partition %s is already mounted.	MainWindow		Η κατάτμηση %s είναι ήδη προσαρτημένη.
+Create…	MainWindow		Δημιουργία…
+Disk system \"%s\"\" not found!	MainWindow		Δίσκος συστήματος \"%s\"\" δεν βρέθηκε!
+Mount	MainWindow		Προσάρτηση
+Create	CreateParamsPanel		Δημιουργία
+Device	PartitionList		Συσκευή
+Disk	MainWindow		Δίσκος
+Device	DiskView		Συσκευή
+Volume name	PartitionList		Όνομα τόμου
+Continue	MainWindow		Συνέχεια
+Cannot delete the selected partition.	MainWindow		Δεν μπορείτε να διαγράψετε το επιλεγμένο διαμέρισμα.
+Mount all	MainWindow		Προσάρτηση όλων
+Cancel	MainWindow		Άκυρο
+Delete partition	MainWindow		Διαγραφή διαμερίσματος
+End: %ld MB	Support		Τέλος: %ld MB
+Eject	MainWindow		Εξαγωγή
+Partition	MainWindow		Διαμέρισμα
+File system	PartitionList		Σύστημα αρχείου
+Size	PartitionList		Μέγεθος
+Partition size	CreateParamsPanel		Μέγεθος κατάτμησης
+Cancel	InitParamsPanel		Άκυρο
+Cancel	CreateParamsPanel		Άκυρο
+The currently selected partition is not empty.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν είναι άδεια.
+Unmount	MainWindow		Αποπροσάρτηση

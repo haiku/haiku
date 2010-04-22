@@ -1,0 +1,97 @@
+1	japanese	x-vnd.Haiku-FileTypes	2205265828
+Display as:	Attribute Window		表示形式：
+Add group	New File Type Window		グループを追加
+Remove	Application Type Window		削除
+Remove icon	Icon View		アイコンを削除
+Could not open file \"%s\": %s\n	FileTypes		ファイル \"%s\" が開けません： %s\n
+New file type	New File Type Window		新規ファイルタイプ
+Add icon…	Icon View		アイコンを追加…
+Do you want to save the changes?	Application Type Window		変更を保存しますか？
+File type	FileType Window		ファイルタイプ
+Could not change attributes	Attribute Window		属性を変更できません
+Show icons in list	FileType Window		一覧にアイコンを表示する
+Cancel	TypeListWindow		中止
+Ok	FileTypes		Ok
+File	FileType Window		ファイル
+This file type already exists.	New File Type Window		このファイルタイプは既に存在します。
+Save	Application Type Window		保存
+Add	Extension Window		追加
+Cancel	Attribute Window		中止
+Group:	New File Type Window		グループ：
+Done	Extension Window		完了
+Attribute	Attribute Window		属性
+Extra attributes	FileType Window		拡張属性
+Could not open file	FileType Window		ファイルが開きません
+Group name:	New File Type Window		グループ名：
+Quit	FileType Window		終了
+no icon	FileType Window		アイコン無し
+File	Application Type Window		ファイル
+Version:	Application Type Window		バージョン：
+Select…	FileType Window		選択…
+Description:	FileType Window		説明：
+Right	Attribute Window		右揃え
+Internal name:	FileType Window		内部名前：
+None	FileType Window		無し
+Icon	FileType Window		アイコン
+Alpha	Application Type Window		アルファ版
+Signature:	Application Type Window		署名:
+Done	TypeListWindow		完了
+Quit, don't save	Application Type Window		保存せずに終了する
+Add…	Application Type Window		追加…
+Type name:	FileType Window		タイプ名：
+(from application)	FileType Window		（アプリケーションから）
+Select preferred application	FileType Window		優先アプリケーションを選択する
+Could not retrieve application signature.	Preferred App Menu		アプリケーションの署名を取得できませんでした
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		\"%s\" アプリケーションはこのファイルタイプに対応していません。\nそれでも設定しますか？
+Type:	Attribute Window		タイプ：
+Done	Attribute Window		完了
+Set Preferred Application	Preferred App Menu		優先アプリケーションを設定する
+Background app	Application Type Window		バックグラウンド実行
+Add new group	New File Type Window		新規グループを追加
+Add…	FileType Window		追加…
+Cancel	Application Type Window		中止
+Cancel	New File Type Window		中止
+Extension:	Extension Window		拡張子：
+Add	Attribute Window		追加
+Close	Application Type Window		閉じる
+Open…	FileType Window		開く…
+Could not open \"%s\":\n%s	FileTypes		\"%s\" が開けません：\n%s
+Alignment:	Attribute Window		配置：
+Cancel	Extension Window		中止
+Could not remove file type: %s\n	FileType Window		ファイルタイプを削除できませんでした： %s\n
+Remove	FileType Window		削除
+Application flags	Application Type Window		アプリケーションフラグ
+FileTypes\n\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		FileTypes\n\tAxel Dörfler 作\n\tCopyright 2006-2007, Haiku.\n
+Editable	Attribute Window		変更可能
+Width:	Attribute Window		幅：
+Cancel	FileType Window		中止
+Beta	Application Type Window		ベータ版
+Extensions:	FileType Window		拡張子：
+About FileTypes…	FileType Window		FileTypesについて…
+Attribute name:	Attribute Window		属性の名前：
+Extension	Extension Window		拡張子
+Add type	New File Type Window		タイプの追加
+[Multiple files]	FileType Window		[複数ファイル]
+Could not set preferred application	FileType Window		優先アプリケーションを設定できません
+Internal name:	Attribute Window		内部的な名前：
+Final	Application Type Window		リリース版
+Open File	FileTypes		ファイルを開く
+Settings	FileType Window		設定
+New resource file…	FileType Window		新規リソースファイル…
+Gamma	Application Type Window		ガンマ版
+Default application	FileType Window		デフォルトアプリケーション
+Long description:	Application Type Window		詳細説明：
+Application types…	FileType Window		アプリケーションタイプ…
+(from super type)	FileType Window		(スーパータイプから)
+Description	FileType Window		説明
+Version info	Application Type Window		バージョン情報
+Center	Attribute Window		中央揃え
+Short description:	Application Type Window		簡単な説明：
+File could not be opened	Preferred App Menu		ファイルを開けませんでした
+Could not change file extensions	Extension Window		ファイル拡張子の変更はできませんでした
+Edit icon…	Icon View		アイコンの編集…
+Save into resource file…	Application Type Window		リソースファイルに保存…
+Left	Attribute Window		左揃え
+Visible	Attribute Window		表示する
+Could not install file type	New File Type Window		ファイルタイプをインストールできませんでした
+Application Type	Application Type Window		アプリケーションタイプ

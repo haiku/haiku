@@ -1,0 +1,45 @@
+1	swedish	x-vnd.Haiku-DriveSetup	560964822
+Delete	MainWindow		Radera
+Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Är du säker på att du vill initialisera den valda partitionen? Efter du har skrivit in initialiseringsparametrarna, så kan du avbryta den här operationen precis innan ändringar skrivs tillbaka till disken.
+Rescan	MainWindow		Skanna om
+OK	MainWindow		Okej
+Could not aquire partitioning information.	MainWindow		Kunde inte anskaffa partitionsinformation.
+<empty>	PartitionList		<tom>
+Unable to find the selected partition by ID.	MainWindow		Kunde inte hitta den valda partitionen genom ID.
+Select a partition from the list below.	DiskView		Välj en partition från listan nedan.
+The selected disk is read-only.	MainWindow		Den valda disken är läs-bara.
+Partition name:	CreateParamsPanel		Partitionsnamn:
+Initialize	InitParamsPanel		Initialisera
+Could not mount partition %s.	MainWindow		Kunde inte montera partition %s.
+The partition %s is already unmounted.	MainWindow		Paritionen %s är redan avmonterad.
+Failed to initialize the partition. No changes have been written to disk.	MainWindow		Kunde inte intialisera partitionen. Inga ändringar har skrivits till disken.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Kunde inte radera partitionen. Inga ändringar har skrivits till disken.
+Partition type:	CreateParamsPanel		Partitionstyp:
+Could not delete the selected partition.	MainWindow		Kunde inte radera den valda partitionen.
+Initialize	MainWindow		Initialisera
+Error: 	MainWindow	in any error alert	Fel: 
+<empty>	DiskView		<tom>
+Format (not implemented)	MainWindow		Formatera (inte realiserat)
+Write changes	MainWindow		Skriv ändringar
+There was an error preparing the disk for modifications.	MainWindow		Det blev ett fel när disken skulle förberedas för modifikationer.
+Create…	MainWindow		Skapa…
+Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
+Mount	MainWindow		Montera
+Create	CreateParamsPanel		Skapa
+Disk	MainWindow		Disk
+Volume name	PartitionList		Volymnamn
+Continue	MainWindow		Fortsätt
+Cannot delete the selected partition.	MainWindow		Kan inte radera den valda partitionen.
+Mount all	MainWindow		Montera alla
+Cancel	MainWindow		Avbryt
+Delete partition	MainWindow		Radera partition
+Partition	MainWindow		Partition
+File system	PartitionList		Filsystem
+Size	PartitionList		Storlek
+Validation of the given initialization parameters failed.	MainWindow		Validering av de givna initialiseringsparametrarna misslyckades.
+The selected partition does not contain a partitioning system.	MainWindow		Den valda partitionen innehåller inget partitionssystem.
+Partition size	CreateParamsPanel		Partitionsstorlek
+Cancel	InitParamsPanel		Avbryt
+Cancel	CreateParamsPanel		Avbryt
+The currently selected partition is not empty.	MainWindow		Den aktuellt valda partitionen är inte tom.
+Unmount	MainWindow		Avmontera

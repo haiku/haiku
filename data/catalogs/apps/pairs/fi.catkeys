@@ -1,3 +1,10 @@
-1	finnish	x-vnd.Haiku-Pairs	575304885
+1	finnish	x-vnd.Haiku-Pairs	794776701
+Expert (8x8)	PairsWindow		Guru (8x8)
+Beginner (4x4)	PairsWindow		Aloittelija (4x4)
 Quit game	PairsWindow		Poistu pelistä
+Game	PairsWindow		Peli
+Size	PairsWindow		Koko
+New	PairsWindow		Uusi
+Intermediate (6x6)	PairsWindow		Keskitaso (6x6)
+Quit	PairsWindow		Poistu
 New game	PairsWindow		Uusi peli

@@ -1,0 +1,122 @@
+1	portuguese	x-vnd.Haiku-FileTypes	4169608688
+Display as:	Attribute Window		Mostrar como:
+Args only	Application Type Window		Apenas argumentos
+Add group	New File Type Window		Adicionar grupo
+Remove	Application Type Window		Remover
+Select same type as	FileType Window		Selecionar o mesmo tipo de
+Remove icon	Icon View		Remover ícone
+Supported types	Application Type Window		Tipos suportados
+Internal name:	New File Type Window		Nome interno:
+Could not open file \"%s\": %s\n	FileTypes		Não foi possível abrir \"%s\": %s\n
+New file type	New File Type Window		Novo tipo de ficheiro
+Add icon…	Icon View		Adicionar ícone…
+FileTypes Request	FileType Window		Pedido de Tipos de Ficheiro
+Do you want to save the changes?	Application Type Window		Quer salvar as alterações efectuadas?
+Multiple files from \"	FileType Window		Multiplos ficheiros desde \"
+File type	FileType Window		Tipo de Ficheiro
+Could not change attributes	Attribute Window		Não foi possível mudar os atributos
+Show icons in list	FileType Window		Mostrar ícones em lista
+Cancel	TypeListWindow		Cancelar
+Ok	FileTypes		OK
+File	FileType Window		Ficheiro
+Recognition rule is not valid:\n\n	FileType Window		A regra de reconhecimento não é válida:\n\n
+This file type already exists.	New File Type Window		Este tipo de ficheiro já existe.
+Save	Application Type Window		Guardar
+Show recognition rule	FileType Window		Mostrar regra de reconhecimento
+Add	Extension Window		Adicionar
+Select same preferred application as	FileType Window		Selecionar o mesmo programa preferido de
+Cancel	Attribute Window		Cancelar
+Multiple launch	Application Type Window		Múltiplas instâncias
+Group:	New File Type Window		Grupo:
+Done	Extension Window		Terminar
+Attribute	Attribute Window		Atributo
+Extra attributes	FileType Window		Atributos extras
+Could not open file	FileType Window		Não foi possível abrir o ficheiro
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileType Window		O acto de remover um grupo de tipos não pode ser anulado.\nTodos os tipos de ficheiro que pertençam a este grupo serão perdidos!\n\nTem a certeza que deseja fazer isto? Para remover o grupo inteiro, mantenha pressionada a tecla Shift e clique em \"Remover\".
+Group name:	New File Type Window		Nome do grupo:
+Could not retrieve preferred application of this file.	Preferred App Menu		Não foi possível indicar um programa preferido para este ficheiro.
+Preferred application	FileType Window		Programa preferido
+Quit	FileType Window		Sair
+no icon	FileType Window		sem ícone
+File recognition	FileType Window		Reconhecimento de ficheiro
+Same as…	FileType Window		O mesmo que…
+File	Application Type Window		Ficheiro
+Version:	Application Type Window		Versão:
+FileTypes request	FileTypes		Pedido de Tipos de Ficheiro
+Select…	FileType Window		Seleccionar...
+Description:	FileType Window		Descrição:
+Right	Attribute Window		À Direita
+Internal name:	FileType Window		Nome interno:
+None	FileType Window		Nenhum
+Development	Application Type Window		Desenvolvimento
+Icon	FileType Window		Ícone
+Special:	Attribute Window		Especial:
+Alpha	Application Type Window		Alfa
+Signature:	Application Type Window		Assinatura:
+Done	TypeListWindow		Terminar
+Quit, don't save	Application Type Window		Sair e não guardar
+Add…	Application Type Window		Adicionar...
+Type name:	FileType Window		Nome do tipo:
+(from application)	FileType Window		(da aplicação)
+Select preferred application	FileType Window		Seleccionar aplicação preferida
+Single launch	Application Type Window		Instância única
+Could not retrieve application signature.	Preferred App Menu		Não foi possível obter a assinatura da aplicação
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		A aplicação \"%s\" não suporta este tipo de ficheiro.\nTem a certeza que deseja defeni-lo na mesma?
+Type:	Attribute Window		Tipo:
+Done	Attribute Window		Terminar
+Set Preferred Application	Preferred App Menu		Defenir aplicação favorita
+Background app	Application Type Window		Aplicação de segundo plano
+Add new group	New File Type Window		Adicionar um novo grupo
+Add…	FileType Window		Adicionar...
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileType Window		O acto de remover um tipo de ficheiro não pode ser anulado. \nTem a certeza que deseja removê-lo?
+Rule:	FileType Window		Regra:
+Cancel	Application Type Window		Cancelar
+Cancel	New File Type Window		Cancelar
+Extension:	Extension Window		Extensão:
+Add	Attribute Window		Adicionar
+Close	Application Type Window		Fechar
+Open…	FileType Window		Abrir...
+Golden master	Application Type Window		Mestre dourado
+Could not open \"%s\":\n%s	FileTypes		Não foi possível abrir \"%s\":\n%s
+Alignment:	Attribute Window		Alinhamento:
+Cancel	Extension Window		Cancelar
+Could not remove file type: %s\n	FileType Window		Não foi possível remover o tipo de ficheiro: %s\n
+Remove	FileType Window		Remover
+Application flags	Application Type Window		Sinalizadores da aplicação
+FileTypes\n\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		Tipos de Ficheiro\n\tescrito por Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+Editable	Attribute Window		Editável
+Width:	Attribute Window		Largura:
+Choose type	TypeListWindow		Escolher tipo
+Save request	Application Type Window		Salvar pedido
+Cancel	FileType Window		Cancelar
+Beta	Application Type Window		Beta
+Extensions:	FileType Window		Extensões:
+About FileTypes…	FileType Window		Sobre o Tipos de Ficheiro…
+Attribute name:	Attribute Window		Nome do atributo:
+Extension	Extension Window		Extensão
+Add type	New File Type Window		Adicionar tipo
+[Multiple files]	FileType Window		[Vários ficheiros]
+Could not set preferred application	FileType Window		Não foi possível defenir a aplicação preferida
+Internal name:	Attribute Window		Nome interno:
+Final	Application Type Window		Final
+Open File	FileTypes		Abrir ficheiro
+Settings	FileType Window		Defenições
+New resource file…	FileType Window		Novo ficheiro de recurso…
+Exclusive launch	Application Type Window		Correr exclusivamente
+Gamma	Application Type Window		Gamma
+Default application	FileType Window		Aplicação predefenida
+Long description:	Application Type Window		Descrição detalhada:
+Application types…	FileType Window		Tipos de aplicações…
+(from super type)	FileType Window		(do grupo de tipos)
+Description	FileType Window		Descrição
+Version info	Application Type Window		Informações da versão
+Center	Attribute Window		Ao centro
+Short description:	Application Type Window		Descrição resumida:
+File could not be opened	Preferred App Menu		Não foi possível abrir o ficheiro
+Could not change file extensions	Extension Window		Não foi possível mudar as extensões dos ficheiros
+Edit icon…	Icon View		Editar ícone…
+Save into resource file…	Application Type Window		Guardar num ficheiro de recurso…
+Left	Attribute Window		À esquerda
+Visible	Attribute Window		Visível
+Could not install file type	New File Type Window		Não foi possível instalar o tipo de ficheiro
+Application Type	Application Type Window		Tipo de aplicação

@@ -1,0 +1,11 @@
+1	greek	x-vnd.Haiku-Keyboard	2881187883
+Keyboard	KeyboardWindow		Πληκτρολόγιο
+Written by Andrew Edward McCall	KeyboardApplication		Γραμμένο απο τον Andrew Edward McCall
+Defaults	KeyboardWindow		Προεπιλογές
+Key repeat rate	KeyboardView		Ρυθμός επανάληψης πλήκτρου
+Revert	KeyboardWindow		Επαναφορά
+OK	KeyboardApplication		Εντάξει
+Fast	KeyboardView		Γρήγορα
+Slow	KeyboardView		Αργά
+Long	KeyboardView		Μακρύ
+Short	KeyboardView		Κοντό

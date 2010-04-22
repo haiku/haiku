@@ -1,0 +1,122 @@
+1	lithuanian	x-vnd.Haiku-FileTypes	4169608688
+Display as:	Attribute Window		Vaizduoti kaip:
+Args only	Application Type Window		Tik argumentai
+Add group	New File Type Window		Pridėti grupę
+Remove	Application Type Window		Pašalinti
+Select same type as	FileType Window		Rinktis tipą kaip
+Remove icon	Icon View		Pašalinti ženkliuką
+Supported types	Application Type Window		Palaikomi tipai
+Internal name:	New File Type Window		Vidinis pavadinimas:
+Could not open file \"%s\": %s\n	FileTypes		Neatidaroma byla „%s“: %s\n
+New file type	New File Type Window		Naujas bylų tipas
+Add icon…	Icon View		Pridėti ženkliuką…
+FileTypes Request	FileType Window		Bylų tipo užklausimas
+Do you want to save the changes?	Application Type Window		Norite išsaugoti keitimus?
+Multiple files from \"	FileType Window		Daugybinės bylos iš „
+File type	FileType Window		Bylų tipai
+Could not change attributes	Attribute Window		Nekeičiami požymiai
+Show icons in list	FileType Window		Rodyti ženkliukus sąraše
+Cancel	TypeListWindow		Atsisakyti
+Ok	FileTypes		Gerai
+File	FileType Window		Byla
+Recognition rule is not valid:\n\n	FileType Window		Atpažinimo taisyklė negalioja:\n\n
+This file type already exists.	New File Type Window		Toks bylų tipas jau yra.
+Save	Application Type Window		Išsaugoti
+Show recognition rule	FileType Window		Rodyti atpažinimo taisyklę
+Add	Extension Window		Pridėti
+Select same preferred application as	FileType Window		Rinktis pageidautiną programą kaip
+Cancel	Attribute Window		Atsisakyti
+Multiple launch	Application Type Window		Daugiariopa paleistis
+Group:	New File Type Window		Grupė:
+Done	Extension Window		Atlikta
+Attribute	Attribute Window		Požymis
+Extra attributes	FileType Window		Papildomi požymiai
+Could not open file	FileType Window		Neatidaroma byla
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileType Window		Supertipo pašalinimas yra negrįžtamas.\nVisi bylų tipai priklausantys šiam supertipui bus prarasti!\n\nTikrai šito norite? Visos grupės pašalinimui, prispauskite „Shift“ klavišą ir spauskite „Pašalinti“.
+Group name:	New File Type Window		Grupės pavadinimas:
+Could not retrieve preferred application of this file.	Preferred App Menu		Nerandama pageidautinos programos šiai bylai.
+Preferred application	FileType Window		Pageidautina programa
+Quit	FileType Window		Baigti
+no icon	FileType Window		be ženkliuko
+File recognition	FileType Window		Bylos atpažinimas
+Same as…	FileType Window		Toks kaip…
+File	Application Type Window		Byla
+Version:	Application Type Window		Versija:
+FileTypes request	FileTypes		Bylų tipo užklausimas
+Select…	FileType Window		Parinkti…
+Description:	FileType Window		Aprašas:
+Right	Attribute Window		Dešinėn
+Internal name:	FileType Window		Vidinis pavadinimas:
+None	FileType Window		Nieko
+Development	Application Type Window		Kūrimas
+Icon	FileType Window		Ženkliukas
+Special:	Attribute Window		Išskirtinis:
+Alpha	Application Type Window		Alfa
+Signature:	Application Type Window		Prierašas:
+Done	TypeListWindow		Atlikta
+Quit, don't save	Application Type Window		Baigti neišsaugant
+Add…	Application Type Window		Pridėti…
+Type name:	FileType Window		Tipo pavadinimas:
+(from application)	FileType Window		(iš programos)
+Select preferred application	FileType Window		Rinktis pageidautiną programą
+Single launch	Application Type Window		Vieninė paleistis
+Could not retrieve application signature.	Preferred App Menu		Nerandamas programos prierašas.
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Programa „%s“ šio bylų tipo nepailaiko.\nTikrai norite vistiek ją rinktis?
+Type:	Attribute Window		Tipas:
+Done	Attribute Window		Atlikta
+Set Preferred Application	Preferred App Menu		Nustatyti pageidautiną programą
+Background app	Application Type Window		Foninė programa
+Add new group	New File Type Window		Pridėti naują grupę
+Add…	FileType Window		Pridėti…
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileType Window		Bylų tipo pašalinimas yra negrįžtamas.\nTikrai norite pašalinti?
+Rule:	FileType Window		Taisyklė:
+Cancel	Application Type Window		Atsisakyti
+Cancel	New File Type Window		Atsisakyti
+Extension:	Extension Window		Plėtinys:
+Add	Attribute Window		Pridėti
+Close	Application Type Window		Uždaryti
+Open…	FileType Window		Atidaryti…
+Golden master	Application Type Window		Aukso ruošinys
+Could not open \"%s\":\n%s	FileTypes		Neatidaromas „%s“:\n%s
+Alignment:	Attribute Window		Lygiavimas:
+Cancel	Extension Window		Atsisakyti
+Could not remove file type: %s\n	FileType Window		Nepašalinamas bylų tipas: %s\n
+Remove	FileType Window		Pašalinti
+Application flags	Application Type Window		Programos žymos
+FileTypes\n\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		BylųTipai (FileTypes)\n\tparašyta Axel'io Dörfler'io\n\tCopyright 2006-2007, Haiku.\n
+Editable	Attribute Window		Taisomi
+Width:	Attribute Window		Plotis:
+Choose type	TypeListWindow		Parinkti tipą
+Save request	Application Type Window		Išsaugoti užklausimą
+Cancel	FileType Window		Atsisakyti
+Beta	Application Type Window		Beta
+Extensions:	FileType Window		Plėtiniai:
+About FileTypes…	FileType Window		Apie BylųTipus…
+Attribute name:	Attribute Window		Požymio pavadinimas:
+Extension	Extension Window		Plėtinys
+Add type	New File Type Window		Pridėti tipą
+[Multiple files]	FileType Window		[Daugiariopos bylos]
+Could not set preferred application	FileType Window		Nepasirenkama pageidautina programa
+Internal name:	Attribute Window		Vidinis pavadinimas:
+Final	Application Type Window		Galutinis
+Open File	FileTypes		Atidaryti bylą
+Settings	FileType Window		Nustatymai
+New resource file…	FileType Window		Nauja išteklių byla…
+Exclusive launch	Application Type Window		Išskirtinė paleistis
+Gamma	Application Type Window		Gama
+Default application	FileType Window		Numatytoji programa
+Long description:	Application Type Window		Ilgasis aprašas:
+Application types…	FileType Window		Programų tipai…
+(from super type)	FileType Window		(iš supertipo)
+Description	FileType Window		Aprašas
+Version info	Application Type Window		Apie versiją
+Center	Attribute Window		Viduryje
+Short description:	Application Type Window		Trumpasis aprašas:
+File could not be opened	Preferred App Menu		Neatidaroma byla
+Could not change file extensions	Extension Window		Nekeičiamas bylos plėtinys
+Edit icon…	Icon View		Taisyti ženkliuką…
+Save into resource file…	Application Type Window		Išsaugoti išteklių bylon…
+Left	Attribute Window		Kairėn
+Visible	Attribute Window		Matomi
+Could not install file type	New File Type Window		Neįdiegiamas bylų tipas
+Application Type	Application Type Window		Programos tipas

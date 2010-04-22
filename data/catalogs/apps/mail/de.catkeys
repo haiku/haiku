@@ -1,4 +1,5 @@
-1	german	x-vnd.Be-MAIL	2102081210
+1	german	x-vnd.Be-MAIL	3640755640
+View	Mail		Ansicht
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		BFS-Attribute des Anhangs immer mitsenden:
 Inconsistency occurred in the undo/redo buffer.	Mail		Es ist eine Inkonsistenz im Rückgängig/Wiederherstellen-System aufgetreten.
@@ -104,6 +105,7 @@ Do you wish to send this message before closing?	Mail		Möchten Sie diese Nachri
 Delete	Mail		Löschen
 Leave as '%s'	Mail		Als '%s' belassen
 Copy	Mail		Kopieren
+Mail couldn't find its dictionary.	Mail		Mail konnte sein Wörterbuch nicht finden.
 Reply preamble:	Mail		Antwort einleiten:
 Signatures	Mail		Signaturen
 Next	Mail		Nächste
@@ -122,7 +124,6 @@ Save as draft	Mail		Als Entwurf speichern
 The mail_daemon could not be started:\n\t	Mail		Der Maildienst (mail_daemon) konnte nicht gestartet werden:\n\t
 Open attachment	Mail		Anhang öffnen
 Reply	Mail		Antworten
-The spell check feature requires the optional \"words\" file on your BeOS CD.	Mail		Die Rechtschreibprüfung erfordert die optionale \"words\" Datei von Ihrer BeOS CD.
 From:	Mail		Von:
 Couldn't open this signature. Sorry.	Mail		Diese Signatur konnte leider nicht geöffnet werden.
 Open draft	Mail		Entwurf öffnen

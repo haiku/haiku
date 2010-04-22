@@ -1,0 +1,48 @@
+1	norwegian bokmål	x-vnd.Haiku-StyledEdit	819814717
+Paste	Menus		Lim inn
+OK	LoadAlert		OK
+File	Menus		Fil
+???	LoadAlert		???
+Left	Menus		Venstre
+Size	Menus		Størrelse
+Save	QuitAlert		Lagre
+Print…	Menus		Skriv ut…
+Can't undo	Menus		Kan ikke angre
+Save	Menus		Lagre
+Replace with:	FindandReplaceWindow		Erstatt med:
+Green	Menus		Grønn
+Yellow	Menus		Gul
+Quit	Menus		Avslutt
+Cancel	RevertToSavedAlert		Avbryt
+Document	Menus		Dokument
+Edit	Menus		Rediger
+Font	Menus		Font
+Cancel	FindandReplaceWindow		Avbryt
+Close	Menus		Lukk
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Ikke lagre
+Color	Menus		Farge
+Red	Menus		Rød
+Open…	Menus		Åpne...
+Center	Menus		Sentrer
+Blue	Menus		Blå
+Cyan	Menus		Cyan
+Magenta	Menus		Magenta
+New	Menus		Ny
+Find selection	Menus		Finn valgt tekst
+Find:	FindandReplaceWindow		Finn:
+Copy	Menus		Kopier
+Cut	Menus		Klipp ut
+Replace	FindandReplaceWindow		Erstatt
+Find again	Menus		Finn igjen
+Cancel	QuitAlert		Avbryt
+Find…	Menus		Finn…
+Select all	Menus		Velg alle
+Black	Menus		Svart
+Untitled 	StyledEditWindow		Ubetitlet
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		Finn
+Encoding	Open_and_SaveAsPanel		Koding
+Save as…	Menus		Lagre som...
+Replace…	Menus		Erstatt...
+Right	Menus		Høyre

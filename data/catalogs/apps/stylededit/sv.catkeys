@@ -1,0 +1,64 @@
+1	swedish	x-vnd.Haiku-StyledEdit	2993675958
+Paste	Menus		Klistra in
+OK	LoadAlert		Okej
+File	Menus		Fil
+???	LoadAlert		???
+Left	Menus		Vänster
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Återgå till den senast använda versionen av \"%s\"? 
+Search backwards	FindandReplaceWindow		Sök baklänges
+Size	Menus		Storlek
+Save	QuitAlert		Spara
+Page setup…	Menus		Sidinställning…
+Redo typing	Menus		Skriv om
+Print…	Menus		Skriv ut...
+Replace same	Menus		Ersätt samma
+Can't undo	Menus		Kan inte ångra
+Save	Menus		Spara
+Replace with:	FindandReplaceWindow		Ersätt med:
+Cancel	SaveAlert		Avbryt
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: \"%s\".
+Green	Menus		Grön
+Revert to saved…	Menus		Återgå till sparat…
+Yellow	Menus		Gul
+Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
+Wrap lines	Menus		Svep in linjer
+Quit	Menus		Avsluta
+Cancel	RevertToSavedAlert		Avbryt
+Document	Menus		Dokument
+Clear	Menus		Klar
+Save changes to the document \"%s\"? 	QuitAlert		Spara ändringar till dokumentet \"%s\"? 
+Edit	Menus		Redigera
+Font	Menus		Font
+Replace all	FindandReplaceWindow		Ersätt alla
+Default	Open_and_SaveAsPanel		Standard
+Cancel	FindandReplaceWindow		Avbryt
+Close	Menus		Stäng
+OK	RevertToSavedAlert		Okej
+Don't save	QuitAlert		Spara inte
+Color	Menus		Färg
+Red	Menus		Röd
+Open…	Menus		Öppna…
+Center	Menus		Mitten
+Blue	Menus		Blå
+Cyan	Menus		Cyan
+Magenta	Menus		Magenta
+New	Menus		Ny
+Find selection	Menus		Hitta val
+Find:	FindandReplaceWindow		Hitta:
+Copy	Menus		Kopiera
+Cut	Menus		Klipp
+Replace	FindandReplaceWindow		Ersätt
+Undo typing	Menus		Ångra inmatning
+Find again	Menus		Sök igen
+Cancel	QuitAlert		Avbryt
+Find…	Menus		Hitta…
+Select all	Menus		Välj alla
+Don't save	SaveAlert		Spara inte
+Black	Menus		Svart
+Untitled 	StyledEditWindow		Odöpt 
+OK	SaveAlert		Okej
+Find	FindandReplaceWindow		Hitta
+Encoding	Open_and_SaveAsPanel		Kodning
+Save as…	Menus		Spara som…
+Replace…	Menus		Ersätt…
+Right	Menus		Höger

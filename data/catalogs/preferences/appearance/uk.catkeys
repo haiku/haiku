@@ -1,43 +1,43 @@
-1	ukrainian 	x-vnd.Haiku-Appearance	3612090060
-Navigation pulse	Colors tab		Навігація Pulse
+1	ukrainian	x-vnd.Haiku-Appearance	3612090060
+Control highlight	Colors tab		Підсвітка елемента
+Control border	Colors tab		Межа елемента
+Antialiasing type:	AntialiasingSettingsView		Тип зглажування :
 Shadow	Colors tab		Тінь
 On	AntialiasingSettingsView		Увімкнути
 Defaults	APRWindow		По замовчуванню
 Grayscale	AntialiasingSettingsView		Відтінки сірого
 Shine	Colors tab		Сяйво
 Off	AntialiasingSettingsView		Вимкнути
-Antialiasing type:	AntialiasingSettingsView		Тип зглажування :
 Success	Colors tab		Успіх
-Inactive window tab	Colors tab		Неактивний
+Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
 Failure	Colors tab		Невдача
-Hinting menu	AntialiasingSettingsView		Натяк меню
-Control border	Colors tab		Керування межею
+Hinting menu	AntialiasingSettingsView		Меню коректування
 Document background	Colors tab		Тло документа
 Revert	APRWindow		Повернути
-Selected menu item border	Colors tab		Вибрана межа пункту меню
-Selected menu item text	Colors tab		Вибраний текст пункта меню
-Antialiasing	APRWindow		Зглажування
-Window tab text	Colors tab		Вікно табуляції
+Window tab	Colors tab		Заголовок вікна
 Tooltip background	Colors tab		Тло підказки
+Selected menu item background	Colors tab		Тло вибраного пункта меню
+Antialiasing	APRWindow		Зглажування
+Navigation base	Colors tab		Основа навігації
+Window tab text	Colors tab		Текст заголовка вікна
 Document text	Colors tab		Текст документа
-Navigation base	Colors tab		Основи навігації
+Navigation pulse	Colors tab		Навігація рulse
+Selected menu item text	Colors tab		Текст виділеного пункту меню
 Menu background	Colors tab		Тло меню
 Appearance	APRWindow		Вигляд
-Control background	Colors tab		Керування тлом
+Panel background	Colors tab		Панель
 Colors	APRWindow		Кольори
-Panel background	Colors tab		Панель 
-Window tab	Colors tab		Табуляція вікна
-Reduce colored edges filter strength:	AntialiasingSettingsView		Зменшити силу фільтра зафарбування межі:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Базове субпіксельне зглажування з гліфом недоступне в цій зборці ,щоб отримати таку можливість зберіть Haiku  самостійно з увімкненим заголовком в опції libfreetype
-Menu item text	Colors tab		Текст пункта меню
-Monospaced fonts only	AntialiasingSettingsView		Тільки моноширинні шрифти
-LCD subpixel	AntialiasingSettingsView		Субпіксель LCD
-Inactive window tab text	Colors tab		Неактивний текст
-Strong	AntialiasingSettingsView		Сильний
-Control highlight	Colors tab		Керування виділенням
-Control text	Colors tab		Керування текстом
+Control background	Colors tab		Тло елементу
+Inactive window tab	Colors tab		Заголовок неактивного вікна
+Reduce colored edges filter strength:	AntialiasingSettingsView		Зменшення сили фільтрації кольорових країв:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпіксельне зглажування в комбінації з уточненням недоступне у цій зборці Haiku через можливі патентні проблеми. Для включення цієї можливості Вам необхідно зібрати Haiku самостійно з включенням особливих опцій у заголовку конфігурації FreeType.
+Control text	Colors tab		Текст елементу
 Tooltip text	Colors tab		Текст підказки
+Menu item text	Colors tab		Текст пункта меню
+LCD subpixel	AntialiasingSettingsView		Субпіксельне зглажування
+Selected menu item border	Colors tab		Рамка виділеного пункту меню
+Strong	AntialiasingSettingsView		Сильний
+Panel text	Colors tab		Текст панелі
+Monospaced fonts only	AntialiasingSettingsView		Тільки моноширинні шрифти
 Antialiasing menu	AntialiasingSettingsView		Зглажування меню
-Selected menu item background	Colors tab		Тло вибраного пункта меню
-Glyph hinting:	AntialiasingSettingsView		Натяк гліфа :
-Panel text	Colors tab		Текстова панель
+Glyph hinting:	AntialiasingSettingsView		Уточнення :

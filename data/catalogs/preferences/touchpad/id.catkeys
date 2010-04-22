@@ -1,0 +1,17 @@
+1	indonesian	x-vnd.Haiku-Touchpad	1713544224
+Scrolling	TouchpadPrefView		Menggulung
+Revert	TouchpadPrefView		Pulihkan
+Defaults	TouchpadPrefView		Defaults
+Slow	TouchpadPrefView		Lambat
+Horizontal scroll step size	TouchpadPrefView		Ukuran langkah penggulungan horisontal
+High	TouchpadPrefView		Tinggi
+Tap gesture	TouchpadPrefView		Tap gesture
+Horizontal scrolling	TouchpadPrefView		Penggulungan horisontal
+Wide	TouchpadPrefView		Lebar
+Fast	TouchpadPrefView		Cepat
+Tap click sensitivity	TouchpadPrefView		Sensitifitas klik tap
+Scroll acceleration	TouchpadPrefView		Akselerasi penggulungan
+Vertical scroll step size	TouchpadPrefView		Ukuran langkah penggulungan vertikal
+Off	TouchpadPrefView		Mati
+Small	TouchpadPrefView		Kecil
+Touchpad	TouchpadMain		Touchpad

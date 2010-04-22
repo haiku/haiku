@@ -1,0 +1,43 @@
+1	greek	x-vnd.Haiku-bootman	1708914626
+The boot manager has been successfully installed on your system.	BootManagerController		Ο διαχειριστής εκκίνησης έχει εγκατασταθεί επιτυχώς στο σύστημά σας.
+After two seconds	DefaultPartitionPage		Μετά από δύο δευτερόλεπτα
+The old Master Boot Record was successfully save to %s.	BootManagerController		Το παλιό Master Boot Record αποθηκεύτηκε επιτυχώς στο %s.
+At least one partition must be selected!	BootManagerController		Πρέπει να επιλέξετε τουλάχιστον μία κατάτμηση!
+The old Master Boot Record could not be saved to %s	BootManagerController		Το παλιό Master Boot Record δεν μπορεί να αποθηκευτεί στο %s
+Restore MBR	BootManagerController	Button	Αποκατάσταση MBR
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Σχετικά με την αποκατάσταση του Master Boot Record (MBR) of %δίσκου από το %αρχείο. Θέλετε να συνεχίσετε;
+Select	FileSelectionPage	Button	Επιλογή
+After four seconds	DefaultPartitionPage		Μετά από τέσσερα δευτερόλεπτα
+Choose this option to install a boot menu, allowing you to select which operating system to boot when you turn on your computer.	EntryPage		Επιλέξτε αυτήν την επιλογή για να εγκαταστήσετε ένα μενού εκκίνησης, το οποίο θα σας επιτρέπει να επιλέγετε ποιό λειτουργικό σύστημα θα εκκινεί όταν ανοίγετε τον υπολογιστή σας.
+Next	WizardView	Button	Επόμενο
+After one second	DefaultPartitionPage		Μετά από ένα δευτερόλεπτο
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Ο πίνακας κατατμήσεων του πρώτου σκληρού δίσκου δεν είναι συμβατός με τον Διαχειριστή Εκκίνησης. \nΟ Διαχειριστής Εκκίνησης χρειάζεται 2 ΚΒ διαθέσιμο χώρο πριν την πρώτη κατάτμηση.
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Ανιχνεύθηκαν οι ακόλουθες κατατμήσεις. Παρακαλούμε τσεκάρετε το κουτάκι  των κατατμήσεων για να συμπεριληφθούν στο μενού εκκίνησης. Επίσης μπορείτε να ορίσετε τα ονόματα των κατατμήσεων όπως θα θέλατε να εμφανίζονται στο μενού εκκίνησης.
+After one minute	DefaultPartitionPage		Μετά απο ένα λεπτό
+The Master Boot Record of the boot device (%s) has been successfully restored from %s.	BootManagerController		Το Master Boot Record της συσκευής εκκίνησης (%s) αποκαταστάθηκε επιτυχώς από %s.
+Haiku Boot Manager	BootManager	About text title	Haiku Διαχειριστής Εκκίνησης
+Write boot menu	BootManagerController	Button	Εγγραφή μενού εκκίνησης
+The Master Boot Record could not be restored!	BootManagerController		Το Master Boot Record δεν μπορεί να αποκατασταθεί!
+Default Partition	DefaultPartitionPage	Title	Προκαθορισμένο Διαμέρισμα
+After five seconds	DefaultPartitionPage		Μετά από πέντε δευτερόλεπτα
+Back	BootManagerController	Button	Πίσω
+Installation of boot menu completed	BootManagerController	Title	Η εγκατάσταση του μενού εκκίνησης ολοκληρώθηκε
+File:	FileSelectionPage	Text control label	Αρχείο:
+Previous	WizardView	Button	Προηγούμενο
+Boot Manager	BootManagerWindow	Window Title	Διαχειριστής Εκκίνησης
+Old Master Boot Record Saved failure	BootManagerController	Title	Το παλιό Master Boot Record απέτυχε να αποθηκευτεί
+Next	BootManagerController	Button	Επόμενο
+Never	DefaultPartitionPage		Ποτέ
+Unnamed %d	LegacyBootDrive	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Ανώνυμο %d
+written by	BootManager		γραμμένο από τον
+Boot Manager is unable to read the partition table!	BootManagerController		Ο Διαχειριστής Εκκίνησης δεν μπορεί να διαβάσει τον πίνακα κατατμήσεων!
+OK	BootManager		Εντάξει
+Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Πνευματικά δικαιώματα %year, Haiku Inc.\n
+Unknown	LegacyBootDrive	Text is shown for an unknown partition type	Άγνωστο
+Default Partition:	DefaultPartitionPage	Menu field label	Προκαθορισμένη Κατάτμηση:
+Partitions	DefaultPartitionPage	Pop up menu title	Κατατμήσεις
+Summary	BootManagerController	Title	Συνοπτικά
+OK	BootManagerController	Button	Εντάξει
+Immediately	DefaultPartitionPage		Άμεσα
+Done	BootManagerController	Button	Ολοκληρώθηκε
+After three seconds	DefaultPartitionPage		Μετά από τρία δευτερόλεπτα

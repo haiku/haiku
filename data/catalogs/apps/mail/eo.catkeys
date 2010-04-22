@@ -1,0 +1,140 @@
+1	esperanto	x-vnd.Be-MAIL	3623971781
+%d - Date	Mail		%d - Dato
+Attach attributes:	Mail		Aldoni atributojn:
+Inconsistency occurred in the undo/redo buffer.	Mail		Nekonsekvenco okazis en la malfara/refara bufro.
+An error occurred trying to save the attachment.	Mail		Eraro okazis dum la konservado de la kunsendaĵo.
+Copy to new	Mail		Kopii al novo
+Edit	Mail		Redakti
+Print	Mail		Printi
+New mail message	Mail		Nova mesaĝo
+Automatically mark mail as read:	Mail		Aŭtomate marki mesaĝojn kiel legitaj:
+Colored quotes:	Mail		Koloraj citaĵoj:
+Subject:	Mail		Temo:
+Reply to all	Mail		Respondi al ĉiuj
+Show icons & labels	Mail		Montri bildetojn kaj etikedojn
+Remove attachment	Mail		Forigi kunsendaĵon
+Button bar:	Mail		Butonaro:
+Beginner	Mail		Komencanto
+Don't save	Mail		Ne konservi
+Expert	Mail		Sperto
+Reply account:	Mail		Responda konto:
+Discard	Mail		Forĵeti
+Message	Mail		Mesaĝo
+Reply to sender	Mail		Respondi al sendinto
+There is no installed handler for URL links.	Mail		Neniu traktilo estas instalita pro URL-aj ligiloj.
+Signature	Mail		Subskribo
+Find again	Mail		Retrovi
+Bcc:	Mail		Blindkopio:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Via ĉefa teksto enhavas %ld malkodeblajn signojn. Eble alia signaro pli bone taŭgus. Klaku al "Sendi" pro sendi ĝin malgraŭe (anstatŭa signo uziĝos pro la malkodeblaj), aŭ elektu Rezigni pro retroiri kaj ĝustigi tion.
+Signature:	Mail		Subskribo:
+Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Retpoŝto\n\nSkribita per Robert Polic.\nPlibonigita per la Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Save changes to this signature?	Mail		Ĉu vi volas konservi la ŝanĝojn al la subskribo?
+Cc:	Mail		Kopio:
+Find	Mail		Trovi
+Preferences…	Mail		Agordoj…
+Undo	Mail		Malfari
+Leave as New	Mail		Lasi kiel Nova
+An error occurred trying to open this signature.	Mail		Eraro okazis dum la malfarmado de la subskribo.
+No file attributes, just plain data	Mail		Sen atributoj, nur kruda datumo
+Edit queries…	Mail		Redakti informmendojn…
+Paste	Mail		Elpoŝigi
+Save attachment…	Mail		Konservi kunsendaĵon…
+Include file attributes in attachments	Mail		Anigi dosierajn atributojn en kunsendaĵoj
+OK	Mail		Daŭrigi
+Send	Mail		Sendi
+Show icons only	Mail		Montri nur bildetojn
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		La forigado de kunsendaĵoj el plusendita mesaĝo ne jam realiĝis!\nTio ne jam ĝuste funkcios.
+Hide	Mail		Kaŝi
+Forward without attachments	Mail		Plusendi sen kunsendaĵoj
+Previous	Mail		Antaŭa
+Redo	Mail		Refari
+Add enclosure…	Mail		Aldoni kunsendaĵon…
+Print…	Mail		Printi…
+Warn unencodable:	Mail		Averti pri malkodigebleco:
+Quit	Mail		Eliri
+%n - Full name	Mail		%n - Kompleta nomo
+ Read 	Mail		 Legita 
+Trash	Mail		Rubujo
+Default account:	Mail		Apriora konto:
+Size:	Mail		Grandeco:
+Account from mail	Mail		Konto de retpoŝto
+Edit signatures…	Mail		Redakti subskribojn…
+New	Mail		Nova
+Attachments: 	Mail		Kunsendaĵoj: 
+Set to %s	Mail		Ŝanĝi al %s
+Forward	Mail		Malantaŭen
+E-mail draft could not be saved!	Mail		Retpoŝta malneto ne eblas konserviĝi!
+To:	Mail		Al:
+Only files can be added as attachments.	Mail		Nur dosieroj eble esti aldonitaj kiel kunsendaĵoj.
+Previous message	Mail		Antaŭa mesaĝo
+Title:	Mail		Titolo:
+Find…	Mail		Trovi...
+Accounts…	Mail		Kontoj...
+Mail preferences	Mail		Poŝtaj agordoj
+Initial spell check mode:	Mail		Kontroli literumadon de la lanĉo:
+Leave same	Mail		Lasi same
+About Mail…	Mail		Pri Retpoŝto…
+Page setup…	Mail		Paĝa agordo…
+Text wrapping:	Mail		Linifaldo:
+Revert	Mail		Malfari
+File	Mail		Dosiero
+None	Mail		Neniu
+Copy link location	Mail		Kopii ligilan lokon en la poŝon
+Show header	Mail		Montri ĉapon
+%e - E-mail address	Mail		%e - Retpoŝta adreso
+Resend	Mail		Resendi
+Show raw message	Mail		Montri krudan mesaĝon
+\\n - Newline	Mail		\\n - Linifinilo
+Start now	Mail		Ek
+Close	Mail		Fermi
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		La retpoŝta demono ne rulas. La meŝago atendas sian vicon kaj sendiĝos kiam la retpoŝto demono lanĉiĝas.
+Really delete this signature? This cannot be undone.	Mail		Ĉu vi vere volas forviŝi ĉi tiun subskribon? Tio ne eblas malfariĝi.
+Open	Mail		Malfermi
+Quote	Mail		Citaĵi
+Add	Mail		Aldoni
+Next message	Mail		Sekva mesaĝo
+User interface	Mail		Uzanta interfaco
+Cancel	Mail		Rezigni
+Send message	Mail		Sendi mesaĝon
+Remove enclosure	Mail		Forigi kunsendaĵon
+Account:	Mail		Konto:
+Decoding:	Mail		Malkodante:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Bedaŭrinde, ne eblis troviĝi aplikaĵo, kiu okupiĝas pri la 'Persono' datumtipo.
+Do you wish to send this message before closing?	Mail		Ĉu vi volas sendi ĉi tiun mesaĝon antaŭ ĝi fermas?
+Delete	Mail		Forviŝi
+Leave as '%s'	Mail		Lasi kiel '%s'
+Copy	Mail		Kopii al la poŝon
+Reply preamble:	Mail		Responda superskribo:
+Signatures	Mail		Subskriboj
+Next	Mail		Sekva
+Set to…	Mail		Ŝanĝi al…
+Use default account	Mail		Uzi aprioran konton
+Sorry	Mail		Pardonu
+Encoding:	Mail		Kodaro:
+Font:	Mail		Tiparo:
+Save address	Mail		Konservi adreson
+Queries	Mail		Informmendoj
+Do you wish to save this message as a draft before closing?	Mail		Ĉu vi volas konservi ĉi tiun mesaĝon kiel malneto antaŭ ĝi fermas?
+Save	Mail		Konservi
+Random	Mail		Hazarda
+Close and 	Mail		Fermi kaj
+Save as draft	Mail		Konservi kiel malneto
+The mail_daemon could not be started:\n\t	Mail		La mail_daemon ne povis komenci:\n\t
+Open attachment	Mail		Malfermi kunsendaĵon
+Reply	Mail		Respondi
+From:	Mail		El:
+Couldn't open this signature. Sorry.	Mail		Bedaŭre ĉi tiu subskribo ne eblis malfermiĝi.
+Open draft	Mail		Malfermi malneton
+Cut	Mail		Enpoŝigi
+Check spelling	Mail		Kontroli literumadon
+Set to Saved	Mail		Ŝanĝi al 'Konservita'
+Open this link	Mail		Malfermi ĉi tiun ligilon
+Auto signature:	Mail		Aŭtomata subskribo:
+Add signature	Mail		Aldoni subskribon
+Need Tracker to move items to trash	Mail		Tracker estas bezonata pro forĵeti mesaĝojn en la rubujon
+Mailing	Mail		Sendado kaj Ricevado
+Unread	Mail		Ne legitaj
+Remove quote	Mail		Forigi citaĵon
+Move to trash	Mail		Forĵeti en la rubujon
+Select all	Mail		Elekti ĉion
+An error occurred trying to save this signature.	Mail		Eraro okazis dum la konservado de ĉi tiu subskribo.

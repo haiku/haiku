@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	1909738892
+1	french	x-vnd.Haiku-StyledEdit	2750476595
 Paste	Menus		Coller
 OK	LoadAlert		OK
 File	Menus		Fichier
@@ -15,6 +15,7 @@ Replace same	Menus		Remplacer le même
 Can't undo	Menus		Impossible d'annuler
 Save	Menus		Sauvegarder
 Replace with:	FindandReplaceWindow		Pemplacer par :
+Cancel	SaveAlert		Annuler
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossible de revenir, fichier non trouvé : \"%s\".
 Case-sensitive	FindandReplaceWindow		Sensible à la casse
 Green	Menus		Vert
@@ -32,6 +33,7 @@ Font	Menus		Police
 Replace all	FindandReplaceWindow		Tout remplacer
 Default	Open_and_SaveAsPanel		Défaut
 Cancel	FindandReplaceWindow		Annuler
+Save	SaveAlert		Sauvegarder
 Close	Menus		Fermer
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erreur de chargement de \"%s\":\n\tFormat inconnu
 OK	RevertToSavedAlert		OK
@@ -57,7 +59,9 @@ Find again	Menus		Chercher encore
 Cancel	QuitAlert		Annuler
 Find…	Menus		Chercher…
 Select all	Menus		Tout sélectionner
+Don't save	SaveAlert		Ne pas enregistrer
 Error loading \"%s\":\n\t%s	LoadAlert		Erreur de chargement de \"%s\":\n\t%s
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document \"%s\" ?
 Black	Menus		Noir
 Untitled 	StyledEditWindow		Sans titre
 OK	SaveAlert		OK

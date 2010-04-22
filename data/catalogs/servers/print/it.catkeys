@@ -1,0 +1,38 @@
+1	italian	x-vnd.Be-PSRV	2376709688
+Undefined	ConfigWindow		Indefinito
+A5	ConfigWindow		A5
+Cancel	PrintServerApp		Annulla
+copies	ConfigWindow		copie
+Legal	ConfigWindow		Legale
+A2	ConfigWindow		A2
+to	ConfigWindow		a
+Page setup:	ConfigWindow		Imposta pagina:
+OK	ConfigWindow		Ok
+Cancel	ConfigWindow		Annulla
+Yes	PrintServerApp		Si
+Would you like to set one up now?	PrintServerApp		Vuoi impostarne una in questo momento?
+Portrait	ConfigWindow		Ritratto
+All pages	ConfigWindow		Tutte le pagine
+There is no default printer set up.	PrintServerApp		Non c'è alcuna impostazione per la stampante predefinita.
+Tabloid	ConfigWindow		Tabloid
+There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Stai creando una stampante attualmente esistente, ma il cui driver non può essere trovato! La sostituisco?
+A4	ConfigWindow		A4
+Printer:	ConfigWindow		Stampante:
+Select a printer	ConfigWindow		Seleziona una stampante
+A1	ConfigWindow		A1
+No	PrintServerApp		No
+B5	ConfigWindow		B5
+Landscape	ConfigWindow		Paesaggio
+There are no printers set up.	PrintServerApp		Non ci sono stampanti impostate.
+Page	ConfigWindow		Pagina
+Ledger	ConfigWindow		Registro
+Letter	ConfigWindow		Lettera
+There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Stai creando una stampante attualmente esistente, ma è totalmente inutilizzabile! La sostituisco?
+A0	ConfigWindow		A0
+A6	ConfigWindow		A6
+A3	ConfigWindow		A3
+OK	PrintServerApp		Ok
+Print setup	ConfigWindow		Imposta stampa
+Would you like to make @ the default printer?	PrintServerApp		Vuoi rendere @ quale stampante predefinita?
+Page setup	ConfigWindow		Imposta pagina
+Paper setup:	ConfigWindow		Imposta carta:

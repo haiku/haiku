@@ -1,0 +1,9 @@
+1	ukrainian	system	2677153267
+%3.2f GiB	StringForSize		%3.2f GiB
+%3.2f KiB	StringForSize		%3.2f KiB
+%d bytes	StringForSize		%d байт
+Green:	ColorControl		Зелений:
+%.2f TiB	StringForSize		%.2f TiB
+Red:	ColorControl		Червоний:
+%3.2f MiB	StringForSize		%3.2f MiB
+Blue:	ColorControl		Голубий:

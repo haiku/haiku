@@ -1,0 +1,42 @@
+1	swedish	x-vnd.Haiku-bootman	2957262429
+The boot manager has been successfully installed on your system.	BootManagerController		Boothanteraren har lyckats installeras på systemet.
+After two seconds	DefaultPartitionPage		Efter två sekunder
+The old Master Boot Record was successfully save to %s.	BootManagerController		Det gamla Huvudbootregistret lyckades sparas till %s.
+At least one partition must be selected!	BootManagerController		Minst en partition måste väljas!
+The old Master Boot Record could not be saved to %s	BootManagerController		Det gamla Huvudbootregistret kunde inte sparas till %s
+Restore MBR	BootManagerController	Button	Återställ HBR
+Select	FileSelectionPage	Button	Välj
+After four seconds	DefaultPartitionPage		Efter fyra sekunder
+Choose this option to install a boot menu, allowing you to select which operating system to boot when you turn on your computer.	EntryPage		Välj detta för att installera en boot-meny, som låter dig välja vilket operativsystem du vill starta när du startar din dator.
+Next	WizardView	Button	Nästa
+After one second	DefaultPartitionPage		Efter en sekund
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Följande partitioner har upptäckts. Var god kolla rutan brevid de partitioner som ska inkluderas i boot-menyn. Du kan också ställa in namnen på partitionerna så som du vill att de ska visas i boot-menyn.
+After one minute	DefaultPartitionPage		Efter en minut
+Haiku Boot Manager	BootManager	About text title	Haiku Boothanterare
+Write boot menu	BootManagerController	Button	Skriv bootmeny
+Choose this option to remove the boot menu previously installed by this program.\n	EntryPage		Välj det här alternativet för att ta bort den bootmenyn som tidigare installerats av det här programmet.\n
+The Master Boot Record could not be restored!	BootManagerController		Huvudbootregistret kunde inte återställas!
+Default Partition	DefaultPartitionPage	Title	Förvald partition
+After five seconds	DefaultPartitionPage		Efter fem sekunder
+Back	BootManagerController	Button	Tillbaka
+Installation of boot menu completed	BootManagerController	Title	Installation av bootmenyn klar
+File:	FileSelectionPage	Text control label	Fil:
+Previous	WizardView	Button	Föregående
+Boot Manager	BootManagerWindow	Window Title	Boothanterare
+Next	BootManagerController	Button	Nästa
+Never	DefaultPartitionPage		Aldrig
+Unnamed %d	LegacyBootDrive	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Odöpt %d
+written by	BootManager		skriven av
+Boot Manager is unable to read the partition table!	BootManagerController		Boothanteraren kan inte läsa partitionstabellen!
+OK	BootManager		Okej
+Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
+Unknown	LegacyBootDrive	Text is shown for an unknown partition type	Okänd
+Backup Master Boot Record	BootManagerController	Title	Reservhuvudbootregister
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		På väg att skriva bootmenyn till disken. Är du säker på att du vill fortsätta?
+Default Partition:	DefaultPartitionPage	Menu field label	Förvald partition:
+Partitions	DefaultPartitionPage	Pop up menu title	Partitioner
+Summary	BootManagerController	Title	Summering
+OK	BootManagerController	Button	Okej
+Immediately	DefaultPartitionPage		Genast
+Done	BootManagerController	Button	Klar
+After three seconds	DefaultPartitionPage		Efter tre sekunder

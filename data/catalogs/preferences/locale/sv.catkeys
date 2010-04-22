@@ -1,48 +1,49 @@
-1	swedish	x-vnd.Haiku-Locale	1007621035
-Day of week (short name)	TimeFormatSettings		veckodag (kortnamn)
+1	swedish	x-vnd.Haiku-Locale	1551394073
+Day in month (2 digits)	TimeFormatSettings		dag i månad (2 siffror)
 Available languages	Locale Preflet Window		Tillgängliga språk
-Decimal separator: 	TimeFormatSettings		Decimalseparerare
+Day of week (name)	TimeFormatSettings		veckodag (namn)
 Separator:	TimeFormatSettings		Separerare:
 Year (4 digits)	TimeFormatSettings		År (4 siffror)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kan inte hitta listan över tillgängliga språk! Prefleten kan inte användas!
+Thousand separator: 	TimeFormatSettings		Tusentalsseparerare
 After	TimeFormatSettings		Efter
+Month name	TimeFormatSettings		månadsnamn
 Long format:	TimeFormatSettings		Långt datum:
 Currency	TimeFormatSettings		Valuta
 Before	TimeFormatSettings		Innan
 Year	TimeFormatSettings		År
+Day of week in month	TimeFormatSettings		veckodag i månad
 Short format:	TimeFormatSettings		Kort datum:
 Currency symbol:	TimeFormatSettings		Valutasymbol:
 Space	TimeFormatSettings		Mellanrum
 Language	Locale Preflet Window		Språk
-Thousand separator: 	TimeFormatSettings		Tusentalsseparerare
-24 hour	TimeFormatSettings		24 hour
+Month number	TimeFormatSettings		månadsnummer
 Year (2 digits)	TimeFormatSettings		År (2 siffror)
 Preferred languages	Locale Preflet Window		Föredragna språk
+Decimal separator: 	TimeFormatSettings		Decimalseparerare
 Symbol position	TimeFormatSettings		Symbolposition
-Month number	TimeFormatSettings		månadsnummer
-Month number (2 digits)	TimeFormatSettings		månadsnummer (2 siffror)
+Day of week (short name)	TimeFormatSettings		veckodag (kortnamn)
 Numbers	TimeFormatSettings		Nummer
+24 hour	TimeFormatSettings		24 timmar
  (unknown format)	TimeFormatSettings		 (okänt format)
 Negative marker:	TimeFormatSettings		Negativmarkör:
-12 hour	TimeFormatSettings		12 hour
+Day in month	TimeFormatSettings		dag i månad
+OK	Locale Preflet Window		Ok
 Defaults	Locale Preflet Window		Förval
+Month	TimeFormatSettings		Månad
 Separator	TimeFormatSettings		Separerare
 Country	Locale Preflet Window		Land
+Month number (2 digits)	TimeFormatSettings		månadsnummer (2 siffror)
 Revert	Locale Preflet Window		Återgå
-Day in month	TimeFormatSettings		dag i månad
-Day of week in month	TimeFormatSettings		veckodag i månad
 Negative marker	TimeFormatSettings		Negativmarkör
-OK	Locale Preflet Window		Ok
+Day of week	TimeFormatSettings		veckodag
+List separator: 	TimeFormatSettings		Listseparerare
+12 hour	TimeFormatSettings		12 timmar
 Time	TimeFormatSettings		Tid
 Date	TimeFormatSettings		Datum
-List separator: 	TimeFormatSettings		Listseparerare
-Day of week	TimeFormatSettings		veckodag
-Locale	Locale Preflet		Locale
+Locale	Locale Preflet		Lokalitet
 None	TimeFormatSettings		Ingen
-Day in month (2 digits)	TimeFormatSettings		dag i månad (2 siffror)
 Clock	TimeFormatSettings		Klocka
 Example:	TimeFormatSettings		Exempel:
-Day of week (name)	TimeFormatSettings		veckodag (namn)
-Month name	TimeFormatSettings		månadsnamn
 Day	TimeFormatSettings		Dag
 Leading 0	TimeFormatSettings		Inledande 0

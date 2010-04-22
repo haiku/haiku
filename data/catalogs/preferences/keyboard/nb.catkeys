@@ -1,0 +1,14 @@
+1	norwegian bokmål	x-vnd.Haiku-Keyboard	914649575
+Keyboard	KeyboardWindow		Tastatur
+Written by Andrew Edward McCall	KeyboardApplication		Skrevet av Andrew Edward McCall
+Typing test area	KeyboardView		Testfelt
+Defaults	KeyboardWindow		Standardinnstillinger
+Key repeat rate	KeyboardView		Repetisjonshastighet 
+Revert	KeyboardWindow		Tilbakestill
+Delay until key repeat	KeyboardView		Forsinkelse før tast repeteres
+OK	KeyboardApplication		OK
+Fast	KeyboardView		Rask
+Slow	KeyboardView		Langsom
+Something has gone wrong!	KeyboardApplication		Noe gikk feil!
+Long	KeyboardView		Lang
+Short	KeyboardView		Kort

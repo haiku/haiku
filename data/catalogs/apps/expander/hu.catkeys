@@ -1,0 +1,37 @@
+1	hungarian	x-vnd.Haiku-Expander	2289329519
+Expand	ExpanderMenu		Kibontás
+Set destination…	ExpanderMenu		Cél választása…
+File expanded	ExpanderWindow		A fájl kibontva
+The destination is read only.	ExpanderWindow		A cél nem írható.
+Expander: Open	ExpanderWindow		Expander: Megnyitás
+ is not supported	ExpanderWindow		 nem támogatott
+Select current	DirectoryFilePanel		Jelenlegit kiválaszt
+Source	ExpanderWindow		Forrás
+Error when expanding archive	ExpanderWindow		Hiba történt a kibontás közben.
+Hide contents	ExpanderWindow		Tartalom elrejtése
+Cancel	ExpanderWindow		Mégsem
+Continue	ExpanderWindow		Folytatás
+Expander	ExpanderWindow	!! Window Title !!	Kicsomagoló
+The destination folder does not exist.	ExpanderWindow		A célkönyvtár nem létezik.
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Biztosan le szeretné állítani\na kibontást? A kibontás még nem fejeződött be.
+Select	DirectoryFilePanel		Kiválaszt
+Creating listing for 	ExpanderWindow		Lista készítése
+Settings	ExpanderMenu		Beállítások
+Settings…	ExpanderMenu		Beállítások…
+Expander: Choose destination	DirectoryFilePanel		Expander: Cél választása
+Show contents	ExpanderWindow		Tartalom megjelenítése
+Expanding file 	ExpanderWindow		Fájl kibontása
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		A könyvtár át lett mozgatva, nevezve vagy nem\ntámogatott.
+The file doesn't exist	ExpanderWindow		A fájl nem létezik
+Stop	ExpanderMenu		Leállítás
+File	ExpanderMenu		Fájl
+Expand	ExpanderWindow		Kibont
+Close	ExpanderMenu		Bezár
+The destination is not a folder.	ExpanderWindow		A cél nem könyvtárra mutat.
+About Expander…	ExpanderMenu		Az Expanderről…
+OK	About		Rendben
+Set source…	ExpanderMenu		Forrás beállítása…
+Select '%s'	DirectoryFilePanel		'%s' kiválasztása
+Show contents	ExpanderMenu		Tartalom megjelenítése
+Stop	ExpanderWindow		Megállít
+Destination	ExpanderWindow		Cél

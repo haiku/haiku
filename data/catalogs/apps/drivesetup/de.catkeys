@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	3321530449
+1	german	x-vnd.Haiku-DriveSetup	2303126039
 Delete	MainWindow		Löschen
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Sind Sie sicher, dass Sie die gewählte Partition initialisieren möchten? Nach der Eingabe der Initialisierungsparameter kann die Aktion noch vor dem Schreiben der Änderungen auf das Medium abgebrochen werden.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf das Speichermedium schreiben möchten?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
@@ -6,10 +6,10 @@ Rescan	MainWindow		Neu einlesen
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Partitionierungsinformationen konnten nicht ermittelt werden.
 There's no space on the partition where a child partition could be created.	MainWindow		Es gibt keinen Platz auf der Partition, wo eine Tochterpartition angelegt werden könnte.
+%ld MiB	Support		%ld MiB
 <empty>	PartitionList		<leer>
 Unable to find the selected partition by ID.	MainWindow		Die ausgewählte Partition konnte anhand ihrer ID nicht gefunden werden.
 Select a partition from the list below.	DiskView		Wählen Sie eine Partition aus der Liste.
-%.1f TB	Support		%.1f TB
 No disk devices have been recognized.	DiskView		Es wurden keine Speichermedien erkannt.
 The selected disk is read-only.	MainWindow		Das ausgewählte Speichermedium kann nur gelesen werden.
 Partition name:	CreateParamsPanel		Partitionsname:
@@ -38,10 +38,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Offset: %ld MB	Support		Versatz: %ld MB
 Write changes	MainWindow		Änderungen schreiben
 There was an error preparing the disk for modifications.	MainWindow		Beim Vorbereiten der Änderungen trat ein interner Fehler auf.
-%3.1f MB	Support		%3.1f MB
 The partition %s is already mounted.	MainWindow		Die Partition %s ist bereits eingehangen.
-%3.1f GB	Support		%3.1f GB
-%ld MB	Support		Ende: %ld MB
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf das Speichermedium schreiben möchten?\n\nAlle Daten auf dem Medium %s gehen dabei unwiderruflich verloren!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf die gewählte Partition schreiben möchten?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
 Create…	MainWindow		Anlegen…
@@ -60,7 +57,6 @@ Cancel	MainWindow		Abbrechen
 Delete partition	MainWindow		Partition löschen
 End: %ld MB	Support		Ende: %ld MB
 Eject	MainWindow		Auswerfen
-%3.1f KB	Support		%3.1f KB
 Partition	MainWindow		Partition
 File system	PartitionList		Dateisystem
 Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter schlug fehl.
@@ -74,7 +70,6 @@ Partition size	CreateParamsPanel		Partitionsgröße
 Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)
 Cancel	InitParamsPanel		Abbrechen
 Cancel	CreateParamsPanel		Abbrechen
-%Ld B	Support		%Ld B
 Creation of the partition has failed.	MainWindow		Anlegen der Parition schlug fehl.
 The currently selected partition is not empty.	MainWindow		Die gewählte Partition ist nicht leer.
 Unmount	MainWindow		Aushängen

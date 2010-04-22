@@ -1,0 +1,38 @@
+1	belarusian	x-vnd.Be-PSRV	2376709688
+Undefined	ConfigWindow		Нявызначаны
+A5	ConfigWindow		A5
+Cancel	PrintServerApp		Скасаваць
+copies	ConfigWindow		экзэмпляраў
+Legal	ConfigWindow		Legal
+A2	ConfigWindow		A2
+to	ConfigWindow		да
+Page setup:	ConfigWindow		Наладкі старонкі:
+OK	ConfigWindow		Так
+Cancel	ConfigWindow		Скасаваць
+Yes	PrintServerApp		Так
+Would you like to set one up now?	PrintServerApp		Жадаеце наладзіць яго зараз?
+Portrait	ConfigWindow		Партрэт
+All pages	ConfigWindow		Усе старонкі
+There is no default printer set up.	PrintServerApp		Прадвызначаная друкарка не прызначана.
+Tabloid	ConfigWindow		Tabloid
+There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Друкарка якую вы збіраецеся дадаць ужо існуе, але яе драйвер ня знойдзены! Замяніць раней дададзеную друкарку?
+A4	ConfigWindow		A4
+Printer:	ConfigWindow		Друкарка:
+Select a printer	ConfigWindow		Абраць друкарку
+A1	ConfigWindow		A1
+No	PrintServerApp		Не
+B5	ConfigWindow		B5
+Landscape	ConfigWindow		Пейзаж
+There are no printers set up.	PrintServerApp		Няма друкарак.
+Page	ConfigWindow		старонка
+Ledger	ConfigWindow		Ledger
+Letter	ConfigWindow		Letter
+There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Друкарка якую вы збіраецеся дадаць ужо існуе, але яна наагул не прыдатная для карыстання! Замяніць раней дададзеную друкарку?
+A0	ConfigWindow		A0
+A6	ConfigWindow		A6
+A3	ConfigWindow		A3
+OK	PrintServerApp		Так
+Print setup	ConfigWindow		Наладкі друку
+Would you like to make @ the default printer?	PrintServerApp		Жадаеце зрабіць @ прадвызначанай друкаркай?
+Page setup	ConfigWindow		Налдакі старонкі
+Paper setup:	ConfigWindow		Налдкі паперы:

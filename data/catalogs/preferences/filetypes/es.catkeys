@@ -1,0 +1,122 @@
+1	spanish	x-vnd.Haiku-FileTypes	4169608688
+Display as:	Attribute Window		Mostrar como:
+Args only	Application Type Window		Sólo argumentos
+Add group	New File Type Window		Añadir grupo
+Remove	Application Type Window		Eliminar
+Select same type as	FileType Window		Elegir el mismo tipo que
+Remove icon	Icon View		Eliminar icono
+Supported types	Application Type Window		Tipos soportados
+Internal name:	New File Type Window		Nombre interno:
+Could not open file \"%s\": %s\n	FileTypes		No se pudo abrir archivo \"%s\": %s\n
+New file type	New File Type Window		Nuevo tipo de fichero
+Add icon…	Icon View		Añadir icono...
+FileTypes Request	FileType Window		Requerimiento de Tipos de archivo
+Do you want to save the changes?	Application Type Window		¿Desea guardar los cambios?
+Multiple files from \"	FileType Window		Múltiples archivos desde \"
+File type	FileType Window		Tipo de archivo
+Could not change attributes	Attribute Window		No se pudieron cambiar los atributos
+Show icons in list	FileType Window		Mostrar iconos en la lista
+Cancel	TypeListWindow		Cancelar
+Ok	FileTypes		Aceptar
+File	FileType Window		Archivo
+Recognition rule is not valid:\n\n	FileType Window		La regla de reconocimiento no es válida:\n\n
+This file type already exists.	New File Type Window		Este tipo de archivo ya existe.
+Save	Application Type Window		Guardar
+Show recognition rule	FileType Window		Mostrar reglas de reconocimiento
+Add	Extension Window		Añadir
+Select same preferred application as	FileType Window		Seleccionar la misma aplicación preferida que
+Cancel	Attribute Window		Cancelar
+Multiple launch	Application Type Window		Ejecución múltiple
+Group:	New File Type Window		Grupo:
+Done	Extension Window		Listo
+Attribute	Attribute Window		Atributo
+Extra attributes	FileType Window		Atributo adicionales
+Could not open file	FileType Window		No se pudo abrir el fichero
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileType Window		Los supertipos eliminados no se pueden recuperar .\nTodos los tipos de fichero pertenecientes a dicho supertipo también se perderán!\n\n¿Desea seguir adelante? Para eliminar el grupo completo, pulse la tecla Shift y después \"Borrar\".
+Group name:	New File Type Window		Nobre del grupo:
+Could not retrieve preferred application of this file.	Preferred App Menu		No se encontró una aplicación asociada a este fichero.
+Preferred application	FileType Window		Aplicación preferida
+Quit	FileType Window		Salir
+no icon	FileType Window		Sin icono
+File recognition	FileType Window		Reconocimiento de ficheros
+Same as…	FileType Window		Igual que...
+File	Application Type Window		Archivo
+Version:	Application Type Window		Versión:
+FileTypes request	FileTypes		Requerimiento de Tipos de archivo
+Select…	FileType Window		Seleccionar…
+Description:	FileType Window		Descripción:
+Right	Attribute Window		Derecha
+Internal name:	FileType Window		Nombre interno:
+None	FileType Window		Ninguno
+Development	Application Type Window		Desarrollo
+Icon	FileType Window		Icono
+Special:	Attribute Window		Especial:
+Alpha	Application Type Window		Alfa
+Signature:	Application Type Window		Firma:
+Done	TypeListWindow		Listo
+Quit, don't save	Application Type Window		Salir sin guardar
+Add…	Application Type Window		Añadir…
+Type name:	FileType Window		Nombre del tipo:
+(from application)	FileType Window		(desde aplicación)
+Select preferred application	FileType Window		Seleccione la aplicación preferida
+Single launch	Application Type Window		Abrir en misma instancia
+Could not retrieve application signature.	Preferred App Menu		No se pudo obtener la firma de la aplicación.
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		La aplicación \"%s\" no soporta este tipo de fichero.\n¿Desea elegirla en cualquier caso?
+Type:	Attribute Window		Tipo:
+Done	Attribute Window		Listo
+Set Preferred Application	Preferred App Menu		Marque la aplicación preferida
+Background app	Application Type Window		Aplicación de fondo
+Add new group	New File Type Window		Añadir nuevo grupo
+Add…	FileType Window		Añadir…
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileType Window		Los tipos de fichero eliminados no se pueden recuperar.\n¿Realmente desea borrarlo?
+Rule:	FileType Window		Regla:
+Cancel	Application Type Window		Cancelar
+Cancel	New File Type Window		Cancelar
+Extension:	Extension Window		Extensión:
+Add	Attribute Window		Añadir
+Close	Application Type Window		Cerrar
+Open…	FileType Window		Abrir…
+Golden master	Application Type Window		Final para pruebas
+Could not open \"%s\":\n%s	FileTypes		No se pudo abrir \"%s\":\n%s
+Alignment:	Attribute Window		Alineación
+Cancel	Extension Window		Cancelar
+Could not remove file type: %s\n	FileType Window		No se pudo eliminar el tipo de fichero: %s\n
+Remove	FileType Window		Eliminar
+Application flags	Application Type Window		Flags de aplicación
+FileTypes\n\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		FileTypes\n\tescrito por Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+Editable	Attribute Window		Modificable
+Width:	Attribute Window		Ancho:
+Choose type	TypeListWindow		Elija tipo
+Save request	Application Type Window		Guardar petición
+Cancel	FileType Window		Cancelar
+Beta	Application Type Window		Beta
+Extensions:	FileType Window		Extensiones:
+About FileTypes…	FileType Window		Acerca de FileTypes…
+Attribute name:	Attribute Window		Nombre de atributo:
+Extension	Extension Window		Extensión
+Add type	New File Type Window		Añadir tipo
+[Multiple files]	FileType Window		[Varios archivos]
+Could not set preferred application	FileType Window		No se pudo seleccionar la aplicación preferida
+Internal name:	Attribute Window		Nombre interno:
+Final	Application Type Window		Final
+Open File	FileTypes		Abrir archivo
+Settings	FileType Window		Configuración
+New resource file…	FileType Window		Nuevo archivo de recursos...
+Exclusive launch	Application Type Window		Ejecución exclusiva
+Gamma	Application Type Window		Gama
+Default application	FileType Window		Aplicación predeterminada
+Long description:	Application Type Window		Descripción larga:
+Application types…	FileType Window		Tipos de aplicación...
+(from super type)	FileType Window		(desde supertipo)
+Description	FileType Window		Descripción
+Version info	Application Type Window		Información de la Versión
+Center	Attribute Window		Centro
+Short description:	Application Type Window		Descripción corta:
+File could not be opened	Preferred App Menu		No se pudo abrir el fichero
+Could not change file extensions	Extension Window		No se pudo cambiar la extensión del fichero
+Edit icon…	Icon View		Editar icono…
+Save into resource file…	Application Type Window		Guardar en el fichero de recursos...
+Left	Attribute Window		Izquierda
+Visible	Attribute Window		Visible
+Could not install file type	New File Type Window		No se pudo instalar el tipo de archivo
+Application Type	Application Type Window		Tipo de aplicación

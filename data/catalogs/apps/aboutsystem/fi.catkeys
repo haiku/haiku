@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	3438887663
+1	finnish	x-vnd.Haiku-About	3196829578
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ja hänen NewOS-ytimensä)\n
 %ld Processors:	AboutView		%ld suoritinta:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektin perustaja)\n\n
@@ -10,9 +10,11 @@ Processor:	AboutView		Suoritin:
 Kernel:	AboutView		Ydin:
 Contributors:\n	AboutView		Avustajat:\n
 Unknown	AboutView		Tuntematon
+... and the many people making donations!\n\n	AboutView		... ja monet lahjoituksia tehneet ihmiset!\n\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… ja luultavasti vielä jotain muuta, jonka joku unohti mainita (anteeksi!)\n\n
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Muisti:
+Google & their Google Summer of Code program\n\n	AboutView		Google ja heidän Google Summer of Code -ohjelmansa\n\n
 Past maintainers:\n	AboutView		Entiset ylläpitäjät:\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Koodin, joka on uniikkia Haikulle, erityisesti ydin ja kaikki koodi johon sovellukset linkittävät, levitysehtona on  
 \n\nSpecial thanks to:\n	AboutView		\n\nErityiskiitokset:\n
@@ -25,6 +27,7 @@ MIT license	AboutView		MIT-lisenssi
 The Haikuware team and their bounty program\n	AboutView		Haikuware-ryhmä ja heidän bounty-ohjelmansa\n
 About this system	AboutWindow		Tästä järjestelmästä
 Version:	AboutView		Versio:
+The BeGeistert team\n	AboutView		BeGeistert-ryhmä\n
 %ld MHz	AboutView		%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Haiku-koodin copyright on Haiku, Inc. -yhtiöllä tai kullekin kuuluvalla tekijällä, milloin lähdekoodissa on nimenomaisesti niin ilmaistu\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Napsauta lisenssinimeä vastaavan lisenssin lukemiseksi.]\n\n

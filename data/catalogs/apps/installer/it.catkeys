@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Installer	1328466502
+1	italian	x-vnd.Haiku-Installer	3609821010
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Sei sicuro di voler annullare l'installazione e riavviare il sistema?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tscritto da Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installazione completa. Il settore d'avvio è stato scritto su '%s'. Premi Esci per abbandonare l'Installer oppure scegli un nuovo volume di destinazione per procedere con un'altra installazione.
@@ -43,7 +43,6 @@ Restart system	InstallerWindow		Riavvia sistema
 OK	InstallerWindow		Ok
 Set up partitions…	InstallerWindow		Imposta partizioni…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		La partizione non può essere montata. Scegli una partizione differente.
-The mount point could not be retrieve.	InstallProgress		Impossibile recuperare punto di montaggio.
 Install anyway	InstallProgress		Installare comunque
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		E' stato riscontrato un errore e l'installazione non è stata completata:\n\nErrore:  %s
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Premi sul tasto Inizia per installare da '%1s' su '%2s'.

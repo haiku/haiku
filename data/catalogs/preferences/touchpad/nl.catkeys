@@ -1,0 +1,18 @@
+1	dutch	x-vnd.Haiku-Touchpad	3077633033
+Scrolling	TouchpadPrefView		Scrollen
+Revert	TouchpadPrefView		Herstellen
+Two finger scrolling	TouchpadPrefView		Tweevinger-scrollen
+Defaults	TouchpadPrefView		Standaardwaarden
+Slow	TouchpadPrefView		Langzaam
+Horizontal scroll step size	TouchpadPrefView		Horizontale scroll-intervalgrootte
+High	TouchpadPrefView		Hoog
+Tap gesture	TouchpadPrefView		Tapgebaar
+Horizontal scrolling	TouchpadPrefView		Horizontaal scrollen
+Wide	TouchpadPrefView		Breed
+Fast	TouchpadPrefView		Snel
+Tap click sensitivity	TouchpadPrefView		Tap-klikgevoeligheid
+Scroll acceleration	TouchpadPrefView		Scroll-acceleratie
+Vertical scroll step size	TouchpadPrefView		Verticale scroll-intervalgrootte
+Off	TouchpadPrefView		Uit
+Small	TouchpadPrefView		Smal
+Touchpad	TouchpadMain		Touchpad

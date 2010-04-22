@@ -1,0 +1,140 @@
+1	dutch	x-vnd.Be-MAIL	3623971781
+%d - Date	Mail		%d - Datum
+Attach attributes:	Mail		Bijvoegen kenmerken:
+Inconsistency occurred in the undo/redo buffer.	Mail		Onregelmatigheid in het herstel- /herhaalbuffer.
+An error occurred trying to save the attachment.	Mail		Fout bij het opslaan van de bijlage.
+Copy to new	Mail		Kopieer naar nieuw
+Edit	Mail		Bewerken
+Print	Mail		Afdrukken
+New mail message	Mail		Nieuw bericht
+Automatically mark mail as read:	Mail		Markeer automatisch als gelezen:
+Colored quotes:	Mail		Quotes in kleur:
+Subject:	Mail		Onderwerp:
+Reply to all	Mail		Beantwoord allen
+Show icons & labels	Mail		Toon iconen & tekst
+Remove attachment	Mail		Verwijder bijlage
+Button bar:	Mail		Knoppenbalk:
+Beginner	Mail		Beginner
+Don't save	Mail		Niet opslaan
+Expert	Mail		Expert
+Reply account:	Mail		Antwoordaccount:
+Discard	Mail		Verwerpen
+Message	Mail		Bericht
+Reply to sender	Mail		Antwoord aan afzender
+There is no installed handler for URL links.	Mail		Toepassing voor het openen van URL links is niet aanwezig.
+Signature	Mail		Onderschrift
+Find again	Mail		Zoek opnieuw
+Bcc:	Mail		Bcc:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Uw hoofdtekst bevat %ld niet-codeerbare tekens. Wellicht werkt een andere letterset beter? Klik op 'Verstuur' om de tekst toch te versturen (een vervangend teken zal dan gebruikt worden op de plaats van elk niet-codeerbaar teken), of kies 'Annuleren' om terug te keren voor een herstelpoging.
+Signature:	Mail		Onderschrift:
+Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nGeschreven door Robert Polic.\nVerrijkt door de Dr. Zoidberg ploeg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Save changes to this signature?	Mail		Veranderingen aan dit onderschrift opslaan?
+Cc:	Mail		Cc:
+Find	Mail		Vind
+Preferences…	Mail		Voorkeuren...
+Undo	Mail		Ongedaan maken
+Leave as New	Mail		Laat als Nieuw
+An error occurred trying to open this signature.	Mail		Er is een fout ontstaan bij het openen van dit onderschift.
+No file attributes, just plain data	Mail		Geen bestandskenmerken, alleen gewone gegevens
+Edit queries…	Mail		Pas zoektermen aan…
+Paste	Mail		Plakken
+Save attachment…	Mail		Bewaar bijlage…
+Include file attributes in attachments	Mail		Maak bestandskenmerken onderdeel van bijlagen
+OK	Mail		OK
+Send	Mail		Verstuur
+Show icons only	Mail		Toon alleen iconen
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Verwijdering van bijlagen uit een doorgestuurd bericht is nog niet geïmplementeerd!\nHet zal nog niet goed werken.
+Hide	Mail		Verberg
+Forward without attachments	Mail		Doorsturen zonder bijlagen
+Previous	Mail		Vorige
+Redo	Mail		Herstel
+Add enclosure…	Mail		Bijlage toevoegen...
+Print…	Mail		Druk af…
+Warn unencodable:	Mail		Waarschuw oncodeerbaar:
+Quit	Mail		Afsluiten
+%n - Full name	Mail		%n - Volledige naam
+ Read 	Mail		Gelezen
+Trash	Mail		Prullenbak
+Default account:	Mail		Standaard-account:
+Size:	Mail		Grootte:
+Account from mail	Mail		Account van mail
+Edit signatures…	Mail		Pas onderschriften aan…
+New	Mail		Nieuw
+Attachments: 	Mail		Bijlagen: 
+Set to %s	Mail		Stel in als  %s
+Forward	Mail		Doorsturen
+E-mail draft could not be saved!	Mail		E-mail concept kon niet bewaard worden!
+To:	Mail		Aan:
+Only files can be added as attachments.	Mail		Alleen bestanden kunnen bijlagen worden.
+Previous message	Mail		Vorig bericht
+Title:	Mail		Titel:
+Find…	Mail		Zoek...
+Accounts…	Mail		Accounts…
+Mail preferences	Mail		Mail-voorkeuren
+Initial spell check mode:	Mail		Aanvankelijke modus spellingcontrole:
+Leave same	Mail		Laat ongewijzigd
+About Mail…	Mail		Over Mail…
+Page setup…	Mail		Pagina-opzet…
+Text wrapping:	Mail		Tekstafbreking:
+Revert	Mail		Ongedaan maken
+File	Mail		Bestand
+None	Mail		Geen
+Copy link location	Mail		Kopieer linklocatie
+Show header	Mail		Toon koptekst
+%e - E-mail address	Mail		%e - E-mailadres
+Resend	Mail		Verstuur opnieuw
+Show raw message	Mail		Toon onbewerkt bericht
+\\n - Newline	Mail		\\n - Nieuweregel
+Start now	Mail		Begin nu
+Close	Mail		Sluit
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		De mail_daemon is niet actief. Dit bericht staat in de wachtrij en wordt verzonden zodra de mail_daemon is gestart.
+Really delete this signature? This cannot be undone.	Mail		Dit onderschrift werkelijk verwijderen? Dit kan niet ongedaan gemaakt worden.
+Open	Mail		Open
+Quote	Mail		Quote
+Add	Mail		Toevoegen
+Next message	Mail		Volgend bericht
+User interface	Mail		Gebruiksinterface
+Cancel	Mail		Annuleren
+Send message	Mail		Verstuur bericht
+Remove enclosure	Mail		Verwijder bijlage
+Account:	Mail		Account:
+Decoding:	Mail		Decoderen:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Sorry, kon geen toepassing vinden die het 'Person' datatype ondersteunt.
+Do you wish to send this message before closing?	Mail		Wilt u dit bericht versturen voor het afsluiten?
+Delete	Mail		Verwijder
+Leave as '%s'	Mail		Behoud als '%s'
+Copy	Mail		Kopieer
+Reply preamble:	Mail		Beantwoord inleiding:
+Signatures	Mail		Onderschriften
+Next	Mail		Volgende
+Set to…	Mail		Stel in als…
+Use default account	Mail		Gebruik standaard-account
+Sorry	Mail		Sorry
+Encoding:	Mail		Coderen:
+Font:	Mail		Lettertype:
+Save address	Mail		Adres opslaan
+Queries	Mail		Zoektermen
+Do you wish to save this message as a draft before closing?	Mail		Wilt u dit bericht als concept opslaan, voor u afsluit?
+Save	Mail		Opslaan
+Random	Mail		Willekeurig
+Close and 	Mail		Sluit en
+Save as draft	Mail		Bewaar als concept
+The mail_daemon could not be started:\n\t	Mail		De mail_daemon kon niet worden gestart:\n\t
+Open attachment	Mail		Open bijlage
+Reply	Mail		Beantwoord
+From:	Mail		Van:
+Couldn't open this signature. Sorry.	Mail		Kon dit onderschrift niet openen. Sorry.
+Open draft	Mail		Open concept
+Cut	Mail		Knippen
+Check spelling	Mail		Controleer spelling
+Set to Saved	Mail		Markeer als Bewaard
+Open this link	Mail		Open deze link
+Auto signature:	Mail		Automatisch onderschrift:
+Add signature	Mail		Onderschrift toevoegen
+Need Tracker to move items to trash	Mail		Tracker is nodig om items naar de Prullenbak te verplaatsen
+Mailing	Mail		Mailverkeer
+Unread	Mail		Ongelezen
+Remove quote	Mail		Quote verwijderen
+Move to trash	Mail		Naar prullenbak verplaatsen
+Select all	Mail		Alles selecteren
+An error occurred trying to save this signature.	Mail		Er is een fout ontstaan tijdens het opslaan van dit onderschrift.

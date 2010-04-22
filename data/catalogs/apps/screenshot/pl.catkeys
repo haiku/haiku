@@ -1,0 +1,19 @@
+1	polish	x-vnd.Haiku-Screenshot	4027877826
+seconds	ScreenshotWindow		sekundy
+Options	ScreenshotWindow		Opcje
+Include window border	ScreenshotWindow		Zawżyj granicę okna
+Back to saving	ScreenshotWindow		Wróć do zapisywania
+Capture active window	ScreenshotWindow		Przechwyć aktywne okno
+screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	zrzut ekranu
+Name:	ScreenshotWindow		Nazwa:
+screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	zrzut ekranu1
+Save screenshot	ScreenshotWindow		Zapisz zrzut ekranu
+Choose folder	ScreenshotWindow		Wybierz folder
+Take screenshot	ScreenshotWindow		Uchwyć zrzut ekranu
+Save	ScreenshotWindow		Zapisz
+Overwrite	ScreenshotWindow		Zastąp
+Retake screenshot	ScreenshotWindow		Ponowny zrzut ekranu
+Choose folder...	ScreenshotWindow		Wybierz folder...
+Please select	ScreenshotWindow		Proszę wybrać
+Save as:	ScreenshotWindow		Zapisz jako:
+Save in:	ScreenshotWindow		Zapisz w:

@@ -1,61 +1,36 @@
-1	ukrainian	x-vnd.Haiku-About	620382499
+1	ukrainian	x-vnd.Haiku-About	3196829578
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (і ядро його NewOS)\n
 %ld Processors:	AboutView		%ld Процесори:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (засновник проекту)\n\n
 The Haiku-Ports team\n	AboutView		Команда Haiku-Ports\n
-Website, marketing & documentation:\n	AboutView		Сайт маркетингу ідокументації:\n
-%s%lld hour	AboutView		%s%lld год.
-... and the many community members making donations!\n\n	AboutView		… і багатьох інших, котрі допомагали!\n\n
-\nPolish\n\n	AboutView		\nПольська\n\n
-\nJapanese\n\n	AboutView		\nЯпонськаi\n\n
-\nFinnish\n\n	AboutView		\nФінськаi\n\n
+Website, marketing & documentation:\n	AboutView		Сайт, маркетинг і документація:\n
 Revision	AboutView		Ревізія
-\nDutch\n\n	AboutView		\nГоландська\n\n
 Source Code: 	AboutView		Код: 
 Processor:	AboutView		Процесор:
 Kernel:	AboutView		Ядро:
-%lld day	AboutView		%lld дні
-\nHungarian\n\n	AboutView		\nУгорська\n\n
-\nGerman\n\n	AboutView		\nНімецька\n\n
 Contributors:\n	AboutView		Співробітники:\n
 Unknown	AboutView		Невідомий
-\nBulgarian\n\n	AboutView		\nБолгарськаi\n\n
-\nPortuguese\n\n	AboutView		\nПортугальська\n\n
-%s%lld minute	AboutView		%s%lld мін.
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… інапевно багатьох інших про кого ми просто не згадали (Вибачте!)\n\n
+... and the many people making donations!\n\n	AboutView		...і багато людей, що зробили внески!\n\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… і напевно багатьох інших, котрих ми забули згадати (Вибачте!)\n\n
 %.2f GHz	AboutView		%.2f GHz
-The BeGeistert team\n\n	AboutView		Команди BeGeistert\n\n
-%s%lld minutes	AboutView		%s%lld мін.
-Memory:	AboutView		Pamięć:
-%s%lld second	AboutView		%s%lld сек.
-Past maintainers:\n	AboutView		Попередні співробітники:\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Код є унікальним для Haiku,особливо ядра системи і додатків, що його супроводжують поширюється за умовами 
+Memory:	AboutView		Пам'ять:
+Google & their Google Summer of Code program\n\n	AboutView		Google і їхня програма Google Summer of Code\n\n
+Past maintainers:\n	AboutView		Попередні розробники:\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Код є унікальним для Haiku,особливо ядро системи і всі коди що додатки можуть використовувати знову поширюються під умовами
 \n\nSpecial thanks to:\n	AboutView		\n\nОсоблива вдячність:\n
-Copyright	Utilities		Авторські права
 Licenses: 	AboutView		Ліцензії: 
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		.Деякі системні бібліотеки містять фрагменти що поширюються під ліцензією LGPL. Авторські права до них можна знайти нижче по тексту.\n\n
-%s%lld seconds	AboutView		%s%lld сек.
-License	Utilities		Licencja
-\nCopyrights\n\n	AboutView		\nАвторські праваn\n
-\nUkrainian\n\n	AboutView		\nУкраїнськаi\n\n
-\nLituanian\n\n	AboutView		\nЛитовська\n\n
-Current maintainers:\n	AboutView		Співробітники:\n
+. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		.Деякі системні бібліотеки містять фрагменти, що поширюються під ліцензією LGPL. Авторські права до них можна знайти нижче по тексту.\n\n
+\nCopyrights\n\n	AboutView		\nАвторські права\n\n
+Current maintainers:\n	AboutView		Розробники:\n
 Time running:	AboutView		Час роботи:
 MIT license	AboutView		ліцензія MIT
-%s%lld hours	AboutView		%s%lld год.
-%lld days	AboutView		%lld днів
-The Haikuware team and their bounty program\n	AboutView		Команди Haikuware і їхніхпрограм bounty\n
-About this system	AboutWindow		Про систему
+The Haikuware team and their bounty program\n	AboutView		Команда Haikuware з їхньою програмою заохочень\n
+About this system	AboutWindow		Про цю систему
 Version:	AboutView		Версія:
-\nRussian\n\n	AboutView		\nРосійська\n\n
-\nItalian\n\n	AboutView		\nІталійська\n\n
-SourceURL	Utilities		Адрес коду
-\nFrench\n\n	AboutView		\nФранцузька\n\n
-\nEsperanto\n\n	AboutView		\nЕсперанто\n\n
-\nSwedish\n\n	AboutView		\nШведська\n\n
+The BeGeistert team\n	AboutView		Команда BeGeistert \n
 %ld MHz	AboutView		%ld MHz
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Авторські права кода Haiku є власністю Haiku, Inc.або авторів що згадуютьсяв коді..\n\n
-[Click a license name to read the respective license.]\n\n	AboutView		[Клікни назву ліцензії, щобїї прочитати.]\n\n
-%d MB total, %d MB used (%d%%)	AboutView		%d MB доступно, %d MB використано (%d%%)
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Авторські права кода Haiku є власністю Haiku, Inc. або відповідних авторів, що відмічено в джерелах.\n\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Клікніть ім'я ліцензії для прочитання її.]\n\n
+%d MB total, %d MB used (%d%%)	AboutView		%d MB разом, %d MB використано (%d%%)
 License: 	AboutView		Ліцензія: 
-Translations:\n	AboutView		Переклад:\n
+Translations:\n	AboutView		Переклади:\n

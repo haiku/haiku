@@ -1,0 +1,43 @@
+1	italian	x-vnd.Haiku-Appearance	3612090060
+Control highlight	Colors tab		Evidenziazione controllo
+Control border	Colors tab		Bordi controllo
+Antialiasing type:	AntialiasingSettingsView		Tipo di antialias:
+Shadow	Colors tab		Ombra
+On	AntialiasingSettingsView		Attivo
+Defaults	APRWindow		Predefiniti
+Grayscale	AntialiasingSettingsView		Scala di grigio
+Shine	Colors tab		Brillantezza
+Off	AntialiasingSettingsView		Disattivo
+Success	Colors tab		Successo
+Inactive window tab text	Colors tab		Testo della linguetta della finestra inattiva
+Failure	Colors tab		Insuccesso
+Hinting menu	AntialiasingSettingsView		Menu suggerimenti
+Document background	Colors tab		Sfondo del documento
+Revert	APRWindow		Ripristina
+Window tab	Colors tab		Linguetta della finestra
+Tooltip background	Colors tab		Sfondo dei suggerimenti
+Selected menu item background	Colors tab		Sfondo della voce selezionata nel menu
+Antialiasing	APRWindow		Antialiasing
+Navigation base	Colors tab		Navigation base
+Window tab text	Colors tab		Testo nella linguetta della finestra
+Document text	Colors tab		Testo del documento
+Navigation pulse	Colors tab		Navigation pulse
+Selected menu item text	Colors tab		Testo della voce selezionata nel menu
+Menu background	Colors tab		Sfondo dei menu
+Appearance	APRWindow		Aspetto
+Panel background	Colors tab		Sfondo del pannello
+Colors	APRWindow		Colori
+Control background	Colors tab		Sfondo del controllo
+Inactive window tab	Colors tab		Linguetta della finestra inattiva
+Reduce colored edges filter strength:	AntialiasingSettingsView		Intensità del filtro di riduzione del bordi colorati:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		L'antialias con sub-pixel in combinazione con l'adattamento del glifo non è disponibile in questa versione di Haiku per evitare possibili problemi dovuti ai brevetti, per attivare questa funzionalità è necessario compilare da soli Haiku e abilitare alcune opzioni nell'intestazione di libfreetype.
+Control text	Colors tab		Testo del controllo
+Tooltip text	Colors tab		Testo del suggerimento
+Menu item text	Colors tab		Testo della voce dei menu
+LCD subpixel	AntialiasingSettingsView		Sub-pixel LCD
+Selected menu item border	Colors tab		Bordo della voce selezionata nel menu
+Strong	AntialiasingSettingsView		Forte
+Panel text	Colors tab		Testo del pannello
+Monospaced fonts only	AntialiasingSettingsView		Solo font con spaziatura fissa
+Antialiasing menu	AntialiasingSettingsView		Menu antialias
+Glyph hinting:	AntialiasingSettingsView		Adattamento glifo:

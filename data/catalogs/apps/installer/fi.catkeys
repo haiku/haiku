@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	3609821010
+1	finnish	x-vnd.Haiku-Installer	4246631894
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Oletko varma, että haluat keskeyttää asennuksen ja käynnistää järjestelmän uudelleen?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Asennusohjelma\n\ttekijä: Jérôme Duval ja Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Alkulataussektori kirjoitettiin kohteeseen '%s'. Jätä asennusohjelma painamalla Poistu-painiketta tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
@@ -63,4 +63,5 @@ Try installing anyway	InstallProgress		Yritä asentaa kaikesta huolimatta
 Are you sure you want to to stop the installation?	InstallerWindow		Oletko varma, että haluat pysäyttää asennuksen?
 Writes the Haiku boot code to the partition start\nsector. This step is automatically performed by\nthe installation, but you can manually make a\npartition bootable in case you do not need to\nperform an installation.	InstallerWindow		Kirjoittaa Haiku-alkukäynnistys-\nsektorin. Asennus suorittaa tämän askeleen\nautomaattisesti, mutta voit manuaalisesti tehdä\nosion alkulatausosioksi siinä tapauksessa, että\nasennusta ei tarvitse suorittaa.
 Onto:	InstallerWindow		Kohteeseen:
+The mount point could not be retrieved.	InstallProgress		Liittämispistettä ei voitu noutaa.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Kohdetaltio ei ole tyhjä. Oletko varma, että haluat asentaa siitä huolimatta?\n\nHuomaa: 'system'-kansio on oleva puhdas kopio lähdetaltiolta, kaikki muut kansiot yhdistetään, kun taas tiedostot ja linkit, jotka esiintyvät sekä lähde- että kohdetaltiolla korvataan lähdetaltion versiolla.

@@ -1,0 +1,122 @@
+1	finnish	x-vnd.Haiku-FileTypes	4169608688
+Display as:	Attribute Window		Näytä nimellä:
+Args only	Application Type Window		Vain argumentit
+Add group	New File Type Window		Lisää ryhmä
+Remove	Application Type Window		Poista
+Select same type as	FileType Window		Valitse sama tyyppi nimellä
+Remove icon	Icon View		Poista kuvake
+Supported types	Application Type Window		Tuetut tyypit
+Internal name:	New File Type Window		Sisäinen nimi:
+Could not open file \"%s\": %s\n	FileTypes		Ei voitu avata tiedostoa \"%s\": %s\n
+New file type	New File Type Window		Uusi tiedostotyyppi
+Add icon…	Icon View		Lisää kuvake…
+FileTypes Request	FileType Window		Tiedostotyyppien pyynnöt
+Do you want to save the changes?	Application Type Window		Haluatko tallentaa muutokset?
+Multiple files from \"	FileType Window		Useita tiedostoja kohteesta \"
+File type	FileType Window		Tiedostotyyppi
+Could not change attributes	Attribute Window		Ei voitu muuttaa attribuutteja
+Show icons in list	FileType Window		Näytä kuvakkeet luettelossa
+Cancel	TypeListWindow		Peru
+Ok	FileTypes		Valmis
+File	FileType Window		Tiedosto
+Recognition rule is not valid:\n\n	FileType Window		Tunnistussääntö ei ole kelvollinen:\n\n
+This file type already exists.	New File Type Window		Tämä tiedostotyyppi on jo olemassa.
+Save	Application Type Window		Tallenna
+Show recognition rule	FileType Window		Näytä tunnistussääntö
+Add	Extension Window		Lisää
+Select same preferred application as	FileType Window		Valitse sama ensisijainen sovellus nimellä
+Cancel	Attribute Window		Peru
+Multiple launch	Application Type Window		Useita käynnistymisiä
+Group:	New File Type Window		Ryhmä:
+Done	Extension Window		Valmis
+Attribute	Attribute Window		Attribuutti
+Extra attributes	FileType Window		Lisäattribuutit
+Could not open file	FileType Window		Ei voitu avata tiedostoa
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileType Window		Kantatyypin poistoa ei voida perua.\nKaikki tähän kantatyyppiin kuuluvat tiedostotyypit kadotetaan!\n\nOletko varma, että haluat tehdä tämän? Koko ryhmän poistamiseksi, pidä alhaalla vaihtonäppäin ja paina \"Poista\".
+Group name:	New File Type Window		Ryhmänimi:
+Could not retrieve preferred application of this file.	Preferred App Menu		Ei voitu noutaa tämän tiedoston ensisijaista sovellusta.
+Preferred application	FileType Window		Ensisijainen sovellus
+Quit	FileType Window		Poistu
+no icon	FileType Window		ei kuvaketta
+File recognition	FileType Window		Tiedostotunnistus
+Same as…	FileType Window		Sama nimellä…
+File	Application Type Window		Tiedosto
+Version:	Application Type Window		Versio:
+FileTypes request	FileTypes		Tiedostotyyppien pyyntö
+Select…	FileType Window		Valitse…
+Description:	FileType Window		Kuvaus:
+Right	Attribute Window		Oikea
+Internal name:	FileType Window		Sisäinen nimi:
+None	FileType Window		Ei mikään
+Development	Application Type Window		Kehitys
+Icon	FileType Window		Kuvake
+Special:	Attribute Window		Erityinen:
+Alpha	Application Type Window		Alfa
+Signature:	Application Type Window		Allekirjoitus:
+Done	TypeListWindow		Valmis
+Quit, don't save	Application Type Window		Poistu, älä tallenna
+Add…	Application Type Window		Lisää…
+Type name:	FileType Window		Tyyppinimi:
+(from application)	FileType Window		(sovelluksesta)
+Select preferred application	FileType Window		Valitse ensisijainen sovellus
+Single launch	Application Type Window		Yksittäiskäynnistys
+Could not retrieve application signature.	Preferred App Menu		Ei voitu noutaa sovellusallekirjoitusta.
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Sovellus \"%s\" ei tue tätä tiedostotyyppiä.\nOletko varma, että haluat silti asettaa sen?
+Type:	Attribute Window		Tyyppi:
+Done	Attribute Window		Valmis
+Set Preferred Application	Preferred App Menu		Aseta ensisijainen sovellus
+Background app	Application Type Window		Taustasovellus
+Add new group	New File Type Window		Lisää uusi ryhmä
+Add…	FileType Window		Lisää…
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileType Window		Tiedostotyyppin poistoa ei voida perua.\nOletko varma, että haluat poistaa sen?
+Rule:	FileType Window		Sääntö:
+Cancel	Application Type Window		Peru
+Cancel	New File Type Window		Peru
+Extension:	Extension Window		Tiedostotarkennin:
+Add	Attribute Window		Lisää
+Close	Application Type Window		Sulje
+Open…	FileType Window		Avaa…
+Golden master	Application Type Window		Golden master -viitemalli
+Could not open \"%s\":\n%s	FileTypes		Ei voitu avata \"%s\":\n%s
+Alignment:	Attribute Window		Tasaus:
+Cancel	Extension Window		Peru
+Could not remove file type: %s\n	FileType Window		Ei voitu poistaa tiedostotyyppiä: %s\n
+Remove	FileType Window		Poista
+Application flags	Application Type Window		Sovellusliput
+FileTypes\n\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		FileTypes\n\ttekijä: Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+Editable	Attribute Window		Muokattava
+Width:	Attribute Window		Leveys:
+Choose type	TypeListWindow		Valitse tyyppi
+Save request	Application Type Window		Tallenna pyyntö
+Cancel	FileType Window		Peru
+Beta	Application Type Window		Beeta
+Extensions:	FileType Window		Tiedostotarkentimet:
+About FileTypes…	FileType Window		FileTypes-ohjelmasta…
+Attribute name:	Attribute Window		Attribuuttinimi:
+Extension	Extension Window		Laajennus
+Add type	New File Type Window		Lisää tyyppi
+[Multiple files]	FileType Window		[Useita tiedostoja]
+Could not set preferred application	FileType Window		Ei voitu asettaa ensisijaista sovellusta
+Internal name:	Attribute Window		Sisäinen nimi:
+Final	Application Type Window		Lopullinen
+Open File	FileTypes		Avaa tiedosto
+Settings	FileType Window		Asetukset
+New resource file…	FileType Window		Uusi resurssitiedosto…
+Exclusive launch	Application Type Window		Yksinomainen käynnistys
+Gamma	Application Type Window		Gamma
+Default application	FileType Window		Oletussovellus
+Long description:	Application Type Window		Pitkä kuvaus:
+Application types…	FileType Window		Sovellustyypit…
+(from super type)	FileType Window		(kantatyypistä)
+Description	FileType Window		Kuvaus
+Version info	Application Type Window		Versiotiedot
+Center	Attribute Window		Keskitä
+Short description:	Application Type Window		Lyhyt kuvaus:
+File could not be opened	Preferred App Menu		Tiedostoa ei voitu avata
+Could not change file extensions	Extension Window		Ei voitu vaihtaa tiedostotarkentimia
+Edit icon…	Icon View		Muokkaa kuvaketta…
+Save into resource file…	Application Type Window		Tallenna resurssitiedostoon…
+Left	Attribute Window		Vasen
+Visible	Attribute Window		Näkyvä
+Could not install file type	New File Type Window		Ei voitu asentaa tiedostotyyppiä
+Application Type	Application Type Window		Sovellustyyppi

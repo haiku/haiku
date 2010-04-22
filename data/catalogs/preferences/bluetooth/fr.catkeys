@@ -1,12 +1,12 @@
 1	french	x-vnd.Haiku-BluetoothPrefs	3840151416
 About Bluetooth…	Window		À propos de Bluetooth…
 Handheld	Settings view		Appareil de poche
-Default inquiry time:	Settings view		Temps de requête par défaut:
+Default inquiry time:	Settings view		Temps de requête par défaut :
 Add device to list	Inquiry panel		Ajouter l'appareil à la liste
 Starting scan...	Inquiry panel		Démarrage de la recherche...
 Show bluetooth console…	Window		Montrer le terminal bluetooth…
 Smart phone	Settings view		Téléphone
- seconds	Inquiry panel		 secondes
+ seconds	Inquiry panel		secondes
 Server	Settings view		Serveur
 Stop bluetooth services…	Window		Arrêter les services bluetooth…
 Identify host as:	Settings view		Identifier l'hôte comme :
@@ -41,7 +41,7 @@ Laptop	Settings view		Portable
 Retrieving name of 	Inquiry panel		Récupérer le nom de
 Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Découvrable
-Service classes: 	Device View		Classes de services:
+Service classes: 	Device View		Classes de services :
 Connections & channels…	Window		Liste des canaux et connexions…
 Refresh LocalDevices…	Window		Rafraîchir les LocalDevices…
 Settings	Window		Paramètres

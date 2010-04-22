@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-StyledEdit	1909738892
+1	finnish	x-vnd.Haiku-StyledEdit	2750476595
 Paste	Menus		Liitä
 OK	LoadAlert		Valmis
 File	Menus		Tiedosto
@@ -15,6 +15,7 @@ Replace same	Menus		Korvaa sama
 Can't undo	Menus		Ei voi perua
 Save	Menus		Tallenna
 Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
+Cancel	SaveAlert		Peru
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: \"%s\".
 Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
 Green	Menus		Vihreä
@@ -32,6 +33,7 @@ Font	Menus		Kirjasin
 Replace all	FindandReplaceWindow		Korvaa kaikki
 Default	Open_and_SaveAsPanel		Oletus
 Cancel	FindandReplaceWindow		Peru
+Save	SaveAlert		Tallenna
 Close	Menus		Sulje
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa \"%s\":\n\tTukematon muoto
 OK	RevertToSavedAlert		Valmis
@@ -57,7 +59,9 @@ Find again	Menus		Hae uudelleen
 Cancel	QuitAlert		Peru
 Find…	Menus		Hae…
 Select all	Menus		Valitse kaikki
+Don't save	SaveAlert		Älä tallenna
 Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa \"%s\":\n\t%s
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan \"%s\"? 
 Black	Menus		Musta
 Untitled 	StyledEditWindow		Otsikoton 
 OK	SaveAlert		Valmis

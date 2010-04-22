@@ -1,0 +1,38 @@
+1	korean	x-vnd.Be-PSRV	2376709688
+Undefined	ConfigWindow		이름없음
+A5	ConfigWindow		A5
+Cancel	PrintServerApp		취소
+copies	ConfigWindow		매수
+Legal	ConfigWindow		리걸
+A2	ConfigWindow		A2
+to	ConfigWindow		까지
+Page setup:	ConfigWindow		페이지 설정:
+OK	ConfigWindow		확인
+Cancel	ConfigWindow		취소
+Yes	PrintServerApp		예
+Would you like to set one up now?	PrintServerApp		지금 하나를 설정하시겠습니까?
+Portrait	ConfigWindow		세로
+All pages	ConfigWindow		모든 페이지
+There is no default printer set up.	PrintServerApp		설정된 기본 프린터가 없습니다.
+Tabloid	ConfigWindow		타블로이드
+There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		당신이 추가하고자 하는 프린터가 이미 존재합니다, 하지만 드라이버를 찾을 수 없습니다! 바꾸겠습니까?
+A4	ConfigWindow		A4
+Printer:	ConfigWindow		프린터:
+Select a printer	ConfigWindow		프린터 선택
+A1	ConfigWindow		A1
+No	PrintServerApp		아니오
+B5	ConfigWindow		B5
+Landscape	ConfigWindow		가로
+There are no printers set up.	PrintServerApp		설정된 프린터가 없습니다.
+Page	ConfigWindow		페이지
+Ledger	ConfigWindow		장부크기
+Letter	ConfigWindow		편지지
+There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		당신이 추가하고자 하는 프린터가 이미 존재합니다, 하지만  사용할 수 없습니다! 바꾸겠습니까?
+A0	ConfigWindow		A0
+A6	ConfigWindow		A6
+A3	ConfigWindow		A3
+OK	PrintServerApp		확인
+Print setup	ConfigWindow		프린터 설정
+Would you like to make @ the default printer?	PrintServerApp		@를 기본 프린터로 만들겠습니까?
+Page setup	ConfigWindow		페이지 설정
+Paper setup:	ConfigWindow		용지 설정:

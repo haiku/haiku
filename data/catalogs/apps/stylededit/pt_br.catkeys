@@ -1,2 +1,12 @@
-1		x-vnd.Haiku-StyledEdit	0
-
+1	brazilian portuguese	x-vnd.Haiku-StyledEdit	1280399445
+Paste	Menus		Colar
+Search backwards	FindandReplaceWindow		Localizar anterior
+Redo typing	Menus		Refazer digitação
+Replace same	Menus		Substituir tudo
+Replace with:	FindandReplaceWindow		Substituir por:
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".
+Revert to saved…	Menus		Reverter para arquivo salvo...
+Save changes to the document \"%s\"? 	QuitAlert		Salvar as alterações ao documento \"%s\"? 
+Find selection	Menus		Localizar seleção
+Error saving \"%s\":\n%s	SaveAlert		Erro ao salvar \"%s\":\n%s
+Undo typing	Menus		Desfazer digitação

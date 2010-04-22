@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-Keymap	4175672673
 Tilde trigger	Keymap window		Тільда
 Grave trigger	Keymap window		Апостроф
-Select dead keys	Keymap window		Неіснуючі кнопки
+Select dead keys	Keymap window		Модифікатори
 Quit	Keymap window		Вихід
 Switch shortcut keys to Haiku mode	Keymap window		Перемикати швидкі кнопки як у Haiku
 Circumflex trigger	Keymap window		Ціркумфлекс

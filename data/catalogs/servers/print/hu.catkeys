@@ -1,0 +1,38 @@
+1	hungarian	x-vnd.Be-PSRV	2376709688
+Undefined	ConfigWindow		Nem meghatározott
+A5	ConfigWindow		A5
+Cancel	PrintServerApp		Mégsem
+copies	ConfigWindow		másolatok
+Legal	ConfigWindow		Legal
+A2	ConfigWindow		A2
+to	ConfigWindow		ide
+Page setup:	ConfigWindow		Oldalbeállítás:
+OK	ConfigWindow		Rendben
+Cancel	ConfigWindow		Mégsem
+Yes	PrintServerApp		Igen
+Would you like to set one up now?	PrintServerApp		Szeretne beállítani egyet most?
+Portrait	ConfigWindow		Álló
+All pages	ConfigWindow		Összes oldal
+There is no default printer set up.	PrintServerApp		Nincs beállítva alapértelmezett nyomtató.
+Tabloid	ConfigWindow		Tabloid
+There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Már létezik olyan nyomtató, amilyet létre szeretne hozni, de ahhoz nem található meghajtóprogram. Lecseréli?
+A4	ConfigWindow		A4
+Printer:	ConfigWindow		Nyomtató:
+Select a printer	ConfigWindow		Válasszon nyomtatót!
+A1	ConfigWindow		A1
+No	PrintServerApp		Nem
+B5	ConfigWindow		B5
+Landscape	ConfigWindow		Fekvő
+There are no printers set up.	PrintServerApp		Nincs beállítva nyomtató.
+Page	ConfigWindow		Oldal
+Ledger	ConfigWindow		Ledger
+Letter	ConfigWindow		Levél
+There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Már létezik olyan nyomtató, amilyet létre szeretne hozni, de az nem használható! Lecseréli?
+A0	ConfigWindow		A0
+A6	ConfigWindow		A6
+A3	ConfigWindow		A3
+OK	PrintServerApp		Rendben
+Print setup	ConfigWindow		Nyomtatási beállítások
+Would you like to make @ the default printer?	PrintServerApp		Szeretné, ha @ lenne az alapértelmezett nyomtató?
+Page setup	ConfigWindow		Oldalbeállítás
+Paper setup:	ConfigWindow		Papír tulajdonságai:

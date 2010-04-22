@@ -1,0 +1,44 @@
+1	japanese	x-vnd.Be-TSKB	3714198408
+Edit menu…	PreferencesWindow		メニューの編集…
+Applications	PreferencesWindow		アプリケーション
+24 hour clock	PreferencesWindow		24時間表記
+Recent documents:	PreferencesWindow		最近使ったドキュメント
+Recent folders	BeMenu		最近開いたフォルダー
+Sort running applications	PreferencesWindow		アルファベット順に並び換える
+Recent applications	BeMenu		最近使ったアプリケーション
+Change time…	TimeView		日付と時刻の設定…
+<Be folder is empty>	BeMenu		<Haiku メニューフォルダーは空です>
+Window	PreferencesWindow		ウィンドウ
+Menu	PreferencesWindow		メニュー
+Show seconds	PreferencesWindow		時刻に秒を表示
+Always on top	PreferencesWindow		常に手前に
+Show all	WindowMenu		すべてを表示
+No windows	WindowMenu		ウィンドウ無し
+Power off	BeMenu		電源を切る
+Auto-raise	PreferencesWindow		マウスオーバーで手前に
+Full date	PreferencesWindow		長い日付形式
+Hide time	TimeView		時刻を隠す
+Recent folders:	PreferencesWindow		最近開いたフォルダー
+Deskbar preferences…	BeMenu		Deskbarの設定…
+Show application expander	PreferencesWindow		エキスパンダーを表示
+Close all	WindowMenu		すべて閉じる
+Deskbar preferences	PreferencesWindow		Deskbarの設定
+Mount	BeMenu		マウント
+European date	PreferencesWindow		ヨーロッパ日付形式
+Recent applications:	PreferencesWindow		最近使ったアプリケーション
+Tracker always first	PreferencesWindow		Trackerを先頭に表示
+About Haiku…	BeMenu		Haikuについて…
+Show calendar…	TimeView		カレンダーの表示…
+Restart system	BeMenu		再起動
+Find…	BeMenu		検索…
+Restart Tracker	BeMenu		Trackerを実行
+Show Time	Tray		時刻を表示する
+Expand new applications	PreferencesWindow		アプリケーション起動時展開表示
+Clock	PreferencesWindow		日付と時刻
+Recent documents	BeMenu		最近使ったドキュメント
+Hide all	WindowMenu		全てを隠す
+Shutdown…	BeMenu		システムの終了…
+Suspend	BeMenu		サスペンド
+Quit application	WindowMenu		アプリケーションを終了
+About this system…	BeMenu		このシステムについて…
+Show replicants	BeMenu		レプリカントを表示

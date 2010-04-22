@@ -1,2 +1,140 @@
-1		x-vnd.Be-MAIL	0
-
+1	brazilian portuguese	x-vnd.Be-MAIL	3623971781
+%d - Date	Mail		%d - Data
+Attach attributes:	Mail		Anexar Atributos:
+Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Desfazer/Refazer.
+An error occurred trying to save the attachment.	Mail		Ocorreu um erro ao tentar salvar o anexo.
+Copy to new	Mail		Copiar para Novo
+Edit	Mail		Editar
+Print	Mail		Imprimir
+New mail message	Mail		Nova mensagem de E-Mail
+Automatically mark mail as read:	Mail		Automaticamente marcar como e-mail como lido
+Colored quotes:	Mail		Citações Coloridas:
+Subject:	Mail		Assunto:
+Reply to all	Mail		Responder a todos
+Show icons & labels	Mail		Mostrar ícones e legendas
+Remove attachment	Mail		Remover anexo
+Button bar:	Mail		Barra de botões:
+Beginner	Mail		Principiante
+Don't save	Mail		Não salvar
+Expert	Mail		Experiente
+Reply account:	Mail		Conta de resposta:
+Discard	Mail		Rejeitar
+Message	Mail		Mensagem
+Reply to sender	Mail		Responder ao remetente
+There is no installed handler for URL links.	Mail		Não existe nenhum programa instalado para abrir hiperlinks
+Signature	Mail		Assinatura
+Find again	Mail		Localizar próximo
+Bcc:	Mail		Bcc:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O seu texto principal contém %ld caracteres incodificáveis. Talvez um conjunto de caracteres novos funcionará melhor? Clique em Enviar para enviar de qualquer modo (um caractere alternativo será usado em vez dos incodificáveis), ou escolha Cancelar para voltar e tentar corrigir o problema.
+Signature:	Mail		Assinatura:
+Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nEscrito por Robert Polic.\nMelhorado pela turma do Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Save changes to this signature?	Mail		Salvar alterações feitas a esta assinatura?
+Cc:	Mail		Cc:
+Find	Mail		Localizar
+Preferences…	Mail		Preferências…
+Undo	Mail		Desfazer
+Leave as New	Mail		Marcar como Nova
+An error occurred trying to open this signature.	Mail		Ocorreu um erro ao tentar abrir esta assinatura.
+No file attributes, just plain data	Mail		Sem Atributos de BeOS, apenas dados simples
+Edit queries…	Mail		Editar consultas...
+Paste	Mail		Colar
+Save attachment…	Mail		Salvar anexo...
+Include file attributes in attachments	Mail		Incluir atributos do BeOS nos anexos
+OK	Mail		OK
+Send	Mail		Enviar
+Show icons only	Mail		Mostrar ícones apenas
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Remover anexos de um email encaminhado não foi implementado!\nEntão não irá funcionar corretamente,
+Hide	Mail		Ocultar
+Forward without attachments	Mail		Reencaminhar sem anexos
+Previous	Mail		Anterior
+Redo	Mail		Refazer
+Add enclosure…	Mail		Adicionar anexo...
+Print…	Mail		Imprimir...
+Warn unencodable:	Mail		Aviso incodificável:
+Quit	Mail		Sair
+%n - Full name	Mail		%n - Nome completo
+ Read 	Mail		Lida
+Trash	Mail		Lixeira
+Default account:	Mail		Conta predefenida:
+Size:	Mail		Tamanho:
+Account from mail	Mail		Conta de e-mail
+Edit signatures…	Mail		Editar assinaturas...
+New	Mail		Novo
+Attachments: 	Mail		Anexos:
+Set to %s	Mail		Defenir como %s
+Forward	Mail		Encaminhar
+E-mail draft could not be saved!	Mail		Não foi possível salvar o rascunho!
+To:	Mail		Para:
+Only files can be added as attachments.	Mail		Apenas arquivos podem ser adicionados como anexos.
+Previous message	Mail		Mensagem anterior
+Title:	Mail		Título:
+Find…	Mail		Localizar..
+Accounts…	Mail		Contas...
+Mail preferences	Mail		Preferências de E-Mail
+Initial spell check mode:	Mail		Modo de correcção ortográfica inicial:
+Leave same	Mail		Deixar a mesma
+About Mail…	Mail		Sobre o Mail...
+Page setup…	Mail		Configurar página...
+Text wrapping:	Mail		Moldagem do texto
+Revert	Mail		Reverter
+File	Mail		Arquivo
+None	Mail		Nenhum
+Copy link location	Mail		Copiar endereço do link
+Show header	Mail		Mostrar cabeçalho
+%e - E-mail address	Mail		%e - Endereço de E-mail
+Resend	Mail		Reenviar
+Show raw message	Mail		Mostrar mensagem não processada
+\\n - Newline	Mail		\\n - Nova linha
+Start now	Mail		Começar agora
+Close	Mail		Fechar
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		O mail_daemon não está sendo executado. Esta mensagem estará em espera e será enviada quando o mail_daemon for iniciado.
+Really delete this signature? This cannot be undone.	Mail		Quer mesmo apagar esta assinatura? Isto não pode ser desfeito.
+Open	Mail		Abrir
+Quote	Mail		Citar
+Add	Mail		Adicionar
+Next message	Mail		Mensagem seguinte
+User interface	Mail		Interface do usuário
+Cancel	Mail		Cancelar
+Send message	Mail		Enviar mensagem
+Remove enclosure	Mail		Remover anexo
+Account:	Mail		Conta:
+Decoding:	Mail		Descodificar:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Desculpe, não foi possível encontrar um programa que possa abri o tipo de dados do 'Person'.
+Do you wish to send this message before closing?	Mail		Quer enviar esta mensagem antes de fechá-la?
+Delete	Mail		Deletar
+Leave as '%s'	Mail		Deixar como '%s'
+Copy	Mail		Copiar
+Reply preamble:	Mail		Sumário da resposta:
+Signatures	Mail		Assinaturas
+Next	Mail		Próximo
+Set to…	Mail		Definir como...
+Use default account	Mail		Usar conta padrão
+Sorry	Mail		Desculpe
+Encoding:	Mail		Codificação:
+Font:	Mail		Fonte:
+Save address	Mail		Salvar endereço
+Queries	Mail		Consultas
+Do you wish to save this message as a draft before closing?	Mail		Você deseja salvar esta mensagem como rascunho antes de fechá-la?
+Save	Mail		Salvar
+Random	Mail		Aleatório
+Close and 	Mail		Fechar e
+Save as draft	Mail		Salvar como rascunho
+The mail_daemon could not be started:\n\t	Mail		O mail_daemon não pôde ser iniciado:\n\t
+Open attachment	Mail		Abrir anexo
+Reply	Mail		Responder
+From:	Mail		De:
+Couldn't open this signature. Sorry.	Mail		Desculpe, não foi possível abrir esta assinatura.
+Open draft	Mail		Abrir rascunho
+Cut	Mail		Recortar
+Check spelling	Mail		Verificar ortografia
+Set to Saved	Mail		Defenir como salvo
+Open this link	Mail		Abrir este link
+Auto signature:	Mail		Assinatura automática:
+Add signature	Mail		Adicionar assinatura
+Need Tracker to move items to trash	Mail		O Tracker é necessário para mover os items para a lixeira
+Mailing	Mail		Correio eletrônico
+Unread	Mail		Não lida
+Remove quote	Mail		Remover citação
+Move to trash	Mail		Mover para a lixeira
+Select all	Mail		Selecionar tudo
+An error occurred trying to save this signature.	Mail		Ocorreu um erro ao tentar salvar esta assinatura.

@@ -1,50 +1,33 @@
-1	hungarian	x-vnd.Haiku-About	840233859
+1	hungarian	x-vnd.Haiku-About	3196829578
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (és az ő NewOS kernele)\n
 %ld Processors:	AboutView		%ld Processzor:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektalapító)\n\n
 The Haiku-Ports team\n	AboutView		A Haiku-átírási csapat\n
 Website, marketing & documentation:\n	AboutView		Weboldal, marketing és dokumentáció:\n
-... and the many community members making donations!\n\n	AboutView		... és a rengeteg közösségi résztvevőnek, akik adományoztak nekünk!\n\n
-\nPolish\n\n	AboutView		\nLengyel\n\n
-\nJapanese\n\n	AboutView		\nJapán\n\n
-\nFinnish\n\n	AboutView		\nFinn\n\n
 Revision	AboutView		Kiadás
-\nDutch\n\n	AboutView		\nHolland\n\n
 Source Code: 	AboutView		Forráskód: 
 Processor:	AboutView		Processzor:
 Kernel:	AboutView		Kernel:
-\nHungarian\n\n	AboutView		\nmagyar\n\n
-\nGerman\n\n	AboutView		\nNémet\n\n
 Contributors:\n	AboutView		Közreműködők:\n
 Unknown	AboutView		Ismeretlen
-\nBulgarian\n\n	AboutView		\nBolgár\n\n
-\nPortuguese\n\n	AboutView		\nPortugál\n\n
+... and the many people making donations!\n\n	AboutView		... és a sok, adományokkal segítő ember!\n\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… és talán még annak a sok embernek, akiket elfelejtettünk megemlíteni (elnézést!)\n\n
 %.2f GHz	AboutView		%.2f GHz
-The BeGeistert team\n\n	AboutView		A BeGeistert csapat\n\n
 Memory:	AboutView		Memória:
+Google & their Google Summer of Code program\n\n	AboutView		Google és a Google Summer of Code programja\n\n
 Past maintainers:\n	AboutView		Régebbi karbantartók:\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Az a kód, mely a Haikuban egyedülálló (különösképpen a kernel és az összes kód, mely az alkalmazásokkal kapcsolódik), az a következő licenc alatt van terjesztve:
 \n\nSpecial thanks to:\n	AboutView		\n\nKülön köszönet:\n
-Copyright	Utilities		Copyright
 Licenses: 	AboutView		Licencek: 
 . Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Néhány rendszerfüggvény-könyvtár harmadik személytől származó, LGPL-licenc alatt terjesztett kódból tevődik össze. A harmadik személyű kódhoz tartozó szerzői jogokat az alábbiakban tekintheti meg.\n\n
-License	Utilities		Licenc
 \nCopyrights\n\n	AboutView		\nSzerzői jogok\n\n
-\nUkrainian\n\n	AboutView		\nUkrán\n\n
-\nLituanian\n\n	AboutView		\nlitván\n\n
 Current maintainers:\n	AboutView		Jelenleg karbantartók:\n
 Time running:	AboutView		Ennyi ideje fut:
 MIT license	AboutView		MIT licenc
 The Haikuware team and their bounty program\n	AboutView		A Haikuware csapata és az adományprogramjuk\n
 About this system	AboutWindow		A futó rendszerről
 Version:	AboutView		Verzió:
-\nRussian\n\n	AboutView		\nOrosz\n\n
-\nItalian\n\n	AboutView		\nOlasz\n\n
-SourceURL	Utilities		ForrásURL
-\nFrench\n\n	AboutView		\nFancia\n\n
-\nEsperanto\n\n	AboutView		\nEszperantó\n\n
-\nSwedish\n\n	AboutView		\nSvéd\n\n
+The BeGeistert team\n	AboutView		A BeGeistert csapat\n
 %ld MHz	AboutView		%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		A Haiku kódjához tartozó szerzői jog a Haiku, Inc. tulajdona vagy a hozzátartozó készítőké, ahol az a forrásban jelezve van.\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Kattintson rá a licenc nevére az adott licenc megjelenítéséhez.]\n\n

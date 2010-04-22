@@ -1,0 +1,68 @@
+1	hungarian	x-vnd.Haiku-StyledEdit	1909738892
+Paste	Menus		Beillesztés
+OK	LoadAlert		Rendben
+File	Menus		Fájl
+???	LoadAlert		???
+Left	Menus		Bal
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Visszaállítja a(z) \"%s\" legutolsó verzióját? 
+Search backwards	FindandReplaceWindow		Keresés visszafelé
+Size	Menus		Méret
+Save	QuitAlert		Mentés
+Page setup…	Menus		Oldalbeállítás…
+Redo typing	Menus		Írás ismétlése
+Print…	Menus		Nyomtatás…
+Replace same	Menus		Azonosat cserélje
+Can't undo	Menus		Nem vonható vissza
+Save	Menus		Mentés
+Replace with:	FindandReplaceWindow		Csere erre:
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, \"%s\" fájl nem található.
+Case-sensitive	FindandReplaceWindow		Kis- és nagybetűérzékeny
+Green	Menus		Zöld
+Revert to saved…	Menus		Vissza a mentett állapotra…
+Yellow	Menus		Sárga
+Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
+Wrap lines	Menus		Sortörés
+Quit	Menus		Kilépés
+Cancel	RevertToSavedAlert		Mégsem
+Document	Menus		Dokumentum
+Clear	Menus		Törlés
+Save changes to the document \"%s\"? 	QuitAlert		Menti a(z) \"%s\" változtatásait? 
+Edit	Menus		Szerkesztés
+Font	Menus		Betűtípus
+Replace all	FindandReplaceWindow		Mindet cseréli
+Default	Open_and_SaveAsPanel		Alapértelmezés
+Cancel	FindandReplaceWindow		Mégsem
+Close	Menus		Bezár
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Hiba a(z) \"%s\" betöltése közben:\n\tA formátum nem támogatott
+OK	RevertToSavedAlert		Rendben
+Don't save	QuitAlert		Ne mentse
+Align	Menus		Igazítás
+Color	Menus		Szín
+Red	Menus		Vörös
+Open…	Menus		Megnyitás…
+Center	Menus		Középre
+Blue	Menus		Kék
+Cyan	Menus		Cián
+Magenta	Menus		Bíbor
+New	Menus		Új
+Wrap-around search	FindandReplaceWindow		Keresés innentől
+Find selection	Menus		Keresés a kijelölésben
+Find:	FindandReplaceWindow		Keresés:
+Error saving \"%s\":\n%s	SaveAlert		Hiba történt mentés közben \"%s\":\n%s
+Copy	Menus		Másol
+Cut	Menus		Kivágás
+Replace	FindandReplaceWindow		Cserél
+Undo typing	Menus		Írás visszavonása
+Find again	Menus		Ismételt keresés
+Cancel	QuitAlert		Mégsem
+Find…	Menus		Keresés…
+Select all	Menus		Mind kijelöl
+Error loading \"%s\":\n\t%s	LoadAlert		Hiba történt betöltés közben \"%s\":\n\t%s
+Black	Menus		Fekete
+Untitled 	StyledEditWindow		Névtelen
+OK	SaveAlert		Rendben
+Find	FindandReplaceWindow		Keresés
+Encoding	Open_and_SaveAsPanel		Kódolás
+Save as…	Menus		Mentés másként…
+Replace…	Menus		Csere…
+Right	Menus		Jobb

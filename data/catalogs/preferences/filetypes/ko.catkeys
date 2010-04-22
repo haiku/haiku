@@ -1,0 +1,122 @@
+1	korean	x-vnd.Haiku-FileTypes	4169608688
+Display as:	Attribute Window		보여주기:
+Args only	Application Type Window		오직 매개변수만 사용
+Add group	New File Type Window		그룹 추가
+Remove	Application Type Window		제거
+Select same type as	FileType Window		같은 형식 선택
+Remove icon	Icon View		아이콘 제거
+Supported types	Application Type Window		지원하는 형식
+Internal name:	New File Type Window		내부 이름:
+Could not open file \"%s\": %s\n	FileTypes		파일 \"%s\" 를 열 수 없음: %s\n
+New file type	New File Type Window		새 파일 형식
+Add icon…	Icon View		아이콘 더하기…
+FileTypes Request	FileType Window		파일 형식이 요구됨
+Do you want to save the changes?	Application Type Window		바뀐 것을 저장하겠습니까?
+Multiple files from \"	FileType Window		여러 파일로부터 \"
+File type	FileType Window		파일 형식
+Could not change attributes	Attribute Window		속성을 바꿀 수 없음
+Show icons in list	FileType Window		목록에 아이콘 보이기
+Cancel	TypeListWindow		취소
+Ok	FileTypes		확인
+File	FileType Window		파일
+Recognition rule is not valid:\n\n	FileType Window		인식 규칙이 유효하지 않습니다:\n\n
+This file type already exists.	New File Type Window		이 파일형식은 이미 존재합니다.
+Save	Application Type Window		저장
+Show recognition rule	FileType Window		인식 규칙 보이기
+Add	Extension Window		추가
+Select same preferred application as	FileType Window		같은 기본 어플리케이션으로부터 선택
+Cancel	Attribute Window		취소
+Multiple launch	Application Type Window		다중 실행
+Group:	New File Type Window		그룹:
+Done	Extension Window		완료
+Attribute	Attribute Window		속성
+Extra attributes	FileType Window		기타 속성
+Could not open file	FileType Window		파일을 열 수 없음
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileType Window		상위 형식을 제거하는 것은 되돌릴 수 없습니다.\n이 상위 형식에 포함된 모든 파일 형식은 잃어버리게 될 것입니다!\n\n당신은 정말로 하겠습니까? 전체 그룹을 제거하려면, Shift키를 누르고 "제거"버튼을 누르십시오.
+Group name:	New File Type Window		그룹 이름:
+Could not retrieve preferred application of this file.	Preferred App Menu		이 파일의 기본 어플리케이션을 찾을 수 없습니다.
+Preferred application	FileType Window		기본 어플리케이션
+Quit	FileType Window		나가기
+no icon	FileType Window		아이콘 없음
+File recognition	FileType Window		파일 인식
+Same as…	FileType Window		동일하게…
+File	Application Type Window		파일
+Version:	Application Type Window		버젼:
+FileTypes request	FileTypes		파일 형식이 요구됨
+Select…	FileType Window		선택…
+Description:	FileType Window		설명:
+Right	Attribute Window		오른쪽
+Internal name:	FileType Window		내부 이름:
+None	FileType Window		없음
+Development	Application Type Window		개발
+Icon	FileType Window		아이콘
+Special:	Attribute Window		특수성:
+Alpha	Application Type Window		알파
+Signature:	Application Type Window		서명:
+Done	TypeListWindow		완료
+Quit, don't save	Application Type Window		나가기,저장 안함
+Add…	Application Type Window		추가…
+Type name:	FileType Window		형식 이름:
+(from application)	FileType Window		(어플리케이션으로부터)
+Select preferred application	FileType Window		기본 어플리케이션 선택
+Single launch	Application Type Window		단일 실행
+Could not retrieve application signature.	Preferred App Menu		어플리케이션 서명을 찾을 수 없습니다.
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		이 어플리케이션 \"%s\" 은 파일 형식을 지원하지 않습니다.\n그래도 설정하시겠습니까?
+Type:	Attribute Window		형식:
+Done	Attribute Window		완료
+Set Preferred Application	Preferred App Menu		기본 어플리케이션 설정
+Background app	Application Type Window		백그라운드 어플리케이션
+Add new group	New File Type Window		새 그룹 추가
+Add…	FileType Window		추가…
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileType Window		파일 형식의 제거는 되돌릴 수 없습니다.\n당신은 그래도 제거하겠습니까?
+Rule:	FileType Window		규칙:
+Cancel	Application Type Window		취소
+Cancel	New File Type Window		취소
+Extension:	Extension Window		확장자:
+Add	Attribute Window		추가
+Close	Application Type Window		닫기
+Open…	FileType Window		열기…
+Golden master	Application Type Window		골든 마스터
+Could not open \"%s\":\n%s	FileTypes		\"%s\"를 열 수 없음:\n%s
+Alignment:	Attribute Window		정렬:
+Cancel	Extension Window		취소
+Could not remove file type: %s\n	FileType Window		파일 형식을 제거 할 수 없음: %s\n
+Remove	FileType Window		제거
+Application flags	Application Type Window		어플리케이션 플래그
+FileTypes\n\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		FileTypes\n\tAxel Dörfler 작성\n\tCopyright 2006-2007, Haiku.\n
+Editable	Attribute Window		편집가능
+Width:	Attribute Window		너비:
+Choose type	TypeListWindow		형식 선택
+Save request	Application Type Window		저장이 요구됨
+Cancel	FileType Window		취소
+Beta	Application Type Window		베타
+Extensions:	FileType Window		확장자:
+About FileTypes…	FileType Window		FileTypes 정보…
+Attribute name:	Attribute Window		속성 이름:
+Extension	Extension Window		확장자
+Add type	New File Type Window		형식 추가
+[Multiple files]	FileType Window		[여러 파일]
+Could not set preferred application	FileType Window		기본 어플리케이션을 설정할 수 없음
+Internal name:	Attribute Window		내부 이름:
+Final	Application Type Window		최종
+Open File	FileTypes		파일 열기
+Settings	FileType Window		설정
+New resource file…	FileType Window		새 리소스 파일…
+Exclusive launch	Application Type Window		독점 실행
+Gamma	Application Type Window		감마
+Default application	FileType Window		기본 어플리케이션
+Long description:	Application Type Window		긴 설명:
+Application types…	FileType Window		어플리케이션 형식…
+(from super type)	FileType Window		(상위 형식으로부터)
+Description	FileType Window		설명
+Version info	Application Type Window		버젼 정보
+Center	Attribute Window		가운데
+Short description:	Application Type Window		짧은 설명:
+File could not be opened	Preferred App Menu		파일을 열 수 없습니다
+Could not change file extensions	Extension Window		파일 확장자를 변경 할 수 없음
+Edit icon…	Icon View		아이콘 편집…
+Save into resource file…	Application Type Window		리소스 파일로 저장
+Left	Attribute Window		왼쪽
+Visible	Attribute Window		보이기
+Could not install file type	New File Type Window		파일 형식을 설치 할 수 없음
+Application Type	Application Type Window		어플리케이션 형식

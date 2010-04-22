@@ -120,7 +120,7 @@ Do you wish to save this message as a draft before closing?	Mail		Voulez-vous sa
 Save	Mail		Sauvegarder
 Random	Mail		Aléatoire
 Close and 	Mail		Fermer et
-Save as draft	Mail		Sauvegarder comme brouillon
+Save as draft	Mail		Sauvegarder le brouillon
 The mail_daemon could not be started:\n\t	Mail		mail_daemon n'a pu être démarré :\n\t
 Open attachment	Mail		Ouvrir le fichier joint
 Reply	Mail		Répondre
@@ -129,7 +129,7 @@ Couldn't open this signature. Sorry.	Mail		Cette signature n'a pu être ouverte.
 Open draft	Mail		Ouvrir le brouillon
 Cut	Mail		Couper
 Check spelling	Mail		Vérifier l'orthographe
-Set to Saved	Mail		Set to Saved
+Set to Saved	Mail		Définir comme Sauvé
 Open this link	Mail		Ouvrir ce lien
 Auto signature:	Mail		Signature automatique :
 Add signature	Mail		Ajouter la signature

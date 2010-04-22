@@ -1,0 +1,34 @@
+1	italian	x-vnd.Haiku-Media	2505372198
+Ready for use…	Media Window		Pronto all'uso…
+Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		L'abilitazione dell'audio real-time consente al sistema di registrare e riprodurre l'audio il più velocemente possibile. Tale prestazione viene conseguita utilizzando maggiore CPU e RAM.\n\nAbilita questa caratteristica unicamente se necessiti della minor latenza possibile.
+Video input:	Media views		Ingresso Video:
+Enable real-time video	Media views		Abilita video real-time
+Waiting for media_server to quit.	Media Window		In attesa del media_server per uscire.
+Cleaning up.	Media Window		Pulizia in corso.
+Defaults	Media views		Predefinito
+Default nodes	Media views		Nodi predefiniti
+Couldn't remove volume control in Deskbar: %s\n	Media Window		Impossibile rimuovere il controllo volume nella deskbar: %s\n
+Couldn't add volume control in Deskbar: %s\n	Media Window		Impossibile aggiungere il controllo volume nella deskbar: %s\n
+Stopping media server…	Media Window		Interruzione del media server…
+Quit	Media Window		Esci
+OK	Media Window		Ok
+Starting media server…	Media Window		Avvio media server…
+Done shutting down.	Media Window		Spegnimento effettuato.
+Video output:	Media views		Uscita Video:
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossibile connettersi al media server.\nVuoi avviarlo?
+Real-time	Media views		Real-time
+Restart media services	Media views		Riavvio media server
+Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		L'abilitazione del video real-time consente al sistema di compiere le operazioni video il più velocemente possibile. Le prestazioni ottimali vengono conseguite utilizzando maggiore RAM.\n\nAbilita questa caratteristica unicamente se necessiti della minore latenza possibile.
+Telling media_addon_server to quit.	Media Window		Richiesta di uscita al media_addon_server.
+This hardware has no controls.	Media Window		Questo hardware non ha controlli.
+Audio output:	Media views		Uscite Audio:
+Restarting media services\nStarting media server…\n	Media Window		Riavvio servizi media\nAvvio media server…\n
+Enable real-time audio	Media views		Abilita audio real-time
+Audio settings	Media Window		Impostazioni Audio
+Start media server	Media Window		Avvia media server
+Media	Media Window		Media
+Restarting media services\nShutting down media server\n	Media Window		Riavvio servizi media\nSpegnimento media server\n
+Channel:	Media views		Canale:
+Show volume control on Deskbar	Media views		Mostra controllo volume nella Deskbar
+Restart the media server to apply changes.	Media views		Riavviare il media server per applicare le modifiche
+Audio input:	Media views		Ingresso audio:

@@ -1,0 +1,20 @@
+1	greek	x-vnd.Haiku-VirtualMemory	866260633
+Turn off	SettingsWindow		Απενεργοποίηση
+GB	SettingsWindow		GΒ
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Απενεργοποιώντας την εικονική μνήμη θα έχετε ανεπιθύμητα αποτελέσματα για τη σταθερότητα του συστήματος όταν εξαντληθεί η μνήμη. \nΗ εικονική μνήμη  δεν επηρεάζει την απόδοση του συστήματος μέχρι να φτάσει σε αυτό το σημείο. \n \ nΕίστε πραγματικά βέβαιοι ότι θέλετε να την απενεργοποιήσετε;
+Requested swap file size:	SettingsWindow		Επιθυμητό μέγεθος αρχείου σελιδοποίησης:
+Physical memory: 	SettingsWindow		Φυσική μνήμη: 
+Changes will take effect on restart!	SettingsWindow		Οι αλλαγές θα ισχύσουν μετά την επανεκκίνηση!
+Defaults	SettingsWindow		Προεπιλογές
+KB	SettingsWindow		ΚΒ
+Use volume:	SettingsWindow		Χρήση τόμου:
+Keep enabled	SettingsWindow		Κράτησέ τη ενεργοποιημένη
+Revert	SettingsWindow		Επαναφορά
+999 MB	SettingsWindow		999 ΜΒ
+Current swap file size: 	SettingsWindow		Τρέχον μέγεθος αρχείου σελιδοποίησης: 
+VirtualMemory	SettingsWindow		Εικονική Μνήμη
+OK	VirtualMemoryApp		Εντάξει
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tγράφτηκε από τον Axel Dörfler\n\tCopyright 2005, Haiku.\n
+Enable virtual memory	SettingsWindow		Ενεργοποίηση εικονικής μνήμης
+MB	SettingsWindow		ΜΒ
+%Ld B	SettingsWindow		%Ld Β

@@ -1,0 +1,9 @@
+1	italian	system	2677153267
+%3.2f GiB	StringForSize		%3.2f GiB
+%3.2f KiB	StringForSize		%3.2f KiB
+%d bytes	StringForSize		%Ld byte
+Green:	ColorControl		Verde:
+%.2f TiB	StringForSize		%.2f TiB
+Red:	ColorControl		Rosso:
+%3.2f MiB	StringForSize		%3.2f MiB
+Blue:	ColorControl		Blu:

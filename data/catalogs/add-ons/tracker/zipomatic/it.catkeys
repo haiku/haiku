@@ -1,18 +1,18 @@
 1	italian	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		1 file added.
-Stop	file:ZipOMaticWindow.cpp		Stop
-Creating archive: %s	file:ZipOMaticWindow.cpp		Creating archive: %s
-Continue	file:ZipOMaticWindow.cpp		Continue
-Preparing to archive	file:ZipperThread.cpp		Preparing to archive
-Filename: %s	file:ZipOMaticWindow.cpp		Filename: %s
-Let them continue	file:ZipOMatic.cpp		Let them continue
-Do you want to stop them?	file:ZipOMatic.cpp		Do you want to stop them?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Are you sure you want to stop creating this archive?
-%ld files added.	file:ZipOMaticWindow.cpp		%ld files added.
-Stopped	file:ZipOMaticWindow.cpp		Stopped
-Archive	file:ZipperThread.cpp		Archive
-Drop files to zip.	file:ZipOMaticWindow.cpp		Drop files to zip.
-Error creating archive	file:ZipOMaticWindow.cpp		Error creating archive
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		You have %ld Zip-O-Matic running.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Archive created OK
-Stop them	file:ZipOMatic.cpp		Stop them
+1 file added.	file:ZipOMaticWindow.cpp		Aggiunto un file.
+Stop	file:ZipOMaticWindow.cpp		Interrompi
+Creating archive: %s	file:ZipOMaticWindow.cpp		Creazione archivio: %s
+Continue	file:ZipOMaticWindow.cpp		Continua
+Preparing to archive	file:ZipperThread.cpp		Preparazione all'archiviazione
+Filename: %s	file:ZipOMaticWindow.cpp		Nome del file: %s
+Let them continue	file:ZipOMatic.cpp		Falli proseguire
+Do you want to stop them?	file:ZipOMatic.cpp		Vuoi interromperli?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Sei sicuro di voler interrompere la creazione di questo archivio?
+%ld files added.	file:ZipOMaticWindow.cpp		Aggiunti %ld file.
+Stopped	file:ZipOMaticWindow.cpp		Interrotto
+Archive	file:ZipperThread.cpp		Archivio
+Drop files to zip.	file:ZipOMaticWindow.cpp		Trascina i file per creare uno zip.
+Error creating archive	file:ZipOMaticWindow.cpp		Errore nella creazione dell'archivio
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Hai %ld Zip-O-Matic in esecuzione.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Archivio creato con successo
+Stop them	file:ZipOMatic.cpp		Interrompili

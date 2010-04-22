@@ -25,7 +25,7 @@ Replace in all windows	FindandReplaceWindow		Keisti visuose languose
 Wrap lines	Menus		Eilučių perkėlimas
 Quit	Menus		Baigti
 Cancel	RevertToSavedAlert		Atsisakyti
-Document	Menus		Dokumentas
+Document	Menus		Tekstas
 Clear	Menus		Valyti
 Save changes to the document \"%s\"? 	QuitAlert		Išsaugoti dokumento „%s“ pakeitimus? 
 Edit	Menus		Taisa

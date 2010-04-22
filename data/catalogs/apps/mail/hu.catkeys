@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	2102081210
+1	hungarian	x-vnd.Be-MAIL	3623971781
 %d - Date	Mail		%d - dátum
 Attach attributes:	Mail		Attribútumok csatolása:
 Inconsistency occurred in the undo/redo buffer.	Mail		Kavarodás történt a visszavon/újra tárolóban.
@@ -40,7 +40,7 @@ Edit queries…	Mail		Lekérések módosítása…
 Paste	Mail		Beillesztés
 Save attachment…	Mail		Csatolmány mentése…
 Include file attributes in attachments	Mail		Fájlattribútumok mellékelése a csatolmányokban
-OK	Mail		OK
+OK	Mail		Rendben
 Send	Mail		Küldés
 Show icons only	Mail		Csak ikonok mutatása
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		A továbbított levelekből még nem lehet eltávolítani a csatolmányokat ebben a programban.\nEz a funkció nem működik még helyesen.
@@ -122,7 +122,6 @@ Save as draft	Mail		Mentés piszkozatként
 The mail_daemon could not be started:\n\t	Mail		A leveleződaemont (mail_daemon) nem lehetett elindítani:\n\t
 Open attachment	Mail		Csatolmány megnyitása
 Reply	Mail		Válasz
-The spell check feature requires the optional \"words\" file on your BeOS CD.	Mail		A helyesírás-ellenőrzőnek szüksége van a BeOS CD-n található „szövegállományra.”
 From:	Mail		Feladó:
 Couldn't open this signature. Sorry.	Mail		Sajnos nem lehet megnyitni az aláírást.
 Open draft	Mail		Piszkozat megnyitása

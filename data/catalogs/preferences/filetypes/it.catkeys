@@ -1,0 +1,118 @@
+1	italian	x-vnd.Haiku-FileTypes	516904878
+Display as:	Attribute Window		Mostra come:
+Add group	New File Type Window		Aggiungi gruppo
+Remove	Application Type Window		Rimuovi
+Select same type as	FileType Window		Seleziona lo stesso tipo di
+Remove icon	Icon View		Rimuovi icona
+Supported types	Application Type Window		Tipi supportati
+Internal name:	New File Type Window		Nome intrinseco:
+Could not open file \"%s\": %s\n	FileTypes		Impossibile aprire il file \"%s\": %s\n
+New file type	New File Type Window		Nuovo tipo di file
+Add icon…	Icon View		Aggiungi icona…
+FileTypes Request	FileType Window		Richiesta Tipi di File
+Do you want to save the changes?	Application Type Window		Vuoi salvare le modifiche?
+Multiple files from \"	FileType Window		File multipli da \"
+File type	FileType Window		Tipo di file
+Could not change attributes	Attribute Window		Impossibile modificare gli attributi
+Show icons in list	FileType Window		Mostra icone in lista
+Cancel	TypeListWindow		Annulla
+Ok	FileTypes		Ok
+File	FileType Window		File
+Recognition rule is not valid:\n\n	FileType Window		Regola di riconoscimento invalida:\n\n
+This file type already exists.	New File Type Window		Questo tipo di file è già esistente.
+Save	Application Type Window		Salva
+Show recognition rule	FileType Window		Mostra regola di riconoscimento
+Add	Extension Window		Aggiungi
+Select same preferred application as	FileType Window		Seleziona la stessa applicazione preferita di
+Cancel	Attribute Window		Annulla
+Multiple launch	Application Type Window		Avvio multiplo
+Group:	New File Type Window		Gruppo:
+Done	Extension Window		Fatto
+Attribute	Attribute Window		Attributo
+Extra attributes	FileType Window		Attributi extra
+Could not open file	FileType Window		Impossibile aprire il file
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileType Window		La rimozione di un sovra-tipo non può essere ripristinata.\nAll Tutti i tipi di file appartenenti a questo sovra-tipo saranno perduti!\n\nSei sicuro di volerlo fare? Per rimuovere l'intero gruppo, tieni premuto il tasto Shift e premi \"Rimuovi\".
+Group name:	New File Type Window		Nome del gruppo:
+Could not retrieve preferred application of this file.	Preferred App Menu		Impossibile recuperare l'applicazione preferita per questo file.
+Preferred application	FileType Window		Applicazione preferita
+Quit	FileType Window		Esci
+no icon	FileType Window		nessuna icona
+File recognition	FileType Window		Riconoscimento del file
+Same as…	FileType Window		Lo stesso di…
+File	Application Type Window		File
+Version:	Application Type Window		Versione:
+FileTypes request	FileTypes		Richiesta dei tipi di file
+Select…	FileType Window		Seleziona...
+Description:	FileType Window		Descrizione:
+Right	Attribute Window		Destra
+Internal name:	FileType Window		Nome intrinseco:
+None	FileType Window		Nessuno
+Development	Application Type Window		Sviluppo
+Icon	FileType Window		Icona
+Special:	Attribute Window		Speciale:
+Alpha	Application Type Window		Alfa
+Signature:	Application Type Window		Firma:
+Done	TypeListWindow		Fatto
+Quit, don't save	Application Type Window		Esci senza salvare
+Add…	Application Type Window		Aggiungi…
+Type name:	FileType Window		Nome del tipo:
+(from application)	FileType Window		(dall'applicazione)
+Select preferred application	FileType Window		Seleziona applicazione preferita
+Single launch	Application Type Window		Avvio singolo
+Could not retrieve application signature.	Preferred App Menu		Impossibile recuperare la firma dell'applicazione.
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		L'applicazione \"%s\" non supporta questo tipo di file.\nSei sicuro di volerlo impostare comunque?
+Type:	Attribute Window		Tipo:
+Done	Attribute Window		Fatto
+Set Preferred Application	Preferred App Menu		Imposta Applicazione Preferita
+Add new group	New File Type Window		Aggiungi nuovo gruppo
+Add…	FileType Window		Aggiungi…
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileType Window		La rimozione di un tipo di file non può essere ripristinato.\nSei sicuro di volerlo rimuovere?
+Rule:	FileType Window		Regola:
+Cancel	Application Type Window		Annulla
+Cancel	New File Type Window		Annulla
+Extension:	Extension Window		Estensione:
+Add	Attribute Window		Aggiungi
+Close	Application Type Window		Chiudi
+Open…	FileType Window		Apri…
+Could not open \"%s\":\n%s	FileTypes		Impossibile aprire \"%s\":\n%s
+Alignment:	Attribute Window		Allineamento:
+Cancel	Extension Window		Annulla
+Could not remove file type: %s\n	FileType Window		Impossibile rimuovere tipo di file: %s\n
+Remove	FileType Window		Rimuovi
+FileTypes\n\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		Tipi di File\n\tscritto da Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+Editable	Attribute Window		Modificabile
+Width:	Attribute Window		Larghezza:
+Choose type	TypeListWindow		Seleziona tipo
+Save request	Application Type Window		Salva richiesta
+Cancel	FileType Window		Annulla
+Beta	Application Type Window		Beta
+Extensions:	FileType Window		Estensioni:
+About FileTypes…	FileType Window		A riguardo di Tipi di File…
+Attribute name:	Attribute Window		Nome attributo:
+Extension	Extension Window		Estensione
+Add type	New File Type Window		Aggiungi tipo
+[Multiple files]	FileType Window		[File multipli]
+Could not set preferred application	FileType Window		Impossibile impostare l'applicazione preferita
+Internal name:	Attribute Window		Nome intrinseco:
+Final	Application Type Window		Finale
+Open File	FileTypes		Apri File
+Settings	FileType Window		Impostazioni
+New resource file…	FileType Window		Nuovo file risorsa…
+Exclusive launch	Application Type Window		Avvio esclusivo
+Gamma	Application Type Window		Gamma
+Default application	FileType Window		Applicazione predefinita
+Long description:	Application Type Window		Descrizione estesa:
+Application types…	FileType Window		Tipi d'applicazione…
+(from super type)	FileType Window		(dal sovra-tipo)
+Description	FileType Window		Descrizione
+Version info	Application Type Window		Informazioni versione
+Center	Attribute Window		Centro
+Short description:	Application Type Window		Descrizione breve:
+File could not be opened	Preferred App Menu		Impossibile aprire il file
+Could not change file extensions	Extension Window		Impossibile modificae le estensioni del file
+Edit icon…	Icon View		Modifica icona…
+Save into resource file…	Application Type Window		Salva in un file risorsa…
+Left	Attribute Window		Sinistra
+Visible	Attribute Window		Visibile
+Could not install file type	New File Type Window		Impossibile installare tipo di file
+Application Type	Application Type Window		Tipo d'applicazione

@@ -1,0 +1,82 @@
+1	german	x-vnd.Haiku-FileTypes	3645713126
+Display as:	Attribute Window		Anzeigen als:
+Add group	New File Type Window		Neue Gruppe erstellen
+Remove	Application Type Window		Entfernen
+Select same type as	FileType Window		Gleichen Typ wählen wie
+Remove icon	Icon View		Icon entfernen
+Supported types	Application Type Window		Unterstützte Typen
+Internal name:	New File Type Window		Interner Name:
+Could not open file \"%s\": %s\n	FileTypes		Datei "%s" konnte nicht geöffnet werden: %s\n
+New file type	New File Type Window		Neuer Dateityp
+Add icon…	Icon View		Icon hinzufügen…
+Do you want to save the changes?	Application Type Window		Wollen Sie die Änderungen speichern?
+File type	FileType Window		Dateityp
+Could not change attributes	Attribute Window		Attribute konnten nicht verändert werden
+Show icons in list	FileType Window		Icons als Liste anzeigen
+Cancel	TypeListWindow		Abbrechen
+Ok	FileTypes		OK
+File	FileType Window		Datei
+Recognition rule is not valid:\n\n	FileType Window		Erkennungsregel ist nicht gültig:\n\n
+This file type already exists.	New File Type Window		Dieser Dateityp existiert bereits.
+Save	Application Type Window		Speichern
+Show recognition rule	FileType Window		Erkennungsregel anzeigen
+Add	Extension Window		Hinzufügen
+Select same preferred application as	FileType Window		Gleiche bevorzugte Anwendung wählen wie
+Cancel	Attribute Window		Abbrechen
+Multiple launch	Application Type Window		Mehrfache Ausführung
+Group:	New File Type Window		Gruppe:
+Done	Extension Window		Erledigt
+Attribute	Attribute Window		Attribut
+Could not open file	FileType Window		Datei konnte nicht geöffnet werden
+Group name:	New File Type Window		Gruppenname:
+Could not retrieve preferred application of this file.	Preferred App Menu		Die bevorzugte Anwendung für diese Datei konnte nicht bestimmt werden.
+Preferred application	FileType Window		Bevorzugte Anwendung
+Quit	FileType Window		Beenden
+no icon	FileType Window		kein Icon
+File recognition	FileType Window		Datei-Erkennung
+Same as…	FileType Window		Gleich wie…
+File	Application Type Window		Datei
+Version:	Application Type Window		Version:
+Description:	FileType Window		Beschreibung:
+Internal name:	FileType Window		Interner Name:
+Development	Application Type Window		Entwicklung
+Icon	FileType Window		Icon
+Alpha	Application Type Window		Alpha
+Signature:	Application Type Window		Signatur:
+Done	TypeListWindow		Erledigt
+Quit, don't save	Application Type Window		Beenden ohne zu speichern
+Add…	Application Type Window		Hinzufügen…
+Type name:	FileType Window		Typname:
+Select preferred application	FileType Window		Bevorzugte Anwendung auswählen
+Single launch	Application Type Window		Einzelausführung
+Type:	Attribute Window		Typ:
+Done	Attribute Window		Erledigt
+Add new group	New File Type Window		Neue Gruppe hinzufügen
+Add…	FileType Window		Hinzufügen…
+Rule:	FileType Window		Regel:
+Cancel	Application Type Window		Abbrechen
+Cancel	New File Type Window		Abbrechen
+Extension:	Extension Window		Erweiterung:
+Add	Attribute Window		Hinzufügen
+Close	Application Type Window		Schließen
+Open…	FileType Window		Öffnen…
+Cancel	Extension Window		Abbrechen
+Remove	FileType Window		Entfernen
+Width:	Attribute Window		Breite:
+Cancel	FileType Window		Abbrechen
+Beta	Application Type Window		Beta
+Extensions:	FileType Window		Erweiterungen:
+About FileTypes…	FileType Window		Über FileTypes…
+Attribute name:	Attribute Window		Attributname:
+Extension	Extension Window		Erweiterung
+Add type	New File Type Window		Typ hinzufügen
+Internal name:	Attribute Window		Interner Name:
+Open File	FileTypes		Datei öffnen
+Settings	FileType Window		Einstellungen
+Gamma	Application Type Window		Gamma
+Long description:	Application Type Window		Ausführliche Beschreibung:
+Description	FileType Window		Beschreibung
+Version info	Application Type Window		Versionsinfo
+Short description:	Application Type Window		Kurzbeschreibung:
+Visible	Attribute Window		Sichtbar
+Application Type	Application Type Window		Anwendungstyp

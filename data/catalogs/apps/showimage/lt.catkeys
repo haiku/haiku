@@ -5,7 +5,7 @@ File	Menus		Byla
 5 seconds	Menus		5 sek.
 Slide delay	Menus		Skaidrės užlaikymas
 Zoom in	Menus		Didinti
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentas '%s' pakeistas. Norite uždaryti?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ pakeistas. Norite uždaryti?
 Page setup…	Menus		Puslapio nustatymai…
 8 seconds	Menus		8 sek.
 Print…	Menus		Spausdinti…
@@ -27,7 +27,7 @@ Browse	Menus		Naršyti
 Edit	Menus		Taisa
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Paveikslėlis neatidaromas! Trūksta pačios bylos, arba transliatoriaus jai.
 First page	Menus		Pirmasis puslapis
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentas '%s' (puslapis %d) pakeistas. Norite uždaryti?
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ (puslapis %d) pakeistas. Norite uždaryti?
 About ShowImage…	Menus		Apie programą…
 Open	Menus		Atidaryti
 OK	LoadAlerts		Gerai
@@ -39,7 +39,7 @@ Resize to (in 1/72 inches):	PrintOptionsWindow		Keisti dydį (1/72 colių):
 Apply	ResizerWindow		Taikyti
 Keep original proportions	ResizerWindow		Išlaikyti pirmininį santykį
 9 seconds	Menus		9 sek.
-Flip left to right	Menus		Apversti kairę dešinę
+Flip left to right	Menus		Apversti kairę su dešine
 Show caption in full screen mode	Menus		Rodyti pavadinimą viso ekrano rodoje
 DPI:	PrintOptionsWindow		Raiška (DPI):
 Next file	Menus		Kita byla
@@ -59,9 +59,9 @@ ShowImage	AboutWindow		Veizyklė
 Last page	Menus		Paskutinis puslapis
 Previous file	Menus		Ankstesnis puslapis
 Resize	ResizerWindow		Dydžio keitimas
-Slide show	Menus		Skaidrės ratu
+Slide show	Menus		Skaidrių ratas
 Fit image to page	PrintOptionsWindow		Įtalpinti puslapin
-Flip top to bottom	Menus		Apversti viršų apačią
+Flip top to bottom	Menus		Apversti viršų su apačia
 Select all	Menus		Žymėti viską
 Zoom factor in %:	PrintOptionsWindow		Didinimas %:
 Width:	PrintOptionsWindow		Plotis:

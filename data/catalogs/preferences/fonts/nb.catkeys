@@ -1,0 +1,11 @@
+1	norwegian bokmål	x-vnd.Haiku-Fonts	1355959961
+Plain font:	Font view		Normal skrifttype:
+Defaults	Main window		Standardinnstillinger
+Fonts	Main window		Skrifttype
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Skrifttype\n\tCopyright  2004-2005, Haiku.\n\n
+Revert	Main window		Tilbakestill
+Size:	Font Selection view		Størrelse:
+Menu font:	Font view		Menyskrifttype:
+Fixed font:	Font view		Fast skrifttype:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Man skal ikke hoppe så høyt at man snubler i sitt eget skjegg.
+Bold font:	Font view		Fet skrifttype:

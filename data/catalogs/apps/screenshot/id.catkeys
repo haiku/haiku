@@ -1,0 +1,28 @@
+1	indonesian	x-vnd.Haiku-Screenshot	1342822790
+seconds	ScreenshotWindow		detik
+Options	ScreenshotWindow		Pilihan
+Desktop	ScreenshotWindow		Desktop
+Include window border	ScreenshotWindow		Termasuk pinggir jendela
+Back to saving	ScreenshotWindow		Kembali untuk menyimpan
+Select	ScreenshotWindow		Pilih
+Capture active window	ScreenshotWindow		Menangkap jendela aktif
+Cancel	ScreenshotWindow		Batal
+screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	screenshot
+Name:	ScreenshotWindow		Nama:
+screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	screenshot1
+Save screenshot	ScreenshotWindow		Simpan screenshot
+Capture entire screen	ScreenshotWindow		Menangkap seluruh layar
+Choose folder	ScreenshotWindow		Pilih folder
+Take screenshot	ScreenshotWindow		Mengambil screenshot
+Save	ScreenshotWindow		Simpan
+Overwrite	ScreenshotWindow		Menindas
+Retake screenshot	ScreenshotWindow		Mengambil screenshot lagi
+Choose folder...	ScreenshotWindow		Pilih folder...
+Please select	ScreenshotWindow		Silahkan pilih
+Save as:	ScreenshotWindow		Simpan sebagai:
+Save in:	ScreenshotWindow		Disimpan di:
+Take screenshot after a delay of	ScreenshotWindow		Mengambil screenshot setelah jeda
+Artwork folder	ScreenshotWindow		Artwork folder
+Home folder	ScreenshotWindow		Home folder
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		File sudah ada.\n Apakah Anda yakin ingin menindasnya?
+Include mouse pointer	ScreenshotWindow		Termasuk pointer tetikus

@@ -1,0 +1,68 @@
+1	german	x-vnd.Haiku-ShowImage	1169415463
+Paste	Menus		Einfügen
+Use as background…	Menus		Als Hintergrundbild verwenden…
+File	Menus		Datei
+5 seconds	Menus		5 Sekunden
+Slide delay	Menus		Bildfolgenverzögerung
+Zoom in	Menus		Vergrößern
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Das Dokument '%s' wurde verändert. Wollen Sie das Dokument schließen?
+Page setup…	Menus		Seite einrichten…
+8 seconds	Menus		8 Sekunden
+Print…	Menus		Drucken…
+Previous page	Menus		Vorherige Seite
+View	Menus		Ansicht
+Full screen	Menus		Ganzer Bildschirm
+Go to page	Menus		Gehe zu Seite
+Zoom out	Menus		Verkleinern
+20 seconds	Menus		20 Sekunden
+Quit	Menus		Beenden
+Invert colors	Menus		Farben invertieren
+3 seconds	Menus		3 Sekunden
+Rotate counterclockwise	Menus		Im Gegenuhrzeigersinn drehen
+10 seconds	Menus		10 Sekunden
+High-quality zooming	Menus		Zoomen mit hoher Qualität
+Clear	Menus		Leeren
+6 seconds	Menus		6 Sekunden
+Edit	Menus		Bearbeiten
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Das Bild konnte nicht geladen werden! Entweder die Datei selbst oder ein passender Translator existiert nicht.
+First page	Menus		Erste Seite
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Das Dokument '%s' (Seite %d) wurde verändert. Wollen Sie das Dokument schließen?
+About ShowImage…	Menus		Über ShowImage…
+Open	Menus		Öffnen
+OK	LoadAlerts		OK
+Close	Menus		Schließen
+Close	ClosePrompt		Schließen
+Height:	ResizerWindow		Höhe:
+Undo	Menus		Rückgängig
+Resize to (in 1/72 inches):	PrintOptionsWindow		Größe ändern zu (in 1/72 Zoll):
+Apply	ResizerWindow		Anwenden
+Keep original proportions	ResizerWindow		Proportionen beibehalten
+9 seconds	Menus		9 Sekunden
+Flip left to right	Menus		Horizontal spiegeln
+DPI:	PrintOptionsWindow		DPI:
+Next file	Menus		Nächste Datei
+4 seconds	Menus		4 Sekunden
+Zoom to window	Menus		In Fenster einpassen
+Close document	ClosePrompt		Dokument schließen
+ShowImage	LoadAlerts		ShowImage
+Height: 	PrintOptionsWindow		Höhe: 
+Cancel	ClosePrompt		Abbrechen
+Resize…	Menus		Größe ändern…
+Print options	PrintOptionsWindow		Druckeinstellungen
+Width:	ResizerWindow		Breite:
+Copy	Menus		Kopieren
+Cut	Menus		Ausschneiden
+ShowImage	AboutWindow		ShowImage
+7 seconds	Menus		7 Sekunden
+Last page	Menus		Letzte Seite
+Previous file	Menus		Vorherige Datei
+Slide show	Menus		Bildfolge
+Fit image to page	PrintOptionsWindow		Bild in Seite einpassen
+Flip top to bottom	Menus		Vertikal spiegeln
+Select all	Menus		Alles markieren
+Width:	PrintOptionsWindow		Breite:
+Image	Menus		Bild
+Rotate clockwise	Menus		Im Uhrzeigersinn drehen
+Original size	Menus		Ursprüngliche Größe
+Next page	Menus		Nächste Seite
+Save as…	Menus		Speichern unter…

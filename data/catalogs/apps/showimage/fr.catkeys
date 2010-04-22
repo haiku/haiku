@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	355830103
+1	french	x-vnd.Haiku-ShowImage	3128795317
 Paste	Menus		Coller
 Use as background…	Menus		Utiliser comme fond d'écran
 File	Menus		Fichier
@@ -6,7 +6,7 @@ File	Menus		Fichier
 Slide delay	Menus		Délai de diaporama
 Zoom in	Menus		Zoom avant
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Le document '%s' a été modifié. Êtes-vous sûr de vouloir le fermer ?
-Page setup…	Menus		Réglages de page…
+Page setup…	Menus		Mise en page…
 8 seconds	Menus		8 secondes
 Print…	Menus		Imprimer…
 Previous page	Menus		Page précédente
@@ -24,8 +24,8 @@ High-quality zooming	Menus		Zoom haute qualité
 Clear	Menus		Vider
 Browse	Menus		Parcourir
 6 seconds	Menus		6 secondes
-Edit	Menus		Editer
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L'image n'a pu être lue! Le fichier ou le Translator nécessaire n'existent pas.
+Edit	Menus		Éditer
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L'image n'a pu être lue ! Le fichier ou son tranducteur n'existe pas.
 First page	Menus		Première page
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document '%s' (page %d) a changé. Voulez-vous fermer le document ?
 About ShowImage…	Menus		A propos de ShowImage…
@@ -33,11 +33,11 @@ Open	Menus		Ouvrir
 OK	LoadAlerts		OK
 Close	Menus		Fermer
 Close	ClosePrompt		Fermer
-Height:	ResizerWindow		Hauteur:
+Height:	ResizerWindow		Hauteur :
 Undo	Menus		Annuler
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionner (in 1/72 inches):
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionner (en 1/72 pouces) :
 Apply	ResizerWindow		Appliquer
-Keep original proportions	ResizerWindow		Converser le ratio original
+Keep original proportions	ResizerWindow		Converser les proportions originales
 9 seconds	Menus		9 secondes
 Flip left to right	Menus		Mirroir vertical
 Show caption in full screen mode	Menus		Afficher les miniatures en mode plein écran
@@ -46,6 +46,7 @@ Next file	Menus		Fichier suivant
 4 seconds	Menus		4 secondes
 Zoom to window	Menus		Zoomer à la taille de la fenêtre
 Close document	ClosePrompt		Fermer le document
+ShowImage	LoadAlerts		ShowImage
 Height: 	PrintOptionsWindow		Hauteur : 
 Cancel	ClosePrompt		Annuler
 Resize…	Menus		Redimensionner...
@@ -63,7 +64,7 @@ Fit image to page	PrintOptionsWindow		Adapter l'image à la page
 Flip top to bottom	Menus		Mirroir horizontal
 Select all	Menus		Tout sélectionner
 Zoom factor in %:	PrintOptionsWindow		Zoomer (en %) :
-Width:	PrintOptionsWindow		Largeur:
+Width:	PrintOptionsWindow		Largeur :
 Image	Menus		Image
 Rotate clockwise	Menus		Rotation à droite
 Original size	Menus		Taille originale

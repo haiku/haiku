@@ -1,0 +1,49 @@
+1	indonesian	x-vnd.Haiku-Installer	1147413260
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Apakah anda ingin berhenti menginstal and start ulang komputer?
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tDitulis oleh Jérôme Duval dan Stephan Aßmus\n\tHak Cipta 2005-2010, Haiku.\n\n
+Quit	InstallerApp		Keluar
+Stop	InstallerWindow	In alert after pressing Stop	Berhenti
+Starting Installation.	InstallProgress		Memulai Instalasi.
+OK	InstallerApp		OK
+Install from:	InstallerWindow		Instal dari:
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld dari %2ld
+Installer	InstallerWindow		Installer
+Continue	InstallerWindow	In alert after pressing Stop	Lanjutkan
+Write boot sector to '%s'	InstallerWindow		Menulis boot sector ke '%s'
+Collecting copy information.	InstallProgress		Mengkollekt informasi copy.
+Quit	InstallerWindow		Keluar
+Performing installation.	InstallProgress		Melakukan Instalasi.
+scanning…	InstallerWindow		memindai…
+Finishing Installation.	InstallProgress		Selesaikan Instalasi!
+README	InstallerApp		BACAKU
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Disk Destinasi may kurang tempat kosong! Coba pilih Disk lain atau pilih tidak install item tambahan.
+?? of ??	InstallerWindow	Unknown progress	?? dari ??
+Show optional packages	InstallerWindow		Menampilkan pilihan paket
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.
+Unknown Type	InstallProgress	Partition content type	Tipe Tidak Diketahui
+<none>	InstallerWindow	No partition available	<kosong>
+Installation canceled.	InstallProgress		Instalasi dibatalkan.
+Hide optional packages	InstallerWindow		Menyembunyikan pilihan paket
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Please close the DriveSetup window before closing the Installer window.
+Restart system	InstallerWindow		Start ulang sistem
+OK	InstallerWindow		OK
+Set up partitions…	InstallerWindow		Set up partitions…
+The partition can't be mounted. Please choose a different partition.	InstallProgress		The partition can't be mounted. Please choose a different partition.
+Install anyway	InstallProgress		Install anyway
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		An error was encountered and the installation was not completed:\n\nError:  %s
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Press the Begin button to install from '%1s' onto '%2s'.
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Running DriveSetup…\n\nClose DriveSetup to continue with the installation.
+OK	InstallProgress		OK
+Please choose target	InstallerWindow		Please choose target
+???	InstallerWindow	Unknown partition name	???
+Begin	InstallerWindow		Mulai
+Welcome to the Haiku Installer!\n\nIMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\nThis is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n1)  If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer installations so we do not recommend using it.\nIf you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n2)  The Installer will take no steps to integrate Haiku into an existing boot menu. The Haiku partition itself will be made bootable. If you have GRUB already installed, edit your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n\tsudo <your favorite text editor> /boot/grub/menu.lst\n\nYou'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\nWith GRUB it's: (hdN,n)\n\nAll harddisks start with \"hd\"\n\"N\" is the hard disk number, starting with \"0\".\n\"n\" is the partition number, also starting with \"0\".\nThe first logical partition always has the number 4, regardless of the number of primary partitions.\n\nSo behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n\t# Haiku on /dev/sda7\n\ttitle\t\t\t\tHaiku\n\trootnoverify\t\t(hd0,6)\n\tchainloader\t\t+1\n\nYou can see the correct partition in GParted for example.\n\n3)  When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\nHave fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Welcome to the Haiku Installer!\n\nIMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\nThis is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n1)  If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer installations so we do not recommend using it.\nIf you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n2)  The Installer will take no steps to integrate Haiku into an existing boot menu. The Haiku partition itself will be made bootable. If you have GRUB already installed, edit your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n\tsudo <your favorite text editor> /boot/grub/menu.lst\n\nYou'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\nWith GRUB it's: (hdN,n)\n\nAll harddisks start with \"hd\"\n\"N\" is the hard disk number, starting with \"0\".\n\"n\" is the partition number, also starting with \"0\".\nThe first logical partition always has the number 4, regardless of the number of primary partitions.\n\nSo behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n\t# Haiku on /dev/sda7\n\ttitle\t\t\t\tHaiku\n\trootnoverify\t\t(hd0,6)\n\tchainloader\t\t+1\n\nYou can see the correct partition in GParted for example.\n\n3)  When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\nHave fun and thanks a lot for trying out Haiku! We hope you like it!
+Write boot sector	InstallerWindow		Menulis sektor boot
+Cancel	InstallerWindow		Batal
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, the application to configure disk partitions, could not be launched.
+No optional packages available.	PackagesView		Pilihan paket tidak tersedia.
+Continue	InstallerApp		Lanjutkan
+Additional disk space required: %s	InstallerWindow		Additional disk space required: %s
+Cancel	InstallProgress		Batal
+Are you sure you want to to stop the installation?	InstallerWindow		Apakah anda yakin akan menhentikan instalasi?
+Onto:	InstallerWindow		Pada:

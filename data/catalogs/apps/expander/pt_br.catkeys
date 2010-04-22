@@ -1,2 +1,17 @@
-1		x-vnd.Haiku-Expander	0
-
+1	brazilian portuguese	x-vnd.Haiku-Expander	2104111075
+Expander: Open	ExpanderWindow		Expansor: Abrir
+ is not supported	ExpanderWindow		não é suportado
+Select current	DirectoryFilePanel		Selecione o atual
+Hide contents	ExpanderWindow		Esconder conteúdo
+Expander	ExpanderWindow	!! Window Title !!	Expansor
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Tem certeza que quer parar de expandir este \narquivo? Os itens expandidos podem não estar completos.
+Expander: Choose destination	DirectoryFilePanel		Expansor: Escolha destino
+Show contents	ExpanderWindow		Mostrar conteúdo
+Expanding file 	ExpanderWindow		Expandindo arquivo
+Expand	ExpanderWindow		Expandir
+About Expander…	ExpanderMenu		Sobre o Expansor…
+Set source…	ExpanderMenu		Selecionar origem…
+Select '%s'	DirectoryFilePanel		Selecionar '%s'
+Show contents	ExpanderMenu		Mostrar conteúdo
+Stop	ExpanderWindow		Parar
+Destination	ExpanderWindow		Destino

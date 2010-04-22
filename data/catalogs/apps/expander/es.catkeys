@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-Expander	1738666712
+1	spanish	x-vnd.Haiku-Expander	3642794258
 Expand	ExpanderMenu		Extraer
 Set destination…	ExpanderMenu		Elegir destino...
 File expanded	ExpanderWindow		Fichero descomprimido
@@ -12,7 +12,6 @@ Hide contents	ExpanderWindow		Esconder contenidos
 Cancel	ExpanderWindow		Cancelar
 Continue	ExpanderWindow		Continuar
 Expander	ExpanderWindow	!! Window Title !!	Expander: extraer archivos
-Expander\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		Expander\n\tescrito por Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nVersión original Be por  \nDominic, Hiroshi, Peter, Pavel y Robert\n
 The destination folder does not exist.	ExpanderWindow		La carpeta de destino no existe.
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		¿Está seguro de querer parar de descomprimir este \narchivo? El elemento descomprimiéndose puede no estar completo.
 Select	DirectoryFilePanel		Seleccionar
@@ -25,10 +24,12 @@ Expanding file 	ExpanderWindow		Descomprimiendo archivo
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		La carpeta o bien fue movida, o renombrada o\n no está soportada.
 The file doesn't exist	ExpanderWindow		El archivo no existe
 Stop	ExpanderMenu		Parar
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tescrito por Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nversión original Be por \nDominic, Hiroshi, Peter, Pavel y Robert\n
 File	ExpanderMenu		Archivo
 Expand	ExpanderWindow		Extraer
 Close	ExpanderMenu		Cerrar
 The destination is not a folder.	ExpanderWindow		El destino no es una carpeta
+Expander	About		Expander: extraer archivos
 About Expander…	ExpanderMenu		Acerca de Expander…
 OK	About		Aceptar
 Set source…	ExpanderMenu		Elegir origen...

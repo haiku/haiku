@@ -1,0 +1,19 @@
+1	greek	x-vnd.Be-PRNT	2177766376
+Waiting	JobListView		Περιμένετε
+page	JobListView		σελίδα
+Cancel	AddPrinterDialog		Άκυρο
+Add printer	AddPrinterDialog		Προσθήκη εκτυπωτή
+Printers	PrintersWindow		Εκτυπωτές
+Default Printer	PrinterListView		Τρέχων εκτυπωτής
+pages	JobListView		σελίδες
+Printer name:	AddPrinterDialog		Όνομα εκτυπωτή:
+Restart job	PrintersWindow		Επανεκκίνηση εργασίας
+Add	AddPrinterDialog		Προσθήκη
+Cancel job	PrintersWindow		Ακύρωση εργασίας
+Remove	PrintersWindow		Αφαίρεσε
+<pick one>	AddPrinterDialog		<επιλέξτε ένα>
+Add …	PrintersWindow		Προσθήκη …
+Completed	JobListView		Ολοκληρώθηκε
+Unknown status	JobListView		Άγνωστη κατάσταση
+Connected to:	AddPrinterDialog		Συνδέθηκε στο:
+Printer type:	AddPrinterDialog		Τύπος εκτυπωτή:

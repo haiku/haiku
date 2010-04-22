@@ -1,0 +1,10 @@
+1	greek	x-vnd.Haiku-CPUFrequencyPref	2007829554
+Ok	Status view		Εντάξει
+Defaults	Pref Window		Προεπιλογές
+Quit	Status view		Έξοδος
+High performance	Status view		Υψηλή επίδοση
+Integration time [ms]: 	CPU Frequency View		Χρόνος ολοκλήρωσης [ms]: 
+Revert	Pref Window		Επαναφορά
+Low energy	Status view		Χαμηλή ενέργεια
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tγράφτηκε από τον Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPU Frequency	Main window		CPU Frequency

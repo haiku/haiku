@@ -7,7 +7,7 @@ The old Master Boot Record could not be saved to %s	BootManagerController		El an
 Restore MBR	BootManagerController	Button	Restaurar MBR
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		El registro de arranque maestro (MBR) del dispositivo:\n\t%s\nserá guardado ahora al disco. Por favor, seleccione un archivo para guardar el MBR en él.\n\nSi algo va mal con la instalación, o quisiera quitar el menú de arranque, tan sólo inicie el programa bootman y elija la opción "Desinstalar".
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	A punto de restaurar el registro de arranque maestro (MBR) de %disk desde %file. ¿Desea continuar?
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Ha ocurrido un error en el menú de arranque. El MBR puede resultar dañado. ¡Debería restaurar el MBR ahora!
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Ha ocurrido un error al escribir el menú de arranque. El MBR puede resultar dañado. ¡Debería restaurar el MBR ahora!
 Timeout: %s	DefaultPartitionPage		Tiempo de espera: %s
 Select	FileSelectionPage	Button	Seleccionar
 After four seconds	DefaultPartitionPage		Después de cuatro segundos

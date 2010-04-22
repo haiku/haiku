@@ -1,0 +1,28 @@
+1	indonesian	x-vnd.Be-PRNT	403433619
+Waiting	JobListView		Menunggu
+page	JobListView		halaman
+Cancel	AddPrinterDialog		Batal
+Add printer	AddPrinterDialog		Menambah printer
+Printers	PrintersWindow		Printer
+Default Printer	PrinterListView		Printer Default
+No pending jobs.	PrinterListView		Tidak ada pekerjaan yang menunggu.
+pages	JobListView		halaman
+Processing	JobListView		Memproses
+Printer name:	AddPrinterDialog		Nama Printer:
+ pending jobs.	PrinterListView		menunggu pekerjaan.
+Restart job	PrintersWindow		Start ulang pekerjaan
+Add	AddPrinterDialog		Tambah
+Make default	PrintersWindow		Jadikan default
+Cancel job	PrintersWindow		Batalkan pekerjaan
+1 pending job.	PrinterListView		1 pekerjaan menunggu.
+Remove	PrintersWindow		Menghapus
+<pick one>	AddPrinterDialog		<pilih satu>
+Add …	PrintersWindow		Tambah …
+Print jobs for 	PrintersWindow		Mencetak pekerjaan untuk
+Failed	JobListView		Gagal
+%.2f KB	JobListView		%.2f KB
+Completed	JobListView		Selesai
+Print jobs: No printer selected	PrintersWindow		Pekerjaan mencetak: Tidak ada printer yang dipilih
+Unknown status	JobListView		Status tidak diketahui
+Connected to:	AddPrinterDialog		Tersambung pada:
+Printer type:	AddPrinterDialog		Tipe Printer:

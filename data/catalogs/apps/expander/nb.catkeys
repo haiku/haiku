@@ -1,0 +1,30 @@
+1	norwegian bokmål	x-vnd.Haiku-Expander	2395853085
+Expand	ExpanderMenu		Pakk ut
+Set destination…	ExpanderMenu		Sett destinasjon…
+File expanded	ExpanderWindow		Fil pakket ut
+Expander: Open	ExpanderWindow		Expander: Åpne
+ is not supported	ExpanderWindow		 støttes ikke
+Select current	DirectoryFilePanel		Velg gjeldende
+Source	ExpanderWindow		Kilde
+Hide contents	ExpanderWindow		Skjul innhold
+Cancel	ExpanderWindow		Avbryt
+Continue	ExpanderWindow		Fortsett
+Expander	ExpanderWindow	!! Window Title !!	Expander
+The destination folder does not exist.	ExpanderWindow		Destinasjonsmappen eksisterer ikke.
+Select	DirectoryFilePanel		Velg
+Settings	ExpanderMenu		Innstillinger
+Settings…	ExpanderMenu		Innstillinger…
+Expander: Choose destination	DirectoryFilePanel		Expander: Velg destinasjon
+Show contents	ExpanderWindow		Vis innhold
+Expanding file 	ExpanderWindow		Pakker ut fil
+Stop	ExpanderMenu		Avbryt
+File	ExpanderMenu		Fil
+Expand	ExpanderWindow		Pakk ut
+Close	ExpanderMenu		Lukk
+The destination is not a folder.	ExpanderWindow		Destinasjonen er ikke en mappe.
+About Expander…	ExpanderMenu		Om Expander…
+OK	About		OK
+Set source…	ExpanderMenu		Sett kilde…
+Select '%s'	DirectoryFilePanel		Velg '%s'
+Show contents	ExpanderMenu		Vis innhold
+Destination	ExpanderWindow		Destinasjon
