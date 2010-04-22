@@ -20,11 +20,11 @@
 #include <CheckBox.h>
 #include <ControlLook.h>
 #include <File.h>
-#include <Locale.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <GroupView.h>
 #include <ListView.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>

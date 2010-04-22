@@ -17,10 +17,10 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
-#include <Locale.h>
 #include <ControlLook.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>

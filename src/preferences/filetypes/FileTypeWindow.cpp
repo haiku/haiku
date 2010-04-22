@@ -17,9 +17,9 @@
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <File.h>
-#include <Locale.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
