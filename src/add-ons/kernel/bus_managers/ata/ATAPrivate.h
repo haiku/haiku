@@ -1,13 +1,14 @@
 /*
  * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
  * Copyright 2008, Marcus Overhagen.
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002-2003, Thomas Kurschel.
  *
  * Distributed under the terms of the MIT License.
  */
 #ifndef ATA_PRIVATE_H
 #define ATA_PRIVATE_H
+
 
 #include <ata_types.h>
 #include <bus/ATA.h>
@@ -25,7 +26,7 @@
 #include "ATAInfoblock.h"
 #include "ATATracing.h"
 
-#define ATA_BLOCK_SIZE				512 /* TODO: retrieve */
+
 #define ATA_MAX_DMA_FAILURES		3
 #define ATA_STANDARD_TIMEOUT		10 * 1000 * 1000
 #define ATA_RELEASE_TIMEOUT			10 * 1000 * 1000
@@ -183,15 +184,17 @@ virtual	status_t					ExecuteIO(ATARequest *request);
 										uint32 *maxBlocks);
 
 		// ATA stuff
-virtual	bool						IsATAPI() { return false; };
+virtual	bool						IsATAPI() const { return false; }
 
-		bool						UseDMA() { return fUseDMA; };
-		bool						Use48Bits() { return fUse48Bits; };
+		bool						UseDMA() const { return fUseDMA; }
+		bool						Use48Bits() const { return fUse48Bits; }
+		size_t						BlockSize() const { return fBlockSize; }
 
 		status_t					Select();
 
-		ata_task_file *				TaskFile() { return &fTaskFile; };
-		ata_reg_mask				RegisterMask() { return fRegisterMask; };
+		ata_task_file *				TaskFile() { return &fTaskFile; }
+		ata_reg_mask				RegisterMask() const
+										{ return fRegisterMask; }
 
 		status_t					SetFeature(int feature);
 		status_t					DisableCommandQueueing();
@@ -219,9 +222,12 @@ private:
 		status_t					_FillTaskFile(ATARequest *request,
 										uint64 address);
 
+		uint64						fTotalSectors;
+		size_t						fBlockSize;
+		size_t						fPhysicalBlockSize;
+		size_t						fBlockOffset;
 		uint8						fIndex;
 		bool						fUse48Bits;
-		uint64						fTotalSectors;
 
 		char						fDebugContext[16];
 };

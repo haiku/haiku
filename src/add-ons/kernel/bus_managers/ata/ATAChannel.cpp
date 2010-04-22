@@ -755,7 +755,7 @@ ATAChannel::ExecutePIOTransfer(ATARequest *request)
 	status_t result = B_OK;
 	size_t *bytesLeft = request->BytesLeft();
 	while (*bytesLeft > 0) {
-		size_t currentLength = MIN(*bytesLeft, ATA_BLOCK_SIZE);
+		size_t currentLength = MIN(*bytesLeft, request->Device()->BlockSize());
 		if (request->IsWrite()) {
 			result = _WritePIOBlock(request, currentLength);
 			if (result != B_OK) {
