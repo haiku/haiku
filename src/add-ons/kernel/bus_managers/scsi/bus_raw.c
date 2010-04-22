@@ -3,7 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 //!	Devfs entry for raw bus access.
+
 
 #include "scsi_internal.h"
 
@@ -24,8 +26,9 @@ typedef struct bus_raw_info {
 
 
 static status_t
-scsi_bus_raw_init(device_node *node, void **cookie)
+scsi_bus_raw_init(void *driverCookie, void **_cookie)
 {
+	device_node *node = (device_node *)driverCookie;
 	device_node *parent;
 	bus_raw_info *bus;
 
@@ -40,7 +43,7 @@ scsi_bus_raw_init(device_node *node, void **cookie)
 
 	bus->node = node;
 
-	*cookie = bus;
+	*_cookie = bus;
 	return B_OK;
 }
 
@@ -53,7 +56,7 @@ scsi_bus_raw_uninit(void *bus)
 
 
 static status_t
-scsi_bus_raw_open(void *bus, const char *path, uint32 flags,
+scsi_bus_raw_open(void *bus, const char *path, int openMode,
 	void **handle_cookie)
 {
 	*handle_cookie = bus;
@@ -76,7 +79,7 @@ scsi_bus_raw_free(void *cookie)
 
 
 static status_t
-scsi_bus_raw_control(void *_cookie, int32 op, void *data, size_t length)
+scsi_bus_raw_control(void *_cookie, uint32 op, void *data, size_t length)
 {
 	bus_raw_info *bus = _cookie;
 
