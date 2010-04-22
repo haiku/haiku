@@ -352,11 +352,14 @@ bool
 Playlist::SetCurrentItemIndex(int32 index)
 {
 	bool result = true;
-	if (index >= CountItems() || index < 0) {
+	if (index >= CountItems()) {
+		index = CountItems() - 1;
+		result = false;
+	}
+	if (index < 0) {
 		index = -1;
 		result = false;
 	}
-
 	if (index == fCurrentIndex)
 		return result;
 

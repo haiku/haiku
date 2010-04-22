@@ -28,8 +28,9 @@ public:
 			bool				IsModifierKey(uint32 keyCode) const;
 			uint32				Modifier(uint32 keyCode) const;
 			uint32				KeyForModifier(uint32 modifier) const;
-			uint8				IsDeadKey(uint32 keyCode,
-									uint32 modifiers,
+			uint8				ActiveDeadKey(uint32 keyCode,
+									uint32 modifiers) const;
+			uint8				DeadKey(uint32 keyCode, uint32 modifiers,
 									bool* isEnabled = NULL) const;
 			bool				IsDeadSecondKey(uint32 keyCode,
 									uint32 modifiers,

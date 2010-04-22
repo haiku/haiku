@@ -81,6 +81,8 @@ public:
 			BAffineTransform		TranslateByCopy(double x, double y) const;
 			BAffineTransform		TranslateByCopy(const BPoint& delta) const;
 
+//			const BAffineTransform&	SetTranslation(double x, double y);
+
 	// Rotation
 	inline	const BAffineTransform&	RotateBy(double angle);
 			const BAffineTransform&	RotateBy(const BPoint& center,
@@ -89,6 +91,8 @@ public:
 			BAffineTransform		RotateByCopy(double angle) const;
 			BAffineTransform		RotateByCopy(const BPoint& center,
 										double angle) const;
+
+//			const BAffineTransform&	SetRotation(double angle);
 
 	// Scaling
 	inline	const BAffineTransform&	ScaleBy(double scale);
@@ -111,6 +115,9 @@ public:
 			BAffineTransform		ScaleByCopy(const BPoint& center,
 										const BPoint& scale) const;
 
+			const BAffineTransform&	SetScale(double scale);
+			const BAffineTransform&	SetScale(double x, double y);
+
 	// Shearing
 	inline	const BAffineTransform&	ShearBy(double x, double y);
 			const BAffineTransform&	ShearBy(const BPoint& center, double x,
@@ -125,6 +132,8 @@ public:
 			BAffineTransform		ShearByCopy(const BPoint& shear) const;
 			BAffineTransform		ShearByCopy(const BPoint& center,
 										const BPoint& shear) const;
+
+//			const BAffineTransform&	SetShear(double x, double y);
 
 	// Multiplication
 	inline	const BAffineTransform&	Multiply(const BAffineTransform& other);
@@ -189,6 +198,9 @@ public:
 			double					tx;
 			double					ty;
 };
+
+
+extern const BAffineTransform B_AFFINE_IDENTITY_TRANSFORM;
 
 
 // #pragma mark - inline methods

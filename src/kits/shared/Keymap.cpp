@@ -247,12 +247,26 @@ BKeymap::KeyForModifier(uint32 modifier) const
 }
 
 
+/*! Checks whether a key is an active dead key.
+*/
+uint8
+BKeymap::ActiveDeadKey(uint32 keyCode, uint32 modifiers) const
+{
+	bool enabled;
+	uint8 deadKey = DeadKey(keyCode, modifiers, &enabled);
+	if (deadKey == 0 || !enabled)
+		return 0;
+
+	return deadKey;
+}
+
+
 /*! Checks whether a key is a dead key.
 	If it is, the enabled/disabled state of that dead key will be passed
 	out via isEnabled (isEnabled is not touched for non-dead keys).
 */
 uint8
-BKeymap::IsDeadKey(uint32 keyCode, uint32 modifiers, bool* _isEnabled) const
+BKeymap::DeadKey(uint32 keyCode, uint32 modifiers, bool* _isEnabled) const
 {
 	uint32 tableMask = 0;
 	int32 offset = Offset(keyCode, modifiers, &tableMask);
@@ -510,10 +524,10 @@ BKeymap::DeadKeyIndex(int32 offset) const
 		return 0;
 
 	uint32 numBytes = fChars[offset];
-	if (!numBytes)
+	if (!numBytes || numBytes > 4)
 		return 0;
 
-	char chars[4];
+	char chars[5];
 	strncpy(chars, &fChars[offset + 1], numBytes);
 	chars[numBytes] = 0;
 
@@ -527,19 +541,15 @@ BKeymap::DeadKeyIndex(int32 offset) const
 
 	uint8 result = 0;
 	for (int32 i = 0; i < 5; i++) {
-		if (offset == deadOffsets[i]) {
-			result = i + 1;
-			break;
-		}
+		if (offset == deadOffsets[i])
+			return i + 1;
 
 		uint32 deadNumBytes = fChars[deadOffsets[i]];
 		if (!deadNumBytes)
 			continue;
 
-		if (strncmp(chars, &fChars[deadOffsets[i] + 1], deadNumBytes) == 0) {
-			result = i + 1;
-			break;
-		}
+		if (strncmp(chars, &fChars[deadOffsets[i] + 1], deadNumBytes) == 0)
+			return i + 1;
 	}
 
 	return result;

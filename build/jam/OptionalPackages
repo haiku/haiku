@@ -24,6 +24,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	BePDF					- native PDF reader
 #	BeZillaBrowser			- fork of Mozilla's 1.8 branch.
 #	Bluetooth				- experimental Haiku components for Bluetooth
+#	Bzip					- file archiving utility
 #	CDRecord				- the command line CD writing tools
 #	Clockwerk				- native audio/video compositing
 #	CLucene					- indexed file search
@@ -69,6 +70,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Welcome					- introductory documentation to Haiku
 #	WifiFirmwareScriptData	- data files needed by install-wifi-firmwares.sh
 #	WonderBrush				- native graphics application
+#	XZ-Utils				- file archiving utility
 #	Yasm					- the assembler utility
 
 local baseURL = http://haiku-files.org/files/optional-packages ;

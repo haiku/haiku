@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -159,7 +159,7 @@ KeyboardLayoutView::MouseDown(BPoint point)
 		if (fKeymap != NULL) {
 			bool isEnabled = false;
 			uint8 deadKey
-				= fKeymap->IsDeadKey(key->code, fModifiers, &isEnabled);
+				= fKeymap->DeadKey(key->code, fModifiers, &isEnabled);
 			if (deadKey > 0) {
 				fKeymap->SetDeadKeyEnabled(key->code, fModifiers, !isEnabled);
 				_InvalidateKey(key);
@@ -585,7 +585,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 	char text[32];
 	if (fKeymap != NULL) {
 		_GetKeyLabel(key, text, sizeof(text), keyKind);
-		deadKey = fKeymap->IsDeadKey(key->code, fModifiers, &isDeadKeyEnabled);
+		deadKey = fKeymap->DeadKey(key->code, fModifiers, &isDeadKeyEnabled);
 		secondDeadKey = fKeymap->IsDeadSecondKey(key->code, fModifiers,
 			fDeadKey);
 	} else {
@@ -945,7 +945,7 @@ KeyboardLayoutView::_HandleDeadKey(uint32 key, int32 modifiers)
 		return false;
 
 	bool isEnabled = false;
-	int32 deadKey = fKeymap->IsDeadKey(key, modifiers, &isEnabled);
+	int32 deadKey = fKeymap->DeadKey(key, modifiers, &isEnabled);
 	if (fDeadKey != deadKey) {
 		if (isEnabled) {
 			Invalidate();

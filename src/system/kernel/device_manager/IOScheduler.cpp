@@ -31,21 +31,6 @@
 #endif
 
 
-// #pragma mark - IOCallback
-
-
-IOCallback::~IOCallback()
-{
-}
-
-
-status_t
-IOCallback::DoIO(IOOperation* operation)
-{
-	return B_ERROR;
-}
-
-
 // #pragma mark -
 
 
@@ -254,7 +239,7 @@ IOScheduler::InitCheck() const
 void
 IOScheduler::SetCallback(IOCallback& callback)
 {
-	SetCallback(&_IOCallbackWrapper, &callback);
+	SetCallback(&IOCallback::WrapperFunction, &callback);
 }
 
 
@@ -867,13 +852,6 @@ IOScheduler::_GetRequestOwner(team_id team, thread_id thread, bool allocate)
 
 	fUnusedRequestOwners.MoveFrom(&existingOwners);
 	return owner;
-}
-
-
-/*static*/ status_t
-IOScheduler::_IOCallbackWrapper(void* data, io_operation* operation)
-{
-	return ((IOCallback*)data)->DoIO(operation);
 }
 
 

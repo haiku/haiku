@@ -1479,11 +1479,8 @@ BTextView::AcceptsPaste(BClipboard *clipboard)
 bool
 BTextView::AcceptsDrop(const BMessage *inMessage)
 {
-	if (fEditable && inMessage && (inMessage->HasData("text/plain", B_MIME_TYPE)
-			|| inMessage->HasData("refs", B_REF_TYPE)))
-		return true;
-
-	return false;
+	return fEditable && inMessage
+		&& inMessage->HasData("text/plain", B_MIME_TYPE);
 }
 
 
@@ -4790,9 +4787,6 @@ BTextView::_MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 		}
 
 		Insert(dropOffset, text, dataLen, runArray);
-	} else if (inMessage->FindRef("refs", &ref) == B_OK) {
-		BPath path(&ref);
-		Insert(dropOffset, path.Path(), strlen(path.Path()));
 	}
 
 	return true;

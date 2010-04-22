@@ -68,6 +68,7 @@ public:
 			void				SetVolume(float value);
 			void				SetPosition(float value, bigtime_t position,
 									bigtime_t duration);
+			float				Position() const;
 
 			PeakView*			GetPeakView() const
 									{ return fPeakView; }

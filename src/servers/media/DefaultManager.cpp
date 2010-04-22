@@ -382,7 +382,8 @@ DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type,
 	BPath msgPath;
 	dormant_node_info msgDninfo;
 	int32 input_id;
-	bool isAudio = type & B_MEDIA_RAW_AUDIO;
+	bool isAudio = (type == B_MEDIA_RAW_AUDIO) 
+		|| (type == B_MEDIA_ENCODED_AUDIO);
 
 	for (int32 i = 0; i < fMsgList.CountItems(); i++) {
 		msg = (BMessage *)fMsgList.ItemAt(i);
