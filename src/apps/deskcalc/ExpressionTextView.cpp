@@ -178,68 +178,64 @@ ExpressionTextView::SetExpression(const char* expression)
 
 
 void
-ExpressionTextView::SetValue(const char* value)
+ExpressionTextView::SetValue(BString value)
 {
-	// copy the value string so we can modify it
-	BString val(value);
-	
 	// save the value
-	fCurrentValue = val;
+	fCurrentValue = value;
 
 	// calculate the width of the string
 	BFont font;
 	uint32 mode = B_FONT_ALL;
 	GetFontAndColor(&font, &mode);
-	float stringWidth = font.StringWidth(val);
+	float stringWidth = font.StringWidth(value);
 	
 	// make the string shorter if it does not fit in the view
 	float viewWidth = Frame().Width();
-	if (val.CountChars() > 3 && stringWidth > viewWidth) {
-		
+	if (value.CountChars() > 3 && stringWidth > viewWidth) {
 		// get the position of the first digit
 		int32 firstDigit = 0;
-		if (val[0] == '-')
+		if (value[0] == '-')
 			firstDigit++;
 
 		// calculate the value of the exponent
 		int32 exponent = 0;
-		int32 offset = val.FindFirst('.');
+		int32 offset = value.FindFirst('.');
 		if (offset == B_ERROR) {
-			exponent = val.CountChars() - 1 - firstDigit;
-			val.Insert('.', 1, firstDigit + 1);
+			exponent = value.CountChars() - 1 - firstDigit;
+			value.Insert('.', 1, firstDigit + 1);
 		} else {
 			if (offset == firstDigit + 1) {
 				// if the value is 0.01 or larger then scientific notation
 				// won't shorten the string
-				if (val[firstDigit] != '0' || val[firstDigit+2] != '0' 
-					|| val[firstDigit+3] != '0') {
+				if (value[firstDigit] != '0' || value[firstDigit+2] != '0' 
+					|| value[firstDigit + 3] != '0') {
 					exponent = 0;
 				} else {
 					// remove the period
-					val.Remove(offset, 1);
+					value.Remove(offset, 1);
 					
 					// check for negative exponent value
 					exponent = 0;
-					while (val[firstDigit] == '0') {
-						val.Remove(firstDigit, 1);
+					while (value[firstDigit] == '0') {
+						value.Remove(firstDigit, 1);
 						exponent--;
 					}
 					
-					//add the period
-					val.Insert('.', 1, firstDigit + 1);
+					// add the period
+					value.Insert('.', 1, firstDigit + 1);
 				}
 			} else {
 				// if the period + 1 digit fits in the view scientific notation
 				// won't shorten the string
-				BString temp = val;
+				BString temp = value;
 				temp.Truncate(offset + 2);
 				stringWidth = font.StringWidth(temp);
 				if (stringWidth < viewWidth)
 					exponent = 0;
 				else {
 					// move the period
-					val.Remove(offset, 1);
-					val.Insert('.', 1, firstDigit + 1);
+					value.Remove(offset, 1);
+					value.Insert('.', 1, firstDigit + 1);
 					
 					exponent = offset - (firstDigit + 1);
 				}
@@ -247,72 +243,73 @@ ExpressionTextView::SetValue(const char* value)
 		}
 		
 		// add the exponent
-		offset = val.CountChars() - 1;
+		offset = value.CountChars() - 1;
 		if (exponent != 0)
-			val << "E" << exponent;
+			value << "E" << exponent;
 		
 		// reduce the number of digits until the string fits or can not be
 		// made any shorter
-		stringWidth = font.StringWidth(val);
+		stringWidth = font.StringWidth(value);
 		char lastRemovedDigit = '0';
 		while (offset > firstDigit && stringWidth > viewWidth) {
-			if (val[offset] != '.')	
-				lastRemovedDigit = val[offset];
-			val.Remove(offset--, 1);
-			stringWidth = font.StringWidth(val);
+			if (value[offset] != '.')	
+				lastRemovedDigit = value[offset];
+			value.Remove(offset--, 1);
+			stringWidth = font.StringWidth(value);
 		}
 		
 		// there is no need to keep the period if no digits follow
-		if (val[offset] == '.') {
-			val.Remove(offset, 1);
+		if (value[offset] == '.') {
+			value.Remove(offset, 1);
 			offset--;
 		}
 		
 		// take care of proper rounding of the result
-		int digit = (int)lastRemovedDigit - 48; // ascii to int
+		int digit = (int)lastRemovedDigit - '0'; // ascii to int
 		if (digit >= 5) {
 			for (; offset >= firstDigit; offset--) {
-				if (val[offset] == '.')
+				if (value[offset] == '.')
 					continue;
-				digit = (int)(val[offset]) - 47; // ascii to int + 1
-				if (digit != 10) break;
-				val.Remove(offset, 1);
+				digit = (int)(value[offset]) - '0' + 1; // ascii to int + 1
+				if (digit != 10)
+					break;
+				value.Remove(offset, 1);
 			}
 			if (digit == 10) {
 				// carry over, shift the result
-				if (val[firstDigit+1] == '.') {
-					val[firstDigit+1] = '0';
-					val[firstDigit] = '.';
+				if (value[firstDigit+1] == '.') {
+					value[firstDigit+1] = '0';
+					value[firstDigit] = '.';
 				}
-				val.Insert('1', 1, firstDigit);
+				value.Insert('1', 1, firstDigit);
 				
-				//remove the exponent value and the last digit
-				offset = val.FindFirst('E');
+				// remove the exponent value and the last digit
+				offset = value.FindFirst('E');
 				if (offset == B_ERROR) 
-					offset = val.CountChars();
-				val.Truncate(--offset);
-				offset--; //offset now points to the last digit
+					offset = value.CountChars();
+				value.Truncate(--offset);
+				offset--; // offset now points to the last digit
 				
 				// increase the exponent and add it back to the string
 				exponent++;
-				val << 'E' << exponent;
+				value << 'E' << exponent;
 			} else {
 				// increase the current digit value with one
-				val[offset] = char(digit + 48);
+				value[offset] = char(digit + 48);
 			}
 		}
 		
 		// remove trailing zeros
-		while (val[offset] == '0')
-			val.Remove(offset--, 1);
+		while (value[offset] == '0')
+			value.Remove(offset--, 1);
 		
 		// there is no need to keep the period if no digits follow
-		if (val[offset] == '.')
-			val.Remove(offset, 1);
+		if (value[offset] == '.')
+			value.Remove(offset, 1);
 	}
 
 	// set the new value	
-	SetExpression(val);
+	SetExpression(value);
 }
 
 

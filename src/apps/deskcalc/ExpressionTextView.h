@@ -42,7 +42,7 @@ class ExpressionTextView : public InputTextView {
 			void				AddKeypadLabel(const char* label);
 
 			void				SetExpression(const char* expression);
-			void				SetValue(const char* value);
+			void				SetValue(BString value);
 
 			void				BackSpace();
 			void				Clear();
