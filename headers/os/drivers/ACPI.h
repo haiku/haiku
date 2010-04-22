@@ -131,37 +131,7 @@ enum {
  */ 
 typedef uint32 acpi_status;
 
-#define AE_CODE_PROGRAMMER              0x1000
- 
-#define AE_OK                           0x0000
-#define AE_ERROR                        0x0001
-#define AE_NOT_ACQUIRED                 0x0014
-#define AE_NO_HARDWARE_RESPONSE         0x0016
-#define AE_BAD_PARAMETER                (0x0001 | AE_CODE_PROGRAMMER)
-#define AE_BAD_ADDRESS                  (0x0009 | AE_CODE_PROGRAMMER)
- 
-#else
-#error "Our ACPI.h uses different naming than actypes.h.\n" \\
-		"If you need actypes.h this probably needs updating."
-
 #endif	// __ACTYPES_H__
-
-
-#ifndef __ACRESTYP_H__
-
-
-typedef struct acpi_prt
-{
-    uint32              length;
-    uint32              pin;
-    int			        address;        /* here for 64-bit alignment */
-    uint32              sourceIndex;
-    char                source[4];		/* pad to 64 bits so sizeof() works in
-    									all cases */
-} acpi_pci_routing_table;
-
-
-#endif // __ACRESTYP_H__
 
 
 typedef uint32 (*acpi_event_handler)(void *Context);

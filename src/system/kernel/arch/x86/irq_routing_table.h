@@ -39,6 +39,18 @@ struct irq_descriptor
 };
 
 
+/* Similar to bus_managers/acpi/include/acrestyp.h definition */
+typedef struct acpi_prt
+{
+	uint32			length;
+	uint32			pin;
+	int				address;		/* here for 64-bit alignment */
+	uint32			sourceIndex;
+	char			source[4];		/* pad to 64 bits so sizeof() works in
+									all cases */
+} acpi_pci_routing_table;
+
+
 void print_irq_descriptor(irq_descriptor* descriptor);
 void print_irq_routing_table(IRQRoutingTable* table);
 

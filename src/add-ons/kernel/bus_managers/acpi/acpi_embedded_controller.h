@@ -33,10 +33,17 @@
 
 #include <ACPI.h>
 #include <condition_variable.h>
-#include <dpc.h>
+
 #include <Drivers.h>
 #include <KernelExport.h>
 #include <lock.h>
+
+extern "C" {
+#include "acpi.h"
+#include "accommon.h"
+#include "acnamesp.h"
+#include "acpi_priv.h"
+}
 
 // #define TRACE_EMBEDDED_CONTROLLER
 #ifdef TRACE_EMBEDDED_CONTROLLER
@@ -44,72 +51,6 @@
 #else
 #	define TRACE(x...)
 #endif
-
-
-dpc_module_info *gDPC = NULL;
-void *gDPCHandle = NULL;
-
-
-#define ACPI_GPE_EDGE_TRIGGERED         (uint8) 0x00
-#define ACPI_GPE_TYPE_RUNTIME           (uint8) 0x04    /* Default */
-
-#define ACPI_NOT_ISR                    0x1
-#define ACPI_ISR                        0x0
-
-enum {
-	OSL_GLOBAL_LOCK_HANDLER,
-	OSL_NOTIFY_HANDLER,
-	OSL_GPE_HANDLER,
-	OSL_DEBUGGER_THREAD,
-	OSL_EC_POLL_HANDLER,
-	OSL_EC_BURST_HANDLER
-};
-
-typedef void (*ACPI_OSD_EXEC_CALLBACK)(void* Context);
-
-
-// ToDo: Maybe also put this acpi function into the acpi module?
-status_t
-AcpiOsExecute(uint32 Type, ACPI_OSD_EXEC_CALLBACK Function,
-	void *Context)
-{
-	switch (Type) {
-		case OSL_GLOBAL_LOCK_HANDLER:
-		case OSL_NOTIFY_HANDLER:
-		case OSL_GPE_HANDLER:
-		case OSL_DEBUGGER_THREAD:
-		case OSL_EC_POLL_HANDLER:
-		case OSL_EC_BURST_HANDLER:
-			break;
-	}
-
-	if (gDPC->queue_dpc(gDPCHandle, Function, Context) != B_OK)
-		return B_ERROR;
-
-	return B_OK;
-}
-
-/* copied from utmisc.c don't want to put this simple function into the acpi
-module */
-void
-AcpiUtStrupr(char *SrcString)
-{
-    char *String;
-
-    if (!SrcString)
-    {
-        return;
-    }
-
-    /* Walk entire string, uppercasing the letters */
-
-    for (String = SrcString; *String; String++)
-    {
-        *String = (char) toupper(*String);
-    }
-
-    return;
-}
 
 
 #define ACPI_REGION_DEACTIVATE  1

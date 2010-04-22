@@ -12,6 +12,7 @@ __BEGIN_DECLS
 #include <device_manager.h>
 #include <KernelExport.h>
 #include <ACPI.h>
+#include <PCI.h>
 
 // name of ACPI root module
 #define ACPI_ROOT_MODULE_NAME 	"bus_managers/acpi/root/driver_v1"
@@ -24,6 +25,7 @@ __BEGIN_DECLS
 
 
 extern device_manager_info *gDeviceManager;
+extern pci_module_info *gPCIManager;
 
 // information about one ACPI device
 typedef struct acpi_device_cookie {
@@ -123,6 +125,9 @@ typedef struct acpi_root_info {
 extern struct acpi_module_info gACPIModule;
 
 extern struct device_module_info acpi_ns_dump_module;
+
+extern struct driver_module_info embedded_controller_driver_module;
+extern struct device_module_info embedded_controller_device_module;
 
 extern acpi_device_module_info gACPIDeviceModule;
 

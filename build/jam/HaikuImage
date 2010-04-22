@@ -119,6 +119,8 @@ SYSTEM_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant
 	$(X86_ONLY)ati.accelerant
 	#$(X86_ONLY)via.accelerant
 	#$(X86_ONLY)vmware.accelerant
+	#$(X86_ONLY)radeonhd.accelerant
+	
 ;
 SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	HVIFTranslator ICOTranslator JPEGTranslator JPEG2000Translator
@@ -241,7 +243,6 @@ if $(TARGET_ARCH) = x86 {
 AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToHaikuImage power : $(X86_ONLY)enhanced_speedstep ;
 AddNewDriversToHaikuImage power : $(X86_ONLY)acpi_battery ;
-AddNewDriversToHaikuImage power : $(X86_ONLY)acpi_embedded_controller ;
 
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf null
