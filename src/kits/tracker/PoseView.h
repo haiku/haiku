@@ -446,7 +446,7 @@ class BPoseView : public BView {
 
 		void AddPoseToList(PoseList *list, bool visibleList, bool insertionSort,
 			BPose *pose, BRect &viewBounds, float &listViewScrollBy,
-			bool forceDraw);
+			bool forceDraw, int32 *indexPtr = NULL);
 		BPose *CreatePose(Model *, PoseInfo *, bool insertionSort = true,
 			int32 *index = 0, BRect *boundsPtr = 0, bool forceDraw = true);
 		virtual void CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,

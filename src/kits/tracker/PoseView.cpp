@@ -1653,7 +1653,7 @@ BPoseView::AddPosesThreadValid(const entry_ref *ref) const
 
 void
 BPoseView::AddPoseToList(PoseList *list, bool visibleList, bool insertionSort,
-	BPose *pose, BRect &viewBounds, float &listViewScrollBy, bool forceDraw)
+	BPose *pose, BRect &viewBounds, float &listViewScrollBy, bool forceDraw, int32 *indexPtr)
 {
 	int32 poseIndex = list->CountItems();
 
@@ -1732,6 +1732,9 @@ BPoseView::AddPoseToList(PoseList *list, bool visibleList, bool insertionSort,
 		if (viewBounds.Intersects(poseBounds))
  			SynchronousUpdate(poseBounds);
 	}
+	
+	if (indexPtr)
+		*indexPtr = poseIndex;
 }
 
 
@@ -1793,11 +1796,11 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 			case kListMode:
 			{
 				AddPoseToList(fPoseList, !fFiltering, insertionSort, pose,
-					viewBounds, listViewScrollBy, forceDraw);
+					viewBounds, listViewScrollBy, forceDraw, &poseIndex);
 
 				if (fFiltering && FilterPose(pose)) {
 					AddPoseToList(fFilteredPoseList, true, insertionSort, pose,
-						viewBounds, listViewScrollBy, forceDraw);
+						viewBounds, listViewScrollBy, forceDraw, &poseIndex);
 				}
 
 				break;
