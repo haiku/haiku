@@ -32,6 +32,7 @@ public:
 
 	// SeekSlider
 			void				SetPosition(float position);
+			float				Position() const;
 			bool				IsTracking() const;
 			void				SetDisabledString(const char* string);
 

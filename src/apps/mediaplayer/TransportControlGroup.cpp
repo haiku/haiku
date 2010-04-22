@@ -464,6 +464,13 @@ TransportControlGroup::SetPosition(float value, bigtime_t position,
 }
 
 
+float
+TransportControlGroup::Position() const
+{
+	return fSeekSlider->Position();
+}
+
+
 void
 TransportControlGroup::SetDisabledString(const char* string)
 {

@@ -299,6 +299,16 @@ SeekSlider::SetPosition(float position)
 }
 
 
+float
+SeekSlider::Position() const
+{
+	int32 range = fMaxValue - fMinValue;
+	if (range == 0)
+		return 0;
+	return (float)(Value() - fMinValue) / range;
+}
+
+
 bool
 SeekSlider::IsTracking() const
 {
