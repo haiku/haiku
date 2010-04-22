@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src add-ons kernel busses scsi ahci ;
 
 UsePrivateHeaders drivers ;
 UsePrivateKernelHeaders ;
+UseHeaders
+	[ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers ata ] : true ;
 
 KernelAddon ahci :
 	ahci.c
@@ -10,4 +12,4 @@ KernelAddon ahci :
 	ahci_sim.cpp
 	sata_request.cpp
 	util.c
-	;
+;

@@ -13,9 +13,10 @@
 #include <ByteOrder.h>
 #include <KernelExport.h>
 
+#include <ATAInfoblock.h>
+
 #include "ahci_controller.h"
 #include "ahci_tracing.h"
-#include "ata_cmds.h"
 #include "sata_request.h"
 #include "scsi_cmds.h"
 #include "util.h"
@@ -547,7 +548,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 	scsi_cmd_inquiry *cmd = (scsi_cmd_inquiry *)request->cdb;
 	scsi_res_inquiry scsiData;
-	ata_res_identify_device	ataData;
+	ata_device_infoblock ataData;
 
 	ASSERT(sizeof(ataData) == 512);
 
@@ -604,10 +605,10 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		sizeof(scsiData.product_rev));
 
 	if (!fIsATAPI) {
-		bool lba = (ataData.words[49] & (1 << 9)) != 0;
-		bool lba48 = (ataData.words[83] & (1 << 10)) != 0;
-		uint32 sectors = *(uint32*)&ataData.words[60];
-		uint64 sectors48 = *(uint64*)&ataData.words[100];
+		bool lba = ataData.dma_supported != 0;
+		bool lba48 = ataData.lba48_supported != 0;
+		uint32 sectors = ataData.lba_sector_count;
+		uint64 sectors48 = ataData.lba48_sector_count;
 		fUse48BitCommands = lba && lba48;
 		fSectorSize = 512;
 		fSectorCount = !(lba || sectors) ? 0 : lba48 ? sectors48 : sectors;
