@@ -5337,7 +5337,6 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 				!= physicalAddress - table[index].size) {
 			if ((uint32)++index + 1 > numEntries) {
 				// table to small
-				status = B_BUFFER_OVERFLOW;
 				break;
 			}
 			table[index].address = (void*)physicalAddress;
