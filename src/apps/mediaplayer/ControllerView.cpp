@@ -98,8 +98,10 @@ void
 ControllerView::TogglePlaying()
 {
 	BAutolock _(fPlaylist);
-	if (fPlaylist->CurrentItemIndex() < 0) {
-		// No valid playlist item - start again from the first one
+	if (fPlaylist->CurrentItemIndex() == fPlaylist->CountItems() - 1
+		&& Position() == 1.0) {
+		// Reached end of playlist and end of last item
+		// -> start again from the first item.
 		fPlaylist->SetCurrentItemIndex(0);
 	} else
 		fController->TogglePlaying();
