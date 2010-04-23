@@ -1654,6 +1654,9 @@ BMenu::_Track(int* action, long start)
 		}
 
 		UnlockLooper();
+		
+		if (releasedOnce)
+			_UpdateStateClose(item, location, buttons);
 
 		if (fState != MENU_STATE_CLOSED) {
 			bigtime_t snoozeAmount = 50000;
