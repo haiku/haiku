@@ -65,11 +65,11 @@ public:
 									~ATAChannel();
 
 		status_t					InitCheck();
-		uint32						ChannelID() { return fChannelID; };
+		uint32						ChannelID() const { return fChannelID; }
 
 		// SCSI stuff
 		void						SetBus(scsi_bus bus);
-		scsi_bus					Bus() { return fSCSIBus; };
+		scsi_bus					Bus() const { return fSCSIBus; }
 		status_t					ScanBus();
 
 		void						PathInquiry(scsi_path_inquiry *info);
@@ -84,7 +84,7 @@ public:
 
 		status_t					Reset();
 
-		bool						UseDMA() { return fUseDMA; };
+		bool						UseDMA() const { return fUseDMA; }
 
 		status_t					Wait(uint8 setBits, uint8 clearedBits,
 										uint32 flags, bigtime_t timeout);
@@ -142,7 +142,7 @@ private:
 										uint8 *virtualAddress, size_t length,
 										size_t *transferred);
 
-		const char *				_DebugContext() { return fDebugContext; };
+		const char *				_DebugContext() { return fDebugContext; }
 
 		device_node *				fNode;
 		uint32						fChannelID;
@@ -207,7 +207,7 @@ virtual	status_t					Configure();
 										uint64 address, uint32 sectorCount);
 
 protected:
-		const char *				_DebugContext() { return fDebugContext; };
+		const char *				_DebugContext() { return fDebugContext; }
 
 		ATAChannel *				fChannel;
 		ata_device_infoblock		fInfoBlock;
@@ -242,7 +242,7 @@ virtual								~ATAPIDevice();
 		status_t					SendPacket(ATARequest *request);
 virtual	status_t					ExecuteIO(ATARequest *request);
 
-virtual	bool						IsATAPI() { return true; };
+virtual	bool						IsATAPI() const { return true; }
 
 virtual	status_t					Configure();
 
@@ -261,47 +261,49 @@ public:
 									~ATARequest();
 
 		void						SetStatus(uint8 status);
-		uint8						Status() { return fStatus; };
+		uint8						Status() const { return fStatus; }
 
 		void						ClearSense();
 		void						SetSense(uint8 key, uint16 codeQualifier);
-		uint8						SenseKey() { return fSenseKey; };
-		uint8						SenseCode() { return fSenseCode; };
-		uint8						SenseQualifier() { return fSenseQualifier; };
+		uint8						SenseKey() const { return fSenseKey; }
+		uint8						SenseCode() const { return fSenseCode; }
+		uint8						SenseQualifier() const
+										{ return fSenseQualifier; }
 
 		void						SetDevice(ATADevice *device);
-		ATADevice *					Device() { return fDevice; };
+		ATADevice *					Device() const { return fDevice; }
 
 		void						SetTimeout(bigtime_t timeout);
-		bigtime_t					Timeout() { return fTimeout; };
+		bigtime_t					Timeout() const { return fTimeout; }
 
 		void						SetIsWrite(bool isWrite);
-		bool						IsWrite() { return fIsWrite; };
+		bool						IsWrite() const { return fIsWrite; }
 
 		void						SetUseDMA(bool useDMA);
-		bool						UseDMA() { return fUseDMA; };
+		bool						UseDMA() const { return fUseDMA; }
 
 		void						SetBytesLeft(uint32 bytesLeft);
-		size_t *					BytesLeft() { return &fBytesLeft; };
+		size_t *					BytesLeft() { return &fBytesLeft; }
 
-		bool						HasData() { return fCCB->data_length > 0; };
-		bool						HasSense() { return fSenseKey != 0; };
+		bool						HasData() const
+										{ return fCCB->data_length > 0; }
+		bool						HasSense() const { return fSenseKey != 0; }
 
 		status_t					Finish(bool resubmit);
 
 		// SCSI stuff
 		status_t					Start(scsi_ccb *ccb);
-		scsi_ccb *					CCB() { return fCCB; };
+		scsi_ccb *					CCB() { return fCCB; }
 
 		void						PrepareSGInfo();
 		void						AdvanceSG(uint32 bytes);
 
-		uint32						SGElementsLeft()
-										{ return fSGElementsLeft; };
-		const physical_entry *		CurrentSGElement()
-										{ return fCurrentSGElement; };
-		uint32						CurrentSGOffset()
-										{ return fCurrentSGOffset; };
+		uint32						SGElementsLeft() const
+										{ return fSGElementsLeft; }
+		const physical_entry *		CurrentSGElement() const
+										{ return fCurrentSGElement; }
+		uint32						CurrentSGOffset() const
+										{ return fCurrentSGOffset; }
 
 		void						SetOddByte(uint8 byte);
 		bool						GetOddByte(uint8 *byte);
