@@ -67,6 +67,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Vim						- the command line text editor
 #	Vision					- powerful native IRC client
 #	VLC						- the multi media player with native interface
+#	WebPositive				- native, WebKit-based web browser
 #	Welcome					- introductory documentation to Haiku
 #	WifiFirmwareScriptData	- data files needed by install-wifi-firmwares.sh
 #	WonderBrush				- native graphics application
@@ -1176,6 +1177,24 @@ if [ IsOptionalHaikuImagePackageAdded VLC ] {
 			: "/boot/apps/vlc-0.8.6d/VLC media player" ;
 		AddSymlinkToHaikuImage common bin
 			: "/boot/apps/vlc-0.8.6d/VLC media player" : vlc ;
+	}
+}
+
+
+# WebPositive
+if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package WebPositive available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
+		Echo "No optional package WebPositive available for gcc2" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			WebPositive-r1a2-gcc4-x86-r459-2010-04-23.zip
+			: $(baseURL)/WebPositive-r1a2-gcc4-x86-r459-2010-04-23.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/WebPositive/WebPositive ;
 	}
 }
 
