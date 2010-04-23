@@ -12,6 +12,7 @@
 #include <scsi.h>
 
 #include "dma_resources.h"
+#include "IOCache.h"
 #include "IORequest.h"
 #include "IOScheduler.h"
 
@@ -19,13 +20,20 @@
 #define SCSI_CD_DRIVER_MODULE_NAME "drivers/disk/scsi/scsi_cd/driver_v1"
 #define SCSI_CD_DEVICE_MODULE_NAME "drivers/disk/scsi/scsi_cd/device_v1"
 
+// enables using the IOCache instead of the IOScheduler
+#define USE_IO_CACHE	0
+
 
 struct cd_driver_info {
 	device_node*			node;
 	::scsi_periph_device	scsi_periph_device;
 	::scsi_device			scsi_device;
 	scsi_device_interface*	scsi;
+#if USE_IO_CACHE
+	IOCache*				io_scheduler;
+#else
 	IOScheduler*			io_scheduler;
+#endif
 	DMAResource*			dma_resource;
 
 	uint64					capacity;

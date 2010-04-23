@@ -884,7 +884,13 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 		if (status != B_OK)
 			panic("initializing DMAResource failed: %s", strerror(status));
 
+#if USE_IO_CACHE
+		info->io_scheduler = new(std::nothrow) IOCache(info->dma_resource,
+			1024 * 1024);
+#else
 		info->io_scheduler = new(std::nothrow) IOScheduler(info->dma_resource);
+#endif
+
 		if (info->io_scheduler == NULL)
 			panic("allocating IOScheduler failed.");
 
@@ -895,6 +901,11 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 
 		info->io_scheduler->SetCallback(do_io, info);
 	}
+
+#if USE_IO_CACHE
+	if (info->io_scheduler != NULL)
+		info->io_scheduler->SetDeviceCapacity(capacity * blockSize);
+#endif
 
 	info->block_size = blockSize;
 }
