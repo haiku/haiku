@@ -363,7 +363,6 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 		InstallOptionalHaikuImagePackage curl-7.20.1-r1a2-x86-gcc2-2010-04-22.zip
 			: $(baseURL)/curl-7.20.1-r1a2-x86-gcc2-2010-04-22.zip
 			:
-			: true
 		;
 	}
 }
@@ -691,7 +690,6 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 		InstallOptionalHaikuImagePackage libxml2-2.7.7-r1a2-x86-gcc2-2010-04-22.zip
 			: $(baseURL)/libxml2-2.7.7-r1a2-x86-gcc2-2010-04-22.zip
 			:
-			: true
 		;
 	}
 }
@@ -1022,7 +1020,6 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 		InstallOptionalHaikuImagePackage sqlite-3.6.23-r1a2-x86-gcc2-2010-04-22.zip
 			: $(baseURL)/sqlite-3.6.23-r1a2-x86-gcc2-2010-04-22.zip
 			:
-			: true
 		;
 	}
 }
