@@ -18,8 +18,8 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_IMAGE_HOST_NAME = shredder ;
 		HAIKU_IMAGE_SIZE = 650 ;
 
-		AddOptionalHaikuImagePackages BePDF BeZillaBrowser Clockwerk Pe Vision
-			VLC WonderBrush ;
+		AddOptionalHaikuImagePackages BePDF Clockwerk Pe Vision
+			WebPositive WonderBrush ;
 		AddOptionalHaikuImagePackages CVS Development Git Mercurial
 			Python Subversion OpenSSH OpenSSL ;
 		AddOptionalHaikuImagePackages Nano P7zip Welcome BeBook XZ-Utils ;
