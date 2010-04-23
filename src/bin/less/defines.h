@@ -197,7 +197,7 @@
 
 
 /* Define EDIT_PGM to your editor. */
-#define EDIT_PGM "vi"
+#define EDIT_PGM "nano"
 
 /* Define HAVE_CONST if your compiler supports the "const" modifier. */
 #define HAVE_CONST 1
