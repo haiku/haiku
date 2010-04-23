@@ -903,8 +903,8 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 				:
 			;
 		} else {
-			InstallOptionalHaikuImagePackage p7zip-9.04-r1a2-x86-gcc2-2010-04-22b.zip
-				: $(baseURL)/p7zip-9.04-r1a2-x86-gcc2-2010-04-22b.zip
+			InstallOptionalHaikuImagePackage p7zip-9.04-r1a2-x86-gcc2-2010-04-22c.zip
+				: $(baseURL)/p7zip-9.04-r1a2-x86-gcc2-2010-04-22c.zip
 				:
 			;
 		}
