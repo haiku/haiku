@@ -31,6 +31,7 @@
 static const uint32 kMsgAddDevices = 'ddDv';
 static const uint32 kMsgRemoveDevice = 'rmDv';
 static const uint32 kMsgPairDevice = 'trDv';
+static const uint32 kMsgDisconnectDevice = 'dsDv';
 static const uint32 kMsgBlockDevice = 'blDv';
 static const uint32 kMsgRefreshDevices = 'rfDv';
 
@@ -50,6 +51,8 @@ RemoteDevicesView::RemoteDevicesView(const char* name, uint32 flags)
 	pairButton = new BButton("pair", TR("Pair" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgPairDevice));
 
+	disconnectButton = new BButton("disconnect", TR("Disconnect"),
+		new BMessage(kMsgDisconnectDevice));
 
 	blockButton = new BButton("block", TR("As blocked"),
 		new BMessage(kMsgBlockDevice));
@@ -77,6 +80,7 @@ RemoteDevicesView::RemoteDevicesView(const char* name, uint32 flags)
 			.Add(availButton)
 			.AddGlue()
 			.Add(pairButton)
+			.Add(disconnectButton)
 			.Add(blockButton)
 			.AddGlue()
 			.SetInsets(0, 15, 0, 15)
@@ -101,6 +105,7 @@ RemoteDevicesView::AttachedToWindow(void)
 	addButton->SetTarget(this);
 	removeButton->SetTarget(this);
 	pairButton->SetTarget(this);
+	disconnectButton->SetTarget(this);
 	blockButton->SetTarget(this);
 	availButton->SetTarget(this);
 
@@ -142,6 +147,17 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 
 			if (remote != NULL)
 				remote->Authenticate();
+
+			break;
+		}
+		case kMsgDisconnectDevice:
+		{
+			DeviceListItem* device = static_cast<DeviceListItem*>(fDeviceList
+				->ItemAt(fDeviceList->CurrentSelection(0)));
+			RemoteDevice* remote = dynamic_cast<RemoteDevice*>(device->Device());
+
+			if (remote != NULL)
+				remote->Disconnect();
 
 			break;
 		}

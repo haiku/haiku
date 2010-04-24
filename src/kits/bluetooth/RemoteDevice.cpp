@@ -24,6 +24,8 @@
 
 namespace Bluetooth {
 
+// TODO: Check headers for valid/reserved ranges
+static const uint16 invalidConnectionHandle = 0xF000;
 
 bool
 RemoteDevice::IsTrustedDevice(void)
@@ -184,10 +186,55 @@ RemoteDevice::Authenticate()
 	if (fMessenger->SendMessage(&request, &reply) == B_OK)
 		reply.FindInt8("status", &btStatus);
 
-	if (btStatus == BT_OK)
+	if (btStatus == BT_OK) {
+		reply.FindInt16("handle", (int16*)&fHandle);
 		return true;
-	else
+	} else
 		return false;
+}
+
+
+status_t
+RemoteDevice::Disconnect(int8 reason)
+{
+	if (fHandle != invalidConnectionHandle) {
+
+		int8 btStatus = BT_ERROR;
+
+		if (fMessenger == NULL || fDiscovererLocalDevice == NULL)
+			return false;
+
+		BluetoothCommand<typed_command(struct hci_disconnect)>
+			disconnect(OGF_LINK_CONTROL, OCF_DISCONNECT);
+
+		disconnect->reason = reason;
+		disconnect->handle = fHandle;
+
+		BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+		BMessage reply;
+
+
+		request.AddInt32("hci_id", fDiscovererLocalDevice->ID());
+		request.AddData("raw command", B_ANY_TYPE,
+			disconnect.Data(), disconnect.Size());
+
+		request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
+		request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL,
+			OCF_DISCONNECT));
+
+		request.AddInt16("eventExpected",  HCI_EVENT_DISCONNECTION_COMPLETE);
+
+		if (fMessenger->SendMessage(&request, &reply) == B_OK)
+			reply.FindInt8("status", &btStatus);
+
+		if (btStatus == BT_OK)
+			fHandle = invalidConnectionHandle;
+
+		return btStatus;
+
+	}
+
+	return B_ERROR;
 }
 
 
@@ -231,7 +278,8 @@ RemoteDevice::SetLocalDeviceOwner(LocalDevice* ld)
 RemoteDevice::RemoteDevice(const bdaddr_t address, uint8 record[3])
 	:
 	BluetoothDevice(),
-	fDiscovererLocalDevice(NULL)
+	fDiscovererLocalDevice(NULL),
+	fHandle(invalidConnectionHandle)
 {
 	fBdaddr = address;
 	fDeviceClass.SetRecord(record);
@@ -242,7 +290,8 @@ RemoteDevice::RemoteDevice(const bdaddr_t address, uint8 record[3])
 RemoteDevice::RemoteDevice(const BString& address)
 	:
 	BluetoothDevice(),
-	fDiscovererLocalDevice(NULL)
+	fDiscovererLocalDevice(NULL),
+	fHandle(invalidConnectionHandle)
 {
 	fBdaddr = bdaddrUtils::FromString((const char*)address.String());
 	fMessenger = _RetrieveBluetoothMessenger();

@@ -6,6 +6,7 @@
 #define _REMOTE_DEVICE_H
 
 #include <bluetooth/bluetooth.h>
+#include <bluetooth/bluetooth_error.h>
 #include <bluetooth/BluetoothDevice.h>
 
 #include <String.h>
@@ -36,7 +37,8 @@ public:
 	bool Equals(RemoteDevice* obj);
 
 	/*static RemoteDevice* GetRemoteDevice(Connection conn);   Throwing */
-	bool Authenticate(); /* Throwing */
+	bool		Authenticate(); /* Throwing */
+	status_t	Disconnect(int8 reason = BT_REMOTE_USER_ENDED_CONNECTION);
 	/* bool Authorize(Connection conn);  Throwing */
 	/*bool Encrypt(Connection conn, bool on);  Throwing */
 	bool IsAuthenticated(); /* Throwing */
@@ -61,6 +63,7 @@ private:
 	LocalDevice* fDiscovererLocalDevice;
 	BMessenger*	 fMessenger;
 
+	uint16		fHandle;
 	uint8		fPageRepetitionMode;
 	uint8		fScanPeriodMode;
 	uint8		fScanMode;

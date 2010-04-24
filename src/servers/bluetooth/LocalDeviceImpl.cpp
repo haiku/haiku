@@ -163,8 +163,8 @@ LocalDeviceImpl::HandleExpectedRequest(struct hci_event_header* event,
 		case HCI_EVENT_DISCONNECTION_COMPLETE:
 			// should belong to a request?  can be sporadic or initiated by us¿?...
 			DisconnectionComplete(
-				JumpEventHeader<struct hci_ev_disconnection_complete_reply>(event),
-				request);
+				JumpEventHeader<struct hci_ev_disconnection_complete_reply>
+				(event), request);
 			break;
 
 		case HCI_EVENT_AUTH_COMPLETE:
@@ -864,6 +864,7 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event,
 	if (event->status == BT_OK) {
 		uint8 cod[3] = {0, 0, 0};
 
+		// TODO: Review, this rDevice is leaked
 		ConnectionIncoming* iConnection = new ConnectionIncoming(
 			new RemoteDevice(event->bdaddr, cod));
 		iConnection->Show();
@@ -883,6 +884,9 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event,
 		BMessage reply;
 		reply.AddInt8("status", event->status);
 
+		if (event->status == BT_OK)
+			reply.AddInt16("handle", event->handle);
+
 		request->SendReply(&reply);
 		reply.PrintToStream();
 
@@ -901,8 +905,15 @@ LocalDeviceImpl::DisconnectionComplete(
 		"%s: Handle=%#x, reason=%s status=%x\n", __FUNCTION__, event->handle,
 		BluetoothError(event->reason), event->status);
 
-	if (request != NULL)
+	if (request != NULL) {
+		BMessage reply;
+		reply.AddInt8("status", event->status);
+
+		request->SendReply(&reply);
+		reply.PrintToStream();
+
 		ClearWantedEvent(request);
+	}
 }
 
 
