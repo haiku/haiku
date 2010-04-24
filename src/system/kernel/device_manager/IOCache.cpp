@@ -12,8 +12,10 @@
 #include <heap.h>
 #include <low_resource_manager.h>
 #include <util/AutoLock.h>
-#include <util/DoublyLinkedList.h>
 #include <vm/vm.h>
+#include <vm/VMAddressSpace.h>
+#include <vm/VMCache.h>
+#include <vm/VMTranslationMap.h>
 
 
 //#define TRACE_IO_CACHE 1
@@ -24,10 +26,11 @@
 #endif
 
 
-// size of the line table
-static const size_t kLineTableSize = 128;
-	// TODO: The table should shrink/grow dynamically, but we can't allocate
-	// memory without risking a deadlock. Use a resource resizer!
+static inline bool
+page_physical_number_less(const vm_page* a, const vm_page* b)
+{
+	return a->physical_page_number < b->physical_page_number;
+}
 
 
 struct IOCache::Operation : IOOperation {
@@ -35,61 +38,18 @@ struct IOCache::Operation : IOOperation {
 };
 
 
-struct IOCache::LineHashDefinition {
-	typedef off_t	KeyType;
-	typedef	Line	ValueType;
-
-	LineHashDefinition(uint32 sizeShift)
-		:
-		fSizeShift(sizeShift)
-	{
-	}
-
-	size_t HashKey(off_t key) const
-	{
-		return size_t(key >> fSizeShift);
-	}
-
-	size_t Hash(const Line* value) const
-	{
-		return HashKey(value->offset);
-	}
-
-	bool Compare(off_t key, const Line* value) const
-	{
-		return value->offset == key;
-	}
-
-	Line*& GetLink(Line* value) const
-	{
-		return value->hashNext;
-	}
-
-private:
-	uint32	fSizeShift;
-};
-
-
-struct IOCache::LineTable : public BOpenHashTable<LineHashDefinition> {
-	LineTable(const LineHashDefinition& definition)
-		:
-		BOpenHashTable<LineHashDefinition>(definition)
-	{
-	}
-};
-
-
 IOCache::IOCache(DMAResource* resource, size_t cacheLineSize)
 	:
 	fDeviceCapacity(0),
 	fLineSize(cacheLineSize),
+	fPagesPerLine(cacheLineSize / B_PAGE_SIZE),
 	fDMAResource(resource),
 	fIOCallback(NULL),
 	fIOCallbackData(NULL),
-	fLineTable(NULL),
-	fUnusedLine(0),
-	fLineCount(0),
-	fLowMemoryHandlerRegistered(false)
+	fArea(-1),
+	fCache(NULL),
+	fPages(NULL),
+	fVecs(NULL)
 {
 	TRACE("%p->IOCache::IOCache(%p, %" B_PRIuSIZE ")\n", this, resource,
 		cacheLineSize);
@@ -100,7 +60,6 @@ IOCache::IOCache(DMAResource* resource, size_t cacheLineSize)
 			"multiple of the page size.", cacheLineSize);
 	}
 
-	mutex_init(&fLock, "I/O cache");
 	mutex_init(&fSerializationLock, "I/O cache request serialization");
 
 	fLineSizeShift = 0;
@@ -113,18 +72,14 @@ IOCache::IOCache(DMAResource* resource, size_t cacheLineSize)
 
 IOCache::~IOCache()
 {
-	if (fLowMemoryHandlerRegistered) {
-		unregister_low_resource_handler(&_LowMemoryHandlerEntry, this);
-			// TODO: Avoid the race condition with the handler!
+	if (fArea >= 0) {
+		vm_page_unreserve_pages(&fMappingReservation);
+		delete_area(fArea);
 	}
 
-	delete fLineTable;
+	delete[] fPages;
+	delete[] fVecs;
 
-	while (Line* line = fUsedLines.RemoveHead())
-		_FreeLine(line);
-	_FreeLine(fUnusedLine);
-
-	mutex_destroy(&fLock);
 	mutex_destroy(&fSerializationLock);
 }
 
@@ -134,33 +89,33 @@ IOCache::Init(const char* name)
 {
 	TRACE("%p->IOCache::Init(\"%s\")\n", this, name);
 
-	// create the line hash table
-	fLineTable = new(std::nothrow) LineTable(LineHashDefinition(
-		fLineSizeShift));
-	if (fLineTable == NULL)
+	// create the area for mapping cache lines
+	fArea = vm_create_null_area(B_SYSTEM_TEAM, "I/O cache line", &fAreaBase,
+		B_ANY_KERNEL_ADDRESS, fLineSize, 0);
+	if (fArea < 0)
+		return fArea;
+
+	// reserve pages for mapping a complete cache line
+	VMAddressSpace* addressSpace = VMAddressSpace::Kernel();
+	VMTranslationMap* translationMap = addressSpace->TranslationMap();
+	size_t pagesNeeded = translationMap->MaxPagesNeededToMap((addr_t)fAreaBase,
+		(addr_t)fAreaBase + fLineSize - 1);
+	vm_page_reserve_pages(&fMappingReservation, pagesNeeded,
+		VM_PRIORITY_SYSTEM);
+
+	// get the area's cache
+	VMArea* area = VMAreaHash::Lookup(fArea);
+	if (area == NULL) {
+		panic("IOCache::Init(): Where's our area (id: %" B_PRId32 ")?!", fArea);
+		return B_ERROR;
+	}
+	fCache = area->cache;
+
+	// allocate arrays for pages and iovecs
+	fPages = new(std::nothrow) vm_page*[fPagesPerLine];
+	fVecs = new(std::nothrow) iovec[fPagesPerLine];
+	if (fPages == NULL || fVecs == NULL)
 		return B_NO_MEMORY;
-
-	status_t error = fLineTable->Init(kLineTableSize);
-	if (error != B_OK)
-		return error;
-
-	// create at least one cache line
-	MutexLocker locker(fLock);
-	fUnusedLine = _AllocateLine();
-	locker.Unlock();
-	if (fUnusedLine == NULL)
-		return B_NO_MEMORY;
-
-	// register low memory handler
-	error = register_low_resource_handler(&_LowMemoryHandlerEntry, this,
-		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
-			| B_KERNEL_RESOURCE_ADDRESS_SPACE, 1);
-			// higher priority than the block cache, so we should be drained
-			// first
-	if (error != B_OK)
-		return error;
-
-	fLowMemoryHandlerRegistered = true;
 
 	return B_OK;
 }
@@ -184,14 +139,20 @@ IOCache::SetCallback(io_callback callback, void* data)
 void
 IOCache::SetDeviceCapacity(off_t deviceCapacity)
 {
-	MutexLocker serializationLocker(fLock);
-	MutexLocker locker(fSerializationLock);
+	TRACE("%p->IOCache::SetDeviceCapacity(%" B_PRIdOFF ")\n", this,
+		deviceCapacity);
+
+	MutexLocker serializationLocker(fSerializationLock);
+	AutoLocker<VMCache> cacheLocker(fCache);
 
 	fDeviceCapacity = deviceCapacity;
 
-	// new media -- burn all cache lines
-	while (Line* line = fUsedLines.Head())
-		_DiscardLine(line);
+	// new media -- burn all cached data
+	while (vm_page* page = fCache->pages.Root()) {
+		DEBUG_PAGE_ACCESS_START(page);
+		fCache->RemovePage(page);
+		vm_page_free(NULL, page);
+	}
 }
 
 
@@ -271,11 +232,11 @@ IOCache::_DoRequest(IORequest* request, size_t& _bytesTransferred)
 		// intersection of request and cache line
 		off_t cacheLineEnd = std::min(lineOffset + fLineSize, fDeviceCapacity);
 		size_t requestLineLength
-			= std::min(size_t(cacheLineEnd - offset), length);
+			= std::min(cacheLineEnd - offset, (off_t)length);
 
 		// transfer the data of the cache line
-		status_t error = _TransferRequestLine(request, lineOffset, offset,
-			requestLineLength);
+		status_t error = _TransferRequestLine(request, lineOffset,
+			cacheLineEnd - lineOffset, offset, requestLineLength);
 		if (error != B_OK)
 			return error;
 
@@ -290,88 +251,281 @@ IOCache::_DoRequest(IORequest* request, size_t& _bytesTransferred)
 
 status_t
 IOCache::_TransferRequestLine(IORequest* request, off_t lineOffset,
-	off_t requestOffset, size_t requestLength)
+	size_t lineSize, off_t requestOffset, size_t requestLength)
 {
 	TRACE("%p->IOCache::_TransferRequestLine(%p, %" B_PRIdOFF
-		", %" B_PRIdOFF  ", %" B_PRIuSIZE "\n", this, request, lineOffset,
+		", %" B_PRIdOFF  ", %" B_PRIuSIZE ")\n", this, request, lineOffset,
 		requestOffset, requestLength);
+
+	// check whether there are pages of the cache line and the mark them used
+	page_num_t firstPageOffset = lineOffset / B_PAGE_SIZE;
+	page_num_t linePageCount = (lineSize + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+
+	AutoLocker<VMCache> cacheLocker(fCache);
+
+	page_num_t firstMissing = 0;
+	page_num_t lastMissing = 0;
+	page_num_t missingPages = 0;
+	page_num_t pageOffset = firstPageOffset;
+
+	VMCachePagesTree::Iterator it = fCache->pages.GetIterator(pageOffset, true,
+		true);
+	while (pageOffset < firstPageOffset + linePageCount) {
+		vm_page* page = it.Next();
+		page_num_t currentPageOffset;
+		if (page == NULL
+			|| page->cache_offset >= firstPageOffset + linePageCount) {
+			page = NULL;
+			currentPageOffset = firstPageOffset + linePageCount;
+		} else
+			currentPageOffset = page->cache_offset;
+
+		if (pageOffset < currentPageOffset) {
+			// pages are missing
+			if (missingPages == 0)
+				firstMissing = pageOffset;
+			lastMissing = currentPageOffset - 1;
+			missingPages += currentPageOffset - pageOffset;
+
+			for (; pageOffset < currentPageOffset; pageOffset++)
+				fPages[pageOffset - firstPageOffset] = NULL;
+		}
+
+		if (page != NULL) {
+			fPages[pageOffset++ - firstPageOffset] = page;
+			DEBUG_PAGE_ACCESS_START(page);
+			vm_page_set_state(page, PAGE_STATE_UNUSED);
+			DEBUG_PAGE_ACCESS_END(page);
+		}
+	}
+
+	cacheLocker.Unlock();
 
 	bool isVIP = (request->Flags() & B_VIP_IO_REQUEST) != 0;
 
-	MutexLocker locker(fLock);
+	if (missingPages > 0) {
+// TODO: If this is a read request and the missing pages range doesn't intersect
+// with the request, just satisfy the request and don't read anything at all.
+		// There are pages of the cache line missing. We have to allocate fresh
+		// ones.
 
-	// get the cache line
-	Line* line = _LookupLine(lineOffset);
-	if (line == NULL) {
-		// line not cached yet -- create it
-		TRACE("%p->IOCache::_TransferRequestLine(): line not cached yet\n",
-			this);
+		// reserve
+		vm_page_reservation reservation;
+		if (!vm_page_try_reserve_pages(&reservation, missingPages,
+				VM_PRIORITY_SYSTEM)) {
+			_DiscardPages(firstMissing - firstPageOffset, missingPages);
 
-		line = _PrepareLine(lineOffset);
+			// fall back to uncached transfer
+			return _TransferRequestLineUncached(request, lineOffset,
+				requestOffset, requestLength);
+		}
 
-		// in case of a read or partial write, read the line from disk
-		if (request->IsRead() || requestLength < line->size) {
-			line->inUse = true;
-			locker.Unlock();
+		// Allocate the missing pages and remove the already existing pages in
+		// the range from the cache. We're going to read/write the whole range
+		// anyway and this way we can sort it, possibly improving the physical
+		// vecs.
+// TODO: When memory is low, we should consider cannibalizing ourselves or
+// simply transferring past the cache!
+		for (pageOffset = firstMissing; pageOffset <= lastMissing;
+				pageOffset++) {
+			page_num_t index = pageOffset - firstPageOffset;
+			if (fPages[index] == NULL) {
+				fPages[index] = vm_page_allocate_page( &reservation,
+					PAGE_STATE_UNUSED);
+				DEBUG_PAGE_ACCESS_END(fPages[index]);
+			} else {
+				cacheLocker.Lock();
+				fCache->RemovePage(fPages[index]);
+				cacheLocker.Unlock();
+			}
+		}
 
-			status_t error = _TransferLine(line, false, isVIP);
+		missingPages = lastMissing - firstMissing + 1;
 
-			locker.Lock();
-			line->inUse = false;
+		// sort the page array by physical page number
+		std::sort(fPages + firstMissing - firstPageOffset,
+			fPages + lastMissing - firstPageOffset + 1,
+			page_physical_number_less);
 
+		// add the pages to the cache
+		cacheLocker.Lock();
+
+		for (pageOffset = firstMissing; pageOffset <= lastMissing;
+				pageOffset++) {
+			page_num_t index = pageOffset - firstPageOffset;
+			fCache->InsertPage(fPages[index], (off_t)pageOffset * B_PAGE_SIZE);
+		}
+
+		cacheLocker.Unlock();
+
+		// Read in the missing pages, if this is a read request or a write
+		// request that doesn't cover the complete missing range.
+		if (request->IsRead()
+			|| requestOffset < (off_t)firstMissing * B_PAGE_SIZE
+			|| requestOffset + requestLength
+				> (lastMissing + 1) * B_PAGE_SIZE) {
+			status_t error = _TransferPages(firstMissing - firstPageOffset,
+				missingPages, false, isVIP);
 			if (error != B_OK) {
-				_DiscardLine(line);
+				_DiscardPages(firstMissing - firstPageOffset, missingPages);
 				return error;
 			}
 		}
-	} else {
-		TRACE("%p->IOCache::_TransferRequestLine(): line cached: %p\n", this,
-			line);
 	}
 
-	// requeue the cache line -- it's most recently used now
-	fUsedLines.Remove(line);
-	fUsedLines.Add(line);
-
 	if (request->IsRead()) {
-		// copy data from cache line to request
-		return request->CopyData(line->buffer + (requestOffset - lineOffset),
-			requestOffset, requestLength);
+		// copy data to request
+		status_t error = _CopyPages(request, requestOffset - lineOffset,
+			requestOffset, requestLength, true);
+		_CachePages(0, linePageCount);
+		return error;
 	} else {
-		// copy data from request to cache line
-		status_t error = request->CopyData(requestOffset,
-			line->buffer + (requestOffset - lineOffset), requestLength);
-		if (error != B_OK)
+		// copy data from request
+		status_t error = _CopyPages(request, requestOffset - lineOffset,
+			requestOffset, requestLength, false);
+		if (error != B_OK) {
+			_DiscardPages(0, linePageCount);
 			return error;
+		}
 
-		// write the cache line to disk
-		line->inUse = true;
-		locker.Unlock();
+		// write the pages to disk
+		page_num_t firstPage = (requestOffset - lineOffset) / B_PAGE_SIZE;
+		page_num_t endPage = (requestOffset + requestLength - lineOffset
+			+ B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+		error = _TransferPages(firstPage, endPage - firstPage, true, isVIP);
 
-		error = _TransferLine(line, true, isVIP);
-			// TODO: In case of a partial write, there's really no point in
-			// writing the complete cache line.
+		if (error != B_OK) {
+			_DiscardPages(firstPage, endPage - firstPage);
+			return error;
+		}
 
-		locker.Lock();
-		line->inUse = false;
-
-		if (error != B_OK)
-			_DiscardLine(line);
+		_CachePages(0, linePageCount);
 		return error;
 	}
 }
 
 
 status_t
-IOCache::_TransferLine(Line* line, bool isWrite, bool isVIP)
+IOCache::_TransferRequestLineUncached(IORequest* request, off_t lineOffset,
+	off_t requestOffset, size_t requestLength)
 {
-	TRACE("%p->IOCache::_TransferLine(%p, write: %d, vip: %d)\n", this, line,
-		isWrite, isVIP);
+	TRACE("%p->IOCache::_TransferRequestLineUncached(%p, %" B_PRIdOFF
+		", %" B_PRIdOFF  ", %" B_PRIuSIZE ")\n", this, request, lineOffset,
+		requestOffset, requestLength);
+
+	// Advance the request to the interesting offset, so the DMAResource can
+	// provide us with fitting operations.
+	off_t actualRequestOffset
+		= request->Offset() + request->Length() - request->RemainingBytes();
+	if (actualRequestOffset > requestOffset) {
+		dprintf("IOCache::_TransferRequestLineUncached(): Request %p advanced "
+			"beyond current cache line (%" B_PRIdOFF " vs. %" B_PRIdOFF ")\n",
+			request, actualRequestOffset, requestOffset);
+		return B_BAD_VALUE;
+	}
+
+	if (actualRequestOffset < requestOffset)
+		request->Advance(requestOffset - actualRequestOffset);
+
+	size_t requestRemaining = request->RemainingBytes() - requestLength;
+
+	// Process single operations until the specified part of the request is
+	// finished or until an error occurs.
+	Operation operation;
+	operation.finishedCondition.Init(this, "I/O cache operation finished");
+
+	while (request->RemainingBytes() > requestRemaining
+		&& request->Status() > 0) {
+		status_t error = fDMAResource->TranslateNext(request, &operation,
+			request->RemainingBytes() - requestRemaining);
+		if (error != B_OK)
+			return error;
+
+		error = _DoOperation(operation);
+
+		request->OperationFinished(&operation, error, false,
+			error == B_OK ? operation.OriginalLength() : 0);
+		request->SetUnfinished();
+			// Keep the request in unfinished state. ScheduleRequest() will set
+			// the final status and notify.
+
+		if (fDMAResource != NULL)
+			fDMAResource->RecycleBuffer(operation.Buffer());
+
+		if (error != B_OK) {
+			TRACE("%p->IOCache::_TransferRequestLineUncached(): operation at "
+				"%" B_PRIdOFF " failed: %s\n", this, operation.Offset(),
+				strerror(error));
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+IOCache::_DoOperation(Operation& operation)
+{
+	TRACE("%p->IOCache::_DoOperation(%" B_PRIdOFF ", %" B_PRIuSIZE ")\n", this,
+		operation.Offset(), operation.Length());
+
+	while (true) {
+		ConditionVariableEntry waitEntry;
+		operation.finishedCondition.Add(&waitEntry);
+
+		status_t error = fIOCallback(fIOCallbackData, &operation);
+		if (error != B_OK) {
+			operation.finishedCondition.NotifyAll(false, error);
+				// removes the entry from the variable
+			return error;
+		}
+
+		// wait for the operation to finish
+		error = waitEntry.Wait();
+		if (error != B_OK)
+			return error;
+
+		if (operation.Finish())
+			return B_OK;
+	}
+}
+
+
+status_t
+IOCache::_TransferPages(size_t firstPage, size_t pageCount, bool isWrite,
+	bool isVIP)
+{
+	TRACE("%p->IOCache::_TransferPages(%" B_PRIuSIZE ", %" B_PRIuSIZE
+		", write: %d, vip: %d)\n", this, firstPage, pageCount, isWrite, isVIP);
+
+	off_t firstPageOffset = (off_t)fPages[firstPage]->cache_offset
+		* B_PAGE_SIZE;
+	size_t requestLength = std::min(
+			firstPageOffset + (off_t)pageCount * B_PAGE_SIZE, fDeviceCapacity)
+		- firstPageOffset;
+
+	// prepare the I/O vecs
+	size_t vecCount = 0;
+	size_t endPage = firstPage + pageCount;
+	addr_t vecsEndAddress = 0;
+	for (size_t i = firstPage; i < endPage; i++) {
+		addr_t pageAddress = fPages[i]->physical_page_number * B_PAGE_SIZE;
+		if (vecCount == 0 || pageAddress != vecsEndAddress) {
+			fVecs[vecCount].iov_base = (void*)pageAddress;
+			fVecs[vecCount++].iov_len = B_PAGE_SIZE;
+			vecsEndAddress = pageAddress + B_PAGE_SIZE;
+		} else {
+			// extend the previous vec
+			fVecs[vecCount - 1].iov_len += B_PAGE_SIZE;
+			vecsEndAddress += B_PAGE_SIZE;
+		}
+	}
 
 	// create a request for the transfer
 	IORequest request;
-	status_t error = request.Init(line->offset, (void*)line->physicalBuffer,
-		line->size, isWrite,
+	status_t error = request.Init(firstPageOffset, fVecs, vecCount,
+		requestLength, isWrite,
 		B_PHYSICAL_IO_REQUEST | (isVIP ? B_VIP_IO_REQUEST : 0));
 	if (error != B_OK)
 		return error;
@@ -382,7 +536,8 @@ IOCache::_TransferLine(Line* line, bool isWrite, bool isVIP)
 	operation.finishedCondition.Init(this, "I/O cache operation finished");
 
 	while (request.RemainingBytes() > 0 && request.Status() > 0) {
-		error = fDMAResource->TranslateNext(&request, &operation, line->size);
+		error = fDMAResource->TranslateNext(&request, &operation,
+			requestLength);
 		if (error != B_OK)
 			return error;
 
@@ -404,200 +559,201 @@ IOCache::_TransferLine(Line* line, bool isWrite, bool isVIP)
 }
 
 
+/*!	Frees all pages in given range of the \c fPages array.
+	\c NULL entries in the range are OK. All non \c NULL entries must refer
+	to pages with \c PAGE_STATE_UNUSED. The pages may belong to \c fCache or
+	may not have a cache.
+	\c fCache must not be locked.
+*/
+void
+IOCache::_DiscardPages(size_t firstPage, size_t pageCount)
+{
+	TRACE("%p->IOCache::_DiscardPages(%" B_PRIuSIZE ", %" B_PRIuSIZE ")\n",
+		this, firstPage, pageCount);
+
+	AutoLocker<VMCache> cacheLocker(fCache);
+
+	for (size_t i = firstPage; i < firstPage + pageCount; i++) {
+		vm_page* page = fPages[i];
+		if (page == NULL)
+			continue;
+
+		DEBUG_PAGE_ACCESS_START(page);
+
+		ASSERT_PRINT(page->State() == PAGE_STATE_UNUSED,
+			"page: %p @! page -m %p", page, page);
+
+		if (page->Cache() != NULL)
+			fCache->RemovePage(page);
+
+		vm_page_free(NULL, page);
+	}
+}
+
+
+/*!	Marks all pages in the given range of the \c fPages array cached.
+	There must not be any \c NULL entries in the given array range. All pages
+	must belong to \c cache and have state \c PAGE_STATE_UNUSED.
+	\c fCache must not be locked.
+*/
+void
+IOCache::_CachePages(size_t firstPage, size_t pageCount)
+{
+	TRACE("%p->IOCache::_CachePages(%" B_PRIuSIZE ", %" B_PRIuSIZE ")\n",
+		this, firstPage, pageCount);
+
+	AutoLocker<VMCache> cacheLocker(fCache);
+
+	for (size_t i = firstPage; i < firstPage + pageCount; i++) {
+		vm_page* page = fPages[i];
+		ASSERT(page != NULL);
+		ASSERT_PRINT(page->State() == PAGE_STATE_UNUSED
+				&& page->Cache() == fCache,
+			"page: %p @! page -m %p", page, page);
+
+		DEBUG_PAGE_ACCESS_START(page);
+		vm_page_set_state(page, PAGE_STATE_CACHED);
+		DEBUG_PAGE_ACCESS_END(page);
+	}
+}
+
+
+/*!	Copies the contents of pages in \c fPages to \a request, or vice versa.
+	\param request The request.
+	\param pagesRelativeOffset The offset relative to \c fPages[0] where to
+		start copying.
+	\param requestOffset The request offset where to start copying.
+	\param requestLength The number of bytes to copy.
+	\param toRequest If \c true the copy directory is from \c fPages to
+		\a request, otherwise the other way around.
+	\return \c B_OK, if copying went fine, another error code otherwise.
+*/
 status_t
-IOCache::_DoOperation(Operation& operation)
+IOCache::_CopyPages(IORequest* request, size_t pagesRelativeOffset,
+	off_t requestOffset, size_t requestLength, bool toRequest)
 {
-	TRACE("%p->IOCache::_DoOperation(%" B_PRIdOFF ", %" B_PRIuSIZE ")\n", this,
-		operation.Offset(), operation.Length());
+	TRACE("%p->IOCache::_CopyPages(%p, %" B_PRIuSIZE ", %" B_PRIdOFF
+		", %" B_PRIuSIZE ", %d)\n", this, request, pagesRelativeOffset,
+		requestOffset, requestLength, toRequest);
 
-	ConditionVariableEntry waitEntry;
-	operation.finishedCondition.Add(&waitEntry);
+	size_t firstPage = pagesRelativeOffset / B_PAGE_SIZE;
+	size_t endPage = (pagesRelativeOffset + requestLength + B_PAGE_SIZE - 1)
+		/ B_PAGE_SIZE;
 
-	status_t error = fIOCallback(fIOCallbackData, &operation);
+	// map the pages
+	status_t error = _MapPages(firstPage, endPage);
+// TODO: _MapPages() cannot fail, so the fallback is never needed. Test which
+// method is faster (probably the active one)!
+#if 0
 	if (error != B_OK) {
-		operation.finishedCondition.NotifyAll(false, error);
-			// removes the entry from the variable
-		return error;
+		// fallback to copying individual pages
+		size_t inPageOffset = pagesRelativeOffset % B_PAGE_SIZE;
+		for (size_t i = firstPage; i < endPage; i++) {
+			// map the page
+			void* handle;
+			addr_t address;
+			error = vm_get_physical_page(
+				fPages[i]->physical_page_number * B_PAGE_SIZE, &address,
+				&handle);
+			if (error != B_OK)
+				return error;
+
+			// copy the page's data
+			size_t toCopy = std::min(B_PAGE_SIZE - inPageOffset, requestLength);
+
+			if (toRequest) {
+				error = request->CopyData((uint8*)(address + inPageOffset),
+					requestOffset, toCopy);
+			} else {
+				error = request->CopyData(requestOffset,
+					(uint8*)(address + inPageOffset), toCopy);
+			}
+
+			// unmap the page
+			vm_put_physical_page(address, handle);
+
+			if (error != B_OK)
+				return error;
+
+			inPageOffset = 0;
+			requestOffset += toCopy;
+			requestLength -= toCopy;
+		}
+
+		return B_OK;
 	}
+#endif	// 0
 
-	// wait for the operation to finish
-	return waitEntry.Wait();
-}
-
-
-IOCache::Line*
-IOCache::_LookupLine(off_t lineOffset)
-{
-	ASSERT_LOCKED_MUTEX(&fLock);
-
-	return fLineTable->Lookup(lineOffset);
-}
-
-
-IOCache::Line*
-IOCache::_PrepareLine(off_t lineOffset)
-{
-	ASSERT_LOCKED_MUTEX(&fLock);
-
-	Line* line = NULL;
-
-	// if there is an unused line recycle it
-	if (fUnusedLine != NULL) {
-		line = fUnusedLine;
-		fUnusedLine = NULL;
-	} else if (!_MemoryIsLow()) {
-		// resources look fine -- allocate a new line
-		line = _AllocateLine();
-	}
-
-	if (line == NULL) {
-		// recycle the least recently used line
-		line = fUsedLines.RemoveHead();
-		fLineTable->RemoveUnchecked(line);
-
-		TRACE("%p->IOCache::_PrepareLine(%" B_PRIdOFF "): recycled line: %p\n",
-			this, lineOffset, line);
+	// copy
+	if (toRequest) {
+		error = request->CopyData((uint8*)fAreaBase + pagesRelativeOffset,
+			requestOffset, requestLength);
 	} else {
-		TRACE("%p->IOCache::_PrepareLine(%" B_PRIdOFF
-			"): allocated new line: %p\n", this, lineOffset, line);
+		error = request->CopyData(requestOffset,
+			(uint8*)fAreaBase + pagesRelativeOffset, requestLength);
 	}
 
-	line->offset = lineOffset;
-	line->size = std::min((off_t)fLineSize, fDeviceCapacity - lineOffset);
-	line->inUse = false;
+	// unmap the pages
+	_UnmapPages(firstPage, endPage);
 
-	fUsedLines.Add(line);
-	fLineTable->InsertUnchecked(line);
-
-	return line;
+	return error;
 }
 
 
+/*!	Maps a range of pages in \c fPages into fArea.
+
+	If successful, it must be balanced by a call to _UnmapPages().
+
+	\param firstPage The \c fPages relative index of the first page to map.
+	\param endPage The \c fPages relative index of the page after the last page
+		to map.
+	\return \c B_OK, if mapping went fine, another error code otherwise.
+*/
+status_t
+IOCache::_MapPages(size_t firstPage, size_t endPage)
+{
+	VMTranslationMap* translationMap
+		= VMAddressSpace::Kernel()->TranslationMap();
+
+	translationMap->Lock();
+
+	for (size_t i = firstPage; i < endPage; i++) {
+		vm_page* page = fPages[i];
+
+		ASSERT_PRINT(page->State() == PAGE_STATE_UNUSED,
+			"page: %p @! page -m %p", page, page);
+
+		translationMap->Map((addr_t)fAreaBase + i * B_PAGE_SIZE,
+			page->physical_page_number * B_PAGE_SIZE,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &fMappingReservation);
+		// NOTE: We don't increment gMappedPagesCount. Our pages have state
+		// PAGE_STATE_UNUSED anyway and we map them only for a short time.
+	}
+
+	translationMap->Unlock();
+
+	return B_OK;
+}
+
+
+/*!	Unmaps a range of pages in \c fPages into fArea.
+
+	Must balance a call to _MapPages().
+
+	\param firstPage The \c fPages relative index of the first page to unmap.
+	\param endPage The \c fPages relative index of the page after the last page
+		to unmap.
+*/
 void
-IOCache::_DiscardLine(Line* line)
+IOCache::_UnmapPages(size_t firstPage, size_t endPage)
 {
-	ASSERT_LOCKED_MUTEX(&fLock);
+	VMTranslationMap* translationMap
+		= VMAddressSpace::Kernel()->TranslationMap();
 
-	fLineTable->RemoveUnchecked(line);
-	fUsedLines.Remove(line);
+	translationMap->Lock();
 
-	if (fUsedLines.IsEmpty()) {
-		// We keep the last cache line around, so I/O cannot fail due to a
-		// failing allocation.
-		TRACE("%p->IOCache::_DiscardLine(): parking line: %p\n", this, line);
-		fUnusedLine = line;
-		line->offset = -1;
-		line->inUse = false;
-	} else {
-		TRACE("%p->IOCache::_DiscardLine(): freeing line: %p\n", this, line);
-		_FreeLine(line);
-	}
-}
+	translationMap->Unmap((addr_t)fAreaBase + firstPage * B_PAGE_SIZE,
+		(addr_t)fAreaBase + endPage * B_PAGE_SIZE - 1);
 
-
-IOCache::Line*
-IOCache::_AllocateLine()
-{
-	ASSERT_LOCKED_MUTEX(&fLock);
-
-	// create the line object
-	Line* line = new(malloc_flags(HEAP_DONT_WAIT_FOR_MEMORY)) Line;
-	if (line == NULL)
-		return NULL;
-
-	// create the buffer area
-	void* address;
-	line->area = vm_create_anonymous_area(B_SYSTEM_TEAM, "I/O cache line",
-		&address, B_ANY_KERNEL_ADDRESS, fLineSize, B_CONTIGUOUS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
-		CREATE_AREA_DONT_WAIT | CREATE_AREA_DONT_CLEAR, true);
-	if (line->area < 0) {
-		delete line;
-		return NULL;
-	}
-
-	// get the physical address of the buffer
-	physical_entry entry;
-	get_memory_map(address, B_PAGE_SIZE, &entry, 1);
-
-	// init the line object
-	line->offset = -1;
-	line->buffer = (uint8*)address;
-	line->physicalBuffer = (addr_t)entry.address;
-	line->inUse = false;
-
-	fLineCount++;
-
-	return line;
-}
-
-
-void
-IOCache::_FreeLine(Line* line)
-{
-	ASSERT_LOCKED_MUTEX(&fLock);
-
-	if (line == NULL)
-		return;
-
-	fLineCount--;
-
-	delete_area(line->area);
-	delete line;
-}
-
-
-/*static*/ void
-IOCache::_LowMemoryHandlerEntry(void* data, uint32 resources, int32 level)
-{
-	((IOCache*)data)->_LowMemoryHandler(resources, level);
-}
-
-
-void
-IOCache::_LowMemoryHandler(uint32 resources, int32 level)
-{
-	TRACE("%p->IOCache::_LowMemoryHandler(): level: %ld\n", this, level);
-
-	MutexLocker locker(fLock);
-
-	// determine how many cache lines to keep
-	size_t linesToKeep = fLineCount;
-
-	switch (level) {
-		case B_NO_LOW_RESOURCE:
-			return;
-		case B_LOW_RESOURCE_NOTE:
-			linesToKeep = fLineCount / 2;
-			break;
-		case B_LOW_RESOURCE_WARNING:
-			linesToKeep = fLineCount / 4;
-			break;
-		case B_LOW_RESOURCE_CRITICAL:
-			linesToKeep = 1;
-			break;
-	}
-
-	if (linesToKeep < 1)
-		linesToKeep = 1;
-
-	// free lines until we reach our target
-	Line* line = fUsedLines.Head();
-	while (linesToKeep < fLineCount && line != NULL) {
-		Line* nextLine = fUsedLines.GetNext(line);
-
-		if (!line->inUse)
-			_DiscardLine(line);
-
-		line = nextLine;
-	}
-}
-
-
-bool
-IOCache::_MemoryIsLow() const
-{
-	return low_resource_state(B_KERNEL_RESOURCE_PAGES
-			| B_KERNEL_RESOURCE_MEMORY | B_KERNEL_RESOURCE_ADDRESS_SPACE)
-		!= B_NO_LOW_RESOURCE;
+	translationMap->Unlock();
 }
