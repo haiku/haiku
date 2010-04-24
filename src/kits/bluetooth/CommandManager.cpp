@@ -6,36 +6,77 @@
 
 #include "CommandManager.h"
 
-inline void* buildCommand(uint8 ogf, uint8 ocf, void** param, size_t psize, size_t* outsize)
+
+#include <bluetooth/bluetooth_error.h>
+
+inline void* buildCommand(uint8 ogf, uint8 ocf, void** param, size_t psize,
+	size_t* outsize)
 {
 	struct hci_command_header* header;
-	
+
 #ifdef BT_IOCTLS_PASS_SIZE
-    header = (struct hci_command_header*) malloc(psize + sizeof(struct hci_command_header));
+	header = (struct hci_command_header*) malloc(psize
+		+ sizeof(struct hci_command_header));
 	*outsize = psize + sizeof(struct hci_command_header);
 #else
-	size_t* size = (size_t*)malloc(psize + sizeof(struct hci_command_header) + sizeof(size_t));
+	size_t* size = (size_t*)malloc(psize + sizeof(struct hci_command_header)
+		+ sizeof(size_t));
 	*outsize = psize + sizeof(struct hci_command_header) + sizeof(size_t);
 
-    *size = psize + sizeof(struct hci_command_header);
-    header = (struct hci_command_header*) (((uint8*)size)+4);
+	*size = psize + sizeof(struct hci_command_header);
+	header = (struct hci_command_header*) (((uint8*)size)+4);
 #endif
 
 
-    if (header != NULL) {
+	if (header != NULL) {
 
-        header->opcode = B_HOST_TO_LENDIAN_INT16(PACK_OPCODE(ogf, ocf));
-        header->clen = psize;
+		header->opcode = B_HOST_TO_LENDIAN_INT16(PACK_OPCODE(ogf, ocf));
+		header->clen = psize;
 
-        if (param != NULL && psize != 0) {
-            *param = ((uint8*)header) + sizeof(struct hci_command_header);
-        }
-    }
+		if (param != NULL && psize != 0) {
+			*param = ((uint8*)header) + sizeof(struct hci_command_header);
+		}
+	}
 #ifdef BT_IOCTLS_PASS_SIZE
-    return header;
+	return header;
 #else
-    return (void*)size;
+	return (void*)size;
 #endif
+}
+
+
+// This is for request that only require a Command complete in reply.
+
+// Propagate to ReadBufferSize => reply stored in server side
+// ReadLocalVersion => reply stored in server side
+// Reset => no reply
+
+// Request that do not need any input parameter
+// Output reply can be fit in 32 bits field without talking status into account
+status_t
+NonParameterCommandRequest(uint8 ofg, uint8 ocf, int32* result, hci_id hId,
+	BMessenger* messenger)
+{
+	int8 bt_status = BT_ERROR;
+
+	BluetoothCommand<> simpleCommand(ofg, ocf);
+
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	BMessage reply;
+
+	request.AddInt32("hci_id", hId);
+	request.AddData("raw command", B_ANY_TYPE,
+		simpleCommand.Data(), simpleCommand.Size());
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(ofg, ocf));
+
+	if (messenger->SendMessage(&request, &reply) == B_OK) {
+		reply.FindInt8("status", &bt_status);
+		if (result != NULL)
+			reply.FindInt32("result", result);
+	}
+
+	return bt_status;
 }
 
 
@@ -46,48 +87,37 @@ inline void* buildCommand(uint8 ogf, uint8 ocf, void** param, size_t psize, size
 
 void* buildReset(size_t* outsize)
 {
-    return buildCommand(OGF_CONTROL_BASEBAND, OCF_RESET, NULL, 0, outsize);
+	return buildCommand(OGF_CONTROL_BASEBAND, OCF_RESET,
+		NULL, 0, outsize);
 }
 
 
 void* buildReadLocalName(size_t* outsize)
 {
-    return buildCommand(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME, NULL, 0, outsize);
+	return buildCommand(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME,
+		NULL, 0, outsize);
 }
 
 
 void* buildReadClassOfDevice(size_t* outsize)
 {
-    return buildCommand(OGF_CONTROL_BASEBAND, OCF_READ_CLASS_OF_DEV, NULL, 0, outsize);
+	return buildCommand(OGF_CONTROL_BASEBAND, OCF_READ_CLASS_OF_DEV,
+	NULL, 0, outsize);
 }
 
 
 void* buildWriteScan(uint8 scanmode, size_t* outsize)
 {
-    struct hci_write_scan_enable* param;
-	void* command = buildCommand(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE, (void**) &param, sizeof(struct hci_write_scan_enable), outsize);
+	struct hci_write_scan_enable* param;
+	void* command = buildCommand(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE,
+		(void**) &param, sizeof(struct hci_write_scan_enable), outsize);
 
 
-    if (command != NULL) {
-        param->scan = scanmode;
-    }
+	if (command != NULL) {
+		param->scan = scanmode;
+	}
 
-    return command;
-
-}
-
-
-void* buildAuthEnable(uint8 auth, size_t* outsize)
-{
-    struct hci_write_authentication_enable* param;
-	void* command = buildCommand(OGF_CONTROL_BASEBAND, OCF_WRITE_AUTH_ENABLE, (void**) &param, sizeof(struct hci_write_authentication_enable), outsize);
-
-
-    if (command != NULL) {
-        param->authentication = auth;
-    }
-
-    return command;
+	return command;
 
 }
 
@@ -97,110 +127,88 @@ void* buildAuthEnable(uint8 auth, size_t* outsize)
 #endif
 
 
-void* buildCreateConnection(bdaddr_t bdaddr)
-{
-	/*
-	cm4.size = sizeof(struct hci_command_header)+sizeof(struct hci_cp_create_conn);
-	cm4.header.opcode = B_HOST_TO_LENDIAN_INT16(hci_opcode_pack(OGF_LINK_CONTROL, OCF_CREATE_CONN));
-	cm4.body.bdaddr.b[0] = 0x92;
-	cm4.body.bdaddr.b[1] = 0xd3;
-	cm4.body.bdaddr.b[2] = 0xaf;
-	cm4.body.bdaddr.b[3] = 0xd9;
-	cm4.body.bdaddr.b[4] = 0x0a;
-	cm4.body.bdaddr.b[5] = 0x00;
-	cm4.body.pkt_type = 0xFFFF;
-	cm4.body.pscan_rep_mode = 1;
-	cm4.body.pscan_mode = 0;
-	cm4.body.clock_offset = 0xc7;
-	cm4.body.role_switch = 1;
-	cm4.header.clen = 13;					
-	ioctl(fd1, ISSUE_BT_COMMAND, &cm4, sizeof(cm4));
-	*/
-
-	return NULL;
-}
-
-
-void* buildRemoteNameRequest(bdaddr_t bdaddr,uint8 pscan_rep_mode, uint16 clock_offset, size_t* outsize)
+void* buildRemoteNameRequest(bdaddr_t bdaddr, uint8 pscan_rep_mode,
+	uint16 clock_offset, size_t* outsize)
 {
 
-    struct hci_remote_name_request* param;
-    void* command = buildCommand(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST, (void**) &param, sizeof(struct hci_remote_name_request), outsize);
+	struct hci_remote_name_request* param;
+	void* command = buildCommand(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST,
+		(void**)&param, sizeof(struct hci_remote_name_request), outsize);
 
-    if (command != NULL) {
-        param->bdaddr = bdaddr;
-        param->pscan_rep_mode = pscan_rep_mode;
-        param->clock_offset = clock_offset;
-    }
+	if (command != NULL) {
+		param->bdaddr = bdaddr;
+		param->pscan_rep_mode = pscan_rep_mode;
+		param->clock_offset = clock_offset;
+	}
 
-    return command;
+	return command;
 }
 
 
 void* buildInquiry(uint32 lap, uint8 length, uint8 num_rsp, size_t* outsize)
 {
 
-    struct hci_cp_inquiry* param;
-    void* command = buildCommand(OGF_LINK_CONTROL, OCF_INQUIRY, (void**) &param, sizeof(struct hci_cp_inquiry), outsize);
+	struct hci_cp_inquiry* param;
+	void* command = buildCommand(OGF_LINK_CONTROL, OCF_INQUIRY,
+		(void**) &param, sizeof(struct hci_cp_inquiry), outsize);
 
-    if (command != NULL) {
+	if (command != NULL) {
 
 		param->lap[2] = (lap >> 16) & 0xFF;
 		param->lap[1] = (lap >>  8) & 0xFF;
-    	param->lap[0] = (lap >>  0) & 0xFF;
-    	param->length = length;
-    	param->num_rsp = num_rsp;
-    }
+		param->lap[0] = (lap >>  0) & 0xFF;
+		param->length = length;
+		param->num_rsp = num_rsp;
+	}
 
-    return command;
+	return command;
 }
 
 
 void* buildInquiryCancel(size_t* outsize)
 {
 
-    return buildCommand(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL, NULL, 0, outsize);
+	return buildCommand(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL, NULL, 0, outsize);
 
 }
 
 
-void* buildPinCodeRequestReply(bdaddr_t bdaddr, uint8 length, char pincode[16], size_t* outsize)
+void* buildPinCodeRequestReply(bdaddr_t bdaddr, uint8 length, char pincode[16],
+	size_t* outsize)
 {
+	struct hci_cp_pin_code_reply* param;
 
-    struct hci_cp_pin_code_reply* param;
+	if (length > HCI_PIN_SIZE)  // PinCode cannot be longer than 16
+		return NULL;
 
-    if (length > HCI_PIN_SIZE)  // PinCode cannot be longer than 16
-	return NULL;
+	void* command = buildCommand(OGF_LINK_CONTROL, OCF_PIN_CODE_REPLY,
+		(void**)&param, sizeof(struct hci_cp_pin_code_reply), outsize);
 
-    void* command = buildCommand(OGF_LINK_CONTROL, OCF_PIN_CODE_REPLY, (void**) &param, sizeof(struct hci_cp_pin_code_reply), outsize);
+	if (command != NULL) {
+		param->bdaddr = bdaddr;
+		param->pin_len = length;
+		memcpy(&param->pin_code, pincode, length);
+	}
 
-    if (command != NULL) {
-
-	param->bdaddr = bdaddr;
-	param->pin_len = length;
-    	memcpy(&param->pin_code, pincode, length);
-
-    }
-
-    return command;
+	return command;
 }
 
 
 void* buildPinCodeRequestNegativeReply(bdaddr_t bdaddr, size_t* outsize)
 {
 
-    struct hci_cp_pin_code_neg_reply* param;
+	struct hci_cp_pin_code_neg_reply* param;
 
-    void* command = buildCommand(OGF_LINK_CONTROL, OCF_PIN_CODE_NEG_REPLY, 
-                                 (void**) &param, sizeof(struct hci_cp_pin_code_neg_reply), outsize);
+	void* command = buildCommand(OGF_LINK_CONTROL, OCF_PIN_CODE_NEG_REPLY,
+		(void**) &param, sizeof(struct hci_cp_pin_code_neg_reply), outsize);
 
-    if (command != NULL) {
+	if (command != NULL) {
 
 		param->bdaddr = bdaddr;
 
-    }
+	}
 
-    return command;
+	return command;
 }
 
 
@@ -224,8 +232,9 @@ void* buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize)
 {
 	struct hci_cp_reject_conn_req* param;
 
-	void *command = buildCommand(OGF_LINK_CONTROL, OCF_REJECT_CONN_REQ,
-					(void**) &param, sizeof(struct hci_cp_reject_conn_req), outsize);
+	void* command = buildCommand(OGF_LINK_CONTROL, OCF_REJECT_CONN_REQ,
+					(void**)&param, sizeof(struct hci_cp_reject_conn_req),
+					outsize);
 
 	if (command != NULL) {
 		param->bdaddr = bdaddr;
@@ -241,19 +250,22 @@ void* buildRejectConnectionRequest(bdaddr_t bdaddr, size_t* outsize)
 
 void* buildReadLocalVersionInformation(size_t* outsize)
 {
-    return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_VERSION, NULL, 0, outsize);
+	return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_LOCAL_VERSION,
+		NULL, 0, outsize);
 }
 
 
 void* buildReadBufferSize(size_t* outsize)
 {
-    return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE, NULL, 0, outsize);
+	return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE,
+		NULL, 0, outsize);
 }
 
 
 void* buildReadBdAddr(size_t* outsize)
 {
-	return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR, NULL, 0, outsize);
+	return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR,
+		NULL, 0, outsize);
 }
 
 
@@ -341,37 +353,37 @@ const char* bluetoothManufacturers[] = {
 
 const char* linkControlCommands[] = {
 	"Inquiry",
-	"Inquiry cancel",
-	"Periodic inquiry mode",
-	"Exit periodic inquiry mode",
-	"Create connection",
+	"Inquiry Cancel",
+	"Periodic Inquiry Mode",
+	"Exit Periodic Inquiry Mode",
+	"Create Connection",
 	"Disconnect",
-	"Add SCO connection", // not on 2.1
-	"Cancel create connection",
-	"Accept connection request",
-	"Reject connection request",
-	"Link key request reply",
-	"Link key request negative reply",
-	"PIN code request reply",
-	"PIN code request negative reply",
-	"Change connection packet type",
+	"Add SCO Connection", // not on 2.1
+	"Cancel Create Connection",
+	"Accept Connection Request",
+	"Reject Connection Request",
+	"Link Key Request Reply",
+	"Link Key Request Negative Reply",
+	"PIN Code Request Reply",
+	"PIN Code Request Negative Reply",
+	"Change Connection Packet Type",
 	"Reserved", // not on 2.1",
-	"Authentication requested",
+	"Authentication Requested",
 	"Reserved", // not on 2.1",
-	"Set connection encryption",
+	"Set Connection Encryption",
 	"Reserved", // not on 2.1",
-	"Change connection link key",
+	"Change Connection Link Key",
 	"Reserved", // not on 2.1",
-	"Master link key",
+	"Master Link Key",
 	"Reserved", // not on 2.1",
-	"Remote name request",
-	"Cancel remote name request",
-	"Read remote supported features",
-	"Read remote extended features",
-	"Read remote version information",
+	"Remote Name Request",
+	"Cancel Remote Name Request",
+	"Read Remote Supported Features",
+	"Read Remote Extended Features",
+	"Read Remote Version Information",
 	"Reserved", // not on 2.1",
-	"Read clock offset",
-	"Read LMP handle",
+	"Read Clock Offset",
+	"Read LMP Handle",
 	"Reserved",
 	"Reserved",
 	"Reserved",
@@ -379,297 +391,297 @@ const char* linkControlCommands[] = {
 	"Reserved",
 	"Reserved",
 	"Reserved",
-	"Setup synchronous connection",
-	"Accept synchronous connection",
-	"Reject synchronous connection",	
-	"IO capability request reply",
-	"User confirmation request reply",
-	"User confirmation request negative reply",
-	"User passkey request reply",
-	"User passkey request negative reply",
-	"Remote OOB data request reply",
+	"Setup Synchronous Connection",
+	"Accept Synchronous Connection",
+	"Reject Synchronous Connection",
+	"IO Capability Request Reply",
+	"User Confirmation Request Reply",
+	"User Confirmation Request Negative Reply",
+	"User Passkey Request Reply",
+	"User Passkey Request Negative Reply",
+	"Remote OOB Data Request Reply",
 	"Reserved",
 	"Reserved",
-	"Remote OOB data request negative reply",
-	"IO capabilities response negative reply"
-};
-
-	
-const char* linkPolicyCommands[] = {	
-	"Hold mode",
-	"Reserved",
-	"Sniff mode",
-	"Exit sniff mode",
-	"Park state",
-	"Exit park state",
-	"QoS setup",
-	"Reserved",
-	"Role discovery",
-	"Reserved",
-	"Switch role",
-	"Read link policy settings",
-	"Write link policy settings",
-	"Read default link policy settings",
-	"Write default link policy settings",
-	"Flow specification",
-	"Sniff subrating"
+	"Remote OOB Data Request Negative Reply",
+	"IO Capabilities Response Negative Reply"
 };
 
 
-const char* controllerBasebandCommands[] = {	
-	"Set event mask",
+const char* linkPolicyCommands[] = {
+	"Hold Mode",
+	"Reserved",
+	"Sniff Mode",
+	"Exit Sniff Mode",
+	"Park State",
+	"Exit Park State",
+	"QoS Setup",
+	"Reserved",
+	"Role Discovery",
+	"Reserved",
+	"Switch Role",
+	"Read Link Policy Settings",
+	"Write Link Policy Settings",
+	"Read Default Link Policy Settings",
+	"Write Default Link Policy Settings",
+	"Flow Specification",
+	"Sniff Subrating"
+};
+
+
+const char* controllerBasebandCommands[] = {
+	"Set Event Mask",
 	"Reserved",
 	"Reset",
-	"Reserved",	
-	"Set event filter",
+	"Reserved",
+	"Set Event Filter",
 	"Reserved",
 	"Reserved",
 	"Flush",
-	"Read PIN type",
-	"Write PIN type",
-	"Create new unit key",
+	"Read PIN Type",
+	"Write PIN Type",
+	"Create New Unit Key",
 	"Reserved",
-	"Read stored link key",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Write stored link key",
-	"Delete stored link key",
-	"Write local name",
-	"Read local name",
-	"Read connection accept timeout",
-	"Write connection accept timeout",
-	"Read page timeout",
-	"Write page timeout",
-	"Read scan enable",
-	"Write scan enable",
-	"Read page scan activity",
-	"Write page scan activity",
-	"Read inquiry scan activity",
-	"Write inquiry scan activity",
-	"Read authentication enable",
-	"Write authentication enable",
-	"Read encryption mode", // not 2.1
-	"Write encryption mode",// not 2.1
-	"Read class of device",
-	"Write class of device",
-	"Read voice setting",
-	"Write voice setting",
-	"Read automatic flush timeout",
-	"Write automatic flush timeout",
-	"Read num broadcast retransmissions",
-	"Write num broadcast retransmissions",	
-	"Read hold mode activity",
-	"Write hold mode activity",
-	"Read transmit power level",
-	"Read synchronous flow control enable",
-	"Write synchronous flow control enable",
-	"Reserved",
-	"Set host controller to host flow control",
-	"Reserved",
-	"Host buffer size",
-	"Reserved",
-	"Host number of completed packets",
-	"Read link supervision timeout",
-	"Write link supervision timeout",
-	"Read number of supported IAC",
-	"Read current IAC LAP",
-	"Write current IAC LAP",
-	"Read page scan period mode", // not 2.1
-	"Write page scan period mode", // not 2.1
-	"Read page scan mode",		// not 2.1
-	"Write page scan mode",		// not 2.1
-	"Set AFH channel classification",
+	"Read Stored Link Key",
 	"Reserved",
 	"Reserved",
-	"Read inquiry scan type",
-	"Write inquiry scan type",
-	"Read inquiry mode",
-	"Write inquiry mode",
-	"Read page scan type",
-	"Write page scan type",
-	"Read AFH channel assessment mode",
-	"Write AFH channel assessment mode",
+	"Reserved",
+	"Write Stored Link Key",
+	"Delete Stored Link Key",
+	"Write Local Name",
+	"Read Local Name",
+	"Read Connection Accept Timeout",
+	"Write Connection Accept Timeout",
+	"Read Page Timeout",
+	"Write Page Timeout",
+	"Read Scan Enable",
+	"Write Scan Enable",
+	"Read Page Scan Activity",
+	"Write Page Scan Activity",
+	"Read Inquiry Scan Activity",
+	"Write Inquiry Scan Activity",
+	"Read Authentication Enable",
+	"Write Authentication Enable",
+	"Read Encryption Mode", // not 2.1
+	"Write Encryption Mode",// not 2.1
+	"Read Class Of Device",
+	"Write Class Of Device",
+	"Read Voice Setting",
+	"Write Voice Setting",
+	"Read Automatic Flush Timeout",
+	"Write Automatic Flush Timeout",
+	"Read Num Broadcast Retransmissions",
+	"Write Num Broadcast Retransmissions",
+	"Read Hold Mode Activity",
+	"Write Hold Mode Activity",
+	"Read Transmit Power Level",
+	"Read Synchronous Flow Control Enable",
+	"Write Synchronous Flow Control Enable",
+	"Reserved",
+	"Set Host Controller To Host Flow Control",
+	"Reserved",
+	"Host Buffer Size",
+	"Reserved",
+	"Host Number Of Completed Packets",
+	"Read Link Supervision Timeout",
+	"Write Link Supervision Timeout",
+	"Read Number of Supported IAC",
+	"Read Current IAC LAP",
+	"Write Current IAC LAP",
+	"Read Page Scan Period Mode", // not 2.1
+	"Write Page Scan Period Mode", // not 2.1
+	"Read Page Scan Mode",		// not 2.1
+	"Write Page Scan Mode",		// not 2.1
+	"Set AFH Channel Classification",
 	"Reserved",
 	"Reserved",
+	"Read Inquiry Scan Type",
+	"Write Inquiry Scan Type",
+	"Read Inquiry Mode",
+	"Write Inquiry Mode",
+	"Read Page Scan Type",
+	"Write Page Scan Type",
+	"Read AFH Channel Assessment Mode",
+	"Write AFH Channel Assessment Mode",
 	"Reserved",
 	"Reserved",
 	"Reserved",
 	"Reserved",
 	"Reserved",
-	"Read extended inquiry response",
-	"Write extended inquiry response",
-	"Refresh encryption key",
-	"Reserved",
-	"Read simple pairing mode",
-	"Write simple pairing mode",
-	"Read local OOB data",
-	"Read inquiry transmit power level",
-	"Write inquiry transmit power level",
-	"Read default erroneous data reporting",
-	"Write default erroneous data reporting",
 	"Reserved",
 	"Reserved",
+	"Read Extended Inquiry Response",
+	"Write Extended Inquiry Response",
+	"Refresh Encryption Key",
 	"Reserved",
-	"Enhanced flush",
-	"Send keypress notification"
+	"Read Simple Pairing Mode",
+	"Write Simple Pairing Mode",
+	"Read Local OOB Data",
+	"Read Inquiry Transmit Power Level",
+	"Write Inquiry Transmit Power Level",
+	"Read Default Erroneous Data Reporting",
+	"Write Default Erroneous Data Reporting",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Enhanced Flush",
+	"Send Keypress Notification"
 };
 
 
-const char* informationalParametersCommands[] = {	
-	"Read local version information",
-	"Read local supported commands",
-	"Read local supported features",
-	"Read local extended features",
-	"Read buffer size",
+const char* informationalParametersCommands[] = {
+	"Read Local Version Information",
+	"Read Local Supported Commands",
+	"Read Local Supported Features",
+	"Read Local Extended Features",
+	"Read Buffer Size",
 	"Reserved",
-	"Read country code", // not 2.1
+	"Read Country Code", // not 2.1
 	"Reserved",
 	"Read BD ADDR"
 };
 
-	
+
 const char* statusParametersCommands[] = {
-	"Read failed contact counter",
-	"Reset failed contact counter",
-	"Read link quality",
+	"Read Failed Contact Counter",
+	"Reset Failed Contact Counter",
+	"Read Link Quality",
 	"Reserved",
 	"Read RSSI",
-	"Read AFH channel map",
-	"Read clock",
+	"Read AFH Channel Map",
+	"Read Clock",
 };
 
 
 const char* testingCommands[] = {
-	"Read loopback mode",
-	"Write loopback mode",
-	"Enable device under test mode",
-	"Write simple pairing debug mode",
+	"Read Loopback Mode",
+	"Write Loopback Mode",
+	"Enable Device Under Test Mode",
+	"Write Simple Pairing Debug Mode",
 };
 
 
 const char* bluetoothEvents[] = {
-	"Inquiry complete",
-	"Inquiry result",
-	"Conn complete",
-	"Conn request",
-	"Disconnection complete",
-	"Auth complete",
-	"Remote name request complete",
-	"Encrypt change",
-	"Change conn link key complete",
-	"Master link key compl",
-	"Rmt features",
-	"Rmt version",
-	"QoS setup complete",
-	"Command complete",
-	"Command status",
-	"Hardware error",
-	"Flush occur",
-	"Role change",
-	"Num comp Pkts",
-	"Mode change",
-	"Return link keys",
-	"Pin code req",
-	"Link key req",
-	"Link key notify",
-	"Loopback command",
-	"Data buffer overflow",
-	"Max slot change",
-	"Read clock offset compl",
-	"Con Pkt type changed",
-	"QoS violation",
+	"Inquiry Complete",
+	"Inquiry Result",
+	"Conn Complete",
+	"Conn Request",
+	"Disconnection Complete",
+	"Auth Complete",
+	"Remote Name Request Complete",
+	"Encrypt Change",
+	"Change Conn Link Key Complete",
+	"Master Link Key Compl",
+	"Rmt Features",
+	"Rmt Version",
+	"Qos Setup Complete",
+	"Command Complete",
+	"Command Status",
+	"Hardware Error",
+	"Flush Occur",
+	"Role Change",
+	"Num Comp Pkts",
+	"Mode Change",
+	"Return Link Keys",
+	"Pin Code Req",
+	"Link Key Req",
+	"Link Key Notify",
+	"Loopback Command",
+	"Data Buffer Overflow",
+	"Max Slot Change",
+	"Read Clock Offset Compl",
+	"Con Pkt Type Changed",
+	"Qos Violation",
 	"Reserved",
-	"Page scan Rep mode change",
-	"Flow specification",
-	"Inquiry result with RSSI",
-	"Remote extended features",
-	"Reserved",
-	"Reserved",
+	"Page Scan Rep Mode Change",
+	"Flow Specification",
+	"Inquiry Result With Rssi",
+	"Remote Extended Features",
 	"Reserved",
 	"Reserved",
 	"Reserved",
 	"Reserved",
 	"Reserved",
 	"Reserved",
-	"Synchronous connection completed",
-	"Synchronous connection changed",
-	"Reserved",
-	"Extended inquiry result",
-	"Encryption key refresh complete",
-	"IO capability request",
-	"IO capability response",
-	"User confirmation request",
-	"User passkey request",
-	"OOB data request",
-	"Simple pairing complete",
-	"Reserved",
-	"Link supervision timeout changed",
-	"Enhanced flush complete",
 	"Reserved",
 	"Reserved",
-	"Keypress notification",
-	"Remote host supported features notification"
+	"Synchronous Connection Completed",
+	"Synchronous Connection Changed",
+	"Reserved",
+	"Extended Inquiry Result",
+	"Encryption Key Refresh Complete",
+	"Io Capability Request",
+	"Io Capability Response",
+	"User Confirmation Request",
+	"User Passkey Request",
+	"Oob Data Request",
+	"Simple Pairing Complete",
+	"Reserved",
+	"Link Supervision Timeout Changed",
+	"Enhanced Flush Complete",
+	"Reserved",
+	"Reserved",
+	"Keypress Notification",
+	"Remote Host Supported Features Notification"
 };
 
 
 const char* bluetoothErrors[] = {
-	"No error",
-	"Unknown command",
-	"No connection",
-	"Hardware failure",
-	"Page timeout",
-	"Authentication failure",
-	"Pin or key missing",
-	"Memory full",
-	"Connection timeout",
-	"Max number of connections",
-	"Max number of SCO connections",
-	"Acl connection exists",
-	"Command disallowed",
-	"Rejected limited resources",
-	"Rejected security",
-	"Rejected personal",
-	"Host timeout",
-	"Unsupported feature",
-	"Invalid parameters",
-	"Remote user ended connection",
-	"Remote low resources",
-	"Remote power off",
-	"Connection terminated",
-	"Repeated attempts",
-	"Pairing not allowed",
-	"Unknown LMP Pdu",
-	"Unsupported remote feature",
-	"SCO offset rejected",
-	"SCO interval rejected",
-	"Air mode rejected",
-	"Invalid LMP parameters",
-	"Unspecified error",
-	"Unsupported LMP parameter value",
-	"Role change not allowed",
-	"LMP response timeout",
-	"LMP error transaction collision",
-	"LMP Pdu not allowed",
-	"Encryption mode not accepted",
-	"Unit link key used",
-	"QoS not supported",
-	"Instant passed",
-	"Pairing with unit key not supported",
-	"Different transaction collision",
-	"QoS unacceptable parameter",
-	"QoS rejected",
-	"Classification not supported",
-	"Insufficient security",
-	"Parameter out of range",
+	"No Error",
+	"Unknown Command",
+	"No Connection",
+	"Hardware Failure",
+	"Page Timeout",
+	"Authentication Failure",
+	"Pin Or Key Missing",
+	"Memory Full",
+	"Connection Timeout",
+	"Max Number Of Connections",
+	"Max Number Of Sco Connections",
+	"Acl Connection Exists",
+	"Command Disallowed",
+	"Rejected Limited Resources",
+	"Rejected Security",
+	"Rejected Personal",
+	"Host Timeout",
+	"Unsupported Feature",
+	"Invalid Parameters",
+	"Remote User Ended Connection",
+	"Remote Low Resources",
+	"Remote Power Off",
+	"Connection Terminated",
+	"Repeated Attempts",
+	"Pairing Not Allowed",
+	"Unknown Lmp Pdu",
+	"Unsupported Remote Feature",
+	"Sco Offset Rejected",
+	"Sco Interval Rejected",
+	"Air Mode Rejected",
+	"Invalid Lmp Parameters",
+	"Unspecified Error",
+	"Unsupported Lmp Parameter Value",
+	"Role Change Not Allowed",
+	"Lmp Response Timeout",
+	"Lmp Error Transaction Collision",
+	"Lmp Pdu Not Allowed",
+	"Encryption Mode Not Accepted",
+	"Unit Link Key Used",
+	"Qos Not Supported",
+	"Instant Passed",
+	"Pairing With Unit Key Not Supported",
+	"Different Transaction Collision",
+	"Qos Unacceptable Parameter",
+	"Qos Rejected",
+	"Classification Not Supported",
+	"Insufficient Security",
+	"Parameter Out Of Range",
 	"Reserved",
-	"Role switch pending",
+	"Role Switch Pending",
 	"Reserved",
-	"Slot violation",
-	"Role switch failed",
-	"Extended inquiry response too Large",
-	"Simple pairing not supported by host",
-	"Host busy pairing"
+	"Slot Violation",
+	"Role Switch Failed",
+	"Extended Inquiry Response Too Large",
+	"Simple Pairing Not Supported By Host",
+	"Host Busy Pairing"
 };
 
 
@@ -677,24 +689,29 @@ const char* hciVersion[] = { "1.0B" , "1.1 " , "1.2 " , "2.0 " , "2.1 "};
 const char* lmpVersion[] = { "1.0 " , "1.1 " , "1.2 " , "2.0 " , "2.1 "};
 
 
-const char* 
+#if 0
+#pragma mark -
+#endif
+
+
+const char*
 BluetoothHciVersion(uint16 ver)
 {
 	return hciVersion[ver];
 }
 
 
-const char* 
+const char*
 BluetoothLmpVersion(uint16 ver)
 {
 	return lmpVersion[ver];
 }
 
 
-const char* 
+const char*
 BluetoothCommandOpcode(uint16 opcode)
 {
-	
+
 	// NOTE: BT implementations beyond 2.1
 	// could specify new commands with OCF numbers
 	// beyond the boundaries of the arrays and crash.
@@ -702,27 +719,27 @@ BluetoothCommandOpcode(uint16 opcode)
 	// our control.
 	switch (GET_OPCODE_OGF(opcode)) {
 		case OGF_LINK_CONTROL:
-			return linkControlCommands[GET_OPCODE_OCF(opcode)-1];
+			return linkControlCommands[GET_OPCODE_OCF(opcode) - 1];
 			break;
 
 		case OGF_LINK_POLICY:
-			return linkPolicyCommands[GET_OPCODE_OCF(opcode)-1];
+			return linkPolicyCommands[GET_OPCODE_OCF(opcode) - 1];
 			break;
 
 		case OGF_CONTROL_BASEBAND:
-			return controllerBasebandCommands[GET_OPCODE_OCF(opcode)-1];
+			return controllerBasebandCommands[GET_OPCODE_OCF(opcode) - 1];
 			break;
 
 		case OGF_INFORMATIONAL_PARAM:
-			return informationalParametersCommands[GET_OPCODE_OCF(opcode)-1];
+			return informationalParametersCommands[GET_OPCODE_OCF(opcode) - 1];
 			break;
 
 		case OGF_STATUS_PARAM:
-			return statusParametersCommands[GET_OPCODE_OCF(opcode)-1];
+			return statusParametersCommands[GET_OPCODE_OCF(opcode) - 1];
 			break;
 
 		case OGF_TESTING_CMD:
-			return testingCommands[GET_OPCODE_OCF(opcode)-1];
+			return testingCommands[GET_OPCODE_OCF(opcode) - 1];
 			break;
 		case OGF_VENDOR_CMD:
 			return "Vendor specific command";
@@ -735,37 +752,33 @@ BluetoothCommandOpcode(uint16 opcode)
 }
 
 
-const char* 
-BluetoothEvent(uint8 event) {
-	
-	if (event < sizeof(bluetoothEvents) / sizeof(const char*)) {
-		return bluetoothEvents[event-1];
-	} else {
-		return "Event out of range!";
-	}
-}
-
-
-const char* 
-BluetoothManufacturer(uint16 manufacturer) {
-	
-	if (manufacturer < sizeof(bluetoothManufacturers) / sizeof(const char*)) {
-		return bluetoothManufacturers[manufacturer];
-	} else if (manufacturer == 0xFFFF) {
-		return "internal use";
-	} else {
-		return "not assigned";
-	}
+const char*
+BluetoothEvent(uint8 event)
+{
+	if (event < sizeof(bluetoothEvents) / sizeof(const char*))
+		return bluetoothEvents[event - 1];
+	else
+		return "Event out of Range!";
 }
 
 
 const char*
-BluetoothError(uint8 error) {
-	
-	if (error < sizeof(bluetoothErrors) / sizeof(const char*)) {
-		return bluetoothErrors[error];
-	} else {
-		return "not specified";
-    }
+BluetoothManufacturer(uint16 manufacturer)
+{
+	if (manufacturer < sizeof(bluetoothManufacturers) / sizeof(const char*))
+		return bluetoothManufacturers[manufacturer];
+	else if (manufacturer == 0xFFFF)
+		return "internal use";
+	else
+		return "not assigned";
 }
 
+
+const char*
+BluetoothError(uint8 error)
+{
+	if (error < sizeof(bluetoothErrors) / sizeof(const char*))
+		return bluetoothErrors[error];
+	else
+		return "not specified";
+}
