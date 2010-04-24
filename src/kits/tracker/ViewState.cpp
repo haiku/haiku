@@ -278,24 +278,14 @@ BColumn::_Sanitize(BColumn *column)
 
 BViewState::BViewState()
 {
-	fViewMode = kListMode;
-	fLastIconMode = 0;
-	fIconSize = 32;
-	fLastIconSize = 32;
-	fListOrigin.Set(0, 0);
-	fIconOrigin.Set(0, 0);
-	fPrimarySortAttr = AttrHashString(kAttrStatName, B_STRING_TYPE);
-	fPrimarySortType = B_STRING_TYPE;
-	fSecondarySortAttr = 0;
-	fSecondarySortType = 0;
-	fReverseSort = false;
-
+	_Init();
 	_StorePreviousState();
 }
 
 
 BViewState::BViewState(BMallocIO *stream, bool endianSwap)
 {
+	_Init();
 	stream->Read(&fViewMode, sizeof(uint32));
 	stream->Read(&fLastIconMode, sizeof(uint32));
 	stream->Read(&fListOrigin, sizeof(BPoint));
@@ -331,8 +321,11 @@ BViewState::BViewState(BMallocIO *stream, bool endianSwap)
 
 BViewState::BViewState(const BMessage &message)
 {
+	_Init();
 	message.FindInt32(kViewStateViewModeName, (int32 *)&fViewMode);
 	message.FindInt32(kViewStateLastIconModeName, (int32 *)&fLastIconMode);
+	message.FindInt32(kViewStateLastIconSizeName,(int32 *)&fLastIconSize);
+	message.FindInt32(kViewStateIconSizeName, (int32 *)&fIconSize);	
 	message.FindPoint(kViewStateListOriginName, &fListOrigin);
 	message.FindPoint(kViewStateIconOriginName, &fIconOrigin);
 	message.FindInt32(kViewStatePrimarySortAttrName,
@@ -430,6 +423,23 @@ BViewState::InstantiateFromMessage(const BMessage &message)
 		return NULL;
 
 	return _Sanitize(new (std::nothrow) BViewState(message));
+}
+
+
+void
+BViewState::_Init()
+{
+	fViewMode = kListMode;
+	fLastIconMode = 0;
+	fIconSize = 32;
+	fLastIconSize = 32;
+	fListOrigin.Set(0, 0);
+	fIconOrigin.Set(0, 0);
+	fPrimarySortAttr = AttrHashString(kAttrStatName, B_STRING_TYPE);
+	fPrimarySortType = B_STRING_TYPE;
+	fSecondarySortAttr = 0;
+	fSecondarySortType = 0;
+	fReverseSort = false;
 }
 
 
