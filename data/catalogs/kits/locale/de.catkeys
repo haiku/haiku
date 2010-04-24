@@ -1,9 +1,0 @@
-1	german	system	2677153267
-%3.2f GiB	StringForSize		%3.2f GiB
-%3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%Ld Byte
-Green:	ColorControl		Grün:
-%.2f TiB	StringForSize		%.2f TiB
-Red:	ColorControl		Rot:
-%3.2f MiB	StringForSize		%3.2f MiB
-Blue:	ColorControl		Blau:

@@ -1,9 +1,0 @@
-1	swedish	system	2677153267
-%3.2f GiB	StringForSize		%3.2f GiB
-%3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d byte
-Green:	ColorControl		Grön:
-%.2f TiB	StringForSize		%.2f TiB
-Red:	ColorControl		Röd:
-%3.2f MiB	StringForSize		%3.2f MiB
-Blue:	ColorControl		Blå:
