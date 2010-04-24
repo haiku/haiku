@@ -96,6 +96,7 @@ else
 	mkindex=mkindex
 fi
 
+
 extractFile()
 {
 	# extractFile <archive> <directory>
@@ -129,8 +130,7 @@ extractFile()
 		rm $extractDir/.OptionalPackageDescription
 	fi
 
-	if [ "$isGCCAgnostic" == "true" ] && [ $isHybridBuild ] ; then
-	#if [ $isGCCAgnostic -eq 1 ] && [ $isHybridBuild ] ; then
+	if [ "$isGCCAgnostic" = "true" ] && [ $isHybridBuild ] ; then
 		extractedLibs=`find "$extractDir/$extractedSubDir/" -name "*.so"`
 		moreExtractedLibs=`find "$extractDir/$extractedSubDir/" -name "*.so.*"`
 		createSymlinksForHybrid $extractedLibs $moreExtractedLibs
@@ -164,7 +164,7 @@ createSymlinksForHybrid()
 		standardLibPaths="system/lib common/lib home/config/lib"
 		isStandardPath=
 		for stdLibPath in $standardLibPaths; do
-			if [ "$relPath" == "$stdLibPath" ]; then
+			if [ "$relPath" = "$stdLibPath" ]; then
 				isStandardPath=true
 				break
 			fi
