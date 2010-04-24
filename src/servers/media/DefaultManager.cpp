@@ -54,7 +54,9 @@ DefaultManager::DefaultManager()
 	fSystemTimeSource(-1),
 	fTimeSource(-1),
 	fAudioMixer(-1),
-	fPhysicalAudioOutInputID(0)
+	fPhysicalAudioOutInputID(0),
+	fThreadId(-1),
+	fRescanRequested(0)
 {
 	strcpy(fPhysicalAudioOutInputName, "default");
 	fBeginHeader[0] = 0xab00150b;
@@ -92,23 +94,39 @@ DefaultManager::LoadState()
 	TRACE("0x%08lx %ld\n", fBeginHeader[0], fBeginHeader[0]);
 	TRACE("0x%08lx %ld\n", fBeginHeader[1], fBeginHeader[1]);
 	TRACE("0x%08lx %ld\n", fBeginHeader[2], fBeginHeader[2]);
-	if (file.Read(&category_count, sizeof(uint32)) < (int32)sizeof(uint32))
+	if (file.Read(&category_count, sizeof(uint32)) < (int32)sizeof(uint32)) {
+		fprintf(stderr, 
+			"DefaultManager::LoadState() failed to read category_count\n");
 		return B_ERROR;
+	}
+	TRACE("DefaultManager::LoadState() category_count %ld\n", category_count);
 	while (category_count--) {
 		BMessage settings;
 		uint32 msg_header;
 		uint32 default_type;
-		if (file.Read(&msg_header, sizeof(uint32)) < (int32)sizeof(uint32))
+		if (file.Read(&msg_header, sizeof(uint32)) < (int32)sizeof(uint32)) {
+			fprintf(stderr, 
+				"DefaultManager::LoadState() failed to read msg_header\n");
 			return B_ERROR;
-		if (file.Read(&default_type, sizeof(uint32)) < (int32)sizeof(uint32))
+		}
+		if (file.Read(&default_type, sizeof(uint32)) < (int32)sizeof(uint32)) {
+			fprintf(stderr, 
+				"DefaultManager::LoadState() failed to read default_type\n");
 			return B_ERROR;
+		}
 		if (settings.Unflatten(&file) == B_OK) {
 			settings.PrintToStream();
 			fMsgList.AddItem(new BMessage(settings));
-		}
+		} else
+			fprintf(stderr, "DefaultManager::LoadState() failed to unflatten\n");
 	}
-	if (file.Read(fEndHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
+	if (file.Read(fEndHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3) {
+		fprintf(stderr, 
+			"DefaultManager::LoadState() failed to read fEndHeader\n");
 		return B_ERROR;
+	}
+	
+	TRACE("LoadState returns B_OK\n");
 	return B_OK;
 }
 
@@ -126,17 +144,14 @@ DefaultManager::SaveState(NodeManager *node_manager)
 	if ((err = create_directory(path.Path(), 0755)) != B_OK)
 		return err;
 	path.Append(kDefaultManagerSettingsFile);
-
-	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-
+	
 	uint32 default_types[] = {kMsgTypeVideoIn, kMsgTypeVideoOut,
 		kMsgTypeAudioIn, kMsgTypeAudioOut};
-	uint32 media_node_ids[] = {fPhysicalVideoIn, fPhysicalVideoOut,
+	media_node_id media_node_ids[] = {fPhysicalVideoIn, fPhysicalVideoOut,
 		fPhysicalAudioIn, fPhysicalAudioOut};
-	for (uint32 i=0; i<sizeof(default_types)/sizeof(default_types[0]); i++) {
-		BMessage *settings = new BMessage();
-		settings->AddInt32(kDefaultManagerType, default_types[i]);
-
+	for (uint32 i = 0; i < sizeof(default_types) / sizeof(default_types[0]);
+		i++) {
+		
 		// we call the node manager to have more infos about nodes
 		dormant_node_info info;
 		media_node node;
@@ -146,9 +161,16 @@ DefaultManager::SaveState(NodeManager *node_manager)
 			|| node_manager->GetDormantNodeInfo(node, &info) != B_OK
 			|| node_manager->ReleaseNodeReference(media_node_ids[i],
 				be_app->Team()) != B_OK
-			|| node_manager->GetAddOnRef(info.addon, &ref) != B_OK)
+			|| node_manager->GetAddOnRef(info.addon, &ref) != B_OK) {
+			if (media_node_ids[i] != -1) {
+				// failed to get node info thus just return
+				return B_ERROR;
+			}
 			continue;
+		}
 
+		BMessage *settings = new BMessage();
+		settings->AddInt32(kDefaultManagerType, default_types[i]);
 		BPath path(&ref);
 		settings->AddInt32(kDefaultManagerAddon, info.addon);
 		settings->AddInt32(kDefaultManagerFlavorId, info.flavor_id);
@@ -160,6 +182,8 @@ DefaultManager::SaveState(NodeManager *node_manager)
 		list.AddItem(settings);
 		TRACE("message %s added\n", info.name);
 	}
+
+	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 
 	if (file.Write(fBeginHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
 		return B_ERROR;
@@ -304,9 +328,13 @@ DefaultManager::Get(media_node_id *nodeid, char *input_name, int32 *inputid,
 status_t
 DefaultManager::Rescan()
 {
-	thread_id fThreadId = spawn_thread(rescan_thread, "rescan defaults",
-		B_NORMAL_PRIORITY - 2, this);
-	resume_thread(fThreadId);
+	atomic_add(&fRescanRequested, 1);
+	if (fThreadId < 0) {
+		fThreadId = spawn_thread(rescan_thread, "rescan defaults",
+			B_NORMAL_PRIORITY - 2, this);
+		resume_thread(fThreadId);
+	}
+			
 	return B_OK;
 }
 
@@ -322,51 +350,60 @@ DefaultManager::rescan_thread(void *arg)
 void
 DefaultManager::RescanThread()
 {
-	printf("DefaultManager::RescanThread() enter\n");
-
-	// We do not search for the system time source,
-	// it should already exist
-	ASSERT(fSystemTimeSource != -1);
-
-	if (fPhysicalVideoOut == -1) {
-		FindPhysical(&fPhysicalVideoOut, kMsgTypeVideoOut, false,
-			B_MEDIA_RAW_VIDEO);
-		FindPhysical(&fPhysicalVideoOut, kMsgTypeVideoOut, false,
-			B_MEDIA_ENCODED_VIDEO);
+	TRACE("DefaultManager::RescanThread() enter\n");
+	
+	while (atomic_and(&fRescanRequested, 0) != 0) {
+		// We do not search for the system time source,
+		// it should already exist
+		ASSERT(fSystemTimeSource != -1);
+	
+		if (fPhysicalVideoOut == -1) {
+			FindPhysical(&fPhysicalVideoOut, kMsgTypeVideoOut, false,
+				B_MEDIA_RAW_VIDEO);
+			FindPhysical(&fPhysicalVideoOut, kMsgTypeVideoOut, false,
+				B_MEDIA_ENCODED_VIDEO);
+		}
+		if (fPhysicalVideoIn == -1) {
+			FindPhysical(&fPhysicalVideoIn, kMsgTypeVideoIn, true,
+				B_MEDIA_RAW_VIDEO);
+			FindPhysical(&fPhysicalVideoIn, kMsgTypeVideoIn, true,
+				B_MEDIA_ENCODED_VIDEO);
+		}
+		if (fPhysicalAudioOut == -1)
+			FindPhysical(&fPhysicalAudioOut, kMsgTypeAudioOut, false,
+				B_MEDIA_RAW_AUDIO);
+		if (fPhysicalAudioIn == -1)
+			FindPhysical(&fPhysicalAudioIn, kMsgTypeAudioIn, true,
+				B_MEDIA_RAW_AUDIO);
+		if (fAudioMixer == -1)
+			FindAudioMixer();
+	
+		// The normal time source is searched for after the
+		// Physical Audio Out has been created.
+		if (fTimeSource == -1)
+			FindTimeSource();
+	
+		// Connect the mixer and physical audio out (soundcard)
+		if (!fMixerConnected && fAudioMixer != -1 && fPhysicalAudioOut != -1) {
+			fMixerConnected = B_OK == ConnectMixerToOutput();
+			if (!fMixerConnected)
+				ERROR("DefaultManager: failed to connect mixer and"
+					"soundcard\n");
+		} else {
+			ERROR("DefaultManager: Did not try to connect mixer and"
+				"soundcard\n");
+		}
+	
+		if (fMixerConnected) {
+			add_on_server_rescan_finished_notify_command cmd;
+			SendToAddOnServer(ADD_ON_SERVER_RESCAN_FINISHED_NOTIFY, &cmd,
+				sizeof(cmd));
+		}
 	}
-	if (fPhysicalVideoIn == -1) {
-		FindPhysical(&fPhysicalVideoIn, kMsgTypeVideoIn, true,
-			B_MEDIA_RAW_VIDEO);
-		FindPhysical(&fPhysicalVideoIn, kMsgTypeVideoIn, true,
-			B_MEDIA_ENCODED_VIDEO);
-	}
-	if (fPhysicalAudioOut == -1)
-		FindPhysical(&fPhysicalAudioOut, kMsgTypeAudioOut, false,
-			B_MEDIA_RAW_AUDIO);
-	if (fPhysicalAudioIn == -1)
-		FindPhysical(&fPhysicalAudioIn, kMsgTypeAudioIn, true,
-			B_MEDIA_RAW_AUDIO);
-	if (fAudioMixer == -1)
-		FindAudioMixer();
+	
+	fThreadId = -1;
 
-	// The normal time source is searched for after the
-	// Physical Audio Out has been created.
-	if (fTimeSource == -1)
-		FindTimeSource();
-
-	// Connect the mixer and physical audio out (soundcard)
-	if (!fMixerConnected && fAudioMixer != -1 && fPhysicalAudioOut != -1) {
-		fMixerConnected = B_OK == ConnectMixerToOutput();
-		if (!fMixerConnected)
-			ERROR("DefaultManager: failed to connect mixer and soundcard\n");
-	} else {
-		ERROR("DefaultManager: Did not try to connect mixer and soundcard\n");
-	}
-
-	add_on_server_rescan_finished_notify_command cmd;
-	SendToAddOnServer(ADD_ON_SERVER_RESCAN_FINISHED_NOTIFY, &cmd, sizeof(cmd));
-
-	printf("DefaultManager::RescanThread() leave\n");
+	TRACE("DefaultManager::RescanThread() leave\n");
 }
 
 

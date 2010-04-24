@@ -51,4 +51,6 @@ private:
 	
 	uint32 fBeginHeader[3];
 	uint32 fEndHeader[3];
+	thread_id fThreadId;
+	vint32 fRescanRequested;
 };
