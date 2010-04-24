@@ -10,7 +10,6 @@
 #include <bluetooth/BluetoothDevice.h>
 /*#include "../media/iconfile.h"*/
 
-
 #include "DeviceListItem.h"
 
 #define INSETS  5
@@ -19,23 +18,14 @@
 namespace Bluetooth {
 
 DeviceListItem::DeviceListItem(BluetoothDevice* bDevice)
-	: BListItem(),
-	fDevice(bDevice)
-{	
-	SetDevice(fDevice);
-}	
-
-
-DeviceListItem::DeviceListItem(bdaddr_t bdaddr, DeviceClass dClass, int32 rssi)
-	: BListItem(),
-	fDevice(NULL),
-	fAddress(bdaddr),
-	fClass(dClass),
-	fName("unknown"),
-	fRSSI(rssi)
+	:
+	BListItem(),
+	fDevice(bDevice),
+	fName("unknown")
 {
-
-}	
+	fAddress = bDevice->GetBluetoothAddress();
+	fClass = bDevice->GetDeviceClass();
+}
 
 
 void
@@ -44,28 +34,28 @@ DeviceListItem::SetDevice(BluetoothDevice* bDevice)
 	fAddress = bDevice->GetBluetoothAddress();
 	fClass = bDevice->GetDeviceClass();
 	fName = bDevice->GetFriendlyName();
-	// AKAIR rssi	can	only be	got	at inquiry time...	
+	// AKAIR rssi we can just have it @ inquiry time...
 }
 
 
-DeviceListItem::~DeviceListItem()	
-{	
+DeviceListItem::~DeviceListItem()
+{
 
 }
 
 
-void 
+void
 DeviceListItem::DrawItem(BView* owner, BRect itemRect, bool	complete)
-{	
-	rgb_color	kBlack = { 0,0,0,0 };	
-	rgb_color	kHighlight = { 156,154,156,0 };	
+{
+	rgb_color	kBlack = { 0, 0, 0, 0 };
+	rgb_color	kHighlight = { 156, 154, 156, 0 };
 
 	if (IsSelected() || complete) {
 		rgb_color	color;
 		if (IsSelected())
 			color = kHighlight;
 		else
-			color = owner->ViewColor();	
+			color = owner->ViewColor();
 
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
@@ -79,7 +69,8 @@ DeviceListItem::DrawItem(BView* owner, BRect itemRect, bool	complete)
 	font_height	finfo;
 	be_plain_font->GetHeight(&finfo);
 
-	BPoint point = BPoint(itemRect.left	+ DeviceClass::PixelsForIcon + 2*INSETS, itemRect.bottom - finfo.descent + 1);
+	BPoint point = BPoint(itemRect.left	+ DeviceClass::PixelsForIcon
+		+ 2 * INSETS, itemRect.bottom - finfo.descent + 1);
 	owner->SetFont(be_fixed_font);
 	owner->SetHighColor(kBlack);
 	owner->MovePenTo(point);
@@ -90,66 +81,78 @@ DeviceListItem::DrawItem(BView* owner, BRect itemRect, bool	complete)
 	fClass.GetMajorDeviceClass(secondLine);
 	secondLine << " / ";
 	fClass.GetMinorDeviceClass(secondLine);
-	
-	owner->DrawString(secondLine.String());	 
 
-	point -= BPoint(0, (finfo.ascent + finfo.descent + finfo.leading) + INSETS); 
+	owner->DrawString(secondLine.String());
+
+	point -= BPoint(0, (finfo.ascent + finfo.descent + finfo.leading) + INSETS);
 
 	owner->SetFont(be_plain_font);
-	owner->MovePenTo(point); 
+	owner->MovePenTo(point);
 	owner->DrawString(fName.String());
-	
+
 	fClass.Draw(owner, BPoint(itemRect.left, itemRect.top));
 
-#if 0	
+#if 0
 	switch (fClass.GetMajorDeviceClass()) {
 		case 1:
 		{
-			BRect iconRect(0,0,15,15);
-			BBitmap *icon=new BBitmap(iconRect, B_CMAP8);
-			icon->SetBits(kTVBits, kTVWidth*kTVHeight, 0, kTVColorSpace);
-			owner->DrawBitmap(icon, iconRect,BRect(itemRect.left + INSETS, itemRect.top + INSETS, 
-				itemRect.left + INSETS + PIXELS_FOR_ICON, itemRect.top + INSETS + PIXELS_FOR_ICON));
-
+			BRect iconRect(0, 0, 15, 15);
+			BBitmap* icon  = new BBitmap(iconRect, B_CMAP8);
+			icon->SetBits(kTVBits, kTVWidth * kTVHeight, 0, kTVColorSpace);
+			owner->DrawBitmap(icon, iconRect, BRect(itemRect.left + INSETS,
+				itemRect.top + INSETS, itemRect.left + INSETS + PIXELS_FOR_ICON,
+				itemRect.top + INSETS + PIXELS_FOR_ICON));
+			break;
 		}
-		break;
 		case 4:
 		{
-			BRect iconRect(0,0,15,15);
-			BBitmap *icon=new BBitmap(iconRect, B_CMAP8);
-			icon->SetBits(kMixerBits, kMixerWidth*kMixerHeight, 0, kMixerColorSpace);
-			owner->DrawBitmap(icon, iconRect,BRect(itemRect.left + INSETS, itemRect.top + INSETS, 
-				itemRect.left + INSETS + PIXELS_FOR_ICON, itemRect.top + INSETS + PIXELS_FOR_ICON));			
+			BRect iconRect(0, 0, 15, 15);
+			BBitmap* icon = new BBitmap(iconRect, B_CMAP8);
+			icon->SetBits(kMixerBits, kMixerWidth * kMixerHeight, 0, kMixerColorSpace);
+			owner->DrawBitmap(icon, iconRect, BRect(itemRect.left + INSETS,
+				itemRect.top + INSETS, itemRect.left + INSETS + PIXELS_FOR_ICON,
+				itemRect.top + INSETS + PIXELS_FOR_ICON));
+			break;
 		}
-		break;
-
 	}
 #endif
 
 	owner->SetHighColor(kBlack);
 
-} 
+}
 
 
 void
-DeviceListItem::Update(BView *owner, const BFont *font)
+DeviceListItem::Update(BView* owner, const BFont* font)
 {
-	BListItem::Update(owner,font);
+	BListItem::Update(owner, font);
 
-   	font_height height;
+	font_height height;
 	font->GetHeight(&height);
-	SetHeight(MAX((height.ascent + height.descent + height.leading) * TEXT_ROWS +
-		(TEXT_ROWS+1)*INSETS, DeviceClass::PixelsForIcon + 2 * INSETS));
+	SetHeight(MAX((height.ascent + height.descent + height.leading) * TEXT_ROWS
+		+ (TEXT_ROWS + 1)*INSETS, DeviceClass::PixelsForIcon + 2 * INSETS));
 
 }
-	
-int	
-DeviceListItem::Compare(const void	*firstArg, const void	*secondArg)	
-{ 
-	 const DeviceListItem	*item1 = *static_cast<const	DeviceListItem * const *>(firstArg); 
-	 const DeviceListItem	*item2 = *static_cast<const	DeviceListItem * const *>(secondArg);	
-				
-	 return	(int)bdaddrUtils::Compare((bdaddr_t*)&item1->fAddress, (bdaddr_t*)&item2->fAddress);	 
-} 
+
+
+int
+DeviceListItem::Compare(const void	*firstArg, const void	*secondArg)
+{
+	const DeviceListItem* item1 = *static_cast<const DeviceListItem* const *>
+		(firstArg);
+	const DeviceListItem* item2 = *static_cast<const DeviceListItem* const *>
+		(secondArg);
+
+	return (int)bdaddrUtils::Compare((bdaddr_t*)&item1->fAddress,
+		(bdaddr_t*)&item2->fAddress);
+}
+
+
+BluetoothDevice*
+DeviceListItem::Device() const
+{
+	return fDevice;
+}
+
 
 }

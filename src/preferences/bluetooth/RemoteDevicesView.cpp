@@ -18,11 +18,12 @@
 #include <SpaceLayoutItem.h>
 
 #include <PincodeWindow.h>
+#include <bluetooth/RemoteDevice.h>
 
-#include "defs.h"
-#include "InquiryPanel.h"
 #include "BluetoothWindow.h"
-
+#include "defs.h"
+#include "DeviceListItem.h"
+#include "InquiryPanel.h"
 #include "RemoteDevicesView.h"
 
 #define TR_CONTEXT "Remote devices"
@@ -33,27 +34,29 @@ static const uint32 kMsgPairDevice = 'trDv';
 static const uint32 kMsgBlockDevice = 'blDv';
 static const uint32 kMsgRefreshDevices = 'rfDv';
 
-RemoteDevicesView::RemoteDevicesView(const char *name, uint32 flags)
+using namespace Bluetooth;
+
+RemoteDevicesView::RemoteDevicesView(const char* name, uint32 flags)
  :	BView(name, flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	addButton = new BButton("add", TR("Add" B_UTF8_ELLIPSIS),
-										new BMessage(kMsgAddDevices));
+		new BMessage(kMsgAddDevices));
 
 	removeButton = new BButton("remove", TR("Remove"),
-										new BMessage(kMsgRemoveDevice));
+		new BMessage(kMsgRemoveDevice));
 
 	pairButton = new BButton("pair", TR("Pair" B_UTF8_ELLIPSIS),
-										new BMessage(kMsgPairDevice));
+		new BMessage(kMsgPairDevice));
 
 
 	blockButton = new BButton("block", TR("As blocked"),
-										new BMessage(kMsgBlockDevice));
+		new BMessage(kMsgBlockDevice));
 
 
 	availButton = new BButton("check", TR("Refresh" B_UTF8_ELLIPSIS),
-										new BMessage(kMsgRefreshDevices));
+		new BMessage(kMsgRefreshDevices));
 
 	// Set up device list
 	fDeviceList = new BListView("DeviceList", B_SINGLE_SELECTION_LIST);
@@ -68,26 +71,28 @@ RemoteDevicesView::RemoteDevicesView(const char *name, uint32 flags)
 		.Add(fScrollView)
 		//.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
 		.Add(BGroupLayoutBuilder(B_VERTICAL)
-						.Add(addButton)
-						.Add(removeButton)
-						.AddGlue()
-						.Add(availButton)
-						.AddGlue()
-						.Add(pairButton)
-						.Add(blockButton)
-						.AddGlue()
-						.SetInsets(0, 15, 0, 15)
-			)
+			.Add(addButton)
+			.Add(removeButton)
+			.AddGlue()
+			.Add(availButton)
+			.AddGlue()
+			.Add(pairButton)
+			.Add(blockButton)
+			.AddGlue()
+			.SetInsets(0, 15, 0, 15)
+		)
 		.SetInsets(5, 5, 5, 100)
 	);
 
 	fDeviceList->SetSelectionMessage(NULL);
 }
 
+
 RemoteDevicesView::~RemoteDevicesView(void)
 {
 
 }
+
 
 void
 RemoteDevicesView::AttachedToWindow(void)
@@ -103,15 +108,16 @@ RemoteDevicesView::AttachedToWindow(void)
 	fDeviceList->Select(0);
 }
 
+
 void
-RemoteDevicesView::MessageReceived(BMessage *msg)
+RemoteDevicesView::MessageReceived(BMessage* message)
 {
-	printf("what = %ld\n", msg->what);
-	switch(msg->what) {
+	switch (message->what) {
 		case kMsgAddDevices:
 		{
-			InquiryPanel* iPanel = new InquiryPanel(BRect(100,100,450,450), ActiveLocalDevice);
-			iPanel->Show();
+			InquiryPanel* inquiryPanel = new InquiryPanel(BRect(100, 100, 450, 450),
+				ActiveLocalDevice);
+			inquiryPanel->Show();
 			break;
 		}
 
@@ -122,7 +128,7 @@ RemoteDevicesView::MessageReceived(BMessage *msg)
 		case kMsgAddToRemoteList:
 		{
 			BListItem* device;
-			msg->FindPointer("device", (void**)&device);
+			message->FindPointer("device", (void**)&device);
 			fDeviceList->AddItem(device);
 			fDeviceList->Invalidate();
 			break;
@@ -130,29 +136,28 @@ RemoteDevicesView::MessageReceived(BMessage *msg)
 
 		case kMsgPairDevice:
 		{
-			bdaddr_t address;
-			address.b[5] = 0x55;
-			address.b[4] = 0x44;
-			address.b[3] = 0x33;
-			address.b[2] = 0x22;
-			address.b[1] = 0x11;
-			address.b[0] = 0x00;
+			DeviceListItem* device = static_cast<DeviceListItem*>(fDeviceList
+				->ItemAt(fDeviceList->CurrentSelection(0)));
+			RemoteDevice* remote = dynamic_cast<RemoteDevice*>(device->Device());
 
-			PincodeWindow* iPincode = new PincodeWindow(address, 0);
-			iPincode->Show();
+			if (remote != NULL)
+				remote->Authenticate();
+
 			break;
 		}
 
 		default:
-			BView::MessageReceived(msg);
+			BView::MessageReceived(message);
 			break;
 	}
 }
+
 
 void RemoteDevicesView::LoadSettings(void)
 {
 
 }
+
 
 bool RemoteDevicesView::IsDefaultable(void)
 {

@@ -18,34 +18,40 @@
 
 #define TR_CONTEXT "Extended local device view"
 
-ExtendedLocalDeviceView::ExtendedLocalDeviceView(BRect frame, LocalDevice* bDevice, uint32 resizingMode, uint32 flags)
- :	BView(frame,"ExtendedLocalDeviceView", resizingMode, flags | B_WILL_DRAW),
+ExtendedLocalDeviceView::ExtendedLocalDeviceView(BRect frame,
+	LocalDevice* bDevice, uint32 resizingMode, uint32 flags)
+	:
+	BView(frame,"ExtendedLocalDeviceView", resizingMode, flags | B_WILL_DRAW),
 	fDevice(bDevice),
 	fScanMode(0)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-	SetLowColor(0,0,0);
-	BRect iDontCare(0,0,0,0);
+	SetLowColor(0, 0, 0);
+	BRect iDontCare(0, 0, 0, 0);
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	fDeviceView = new BluetoothDeviceView(BRect(0,0,5,5), bDevice);
+	fDeviceView = new BluetoothDeviceView(BRect(0, 0, 5, 5), bDevice);
 
 	fDiscoverable = new BCheckBox(iDontCare, "Discoverable", TR("Discoverable"),
 		new BMessage(SET_DISCOVERABLE));
-	fVisible = new BCheckBox(iDontCare, "Visible", TR("Show name"), new BMessage(SET_VISIBLE));
+	fVisible = new BCheckBox(iDontCare, "Visible", TR("Show name"),
+		new BMessage(SET_VISIBLE));
+	fAuthentication = new BCheckBox(iDontCare, "Authenticate", TR("Authenticate"),
+		new BMessage(SET_AUTHENTICATION));
 
 	fDiscoverable->SetEnabled(false);
 	fVisible->SetEnabled(false);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 				.Add(fDeviceView)
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL)		
-						.AddGlue()			
+				.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+						.AddGlue()
 						.Add(fDiscoverable)
 						.Add(fVisible)
 						.SetInsets(5, 5, 5, 5)
 					)
+				.Add(fAuthentication)
 				.Add(BSpaceLayoutItem::CreateVerticalStrut(0))
 			.SetInsets(5, 5, 5, 5)
 	);
@@ -64,7 +70,7 @@ ExtendedLocalDeviceView::SetLocalDevice(LocalDevice* lDevice)
 {
 	if (lDevice != NULL) {
 		fDevice = lDevice;
-		SetName(lDevice->GetFriendlyName().String());	
+		SetName(lDevice->GetFriendlyName().String());
 		fDeviceView->SetBluetoothDevice(lDevice);
 	}
 }
@@ -73,26 +79,27 @@ ExtendedLocalDeviceView::SetLocalDevice(LocalDevice* lDevice)
 void
 ExtendedLocalDeviceView::AttachedToWindow()
 {
-	fDiscoverable->SetTarget(this);	
-	fVisible->SetTarget(this);	
+	fDiscoverable->SetTarget(this);
+	fVisible->SetTarget(this);
+	fAuthentication->SetTarget(this);
 }
 
 
 void
-ExtendedLocalDeviceView::SetTarget(BHandler *tgt)
+ExtendedLocalDeviceView::SetTarget(BHandler* target)
 {
 
 }
 
 
 void
-ExtendedLocalDeviceView::MessageReceived(BMessage *msg)
+ExtendedLocalDeviceView::MessageReceived(BMessage* message)
 {
-	if(msg->WasDropped()) {
+	if (message->WasDropped()) {
 
 	}
 
-	switch(msg->what)
+	switch (message->what)
 	{
 		case SET_DISCOVERABLE:
 		case SET_VISIBLE:
@@ -111,10 +118,13 @@ ExtendedLocalDeviceView::MessageReceived(BMessage *msg)
 			if (fDevice != NULL)
 				fDevice->SetDiscoverable(fScanMode);
 
-		break;
+			break;
+		case SET_AUTHENTICATION:
+			fDevice->SetAuthentication(fAuthentication->Value());
+			break;
 
 		default:
-			BView::MessageReceived(msg);
+			BView::MessageReceived(message);
 		break;
 	}
 }

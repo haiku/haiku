@@ -19,15 +19,15 @@ class DeviceListItem : public BListItem
 {
 	public:
 		DeviceListItem(BluetoothDevice*	bDevice);
-		DeviceListItem(bdaddr_t	bdaddr,	DeviceClass	dClass,	int32 rssi = 0);
-		
+
 		~DeviceListItem();
-		
-		void DrawItem(BView *, BRect, bool = false);
-		void Update(BView *owner, const BFont *font);
-		
-		static int Compare(const void *firstArg, const void *secondArg);
+
+		void DrawItem(BView*, BRect, bool = false);
+		void Update(BView* owner, const BFont* font);
+
+		static int Compare(const void* firstArg, const void* secondArg);
 		void SetDevice(BluetoothDevice* bDevice);
+		BluetoothDevice* Device() const;
 
 	private:
 		BluetoothDevice*	fDevice;

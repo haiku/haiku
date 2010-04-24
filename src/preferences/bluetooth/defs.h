@@ -19,6 +19,7 @@
 
 #define SET_VISIBLE 		'sVis'
 #define SET_DISCOVERABLE 	'sDis'
+#define SET_AUTHENTICATION 	'sAth'
 
 #define SET_UI_COLORS 'suic'
 #define PREFS_CHOSEN 'prch'

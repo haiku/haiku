@@ -22,21 +22,22 @@ class BCheckBox;
 class ExtendedLocalDeviceView : public BView
 {
 public:
-	ExtendedLocalDeviceView(BRect frame, LocalDevice* bDevice, 
-		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP, 
+	ExtendedLocalDeviceView(BRect frame, LocalDevice* bDevice,
+		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		uint32 flags = B_WILL_DRAW);
 	~ExtendedLocalDeviceView(void);
-		
+
 	void SetLocalDevice(LocalDevice* lDevice);
 
 
-	virtual void MessageReceived(BMessage *msg);
+	virtual void MessageReceived(BMessage* message);
 	virtual void AttachedToWindow();
-	virtual void SetTarget(BHandler *tgt);
+	virtual void SetTarget(BHandler* target);
 	virtual void SetEnabled(bool value);
-	
+
 protected:
 	LocalDevice*		fDevice;
+	BCheckBox*			fAuthentication;
 	BCheckBox*			fDiscoverable;
 	BCheckBox*			fVisible;
 	BluetoothDeviceView* fDeviceView;
