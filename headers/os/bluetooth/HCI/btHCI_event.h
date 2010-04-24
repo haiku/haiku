@@ -315,11 +315,11 @@ struct hci_ev_sychronous_connection_changed {
 #define HCI_EVENT_REMOTE_HOST_SUPPORTED_FEATURES_NOTIFICATION	0x3D
 
 
-/* HAIKU Internal Events, not produced by the transport devices but 
- * by some entity of the Haiku Bluetooth Stack. 
+/* HAIKU Internal Events, not produced by the transport devices but
+ * by some entity of the Haiku Bluetooth Stack.
  * The MSB 0xE is chosen for this purpose
  */
- 
+
 #define HCI_HAIKU_EVENT_SERVER_QUITTING				0xE0
 #define HCI_HAIKU_EVENT_DEVICE_REMOVED				0xE1
 

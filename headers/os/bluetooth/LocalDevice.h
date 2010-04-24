@@ -38,6 +38,7 @@ public:
 
 	/* Possible throwing */
 			status_t		SetDiscoverable(int mode);
+			status_t		SetAuthentication(bool authentication);
 
 			BString			GetProperty(const char* property);
 			status_t 		GetProperty(const char* property, uint32* value);
@@ -56,6 +57,8 @@ private:
 			status_t		_ReadLocalVersion();
 			status_t		_ReadBufferSize();
 			status_t		_ReadLocalFeatures();
+			status_t		_ReadTimeouts();
+			status_t		_ReadLinkKeys();
 			status_t		Reset();
 
 	static	LocalDevice*	RequestLocalDeviceID(BMessage* request);

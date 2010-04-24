@@ -191,6 +191,19 @@ LocalDevice::SetDiscoverable(int mode)
 }
 
 
+struct authentication_t {
+	uint8 param;
+};
+
+status_t
+LocalDevice::SetAuthentication(bool authentication)
+{
+	return SingleParameterCommandRequest<struct authentication_t, uint8>
+		(OGF_CONTROL_BASEBAND, OCF_WRITE_AUTH_ENABLE, authentication,
+		NULL, fHid, fMessenger);
+}
+
+
 bdaddr_t
 LocalDevice::GetBluetoothAddress()
 {
@@ -407,6 +420,58 @@ LocalDevice::_ReadLocalFeatures()
 
 
 status_t
+LocalDevice::_ReadLinkKeys()
+{
+	int8 bt_status = BT_ERROR;
+
+	BluetoothCommand<> LocalFeatures(OGF_CONTROL_BASEBAND,
+		OCF_READ_STORED_LINK_KEY);
+
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	BMessage reply;
+
+	request.AddInt32("hci_id", fHid);
+	request.AddData("raw command", B_ANY_TYPE,
+		LocalFeatures.Data(), LocalFeatures.Size());
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND,
+		OCF_READ_STORED_LINK_KEY));
+
+	request.AddInt16("eventExpected",  HCI_EVENT_RETURN_LINK_KEYS);
+
+
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindInt8("status", &bt_status);
+
+	return bt_status;
+}
+
+
+struct pageTimeout_t {
+	uint16 param;
+};
+
+status_t
+LocalDevice::_ReadTimeouts()
+{
+
+	// Read PageTimeout
+	NonParameterCommandRequest(OGF_CONTROL_BASEBAND,
+		OCF_READ_PG_TIMEOUT, NULL, fHid, fMessenger);
+
+	// Write PageTimeout
+	SingleParameterCommandRequest<struct pageTimeout_t, uint16>
+		(OGF_CONTROL_BASEBAND, OCF_WRITE_PG_TIMEOUT, 0x8000, NULL,
+		fHid, fMessenger);
+
+	// Write PageTimeout
+	return SingleParameterCommandRequest<struct pageTimeout_t, uint16>
+		(OGF_CONTROL_BASEBAND, OCF_WRITE_CA_TIMEOUT, 0x7d00, NULL,
+		fHid, fMessenger);
+}
+
+
+status_t
 LocalDevice::Reset()
 {
 	int8 bt_status = BT_ERROR;
@@ -443,13 +508,18 @@ LocalDevice::updateRecord(ServiceRecord srvRecord) {
 */
 
 
-LocalDevice::LocalDevice(hci_id hid) : fHid(hid)
+LocalDevice::LocalDevice(hci_id hid)
+	:
+	BluetoothDevice(),
+	fHid(hid)
 {
 	fMessenger = _RetrieveBluetoothMessenger();
 
 	_ReadBufferSize();
 	_ReadLocalFeatures();
 	_ReadLocalVersion();
+	_ReadTimeouts();
+	_ReadLinkKeys();
 
 	uint32 value;
 
@@ -461,7 +531,7 @@ LocalDevice::LocalDevice(hci_id hid) : fHid(hid)
 		// Reset();	// Perform a reset to Broadcom buggyland
 
 // Uncomment this out if your Broadcom dongle has a null bdaddr
-// #define BT_WRITE_BDADDR_FOR_BCM2035
+//#define BT_WRITE_BDADDR_FOR_BCM2035
 #ifdef BT_WRITE_BDADDR_FOR_BCM2035
 #warning Writting broadcom bdaddr @ init.
 		// try write bdaddr to a bcm2035 -> will be moved to an addon

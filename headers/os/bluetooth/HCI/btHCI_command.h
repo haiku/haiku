@@ -102,7 +102,13 @@ struct hci_command_header {
 		char		local_name[HCI_DEVICE_NAME_SIZE];
 	} __attribute__ ((packed));
 
+	#define OCF_READ_CA_TIMEOUT			0x0015
 	#define OCF_WRITE_CA_TIMEOUT		0x0016
+	#define OCF_READ_PG_TIMEOUT			0x0017
+	struct hci_rp_read_page_timeout {
+		uint8		status;
+		uint16		page_timeout;
+	} __attribute__ ((packed));
 	#define OCF_WRITE_PG_TIMEOUT		0x0018
 
 	#define OCF_WRITE_SCAN_ENABLE		0x001A
@@ -238,6 +244,11 @@ struct hci_command_header {
 		bdaddr_t bdaddr;
 		uint8		pin_len;
 		uint8		pin_code[HCI_PIN_SIZE];
+	} __attribute__ ((packed));
+
+	struct hci_cp_link_key_reply_reply {
+		uint8	status;
+		bdaddr_t bdaddr;
 	} __attribute__ ((packed));
 
 	#define OCF_PIN_CODE_NEG_REPLY		0x000E
