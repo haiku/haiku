@@ -42,7 +42,7 @@ DispatchEvent(struct hci_event_header* header, int32 code, size_t size)
 	}
 
 	// fetch the LocalDevice who belongs this event
-		LocalDeviceImpl* lDeviceImplementation = ((BluetoothServer*)be_app)->
+	LocalDeviceImpl* lDeviceImplementation = ((BluetoothServer*)be_app)->
 		LocateLocalDeviceImpl(GET_PORTCODE_HID(code));
 
 	if (lDeviceImplementation == NULL) {
@@ -436,6 +436,8 @@ BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
 
 		// Check if the property has been already retrieved
 		if (lDeviceImpl->IsPropertyAvailable(propertyRequested)) {
+
+			// 1 bytes requests
 			if (strcmp(propertyRequested, "hci_version") == 0
 				|| strcmp(propertyRequested, "lmp_version") == 0
 				|| strcmp(propertyRequested, "sco_mtu") == 0) {
@@ -444,16 +446,29 @@ BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
 					FindInt8(propertyRequested);
 				reply->AddInt32("result", result);
 
+			// 2 bytes requests
 			} else if (strcmp(propertyRequested, "hci_revision") == 0
 					|| strcmp(propertyRequested, "lmp_subversion") == 0
 					|| strcmp(propertyRequested, "manufacturer") == 0
 					|| strcmp(propertyRequested, "acl_mtu") == 0
 					|| strcmp(propertyRequested, "acl_max_pkt") == 0
-					|| strcmp(propertyRequested, "sco_max_pkt") == 0 ) {
+					|| strcmp(propertyRequested, "sco_max_pkt") == 0
+					|| strcmp(propertyRequested, "packet_type") == 0 ) {
 
 				uint16 result = lDeviceImpl->GetPropertiesMessage()->
 					FindInt16(propertyRequested);
 				reply->AddInt32("result", result);
+
+			// 1 bit requests
+			} else if (strcmp(propertyRequested, "role_switch_capable") == 0
+					|| strcmp(propertyRequested, "encrypt_capable") == 0) {
+
+				bool result = lDeviceImpl->GetPropertiesMessage()->
+					FindBool(propertyRequested);
+
+				reply->AddInt32("result", result);
+
+
 
 			} else {
 				Output::Instance()->Postf(BLACKBOARD_LD(lDeviceImpl->GetID()),

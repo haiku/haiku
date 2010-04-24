@@ -10,32 +10,32 @@
 LocalDeviceHandler::LocalDeviceHandler(HCIDelegate* hd)
 {
 	fHCIDelegate = hd;
-	fProperties = new BMessage();	
+	fProperties = new BMessage();
 }
 
 
-LocalDeviceHandler::~LocalDeviceHandler() 
+LocalDeviceHandler::~LocalDeviceHandler()
 {
 	delete fHCIDelegate;
-	delete fProperties;	
+	delete fProperties;
 }
 
 
 hci_id
 LocalDeviceHandler::GetID()
 {
-    return fHCIDelegate->Id();
+	return fHCIDelegate->Id();
 }
 
 
 status_t
 LocalDeviceHandler::Launch(void)
 {
-    return fHCIDelegate->Launch();
+	return fHCIDelegate->Launch();
 }
 
 
-bool 
+bool
 LocalDeviceHandler::Available()
 {
 
@@ -54,33 +54,33 @@ bool
 LocalDeviceHandler::IsPropertyAvailable(const char* property)
 {
 	type_code typeFound;
-	int32     countFound;
+	int32 countFound;
 
 	return (fProperties->GetInfo(property, &typeFound, &countFound) == B_OK );
 }
 
 
 void
-LocalDeviceHandler::AddWantedEvent(BMessage* msg) 
+LocalDeviceHandler::AddWantedEvent(BMessage* msg)
 {
-    fEventsWanted.Lock();
-    // TODO: review why it is needed to replicate the msg
-    printf("Adding request... %p\n", msg);
-    fEventsWanted.AddMessage(msg);
-    fEventsWanted.Unlock();
+	fEventsWanted.Lock();
+	// TODO: review why it is needed to replicate the msg
+	printf("Adding request... %p\n", msg);
+	fEventsWanted.AddMessage(msg);
+	fEventsWanted.Unlock();
 }
 
 
-void 
+void
 LocalDeviceHandler::ClearWantedEvent(BMessage* msg)
 {
-    fEventsWanted.Lock();
-    fEventsWanted.RemoveMessage(msg);
-    fEventsWanted.Unlock();
+	fEventsWanted.Lock();
+	fEventsWanted.RemoveMessage(msg);
+	fEventsWanted.Unlock();
 }
 
 
-void 
+void
 LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode)
 {
 	// Remove the whole petition from queue
@@ -90,10 +90,10 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode)
 	int16 opcodeFound;
 	int32 eventIndex = 0;
 
-	// for each Event    
+	// for each Event
 	while (msg->FindInt16("eventExpected", eventIndex, &eventFound) == B_OK) {
 
-		printf("%s:Event expected@%ld...\n", __FUNCTION__, eventIndex);
+		printf("%s:Event expected %d@%ld...\n", __FUNCTION__, event, eventIndex);
 
 		if (eventFound == event) {
 
@@ -102,12 +102,12 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode)
 			if (opcode != 0) {
 
 				// The opcode matches
-				if ((msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) == B_OK) 
+				if ((msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) == B_OK)
 					&& ((uint16)opcodeFound == opcode)) {
 
 					// this should remove only the entry
 					printf("Removed event %#x and opcode %d from request %p\n",
-						event, opcode, msg); 
+						event, opcode, msg);
 					(void)msg->RemoveData("eventExpected", eventIndex);
 					(void)msg->RemoveData("opcodeExpected", eventIndex);
 					goto finish;
@@ -142,39 +142,40 @@ LocalDeviceHandler::FindPetition(uint16 event, uint16 opcode, int32* indexFound)
 	// for each Petition
 	for (int32 index = 0 ; index < fEventsWanted.CountMessages() ; index++) {
 		BMessage* msg = fEventsWanted.FindMessage(index);
-		printf("%s:Petition %ld ... of %ld msg #%p\n", __FUNCTION__, index, 
+		printf("%s:Petition %ld ... of %ld msg #%p\n", __FUNCTION__, index,
 			fEventsWanted.CountMessages(), msg);
-		//msg->PrintToStream();
+		msg->PrintToStream();
 		eventIndex = 0;
 
 		// for each Event
 		while (msg->FindInt16("eventExpected", eventIndex, &eventFound) == B_OK ) {
 			if (eventFound == event) {
-		
-				printf("%s:Event found@%ld...", __FUNCTION__, eventIndex);
-				// there is an opcode specified.. 
-				if (msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) 
+
+				printf("%s:Event %d found@%ld...", __FUNCTION__, event, eventIndex);
+				// there is an opcode specified..
+				if (msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound)
 					== B_OK) {
 					// ensure the opcode
 					if ((uint16)opcodeFound != opcode) {
 						printf("%s:opcode does not match %d\n",
 							__FUNCTION__, opcode);
-						break;
+						eventIndex++;
+						continue;
 					}
 					printf("Opcode matches %d\n", opcode);
 				} else {
 					printf("No opcode specified\n");
 				}
-		
+
 				fEventsWanted.Unlock();
 				if (indexFound != NULL)
 					*indexFound = eventIndex;
 				return msg;
-			} 
+			}
 			eventIndex++;
 		}
 	}
-	printf("%s:Nothing found\n", __FUNCTION__);
+	printf("%s:Event %d not found\n", __FUNCTION__, event);
 
 	fEventsWanted.Unlock();
 	return NULL;
