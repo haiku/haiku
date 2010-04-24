@@ -5,13 +5,12 @@
 #ifndef _BLUETOOTH_DEVICE_H
 #define _BLUETOOTH_DEVICE_H
 
+#include <bluetooth/bdaddrUtils.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/DeviceClass.h>
-#include <bluetooth/bdaddrUtils.h>
 
-#include <Messenger.h>
 #include <Message.h>
-
+#include <Messenger.h>
 #include <String.h>
 
 
