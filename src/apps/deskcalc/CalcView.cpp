@@ -917,7 +917,7 @@ CalcView::Evaluate()
 	}
 
 	// render new result to display
-	fExpressionTextView->SetExpression(value.String());
+	fExpressionTextView->SetValue(value.String());
 }
 
 

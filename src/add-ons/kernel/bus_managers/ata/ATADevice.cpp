@@ -17,9 +17,12 @@ ATADevice::ATADevice(ATAChannel *channel, uint8 index)
 	fUseDMA(channel->UseDMA()),
 	fDMAMode(0),
 	fDMAFailures(0),
+	fTotalSectors(0),
+	fBlockSize(512),
+	fPhysicalBlockSize(512),
+	fBlockOffset(0),
 	fIndex(index),
-	fUse48Bits(false),
-	fTotalSectors(0)
+	fUse48Bits(false)
 {
 	memset(&fInfoBlock, 0, sizeof(fInfoBlock));
 	memset(&fTaskFile, 0, sizeof(fTaskFile));
@@ -170,7 +173,7 @@ ATADevice::ReadCapacity(ATARequest *request)
 	}
 
 	scsi_res_read_capacity data;
-	data.block_size = B_HOST_TO_BENDIAN_INT32(ATA_BLOCK_SIZE);
+	data.block_size = B_HOST_TO_BENDIAN_INT32(fBlockSize);
 
 	uint32 lastBlock = fTotalSectors - 1;
 	data.lba = B_HOST_TO_BENDIAN_INT32(lastBlock);
@@ -305,12 +308,12 @@ status_t
 ATADevice::Select()
 {
 	status_t err = fChannel->SelectDevice(fIndex);
-#if 1	
-    // for debugging only                                                                                                                                                                                                                      
+#if 1
+    // for debugging only
 	if (fChannel->SelectedDevice() != fIndex) {
 		TRACE_ERROR("device %d not selected!\n", fIndex);
-		return B_ERROR;                                                                                                                                                                                                                    
-	}                                                                                                                                                                                                                                          
+		return B_ERROR;
+	}
 #endif
 	return err;
 }
@@ -442,6 +445,23 @@ ATADevice::Configure()
 	}
 
 	fTotalSectors = fInfoBlock.lba_sector_count;
+
+	if (fInfoBlock.word_106_bit_14_one && !fInfoBlock.word_106_bit_15_zero) {
+		// contains a valid block size configuration
+		if (fInfoBlock.logical_sector_not_512_bytes)
+			fBlockSize = fInfoBlock.logical_sector_size * 2;
+
+		if (fInfoBlock.multiple_logical_per_physical_sectors) {
+			fPhysicalBlockSize
+				= fBlockSize << fInfoBlock.logical_sectors_per_physical_sector;
+		} else
+			fPhysicalBlockSize = fBlockSize;
+	}
+	if (fInfoBlock.word_209_bit_14_one && !fInfoBlock.word_209_bit_15_zero) {
+		// contains a valid logical block offset configuration
+		fBlockOffset = fInfoBlock.logical_sector_offset;
+	}
+
 	fTaskFile.lba.mode = ATA_MODE_LBA;
 	fTaskFile.lba.device = fIndex;
 
@@ -540,7 +560,7 @@ ATADevice::ExecuteReadWrite(ATARequest *request, uint64 address,
 	if (!request->UseDMA())
 		request->PrepareSGInfo();
 
-	request->SetBytesLeft(sectorCount * ATA_BLOCK_SIZE);
+	request->SetBytesLeft(sectorCount * fBlockSize);
 	if (_FillTaskFile(request, address) != B_OK) {
 		TRACE_ERROR("failed to setup transfer request\n");
 		if (request->UseDMA())
@@ -615,7 +635,7 @@ ATADevice::_FillTaskFile(ATARequest *request, uint64 address)
 		{ ATA_COMMAND_READ_DMA, ATA_COMMAND_WRITE_DMA }
 	};
 
-	uint32 sectorCount = *request->BytesLeft() / ATA_BLOCK_SIZE;
+	uint32 sectorCount = *request->BytesLeft() / fBlockSize;
 	TRACE("about to transfer %lu sectors\n", sectorCount);
 
 	if (fUse48Bits

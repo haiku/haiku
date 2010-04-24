@@ -74,7 +74,7 @@ SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	Touchpad <preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
-	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku Gradients
+	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku
 ;
 ICU_LIBS = libicu-common.so libicu-data.so libicu-i18n.so
 ;

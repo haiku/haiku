@@ -32,6 +32,7 @@ class ExpressionTextView : public InputTextView {
 	virtual	void				GetDragParameters(BMessage* dragMessage,
 									BBitmap** bitmap, BPoint* point,
 									BHandler** handler);
+			void 				SetTextRect(BRect rect);
 
 	// InputTextView
 	virtual	void				RevertChanges();
@@ -41,6 +42,7 @@ class ExpressionTextView : public InputTextView {
 			void				AddKeypadLabel(const char* label);
 
 			void				SetExpression(const char* expression);
+			void				SetValue(BString value);
 
 			void				BackSpace();
 			void				Clear();
@@ -59,6 +61,9 @@ class ExpressionTextView : public InputTextView {
 			BList				fPreviousExpressions;
 			int32				fHistoryPos;
 			BString				fCurrentExpression;
+			BString				fCurrentValue;
+			
+			bool				fChangesApplied;
 };
 
 #endif // EXPRESSION_TEXT_VIEW_H

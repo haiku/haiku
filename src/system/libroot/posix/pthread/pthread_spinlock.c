@@ -5,6 +5,9 @@
 
 
 #include <pthread.h>
+
+#include <arch_cpu_defs.h>
+
 #include "pthread_private.h"
 
 
@@ -15,7 +18,7 @@
 int
 pthread_spin_init(pthread_spinlock_t* lock, int pshared)
 {
-	// this implementation of spinlocks doesn't differentiate
+	// This implementation of spinlocks doesn't differentiate
 	// between spin locks used by threads in the same process or
 	// between threads of different processes.
 
@@ -34,8 +37,11 @@ pthread_spin_destroy(pthread_spinlock_t* lock)
 int
 pthread_spin_lock(pthread_spinlock_t* lock)
 {
-	while (atomic_test_and_set((int32*)&lock->lock, LOCKED, UNLOCKED) == LOCKED)
-		; // spin
+	while (atomic_test_and_set((int32*)&lock->lock, LOCKED, UNLOCKED)
+			== LOCKED) {
+		SPINLOCK_PAUSE(); // spin
+			// TODO: On UP machines we should thread_yield() in the loop.
+	}
 	return 0;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2010, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -7,158 +7,204 @@
 #ifndef _SCSI_CMDS_H
 #define _SCSI_CMDS_H
 
-// SCSI commands and their data structures and constants
+
+//! SCSI commands and their data structures and constants
 
 
 #include <lendian_bitfield.h>
 
 
-// always keep in mind that SCSI is big-endian !!!
+// Always keep in mind that SCSI is big-endian!
 
 #define SCSI_STD_TIMEOUT 10
 
 // SCSI device status (as the result of a command)
-#define SCSI_STATUS_GOOD (0 << 1)
-#define SCSI_STATUS_CHECK_CONDITION (1 << 1)	// error occured
-#define SCSI_STATUS_CONDITION_MET (2 << 1)		// "found" for SEARCH DATA and PREFETCH
-#define SCSI_STATUS_BUSY (4 << 1)				// try again later (??? == QUEUE_FULL ???)
-#define SCSI_STATUS_INTERMEDIATE (8 << 1)		// used by linked command only
-#define SCSI_STATUS_INTERMEDIATE_COND_MET (10 << 1) // ditto
-#define SCSI_STATUS_RESERVATION_CONFLICT (12 << 1) // only if RESERVE/RELEASE is used
-#define SCSI_STATUS_COMMAND_TERMINATED (17 << 1) // aborted by TERMINATE I/O PROCESS
-#define SCSI_STATUS_QUEUE_FULL (20 << 1)		// queue full
+#define SCSI_STATUS_GOOD					(0 << 1)
+#define SCSI_STATUS_CHECK_CONDITION			(1 << 1)	// error occured
+#define SCSI_STATUS_CONDITION_MET			(2 << 1)
+	// "found" for SEARCH DATA and PREFETCH
+#define SCSI_STATUS_BUSY					(4 << 1)
+	// try again later (??? == QUEUE_FULL ???)
+#define SCSI_STATUS_INTERMEDIATE			(8 << 1)
+	// used by linked command only
+#define SCSI_STATUS_INTERMEDIATE_COND_MET	(10 << 1)	// ditto
+#define SCSI_STATUS_RESERVATION_CONFLICT	(12 << 1)
+	// only if RESERVE/RELEASE is used
+#define SCSI_STATUS_COMMAND_TERMINATED		(17 << 1)
+	// aborted by TERMINATE I/O PROCESS
+#define SCSI_STATUS_QUEUE_FULL				(20 << 1)	// queue full
 
 #define SCSI_STATUS_MASK 0xfe
 
 // SCSI sense key
-#define SCSIS_KEY_NO_SENSE 0
-#define SCSIS_KEY_RECOVERED_ERROR 1
-#define SCSIS_KEY_NOT_READY 2				// operator intervention may be required
-#define SCSIS_KEY_MEDIUM_ERROR 3			// can be set if source could be hardware error
-#define SCSIS_KEY_HARDWARE_ERROR 4
-#define SCSIS_KEY_ILLEGAL_REQUEST 5			// invalid command
-#define SCSIS_KEY_UNIT_ATTENTION 6			// medium changed or target reset
-#define SCSIS_KEY_DATA_PROTECT 7			// data access forbidden
-#define SCSIS_KEY_BLANK_CHECK 8				// tried to read blank or to write non-blank medium
-#define SCSIS_KEY_VENDOR_SPECIFIC 9
-#define SCSIS_KEY_COPY_ABORTED 10			// error in COPY or COMPARE command
-#define SCSIS_KEY_ABORTED_COMMAND 11		// aborted by target, retry *may* help
-#define SCSIS_KEY_EQUAL 12					// during SEARCH: data found
-#define SCSIS_KEY_VOLUME_OVERFLOW 13		// tried to write buffered data beyond end of medium
-#define SCSIS_KEY_MISCOMPARE 14
-#define SCSIS_KEY_RESERVED 15
+#define SCSIS_KEY_NO_SENSE					0
+#define SCSIS_KEY_RECOVERED_ERROR			1
+#define SCSIS_KEY_NOT_READY					2
+	// operator intervention may be required
+#define SCSIS_KEY_MEDIUM_ERROR				3
+	// can be set if source could be hardware error
+#define SCSIS_KEY_HARDWARE_ERROR			4
+#define SCSIS_KEY_ILLEGAL_REQUEST			5	// invalid command
+#define SCSIS_KEY_UNIT_ATTENTION			6
+	// medium changed or target reset
+#define SCSIS_KEY_DATA_PROTECT				7	// data access forbidden
+#define SCSIS_KEY_BLANK_CHECK				8
+	// tried to read blank or to write non-blank medium
+#define SCSIS_KEY_VENDOR_SPECIFIC			9
+#define SCSIS_KEY_COPY_ABORTED				10
+	// error in COPY or COMPARE command
+#define SCSIS_KEY_ABORTED_COMMAND			11
+	// aborted by target, retry *may* help
+#define SCSIS_KEY_EQUAL						12	// during SEARCH: data found
+#define SCSIS_KEY_VOLUME_OVERFLOW			13
+	// tried to write buffered data beyond end of medium
+#define SCSIS_KEY_MISCOMPARE				14
+#define SCSIS_KEY_RESERVED					15
 
 // SCSI ASC and ASCQ data - (ASC << 8) | ASCQ
 // all codes with bit 7 of ASC or ASCQ set are vendor-specific
-#define SCSIS_ASC_NO_SENSE 0x0000
-#define SCSIS_ASC_IO_PROC_TERMINATED 0x0006
-#define SCSIS_ASC_AUDIO_PLAYING 0x0011
-#define SCSIS_ASC_AUDIO_PAUSED 0x0012
-#define SCSIS_ASC_AUDIO_COMPLETED 0x0013
-#define SCSIS_ASC_AUDIO_ERROR 0x0014		// playing has stopped due to error
-#define SCSIS_ASC_AUDIO_NO_STATUS 0x0015
-#define SCSIS_ASC_NO_INDEX 0x0100			// no index/sector signal
-#define SCSIS_ASC_NO_SEEK_CMP 0x0200		// ???
-#define SCSIS_ASC_WRITE_FAULT 0x0300
-#define SCSIS_ASC_LUN_NOT_READY 0x0400		// LUN not ready, cause not reportable
-#define SCSIS_ASC_LUN_BECOMING_READY 0x0401 // LUN in progress of becoming ready
-#define SCSIS_ASC_LUN_NEED_INIT 0x0402		// LUN need initializing command
-#define SCSIS_ASC_LUN_NEED_MANUAL_HELP 0x0403 // LUN needs manual intervention
-#define SCSIS_ASC_LUN_FORMATTING 0x0404		// LUN format in progress
-#define SCSIS_ASC_LUN_SEL_FAILED 0x0500		// LUN doesn't respond to selection
-#define SCSIS_ASC_LUN_COM_FAILURE 0x0800	// LUN communication failure
-#define SCSIS_ASC_LUN_TIMEOUT 0x0801		// LUN communication time-out
-#define SCSIS_ASC_LUN_COM_PARITY 0x0802		// LUN communication parity failure
-#define SCSIS_ASC_LUN_COM_CRC 0x0803		// LUN communication CRC failure (SCSI-3)
-#define SCSIS_ASC_WRITE_ERR_AUTOREALLOC 0x0c01	// recovered by auto-reallocation
+#define SCSIS_ASC_NO_SENSE					0x0000
+#define SCSIS_ASC_IO_PROC_TERMINATED		0x0006
+#define SCSIS_ASC_AUDIO_PLAYING				0x0011
+#define SCSIS_ASC_AUDIO_PAUSED				0x0012
+#define SCSIS_ASC_AUDIO_COMPLETED			0x0013
+#define SCSIS_ASC_AUDIO_ERROR				0x0014
+	// playing has stopped due to error
+#define SCSIS_ASC_AUDIO_NO_STATUS			0x0015
+#define SCSIS_ASC_NO_INDEX					0x0100	// no index/sector signal
+#define SCSIS_ASC_NO_SEEK_CMP				0x0200	// ???
+#define SCSIS_ASC_WRITE_FAULT				0x0300
+#define SCSIS_ASC_LUN_NOT_READY				0x0400
+	// LUN not ready, cause not reportable
+#define SCSIS_ASC_LUN_BECOMING_READY		0x0401
+	// LUN in progress of becoming ready
+#define SCSIS_ASC_LUN_NEED_INIT				0x0402
+	// LUN need initializing command
+#define SCSIS_ASC_LUN_NEED_MANUAL_HELP		0x0403
+	// LUN needs manual intervention
+#define SCSIS_ASC_LUN_FORMATTING			0x0404
+	// LUN format in progress
+#define SCSIS_ASC_LUN_SEL_FAILED			0x0500
+	// LUN doesn't respond to selection
+#define SCSIS_ASC_LUN_COM_FAILURE			0x0800	// LUN communication failure
+#define SCSIS_ASC_LUN_TIMEOUT				0x0801
+	// LUN communication time-out
+#define SCSIS_ASC_LUN_COM_PARITY			0x0802
+	// LUN communication parity failure
+#define SCSIS_ASC_LUN_COM_CRC				0x0803
+	// LUN communication CRC failure (SCSI-3)
+#define SCSIS_ASC_WRITE_ERR_AUTOREALLOC		0x0c01
+	// recovered by auto-reallocation
 #define SCSIS_ASC_WRITE_ERR_AUTOREALLOC_FAILED 0x0c02
-#define SCSIS_ASC_ECC_ERROR 0x1000
-#define SCSIS_ASC_UNREC_READ_ERR 0x1100		// unrecovered read error
-#define SCSIS_ASC_READ_RETRIES_EXH 0x1101	// read retries exhausted
-#define SCSIS_ASC_UNREC_READ_ERR_AUTOREALLOC_FAILED 0x1104 // above + auto-reallocate failed
-#define SCSIS_ASC_RECORD_NOT_FOUND 0x1401
-#define SCSIS_ASC_RANDOM_POS_ERROR 0x1500	// random positioning error
-#define SCSIS_ASC_POSITIONING_ERR 0x1501	// mechanical positioning error
-#define SCSIS_ASC_POS_ERR_ON_READ 0x1502	// positioning error detected by reading
-#define SCSIS_ASC_DATA_RECOV_NO_ERR_CORR 0x1700	// recovered with no error correction applied
-#define SCSIS_ASC_DATA_RECOV_WITH_RETRIES 0x1701 
-#define SCSIS_ASC_DATA_RECOV_POS_HEAD_OFS 0x1702 // ?recovered with positive head offset
-#define SCSIS_ASC_DATA_RECOV_NEG_HEAD_OFS 0x1703 // ?recovered with negative head offset
-#define SCSIS_ASC_DATA_RECOV_WITH_RETRIES_CIRC 0x1704 // recovered with retries/CIRC
-#define SCSIS_ASC_DATA_RECOV_PREV_SECT_ID 0x1705 // recovered using previous sector ID
+#define SCSIS_ASC_ECC_ERROR					0x1000
+#define SCSIS_ASC_UNREC_READ_ERR			0x1100	// unrecovered read error
+#define SCSIS_ASC_READ_RETRIES_EXH			0x1101	// read retries exhausted
+#define SCSIS_ASC_UNREC_READ_ERR_AUTOREALLOC_FAILED 0x1104
+	// above + auto-reallocate failed
+#define SCSIS_ASC_RECORD_NOT_FOUND			0x1401
+#define SCSIS_ASC_RANDOM_POS_ERROR			0x1500	// random positioning error
+#define SCSIS_ASC_POSITIONING_ERR			0x1501
+	// mechanical positioning error
+#define SCSIS_ASC_POS_ERR_ON_READ			0x1502
+	// positioning error detected by reading
+#define SCSIS_ASC_DATA_RECOV_NO_ERR_CORR	0x1700
+	// recovered with no error correction applied
+#define SCSIS_ASC_DATA_RECOV_WITH_RETRIES	0x1701
+#define SCSIS_ASC_DATA_RECOV_POS_HEAD_OFS	0x1702
+	// ?recovered with positive head offset
+#define SCSIS_ASC_DATA_RECOV_NEG_HEAD_OFS	0x1703
+	// ?recovered with negative head offset
+#define SCSIS_ASC_DATA_RECOV_WITH_RETRIES_CIRC 0x1704
+	// recovered with retries/CIRC
+#define SCSIS_ASC_DATA_RECOV_PREV_SECT_ID	0x1705
+	// recovered using previous sector ID
 #define SCSIS_ASC_DATA_RECOV_NO_ECC_AUTOREALLOC 0x1706
 #define SCSIS_ASC_DATA_RECOV_NO_ECC_REASSIGN 0x1707 // reassign recommended
-#define SCSIS_ASC_DATA_RECOV_NO_ECC_REWRITE 0x1708 // rewrite recommended
-#define SCSIS_ASC_DATA_RECOV_WITH_CORR 0x1800 // recovered using error correction
-#define SCSIS_ASC_DATA_RECOV_WITH_CORR_RETRIES 0x1801 // used error correction and retries
-#define SCSIS_ASC_DATA_RECOV_AUTOREALLOC 0x1802
-#define SCSIS_ASC_DATA_RECOV_CIRC 0x1803	// recovered using CIRC
-#define SCSIS_ASC_DATA_RECOV_LEC 0x1804		// recovered using LEC
-#define SCSIS_ASC_DATA_RECOV_REASSIGN 0x1805 // reassign recommended
-#define SCSIS_ASC_DATA_RECOV_REWRITE 0x1806 // rewrite recommended
-#define SCSIS_ASC_PARAM_LIST_LENGTH_ERR 0x1a00	// parameter list too short
-#define SCSIS_ASC_ID_RECOV 0x1e00			// recoved ID with ECC
-#define SCSIS_ASC_INV_OPCODE 0x2000
-#define SCSIS_ASC_LBA_OOR 0x2100			// LBA out of range
-#define SCSIS_ASC_ILL_FUNCTION 0x2200		// better use 0x2000/0x2400/0x2600 instead
-#define SCSIS_ASC_INV_CDB_FIELD 0x2400
-#define SCSIS_ASC_LUN_NOT_SUPPORTED 0x2500
-#define SCSIS_ASC_INV_PARAM_LIST_FIELD 0x2600
-#define SCSIS_ASC_PARAM_NOT_SUPPORTED 0x2601
-#define SCSIS_ASC_PARAM_VALUE_INV 0x2602
-#define SCSIS_ASC_WRITE_PROTECTED 0x2700
-#define SCSIS_ASC_MEDIUM_CHANGED 0x2800
-#define SCSIS_ASC_WAS_RESET 0x2900			// reset by power-on/bus reset/device reset
-#define SCSIS_ASC_PARAMS_CHANGED 0x2a00
-#define SCSIS_ASC_MEDIUM_FORMAT_CORRUPTED 0x3100
-#define SCSIS_ASC_ROUNDED_PARAM 0x3700		// parameter got rounded
-#define SCSIS_ASC_NO_MEDIUM 0x3a00			// medium not present
-#define SCSIS_ASC_INTERNAL_FAILURE 0x4400
-#define SCSIS_ASC_SEL_FAILURE 0x4500		// select/reselect failure
-#define SCSIS_ASC_UNSUCC_SOFT_RESET 0x4600	// unsuccessful soft reset
-#define SCSIS_ASC_SCSI_PARITY_ERR 0x4700	// SCSI parity error
-#define SCSIS_ASC_LOAD_EJECT_FAILED 0x5300	// media load or eject failed
-#define SCSIS_ASC_REMOVAL_PREVENTED 0x5302	// medium removal prevented
-#define SCSIS_ASC_REMOVAL_REQUESTED 0x5a01	// operator requests medium removal
+#define SCSIS_ASC_DATA_RECOV_NO_ECC_REWRITE	0x1708	// rewrite recommended
+#define SCSIS_ASC_DATA_RECOV_WITH_CORR		0x1800
+	// recovered using error correction
+#define SCSIS_ASC_DATA_RECOV_WITH_CORR_RETRIES 0x1801
+	// used error correction and retries
+#define SCSIS_ASC_DATA_RECOV_AUTOREALLOC	0x1802
+#define SCSIS_ASC_DATA_RECOV_CIRC			0x1803	// recovered using CIRC
+#define SCSIS_ASC_DATA_RECOV_LEC			0x1804	// recovered using LEC
+#define SCSIS_ASC_DATA_RECOV_REASSIGN		0x1805	// reassign recommended
+#define SCSIS_ASC_DATA_RECOV_REWRITE		0x1806	// rewrite recommended
+#define SCSIS_ASC_PARAM_LIST_LENGTH_ERR		0x1a00	// parameter list too short
+#define SCSIS_ASC_ID_RECOV					0x1e00	// recoved ID with ECC
+#define SCSIS_ASC_INV_OPCODE				0x2000
+#define SCSIS_ASC_LBA_OOR					0x2100	// LBA out of range
+#define SCSIS_ASC_ILL_FUNCTION				0x2200
+	// better use 0x2000/0x2400/0x2600 instead
+#define SCSIS_ASC_INV_CDB_FIELD				0x2400
+#define SCSIS_ASC_LUN_NOT_SUPPORTED			0x2500
+#define SCSIS_ASC_INV_PARAM_LIST_FIELD		0x2600
+#define SCSIS_ASC_PARAM_NOT_SUPPORTED		0x2601
+#define SCSIS_ASC_PARAM_VALUE_INV			0x2602
+#define SCSIS_ASC_WRITE_PROTECTED			0x2700
+#define SCSIS_ASC_MEDIUM_CHANGED			0x2800
+#define SCSIS_ASC_WAS_RESET					0x2900
+	// reset by power-on/bus reset/device reset
+#define SCSIS_ASC_PARAMS_CHANGED			0x2a00
+#define SCSIS_ASC_MEDIUM_FORMAT_CORRUPTED	0x3100
+#define SCSIS_ASC_ROUNDED_PARAM				0x3700	// parameter got rounded
+#define SCSIS_ASC_NO_MEDIUM					0x3a00	// medium not present
+#define SCSIS_ASC_INTERNAL_FAILURE			0x4400
+#define SCSIS_ASC_SEL_FAILURE				0x4500	// select/reselect failure
+#define SCSIS_ASC_UNSUCC_SOFT_RESET			0x4600	// unsuccessful soft reset
+#define SCSIS_ASC_SCSI_PARITY_ERR			0x4700	// SCSI parity error
+#define SCSIS_ASC_LOAD_EJECT_FAILED			0x5300
+	// media load or eject failed
+#define SCSIS_ASC_REMOVAL_PREVENTED			0x5302	// medium removal prevented
+#define SCSIS_ASC_REMOVAL_REQUESTED			0x5a01
+	// operator requests medium removal
 
 // some scsi op-codes
-#define	SCSI_OP_TEST_UNIT_READY 0x00
-#define SCSI_OP_REQUEST_SENSE 0x03
-#define SCSI_OP_FORMAT 0x04
-#define	SCSI_OP_READ_6 0x08
-#define SCSI_OP_WRITE_6 0x0a
-#define SCSI_OP_INQUIRY 0x12
-#define SCSI_OP_MODE_SELECT_6 0x15
-#define SCSI_OP_RESERVE 0x16
-#define SCSI_OP_RELEASE 0x17
-#define SCSI_OP_MODE_SENSE_6 0x1a
-#define SCSI_OP_START_STOP 0x1b
-#define	SCSI_OP_RECEIVE_DIAGNOSTIC 0x1c
-#define	SCSI_OP_SEND_DIAGNOSTIC 0x1d
-#define SCSI_OP_PREVENT_ALLOW 0x1e
-#define	SCSI_OP_READ_CAPACITY 0x25
-#define	SCSI_OP_READ_10 0x28
-#define SCSI_OP_WRITE_10 0x2a
-#define SCSI_OP_POSITION_TO_ELEMENT 0x2b
-#define SCSI_OP_VERIFY 0x2f
-#define	SCSI_OP_SYNCHRONIZE_CACHE 0x35
-#define	SCSI_OP_WRITE_BUFFER 0x3b
-#define	SCSI_OP_READ_BUFFER 0x3c
-#define	SCSI_OP_CHANGE_DEFINITION 0x40
-#define SCSI_OP_READ_SUB_CHANNEL 0x42
-#define SCSI_OP_READ_TOC 0x43
-#define SCSI_OP_PLAY_MSF 0x47
-#define SCSI_OP_PLAY_AUDIO_TRACK_INDEX 0x48	// obsolete, spec missing
-#define SCSI_OP_PAUSE_RESUME 0x4b
-#define SCSI_OP_STOP_PLAY 0x4e
-#define	SCSI_OP_MODE_SELECT_10 0x55
-#define	SCSI_OP_MODE_SENSE_10 0x5A
-#define SCSI_OP_MOVE_MEDIUM 0xa5
-#define SCSI_OP_READ_12 0xa8
-#define SCSI_OP_WRITE_12 0xaa
-#define SCSI_OP_READ_ELEMENT_STATUS 0xb8
-#define SCSI_OP_SCAN 0xba
-#define SCSI_OP_READ_CD 0xbe
+#define	SCSI_OP_TEST_UNIT_READY				0x00
+#define SCSI_OP_REQUEST_SENSE				0x03
+#define SCSI_OP_FORMAT						0x04
+#define	SCSI_OP_READ_6						0x08
+#define SCSI_OP_WRITE_6						0x0a
+#define SCSI_OP_INQUIRY						0x12
+#define SCSI_OP_MODE_SELECT_6				0x15
+#define SCSI_OP_RESERVE						0x16
+#define SCSI_OP_RELEASE						0x17
+#define SCSI_OP_MODE_SENSE_6				0x1a
+#define SCSI_OP_START_STOP					0x1b
+#define	SCSI_OP_RECEIVE_DIAGNOSTIC			0x1c
+#define	SCSI_OP_SEND_DIAGNOSTIC				0x1d
+#define SCSI_OP_PREVENT_ALLOW				0x1e
+#define	SCSI_OP_READ_CAPACITY				0x25
+#define	SCSI_OP_READ_10						0x28
+#define SCSI_OP_WRITE_10					0x2a
+#define SCSI_OP_POSITION_TO_ELEMENT			0x2b
+#define SCSI_OP_VERIFY						0x2f
+#define	SCSI_OP_SYNCHRONIZE_CACHE			0x35
+#define	SCSI_OP_WRITE_BUFFER				0x3b
+#define	SCSI_OP_READ_BUFFER					0x3c
+#define	SCSI_OP_CHANGE_DEFINITION			0x40
+#define SCSI_OP_READ_SUB_CHANNEL			0x42
+#define SCSI_OP_READ_TOC					0x43
+#define SCSI_OP_PLAY_MSF					0x47
+#define SCSI_OP_PLAY_AUDIO_TRACK_INDEX		0x48	// obsolete, spec missing
+#define SCSI_OP_PAUSE_RESUME				0x4b
+#define SCSI_OP_STOP_PLAY					0x4e
+#define	SCSI_OP_MODE_SELECT_10				0x55
+#define	SCSI_OP_MODE_SENSE_10				0x5A
+#define SCSI_OP_READ_16						0x88
+#define SCSI_OP_WRITE_16					0x8a
+#define SCSI_OP_SERVICE_ACTION_IN			0x9e
+#define SCSI_OP_SERVICE_ACTION_OUT			0x9f
+#define SCSI_OP_MOVE_MEDIUM					0xa5
+#define SCSI_OP_READ_12						0xa8
+#define SCSI_OP_WRITE_12					0xaa
+#define SCSI_OP_READ_ELEMENT_STATUS			0xb8
+#define SCSI_OP_SCAN						0xba
+#define SCSI_OP_READ_CD						0xbe
+
+// Service-Action-In defines
+#define SCSI_SAI_READ_CAPACITY_16			0x10
+
 
 // INQUIRY
 
@@ -193,7 +239,7 @@ typedef struct scsi_res_inquiry {
 		response_data_format : 4,		// 2 = SCSI/2 compliant
 		_res3_4 : 2,
 		term_iop : 1,					// 1 = supports TERMINATE I/O PROCESS
-		async_enc : 1					// processor devices only : 
+		async_enc : 1					// processor devices only :
 										// Asynchronous Event Notification Capable
 	);
 	uint8	additional_length;			// total (whished) length = this + 4
@@ -370,19 +416,19 @@ typedef struct scsi_sense {
 	LBITFIELD8_5(
 		sense_key : 4,
 		res2_4 : 1,
-		ILI : 1,							// incorrect length indicator - req. block 
+		ILI : 1,							// incorrect length indicator - req. block
 											// length doesn't match physical block length
 		EOM : 1,							// serial devices only
 		Filemark : 1						// optional for random access
 	);
-	
+
 	uint8 highest_inf;						// device-type or command specific
 	uint8 high_inf;							// device-type 0, 4, 5, 7: block address
 	uint8 mid_inf;							// device-type 1, 2, 3: req length - act. length
 	uint8 low_inf;							// (and others for sequential dev. and COPY cmds
-	
+
 	uint8 add_sense_length; 				// total length = this + 7
-	
+
 	uint8 highest_cmd_inf;
 	uint8 high_cmd_inf;
 	uint8 mid_cmd_inf;
@@ -390,7 +436,7 @@ typedef struct scsi_sense {
 	uint8 asc;
 	uint8 ascq;								// this can be zero if unsupported
 	uint8 unit_code;						// != 0 to specify internal device unit
-	
+
 	union {
 		struct {
 		LBITFIELD8_2(
@@ -400,7 +446,7 @@ typedef struct scsi_sense {
 		uint8 mid_key_spec;
 		uint8 low_key_spec;
 		} raw;
-		
+
 		// ILLEGAL REQUEST
 		struct {
 		LBITFIELD8_5(
@@ -418,22 +464,22 @@ typedef struct scsi_sense {
 		struct {
 		LBITFIELD8_2(
 			res15_0 : 7,
-			SKSV : 1	
+			SKSV : 1
 		);
 		uint8 high_retry_cnt;
 		uint8 low_retry_cnt;
 		} acc_error;
-		
+
 		// format progress (if sense key = NOT READY)
 		struct {
 		LBITFIELD8_2(
 			res15_0 : 7,
-			SKSV : 1	
+			SKSV : 1
 		);
 		uint16	progress;				// 0 = start, 0xffff = almost finished
 		} format_progress;
 	} sense_key_spec;
-		
+
 	// starting with offset 18 there are additional sense byte
 } _PACKED scsi_sense;
 
@@ -625,13 +671,13 @@ typedef struct scsi_modepage_control {
 		UAAENP : 1,			// unit attention AEN permission; true = send AEN,
 							// false = generate UA condition (for everything but init.)
 		RAENP : 1,			// ready AEN permission; true = send async event notification
-							// (AEN) instead of generating an Unit Attention (UA) Condition 
+							// (AEN) instead of generating an Unit Attention (UA) Condition
 							// after initialization
 		res4_3 : 4,
 		EECA : 1			// enable Extended Contingent Allegiance
 	);
 	uint8 res5;
-	uint8 high_AEN_holdoff;	// ready AEN hold off period - delay in ms between 
+	uint8 high_AEN_holdoff;	// ready AEN hold off period - delay in ms between
 	uint8 low_AEN_holdoff;	// initialization and AEN
 } scsi_modepage_control;
 
@@ -897,7 +943,7 @@ typedef struct scsi_cmd_pause_resume {
 } _PACKED scsi_cmd_pause_resume;
 
 
-// SCAN 
+// SCAN
 
 typedef struct scsi_cmd_scan {
 	uint8	opcode;
@@ -947,7 +993,7 @@ typedef struct scsi_cmd_read_cd {
 		_res9_0 : 1,
 		error_field : 2,
 		edc_ecc : 1,			// include EDC/ECC; includes 8 byte padding for Mode 1 format
-		user_data : 1,			// if 1, include user data 
+		user_data : 1,			// if 1, include user data
 								// (mode select block size is ignored)
 		header_code : 2,
 		sync : 1				// if 1, include sync field from sector
@@ -962,7 +1008,7 @@ typedef struct scsi_cmd_read_cd {
 // possible values for header_code
 enum scsi_read_cd_header_code {
 	scsi_read_cd_header_none			= 0,
-	scsi_read_cd_header_hdr_only		= 1,	
+	scsi_read_cd_header_hdr_only		= 1,
 	scsi_read_cd_header_sub_header_only	= 2,
 	scsi_read_cd_header_all_headers		= 3,
 };
@@ -994,9 +1040,10 @@ typedef struct scsi_cmd_sync_cache {
 		lun : 3
 	);
 	scsi_cd_lba lba;
-	uint8	_res2;	
+	uint8	_res2;
 	uint16	block_count;		// big endian
 	uint8	control;
 } _PACKED scsi_cmd_sync_cache;
+
 
 #endif	/* _SCSI_CMDS_H */

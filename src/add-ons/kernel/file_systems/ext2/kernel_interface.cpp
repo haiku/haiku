@@ -167,7 +167,7 @@ ext2_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 {
 	Volume* volume = (Volume*)_volume->private_volume;
 
-	if (id < 2 || id > volume->NumBlocks()) {
+	if (id < 2 || id > volume->NumInodes()) {
 		dprintf("ext2: inode at %Ld requested!\n", id);
 		return B_ERROR;
 	}

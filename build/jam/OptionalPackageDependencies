@@ -23,4 +23,5 @@ OptionalPackageDependencies NetFS : UserlandFS ;
 OptionalPackageDependencies Vim : LibIconv ;
 OptionalPackageDependencies XZ-Utils : Tar ;
 OptionalPackageDependencies Tar : LibIconv ; 
+OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite ; 
 
