@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include <bluetooth/bluetooth.h>
+#include <bluetooth/bluetooth_error.h>
 #include <bluetooth/HCI/btHCI_command.h>
 #include <bluetooth/HCI/btHCI_event.h>
 
