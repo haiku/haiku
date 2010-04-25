@@ -4,6 +4,9 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) libjasper ] ;
 
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
+	#for BaseTranslator.h and friends
+
 # Exclude unwanted formats
 CCFLAGS += -DEXCLUDE_MIF_SUPPORT
 	-DEXCLUDE_PNM_SUPPORT
@@ -66,7 +69,7 @@ Translator JPEG2000Translator :
 
 	$(jasper_files)
 
-	: be translation $(TARGET_LIBSUPC++)
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	: true
 ;
 
