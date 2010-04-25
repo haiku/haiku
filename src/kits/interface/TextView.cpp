@@ -2231,6 +2231,7 @@ BTextView::TextRect() const
 void
 BTextView::_ResetTextRect()
 {
+	BRect oldTextRect(fTextRect);
 	// reset text rect to bounds minus insets ...
 	fTextRect = Bounds().OffsetToCopy(B_ORIGIN);
 	fTextRect.left += fLayoutData->leftInset;
@@ -2241,6 +2242,11 @@ BTextView::_ResetTextRect()
 	// and rewrap (potentially adjusting the right and the bottom of the text
 	// rect)
 	_Refresh(0, TextLength(), false);
+
+	// Make sure that the dirty area outside the text is redrawn too.
+	BRegion invalid(oldTextRect | fTextRect);
+	invalid.Exclude(fTextRect);
+	Invalidate(&invalid);
 }
 
 
