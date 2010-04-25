@@ -565,9 +565,9 @@ MAPM
 ExpressionParser::_ParseFunction(const Token& token)
 {
 	if (strcasecmp("e", token.string.String()) == 0)
-		return MAPM(M_E);
+		return MAPM(MM_E);
 	else if (strcasecmp("pi", token.string.String()) == 0)
-		return MAPM(M_PI);
+		return MAPM(MM_PI);
 
 	// hard coded cases for different count of arguments
 	// supports functions with 3 arguments at most
