@@ -53,8 +53,8 @@ load_symbols true
 #emergency_keys false
 	# Disables emergency keys (ie. Alt-SysReq+*), enabled by default
 
-#acpi true
-	# ACPI support, off by default
+acpi true
+	# ACPI support, disabled by default
 
 #acpi_avoid_full_init true
 	# Avoids running _INI and _STA methods and final object initialization,
