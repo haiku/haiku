@@ -79,7 +79,7 @@ CopyEngine::~CopyEngine()
 
 
 void
-CopyEngine::ResetTargets()
+CopyEngine::ResetTargets(const char* source)
 {
 	// TODO: One could subtract the bytes/items which were added to the
 	// ProgressReporter before resetting them...
@@ -98,27 +98,25 @@ CopyEngine::ResetTargets()
 
 	fCurrentTargetFolder = NULL;
 	fCurrentItem = NULL;
+	
+	// init BEntry pointing to /var
+	// There is no other way to retrieve the path to the var folder
+	// on the source volume. Using find_directory() with
+	// B_COMMON_VAR_DIRECTORY will only ever get the var folder on the
+	// current /boot volume regardless of the volume of "source", which
+	// makes sense, since passing a volume is meant to folders that are
+	// volume specific, like "trash".
+	BPath path(source);
+	if (path.Append("common/var") == B_OK)
+		fVarDirectory.SetTo(path.Path());
+	else
+		fVarDirectory.Unset();
 }
 
 
 status_t
 CopyEngine::CollectTargets(const char* source, sem_id cancelSemaphore)
 {
-	// init BEntry pointing to /var
-	{
-		// There is no other way to retrieve the path to the var folder
-		// on the source volume. Using find_directory() with
-		// B_COMMON_VAR_DIRECTORY will only ever get the var folder on the
-		// current /boot volume regardless of the volume of "source", which
-		// makes sense, since passing a volume is meant to folders that are
-		// volume specific, like "trash".
-		BPath path(source);
-		if (path.Append("common/var") == B_OK)
-			fVarDirectory.SetTo(path.Path());
-		else
-			fVarDirectory.Unset();
-	}
-
 	int32 level = 0;
 	status_t ret = _CollectCopyInfo(source, level, cancelSemaphore);
 	if (ret == B_OK && fProgressReporter != NULL)
@@ -535,7 +533,7 @@ CopyEngine::_ShouldCopyEntry(const BEntry& entry, const char* name,
 	}
 	if (fVarDirectory == entry) {
 		// current location of var
-		printf("ignoring '%s'.\n", name);
+		printf("ignoring common/'%s'.\n", name);
 		return false;
 	}
 	return true;

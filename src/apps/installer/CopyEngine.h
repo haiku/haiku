@@ -23,7 +23,7 @@ public:
 								CopyEngine(ProgressReporter* reporter);
 	virtual						~CopyEngine();
 
-			void				ResetTargets();
+			void				ResetTargets(const char* source);
 			status_t			CollectTargets(const char* source,
 									sem_id cancelSemaphore = -1);
 

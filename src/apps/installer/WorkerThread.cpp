@@ -382,12 +382,12 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		goto error;
 	}
 
-	// Begin actuall installation
+	// Begin actual installation
 
 	_LaunchInitScript(targetDirectory);
 
 	// let the engine collect information for the progress bar later on
-	engine.ResetTargets();
+	engine.ResetTargets(srcDirectory.Path());
 	err = engine.CollectTargets(srcDirectory.Path(), fCancelSemaphore);
 	if (err != B_OK)
 		goto error;
