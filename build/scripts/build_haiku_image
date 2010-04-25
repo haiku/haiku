@@ -178,7 +178,7 @@ createSymlinksForHybrid()
 			destLinkTarget="../$srcLib"
 
 			mkdir -p $destLinkDir
-			ln -sf -t $destLinkDir $destLinkTarget
+			ln -sf $destLinkTarget $destLinkDir
 		fi
 	done
 }
