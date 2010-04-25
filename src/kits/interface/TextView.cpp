@@ -1792,7 +1792,6 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 		} else {
 			int32 length = inOffset - line->offset;
 			result.x += _TabExpandedStyledWidth(line->offset, length);
-
 		}
 	}
 
@@ -5531,7 +5530,7 @@ BTextView::_NullStyleHeight() const
 
 	font_height fontHeight;
 	font->GetHeight(&fontHeight);
-	return fontHeight.ascent + fontHeight.descent;
+	return ceilf(fontHeight.ascent + fontHeight.descent + 1);
 }
 
 
