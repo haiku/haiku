@@ -10,31 +10,31 @@
 #include <vm/vm_page.h>
 
 #include "dma_resources.h"
-#include "IOCallback.h"
-#include "IORequest.h"
+#include "IOScheduler.h"
 
 
 struct VMCache;
 struct vm_page;
 
 
-class IOCache {
+class IOCache : public IOScheduler {
 public:
 								IOCache(DMAResource* resource,
 									size_t cacheLineSize);
-								~IOCache();
+	virtual						~IOCache();
 
-			status_t			Init(const char* name);
+	virtual	status_t			Init(const char* name);
 
-			void				SetCallback(IOCallback& callback);
-			void				SetCallback(io_callback callback, void* data);
+	virtual	void				SetDeviceCapacity(off_t deviceCapacity);
 
-			void				SetDeviceCapacity(off_t deviceCapacity);
+	virtual	status_t			ScheduleRequest(IORequest* request);
 
-			status_t			ScheduleRequest(IORequest* request);
-
-			void				OperationCompleted(IOOperation* operation,
+	virtual	void				AbortRequest(IORequest* request,
+									status_t status = B_CANCELED);
+	virtual	void				OperationCompleted(IOOperation* operation,
 									status_t status, size_t transferredBytes);
+
+	virtual	void				Dump() const;
 
 private:
 			struct Operation;
@@ -70,9 +70,6 @@ private:
 			size_t				fLineSize;
 			uint32				fLineSizeShift;
 			size_t				fPagesPerLine;
-			DMAResource*		fDMAResource;
-			io_callback			fIOCallback;
-			void*				fIOCallbackData;
 			area_id				fArea;
 			void*				fAreaBase;
 			vm_page_reservation	fMappingReservation;

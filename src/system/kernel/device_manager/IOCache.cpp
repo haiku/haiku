@@ -40,12 +40,10 @@ struct IOCache::Operation : IOOperation {
 
 IOCache::IOCache(DMAResource* resource, size_t cacheLineSize)
 	:
+	IOScheduler(resource),
 	fDeviceCapacity(0),
 	fLineSize(cacheLineSize),
 	fPagesPerLine(cacheLineSize / B_PAGE_SIZE),
-	fDMAResource(resource),
-	fIOCallback(NULL),
-	fIOCallbackData(NULL),
 	fArea(-1),
 	fCache(NULL),
 	fPages(NULL),
@@ -89,6 +87,10 @@ IOCache::Init(const char* name)
 {
 	TRACE("%p->IOCache::Init(\"%s\")\n", this, name);
 
+	status_t error = IOScheduler::Init(name);
+	if (error != B_OK)
+		return error;
+
 	// create the area for mapping cache lines
 	fArea = vm_create_null_area(B_SYSTEM_TEAM, "I/O cache line", &fAreaBase,
 		B_ANY_KERNEL_ADDRESS, fLineSize, 0);
@@ -118,21 +120,6 @@ IOCache::Init(const char* name)
 		return B_NO_MEMORY;
 
 	return B_OK;
-}
-
-
-void
-IOCache::SetCallback(IOCallback& callback)
-{
-	SetCallback(&IOCallback::WrapperFunction, &callback);
-}
-
-
-void
-IOCache::SetCallback(io_callback callback, void* data)
-{
-	fIOCallback = callback;
-	fIOCallbackData = data;
 }
 
 
@@ -195,6 +182,13 @@ IOCache::ScheduleRequest(IORequest* request)
 
 
 void
+IOCache::AbortRequest(IORequest* request, status_t status)
+{
+	// TODO:...
+}
+
+
+void
 IOCache::OperationCompleted(IOOperation* operation, status_t status,
 	size_t transferredBytes)
 {
@@ -204,6 +198,14 @@ IOCache::OperationCompleted(IOOperation* operation, status_t status,
 			transferredBytes == operation->Length() ? B_OK : B_ERROR);
 	} else
 		((Operation*)operation)->finishedCondition.NotifyAll(false, status);
+}
+
+
+void
+IOCache::Dump() const
+{
+	kprintf("IOCache at %p\n", this);
+	kprintf("  DMA resource:   %p\n", fDMAResource);
 }
 
 
