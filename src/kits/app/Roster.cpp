@@ -843,13 +843,21 @@ BRoster::GetActiveAppInfo(app_info* info) const
 /*!	\brief Finds an application associated with a MIME type.
 
 	The method gets the signature of the supplied type's preferred application
-	or, if it doesn't have a preferred application, the one of its supertype.
+	and the signatures of all other applications supporting the MIME type
+	directly. Additionally, the preferred application signature and all
+	supporting applications for the supertype are retrieved.
 	Then the MIME database is asked which executable is associated with the
-	signature. If the database doesn't have a reference to an exectuable, the
-	boot volume is queried for a file with the signature. If more than one
-	file has been found, the one with the greatest version is picked, or if
-	no file has a version info, the one with the most recent modification
-	date.
+	signatures in the resulting list. If the database doesn't have a reference
+	to an exectuable, the boot volume is queried for a file with the signature.
+	If more than one file has been found, the one with the greatest version is
+	picked, or if no file has a version info, the one with the most recent
+	modification date. The first application from the signature list which can
+	be successfully resolved by this algorithm is returned. Contrary to BeOS
+	behavior, this means that if the preferred application of the provided MIME
+	type cannot be resolved, or if it does not have a preferred application
+	associated, the method will return other applications with direct support
+	for the MIME type before it resorts to the preferred application or
+	supporting applications of the super type.
 
 	\param mimeType The MIME type for which an application shall be found.
 	\param app A pointer to a pre-allocated entry_ref to be filled with
@@ -859,10 +867,11 @@ BRoster::GetActiveAppInfo(app_info* info) const
 	- \c B_BAD_VALUE: \c NULL \a mimeType or \a app.
 	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
-	  preferred application is associated.
+	  preferred application is associated and no other supporting
+	  applications could be identified.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
 	  its preferred application could not be found.
-	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's only supporting
 	  application is in trash.
 	- other error codes
 */
