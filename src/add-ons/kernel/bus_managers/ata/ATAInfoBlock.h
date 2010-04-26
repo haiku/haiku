@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
