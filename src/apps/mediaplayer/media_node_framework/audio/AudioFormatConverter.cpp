@@ -35,7 +35,7 @@ struct ReadInt {
 	inline int operator()(const void* buffer) const {
 		// 0 == mid, 0x80000001 == bottom, 0x7fffffff == top
 		int b = *(int*)buffer;
-		if (b == -2147483648LL)
+		if (b == INT_MIN)
 			b++;
 		return b;
 	}
