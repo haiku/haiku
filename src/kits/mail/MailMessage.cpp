@@ -1,6 +1,6 @@
 /*
  * Copyright 2001-2004 Dr. Zoidberg Enterprises. All rights reserved.
- * Copyright 2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2007, 2010, Haiku Inc. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -14,6 +14,7 @@
 #include <File.h>
 #include <E-mail.h>
 #include <Entry.h>
+#include <FindDirectory.h>
 #include <netdb.h>
 #include <NodeInfo.h>
 #include <Messenger.h>
@@ -908,12 +909,22 @@ BEmailMessage::Send(bool send_now)
 		SendViaAccount(via->ID());
 	}
 
-	create_directory(via->MetaData()->FindString("path"),0777);
-	BDirectory directory(via->MetaData()->FindString("path"));
+	BString path;
+	if (via->MetaData()->FindString("path", &path) != B_OK) {
+		BPath defaultMailOutPath;
+		if (find_directory(B_USER_DIRECTORY, &defaultMailOutPath) != B_OK
+			|| defaultMailOutPath.Append("mail/out") != B_OK)
+			path = "/boot/home/mail/out";
+		else
+			path = defaultMailOutPath.Path();
+	}
+
+	create_directory(path.String(), 0777);
+	BDirectory directory(path.String());
 
 	BEntry message;
 
-	status_t status = RenderTo(&directory,&message);
+	status_t status = RenderTo(&directory, &message);
 	delete via;
 	if (status >= B_OK && send_now) {
 		BMailSettings settings_file;
