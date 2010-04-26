@@ -32,7 +32,7 @@
 #include "id_generator.h"
 #include "IORequest.h"
 #include "io_resources.h"
-#include "IOScheduler.h"
+#include "IOSchedulerRoster.h"
 
 
 //#define TRACE_DEVICE_MANAGER

@@ -19,6 +19,7 @@ KernelMergeObject kernel_device_manager.o :
 	IOCallback.cpp
 	IORequest.cpp
 	IOScheduler.cpp
+	IOSchedulerRoster.cpp
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;
