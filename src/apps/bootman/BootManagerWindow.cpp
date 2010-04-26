@@ -17,9 +17,12 @@
 
 #include <Application.h>
 #include <Catalog.h>
+#include <Roster.h>
 #include <Screen.h>
 
 #include <math.h>
+
+#include "tracker_private.h"
 
 
 #undef TR_CONTEXT
@@ -28,7 +31,8 @@
 
 
 BootManagerWindow::BootManagerWindow()
-	: BWindow(BRect(100, 100, 500, 400), TR_CMT("Boot Manager", "Window Title"),
+	:
+	BWindow(BRect(100, 100, 500, 400), TR_CMT("Boot Manager", "Window Title"),
 		B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
@@ -44,6 +48,11 @@ BootManagerWindow::BootManagerWindow()
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_ABOUT_REQUESTED));
 
 	CenterOnScreen();
+
+	// Prevent minimizing this window if the user would have no way to
+	// get back to it. (For example when only the Installer runs.)
+	if (!be_roster->IsRunning(kDeskbarSignature))
+		SetFlags(Flags() | B_NOT_MINIMIZABLE);
 }
 
 
