@@ -1174,20 +1174,6 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			vm_page_reserve_pages(&reservation, reservedPages, priority);
 	}
 
-	// Lock the address space and, if B_EXACT_ADDRESS and
-	// CREATE_AREA_UNMAP_ADDRESS_RANGE were specified, ensure the address range
-	// is not wired.
-	do {
-		status = locker.SetTo(team);
-		if (status != B_OK)
-			goto err0;
-
-		addressSpace = locker.AddressSpace();
-	} while (addressSpec == B_EXACT_ADDRESS
-		&& (flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0
-		&& wait_if_address_range_is_wired(addressSpace, (addr_t)*address, size,
-			&locker));
-
 	if (wiring == B_CONTIGUOUS) {
 		// we try to allocate the page run here upfront as this may easily
 		// fail for obvious reasons
@@ -1198,6 +1184,20 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			goto err0;
 		}
 	}
+
+	// Lock the address space and, if B_EXACT_ADDRESS and
+	// CREATE_AREA_UNMAP_ADDRESS_RANGE were specified, ensure the address range
+	// is not wired.
+	do {
+		status = locker.SetTo(team);
+		if (status != B_OK)
+			goto err1;
+
+		addressSpace = locker.AddressSpace();
+	} while (addressSpec == B_EXACT_ADDRESS
+		&& (flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0
+		&& wait_if_address_range_is_wired(addressSpace, (addr_t)*address, size,
+			&locker));
 
 	// create an anonymous cache
 	// if it's a stack, make sure that two pages are available at least
