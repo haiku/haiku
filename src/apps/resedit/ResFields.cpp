@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2005-2010, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author:
+ *		DarkWyrm <darkwyrm@gmail.com>
+ */
 #include "ResFields.h"
 #include "ResourceData.h"
 #include <DataIO.h>

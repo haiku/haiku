@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2005-2010, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author:
+ *		DarkWyrm <darkwyrm@gmail.com>
+ */
 #include "InternalEditors.h"
 #include "BitmapView.h"
 #include "ResourceData.h"
@@ -80,6 +87,8 @@ ImageEditor::ImageEditor(const BRect &frame, ResourceData *data, BHandler *owner
 	
 	ResizeTo(MAX(fImageView->Frame().right, fNameBox->Frame().right) + 20,
 			fImageView->Frame().bottom + fOK->Frame().Height() + 20);
+	
+	SetSizeLimits(Bounds().right,30000,Bounds().bottom,30000);
 }
 
 

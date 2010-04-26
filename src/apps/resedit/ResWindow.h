@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2005-2008, Haiku, Inc.
+ * Copyright (c) 2005-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
- *		DarkWyrm <darkwyrm@earthlink.net>
+ *		DarkWyrm <darkwyrm@gmail.com>
  */
 #ifndef RESWIN_H
 #define RESWIN_H

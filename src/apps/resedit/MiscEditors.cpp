@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2005-2010, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author:
+ *		DarkWyrm <darkwyrm@gmail.com>
+ */
 #include "InternalEditors.h"
 #include "ResourceData.h"
 #include <Messenger.h>
@@ -138,7 +145,7 @@ StringEditView::GetPreferredWidth(void) const
 					be_plain_font->StringWidth("(attr) ") + 15;
 	float namewidth = be_plain_font->StringWidth("Name: ") + 
 					be_plain_font->StringWidth(fNameBox->Text()) + 15;
-	return idwidth + namewidth + 30;
+	return idwidth + namewidth + 100;
 }
 
 

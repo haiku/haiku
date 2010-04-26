@@ -1,23 +1,27 @@
 /*
- * Copyright (c) 2005-2006, Haiku, Inc.
+ * Copyright (c) 2005-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
- *		DarkWyrm <darkwyrm@earthlink.net>
+ *		DarkWyrm <darkwyrm@gmail.com>
  */
 #include "ResView.h"
 
 #include <Application.h>
+#include <File.h>
 #include <ScrollView.h>
-#include <MenuBar.h>
+#include <malloc.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <stdio.h>
-#include <ColumnTypes.h>
+#include <TranslatorRoster.h>
+#include <TypeConstants.h>
+#include "ColumnTypes.h"
 
 #include "App.h"
 #include "ResourceData.h"
 #include "ResFields.h"
+#include "ResListView.h"
 #include "ResWindow.h"
 #include "PreviewColumn.h"
 #include "Editor.h"
@@ -32,6 +36,8 @@ enum {
 	M_SAVE_FILE,
 	M_SAVE_FILE_AS,
 	M_QUIT,
+	M_SELECT_FILE,
+	M_DELETE_RESOURCE,
 	M_EDIT_RESOURCE
 };
 
@@ -52,23 +58,16 @@ ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
 		sUntitled++;
 	}
 	
-	BMenu *menu = new BMenu("File");
-	menu->AddItem(new BMenuItem("New" B_UTF8_ELLIPSIS, new BMessage(M_NEW_FILE), 'N'));
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Open" B_UTF8_ELLIPSIS, new BMessage(M_OPEN_FILE), 'O'));
-	menu->AddItem(new BMenuItem("Quit", new BMessage(M_QUIT), 'Q'));
-	
 	BRect r(Bounds());
 	r.bottom = 16;
 	fBar = new BMenuBar(r, "bar");
 	AddChild(fBar);
 	
-	fBar->AddItem(menu);
+	BuildMenus(fBar);
 	
 	r = Bounds();
 	r.top = fBar->Frame().bottom + 4;
-	fListView = new BColumnListView(r, "gridview", B_FOLLOW_ALL, B_WILL_DRAW,
-									B_FANCY_BORDER);
+	fListView = new ResListView(r, "gridview", B_FOLLOW_ALL, B_WILL_DRAW, B_FANCY_BORDER);
 	AddChild(fListView);
 	
 	rgb_color white = { 255,255,255,255 };
@@ -81,11 +80,14 @@ ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
 	fListView->AddColumn(new BStringColumn("Type",width,width,100,B_TRUNCATE_END),1);
 	fListView->AddColumn(new BStringColumn("Name",150,50,300,B_TRUNCATE_END),2);
 	fListView->AddColumn(new PreviewColumn("Data",150,50,300),3);
+	
+	// Editing is disabled for now
 	fListView->SetInvocationMessage(new BMessage(M_EDIT_RESOURCE));
 	
 	width = be_plain_font->StringWidth("1000 bytes") + 20;
 	fListView->AddColumn(new BSizeColumn("Size",width,10,100),4);
 	
+	fFilePanel = new BFilePanel(B_OPEN_PANEL);
 	if (ref)
 		OpenFile(*ref);
 }
@@ -95,6 +97,7 @@ ResView::~ResView(void)
 {
 	EmptyDataList();
 	delete fRef;
+	delete fFilePanel;
 }
 
 
@@ -104,17 +107,13 @@ ResView::AttachedToWindow(void)
 	for(int32 i = 0; i < fBar->CountItems(); i++)
 		fBar->SubmenuAt(i)->SetTargetForItems(this);
 	fListView->SetTarget(this);
+	fFilePanel->SetTarget(BMessenger(this));
 }
 
 
 void
 ResView::MessageReceived(BMessage *msg)
 {
-	if (msg->WasDropped()) {
-		be_app->PostMessage(msg);
-		return;
-	}
-	
 	switch (msg->what) {
 		case M_NEW_FILE: {
 			BRect r(100,100,400,400);
@@ -130,6 +129,21 @@ ResView::MessageReceived(BMessage *msg)
 		}
 		case M_QUIT: {
 			be_app->PostMessage(B_QUIT_REQUESTED);
+			break;
+		}
+		case B_REFS_RECEIVED: {
+			int32 i = 0;
+			entry_ref ref;
+			while (msg->FindRef("refs",i++,&ref) == B_OK)
+				AddResource(ref);
+			break;
+		}
+		case M_SELECT_FILE: {
+			fFilePanel->Show();
+			break;
+		}
+		case M_DELETE_RESOURCE: {
+			DeleteSelectedResources();
 			break;
 		}
 		case M_EDIT_RESOURCE: {
@@ -164,7 +178,6 @@ void
 ResView::OpenFile(const entry_ref &ref)
 {
 	// Add all the 133t resources and attributes of the file
-	
 	BFile file(&ref, B_READ_ONLY);
 	BResources resources;
 	if (resources.SetTo(&file) != B_OK)
@@ -174,19 +187,10 @@ ResView::OpenFile(const entry_ref &ref)
 	resources.PreloadResourceType();
 	
 	int32 index = 0;
-	BRow *row;
+	ResDataRow *row;
 	ResourceData *resData = new ResourceData();
 	while (resData->SetFromResource(index, resources)) {
-		row = new BRow();
-		row->SetField(new BStringField(resData->GetIDString()),0);
-		row->SetField(new TypeCodeField(resData->GetType(),resData),1);
-		row->SetField(new BStringField(resData->GetName()),2);
-		BField *field = gResRoster.MakeFieldForType(resData->GetType(),
-													resData->GetData(),
-													resData->GetLength());
-		if (field)
-			row->SetField(field,3);
-		row->SetField(new BSizeField(resData->GetLength()),4);
+		row = new ResDataRow(resData);
 		fListView->AddRow(row);
 		fDataList.AddItem(resData);
 		resData = new ResourceData();
@@ -201,16 +205,7 @@ ResView::OpenFile(const entry_ref &ref)
 		resData = new ResourceData();
 		while (node.GetNextAttrName(attrName) == B_OK) {
 			if (resData->SetFromAttribute(attrName, node)) {
-				row = new BRow();
-				row->SetField(new BStringField(resData->GetIDString()),0);
-				row->SetField(new TypeCodeField(resData->GetType(),resData),1);
-				row->SetField(new BStringField(resData->GetName()),2);
-				BField *field = gResRoster.MakeFieldForType(resData->GetType(),
-															resData->GetData(),
-															resData->GetLength());
-				if (field)
-					row->SetField(field,3);
-				row->SetField(new BSizeField(resData->GetLength()),4);
+				row = new ResDataRow(resData);
 				fListView->AddRow(row);
 				fDataList.AddItem(resData);
 				resData = new ResourceData();
@@ -218,6 +213,25 @@ ResView::OpenFile(const entry_ref &ref)
 		}
 		delete resData;
 	}
+}
+
+
+void
+ResView::BuildMenus(BMenuBar *menuBar)
+{
+	BMenu *menu = new BMenu("File");
+	menu->AddItem(new BMenuItem("New" B_UTF8_ELLIPSIS, new BMessage(M_NEW_FILE), 'N'));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Open" B_UTF8_ELLIPSIS, new BMessage(M_OPEN_FILE), 'O'));
+	menuBar->AddItem(menu);
+	
+	menu = new BMenu("Resource");
+	
+	menu->AddItem(new BMenuItem("Add" B_UTF8_ELLIPSIS, new BMessage(M_SELECT_FILE), 'F'));
+	menu->AddItem(new BMenuItem("Delete", new BMessage(M_DELETE_RESOURCE), 'D'));
+	
+	
+	menuBar->AddItem(menu);
 }
 
 
@@ -250,4 +264,99 @@ ResView::UpdateRow(BRow *row)
 	
 	BSizeField *sizeField = (BSizeField*)row->GetField(4);
 	sizeField->SetSize(resData->GetLength());
+}
+
+
+void
+ResView::AddResource(const entry_ref &ref)
+{
+	BFile file(&ref,B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
+	
+	BString mime;
+	file.ReadAttrString("BEOS:TYPE",&mime);
+	
+	if (mime == "application/x-be-resource") {
+		BMessage msg(B_REFS_RECEIVED);
+		msg.AddRef("refs",&ref);
+		be_app->PostMessage(&msg);
+		return;
+	}
+	
+	type_code fileType = 0;
+	
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	translator_info info;
+	if (roster->Identify(&file,NULL,&info,0,mime.String()) == B_OK)
+		fileType = info.type;
+	else
+		fileType = B_RAW_TYPE;
+	
+	int32 lastID = -1;
+	for (int32 i = 0; i < fDataList.CountItems(); i++) {
+		ResourceData *resData = (ResourceData*)fDataList.ItemAt(i);
+		if (resData->GetType() == fileType && resData->GetID() > lastID)
+			lastID = resData->GetID();
+	}
+	
+	off_t fileSize;
+	file.GetSize(&fileSize);
+	
+	if (fileSize < 1)
+		return;
+	
+	char *fileData = (char *)malloc(fileSize);
+	file.Read(fileData,fileSize);
+	
+	ResourceData *resData = new ResourceData(fileType,lastID + 1, ref.name,
+											fileData,fileSize);
+	fDataList.AddItem(resData);
+	
+	ResDataRow *row = new ResDataRow(resData);
+	fListView->AddRow(row);
+	
+	fIsDirty = true;
+}
+
+
+void
+ResView::DeleteSelectedResources(void)
+{
+	ResDataRow *selection = (ResDataRow*)fListView->CurrentSelection();
+	
+	if (selection)
+		fIsDirty = true;
+	
+	while (selection) {
+		ResourceData *data = selection->GetData();
+		fListView->RemoveRow(selection);
+		fDataList.RemoveItem(data);
+		delete data;
+		selection = (ResDataRow*)fListView->CurrentSelection();
+	}
+}
+
+
+ResDataRow::ResDataRow(ResourceData *data)
+  :	fResData(data)
+{
+	if (data) {
+		SetField(new BStringField(fResData->GetIDString()),0);
+		SetField(new TypeCodeField(fResData->GetType(),fResData),1);
+		SetField(new BStringField(fResData->GetName()),2);
+		BField *field = gResRoster.MakeFieldForType(fResData->GetType(),
+													fResData->GetData(),
+													fResData->GetLength());
+		if (field)
+			SetField(field,3);
+		SetField(new BSizeField(fResData->GetLength()),4);
+	}
+}
+	
+
+ResourceData *
+ResDataRow::GetData(void) const
+{
+	return fResData;
 }

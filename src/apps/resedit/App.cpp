@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2005-2006, Haiku, Inc.
+ * Copyright (c) 2005-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
- *		DarkWyrm <darkwyrm@earthlink.net>
+ *		DarkWyrm <darkwyrm@gmail.com>
  */
 #include "App.h"
 #include "ResWindow.h"
@@ -19,25 +19,25 @@ main(void)
 
 
 App::App(void)
-  :	BApplication("application/x-vnd.Haiku-ResEdit"),
-  	fWindowCount(0)
+  :	BApplication("application/x-vnd.Haiku-ResEdit")
 {
 	fOpenPanel = new BFilePanel();
-	fSavePanel = new BFilePanel(B_SAVE_PANEL);
 }
 
 
 App::~App(void)
 {
 	delete fOpenPanel;
-	delete fSavePanel;
 }
 
 
 void
 App::ReadyToRun(void)
 {
-	if (fWindowCount < 1)
+	// CountWindows() needs to be used instead of fWindowCount because the registration
+	// message isn't processed in time. One of the windows belong to the BFilePanels and is
+	// counted in CountWindows().
+	if (CountWindows() < 2)
 		new ResWindow(BRect(50, 100, 600, 400));
 }
 
@@ -46,16 +46,6 @@ void
 App::MessageReceived(BMessage *msg)
 {
 	switch(msg->what) {
-		case M_REGISTER_WINDOW: {
-			fWindowCount++;
-			break;
-		}
-		case M_UNREGISTER_WINDOW: {
-			fWindowCount--;
-			if (fWindowCount == 0)
-				PostMessage(B_QUIT_REQUESTED);
-			break;
-		}
 		case M_SHOW_OPEN_PANEL: {
 			// Don't do anything if it's already open
 			if (fOpenPanel->IsShowing())
@@ -90,20 +80,3 @@ App::RefsReceived(BMessage *msg)
 	while (msg->FindRef("refs", i++, &ref) == B_OK)
 		new ResWindow(BRect(50, 100, 600, 400), &ref);
 }
-
-
-bool
-App::QuitRequested(void)
-{
-	for (int32 i = 0; i < CountWindows(); i++) {
-		BWindow *win = WindowAt(i);
-		if (fOpenPanel->Window() == win || fSavePanel->Window() == win)
-			continue;
-		
-		if (!win->QuitRequested())
-			return false;
-	}
-	
-	return true;
-}
-

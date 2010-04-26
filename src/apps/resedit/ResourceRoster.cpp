@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2005-2006, Haiku, Inc.
+ * Copyright (c) 2005-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
- *		DarkWyrm <darkwyrm@earthlink.net>
+ *		DarkWyrm <darkwyrm@gmail.com>
  */
 #include "ResourceRoster.h"
 #include <Roster.h>
@@ -152,7 +152,7 @@ ResourceRoster::SpawnEditor(ResourceData *data, BHandler *handler)
 	// temporary code until editors are done
 	switch (data->GetType()) {
 		case B_MIME_STRING_TYPE: {
-			StringEditor *strEd = new StringEditor(BRect(100,100,300,200),
+			StringEditor *strEd = new StringEditor(BRect(100,100,400,200),
 													data, handler);
 			strEd->Show();
 			break;

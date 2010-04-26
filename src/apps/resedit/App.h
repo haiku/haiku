@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2005-2006, Haiku, Inc.
+ * Copyright (c) 2005-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
- *		DarkWyrm <darkwyrm@earthlink.net>
+ *		DarkWyrm <darkwyrm@gmail.com>
  */
 #ifndef APP_H
 #define APP_H
@@ -12,8 +12,6 @@
 #include <FilePanel.h>
 
 enum {
-	M_REGISTER_WINDOW = 'regw',
-	M_UNREGISTER_WINDOW,
 	M_SHOW_OPEN_PANEL,
 	M_SHOW_SAVE_PANEL
 };
@@ -27,11 +25,9 @@ public:
 	void	ArgvReceived(int32 argc, char** argv);
 	void	RefsReceived(BMessage *msg);
 	void	ReadyToRun(void);
-	bool	QuitRequested(void);
 	
 private:
-	uint32		fWindowCount;
-	BFilePanel	*fOpenPanel, *fSavePanel;
+	BFilePanel	*fOpenPanel;
 };
 
 #endif

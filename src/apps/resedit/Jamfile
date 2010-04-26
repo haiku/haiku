@@ -22,6 +22,7 @@ Application ResEdit :
 	NumberEditors.cpp
 	PreviewColumn.cpp
 	ResFields.cpp
+	ResListView.cpp
 	ResourceData.cpp
 	ResourceRoster.cpp
 	ResView.cpp
