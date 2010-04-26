@@ -37,14 +37,23 @@ LanguageListItem::LanguageListItem(const char* text, const char* code)
 }
 
 
+LanguageListItem::LanguageListItem(const LanguageListItem& other)
+	:
+	BStringItem(other.Text()),
+	fLanguageCode(other.fLanguageCode),
+	fIcon(other.fIcon ? new(std::nothrow) BBitmap(other.fIcon) : NULL)
+{
+}
+
+
 LanguageListItem::~LanguageListItem()
 {
-	delete fIcon;	
+	delete fIcon;
 }
 
 
 //MediaListItem - DrawItem
-void 
+void
 LanguageListItem::DrawItem(BView *owner, BRect frame, bool complete)
 {
 	rgb_color kHighlight = { 140,140,140,0 };
@@ -66,7 +75,7 @@ LanguageListItem::DrawItem(BView *owner, BRect frame, bool complete)
 	} else {
 		owner->SetLowColor(owner->ViewColor());
 	}
-	
+
 	frame.left += 4;
 	BRect iconFrame(frame);
 	iconFrame.Set(iconFrame.left, iconFrame.top+1, iconFrame.left+15, iconFrame.top+16);
@@ -79,7 +88,7 @@ LanguageListItem::DrawItem(BView *owner, BRect frame, bool complete)
 
 	frame.left += 16 * (OutlineLevel() + 1);
 	owner->SetHighColor(kBlack);
-	
+
 	BFont		font = be_plain_font;
 	font_height	finfo;
 	font.GetHeight(&finfo);
@@ -193,7 +202,7 @@ void LanguageListView::MessageReceived (BMessage* message)
 					// Item has a parent
 					fDropIndex = FullListIndexOf(Superitem(FullListItemAt(fDropIndex)));
 				}
-				
+
 				// Item is now a top level one - we must insert just below its last child
 				fDropIndex += CountItemsUnder(FullListItemAt(fDropIndex),false)  + 1;
 
@@ -355,7 +364,7 @@ LanguageListView::MouseMoved(BPoint where, uint32 transit, const BMessage* msg)
 				// offset where by half of item height
 				BRect r = ItemFrame(0);
 				where.y += r.Height() / 2.0;
-	
+
 				int32 index = FullListIndexOf(where);
 				if (index < 0)
 					index = FullListCountItems();

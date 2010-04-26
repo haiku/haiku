@@ -19,32 +19,16 @@
 class LanguageListItem: public BStringItem {
 	public:
 		LanguageListItem(const char* text, const char* code);
-
-		LanguageListItem(const LanguageListItem& other)
-			:
-			BStringItem(other.Text()),
-			fLanguageCode(other.fLanguageCode),
-			fIcon(other.fIcon)
-		{}
-
+		LanguageListItem(const LanguageListItem& other);
 		~LanguageListItem();
 
-		const inline BString LanguageCode() { return fLanguageCode; }
+		const BString& LanguageCode() { return fLanguageCode; }
 		void DrawItem(BView *owner, BRect frame, bool complete = false);
 
 	private:
-		const BString fLanguageCode;
+		BString fLanguageCode;
 		BBitmap* fIcon;
 };
-
-
-static int
-compare_list_items(const void* _a, const void* _b)
-{
-	LanguageListItem* a = *(LanguageListItem**)_a;
-	LanguageListItem* b = *(LanguageListItem**)_b;
-	return strcasecmp(a->Text(), b->Text());
-}
 
 
 class LanguageListView: public BOutlineListView {
