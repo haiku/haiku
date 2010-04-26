@@ -126,8 +126,8 @@ if [ IsOptionalHaikuImagePackageAdded BeAE ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package BeAE available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage beae-20-x86-gcc2-2010-03-14.zip
-			: $(baseURL)/beae-20-x86-gcc2-2010-03-14.zip
+		InstallOptionalHaikuImagePackage beae-20-r1a2-x86-gcc2-2010-04-25.zip
+			: $(baseURL)/beae-20-r1a2-x86-gcc2-2010-04-25.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Applications
@@ -1302,8 +1302,8 @@ if [ IsOptionalHaikuImagePackageAdded XZ-Utils ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package XZ-Utils available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage xz-utils-4.999.9-x86-gcc4-2010-02-25.zip
-			: $(baseURL)/xz-utils-4.999.9-x86-gcc4-2010-02-25.zip
+		InstallOptionalHaikuImagePackage xz-utils-4.999.9-r1a2-x86-gcc4-2010-04-25.zip
+			: $(baseURL)/xz-utils-4.999.9-r1a2-x86-gcc4-2010-04-25.zip
 			:
 			:
 			: true
