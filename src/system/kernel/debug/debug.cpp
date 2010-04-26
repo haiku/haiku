@@ -101,6 +101,7 @@ static struct ring_buffer* sSyslogBuffer;
 static size_t sSyslogBufferOffset = 0;
 	// (relative) buffer offset of the yet unsent syslog messages
 static bool sSyslogDropped = false;
+static bool sDebugSyslog = false;
 static size_t sSyslogDebuggerOffset = 0;
 	// (relative) buffer offset of the kernel debugger messages of the current
 	// KDL session
@@ -805,7 +806,8 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 	if (sCurrentKernelDebuggerMessage != NULL)
 		va_copy(sCurrentKernelDebuggerMessageArgs, args);
 
-	sSyslogDebuggerOffset = ring_buffer_readable(sSyslogBuffer);
+	sSyslogDebuggerOffset = sSyslogBuffer != NULL
+		? ring_buffer_readable(sSyslogBuffer) : 0;
 
 	print_kernel_debugger_message();
 
@@ -1298,8 +1300,15 @@ syslog_init_post_threads(void)
 	// initializing kernel syslog service failed -- disable it
 
 	sSyslogOutputEnabled = false;
+
+	if (sSyslogBuffer != NULL) {
+		if (sDebugSyslog)
+			delete_area(area_for(sSyslogBuffer));
+		else
+			delete_ring_buffer(sSyslogBuffer);
+	}
+
 	free(sSyslogMessage);
-	free(sSyslogBuffer);
 	delete_sem(sSyslogNotify);
 
 	return B_ERROR;
@@ -1348,8 +1357,13 @@ syslog_init_post_vm(struct kernel_args* args)
 		// create an area for the debug syslog buffer
 		void* base = (void*)ROUNDDOWN((addr_t)args->debug_output, B_PAGE_SIZE);
 		size_t size = ROUNDUP(args->debug_size, B_PAGE_SIZE);
-		create_area("syslog debug", &base, B_EXACT_ADDRESS, size,
-			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		area_id area = create_area("syslog debug", &base, B_EXACT_ADDRESS, size,
+				B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (area < 0) {
+			sSyslogBuffer = NULL;
+			status = B_NO_MEMORY;
+			goto err2;
+		}
 	}
 
 	// initialize syslog message
@@ -1396,6 +1410,7 @@ syslog_init(struct kernel_args* args)
 
 	sSyslogBuffer = create_ring_buffer_etc(args->debug_output, args->debug_size,
 		RING_BUFFER_INIT_FROM_BUFFER);
+	sDebugSyslog = true;
 
 	return B_OK;
 }
