@@ -586,7 +586,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		}
 	}
 
-	if (fRef)
+	if (fRef != NULL)
 		SetTitleForMessage();
 
 	_UpdateSizeLimits();
@@ -1120,7 +1120,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			bool foundRef = false;
 			entry_ref nextRef;
 			if ((msg->what == M_DELETE_PREV || msg->what == M_DELETE_NEXT)
-				&& fRef) {
+				&& fRef != NULL) {
 				// Find the next message that should be displayed
 				nextRef = *fRef;
 				foundRef = GetTrackerWindowFile(&nextRef,
@@ -1453,7 +1453,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			msg->what = M_NEXTMSG;
 		case M_PREVMSG:
 		case M_NEXTMSG:
-			if (fRef) {
+			if (fRef != NULL) {
 				entry_ref nextRef = *fRef;
 				if (GetTrackerWindowFile(&nextRef, (msg->what == M_NEXTMSG))) {
 					TMailWindow *window
@@ -1478,7 +1478,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			}
 			break;
 		case M_SAVE_POSITION:
-			if (fRef)
+			if (fRef != NULL)
 				SaveTrackerPosition(fRef);
 			break;
 
@@ -1617,8 +1617,8 @@ TMailWindow::QuitRequested()
 			|| (fHeaderView->fCc && strlen(fHeaderView->fCc->Text()))
 			|| (fHeaderView->fBcc && strlen(fHeaderView->fBcc->Text()))
 			|| (strlen(fContentView->fTextView->Text()) && (!fStartingText 
-				|| fStartingText
-				&& strcmp(fContentView->fTextView->Text(), fStartingText)))
+				|| (fStartingText
+					&& strcmp(fContentView->fTextView->Text(), fStartingText))))
 			|| (fEnclosuresView != NULL 
 				&& fEnclosuresView->fList->CountItems()))) {
 		if (fResending) {
@@ -1677,7 +1677,7 @@ TMailWindow::QuitRequested()
 				}
 			}
 		}
-	} else if (fRef && !sKeepStatusOnQuit) {
+	} else if (fRef != NULL && !sKeepStatusOnQuit) {
 		// ...Otherwise just set the message read
 		if (fAutoMarkRead)
 			SetCurrentMessageRead();
@@ -2488,8 +2488,9 @@ TMailWindow::SaveAsDraft()
 
 	if (fDraft) {
 		if ((status = draft.SetTo(fRef,
-			B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE)) != B_OK)
+			B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE)) != B_OK) {
 			return status;
+		}
 	} else {
 		// Get the user home directory
 		if ((status = find_directory(B_USER_DIRECTORY, &draftPath)) != B_OK)
@@ -2536,9 +2537,9 @@ TMailWindow::SaveAsDraft()
 				}
 
 				// Cache the ref
-				delete fRef;
+				if (fRef == NULL);
+					fRef = new entry_ref;
 				BEntry entry(&dir, fileName);
-				fRef = new entry_ref;
 				entry.GetRef(fRef);
 				break;
 			}
@@ -2743,8 +2744,7 @@ TMailWindow::OpenMessage(entry_ref *ref, uint32 characterSetForDecoding)
 	//
 	//	Set some references to the email file
 	//
-	if (fRef)
-		delete fRef;
+	delete fRef;
 	fRef = new entry_ref(*ref);
 
 	if (fStartingText) {
