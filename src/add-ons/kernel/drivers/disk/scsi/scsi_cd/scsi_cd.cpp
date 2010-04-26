@@ -20,6 +20,9 @@
 
 #include <io_requests.h>
 
+#include "IOCache.h"
+#include "IOSchedulerSimple.h"
+
 
 //#define TRACE_CD_DISK
 #ifdef TRACE_CD_DISK
@@ -888,7 +891,8 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 		info->io_scheduler = new(std::nothrow) IOCache(info->dma_resource,
 			1024 * 1024);
 #else
-		info->io_scheduler = new(std::nothrow) IOScheduler(info->dma_resource);
+		info->io_scheduler = new(std::nothrow) IOSchedulerSimple(
+			info->dma_resource);
 #endif
 
 		if (info->io_scheduler == NULL)
