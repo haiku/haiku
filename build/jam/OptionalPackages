@@ -63,6 +63,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	SQLite					- the database implementation
 #	Subversion				- the version control system
 #	Tar						- archiving utility
+#	TrackerNewTemplates		- template files for Tracker's New menu
 #	UserlandFS				- aids native file system development (like FUSE)
 #	Vim						- the command line text editor
 #	Vision					- powerful native IRC client
@@ -1068,6 +1069,15 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 			:
 		;
 	}
+}
+
+
+# TrackerNewTemplates
+if [ IsOptionalHaikuImagePackageAdded TrackerNewTemplates ] {
+	InstallOptionalHaikuImagePackage TrackerNewTemplates-2010-04-26.zip
+		: $(baseURL)/TrackerNewTemplates-2010-04-26.zip
+		: home config settings Tracker "Tracker New Templates"
+	;
 }
 
 
