@@ -60,3 +60,9 @@ IOScheduler::SetCallback(io_callback callback, void* data)
 	fIOCallback = callback;
 	fIOCallbackData = data;
 }
+
+
+void
+IOScheduler::SetDeviceCapacity(off_t deviceCapacity)
+{
+}

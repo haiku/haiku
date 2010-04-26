@@ -45,6 +45,8 @@ public:
 	virtual	void				SetCallback(IOCallback& callback);
 	virtual	void				SetCallback(io_callback callback, void* data);
 
+	virtual	void				SetDeviceCapacity(off_t deviceCapacity);
+
 	virtual	status_t			ScheduleRequest(IORequest* request) = 0;
 
 	virtual	void				AbortRequest(IORequest* request,
