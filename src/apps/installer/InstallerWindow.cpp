@@ -15,6 +15,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <GridLayoutBuilder.h>
@@ -213,23 +214,31 @@ InstallerWindow::InstallerWindow()
 		TR("Set up partitions" B_UTF8_ELLIPSIS),
 		new BMessage(LAUNCH_DRIVE_SETUP));
 
-	fLaunchBootmanButton = new BButton("bootman_button",
-		TR("Set up boot menu"), new BMessage(LAUNCH_BOOTMAN));
-	fLaunchBootmanButton->SetEnabled(false);
+	fLaunchBootmanItem = new BMenuItem(TR("Set up boot menu"),
+		new BMessage(LAUNCH_BOOTMAN));
+	fLaunchBootmanItem->SetEnabled(false);
 
-	fMakeBootableButton = new BButton("makebootable_button",
-		TR("Write boot sector"), new BMessage(MSG_WRITE_BOOT_SECTOR));
-	fMakeBootableButton->SetEnabled(false);
+	fMakeBootableItem = new BMenuItem(TR("Write boot sector"),
+		new BMessage(MSG_WRITE_BOOT_SECTOR));
+	fMakeBootableItem->SetEnabled(false);
+	BMenuBar* mainMenu = new BMenuBar("main menu");
+	BMenu* toolsMenu = new BMenu(TR("Tools"));
+	toolsMenu->AddItem(fLaunchBootmanItem);
+	toolsMenu->AddItem(fMakeBootableItem);
+	mainMenu->AddItem(toolsMenu);
+
+	float spacing = be_control_look->DefaultItemSpacing();
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+		.Add(mainMenu)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
 			.Add(logoView)
 			.Add(fStatusView)
 		)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-		.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
-			.Add(BGridLayoutBuilder(0, 10)
+		.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
+			.Add(BGridLayoutBuilder(0, spacing)
 				.Add(fSrcMenuField->CreateLabelLayoutItem(), 0, 0)
 				.Add(fSrcMenuField->CreateMenuBarLayoutItem(), 1, 0)
 				.Add(fDestMenuField->CreateLabelLayoutItem(), 0, 1)
@@ -243,14 +252,12 @@ InstallerWindow::InstallerWindow()
 				.Add(fSizeView, 0, 6, 2)
 			)
 
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
 				.Add(fLaunchDriveSetupButton)
-				.Add(fLaunchBootmanButton)
-				.Add(fMakeBootableButton)
 				.AddGlue()
 				.Add(fBeginButton)
 			)
-			.SetInsets(10, 10, 10, 10)
+			.SetInsets(spacing, spacing, spacing, spacing)
 		)
 	);
 
@@ -271,17 +278,17 @@ InstallerWindow::InstallerWindow()
 		"Partitions can be initialized with the\n"
 		"Be File System needed for a Haiku boot\n"
 		"partition."));
-	fLaunchBootmanButton->SetToolTip(
-		TR("Install or uninstall the Haiku boot menu, which allows to "
-		"choose an operating system to boot when the computer starts.\n"
-		"If this computer already has a boot manager such as GRUB installed, "
-		"it is better to add Haiku to that menu than to overwrite it."));
-	fMakeBootableButton->SetToolTip(
-		TR("Writes the Haiku boot code to the partition start\n"
-		"sector. This step is automatically performed by\n"
-		"the installation, but you can manually make a\n"
-		"partition bootable in case you do not need to\n"
-		"perform an installation."));
+//	fLaunchBootmanItem->SetToolTip(
+//		TR("Install or uninstall the Haiku boot menu, which allows to "
+//		"choose an operating system to boot when the computer starts.\n"
+//		"If this computer already has a boot manager such as GRUB installed, "
+//		"it is better to add Haiku to that menu than to overwrite it."));
+//	fMakeBootableItem->SetToolTip(
+//		TR("Writes the Haiku boot code to the partition start\n"
+//		"sector. This step is automatically performed by\n"
+//		"the installation, but you can manually make a\n"
+//		"partition bootable in case you do not need to\n"
+//		"perform an installation."));
 
 	// finish creating window
 	if (!be_roster->IsRunning(kDeskbarSignature))
@@ -298,7 +305,7 @@ InstallerWindow::InstallerWindow()
  
 	if (Lock()) {
 		fLaunchDriveSetupButton->SetEnabled(!fDriveSetupLaunched);
-		fLaunchBootmanButton->SetEnabled(!fBootmanLaunched);
+		fLaunchBootmanItem->SetEnabled(!fBootmanLaunched);
 		Unlock();
 	}
 
@@ -648,8 +655,8 @@ void
 InstallerWindow::_DisableInterface(bool disable)
 {
 	fLaunchDriveSetupButton->SetEnabled(!disable);
-	fLaunchBootmanButton->SetEnabled(!disable);
-	fMakeBootableButton->SetEnabled(!disable);
+	fLaunchBootmanItem->SetEnabled(!disable);
+	fMakeBootableItem->SetEnabled(!disable);
 	fSrcMenuField->SetEnabled(!disable);
 	fDestMenuField->SetEnabled(!disable);
 }
@@ -747,9 +754,11 @@ InstallerWindow::_UpdateControls()
 		label = buffer;
 	} else
 		label = TR("Write boot sector");
-	fMakeBootableButton->SetEnabled(dstItem != NULL);
-	fMakeBootableButton->SetLabel(label.String());
-	fLaunchBootmanButton->SetEnabled(dstItem != NULL);
+	fMakeBootableItem->SetEnabled(dstItem != NULL);
+	fMakeBootableItem->SetLabel(label.String());
+// TODO: Once bootman support writing to specific disks, enable this, since
+// we would pass it the disk which contains the target partition.
+//	fLaunchBootmanItem->SetEnabled(dstItem != NULL);
 
 	if (!fEncouragedToSetupPartitions && !foundOneSuitableTarget) {
 		// Focus the users attention on the DriveSetup button

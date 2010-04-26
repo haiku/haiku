@@ -18,6 +18,7 @@ class BButton;
 class BLayoutItem;
 class BMenu;
 class BMenuField;
+class BMenuItem;
 class BStatusBar;
 class BStringView;
 class BTextView;
@@ -86,8 +87,8 @@ private:
 
 			BButton*			fBeginButton;
 			BButton*			fLaunchDriveSetupButton;
-			BButton*			fLaunchBootmanButton;
-			BButton*			fMakeBootableButton;
+			BMenuItem*			fLaunchBootmanItem;
+			BMenuItem*			fMakeBootableItem;
 
 			bool				fEncouragedToSetupPartitions;
 
