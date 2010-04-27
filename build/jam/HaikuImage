@@ -323,7 +323,7 @@ AddSymlinkToHaikuImage system bin : trash : untrash ;
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
 # Mailbox folders and symlink
-AddDirectoryToHaikuImage home mail drafts ;
+AddDirectoryToHaikuImage home mail draft ;
 AddDirectoryToHaikuImage home mail in ;
 AddDirectoryToHaikuImage home mail out ;
 AddSymlinkToHaikuImage home config settings Mail : ../../../mail/in : mailbox ;
