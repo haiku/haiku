@@ -2614,6 +2614,7 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 	// applications for the sub and the super type respectively.
 	const char* kSigField = "applications";
 	BMessage signatures;
+	bool addedSecondarySignature = false;
 	if (error == B_OK) {
 		if (primarySignature[0] != '\0')
 			error = signatures.AddString(kSigField, primarySignature);
@@ -2624,8 +2625,10 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 			// we fall-back to non-preferred but supporting apps only in the
 			// case when there is a preferred handler for the sub-type but
 			// it cannot be resolved (misconfiguration).
-			if (secondarySignature[0] != '\0')
+			if (secondarySignature[0] != '\0') {
 				error = signatures.AddString(kSigField, secondarySignature);
+				addedSecondarySignature = true;
+			}
 		}
 	}
 
@@ -2635,30 +2638,48 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 		int32 subCount;
 		if (supportingSignatures.FindInt32("be:sub", &subCount) != B_OK)
 			subCount = 0;
-		// Add all signatures with direct support for the sub-type
+		// Add all signatures with direct support for the sub-type.
 		const char* supportingType;
+		if (!addedSecondarySignature) {
+			// Try to add the secondarySignature in front of all other
+			// supporting apps, if we find it among those.
+			for (int32 i = 0; error == B_OK && i < subCount
+					&& supportingSignatures.FindString(kSigField, i,
+						&supportingType) == B_OK; i++) {
+				if (strcmp(primarySignature, supportingType) != 0
+					&& strcmp(secondarySignature, supportingType) == 0) {
+					error = signatures.AddString(kSigField, supportingType);
+					addedSecondarySignature = true;
+					break;
+				}
+			}
+		}
 		for (int32 i = 0; error == B_OK && i < subCount
 				&& supportingSignatures.FindString(kSigField, i,
 					&supportingType) == B_OK; i++) {
-			// don't add the signature if it's the preferred app already.
-			if (strcmp(primarySignature, supportingType) != 0)
+			if (strcmp(primarySignature, supportingType) != 0
+				&& strcmp(secondarySignature, supportingType) != 0) {
 				error = signatures.AddString(kSigField, supportingType);
+			}
 		}
 		// Add the preferred type of the super type here before adding
 		// the other types supporting the super type, but only if we have
 		// not already added it in case there was no preferred app for the
 		// sub-type configured.
-		if (error == B_OK && primarySignature[0] != '\0'
+		if (error == B_OK && !addedSecondarySignature
 			&& secondarySignature[0] != '\0') {
 			error = signatures.AddString(kSigField, secondarySignature);
 		}
-		// Add all signatures with support for the super-type
+		// Add all signatures with support for the super-type.
 		for (int32 i = subCount; error == B_OK
 				&& supportingSignatures.FindString(kSigField, i,
 					&supportingType) == B_OK; i++) {
-			// don't add the signature if it's the preferred app already.
-			if (strcmp(secondarySignature, supportingType) != 0)
+			// Don't add the signature if it's one of the preferred apps
+			// already.
+			if (strcmp(primarySignature, supportingType) != 0
+				&& strcmp(secondarySignature, supportingType) != 0) {
 				error = signatures.AddString(kSigField, supportingType);
+			}
 		}
 	} else {
 		// Failed to get supporting apps, just add the preferred apps.
