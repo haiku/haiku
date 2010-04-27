@@ -78,8 +78,8 @@ ResourceData::SetFromResource(const int32 &index, BResources &res)
 	fIDString = "";
 	fIDString << fID;
 	fAttr = false;
-	char *data = (char *)res.LoadResource(fType,fID,&fLength);
-	SetData(data,fLength);
+	char *data = (char *)res.LoadResource(fType, fID, &fLength);
+	SetData(data, fLength);
 	
 	return true;
 }
@@ -127,7 +127,7 @@ ResourceData::SetTo(const type_code &code, const int32 &id,
 	fIDString = "";
 	fIDString << fID;
 	fName = name;
-	SetData(data,length);
+	SetData(data, length);
 	
 }
 
@@ -158,7 +158,7 @@ ResourceData::SetData(const char *data, const size_t &size)
 	
 	if (size > 0) {
 		fData = (char *)malloc(size);
-		memcpy(fData,data,size);
+		memcpy(fData, data, size);
 	}
 	else
 		fData = NULL;

@@ -1,25 +1,25 @@
 #ifndef BMPVIEW_H
 #define BMPVIEW_H
 
-#include <Message.h>
 #include <Bitmap.h>
+#include <Message.h>
 #include <Invoker.h>
+#include <PopUpMenu.h>
 #include <String.h>
 #include <View.h>
-#include <PopUpMenu.h>
 
 enum
 {
-	M_BITMAP_ADDED='mbma',
-	M_BITMAP_REMOVED='mbmr'
+	M_BITMAP_ADDED = 'mbma',
+	M_BITMAP_REMOVED = 'mbmr'
 };
 
 class BitmapView : public BView, public BInvoker
 {
 public:
 	BitmapView(BRect frame, const char *name, BMessage *mod, BBitmap *bitmap, 
-		const char *label = NULL, border_style = B_PLAIN_BORDER,
-		int32 resize = B_FOLLOW_LEFT | B_FOLLOW_TOP, int32 flags = B_WILL_DRAW);
+				const char *label = NULL, border_style = B_PLAIN_BORDER,
+				int32 resize = B_FOLLOW_LEFT | B_FOLLOW_TOP, int32 flags = B_WILL_DRAW);
 	~BitmapView(void);
 	virtual void AttachedToWindow(void);
 	

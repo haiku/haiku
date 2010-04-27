@@ -6,14 +6,15 @@
  *		DarkWyrm <darkwyrm@gmail.com>
  */
 #include "InlineEditor.h"
-#include <MessageFilter.h>
+
 #include <Handler.h>
+#include <MessageFilter.h>
 
 class EditFilter : public BMessageFilter
 {
 public:
 	EditFilter(BTextControl *textbox)
-		: BMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE,B_KEY_DOWN)
+		: BMessageFilter(B_PROGRAMMED_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN)
 	{
 		fTextBox = textbox;
 	}
@@ -25,7 +26,7 @@ public:
 	filter_result Filter(BMessage *msg, BHandler **target)
 	{
 		int32 rawchar;
-		msg->FindInt32("raw_char",&rawchar);
+		msg->FindInt32("raw_char", &rawchar);
 		
 		if (rawchar == B_ESCAPE) {
 			BLooper *loop = (*target)->Looper();
@@ -48,20 +49,19 @@ private:
 
 InlineEditor::InlineEditor(BMessenger target, const BRect &frame, 
 							const char *text)
- :	BWindow(frame,"InlineEditor",B_NO_BORDER_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+ :	BWindow(frame, "InlineEditor", B_NO_BORDER_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
  			B_ASYNCHRONOUS_CONTROLS),
  	fMessenger(target),
  	fCommand(M_INLINE_TEXT)
 {
-	fTextBox = new BTextControl(BRect(0,0,1,1), "inlinebox",NULL, text,
-								new BMessage(fCommand), B_FOLLOW_ALL,
-								B_WILL_DRAW);
+	fTextBox = new BTextControl(BRect(0, 0, 1, 1), "inlinebox", NULL, text,
+								new BMessage(fCommand), B_FOLLOW_ALL, B_WILL_DRAW);
 	AddChild(fTextBox);
 	fTextBox->SetDivider(0);
 	fTextBox->MakeFocus(true);
 	
 	fTextBox->ResizeToPreferred();
-	fTextBox->ResizeTo(Bounds().Width(),fTextBox->Bounds().Height());
+	fTextBox->ResizeTo(Bounds().Width(), fTextBox->Bounds().Height());
 	ResizeTo(Bounds().Width(), fTextBox->Bounds().Height());
 	
 	AddCommonFilter(new EditFilter(fTextBox));

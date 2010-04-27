@@ -10,15 +10,16 @@
 #include <Application.h>
 #include <File.h>
 #include <ScrollView.h>
-#include <malloc.h>
 #include <Menu.h>
 #include <MenuItem.h>
-#include <stdio.h>
 #include <TranslatorRoster.h>
 #include <TypeConstants.h>
-#include "ColumnTypes.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "App.h"
+#include "ColumnTypes.h"
 #include "ResourceData.h"
 #include "ResFields.h"
 #include "ResListView.h"
@@ -70,22 +71,22 @@ ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
 	fListView = new ResListView(r, "gridview", B_FOLLOW_ALL, B_WILL_DRAW, B_FANCY_BORDER);
 	AddChild(fListView);
 	
-	rgb_color white = { 255,255,255,255 };
+	rgb_color white = { 255, 255, 255, 255 };
 	fListView->SetColor(B_COLOR_BACKGROUND, white);
 	fListView->SetColor(B_COLOR_SELECTION, ui_color(B_MENU_BACKGROUND_COLOR));
 	
 	float width = be_plain_font->StringWidth("00000") + 20;
-	fListView->AddColumn(new BStringColumn("ID",width,width,100,B_TRUNCATE_END),0);
+	fListView->AddColumn(new BStringColumn("ID", width, width, 100, B_TRUNCATE_END), 0);
 	
-	fListView->AddColumn(new BStringColumn("Type",width,width,100,B_TRUNCATE_END),1);
-	fListView->AddColumn(new BStringColumn("Name",150,50,300,B_TRUNCATE_END),2);
-	fListView->AddColumn(new PreviewColumn("Data",150,50,300),3);
+	fListView->AddColumn(new BStringColumn("Type", width, width, 100, B_TRUNCATE_END), 1);
+	fListView->AddColumn(new BStringColumn("Name", 150, 50, 300, B_TRUNCATE_END), 2);
+	fListView->AddColumn(new PreviewColumn("Data", 150, 50, 300), 3);
 	
 	// Editing is disabled for now
 	fListView->SetInvocationMessage(new BMessage(M_EDIT_RESOURCE));
 	
 	width = be_plain_font->StringWidth("1000 bytes") + 20;
-	fListView->AddColumn(new BSizeColumn("Size",width,10,100),4);
+	fListView->AddColumn(new BSizeColumn("Size", width, 10, 100), 4);
 	
 	fFilePanel = new BFilePanel(B_OPEN_PANEL);
 	if (ref)
@@ -116,9 +117,9 @@ ResView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case M_NEW_FILE: {
-			BRect r(100,100,400,400);
+			BRect r(100, 100, 400, 400);
 			if (Window())
-				r = Window()->Frame().OffsetByCopy(10,10);
+				r = Window()->Frame().OffsetByCopy(10, 10);
 			ResWindow *win = new ResWindow(r);
 			win->Show();
 			break;
@@ -134,7 +135,7 @@ ResView::MessageReceived(BMessage *msg)
 		case B_REFS_RECEIVED: {
 			int32 i = 0;
 			entry_ref ref;
-			while (msg->FindRef("refs",i++,&ref) == B_OK)
+			while (msg->FindRef("refs", i++, &ref) == B_OK)
 				AddResource(ref);
 			break;
 		}
@@ -149,12 +150,12 @@ ResView::MessageReceived(BMessage *msg)
 		case M_EDIT_RESOURCE: {
 			BRow *row = fListView->CurrentSelection();
 			TypeCodeField *field = (TypeCodeField*)row->GetField(1);
-			gResRoster.SpawnEditor(field->GetResourceData(),this);
+			gResRoster.SpawnEditor(field->GetResourceData(), this);
 			break;
 		}
 		case M_UPDATE_RESOURCE: {
 			ResourceData *item;
-			if (msg->FindPointer("item",(void **)&item) != B_OK)
+			if (msg->FindPointer("item", (void **)&item) != B_OK)
 				break;
 			
 			for (int32 i = 0; i < fListView->CountRows(); i++) {
@@ -270,16 +271,16 @@ ResView::UpdateRow(BRow *row)
 void
 ResView::AddResource(const entry_ref &ref)
 {
-	BFile file(&ref,B_READ_ONLY);
+	BFile file(&ref, B_READ_ONLY);
 	if (file.InitCheck() != B_OK)
 		return;
 	
 	BString mime;
-	file.ReadAttrString("BEOS:TYPE",&mime);
+	file.ReadAttrString("BEOS:TYPE", &mime);
 	
 	if (mime == "application/x-be-resource") {
 		BMessage msg(B_REFS_RECEIVED);
-		msg.AddRef("refs",&ref);
+		msg.AddRef("refs", &ref);
 		be_app->PostMessage(&msg);
 		return;
 	}
@@ -288,7 +289,7 @@ ResView::AddResource(const entry_ref &ref)
 	
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
 	translator_info info;
-	if (roster->Identify(&file,NULL,&info,0,mime.String()) == B_OK)
+	if (roster->Identify(&file, NULL, &info, 0, mime.String()) == B_OK)
 		fileType = info.type;
 	else
 		fileType = B_RAW_TYPE;
@@ -307,10 +308,10 @@ ResView::AddResource(const entry_ref &ref)
 		return;
 	
 	char *fileData = (char *)malloc(fileSize);
-	file.Read(fileData,fileSize);
+	file.Read(fileData, fileSize);
 	
-	ResourceData *resData = new ResourceData(fileType,lastID + 1, ref.name,
-											fileData,fileSize);
+	ResourceData *resData = new ResourceData(fileType, lastID + 1, ref.name,
+											fileData, fileSize);
 	fDataList.AddItem(resData);
 	
 	ResDataRow *row = new ResDataRow(resData);
@@ -342,15 +343,15 @@ ResDataRow::ResDataRow(ResourceData *data)
   :	fResData(data)
 {
 	if (data) {
-		SetField(new BStringField(fResData->GetIDString()),0);
-		SetField(new TypeCodeField(fResData->GetType(),fResData),1);
-		SetField(new BStringField(fResData->GetName()),2);
+		SetField(new BStringField(fResData->GetIDString()), 0);
+		SetField(new TypeCodeField(fResData->GetType(), fResData), 1);
+		SetField(new BStringField(fResData->GetName()), 2);
 		BField *field = gResRoster.MakeFieldForType(fResData->GetType(),
 													fResData->GetData(),
 													fResData->GetLength());
 		if (field)
-			SetField(field,3);
-		SetField(new BSizeField(fResData->GetLength()),4);
+			SetField(field, 3);
+		SetField(new BSizeField(fResData->GetLength()), 4);
 	}
 }
 	

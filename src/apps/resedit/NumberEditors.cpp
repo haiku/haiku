@@ -7,9 +7,11 @@
  */
 #include "InternalEditors.h"
 #include "ResourceData.h"
-#include <Messenger.h>
+
 #include <Message.h>
+#include <Messenger.h>
 #include <String.h>
+
 #include <stdlib.h>
 
 DoubleEditor::DoubleEditor(const BRect &frame, ResourceData *data,
@@ -40,10 +42,10 @@ DoubleEditor::MessageReceived(BMessage *msg)
 		}
 		
 		GetData()->SetName(fView->GetName());
-		GetData()->SetData(fView->GetValue(),strlen(fView->GetValue()));
+		GetData()->SetData(fView->GetValue(), strlen(fView->GetValue()));
 		
 		BMessage updatemsg(M_UPDATE_RESOURCE);
-		updatemsg.AddPointer("item",GetData());
+		updatemsg.AddPointer("item", GetData());
 		BMessenger msgr(GetOwner());
 		msgr.SendMessage(&updatemsg);
 		PostMessage(B_QUIT_REQUESTED);

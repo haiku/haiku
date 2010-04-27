@@ -8,10 +8,10 @@
 #ifndef RESOURCE_DATA_H
 #define RESOURCE_DATA_H
 
-#include <Resources.h>
-#include <String.h>
-#include <Node.h>
 #include <fs_attr.h>
+#include <Resources.h>
+#include <Node.h>
+#include <String.h>
 
 class ResourceData
 {

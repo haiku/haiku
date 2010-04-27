@@ -6,15 +6,16 @@
  *		DarkWyrm <darkwyrm@gmail.com>
  */
 #include "ResWindow.h"
-#include "ResView.h"
+
 #include "App.h"
+#include "ResView.h"
 
 static int32 sWindowCount = 0;
 
 ResWindow::ResWindow(const BRect &rect, const entry_ref *ref)
- :	BWindow(rect,"", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+ :	BWindow(rect, "", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
-	atomic_add(&sWindowCount,1);
+	atomic_add(&sWindowCount, 1);
 	
 	ResView *child = new ResView(Bounds(), "resview", B_FOLLOW_ALL,
 								B_WILL_DRAW, ref);
@@ -34,11 +35,10 @@ ResWindow::~ResWindow(void)
 bool
 ResWindow::QuitRequested(void)
 {
-	atomic_add(&sWindowCount,-1);
+	atomic_add(&sWindowCount, -1);
 	
 	if (sWindowCount == 0)
 		be_app->PostMessage(B_QUIT_REQUESTED);
-	//	be_app->PostMessage(M_UNREGISTER_WINDOW);
 	return true;
 }
 

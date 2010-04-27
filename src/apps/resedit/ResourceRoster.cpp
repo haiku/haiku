@@ -6,17 +6,18 @@
  *		DarkWyrm <darkwyrm@gmail.com>
  */
 #include "ResourceRoster.h"
-#include <Roster.h>
-#include <Entry.h>
-#include <Path.h>
-#include <image.h>
-#include <Application.h>
-#include <String.h>
-#include <Directory.h>
-#include <Bitmap.h>
 
-#include "ResourceData.h"
+#include <Application.h>
+#include <Bitmap.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <image.h>
+#include <Path.h>
+#include <Roster.h>
+#include <String.h>
+
 #include "InternalEditors.h"
+#include "ResourceData.h"
 #include "ResFields.h"
 
 // For the MakeFieldForType temp code
@@ -89,7 +90,7 @@ ResourceRoster::MakeFieldForType(const int32 &type, const char *data,
 		case B_TIFF_FORMAT:
 		case B_PNG_FORMAT:
 		case B_JPEG_FORMAT: {
-			BMemoryIO memio(data,length);
+			BMemoryIO memio(data, length);
 			BBitmap *bitmap = BTranslationUtils::GetBitmap(&memio);
 			if (bitmap) {
 				BitmapPreviewField *field = new BitmapPreviewField(bitmap);
@@ -127,13 +128,13 @@ ResourceRoster::LoadEditors(void)
 			continue;
 		
 		char *temp;
-		if (get_image_symbol(addon,"description",B_SYMBOL_TYPE_DATA,(void **)(&temp)) != B_OK) {
+		if (get_image_symbol(addon, "description", B_SYMBOL_TYPE_DATA, (void **)(&temp)) != B_OK) {
 			unload_add_on(addon);
 			continue;
 		}
 		
 		create_editor *createFunc;
-		if (get_image_symbol(addon,"instantiate_editor",B_SYMBOL_TYPE_TEXT,(void **)(&createFunc)) != B_OK) {
+		if (get_image_symbol(addon, "instantiate_editor", B_SYMBOL_TYPE_TEXT, (void **)(&createFunc)) != B_OK) {
 			delete temp;
 			unload_add_on(addon);
 			continue;
@@ -152,7 +153,7 @@ ResourceRoster::SpawnEditor(ResourceData *data, BHandler *handler)
 	// temporary code until editors are done
 	switch (data->GetType()) {
 		case B_MIME_STRING_TYPE: {
-			StringEditor *strEd = new StringEditor(BRect(100,100,400,200),
+			StringEditor *strEd = new StringEditor(BRect(100, 100, 400, 200),
 													data, handler);
 			strEd->Show();
 			break;
@@ -164,7 +165,7 @@ ResourceRoster::SpawnEditor(ResourceData *data, BHandler *handler)
 		case B_TIFF_FORMAT:
 		case B_PNG_FORMAT:
 		case B_JPEG_FORMAT: {
-			ImageEditor *imgEd = new ImageEditor(BRect(100,100,300,200),
+			ImageEditor *imgEd = new ImageEditor(BRect(100, 100, 300, 200),
 													data, handler);
 			imgEd->Show();
 			break;

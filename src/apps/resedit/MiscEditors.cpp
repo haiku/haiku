@@ -7,9 +7,11 @@
  */
 #include "InternalEditors.h"
 #include "ResourceData.h"
-#include <Messenger.h>
+
 #include <Message.h>
+#include <Messenger.h>
 #include <String.h>
+
 #include <stdlib.h>
 
 StringEditor::StringEditor(const BRect &frame, ResourceData *data,
@@ -44,10 +46,10 @@ StringEditor::MessageReceived(BMessage *msg)
 			GetData()->SetID(newid);
 		}
 		GetData()->SetName(fView->GetName());
-		GetData()->SetData(fView->GetValue(),strlen(fView->GetValue()));
+		GetData()->SetData(fView->GetValue(), strlen(fView->GetValue()));
 		
 		BMessage updatemsg(M_UPDATE_RESOURCE);
-		updatemsg.AddPointer("item",GetData());
+		updatemsg.AddPointer("item", GetData());
 		BMessenger msgr(GetOwner());
 		msgr.SendMessage(&updatemsg);
 		PostMessage(B_QUIT_REQUESTED);
@@ -85,28 +87,28 @@ StringEditView::StringEditView(const BRect &frame)
 	be_plain_font->GetHeight(&fh);
 	float strheight = fh.ascent + fh.descent + fh.leading + 5;
 	
-	fIDBox = new BTextControl(BRect(10,10,10 + (strwidth + labelwidth) + 15,
+	fIDBox = new BTextControl(BRect(10, 10, 10 + (strwidth + labelwidth) + 15,
 									10 + strheight),
-							  "id","ID: ","", NULL);
+							  "id", "ID: ", "", NULL);
 	fIDBox->SetDivider(labelwidth + 5);
 	AddChild(fIDBox);
 	
 	r = fIDBox->Frame();
 	r.OffsetBy(r.Width() + 10, 0);
 	r.right = Bounds().right - 10;
-	fNameBox = new BTextControl(r,"name","Name: ","", NULL,
+	fNameBox = new BTextControl(r, "name", "Name: ", "", NULL,
 								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fNameBox->SetDivider(be_plain_font->StringWidth("Name: ") + 5);
 	AddChild(fNameBox);
 	
-	r.OffsetBy(0,r.Height() + 10);
+	r.OffsetBy(0, r.Height() + 10);
 	r.left = 10;
-	fValueBox = new BTextControl(r,"value","Value: ","", NULL,
+	fValueBox = new BTextControl(r, "value", "Value: ", "", NULL,
 								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fValueBox->SetDivider(be_plain_font->StringWidth("Value: ") + 5);
 	AddChild(fValueBox);
 	
-	fOK = new BButton(BRect(10,10,11,11),"ok","Cancel",new BMessage(M_UPDATE_RESOURCE),
+	fOK = new BButton(BRect(10, 10, 11, 11), "ok", "Cancel", new BMessage(M_UPDATE_RESOURCE),
 					  B_FOLLOW_RIGHT);
 	fOK->ResizeToPreferred();
 	fOK->SetLabel("OK");
@@ -116,7 +118,7 @@ StringEditView::StringEditView(const BRect &frame)
 	fOK->MoveTo(r.right - fOK->Bounds().Width(), r.bottom + 10);
 	r = fOK->Frame();
 	r.OffsetBy(-r.Width() - 10, 0);
-	fCancel = new BButton(r,"cancel","Cancel",new BMessage(B_QUIT_REQUESTED),
+	fCancel = new BButton(r, "cancel", "Cancel", new BMessage(B_QUIT_REQUESTED),
 					  B_FOLLOW_RIGHT);
 	AddChild(fCancel);
 }

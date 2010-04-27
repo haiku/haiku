@@ -7,6 +7,7 @@
  */
 #include "PreviewColumn.h"
 #include "ResFields.h"
+
 #include <stdio.h>
 
 PreviewColumn::PreviewColumn(const char *title, float width,
@@ -19,7 +20,7 @@ void
 PreviewColumn::DrawField(BField* field, BRect rect, BView* parent)
 {
 	PreviewField *pField = (PreviewField*)field;
-	pField->DrawField(rect,parent);
+	pField->DrawField(rect, parent);
 }
 
 bool

@@ -8,9 +8,9 @@
 #ifndef INLINE_EDITOR
 #define INLINE_EDITOR
 
-#include <Window.h>
-#include <TextControl.h>
 #include <Messenger.h>
+#include <TextControl.h>
+#include <Window.h>
 
 #define M_INLINE_TEXT 'intx'
 

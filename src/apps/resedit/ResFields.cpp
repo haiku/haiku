@@ -7,6 +7,7 @@
  */
 #include "ResFields.h"
 #include "ResourceData.h"
+
 #include <DataIO.h>
 #include <TranslationUtils.h>
 
@@ -77,7 +78,7 @@ BitmapPreviewField::DrawField(BRect rect, BView *parent)
 void
 BitmapPreviewField::SetData(char *data, const size_t &length)
 {
-	BMemoryIO memio(data,length);
+	BMemoryIO memio(data, length);
 	fBitmap = BTranslationUtils::GetBitmap(&memio);
 }
 

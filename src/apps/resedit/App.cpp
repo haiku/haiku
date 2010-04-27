@@ -7,6 +7,7 @@
  */
 #include "App.h"
 #include "ResWindow.h"
+
 #include <Entry.h>
 
 int
