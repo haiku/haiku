@@ -169,6 +169,5 @@ HVIFTranslator::DerivedTranslate(BPositionIO *inSource,
 BView *
 HVIFTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new HVIFView(BRect(0, 0, 250, 150), "HVIFTranslator Settings",
-		B_FOLLOW_ALL, B_WILL_DRAW, settings);
+	return new HVIFView("HVIFTranslator Settings", B_WILL_DRAW, settings);
 }
