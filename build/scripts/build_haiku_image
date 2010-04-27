@@ -46,7 +46,7 @@ if [ ! $isCD ]; then
 	if readlink -f "$imagePath" > /dev/null 2>&1 ; then
 		normalizedImagePath=$(readlink -f "$imagePath")
 	elif realpath "$imagePath" > /dev/null 2>&1 ; then
-		normalizedImagePath=$(realpath "$imagePath")		
+		normalizedImagePath=$(realpath "$imagePath")
 	elif greadlink -f "$imagePath" > /dev/null 2>&1 ; then
 		normalizedImagePath=$(greadlink -f "$imagePath")
 	fi
@@ -152,7 +152,7 @@ createSymlinksForHybrid()
 	else
 		gccAltDir=gcc2
 	fi
-	
+
 	# Iterate over the library file paths that were passed in.
 	for srcPathLib in $@; do
 		# determine the relative path of the library
@@ -195,7 +195,7 @@ if [ $isCD ]; then
 	# setup output dir
 	$rmAttrs -rf "$outputDir"
 	mkdir -p "$outputDir"
-fi 
+fi
 
 # create the image and mount it
 if [ $isImage ]; then
