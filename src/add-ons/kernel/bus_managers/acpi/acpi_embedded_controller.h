@@ -55,17 +55,17 @@ extern "C" {
 
 #define ACPI_REGION_DEACTIVATE  1
 
-#define ACPI_READ                       0
-#define ACPI_WRITE                      1
+#define ACPI_READ						0
+#define ACPI_WRITE						1
 
-typedef uint8                           EC_COMMAND;
+typedef uint8							EC_COMMAND;
 
-#define EC_COMMAND_UNKNOWN              ((EC_COMMAND) 0x00)
-#define EC_COMMAND_READ                 ((EC_COMMAND) 0x80)
-#define EC_COMMAND_WRITE                ((EC_COMMAND) 0x81)
-#define EC_COMMAND_BURST_ENABLE         ((EC_COMMAND) 0x82)
-#define EC_COMMAND_BURST_DISABLE        ((EC_COMMAND) 0x83)
-#define EC_COMMAND_QUERY                ((EC_COMMAND) 0x84)
+#define EC_COMMAND_UNKNOWN				((EC_COMMAND) 0x00)
+#define EC_COMMAND_READ					((EC_COMMAND) 0x80)
+#define EC_COMMAND_WRITE				((EC_COMMAND) 0x81)
+#define EC_COMMAND_BURST_ENABLE			((EC_COMMAND) 0x82)
+#define EC_COMMAND_BURST_DISABLE		((EC_COMMAND) 0x83)
+#define EC_COMMAND_QUERY				((EC_COMMAND) 0x84)
 
 /*
  * EC_STATUS:
@@ -88,48 +88,48 @@ typedef uint8                           EC_COMMAND;
  *
  */
 
-typedef uint8                           EC_STATUS;
+typedef uint8							EC_STATUS;
 
-#define EC_FLAG_OUTPUT_BUFFER           ((EC_STATUS) 0x01)
-#define EC_FLAG_INPUT_BUFFER            ((EC_STATUS) 0x02)
-#define EC_FLAG_DATA_IS_CMD             ((EC_STATUS) 0x08)
-#define EC_FLAG_BURST_MODE              ((EC_STATUS) 0x10)
+#define EC_FLAG_OUTPUT_BUFFER			((EC_STATUS) 0x01)
+#define EC_FLAG_INPUT_BUFFER			((EC_STATUS) 0x02)
+#define EC_FLAG_DATA_IS_CMD				((EC_STATUS) 0x08)
+#define EC_FLAG_BURST_MODE				((EC_STATUS) 0x10)
 
 /*
  * EC_EVENT:
  * ---------
  */
-typedef uint8                           EC_EVENT;
+typedef uint8							EC_EVENT;
 
-#define EC_EVENT_UNKNOWN                ((EC_EVENT) 0x00)
-#define EC_EVENT_OUTPUT_BUFFER_FULL     ((EC_EVENT) 0x01)
-#define EC_EVENT_INPUT_BUFFER_EMPTY     ((EC_EVENT) 0x02)
-#define EC_EVENT_SCI                    ((EC_EVENT) 0x20)
-#define EC_EVENT_SMI                    ((EC_EVENT) 0x40)
+#define EC_EVENT_UNKNOWN				((EC_EVENT) 0x00)
+#define EC_EVENT_OUTPUT_BUFFER_FULL		((EC_EVENT) 0x01)
+#define EC_EVENT_INPUT_BUFFER_EMPTY		((EC_EVENT) 0x02)
+#define EC_EVENT_SCI					((EC_EVENT) 0x20)
+#define EC_EVENT_SMI					((EC_EVENT) 0x40)
 
 /* Data byte returned after burst enable indicating it was successful. */
-#define EC_BURST_ACK                    0x90
+#define EC_BURST_ACK					0x90
 
 
 /*
  * Register access primitives
  */
-#define EC_GET_DATA(sc)                                                 \
-        bus_space_read_1((sc)->ec_data_pci_address)
+#define EC_GET_DATA(sc) \
+		bus_space_read_1((sc)->ec_data_pci_address)
 
-#define EC_SET_DATA(sc, v)                                              \
-        bus_space_write_1((sc)->ec_data_pci_address, (v))
+#define EC_SET_DATA(sc, v) \
+		bus_space_write_1((sc)->ec_data_pci_address, (v))
 
-#define EC_GET_CSR(sc)                                                  \
-        bus_space_read_1((sc)->ec_csr_pci_address)
+#define EC_GET_CSR(sc) \
+		bus_space_read_1((sc)->ec_csr_pci_address)
 
-#define EC_SET_CSR(sc, v)                                               \
-        bus_space_write_1((sc)->ec_csr_pci_address, (v))
+#define EC_SET_CSR(sc, v) \
+		bus_space_write_1((sc)->ec_csr_pci_address, (v))
 
 
-#define ACPI_PKG_VALID(pkg, size)                               \
-    ((pkg) != NULL && (pkg)->object_type == ACPI_TYPE_PACKAGE &&       \
-    (pkg)->data.package.count >= (size))
+#define ACPI_PKG_VALID(pkg, size) \
+		((pkg) != NULL && (pkg)->object_type == ACPI_TYPE_PACKAGE && \
+		(pkg)->data.package.count >= (size))
 
 int32 acpi_get_type(device_node* dev);
 
@@ -137,25 +137,25 @@ int32 acpi_get_type(device_node* dev);
  * Driver cookie.
  */
 struct acpi_ec_cookie {
-    device_node*        		ec_dev;
-    acpi_module_info*			ec_acpi_module;
-    acpi_device_module_info* 	ec_acpi;
-    acpi_device					ec_handle;
-    int							ec_uid;
-    acpi_handle         		ec_gpehandle;
-    uint8               		ec_gpebit;
+	device_node*				ec_dev;
+	acpi_module_info*			ec_acpi_module;
+	acpi_device_module_info* 	ec_acpi;
+	acpi_device					ec_handle;
+	int							ec_uid;
+	acpi_handle					ec_gpehandle;
+	uint8						ec_gpebit;
 
 	int							ec_data_pci_address; 
- 	int							ec_csr_pci_address;
+	int							ec_csr_pci_address;
 
-    int                 		ec_glk;
-    uint32						ec_glkhandle;
-    mutex						ec_lock;
-    int                 		ec_burstactive;
-    int                 		ec_sci_pending;
-    vint32						ec_gencount;
-    ConditionVariable			ec_condition_var;
-    int							ec_suspending;
+	int							ec_glk;
+	uint32						ec_glkhandle;
+	mutex						ec_lock;
+	int							ec_burstactive;
+	int							ec_sci_pending;
+	vint32						ec_gencount;
+	ConditionVariable			ec_condition_var;
+	int							ec_suspending;
 };
 
 
@@ -168,66 +168,64 @@ struct acpi_ec_cookie {
 #define EC_LOCK_TIMEOUT 1000
 
 /* Default delay in microseconds between each run of the status polling loop. */
-#define EC_POLL_DELAY   5
+#define EC_POLL_DELAY	5
 
 /* Total time in ms spent waiting for a response from EC. */
-#define EC_TIMEOUT      750
+#define EC_TIMEOUT		750
 
-#define EVENT_READY(event, status)                      \
-        (((event) == EC_EVENT_OUTPUT_BUFFER_FULL &&     \
-         ((status) & EC_FLAG_OUTPUT_BUFFER) != 0) ||    \
-         ((event) == EC_EVENT_INPUT_BUFFER_EMPTY &&     \
-         ((status) & EC_FLAG_INPUT_BUFFER) == 0))
+#define EVENT_READY(event, status) \
+		(((event) == EC_EVENT_OUTPUT_BUFFER_FULL && \
+		((status) & EC_FLAG_OUTPUT_BUFFER) != 0) || \
+		((event) == EC_EVENT_INPUT_BUFFER_EMPTY && \
+		((status) & EC_FLAG_INPUT_BUFFER) == 0))
 
 
-static int      ec_burst_mode = 1;
-static int      ec_polled_mode = 0;
 
-static int      ec_timeout = EC_TIMEOUT;
+static int		ec_burst_mode = 1;
+static int		ec_polled_mode = 0;
+
+static int		ec_timeout = EC_TIMEOUT;
 
 static status_t
 EcLock(struct acpi_ec_cookie *sc)
 {
-    status_t status;
-
-
-    /* If _GLK is non-zero, acquire the global lock. */
-    status = B_OK;
-    if (sc->ec_glk) {
-        status = sc->ec_acpi_module->acquire_global_lock(EC_LOCK_TIMEOUT,
-        	&sc->ec_glkhandle);
-        if (status != B_OK)
-            return status;
-    }
+	/* If _GLK is non-zero, acquire the global lock. */
+	status_t status = B_OK;
+	if (sc->ec_glk) {
+		status = sc->ec_acpi_module->acquire_global_lock(EC_LOCK_TIMEOUT,
+			&sc->ec_glkhandle);
+		if (status != B_OK)
+			return status;
+	}
 	mutex_lock(&sc->ec_lock);
-   return status;
+	return status;
 }
 
 
 static void
 EcUnlock(struct acpi_ec_cookie *sc)
 {
-    mutex_unlock(&sc->ec_lock);    
-    if (sc->ec_glk)
-        sc->ec_acpi_module->release_global_lock(sc->ec_glkhandle);
+	mutex_unlock(&sc->ec_lock);    
+	if (sc->ec_glk)
+		sc->ec_acpi_module->release_global_lock(sc->ec_glkhandle);
 }
 
 
-static uint32	        EcGpeHandler(void *context);
+static uint32			EcGpeHandler(void *context);
 
 static acpi_status		EcSpaceSetup(acpi_handle region, uint32 function,
-                                void *context, void **return_Context);
+							void *context, void **return_Context);
 static acpi_status		EcSpaceHandler(uint32 function,
-                                acpi_physical_address address,
-                                uint32 width, int *value,
-                                void *context, void *regionContext);
+							acpi_physical_address address,
+							uint32 width, int *value,
+							void *context, void *regionContext);
 static acpi_status		EcWaitEvent(struct acpi_ec_cookie *sc, EC_EVENT event,
-                               	int32 gen_count);
+							int32 gen_count);
 static acpi_status		EcCommand(struct acpi_ec_cookie *sc, EC_COMMAND cmd);
 static acpi_status		EcRead(struct acpi_ec_cookie *sc, uint8 address,
-                                uint8 *readData);
+							uint8 *readData);
 static acpi_status		EcWrite(struct acpi_ec_cookie *sc, uint8 address,
-                                uint8 *writeData);
+							uint8 *writeData);
 
 
 #endif	// ACPI_EMBEDDED_CONTROLLER_H

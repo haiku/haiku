@@ -50,10 +50,7 @@
 // name of pnp generator of path ids
 #define ACPI_EC_PATHID_GENERATOR "embedded_controller/path_id"
 
-// cpu frequency in Hz
-int64 gHz;
-		
-		
+
 uint8
 bus_space_read_1(int address)
 {
@@ -259,12 +256,6 @@ static status_t
 embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 {
 	TRACE("init driver\n");
-	// first get the cpu speed, needed to calculate a timeout
-	// ToDo: catch frequency changes
-	system_info systemInfo;
-	if (get_system_info(&systemInfo) != B_OK)
-		return B_ERROR;
-	gHz = systemInfo.cpu_clock_speed;
 
 	acpi_ec_cookie* sc;
 	sc = (acpi_ec_cookie*) malloc(sizeof(acpi_ec_cookie));
@@ -689,7 +680,7 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 gen_count)
 
 	// int need_poll = cold || rebooting || ec_polled_mode || sc->ec_suspending;
 	int need_poll = ec_polled_mode || sc->ec_suspending;
-    
+
 	/*
 	 * The main CPU should be much faster than the EC.  So the status should
 	 * be "not ready" when we start waiting.  But if the main CPU is really
@@ -716,26 +707,17 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 gen_count)
 
 	/* Wait for event by polling or GPE (interrupt). */
 	if (need_poll) {
-		count = ec_timeout / EC_POLL_DELAY;
+		count = (ec_timeout * 1000) / EC_POLL_DELAY;
 		if (count == 0)
 			count = 1;
 		for (i = 0; i < count; i++) {
 			status = EcCheckStatus(sc, "poll", event);
-			if (status == B_OK)
+			if (status == AE_OK)
 				break;
 			spin(EC_POLL_DELAY);
 		}
 	} else {
-		bigtime_t slp_ival = gHz / 1000000;
-		if (slp_ival != 0) {
-			count = ec_timeout;
-		} else {
-			/* hz has less than 1 ms resolution so scale timeout. */
-			slp_ival = 1;
-			count = ec_timeout / (1000 / gHz);
-		}
-
-		count = ec_timeout;
+		bigtime_t slp_ival = system_time() + ec_timeout * 1000;
 
 		/*
 		 * Wait for the GPE to signal the status changed, checking the
@@ -743,7 +725,8 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 gen_count)
 		 * GPE for an event we're not interested in here (i.e., SCI for
 		 * EC query).
 		 */
-		for (i = 0; i < count; i++) {
+		status_t waitStatus = B_NO_ERROR;
+		while (waitStatus != B_TIMED_OUT) {
 			if (gen_count != sc->ec_gencount) {
 				/*
 				 * Record new generation count.  It's possible the GPE was
@@ -756,7 +739,8 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 gen_count)
 				if (status == AE_OK)
 					break;
 			}
-			sc->ec_condition_var.Wait(B_RELATIVE_TIMEOUT, slp_ival);
+			waitStatus = sc->ec_condition_var.Wait(B_ABSOLUTE_TIMEOUT,
+				slp_ival);
 		}
 
 		/*
@@ -768,7 +752,7 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 gen_count)
 		if (status != AE_OK) {
 			status = EcCheckStatus(sc, "sleep_end", event);
 			TRACE("wait timed out (%sresponse), forcing polled mode\n",
-				status == B_OK ? "" : "no ");
+				status == AE_OK ? "" : "no ");
 			ec_polled_mode = TRUE;
 		}
 	}
