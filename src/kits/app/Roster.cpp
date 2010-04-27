@@ -843,21 +843,26 @@ BRoster::GetActiveAppInfo(app_info* info) const
 /*!	\brief Finds an application associated with a MIME type.
 
 	The method gets the signature of the supplied type's preferred application
-	and the signatures of all other applications supporting the MIME type
-	directly. Additionally, the preferred application signature and all
-	supporting applications for the supertype are retrieved.
-	Then the MIME database is asked which executable is associated with the
-	signatures in the resulting list. If the database doesn't have a reference
-	to an exectuable, the boot volume is queried for a file with the signature.
-	If more than one file has been found, the one with the greatest version is
-	picked, or if no file has a version info, the one with the most recent
-	modification date. The first application from the signature list which can
-	be successfully resolved by this algorithm is returned. Contrary to BeOS
-	behavior, this means that if the preferred application of the provided MIME
-	type cannot be resolved, or if it does not have a preferred application
-	associated, the method will return other applications with direct support
-	for the MIME type before it resorts to the preferred application or
-	supporting applications of the super type.
+	and the signature of the super type's preferred application. It will also
+	get all supporting applications for the type and super type and build a
+	list of candiate handlers. In the case that a preferred handler is
+	configured for the sub-type, other supporting apps will be inserted in the
+	candidate list before the super-type preferred and supporting handlers,
+	since it is assumed that the super type handlers are not well suited for
+	the sub-type. The following resolving algorithm is performed on each
+	signature of the resulting list:
+	The MIME database is asked which executable is associated with the
+	signature. If the database doesn't have a reference to an exectuable, the
+	boot volume is queried for a file with the signature. If more than one file
+	has been found, the one with the greatest version is picked, or if no file
+	has a version info, the one with the most recent modification date. The
+	first application from the signature list which can be successfully
+	resolved by this algorithm is returned. Contrary to BeOS behavior, this
+	means that if the preferred application of the provided MIME type cannot
+	be resolved, or if it does not have a preferred application associated,
+	the method will return other applications with direct support for the MIME
+	type before it resorts to the preferred application or supporting
+	applications of the super type.
 
 	\param mimeType The MIME type for which an application shall be found.
 	\param app A pointer to a pre-allocated entry_ref to be filled with
@@ -2609,8 +2614,20 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 	// applications for the sub and the super type respectively.
 	const char* kSigField = "applications";
 	BMessage signatures;
-	if (error == B_OK && primarySignature[0] != '\0')
-		error = signatures.AddString(kSigField, primarySignature);
+	if (error == B_OK) {
+		if (primarySignature[0] != '\0')
+			error = signatures.AddString(kSigField, primarySignature);
+		else {
+			// If there is a preferred app configured for the super type,
+			// but no preferred type for the sub-type, add the preferred
+			// super type handler in front of any other handlers. This way
+			// we fall-back to non-preferred but supporting apps only in the
+			// case when there is a preferred handler for the sub-type but
+			// it cannot be resolved (misconfiguration).
+			if (secondarySignature[0] != '\0')
+				error = signatures.AddString(kSigField, secondarySignature);
+		}
+	}
 
 	BMessage supportingSignatures;
 	if (error == B_OK
@@ -2628,9 +2645,13 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 				error = signatures.AddString(kSigField, supportingType);
 		}
 		// Add the preferred type of the super type here before adding
-		// the other types supporting the super type.
-		if (error == B_OK && secondarySignature[0] != '\0')
+		// the other types supporting the super type, but only if we have
+		// not already added it in case there was no preferred app for the
+		// sub-type configured.
+		if (error == B_OK && primarySignature[0] != '\0'
+			&& secondarySignature[0] != '\0') {
 			error = signatures.AddString(kSigField, secondarySignature);
+		}
 		// Add all signatures with support for the super-type
 		for (int32 i = subCount; error == B_OK
 				&& supportingSignatures.FindString(kSigField, i,
@@ -2641,7 +2662,7 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 		}
 	} else {
 		// Failed to get supporting apps, just add the preferred apps.
-		if (error == B_OK)
+		if (error == B_OK && secondarySignature[0] != '\0')
 			error = signatures.AddString(kSigField, secondarySignature);
 	}
 
