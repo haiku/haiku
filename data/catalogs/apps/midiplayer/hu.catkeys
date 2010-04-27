@@ -1,19 +1,19 @@
 1	hungarian	x-vnd.Haiku-MidiPlayer	1406887279
 None	Main Window		Semmi
 Live input:	Main Window		Élő bemenet:
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI-lejátszó 1.0.0 beta\n\nEz a kis program\nLe tud játszani sok-sok\nVacak muzsikát
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI-lejátszó 1.0.0 beta\n\nApró kis program\nGyatrán hangzó dalokat\nJátszik le ezret
 Stop	Main Window		Megállít
 Cavern	Main Window		Barlang
 Volume:	Main Window		Hangerő:
 Reverb:	Main Window		Visszhang:
-OK	Main Window		OK
+OK	Main Window		Rendben
 MidiPlayer	Main Window		MIDI-lejátszó
-Off	Main Window		Ki
+Off	Main Window		Nincs
 Dungeon	Main Window		Cella
 Play	Main Window		Lejátszás
 Garage	Main Window		Garázs
 Closet	Main Window		Szekrény
 Drop MIDI file here	Scope View		Húzzon ide egy MIDI-fájlt!
 Igor's lab	Main Window		Igor laboratóriuma
-Scope	Main Window		Cső
-Could not load song	Main Window		Nem lehetett betölteni a számot
+Scope	Main Window		Oszcilloszkóp
+Could not load song	Main Window		Nem lehetett betölteni a számot!

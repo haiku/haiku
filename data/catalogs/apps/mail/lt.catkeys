@@ -1,7 +1,7 @@
 1	lithuanian	x-vnd.Be-MAIL	3640755640
 View	Mail		Roda
 %d - Date	Mail		%d - data
-Attach attributes:	Mail		Pridėti bylų atributus:
+Attach attributes:	Mail		Pridėti bylų požymius:
 Inconsistency occurred in the undo/redo buffer.	Mail		Nesutapimas buferyje atšaukti/grąžinti.
 An error occurred trying to save the attachment.	Mail		Klaida išsaugant priedėlį.
 Copy to new	Mail		Kopijuoti į naujus
@@ -26,9 +26,9 @@ There is no installed handler for URL links.	Mail		Nėra priemonės tvarkytis su
 Signature	Mail		Prierašas
 Find again	Mail		Rasti dar
 Bcc:	Mail		Slapukas:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Pagrindiniame tekste yra nekoduojamas simbolis %ld. Gali būti, kad kitokia koduotė geriau tiktų? Spauskite „Siųsti“, kad visvien išsiųstumėte (nekoduojami simboliai bus pakeisti kuoduojamais), arba spauskite „Atsisakyti“ ir bandykite taisyti laiško tekstą.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Pagrindiniame tekste yra nekoduojamas simbolis %ld. Gali būti, kad kitokia koduotė geriau tiktų? Spauskite „Siųsti“, kad vis vien išsiųstumėte (nekoduojami simboliai bus pakeisti kuoduojamais), arba spauskite „Atsisakyti“ ir bandykite taisyti laiško tekstą.
 Signature:	Mail		Prierašas:
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail (Paštas)\n\nParašyta Robert'o Polic'o.\nTobulinta Dr. Zoidberg'o grupės.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Paštas (Mail)\n\nParašyta Robert'o Polic'o.\nTobulinta Dr. Zoidberg'o grupės.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		Išsaugoti šio prierašo keitimus?
 Cc:	Mail		Kopija:
 Find	Mail		Rasti
@@ -36,11 +36,11 @@ Preferences…	Mail		Parinktys…
 Undo	Mail		Atšaukti
 Leave as New	Mail		Palikti kaip naują
 An error occurred trying to open this signature.	Mail		Klaida atidarant šį prierašą.
-No file attributes, just plain data	Mail		Be bylos atributų, tiesiog tekstas
+No file attributes, just plain data	Mail		Be bylos požymių, tiesiog tekstas
 Edit queries…	Mail		Taisyti užklausas…
 Paste	Mail		Įdėti
 Save attachment…	Mail		Išsaugoti priedėlį…
-Include file attributes in attachments	Mail		Įtraukti priedėlin bylos atributus
+Include file attributes in attachments	Mail		Įtraukti priedėlin bylos požymius
 OK	Mail		Gerai
 Send	Mail		Siųsti
 Show icons only	Mail		Rodyti tik ženkliukus
@@ -54,7 +54,7 @@ Print…	Mail		Spausdinti…
 Warn unencodable:	Mail		Įspėti apie neiškodavimus:
 Quit	Mail		Baigti
 %n - Full name	Mail		%n – Pilnas pavadinimas
- Read 	Mail		 skaityta 
+ Read 	Mail		Skaityta 
 Trash	Mail		Šiukšlinė
 Default account:	Mail		Numatytoji paskyra:
 Size:	Mail		Dydis:
@@ -103,7 +103,7 @@ Decoding:	Mail		Dekodavimas:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Nerandama priemonės bylų „Person“ tipui.
 Do you wish to send this message before closing?	Mail		Norite išsiųsti šį laišką prieš uždarymą?
 Delete	Mail		Šalinti
-Leave as '%s'	Mail		Palikti kaip '%s'
+Leave as '%s'	Mail		Palikti kaip „%s“
 Copy	Mail		Kopija
 Mail couldn't find its dictionary.	Mail		Nerandamas laiško žodynėlis
 Reply preamble:	Mail		Atsakyti įžanga:

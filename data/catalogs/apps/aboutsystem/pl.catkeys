@@ -1,61 +1,27 @@
-1	polish	x-vnd.Haiku-About	620382499
+1	polish	x-vnd.Haiku-About	2941736986
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i jego kernela NewOS)\n
 %ld Processors:	AboutView		Liczba procesorów %ld:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundatora projektu)\n\n
 The Haiku-Ports team\n	AboutView		Zespółu Haiku-Ports\n
 Website, marketing & documentation:\n	AboutView		Strona WWW, marketing i dokumentacja:\n
-%s%lld hour	AboutView		%s%lld godz.
-... and the many community members making donations!\n\n	AboutView		… i wielu innych członków społeczności robiących dotację!\n\n
-\nPolish\n\n	AboutView		\nPolski\n\n
-\nJapanese\n\n	AboutView		\nJapoński\n\n
-\nFinnish\n\n	AboutView		\nFiński\n\n
 Revision	AboutView		Rewizja
-\nDutch\n\n	AboutView		\nHoldenderski\n\n
 Source Code: 	AboutView		Kod źródłowy: 
 Processor:	AboutView		Procesor:
 Kernel:	AboutView		Kernel:
-%lld day	AboutView		%lld dni
-\nHungarian\n\n	AboutView		\nWęgierski\n\n
-\nGerman\n\n	AboutView		\nNiemiecki\n\n
 Contributors:\n	AboutView		Współpracownicy:\n
 Unknown	AboutView		Nieznany
-\nBulgarian\n\n	AboutView		\nBułgarski\n\n
-\nPortuguese\n\n	AboutView		\nPortugalski\n\n
-%s%lld minute	AboutView		%s%lld min.
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… i prawdopodobnie paru innych, o których zapomnieliśmy wspomnieć (przepraszamy!)\n\n
 %.2f GHz	AboutView		%.2f GHz
-The BeGeistert team\n\n	AboutView		Zespółu BeGeistert\n\n
-%s%lld minutes	AboutView		%s%lld min.
 Memory:	AboutView		Pamięć:
-%s%lld second	AboutView		%s%lld sek.
 Past maintainers:\n	AboutView		Wcześniejsi współpracownicy:\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Kod źródłowy unikalny dla Haiku, szczególnie jądra systemu i aplikacji z nim rozprowadzanych, dystrybuowany jest pod warunkami 
 \n\nSpecial thanks to:\n	AboutView		\n\nSpecjalne podziękowania dla:\n
-Copyright	Utilities		Prawa autorskie
 Licenses: 	AboutView		Licencje: 
 . Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Niektóre  biblioteki systemowe zawieraja oprogramowanie objęte licencją LGPL. Prawa autorskie do nich można znaleźć poniżej.\n\n
-%s%lld seconds	AboutView		%s%lld sek.
-License	Utilities		Licencja
 \nCopyrights\n\n	AboutView		\nPrawa autorskie\n\n
-\nUkrainian\n\n	AboutView		\nUkraiński\n\n
-\nLituanian\n\n	AboutView		\nLitewski\n\n
 Current maintainers:\n	AboutView		Obecni wspołpracownicy:\n
 Time running:	AboutView		Czas działania:
 MIT license	AboutView		licencji MIT
-%s%lld hours	AboutView		%s%lld godz.
-%lld days	AboutView		%lld dni
 The Haikuware team and their bounty program\n	AboutView		Zespółu Haikuware i ich program bounty\n
 About this system	AboutWindow		O systemie
 Version:	AboutView		Wersja:
-\nRussian\n\n	AboutView		\nRosyjski\n\n
-\nItalian\n\n	AboutView		\nWłoski\n\n
-SourceURL	Utilities		Adres źródłowy
-\nFrench\n\n	AboutView		\nFrancuski\n\n
-\nEsperanto\n\n	AboutView		\nEsperanto\n\n
-\nSwedish\n\n	AboutView		\nSzwedzki\n\n
-%ld MHz	AboutView		%ld MHz
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Prawa autorskie kodu źródłowego Haiku są własnością Haiku, Inc. lub autorów wymienionych w kodzie źródłowym..\n\n
-[Click a license name to read the respective license.]\n\n	AboutView		[Kliknij nazwę licencji, aby ją przeczytać.]\n\n
-%d MB total, %d MB used (%d%%)	AboutView		%d MB łącznie, %d MB użyte (%d%%)
-License: 	AboutView		Licencja: 
-Translations:\n	AboutView		Tłumaczenia na język:\n

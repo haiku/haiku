@@ -1,22 +1,22 @@
 1	esperanto	x-vnd.Haiku-Mouse	104106491
-Click to activate	SettingsView		Klaki pro aktivigi
+Click to activate	SettingsView		Aktivigi per klako
 Mouse type:	SettingsView		Mustipo:
 Warp	SettingsView		Teleporti
 2-Button	SettingsView		Dubutona
-Double-click test area	SettingsView		Duobla klaka provejo
+Double-click test area	SettingsView		Testospaco de duobla klako
 Revert	MouseWindow		Malfari
 ...by Andrew Edward McCall	MouseApplication		...per Andrew Edward McCall
 Mouse acceleration	SettingsView		Musa akcelo
-Click to focus	SettingsView		Klaki pro enfokusigi
+Click to focus	SettingsView		Klaki por fokusigi
 3-Button	SettingsView		Tributona
 Mouse speed	SettingsView		Musa rapideco
-Focus mode:	SettingsView		Aktivigada metodo:
-Instant warp	SettingsView		Tuja teleportado
-Dig Deal	MouseApplication		Dig Deal
+Focus mode:	SettingsView		Aktivigada reĝimo:
+Instant warp	SettingsView		Teleporti tuj
+Dig Deal	MouseApplication		Ĉu tio gravas?
 1-Button	SettingsView		Unubutona
-Double-click speed	SettingsView		Duobla klaka rapideco
+Double-click speed	SettingsView		Rapideco de duobla klako
 Defaults	MouseWindow		Aprioraj
-Focus follows mouse	SettingsView		Fokuso sekvas muson
+Focus follows mouse	SettingsView		Musosekvanta fokuso
 Accept first click	SettingsView		Akceptu unuan klakon
 Fast	SettingsView		Rapida
 Normal	SettingsView		Normala

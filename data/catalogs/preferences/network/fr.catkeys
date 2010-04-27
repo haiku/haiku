@@ -9,7 +9,7 @@ DNS #1:	EthernetSettingsView		DNS n°1 :
 IP address:	EthernetSettingsView		Adresse IP :
 Network	NetworkWindow		Réseau
 Adapter:	EthernetSettingsView		Adaptateur :
-Domain:	EthernetSettingsView		Domaine:
+Domain:	EthernetSettingsView		Domaine :
 Revert	EthernetSettingsView		Défaire
 Sending auto-config message failed: 	EthernetSettingsView		Échec d'envoi du message de configuration automatique :
 Mode:	EthernetSettingsView		Mode :

@@ -89,11 +89,7 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 			owner->FillRect(rect, B_SOLID_LOW);
 		}
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_RGBA32);
-#else
-		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_CMAP8);
-#endif
 		BMimeType mimeType(fType.String());
 		status_t status = icon_for_type(mimeType, bitmap, B_MINI_ICON);
 		if (status < B_OK) {
@@ -267,10 +263,9 @@ MimeTypeItem::CompareLabels(const BListItem* a, const BListItem* b)
 //	#pragma mark -
 
 
-MimeTypeListView::MimeTypeListView(BRect rect, const char* name,
-		const char* supertype, bool showIcons, bool applicationMode,
-		uint32 resizingMode)
-	: BOutlineListView(rect, name, B_SINGLE_SELECTION_LIST, resizingMode),
+MimeTypeListView::MimeTypeListView(const char* name,
+		const char* supertype, bool showIcons, bool applicationMode)
+	: BOutlineListView(name, B_SINGLE_SELECTION_LIST),
 	fSupertype(supertype),
 	fShowIcons(showIcons),
 	fApplicationMode(applicationMode)
@@ -284,7 +279,8 @@ MimeTypeListView::~MimeTypeListView()
 
 
 void
-MimeTypeListView::_CollectSubtypes(const char* supertype, MimeTypeItem* supertypeItem)
+MimeTypeListView::_CollectSubtypes(const char* supertype,
+	MimeTypeItem* supertypeItem)
 {
 	BMessage types;
 	if (BMimeType::GetInstalledTypes(supertype, &types) != B_OK)
@@ -324,7 +320,8 @@ MimeTypeListView::_CollectTypes()
 
 		const char* supertype;
 		int32 index = 0;
-		while (superTypes.FindString("super_types", index++, &supertype) == B_OK) {
+		while (superTypes.FindString("super_types", index++, &supertype)
+			== B_OK) {
 			MimeTypeItem* supertypeItem = new MimeTypeItem(supertype);
 			AddItem(supertypeItem);
 
@@ -339,10 +336,7 @@ MimeTypeListView::_CollectTypes()
 void
 MimeTypeListView::_MakeTypesUnique(MimeTypeItem* underItem)
 {
-#ifndef __HAIKU__
-	if (fSupertype.Type() == NULL)
-#endif
-		SortItemsUnder(underItem, underItem != NULL, &MimeTypeItem::Compare);
+	SortItemsUnder(underItem, underItem != NULL, &MimeTypeItem::Compare);
 
 	bool lastItemSame = false;
 	MimeTypeItem* last = NULL;
@@ -494,18 +488,10 @@ MimeTypeListView::MessageReceived(BMessage* message)
 					BMessage addType(kMsgAddType);
 					addType.AddString("type", type);
 
-#ifdef __HAIKU__
-					if (BMessageRunner::StartSending(this, &addType, 200000ULL, 1) != B_OK)
-						_AddNewType(type);
-#else
-					// TODO: free runner again!
-					BMessageRunner* runner = new BMessageRunner(this, &addType,
-						200000ULL, 1);
-					if (runner->InitCheck() != B_OK) {
-						delete runner;
+					if (BMessageRunner::StartSending(this, &addType, 200000ULL,
+						1) != B_OK) {
 						_AddNewType(type);
 					}
-#endif
 					break;
 				}
 				case B_MIME_TYPE_DELETED:
@@ -520,8 +506,8 @@ MimeTypeListView::MessageReceived(BMessage* message)
 				}
 				case B_PREFERRED_APP_CHANGED:
 				{
-					// try to add or remove this type (changing the preferred app
-					// might change visibility in our list)
+					// try to add or remove this type (changing the preferred
+					// app might change visibility in our list)
 					_AddNewType(type);
 
 					// supposed to fall through

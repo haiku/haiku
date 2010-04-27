@@ -1,38 +1,38 @@
 1	german	x-vnd.Be-PSRV	2376709688
-Page setup	ConfigWindow		Seitenkonfiguration
-Print setup	ConfigWindow		Druckkonfiguration
-Select a printer	ConfigWindow		Druckerauswahl
-Printer:	ConfigWindow		Drucker:
-Paper setup:	ConfigWindow		Papierkonfiguration:
-Page setup:	ConfigWindow		Seitenkonfiguration:
-Cancel	ConfigWindow		Abbrechen
-OK	ConfigWindow		OK
-Undefined	ConfigWindow		Nicht definiert
-Portrait	ConfigWindow		Hochformat
-Landscape	ConfigWindow		Querformat
-Page	ConfigWindow		Seite
-to	ConfigWindow		bis
-All pages	ConfigWindow		Alle Seiten
-copies	ConfigWindow		Kopien
-Letter	ConfigWindow		Letter (US)
-Legal	ConfigWindow		Legal (US)
-Ledger	ConfigWindow		Ledger (US)
-Tabloid	ConfigWindow		Tabloid (US)
-A0	ConfigWindow		A0
-A1	ConfigWindow		A1
-A2	ConfigWindow		A2
-A3	ConfigWindow		A3
-A4	ConfigWindow		A4
-A5	ConfigWindow		A5
-A6	ConfigWindow		A6
-B5	ConfigWindow		B5
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Ein Drucker mit diesem Namen existiert bereits, dessen Treiber konnte jedoch nicht gefunden werden. Soll der Drucker ersetzt werden?
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Ein Drucker mit diesem Namen existiert bereits, ist jedoch nicht verwendbar! Soll der Drucker ersetzt werden?
-OK	PrintServerApp		OK
+Undefined	ConfigWindow		Undefiniert
+A5	ConfigWindow		DIN A5
 Cancel	PrintServerApp		Abbrechen
-There are no printers set up.	PrintServerApp		Es sind keine Drucker konfiguriert.
-There is no default printer set up.	PrintServerApp		Es ist kein standard Drucker definiert.
-Would you like to set one up now?	PrintServerApp		Möchten Sie jetzt einen Drucker konfigurieren?
-Would you like to make @ the default printer?	PrintServerApp		Möchten Sie @ als standard Drucker verwenden?
-No	PrintServerApp		Nein
+copies	ConfigWindow		Kopien
+Legal	ConfigWindow		US-Legal
+A2	ConfigWindow		DIN A2
+to	ConfigWindow		bis
+Page setup:	ConfigWindow		Seiteneinrichtung:
+OK	ConfigWindow		OK
+Cancel	ConfigWindow		Abbrechen
 Yes	PrintServerApp		Ja
+Would you like to set one up now?	PrintServerApp		Möchten Sie jetzt einen einrichten?
+Portrait	ConfigWindow		Portrait (hochkant)
+All pages	ConfigWindow		Alle Seiten
+There is no default printer set up.	PrintServerApp		Es ist kein bevorzugter Drucker eingerichtet.
+Tabloid	ConfigWindow		US Tabloid
+There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Es gibt bereits einen Drucker wie Sie ihn gerade anlegen, aber der passende Treiber konnte nicht gefunden werden. Ersetzen?
+A4	ConfigWindow		DIN A4
+Printer:	ConfigWindow		Drucker:
+Select a printer	ConfigWindow		Drucker wählen
+A1	ConfigWindow		DIN A1
+No	PrintServerApp		Nein
+B5	ConfigWindow		ISO B5
+Landscape	ConfigWindow		Landschaft (seitwärts)
+There are no printers set up.	PrintServerApp		Es sind keine Drucker eingerichtet.
+Page	ConfigWindow		Seite
+Ledger	ConfigWindow		US Ledger
+Letter	ConfigWindow		US Brief
+There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Es gibt bereits einen Drucker wie Sie ihn gerade anlegen, aber der funktioniert überhaupt nicht nicht! Ersetzen?
+A0	ConfigWindow		DIN A0
+A6	ConfigWindow		DIN A6
+A3	ConfigWindow		DIN A3
+OK	PrintServerApp		OK
+Print setup	ConfigWindow		Druckeinstellungen
+Would you like to make @ the default printer?	PrintServerApp		Möchten Sie @ zum bevorzugten Drucker machen?
+Page setup	ConfigWindow		Seite einrichten
+Paper setup:	ConfigWindow		Papierformat:

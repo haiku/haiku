@@ -11,9 +11,8 @@
 
 class DropTargetListView : public BListView {
 	public:
-		DropTargetListView(BRect frame, const char* name,
+		DropTargetListView(const char* name,
 			list_view_type type = B_SINGLE_SELECTION_LIST,
-			uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 		virtual ~DropTargetListView();
 

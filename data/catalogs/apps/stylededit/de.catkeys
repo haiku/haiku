@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	1909738892
+1	german	x-vnd.Haiku-StyledEdit	2750476595
 Paste	Menus		Einfügen
 OK	LoadAlert		OK
 File	Menus		Datei
@@ -15,6 +15,7 @@ Replace same	Menus		Erneut ersetzen
 Can't undo	Menus		Rückgängig nicht möglich
 Save	Menus		Speichern
 Replace with:	FindandReplaceWindow		Ersetzen durch:
+Cancel	SaveAlert		Abbrechen
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig nicht möglich, Datei nicht gefunden: "%s".
 Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
 Green	Menus		Grün
@@ -32,6 +33,7 @@ Font	Menus		Schriftart
 Replace all	FindandReplaceWindow		Alle ersetzen
 Default	Open_and_SaveAsPanel		Standard
 Cancel	FindandReplaceWindow		Abbrechen
+Save	SaveAlert		Speichern
 Close	Menus		Schließen
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fehler beim Laden von \"%s\":\n\tDateiformat nicht unterstützt
 OK	RevertToSavedAlert		OK
@@ -57,7 +59,9 @@ Find again	Menus		Weitersuchen
 Cancel	QuitAlert		Abbrechen
 Find…	Menus		Suchen…
 Select all	Menus		Alles markieren
+Don't save	SaveAlert		Nicht speichern
 Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von "%s":\n\t%s
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist schreibgeschützt. Änderungen am Dokument \"%s\" speichern? 
 Black	Menus		Schwarz
 Untitled 	StyledEditWindow		Unbenannt
 OK	SaveAlert		OK

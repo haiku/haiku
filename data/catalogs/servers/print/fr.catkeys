@@ -1,9 +1,9 @@
-1	french	x-vnd.Be-PSRV	2414355392
+1	french	x-vnd.Be-PSRV	2376709688
 Undefined	ConfigWindow		Indéfini
 A5	ConfigWindow		A5
 Cancel	PrintServerApp		Annuler
 copies	ConfigWindow		copies
-Legal	ConfigWindow		Legal
+Legal	ConfigWindow		Légal
 A2	ConfigWindow		A2
 to	ConfigWindow		vers
 Page setup:	ConfigWindow		Réglages de page :
@@ -15,7 +15,7 @@ Portrait	ConfigWindow		Portrait
 All pages	ConfigWindow		Toutes les pages
 There is no default printer set up.	PrintServerApp		Pas d'imprimante par défaut sélectionnée.
 Tabloid	ConfigWindow		Tabloid
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Il existe déjà une imprimante identique à celle que vous allez créer, sauf que son pilote n'a pas pu être trouvé! Remplacer cette imprimante ?
+There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Il existe déjà une imprimante identique à celle que vous allez créer, sauf que son pilote n'a pas pu être trouvé ! Remplacer cette imprimante ?
 A4	ConfigWindow		A4
 Printer:	ConfigWindow		Imprimante :
 Select a printer	ConfigWindow		Choisir une imprimante
@@ -25,13 +25,14 @@ B5	ConfigWindow		B5
 Landscape	ConfigWindow		Paysage
 There are no printers set up.	PrintServerApp		Aucune imprimante n'est installée.
 Page	ConfigWindow		Page
+Ledger	ConfigWindow		Ledger (11x17 pouces)
 Letter	ConfigWindow		Lettre
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Il existe déjà une imprimante identique à celle que vous allez créer, mais elle n'est pas utilisable! Remplacer cette imprimante?
+There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Il existe déjà une imprimante identique à celle que vous allez créer, mais elle n'est pas utilisable ! Remplacer cette imprimante ?
 A0	ConfigWindow		A0
 A6	ConfigWindow		A6
 A3	ConfigWindow		A3
 OK	PrintServerApp		OK
 Print setup	ConfigWindow		Réglages d'impression
-Would you like to make @ the default printer?	PrintServerApp		Voudriez-vous faire de @, l'imprimante par défaut?
+Would you like to make @ the default printer?	PrintServerApp		Voudriez-vous faire de @, l'imprimante par défaut ?
 Page setup	ConfigWindow		Réglages de la mise en page
 Paper setup:	ConfigWindow		Choix du papier :

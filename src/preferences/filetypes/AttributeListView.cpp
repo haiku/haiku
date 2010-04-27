@@ -71,7 +71,7 @@ name_for_type(BString& string, type_code type, const char* displayAs)
 	buffer[4] = 0xff & (type);
 	buffer[5] = '\'';
 	buffer[6] = 0;
-	for (int16 i = 0;i < 4;i++) {
+	for (int16 i = 0; i < 4; i++) {
 		if (buffer[i] < ' ')
 			buffer[i] = '.';
 	}
@@ -81,7 +81,7 @@ name_for_type(BString& string, type_code type, const char* displayAs)
 }
 
 
-AttributeItem *
+AttributeItem*
 create_attribute_item(BMessage& attributes, int32 index)
 {
 	const char* publicName;
@@ -235,9 +235,8 @@ AttributeItem::operator!=(const AttributeItem& other) const
 //	#pragma mark -
 
 
-AttributeListView::AttributeListView(BRect frame, const char* name,
-		uint32 resizingMode)
-	: BListView(frame, name, B_SINGLE_SELECTION_LIST, resizingMode,
+AttributeListView::AttributeListView(const char* name)
+	: BListView(name, B_SINGLE_SELECTION_LIST,
 		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 {
 }

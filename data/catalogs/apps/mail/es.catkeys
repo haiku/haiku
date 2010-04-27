@@ -61,12 +61,12 @@ Size:	Mail		Tamaño:
 Account from mail	Mail		Cuenta desde correo
 Edit signatures…	Mail		Editar firmas…
 New	Mail		Nuevo
-Attachments: 	Mail		Ficheros adjuntos: 
+Attachments: 	Mail		Archivos adjuntos: 
 Set to %s	Mail		Marcar como %s
 Forward	Mail		Reenviar
 E-mail draft could not be saved!	Mail		¡No se pudo guardar el borrador!
 To:	Mail		Para:
-Only files can be added as attachments.	Mail		Sólo se permite adjuntar ficheros.
+Only files can be added as attachments.	Mail		Sólo se permiten colocar archivos como adjuntos.
 Previous message	Mail		Mensaje anterior
 Title:	Mail		Título:
 Find…	Mail		Buscar…
@@ -89,7 +89,7 @@ Show raw message	Mail		Mostrar mensaje en crudo
 Start now	Mail		Comenzar ahora
 Close	Mail		Cerrar
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		El demonio de correo no esta funcionando. El mensaje queda encolado y se enviará cuando mail_daemon arranque.
-Really delete this signature? This cannot be undone.	Mail		¿Desea borrar realmente esta firma?. Esto no puede deshacerse.
+Really delete this signature? This cannot be undone.	Mail		¿Realmente desea borrar esta firma?. Después no podrá recuperarla.
 Open	Mail		Abrir
 Quote	Mail		Cita
 Add	Mail		Añadir
@@ -97,10 +97,10 @@ Next message	Mail		Mensaje siguiente
 User interface	Mail		Interfaz de usuario
 Cancel	Mail		Cancelar
 Send message	Mail		Enviar mensaje
-Remove enclosure	Mail		Quitar documento adjunto
+Remove enclosure	Mail		Eliminar documento adjunto
 Account:	Mail		Cuenta:
-Decoding:	Mail		Decodificación:
-Sorry, could not find an application that supports the 'Person' data type.	Mail		No se encuentra aplicación asociada al tipo de dato 'Persona'.
+Decoding:	Mail		Decodificando:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		No se encuentra la aplicación asociada al tipo de dato 'Persona'.
 Do you wish to send this message before closing?	Mail		¿Desea enviar el mensaje antes de cerrarlo?
 Delete	Mail		Borrar
 Leave as '%s'	Mail		Dejar como '%s'
@@ -135,7 +135,7 @@ Auto signature:	Mail		Firma automática
 Add signature	Mail		Añadir firma
 Need Tracker to move items to trash	Mail		Requerir a Tracker mover elementos a la papelera
 Mailing	Mail		Mensajería
-Unread	Mail		No leído
+Unread	Mail		Sin leer
 Remove quote	Mail		Eliminar cita
 Move to trash	Mail		Mover a la Papelera
 Select all	Mail		Seleccionar todo

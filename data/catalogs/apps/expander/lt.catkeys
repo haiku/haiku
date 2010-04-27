@@ -33,7 +33,7 @@ Expander	About		Skleideris
 About Expander…	ExpanderMenu		Apie programą…
 OK	About		Gerai
 Set source…	ExpanderMenu		Parinkti šaltinį…
-Select '%s'	DirectoryFilePanel		Rinktis '%s'
+Select '%s'	DirectoryFilePanel		Rinktis „%s“
 Show contents	ExpanderMenu		Rodyti turinį
 Stop	ExpanderWindow		Stop
 Destination	ExpanderWindow		Paskirtis

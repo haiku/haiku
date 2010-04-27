@@ -1,18 +1,18 @@
 1	ukrainian	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		Додано 1файл.
-Stop	file:ZipOMaticWindow.cpp		Зупининити
-Creating archive: %s	file:ZipOMaticWindow.cpp		Створення архіва: %s
+1 file added.	file:ZipOMaticWindow.cpp		Додано 1 файл .
+Stop	file:ZipOMaticWindow.cpp		Зупинити
+Creating archive: %s	file:ZipOMaticWindow.cpp		Створення архіву: %s
 Continue	file:ZipOMaticWindow.cpp		Продовжити
-Preparing to archive	file:ZipperThread.cpp		Підготовка до архівування
-Filename: %s	file:ZipOMaticWindow.cpp		Ім"я файла: %s
-Let them continue	file:ZipOMatic.cpp		Дозволити продовження
-Do you want to stop them?	file:ZipOMatic.cpp		Ви хочете зупинити їх?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ви впевнені, що хочете зупинити створення цього  архіва?
+Preparing to archive	file:ZipperThread.cpp		Підготовка архіву
+Filename: %s	file:ZipOMaticWindow.cpp		Ім'я файлу: %s
+Let them continue	file:ZipOMatic.cpp		Нехай це продовжується
+Do you want to stop them?	file:ZipOMatic.cpp		Ви хочете зупинити це?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ви впевнені, що хочете зупинити створення цього архіву?
 %ld files added.	file:ZipOMaticWindow.cpp		%ld файлів додано.
 Stopped	file:ZipOMaticWindow.cpp		Зупинено
 Archive	file:ZipperThread.cpp		Архів
-Drop files to zip.	file:ZipOMaticWindow.cpp		Додати файли для стиску в архів.
-Error creating archive	file:ZipOMaticWindow.cpp		Помилка створення архіва
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Ви маєте %ld Zip-O-Matic запущено.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створено
-Stop them	file:ZipOMatic.cpp		Зупинити їх
+Drop files to zip.	file:ZipOMaticWindow.cpp		Перемістіть файли для створення  архіву.
+Error creating archive	file:ZipOMaticWindow.cpp		Помилка створення архіву
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У вас працює %ld копій Zip-O-Matic.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створений
+Stop them	file:ZipOMatic.cpp		Зупинити це

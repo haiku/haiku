@@ -34,8 +34,8 @@ struct ReadFloat {
 struct ReadInt {
 	inline int operator()(const void* buffer) const {
 		// 0 == mid, 0x80000001 == bottom, 0x7fffffff == top
-		short b = *(int*)buffer;
-		if (b == 0x80000000)
+		int b = *(int*)buffer;
+		if (b == INT_MIN)
 			b++;
 		return b;
 	}
@@ -182,7 +182,7 @@ AudioFormatConverter::~AudioFormatConverter()
 bigtime_t
 AudioFormatConverter::InitialLatency() const
 {
-	fSource->InitialLatency();
+	return fSource->InitialLatency();
 }
 
 status_t

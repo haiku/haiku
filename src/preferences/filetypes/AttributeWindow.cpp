@@ -12,11 +12,15 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
 #include <PopUpMenu.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <TextControl.h>
 
@@ -91,40 +95,30 @@ display_as_parameter(const char* special)
 
 AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 		AttributeItem* attributeItem)
-	: BWindow(BRect(100, 100, 350, 200), TR("Attribute"), B_MODAL_WINDOW_LOOK,
-		B_MODAL_SUBSET_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE
+	:
+	BWindow(BRect(100, 100, 350, 200), TR("Attribute"), B_MODAL_WINDOW_LOOK,
+		B_MODAL_SUBSET_WINDOW_FEEL, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS
 			| B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target),
 	fMimeType(mimeType.Type())
 {
+	float padding = 3.0f;
+	//if (be_control_look)
+		//padding = be_control_look->DefaultItemSpacing();
+
 	if (attributeItem != NULL)
 		fAttribute = *attributeItem;
 
-	BRect rect = Bounds();
-	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
-
-	rect.InsetBy(8.0f, 8.0f);
-	fPublicNameControl = new BTextControl(rect, "public", TR("Attribute name:"),
-		fAttribute.PublicName(), NULL, B_FOLLOW_LEFT_RIGHT);
-	fPublicNameControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
-
-	float labelWidth = fPublicNameControl->StringWidth(fPublicNameControl->Label()) + 2.0f;
-	fPublicNameControl->SetDivider(labelWidth);
+	fPublicNameControl = new BTextControl(TR("Attribute name:"),
+		fAttribute.PublicName(), NULL);
+	fPublicNameControl->SetModificationMessage(
+		new BMessage(kMsgAttributeUpdated));
 	fPublicNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
-	float width, height;
-	fPublicNameControl->GetPreferredSize(&width, &height);
-	fPublicNameControl->ResizeTo(rect.Width(), height);
-	topView->AddChild(fPublicNameControl);
-
-	rect = fPublicNameControl->Frame();
-	rect.OffsetBy(0.0f, rect.Height() + 5.0f);
-	fAttributeControl = new BTextControl(rect, "internal", TR("Internal name:"),
-		fAttribute.Name(), NULL, B_FOLLOW_LEFT_RIGHT);
-	fAttributeControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
-	fAttributeControl->SetDivider(labelWidth);
+	fAttributeControl = new BTextControl(TR("Internal name:"),
+		fAttribute.Name(), NULL);
+	fAttributeControl->SetModificationMessage(
+		new BMessage(kMsgAttributeUpdated));
 	fAttributeControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
 	// filter out invalid characters that can't be part of an attribute
@@ -133,8 +127,6 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	for (int32 i = 0; disallowedCharacters[i]; i++) {
 		textView->DisallowChar(disallowedCharacters[i]);
 	}
-
-	topView->AddChild(fAttributeControl);
 
 	fTypeMenu = new BPopUpMenu("type");
 	BMenuItem* item = NULL;
@@ -149,27 +141,13 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 			item->SetMarked(true);
 	}
 
-	rect.OffsetBy(0.0f, rect.Height() + 4.0f);
-	BMenuField* menuField = new BMenuField(rect, "types",
-		TR("Type:"), fTypeMenu);
-	menuField->SetDivider(labelWidth);
-	menuField->SetAlignment(B_ALIGN_RIGHT);
-	menuField->GetPreferredSize(&width, &height);
-	menuField->ResizeTo(rect.Width(), height);
-	topView->AddChild(menuField);
+	BMenuField* typeMenuField = new BMenuField("types" , TR("Type:"),
+		fTypeMenu);
+	typeMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	rect.OffsetBy(0.0f, rect.Height() + 4.0f);
-	rect.bottom = rect.top + fAttributeControl->Bounds().Height() * 2.0f + 18.0f;
-	BBox* box = new BBox(rect, "", B_FOLLOW_LEFT_RIGHT);
-	topView->AddChild(box);
-
-	fVisibleCheckBox = new BCheckBox(rect, "visible", TR("Visible"),
+	fVisibleCheckBox = new BCheckBox("visible", TR("Visible"),
 		new BMessage(kMsgVisibilityChanged));
 	fVisibleCheckBox->SetValue(fAttribute.Visible());
-	fVisibleCheckBox->ResizeToPreferred();
-	box->SetLabel(fVisibleCheckBox);
-
-	labelWidth -= 8.0f;
 
 	BMenu* menu = new BPopUpMenu("display as");
 	for (int32 i = 0; kDisplayAsMap[i].name != NULL; i++) {
@@ -188,42 +166,29 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 			item->SetMarked(true);
 	}
 
-	rect.OffsetTo(8.0f, fVisibleCheckBox->Bounds().Height());
-	rect.right -= 18.0f;
-	fDisplayAsMenuField = new BMenuField(rect, "display as",
-		TR("Display as:"), menu);
-	fDisplayAsMenuField->SetDivider(labelWidth);
+	fDisplayAsMenuField = new BMenuField("display as",
+		TR_CMT("Display as:", "Tracker offers different display modes for "
+			"attributes."), menu);
 	fDisplayAsMenuField->SetAlignment(B_ALIGN_RIGHT);
-	fDisplayAsMenuField->ResizeTo(rect.Width(), height);
-	box->AddChild(fDisplayAsMenuField);
 
-	fEditableCheckBox = new BCheckBox(rect, "editable", TR("Editable"),
-		new BMessage(kMsgAttributeUpdated), B_FOLLOW_RIGHT);
+	fEditableCheckBox = new BCheckBox("editable", TR_CMT("Editable",
+		"If Tracker allows to edit this attribute."),
+		new BMessage(kMsgAttributeUpdated));
 	fEditableCheckBox->SetValue(fAttribute.Editable());
-	fEditableCheckBox->ResizeToPreferred();
-	fEditableCheckBox->MoveTo(rect.right - fEditableCheckBox->Bounds().Width(),
-		rect.top + (fDisplayAsMenuField->Bounds().Height()
-		- fEditableCheckBox->Bounds().Height()) / 2.0f);
-	box->AddChild(fEditableCheckBox);
 
-	rect.OffsetBy(0.0f, menuField->Bounds().Height() + 4.0f);
-	rect.bottom = rect.top + fPublicNameControl->Bounds().Height();
-	fSpecialControl = new BTextControl(rect, "special", TR("Special:"),
-		display_as_parameter(fAttribute.DisplayAs()), NULL,
-		B_FOLLOW_LEFT_RIGHT);
-	fSpecialControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
-	fSpecialControl->SetDivider(labelWidth);
+	fSpecialControl = new BTextControl(TR("Special:"),
+		display_as_parameter(fAttribute.DisplayAs()), NULL);
+	fSpecialControl->SetModificationMessage(
+		new BMessage(kMsgAttributeUpdated));
 	fSpecialControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fSpecialControl->SetEnabled(false);
-	box->AddChild(fSpecialControl);
 
 	char text[64];
 	snprintf(text, sizeof(text), "%ld", fAttribute.Width());
-	rect.OffsetBy(0.0f, fSpecialControl->Bounds().Height() + 4.0f);
-	fWidthControl = new BTextControl(rect, "width", TR("Width:"),
-		text, NULL, B_FOLLOW_LEFT_RIGHT);
-	fWidthControl->SetModificationMessage(new BMessage(kMsgAttributeUpdated));
-	fWidthControl->SetDivider(labelWidth);
+	fWidthControl = new BTextControl(TR_CMT("Width:",
+		"Default column width in Tracker for this attribute."), text, NULL);
+	fWidthControl->SetModificationMessage(
+		new BMessage(kMsgAttributeUpdated));
 	fWidthControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
 	// filter out invalid characters that can't be part of a width
@@ -234,15 +199,16 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	}
 	textView->SetMaxBytes(4);
 
-	box->AddChild(fWidthControl);
-
 	const struct alignment_map {
 		int32		alignment;
 		const char*	name;
 	} kAlignmentMap[] = {
-		{B_ALIGN_LEFT, TR("Left")},
-		{B_ALIGN_RIGHT, TR("Right")},
-		{B_ALIGN_CENTER, TR("Center")},
+		{B_ALIGN_LEFT, TR_CMT("Left", "Attribute column alignment in "
+			"Tracker")},
+		{B_ALIGN_RIGHT, TR_CMT("Right", "Attribute column alignment in "
+			"Tracker")},
+		{B_ALIGN_CENTER, TR_CMT("Center", "Attribute column alignment in "
+			"Tracker")},
 		{0, NULL}
 	};
 
@@ -258,36 +224,50 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 			item->SetMarked(true);
 	}
 
-	rect.OffsetBy(0.0f, menuField->Bounds().Height() + 1.0f);
-	fAlignmentMenuField = new BMenuField(rect, "alignment",
+	fAlignmentMenuField = new BMenuField("alignment",
 		TR("Alignment:"), menu);
-	fAlignmentMenuField->SetDivider(labelWidth);
 	fAlignmentMenuField->SetAlignment(B_ALIGN_RIGHT);
-	fAlignmentMenuField->ResizeTo(rect.Width(), height);
-	box->AddChild(fAlignmentMenuField);
-	box->ResizeBy(0.0f, fAlignmentMenuField->Bounds().Height() * 2.0f
-		+ fVisibleCheckBox->Bounds().Height());
 
-	fAcceptButton = new BButton(rect, "add", item ? TR("Done") : TR("Add"),
-		new BMessage(kMsgAccept), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	fAcceptButton->ResizeToPreferred();
-	fAcceptButton->MoveTo(Bounds().Width() - 8.0f - fAcceptButton->Bounds().Width(),
-		Bounds().Height() - 8.0f - fAcceptButton->Bounds().Height());
+	fAcceptButton = new BButton("add", item ? TR("Done") : TR("Add"),
+		new BMessage(kMsgAccept));
 	fAcceptButton->SetEnabled(false);
-	topView->AddChild(fAcceptButton);
 
-	BButton* button = new BButton(rect, "cancel", TR("Cancel"),
-		new BMessage(B_QUIT_REQUESTED), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->MoveTo(fAcceptButton->Frame().left - 10.0f - button->Bounds().Width(),
-		fAcceptButton->Frame().top);
-	topView->AddChild(button);
+	BButton* cancelButton = new BButton("cancel", TR("Cancel"),
+		new BMessage(B_QUIT_REQUESTED));
 
-	ResizeTo(labelWidth * 4.0f + 24.0f, box->Frame().bottom
-		+ button->Bounds().Height() + 20.0f);
-	SetSizeLimits(fEditableCheckBox->Bounds().Width() + button->Bounds().Width()
-		+ fAcceptButton->Bounds().Width() + labelWidth + 24.0f,
-		32767.0f, Frame().Height(), Frame().Height());
+	BBox* visibleBox;
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+		.SetInsets(padding, padding, padding, padding)
+		.Add(BGridLayoutBuilder(padding, padding)
+			.Add(fPublicNameControl->CreateLabelLayoutItem(), 0, 0)
+			.Add(fPublicNameControl->CreateTextViewLayoutItem(), 1, 0)
+			.Add(fAttributeControl->CreateLabelLayoutItem(), 0, 1)
+			.Add(fAttributeControl->CreateTextViewLayoutItem(), 1, 1)
+			.Add(typeMenuField->CreateLabelLayoutItem(), 0, 2)
+			.Add(typeMenuField->CreateMenuBarLayoutItem(), 1, 2)
+		)
+		.Add(visibleBox = new BBox(B_FANCY_BORDER, 
+			BGridLayoutBuilder(padding, padding)
+				.Add(fDisplayAsMenuField->CreateLabelLayoutItem(), 0, 0)
+				.Add(fDisplayAsMenuField->CreateMenuBarLayoutItem(), 1, 0)
+				.Add(fEditableCheckBox, 3, 0)
+				.Add(fSpecialControl->CreateLabelLayoutItem(), 0, 1)
+				.Add(fSpecialControl->CreateTextViewLayoutItem(), 1, 1, 3)
+				.Add(fWidthControl->CreateLabelLayoutItem(), 0, 2)
+				.Add(fWidthControl->CreateTextViewLayoutItem(), 1, 2, 3)
+				.Add(fAlignmentMenuField->CreateLabelLayoutItem(), 0, 3)
+				.Add(fAlignmentMenuField->CreateMenuBarLayoutItem(), 1, 3, 3)
+				.SetInsets(padding, padding, padding, padding)
+			))
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+			.Add(BSpaceLayoutItem::CreateGlue())
+			.Add(BSpaceLayoutItem::CreateGlue())
+			.Add(cancelButton)
+			.Add(fAcceptButton)
+		)
+	);
+	visibleBox->SetLabel(fVisibleCheckBox);
 
 	fAcceptButton->MakeDefault(true);
 	fPublicNameControl->MakeFocus(true);

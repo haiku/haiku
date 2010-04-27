@@ -18,7 +18,7 @@ Cancel job	PrintersWindow		Peru työ
 Remove	PrintersWindow		Poista
 <pick one>	AddPrinterDialog		<poimi yksi>
 Add …	PrintersWindow		Lisää …
-Print jobs for 	PrintersWindow		Tulosta työt kohteelle 
+Print jobs for 	PrintersWindow		Tulostustyöt kohteelle 
 Failed	JobListView		Epäonnistui
 %.2f KB	JobListView		%.2f kilotavua
 Completed	JobListView		Valmis

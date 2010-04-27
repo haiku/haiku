@@ -1,7 +1,7 @@
 1	spanish	x-vnd.Haiku-Appearance	3612090060
 Control highlight	Colors tab		Resaltado del control
 Control border	Colors tab		Borde del control
-Antialiasing type:	AntialiasingSettingsView		Tipo de antialiasing:
+Antialiasing type:	AntialiasingSettingsView		Tipo de suavizado:
 Shadow	Colors tab		Sombra
 On	AntialiasingSettingsView		Activado
 Defaults	APRWindow		Valores predeterminados
@@ -15,9 +15,9 @@ Hinting menu	AntialiasingSettingsView		Menú mejorado de tipo de letra
 Document background	Colors tab		Fondo de documento
 Revert	APRWindow		Revertir
 Window tab	Colors tab		Pestaña de ventana
-Tooltip background	Colors tab		Fondo de Descripción emergente
+Tooltip background	Colors tab		Fondo de descripción emergente
 Selected menu item background	Colors tab		Fondo de elemento de menú seleccionado
-Antialiasing	APRWindow		Antialiasing (Suavizado)
+Antialiasing	APRWindow		Suavizado (Antialiasing)
 Navigation base	Colors tab		Base de navegación
 Window tab text	Colors tab		Texto de pestaña de ventana
 Document text	Colors tab		Texto de documento
@@ -30,7 +30,7 @@ Colors	APRWindow		Colores
 Control background	Colors tab		Fondo de control
 Inactive window tab	Colors tab		Pestaña de ventana inactiva
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reducir fortaleza del filtro de bordes coloreados:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Para evitar posibles conflictos de patentes, el antialiasing basado en subpixel, en combinación con la mejora de caracteres, no estará disponible en esta compilación de Haiku. Para habilitarlos, deberá compilar por si mismo Haiku activando ciertas opciones en la cabecera de configuración de libfreetype.
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Para evitar posibles conflictos de patentes, el suavizado basado en subpixel, en combinación con la mejora de caracteres, no estará disponible en esta compilación de Haiku. Para habilitarlos, deberá compilar por sí mismo Haiku activando ciertas opciones en la cabecera de configuración de libfreetype.
 Control text	Colors tab		Texto de control
 Tooltip text	Colors tab		Texto de descripción emergente
 Menu item text	Colors tab		Texto de item de menú
@@ -39,5 +39,5 @@ Selected menu item border	Colors tab		Borde de item de menú seleccionado
 Strong	AntialiasingSettingsView		Importante
 Panel text	Colors tab		Texto de panel
 Monospaced fonts only	AntialiasingSettingsView		Sólo tipos de letra monoespaciados
-Antialiasing menu	AntialiasingSettingsView		Menu de suavizado (antialiasing)
-Glyph hinting:	AntialiasingSettingsView		Mejorado de glifos:
+Antialiasing menu	AntialiasingSettingsView		Menú de suavizado
+Glyph hinting:	AntialiasingSettingsView		Mejorado de símbolos:

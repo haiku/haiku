@@ -1,17 +1,18 @@
-1	swedish	x-vnd.Haiku-Network	2897060402
+1	swedish	x-vnd.Haiku-Network	3643490310
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Nätmask:
 DHCP	EthernetSettingsView		DHCP
 DNS #2:	EthernetSettingsView		Sekundär DNS:
 Apply	EthernetSettingsView		Använd
+OK	EthernetSettingsView		Ok
 DNS #1:	EthernetSettingsView		Primär DNS:
+IP address:	EthernetSettingsView		IP-adress:
 Network	NetworkWindow		Nätverk
 Adapter:	EthernetSettingsView		Nätverkskort:
-IP address:	EthernetSettingsView		IP-adress:
+Domain:	EthernetSettingsView		Domän:
 Revert	EthernetSettingsView		Återställ
-Sending auto-config message failed: 	EthernetSettingsView		Sändning av autokonfigurationsmeddelande misslyckades: 
+Sending auto-config message failed: 	EthernetSettingsView		Sändning av autokonfigurationsmeddelande misslyckades:
 Mode:	EthernetSettingsView		Konfiguration:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Automatisk konfiguration kan inte ske utan att net_server kör!
-Auto-configuring failed: 	EthernetSettingsView		Automatisk konfiguration misslyckades: 
+Auto-configuring failed: 	EthernetSettingsView		Automatisk konfiguration misslyckades:
 Static	EthernetSettingsView		Statisk
-OK	EthernetSettingsView		Ok

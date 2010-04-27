@@ -50,7 +50,7 @@ class AttributeItem : public BStringItem {
 
 class AttributeListView : public BListView {
 	public:
-		AttributeListView(BRect frame, const char* name, uint32 resizingMode);
+		AttributeListView(const char* name);
 		virtual ~AttributeListView();
 
 		void SetTo(BMimeType* type);
@@ -76,6 +76,6 @@ struct display_as_map {
 
 extern const struct display_as_map kDisplayAsMap[];
 
-AttributeItem *create_attribute_item(BMessage& attributes, int32 index);
+AttributeItem* create_attribute_item(BMessage& attributes, int32 index);
 
 #endif	// ATTRIBUTE_LIST_VIEW_H

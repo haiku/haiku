@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2005, Jérôme DUVAL
  *  All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -18,6 +18,7 @@ class BButton;
 class BLayoutItem;
 class BMenu;
 class BMenuField;
+class BMenuItem;
 class BStatusBar;
 class BStringView;
 class BTextView;
@@ -53,6 +54,7 @@ public:
 private:
 			void				_ShowOptionalPackages();
 			void				_LaunchDriveSetup();
+			void				_LaunchBootman();
 			void				_DisableInterface(bool disable);
 			void				_ScanPartitions();
 			void				_UpdateControls();
@@ -84,12 +86,14 @@ private:
 			BLayoutItem*		fProgressLayoutItem;
 
 			BButton*			fBeginButton;
-			BButton*			fSetupButton;
-			BButton*			fMakeBootableButton;
+			BButton*			fLaunchDriveSetupButton;
+			BMenuItem*			fLaunchBootmanItem;
+			BMenuItem*			fMakeBootableItem;
 
 			bool				fEncouragedToSetupPartitions;
 
 			bool				fDriveSetupLaunched;
+			bool				fBootmanLaunched;
 			InstallStatus		fInstallStatus;
 
 			WorkerThread*		fWorkerThread;

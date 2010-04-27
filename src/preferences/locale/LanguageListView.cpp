@@ -1,19 +1,21 @@
 /*
- * Copyright 2006-2010, Haiku.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2006-2010, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
  * Authors:
- *		Adrien Destugues <pulkomandy@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Adrien Destugues <pulkomandy@gmail.com>
 */
 #include "LanguageListView.h"
-#include "Locale.h"
-
-#include <Bitmap.h>
-#include <Country.h>
 
 #include <stdio.h>
 
 #include <new>
+
+#include <Bitmap.h>
+#include <Country.h>
+
+#include "Locale.h"
 
 
 #define MAX_DRAG_HEIGHT		200.0
@@ -37,15 +39,24 @@ LanguageListItem::LanguageListItem(const char* text, const char* code)
 }
 
 
+LanguageListItem::LanguageListItem(const LanguageListItem& other)
+	:
+	BStringItem(other.Text()),
+	fLanguageCode(other.fLanguageCode),
+	fIcon(other.fIcon ? new(std::nothrow) BBitmap(other.fIcon) : NULL)
+{
+}
+
+
 LanguageListItem::~LanguageListItem()
 {
-	delete fIcon;	
+	delete fIcon;
 }
 
 
 //MediaListItem - DrawItem
-void 
-LanguageListItem::DrawItem(BView *owner, BRect frame, bool complete)
+void
+LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
 	rgb_color kHighlight = { 140,140,140,0 };
 	rgb_color kBlack = { 0,0,0,0 };
@@ -54,22 +65,21 @@ LanguageListItem::DrawItem(BView *owner, BRect frame, bool complete)
 
 	if (IsSelected() || complete) {
 		rgb_color color;
-		if (IsSelected()) {
+		if (IsSelected())
 			color = kHighlight;
-		} else {
+		else
 			color = owner->ViewColor();
-		}
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
 		owner->FillRect(r);
 		owner->SetHighColor(kBlack);
-	} else {
+	} else
 		owner->SetLowColor(owner->ViewColor());
-	}
-	
+
 	frame.left += 4;
 	BRect iconFrame(frame);
-	iconFrame.Set(iconFrame.left, iconFrame.top+1, iconFrame.left+15, iconFrame.top+16);
+	iconFrame.Set(iconFrame.left, iconFrame.top+1, iconFrame.left+15,
+		iconFrame.top+16);
 
 	if (fIcon && fIcon->IsValid()) {
 		owner->SetDrawingMode(B_OP_OVER);
@@ -79,13 +89,14 @@ LanguageListItem::DrawItem(BView *owner, BRect frame, bool complete)
 
 	frame.left += 16 * (OutlineLevel() + 1);
 	owner->SetHighColor(kBlack);
-	
-	BFont		font = be_plain_font;
+
+	BFont font = be_plain_font;
 	font_height	finfo;
 	font.GetHeight(&finfo);
 	owner->SetFont(&font);
-	owner->MovePenTo(frame.left+8, frame.top + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 2) +
-					(finfo.ascent + finfo.descent) - 1);
+	owner->MovePenTo(frame.left+8, frame.top + ((frame.Height() - (finfo.ascent
+					+ finfo.descent + finfo.leading)) / 2) + (finfo.ascent
+			+ finfo.descent) - 1);
 	owner->DrawString(Text());
 }
 
@@ -96,6 +107,20 @@ LanguageListView::LanguageListView(const char* name, list_view_type type)
 	BOutlineListView(name, type),
 	fMsgPrefLanguagesChanged(new BMessage(kMsgPrefLanguagesChanged))
 {
+}
+
+
+LanguageListView::~LanguageListView()
+{
+	delete fMsgPrefLanguagesChanged;
+}
+
+
+void
+LanguageListView::AttachedToWindow()
+{
+	BOutlineListView::AttachedToWindow();
+	ScrollToSelection();
 }
 
 
@@ -123,8 +148,8 @@ LanguageListView::MoveItems(BList& items, int32 index)
 		}
 		// else ??? -> blow up
 	}
-	for (int32 i = 0;
-		 BListItem* item = (BListItem*)removedItems.ItemAt(i); i++) {
+	for (int32 i = 0; BListItem* item = (BListItem*)removedItems.ItemAt(i);
+		i++) {
 		if (AddItem(item, index)) {
 			// after we're done, the newly inserted items will be selected
 			Select(index, true);
@@ -151,22 +176,22 @@ void LanguageListView::MessageReceived (BMessage* message)
 
 				BList items;
 				int32 index;
-				for (int32 i = 0; message->FindInt32("index", i, &index)
-					 	== B_OK; i++)
+				for (int32 i = 0;
+					message->FindInt32("index", i, &index) == B_OK; i++) {
 					if (BListItem* item = FullListItemAt(index))
 						items.AddItem((void*)item);
+				}
 
 				if (items.CountItems() > 0) {
 					// There is something to move
-					LanguageListItem* parent =
-						static_cast<LanguageListItem*>(Superitem(
-							static_cast<LanguageListItem*>(
+					LanguageListItem* parent = static_cast<LanguageListItem*>(
+						Superitem(static_cast<LanguageListItem*>(
 								items.FirstItem())));
 					if (parent) {
 						// item has a parent - it should then stay
 						// below it
-						if (Superitem(FullListItemAt(fDropIndex - 1))
-								== parent || FullListItemAt(fDropIndex - 1) == parent)
+						if (Superitem(FullListItemAt(fDropIndex - 1)) == parent
+							|| FullListItemAt(fDropIndex - 1) == parent)
 							MoveItems(items, fDropIndex);
 					} else {
 						// item is top level and should stay so.
@@ -175,8 +200,9 @@ void LanguageListView::MessageReceived (BMessage* message)
 						else {
 							int itemCount = CountItemsUnder(
 								FullListItemAt(fDropIndex), true);
-							MoveItems(items, FullListIndexOf(
-								Superitem(FullListItemAt(fDropIndex - 1))+itemCount));
+							MoveItems(items, FullListIndexOf(Superitem(
+										FullListItemAt(fDropIndex - 1))
+									+ itemCount));
 						}
 					}
 				}
@@ -191,16 +217,19 @@ void LanguageListView::MessageReceived (BMessage* message)
 				// in the middle of another outline
 				if (Superitem(FullListItemAt(fDropIndex))) {
 					// Item has a parent
-					fDropIndex = FullListIndexOf(Superitem(FullListItemAt(fDropIndex)));
+					fDropIndex = FullListIndexOf(Superitem(FullListItemAt(
+								fDropIndex)));
 				}
-				
-				// Item is now a top level one - we must insert just below its last child
-				fDropIndex += CountItemsUnder(FullListItemAt(fDropIndex),false)  + 1;
+
+				// Item is now a top level one - we must insert just below its
+				// last child
+				fDropIndex += CountItemsUnder(FullListItemAt(fDropIndex),false)
+					+ 1;
 
 				int32 index;
-				for (int32 i = 0; message->FindInt32("index", i, &index)
-						== B_OK; i++) {
-					MoveItemFrom(list,index,fDropIndex);
+				for (int32 i = 0;
+					message->FindInt32("index", i, &index) == B_OK; i++) {
+					MoveItemFrom(list, index, fDropIndex);
 					fDropIndex++;
 				}
 
@@ -222,8 +251,8 @@ LanguageListView::MoveItemFrom(BOutlineListView* origin, int32 index,
 	LanguageListItem* itemToMove = static_cast<LanguageListItem*>(
 		origin->Superitem(origin->FullListItemAt(index)));
 	if (itemToMove == NULL) {
-		itemToMove = static_cast<LanguageListItem*>(
-			origin->FullListItemAt(index));
+		itemToMove = static_cast<LanguageListItem*>(origin->FullListItemAt(
+				index));
 	} else
 		index = origin->FullListIndexOf(itemToMove);
 
@@ -235,7 +264,7 @@ LanguageListView::MoveItemFrom(BOutlineListView* origin, int32 index,
 	for (int i = 0; i < itemCount ; i++) {
 		LanguageListItem* subItem = static_cast<LanguageListItem*>(
 			origin->ItemUnderAt(itemToMove, true, i));
-		this->AddUnder(new LanguageListItem(*subItem),newItem);
+		this->AddUnder(new LanguageListItem(*subItem), newItem);
 	}
 	origin->RemoveItem(index);
 		// This will also remove the children
@@ -255,19 +284,19 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 	if (item) {
 		// create drag message
 		BMessage msg('DRAG');
-		msg.AddPointer("list",(void*)(this));
+		msg.AddPointer("list", (void*)(this));
 		int32 index;
-		for (int32 i = 0; (index = FullListCurrentSelection(i)) >= 0; i++) {
+		for (int32 i = 0; (index = FullListCurrentSelection(i)) >= 0; i++)
 			msg.AddInt32("index", index);
-		}
 		// figure out drag rect
 		float width = Bounds().Width();
 		BRect dragRect(0.0, 0.0, width, -1.0);
 		// figure out, how many items fit into our bitmap
 		int32 numItems;
 		bool fade = false;
-		for (numItems = 0; BListItem* item = FullListItemAt(CurrentSelection(numItems));
-				numItems++) {
+		for (numItems = 0;
+			BListItem* item = FullListItemAt(CurrentSelection(numItems));
+			numItems++) {
 			dragRect.bottom += ceilf(item->Height()) + 1.0;
 			if (dragRect.Height() > MAX_DRAG_HEIGHT) {
 				fade = true;
@@ -278,8 +307,8 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 		}
 		BBitmap* dragBitmap = new BBitmap(dragRect, B_RGB32, true);
 		if (dragBitmap && dragBitmap->IsValid()) {
-			BView* v = new BView(dragBitmap->Bounds(), "helper",
-				B_FOLLOW_NONE, B_WILL_DRAW);
+			BView* v = new BView(dragBitmap->Bounds(), "helper", B_FOLLOW_NONE,
+				B_WILL_DRAW);
 			dragBitmap->AddChild(v);
 			dragBitmap->Lock();
 			BRect itemBounds(dragRect) ;
@@ -306,25 +335,21 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 			int32 bpr = dragBitmap->BytesPerRow();
 
 			if (fade) {
-				for (int32 y = 0; y < height - ALPHA / 2;
-						y++, bits += bpr) {
+				for (int32 y = 0; y < height - ALPHA / 2; y++, bits += bpr) {
 					uint8* line = bits + 3;
-					for (uint8* end = line + 4 * width; line < end;
-							line += 4)
+					for (uint8* end = line + 4 * width; line < end; line += 4)
 						*line = ALPHA;
 				}
 				for (int32 y = height - ALPHA / 2; y < height;
-						y++, bits += bpr) {
+					y++, bits += bpr) {
 					uint8* line = bits + 3;
-					for (uint8* end = line + 4 * width; line < end;
-							line += 4)
+					for (uint8* end = line + 4 * width; line < end; line += 4)
 						*line = (height - y) << 1;
 				}
 			} else {
 				for (int32 y = 0; y < height; y++, bits += bpr) {
 					uint8* line = bits + 3;
-					for (uint8* end = line + 4 * width; line < end;
-							line += 4)
+					for (uint8* end = line + 4 * width; line < end; line += 4)
 						*line = ALPHA;
 				}
 			}
@@ -347,39 +372,41 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 void
 LanguageListView::MouseMoved(BPoint where, uint32 transit, const BMessage* msg)
 {
-	if (msg && (msg->what == 'DRAG')) {
+	if (msg && msg->what == 'DRAG') {
 		switch (transit) {
 			case B_ENTERED_VIEW:
-			case B_INSIDE_VIEW: {
+			case B_INSIDE_VIEW:
+			{
 				// set drop target through virtual function
 				// offset where by half of item height
 				BRect r = ItemFrame(0);
 				where.y += r.Height() / 2.0;
-	
+
 				int32 index = FullListIndexOf(where);
 				if (index < 0)
 					index = FullListCountItems();
 				if (fDropIndex != index) {
 					fDropIndex = index;
 					if (fDropIndex >= 0) {
-						int32 count = FullListCountItems();
-						if (fDropIndex == count) {
-							BRect r;
-							if (FullListItemAt(count - 1)) {
-								r = ItemFrame(count - 1);
-								r.top = r.bottom;
-								r.bottom = r.top + 1.0;
-							} else {
-								r = Bounds();
-								r.bottom--;
-									// compensate for scrollbars moved slightly
-									// out of window
-							}
-						} else {
-							BRect r = ItemFrame(fDropIndex);
-							r.top--;
-							r.bottom = r.top + 1.0;
-						}
+// TODO: find out what this was intended for (as it doesn't have any effect)
+//						int32 count = FullListCountItems();
+//						if (fDropIndex == count) {
+//							BRect r;
+//							if (FullListItemAt(count - 1)) {
+//								r = ItemFrame(count - 1);
+//								r.top = r.bottom;
+//								r.bottom = r.top + 1.0;
+//							} else {
+//								r = Bounds();
+//								r.bottom--;
+//									// compensate for scrollbars moved slightly
+//									// out of window
+//							}
+//						} else {
+//							BRect r = ItemFrame(fDropIndex);
+//							r.top--;
+//							r.bottom = r.top + 1.0;
+//						}
 					}
 				}
 				break;

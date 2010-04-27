@@ -1,43 +1,43 @@
-1	Japanese	x-vnd.Haiku-Appearance	3612090060
-Navigation pulse	Colors tab		ナビゲーションの点滅
+1	japanese	x-vnd.Haiku-Appearance	3612090060
+Control highlight	Colors tab		コントロールのハイライト
+Control border	Colors tab		コントロールの境界
+Antialiasing type:	AntialiasingSettingsView		アンチエイリアスのタイプ：
 Shadow	Colors tab		影
 On	AntialiasingSettingsView		有効
 Defaults	APRWindow		デフォルト
 Grayscale	AntialiasingSettingsView		グレースケール
 Shine	Colors tab		光
 Off	AntialiasingSettingsView		無効
-Antialiasing type:	AntialiasingSettingsView		アンチエイリアスのタイプ：
 Success	Colors tab		成功
-Inactive window tab	Colors tab		非アクティブウィンドウタブ
+Inactive window tab text	Colors tab		非アクティブウィンドウタブの文字
 Failure	Colors tab		失敗
 Hinting menu	AntialiasingSettingsView		ヒンティングメニュー
-Control border	Colors tab		コントロールの境界
 Document background	Colors tab		ドキュメントの背景
 Revert	APRWindow		元に戻す
-Selected menu item border	Colors tab		メニュー選択項目の境界
-Selected menu item text	Colors tab		メニュー選択項目の文字
-Antialiasing	APRWindow		アンチエイリアス
-Window tab text	Colors tab		ウィンドウタブの文字
+Window tab	Colors tab		ウィンドウのタブ
 Tooltip background	Colors tab		ツールチップの背景
-Document text	Colors tab		ドキュメントの文字
+Selected menu item background	Colors tab		メニュー選択項目の背景
+Antialiasing	APRWindow		アンチエイリアス
 Navigation base	Colors tab		ナビゲーション
+Window tab text	Colors tab		ウィンドウタブの文字
+Document text	Colors tab		ドキュメントの文字
+Navigation pulse	Colors tab		ナビゲーションの点滅
+Selected menu item text	Colors tab		メニュー選択項目の文字
 Menu background	Colors tab		メニューの背景
 Appearance	APRWindow		外観
-Control background	Colors tab		コントロールの背景
-Colors	APRWindow		色
 Panel background	Colors tab		パネルの背景
-Window tab	Colors tab		ウィンドウのタブ
-Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce colored edges filter strength:
+Colors	APRWindow		色
+Control background	Colors tab		コントロールの背景
+Inactive window tab	Colors tab		非アクティブウィンドウタブ
+Reduce colored edges filter strength:	AntialiasingSettingsView		カラーエッジフィルターの強度を下げる
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		この Haiku のビルドでは、グリフのヒンティングと組合せたサブピクセルベースのアンチエイリアスは特許問題の可能性を回避するため使用できません。有効にするには、Haiku をソースからビルドして、libfreetype の設定ヘッダーファイル中の特定のオプションを有効にしなければなりません。
-Menu item text	Colors tab		メニュー項目の文字
-Monospaced fonts only	AntialiasingSettingsView		等幅フォントのみ有効
-LCD subpixel	AntialiasingSettingsView		LCD サブピクセル
-Inactive window tab text	Colors tab		非アクティブウィンドウタブの文字
-Strong	AntialiasingSettingsView		強い
-Control highlight	Colors tab		コントロールのハイライト
 Control text	Colors tab		コントロールの文字
 Tooltip text	Colors tab		ツールチップの文字
-Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー
-Selected menu item background	Colors tab		メニュー選択項目の背景
-Glyph hinting:	AntialiasingSettingsView		グリフのヒンティング：
+Menu item text	Colors tab		メニュー項目の文字
+LCD subpixel	AntialiasingSettingsView		LCD サブピクセル
+Selected menu item border	Colors tab		メニュー選択項目の境界
+Strong	AntialiasingSettingsView		強い
 Panel text	Colors tab		パネルの文字
+Monospaced fonts only	AntialiasingSettingsView		等幅フォントのみ有効
+Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー
+Glyph hinting:	AntialiasingSettingsView		グリフのヒンティング：

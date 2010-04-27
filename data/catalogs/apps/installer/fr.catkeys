@@ -3,36 +3,36 @@ Are you sure you want to abort the installation and restart the system?	Installe
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installeur\n\técrit par Jérôme Duval et Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installation terminée. Le secteur d'amorce à été écrit sur '%s'. Cliquer sur Quitter pour sortir de l'Installeur ou choisir un nouveau volume cible pour faire une autre installation.
 Quit	InstallerApp		Quitter
-Additional disk space required: 0.0 KiB	InstallerWindow		Espace disque additionnel requis: 0.0 KiB
+Additional disk space required: 0.0 KiB	InstallerWindow		Espace disque additionnel requis: 0.0 Kio
 Stop	InstallerWindow	In alert after pressing Stop	Arrêt
 Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installation terminée. Le secteur d'amorce à été écrit sur '%s'. Cliquer sur Quitter pour redémarrer l'ordinateur ou choisir un nouveau volume cible pour faire une autre installation.
 Install progress:  	InstallerWindow		Avancement de l'installation :  
 Starting Installation.	InstallProgress		Début de l'installation.
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Êtes-vous sur de vouloir installer sur le disque de démarrage ? Un redémarrage sera nécessaire dans ce cas.
 OK	InstallerApp		OK
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Sélectionner la source et la destination dans le menu pop-up. Puis cliquer sur  \"Commencer\".
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Sélectionner la source et la destination dans les listes déroulantes. Puis cliquer sur \"Commencer\".
 Install from:	InstallerWindow		Installer depuis :
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld sur %2ld
 Installer	InstallerWindow		Installeur
 Continue	InstallerWindow	In alert after pressing Stop	Continuer
 Write boot sector to '%s'	InstallerWindow		Écrire le secteur d'amorce sur '%s'
 Collecting copy information.	InstallProgress		Récupération des informations de copie.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Choisir le disque source dans le menu pop-up, puis cliquer sur \"Commencer\".
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Choisir le disque source dans la liste déroulante, puis cliquer sur \"Commencer\".
 Quit	InstallerWindow		Quitter
 Boot sector successfully written.	InstallProgress		Écriture du secteur d'amorce réussie.
 Performing installation.	InstallProgress		Installation en cours.
 scanning…	InstallerWindow		recherche…
 Boot sector not written because of an  internal error.	InstallProgress		Erreur interne lors de l'écriture du secteur d'amorce.
 Finishing Installation.	InstallProgress		Termine l'installation.
-README	InstallerApp		LISEZ MOI
+README	InstallerApp		LISEZ-MOI
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Le disque de destination pourrait ne pas avoir assez de place. Sélectionnez un autre disque ou retirez certains objets optionnels.
 Scanning for disks…	InstallerWindow		Recherche des disques…
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Impossible de monter ce disque. Veuillez en choisir un autre.
 ?? of ??	InstallerWindow	Unknown progress	?? sur ??
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Lancer l'utilitaire DriveSetup pour partitionner\nles disques durs et autres médias disponibles.\nLes partitions peuvent être initialisées avec\nle Système de Fichiers Be indispensable pour une partition\nde démarrage Haiku.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Lancer l'utilitaire DriveSetup pour partitionner les\ndisques durs et les autres médias disponibles.\nLes partitions peuvent être initialisées avec\nle Système de Fichiers Be indispensable pour une\npartition de démarrage Haiku.
 Show optional packages	InstallerWindow		Montrer les paquets optionnels
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Aucune des partitions disponibles ne peut être utilisée pour l'installation. Créez des partitions et initialisez-en au moins une avec le Système de Fichiers Be.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sélectionner le disque de destination, puis cliquer sur \"Commencer\".
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Sélectionner le disque de destination dans la liste déroulante, puis cliquer sur \"Commencer\".
 Unknown Type	InstallProgress	Partition content type	Type inconnu
 <none>	InstallerWindow	No partition available	<aucun>
 Installation canceled.	InstallProgress		Installation annulée.

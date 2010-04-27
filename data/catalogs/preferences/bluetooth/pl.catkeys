@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-BluetoothPrefs	3840151416
+1	polish	x-vnd.Haiku-BluetoothPrefs	1095433726
 About Bluetooth…	Window		O Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Domyślny czas zapytania:
@@ -7,7 +7,6 @@ Starting scan...	Inquiry panel		Rozpoczynanie skanowania…
 Show bluetooth console…	Window		Pokaż konsole bluetooth…
 Smart phone	Settings view		Telefon
  seconds	Inquiry panel		 sekund
-Server	Settings view		Serwer
 Stop bluetooth services…	Window		Zatrzymaj usługi bluetooth…
 Identify host as:	Settings view		Identyfikuj host jako:
 View	Window		Widok

@@ -22,7 +22,7 @@ File	FileType Window		Файл
 Recognition rule is not valid:\n\n	FileType Window		Неправильное правило распознания:\n\n
 This file type already exists.	New File Type Window		Этот тип файла уже существует.
 Save	Application Type Window		Сохранить
-Show recognition rule	FileType Window		Отображать правило распознания
+Show recognition rule	FileType Window		Отображать правило распознавания
 Add	Extension Window		Добавить
 Select same preferred application as	FileType Window		Выбрать такое же предпочтительное приложение как у
 Cancel	Attribute Window		Отмена
@@ -38,7 +38,7 @@ Could not retrieve preferred application of this file.	Preferred App Menu		Не�
 Preferred application	FileType Window		Предпочтительное приложение
 Quit	FileType Window		Выход
 no icon	FileType Window		нет значка
-File recognition	FileType Window		Распознание файла
+File recognition	FileType Window		Распознавание файла
 Same as…	FileType Window		Такое же как…
 File	Application Type Window		Файл
 Version:	Application Type Window		Версия:
@@ -48,7 +48,7 @@ Description:	FileType Window		Описание:
 Right	Attribute Window		По правому краю
 Internal name:	FileType Window		Внутреннее имя:
 None	FileType Window		Не выбрано
-Development	Application Type Window		Разработка
+Development	Application Type Window		Разрабатываемая
 Icon	FileType Window		Значок
 Special:	Attribute Window		Особый:
 Alpha	Application Type Window		Альфа
@@ -76,7 +76,7 @@ Extension:	Extension Window		Расширение:
 Add	Attribute Window		Добавить
 Close	Application Type Window		Закрыть
 Open…	FileType Window		Открыть…
-Golden master	Application Type Window		Золотой
+Golden master	Application Type Window		Золотая
 Could not open \"%s\":\n%s	FileTypes		Невозмножно открыть \"%s\":\n%s
 Alignment:	Attribute Window		Выравнивание:
 Cancel	Extension Window		Отмена
@@ -98,7 +98,7 @@ Add type	New File Type Window		Добавить тип
 [Multiple files]	FileType Window		[Несколько файлов]
 Could not set preferred application	FileType Window		Невозможно назначить предпочтительное приложение
 Internal name:	Attribute Window		Внутреннее имя:
-Final	Application Type Window		Окончание
+Final	Application Type Window		Финальная
 Open File	FileTypes		Открыть файл
 Settings	FileType Window		Настройки
 New resource file…	FileType Window		Новый ресурс-файл…

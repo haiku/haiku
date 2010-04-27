@@ -100,11 +100,9 @@ BCountry::GetIcon(BBitmap* result)
    	size_t size;
    	const char* code = fICULocale->getCountry();
 	if (code != NULL) {
-		printf("this is %s drawing\n",code);
    		const void* buffer = storage.LoadResource(B_VECTOR_ICON_TYPE, code,
    			&size);
    		if (buffer != NULL && size != 0) {
-   			puts("    icon found!");
 			return BIconUtils::GetVectorIcon(static_cast<const uint8*>(buffer),
 				size, result);
    		}

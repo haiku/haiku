@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src apps bootman ;
 
-UsePrivateHeaders shared ;
-UsePrivateHeaders storage ;
+UsePrivateHeaders shared storage tracker ;
 
 Application bootman :
 	BootManager.cpp

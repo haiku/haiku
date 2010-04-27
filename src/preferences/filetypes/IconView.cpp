@@ -7,15 +7,12 @@
 #include "IconView.h"
 #include "MimeTypeListView.h"
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#	include <IconUtils.h>
-#	include <IconEditorProtocol.h>
-#endif
-
 #include <Application.h>
 #include <AppFileInfo.h>
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <IconEditorProtocol.h>
+#include <IconUtils.h>
 #include <Locale.h>
 #include <MenuItem.h>
 #include <Mime.h>
@@ -23,6 +20,7 @@
 #include <PopUpMenu.h>
 #include <Resources.h>
 #include <Roster.h>
+#include <Size.h>
 
 #include <new>
 #include <stdlib.h>
@@ -36,7 +34,6 @@
 using namespace std;
 
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 status_t
 icon_for_type(const BMimeType& type, uint8** _data, size_t* _size,
 	icon_source* _source)
@@ -93,7 +90,6 @@ icon_for_type(const BMimeType& type, uint8** _data, size_t* _size,
 
 	return source != kNoIcon ? B_OK : B_ERROR;
 }
-#endif
 
 
 status_t
@@ -182,7 +178,6 @@ Icon::SetTo(const BAppFileInfo& info, const char* type)
 {
 	Unset();
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	uint8* data;
 	size_t size;
 	if (info.GetIconForType(type, &data, &size) == B_OK) {
@@ -190,7 +185,6 @@ Icon::SetTo(const BAppFileInfo& info, const char* type)
 		AdoptData(data, size);
 		return;
 	}
-#endif
 
 	BBitmap* icon = AllocateBitmap(B_LARGE_ICON, B_CMAP8);
 	if (icon && info.GetIconForType(type, icon, B_LARGE_ICON) == B_OK)
@@ -224,7 +218,6 @@ Icon::SetTo(const BMimeType& type, icon_source* _source)
 {
 	Unset();
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	uint8* data;
 	size_t size;
 	if (icon_for_type(type, &data, &size, _source) == B_OK) {
@@ -232,7 +225,6 @@ Icon::SetTo(const BMimeType& type, icon_source* _source)
 		AdoptData(data, size);
 		return;
 	}
-#endif
 
 	BBitmap* icon = AllocateBitmap(B_LARGE_ICON, B_CMAP8);
 	if (icon && icon_for_type(type, *icon, B_LARGE_ICON, _source) == B_OK)
@@ -257,10 +249,8 @@ Icon::CopyTo(BAppFileInfo& info, const char* type, bool force) const
 		status = info.SetIconForType(type, fLarge, B_LARGE_ICON);
 	if (fMini != NULL || force)
 		status = info.SetIconForType(type, fMini, B_MINI_ICON);
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (fData != NULL || force)
 		status = info.SetIconForType(type, fData, fSize);
-#endif
 	return status;
 }
 
@@ -291,10 +281,8 @@ Icon::CopyTo(BMimeType& type, bool force) const
 		status = type.SetIcon(fLarge, B_LARGE_ICON);
 	if (fMini != NULL || force)
 		status = type.SetIcon(fMini, B_MINI_ICON);
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (fData != NULL || force)
 		status = type.SetIcon(fData, fSize);
-#endif
 	return status;
 }
 
@@ -316,10 +304,8 @@ Icon::CopyTo(BMessage& message) const
 		if (status == B_OK)
 			status = message.AddMessage("icon/mini", &archive);
 	}
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (status == B_OK && fData != NULL)
 		status = message.AddData("icon", B_VECTOR_ICON_TYPE, fData, fSize);
-#endif
 
 	return B_OK;
 }
@@ -360,7 +346,6 @@ Icon::SetMini(const BBitmap* mini)
 void
 Icon::SetData(const uint8* data, size_t size)
 {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	free(fData);
 	fData = NULL;
 
@@ -372,7 +357,6 @@ Icon::SetData(const uint8* data, size_t size)
 			memcpy(fData, data, size);
 		}
 	}
-#endif
 }
 
 
@@ -447,10 +431,8 @@ Icon::GetIcon(BBitmap* bitmap) const
 	if (bitmap == NULL)
 		return B_BAD_VALUE;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (fData != NULL && BIconUtils::GetVectorIcon(fData, fSize, bitmap) == B_OK)
 		return B_OK;
-#endif
 
 	int32 width = bitmap->Bounds().IntegerWidth() + 1;
 
@@ -508,11 +490,7 @@ Icon::AdoptData(uint8* data, size_t size)
 /*static*/ BBitmap*
 Icon::AllocateBitmap(int32 size, int32 space)
 {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	int32 kSpace = B_RGBA32;
-#else
-	int32 kSpace = B_CMAP8;
-#endif
 	if (space == -1)
 		space = kSpace;
 
@@ -530,8 +508,8 @@ Icon::AllocateBitmap(int32 size, int32 space)
 //	#pragma mark -
 
 
-IconView::IconView(BRect rect, const char* name, uint32 resizeMode, uint32 flags)
-	: BControl(rect, name, NULL, NULL, resizeMode, B_WILL_DRAW | flags),
+IconView::IconView(const char* name, uint32 flags)
+	: BControl(name, NULL, NULL, B_WILL_DRAW | flags),
 	fModificationMessage(NULL),
 	fIconSize(B_LARGE_ICON),
 	fIcon(NULL),
@@ -588,9 +566,8 @@ IconView::MessageReceived(BMessage* message)
 		const uint8* data = NULL;
 		ssize_t size = 0;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		message->FindData("icon", B_VECTOR_ICON_TYPE, (const void**)&data, &size);
-#endif
+		message->FindData("icon", B_VECTOR_ICON_TYPE, (const void**)&data,
+			&size);
 
 		BMessage archive;
 		if (message->FindMessage("icon/large", &archive) == B_OK)
@@ -672,16 +649,13 @@ IconView::MessageReceived(BMessage* message)
 
 				if (which == B_MIME_TYPE_DELETED
 					|| which == B_PREFERRED_APP_CHANGED
-#ifdef __HAIKU__
 					|| which == B_SUPPORTED_TYPES_CHANGED
-#endif
 					|| which == B_ICON_FOR_TYPE_CHANGED)
 					Update();
 			}
 			break;
 		}
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		case B_ICON_DATA_EDITED:
 		{
 			const uint8* data;
@@ -693,7 +667,6 @@ IconView::MessageReceived(BMessage* message)
 			_SetIcon(NULL, NULL, data, size);
 			break;
 		}
-#endif
 
 		default:
 			BControl::MessageReceived(message);
@@ -710,7 +683,8 @@ IconView::AcceptsDrag(const BMessage* message)
 
 	type_code type;
 	int32 count;
-	if (message->GetInfo("refs", &type, &count) == B_OK && count == 1 && type == B_REF_TYPE) {
+	if (message->GetInfo("refs", &type, &count) == B_OK && count == 1
+		&& type == B_REF_TYPE) {
 		// if we're bound to an entry, check that no one drops this to us
 		entry_ref ref;
 		if (fHasRef && message->FindRef("refs", &ref) == B_OK && fRef == ref)
@@ -719,11 +693,12 @@ IconView::AcceptsDrag(const BMessage* message)
 		return true;
 	}
 
-	if (message->GetInfo("icon/large", &type) == B_OK && type == B_MESSAGE_TYPE
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		|| message->GetInfo("icon", &type) == B_OK && type == B_VECTOR_ICON_TYPE
-#endif
-		|| message->GetInfo("icon/mini", &type) == B_OK && type == B_MESSAGE_TYPE)
+	if (message->GetInfo("icon/large", &type) == B_OK
+			&& type == B_MESSAGE_TYPE
+		|| message->GetInfo("icon", &type) == B_OK
+			&& type == B_VECTOR_ICON_TYPE
+		|| message->GetInfo("icon/mini", &type) == B_OK
+			&& type == B_MESSAGE_TYPE)
 		return true;
 
 	return false;
@@ -764,13 +739,10 @@ IconView::Draw(BRect updateRect)
 		SetPenSize(2);
 		BRect rect = BitmapRect();
 // TODO: this is an incompatibility between R5 and Haiku and should be fixed!
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+// (Necessary adjustment differs.)
 		rect.left++;
 		rect.top++;
-#else
-		rect.right--;
-		rect.bottom--;
-#endif
+
 		StrokeRect(rect);
 		SetPenSize(1);
 	}
@@ -785,6 +757,29 @@ IconView::GetPreferredSize(float* _width, float* _height)
 
 	if (_height)
 		*_height = fIconSize;
+}
+
+
+BSize
+IconView::MinSize()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+	return BSize(width, height);
+}
+
+
+BSize
+IconView::PreferredSize()
+{
+	return MinSize();
+}
+
+
+BSize
+IconView::MaxSize()
+{
+	return MinSize();
 }
 
 
@@ -1075,7 +1070,6 @@ IconView::ShowIconHeap(bool show)
 		BResources* resources = be_app->AppResources();
 		if (resources != NULL) {
 			const void* data = NULL;
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			size_t size;
 			data = resources->LoadResource('VICN', "icon heap", &size);
 			if (data != NULL) {
@@ -1089,7 +1083,6 @@ IconView::ShowIconHeap(bool show)
 					data = NULL;
 				}
 			}
-#endif // HAIKU_TARGET_PLATFORM_HAIKU
 			if (data == NULL) {
 				// no vector icon or failed to get bitmap
 				// try bitmap icon
@@ -1119,10 +1112,11 @@ IconView::ShowEmptyFrame(bool show)
 }
 
 
-void
+status_t
 IconView::SetTarget(const BMessenger& target)
 {
 	fTarget = target;
+	return B_OK;
 }
 
 
@@ -1134,7 +1128,7 @@ IconView::SetModificationMessage(BMessage* message)
 }
 
 
-void
+status_t
 IconView::Invoke(const BMessage* _message)
 {
 	if (_message == NULL)
@@ -1143,6 +1137,7 @@ IconView::Invoke(const BMessage* _message)
 		BMessage message(*_message);
 		fTarget.SendMessage(&message);
 	}
+	return B_OK;
 }
 
 
@@ -1178,8 +1173,6 @@ IconView::GetMimeType(BMimeType& type) const
 void
 IconView::_AddOrEditIcon()
 {
-	// this works only in Haiku! (the icon editor is built-in in R5's FileType)
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	BMessage message;
 	if (fHasRef && fType.Type() == NULL) {
 		// in ref mode, Icon-O-Matic can change the icon directly, and
@@ -1216,7 +1209,6 @@ IconView::_AddOrEditIcon()
 	}
 
 	be_roster->Launch("application/x-vnd.haiku-icon_o_matic", &message);
-#endif
 }
 
 
@@ -1232,10 +1224,8 @@ IconView::_SetIcon(BBitmap* large, BBitmap* mini, const uint8* data, size_t size
 				info.SetIconForType(fType.Type(), large, B_LARGE_ICON);
 			if (mini != NULL || force)
 				info.SetIconForType(fType.Type(), mini, B_MINI_ICON);
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			if (data != NULL || force)
 				info.SetIconForType(fType.Type(), data, size);
-#endif
 		}
 		// the icon shown will be updated using node monitoring
 	} else if (fHasType) {
@@ -1243,10 +1233,8 @@ IconView::_SetIcon(BBitmap* large, BBitmap* mini, const uint8* data, size_t size
 			fType.SetIcon(large, B_LARGE_ICON);
 		if (mini != NULL || force)
 			fType.SetIcon(mini, B_MINI_ICON);
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		if (data != NULL || force)
 			fType.SetIcon(data, size);
-#endif
 		// the icon shown will be updated automatically - we're watching
 		// any changes to the MIME database
 	} else if (fIconData != NULL) {
@@ -1282,7 +1270,6 @@ IconView::_SetIcon(entry_ref* ref)
 	if (file.InitCheck() != B_OK || info.InitCheck() != B_OK)
 		return;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	// try vector/PNG icon first
 	uint8* data = NULL;
 	size_t size = 0;
@@ -1291,7 +1278,6 @@ IconView::_SetIcon(entry_ref* ref)
 		free(data);
 		return;
 	}
-#endif
 
 	// try large/mini icons
 	bool hasMini = false;
@@ -1322,26 +1308,19 @@ IconView::_SetIcon(entry_ref* ref)
 			return;
 
 		BMimeType mimeType(type);
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		if (icon_for_type(mimeType, &data, &size) != B_OK) {
 			// only try large/mini icons when there is no vector icon
-#endif
 			if (large != NULL && icon_for_type(mimeType, *large, B_LARGE_ICON) == B_OK)
 				hasLarge = true;
 			if (mini != NULL && icon_for_type(mimeType, *mini, B_MINI_ICON) == B_OK)
 				hasMini = true;
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		}
-#endif
 	}
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (data != NULL) {
 		_SetIcon(NULL, NULL, data, size);
 		free(data);
-	} else
-#endif
-	if (hasLarge || hasMini)
+	} else if (hasLarge || hasMini)
 		_SetIcon(large, mini, NULL, 0);
 
 	delete large;

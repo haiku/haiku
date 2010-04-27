@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-Backgrounds	739979648
-X:	Main View		X方向：
+X:	Main View		X 方向：
 Resolution: 	Image Filepanel		解像度：
 pick one	Main View		１つ選択
 Default	Main View		デフォルト
@@ -16,7 +16,7 @@ Folder: 	Main View		フォルダー：
 Apply	Main View		適用
 Other folder…	Main View		指定フォルダー…
 Backgrounds	Main Window		背景
-Y:	Main View		Y方向：
+Y:	Main View		Y 方向：
 Tile	Main View		タイル状
 Select	Main View		選択
 Scale to fit	Main View		画面サイズに合わせる

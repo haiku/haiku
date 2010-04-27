@@ -10,6 +10,9 @@
 
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayout.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -110,25 +113,23 @@ replace_extension(BMimeType& type, const char* newExtension,
 ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 		const char* extension)
 	: BWindow(BRect(100, 100, 350, 200), TR("Extension"), B_MODAL_WINDOW_LOOK,
-		B_MODAL_SUBSET_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE
-			| B_ASYNCHRONOUS_CONTROLS),
+		B_MODAL_SUBSET_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE
+			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fTarget(target),
 	fMimeType(type.Type()),
 	fExtension(extension)
 {
-	BRect rect = Bounds();
-	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
+	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	rect.InsetBy(8.0f, 8.0f);
-	fExtensionControl = new BTextControl(rect, "extension", TR("Extension:"), extension,
-		NULL, B_FOLLOW_LEFT_RIGHT);
-
-	float labelWidth = fExtensionControl->StringWidth(fExtensionControl->Label()) + 2.0f;
-	fExtensionControl->SetModificationMessage(new BMessage(kMsgExtensionUpdated));
-	fExtensionControl->SetDivider(labelWidth);
-	fExtensionControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+	float padding = 3.0f;
+	//if (be_control_look)
+		// padding = be_control_look->DefaultItemSpacing();
+			// this seems to be very large!
+	
+	fExtensionControl = new BTextControl(TR("Extension:"), extension, NULL);
+	fExtensionControl->SetModificationMessage(
+		new BMessage(kMsgExtensionUpdated));
+	fExtensionControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_LEFT);
 
 	// filter out invalid characters that can't be part of an extension
 	BTextView* textView = fExtensionControl->TextView();
@@ -137,30 +138,20 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 		textView->DisallowChar(disallowedCharacters[i]);
 	}
 
-	float width, height;
-	fExtensionControl->GetPreferredSize(&width, &height);
-	fExtensionControl->ResizeTo(rect.Width(), height);
-	topView->AddChild(fExtensionControl);
-
-	fAcceptButton = new BButton(rect, "add", extension ? TR("Done") : TR("Add"),
-		new BMessage(kMsgAccept), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	fAcceptButton->ResizeToPreferred();
-	fAcceptButton->MoveTo(Bounds().Width() - 8.0f - fAcceptButton->Bounds().Width(),
-		Bounds().Height() - 8.0f - fAcceptButton->Bounds().Height());
+	fAcceptButton = new BButton(extension ? TR("Done") : TR("Add"),
+		new BMessage(kMsgAccept));
 	fAcceptButton->SetEnabled(false);
-	topView->AddChild(fAcceptButton);
 
-	BButton* button = new BButton(rect, "cancel", TR("Cancel"),
-		new BMessage(B_QUIT_REQUESTED), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->MoveTo(fAcceptButton->Frame().left - 10.0f - button->Bounds().Width(),
-		fAcceptButton->Frame().top);
-	topView->AddChild(button);
+	BButton* button = new BButton(TR("Cancel"),
+		new BMessage(B_QUIT_REQUESTED));
 
-	ResizeTo(labelWidth * 4.0f + 24.0f, fExtensionControl->Bounds().Height()
-		+ fAcceptButton->Bounds().Height() + 28.0f);
-	SetSizeLimits(button->Bounds().Width() + fAcceptButton->Bounds().Width() + 26.0f,
-		32767.0f, Frame().Height(), Frame().Height());
+	AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(fExtensionControl->CreateLabelLayoutItem(), 0, 0)
+		.Add(fExtensionControl->CreateTextViewLayoutItem(), 1, 0)
+		.Add(fAcceptButton, 0, 1)
+		.Add(button, 1, 1)
+		.SetInsets(padding, padding, padding, padding)
+	);
 
 	// omit the leading dot
 	if (fExtension.ByteAt(0) == '.')

@@ -5,6 +5,7 @@
  * Authors:
  *		Karsten Heimrich
  *		Fredrik Modéen
+ *		Wim van der Meer, WPJvanderMeer@gmail.com
  */
 #ifndef SCREENSHOT_WINDOW_H
 #define SCREENSHOT_WINDOW_H
@@ -31,12 +32,13 @@ class PreviewView;
 
 class ScreenshotWindow : public BWindow {
 public:
-							ScreenshotWindow(bigtime_t delay = 0,
-								bool includeBorder = false,
-								bool includeMouse = false,
-								bool grabActiveWindow = false,
-								bool showConfigWindow = false,
-								bool saveScreenshotSilent = false,
+							ScreenshotWindow();
+							ScreenshotWindow(bigtime_t delay,
+								bool includeBorder,
+								bool includeMouse,
+								bool grabActiveWindow,
+								bool showConfigWindow,
+								bool saveScreenshotSilent,
 								int32 imageFileType = B_PNG_FORMAT,
 								const char* outputFilename = NULL);
 	virtual					~ScreenshotWindow();
@@ -44,13 +46,13 @@ public:
 	virtual	void			MessageReceived(BMessage* message);
 
 private:
-			void			_InitWindow();
+			void			_InitWindow(const BMessage& settings);
 			BPath			_GetDirectory();
 			void			_SetupFirstLayoutItem(BCardLayout* layout);
-			void			_SetupSecondLayoutItem(BCardLayout* layout);
-			void			_DisallowChar(BTextView* textView);
-			void			_SetupTranslatorMenu(BMenu* translatorMenu,
+			void			_SetupSecondLayoutItem(BCardLayout* layout,
 								const BMessage& settings);
+			void			_DisallowChar(BTextView* textView);
+			void			_SetupTranslatorMenu(BMenu* translatorMenu);
 			void			_SetupOutputPathMenu(BMenu* outputPathMenu,
 								const BMessage& settings);
 			void			_AddItemToPathMenu(const char* path,
@@ -64,7 +66,7 @@ private:
 			BMessage		_ReadSettings() const;
 			void			_WriteSettings() const;
 
-			void			_TakeScreenshot();
+			void			_TakeScreenshot(bigtime_t delay);
 			status_t		_GetActiveWindowFrame(BRect* frame);
 			void			_MakeTabSpaceTransparent(BRect* frame);
 

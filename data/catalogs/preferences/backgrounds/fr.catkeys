@@ -4,22 +4,22 @@ Resolution: 	Image Filepanel		Résolution :
 pick one	Main View		choisir
 Default	Main View		Défaut
 Center	Main View		Centré
-Manual	Main View		Manuel
+Manual	Main View		Placement manuel
 Default folder	Main View		Dossier par défaut
 Revert	Main View		Défaire
 None	Main View		Aucun
-All workspaces	Main View		Tous les workspaces
+All workspaces	Main View		Tous les espaces de travail
 Icon label outline	Main View		Contour des étiquettes des icônes
 Other…	Main View		Autre…
-Current workspace	Main View		Workspace courant
+Current workspace	Main View		Espace de travail courant
 Folder: 	Main View		Dossier : 
 Apply	Main View		Appliquer
 Other folder…	Main View		Autre dossier…
 Backgrounds	Main Window		Fonds d'écran
 Y:	Main View		Y :
-Tile	Main View		Titre
-Select	Main View		Selectionner
-Scale to fit	Main View		Réduire
+Tile	Main View		Mosaique
+Select	Main View		Sélectionner
+Scale to fit	Main View		A l’échelle
 Placement:	Main View		Disposition :
-Preview	Main View		Apperçu
+Preview	Main View		Aperçu
 Image:	Main View		Image :

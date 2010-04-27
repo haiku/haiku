@@ -1,9 +1,9 @@
 1	french	system	2677153267
-%3.2f GiB	StringForSize		%3.2f Gio
-%3.2f KiB	StringForSize		%3.2f Kio
+%3.2f GiB	StringForSize		%3.2f GiO
+%3.2f KiB	StringForSize		%3.2f KiO
 %d bytes	StringForSize		%d octets
-%.2f TiB	StringForSize		%.2f Tio
-%3.2f MiB	StringForSize		%3.2f Mio
-Red:	ColorControl		Rouge :
 Green:	ColorControl		Vert :
+%.2f TiB	StringForSize		%.2f TiO
+Red:	ColorControl		Rouge :
+%3.2f MiB	StringForSize		%3.2f MiO
 Blue:	ColorControl		Bleu :

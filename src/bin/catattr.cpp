@@ -96,9 +96,10 @@ type_to_string(uint32 type)
 
 
 static status_t
-catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
+catAttr(const char *attribute, const char *fileName, bool keepRaw = false,
+	bool resolveLinks = true)
 {
-	int fd = open(fileName, O_RDONLY);
+	int fd = open(fileName, O_RDONLY | (resolveLinks ? 0 : O_NOTRAVERSE));
 	if (fd < 0)
 		return errno;
 
@@ -255,7 +256,13 @@ main(int argc, char *argv[])
 	if (argc > 2) {
 		int32 attrNameIndex = 1;
 		bool keepRaw = false;
+		bool resolveLinks = true;
 
+		if (!strcmp(argv[attrNameIndex], "-P")) {
+			resolveLinks = false;
+			attrNameIndex++;
+		}
+		
 		// see if user wants to get to the raw data of the attribute
 		if (strcmp(argv[attrNameIndex], "--raw") == 0 ||
 			strcmp(argv[attrNameIndex], "-r") == 0) {
@@ -265,16 +272,19 @@ main(int argc, char *argv[])
 
 		// Cat the attribute for every file given
 		for (int32 i = attrNameIndex + 1; i < argc; i++) {
-			status_t status = catAttr(argv[attrNameIndex], argv[i], keepRaw);
+			status_t status = catAttr(argv[attrNameIndex], argv[i], keepRaw,
+				resolveLinks);
 			if (status != B_OK) {
-				fprintf(stderr, "%s: file \"%s\", attribute \"%s\": %s\n",
+				fprintf(stderr, "%s: \"%s\", attribute \"%s\": %s\n",
 					program, argv[i], argv[attrNameIndex], strerror(status));
 			}
 		}
 	} else {
 		// Issue usage message
-		fprintf(stderr, "usage: %s [--raw|-r] <attribute-name> <file1> "
-			"[<file2>...]\n", program);
+		fprintf(stderr, "usage: %s [-P] [--raw|-r] <attribute-name> <file1> "
+			"[<file2>...]\n"
+			"\t-P : Don't resolve links\n"
+			"\t--raw|-r : Get the raw data of attributes\n", program);
 		// Be's original version -only- returned 1 if the
 		// amount of parameters was wrong, not if the file
 		// or attribute couldn't be found (!)

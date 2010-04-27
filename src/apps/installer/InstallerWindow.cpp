@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2005-2008, Jérôme DUVAL
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -15,6 +15,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <GridLayoutBuilder.h>
@@ -48,10 +49,12 @@
 #define TR_CONTEXT "InstallerWindow"
 
 #define DRIVESETUP_SIG "application/x-vnd.Haiku-DriveSetup"
+#define BOOTMAN_SIG "application/x-vnd.Haiku-Bootman"
 
 const uint32 BEGIN_MESSAGE = 'iBGN';
 const uint32 SHOW_BOTTOM_MESSAGE = 'iSBT';
-const uint32 SETUP_MESSAGE = 'iSEP';
+const uint32 LAUNCH_DRIVE_SETUP = 'iSEP';
+const uint32 LAUNCH_BOOTMAN = 'iWBM';
 const uint32 START_SCAN = 'iSSC';
 const uint32 PACKAGE_CHECKBOX = 'iPCB';
 const uint32 ENCOURAGE_DRIVESETUP = 'iENC';
@@ -151,6 +154,7 @@ InstallerWindow::InstallerWindow()
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fEncouragedToSetupPartitions(false),
 	fDriveSetupLaunched(false),
+	fBootmanLaunched(false),
 	fInstallStatus(kReadyForInstall),
 	fWorkerThread(new WorkerThread(this)),
 	fCopyEngineCancelSemaphore(-1)
@@ -206,22 +210,35 @@ InstallerWindow::InstallerWindow()
 	fBeginButton->MakeDefault(true);
 	fBeginButton->SetEnabled(false);
 
-	fSetupButton = new BButton("setup_button",
-		TR("Set up partitions" B_UTF8_ELLIPSIS), new BMessage(SETUP_MESSAGE));
+	fLaunchDriveSetupButton = new BButton("setup_button",
+		TR("Set up partitions" B_UTF8_ELLIPSIS),
+		new BMessage(LAUNCH_DRIVE_SETUP));
 
-	fMakeBootableButton = new BButton("makebootable_button",
-		TR("Write boot sector"), new BMessage(MSG_WRITE_BOOT_SECTOR));
-	fMakeBootableButton->SetEnabled(false);
+	fLaunchBootmanItem = new BMenuItem(TR("Set up boot menu"),
+		new BMessage(LAUNCH_BOOTMAN));
+	fLaunchBootmanItem->SetEnabled(false);
+
+	fMakeBootableItem = new BMenuItem(TR("Write boot sector"),
+		new BMessage(MSG_WRITE_BOOT_SECTOR));
+	fMakeBootableItem->SetEnabled(false);
+	BMenuBar* mainMenu = new BMenuBar("main menu");
+	BMenu* toolsMenu = new BMenu(TR("Tools"));
+	toolsMenu->AddItem(fLaunchBootmanItem);
+	toolsMenu->AddItem(fMakeBootableItem);
+	mainMenu->AddItem(toolsMenu);
+
+	float spacing = be_control_look->DefaultItemSpacing();
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+		.Add(mainMenu)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
 			.Add(logoView)
 			.Add(fStatusView)
 		)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-		.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
-			.Add(BGridLayoutBuilder(0, 10)
+		.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
+			.Add(BGridLayoutBuilder(0, spacing)
 				.Add(fSrcMenuField->CreateLabelLayoutItem(), 0, 0)
 				.Add(fSrcMenuField->CreateMenuBarLayoutItem(), 1, 0)
 				.Add(fDestMenuField->CreateLabelLayoutItem(), 0, 1)
@@ -235,13 +252,12 @@ InstallerWindow::InstallerWindow()
 				.Add(fSizeView, 0, 6, 2)
 			)
 
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-				.Add(fSetupButton)
-				.Add(fMakeBootableButton)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
+				.Add(fLaunchDriveSetupButton)
 				.AddGlue()
 				.Add(fBeginButton)
 			)
-			.SetInsets(10, 10, 10, 10)
+			.SetInsets(spacing, spacing, spacing, spacing)
 		)
 	);
 
@@ -256,18 +272,23 @@ InstallerWindow::InstallerWindow()
 	fProgressLayoutItem->SetVisible(false);
 
 	// Setup tool tips for the non-obvious features
-	fSetupButton->SetToolTip(
+	fLaunchDriveSetupButton->SetToolTip(
 		TR("Launch the DriveSetup utility to partition\n"
 		"available hard drives and other media.\n"
 		"Partitions can be initialized with the\n"
 		"Be File System needed for a Haiku boot\n"
 		"partition."));
-	fMakeBootableButton->SetToolTip(
-		TR("Writes the Haiku boot code to the partition start\n"
-		"sector. This step is automatically performed by\n"
-		"the installation, but you can manually make a\n"
-		"partition bootable in case you do not need to\n"
-		"perform an installation."));
+//	fLaunchBootmanItem->SetToolTip(
+//		TR("Install or uninstall the Haiku boot menu, which allows to "
+//		"choose an operating system to boot when the computer starts.\n"
+//		"If this computer already has a boot manager such as GRUB installed, "
+//		"it is better to add Haiku to that menu than to overwrite it."));
+//	fMakeBootableItem->SetToolTip(
+//		TR("Writes the Haiku boot code to the partition start\n"
+//		"sector. This step is automatically performed by\n"
+//		"the installation, but you can manually make a\n"
+//		"partition bootable in case you do not need to\n"
+//		"perform an installation."));
 
 	// finish creating window
 	if (!be_roster->IsRunning(kDeskbarSignature))
@@ -276,14 +297,17 @@ InstallerWindow::InstallerWindow()
 	CenterOnScreen();
 	Show();
 
+	// Register to receive notifications when apps launch or quit...
+	be_roster->StartWatching(this);
+	// ... and check the two we are interested in.
 	fDriveSetupLaunched = be_roster->IsRunning(DRIVESETUP_SIG);
+	fBootmanLaunched = be_roster->IsRunning(BOOTMAN_SIG);
  
 	if (Lock()) {
-		fSetupButton->SetEnabled(!fDriveSetupLaunched);
+		fLaunchDriveSetupButton->SetEnabled(!fDriveSetupLaunched);
+		fLaunchBootmanItem->SetEnabled(!fBootmanLaunched);
 		Unlock();
 	}
-
-	be_roster->StartWatching(this);
 
 	PostMessage(START_SCAN);
 }
@@ -372,8 +396,11 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case TARGET_PARTITION:
 			_UpdateControls();
 			break;
-		case SETUP_MESSAGE:
+		case LAUNCH_DRIVE_SETUP:
 			_LaunchDriveSetup();
+			break;
+		case LAUNCH_BOOTMAN:
+			_LaunchBootman();
 			break;
 		case PACKAGE_CHECKBOX:
 		{
@@ -468,17 +495,46 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case B_SOME_APP_QUIT:
 		{
 			const char *signature;
-			if (msg->FindString("be:signature", &signature) == B_OK
-				&& strcasecmp(signature, DRIVESETUP_SIG) == 0) {
-				fDriveSetupLaunched = msg->what == B_SOME_APP_LAUNCHED;
-				fBeginButton->SetEnabled(!fDriveSetupLaunched);
-				_DisableInterface(fDriveSetupLaunched);
-				if (fDriveSetupLaunched)
+			if (msg->FindString("be:signature", &signature) != B_OK)
+				break;
+			bool isDriveSetup = strcasecmp(signature, DRIVESETUP_SIG) == 0;
+			bool isBootman = strcasecmp(signature, BOOTMAN_SIG) == 0;
+			if (isDriveSetup || isBootman) {
+				bool scanPartitions = false;
+				if (isDriveSetup) {
+					bool launched = msg->what == B_SOME_APP_LAUNCHED;					
+					// We need to scan partitions if DriveSetup has quit.
+					scanPartitions = fDriveSetupLaunched && !launched;
+					fDriveSetupLaunched = launched;
+				}
+				if (isBootman)
+					fBootmanLaunched = msg->what == B_SOME_APP_LAUNCHED;
+
+				fBeginButton->SetEnabled(
+					!fDriveSetupLaunched && !fBootmanLaunched);
+				_DisableInterface(fDriveSetupLaunched || fBootmanLaunched);
+				if (fDriveSetupLaunched && fBootmanLaunched) {
+					_SetStatusMessage(TR("Running Boot Manager and "
+						"DriveSetup" B_UTF8_ELLIPSIS
+						"\n\nClose both applications to continue with the "
+						"installation."));
+				} else if (fDriveSetupLaunched) {
 					_SetStatusMessage(TR("Running DriveSetup" B_UTF8_ELLIPSIS
 						"\n\nClose DriveSetup to continue with the "
 						"installation."));
-				else
-					_ScanPartitions();
+				} else if (fBootmanLaunched) {
+					_SetStatusMessage(TR("Running Boot Manager" B_UTF8_ELLIPSIS
+						"\n\nClose Boot Manager to continue with the "
+						"installation."));
+				} else {
+					// If neither DriveSetup nor Bootman is running, we need
+					// to scan partitions in case DriveSetup has quit, or
+					// we need to update the guidance message.
+					if (scanPartitions)
+						_ScanPartitions();
+					else
+						_UpdateControls();
+				}
 			}
 			break;
 		}
@@ -496,9 +552,19 @@ InstallerWindow::MessageReceived(BMessage *msg)
 bool
 InstallerWindow::QuitRequested()
 {
-	if (fDriveSetupLaunched) {
-		(new BAlert("driveSetup",
+	if (fDriveSetupLaunched && fBootmanLaunched) {
+		(new BAlert(TR("Quit Boot Manager and DriveSetup"),
+			TR("Please close the Boot Manager and DriveSetup windows before "
+			"closing the Installer window."), TR("OK")))->Go();
+		return false;
+	} else if (fDriveSetupLaunched) {
+		(new BAlert(TR("Quit DriveSetup"),
 			TR("Please close the DriveSetup window before closing the "
+			"Installer window."), TR("OK")))->Go();
+		return false;
+	} else if (fBootmanLaunched) {
+		(new BAlert(TR("Quit Boot Manager"),
+			TR("Please close the Boot Manager window before closing the "
 			"Installer window."), TR("OK")))->Go();
 		return false;
 	}
@@ -559,10 +625,38 @@ InstallerWindow::_LaunchDriveSetup()
 
 
 void
+InstallerWindow::_LaunchBootman()
+{
+	// TODO: Currently bootman always tries to install to the "first" harddisk.
+	// If/when it later supports being installed to a certain harddisk, we
+	// would have to pass it the disk that contains the target partition here.
+	if (be_roster->Launch(BOOTMAN_SIG) != B_OK) {
+		// Try really hard to launch it. It's very likely that this fails,
+		// when we run from the CD and there is only an incomplete mime
+		// database for example...
+		BPath path;
+		if (find_directory(B_SYSTEM_BIN_DIRECTORY, &path) != B_OK
+			|| path.Append("bootman") != B_OK) {
+			path.SetTo("/boot/system/bin/bootman");
+		}
+		BEntry entry(path.Path());
+		entry_ref ref;
+		if (entry.GetRef(&ref) != B_OK || be_roster->Launch(&ref) != B_OK) {
+			BAlert* alert = new BAlert("error", TR("Bootman, the "
+				"application to configure the Haiku boot menu, could not be "
+				"launched."), TR("OK"));
+			alert->Go();
+		}
+	}
+}
+
+
+void
 InstallerWindow::_DisableInterface(bool disable)
 {
-	fSetupButton->SetEnabled(!disable);
-	fMakeBootableButton->SetEnabled(!disable);
+	fLaunchDriveSetupButton->SetEnabled(!disable);
+	fLaunchBootmanItem->SetEnabled(!disable);
+	fMakeBootableItem->SetEnabled(!disable);
 	fSrcMenuField->SetEnabled(!disable);
 	fDestMenuField->SetEnabled(!disable);
 }
@@ -581,9 +675,9 @@ InstallerWindow::_ScanPartitions()
 
 	fWorkerThread->ScanDisksPartitions(fSrcMenu, fDestMenu);
 
-	if (fSrcMenu->ItemAt(0)) {
+	if (fSrcMenu->ItemAt(0) != NULL)
 		_PublishPackages();
-	}
+
 	_UpdateControls();
 }
 
@@ -632,15 +726,15 @@ InstallerWindow::_UpdateControls()
 	}
 	fDestMenuField->MenuItem()->SetLabel(label.String());
 
-	if (srcItem && dstItem) {
+	if (srcItem != NULL && dstItem != NULL) {
 		char message[255];
 		sprintf(message, TR("Press the Begin button to install from '%1s' "
 			"onto '%2s'."), srcItem->Name(), dstItem->Name());
 		_SetStatusMessage(message);
-	} else if (srcItem) {
+	} else if (srcItem != NULL) {
 		_SetStatusMessage(TR("Choose the disk you want to install onto from "
 			"the pop-up menu. Then click \"Begin\"."));
-	} else if (dstItem) {
+	} else if (dstItem != NULL) {
 		_SetStatusMessage(TR("Choose the source disk from the "
 			"pop-up menu. Then click \"Begin\"."));
 	} else {
@@ -652,16 +746,19 @@ InstallerWindow::_UpdateControls()
 	fBeginButton->SetLabel(TR("Begin"));
 	fBeginButton->SetEnabled(srcItem && dstItem);
 
-	// adjust "Write Boot Sector" button
-	if (dstItem) {
+	// adjust "Write Boot Sector" and "Set up boot menu" buttons
+	if (dstItem != NULL) {
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer), TR("Write boot sector to '%s'"),
 			dstItem->Name());
 		label = buffer;
 	} else
 		label = TR("Write boot sector");
-	fMakeBootableButton->SetEnabled(dstItem);
-	fMakeBootableButton->SetLabel(label.String());
+	fMakeBootableItem->SetEnabled(dstItem != NULL);
+	fMakeBootableItem->SetLabel(label.String());
+// TODO: Once bootman support writing to specific disks, enable this, since
+// we would pass it the disk which contains the target partition.
+//	fLaunchBootmanItem->SetEnabled(dstItem != NULL);
 
 	if (!fEncouragedToSetupPartitions && !foundOneSuitableTarget) {
 		// Focus the users attention on the DriveSetup button
@@ -676,7 +773,7 @@ InstallerWindow::_PublishPackages()
 {
 	fPackagesView->Clean();
 	PartitionMenuItem *item = (PartitionMenuItem *)fSrcMenu->FindMarked();
-	if (!item)
+	if (item == NULL)
 		return;
 
 	BPath directory;

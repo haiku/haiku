@@ -16,12 +16,16 @@
 #include "PreferredAppMenu.h"
 #include "StringView.h"
 
+#include <Alignment.h>
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
 #include <MenuBar.h>
@@ -32,6 +36,8 @@
 #include <OutlineListView.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
+#include <SpaceLayoutItem.h>
+#include <SplitView.h>
 #include <TextControl.h>
 
 #include <OverrideAlert.h>
@@ -42,7 +48,7 @@
 
 
 #undef TR_CONTEXT
-#define TR_CONTEXT "FileType Window"
+#define TR_CONTEXT "FileTypes Window"
 
 
 const uint32 kMsgTypeSelected = 'typs';
@@ -73,10 +79,10 @@ const uint32 kMsgDescriptionEntered = 'dsce';
 const uint32 kMsgToggleIcons = 'tgic';
 const uint32 kMsgToggleRule = 'tgrl';
 
+
 class TypeIconView : public IconView {
 	public:
-		TypeIconView(BRect frame, const char* name,
-			int32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP);
+		TypeIconView(const char* name);
 		virtual ~TypeIconView();
 
 		virtual void Draw(BRect updateRect);
@@ -86,11 +92,11 @@ class TypeIconView : public IconView {
 		virtual BRect BitmapRect() const;
 };
 
+
 class ExtensionListView : public DropTargetListView {
 	public:
-		ExtensionListView(BRect frame, const char* name,
+		ExtensionListView(const char* name,
 			list_view_type type = B_SINGLE_SELECTION_LIST,
-			uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 		virtual ~ExtensionListView();
 
@@ -107,8 +113,8 @@ class ExtensionListView : public DropTargetListView {
 //	#pragma mark -
 
 
-TypeIconView::TypeIconView(BRect frame, const char* name, int32 resizingMode)
-	: IconView(frame, name, resizingMode)
+TypeIconView::TypeIconView(const char* name)
+	: IconView(name)
 {
 	ShowEmptyFrame(false);
 }
@@ -179,7 +185,8 @@ TypeIconView::GetPreferredSize(float* _width, float* _height)
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
-		*_height = IconSize() + 3.0f + ceilf(fontHeight.ascent + fontHeight.descent);
+		*_height = IconSize() + 3.0f + ceilf(fontHeight.ascent
+			+ fontHeight.descent);
 	}
 }
 
@@ -195,7 +202,8 @@ TypeIconView::BitmapRect() const
 		float width = StringWidth(TR("no icon")) + 8.0f;
 		float height = ceilf(fontHeight.ascent + fontHeight.descent) + 6.0f;
 		float x = (Bounds().Width() - width) / 2.0f;
-		float y = ceilf((IconSize() - fontHeight.ascent - fontHeight.descent) / 2.0f) - 3.0f;
+		float y = ceilf((IconSize() - fontHeight.ascent - fontHeight.descent)
+			/ 2.0f) - 3.0f;
 
 		return BRect(x, y, x + width, y + height);
 	}
@@ -208,9 +216,9 @@ TypeIconView::BitmapRect() const
 //	#pragma mark -
 
 
-ExtensionListView::ExtensionListView(BRect frame, const char* name,
-		list_view_type type, uint32 resizeMask, uint32 flags)
-	: DropTargetListView(frame, name, type, resizeMask, flags)
+ExtensionListView::ExtensionListView(const char* name,
+		list_view_type type, uint32 flags)
+	: DropTargetListView(name, type, flags)
 {
 }
 
@@ -277,8 +285,9 @@ ExtensionListView::SetType(BMimeType* type)
 
 
 FileTypesWindow::FileTypesWindow(const BMessage& settings)
-	: BWindow(_Frame(settings), "FileTypes", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
+	:
+	BWindow(_Frame(settings), TR("FileTypes"), B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fNewTypeWindow(NULL)
 {
 	bool showIcons;
@@ -288,10 +297,19 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	if (settings.FindBool("show_rule", &showRule) != B_OK)
 		showRule = false;
 
-	// add the menu
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	float padding = 3.0f;
+	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
+	if (be_control_look) {
+		// padding = be_control_look->DefaultItemSpacing();
+			// this seems to be very large!
+		labelAlignment = be_control_look->DefaultLabelAlignment();
+	}
+	BAlignment fullAlignment = 
+		BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
 
-	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), NULL);
-	AddChild(menuBar);
+	// add the menu
+	BMenuBar* menuBar = new BMenuBar("");
 
 	BMenu* menu = new BMenu(TR("File"));
 	BMenuItem* item;
@@ -300,11 +318,12 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	item->SetEnabled(false);
 
 	BMenu* recentsMenu = BRecentFilesList::NewFileListMenu(
-		TR("Open" B_UTF8_ELLIPSIS),
-		NULL, NULL, be_app, 10, false, NULL, kSignature);
+		TR("Open" B_UTF8_ELLIPSIS), NULL, NULL, be_app, 10, false, NULL,
+		kSignature);
 	item = new BMenuItem(recentsMenu, new BMessage(kMsgOpenFilePanel));
 	item->SetShortcut('O', B_COMMAND_KEY);
 	menu->AddItem(item);
+
 	menu->AddItem(new BMenuItem(TR("Application types" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOpenApplicationTypesWindow)));
 	menu->AddSeparatorItem();
@@ -319,264 +338,187 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	menuBar->AddItem(menu);
 
 	menu = new BMenu(TR("Settings"));
-	item = new BMenuItem(TR("Show icons in list"), new BMessage(kMsgToggleIcons));
+	item = new BMenuItem(TR("Show icons in list"),
+		new BMessage(kMsgToggleIcons));
 	item->SetMarked(showIcons);
 	item->SetTarget(this);
 	menu->AddItem(item);
 
-	item = new BMenuItem(TR("Show recognition rule"), new BMessage(kMsgToggleRule));
+	item = new BMenuItem(TR("Show recognition rule"),
+		new BMessage(kMsgToggleRule));
 	item->SetMarked(showRule);
 	item->SetTarget(this);
 	menu->AddItem(item);
 	menuBar->AddItem(menu);
 
+	AddChild(menuBar);
+	menuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
+
 	// MIME Types list
+	BButton* addTypeButton = new BButton("add", TR("Add" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgAddType));
 
-	BRect rect = Bounds();
-	rect.top = menuBar->Bounds().Height() + 1.0f;
-	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
+	fRemoveTypeButton = new BButton("remove", TR("Remove"),
+		new BMessage(kMsgRemoveType) );
 
-	BButton* button = new BButton(rect, "add", TR("Add" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgAddType), B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->MoveTo(8.0f, topView->Bounds().bottom - 8.0f - button->Bounds().Height());
-	topView->AddChild(button);
-
-	rect = button->Frame();
-	rect.OffsetBy(rect.Width() + 8.0f, 0.0f);
-	fRemoveTypeButton = new BButton(rect, "remove", TR("Remove"),
-		new BMessage(kMsgRemoveType), B_FOLLOW_BOTTOM);
-	fRemoveTypeButton->ResizeToPreferred();
-	topView->AddChild(fRemoveTypeButton);
-
-	rect.bottom = rect.top - 10.0f;
-	rect.top = 10.0f;
-	rect.left = 10.0f;
-	rect.right -= B_V_SCROLL_BAR_WIDTH + 2.0f;
-	if (rect.right < 180)
-		rect.right = 180;
-
-	fTypeListView = new MimeTypeListView(rect, "typeview", NULL, showIcons, false,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
+	fTypeListView = new MimeTypeListView("typeview", NULL, showIcons, false);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
 
-	BScrollView* scrollView = new BScrollView("scrollview", fTypeListView,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-	topView->AddChild(scrollView);
+	BScrollView* typeListScrollView = new BScrollView("scrollview",
+		fTypeListView, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
 	// "Icon" group
 
-	font_height plainHeight;
-	be_plain_font->GetHeight(&plainHeight);
-	float height = ceilf(plainHeight.ascent + plainHeight.descent
-		+ plainHeight.leading) + 2.0f;
-
-	BFont font(be_bold_font);
-	float labelWidth = font.StringWidth(TR("Icon"));
-	font_height boldHeight;
-	font.GetHeight(&boldHeight);
-
-	BRect innerRect;
-	fIconView = new TypeIconView(innerRect, "icon",
-		B_FOLLOW_LEFT | B_FOLLOW_V_CENTER);
-	fIconView->ResizeToPreferred();
-
-	rect.left = rect.right + 12.0f + B_V_SCROLL_BAR_WIDTH;
-	rect.right = rect.left + max_c(fIconView->Bounds().Width(), labelWidth) + 16.0f;
-	rect.bottom = rect.top + ceilf(boldHeight.ascent)
-		+ max_c(fIconView->Bounds().Height(),
-			button->Bounds().Height() * 2.0f + height + 4.0f) + 12.0f;
-	rect.top -= 2.0f;
-	fIconBox = new BBox(rect);
+	fIconView = new TypeIconView("icon");
+	fIconBox = new BBox("Icon BBox");
 	fIconBox->SetLabel(TR("Icon"));
-	topView->AddChild(fIconBox);
-
-	innerRect.left = 8.0f;
-	innerRect.top = plainHeight.ascent + 3.0f
-		+ (rect.Height() - boldHeight.ascent - fIconView->Bounds().Height()) / 2.0f;
-	if (innerRect.top + fIconView->Bounds().Height() > fIconBox->Bounds().Height() - 6.0f)
-		innerRect.top = fIconBox->Bounds().Height() - 6.0f - fIconView->Bounds().Height();
-	fIconView->MoveTo(innerRect.LeftTop());
-	fIconBox->AddChild(fIconView);
+	fIconBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+		.Add(BSpaceLayoutItem::CreateGlue(), 1)
+		.Add(fIconView, 3)
+		.Add(BSpaceLayoutItem::CreateGlue(), 1)
+		.SetInsets(padding, padding, padding, padding)
+	);
 
 	// "File Recognition" group
 
-	BRect rightRect(rect);
-	rightRect.left = rect.right + 8.0f;
-	rightRect.right = topView->Bounds().Width() - 8.0f;
-	fRecognitionBox = new BBox(rightRect, NULL, B_FOLLOW_LEFT_RIGHT);
+	fRecognitionBox = new BBox("Recognition Box");
 	fRecognitionBox->SetLabel(TR("File recognition"));
-	topView->AddChild(fRecognitionBox);
+	fRecognitionBox->SetExplicitAlignment(fullAlignment);
 
-	innerRect = fRecognitionBox->Bounds().InsetByCopy(8.0f, 4.0f);
-	innerRect.top += ceilf(boldHeight.ascent);
-	fExtensionLabel = new StringView(innerRect, "extension", TR("Extensions:"), NULL);
-	fExtensionLabel->SetAlignment(B_ALIGN_LEFT, B_ALIGN_LEFT);
-	fExtensionLabel->ResizeToPreferred();
-	fRecognitionBox->AddChild(fExtensionLabel);
+	fExtensionLabel = new StringView(TR("Extensions:"), NULL);
+	fExtensionLabel->LabelView()->SetExplicitAlignment(labelAlignment);
 
-	innerRect.top += fExtensionLabel->Bounds().Height() + 2.0f;
-	innerRect.left = innerRect.right - button->StringWidth(TR("Remove")) - 16.0f;
-	innerRect.bottom = innerRect.top + button->Bounds().Height();
-	fAddExtensionButton = new BButton(innerRect, "add ext", TR("Add" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgAddExtension), B_FOLLOW_RIGHT);
-	fRecognitionBox->AddChild(fAddExtensionButton);
+	fAddExtensionButton = new BButton("add ext", TR("Add" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgAddExtension));
 
-	innerRect.OffsetBy(0, innerRect.Height() + 4.0f);
-	fRemoveExtensionButton = new BButton(innerRect, "remove ext", TR("Remove"),
-		new BMessage(kMsgRemoveExtension), B_FOLLOW_RIGHT);
-	fRecognitionBox->AddChild(fRemoveExtensionButton);
+	fRemoveExtensionButton = new BButton("remove ext", TR("Remove"),
+		new BMessage(kMsgRemoveExtension));
 
-	innerRect.right = innerRect.left - 10.0f - B_V_SCROLL_BAR_WIDTH;
-	innerRect.left = 10.0f;
-	innerRect.top = fAddExtensionButton->Frame().top + 2.0f;
-	innerRect.bottom = innerRect.bottom - 2.0f;
-		// take scrollview border into account
-	fExtensionListView = new ExtensionListView(innerRect, "listview ext",
-		B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT_RIGHT);
-	fExtensionListView->SetSelectionMessage(new BMessage(kMsgExtensionSelected));
-	fExtensionListView->SetInvocationMessage(new BMessage(kMsgExtensionInvoked));
+	fExtensionListView = new ExtensionListView("listview ext",
+		B_SINGLE_SELECTION_LIST);
+	fExtensionListView->SetSelectionMessage(
+		new BMessage(kMsgExtensionSelected));
+	fExtensionListView->SetInvocationMessage(
+		new BMessage(kMsgExtensionInvoked));
 
-	scrollView = new BScrollView("scrollview ext", fExtensionListView,
-		B_FOLLOW_LEFT_RIGHT, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-	fRecognitionBox->AddChild(scrollView);
+	BScrollView* scrollView = new BScrollView("scrollview ext", 
+		fExtensionListView, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
-	innerRect.left = 8.0f;
-	innerRect.top = innerRect.bottom + 10.0f;
-	innerRect.right = fRecognitionBox->Bounds().right - 8.0f;
-	innerRect.bottom = innerRect.top + 20.0f;
-	fRuleControl = new BTextControl(innerRect, "rule", TR("Rule:"), "",
-		new BMessage(kMsgRuleEntered), B_FOLLOW_LEFT_RIGHT);
-	//fRuleControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	fRuleControl->SetDivider(fRuleControl->StringWidth(fRuleControl->Label()) + 6.0f);
+	fRuleControl = new BTextControl("rule", TR("Rule:"), "", 
+		new BMessage(kMsgRuleEntered));
+	fRuleControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fRuleControl->Hide();
-	fRecognitionBox->AddChild(fRuleControl);
+
+	BView* recognitionBoxGrid = 
+		BGridLayoutBuilder(padding, padding)
+			.Add(fExtensionLabel->LabelView(), 0, 0)
+			.Add(scrollView, 0, 1, 2, 3)
+			.Add(fAddExtensionButton, 2, 1)
+			.Add(fRemoveExtensionButton, 2, 2)
+			.Add(fRuleControl, 0, 4, 3, 1)
+			.SetInsets(padding, padding, padding, padding);
+
+	recognitionBoxGrid->SetExplicitAlignment(fullAlignment);
+	fRecognitionBox->AddChild(recognitionBoxGrid);
 
 	// "Description" group
 
-	rect.top = rect.bottom + 8.0f;
-	rect.bottom = rect.top + ceilf(boldHeight.ascent) + 24.0f;
-	rect.right = rightRect.right;
-	fDescriptionBox = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
+	fDescriptionBox = new BBox("description BBox");
 	fDescriptionBox->SetLabel(TR("Description"));
-	topView->AddChild(fDescriptionBox);
+	fDescriptionBox->SetExplicitAlignment(fullAlignment);
 
-	innerRect = fDescriptionBox->Bounds().InsetByCopy(8.0f, 6.0f);
-	innerRect.top += ceilf(boldHeight.ascent);
-	innerRect.bottom = innerRect.top + button->Bounds().Height();
-	fInternalNameView = new StringView(innerRect, "internal", TR("Internal name:"), "",
-		B_FOLLOW_LEFT_RIGHT);
-	labelWidth = fInternalNameView->StringWidth(fInternalNameView->Label()) + 2.0f;
-	fInternalNameView->SetDivider(labelWidth);
+	fInternalNameView = new StringView(TR("Internal name:"), NULL);
 	fInternalNameView->SetEnabled(false);
-	fInternalNameView->ResizeToPreferred();
-	fDescriptionBox->AddChild(fInternalNameView);
+	fTypeNameControl = new BTextControl("type", TR("Type name:"), "", 
+		new BMessage(kMsgTypeEntered));
+	fDescriptionControl = new BTextControl("description", TR("Description:"),
+		"", new BMessage(kMsgDescriptionEntered));
 
-	innerRect.OffsetBy(0, fInternalNameView->Bounds().Height() + 5.0f);
-	fTypeNameControl = new BTextControl(innerRect, "type", TR("Type name:"), "",
-		new BMessage(kMsgTypeEntered), B_FOLLOW_LEFT_RIGHT);
-	fTypeNameControl->SetDivider(labelWidth);
-	fTypeNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	fDescriptionBox->ResizeBy(0, fInternalNameView->Bounds().Height()
-		+ fTypeNameControl->Bounds().Height() * 2.0f);
-	fDescriptionBox->AddChild(fTypeNameControl);
+	fDescriptionBox->AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(fInternalNameView->LabelView(), 0, 0)
+		.Add(fInternalNameView->TextView(), 1, 0)
+		.Add(fTypeNameControl->CreateLabelLayoutItem(), 0, 1)
+		.Add(fTypeNameControl->CreateTextViewLayoutItem(), 1, 1, 2)
+		.Add(fDescriptionControl->CreateLabelLayoutItem(), 0, 2)
+		.Add(fDescriptionControl->CreateTextViewLayoutItem(), 1, 2, 2)
+		.SetInsets(padding, padding, padding, padding)
+	);
 
-	innerRect.OffsetBy(0, fTypeNameControl->Bounds().Height() + 5.0f);
-	fDescriptionControl = new BTextControl(innerRect, "description", TR("Description:"), "",
-		new BMessage(kMsgDescriptionEntered), B_FOLLOW_LEFT_RIGHT);
-	fDescriptionControl->SetDivider(labelWidth);
-	fDescriptionControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	fDescriptionBox->AddChild(fDescriptionControl);
 
 	// "Preferred Application" group
 
-	rect = fDescriptionBox->Frame();
-	rect.top = rect.bottom + 8.0f;
-	rect.bottom = rect.top + ceilf(boldHeight.ascent)
-		+ button->Bounds().Height() + 14.0f;
-	fPreferredBox = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
+	fPreferredBox = new BBox("preferred BBox");
 	fPreferredBox->SetLabel(TR("Preferred application"));
-	topView->AddChild(fPreferredBox);
-
-	innerRect = fPreferredBox->Bounds().InsetByCopy(8.0f, 6.0f);
-	innerRect.top += ceilf(boldHeight.ascent);
-	innerRect.left = innerRect.right - button->StringWidth(
-		TR("Same as" B_UTF8_ELLIPSIS)) - 24.0f;
-	innerRect.bottom = innerRect.top + button->Bounds().Height();
-	fSameAsButton = new BButton(innerRect, "same as",
-		TR("Same as" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgSamePreferredAppAs), B_FOLLOW_RIGHT);
-	fPreferredBox->AddChild(fSameAsButton);
-
-	innerRect.OffsetBy(-innerRect.Width() - 6.0f, 0.0f);
-	fSelectButton = new BButton(innerRect, "select", TR("Select" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgSelectPreferredApp), B_FOLLOW_RIGHT);
-	fPreferredBox->AddChild(fSelectButton);
 
 	menu = new BPopUpMenu("preferred");
 	menu->AddItem(item = new BMenuItem(TR("None"),
 		new BMessage(kMsgPreferredAppChosen)));
 	item->SetMarked(true);
+	fPreferredField = new BMenuField("preferred", (char*)NULL, menu);
 
-	innerRect.right = innerRect.left - 6.0f;
-	innerRect.left = 8.0f;
+	fSelectButton = new BButton("select", TR("Select" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgSelectPreferredApp));
 
-	fPreferredField = new BMenuField(innerRect, "preferred", NULL, menu, true,
-		B_FOLLOW_LEFT_RIGHT);
-	float width;
-	fPreferredField->GetPreferredSize(&width, &height);
-	fPreferredField->ResizeTo(innerRect.Width(), height);
-	fPreferredField->MoveBy(0.0f, (innerRect.Height() - height) / 2.0f);
+	fSameAsButton = new BButton("same as", TR("Same as" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgSamePreferredAppAs));
 
-	fPreferredBox->AddChild(fPreferredField);
+	fPreferredBox->AddChild(
+		BGroupLayoutBuilder(B_HORIZONTAL, padding)
+			.Add(fPreferredField)
+			.Add(fSelectButton)
+			.Add(fSameAsButton)
+			.SetInsets(padding, padding, padding, padding)
+	);
 
 	// "Extra Attributes" group
-
-	rect.top = rect.bottom + 8.0f;
-	rect.bottom = topView->Bounds().Height() - 8.0f;
-	fAttributeBox = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT
-		| B_FOLLOW_TOP_BOTTOM);
+	fAttributeBox = new BBox("Attribute Box");
 	fAttributeBox->SetLabel(TR("Extra attributes"));
-	topView->AddChild(fAttributeBox);
 
-	innerRect = fAttributeBox->Bounds().InsetByCopy(8.0f, 6.0f);
-	innerRect.top += ceilf(boldHeight.ascent);
-	innerRect.left = innerRect.right - button->StringWidth(TR("Remove")) - 16.0f;
-	innerRect.bottom = innerRect.top + button->Bounds().Height();
-	fAddAttributeButton = new BButton(innerRect, "add attr",
-		TR("Add" B_UTF8_ELLIPSIS), new BMessage(kMsgAddAttribute), B_FOLLOW_RIGHT);
-	fAttributeBox->AddChild(fAddAttributeButton);
+	fAddAttributeButton = new BButton("add attr",
+		"Add" B_UTF8_ELLIPSIS, new BMessage(kMsgAddAttribute));
 
-	innerRect.OffsetBy(0, innerRect.Height() + 4.0f);
-	fRemoveAttributeButton = new BButton(innerRect, "remove attr", TR("Remove"),
-		new BMessage(kMsgRemoveAttribute), B_FOLLOW_RIGHT);
-	fAttributeBox->AddChild(fRemoveAttributeButton);
-/*
-	innerRect.OffsetBy(0, innerRect.Height() + 4.0f);
-	button = new BButton(innerRect, "push attr", "Push Up",
-		new BMessage(kMsgRemoveAttribute), B_FOLLOW_RIGHT);
-	fAttributeBox->AddChild(button);
-*/
-	innerRect.right = innerRect.left - 10.0f - B_V_SCROLL_BAR_WIDTH;
-	innerRect.left = 10.0f;
-	innerRect.top = 8.0f + ceilf(boldHeight.ascent);
-	innerRect.bottom = fAttributeBox->Bounds().bottom - 10.0f;
-		// take scrollview border into account
-	fAttributeListView = new AttributeListView(innerRect, "listview attr",
-		B_FOLLOW_ALL);
-	fAttributeListView->SetSelectionMessage(new BMessage(kMsgAttributeSelected));
-	fAttributeListView->SetInvocationMessage(new BMessage(kMsgAttributeInvoked));
+	fRemoveAttributeButton = new BButton("remove attr", TR("Remove"),
+		new BMessage(kMsgRemoveAttribute));
 
-	scrollView = new BScrollView("scrollview attr", fAttributeListView,
-		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-	fAttributeBox->AddChild(scrollView);
+	fAttributeListView = new AttributeListView("listview attr");
+	fAttributeListView->SetSelectionMessage(
+		new BMessage(kMsgAttributeSelected));
+	fAttributeListView->SetInvocationMessage(
+		new BMessage(kMsgAttributeInvoked));
 
-	SetSizeLimits(rightRect.left + 72.0f + font.StringWidth("jpg")
-		+ font.StringWidth(fRecognitionBox->Label()), 32767.0f,
-		rect.top + 2.0f * button->Bounds().Height() + boldHeight.ascent
-		+ 32.0f + menuBar->Bounds().Height(), 32767.0f);
+	BScrollView* attributesScroller = new BScrollView("scrollview attr",
+		fAttributeListView, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
+
+	fAttributeBox->AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(attributesScroller, 0, 0, 2, 3)
+		.Add(fAddAttributeButton, 2, 0)
+		.Add(fRemoveAttributeButton, 2, 1)
+		.SetInsets(padding, padding, padding, padding)
+	);
+
+
+	BView* topView = 
+		BGroupLayoutBuilder(B_HORIZONTAL, padding)
+		.SetInsets(padding, padding, padding, padding)
+		.Add(BGroupLayoutBuilder(B_VERTICAL, padding)
+			.Add(typeListScrollView)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+				.Add(addTypeButton).Add(fRemoveTypeButton)
+			)
+		)
+		// Right side
+		.Add(BGroupLayoutBuilder(B_VERTICAL, padding)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+				.Add(fIconBox, 1).Add(fRecognitionBox, 3)
+			)
+			.Add(fDescriptionBox)
+			.Add(fPreferredBox)
+			.Add(fAttributeBox, 5)
+		);
+
+	//topView->SetExplicitAlignment(fullAlignment);
+	//topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(topView);
 
 	_SetType(NULL);
 	_ShowSnifferRule(showRule);
@@ -598,7 +540,7 @@ FileTypesWindow::_Frame(const BMessage& settings) const
 	if (settings.FindRect("file_types_frame", &rect) == B_OK)
 		return rect;
 
-	return BRect(80.0f, 80.0f, 600.0f, 480.0f);
+	return BRect(80.0f, 80.0f, 0.0f, 0.0f);
 }
 
 
@@ -608,29 +550,10 @@ FileTypesWindow::_ShowSnifferRule(bool show)
 	if (fRuleControl->IsHidden() == !show)
 		return;
 
-	float minWidth, maxWidth, minHeight, maxHeight;
-	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-
-	float diff = fRuleControl->Bounds().Height() + 8.0f;
-
-	if (!show) {
+	if (!show)
 		fRuleControl->Hide();
-		diff = -diff;
-	}
-
-	// adjust other controls to make space or take it again
-
-	fIconBox->ResizeBy(0.0f, diff);
-	fRecognitionBox->ResizeBy(0.0f, diff);
-	fDescriptionBox->MoveBy(0.0f, diff);
-	fPreferredBox->MoveBy(0.0f, diff);
-	fAttributeBox->MoveBy(0.0f, diff);
-	fAttributeBox->ResizeBy(0.0f, -diff);
-
-	if (show)
+	else
 		fRuleControl->Show();
-
-	SetSizeLimits(minWidth, maxWidth, minHeight + diff, maxHeight);
 }
 
 
@@ -671,8 +594,10 @@ FileTypesWindow::_AdoptPreferredApplication(BMessage* message, bool sameAs)
 		return;
 
 	BString preferred;
-	if (retrieve_preferred_app(message, sameAs, fCurrentType.Type(), preferred) != B_OK)
+	if (retrieve_preferred_app(message, sameAs, fCurrentType.Type(), preferred)
+		!= B_OK) {
 		return;
+	}
 
 	status_t status = fCurrentType.SetPreferredApp(preferred.String());
 	if (status != B_OK)
@@ -683,7 +608,8 @@ FileTypesWindow::_AdoptPreferredApplication(BMessage* message, bool sameAs)
 void
 FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 {
-	update_preferred_app_menu(fPreferredField->Menu(), type, kMsgPreferredAppChosen);
+	update_preferred_app_menu(fPreferredField->Menu(), type,
+		kMsgPreferredAppChosen);
 }
 
 
@@ -787,8 +713,9 @@ FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 void
 FileTypesWindow::PlaceSubWindow(BWindow* window)
 {
-	window->MoveTo(Frame().left + (Frame().Width() - window->Frame().Width()) / 2.0f,
-		Frame().top + (Frame().Height() - window->Frame().Height()) / 2.0f);
+	window->MoveTo(Frame().left + (Frame().Width() - window->Frame().Width())
+		/ 2.0f, Frame().top + (Frame().Height() - window->Frame().Height())
+		/ 2.0f);
 }
 
 
@@ -797,12 +724,14 @@ FileTypesWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_SIMPLE_DATA:
+		{
 			type_code type;
 			if (message->GetInfo("refs", &type) == B_OK
 				&& type == B_REF_TYPE) {
 				be_app->PostMessage(message);
 			}
 			break;
+		}
 
 		case kMsgToggleIcons:
 		{
@@ -840,7 +769,8 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		{
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK) {
-				MimeTypeItem* item = (MimeTypeItem*)fTypeListView->ItemAt(index);
+				MimeTypeItem* item
+					= (MimeTypeItem*)fTypeListView->ItemAt(index);
 				if (item != NULL) {
 					BMimeType type(item->Type());
 					_SetType(&type);
@@ -851,14 +781,14 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgAddType:
-		{
 			if (fNewTypeWindow == NULL) {
-				fNewTypeWindow = new NewFileTypeWindow(this, fCurrentType.Type());
+				fNewTypeWindow
+					= new NewFileTypeWindow(this, fCurrentType.Type());
 				fNewTypeWindow->Show();
 			} else
 				fNewTypeWindow->Activate();
 			break;
-		}
+
 		case kMsgNewTypeWindowClosed:
 			fNewTypeWindow = NULL;
 			break;
@@ -870,7 +800,7 @@ FileTypesWindow::MessageReceived(BMessage* message)
 
 			BAlert* alert;
 			if (fCurrentType.IsSupertypeOnly()) {
-				alert = new BPrivate::OverrideAlert(TR("FileTypes Request"),
+				alert = new BPrivate::OverrideAlert(TR("FileTypes request"),
 					TR("Removing a super type cannot be reverted.\n"
 					"All file types that belong to this super type "
 					"will be lost!\n\n"
@@ -879,17 +809,20 @@ FileTypesWindow::MessageReceived(BMessage* message)
 					TR("Remove"), B_SHIFT_KEY, TR("Cancel"), 0, NULL, 0,
 					B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			} else {
-				alert = new BAlert(TR("FileTypes Request"),
+				alert = new BAlert(TR("FileTypes request"),
 					TR("Removing a file type cannot be reverted.\n"
 					"Are you sure you want to remove it?"),
-					TR("Remove"), TR("Cancel"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+					TR("Remove"), TR("Cancel"), NULL, B_WIDTH_AS_USUAL,
+					B_WARNING_ALERT);
 			}
 			if (alert->Go())
 				break;
 
 			status_t status = fCurrentType.Delete();
-			if (status != B_OK)
-				fprintf(stderr, TR("Could not remove file type: %s\n"), strerror(status));
+			if (status != B_OK) {
+				fprintf(stderr, TR("Could not remove file type: %s\n"),
+					strerror(status));
+			}
 			break;
 		}
 
@@ -907,7 +840,8 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		{
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK) {
-				BStringItem* item = (BStringItem*)fExtensionListView->ItemAt(index);
+				BStringItem* item
+					= (BStringItem*)fExtensionListView->ItemAt(index);
 				fRemoveExtensionButton->SetEnabled(item != NULL);
 			}
 			break;
@@ -920,11 +854,13 @@ FileTypesWindow::MessageReceived(BMessage* message)
 
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK) {
-				BStringItem* item = (BStringItem*)fExtensionListView->ItemAt(index);
+				BStringItem* item
+					= (BStringItem*)fExtensionListView->ItemAt(index);
 				if (item == NULL)
 					break;
 
-				BWindow* window = new ExtensionWindow(this, fCurrentType, item->Text());
+				BWindow* window
+					= new ExtensionWindow(this, fCurrentType, item->Text());
 				window->Show();
 			}
 			break;
@@ -958,7 +894,8 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		{
 			// check rule
 			BString parseError;
-			if (BMimeType::CheckSnifferRule(fRuleControl->Text(), &parseError) != B_OK) {
+			if (BMimeType::CheckSnifferRule(fRuleControl->Text(),
+					&parseError) != B_OK) {
 				parseError.Prepend(TR("Recognition rule is not valid:\n\n"));
 				error_alert(parseError.String());
 			} else
@@ -1009,7 +946,8 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		case kMsgSamePreferredAppAs:
 		{
 			BMessage panel(kMsgOpenFilePanel);
-			panel.AddString("title", TR("Select same preferred application as"));
+			panel.AddString("title", TR("Select same preferred application "
+				"as"));
 			panel.AddInt32("message", kMsgSamePreferredAppAsOpened);
 			panel.AddMessenger("target", this);
 
@@ -1026,7 +964,8 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		{
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK) {
-				AttributeItem* item = (AttributeItem*)fAttributeListView->ItemAt(index);
+				AttributeItem* item
+					= (AttributeItem*)fAttributeListView->ItemAt(index);
 				fRemoveAttributeButton->SetEnabled(item != NULL);
 			}
 			break;
@@ -1039,7 +978,8 @@ FileTypesWindow::MessageReceived(BMessage* message)
 
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK) {
-				AttributeItem* item = (AttributeItem*)fAttributeListView->ItemAt(index);
+				AttributeItem* item
+					= (AttributeItem*)fAttributeListView->ItemAt(index);
 				if (item == NULL)
 					break;
 
@@ -1075,7 +1015,8 @@ FileTypesWindow::MessageReceived(BMessage* message)
 				};
 
 				for (uint32 i = 0; i <
-						sizeof(kAttributeNames) / sizeof(kAttributeNames[0]); i++) {
+						sizeof(kAttributeNames) / sizeof(kAttributeNames[0]);
+						i++) {
 					attributes.RemoveData(kAttributeNames[i], index);
 				}
 
@@ -1104,9 +1045,7 @@ FileTypesWindow::MessageReceived(BMessage* message)
 				// this change could still affect our current type
 
 				if (which == B_MIME_TYPE_DELETED
-#ifdef __HAIKU__
 					|| which == B_SUPPORTED_TYPES_CHANGED
-#endif
 					|| which == B_PREFERRED_APP_CHANGED)
 					_UpdatePreferredApps(&fCurrentType);
 			}

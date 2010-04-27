@@ -4,220 +4,104 @@
  */
 
 
+#include <GroupView.h>
+#include <LayoutItem.h>
+#include <StringView.h>
+
 #include "StringView.h"
 
 
-StringView::StringView(BRect frame, const char* name, const char* label,
-	const char* text, uint32 resizeMask, uint32 flags)
-	: BView(frame, name, resizeMask, flags),
-	fLabel(label),
-	fText(text),
-	fLabelAlignment(B_ALIGN_RIGHT),
-	fTextAlignment(B_ALIGN_LEFT),
-	fEnabled(true)
+StringView::StringView(const char* label, const char* text)
+	:
+	fView(NULL),
+	fLabel(new BStringView(NULL, label)),
+	fLabelItem(NULL),
+	fText(new BStringView(NULL, text)),
+	fTextItem(NULL)
 {
-	fDivider = StringWidth(label) + 4.0f;
-}
-
-
-StringView::~StringView()
-{
-}
-
-
-void
-StringView::SetAlignment(alignment labelAlignment, alignment textAlignment)
-{
-	if (labelAlignment == fLabelAlignment && textAlignment == fTextAlignment)
-		return;
-
-	fLabelAlignment = labelAlignment;
-	fTextAlignment = textAlignment;
-
-	Invalidate();
-}
-
-
-void
-StringView::GetAlignment(alignment* _label, alignment* _text) const
-{
-	if (_label)
-		*_label = fLabelAlignment;
-	if (_text)
-		*_text = fTextAlignment;
-}
-
-
-void
-StringView::SetDivider(float divider)
-{
-	fDivider = divider;
-	_UpdateText();
-
-	Invalidate();
-}
-
-
-void
-StringView::AttachedToWindow()
-{
-	if (Parent() != NULL)
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	SetLowColor(ViewColor());
-	_UpdateText();
-}
-
-
-void
-StringView::Draw(BRect updateRect)
-{
-	BRect rect = Bounds();
-
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-
-	float y = ceilf(fontHeight.ascent) + 1.0f;
-	float x;
-
-#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
-	rgb_color textColor = {0, 0, 0, 255};
-#else
-	rgb_color textColor = ui_color(B_CONTROL_TEXT_COLOR);
-#endif
-
-	SetHighColor(IsEnabled() ? textColor
-		: tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
-
-	if (Label()) {
-		switch (fLabelAlignment) {
-			case B_ALIGN_RIGHT:
-				x = Divider() - StringWidth(Label()) - 3.0f;
-				break;
-
-			case B_ALIGN_CENTER:
-				x = Divider() - StringWidth(Label()) / 2.0f;
-				break;
-
-			default:
-				x = 1.0f;
-				break;
-		}
-
-		DrawString(Label(), BPoint(x, y));
-	}
-
-	if (fTruncatedText.String() != NULL) {
-		switch (fTextAlignment) {
-			case B_ALIGN_RIGHT:
-				x = rect.Width() - StringWidth(fTruncatedText.String());
-				break;
-
-			case B_ALIGN_CENTER:
-				x = Divider() + (rect.Width() - Divider() - StringWidth(Label())) / 2.0f;
-				break;
-
-			default:
-				x = Divider() + 3.0f;
-				break;
-		}
-
-		DrawString(fTruncatedText.String(), BPoint(x, y));
-	}
-}
-
-
-void
-StringView::FrameResized(float width, float height)
-{
-	BString oldTruncated = fTruncatedText;
-	_UpdateText();
-
-	if (oldTruncated != fTruncatedText) {
-		// invalidate text portion only
-		BRect rect = Bounds();
-		rect.left = Divider();
-		Invalidate(rect);
-	}
-}
-
-
-void
-StringView::ResizeToPreferred()
-{
-	float width, height;
-	GetPreferredSize(&width, &height);
-
-	// Resize the width only for B_ALIGN_LEFT (if its large enough already, that is)
-	if (Bounds().Width() > width
-		&& (fLabelAlignment != B_ALIGN_LEFT || fTextAlignment != B_ALIGN_LEFT))
-		width = Bounds().Width();
-
-	BView::ResizeTo(width, height);
-}
-
-
-void
-StringView::GetPreferredSize(float* _width, float* _height)
-{
-	if (!Text() && !Label()) {
-		BView::GetPreferredSize(_width, _height);
-		return;
-	}
-
-	if (_width)
-		*_width = 7.0f + ceilf(StringWidth(Label()) + StringWidth(Text()));
-
-	if (_height) {
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
-		*_height = ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 2.0f;
-	}
-}
-
-
-void
-StringView::SetEnabled(bool enabled)
-{
-	if (IsEnabled() == enabled)
-		return;
-
-	fEnabled = enabled;
-	Invalidate();
 }
 
 
 void
 StringView::SetLabel(const char* label)
 {
-	fLabel = label;
-
-	// invalidate label portion only
-	BRect rect = Bounds();
-	rect.right = Divider();
-	Invalidate(rect);
+	fLabel->SetText(label);
 }
 
 
 void
 StringView::SetText(const char* text)
 {
-	fText = text;
-
-	_UpdateText();
-
-	// invalidate text portion only
-	BRect rect = Bounds();
-	rect.left = Divider();
-	Invalidate(rect);
+	fText->SetText(text);
 }
+
+
+BLayoutItem*
+StringView::GetLabelLayoutItem()
+{
+	return fLabelItem;
+}
+
+
+BView*
+StringView::LabelView()
+{ return fLabel; }
+
+
+BLayoutItem*
+StringView::GetTextLayoutItem()
+{
+	return fTextItem;
+}
+
+
+BView*
+StringView::TextView()
+{ return fText; }
 
 
 void
-StringView::_UpdateText()
+StringView::SetEnabled(bool enabled)
 {
-	fTruncatedText = fText;
-	TruncateString(&fTruncatedText, B_TRUNCATE_MIDDLE, Bounds().Width() - Divider());
+	
+	rgb_color color;
+
+	if (!enabled) {
+		color = tint_color(
+			ui_color(B_PANEL_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT);
+	} else
+		color = ui_color(B_CONTROL_TEXT_COLOR);
+
+	fLabel->SetHighColor(color);
+	fText->SetHighColor(color);
+	fLabel->Invalidate();
+	fText->Invalidate();
 }
+
+	
+//cast operator BView*
+StringView::operator BView*()
+{
+	if (fView)
+		return fView;
+	fView = new BGroupView(B_HORIZONTAL);
+	BLayout* layout = fView->GroupLayout();
+	fLabelItem = layout->AddView(fLabel);
+	fTextItem = layout->AddView(fText);
+	return fView;
+}
+
+
+const char*
+StringView::Label() const
+{
+	return fLabel->Text();
+}
+
+
+const char*
+StringView::Text() const
+{
+	return fText->Text();
+}
+

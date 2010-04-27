@@ -1,2 +1,19 @@
-1		x-vnd.Haiku-Screenshot	0
-
+1	brazilian portuguese	x-vnd.Haiku-Screenshot	558783371
+Desktop	ScreenshotWindow		Área de Trabalho
+Include window border	ScreenshotWindow		Incluir borda da janela
+Back to saving	ScreenshotWindow		Voltar para salvar
+Select	ScreenshotWindow		Selecionar
+Capture active window	ScreenshotWindow		Capturar janela ativa
+screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	Captura de tela
+screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	caputuradetela1
+Save screenshot	ScreenshotWindow		Salvar captura de tela
+Capture entire screen	ScreenshotWindow		Capturar tela inteira
+Take screenshot	ScreenshotWindow		Capturar tela
+Save	ScreenshotWindow		Salvar
+Please select	ScreenshotWindow		Por favor selecione
+Save as:	ScreenshotWindow		Salvar como:
+Save in:	ScreenshotWindow		Salvar em:
+Take screenshot after a delay of	ScreenshotWindow		Capturar tela depois de
+Artwork folder	ScreenshotWindow		Pasta de Artes
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Este arquivo já existe.\n Você tem certeza que deseja sobrescrevê-lo?
+Include mouse pointer	ScreenshotWindow		Incluir seta do mouse

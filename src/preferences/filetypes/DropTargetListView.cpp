@@ -7,9 +7,9 @@
 #include "DropTargetListView.h"
 
 
-DropTargetListView::DropTargetListView(BRect frame, const char* name,
-		list_view_type type, uint32 resizeMask, uint32 flags)
-	: BListView(frame, name, type, resizeMask, flags),
+DropTargetListView::DropTargetListView(const char* name,
+		list_view_type type, uint32 flags)
+	: BListView(name, type, flags),
 	fDropTarget(false)
 {
 }

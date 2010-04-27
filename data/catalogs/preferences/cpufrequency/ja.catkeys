@@ -1,0 +1,18 @@
+1	japanese	x-vnd.Haiku-CPUFrequencyPref	2071225432
+Ok	Status view		Ok
+CPU frequency status view	CPU Frequency View		CPU周波数ビュー
+Set state	Status view		設定
+Defaults	Pref Window		デフォルト
+Install replicant into Deskbar	CPU Frequency View		Deskbarでリプリカントを表示
+Quit	Status view		終了
+High performance	Status view		ハイパフォーマンス
+Stepping policy	CPU Frequency View		ステッピングポリシー
+Dynamic performance	Status view		ダイナミックパッフォーマンス
+Dynamic stepping	CPU Frequency View		ダイナミックステッピング
+Stepping policy: 	CPU Frequency View		ステッピングポリシー
+Open Speedstep preferences…	Status view		Open Speedstep の設定…
+Revert	Pref Window		元に戻す
+Low energy	Status view		低電力消費モード
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		CPUFrequency の起動が失敗しました。\n\nエラー： 
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tClemens Zeidler 作\n\tCopyright 2009, Haiku, Inc.\n
+CPU Frequency	Main window		CPU周波数

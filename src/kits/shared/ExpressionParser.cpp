@@ -565,9 +565,9 @@ MAPM
 ExpressionParser::_ParseFunction(const Token& token)
 {
 	if (strcasecmp("e", token.string.String()) == 0)
-		return MAPM(M_E);
+		return MAPM(MM_E);
 	else if (strcasecmp("pi", token.string.String()) == 0)
-		return MAPM(M_PI);
+		return MAPM(MM_PI);
 
 	// hard coded cases for different count of arguments
 	// supports functions with 3 arguments at most
@@ -604,10 +604,10 @@ ExpressionParser::_ParseFunction(const Token& token)
 	} else if (strcasecmp("floor", token.string.String()) == 0) {
 		_InitArguments(values, 1);
 		return values[0].floor();
-	} else if (strcasecmp("log", token.string.String()) == 0) {
+	} else if (strcasecmp("ln", token.string.String()) == 0) {
 		_InitArguments(values, 1);
 		return values[0].log();
-	} else if (strcasecmp("log10", token.string.String()) == 0) {
+	} else if (strcasecmp("log", token.string.String()) == 0) {
 		_InitArguments(values, 1);
 		return values[0].log10();
 	} else if (strcasecmp("pow", token.string.String()) == 0) {

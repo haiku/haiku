@@ -1,19 +1,14 @@
-1	Bulgarian	x-vnd.Haiku-BluetoothPrefs	348749678
+1	bulgarian	x-vnd.Haiku-BluetoothPrefs	3281507694
 About Bluetooth…	Window		 За програмата
 Handheld	Settings view		Преносим
 Default inquiry time:	Settings view		По подразбиране:
 Add device to list	Inquiry panel		Добави устройство към списъка
 Starting scan...	Inquiry panel		Начало на сканиране...
 Show bluetooth console…	Window		Покажи bluetoothконзола
-Smart phone	Settings view		Smart phone
- seconds	Inquiry panel		 секунди
-Server	Settings view		Сървър
 Stop bluetooth services…	Window		Спри bluetoothуслугите
 Identify host as:	Settings view		Идентифицирай се като:
 View	Window		Вид
 Refresh…	Remote devices		Обнови
-Pair…	Remote devices		Pair…
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système bluetoothHaiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec le soutien de :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nMerci à toutes les personnes qui ont aidé...\n\nDons de matériel :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinancièrement :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nRustines :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nQui m'ont tout appris :\n\t- l'équipe yellowTAB
 Incoming connections policy:	Settings view		Политика за входящи връзки:
 From all devices	Settings view		От всички устройства
 Show name	Extended local device view		Покажи име
@@ -38,10 +33,9 @@ Desktop	Settings view		Работно поле
 Revert	Window		Върни
 Remote devices	Window		Изтриване на устройство
 Laptop	Settings view		Лаптоп
-Retrieving name of 	Inquiry panel		Извличане на името на 
-Bluetooth	Window		Bluetooth
+Retrieving name of 	Inquiry panel		Извличане на името на
 Discoverable	Extended local device view		Обявено
-Service classes: 	Device View		Клас на услуги: 
+Service classes: 	Device View		Клас на услуги:
 Connections & channels…	Window		Список на връзки и канали
 Refresh LocalDevices…	Window		Обновление на локали устройства
 Settings	Window		Параметри

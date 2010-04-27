@@ -1,24 +1,24 @@
 1	ukrainian	x-vnd.Haiku-Mouse	104106491
-Click to activate	SettingsView		Клікніть, щоб активувати
-Mouse type:	SettingsView		Тип мишки:
-Warp	SettingsView		Перенести
-2-Button	SettingsView		Двохкнопкова
-Double-click test area	SettingsView		Зона перевірки подвійного кліка
+Click to activate	SettingsView		Натисніть для активації
+Mouse type:	SettingsView		Тип миші:
+Warp	SettingsView		Переміщення
+2-Button	SettingsView		Двухкнопочна
+Double-click test area	SettingsView		Область для перевірки подвійного кліку
 Revert	MouseWindow		Повернути
-...by Andrew Edward McCall	MouseApplication		...автор Andrew Edward McCall
-Mouse acceleration	SettingsView		Прискорення курсора
-Click to focus	SettingsView		Клікни, щоб відзначити
-3-Button	SettingsView		Трьохкнопкова
-Mouse speed	SettingsView		Швидкість курсора
-Focus mode:	SettingsView		Режим відзначення:
-Instant warp	SettingsView		Миттєве перенесення
-Dig Deal	MouseApplication		Dig Deal
-1-Button	SettingsView		Однокнопкова
+...by Andrew Edward McCall	MouseApplication		...розробив Andrew Edward McCall
+Mouse acceleration	SettingsView		Прискорення вказівника
+Click to focus	SettingsView		Клацніть для встановлення фокуса
+3-Button	SettingsView		Трикнопочна
+Mouse speed	SettingsView		Швидкість переміщення вказівника
+Focus mode:	SettingsView		Режим фокуса:
+Instant warp	SettingsView		Миттєве переміщення
+Dig Deal	MouseApplication		Чудово
+1-Button	SettingsView		Однокнопочна
 Double-click speed	SettingsView		Швидкість подвійного кліку
-Defaults	MouseWindow		По замовчуванню
-Focus follows mouse	SettingsView		Прагнути до курсора
-Accept first click	SettingsView		Визнавати перший клік
+Defaults	MouseWindow		За замовчуванням
+Focus follows mouse	SettingsView		Фокус слідує за вказівником
+Accept first click	SettingsView		Приймати перше клік
 Fast	SettingsView		Швидко
-Normal	SettingsView		Нормальна
-Mouse	MouseWindow		Мишка
+Normal	SettingsView		Нормально
+Mouse	MouseWindow		Миша
 Slow	SettingsView		Повільно

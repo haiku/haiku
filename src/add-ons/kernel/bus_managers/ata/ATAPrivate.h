@@ -23,7 +23,7 @@
 #include <util/AutoLock.h>
 
 #include "ATACommands.h"
-#include "ATAInfoblock.h"
+#include "ATAInfoBlock.h"
 #include "ATATracing.h"
 
 

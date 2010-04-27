@@ -18,9 +18,13 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <File.h>
-#include <Locale.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
+#include <GroupView.h>
 #include <ListView.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -30,6 +34,7 @@
 #include <RadioButton.h>
 #include <Roster.h>
 #include <ScrollView.h>
+#include <StringView.h>
 #include <TextControl.h>
 
 #include <ctype.h>
@@ -60,16 +65,14 @@ const uint32 kMsgTypeRemoved = 'tprm';
 // TextView that filters the tab key to be able to tab-navigate while editing	
 class TabFilteringTextView : public BTextView {
 	public:
-		TabFilteringTextView(BRect frame, const char* name, BRect textRect,
-			uint32 resizeMask, uint32 flags = B_WILL_DRAW | B_PULSE_NEEDED);
+		TabFilteringTextView(const char* name);
 		virtual ~TabFilteringTextView();
 		virtual void KeyDown(const char* bytes, int32 count);
 };
 
 
-TabFilteringTextView::TabFilteringTextView(BRect frame, const char* name,
-	BRect textRect, uint32 resizeMask, uint32 flags)
-	:	BTextView(frame, name, textRect, resizeMask, flags)
+TabFilteringTextView::TabFilteringTextView(const char* name)
+	:	BTextView(name, B_WILL_DRAW | B_PULSE_NEEDED)
 {
 }
 
@@ -108,9 +111,8 @@ class SupportedTypeItem : public BStringItem {
 
 class SupportedTypeListView : public DropTargetListView {
 	public:
-		SupportedTypeListView(BRect frame, const char* name,
+		SupportedTypeListView(const char* name,
 			list_view_type type = B_SINGLE_SELECTION_LIST,
-			uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 		virtual ~SupportedTypeListView();
 
@@ -159,11 +161,11 @@ SupportedTypeItem::Compare(const void* _a, const void* _b)
 {
 	const SupportedTypeItem* a = *(const SupportedTypeItem**)_a;
 	const SupportedTypeItem* b = *(const SupportedTypeItem**)_b;
-
+	
 	int compare = strcasecmp(a->Text(), b->Text());
 	if (compare != 0)
 		return compare;
-
+	
 	return strcasecmp(a->Type(), b->Type());
 }
 
@@ -171,9 +173,10 @@ SupportedTypeItem::Compare(const void* _a, const void* _b)
 //	#pragma mark -
 
 
-SupportedTypeListView::SupportedTypeListView(BRect frame, const char* name,
-		list_view_type type, uint32 resizeMask, uint32 flags)
-	: DropTargetListView(frame, name, type, resizeMask, flags)
+SupportedTypeListView::SupportedTypeListView(const char* name,
+	list_view_type type, uint32 flags)
+	:
+	DropTargetListView(name, type, flags)
 {
 }
 
@@ -194,12 +197,12 @@ SupportedTypeListView::MessageReceived(BMessage* message)
 			BNodeInfo info(&node);
 			if (node.InitCheck() != B_OK || info.InitCheck() != B_OK)
 				continue;
-
+	
 			// TODO: we could identify the file in case it doesn't have a type...
 			char type[B_MIME_TYPE_LENGTH];
 			if (info.GetType(type) != B_OK)
 				continue;
-
+	
 			// check if that type is already in our list
 			bool found = false;
 			for (int32 i = CountItems(); i-- > 0;) {
@@ -209,13 +212,13 @@ SupportedTypeListView::MessageReceived(BMessage* message)
 					break;
 				}
 			}
-
+	
 			if (!found) {
 				// add type
 				AddItem(new SupportedTypeItem(type));
 			}
 		}
-
+	
 		SortItems(&SupportedTypeItem::Compare);
 	} else
 		DropTargetListView::MessageReceived(message);
@@ -233,17 +236,26 @@ SupportedTypeListView::AcceptsDrag(const BMessage* message)
 //	#pragma mark -
 
 
-ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entry)
-	: BWindow(BRect(0.0f, 0.0f, 250.0f, 340.0f).OffsetBySelf(position),
-		TR("Application Type"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
+ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, 
+	const BEntry& entry)
+	:
+	BWindow(BRect(0.0f, 0.0f, 250.0f, 340.0f).OffsetBySelf(position),
+		TR("Application type"), B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | 
+			B_FRAME_EVENTS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fChangedProperties(0)
 {
-	// add the menu
-
-	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), NULL);
-	AddChild(menuBar);
-
+	float padding = 3.0f;
+	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
+	if (be_control_look){
+		// padding = be_control_look->DefaultItemSpacing();
+			// seems too big
+		labelAlignment = be_control_look->DefaultLabelAlignment();
+	}
+	
+	BMenuBar* menuBar = new BMenuBar((char*)NULL);
+	menuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
+	
 	BMenu* menu = new BMenu(TR("File"));
 	fSaveMenuItem = new BMenuItem(TR("Save"), new BMessage(kMsgSave), 'S');
 	fSaveMenuItem->SetEnabled(false);
@@ -252,32 +264,20 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	menu->AddItem(item = new BMenuItem(
 		TR("Save into resource file" B_UTF8_ELLIPSIS), NULL));
 	item->SetEnabled(false);
-
+	
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(TR("Close"), new BMessage(B_QUIT_REQUESTED),
 		'W', B_COMMAND_KEY));
 	menuBar->AddItem(menu);
+	
 
-	// Top view and signature
-
-	BRect rect = Bounds();
-	rect.top = menuBar->Bounds().Height() + 1.0f;
-	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
-
-	rect = topView->Bounds().InsetByCopy(8.0f, 8.0f);
-	fSignatureControl = new BTextControl(rect, "signature", TR("Signature:"), NULL,
-		new BMessage(kMsgSignatureChanged), B_FOLLOW_LEFT_RIGHT);
-	fSignatureControl->SetModificationMessage(
+	// Signature
+	
+	fSignatureControl = new BTextControl(TR("Signature:"), NULL, 
 		new BMessage(kMsgSignatureChanged));
-	fSignatureControl->SetDivider(fSignatureControl->StringWidth(
-		fSignatureControl->Label()) + 4.0f);
-	float width, height;
-	fSignatureControl->GetPreferredSize(&width, &height);
-	fSignatureControl->ResizeTo(rect.Width(), height);
-	topView->AddChild(fSignatureControl);
-
+	fSignatureControl->SetModificationMessage( 
+		new BMessage(kMsgSignatureChanged));
+	
 	// filter out invalid characters that can't be part of a MIME type name
 	BTextView* textView = fSignatureControl->TextView();
 	textView->SetMaxBytes(B_MIME_TYPE_LENGTH);
@@ -285,278 +285,162 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	for (int32 i = 0; disallowedCharacters[i]; i++) {
 		textView->DisallowChar(disallowedCharacters[i]);
 	}
-
+	
 	// "Application Flags" group
+	
+	BBox* flagsBox = new BBox("flagsBox");
 
-	BFont font(be_bold_font);
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
-
-	width = font.StringWidth("Icon") + 16.0f;
-	if (width < B_LARGE_ICON + 16.0f)
-		width = B_LARGE_ICON + 16.0f;
-
-	rect.top = fSignatureControl->Frame().bottom + 4.0f;
-	rect.bottom = rect.top + 100.0f;
-	rect.right -= width + 8.0f;
-	BBox* box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	topView->AddChild(box);
-
-	fFlagsCheckBox = new BCheckBox(rect, "flags", TR("Application flags"),
+	fFlagsCheckBox = new BCheckBox("flags", TR("Application flags"),
 		new BMessage(kMsgToggleAppFlags));
 	fFlagsCheckBox->SetValue(B_CONTROL_ON);
-	fFlagsCheckBox->ResizeToPreferred();
-	box->SetLabel(fFlagsCheckBox);
-
-	rect.top = fFlagsCheckBox->Bounds().Height() + 4.0f;
-	fSingleLaunchButton = new BRadioButton(rect, "single", TR("Single launch"),
+	
+	fSingleLaunchButton = new BRadioButton("single", TR("Single launch"),
 		new BMessage(kMsgAppFlagsChanged));
-	fSingleLaunchButton->ResizeToPreferred();
-	box->AddChild(fSingleLaunchButton);
-
-	rect.OffsetBy(0.0f, fSingleLaunchButton->Bounds().Height() + 0.0f);
-	fMultipleLaunchButton = new BRadioButton(rect, "multiple",
+	
+	fMultipleLaunchButton = new BRadioButton("multiple",
 		TR("Multiple launch"), new BMessage(kMsgAppFlagsChanged));
-	fMultipleLaunchButton->ResizeToPreferred();
-	box->AddChild(fMultipleLaunchButton);
-
-	rect.OffsetBy(0.0f, fSingleLaunchButton->Bounds().Height() + 0.0f);
-	fExclusiveLaunchButton = new BRadioButton(rect, "exclusive",
+	
+	fExclusiveLaunchButton = new BRadioButton("exclusive",
 		TR("Exclusive launch"), new BMessage(kMsgAppFlagsChanged));
-	fExclusiveLaunchButton->ResizeToPreferred();
-	box->AddChild(fExclusiveLaunchButton);
-
-	rect.top = fSingleLaunchButton->Frame().top;
-	rect.left = fExclusiveLaunchButton->Frame().right + 4.0f;
-	fArgsOnlyCheckBox = new BCheckBox(rect, "args only", TR("Args only"),
+	
+	fArgsOnlyCheckBox = new BCheckBox("args only", TR("Args only"),
 		new BMessage(kMsgAppFlagsChanged));
-	fArgsOnlyCheckBox->ResizeToPreferred();
-	box->AddChild(fArgsOnlyCheckBox);
-
-	rect.top += fArgsOnlyCheckBox->Bounds().Height();
-	fBackgroundAppCheckBox = new BCheckBox(rect, "background",
+	
+	fBackgroundAppCheckBox = new BCheckBox("background",
 		TR("Background app"), new BMessage(kMsgAppFlagsChanged));
-	fBackgroundAppCheckBox->ResizeToPreferred();
-	box->AddChild(fBackgroundAppCheckBox);
-
-	box->ResizeTo(box->Bounds().Width(),
-		fExclusiveLaunchButton->Frame().bottom + 8.0f);
-
+	
+	flagsBox->AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(fSingleLaunchButton, 0, 0).Add(fArgsOnlyCheckBox, 1, 0)
+		.Add(fMultipleLaunchButton, 0, 1).Add(fBackgroundAppCheckBox, 1, 1)
+		.Add(fExclusiveLaunchButton, 0, 2)
+		.SetInsets(padding, padding, padding, padding));
+	flagsBox->SetLabel(fFlagsCheckBox);
+	
 	// "Icon" group
-
-	rect = box->Frame();
-#ifdef __HAIKU__
-	rect.top += box->TopBorderOffset();
-#endif
-	rect.left = rect.right + 8.0f;
-	rect.right += width + 8.0f;
-	float iconBoxWidth = rect.Width();
-	box = new BBox(rect, NULL, B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	box->SetLabel("Icon");
-#ifdef __HAIKU__
-	box->MoveBy(0.0f, -box->TopBorderOffset());
-	box->ResizeBy(0.0f, box->TopBorderOffset());
-#endif
-	topView->AddChild(box);
-
-	rect = BRect(8.0f, 0.0f, 7.0f + B_LARGE_ICON, B_LARGE_ICON - 1.0f);
-#ifdef __HAIKU__
-	rect.OffsetBy(0.0f, (box->Bounds().Height() + box->TopBorderOffset()
-		- rect.Height()) / 2.0f);
-#else
-	rect.OffsetBy(0.0f, (box->Bounds().Height() - rect.Height()) / 2.0f);
-#endif
-	if (rect.top < fontHeight.ascent + fontHeight.descent + 4.0f)
-		rect.top = fontHeight.ascent + fontHeight.descent + 4.0f;
-	fIconView = new IconView(rect, "icon");
+	
+	BBox* iconBox = new BBox("IconBox");
+	iconBox->SetLabel(TR("Icon"));
+	fIconView = new IconView("icon");
 	fIconView->SetModificationMessage(new BMessage(kMsgIconChanged));
-	box->AddChild(fIconView);
-
+	iconBox->AddChild(
+		BGroupLayoutBuilder(B_HORIZONTAL)
+		.Add(fIconView)
+		.SetInsets(padding, padding, padding, padding)
+	);
+	
 	// "Supported Types" group
-
-	rect.top = box->Frame().bottom + 8.0f;
-	rect.bottom = rect.top + box->Bounds().Height();
-	rect.left = 8.0f;
-	rect.right = Bounds().Width() - 8.0f;
-	BBox* typeBox = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
+	
+	BBox* typeBox = new BBox("typesBox");
 	typeBox->SetLabel(TR("Supported types"));
-	topView->AddChild(typeBox);
-
-	rect = typeBox->Bounds().InsetByCopy(8.0f, 6.0f);
-	rect.top += ceilf(fontHeight.ascent);
-	fAddTypeButton = new BButton(rect, "add type", TR("Add" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgAddType), B_FOLLOW_RIGHT);
-	fAddTypeButton->ResizeToPreferred();
-	fAddTypeButton->MoveBy(rect.right - fAddTypeButton->Bounds().Width()
-		- B_LARGE_ICON - 16.0f, 0.0f);
-	typeBox->AddChild(fAddTypeButton);
-
-	rect = fAddTypeButton->Frame();
-	rect.OffsetBy(0, rect.Height() + 4.0f);
-	fRemoveTypeButton = new BButton(rect, "remove type", TR("Remove"),
-		new BMessage(kMsgRemoveType), B_FOLLOW_RIGHT);
-	typeBox->AddChild(fRemoveTypeButton);
-
-	rect.right = rect.left - 10.0f - B_V_SCROLL_BAR_WIDTH;
-	rect.left = 10.0f;
-	rect.top = 8.0f + ceilf(fontHeight.ascent);
-	rect.bottom -= 2.0f;
-		// take scrollview border into account
-	fTypeListView = new SupportedTypeListView(rect, "type listview",
-		B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
+	
+	fTypeListView = new SupportedTypeListView("Suppported Types", 
+		B_SINGLE_SELECTION_LIST);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
-
+	
 	BScrollView* scrollView = new BScrollView("type scrollview", fTypeListView,
-		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-
-	typeBox->ResizeTo(typeBox->Bounds().Width(), fRemoveTypeButton->Frame().bottom + 8.0f);
-	typeBox->AddChild(scrollView);
-
-	rect.left = fRemoveTypeButton->Frame().right + 8.0f;
-#ifdef __HAIKU__
-	rect.top = (box->Bounds().Height() + box->TopBorderOffset() - B_LARGE_ICON) / 2.0f;
-#else
-	rect.top = (box->Bounds().Height() - B_LARGE_ICON) / 2.0f;
-#endif
-	rect.right = rect.left + B_LARGE_ICON - 1.0f;
-	rect.bottom = rect.top + B_LARGE_ICON - 1.0f;
-	fTypeIconView = new IconView(rect, "type icon", B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
+	
+	fAddTypeButton = new BButton("add type", TR("Add" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgAddType));
+	
+	fRemoveTypeButton = new BButton("remove type", TR("Remove"),
+		new BMessage(kMsgRemoveType));
+	
+	fTypeIconView = new IconView("type icon");
+	BView* iconHolder = BGroupLayoutBuilder(B_HORIZONTAL).Add(fTypeIconView);
 	fTypeIconView->SetModificationMessage(new BMessage(kMsgTypeIconsChanged));
-	typeBox->AddChild(fTypeIconView);
-
+	
+	typeBox->AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(scrollView, 0, 0, 1, 4)
+		.Add(fAddTypeButton, 1, 0, 1, 2)
+		.Add(fRemoveTypeButton, 1, 2, 1, 2)
+		.Add(iconHolder, 2, 1, 1, 2)
+		.SetInsets(padding, padding, padding, padding)
+		.SetColumnWeight(0, 3)
+		.SetColumnWeight(1, 2)
+		.SetColumnWeight(2, 1)
+	);
+	iconHolder->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+	
 	// "Version Info" group
-
-	rect.top = typeBox->Frame().bottom + 8.0f;
-	rect.bottom = rect.top + typeBox->Bounds().Height();
-	rect.left = 8.0f;
-	rect.right = Bounds().Width() - 8.0f;
-	box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-		// the resizing mode will later also be set to B_FOLLOW_BOTTOM
-	box->SetLabel(TR("Version info"));
-	topView->AddChild(box);
-
-	BMenuField* menuField;
-#if 0
-	BPopUpMenu *popUpMenu = new BPopUpMenu("version info", true, true);
-	item = new BMenuItem("Version Info", NULL);
-	item->SetMarked(true);
-	popUpMenu->AddItem(item);
-	item = new BMenuItem("System Version Info", NULL);
-	popUpMenu->AddItem(item);
-
-	menuField = new BMenuField(BRect(0, 0, 100, 15),
-		"version kind", NULL, popUpMenu, true);
-	menuField->ResizeToPreferred();
-	box->SetLabel(menuField);
-#endif
-
-	rect.top = 4.0f + ceilf(fontHeight.ascent + fontHeight.descent);
-	rect.bottom = rect.top + height;
-	fMajorVersionControl = new BTextControl(rect, "major", TR("Version:"), NULL,
-		NULL);
-	fMajorVersionControl->SetDivider(fMajorVersionControl->StringWidth(
-		fMajorVersionControl->Label()) + 4.0f);
-	fMajorVersionControl->GetPreferredSize(&width, &height);
-	width = 12.0f + fMajorVersionControl->StringWidth("99");
-	fMajorVersionControl->ResizeTo(fMajorVersionControl->Divider() + width, height);
+	
+	BBox* versionBox = new BBox("versionBox");
+	versionBox->SetLabel(TR("Version info"));
+	
+	fMajorVersionControl = new BTextControl(TR("Version:"), NULL, NULL);
 	_MakeNumberTextControl(fMajorVersionControl);
-	box->AddChild(fMajorVersionControl);
-
-	rect.left = fMajorVersionControl->Frame().right + 1.0f;
-	fMiddleVersionControl = new BTextControl(rect, "middle", ".", NULL,
-		NULL);
-	fMiddleVersionControl->SetDivider(fMiddleVersionControl->StringWidth(
-		fMiddleVersionControl->Label()) + 4.0f);
-	fMiddleVersionControl->ResizeTo(fMiddleVersionControl->Divider() + width, height);
+	
+	fMiddleVersionControl = new BTextControl(".", NULL, NULL);
 	_MakeNumberTextControl(fMiddleVersionControl);
-	box->AddChild(fMiddleVersionControl);
-
-	rect.left = fMiddleVersionControl->Frame().right + 1.0f;
-	fMinorVersionControl = new BTextControl(rect, "middle", ".", NULL,
-		NULL);
-	fMinorVersionControl->SetDivider(fMinorVersionControl->StringWidth(
-		fMinorVersionControl->Label()) + 4.0f);
-	fMinorVersionControl->ResizeTo(fMinorVersionControl->Divider() + width, height);
+	
+	fMinorVersionControl = new BTextControl(".", NULL, NULL);
 	_MakeNumberTextControl(fMinorVersionControl);
-	box->AddChild(fMinorVersionControl);
-
+	
 	fVarietyMenu = new BPopUpMenu("variety", true, true);
 	fVarietyMenu->AddItem(new BMenuItem(TR("Development"), NULL));
 	fVarietyMenu->AddItem(new BMenuItem(TR("Alpha"), NULL));
 	fVarietyMenu->AddItem(new BMenuItem(TR("Beta"), NULL));
 	fVarietyMenu->AddItem(new BMenuItem(TR("Gamma"), NULL));
-	fVarietyMenu->AddItem(item = new BMenuItem(TR("Golden master"), NULL));
+	item = new BMenuItem(TR("Golden master"), NULL);
+	fVarietyMenu->AddItem(item);
 	item->SetMarked(true);
 	fVarietyMenu->AddItem(new BMenuItem(TR("Final"), NULL));
-
-	rect.top--;
-		// BMenuField oddity
-	rect.left = fMinorVersionControl->Frame().right + 6.0f;
-	menuField = new BMenuField(rect,
-		"variety", NULL, fVarietyMenu, true);
-	menuField->ResizeToPreferred();
-	box->AddChild(menuField);
-
-	rect.top++;
-	rect.left = menuField->Frame().right;
-	rect.right = rect.left + 30.0f;	
-	fInternalVersionControl = new BTextControl(rect, "internal", "/", NULL,
-		NULL);
-	fInternalVersionControl->SetDivider(fInternalVersionControl->StringWidth(
-		fInternalVersionControl->Label()) + 4.0f);
-	fInternalVersionControl->ResizeTo(fInternalVersionControl->Divider() + width, height);
-	box->AddChild(fInternalVersionControl);
-
-	rect = box->Bounds().InsetByCopy(8.0f, 0.0f);
-	rect.top = fInternalVersionControl->Frame().bottom + 8.0f;
-	fShortDescriptionControl = new BTextControl(rect, "short desc", TR("Short description:"),
-		NULL, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	float labelWidth = fShortDescriptionControl->StringWidth(
-		fShortDescriptionControl->Label()) + 4.0f;
-	fShortDescriptionControl->SetDivider(labelWidth);
-	fShortDescriptionControl->GetPreferredSize(&width, &height);
-	fShortDescriptionControl->ResizeTo(rect.Width(), height);
-
+	
+	BMenuField* varietyField = new BMenuField("", fVarietyMenu);
+	fInternalVersionControl = new BTextControl("/", NULL, NULL);
+	fShortDescriptionControl = 
+		new BTextControl(TR("Short description:"), NULL, NULL);
+	
 	// TODO: workaround for a GCC 4.1.0 bug? Or is that really what the standard says?
 	version_info versionInfo;
-	fShortDescriptionControl->TextView()->SetMaxBytes(sizeof(versionInfo.short_info));
-	box->AddChild(fShortDescriptionControl);
-
-	rect.OffsetBy(0.0f, fShortDescriptionControl->Bounds().Height() + 5.0f);
-	rect.right = rect.left + labelWidth;
-	StringView* label = new StringView(rect, NULL, TR("Long description:"), NULL);
-	label->SetDivider(labelWidth);
-	box->AddChild(label);
-
-	rect.left = rect.right + 3.0f;
-	rect.top += 1.0f;
-	rect.right = box->Bounds().Width() - 10.0f - B_V_SCROLL_BAR_WIDTH;
-	rect.bottom = rect.top + fShortDescriptionControl->Bounds().Height() * 3.0f - 1.0f;
-	fLongDescriptionView = new TabFilteringTextView(rect, "long desc",
-		rect.OffsetToCopy(B_ORIGIN), B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS
-		| B_NAVIGABLE);
+	fShortDescriptionControl->TextView()->SetMaxBytes(
+		sizeof(versionInfo.short_info));
+	
+	BStringView* longLabel = new BStringView(NULL, TR("Long description:"));
+	longLabel->SetExplicitAlignment(labelAlignment);
+	fLongDescriptionView = new TabFilteringTextView("long desc");
 	fLongDescriptionView->SetMaxBytes(sizeof(versionInfo.long_info));
-
+	
 	scrollView = new BScrollView("desc scrollview", fLongDescriptionView,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-	box->ResizeTo(box->Bounds().Width(), scrollView->Frame().bottom + 8.0f);
-	box->AddChild(scrollView);
+		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
-	// Adjust window size and limits
+	// TODO: remove workaround (bug #5678)
+	BSize minScrollSize = scrollView->ScrollBar(B_VERTICAL)->MinSize();
+	minScrollSize.width+=fLongDescriptionView->MinSize().width;
+	scrollView->SetExplicitMinSize(minScrollSize);
+	
+	versionBox->AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(fMajorVersionControl->CreateLabelLayoutItem(), 0, 0)
+		.Add(fMajorVersionControl->CreateTextViewLayoutItem(), 1, 0)
+		.Add(fMiddleVersionControl, 2, 0, 2)
+		.Add(fMinorVersionControl, 4, 0, 2)
+		.Add(varietyField, 6, 0, 3)
+		.Add(fInternalVersionControl, 9, 0, 2)
+		.Add(fShortDescriptionControl->CreateLabelLayoutItem(), 0, 1)
+		.Add(fShortDescriptionControl->CreateTextViewLayoutItem(), 1, 1, 10)
+		.Add(longLabel, 0, 2)
+		.Add(scrollView, 1, 2, 10, 3)
+		.SetInsets(padding, padding, padding, padding)
+		.SetRowWeight(3, 3)
+	);
 
-	width = fInternalVersionControl->Frame().right + 16.0f;
-	float minWidth = fBackgroundAppCheckBox->Frame().right + iconBoxWidth + 32.0f;
-	if (width > minWidth)
-		minWidth = width;
+	// put it all together
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(menuBar);
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+		.Add(fSignatureControl)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+			.Add(flagsBox, 3)
+			.Add(iconBox, 1)
+		)
+		.Add(typeBox)
+		.Add(versionBox)
+		.SetInsets(padding, padding, padding, padding)
+	);
 
-	ResizeTo(Bounds().Width() > minWidth ? Bounds().Width() : minWidth,
-		box->Frame().bottom + topView->Frame().top + 8.0f);
-	SetSizeLimits(minWidth, 32767.0f, Bounds().Height(), 32767.0f);
-	typeBox->SetResizingMode(B_FOLLOW_ALL);
-	box->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+	SetKeyMenuBar(menuBar);
 
 	fSignatureControl->MakeFocus(true);
-
 	BMimeType::StartWatching(this);
 	_SetTo(entry);
 }
@@ -982,7 +866,8 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 		{
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK) {
-				SupportedTypeItem* item = (SupportedTypeItem*)fTypeListView->ItemAt(index);
+				SupportedTypeItem* item
+					= (SupportedTypeItem*)fTypeListView->ItemAt(index);
 
 				fTypeIconView->SetModificationMessage(NULL);
 				fTypeIconView->SetTo(item != NULL ? &item->Icon() : NULL);

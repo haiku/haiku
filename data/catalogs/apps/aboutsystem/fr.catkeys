@@ -1,9 +1,9 @@
 1	french	x-vnd.Haiku-About	3196829578
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (et son noyau, NewOS)\n
-%ld Processors:	AboutView		%ld Processeurs:
+%ld Processors:	AboutView		%ld Processeurs :
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondateur du projet)\n\n
 The Haiku-Ports team\n	AboutView		L'équipe de Haiku-Ports\n
-Website, marketing & documentation:\n	AboutView		Site web, publicité & documentation:\n
+Website, marketing & documentation:\n	AboutView		Site web, publicité & documentation :\n
 Revision	AboutView		Révision
 Source Code: 	AboutView		Code Source : 
 Processor:	AboutView		Processeur :
@@ -13,18 +13,18 @@ Unknown	AboutView		Inconnu
 ... and the many people making donations!\n\n	AboutView		... et nos nombreux donateurs!\n\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… et surement d'autres que nous avons oubliés (désolé !)\n\n
 %.2f GHz	AboutView		%.2f GHz
-Memory:	AboutView		Memoire :
+Memory:	AboutView		Mémoire :
 Google & their Google Summer of Code program\n\n	AboutView		Google & son programme Google Summer of Code (GSoC)\n\n
-Past maintainers:\n	AboutView		Précédents développeurs:\n
+Past maintainers:\n	AboutView		Précédents développeurs :\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Le code propre à Haiku, en particulier le noyau et tout code auquel les applications peuvent être liées, est distribué sous les termes de
 \n\nSpecial thanks to:\n	AboutView		\n\nRemerciements spéciaux à :\n
 Licenses: 	AboutView		Licenses : 
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Certaines bibliothèques du système contiennent du code publié sous la licence LGPL. Vous pouvez voir ci-dessous les copyrights du code tierce partie.\n\n
-\nCopyrights\n\n	AboutView		\nCopyrights\n\n
-Current maintainers:\n	AboutView		Développeurs actuels:\n
-Time running:	AboutView		Temps depuis le démarrage:
+. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Certaines bibliothèques du système contiennent du code de tiers publié sous la licence LGPL. Vous pouvez voir ci-dessous les droits d'auteurs des tiers.\n\n
+\nCopyrights\n\n	AboutView		\nDroits d'auteurs\n\n
+Current maintainers:\n	AboutView		Développeurs actuels :\n
+Time running:	AboutView		Temps depuis le démarrage :
 MIT license	AboutView		Licence MIT
-The Haikuware team and their bounty program\n	AboutView		L'équipe HAikuware et leur programme de bounties\n
+The Haikuware team and their bounty program\n	AboutView		L'équipe Haikuware et leur programme de récompenses\n
 About this system	AboutWindow		À propos de ce système
 Version:	AboutView		Version :
 The BeGeistert team\n	AboutView		L'équipe BeGeistert\n

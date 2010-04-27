@@ -34,6 +34,15 @@
 #define TR_CONTEXT "Locale Preflet Window"
 
 
+static int
+compare_list_items(const void* _a, const void* _b)
+{
+	LanguageListItem* a = *(LanguageListItem**)_a;
+	LanguageListItem* b = *(LanguageListItem**)_b;
+	return strcasecmp(a->Text(), b->Text());
+}
+
+
 LocaleWindow::LocaleWindow()
 	:
 	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_NOT_RESIZABLE
@@ -54,7 +63,7 @@ LocaleWindow::LocaleWindow()
 
 	BView* languageTab = new BView(TR("Language"), B_WILL_DRAW);
 	languageTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
-	
+
 	{
 		// first list: available languages
 		fLanguageListView = new LanguageListView("available",
@@ -161,7 +170,7 @@ LocaleWindow::LocaleWindow()
 		BScrollView* scrollView = new BScrollView("scroller",
 			listView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 		listView->SetSelectionMessage(new BMessage(kMsgCountrySelection));
-		
+
 		// get all available countries from ICU
 		// Use DateFormat::getAvailableLocale so we get only the one we can
 		// use. Maybe check the NumberFormat one and see if there is more.

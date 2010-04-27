@@ -13,7 +13,7 @@
 #include <ByteOrder.h>
 #include <KernelExport.h>
 
-#include <ATAInfoblock.h>
+#include <ATAInfoBlock.h>
 
 #include "ahci_controller.h"
 #include "ahci_tracing.h"

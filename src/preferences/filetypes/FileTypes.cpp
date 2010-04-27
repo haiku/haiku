@@ -1,6 +1,6 @@
 /*
- * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
@@ -76,8 +76,8 @@ class FileTypes : public BApplication {
 		BWindow		*fApplicationTypesWindow;
 		uint32		fWindowCount;
 		uint32		fTypeWindowCount;
-		
-		BCatalog fCatalog;
+
+		BCatalog	fCatalog;
 };
 
 
@@ -221,7 +221,7 @@ FileTypes::RefsReceived(BMessage *message)
 				ref.name, strerror(status));
 
 			(new BAlert(TR("FileTypes request"),
-				buffer, "Ok", NULL, NULL,
+				buffer, TR("OK"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 
 			message->RemoveData("refs", --index);
@@ -287,7 +287,7 @@ FileTypes::ArgvReceived(int32 argc, char **argv)
 
 		if ((status = entry.SetTo(path.Path(), false)) != B_OK
 			|| (status = entry.GetRef(&ref)) != B_OK) {
-			fprintf(stderr, TR("Could not open file \"%s\": %s\n"),
+			fprintf(stderr, "Could not open file \"%s\": %s\n",
 				path.Path(), strerror(status));
 			continue;
 		}
@@ -356,7 +356,7 @@ FileTypes::MessageReceived(BMessage *message)
 			// the open file panel sends us a message when it's done
 			const char* subTitle;
 			if (message->FindString("title", &subTitle) != B_OK)
-				subTitle = TR("Open File");
+				subTitle = TR("Open file");
 
 			int32 what;
 			if (message->FindInt32("message", &what) != B_OK)
@@ -366,7 +366,7 @@ FileTypes::MessageReceived(BMessage *message)
 			if (message->FindMessenger("target", &target) != B_OK)
 				target = be_app_messenger;
 
-			BString title = "FileTypes";
+			BString title = TR("FileTypes");
 			if (subTitle != NULL && subTitle[0]) {
 				title.Append(": ");
 				title.Append(subTitle);
@@ -407,9 +407,12 @@ FileTypes::MessageReceived(BMessage *message)
 void
 FileTypes::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", TR("FileTypes\n"
-		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2006-2007, Haiku.\n"), TR("Ok"));
+	BString aboutText(TR("FileTypes"));
+	int32 titleLength = aboutText.Length();
+	aboutText << "\n";
+	aboutText << TR("\twritten by Axel Dörfler\n"
+		"\tCopyright 2006-2007, Haiku.\n");
+	BAlert *alert = new BAlert("about", aboutText.String(), TR("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -418,7 +421,7 @@ FileTypes::AboutRequested()
 	view->GetFont(&font);
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE); 			
-	view->SetFontAndColor(0, 9, &font);
+	view->SetFontAndColor(0, titleLength, &font);
 
 	alert->Go();
 }
@@ -454,12 +457,14 @@ void
 error_alert(const char* message, status_t status, alert_type type)
 {
 	char warning[512];
-	if (status != B_OK)
-		snprintf(warning, sizeof(warning), "%s:\n\t%s\n", message, strerror(status));
+	if (status != B_OK) {
+		snprintf(warning, sizeof(warning), "%s:\n\t%s\n", message,
+			strerror(status));
+	}
 
-	(new BAlert(TR("FileTypes Request"),
+	(new BAlert(TR("FileTypes request"),
 		status == B_OK ? message : warning,
-		"Ok", NULL, NULL, B_WIDTH_AS_USUAL, type))->Go();
+		TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, type))->Go();
 }
 
 

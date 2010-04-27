@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	423009066
+1	finnish	x-vnd.Be-MAIL	3640755640
 View	Mail		Näkymä
 %d - Date	Mail		%d - Päivämäärä
 Attach attributes:	Mail		Liittämisattribuutit:
@@ -105,6 +105,7 @@ Do you wish to send this message before closing?	Mail		Haluatko lähettää täm
 Delete	Mail		Poista
 Leave as '%s'	Mail		Jätä nimellä '%s'
 Copy	Mail		Kopioi
+Mail couldn't find its dictionary.	Mail		Sähköposti ei löytänyt hakemistoaan.
 Reply preamble:	Mail		Vastauksen esipuhe:
 Signatures	Mail		Allekirjoitukset
 Next	Mail		Seuraava

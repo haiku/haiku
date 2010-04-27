@@ -9,7 +9,7 @@ Attributes stack size:	Capabilities		Tamaño de pila de atributos:
 OpenGL version:	InfoView		Versión de OpenGL:
 Name stack size:	Capabilities		Tamaño de pila de nombre:
 Auxiliary buffer(s):	Capabilities		Búfer(es) auxiliares:
-Max. recommended vertex elements:	Capabilities		Nº máx. recomendado de vertices:
+Max. recommended vertex elements:	Capabilities		Nº máx. recomendado de vértices:
 GLU version:	InfoView		Versión de GLU:
 Model stack size:	Capabilities		Tamaño de pila de modelo:
 Projection stack size:	Capabilities		Tamaño de pila de proyección:
@@ -19,7 +19,7 @@ Max. convolution:	Capabilities		Nº máx. convoluciones:
 GLUT API version:	InfoView		Versión de API de GLUT:
 Texture stack size:	Capabilities		Tamaño de pila de textura:
 Max. evaluators equation order:	Capabilities		Orden máx. de evaluadores de ecuación:
-Max. 3D texture size:	Capabilities		Tamaño máx de textura 3D:
+Max. 3D texture size:	Capabilities		Tamaño máx. de textura 3D:
 Capabilities	Capabilities		Capacidades
 Max. recommended index elements:	Capabilities		Elementos de índice recomendados máximos:
 Available	Extensions		Disponible

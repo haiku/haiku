@@ -324,7 +324,7 @@ AddSymlinkToHaikuImage system bin : trash : untrash ;
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
 # Mailbox folders and symlink
-AddDirectoryToHaikuImage home mail drafts ;
+AddDirectoryToHaikuImage home mail draft ;
 AddDirectoryToHaikuImage home mail in ;
 AddDirectoryToHaikuImage home mail out ;
 AddSymlinkToHaikuImage home config settings Mail : ../../../mail/in : mailbox ;
@@ -724,6 +724,13 @@ HAIKU_INSTALL_DIR ?= $(HAIKU_DEFAULT_INSTALL_DIR) ;
 # the pseudo target all image contents is attached to
 NotFile $(HAIKU_IMAGE_CONTAINER_NAME) ;
 
+# Detect a hybrid GCC2/GCC4 image.
+local isHybridBuild ;
+if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
+		&& $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
+	isHybridBuild = 1 ;
+}
+
 # prepare the script that initializes the shell variables
 HAIKU_IMAGE_INIT_VARIABLES_SCRIPT = <HaikuImage>haiku.image-init-vars ;
 local script = $(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT) ;
@@ -735,6 +742,8 @@ AddVariableToScript $(script) : outputDir : $(HAIKU_OUTPUT_DIR) ;
 AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
 AddVariableToScript $(script) : installDir : $(HAIKU_INSTALL_DIR) ;
 #AddVariableToScript $(script) : isImage : 1 ;
+AddVariableToScript $(script) : gccVersion : $(HAIKU_GCC_VERSION[1]) ;
+AddVariableToScript $(script) : isHybridBuild : $(isHybridBuild) ;
 AddVariableToScript $(script) : imageSize : $(HAIKU_IMAGE_SIZE) ;
 AddVariableToScript $(script) : imageLabel : $(HAIKU_IMAGE_LABEL) ;
 AddVariableToScript $(script) : addBuildCompatibilityLibDir

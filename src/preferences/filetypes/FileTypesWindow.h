@@ -20,9 +20,9 @@ class BTextControl;
 
 class AttributeListView;
 class ExtensionListView;
-class TypeIconView;
 class MimeTypeListView;
 class StringView;
+class TypeIconView;
 
 
 class FileTypesWindow : public BWindow {

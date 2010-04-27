@@ -27,7 +27,6 @@ class ApplicationTypesWindow : public BWindow {
 		ApplicationTypesWindow(const BMessage& settings);
 		virtual ~ApplicationTypesWindow();
 
-		virtual void FrameResized(float width, float height);
 		virtual void MessageReceived(BMessage* message);
 		virtual bool QuitRequested();
 
