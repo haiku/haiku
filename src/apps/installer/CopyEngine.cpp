@@ -98,7 +98,7 @@ CopyEngine::ResetTargets(const char* source)
 
 	fCurrentTargetFolder = NULL;
 	fCurrentItem = NULL;
-	
+
 	// init BEntry pointing to /var
 	// There is no other way to retrieve the path to the var folder
 	// on the source volume. Using find_directory() with
@@ -107,7 +107,8 @@ CopyEngine::ResetTargets(const char* source)
 	// makes sense, since passing a volume is meant to folders that are
 	// volume specific, like "trash".
 	BPath path(source);
-	if (path.Append("common/var") == B_OK)
+	if ((path.Append("common/var") == B_OK)
+		|| (path.Append("_sources_") == B_OK))
 		fVarDirectory.SetTo(path.Path());
 	else
 		fVarDirectory.Unset();
@@ -513,6 +514,10 @@ CopyEngine::_ShouldCopyEntry(const BEntry& entry, const char* name,
 			return false;
 		}
 		if (strcmp(PACKAGES_DIRECTORY, name) == 0) {
+			printf("ignoring '%s'.\n", name);
+			return false;
+		}
+		if (strcmp(SOURCES_DIRECTORY, name) == 0) {
 			printf("ignoring '%s'.\n", name);
 			return false;
 		}
