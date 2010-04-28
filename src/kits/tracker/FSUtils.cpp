@@ -2393,7 +2393,8 @@ FSGetTrashDir(BDirectory *trashDir, dev_t dev)
 		trashDir->WriteAttr(kAttrMiniIcon, 'MICN', 0,
 			data, size);
 	}
-#ifdef __HAIKU__
+// TODO: figure out why writing the vector icon seems broken.
+#if 0
 	data = GetTrackerResources()->
 		LoadResource(B_VECTOR_ICON_TYPE, R_TrashIcon, &size);
 	if (data != NULL) {
