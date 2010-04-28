@@ -2065,23 +2065,6 @@ BPoseView::MessageReceived(BMessage *message)
 		return;
 
 	switch (message->what) {
-		case kContextMenuDragNDrop:
-		{
-			BContainerWindow *window = ContainerWindow();
-			if (window && window->Dragging()) {
-				BPoint droppoint, dropoffset;
-				if (message->FindPoint("_drop_point_", &droppoint) == B_OK) {
-					BMessage* dragmessage = window->DragMessage();
-					dragmessage->FindPoint("click_pt", &dropoffset);
-					dragmessage->AddPoint("_drop_point_", droppoint);
-					dragmessage->AddPoint("_drop_offset_", dropoffset);
-					HandleMessageDropped(dragmessage);
-				}
-				DragStop();
-			}
-			break;
-		}
-
 		case kAddNewPoses:
 		{
 			AddPosesResult *currentPoses;

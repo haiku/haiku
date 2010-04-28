@@ -1393,16 +1393,6 @@ BContainerWindow::MessageReceived(BMessage *message)
 			PostMessage(message, PoseView());
 			break;
 
-		case kContextMenuDragNDrop:
-			//
-			//	sent when the SlowContextPopup goes away
-			//
-			if (fWaitingForRefs && Dragging())
-				PostMessage(message, PoseView());
-			else
-				fWaitingForRefs = false;
-			break;
-
 		case kRestoreState:
 			if (message->HasMessage("state")) {
 				BMessage state;
