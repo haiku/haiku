@@ -293,13 +293,15 @@ reserve_pages(file_cache_ref* ref, vm_page_reservation* reservation,
 			// we are not mapped, and we're accessed sequentially
 
 			if (isWrite) {
-				// just schedule some pages to be written back
+				// Just write some pages back, and actually wait until they
+				// have been written back in order to relieve the page pressure
+				// a bit.
 				int32 index = ref->last_access_index;
 				int32 previous = index - 1;
 				if (previous < 0)
 					previous = LAST_ACCESSES - 1;
 
-				vm_page_schedule_write_page_range(cache,
+				vm_page_write_modified_page_range(cache,
 					ref->LastAccessPageOffset(previous, true),
 					ref->LastAccessPageOffset(index, true));
 			} else {
