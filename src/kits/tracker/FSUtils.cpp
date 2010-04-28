@@ -2362,7 +2362,13 @@ FSGetTrashDir(BDirectory *trashDir, dev_t dev)
 		return result;
 
 	BPath path;
-	result = find_directory(B_TRASH_DIRECTORY, &path, true, &volume);
+	bool created = false;
+	result = find_directory(B_TRASH_DIRECTORY, &path, false, &volume);
+	if (result != B_OK) {
+		result = find_directory(B_TRASH_DIRECTORY, &path, true, 
+			&volume);
+		created = true;
+	}
 	if (result != B_OK)
 		return result;
 
@@ -2370,38 +2376,40 @@ FSGetTrashDir(BDirectory *trashDir, dev_t dev)
 	if (result != B_OK)
 		return result;
 
-	// make trash invisible
-	StatStruct sbuf;
-	trashDir->GetStat(&sbuf);
+	if (created)
+	{
+		// make trash invisible
+		StatStruct sbuf;
+		trashDir->GetStat(&sbuf);
 
-	PoseInfo poseInfo;
-	poseInfo.fInvisible = true;
-	poseInfo.fInitedDirectory = sbuf.st_ino;
-	trashDir->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
-		sizeof(PoseInfo));
+		PoseInfo poseInfo;
+		poseInfo.fInvisible = true;
+		poseInfo.fInitedDirectory = sbuf.st_ino;
+		trashDir->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
+			sizeof(PoseInfo));
 
-	size_t size;
-	const void* data = GetTrackerResources()->
-		LoadResource('ICON', R_TrashIcon, &size);
-	if (data != NULL) {
-		trashDir->WriteAttr(kAttrLargeIcon, 'ICON', 0,
-			data, size);
-	}
-	data = GetTrackerResources()->
-		LoadResource('MICN', R_TrashIcon, &size);
-	if (data != NULL) {
-		trashDir->WriteAttr(kAttrMiniIcon, 'MICN', 0,
-			data, size);
-	}
-// TODO: figure out why writing the vector icon seems broken.
-#if 0
-	data = GetTrackerResources()->
-		LoadResource(B_VECTOR_ICON_TYPE, R_TrashIcon, &size);
-	if (data != NULL) {
-		trashDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0,
-			data, size);
-	}
+		size_t size;
+		const void* data = GetTrackerResources()->
+			LoadResource('ICON', R_TrashIcon, &size);
+		if (data != NULL) {
+			trashDir->WriteAttr(kAttrLargeIcon, 'ICON', 0,
+				data, size);
+		}
+		data = GetTrackerResources()->
+			LoadResource('MICN', R_TrashIcon, &size);
+		if (data != NULL) {
+			trashDir->WriteAttr(kAttrMiniIcon, 'MICN', 0,
+				data, size);
+		}
+#ifdef __HAIKU__
+		data = GetTrackerResources()->
+			LoadResource(B_VECTOR_ICON_TYPE, R_TrashIcon, &size);
+		if (data != NULL) {
+			trashDir->WriteAttr(kAttrIcon, B_VECTOR_ICON_TYPE, 0,
+				data, size);
+		}
 #endif
+	}
 
 	return B_OK;
 }
