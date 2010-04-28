@@ -107,8 +107,7 @@ CopyEngine::ResetTargets(const char* source)
 	// makes sense, since passing a volume is meant to folders that are
 	// volume specific, like "trash".
 	BPath path(source);
-	if ((path.Append("common/var") == B_OK)
-		|| (path.Append("_sources_") == B_OK))
+	if (path.Append("common/var") == B_OK)
 		fVarDirectory.SetTo(path.Path());
 	else
 		fVarDirectory.Unset();
