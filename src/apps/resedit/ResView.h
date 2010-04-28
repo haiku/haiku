@@ -19,11 +19,18 @@
 
 #include "ResourceRoster.h"
 
-
 class BMenuBar;
 class ResListView;
 
-class ResView : public BView {
+enum {
+	FILE_CLEAN = 0,
+	FILE_DIRTY,
+	FILE_INIT,
+	FILE_QUIT_AFTER_SAVE
+};
+
+class ResView : public BView
+{
 public:
 					ResView(const BRect &frame, const char *name,
 							const int32 &resize, const int32 &flags,
@@ -33,9 +40,12 @@ public:
 	void			MessageReceived(BMessage *msg);
 	
 	const char *	Filename(void) const { return fFileName.String(); }
-	bool			IsDirty(void) const { return fIsDirty; }
+	uint8			GetSaveStatus(void) const { return fSaveStatus; }
 	
+	status_t		SetTo(const entry_ref &dir, const BString &name);
 	void			OpenFile(const entry_ref &ref);
+	void			SaveFile(void);
+	void			SaveAndQuit(void);
 	
 private:
 	void			BuildMenus(BMenuBar *menuBar);
@@ -44,21 +54,23 @@ private:
 	void			HandleDrop(BMessage *msg);
 	void			AddResource(const entry_ref &ref);
 	void			DeleteSelectedResources(void);
+	void			SetSaveStatus(uint8 value);
 	
 	ResListView		*fListView;
 	entry_ref		*fRef;
 	BString			fFileName;
 	BMenuBar		*fBar;
-	bool			fIsDirty;
+	uint8			fSaveStatus;
 	BList			fDataList;
-	BFilePanel		*fFilePanel;
+	BFilePanel		*fOpenPanel,
+					*fSavePanel;
 };
+
 
 class ResDataRow : public BRow
 {
 public:
 					ResDataRow(ResourceData *data);
-	
 	ResourceData *	GetData(void) const;
 	
 private:

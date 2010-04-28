@@ -9,9 +9,10 @@
 
 #include <Application.h>
 #include <File.h>
-#include <ScrollView.h>
 #include <Menu.h>
 #include <MenuItem.h>
+#include <Path.h>
+#include <ScrollView.h>
 #include <TranslatorRoster.h>
 #include <TypeConstants.h>
 
@@ -35,7 +36,6 @@ enum {
 	M_NEW_FILE = 'nwfl',
 	M_OPEN_FILE,
 	M_SAVE_FILE,
-	M_SAVE_FILE_AS,
 	M_QUIT,
 	M_SELECT_FILE,
 	M_DELETE_RESOURCE,
@@ -45,7 +45,10 @@ enum {
 ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
 				const int32 &flags, const entry_ref *ref)
   :	BView(frame, name, resize, flags),
-  	fIsDirty(false)
+  	fRef(NULL),
+	fSaveStatus(FILE_INIT),
+  	fOpenPanel(NULL),
+  	fSavePanel(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	if (ref) {
@@ -53,7 +56,6 @@ ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
 		*fRef = *ref;
 		fFileName = fRef->name;
 	} else {
-		fRef = NULL;
 		fFileName = "Untitled ";
 		fFileName << sUntitled;
 		sUntitled++;
@@ -88,9 +90,11 @@ ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
 	width = be_plain_font->StringWidth("1000 bytes") + 20;
 	fListView->AddColumn(new BSizeColumn("Size", width, 10, 100), 4);
 	
-	fFilePanel = new BFilePanel(B_OPEN_PANEL);
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL);
 	if (ref)
 		OpenFile(*ref);
+	
+	fSavePanel = new BFilePanel(B_SAVE_PANEL);
 }
 
 
@@ -98,17 +102,27 @@ ResView::~ResView(void)
 {
 	EmptyDataList();
 	delete fRef;
-	delete fFilePanel;
+	delete fOpenPanel;
+	delete fSavePanel;
 }
 
 
 void
 ResView::AttachedToWindow(void)
 {
-	for(int32 i = 0; i < fBar->CountItems(); i++)
+	for (int32 i = 0; i < fBar->CountItems(); i++)
 		fBar->SubmenuAt(i)->SetTargetForItems(this);
 	fListView->SetTarget(this);
-	fFilePanel->SetTarget(BMessenger(this));
+	
+	BMessenger messenger(this);
+	fOpenPanel->SetTarget(messenger);
+	fSavePanel->SetTarget(messenger);
+	
+	Window()->Lock();
+	BString title("ResEdit: ");
+	title << fFileName;
+	Window()->SetTitle(title.String());
+	Window()->Unlock();
 }
 
 
@@ -128,6 +142,32 @@ ResView::MessageReceived(BMessage *msg)
 			be_app->PostMessage(M_SHOW_OPEN_PANEL);
 			break;
 		}
+		case B_CANCEL: {
+			if (fSaveStatus == FILE_QUIT_AFTER_SAVE)
+				SetSaveStatus(FILE_DIRTY);
+			break;
+		}
+		case B_SAVE_REQUESTED: {
+			entry_ref saveDir;
+			BString name;
+			if (msg->FindRef("directory",&saveDir) == B_OK &&
+				msg->FindString("name",&name) == B_OK) {
+				SetTo(saveDir,name);
+				SaveFile();
+			}
+			break;
+		}
+		case M_SAVE_FILE: {
+			if (!fRef)
+				fSavePanel->Show();
+			else
+				SaveFile();
+			break;
+		}
+		case M_SHOW_SAVE_PANEL: {
+			fSavePanel->Show();
+			break;
+		}
 		case M_QUIT: {
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			break;
@@ -140,7 +180,7 @@ ResView::MessageReceived(BMessage *msg)
 			break;
 		}
 		case M_SELECT_FILE: {
-			fFilePanel->Show();
+			fOpenPanel->Show();
 			break;
 		}
 		case M_DELETE_RESOURCE: {
@@ -172,6 +212,27 @@ ResView::MessageReceived(BMessage *msg)
 		default:
 			BView::MessageReceived(msg);
 	}
+}
+
+
+status_t
+ResView::SetTo(const entry_ref &dir, const BString &name)
+{
+	entry_ref fileRef;
+	
+	BPath path(&dir);
+	path.Append(name.String());
+	BFile file(path.Path(), B_CREATE_FILE | B_READ_WRITE);
+	if (file.InitCheck() != B_OK)
+		return B_ERROR;
+	
+	if (!fRef)
+		fRef = new entry_ref();
+	
+	BEntry entry(path.Path());
+	entry.GetRef(fRef);
+	fFileName = name;
+	return B_OK;
 }
 
 
@@ -218,20 +279,59 @@ ResView::OpenFile(const entry_ref &ref)
 
 
 void
+ResView::SaveFile(void)
+{
+	if (fSaveStatus == FILE_CLEAN || !fRef)
+		return;
+	
+	BFile file(fRef,B_READ_WRITE);
+	BResources res(&file,true);
+	file.Unset();
+	
+	for (int32 i = 0; i < fListView->CountRows(); i++) {
+		ResDataRow *row = (ResDataRow*)fListView->RowAt(i);
+		ResourceData *data = row->GetData();
+		res.AddResource(data->GetType(), data->GetID(), data->GetData(),
+						data->GetLength(), data->GetName());
+	}
+	
+	res.Sync();
+	
+	if (fSaveStatus == FILE_QUIT_AFTER_SAVE && Window())
+		Window()->PostMessage(B_QUIT_REQUESTED);
+	SetSaveStatus(FILE_CLEAN);
+}
+
+
+void
+ResView::SaveAndQuit(void)
+{
+	SetSaveStatus(FILE_QUIT_AFTER_SAVE);
+	if (!fRef) {
+		fSavePanel->Show();
+		return;
+	}
+	
+	SaveFile();
+}
+
+
+void
 ResView::BuildMenus(BMenuBar *menuBar)
 {
 	BMenu *menu = new BMenu("File");
 	menu->AddItem(new BMenuItem("New" B_UTF8_ELLIPSIS, new BMessage(M_NEW_FILE), 'N'));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Open" B_UTF8_ELLIPSIS, new BMessage(M_OPEN_FILE), 'O'));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Save", new BMessage(M_SAVE_FILE), 'S'));
+	menu->AddItem(new BMenuItem("Save As" B_UTF8_ELLIPSIS, new BMessage(M_SHOW_SAVE_PANEL), 'S',
+								B_COMMAND_KEY | B_SHIFT_KEY));
 	menuBar->AddItem(menu);
 	
 	menu = new BMenu("Resource");
-	
 	menu->AddItem(new BMenuItem("Add" B_UTF8_ELLIPSIS, new BMessage(M_SELECT_FILE), 'F'));
 	menu->AddItem(new BMenuItem("Delete", new BMessage(M_DELETE_RESOURCE), 'D'));
-	
-	
 	menuBar->AddItem(menu);
 }
 
@@ -317,7 +417,7 @@ ResView::AddResource(const entry_ref &ref)
 	ResDataRow *row = new ResDataRow(resData);
 	fListView->AddRow(row);
 	
-	fIsDirty = true;
+	SetSaveStatus(FILE_DIRTY);
 }
 
 
@@ -325,9 +425,10 @@ void
 ResView::DeleteSelectedResources(void)
 {
 	ResDataRow *selection = (ResDataRow*)fListView->CurrentSelection();
+	if (!selection)
+		return;
 	
-	if (selection)
-		fIsDirty = true;
+	SetSaveStatus(FILE_DIRTY);
 	
 	while (selection) {
 		ResourceData *data = selection->GetData();
@@ -335,6 +436,27 @@ ResView::DeleteSelectedResources(void)
 		fDataList.RemoveItem(data);
 		delete data;
 		selection = (ResDataRow*)fListView->CurrentSelection();
+	}
+}
+
+
+void
+ResView::SetSaveStatus(uint8 value)
+{
+	if (value == fSaveStatus)
+		return;
+	
+	fSaveStatus = value;
+	
+	BString title("ResEdit: ");
+	title << fFileName;
+	if (fSaveStatus == FILE_DIRTY)
+		title << "*";
+	
+	if (Window()) {
+		Window()->Lock();
+		Window()->SetTitle(title.String());
+		Window()->Unlock();
 	}
 }
 

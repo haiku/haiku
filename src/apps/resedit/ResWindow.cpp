@@ -10,6 +10,8 @@
 #include "App.h"
 #include "ResView.h"
 
+#include <Alert.h>
+
 static int32 sWindowCount = 0;
 
 ResWindow::ResWindow(const BRect &rect, const entry_ref *ref)
@@ -17,12 +19,8 @@ ResWindow::ResWindow(const BRect &rect, const entry_ref *ref)
 {
 	atomic_add(&sWindowCount, 1);
 	
-	ResView *child = new ResView(Bounds(), "resview", B_FOLLOW_ALL,
-								B_WILL_DRAW, ref);
-	AddChild(child);
-	
-	SetTitle(child->Filename());
-
+	fView = new ResView(Bounds(), "resview", B_FOLLOW_ALL, B_WILL_DRAW, ref);
+	AddChild(fView);
 	Show();
 }
 
@@ -35,6 +33,20 @@ ResWindow::~ResWindow(void)
 bool
 ResWindow::QuitRequested(void)
 {
+	if (fView->GetSaveStatus() == FILE_DIRTY) {
+		BAlert *alert = new BAlert("ResEdit","Save your changes?","Cancel","Don't Save","Save");
+		switch (alert->Go()) {
+			case 0:
+				return false;
+			case 2: {
+				fView->SaveAndQuit();
+				return false;
+			}
+			default:
+				break;
+		}
+	}
+	
 	atomic_add(&sWindowCount, -1);
 	
 	if (sWindowCount == 0)

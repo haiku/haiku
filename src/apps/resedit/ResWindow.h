@@ -10,8 +10,8 @@
 
 #include <Window.h>
 
-
 struct entry_ref;
+class ResView;
 
 class ResWindow : public BWindow {
 public:
@@ -20,6 +20,8 @@ public:
 	virtual						~ResWindow();
 
 	virtual	bool				QuitRequested();
+private:
+	ResView		*fView;
 };
 
 #endif // RESWIN_H
