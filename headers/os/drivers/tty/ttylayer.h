@@ -28,6 +28,7 @@ struct ddomain {
 	bool	bg;
 	bool	locked;
 };
+#define ddbackground(d) ((d)->bg = true)
 
 
 typedef bool (*tty_service_func)(struct tty *tty, struct ddrover *rover, uint op);

@@ -26,8 +26,11 @@ char *gDeviceNames[DEVICES_COUNT + 1];
 config_manager_for_driver_module_info *gConfigManagerModule = NULL;
 isa_module_info *gISAModule = NULL;
 pci_module_info *gPCIModule = NULL;
-//XXX: ifndef __HAIKU__
+#ifdef __HAIKU__
+tty_module_info *gTTYModule = NULL;
+#else
 tty_module_info_v1_bone *gTTYModule = NULL;
+#endif
 struct ddomain gSerialDomain;
 sem_id gDriverLock = -1;
 bool gHandleISA = false;
@@ -842,7 +845,7 @@ pc_serial_interrupt(void *arg)
 
 
 /* pc_serial_open - handle open() calls */
-static status_t
+status_t
 pc_serial_open(const char *name, uint32 flags, void **cookie)
 {
 	TRACE_FUNCALLS("> pc_serial_open(%s, 0x%08x, 0x%08x)\n", name, flags, cookie);
@@ -863,7 +866,7 @@ pc_serial_open(const char *name, uint32 flags, void **cookie)
 
 
 /* pc_serial_read - handle read() calls */
-static status_t
+status_t
 pc_serial_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 {
 	TRACE_FUNCALLS("> pc_serial_read(0x%08x, %Ld, 0x%08x, %d)\n", cookie,
@@ -874,7 +877,7 @@ pc_serial_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 
 
 /* pc_serial_write - handle write() calls */
-static status_t
+status_t
 pc_serial_write(void *cookie, off_t position, const void *buffer,
 	size_t *numBytes)
 {
@@ -886,7 +889,7 @@ pc_serial_write(void *cookie, off_t position, const void *buffer,
 
 
 /* pc_serial_control - handle ioctl calls */
-static status_t
+status_t
 pc_serial_control(void *cookie, uint32 op, void *arg, size_t length)
 {
 	TRACE_FUNCALLS("> pc_serial_control(0x%08x, 0x%08x, 0x%08x, %d)\n",
@@ -898,7 +901,7 @@ pc_serial_control(void *cookie, uint32 op, void *arg, size_t length)
 
 #if defined(B_BEOS_VERSION_DANO) || defined(__HAIKU__)
 /* pc_serial_select - handle select start */
-static status_t
+status_t
 pc_serial_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
 {
 	TRACE_FUNCALLS("> pc_serial_select(0x%08x, 0x%08x, 0x%08x, %p)\n",
@@ -909,7 +912,7 @@ pc_serial_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
 
 
 /* pc_serial_deselect - handle select exit */
-static status_t
+status_t
 pc_serial_deselect(void *cookie, uint8 event, selectsync *sync)
 {
 	TRACE_FUNCALLS("> pc_serial_deselect(0x%08x, 0x%08x, %p)\n",
@@ -921,7 +924,7 @@ pc_serial_deselect(void *cookie, uint8 event, selectsync *sync)
 
 
 /* pc_serial_close - handle close() calls */
-static status_t
+status_t
 pc_serial_close(void *cookie)
 {
 	TRACE_FUNCALLS("> pc_serial_close(0x%08x)\n", cookie);
@@ -931,7 +934,7 @@ pc_serial_close(void *cookie)
 
 
 /* pc_serial_free - called after last device is closed, and all i/o complete. */
-static status_t
+status_t
 pc_serial_free(void *cookie)
 {
 	TRACE_FUNCALLS("> pc_serial_free(0x%08x)\n", cookie);

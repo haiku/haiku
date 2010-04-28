@@ -191,8 +191,11 @@ struct tty_module_info_v1_bone {
 extern config_manager_for_driver_module_info *gConfigManagerModule;
 extern isa_module_info *gISAModule;
 extern pci_module_info *gPCIModule;
-//extern tty_module_info *gTTYModule;
+#ifdef __HAIKU__
+extern tty_module_info *gTTYModule;
+#else
 extern tty_module_info_v1_bone *gTTYModule;
+#endif
 extern struct ddomain gSerialDomain;
 
 extern "C" {
