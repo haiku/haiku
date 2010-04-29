@@ -1306,6 +1306,8 @@ syslog_init_post_threads(void)
 			delete_area(area_for(sSyslogBuffer));
 		else
 			delete_ring_buffer(sSyslogBuffer);
+
+		sSyslogBuffer = NULL;
 	}
 
 	free(sSyslogMessage);
@@ -1364,7 +1366,6 @@ syslog_init_post_vm(struct kernel_args* args)
 		area_id area = create_area("syslog debug", &base, B_EXACT_ADDRESS, size,
 				B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (area < 0) {
-			sSyslogBuffer = NULL;
 			status = B_NO_MEMORY;
 			goto err2;
 		}
@@ -1402,6 +1403,7 @@ err2:
 	free(sSyslogMessage);
 err1:
 	sSyslogOutputEnabled = false;
+	sSyslogBuffer = NULL;
 	return status;
 }
 
