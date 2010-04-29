@@ -192,7 +192,10 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("spawning main2 thread\n");
 		thread_id thread = spawn_kernel_thread(&main2, "main2",
 			B_NORMAL_PRIORITY, NULL);
-		send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+		resume_thread(thread);
+
+		// We're ready to start the scheduler and enable interrupts on all CPUs.
+		scheduler_enable_scheduling();
 
 		// bring up the AP cpus in a lock step fashion
 		TRACE("waking up AP cpus\n");

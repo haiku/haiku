@@ -7,7 +7,6 @@
 #include <block_cache.h>
 
 #include <unistd.h>
-#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -2602,7 +2601,7 @@ block_cache_init(void)
 	sNotifierWriterThread = spawn_kernel_thread(&block_notifier_and_writer,
 		"block notifier/writer", B_LOW_PRIORITY, NULL);
 	if (sNotifierWriterThread >= B_OK)
-		send_signal_etc(sNotifierWriterThread, SIGCONT, B_DO_NOT_RESCHEDULE);
+		resume_thread(sNotifierWriterThread);
 
 #if DEBUG_BLOCK_CACHE
 	add_debugger_command_etc("block_caches", &dump_caches,

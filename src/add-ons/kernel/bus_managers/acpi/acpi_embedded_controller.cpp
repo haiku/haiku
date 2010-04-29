@@ -33,7 +33,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ACPI.h>
 #include <condition_variable.h>
 #include <Errors.h>
 #include <KernelExport.h>
@@ -50,12 +49,6 @@
 
 // name of pnp generator of path ids
 #define ACPI_EC_PATHID_GENERATOR "embedded_controller/path_id"
-
-device_manager_info *gDeviceManager = NULL;
-pci_module_info *gPCIManager = NULL;
-
-// cpu frequency in Hz
-int64 gHz;
 
 
 uint8
@@ -80,7 +73,7 @@ acpi_GetInteger(acpi_device_module_info* acpi, acpi_device& acpiCookie,
 	acpi_object_type object;
 	buf.pointer = &object;
 	buf.length = sizeof(acpi_object_type);
-	
+
 	/*
 	 * Assume that what we've been pointed at is an Integer object, or
 	 * a method that will return an Integer.
@@ -211,7 +204,7 @@ acpi_get_type(device_node* dev)
 	const char *bus;
 	if (gDeviceManager->get_attr_string(dev, B_DEVICE_BUS, &bus, false))
 		return -1;
-	
+
 	if (strcmp(bus, "acpi"))
 		return -1;
 
@@ -230,14 +223,16 @@ embedded_controller_support(device_node* dev)
     static const char* ec_ids[] = { "PNP0C09", NULL };
 
 	/* Check that this is a device. */
+	TRACE("before acpi_get_type...");
 	if (acpi_get_type(dev) != ACPI_TYPE_DEVICE)
 		return 0.0;
-	
+
 	const char* name;
+
 	if (gDeviceManager->get_attr_string(dev, ACPI_DEVICE_HID_ITEM, &name, false)
 			!= B_OK || strcmp(name, ec_ids[0]))
 		return 0.0;
-   
+   TRACE("after\n");
 	TRACE("supported device found %s\n", name);
 	return 0.6;
 }
@@ -261,12 +256,6 @@ static status_t
 embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 {
 	TRACE("init driver\n");
-	// first get the cpu speed, needed to calculate a timeout
-	// ToDo: catch frequency changes
-	system_info systemInfo;
-	if (get_system_info(&systemInfo) != B_OK)
-		return B_ERROR;
-	gHz = systemInfo.cpu_clock_speed;
 
 	acpi_ec_cookie* sc;
 	sc = (acpi_ec_cookie*) malloc(sizeof(acpi_ec_cookie));
@@ -292,21 +281,6 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 	if (get_module(B_ACPI_MODULE_NAME, (module_info**)&sc->ec_acpi_module)
 		!= B_OK)
 		return B_ERROR;
-
-	// DPC module
-	if (gDPC == NULL && get_module(B_DPC_MODULE_NAME, (module_info**) &gDPC)
-		!= B_OK) {
-		dprintf("failed to get dpc module for os execution\n");
-		return B_ERROR;
-	}
-
-	if (gDPCHandle == NULL) {
-		if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task", B_NORMAL_PRIORITY)
-			!= B_OK) {
-			dprintf("failed to create os execution queue\n");
-			return B_ERROR;
-		}
-	}
 
 	acpi_data buf;
 	buf.pointer = NULL;
@@ -431,9 +405,6 @@ embedded_controller_uninit_driver(void* driverCookie)
 	mutex_destroy(&sc->ec_lock);
 	free(sc);
 	put_module(B_ACPI_MODULE_NAME);
-	put_module(B_DPC_MODULE_NAME);
-	gDPC = NULL;
-	gDPCHandle = NULL;
 }
 
 
@@ -468,13 +439,6 @@ embedded_controller_uninit_device(void* _cookie)
 	acpi_ec_cookie *device = (acpi_ec_cookie*)_cookie;
 	free(device);
 }
-
-
-module_dependency module_dependencies[] = {
-	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **) &gDeviceManager },
-	{ B_PCI_MODULE_NAME, (module_info **) &gPCIManager},
-	{}
-};
 
 
 driver_module_info embedded_controller_driver_module = {
@@ -514,13 +478,6 @@ struct device_module_info embedded_controller_device_module = {
 	embedded_controller_control,
 
 	NULL,
-	NULL
-};
-
-
-module_info* modules[] = {
-	(module_info*) &embedded_controller_driver_module,
-	(module_info*) &embedded_controller_device_module,
 	NULL
 };
 
@@ -606,9 +563,9 @@ EcGpeHandler(void* context)
 	EC_STATUS EcStatus = EC_GET_CSR(sc);
 	if ((EcStatus & EC_EVENT_SCI) && !sc->ec_sci_pending) {
 		TRACE("gpe queueing query handler\n");
-		status_t status = AcpiOsExecute(OSL_GPE_HANDLER, EcGpeQueryHandler,
+		ACPI_STATUS s = AcpiOsExecute(OSL_GPE_HANDLER, EcGpeQueryHandler,
 			context);
-		if (status == B_OK)
+		if (s == AE_OK)
 			sc->ec_sci_pending = TRUE;
 		else
 			dprintf("EcGpeHandler: queuing GPE query handler failed\n");
@@ -720,10 +677,10 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 gen_count)
 {
 	acpi_status status = AE_NO_HARDWARE_RESPONSE;
 	int32 count, i;
-	
+
 	// int need_poll = cold || rebooting || ec_polled_mode || sc->ec_suspending;
 	int need_poll = ec_polled_mode || sc->ec_suspending;
-    
+
 	/*
 	 * The main CPU should be much faster than the EC.  So the status should
 	 * be "not ready" when we start waiting.  But if the main CPU is really
@@ -750,34 +707,26 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 gen_count)
 
 	/* Wait for event by polling or GPE (interrupt). */
 	if (need_poll) {
-		count = ec_timeout / EC_POLL_DELAY;
+		count = (ec_timeout * 1000) / EC_POLL_DELAY;
 		if (count == 0)
 			count = 1;
 		for (i = 0; i < count; i++) {
 			status = EcCheckStatus(sc, "poll", event);
-			if (status == B_OK)
+			if (status == AE_OK)
 				break;
 			spin(EC_POLL_DELAY);
 		}
 	} else {
-		bigtime_t slp_ival = gHz / 1000000;
-		if (slp_ival != 0) {
-			count = ec_timeout;
-		} else {
-			/* hz has less than 1 ms resolution so scale timeout. */
-			slp_ival = 1;
-			count = ec_timeout / (1000 / gHz);
-		}
+		bigtime_t slp_ival = system_time() + ec_timeout * 1000;
 
-		count = ec_timeout;
-		
 		/*
 		 * Wait for the GPE to signal the status changed, checking the
 		 * status register each time we get one.  It's possible to get a
 		 * GPE for an event we're not interested in here (i.e., SCI for
 		 * EC query).
 		 */
-		for (i = 0; i < count; i++) {
+		status_t waitStatus = B_NO_ERROR;
+		while (waitStatus != B_TIMED_OUT) {
 			if (gen_count != sc->ec_gencount) {
 				/*
 				 * Record new generation count.  It's possible the GPE was
@@ -790,7 +739,8 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 gen_count)
 				if (status == AE_OK)
 					break;
 			}
-			sc->ec_condition_var.Wait(B_RELATIVE_TIMEOUT, slp_ival);
+			waitStatus = sc->ec_condition_var.Wait(B_ABSOLUTE_TIMEOUT,
+				slp_ival);
 		}
 
 		/*
@@ -802,7 +752,7 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 gen_count)
 		if (status != AE_OK) {
 			status = EcCheckStatus(sc, "sleep_end", event);
 			TRACE("wait timed out (%sresponse), forcing polled mode\n",
-				status == B_OK ? "" : "no ");
+				status == AE_OK ? "" : "no ");
 			ec_polled_mode = TRUE;
 		}
 	}
@@ -876,7 +826,7 @@ EcRead(struct acpi_ec_cookie* sc, uint8 address, uint8* readData)
 		return status;
 
 	u_int gen_count = sc->ec_gencount;
-	
+
 	EC_SET_DATA(sc, address);
 	status = EcWaitEvent(sc, EC_EVENT_OUTPUT_BUFFER_FULL, gen_count);
 	if (status != AE_OK) {
@@ -884,7 +834,7 @@ EcRead(struct acpi_ec_cookie* sc, uint8 address, uint8* readData)
 		return status;
 	}
 	*readData = EC_GET_DATA(sc);
-	
+
 	if (sc->ec_burstactive) {
 		sc->ec_burstactive = FALSE;
 		status = EcCommand(sc, EC_COMMAND_BURST_DISABLE);

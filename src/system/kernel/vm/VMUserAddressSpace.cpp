@@ -16,6 +16,7 @@
 
 #include <heap.h>
 #include <thread.h>
+#include <util/atomic.h>
 #include <vm/vm.h>
 #include <vm/VMArea.h>
 
@@ -95,8 +96,9 @@ VMArea*
 VMUserAddressSpace::LookupArea(addr_t address) const
 {
 	// check the area hint first
-	if (fAreaHint != NULL && fAreaHint->ContainsAddress(address))
-		return fAreaHint;
+	VMArea* areaHint = atomic_pointer_get(&fAreaHint);
+	if (areaHint != NULL && areaHint->ContainsAddress(address))
+		return areaHint;
 
 	for (VMUserAreaList::ConstIterator it = fAreas.GetIterator();
 			VMUserArea* area = it.Next();) {
@@ -104,7 +106,7 @@ VMUserAddressSpace::LookupArea(addr_t address) const
 			continue;
 
 		if (area->ContainsAddress(address)) {
-			fAreaHint = area;
+			atomic_pointer_set(&fAreaHint, area);
 			return area;
 		}
 	}

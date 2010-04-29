@@ -814,7 +814,7 @@ rule InstallSourceArchive file : url
 		local archiveFile = [ DownloadFile $(file) : $(url) ] ;
 
 		# copy directly into image
-		AddFilesToHaikuImage develop sources : $(archiveFile) ;
+		AddFilesToHaikuImage _sources_ : $(archiveFile) ;
 	}
 }
 
@@ -837,7 +837,7 @@ rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
 		#}
 	} else {
 		# extract onto image
-		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile) : : 
+		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile) : :
 			: $(isGCCAgnostic) ;
 	}
 }

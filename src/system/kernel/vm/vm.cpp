@@ -613,7 +613,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		// If no one else uses the area's cache, we can resize it, too.
 		if (cache->areas == area && area->cache_next == NULL
-			&& list_is_empty(&cache->consumers)) {
+			&& list_is_empty(&cache->consumers)
+			&& cache->type == CACHE_TYPE_RAM) {
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
@@ -1173,20 +1174,6 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			vm_page_reserve_pages(&reservation, reservedPages, priority);
 	}
 
-	// Lock the address space and, if B_EXACT_ADDRESS and
-	// CREATE_AREA_UNMAP_ADDRESS_RANGE were specified, ensure the address range
-	// is not wired.
-	do {
-		status = locker.SetTo(team);
-		if (status != B_OK)
-			goto err0;
-
-		addressSpace = locker.AddressSpace();
-	} while (addressSpec == B_EXACT_ADDRESS
-		&& (flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0
-		&& wait_if_address_range_is_wired(addressSpace, (addr_t)*address, size,
-			&locker));
-
 	if (wiring == B_CONTIGUOUS) {
 		// we try to allocate the page run here upfront as this may easily
 		// fail for obvious reasons
@@ -1197,6 +1184,20 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			goto err0;
 		}
 	}
+
+	// Lock the address space and, if B_EXACT_ADDRESS and
+	// CREATE_AREA_UNMAP_ADDRESS_RANGE were specified, ensure the address range
+	// is not wired.
+	do {
+		status = locker.SetTo(team);
+		if (status != B_OK)
+			goto err1;
+
+		addressSpace = locker.AddressSpace();
+	} while (addressSpec == B_EXACT_ADDRESS
+		&& (flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0
+		&& wait_if_address_range_is_wired(addressSpace, (addr_t)*address, size,
+			&locker));
 
 	// create an anonymous cache
 	// if it's a stack, make sure that two pages are available at least
@@ -5336,7 +5337,6 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 				!= physicalAddress - table[index].size) {
 			if ((uint32)++index + 1 > numEntries) {
 				// table to small
-				status = B_BUFFER_OVERFLOW;
 				break;
 			}
 			table[index].address = (void*)physicalAddress;

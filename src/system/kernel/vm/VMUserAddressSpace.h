@@ -58,8 +58,8 @@ private:
 									VMUserArea* area, uint32 allocationFlags);
 
 private:
-			VMUserAreaList	fAreas;
-	mutable	VMArea*				fAreaHint;
+			VMUserAreaList		fAreas;
+	mutable	VMUserArea*			fAreaHint;
 };
 
 

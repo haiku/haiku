@@ -241,7 +241,6 @@ if $(TARGET_ARCH) = x86 {
 AddNewDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToHaikuImage power : $(X86_ONLY)enhanced_speedstep ;
 AddNewDriversToHaikuImage power : $(X86_ONLY)acpi_battery ;
-AddNewDriversToHaikuImage power : $(X86_ONLY)acpi_embedded_controller ;
 
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf null

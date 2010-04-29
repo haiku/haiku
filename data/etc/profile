@@ -5,6 +5,10 @@
 
 echo -e "\nWelcome to the Haiku shell.\n"
 
+if [ -z $BE_HOST_CPU ]; then
+	. /boot/system/boot/SetupEnvironment
+fi
+
 export PS1="\w> "
 export HISTFILESIZE=50
 export HISTCONTROL=ignoredups

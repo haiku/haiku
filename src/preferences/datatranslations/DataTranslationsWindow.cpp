@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc.
+ * Copyright 2002-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -36,41 +36,25 @@
 #include "XTab.h"
 #include "YTab.h"
 
-#define DTW_RIGHT	400
-#define DTW_BOTTOM	300
-
 
 const uint32 kMsgTranslatorInfo = 'trin';
 const uint32 kMsgSelectedTranslator = 'trsl';
 
 
 DataTranslationsWindow::DataTranslationsWindow()
-	: BWindow(BRect(0, 0, DTW_RIGHT, DTW_BOTTOM),
-		"DataTranslations", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+	: BWindow(BRect(0, 0, 550, 350), "DataTranslations", B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	MoveTo(dynamic_cast<DataTranslationsApplication *>(be_app)->WindowCorner());
 
+	_SetupViews();
+
 	// Make sure that the window isn't positioned off screen
 	BScreen screen;
-	BRect scrf = screen.Frame(), winf = Frame();
-	float x = winf.left, y = winf.top;
-	scrf.top += 24;
-	scrf.left += 5;
-	scrf.right -= 5;
-	if (winf.left < scrf.left)
-		x = scrf.left;
-	if (winf.right > scrf.right)
-		x = scrf.right - winf.Width() - 5;
-	if (winf.top < scrf.top)
-		y = scrf.top;
-	if (winf.bottom > scrf.bottom)
-		y = scrf.bottom - winf.Height() - 15;
-
-	if (x != winf.left || y != winf.top)
-		MoveTo(x, y);
-
-	_SetupViews();
+	BRect screenFrame = screen.Frame();
+	if (!screenFrame.Contains(Frame()))
+		CenterOnScreen();
 
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
 	roster->StartWatching(this);
@@ -140,7 +124,7 @@ status_t
 DataTranslationsWindow::_ShowConfigView(int32 id)
 {
 	// Shows the config panel for the translator with the given id
-	
+
 	if (id < 0)
 		return B_BAD_VALUE;
 
@@ -222,7 +206,7 @@ DataTranslationsWindow::_SetupViews()
 	// Add the translator name view
 	fTranslatorNameView = new BStringView("TranName", "None");
 
-	// Populate the translators list view   
+	// Populate the translators list view
 	_PopulateListView();
 
 	// Build the layout
@@ -403,6 +387,6 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 		default:
 			BWindow::MessageReceived(message);
 			break;
-	}	
+	}
 }
 

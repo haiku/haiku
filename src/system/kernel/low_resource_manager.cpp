@@ -8,7 +8,6 @@
 #include <low_resource_manager.h>
 
 #include <new>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -364,7 +363,7 @@ low_resource_manager_init_post_thread(void)
 
 	thread_id thread = spawn_kernel_thread(&low_resource_manager,
 		"low resource manager", B_LOW_PRIORITY, NULL);
-	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	resume_thread(thread);
 
 	add_debugger_command("low_resource", &dump_handlers,
 		"Dump list of low resource handlers");

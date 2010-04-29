@@ -8,7 +8,6 @@
  */
 
 
-#include <signal.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -2915,7 +2914,7 @@ vm_page_init_post_thread(kernel_args *args)
 
 	thread_id thread = spawn_kernel_thread(&page_scrubber, "page scrubber",
 		B_LOWEST_ACTIVE_PRIORITY, NULL);
-	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	resume_thread(thread);
 
 	// start page writer
 
@@ -2923,7 +2922,7 @@ vm_page_init_post_thread(kernel_args *args)
 
 	thread = spawn_kernel_thread(&page_writer, "page writer",
 		B_NORMAL_PRIORITY + 1, NULL);
-	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	resume_thread(thread);
 
 	// start page daemon
 
@@ -2931,7 +2930,7 @@ vm_page_init_post_thread(kernel_args *args)
 
 	thread = spawn_kernel_thread(&page_daemon, "page daemon",
 		B_NORMAL_PRIORITY, NULL);
-	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	resume_thread(thread);
 
 	return B_OK;
 }
