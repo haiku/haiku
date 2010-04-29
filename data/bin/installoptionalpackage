@@ -393,7 +393,7 @@ function ReadPackageNamesIntoMemory()
 	# read list into associative array
 	while read line ; do
 		local pkg=`echo ${line} | awk '{print $1}'`
-		local pkgDeps=${line/':'/}
+		local pkgDeps=${line/"${pkg} :"/}
 		availablePackages[${pkg}]="${pkgDeps}"
 		availablePackagesKeys="${availablePackagesKeys} ${pkg}"
 	done < ${file}
@@ -419,8 +419,9 @@ function GeneratePackageNames()
 
 		nonRepeatingDeps=""
 		GetPackageDependencies "$pkg"
+		local lowerCasePkg=`echo ${pkg} | tr '[A-Z]' '[a-z]'`
 		if IsPackageAndDepsOkToInstall ${pkg} ; then
-			echo "${pkg} : ${nonRepeatingDeps}"  >> ${file}
+			echo "${lowerCasePkg} : ${pkg} ${nonRepeatingDeps}"  >> ${file}
 		fi
 
 	done < ${file}.temp
@@ -483,7 +484,8 @@ function BuildListOfRequestedPackages()
 		shift
 	fi
 	while [ $# -gt 0 ]; do
-		wantsToInstall="${wantsToInstall} $1"
+		local lowerCase=`echo $1 | tr '[A-Z]' '[a-z]'`
+		wantsToInstall="${wantsToInstall} $lowerCase"
 		shift
 	done
 }
