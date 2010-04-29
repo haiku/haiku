@@ -7,7 +7,6 @@
 #include <kernel_daemon.h>
 
 #include <new>
-#include <signal.h>
 #include <stdlib.h>
 
 #include <KernelExport.h>
@@ -75,7 +74,7 @@ KernelDaemon::Init(const char* name)
 	if (fThread < 0)
 		return fThread;
 
-	send_signal_etc(fThread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	resume_thread(fThread);
 	fUnregisterCondition.Init(this, name);
 
 	return B_OK;
@@ -144,7 +143,7 @@ KernelDaemon::Unregister(daemon_hook function, void* arg)
 					locker.Unlock();
 
 					entry.Wait();
-					
+
 					locker.Lock();
 				}
 			}

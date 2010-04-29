@@ -15,7 +15,6 @@
 #include <int.h>
 #include <kernel.h>
 #include <lock.h>
-#include <signal.h>
 #include <string.h>
 #include <team.h>
 #include <thread.h>
@@ -2176,7 +2175,7 @@ heap_init_post_thread()
 
 	dprintf("heap_init_post_thread(): created VIP heap: %p\n", sVIPHeap);
 
-	send_signal_etc(sHeapGrowThread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	resume_thread(sHeapGrowThread);
 
 #endif	// !USE_SLAB_ALLOCATOR_FOR_MALLOC
 

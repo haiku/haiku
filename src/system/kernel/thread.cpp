@@ -2162,7 +2162,7 @@ thread_init(kernel_args *args)
 		B_DISPLAY_PRIORITY, NULL);
 	if (undertakerThread < 0)
 		panic("Failed to create undertaker thread!");
-	send_signal_etc(undertakerThread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	resume_thread(undertakerThread);
 
 	// set up some debugger commands
 	add_debugger_command_etc("threads", &dump_thread_list, "List all threads",

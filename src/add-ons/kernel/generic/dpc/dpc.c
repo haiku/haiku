@@ -12,7 +12,6 @@
 
 #include <KernelExport.h>
 
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -60,7 +59,7 @@ dpc_thread(void *arg)
 
 		release_spinlock(&queue->lock);
 		restore_interrupts(former);
-		
+
 		dpc.function(dpc.arg);
 	}
 
@@ -69,7 +68,7 @@ dpc_thread(void *arg)
 	while (queue->count--) {
 		dpc = queue->slots[queue->head];
 		queue->head = (queue->head++) % queue->size;
-		dpc.function(dpc.arg);	
+		dpc.function(dpc.arg);
 	}
 
 	// Now, let's die quietly, ignored by all... sigh.
@@ -85,20 +84,20 @@ new_dpc_queue(void **handle, const char *name, int32 priority)
 {
 	char str[64];
 	dpc_queue *queue;
-	
+
 	if (!handle)
 		return B_BAD_VALUE;
 
 	queue = malloc(sizeof(dpc_queue) + DPC_QUEUE_SIZE * sizeof(dpc_slot));
 	if (!queue)
 		return B_NO_MEMORY;
-	
+
 	queue->head = queue->tail = 0;
 	queue->size = DPC_QUEUE_SIZE;
 	queue->count = 0;
 	B_INITIALIZE_SPINLOCK(&queue->lock);	// Init the spinlock
 
-	snprintf(str, sizeof(str), "%.*s_wakeup_sem", 
+	snprintf(str, sizeof(str), "%.*s_wakeup_sem",
 		(int) sizeof(str) - 11, name);
 
 	queue->wakeup_sem = create_sem(0, str);
@@ -107,7 +106,7 @@ new_dpc_queue(void **handle, const char *name, int32 priority)
 		free(queue);
 		return status;
 	}
-	
+
 	// Fire a kernel thread to actually handle (aka call them!)
 	// the queued/deferred procedure calls
 	queue->thread = spawn_kernel_thread(dpc_thread, name, priority, queue);
@@ -117,7 +116,7 @@ new_dpc_queue(void **handle, const char *name, int32 priority)
 		free(queue);
 		return status;
 	}
-	send_signal_etc(queue->thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	resume_thread(queue->thread);
 
 	*handle = queue;
 
@@ -139,10 +138,10 @@ delete_dpc_queue(void *handle)
 	// Close the queue: queue_dpc() should knows we're closing:
 	former = disable_interrupts();
 	acquire_spinlock(&queue->lock);
-	
+
 	thread = queue->thread;
 	queue->thread = -1;
-	
+
 	release_spinlock(&queue->lock);
 	restore_interrupts(former);
 
@@ -151,7 +150,7 @@ delete_dpc_queue(void *handle)
 	wait_for_thread(thread, &exit_value);
 
 	free(queue);
-	
+
 	return B_OK;
 }
 
@@ -162,14 +161,14 @@ queue_dpc(void *handle, dpc_func function, void *arg)
 	dpc_queue *queue = handle;
 	cpu_status former;
 	status_t status = B_OK;
-	
+
 	if (!queue || !function)
 		return B_BAD_VALUE;
 
 	// Try to be safe being called from interrupt handlers:
 	former = disable_interrupts();
 	acquire_spinlock(&queue->lock);
-	
+
 	if (queue->thread < 0) {
 		// Queue thread is dying...
 		status = B_CANCELED;
@@ -180,7 +179,7 @@ queue_dpc(void *handle, dpc_func function, void *arg)
 		queue->slots[queue->tail].function = function;
 		queue->slots[queue->tail].arg      = arg;
 		queue->tail = (queue->tail++) % queue->size;
-		queue->count++;	
+		queue->count++;
 	}
 
 	release_spinlock(&queue->lock);
@@ -191,7 +190,7 @@ queue_dpc(void *handle, dpc_func function, void *arg)
 		// Notice that interrupt handlers should returns B_INVOKE_SCHEDULER to
 		// shorten DPC latency as much as possible...
 		status = release_sem_etc(queue->wakeup_sem, 1, B_DO_NOT_RESCHEDULE);
-	
+
 	return status;
 }
 
@@ -217,7 +216,7 @@ static dpc_module_info sDPCModule = {
 		0,
 		std_ops
 	},
-	
+
 	new_dpc_queue,
 	delete_dpc_queue,
 	queue_dpc

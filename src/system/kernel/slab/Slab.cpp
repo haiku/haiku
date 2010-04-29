@@ -11,7 +11,6 @@
 
 #include <algorithm>
 #include <new>
-#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -809,5 +808,5 @@ slab_init_post_thread()
 		return;
 	}
 
-	send_signal_etc(objectCacheResizer, SIGCONT, B_DO_NOT_RESCHEDULE);
+	resume_thread(objectCacheResizer);
 }
