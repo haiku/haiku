@@ -6,7 +6,7 @@
 echo -e "\nWelcome to the Haiku shell.\n"
 
 if [ -z $BE_HOST_CPU ]; then
-	source /boot/system/boot/SetupEnvironment
+	. /boot/system/boot/SetupEnvironment
 fi
 
 export PS1="\w> "
