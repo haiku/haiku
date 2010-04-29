@@ -1321,8 +1321,12 @@ syslog_init_post_vm(struct kernel_args* args)
 	status_t status;
 	int32 length = 0;
 
-	if (!sSyslogOutputEnabled)
+	if (!sSyslogOutputEnabled) {
+		sSyslogBuffer = NULL;
+			// Might already have been set in syslog_init(), if the debug syslog
+			// was enabled. Just drop it -- we'll never create the area.
 		return B_OK;
+	}
 
 	sSyslogMessage = (syslog_message*)malloc(SYSLOG_MESSAGE_BUFFER_SIZE);
 	if (sSyslogMessage == NULL) {
