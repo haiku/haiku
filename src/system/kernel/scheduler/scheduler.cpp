@@ -18,6 +18,17 @@
 struct scheduler_ops* gScheduler;
 SchedulerListenerList gSchedulerListeners;
 
+static void (*sRescheduleFunction)(void);
+
+
+static void
+scheduler_reschedule_no_op(void)
+{
+}
+
+
+// #pragma mark -
+
 
 SchedulerListener::~SchedulerListener()
 {
@@ -62,6 +73,11 @@ scheduler_init(void)
 		scheduler_simple_init();
 	}
 
+	// Disable rescheduling until the basic kernel initialization is done and
+	// CPUs are ready to enable interrupts.
+	sRescheduleFunction = gScheduler->reschedule;
+	gScheduler->reschedule = scheduler_reschedule_no_op;
+
 #if SCHEDULER_TRACING
 	add_debugger_command_etc("scheduler", &cmd_scheduler,
 		"Analyze scheduler tracing information",
@@ -69,6 +85,13 @@ scheduler_init(void)
 		"Analyzes scheduler tracing information for a given thread.\n"
 		"  <thread>  - ID of the thread.\n", 0);
 #endif
+}
+
+
+void
+scheduler_enable_scheduling(void)
+{
+	gScheduler->reschedule = sRescheduleFunction;
 }
 
 
