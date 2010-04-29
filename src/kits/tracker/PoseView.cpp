@@ -4631,6 +4631,9 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 		return;
 
 	ASSERT(srcWindow->PoseView()->TargetModel());
+	
+	if (srcWindow->PoseView()->SelectionList()->CountItems() == 0)
+		return;
 
 	bool createRelativeLink = relativeLink;
 	if (((buttons & B_SECONDARY_MOUSE_BUTTON)
