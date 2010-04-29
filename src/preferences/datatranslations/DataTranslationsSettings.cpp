@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc.
+ * Copyright 2002-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -25,7 +25,7 @@ DataTranslationsSettings::DataTranslationsSettings()
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
 
-	fCorner = BPoint(50, 50);
+	fCorner = BPoint(-1, -1);
 
 	path.Append("system/DataTranslations settings");
 	BFile file(path.Path(), B_READ_ONLY);
@@ -41,7 +41,7 @@ DataTranslationsSettings::DataTranslationsSettings()
 
 
 DataTranslationsSettings::~DataTranslationsSettings()
-{	
+{
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) < B_OK)
 		return;
