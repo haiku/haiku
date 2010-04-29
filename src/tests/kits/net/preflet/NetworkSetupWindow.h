@@ -1,8 +1,13 @@
 #ifndef NETWORKSETUPWINDOW_H
 #define NETWORKSETUPWINDOW_H
 
+class NetworkSetupWindow;
 
-#include <InterfaceKit.h>
+#include <Window.h>
+
+class BTabView;
+class BButton;
+class BMenu;
 
 class NetworkSetupWindow : public BWindow
 {
@@ -27,17 +32,16 @@ class NetworkSetupWindow : public BWindow
 				
 		bool			QuitRequested();
 		void			MessageReceived(BMessage* msg);
-		void			AttachedToWindow();
 
 	private:
 		void _BuildProfilesMenu(BMenu* menu, int32 msg);
-		void _BuildShowMenu(BMenu* menu, int32 msg);
+		void _BuildShowTabView(int32 msg);
 	
 		BButton*	fHelpButton;
 		BButton*	fRevertButton;
 		BButton*	fApplyNowButton;
 
-		BBox*		fPanel;
+		BTabView*	fPanel;
 		BView*		fAddonView;
 		BRect		fMinAddonViewRect;
 };

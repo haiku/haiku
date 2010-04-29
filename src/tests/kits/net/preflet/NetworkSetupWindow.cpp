@@ -10,6 +10,7 @@
 #include <Roster.h>
 #include <StorageKit.h>
 #include <SupportKit.h>
+#include <TabView.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -26,9 +27,6 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	BWindow(BRect(100, 100, 300, 300), title, B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BMenu *showPopup = new BPopUpMenu("<please select me!>");
-	_BuildShowMenu(showPopup, SHOW_MSG);
-
 	BBox *topDivider = new BBox(B_EMPTY_STRING);
 	topDivider->SetBorder(B_PLAIN_BORDER);
 
@@ -46,13 +44,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	// ---- Settings section
 
-	// Make the show popup field half the whole width and centered
-	BMenuField *showMenuField = new BMenuField("show_menu", 
-			TR("Show:"), showPopup);
-	showMenuField->SetFont(be_bold_font);
-
-	fPanel = new BBox("showview_box");
-	fPanel->SetBorder(B_NO_BORDER);
+	fPanel = new BTabView("showview_box");
 
 	// ---- Bottom globals buttons section
 	BBox *bottomDivider = new BBox(B_EMPTY_STRING);
@@ -82,7 +74,6 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 			.Add(button)
 		.End()
 		.Add(topDivider)
-		.Add(showMenuField)
 		.Add(fPanel)
 		.Add(bottomDivider)
 		.AddGroup(B_HORIZONTAL, 5)
@@ -92,6 +83,8 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 		.End()
 		.SetInsets(10, 10, 10, 10)
 	);
+
+	_BuildShowTabView(SHOW_MSG);
 
 	topDivider->SetExplicitMaxSize(BSize(B_SIZE_UNSET, 1));
 	bottomDivider->SetExplicitMaxSize(BSize(B_SIZE_UNSET, 1));
@@ -227,9 +220,8 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 
 
 void
-NetworkSetupWindow::_BuildShowMenu(BMenu* menu, int32 msg_what)
+NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 {
-	menu->SetRadioMode(true);		
 	BPath path;
 	BPath addon_path;
 	BDirectory dir;
@@ -295,7 +287,10 @@ NetworkSetupWindow::_BuildShowMenu(BMenu* menu, int32 msg_what)
 					msg->AddString("addon_path", addon_path.Path());
 					msg->AddPointer("addon", addon);
 					msg->AddPointer("addon_view", addon_view);
-					menu->AddItem(new BMenuItem(addon->Name(), msg));
+					
+					BTab *tab = new BTab;
+					fPanel->AddTab(addon_view,tab);
+					tab->SetLabel(addon->Name());
 					n++;
 				}
 				continue;

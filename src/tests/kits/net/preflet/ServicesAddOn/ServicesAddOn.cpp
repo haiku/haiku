@@ -12,7 +12,7 @@ class ServicesAddOn : public NetworkSetupAddOn {
 public:
 					ServicesAddOn(image_id addon_image);
 	BView* 			CreateView(BRect* bounds);
-	const char* 	Name() { return "Internet services"; };
+	const char* 	Name() { return "Services"; };
 };
 
 
@@ -83,22 +83,3 @@ ServicesAddOn::CreateView(BRect* bounds)
 	*bounds = r;
 	return sv;
 }
-	
-/*
-	BDirectory	folder;
-	BEntry		entry;
-	
-	folder.SetTo ( "/boot/beos/etc/bubblejet" );
-	if ( folder.InitCheck() != B_OK )
-		return;
-		
-	while ( folder.GetNextEntry ( &entry ) != B_ENTRY_NOT_FOUND )
-		{
-		char	name[B_FILE_NAME_LENGTH];
-		if ( entry.GetName(name) == B_NO_ERROR )
-			m_model_list->AddItem (new BStringItem(name));
-		};
-
-	m_model_list->SetSelectionMessage(new BMessage(MODEL_MSG));
-	m_model_list->SetInvocationMessage(new BMessage(OK_MSG));
-*/
