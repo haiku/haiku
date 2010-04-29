@@ -308,6 +308,7 @@ scsi_finish_mode_sense_10_6(scsi_ccb *request)
 	if (request->subsys_status != SCSI_REQ_CMP
 		|| request->device_status != SCSI_STATUS_GOOD) {
 		// on error, do nothing
+		restore_request_data(request);
 		release_emulation_buffer(request);
 		return;
 	}
@@ -517,14 +518,6 @@ get_emulation_buffer(scsi_ccb *request)
 	SHOW_FLOW0(3, "");
 
 	acquire_sem(device->buffer_sem);
-
-	request->orig_sg_list = request->sg_list;
-	request->orig_sg_count = request->sg_count;
-	request->orig_data_length = request->data_length;
-
-	request->sg_list = device->buffer_sg_list;
-	request->sg_count = device->buffer_sg_count;
-	request->data_length = device->buffer_size;
 }
 
 
