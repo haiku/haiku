@@ -890,11 +890,10 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/netsurf/NetSurf ;
-		if $(HAIKU_INCLUDE_SOURCES) = 1 {
-			InstallSourceArchive netsurf-r9862.7z
-				: $(baseSourceURL)/2010/netsurf-r9862.7z
-			;
-		}
+		local sURL = http://haiku-files.org/files/sources ;
+		InstallSourceArchive netsurf-r9862.7z
+			: $(sURL)/2010/netsurf-r9862.7z
+		;
 	}
 }
 
