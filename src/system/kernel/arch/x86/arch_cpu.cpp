@@ -85,6 +85,7 @@ bool gHasSSE = false;
 
 static uint32 sCpuRendezvous;
 static uint32 sCpuRendezvous2;
+static uint32 sCpuRendezvous3;
 static vint32 sTSCSyncRendezvous;
 
 segment_descriptor *gGDT = NULL;
@@ -167,6 +168,13 @@ set_mtrr(void *_parameter, int cpu)
 	// wait until all CPUs have arrived here
 	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
 
+	// One CPU has to reset sCpuRendezvous3 -- it is needed to prevent the CPU
+	// that initiated the call_all_cpus() from doing that again and clearing
+	// sCpuRendezvous2 before the last CPU has actually left the loop in
+	// smp_cpu_rendezvous();
+	if (cpu == 0)
+		atomic_set((vint32*)&sCpuRendezvous3, 0);
+
 	disable_caches();
 
 	sCpuModule->set_mtrr(parameter->index, parameter->base, parameter->length,
@@ -176,6 +184,7 @@ set_mtrr(void *_parameter, int cpu)
 
 	// wait until all CPUs have arrived here
 	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous3, cpu);
 }
 
 
@@ -187,6 +196,13 @@ set_mtrrs(void* _parameter, int cpu)
 	// wait until all CPUs have arrived here
 	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
 
+	// One CPU has to reset sCpuRendezvous3 -- it is needed to prevent the CPU
+	// that initiated the call_all_cpus() from doing that again and clearing
+	// sCpuRendezvous2 before the last CPU has actually left the loop in
+	// smp_cpu_rendezvous();
+	if (cpu == 0)
+		atomic_set((vint32*)&sCpuRendezvous3, 0);
+
 	disable_caches();
 
 	sCpuModule->set_mtrrs(parameter->defaultType, parameter->infos,
@@ -196,6 +212,7 @@ set_mtrrs(void* _parameter, int cpu)
 
 	// wait until all CPUs have arrived here
 	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous3, cpu);
 }
 
 
@@ -205,6 +222,13 @@ init_mtrrs(void *_unused, int cpu)
 	// wait until all CPUs have arrived here
 	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
 
+	// One CPU has to reset sCpuRendezvous3 -- it is needed to prevent the CPU
+	// that initiated the call_all_cpus() from doing that again and clearing
+	// sCpuRendezvous2 before the last CPU has actually left the loop in
+	// smp_cpu_rendezvous();
+	if (cpu == 0)
+		atomic_set((vint32*)&sCpuRendezvous3, 0);
+
 	disable_caches();
 
 	sCpuModule->init_mtrrs();
@@ -213,6 +237,7 @@ init_mtrrs(void *_unused, int cpu)
 
 	// wait until all CPUs have arrived here
 	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous3, cpu);
 }
 
 
