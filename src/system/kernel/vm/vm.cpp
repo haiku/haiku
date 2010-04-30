@@ -776,9 +776,10 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		VMCache* newCache;
 
 		// create an anonymous cache
+		bool isStack = (protection & B_STACK_AREA) != 0;
 		status = VMCacheFactory::CreateAnonymousCache(newCache,
-			(protection & B_STACK_AREA) != 0, 0, USER_STACK_GUARD_PAGES, true,
-			VM_PRIORITY_USER);
+			isStack || (protection & B_OVERCOMMITTING_AREA) != 0, 0,
+			isStack ? USER_STACK_GUARD_PAGES : 0, true, VM_PRIORITY_USER);
 		if (status != B_OK)
 			goto err1;
 
