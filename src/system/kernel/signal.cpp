@@ -923,6 +923,13 @@ sigwait_internal(const sigset_t *set, int *_signal)
 }
 
 
+int
+sigwait(const sigset_t *set, int *_signal)
+{
+	RETURN_AND_SET_ERRNO(sigwait_internal(set, _signal));
+}
+
+
 /*!	Replace the current signal block mask and wait for any event to happen.
 	Before returning, the original signal block mask is reinstantiated.
 */
@@ -958,6 +965,13 @@ sigsuspend_internal(const sigset_t *mask)
 }
 
 
+int
+sigsuspend(const sigset_t *mask)
+{
+	RETURN_AND_SET_ERRNO(sigsuspend_internal(mask));
+}
+
+
 static status_t
 sigpending_internal(sigset_t *set)
 {
@@ -971,7 +985,14 @@ sigpending_internal(sigset_t *set)
 }
 
 
-//	#pragma mark -
+int
+sigpending(sigset_t *set)
+{
+	RETURN_AND_SET_ERRNO(sigpending_internal(set));
+}
+
+
+// #pragma mark - syscalls
 
 
 bigtime_t
