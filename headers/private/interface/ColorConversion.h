@@ -38,6 +38,7 @@ public:
 	inline uint8 IndexForRGB16(uint8 red, uint8 green, uint8 blue) const;
 	inline uint8 IndexForRGB24(uint32 rgb) const;
 	inline uint8 IndexForRGB24(uint8 red, uint8 green, uint8 blue) const;
+	inline uint8 IndexForRGBA32(uint32 rgba) const;
 	inline uint8 IndexForGray(uint8 gray) const;
 
 	inline const rgb_color &RGBColorForIndex(uint8 index) const;
