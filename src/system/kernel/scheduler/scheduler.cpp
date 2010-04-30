@@ -24,6 +24,9 @@ static void (*sRescheduleFunction)(void);
 static void
 scheduler_reschedule_no_op(void)
 {
+	struct thread* thread = thread_get_current_thread();
+	if (thread != NULL && thread->next_state != B_THREAD_READY)
+		panic("scheduler_reschedule_no_op() called in non-ready thread");
 }
 
 
