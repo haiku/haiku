@@ -527,8 +527,9 @@ VMAnonymousCache::Commit(off_t size, int priority)
 {
 	TRACE("%p->VMAnonymousCache::Commit(%lld)\n", this, size);
 
-	// if we can overcommit, we don't commit here, but in anonymous_fault()
-	if (fCanOvercommit) {
+	// If we can overcommit, we don't commit here, but in Fault(). We always
+	// unreserve memory, if we're asked to shrink our commitment, though.
+	if (fCanOvercommit && size > committed_size) {
 		if (fHasPrecommitted)
 			return B_OK;
 
@@ -783,14 +784,21 @@ VMAnonymousCache::Fault(struct VMAddressSpace* aspace, off_t offset)
 		}
 
 		if (fPrecommittedPages == 0) {
+			// never commit more than needed
+			if (committed_size / B_PAGE_SIZE > page_count)
+				return B_BAD_HANDLER;
+
 			// try to commit additional swap space/memory
 			if (swap_space_reserve(B_PAGE_SIZE) == B_PAGE_SIZE) {
 				fCommittedSwapSize += B_PAGE_SIZE;
 			} else {
 				int priority = aspace == VMAddressSpace::Kernel()
 					? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER;
-				if (vm_try_reserve_memory(B_PAGE_SIZE, priority, 0) != B_OK)
+				if (vm_try_reserve_memory(B_PAGE_SIZE, priority, 0) != B_OK) {
+					dprintf("%p->VMAnonymousCache::Fault(): Failed to reserve "
+						"%d bytes of RAM.\n", this, (int)B_PAGE_SIZE);
 					return B_NO_MEMORY;
+				}
 			}
 
 			committed_size += B_PAGE_SIZE;
