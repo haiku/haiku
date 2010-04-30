@@ -230,32 +230,27 @@ if [ IsOptionalHaikuImagePackageAdded BePDF ] {
 
 # BeZillaBrowser
 if [ IsOptionalHaikuImagePackageAdded BeZillaBrowser ] {
-	local sURL = http://haiku-files.org/files/sources ;
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BeZillaBrowser available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage
-			BeZillaBrowser-2.0.0.22pre-x86-gcc4-2010-03-14.zip
-			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc4-2010-03-14.zip
- 			:
- 		;
- 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/BeZillaBrowser/BeZillaBrowser
-		;
-		InstallSourceArchive BeZillaBrowser-2010-01-21-src.7z
-			: $(sURL)/2010/BeZillaBrowser-2010-01-21-src.7z
-			;
 	} else {
-		InstallOptionalHaikuImagePackage
-			BeZillaBrowser-2.0.0.22pre-x86-gcc2-2010-03-14.zip
-			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc2-2010-03-14.zip
- 			:
- 		;
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				BeZillaBrowser-2.0.0.22pre-x86-gcc4-2010-03-14.zip
+				: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc4-2010-03-14.zip
+ 				:
+ 			;
+ 		} else {
+			InstallOptionalHaikuImagePackage
+				BeZillaBrowser-2.0.0.22pre-x86-gcc2-2010-03-14.zip
+				: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc2-2010-03-14.zip
+ 				:
+ 			;
+ 		}
  		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser
 		;
 		InstallSourceArchive BeZillaBrowser-2010-01-21-src.7z
-			: $(sURL)/2010/BeZillaBrowser-2010-01-21-src.7z
+			: http://haiku-files.org/files/sources/2010/BeZillaBrowser-2010-01-21-src.7z
 		;
 	}
 }
@@ -897,9 +892,8 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/netsurf/NetSurf ;
-		local sURL = http://haiku-files.org/files/sources ;
 		InstallSourceArchive netsurf-r9862.7z
-			: $(sURL)/2010/netsurf-r9862.7z
+			: http://haiku-files.org/files/sources/2010/netsurf-r9862.7z
 		;
 	}
 }
