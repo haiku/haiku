@@ -1076,7 +1076,17 @@ smp_wake_up_non_boot_cpus()
 	}
 }
 
-/* have all cpus spin until all have run */
+
+/*!	Spin until all CPUs have reached the rendez-vous point.
+
+	The rendez-vous variable \c *var must have been initialized to 0 before the
+	function is called. The variable will be non-null when the function returns.
+
+	Note that when the function returns on one CPU, it only means that all CPU
+	have already entered the function. It does not mean that the variable can
+	already be reset. Only when all CPUs have returned (which would have to be
+	ensured via another rendez-vous) the variable can be reset.
+*/
 void
 smp_cpu_rendezvous(volatile uint32 *var, int current_cpu)
 {
@@ -1085,6 +1095,7 @@ smp_cpu_rendezvous(volatile uint32 *var, int current_cpu)
 	while (*var != (((uint32)1 << sNumCPUs) - 1))
 		PAUSE();
 }
+
 
 status_t
 smp_init(kernel_args *args)
