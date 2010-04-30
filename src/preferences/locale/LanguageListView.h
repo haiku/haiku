@@ -5,6 +5,7 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Adrien Destugues <pulkomandy@gmail.com>
+ *		Oliver Tappe <zooey@hirschkaefer.de>
 */
 #ifndef __LANGUAGE_LIST_VIEW_H
 #define __LANGUAGE_LIST_VIEW_H
@@ -19,7 +20,6 @@ class LanguageListItem : public BStringItem {
 public:
 							LanguageListItem(const char* text,
 								const char* code);
-							LanguageListItem(const LanguageListItem& other);
 	virtual					~LanguageListItem();
 
 			const BString&	LanguageCode() { return fLanguageCode; }

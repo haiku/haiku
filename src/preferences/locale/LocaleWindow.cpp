@@ -43,6 +43,15 @@ compare_list_items(const void* _a, const void* _b)
 }
 
 
+static int
+compare_typed_list_items(const BListItem* _a, const BListItem* _b)
+{
+	LanguageListItem* a = *(LanguageListItem**)_a;
+	LanguageListItem* b = *(LanguageListItem**)_b;
+	return strcasecmp(a->Text(), b->Text());
+}
+
+
 LocaleWindow::LocaleWindow()
 	:
 	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_NOT_RESIZABLE
@@ -84,7 +93,7 @@ LocaleWindow::LocaleWindow()
 			for (int i = 0; installedLanguages.FindString("langs",
 					i, &currentLanguageCode) == B_OK; i++) {
 
-				// Now get an human-readable, loacalized name for each language
+				// Now get an human-readable, localized name for each language
 				// TODO: sort them using collators.
 				BLanguage* currentLanguage;
 				be_locale_roster->GetLanguage(&currentLanguage,
@@ -101,11 +110,17 @@ LocaleWindow::LocaleWindow()
 					// This is a language without country, add it at top-level
 					fLanguageListView->AddItem(si);
 					si->SetExpanded(false);
+					if (lastAddedLanguage != NULL) {
+						fLanguageListView->SortItemsUnder(lastAddedLanguage,
+							true, compare_typed_list_items);
+					}
 					lastAddedLanguage = si;
 				}
 
 				delete currentLanguage;
 			}
+			fLanguageListView->SortItemsUnder(lastAddedLanguage, true,
+				compare_typed_list_items);
 
 			fLanguageListView->SortItems(compare_list_items);
 				// see previous comment on sort using collators
@@ -133,9 +148,8 @@ LocaleWindow::LocaleWindow()
 		BMessage msg;
 		be_locale_roster->GetPreferredLanguages(&msg);
 		BString langCode;
-		for (int index = 0; msg.FindString("language", index, &langCode)
-					== B_OK;
-				index++) {
+		for (int index = 0;
+			msg.FindString("language", index, &langCode) == B_OK; index++) {
 			for (int listPos = 0; LanguageListItem* lli
 					= static_cast<LanguageListItem*>
 						(fLanguageListView->FullListItemAt(listPos));
@@ -144,8 +158,9 @@ LocaleWindow::LocaleWindow()
 					// We found the item we were looking for, now move it to
 					// the other list along with all its children
 					static_cast<LanguageListView*>(fPreferredListView)
-						-> MoveItemFrom(fLanguageListView, fLanguageListView
-							-> FullListIndexOf(lli));
+						->MoveItemFrom(fLanguageListView,
+							fLanguageListView->FullListIndexOf(lli),
+							fLanguageListView->CountItems());
 				}
 			}
 		}
@@ -247,22 +262,21 @@ LocaleWindow::MessageReceived(BMessage* message)
 
 		case kMsgPrefLanguagesChanged:
 		{
-				BMessage update(kMsgSettingsChanged);
-				int index = 0;
-				while (index < fPreferredListView->FullListCountItems()) {
-					// only include subitems : we can guess the superitem
-					// from them anyway
-					if (fPreferredListView->Superitem(fPreferredListView->
-								FullListItemAt(index))
-							!= NULL) {
-						update.AddString("language",
-							static_cast<LanguageListItem*>
-								(fPreferredListView->FullListItemAt(index))
-							-> LanguageCode());
-					}
-					index++;
+			BMessage update(kMsgSettingsChanged);
+			int index = 0;
+			while (index < fPreferredListView->FullListCountItems()) {
+				// only include subitems : we can guess the superitem
+				// from them anyway
+				if (fPreferredListView->Superitem(
+						fPreferredListView->FullListItemAt(index)) != NULL) {
+					update.AddString("language", static_cast<LanguageListItem*>(
+							fPreferredListView->FullListItemAt(index))
+						->LanguageCode());
 				}
-				be_app_messenger.SendMessage(&update);
+				index++;
+			}
+			fLanguageListView->SortItems(compare_list_items);
+			be_app_messenger.SendMessage(&update);
 			break;
 		}
 
@@ -293,8 +307,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 					= static_cast<LanguageListItem*>
 						(fLanguageListView->RemoveItem(index));
 				fPreferredListView->AddItem(listItem);
-				fPreferredListView
-					->Invoke(fMsgPrefLanguagesChanged);
+				fPreferredListView->Invoke(fMsgPrefLanguagesChanged);
 			}
 			break;
 		}
@@ -312,8 +325,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 				fLanguageListView->AddItem(listItem);
 				fLanguageListView->SortItems(compare_list_items);
 					// see previous comment on sort using collators
-				fPreferredListView
-					->Invoke(fMsgPrefLanguagesChanged);
+				fPreferredListView->Invoke(fMsgPrefLanguagesChanged);
 			}
 			break;
 		}

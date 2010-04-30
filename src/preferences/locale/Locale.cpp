@@ -109,10 +109,8 @@ void
 Settings::UpdateFrom(BMessage* message)
 {
 	BPoint point;
-	if (message->FindPoint("window_location", &point) == B_OK) {
-		fMessage.RemoveName("window_location");
-		fMessage.AddPoint("window_location", point);
-	}
+	if (message->FindPoint("window_location", &point) == B_OK)
+		fMessage.ReplacePoint("window_location", point);
 
 	BString langName;
 	// We make sure there is at least one string before erasing the previous
@@ -127,9 +125,8 @@ Settings::UpdateFrom(BMessage* message)
 		}
 	}
 
-	if (message->FindString("country",&langName) == B_OK)
+	if (message->FindString("country", &langName) == B_OK)
 		fMessage.ReplaceString("country", langName);
-
 
 	fUpdated = true;
 }
