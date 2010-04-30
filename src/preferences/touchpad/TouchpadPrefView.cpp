@@ -369,19 +369,19 @@ TouchpadPrefView::SetupView()
 	fScrollAccelSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
 
 	fScrollStepXSlider = new BSlider("scroll_stepX",
-		TR("Horizontal scroll step size"),
+		TR("Horizontal scroll speed"),
 		new BMessage(SCROLL_CONTROL_CHANGED),
 		0, 20, B_HORIZONTAL);
 	fScrollStepXSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fScrollStepXSlider->SetHashMarkCount(7);
-	fScrollStepXSlider->SetLimitLabels(TR("Wide"), TR("Small"));
+	fScrollStepXSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
 
 	fScrollStepYSlider = new BSlider("scroll_stepY",
-		TR("Vertical scroll step size"), new BMessage(SCROLL_CONTROL_CHANGED),
+		TR("Vertical scroll speed"), new BMessage(SCROLL_CONTROL_CHANGED),
 		0, 20, B_HORIZONTAL);
 	fScrollStepYSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fScrollStepYSlider->SetHashMarkCount(7);
-	fScrollStepYSlider->SetLimitLabels(TR("Wide"), TR("Small"));
+	fScrollStepYSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
 
 	fTwoFingerBox = new BCheckBox(TR("Two finger scrolling"),
 		new BMessage(SCROLL_CONTROL_CHANGED));
