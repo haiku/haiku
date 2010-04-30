@@ -1044,20 +1044,25 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 }
 
 
+/*!	Spin on non-boot CPUs until smp_wake_up_non_boot_cpus() has been called.
+
+	\param cpu The index of the calling CPU.
+	\param rendezVous A rendez-vous variable to make sure that the boot CPU
+		does not return before all other CPUs have started waiting.
+	\return \c true on the boot CPU, \c false otherwise.
+*/
 bool
-smp_trap_non_boot_cpus(int32 cpu)
+smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 {
-	if (cpu > 0) {
-#if B_DEBUG_SPINLOCK_CONTENTION
-		boot_cpu_spin[cpu].lock = 1;
-#else
-		boot_cpu_spin[cpu] = 1;
-#endif
-		acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
-		return false;
+	if (cpu == 0) {
+		smp_cpu_rendezvous(rendezVous, cpu);
+		return true;
 	}
 
-	return true;
+	acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
+	smp_cpu_rendezvous(rendezVous, cpu);
+	acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
+	return false;
 }
 
 

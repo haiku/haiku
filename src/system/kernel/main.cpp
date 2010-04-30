@@ -67,6 +67,7 @@ bool gKernelStartup = true;
 static kernel_args sKernelArgs;
 static uint32 sCpuRendezvous;
 static uint32 sCpuRendezvous2;
+static uint32 sCpuRendezvous3;
 
 static int32 main2(void *);
 
@@ -100,7 +101,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 	thread_preboot_init_percpu(&sKernelArgs, currentCPU);
 
 	// if we're not a boot cpu, spin here until someone wakes us up
-	if (smp_trap_non_boot_cpus(currentCPU)) {
+	if (smp_trap_non_boot_cpus(currentCPU, &sCpuRendezvous3)) {
 		// init platform
 		arch_platform_init(&sKernelArgs);
 
