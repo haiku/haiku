@@ -10,7 +10,7 @@ resource(2, "META:SNIFF_RULE") #'CSTR' array {
 
 resource(3, "META:S:DESC") #'MSDC' "HTML File";
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.mozilla-firefox";
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-WebPositive";
 
 resource(5, "META:EXTENS") message(234) {
 	"extensions" = "htm",
