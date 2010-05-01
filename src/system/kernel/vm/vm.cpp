@@ -5742,7 +5742,7 @@ _user_clone_area(const char* userName, void** userAddress, uint32 addressSpec,
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 			return B_BAD_VALUE;
 	}
-	if ((protection & ~B_USER_PROTECTION) != 0)
+	if ((protection & ~B_USER_AREA_FLAGS) != 0)
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userName)
@@ -5781,7 +5781,7 @@ _user_create_area(const char* userName, void** userAddress, uint32 addressSpec,
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 			return B_BAD_VALUE;
 	}
-	if ((protection & ~B_USER_PROTECTION) != 0)
+	if ((protection & ~B_USER_AREA_FLAGS) != 0)
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userName)
@@ -5824,13 +5824,18 @@ _user_delete_area(area_id area)
 // TODO: create a BeOS style call for this!
 
 area_id
-_user_map_file(const char* userName, void** userAddress, int addressSpec,
-	size_t size, int protection, int mapping, bool unmapAddressRange, int fd,
-	off_t offset)
+_user_map_file(const char* userName, void** userAddress, uint32 addressSpec,
+	size_t size, uint32 protection, uint32 mapping, bool unmapAddressRange,
+	int fd, off_t offset)
 {
 	char name[B_OS_NAME_LENGTH];
 	void* address;
 	area_id area;
+
+	if ((protection & ~B_USER_AREA_FLAGS) != 0)
+		return B_BAD_VALUE;
+
+	fix_protection(&protection);
 
 	if (!IS_USER_ADDRESS(userName) || !IS_USER_ADDRESS(userAddress)
 		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK
@@ -5847,10 +5852,6 @@ _user_map_file(const char* userName, void** userAddress, int addressSpec,
 			return B_BAD_ADDRESS;
 		}
 	}
-
-	// userland created areas can always be accessed by the kernel
-	protection |= B_KERNEL_READ_AREA
-		| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
 
 	area = _vm_map_file(VMAddressSpace::CurrentID(), name, &address,
 		addressSpec, size, protection, mapping, unmapAddressRange, fd, offset,
@@ -5894,7 +5895,7 @@ _user_unmap_memory(void* _address, size_t size)
 
 
 status_t
-_user_set_memory_protection(void* _address, size_t size, int protection)
+_user_set_memory_protection(void* _address, size_t size, uint32 protection)
 {
 	// check address range
 	addr_t address = (addr_t)_address;
@@ -5909,12 +5910,10 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 	}
 
 	// extend and check protection
-	protection &= B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA;
-	uint32 actualProtection = protection | B_KERNEL_READ_AREA
-		| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
+	if ((protection & ~B_USER_PROTECTION) != 0)
+		return B_BAD_VALUE;
 
-	if (!arch_vm_supports_protection(actualProtection))
-		return B_NOT_SUPPORTED;
+	fix_protection(&protection);
 
 	// We need to write lock the address space, since we're going to play with
 	// the areas. Also make sure that none of the areas is wired and that we're
@@ -5979,7 +5978,7 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 		sizeLeft -= rangeSize;
 
 		if (area->page_protections == NULL) {
-			if (area->protection == actualProtection)
+			if (area->protection == protection)
 				continue;
 
 			// In the page protections we store only the three user protections,
@@ -6032,7 +6031,7 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 				&& (protection & B_WRITE_AREA) != 0;
 
 			if (!unmapPage)
-				map->ProtectPage(area, pageAddress, actualProtection);
+				map->ProtectPage(area, pageAddress, protection);
 
 			map->Unlock();
 
@@ -6049,7 +6048,7 @@ _user_set_memory_protection(void* _address, size_t size, int protection)
 
 
 status_t
-_user_sync_memory(void* _address, size_t size, int flags)
+_user_sync_memory(void* _address, size_t size, uint32 flags)
 {
 	addr_t address = (addr_t)_address;
 	size = PAGE_ALIGN(size);
@@ -6129,7 +6128,7 @@ _user_sync_memory(void* _address, size_t size, int flags)
 
 
 status_t
-_user_memory_advice(void* address, size_t size, int advice)
+_user_memory_advice(void* address, size_t size, uint32 advice)
 {
 	// TODO: Implement!
 	return B_OK;

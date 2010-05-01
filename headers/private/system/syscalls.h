@@ -398,15 +398,15 @@ extern status_t		_kern_reserve_address_range(addr_t* _address,
 extern status_t		_kern_unreserve_address_range(addr_t address, addr_t size);
 
 extern area_id		_kern_map_file(const char *name, void **address,
-						int addressSpec, size_t size, int protection,
-						int mapping, bool unmapAddressRange, int fd,
+						uint32 addressSpec, size_t size, uint32 protection,
+						uint32 mapping, bool unmapAddressRange, int fd,
 						off_t offset);
 extern status_t		_kern_unmap_memory(void *address, size_t size);
 extern status_t		_kern_set_memory_protection(void *address, size_t size,
-						int protection);
+						uint32 protection);
 extern status_t		_kern_sync_memory(void *address, size_t size, int flags);
 extern status_t		_kern_memory_advice(void *address, size_t size,
-						int advice);
+						uint32 advice);
 
 /* kernel port functions */
 extern port_id		_kern_create_port(int32 queue_length, const char *name);
