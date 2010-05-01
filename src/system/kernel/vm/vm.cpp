@@ -502,7 +502,7 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection,
 		map->Lock();
 
 		map->Map(address, page->physical_page_number * B_PAGE_SIZE, protection,
-			reservation);
+			area->MemoryType(), reservation);
 
 		// insert mapping into lists
 		if (page->mappings.IsEmpty() && page->wired_count == 0)
@@ -517,7 +517,7 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection,
 
 		map->Lock();
 		map->Map(address, page->physical_page_number * B_PAGE_SIZE, protection,
-			reservation);
+			area->MemoryType(), reservation);
 		map->Unlock();
 
 		increment_page_wired_count(page);
@@ -1338,7 +1338,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 					panic("couldn't lookup physical page just allocated\n");
 
 				status = map->Map(virtualAddress, physicalAddress, protection,
-					&reservation);
+					area->MemoryType(), &reservation);
 				if (status < B_OK)
 					panic("couldn't map physical page in page run\n");
 
@@ -1466,7 +1466,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 
 		for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
 			map->Map(area->Base() + offset, physicalAddress + offset,
-				protection, &reservation);
+				protection, area->MemoryType(), &reservation);
 		}
 
 		map->Unlock();
@@ -1571,7 +1571,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 
 		map->Map(area->Base() + offset,
 			(addr_t)vecs[vecIndex].iov_base + vecOffset, protection,
-			&reservation);
+			area->MemoryType(), &reservation);
 
 		vecOffset += B_PAGE_SIZE;
 	}
@@ -1964,7 +1964,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 			for (addr_t offset = 0; offset < newArea->Size();
 					offset += B_PAGE_SIZE) {
 				map->Map(newArea->Base() + offset, physicalAddress + offset,
-					protection, &reservation);
+					protection, newArea->MemoryType(), &reservation);
 			}
 
 			map->Unlock();
@@ -4453,6 +4453,8 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 status_t
 vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type)
 {
+	// NOTE: The caller is responsible for synchronizing calls to this function!
+
 	AddressSpaceReadLocker locker;
 	VMArea* area;
 	status_t status = locker.SetFromArea(id, area);
@@ -4464,12 +4466,24 @@ vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type)
 	if (type == oldType)
 		return B_OK;
 
+	// set the memory type of the area and the mapped pages
+	VMTranslationMap* map = area->address_space->TranslationMap();
+	map->Lock();
+	area->SetMemoryType(type);
+	map->ProtectArea(area, area->protection);
+	map->Unlock();
+
 	// set the physical memory type
 	status_t error = arch_vm_set_memory_type(area, physicalBase, type);
-	if (error != B_OK)
+	if (error != B_OK) {
+		// reset the memory type of the area and the mapped pages
+		map->Lock();
+		area->SetMemoryType(oldType);
+		map->ProtectArea(area, area->protection);
+		map->Unlock();
 		return error;
+	}
 
-	area->SetMemoryType(type);
 	return B_OK;
 
 }

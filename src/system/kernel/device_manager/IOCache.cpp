@@ -727,7 +727,7 @@ IOCache::_MapPages(size_t firstPage, size_t endPage)
 
 		translationMap->Map((addr_t)fAreaBase + i * B_PAGE_SIZE,
 			page->physical_page_number * B_PAGE_SIZE,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &fMappingReservation);
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, &fMappingReservation);
 		// NOTE: We don't increment gMappedPagesCount. Our pages have state
 		// PAGE_STATE_UNUSED anyway and we map them only for a short time.
 	}

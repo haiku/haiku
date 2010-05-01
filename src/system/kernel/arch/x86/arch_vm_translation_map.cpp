@@ -402,8 +402,9 @@ X86VMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 
 status_t
 X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes,
-	vm_page_reservation* reservation)
+	uint32 memoryType, vm_page_reservation* reservation)
 {
+// TODO: Support memory types!
 	TRACE("map_tmap: entry pa 0x%lx va 0x%lx\n", pa, va);
 
 /*
@@ -971,8 +972,10 @@ X86VMTranslationMap::MappedSize() const
 
 
 status_t
-X86VMTranslationMap::Protect(addr_t start, addr_t end, uint32 attributes)
+X86VMTranslationMap::Protect(addr_t start, addr_t end, uint32 attributes,
+	uint32 memoryType)
 {
+// TODO: Support memory types!
 	page_directory_entry *pd = fArchData->pgdir_virt;
 
 	start = ROUNDDOWN(start, B_PAGE_SIZE);

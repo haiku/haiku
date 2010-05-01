@@ -30,8 +30,8 @@ struct X86VMTranslationMap : VMTranslationMap {
 									addr_t end) const;
 
 	virtual	status_t			Map(addr_t virtualAddress,
-									addr_t physicalAddress,
-									uint32 attributes,
+									addr_t physicalAddress, uint32 attributes,
+									uint32 memoryType,
 									vm_page_reservation* reservation);
 	virtual	status_t			Unmap(addr_t start, addr_t end);
 
@@ -51,7 +51,7 @@ struct X86VMTranslationMap : VMTranslationMap {
 									uint32* _flags);
 
 	virtual	status_t			Protect(addr_t base, addr_t top,
-									uint32 attributes);
+									uint32 attributes, uint32 memoryType);
 
 	virtual	status_t			ClearFlags(addr_t virtualAddress,
 									uint32 flags);
