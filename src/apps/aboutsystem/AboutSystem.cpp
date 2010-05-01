@@ -851,7 +851,7 @@ AboutView::_CreateCreditsView()
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(TR("The copyright to the Haiku code is property of "
 		"Haiku, Inc. or of the respective authors where expressly noted "
-		"in the source."
+		"in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc."
 		"\n\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
