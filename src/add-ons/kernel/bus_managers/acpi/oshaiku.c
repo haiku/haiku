@@ -115,6 +115,7 @@
 
 
 #include <OS.h>
+#include <kernel.h>
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
@@ -819,7 +820,10 @@ void
 AcpiOsSleep(ACPI_INTEGER milliseconds)
 {
 	DEBUG_FUNCTION_F("milliseconds: %lu", milliseconds);
-	snooze(milliseconds * 1000);
+	if (gKernelStartup)
+		spin(milliseconds * 1000);
+	else
+		snooze(milliseconds * 1000);
 }
 
 
