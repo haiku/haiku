@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -9,6 +9,8 @@
 #ifndef _KERNEL_VM_VM_AREA_H
 #define _KERNEL_VM_VM_AREA_H
 
+
+#include <vm_defs.h>
 
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
@@ -91,8 +93,11 @@ struct VMArea {
 	area_id					id;
 	uint32					protection;
 	uint16					wiring;
-	uint16					memory_type;
 
+private:
+	uint16					memory_type;	// >> shifted by MEMORY_TYPE_SHIFT
+
+public:
 	VMCache*				cache;
 	vint32					no_cache_change;
 	off_t					cache_offset;
@@ -107,6 +112,9 @@ struct VMArea {
 
 			addr_t				Base() const	{ return fBase; }
 			size_t				Size() const	{ return fSize; }
+
+	inline	uint32				MemoryType() const;
+	inline	void				SetMemoryType(uint32 memoryType);
 
 			bool				ContainsAddress(addr_t address) const
 									{ return address >= fBase
@@ -202,6 +210,20 @@ private:
 	static	rw_lock				sLock;
 	static	VMAreaHashTable		sTable;
 };
+
+
+uint32
+VMArea::MemoryType() const
+{
+	return (uint32)memory_type << MEMORY_TYPE_SHIFT;
+}
+
+
+void
+VMArea::SetMemoryType(uint32 memoryType)
+{
+	memory_type = memoryType >> MEMORY_TYPE_SHIFT;
+}
 
 
 #endif	// _KERNEL_VM_VM_AREA_H

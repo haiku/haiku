@@ -1444,6 +1444,8 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 		if (memoryType == 0)
 			memoryType = B_MTR_UC;
 
+		area->SetMemoryType(memoryType);
+
 		status = arch_vm_set_memory_type(area, physicalAddress, memoryType);
 		if (status != B_OK)
 			delete_area(locker.AddressSpace(), area, false);
@@ -3038,7 +3040,7 @@ dump_area_struct(VMArea* area, bool mappings)
 	kprintf("size:\t\t0x%lx\n", area->Size());
 	kprintf("protection:\t0x%lx\n", area->protection);
 	kprintf("wiring:\t\t0x%x\n", area->wiring);
-	kprintf("memory_type:\t0x%x\n", area->memory_type);
+	kprintf("memory_type:\t%#" B_PRIx32 "\n", area->MemoryType());
 	kprintf("cache:\t\t%p\n", area->cache);
 	kprintf("cache_type:\t%s\n", cache_type_to_string(area->cache_type));
 	kprintf("cache_offset:\t0x%Lx\n", area->cache_offset);
@@ -4457,7 +4459,19 @@ vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type)
 	if (status != B_OK)
 		return status;
 
-	return arch_vm_set_memory_type(area, physicalBase, type);
+	// nothing to do, if the type doesn't change
+	uint32 oldType = area->MemoryType();
+	if (type == oldType)
+		return B_OK;
+
+	// set the physical memory type
+	status_t error = arch_vm_set_memory_type(area, physicalBase, type);
+	if (error != B_OK)
+		return error;
+
+	area->SetMemoryType(type);
+	return B_OK;
+
 }
 
 
