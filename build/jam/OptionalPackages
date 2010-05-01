@@ -925,8 +925,9 @@ if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSound available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage OpenSound.zip
-			: $(baseURL)/OpenSound-x86-gcc2-2008-06-21.zip
+		InstallOptionalHaikuImagePackage 
+			opensound-4.2-r1a2-x86-gcc2-2010-05-01.zip
+			: $(baseURL)/opensound-4.2-r1a2-x86-gcc2-2010-05-01.zip
 			:
 		;
 	}
@@ -1438,7 +1439,8 @@ if [ IsOptionalHaikuImagePackageAdded Yasm ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Yasm available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage yasm-0.8.0-r1a2-x86-gcc2-2010-04-21.zip
+		InstallOptionalHaikuImagePackage 
+			yasm-0.8.0-r1a2-x86-gcc2-2010-04-21.zip
 			: $(baseURL)/yasm-0.8.0-r1a2-x86-gcc2-2010-04-21.zip
 			:
 		;
