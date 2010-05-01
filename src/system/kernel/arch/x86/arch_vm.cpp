@@ -667,8 +667,9 @@ arch_vm_supports_protection(uint32 protection)
 	// other way around is not supported either, we don't care in this case
 	// and give the kernel full access.
 	if ((protection & (B_READ_AREA | B_WRITE_AREA)) == B_READ_AREA
-		&& protection & B_KERNEL_WRITE_AREA)
+		&& (protection & B_KERNEL_WRITE_AREA) != 0) {
 		return false;
+	}
 
 	return true;
 }
