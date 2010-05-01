@@ -144,6 +144,7 @@ static const Translation gTranslations[] =
 		"Nicolás C (CapitanPico)\n"
 		"Oscar Carballal (oscarcp)\n"
 		"Miguel Zúñiga González (miguel~1.mx)\n"
+		"César Ortiz Pantoja (ccortiz)\n"
 	},
 	{ "sv",
 		"Johan Holmberg\n"
