@@ -30,6 +30,7 @@
 
 #include "acpi_embedded_controller.h"
 
+#include <kernel.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -671,7 +672,7 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 generationCount)
 	int32 count, i;
 
 	// int need_poll = cold || rebooting || ec_polled_mode || sc->ec_suspending;
-	int needPoll = ec_polled_mode || sc->ec_suspending;
+	int needPoll = ec_polled_mode || sc->ec_suspending || gKernelStartup;
 
 	// The main CPU should be much faster than the EC.  So the status should
 	// be "not ready" when we start waiting.  But if the main CPU is really
