@@ -868,7 +868,7 @@ ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
 	for (; virtualAddress < virtualEnd;
 		 virtualAddress += B_PAGE_SIZE, physicalAddress += B_PAGE_SIZE) {
 		status_t error = map->Map(virtualAddress, physicalAddress,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &reservation);
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, &reservation);
 		if (error != B_OK)
 			return error;
 	}
