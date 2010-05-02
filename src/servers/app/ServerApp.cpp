@@ -910,7 +910,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 index;
 			link.Read<int32>(&index);
 
-			fDesktop->SetWorkspace(index);
+			bool takeFocusWindowThere;
+			link.Read<bool>(&takeFocusWindowThere);
+
+			fDesktop->SetWorkspace(index, takeFocusWindowThere);
 			break;
 		}
 

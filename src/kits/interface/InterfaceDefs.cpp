@@ -804,6 +804,7 @@ activate_workspace(int32 workspace)
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_ACTIVATE_WORKSPACE);
 	link.Attach<int32>(workspace);
+	link.Attach<bool>(false);
 	link.Flush();
 }
 
