@@ -36,19 +36,11 @@
 
 
 static int
-compare_list_items(const void* _a, const void* _b)
-{
-	LanguageListItem* a = *(LanguageListItem**)_a;
-	LanguageListItem* b = *(LanguageListItem**)_b;
-	return strcasecmp(a->Text(), b->Text());
-}
-
-
-static int
 compare_typed_list_items(const BListItem* _a, const BListItem* _b)
 {
-	LanguageListItem* a = *(LanguageListItem**)_a;
-	LanguageListItem* b = *(LanguageListItem**)_b;
+	// TODO: sort them using collators.
+	LanguageListItem* a = (LanguageListItem*)_a;
+	LanguageListItem* b = (LanguageListItem*)_b;
 	return strcasecmp(a->Text(), b->Text());
 }
 
@@ -87,16 +79,14 @@ LocaleWindow::LocaleWindow()
 
 	// Fill the language list from the LocaleRoster data
 	BMessage installedLanguages;
-	if (be_locale_roster->GetInstalledLanguages(&installedLanguages)
-			== B_OK) {
+	if (be_locale_roster->GetInstalledLanguages(&installedLanguages) == B_OK) {
 		BString currentLanguageCode;
 		BString currentLanguageName;
-		LanguageListItem* lastAddedItem = NULL;
+		LanguageListItem* lastAddedCountryItem = NULL;
 
 		for (int i = 0; installedLanguages.FindString("langs",
 				i, &currentLanguageCode) == B_OK; i++) {
 			// Now get an human-readable, localized name for each language
-			// TODO: sort them using collators.
 			BLanguage* currentLanguage;
 			be_locale_roster->GetLanguage(&currentLanguage,
 				currentLanguageCode.String());
@@ -107,26 +97,18 @@ LocaleWindow::LocaleWindow()
 			LanguageListItem* item = new LanguageListItem(currentLanguageName,
 				currentLanguageCode.String());
 			if (currentLanguage->IsCountry()) {
-				fLanguageListView->AddUnder(item, lastAddedItem);
+				fLanguageListView->AddUnder(item, lastAddedCountryItem);
 			} else {
 				// This is a language without country, add it at top-level
 				fLanguageListView->AddItem(item);
 				item->SetExpanded(false);
-				if (lastAddedItem != NULL) {
-					fLanguageListView->SortItemsUnder(lastAddedItem, true,
-						compare_typed_list_items);
-				}
-				lastAddedItem = item;
+				lastAddedCountryItem = item;
 			}
 
 			delete currentLanguage;
 		}
-		fLanguageListView->SortItemsUnder(lastAddedItem, true,
-			compare_typed_list_items);
 
-		fLanguageListView->SortItems(compare_list_items);
-			// see previous comment on sort using collators
-
+		fLanguageListView->FullListSortItems(compare_typed_list_items);
 	} else {
 		BAlert* myAlert = new BAlert("Error",
 			TR("Unable to find the available languages! You can't use this "
@@ -271,7 +253,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 				}
 				index++;
 			}
-			fLanguageListView->SortItems(compare_list_items);
+			fLanguageListView->FullListSortItems(compare_typed_list_items);
 			be_app_messenger.SendMessage(&update);
 			break;
 		}
@@ -320,8 +302,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 				LanguageListItem* listItem = static_cast<LanguageListItem*>
 					(fPreferredListView->RemoveItem(index));
 				fLanguageListView->AddItem(listItem);
-				fLanguageListView->SortItems(compare_list_items);
-					// see previous comment on sort using collators
+				fLanguageListView->FullListSortItems(compare_typed_list_items);
 				fPreferredListView->Invoke(fMsgPrefLanguagesChanged);
 			}
 			break;
