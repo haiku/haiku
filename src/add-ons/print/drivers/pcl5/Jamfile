@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
-AddResources PCL5\ Compatible : PCL5.rsrc ;
+AddResources PCL5\ Compatible : PCL5.rdef ;
 
 Addon PCL5\ Compatible :
 	PCL5Entry.cpp

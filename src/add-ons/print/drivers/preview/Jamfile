@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
-AddResources Preview : Preview.rsrc ;
+AddResources Preview : Preview.rdef ;
 
 Addon Preview :
 	PageSetupWindow.cpp
