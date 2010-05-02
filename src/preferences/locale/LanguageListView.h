@@ -6,9 +6,9 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Adrien Destugues <pulkomandy@gmail.com>
  *		Oliver Tappe <zooey@hirschkaefer.de>
-*/
-#ifndef __LANGUAGE_LIST_VIEW_H
-#define __LANGUAGE_LIST_VIEW_H
+ */
+#ifndef LANGUAGE_LIST_VIEW_H
+#define LANGUAGE_LIST_VIEW_H
 
 
 #include <OutlineListView.h>
@@ -53,4 +53,4 @@ private:
 };
 
 
-#endif
+#endif	// LANGUAGE_LIST_VIEW_H

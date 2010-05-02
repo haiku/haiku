@@ -6,7 +6,9 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Adrien Destugues <pulkomandy@gmail.com>
  *		Oliver Tappe <zooey@hirschkaefer.de>
-*/
+ */
+
+
 #include "LanguageListView.h"
 
 #include <stdio.h>
@@ -46,7 +48,6 @@ LanguageListItem::~LanguageListItem()
 }
 
 
-//MediaListItem - DrawItem
 void
 LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
@@ -92,6 +93,8 @@ LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 	owner->DrawString(Text());
 }
 
+
+// #pragma mark -
 
 
 LanguageListView::LanguageListView(const char* name, list_view_type type)
@@ -162,7 +165,8 @@ LanguageListView::MoveItems(BList& items, int32 index)
 }
 
 
-void LanguageListView::MessageReceived (BMessage* message)
+void
+LanguageListView::MessageReceived(BMessage* message)
 {
 	if (message->what == 'DRAG') {
 		// Someone just dropped something on us

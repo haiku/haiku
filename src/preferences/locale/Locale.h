@@ -19,5 +19,6 @@ static const uint32 kMsgPrefLangInvoked = 'pliv';
 static const uint32 kMsgDefaults = 'dflt';
 static const uint32 kMsgRevert = 'revt';
 
+
 #endif	/* LOCALE_H */
 

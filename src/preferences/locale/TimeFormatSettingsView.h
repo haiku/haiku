@@ -2,8 +2,8 @@
  * Copyright 2009, Adrien Destugues, pulkomandy@gmail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef __TIMEFORMATSETTINGS_H__
-#define __TIMEFORMATSETTINGS_H__
+#ifndef TIME_FORMAT_SETTINGS_H
+#define TIME_FORMAT_SETTINGS_H
 
 
 #include <Box.h>
@@ -35,54 +35,54 @@ const uint32 kMenuMessage = 'FRMT';
 
 class FormatView : public BView {
 public:
-							FormatView(BCountry* country);
+								FormatView(BCountry* country);
 
-	virtual	void			MessageReceived(BMessage* message);
-	virtual	void			AttachedToWindow();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				AttachedToWindow();
 
-	virtual	void			SetDefaults();
-	virtual	bool			IsDefaultable() const;
-	virtual	void			Revert();
-	virtual	void			SetCountry(BCountry* country);
-	virtual	void			RecordRevertSettings();
-	virtual	bool			IsRevertable() const;
+	virtual	void				SetDefaults();
+	virtual	bool				IsDefaultable() const;
+	virtual	void				Revert();
+	virtual	void				SetCountry(BCountry* country);
+	virtual	void				RecordRevertSettings();
+	virtual	bool				IsRevertable() const;
 
 private:
-			void			_UpdateExamples();
-			void			_SendNotices();
-			void			_ParseDateFormat();
-			void			_UpdateLongDateFormatString();
+			void				_UpdateExamples();
+			void				_SendNotices();
+			void				_ParseDateFormat();
+			void				_UpdateLongDateFormatString();
 
-			BRadioButton*	f24HrRadioButton;
-			BRadioButton*	f12HrRadioButton;
+private:
+			BRadioButton*		f24HrRadioButton;
+			BRadioButton*		f12HrRadioButton;
 
-			BMenuField*		fLongDateMenu[4];
-			BString			fLongDateString[4];
-			BTextControl*	fLongDateSeparator[4];
-			BMenuField*		fDateMenu[3];
-			BString			fDateString[3];
+			BMenuField*			fLongDateMenu[4];
+			BString				fLongDateString[4];
+			BTextControl*		fLongDateSeparator[4];
+			BMenuField*			fDateMenu[3];
+			BString				fDateString[3];
 
-			BMenuField*		fSeparatorMenuField;
+			BMenuField*			fSeparatorMenuField;
 
-			BStringView*	fLongDateExampleView;
-			BStringView*	fShortDateExampleView;
-			BStringView*	fLongTimeExampleView;
-			BStringView*	fShortTimeExampleView;
-			BStringView*	fNumberFormatExampleView;
+			BStringView*		fLongDateExampleView;
+			BStringView*		fShortDateExampleView;
+			BStringView*		fLongTimeExampleView;
+			BStringView*		fShortTimeExampleView;
+			BStringView*		fNumberFormatExampleView;
 
-			bool			f24HrClock;
+			bool				f24HrClock;
 
-			FormatSeparator	fSeparator;
-			BString			fDateFormat;
+			FormatSeparator		fSeparator;
+			BString				fDateFormat;
 
-			BCountry*		fCountry;
+			BCountry*			fCountry;
 
-			BBox*			fDateBox;
-			BBox*			fTimeBox;
-			BBox*			fNumbersBox;
-			BBox*			fCurrencyBox;
+			BBox*				fDateBox;
+			BBox*				fTimeBox;
+			BBox*				fNumbersBox;
+			BBox*				fCurrencyBox;
 };
 
 
-#endif
-
+#endif	// TIME_FORMAT_SETTINGS_H
