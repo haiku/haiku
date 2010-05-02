@@ -1451,17 +1451,28 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 			delete_area(locker.AddressSpace(), area, false);
 	}
 
-	if (status >= B_OK && !alreadyWired) {
-		// make sure our area is mapped in completely
+	if (status != B_OK)
+		return status;
 
-		VMTranslationMap* map = locker.AddressSpace()->TranslationMap();
+	VMTranslationMap* map = locker.AddressSpace()->TranslationMap();
+
+	if (alreadyWired) {
+		// The area is already mapped, but possibly not with the right
+		// memory type.
+		map->Lock();
+		map->ProtectArea(area, area->protection);
+		map->Unlock();
+	} else {
+		// Map the area completely.
+
+		// reserve pages needed for the mapping
 		size_t reservePages = map->MaxPagesNeededToMap(area->Base(),
 			area->Base() + (size - 1));
-
 		vm_page_reservation reservation;
 		vm_page_reserve_pages(&reservation, reservePages,
 			team == VMAddressSpace::KernelID()
 				? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
+
 		map->Lock();
 
 		for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
@@ -1470,11 +1481,9 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 		}
 
 		map->Unlock();
+
 		vm_page_unreserve_pages(&reservation);
 	}
-
-	if (status < B_OK)
-		return status;
 
 	// modify the pointer returned to be offset back into the new area
 	// the same way the physical address in was offset
