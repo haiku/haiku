@@ -82,6 +82,12 @@ struct memory_type_range_point
 };
 
 
+struct update_mtrr_info {
+	uint64	ignoreUncacheableSize;
+	uint64	shortestUncacheableSize;
+};
+
+
 typedef DoublyLinkedList<memory_type_range> MemoryTypeRangeList;
 
 static mutex sMemoryTypeLock = MUTEX_INITIALIZER("memory type ranges");
@@ -120,13 +126,8 @@ set_mtrrs()
 static bool
 add_used_mtrr(uint64 base, uint64 size, uint32 type)
 {
-	if (sMemoryTypeRegistersUsed == sMemoryTypeRegisterCount) {
-		if (sMemoryTypeRegisterCount > 0) {
-			panic("add_used_mtrr(%#" B_PRIx64 ", %#" B_PRIx64 ", %" B_PRIu32
-				"): out of MTRRs!\n", base, size, type);
-		}
+	if (sMemoryTypeRegistersUsed == sMemoryTypeRegisterCount)
 		return false;
-	}
 
 	x86_mtrr_info& mtrr = sMemoryTypeRegisters[sMemoryTypeRegistersUsed++];
 	mtrr.base = base;
@@ -304,7 +305,7 @@ ensure_temporary_ranges_space(int32 count)
 
 
 status_t
-update_mtrrs()
+update_mtrrs(update_mtrr_info& updateInfo)
 {
 	// resize the temporary points/ranges arrays, if necessary
 	if (!ensure_temporary_ranges_space(sMemoryTypeRangeCount * 2))
@@ -315,6 +316,17 @@ update_mtrrs()
 	int32 pointCount = 0;
 	for (MemoryTypeRangeList::Iterator it = sMemoryTypeRanges.GetIterator();
 			memory_type_range* range = it.Next();) {
+		if (range->type == IA32_MTR_UNCACHED) {
+			// Ignore uncacheable ranges below a certain size, if requested.
+			// Since we always enforce uncacheability via the PTE attributes,
+			// this is no problem (though not recommended for performance
+			// reasons).
+			if (range->size <= updateInfo.ignoreUncacheableSize)
+				continue;
+			if (range->size < updateInfo.shortestUncacheableSize)
+				updateInfo.shortestUncacheableSize = range->size;
+		}
+
 		rangePoints[pointCount].address = range->base;
 		rangePoints[pointCount++].range = range;
 		rangePoints[pointCount].address = range->base + range->size;
@@ -411,7 +423,7 @@ update_mtrrs()
 	// equally typed ranges, if possible. There are two exceptions to the
 	// intersection requirement: Uncached ranges may intersect with any other
 	// range; the resulting type will still be uncached. Hence we can ignore
-	// uncached ranges when extending the other ranges. Write-through range may
+	// uncached ranges when extending the other ranges. Write-through ranges may
 	// intersect with write-back ranges; the resulting type will be
 	// write-through. Hence we can ignore write-through ranges when extending
 	// write-back ranges.
@@ -466,13 +478,55 @@ update_mtrrs()
 			if (ranges[i].size == 0 || ranges[i].type != type)
 				continue;
 
-			add_mtrrs_for_range(ranges[i].base, ranges[i].size, type);
+			if (!add_mtrrs_for_range(ranges[i].base, ranges[i].size, type))
+				return B_BUSY;
 		}
 	}
 
 	set_mtrrs();
 
 	return B_OK;
+}
+
+
+status_t
+update_mtrrs()
+{
+	// Until we know how many MTRRs we have, pretend everything is OK.
+	if (sMemoryTypeRegisterCount == 0)
+		return B_OK;
+
+	update_mtrr_info updateInfo;
+	updateInfo.ignoreUncacheableSize = 0;
+
+	while (true) {
+		TRACE_MTRR2("update_mtrrs(): Trying with ignoreUncacheableSize %#"
+			B_PRIx64 ".\n", updateInfo.ignoreUncacheableSize);
+
+		updateInfo.shortestUncacheableSize = ~(uint64)0;
+		status_t error = update_mtrrs(updateInfo);
+		if (error != B_BUSY) {
+			if (error == B_OK && updateInfo.ignoreUncacheableSize > 0) {
+				TRACE_MTRR("update_mtrrs(): Succeeded setting MTRRs after "
+					"ignoring uncacheable ranges up to size %#" B_PRIx64 ".\n",
+					updateInfo.ignoreUncacheableSize);
+			}
+			return error;
+		}
+
+		// Not enough MTRRs. Retry with less uncacheable ranges.
+		if (updateInfo.shortestUncacheableSize == ~(uint64)0) {
+			// Ugh, even without any uncacheable ranges the available MTRRs do
+			// not suffice.
+			panic("update_mtrrs(): Out of MTRRs!");
+			return B_BUSY;
+		}
+
+		ASSERT(updateInfo.ignoreUncacheableSize
+			< updateInfo.shortestUncacheableSize);
+
+		updateInfo.ignoreUncacheableSize = updateInfo.shortestUncacheableSize;
+	}
 }
 
 
