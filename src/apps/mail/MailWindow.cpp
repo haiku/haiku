@@ -2537,7 +2537,7 @@ TMailWindow::SaveAsDraft()
 				}
 
 				// Cache the ref
-				if (fRef == NULL);
+				if (fRef == NULL)
 					fRef = new entry_ref;
 				BEntry entry(&dir, fileName);
 				entry.GetRef(fRef);

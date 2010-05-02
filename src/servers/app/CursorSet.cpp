@@ -164,7 +164,7 @@ CursorSet::RemoveCursor(BCursorID which)
 status_t
 CursorSet::FindCursor(BCursorID which, BBitmap **cursor, BPoint *hotspot)
 {
-	if (!cursor || !hotspot);
+	if (!cursor || !hotspot)
 		return B_BAD_VALUE;
 
 	BMessage msg;
