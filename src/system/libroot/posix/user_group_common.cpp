@@ -73,7 +73,7 @@ BPrivate::send_authentication_request_to_registrar(KMessage& request,
 }
 
 
-class Tokenizer {
+class BPrivate::Tokenizer {
 public:
 	Tokenizer(char* string)
 		: fString(string)
