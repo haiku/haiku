@@ -725,7 +725,7 @@ mmu_init(void)
 		gKernelArgs.physical_memory_range[0].start = 0;
 		gKernelArgs.physical_memory_range[0].size = 0x9f000;
 		gKernelArgs.physical_memory_range[1].start = 0x100000;
-		gKernelArgs.physical_memory_range[1].size = memSize;
+		gKernelArgs.physical_memory_range[1].size = memSize - 0x100000;
 		gKernelArgs.num_physical_memory_ranges = 2;
 	}
 
