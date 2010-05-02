@@ -419,6 +419,7 @@ BPopUpMenu::_StartTrack(BPoint where, bool autoInvoke, bool startOpened, BRect *
 
 	// Show the menu's window
 	Show();
+	snooze(50000);
 	BMenuItem *result = Track(startOpened, _specialRect);
 	if (result != NULL && autoInvoke)
 		result->Invoke();

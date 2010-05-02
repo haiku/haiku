@@ -1628,6 +1628,8 @@ BMenu::_Track(int* action, long start)
 		} else if (item != NULL) {
 			_UpdateStateOpenSelect(item, location, navAreaRectAbove,
 				navAreaRectBelow, selectedTime, navigationAreaTime);
+			if (!releasedOnce)
+				releasedOnce = true;
 		} else if (_OverSuper(screenLocation)) {
 			fState = MENU_STATE_TRACKING;
 			UnlockLooper();
