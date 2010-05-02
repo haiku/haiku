@@ -163,11 +163,11 @@ memory_type_to_pte_flags(uint32 memoryType)
 	// (usually only write-combining for the frame buffer).
 	switch (memoryType) {
 		case B_MTR_UC:
-			return X86_PTE_CACHING_DISABLED;
+			return X86_PTE_CACHING_DISABLED | X86_PTE_WRITE_THROUGH;
 
 		case B_MTR_WC:
 			// X86_PTE_WRITE_THROUGH would be closer, but the combination with
-			// MTRR WC is "implementation defined" for Pentium [Pro].
+			// MTRR WC is "implementation defined" for Pentium Pro/II.
 			return 0;
 
 		case B_MTR_WT:
