@@ -3,7 +3,8 @@
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
-
+#ifndef _BUFFER_MANAGER_H
+#define _BUFFER_MANAGER_H
 
 #include <set>
 
@@ -110,3 +111,4 @@ private:
 			SourceInfoMap	fSourceInfoMap;
 };
 
+#endif // _BUFFER_MANAGER_H

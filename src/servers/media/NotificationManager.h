@@ -1,9 +1,10 @@
-/* 
+/*
  * Copyright 2002, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NOTIFICATION_MANAGER_H
 #define NOTIFICATION_MANAGER_H
+
 
 #include <Locker.h>
 #include <MediaNode.h>
@@ -24,9 +25,9 @@ class NotificationManager {
 public:
 								NotificationManager();
 								~NotificationManager();
-	
+
 			void				Dump();
-	
+
 			void				EnqueueMessage(BMessage* message);
 
 			void				CleanupTeam(team_id team);

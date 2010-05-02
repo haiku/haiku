@@ -2,6 +2,8 @@
  * Copyright 2003, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+#ifndef _MEDIA_FILES_MANAGER_H
+#define _MEDIA_FILES_MANAGER_H
 
 
 #include <map>
@@ -12,7 +14,7 @@
 #include <MessageRunner.h>
 #include <String.h>
 
-#include <DataExchange.h>
+#include "DataExchange.h"
 
 
 #define MEDIA_FILES_MANAGER_SAVE_TIMER 'mmst'
@@ -70,3 +72,5 @@ private:
 			TypeMap				fMap;
 			BMessageRunner*		fSaveTimerRunner;
 };
+
+#endif // _MEDIA_FILES_MANAGER_H

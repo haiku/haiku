@@ -55,8 +55,9 @@ DefaultManager::DefaultManager()
 	fTimeSource(-1),
 	fAudioMixer(-1),
 	fPhysicalAudioOutInputID(0),
-	fThreadId(-1),
-	fRescanRequested(0)
+	fRescanThread(-1),
+	fRescanRequested(0),
+ 	fRescanLock("rescan default manager")
 {
 	strcpy(fPhysicalAudioOutInputName, "default");
 	fBeginHeader[0] = 0xab00150b;
@@ -95,7 +96,7 @@ DefaultManager::LoadState()
 	TRACE("0x%08lx %ld\n", fBeginHeader[1], fBeginHeader[1]);
 	TRACE("0x%08lx %ld\n", fBeginHeader[2], fBeginHeader[2]);
 	if (file.Read(&category_count, sizeof(uint32)) < (int32)sizeof(uint32)) {
-		fprintf(stderr, 
+		fprintf(stderr,
 			"DefaultManager::LoadState() failed to read category_count\n");
 		return B_ERROR;
 	}
@@ -105,12 +106,12 @@ DefaultManager::LoadState()
 		uint32 msg_header;
 		uint32 default_type;
 		if (file.Read(&msg_header, sizeof(uint32)) < (int32)sizeof(uint32)) {
-			fprintf(stderr, 
+			fprintf(stderr,
 				"DefaultManager::LoadState() failed to read msg_header\n");
 			return B_ERROR;
 		}
 		if (file.Read(&default_type, sizeof(uint32)) < (int32)sizeof(uint32)) {
-			fprintf(stderr, 
+			fprintf(stderr,
 				"DefaultManager::LoadState() failed to read default_type\n");
 			return B_ERROR;
 		}
@@ -121,11 +122,11 @@ DefaultManager::LoadState()
 			fprintf(stderr, "DefaultManager::LoadState() failed to unflatten\n");
 	}
 	if (file.Read(fEndHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3) {
-		fprintf(stderr, 
+		fprintf(stderr,
 			"DefaultManager::LoadState() failed to read fEndHeader\n");
 		return B_ERROR;
 	}
-	
+
 	TRACE("LoadState returns B_OK\n");
 	return B_OK;
 }
@@ -144,14 +145,14 @@ DefaultManager::SaveState(NodeManager *node_manager)
 	if ((err = create_directory(path.Path(), 0755)) != B_OK)
 		return err;
 	path.Append(kDefaultManagerSettingsFile);
-	
+
 	uint32 default_types[] = {kMsgTypeVideoIn, kMsgTypeVideoOut,
 		kMsgTypeAudioIn, kMsgTypeAudioOut};
 	media_node_id media_node_ids[] = {fPhysicalVideoIn, fPhysicalVideoOut,
 		fPhysicalAudioIn, fPhysicalAudioOut};
 	for (uint32 i = 0; i < sizeof(default_types) / sizeof(default_types[0]);
 		i++) {
-		
+
 		// we call the node manager to have more infos about nodes
 		dormant_node_info info;
 		media_node node;
@@ -328,13 +329,14 @@ DefaultManager::Get(media_node_id *nodeid, char *input_name, int32 *inputid,
 status_t
 DefaultManager::Rescan()
 {
+	BAutolock locker(fRescanLock);
 	atomic_add(&fRescanRequested, 1);
-	if (fThreadId < 0) {
-		fThreadId = spawn_thread(rescan_thread, "rescan defaults",
+	if (fRescanThread < 0) {
+		fRescanThread = spawn_thread(rescan_thread, "rescan defaults",
 			B_NORMAL_PRIORITY - 2, this);
-		resume_thread(fThreadId);
+		resume_thread(fRescanThread);
 	}
-			
+
 	return B_OK;
 }
 
@@ -342,50 +344,54 @@ DefaultManager::Rescan()
 int32
 DefaultManager::rescan_thread(void *arg)
 {
-	reinterpret_cast<DefaultManager *>(arg)->RescanThread();
+	reinterpret_cast<DefaultManager *>(arg)->_RescanThread();
 	return 0;
 }
 
 
 void
-DefaultManager::RescanThread()
+DefaultManager::_RescanThread()
 {
-	TRACE("DefaultManager::RescanThread() enter\n");
-	
+	TRACE("DefaultManager::_RescanThread() enter\n");
+
+	BAutolock locker(fRescanLock);
+
 	while (atomic_and(&fRescanRequested, 0) != 0) {
+		locker.Unlock();
+
 		// We do not search for the system time source,
 		// it should already exist
 		ASSERT(fSystemTimeSource != -1);
-	
+
 		if (fPhysicalVideoOut == -1) {
-			FindPhysical(&fPhysicalVideoOut, kMsgTypeVideoOut, false,
+			_FindPhysical(&fPhysicalVideoOut, kMsgTypeVideoOut, false,
 				B_MEDIA_RAW_VIDEO);
-			FindPhysical(&fPhysicalVideoOut, kMsgTypeVideoOut, false,
+			_FindPhysical(&fPhysicalVideoOut, kMsgTypeVideoOut, false,
 				B_MEDIA_ENCODED_VIDEO);
 		}
 		if (fPhysicalVideoIn == -1) {
-			FindPhysical(&fPhysicalVideoIn, kMsgTypeVideoIn, true,
+			_FindPhysical(&fPhysicalVideoIn, kMsgTypeVideoIn, true,
 				B_MEDIA_RAW_VIDEO);
-			FindPhysical(&fPhysicalVideoIn, kMsgTypeVideoIn, true,
+			_FindPhysical(&fPhysicalVideoIn, kMsgTypeVideoIn, true,
 				B_MEDIA_ENCODED_VIDEO);
 		}
 		if (fPhysicalAudioOut == -1)
-			FindPhysical(&fPhysicalAudioOut, kMsgTypeAudioOut, false,
+			_FindPhysical(&fPhysicalAudioOut, kMsgTypeAudioOut, false,
 				B_MEDIA_RAW_AUDIO);
 		if (fPhysicalAudioIn == -1)
-			FindPhysical(&fPhysicalAudioIn, kMsgTypeAudioIn, true,
+			_FindPhysical(&fPhysicalAudioIn, kMsgTypeAudioIn, true,
 				B_MEDIA_RAW_AUDIO);
 		if (fAudioMixer == -1)
-			FindAudioMixer();
-	
+			_FindAudioMixer();
+
 		// The normal time source is searched for after the
 		// Physical Audio Out has been created.
 		if (fTimeSource == -1)
-			FindTimeSource();
-	
+			_FindTimeSource();
+
 		// Connect the mixer and physical audio out (soundcard)
 		if (!fMixerConnected && fAudioMixer != -1 && fPhysicalAudioOut != -1) {
-			fMixerConnected = B_OK == ConnectMixerToOutput();
+			fMixerConnected = B_OK == _ConnectMixerToOutput();
 			if (!fMixerConnected)
 				ERROR("DefaultManager: failed to connect mixer and"
 					"soundcard\n");
@@ -393,22 +399,24 @@ DefaultManager::RescanThread()
 			ERROR("DefaultManager: Did not try to connect mixer and"
 				"soundcard\n");
 		}
-	
+
 		if (fMixerConnected) {
 			add_on_server_rescan_finished_notify_command cmd;
 			SendToAddOnServer(ADD_ON_SERVER_RESCAN_FINISHED_NOTIFY, &cmd,
 				sizeof(cmd));
 		}
-	}
-	
-	fThreadId = -1;
 
-	TRACE("DefaultManager::RescanThread() leave\n");
+		locker.Lock();
+	}
+
+	fRescanThread = -1;
+
+	TRACE("DefaultManager::_RescanThread() leave\n");
 }
 
 
 void
-DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type,
+DefaultManager::_FindPhysical(volatile media_node_id *id, uint32 default_type,
 	bool isInput, media_type type)
 {
 	live_node_info info[MAX_NODE_INFOS];
@@ -419,7 +427,7 @@ DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type,
 	BPath msgPath;
 	dormant_node_info msgDninfo;
 	int32 input_id;
-	bool isAudio = (type == B_MEDIA_RAW_AUDIO) 
+	bool isAudio = (type == B_MEDIA_RAW_AUDIO)
 		|| (type == B_MEDIA_ENCODED_AUDIO);
 
 	for (int32 i = 0; i < fMsgList.CountItems(); i++) {
@@ -512,7 +520,7 @@ DefaultManager::FindPhysical(volatile media_node_id *id, uint32 default_type,
 
 
 void
-DefaultManager::FindTimeSource()
+DefaultManager::_FindTimeSource()
 {
 	live_node_info info[MAX_NODE_INFOS];
 	media_format input; /* a physical audio output has a logical data input (DAC)*/
@@ -577,7 +585,7 @@ DefaultManager::FindTimeSource()
 
 
 void
-DefaultManager::FindAudioMixer()
+DefaultManager::_FindAudioMixer()
 {
 	live_node_info info;
 	int32 count;
@@ -596,7 +604,7 @@ DefaultManager::FindAudioMixer()
 
 
 status_t
-DefaultManager::ConnectMixerToOutput()
+DefaultManager::_ConnectMixerToOutput()
 {
 	BMediaRoster 		*roster;
 	media_node 			timesource;
