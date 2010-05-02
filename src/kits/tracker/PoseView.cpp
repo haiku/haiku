@@ -3634,7 +3634,13 @@ BPoseView::AddToVSList(BPose *pose)
 int32
 BPoseView::RemoveFromVSList(const BPose *pose)
 {
-	int32 index = FirstIndexAtOrBelow((int32)pose->Location(this).y);
+	//int32 index = FirstIndexAtOrBelow((int32)pose->Location(this).y);
+		// This optimisation is buggy and the index returned can be greater
+		// than the actual index of the pose we search, thus missing it
+		// and failing to remove it. This having severe implications
+		// everywhere in the code as it is asserted that it must be always
+		// in sync with fPoseList. See ticket #4322.
+	int32 index = 0;
 
 	int32 count = fVSPoseList->CountItems();
 	for (; index < count; index++) {
