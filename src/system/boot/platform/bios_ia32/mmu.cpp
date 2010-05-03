@@ -309,7 +309,7 @@ get_memory_map(extended_memory **_extendedMemory)
 		regs.edx = 'SMAP';
 
 		call_bios(0x15, &regs);
-		if (regs.flags & CARRY_FLAG)
+		if ((regs.flags & CARRY_FLAG) != 0)
 			return 0;
 
 		regs.edi += sizeof(extended_memory);
@@ -716,17 +716,36 @@ mmu_init(void)
 			}
 		}
 	} else {
-		// TODO: for now!
-		dprintf("No extended memory block - using 64 MB (fix me!)\n");
-		uint32 memSize = 64 * 1024 * 1024;
-
+		bios_regs regs;
+		
 		// We dont have an extended map, assume memory is contiguously mapped
 		// at 0x0, but leave out the BIOS range ((640k - 1 page) to 1 MB).
 		gKernelArgs.physical_memory_range[0].start = 0;
 		gKernelArgs.physical_memory_range[0].size = 0x9f000;
 		gKernelArgs.physical_memory_range[1].start = 0x100000;
-		gKernelArgs.physical_memory_range[1].size = memSize - 0x100000;
-		gKernelArgs.num_physical_memory_ranges = 2;
+
+		regs.eax = 0xe801; // AX
+		call_bios(0x15, &regs);
+		if ((regs.flags & CARRY_FLAG) != 0) {
+			regs.eax = 0x8800; // AH 88h
+			call_bios(0x15, &regs);
+			if ((regs.flags & CARRY_FLAG) != 0) {
+				// TODO: for now!
+				dprintf("No memory size - using 64 MB (fix me!)\n");
+				uint32 memSize = 64 * 1024 * 1024;
+				gKernelArgs.physical_memory_range[1].size = memSize - 0x100000;
+			} else {
+				dprintf("Get Extended Memory Size succeeded.\n");
+				gKernelArgs.physical_memory_range[1].size = regs.eax * 1024;
+			}
+			gKernelArgs.num_physical_memory_ranges = 2;
+		} else {
+			dprintf("Get Memory Size for Large Configurations succeeded.\n");
+			gKernelArgs.physical_memory_range[1].size = regs.ecx * 1024;
+			gKernelArgs.physical_memory_range[2].start = 0x1000000;
+			gKernelArgs.physical_memory_range[2].size = regs.edx * 64 * 1024;
+			gKernelArgs.num_physical_memory_ranges = 3;
+		}
 	}
 
 	gKernelArgs.arch_args.page_hole = 0xffc00000;
