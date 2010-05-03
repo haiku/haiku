@@ -48,6 +48,7 @@ HAIKU_GCC_VERSION[1]=${HAIKU_GCC_VERSION[1]}
 isHybridBuild=${isHybridBuild}
 TARGET_ARCH=${TARGET_ARCH}
 HAIKU_IMAGE_HOST_NAME=`uname -n`
+#TODO: possibly add a CLI option to execute InstallSourceArchive
 HAIKU_INCLUDE_SOURCES=0
 $urlLine
 $sslPkgLine
@@ -167,6 +168,14 @@ function InstallOptionalHaikuImagePackage()
 		rm '/boot/.OptionalPackageDescription'
 	fi
 	rm "\$archiveFile"
+}
+
+
+function InstallSourceArchive()
+{
+	if [ \$HAIKU_INCLUDE_SOURCES -gt 0 ]; then
+		echo "InstallSourceArchive is not implemented."
+	fi
 }
 
 
