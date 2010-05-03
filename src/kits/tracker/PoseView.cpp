@@ -6184,6 +6184,10 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 			SelectPose(pose, index);
 			break;
 		}
+		
+		case B_FUNCTION_KEY:
+		case B_INSERT:
+			break;
 
 		default:
 		{
