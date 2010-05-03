@@ -6,6 +6,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include "VMDeviceCache.h"
 
 
@@ -14,14 +15,6 @@ VMDeviceCache::Init(addr_t baseAddress, uint32 allocationFlags)
 {
 	fBaseAddress = baseAddress;
 	return VMCache::Init(CACHE_TYPE_DEVICE, allocationFlags);
-}
-
-
-bool
-VMDeviceCache::HasPage(off_t offset)
-{
-	// this should never be called
-	return false;
 }
 
 
@@ -40,11 +33,4 @@ VMDeviceCache::Write(off_t offset, const iovec *vecs, size_t count,
 {
 	// no place to write, this will cause the page daemon to skip this store
 	return B_OK;
-}
-
-
-status_t
-VMDeviceCache::Fault(struct VMAddressSpace* addressSpace, off_t offset)
-{
-	return B_BAD_ADDRESS;
 }

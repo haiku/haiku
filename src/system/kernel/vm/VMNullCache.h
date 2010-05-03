@@ -16,9 +16,6 @@
 class VMNullCache : public VMCache {
 public:
 			status_t			Init(uint32 allocationFlags);
-
-	virtual	status_t			Fault(struct VMAddressSpace* addressSpace,
-									off_t offset);
 };
 
 

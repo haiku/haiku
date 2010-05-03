@@ -54,6 +54,9 @@ class TranslationMapPhysicalPageMapper;
 #define X86_PTE_IGNORED2			0x00000400
 #define X86_PTE_IGNORED3			0x00000800
 #define X86_PTE_ADDRESS_MASK		0xfffff000
+#define X86_PTE_PROTECTION_MASK		(X86_PTE_WRITABLE | X86_PTE_USER)
+#define X86_PTE_MEMORY_TYPE_MASK	(X86_PTE_WRITE_THROUGH \
+										| X86_PTE_CACHING_DISABLED)
 
 
 typedef uint32 page_table_entry;

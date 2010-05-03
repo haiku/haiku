@@ -148,14 +148,14 @@ area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
 			size_t size, uint32 lock, uint32 protection);
 status_t _user_delete_area(area_id area);
 
-area_id _user_map_file(const char *uname, void **uaddress, int addressSpec,
-			size_t size, int protection, int mapping, bool unmapAddressRange,
-			int fd, off_t offset);
+area_id _user_map_file(const char *uname, void **uaddress, uint32 addressSpec,
+			size_t size, uint32 protection, uint32 mapping,
+			bool unmapAddressRange, int fd, off_t offset);
 status_t _user_unmap_memory(void *address, size_t size);
 status_t _user_set_memory_protection(void* address, size_t size,
-			int protection);
-status_t _user_sync_memory(void *address, size_t size, int flags);
-status_t _user_memory_advice(void* address, size_t size, int advice);
+			uint32 protection);
+status_t _user_sync_memory(void *address, size_t size, uint32 flags);
+status_t _user_memory_advice(void* address, size_t size, uint32 advice);
 
 area_id _user_area_for(void *address);
 area_id _user_find_area(const char *name);

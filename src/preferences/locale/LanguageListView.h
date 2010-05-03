@@ -5,9 +5,10 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Adrien Destugues <pulkomandy@gmail.com>
-*/
-#ifndef __LANGUAGE_LIST_VIEW_H
-#define __LANGUAGE_LIST_VIEW_H
+ *		Oliver Tappe <zooey@hirschkaefer.de>
+ */
+#ifndef LANGUAGE_LIST_VIEW_H
+#define LANGUAGE_LIST_VIEW_H
 
 
 #include <OutlineListView.h>
@@ -19,7 +20,6 @@ class LanguageListItem : public BStringItem {
 public:
 							LanguageListItem(const char* text,
 								const char* code);
-							LanguageListItem(const LanguageListItem& other);
 	virtual					~LanguageListItem();
 
 			const BString&	LanguageCode() { return fLanguageCode; }
@@ -53,4 +53,4 @@ private:
 };
 
 
-#endif
+#endif	// LANGUAGE_LIST_VIEW_H

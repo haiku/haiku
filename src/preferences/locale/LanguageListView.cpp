@@ -5,7 +5,10 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Adrien Destugues <pulkomandy@gmail.com>
-*/
+ *		Oliver Tappe <zooey@hirschkaefer.de>
+ */
+
+
 #include "LanguageListView.h"
 
 #include <stdio.h>
@@ -39,22 +42,12 @@ LanguageListItem::LanguageListItem(const char* text, const char* code)
 }
 
 
-LanguageListItem::LanguageListItem(const LanguageListItem& other)
-	:
-	BStringItem(other.Text()),
-	fLanguageCode(other.fLanguageCode),
-	fIcon(other.fIcon ? new(std::nothrow) BBitmap(other.fIcon) : NULL)
-{
-}
-
-
 LanguageListItem::~LanguageListItem()
 {
 	delete fIcon;
 }
 
 
-//MediaListItem - DrawItem
 void
 LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
@@ -101,6 +94,8 @@ LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 }
 
 
+// #pragma mark -
+
 
 LanguageListView::LanguageListView(const char* name, list_view_type type)
 	:
@@ -131,49 +126,59 @@ LanguageListView::MoveItems(BList& items, int32 index)
 	// or sublevels within the same top level
 
 	DeselectAll();
-	// we remove the items while we look at them, the insertion index is
-	// decreaded when the items index is lower, so that we insert at the right
-	// spot after removal
-	BList removedItems;
+
+	// collect all items that must be moved (adding subitems as necessary)
 	int32 count = items.CountItems();
-	// We loop in the reverse way so we can remove childs before their parents
-	for (int32 i = count - 1; i >= 0; i--) {
+	BList itemsToBeMoved;
+	for (int32 i = 0; i < count; i++) {
 		BListItem* item = (BListItem*)items.ItemAt(i);
-		int32 removeIndex = IndexOf(item);
-		// TODO : remove all childs before removing the item itself, or else
-		// they will be lost forever
-		if (RemoveItem(item) && removedItems.AddItem((void*)item, 0)) {
+		itemsToBeMoved.AddItem(item);
+		if (item->OutlineLevel() == 0) {
+			// add all subitems, as they need to be moved, too
+			int32 subItemCount = CountItemsUnder(item, true);
+			for (int subIndex = 0; subIndex < subItemCount ; subIndex++)
+				itemsToBeMoved.AddItem(ItemUnderAt(item, true, subIndex));
+		}
+	}
+
+	// now remove all the items backwards (in order to remove children before
+	// their parent), decreasing target index if we are removing items before
+	// it
+	count = itemsToBeMoved.CountItems();
+	for (int32 i = count - 1; i >= 0; i--) {
+		BListItem* item = (BListItem*)itemsToBeMoved.ItemAt(i);
+		int32 removeIndex = FullListIndexOf(item);
+		if (RemoveItem(item)) {
 			if (removeIndex < index)
 				index--;
 		}
-		// else ??? -> blow up
 	}
-	for (int32 i = 0; BListItem* item = (BListItem*)removedItems.ItemAt(i);
-		i++) {
-		if (AddItem(item, index)) {
-			// after we're done, the newly inserted items will be selected
-			Select(index, true);
-			// next items will be inserted after this one
+
+	// finally add all the items at the given index
+	for (int32 i = 0; i < count; i++) {
+		BListItem* item = (BListItem*)itemsToBeMoved.ItemAt(i);
+		if (AddItem(item, index))
 			index++;
-		} else
+		else
 			delete item;
 	}
 }
 
 
-void LanguageListView::MessageReceived (BMessage* message)
+void
+LanguageListView::MessageReceived(BMessage* message)
 {
 	if (message->what == 'DRAG') {
 		// Someone just dropped something on us
 		LanguageListView* list = NULL;
 		if (message->FindPointer("list", (void**)&list) == B_OK) {
 			// It comes from a list
+			int32 count = CountItems();
+			if (fDropIndex < 0 || fDropIndex > count)
+				fDropIndex = count;
+
 			if (list == this) {
 				// It comes from ourselves : move the item around in the list
-				int32 count = CountItems();
-				if (fDropIndex < 0 || fDropIndex > count)
-					fDropIndex = count;
-
 				BList items;
 				int32 index;
 				for (int32 i = 0;
@@ -209,9 +214,6 @@ void LanguageListView::MessageReceived (BMessage* message)
 				fDropIndex = -1;
 			} else {
 				// It comes from another list : move it here
-				int32 count = CountItems();
-				if (fDropIndex < 0 || fDropIndex > count)
-					fDropIndex = count;
 
 				// ensure we always drop things at top-level and not
 				// in the middle of another outline
@@ -223,14 +225,17 @@ void LanguageListView::MessageReceived (BMessage* message)
 
 				// Item is now a top level one - we must insert just below its
 				// last child
-				fDropIndex += CountItemsUnder(FullListItemAt(fDropIndex),false)
+				fDropIndex += CountItemsUnder(FullListItemAt(fDropIndex), true)
 					+ 1;
 
-				int32 index;
-				for (int32 i = 0;
-					message->FindInt32("index", i, &index) == B_OK; i++) {
-					MoveItemFrom(list, index, fDropIndex);
-					fDropIndex++;
+				int32 indexCount;
+				type_code dummy;
+				if (message->GetInfo("index", &dummy, &indexCount) == B_OK) {
+					for (int32 i = indexCount - 1; i >= 0; i--) {
+						int32 index;
+						if (message->FindInt32("index", i, &index) == B_OK)
+							MoveItemFrom(list, index, fDropIndex);
+					}
 				}
 
 				fDropIndex = -1;
@@ -247,27 +252,36 @@ LanguageListView::MoveItemFrom(BOutlineListView* origin, int32 index,
 	int32 dropSpot)
 {
 	// Check that the node we are going to move is a top-level one.
-	// If not, we want his parent instead
+	// If not, we want its parent instead
 	LanguageListItem* itemToMove = static_cast<LanguageListItem*>(
 		origin->Superitem(origin->FullListItemAt(index)));
 	if (itemToMove == NULL) {
-		itemToMove = static_cast<LanguageListItem*>(origin->FullListItemAt(
-				index));
+		itemToMove = static_cast<LanguageListItem*>(
+			origin->FullListItemAt(index));
+		if (itemToMove == NULL)
+			return;
 	} else
 		index = origin->FullListIndexOf(itemToMove);
 
-	int itemCount = origin->CountItemsUnder(itemToMove, true);
-	LanguageListItem* newItem = new LanguageListItem(*itemToMove);
-	this->AddItem(newItem, dropSpot);
-	newItem->SetExpanded(itemToMove->IsExpanded());
-
-	for (int i = 0; i < itemCount ; i++) {
-		LanguageListItem* subItem = static_cast<LanguageListItem*>(
-			origin->ItemUnderAt(itemToMove, true, i));
-		this->AddUnder(new LanguageListItem(*subItem), newItem);
+	// collect all items that must be moved (adding subitems as necessary)
+	BList itemsToBeMoved;
+	itemsToBeMoved.AddItem(itemToMove);
+	// add all subitems, as they need to be moved, too
+	int32 subItemCount = origin->CountItemsUnder(itemToMove, true);
+	for (int32 subIndex = 0; subIndex < subItemCount; subIndex++) {
+		itemsToBeMoved.AddItem(origin->ItemUnderAt(itemToMove, true,
+			subIndex));
 	}
-	origin->RemoveItem(index);
-		// This will also remove the children
+
+	// now remove all items from origin in reverse order (to remove the children
+	// before the parent) ...
+	// TODO: using RemoveItem() on the parent will delete the subitems, which
+	//       may be a bug, actually.
+	int32 itemCount = itemsToBeMoved.CountItems();
+	for (int32 i = itemCount - 1; i >= 0; i--)
+		origin->RemoveItem(index + i);
+	// ... and add all the items to this list
+	AddList(&itemsToBeMoved, dropSpot);
 }
 
 
@@ -277,7 +291,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 	bool success = false;
 	BListItem* item = FullListItemAt(CurrentSelection(0));
 	if (!item) {
-		// workarround a timing problem
+		// workaround for a timing problem
 		Select(index);
 		item = FullListItemAt(index);
 	}
@@ -285,18 +299,46 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 		// create drag message
 		BMessage msg('DRAG');
 		msg.AddPointer("list", (void*)(this));
+		// first selection round, consider only superitems
 		int32 index;
-		for (int32 i = 0; (index = FullListCurrentSelection(i)) >= 0; i++)
-			msg.AddInt32("index", index);
+		for (int32 i = 0; (index = FullListCurrentSelection(i)) >= 0; i++) {
+			BListItem* item = FullListItemAt(index);
+			if (item == NULL)
+				return false;
+			if (item->OutlineLevel() == 0)
+				msg.AddInt32("index", index);
+		}
+		if (!msg.HasInt32("index")) {
+			// second selection round, consider only subitems of the same
+			// (i.e. the first) parent
+			BListItem* seenSuperItem = NULL;
+			for (int32 i = 0; (index = FullListCurrentSelection(i)) >= 0; i++) {
+				BListItem* item = FullListItemAt(index);
+				if (item == NULL)
+					return false;
+				if (item->OutlineLevel() != 0) {
+					BListItem* superItem = Superitem(item);
+					if (seenSuperItem == NULL)
+						seenSuperItem = superItem;
+					if (superItem == seenSuperItem)
+						msg.AddInt32("index", index);
+					else
+						break;
+				}
+			}
+		}
+
 		// figure out drag rect
 		float width = Bounds().Width();
 		BRect dragRect(0.0, 0.0, width, -1.0);
 		// figure out, how many items fit into our bitmap
-		int32 numItems;
 		bool fade = false;
+		int32 numItems;
+		int32 currIndex;
+		BListItem* item;
 		for (numItems = 0;
-			BListItem* item = FullListItemAt(CurrentSelection(numItems));
-			numItems++) {
+			msg.FindInt32("index", numItems, &currIndex) == B_OK
+				&& (item = FullListItemAt(currIndex)) != NULL; numItems++) {
 			dragRect.bottom += ceilf(item->Height()) + 1.0;
 			if (dragRect.Height() > MAX_DRAG_HEIGHT) {
 				fade = true;
@@ -315,7 +357,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 			itemBounds.bottom = 0.0;
 			// let all selected items, that fit into our drag_bitmap, draw
 			for (int32 i = 0; i < numItems; i++) {
-				int32 index = FullListCurrentSelection(i);
+				int32 index = msg.FindInt32("index", i);
 				LanguageListItem* item
 					= static_cast<LanguageListItem*>(FullListItemAt(index));
 				itemBounds.bottom = itemBounds.top + ceilf(item->Height());

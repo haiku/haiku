@@ -1360,7 +1360,8 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 
 		translationMap->Map(vmArea->Base() + offset,
 			page->physical_page_number * B_PAGE_SIZE,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &reservation);
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			vmArea->MemoryType(), &reservation);
 	}
 
 	translationMap->Unlock();

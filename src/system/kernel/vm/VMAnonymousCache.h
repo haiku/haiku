@@ -38,6 +38,8 @@ public:
 									int32 numGuardPages,
 									uint32 allocationFlags);
 
+	virtual	status_t			Resize(off_t newSize, int priority);
+
 	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);
 	virtual	bool				DebugHasPage(off_t offset);

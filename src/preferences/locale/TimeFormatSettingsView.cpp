@@ -35,28 +35,32 @@
 #define TR_CONTEXT "TimeFormatSettings"
 
 
-BMessage*
-MenuMessage(const char* format, BMenuField* field)
-{
-	BMessage* msg = new BMessage(kMenuMessage);
-	msg->AddPointer("dest", field);
-	msg->AddString("format", format);
-
-	return msg;
-}
-
-
 class DateMenuItem: public BMenuItem {
 public:
-							DateMenuItem(const char* label, const char* code,
-								BMenuField* field)
-								:
-								BMenuItem(label, MenuMessage(code, field))
-							{
-								fIcuCode = code;
-							}
+	DateMenuItem(const char* label, const char* code, BMenuField* field)
+		:
+		BMenuItem(label, _MenuMessage(code, field))
+	{
+		fIcuCode = code;
+	}
 
-			BString			fIcuCode;
+	const BString& ICUCode() const
+	{
+		return fIcuCode;
+	}
+
+private:
+	static BMessage* _MenuMessage(const char* format, BMenuField* field)
+	{
+		BMessage* msg = new BMessage(kMenuMessage);
+		msg->AddPointer("dest", field);
+		msg->AddString("format", format);
+
+		return msg;
+	}
+
+private:
+	BString			fIcuCode;
 };
 
 
@@ -114,6 +118,20 @@ CreateDateMenu(BMenuField** field, bool longFormat = true)
 		//yearMenu->AddItem(new DateMenuItem("Y", "Y", *field));
 		//yearMenu->AddItem(new DateMenuItem("u", "u", *field));
 }
+
+
+bool
+IsSpecialDateChar(char charToTest)
+{
+	static const char* specials = "dDeEFgMLyYu";
+	for (int i = 0; i < 11; i++)
+		if (charToTest == specials[i])
+			return true;
+	return false;
+}
+
+
+// #pragma mark -
 
 
 FormatView::FormatView(BCountry* country)
@@ -335,130 +353,6 @@ FormatView::FormatView(BCountry* country)
 }
 
 
-bool IsSpecialDateChar(char charToTest)
-{
-	static const char* specials = "dDeEFgMLyYu";
-	for (int i = 0; i < 11; i++)
-		if (charToTest == specials[i])
-			return true;
-	return false;
-}
-
-
-// Get the date format from ICU and set the date fields accordingly
-void
-FormatView::_ParseDateFormat()
-{
-	// TODO parse the short date too
-	BString dateFormatString;
-	fCountry->DateFormat(dateFormatString, true);
-	const char* dateFormat = dateFormatString.String();
-
-	// Travel trough the string and parse it
-	const char* parsePointer = dateFormat;
-	const char* fieldBegin = dateFormat;
-
-	for (int i = 0; i < 4; i++)
-	{
-		fieldBegin = parsePointer;
-		while (*parsePointer == *(parsePointer + 1)) parsePointer++ ;
-		parsePointer++;
-		BString str;
-		str.Append(fieldBegin, parsePointer - fieldBegin);
-
-		fLongDateString[i] = str;
-
-		BMenu* subMenu;
-		bool isFound = false;
-		for (int subMenuIndex = 0; subMenuIndex < 3; subMenuIndex++) {
-			subMenu = fLongDateMenu[i]->Menu()->SubmenuAt(subMenuIndex);
-			BMenuItem* item;
-			for (int itemIndex = 0; (item = subMenu->ItemAt(itemIndex)) != NULL;
-					itemIndex++) {
-				if (static_cast<DateMenuItem*>(item)->fIcuCode == str) {
-					item->SetMarked(true);
-					fLongDateMenu[i]->MenuItem()->SetLabel(item->Label());
-					isFound = true;
-				} else
-					item->SetMarked(false);
-			}
-		}
-
-		if (!isFound)
-			fLongDateMenu[i]->MenuItem()->SetLabel(str.Append("*"));
-
-		fieldBegin = parsePointer;
-		while ((!IsSpecialDateChar(*parsePointer)) && *parsePointer != '\0'
-				&& *(parsePointer - 1) >= 0) {
-			if (*parsePointer == '\'') {
-				parsePointer++;
-				while (*parsePointer != '\'') parsePointer++;
-			}
-			parsePointer++;
-		}
-		str.Truncate(0);
-		str.Append(fieldBegin, parsePointer - fieldBegin);
-		fLongDateSeparator[i]->SetText(str);
-	}
-
-	// Short date is a bit more tricky, we want to extract the separator
-	dateFormatString.Truncate(0);
-	fCountry->DateFormat(dateFormatString, false);
-	dateFormat = dateFormatString.String();
-
-	// Travel trough the string and parse it
-	parsePointer = dateFormat;
-	fieldBegin = dateFormat;
-
-	for (int i = 0; i < 3; i++)
-	{
-		fieldBegin = parsePointer;
-		while (*parsePointer == *(parsePointer + 1)) parsePointer++ ;
-		parsePointer++;
-		BString str;
-		str.Append(fieldBegin, parsePointer - fieldBegin);
-
-		fLongDateString[i] = str;
-
-		BMenu* subMenu;
-		bool isFound = false;
-		for (int subMenuIndex = 0; subMenuIndex < 3; subMenuIndex++) {
-			subMenu = fDateMenu[i]->Menu()->SubmenuAt(subMenuIndex);
-			BMenuItem* item;
-			for (int itemIndex = 0; (item = subMenu->ItemAt(itemIndex)) != NULL;
-					itemIndex++) {
-				if (static_cast<DateMenuItem*>(item)->fIcuCode == str) {
-					item->SetMarked(true);
-					fDateMenu[i]->MenuItem()->SetLabel(item->Label());
-					isFound = true;
-				} else
-					item->SetMarked(false);
-			}
-		}
-
-		if (!isFound) {
-			fDateMenu[i]->MenuItem()->SetLabel(
-				str.Append(TR(" (unknown format)")));
-		}
-
-		fieldBegin = parsePointer;
-		while ((!IsSpecialDateChar(*parsePointer)) && *parsePointer != '\0'
-				&& *(parsePointer - 1) >= 0) {
-			if (*parsePointer == '\'') {
-				parsePointer++;
-				while (*parsePointer != '\'') parsePointer++;
-			}
-			parsePointer++;
-		}
-		if (parsePointer - fieldBegin > 0) {
-			str.Truncate(0);
-			str.Append(fieldBegin, parsePointer - fieldBegin);
-			fSeparatorMenuField->MenuItem()->SetLabel(str);
-		}
-	}
-}
-
-
 void
 FormatView::AttachedToWindow()
 {
@@ -477,32 +371,6 @@ FormatView::AttachedToWindow()
 	}
 
 	fSeparatorMenuField->Menu()->SetTargetForItems(this);
-}
-
-
-void
-FormatView::_UpdateLongDateFormatString()
-{
-	BString newDateFormat;
-
-	for (int i = 0; i < 4; i++) {
-		newDateFormat.Append(fLongDateString[i]);
-		newDateFormat.Append(fLongDateSeparator[i]->Text());
-	}
-
-	// TODO save this in the settings preflet and make the roster load it back
-	fCountry->SetDateFormat(newDateFormat.String());
-
-	newDateFormat.Truncate(0);
-
-		newDateFormat.Append(fDateString[0]);
-		newDateFormat.Append(fSeparatorMenuField->MenuItem()->Label());
-		newDateFormat.Append(fDateString[1]);
-		newDateFormat.Append(fSeparatorMenuField->MenuItem()->Label());
-		newDateFormat.Append(fDateString[2]);
-
-	// TODO save this in the settings preflet and make the roster load it back
-	fCountry->SetDateFormat(newDateFormat.String(), false);
 }
 
 
@@ -569,7 +437,7 @@ FormatView::MessageReceived(BMessage* message)
 				Window()->PostMessage(kSettingsContentsModified);
 				break;
 			}
-		
+
 		default:
 			BView::MessageReceived(message);
 	}
@@ -621,20 +489,6 @@ FormatView::Revert()
 
 	//ShowCurrentSettings();
 	_SendNotices();
-}
-
-
-void
-FormatView::_SendNotices()
-{
-	// Make the notification message and send it to the tracker:
-	/*
-	BMessage notificationMessage;
-	notificationMessage.AddInt32("TimeFormatSeparator", (int32)settings.TimeFormatSeparator());
-	notificationMessage.AddInt32("DateOrderFormat", (int32)settings.DateOrderFormat());
-	notificationMessage.AddBool("24HrClock", settings.ClockIs24Hr());
-	tracker->SendNotices(kDateFormatChanged, &notificationMessage);
-	*/
 }
 
 
@@ -722,3 +576,155 @@ FormatView::_UpdateExamples()
 		fNumberFormatExampleView->SetText(u_errorName((UErrorCode)Error));
 }
 
+
+void
+FormatView::_SendNotices()
+{
+	// Make the notification message and send it to the tracker:
+	/*
+	BMessage notificationMessage;
+	notificationMessage.AddInt32("TimeFormatSeparator", (int32)settings.TimeFormatSeparator());
+	notificationMessage.AddInt32("DateOrderFormat", (int32)settings.DateOrderFormat());
+	notificationMessage.AddBool("24HrClock", settings.ClockIs24Hr());
+	tracker->SendNotices(kDateFormatChanged, &notificationMessage);
+	*/
+}
+
+
+//! Get the date format from ICU and set the date fields accordingly
+void
+FormatView::_ParseDateFormat()
+{
+	// TODO parse the short date too
+	BString dateFormatString;
+	fCountry->DateFormat(dateFormatString, true);
+	const char* dateFormat = dateFormatString.String();
+
+	// Travel trough the string and parse it
+	const char* parsePointer = dateFormat;
+	const char* fieldBegin = dateFormat;
+
+	for (int i = 0; i < 4; i++)
+	{
+		fieldBegin = parsePointer;
+		while (*parsePointer == *(parsePointer + 1)) parsePointer++ ;
+		parsePointer++;
+		BString str;
+		str.Append(fieldBegin, parsePointer - fieldBegin);
+
+		fLongDateString[i] = str;
+
+		BMenu* subMenu;
+		bool isFound = false;
+		for (int subMenuIndex = 0; subMenuIndex < 3; subMenuIndex++) {
+			subMenu = fLongDateMenu[i]->Menu()->SubmenuAt(subMenuIndex);
+			BMenuItem* item;
+			for (int itemIndex = 0; (item = subMenu->ItemAt(itemIndex)) != NULL;
+					itemIndex++) {
+				if (static_cast<DateMenuItem*>(item)->ICUCode() == str) {
+					item->SetMarked(true);
+					fLongDateMenu[i]->MenuItem()->SetLabel(item->Label());
+					isFound = true;
+				} else
+					item->SetMarked(false);
+			}
+		}
+
+		if (!isFound)
+			fLongDateMenu[i]->MenuItem()->SetLabel(str.Append("*"));
+
+		fieldBegin = parsePointer;
+		while ((!IsSpecialDateChar(*parsePointer)) && *parsePointer != '\0'
+				&& *(parsePointer - 1) >= 0) {
+			if (*parsePointer == '\'') {
+				parsePointer++;
+				while (*parsePointer != '\'') parsePointer++;
+			}
+			parsePointer++;
+		}
+		str.Truncate(0);
+		str.Append(fieldBegin, parsePointer - fieldBegin);
+		fLongDateSeparator[i]->SetText(str);
+	}
+
+	// Short date is a bit more tricky, we want to extract the separator
+	dateFormatString.Truncate(0);
+	fCountry->DateFormat(dateFormatString, false);
+	dateFormat = dateFormatString.String();
+
+	// Travel trough the string and parse it
+	parsePointer = dateFormat;
+	fieldBegin = dateFormat;
+
+	for (int i = 0; i < 3; i++) {
+		fieldBegin = parsePointer;
+		while (*parsePointer == *(parsePointer + 1)) parsePointer++ ;
+		parsePointer++;
+		BString str;
+		str.Append(fieldBegin, parsePointer - fieldBegin);
+
+		fLongDateString[i] = str;
+
+		BMenu* subMenu;
+		bool isFound = false;
+		for (int subMenuIndex = 0; subMenuIndex < 3; subMenuIndex++) {
+			subMenu = fDateMenu[i]->Menu()->SubmenuAt(subMenuIndex);
+			BMenuItem* item;
+			for (int itemIndex = 0; (item = subMenu->ItemAt(itemIndex)) != NULL;
+					itemIndex++) {
+				if (static_cast<DateMenuItem*>(item)->ICUCode() == str) {
+					item->SetMarked(true);
+					fDateMenu[i]->MenuItem()->SetLabel(item->Label());
+					isFound = true;
+				} else
+					item->SetMarked(false);
+			}
+		}
+
+		if (!isFound) {
+			fDateMenu[i]->MenuItem()->SetLabel(
+				str.Append(TR(" (unknown format)")));
+		}
+
+		fieldBegin = parsePointer;
+		while ((!IsSpecialDateChar(*parsePointer)) && *parsePointer != '\0'
+				&& *(parsePointer - 1) >= 0) {
+			if (*parsePointer == '\'') {
+				parsePointer++;
+				while (*parsePointer != '\'') parsePointer++;
+			}
+			parsePointer++;
+		}
+		if (parsePointer - fieldBegin > 0) {
+			str.Truncate(0);
+			str.Append(fieldBegin, parsePointer - fieldBegin);
+			fSeparatorMenuField->MenuItem()->SetLabel(str);
+		}
+	}
+}
+
+
+void
+FormatView::_UpdateLongDateFormatString()
+{
+	BString newDateFormat;
+
+	for (int i = 0; i < 4; i++) {
+		newDateFormat.Append(fLongDateString[i]);
+		newDateFormat.Append(fLongDateSeparator[i]->Text());
+	}
+
+	// TODO save this in the settings preflet and make the roster load it back
+	fCountry->SetDateFormat(newDateFormat.String());
+
+	newDateFormat.Truncate(0);
+
+	newDateFormat.Append(fDateString[0]);
+	newDateFormat.Append(fSeparatorMenuField->MenuItem()->Label());
+	newDateFormat.Append(fDateString[1]);
+	newDateFormat.Append(fSeparatorMenuField->MenuItem()->Label());
+	newDateFormat.Append(fDateString[2]);
+
+	// TODO save this in the settings preflet and make the roster load it back
+	fCountry->SetDateFormat(newDateFormat.String(), false);
+}

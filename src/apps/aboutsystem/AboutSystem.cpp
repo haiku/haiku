@@ -144,6 +144,7 @@ static const Translation gTranslations[] =
 		"Nicolás C (CapitanPico)\n"
 		"Oscar Carballal (oscarcp)\n"
 		"Miguel Zúñiga González (miguel~1.mx)\n"
+		"César Ortiz Pantoja (ccortiz)\n"
 	},
 	{ "sv",
 		"Johan Holmberg\n"
@@ -851,7 +852,7 @@ AboutView::_CreateCreditsView()
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(TR("The copyright to the Haiku code is property of "
 		"Haiku, Inc. or of the respective authors where expressly noted "
-		"in the source."
+		"in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc."
 		"\n\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
@@ -1115,7 +1116,7 @@ AboutView::_CreateCreditsView()
 	// GNU copyrights
 	AddCopyrightEntry("The GNU Project",
 		"Contains software from the GNU Project, "
-		"released under the GPL and LGPL licences:\n"
+		"released under the GPL and LGPL licenses:\n"
 		"GNU C Library, "
 		"GNU coretools, diffutils, findutils, "
 		"sharutils, gawk, bison, m4, make, "
@@ -1129,7 +1130,7 @@ AboutView::_CreateCreditsView()
 	// FreeBSD copyrights
 	AddCopyrightEntry("The FreeBSD Project",
 		"Contains software from the FreeBSD Project, "
-		"released under the BSD licence:\n"
+		"released under the BSD license:\n"
 		"cal, ftpd, ping, telnet, "
 		"telnetd, traceroute\n"
 		COPYRIGHT_STRING "1994-2008 The FreeBSD Project.  "

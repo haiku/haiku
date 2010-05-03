@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -354,11 +354,20 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 				return image->regions[i].id;
 			}
 		} else {
+			// Map all segments r/w first -- write access might be needed for
+			// relocations. When we've done with those we change the protection
+			// of read-only segments back to read-only. We map those segments
+			// over-committing, since quite likely only a relatively small
+			// number of pages needs to be touched and we want to avoid a lot
+			// of memory to be committed for them temporarily, just because we
+			// have to write map them.
+			uint32 protection = B_READ_AREA | B_WRITE_AREA
+				| ((image->regions[i].flags & RFLAG_RW) != 0
+					? 0 : B_OVERCOMMITTING_AREA);
 			image->regions[i].id = _kern_map_file(regionName,
 				(void**)&loadAddress, B_EXACT_ADDRESS,
-				image->regions[i].vmsize, B_READ_AREA | B_WRITE_AREA,
-				REGION_PRIVATE_MAP, false, fd,
-				PAGE_BASE(image->regions[i].fdstart));
+				image->regions[i].vmsize, protection, REGION_PRIVATE_MAP, false,
+				fd, PAGE_BASE(image->regions[i].fdstart));
 
 			if (image->regions[i].id < 0) {
 				_kern_unreserve_address_range(reservedAddress, reservedSize);

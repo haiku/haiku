@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
-AddResources PCL6\ Compatible : PCL6.rsrc ;
+AddResources PCL6\ Compatible : PCL6.rdef ;
 
 Addon PCL6\ Compatible :
 	DeltaRowCompression.cpp

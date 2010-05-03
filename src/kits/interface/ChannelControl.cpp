@@ -317,7 +317,7 @@ BChannelControl::SetValue(int32 value)
 	if (value > fChannelMax[fCurrentChannel])
 		value = fChannelMax[fCurrentChannel];
 	
-	if (value < fChannelMin[fCurrentChannel]);
+	if (value < fChannelMin[fCurrentChannel])
 		value = fChannelMin[fCurrentChannel];
 		
 	if (value != fChannelValues[fCurrentChannel]) {

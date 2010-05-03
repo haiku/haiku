@@ -821,27 +821,58 @@ dump_page_stats(int argc, char **argv)
 {
 	page_num_t swappableModified = 0;
 	page_num_t swappableModifiedInactive = 0;
+
 	size_t counter[8];
 	size_t busyCounter[8];
-	addr_t i;
-
 	memset(counter, 0, sizeof(counter));
 	memset(busyCounter, 0, sizeof(busyCounter));
 
-	for (i = 0; i < sNumPages; i++) {
+	struct page_run {
+		page_num_t	start;
+		page_num_t	end;
+
+		page_num_t Length() const	{ return end - start; }
+	};
+
+	page_run currentFreeRun = { 0, 0 };
+	page_run currentCachedRun = { 0, 0 };
+	page_run longestFreeRun = { 0, 0 };
+	page_run longestCachedRun = { 0, 0 };
+
+	for (addr_t i = 0; i < sNumPages; i++) {
 		if (sPages[i].State() > 7)
 			panic("page %li at %p has invalid state!\n", i, &sPages[i]);
 
-		counter[sPages[i].State()]++;
-		if (sPages[i].busy)
-			busyCounter[sPages[i].State()]++;
+		uint32 pageState = sPages[i].State();
 
-		if (sPages[i].State() == PAGE_STATE_MODIFIED
+		counter[pageState]++;
+		if (sPages[i].busy)
+			busyCounter[pageState]++;
+
+		if (pageState == PAGE_STATE_MODIFIED
 			&& sPages[i].Cache() != NULL
 			&& sPages[i].Cache()->temporary && sPages[i].wired_count == 0) {
 			swappableModified++;
 			if (sPages[i].usage_count == 0)
 				swappableModifiedInactive++;
+		}
+
+		// track free and cached pages runs
+		if (pageState == PAGE_STATE_FREE || pageState == PAGE_STATE_CLEAR) {
+			currentFreeRun.end = i + 1;
+			currentCachedRun.end = i + 1;
+		} else {
+			if (currentFreeRun.Length() > longestFreeRun.Length())
+				longestFreeRun = currentFreeRun;
+			currentFreeRun.start = currentFreeRun.end = i + 1;
+
+			if (pageState == PAGE_STATE_CACHED) {
+				currentCachedRun.end = i + 1;
+			} else {
+				if (currentCachedRun.Length() > longestCachedRun.Length())
+					longestCachedRun = currentCachedRun;
+				currentCachedRun.start = currentCachedRun.end = i + 1;
+			}
 		}
 	}
 
@@ -867,6 +898,12 @@ dump_page_stats(int argc, char **argv)
 	kprintf("unsatisfied page reservations: %" B_PRId32 "\n",
 		sUnsatisfiedPageReservations);
 	kprintf("mapped pages: %lu\n", gMappedPagesCount);
+	kprintf("longest free pages run: %" B_PRIuSIZE " pages (at %" B_PRIuSIZE
+		")\n", longestFreeRun.Length(),
+		sPages[longestFreeRun.start].physical_page_number);
+	kprintf("longest free/cached pages run: %" B_PRIuSIZE " pages (at %"
+		B_PRIuSIZE ")\n", longestCachedRun.Length(),
+		sPages[longestCachedRun.start].physical_page_number);
 
 	kprintf("waiting threads:\n");
 	for (PageReservationWaiterList::Iterator it
@@ -2097,6 +2134,9 @@ free_cached_page(vm_page *page, bool dontWait)
 	// we can now steal this page
 
 	cache->RemovePage(page);
+		// Now the page doesn't have cache anymore, so no one else (e.g.
+		// vm_page_allocate_page_run() can pick it up), since they would be
+		// required to lock the cache first, which would fail.
 
 	sCachedPageQueue.RemoveUnlocked(page);
 	return true;
@@ -3088,7 +3128,48 @@ vm_page_allocate_page(vm_page_reservation* reservation, uint32 flags)
 }
 
 
-static vm_page*
+static void
+allocate_page_run_cleanup(VMPageQueue::PageList& freePages,
+	VMPageQueue::PageList& clearPages)
+{
+	while (vm_page* page = freePages.RemoveHead()) {
+		page->busy = false;
+		page->SetState(PAGE_STATE_FREE);
+		DEBUG_PAGE_ACCESS_END(page);
+		sFreePageQueue.PrependUnlocked(page);
+	}
+
+	while (vm_page* page = clearPages.RemoveHead()) {
+		page->busy = false;
+		page->SetState(PAGE_STATE_CLEAR);
+		DEBUG_PAGE_ACCESS_END(page);
+		sClearPageQueue.PrependUnlocked(page);
+	}
+
+}
+
+
+/*!	Tries to allocate the a contiguous run of \a length pages starting at
+	index \a start.
+
+	The must have write-locked the free/clear page queues. The function will
+	unlock regardless of whether it succeeds or fails.
+
+	If the function fails, it cleans up after itself, i.e. it will free all
+	pages it managed to allocate.
+
+	\param start The start index (into \c sPages) of the run.
+	\param length The number of pages to allocate.
+	\param flags Page allocation flags. Encodes the state the function shall
+		set the allocated pages to, whether the pages shall be marked busy
+		(VM_PAGE_ALLOC_BUSY), and whether the pages shall be cleared
+		(VM_PAGE_ALLOC_CLEAR).
+	\param freeClearQueueLocker Locked WriteLocker for the free/clear page
+		queues in locked state. Will be unlocked by the function.
+	\return The index of the first page that could not be allocated. \a length
+		is returned when the function was successful.
+*/
+static page_num_t
 allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 	WriteLocker& freeClearQueueLocker)
 {
@@ -3098,28 +3179,109 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 
 	TA(AllocatePageRun(length));
 
-	// pull the pages out of the appropriate queues
+	// Pull the free/clear pages out of their respective queues. Cached pages
+	// are allocated later.
+	page_num_t cachedPages = 0;
 	VMPageQueue::PageList freePages;
 	VMPageQueue::PageList clearPages;
-	for (page_num_t i = 0; i < length; i++) {
+	page_num_t i = 0;
+	for (; i < length; i++) {
+		bool pageAllocated = true;
+		bool noPage = false;
 		vm_page& page = sPages[start + i];
-		DEBUG_PAGE_ACCESS_START(&page);
-		if (page.State() == PAGE_STATE_CLEAR) {
-			sClearPageQueue.Remove(&page);
-			clearPages.Add(&page);
-		} else {
-			sFreePageQueue.Remove(&page);
-			freePages.Add(&page);
+		switch (page.State()) {
+			case PAGE_STATE_CLEAR:
+				DEBUG_PAGE_ACCESS_START(&page);
+				sClearPageQueue.Remove(&page);
+				clearPages.Add(&page);
+				break;
+			case PAGE_STATE_FREE:
+				DEBUG_PAGE_ACCESS_START(&page);
+				sFreePageQueue.Remove(&page);
+				freePages.Add(&page);
+				break;
+			case PAGE_STATE_CACHED:
+				// We allocate cached pages later.
+				cachedPages++;
+				pageAllocated = false;
+				break;
+
+			default:
+				// Probably a page was cached when our caller checked. Now it's
+				// gone and we have to abort.
+				noPage = true;
+				break;
 		}
 
-		page.SetState(flags & VM_PAGE_ALLOC_STATE);
-		page.busy = flags & VM_PAGE_ALLOC_BUSY;
-		page.usage_count = 0;
-		page.accessed = false;
-		page.modified = false;
+		if (noPage)
+			break;
+
+		if (pageAllocated) {
+			page.SetState(flags & VM_PAGE_ALLOC_STATE);
+			page.busy = (flags & VM_PAGE_ALLOC_BUSY) != 0;
+			page.usage_count = 0;
+			page.accessed = false;
+			page.modified = false;
+		}
+	}
+
+	if (i < length) {
+		// failed to allocate a page -- free all that we've got
+		allocate_page_run_cleanup(freePages, clearPages);
+		return i;
 	}
 
 	freeClearQueueLocker.Unlock();
+
+	if (cachedPages > 0) {
+		// allocate the pages that weren't free but cached
+		page_num_t freedCachedPages = 0;
+		page_num_t nextIndex = start;
+		vm_page* freePage = freePages.Head();
+		vm_page* clearPage = clearPages.Head();
+		while (cachedPages > 0) {
+			// skip, if we've already got the page
+			if (freePage != NULL && size_t(freePage - sPages) == nextIndex) {
+				freePage = freePages.GetNext(freePage);
+				nextIndex++;
+				continue;
+			}
+			if (clearPage != NULL && size_t(clearPage - sPages) == nextIndex) {
+				clearPage = clearPages.GetNext(clearPage);
+				nextIndex++;
+				continue;
+			}
+
+			// free the page, if it is still cached
+			vm_page& page = sPages[nextIndex];
+			if (!free_cached_page(&page, false))
+				break;
+
+			page.SetState(flags & VM_PAGE_ALLOC_STATE);
+			page.busy = (flags & VM_PAGE_ALLOC_BUSY) != 0;
+			page.usage_count = 0;
+			page.accessed = false;
+			page.modified = false;
+
+			freePages.InsertBefore(freePage, &page);
+			freedCachedPages++;
+			cachedPages--;
+			nextIndex++;
+		}
+
+		// If we have freed cached pages, we need to balance things.
+		if (freedCachedPages > 0)
+			unreserve_pages(freedCachedPages);
+
+		if (nextIndex - start < length) {
+			// failed to allocate all cached pages -- free all that we've got
+			freeClearQueueLocker.Lock();
+			allocate_page_run_cleanup(freePages, clearPages);
+			freeClearQueueLocker.Unlock();
+
+			return nextIndex - start;
+		}
+	}
 
 	// clear pages, if requested
 	if ((flags & VM_PAGE_ALLOC_CLEAR) != 0) {
@@ -3138,27 +3300,42 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 	// Note: We don't unreserve the pages since we pulled them out of the
 	// free/clear queues without adjusting sUnreservedFreePages.
 
-	return &sPages[start];
+	return length;
 }
 
 
 vm_page *
-vm_page_allocate_page_run(uint32 flags, addr_t base, addr_t length,
+vm_page_allocate_page_run(uint32 flags, addr_t base, size_t length,
 	int priority)
 {
 	uint32 start = base >> PAGE_SHIFT;
 
 	vm_page_reservation reservation;
-	if (!vm_page_try_reserve_pages(&reservation, length, priority))
-		return NULL;
-		// TODO: add more tries, ie. free some inactive, ...
-		// no free space
+	vm_page_reserve_pages(&reservation, length, priority);
 
 	WriteLocker freeClearQueueLocker(sFreePageQueuesLock);
+
+	// First we try to get a run with free pages only. If that fails, we also
+	// consider cached pages. If there are only few free pages and many cached
+	// ones, the odds are that we won't find enough contiguous ones, so we skip
+	// the first iteration in this case.
+	int32 freePages = sUnreservedFreePages;
+	int useCached = freePages > 0 && (page_num_t)freePages > 2 * length ? 0 : 1;
 
 	for (;;) {
 		bool foundRun = true;
 		if (start + length > sNumPages) {
+			if (useCached == 0) {
+				// The first iteration with free pages only was unsuccessful.
+				// Try again also considering cached pages.
+				useCached = 1;
+				start = base >> PAGE_SHIFT;
+				continue;
+			}
+
+			dprintf("vm_page_allocate_page_run(): Failed to allocate run of "
+				"length %" B_PRIuSIZE " in second iteration!", length);
+
 			freeClearQueueLocker.Unlock();
 			vm_page_unreserve_pages(&reservation);
 			return NULL;
@@ -3166,72 +3343,26 @@ vm_page_allocate_page_run(uint32 flags, addr_t base, addr_t length,
 
 		uint32 i;
 		for (i = 0; i < length; i++) {
-			if (sPages[start + i].State() != PAGE_STATE_FREE
-				&& sPages[start + i].State() != PAGE_STATE_CLEAR) {
+			uint32 pageState = sPages[start + i].State();
+			if (pageState != PAGE_STATE_FREE
+				&& pageState != PAGE_STATE_CLEAR
+				&& (pageState != PAGE_STATE_CACHED || useCached == 0)) {
 				foundRun = false;
-				i++;
 				break;
 			}
 		}
 
-		if (foundRun)
-			return allocate_page_run(start, length, flags,
-				freeClearQueueLocker);
+		if (foundRun) {
+			i = allocate_page_run(start, length, flags, freeClearQueueLocker);
+			if (i == length)
+				return &sPages[start];
 
-		start += i;
-	}
-}
-
-
-vm_page *
-vm_page_allocate_page_run_no_base(uint32 flags, addr_t count, int priority)
-{
-	VMPageQueue* queue;
-	VMPageQueue* otherQueue;
-	if ((flags & VM_PAGE_ALLOC_CLEAR) != 0) {
-		queue = &sClearPageQueue;
-		otherQueue = &sFreePageQueue;
-	} else {
-		queue = &sFreePageQueue;
-		otherQueue = &sClearPageQueue;
-	}
-
-	vm_page_reservation reservation;
-	if (!vm_page_try_reserve_pages(&reservation, count, priority))
-		return NULL;
-		// TODO: add more tries, ie. free some inactive, ...
-		// no free space
-
-	WriteLocker freeClearQueueLocker(sFreePageQueuesLock);
-
-	for (;;) {
-		VMPageQueue::Iterator it = queue->GetIterator();
-		while (vm_page *page = it.Next()) {
-			vm_page *current = page;
-			if (current >= &sPages[sNumPages - count])
-				continue;
-
-			bool foundRun = true;
-			for (uint32 i = 0; i < count; i++, current++) {
-				if (current->State() != PAGE_STATE_FREE
-					&& current->State() != PAGE_STATE_CLEAR) {
-					foundRun = false;
-					break;
-				}
-			}
-
-			if (foundRun) {
-				return allocate_page_run(page - sPages, count, flags,
-					freeClearQueueLocker);
-			}
+			// apparently a cached page couldn't be allocated -- skip it and
+			// continue
+			freeClearQueueLocker.Lock();
 		}
 
-		if (queue == otherQueue) {
-			freeClearQueueLocker.Unlock();
-			vm_page_unreserve_pages(&reservation);
-		}
-
-		queue = otherQueue;
+		start += i + 1;
 	}
 }
 

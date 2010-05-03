@@ -19,6 +19,10 @@
 #include <string.h>
 
 #include <io_requests.h>
+#include <vm/vm_page.h>
+
+#include "IOCache.h"
+#include "IOSchedulerSimple.h"
 
 
 //#define TRACE_CD_DISK
@@ -884,7 +888,23 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 		if (status != B_OK)
 			panic("initializing DMAResource failed: %s", strerror(status));
 
-		info->io_scheduler = new(std::nothrow) IOScheduler(info->dma_resource);
+		// Allocate the I/O scheduler. If there seems to be sufficient memory
+		// we use an IOCache, since that adds caching at the lowest I/O layer
+		// and thus dramatically reduces I/O operations and seeks. The
+		// disadvantage is that it increases free memory (physical pages)
+		// fragmentation, which makes large contiguous allocations more likely
+		// to fail.
+		size_t freeMemory = vm_page_num_free_pages();
+		if (freeMemory > 180 * 1024 * 1024 / B_PAGE_SIZE) {
+			info->io_scheduler = new(std::nothrow) IOCache(info->dma_resource,
+				1024 * 1024);
+		} else {
+			dprintf("scsi_cd: Using IOSchedulerSimple instead of IOCache to "
+				"avoid memory allocation issues.\n");
+			info->io_scheduler = new(std::nothrow) IOSchedulerSimple(
+				info->dma_resource);
+		}
+
 		if (info->io_scheduler == NULL)
 			panic("allocating IOScheduler failed.");
 
@@ -895,6 +915,9 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 
 		info->io_scheduler->SetCallback(do_io, info);
 	}
+
+	if (info->io_scheduler != NULL)
+		info->io_scheduler->SetDeviceCapacity(capacity * blockSize);
 
 	info->block_size = blockSize;
 }

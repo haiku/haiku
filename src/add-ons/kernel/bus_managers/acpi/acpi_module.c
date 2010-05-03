@@ -5,6 +5,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,24 +22,24 @@
 #	define TRACE(x) ;
 #endif
 
-device_manager_info *gDeviceManager = NULL;
-pci_module_info *gPCIManager = NULL;
+
+device_manager_info* gDeviceManager = NULL;
+pci_module_info* gPCIManager = NULL;
 dpc_module_info* gDPC = NULL;
 
 module_dependency module_dependencies[] = {
-	{B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager},
-	{B_PCI_MODULE_NAME, (module_info **)&gPCIManager},
-	{B_DPC_MODULE_NAME, (module_info **)&gDPC},
+	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&gDeviceManager},
+	{B_PCI_MODULE_NAME, (module_info**)&gPCIManager},
+	{B_DPC_MODULE_NAME, (module_info**)&gDPC},
 	{}
 };
 
 
 static float
-acpi_module_supports_device(device_node *parent)
+acpi_module_supports_device(device_node* parent)
 {
-	const char *bus;
-
 	// make sure parent is really device root
+	const char* bus;
 	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return B_ERROR;
 
@@ -50,9 +51,8 @@ acpi_module_supports_device(device_node *parent)
 
 
 static status_t
-acpi_module_register_device(device_node *parent)
+acpi_module_register_device(device_node* parent)
 {
-
 	device_attr attrs[] = {
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "ACPI" }},
 
@@ -60,27 +60,27 @@ acpi_module_register_device(device_node *parent)
 		{}
 	};
 
-	io_resource *resources = NULL;
-
-	return gDeviceManager->register_node(parent, ACPI_ROOT_MODULE_NAME, attrs, resources, NULL);
+	return gDeviceManager->register_node(parent, ACPI_ROOT_MODULE_NAME, attrs,
+		NULL, NULL);
 }
 
 
 static status_t
-acpi_enumerate_child_devices(device_node *node, const char *root)
+acpi_enumerate_child_devices(device_node* node, const char* root)
 {
 	char result[255];
-	void *counter = NULL;
-	device_node *parent = NULL;
+	void* counter = NULL;
+	device_node* parent = NULL;
 
 	TRACE(("acpi_enumerate_child_devices: recursing from %s\n", root));
 
 	// get a reference on the parent
 	parent = gDeviceManager->get_parent_node(node);
 
-	while (get_next_entry(ACPI_TYPE_ANY, root, result, sizeof(result), &counter) == B_OK) {
+	while (get_next_entry(ACPI_TYPE_ANY, root, result,
+			sizeof(result), &counter) == B_OK) {
 		uint32 type = get_object_type(result);
-		device_node *deviceNode;
+		device_node* deviceNode;
 
 		switch (type) {
 			case ACPI_TYPE_POWER:
@@ -113,8 +113,7 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 
 				if (gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs,
 						NULL, &deviceNode) == B_OK)
-	                		acpi_enumerate_child_devices(deviceNode, result);
-
+	                acpi_enumerate_child_devices(deviceNode, result);
 				break;
 			}
 			default:
@@ -129,22 +128,21 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 
 
 static status_t
-acpi_module_register_child_devices(void *cookie)
+acpi_module_register_child_devices(void* cookie)
 {
-	status_t err;
-	device_node *node = cookie;
+	device_node* node = cookie;
 
-	err = gDeviceManager->publish_device(node, "acpi/namespace", ACPI_NS_DUMP_DEVICE_MODULE_NAME);
-	if (err != B_OK) {
-		return err;
-	}
+	status_t status = gDeviceManager->publish_device(node, "acpi/namespace",
+		ACPI_NS_DUMP_DEVICE_MODULE_NAME);
+	if (status != B_OK)
+		return status;
 
 	return acpi_enumerate_child_devices(node, "\\");
 }
 
 
 static status_t
-acpi_module_init(device_node *node, void **_cookie)
+acpi_module_init(device_node* node, void** _cookie)
 {
 	*_cookie = node;
 	return B_OK;
@@ -152,7 +150,7 @@ acpi_module_init(device_node *node, void **_cookie)
 
 
 static void
-acpi_module_uninit(void *cookie)
+acpi_module_uninit(void* cookie)
 {
 }
 
@@ -163,7 +161,7 @@ acpi_module_std_ops(int32 op, ...)
 	switch (op) {
 		case B_MODULE_INIT:
 		{
-			module_info *module;
+			module_info* module;
 			return get_module(B_ACPI_MODULE_NAME, &module);
 				// this serializes our module initialization
 		}
@@ -221,12 +219,13 @@ static struct acpi_root_info sACPIRootModule = {
 	evaluate_method,
 };
 
-_EXPORT module_info *modules[] = {
-	(module_info *)&gACPIModule,
-	(module_info *)&sACPIRootModule,
-	(module_info *)&acpi_ns_dump_module,
-	(module_info *)&gACPIDeviceModule,
-	(module_info*) &embedded_controller_driver_module,
-	(module_info*) &embedded_controller_device_module,
+
+module_info* modules[] = {
+	(module_info*)&gACPIModule,
+	(module_info*)&sACPIRootModule,
+	(module_info*)&acpi_ns_dump_module,
+	(module_info*)&gACPIDeviceModule,
+	(module_info*)&embedded_controller_driver_module,
+	(module_info*)&embedded_controller_device_module,
 	NULL
 };

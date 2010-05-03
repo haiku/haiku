@@ -1,5 +1,6 @@
 /*
- * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2010, Adrien Destugues <pulkomandy@gmail.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -35,12 +36,16 @@
 
 
 static int
-compare_list_items(const void* _a, const void* _b)
+compare_typed_list_items(const BListItem* _a, const BListItem* _b)
 {
-	LanguageListItem* a = *(LanguageListItem**)_a;
-	LanguageListItem* b = *(LanguageListItem**)_b;
+	// TODO: sort them using collators.
+	LanguageListItem* a = (LanguageListItem*)_a;
+	LanguageListItem* b = (LanguageListItem*)_b;
 	return strcasecmp(a->Text(), b->Text());
 }
+
+
+// #pragma mark -
 
 
 LocaleWindow::LocaleWindow()
@@ -64,150 +69,138 @@ LocaleWindow::LocaleWindow()
 	BView* languageTab = new BView(TR("Language"), B_WILL_DRAW);
 	languageTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
-	{
-		// first list: available languages
-		fLanguageListView = new LanguageListView("available",
-			B_MULTIPLE_SELECTION_LIST);
-		BScrollView* scrollView = new BScrollView("scroller", fLanguageListView,
-			B_WILL_DRAW | B_FRAME_EVENTS, false, true);
+	// first list: available languages
+	fLanguageListView = new LanguageListView("available",
+		B_MULTIPLE_SELECTION_LIST);
+	BScrollView* scrollView = new BScrollView("scroller", fLanguageListView,
+		B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
-		fLanguageListView->SetInvocationMessage(new BMessage(kMsgLangInvoked));
+	fLanguageListView->SetInvocationMessage(new BMessage(kMsgLangInvoked));
 
-		// Fill the language list from the LocaleRoster data
-		BMessage installedLanguages;
-		if (be_locale_roster->GetInstalledLanguages(&installedLanguages)
-				== B_OK) {
+	// Fill the language list from the LocaleRoster data
+	BMessage installedLanguages;
+	if (be_locale_roster->GetInstalledLanguages(&installedLanguages) == B_OK) {
+		BString currentLanguageCode;
+		BString currentLanguageName;
+		LanguageListItem* lastAddedCountryItem = NULL;
 
-			BString currentLanguageCode;
-			BString currentLanguageName;
-			LanguageListItem* lastAddedLanguage = NULL;
-			for (int i = 0; installedLanguages.FindString("langs",
-					i, &currentLanguageCode) == B_OK; i++) {
+		for (int i = 0; installedLanguages.FindString("langs",
+				i, &currentLanguageCode) == B_OK; i++) {
+			// Now get an human-readable, localized name for each language
+			BLanguage* currentLanguage;
+			be_locale_roster->GetLanguage(&currentLanguage,
+				currentLanguageCode.String());
 
-				// Now get an human-readable, loacalized name for each language
-				// TODO: sort them using collators.
-				BLanguage* currentLanguage;
-				be_locale_roster->GetLanguage(&currentLanguage,
-					currentLanguageCode.String());
+			currentLanguageName.Truncate(0);
+			currentLanguage->GetName(&currentLanguageName);
 
-				currentLanguageName.Truncate(0);
-				currentLanguage->GetName(&currentLanguageName);
-
-				LanguageListItem* si = new LanguageListItem(currentLanguageName,
-					currentLanguageCode.String());
-				if (currentLanguage->IsCountry()) {
-					fLanguageListView->AddUnder(si,lastAddedLanguage);
-				} else {
-					// This is a language without country, add it at top-level
-					fLanguageListView->AddItem(si);
-					si->SetExpanded(false);
-					lastAddedLanguage = si;
-				}
-
-				delete currentLanguage;
+			LanguageListItem* item = new LanguageListItem(currentLanguageName,
+				currentLanguageCode.String());
+			if (currentLanguage->IsCountry()) {
+				fLanguageListView->AddUnder(item, lastAddedCountryItem);
+			} else {
+				// This is a language without country, add it at top-level
+				fLanguageListView->AddItem(item);
+				item->SetExpanded(false);
+				lastAddedCountryItem = item;
 			}
 
-			fLanguageListView->SortItems(compare_list_items);
-				// see previous comment on sort using collators
-
-		} else {
-			BAlert* myAlert = new BAlert("Error",
-				TR("Unable to find the available languages! You can't use this "
-					"preflet!"),
-				TR("OK"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
-			myAlert->Go();
+			delete currentLanguage;
 		}
 
-		// Second list: active languages
-		fPreferredListView = new LanguageListView("preferred",
-			B_MULTIPLE_SELECTION_LIST);
-		BScrollView* scrollViewEnabled = new BScrollView("scroller",
-			fPreferredListView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
-
-		fPreferredListView
-			->SetInvocationMessage(new BMessage(kMsgPrefLangInvoked));
-
-		// get the preferred languages from the Settings. Move them here from
-		// the other list.
-		BMessage msg;
-		be_locale_roster->GetPreferredLanguages(&msg);
-		BString langCode;
-		for (int index = 0; msg.FindString("language", index, &langCode)
-					== B_OK;
-				index++) {
-			for (int listPos = 0; LanguageListItem* lli
-					= static_cast<LanguageListItem*>
-						(fLanguageListView->FullListItemAt(listPos));
-					listPos++) {
-				if (langCode == lli->LanguageCode()) {
-					// We found the item we were looking for, now move it to
-					// the other list along with all its children
-					static_cast<LanguageListView*>(fPreferredListView)
-						-> MoveItemFrom(fLanguageListView, fLanguageListView
-							-> FullListIndexOf(lli));
-				}
-			}
-		}
-
-		languageTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 10)
-			.AddGroup(B_VERTICAL, 10)
-				.Add(new BStringView("", TR("Available languages")))
-				.Add(scrollView)
-				.End()
-			.AddGroup(B_VERTICAL, 10)
-				.Add(new BStringView("", TR("Preferred languages")))
-				.Add(scrollViewEnabled)
-				.End()
-			.View());
+		fLanguageListView->FullListSortItems(compare_typed_list_items);
+	} else {
+		BAlert* myAlert = new BAlert("Error",
+			TR("Unable to find the available languages! You can't use this "
+				"preflet!"),
+			TR("OK"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
+		myAlert->Go();
 	}
+
+	// Second list: active languages
+	fPreferredListView = new LanguageListView("preferred",
+		B_MULTIPLE_SELECTION_LIST);
+	BScrollView* scrollViewEnabled = new BScrollView("scroller",
+		fPreferredListView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
+
+	fPreferredListView->SetInvocationMessage(new BMessage(kMsgPrefLangInvoked));
+
+	// get the preferred languages from the Settings. Move them here from
+	// the other list.
+	BMessage msg;
+	be_locale_roster->GetPreferredLanguages(&msg);
+	BString langCode;
+	for (int index = 0; msg.FindString("language", index, &langCode) == B_OK;
+			index++) {
+		for (int listPos = 0; LanguageListItem* item
+				= static_cast<LanguageListItem*>
+					(fLanguageListView->FullListItemAt(listPos));
+				listPos++) {
+			if (langCode == item->LanguageCode()) {
+				// We found the item we were looking for, now move it to
+				// the other list along with all its children
+				static_cast<LanguageListView*>(fPreferredListView)
+					->MoveItemFrom(fLanguageListView,
+						fLanguageListView->FullListIndexOf(item),
+						fLanguageListView->CountItems());
+			}
+		}
+	}
+
+	languageTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 10)
+		.AddGroup(B_VERTICAL, 10)
+			.Add(new BStringView("", TR("Available languages")))
+			.Add(scrollView)
+			.End()
+		.AddGroup(B_VERTICAL, 10)
+			.Add(new BStringView("", TR("Preferred languages")))
+			.Add(scrollViewEnabled)
+			.End()
+		.View());
 
 	BView* countryTab = new BView(TR("Country"), B_WILL_DRAW);
 	countryTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
-	{
-		BListView* listView = new BListView("country", B_SINGLE_SELECTION_LIST);
-		BScrollView* scrollView = new BScrollView("scroller",
-			listView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
-		listView->SetSelectionMessage(new BMessage(kMsgCountrySelection));
+	BListView* listView = new BListView("country", B_SINGLE_SELECTION_LIST);
+	scrollView = new BScrollView("scroller", listView,
+		B_WILL_DRAW | B_FRAME_EVENTS, false, true);
+	listView->SetSelectionMessage(new BMessage(kMsgCountrySelection));
 
-		// get all available countries from ICU
-		// Use DateFormat::getAvailableLocale so we get only the one we can
-		// use. Maybe check the NumberFormat one and see if there is more.
-		int32_t localeCount;
-		const Locale* currentLocale
-			= Locale::getAvailableLocales(localeCount);
+	// get all available countries from ICU
+	// Use DateFormat::getAvailableLocale so we get only the one we can
+	// use. Maybe check the NumberFormat one and see if there is more.
+	int32_t localeCount;
+	const Locale* currentLocale = Locale::getAvailableLocales(localeCount);
 
-		for (int index = 0; index < localeCount; index++)
-		{
-			UnicodeString countryFullName;
-			BString str;
-			BStringByteSink bbs(&str);
-			currentLocale[index].getDisplayName(countryFullName);
-			countryFullName.toUTF8(bbs);
-			LanguageListItem* si
-				= new LanguageListItem(str, currentLocale[index].getName());
-			listView->AddItem(si);
-			if (strcmp(currentLocale[index].getName(),
-					defaultCountry->Code()) == 0)
-				listView->Select(listView->CountItems() - 1);
-		}
+	for (int index = 0; index < localeCount; index++) {
+		UnicodeString countryFullName;
+		BString string;
+		BStringByteSink sink(&string);
+		currentLocale[index].getDisplayName(countryFullName);
+		countryFullName.toUTF8(sink);
 
-		// TODO: find a real solution intead of this hack
-		listView->SetExplicitMinSize(BSize(300, B_SIZE_UNSET));
-
-		fFormatView = new FormatView(defaultCountry);
-
-		countryTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 5)
-			.AddGroup(B_VERTICAL, 3)
-				.Add(scrollView)
-				.End()
-			.Add(fFormatView)
-			.View()
-		);
-
-		listView->ScrollToSelection();
+		LanguageListItem* item
+			= new LanguageListItem(string, currentLocale[index].getName());
+		listView->AddItem(item);
+		if (!strcmp(currentLocale[index].getName(), defaultCountry->Code()))
+			listView->Select(listView->CountItems() - 1);
 	}
+
+	// TODO: find a real solution intead of this hack
+	listView->SetExplicitMinSize(BSize(300, B_SIZE_UNSET));
+
+	fFormatView = new FormatView(defaultCountry);
+
+	countryTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 5)
+		.AddGroup(B_VERTICAL, 3)
+			.Add(scrollView)
+			.End()
+		.Add(fFormatView)
+		.View()
+	);
+
+	listView->ScrollToSelection();
 
 	tabView->AddTab(languageTab);
 	tabView->AddTab(countryTab);
@@ -247,22 +240,21 @@ LocaleWindow::MessageReceived(BMessage* message)
 
 		case kMsgPrefLanguagesChanged:
 		{
-				BMessage update(kMsgSettingsChanged);
-				int index = 0;
-				while (index < fPreferredListView->FullListCountItems()) {
-					// only include subitems : we can guess the superitem
-					// from them anyway
-					if (fPreferredListView->Superitem(fPreferredListView->
-								FullListItemAt(index))
-							!= NULL) {
-						update.AddString("language",
-							static_cast<LanguageListItem*>
-								(fPreferredListView->FullListItemAt(index))
-							-> LanguageCode());
-					}
-					index++;
+			BMessage update(kMsgSettingsChanged);
+			int index = 0;
+			while (index < fPreferredListView->FullListCountItems()) {
+				// only include subitems : we can guess the superitem
+				// from them anyway
+				if (fPreferredListView->Superitem(
+						fPreferredListView->FullListItemAt(index)) != NULL) {
+					LanguageListItem* item = static_cast<LanguageListItem*>(
+						fPreferredListView->FullListItemAt(index));
+					update.AddString("language", item->LanguageCode());
 				}
-				be_app_messenger.SendMessage(&update);
+				index++;
+			}
+			fLanguageListView->FullListSortItems(compare_typed_list_items);
+			be_app_messenger.SendMessage(&update);
 			break;
 		}
 
@@ -271,16 +263,19 @@ LocaleWindow::MessageReceived(BMessage* message)
 			// Country selection changed.
 			// Get the new selected country from the ListView and send it to the
 			// main app event handler.
-			void* ptr;
-			message->FindPointer("source", &ptr);
-			BListView* countryList = static_cast<BListView*>(ptr);
-			LanguageListItem* lli = static_cast<LanguageListItem*>
+			void* listView;
+			if (message->FindPointer("source", &listView) != B_OK)
+				break;
+
+			BListView* countryList = static_cast<BListView*>(listView);
+
+			LanguageListItem* item = static_cast<LanguageListItem*>
 				(countryList->ItemAt(countryList->CurrentSelection()));
 			BMessage newMessage(kMsgSettingsChanged);
-			newMessage.AddString("country",lli->LanguageCode());
+			newMessage.AddString("country", item->LanguageCode());
 			be_app_messenger.SendMessage(&newMessage);
 
-			BCountry* country = new BCountry(lli->LanguageCode());
+			BCountry* country = new BCountry(item->LanguageCode());
 			fFormatView->SetCountry(country);
 			break;
 		}
@@ -289,12 +284,10 @@ LocaleWindow::MessageReceived(BMessage* message)
 		{
 			int32 index = 0;
 			if (message->FindInt32("index", &index) == B_OK) {
-				LanguageListItem* listItem
-					= static_cast<LanguageListItem*>
-						(fLanguageListView->RemoveItem(index));
+				LanguageListItem* listItem = static_cast<LanguageListItem*>
+					(fLanguageListView->RemoveItem(index));
 				fPreferredListView->AddItem(listItem);
-				fPreferredListView
-					->Invoke(fMsgPrefLanguagesChanged);
+				fPreferredListView->Invoke(fMsgPrefLanguagesChanged);
 			}
 			break;
 		}
@@ -306,14 +299,11 @@ LocaleWindow::MessageReceived(BMessage* message)
 
 			int32 index = 0;
 			if (message->FindInt32("index", &index) == B_OK) {
-				LanguageListItem* listItem
-					= static_cast<LanguageListItem*>
-						(fPreferredListView->RemoveItem(index));
+				LanguageListItem* listItem = static_cast<LanguageListItem*>
+					(fPreferredListView->RemoveItem(index));
 				fLanguageListView->AddItem(listItem);
-				fLanguageListView->SortItems(compare_list_items);
-					// see previous comment on sort using collators
-				fPreferredListView
-					->Invoke(fMsgPrefLanguagesChanged);
+				fLanguageListView->FullListSortItems(compare_typed_list_items);
+				fPreferredListView->Invoke(fMsgPrefLanguagesChanged);
 			}
 			break;
 		}

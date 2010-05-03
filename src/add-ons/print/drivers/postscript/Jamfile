@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
-AddResources PS\ Compatible : PS.rsrc ;
+AddResources PS\ Compatible : PS.rdef ;
 
 Addon PS\ Compatible :
 	PSEntry.cpp

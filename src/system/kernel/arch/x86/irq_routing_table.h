@@ -1,3 +1,7 @@
+/*
+ * Copyright 2010, Clemens Zeidler, haiku@clemens-zeidler.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef IRQ_ROUTING_TABLE_H
 #define IRQ_ROUTING_TABLE_H
 
@@ -9,8 +13,7 @@
 #include "util/Vector.h"
 
 
-struct irq_routing_entry
-{
+struct irq_routing_entry {
 	int				device_address;
 	int8			pin;
 
@@ -26,8 +29,7 @@ struct irq_routing_entry
 typedef Vector<irq_routing_entry> IRQRoutingTable;
 
 
-struct irq_descriptor
-{
+struct irq_descriptor {
 	irq_descriptor();
 	// bit 0 is interrupt 0, bit 2 is interrupt 2, and so on
 	int16			irq;
@@ -39,15 +41,14 @@ struct irq_descriptor
 };
 
 
-/* Similar to bus_managers/acpi/include/acrestyp.h definition */
-typedef struct acpi_prt
-{
+// Similar to bus_managers/acpi/include/acrestyp.h definition
+typedef struct acpi_prt {
 	uint32			length;
 	uint32			pin;
-	int				address;		/* here for 64-bit alignment */
+	int				address;		// here for 64-bit alignment
 	uint32			sourceIndex;
-	char			source[4];		/* pad to 64 bits so sizeof() works in
-									all cases */
+	char			source[4];		// pad to 64 bits so sizeof() works in
+									// all cases
 } acpi_pci_routing_table;
 
 
@@ -68,4 +69,4 @@ status_t read_possible_irq(acpi_module_info* acpi, acpi_handle device,
 status_t set_acpi_irq(acpi_module_info* acpi, acpi_handle device,
 			irq_descriptor* descriptor);
 
-#endif
+#endif	// IRQ_ROUTING_TABLE_H

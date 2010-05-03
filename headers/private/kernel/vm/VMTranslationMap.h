@@ -12,10 +12,11 @@
 #include <kernel.h>
 #include <lock.h>
 
+#include <vm/VMArea.h>
+
 
 struct kernel_args;
 struct vm_page_reservation;
-struct VMArea;
 
 
 struct VMTranslationMap {
@@ -32,8 +33,8 @@ struct VMTranslationMap {
 									addr_t end) const = 0;
 
 	virtual	status_t			Map(addr_t virtualAddress,
-									addr_t physicalAddress,
-									uint32 attributes,
+									addr_t physicalAddress, uint32 attributes,
+									uint32 memoryType,
 									vm_page_reservation* reservation) = 0;
 	virtual	status_t			Unmap(addr_t start, addr_t end) = 0;
 
@@ -54,7 +55,7 @@ struct VMTranslationMap {
 									uint32* _flags) = 0;
 
 	virtual	status_t			Protect(addr_t base, addr_t top,
-									uint32 attributes) = 0;
+									uint32 attributes, uint32 memoryType) = 0;
 			status_t			ProtectPage(VMArea* area, addr_t address,
 									uint32 attributes);
 			status_t			ProtectArea(VMArea* area,
@@ -119,7 +120,8 @@ struct VMPhysicalPageMapper {
 inline status_t
 VMTranslationMap::ProtectPage(VMArea* area, addr_t address, uint32 attributes)
 {
-	return Protect(address, address + B_PAGE_SIZE - 1, attributes);
+	return Protect(address, address + B_PAGE_SIZE - 1, attributes,
+		area->MemoryType());
 }
 
 
@@ -127,7 +129,8 @@ VMTranslationMap::ProtectPage(VMArea* area, addr_t address, uint32 attributes)
 inline status_t
 VMTranslationMap::ProtectArea(VMArea* area, uint32 attributes)
 {
-	return Protect(area->Base(), area->Base() + area->Size() - 1, attributes);
+	return Protect(area->Base(), area->Base() + area->Size() - 1, attributes,
+		area->MemoryType());
 }
 
 

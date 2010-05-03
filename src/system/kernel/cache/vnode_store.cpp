@@ -36,10 +36,8 @@ VMVnodeCache::Init(struct vnode *vnode, uint32 allocationFlags)
 bool
 VMVnodeCache::HasPage(off_t offset)
 {
-	// We always pretend to have the page - even if it's beyond the size of
-	// the file. The read function will only cut down the size of the read,
-	// it won't fail because of that.
-	return true;
+	return ROUNDUP(offset, B_PAGE_SIZE) >= virtual_base
+		&& offset < virtual_end;
 }
 
 
@@ -103,6 +101,10 @@ VMVnodeCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
 status_t
 VMVnodeCache::Fault(struct VMAddressSpace *aspace, off_t offset)
 {
+	if (!HasPage(offset))
+		return B_BAD_ADDRESS;
+
+	// vm_soft_fault() reads the page in.
 	return B_BAD_HANDLER;
 }
 

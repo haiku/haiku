@@ -29,6 +29,7 @@
 #ifndef ACPI_EMBEDDED_CONTROLLER_H
 #define ACPI_EMBEDDED_CONTROLLER_H
 
+
 #include <ctype.h>
 
 #include <ACPI.h>
@@ -39,11 +40,12 @@
 #include <lock.h>
 
 extern "C" {
-#include "acpi.h"
-#include "accommon.h"
-#include "acnamesp.h"
-#include "acpi_priv.h"
+#	include "acpi.h"
+#	include "accommon.h"
+#	include "acnamesp.h"
+#	include "acpi_priv.h"
 }
+
 
 // #define TRACE_EMBEDDED_CONTROLLER
 #ifdef TRACE_EMBEDDED_CONTROLLER
@@ -145,7 +147,7 @@ struct acpi_ec_cookie {
 	acpi_handle					ec_gpehandle;
 	uint8						ec_gpebit;
 
-	int							ec_data_pci_address; 
+	int							ec_data_pci_address;
 	int							ec_csr_pci_address;
 
 	int							ec_glk;
@@ -157,7 +159,6 @@ struct acpi_ec_cookie {
 	ConditionVariable			ec_condition_var;
 	int							ec_suspending;
 };
-
 
 
 /*
@@ -186,6 +187,7 @@ static int		ec_polled_mode = 0;
 
 static int		ec_timeout = EC_TIMEOUT;
 
+
 static status_t
 EcLock(struct acpi_ec_cookie *sc)
 {
@@ -205,7 +207,7 @@ EcLock(struct acpi_ec_cookie *sc)
 static void
 EcUnlock(struct acpi_ec_cookie *sc)
 {
-	mutex_unlock(&sc->ec_lock);    
+	mutex_unlock(&sc->ec_lock);
 	if (sc->ec_glk)
 		sc->ec_acpi_module->release_global_lock(sc->ec_glkhandle);
 }

@@ -11,9 +11,9 @@
 #include <scsi.h>
 #include <scsi_periph.h>
 
-#include "dma_resources.h"
-#include "IORequest.h"
-#include "IOScheduler.h"
+
+struct DMAResource;
+struct IOScheduler;
 
 
 #define SCSI_DISK_DRIVER_MODULE_NAME "drivers/disk/scsi/scsi_disk/driver_v1"

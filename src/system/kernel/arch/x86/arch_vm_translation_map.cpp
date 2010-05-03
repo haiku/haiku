@@ -151,12 +151,44 @@ early_query(addr_t va, addr_t *_physicalAddress)
 }
 
 
+static inline uint32
+memory_type_to_pte_flags(uint32 memoryType)
+{
+	// ATM we only handle the uncacheable and write-through type explicitly. For
+	// all other types we rely on the MTRRs to be set up correctly. Since we set
+	// the default memory type to write-back and since the uncacheable type in
+	// the PTE overrides any MTRR attribute (though, as per the specs, that is
+	// not recommended for performance reasons), this reduces the work we
+	// actually *have* to do with the MTRRs to setting the remaining types
+	// (usually only write-combining for the frame buffer).
+	switch (memoryType) {
+		case B_MTR_UC:
+			return X86_PTE_CACHING_DISABLED | X86_PTE_WRITE_THROUGH;
+
+		case B_MTR_WC:
+			// X86_PTE_WRITE_THROUGH would be closer, but the combination with
+			// MTRR WC is "implementation defined" for Pentium Pro/II.
+			return 0;
+
+		case B_MTR_WT:
+			return X86_PTE_WRITE_THROUGH;
+
+		case B_MTR_WP:
+		case B_MTR_WB:
+		default:
+			return 0;
+	}
+}
+
+
 static void
 put_page_table_entry_in_pgtable(page_table_entry* entry,
-	addr_t physicalAddress, uint32 attributes, bool globalPage)
+	addr_t physicalAddress, uint32 attributes, uint32 memoryType,
+	bool globalPage)
 {
 	page_table_entry page = (physicalAddress & X86_PTE_ADDRESS_MASK)
-		| X86_PTE_PRESENT | (globalPage ? X86_PTE_GLOBAL : 0);
+		| X86_PTE_PRESENT | (globalPage ? X86_PTE_GLOBAL : 0)
+		| memory_type_to_pte_flags(memoryType);
 
 	// if the page is user accessible, it's automatically
 	// accessible in kernel space, too (but with the same
@@ -402,7 +434,7 @@ X86VMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 
 status_t
 X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes,
-	vm_page_reservation* reservation)
+	uint32 memoryType, vm_page_reservation* reservation)
 {
 	TRACE("map_tmap: entry pa 0x%lx va 0x%lx\n", pa, va);
 
@@ -457,7 +489,7 @@ X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes,
 		"virtual address: %#" B_PRIxADDR ", existing pte: %#" B_PRIx32, va,
 		pt[index]);
 
-	put_page_table_entry_in_pgtable(&pt[index], pa, attributes,
+	put_page_table_entry_in_pgtable(&pt[index], pa, attributes, memoryType,
 		IS_KERNEL_MAP(map));
 
 	pinner.Unlock();
@@ -971,7 +1003,8 @@ X86VMTranslationMap::MappedSize() const
 
 
 status_t
-X86VMTranslationMap::Protect(addr_t start, addr_t end, uint32 attributes)
+X86VMTranslationMap::Protect(addr_t start, addr_t end, uint32 attributes,
+	uint32 memoryType)
 {
 	page_directory_entry *pd = fArchData->pgdir_virt;
 
@@ -1023,8 +1056,8 @@ restart:
 		page_table_entry oldEntry;
 		while (true) {
 			oldEntry = test_and_set_page_table_entry(&pt[index],
-				(entry & ~(X86_PTE_WRITABLE | X86_PTE_USER))
-					| newProtectionFlags,
+				(entry & ~(X86_PTE_PROTECTION_MASK | X86_PTE_MEMORY_TYPE_MASK))
+					| newProtectionFlags | memory_type_to_pte_flags(memoryType),
 				entry);
 			if (oldEntry == entry)
 				break;
@@ -1446,7 +1479,7 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 
 	// now, fill in the pentry
 	put_page_table_entry_in_pgtable(sPageHole + va / B_PAGE_SIZE, pa,
-		attributes, IS_KERNEL_ADDRESS(va));
+		attributes, 0, IS_KERNEL_ADDRESS(va));
 
 	return B_OK;
 }

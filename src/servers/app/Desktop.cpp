@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -3251,8 +3251,10 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 	}
 
 	// Set new focus, but keep focus to a floating window if still visible
-	if (!_Windows(index).HasWindow(FocusWindow())
-		|| !FocusWindow()->IsFloating())
+	if (movedWindow != NULL)
+		SetFocusWindow(movedWindow);
+	else if (!_Windows(index).HasWindow(FocusWindow())
+		|| (FocusWindow() != NULL && !FocusWindow()->IsFloating()))
 		SetFocusWindow(fLastWorkspaceFocus[index]);
 
 	_WindowChanged(NULL);

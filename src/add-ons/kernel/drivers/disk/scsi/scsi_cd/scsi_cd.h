@@ -13,7 +13,10 @@
 
 #include "dma_resources.h"
 #include "IORequest.h"
-#include "IOScheduler.h"
+
+
+struct IOCache;
+struct IOScheduler;
 
 
 #define SCSI_CD_DRIVER_MODULE_NAME "drivers/disk/scsi/scsi_cd/driver_v1"

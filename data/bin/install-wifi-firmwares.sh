@@ -8,8 +8,8 @@
 #
 # Synopsis:
 #	Provide a mechanism for end-users to install various firmwares for wireless
-#	network cards in a manner that complies with their individual licenses. 
-# 
+#	network cards in a manner that complies with their individual licenses.
+#
 # Supported chipsets:
 # 	Intel ipw2100
 #	Intel ipw2200/2225/2915
@@ -37,15 +37,15 @@ function DisplayAlert()
 	case "${result}" in
 		"$VIEW")
 			ViewLicenses ;
-			DisplayAlert ; 
+			DisplayAlert ;
 			;;
 		"$ABORT")
 			exit 0 ;;
-		"$OK")	
+		"$OK")
 			InstallAllFirmwares ;
 			exit 0 ;
 			;;
-	esac	
+	esac
 }
 
 
@@ -66,7 +66,7 @@ function ViewLicenses()
 
 EOF
 	cat "$intelLicense" >> $license
-	
+
 	open $license
 }
 
@@ -207,7 +207,7 @@ function InstallIprowifi2200()
 	gunzip < "${firmwareDir}/${driver}/$file" | tar xf -
 
 	# Install the firmware & license file.
-	cd "${tempDir}/ipw2200-fw-3.1"	
+	cd "${tempDir}/ipw2200-fw-3.1"
 	mv LICENSE.ipw2200-fw "${firmwareDir}/${driver}/"
 	mv ipw2200-ibss.fw "${firmwareDir}/${driver}/"
 	mv ipw2200-sniffer.fw "${firmwareDir}/${driver}/"
@@ -292,7 +292,7 @@ function BuildBroadcomFWCutter()
 	DownloadFileIfNotCached ${baseURL}/include/arch/x86/bits/byteswap.h byteswap.h $dir/bits
 	if [ $result -gt 0 ]; then
 		return $result
-	fi	
+	fi
 
 	# Copy those files to working directory.
 	mkdir -p bits
@@ -315,13 +315,15 @@ function CutAndInstallBroadcomFirmware()
 {
 	# Download firmware.
 	local file="wl_apsta-3.130.20.0.o"
+	local dir="${firmwareDir}/${driver}"
 	local url='http://downloads.openwrt.org/sources/wl_apsta-3.130.20.0.o'
-	DownloadFileIfNotCached $url $file $tempDir
+	DownloadFileIfNotCached $url $file $dir
 	if [ $result -gt 0 ]; then
 		return $result
 	fi
 
 	# Cut firmware in pieces.
+	cp "$dir/$file" "$tempDir"
 	cd "$tempDir"
 	b43-fwcutter $file > /dev/null 2>&1
 

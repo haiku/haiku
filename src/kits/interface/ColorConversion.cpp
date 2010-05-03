@@ -308,6 +308,23 @@ PaletteConverter::IndexForRGB24(uint8 red, uint8 green, uint8 blue) const
 }
 
 
+/*!	\brief Returns the palette color index closest to a given RGBA 32 color.
+
+	The object must be properly initialized.
+
+	\param rgb The RGB 32A color value (R[31:24]G[23:16]B[15:8]A[7:0]).
+	\return The palette color index for the supplied color.
+*/
+inline
+uint8
+PaletteConverter::IndexForRGBA32(uint32 rgba) const
+{
+	if ((rgba & 0x000000ff) < 128)
+		return B_TRANSPARENT_MAGIC_CMAP8;
+	return IndexForRGB24(rgba);
+}
+
+
 /*!	\brief Returns the palette color index closest to a given Gray 8 color.
 
 	The object must be properly initialized.
@@ -539,7 +556,7 @@ ReadGray1(const uint8 **source, int32 index)
 void
 WriteCMAP8(uint8 **dest, uint8 *data, int32 index)
 {
-	**dest = sPaletteConverter.IndexForRGB15(*(uint16 *)data);
+	**dest = sPaletteConverter.IndexForRGBA32(*(uint32 *)data);
 	(*dest)++;
 }
 
@@ -836,11 +853,11 @@ ConvertBits(const srcByte *srcBits, void *dstBits, int32 srcBitsLength,
 		case B_CMAP8:
 			PaletteConverter::InitializeDefault();
 			ConvertBits(srcBits, (uint8 *)dstBits, srcBitsLength,
-				dstBitsLength, redShift - 15, greenShift - 10, blueShift - 5,
-				0, 0, 0x7c00, 0x03e0, 0x001f, 0x0000, srcBytesPerRow,
-				dstBytesPerRow, srcBitsPerPixel, 8, srcColorSpace,
-				dstColorSpace, srcOffset, dstOffset, width, height, srcSwap,
-				false, srcFunc, WriteCMAP8);
+				dstBitsLength, redShift - 32, greenShift - 24, blueShift - 16,
+				alphaShift - 8, alphaBits, 0xff000000, 0x00ff0000, 0x0000ff00,
+				0x000000ff, srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 8,
+				srcColorSpace, dstColorSpace, srcOffset, dstOffset,
+				width, height, srcSwap, false, srcFunc, WriteCMAP8);
 			break;
 
 		default:

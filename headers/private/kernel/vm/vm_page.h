@@ -60,9 +60,7 @@ bool vm_page_try_reserve_pages(vm_page_reservation* reservation, uint32 count,
 struct vm_page *vm_page_allocate_page(vm_page_reservation* reservation,
 	uint32 flags);
 struct vm_page *vm_page_allocate_page_run(uint32 flags, addr_t base,
-	addr_t length, int priority);
-struct vm_page *vm_page_allocate_page_run_no_base(uint32 flags, addr_t count,
-	int priority);
+	size_t length, int priority);
 struct vm_page *vm_page_at_index(int32 index);
 struct vm_page *vm_lookup_page(addr_t pageNumber);
 bool vm_page_is_dummy(struct vm_page *page);

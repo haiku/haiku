@@ -114,10 +114,22 @@
  *****************************************************************************/
 
 
-#include <OS.h>
+
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
+
+#include <OS.h>
+
+#ifdef _KERNEL_MODE
+#	include <KernelExport.h>
+
+#	include <dpc.h>
+#	include <PCI.h>
+
+#	include <kernel.h>
+#	include <vm/vm.h>
+#endif
 
 #include "acpi.h"
 #include "accommon.h"
@@ -125,18 +137,6 @@
 #include "acparser.h"
 #include "acdebug.h"
 
-#ifdef _KERNEL_MODE
-#include <KernelExport.h>
-
-#include <dpc.h>
-#include <PCI.h>
-#include <vm/vm.h>
-
-
-extern pci_module_info *gPCIManager;
-extern dpc_module_info *gDPC;
-extern void *gDPCHandle;
-#endif
 
 ACPI_MODULE_NAME("Haiku ACPI Module")
 
@@ -169,6 +169,12 @@ ACPI_MODULE_NAME("Haiku ACPI Module")
 #	endif
 #endif
 
+
+#ifdef _KERNEL_MODE
+extern pci_module_info *gPCIManager;
+extern dpc_module_info *gDPC;
+extern void *gDPCHandle;
+#endif
 
 extern FILE *AcpiGbl_DebugFile;
 FILE *AcpiGbl_OutputFile;
@@ -819,7 +825,10 @@ void
 AcpiOsSleep(ACPI_INTEGER milliseconds)
 {
 	DEBUG_FUNCTION_F("milliseconds: %lu", milliseconds);
-	snooze(milliseconds * 1000);
+	if (gKernelStartup)
+		spin(milliseconds * 1000);
+	else
+		snooze(milliseconds * 1000);
 }
 
 

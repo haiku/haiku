@@ -1,12 +1,14 @@
 /*
- * Copyright 2002-2005, Haiku.
+ * Copyright 2002-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Francois Revol (mmu_man@users.sf.net)
  */
 
+
 /*!	Shuts down the system, either halting or rebooting. */
+
 
 #include <syscalls.h>
 
@@ -21,12 +23,14 @@
 #include <unistd.h>
 #include <ctype.h>
 
+
 uint32 gTimeToSleep = 0;
 bool gReboot = false;
 
-// we get here when shutdown is cancelled.
-// then sleep() returns
 
+/*!	We get here when shutdown is cancelled.
+	Then sleep() returns.
+*/
 void
 handle_usr1(int sig)
 {
@@ -107,19 +111,23 @@ main(int argc, char **argv)
 						break;
 					case 'c':
 					{
-						// find all running shutdown command and signal its shutdown thread
-	
+						// find all running shutdown commands and signal their
+						// shutdown threads
+
 						thread_info threadInfo;
 						get_thread_info(find_thread(NULL), &threadInfo);
-			
+
 						team_id thisTeam = threadInfo.team;
-			
+
 						int32 team_cookie = 0;
 						team_info teamInfo;
-						while (get_next_team_info(&team_cookie, &teamInfo) == B_OK) {
-							if (strstr(teamInfo.args, "shutdown") != NULL && teamInfo.team != thisTeam) {
+						while (get_next_team_info(&team_cookie, &teamInfo)
+								== B_OK) {
+							if (strstr(teamInfo.args, "shutdown") != NULL
+								&& teamInfo.team != thisTeam) {
 								int32 thread_cookie = 0;
-								while (get_next_thread_info(teamInfo.team, &thread_cookie, &threadInfo) == B_OK) {
+								while (get_next_thread_info(teamInfo.team,
+										&thread_cookie, &threadInfo) == B_OK) {
 									if (!strcmp(threadInfo.name, "shutdown"))
 										kill(threadInfo.thread, SIGUSR1);
 								}
@@ -148,7 +156,8 @@ main(int argc, char **argv)
 
 		signal(SIGUSR1, handle_usr1);
 
-		printf("Delaying %s by %lu seconds...\n", gReboot ? "reboot" : "shutdown", gTimeToSleep);
+		printf("Delaying %s by %lu seconds...\n",
+			gReboot ? "reboot" : "shutdown", gTimeToSleep);
 
 		left = sleep(gTimeToSleep);
 
@@ -162,7 +171,7 @@ main(int argc, char **argv)
 		#ifdef __HAIKU__
 		_kern_shutdown(gReboot);
 		#endif // __HAIKU__
-		fprintf(stderr, "Shutdown failed!\n");
+		fprintf(stderr, "Shutdown failed! (Do you have ACPI enabled?)\n");
 		return 2;
 	} else {
 		BRoster roster;

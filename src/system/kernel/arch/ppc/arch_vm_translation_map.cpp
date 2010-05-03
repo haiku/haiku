@@ -146,8 +146,8 @@ struct PPCVMTranslationMap : VMTranslationMap {
 									addr_t end) const;
 
 	virtual	status_t			Map(addr_t virtualAddress,
-									addr_t physicalAddress,
-									uint32 attributes,
+									addr_t physicalAddress, uint32 attributes,
+									uint32 memoryType,
 									vm_page_reservation* reservation);
 	virtual	status_t			Unmap(addr_t start, addr_t end);
 
@@ -162,7 +162,7 @@ struct PPCVMTranslationMap : VMTranslationMap {
 									uint32* _flags);
 
 	virtual	status_t			Protect(addr_t base, addr_t top,
-									uint32 attributes);
+									uint32 attributes, uint32 memoryType);
 	virtual	status_t			ClearFlags(addr_t virtualAddress,
 									uint32 flags);
 
@@ -396,8 +396,9 @@ PPCVMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 
 status_t
 PPCVMTranslationMap::Map(addr_t virtualAddress, addr_t physicalAddress,
-	uint32 attributes, vm_page_reservation* reservation)
+	uint32 attributes, uint32 memoryType, vm_page_reservation* reservation)
 {
+// TODO: Support memory types!
 	// lookup the vsid based off the va
 	uint32 virtualSegmentID = VADDR_TO_VSID(fVSIDBase, virtualAddress);
 	uint32 protection = 0;
@@ -592,7 +593,8 @@ PPCVMTranslationMap::MappedSize() const
 
 
 status_t
-PPCVMTranslationMap::Protect(addr_t base, addr_t top, uint32 attributes)
+PPCVMTranslationMap::Protect(addr_t base, addr_t top, uint32 attributes,
+	uint32 memoryType)
 {
 	// XXX finish
 	return B_ERROR;
@@ -866,7 +868,7 @@ ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
 	for (; virtualAddress < virtualEnd;
 		 virtualAddress += B_PAGE_SIZE, physicalAddress += B_PAGE_SIZE) {
 		status_t error = map->Map(virtualAddress, physicalAddress,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &reservation);
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, &reservation);
 		if (error != B_OK)
 			return error;
 	}

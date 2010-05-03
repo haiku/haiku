@@ -1044,20 +1044,25 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 }
 
 
+/*!	Spin on non-boot CPUs until smp_wake_up_non_boot_cpus() has been called.
+
+	\param cpu The index of the calling CPU.
+	\param rendezVous A rendez-vous variable to make sure that the boot CPU
+		does not return before all other CPUs have started waiting.
+	\return \c true on the boot CPU, \c false otherwise.
+*/
 bool
-smp_trap_non_boot_cpus(int32 cpu)
+smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 {
-	if (cpu > 0) {
-#if B_DEBUG_SPINLOCK_CONTENTION
-		boot_cpu_spin[cpu].lock = 1;
-#else
-		boot_cpu_spin[cpu] = 1;
-#endif
-		acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
-		return false;
+	if (cpu == 0) {
+		smp_cpu_rendezvous(rendezVous, cpu);
+		return true;
 	}
 
-	return true;
+	acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
+	smp_cpu_rendezvous(rendezVous, cpu);
+	acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
+	return false;
 }
 
 
@@ -1076,7 +1081,17 @@ smp_wake_up_non_boot_cpus()
 	}
 }
 
-/* have all cpus spin until all have run */
+
+/*!	Spin until all CPUs have reached the rendez-vous point.
+
+	The rendez-vous variable \c *var must have been initialized to 0 before the
+	function is called. The variable will be non-null when the function returns.
+
+	Note that when the function returns on one CPU, it only means that all CPU
+	have already entered the function. It does not mean that the variable can
+	already be reset. Only when all CPUs have returned (which would have to be
+	ensured via another rendez-vous) the variable can be reset.
+*/
 void
 smp_cpu_rendezvous(volatile uint32 *var, int current_cpu)
 {
@@ -1085,6 +1100,7 @@ smp_cpu_rendezvous(volatile uint32 *var, int current_cpu)
 	while (*var != (((uint32)1 << sNumCPUs) - 1))
 		PAUSE();
 }
+
 
 status_t
 smp_init(kernel_args *args)

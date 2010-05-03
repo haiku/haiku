@@ -42,10 +42,9 @@
 	// Usable from userland according to its protection flags, but the area
 	// itself is not deletable, resizable, etc from userland.
 
-#define B_USER_AREA_FLAGS		(B_USER_PROTECTION)
+#define B_USER_AREA_FLAGS		(B_USER_PROTECTION | B_OVERCOMMITTING_AREA)
 #define B_KERNEL_AREA_FLAGS \
-	(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA | B_OVERCOMMITTING_AREA \
-		| B_SHARED_AREA)
+	(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA | B_SHARED_AREA)
 
 // mapping argument for several internal VM functions
 enum {

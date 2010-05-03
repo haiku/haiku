@@ -121,22 +121,6 @@ BSlowContextMenu::DetachedFromWindow()
 	//	if this changes, BeMenu and RecentsMenu
 	//	in Deskbar should also change
 	fTypesList = NULL;
-				
-	uint32 buttons;
-	BPoint location;
-	GetMouse(&location, &buttons);
-	//	if we are tracking a drag,
-	//	don't send this message
-	if (buttons == 0) {
-		//	send a special message to ContainerWindow
-		//	this will occur and be used only if
-		//	the dropped occurred in the pose (drop on an icon),
-		//	not in the menu
-		BMessage message(kContextMenuDragNDrop);
-		ConvertToScreen(&location);
-		message.AddPoint("_drop_point_", location);
-		fMessenger.SendMessage(&message);
-	}
 }
 
 

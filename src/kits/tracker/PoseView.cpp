@@ -2065,23 +2065,6 @@ BPoseView::MessageReceived(BMessage *message)
 		return;
 
 	switch (message->what) {
-		case kContextMenuDragNDrop:
-		{
-			BContainerWindow *window = ContainerWindow();
-			if (window && window->Dragging()) {
-				BPoint droppoint, dropoffset;
-				if (message->FindPoint("_drop_point_", &droppoint) == B_OK) {
-					BMessage* dragmessage = window->DragMessage();
-					dragmessage->FindPoint("click_pt", &dropoffset);
-					dragmessage->AddPoint("_drop_point_", droppoint);
-					dragmessage->AddPoint("_drop_offset_", dropoffset);
-					HandleMessageDropped(dragmessage);
-				}
-				DragStop();
-			}
-			break;
-		}
-
 		case kAddNewPoses:
 		{
 			AddPosesResult *currentPoses;
@@ -3651,7 +3634,13 @@ BPoseView::AddToVSList(BPose *pose)
 int32
 BPoseView::RemoveFromVSList(const BPose *pose)
 {
-	int32 index = FirstIndexAtOrBelow((int32)pose->Location(this).y);
+	//int32 index = FirstIndexAtOrBelow((int32)pose->Location(this).y);
+		// This optimisation is buggy and the index returned can be greater
+		// than the actual index of the pose we search, thus missing it
+		// and failing to remove it. This having severe implications
+		// everywhere in the code as it is asserted that it must be always
+		// in sync with fPoseList. See ticket #4322.
+	int32 index = 0;
 
 	int32 count = fVSPoseList->CountItems();
 	for (; index < count; index++) {
@@ -4648,6 +4637,9 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 		return;
 
 	ASSERT(srcWindow->PoseView()->TargetModel());
+	
+	if (srcWindow->PoseView()->SelectionList()->CountItems() == 0)
+		return;
 
 	bool createRelativeLink = relativeLink;
 	if (((buttons & B_SECONDARY_MOUSE_BUTTON)
@@ -6192,6 +6184,10 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 			SelectPose(pose, index);
 			break;
 		}
+		
+		case B_FUNCTION_KEY:
+		case B_INSERT:
+			break;
 
 		default:
 		{

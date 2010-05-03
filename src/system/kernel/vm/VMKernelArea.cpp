@@ -33,7 +33,8 @@ VMKernelArea::Create(VMAddressSpace* addressSpace, const char* name,
 		return NULL;
 
 	if (area->Init(name, allocationFlags) != B_OK) {
-		delete area;
+		area->~VMKernelArea();
+		free_etc(area, allocationFlags);
 		return NULL;
 	}
 

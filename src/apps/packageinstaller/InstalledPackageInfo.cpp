@@ -213,7 +213,6 @@ InstalledPackageInfo::Uninstall()
 	// Try to remove all entries that are present in the list
 	for (i = 0; i < count; i++) {
 		iter = static_cast<BString *>(fInstalledItems.ItemAt(count - i - 1));
-		fprintf(stderr, "Removing: %s (%ld/%ld)\n", iter->String(), i, count);
 		ret = entry.SetTo(iter->String());
 		if (ret == B_BUSY) {
 			// The entry's directory is locked - wait a few cycles for it to
@@ -235,10 +234,7 @@ InstalledPackageInfo::Uninstall()
 			return fStatus;
 		}
 
-		fprintf(stderr, "...we continue\n");
-
 		if (entry.Exists() && entry.Remove() != B_OK) {
-			fprintf(stderr, "\n%s\n", strerror(ret));
 			fStatus = B_ERROR;
 			return fStatus;
 		}
