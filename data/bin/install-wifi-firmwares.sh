@@ -77,7 +77,6 @@ function InstallAllFirmwares()
 	InstallIprowifi2200
 	InstallBroadcom43xx
 	InstallMarvell88w8335
-	echo "All firmwares successfully installed."
 }
 
 
