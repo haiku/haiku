@@ -589,7 +589,7 @@ PackageView::_GroupChanged(int32 index)
 				}
 			}
 
-			if (item) {
+			if (item != NULL) {
 				item->SetMarked(true);
 				fCurrentPath.SetTo(path.Path());
 			}
@@ -600,17 +600,18 @@ PackageView::_GroupChanged(int32 index)
 			fDestination->AddItem(item);
 
 			fDestField->SetEnabled(true);
-		}
-		else if (prof->path_type == P_USER_PATH) {
+		} else if (prof->path_type == P_USER_PATH) {
 			BString name;
+			bool defaultPathSet = false;
 			char sizeString[32], volumeName[B_FILE_NAME_LENGTH];
 			BVolumeRoster roster;
 			BDirectory mountPoint;
 
 			while (roster.GetNextVolume(&volume) != B_BAD_VALUE) {
-				if (volume.IsReadOnly() ||
-						volume.GetRootDirectory(&mountPoint) != B_OK)
+				if (volume.IsReadOnly() || !volume.IsPersistent()
+					|| volume.GetRootDirectory(&mountPoint) != B_OK) {
 					continue;
+				}
 
 				if (path.SetTo(&mountPoint, NULL) != B_OK)
 					continue;
@@ -625,11 +626,17 @@ PackageView::_GroupChanged(int32 index)
 				item = new BMenuItem(name.String(), temp);
 				item->SetTarget(this);
 				fDestination->AddItem(item);
+
+				// The first volume becomes the default element
+				if (!defaultPathSet) {
+					item->SetMarked(true);
+					fCurrentPath.SetTo(path.Path());
+					defaultPathSet = true;
+				}
 			}
 
 			fDestField->SetEnabled(true);
-		}
-		else
+		} else
 			fDestField->SetEnabled(false);
 	}
 
