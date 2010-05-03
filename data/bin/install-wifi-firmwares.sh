@@ -77,6 +77,7 @@ function InstallAllFirmwares()
 	InstallIprowifi2200
 	InstallBroadcom43xx
 	InstallMarvell88w8335
+	echo "All firmwares successfully installed."
 }
 
 
@@ -315,13 +316,15 @@ function CutAndInstallBroadcomFirmware()
 {
 	# Download firmware.
 	local file="wl_apsta-3.130.20.0.o"
+	local dir="${firmwareDir}/${driver}"
 	local url='http://downloads.openwrt.org/sources/wl_apsta-3.130.20.0.o'
-	DownloadFileIfNotCached $url $file $tempDir
+	DownloadFileIfNotCached $url $file $dir
 	if [ $result -gt 0 ]; then
 		return $result
 	fi
 
 	# Cut firmware in pieces.
+	cp "$dir/$file" "$tempDir"
 	cd "$tempDir"
 	b43-fwcutter $file > /dev/null 2>&1
 
