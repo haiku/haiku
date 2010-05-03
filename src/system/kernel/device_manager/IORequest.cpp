@@ -909,6 +909,7 @@ IORequest::NotifyFinished()
 		}
 	}
 
+	ASSERT(!fIsNotified);
 	ASSERT(fPendingChildren == 0);
 	ASSERT(fChildren.IsEmpty()
 		|| dynamic_cast<IOOperation*>(fChildren.Head()) == NULL);
