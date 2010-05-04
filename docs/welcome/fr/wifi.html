@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+* 		Matt Madia who wrote http://www.haiku-os.org/guides/wifi 
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Wifi</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../de/wifi.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../ru/wifi.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/wifi.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../uk/wifi.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../en/wifi.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+   <a href="../welcome_fr.html" class="uplink">Welcome</a>
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2>Wifi in Haiku</h2>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="hardware" rel="nofollow" id="hardware">Expected supported hardware</a></h3>
+<p>All of FreeBSD 8 wlan drivers should be working. Any PCMCIA, CardBus, ExpressCard, USB or ISA based cards will not work. Only PCI, miniPCI, PCI-Express, miniPci-Express and PCI-X are supposed to work.<br />
+This includes:
+</p>
+<ul>
+<li><p><i>aironetwifi</i> supporting at least<br />
+Cisco Aironet 350 Series<br />
+Aironet PCI4500<br />
+Aironet PCI4800<br />
+</p></li>
+<li><p><i>atheroswifi</i> supporting almost every chipset outthere (though no AR9285 chips)</p></li>
+<li><p><i>broadcom43xx</i> supporting<br />
+BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 and BCM4318
+</p></li>
+<li><p><i>iprowifi2100</i> supporting the 2100 chips</p></li>
+<li><p><i>iprowifi2200</i> supporting<br />
+2200BG<br />
+2225BG<br />
+2915ABG
+</p></li>
+<li><p><i>iprowifi3945</i> supporting the 3945 chips</p></li>
+<li><p><i>iprowifi4965</i> supporting the 4965 chips</p></li>
+<li><p><i>marvell88w8335</i> supporting<br />
+Marvell Libertas 88W8310<br />
+Marvell Libertas 88W8335
+</p></li>
+<li><p><i>marvell88w8363</i> supporting the 88W8363 chips</p></li>
+<li><p><i>ralinkwifi</i> supporting<br />
+RT2560<br />
+RT2561S<br />
+RT2561<br />
+RT2661
+</p></li>
+<li><p><i>wavelanwifi</i> supporting at least<br />
+3Com Airconnect<br />
+GLPRISM2 WaveLAN<br />
+Intersil Prism3<br />
+Intersil Prism2.5<br />
+Linksys WDT11<br />
+Netgear MA301<br />
+PRISM2STA WaveLAN<br />
+Siemens SpeedStream<br />
+SMC 2602W<br />
+Us Robotics 2415<br />
+Addtron AWA-100 PCI
+</p></li>
+</ul>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="wep" rel="nofollow" id="wep">WEP encryption</a></h3>
+<p>WEP encryption is available through a command-line application <span class="cli">setwep</span>. It is a temporary means for joining an unencrypted or WEP encrypted wifi network. <span class="cli">setwep</span> works with 64- and 128-bit WEP and supports both text keys as well as hex digit keys (see <a href="#wep-notes" rel="nofollow">WEP notes</a> below)
+</p>
+<p>The usage is: <span class="cli">setwep device_path [ssid] [key]</span>. Below are some examples. </p>
+<p>In this example, let us assume your wifi network card is "/dev/net/iprowifi3945/0" and the wireless network is named "haikuwifi".</p>
+<h4>Example 1: Connect with 64-bit WEP encryption using a hex digit key</h4>
+<pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi 0x3456789abc
+</pre><h4>Example 2: Connect to an unencrypted wireless network</h4>
+<pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi
+</pre><div class="box-info">
+<li>To find out what your device_path is, have a look in Preferences -&gt; Network.</li>
+<li>To make your wifi device connect to a given SSID at each boot, add the setwep command to your home/config/boot/UserBootscript.</li>
+</div>
+<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP notes</strong></a></p>
+<ul>
+<li>64-bit WEP uses a 40-bit key, which means 5 text characters or 10 hex digits</li>
+<li>128-bit WEP uses a 104-bit key, which means 13 text characters or 26 hex digits</li>
+<li>hexadecimal digits = characters 0-9 and A through F (prepended with '0x')</li>
+</ul>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="wpa" rel="nofollow" id="wpa">WPA encryption</a></h3>
+<p>At the moment there is no WPA encryption available in Haiku. However, there is some <a target="_blank" class="ext" href="http://alexbl.net/%7Ealexbl/haiku-wpa/" rel="nofollow">preliminary and unfinished code for implementing WPA</a><span class="ext"></span> available. Some tasks for improving this is to plug it into the wpa_supplicant build process and then fixing compile &amp; runtime issues.</p>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
+<p>To install the firmware for Intel ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you'll need to run</p>
+<pre class="terminal">~&gt; install-wifi-firmwares.sh
+</pre>
+<p>The Intel ipw2100 and ipw22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>
+<p>People building their own Haiku image can modify their <span class="cli">build/jam/UserBuildConfig</span> accordingly. Details for that and general updates on the wifi topic are found at the <a href="http://www.haiku-os.org/guides/wifi">online version of this document</a>.</p>
+<p>If you have to download the firmware, but don't have a working internet connection under Haiku, the online version offers a <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">shell script</a>, which will create a zip file for you to extract to Haiku's <tt>/boot</tt>. After that you'll have all files needed by install-wifi-firmwares.sh.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+   <a href="../welcome_fr.html" class="uplink">Welcome</a>
+</span></div>
+</div>
+
+</body>
+</html>
