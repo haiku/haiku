@@ -2439,8 +2439,6 @@ BContainerWindow::ShowDropContextMenu(BPoint loc)
 
 	PoseView()->ConvertToScreen(&global);
 	PoseView()->CommitActivePose();
-	BRect mouseRect(global.x, global.y, global.x, global.y);
-	mouseRect.InsetBy(-5, -5);
 
 	// Change the "Create Link" item - allow user to
 	// create relative links with the Shift key down.
@@ -2455,7 +2453,7 @@ BContainerWindow::ShowDropContextMenu(BPoint loc)
 		item->SetMessage(new BMessage(kCreateLink));
 	}
 
-	item = fDropContextMenu->Go(global, true, true, mouseRect);
+	item = fDropContextMenu->Go(global, true, true);
 	if (item)
 		return item->Command();
 
@@ -2470,8 +2468,6 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 	BPoint global(loc);
 	PoseView()->ConvertToScreen(&global);
 	PoseView()->CommitActivePose();
-	BRect mouseRect(global.x, global.y, global.x, global.y);
-	mouseRect.InsetBy(-5, -5);
 
 	if (ref) {
 		// clicked on a pose, show file or volume context menu
@@ -2488,14 +2484,12 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 			BPoint global(loc);
 			PoseView()->ConvertToScreen(&global);
 			PoseView()->CommitActivePose();
-			BRect mouseRect(global.x, global.y, global.x, global.y);
-			mouseRect.InsetBy(-5, -5);
 	
 			EnableNamedMenuItem(fTrashContextMenu, kEmptyTrash,
 				static_cast<TTracker *>(be_app)->TrashFull());
 	
 			SetupNavigationMenu(ref, fTrashContextMenu);
-			fTrashContextMenu->Go(global, true, false, mouseRect, true);
+			fTrashContextMenu->Go(global, true, true, true);
 		} else {
 		
 			bool showAsVolume = false;
@@ -2591,7 +2585,7 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 		
 				UpdateMenu(fContextMenu, kPosePopUpContext);
 		
-				fContextMenu->Go(global, true, false, mouseRect, true);
+				fContextMenu->Go(global, true, true, true);
 			}
 		}
 	} else if (fWindowContextMenu) {
@@ -2605,7 +2599,7 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 		SetupNavigationMenu(ref, fWindowContextMenu);
 		UpdateMenu(fWindowContextMenu, kWindowPopUpContext);
 
-		fWindowContextMenu->Go(global, true, false, mouseRect, true);
+		fWindowContextMenu->Go(global, true, true, true);
 	}
 	fContextMenu = NULL;
 }
