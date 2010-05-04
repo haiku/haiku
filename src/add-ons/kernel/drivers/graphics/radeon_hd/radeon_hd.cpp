@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 
 
@@ -41,15 +42,6 @@
 status_t
 radeon_hd_init(radeon_info &info)
 {
-	int fbIndex = 0;
-	int mmioIndex = 1;
-	if (info.device_type.InFamily(RADEON_TYPE_9xx)) {
-		// For some reason Intel saw the need to change the order of the
-		// mappings with the introduction of the i9xx family
-		mmioIndex = 0;
-		fbIndex = 2;
-	}
-
 	// memory mapped I/O
 	
 	AreaKeeper sharedCreator;
