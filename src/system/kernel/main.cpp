@@ -123,6 +123,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		vm_init(&sKernelArgs);
 			// Before vm_init_post_sem() is called, we have to make sure that
 			// the boot loader allocated region is not used anymore
+		boot_item_init();
 		debug_init_post_vm(&sKernelArgs);
 		low_resource_manager_init();
 
@@ -130,7 +131,6 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		arch_platform_init_post_vm(&sKernelArgs);
 		lock_debug_init();
 		TRACE("init driver_settings\n");
-		boot_item_init();
 		driver_settings_init(&sKernelArgs);
 		debug_init_post_settings(&sKernelArgs);
 		TRACE("init notification services\n");
