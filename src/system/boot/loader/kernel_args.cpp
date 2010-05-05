@@ -6,11 +6,13 @@
 
 #include <OS.h>
 
+#include <string.h>
+
+#include <algorithm>
+
 #include <kernel.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
-
-#include <string.h>
 
 
 static const size_t kChunkSize = 8 * B_PAGE_SIZE;
@@ -211,6 +213,36 @@ get_free_address_range(addr_range *ranges, uint32 numRanges, addr_t base,
 
 	*_rangeBase = base;
 	return true;
+}
+
+
+bool
+is_address_range_covered(addr_range* ranges, uint32 numRanges, addr_t base,
+	size_t size)
+{
+	// Note: We don't assume that the ranges are sorted, so we can't do this
+	// in a simple loop. Instead we restart the loop whenever the start of the
+	// given range intersects with an existing one.
+
+	for (uint32 i = 0; i < numRanges;) {
+		addr_t rangeStart = ranges[i].start;
+		addr_t rangeSize = ranges[i].size;
+
+		if (rangeStart <= base && rangeSize > base - rangeStart) {
+			size_t intersect = std::min(rangeStart + rangeSize - base, size);
+			base += intersect;
+			size -= intersect;
+			if (size == 0)
+				return true;
+
+			i = 0;
+			continue;
+		}
+
+		i++;
+	}
+
+	return false;
 }
 
 
