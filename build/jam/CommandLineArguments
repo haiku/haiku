@@ -32,10 +32,9 @@ rule ProcessCommandLineArguments
 				Echo ;
 				Echo "Default build profiles:" ;
 				Echo "  image         - A raw disk image." ;
-				Echo "  anyboot-image - A custom image for either CD or disk" ;
+				Echo "  anyboot-image - A custom image for either CD or disk." ;
 				Echo "  cd-image      - An ISO9660 CD image." ;
 				Echo "  vmware-image  - A VMware disk image." ;
-				Echo "  disk          - A partition or hard disk device." ;
 				Echo "  install       - A Haiku installation in a directory." ;
 				Echo ;
 				Echo "Build profile actions:" ;
