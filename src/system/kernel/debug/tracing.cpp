@@ -364,7 +364,7 @@ TracingMetaData::Create(TracingMetaData*& _metaData)
 	} else
 		dprintf("No previous tracing meta data found.\n");
 
-	// no previous tracng data found -- create new one
+	// no previous tracing data found -- create new one
 	error = _CreateMetaDataArea(false, area, metaData);
 	if (error != B_OK)
 		return error;
