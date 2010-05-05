@@ -1295,25 +1295,33 @@ clear_page(struct vm_page *page)
 
 
 static status_t
-mark_page_range_in_use(addr_t startPage, addr_t length, bool wired)
+mark_page_range_in_use(addr_t startPage, size_t length, bool wired)
 {
 	TRACE(("mark_page_range_in_use: start 0x%lx, len 0x%lx\n",
 		startPage, length));
 
 	if (sPhysicalPageOffset > startPage) {
-		TRACE(("mark_page_range_in_use: start page %ld is before free list\n",
-			startPage));
-		return B_BAD_VALUE;
+		dprintf("mark_page_range_in_use(%#" B_PRIxADDR ", %#" B_PRIxSIZE "): "
+			"start page is before free list", startPage, length);
+		if (sPhysicalPageOffset - startPage >= length)
+			return B_OK;
+		length -= sPhysicalPageOffset - startPage;
+		startPage = sPhysicalPageOffset;
 	}
+
 	startPage -= sPhysicalPageOffset;
+
 	if (startPage + length > sNumPages) {
-		TRACE(("mark_page_range_in_use: range would extend past free list\n"));
-		return B_BAD_VALUE;
+		dprintf("mark_page_range_in_use(%#" B_PRIxADDR ", %#" B_PRIxSIZE "): "
+			"range would extend past free list", startPage, length);
+		if (startPage >= sNumPages)
+			return B_OK;
+		length = sNumPages - startPage;
 	}
 
 	WriteLocker locker(sFreePageQueuesLock);
 
-	for (addr_t i = 0; i < length; i++) {
+	for (size_t i = 0; i < length; i++) {
 		vm_page *page = &sPages[startPage + i];
 		switch (page->State()) {
 			case PAGE_STATE_FREE:
