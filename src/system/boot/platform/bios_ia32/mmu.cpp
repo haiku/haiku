@@ -450,11 +450,18 @@ mmu_allocate(void *virtualAddress, size_t size)
 bool
 mmu_allocate_physical(addr_t base, size_t size)
 {
+	// check whether the physical memory range exists at all
+	if (!is_address_range_covered(gKernelArgs.physical_memory_range,
+			gKernelArgs.num_physical_memory_ranges, base, size)) {
+		return false;
+	}
+
+	// check whether the physical range is still free
 	addr_t foundBase;
 	if (!get_free_address_range(gKernelArgs.physical_allocated_range,
 			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalAddress,
-			size, &foundBase)) {
-		return B_BAD_VALUE;
+			size, &foundBase) || foundBase != base) {
+		return false;
 	}
 
 	return insert_physical_allocated_range(base, size) == B_OK;
@@ -717,7 +724,7 @@ mmu_init(void)
 		}
 	} else {
 		bios_regs regs;
-		
+
 		// We dont have an extended map, assume memory is contiguously mapped
 		// at 0x0, but leave out the BIOS range ((640k - 1 page) to 1 MB).
 		gKernelArgs.physical_memory_range[0].start = 0;
