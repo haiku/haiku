@@ -1,0 +1,4 @@
+#vesa resolution configuration:
+# mode {x-resolution} {y-resolution} {bitdepth},
+#   for example:
+#mode 1280 1024 32
