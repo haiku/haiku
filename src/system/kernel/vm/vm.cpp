@@ -3652,10 +3652,11 @@ vm_init(kernel_args* args)
 	object_cache_set_minimum_reserve(gPageMappingsObjectCache, 1024);
 
 #if DEBUG_CACHE_LIST
-	create_area("cache info table", (void**)&sCacheInfoTable,
-		B_ANY_KERNEL_ADDRESS,
+	create_area_etc(VMAddressSpace::KernelID(), "cache info table",
+		(void**)&sCacheInfoTable, B_ANY_KERNEL_ADDRESS,
 		ROUNDUP(kCacheInfoTableCount * sizeof(cache_info), B_PAGE_SIZE),
-		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
+		CREATE_AREA_DONT_WAIT);
 #endif	// DEBUG_CACHE_LIST
 
 	// add some debugger commands

@@ -1371,8 +1371,9 @@ arch_int_init_post_vm(struct kernel_args *args)
 	if (cpuCount > 0) {
 		size_t areaSize = ROUNDUP(cpuCount * idtSize, B_PAGE_SIZE);
 		desc_table* idt;
-		area = create_area("idt", (void**)&idt, B_ANY_KERNEL_ADDRESS,
-			areaSize, B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		area = create_area_etc(B_SYSTEM_TEAM, "idt", (void**)&idt,
+			B_ANY_KERNEL_ADDRESS, areaSize, B_CONTIGUOUS,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
 		if (area < 0)
 			return area;
 

@@ -3,11 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <debug_heap.h>
 
 #include <new>
 
 #include <util/AutoLock.h>
+#include <vm/vm.h>
 
 
 #define INITIAL_HEAP_SIZE	B_PAGE_SIZE
@@ -289,9 +291,9 @@ debug_heap_init()
 {
 	// create the heap area
 	void* base;
-	area_id area = create_area("kdebug heap", (void**)&base,
+	area_id area = create_area_etc(B_SYSTEM_TEAM, "kdebug heap", (void**)&base,
 		B_ANY_KERNEL_ADDRESS, KDEBUG_HEAP, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
 	if (area < 0)
 		return;
 

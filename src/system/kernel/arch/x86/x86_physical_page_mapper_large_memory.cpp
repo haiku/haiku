@@ -3,7 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-/*	Implementation of a physical page mapping strategy (PhysicalPageMapper,
+
+/*!	Implementation of a physical page mapping strategy (PhysicalPageMapper,
 	TranslationMapPhysicalPageMapper) suitable for machines with a lot of
 	memory, i.e. more than we can afford to completely map into the kernel
 	address space.
@@ -866,9 +867,9 @@ LargeMemoryPhysicalPageMapper::_AllocatePool(PhysicalPageSlotPool*& _pool)
 	// structures
 	size_t areaSize = B_PAGE_SIZE + sizeof(PhysicalPageSlot[1024]);
 	void* data;
-	area_id dataArea = create_area("physical page pool", &data,
-		B_ANY_KERNEL_ADDRESS, PAGE_ALIGN(areaSize), B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	area_id dataArea = create_area_etc(B_SYSTEM_TEAM, "physical page pool",
+		&data, B_ANY_KERNEL_ADDRESS, PAGE_ALIGN(areaSize), B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
 	if (dataArea < 0)
 		return dataArea;
 
