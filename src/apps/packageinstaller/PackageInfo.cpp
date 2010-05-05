@@ -1,23 +1,24 @@
 /*
- * Copyright (c) 2007-2009, Haiku, Inc.
+ * Copyright (c) 2007-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
  *		Łukasz 'Sil2100' Zemczak <sil2100@vexillium.org>
  */
 
-
 #include "PackageInfo.h"
 
 #include <Alert.h>
 #include <ByteOrder.h>
+#include <Catalog.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <Path.h>
 #include <kernel/OS.h>
 
 
-// Macro reserved for later localization
-#define T(x) x
+#undef TR_CONTEXT
+#define TR_CONTEXT "PackageInfo"
 
 #define RETURN_AND_SET_STATUS(err) fStatus = err; \
 	fprintf(stderr, "err at %s():%d: %x\n", __FUNCTION__, __LINE__, err); \
@@ -48,7 +49,7 @@ PackageInfo::PackageInfo()
 	:
 	fStatus(B_NO_INIT),
 	fPackageFile(0),
-	fDescription(T("No package available.")),
+	fDescription(TR("No package available.")),
 	fProfiles(2),
 	fHasImage(false)
 {
@@ -59,7 +60,7 @@ PackageInfo::PackageInfo(const entry_ref *ref)
 	:
 	fStatus(B_NO_INIT),
 	fPackageFile(new BFile(ref, B_READ_ONLY)),
-	fDescription(T("No package selected.")),
+	fDescription(TR("No package selected.")),
 	fProfiles(2),
 	fHasImage(false)
 {
@@ -1027,7 +1028,7 @@ PackageInfo::Parse()
 			parser_debug("PtcI\n");
 			break;
 		} else {
-			fprintf(stderr, "Unknown file tag %s\n", buffer);
+			fprintf(stderr, TR("Unknown file tag %s\n"), buffer);
 			RETURN_AND_SET_STATUS(B_ERROR);
 		}
 	}
@@ -1035,11 +1036,11 @@ PackageInfo::Parse()
 	if (static_cast<uint64>(actualSize) != fileSize) {
 		// Inform the user of a possible error
 		int32 selection;
-		BAlert *warning = new BAlert(T("filesize_wrong"),
-			T("There seems to be a file size mismatch in the package file. "
+		BAlert *warning = new BAlert("filesize_wrong",
+			TR("There seems to be a file size mismatch in the package file. "
 				"The package might be corrupted or have been modified after its "
-				"creation. Do you still wish to continue?"), T("Continue"),
-				T("Abort"), NULL,
+				"creation. Do you still wish to continue?"), TR("Continue"),
+				TR("Abort"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		selection = warning->Go();
 

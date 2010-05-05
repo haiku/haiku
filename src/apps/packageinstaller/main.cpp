@@ -9,15 +9,20 @@
 
 #include "PackageWindow.h"
 
+#include <Alert.h>
 #include <Application.h>
+#include <Autolock.h>
+#include <Catalog.h>
+#include <Entry.h>
 #include <FilePanel.h>
 #include <List.h>
-#include <Alert.h>
+#include <Locale.h>
 #include <TextView.h>
-#include <Entry.h>
-#include <Autolock.h>
+
 #include <stdio.h>
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Packageinstaller main"
 
 class PackageInstaller : public BApplication {
 	public:
@@ -33,16 +38,20 @@ class PackageInstaller : public BApplication {
 		void AboutRequested();
 
 	private:
-		BFilePanel *fOpen;
-		uint32 fWindowCount;
+		BFilePanel	*fOpen;
+		uint32		fWindowCount;
+		BCatalog	fAppCatalog;
 };
 
 
 PackageInstaller::PackageInstaller()
 	:	BApplication("application/x-vnd.Haiku-PackageInstaller"),
-	fWindowCount(0)
+	fOpen(NULL),
+	fWindowCount(0),
+	fAppCatalog(NULL)
 {
 	fOpen = new BFilePanel(B_OPEN_PANEL);
+	be_locale->GetAppCatalog(&fAppCatalog);
 }
 
 
@@ -94,13 +103,13 @@ PackageInstaller::ArgvReceived(int32 argc, char **argv)
 	
 	for (i = 1; i < argc; i++) {
 		if (path.SetTo(argv[i]) != B_OK) {
-			fprintf(stderr, "Error! \"%s\" is not a valid path.\n", argv[i]);
+			fprintf(stderr, TR("Error! \"%s\" is not a valid path.\n"), argv[i]);
 			continue;
 		}
 		
 		ret = get_ref_for_path(path.Path(), &ref);
 		if (ret != B_OK) {
-			fprintf(stderr, "Error (%s)! Could not open \"%s\".\n", strerror(ret), 
+			fprintf(stderr, TR("Error (%s)! Could not open \"%s\".\n"), strerror(ret), 
 					argv[i]);
 			continue;
 		}
@@ -135,11 +144,11 @@ void
 PackageInstaller::AboutRequested()
 {
 	BAlert *about = new BAlert("about",
-		"PackageInstaller\n"
+		TR("PackageInstaller\n"
 		"BeOS legacy .pkg file installer for Haiku.\n\n"
 		"Copyright 2007,\nŁukasz 'Sil2100' Zemczak\n\n"
-		"Copyright (c) 2007 Haiku, Inc. \n",
-		"OK");
+		"Copyright (c) 2007 Haiku, Inc. \n"),
+		TR("OK"));
 
 	BTextView *view = about->TextView();
 	BFont font;
