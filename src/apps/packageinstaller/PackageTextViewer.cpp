@@ -6,6 +6,7 @@
  *		Łukasz 'Sil2100' Zemczak <sil2100@vexillium.org>
  */
 
+
 #include "PackageTextViewer.h"
 
 #include <Button.h>
