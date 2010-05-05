@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 
 /*! This is main - initializes the kernel and launches the Bootscript */
 
@@ -122,6 +123,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		vm_init(&sKernelArgs);
 			// Before vm_init_post_sem() is called, we have to make sure that
 			// the boot loader allocated region is not used anymore
+		debug_init_post_vm(&sKernelArgs);
 		low_resource_manager_init();
 
 		// now we can use the heap and create areas
@@ -130,7 +132,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init driver_settings\n");
 		boot_item_init();
 		driver_settings_init(&sKernelArgs);
-		debug_init_post_vm(&sKernelArgs);
+		debug_init_post_settings(&sKernelArgs);
 		TRACE("init notification services\n");
 		notifications_init();
 		TRACE("init teams\n");
