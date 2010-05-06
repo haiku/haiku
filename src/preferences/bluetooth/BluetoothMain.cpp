@@ -90,7 +90,7 @@ void
 BluetoothApplication::AboutRequested()
 {
 
-	(new BAlert("about", TR("Haiku Bluetooth system, (ARCE)\n\n"
+	(new BAlert("about", B_TRANSLATE("Haiku Bluetooth system, (ARCE)\n\n"
 							"Created by Oliver Ruiz Dorantes\n\n"
 							"With support of:\n"
 							"	- Mika Lindqvist\n"
@@ -119,7 +119,8 @@ BluetoothApplication::AboutRequested()
 							"Testing:\n"
 							"	- Petter H. Juliussen\n"
 							"Who gave me all the knowledge:\n"
-							"	- the yellowTAB team"), TR("OK")))->Go();
+							"	- the yellowTAB team"),
+						B_TRANSLATE("OK")))->Go();
 
 }
 

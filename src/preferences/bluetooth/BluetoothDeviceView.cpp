@@ -39,7 +39,8 @@ BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice,
 		bdaddrUtils::ToString(bdaddrUtils::NullAddress()));
 	fBdaddr->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
 
-	fClassService = new BStringView("ServiceClass", TR("Service classes: "));
+	fClassService = new BStringView("ServiceClass",
+		B_TRANSLATE("Service classes: "));
 	fClassService->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_MIDDLE));
 
@@ -116,7 +117,7 @@ BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 		fName->SetText(bDevice->GetFriendlyName().String());
 		fBdaddr->SetText(bdaddrUtils::ToString(bDevice->GetBluetoothAddress()));
 
-		BString string(TR("Service classes: "));
+		BString string(B_TRANSLATE("Service classes: "));
 		bDevice->GetDeviceClass().GetServiceClass(string);
 		fClassService->SetText(string.String());
 

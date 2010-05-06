@@ -38,15 +38,16 @@ static const int32 kMsgSetDeviceClassSmartPhone = 'sDCp';
 static const int32 kMsgSetAverageWeight = 'afEa';
 static const int32 kMsgLocalSwitched = 'lDsW';
 
-static const char* kAllLabel = TR_MARK("From all devices");
-static const char* kTrustedLabel = TR_MARK("Only from trusted devices");
-static const char* kAlwaysLabel = TR_MARK("Always ask");
+static const char* kAllLabel = B_TRANSLATE_MARK("From all devices");
+static const char* kTrustedLabel =
+	B_TRANSLATE_MARK("Only from trusted devices");
+static const char* kAlwaysLabel = B_TRANSLATE_MARK("Always ask");
 
-static const char* kDesktopLabel = TR_MARK("Desktop");
-static const char* kServerLabel = TR_MARK("Server");
-static const char* kLaptopLabel = TR_MARK("Laptop");
-static const char* kHandheldLabel = TR_MARK("Handheld");
-static const char* kPhoneLabel = TR_MARK("Smart phone");
+static const char* kDesktopLabel = B_TRANSLATE_MARK("Desktop");
+static const char* kServerLabel = B_TRANSLATE_MARK("Server");
+static const char* kLaptopLabel = B_TRANSLATE_MARK("Laptop");
+static const char* kHandheldLabel = B_TRANSLATE_MARK("Handheld");
+static const char* kPhoneLabel = B_TRANSLATE_MARK("Smart phone");
 
 
 //	#pragma mark -
@@ -57,25 +58,27 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 {
 	_BuildConnectionPolicy();
 	fPolicyMenuField = new BMenuField("antialiasing",
-		TR("Incoming connections policy:"), fPolicyMenu, NULL);
+		B_TRANSLATE("Incoming connections policy:"), fPolicyMenu, NULL);
 
 	fInquiryTimeControl = new BSlider("time",
-		TR("Default inquiry time:"), new BMessage(kMsgSetAverageWeight), 0, 255,
-		B_HORIZONTAL);
-	fInquiryTimeControl->SetLimitLabels(TR("15 secs"), TR("61 secs"));
+		B_TRANSLATE("Default inquiry time:"), new BMessage(kMsgSetAverageWeight),
+		0, 255, B_HORIZONTAL);
+	fInquiryTimeControl->SetLimitLabels(B_TRANSLATE("15 secs"),
+		B_TRANSLATE("61 secs"));
 	fInquiryTimeControl->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fInquiryTimeControl->SetHashMarkCount(255 / 15);
 	fInquiryTimeControl->SetEnabled(true);
 
 	// hinting menu
 	_BuildClassMenu();
-	fClassMenuField = new BMenuField("class", TR("Identify host as:"),
+	fClassMenuField = new BMenuField("class", B_TRANSLATE("Identify host as:"),
 		fClassMenu, NULL);
 
 	// localdevices menu
 	_BuildLocalDevicesMenu();
 	fLocalDevicesMenuField = new BMenuField("devices",
-		TR("Local devices found on system:"), fLocalDevicesMenu, NULL);
+		B_TRANSLATE("Local devices found on system:"),
+		fLocalDevicesMenu, NULL);
 
 	fExtDeviceView = new ExtendedLocalDeviceView(BRect(0, 0, 5, 5), NULL);
 
@@ -195,23 +198,23 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 void
 BluetoothSettingsView::_BuildConnectionPolicy()
 {
-	fPolicyMenu = new BPopUpMenu(TR("Policy..."));
+	fPolicyMenu = new BPopUpMenu(B_TRANSLATE("Policy..."));
 
 	BMessage* message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", false);
 
-	BMenuItem* item = new BMenuItem(TR(kAllLabel), message);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE(kAllLabel), message);
 
 	fPolicyMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", true);
 
-	item = new BMenuItem(TR(kTrustedLabel), message);
+	item = new BMenuItem(B_TRANSLATE(kTrustedLabel), message);
 
 	fPolicyMenu->AddItem(item);
 
-	BMenuItem* item2 = new BMenuItem(TR(kAlwaysLabel), NULL);
+	BMenuItem* item2 = new BMenuItem(B_TRANSLATE(kAlwaysLabel), NULL);
 
 	fPolicyMenu->AddItem(item2);
 
@@ -222,27 +225,27 @@ void
 BluetoothSettingsView::_BuildClassMenu()
 {
 
-	fClassMenu = new BPopUpMenu(TR("Identify us as..."));
+	fClassMenu = new BPopUpMenu(B_TRANSLATE("Identify us as..."));
 	BMessage* message;
 
 	message = new BMessage(kMsgSetDeviceClassDesktop);
-	BMenuItem* item = new BMenuItem(TR(kDesktopLabel), message);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE(kDesktopLabel), message);
 	fClassMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetDeviceClassServer);
-	item = new BMenuItem(TR(kServerLabel), message);
+	item = new BMenuItem(B_TRANSLATE(kServerLabel), message);
 	fClassMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetDeviceClassLaptop);
-	item = new BMenuItem(TR(kLaptopLabel), message);
+	item = new BMenuItem(B_TRANSLATE(kLaptopLabel), message);
 	fClassMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetDeviceClassHandheld);
-	item = new BMenuItem(TR(kHandheldLabel), message);
+	item = new BMenuItem(B_TRANSLATE(kHandheldLabel), message);
 	fClassMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetDeviceClassSmartPhone);
-	item = new BMenuItem(TR(kPhoneLabel), message);
+	item = new BMenuItem(B_TRANSLATE(kPhoneLabel), message);
 	fClassMenu->AddItem(item);
 
 }
@@ -254,7 +257,7 @@ BluetoothSettingsView::_BuildLocalDevicesMenu()
 	LocalDevice* lDevice;
 
 	if (!fLocalDevicesMenu)
-		fLocalDevicesMenu = new BPopUpMenu(TR("Pick LocalDevice..."));
+		fLocalDevicesMenu = new BPopUpMenu(B_TRANSLATE("Pick LocalDevice..."));
 
 	for (uint32 index = 0; index < LocalDevice::GetLocalDeviceCount(); index++) {
 

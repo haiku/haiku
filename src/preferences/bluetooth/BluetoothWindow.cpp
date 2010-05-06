@@ -33,50 +33,55 @@ LocalDevice* ActiveLocalDevice = NULL;
 
 
 BluetoothWindow::BluetoothWindow(BRect frame)
- :	BWindow(frame, TR("Bluetooth"), B_TITLED_WINDOW,
+ :	BWindow(frame, B_TRANSLATE("Bluetooth"), B_TITLED_WINDOW,
  		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	fDefaultsButton = new BButton("defaults", TR("Defaults"),
+	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
 		new BMessage(kMsgSetDefaults), B_WILL_DRAW);
 
-	fRevertButton = new BButton("revert", TR("Revert"),
+	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert), B_WILL_DRAW);
 
 	// Add the menu bar
 	fMenubar = new BMenuBar(Bounds(), "menu_bar");
 
 	// Add File menu to menu bar
-	BMenu* menu = new BMenu(TR("Server"));
-	menu->AddItem(new BMenuItem(TR("Start bluetooth services" B_UTF8_ELLIPSIS),
+	BMenu* menu = new BMenu(B_TRANSLATE("Server"));
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Start bluetooth services" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgStartServices), 0));
-	menu->AddItem(new BMenuItem(TR("Stop bluetooth services" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Stop bluetooth services" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgStopServices), 0));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Show bluetooth console" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Show bluetooth console" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgStartServices), 0));
-	menu->AddItem(new BMenuItem(TR("Refresh LocalDevices" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Refresh LocalDevices" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgRefresh), 0));
 	fMenubar->AddItem(menu);
 
-	menu = new BMenu(TR("View"));
-	menu->AddItem(new BMenuItem(TR("Connections & channels" B_UTF8_ELLIPSIS),
-		NULL, 0));
-	menu->AddItem(new BMenuItem(TR("Remote devices list" B_UTF8_ELLIPSIS),
-		NULL, 0));
+	menu = new BMenu(B_TRANSLATE("View"));
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Connections & channels" B_UTF8_ELLIPSIS), NULL, 0));
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Remote devices list" B_UTF8_ELLIPSIS), NULL, 0));
 	fMenubar->AddItem(menu);
 
-	menu = new BMenu(TR("Help"));
-	menu->AddItem(new BMenuItem(TR("About Bluetooth" B_UTF8_ELLIPSIS),
+	menu = new BMenu(B_TRANSLATE("Help"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("About Bluetooth" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED), 0));
 	fMenubar->AddItem(menu);
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
 
-	fSettingsView = new BluetoothSettingsView(TR("Settings"));
+	fSettingsView = new BluetoothSettingsView(B_TRANSLATE("Settings"));
 //	fConnChan = new ConnChanView("Connections & Channels", B_WILL_DRAW);
-	fRemoteDevices = new RemoteDevicesView(TR("Remote devices"), B_WILL_DRAW);
+	fRemoteDevices = new RemoteDevicesView(
+		B_TRANSLATE("Remote devices"), B_WILL_DRAW);
 
 	tabView->AddTab(fRemoteDevices);
 //	tabView->AddTab(fConnChan);

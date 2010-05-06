@@ -42,23 +42,23 @@ RemoteDevicesView::RemoteDevicesView(const char* name, uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	addButton = new BButton("add", TR("Add" B_UTF8_ELLIPSIS),
+	addButton = new BButton("add", B_TRANSLATE("Add" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgAddDevices));
 
-	removeButton = new BButton("remove", TR("Remove"),
+	removeButton = new BButton("remove", B_TRANSLATE("Remove"),
 		new BMessage(kMsgRemoveDevice));
 
-	pairButton = new BButton("pair", TR("Pair" B_UTF8_ELLIPSIS),
+	pairButton = new BButton("pair", B_TRANSLATE("Pair" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgPairDevice));
 
-	disconnectButton = new BButton("disconnect", TR("Disconnect"),
+	disconnectButton = new BButton("disconnect", B_TRANSLATE("Disconnect"),
 		new BMessage(kMsgDisconnectDevice));
 
-	blockButton = new BButton("block", TR("As blocked"),
+	blockButton = new BButton("block", B_TRANSLATE("As blocked"),
 		new BMessage(kMsgBlockDevice));
 
 
-	availButton = new BButton("check", TR("Refresh" B_UTF8_ELLIPSIS),
+	availButton = new BButton("check", B_TRANSLATE("Refresh" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgRefreshDevices));
 
 	// Set up device list

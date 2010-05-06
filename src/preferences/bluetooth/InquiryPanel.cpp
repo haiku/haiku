@@ -102,7 +102,8 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	fScanProgress = new BStatusBar("status", TR("Scanning progress"), "");
+	fScanProgress = new BStatusBar("status",
+		B_TRANSLATE("Scanning progress"), "");
 	activeColor = fScanProgress->BarColor();
 
 	if (fLocalDevice == NULL)
@@ -114,10 +115,10 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 	fMessage->MakeEditable(false);
 	fMessage->MakeSelectable(false);
 
-	fInquiryButton = new BButton("Inquiry", TR("Inquiry"),
+	fInquiryButton = new BButton("Inquiry", B_TRANSLATE("Inquiry"),
 		new BMessage(kMsgInquiry), B_WILL_DRAW);
 
-	fAddButton = new BButton("add", TR("Add device to list"),
+	fAddButton = new BButton("add", B_TRANSLATE("Add device to list"),
 		new BMessage(kMsgAddToRemoteList), B_WILL_DRAW);
 	fAddButton->SetEnabled(false);
 
@@ -128,7 +129,8 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	if (fLocalDevice != NULL) {
-		fMessage->SetText(TR("Check that the Bluetooth capabilities of your"
+		fMessage->SetText(B_TRANSLATE(
+			"Check that the Bluetooth capabilities of your"
 			" remote device are activated. Press 'Inquiry' to start scanning."
 			" The needed time for the retrieval of the names is unknown, "
 			"although should not take more than 3 seconds per device. "
@@ -143,8 +145,8 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 
 
 	} else {
-		fMessage->SetText(TR("There isn't any Bluetooth LocalDevice registered"
-							" on the system."));
+		fMessage->SetText(B_TRANSLATE("There isn't any Bluetooth LocalDevice "
+			"registered on the system."));
 		fInquiryButton->SetEnabled(false);
 	}
 
@@ -220,7 +222,7 @@ InquiryPanel::MessageReceived(BMessage* message)
 			fRemoteList->MakeEmpty();
 			fScanProgress->Reset();
 			fScanProgress->SetTo(1);
-			fScanProgress->SetTrailingText(TR("Starting scan..."));
+			fScanProgress->SetTrailingText(B_TRANSLATE("Starting scan..."));
 			fScanProgress->SetBarColor(activeColor);
 
 			fAddButton->SetEnabled(false);
@@ -240,7 +242,7 @@ InquiryPanel::MessageReceived(BMessage* message)
 			fRetrieving = true;
 			labelPlaced = false;
 			fScanProgress->SetTo(100);
-			fScanProgress->SetTrailingText(TR("Retrieving names..."));
+			fScanProgress->SetTrailingText(B_TRANSLATE("Retrieving names..."));
 			BMessageRunner::StartSending(fMessenger, fRetrieveMessage, 1000000, 1);
 
 		break;
@@ -248,12 +250,13 @@ InquiryPanel::MessageReceived(BMessage* message)
 		case kMsgSecond:
 			if (fScanning && scanningTime < timer) {
 				// TODO time formatting could use Locale Kit
-				BString elapsedTime = TR("Remaining ");
+				BString elapsedTime = B_TRANSLATE("Remaining ");
 
 				// TODO should not be needed if SetMaxValue works...
 				fScanProgress->SetTo(scanningTime * 100 / timer);
 
-				elapsedTime << (int)(timer - scanningTime) << TR(" seconds");
+				elapsedTime << (int)(timer - scanningTime) <<
+					B_TRANSLATE(" seconds");
 				fScanProgress->SetTrailingText(elapsedTime.String());
 
 				scanningTime = scanningTime + 1;
@@ -269,7 +272,8 @@ InquiryPanel::MessageReceived(BMessage* message)
 					if (!labelPlaced) {
 
 						labelPlaced = true;
-						BString progressText = TR("Retrieving name of ");
+						BString progressText =
+							B_TRANSLATE("Retrieving name of ");
 						progressText << bdaddrUtils::ToString(fDiscoveryAgent
 							->RetrieveDevices(0).ItemAt(retrievalIndex)
 							->GetBluetoothAddress());
@@ -294,8 +298,10 @@ InquiryPanel::MessageReceived(BMessage* message)
 					fRetrieving = false;
 					retrievalIndex = 0;
 
-					fScanProgress->SetBarColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-					fScanProgress->SetTrailingText(TR("Scanning completed."));
+					fScanProgress->SetBarColor(
+						ui_color(B_PANEL_BACKGROUND_COLOR));
+					fScanProgress->SetTrailingText(
+						B_TRANSLATE("Scanning completed."));
 					fInquiryButton->SetEnabled(true);
 					UpdateListStatus();
 				}

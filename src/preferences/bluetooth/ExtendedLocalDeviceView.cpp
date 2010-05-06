@@ -33,12 +33,12 @@ ExtendedLocalDeviceView::ExtendedLocalDeviceView(BRect frame,
 
 	fDeviceView = new BluetoothDeviceView(BRect(0, 0, 5, 5), bDevice);
 
-	fDiscoverable = new BCheckBox(iDontCare, "Discoverable", TR("Discoverable"),
-		new BMessage(SET_DISCOVERABLE));
-	fVisible = new BCheckBox(iDontCare, "Visible", TR("Show name"),
-		new BMessage(SET_VISIBLE));
-	fAuthentication = new BCheckBox(iDontCare, "Authenticate", TR("Authenticate"),
-		new BMessage(SET_AUTHENTICATION));
+	fDiscoverable = new BCheckBox(iDontCare, "Discoverable",
+		B_TRANSLATE("Discoverable"), new BMessage(SET_DISCOVERABLE));
+	fVisible = new BCheckBox(iDontCare, "Visible",
+		B_TRANSLATE("Show name"), new BMessage(SET_VISIBLE));
+	fAuthentication = new BCheckBox(iDontCare, "Authenticate",
+		B_TRANSLATE("Authenticate"), new BMessage(SET_AUTHENTICATION));
 
 	fDiscoverable->SetEnabled(false);
 	fVisible->SetEnabled(false);
