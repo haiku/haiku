@@ -14,10 +14,12 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <IconUtils.h>
+#include <Locale.h>
 #include <List.h>
 #include <Node.h>
 #include <NodeInfo.h>
@@ -91,6 +93,8 @@ PairsView::_HasBitmap(BList& bitmaps, BBitmap* bitmap)
 	return false;
 }
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "PairsView"
 
 void
 PairsView::_ReadRandomIcons()
@@ -163,12 +167,12 @@ PairsView::_ReadRandomIcons()
 		int32 index = rand() % bitmaps.CountItems();
 		BBitmap* bitmap = ((BBitmap*)bitmaps.RemoveItem(index));
 		if (bitmap == NULL) {
-			BString strErr;
-			strErr
-				<< "Pairs did not find enough vector icons in the system; it "
-				<< "needs at least " << fNumOfCards / 2;
-			BAlert* alert = new BAlert("fatal", strErr,
-				"OK", NULL, NULL, B_WIDTH_FROM_WIDEST, B_STOP_ALERT);
+			char buffer[512];
+			snprintf(buffer, sizeof(buffer), TR("Pairs did not find enough "
+				"vector icons in the system; it needs at least %d."),
+				fNumOfCards / 2);
+			BAlert* alert = new BAlert("fatal", buffer, TR("OK"), NULL, NULL,
+				B_WIDTH_FROM_WIDEST, B_STOP_ALERT);
 			alert->Go();
 			exit(1);
 		}
