@@ -131,7 +131,7 @@ ImageFilePanel::SelectionChanged()
 					B_FOLLOW_LEFT | B_FOLLOW_TOP, 0);
 
 				BString resolution;
-				resolution << TR("Resolution: ")
+				resolution << B_TRANSLATE("Resolution: ")
 					<< (int)(bitmap->Bounds().Width() + 1)
 					<< "x" << (int)(bitmap->Bounds().Height() + 1);
 				fResolutionView->SetText(resolution.String());

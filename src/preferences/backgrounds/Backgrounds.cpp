@@ -91,7 +91,7 @@ BackgroundsApplication::RefsReceived(BMessage* message)
 
 BackgroundsWindow::BackgroundsWindow()
 	:
-	BWindow(BRect(0, 0, 0, 0), TR("Backgrounds"), B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE("Backgrounds"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES)
 {
