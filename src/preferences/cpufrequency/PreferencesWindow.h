@@ -46,25 +46,25 @@ public:
 								PreferencesStorage(const char* file,
 									const Preferences& defaultPreferences);
 								~PreferencesStorage();
-			
+
 			void				Revert();
 			void				Defaults();
-		
+
 			BPoint 				WindowPosition() {return fWindowPosition; }
 			void				SetWindowPosition(BPoint position)
 									{ fWindowPosition = position; }
-			
+
 			Preferences*		GetPreferences() { return &fPreferences; }
-			
+
 			status_t			LoadPreferences();
 			status_t			SavePreferences();
-			
+
 			BString&			PreferencesFile() {	return fPreferencesFile; }
 			status_t			GetPreferencesPath(BPath &path);
-			
+
 private:
 			BString				fPreferencesFile;
-			
+
 			Preferences			fPreferences;
 			Preferences			fStartPreferences;
 			const Preferences&	fDefaultPreferences;
@@ -81,12 +81,12 @@ public:
 	virtual						~PrefFileWatcher();
 
 	virtual filter_result		Filter(BMessage* message, BHandler** _target);
-		
+
 private:
 			PreferencesStorage<Preferences>* fPreferencesStorage;
 			node_ref			fPreferencesNode;
 			node_ref			fPreferencesDirectoryNode;
-			
+
 			BHandler*			fTarget;
 };
 
@@ -101,15 +101,15 @@ public:
 	virtual						~PreferencesWindow();
 	virtual void				MessageReceived(BMessage *msg);
 	virtual bool				QuitRequested();
-		
+
 	virtual bool				SetPreferencesView(BView* prefView);
-		
+
 private:
 			void				_MoveToPosition();
 
 			BView*				fPreferencesView;
 			BButton*			fRevertButton;
-			BButton*			fDefaultButton;	
+			BButton*			fDefaultButton;
 			BGroupLayout*		fRootLayout;
 };
 
@@ -190,7 +190,7 @@ PreferencesStorage<Preferences>::LoadPreferences()
 		LOG("failed to load settings\n");
 		return B_ERROR;
 	}
-	
+
 	if (settingsFile.Read(&fPreferences, sizeof(Preferences))
 			!= sizeof(Preferences)) {
 		LOG("failed to load settings\n");
@@ -244,7 +244,7 @@ PrefFileWatcher<Preferences>::PrefFileWatcher(
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 
-	BEntry entry(path.Path()); 
+	BEntry entry(path.Path());
 	if (entry.GetNodeRef(&fPreferencesDirectoryNode) == B_OK)
 		watch_node(&fPreferencesDirectoryNode, B_WATCH_DIRECTORY, fTarget);
 
@@ -273,11 +273,11 @@ PrefFileWatcher<Preferences>::Filter(BMessage *msg, BHandler **target)
 	int32 opcode;
 	BPath path;
 	node_ref nref;
-	
+
 	if (msg->what != B_NODE_MONITOR
 			|| msg->FindInt32("opcode", &opcode) != B_OK)
 		return result;
-		
+
 	switch (opcode) {
 		case B_ENTRY_MOVED:
 			msg->FindInt64("to directory", dir);
@@ -289,14 +289,14 @@ PrefFileWatcher<Preferences>::Filter(BMessage *msg, BHandler **target)
 			msg->FindString("name", &name);
 			fPreferencesStorage->GetPreferencesPath(path);
 			if (path.Path() == name) {
-				msg->FindInt32("device", &fPreferencesNode.device); 
+				msg->FindInt32("device", &fPreferencesNode.device);
 				msg->FindInt64("node", &fPreferencesNode.node);
 				watch_node(&fPreferencesNode, B_WATCH_STAT, fTarget);
 			}
 			fPreferencesStorage->LoadPreferences();
 			msg->what = kUpdatedPreferences;
 			break;
-			
+
 		case B_ENTRY_REMOVED:
 			msg->FindInt32("device", &nref.device);
 			msg->FindInt64("node", &nref.node);
@@ -309,7 +309,7 @@ PrefFileWatcher<Preferences>::Filter(BMessage *msg, BHandler **target)
 				msg->what = kUpdatedPreferences;
 			}
 			break;
-			
+
 		case B_STAT_CHANGED:
 			msg->FindInt32("device", &nref.device);
 			msg->FindInt64("node", &nref.node);
@@ -333,16 +333,19 @@ PreferencesWindow<Preferences>::PreferencesWindow(const char* title,
 	fPreferencesView(NULL)
 {
 	BGroupView* buttonView = new BGroupView(B_HORIZONTAL);
-	fDefaultButton = new BButton(TR("Defaults"), new BMessage(kDefaultMsg));
+	fDefaultButton = new BButton(B_TRANSLATE("Defaults"),
+		new BMessage(kDefaultMsg));
 
 	buttonView->AddChild(fDefaultButton);
-	buttonView->GetLayout()->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(7));
-	fRevertButton = new BButton(TR("Revert"), new BMessage(kRevertMsg));
-	
+	buttonView->GetLayout()->AddItem(
+		BSpaceLayoutItem::CreateHorizontalStrut(7));
+	fRevertButton = new BButton(B_TRANSLATE("Revert"),
+		new BMessage(kRevertMsg));
+
 	fRevertButton->SetEnabled(false);
 	buttonView->AddChild(fRevertButton);
 	buttonView->GetLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
-	
+
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	fRootLayout = new BGroupLayout(B_VERTICAL);
 	fRootLayout->SetInsets(10, 10, 10, 10);
@@ -350,9 +353,9 @@ PreferencesWindow<Preferences>::PreferencesWindow(const char* title,
 	BView* rootView = new BView("root view", 0, fRootLayout);
 	AddChild(rootView);
 	rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	fRootLayout->AddView(buttonView);
-		
+
 	BSize size = fRootLayout->PreferredSize();
 	ResizeTo(size.width, size.height);
 	_MoveToPosition();
@@ -375,24 +378,24 @@ PreferencesWindow<Preferences>::MessageReceived(BMessage *msg)
 		case kConfigChangedMsg:
 			fRevertButton->SetEnabled(true);
 			break;
-			
+
 		case kDefaultMsg:
 			PreferencesStorage<Preferences>::Defaults();
 			fRevertButton->SetEnabled(true);
 			if (fPreferencesView)
 				PostMessage(kDefaultMsg, fPreferencesView);
 			break;
-			
+
 		case kRevertMsg:
 			PreferencesStorage<Preferences>::Revert();
 			fRevertButton->SetEnabled(false);
 			if (fPreferencesView)
 				PostMessage(kRevertMsg, fPreferencesView);
 			break;
-			
+
 		default:
 			BWindow::MessageReceived(msg);
-	}	
+	}
 }
 
 
@@ -411,14 +414,14 @@ PreferencesWindow<Preferences>::SetPreferencesView(BView* prefView)
 {
 	if (fPreferencesView)
 		return false;
-		
+
 	fPreferencesView = prefView;
 	fRootLayout->AddView(0, fPreferencesView);
-	
+
 	BSize size = fRootLayout->PreferredSize();
 	ResizeTo(size.width, size.height);
 	_MoveToPosition();
-	
+
 	return true;
 }
 

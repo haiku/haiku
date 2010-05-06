@@ -14,7 +14,7 @@
 
 #define TR_CONTEXT "Main window"
 
-int 
+int
 main(int argc, char* argv[])
 {
 	BApplication	*app = new BApplication(kPrefSignature);
@@ -23,15 +23,16 @@ main(int argc, char* argv[])
 	be_locale->GetAppCatalog(&cat);
 
 	PreferencesWindow<freq_preferences> *window;
-	window = new PreferencesWindow<freq_preferences>(TR("CPU Frequency"),
-														kPreferencesFileName,
-														kDefaultPreferences);
+	window = new PreferencesWindow<freq_preferences>(
+												B_TRANSLATE("CPU Frequency"),
+												kPreferencesFileName,
+												kDefaultPreferences);
 	CPUFrequencyView* prefView = new CPUFrequencyView(BRect(0, 0, 400, 350),
 														window);
 	window->SetPreferencesView(prefView);
 	window->Show();
 	app->Run();
-	
+
 	delete app;
 	return 0;
 }

@@ -41,16 +41,16 @@ extern "C" _EXPORT BView *instantiate_deskbar_item(void);
  * So we mark them explicitly here.
  */
 void notUsed() {
-	TR_MARK("Dynamic performance");
-	TR_MARK("High performance");
-	TR_MARK("Low energy");
-	TR_MARK("Set state");
-	TR_MARK("CPUFrequency\n"
+	B_TRANSLATE_MARK("Dynamic performance");
+	B_TRANSLATE_MARK("High performance");
+	B_TRANSLATE_MARK("Low energy");
+	B_TRANSLATE_MARK("Set state");
+	B_TRANSLATE_MARK("CPUFrequency\n"
 			"\twritten by Clemens Zeidler\n"
 			"\tCopyright 2009, Haiku, Inc.\n");
-	TR_MARK("Ok");
-	TR_MARK("Open Speedstep preferences" B_UTF8_ELLIPSIS);
-	TR_MARK("Quit");
+	B_TRANSLATE_MARK("Ok");
+	B_TRANSLATE_MARK("Open Speedstep preferences" B_UTF8_ELLIPSIS);
+	B_TRANSLATE_MARK("Quit");
 }
 
 // messages FrequencySwitcher
@@ -218,19 +218,20 @@ FrequencyMenu::FrequencyMenu(BMenu* menu, BHandler* target,
 {
 	BCatalog catalog("x-vnd.Haiku-CPUFrequencyPref");
 	fDynamicPerformance = new BMenuItem(
-		catalog.GetString("Dynamic performance",TR_CONTEXT),
+		catalog.GetString("Dynamic performance", TR_CONTEXT),
 		new BMessage(kMsgPolicyDynamic));
 	fHighPerformance = new BMenuItem(
-		catalog.GetString("High performance",TR_CONTEXT),
+		catalog.GetString("High performance", TR_CONTEXT),
 		new BMessage(kMsgPolicyPerformance));
-	fLowEnergie = new BMenuItem(catalog.GetString("Low energy",TR_CONTEXT),
-		new BMessage(kMsgPolicyLowEnergy));
+	fLowEnergie = new BMenuItem(catalog.GetString("Low energy",
+		TR_CONTEXT), new BMessage(kMsgPolicyLowEnergy));
 
 	menu->AddItem(fDynamicPerformance);
 	menu->AddItem(fHighPerformance);
 	menu->AddItem(fLowEnergie);
 
-	fCustomStateMenu = new BMenu(catalog.GetString("Set state",TR_CONTEXT));
+	fCustomStateMenu = new BMenu(catalog.GetString("Set state",
+		TR_CONTEXT));
 
 	StateList* stateList = fInterface->GetCpuFrequencyStates();
 	for (int i = 0; i < stateList->CountItems(); i++) {
@@ -367,7 +368,7 @@ FrequencyMenu::UpdateMenu()
 //	#pragma mark -
 
 
-StatusView::StatusView(BRect frame,	bool inDeskbar,	
+StatusView::StatusView(BRect frame,	bool inDeskbar,
 	PreferencesStorage<freq_preferences>* storage)
 	:
 	BView(frame, kDeskbarItemName, B_FOLLOW_LEFT | B_FOLLOW_TOP,
@@ -506,8 +507,8 @@ StatusView::AttachedToWindow()
 
 	// perferences menu
 	fPreferencesMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
-	fPreferencesMenuFilter = new FrequencyMenu(fPreferencesMenu, this, fStorage,
-		&fDriverInterface);
+	fPreferencesMenuFilter = new FrequencyMenu(fPreferencesMenu, this,
+		fStorage, &fDriverInterface);
 
 	fPreferencesMenu->SetFont(be_plain_font);
 
@@ -519,8 +520,8 @@ StatusView::AttachedToWindow()
 	fOpenPrefItem->SetTarget(this);
 
 	if (fInDeskbar) {
-		fQuitItem= new BMenuItem(fCatalog.GetString("Quit", TR_CONTEXT),
-			new BMessage(B_QUIT_REQUESTED));
+		fQuitItem= new BMenuItem(fCatalog.GetString("Quit",
+			TR_CONTEXT), new BMessage(B_QUIT_REQUESTED));
 		fPreferencesMenu->AddItem(fQuitItem);
 		fQuitItem->SetTarget(this);
 	}
@@ -684,8 +685,8 @@ StatusView::_OpenPreferences()
 			ret = be_roster->ActivateApp(info.team);
 	}
 	if (ret < B_OK) {
-		BString errorMessage(TR("Launching the CPU frequency preflet failed.\n\n"
-			"Error: "));
+		BString errorMessage(B_TRANSLATE(
+			"Launching the CPU frequency preflet failed.\n\nError: "));
 		errorMessage << strerror(ret);
 		BAlert* alert = new BAlert("launch error", errorMessage.String(),
 			"Ok");

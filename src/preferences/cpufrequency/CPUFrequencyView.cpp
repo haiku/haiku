@@ -39,64 +39,66 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	SetLayout(mainLayout);
 	mainLayout->SetSpacing(10);
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	// stepping policy
 	BRect rect = Bounds();
 	rect.InsetBy(5, 5);
 	BBox *policyBox = new BBox(rect, "policyBox");
-	policyBox->SetLabel(TR("Stepping policy"));
+	policyBox->SetLabel(B_TRANSLATE("Stepping policy"));
 	BGroupLayout* policyLayout = new BGroupLayout(B_VERTICAL);
 	policyLayout->SetInsets(10, policyBox->TopBorderOffset() * 2 + 10, 10, 10);
 	policyLayout->SetSpacing(10);
 	policyBox->SetLayout(policyLayout);
 	mainLayout->AddView(policyBox);
-	
-	fPolicyMenu = new BMenu(TR("Stepping policy: "));
-	BMenuField *menuField = new BMenuField(TR("Stepping policy: "), fPolicyMenu);
-	
+
+	fPolicyMenu = new BMenu(B_TRANSLATE("Stepping policy: "));
+	BMenuField *menuField = new BMenuField(
+		B_TRANSLATE("Stepping policy: "), fPolicyMenu);
+
 	policyLayout->AddView(menuField);
-	
+
 	// dynamic stepping
 	BBox *dynamicBox = new BBox(rect, "dynamicBox");
-	dynamicBox->SetLabel(TR("Dynamic stepping"));
+	dynamicBox->SetLabel(B_TRANSLATE("Dynamic stepping"));
 	BGroupLayout* dynamicLayout = new BGroupLayout(B_VERTICAL);
 	dynamicLayout->SetInsets(10, dynamicBox->TopBorderOffset() * 2 + 10,
 								10, 10);
 	dynamicLayout->SetSpacing(10);
 	dynamicBox->SetLayout(dynamicLayout);
 	mainLayout->AddView(dynamicBox);
-	
+
 	fColorStepView = new ColorStepView(frame);
 	fColorStepView->SetFrequencys(fDriverInterface.GetCpuFrequencyStates());
-	
+
 	fIntegrationTime = new BTextControl(BRect(0,0,Bounds().Width(),10),
-											"intergal",
-											TR("Integration time [ms]: "), "",
-											new BMessage(kIntegrationTimeChanged));
-	
+										"intergal",
+										B_TRANSLATE("Integration time [ms]: "),
+										"",
+										new BMessage(kIntegrationTimeChanged));
+
 	dynamicLayout->AddView(fColorStepView);
 	dynamicLayout->AddView(fIntegrationTime);
-	
+
 	// status view
 	BBox *statusBox = new BBox(rect, "statusBox");
-	statusBox->SetLabel(TR("CPU frequency status view"));
+	statusBox->SetLabel(B_TRANSLATE("CPU frequency status view"));
 	BGroupLayout* statusLayout = new BGroupLayout(B_HORIZONTAL);
 	statusLayout->SetInsets(10, statusBox->TopBorderOffset() * 2 + 10, 10, 10);
 	statusLayout->SetSpacing(10);
 	statusBox->SetLayout(statusLayout);
 	mainLayout->AddView(statusBox);
-	
+
 	fStatusView = new StatusView(BRect(0, 0, 5, 5), false,
 									fStorage);
 	fStatusView->ShowPopUpMenu(false);
-		
+
 	fInstallButton = new BButton("installButton",
-									TR("Install replicant into Deskbar"),
-									new BMessage(kInstallIntoDeskbar));
-	
+								B_TRANSLATE("Install replicant into Deskbar"),
+								new BMessage(kInstallIntoDeskbar));
+
 	statusLayout->AddView(fStatusView);
 	statusLayout->AddView(fInstallButton);
-	statusLayout->AddItem(BSpaceLayoutItem::CreateGlue());	
+	statusLayout->AddItem(BSpaceLayoutItem::CreateGlue());
 }
 
 
@@ -105,7 +107,7 @@ CPUFrequencyView::MessageReceived(BMessage* message)
 {
 	freq_preferences* pref = fStorage->GetPreferences();
 	bool configChanged = false;
-	
+
 	switch (message->what) {
 		case kUpdatedPreferences:
 			fStatusView->MessageReceived(message);
@@ -119,24 +121,24 @@ CPUFrequencyView::MessageReceived(BMessage* message)
 			}
 			configChanged = true;
 			break;
-				
+
 		case kSteppingChanged:
 			// from ColorStepView
 			pref->stepping_threshold = fColorStepView->GetSliderPosition();
 			fStorage->SavePreferences();
 			configChanged = true;
 			break;
-			
+
 		case kIntegrationTimeChanged:
-			_ReadIntegrationTime();		
-			fStorage->SavePreferences();	
+			_ReadIntegrationTime();
+			fStorage->SavePreferences();
 			configChanged = true;
 			break;
-			
+
 		case kInstallIntoDeskbar:
 			_InstallReplicantInDeskbar();
 			break;
-			
+
 		case kRevertMsg:
 		case kDefaultMsg:
 			fStatusView->UpdateCPUFreqState();
@@ -145,7 +147,7 @@ CPUFrequencyView::MessageReceived(BMessage* message)
 		default:
 			BView::MessageReceived(message);
 	}
-	
+
 	if (configChanged)
 		Window()->PostMessage(kConfigChangedMsg);
 }
@@ -157,11 +159,11 @@ CPUFrequencyView::AttachedToWindow()
 	fFrequencyMenu = new FrequencyMenu(fPolicyMenu, this,
 		fStorage, &fDriverInterface);
 	AddFilter(fFrequencyMenu);
-	
+
 	fColorStepView->SetTarget(this);
 	fIntegrationTime->SetTarget(this);
 	fInstallButton->SetTarget(this);
-	
+
 	_UpdateViews();
 }
 
@@ -224,7 +226,7 @@ CPUFrequencyView::_UpdateViews()
 		fColorStepView->SetEnabled(false);
 		fIntegrationTime->SetEnabled(false);
 	}
-	
+
 	BString out;
 	out << pref->integration_time / kMilliSecond;
 	fIntegrationTime->SetText(out.String());
@@ -244,4 +246,4 @@ CPUFrequencyView::_ReadIntegrationTime()
 	else {
 		pref->integration_time = integration_time;
 	}
-}		
+}

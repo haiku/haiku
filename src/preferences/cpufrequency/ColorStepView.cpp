@@ -27,20 +27,20 @@ ColorStepView::ColorStepView(BRect frame)
 	: BControl(frame, "ColorStepView", "", new BMessage(kSteppingChanged),
 				B_FOLLOW_ALL, B_WILL_DRAW),
 	fOffScreenView(NULL),
-	fOffScreenBitmap(NULL)	
+	fOffScreenBitmap(NULL)
 {
 	fPerformanceList = new PerformanceList(20, true);
-	
+
 	fSliderPosition = 0;
 	fNSteps = 0;
 	fLowFreqColor.red = 0;
 	fLowFreqColor.blue = 255;
 	fLowFreqColor.green = 0;
-	
+
 	fHighFreqColor.red = 255;
 	fHighFreqColor.blue = 0;
 	fHighFreqColor.green = 0;
-	
+
 	fMinFrequencyLabel = "? MHz";
 	fMaxFrequencyLabel = "? MHz";
 	_InitView();
@@ -57,7 +57,7 @@ void
 ColorStepView::AttachedToWindow()
 {
 	fSlider->SetTarget(this);
-	
+
 	if (!fOffScreenView) {
 		fOffScreenView = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW);
 	}
@@ -99,7 +99,7 @@ ColorStepView::FrameResized(float w,float h)
 		delete fOffScreenBitmap;
 
 		fOffScreenView->ResizeTo(bounds.Width(), bounds.Height());
-	
+
 		fOffScreenBitmap = new BBitmap(Bounds(), B_RGBA32, true, false);
 		fOffScreenBitmap->AddChild(fOffScreenView);
 	}
@@ -114,7 +114,7 @@ ColorStepView::GetPreferredSize(float *width, float *height)
 	*width = Frame().Width();
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
-	
+
 	*height = fSlider->Frame().Height();
 	*height += kColorBarHeight;
 	*height += fontHeight.descent + fontHeight.ascent + 5;
@@ -131,33 +131,33 @@ ColorStepView::Draw(BRect updateRect)
 	else{
 		view = this;
 	}
-	
+
 	if (!fOffScreenBitmap || !fOffScreenBitmap->Lock())
 		return;
 	view->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		
+
 	view->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	view->FillRect(updateRect);
-		
+
 	BRect colorBarRect =  fSlider->BarFrame();
 	colorBarRect.top = 0;
 	colorBarRect.bottom = kColorBarHeight;
-	colorBarRect.OffsetTo(colorBarRect.left, fSlider->Frame().bottom);	
-			
+	colorBarRect.OffsetTo(colorBarRect.left, fSlider->Frame().bottom);
+
 	float pos = 0.0;
 	for (int i = fPerformanceList->CountItems() - 1; i >= 0 ; i--) {
 		performance_step* perfState = fPerformanceList->ItemAt(i);
-		
+
 		float nextPos = perfState->cpu_usage;
 		float width = colorBarRect.Width();
-		
+
 		BRect subRect(colorBarRect);
 		subRect.left += pos * width;
 		subRect.right = colorBarRect.left + nextPos * width;
-		
+
 		view->SetHighColor(perfState->color);
 		view->FillRect(subRect);
-		
+
 		pos = nextPos;
 	}
 	// draw label
@@ -166,25 +166,25 @@ ColorStepView::Draw(BRect updateRect)
 	} else {
 		view->SetHighColor(tint_color(LowColor(), B_DISABLED_LABEL_TINT));
 	}
-	
+
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	float totalFontHeight = fontHeight.descent + fontHeight.ascent;
-	
+
 	view->DrawString(fMinFrequencyLabel.String(),
 						BPoint(0.0,
 								colorBarRect.bottom + totalFontHeight + 5));
-	
+
 	view->DrawString(fMaxFrequencyLabel.String(),
 						BPoint(Bounds().right
 								- StringWidth(fMaxFrequencyLabel.String()),
 								colorBarRect.bottom	+ totalFontHeight + 5));
-	
+
 	// blit bitmap
 	fOffScreenView->Sync();
 	fOffScreenBitmap->Unlock();
 	DrawBitmap(fOffScreenBitmap, B_ORIGIN);
-	
+
 	BView::Draw(updateRect);
 }
 
@@ -227,7 +227,7 @@ ColorStepView::SetFrequencys(StateList *list)
 		fMinFrequencyLabel = CreateFrequencyString(minFreq);
 		fMaxFrequencyLabel = CreateFrequencyString(maxFreq);
 	}
-	
+
 	// fit size of fPerformanceList
 	int32 perfNumber = fPerformanceList->CountItems();
 	if (perfNumber < fNSteps) {
@@ -251,7 +251,7 @@ ColorStepView::GetPerformanceSteps()
 }
 
 
-BString	
+BString
 ColorStepView::CreateFrequencyString(uint16 frequency)
 {
 	BString string = "";
@@ -277,18 +277,19 @@ ColorStepView::UsageOfStep(int32 step, int32 nSteps, float base)
 	return base + singleWidth * step;
 }
 
-		
+
 void
 ColorStepView::_InitView()
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	BRect sliderFrame(Bounds());
-	
-	fSlider = new BSlider(sliderFrame, "StepSlider", TR("Step up by CPU usage"),
+
+	fSlider = new BSlider(sliderFrame, "StepSlider",
+							B_TRANSLATE("Step up by CPU usage"),
 							new BMessage(kSteppingChanged), 0, 100);
 	fSlider->SetModificationMessage(new BMessage(kMSGSliderChanged));
-	
+
 	fSliderPosition = 0.25 - fNSteps * 0.05;
 	fSlider->SetPosition(fSliderPosition);
 	fSlider->SetLimitLabels("0%", "100%");
@@ -315,7 +316,7 @@ ColorStepView::_PositonStep(int32 step)
 {
 	if (step >= fNSteps)
 		return 1.0;
-	
+
 	return UsageOfStep(step, fNSteps, fSliderPosition);
 }
 
