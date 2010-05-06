@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Philippe Saint-Pierre
  *		Jonas Sundström
  */
+
 
 #include "Constants.h"
 #include "ColorMenuItem.h"
@@ -26,6 +27,7 @@
 #include <Debug.h>
 #include <File.h>
 #include <FilePanel.h>
+#include <fs_attr.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -44,8 +46,11 @@ using namespace BPrivate;
 
 const float kLineViewWidth = 30.0;
 
+#define ATTRNAME_SE_INFO "se-info"
+
 #undef TR_CONTEXT
 #define TR_CONTEXT "StyledEditWindow"
+
 
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
@@ -79,6 +84,7 @@ StyledEditWindow::~StyledEditWindow()
 
 #undef TR_CONTEXT
 #define TR_CONTEXT "Menus"
+
 
 void
 StyledEditWindow::InitWindow(uint32 encoding)
@@ -129,7 +135,7 @@ StyledEditWindow::InitWindow(uint32 encoding)
 		true, true, B_PLAIN_BORDER);
 	AddChild(fScrollView);
 	fTextView->MakeFocus(true);
-	
+
 	// Add "File"-menu:
 	BMenu* menu = new BMenu(TR("File"));
 	fMenuBar->AddItem(menu);
@@ -272,7 +278,7 @@ StyledEditWindow::InitWindow(uint32 encoding)
 		if (get_font_family(i, &family) == B_OK) {
 			subMenu = new BMenu(family);
 			subMenu->SetRadioMode(true);
-			fFontMenu->AddItem(menuItem = new BMenuItem(subMenu, 
+			fFontMenu->AddItem(menuItem = new BMenuItem(subMenu,
 				new BMessage(FONT_FAMILY)));
 
 			int32 numStyles = count_font_styles(family);
@@ -311,6 +317,61 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	fSavePanel = NULL;
 	fSavePanelEncodingMenu = NULL;
 		// build lazily
+}
+
+
+void
+StyledEditWindow::LoadAttrs()
+{
+	if (!fSaveMessage)
+		return;
+
+	entry_ref dir;
+	const char* name;
+	if (fSaveMessage->FindRef("directory", &dir) != B_OK
+		|| fSaveMessage->FindString("name", &name) != B_OK)
+		return;
+
+	BPath documentPath(&dir);
+	documentPath.Append(name);
+
+	BNode documentNode(documentPath.Path());
+	if (documentNode.InitCheck() != B_OK)
+		return;
+
+	BRect newFrame(Frame());
+	ssize_t bytesRead = documentNode.ReadAttr(ATTRNAME_SE_INFO, B_RECT_TYPE,
+		0, &newFrame, sizeof(BRect));
+	if (bytesRead < 0)
+		return;
+
+	MoveTo(newFrame.left, newFrame.top);
+	ResizeTo(newFrame.Width(), newFrame.Height());
+}
+
+
+void
+StyledEditWindow::SaveAttrs()
+{
+	if (!fSaveMessage)
+		return;
+
+	entry_ref dir;
+	const char* name;
+	if (fSaveMessage->FindRef("directory", &dir) != B_OK
+		|| fSaveMessage->FindString("name", &name) != B_OK)
+		return;
+
+	BPath documentPath(&dir);
+	documentPath.Append(name);
+
+	BNode documentNode(documentPath.Path());
+	if (documentNode.InitCheck() != B_OK)
+		return;
+
+	BRect frame(Frame());
+	documentNode.WriteAttr(ATTRNAME_SE_INFO, B_RECT_TYPE, 0, &frame,
+		sizeof(BRect));
 }
 
 
@@ -768,6 +829,7 @@ StyledEditWindow::MenusBeginning()
 void
 StyledEditWindow::Quit()
 {
+	SaveAttrs();
 	styled_edit_app->CloseDocument();
 	BWindow::Quit();
 }
@@ -791,6 +853,7 @@ bs_printf(BString* string, const char* format, ...)
 #undef TR_CONTEXT
 #define TR_CONTEXT "QuitAlert"
 
+
 bool
 StyledEditWindow::QuitRequested()
 {
@@ -799,7 +862,7 @@ StyledEditWindow::QuitRequested()
 
 	BString alertText;
 	bs_printf(&alertText, TR("Save changes to the document \"%s\"? "), Title());
-	
+
 	int32 index = _ShowAlert(alertText, TR("Cancel"), TR("Don't save"), TR("Save"),
 		B_WARNING_ALERT);
 
@@ -820,6 +883,7 @@ StyledEditWindow::QuitRequested()
 
 #undef TR_CONTEXT
 #define TR_CONTEXT "SaveAlert"
+
 
 status_t
 StyledEditWindow::Save(BMessage* message)
@@ -862,7 +926,7 @@ StyledEditWindow::Save(BMessage* message)
 						break;
 				}
 			}
-			
+
 			status = fTextView->WriteStyledEditFile(&file);
 		}
 	}
@@ -899,6 +963,7 @@ StyledEditWindow::Save(BMessage* message)
 
 #undef TR_CONTEXT
 #define TR_CONTEXT "Open_and_SaveAsPanel"
+
 
 status_t
 StyledEditWindow::SaveAs(BMessage* message)
@@ -952,6 +1017,7 @@ StyledEditWindow::SaveAs(BMessage* message)
 
 #undef TR_CONTEXT
 #define TR_CONTEXT "LoadAlert"
+
 
 status_t
 StyledEditWindow::_LoadFile(entry_ref* ref)
@@ -1035,6 +1101,8 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 		fSaveMessage->AddRef("directory", &parentRef);
 		fSaveMessage->AddString("name", name);
 		SetTitle(name);
+
+		LoadAttrs();
 	}
 	fTextView->Select(0, 0);
 }
@@ -1042,6 +1110,7 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 
 #undef TR_CONTEXT
 #define TR_CONTEXT "RevertToSavedAlert"
+
 
 void
 StyledEditWindow::RevertToSaved()
@@ -1407,6 +1476,8 @@ StyledEditWindow::SetFontStyle(const char* fontFamily, const char* fontStyle)
 
 #undef TR_CONTEXT
 #define TR_CONTEXT "Menus"
+
+
 void
 StyledEditWindow::_UpdateCleanUndoRedoSaveRevert()
 {

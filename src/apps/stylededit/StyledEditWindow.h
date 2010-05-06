@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,6 +15,7 @@
 #include <Window.h>
 #include <String.h>
 #include <Message.h>
+
 
 struct entry_ref;
 
@@ -32,7 +33,7 @@ class StyledEditWindow : public BWindow {
 						StyledEditWindow(BRect frame, int32 id, uint32 encoding = 0);
 						StyledEditWindow(BRect frame, entry_ref *ref, uint32 encoding = 0);
 		virtual			~StyledEditWindow();
-	
+
 		virtual void	Quit();
 		virtual bool	QuitRequested();
 		virtual void	MessageReceived(BMessage *message);
@@ -40,17 +41,19 @@ class StyledEditWindow : public BWindow {
 
 		status_t		Save(BMessage *message = 0);
 		status_t		SaveAs(BMessage *message = 0);
-		void			OpenFile(entry_ref *ref); 
+		void			OpenFile(entry_ref *ref);
 		status_t		PageSetup(const char *documentname);
 		void			Print(const char *documentname);
 		void			SearchAllWindows(BString find, BString replace, bool casesens);
 		bool			IsDocumentEntryRef(const entry_ref *ref);
 
-	private: 
+	private:
 		void			InitWindow(uint32 encoding = 0);
+		void			LoadAttrs();
+		void			SaveAttrs();
 		bool			Search(BString searchfor, bool casesens, bool wrap, bool backsearch);
 		void			FindSelection();
-		bool			Replace(BString findthis, BString replacewith, bool casesens, 
+		bool			Replace(BString findthis, BString replacewith, bool casesens,
 							bool wrap, bool backsearch);
 		void			ReplaceAll(BString find, BString replace, bool casesens);
 		void			SetFontSize(float fontSize);
@@ -65,7 +68,7 @@ class StyledEditWindow : public BWindow {
 
 		BMenuBar		*fMenuBar;
 		BMessage		*fPrintSettings;
-		BMessage		*fSaveMessage; 
+		BMessage		*fSaveMessage;
 		BMenu			*fRecentMenu;
 
 		BMenu			*fFontMenu;
@@ -123,5 +126,5 @@ class StyledEditWindow : public BWindow {
 		BMenu			*fSavePanelEncodingMenu;
 };
 
-#endif	// STYLED_EDIT_WINDOW_H
 
+#endif	// STYLED_EDIT_WINDOW_H
