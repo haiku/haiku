@@ -794,9 +794,11 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		cache = newCache;
 	}
 
-	status = cache->SetMinimalCommitment(size, priority);
-	if (status != B_OK)
-		goto err2;
+	if ((flags & CREATE_AREA_DONT_COMMIT_MEMORY) == 0) {
+		status = cache->SetMinimalCommitment(size, priority);
+		if (status != B_OK)
+			goto err2;
+	}
 
 	// check to see if this address space has entered DELETE state
 	if (addressSpace->IsBeingDeleted()) {
@@ -2229,7 +2231,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	status = map_backing_store(targetAddressSpace, cache, _address,
 		source->cache_offset, source->Size(), addressSpec, source->wiring,
 		protection, sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
-		&target, name, 0, true);
+		&target, name, writableCopy ? 0 : CREATE_AREA_DONT_COMMIT_MEMORY, true);
 	if (status < B_OK)
 		return status;
 
