@@ -304,7 +304,7 @@ void Account::CreateInbound()
 	if (!BEntry(path.Path()).Exists()) {
 		find_directory(B_BEOS_ADDONS_DIRECTORY,&path);
 		path.Append(kSystemFilterAddOnPath);
-		path.Append(TR ("New mail notification"));
+		path.Append("New mail notification");
 	}
 	BEntry(path.Path()).GetRef(&ref);
 	fInbound->AddFilter(msg,ref);
@@ -312,11 +312,11 @@ void Account::CreateInbound()
 	// Inbox
 	path = addOnPath;
 	path.Append(kSystemFilterAddOnPath);
-	path.Append(TR ("Inbox"));
+	path.Append("Inbox");
 	if (!BEntry(path.Path()).Exists()) {
 		find_directory(B_BEOS_ADDONS_DIRECTORY,&path);
 		path.Append(kSystemFilterAddOnPath);
-		path.Append(TR ("Inbox"));
+		path.Append("Inbox");
 	}
 	BEntry(path.Path()).GetRef(&ref);
 	fInbound->AddFilter(msg,ref);
@@ -347,11 +347,11 @@ void Account::CreateOutbound()
 		
 	path = addOnPath;
 	path.Append(kSystemFilterAddOnPath);
-	path.Append(TR ("Outbox"));
+	path.Append("Outbox");
 	if (!BEntry(path.Path()).Exists()) {
 		find_directory(B_BEOS_ADDONS_DIRECTORY,&path);
 		path.Append(kSystemFilterAddOnPath);
-		path.Append(TR ("Outbox"));
+		path.Append("Outbox");
 	}
 	BEntry(path.Path()).GetRef(&ref);
 	fOutbound->AddFilter(msg,ref);
