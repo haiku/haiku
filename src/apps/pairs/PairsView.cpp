@@ -19,8 +19,8 @@
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <IconUtils.h>
-#include <Locale.h>
 #include <List.h>
+#include <Locale.h>
 #include <Node.h>
 #include <NodeInfo.h>
 #include <Path.h>
