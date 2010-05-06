@@ -36,10 +36,12 @@
 #include <PrintJob.h>
 #include <Rect.h>
 #include <Roster.h>
+#include <Screen.h>
 #include <ScrollView.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
+
 
 using namespace BPrivate;
 
@@ -50,6 +52,24 @@ const float kLineViewWidth = 30.0;
 
 #undef TR_CONTEXT
 #define TR_CONTEXT "StyledEditWindow"
+
+
+// This is a temporary solution for building BString with printf like format.
+// will be removed in the future.
+static void
+bs_printf(BString* string, const char* format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	char* buf;
+	vasprintf(&buf, format, ap);
+	string->SetTo(buf);
+	free(buf);
+	va_end(ap);
+}
+
+
+// #pragma mark -
 
 
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
@@ -339,14 +359,21 @@ StyledEditWindow::LoadAttrs()
 	if (documentNode.InitCheck() != B_OK)
 		return;
 
-	BRect newFrame(Frame());
+	BRect newFrame;
 	ssize_t bytesRead = documentNode.ReadAttr(ATTRNAME_SE_INFO, B_RECT_TYPE,
 		0, &newFrame, sizeof(BRect));
-	if (bytesRead < 0)
+	if (bytesRead != sizeof(BRect))
 		return;
 
-	MoveTo(newFrame.left, newFrame.top);
-	ResizeTo(newFrame.Width(), newFrame.Height());
+	swap_data(B_RECT_TYPE, &newFrame, sizeof(BRect), B_SWAP_BENDIAN_TO_HOST);
+
+	// Check if the frame in on screen, otherwise, ignore it
+	BScreen screen(this);
+	if (newFrame.Width() > 32 && newFrame.Height() > 32
+		&& screen.Frame().Contains(newFrame)) {
+		MoveTo(newFrame.left, newFrame.top);
+		ResizeTo(newFrame.Width(), newFrame.Height());
+	}
 }
 
 
@@ -370,6 +397,8 @@ StyledEditWindow::SaveAttrs()
 		return;
 
 	BRect frame(Frame());
+	swap_data(B_RECT_TYPE, &frame, sizeof(BRect), B_SWAP_HOST_TO_BENDIAN);
+
 	documentNode.WriteAttr(ATTRNAME_SE_INFO, B_RECT_TYPE, 0, &frame,
 		sizeof(BRect));
 }
@@ -832,21 +861,6 @@ StyledEditWindow::Quit()
 	SaveAttrs();
 	styled_edit_app->CloseDocument();
 	BWindow::Quit();
-}
-
-
-// This is temporary solution for building BString with printf like format.
-// will be removed in the future.
-static void
-bs_printf(BString* string, const char* format, ...)
-{
-	va_list 	ap;
-	va_start(ap, format);
-	char*	buf;
-	vasprintf(&buf, format, ap);
-	string->SetTo(buf);
-	free(buf);
-	va_end(ap);
 }
 
 
