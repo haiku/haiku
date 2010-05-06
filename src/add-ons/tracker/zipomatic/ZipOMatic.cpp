@@ -45,7 +45,7 @@ ZipOMatic::~ZipOMatic()
 }
 
 
-void 
+void
 ZipOMatic::RefsReceived(BMessage* message)
 {
 	entry_ref ref;
@@ -66,7 +66,7 @@ ZipOMatic::ReadyToRun()
 }
 
 
-void 
+void
 ZipOMatic::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -96,7 +96,7 @@ ZipOMatic::MessageReceived(BMessage* message)
 
 		default:
 			BApplication::MessageReceived(message);
-			break;			
+			break;
 	}
 }
 
@@ -106,33 +106,33 @@ ZipOMatic::QuitRequested(void)
 {
 	if (CountWindows() <= 0)
 		return true;
-	
+
 	BWindow* window;
 	ZippoWindow* zippo;
 	ZippoWindow* lastFoundZippo = NULL;
 	int32 zippoCount = 0;
-	
+
 	for (int32 i = 0;; i++) {
 		window = WindowAt(i);
 		if (window == NULL)
 			break;
-		
+
 		zippo = dynamic_cast<ZippoWindow*>(window);
 		if (zippo == NULL)
 			continue;
-		
+
 		lastFoundZippo = zippo;
-		
+
 		if (zippo->Lock()) {
 			if (zippo->IsZipping())
 				zippoCount++;
 			else
 				zippo->PostMessage(B_QUIT_REQUESTED);
-				
+
 			zippo->Unlock();
 		}
 	}
-	
+
 	if (zippoCount == 1) {
 		// This is likely the most frequent case - a single zipper.
 		// We post a message to the window so it can put up its own
@@ -153,32 +153,32 @@ ZipOMatic::QuitRequested(void)
 		// in that zippers are not paused while the BAlert is up.
 
 		BString question;
-		question << TR("You have %ld Zip-O-Matic running.\n\n");
-		question << TR("Do you want to stop them?");
-		
+		question << B_TRANSLATE("You have %ld Zip-O-Matic running.\n\n");
+		question << B_TRANSLATE("Do you want to stop them?");
+
 		BString temp;
 		temp << zippoCount;
 		question.ReplaceFirst("%ld", temp.String());
 
 		BAlert* alert = new BAlert(NULL, question.String(),
-			TR("Stop them"), TR("Let them continue"), NULL, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT);
+			B_TRANSLATE("Stop them"), B_TRANSLATE("Let them continue"), NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(fInvoker);
 		alert->Activate();
 			// BAlert, being modal, does not show on the current workspace
 			// if the application has no window there. Activate() triggers
 			// a switch to a workspace where it does have a window.
-			
+
 			// TODO: See if AS_ACTIVATE_WINDOW should be handled differently
 			// in src/servers/app/Desktop.cpp Desktop::ActivateWindow()
 			// or if maybe BAlert should (and does not?) activate itself.
-			
+
 		return false;
 	}
 
 	if (CountWindows() <= 0)
 		return true;
-	
+
 	return false;
 }
 
@@ -208,7 +208,7 @@ ZipOMatic::_UseExistingOrCreateNewWindow(BMessage* message)
 			continue;
 
 		list.AddItem(zWindow);
-		
+
 		if (zWindow->Lock()) {
 			if (!zWindow->IsZipping()) {
 				if (message != NULL)
@@ -239,16 +239,16 @@ ZipOMatic::_StopZipping()
 	BWindow* window;
 	ZippoWindow* zippo;
 	BList list;
-	
+
 	for (int32 i = 0;; i++) {
 		window = WindowAt(i);
 		if (window == NULL)
 			break;
-		
+
 		zippo = dynamic_cast<ZippoWindow*>(window);
 		if (zippo == NULL)
 			continue;
-		
+
 		list.AddItem(zippo);
 	}
 
@@ -264,6 +264,6 @@ ZipOMatic::_StopZipping()
 			zippo->PostMessage(B_QUIT_REQUESTED);
 			zippo->Unlock();
 		}
-	}	
+	}
 }
 

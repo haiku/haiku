@@ -44,7 +44,7 @@ ZipperThread::ZipperThread(BMessage* refsMessage, BWindow* window)
 }
 
 
-ZipperThread::~ZipperThread()	
+ZipperThread::~ZipperThread()
 {
 }
 
@@ -112,7 +112,7 @@ ZipperThread::ThreadStartup()
 	BString archiveName;
 
 	if (refCount > 1)
-		archiveName = TR("Archive");
+		archiveName = B_TRANSLATE("Archive");
 	else
 		archiveName = lastRef.name;
 
@@ -154,7 +154,7 @@ ZipperThread::ThreadStartup()
 
 	argv[argc] = NULL;
 
-	fZipProcess = _PipeCommand(argc, argv, fStdIn, fStdOut, fStdErr); 
+	fZipProcess = _PipeCommand(argc, argv, fStdIn, fStdOut, fStdErr);
 
 	delete [] argv;
 
@@ -170,7 +170,7 @@ ZipperThread::ThreadStartup()
 	_SendMessageToWindow(ZIPPO_TASK_DESCRIPTION, "archive_filename",
 		archiveName.String());
 	_SendMessageToWindow(ZIPPO_LINE_OF_STDOUT, "zip_output",
-		TR("Preparing to archive"));
+		B_TRANSLATE("Preparing to archive"));
 
 	return B_OK;
 }
@@ -206,8 +206,8 @@ ZipperThread::ExecuteUnit()
 status_t
 ZipperThread::ThreadShutdown()
 {
-	close(fStdIn); 
-	close(fStdOut); 
+	close(fStdIn);
+	close(fStdOut);
 	close(fStdErr);
 
 	// _SelectInTracker();
@@ -250,8 +250,8 @@ void
 ZipperThread::_MakeShellSafe(BString* string)
 {
 	string->CharacterEscape("\"$`", '\\');
-	string->Prepend("\""); 
-	string->Append("\""); 
+	string->Prepend("\"");
+	string->Append("\"");
 }
 
 
@@ -294,9 +294,9 @@ ZipperThread::_PipeCommand(int argc, const char** argv, int& in, int& out,
 		close(errPipe[1]);
 
 		if (errno == 0) {
-			in = inPipe[1];		// Write to in, appears on cmd's stdin 
-			out = outPipe[0];	// Read from out, taken from cmd's stdout 
-			err = errPipe[0];	// Read from err, taken from cmd's stderr 
+			in = inPipe[1];		// Write to in, appears on cmd's stdin
+			out = outPipe[0];	// Read from out, taken from cmd's stdout
+			err = errPipe[0];	// Read from err, taken from cmd's stderr
 
 			// execute command
 			thread = load_image(argc, argv, envp);
@@ -419,7 +419,7 @@ ZipperThread::_SelectInTracker(int32 tryNumber)
 	BMessenger trackerMessenger("application/x-vnd.Be-TRAK");
 	if (!trackerMessenger.IsValid())
 		return B_ERROR;
-	
+
 	BMessage request;
 	BMessage reply;
 	status_t status;

@@ -55,11 +55,13 @@ ZippoWindow::ZippoWindow(BList windowList, bool keepOpen)
 	fArchiveNameView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
-	fZipOutputView = new BStringView("output_text", TR("Drop files to zip."));
+	fZipOutputView = new BStringView("output_text",
+		B_TRANSLATE("Drop files to zip."));
 	fZipOutputView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
-	fStopButton = new BButton("stop", TR("Stop"), new BMessage(B_QUIT_REQUESTED));
+	fStopButton = new BButton("stop", B_TRANSLATE("Stop"),
+		new BMessage(B_QUIT_REQUESTED));
 	fStopButton->SetEnabled(false);
 	fStopButton->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 		B_ALIGN_VERTICAL_UNSET));
@@ -81,54 +83,54 @@ ZippoWindow::ZippoWindow(BList windowList, bool keepOpen)
 }
 
 
-ZippoWindow::~ZippoWindow()	
+ZippoWindow::~ZippoWindow()
 {
 	delete fWindowInvoker;
 }
 
 
-void 
+void
 ZippoWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_REFS_RECEIVED:
 		case B_SIMPLE_DATA:
-			if (IsZipping()) {	
-				message->what = B_REFS_RECEIVED;	
+			if (IsZipping()) {
+				message->what = B_REFS_RECEIVED;
 				be_app_messenger.SendMessage(message);
 			} else {
 				_StartZipping(message);
 			}
 			break;
-		
+
 		case ZIPPO_THREAD_EXIT:
 			fThread = NULL;
 			fActivityView->Stop();
 			fStopButton->SetEnabled(false);
 			fArchiveNameView->SetText(" ");
 			if (fZippingWasStopped)
-				fZipOutputView->SetText(TR("Stopped"));
+				fZipOutputView->SetText(B_TRANSLATE("Stopped"));
 			else
-				fZipOutputView->SetText(TR("Archive created OK"));
-				
+				fZipOutputView->SetText(B_TRANSLATE("Archive created OK"));
+
 			_CloseWindowOrKeepOpen();
 			break;
-											
+
 		case ZIPPO_THREAD_EXIT_ERROR:
 			// TODO: figure out why this case does not happen when it should
 			fThread = NULL;
 			fActivityView->Stop();
 			fStopButton->SetEnabled(false);
 			fArchiveNameView->SetText("");
-			fZipOutputView->SetText(TR("Error creating archive"));
+			fZipOutputView->SetText(B_TRANSLATE("Error creating archive"));
 			break;
-						
+
 		case ZIPPO_TASK_DESCRIPTION:
 		{
 			BString filename;
 			if (message->FindString("archive_filename", &filename) == B_OK) {
 				fArchiveName = filename;
-				BString temp(TR("Creating archive: %s"));
+				BString temp(B_TRANSLATE("Creating archive: %s"));
 				temp.ReplaceFirst("%s", filename.String());
 				fArchiveNameView->SetText(temp.String());
 			}
@@ -145,7 +147,7 @@ ZippoWindow::MessageReceived(BMessage* message)
 					// behavior as the window resizes for each line of output.
 					// Instead of showing the true output of /bin/zip
 					// we display a file count and whether the archive is
-					// being created (added to) or if we're updating an 
+					// being created (added to) or if we're updating an
 					// already existing archive.
 
 					BString output;
@@ -154,9 +156,9 @@ ZippoWindow::MessageReceived(BMessage* message)
 					count << fFileCount;
 
 					if (fFileCount == 1) {
-						output << TR("1 file added.");
+						output << B_TRANSLATE("1 file added.");
 					} else {
-						output << TR("%ld files added.");
+						output << B_TRANSLATE("%ld files added.");
 						output.ReplaceFirst("%ld", count.String());
 					}
 
@@ -177,13 +179,13 @@ ZippoWindow::MessageReceived(BMessage* message)
 				} else {
 					if (fThread != NULL)
 						fThread->ResumeExternalZip();
-						
+
 					fActivityView->Start();
 				}
 			}
 			break;
 		}
-		
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -204,14 +206,15 @@ ZippoWindow::QuitRequested()
 		fActivityView->Pause();
 
 		BString message;
-		message << TR("Are you sure you want to stop creating this archive?");
+		message << B_TRANSLATE("Are you sure you want to stop creating this "
+			"archive?");
 		message << "\n\n";
-		message << TR("Filename: %s");
+		message << B_TRANSLATE("Filename: %s");
 		message << "\n";
 		message.ReplaceFirst("%s", fArchiveName.String());
 
-		BAlert* alert = new BAlert(NULL, message.String(), TR("Stop"),
-			TR("Continue"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert(NULL, message.String(), B_TRANSLATE("Stop"),
+			B_TRANSLATE("Continue"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(fWindowInvoker);
 
 		return false;
@@ -228,7 +231,7 @@ ZippoWindow::_StartZipping(BMessage* message)
 
 	fThread = new ZipperThread(message, this);
 	fThread->Start();
-	
+
 	fZippingWasStopped = false;
 }
 
@@ -243,13 +246,13 @@ ZippoWindow::StopZipping()
 
 	fThread->InterruptExternalZip();
 	fThread->Quit();
-	
+
 	status_t status = B_OK;
 	fThread->WaitForThread(&status);
 	fThread = NULL;
 
 	fArchiveNameView->SetText(" ");
-	fZipOutputView->SetText(TR("Stopped"));
+	fZipOutputView->SetText(B_TRANSLATE("Stopped"));
 
 	_CloseWindowOrKeepOpen();
 }
@@ -308,7 +311,7 @@ ZippoWindow::_FindBestPlacement()
 	tryRect = centeredRect;
 	while (true) {
 		_OffsetRect(&tryRect, primaryDirection);
-		
+
 		if (!screen.Frame().Contains(tryRect))
 			_OffscreenBounceBack(&tryRect, &primaryDirection, right);
 
@@ -327,7 +330,7 @@ ZippoWindow::_FindBestPlacement()
 		ZippoWindow* window = dynamic_cast<ZippoWindow*>(win);
 		if (window == NULL)
 			continue;
-	
+
 		if (window == this)
 			continue;
 
@@ -351,7 +354,7 @@ ZippoWindow::_FindBestPlacement()
 	// find nearest rect
 	bool gotRect = false;
 	BRect nearestRect(0, 0, 0, 0);
-	
+
 	while (true) {
 		BRect* rect = static_cast<BRect*>(tryRectList.RemoveItem((int32)0));
 		if (rect == NULL)
