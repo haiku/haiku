@@ -29,15 +29,16 @@
 
 PreferencesWindow::PreferencesWindow(BRect frame)
 	:
-	BWindow(frame, TR("Deskbar preferences"), B_TITLED_WINDOW,
+	BWindow(frame, B_TRANSLATE("Deskbar preferences"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	// Controls
-	fMenuRecentDocuments = new BCheckBox(TR("Recent documents:"),
+	fMenuRecentDocuments = new BCheckBox(B_TRANSLATE("Recent documents:"),
 		new BMessage(kUpdateRecentCounts));
-	fMenuRecentApplications = new BCheckBox(TR("Recent applications:"),
+	fMenuRecentApplications = new BCheckBox(
+		B_TRANSLATE("Recent applications:"),
 		new BMessage(kUpdateRecentCounts));
-	fMenuRecentFolders = new BCheckBox(TR("Recent folders:"),
+	fMenuRecentFolders = new BCheckBox(B_TRANSLATE("Recent folders:"),
 		new BMessage(kUpdateRecentCounts));
 
 	fMenuRecentDocumentCount = new BTextControl(NULL, NULL,
@@ -47,25 +48,29 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fMenuRecentFolderCount = new BTextControl(NULL, NULL,
 		new BMessage(kUpdateRecentCounts));
 
-	fAppsSort = new BCheckBox(TR("Sort running applications"),
+	fAppsSort = new BCheckBox(B_TRANSLATE("Sort running applications"),
 		new BMessage(kSortRunningApps));
-	fAppsSortTrackerFirst = new BCheckBox(TR("Tracker always first"),
+	fAppsSortTrackerFirst = new BCheckBox(B_TRANSLATE("Tracker always first"),
 		new BMessage(kTrackerFirst));
-	fAppsShowExpanders = new BCheckBox(TR("Show application expander"),
+	fAppsShowExpanders = new BCheckBox(
+		B_TRANSLATE("Show application expander"),
 		new BMessage(kSuperExpando));
-	fAppsExpandNew = new BCheckBox(TR("Expand new applications"),
+	fAppsExpandNew = new BCheckBox(B_TRANSLATE("Expand new applications"),
 		new BMessage(kExpandNewTeams));
 
-	fClock24Hours = new BCheckBox(TR("24 hour clock"), new BMessage(kMilTime));
-	fClockSeconds = new BCheckBox(TR("Show seconds"),
+	fClock24Hours = new BCheckBox(B_TRANSLATE("24 hour clock"),
+		new BMessage(kMilTime));
+	fClockSeconds = new BCheckBox(B_TRANSLATE("Show seconds"),
 		new BMessage(kShowSeconds));
-	fClockEuropeanDate = new BCheckBox(TR("European date"),
+	fClockEuropeanDate = new BCheckBox(B_TRANSLATE("European date"),
 		new BMessage(kEuroDate));
-	fClockFullDate = new BCheckBox(TR("Full date"), new BMessage(kFullDate));
+	fClockFullDate = new BCheckBox(B_TRANSLATE("Full date"),
+		new BMessage(kFullDate));
 
-	fWindowAlwaysOnTop = new BCheckBox(TR("Always on top"),
+	fWindowAlwaysOnTop = new BCheckBox(B_TRANSLATE("Always on top"),
 		new BMessage(kAlwaysTop));
-	fWindowAutoRaise = new BCheckBox(TR("Auto-raise"), new BMessage(kAutoRaise));
+	fWindowAutoRaise = new BCheckBox(B_TRANSLATE("Auto-raise"),
+		new BMessage(kAutoRaise));
 
 	BTextView* docTextView = fMenuRecentDocumentCount->TextView();
 	BTextView* appTextView = fMenuRecentApplicationCount->TextView();
@@ -98,10 +103,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	fMenuRecentDocuments->SetValue(appSettings->recentDocsEnabled);
 	fMenuRecentDocumentCount->SetEnabled(appSettings->recentDocsEnabled);
-	
+
 	fMenuRecentApplications->SetValue(appSettings->recentAppsEnabled);
 	fMenuRecentApplicationCount->SetEnabled(appSettings->recentAppsEnabled);
-	
+
 	fMenuRecentFolders->SetValue(appSettings->recentFoldersEnabled);
 	fMenuRecentFolderCount->SetEnabled(appSettings->recentFoldersEnabled);
 
@@ -154,10 +159,10 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fClockBox = new BBox("fClockBox");
 	fWindowBox = new BBox("fWindowBox");
 
-	fMenuBox->SetLabel(TR("Menu"));
-	fAppsBox->SetLabel(TR("Applications"));
-	fClockBox->SetLabel(TR("Clock"));
-	fWindowBox->SetLabel(TR("Window"));
+	fMenuBox->SetLabel(B_TRANSLATE("Menu"));
+	fAppsBox->SetLabel(B_TRANSLATE("Applications"));
+	fClockBox->SetLabel(B_TRANSLATE("Clock"));
+	fWindowBox->SetLabel(B_TRANSLATE("Window"));
 
 	BView* view;
 	view = BLayoutBuilder::Group<>()
@@ -174,7 +179,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 					.Add(fMenuRecentApplicationCount)
 					.End()
 				.End()
-			.Add(new BButton(TR("Edit menu" B_UTF8_ELLIPSIS),
+			.Add(new BButton(B_TRANSLATE("Edit menu" B_UTF8_ELLIPSIS),
 				new BMessage(kEditMenuInTracker)))
 			.SetInsets(10, 10, 10, 10)
 			.End()

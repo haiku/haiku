@@ -141,7 +141,8 @@ void
 TBeMenu::DoneBuildingItemList()
 {
 	if (fItemList->CountItems() <= 0) {
-		BMenuItem* item = new BMenuItem(TR("<Be folder is empty>"), 0);
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("<Be folder is empty>"),
+			0);
 		item->SetEnabled(false);
 		AddItem(item);
 	} else
@@ -157,8 +158,10 @@ TBeMenu::AddNextItem()
 
 	TrackingHookData* data = fBarView->GetTrackingHookData();
 	if (fAddState == kAddingRecents) {
-		static const char* recentTitle[] = {TR_MARK("Recent documents"),
-			TR_MARK("Recent folders"), TR_MARK("Recent applications")};
+		static const char* recentTitle[] = {
+			B_TRANSLATE_MARK("Recent documents"),
+			B_TRANSLATE_MARK("Recent folders"),
+			B_TRANSLATE_MARK("Recent applications")};
 		const int recentType[] = {kRecentDocuments, kRecentFolders,
 			kRecentApplications};
 		const int recentTypes = 3;
@@ -167,8 +170,8 @@ TBeMenu::AddNextItem()
 		bool enabled = false;
 
 		for (int i = 0; i < recentTypes; i++) {
-			recentItem[i] = new TRecentsMenu(TR(recentTitle[i]), fBarView,
-				recentType[i]);
+			recentItem[i] = new TRecentsMenu(B_TRANSLATE(recentTitle[i]),
+				fBarView, recentType[i]);
 
 			if (recentItem[i])
 				enabled |= recentItem[i]->RecentsEnabled();
@@ -233,65 +236,71 @@ TBeMenu::AddStandardBeMenuItems()
 	BMenuItem* item;
 	BRoster roster;
 	if (!roster.IsRunning(kTrackerSignature)) {
-		item = new BMenuItem(TR("Restart Tracker"), new BMessage(kRestartTracker));
+		item = new BMenuItem(B_TRANSLATE("Restart Tracker"),
+			new BMessage(kRestartTracker));
 		AddItem(item);
 		AddSeparatorItem();
 	}
 
-	static const char* kAboutHaikuMenuItemStr = TR_MARK(
+	static const char* kAboutHaikuMenuItemStr = B_TRANSLATE_MARK(
 		"About Haiku" B_UTF8_ELLIPSIS);
-	static const char* kAboutThisSystemMenuItemStr = TR_MARK(
+	static const char* kAboutThisSystemMenuItemStr = B_TRANSLATE_MARK(
 		"About this system" B_UTF8_ELLIPSIS);
 
 	item = new BMenuItem(
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
-	TR(kAboutHaikuMenuItemStr)
+	B_TRANSLATE(kAboutHaikuMenuItemStr)
 #else
-	TR(kAboutThisSystemMenuItemStr)
+	B_TRANSLATE(kAboutThisSystemMenuItemStr)
 #endif
 		, new BMessage(kShowSplash));
 	item->SetEnabled(!dragging);
 	AddItem(item);
 
-	static const char* kFindMenuItemStr = TR_MARK("Find" B_UTF8_ELLIPSIS);
+	static const char* kFindMenuItemStr =
+		B_TRANSLATE_MARK("Find" B_UTF8_ELLIPSIS);
 
 #ifdef SHOW_RECENT_FIND_ITEMS
 	item = new BMenuItem(
 		TrackerBuildRecentFindItemsMenu(kFindMenuItemStr),
 		new BMessage(kFindButton));
 #else
- 	item = new BMenuItem(TR(kFindMenuItemStr), new BMessage(kFindButton));
+ 	item = new BMenuItem(B_TRANSLATE(kFindMenuItemStr),
+ 		new BMessage(kFindButton));
 #endif
 	item->SetEnabled(!dragging);
 	AddItem(item);
 
-	item = new BMenuItem(TR("Show replicants"), new BMessage(kToggleDraggers));
+	item = new BMenuItem(B_TRANSLATE("Show replicants"),
+		new BMessage(kToggleDraggers));
 	item->SetEnabled(!dragging);
 	item->SetMarked(BDragger::AreDraggersDrawn());
 	AddItem(item);
 
-	static const char* kMountMenuStr = TR_MARK("Mount");
+	static const char* kMountMenuStr = B_TRANSLATE_MARK("Mount");
 
 #ifdef MOUNT_MENU_IN_DESKBAR
-	DeskbarMountMenu* mountMenu = new DeskbarMountMenu(TR(kMountMenuStr));
+	DeskbarMountMenu* mountMenu = new DeskbarMountMenu(
+		B_TRANSLATE(kMountMenuStr));
 	mountMenu->SetEnabled(!dragging);
 	AddItem(mountMenu);
 #endif
 
-	item = new BMenuItem(TR("Deskbar preferences" B_UTF8_ELLIPSIS),
+	item = new BMenuItem(B_TRANSLATE("Deskbar preferences" B_UTF8_ELLIPSIS),
 		new BMessage(kConfigShow));
  	item->SetTarget(be_app);
 	AddItem(item);
 
 	AddSeparatorItem();
 
-	BMenu* shutdownMenu = new BMenu(TR("Shutdown" B_UTF8_ELLIPSIS));
+	BMenu* shutdownMenu = new BMenu(B_TRANSLATE("Shutdown" B_UTF8_ELLIPSIS));
 
-	item = new BMenuItem(TR("Restart system"), new BMessage(kRebootSystem));
+	item = new BMenuItem(B_TRANSLATE("Restart system"),
+		new BMessage(kRebootSystem));
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 
-	static const char* kSuspendMenuItemStr = TR_MARK("Suspend");
+	static const char* kSuspendMenuItemStr = B_TRANSLATE_MARK("Suspend");
 
 #ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
@@ -301,7 +310,8 @@ TBeMenu::AddStandardBeMenuItems()
 	}
 #endif
 
-	item = new BMenuItem(TR("Power off"), new BMessage(kShutdownSystem));
+	item = new BMenuItem(B_TRANSLATE("Power off"),
+		new BMessage(kShutdownSystem));
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 	shutdownMenu->SetFont(be_plain_font);

@@ -133,8 +133,8 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 	fShelf(new TReplicantShelf(this)),
 	fMultiRowMode(vertical),
 	fMinimumTrayWidth(kMinimumTrayWidth),
-	fAlignmentSupport(false)	
-{	
+	fAlignmentSupport(false)
+{
 	// init the minimum window width according to the logo.
 	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
 		R_BeLogoIcon);
@@ -290,14 +290,14 @@ void
 TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 {
 	float width = 0, height = kMinimumTrayHeight;
-	
+
 	if (fMultiRowMode) {
 		if (fShelf->CountReplicants() > 0)
 			height = fRightBottomReplicant.bottom;
 
 		// the height will be uniform for the number of rows
 		// necessary to show all the reps + any gutters
-		// necessary for spacing	
+		// necessary for spacing
 		int32 rowCount = (int32)(height / kMaxReplicantHeight);
 		height = kGutter + (rowCount * kMaxReplicantHeight)
 			+ ((rowCount - 1) * kIconGap) + kGutter;
@@ -311,7 +311,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 				&& fRightBottomReplicant.right + 6 >= fClock->Frame().left) {
 				width = fRightBottomReplicant.right + 6
 					+ fClock->Frame().Width();
-			} else 
+			} else
 				width = fRightBottomReplicant.right + 3;
 		}
 		// this view has a fixed minimum width
@@ -333,7 +333,7 @@ TReplicantTray::AdjustPlacement()
 	BRect bounds = Bounds();
 	float width, height;
 	GetPreferredSize(&width, &height);
-	
+
 	if (width == bounds.Width() && height == bounds.Height()) {
 		// no need to change anything
 		return;
@@ -353,13 +353,13 @@ return;
 	rgb_color menuColor = ViewColor();
 	rgb_color vdark = tint_color(menuColor, B_DARKEN_3_TINT);
 	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
-	
+
 	BRect frame(Bounds());
 
 	SetHighColor(light);
 	StrokeLine(frame.LeftBottom(), frame.RightBottom());
 	StrokeLine(frame.RightBottom(), frame.RightTop());
-	
+
 	SetHighColor(vdark);
 	StrokeLine(frame.RightTop(), frame.LeftTop());
 	StrokeLine(frame.LeftTop(), frame.LeftBottom());
@@ -418,11 +418,12 @@ TReplicantTray::ShowReplicantMenu(BPoint point)
 	if (fBarView->ShowingClock())
 		fClock->ShowClockOptions(ConvertToScreen(point));
 	else {
-		BMenuItem* item = new BMenuItem(TR("Show Time"), new BMessage('time'));
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("Show Time"),
+			new BMessage('time'));
 		menu->AddItem(item);
 		menu->SetTargetForItems(this);
 		BPoint where = ConvertToScreen(point);
-		menu->Go(where, true, true, BRect(where - BPoint(4, 4), 
+		menu->Go(where, true, true, BRect(where - BPoint(4, 4),
 			where + BPoint(4, 4)), true);
 	}
 }
@@ -432,7 +433,7 @@ void
 TReplicantTray::MouseDown(BPoint where)
 {
 #ifdef DB_ADDONS
-	if (modifiers() & B_CONTROL_KEY) 
+	if (modifiers() & B_CONTROL_KEY)
 		DumpList(fItemList);
 #endif
 
@@ -466,7 +467,7 @@ TReplicantTray::MouseDown(BPoint where)
 	BView::MouseDown(where);
 }
 
-#ifdef DB_ADDONS		
+#ifdef DB_ADDONS
 
 void
 TReplicantTray::InitAddOnSupport()
@@ -526,7 +527,7 @@ TReplicantTray::DeleteAddOnSupport()
 		if (item) {
 			if (item->isAddOn)
 				watch_node(&(item->nodeRef), B_STOP_WATCHING, this, Window());
-			
+
 			delete item;
 		}
 	}
@@ -646,7 +647,7 @@ TReplicantTray::HandleEntryUpdate(BMessage* message)
 				// that we expect
 				if (IsAddOn(ref)) {
 					int32 id;
-					BEntry entry(&ref);					
+					BEntry entry(&ref);
 					LoadAddOn(&entry, &id);
 				}
 			}
@@ -750,10 +751,10 @@ TReplicantTray::HandleEntryUpdate(BMessage* message)
 			if (message->FindInt32("device", &device) != B_OK)
 				break;
 
-			UnloadAddOn(NULL, &device, false, true);	
+			UnloadAddOn(NULL, &device, false, true);
 			break;
 		}
-	}	
+	}
 }
 
 
@@ -800,7 +801,7 @@ TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool force)
 	if (image < B_OK)
 		return image;
 
-	// get the view loading function symbol		
+	// get the view loading function symbol
 	//    we first look for a symbol that takes an image_id
 	//    and entry_ref pointer, if not found, go with normal
 	//    instantiate function
@@ -864,7 +865,7 @@ TReplicantTray::AddItem(int32 id, node_ref nodeRef, BEntry& entry, bool isAddOn)
 	if (isAddOn)
 		watch_node(&nodeRef, B_WATCH_NAME | B_WATCH_ATTR, this, Window());
 
-	return B_OK;		
+	return B_OK;
 }
 
 
@@ -883,7 +884,7 @@ TReplicantTray::UnloadAddOn(node_ref* nodeRef, dev_t* device,
 
 		if ((which && nodeRef && item->nodeRef == *nodeRef)
 			|| (device && item->nodeRef.device == *device)) {
-			
+
 			if (device && be_roster->IsRunning(&item->entryRef))
 				continue;
 
@@ -911,14 +912,14 @@ TReplicantTray::RemoveItem(int32 id)
 	}
 
 	fItemList->RemoveItem(item);
-	delete item;			
+	delete item;
 }
 
 
 /**	ENTRY_MOVED message, moving only occurs on a device
  *	copying will occur (ENTRY_CREATED) between devices
  */
-	
+
 void
 TReplicantTray::MoveItem(entry_ref* ref, ino_t toDirectory)
 {
@@ -984,12 +985,12 @@ TReplicantTray::ItemInfo(const char* name, int32* id)
 {
 	if (!name || strlen(name) <= 0)
 		return B_ERROR;
-		
+
 	int32 index;
 	BView* view = ViewAt(&index, id, name);
 	if (view)
 		return B_OK;
-	
+
 	return B_ERROR;
 }
 
@@ -1003,14 +1004,14 @@ TReplicantTray::ItemInfo(int32 index, const char** name, int32* id)
 {
 	if (index < 0)
 		return B_ERROR;
-		
+
 	BView* view;
 	fShelf->ReplicantAt(index, &view, (uint32*)id, NULL);
 	if (view) {
 		*name = view->Name();
 		return B_OK;
 	}
-	
+
 	return B_ERROR;
 }
 
@@ -1022,7 +1023,7 @@ TReplicantTray::IconExists(int32 target, bool byIndex)
 {
 	int32 index, id;
 	BView* view = ViewAt(&index, &id, target, byIndex);
-		
+
 	return view && index >= 0;
 }
 
@@ -1034,10 +1035,10 @@ TReplicantTray::IconExists(const char* name)
 {
 	if (!name || strlen(name) == 0)
 		return false;
-		
+
 	int32 index, id;
 	BView* view = ViewAt(&index, &id, name);
-	
+
 	return view && index >= 0;
 }
 
@@ -1115,7 +1116,7 @@ TReplicantTray::AddIcon(BMessage* archive, int32* id, const entry_ref* addOn)
 
 	if (originalBounds != view->Bounds()) {
 		// The replicant changed its size when added to the window, so we need
-		// to recompute all over again (it's already done once via 
+		// to recompute all over again (it's already done once via
 		// BShelf::AddReplicant() and TReplicantShelf::CanAcceptReplicantView())
 		RealignReplicants();
 	}
@@ -1139,7 +1140,7 @@ TReplicantTray::RemoveIcon(int32 target, bool byIndex)
 {
 	if (target < 0)
 		return;
-	
+
 	int32 index, id;
 	BView* view = ViewAt(&index, &id, target, byIndex);
 	if (view && index >= 0) {
@@ -1158,7 +1159,7 @@ TReplicantTray::RemoveIcon(const char* name)
 {
 	if (!name || strlen(name) <= 0)
 		return;
-	
+
 	int32 id, index;
 	BView* view = ViewAt(&index, &id, name);
 	if (view && index >= 0) {
@@ -1204,7 +1205,7 @@ BView*
 TReplicantTray::ViewAt(int32* index, int32* id, int32 target, bool byIndex)
 {
 	*index = -1;
-	
+
 	BView* view;
 	if (byIndex) {
 		if (fShelf->ReplicantAt(target, &view, (uint32*)id)) {
@@ -1225,7 +1226,7 @@ TReplicantTray::ViewAt(int32* index, int32* id, int32 target, bool byIndex)
 			}
 		}
 	}
-	
+
 	return NULL;
 }
 
@@ -1239,7 +1240,7 @@ TReplicantTray::ViewAt(int32* index, int32* id, const char* name)
 {
 	*index = -1;
 	*id = -1;
-	
+
 	BView* view;
 	int32 count = fShelf->CountReplicants()-1;
 	for (int32 repIndex = count ; repIndex >= 0 ; repIndex--) {
@@ -1249,7 +1250,7 @@ TReplicantTray::ViewAt(int32* index, int32* id, const char* name)
 			return view;
 		}
 	}
-	
+
 	return NULL;
 }
 
@@ -1449,9 +1450,9 @@ TDragRegion::GetPreferredSize(float* width, float* height)
 {
 	fChild->ResizeToPreferred();
 	*width = fChild->Bounds().Width();
-	*height = fChild->Bounds().Height();	
-	
-	if (fDragLocation != kNoDragRegion) 
+	*height = fChild->Bounds().Height();
+
+	if (fDragLocation != kNoDragRegion)
 		*width += 7;
 	else
 		*width += 6;
@@ -1471,7 +1472,7 @@ TDragRegion::FrameMoved(BPoint)
 }
 
 
-void 
+void
 TDragRegion::Draw(BRect)
 {
 	rgb_color menuColor = ViewColor();
@@ -1481,7 +1482,7 @@ TDragRegion::Draw(BRect)
 	rgb_color vdark = tint_color(menuColor, B_DARKEN_3_TINT);
 	rgb_color vvdark = tint_color(menuColor, B_DARKEN_4_TINT);
 	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
-	
+
 	BRect frame(Bounds());
 	BeginLineArray(4);
 
@@ -1516,7 +1517,7 @@ TDragRegion::Draw(BRect)
 				BPoint(frame.right - 1, frame.bottom), hilite);
 		} else if (fBarView->AcrossBottom()) {
 			AddLine(BPoint(frame.left, frame.top + 1),
-				BPoint(frame.right - 1, frame.top + 1), light);		
+				BPoint(frame.right - 1, frame.top + 1), light);
 			AddLine(frame.LeftBottom(), frame.RightBottom(), hilite);
 			AddLine(frame.RightTop(), frame.RightBottom(), vvdark);
 			AddLine(BPoint(frame.right - 1, frame.top + 1),
@@ -1525,7 +1526,7 @@ TDragRegion::Draw(BRect)
 	}
 
 	EndLineArray();
-	
+
 	if (fDragLocation != kDontDrawDragRegion || fDragLocation != kNoDragRegion)
 		DrawDragRegion();
 }
@@ -1533,7 +1534,7 @@ TDragRegion::Draw(BRect)
 
 void
 TDragRegion::DrawDragRegion()
-{	
+{
 	BRect dragRegion(DragRegion());
 
 	rgb_color menuColor = ViewColor();
@@ -1551,11 +1552,11 @@ TDragRegion::DrawDragRegion()
 	BPoint pt;
 	pt.x = floorf((dragRegion.left + dragRegion.right) / 2 + 0.5) - 1;
 	pt.y = dragRegion.top + 2;
-	
+
 	while (pt.y + 1 <= dragRegion.bottom) {
 		AddLine(pt, pt, vdark);
 		AddLine(pt + BPoint(1, 1), pt + BPoint(1, 1), light);
-		
+
 		pt.y += 3;
 	}
 	EndLineArray();
@@ -1588,7 +1589,7 @@ TDragRegion::DragRegion() const
 		placeOnLeft = true;
 	else if (fDragLocation == kDragRegionRight)
 		placeOnLeft = false;
-	
+
 	if (placeOnLeft) {
 		dragRegion.left += kLeftRightInset;
 		dragRegion.right = dragRegion.left + kDragWidth;
@@ -1596,12 +1597,12 @@ TDragRegion::DragRegion() const
 		dragRegion.right -= kLeftRightInset;
 		dragRegion.left = dragRegion.right - kDragWidth;
 	}
-	
+
 	return dragRegion;
 }
 
 
-void 
+void
 TDragRegion::MouseDown(BPoint thePoint)
 {
 	ulong buttons;
@@ -1633,7 +1634,7 @@ TDragRegion::MouseDown(BPoint thePoint)
 }
 
 
-void 
+void
 TDragRegion::MouseUp(BPoint pt)
 {
 	if (IsTracking()) {
@@ -1644,8 +1645,8 @@ TDragRegion::MouseUp(BPoint pt)
 }
 
 
-bool 
-TDragRegion::SwitchModeForRect(BPoint mouse, BRect rect, 
+bool
+TDragRegion::SwitchModeForRect(BPoint mouse, BRect rect,
 	bool newVertical, bool newLeft, bool newTop, int32 newState)
 {
 	if (!rect.Contains(mouse))
@@ -1664,7 +1665,7 @@ TDragRegion::SwitchModeForRect(BPoint mouse, BRect rect,
 }
 
 
-void 
+void
 TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 {
 	if (IsTracking()) {
@@ -1678,7 +1679,7 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 		float vDivider = frame.Height() / 2;
 #ifdef FULL_MODE
 		float thirdScreen = frame.Height() / 3;
-#endif		
+#endif
 		BRect topLeft(frame.left, frame.top, frame.left + hDivider,
 			miniDivider);
 		BRect topMiddle(frame.left + hDivider, frame.top, frame.right
@@ -1701,7 +1702,7 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			frame.bottom - thirdScreen);
 
 		vDivider = frame.bottom - thirdScreen;
-#endif		
+#endif
 		BRect bottomLeft(frame.left, vDivider, frame.left + hDivider,
 			frame.bottom);
 		BRect bottomMiddle(frame.left + hDivider, vDivider, frame.right
@@ -1746,7 +1747,7 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 int32
 TDragRegion::DragRegionLocation() const
 {
-	return fDragLocation;	
+	return fDragLocation;
 }
 
 
@@ -1755,7 +1756,7 @@ TDragRegion::SetDragRegionLocation(int32 location)
 {
 	if (location == fDragLocation)
 		return;
-		
+
 	fDragLocation = location;
 	Invalidate();
 }

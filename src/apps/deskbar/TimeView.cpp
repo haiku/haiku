@@ -563,14 +563,14 @@ TTimeView::ShowClockOptions(BPoint point)
 	menu->SetFont(be_plain_font);
 	BMenuItem* item;
 
-	item = new BMenuItem(TR("Change time" B_UTF8_ELLIPSIS),
+	item = new BMenuItem(B_TRANSLATE("Change time" B_UTF8_ELLIPSIS),
 		new BMessage(kChangeClock));
 	menu->AddItem(item);
 
-	item = new BMenuItem(TR("Hide time"), new BMessage('time'));
+	item = new BMenuItem(B_TRANSLATE("Hide time"), new BMessage('time'));
 	menu->AddItem(item);
 
-	item = new BMenuItem(TR("Show calendar" B_UTF8_ELLIPSIS),
+	item = new BMenuItem(B_TRANSLATE("Show calendar" B_UTF8_ELLIPSIS),
 		new BMessage(kShowCalendar));
 	menu->AddItem(item);
 
